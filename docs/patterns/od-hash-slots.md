@@ -53,6 +53,37 @@ dummy local) Init, byte-identical.
 
 ## note
 This is the dominant /Od matching cost: instruction selection is otherwise very
-literal and easy to hit. Any multi-local function will need a name search. A
-worthwhile infra investment is reversing the exact MSVC 4.2 identifier hash so
-names can be *computed* rather than brute-forced (see report).
+literal and easy to hit. Any multi-local function will need a name search.
+
+## SOLVED — the exact hash (no more brute force)
+Reverse-engineered from the toolchain itself (read, not guessed): the identifier
+lexer in **C1XX.EXE `FUN_0041d1a2`** computes, as it scans each identifier:
+
+```c
+unsigned h = 0;
+for (char *p = ident; isidchar(*p); p++)        // class table DAT_004b41c0[c] & 0x10
+    h = (h >> 4) + h*4 + (unsigned char)*p;     // SHR 4 ; LEA +EBP*4 ; LEA +char
+unsigned key = (h ^ (h >> 16)) & 0xffff;        // 16-bit fold, stored in name record +0x8
+```
+
+The back end (**C2.EXE `FUN_0044bb5e`/`FUN_0044c4df`**) keeps a 16-bucket per-scope
+table; a local lands in `bucket = key & 0xF` and is **head-inserted (LIFO)**. The
+frame layout walks bucket 0..15, each chain newest-first → slot order is
+
+```
+sort locals by (bucket ascending, declaration index DESCENDING)
+```
+
+The `>>16` fold only bites once `h >= 2^16` (~5+ chars), which is why naive
+rolling-hash guesses fit short names but not long ones. Verified byte-exact vs the
+retail compiler on 146 single-name buckets and 40 random multi-name layouts.
+
+**Use `tools/od_slots.py`** — pure function, no compiler in the loop:
+`bucket(name)`, `slot_order(decl_names)`, `predict_offsets()`, `solve(n)`, and
+`solve_layout(slots)` (name a target layout from a role/candidate list). This
+replaces the per-function wine-`cl` name search entirely;
+`tools/od_oracle.py` verifies against the real compiler.
+
+**Full model** — including the per-scope 16-bucket tables, the VC4.2 old-for-scope
+quirk, no-slot-reuse, and the multi-scope layout algorithm — is documented in
+**[../od-stack-layout.md](../od-stack-layout.md)**.
