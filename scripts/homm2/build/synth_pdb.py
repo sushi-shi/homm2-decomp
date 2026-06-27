@@ -55,7 +55,7 @@ def read_csv(path):
 
 def main(argv=None):
     ap = argparse.ArgumentParser()
-    ap.add_argument("--exe", default=os.environ.get("HOMM2_EXE", str(REPO / "orig/HEROES2W.EXE")))
+    ap.add_argument("--exe", default=os.environ.get("HOMM2_EXE", str(REPO / "build/orig/HEROES2W.EXE")))
     ap.add_argument("--csv", default=str(REPO / "build/gen/symbol_names.csv"))
     ap.add_argument("--out", default=str(REPO / "build/pdb/HEROES2W.pdb"))
     a = ap.parse_args(argv)
