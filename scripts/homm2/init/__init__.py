@@ -26,5 +26,8 @@ def main(argv=None):
            "--output-path", "build/delink", "--engine-path", "c:\\proj\\"): return 1
     # 5. configure the base build + objdiff project
     if run("python3", "configure.py"): return 1
+    # 6. generate the clangd compile DB (editor tooling: resolves <va.h> + MSVC headers)
+    if run("python3", "-m", "homm2.init.clangd"):
+        print("[init] WARN: clangd DB step failed (editor-only; build is unaffected)")
     print("[init] done. Next: `homm2 build`")
     return 0
