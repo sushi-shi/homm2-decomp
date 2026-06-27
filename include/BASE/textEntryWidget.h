@@ -1,4 +1,5 @@
-#pragma once
+#ifndef HOMM2_BASE_TEXTENTRYWIDGET_H
+#define HOMM2_BASE_TEXTENTRYWIDGET_H
 // Reconstructed class (BASE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // 8 methods, 2 own-virtual, 0 static data.
 #include "../_macros.h"
@@ -19,3 +20,4 @@ public:
     void Read(int);
     void SetupDisplayString(char *, unsigned short int);
 };
+#endif // HOMM2_BASE_TEXTENTRYWIDGET_H

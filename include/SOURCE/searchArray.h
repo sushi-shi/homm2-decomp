@@ -1,4 +1,5 @@
-#pragma once
+#ifndef HOMM2_SOURCE_SEARCHARRAY_H
+#define HOMM2_SOURCE_SEARCHARRAY_H
 // Reconstructed class (SOURCE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // 13 methods, 0 own-virtual, 0 static data.
 #include "../_macros.h"
@@ -23,3 +24,4 @@ public:
     int FindCombatPath(int, int, class army *, int, int);
     void PushCombatPoint(int, int, int, int);
 };
+#endif // HOMM2_SOURCE_SEARCHARRAY_H

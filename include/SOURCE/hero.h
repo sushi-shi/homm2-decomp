@@ -1,4 +1,5 @@
-#pragma once
+#ifndef HOMM2_SOURCE_HERO_H
+#define HOMM2_SOURCE_HERO_H
 // Reconstructed class (SOURCE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // 34 methods, 0 own-virtual, 0 static data.
 #include "../_macros.h"
@@ -44,3 +45,4 @@ public:
     void DoSSLevelDialog(int, int);
     void CheckAnduranPieces(int);
 };
+#endif // HOMM2_SOURCE_HERO_H

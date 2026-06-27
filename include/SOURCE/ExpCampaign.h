@@ -1,4 +1,5 @@
-#pragma once
+#ifndef HOMM2_SOURCE_EXPCAMPAIGN_H
+#define HOMM2_SOURCE_EXPCAMPAIGN_H
 // Reconstructed class (SOURCE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // 36 methods, 0 own-virtual, 0 static data.
 #include "../_macros.h"
@@ -46,3 +47,4 @@ public:
     signed char IsSpecialUA(void);
     signed char IsSpecialLossCondition(int);
 };
+#endif // HOMM2_SOURCE_EXPCAMPAIGN_H

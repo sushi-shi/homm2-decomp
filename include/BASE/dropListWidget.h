@@ -1,4 +1,5 @@
-#pragma once
+#ifndef HOMM2_BASE_DROPLISTWIDGET_H
+#define HOMM2_BASE_DROPLISTWIDGET_H
 // Reconstructed class (BASE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // 11 methods, 2 own-virtual, 0 static data.
 #include "../_macros.h"
@@ -22,3 +23,4 @@ public:
     void RestoreDropBackground(void);
     void ProcessSelectDialog(void);
 };
+#endif // HOMM2_BASE_DROPLISTWIDGET_H

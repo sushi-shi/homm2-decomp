@@ -1,4 +1,5 @@
-#pragma once
+#ifndef HOMM2_SOURCE_ADVMANAGER_H
+#define HOMM2_SOURCE_ADVMANAGER_H
 // Reconstructed class (SOURCE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // 139 methods, 3 own-virtual, 0 static data.
 #include "../_macros.h"
@@ -157,3 +158,4 @@ public:
     void ReceiveHeroTownData(char *, int *, int *, int *, class hero * *, class armyGroup * *, class town * *, class hero * *, class armyGroup * *, int *, int *, int *, signed char *, signed char *, signed char *);
     int AutoResolveCombat(int, int, class hero *, class armyGroup *, class town *, class hero *, class armyGroup *, int, int, int, int);
 };
+#endif // HOMM2_SOURCE_ADVMANAGER_H

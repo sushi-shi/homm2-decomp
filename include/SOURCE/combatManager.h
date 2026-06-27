@@ -1,4 +1,5 @@
-#pragma once
+#ifndef HOMM2_SOURCE_COMBATMANAGER_H
+#define HOMM2_SOURCE_COMBATMANAGER_H
 // Reconstructed class (SOURCE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // 149 methods, 3 own-virtual, 0 static data.
 #include "../_macros.h"
@@ -168,3 +169,4 @@ public:
     int WalkTowardArmyFront(class army *, int, int);
     int WalkTowardArmy(class army *, int, int);
 };
+#endif // HOMM2_SOURCE_COMBATMANAGER_H

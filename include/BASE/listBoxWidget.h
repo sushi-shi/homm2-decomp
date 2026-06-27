@@ -1,4 +1,5 @@
-#pragma once
+#ifndef HOMM2_BASE_LISTBOXWIDGET_H
+#define HOMM2_BASE_LISTBOXWIDGET_H
 // Reconstructed class (BASE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // 9 methods, 2 own-virtual, 0 static data.
 #include "../_macros.h"
@@ -20,3 +21,4 @@ public:
     void DrawLBStuff(int);
     int ProcessMouseMessage(struct tag_message &);
 };
+#endif // HOMM2_BASE_LISTBOXWIDGET_H

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef HOMM2_SOURCE_GAME_H
+#define HOMM2_SOURCE_GAME_H
 // Reconstructed class (SOURCE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // 114 methods, 0 own-virtual, 0 static data.
 #include "../_macros.h"
@@ -131,3 +132,4 @@ public:
     void GetVictoryConditionText(char *);
     int GetSideDesc(char *, int, int);
 };
+#endif // HOMM2_SOURCE_GAME_H
