@@ -215,6 +215,17 @@ mapCellExtra *fullMap::GetNewCellExtraObject(int x, int y)
 // /Od slots are MSVC symbol-hash order: retail frame is idx@-4, ptr@-8, t@-c, with
 // one reserved unused local @-10 (this spills to -0x14). Names chosen so their
 // buckets (0,1,4,6) sort into that order. The 7th param is unused in retail.
+//
+// NEEDS /G5: the four objTileset/ovlTileset bitfield READS lower in retail to
+// `movb; shrb; andw $mask; andl $0xffff` — the unsigned-bitfield->int zero-extend
+// idiom that MSVC 4.2 emits only under /G5 (Pentium). Under the build's /Gr-only
+// flags they instead become `andb; xor; movb` (4 sites mismatch). Compiling this
+// TU with /G5 makes them byte-exact AND leaves the 7 already-exact functions
+// byte-identical (verified). Two residuals survive even with /G5: the /Od leading
+// `jmp`-to-next at each chain-loop head (documented block-jmp wall,
+// docs/patterns/od-cell-access-and-block-jmps.md) and the cell-reset objTileset
+// write operand-order (t-first vs field-first; an /Od schedule driven by t's
+// liveness across both branches).
 VA(0x0040ba6f, 0x2ea)
 void fullMap::ChangeTilesetIndex(mapCell *cell, int x, int y, int tileset, int index, int overlay, int)
 {

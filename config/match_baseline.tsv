@@ -430,7 +430,7 @@ BASE/soundmgr	?ValidatePreviousPosition@soundManager@@QAEXH@Z	0.0000
 BASE/soundmgr	?WAVE_init_driver@@YIPAU_DIG_DRIVER@@KGGG@Z	0.0000
 EDITOR/mapcell	??0fullMap@@QAE@XZ	100.0000
 EDITOR/mapcell	??1fullMap@@QAE@XZ	100.0000
-EDITOR/mapcell	?ChangeTilesetIndex@fullMap@@QAEXPAVmapCell@@HHHHHH@Z	0.0000
+EDITOR/mapcell	?ChangeTilesetIndex@fullMap@@QAEXPAVmapCell@@HHHHHH@Z	96.4434
 EDITOR/mapcell	?ClearCellExtra@fullMap@@QAEXH@Z	100.0000
 EDITOR/mapcell	?Close@fullMap@@QAEXXZ	100.0000
 EDITOR/mapcell	?GetNewCellExtraIndex@fullMap@@QAEHXZ	100.0000
