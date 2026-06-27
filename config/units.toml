@@ -230,6 +230,11 @@ source = "src/BASE/soundmgr.cpp"
 flags = "base"
 
 [[unit]]
+unit = "EDITOR/mapcell"
+source = "src/EDITOR/mapcell.cpp"
+flags = "base"
+
+[[unit]]
 unit = "SOURCE/ADVMGR"
 source = "src/SOURCE/ADVMGR.cpp"
 flags = "base"
@@ -452,11 +457,6 @@ flags = "base"
 [[unit]]
 unit = "SOURCE/kbwin"
 source = "src/SOURCE/kbwin.cpp"
-flags = "base"
-
-[[unit]]
-unit = "SOURCE/mapcell"
-source = "src/EDITOR/mapcell.cpp"
 flags = "base"
 
 [[unit]]
