@@ -183,8 +183,9 @@ with open(os.path.join(REPO,"config","units.toml"),"w") as f:
     # The retail build is a DEBUG build: /Od (unoptimized - full ebp frames, locals
     # round-tripped through the stack) + /Gr (__fastcall default; 458 free fns mangle
     # @@YI vs 6 cdecl) + /MT (static LIBCMT). Verified vs retail disassembly.
-    f.write('base = ["/nologo", "/c", "/Od", "/MT", "/Gr"]\n')
-    f.write('eh   = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/GX"]\n\n')
+    # One profile: the whole binary is a uniform /Od debug build with no C++ EH
+    # (no __CxxFrameHandler/throws) and no /O2 TUs - so every unit is `base`.
+    f.write('base = ["/nologo", "/c", "/Od", "/MT", "/Gr"]\n\n')
     for st,src in units:
         f.write(f'[[unit]]\nunit = "{st}"\nsource = "{src}"\nflags = "base"\n\n')
 

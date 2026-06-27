@@ -14,3 +14,10 @@ The retail PoL HEROES2W.EXE is a **DEBUG build** (it ships a CodeView NB09 strea
 
 Implication: matching is MUCH easier than an /O2 decomp - each statement lowers
 mechanically; there is no regalloc/scheduling/inlining to fight.
+
+## C++ exceptions: NONE
+
+No `__CxxFrameHandler` / `_CxxThrowException` / `__EH_prolog` anywhere in the game
+code (the 1 `_except_handler` is the CRT entry-point SEH wrapper; the 15 `??_E` are
+vector deleting destructors from `delete[]`, not EH). So **no `/GX`**, and zero EH
+unwind funclets to match - there is a single flag profile, `base`.
