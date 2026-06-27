@@ -115,9 +115,9 @@ for tier in ("BASE","SOURCE","EDITOR"):
             if fn.lower().endswith((".cpp",".c")): srcfiles[fn.rsplit(".",1)[0].lower()]=f"src/{tier}/{fn}"
 
 # ---- emit symbol_names.csv ----
-os.makedirs(os.path.join(REPO,"config"),exist_ok=True)
+os.makedirs(os.path.join(REPO,"build","gen"),exist_ok=True); os.makedirs(os.path.join(REPO,"config"),exist_ok=True)
 n_func=n_data=0
-with open(os.path.join(REPO,"config","symbol_names.csv"),"w") as f:
+with open(os.path.join(REPO,"build","gen","symbol_names.csv"),"w") as f:
     f.write("rva,name,unit,size,kind\n")
     for va,raw in pubs:
         im=which(va); unit=stem_of(modname.get(im,"")) if im is not None else "unknown"
