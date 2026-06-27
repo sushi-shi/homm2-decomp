@@ -7,7 +7,6 @@ platform = "win32"
 
 [flags]
 base = ["/nologo", "/c", "/Od", "/MT", "/Gr"]   # DEBUG build: /Od + /Gr(fastcall) + /MT(LIBCMT)
-eh   = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/GX"]
 
 [[unit]]
 unit = "BASE/BASEMGR"
