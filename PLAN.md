@@ -152,6 +152,24 @@ names). Adapt the matcher loop: skip "pull Ghidra decomp / identify"; go straigh
 `h2 build` → objdiff → iterate. Keep STOP-EARLY, worktree pool, serial integration, the
 RVA-order + zero-padded-address conventions.
 
+## Phase 0 status (implemented, single-threaded)
+
+- ✅ **Compiler pinned: VC++ 4.2** (`docs/compiler-detection.md`).
+- ✅ **Toolchain provisioned** from `en_vc42ent` disc1 → `build/toolchain/msvc/{bin,include,lib}`
+  (CL/C1/C1XX/C2/LINK/CVTRES/MSPDB41 + 393 SDK headers + the full `C:\MSDEV\LIB` libset).
+- ✅ **Manifest from CodeView** (`tools/gen_manifest.py`): `config/units.toml` (95 units) +
+  `build/gen/symbol_names.csv` (2092 funcs + 1449 named data + **6413 harvested `.reloc`
+  constants** so vostok is happy).
+- ✅ **TARGET side proven**: `synth_pdb` (CSV → valid PDB) → `vostok-delinker` → **236 per-unit
+  COFF target objects**. The CodeView→PDB→delink path works end-to-end, one-time.
+- ✅ **BASE side proven**: VC4.2 `cl.exe /c /O2 /MT` runs under wine → valid i386 COFF.
+- ✅ flake (default+build shells), `rva.h`/`Ints.h`, `.clangd`, `.clang-format`, git repo, commits.
+
+**Remaining glue to "one TU green":** `configure.py` (units.toml → `build.ninja` + `objdiff.json`),
+`cc_wrap` (compile `src/<unit>.cpp` with INCLUDE/LIB set), `objdiff` (base vs target → %), and the
+`homm2 init`/`build` CLI wiring. Then the rest of the carcass (match/status, README, work queue,
+CLAUDE.md+agents, nvim, docs).
+
 ## Execution phasing
 
 1. **Phase 0 (me, now → on your approval):** B0–B4 — provision the toolchain, scaffold the
