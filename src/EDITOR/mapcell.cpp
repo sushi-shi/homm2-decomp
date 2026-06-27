@@ -46,6 +46,7 @@ void fullMap::Close(void)
 RVA(0x0040b145, 0x53)
 void fullMap::Init(int w, int h)
 {
+    int n;  // retail reserves one unused /Od slot at -0x4 (this spills to -0x8)
     width = w;
     height = h;
     Close();
@@ -71,20 +72,23 @@ void fullMap::ClearCellExtra(int index)
 RVA(0x0040b266, 0x130)
 int fullMap::GetNewCellExtraIndex(void)
 {
-    int i;
-    mapCellExtra *nb;
-    int j;
+    // NOTE: /Od stack-slot order is MSVC symbol-HASH order, not declaration order.
+    // The retail frame is loop1@-4, newbuf@-8, loop2@-c; names are chosen so their
+    // hashes sort in that order (hash(nb) < hash(i) < hash(j)). See docs/patterns/od-hash-slots.md.
+    int nb;            // loop1 counter  -> -0x4
+    mapCellExtra *i;   // grown buffer   -> -0x8
+    int j;             // loop2 counter  -> -0xc
 
-    for (i = 1; i < extraCount; i++) {
-        if (extras[i].index == 0xFFFF) {
-            ClearCellExtra(i);
-            return i;
+    for (nb = 1; nb < extraCount; nb++) {
+        if (extras[nb].index == 0xFFFF) {
+            ClearCellExtra(nb);
+            return nb;
         }
     }
-    nb = (mapCellExtra *)operator new((extraCount + 100) * sizeof(mapCellExtra));
-    memcpy(nb, extras, extraCount * sizeof(mapCellExtra));
+    i = (mapCellExtra *)operator new((extraCount + 100) * sizeof(mapCellExtra));
+    memcpy(i, extras, extraCount * sizeof(mapCellExtra));
     delete extras;
-    extras = nb;
+    extras = i;
     for (j = extraCount; j < extraCount + 100; j++)
         extras[j].index = 0xFFFF;
     extraCount += 100;
@@ -105,10 +109,12 @@ void fullMap::Write(int handle)
 RVA(0x0040b7da, 0x295)
 void fullMap::Read(int handle, int convert)
 {
-    int k;
-    oldMapCell *tmp;
-    int x, y;
-    oldMapCellExtra *tmp2;
+    // /Od slots are MSVC symbol-hash order: retail frame is
+    //   extraLoop@-4, oldCells@-8, x@-c, y@-10, oldExtras@-14.
+    int nb;                 // extras-convert loop counter -> -0x4
+    oldMapCell *tmp;        // legacy cell scratch buffer  -> -0x8
+    int x, y;               // cell convert loops          -> -0xc / -0x10
+    oldMapCellExtra *tmp2;  // legacy extra scratch buffer -> -0x14
 
     _read(handle, &width, sizeof(width));
     _read(handle, &height, sizeof(height));
@@ -130,8 +136,8 @@ void fullMap::Read(int handle, int convert)
     if (convert) {
         tmp2 = (oldMapCellExtra *)operator new(extraCount * sizeof(oldMapCellExtra));
         _read(handle, tmp2, extraCount * sizeof(oldMapCellExtra));
-        for (k = 0; k < extraCount; k++)
-            memcpy(extras + k, tmp2 + k, sizeof(mapCellExtra));
+        for (nb = 0; nb < extraCount; nb++)
+            memcpy(extras + nb, tmp2 + nb, sizeof(mapCellExtra));
         delete tmp2;
     } else {
         _read(handle, extras, extraCount * sizeof(mapCellExtra));
