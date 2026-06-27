@@ -6,7 +6,8 @@ compiler = "msvc4.2"
 platform = "win32"
 
 [flags]
-base = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5"]
+base = ["/nologo", "/c", "/Od", "/MT", "/Gr"]
+g5 = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5"]
 
 [[unit]]
 unit = "BASE/BASEMGR"
@@ -231,7 +232,7 @@ flags = "base"
 [[unit]]
 unit = "EDITOR/mapcell"
 source = "src/EDITOR/mapcell.cpp"
-flags = "base"
+flags = "g5"
 
 [[unit]]
 unit = "SOURCE/ADVMGR"
