@@ -40,7 +40,24 @@ trades 4 calls for 4 `jmp $+0`, exactly the retail shape.
    giving the wrong `0xa(%eax,%ecx)` (no scale). Pick the form that reproduces the
    retail addressing mode, not just the right value.
 
+## counting & placing the jumps (this is NOT a wall)
+The `jmp $+0` are understood, not mysterious — use them as a checksum:
+- **Count first.** Roughly **one `jmp $+0` per inlined call site** in a region (plus
+  one per branch landing-pad: function entry, `jne`-target). If your count is SHORT,
+  you're missing an inline call (you hand-inlined it, or skipped an accessor) — add
+  it. `llvm-objdump -d <obj> | grep -c "e9 00 00 00 00"` both sides.
+- **Don't be fooled by the alignment `nop`s.** The delinked target carries trailing
+  `nop` padding (`90`); objdiff IGNORES it for scoring (100%-matched functions have
+  them too), so it is never the blocker — don't chase it.
+- **Then placement.** Once counts match, the only residual is the LEADING-vs-TRAILING
+  position of a given inline bracket (e.g. a `cell = &Row(y)[x]` assignment brackets
+  *after* the store in retail but *before* the body in our build). This is an opaque
+  C2.EXE block-layout choice; it resisted every accessor/statement-shape variant
+  tried. If that is genuinely all that is left, it is a thin **`@early-stop`** reason
+  — but verify with displacements-on diffing first (see od-hash-slots.md): a wrong
+  slot can masquerade as "just jmps" behind the fuzzy.
+
 On mapcell this lifted `GetNewCellExtra{Object,Overlay}` from a structurally-capped
-~91% to ~97% (addressing exact; residual is the precise `jmp $+0` placement, i.e. the
-exact accessor decomposition the original used), and `/Ob1` alone lifted the untouched
+~91% to ~97% (addressing exact, jmp$+0 count 10/10, frame slots fixed via od_slots);
+the only residual is ~1 inline-bracket placement. `/Ob1` alone lifted the untouched
 `ChangeTilesetIndex` 96→99%.
