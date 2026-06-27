@@ -114,19 +114,21 @@ allva=sorted(set(v for v,_ in pubs))
 def dsize(va):  # data extent = gap to next symbol (best effort)
     i=bisect.bisect_right(allva,va); return (allva[i]-va) if i<len(allva) else 4
 
-# ---- tier placement (basewin.lib=BASE, directly-linked=SOURCE, assert=tier) ----
-assert_dir={}
-if srcpaths and os.path.exists(srcpaths):
-    for line in open(srcpaths):
-        line=line.strip().lower().replace("/","\\")
-        if "\\" in line: sub,fn=line.rsplit("\\",1); assert_dir[fn]=sub.upper()
+# ---- tier placement: the committed src/<TIER>/ tree IS the tier map (every
+# reconstruction compiland has a src/<TIER>/<stem>.cpp). lib-based fallback for any
+# compiland that has no src file yet (basewin.lib -> BASE; directly-linked -> SOURCE).
+src_tier={}
+for _t in ("BASE","SOURCE","EDITOR"):
+    _dd=os.path.join(REPO,"src",_t)
+    if os.path.isdir(_dd):
+        for _fn in os.listdir(_dd):
+            if _fn.lower().endswith((".cpp",".c")): src_tier[_fn.rsplit(".",1)[0].lower()]=_t
 def stem_of(name):
     b=name.replace("\\","/").split("/")[-1]; return b[:-4] if b.lower().endswith(".obj") else b
 def tier_of(im):
     if im is None: return None
-    name=modname.get(im,""); lib=modlib.get(im,""); st=stem_of(name).lower()
-    if st+".cpp" in assert_dir: return assert_dir[st+".cpp"]
-    if st+".c" in assert_dir: return assert_dir[st+".c"]
+    lib=modlib.get(im,""); st=stem_of(modname.get(im,"")).lower()
+    if st in src_tier: return src_tier[st]
     if "basewin" in lib.lower(): return "BASE"
     if lib=="": return "SOURCE"
     return None   # external/CRT — not a reconstruction unit
