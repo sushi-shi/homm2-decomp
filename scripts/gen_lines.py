@@ -23,8 +23,10 @@ REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[1]))
 
 
 def find_def_line(src_lines, mangled):
-    """Source line of a function's definition signature, from its mangled name.
-    `?Name@Class@@...` -> grep `Class::Name`; `?Name@@YA...` -> grep `Name(`."""
+    """Source line of a function's BODY opening brace `{` - the base MSVC's
+    per-function-relative line numbers count from (abs = brace_line + rel; rel 1 is
+    the first body line). Located from the mangled name: `?Name@Class@@...` ->
+    grep `Class::Name`; `?Name@@YA...` -> grep `Name(`; then the next `{`."""
     m = re.match(r"\?([A-Za-z0-9_]+)@([A-Za-z0-9_]+)@@", mangled)   # method
     needle = f"{m.group(2)}::{m.group(1)}" if m else None
     if not needle:
@@ -34,6 +36,9 @@ def find_def_line(src_lines, mangled):
         return None
     for n, line in enumerate(src_lines, 1):
         if needle in line and not line.lstrip().startswith(("//", "*", "VA(")):
+            for b in range(n, min(n + 6, len(src_lines)) + 1):      # body brace: this line or just below
+                if "{" in src_lines[b - 1]:
+                    return b
             return n
     return None
 
