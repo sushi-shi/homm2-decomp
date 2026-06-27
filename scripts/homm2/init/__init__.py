@@ -15,14 +15,14 @@ def run(*cmd):
 
 def main(argv=None):
     # 1. manifest straight from CodeView (units.toml + symbol_names.csv) - cl-free
-    if run("python3", "scripts/gen_manifest.py", "orig/HEROES2W.EXE", ".", "orig/pol-source-dirs.txt"): return 1
+    if run("python3", "scripts/gen_manifest.py", "build/orig/HEROES2W.EXE", ".", "orig/pol-source-dirs.txt"): return 1
     # 2. give string-literal constants their real ??_C@ names (cl oracle)
     if run("python3", "scripts/name_strings.py"): return 1
     # 3. synthesize the PDB the delinker needs
     if run("python3", "-m", "homm2.build.synth_pdb"): return 1
     # 4. delink HEROES2W.EXE -> per-unit COFF target objects (folder-structured)
     shutil.rmtree(REPO / "build/delink", ignore_errors=True); (REPO / "build/delink").mkdir(parents=True)
-    if run("vostok-delinker", "--pdb-path", "build/pdb/HEROES2W.pdb", "--exe-path", "orig/HEROES2W.EXE",
+    if run("vostok-delinker", "--pdb-path", "build/pdb/HEROES2W.pdb", "--exe-path", "build/orig/HEROES2W.EXE",
            "--output-path", "build/delink", "--engine-path", "c:\\proj\\"): return 1
     # 5. configure the base build + objdiff project
     if run("python3", "configure.py"): return 1

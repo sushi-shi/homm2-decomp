@@ -61,8 +61,9 @@
         if [ -z "''${HOMM2_NVIM_WRAPPED:-}" ] && command -v nvim >/dev/null 2>&1 && [ -d "$HOMM2_DIR/editor/nvim" ]; then
           _real="$(command -v nvim)"; _bin="$HOMM2_DIR/build/nvim-shim"; mkdir -p "$_bin"
           printf '#!/bin/sh\nexec "%s" --cmd "set rtp^=%s/editor/nvim" "$@"\n' "$_real" "$HOMM2_DIR" > "$_bin/nvim"
-          chmod +x "$_bin/nvim"; export PATH="$_bin:$PATH"; export HOMM2_NVIM_WRAPPED=1
-          echo "[homm2] nvim       : WRAPPED -> auto-loads editor/nvim (:Homm2)." >&2
+          printf '#!/bin/sh\nexec "%s/nvim" -c Ranger "$@"\n' "$_bin" > "$_bin/ranger"
+          chmod +x "$_bin/nvim" "$_bin/ranger"; export PATH="$_bin:$PATH"; export HOMM2_NVIM_WRAPPED=1
+          echo "[homm2] nvim       : WRAPPED -> editor/nvim (:Homm2); 'ranger' starts nvim :Ranger." >&2
         fi
       '';
 
@@ -84,7 +85,8 @@
           packages = commonTools;
           shellHook = ''
             export HOMM2_DIR="$PWD"
-            export HOMM2_EXE="$HOMM2_DIR/orig/HEROES2W.EXE"
+            export HOMM2_EXE="$HOMM2_DIR/build/orig/HEROES2W.EXE"
+            [ -f "$HOMM2_EXE" ] || echo "[homm2] target EXE : MISSING - copy your HEROES2W.EXE into build/orig/ (gitignored, never committed)" >&2
             export HOMM2_CLANG="${pkgs.llvmPackages.clang-unwrapped}/bin/clang"
             export PYTHONPATH="$HOMM2_DIR/scripts''${PYTHONPATH:+:$PYTHONPATH}"
             if [ "$(git -C "$HOMM2_DIR" config --local core.hooksPath 2>/dev/null)" != ".githooks" ]; then
@@ -107,7 +109,8 @@
           packages = commonTools ++ [ pkgs.wineWow64Packages.staging ];
           shellHook = ''
             export HOMM2_DIR="$PWD"
-            export HOMM2_EXE="$HOMM2_DIR/orig/HEROES2W.EXE"
+            export HOMM2_EXE="$HOMM2_DIR/build/orig/HEROES2W.EXE"
+            [ -f "$HOMM2_EXE" ] || echo "[homm2] target EXE : MISSING - copy your HEROES2W.EXE into build/orig/ (gitignored, never committed)" >&2
             export HOMM2_CLANG="${pkgs.llvmPackages.clang-unwrapped}/bin/clang"
             export PYTHONPATH="$HOMM2_DIR/scripts''${PYTHONPATH:+:$PYTHONPATH}"
             export HOMM2_TOOLCHAIN="''${HOMM2_TOOLCHAIN:-$HOMM2_DIR/build/toolchain}"
