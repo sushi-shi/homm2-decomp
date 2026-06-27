@@ -1,0 +1,29 @@
+# clangd over the GENERATED clang compilation database. ADDITIVE editor tooling
+# (go-to-def / completion / hover / diagnostics) that runs ALONGSIDE the real
+# matching build - it does NOT drive or verify it. The Wine MSVC 4.2 build
+# (scripts/homm2/build/cc_wrap.py) is the sole verdict on correctness; clang is
+# only a READER of this MSVC4.2-dialect code.
+#
+# Generate the DB first:  homm2 clangd
+CompileFlags:
+  CompilationDatabase: build/clangd
+  Add:
+    # Emulate MSVC 4.2 (cl 10.20 == _MSC_VER 1020) so the ancient MFC/CRT headers
+    # take their MSVC-version codepaths.
+    - --target=i386-pc-windows-msvc
+    - -fms-compatibility-version=10.20
+    - -fms-extensions
+    - -fdelayed-template-parsing
+    - -ferror-limit=0
+    # MSVC 4.2 accepts `char *p = "literal";` (only deprecated in C++98). The real
+    # cl build accepts it, so silence clang's -Wwritable-strings false positive.
+    - -Wno-writable-strings
+Diagnostics:
+  Suppress:
+    - -Wmicrosoft
+    - -Wignored-pragmas
+    - -Wpragma-pack
+    - -Wnonportable-include-path
+  UnusedIncludes: None
+  ClangTidy:
+    Remove: "*"

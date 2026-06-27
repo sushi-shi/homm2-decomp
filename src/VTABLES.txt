@@ -1,0 +1,135 @@
+# Recovered C++ vtables (PoL HEROES2W.EXE), slots labelled override/new/inherited
+
+===== vtable MIDIWrap  @ 0x004ebab8   (1 slots)   (root) =====
+  [ 0] RVA(0x004daff0, 0x3d)  void * MIDIWrap::scalar_dtor(unsigned int)   <- introduces virtual
+
+===== vtable advManager  @ 0x004eb6c8   (3 slots)   : public baseManager =====
+  [ 0] RVA(0x0045665f, 0x9c9)  int advManager::Open(int)   <- override (implements baseManager pure virtual)
+  [ 1] RVA(0x00457028, 0x40a)  void advManager::Close(void)   <- override (implements baseManager pure virtual)
+  [ 2] RVA(0x00457d6c, 0xfda)  int advManager::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
+
+===== vtable baseManager  @ 0x004eba70   (3 slots)   : public widget =====
+  [ 0] RVA(0x004e1560, 0xb)  __purecall   <- = 0 (pure virtual)
+  [ 1] RVA(0x004e1560, 0xb)  __purecall   <- = 0 (pure virtual)
+  [ 2] RVA(0x004e1560, 0xb)  __purecall   <- = 0 (pure virtual)
+
+===== vtable bitmap  @ 0x004eba3c   (1 slots)   (root) =====
+  [ 0] RVA(0x004cfff0, 0x41)  void * bitmap::scalar_dtor(unsigned int)   <- introduces virtual
+
+===== vtable border  @ 0x004eba60   (3 slots)   : public widget =====
+  [ 0] RVA(0x004d2480, 0xab)  void border::Draw(void)   <- override (implements widget pure virtual)
+  [ 1] RVA(0x004d20e0, 0x4d)  void * border::scalar_dtor(unsigned int)   <- override (implements widget pure virtual)
+  [ 2] RVA(0x004d22f0, 0x181)  int border::Main(struct tag_message &)   <- override (implements widget pure virtual)
+
+===== vtable button  @ 0x004ebaf0   (3 slots)   : public widget =====
+  [ 0] RVA(0x004ddda0, 0x55)  void button::Draw(void)   <- override (implements widget pure virtual)
+  [ 1] RVA(0x004dd480, 0x36)  void * button::scalar_dtor(unsigned int)   <- override (implements widget pure virtual)
+  [ 2] RVA(0x004dd6d0, 0x595)  int button::Main(struct tag_message &)   <- override (implements widget pure virtual)
+
+===== vtable combatManager  @ 0x004eb898   (3 slots)   : public baseManager =====
+  [ 0] RVA(0x00490aa0, 0x43f)  int combatManager::Open(int)   <- override (implements baseManager pure virtual)
+  [ 1] RVA(0x00490edf, 0x3d6)  void combatManager::Close(void)   <- override (implements baseManager pure virtual)
+  [ 2] RVA(0x0042a6d0, 0x36d)  int combatManager::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
+
+===== vtable dimmerWidget  @ 0x004ebae0   (3 slots)   : public widget =====
+  [ 0] RVA(0x004dd400, 0x5)  void dimmerWidget::Draw(void)   <- override (implements widget pure virtual)
+  [ 1] RVA(0x004dd410, 0x25)  void * dimmerWidget::scalar_dtor(unsigned int)   <- override (implements widget pure virtual)
+  [ 2] RVA(0x004dd3f0, 0xd)  int dimmerWidget::Main(struct tag_message &)   <- override (implements widget pure virtual)
+
+===== vtable dropListWidget  @ 0x004ebad0   (3 slots)   : public widget =====
+  [ 0] RVA(0x004dc630, 0xaf)  void dropListWidget::Draw(void)   <- override (implements widget pure virtual)
+  [ 1] RVA(0x004dbf40, 0x1f)  void * dropListWidget::scalar_dtor(unsigned int)   <- override (implements widget pure virtual)
+  [ 2] RVA(0x004dc2e0, 0x350)  int dropListWidget::Main(struct tag_message &)   <- override (implements widget pure virtual)
+
+===== vtable fileRequester  @ 0x004eb888   (3 slots)   : public baseManager =====
+  [ 0] RVA(0x0048d5e1, 0x466)  int fileRequester::Open(int)   <- override (implements baseManager pure virtual)
+  [ 1] RVA(0x0048d556, 0x8b)  void fileRequester::Close(void)   <- override (implements baseManager pure virtual)
+  [ 2] RVA(0x0048daec, 0x11ae)  int fileRequester::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
+
+===== vtable font  @ 0x004eb9e4   (1 slots)   (root) =====
+  [ 0] RVA(0x004c70a0, 0x39)  void * font::scalar_dtor(unsigned int)   <- introduces virtual
+
+===== vtable heroWindowManager  @ 0x004eba10   (3 slots)   : public baseManager =====
+  [ 0] RVA(0x004caad0, 0xd6)  int heroWindowManager::Open(int)   <- override (implements baseManager pure virtual)
+  [ 1] RVA(0x004cabb0, 0x45)  void heroWindowManager::Close(void)   <- override (implements baseManager pure virtual)
+  [ 2] RVA(0x004cac00, 0x2d)  int heroWindowManager::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
+
+===== vtable highScoreManager  @ 0x004eb838   (3 slots)   : public baseManager =====
+  [ 0] RVA(0x00489a96, 0x14c)  int highScoreManager::Open(int)   <- override (implements baseManager pure virtual)
+  [ 1] RVA(0x00489be2, 0x5e)  void highScoreManager::Close(void)   <- override (implements baseManager pure virtual)
+  [ 2] RVA(0x00489c40, 0x22a)  int highScoreManager::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
+
+===== vtable icon  @ 0x004eb9e8   (1 slots)   (root) =====
+  [ 0] RVA(0x004c7a90, 0x36)  void * icon::scalar_dtor(unsigned int)   <- introduces virtual
+
+===== vtable iconWidget  @ 0x004eba40   (3 slots)   : public widget =====
+  [ 0] RVA(0x004d0f70, 0xe5)  void iconWidget::Draw(void)   <- override (implements widget pure virtual)
+  [ 1] RVA(0x004d0a90, 0x36)  void * iconWidget::scalar_dtor(unsigned int)   <- override (implements widget pure virtual)
+  [ 2] RVA(0x004d0cd0, 0x291)  int iconWidget::Main(struct tag_message &)   <- override (implements widget pure virtual)
+
+===== vtable inputManager  @ 0x004eba30   (3 slots)   : public baseManager =====
+  [ 0] RVA(0x004ce230, 0x78)  int inputManager::Open(int)   <- override (implements baseManager pure virtual)
+  [ 1] RVA(0x004ce2b0, 0x20)  void inputManager::Close(void)   <- override (implements baseManager pure virtual)
+  [ 2] RVA(0x004ce2d0, 0x5)  int inputManager::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
+
+===== vtable listBoxWidget  @ 0x004ebac0   (3 slots)   : public widget =====
+  [ 0] RVA(0x004db890, 0x8)  void listBoxWidget::Draw(void)   <- override (implements widget pure virtual)
+  [ 1] RVA(0x004db0b0, 0x1f)  void * listBoxWidget::scalar_dtor(unsigned int)   <- override (implements widget pure virtual)
+  [ 2] RVA(0x004db520, 0x368)  int listBoxWidget::Main(struct tag_message &)   <- override (implements widget pure virtual)
+
+===== vtable mouseManager  @ 0x004eba00   (3 slots)   : public baseManager =====
+  [ 0] RVA(0x004c9350, 0x94)  int mouseManager::Open(int)   <- override (implements baseManager pure virtual)
+  [ 1] RVA(0x004c93f0, 0xed)  void mouseManager::Close(void)   <- override (implements baseManager pure virtual)
+  [ 2] RVA(0x004c94e0, 0x5)  int mouseManager::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
+
+===== vtable palette  @ 0x004eba7c   (1 slots)   (root) =====
+  [ 0] RVA(0x004d25b0, 0x41)  void * palette::scalar_dtor(unsigned int)   <- introduces virtual
+
+===== vtable recruitUnit  @ 0x004eb848   (3 slots)   : public baseManager =====
+  [ 0] RVA(0x0048b49c, 0x24b)  int recruitUnit::Open(int)   <- override (implements baseManager pure virtual)
+  [ 1] RVA(0x0048b6e7, 0xe7)  void recruitUnit::Close(void)   <- override (implements baseManager pure virtual)
+  [ 2] RVA(0x0048b8f0, 0x41b)  int recruitUnit::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
+
+===== vtable resource  @ 0x004ebaac   (1 slots)   (root) =====
+  [ 0] RVA(0x004e1560, 0xb)  __purecall   <- = 0 (pure virtual)
+
+===== vtable resourceManager  @ 0x004eb9f0   (3 slots)   : public baseManager =====
+  [ 0] RVA(0x004c88a0, 0xab)  int resourceManager::Open(int)   <- override (implements baseManager pure virtual)
+  [ 1] RVA(0x004c89e0, 0xc8)  void resourceManager::Close(void)   <- override (implements baseManager pure virtual)
+  [ 2] RVA(0x004c8880, 0x1a)  int resourceManager::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
+
+===== vtable sample  @ 0x004ebab4   (1 slots)   (root) =====
+  [ 0] RVA(0x004daef0, 0x41)  void * sample::scalar_dtor(unsigned int)   <- introduces virtual
+
+===== vtable soundManager  @ 0x004eba20   (3 slots)   : public baseManager =====
+  [ 0] RVA(0x004cc560, 0x3a8)  int soundManager::Open(int)   <- override (implements baseManager pure virtual)
+  [ 1] RVA(0x004cc9b0, 0x96)  void soundManager::Close(void)   <- override (implements baseManager pure virtual)
+  [ 2] RVA(0x004cca50, 0x1a)  int soundManager::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
+
+===== vtable swapManager  @ 0x004eb650   (3 slots)   : public baseManager =====
+  [ 0] RVA(0x00454502, 0x3bc)  int swapManager::Open(int)   <- override (implements baseManager pure virtual)
+  [ 1] RVA(0x004548be, 0x12d)  void swapManager::Close(void)   <- override (implements baseManager pure virtual)
+  [ 2] RVA(0x00454be3, 0xaf0)  int swapManager::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
+
+===== vtable textEntryWidget  @ 0x004ebaa0   (3 slots)   : public widget =====
+  [ 0] RVA(0x004d9410, 0x160)  void textEntryWidget::Draw(void)   <- override (implements widget pure virtual)
+  [ 1] RVA(0x004d8770, 0x36)  void * textEntryWidget::scalar_dtor(unsigned int)   <- override (implements widget pure virtual)
+  [ 2] RVA(0x004d8b90, 0x874)  int textEntryWidget::Main(struct tag_message &)   <- override (implements widget pure virtual)
+
+===== vtable textWidget  @ 0x004eba50   (3 slots)   : public widget =====
+  [ 0] RVA(0x004d1490, 0x49)  void textWidget::Draw(void)   <- override (implements widget pure virtual)
+  [ 1] RVA(0x004d10a0, 0x45)  void * textWidget::scalar_dtor(unsigned int)   <- override (implements widget pure virtual)
+  [ 2] RVA(0x004d1280, 0x210)  int textWidget::Main(struct tag_message &)   <- override (implements widget pure virtual)
+
+===== vtable tileset  @ 0x004ebab0   (1 slots)   (root) =====
+  [ 0] RVA(0x004dacf0, 0x36)  void * tileset::scalar_dtor(unsigned int)   <- introduces virtual
+
+===== vtable townManager  @ 0x004eb140   (3 slots)   : public baseManager =====
+  [ 0] RVA(0x00414109, 0x1ef)  int townManager::Open(int)   <- override (implements baseManager pure virtual)
+  [ 1] RVA(0x00414e98, 0xca)  void townManager::Close(void)   <- override (implements baseManager pure virtual)
+  [ 2] RVA(0x0041595d, 0x1830)  int townManager::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
+
+===== vtable widget  @ 0x004ebb00   (3 slots)   (root) =====
+  [ 0] RVA(0x004e1560, 0xb)  __purecall   <- = 0 (pure virtual)
+  [ 1] RVA(0x004e1560, 0xb)  __purecall   <- = 0 (pure virtual)
+  [ 2] RVA(0x004e1560, 0xb)  __purecall   <- = 0 (pure virtual)

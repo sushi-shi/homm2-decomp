@@ -1,0 +1,20 @@
+# static libraries linked into PoL HEROES2W.EXE (from CodeView sstLibraries)
+C:\MSDEV\LIB\oldnames.lib
+C:\MSDEV\LIB\winmm.lib
+C:\MSDEV\LIB\kernel32.lib
+C:\MSDEV\LIB\user32.lib
+C:\MSDEV\LIB\gdi32.lib
+C:\MSDEV\LIB\winspool.lib
+C:\MSDEV\LIB\comdlg32.lib
+C:\MSDEV\LIB\advapi32.lib
+C:\MSDEV\LIB\shell32.lib
+C:\MSDEV\LIB\ole32.lib
+C:\MSDEV\LIB\oleaut32.lib
+C:\MSDEV\LIB\uuid.lib
+C:\MSDEV\LIB\wsock32.lib
+.\Smkw32ms.lib
+.\basewin.lib
+.\Mss32.lib
+.\Wing32.lib
+.\netapi32.lib
+C:\MSDEV\LIB\LIBCMT.lib
