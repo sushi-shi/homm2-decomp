@@ -28,7 +28,8 @@ struct mapCellExtra {       // 7 bytes (packed)
 #pragma pack(pop)
 SIZE(mapCellExtra, 7);
 
-struct mapCell {            // 12 bytes
+class mapCell {            // 12 bytes (CodeView mangles every use as PAVmapCell -> class)
+public:
     u16 tile;               // +0
     u8  objFlag0   : 1;     // +2 bit0
     u8  objFlag1   : 1;     // +2 bit1

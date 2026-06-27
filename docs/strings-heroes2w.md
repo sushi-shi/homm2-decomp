@@ -1,6 +1,6 @@
 # Strings — HEROES2W.EXE (Price of Loyalty)
 
-Extracted by `scripts/extract_strings.py` (printable runs >= 5 bytes, deduped).
+Extracted by `scripts/archive/extract_strings.py` (printable runs >= 5 bytes, deduped).
 Source paths recover original file names; assert/expression strings can recover
 argument / local / member identifiers (MSVC `assert()` embeds the expression).
 **Hints, not authoritative** — cross-check against the disassembly.

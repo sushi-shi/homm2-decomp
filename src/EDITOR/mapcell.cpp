@@ -209,5 +209,81 @@ mapCellExtra *fullMap::GetNewCellExtraObject(int x, int y)
     }
 }
 
-// VA(0x0040ba6f, 0x2ea)
-// void fullMap::ChangeTilesetIndex(class mapCell *, int, int, int, int, int, int);
+// Sets the object (overlay==0) or overlay (overlay!=0) tileset+index on a cell:
+// either directly on the cell (when its current obj/ovl is empty or already on the
+// requested tileset) or by walking/appending the cell's extras chain.
+// /Od slots are MSVC symbol-hash order: retail frame is idx@-4, ptr@-8, t@-c, with
+// one reserved unused local @-10 (this spills to -0x14). Names chosen so their
+// buckets (0,1,4,6) sort into that order. The 7th param is unused in retail.
+VA(0x0040ba6f, 0x2ea)
+void fullMap::ChangeTilesetIndex(mapCell *cell, int x, int y, int tileset, int index, int overlay, int)
+{
+    int idx;             // chain index        -> -0x4
+    mapCellExtra *ptr;   // current chain node -> -0x8
+    int t;               // tileset to store   -> -0xc
+    int dummy;           // reserved unused    -> -0x10
+
+    ptr = 0;
+    if (index == 0xFF)
+        t = 0;
+    else
+        t = tileset;
+
+    if (overlay == 0) {
+        if (cell->objIndex != 0xFF && cell->objTileset != tileset) {
+            idx = cell->extra;
+            while (idx != 0) {
+                ptr = &extras[idx];
+                if (ptr->objIndex != 0xFF && ptr->objTileset != tileset) {
+                    idx = ptr->index;
+                } else {
+                    ptr->objFlag = 0;
+                    ptr->f4a = 0;
+                    ptr->f4b = 0;
+                    ptr->f4c = 0;
+                    ptr->objTileset = t;
+                    ptr->objIndex = index;
+                    break;
+                }
+            }
+            if (idx == 0) {
+                ptr = GetNewCellExtraObject(x, y);
+                ptr->objTileset = t;
+                ptr->objIndex = index;
+            }
+        } else {
+            cell->objFlag0 = 0;
+            cell->w4a = 0;
+            cell->w4b = 0;
+            cell->w4c = 0;
+            cell->objTileset = t;
+            cell->objIndex = index;
+        }
+    } else {
+        if (cell->ovlIndex != 0xFF && cell->ovlTileset != tileset) {
+            idx = cell->extra;
+            while (idx != 0) {
+                ptr = &extras[idx];
+                if (ptr->ovlIndex != 0xFF && ptr->ovlTileset != tileset) {
+                    idx = ptr->index;
+                } else {
+                    ptr->ovlFlag0 = 0;
+                    ptr->ovlFlag1 = 0;
+                    ptr->ovlTileset = t;
+                    ptr->ovlIndex = index;
+                    break;
+                }
+            }
+            if (idx == 0) {
+                ptr = GetNewCellExtraOverlay(x, y);
+                ptr->ovlTileset = t;
+                ptr->ovlIndex = index;
+            }
+        } else {
+            cell->ovlFlag0 = 0;
+            cell->ovlFlag1 = 0;
+            cell->ovlTileset = t;
+            cell->ovlIndex = index;
+        }
+    }
+}
