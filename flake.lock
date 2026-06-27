@@ -1,0 +1,67 @@
+{
+  "nodes": {
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1779560665,
+        "narHash": "sha256-tpyBcxPpcQb8ukyNF7DoCwfSY3VPsxHoYwj00Cayv5o=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "64c08a7ca051951c8eae34e3e3cb1e202fe36786",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "64c08a7ca051951c8eae34e3e3cb1e202fe36786",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "nixpkgs": "nixpkgs",
+        "rust-overlay": "rust-overlay",
+        "vostok-delinker-src": "vostok-delinker-src"
+      }
+    },
+    "rust-overlay": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1779851998,
+        "narHash": "sha256-UkkMh3bX9QW4Luqkm98nUaOqKWrU6i65mUnph3WeSSw=",
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "rev": "6cddd512fa2bf7231f098d3a2f92f6e4cff71e0a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "rev": "6cddd512fa2bf7231f098d3a2f92f6e4cff71e0a",
+        "type": "github"
+      }
+    },
+    "vostok-delinker-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1781514239,
+        "narHash": "sha256-Kf6fu3tuzIgT8xIbmDhXPsTJYtExX/98eBKQYjwgBfw=",
+        "owner": "srp-survarium",
+        "repo": "vostok-delinker",
+        "rev": "8a42a0ba6f6b90651d62d1911eb97b80a5faa149",
+        "type": "github"
+      },
+      "original": {
+        "owner": "srp-survarium",
+        "repo": "vostok-delinker",
+        "rev": "8a42a0ba6f6b90651d62d1911eb97b80a5faa149",
+        "type": "github"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}
