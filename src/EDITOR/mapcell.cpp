@@ -146,37 +146,40 @@ void fullMap::Read(int handle, int convert)
     }
 }
 
-// @early-stop ~97%: cell/extra access goes through the inline Row()/Extra()
-// accessors so /Ob1 splices them in - matching retail's deferred Row(y)[x] indexing
-// AND its per-call `jmp $+0`s (raw expressions capped this at ~91%). Residual is a few
-// jmp-placement slots (the exact accessor decomposition) + trailing alignment nop.
+// @early-stop ~97%: cell/extra access goes through inline Row()/Extra() so /Ob1
+// splices them in - matching retail's deferred Row(y)[x] addressing AND its jmp$+0
+// count (10/10; raw expressions capped this at ~91%). Locals node/ix/ni/cell are
+// named so the /Od hash drops them on retail's exact frame slots (-0x4/-0x8/-0xc/
+// -0x10) via od_slots. Residual: ~2 inline-bracket jmp$+0 the compiler emits leading
+// (after the `if`) vs retail's trailing (after the `cell` store) - an opaque MSVC /Od
+// inline-bracketing choice that resisted accessor + statement-shape variants.
 // See docs/patterns/inline-accessors.md, docs/patterns/od-hash-slots.md.
 VA(0x0040b396, 0x1d3)
 mapCellExtra *fullMap::GetNewCellExtraOverlay(int x, int y)
 {
-    mapCellExtra *cur;   // -0x4
-    int idx;             // -0x8
+    mapCellExtra *node;  // -0x4
+    int ix;              // -0x8
     int ni;              // -0xc
-    mapCell *cp;         // -0x10
+    mapCell *cell;       // -0x10
 
     if (Row(y)[x].extra == 0) {
-        cp = &Row(y)[x];
-        cp->extra = GetNewCellExtraIndex();
+        cell = &Row(y)[x];
+        cell->extra = GetNewCellExtraIndex();
         return Extra(Row(y)[x].extra);
     }
-    idx = Row(y)[x].extra;
-    cur = Extra(Row(y)[x].extra);
+    ix = Row(y)[x].extra;
+    node = Extra(Row(y)[x].extra);
     for (;;) {
-        if (cur->ovlIndex == 0xFF)
-            return cur;
-        if (cur->index == 0) {
+        if (node->ovlIndex == 0xFF)
+            return node;
+        if (node->index == 0) {
             ni = GetNewCellExtraIndex();
-            cur = Extra(idx);
-            cur->index = ni;
-            return Extra(cur->index);
+            node = Extra(ix);
+            node->index = ni;
+            return Extra(node->index);
         }
-        idx = cur->index;
-        cur = Extra(cur->index);
+        ix = node->index;
+        node = Extra(node->index);
     }
 }
 
@@ -185,29 +188,29 @@ mapCellExtra *fullMap::GetNewCellExtraOverlay(int x, int y)
 VA(0x0040b569, 0x1d3)
 mapCellExtra *fullMap::GetNewCellExtraObject(int x, int y)
 {
-    mapCellExtra *cur;   // -0x4
-    int idx;             // -0x8
+    mapCellExtra *node;  // -0x4
+    int ix;              // -0x8
     int ni;              // -0xc
-    mapCell *cp;         // -0x10
+    mapCell *cell;       // -0x10
 
     if (Row(y)[x].extra == 0) {
-        cp = &Row(y)[x];
-        cp->extra = GetNewCellExtraIndex();
+        cell = &Row(y)[x];
+        cell->extra = GetNewCellExtraIndex();
         return Extra(Row(y)[x].extra);
     }
-    idx = Row(y)[x].extra;
-    cur = Extra(Row(y)[x].extra);
+    ix = Row(y)[x].extra;
+    node = Extra(Row(y)[x].extra);
     for (;;) {
-        if (cur->objIndex == 0xFF)
-            return cur;
-        if (cur->index == 0) {
+        if (node->objIndex == 0xFF)
+            return node;
+        if (node->index == 0) {
             ni = GetNewCellExtraIndex();
-            cur = Extra(idx);
-            cur->index = ni;
-            return Extra(cur->index);
+            node = Extra(ix);
+            node->index = ni;
+            return Extra(node->index);
         }
-        idx = cur->index;
-        cur = Extra(cur->index);
+        ix = node->index;
+        node = Extra(node->index);
     }
 }
 
