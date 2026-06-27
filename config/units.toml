@@ -10,477 +10,477 @@ base = ["/nologo", "/c", "/O2", "/MT"]      # default VC4.2 profile (refine via 
 eh   = ["/nologo", "/c", "/O2", "/MT", "/GX"]
 
 [[unit]]
-unit = "ADVMGR"
-source = "src/SOURCE/ADVMGR.cpp"
-flags = "base"
-
-[[unit]]
-unit = "AI"
-source = "src/SOURCE/AI.cpp"
-flags = "base"
-
-[[unit]]
-unit = "ARMY"
-source = "src/SOURCE/ARMY.cpp"
-flags = "base"
-
-[[unit]]
-unit = "ARMYGRP"
-source = "src/SOURCE/ARMYGRP.cpp"
-flags = "base"
-
-[[unit]]
-unit = "BASEMGR"
+unit = "BASE/BASEMGR"
 source = "src/BASE/BASEMGR.cpp"
 flags = "base"
 
 [[unit]]
-unit = "BITMAP"
+unit = "BASE/BITMAP"
 source = "src/BASE/BITMAP.cpp"
 flags = "base"
 
 [[unit]]
-unit = "BITS"
+unit = "BASE/BITS"
 source = "src/BASE/BITS.cpp"
 flags = "base"
 
 [[unit]]
-unit = "BORDER"
+unit = "BASE/BORDER"
 source = "src/BASE/BORDER.cpp"
 flags = "base"
 
 [[unit]]
-unit = "BUTTON"
+unit = "BASE/BUTTON"
 source = "src/BASE/BUTTON.cpp"
 flags = "base"
 
 [[unit]]
-unit = "Blur"
+unit = "BASE/Blur"
 source = "src/BASE/Blur.cpp"
 flags = "base"
 
 [[unit]]
-unit = "Bzip"
+unit = "BASE/Bzip"
 source = "src/BASE/Bzip.cpp"
 flags = "base"
 
 [[unit]]
-unit = "CMBTMGR"
-source = "src/SOURCE/CMBTMGR.cpp"
-flags = "base"
-
-[[unit]]
-unit = "COMMAND"
-source = "src/SOURCE/COMMAND.cpp"
-flags = "base"
-
-[[unit]]
-unit = "CURSOR"
-source = "src/SOURCE/CURSOR.cpp"
-flags = "base"
-
-[[unit]]
-unit = "Campaign"
-source = "src/SOURCE/Campaign.cpp"
-flags = "base"
-
-[[unit]]
-unit = "Castle"
-source = "src/SOURCE/Castle.cpp"
-flags = "base"
-
-[[unit]]
-unit = "DIMMER"
+unit = "BASE/DIMMER"
 source = "src/BASE/DIMMER.cpp"
 flags = "base"
 
 [[unit]]
-unit = "DRAWING"
-source = "src/SOURCE/DRAWING.cpp"
-flags = "base"
-
-[[unit]]
-unit = "EVENTS"
-source = "src/SOURCE/EVENTS.cpp"
-flags = "base"
-
-[[unit]]
-unit = "EXEC"
+unit = "BASE/EXEC"
 source = "src/BASE/EXEC.cpp"
 flags = "base"
 
 [[unit]]
-unit = "FINDPATH"
-source = "src/SOURCE/FINDPATH.cpp"
-flags = "base"
-
-[[unit]]
-unit = "FLY"
-source = "src/SOURCE/FLY.cpp"
-flags = "base"
-
-[[unit]]
-unit = "FONT"
+unit = "BASE/FONT"
 source = "src/BASE/FONT.cpp"
 flags = "base"
 
 [[unit]]
-unit = "GAME"
-source = "src/SOURCE/GAME.cpp"
-flags = "base"
-
-[[unit]]
-unit = "HERO"
-source = "src/SOURCE/HERO.cpp"
-flags = "base"
-
-[[unit]]
-unit = "HEXCELL"
-source = "src/SOURCE/HEXCELL.cpp"
-flags = "base"
-
-[[unit]]
-unit = "HISCORE"
-source = "src/SOURCE/HISCORE.cpp"
-flags = "base"
-
-[[unit]]
-unit = "ICON"
+unit = "BASE/ICON"
 source = "src/BASE/ICON.cpp"
 flags = "base"
 
 [[unit]]
-unit = "ICONWDGT"
+unit = "BASE/ICONWDGT"
 source = "src/BASE/ICONWDGT.cpp"
 flags = "base"
 
 [[unit]]
-unit = "INPUTMGR"
+unit = "BASE/INPUTMGR"
 source = "src/BASE/INPUTMGR.cpp"
 flags = "base"
 
 [[unit]]
-unit = "Icon2b"
+unit = "BASE/Icon2b"
 source = "src/BASE/Icon2b.cpp"
 flags = "base"
 
 [[unit]]
-unit = "Icond2b"
+unit = "BASE/Icond2b"
 source = "src/BASE/Icond2b.cpp"
 flags = "base"
 
 [[unit]]
-unit = "Icondf2b"
+unit = "BASE/Icondf2b"
 source = "src/BASE/Icondf2b.cpp"
 flags = "base"
 
 [[unit]]
-unit = "Iconf2b"
+unit = "BASE/Iconf2b"
 source = "src/BASE/Iconf2b.cpp"
 flags = "base"
 
 [[unit]]
-unit = "Iconm2b"
+unit = "BASE/Iconm2b"
 source = "src/BASE/Iconm2b.cpp"
 flags = "base"
 
 [[unit]]
-unit = "Iconmf2b"
+unit = "BASE/Iconmf2b"
 source = "src/BASE/Iconmf2b.cpp"
 flags = "base"
 
 [[unit]]
-unit = "KB"
-source = "src/SOURCE/KB.cpp"
-flags = "base"
-
-[[unit]]
-unit = "MOUSEMGR"
+unit = "BASE/MOUSEMGR"
 source = "src/BASE/MOUSEMGR.cpp"
 flags = "base"
 
 [[unit]]
-unit = "Midi"
+unit = "BASE/Midi"
 source = "src/BASE/Midi.cpp"
 flags = "base"
 
 [[unit]]
-unit = "Misc"
+unit = "BASE/Misc"
 source = "src/BASE/Misc.cpp"
 flags = "base"
 
 [[unit]]
-unit = "Modem"
-source = "src/SOURCE/Modem.cpp"
-flags = "base"
-
-[[unit]]
-unit = "NOOPT"
-source = "src/SOURCE/NOOPT.cpp"
-flags = "base"
-
-[[unit]]
-unit = "Netbios"
-source = "src/SOURCE/Netbios.cpp"
-flags = "base"
-
-[[unit]]
-unit = "Newgame"
-source = "src/SOURCE/Newgame.cpp"
-flags = "base"
-
-[[unit]]
-unit = "Overview"
-source = "src/SOURCE/Overview.cpp"
-flags = "base"
-
-[[unit]]
-unit = "PALETTE"
+unit = "BASE/PALETTE"
 source = "src/BASE/PALETTE.cpp"
 flags = "base"
 
 [[unit]]
-unit = "PATH"
-source = "src/SOURCE/PATH.cpp"
-flags = "base"
-
-[[unit]]
-unit = "PHILAI"
-source = "src/SOURCE/PHILAI.cpp"
-flags = "base"
-
-[[unit]]
-unit = "RECRUIT"
-source = "src/SOURCE/RECRUIT.cpp"
-flags = "base"
-
-[[unit]]
-unit = "REMOTE"
-source = "src/SOURCE/REMOTE.cpp"
-flags = "base"
-
-[[unit]]
-unit = "REQUEST"
-source = "src/SOURCE/REQUEST.cpp"
-flags = "base"
-
-[[unit]]
-unit = "RESMGR"
+unit = "BASE/RESMGR"
 source = "src/BASE/RESMGR.cpp"
 flags = "base"
 
 [[unit]]
-unit = "RESOURCE"
+unit = "BASE/RESOURCE"
 source = "src/BASE/RESOURCE.cpp"
 flags = "base"
 
 [[unit]]
-unit = "Ripple"
+unit = "BASE/Ripple"
 source = "src/BASE/Ripple.cpp"
 flags = "base"
 
 [[unit]]
-unit = "SAMPLE"
+unit = "BASE/SAMPLE"
 source = "src/BASE/SAMPLE.cpp"
 flags = "base"
 
 [[unit]]
-unit = "SEARCH"
-source = "src/SOURCE/SEARCH.cpp"
-flags = "base"
-
-[[unit]]
-unit = "SETUP"
-source = "src/SOURCE/SETUP.cpp"
-flags = "base"
-
-[[unit]]
-unit = "SMACKMGR"
-source = "src/SOURCE/SMACKMGR.cpp"
-flags = "base"
-
-[[unit]]
-unit = "SPELLAI"
-source = "src/SOURCE/SPELLAI.cpp"
-flags = "base"
-
-[[unit]]
-unit = "SPELLS"
-source = "src/SOURCE/SPELLS.cpp"
-flags = "base"
-
-[[unit]]
-unit = "STRIP"
-source = "src/SOURCE/STRIP.cpp"
-flags = "base"
-
-[[unit]]
-unit = "SWAPMGR"
-source = "src/SOURCE/SWAPMGR.cpp"
-flags = "base"
-
-[[unit]]
-unit = "TEXTWDGT"
+unit = "BASE/TEXTWDGT"
 source = "src/BASE/TEXTWDGT.cpp"
 flags = "base"
 
 [[unit]]
-unit = "TILE"
+unit = "BASE/TILE"
 source = "src/BASE/TILE.cpp"
 flags = "base"
 
 [[unit]]
-unit = "TILESET"
+unit = "BASE/TILESET"
 source = "src/BASE/TILESET.cpp"
 flags = "base"
 
 [[unit]]
-unit = "TOWN"
-source = "src/SOURCE/TOWN.cpp"
-flags = "base"
-
-[[unit]]
-unit = "TOWNMGR"
-source = "src/SOURCE/TOWNMGR.cpp"
-flags = "base"
-
-[[unit]]
-unit = "Textntry"
+unit = "BASE/Textntry"
 source = "src/BASE/Textntry.cpp"
 flags = "base"
 
 [[unit]]
-unit = "VIEW"
-source = "src/SOURCE/VIEW.cpp"
-flags = "base"
-
-[[unit]]
-unit = "Viewwrld"
-source = "src/SOURCE/Viewwrld.cpp"
-flags = "base"
-
-[[unit]]
-unit = "WIDGET"
+unit = "BASE/WIDGET"
 source = "src/BASE/WIDGET.cpp"
 flags = "base"
 
 [[unit]]
-unit = "WINDOW"
+unit = "BASE/WINDOW"
 source = "src/BASE/WINDOW.cpp"
 flags = "base"
 
 [[unit]]
-unit = "WINMGR"
+unit = "BASE/WINMGR"
 source = "src/BASE/WINMGR.cpp"
 flags = "base"
 
 [[unit]]
-unit = "Wsnetwin"
-source = "src/SOURCE/Wsnetwin.cpp"
-flags = "base"
-
-[[unit]]
-unit = "X_CAMPGN"
-source = "src/SOURCE/X_CAMPGN.cpp"
-flags = "base"
-
-[[unit]]
-unit = "X_GLOBAL"
-source = "src/SOURCE/X_GLOBAL.cpp"
-flags = "base"
-
-[[unit]]
-unit = "bmap2"
+unit = "BASE/bmap2"
 source = "src/BASE/bmap2.cpp"
 flags = "base"
 
 [[unit]]
-unit = "comwin"
-source = "src/SOURCE/comwin.cpp"
-flags = "base"
-
-[[unit]]
-unit = "dpnetwin"
-source = "src/SOURCE/dpnetwin.cpp"
-flags = "base"
-
-[[unit]]
-unit = "droplist"
+unit = "BASE/droplist"
 source = "src/BASE/droplist.cpp"
 flags = "base"
 
 [[unit]]
-unit = "icon2bc"
+unit = "BASE/icon2bc"
 source = "src/BASE/icon2bc.cpp"
 flags = "base"
 
 [[unit]]
-unit = "icon2bs"
+unit = "BASE/icon2bs"
 source = "src/BASE/icon2bs.cpp"
 flags = "base"
 
 [[unit]]
-unit = "icon2by"
+unit = "BASE/icon2by"
 source = "src/BASE/icon2by.cpp"
 flags = "base"
 
 [[unit]]
-unit = "iconf2bc"
+unit = "BASE/iconf2bc"
 source = "src/BASE/iconf2bc.cpp"
 flags = "base"
 
 [[unit]]
-unit = "iconf2by"
+unit = "BASE/iconf2by"
 source = "src/BASE/iconf2by.cpp"
 flags = "base"
 
 [[unit]]
-unit = "kbwin"
-source = "src/SOURCE/kbwin.cpp"
-flags = "base"
-
-[[unit]]
-unit = "listbox"
+unit = "BASE/listbox"
 source = "src/BASE/listbox.cpp"
 flags = "base"
 
 [[unit]]
-unit = "mapcell"
-source = "src/EDITOR/mapcell.cpp"
-flags = "base"
-
-[[unit]]
-unit = "miscwin"
+unit = "BASE/miscwin"
 source = "src/BASE/miscwin.cpp"
 flags = "base"
 
 [[unit]]
-unit = "netwin"
-source = "src/SOURCE/netwin.cpp"
-flags = "base"
-
-[[unit]]
-unit = "soundmgr"
+unit = "BASE/soundmgr"
 source = "src/BASE/soundmgr.cpp"
 flags = "base"
 
 [[unit]]
-unit = "tradpost"
+unit = "SOURCE/ADVMGR"
+source = "src/SOURCE/ADVMGR.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/AI"
+source = "src/SOURCE/AI.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/ARMY"
+source = "src/SOURCE/ARMY.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/ARMYGRP"
+source = "src/SOURCE/ARMYGRP.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/CMBTMGR"
+source = "src/SOURCE/CMBTMGR.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/COMMAND"
+source = "src/SOURCE/COMMAND.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/CURSOR"
+source = "src/SOURCE/CURSOR.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/Campaign"
+source = "src/SOURCE/Campaign.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/Castle"
+source = "src/SOURCE/Castle.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/DRAWING"
+source = "src/SOURCE/DRAWING.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/EVENTS"
+source = "src/SOURCE/EVENTS.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/FINDPATH"
+source = "src/SOURCE/FINDPATH.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/FLY"
+source = "src/SOURCE/FLY.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/GAME"
+source = "src/SOURCE/GAME.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/HERO"
+source = "src/SOURCE/HERO.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/HEXCELL"
+source = "src/SOURCE/HEXCELL.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/HISCORE"
+source = "src/SOURCE/HISCORE.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/KB"
+source = "src/SOURCE/KB.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/Modem"
+source = "src/SOURCE/Modem.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/NOOPT"
+source = "src/SOURCE/NOOPT.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/Netbios"
+source = "src/SOURCE/Netbios.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/Newgame"
+source = "src/SOURCE/Newgame.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/Overview"
+source = "src/SOURCE/Overview.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/PATH"
+source = "src/SOURCE/PATH.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/PHILAI"
+source = "src/SOURCE/PHILAI.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/RECRUIT"
+source = "src/SOURCE/RECRUIT.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/REMOTE"
+source = "src/SOURCE/REMOTE.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/REQUEST"
+source = "src/SOURCE/REQUEST.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/SEARCH"
+source = "src/SOURCE/SEARCH.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/SETUP"
+source = "src/SOURCE/SETUP.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/SMACKMGR"
+source = "src/SOURCE/SMACKMGR.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/SPELLAI"
+source = "src/SOURCE/SPELLAI.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/SPELLS"
+source = "src/SOURCE/SPELLS.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/STRIP"
+source = "src/SOURCE/STRIP.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/SWAPMGR"
+source = "src/SOURCE/SWAPMGR.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/TOWN"
+source = "src/SOURCE/TOWN.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/TOWNMGR"
+source = "src/SOURCE/TOWNMGR.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/VIEW"
+source = "src/SOURCE/VIEW.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/Viewwrld"
+source = "src/SOURCE/Viewwrld.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/Wsnetwin"
+source = "src/SOURCE/Wsnetwin.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/X_CAMPGN"
+source = "src/SOURCE/X_CAMPGN.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/X_GLOBAL"
+source = "src/SOURCE/X_GLOBAL.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/comwin"
+source = "src/SOURCE/comwin.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/dpnetwin"
+source = "src/SOURCE/dpnetwin.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/kbwin"
+source = "src/SOURCE/kbwin.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/mapcell"
+source = "src/EDITOR/mapcell.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/netwin"
+source = "src/SOURCE/netwin.cpp"
+flags = "base"
+
+[[unit]]
+unit = "SOURCE/tradpost"
 source = "src/SOURCE/tradpost.cpp"
 flags = "base"
 
 [[unit]]
-unit = "wingraph"
+unit = "SOURCE/wingraph"
 source = "src/SOURCE/wingraph.cpp"
 flags = "base"
 
 [[unit]]
-unit = "x_arena"
+unit = "SOURCE/x_arena"
 source = "src/SOURCE/x_arena.cpp"
 flags = "base"
 
 [[unit]]
-unit = "x_cdtest"
+unit = "SOURCE/x_cdtest"
 source = "src/SOURCE/x_cdtest.cpp"
 flags = "base"
 
