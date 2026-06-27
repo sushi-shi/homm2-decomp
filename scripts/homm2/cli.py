@@ -1,0 +1,23 @@
+"""homm2 CLI - python -m homm2 {init|configure|build|status}."""
+import os, subprocess, sys
+from pathlib import Path
+REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[2]))
+
+def sh(*cmd):
+    return subprocess.run([str(c) for c in cmd], cwd=REPO).returncode
+
+def main(argv=None):
+    argv = list(sys.argv[1:] if argv is None else argv)
+    cmd = argv[0] if argv else "help"; rest = argv[1:]
+    if cmd == "init":
+        from homm2.init import main as m; return m(rest)
+    if cmd == "configure":
+        return sh("python3", "configure.py")
+    if cmd == "build":
+        if sh("python3", "configure.py"): return 1
+        if sh("ninja", *rest): return 1
+        from homm2.match.status import main as st; return st([])
+    if cmd == "status":
+        from homm2.match.status import main as st; return st(rest)
+    print("usage: homm2 {init|configure|build|status}", file=sys.stderr)
+    return 0 if cmd in ("help", "-h", "--help") else 1
