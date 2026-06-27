@@ -102,10 +102,15 @@ def main(argv):
         rows = []
         for rel, off in recs:
             ab = dl + rel
-            txt = src_lines[ab - 1].strip() if 0 < ab <= len(src_lines) else ""
-            if txt:
-                rows.append([off, ab, txt])
+            line = src_lines[ab - 1] if 0 < ab <= len(src_lines) else ""
+            if line.strip():
+                rows.append([off, ab, line])
         if rows:
+            # dedent by the function's OUTERMOST statement indent: the body sits at
+            # column 0 while RELATIVE C++ nesting (scope) is preserved.
+            base = min(len(r[2]) - len(r[2].lstrip()) for r in rows)
+            for r in rows:
+                r[2] = r[2][base:].rstrip()
             result[mangled] = rows
     outp = REPO / "build/lines" / f"{unit}.json"
     outp.write_text(json.dumps(result) + "\n")

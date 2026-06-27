@@ -311,7 +311,7 @@ local function read_source_json(root, unit)
   local out = {}
   for mangled, rows in pairs(j) do
     local m = {}
-    for _, r in ipairs(rows) do m[r[1]] = ("L%d  %s"):format(r[2], r[3]) end
+    for _, r in ipairs(rows) do m[r[1]] = ("%d: %s"):format(r[2], r[3]) end
     out[mangled] = m
   end
   return out
@@ -376,11 +376,11 @@ local function attach_source_lines(buf, ctx)
     for i, addr in pairs(ctx.addrs) do
       if stmts[addr] then
         pcall(vim.api.nvim_buf_set_extmark, buf, SRC_NS, (i - 1) + off0, 0,
-          { virt_lines = { { { "  ; " .. stmts[addr], "Comment" } } }, virt_lines_above = true })
+          { virt_lines = { { { stmts[addr], "Comment" } } }, virt_lines_above = true })
         local ti = inv_t and ctx.raws and inv_t[ctx.raws[i]]   -- paired target row
         if ti then
           pcall(vim.api.nvim_buf_set_extmark, tbuf, SRC_NS, ti - 1, 0,
-            { virt_lines = { { { "  ;", "Comment" } } }, virt_lines_above = true })
+            { virt_lines = { { { ";", "Comment" } } }, virt_lines_above = true })
         end
       end
     end
