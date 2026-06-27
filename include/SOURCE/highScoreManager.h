@@ -1,4 +1,5 @@
-#pragma once
+#ifndef HOMM2_SOURCE_HIGHSCOREMANAGER_H
+#define HOMM2_SOURCE_HIGHSCOREMANAGER_H
 // Reconstructed class (SOURCE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // 5 methods, 3 own-virtual, 0 static data.
 #include "../_macros.h"
@@ -17,3 +18,4 @@ public:
     // --- methods ---
     void Update(void);
 };
+#endif // HOMM2_SOURCE_HIGHSCOREMANAGER_H

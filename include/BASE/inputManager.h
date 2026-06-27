@@ -1,4 +1,5 @@
-#pragma once
+#ifndef HOMM2_BASE_INPUTMANAGER_H
+#define HOMM2_BASE_INPUTMANAGER_H
 // Reconstructed class (BASE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // 12 methods, 3 own-virtual, 0 static data.
 #include "../_macros.h"
@@ -24,3 +25,4 @@ public:
     void MakeScanCodeTable(void);
     void ForceMouseMove(void);
 };
+#endif // HOMM2_BASE_INPUTMANAGER_H

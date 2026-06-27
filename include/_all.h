@@ -1,4 +1,5 @@
-#pragma once
+#ifndef HOMM2__ALL_H
+#define HOMM2__ALL_H
 // every reconstructed class, base-before-derived
 #include "SOURCE/ExpCampaign.h"
 #include "BASE/MIDIWrap.h"
@@ -46,3 +47,4 @@
 #include "SOURCE/town.h"
 #include "SOURCE/townManager.h"
 #include "SOURCE/townObject.h"
+#endif // HOMM2__ALL_H
