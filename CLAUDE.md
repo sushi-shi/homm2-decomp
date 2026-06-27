@@ -12,12 +12,21 @@ with the original **MSVC 4.2** toolchain under wine, produces object files
   ground truth** — already extracted to `build/gen/symbol_names.csv` and the
   recovered `include/` headers. **Never guess or re-derive them; there is no
   Ghidra / FID / name-recovery stage**.
-- **The build is `/Od` (debug), not `/O2`.** Flags: **`/nologo /c /Od /MT /Gr`** —
+- **The build is `/Od` (debug), not `/O2`.** Flags: **`/nologo /c /Od /MT /Gr /G5 /Ob1`** —
   unoptimized (full `ebp` frames, every local spilled), static LIBCMT,
-  **`__fastcall` default** (free fns mangle `@@YI`; 1st/2nd int args in ECX/EDX).
+  **`__fastcall` default** (free fns mangle `@@YI`; 1st/2nd int args in ECX/EDX),
+  **`/G5`** (Pentium target: zero-extends with AND, never MOVZX — `docs/patterns/od-debug-build.md`).
   **No `/GX` → no C++ exceptions / no EH state. No RTTI.** So the EH wall and the
-  /O2 regalloc/scheduling walls of a typical decomp **do not exist here** — most
-  functions reconstruct to 100% directly. Lowering is literal: body maps ~1:1 to asm.
+  /O2 regalloc/scheduling walls of a typical decomp **do not exist here** — lowering is
+  mostly literal, body ~1:1 to asm.
+- **But inline expansion is ON (`/Ob1`) — separate axis from `/Od`.** "Unoptimized but
+  inlined." The retail `.text` is littered with `jmp $+0` (`e9 00000000`, jump-to-next)
+  that plain `/Od` never emits: they are the per-call-site continuation jumps of
+  **inlined in-class accessors**. A cluster of `jmp $+0` around repeated field/array
+  access is the fingerprint that the original used inline getters (e.g. `fullMap::Row`/
+  `Extra`) — reconstruct them, don't hand-inline to a raw expression (that structurally
+  caps the match). Fully-inlined accessors emit no symbol, so CodeView lists none.
+  Pattern: **`docs/patterns/inline-accessors.md`**.
 - **The one real /Od lever is SOLVED: stack-slot naming.** `/Od` assigns each
   local's frame offset by a **hash of its name** (per-scope 16-bucket table), not
   declaration order. This is fully reverse-engineered → **`scripts/od_slots.py`**

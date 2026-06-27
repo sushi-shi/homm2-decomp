@@ -1,20 +1,24 @@
-# HEROES2W.EXE is an unoptimized /Od /Gr debug build
+# HEROES2W.EXE is an unoptimized /Od /Gr /G5 /Ob1 debug build
 
 **tags:** `toolchain:vc42` `topic:od` `topic:flags`
 
 ## symptom
 The retail `.text` for a TU spills `this`/params to the stack and reloads them
-on every use, emits `jmp` to the next instruction at statement boundaries,
-always pushes ebx/esi/edi in the prologue, and never keeps a value live across
-statements. That is textbook **/Od** (no optimization), not /O2.
+on every use, always pushes ebx/esi/edi in the prologue, and never keeps a value
+live across statements. That is textbook **/Od** (no optimization), not /O2. It is
+also littered with `jmp $+0` (jump-to-next) — but those are NOT generic statement
+boundaries (plain /Od emits none); they are inline-expansion artifacts, see
+**inline-accessors.md**.
 
 ## cause
 PoL `HEROES2W.EXE` was shipped compiled **/Od** (which is also why it carries a
 full CodeView NB09 stream). The configured `base` flag profile is therefore the
 debug set, not an optimized one:
 ```
-base = ["/nologo", "/c", "/Od", "/MT", "/Gr"]
+base = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1"]
 ```
+(`/G5` = Pentium target, AND-not-MOVZX zero-extend; `/Ob1` = inline expansion ON —
+a separate axis from /Od, see inline-accessors.md.)
 `/Gr` makes the *default* calling convention `__fastcall` for free functions —
 member functions stay `__thiscall` (ecx=this, callee cleanup `ret $N`), but any
 free/CRT function you declare yourself will be mis-called unless it carries an
@@ -33,6 +37,7 @@ explicit convention.
 
 ## upside
 /Od is *much* easier to match than /O2 — no scheduling or instruction-combining
-to reproduce. The two real costs are (1) hash-ordered local slots
-(see od-hash-slots.md) and (2) occasional regalloc/scheduling of member-base
-pointer additions inside loops.
+to reproduce. The real costs are (1) hash-ordered local slots (see od-hash-slots.md),
+(2) occasional regalloc/scheduling of member-base pointer additions inside loops, and
+(3) reconstructing the inline accessors `/Ob1` expands (the `jmp $+0` fingerprint;
+see inline-accessors.md) instead of hand-inlining them to raw expressions.

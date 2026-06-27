@@ -1,6 +1,6 @@
-# /Od 2D cell access form + the block-jmp-to-next wall
+# /Od 2D cell access form + the block-jmp-to-next wall (SOLVED -> inline-accessors.md)
 
-**tags:** `topic:od` `cpp:array` `topic:wall` `toolchain:vc42`
+**tags:** `topic:od` `cpp:array` `toolchain:vc42` `cpp:inline`
 
 ## cell-access form (steerable)
 Retail accesses a row-major grid element `cells[width*y + x]` as a **base pointer
@@ -11,13 +11,21 @@ addl (this),eax                                                       ; + cells 
 movl x,ecx ; leal(ecx,ecx,2),ecx                                      ; x*3
 movw 0xa(eax,ecx,4),dx                                                ; + x*12 + field
 ```
-The natural `cells[width*y + x].extra` instead **combines** the index
-(`imul; add x; lea*3`) then scales once — a mismatch. Spell it as a base pointer:
+Getting this exact addressing needs the row base to materialize as a **pointer
+value** before `[x]`. A *raw* `(cells + width*y)[x].extra` REASSOCIATES to
+`width*y*12 + x*12` then `+cells` -> wrong `0xa(%eax,%ecx)` (no scale). An **inline
+row accessor** keeps the boundary and defers `[x]`:
 ```cpp
-(cells + width * y)[x].extra        // width*y folds into the base, x into addressing
-(cells + width * y) + x             // for &cells[width*y+x]
+mapCell *Row(int y) { return cells + width * y; }   // then Row(y)[x].extra
 ```
-This made the four cell reads in GetNewCellExtra* match.
+gives `0xa(%eax,%ecx,4)` — the retail form. See `inline-accessors.md`.
+
+## the block-jmp wall — SOLVED
+The `jmp $+0` filler was **inline expansion (`/Ob1`)**, not a mysterious /Od quirk:
+each inlined accessor call emits a per-site continuation `jmp $+0`. Reconstructing
+the `Row`/`Extra` inline accessors + `/Ob1` reproduces both the addressing and the
+jumps, taking GetNewCellExtra* from the ~86–91% plateau to ~97%. Full writeup:
+**`inline-accessors.md`**.
 
 ## the block-jmp wall (topic:wall — not yet steered)
 Retail GetNewCellExtraOverlay/Object carry /Od **jmp-to-next-instruction** filler
@@ -27,6 +35,6 @@ prologue (target+0x11), plus paired `jmp;jmp` at block ends and after returning
 none reproduced the leading jmp, and the count stays ~10 instructions short
 (~86% vs 100%). Likely a specific source construct (an inline accessor that VC4.2
 /Od does *not* inline but still brackets, or a loop/scope shape) drives these.
-Combined with the 4-local hash-slot order (cur/idx/ni/cp), these two functions
-are parked at a plateau. Revisit once the MSVC 4.2 identifier hash is reversed
-and the jmp-emitting construct is identified.
+The remaining residual is the exact `jmp $+0` placement (which accessor decomposition
+the original used) plus the 4-local hash-slot order (cur/idx/ni/cp) — ordinary
+matcher polish, no longer a wall.
