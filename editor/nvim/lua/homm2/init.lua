@@ -264,10 +264,12 @@ local function asm_lines(sym)
   local label = {}
   for idx, d in ipairs(ordered) do label[d] = ".L" .. idx end
 
-  -- `out` = display lines; `addrs[i]` = code offset of out[i] for instruction rows
-  -- (nil for label rows). The source overlay matches addrs to the line table.
-  local out, addrs = {}, {}
-  for _, i in ipairs(ins) do
+  -- `out` = display lines; for each instruction row, `addrs[i]` = its code offset
+  -- and `raws[i]` = its index in objdiff's instruction array (label rows: both nil).
+  -- objdiff's left/right arrays are index-PAIRED, so raws is the join that aligns a
+  -- base row with its target row across the two panes (their addresses differ).
+  local out, addrs, raws = {}, {}, {}
+  for k, i in ipairs(ins) do
     local I = i.instruction or {}
     -- Skip objdiff's diff-alignment GAPS: empty placeholder rows (no `formatted`,
     -- diff_kind INSERT/DELETE) it inserts so the two sides line up. They are not
@@ -281,10 +283,11 @@ local function asm_lines(sym)
       if d and label[d] then text = text:gsub(("0x%x"):format(d), label[d]) end
       out[#out + 1] = "    " .. text
       addrs[#out] = off
+      raws[#out] = k
     end
   end
   if #out == 0 then out = { "(no instructions)" } end
-  return out, addrs
+  return out, addrs, raws
 end
 
 local function pct(x) return string.format("%.2f%%", x or 0) end
@@ -343,25 +346,55 @@ local function source_map(root, unit, cb)
     end)
 end
 
---- Place / refresh the source-statement virtual lines on a base asm buffer.
+--- Place / refresh the source-statement overlay. Driven by the BASE buffer only
+--- (single vb, or the base pane of a diff). The base buffer shows each statement's
+--- text above its asm; in a diff, the SAME virtual line is mirrored as an empty `;`
+--- on the TARGET pane at the index-PAIRED row (ctx.sibling_target + ctx.traws), so
+--- the two scrollbound panes grow by equal virtual lines and stay aligned - a
+--- base-only overlay would shift base down out of sync. Target/vt are never driven
+--- directly. Clears first (its buffer + the sibling) so toggle-off cleans up both.
+--- Caveat: a statement whose first instruction is a base-only insertion (the target
+--- has a GAP there) has no target row to pad, so it drifts the panes by one below
+--- that point; perfectly matched functions have no gaps and stay exact.
 local function attach_source_lines(buf, ctx)
-  if not (M.config.source_lines and ctx and ctx.side == "base"
-          and ctx.addrs and ctx.name and ctx.unit and ctx.root) then return end
+  if not (ctx and ctx.side == "base" and vim.api.nvim_buf_is_valid(buf)) then return end
+  pcall(vim.api.nvim_buf_clear_namespace, buf, SRC_NS, 0, -1)
+  if ctx.sibling_target and vim.api.nvim_buf_is_valid(ctx.sibling_target) then
+    pcall(vim.api.nvim_buf_clear_namespace, ctx.sibling_target, SRC_NS, 0, -1)
+  end
+  if not (M.config.source_lines and ctx.addrs and ctx.name and ctx.unit and ctx.root) then return end
   source_map(ctx.root, ctx.unit, function(map)
     if not (map and vim.api.nvim_buf_is_valid(buf)) then return end
     local stmts = map[ctx.name]; if not stmts then return end
-    vim.api.nvim_buf_clear_namespace(buf, SRC_NS, 0, -1)
+    pcall(vim.api.nvim_buf_clear_namespace, buf, SRC_NS, 0, -1)
     local off0 = ctx.line_offset or 0
+    local tbuf, inv_t = ctx.sibling_target, nil   -- target row by raw index, for padding
+    if tbuf and ctx.traws and vim.api.nvim_buf_is_valid(tbuf) then
+      pcall(vim.api.nvim_buf_clear_namespace, tbuf, SRC_NS, 0, -1)
+      inv_t = {}; for ti, k in pairs(ctx.traws) do inv_t[k] = ti end
+    end
     for i, addr in pairs(ctx.addrs) do
-      local txt = stmts[addr]
-      if txt then
-        pcall(vim.api.nvim_buf_set_extmark, buf, SRC_NS, (i - 1) + off0, 0, {
-          virt_lines = { { { "  ; " .. txt, "Comment" } } },
-          virt_lines_above = true,
-        })
+      if stmts[addr] then
+        pcall(vim.api.nvim_buf_set_extmark, buf, SRC_NS, (i - 1) + off0, 0,
+          { virt_lines = { { { "  ; " .. stmts[addr], "Comment" } } }, virt_lines_above = true })
+        local ti = inv_t and ctx.raws and inv_t[ctx.raws[i]]   -- paired target row
+        if ti then
+          pcall(vim.api.nvim_buf_set_extmark, tbuf, SRC_NS, ti - 1, 0,
+            { virt_lines = { { { "  ;", "Comment" } } }, virt_lines_above = true })
+        end
       end
     end
   end)
+end
+
+--- Re-apply (or clear, when toggled off) the overlay on every open view; the base
+--- pane drives its target sibling, so both diff panes stay aligned.
+local function refresh_all_source()
+  for _, b in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_valid(b) and vim.b[b].homm2 then
+      attach_source_lines(b, vim.b[b].homm2)
+    end
+  end
 end
 
 -- --------------------------------------------------------------- rendering ---
@@ -487,18 +520,20 @@ end
 --- highlighted - the objdiff look, in the editor. A winbar labels each pane
 --- TARGET (retail) / BASE (recompiled) so the sides are never ambiguous.
 local function show_diff(root, sym, t, b)
-  local function pane(side, s)
+  local function pane(side, s, extra)
     local name = "homm2://diff." .. side .. "/" .. sym.name:gsub("[^%w_:~.$?@]+", ".")
     local buf = vim.fn.bufnr("^" .. vim.fn.fnameescape(name) .. "$")
     if buf == -1 then
       buf = vim.api.nvim_create_buf(true, true)
       vim.api.nvim_buf_set_name(buf, name)
     end
-    local lines, addrs = asm_lines(s)
-    fill(buf, lines, { root = root, filetype = "asm", kind = "diffpane",
-                       name = sym.name, unit = sym.unit, side = side,
-                       addrs = addrs, line_offset = 0 })
-    return buf
+    local lines, addrs, raws = asm_lines(s)
+    local ctx = { root = root, filetype = "asm", kind = "diffpane",
+                  name = sym.name, unit = sym.unit, side = side,
+                  addrs = addrs, raws = raws, line_offset = 0 }
+    for k, v in pairs(extra or {}) do ctx[k] = v end
+    fill(buf, lines, ctx)
+    return buf, raws
   end
 
   -- Lighter than nvim's default diff (which washes the whole CHANGED line via
@@ -509,7 +544,11 @@ local function show_diff(root, sym, t, b)
   vim.api.nvim_set_hl(0, "Homm2DiffText", { underline = true })
   local WH = "DiffChange:Homm2DiffChange,DiffText:Homm2DiffText"
 
-  local tbuf, bbuf = pane("target", t), pane("base", b)
+  -- render TARGET first so its paired raw indices are known, then the BASE pane
+  -- drives the overlay: statement text on base + an empty `;` on target at the
+  -- index-paired row, keeping the scrollbound panes aligned.
+  local tbuf, traws = pane("target", t)
+  local bbuf = pane("base", b, { sibling_target = tbuf, traws = traws })
   vim.cmd(M.config.split)
   vim.api.nvim_win_set_buf(0, tbuf)
   set_winbar(vim.api.nvim_get_current_win(), "TARGET (retail)", sym.name, t.match_percent)
@@ -1197,9 +1236,7 @@ function M.dispatch(arg)
   if arg == "source" then
     M.config.source_lines = not M.config.source_lines
     save_state(project_root(0))
-    local buf, ctx = vim.api.nvim_get_current_buf(), vim.b.homm2
-    if M.config.source_lines then attach_source_lines(buf, ctx)
-    else pcall(vim.api.nvim_buf_clear_namespace, buf, SRC_NS, 0, -1) end
+    refresh_all_source()   -- re-apply/clear on every open view (both diff panes)
     return notify("source overlay " .. (M.config.source_lines and "ON (base views)" or "off"))
   end
   if arg == "target" or arg == "base" or arg == "diff" then return M.view(arg) end
