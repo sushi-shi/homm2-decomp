@@ -1,4 +1,5 @@
-#pragma once
+#ifndef HOMM2_EDITOR_FULLMAP_H
+#define HOMM2_EDITOR_FULLMAP_H
 // Reconstructed class (EDITOR) from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // 11 methods, 0 own-virtual, 0 static data.
 #include <va.h>
@@ -31,3 +32,4 @@ public:
     void ChangeTilesetIndex(class mapCell *, int, int, int, int, int, int);
 };
 SIZE(fullMap, 20);
+#endif // HOMM2_EDITOR_FULLMAP_H
