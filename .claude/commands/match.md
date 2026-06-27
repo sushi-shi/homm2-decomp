@@ -29,7 +29,7 @@ In short (full rules in the two agent docs):
 3. **Fan out:** N background matchers (`subagent_type="matcher"`, `run_in_background: true`,
    **NOT** `isolation: worktree`). Each prompt: absolute worktree path + `cd` there first,
    absolute paths, the target RVA/name/size/TU, the 8-digit convention, the
-   **`tools/od_slots.py` stack-naming workflow**, push-to-100% + byte-proven `@early-stop`, report % +
+   **`scripts/od_slots.py` stack-naming workflow**, push-to-100% + byte-proven `@early-stop`, report % +
    one-line summary + full `git diff`. **Lane discipline:** all targets of one TU through
    ONE slot.
 4. **Integrate SERIALLY:** one at a time — guard master clean → apply only that matcher's

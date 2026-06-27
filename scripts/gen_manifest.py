@@ -83,8 +83,7 @@ pubs.sort()
 # named"). Every .reloc fixup stores an absolute VA; targets landing in a data
 # section that aren't already a named symbol get a synthetic name so the delinker
 # can emit a named external ref (the name mismatch vs our base obj is absorbed by
-# reloc-masking during matching). This is the CodeView-side equivalent of gruntz's
-# Ghidra symbols.csv constant inventory.
+# reloc-masking during matching). This is a CodeView-side constant inventory.
 named_va = set(v for v, _ in pubs)
 ddir = e + 24 + 96
 rrva, rsize = struct.unpack_from("<II", d, ddir + 5 * 8)
@@ -176,7 +175,7 @@ for im,name in modname.items():
     if src: units.append((f"{tier}/{st}", src))
 units.sort()
 with open(os.path.join(REPO,"config","units.toml"),"w") as f:
-    f.write("# units.toml - per-TU build manifest (generated from CodeView by tools/gen_manifest.py).\n")
+    f.write("# units.toml - per-TU build manifest (generated from CodeView by scripts/gen_manifest.py).\n")
     f.write("# unit MUST match the unit column in config/symbol_names.csv.\n\n")
     f.write('[build]\ncompiler = "msvc4.2"\nplatform = "win32"\n\n')
     f.write("[flags]\n")

@@ -23,4 +23,4 @@ confidence from static evidence; empirical byte-match confirmation pending a VC4
 Compile one leaf function (e.g. a small `BASE/` accessor of known RVA+size) with cl 10.20
 `/c /O2 /MT` and objdiff against the delinked retail object. A byte-match pins 4.2 exactly;
 a near-miss would send us to test 4.1. This needs the VC4.2 `cl.exe`/`c1.dll`/`c2.exe` +
-`include/` + `lib/` (LIBCMT + the era Win32 SDK), packaged like gruntz's VC5 tarball.
+`include/` + `lib/` (LIBCMT + the era Win32 SDK), packaged as a self-contained toolchain tree.

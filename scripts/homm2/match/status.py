@@ -43,7 +43,7 @@ def _md_table(headers, aligns, rows):
 
 
 def readme_block(data):
-    """gruntz-style per-tier match table (Module = BASE/SOURCE/EDITOR tier)."""
+    """per-tier match table (Module = BASE/SOURCE/EDITOR tier)."""
     tiers = {}
     for u in data.get("units", []):
         tier = u.get("name", "?").split("/")[0]

@@ -1,5 +1,5 @@
 # Rust-like clang-format style for the reconstructed C++. Whitespace-only =>
-# matching-NEUTRAL. Run via `gruntz format`; rationale in docs/build-system.md.
+# matching-NEUTRAL. Apply with clang-format using the repo .clang-format.
 ---
 Language: Cpp
 BasedOnStyle: LLVM

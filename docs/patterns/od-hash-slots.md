@@ -78,11 +78,11 @@ The `>>16` fold only bites once `h >= 2^16` (~5+ chars), which is why naive
 rolling-hash guesses fit short names but not long ones. Verified byte-exact vs the
 retail compiler on 146 single-name buckets and 40 random multi-name layouts.
 
-**Use `tools/od_slots.py`** — pure function, no compiler in the loop:
+**Use `scripts/od_slots.py`** — pure function, no compiler in the loop:
 `bucket(name)`, `slot_order(decl_names)`, `predict_offsets()`, `solve(n)`, and
 `solve_layout(slots)` (name a target layout from a role/candidate list). This
 replaces the per-function wine-`cl` name search entirely;
-`tools/od_oracle.py` verifies against the real compiler.
+`scripts/od_oracle.py` verifies against the real compiler.
 
 **Full model** — including the per-scope 16-bucket tables, the VC4.2 old-for-scope
 quirk, no-slot-reuse, and the multi-scope layout algorithm — is documented in
