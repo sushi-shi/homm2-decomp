@@ -106,6 +106,8 @@ void fullMap::Write(int handle)
     _write(handle, extras, extraCount * sizeof(mapCellExtra));
 }
 
+// ~98%: all slots + logic match; one convert-path memcpy dst (cells+width*y+x)
+// schedules the cells-base add differently (regalloc artifact, see report).
 RVA(0x0040b7da, 0x295)
 void fullMap::Read(int handle, int convert)
 {
@@ -144,11 +146,68 @@ void fullMap::Read(int handle, int convert)
     }
 }
 
+// PARTIAL (~86%): logic + the (cells+width*y)[x] cell-access form match retail;
+// residual is /Od block-boundary jmp-to-next artifacts (incl. a leading jmp) plus
+// the 4-local hash-slot order (cur/idx/ni/cp). See docs/patterns/od-hash-slots.md.
 RVA(0x0040b396, 0x1d3)
-// struct mapCellExtra * fullMap::GetNewCellExtraOverlay(int, int);
+mapCellExtra *fullMap::GetNewCellExtraOverlay(int x, int y)
+{
+    mapCellExtra *cur;   // -0x4
+    int idx;             // -0x8
+    int ni;              // -0xc
+    mapCell *cp;         // -0x10
 
+    if ((cells + width * y)[x].extra == 0) {
+        cp = (cells + width * y) + x;
+        cp->extra = GetNewCellExtraIndex();
+        return &extras[(cells + width * y)[x].extra];
+    }
+    idx = (cells + width * y)[x].extra;
+    cur = &extras[(cells + width * y)[x].extra];
+    for (;;) {
+        if (cur->ovlIndex == 0xFF)
+            return cur;
+        if (cur->index == 0) {
+            ni = GetNewCellExtraIndex();
+            cur = &extras[idx];
+            cur->index = ni;
+            return &extras[cur->index];
+        }
+        idx = cur->index;
+        cur = &extras[cur->index];
+    }
+}
+
+// PARTIAL (~86%): twin of GetNewCellExtraOverlay (objIndex vs ovlIndex); same
+// /Od block-jmp + hash-slot residual.
 RVA(0x0040b569, 0x1d3)
-// struct mapCellExtra * fullMap::GetNewCellExtraObject(int, int);
+mapCellExtra *fullMap::GetNewCellExtraObject(int x, int y)
+{
+    mapCellExtra *cur;   // -0x4
+    int idx;             // -0x8
+    int ni;              // -0xc
+    mapCell *cp;         // -0x10
+
+    if ((cells + width * y)[x].extra == 0) {
+        cp = (cells + width * y) + x;
+        cp->extra = GetNewCellExtraIndex();
+        return &extras[(cells + width * y)[x].extra];
+    }
+    idx = (cells + width * y)[x].extra;
+    cur = &extras[(cells + width * y)[x].extra];
+    for (;;) {
+        if (cur->objIndex == 0xFF)
+            return cur;
+        if (cur->index == 0) {
+            ni = GetNewCellExtraIndex();
+            cur = &extras[idx];
+            cur->index = ni;
+            return &extras[cur->index];
+        }
+        idx = cur->index;
+        cur = &extras[cur->index];
+    }
+}
 
 RVA(0x0040ba6f, 0x2ea)
 // void fullMap::ChangeTilesetIndex(class mapCell *, int, int, int, int, int, int);
