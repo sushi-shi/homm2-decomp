@@ -896,18 +896,14 @@ end
 -- build_gen tags each request so a killed job's on_exit bails out.
 local build_job, build_gen, build_note = nil, 0, nil
 
---- Run `homm2 build` (incremental, wrapped in the MSVC+wine shell).
+--- Run `homm2 build` (incremental).
 --- quiet=false: a terminal split with the live log (manual :Homm2Build).
 --- quiet=true : no log window - just a small "building ..." note that closes
 ---              into the result popup (build-on-save).
---- nvim launched from `nix develop .#build` already has the toolchain env, so we
---- run `homm2 build` DIRECTLY - no per-build `nix develop` (which costs ~2.5s).
---- Outside it we wrap in `nix develop .#build` (works, but pays that every build;
---- launch nvim from .#build for the fast loop).
-local function in_build_env()
-  return (os.getenv("MSVC_DIR") or "") ~= "" and (os.getenv("WINEPREFIX") or "") ~= ""
-end
-
+--- The plugin only ever loads from a `nix develop` shell (the shim that injects it
+--- is itself set up by the shellHook), so the toolchain is on PATH and we run
+--- `homm2 build` DIRECTLY. From the wrong shell (.#default - no wine/MSVC) the build
+--- fails loudly, which is the correct signal to re-enter `nix develop .#build`.
 local function do_build(root, args, quiet)
   if build_job then pcall(vim.fn.jobstop, build_job); build_job = nil end
   if build_note then pcall(build_note); build_note = nil end
@@ -916,11 +912,9 @@ local function do_build(root, args, quiet)
   local t0 = uv.hrtime()
   local before = read_report(root)
   local unit = (select(1, symbol_at(root, 0, vim.api.nvim_win_get_cursor(0)[1])) or {}).unit
-  local direct = in_build_env()
-  local cmd = direct and { "homm2", "build" }
-              or { "nix", "develop", ".#build", "--command", "homm2", "build" }
+  local cmd = { "homm2", "build" }
   vim.list_extend(cmd, args or {})
-  log("build" .. (quiet and " (on save)" or "") .. (direct and " [direct]" or " [nix]")
+  log("build" .. (quiet and " (on save)" or "")
     .. ": " .. table.concat(cmd, " ") .. "  [" .. root .. "]")
   local function on_exit(_, code)
     vim.schedule(function()
@@ -1052,11 +1046,9 @@ local function do_fast_build(root, unit, buf)
   local t0 = uv.hrtime()
   local before = effective_unit_pcts(root, unit)
   local target = "build/objdiff/base/" .. unit .. ".obj"
-  local direct = in_build_env()
   -- A specific ninja target -> ninja builds only that obj.
-  local cmd = direct and { "homm2", "build", target }
-              or { "nix", "develop", ".#build", "--command", "homm2", "build", target }
-  log("save-build [" .. unit .. "]" .. (direct and " [direct]" or " [nix]")
+  local cmd = { "homm2", "build", target }
+  log("save-build [" .. unit .. "]"
     .. ": " .. table.concat(cmd, " ") .. "  [" .. root .. "]")
   build_note = show_note("building " .. unit .. " ...")
   build_job = vim.fn.jobstart(cmd, { cwd = root, on_exit = function(_, code)
