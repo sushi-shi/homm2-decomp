@@ -146,9 +146,11 @@ void fullMap::Read(int handle, int convert)
     }
 }
 
-// PARTIAL (~86%): logic + the (cells+width*y)[x] cell-access form match retail;
-// residual is /Od block-boundary jmp-to-next artifacts (incl. a leading jmp) plus
-// the 4-local hash-slot order (cur/idx/ni/cp). See docs/patterns/od-hash-slots.md.
+// @early-stop ~97%: cell/extra access goes through the inline Row()/Extra()
+// accessors so /Ob1 splices them in - matching retail's deferred Row(y)[x] indexing
+// AND its per-call `jmp $+0`s (raw expressions capped this at ~91%). Residual is a few
+// jmp-placement slots (the exact accessor decomposition) + trailing alignment nop.
+// See docs/patterns/inline-accessors.md, docs/patterns/od-hash-slots.md.
 VA(0x0040b396, 0x1d3)
 mapCellExtra *fullMap::GetNewCellExtraOverlay(int x, int y)
 {
@@ -157,29 +159,29 @@ mapCellExtra *fullMap::GetNewCellExtraOverlay(int x, int y)
     int ni;              // -0xc
     mapCell *cp;         // -0x10
 
-    if ((cells + width * y)[x].extra == 0) {
-        cp = (cells + width * y) + x;
+    if (Row(y)[x].extra == 0) {
+        cp = &Row(y)[x];
         cp->extra = GetNewCellExtraIndex();
-        return &extras[(cells + width * y)[x].extra];
+        return Extra(Row(y)[x].extra);
     }
-    idx = (cells + width * y)[x].extra;
-    cur = &extras[(cells + width * y)[x].extra];
+    idx = Row(y)[x].extra;
+    cur = Extra(Row(y)[x].extra);
     for (;;) {
         if (cur->ovlIndex == 0xFF)
             return cur;
         if (cur->index == 0) {
             ni = GetNewCellExtraIndex();
-            cur = &extras[idx];
+            cur = Extra(idx);
             cur->index = ni;
-            return &extras[cur->index];
+            return Extra(cur->index);
         }
         idx = cur->index;
-        cur = &extras[cur->index];
+        cur = Extra(cur->index);
     }
 }
 
-// PARTIAL (~86%): twin of GetNewCellExtraOverlay (objIndex vs ovlIndex); same
-// /Od block-jmp + hash-slot residual.
+// @early-stop ~97%: twin of GetNewCellExtraOverlay (objIndex vs ovlIndex); same
+// inline-accessor + /Ob1 reconstruction, same jmp-placement residual.
 VA(0x0040b569, 0x1d3)
 mapCellExtra *fullMap::GetNewCellExtraObject(int x, int y)
 {
@@ -188,24 +190,24 @@ mapCellExtra *fullMap::GetNewCellExtraObject(int x, int y)
     int ni;              // -0xc
     mapCell *cp;         // -0x10
 
-    if ((cells + width * y)[x].extra == 0) {
-        cp = (cells + width * y) + x;
+    if (Row(y)[x].extra == 0) {
+        cp = &Row(y)[x];
         cp->extra = GetNewCellExtraIndex();
-        return &extras[(cells + width * y)[x].extra];
+        return Extra(Row(y)[x].extra);
     }
-    idx = (cells + width * y)[x].extra;
-    cur = &extras[(cells + width * y)[x].extra];
+    idx = Row(y)[x].extra;
+    cur = Extra(Row(y)[x].extra);
     for (;;) {
         if (cur->objIndex == 0xFF)
             return cur;
         if (cur->index == 0) {
             ni = GetNewCellExtraIndex();
-            cur = &extras[idx];
+            cur = Extra(idx);
             cur->index = ni;
-            return &extras[cur->index];
+            return Extra(cur->index);
         }
         idx = cur->index;
-        cur = &extras[cur->index];
+        cur = Extra(cur->index);
     }
 }
 
