@@ -1,4 +1,4 @@
-# units.toml - per-TU build manifest (generated from CodeView by tools/gen_manifest.py).
+# units.toml - per-TU build manifest (generated from CodeView by scripts/gen_manifest.py).
 # unit MUST match the unit column in config/symbol_names.csv.
 
 [build]
@@ -6,7 +6,7 @@ compiler = "msvc4.2"
 platform = "win32"
 
 [flags]
-base = ["/nologo", "/c", "/Od", "/MT", "/Gr"]   # DEBUG build: /Od + /Gr(fastcall) + /MT(LIBCMT)
+base = ["/nologo", "/c", "/Od", "/MT", "/Gr"]
 
 [[unit]]
 unit = "BASE/BASEMGR"
