@@ -18,7 +18,14 @@ HOMM2_DIR = next((p for p in SCRIPT_DIR.parents if (p / "flake.nix").exists()), 
 def die(m): print(f"[cc_wrap] ERROR: {m}", file=sys.stderr); sys.exit(1)
 def find_ci(d, name):
     return next((p for p in d.iterdir() if p.name.lower() == name.lower()), None) if d.is_dir() else None
-def msvc_dir(): return Path(os.environ.get("MSVC_DIR", str(HOMM2_DIR / "build/toolchain/msvc")))
+def msvc_dir():
+    # Honor a VALID $MSVC_DIR override (e.g. a hosted toolchain); otherwise anchor on
+    # the repo's own build/toolchain. A stale/wrong MSVC_DIR or HOMM2_TOOLCHAIN
+    # lingering in the env (shell entered from a subdir) thus can't break the build.
+    env = os.environ.get("MSVC_DIR")
+    if env and find_ci(Path(env) / "bin", "cl.exe"):
+        return Path(env)
+    return HOMM2_DIR / "build/toolchain/msvc"
 def winepath_w(p):
     return subprocess.check_output(["winepath", "-w", str(p)], text=True, stderr=subprocess.DEVNULL).strip()
 def ensure_wineserver():
@@ -53,6 +60,8 @@ def main():
     out.parent.mkdir(parents=True, exist_ok=True)
     if out.exists(): out.unlink()
     os.environ.setdefault("WINEDEBUG", "fixme-all,err-kerberos")
+    if not Path(os.environ.get("WINEPREFIX", "")).is_dir():   # same anti-stale anchor
+        os.environ["WINEPREFIX"] = str(HOMM2_DIR / "build/wineprefix")
     ensure_wineserver()
     # INCLUDE = MSVC headers + repo include/ (cl reads INCLUDE for <...> system headers).
     incs = [msvc / "include"]
