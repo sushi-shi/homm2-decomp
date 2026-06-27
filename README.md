@@ -23,7 +23,7 @@ _**Functions exact** = byte-identical. **Fuzzy** = size-weighted instruction mat
 | :------- | ----: | --------------: | ----: |
 | `SOURCE` |    50 | 0 / 1039 (0.0%) |  0.0% |
 | `BASE`   |    44 |  0 / 445 (0.0%) |  0.0% |
-| `EDITOR` |     1 |  7 / 11 (63.6%) | 98.4% |
+| `EDITOR` |     1 |  7 / 11 (63.6%) | 98.5% |
 
 <!-- match-score:end -->
 
