@@ -180,8 +180,11 @@ with open(os.path.join(REPO,"config","units.toml"),"w") as f:
     f.write("# unit MUST match the unit column in config/symbol_names.csv.\n\n")
     f.write('[build]\ncompiler = "msvc4.2"\nplatform = "win32"\n\n')
     f.write("[flags]\n")
-    f.write('base = ["/nologo", "/c", "/O2", "/MT"]      # default VC4.2 profile (refine via docs/linker-flags.md)\n')
-    f.write('eh   = ["/nologo", "/c", "/O2", "/MT", "/GX"]\n\n')
+    # The retail build is a DEBUG build: /Od (unoptimized - full ebp frames, locals
+    # round-tripped through the stack) + /Gr (__fastcall default; 458 free fns mangle
+    # @@YI vs 6 cdecl) + /MT (static LIBCMT). Verified vs retail disassembly.
+    f.write('base = ["/nologo", "/c", "/Od", "/MT", "/Gr"]\n')
+    f.write('eh   = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/GX"]\n\n')
     for st,src in units:
         f.write(f'[[unit]]\nunit = "{st}"\nsource = "{src}"\nflags = "base"\n\n')
 
