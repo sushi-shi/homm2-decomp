@@ -1,0 +1,75 @@
+# Rust-like clang-format style for the reconstructed C++. Whitespace-only =>
+# matching-NEUTRAL. Run via `gruntz format`; rationale in docs/build-system.md.
+---
+Language: Cpp
+BasedOnStyle: LLVM
+# c++03 is clang-format's OLDEST standard; any pre-C++11 value keeps `> >` (not
+# `>>`), which the pre-C++98 MSVC 5.0 parser needs. Not a claim that we're c++03.
+Standard: c++03
+
+# --- indentation -----------------------------------------------------------
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ContinuationIndentWidth: 4
+AccessModifierOffset: -4
+NamespaceIndentation: All
+IndentCaseLabels: true
+IndentPPDirectives: None
+IndentExternBlock: Indent
+
+# --- line width ------------------------------------------------------------
+ColumnLimit: 100
+MaxEmptyLinesToKeep: 1
+
+# --- braces: attach everything, like Rust ----------------------------------
+BreakBeforeBraces: Attach
+InsertBraces: true
+Cpp11BracedListStyle: true
+InsertTrailingCommas: Wrapped
+
+# nothing collapses onto one line (rustfmt expands bodies)
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortBlocksOnASingleLine: Never
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortEnumsOnASingleLine: false
+
+# --- pointers / references bind to the type (Rust `&T`) ---------------------
+DerivePointerAlignment: false
+PointerAlignment: Left
+ReferenceAlignment: Left
+
+# --- spacing ---------------------------------------------------------------
+SpaceBeforeParens: ControlStatements
+SpaceAfterTemplateKeyword: false
+SpacesBeforeTrailingComments: 1
+
+# --- wrapping: BlockIndent; one-per-line when wrapped (no bin-packing) -------
+# Data tables (e.g. the Font GUIDs) opt out with `// clang-format off/on`.
+AlignAfterOpenBracket: BlockIndent
+BinPackArguments: false
+BinPackParameters: false
+AllowAllArgumentsOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+PackConstructorInitializers: NextLine
+BreakConstructorInitializers: BeforeColon
+BreakBeforeBinaryOperators: NonAssignment
+
+# --- comments not rewrapped; trailing comments column-aligned ---------------
+ReflowComments: Never
+AlignTrailingComments:
+  Kind: Always
+  OverEmptyLines: 0
+SortIncludes: Never
+
+# --- project macros (include/rva.h) ----------------------------------------
+StatementMacros:
+  - RVA
+  - RVAU
+  - SYMBOL
+  - DATA
+AttributeMacros:
+  - OVERRIDE
+...
