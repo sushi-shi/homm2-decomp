@@ -8,6 +8,15 @@ A function's instruction *selection* matches the retail byte-for-byte, but every
 permuted (e.g. retail has `i@-0x4, buf@-0x8, j@-0xc` but your build emits
 `buf@-0x4, i@-0x8, j@-0xc`). Reordering the C declarations does **nothing**.
 
+> ⚠️ **objdiff's fuzzy% HIDES this.** A differing displacement (`-0x4` vs `-0x10`)
+> is scored as a *partial* instruction match, not a miss — so a function with EVERY
+> local on the wrong slot can read **97%+ fuzzy** and look "almost done" when it is
+> structurally wrong. ALWAYS confirm by diffing with the **`(%ebp)` displacements
+> visible**: disasm both objs, normalize jump/call targets only, KEEP `-0xN(%ebp)`.
+> If the offsets don't line up, it's this bug — fix the NAMES, not the logic.
+> (On GetNewCellExtra* the locals were fully permuted behind a 97% fuzzy until
+> diffed this way.)
+
 ## cause
 MSVC 4.2 `/Od` assigns frame offsets by walking its **local symbol hash table**,
 not by declaration or first-use order. The bucket a local lands in is a function

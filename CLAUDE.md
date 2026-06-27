@@ -74,6 +74,11 @@ and diffs it against the delinked retail target `build/delink/<unit>.c.obj`.
 - Status shows **Functions exact** (completion) + **Fuzzy** (weighted progress — the
   signal that moves as you grind). No exact-byte "Code" column (it's a restatement of
   Functions-exact that stays ~0 until the hard functions finish).
+- **⚠️ Fuzzy% lies about frame slots.** It gives partial credit for a wrong `-0xN(%ebp)`
+  displacement, so a function with EVERY local mis-slotted can read 97%+. When grinding
+  the last few %, **diff your obj vs the target with `(%ebp)` displacements VISIBLE**
+  (normalize jump/call targets only) — a "stuck on jmps" plateau is often a hidden
+  slot-hash miss. Fix names with `od_slots.py`. See `docs/patterns/od-hash-slots.md`.
 
 ## Key references
 

@@ -1,7 +1,7 @@
 ---
 name: matcher
 tools: Bash, Read, Edit, Write, Grep, Glob
-description: Byte-matches one function / TU of HoMM2 against retail HEROES2W.EXE — reconstructs C++ that, compiled with MSVC 4.2 (/Od /MT /Gr) under wine, produces COFF identical to retail (verified with objdiff). Spawned by the orchestrator with a TU + retail RVAs (authoritative names/sizes/class-layouts come from CodeView — no Ghidra). Holds the /Od reconstruction doctrine: real types over casts, real Win32 headers, the SOLVED stack-slot hash (scripts/od_slots.py), reloc-masking, fastcall.
+description: Byte-matches one function / TU of HoMM2 against retail HEROES2W.EXE — reconstructs C++ that, compiled with MSVC 4.2 (/Od /MT /Gr /G5 /Ob1) under wine, produces COFF identical to retail (verified with objdiff). Spawned by the orchestrator with a TU + retail RVAs (authoritative names/sizes/class-layouts come from CodeView — no Ghidra). Holds the /Od reconstruction doctrine: real types over casts, real Win32 headers, the SOLVED stack-slot hash (scripts/od_slots.py), inline accessors (/Ob1 jmp $+0 fingerprint), reloc-masking, fastcall.
 ---
 
 # matcher — reconstruct one byte-matching TU (MSVC 4.2 /Od)
@@ -51,6 +51,15 @@ are GROUND TRUTH, already extracted — never re-derive or guess them:
    (by symptom/tag); most /Od idioms are cataloged. New idiom → add a
    `docs/patterns/<name>.md` + one INDEX line in the SAME change.
 
+   > ⚠️ **objdiff's fuzzy% LIES about frame slots — it gives partial credit for a
+   > differing displacement, so a function can read 97% while EVERY local is on the
+   > wrong `-0xN(%ebp)` slot.** Never trust a high fuzzy. Diff your obj vs the target
+   > with the **`(%ebp)` displacements VISIBLE** (normalize only jump/call targets,
+   > NOT stack offsets): `llvm-objdump -d` both, strip addresses, keep `-0xN(%ebp)`.
+   > If `cur@-0x4` here is `cur@-0x10` in retail, that's a SLOT-HASH miss → fix the
+   > local NAMES with `od_slots` (below), not the logic. This was hidden on
+   > GetNewCellExtra* until diffed with displacements on.
+
 ## The dominant /Od lever: stack-slot names are SOLVED — compute, don't grind
 
 `/Od` assigns each local's frame offset by a **hash of its name** (per-scope
@@ -70,14 +79,41 @@ loop. Use **`scripts/od_slots.py`** (pure, no compiler):
 This is the homm2-specific superpower — what was a per-function brute-force in the
 first probe is now a direct computation.
 
+## The second lever: inline accessors — the `jmp $+0` fingerprint (`/Ob1`)
+
+The build is `/Od /Ob1`: **unoptimized but with inline expansion ON** (`/Ob` is a
+SEPARATE axis from `/Od`). So the retail `.text` is littered with **`jmp $+0`**
+(`e9 00 00 00 00`, jump-to-next, a no-op) that plain `/Od` never emits — these are
+the per-call-site continuation jumps of **inlined in-class accessors**.
+
+- **A cluster of `jmp $+0` around repeated field/array access is the fingerprint
+  that the original used inline getters.** Don't hand-inline the access to a raw
+  expression (e.g. `(cells+width*y)[x]`) — that byte-matches a subset but
+  STRUCTURALLY CAPS the match (no per-call jmp) and reassociates the addressing.
+  Reconstruct the accessor as an inline method and call it.
+- **Match the accessor's RETURN SHAPE to the addressing.** A *row-pointer* accessor
+  (`mapCell *Row(int y){ return cells+width*y; }`, caller does `Row(y)[x].extra`)
+  keeps the row base in a register and DEFERS `[x]` to the load (`0xa(%eax,%ecx,4)`)
+  — retail's form. A cell-pointer/reference accessor resolves `[x]` early →
+  `0xa(%eax,%ecx)` (no scale), a mismatch. Pick the form that reproduces the
+  addressing mode, not just the value.
+- `/Ob1` (not `/Ob2`): retail still emits real `call`s to out-of-line methods.
+- Full writeup: **`docs/patterns/inline-accessors.md`**. This is NOT a wall — it is
+  a known, reproducible pattern. (The only residual that resists source steering is
+  the exact LEADING-vs-TRAILING placement of an individual inline bracket — a thin
+  `@early-stop` reason, not a reason to leave logic wrong.)
+
 ## Toolchain facts (verified — see docs/)
 
-- Flags: **`/Od /MT /Gr`** — unoptimized, static LIBCMT, **`__fastcall` default**
-  (most free functions mangle `@@YI`; 1st/2nd int args in ECX/EDX, spilled to stack
-  under /Od). NO `/GX` → **no C++ exceptions / no EH state**. NO RTTI. So an optimized decomp's
-  EH-wall and /O2 regalloc walls DO NOT EXIST here — most functions go to 100%.
-- Known residual walls (rare): `/Od` block-boundary `jmp`-to-next artifacts, an
-  occasional regalloc choice. See `docs/patterns/od-cell-access-and-block-jmps.md`.
+- Flags: **`/Od /MT /Gr /G5 /Ob1`** — unoptimized, static LIBCMT, **`__fastcall`
+  default** (most free functions mangle `@@YI`; 1st/2nd int args in ECX/EDX, spilled
+  to stack under /Od), **`/G5`** (Pentium: zero-extend unsigned 16→32 with AND, never
+  MOVZX), **`/Ob1`** (inline expansion — see the lever above). NO `/GX` → **no C++
+  exceptions / no EH state**. NO RTTI. So an optimized decomp's EH-wall and /O2
+  regalloc walls DO NOT EXIST here — most functions go to 100%.
+- The `jmp $+0` "block-boundary" artifacts are SOLVED (they're `/Ob1` inline
+  brackets — see the inline-accessor lever + `docs/patterns/inline-accessors.md`),
+  NOT a wall.
 - String literals: every literal is named `??_C@_0<len>@<hash>@...` at the object
   level; constants flow through reloc-masking — operand-name differences are not a
   mismatch (confirm with `llvm-objdump -dr` base vs target).
@@ -96,9 +132,12 @@ first probe is now a direct computation.
 ## Push every function to 100% — chase each wall, do NOT bail early
 
 This is an unoptimized `/Od` build: unlike a /O2 decomp there is **no EH wall and no
-scheduler/regalloc puzzle to plateau on**, and the one real wall — stack-slot order —
-is **solved** (`od_slots.py`). So **the default outcome is 100%.** Do NOT bank a
-partial and move on; do NOT stop at the first plateau.
+scheduler/regalloc puzzle to plateau on**. The two levers that DO matter are both
+understood: stack-slot order (`od_slots.py`) and inline accessors (`/Ob1` `jmp $+0`).
+So **the default outcome is 100%.** Do NOT bank a partial and move on; do NOT stop at
+the first plateau. **Before deciding a function is "stuck on slots/jmps", re-diff with
+`(%ebp)` displacements visible** (fuzzy hides slot misses) and check for the inline-
+accessor `jmp $+0` fingerprint — most plateaus are one of these two, both fixable.
 
 1. **Push every function to 100%.** A plateau is almost always a fixable codegen-
    shape bug in *your* source — iterate different spellings, re-check the slot names
