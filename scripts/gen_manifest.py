@@ -183,15 +183,24 @@ with open(os.path.join(REPO,"config","units.toml"),"w") as f:
     f.write("[flags]\n")
     # Retail is a DEBUG build: /Od (full ebp frames, every local spilled) + /Gr
     # (__fastcall default; 458 free fns mangle @@YI vs 6 cdecl) + /MT (static LIBCMT)
-    # + /G5 (Pentium target). No C++ EH (no __CxxFrameHandler/throws), no RTTI, no /O2.
+    # + /G5 (Pentium target) + /Ob1 (inline expansion ON). No C++ EH, no RTTI, no /O2.
     #
     # /G5 is GLOBAL (all three NWC tiers), proven by the Pentium "avoid MOVZX" rule:
     # /G5 zero-extends unsigned 16->32 with AND, not MOVZX (non-pairable/slow on P5) -
     # `movw;shrw;andw $mask;andl $0xffff` where /GB-blend emits `...;movzwl`. The .text
     # has 190 AND-zero-extends spanning the whole SOURCE+BASE range vs only 3 MOVZX in
     # ~1500 NWC funcs (the linked CRT, Microsoft-built, still uses MOVZX - a built-in
-    # control). One uniform profile - every unit `base`.
-    f.write('base = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5"]\n\n')
+    # control).
+    #
+    # /Ob1 (inline expansion) is a SEPARATE axis from /Od (optimization): unoptimized
+    # but inlined. Proven on EDITOR/mapcell - the retail .text is littered with `jmp $+0`
+    # (e9 00000000, jump-to-next) that plain /Od never emits; they are the per-call-site
+    # continuation jumps of inlined in-class accessors. Reconstructing those accessors
+    # (fullMap::Row/Extra) + /Ob1 lifts GetNewCellExtra* from a structurally-capped ~91%
+    # to ~97% (addressing now exact; residual is jmp-placement). /Ob1 not /Ob2: retail
+    # still emits real calls to out-of-line methods (e.g. GetNewCellExtraIndex), which
+    # /Ob1 leaves alone. One uniform profile - every unit `base`.
+    f.write('base = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1"]\n\n')
     for st,src in units:
         f.write(f'[[unit]]\nunit = "{st}"\nsource = "{src}"\nflags = "base"\n\n')
 
