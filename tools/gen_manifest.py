@@ -79,6 +79,32 @@ for sst,iMod,lfo,cb in ents:
         p+=2+rl
 pubs.sort()
 
+# ---- harvest reloc-target constants (vostok-delinker: "all constants must be
+# named"). Every .reloc fixup stores an absolute VA; targets landing in a data
+# section that aren't already a named symbol get a synthetic name so the delinker
+# can emit a named external ref (the name mismatch vs our base obj is absorbed by
+# reloc-masking during matching). This is the CodeView-side equivalent of gruntz's
+# Ghidra symbols.csv constant inventory.
+named_va = set(v for v, _ in pubs)
+ddir = e + 24 + 96
+rrva, rsize = struct.unpack_from("<II", d, ddir + 5 * 8)
+consts = set()
+if rsize:
+    o = va2off(imgbase + rrva); p = o; end = o + rsize
+    while p < end:
+        page, blk = struct.unpack_from("<II", d, p)
+        if blk == 0: break
+        for i in range((blk - 8) // 2):
+            w = struct.unpack_from("<H", d, p + 8 + i * 2)[0]
+            if w >> 12:
+                fo = va2off(imgbase + page + (w & 0xfff))
+                if fo is not None and fo + 4 <= len(d):
+                    tgt = struct.unpack_from("<I", d, fo)[0]
+                    sc = sec_of(tgt - imgbase)
+                    if sc in (".rdata", ".data") and tgt not in named_va:
+                        consts.add(tgt)
+        p += blk
+
 # ---- sizes ----
 text_syms=sorted(va for va,_ in pubs if (sec_of(va-imgbase) or "").startswith(".text"))
 def fsize(va):
@@ -127,6 +153,10 @@ with open(os.path.join(REPO,"build","gen","symbol_names.csv"),"w") as f:
         else:
             kind="func"; size=fsize(va); n_func+=1
         f.write(f"0x{rva:x},{raw},{unit},0x{size:x},{kind}\n")
+    n_const = 0
+    for tgt in sorted(consts):
+        rva = tgt - imgbase
+        f.write(f"0x{rva:x},const_{rva:08x},_const,0x0,data\n"); n_const += 1; n_data += 1
 
 # ---- emit units.toml (NWC reconstruction units only) ----
 units=[]
