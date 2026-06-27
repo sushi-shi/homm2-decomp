@@ -13,11 +13,13 @@
 -- so nothing here goes stale the way line tables would.
 --
 -- Source overlay (config.source_lines, toggle `vL` / `:Homm2 source`): on the
--- BASE side only (vb, and the base pane of vd), each source STATEMENT is floated
--- as a virtual line above the asm it lowered to. Data: build/lines/<unit>.json
--- from scripts/gen_lines.py (compiles the TU /Z7 - codegen-neutral - and reads the
--- COFF line table; needs the `nix develop .#build` shell for wine cl). Retail has
--- no line info, so target/diff-target panes are never annotated.
+-- BASE side only (vb, and the base pane of vd): each source STATEMENT is floated as
+-- a virtual line above the asm it lowered to, and each `[ebp±off]` access is tagged
+-- end-of-line with its local/param NAME (`mov eax, [ebp-0x10] ; cell`). Data:
+-- build/lines/<unit>.json from scripts/gen_lines.py (compiles the TU /Z7 -
+-- codegen-neutral - and reads its COFF line table + .debug$S S_BPREL32 locals; needs
+-- the `nix develop .#build` shell for wine cl). Retail has no debug info, so
+-- target/diff-target panes are never annotated.
 
 local M = {}
 local uv = vim.uv or vim.loop
@@ -308,13 +310,18 @@ local function read_source_json(root, unit)
   local data = fd:read("*a"); fd:close()
   local ok, j = pcall(vim.json.decode, data)
   if not ok or type(j) ~= "table" then return nil end
-  local out = {}
-  for mangled, rows in pairs(j) do
+  local stmts, locals = {}, {}
+  for mangled, rows in pairs(j.stmts or {}) do
     local m = {}
-    for _, r in ipairs(rows) do m[r[1]] = ("%d: %s"):format(r[2], r[3]) end
-    out[mangled] = m
+    for _, r in ipairs(rows) do m[r[1]] = ("%d: %s"):format(r[2], r[3]) end  -- {offset -> "line: src"}
+    stmts[mangled] = m
   end
-  return out
+  for mangled, rows in pairs(j.locals or {}) do
+    local m = {}
+    for _, r in ipairs(rows) do m[r[1]] = r[2] end                          -- {bp_offset -> name}
+    locals[mangled] = m
+  end
+  return { stmts = stmts, locals = locals }
 end
 
 --- {mangled -> {offset -> label}} for a unit; cached by the base obj's mtime,
@@ -365,22 +372,41 @@ local function attach_source_lines(buf, ctx)
   if not (M.config.source_lines and ctx.addrs and ctx.name and ctx.unit and ctx.root) then return end
   source_map(ctx.root, ctx.unit, function(map)
     if not (map and vim.api.nvim_buf_is_valid(buf)) then return end
-    local stmts = map[ctx.name]; if not stmts then return end
+    local stmts = map.stmts[ctx.name]
+    local locals = map.locals[ctx.name]
+    if not (stmts or locals) then return end
     pcall(vim.api.nvim_buf_clear_namespace, buf, SRC_NS, 0, -1)
     local off0 = ctx.line_offset or 0
-    local tbuf, inv_t = ctx.sibling_target, nil   -- target row by raw index, for padding
-    if tbuf and ctx.traws and vim.api.nvim_buf_is_valid(tbuf) then
-      pcall(vim.api.nvim_buf_clear_namespace, tbuf, SRC_NS, 0, -1)
-      inv_t = {}; for ti, k in pairs(ctx.traws) do inv_t[k] = ti end
+    -- (1) statement text above each statement's first instruction (+ aligned target pad)
+    if stmts then
+      local tbuf, inv_t = ctx.sibling_target, nil   -- target row by raw index, for padding
+      if tbuf and ctx.traws and vim.api.nvim_buf_is_valid(tbuf) then
+        pcall(vim.api.nvim_buf_clear_namespace, tbuf, SRC_NS, 0, -1)
+        inv_t = {}; for ti, k in pairs(ctx.traws) do inv_t[k] = ti end
+      end
+      for i, addr in pairs(ctx.addrs) do
+        if stmts[addr] then
+          pcall(vim.api.nvim_buf_set_extmark, buf, SRC_NS, (i - 1) + off0, 0,
+            { virt_lines = { { { stmts[addr], "Comment" } } }, virt_lines_above = true })
+          local ti = inv_t and ctx.raws and inv_t[ctx.raws[i]]   -- paired target row
+          if ti then
+            pcall(vim.api.nvim_buf_set_extmark, tbuf, SRC_NS, ti - 1, 0,
+              { virt_lines = { { { ";", "Comment" } } }, virt_lines_above = true })
+          end
+        end
+      end
     end
-    for i, addr in pairs(ctx.addrs) do
-      if stmts[addr] then
-        pcall(vim.api.nvim_buf_set_extmark, buf, SRC_NS, (i - 1) + off0, 0,
-          { virt_lines = { { { stmts[addr], "Comment" } } }, virt_lines_above = true })
-        local ti = inv_t and ctx.raws and inv_t[ctx.raws[i]]   -- paired target row
-        if ti then
-          pcall(vim.api.nvim_buf_set_extmark, tbuf, SRC_NS, ti - 1, 0,
-            { virt_lines = { { { ";", "Comment" } } }, virt_lines_above = true })
+    -- (2) local/param name after each `[ebp±off]` access (end-of-line; adds no rows,
+    -- so it never disturbs the diff alignment).
+    if locals then
+      for row, line in ipairs(vim.api.nvim_buf_get_lines(buf, 0, -1, false)) do
+        local sign, hex = line:match("%[ebp([%-%+])(0x%x+)%]")
+        if sign then
+          local nm = locals[tonumber(hex) * (sign == "-" and -1 or 1)]
+          if nm then
+            pcall(vim.api.nvim_buf_set_extmark, buf, SRC_NS, row - 1, 0,
+              { virt_text = { { " ; " .. nm, "Comment" } }, virt_text_pos = "eol" })
+          end
         end
       end
     end
