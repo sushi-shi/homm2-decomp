@@ -82,7 +82,7 @@ def main(argv=None):
     seen = set()
     func_file = {}
     for rva, size, name, unit in funcs:
-        sf = r"c:\proj\%s.c" % unit
+        sf = r"c:\proj\%s.c" % unit.replace("/", "\\")   # tier folder -> subdir in delink output
         func_file[rva] = sf
         if sf not in seen:
             seen.add(sf); files.append(sf)

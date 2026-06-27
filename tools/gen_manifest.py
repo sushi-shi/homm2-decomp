@@ -131,6 +131,13 @@ def tier_of(im):
     if "basewin" in lib.lower(): return "BASE"
     if lib=="": return "SOURCE"
     return None   # external/CRT — not a reconstruction unit
+def unit_of(im):
+    # unit identifier carries its tier folder so the delinker mirrors src/:
+    # NWC reconstruction units -> "<TIER>/<stem>" (-> build/delink/<TIER>/<stem>.c.obj);
+    # external/CRT/synthetic stay flat.
+    if im is None: return "unknown"
+    t=tier_of(im); st=stem_of(modname.get(im,""))
+    return f"{t}/{st}" if t in ("BASE","SOURCE","EDITOR") else st
 
 # existing src files: stem(lower) -> repo-relative path
 srcfiles={}
@@ -146,7 +153,7 @@ n_func=n_data=0
 with open(os.path.join(REPO,"build","gen","symbol_names.csv"),"w") as f:
     f.write("rva,name,unit,size,kind\n")
     for va,raw in pubs:
-        im=which(va); unit=stem_of(modname.get(im,"")) if im is not None else "unknown"
+        im=which(va); unit=unit_of(im)
         rva=va-imgbase; s=sec_of(rva) or ""
         if raw.startswith("??_7") or raw.startswith("??_R") or not s.startswith(".text"):
             kind="data"; size=dsize(va); n_data+=1
@@ -166,7 +173,7 @@ for im,name in modname.items():
     if tier not in ("BASE","SOURCE","EDITOR"): continue
     st=stem_of(name)
     src=srcfiles.get(st.lower())
-    if src: units.append((st, src))
+    if src: units.append((f"{tier}/{st}", src))
 units.sort()
 with open(os.path.join(REPO,"config","units.toml"),"w") as f:
     f.write("# units.toml - per-TU build manifest (generated from CodeView by tools/gen_manifest.py).\n")
