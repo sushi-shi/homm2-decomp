@@ -183,10 +183,12 @@ with open(os.path.join(REPO,"config","units.toml"),"w") as f:
     f.write("[flags]\n")
     # The retail build is a DEBUG build: /Od (unoptimized - full ebp frames, locals
     # round-tripped through the stack) + /Gr (__fastcall default; 458 free fns mangle
-    # @@YI vs 6 cdecl) + /MT (static LIBCMT). Verified vs retail disassembly.
-    # One profile: the whole binary is a uniform /Od debug build with no C++ EH
-    # (no __CxxFrameHandler/throws) and no /O2 TUs - so every unit is `base`.
-    f.write('base = ["/nologo", "/c", "/Od", "/MT", "/Gr"]\n\n')
+    # @@YI vs 6 cdecl) + /MT (static LIBCMT) + /G5 (Pentium scheduling - even under /Od
+    # it selects the unsigned-bitfield->int zero-extend idiom `movb;shrb;andw;andl` over
+    # the /Gr-only `andb;xor;movb`; found via EDITOR/mapcell, verified to keep the
+    # already-exact functions byte-identical). Verified vs retail disassembly.
+    # One uniform profile - no C++ EH (no __CxxFrameHandler/throws), no /O2 - every unit `base`.
+    f.write('base = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5"]\n\n')
     for st,src in units:
         f.write(f'[[unit]]\nunit = "{st}"\nsource = "{src}"\nflags = "base"\n\n')
 
