@@ -3,3 +3,6 @@
 __pycache__/
 .ninja_deps
 .ninja_log
+/build.ninja
+.ninja_log
+.ninja_deps
