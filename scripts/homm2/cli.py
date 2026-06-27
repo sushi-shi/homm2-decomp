@@ -16,7 +16,8 @@ def main(argv=None):
     if cmd == "build":
         if sh("python3", "configure.py"): return 1
         if sh("ninja", *rest): return 1
-        from homm2.match.status import main as st; return st([])
+        from homm2.match.status import main as st
+        st(["--write-readme"]); return st([])   # refresh README % block + print summary
     if cmd == "status":
         from homm2.match.status import main as st; return st(rest)
     print("usage: homm2 {init|configure|build|status}", file=sys.stderr)

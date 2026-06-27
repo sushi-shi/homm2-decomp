@@ -3,6 +3,7 @@
 // functions: 1   data: 0
 // RVA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
+#include <rva.h>
 RVA(0x004cfae0, 0x266)
-void MonoIconToBitmap(class icon *, class bitmap *, int, int, int, int, int, int, int, int, int);
+// void MonoIconToBitmap(class icon *, class bitmap *, int, int, int, int, int, int, int, int, int);
 

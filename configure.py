@@ -42,13 +42,24 @@ def main():
         w.default("all")
 
     od = REPO / "build/objdiff"; od.mkdir(parents=True, exist_ok=True)
-    units_j = [{
-        "name": u["unit"],
-        "base_path": f"./base/{u['unit']}.obj",
-        "target_path": f"../delink/{u['unit']}.c.obj",
-        "scratch": {"platform": build.get("platform", "win32"),
-                    "compiler": build.get("compiler", "msvc4.2")},
-    } for u in units]
+    # minimal VALID empty i386 COFF (.text, no symbols) for units the delinker emits
+    # no target for (data-only TUs e.g. X_GLOBAL; editor-only TUs e.g. mapcell).
+    import struct
+    dummy = (struct.pack("<HHIIIHH", 0x14C, 1, 0, 20 + 40, 0, 0, 0)       # header (symtab @ 60)
+             + struct.pack("<8sIIIIIIHHI", b".text\0\0\0", 0, 0, 0, 0, 0, 0, 0, 0, 0x60000020)
+             + struct.pack("<I", 4))                                       # empty string table
+    (od / "dummy.obj").write_bytes(dummy)
+    delink = REPO / "build/delink"
+    units_j = []
+    for u in units:
+        tgt = delink / f"{u['unit']}.c.obj"
+        units_j.append({
+            "name": u["unit"],
+            "base_path": f"./base/{u['unit']}.obj",
+            "target_path": f"../delink/{u['unit']}.c.obj" if tgt.exists() else "./dummy.obj",
+            "scratch": {"platform": build.get("platform", "win32"),
+                        "compiler": build.get("compiler", "msvc4.2")},
+        })
     (od / "objdiff.json").write_text(json.dumps({
         "$schema": "https://raw.githubusercontent.com/encounter/objdiff/main/config.schema.json",
         "build_base": False, "build_target": False,

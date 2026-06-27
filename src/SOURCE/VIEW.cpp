@@ -3,14 +3,15 @@
 // functions: 3   data: 1
 // RVA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
+#include <rva.h>
 RVA(0x0040bd60, 0x6d3)
-int combatManager::ViewGeneral(int, int, int);
+// int combatManager::ViewGeneral(int, int, int);
 
 RVA(0x0040c433, 0x351)
-int HandleViewGeneral(struct tag_message &);
+// int HandleViewGeneral(struct tag_message &);
 
 RVA(0x0040c784, 0x165)
-void combatManager::ViewArmy(class army *, int);
+// void combatManager::ViewArmy(class army *, int);
 
 // ---- data / globals / vtables ----
 DATA(0x004eddf4)  // int iViewGeneralWhichSide

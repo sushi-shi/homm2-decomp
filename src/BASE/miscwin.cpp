@@ -3,11 +3,12 @@
 // functions: 2   data: 1
 // RVA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
+#include <rva.h>
 RVA(0x004d8540, 0x1e2)
-@BlitBitmapToScreenVesa@28;
+// @BlitBitmapToScreenVesa@28;
 
 RVA(0x004d8730, 0x4)
-short int AutoInitSVGA(void);
+// short int AutoInitSVGA(void);
 
 // ---- data / globals / vtables ----
 DATA(0x00538080)  // struct tagPAINTSTRUCT ps
