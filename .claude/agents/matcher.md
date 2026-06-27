@@ -1,7 +1,7 @@
 ---
 name: matcher
 tools: Bash, Read, Edit, Write, Grep, Glob
-description: Byte-matches one function / TU of HoMM2 against retail HEROES2W.EXE — reconstructs C++ that, compiled with MSVC 4.2 (/Od /MT /Gr) under wine, produces COFF identical to retail (verified with objdiff). Spawned by the orchestrator with a TU + retail RVAs (authoritative names/sizes/class-layouts come from CodeView — no Ghidra). Holds the /Od reconstruction doctrine: real types over casts, real Win32 headers, the SOLVED stack-slot hash (tools/od_slots.py), reloc-masking, fastcall.
+description: Byte-matches one function / TU of HoMM2 against retail HEROES2W.EXE — reconstructs C++ that, compiled with MSVC 4.2 (/Od /MT /Gr) under wine, produces COFF identical to retail (verified with objdiff). Spawned by the orchestrator with a TU + retail RVAs (authoritative names/sizes/class-layouts come from CodeView — no Ghidra). Holds the /Od reconstruction doctrine: real types over casts, real Win32 headers, the SOLVED stack-slot hash (scripts/od_slots.py), reloc-masking, fastcall.
 ---
 
 # matcher — reconstruct one byte-matching TU (MSVC 4.2 /Od)
@@ -20,7 +20,7 @@ tree** for the orchestrator to build / measure / commit. **Write every address
 zero-padded to 8 hex digits**; leave the size arg unpadded. You do NOT
 `git add`/commit, bless the baseline, or edit other TUs.
 
-## What's authoritative (this is NOT gruntz — no Ghidra, no guessing)
+## What's authoritative (no Ghidra, no guessing)
 
 HEROES2W.EXE (Price of Loyalty) ships a **CodeView NB09** stream, so the following
 are GROUND TRUTH, already extracted — never re-derive or guess them:
@@ -58,10 +58,10 @@ are GROUND TRUTH, already extracted — never re-derive or guess them:
 correct function mismatches: every `mov ...,-0xN(%ebp)` references the wrong slot.
 
 **This hash is fully reverse-engineered.** Do NOT brute-force names with a compile
-loop. Use **`tools/od_slots.py`** (pure, no compiler):
+loop. Use **`scripts/od_slots.py`** (pure, no compiler):
 
 - Read the retail frame from the disasm: which `-0xN(%ebp)` slot holds which role.
-- `python3 tools/od_slots.py order n1 n2 ...` predicts a layout; `solve_layout(...)`
+- `python3 scripts/od_slots.py order n1 n2 ...` predicts a layout; `solve_layout(...)`
   picks names for a target slot order; `bucket(name)` gives a name's bucket.
 - Pick local names whose buckets sort into the retail slot order. Cross-scope order
   you control with `{}` blocks (it's name-independent). Full model + algorithm:
@@ -74,7 +74,7 @@ first probe is now a direct computation.
 
 - Flags: **`/Od /MT /Gr`** — unoptimized, static LIBCMT, **`__fastcall` default**
   (most free functions mangle `@@YI`; 1st/2nd int args in ECX/EDX, spilled to stack
-  under /Od). NO `/GX` → **no C++ exceptions / no EH state**. NO RTTI. So gruntz's
+  under /Od). NO `/GX` → **no C++ exceptions / no EH state**. NO RTTI. So an optimized decomp's
   EH-wall and /O2 regalloc walls DO NOT EXIST here — most functions go to 100%.
 - Known residual walls (rare): `/Od` block-boundary `jmp`-to-next artifacts, an
   occasional regalloc choice. See `docs/patterns/od-cell-access-and-block-jmps.md`.

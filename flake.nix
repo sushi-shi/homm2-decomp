@@ -7,7 +7,7 @@
       url = "github:oxalica/rust-overlay/6cddd512fa2bf7231f098d3a2f92f6e4cff71e0a";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # Same delinker gruntz uses (fix/absolute-data-relocs: DIR32 for abs refs, REL32 for branches).
+    # vostok-delinker (the delinker) (fix/absolute-data-relocs: DIR32 for abs refs, REL32 for branches).
     vostok-delinker-src = {
       url = "github:srp-survarium/vostok-delinker/8a42a0ba6f6b90651d62d1911eb97b80a5faa149";
       flake = false;
@@ -100,7 +100,7 @@
         };
 
         # Build - MSVC 4.2 under wine. Toolchain defaults to build/toolchain (populate
-        # from the en_vc42ent discs via tools/make-toolchain.sh); override $HOMM2_TOOLCHAIN
+        # from the en_vc42ent discs via scripts/make-toolchain.sh); override $HOMM2_TOOLCHAIN
         # to a hosted tarball once pinned.
         build = pkgs.mkShell {
           name = "homm2-build";
@@ -119,7 +119,7 @@
             git -C "$HOMM2_DIR" config --local core.hooksPath .githooks 2>/dev/null || true
             echo "[homm2] MSVC 4.2   : $MSVC_DIR/bin/CL.EXE (under wine)" >&2
             if [ ! -x "$MSVC_DIR/bin/CL.EXE" ] && [ ! -x "$MSVC_DIR/bin/cl.exe" ]; then
-              echo "[homm2] MSVC 4.2   : NOT PROVISIONED - run tools/make-toolchain.sh on the en_vc42ent discs" >&2
+              echo "[homm2] MSVC 4.2   : NOT PROVISIONED - run scripts/make-toolchain.sh on the en_vc42ent discs" >&2
             fi
             echo "[homm2] target EXE : $HOMM2_EXE" >&2
             echo "[homm2] cli        : 'homm2 <cmd>' (build/configure/status/...)" >&2

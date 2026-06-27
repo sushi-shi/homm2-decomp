@@ -11,7 +11,7 @@ with the original **MSVC 4.2** toolchain under wine, produces object files
   **names, RVAs, sizes, owning class/TU/tier, vtables, and class layouts are
   ground truth** — already extracted to `build/gen/symbol_names.csv` and the
   recovered `include/` headers. **Never guess or re-derive them; there is no
-  Ghidra / FID / name-recovery stage** (unlike the gruntz decomp this is modeled on).
+  Ghidra / FID / name-recovery stage**.
 - **The build is `/Od` (debug), not `/O2`.** Flags: **`/nologo /c /Od /MT /Gr`** —
   unoptimized (full `ebp` frames, every local spilled), static LIBCMT,
   **`__fastcall` default** (free fns mangle `@@YI`; 1st/2nd int args in ECX/EDX).
@@ -20,7 +20,7 @@ with the original **MSVC 4.2** toolchain under wine, produces object files
   functions reconstruct to 100% directly. Lowering is literal: body maps ~1:1 to asm.
 - **The one real /Od lever is SOLVED: stack-slot naming.** `/Od` assigns each
   local's frame offset by a **hash of its name** (per-scope 16-bucket table), not
-  declaration order. This is fully reverse-engineered → **`tools/od_slots.py`**
+  declaration order. This is fully reverse-engineered → **`scripts/od_slots.py`**
   *computes* local names for a target retail frame (no compile-loop brute force).
   Full model: **`docs/od-stack-layout.md`**; pattern: `docs/patterns/od-hash-slots.md`.
 
@@ -71,5 +71,5 @@ and diffs it against the delinked retail target `build/delink/<unit>.c.obj`.
 - `docs/od-stack-layout.md` — the /Od name-hash + per-scope tables (the matcher's superpower).
 - `docs/patterns/INDEX.md` — codegen idiom catalog (grep by symptom/tag when a diff row sticks).
 - `docs/compiler-detection.md`, `docs/linker-flags.md` — toolchain facts.
-- `tools/od_slots.py` (predict/solve slots) · `tools/od_oracle.py` (verify vs real cl).
+- `scripts/od_slots.py` (predict/solve slots) · `scripts/od_oracle.py` (verify vs real cl).
 - `editor/nvim` — `:Homm2` in-editor diff/build/status (auto-loaded by the dev-shell).

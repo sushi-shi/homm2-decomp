@@ -211,7 +211,7 @@ def inc_path(frm, cls):
 
 # ---------- emit ----------
 open(os.path.join(outdir,"_macros.h"),"w").write(
-    "#pragma once\n// No-op annotation macros (Gruntz-style).\n"
+    "#pragma once\n// No-op annotation macros.\n"
     "#define VA(addr, size)\n#define DATA(addr)\n#define OVERRIDE\n")
 emitted=[]
 for C in classes:

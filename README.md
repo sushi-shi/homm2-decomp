@@ -7,8 +7,7 @@ toolchain, produce object files matching the retail `.text`, verified with
 [objdiff](https://github.com/encounter/objdiff).
 
 Because the target carries CodeView symbols, function names / sizes / classes / vtables are
-**authoritative from day one** — there is no Ghidra/FID name-recovery stage (cf. the gruntz
-decomp this is modeled on). The whole symbol map, the synthesized PDB the delinker needs, and
+**authoritative from day one** — there is no Ghidra/FID name-recovery stage. The whole symbol map, the synthesized PDB the delinker needs, and
 the per-unit target objects are produced once by `homm2 init`.
 
 <!-- match-score:start -->
@@ -35,8 +34,8 @@ src/      {BASE,SOURCE,EDITOR}   reconstructed C++ (carcass: RVA-annotated stubs
 include/  {BASE,SOURCE,EDITOR}   recovered class headers (vtables, OVERRIDE) + va.h / Ints.h
 orig/     HEROES2W.EXE + symbols / compilands / source-dirs (CodeView exports)
 config/   units.toml             per-TU build manifest
-tools/    gen_manifest / name_strings / make_compilable / cv-nb09-*  (CodeView pipeline)
-scripts/homm2/   the `homm2` CLI package (init / configure / build / status)
+scripts/archive/  one-time CodeView carcass builders (materialize_src, codeview_*, make_compilable)
+scripts/   homm2 CLI pkg (homm2.*) + gen_manifest / name_strings / od_slots / od_oracle
 build/    (gitignored)           toolchain, synth PDB, delinked targets, base objs, objdiff report
 flake.nix two dev shells: default (analysis+diff+clang), build (+wine+MSVC 4.2)
 ```

@@ -5,7 +5,7 @@ Compiles a one-function probe with the real MSVC 4.2 toolchain and reads each
 local's ebp-relative frame offset straight from the CodeView S_BPREL32 records the
 compiler emits with /Z7. /Z7 adds debug records but does NOT change /Od code
 generation, so the slot assignment is byte-identical to the real `/Od /MT /Gr`
-build. Use this to verify any prediction from tools/od_slots.py.
+build. Use this to verify any prediction from scripts/od_slots.py.
 
   slots(["foo","bar","baz"]) -> [("foo",-4),("bar",-8),...]   # iteration order (-4 first)
 

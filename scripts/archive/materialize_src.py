@@ -2,7 +2,7 @@
 # cv-nb09-materialize.py  PE  DEMANGLED_ADDRMAP  OUTROOT
 # Materialize a reconstructed source tree from an embedded CodeView NB09 stream:
 #   - one .cpp/.c per compiland (translation unit), under OUTROOT mirroring paths
-#   - every function annotated Gruntz-style:  VA(0xADDR, 0xSIZE)
+#   - every function annotated:  VA(0xADDR, 0xSIZE)
 #       (size = bytes to next .text symbol, trailing 0xCC/0x90 padding trimmed)
 #   - per-class vtable layouts (walked via relocations) with each slot labelled
 #       "new virtual" / "override of Base::m" / "inherited from Base"

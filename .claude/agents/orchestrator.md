@@ -74,7 +74,7 @@ Spawn a **matcher** (`subagent_type: matcher`), **`run_in_background: true`**, *
    `nix develop .#build` shell, every `homm2 build`/`status` inside it. Absolute paths
    everywhere (relative paths can leak into master).
 3. Carry the target (RVA / mangled+demangled name / size / TU), the 8-digit address
-   convention, the **`tools/od_slots.py` stack-naming workflow**, and the
+   convention, the **`scripts/od_slots.py` stack-naming workflow**, and the
    push-to-100% mandate + byte-proven `@early-stop` (marker line + byte reason, no %).
 4. **Forbid `homm2`-format-style reflows** — edit only the target file(s); leave
    formatting to integration.
