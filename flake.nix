@@ -61,7 +61,7 @@
         if [ -z "''${HOMM2_NVIM_WRAPPED:-}" ] && command -v nvim >/dev/null 2>&1 && [ -d "$HOMM2_DIR/editor/nvim" ]; then
           _real="$(command -v nvim)"; _bin="$HOMM2_DIR/build/nvim-shim"; mkdir -p "$_bin"
           printf '#!/bin/sh\nexec "%s" --cmd "set rtp^=%s/editor/nvim" "$@"\n' "$_real" "$HOMM2_DIR" > "$_bin/nvim"
-          printf '#!/bin/sh\nexec "%s/nvim" -c Ranger "$@"\n' "$_bin" > "$_bin/ranger"
+          printf '#!/bin/sh\nexec "%s/nvim" -c Ranger\n' "$_bin" > "$_bin/ranger"
           chmod +x "$_bin/nvim" "$_bin/ranger"; export PATH="$_bin:$PATH"; export HOMM2_NVIM_WRAPPED=1
           echo "[homm2] nvim       : WRAPPED -> editor/nvim (:Homm2); 'ranger' starts nvim :Ranger." >&2
         fi
