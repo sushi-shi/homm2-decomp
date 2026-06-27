@@ -1,7 +1,7 @@
 #pragma once
 // Reconstructed class (EDITOR) from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // 11 methods, 0 own-virtual, 0 static data.
-#include <rva.h>
+#include <va.h>
 #include "mapcell.h"
 // forward declarations:
 class mapCell;

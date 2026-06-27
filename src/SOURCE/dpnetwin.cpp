@@ -1,55 +1,55 @@
 // Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // compiland: .\Win32_Re\dpnetwin.obj   from: (directly linked into exe)
 // functions: 16   data: 25
-// RVA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
+// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
-#include <rva.h>
-RVA(0x0041eda0, 0x95)
+#include <va.h>
+VA(0x0041eda0, 0x95)
 // int dpEnumServiceProvider(struct _GUID *, char *, unsigned long int, unsigned long int, void *);
 
-RVA(0x0041ee35, 0x7a)
+VA(0x0041ee35, 0x7a)
 // int dpEnumSession(struct DPSESSIONDESC *, void *, unsigned long int *, unsigned long int);
 
-RVA(0x0041eeaf, 0x311)
+VA(0x0041eeaf, 0x311)
 // short int dpnet_init(void);
 
-RVA(0x0041f1c0, 0xce)
+VA(0x0041f1c0, 0xce)
 // void CleanupDPVars(void);
 
-RVA(0x0041f28e, 0x116)
+VA(0x0041f28e, 0x116)
 // void dpnet_term(void);
 
-RVA(0x0041f3a4, 0xee)
+VA(0x0041f3a4, 0xee)
 // void dpSendMessage(int, unsigned char, unsigned short int, void *);
 
-RVA(0x0041f492, 0x5a)
+VA(0x0041f492, 0x5a)
 // int dpnet_snd(int, int, void *);
 
-RVA(0x0041f4ec, 0xa7)
+VA(0x0041f4ec, 0xa7)
 // short int dpnet_rcv(short int, unsigned short int, void *);
 
-RVA(0x0041f593, 0x1d)
+VA(0x0041f593, 0x1d)
 // unsigned char dpnet_stat(short int, unsigned short int);
 
-RVA(0x0041f5b0, 0x13)
+VA(0x0041f5b0, 0x13)
 // short int dpnet_sess(int, int);
 
-RVA(0x0041f5c3, 0xbe)
+VA(0x0041f5c3, 0xbe)
 // void dpProcessMessages(void);
 
-RVA(0x0041f681, 0x274)
+VA(0x0041f681, 0x274)
 // void dpEvaluateMessage(unsigned long int, int);
 
-RVA(0x0041f8f5, 0x182)
+VA(0x0041f8f5, 0x182)
 // int dpWaitForFirstGuest(void);
 
-RVA(0x0041fa77, 0x84)
+VA(0x0041fa77, 0x84)
 // int dpWaitForExtraGuests(void);
 
-RVA(0x0041fafb, 0x3d2)
+VA(0x0041fafb, 0x3d2)
 // int dpWaitForHost(void);
 
-RVA(0x0041fecd, 0x5eb)
+VA(0x0041fecd, 0x5eb)
 // void DPSD(int, char *, int);
 
 // ---- data / globals / vtables ----

@@ -1,100 +1,100 @@
 // Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // compiland: .\Win32_RE\RESMGR.OBJ   from: .\basewin.lib
 // functions: 31   data: 4
-// RVA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
+// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
-#include <rva.h>
-RVA(0x004c7fa0, 0xdb)
+#include <va.h>
+VA(0x004c7fa0, 0xdb)
 // void resourceManager::constructor(void);
 
-RVA(0x004c8080, 0xa2)
+VA(0x004c8080, 0xa2)
 // void resourceManager::GetBackdrop(char *, class bitmap *, int);
 
-RVA(0x004c8130, 0xd2)
+VA(0x004c8130, 0xd2)
 // void resourceManager::GetBackdropAtLoc(char *, class bitmap *, int, int, int);
 
-RVA(0x004c8210, 0x97)
+VA(0x004c8210, 0x97)
 // class palette * resourceManager::GetPalette(char *);
 
-RVA(0x004c82b0, 0x97)
+VA(0x004c82b0, 0x97)
 // class bitmap * resourceManager::GetBitmap(char *);
 
-RVA(0x004c8350, 0x2f)
+VA(0x004c8350, 0x2f)
 // class icon * resourceManager::GetIcon(char *);
 
-RVA(0x004c8380, 0x86)
+VA(0x004c8380, 0x86)
 // class icon * resourceManager::GetIcon(unsigned long int);
 
-RVA(0x004c8410, 0x97)
+VA(0x004c8410, 0x97)
 // class tileset * resourceManager::GetTileset(char *);
 
-RVA(0x004c84b0, 0x1a)
+VA(0x004c84b0, 0x1a)
 // class mouse * resourceManager::GetMouse(char *);
 
-RVA(0x004c84d0, 0x97)
+VA(0x004c84d0, 0x97)
 // class font * resourceManager::GetFont(char *);
 
-RVA(0x004c8570, 0x9d)
+VA(0x004c8570, 0x9d)
 // class sample * resourceManager::GetSample(char *);
 
-RVA(0x004c8610, 0x97)
+VA(0x004c8610, 0x97)
 // class MIDIWrap * resourceManager::GetMIDIWrap(char *);
 
-RVA(0x004c86b0, 0x87)
+VA(0x004c86b0, 0x87)
 // void resourceManager::Dispose(class resource *);
 
-RVA(0x004c8740, 0x55)
+VA(0x004c8740, 0x55)
 // void resourceManager::AddResource(class resource *);
 
-RVA(0x004c87a0, 0x8b)
+VA(0x004c87a0, 0x8b)
 // void resourceManager::Expunge(void);
 
-RVA(0x004c8830, 0x4b)
+VA(0x004c8830, 0x4b)
 // class resource * resourceManager::Query(unsigned long int);
 
-RVA(0x004c8880, 0x1a)
+VA(0x004c8880, 0x1a)
 // int resourceManager::Main(struct tag_message &);   // virtual [override (implements baseManager pure virtual)]
 
-RVA(0x004c88a0, 0xab)
+VA(0x004c88a0, 0xab)
 // int resourceManager::Open(int);   // virtual [override (implements baseManager pure virtual)]
 
-RVA(0x004c8950, 0x88)
+VA(0x004c8950, 0x88)
 // void resourceManager::RemoveResource(class resource *);
 
-RVA(0x004c89e0, 0xc8)
+VA(0x004c89e0, 0xc8)
 // void resourceManager::Close(void);   // virtual [override (implements baseManager pure virtual)]
 
-RVA(0x004c8ab0, 0x143)
+VA(0x004c8ab0, 0x143)
 // int resourceManager::LoadAggregateHeader(char *);
 
-RVA(0x004c8c00, 0x11c)
+VA(0x004c8c00, 0x11c)
 // void resourceManager::PointToFile(unsigned long int);
 
-RVA(0x004c8d20, 0xfa)
+VA(0x004c8d20, 0xfa)
 // unsigned long int resourceManager::GetFileSize(unsigned long int);
 
-RVA(0x004c8e20, 0x52)
+VA(0x004c8e20, 0x52)
 // void resourceManager::SavePosition(void);
 
-RVA(0x004c8e80, 0x53)
+VA(0x004c8e80, 0x53)
 // void resourceManager::RestorePosition(void);
 
-RVA(0x004c8ee0, 0x81)
+VA(0x004c8ee0, 0x81)
 // signed char resourceManager::ReadByte(void);
 
-RVA(0x004c8f70, 0x84)
+VA(0x004c8f70, 0x84)
 // short int resourceManager::ReadWord(void);
 
-RVA(0x004c9000, 0x84)
+VA(0x004c9000, 0x84)
 // long int resourceManager::ReadLong(void);
 
-RVA(0x004c9090, 0xe3)
+VA(0x004c9090, 0xe3)
 // unsigned long int resourceManager::MakeId(char *, int);
 
-RVA(0x004c9180, 0x26)
+VA(0x004c9180, 0x26)
 // void resourceManager::Read13(signed char *);
 
-RVA(0x004c91b0, 0xbd)
+VA(0x004c91b0, 0xbd)
 // void resourceManager::ReadBlock(signed char *, unsigned long int);
 
 // ---- data / globals / vtables ----
@@ -104,6 +104,6 @@ DATA(0x005331e8)  // int * lastAggZ
 DATA(0x00533210)  // long int * lastPositionZ
 
 // ===== vtable resourceManager : public baseManager  (3 slots) =====
-//  [ 0] RVA(0x004c88a0, 0xab)  int resourceManager::Open(int)   <- override (implements baseManager pure virtual)
-//  [ 1] RVA(0x004c89e0, 0xc8)  void resourceManager::Close(void)   <- override (implements baseManager pure virtual)
-//  [ 2] RVA(0x004c8880, 0x1a)  int resourceManager::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
+//  [ 0] VA(0x004c88a0, 0xab)  int resourceManager::Open(int)   <- override (implements baseManager pure virtual)
+//  [ 1] VA(0x004c89e0, 0xc8)  void resourceManager::Close(void)   <- override (implements baseManager pure virtual)
+//  [ 2] VA(0x004c8880, 0x1a)  int resourceManager::Main(struct tag_message &)   <- override (implements baseManager pure virtual)

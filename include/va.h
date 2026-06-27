@@ -1,42 +1,38 @@
-// rva.h - RVA/data label macros for the binary-matching pipeline.
+// va.h - VA/data label macros for the binary-matching pipeline.
 //
 // Matched code/data carries its retail address as a clang `annotate` ATTRIBUTE.
-// labels.py compiles each TU to LLVM IR and reads @llvm.global.annotations -
-// pairing the MANGLED SYMBOL directly with the annotation string (no fragile
-// "nearest definition" positional join).
+// The address is a VA (image-base-included, e.g. 0x0040b070) - the value a
+// disassembler shows. (symbol_names.csv's rva column is image-base-RELATIVE;
+// tooling that joins the two bridges by the image base.)
 //
-//   RVA(addr, size)  - on a matched FUNCTION definition. `size` is the retail
+//   VA(addr, size)   - on a matched FUNCTION definition. `size` is the retail
 //                      byte extent (authoritative function boundary; we have it
 //                      exactly from CodeView).
-//   RVAU(addr)       - matched function with NO known size ("U" = unsized).
+//   VAU(addr)        - matched function with NO known size ("U" = unsized).
 //   SYMBOL(mangled)  - explicit mangled-name override when clang's MS-mangling
 //                      differs from the retail symbol.
-//   DATA(addr)       - on an `extern` decl of a matched GLOBAL.
+//   DATA(addr)       - on an `extern` decl of a matched GLOBAL (also a VA).
 //   SIZE(type,bytes) - file-scope sizeof assert; a REAL compile-time check under
 //                      BOTH clang and MSVC 4.2 (whose sizeof is matching ground
 //                      truth). Emits no code -> matching-neutral.
 //   OVERRIDE         - compile-time-only check that a method overrides a base
 //                      virtual (clang enforces; MSVC 4.2 has no `override`).
 //
-// IMPORTANT - the same source is compiled by clang (the label step) AND by MSVC
+// IMPORTANT - the same source is compiled by clang (editor tooling) AND by MSVC
 // 4.2 under wine (the base objs). MSVC 4.2 predates __attribute__, [[...]], and
 // C99 variadic macros, so each macro is FIXED-arity and compiles to nothing
-// under any non-clang compiler. Under MSVC the attributes vanish -> purely
-// clang-side labels, never perturbing matched bytes. (SIZE is the one deliberate
-// exception: a real sizeof assert active under MSVC too, still emitting no code.)
-//
-// IR caveat: clang only emits annotations for DEFINED globals; an `extern` decl's
-// annotation is dropped from IR. So DATA labels are text-scanned by labels.py and
-// bound to the clang-AST VarDecl mangledName; functions/SYMBOL go through IR.
-#ifndef HOMM2_RVA_H
-#define HOMM2_RVA_H
+// under any non-clang compiler. Under MSVC the attributes vanish -> never
+// perturbing matched bytes. (SIZE is the one deliberate exception: a real sizeof
+// assert active under MSVC too, still emitting no code.)
+#ifndef HOMM2_VA_H
+#define HOMM2_VA_H
 
 #include <Ints.h>
 
 #ifdef __clang__
 
-#define RVA(addr, size) __attribute__((annotate("rva:" #addr " size:" #size)))
-#define RVAU(addr) __attribute__((annotate("rva:" #addr)))
+#define VA(addr, size) __attribute__((annotate("va:" #addr " size:" #size)))
+#define VAU(addr) __attribute__((annotate("va:" #addr)))
 #define SYMBOL(mangled) __attribute__((annotate("symbol:" #mangled)))
 #define DATA(addr) __attribute__((annotate("data:" #addr)))
 #define OVERRIDE override
@@ -44,8 +40,8 @@
 
 #else // MSVC 4.2 (and any non-clang compiler): compile the labels out.
 
-#define RVA(addr, size)
-#define RVAU(addr)
+#define VA(addr, size)
+#define VAU(addr)
 #define SYMBOL(mangled)
 #define DATA(addr)
 #define OVERRIDE
@@ -59,4 +55,4 @@
 
 #endif
 
-#endif // HOMM2_RVA_H
+#endif // HOMM2_VA_H

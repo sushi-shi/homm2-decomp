@@ -1,253 +1,253 @@
 // Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // compiland: .\Win32_Re\PHILAI.OBJ   from: (directly linked into exe)
 // functions: 82   data: 51
-// RVA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
+// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
-#include <rva.h>
-RVA(0x0043781b, 0x1b5)
+#include <va.h>
+VA(0x0043781b, 0x1b5)
 // void ResetHeroRVs(int, int, int);
 
-RVA(0x004379d0, 0x180)
+VA(0x004379d0, 0x180)
 // void CheckDoMain(int, int);
 
-RVA(0x00437b50, 0x10)
+VA(0x00437b50, 0x10)
 // void ShowStatus(void);
 
-RVA(0x00437b60, 0x55)
+VA(0x00437b60, 0x55)
 // void philAI::constructor(void);
 
-RVA(0x00437bb5, 0xac)
+VA(0x00437bb5, 0xac)
 // void philAI::DoAllHeroInteractions(void);
 
-RVA(0x00437c61, 0x37e)
+VA(0x00437c61, 0x37e)
 // void philAI::CheckForCreatureUpgrades(void);
 
-RVA(0x00437fdf, 0x4be)
+VA(0x00437fdf, 0x4be)
 // void philAI::CheckBuyStuff(void);
 
-RVA(0x0043849d, 0x2e8)
+VA(0x0043849d, 0x2e8)
 // int philAI::GoodAdjacent(int *);
 
-RVA(0x00438785, 0x4b8)
+VA(0x00438785, 0x4b8)
 // void philAI::CheckReload(void);
 
-RVA(0x00438c3d, 0x302)
+VA(0x00438c3d, 0x302)
 // void philAI::CheckBerserk(void);
 
-RVA(0x00438f3f, 0x71)
+VA(0x00438f3f, 0x71)
 // void philAI::DimensionDoorTo(int, int);
 
-RVA(0x00438fb0, 0x3f9)
+VA(0x00438fb0, 0x3f9)
 // int philAI::DoAnywhereDDoorTownGate(int);
 
-RVA(0x004393a9, 0x158)
+VA(0x004393a9, 0x158)
 // int philAI::DoDimensionDoor(class hero *);
 
-RVA(0x00439501, 0xb7)
+VA(0x00439501, 0xb7)
 // void philAI::SetupRelativeHeroStrengths(void);
 
-RVA(0x004395b8, 0x79)
+VA(0x004395b8, 0x79)
 // void ValidateHero(class hero *);
 
-RVA(0x00439631, 0xcad)
+VA(0x00439631, 0xcad)
 // void philAI::DoAI(int);
 
-RVA(0x0043a2de, 0x4b)
+VA(0x0043a2de, 0x4b)
 // void philAI::GetGameAIVars(void);
 
-RVA(0x0043a329, 0xe2b)
+VA(0x0043a329, 0xe2b)
 // void philAI::GetTurnAIVars(int);
 
-RVA(0x0043b154, 0x5f4)
+VA(0x0043b154, 0x5f4)
 // void philAI::GetBestBHC(int, struct BHC &);
 
-RVA(0x0043b748, 0x11d)
+VA(0x0043b748, 0x11d)
 // class hero * philAI::DetermineHeroToMove(int);
 
-RVA(0x0043b865, 0xe7d)
+VA(0x0043b865, 0xe7d)
 // int philAI::DetermineTargetPosition(int &, int &, int, int &);
 
-RVA(0x0043c6e2, 0x791)
+VA(0x0043c6e2, 0x791)
 // void philAI::ProbableOutcomeOfBattle(class armyGroup *, class hero *, class armyGroup *, class hero *, class armyGroup *, int, int, int, float &, int &, int &, int &, int &, int &);
 
-RVA(0x0043ce73, 0x1e)
+VA(0x0043ce73, 0x1e)
 // float philAI::GetOddsOfWinning(int);
 
-RVA(0x0043ce91, 0x826)
+VA(0x0043ce91, 0x826)
 // void philAI::ValueOfBuyingBuilding(class town *, int, int &, float &);
 
-RVA(0x0043d6b7, 0x19b)
+VA(0x0043d6b7, 0x19b)
 // void philAI::GetBestBuilding(class town *, struct BHC &, float &);
 
-RVA(0x0043d852, 0x306)
+VA(0x0043d852, 0x306)
 // void philAI::ValueOfBuyingCreature(class town *, int, int &, int, float &);
 
-RVA(0x0043db58, 0x35b)
+VA(0x0043db58, 0x35b)
 // void philAI::GetBestCreature(class town *, struct BHC &, float &);
 
-RVA(0x0043deb3, 0x48)
+VA(0x0043deb3, 0x48)
 // int philAI::CreaturesToBuy(class town *, int);
 
-RVA(0x0043defb, 0x5f)
+VA(0x0043defb, 0x5f)
 // int philAI::CreaturesToBuy(int, int);
 
-RVA(0x0043df5a, 0x9c)
+VA(0x0043df5a, 0x9c)
 // int philAI::MaxBuyableCreatures(int);
 
-RVA(0x0043dff6, 0x2b2)
+VA(0x0043dff6, 0x2b2)
 // void philAI::ValueOfBuyingHero(class town *, class hero *, int &, float &);
 
-RVA(0x0043e2a8, 0x1b1)
+VA(0x0043e2a8, 0x1b1)
 // void philAI::GetBestHero(class town *, struct BHC &, float &);
 
-RVA(0x0043e459, 0x65)
+VA(0x0043e459, 0x65)
 // void philAI::LikelihoodOfEnemyAttacking(class town *, class hero *, float &, float &, int &, int &, int &, float &);
 
-RVA(0x0043e4be, 0x1a)
+VA(0x0043e4be, 0x1a)
 // int philAI::MeanRVOfUnexploredTerritory(int);
 
-RVA(0x0043e4d8, 0x1d8)
+VA(0x0043e4d8, 0x1d8)
 // void philAI::GetGameAttentionValue(int);
 
-RVA(0x0043e6b0, 0xf2)
+VA(0x0043e6b0, 0xf2)
 // void philAI::GetTurnAttentionValue(int);
 
-RVA(0x0043e7a2, 0xa6)
+VA(0x0043e7a2, 0xa6)
 // int philAI::RVConversion(int * const);
 
-RVA(0x0043e848, 0xd0)
+VA(0x0043e848, 0xd0)
 // float philAI::TurnsToBuy(int * const);
 
-RVA(0x0043e918, 0x62d)
+VA(0x0043e918, 0x62d)
 // int philAI::RVOfPosition(int, int, int, int, int, int, int, int, int, int);
 
-RVA(0x0043ef45, 0xaf9)
+VA(0x0043ef45, 0xaf9)
 // int philAI::StrategicValueOfPosition(int, int, int, int, int *, int);
 
-RVA(0x0043fa3e, 0x14e)
+VA(0x0043fa3e, 0x14e)
 // int philAI::ValueOfTown(class town *);
 
-RVA(0x0043fb8c, 0x180)
+VA(0x0043fb8c, 0x180)
 // void philAI::TurnCostResource(int);
 
-RVA(0x0043fd0c, 0x175)
+VA(0x0043fd0c, 0x175)
 // float philAI::TurnValueOfObelisk(int);
 
-RVA(0x0043fe81, 0x51)
+VA(0x0043fe81, 0x51)
 // float philAI::FutureDeflator(int * const);
 
-RVA(0x0043fed2, 0xbf8)
+VA(0x0043fed2, 0xbf8)
 // int philAI::FightValueOfStack(class armyGroup *, class hero *, int, int, int, int);
 
-RVA(0x00440aca, 0x1e7)
+VA(0x00440aca, 0x1e7)
 // void philAI::EvaluateOneTimeCreaturePurchase(int, int, int, int &, int &, int &);
 
-RVA(0x00440cb1, 0x768)
+VA(0x00440cb1, 0x768)
 // int philAI::QuickCombat(class armyGroup *, class hero *, class armyGroup *, class hero *, int, int, float &, float &);
 
-RVA(0x00441419, 0x422)
+VA(0x00441419, 0x422)
 // void philAI::HeroInteractionAtHero(class hero *, class hero *, int, int *);
 
-RVA(0x0044183b, 0x882)
+VA(0x0044183b, 0x882)
 // void philAI::HeroInteractionAtTown(class hero *, class town *, int, int *);
 
-RVA(0x004420bd, 0x4ba)
+VA(0x004420bd, 0x4ba)
 // void philAI::RedistributeTroops(class armyGroup *, class armyGroup *, int, int, int, int, int);
 
-RVA(0x00442577, 0x39)
+VA(0x00442577, 0x39)
 // int philAI::ChooseGoldOrExperience(int, int);
 
-RVA(0x004425b0, 0xc7)
+VA(0x004425b0, 0xc7)
 // void philAI::ChooseEvaluateBattle(class armyGroup *, class hero *, class armyGroup *, class hero *, int, int, int, int &, int &);
 
-RVA(0x00442677, 0xfa)
+VA(0x00442677, 0xfa)
 // int philAI::ChooseToFightForArtifact(int, int, int);
 
-RVA(0x00442771, 0x53)
+VA(0x00442771, 0x53)
 // int philAI::NetValueOfArtifact(int, int, int, int);
 
-RVA(0x004427c4, 0x1d)
+VA(0x004427c4, 0x1d)
 // int philAI::ChooseToPayRansomOnHero(int);
 
-RVA(0x004427e1, 0xd7)
+VA(0x004427e1, 0xd7)
 // void philAI::BuildBuilding(class town *, int);
 
-RVA(0x004428b8, 0x328)
+VA(0x004428b8, 0x328)
 // void philAI::BuildHero(class town *, int);
 
-RVA(0x00442be0, 0x2cd)
+VA(0x00442be0, 0x2cd)
 // void philAI::BuildCreature(class town *, int, int);
 
-RVA(0x00442ead, 0x15a)
+VA(0x00442ead, 0x15a)
 // int philAI::CanBuyBHC(struct BHC &);
 
-RVA(0x00443007, 0x164)
+VA(0x00443007, 0x164)
 // int philAI::CombatMonsterEvent(class hero *, int, int *, class mapCell *);
 
-RVA(0x0044316b, 0x6d7)
+VA(0x0044316b, 0x6d7)
 // int philAI::FightEvent(class hero *, class mapCell *, int);
 
-RVA(0x00443842, 0x73)
+VA(0x00443842, 0x73)
 // int philAI::DamageGroup(class armyGroup *, class hero *, class hero *, float);
 
-RVA(0x004438b5, 0xcb)
+VA(0x004438b5, 0xcb)
 // void philAI::IncrementHourGlass(void);
 
-RVA(0x00443980, 0x227)
+VA(0x00443980, 0x227)
 // void philAI::TownEvent(class mapCell *, class hero *, int, int);
 
-RVA(0x00443ba7, 0xad)
+VA(0x00443ba7, 0xad)
 // int philAI::ComputeUpgradeValue(int, int);
 
-RVA(0x00443c54, 0x271)
+VA(0x00443c54, 0x271)
 // int philAI::ComputeValueOfSS(class hero *, int, int);
 
-RVA(0x00443ec5, 0x59)
+VA(0x00443ec5, 0x59)
 // int philAI::ComputeValueOfFreeSS(class hero *, int);
 
-RVA(0x00443f1e, 0xa6)
+VA(0x00443f1e, 0xa6)
 // int philAI::ManaRefreshValue(class hero *, int);
 
-RVA(0x00443fc4, 0x1ac5)
+VA(0x00443fc4, 0x1ac5)
 // int philAI::ValueOfEventAtPosition(int, int, int, int *);
 
-RVA(0x00445a89, 0x299)
+VA(0x00445a89, 0x299)
 // int philAI::EvaluateGenericSite(class mapCell *);
 
-RVA(0x00445d22, 0x5e)
+VA(0x00445d22, 0x5e)
 // int philAI::EvaluateBarrier(class mapCell *);
 
-RVA(0x00445d80, 0x5e)
+VA(0x00445d80, 0x5e)
 // int philAI::EvaluatePassword(class mapCell *);
 
-RVA(0x00445dde, 0xf5)
+VA(0x00445dde, 0xf5)
 // int philAI::EvaluateRecruitSite(class mapCell *);
 
-RVA(0x00445ed3, 0x1d)
+VA(0x00445ed3, 0x1d)
 // int philAI::EvaluateJail(class mapCell *);
 
-RVA(0x00445ef0, 0xf6)
+VA(0x00445ef0, 0xf6)
 // void InitAIMapVars(void);
 
-RVA(0x00445fe6, 0x112)
+VA(0x00445fe6, 0x112)
 // void CloseAIMapVars(void);
 
-RVA(0x004460f8, 0x26a)
+VA(0x004460f8, 0x26a)
 // int OnMySide(int);
 
-RVA(0x00446362, 0x2bc)
+VA(0x00446362, 0x2bc)
 // int philAI::EvaluateArtifactEvent(int, int);
 
-RVA(0x0044661e, 0x30a)
+VA(0x0044661e, 0x30a)
 // int philAI::EvaluateMineEvent(int, int, int, int *);
 
-RVA(0x00446928, 0x33e)
+VA(0x00446928, 0x33e)
 // int philAI::EvaluateMonsterEvent(int, int, int *);
 
-RVA(0x00446c66, 0x5ab)
+VA(0x00446c66, 0x5ab)
 // int philAI::EvaluateHeroEvent(int, int, int, int, int *);
 
-RVA(0x00447211, 0x4fa)
+VA(0x00447211, 0x4fa)
 // int philAI::EvaluateTownEvent(int, int, int, int, int *);
 
 // ---- data / globals / vtables ----

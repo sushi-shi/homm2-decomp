@@ -1,52 +1,52 @@
 // Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // compiland: .\Win32_Re\Modem.obj   from: (directly linked into exe)
 // functions: 15   data: 22
-// RVA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
+// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
-#include <rva.h>
-RVA(0x0040c8f0, 0x24e)
+#include <va.h>
+VA(0x0040c8f0, 0x24e)
 // void ModemSetup(int);
 
-RVA(0x0040cb3e, 0x9e)
+VA(0x0040cb3e, 0x9e)
 // long int Dial(void);
 
-RVA(0x0040cbdc, 0x54)
+VA(0x0040cbdc, 0x54)
 // long int Wait(void);
 
-RVA(0x0040cc30, 0x79)
+VA(0x0040cc30, 0x79)
 // void GUIModemCommand(char *, char *);
 
-RVA(0x0040cca9, 0x95)
+VA(0x0040cca9, 0x95)
 // signed char GUIModemCommandExec(void);
 
-RVA(0x0040cd3e, 0x8e)
+VA(0x0040cd3e, 0x8e)
 // void ModemCommand(char *);
 
-RVA(0x0040cdcc, 0x82)
+VA(0x0040cdcc, 0x82)
 // signed char GUIModemResponse(char *, char *);
 
-RVA(0x0040ce4e, 0xe2)
+VA(0x0040ce4e, 0xe2)
 // signed char GUIModemResponseExec(void);
 
-RVA(0x0040cf30, 0x4e)
+VA(0x0040cf30, 0x4e)
 // int write_buffer(char *, int);
 
-RVA(0x0040cf7e, 0x47)
+VA(0x0040cf7e, 0x47)
 // int read_byte(void);
 
-RVA(0x0040cfc5, 0x27)
+VA(0x0040cfc5, 0x27)
 // void write_byte(int);
 
-RVA(0x0040cfec, 0x1bb)
+VA(0x0040cfec, 0x1bb)
 // void Connect(void);
 
-RVA(0x0040d1a7, 0x211)
+VA(0x0040d1a7, 0x211)
 // int WaitForDirectConnect(void);
 
-RVA(0x0040d3b8, 0x127)
+VA(0x0040d3b8, 0x127)
 // char ReadPacket(void);
 
-RVA(0x0040d4df, 0xff)
+VA(0x0040d4df, 0xff)
 // void WriteModemPacket(char *, int);
 
 // ---- data / globals / vtables ----

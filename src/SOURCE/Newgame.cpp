@@ -1,55 +1,55 @@
 // Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // compiland: .\Win32_Re\Newgame.obj   from: (directly linked into exe)
 // functions: 16   data: 8
-// RVA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
+// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
-#include <rva.h>
-RVA(0x004b6f40, 0x1d5)
+#include <va.h>
+VA(0x004b6f40, 0x1d5)
 // void game::GetMap(void);
 
-RVA(0x004b7115, 0x77)
+VA(0x004b7115, 0x77)
 // void game::ProcessNewMap(struct SMapHeader *);
 
-RVA(0x004b718c, 0x491)
+VA(0x004b718c, 0x491)
 // void game::InitNewGame(struct SMapHeader *);
 
-RVA(0x004b761d, 0x81)
+VA(0x004b761d, 0x81)
 // void game::SetupNetPlayerNames(void);
 
-RVA(0x004b769e, 0xaca)
+VA(0x004b769e, 0xaca)
 // int game::NewGame(void);
 
-RVA(0x004b8168, 0xf1)
+VA(0x004b8168, 0xf1)
 // void game::CleanUpNewGameWindow(void);
 
-RVA(0x004b8259, 0x67d)
+VA(0x004b8259, 0x67d)
 // void game::InitNewGameWindow(void);
 
-RVA(0x004b88d6, 0x59c)
+VA(0x004b88d6, 0x59c)
 // void game::UpdateNewGameWindow(void);
 
-RVA(0x004b8e72, 0xf46)
+VA(0x004b8e72, 0xf46)
 // int NewGameHandler(struct tag_message &);
 
-RVA(0x004b9db8, 0x418)
+VA(0x004b9db8, 0x418)
 // int game::ProcessNGKeyPress(struct tag_message &);
 
-RVA(0x004ba1d0, 0x11e)
+VA(0x004ba1d0, 0x11e)
 // void game::NGKPSetupDisplayString(char *, unsigned short int);
 
-RVA(0x004ba2ee, 0xae)
+VA(0x004ba2ee, 0xae)
 // void game::DrawNGKPDisplayString(int);
 
-RVA(0x004ba39c, 0xb71)
+VA(0x004ba39c, 0xb71)
 // void game::ShowScenInfo(void);
 
-RVA(0x004baf0d, 0x1c7)
+VA(0x004baf0d, 0x1c7)
 // void game::GetLossConditionText(char *);
 
-RVA(0x004bb0d4, 0x2fb)
+VA(0x004bb0d4, 0x2fb)
 // void game::GetVictoryConditionText(char *);
 
-RVA(0x004bb3cf, 0x2a7)
+VA(0x004bb3cf, 0x2a7)
 // int game::GetSideDesc(char *, int, int);
 
 // ---- data / globals / vtables ----
