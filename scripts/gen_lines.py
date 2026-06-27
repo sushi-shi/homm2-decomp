@@ -82,6 +82,49 @@ def parse_obj(obj):
     return out
 
 
+def parse_locals(obj):
+    """{qualified name -> {bp_offset -> local/param name}} from the /Z7 .debug$S
+    S_BPREL32 records (grouped by their enclosing S_GPROC32)."""
+    d = obj.read_bytes()
+    nsec = struct.unpack_from("<H", d, 2)[0]
+    out = {}
+    cur = None
+    for s in range(nsec):
+        o = 20 + s * 40
+        if d[o:o + 8] != b".debug$S":
+            continue
+        praw = struct.unpack_from("<I", d, o + 20)[0]
+        size = struct.unpack_from("<I", d, o + 16)[0]
+        b = d[praw:praw + size]
+        p = 4                                          # skip the CV4 signature
+        while p + 4 <= len(b):
+            rl, rt = struct.unpack_from("<HH", b, p)
+            if rl == 0:
+                break
+            body = b[p + 4:p + 2 + rl]
+            if rt in (0x0204, 0x0205) and len(body) > 34:   # L/GPROC32: name @ body[34]
+                nl = body[33]
+                cur = body[34:34 + nl].decode("latin1")
+                out.setdefault(cur, {})
+            elif rt == 0x0200 and cur is not None:           # S_BPREL32: i32 off, u16 ty, name
+                off = struct.unpack_from("<i", body, 0)[0]
+                nl = body[6]
+                out[cur][off] = body[7:7 + nl].decode("latin1")
+            elif rt == 0x0006:                               # S_END
+                cur = None
+            p += 2 + rl
+    return out
+
+
+def mangled_to_qual(m):
+    """`?Name@Class@@...` -> `Class::Name`; `?Name@@YA...` -> `Name`."""
+    x = re.match(r"\?([A-Za-z0-9_]+)@([A-Za-z0-9_]+)@@", m)
+    if x:
+        return f"{x.group(2)}::{x.group(1)}"
+    x = re.match(r"\?([A-Za-z0-9_]+)@@", m)
+    return x.group(1) if x else None
+
+
 def main(argv):
     unit = argv[0]
     man = tomllib.loads((REPO / "config/units.toml").read_text())
@@ -99,28 +142,33 @@ def main(argv):
         sys.exit(f"gen_lines: /Z7 compile failed for {unit}")
     src_lines = src.read_text(errors="replace").splitlines()
     fns = parse_obj(obj)
-    result = {}
+    loc_by_qual = parse_locals(obj)
+    result = {"stmts": {}, "locals": {}}
     for mangled, (base, recs) in fns.items():
         dl = find_def_line(src_lines, mangled)
-        if dl is None:
-            continue
-        rows = []
-        for rel, off in recs:
-            ab = dl + rel
-            line = src_lines[ab - 1] if 0 < ab <= len(src_lines) else ""
-            if line.strip():
-                rows.append([off, ab, line])
-        if rows:
-            # dedent by the function's OUTERMOST statement indent: the body sits at
-            # column 0 while RELATIVE C++ nesting (scope) is preserved.
-            base = min(len(r[2]) - len(r[2].lstrip()) for r in rows)
-            for r in rows:
-                r[2] = r[2][base:].rstrip()
-            result[mangled] = rows
+        if dl is not None:
+            rows = []
+            for rel, off in recs:
+                ab = dl + rel
+                line = src_lines[ab - 1] if 0 < ab <= len(src_lines) else ""
+                if line.strip():
+                    rows.append([off, ab, line])
+            if rows:
+                # dedent by the function's OUTERMOST statement indent: the body sits
+                # at column 0 while RELATIVE C++ nesting (scope) is preserved.
+                ind = min(len(r[2]) - len(r[2].lstrip()) for r in rows)
+                for r in rows:
+                    r[2] = r[2][ind:].rstrip()
+                result["stmts"][mangled] = rows
+        loc = loc_by_qual.get(mangled_to_qual(mangled) or "")
+        if loc:                                          # [[bp_offset, name], ...]
+            result["locals"][mangled] = [[o, n] for o, n in sorted(loc.items())]
     outp = REPO / "build/lines" / f"{unit}.json"
     outp.write_text(json.dumps(result) + "\n")
     print(f"gen_lines: {unit} -> {outp.relative_to(REPO)} "
-          f"({len(result)} fns, {sum(len(v) for v in result.values())} statements)")
+          f"({len(result['stmts'])} fns, "
+          f"{sum(len(v) for v in result['stmts'].values())} statements, "
+          f"{sum(len(v) for v in result['locals'].values())} locals)")
 
 
 if __name__ == "__main__":
