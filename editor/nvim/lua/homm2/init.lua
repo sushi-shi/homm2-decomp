@@ -11,6 +11,13 @@
 -- build/objdiff/report.json (per-function match %). The retail ADDRESS in each
 -- function's VA(...) macro is the join key - it moves with the function text,
 -- so nothing here goes stale the way line tables would.
+--
+-- Source overlay (config.source_lines, toggle `vL` / `:Homm2 source`): on the
+-- BASE side only (vb, and the base pane of vd), each source STATEMENT is floated
+-- as a virtual line above the asm it lowered to. Data: build/lines/<unit>.json
+-- from scripts/gen_lines.py (compiles the TU /Z7 - codegen-neutral - and reads the
+-- COFF line table; needs the `nix develop .#build` shell for wine cl). Retail has
+-- no line info, so target/diff-target panes are never annotated.
 
 local M = {}
 local uv = vim.uv or vim.loop
@@ -18,6 +25,7 @@ local uv = vim.uv or vim.loop
 M.config = {
   keymaps = true,             -- vt/vb (asm), vd (diff), vs (status), vB (build), V (peek)
   hints = true,               -- inline match-% virtual text after each VA(...) line
+  source_lines = true,        -- overlay each source statement above its asm (BASE side only: vb + vd base pane)
   build_on_save = false,      -- rebuild (quietly) whenever a TU is saved
   format_on_save = false,     -- clang-format the saved file in place (root .clang-format)
   split = "botright vsplit",  -- where asm/status views open
@@ -256,7 +264,9 @@ local function asm_lines(sym)
   local label = {}
   for idx, d in ipairs(ordered) do label[d] = ".L" .. idx end
 
-  local out = {}
+  -- `out` = display lines; `addrs[i]` = code offset of out[i] for instruction rows
+  -- (nil for label rows). The source overlay matches addrs to the line table.
+  local out, addrs = {}, {}
   for _, i in ipairs(ins) do
     local I = i.instruction or {}
     -- Skip objdiff's diff-alignment GAPS: empty placeholder rows (no `formatted`,
@@ -270,13 +280,89 @@ local function asm_lines(sym)
       local d = tonumber(I.branch_dest or "")
       if d and label[d] then text = text:gsub(("0x%x"):format(d), label[d]) end
       out[#out + 1] = "    " .. text
+      addrs[#out] = off
     end
   end
   if #out == 0 then out = { "(no instructions)" } end
-  return out
+  return out, addrs
 end
 
 local function pct(x) return string.format("%.2f%%", x or 0) end
+
+-- --------------------------------------------------- source-line overlay ---
+-- BASE-only (our /Z7 build carries line info; retail has none). For vb and the
+-- base pane of vd we float each source STATEMENT above the asm it lowered to, as
+-- transient virtual lines (the buffer text is unchanged). Data: build/lines/
+-- <unit>.json from scripts/gen_lines.py (compiles the TU /Z7 - codegen-neutral, so
+-- the COFF line-table offsets equal objdiff's base-side instruction addresses).
+local SRC_NS = vim.api.nvim_create_namespace("homm2_source")
+local source_cache = {}    -- "root|unit" -> { mtime, map = {mangled -> {offset -> "Lnnn  text"}} }
+local source_pending = {}  -- "root|unit" -> true while gen_lines runs (no double-spawn)
+
+local function read_source_json(root, unit)
+  local fd = io.open(root .. "/build/lines/" .. unit .. ".json", "r")
+  if not fd then return nil end
+  local data = fd:read("*a"); fd:close()
+  local ok, j = pcall(vim.json.decode, data)
+  if not ok or type(j) ~= "table" then return nil end
+  local out = {}
+  for mangled, rows in pairs(j) do
+    local m = {}
+    for _, r in ipairs(rows) do m[r[1]] = ("L%d  %s"):format(r[2], r[3]) end
+    out[mangled] = m
+  end
+  return out
+end
+
+--- {mangled -> {offset -> label}} for a unit; cached by the base obj's mtime,
+--- (re)generated lazily. Needs the build shell (wine cl); silent no-op otherwise.
+local function source_map(root, unit, cb)
+  local st = uv.fs_stat(root .. "/" .. ODIR .. "/base/" .. unit .. ".obj")
+  local mt = st and st.mtime.sec or 0
+  local key = root .. "|" .. unit
+  local c = source_cache[key]
+  if c and c.mtime == mt and c.map then return cb(c.map) end
+  local js = uv.fs_stat(root .. "/build/lines/" .. unit .. ".json")
+  if js and js.mtime.sec >= mt then
+    local map = read_source_json(root, unit)
+    if map then source_cache[key] = { mtime = mt, map = map }; return cb(map) end
+  end
+  if source_pending[key] then return end
+  source_pending[key] = true
+  log("gen_lines " .. unit .. "  [" .. root .. "]")
+  vim.system({ "python3", "scripts/gen_lines.py", unit }, { cwd = root, text = true },
+    function(res)
+      vim.schedule(function()
+        source_pending[key] = nil
+        if res.code ~= 0 then
+          return log("gen_lines failed: " .. ((res.stderr or ""):gsub("%s+$", "")))
+        end
+        local map = read_source_json(root, unit)
+        if map then source_cache[key] = { mtime = mt, map = map }; cb(map) end
+      end)
+    end)
+end
+
+--- Place / refresh the source-statement virtual lines on a base asm buffer.
+local function attach_source_lines(buf, ctx)
+  if not (M.config.source_lines and ctx and ctx.side == "base"
+          and ctx.addrs and ctx.name and ctx.unit and ctx.root) then return end
+  source_map(ctx.root, ctx.unit, function(map)
+    if not (map and vim.api.nvim_buf_is_valid(buf)) then return end
+    local stmts = map[ctx.name]; if not stmts then return end
+    vim.api.nvim_buf_clear_namespace(buf, SRC_NS, 0, -1)
+    local off0 = ctx.line_offset or 0
+    for i, addr in pairs(ctx.addrs) do
+      local txt = stmts[addr]
+      if txt then
+        pcall(vim.api.nvim_buf_set_extmark, buf, SRC_NS, (i - 1) + off0, 0, {
+          virt_lines = { { { "  ; " .. txt, "Comment" } } },
+          virt_lines_above = true,
+        })
+      end
+    end
+  end)
+end
 
 -- --------------------------------------------------------------- rendering ---
 
@@ -293,6 +379,7 @@ local function fill(buf, lines, ctx)
   vim.keymap.set("n", "q", "<cmd>close<cr>", opts)
   vim.keymap.set("n", "<CR>", function() M.follow() end, opts)
   vim.keymap.set("n", "V", function() M.follow() end, opts)
+  pcall(attach_source_lines, buf, ctx)   -- BASE asm only; no-op elsewhere
 end
 
 -- Replace a scratch view's content in place (re-render after a build). The view
@@ -407,8 +494,10 @@ local function show_diff(root, sym, t, b)
       buf = vim.api.nvim_create_buf(true, true)
       vim.api.nvim_buf_set_name(buf, name)
     end
-    fill(buf, asm_lines(s), { root = root, filetype = "asm", kind = "diffpane",
-                              name = sym.name, unit = sym.unit, side = side })
+    local lines, addrs = asm_lines(s)
+    fill(buf, lines, { root = root, filetype = "asm", kind = "diffpane",
+                       name = sym.name, unit = sym.unit, side = side,
+                       addrs = addrs, line_offset = 0 })
     return buf
   end
 
@@ -477,12 +566,14 @@ local function open_for(root, sym, side, src_win)
     if side == "diff" then
       show_diff(root, sym, t, b)
     else
-      local asm = asm_lines(one)
+      local asm, addrs = asm_lines(one)
       local lines = { ("; %s   %s   %s"):format(sym.name, side, pct(one.match_percent)) }
       vim.list_extend(lines, asm)
-      -- stash the rendered asm so a later build can diff base prev-build -> now
+      -- stash the rendered asm so a later build can diff base prev-build -> now.
+      -- line_offset = 1: the header line above shifts every asm row down one.
       show_split(lines, { root = root, tag = side .. "/" .. sym.name, kind = "asm",
-                          name = sym.name, unit = sym.unit, side = side, asm = asm })
+                          name = sym.name, unit = sym.unit, side = side, asm = asm,
+                          addrs = addrs, line_offset = 1 })
     end
     -- keep the cursor in the source buffer; don't jump into the opened view
     if src_win and vim.api.nvim_win_is_valid(src_win) then
@@ -1047,7 +1138,8 @@ local function save_state(root)
   if not fd then return end
   fd:write(vim.json.encode({ hints = M.config.hints,
                              build_on_save = M.config.build_on_save,
-                             format_on_save = M.config.format_on_save }))
+                             format_on_save = M.config.format_on_save,
+                             source_lines = M.config.source_lines }))
   fd:close()
 end
 
@@ -1066,6 +1158,7 @@ function M.load_state(buf)
     if type(s.hints) == "boolean" then M.config.hints = s.hints end
     if type(s.build_on_save) == "boolean" then M.config.build_on_save = s.build_on_save end
     if type(s.format_on_save) == "boolean" then M.config.format_on_save = s.format_on_save end
+    if type(s.source_lines) == "boolean" then M.config.source_lines = s.source_lines end
   end
 end
 
@@ -1101,8 +1194,16 @@ function M.dispatch(arg)
     save_state(project_root(0))
     return notify("format on save " .. (M.config.format_on_save and "ON" or "off"))
   end
+  if arg == "source" then
+    M.config.source_lines = not M.config.source_lines
+    save_state(project_root(0))
+    local buf, ctx = vim.api.nvim_get_current_buf(), vim.b.homm2
+    if M.config.source_lines then attach_source_lines(buf, ctx)
+    else pcall(vim.api.nvim_buf_clear_namespace, buf, SRC_NS, 0, -1) end
+    return notify("source overlay " .. (M.config.source_lines and "ON (base views)" or "off"))
+  end
   if arg == "target" or arg == "base" or arg == "diff" then return M.view(arg) end
-  return notify("usage: :Homm2 {target|base|diff|status|hints|autobuild|autoformat|close}",
+  return notify("usage: :Homm2 {target|base|diff|status|hints|source|autobuild|autoformat|close}",
     vim.log.levels.WARN)
 end
 
@@ -1112,6 +1213,7 @@ function M.attach_keymaps(buf)
     vb = function() M.view("base") end,    -- view base asm
     vd = function() M.view("diff") end,    -- view diff (the objdiff look)
     vs = function() M.status() end,        -- status overview
+    vL = function() M.dispatch("source") end, -- toggle source-statement overlay (base views)
     vB = function() M.build({}) end,       -- build
     vq = function() M.close() end,         -- close all homm2 views
   }
