@@ -144,10 +144,11 @@ def main(argv=None):
 def _patch_dbi(pdb, empty_stream):
     # Walk the MSF to find the DBI stream (stream 3) first block, patch offset 0x14.
     d = bytearray(pdb.read_bytes())
-    bs = struct.unpack_from("<I", d, 24)[0]
-    num_blocks = struct.unpack_from("<I", d, 28)[0]
-    num_dir_bytes = struct.unpack_from("<I", d, 32)[0]
-    blk_map_addr = struct.unpack_from("<I", d, 44)[0]
+    # MSF SuperBlock fields follow the 32-byte magic signature.
+    bs = struct.unpack_from("<I", d, 32)[0]            # BlockSize
+    num_blocks = struct.unpack_from("<I", d, 40)[0]    # NumBlocks
+    num_dir_bytes = struct.unpack_from("<I", d, 44)[0] # NumDirectoryBytes
+    blk_map_addr = struct.unpack_from("<I", d, 52)[0]  # BlockMapAddr
     # directory block list
     ndir_blocks = (num_dir_bytes + bs - 1) // bs
     dir_blocks = [struct.unpack_from("<I", d, blk_map_addr * bs + 4 * i)[0] for i in range(ndir_blocks)]
