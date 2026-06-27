@@ -121,7 +121,7 @@
             case "$-" in *i*) trap 'wineserver -k >/dev/null 2>&1 || true' EXIT ;; esac
             git -C "$HOMM2_DIR" config --local core.hooksPath .githooks 2>/dev/null || true
             echo "[homm2] MSVC 4.2   : $MSVC_DIR/bin/CL.EXE (under wine)" >&2
-            if [ ! -x "$MSVC_DIR/bin/CL.EXE" ] && [ ! -x "$MSVC_DIR/bin/cl.exe" ]; then
+            if [ ! -f "$MSVC_DIR/bin/CL.EXE" ] && [ ! -f "$MSVC_DIR/bin/cl.exe" ]; then
               echo "[homm2] MSVC 4.2   : NOT PROVISIONED - run scripts/make-toolchain.sh on the en_vc42ent discs" >&2
             fi
             echo "[homm2] target EXE : $HOMM2_EXE" >&2

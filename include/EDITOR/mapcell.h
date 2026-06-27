@@ -1,4 +1,5 @@
-#pragma once
+#ifndef HOMM2_EDITOR_MAPCELL_H
+#define HOMM2_EDITOR_MAPCELL_H
 // Map data records for the EDITOR/mapcell TU (fullMap). NOT original source.
 //
 // Layout recovered from the retail /Od this+offset accesses (mapcell.c.obj):
@@ -47,3 +48,4 @@ public:
     u16 extra;              // +0xa  head index into the extras chain
 };
 SIZE(mapCell, 12);
+#endif // HOMM2_EDITOR_MAPCELL_H
