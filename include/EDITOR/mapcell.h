@@ -7,7 +7,7 @@
 //     extraCount*7 bytes).
 //   - mapCell is a 12-byte record (cells allocated as width*height*12; memcpy 12).
 // Byte/word access widths + bit positions are read off the andb/andw/movw forms.
-#include <rva.h>
+#include <va.h>
 #include <Ints.h>
 
 #pragma pack(push, 1)

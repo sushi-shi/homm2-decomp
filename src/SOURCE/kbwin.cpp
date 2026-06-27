@@ -1,55 +1,55 @@
 // Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // compiland: .\Win32_Re\kbwin.obj   from: (directly linked into exe)
 // functions: 16   data: 21
-// RVA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
+// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
-#include <rva.h>
-RVA(0x0041bce0, 0x146)
+#include <va.h>
+VA(0x0041bce0, 0x146)
 // _WinMain@16;
 
-RVA(0x0041be26, 0x339)
+VA(0x0041be26, 0x339)
 // int AppInit(void *, void *, int, char *);
 
-RVA(0x0041c15f, 0x31)
+VA(0x0041c15f, 0x31)
 // int AppIdle(void);
 
-RVA(0x0041c190, 0x57e)
+VA(0x0041c190, 0x57e)
 // long int AppWndProc(void *, unsigned int, unsigned int, long int);
 
-RVA(0x0041c70e, 0x90)
+VA(0x0041c70e, 0x90)
 // int AppAbout(void *, unsigned int, unsigned int, long int);
 
-RVA(0x0041c79e, 0x1a)
+VA(0x0041c79e, 0x1a)
 // void AppExit(void);
 
-RVA(0x0041c7b8, 0xc8)
+VA(0x0041c7b8, 0xc8)
 // void Process1WindowsMessage(void);
 
-RVA(0x0041c880, 0x147)
+VA(0x0041c880, 0x147)
 // void ResizeWindow(int, int, int, int);
 
-RVA(0x0041c9c7, 0x197)
+VA(0x0041c9c7, 0x197)
 // long int AppCommand(void *, unsigned int, unsigned int, long int);
 
-RVA(0x0041cb5e, 0xd7)
+VA(0x0041cb5e, 0xd7)
 // void UpdateDfltMenu(void *);
 
-RVA(0x0041cc35, 0xac)
+VA(0x0041cc35, 0xac)
 // void KBChangeMenu(void *);
 
-RVA(0x0041cce1, 0x15c)
+VA(0x0041cce1, 0x15c)
 // void SetMenuStatus(int);
 
-RVA(0x0041ce3d, 0x7b)
+VA(0x0041ce3d, 0x7b)
 // void SetNoDialogMenus(int);
 
-RVA(0x0041ceb8, 0x159)
+VA(0x0041ceb8, 0x159)
 // void SetMenus(void *, int);
 
-RVA(0x0041d011, 0x16)
+VA(0x0041d011, 0x16)
 // long int KBTickCount(void);
 
-RVA(0x0041d027, 0x10)
+VA(0x0041d027, 0x10)
 // void InitVideo(void);
 
 // ---- data / globals / vtables ----

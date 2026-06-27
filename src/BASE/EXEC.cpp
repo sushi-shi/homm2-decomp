@@ -1,36 +1,36 @@
 // Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // compiland: .\Win32_RE\EXEC.OBJ   from: .\basewin.lib
 // functions: 10   data: 0
-// RVA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
+// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
-#include <rva.h>
-RVA(0x004d1610, 0x10)
+#include <va.h>
+VA(0x004d1610, 0x10)
 // void executive::constructor(void);
 
-RVA(0x004d1620, 0x9e)
+VA(0x004d1620, 0x9e)
 // int executive::InitSystem(void);
 
-RVA(0x004d16c0, 0x86)
+VA(0x004d16c0, 0x86)
 // void executive::ShutDownSystem(void);
 
-RVA(0x004d1750, 0xfb)
+VA(0x004d1750, 0xfb)
 // int executive::DoDialog(class baseManager *);
 
-RVA(0x004d1850, 0x86)
+VA(0x004d1850, 0x86)
 // void executive::PrintManagerList(void);
 
-RVA(0x004d18e0, 0xce)
+VA(0x004d18e0, 0xce)
 // int executive::AddManager(class baseManager *, int);
 
-RVA(0x004d19b0, 0x76)
+VA(0x004d19b0, 0x76)
 // void executive::RemoveManager(class baseManager *);
 
-RVA(0x004d1a30, 0x5a)
+VA(0x004d1a30, 0x5a)
 // void executive::CallManager(class baseManager *);
 
-RVA(0x004d1a90, 0xfa)
+VA(0x004d1a90, 0xfa)
 // void executive::MainLoop(void);
 
-RVA(0x004d1b90, 0xa)
+VA(0x004d1b90, 0xa)
 // void executive::Terminate(void);
 

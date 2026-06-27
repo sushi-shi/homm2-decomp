@@ -1,9 +1,9 @@
 // Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // compiland: .\Win32_Re\mapcell.obj   from: (directly linked into exe)
 // functions: 11   data: 0
-// RVA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
+// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
-#include <rva.h>
+#include <va.h>
 #include "EDITOR/fullMap.h"
 #include <string.h>
 #include <io.h>
@@ -17,7 +17,7 @@ struct oldMapCellExtra {
     u8 raw[15];
 };
 
-RVA(0x0040b070, 0x36)
+VA(0x0040b070, 0x36)
 fullMap::fullMap(void)
 {
     cells = 0;
@@ -25,13 +25,13 @@ fullMap::fullMap(void)
     extraCount = 0;
 }
 
-RVA(0x0040b0a6, 0x1e)
+VA(0x0040b0a6, 0x1e)
 fullMap::~fullMap(void)
 {
     Close();
 }
 
-RVA(0x0040b0c4, 0x81)
+VA(0x0040b0c4, 0x81)
 void fullMap::Close(void)
 {
     if (cells)
@@ -43,7 +43,7 @@ void fullMap::Close(void)
     extraCount = 0;
 }
 
-RVA(0x0040b145, 0x53)
+VA(0x0040b145, 0x53)
 void fullMap::Init(int w, int h)
 {
     int n;  // retail reserves one unused /Od slot at -0x4 (this spills to -0x8)
@@ -53,7 +53,7 @@ void fullMap::Init(int w, int h)
     cells = (mapCell *)operator new(width * height * sizeof(mapCell));
 }
 
-RVA(0x0040b198, 0xce)
+VA(0x0040b198, 0xce)
 void fullMap::ClearCellExtra(int index)
 {
     extras[index].objTileset = 0;
@@ -69,7 +69,7 @@ void fullMap::ClearCellExtra(int index)
     extras[index].index = 0;
 }
 
-RVA(0x0040b266, 0x130)
+VA(0x0040b266, 0x130)
 int fullMap::GetNewCellExtraIndex(void)
 {
     // NOTE: /Od stack-slot order is MSVC symbol-HASH order, not declaration order.
@@ -96,7 +96,7 @@ int fullMap::GetNewCellExtraIndex(void)
     return extraCount - 100;
 }
 
-RVA(0x0040b73c, 0x9e)
+VA(0x0040b73c, 0x9e)
 void fullMap::Write(int handle)
 {
     _write(handle, &width, sizeof(width));
@@ -108,7 +108,7 @@ void fullMap::Write(int handle)
 
 // ~98%: all slots + logic match; one convert-path memcpy dst (cells+width*y+x)
 // schedules the cells-base add differently (regalloc artifact, see report).
-RVA(0x0040b7da, 0x295)
+VA(0x0040b7da, 0x295)
 void fullMap::Read(int handle, int convert)
 {
     // /Od slots are MSVC symbol-hash order: retail frame is
@@ -149,7 +149,7 @@ void fullMap::Read(int handle, int convert)
 // PARTIAL (~86%): logic + the (cells+width*y)[x] cell-access form match retail;
 // residual is /Od block-boundary jmp-to-next artifacts (incl. a leading jmp) plus
 // the 4-local hash-slot order (cur/idx/ni/cp). See docs/patterns/od-hash-slots.md.
-RVA(0x0040b396, 0x1d3)
+VA(0x0040b396, 0x1d3)
 mapCellExtra *fullMap::GetNewCellExtraOverlay(int x, int y)
 {
     mapCellExtra *cur;   // -0x4
@@ -180,7 +180,7 @@ mapCellExtra *fullMap::GetNewCellExtraOverlay(int x, int y)
 
 // PARTIAL (~86%): twin of GetNewCellExtraOverlay (objIndex vs ovlIndex); same
 // /Od block-jmp + hash-slot residual.
-RVA(0x0040b569, 0x1d3)
+VA(0x0040b569, 0x1d3)
 mapCellExtra *fullMap::GetNewCellExtraObject(int x, int y)
 {
     mapCellExtra *cur;   // -0x4
@@ -209,5 +209,5 @@ mapCellExtra *fullMap::GetNewCellExtraObject(int x, int y)
     }
 }
 
-RVA(0x0040ba6f, 0x2ea)
+// VA(0x0040ba6f, 0x2ea)
 // void fullMap::ChangeTilesetIndex(class mapCell *, int, int, int, int, int, int);

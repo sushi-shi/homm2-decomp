@@ -2,7 +2,7 @@
 # cv-nb09-materialize.py  PE  DEMANGLED_ADDRMAP  OUTROOT
 # Materialize a reconstructed source tree from an embedded CodeView NB09 stream:
 #   - one .cpp/.c per compiland (translation unit), under OUTROOT mirroring paths
-#   - every function annotated Gruntz-style:  RVA(0xADDR, 0xSIZE)
+#   - every function annotated Gruntz-style:  VA(0xADDR, 0xSIZE)
 #       (size = bytes to next .text symbol, trailing 0xCC/0x90 padding trimmed)
 #   - per-class vtable layouts (walked via relocations) with each slot labelled
 #       "new virtual" / "override of Base::m" / "inherited from Base"
@@ -191,7 +191,7 @@ for C in sorted(vtables):
     for i,ptr,fn,fc in vtables[C]:
         tag=slot_label(C,B,i,fc,ptr,fn)
         vlabel.setdefault(ptr, []).append((C,i,tag))
-        vt_text.append(f"  [{i:2}] RVA(0x{ptr:08x}, 0x{fsize(ptr):x})  {cleandecl(fn)}   <- {tag}")
+        vt_text.append(f"  [{i:2}] VA(0x{ptr:08x}, 0x{fsize(ptr):x})  {cleandecl(fn)}   <- {tag}")
 # class -> home TU (where its ctor lives, else where its vtable lives)
 home={}
 for va,raw in pubs:
@@ -250,14 +250,14 @@ for im,name in modname.items():
         f.write(f"// Reconstructed from CodeView NB09 of {os.path.basename(pe)} — NOT original source.\n")
         f.write(f"// compiland: {name}   from: {lib}\n")
         f.write(f"// functions: {len(funcs)}   data: {len(data)}\n")
-        f.write("// RVA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.\n\n")
+        f.write("// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.\n\n")
         for va in funcs:
             decl=cleandecl(name_at.get(va,f"sub_{va:08x}"))
             tags=vlabel.get(va)
             note=""
             if tags:
                 C,i,tag=tags[0]; note=f"   // virtual [{tag}]" + (f"  (+{len(tags)-1} more)" if len(tags)>1 else "")
-            f.write(f"RVA(0x{va:08x}, 0x{fsize(va):x})\n{decl};{note}\n\n")
+            f.write(f"VA(0x{va:08x}, 0x{fsize(va):x})\n{decl};{note}\n\n")
         if data:
             f.write("// ---- data / globals / vtables ----\n")
             for va in data:
@@ -269,7 +269,7 @@ for im,name in modname.items():
             f.write(f"\n// ===== vtable {C}" + (f" : public {B}" if B else " (root)") + f"  ({len(vtables[C])} slots) =====\n")
             for i,ptr,fn2,fc in vtables[C]:
                 tag=slot_label(C,B,i,fc,ptr,fn2)
-                f.write(f"//  [{i:2}] RVA(0x{ptr:08x}, 0x{fsize(ptr):x})  {cleandecl(fn2)}   <- {tag}\n")
+                f.write(f"//  [{i:2}] VA(0x{ptr:08x}, 0x{fsize(ptr):x})  {cleandecl(fn2)}   <- {tag}\n")
     nfiles+=1
 print(f"wrote {nfiles} source files under {outroot}/")
 print(f"vtables recovered: {len(vtables)}  (see {outroot}/VTABLES.txt)")

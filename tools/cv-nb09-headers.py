@@ -212,7 +212,7 @@ def inc_path(frm, cls):
 # ---------- emit ----------
 open(os.path.join(outdir,"_macros.h"),"w").write(
     "#pragma once\n// No-op annotation macros (Gruntz-style).\n"
-    "#define RVA(addr, size)\n#define DATA(addr)\n#define OVERRIDE\n")
+    "#define VA(addr, size)\n#define DATA(addr)\n#define OVERRIDE\n")
 emitted=[]
 for C in classes:
     tier=class_tier[C]; base=vbase.get(C)
