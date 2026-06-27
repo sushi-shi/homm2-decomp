@@ -3,218 +3,219 @@
 // functions: 71   data: 441
 // RVA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
+#include <rva.h>
 RVA(0x00496450, 0x14e)
-@PollSound@0;
+// @PollSound@0;
 
 RVA(0x0049659e, 0x20)
-void ForcePollSound(void);
+// void ForcePollSound(void);
 
 RVA(0x004965be, 0x39e)
-void InitMainClasses(void);
+// void InitMainClasses(void);
 
 RVA(0x0049695c, 0x344)
-void DeleteMainClasses(void);
+// void DeleteMainClasses(void);
 
 RVA(0x00496ca0, 0x39)
-void EarlyShutdown(char *, char *);
+// void EarlyShutdown(char *, char *);
 
 RVA(0x00496cd9, 0x148)
-void SetupCDRom(void);
+// void SetupCDRom(void);
 
 RVA(0x00496e21, 0x77)
-int EarlySetup(void);
+// int EarlySetup(void);
 
 RVA(0x00496e98, 0x16c0)
-int oldmain(void);
+// int oldmain(void);
 
 RVA(0x00498558, 0x44)
-char toupper(char);
+// char toupper(char);
 
 RVA(0x0049859c, 0x791)
-int InterpretCommandLine(void);
+// int InterpretCommandLine(void);
 
 RVA(0x00498d2d, 0x698)
-int InitMenuHandler(struct tag_message &);
+// int InitMenuHandler(struct tag_message &);
 
 RVA(0x004993c5, 0x1b)
-int NullHandler(struct tag_message &);
+// int NullHandler(struct tag_message &);
 
 RVA(0x004993e0, 0x1a9)
-int RecruitHeroHandler(struct tag_message &);
+// int RecruitHeroHandler(struct tag_message &);
 
 RVA(0x00499589, 0x1a7)
-char * GetBuildingInfo(int, int, int);
+// char * GetBuildingInfo(int, int, int);
 
 RVA(0x00499730, 0xa4)
-char * GetBuildingName(int, int);
+// char * GetBuildingName(int, int);
 
 RVA(0x004997d4, 0x138)
-void GetBuildingCost(int, int, int * const, int);
+// void GetBuildingCost(int, int, int * const, int);
 
 RVA(0x0049990c, 0x20)
-char * GetMonsterName(int);
+// char * GetMonsterName(int);
 
 RVA(0x0049992c, 0x140)
-void GetMonsterCost(int, int * const);
+// void GetMonsterCost(int, int * const);
 
 RVA(0x00499a6c, 0x2b5)
-int CanBuild(class town *, int);
+// int CanBuild(class town *, int);
 
 RVA(0x00499d21, 0x9a)
-int CanBuy(class town *, int);
+// int CanBuy(class town *, int);
 
 RVA(0x00499dbb, 0xc6)
-int GetBuildingBaseResourceValue(int, int, int);
+// int GetBuildingBaseResourceValue(int, int, int);
 
 RVA(0x00499e81, 0x21e)
-int WaitHandler(struct tag_message &);
+// int WaitHandler(struct tag_message &);
 
 RVA(0x0049a09f, 0x472)
-int EventWindowHandler(struct tag_message &);
+// int EventWindowHandler(struct tag_message &);
 
 RVA(0x0049a511, 0x1e)
-int TrueFalseDialogHandler(struct tag_message &);
+// int TrueFalseDialogHandler(struct tag_message &);
 
 RVA(0x0049a52f, 0x192)
-void PlayerDead(int);
+// void PlayerDead(int);
 
 RVA(0x0049a6c1, 0x19bb)
-void CheckEndGame(int, int);
+// void CheckEndGame(int, int);
 
 RVA(0x0049c07c, 0x95)
-void QuickViewWait(void);
+// void QuickViewWait(void);
 
 RVA(0x0049c111, 0x201)
-void InitVars(void);
+// void InitVars(void);
 
 RVA(0x0049c312, 0x61b)
-void game::ShowMoraleInfo(class hero *, int);
+// void game::ShowMoraleInfo(class hero *, int);
 
 RVA(0x0049c92d, 0x371)
-void game::ShowLuckInfo(class hero *, int);
+// void game::ShowLuckInfo(class hero *, int);
 
 RVA(0x0049cc9e, 0xd7)
-void ClearMapExtra(void);
+// void ClearMapExtra(void);
 
 RVA(0x0049cd75, 0x9f)
-int GetMonType(int, int);
+// int GetMonType(int, int);
 
 RVA(0x0049ce14, 0x4ac)
-int AddScoreToHighScore(int, int, int, int, char *);
+// int AddScoreToHighScore(int, int, int, int, char *);
 
 RVA(0x0049d2c0, 0x66)
-void BVResMsg(char *, int, int);
+// void BVResMsg(char *, int, int);
 
 RVA(0x0049d326, 0x2d)
-void GOut(char *);
+// void GOut(char *);
 
 RVA(0x0049d353, 0x54)
-int NetPosToGamePos(int);
+// int NetPosToGamePos(int);
 
 RVA(0x0049d3a7, 0xff)
-int WaitForOtherPlayer(void);
+// int WaitForOtherPlayer(void);
 
 RVA(0x0049d4a6, 0xb85)
-void PopNetBox(char *, int);
+// void PopNetBox(char *, int);
 
 RVA(0x0049e02b, 0xc7)
-void AddNetBoxLine(char *, char);
+// void AddNetBoxLine(char *, char);
 
 RVA(0x0049e0f2, 0x214)
-void ShutDown(char *);
+// void ShutDown(char *);
 
 RVA(0x0049e306, 0xa2)
-void FileError(char *);
+// void FileError(char *);
 
 RVA(0x0049e3a8, 0x255)
-void SmackFade(unsigned char *, unsigned char *);
+// void SmackFade(unsigned char *, unsigned char *);
 
 RVA(0x0049e5fd, 0x303)
-void ShowCongrats(int);
+// void ShowCongrats(int);
 
 RVA(0x0049e900, 0x99)
-void CongratsWait(void);
+// void CongratsWait(void);
 
 RVA(0x0049e999, 0x54)
-struct SAMPLE2 LoadPlaySample(char *);
+// struct SAMPLE2 LoadPlaySample(char *);
 
 RVA(0x0049e9ed, 0x8f)
-void WaitEndSample(struct SAMPLE2, int);
+// void WaitEndSample(struct SAMPLE2, int);
 
 RVA(0x0049ea7c, 0x5d)
-void MemError(void);
+// void MemError(void);
 
 RVA(0x0049ead9, 0x3b)
-char * GetTownName(int);
+// char * GetTownName(int);
 
 RVA(0x0049eb14, 0x3a)
-void LoadSystemwideIcons(void);
+// void LoadSystemwideIcons(void);
 
 RVA(0x0049eb4e, 0x32)
-void UnloadSystemwideIcons(void);
+// void UnloadSystemwideIcons(void);
 
 RVA(0x0049eb80, 0x10)
-void EarlyShutDownSystem(void);
+// void EarlyShutDownSystem(void);
 
 RVA(0x0049eb90, 0x75)
-int GameUnsaved(void);
+// int GameUnsaved(void);
 
 RVA(0x0049ec05, 0xa18)
-int HandleAppSpecificMenuCommands(int);
+// int HandleAppSpecificMenuCommands(int);
 
 RVA(0x0049f61d, 0x310)
-void UpdateSystemOptionsMenu(void);
+// void UpdateSystemOptionsMenu(void);
 
 RVA(0x0049f92d, 0x99)
-void CleanUpMenus(void);
+// void CleanUpMenus(void);
 
 RVA(0x0049f9c6, 0x2a)
-void UpdateAppSpecificMenus(void *);
+// void UpdateAppSpecificMenus(void *);
 
 RVA(0x0049f9f0, 0x2d)
-void EarlyResizeWindow(int, int, int, int);
+// void EarlyResizeWindow(int, int, int, int);
 
 RVA(0x0049fa1d, 0x53)
-int InMapArea(int, int);
+// int InMapArea(int, int);
 
 RVA(0x0049fa70, 0x6bc)
-void SetupDynamicWindow(int, int, int, int, int, int, int, int *, int *, int *, int *, int *, int *, class heroWindow * *, int);
+// void SetupDynamicWindow(int, int, int, int, int, int, int, int *, int *, int *, int *, int *, int *, class heroWindow * *, int);
 
 RVA(0x004a012c, 0x108)
-void TestDynamicWindow(int, int);
+// void TestDynamicWindow(int, int);
 
 RVA(0x004a0234, 0x91)
-void HandleRemoteDeadPlayerExit(int);
+// void HandleRemoteDeadPlayerExit(int);
 
 RVA(0x004a02c5, 0xaa)
-void HandleRemoteSuddenExit(void);
+// void HandleRemoteSuddenExit(void);
 
 RVA(0x004a036f, 0x62)
-void DropDownToOnePlayer(void);
+// void DropDownToOnePlayer(void);
 
 RVA(0x004a03d1, 0x412)
-void ReceiveHostReportsPlayerExit(int, struct SPlayerExit, int);
+// void ReceiveHostReportsPlayerExit(int, struct SPlayerExit, int);
 
 RVA(0x004a07e3, 0x361)
-void ReceiveRemotePlayerExit(struct SPlayerExit);
+// void ReceiveRemotePlayerExit(struct SPlayerExit);
 
 RVA(0x004a0b44, 0x29)
-int CheckMem(void);
+// int CheckMem(void);
 
 RVA(0x004a0b6d, 0x109)
-int GetManaCost(int, class hero *);
+// int GetManaCost(int, class hero *);
 
 RVA(0x004a0c76, 0x9f)
-void SetWinText(class heroWindow *, int);
+// void SetWinText(class heroWindow *, int);
 
 RVA(0x004a0d15, 0x8a)
-void CheckShingleUpdate(void);
+// void CheckShingleUpdate(void);
 
 RVA(0x004a0d9f, 0x17c6)
-void NormalDialog(char *, int, int, int, int, int, int, int, int, int);
+// void NormalDialog(char *, int, int, int, int, int, int, int, int, int);
 
 RVA(0x004a2565, 0x71)
-void UpdateNormalDialog(char *);
+// void UpdateNormalDialog(char *);
 
 // ---- data / globals / vtables ----
 DATA(0x004f8c58)  // unsigned char * giGroundToTerrain

@@ -4,6 +4,7 @@
 // RVA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 // ---- data / globals / vtables ----
+#include <rva.h>
 DATA(0x004f2558)  // char * * xSetupCampaignGameHelp
 DATA(0x004f2568)  // char * * xSetupStandardGameHelp
 DATA(0x004f2578)  // char * * xCampaignAwards

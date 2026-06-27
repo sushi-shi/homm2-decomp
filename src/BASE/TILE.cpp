@@ -3,6 +3,7 @@
 // functions: 1   data: 0
 // RVA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
+#include <rva.h>
 RVA(0x004d310c, 0x18f)
-_TileToBitmap;
+// _TileToBitmap;
 

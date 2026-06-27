@@ -3,29 +3,30 @@
 // functions: 8   data: 2
 // RVA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
+#include <rva.h>
 RVA(0x004dad60, 0x181)
-void sample::constructor(char *, long int, long int, long int);
+// void sample::constructor(char *, long int, long int, long int);
 
 RVA(0x004daef0, 0x41)
-void * sample::scalar_dtor(unsigned int);   // virtual [introduces virtual]
+// void * sample::scalar_dtor(unsigned int);   // virtual [introduces virtual]
 
 RVA(0x004daef0, 0x41)
-void * sample::scalar_dtor(unsigned int);   // virtual [introduces virtual]
+// void * sample::scalar_dtor(unsigned int);   // virtual [introduces virtual]
 
 RVA(0x004daf40, 0x2c)
-void sample::~destructor(void);
+// void sample::~destructor(void);
 
 RVA(0x004daf70, 0x72)
-void MIDIWrap::constructor(char *);
+// void MIDIWrap::constructor(char *);
 
 RVA(0x004daff0, 0x3d)
-void * MIDIWrap::scalar_dtor(unsigned int);   // virtual [introduces virtual]
+// void * MIDIWrap::scalar_dtor(unsigned int);   // virtual [introduces virtual]
 
 RVA(0x004daff0, 0x3d)
-void * MIDIWrap::scalar_dtor(unsigned int);   // virtual [introduces virtual]
+// void * MIDIWrap::scalar_dtor(unsigned int);   // virtual [introduces virtual]
 
 RVA(0x004db030, 0x28)
-void MIDIWrap::~destructor(void);
+// void MIDIWrap::~destructor(void);
 
 // ---- data / globals / vtables ----
 DATA(0x004ebab4)  // const sample::vftable

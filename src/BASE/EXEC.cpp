@@ -3,33 +3,34 @@
 // functions: 10   data: 0
 // RVA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
+#include <rva.h>
 RVA(0x004d1610, 0x10)
-void executive::constructor(void);
+// void executive::constructor(void);
 
 RVA(0x004d1620, 0x9e)
-int executive::InitSystem(void);
+// int executive::InitSystem(void);
 
 RVA(0x004d16c0, 0x86)
-void executive::ShutDownSystem(void);
+// void executive::ShutDownSystem(void);
 
 RVA(0x004d1750, 0xfb)
-int executive::DoDialog(class baseManager *);
+// int executive::DoDialog(class baseManager *);
 
 RVA(0x004d1850, 0x86)
-void executive::PrintManagerList(void);
+// void executive::PrintManagerList(void);
 
 RVA(0x004d18e0, 0xce)
-int executive::AddManager(class baseManager *, int);
+// int executive::AddManager(class baseManager *, int);
 
 RVA(0x004d19b0, 0x76)
-void executive::RemoveManager(class baseManager *);
+// void executive::RemoveManager(class baseManager *);
 
 RVA(0x004d1a30, 0x5a)
-void executive::CallManager(class baseManager *);
+// void executive::CallManager(class baseManager *);
 
 RVA(0x004d1a90, 0xfa)
-void executive::MainLoop(void);
+// void executive::MainLoop(void);
 
 RVA(0x004d1b90, 0xa)
-void executive::Terminate(void);
+// void executive::Terminate(void);
 

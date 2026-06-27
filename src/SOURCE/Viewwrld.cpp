@@ -3,20 +3,21 @@
 // functions: 5   data: 17
 // RVA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
+#include <rva.h>
 RVA(0x004333c0, 0x267)
-void advManager::ViewWorld(int, int, int);
+// void advManager::ViewWorld(int, int, int);
 
 RVA(0x00433627, 0x5a)
-void advManager::VWCleanup(void);
+// void advManager::VWCleanup(void);
 
 RVA(0x00433681, 0x253)
-void advManager::VWInit(int, int);
+// void advManager::VWInit(int, int);
 
 RVA(0x004338d4, 0x1346)
-void advManager::VWCompleteDraw(void);
+// void advManager::VWCompleteDraw(void);
 
 RVA(0x00434c1a, 0x5e2)
-int ViewWorldDialogHandler(struct tag_message &);
+// int ViewWorldDialogHandler(struct tag_message &);
 
 // ---- data / globals / vtables ----
 DATA(0x004f11b8)  // signed char (*)[6][2] iVWHalf

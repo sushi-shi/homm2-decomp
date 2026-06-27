@@ -3,20 +3,21 @@
 // functions: 5   data: 1
 // RVA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
+#include <rva.h>
 RVA(0x00489a30, 0x66)
-void highScoreManager::constructor(void);
+// void highScoreManager::constructor(void);
 
 RVA(0x00489a96, 0x14c)
-int highScoreManager::Open(int);   // virtual [override (implements baseManager pure virtual)]
+// int highScoreManager::Open(int);   // virtual [override (implements baseManager pure virtual)]
 
 RVA(0x00489be2, 0x5e)
-void highScoreManager::Close(void);   // virtual [override (implements baseManager pure virtual)]
+// void highScoreManager::Close(void);   // virtual [override (implements baseManager pure virtual)]
 
 RVA(0x00489c40, 0x22a)
-int highScoreManager::Main(struct tag_message &);   // virtual [override (implements baseManager pure virtual)]
+// int highScoreManager::Main(struct tag_message &);   // virtual [override (implements baseManager pure virtual)]
 
 RVA(0x00489e6a, 0x7d3)
-void highScoreManager::Update(void);
+// void highScoreManager::Update(void);
 
 // ---- data / globals / vtables ----
 DATA(0x004eb838)  // const highScoreManager::vftable

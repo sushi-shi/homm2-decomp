@@ -3,29 +3,30 @@
 // functions: 8   data: 12
 // RVA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
+#include <rva.h>
 RVA(0x00401000, 0x4e)
-void ConvertSmackerPalette(unsigned char *);
+// void ConvertSmackerPalette(unsigned char *);
 
 RVA(0x0040104e, 0x21f)
-void DoAdvance(struct SmackTag *, int, int, int, int);
+// void DoAdvance(struct SmackTag *, int, int, int, int);
 
 RVA(0x0040126d, 0x118c)
-void SmackManagerMain(void);
+// void SmackManagerMain(void);
 
 RVA(0x004023f9, 0x56)
-void ShutDownSmacker(void);
+// void ShutDownSmacker(void);
 
 RVA(0x0040244f, 0x17f)
-int PlaySmacker(int);
+// int PlaySmacker(int);
 
 RVA(0x004025ce, 0x65)
-int ExpansionCampaignRect(int, int);
+// int ExpansionCampaignRect(int, int);
 
 RVA(0x00402633, 0x89)
-signed char PointInRect(int, int, struct tag_rect *);
+// signed char PointInRect(int, int, struct tag_rect *);
 
 RVA(0x004026bc, 0x251)
-void PrintSummaryInfo(struct SmackSumTag *);
+// void PrintSummaryInfo(struct SmackSumTag *);
 
 // ---- data / globals / vtables ----
 DATA(0x004ec040)  // int bSmackSound

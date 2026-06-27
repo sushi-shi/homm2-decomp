@@ -3,20 +3,21 @@
 // functions: 5   data: 6
 // RVA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
+#include <rva.h>
 RVA(0x004132f0, 0x155)
-signed char InitNetHost(void);
+// signed char InitNetHost(void);
 
 RVA(0x00413445, 0x1ab)
-signed char InitNetGuest(void);
+// signed char InitNetGuest(void);
 
 RVA(0x004135f0, 0x5f)
-signed char WaitForHost(void);
+// signed char WaitForHost(void);
 
 RVA(0x0041364f, 0xe9)
-signed char WaitForGuest(void);
+// signed char WaitForGuest(void);
 
 RVA(0x00413738, 0x1ba)
-int nbnet_init(void);
+// int nbnet_init(void);
 
 // ---- data / globals / vtables ----
 DATA(0x004ee5c8)  // signed char iInitNetHostStatus
