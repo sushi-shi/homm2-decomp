@@ -10,3 +10,6 @@ __pycache__/
 # user-provided game binaries (never committed)
 *.EXE
 *.exe
+
+# stray PDB cl writes into the cwd on /Od builds
+/vc40.pdb
