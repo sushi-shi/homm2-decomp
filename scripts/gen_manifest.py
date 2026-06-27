@@ -182,19 +182,18 @@ with open(os.path.join(REPO,"config","units.toml"),"w") as f:
     f.write('[build]\ncompiler = "msvc4.2"\nplatform = "win32"\n\n')
     f.write("[flags]\n")
     # Retail is a DEBUG build: /Od (full ebp frames, every local spilled) + /Gr
-    # (__fastcall default; 458 free fns mangle @@YI vs 6 cdecl) + /MT (static LIBCMT).
-    # No C++ EH (no __CxxFrameHandler/throws), no RTTI, no /O2.
-    #   base : the uniform debug profile.
-    #   g5   : base + /G5 (Pentium scheduling). Even under /Od, /G5 selects the
-    #          unsigned-bitfield->int zero-extend idiom `movb;shrb;andw;andl` over
-    #          the /Gr-only `andb;xor;movb`. CONFIRMED on EDITOR/mapcell; whether
-    #          BASE/SOURCE were built /G5 (vs /GB blended) is still open, so for now
-    #          only EDITOR opts in - everything else stays on base (decide later).
-    f.write('base = ["/nologo", "/c", "/Od", "/MT", "/Gr"]\n')
-    f.write('g5 = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5"]\n\n')
+    # (__fastcall default; 458 free fns mangle @@YI vs 6 cdecl) + /MT (static LIBCMT)
+    # + /G5 (Pentium target). No C++ EH (no __CxxFrameHandler/throws), no RTTI, no /O2.
+    #
+    # /G5 is GLOBAL (all three NWC tiers), proven by the Pentium "avoid MOVZX" rule:
+    # /G5 zero-extends unsigned 16->32 with AND, not MOVZX (non-pairable/slow on P5) -
+    # `movw;shrw;andw $mask;andl $0xffff` where /GB-blend emits `...;movzwl`. The .text
+    # has 190 AND-zero-extends spanning the whole SOURCE+BASE range vs only 3 MOVZX in
+    # ~1500 NWC funcs (the linked CRT, Microsoft-built, still uses MOVZX - a built-in
+    # control). One uniform profile - every unit `base`.
+    f.write('base = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5"]\n\n')
     for st,src in units:
-        prof = "g5" if st.split("/")[0] == "EDITOR" else "base"
-        f.write(f'[[unit]]\nunit = "{st}"\nsource = "{src}"\nflags = "{prof}"\n\n')
+        f.write(f'[[unit]]\nunit = "{st}"\nsource = "{src}"\nflags = "base"\n\n')
 
 print(f"symbol_names.csv: {n_func} funcs + {n_data} data = {n_func+n_data} symbols")
 print(f"units.toml: {len(units)} NWC reconstruction units")
