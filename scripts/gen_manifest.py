@@ -181,16 +181,20 @@ with open(os.path.join(REPO,"config","units.toml"),"w") as f:
     f.write("# unit MUST match the unit column in config/symbol_names.csv.\n\n")
     f.write('[build]\ncompiler = "msvc4.2"\nplatform = "win32"\n\n')
     f.write("[flags]\n")
-    # The retail build is a DEBUG build: /Od (unoptimized - full ebp frames, locals
-    # round-tripped through the stack) + /Gr (__fastcall default; 458 free fns mangle
-    # @@YI vs 6 cdecl) + /MT (static LIBCMT) + /G5 (Pentium scheduling - even under /Od
-    # it selects the unsigned-bitfield->int zero-extend idiom `movb;shrb;andw;andl` over
-    # the /Gr-only `andb;xor;movb`; found via EDITOR/mapcell, verified to keep the
-    # already-exact functions byte-identical). Verified vs retail disassembly.
-    # One uniform profile - no C++ EH (no __CxxFrameHandler/throws), no /O2 - every unit `base`.
-    f.write('base = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5"]\n\n')
+    # Retail is a DEBUG build: /Od (full ebp frames, every local spilled) + /Gr
+    # (__fastcall default; 458 free fns mangle @@YI vs 6 cdecl) + /MT (static LIBCMT).
+    # No C++ EH (no __CxxFrameHandler/throws), no RTTI, no /O2.
+    #   base : the uniform debug profile.
+    #   g5   : base + /G5 (Pentium scheduling). Even under /Od, /G5 selects the
+    #          unsigned-bitfield->int zero-extend idiom `movb;shrb;andw;andl` over
+    #          the /Gr-only `andb;xor;movb`. CONFIRMED on EDITOR/mapcell; whether
+    #          BASE/SOURCE were built /G5 (vs /GB blended) is still open, so for now
+    #          only EDITOR opts in - everything else stays on base (decide later).
+    f.write('base = ["/nologo", "/c", "/Od", "/MT", "/Gr"]\n')
+    f.write('g5 = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5"]\n\n')
     for st,src in units:
-        f.write(f'[[unit]]\nunit = "{st}"\nsource = "{src}"\nflags = "base"\n\n')
+        prof = "g5" if st.split("/")[0] == "EDITOR" else "base"
+        f.write(f'[[unit]]\nunit = "{st}"\nsource = "{src}"\nflags = "{prof}"\n\n')
 
 print(f"symbol_names.csv: {n_func} funcs + {n_data} data = {n_func+n_data} symbols")
 print(f"units.toml: {len(units)} NWC reconstruction units")
