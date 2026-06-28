@@ -141,6 +141,11 @@ extern char gText[];
 extern void LogStr(char *);
 extern void *BaseAlloc(unsigned int size, char *file, int line);
 extern void BaseFree(void *ptr, char *file, int line);
+extern void FileError(char *);
+extern int Random(int, int);
+extern "C" int _open(const char *, int, int);
+extern "C" int _write(int, const void *, unsigned int);
+extern "C" int _close(int);
 // NWC wraps malloc/free in BaseAlloc/BaseFree(ptr, __FILE__, __LINE__). __FILE__ is
 // the original build path (reloc-masked); __LINE__ immediates are hardcoded from the
 // retail disasm since our line layout differs.
@@ -1753,10 +1758,86 @@ void uncompress(Char *name)
 }
 
 VA(0x004d7f60, 0x2d5)
-// long int EncodeData(char *, char *, unsigned long int);
+long EncodeData(char *dst, char *src, unsigned long srcLen)
+{
+    char  fname[450] = "";
+    int   fd;
+    FILE *fp;
+    long  flen;
+
+    outputHandleJustInCase = NULL;
+    bsInUse = 0;
+    errno = 0;
+    blockSize100k = 3;
+    LogStr("Encode 1");
+    allocateCompressStructures();
+
+    strcpy(fname, ".\\DATA\\");
+    strcat(fname, "H2C");
+    fname[strlen(fname)] = (char)Random(0x41, 0x5a);
+    fname[strlen(fname)] = (char)Random(0x41, 0x5a);
+    fname[strlen(fname)] = (char)Random(0x41, 0x5a);
+    fname[strlen(fname)] = (char)Random(0x41, 0x5a);
+
+    fd = _open(fname, 0x8301, 0x80);
+    if (fd == -1) FileError(fname);
+    _write(fd, src, srcLen);
+    _close(fd);
+    compress(fname);
+
+    strcat(fname, ".nw");
+    fp = fopen(fname, "rb");
+    fseek(fp, 0, 2);
+    flen = ftell(fp);
+    fseek(fp, 0, 0);
+    fread(dst, flen, 1, fp);
+    fclose(fp);
+    remove(fname);
+    FreeCompressStructures();
+
+    return flen;
+}
 
 VA(0x004d8240, 0x2f3)
-// long int DecodeData(char *, char *, unsigned long int);
+long DecodeData(char *dst, char *src, unsigned long srcLen)
+{
+    char  fname[450] = "";
+    int   fd;
+    FILE *fp;
+    long  flen;
+
+    outputHandleJustInCase = NULL;
+    bsInUse = 0;
+    errno = 0;
+    blockSize100k = 0;
+    allocateCompressStructures();
+
+    strcpy(fname, ".\\DATA\\");
+    strcat(fname, "H2C");
+    fname[strlen(fname)] = (char)Random(0x41, 0x5a);
+    fname[strlen(fname)] = (char)Random(0x41, 0x5a);
+    fname[strlen(fname)] = (char)Random(0x41, 0x5a);
+    fname[strlen(fname)] = (char)Random(0x41, 0x5a);
+    strcat(fname, ".nw");
+
+    fd = _open(fname, 0x8301, 0x80);
+    if (fd == -1) FileError(fname);
+    _write(fd, src, srcLen);
+    _close(fd);
+    uncompress(fname);
+
+    fname[strlen(fname) - 3] = '\0';
+    fp = fopen(fname, "rb");
+    fseek(fp, 0, 2);
+    flen = ftell(fp);
+    fseek(fp, 0, 0);
+    fread(dst, flen, 1, fp);
+    fclose(fp);
+    remove(fname);
+    FreeCompressStructures();
+
+    return flen;
+}
 
 // ---- data / globals / vtables ----
 DATA(0x0051ff50)  // unsigned int * crc32Table
