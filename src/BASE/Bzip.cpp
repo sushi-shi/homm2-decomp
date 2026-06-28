@@ -5,6 +5,7 @@
 
 #include <va.h>
 #include <stdio.h>
+#include <errno.h>
 
 // bzip-0.21 (Julian Seward, 1996) — the original arithmetic-coding bzip the
 // retail Bzip.obj is built from. Types/macros mirror the reference so bodies
@@ -97,6 +98,16 @@ Int32   blockSize100k;
 Int32   veryVerbose;
 Char   *progName;
 Int32   compressing;
+Int32   bytesIn;
+extern UInt32 crc32Table[256];
+
+#define MY_EOF 257
+#define UPDATE_CRC(crcVar,cha)              \
+{                                           \
+   crcVar = (crcVar << 8) ^                 \
+            crc32Table[(crcVar >> 24) ^     \
+                       ((UChar)cha)];       \
+}
 
 #define IF_THEN_ELSE(c,t,e) ((c) ? (t) : (e))
 #define GETFIRST(a)    ((UChar)(words[a] >> 24))
@@ -106,6 +117,9 @@ Int32   compressing;
 #define GETREST16(a)   (words[a] & 0x0000ffff)
 
 void blockOverrun(void);
+void unblockError(void);
+void compressOutOfMemory(Int32 draw, Int32 blockSize);
+void uncompressOutOfMemory(Int32 draw, Int32 blockSize);
 
 void panic(char *s);
 void ioError(void);
@@ -1208,13 +1222,130 @@ void spotBlock(Bool weAreCompressing)
 }
 
 VA(0x004d6f40, 0x15c)
-// int getRLEpair(struct _iobuf *);
+Int32 getRLEpair(FILE *src)
+{
+    Int32     runLength;
+    IntNative ch, chLatest;
+
+    ch = getc(src);
+
+    if (ch == EOF) {
+        ERROR_IF_NOT_ZERO(errno);
+        return (1 << 16) | MY_EOF;
+    }
+
+    runLength = 0;
+    do {
+        chLatest = getc(src);
+        runLength++;
+        bytesIn++;
+    }
+        while (ch == chLatest && runLength < 255);
+
+    if (chLatest != EOF) {
+        if (ungetc(chLatest, src) == EOF)
+            panic((char *)"getRLEpair: ungetc failed");
+    } else {
+        ERROR_IF_NOT_ZERO(errno);
+    }
+
+    if (runLength == 1) {
+        UPDATE_CRC(globalCrc, (UChar)ch);
+        return (1 << 16) | ch;
+    } else {
+        Int32 i;
+        for (i = 1; i <= runLength; i++)
+            UPDATE_CRC(globalCrc, (UChar)ch);
+        return (runLength << 16) | ch;
+    }
+}
 
 VA(0x004d70a0, 0x1eb)
-// int loadAndRLEsource(struct _iobuf *);
+Bool loadAndRLEsource(FILE *src)
+{
+    Int32 ch, allowableBlockSize;
+
+    last = -1;
+    ch   = 0;
+
+    allowableBlockSize = 100000 * blockSize100k - 20;
+
+    while (last < allowableBlockSize && ch != MY_EOF) {
+        Int32 rlePair, runLen;
+        rlePair = getRLEpair(src);
+        ch      = rlePair & 0xFFFF;
+        runLen  = (UInt32)rlePair >> 16;
+
+        if (ch == MY_EOF)
+            { last++; SETFIRST(last, ((UChar)42)); }
+            else
+            switch (runLen) {
+                case 1:
+                    last++; SETFIRST(last, ((UChar)ch)); break;
+                case 2:
+                    last++; SETFIRST(last, ((UChar)ch));
+                    last++; SETFIRST(last, ((UChar)ch)); break;
+                case 3:
+                    last++; SETFIRST(last, ((UChar)ch));
+                    last++; SETFIRST(last, ((UChar)ch));
+                    last++; SETFIRST(last, ((UChar)ch)); break;
+                default:
+                    last++; SETFIRST(last, ((UChar)ch));
+                    last++; SETFIRST(last, ((UChar)ch));
+                    last++; SETFIRST(last, ((UChar)ch));
+                    last++; SETFIRST(last, ((UChar)ch));
+                    last++; SETFIRST(last, ((UChar)(runLen-4))); break;
+            }
+    }
+    return (ch == MY_EOF);
+}
 
 VA(0x004d7290, 0x18d)
-// void unRLEandDump(struct _iobuf *, int);
+void unRLEandDump(FILE *dst, Bool thisIsTheLastBlock)
+{
+    IntNative retVal;
+    Int32     lastCharToSpew, i, count, chPrev, ch;
+    UInt32    localCrc;
+
+    if (thisIsTheLastBlock)
+        lastCharToSpew = last - 1; else
+        lastCharToSpew = last;
+
+    count    = 0;
+    i        = 0;
+    ch       = 256;
+    localCrc = getGlobalCRC();
+
+    while (i <= lastCharToSpew) {
+        chPrev = ch;
+        ch = block[i];
+        i++;
+
+        retVal = putc(ch, dst);
+        ERROR_IF_EOF(retVal);
+        UPDATE_CRC(localCrc, (UChar)ch);
+
+        if (ch != chPrev) {
+            count = 1;
+        } else {
+            count++;
+            if (count >= 4) {
+                Int32 j;
+                for (j = 0;  j < (Int32)block[i];  j++) {
+                    retVal = putc(ch, dst);
+                    ERROR_IF_EOF(retVal);
+                    UPDATE_CRC(localCrc, (UChar)ch);
+                }
+                i++;
+                count = 0;
+            }
+        }
+    }
+
+    setGlobalCRC(localCrc);
+
+    if (thisIsTheLastBlock && block[last] != 42) unblockError();
+}
 
 VA(0x004d7420, 0x2e6)
 // void compressStream(struct _iobuf *, struct _iobuf *);

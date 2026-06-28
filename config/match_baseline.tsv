@@ -86,7 +86,7 @@ BASE/Bzip	?getFinalCRC@@YIIXZ	100.0000
 BASE/Bzip	?getGlobalCRC@@YIIXZ	100.0000
 BASE/Bzip	?getInt32@@YIHPAUBitStream@@@Z	100.0000
 BASE/Bzip	?getMTFVal@@YIHPAUBitStream@@@Z	99.3478
-BASE/Bzip	?getRLEpair@@YIHPAU_iobuf@@@Z	0.0000
+BASE/Bzip	?getRLEpair@@YIHPAU_iobuf@@@Z	99.2283
 BASE/Bzip	?getSymbol@@YIHPAUModel@@PAUBitStream@@@Z	100.0000
 BASE/Bzip	?getUChar@@YIEPAUBitStream@@@Z	100.0000
 BASE/Bzip	?getUInt32@@YIIPAUBitStream@@@Z	100.0000
@@ -95,7 +95,7 @@ BASE/Bzip	?initModel@@YIXPAUModel@@PADHHH@Z	100.0000
 BASE/Bzip	?initModels@@YIXXZ	100.0000
 BASE/Bzip	?initialiseCRC@@YIXXZ	100.0000
 BASE/Bzip	?ioError@@YIXXZ	100.0000
-BASE/Bzip	?loadAndRLEsource@@YIHPAU_iobuf@@@Z	0.0000
+BASE/Bzip	?loadAndRLEsource@@YIHPAU_iobuf@@@Z	98.1964
 BASE/Bzip	?minUInt32@@YIIII@Z	100.0000
 BASE/Bzip	?moveToFrontCodeAndSend@@YIXPAUBitStream@@H@Z	99.6452
 BASE/Bzip	?mySIGSEGVorSIGBUScatcher@@YIXPAH@Z	100.0000
@@ -112,11 +112,11 @@ BASE/Bzip	?setDecompressStructureSizes@@YIXH@Z	0.0000
 BASE/Bzip	?setGlobalCRC@@YIXI@Z	100.0000
 BASE/Bzip	?shellTrivial@@YIXXZ	99.5556
 BASE/Bzip	?showFileNames@@YIXXZ	100.0000
-BASE/Bzip	?sortIt@@YIXXZ	97.7877
+BASE/Bzip	?sortIt@@YIXXZ	97.8832
 BASE/Bzip	?spotBlock@@YIXH@Z	99.4773
 BASE/Bzip	?stripe@@YIXXZ	100.0000
 BASE/Bzip	?trivialGt@@YIHHH@Z	96.8966
-BASE/Bzip	?unRLEandDump@@YIXPAU_iobuf@@H@Z	0.0000
+BASE/Bzip	?unRLEandDump@@YIXPAU_iobuf@@H@Z	99.7273
 BASE/Bzip	?unblockError@@YIXXZ	100.0000
 BASE/Bzip	?uncompress@@YIXPAD@Z	0.0000
 BASE/Bzip	?uncompressOutOfMemory@@YIXHH@Z	100.0000
