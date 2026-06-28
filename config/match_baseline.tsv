@@ -35,13 +35,13 @@ BASE/BUTTON	?Main@button@@UAEHAAUtag_message@@@Z	0.0000
 BASE/BUTTON	?Read@button@@QAEXXZ	0.0000
 BASE/BUTTON	?Select@button@@QAEFAAUtag_message@@@Z	0.0000
 BASE/Blur	?DoBlur@@YIXPAVbitmap@@0HHHH@Z	0.0000
-BASE/Bzip	?DecodeData@@YIJPAD0K@Z	0.0000
-BASE/Bzip	?EncodeData@@YIJPAD0K@Z	0.0000
+BASE/Bzip	?DecodeData@@YIJPAD0K@Z	91.9293
+BASE/Bzip	?EncodeData@@YIJPAD0K@Z	91.6215
 BASE/Bzip	?FreeCompressStructures@@YIXXZ	100.0000
 BASE/Bzip	?FreeDecompressStructures@@YIXXZ	100.0000
 BASE/Bzip	?GETALL@@YIIH@Z	100.0000
 BASE/Bzip	?NORMALISE@@YIHH@Z	100.0000
-BASE/Bzip	?NORMALISEHI@@YIHH@Z	91.0000
+BASE/Bzip	?NORMALISEHI@@YIHH@Z	100.0000
 BASE/Bzip	?NORMALISELO@@YIHH@Z	100.0000
 BASE/Bzip	?SETFIRST16@@YIXHI@Z	100.0000
 BASE/Bzip	?SETFIRST@@YIXHE@Z	100.0000
@@ -97,7 +97,7 @@ BASE/Bzip	?initialiseCRC@@YIXXZ	100.0000
 BASE/Bzip	?ioError@@YIXXZ	100.0000
 BASE/Bzip	?loadAndRLEsource@@YIHPAU_iobuf@@@Z	98.1964
 BASE/Bzip	?minUInt32@@YIIII@Z	100.0000
-BASE/Bzip	?moveToFrontCodeAndSend@@YIXPAUBitStream@@H@Z	97.7097
+BASE/Bzip	?moveToFrontCodeAndSend@@YIXPAUBitStream@@H@Z	99.6344
 BASE/Bzip	?mySIGSEGVorSIGBUScatcher@@YIXPAH@Z	100.0000
 BASE/Bzip	?mySignalCatcher@@YAXPAH@Z	100.0000
 BASE/Bzip	?panic@@YIXPAD@Z	100.0000
@@ -112,7 +112,7 @@ BASE/Bzip	?setDecompressStructureSizes@@YIXH@Z	100.0000
 BASE/Bzip	?setGlobalCRC@@YIXI@Z	100.0000
 BASE/Bzip	?shellTrivial@@YIXXZ	99.5556
 BASE/Bzip	?showFileNames@@YIXXZ	100.0000
-BASE/Bzip	?sortIt@@YIXXZ	97.3652
+BASE/Bzip	?sortIt@@YIXXZ	99.1189
 BASE/Bzip	?spotBlock@@YIXH@Z	98.1136
 BASE/Bzip	?stripe@@YIXXZ	95.7143
 BASE/Bzip	?trivialGt@@YIHHH@Z	100.0000
