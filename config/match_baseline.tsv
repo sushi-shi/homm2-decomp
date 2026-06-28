@@ -41,7 +41,7 @@ BASE/Bzip	?FreeCompressStructures@@YIXXZ	0.0000
 BASE/Bzip	?FreeDecompressStructures@@YIXXZ	0.0000
 BASE/Bzip	?GETALL@@YIIH@Z	100.0000
 BASE/Bzip	?NORMALISE@@YIHH@Z	88.0000
-BASE/Bzip	?NORMALISEHI@@YIHH@Z	91.0000
+BASE/Bzip	?NORMALISEHI@@YIHH@Z	100.0000
 BASE/Bzip	?NORMALISELO@@YIHH@Z	93.6842
 BASE/Bzip	?SETFIRST16@@YIXHI@Z	100.0000
 BASE/Bzip	?SETFIRST@@YIXHE@Z	100.0000
@@ -105,7 +105,7 @@ BASE/Bzip	?putInt32@@YIXPAUBitStream@@H@Z	100.0000
 BASE/Bzip	?putSymbol@@YIXPAUModel@@HPAUBitStream@@@Z	100.0000
 BASE/Bzip	?putUChar@@YIXPAUBitStream@@E@Z	100.0000
 BASE/Bzip	?putUInt32@@YIXPAUBitStream@@I@Z	100.0000
-BASE/Bzip	?qsortFull@@YIXHH@Z	99.0870
+BASE/Bzip	?qsortFull@@YIXHH@Z	99.5181
 BASE/Bzip	?sendMTFVal@@YIXPAUBitStream@@H@Z	100.0000
 BASE/Bzip	?sendZeroes@@YIXPAUBitStream@@H@Z	100.0000
 BASE/Bzip	?setDecompressStructureSizes@@YIXH@Z	0.0000
@@ -113,7 +113,7 @@ BASE/Bzip	?setGlobalCRC@@YIXI@Z	100.0000
 BASE/Bzip	?shellTrivial@@YIXXZ	99.5556
 BASE/Bzip	?showFileNames@@YIXXZ	100.0000
 BASE/Bzip	?sortIt@@YIXXZ	0.0000
-BASE/Bzip	?spotBlock@@YIXH@Z	0.0000
+BASE/Bzip	?spotBlock@@YIXH@Z	99.4773
 BASE/Bzip	?stripe@@YIXXZ	100.0000
 BASE/Bzip	?trivialGt@@YIHHH@Z	96.8966
 BASE/Bzip	?unRLEandDump@@YIXPAU_iobuf@@H@Z	0.0000
@@ -121,7 +121,7 @@ BASE/Bzip	?unblockError@@YIXXZ	0.0000
 BASE/Bzip	?uncompress@@YIXPAD@Z	0.0000
 BASE/Bzip	?uncompressOutOfMemory@@YIXHH@Z	0.0000
 BASE/Bzip	?uncompressStream@@YIHPAU_iobuf@@0@Z	0.0000
-BASE/Bzip	?undoReversibleTransformation@@YIXXZ	0.0000
+BASE/Bzip	?undoReversibleTransformation@@YIXXZ	99.5823
 BASE/Bzip	?updateModel@@YIXPAUModel@@H@Z	100.0000
 BASE/DIMMER	??0dimmerWidget@@QAE@FFFFFF@Z	0.0000
 BASE/DIMMER	??0dimmerWidget@@QAE@XZ	0.0000
