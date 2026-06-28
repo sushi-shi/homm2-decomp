@@ -118,7 +118,7 @@ BASE/Bzip	?stripe@@YIXXZ	95.7143
 BASE/Bzip	?trivialGt@@YIHHH@Z	100.0000
 BASE/Bzip	?unRLEandDump@@YIXPAU_iobuf@@H@Z	99.7273
 BASE/Bzip	?unblockError@@YIXXZ	100.0000
-BASE/Bzip	?uncompress@@YIXPAD@Z	0.0000
+BASE/Bzip	?uncompress@@YIXPAD@Z	99.9405
 BASE/Bzip	?uncompressOutOfMemory@@YIXHH@Z	100.0000
 BASE/Bzip	?uncompressStream@@YIHPAU_iobuf@@0@Z	88.1355
 BASE/Bzip	?undoReversibleTransformation@@YIXXZ	99.5823
