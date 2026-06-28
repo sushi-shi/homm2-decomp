@@ -95,6 +95,8 @@ Int32   lastPP;
 Int32   origPtr;
 Int32   blockSize100k;
 Int32   veryVerbose;
+Char   *progName;
+Int32   compressing;
 
 #define IF_THEN_ELSE(c,t,e) ((c) ? (t) : (e))
 #define GETFIRST(a)    ((UChar)(words[a] >> 24))
@@ -1236,34 +1238,139 @@ void panic(char *s)
 }
 
 VA(0x004d79c0, 0x4d)
-// void crcError(unsigned int, unsigned int);
+void crcError(UInt32 crcStored, UInt32 crcComputed)
+{
+    sprintf(gText,
+            "\n%s: Data integrity error when decompressing.\n"
+            "\tStored CRC = 0x%x, computed CRC = 0x%x\n"
+            "\tThis could be a bug -- please report it to me at:\n"
+            "\tsewardj@cs.man.ac.uk.\n",
+            progName, crcStored, crcComputed);
+    LogStr(gText);
+    showFileNames();
+    cleanUpAndFail();
+}
 
 VA(0x004d7a10, 0x4a)
-// void compressedStreamEOF(void);
+void compressedStreamEOF(void)
+{
+    sprintf(gText,
+            "\n%s: Compressed file ends unexpectedly;\n\t"
+            "perhaps it is corrupted?  *Possible* reason follows.\n",
+            progName);
+    LogStr(gText);
+    perror(progName);
+    showFileNames();
+    cleanUpAndFail();
+}
 
 VA(0x004d7a60, 0x4a)
-// void ioError(void);
+void ioError(void)
+{
+    sprintf(gText,
+            "\n%s: I/O or other error, bailing out.  Possible reason follows.\n",
+            progName);
+    LogStr(gText);
+    perror(progName);
+    showFileNames();
+    cleanUpAndFail();
+}
 
 VA(0x004d7ab0, 0x3c)
-// void blockOverrun(void);
+void blockOverrun(void)
+{
+    sprintf(gText,
+            "\n%s: block overrun during decompression,\n"
+            "\twhich probably means the compressed file\n"
+            "\tis corrupted.\n",
+            progName);
+    LogStr(gText);
+    showFileNames();
+    cleanUpAndFail();
+}
 
 VA(0x004d7af0, 0x3c)
-// void unblockError(void);
+void unblockError(void)
+{
+    sprintf(gText,
+            "\n%s: compressed file didn't unblock correctly,\n"
+            "\twhich probably means it is corrupted.\n",
+            progName);
+    LogStr(gText);
+    showFileNames();
+    cleanUpAndFail();
+}
 
 VA(0x004d7b30, 0x3c)
-// void bitStreamEOF(void);
+void bitStreamEOF(void)
+{
+    sprintf(gText,
+            "\n%s: read past the end of compressed data,\n"
+            "\twhich probably means it is corrupted.\n",
+            progName);
+    LogStr(gText);
+    showFileNames();
+    cleanUpAndFail();
+}
 
 VA(0x004d7b70, 0x37)
-// void mySignalCatcher(int *);
+void __cdecl mySignalCatcher(IntNative *n)
+{
+    sprintf(gText,
+            "\n%s: Control-C (or similar) caught, quitting.\n",
+            progName);
+    LogStr(gText);
+    cleanUpAndFail();
+}
 
 VA(0x004d7bb0, 0x76)
-// void mySIGSEGVorSIGBUScatcher(int *);
+void mySIGSEGVorSIGBUScatcher(IntNative *n)
+{
+    if (compressing) {
+        sprintf(gText,
+                "\n%s: Caught a SIGSEGV or SIGBUS whilst compressing,\n"
+                "\twhich probably indicates a bug in BZIP.  Please\n"
+                "\treport it to me at: sewardj@cs.man.ac.uk\n",
+                progName);
+        LogStr(gText);
+    } else {
+        sprintf(gText,
+                "\n%s: Caught a SIGSEGV or SIGBUS whilst decompressing,\n"
+                "\twhich probably indicates that the compressed data\n"
+                "\tis corrupted.\n",
+                progName);
+        LogStr(gText);
+    }
+
+    showFileNames();
+    cleanUpAndFail();
+}
 
 VA(0x004d7c30, 0x4d)
-// void uncompressOutOfMemory(int, int);
+void uncompressOutOfMemory(Int32 draw, Int32 blockSize)
+{
+    sprintf(gText,
+            "\n%s: Can't allocate enough memory for decompression.\n"
+            "\tRequested %d bytes for a block size of %d.\n"
+            "\tFind a machine with more memory, perhaps?\n",
+            progName, draw, blockSize);
+    LogStr(gText);
+    showFileNames();
+    cleanUpAndFail();
+}
 
 VA(0x004d7c80, 0x4d)
-// void compressOutOfMemory(int, int);
+void compressOutOfMemory(Int32 draw, Int32 blockSize)
+{
+    sprintf(gText,
+            "\n%s: Can't allocate enough memory for compression.\n"
+            "\tRequested %d bytes for a block size of %d.\n"
+            "\tReduce the block size, and/or use the -e flag.\n",
+            progName, draw, blockSize);
+    LogStr(gText);
+    showFileNames();
+    cleanUpAndFail();
+}
 
 VA(0x004d7cd0, 0x83)
 // int endsInBz(char *);
