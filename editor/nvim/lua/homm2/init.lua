@@ -914,6 +914,7 @@ local function finish_build(root, before, unit, code, elapsed)
   diff_cache = {}
   build_popup(root, before, unit, elapsed)
   refresh_all_hints()  -- the inline %s (and status) now reflect the new build
+  refresh_all_source()
   refresh_views(root)  -- and any open asm/diff/status views re-render in place
 end
 
@@ -1058,6 +1059,7 @@ local function finish_fast_build(root, unit, buf, before, elapsed)
     live_pct[root][unit] = now
     if vim.api.nvim_buf_is_valid(buf) then M.hints(buf) end
     refresh_views(root)  -- open vt/vb/vd for this unit re-render against the new base
+    refresh_all_source()
     fast_build_popup(root, unit, before, now, elapsed)
   end)
 end
