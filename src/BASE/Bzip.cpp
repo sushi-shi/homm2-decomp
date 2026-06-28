@@ -9,6 +9,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+// Bzip has the string ops inlined (retail endsInBz/compress use repne scasb +
+// rep movs, not calls), so intrinsics are on for this TU.
+#pragma intrinsic(strcpy, strcat, strlen, memcpy)
+
 // bzip-0.21 (Julian Seward, 1996) — the original arithmetic-coding bzip the
 // retail Bzip.obj is built from. Types/macros mirror the reference so bodies
 // transcribe near-verbatim (same names -> matching /Od stack slots).
@@ -102,7 +106,10 @@ Char   *progName;
 Int32   compressing;
 Int32   bytesIn;
 Int32   verbose;
+FILE   *outputHandleJustInCase;
 extern UInt32 crc32Table[256];
+extern char inName[];
+extern char outName[];
 
 #define MY_EOF 257
 #define UPDATE_CRC(crcVar,cha)              \
@@ -1699,7 +1706,26 @@ Bool endsInBz(Char *name)
 }
 
 VA(0x004d7d60, 0xe2)
-// void compress(char *);
+void compress(Char *name)
+{
+    FILE *inStr;
+    FILE *outStr;
+    IntNative retVal;
+
+    strcpy(inName, name);
+    strcpy(outName, name);
+    strcat(outName, ".bz");
+
+    inStr = fopen(inName, "rb");
+    outStr = fopen(outName, "wb");
+
+    errno = 0;
+    outputHandleJustInCase = outStr;
+    compressStream(inStr, outStr);
+    outputHandleJustInCase = NULL;
+
+    retVal = remove(inName);
+}
 
 VA(0x004d7e50, 0x110)
 // void uncompress(char *);
