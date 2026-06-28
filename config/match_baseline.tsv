@@ -76,7 +76,7 @@ BASE/Bzip	?compressStream@@YIXPAU_iobuf@@0@Z	0.0000
 BASE/Bzip	?compressedStreamEOF@@YIXXZ	0.0000
 BASE/Bzip	?copyOffsetWords@@YIXXZ	100.0000
 BASE/Bzip	?crcError@@YIXII@Z	0.0000
-BASE/Bzip	?doReversibleTransformation@@YIXXZ	0.0000
+BASE/Bzip	?doReversibleTransformation@@YIXXZ	100.0000
 BASE/Bzip	?dumpAllModelStats@@YIXXZ	100.0000
 BASE/Bzip	?dumpModelStats@@YIXPAUModel@@@Z	100.0000
 BASE/Bzip	?endsInBz@@YIHPAD@Z	0.0000
@@ -112,7 +112,7 @@ BASE/Bzip	?setDecompressStructureSizes@@YIXH@Z	0.0000
 BASE/Bzip	?setGlobalCRC@@YIXI@Z	100.0000
 BASE/Bzip	?shellTrivial@@YIXXZ	99.5556
 BASE/Bzip	?showFileNames@@YIXXZ	100.0000
-BASE/Bzip	?sortIt@@YIXXZ	0.0000
+BASE/Bzip	?sortIt@@YIXXZ	97.5053
 BASE/Bzip	?spotBlock@@YIXH@Z	99.4773
 BASE/Bzip	?stripe@@YIXXZ	100.0000
 BASE/Bzip	?trivialGt@@YIHHH@Z	96.8966

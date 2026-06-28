@@ -1025,10 +1025,113 @@ void shellTrivial(void)
 }
 
 VA(0x004d6720, 0x434)
-// void sortIt(void);
+void sortIt(void)
+{
+    lastPP = last + 1;
+
+    if (lastPP <= 1024) {
+
+        Int32 i;
+
+        if (veryVerbose) { sprintf(gText, "trivialSort ...\n"); LogStr(gText); }
+        for (i = 0; i <= last; i++) zptr[i] = i;
+        shellTrivial();
+        if (veryVerbose) { sprintf(gText, "trivialSort done.\n"); LogStr(gText); }
+
+    } else {
+        Int32 i;
+        Int32 grade;
+        Int32 notDone;
+
+        stripe();
+
+        if (veryVerbose) { sprintf(gText, "bucket sorting ...\n"); LogStr(gText); }
+
+        for (i = 0; i <= 65536; i++)
+            ftab[i] = 0;
+        for (i = 0; i <= last; i++)
+            ftab[GETFIRST16(i)]++;
+        for (i = 1; i <= 65536; i++)
+            ftab[i] += ftab[i-1];
+
+        for (i = 0; i <= last; i++) {
+            UInt32 j = GETFIRST16(i);
+            ftab[j]--;
+            zptr[ftab[j]] = i;
+        }
+
+        copyOffsetWords();
+
+        notDone = lastPP;
+        for (grade = 1; grade <= 5; grade++) {
+            Int32 candNo;
+            Int32 loBound = 0;
+            Int32 hiBound = 0;
+
+            switch (grade) {
+                case 1:  loBound = 2;     hiBound = 15;     break;
+                case 2:  loBound = 16;    hiBound = 255;    break;
+                case 3:  loBound = 256;   hiBound = 4095;   break;
+                case 4:  loBound = 4096;  hiBound = 65535;  break;
+                case 5:  loBound = 65536; hiBound = 900000; break;
+                default: panic((char *)"gradedSort");       break;
+            }
+            if (loBound > lastPP) continue;
+
+            candNo = 0;
+            for (i = 0; i <= 65535; i++) {
+
+                Int32 freqHere = ftab[i+1] - ftab[i];
+
+                if (freqHere >= loBound && freqHere <= hiBound) {
+                    Int32 j, k;
+                    Int32 lower = ftab[i];
+                    Int32 upper = ftab[i+1] - 1;
+
+                    candNo++;
+                    notDone -= freqHere;
+
+                    if (veryVerbose) {
+                        sprintf(gText,
+                                "   %d -> %d:  cand %5d,   freq = %6d,   notdone = %6d",
+                                loBound, hiBound, candNo, freqHere, notDone);
+                        LogStr(gText);
+                    }
+
+                    qsortFull(lower, upper);
+
+                    if (freqHere < 65535) {
+                        for (j = lower, k = 0; j <= upper; j++, k++) {
+                            Int32 a2update = zptr[j];
+                            SETREST16(a2update, k);
+                            if (a2update < (4 * NUM_FULLGT_UNROLLINGS))
+                                SETREST16(a2update + lastPP, k);
+                        }
+                    }
+                    if (veryVerbose) { sprintf(gText, "\n"); LogStr(gText); }
+
+                }
+            }
+        }
+    }
+}
 
 VA(0x004d6b60, 0xa4)
-// void doReversibleTransformation(void);
+void doReversibleTransformation(void)
+{
+    Int32 i;
+
+    if (veryVerbose) { sprintf(gText, "\n"); LogStr(gText); }
+
+    sortIt();
+
+    origPtr = -1;
+    for (i = 0; i <= last; i++)
+        if (zptr[i] == 0)
+            { origPtr = i; break; }
+
+    if (origPtr == -1) panic((char *)"doReversibleTransformation");
+}
 
 VA(0x004d6c10, 0x158)
 void undoReversibleTransformation(void)
