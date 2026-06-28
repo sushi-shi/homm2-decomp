@@ -1728,7 +1728,29 @@ void compress(Char *name)
 }
 
 VA(0x004d7e50, 0x110)
-// void uncompress(char *);
+void uncompress(Char *name)
+{
+    FILE *inStr;
+    FILE *outStr;
+    Bool magicNumberOK;
+    IntNative retVal;
+
+    strcpy(inName, name);
+    strcpy(outName, name);
+    if (endsInBz(inName))
+        outName[strlen(outName) - 3] = '\0';
+
+    inStr = fopen(inName, "rb");
+    outStr = fopen(outName, "wb");
+
+    errno = 0;
+    outputHandleJustInCase = outStr;
+    magicNumberOK = uncompressStream(inStr, outStr);
+    outputHandleJustInCase = NULL;
+
+    retVal = remove(inName);
+    ERROR_IF_NOT_ZERO(retVal);
+}
 
 VA(0x004d7f60, 0x2d5)
 // long int EncodeData(char *, char *, unsigned long int);
