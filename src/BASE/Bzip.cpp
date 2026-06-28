@@ -83,6 +83,27 @@ Model models[8];
 #define EOB     259
 #define INVALID 260
 
+#define NUM_FULLGT_UNROLLINGS 4
+#define MAX_DENORM_OFFSET (4 * NUM_FULLGT_UNROLLINGS)
+UInt32 *words;
+Int32  *zptr;
+Int32  *ftab;
+UChar  *block;
+UChar  *ll;
+Int32   last;
+Int32   lastPP;
+Int32   origPtr;
+Int32   blockSize100k;
+
+#define IF_THEN_ELSE(c,t,e) ((c) ? (t) : (e))
+#define GETFIRST(a)    ((UChar)(words[a] >> 24))
+#define GETREST(a)     (words[a] & 0x00ffffff)
+#define SETALL(a,w)    words[a] = (w)
+#define GETFIRST16(a)  ((UInt32)(words[a] >> 16))
+#define GETREST16(a)   (words[a] & 0x0000ffff)
+
+void blockOverrun(void);
+
 void panic(char *s);
 void ioError(void);
 void compressedStreamEOF(void);
@@ -595,55 +616,252 @@ VA(0x004d5480, 0xe4)
 // void setDecompressStructureSizes(int);
 
 VA(0x004d5570, 0x22)
-// unsigned int GETALL(int);
+UInt32 GETALL(Int32 a)
+{
+    return words[a];
+}
 
 VA(0x004d55a0, 0x41)
-// void SETREST16(int, unsigned int);
+void SETREST16(Int32 a, UInt32 w)
+{
+    words[a] = (words[a] & 0xffff0000) | (((UInt32)(w)) & 0x0000ffff);
+}
 
 VA(0x004d55f0, 0x3e)
-// void SETFIRST16(int, unsigned int);
+void SETFIRST16(Int32 a, UInt32 w)
+{
+    words[a] = (words[a] & 0x0000ffff) | (((UInt32)(w)) << 16);
+}
 
 VA(0x004d5630, 0x41)
-// void SETREST(int, unsigned int);
+void SETREST(Int32 a, UInt32 w)
+{
+    words[a] = (words[a] & 0xff000000) | (((UInt32)(w)) & 0x00ffffff);
+}
 
 VA(0x004d5680, 0x40)
-// void SETFIRST(int, unsigned char);
+void SETFIRST(Int32 a, UChar c)
+{
+    words[a] = (words[a] & 0x00ffffff) | (((UInt32)(c)) << 24);
+}
 
 VA(0x004d56c0, 0x40)
-// void SETSECOND(int, unsigned char);
+void SETSECOND(Int32 a, UChar c)
+{
+    words[a] = (words[a] & 0xff00ffff) | (((UInt32)(c)) << 16);
+}
 
 VA(0x004d5700, 0x40)
-// void SETTHIRD(int, unsigned char);
+void SETTHIRD(Int32 a, UChar c)
+{
+    words[a] = (words[a] & 0xffff00ff) | (((UInt32)(c)) << 8);
+}
 
 VA(0x004d5740, 0x3d)
-// void SETFOURTH(int, unsigned char);
+void SETFOURTH(Int32 a, UChar c)
+{
+    words[a] = (words[a] & 0xffffff00) | (((UInt32)(c)));
+}
 
 VA(0x004d5780, 0x4d)
-// int NORMALISE(int);
+Int32 NORMALISE(Int32 p)
+{
+    return
+    IF_THEN_ELSE(((p) < 0),
+                 ((p) + lastPP),
+                 IF_THEN_ELSE(((p) >= lastPP),
+                              ((p) - lastPP),
+                              (p)));
+}
 
 VA(0x004d57d0, 0x36)
-// int NORMALISEHI(int);
+Int32 NORMALISEHI(Int32 p)
+{
+    return
+    IF_THEN_ELSE(((p) >= lastPP),
+                 ((p) - lastPP),
+                 (p));
+}
 
 VA(0x004d5810, 0x31)
-// int NORMALISELO(int);
+Int32 NORMALISELO(Int32 p)
+{
+    return
+    IF_THEN_ELSE(((p) < 0),
+                 ((p) + lastPP),
+                 (p));
+}
 
 VA(0x004d5850, 0x39)
-// int STRONG_NORMALISE(int);
+Int32 STRONG_NORMALISE(Int32 p)
+{
+    while (p < 0) { p += lastPP; }
+    return
+        p % lastPP;
+}
 
 VA(0x004d5890, 0x9d)
-// void sendZeroes(struct BitStream *, int);
+void sendZeroes(BitStream *outStream, Int32 zeroesPending)
+{
+    UInt32 bitsToSend;
+    Int32  numBits;
+
+    if (zeroesPending == 0)
+        return;
+
+    bitsToSend = 0;
+    numBits = 0;
+    while (zeroesPending != 0) {
+        numBits++;
+        bitsToSend <<= 1;
+        zeroesPending--;
+        if ((zeroesPending & 0x1) == 1) bitsToSend |= 1;
+        zeroesPending >>= 1;
+    }
+    while (numBits > 0) {
+        if ((bitsToSend & 0x1) == 1)
+            sendMTFVal(outStream, RUNA); else
+            sendMTFVal(outStream, RUNB);
+        bitsToSend >>= 1;
+        numBits--;
+    }
+}
 
 VA(0x004d5930, 0x189)
-// void moveToFrontCodeAndSend(struct BitStream *, int);
+void moveToFrontCodeAndSend(BitStream *outStream, Bool thisIsTheLastBlock)
+{
+    UChar  yy[256];
+    Int32  i, j;
+    UChar  tmp;
+    UChar  tmp2;
+    Int32  zeroesPending;
+
+    zeroesPending = 0;
+    if (thisIsTheLastBlock)
+        putInt32(outStream, -(origPtr + 1)); else
+        putInt32(outStream,  (origPtr + 1));
+
+    initModels();
+
+    for (i = 0; i <= 255; i++)
+        yy[i] = (UChar)i;
+
+    for (i = 0; i <= last; i++) {
+        UChar ll_i;
+
+        ll_i = GETFIRST(NORMALISELO(zptr[i] - 1));
+
+        j = 0;
+        tmp = yy[j];
+        while (ll_i != tmp) {
+            j++;
+            tmp2 = tmp;
+            tmp = yy[j];
+            yy[j] = tmp2;
+        }
+        yy[0] = tmp;
+
+        if (j == 0) {
+            zeroesPending++;
+        } else {
+            sendZeroes(outStream, zeroesPending);
+            zeroesPending = 0;
+            sendMTFVal(outStream, j);
+        }
+    }
+    sendZeroes(outStream, zeroesPending);
+    sendMTFVal(outStream, EOB);
+}
 
 VA(0x004d5ac0, 0x2d9)
-// int getAndMoveToFrontDecode(struct BitStream *);
+Bool getAndMoveToFrontDecode(BitStream *inStream)
+{
+    UChar  yy[256];
+    Int32  i, j, tmpOrigPtr, nextSym, limit;
+
+    limit = 100000 * blockSize100k;
+
+    tmpOrigPtr = getInt32(inStream);
+    if (tmpOrigPtr < 0)
+        origPtr = (-tmpOrigPtr) - 1; else
+        origPtr =   tmpOrigPtr  - 1;
+
+    initModels();
+
+    for (i = 0; i <= 255; i++)
+        yy[i] = (UChar)i;
+
+    last = -1;
+
+    nextSym = getMTFVal(inStream);
+
+    LOOPSTART:
+
+    if (nextSym == EOB)
+        return (tmpOrigPtr < 0);
+
+    if (nextSym == RUNA || nextSym == RUNB) {
+        Int32 n = 0;
+        do {
+            n <<= 1;
+            if (nextSym == RUNA) n |= 1;
+            n++;
+            nextSym = getMTFVal(inStream);
+        }
+            while (nextSym == RUNA || nextSym == RUNB);
+        while (n > 0) {
+            last++; if (last >= limit) blockOverrun();
+            ll[last] = yy[0];
+            n--;
+        }
+        goto LOOPSTART;
+    }
+
+    if (nextSym >= 1 && nextSym <= 255) {
+        last++; if (last >= limit) blockOverrun();
+        ll[last] = yy[nextSym];
+
+        j = nextSym;
+        for (; j > 3; j -= 4) {
+            yy[j]   = yy[j-1];
+            yy[j-1] = yy[j-2];
+            yy[j-2] = yy[j-3];
+            yy[j-3] = yy[j-4];
+        }
+        for (; j > 0; j--) yy[j] = yy[j-1];
+
+        yy[0] = ll[last];
+        nextSym = getMTFVal(inStream);
+        goto LOOPSTART;
+    }
+
+    sprintf(gText, "bad MTF value %d\n", nextSym);
+    LogStr(gText);
+    panic((char *)"getAndMoveToFrontDecode\n");
+    return True;
+}
 
 VA(0x004d5da0, 0x84)
-// void stripe(void);
+void stripe(void)
+{
+    Int32 i;
+
+    for (i = 0; i < lastPP; i++) {
+        UChar c = GETFIRST(i);
+        SETSECOND(NORMALISELO(i-1), c);
+        SETTHIRD (NORMALISELO(i-2), c);
+        SETFOURTH(NORMALISELO(i-3), c);
+    }
+}
 
 VA(0x004d5e30, 0x4f)
-// void copyOffsetWords(void);
+void copyOffsetWords(void)
+{
+    Int32 i;
+
+    for (i = 0; i < 4 * NUM_FULLGT_UNROLLINGS; i++)
+        words[lastPP+i] = words[i];
+}
 
 VA(0x004d5e80, 0x172)
 // int fullGt(int, int);
