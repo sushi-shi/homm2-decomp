@@ -864,16 +864,164 @@ void copyOffsetWords(void)
 }
 
 VA(0x004d5e80, 0x172)
-// int fullGt(int, int);
+Bool fullGt(Int32 i1, Int32 i2)
+{
+    Int32 i1orig = i1;
+
+    if (i1 == i2) return False;
+
+    do {
+        UInt32 w1;
+        UInt32 w2;
+
+        w1 = GETALL(i1);
+        w2 = GETALL(i2);
+        if (w1 != w2) return (w1 > w2);
+        i1 += 4;
+        i2 += 4;
+
+        w1 = GETALL(i1);
+        w2 = GETALL(i2);
+        if (w1 != w2) return (w1 > w2);
+        i1 += 4;
+        i2 += 4;
+
+        w1 = GETALL(i1);
+        w2 = GETALL(i2);
+        if (w1 != w2) return (w1 > w2);
+        i1 += 4;
+        i2 += 4;
+
+        w1 = GETALL(i1);
+        w2 = GETALL(i2);
+        if (w1 != w2) return (w1 > w2);
+        i1 += 4;
+        i2 += 4;
+
+        i1 = NORMALISEHI(i1);
+        i2 = NORMALISEHI(i2);
+
+    }
+        while (i1 != i1orig);
+    return False;
+}
+
+#define ISORT_BELOW 10
+#define RC(x) (x)
+#define SWAP(za,zb)                                           \
+   { Int32 zl = (za); Int32 zr = (zb);                        \
+     Int32 zt = zptr[RC(zl)]; zptr[RC(zl)] = zptr[RC(zr)];    \
+     zptr[RC(zr)] = zt;                                       \
+   }
 
 VA(0x004d6000, 0x548)
-// void qsortFull(int, int);
+void qsortFull(Int32 left, Int32 right)
+{
+    Int32 pivot, v;
+    Int32 i, j;
+    Int32 wuC;
+
+    Int32 stackL[40];
+    Int32 stackR[40];
+    Int32 sp = 0;
+
+    Int32 wuL = left;
+    Int32 wuR = right;
+
+    while (True) {
+
+        if (wuR - wuL > ISORT_BELOW) {
+
+            wuC = (wuL + wuR) >> 1;
+            if (fullGt(zptr[RC(wuL)], zptr[RC(wuC)])) SWAP(wuL, wuC);
+            if (fullGt(zptr[RC(wuL)], zptr[RC(wuR)])) SWAP(wuL, wuR);
+            if (fullGt(zptr[RC(wuC)], zptr[RC(wuR)])) SWAP(wuC, wuR);
+
+            SWAP(wuC, wuR-1);
+            pivot = zptr[RC(wuR-1)];
+
+            i = wuL;
+            j = wuR - 1;
+            for (;;) {
+                do i++; while (fullGt(pivot, zptr[RC(i)]));
+                do j--; while (fullGt(zptr[RC(j)], pivot));
+                if (i < j) SWAP(i, j) else break;
+            }
+            SWAP(i, wuR-1);
+
+            if ((i - wuL) > (wuR - i)) {
+                stackL[sp] = wuL; stackR[sp] = i-1; sp++; wuL = i+1;
+            } else {
+                stackL[sp] = i+1; stackR[sp] = wuR; sp++; wuR = i-1;
+            }
+
+        } else {
+
+            for (i = wuL + 1; i <= wuR; i++) {
+                v = zptr[RC(i)];
+                j = i;
+                while (fullGt(zptr[RC(j-1)], v)) {
+                    zptr[RC(j)] = zptr[RC(j-1)];
+                    j = j - 1;
+                    if (j <= wuL) goto zero;
+                }
+                zero:
+                zptr[RC(j)] = v;
+            }
+            if (sp == 0) return;
+            sp--; wuL = stackL[sp]; wuR = stackR[sp];
+
+        }
+    }
+}
+
+#undef RC
+#undef SWAP
+#undef ISORT_BELOW
 
 VA(0x004d6550, 0xbc)
-// int trivialGt(int, int);
+Bool trivialGt(Int32 i1, Int32 i2)
+{
+    Int32 k;
+
+    for (k = 0; k <= last; k++) {
+        UChar c1 = GETFIRST(i1);
+        UChar c2 = GETFIRST(i2);
+        if (c1 == c2) {
+            i1++; i1 = NORMALISEHI(i1);
+            i2++; i2 = NORMALISEHI(i2);
+        } else
+        if (c1 > c2) return True; else return False;
+    }
+    return False;
+}
 
 VA(0x004d6610, 0x10f)
-// void shellTrivial(void);
+void shellTrivial(void)
+{
+    Int32 i, j, h, bigN;
+    Int32 v;
+
+    Int32 ptrLo = 0;
+    Int32 ptrHi = last;
+    bigN = ptrHi - ptrLo + 1;
+    h = 1;
+    do { h = 3 * h + 1; } while (!(h > bigN));
+    do {
+        h = h / 3;
+        for (i = ptrLo + h; i <= ptrHi; i++) {
+            v = zptr[i];
+            j = i;
+            while (trivialGt(zptr[j-h], v)) {
+                zptr[j] = zptr[j-h];
+                j = j - h;
+                if (j <= (ptrLo + h - 1)) goto zero;
+            }
+            zero:
+            zptr[j] = v;
+        }
+    } while (h != 1);
+}
 
 VA(0x004d6720, 0x434)
 // void sortIt(void);
