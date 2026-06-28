@@ -4,17 +4,32 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+
+unsigned int globalCrc;
+
 VA(0x004d4050, 0x1a)
-// void initialiseCRC(void);
+void initialiseCRC(void)
+{
+    globalCrc = 0xffffffff;
+}
 
 VA(0x004d4070, 0x17)
-// unsigned int getFinalCRC(void);
+unsigned int getFinalCRC(void)
+{
+    return ~globalCrc;
+}
 
 VA(0x004d4090, 0x15)
-// unsigned int getGlobalCRC(void);
+unsigned int getGlobalCRC(void)
+{
+    return globalCrc;
+}
 
 VA(0x004d40b0, 0x1e)
-// void setGlobalCRC(unsigned int);
+void setGlobalCRC(unsigned int newCrc)
+{
+    globalCrc = newCrc;
+}
 
 VA(0x004d40d0, 0x64)
 // struct BitStream * bsOpenReadStream(struct _iobuf *);
@@ -38,7 +53,10 @@ VA(0x004d4380, 0xe8)
 // void bsClose(struct BitStream *);
 
 VA(0x004d4470, 0x35)
-// unsigned int minUInt32(unsigned int, unsigned int);
+unsigned int minUInt32(unsigned int a, unsigned int b)
+{
+    if (a < b) return a; else return b;
+}
 
 VA(0x004d44b0, 0x4e)
 // void arithCodeBitPlusFollow(struct BitStream *, unsigned int);
@@ -215,13 +233,19 @@ VA(0x004d7710, 0x26e)
 // int uncompressStream(struct _iobuf *, struct _iobuf *);
 
 VA(0x004d7980, 0x10)
-// void showFileNames(void);
+void showFileNames(void)
+{
+}
 
 VA(0x004d7990, 0x10)
-// void cleanUpAndFail(void);
+void cleanUpAndFail(void)
+{
+}
 
 VA(0x004d79a0, 0x16)
-// void panic(char *);
+void panic(char *s)
+{
+}
 
 VA(0x004d79c0, 0x4d)
 // void crcError(unsigned int, unsigned int);
