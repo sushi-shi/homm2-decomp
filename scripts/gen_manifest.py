@@ -140,6 +140,27 @@ def unit_of(im):
     t=tier_of(im); st=stem_of(modname.get(im,""))
     return f"{t}/{st}" if t in ("BASE","SOURCE","EDITOR") else st
 
+# ---- per-TU optimization level (empirical, from the PE itself) -------------
+# Retail optimization is PER-COMPILAND, not uniform /Od: the basewin.lib UI
+# framework (most of BASE) + a couple SOURCE units shipped /O2 (FPO, register
+# allocation, intrinsic strlen), while the game logic (SOURCE/*) and EDITOR are
+# /Od (full ebp frames). The CodeView S_COMPILE record does NOT encode opt level,
+# so classify by the prologue: a /Od function opens `push ebp; mov ebp,esp`
+# (55 8b ec); an /O2 (/Oy) function omits the frame pointer. The split is clean
+# per-TU (no mixed compilands), so a simple majority vote is exact.
+def is_od_func(va):
+    o=va2off(va)
+    return o is not None and o+3<=len(d) and d[o]==0x55 and d[o+1]==0x8b and d[o+2]==0xec
+unit_funcs=defaultdict(list)
+for _va,_raw in pubs:
+    if (sec_of(_va-imgbase) or "").startswith(".text"):
+        unit_funcs[unit_of(which(_va))].append(_va)
+def profile_of(unit):
+    fns=unit_funcs.get(unit,[])
+    if not fns: return "base"            # data-only TU: harmless default
+    od=sum(1 for va in fns if is_od_func(va))
+    return "base" if od*2>=len(fns) else "o2"
+
 # existing src files: stem(lower) -> repo-relative path
 srcfiles={}
 for tier in ("BASE","SOURCE","EDITOR"):
@@ -199,10 +220,18 @@ with open(os.path.join(REPO,"config","units.toml"),"w") as f:
     # (fullMap::Row/Extra) + /Ob1 lifts GetNewCellExtra* from a structurally-capped ~91%
     # to ~97% (addressing now exact; residual is jmp-placement). /Ob1 not /Ob2: retail
     # still emits real calls to out-of-line methods (e.g. GetNewCellExtraIndex), which
-    # /Ob1 leaves alone. One uniform profile - every unit `base`.
-    f.write('base = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1"]\n\n')
+    # /Ob1 leaves alone.
+    #
+    # Optimization is PER-TU (profile_of, above). The basewin.lib UI framework (most of
+    # BASE) + SOURCE/{FINDPATH,SEARCH} shipped /O2 (FPO + register allocation + intrinsic
+    # strlen via `repne scasb`); the rest (SOURCE game logic, EDITOR) is /Od. /O2 already
+    # implies /Oy/Oi/Og/Ot/Ob1, so the o2 profile drops the explicit /Od and /Ob1.
+    # Proven on BASE/Misc: switching it to o2 took MemSize/SRand/Random/MAKEFILEID/... to
+    # byte-exact (they were ~0% under /Od - wrong frame shape).
+    f.write('base = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1"]\n')
+    f.write('o2 = ["/nologo", "/c", "/O2", "/MT", "/Gr", "/G5"]\n\n')
     for st,src in units:
-        f.write(f'[[unit]]\nunit = "{st}"\nsource = "{src}"\nflags = "base"\n\n')
+        f.write(f'[[unit]]\nunit = "{st}"\nsource = "{src}"\nflags = "{profile_of(st)}"\n\n')
 
 print(f"symbol_names.csv: {n_func} funcs + {n_data} data = {n_func+n_data} symbols")
 print(f"units.toml: {len(units)} NWC reconstruction units")
