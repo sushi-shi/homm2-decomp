@@ -132,6 +132,12 @@ void compressedStreamEOF(void);
 void bitStreamEOF(void);
 extern char gText[];
 extern void LogStr(char *);
+extern void *BaseAlloc(unsigned int size, char *file, int line);
+extern void BaseFree(void *ptr, char *file, int line);
+// NWC wraps malloc/free in BaseAlloc/BaseFree(ptr, __FILE__, __LINE__). __FILE__ is
+// the original build path (reloc-masked); __LINE__ immediates are hardcoded from the
+// retail disasm since our line layout differs.
+#define BZFILE ((char *)"I:\\Projects\\Heroes\\Prog\\BASE\\Bzip.c")
 
 VA(0x004d4050, 0x1a)
 void initialiseCRC(void)
@@ -626,19 +632,66 @@ void sendMTFVal(BitStream *bs, Int32 n)
 }
 
 VA(0x004d5270, 0x94)
-// void FreeCompressStructures(void);
+void FreeCompressStructures(void)
+{
+    if (words != NULL) BaseFree(words, BZFILE, 0x461);
+    if (ftab  != NULL) BaseFree(ftab,  BZFILE, 0x462);
+    if (zptr  != NULL) BaseFree(zptr,  BZFILE, 0x463);
+    words = NULL;
+    ftab  = NULL;
+    zptr  = NULL;
+}
 
 VA(0x004d5310, 0xcf)
-// void allocateCompressStructures(void);
-// NWC-modified: uses BaseAlloc(size, __FILE__, __LINE__) not malloc, and calls
-// FreeCompressStructures() first. Needs a disasm pass, not clean reference.
+void allocateCompressStructures(void)
+{
+    Int32 n = 100000 * blockSize100k;
+    FreeCompressStructures();
+    words = (UInt32 *)BaseAlloc((n + MAX_DENORM_OFFSET) * sizeof(Int32) + 1, BZFILE, 0x475);
+    zptr  = (Int32 *)BaseAlloc(n                        * sizeof(Int32) + 1, BZFILE, 0x476);
+    ftab  = (Int32 *)BaseAlloc(65537                    * sizeof(Int32) + 1, BZFILE, 0x477);
+
+    if (words == NULL || zptr == NULL || ftab == NULL) {
+        Int32 totalDraw = (n + MAX_DENORM_OFFSET) * sizeof(Int32) +
+                          n * sizeof(Int32) +
+                          65537 * sizeof(Int32);
+
+        compressOutOfMemory(totalDraw, n);
+    }
+}
 
 VA(0x004d53e0, 0x94)
-// void FreeDecompressStructures(void);
+void FreeDecompressStructures(void)
+{
+    if (block != NULL) BaseFree(block, BZFILE, 0x489);
+    if (ll    != NULL) BaseFree(ll,    BZFILE, 0x48a);
+    if (zptr  != NULL) BaseFree(zptr,  BZFILE, 0x48b);
+    block = NULL;
+    ll    = NULL;
+    zptr  = NULL;
+}
 
 VA(0x004d5480, 0xe4)
-// void setDecompressStructureSizes(int);
-// NWC-modified: BaseAlloc + FreeDecompressStructures() refactor. Disasm pass.
+void setDecompressStructureSizes(Int32 newSize100k)
+{
+    if (newSize100k == blockSize100k)
+        return;
+
+    blockSize100k = newSize100k;
+    FreeDecompressStructures();
+
+    if (newSize100k != 0) {
+        Int32 n = 100000 * newSize100k;
+        block = (UChar *)BaseAlloc(n * sizeof(UChar) + 1, BZFILE, 0x4a1);
+        ll    = (UChar *)BaseAlloc(n * sizeof(UChar) + 1, BZFILE, 0x4a2);
+        zptr  = (Int32 *)BaseAlloc(n * sizeof(Int32) + 1, BZFILE, 0x4a3);
+
+        if (block == NULL || ll == NULL || zptr == NULL) {
+            Int32 totalDraw = 6 * n * sizeof(UChar);
+            uncompressOutOfMemory(totalDraw, n);
+        }
+    }
+}
 
 VA(0x004d5570, 0x22)
 UInt32 GETALL(Int32 a)
