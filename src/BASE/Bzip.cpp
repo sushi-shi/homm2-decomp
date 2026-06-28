@@ -57,6 +57,32 @@ UInt32 bigD;
 UInt32 bitsOutstanding;
 Model bogusModel;
 
+#define BASIS         0
+#define MODEL_2_3     1
+#define MODEL_4_7     2
+#define MODEL_8_15    3
+#define MODEL_16_31   4
+#define MODEL_32_63   5
+#define MODEL_64_127  6
+#define MODEL_128_255 7
+Model models[8];
+
+#define VAL_RUNA    1
+#define VAL_RUNB    2
+#define VAL_ONE     3
+#define VAL_2_3     4
+#define VAL_4_7     5
+#define VAL_8_15    6
+#define VAL_16_31   7
+#define VAL_32_63   8
+#define VAL_64_127  9
+#define VAL_128_255 10
+#define VAL_EOB     11
+#define RUNA    257
+#define RUNB    258
+#define EOB     259
+#define INVALID 260
+
 void panic(char *s);
 void ioError(void);
 void compressedStreamEOF(void);
@@ -450,16 +476,111 @@ UInt32 getUInt32(BitStream *bs)
 }
 
 VA(0x004d4d30, 0xda)
-// void initModels(void);
+void initModels(void)
+{
+    initModel(&models[BASIS],         (char *)"basis",   11,  12,  1000);
+    initModel(&models[MODEL_2_3],     (char *)"2-3",     2,   4,   1000);
+    initModel(&models[MODEL_4_7],     (char *)"4-7",     4,   3,   1000);
+    initModel(&models[MODEL_8_15],    (char *)"8-15",    8,   3,   1000);
+    initModel(&models[MODEL_16_31],   (char *)"16-31",   16,  3,   1000);
+    initModel(&models[MODEL_32_63],   (char *)"32-63",   32,  3,   1000);
+    initModel(&models[MODEL_64_127],  (char *)"64-127",  64,  2,   1000);
+    initModel(&models[MODEL_128_255], (char *)"128-255", 128, 1,   1000);
+}
 
 VA(0x004d4e10, 0x71)
-// void dumpAllModelStats(void);
+void dumpAllModelStats(void)
+{
+    dumpModelStats(&bogusModel);
+    dumpModelStats(&models[BASIS]);
+    dumpModelStats(&models[MODEL_2_3]);
+    dumpModelStats(&models[MODEL_4_7]);
+    dumpModelStats(&models[MODEL_8_15]);
+    dumpModelStats(&models[MODEL_16_31]);
+    dumpModelStats(&models[MODEL_32_63]);
+    dumpModelStats(&models[MODEL_64_127]);
+    dumpModelStats(&models[MODEL_128_255]);
+}
 
 VA(0x004d4e90, 0x153)
-// int getMTFVal(struct BitStream *);
+Int32 getMTFVal(BitStream *bs)
+{
+    Int32 retVal;
+
+    switch (getSymbol(&models[BASIS], bs)) {
+        case VAL_EOB:
+            retVal = EOB; break;
+        case VAL_RUNA:
+            retVal = RUNA; break;
+        case VAL_RUNB:
+            retVal = RUNB; break;
+        case VAL_ONE:
+            retVal = 1; break;
+        case VAL_2_3:
+            retVal = getSymbol(&models[MODEL_2_3], bs) + 2 - 1; break;
+        case VAL_4_7:
+            retVal = getSymbol(&models[MODEL_4_7], bs) + 4 - 1; break;
+        case VAL_8_15:
+            retVal = getSymbol(&models[MODEL_8_15], bs) + 8 - 1; break;
+        case VAL_16_31:
+            retVal = getSymbol(&models[MODEL_16_31], bs) + 16 - 1; break;
+        case VAL_32_63:
+            retVal = getSymbol(&models[MODEL_32_63], bs) + 32 - 1; break;
+        case VAL_64_127:
+            retVal = getSymbol(&models[MODEL_64_127], bs) + 64 - 1; break;
+        default:
+            retVal = getSymbol(&models[MODEL_128_255], bs) + 128 - 1; break;
+    }
+    return retVal;
+}
 
 VA(0x004d4ff0, 0x27f)
-// void sendMTFVal(struct BitStream *, int);
+void sendMTFVal(BitStream *bs, Int32 n)
+{
+    if (n == RUNA) putSymbol(&models[BASIS], VAL_RUNA, bs); else
+    if (n == RUNB) putSymbol(&models[BASIS], VAL_RUNB, bs); else
+    if (n == EOB ) putSymbol(&models[BASIS], VAL_EOB,  bs); else
+
+    if (n == 1) putSymbol(&models[BASIS], VAL_ONE, bs); else
+
+    if (n >= 2 && n <= 3) {
+        putSymbol(&models[BASIS], VAL_2_3, bs);
+        putSymbol(&models[MODEL_2_3], n - 2 + 1, bs);
+    } else
+
+    if (n >= 4 && n <= 7) {
+        putSymbol(&models[BASIS], VAL_4_7, bs);
+        putSymbol(&models[MODEL_4_7], n - 4 + 1, bs);
+    } else
+
+    if (n >= 8 && n <= 15) {
+        putSymbol(&models[BASIS], VAL_8_15, bs);
+        putSymbol(&models[MODEL_8_15], n - 8 + 1, bs);
+    } else
+
+    if (n >= 16 && n <= 31) {
+        putSymbol(&models[BASIS], VAL_16_31, bs);
+        putSymbol(&models[MODEL_16_31], n - 16 + 1, bs);
+    } else
+
+    if (n >= 32 && n <= 63) {
+        putSymbol(&models[BASIS], VAL_32_63, bs);
+        putSymbol(&models[MODEL_32_63], n - 32 + 1, bs);
+    } else
+
+    if (n >= 64 && n <= 127) {
+        putSymbol(&models[BASIS], VAL_64_127, bs);
+        putSymbol(&models[MODEL_64_127], n - 64 + 1, bs);
+    } else
+
+    if (n >= 128 && n <= 255) {
+        putSymbol(&models[BASIS], VAL_128_255, bs);
+        putSymbol(&models[MODEL_128_255], n - 128 + 1, bs);
+    } else {
+
+        panic((char *)"sendMTFVal: bad value!");
+    }
+}
 
 VA(0x004d5270, 0x94)
 // void FreeCompressStructures(void);
