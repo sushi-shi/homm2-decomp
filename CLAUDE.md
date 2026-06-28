@@ -12,13 +12,26 @@ with the original **MSVC 4.2** toolchain under wine, produces object files
   ground truth** — already extracted to `build/gen/symbol_names.csv` and the
   recovered `include/` headers. **Never guess or re-derive them; there is no
   Ghidra / FID / name-recovery stage**.
-- **The build is `/Od` (debug), not `/O2`.** Flags: **`/nologo /c /Od /MT /Gr /G5 /Ob1`** —
-  unoptimized (full `ebp` frames, every local spilled), static LIBCMT,
-  **`__fastcall` default** (free fns mangle `@@YI`; 1st/2nd int args in ECX/EDX),
-  **`/G5`** (Pentium target: zero-extends with AND, never MOVZX — `docs/patterns/od-debug-build.md`).
-  **No `/GX` → no C++ exceptions / no EH state. No RTTI.** So the EH wall and the
-  /O2 regalloc/scheduling walls of a typical decomp **do not exist here** — lowering is
-  mostly literal, body ~1:1 to asm.
+- **Most TUs are `/Od` (debug), but optimization is PER-TU — 39 of 95 ship `/O2`.**
+  Default flags: **`/nologo /c /Od /MT /Gr /G5 /Ob1`** — unoptimized (full `ebp`
+  frames, every local spilled), static LIBCMT, **`__fastcall` default** (free fns
+  mangle `@@YI`; 1st/2nd int args in ECX/EDX), **`/G5`** (Pentium target:
+  zero-extends with AND, never MOVZX — `docs/patterns/od-debug-build.md`).
+  **No `/GX` → no C++ exceptions / no EH state. No RTTI.**
+  - **`/O2` TUs** (flags `/nologo /c /O2 /MT /Gr /G5` — `o2` profile): the
+    **basewin.lib UI framework** (most of BASE — BITMAP, BUTTON, WIDGET, WINMGR,
+    MOUSEMGR, Misc, droplist, listbox, icons, …) **+ SOURCE/{FINDPATH,SEARCH}**.
+    Here lowering is NOT literal: **FPO (no `ebp` frame), register allocation,
+    strength-reduction `lea`, intrinsic `strlen` via `repne scasb`**, and the
+    optimizer reassociates/CSEs. The `/Od` levers below DON'T apply; the wall is
+    matching the optimizer's register allocator + instruction selection (steer with
+    source structure: separate statements to block factoring, `>>1` not `/2`, etc.).
+  - **`/Od` TUs**: all SOURCE game logic (GAME, HERO, ARMY, CMBTMGR, SPELLS, AI, …),
+    EDITOR/mapcell, and 7 BASE TUs (BITS, Bzip, FONT, RESMGR, TILE, WINDOW, soundmgr).
+    No EH/regalloc wall — lowering is literal, body ~1:1 to asm.
+  - Opt level is **not in CodeView** (S_COMPILE omits it). `gen_manifest.py`
+    classifies each TU by prologue (`push ebp;mov ebp,esp` = /Od, FPO = /O2) →
+    `flags="base"|"o2"` in `config/units.toml`. See `[[optimization-is-per-tu]]`.
 - **But inline expansion is ON (`/Ob1`) — separate axis from `/Od`.** "Unoptimized but
   inlined." The retail `.text` is littered with `jmp $+0` (`e9 00000000`, jump-to-next)
   that plain `/Od` never emits: they are the per-call-site continuation jumps of
