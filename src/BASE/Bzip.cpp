@@ -6,6 +6,8 @@
 #include <va.h>
 #include <stdio.h>
 #include <errno.h>
+#include <stdlib.h>
+#include <string.h>
 
 // bzip-0.21 (Julian Seward, 1996) — the original arithmetic-coding bzip the
 // retail Bzip.obj is built from. Types/macros mirror the reference so bodies
@@ -99,6 +101,7 @@ Int32   veryVerbose;
 Char   *progName;
 Int32   compressing;
 Int32   bytesIn;
+Int32   verbose;
 extern UInt32 crc32Table[256];
 
 #define MY_EOF 257
@@ -118,6 +121,8 @@ extern UInt32 crc32Table[256];
 
 void blockOverrun(void);
 void unblockError(void);
+void crcError(UInt32 crcStored, UInt32 crcComputed);
+void setDecompressStructureSizes(Int32 newSize100k);
 void compressOutOfMemory(Int32 draw, Int32 blockSize);
 void uncompressOutOfMemory(Int32 draw, Int32 blockSize);
 
@@ -625,12 +630,15 @@ VA(0x004d5270, 0x94)
 
 VA(0x004d5310, 0xcf)
 // void allocateCompressStructures(void);
+// NWC-modified: uses BaseAlloc(size, __FILE__, __LINE__) not malloc, and calls
+// FreeCompressStructures() first. Needs a disasm pass, not clean reference.
 
 VA(0x004d53e0, 0x94)
 // void FreeDecompressStructures(void);
 
 VA(0x004d5480, 0xe4)
 // void setDecompressStructureSizes(int);
+// NWC-modified: BaseAlloc + FreeDecompressStructures() refactor. Disasm pass.
 
 VA(0x004d5570, 0x22)
 UInt32 GETALL(Int32 a)
@@ -1348,10 +1356,133 @@ void unRLEandDump(FILE *dst, Bool thisIsTheLastBlock)
 }
 
 VA(0x004d7420, 0x2e6)
-// void compressStream(struct _iobuf *, struct _iobuf *);
+void compressStream(FILE *stream, FILE *zStream)
+{
+    IntNative  retVal;
+    Bool       thisIsTheLastBlock;
+    BitStream  *zbs;
+    UInt32     crcToSend;
+    Int32      blockNo = 1;
+
+    bytesIn  = 0;
+    bytesOut = 0;
+
+    zbs = bsOpenWriteStream(zStream);
+
+    bsPutUChar(zbs, 'B');
+    bsPutUChar(zbs, 'Z');
+    bsPutUChar(zbs, '0');
+    bsPutUChar(zbs, '0' + blockSize100k);
+
+    initialiseCRC();
+    initBogusModel();
+    arithCodeStartEncoding(zbs);
+
+    do {
+        if (veryVerbose) { sprintf(gText, "\nBEGIN block %d\n", blockNo); LogStr(gText); }
+        blockNo++;
+        thisIsTheLastBlock = loadAndRLEsource(stream);
+        spotBlock(True);
+        doReversibleTransformation();
+        moveToFrontCodeAndSend(zbs, thisIsTheLastBlock);
+    }
+        while (!thisIsTheLastBlock);
+
+    crcToSend = getFinalCRC();
+    putUInt32(zbs, crcToSend);
+    if (veryVerbose) { sprintf(gText, "\nCRC = 0x%x\n", crcToSend); LogStr(gText); }
+
+    arithCodeDoneEncoding(zbs);
+    bsClose(zbs);
+    ERROR_IF_NOT_ZERO(ferror(stream));
+    retVal = fclose(stream);
+    ERROR_IF_EOF(retVal);
+
+    if (veryVerbose) {
+        sprintf(gText, "\n"); LogStr(gText);
+        dumpAllModelStats();
+        sprintf(gText, "\n"); LogStr(gText);
+    }
+
+    if (bytesIn == 0) bytesIn = 1;
+    if (bytesOut == 0) bytesOut = 1;
+
+    if (verbose) {
+        sprintf(gText, "%6.3f:1, %6.3f bits/byte, "
+                       "%5.2f%% saved, %d in, %d out.\n",
+                (float)bytesIn / (float)bytesOut,
+                (8.0 * (float)bytesOut) / (float)bytesIn,
+                100.0 * (1.0 - (float)bytesOut / (float)bytesIn),
+                bytesIn,
+                bytesOut);
+        LogStr(gText);
+    }
+
+    if (veryVerbose) { sprintf(gText, "\n"); LogStr(gText); }
+}
 
 VA(0x004d7710, 0x26e)
-// int uncompressStream(struct _iobuf *, struct _iobuf *);
+Bool uncompressStream(FILE *zStream, FILE *stream)
+{
+    Bool       thisIsTheLastBlock;
+    BitStream  *zbs;
+    Int32      magic1, magic2, magic3, magic4;
+    UInt32     crcStored, crcComputed;
+    Int32      currBlockNo;
+    IntNative  retVal;
+
+    zbs = (bsOpenReadStream(zStream));
+
+    magic1 = (Int32)bsGetUChar(zbs);
+    magic2 = (Int32)bsGetUChar(zbs);
+    magic3 = (Int32)bsGetUChar(zbs);
+    magic4 = (Int32)bsGetUChar(zbs);
+    if (magic1 != 'B' ||
+        magic2 != 'Z' ||
+        magic3 != '0' ||
+        magic4 < '1'  ||
+        magic4 > '9') {
+        bsClose(zbs);
+        retVal = fclose(stream);
+        ERROR_IF_EOF(retVal);
+        return False;
+    }
+
+    setDecompressStructureSizes(magic4 - '0');
+    initialiseCRC();
+    initBogusModel();
+    arithCodeStartDecoding(zbs);
+
+    if (veryVerbose) { sprintf(gText, "\n  "); LogStr(gText); }
+    currBlockNo = 0;
+    do {
+        currBlockNo++;
+        if (veryVerbose) { sprintf(gText, "[%d: ac+mtf ", currBlockNo); LogStr(gText); }
+        thisIsTheLastBlock = getAndMoveToFrontDecode(zbs);
+        if (veryVerbose) { sprintf(gText, "rt "); LogStr(gText); }
+        undoReversibleTransformation();
+        spotBlock(False);
+        if (veryVerbose) { sprintf(gText, "rld"); LogStr(gText); }
+        unRLEandDump(stream, thisIsTheLastBlock);
+        if (veryVerbose) { sprintf(gText, "] "); LogStr(gText); }
+    }
+        while (!thisIsTheLastBlock);
+
+    if (veryVerbose) { sprintf(gText, "\n  "); LogStr(gText); }
+
+    crcStored   = getUInt32(zbs);
+    crcComputed = getFinalCRC();
+    if (veryVerbose) { sprintf(gText, "CRCs: stored = 0x%x, computed = 0x%x\n  ", crcStored, crcComputed); LogStr(gText); }
+    if (crcStored != crcComputed)
+        crcError(crcStored, crcComputed);
+
+    arithCodeDoneDecoding(zbs);
+    bsClose(zbs);
+    ERROR_IF_NOT_ZERO(ferror(stream));
+    retVal = fclose(stream);
+    ERROR_IF_EOF(retVal);
+    return True;
+}
 
 VA(0x004d7980, 0x10)
 void showFileNames(void)
@@ -1504,7 +1635,15 @@ void compressOutOfMemory(Int32 draw, Int32 blockSize)
 }
 
 VA(0x004d7cd0, 0x83)
-// int endsInBz(char *);
+Bool endsInBz(Char *name)
+{
+    Int32 n = strlen(name);
+    if (n <= 3) return False;
+    return
+        (name[n-3] == '.' &&
+         name[n-2] == 'b' &&
+         name[n-1] == 'z');
+}
 
 VA(0x004d7d60, 0xe2)
 // void compress(char *);
