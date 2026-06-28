@@ -94,6 +94,7 @@ Int32   last;
 Int32   lastPP;
 Int32   origPtr;
 Int32   blockSize100k;
+Int32   veryVerbose;
 
 #define IF_THEN_ELSE(c,t,e) ((c) ? (t) : (e))
 #define GETFIRST(a)    ((UChar)(words[a] >> 24))
@@ -1030,10 +1031,76 @@ VA(0x004d6b60, 0xa4)
 // void doReversibleTransformation(void);
 
 VA(0x004d6c10, 0x158)
-// void undoReversibleTransformation(void);
+void undoReversibleTransformation(void)
+{
+    Int32  cc[256];
+    Int32  i, j, ch, sum;
+
+    for (i = 0; i <= 255; i++) cc[i] = 0;
+
+    for (i = 0; i <= last; i++) {
+        UChar ll_i = ll[i];
+        zptr[i] = cc[ll_i];
+        cc[ll_i]++;
+    }
+
+    sum = 0;
+    for (ch = 0; ch <= 255; ch++) {
+        sum = sum + cc[ch];
+        cc[ch] = sum - cc[ch];
+    }
+
+    i = origPtr;
+    for (j = last; j >= 0; j--) {
+        UChar ll_i = ll[i];
+        block[j] = ll_i;
+        i = zptr[i] + cc[ll_i];
+    }
+}
+
+#define SPOT_BASIS_STEP 8000
 
 VA(0x004d6d70, 0x1c1)
-// void spotBlock(int);
+void spotBlock(Bool weAreCompressing)
+{
+    Int32 pos, delta, newdelta;
+
+    pos   = SPOT_BASIS_STEP;
+    delta = 1;
+
+    while (pos < last) {
+
+        Int32 n;
+
+        if (weAreCompressing)
+            n = (Int32)GETFIRST(pos) + 1; else
+            n = (Int32)block[pos]    - 1;
+
+        if (n == 256) n = 0; else if (n == -1)  n = 255;
+
+        if (!(n >= 0 && n <= 255)) panic((char *)"spotBlock");
+
+        if (weAreCompressing)
+            SETFIRST(pos, (UChar)n); else
+            block[pos] = (UChar)n;
+
+        switch (delta) {
+            case 3:  newdelta = 1; break;
+            case 1:  newdelta = 4; break;
+            case 4:  newdelta = 5; break;
+            case 5:  newdelta = 9; break;
+            case 9:  newdelta = 2; break;
+            case 2:  newdelta = 6; break;
+            case 6:  newdelta = 7; break;
+            case 8:  newdelta = 8; break;
+            case 7:  newdelta = 3; break;
+            default: newdelta = 1; break;
+        }
+        delta = newdelta;
+
+        pos = pos + SPOT_BASIS_STEP + 17 * (newdelta - 5);
+    }
+}
 
 VA(0x004d6f40, 0x15c)
 // int getRLEpair(struct _iobuf *);
