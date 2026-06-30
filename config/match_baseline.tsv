@@ -72,7 +72,7 @@ BASE/Bzip	?bsPutUChar@@YIXPAUBitStream@@E@Z	100.0000
 BASE/Bzip	?cleanUpAndFail@@YIXXZ	100.0000
 BASE/Bzip	?compress@@YIXPAD@Z	99.9178
 BASE/Bzip	?compressOutOfMemory@@YIXHH@Z	100.0000
-BASE/Bzip	?compressStream@@YIXPAU_iobuf@@0@Z	88.3626
+BASE/Bzip	?compressStream@@YIXPAU_iobuf@@0@Z	99.9011
 BASE/Bzip	?compressedStreamEOF@@YIXXZ	100.0000
 BASE/Bzip	?copyOffsetWords@@YIXXZ	95.2000
 BASE/Bzip	?crcError@@YIXII@Z	100.0000
@@ -1121,7 +1121,7 @@ SOURCE/PHILAI	?HeroInteractionAtTown@philAI@@QAEXPAVhero@@PAVtown@@HPAH@Z	0.0000
 SOURCE/PHILAI	?IncrementHourGlass@philAI@@QAEXXZ	0.0000
 SOURCE/PHILAI	?InitAIMapVars@@YIXXZ	0.0000
 SOURCE/PHILAI	?LikelihoodOfEnemyAttacking@philAI@@QAEXPAVtown@@PAVhero@@AAM2AAH332@Z	100.0000
-SOURCE/PHILAI	?ManaRefreshValue@philAI@@QAEHPAVhero@@H@Z	87.5000
+SOURCE/PHILAI	?ManaRefreshValue@philAI@@QAEHPAVhero@@H@Z	100.0000
 SOURCE/PHILAI	?MaxBuyableCreatures@philAI@@QAEHH@Z	100.0000
 SOURCE/PHILAI	?MeanRVOfUnexploredTerritory@philAI@@QAEHH@Z	100.0000
 SOURCE/PHILAI	?NetValueOfArtifact@philAI@@QAEHHHHH@Z	100.0000

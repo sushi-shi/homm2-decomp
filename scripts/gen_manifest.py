@@ -228,8 +228,15 @@ with open(os.path.join(REPO,"config","units.toml"),"w") as f:
     # implies /Oy/Oi/Og/Ot/Ob1, so the o2 profile drops the explicit /Od and /Ob1.
     # Proven on BASE/Misc: switching it to o2 took MemSize/SRand/Random/MAKEFILEID/... to
     # byte-exact (they were ~0% under /Od - wrong frame shape).
-    f.write('base = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1"]\n')
-    f.write('o2 = ["/nologo", "/c", "/O2", "/MT", "/Gr", "/G5"]\n\n')
+    #
+    # /QIfdiv (Pentium FDIV-bug workaround) is GLOBAL (both tiers): retail wraps every
+    # float divide with the `cmp __adjust_fdiv,0 / jne / __adj_fdiv_r` guard (PHILAI alone
+    # has 53 such sites; "__adjust_fdiv" is in the exe's string table). Without it our objs
+    # emit 0 guards. Adding it lifted philAI::ManaRefreshValue 91% -> 100% with zero
+    # regressions across all 95 units (status check clean) - guards only appear around
+    # float divides, so a function that already matches without one is unaffected.
+    f.write('base = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/QIfdiv"]\n')
+    f.write('o2 = ["/nologo", "/c", "/O2", "/MT", "/Gr", "/G5", "/QIfdiv"]\n\n')
     for st,src in units:
         f.write(f'[[unit]]\nunit = "{st}"\nsource = "{src}"\nflags = "{profile_of(st)}"\n\n')
 

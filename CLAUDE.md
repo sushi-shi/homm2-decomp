@@ -13,7 +13,7 @@ with the original **MSVC 4.2** toolchain under wine, produces object files
   recovered `include/` headers. **Never guess or re-derive them; there is no
   Ghidra / FID / name-recovery stage**.
 - **Most TUs are `/Od` (debug), but optimization is PER-TU — 39 of 95 ship `/O2`.**
-  Default flags: **`/nologo /c /Od /MT /Gr /G5 /Ob1`** — unoptimized (full `ebp`
+  Default flags: **`/nologo /c /Od /MT /Gr /G5 /Ob1 /QIfdiv`** — unoptimized (full `ebp`
   frames, every local spilled), static LIBCMT, **`__fastcall` default** (free fns
   mangle `@@YI`; 1st/2nd int args in ECX/EDX), **`/G5`** (Pentium target:
   zero-extends with AND, never MOVZX — `docs/patterns/od-debug-build.md`).

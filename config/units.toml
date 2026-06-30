@@ -6,8 +6,8 @@ compiler = "msvc4.2"
 platform = "win32"
 
 [flags]
-base = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1"]
-o2 = ["/nologo", "/c", "/O2", "/MT", "/Gr", "/G5"]
+base = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/QIfdiv"]
+o2 = ["/nologo", "/c", "/O2", "/MT", "/Gr", "/G5", "/QIfdiv"]
 
 [[unit]]
 unit = "BASE/BASEMGR"
