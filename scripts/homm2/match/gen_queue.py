@@ -13,22 +13,26 @@ REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[3]))
 CSV = REPO / "build/gen/symbol_names.csv"
 OUT = REPO / "config/match-queue.md"
 TIERS = ("BASE", "SOURCE", "EDITOR")
+IMAGE_BASE = 0x400000  # src VA() macros carry absolute VAs; the CSV is RVA-relative
 
 
 def reconstructed_rvas():
     """RVAs with a REAL body in src/ — not the carcass placeholders, which are an
     `VA(...)` line followed only by a `// signature;` comment. A function counts as
-    reconstructed only if its block (RVA up to the next RVA / EOF) has a real `{`."""
+    reconstructed only if its block (RVA up to the next RVA / EOF) has a real `{`.
+
+    src `VA()` macros carry ABSOLUTE VAs (RVA + IMAGE_BASE); the CSV this set is
+    matched against is RVA-relative, so normalise back to RVA-space here."""
     s = set()
     pat = re.compile(r"VA\((0x[0-9a-fA-F]{1,8})")
     for p in (REPO / "src").rglob("*.cpp"):
         lines = p.read_text(errors="replace").splitlines()
         marks = [(i, int(m.group(1), 16)) for i, l in enumerate(lines)
                  if (m := pat.search(l))]
-        for k, (i, rva) in enumerate(marks):
+        for k, (i, va) in enumerate(marks):
             end = marks[k + 1][0] if k + 1 < len(marks) else len(lines)
             if any("{" in l and not l.lstrip().startswith("//") for l in lines[i + 1:end]):
-                s.add(rva)
+                s.add(va - IMAGE_BASE if va >= IMAGE_BASE else va)
     return s
 
 
