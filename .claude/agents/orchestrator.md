@@ -109,19 +109,25 @@ Process completed matchers **one at a time** (master has one `build/`, one HEAD)
 1. **Guard:** `git -C <master> status --porcelain` clean before you start. If a
    matcher leaked into master (relative-path bug), `git restore` the stray files first.
 2. **Apply** the matcher's TU file(s) to master (`cp <worktree>/<file> <master>/<file>`).
-   **Never copy `README.md` or `config/match_baseline.tsv`** (regenerated/blessed in
-   master). Touch only that matcher's file(s).
-3. **Build + measure** in master: `nix develop .#build --command homm2 build`. Confirm
-   the target hit its reported %, read the before→after exact count.
+   **Never copy the worktree's `README.md` or `config/match_baseline.tsv`** — those are
+   regenerated/blessed in master (you take master's, see below). Touch only that
+   matcher's file(s).
+3. **Build + measure** in master: `nix develop .#build --command homm2 build`. This
+   recompiles, re-objdiffs, **and regenerates master's `README.md` match block** (via
+   `homm2 status --write-readme`). Confirm the target hit its reported %, read the
+   before→after exact count.
 4. **Bless** the baseline: `homm2 status update`. Use `--accept-regressions` ONLY for a
    trivial cross-function fuzzy drift (a neighbor in the same aggregate obj moving
    <0.1% — pure objdiff noise). A real `best%` drop on an untouched function is NOT
    acceptable — investigate. Keep the bless in the same commit.
-5. **Commit** atomically: `git add` ONLY this matcher's file(s) +
-   `config/match_baseline.tsv`, message `match: <fn> -> <result>` with the
+5. **Commit** atomically: `git add` this matcher's file(s) + `config/match_baseline.tsv`
+   + **`README.md`** (master's freshly-regenerated match block — ALWAYS stage it so the
+   scoreboard never drifts from the commits), message `match: <fn> -> <result>` with the
    `Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>` trailer.
-   One matcher = one commit. A clean `@early-stop` partial is a legitimate commit; a
-   mis-attributed / wrong-shape reconstruction is NOT — keep it stubbed.
+   One matcher = one commit. **Do NOT stage `config/match-queue.md`** (a transient
+   regenerated worklist — `git checkout --` it if it's dirty). A clean `@early-stop`
+   partial is a legitimate commit; a mis-attributed / wrong-shape reconstruction is NOT
+   — keep it stubbed.
 6. **Refill:** `git -C .claude/worktrees/matcher-N reset --hard master` (its `build/`
    survives), pick the next target (cross-check skip), dispatch a new background matcher.
 
