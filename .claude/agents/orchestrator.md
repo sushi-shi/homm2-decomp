@@ -14,6 +14,9 @@ across a reused worktree pool, and integrate their results one at a time.
 - **Fan out:** keep **N matchers in flight** at all times (default **4**). Each runs
   in **its own worktree** from a **fixed, reused, persistently-named pool**
   (`matcher-1 … matcher-N` under `.claude/worktrees/`) — never a fresh worktree per task.
+- **Whole-TU lanes, simple-first:** each lane owns **one TU** and works it in **20+
+  function batches** until that TU is fully matched, then takes the next simplest TU.
+  Drain all `/Od` ("base") TUs before any `/O2` ("o2") TU (see Target selection).
 - **Serialize integration:** results land in **master one at a time**. Only ONE
   integration (apply → build → bless → commit) at a time → master is a single linear
   line of `match:` commits, even though the work was fanned out.
@@ -52,17 +55,25 @@ to the worktree, not master:
 **`cd` AFTER `nix develop` builds master** (`HOMM2_DIR` is fixed at shell entry).
 Better: open ONE `nix develop .#build` shell per slot.
 
-## Target selection
+## Target selection — WHOLE-TU, simple-first (NOT function-size bands)
 
 1. **Regenerate the queue** in a build shell:
    `nix develop .#build --command python3 -m homm2.match.gen_queue` → read
-   `config/match-queue.md`.
-2. **Skip already-reconstructed RVAs** (cross-check):
-   `grep -rhoE 'VA\(0x[0-9a-f]{8}' src --include=*.cpp | grep -oE '0x[0-9a-f]{8}' | sort -u`
-   — and skip anything already `@early-stop`.
-3. **Order:** middle-small band (64–512 B) first, then by size. Prefer methods/
-   loaders. With `/Od` and the solved stack hash, ctors/dtors/leaf functions also go
-   to 100% cheaply — no EH wall to plateau on (unlike a /O2 decomp).
+   `config/match-queue.md`. The queue is **grouped by TU** and ordered **simple→hard**:
+   every `/Od` ("base", literal-lowering) TU before every `/O2` ("o2", FPO+regalloc)
+   TU, and within a tier by remaining bytes ascending. Within a TU, functions are in
+   retail-RVA (define) order.
+2. **Skip already-reconstructed RVAs.** The queue already drops them; if cross-checking
+   by hand, src `VA()` macros carry **absolute VAs** (`RVA + 0x400000`), so normalise
+   before comparing to the queue's RVAs. Also skip anything already `@early-stop`.
+3. **Match TU-by-TU, not function-by-function.** Hand a lane a **whole TU** (or a
+   **20+ function chunk** of a large one) and keep that lane on that TU until it is
+   **fully matched**, then give the lane the next simple TU. Tiny TUs (1–8 funcs):
+   bundle a few **adjacent, non-overlapping** TUs into one ≥20-func dispatch on a single
+   lane. **Drain all `/Od` TUs before starting any `/O2` TU.** With `/Od` + the solved
+   stack hash, ctors/dtors/leaf functions go to 100% cheaply — no EH wall to plateau on.
+   Do NOT interleave small functions across many TUs (the old size-band order) — a
+   half-touched TU per lane multiplies the shared-header/top-of-file churn.
 
 ## Dispatching a matcher into a pool slot
 
@@ -73,9 +84,12 @@ Spawn a **matcher** (`subagent_type: matcher`), **`run_in_background: true`**, *
 2. **Work cd-first, in ONE open shell:** `cd <abs worktree>` FIRST, then a single
    `nix develop .#build` shell, every `homm2 build`/`status` inside it. Absolute paths
    everywhere (relative paths can leak into master).
-3. Carry the target (RVA / mangled+demangled name / size / TU), the 8-digit address
-   convention, the **`scripts/od_slots.py` stack-naming workflow**, and the
-   push-to-100% mandate + byte-proven `@early-stop` (marker line + byte reason, no %).
+3. Carry a **whole-TU batch (20+ functions, or the entire TU if smaller)** — each as
+   RVA / mangled+demangled name / size — plus the TU name, the 8-digit ABSOLUTE-VA
+   convention (`VA(RVA+0x400000, size)`; placeholders in the scaffold already show it),
+   the **`scripts/od_slots.py` stack-naming workflow**, and the push-to-100% mandate +
+   byte-proven `@early-stop` (marker line + byte reason, no %). Tell the matcher to do
+   the functions in retail-RVA order and to report each one's result.
 4. **Forbid `homm2`-format-style reflows** — edit only the target file(s); leave
    formatting to integration.
 5. Report: final per-function % + one-line summary + the **complete `git diff`**.

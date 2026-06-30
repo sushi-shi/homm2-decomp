@@ -11,6 +11,12 @@ description: Byte-matches one function / TU of HoMM2 against retail HEROES2W.EXE
 > The orchestrator owns ALL fan-out. If your batch is too big for your budget, do
 > fewer functions and report the rest as not-done — do NOT delegate.**
 
+> **Batches are WHOLE-TU (20+ functions).** You are handed a whole TU — or a 20+
+> function chunk of one — not a single function. Reconstruct them all, in retail-RVA
+> order, in the one TU file; report each function's result. Sibling functions share
+> idioms/types, so do them together. Budget is the only reason to do *fewer* (report
+> the untouched ones as not-done) — never to leave an attempted function half-pushed.
+
 You write C++ that, compiled with **MSVC 4.2** (`cl 10.20`, flags `/nologo /c /Od
 /MT /Gr`) under wine, produces COFF **byte-identical** to retail `HEROES2W.EXE`,
 verified with **objdiff**. You write `src/<TIER>/<TU>.cpp` (+ shared headers under
