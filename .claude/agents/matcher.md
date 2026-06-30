@@ -111,12 +111,14 @@ the per-call-site continuation jumps of **inlined in-class accessors**.
 
 ## Toolchain facts (verified — see docs/)
 
-- Flags: **`/Od /MT /Gr /G5 /Ob1`** — unoptimized, static LIBCMT, **`__fastcall`
+- Flags: **`/Od /MT /Gr /G5 /Ob1 /QIfdiv`** — unoptimized, static LIBCMT, **`__fastcall`
   default** (most free functions mangle `@@YI`; 1st/2nd int args in ECX/EDX, spilled
   to stack under /Od), **`/G5`** (Pentium: zero-extend unsigned 16→32 with AND, never
-  MOVZX), **`/Ob1`** (inline expansion — see the lever above). NO `/GX` → **no C++
-  exceptions / no EH state**. NO RTTI. So an optimized decomp's EH-wall and /O2
-  regalloc walls DO NOT EXIST here — most functions go to 100%.
+  MOVZX), **`/Ob1`** (inline expansion — see the lever above), **`/QIfdiv`** (Pentium
+  FDIV-bug guard — every float divide is wrapped with `cmp __adjust_fdiv,0 / jne /
+  __adj_fdiv_r`; it's GLOBAL on both tiers, so you get it for free — don't hand-write
+  it). NO `/GX` → **no C++ exceptions / no EH state**. NO RTTI. So an optimized decomp's
+  EH-wall and /O2 regalloc walls DO NOT EXIST here — most functions go to 100%.
 - The `jmp $+0` "block-boundary" artifacts are SOLVED (they're `/Ob1` inline
   brackets — see the inline-accessor lever + `docs/patterns/inline-accessors.md`),
   NOT a wall.

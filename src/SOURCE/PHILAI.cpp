@@ -431,11 +431,6 @@ int philAI::ComputeValueOfFreeSS(hero *h, int ss) {
         return ComputeValueOfSS(h, ss, 1);
 }
 
-// @early-stop
-// Complete & byte-exact except the Pentium FDIV-bug guard around the one float divide:
-// retail wraps it with `cmp __adjust_fdiv,0 / jne / __adj_fdiv_r` (built with /QIfdiv —
-// 53 such sites in retail PHILAI); this build config omits /QIfdiv (0 sites), so only
-// that ~6-insn guard is absent. fild order (deficit then sp) already matches.
 VA(0x00443f1e, 0xa6)
 int philAI::ManaRefreshValue(hero *h, int level) {
     int v = 0;
