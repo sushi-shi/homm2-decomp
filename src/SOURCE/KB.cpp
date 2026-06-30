@@ -7,10 +7,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
 
 #include <SOURCE/advManager.h>
+#include <SOURCE/hero.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
+#include <BASE/inputManager.h>
 #include <BASE/resourceManager.h>
 #include <BASE/soundManager.h>
 #include <BASE/icon.h>
@@ -35,12 +38,65 @@ struct townSlot {
     char m_pad[0x64];
 };
 
-class game;
 class combatManager;
 class townManager;
+class town;
+
+class game {
+public:
+    int TransmitSaveGame(int, int, int);
+    int ReceiveSaveGame(int, int, int, int);
+};
+
+class mouseManager {
+public:
+    void ReallyHidePointer(void);
+    void ReallyShowPointer(void);
+};
+
+// ---- TU-local structs (sizes/offsets from retail disasm) ----
+struct tag_monsterInfo {
+    short m_0;
+    char m_pad[24];
+};                                  // sizeof 26
+
+struct SSpellInfo {
+    char m_pad0[14];
+    unsigned char m_e;
+    char m_pad1[7];
+};                                  // sizeof 22
+
+#pragma pack(push, 1)
+struct SWinSetup {
+    unsigned char m_0;
+    unsigned short m_1;
+    char *m_3;
+};                                  // packed, sizeof 7
+#pragma pack(pop)
+
+struct SPlayerExit {
+    signed char m_0, m_1, m_2, m_3, m_4, m_5, m_6;
+};                                  // sizeof 7
+
+struct SNetPlayerInfo {
+    char m_pad[0xcc];
+};
+
+#pragma pack(push, 1)
+struct playerRec {
+    char m_pad0[0x8f];
+    int resources[7];               // offset 0x8f
+    char m_pad1[0x70];
+};                                  // packed, sizeof 283
+#pragma pack(pop)
+
+#define KBFILE ((char *)"I:\\Projects\\Heroes\\Prog\\SOURCE\\KB.CPP")
+#define KBLINE (*(short *)"\xBE\x0C")
 
 extern "C" void PollSound(void);
 extern "C" __declspec(dllimport) int __stdcall MessageBoxA(void *, const char *, const char *, unsigned int);
+extern "C" __declspec(dllimport) int __stdcall SetMenu(void *, void *);
+extern "C" __declspec(dllimport) int __stdcall DestroyMenu(void *);
 
 long KBTickCount(void);
 void InitMainClasses(void);
@@ -58,6 +114,13 @@ void Process1WindowsMessage(void);
 void ShutDown(char *);
 void UpdateSystemOptionsMenu(void);
 int EventWindowHandler(struct tag_message &);
+char *GetRemoteData(signed char);
+int TransmitRemoteData(char *, int, int, signed char, signed char, signed char, signed char);
+void DelayMilli(long);
+void LogInt(char *, int, int, int, int, int, int, int);
+void BaseFree(void *, char *, int);
+void SetupDynamicWindow(int, int, int, int, int, int, int, int *, int *, int *, int *, int *, int *, class heroWindow **, int);
+void ReceiveRemotePlayerExit(SPlayerExit);
 
 extern game *gpGame;
 extern advManager *gpAdvManager;
@@ -93,6 +156,45 @@ extern int giTotalHighMem;
 extern int giHighMemBuffer;
 extern int iNextShingleAnim;
 extern int iShingleAnimFrame;
+
+extern inputManager *gpInputManager;
+extern mouseManager *gpMouseManager;
+extern int giCurPlayer;
+extern int giThisGamePos;
+extern int gbGameInitialized;
+extern int gbRemoteOn;
+extern int gbThisNetGotAdventureControl;
+extern char gbUseRegularCompression;
+extern char gbUseDiffCompression;
+extern int iMaxMapExtra;
+extern void **ppMapExtra;
+extern short *pwSizeOfMapExtra;
+extern void *hmnuApp;
+extern void *hmnuDflt;
+extern void *hmnuCmbt;
+extern void *hmnuTown;
+extern char *xNecromancerShrine;
+extern char *gWellExtraNames[];
+extern char *gSpecialBuildingNames[];
+extern char *gNeutralBuildingNames[];
+extern char *gDwellingNames[][12];
+extern int gMageBuildingCosts[][7];
+extern int gSpecialBuildingCosts[][7];
+extern int gNeutralBuildingCosts[][7];
+extern int gDwellingCosts[][12][7];
+extern int xShrineBuildingCost[];
+extern int gMageBaseResourceValues[];
+extern int gSpecialBuildingBaseResourceValues[];
+extern int gNeutralBaseResourceValues[];
+extern int gDwellingBaseResourceValues[][12];
+extern tag_monsterInfo gMonsterDatabase[];
+extern short giScoreMon[][2];
+extern short giScoreCampaignMon[][2];
+extern SWinSetup gWinSetup[];
+extern SSpellInfo gsSpellInfo[];
+extern SNetPlayerInfo gsNetPlayerInfo[];
+extern char cNetBoxLine[][140];
+extern char cNetBoxColor[];
 
 static long glNextPollTime;
 
@@ -176,10 +278,43 @@ VA(0x00499589, 0x1a7)
 // char * GetBuildingInfo(int, int, int);
 
 VA(0x00499730, 0xa4)
-// char * GetBuildingName(int, int);
+char *GetBuildingName(int race, int building)
+{
+    if (race == 5 && building == 2)
+        return xNecromancerShrine;
+    if (building == 0xb)
+        return gWellExtraNames[race];
+    else if (building == 0xd)
+        return gSpecialBuildingNames[race];
+    else if (building < 0x13)
+        return gNeutralBuildingNames[building];
+    else
+        return gDwellingNames[race][building];
+}
 
+// @early-stop
+// ~98%: 2-instruction /Od body-placement variance — retail emits the final
+// `else if (building<0x10)` body out-of-line (`jl body; jmp epi`); this build lowers it
+// inline (`jge skip`). Logic byte-exact otherwise; resisted every source structure tried.
 VA(0x004997d4, 0x138)
-// void GetBuildingCost(int, int, int * const, int);
+void GetBuildingCost(int race, int building, int *const dest, int mageLevel)
+{
+    int level;
+    if (building == 2 && race == 5) {
+        memcpy(dest, xShrineBuildingCost, 0x1c);
+    } else if (building >= 0x13 && building <= 0x1e) {
+        memcpy(dest, gDwellingCosts[race][building - 0x13], 0x1c);
+    } else if (building == 0) {
+        level = mageLevel + 1;
+        if (level > 5)
+            level = 5;
+        memcpy(dest, gMageBuildingCosts[mageLevel + 1], 0x1c);
+    } else if (building == 0xd) {
+        memcpy(dest, gSpecialBuildingCosts[race], 0x1c);
+    } else if (building < 0x10) {
+        memcpy(dest, gNeutralBuildingCosts[building], 0x1c);
+    }
+}
 
 VA(0x0049990c, 0x20)
 char *GetMonsterName(int m)
@@ -187,17 +322,77 @@ char *GetMonsterName(int m)
     return gArmyNames[m];
 }
 
+// @early-stop
+// ~99.6%: code bytes link-identical; residual is the switch jump/index-table reloc
+// names ($L... vs func+off) the delinker assigns differently. Confirmed same linked bytes.
 VA(0x0049992c, 0x140)
-// void GetMonsterCost(int, int * const);
+void GetMonsterCost(int monster, int *const cost)
+{
+    int idx;
+    for (idx = 0; idx < 7; idx++)
+        cost[idx] = 0;
+    cost[6] = gMonsterDatabase[monster].m_0;
+    switch (monster) {
+    case 60:
+        cost[5] = 1;
+        break;
+    case 28:
+        cost[1] = 1;
+        break;
+    case 19:
+        cost[4] = 1;
+        break;
+    case 35:
+    case 36:
+        cost[3] = 1;
+        break;
+    case 37:
+        cost[3] = 2;
+        break;
+    case 45:
+        cost[5] = 1;
+        break;
+    case 46:
+        cost[5] = 2;
+        break;
+    }
+}
 
 VA(0x00499a6c, 0x2b5)
 // int CanBuild(class town *, int);
 
 VA(0x00499d21, 0x9a)
-// int CanBuy(class town *, int);
+int CanBuy(town *t, int type)
+{
+    int buf[7];
+    playerRec *ptr;
+    int idx;
+    GetBuildingCost(*((signed char *)t + 3), type, buf, *((signed char *)t + 0x1c));
+    ptr = (playerRec *)((char *)(giCurPlayer + (playerRec *)gpGame) + 0x49c);
+    for (idx = 0; idx < 7; idx++)
+        if (ptr->resources[idx] < buf[idx])
+            return 0;
+    return 1;
+}
 
 VA(0x00499dbb, 0xc6)
-// int GetBuildingBaseResourceValue(int, int, int);
+int GetBuildingBaseResourceValue(int race, int building, int level)
+{
+    if (race == 5 && building == 5)
+        return 1000;
+    if (building < 0x13 || building > 0x1e) {
+        if (building > 0xf)
+            return 0;
+        else if (building == 0)
+            return gMageBaseResourceValues[level];
+        else if (building == 0xd)
+            return gSpecialBuildingBaseResourceValues[race];
+        else
+            return gNeutralBaseResourceValues[building];
+    } else {
+        return gDwellingBaseResourceValues[race][building];
+    }
+}
 
 VA(0x00499e81, 0x21e)
 // int WaitHandler(struct tag_message &);
@@ -218,7 +413,23 @@ VA(0x0049a6c1, 0x19bb)
 // void CheckEndGame(int, int);
 
 VA(0x0049c07c, 0x95)
-// void QuickViewWait(void);
+void QuickViewWait(void)
+{
+    tag_message ev;
+    int done;
+    gpMouseManager->ReallyHidePointer();
+    done = 0;
+    while (!done) {
+        PollSound();
+        Process1WindowsMessage();
+        ev = gpInputManager->GetEvent();
+        if (ev.type == 0x40 || ev.type == 8 || ev.type == 0x10)
+            done = 1;
+        else
+            done = 0;
+    }
+    gpMouseManager->ReallyShowPointer();
+}
 
 VA(0x0049c111, 0x201)
 // void InitVars(void);
@@ -230,10 +441,37 @@ VA(0x0049c92d, 0x371)
 // void game::ShowLuckInfo(class hero *, int);
 
 VA(0x0049cc9e, 0xd7)
-// void ClearMapExtra(void);
+void ClearMapExtra(void)
+{
+    int i;
+    for (i = 0; i < iMaxMapExtra; i++) {
+        if (ppMapExtra[i])
+            BaseFree(ppMapExtra[i], KBFILE, KBLINE + 6);
+    }
+    if (ppMapExtra)
+        BaseFree(ppMapExtra, KBFILE, KBLINE + 9);
+    ppMapExtra = 0;
+    if (pwSizeOfMapExtra)
+        BaseFree(pwSizeOfMapExtra, KBFILE, KBLINE + 0xd);
+    pwSizeOfMapExtra = 0;
+    iMaxMapExtra = 0;
+}
 
 VA(0x0049cd75, 0x9f)
-// int GetMonType(int, int);
+int GetMonType(int score, int campaign)
+{
+    int idx;
+    for (idx = 0x41; idx >= 0; idx--) {
+        if (campaign == 0 || campaign == 2) {
+            if (giScoreCampaignMon[idx][0] >= score)
+                return giScoreCampaignMon[idx][1];
+        } else {
+            if (giScoreMon[idx][0] <= score)
+                return giScoreMon[idx][1];
+        }
+    }
+    return giScoreMon[0][1];
+}
 
 VA(0x0049ce14, 0x4ac)
 // int AddScoreToHighScore(int, int, int, int, char *);
@@ -266,19 +504,63 @@ int NetPosToGamePos(int netPos)
 }
 
 VA(0x0049d3a7, 0xff)
-// int WaitForOtherPlayer(void);
+int WaitForOtherPlayer(void)
+{
+    int result = 0;
+    char *data;
+    PollSound();
+    data = GetRemoteData(1);
+    if (data && data[5] == 2) {
+        switch (data[6]) {
+        case 0x20:
+            memcpy(gbGamePosToNetPos, data + 9, 6);
+            gbUseRegularCompression = data[0xf];
+            gbUseDiffCompression = data[0x10];
+            memcpy(gsNetPlayerInfo, data + 0x11, 0xcc);
+            giThisGamePos = NetPosToGamePos(giThisNetPos);
+            break;
+        case 1:
+            result = gpGame->ReceiveSaveGame(*(int *)(data + 9), *(int *)(data + 0xd),
+                                             *(int *)(data + 0x11), data[0]);
+            break;
+        }
+    }
+    return result;
+}
 
 VA(0x0049d4a6, 0xb85)
 // void PopNetBox(char *, int);
 
 VA(0x0049e02b, 0xc7)
-// void AddNetBoxLine(char *, char);
+void AddNetBoxLine(char *str, char color)
+{
+    if (color < 0 || color > 6)
+        color = 6;
+    strcpy(cNetBoxLine[0], cNetBoxLine[1]);
+    strcpy(cNetBoxLine[1], cNetBoxLine[2]);
+    strcpy(cNetBoxLine[2], cNetBoxLine[3]);
+    strcpy(cNetBoxLine[3], str);
+    cNetBoxColor[0] = cNetBoxColor[1];
+    cNetBoxColor[1] = cNetBoxColor[2];
+    cNetBoxColor[2] = cNetBoxColor[3];
+    cNetBoxColor[3] = color;
+}
 
 VA(0x0049e0f2, 0x214)
 // void ShutDown(char *);
 
 VA(0x0049e306, 0xa2)
-// void FileError(char *);
+void FileError(char *filename)
+{
+    char buf1[500];
+    int err;
+    char buf[500];
+    err = errno;
+    sprintf(buf1, "File Error %s", strerror(err));
+    LogInt(buf1, err, -999, -999, -999, -999, -999, -999);
+    sprintf(buf, "Error opening file %s!", filename);
+    ShutDown(buf);
+}
 
 VA(0x0049e3a8, 0x255)
 // void SmackFade(unsigned char *, unsigned char *);
@@ -287,7 +569,21 @@ VA(0x0049e5fd, 0x303)
 // void ShowCongrats(int);
 
 VA(0x0049e900, 0x99)
-// void CongratsWait(void);
+void CongratsWait(void)
+{
+    int cmd = 0;
+    int done = 0;
+    tag_message msg;
+    gpInputManager->Flush();
+    while (!done) {
+        PollSound();
+        Process1WindowsMessage();
+        msg = gpInputManager->GetEvent();
+        if (msg.type == 1 || msg.type == 8 || msg.type == 0x10 || msg.type == 0x20 ||
+            msg.type == 0x40)
+            done = 1;
+    }
+}
 
 VA(0x0049e999, 0x54)
 SAMPLE2 LoadPlaySample(char *name)
@@ -372,7 +668,21 @@ VA(0x0049f61d, 0x310)
 // void UpdateSystemOptionsMenu(void);
 
 VA(0x0049f92d, 0x99)
-// void CleanUpMenus(void);
+void CleanUpMenus(void)
+{
+    if (hmnuApp) {
+        SetMenu(hwndApp, 0);
+        if (hmnuAdv)
+            DestroyMenu(hmnuAdv);
+        if (hmnuDflt)
+            DestroyMenu(hmnuDflt);
+        if (hmnuCmbt)
+            DestroyMenu(hmnuCmbt);
+        if (hmnuTown)
+            DestroyMenu(hmnuTown);
+    }
+    hmnuApp = 0;
+}
 
 VA(0x0049f9c6, 0x2a)
 void UpdateAppSpecificMenus(void *hMenu)
@@ -398,13 +708,70 @@ VA(0x0049fa70, 0x6bc)
 // void SetupDynamicWindow(int, int, int, int, int, int, int, int *, int *, int *, int *, int *, int *, class heroWindow * *, int);
 
 VA(0x004a012c, 0x108)
-// void TestDynamicWindow(int, int);
+void TestDynamicWindow(int p1, int p2)
+{
+    heroWindow *p;
+    int q, r, s, u, v, w;
+    int t;
+    SetupDynamicWindow(0, 0, 1, 640, 480, p1 * 48, p2 * 48, &s, &u, &v, &w, &q, &r, &p, 0);
+    gpWindowManager->AddWindow(p, -1, 1);
+    t = 0;
+    gpInputManager->Flush();
+    while (!t) {
+        Process1WindowsMessage();
+        switch (gpInputManager->GetEvent().type) {
+        case 1:
+        case 8:
+        case 0x20:
+            t = 1;
+        }
+    }
+    gpWindowManager->RemoveWindow(p);
+    delete p;
+}
 
 VA(0x004a0234, 0x91)
-// void HandleRemoteDeadPlayerExit(int);
+void HandleRemoteDeadPlayerExit(int pos)
+{
+    SPlayerExit pe;
+    if (giThisGamePos == pos) {
+        if (!gpGame->TransmitSaveGame((giThisNetPos + 1) % giNumHumanPlayers, 1, 0))
+            ShutDown(0);
+        RemoteCleanup();
+    } else {
+        pe.m_0 = gbGamePosToNetPos[pos];
+        pe.m_1 = pos;
+        pe.m_2 = 0;
+        pe.m_3 = 0;
+        pe.m_4 = 1;
+        pe.m_5 = 0;
+        ReceiveRemotePlayerExit(pe);
+    }
+}
 
 VA(0x004a02c5, 0xaa)
-// void HandleRemoteSuddenExit(void);
+void HandleRemoteSuddenExit(void)
+{
+    int a;
+    char buf[5];
+    if (!gbGameInitialized)
+        return;
+    if (!gbRemoteOn)
+        return;
+    buf[0] = giThisNetPos;
+    buf[1] = giThisGamePos;
+    buf[2] = gbThisNetGotAdventureControl;
+    buf[3] = 0;
+    buf[4] = 0;
+    if (giThisNetPos == 0)
+        a = 1;
+    else
+        a = 0;
+    LogStr("HRSE1");
+    TransmitRemoteData(buf, a, 7, 0x1f, 0, 0, 2);
+    LogStr("HRSE2");
+    DelayMilli(500);
+}
 
 VA(0x004a036f, 0x62)
 void DropDownToOnePlayer(void)
@@ -432,10 +799,39 @@ int CheckMem(void)
 }
 
 VA(0x004a0b6d, 0x109)
-// int GetManaCost(int, class hero *);
+int GetManaCost(int spell, hero *h)
+{
+    int c = gsSpellInfo[spell].m_e;
+    if (h != 0) {
+        if (h->HasArtifact(0x29) && (spell == 0x12 || spell == 0x13))
+            c >>= 1;
+        if (h->HasArtifact(0x2c) && (spell == 0x1a || spell == 0x1f || spell == 0x1e || spell == 0xd))
+            c >>= 1;
+        if (h->HasArtifact(0x33) && (spell == 0xe || spell == 0xf))
+            c >>= 1;
+        if (h->HasArtifact(0x36) && (spell == 0x2b || spell == 0x2c || spell == 0x2d || spell == 0x2e))
+            c >>= 1;
+    }
+    return c;
+}
 
 VA(0x004a0c76, 0x9f)
-// void SetWinText(class heroWindow *, int);
+void SetWinText(heroWindow *j, int id)
+{
+    int a = 0;
+    int i;
+    tag_message c;
+    for (i = 0; i < 0x49; i++) {
+        if (gWinSetup[i].m_0 == id) {
+            a++;
+            c.type = 0x200;
+            c.field4 = 3;
+            c.field8 = gWinSetup[i].m_1;
+            c.text = gWinSetup[i].m_3;
+            j->BroadcastMessage(c);
+        }
+    }
+}
 
 VA(0x004a0d15, 0x8a)
 void CheckShingleUpdate(void)
