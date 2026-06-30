@@ -7,12 +7,15 @@
 #include <stdio.h>
 #include <SOURCE/game.h>
 #include <SOURCE/playerData.h>
+#include <SOURCE/town.h>
+#include <SOURCE/searchArray.h>
+#include <SOURCE/advManager.h>
+#include <SOURCE/armyGroup.h>
 #include <EDITOR/mapcell.h>
+#include <EDITOR/fullMap.h>
 #include <BASE/soundManager.h>
 #include <BASE/resourceManager.h>
 #include <BASE/heroWindowManager.h>
-
-class advManager;
 
 extern soundManager *gpSoundManager;
 extern game *gpGame;
@@ -26,6 +29,49 @@ extern int bShowIt;
 extern void AiPrint(char *);
 extern void IconToBitmap(class icon *, class bitmap *, int, int, int, int, int, int, int, int, int);
 void CompressTest2(void);
+
+// --- globals referenced below ---
+extern int MAP_WIDTH;
+extern int MAP_HEIGHT;
+extern unsigned char *mapExtra;
+extern unsigned char giGroundToTerrain[];
+extern signed char gbThisNetHumanPlayer[];
+extern int giCurPlayer;
+extern int gbAllBlack;
+extern void **ppMapExtra;
+extern signed char xIsExpansionMap;
+extern char bMapInitialized;
+extern searchArray *gpSearchArray;
+struct configStruct { char pad[0x1a0]; };
+extern configStruct gConfig;
+struct EventExtra;
+
+// --- free functions referenced below ---
+extern int CalcTerrainCost(int, int, int, int, int, int);
+extern void SendMapChange(int, signed char, unsigned char, unsigned char, int, unsigned char, unsigned char);
+extern void *BaseAlloc(unsigned int, char *, int);
+extern void BaseFree(void *, char *, int);
+extern long FileSize(char *);
+extern int calc_crc_long(unsigned char *, int);
+extern void FileError(char *);
+extern "C" int __cdecl _open(const char *, int);
+extern "C" int __cdecl _read(int, void *, unsigned int);
+extern "C" int __cdecl _close(int);
+extern "C" void *__cdecl memset(void *, int, unsigned int);
+
+// GAME's BaseAlloc/BaseFree pass __FILE__ + a source line number. The retail
+// encodes the base line as a 2-byte string read via movswl, then adds a per-call
+// delta; reproduce byte-exactly. __FILE__ is the original build path (reloc-masked).
+#define GFILE ((char *)"I:\\Projects\\Heroes\\Prog\\SOURCE\\GAME.CPP")
+
+// fullMap is embedded in `game` at this+0xb3e; the retail folds the +0xb3e into the
+// member offsets and inlines Row/Extra (/Ob1), so access it inline via the cast.
+#define WORLDMAP ((fullMap *)((char *)this + 0xb3e))
+
+// Inline accessors that reference gpGame directly (the retail emits `add [gpGame]`
+// + a per-call `jmp $+0`), so they are free inline helpers, not game methods.
+inline town *GetCastle(int idx) { return (town *)((char *)gpGame + idx * 100 + 0xb53); }
+inline signed char PlayerEventByte(signed char color) { return ((signed char *)gpGame)[color * 283 + 0x49c]; }
 
 struct SCreatureInfo {
     unsigned short value;
@@ -71,7 +117,26 @@ int GetNumObelisks(int color)
 }
 
 VA(0x00470f10, 0xca)
-// int playerData::BuildingsOwned(int, int, int);
+int playerData::BuildingsOwned(int a, int b, int c)
+{
+    int count = 0;
+    int i;
+    for (i = 0; i < ((signed char *)this)[0x44]; i++) {
+        signed char *town = (signed char *)((char *)gpGame + ((signed char *)this)[i + 0x47] * 100 + 0xb53);
+        if (b < 0x13 || town[3] == a) {
+            if (b == 0) {
+                if (*(int *)(town + 0x18) & 1) {
+                    if (town[0x1c] == c)
+                        count++;
+                }
+            } else {
+                if (*(int *)(town + 0x18) & (1 << b))
+                    count++;
+            }
+        }
+    }
+    return count;
+}
 
 VA(0x00470fda, 0x97)
 int playerData::NumOfGivenArtifact(int artifact)
@@ -108,7 +173,15 @@ VA(0x00471500, 0x2ac)
 // int game::SetupPuzzlePieces(int, int);
 
 VA(0x004717ac, 0xb5)
-// int game::IsMobile(int);
+int game::IsMobile(int heroId)
+{
+    if (heroId == -1)
+        return 0;
+    char *hp = (char *)this + heroId * 250 + 0x27c4;
+    mapCell *cp = gpAdvManager->GetCell(*(int *)(hp + 0x19), *(int *)(hp + 0x1d));
+    return CalcTerrainCost(giGroundToTerrain[cp->tile], 1, *(int *)(hp + 0x35),
+                           ((signed char *)hp)[0x74], cp->objFlag1, 0) <= *(int *)(hp + 0x35);
+}
 
 VA(0x00471861, 0x1e)
 fullMap *game::GetWorldMapData(void)
@@ -117,7 +190,27 @@ fullMap *game::GetWorldMapData(void)
 }
 
 VA(0x0047187f, 0x11e)
-// int game::CreateBoat(int, int, int);
+int game::CreateBoat(int x, int y, int notify)
+{
+    int boatIdx = Scan((signed char *)this + 0x631d, 0, 0x30);
+    if (boatIdx != -1) {
+        if (notify == 0)
+            SendMapChange(4, 0, x, y, -999, 0, 0);
+        ((char *)this)[boatIdx + 0x631d] = (char)boatIdx;
+        char *boat = (char *)this + boatIdx * 8 + 0x619d;
+        boat[0] = (char)boatIdx;
+        boat[1] = (char)x;
+        boat[2] = (char)y;
+        boat[3] = 2;
+        boat[7] = (char)giCurPlayer;
+        mapCell *cell = WORLDMAP->Row(y) + x;
+        boat[4] = ((char *)cell)[9];
+        boat[5] = (char)cell->w4hi;
+        ((char *)cell)[9] = (char)0xab;
+        cell->w4hi = boatIdx;
+    }
+    return boatIdx;
+}
 
 VA(0x0047199d, 0x5a)
 int game::Scan(signed char *array, int start, int length)
@@ -326,7 +419,19 @@ VA(0x0047f5f1, 0x619)
 // void game::RandomizeMine(int, int);
 
 VA(0x0047fc0a, 0xc6)
-// void game::InitRandomArtifacts(void);
+void game::InitRandomArtifacts(void)
+{
+    int xx;
+    memset((char *)this + 0x6136, 0, 0x67);
+    int x;
+    for (x = 0; x < MAP_WIDTH; x++) {
+        for (int y = 0; y < MAP_HEIGHT; y++) {
+            mapCell *cell = WORLDMAP->Row(y) + x;
+            if (((unsigned char *)cell)[9] == 0xa9)
+                ((char *)this)[0x6136 + (((unsigned char *)cell)[3] >> 1)] = 1;
+        }
+    }
+}
 
 VA(0x0047fcd0, 0x17f)
 // int game::GetRandomArtifactId(int, int);
@@ -352,11 +457,56 @@ VA(0x0048041e, 0x746)
 VA(0x00480b64, 0x230)
 // void game::SetVisibility(int, int, int, int);
 
+// @early-stop
+// Logic + frame slots byte-exact; residual is 3 commutative operand-load swaps (the
+// inner-loop test y<MAP_HEIGHT and the two y*MAP_WIDTH index multiplies load the OTHER
+// operand into eax first). Not source-steerable (operand order / reversed compare /
+// extra temp all tested - no effect): it is the TU-cumulative /Od eval-order parity of
+// the partial GAME TU (most preceding functions are still placeholders, so the temp
+// counter is off from retail). Same class as the ExperienceValueOfStack @early-stop;
+// aligns when GAME is fuller.
 VA(0x00480d94, 0xd8)
-// void game::MakeAllWaterVisible(int);
+void game::MakeAllWaterVisible(int player)
+{
+    char mask = (char)(1 << player);
+    int x;
+    int y;
+    for (x = 0; x < MAP_WIDTH; x++) {
+        for (y = 0; y < MAP_HEIGHT; y++) {
+            if (giGroundToTerrain[WORLDMAP->Row(y)[x].tile] == 0)
+                mapExtra[y * MAP_WIDTH + x] |= mask;
+        }
+    }
+}
 
 VA(0x00480e6c, 0xfc)
-// void game::GiveArmy(class armyGroup *, int, int, int);
+void game::GiveArmy(armyGroup *group, int type, int count, int slot)
+{
+    int tmp;
+    int i;
+    if (slot >= 0) {
+        i = slot;
+        ((char *)group)[i] = (char)type;
+        i[(short *)((char *)group + 5)] = 0;
+    } else {
+        for (i = 0; i < 5; i++) {
+            if (((signed char *)group)[i] == type)
+                break;
+        }
+        if (i >= 5) {
+            for (i = 0; i < 5; i++) {
+                if (((signed char *)group)[i] < 0) {
+                    i[(short *)((char *)group + 5)] = 0;
+                    break;
+                }
+            }
+        }
+        if (i >= 5)
+            return;
+    }
+    ((char *)group)[i] = (char)type;
+    i[(short *)((char *)group + 5)] += count;
+}
 
 // @early-stop
 // ~96%: only the operand-load order of one ((signed char*)group)[i] read differs
@@ -382,8 +532,30 @@ int game::ExperienceValueOfStack(armyGroup *group, hero *h)
 VA(0x00480ff9, 0x126)
 // int game::GetLuck(class hero *, class army *, class town *);
 
+// @early-stop
+// Logic + frame slots byte-exact (col/row/mask + nested x/y land on retail's -0x4..-0x14
+// via the {} block); residual is the same TU-cumulative /Od eval-order parity as
+// MakeAllWaterVisible - the inner-loop test and the y*MAP_WIDTH multiplies load the other
+// operand first. Aligns when GAME is fuller.
 VA(0x0048111f, 0xf1)
-// void game::SetupAdjacentMons(void);
+void game::SetupAdjacentMons(void)
+{
+    int col;
+    int row;
+    unsigned char mask = 0x7f;
+    {
+        int x;
+        int y;
+        for (x = 0; x < MAP_WIDTH; x++) {
+            for (y = 0; y < MAP_HEIGHT; y++) {
+                if (gpAdvManager->FindAdjacentMonster(x, y, &col, &row, -1, -1))
+                    mapExtra[y * MAP_WIDTH + x] |= 0x80;
+                else
+                    mapExtra[y * MAP_WIDTH + x] &= mask;
+            }
+        }
+    }
+}
 
 VA(0x00481210, 0x61)
 void game::CancelComputerScreen(void)
@@ -397,7 +569,25 @@ void game::CancelComputerScreen(void)
 }
 
 VA(0x00481271, 0xed)
-// void game::ShowComputerScreen(void);
+void game::ShowComputerScreen(void)
+{
+    if (*(int *)((char *)&gConfig + 0x18)) {
+        int saved = gbThisNetHumanPlayer[giCurPlayer];
+        gbThisNetHumanPlayer[giCurPlayer] = 1;
+        int i;
+        for (i = 1; i <= 6; i++)
+            gpWindowManager->BroadcastMessage(0x200, 5, i, 0x4008);
+        gbAllBlack = 1;
+        gpAdvManager->CompleteDraw(1);
+        gpAdvManager->UpdateHeroLocators(1, 1);
+        gpAdvManager->UpdateTownLocators(1, 1);
+        gpAdvManager->UpdBottomView(1, 1, 1);
+        gpAdvManager->UpdateScreen(0, 1);
+        gbAllBlack = 0;
+        gbThisNetHumanPlayer[giCurPlayer] = (signed char)saved;
+    }
+    ShowHeroesLogo();
+}
 
 VA(0x0048135e, 0xa0)
 void game::ShowHeroesLogo(void)
@@ -415,8 +605,25 @@ void game::ShowHeroesLogo(void)
 VA(0x004813fe, 0x143)
 // void game::WaitForPlayer(char *, int);
 
+// @early-stop
+// Computation byte-exact; residual is 2 inline-accessor jmp$+0 brackets the /Ob1
+// expander places leading (after the ternary test) where retail places them trailing
+// (after the Extra() body) - the documented /Od /Ob1 block-boundary artifact, identical
+// in kind to EDITOR/mapcell GetNewCellExtra*. See docs/patterns/inline-accessors.md.
 VA(0x00481541, 0x104)
-// int game::HasLateOverlay(int, int);
+int game::HasLateOverlay(int col, int row)
+{
+    mapCell *cell = WORLDMAP->Row(row) + col;
+    if (cell->ovlFlag1)
+        return 1;
+    mapCellExtra *extra = cell->extra ? WORLDMAP->Extra(cell->extra) : 0;
+    while (extra) {
+        if (extra->ovlFlag1)
+            return 1;
+        extra = extra->index ? WORLDMAP->Extra(extra->index) : 0;
+    }
+    return 0;
+}
 
 VA(0x00481645, 0x120)
 // void game::ConvertFlagToLateOverlay(int, int);
@@ -424,8 +631,23 @@ VA(0x00481645, 0x120)
 VA(0x00481765, 0x13b)
 // int game::HasObjectTilesetIndex(int, int, int, int);
 
+// @early-stop
+// Twin of HasLateOverlay: computation byte-exact; only the 2 inline-accessor jmp$+0
+// brackets (Extra()) are placed leading vs retail's trailing - the same /Od /Ob1
+// block-boundary artifact. See docs/patterns/inline-accessors.md.
 VA(0x004818a0, 0x112)
-// void game::ConvertAllToLateOverlay(int, int);
+void game::ConvertAllToLateOverlay(int col, int row)
+{
+    mapCell *cell = WORLDMAP->Row(row) + col;
+    if (cell->ovlIndex != 0xff)
+        cell->ovlFlag1 = 1;
+    mapCellExtra *extra = cell->extra ? WORLDMAP->Extra(cell->extra) : 0;
+    while (extra) {
+        if (extra->ovlIndex != 0xff)
+            extra->ovlFlag1 = 1;
+        extra = extra->index ? WORLDMAP->Extra(extra->index) : 0;
+    }
+}
 
 VA(0x004819b2, 0x295)
 // void game::ProcessMapExtra(void);
@@ -460,12 +682,6 @@ int game::GetBoatsBuilt(void)
     return count;
 }
 
-// @early-stop
-// ~92%: only the 8-instr index reduction of the inner town-list read differs. Retail
-// fuses i + color*283 into one lea with this-base + disp 0x4e3; MSVC emits that fused
-// form only for a pointer-cast ((T(*)[283])P)[c][i], which would fold 0x4e3 into the
-// base (disp 0) and break the byte-exact testb $2,mem + downstream. The member-2D form
-// here keeps everything else byte-exact and localizes the residual to these 8 bytes.
 VA(0x00484471, 0x9c)
 int game::GetNumThievesGuilds(int color)
 {
@@ -479,22 +695,131 @@ int game::GetNumThievesGuilds(int color)
 }
 
 VA(0x0048450d, 0x113)
-// int game::CalcDifficultyRating(void);
+int game::CalcDifficultyRating(void)
+{
+    int notused;
+    int rating = 0;
+    if (((signed char *)this)[0x465] == 0)
+        rating += 0x32;
+    else if (((signed char *)this)[0x465] == 1)
+        rating += 0x50;
+    else if (((signed char *)this)[0x465] == 2)
+        rating += 0x64;
+    else if (((signed char *)this)[0x465] == 3)
+        rating += 0x78;
+    else if (((signed char *)this)[0x465] == 4)
+        rating += 0x8c;
+    if (((unsigned char *)this)[0x2ad] == 0)
+        ;
+    else if (((unsigned char *)this)[0x2ad] == 1)
+        rating += 0x14;
+    else if (((unsigned char *)this)[0x2ad] == 2)
+        rating += 0x28;
+    else if (((unsigned char *)this)[0x2ad] == 3)
+        rating += 0x50;
+    return rating;
+}
 
 VA(0x00484620, 0x1ea)
 // int CalcBaseScore(int);
 
+// @early-stop
+// ~99.9%: logic byte-exact (matched 100% standalone); tiny residual is the same
+// TU-cumulative /Od operand-load-order parity as the other GAME parks — should resolve
+// as the surrounding GAME functions are reconstructed.
 VA(0x0048480a, 0xb5)
-// void game::RestoreCell(int, int, int, int, class mapCell *, int);
+void game::RestoreCell(int x, int y, int obj, int barrier, mapCell *passedCell, int p6)
+{
+    mapCell *cell;
+    if (passedCell)
+        cell = passedCell;
+    else
+        cell = gpAdvManager->GetCell(x, y);
+    if (y > 0 && obj == 0xa3 &&
+        ((unsigned char *)gpAdvManager->GetCell(x, y - 1))[9] != 0x23) {
+        ((char *)cell)[9] = 0;
+        cell->w4hi = 0;
+    } else {
+        ((char *)cell)[9] = (char)obj;
+        cell->w4hi = barrier;
+    }
+}
 
+// @early-stop
+// Condition (3-term &&), reinit, and realloc (BaseFree/BaseAlloc/memset) all byte-exact;
+// residual is 2 redundant jumps retail /Od emits for the empty then-branch of the
+// if/else - an end-of-function trampoline (jmp $+0 class) plus a dead `jmp realloc` -
+// that my build collapses to one direct jmp. A /Od jump-layout artifact of the empty
+// then; not behaviorally meaningful.
 VA(0x004848bf, 0xe3)
-// void game::SetMapSize(int, int);
+void game::SetMapSize(int w, int h)
+{
+    if (MAP_HEIGHT == h && MAP_WIDTH == w && bMapInitialized) {
+    } else {
+        bMapInitialized = 1;
+        MAP_WIDTH = w;
+        MAP_HEIGHT = h;
+        gpSearchArray->Init();
+    }
+    if (mapExtra)
+        BaseFree(mapExtra, GFILE, *(short *)"\x0d\x1d" + 0xc);
+    mapExtra = (unsigned char *)BaseAlloc(MAP_WIDTH * MAP_HEIGHT, GFILE, *(short *)"\x0d\x1d" + 0xd);
+    memset(mapExtra, 0, MAP_WIDTH * MAP_HEIGHT);
+}
 
+// @early-stop
+// Logic + frame slots byte-exact; residual is the operand-eval order of the two
+// `flags |= <extracted len bits>` ORs: retail loads `flags` into al first (then keeps
+// len in ecx and pulls the shifted byte via ch), my build evaluates the value first and
+// ORs flags from memory. Same TU-cumulative /Od eval-order parity as MakeAllWaterVisible;
+// not source-steerable. Aligns when GAME is fuller.
 VA(0x004849a2, 0x100)
-// void WriteDiffHeaderInfo(unsigned char, int, unsigned char *, int *);
+void WriteDiffHeaderInfo(unsigned char cmd, int len, unsigned char *buf, int *pos)
+{
+    unsigned char flags = 0;
+    flags = (cmd << 7) | flags;
+    if (len > 0x1fff) {
+        flags |= 0x40;
+        flags |= (len & 0x2f0000) >> 16;
+        unsigned short word = (unsigned short)(len & 0xffff);
+        buf[*pos] = flags;
+        *(unsigned short *)(buf + *pos + 1) = word;
+        *pos += 3;
+    } else if (len > 0x1f) {
+        flags |= 0x20;
+        flags |= (len >> 8) & 0x1f;
+        unsigned char lo = (unsigned char)len;
+        buf[*pos] = flags;
+        buf[*pos + 1] = lo;
+        *pos += 2;
+    } else {
+        flags |= (unsigned char)len;
+        buf[*pos] = flags;
+        (*pos)++;
+    }
+}
 
 VA(0x00484aa2, 0xab)
-// int GetSkipCopyLen(unsigned char *, int *);
+int GetSkipCopyLen(unsigned char *buf, int *pos)
+{
+    unsigned char b = buf[*pos];
+    int len;
+    if (b & 0x40) {
+        len = b & 0x3f;
+        len <<= 16;
+        len |= *(unsigned short *)(buf + *pos + 1);
+        *pos += 3;
+    } else if (b & 0x20) {
+        len = b & 0x1f;
+        len <<= 8;
+        len |= buf[*pos + 1];
+        *pos += 2;
+    } else {
+        len = b & 0x1f;
+        (*pos)++;
+    }
+    return len;
+}
 
 VA(0x00484b4d, 0x5ba)
 // void CreateDiffFile(char *, char *, char *, int, int);
@@ -528,7 +853,19 @@ VA(0x0048558f, 0x79f)
 // void game::SetupNewRumour(void);
 
 VA(0x00485d2e, 0xd9)
-// struct EventExtra * GetMapEvent(int, int);
+EventExtra *GetMapEvent(int x, int y)
+{
+    int i;
+    for (i = 0; i < *(unsigned short *)((char *)gpGame + 0x657b); i++) {
+        EventExtra *ev = (EventExtra *)ppMapExtra[*(unsigned short *)((char *)gpGame + 0x657d + i * 2)];
+        if (*(unsigned short *)((char *)ev + 0x26) == x &&
+            *(unsigned short *)((char *)ev + 0x28) == y &&
+            ((signed char *)ev)[0x25] != 0 &&
+            ((unsigned char *)ev)[0x2b + PlayerEventByte(giCurPlayer)] != 0)
+            return ev;
+    }
+    return 0;
+}
 
 VA(0x00485e07, 0x34c)
 // void game::CheckForTimeEvent(void);
@@ -537,7 +874,19 @@ VA(0x00486153, 0x143)
 // void CheckValidAvailableHeroes(void);
 
 VA(0x00486296, 0xab)
-// int CalcFileCRC(char *);
+int CalcFileCRC(char *filename)
+{
+    long size = FileSize(filename);
+    char *block = (char *)BaseAlloc(size, GFILE, *(short *)"\x5e\x1f" + 3);
+    int hand = _open(filename, 0x8000);
+    if (hand == -1)
+        FileError(filename);
+    _read(hand, block, size);
+    int crc = calc_crc_long((unsigned char *)block, size);
+    _close(hand);
+    BaseFree(block, GFILE, *(short *)"\x5e\x1f" + 0xe);
+    return crc;
+}
 
 VA(0x00486341, 0x153)
 // void CompressTest2(void);
@@ -557,8 +906,37 @@ void CompressTest3(void)
     }
 }
 
+// @early-stop
+// Logic + frame slots byte-exact (count/cell function-scope, col/row/castle in the {}
+// block -> retail's -0x4..-0x14); residual is the same TU-cumulative /Od eval-order
+// parity - both loop tests (row<MAP_HEIGHT, col<MAP_WIDTH) load the global into eax
+// first in retail vs the loop var in my build. Aligns when GAME is fuller.
 VA(0x004866a5, 0x119)
-// int game::CountShrines(int);
+int game::CountShrines(int player)
+{
+    if (xIsExpansionMap == 0)
+        return 0;
+    int count = 0;
+    mapCell *cell;
+    {
+        int col;
+        int row;
+        town *castle;
+        for (row = 0; row < MAP_HEIGHT; row++) {
+            for (col = 0; col < MAP_WIDTH; col++) {
+                cell = WORLDMAP->Row(row) + col;
+                if (((unsigned char *)cell)[9] == 0xa3) {
+                    castle = GetCastle(cell->w4hi);
+                    if (((signed char *)castle)[1] == player &&
+                        (*(int *)((char *)castle + 0x18) & 4) &&
+                        ((signed char *)castle)[3] == 5)
+                        count++;
+                }
+            }
+        }
+    }
+    return count;
+}
 
 // ---- data / globals / vtables ----
 DATA(0x004f70e0)  // int gbGameOver
