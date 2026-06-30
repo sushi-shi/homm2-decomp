@@ -4,6 +4,10 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+
+struct tag_message;
+int EventWindowHandler(struct tag_message &);
+
 VA(0x00496450, 0x14e)
 // @PollSound@0;
 
@@ -38,7 +42,10 @@ VA(0x00498d2d, 0x698)
 // int InitMenuHandler(struct tag_message &);
 
 VA(0x004993c5, 0x1b)
-// int NullHandler(struct tag_message &);
+int NullHandler(struct tag_message &msg)
+{
+    return 1;
+}
 
 VA(0x004993e0, 0x1a9)
 // int RecruitHeroHandler(struct tag_message &);
@@ -74,7 +81,10 @@ VA(0x0049a09f, 0x472)
 // int EventWindowHandler(struct tag_message &);
 
 VA(0x0049a511, 0x1e)
-// int TrueFalseDialogHandler(struct tag_message &);
+int TrueFalseDialogHandler(struct tag_message &msg)
+{
+    return EventWindowHandler(msg);
+}
 
 VA(0x0049a52f, 0x192)
 // void PlayerDead(int);
@@ -155,7 +165,9 @@ VA(0x0049eb4e, 0x32)
 // void UnloadSystemwideIcons(void);
 
 VA(0x0049eb80, 0x10)
-// void EarlyShutDownSystem(void);
+void EarlyShutDownSystem(void)
+{
+}
 
 VA(0x0049eb90, 0x75)
 // int GameUnsaved(void);
