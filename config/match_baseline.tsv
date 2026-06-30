@@ -949,7 +949,7 @@ SOURCE/KB	?DeleteMainClasses@@YIXXZ	0.0000
 SOURCE/KB	?DropDownToOnePlayer@@YIXXZ	0.0000
 SOURCE/KB	?EarlyResizeWindow@@YIXHHHH@Z	0.0000
 SOURCE/KB	?EarlySetup@@YIHXZ	0.0000
-SOURCE/KB	?EarlyShutDownSystem@@YIXXZ	0.0000
+SOURCE/KB	?EarlyShutDownSystem@@YIXXZ	100.0000
 SOURCE/KB	?EarlyShutdown@@YIXPAD0@Z	0.0000
 SOURCE/KB	?EventWindowHandler@@YIHAAUtag_message@@@Z	0.0000
 SOURCE/KB	?FileError@@YIXPAD@Z	0.0000
@@ -978,7 +978,7 @@ SOURCE/KB	?LoadSystemwideIcons@@YIXXZ	0.0000
 SOURCE/KB	?MemError@@YIXXZ	0.0000
 SOURCE/KB	?NetPosToGamePos@@YIHH@Z	0.0000
 SOURCE/KB	?NormalDialog@@YIXPADHHHHHHHHH@Z	0.0000
-SOURCE/KB	?NullHandler@@YIHAAUtag_message@@@Z	0.0000
+SOURCE/KB	?NullHandler@@YIHAAUtag_message@@@Z	100.0000
 SOURCE/KB	?PlayerDead@@YIXH@Z	0.0000
 SOURCE/KB	?PopNetBox@@YIXPADH@Z	0.0000
 SOURCE/KB	?QuickViewWait@@YIXXZ	0.0000
@@ -994,7 +994,7 @@ SOURCE/KB	?ShowMoraleInfo@game@@QAEXPAVhero@@H@Z	0.0000
 SOURCE/KB	?ShutDown@@YIXPAD@Z	0.0000
 SOURCE/KB	?SmackFade@@YIXPAE0@Z	0.0000
 SOURCE/KB	?TestDynamicWindow@@YIXHH@Z	0.0000
-SOURCE/KB	?TrueFalseDialogHandler@@YIHAAUtag_message@@@Z	0.0000
+SOURCE/KB	?TrueFalseDialogHandler@@YIHAAUtag_message@@@Z	100.0000
 SOURCE/KB	?UnloadSystemwideIcons@@YIXXZ	0.0000
 SOURCE/KB	?UpdateAppSpecificMenus@@YIXPAX@Z	0.0000
 SOURCE/KB	?UpdateNormalDialog@@YIXPAD@Z	0.0000
