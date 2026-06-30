@@ -817,7 +817,7 @@ SOURCE/GAME	?GetRandomArtifactId@game@@QAEHHH@Z	0.0000
 SOURCE/GAME	?GetRandomNumTroops@game@@QAEHH@Z	0.0000
 SOURCE/GAME	?GetSkipCopyLen@@YIHPAEPAH@Z	0.0000
 SOURCE/GAME	?GetTownId@game@@QAEHHH@Z	0.0000
-SOURCE/GAME	?GetWorldMapData@game@@QAEPAVfullMap@@XZ	0.0000
+SOURCE/GAME	?GetWorldMapData@game@@QAEPAVfullMap@@XZ	100.0000
 SOURCE/GAME	?GiveArmy@game@@QAEXPAVarmyGroup@@HHH@Z	0.0000
 SOURCE/GAME	?GiveTroopsToNeutralTown@game@@QAEXH@Z	0.0000
 SOURCE/GAME	?GiveTroopsToNeutralTowns@game@@QAEXXZ	0.0000
@@ -848,7 +848,7 @@ SOURCE/GAME	?RandomizeBarrier@game@@QAEXPAVmapCell@@@Z	0.0000
 SOURCE/GAME	?RandomizeEvents@game@@QAEXXZ	0.0000
 SOURCE/GAME	?RandomizeHeroPool@game@@QAEXXZ	0.0000
 SOURCE/GAME	?RandomizeMine@game@@QAEXHH@Z	0.0000
-SOURCE/GAME	?RandomizePassword@game@@QAEXPAVmapCell@@@Z	0.0000
+SOURCE/GAME	?RandomizePassword@game@@QAEXPAVmapCell@@@Z	100.0000
 SOURCE/GAME	?RandomizeTown@game@@QAEXHHH@Z	0.0000
 SOURCE/GAME	?Read@playerData@@QAEXH@Z	0.0000
 SOURCE/GAME	?ReceiveSaveGame@game@@QAEHHHHH@Z	0.0000
@@ -867,7 +867,7 @@ SOURCE/GAME	?ShowComputerScreen@game@@QAEXXZ	0.0000
 SOURCE/GAME	?ShowHeroesLogo@game@@QAEXXZ	0.0000
 SOURCE/GAME	?TownIDToTownPos@game@@QAEHPAVplayerData@@H@Z	0.0000
 SOURCE/GAME	?TransmitSaveGame@game@@QAEHHHH@Z	0.0000
-SOURCE/GAME	?TurnOffAIMusic@game@@QAEXXZ	0.0000
+SOURCE/GAME	?TurnOffAIMusic@game@@QAEXXZ	100.0000
 SOURCE/GAME	?TurnOnAIMusic@game@@QAEXXZ	0.0000
 SOURCE/GAME	?UpdateSpellWidgets@game@@QAEXXZ	0.0000
 SOURCE/GAME	?ViewArmy@game@@QAEXHHHHPAVtown@@HHHPAVhero@@PAVarmy@@PAVarmyGroup@@H@Z	0.0000

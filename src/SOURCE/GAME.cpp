@@ -4,6 +4,11 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <SOURCE/game.h>
+
+class soundManager;
+extern soundManager *gpSoundManager;
+
 VA(0x004708b0, 0x23d)
 // void playerData::Write(int);
 
@@ -38,7 +43,10 @@ VA(0x004717ac, 0xb5)
 // int game::IsMobile(int);
 
 VA(0x00471861, 0x1e)
-// class fullMap * game::GetWorldMapData(void);
+fullMap *game::GetWorldMapData(void)
+{
+    return (fullMap *)((char *)this + 0xb3e);
+}
 
 VA(0x0047187f, 0x11e)
 // int game::CreateBoat(int, int, int);
@@ -89,7 +97,10 @@ VA(0x00478aea, 0x64)
 // void game::RandomizeBarrier(class mapCell *);
 
 VA(0x00478b4e, 0x24)
-// void game::RandomizePassword(class mapCell *);
+void game::RandomizePassword(mapCell *cell)
+{
+    RandomizeBarrier(cell);
+}
 
 VA(0x00478b72, 0x478)
 // int game::LoadMap(char *);
@@ -125,7 +136,10 @@ VA(0x0047bd35, 0x3f)
 // void game::TurnOnAIMusic(void);
 
 VA(0x0047bd74, 0x25)
-// void game::TurnOffAIMusic(void);
+void game::TurnOffAIMusic(void)
+{
+    *(int *)((char *)gpSoundManager + 0x684) = 1;
+}
 
 VA(0x0047bd99, 0x596)
 // void game::NextPlayer(void);
