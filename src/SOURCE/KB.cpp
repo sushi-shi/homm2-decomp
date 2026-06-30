@@ -4,15 +4,112 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
-struct tag_message;
+#include <SOURCE/advManager.h>
+#include <BASE/heroWindow.h>
+#include <BASE/heroWindowManager.h>
+#include <BASE/resourceManager.h>
+#include <BASE/soundManager.h>
+#include <BASE/icon.h>
+
+struct tag_message {
+    int type;
+    int field4;
+    int field8;
+    int fieldC;
+    int field10;
+    int field14;
+    char *text;
+};
+
+struct SAMPLE2 {
+    class sample *pSample;
+    struct _SAMPLE *pMem;
+};
+
+// 100-byte per-castle record indexed off game (array at game+0xb53).
+struct townSlot {
+    char m_pad[0x64];
+};
+
+class game;
+class combatManager;
+class townManager;
+
+extern "C" void PollSound(void);
+extern "C" __declspec(dllimport) int __stdcall MessageBoxA(void *, const char *, const char *, unsigned int);
+
+long KBTickCount(void);
+void InitMainClasses(void);
+void GetGraphicsInfo(void);
+void ReadPrefs(void);
+int InterpretCommandLine(void);
+void LogTruncate(void);
+void LogStr(char *);
+int SetupCDDrive(void);
+void InitVars(void);
+void AiPrint(char *);
+void RemoteCleanup(void);
+void ComputeAdvNetControl(void);
+void Process1WindowsMessage(void);
+void ShutDown(char *);
+void UpdateSystemOptionsMenu(void);
 int EventWindowHandler(struct tag_message &);
+
+extern game *gpGame;
+extern advManager *gpAdvManager;
+extern combatManager *gpCombatManager;
+extern townManager *gpTownManager;
+extern resourceManager *gpResourceManager;
+extern soundManager *gpSoundManager;
+extern heroWindowManager *gpWindowManager;
+extern heroWindow *pNormalDialogWindow;
+extern icon *gBuyBuildIcons;
+extern icon *gSystemIcons;
+extern icon *gShingleAnim;
+
+extern int giBottomViewOverride;
+extern int giBottomViewOverrideEndTime;
+extern int giBottomViewResource;
+extern int giBottomViewResourceQty;
+extern char gcBottomViewText[];
+extern signed char gbGamePosToNetPos[];
+extern int gbHumanPlayer[];
+extern char *gArmyNames[];
+extern int gbInMemError;
+extern char *cOutOfMemory;
+extern char gText[];
+extern int iCDRomErr;
+extern int bEarlySetupDone;
+extern int giNumHumanPlayers;
+extern int giThisNetPos;
+extern void *hmnuAdv;
+extern void *hwndApp;
+extern int gbClosingApp;
+extern int giTotalHighMem;
+extern int giHighMemBuffer;
+extern int iNextShingleAnim;
+extern int iShingleAnimFrame;
+
+static long glNextPollTime;
+
+inline townSlot *GetCastleRec(int i)
+{
+    return (townSlot *)((char *)(i + (townSlot *)gpGame) + 0xb53);
+}
 
 VA(0x00496450, 0x14e)
 // @PollSound@0;
 
 VA(0x0049659e, 0x20)
-// void ForcePollSound(void);
+void ForcePollSound(void)
+{
+    glNextPollTime = KBTickCount() - 1;
+    PollSound();
+}
 
 VA(0x004965be, 0x39e)
 // void InitMainClasses(void);
@@ -21,19 +118,44 @@ VA(0x0049695c, 0x344)
 // void DeleteMainClasses(void);
 
 VA(0x00496ca0, 0x39)
-// void EarlyShutdown(char *, char *);
+void EarlyShutdown(char *caption, char *text)
+{
+    MessageBoxA(hwndApp, text, caption, 0x10);
+    exit(0);
+}
 
 VA(0x00496cd9, 0x148)
 // void SetupCDRom(void);
 
 VA(0x00496e21, 0x77)
-// int EarlySetup(void);
+int EarlySetup(void)
+{
+    if (bEarlySetupDone)
+        return 0;
+    InitMainClasses();
+    GetGraphicsInfo();
+    ReadPrefs();
+    if (!InterpretCommandLine())
+        return 1;
+    LogTruncate();
+    LogStr("ES1");
+    iCDRomErr = SetupCDDrive();
+    InitVars();
+    LogStr("ES2");
+    return 1;
+}
 
 VA(0x00496e98, 0x16c0)
 // int oldmain(void);
 
 VA(0x00498558, 0x44)
-// char toupper(char);
+char toupper(char c)
+{
+    if (c >= 'a' && c <= 'z')
+        return c - ' ';
+    else
+        return c;
+}
 
 VA(0x0049859c, 0x791)
 // int InterpretCommandLine(void);
@@ -60,7 +182,10 @@ VA(0x004997d4, 0x138)
 // void GetBuildingCost(int, int, int * const, int);
 
 VA(0x0049990c, 0x20)
-// char * GetMonsterName(int);
+char *GetMonsterName(int m)
+{
+    return gArmyNames[m];
+}
 
 VA(0x0049992c, 0x140)
 // void GetMonsterCost(int, int * const);
@@ -114,13 +239,31 @@ VA(0x0049ce14, 0x4ac)
 // int AddScoreToHighScore(int, int, int, int, char *);
 
 VA(0x0049d2c0, 0x66)
-// void BVResMsg(char *, int, int);
+void BVResMsg(char *s, int res, int qty)
+{
+    giBottomViewOverride = 5;
+    giBottomViewOverrideEndTime = KBTickCount() + 0x1388;
+    giBottomViewResource = res;
+    giBottomViewResourceQty = qty;
+    strcpy(gcBottomViewText, s);
+    gpAdvManager->UpdBottomView(1, 1, 1);
+}
 
 VA(0x0049d326, 0x2d)
-// void GOut(char *);
+void GOut(char *str)
+{
+    if (*(int *)((char *)gpAdvManager + 0x32) == 1)
+        AiPrint(str);
+}
 
 VA(0x0049d353, 0x54)
-// int NetPosToGamePos(int);
+int NetPosToGamePos(int netPos)
+{
+    for (int i = 0; i < 6; i++)
+        if (gbGamePosToNetPos[i] == netPos)
+            return i;
+    return -1;
+}
 
 VA(0x0049d3a7, 0xff)
 // int WaitForOtherPlayer(void);
@@ -147,22 +290,64 @@ VA(0x0049e900, 0x99)
 // void CongratsWait(void);
 
 VA(0x0049e999, 0x54)
-// struct SAMPLE2 LoadPlaySample(char *);
+SAMPLE2 LoadPlaySample(char *name)
+{
+    SAMPLE2 ss;
+    ss.pSample = gpResourceManager->GetSample(name);
+    if (ss.pSample) {
+        *(int *)((char *)ss.pSample + 0x1c) = 2;
+        ss.pMem = gpSoundManager->MemorySample(ss.pSample);
+    }
+    return ss;
+}
 
 VA(0x0049e9ed, 0x8f)
-// void WaitEndSample(struct SAMPLE2, int);
+void WaitEndSample(SAMPLE2 s, int waitTime)
+{
+    long endTime;
+    if (waitTime < 0)
+        waitTime = 4000;
+    endTime = KBTickCount() + waitTime;
+    if (s.pMem)
+        while (gpSoundManager->DigitalReport(s.pMem, 4) && KBTickCount() < endTime) {
+            Process1WindowsMessage();
+            PollSound();
+        }
+    if (s.pSample)
+        gpResourceManager->Dispose((resource *)s.pSample);
+}
 
 VA(0x0049ea7c, 0x5d)
-// void MemError(void);
+void MemError(void)
+{
+    if (gbInMemError)
+        return;
+    gbInMemError = 1;
+    LogStr("Out of Memory");
+    sprintf(gText, cOutOfMemory, "Out of memory.", 0x1900);
+    ShutDown(gText);
+}
 
 VA(0x0049ead9, 0x3b)
-// char * GetTownName(int);
+char *GetTownName(int i)
+{
+    townSlot *t = GetCastleRec(i);
+    return (char *)t + 0x57;
+}
 
 VA(0x0049eb14, 0x3a)
-// void LoadSystemwideIcons(void);
+void LoadSystemwideIcons(void)
+{
+    gBuyBuildIcons = gpResourceManager->GetIcon("buybuild.icn");
+    gSystemIcons = gpResourceManager->GetIcon("system.icn");
+}
 
 VA(0x0049eb4e, 0x32)
-// void UnloadSystemwideIcons(void);
+void UnloadSystemwideIcons(void)
+{
+    gpResourceManager->Dispose((resource *)gBuyBuildIcons);
+    gpResourceManager->Dispose((resource *)gSystemIcons);
+}
 
 VA(0x0049eb80, 0x10)
 void EarlyShutDownSystem(void)
@@ -170,7 +355,15 @@ void EarlyShutDownSystem(void)
 }
 
 VA(0x0049eb90, 0x75)
-// int GameUnsaved(void);
+int GameUnsaved(void)
+{
+    if ((gpAdvManager && *(int *)((char *)gpAdvManager + 0x32) == 1) ||
+        (gpCombatManager && *(int *)((char *)gpCombatManager + 0x32) == 1) ||
+        (gpTownManager && *(int *)((char *)gpTownManager + 0x32) == 1))
+        return 1;
+    else
+        return 0;
+}
 
 VA(0x0049ec05, 0xa18)
 // int HandleAppSpecificMenuCommands(int);
@@ -182,13 +375,24 @@ VA(0x0049f92d, 0x99)
 // void CleanUpMenus(void);
 
 VA(0x0049f9c6, 0x2a)
-// void UpdateAppSpecificMenus(void *);
+void UpdateAppSpecificMenus(void *hMenu)
+{
+    if (hmnuAdv == hMenu)
+        UpdateSystemOptionsMenu();
+}
 
 VA(0x0049f9f0, 0x2d)
-// void EarlyResizeWindow(int, int, int, int);
+void EarlyResizeWindow(int x, int y, int w, int h)
+{
+    if (gbClosingApp)
+        return;
+}
 
 VA(0x0049fa1d, 0x53)
-// int InMapArea(int, int);
+int InMapArea(int x, int y)
+{
+    return (x >= 16 && x < 448 && y >= 16 && y < 448);
+}
 
 VA(0x0049fa70, 0x6bc)
 // void SetupDynamicWindow(int, int, int, int, int, int, int, int *, int *, int *, int *, int *, int *, class heroWindow * *, int);
@@ -203,7 +407,15 @@ VA(0x004a02c5, 0xaa)
 // void HandleRemoteSuddenExit(void);
 
 VA(0x004a036f, 0x62)
-// void DropDownToOnePlayer(void);
+void DropDownToOnePlayer(void)
+{
+    RemoteCleanup();
+    giNumHumanPlayers = 1;
+    for (int i = 0; i < 6; i++)
+        if (giThisNetPos != i)
+            gbHumanPlayer[i] = 0;
+    ComputeAdvNetControl();
+}
 
 VA(0x004a03d1, 0x412)
 // void ReceiveHostReportsPlayerExit(int, struct SPlayerExit, int);
@@ -212,7 +424,12 @@ VA(0x004a07e3, 0x361)
 // void ReceiveRemotePlayerExit(struct SPlayerExit);
 
 VA(0x004a0b44, 0x29)
-// int CheckMem(void);
+int CheckMem(void)
+{
+    giTotalHighMem = 16000;
+    giHighMemBuffer = 8000;
+    return 1;
+}
 
 VA(0x004a0b6d, 0x109)
 // int GetManaCost(int, class hero *);
@@ -221,13 +438,34 @@ VA(0x004a0c76, 0x9f)
 // void SetWinText(class heroWindow *, int);
 
 VA(0x004a0d15, 0x8a)
-// void CheckShingleUpdate(void);
+void CheckShingleUpdate(void)
+{
+    if (!gShingleAnim)
+        return;
+    if (KBTickCount() > iNextShingleAnim) {
+        iNextShingleAnim = KBTickCount() + 250;
+        iShingleAnimFrame = (iShingleAnimFrame + 1) % 39;
+        gShingleAnim->DrawToBuffer(0, 0, iShingleAnimFrame + 1, 0);
+        gpWindowManager->UpdateScreenRegion(0x2e, 0xb0, 0x8b, 0xbb);
+    }
+}
 
 VA(0x004a0d9f, 0x17c6)
 // void NormalDialog(char *, int, int, int, int, int, int, int, int, int);
 
 VA(0x004a2565, 0x71)
-// void UpdateNormalDialog(char *);
+void UpdateNormalDialog(char *text)
+{
+    short show = 1;
+    tag_message evt;
+    evt.type = 0x200;
+    evt.field4 = 3;
+    evt.field8 = 1;
+    evt.text = text;
+    pNormalDialogWindow->BroadcastMessage(evt);
+    pNormalDialogWindow->DrawWindow(0, 0, 0x9000);
+    pNormalDialogWindow->DrawWindow(1, -65535, -256);
+}
 
 // ---- data / globals / vtables ----
 DATA(0x004f8c58)  // unsigned char * giGroundToTerrain
