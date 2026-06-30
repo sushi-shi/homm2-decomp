@@ -4,6 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <SOURCE/philAI.h>
 VA(0x0043781b, 0x1b5)
 // void ResetHeroRVs(int, int, int);
 
@@ -11,7 +12,7 @@ VA(0x004379d0, 0x180)
 // void CheckDoMain(int, int);
 
 VA(0x00437b50, 0x10)
-// void ShowStatus(void);
+void ShowStatus(void) {}
 
 VA(0x00437b60, 0x55)
 // void philAI::constructor(void);
@@ -104,7 +105,7 @@ VA(0x0043e459, 0x65)
 // void philAI::LikelihoodOfEnemyAttacking(class town *, class hero *, float &, float &, int &, int &, int &, float &);
 
 VA(0x0043e4be, 0x1a)
-// int philAI::MeanRVOfUnexploredTerritory(int);
+int philAI::MeanRVOfUnexploredTerritory(int) { return 0; }
 
 VA(0x0043e4d8, 0x1d8)
 // void philAI::GetGameAttentionValue(int);
@@ -167,7 +168,7 @@ VA(0x00442771, 0x53)
 // int philAI::NetValueOfArtifact(int, int, int, int);
 
 VA(0x004427c4, 0x1d)
-// int philAI::ChooseToPayRansomOnHero(int);
+int philAI::ChooseToPayRansomOnHero(int) { return 1; }
 
 VA(0x004427e1, 0xd7)
 // void philAI::BuildBuilding(class town *, int);
