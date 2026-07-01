@@ -55,7 +55,11 @@ are GROUND TRUTH, already extracted — never re-derive or guess them:
 4. **Iterate** on the per-function objdiff residual until 100% (or a byte-proven
    `@early-stop`). **When a diff row is stuck, GREP `docs/patterns/INDEX.md` FIRST**
    (by symptom/tag); most /Od idioms are cataloged. New idiom → add a
-   `docs/patterns/<name>.md` + one INDEX line in the SAME change.
+   `docs/patterns/<name>.md` + one INDEX line in the SAME change. **A pattern doc MUST
+   show the real byte-level asm of the diff (retail vs ours, side by side) AND what made
+   it match in the end** (the exact source spelling / flag / structural change, or for a
+   "reverse pattern" the non-local trigger) — never prose alone. Grab the asm with
+   `llvm-objdump -d --disassemble-symbols=<mangled> build/delink/... vs build/objdiff/...`.
 
    > ⚠️ **objdiff's fuzzy% LIES about frame slots — it gives partial credit for a
    > differing displacement, so a function can read 97% while EVERY local is on the
@@ -155,12 +159,17 @@ accessor `jmp $+0` fingerprint — most plateaus are one of these two, both fixa
    new idiom → add `docs/patterns/<name>.md` + one INDEX line in the SAME change.
    Keep going until the only thing left is provably not your code.
 3. **Size is not a reason to defer.** Reconstruct large bodies leaf-first, in full.
-4. **The ONLY acceptable non-100% is a byte-PROVEN `@early-stop`:** a COMPLETE,
-   correct reconstruction where you have proven with `llvm-objdump -dr` (base obj vs
-   target obj) that the **code bytes are byte-exact** and the residual is a genuine
-   delinker / reloc-naming / `/Od` block-boundary artifact — **never** a partial that
-   under-counts because you stopped guessing. Mark it `// @early-stop` (marker line
-   above the `VA()`, the byte-level reason on the next line, no %):
+4. **Acceptable non-100% comes in exactly two `@early-stop` flavors — never a partial
+   that under-counts because you stopped guessing.** Mark it `// @early-stop` (marker
+   line above the `VA()`, the byte-level reason on the next line, no %):
+   - **(a) Permanent artifact** — code bytes proven byte-exact with `llvm-objdump -dr`
+     (base vs target) and the residual is a genuine delinker / reloc-naming / `/Od`
+     block-boundary artifact.
+   - **(b) Soft / TU-cumulative** — logic AND frame slots byte-exact, the only diff is a
+     commutative `/Od` operand load-order that is **not source-steerable** and resolves
+     as sibling TU functions land (see **`docs/patterns/tu-cumulative-eval-order.md`** —
+     confirm-then-park checklist there). Try the SIB `i[(T*)p]` / `val|0` escape hatches
+     FIRST; if they don't apply, park it and expect 100% for free once the TU fills.
 
        // @early-stop
        // reloc-masked: code bytes identical (llvm-objdump -dr); only the operand's symbol name differs

@@ -35,6 +35,10 @@ In short (full rules in the two agent docs):
    **`scripts/od_slots.py` stack-naming workflow**, push-to-100% + byte-proven `@early-stop`,
    report per-fn % + one-line summary + full `git diff`. **Lane discipline:** each lane
    owns one TU and works it in 20+ batches until done, then takes the next simplest TU.
+   **Any new `docs/patterns/*.md` MUST carry real asm (retail vs ours, side by side) +
+   what made it match** — never prose alone (`docs/patterns/INDEX.md` header). Two
+   `@early-stop` flavors are legit: permanent reloc/delinker artifacts, and the soft
+   `tu-cumulative-eval-order` class (resolves as sibling TU funcs land).
 4. **Integrate SERIALLY:** one at a time — guard master clean → apply only that matcher's
    file(s) → `homm2 build` (recompiles + regenerates README's match block) → confirm % →
    `homm2 status update` (`--accept-regressions` only for trivial cross-fn fuzzy drift) →
