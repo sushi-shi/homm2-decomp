@@ -92,7 +92,12 @@ Spawn a **matcher** (`subagent_type: matcher`), **`run_in_background: true`**, *
    the functions in retail-RVA order and to report each one's result.
 4. **Forbid `homm2`-format-style reflows** — edit only the target file(s); leave
    formatting to integration.
-5. Report: final per-function % + one-line summary + the **complete `git diff`**.
+5. **Any new `docs/patterns/<name>.md` MUST show real byte-level asm (retail vs ours,
+   side by side) AND what made it match** (source spelling / flag / structural change,
+   or a "reverse pattern" non-local trigger) — never prose alone (see
+   `docs/patterns/INDEX.md` header). This holds equally when YOU (or a matcher) document
+   a pattern at integration time.
+6. Report: final per-function % + one-line summary + the **complete `git diff`**.
 
 ### Lane discipline (avoid same-file collisions)
 
