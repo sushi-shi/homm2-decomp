@@ -39,19 +39,44 @@ struct townSlot {
 };
 
 class combatManager;
-class townManager;
-class town;
 
 class game {
 public:
     int TransmitSaveGame(int, int, int);
     int ReceiveSaveGame(int, int, int, int);
+    void ClaimMine(int, int);
 };
 
 class mouseManager {
 public:
     void ReallyHidePointer(void);
     void ReallyShowPointer(void);
+    void NewUpdate(int);
+    void ShowColorPointer(void);
+    void SetColorMice(int);
+};
+
+class townManager {
+public:
+    void RedrawTownScreen(void);
+};
+
+class town {
+public:
+    int CanBuildDock(void);
+};
+
+class executive {
+public:
+    void ShutDownSystem(void);
+};
+
+class palette;
+class font;
+
+// hero storage is 250 bytes (the recovered hero class carries no data members).
+struct heroRec {
+    char m_pad[250];
 };
 
 // ---- TU-local structs (sizes/offsets from retail disasm) ----
@@ -196,15 +221,134 @@ extern SNetPlayerInfo gsNetPlayerInfo[];
 extern char cNetBoxLine[][140];
 extern char cNetBoxColor[];
 
+// ---- additions for this batch ----
+struct MemEntry;
+
+extern int bInShutDown;
+
+extern executive *gpExec;
+extern palette *gPalette;
+extern font *bigFont;
+extern font *smallFont;
+extern MemEntry *gpMemEntry;
+extern unsigned char *mapExtra;
+extern SAMPLE2 NULL_SAMPLE2;
+
+extern int gbInPollSound;
+extern int gbPutzingWithMouseCtr;
+extern int giCycleType;
+extern int bDoColorCycle;
+extern int giGraphicsType;
+extern int giMainVideoModeColorDepth;
+extern int gbHeroMoving;
+extern int gbForegroundApp;
+extern int giTCPHostStatus;
+extern int gbNoCDRom;
+extern int gbNoSound;
+extern int gbFunctionComplete;
+extern int giWaitType;
+extern int gbCheatMenus;
+extern int gbInNewGameSetup;
+extern int gGameCommand;
+extern signed char gbCombatSurrender;
+extern signed char gbRetreatWin;
+extern signed char xIsExpansionMap;
+extern int glTimers[];
+extern void *hInstApp;
+extern void *gEventHandle;
+extern char *xNecromancerShrineDesc;
+extern char *gArmyNamesPlural[];
+extern char *gBuildingInfoSpecial[];
+extern char *cBuildingInfoNeutral[];
+extern signed char gDwellingType[][12];
+extern unsigned long gHierarchyMask[][12];
+
+void CycleColors(int);
+void PollRemote(void);
+void SetPalette(signed char *, int);
+void NormalDialog(char *, int, int, int, int, int, int, int, int, int);
+int HeroView(int, int, int);
+void ShutDownSmacker(void);
+void SetFullScreenStatus(int);
+void CloseAIMapVars(void);
+void DeleteMainClasses(void);
+void AppExit(void);
+void PrintMemoryLeaks(void);
+void FadeTo(unsigned char *, unsigned char *, int);
+void UpdatePalette(unsigned char *);
+void *BaseAlloc(unsigned int, char *, int);
+void SendMapChange(int, signed char, unsigned char, unsigned char, int, unsigned char, unsigned char);
+int WaitForOtherPlayer(void);
+signed char WaitForHost(void);
+signed char WaitForGuest(void);
+signed char InitNetGuest(void);
+signed char InitNetHost(void);
+signed char GUIModemCommandExec(void);
+signed char GUIModemResponseExec(void);
+int WaitForDirectConnect(void);
+int dpWaitForFirstGuest(void);
+int dpWaitForExtraGuests(void);
+int dpWaitForHost(void);
+int wsWaitForFirstGuest(void);
+int wsWaitForExtraGuests(void);
+int wsWaitForHost(void);
+char *GetBuildingName(int, int);
+void CheckShingleUpdate(void);
+void HandleRemoteDeadPlayerExit(int);
+void UnloadSystemwideIcons(void);
+void HandleRemoteSuddenExit(void);
+extern "C" int __cdecl BitTest(void *, int);
+extern "C" __declspec(dllimport) void *__stdcall LoadMenuA(void *, const char *);
+extern "C" __declspec(dllimport) int __stdcall CloseHandle(void *);
+
 static long glNextPollTime;
+static long glNextMouseTime;
+static long glNextCycleTime;
+
+static char cBlank0[4], cBlank1[4], cBlank2[4], cBlank3[4];
 
 inline townSlot *GetCastleRec(int i)
 {
     return (townSlot *)((char *)(i + (townSlot *)gpGame) + 0xb53);
 }
 
+inline hero *GetHeroSlot(int i)
+{
+    return (hero *)((heroRec *)((char *)gpGame + 0x27c4) + i);
+}
+
 VA(0x00496450, 0x14e)
-// @PollSound@0;
+extern "C" void PollSound(void)
+{
+    if (gbInPollSound)
+        return;
+    gbInPollSound = 1;
+    if (KBTickCount() > glNextMouseTime && !gbPutzingWithMouseCtr) {
+        glNextMouseTime = KBTickCount() + 13;
+        gpMouseManager->NewUpdate(0);
+    }
+    if (KBTickCount() > glNextCycleTime) {
+        if (giCycleType == 1 || giCycleType == 3)
+            glNextCycleTime = KBTickCount() + 110;
+        else
+            glNextCycleTime = KBTickCount() + 200;
+        bDoColorCycle = 1;
+        if (giGraphicsType == 1 && giMainVideoModeColorDepth != 8) {
+            glNextCycleTime += 300;
+            if (gbHeroMoving)
+                bDoColorCycle = 0;
+        }
+        if (bDoColorCycle)
+            CycleColors(0);
+    }
+    if (KBTickCount() > glNextPollTime) {
+        glNextPollTime = KBTickCount() + 30;
+        if (gbForegroundApp)
+            gpSoundManager->PollSound();
+        PollRemote();
+    }
+    gbInPollSound = 0;
+}
 
 VA(0x0049659e, 0x20)
 void ForcePollSound(void)
@@ -227,7 +371,36 @@ void EarlyShutdown(char *caption, char *text)
 }
 
 VA(0x00496cd9, 0x148)
-// void SetupCDRom(void);
+void SetupCDRom(void)
+{
+    int savedNoSound = gbNoSound;
+    if (iCDRomErr == 1) {
+        SetPalette(*(signed char **)((char *)gPalette + 0x10), 1);
+        gpMouseManager->ShowColorPointer();
+        gbNoSound = 1;
+        if (giTCPHostStatus)
+            NormalDialog("Unable to access CD-ROM Drive.  Without a CD-ROM drive and a Heroes 2 Expansion CD-ROM you will only be able to play as the guest in a multi-player game.",
+                         1, -1, -1, -1, 0, -1, 0, -1, 0);
+        gbNoCDRom = 1;
+    } else if (iCDRomErr == 2) {
+        SetPalette(*(signed char **)((char *)gPalette + 0x10), 1);
+        gpMouseManager->ShowColorPointer();
+        gbNoSound = 1;
+        if (giTCPHostStatus)
+            NormalDialog("The Heroes 2 Expansion CD-ROM is not in the drive.  Without a Heroes 2 Expansion CD-ROM you will only be able to play as the guest in a multi-player game.  If you have the CD, then exit the program, put the CD in, and try again.",
+                         1, -1, -1, -1, 0, -1, 0, -1, 0);
+        gbNoCDRom = 1;
+    }
+    if (iCDRomErr == 3) {
+        EarlyShutdown("Startup Error", "Unable to change to the Heroes II directory.  Please run the installation program.");
+        exit(0);
+    }
+    if (iCDRomErr == 4) {
+        EarlyShutdown("Startup Error", "Unable to find the Heroes II data files.  Please run the installation program.");
+        exit(0);
+    }
+    gbNoSound = savedNoSound;
+}
 
 VA(0x00496e21, 0x77)
 int EarlySetup(void)
@@ -272,10 +445,79 @@ int NullHandler(struct tag_message &msg)
 }
 
 VA(0x004993e0, 0x1a9)
-// int RecruitHeroHandler(struct tag_message &);
+int RecruitHeroHandler(tag_message &msg)
+{
+    // e/p/c/d are the (dead) event-id shorts; a = handled flag; b reserves a slot.
+    short e = 2, p = 3, c = 8, d = 9;
+    int a = 0;
+    int b;
+    if (msg.type == 0x200) {
+        switch (msg.field4) {
+        case 0xc:
+            switch (msg.field8) {
+            case 2:
+                HeroView((unsigned char)(*(char **)((char *)gpTownManager + 0x176))[2], 1, 0);
+                gpTownManager->RedrawTownScreen();
+                (*(heroWindow **)((char *)gpTownManager + 0x162))->DrawWindow();
+                (*(heroWindow **)((char *)gpTownManager + 0x166))->DrawWindow();
+                gpWindowManager->FadeScreen(0, 8, 0);
+                break;
+            default:
+                break;
+            }
+            break;
+        case 0xd:
+            switch (msg.field8) {
+            case 0x7801:
+                *(int *)((char *)gpTownManager + 0x172) = -1;
+                a = 1;
+                break;
+            case 0x7802:
+                *(int *)((char *)gpTownManager + 0x172) = 0;
+                *(int *)((char *)gpWindowManager + 0x5a) = msg.field8;
+                a = 1;
+                break;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+    if (a == 1) {
+        msg.field8 = 0xa;
+        msg.field4 = msg.field8;
+        return 2;
+    }
+    return 1;
+}
 
 VA(0x00499589, 0x1a7)
-// char * GetBuildingInfo(int, int, int);
+char *GetBuildingInfo(int race, int building, int mode)
+{
+    char buf[400];
+    if (race == 5 && building == 2) {
+        sprintf(buf, xNecromancerShrineDesc);
+    } else if (building == 0xb) {
+        sprintf(buf, "The %s increases production of %s by 8 per week.",
+                GetBuildingName(race, building),
+                gArmyNamesPlural[gDwellingType[race][0]]);
+    } else if (building == 0xd) {
+        sprintf(buf, gBuildingInfoSpecial[race]);
+    } else if (building < 0x13) {
+        sprintf(buf, cBuildingInfoNeutral[building]);
+    } else {
+        sprintf(gText, "The %s produces %s.",
+                GetBuildingName(race, building),
+                gArmyNamesPlural[gDwellingType[race][building]]);
+        return gText;
+    }
+    if (mode) {
+        sprintf(gText, "{%s}\n\n%s", GetBuildingName(race, building), buf);
+    } else {
+        sprintf(gText, buf);
+    }
+    return gText;
+}
 
 VA(0x00499730, 0xa4)
 char *GetBuildingName(int race, int building)
@@ -358,8 +600,64 @@ void GetMonsterCost(int monster, int *const cost)
     }
 }
 
+// @early-stop
+// tu-cumulative: logic + all frame slots byte-exact (reqMask@-8, haveMask@-4 match
+// retail); the only residual is 2 bytes — the commutative `&` operand load-order in
+// `(reqMask & haveMask) == reqMask` (retail loads reqMask first, this cl loads the
+// just-OR'd haveMask first). Not source-steerable (tried both `&` orders, `==` swap).
 VA(0x00499a6c, 0x2b5)
-// int CanBuild(class town *, int);
+int CanBuild(town *t, int building)
+{
+    int reqMask;
+    int haveMask;
+    if (BitTest((char *)gpGame + 0x27bb, *(signed char *)t))
+        return 0;
+    if (building != 6 && !(*(int *)((char *)t + 0x18) & 0x40))
+        return 0;
+    if (!xIsExpansionMap && building == 2 && *((signed char *)t + 3) == 5)
+        return 0;
+    if (building == 3) {
+        if (t->CanBuildDock())
+            return 1;
+        else
+            return 0;
+    }
+    if (building == 0 && *((signed char *)t + 0x1c) >= 5)
+        return 0;
+    if (building == 5 || building == 0xe || building == 0x10 || building == 0x11 ||
+        building == 0x12 || building == 0x1f)
+        return 0;
+    if (building < 0x13 || building > 0x1e)
+        return 1;
+    if ((building == 0x14 && (*(int *)((char *)t + 0x18) & 0x02000000)) ||
+        (building == 0x15 && (*(int *)((char *)t + 0x18) & 0x04000000)) ||
+        (building == 0x16 && (*(int *)((char *)t + 0x18) & 0x08000000)) ||
+        (building == 0x17 && (*(int *)((char *)t + 0x18) & 0x10000000)) ||
+        (building == 0x18 && ((*(int *)((char *)t + 0x18) & 0x20000000) ||
+                              (*(int *)((char *)t + 0x18) & 0x40000000))) ||
+        (building == 0x1d && (*(int *)((char *)t + 0x18) & 0x40000000)))
+        return 0;
+    reqMask = gHierarchyMask[*((signed char *)t + 3)][building - 0x13];
+    haveMask = *(int *)((char *)t + 0x18);
+    if (haveMask & 0x02000000)
+        haveMask |= 0x100000;
+    if (haveMask & 0x04000000)
+        haveMask |= 0x200000;
+    if (haveMask & 0x08000000)
+        haveMask |= 0x400000;
+    if (haveMask & 0x10000000)
+        haveMask |= 0x800000;
+    if (haveMask & 0x40000000)
+        haveMask |= 0x20000000;
+    if (haveMask & 0x20000000)
+        haveMask |= 0x1000000;
+    if ((reqMask & haveMask) == reqMask) {
+        if (*((signed char *)t + 3) == 5 && building == 0x1c && *((signed char *)t + 0x1c) <= 1)
+            return 0;
+        return 1;
+    }
+    return 0;
+}
 
 VA(0x00499d21, 0x9a)
 int CanBuy(town *t, int type)
@@ -394,8 +692,86 @@ int GetBuildingBaseResourceValue(int race, int building, int level)
     }
 }
 
+// @early-stop
+// reloc-masked: code bytes byte-identical to retail (coffcmp: 0 non-reloc diffs).
+// The only residual is the giWaitType switch jump-table's self-relocs (DIR32 to
+// WaitHandler+offset) which the delinker labels differently — same delinker artifact
+// class as GetMonsterCost above.
 VA(0x00499e81, 0x21e)
-// int WaitHandler(struct tag_message &);
+int WaitHandler(tag_message &msg)
+{
+    int result = 0;
+    gbFunctionComplete = 1;
+    PollSound();
+    if (msg.type == 0x200) {
+        switch (msg.field4) {
+        case 0xd:
+            switch (msg.field8) {
+            case 0x7800:
+            case 0x7801:
+            case 0x7802:
+                gbFunctionComplete = 0;
+                result = 1;
+                break;
+            }
+        }
+    }
+    if (result == 0) {
+        switch (giWaitType) {
+        case 0:
+            result = WaitForOtherPlayer();
+            break;
+        case 1:
+            result = WaitForHost();
+            break;
+        case 2:
+            result = WaitForGuest();
+            break;
+        case 3:
+            result = InitNetGuest();
+            break;
+        case 4:
+            result = InitNetHost();
+            break;
+        case 5:
+            result = GUIModemCommandExec();
+            break;
+        case 6:
+            result = GUIModemResponseExec();
+            break;
+        case 7:
+            result = WaitForDirectConnect();
+            break;
+        case 8:
+            result = dpWaitForFirstGuest();
+            break;
+        case 9:
+            result = dpWaitForExtraGuests();
+            break;
+        case 0xa:
+            result = dpWaitForHost();
+            break;
+        case 0xb:
+            result = wsWaitForFirstGuest();
+            break;
+        case 0xc:
+            result = wsWaitForExtraGuests();
+            break;
+        case 0xd:
+            result = wsWaitForHost();
+            break;
+        }
+    }
+    CheckShingleUpdate();
+    if (result != 0) {
+        *(int *)((char *)gpWindowManager + 0x5a) = 0x7801;
+        msg.type = 0x200;
+        msg.field8 = 0xa;
+        msg.field4 = msg.field8;
+        return 2;
+    }
+    return 1;
+}
 
 VA(0x0049a09f, 0x472)
 // int EventWindowHandler(struct tag_message &);
@@ -407,7 +783,32 @@ int TrueFalseDialogHandler(struct tag_message &msg)
 }
 
 VA(0x0049a52f, 0x192)
-// void PlayerDead(int);
+void PlayerDead(int player)
+{
+    playerRec *rec;
+    int i;
+    gbRetreatWin = 0;
+    rec = (playerRec *)((char *)(player + (playerRec *)gpGame) + 0x49c);
+    *((char *)(player + (char *)gpGame) + 0x490) = 1;
+    ++*((char *)gpGame + 0x48f);
+    for (i = 0; i < 0x90; i++) {
+        if (*((signed char *)(i + (char *)gpGame) + 0x60a6) == player)
+            gpGame->ClaimMine(i, -1);
+    }
+    for (i = *((signed char *)rec + 1) - 1; i >= 0; i--) {
+        GetHeroSlot(*((signed char *)(i + (char *)rec) + 4))->Deallocate(1);
+    }
+    for (i = 0; i < 2; i++) {
+        if (*((signed char *)(*((signed char *)(i + (char *)rec) + 0xc) + (char *)gpGame) + 0x5c80) == 0x40)
+            *((signed char *)(*((signed char *)(i + (char *)rec) + 0xc) + (char *)gpGame) + 0x5c80) = -1;
+    }
+    if (gbRemoteOn) {
+        if (gbHumanPlayer[player])
+            HandleRemoteDeadPlayerExit(player);
+        else
+            SendMapChange(0xa, player, 0, 0, -999, 0, 0);
+    }
+}
 
 VA(0x0049a6c1, 0x19bb)
 // void CheckEndGame(int, int);
@@ -432,7 +833,44 @@ void QuickViewWait(void)
 }
 
 VA(0x0049c111, 0x201)
-// void InitVars(void);
+void InitVars(void)
+{
+    int i;
+    int j;
+    NULL_SAMPLE2.pSample = 0;
+    NULL_SAMPLE2.pMem = (struct _SAMPLE *)NULL_SAMPLE2.pSample;
+    gGameCommand = -1;
+    gPalette = 0;
+    gbCombatSurrender = 0;
+    *(int *)((char *)gpGame + 0x65e5) = 0;
+    strcpy((char *)gpGame + 0x466, "brokena.mp2");
+    *((char *)gpGame + 0x47a) = 0;
+    gbInNewGameSetup = 0;
+    strcpy(cNetBoxLine[0], cBlank0);
+    strcpy(cNetBoxLine[1], cBlank1);
+    strcpy(cNetBoxLine[2], cBlank2);
+    strcpy(cNetBoxLine[3], cBlank3);
+    cNetBoxColor[0] = 6;
+    cNetBoxColor[1] = 6;
+    cNetBoxColor[2] = 6;
+    cNetBoxColor[3] = 6;
+    ppMapExtra = 0;
+    pwSizeOfMapExtra = 0;
+    iMaxMapExtra = 0;
+    for (i = 0; i < 0xa; i++)
+        glTimers[i] = 0;
+    if (gbCheatMenus) {
+        hmnuDflt = LoadMenuA(hInstApp, "mnuDflt");
+        hmnuCmbt = LoadMenuA(hInstApp, "mnuCmbt");
+        hmnuAdv = LoadMenuA(hInstApp, "mnuAdvD");
+        hmnuTown = LoadMenuA(hInstApp, "mnuTownD");
+    } else {
+        hmnuDflt = LoadMenuA(hInstApp, "mnuDflt");
+        hmnuCmbt = LoadMenuA(hInstApp, "mnuCmbt");
+        hmnuAdv = LoadMenuA(hInstApp, "mnuAdv");
+        hmnuTown = LoadMenuA(hInstApp, "mnuTown");
+    }
+}
 
 VA(0x0049c312, 0x61b)
 // void game::ShowMoraleInfo(class hero *, int);
@@ -547,7 +985,60 @@ void AddNetBoxLine(char *str, char color)
 }
 
 VA(0x0049e0f2, 0x214)
-// void ShutDown(char *);
+void ShutDown(char *msg)
+{
+    char buf[768];
+    if (bInShutDown)
+        return;
+    LogStr("Shutdown");
+    bInShutDown = 1;
+    gbClosingApp = 1;
+    buf[0] = 0;
+    gpMouseManager->SetColorMice(0);
+    if (msg) {
+        strcpy(buf, msg);
+        SetFullScreenStatus(0);
+        LogStr(buf);
+        MessageBoxA(hwndApp, buf, "Unexpected Program Termination", 0x10);
+    } else {
+        sprintf(buf, "Bye!");
+    }
+    ShutDownSmacker();
+    gpSoundManager->CDStop();
+    ClearMapExtra();
+    UnloadSystemwideIcons();
+    if (gbRemoteOn)
+        HandleRemoteSuddenExit();
+    if (gPalette) {
+        gpResourceManager->Dispose((resource *)gPalette);
+        gPalette = 0;
+    }
+    if (bigFont) {
+        gpResourceManager->Dispose((resource *)bigFont);
+        bigFont = 0;
+    }
+    if (smallFont) {
+        gpResourceManager->Dispose((resource *)smallFont);
+        smallFont = 0;
+    }
+    RemoteCleanup();
+    gpExec->ShutDownSystem();
+    if (gEventHandle) {
+        CloseHandle(gEventHandle);
+        gEventHandle = 0;
+    }
+    if (mapExtra)
+        BaseFree(mapExtra, KBFILE, (*(short *)"\x5f\x0e") + 0x47);
+    mapExtra = 0;
+    CloseAIMapVars();
+    DeleteMainClasses();
+    AppExit();
+    PrintMemoryLeaks();
+    if (gpMemEntry)
+        free(gpMemEntry);
+    gpMemEntry = 0;
+    exit(0);
+}
 
 VA(0x0049e306, 0xa2)
 void FileError(char *filename)
@@ -562,8 +1053,63 @@ void FileError(char *filename)
     ShutDown(buf);
 }
 
+// @early-stop
+// tu-cumulative: logic + all 14 frame slots byte-exact (od_oracle-verified). The only
+// residual (coffcmp: 40 bytes, all in the two brightness averages + the minDist test)
+// is a /Od operand-evaluation-order difference this cl renders vs retail: the 3-term
+// sum `p[2]+p[0]+p[1]` reads +2,+1,+0 here but +2,+0,+1 in retail, and the `d>p`
+// compare loads the other operand first. Not source-steerable (probed every term
+// ordering, explicit grouping, `|0`, and an inline helper — all identical here).
 VA(0x0049e3a8, 0x255)
-// void SmackFade(unsigned char *, unsigned char *);
+void SmackFade(unsigned char *src, unsigned char *dst)
+{
+    // /Od frame slots (od_oracle-verified): a=newPal(-8) b=avg2(-c) c=x(-10)
+    // d=minDist(-14) e=avg1(-18) f=map(-1c) g=y(-20) h=outer(-24) i=inner(-28)
+    // j=screen(-2c) k=best(-30) p=dist(-4)
+    unsigned char *a;   /* newPal */
+    unsigned char *f;   /* map    */
+    int k;              /* best   */
+    int h, i;           /* outer / inner loop */
+    int e, b;           /* avg1, avg2 */
+    int d;              /* minDist */
+    int p;              /* dist   */
+    unsigned char *j;   /* screen */
+    int c, g;           /* x, y   */
+
+    a = 0;
+    f = 0;
+    k = -1;
+    a = (unsigned char *)BaseAlloc(0x300, KBFILE, (*(short *)"\x61\x0f") + 0xd);
+    f = (unsigned char *)BaseAlloc(0x100, KBFILE, (*(short *)"\x61\x0f") + 0xe);
+    memset(a, 0, 0x300);
+    memset(f, 0, 0x100);
+    for (h = 0xa; h < 0xf6; h++) {
+        e = (src[h * 3 + 2] + src[h * 3] + src[h * 3 + 1]) / 3;
+        d = 0x3e7;
+        for (i = 0xa; i < 0x24; i++) {
+            b = (dst[i * 3 + 2] + dst[i * 3] + dst[i * 3 + 1]) / 3;
+            p = abs(e - b);
+            if (d > p) {
+                d = p;
+                k = i;
+            }
+        }
+        memcpy(a + h * 3, dst + k * 3, 3);
+        f[h] = (unsigned char)k;
+    }
+    FadeTo(src, a, 8);
+    j = *(unsigned char **)(*(char **)((char *)gpWindowManager + 0x46) + 0x16);
+    for (c = 0; c < 0x280; c++) {
+        for (g = 0; g < 0x1e0; g++) {
+            *j = f[*j];
+            j++;
+        }
+    }
+    gpWindowManager->UpdateScreen();
+    UpdatePalette(dst);
+    BaseFree(a, KBFILE, (*(short *)"\x61\x0f") + 0x31);
+    BaseFree(f, KBFILE, (*(short *)"\x61\x0f") + 0x32);
+}
 
 VA(0x0049e5fd, 0x303)
 // void ShowCongrats(int);
