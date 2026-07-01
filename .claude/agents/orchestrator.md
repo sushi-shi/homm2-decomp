@@ -84,12 +84,16 @@ Spawn a **matcher** (`subagent_type: matcher`), **`run_in_background: true`**, *
 2. **Work cd-first, in ONE open shell:** `cd <abs worktree>` FIRST, then a single
    `nix develop .#build` shell, every `homm2 build`/`status` inside it. Absolute paths
    everywhere (relative paths can leak into master).
-3. Carry a **whole-TU batch (20+ functions, or the entire TU if smaller)** — each as
-   RVA / mangled+demangled name / size — plus the TU name, the 8-digit ABSOLUTE-VA
-   convention (`VA(RVA+0x400000, size)`; placeholders in the scaffold already show it),
-   the **`scripts/od_slots.py` stack-naming workflow**, and the push-to-100% mandate +
-   byte-proven `@early-stop` (marker line + byte reason, no %). Tell the matcher to do
-   the functions in retail-RVA order and to report each one's result.
+3. Carry a **whole-TU batch — each as RVA / mangled+demangled name / size** — plus the
+   TU name, the 8-digit ABSOLUTE-VA convention (`VA(RVA+0x400000, size)`; placeholders in
+   the scaffold already show it), the **`scripts/od_slots.py` stack-naming workflow**, and
+   the push-to-100% mandate + byte-proven `@early-stop` (marker line + byte reason, no %).
+   Tell the matcher to do the functions in retail-RVA order and to report each one's
+   result. **Batch SIZING is YOUR job — the matcher finishes every function it's handed
+   and does NOT bail, so size the batch to be completable in one matcher run:** ~20+ for
+   small functions, but **drop to ~10–16 when the TU's remaining functions are large**
+   (avg body ≳0x100 B). Do NOT tell the matcher it may "do fewer / report the rest
+   not-done" — that invites early bail-out; hand it a batch it can and must finish.
 4. **Forbid `homm2`-format-style reflows** — edit only the target file(s); leave
    formatting to integration.
 5. **Any new `docs/patterns/<name>.md` MUST show real byte-level asm (retail vs ours,

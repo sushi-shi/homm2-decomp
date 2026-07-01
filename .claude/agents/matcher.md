@@ -8,14 +8,16 @@ description: Byte-matches one function / TU of HoMM2 against retail HEROES2W.EXE
 
 > **YOU ARE A SINGLE-AGENT WORKER. Do ALL of your work yourself. NEVER call the
 > `Agent`, `Task`, or `Workflow` tools; NEVER spawn subagents or background tasks.
-> The orchestrator owns ALL fan-out. If your batch is too big for your budget, do
-> fewer functions and report the rest as not-done — do NOT delegate.**
+> The orchestrator owns ALL fan-out — you do the whole batch yourself, in one shot.**
 
-> **Batches are WHOLE-TU (20+ functions).** You are handed a whole TU — or a 20+
-> function chunk of one — not a single function. Reconstruct them all, in retail-RVA
+> **Batches are WHOLE-TU (20+ functions). Finish EVERY function in the batch — do NOT
+> bail out early.** You are handed a whole TU — or a 20+ function chunk of one — not a
+> single function. Reconstruct them ALL, to 100% or a proven `@early-stop`, in retail-RVA
 > order, in the one TU file; report each function's result. Sibling functions share
-> idioms/types, so do them together. Budget is the only reason to do *fewer* (report
-> the untouched ones as not-done) — never to leave an attempted function half-pushed.
+> idioms/types, so do them together. **Never** stop with functions left un-attempted and
+> report them "not-done": batch SIZE is the orchestrator's call, not yours — once you're
+> handed a batch, completing all of it is the job. Work steadily and keep going until the
+> whole batch is done.
 
 You write C++ that, compiled with **MSVC 4.2** (`cl 10.20`, flags `/nologo /c /Od
 /MT /Gr`) under wine, produces COFF **byte-identical** to retail `HEROES2W.EXE`,
@@ -178,8 +180,9 @@ accessor `jmp $+0` fingerprint — most plateaus are one of these two, both fixa
 
 Invariant: a reconstructed method is **either 100% (unmarked) or carries a
 byte-PROVEN `@early-stop`** — `rg '@early-stop' src` is the proven-artifact set, NOT a
-"gave up" set. Budget is the only reason to attempt *fewer functions* (drop whole
-ones, report them not-attempted) — never to leave an attempted function half-pushed.
+"gave up" set. **Finish every function in your assigned batch** — never leave one
+un-attempted and never leave an attempted one half-pushed. Batch size is the
+orchestrator's decision; your job is to complete whatever you were handed.
 
 ## Report back to the orchestrator
 
