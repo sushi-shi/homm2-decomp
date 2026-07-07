@@ -8,6 +8,7 @@ platform = "win32"
 [flags]
 base = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/QIfdiv"]
 o2 = ["/nologo", "/c", "/O2", "/MT", "/Gr", "/G5", "/QIfdiv"]
+base_oi = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/QIfdiv", "/Oi"]
 
 [[unit]]
 unit = "BASE/BASEMGR"
@@ -57,7 +58,7 @@ flags = "o2"
 [[unit]]
 unit = "BASE/FONT"
 source = "src/BASE/FONT.cpp"
-flags = "base"
+flags = "base_oi"
 
 [[unit]]
 unit = "BASE/ICON"

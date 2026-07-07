@@ -13,7 +13,7 @@ class icon : public resource {
 public:
     // --- own members (base resource occupies 0x00..0x10; widths from access-analysis) ---
     short  field_0x10;  // +0x10
-    int    field_0x12;  // +0x12
+    char  *field_0x12;  // +0x12  (glyph/sprite data; indexed as a byte pointer)
     // --- constructors ---
     icon(unsigned long int);
     virtual ~icon();

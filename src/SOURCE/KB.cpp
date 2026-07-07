@@ -1236,6 +1236,7 @@ int bDoColorCycle;
 inputManager *gpInputManager;
 SAMPLE2 NULL_SAMPLE2;
 int iMaxMapExtra;
+int gbLoadingMonoIcon;
 palette *gPalette;
 resourceManager *gpResourceManager;
 int bSpecialHideCursor;
