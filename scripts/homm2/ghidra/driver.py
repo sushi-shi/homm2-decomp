@@ -34,7 +34,9 @@ SCRIPTS_DIR = Path(__file__).resolve().parent / "scripts"
 APPLY_NAMES = SCRIPTS_DIR / "apply_names.py"
 EXPORT_FUNCS = SCRIPTS_DIR / "export_functions.py"
 DECOMP_EXPORT = SCRIPTS_DIR / "decomp_export.py"
+RECOVER_STRUCTS = SCRIPTS_DIR / "recover_structs.py"
 FUNCTIONS_CSV = PROJ_DIR / "exports" / "functions.csv"
+STRUCT_SUMMARY_CSV = PROJ_DIR / "exports" / "struct_summary.csv"
 
 
 def _project_exists() -> bool:
@@ -100,8 +102,28 @@ def cli_main(argv) -> int:
     functions.csv. First run imports + auto-analyzes (minutes); afterwards it reuses the DB."""
     argv = list(argv)
     if "-h" in argv or "--help" in argv:
-        print("usage: homm2 ghidra [--analyze | --no-analyze]\n" + __doc__)
+        print("usage: homm2 ghidra [--analyze | --no-analyze] [--structs]\n" + __doc__)
         return 0
+
+    # --structs: decompiler-backed class LAYOUT recovery (FillOutStructureHelper). Reuses the
+    # analyzed DB (analyze only if never built), re-applies our CodeView names (idempotent) so
+    # `this`/__thiscall are set, then runs recover_structs.py -> struct_{layouts,summary}.csv.
+    # Read-only w.r.t. the DB (every probe transaction is rolled back).
+    if "--structs" in argv:
+        analyze = ("--analyze" in argv) or not _project_exists()
+        if analyze:
+            print("[homm2 ghidra] importing + auto-analyzing HEROES2W.EXE (SEVERAL MINUTES, "
+                  "one-time) ...", flush=True)
+        else:
+            print("[homm2 ghidra --structs] reusing analyzed project; recovering class "
+                  "layouts ...", flush=True)
+        rc = run_scripts([APPLY_NAMES, RECOVER_STRUCTS], analyze)
+        if rc == 0 and STRUCT_SUMMARY_CSV.is_file():
+            n = sum(1 for _ in STRUCT_SUMMARY_CSV.open()) - 1
+            print("[homm2 ghidra --structs] done - %d classes -> %s (+ struct_layouts.csv)"
+                  % (n, STRUCT_SUMMARY_CSV.relative_to(REPO)))
+        return rc
+
     if "--no-analyze" in argv:
         analyze = False
     elif "--analyze" in argv:

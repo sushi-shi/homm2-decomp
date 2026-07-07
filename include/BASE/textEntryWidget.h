@@ -7,8 +7,33 @@
 // forward declarations:
 struct tag_message;
 
+#pragma pack(push, 1)  // recovered layout is byte-packed
 class textEntryWidget : public widget {
 public:
+    // --- members (offsets from Ghidra this+off access-analysis; widths are
+    // access-widths, NOT confirmed types; refine during byte-matching) ---
+    // (derived: base widget = 0x20 bytes at 0x00 via ': public widget'; own fields below)
+    int    field_0x20;  // +0x20
+    int    field_0x24;  // +0x24
+    short  field_0x28;  // +0x28
+    char   field_0x2a;  // +0x2a
+    int    field_0x2b;  // +0x2b
+    short  field_0x2f;  // +0x2f
+    short  field_0x31;  // +0x31
+    short  field_0x33;  // +0x33
+    short  field_0x35;  // +0x35
+    short  field_0x37;  // +0x37
+    short  field_0x39;  // +0x39
+    short  field_0x3b;  // +0x3b
+    short  field_0x3d;  // +0x3d
+    short  field_0x3f;  // +0x3f
+    short  field_0x41;  // +0x41
+    short  field_0x43;  // +0x43
+    short  field_0x45;  // +0x45
+    short  field_0x47;  // +0x47  !union: conflicting widths
+    short  field_0x49;  // +0x49
+    short  field_0x4b;  // +0x4b
+    char   field_0x4d;  // +0x4d
     // --- constructors ---
     textEntryWidget(void);
     textEntryWidget(short int, short int, short int, short int, short int, char *, char *, short int, char *, short int, short int, short int, short int, int, int);
@@ -20,4 +45,6 @@ public:
     void Read(int);
     void SetupDisplayString(char *, unsigned short int);
 };
+#pragma pack(pop)
+SIZE(textEntryWidget, 0x4e);
 #endif // HOMM2_BASE_TEXTENTRYWIDGET_H

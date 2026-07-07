@@ -9,8 +9,41 @@ class sample;
 struct _SAMPLE;
 struct tag_message;
 
+#pragma pack(push, 1)  // recovered layout is byte-packed
 class soundManager : public baseManager {
 public:
+    // --- members (offsets from Ghidra this+off access-analysis; widths are
+    // access-widths, NOT confirmed types; refine during byte-matching) ---
+    // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
+    int    field_0x36;  // +0x36
+    int    field_0x3a;  // +0x3a
+    int    field_0x3e;  // +0x3e
+    char _pad_0x42[0xe];
+    int    field_0x50;  // +0x50
+    int    field_0x54;  // +0x54
+    char _pad_0x58[0x3c];
+    int    field_0x94;  // +0x94
+    char _pad_0x98[0x4d4];
+    int    field_0x56c;  // +0x56c
+    char _pad_0x570[0x4];
+    int    field_0x574;  // +0x574
+    char   field_0x578;  // +0x578
+    char   field_0x579;  // +0x579
+    char   field_0x57a;  // +0x57a
+    char   field_0x57b;  // +0x57b
+    char _pad_0x57c[0x104];
+    int    field_0x680;  // +0x680
+    int    field_0x684;  // +0x684
+    int    field_0x688;  // +0x688
+    int    field_0x68c;  // +0x68c
+    int    field_0x690;  // +0x690
+    int    field_0x694;  // +0x694
+    short  field_0x698;  // +0x698
+    int    field_0x69a;  // +0x69a
+    int    field_0x69e;  // +0x69e
+    int    field_0x6a2;  // +0x6a2
+    int    field_0x6a6;  // +0x6a6
+    int    field_0x6aa;  // +0x6aa
     // --- constructors ---
     soundManager(void);
     // --- virtual methods (vtable order) ---
@@ -52,4 +85,6 @@ public:
     void MIDISetVolume(void);
     void MIDIPoll(void);
 };
+#pragma pack(pop)
+SIZE(soundManager, 0x6ae);
 #endif // HOMM2_BASE_SOUNDMANAGER_H

@@ -6,8 +6,47 @@
 // forward declarations:
 class town;
 
+#pragma pack(push, 1)  // recovered layout is byte-packed
 class hero {
 public:
+    // --- members (offsets from Ghidra this+off access-analysis; widths are
+    // access-widths, NOT confirmed types; refine during byte-matching) ---
+    short  field_0x0;  // +0x00
+    char   field_0x2;  // +0x02
+    char   field_0x3;  // +0x03
+    short  field_0x4;  // +0x04
+    char _pad_0x6[0x1];
+    short  field_0x7;  // +0x07
+    char _pad_0x9[0x1];
+    char   field_0xa;  // +0x0a
+    char _pad_0xb[0xc];
+    char   field_0x17;  // +0x17
+    char   field_0x18;  // +0x18
+    int    field_0x19;  // +0x19
+    int    field_0x1d;  // +0x1d
+    int    field_0x21;  // +0x21
+    int    field_0x25;  // +0x25
+    char _pad_0x29[0x4];
+    short  field_0x2d;  // +0x2d
+    short  field_0x2f;  // +0x2f
+    char _pad_0x31[0x8];
+    int    field_0x39;  // +0x39
+    short  field_0x3d;  // +0x3d
+    char _pad_0x3f[0x2];
+    char   field_0x41;  // +0x41
+    char _pad_0x42[0x2];
+    char   field_0x44;  // +0x44
+    char   field_0x45;  // +0x45
+    char _pad_0x46[0x1d];
+    char   field_0x63;  // +0x63
+    char   field_0x64;  // +0x64
+    char _pad_0x65[0x16];
+    char   field_0x7b;  // +0x7b
+    char _pad_0x7c[0x14];
+    int    field_0x90;  // +0x90
+    char _pad_0x94[0x4f];
+    int    field_0xe3;  // +0xe3  !union: conflicting widths
+    // size >= 0xe7 (accessed lower bound; no ctor/stride oracle)
     // --- constructors ---
     hero(void);
     // --- methods ---
@@ -45,4 +84,5 @@ public:
     void DoSSLevelDialog(int, int);
     void CheckAnduranPieces(int);
 };
+#pragma pack(pop)
 #endif // HOMM2_SOURCE_HERO_H

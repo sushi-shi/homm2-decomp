@@ -8,8 +8,43 @@
 class heroWindow;
 struct tag_message;
 
+#pragma pack(push, 1)  // recovered layout is byte-packed
 class townManager : public baseManager {
 public:
+    // --- members (offsets from Ghidra this+off access-analysis; widths are
+    // access-widths, NOT confirmed types; refine during byte-matching) ---
+    // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
+    int    field_0x36;  // +0x36
+    int    field_0x3a;  // +0x3a
+    char _pad_0x3e[0x80];
+    int    field_0xbe;  // +0xbe
+    int    field_0xc2;  // +0xc2
+    int    field_0xc6;  // +0xc6
+    int    field_0xca;  // +0xca
+    int    field_0xce;  // +0xce
+    int    field_0xd2;  // +0xd2
+    int    field_0xd6;  // +0xd6
+    int    field_0xda;  // +0xda
+    int    field_0xde;  // +0xde
+    int    field_0xe2;  // +0xe2
+    int    field_0xe6;  // +0xe6
+    int    field_0xea;  // +0xea
+    int    field_0xee;  // +0xee
+    char _pad_0xf2[0x50];
+    int    field_0x142;  // +0x142
+    int    field_0x146;  // +0x146
+    int    field_0x14a;  // +0x14a
+    int    field_0x14e;  // +0x14e
+    int    field_0x152;  // +0x152
+    int    field_0x156;  // +0x156
+    int    field_0x15a;  // +0x15a
+    int    field_0x15e;  // +0x15e
+    int    field_0x162;  // +0x162
+    int    field_0x166;  // +0x166
+    int    field_0x16a;  // +0x16a
+    int    field_0x16e;  // +0x16e
+    int    field_0x172;  // +0x172
+    int    field_0x176;  // +0x176
     // --- constructors ---
     townManager(void);
     // --- virtual methods (vtable order) ---
@@ -40,4 +75,6 @@ public:
     void SetupThievesGuild(class heroWindow *, int);
     void SetupCastle(class heroWindow *, int);
 };
+#pragma pack(pop)
+SIZE(townManager, 0x17a);
 #endif // HOMM2_SOURCE_TOWNMANAGER_H

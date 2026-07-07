@@ -7,8 +7,66 @@
 // forward declarations:
 struct tag_message;
 
+#pragma pack(push, 1)  // recovered layout is byte-packed
 class listBoxWidget : public widget {
 public:
+    // --- members (offsets from Ghidra this+off access-analysis; widths are
+    // access-widths, NOT confirmed types; refine during byte-matching) ---
+    // (derived: base widget = 0x20 bytes at 0x00 via ': public widget'; own fields below)
+    int    field_0x20;  // +0x20
+    int    field_0x24;  // +0x24
+    short  field_0x28;  // +0x28
+    short  field_0x2a;  // +0x2a
+    short  field_0x2c;  // +0x2c
+    short  field_0x2e;  // +0x2e
+    short  field_0x30;  // +0x30
+    short  field_0x32;  // +0x32
+    short  field_0x34;  // +0x34
+    short  field_0x36;  // +0x36
+    int    field_0x38;  // +0x38
+    int    field_0x3c;  // +0x3c
+    short  field_0x40;  // +0x40
+    short  field_0x42;  // +0x42
+    short  field_0x44;  // +0x44
+    short  field_0x46;  // +0x46
+    short  field_0x48;  // +0x48
+    short  field_0x4a;  // +0x4a
+    short  field_0x4c;  // +0x4c
+    short  field_0x4e;  // +0x4e
+    short  field_0x50;  // +0x50
+    short  field_0x52;  // +0x52
+    short  field_0x54;  // +0x54
+    short  field_0x56;  // +0x56
+    short  field_0x58;  // +0x58
+    short  field_0x5a;  // +0x5a
+    short  field_0x5c;  // +0x5c
+    short  field_0x5e;  // +0x5e
+    short  field_0x60;  // +0x60
+    short  field_0x62;  // +0x62
+    short  field_0x64;  // +0x64
+    short  field_0x66;  // +0x66
+    short  field_0x68;  // +0x68
+    short  field_0x6a;  // +0x6a
+    short  field_0x6c;  // +0x6c
+    short  field_0x6e;  // +0x6e
+    short  field_0x70;  // +0x70
+    short  field_0x72;  // +0x72
+    short  field_0x74;  // +0x74
+    short  field_0x76;  // +0x76
+    short  field_0x78;  // +0x78
+    short  field_0x7a;  // +0x7a
+    short  field_0x7c;  // +0x7c
+    short  field_0x7e;  // +0x7e
+    short  field_0x80;  // +0x80
+    short  field_0x82;  // +0x82
+    short  field_0x84;  // +0x84
+    short  field_0x86;  // +0x86
+    short  field_0x88;  // +0x88
+    char   field_0x8a;  // +0x8a
+    char   field_0x8b;  // +0x8b
+    char   field_0x8c;  // +0x8c
+    char   field_0x8d;  // +0x8d
+    int    field_0x8e;  // +0x8e
     // --- constructors ---
     listBoxWidget(void);
     virtual ~listBoxWidget() OVERRIDE;
@@ -21,4 +79,6 @@ public:
     void DrawLBStuff(int);
     int ProcessMouseMessage(struct tag_message &);
 };
+#pragma pack(pop)
+SIZE(listBoxWidget, 0x92);
 #endif // HOMM2_BASE_LISTBOXWIDGET_H
