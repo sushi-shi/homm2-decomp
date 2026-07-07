@@ -8,6 +8,9 @@
 #include <string.h>
 #include <windows.h>
 #include <SOURCE/X_GLOBAL.h>
+#include <BASE/bitmap.h>
+#include <BASE/heroWindowManager.h>
+#include <SOURCE/KB.h>
 VA(0x004c9270, 0xd9)
 mouseManager::mouseManager(void) : baseManager()
 {
@@ -61,7 +64,11 @@ VA(0x004c9f20, 0xa2)
 void mouseManager::SaveAndDraw(void) {}
 
 VA(0x004c9fd0, 0x29)
-void mouseManager::RestoreUnderlying(void) {}
+void mouseManager::RestoreUnderlying(void)
+{
+    field_0x36->CopyToCareful(gpWindowManager->field_0x46, field_0x5e, field_0x62, 0, 0,
+                              field_0x76, field_0x7a);
+}
 
 VA(0x004ca000, 0x2c)
 void mouseManager::ReallyHidePointer(void)
