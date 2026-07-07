@@ -10,6 +10,9 @@
 #include <BASE/Misc.h>
 #include <BASE/mouseManager.h>
 #include <BASE/heroWindow.h>
+#include <BASE/palette.h>
+#include <BASE/inputManager.h>
+#include <stdio.h>
 #include <SOURCE/KB.h>
 VA(0x004ca6d0, 0x3a3)
 void CycleColors(int) {}
@@ -163,7 +166,15 @@ VA(0x004cb030, 0x80)
 void heroWindowManager::FadeScreen(int, int, class palette *) {}
 
 VA(0x004cb0b0, 0x53)
-void heroWindowManager::ScreenShot(void) {}
+void heroWindowManager::ScreenShot(void)
+{
+    char local_10[16];
+    sprintf(local_10, "SHOT%04d.PCX", field_0x52);
+    CreatePCXFile(local_10, field_0x46->field_0x16, 640, 480,
+                  reinterpret_cast<unsigned char *>(gPalette->field_0x10));
+    field_0x52++;
+    gpInputManager->Flush();
+}
 
 VA(0x004cb110, 0xc0)
 void heroWindowManager::SaveFizzleSource(int, int, int, int) {}

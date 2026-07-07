@@ -345,7 +345,7 @@ BASE/WINDOW	?RemoveWidget@heroWindow@@QAEXPAVwidget@@@Z	16.0247	a1e1ac785a8f
 BASE/WINDOW	?RestoreBackground@heroWindow@@QAEXXZ	100.0000	1ad6adddfb67
 BASE/WINDOW	?SaveBackground@heroWindow@@QAEHXZ	100.0000	b4aefb12dfaa
 BASE/WINMGR	??0heroWindowManager@@QAE@XZ	100.0000	41337786b991
-BASE/WINMGR	?AddWindow@heroWindowManager@@QAEXPAVheroWindow@@HH@Z	75.0946	d38ba83b65aa
+BASE/WINMGR	?AddWindow@heroWindowManager@@QAEXPAVheroWindow@@HH@Z	78.3649	d38ba83b65aa
 BASE/WINMGR	?BroadcastMessage@heroWindowManager@@QAEHHHHH@Z	81.1765	89a4bfb5663a
 BASE/WINMGR	?Close@heroWindowManager@@UAEXXZ	3.5714	b88807443073
 BASE/WINMGR	?ConvertToHover@heroWindowManager@@QAEHAAUtag_message@@@Z	20.0000	965da9c36dfd
@@ -359,7 +359,7 @@ BASE/WINMGR	?RedrawScreen@heroWindowManager@@QAEXXZ	100.0000	d123d235bd7e
 BASE/WINMGR	?ReleaseFizzleSource@heroWindowManager@@QAEXXZ	100.0000	ccbdef6cd22c
 BASE/WINMGR	?RemoveWindow@heroWindowManager@@QAEXPAVheroWindow@@@Z	89.6939	b6f4108fa5d3
 BASE/WINMGR	?SaveFizzleSource@heroWindowManager@@QAEXHHHH@Z	1.4085	263a2d0d013d
-BASE/WINMGR	?ScreenShot@heroWindowManager@@QAEXXZ	3.8462	19a11dd50ceb
+BASE/WINMGR	?ScreenShot@heroWindowManager@@QAEXXZ	100.0000	6a1436975481
 BASE/WINMGR	?UpdateScreen@heroWindowManager@@QAEXXZ	100.0000	4077d1619d5f
 BASE/WINMGR	?UpdateScreenRegion@heroWindowManager@@QAEXHHHH@Z	100.0000	540656621367
 BASE/WINMGR	empty_stub	0.0000	

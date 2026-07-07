@@ -14,7 +14,7 @@ public:
     short  field_0x10;  // +0x10
     short  field_0x12;  // +0x12
     short  field_0x14;  // +0x14
-    int    field_0x16;  // +0x16
+    unsigned char *field_0x16;  // +0x16  pixel data
     // --- constructors ---
     bitmap(void);
     bitmap(short int, short int, short int);
