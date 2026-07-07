@@ -345,7 +345,7 @@ BASE/WINDOW	?RemoveWidget@heroWindow@@QAEXPAVwidget@@@Z	16.0247	a1e1ac785a8f
 BASE/WINDOW	?RestoreBackground@heroWindow@@QAEXXZ	100.0000	1ad6adddfb67
 BASE/WINDOW	?SaveBackground@heroWindow@@QAEHXZ	100.0000	b4aefb12dfaa
 BASE/WINMGR	??0heroWindowManager@@QAE@XZ	100.0000	41337786b991
-BASE/WINMGR	?AddWindow@heroWindowManager@@QAEXPAVheroWindow@@HH@Z	1.3514	e65bfcde03c2
+BASE/WINMGR	?AddWindow@heroWindowManager@@QAEXPAVheroWindow@@HH@Z	75.0946	d38ba83b65aa
 BASE/WINMGR	?BroadcastMessage@heroWindowManager@@QAEHHHHH@Z	8.2353	450c19fd2af4
 BASE/WINMGR	?Close@heroWindowManager@@UAEXXZ	3.5714	b88807443073
 BASE/WINMGR	?ConvertToHover@heroWindowManager@@QAEHAAUtag_message@@@Z	20.0000	965da9c36dfd

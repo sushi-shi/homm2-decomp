@@ -47,7 +47,48 @@ VA(0x004cac40, 0x35)
 int heroWindowManager::BroadcastMessage(int, int, int, int) { return 0; }
 
 VA(0x004cac80, 0xbc)
-void heroWindowManager::AddWindow(class heroWindow *, int, int) {}
+void heroWindowManager::AddWindow(class heroWindow *w, int param_2, int param_3)
+{
+    heroWindow *cur = field_0x3a;
+    int z = 0;
+    if ((w->field_0x20 & 1) == 0)
+        z = param_2;
+    if (z == -1 && (z = 0, cur != 0))
+        z = cur->field_0x0 + 1;
+    if (z != 0 && field_0x36 == 0)
+        return;
+    if (w->Open(z, param_3) != 0)
+        return;
+    if (cur != 0) {
+        do {
+            if (cur->field_0x0 <= z)
+                break;
+            cur = cur->field_0x8;
+        } while (cur != 0);
+        if (cur != 0) {
+            if (cur->field_0x4 == 0) {
+                w->field_0x4 = 0;
+                w->field_0x8 = field_0x3a;
+                field_0x3a->field_0x4 = w;
+                field_0x3a = w;
+            } else {
+                w->field_0x8 = cur;
+                w->field_0x4 = cur->field_0x4;
+                cur->field_0x4->field_0x8 = w;
+                cur->field_0x4 = w;
+            }
+            goto done;
+        }
+    }
+    w->field_0x8 = 0;
+    w->field_0x4 = field_0x36;
+    field_0x36 = w;
+    if (field_0x3a == 0)
+        field_0x3a = w;
+done:
+    field_0x42 = field_0x3e;
+    field_0x3e = w;
+}
 
 VA(0x004cad40, 0x87)
 void heroWindowManager::RemoveWindow(class heroWindow *w)
