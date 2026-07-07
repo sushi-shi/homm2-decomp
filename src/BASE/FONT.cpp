@@ -67,7 +67,45 @@ VA(0x004c7470, 0x313)
 void font::DrawBoundedString(char *, int, int, int, int, int, int) {}
 
 VA(0x004c7790, 0x1b3)
-int font::LineLength(char *, int) { return 0; }
+int font::LineLength(char *str, int maxW)
+{
+    // Word-wrap: count how many lines `str` needs at width maxW, breaking at spaces.
+    // 13 locals (frame 0x38); names carry the /Od slot hashes (od_slots). q/v declared-unused;
+    // aa/t/u are set-or-zeroed-but-unused (vestigial). Init order matches the retail.
+    int s = strlen(str);                 // len   @ -0x10
+    char aa = ' ';                       //       @ -0x30 (vestigial)
+    int z = 0, t = 0, r = 0, y = 0, p = 0, u = 0, x = 0, gap = 0;
+    // z=lineCount(-0x2c) t=vestigial(-0x14) r=wordStart(-0xc) y=(-0x28) p=i(-0x4)
+    // u=vestigial(-0x18) x=width(-0x24) gap=breakPt(-0x34)
+    char *w = str;                       // ptr   @ -0x20
+    int q, v;                            // unused @ -0x8, -0x1c
+    while (p < s && w[p] != 0) {
+        while (w[p] != 0 && w[p] != '\n' && x <= maxW) {
+            x += GetCharacterWidth(w[p]);
+            p++;
+        }
+        if (x > maxW) {
+            p--;
+            gap = 0;
+            while (w[p] != ' ' && p >= r) {
+                x -= GetCharacterWidth(w[p]);
+                if (gap == 0 && x < maxW)
+                    gap = p;
+                p--;
+            }
+            if (p <= r)
+                p = gap;
+            if (w[p] == ' ')
+                x -= GetCharacterWidth(w[p]);
+        }
+        y = p;
+        z++;
+        r = y + 1;
+        p = r;
+        x = 0;
+    }
+    return z;
+}
 
 VA(0x004c7950, 0xc4)
 int font::LineWidth(char *str)
