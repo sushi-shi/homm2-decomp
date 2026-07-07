@@ -8,6 +8,8 @@
 #include <BASE/resource.h>
 #include <BASE/tileset.h>
 #include <BASE/font.h>
+#include <BASE/bitmap.h>
+#include <BASE/palette.h>
 VA(0x004c7fa0, 0xdb)
 resourceManager::resourceManager(void) {}
 
@@ -18,10 +20,32 @@ VA(0x004c8130, 0xd2)
 void resourceManager::GetBackdropAtLoc(char *, class bitmap *, int, int, int) {}
 
 VA(0x004c8210, 0x97)
-class palette * resourceManager::GetPalette(char *) { return 0; }
+class palette * resourceManager::GetPalette(char *name)
+{
+    unsigned long id = MakeId(name, 1);
+    resource *r = Query(id);
+    if (r != 0) {
+        r->field_0x6++;
+    } else {
+        r = new palette(id);
+        AddResource(r);
+    }
+    return static_cast<palette *>(r);
+}
 
 VA(0x004c82b0, 0x97)
-class bitmap * resourceManager::GetBitmap(char *) { return 0; }
+class bitmap * resourceManager::GetBitmap(char *name)
+{
+    unsigned long id = MakeId(name, 1);
+    resource *r = Query(id);
+    if (r != 0) {
+        r->field_0x6++;
+    } else {
+        r = new bitmap(id);
+        AddResource(r);
+    }
+    return static_cast<bitmap *>(r);
+}
 
 VA(0x004c8350, 0x2f)
 class icon * resourceManager::GetIcon(char *name) { return GetIcon(MakeId(name, 1)); }
