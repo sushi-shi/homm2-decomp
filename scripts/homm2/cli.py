@@ -23,6 +23,7 @@ def main(argv=None):
         if sh("python3", "-m", "homm2.build.assert_decls"): return 1
         if sh("python3", "-m", "homm2.build.assert_no_fake_labels"): return 1
         if sh("python3", "-m", "homm2.build.assert_globals_data"): return 1
+        if sh("python3", "-m", "homm2.build.assert_defs_declared"): return 1
         from homm2.match.status import main as st
         st(["--write-readme"]); return st([])   # refresh README % block + print summary
     if cmd == "status":

@@ -4,6 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <BASE/BITS.h>
 
 VA(0x004d1594, 0x2e)
 extern "C" int __cdecl BitTest(void *, int) { return 0; }

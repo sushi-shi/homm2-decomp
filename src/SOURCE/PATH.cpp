@@ -4,6 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <SOURCE/PATH.h>
 #include <_all.h>
 VA(0x004bdbf0, 0x14a)
 int army::FindPath(int, int, int, int, int) { return 0; }

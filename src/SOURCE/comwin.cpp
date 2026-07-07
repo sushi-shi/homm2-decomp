@@ -4,6 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <SOURCE/comwin.h>
 #include <_all.h>
 VA(0x0048a640, 0x74)
 void add_node(struct tag_Anchor *, struct tag_Node *) {}

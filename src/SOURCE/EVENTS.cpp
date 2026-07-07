@@ -4,6 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <SOURCE/EVENTS.h>
 #include <_all.h>
 VA(0x004a8530, 0x5adb)
 void advManager::DoEvent(class mapCell *, int, int) {}

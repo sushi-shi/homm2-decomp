@@ -4,6 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <SOURCE/Netbios.h>
 #include <_all.h>
 VA(0x004132f0, 0x155)
 signed char InitNetHost(void) { return 0; }
