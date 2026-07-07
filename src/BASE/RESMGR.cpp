@@ -5,6 +5,8 @@
 
 #include <va.h>
 #include <BASE/resourceManager.h>
+#include <BASE/resource.h>
+#include <BASE/tileset.h>
 VA(0x004c7fa0, 0xdb)
 resourceManager::resourceManager(void) {}
 
@@ -27,7 +29,18 @@ VA(0x004c8380, 0x86)
 class icon * resourceManager::GetIcon(unsigned long int) { return 0; }
 
 VA(0x004c8410, 0x97)
-class tileset * resourceManager::GetTileset(char *) { return 0; }
+class tileset * resourceManager::GetTileset(char *name)
+{
+    unsigned long id = MakeId(name, 1);
+    resource *r = Query(id);
+    if (r != 0) {
+        r->field_0x6++;
+    } else {
+        r = new tileset(id);
+        AddResource(r);
+    }
+    return static_cast<tileset *>(r);
+}
 
 VA(0x004c84b0, 0x1a)
 class mouse * resourceManager::GetMouse(char *) { return 0; }
