@@ -22,6 +22,10 @@
 //     case 0x8000:  // horizontal flip: write each row right-to-left, byte by byte (lodsb)
 //     case 0xC000:  // 180-degree: both flips, source read backward with the direction flag (std)
 //   }
+// @early-stop 94%: body + all jumps byte-exact under /O2. Residual is one prologue byte — the retail
+// uses ebx but does NOT save it (hand-asm clobber), whereas MSVC 4.2 always emits `push ebx` for an
+// __asm that writes ebx (verified under C / C++ / /O2 / /Od). That extra push shifts every /O2
+// loop-alignment nop. Likely a compiler minor-version policy diff (NWC's toolchain vs our 4.2).
 VA(0x004d310c, 0x18f)
 extern "C" void __cdecl TileToBitmap(bitmap *src, unsigned int flags, bitmap *dst, int x, int y)
 {
