@@ -5,5 +5,5 @@
 
 #include <va.h>
 VA(0x004d310c, 0x18f)
-// _TileToBitmap;
+extern "C" void __cdecl TileToBitmap(void) {}
 

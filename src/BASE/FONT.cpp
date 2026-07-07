@@ -4,35 +4,30 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <_all.h>
 VA(0x004c6fd0, 0xc8)
-// void font::constructor(unsigned long int);
-
-VA(0x004c70a0, 0x39)
-// void * font::scalar_dtor(unsigned int);   // virtual [introduces virtual]
-
-VA(0x004c70a0, 0x39)
-// void * font::scalar_dtor(unsigned int);   // virtual [introduces virtual]
+font::font(unsigned long int) {}
 
 VA(0x004c70e0, 0x39)
-// void font::~destructor(void);
+font::~font() {}
 
 VA(0x004c7120, 0x24a)
-// void font::DrawStringExecute(char *, int, int, int, int, int, int, int);
+void font::DrawStringExecute(char *, int, int, int, int, int, int, int) {}
 
 VA(0x004c7370, 0x48)
-// void font::DrawString(char *, int, int, int);
+void font::DrawString(char *, int, int, int) {}
 
 VA(0x004c73c0, 0xaf)
-// int font::GetCharacterWidth(unsigned char);
+int font::GetCharacterWidth(unsigned char) { return 0; }
 
 VA(0x004c7470, 0x313)
-// void font::DrawBoundedString(char *, int, int, int, int, int, int);
+void font::DrawBoundedString(char *, int, int, int, int, int, int) {}
 
 VA(0x004c7790, 0x1b3)
-// int font::LineLength(char *, int);
+int font::LineLength(char *, int) { return 0; }
 
 VA(0x004c7950, 0xc4)
-// int font::LineWidth(char *);
+int font::LineWidth(char *) { return 0; }
 
 // ---- data / globals / vtables ----
 DATA(0x004eb9e4)  // const font::vftable

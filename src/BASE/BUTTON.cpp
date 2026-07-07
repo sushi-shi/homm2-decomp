@@ -4,38 +4,33 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <_all.h>
 VA(0x004dd440, 0x34)
-// void button::constructor(void);
-
-VA(0x004dd480, 0x36)
-// void * button::scalar_dtor(unsigned int);   // virtual [override (implements widget pure virtual)]
-
-VA(0x004dd480, 0x36)
-// void * button::scalar_dtor(unsigned int);   // virtual [override (implements widget pure virtual)]
+button::button(void) {}
 
 VA(0x004dd4c0, 0x6e)
-// void button::constructor(short int, short int, short int, short int, unsigned long int, short int, short int, short int, short int, short int, short int);
+button::button(short int, short int, short int, short int, unsigned long int, short int, short int, short int, short int, short int, short int) {}
 
 VA(0x004dd530, 0x7c)
-// void button::constructor(short int, short int, short int, short int, char *, short int, short int, short int, short int, short int, short int);
+button::button(short int, short int, short int, short int, char *, short int, short int, short int, short int, short int, short int) {}
 
 VA(0x004dd5b0, 0xeb)
-// void button::Read(void);
+void button::Read(void) {}
 
 VA(0x004dd6a0, 0x21)
-// void button::~destructor(void);
+button::~button() {}
 
 VA(0x004dd6d0, 0x595)
-// int button::Main(struct tag_message &);   // virtual [override (implements widget pure virtual)]
+int button::Main(struct tag_message &) { return 0; }
 
 VA(0x004ddc70, 0x96)
-// short int button::Select(struct tag_message &);
+short int button::Select(struct tag_message &) { return 0; }
 
 VA(0x004ddd10, 0x83)
-// short int button::Deselect(struct tag_message &);
+short int button::Deselect(struct tag_message &) { return 0; }
 
 VA(0x004ddda0, 0x55)
-// void button::Draw(void);   // virtual [override (implements widget pure virtual)]
+void button::Draw(void) {}
 
 // ---- data / globals / vtables ----
 DATA(0x004ebaf0)  // const button::vftable

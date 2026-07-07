@@ -4,38 +4,39 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <_all.h>
 VA(0x004867c0, 0x279)
-// int combatManager::DoSpellAI(int, int);
+int combatManager::DoSpellAI(int, int) { return 0; }
 
 VA(0x00486a39, 0x1155)
-// void combatManager::DetermineEffectOfSpell(int, int *, int *);
+void combatManager::DetermineEffectOfSpell(int, int *, int *) {}
 
 VA(0x00487b8e, 0x34c)
-// int combatManager::EffectSpellCreateCreature(int, int);
+int combatManager::EffectSpellCreateCreature(int, int) { return 0; }
 
 VA(0x00487eda, 0x72d)
-// int combatManager::RawEffectSpellInfluence(class army *, int);
+int combatManager::RawEffectSpellInfluence(class army *, int) { return 0; }
 
 VA(0x00488607, 0x66)
-// void combatManager::ClearEffects(void);
+void combatManager::ClearEffects(void) {}
 
 VA(0x0048866d, 0x40)
-// void combatManager::NextPos(int *);
+void combatManager::NextPos(int *) {}
 
 VA(0x004886ad, 0xa1)
-// int combatManager::FirstArmy(int, int, int *);
+int combatManager::FirstArmy(int, int, int *) { return 0; }
 
 VA(0x0048874e, 0x73)
-// int combatManager::FirstResurrectable(int, int *, int);
+int combatManager::FirstResurrectable(int, int *, int) { return 0; }
 
 VA(0x004887c1, 0x421)
-// void combatManager::EffectSpellCure(int *, int, int, int);
+void combatManager::EffectSpellCure(int *, int, int, int) {}
 
 VA(0x00488be2, 0x176)
-// void combatManager::EffectSpellResurrect(int *, int, int);
+void combatManager::EffectSpellResurrect(int *, int, int) {}
 
 VA(0x00488d58, 0xcc9)
-// void combatManager::EffectSpellDamage(int *, int, int);
+void combatManager::EffectSpellDamage(int *, int, int) {}
 
 // ---- data / globals / vtables ----
 DATA(0x004f80b8)  // float * gfDurationMods

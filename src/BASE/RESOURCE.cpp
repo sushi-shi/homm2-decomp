@@ -4,14 +4,15 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <_all.h>
 VA(0x004d9730, 0x19)
-// void resource::constructor(void);
+resource::resource(void) {}
 
 VA(0x004d9750, 0x2d)
-// void resource::constructor(short int, unsigned long int, short int, class resource *);
+resource::resource(short int, unsigned long int, short int, class resource *) {}
 
 VA(0x004d9780, 0x7)
-// void resource::~destructor(void);
+resource::~resource() {}
 
 // ---- data / globals / vtables ----
 DATA(0x004ebaac)  // const resource::vftable

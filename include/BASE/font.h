@@ -10,7 +10,9 @@ public:
     font(unsigned long int);
     virtual ~font();
     // --- methods ---
-    void DrawStringExecute(char *, int, int, int, int, int, int, int);
+protected:
+    void DrawStringExecute(char *, int, int, int, int, int, int, int);   // ?...@font@@IAE... (protected)
+public:
     void DrawString(char *, int, int, int);
     int GetCharacterWidth(unsigned char);
     void DrawBoundedString(char *, int, int, int, int, int, int);

@@ -4,20 +4,21 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <_all.h>
 VA(0x00489a30, 0x66)
-// void highScoreManager::constructor(void);
+highScoreManager::highScoreManager(void) {}
 
 VA(0x00489a96, 0x14c)
-// int highScoreManager::Open(int);   // virtual [override (implements baseManager pure virtual)]
+int highScoreManager::Open(int) { return 0; }
 
 VA(0x00489be2, 0x5e)
-// void highScoreManager::Close(void);   // virtual [override (implements baseManager pure virtual)]
+void highScoreManager::Close(void) {}
 
 VA(0x00489c40, 0x22a)
-// int highScoreManager::Main(struct tag_message &);   // virtual [override (implements baseManager pure virtual)]
+int highScoreManager::Main(struct tag_message &) { return 0; }
 
 VA(0x00489e6a, 0x7d3)
-// void highScoreManager::Update(void);
+void highScoreManager::Update(void) {}
 
 // ---- data / globals / vtables ----
 DATA(0x004eb838)  // const highScoreManager::vftable

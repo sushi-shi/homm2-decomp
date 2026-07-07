@@ -4,8 +4,9 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <_all.h>
 VA(0x004d2530, 0x47)
-// void baseManager::constructor(void);
+baseManager::baseManager(void) {}
 
 // ---- data / globals / vtables ----
 DATA(0x004eba70)  // const baseManager::vftable

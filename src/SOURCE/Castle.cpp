@@ -4,11 +4,12 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <_all.h>
 VA(0x0041d040, 0x10bb)
-// void townManager::SetupCastle(class heroWindow *, int);
+void townManager::SetupCastle(class heroWindow *, int) {}
 
 VA(0x0041e0fb, 0xca3)
-// int CastleHandler(struct tag_message &);
+int CastleHandler(struct tag_message &) { return 0; }
 
 // ---- data / globals / vtables ----
 DATA(0x004ef5e0)  // unsigned char * castleSlotsBase

@@ -4,68 +4,69 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <_all.h>
 VA(0x004ca6d0, 0x3a3)
-// void CycleColors(int);
+void CycleColors(int) {}
 
 VA(0x004caa80, 0x41)
-// void heroWindowManager::constructor(void);
+heroWindowManager::heroWindowManager(void) {}
 
 VA(0x004caad0, 0xd6)
-// int heroWindowManager::Open(int);   // virtual [override (implements baseManager pure virtual)]
+int heroWindowManager::Open(int) { return 0; }
 
 VA(0x004cabb0, 0x45)
-// void heroWindowManager::Close(void);   // virtual [override (implements baseManager pure virtual)]
+void heroWindowManager::Close(void) {}
 
 VA(0x004cac00, 0x2d)
-// int heroWindowManager::Main(struct tag_message &);   // virtual [override (implements baseManager pure virtual)]
+int heroWindowManager::Main(struct tag_message &) { return 0; }
 
 VA(0x004cac30, 0xf)
-// int heroWindowManager::ConvertToHover(struct tag_message &);
+int heroWindowManager::ConvertToHover(struct tag_message &) { return 0; }
 
 VA(0x004cac40, 0x35)
-// int heroWindowManager::BroadcastMessage(int, int, int, int);
+int heroWindowManager::BroadcastMessage(int, int, int, int) { return 0; }
 
 VA(0x004cac80, 0xbc)
-// void heroWindowManager::AddWindow(class heroWindow *, int, int);
+void heroWindowManager::AddWindow(class heroWindow *, int, int) {}
 
 VA(0x004cad40, 0x87)
-// void heroWindowManager::RemoveWindow(class heroWindow *);
+void heroWindowManager::RemoveWindow(class heroWindow *) {}
 
 VA(0x004cadd0, 0x1cf)
-// int heroWindowManager::DoDialog(class heroWindow *, int (*)(struct tag_message &), int);
+int heroWindowManager::DoDialog(class heroWindow *, int (*)(struct tag_message &), int) { return 0; }
 
 VA(0x004cafa0, 0x17)
-// void heroWindowManager::UpdateScreen(void);
+void heroWindowManager::UpdateScreen(void) {}
 
 VA(0x004cafc0, 0x4f)
-// void heroWindowManager::UpdateScreenRegion(int, int, int, int);
+void heroWindowManager::UpdateScreenRegion(int, int, int, int) {}
 
 VA(0x004cb010, 0x18)
-// void heroWindowManager::RedrawScreen(void);
+void heroWindowManager::RedrawScreen(void) {}
 
 VA(0x004cb030, 0x80)
-// void heroWindowManager::FadeScreen(int, int, class palette *);
+void heroWindowManager::FadeScreen(int, int, class palette *) {}
 
 VA(0x004cb0b0, 0x53)
-// void heroWindowManager::ScreenShot(void);
+void heroWindowManager::ScreenShot(void) {}
 
 VA(0x004cb110, 0xc0)
-// void heroWindowManager::SaveFizzleSource(int, int, int, int);
+void heroWindowManager::SaveFizzleSource(int, int, int, int) {}
 
 VA(0x004cb1d0, 0x1)
-// void CreateFizzleTables(void);
+void CreateFizzleTables(void) {}
 
 VA(0x004cb1e0, 0x402)
-// void heroWindowManager::FizzleForward(int, int, int, int, int, signed char *, signed char *);
+void heroWindowManager::FizzleForward(int, int, int, int, int, signed char *, signed char *) {}
 
 VA(0x004cb5f0, 0x19)
-// void heroWindowManager::ReleaseFizzleSource(void);
+void heroWindowManager::ReleaseFizzleSource(void) {}
 
 VA(0x004cb610, 0x1)
-// void CreateColorTables(void);
+void CreateColorTables(void) {}
 
 VA(0x004cb620, 0x1)
-// void CreateColorLookupTables(void);
+void CreateColorLookupTables(void) {}
 
 // ---- data / globals / vtables ----
 DATA(0x004eba10)  // const heroWindowManager::vftable

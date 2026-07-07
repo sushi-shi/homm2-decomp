@@ -36,7 +36,9 @@ public:
     void ReplaySmacker4(void);
     unsigned char IsCompleted(void);
     signed char IsThisMapCompleted(void);
-    static int MessageHandler(struct tag_message &);
+private:
+    static int MessageHandler(struct tag_message &);   // ?...@ExpCampaign@@CIH... (private static)
+public:
     void Autosave(void);
     int Choose(void);
     short int Days(void);

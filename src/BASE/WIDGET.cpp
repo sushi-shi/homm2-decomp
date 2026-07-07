@@ -4,26 +4,27 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <_all.h>
 VA(0x004dde00, 0x5a)
-// void widget::constructor(short int, short int, short int, short int, short int, short int);
+widget::widget(short int, short int, short int, short int, short int, short int) {}
 
 VA(0x004dde60, 0x3f)
-// void widget::constructor(void);
+widget::widget(void) {}
 
 VA(0x004ddea0, 0x7)
-// void widget::~destructor(void);
+widget::~widget() {}
 
 VA(0x004ddeb0, 0x14)
-// int widget::Open(int, class heroWindow *);
+int widget::Open(int, class heroWindow *) { return 0; }
 
 VA(0x004dded0, 0x1)
-// void widget::Close(void);
+void widget::Close(void) {}
 
 VA(0x004ddee0, 0x2f4)
-// int widget::Main(struct tag_message &);
+int widget::Main(struct tag_message &) { return 0; }
 
 VA(0x004de1e0, 0x47)
-// void widget::Dim(void);
+void widget::Dim(void) {}
 
 // ---- data / globals / vtables ----
 DATA(0x004ebb00)  // const widget::vftable

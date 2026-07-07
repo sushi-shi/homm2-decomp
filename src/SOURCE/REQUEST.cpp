@@ -4,53 +4,54 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <_all.h>
 VA(0x0048c920, 0x80)
-// int GetMapHeader(char *, struct SMapHeader *);
+int GetMapHeader(char *, struct SMapHeader *) { return 0; }
 
 VA(0x0048c9a0, 0x1b)
-// int CheckSumIsDemoOK(char *);
+int CheckSumIsDemoOK(char *) { return 0; }
 
 VA(0x0048c9bb, 0xbb)
-// int ShowThisMapGame(char *);
+int ShowThisMapGame(char *) { return 0; }
 
 VA(0x0048ca76, 0x1b)
-// int ShowThisMap(char *);
+int ShowThisMap(char *) { return 0; }
 
 VA(0x0048ca91, 0x7c1)
-// int fileRequester::InitializeFiles(char *, char *, int);
+int fileRequester::InitializeFiles(char *, char *, int) { return 0; }
 
 VA(0x0048d252, 0x16e)
-// void fileRequester::constructor(int, int, int, char *, char *, char *);
+fileRequester::fileRequester(int, int, int, char *, char *, char *) {}
 
 VA(0x0048d3c0, 0x63)
-// int fileRequester::MapExistsForFilter(int);
+int fileRequester::MapExistsForFilter(int) { return 0; }
 
 VA(0x0048d423, 0x6c)
-// void fileRequester::SetupFiles(void);
+void fileRequester::SetupFiles(void) {}
 
 VA(0x0048d48f, 0xc7)
-// void fileRequester::CleanUpData(void);
+void fileRequester::CleanUpData(void) {}
 
 VA(0x0048d556, 0x8b)
-// void fileRequester::Close(void);   // virtual [override (implements baseManager pure virtual)]
+void fileRequester::Close(void) {}
 
 VA(0x0048d5e1, 0x466)
-// int fileRequester::Open(int);   // virtual [override (implements baseManager pure virtual)]
+int fileRequester::Open(int) { return 0; }
 
 VA(0x0048da47, 0xa5)
-// void fileRequester::SetOK(int);
+void fileRequester::SetOK(int) {}
 
 VA(0x0048daec, 0x11ae)
-// int fileRequester::Main(struct tag_message &);   // virtual [override (implements baseManager pure virtual)]
+int fileRequester::Main(struct tag_message &) { return 0; }
 
 VA(0x0048ec9a, 0x2e8)
-// void fileRequester::DoKnob(void);
+void fileRequester::DoKnob(void) {}
 
 VA(0x0048ef82, 0xc42)
-// void fileRequester::Update(int);
+void fileRequester::Update(int) {}
 
 VA(0x0048fbc4, 0x15b)
-// char * fileRequester::GetFilename(void);
+char * fileRequester::GetFilename(void) { return 0; }
 
 // ---- data / globals / vtables ----
 DATA(0x004eb888)  // const fileRequester::vftable

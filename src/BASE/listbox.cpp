@@ -4,35 +4,30 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <_all.h>
 VA(0x004db060, 0x42)
-// void listBoxWidget::constructor(void);
-
-VA(0x004db0b0, 0x1f)
-// void * listBoxWidget::scalar_dtor(unsigned int);   // virtual [override (implements widget pure virtual)]
-
-VA(0x004db0b0, 0x1f)
-// void * listBoxWidget::scalar_dtor(unsigned int);   // virtual [override (implements widget pure virtual)]
+listBoxWidget::listBoxWidget(void) {}
 
 VA(0x004db0d0, 0x86)
-// void listBoxWidget::~destructor(void);
+listBoxWidget::~listBoxWidget() {}
 
 VA(0x004db160, 0x26e)
-// void listBoxWidget::Read(void);
+void listBoxWidget::Read(void) {}
 
 VA(0x004db3d0, 0x142)
-// void listBoxWidget::DeleteItem(int);
+void listBoxWidget::DeleteItem(int) {}
 
 VA(0x004db520, 0x368)
-// int listBoxWidget::Main(struct tag_message &);   // virtual [override (implements widget pure virtual)]
+int listBoxWidget::Main(struct tag_message &) { return 0; }
 
 VA(0x004db890, 0x8)
-// void listBoxWidget::Draw(void);   // virtual [override (implements widget pure virtual)]
+void listBoxWidget::Draw(void) {}
 
 VA(0x004db8a0, 0x334)
-// void listBoxWidget::DrawLBStuff(int);
+void listBoxWidget::DrawLBStuff(int) {}
 
 VA(0x004dbbe0, 0x312)
-// int listBoxWidget::ProcessMouseMessage(struct tag_message &);
+int listBoxWidget::ProcessMouseMessage(struct tag_message &) { return 0; }
 
 // ---- data / globals / vtables ----
 DATA(0x004ebac0)  // const listBoxWidget::vftable

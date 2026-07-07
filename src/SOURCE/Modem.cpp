@@ -4,50 +4,51 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <_all.h>
 VA(0x0040c8f0, 0x24e)
-// void ModemSetup(int);
+void ModemSetup(int) {}
 
 VA(0x0040cb3e, 0x9e)
-// long int Dial(void);
+long int Dial(void) { return 0; }
 
 VA(0x0040cbdc, 0x54)
-// long int Wait(void);
+long int Wait(void) { return 0; }
 
 VA(0x0040cc30, 0x79)
-// void GUIModemCommand(char *, char *);
+void GUIModemCommand(char *, char *) {}
 
 VA(0x0040cca9, 0x95)
-// signed char GUIModemCommandExec(void);
+signed char GUIModemCommandExec(void) { return 0; }
 
 VA(0x0040cd3e, 0x8e)
-// void ModemCommand(char *);
+void ModemCommand(char *) {}
 
 VA(0x0040cdcc, 0x82)
-// signed char GUIModemResponse(char *, char *);
+signed char GUIModemResponse(char *, char *) { return 0; }
 
 VA(0x0040ce4e, 0xe2)
-// signed char GUIModemResponseExec(void);
+signed char GUIModemResponseExec(void) { return 0; }
 
 VA(0x0040cf30, 0x4e)
-// int write_buffer(char *, int);
+int write_buffer(char *, int) { return 0; }
 
 VA(0x0040cf7e, 0x47)
-// int read_byte(void);
+int read_byte(void) { return 0; }
 
 VA(0x0040cfc5, 0x27)
-// void write_byte(int);
+void write_byte(int) {}
 
 VA(0x0040cfec, 0x1bb)
-// void Connect(void);
+void Connect(void) {}
 
 VA(0x0040d1a7, 0x211)
-// int WaitForDirectConnect(void);
+int WaitForDirectConnect(void) { return 0; }
 
 VA(0x0040d3b8, 0x127)
-// char ReadPacket(void);
+char ReadPacket(void) { return 0; }
 
 VA(0x0040d4df, 0xff)
-// void WriteModemPacket(char *, int);
+void WriteModemPacket(char *, int) {}
 
 // ---- data / globals / vtables ----
 DATA(0x004ede50)  // int iBaudBits

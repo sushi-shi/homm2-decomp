@@ -4,50 +4,52 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <_all.h>
+#include <_carcass_types.h>
 VA(0x004cdb50, 0x308)
-// int KeyboardMessageHandler(void *, unsigned int, unsigned int, long int);
+int KeyboardMessageHandler(void *, unsigned int, unsigned int, long int) { return 0; }
 
 VA(0x004cde60, 0x36c)
-// int MouseMessageHandler(void *, unsigned int, unsigned int, long int);
+int MouseMessageHandler(void *, unsigned int, unsigned int, long int) { return 0; }
 
 VA(0x004ce1d0, 0x56)
-// void inputManager::constructor(void);
+inputManager::inputManager(void) {}
 
 VA(0x004ce230, 0x78)
-// int inputManager::Open(int);   // virtual [override (implements baseManager pure virtual)]
+int inputManager::Open(int) { return 0; }
 
 VA(0x004ce2b0, 0x20)
-// void inputManager::Close(void);   // virtual [override (implements baseManager pure virtual)]
+void inputManager::Close(void) {}
 
 VA(0x004ce2d0, 0x5)
-// int inputManager::Main(struct tag_message &);   // virtual [override (implements baseManager pure virtual)]
+int inputManager::Main(struct tag_message &) { return 0; }
 
 VA(0x004ce2e0, 0xf)
-// void inputManager::Flush(void);
+void inputManager::Flush(void) {}
 
 VA(0x004ce2f0, 0xa8)
-// struct tag_message inputManager::GetEvent(void);
+struct tag_message inputManager::GetEvent(void) { return *(struct tag_message *)0; }
 
 VA(0x004ce3a0, 0xa1)
-// struct tag_message inputManager::PeekEvent(void);
+struct tag_message inputManager::PeekEvent(void) { return *(struct tag_message *)0; }
 
 VA(0x004ce450, 0x3)
-// void inputManager::SetMouseCoords(int, int);
+void inputManager::SetMouseCoords(int, int) {}
 
 VA(0x004ce460, 0x1b)
-// void inputManager::SetKeyCodeType(int);
+void inputManager::SetKeyCodeType(int) {}
 
 VA(0x004ce480, 0x1cb)
-// void inputManager::AsciiConvert(struct tag_message &);
+void inputManager::AsciiConvert(struct tag_message &) {}
 
 VA(0x004ce650, 0x33c)
-// void inputManager::MakeScanCodeTable(void);
+void inputManager::MakeScanCodeTable(void) {}
 
 VA(0x004ce990, 0xe4)
-// void CheckChangeCursor(int, int, int);
+void CheckChangeCursor(int, int, int) {}
 
 VA(0x004cea80, 0xe9)
-// void inputManager::ForceMouseMove(void);
+void inputManager::ForceMouseMove(void) {}
 
 // ---- data / globals / vtables ----
 DATA(0x004eba30)  // const inputManager::vftable

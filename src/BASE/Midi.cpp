@@ -4,26 +4,27 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <_all.h>
 VA(0x004d3850, 0xb8)
-// void soundManager::MIDIStartup(void);
+void soundManager::MIDIStartup(void) {}
 
 VA(0x004d3910, 0x1a9)
-// void soundManager::MIDIShutdown(void);
+void soundManager::MIDIShutdown(void) {}
 
 VA(0x004d3ac0, 0x3ab)
-// void soundManager::MIDIPlay(int);
+void soundManager::MIDIPlay(int) {}
 
 VA(0x004d3e70, 0x108)
-// void soundManager::MIDIStop(void);
+void soundManager::MIDIStop(void) {}
 
 VA(0x004d3f80, 0x46)
-// int soundManager::MIDIIsPlaying(void);
+int soundManager::MIDIIsPlaying(void) { return 0; }
 
 VA(0x004d3fd0, 0x68)
-// void soundManager::MIDISetVolume(void);
+void soundManager::MIDISetVolume(void) {}
 
 VA(0x004d4040, 0x1)
-// void soundManager::MIDIPoll(void);
+void soundManager::MIDIPoll(void) {}
 
 // ---- data / globals / vtables ----
 DATA(0x0051fec8)  // struct _MDI_DRIVER * hMDI

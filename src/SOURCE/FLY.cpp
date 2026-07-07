@@ -4,15 +4,16 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <_all.h>
 VA(0x004a5900, 0x295)
-// int army::CanFit(int, int, int *);
+int army::CanFit(int, int, int *) { return 0; }
 
 VA(0x004a5b95, 0x405)
-// int army::ValidFlight(int, int);
+int army::ValidFlight(int, int) { return 0; }
 
 VA(0x004a5f9a, 0x25)
-// int army::FlyTo(void);
+int army::FlyTo(void) { return 0; }
 
 VA(0x004a5fbf, 0xc1f)
-// int army::FlyTo(int);
+int army::FlyTo(int) { return 0; }
 
