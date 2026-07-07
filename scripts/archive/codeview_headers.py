@@ -87,6 +87,20 @@ for line in open(addrmap_file,errors="replace"):
         a,nm=line.rstrip("\n").split("\t",1); pretty[int(a,16)]=nm
 name_at={va:pretty.get(va,raw) for va,raw in pubs}
 
+# raw mangled name per VA — lets us read a method's virtualness straight from the MSVC
+# access char instead of only from vtable slot targets. This is ESSENTIAL for pure
+# virtuals: an abstract class's own slot for a pure virtual points at __purecall (not the
+# method), so slot-target scanning alone misfiles pure-virtual-WITH-body methods
+# (widget::Main, ~widget, resource::~resource) as non-virtual.
+mangled_at={}
+for va,raw in pubs: mangled_at.setdefault(va,raw)
+_VIRT_ACCESS=set("EFMNUV")  # fn property char: E/F priv-virt, M/N prot-virt, U/V pub-virt
+def virtual_by_mangling(va):
+    r=mangled_at.get(va,"")
+    if r[:4] in ("??_E","??_G"): return True   # vector/scalar deleting dtor => always virtual
+    m=re.search(r'@@([A-Z])',r)                # first `@@<char>` = the function-property code
+    return bool(m) and m.group(1) in _VIRT_ACCESS
+
 # assert __FILE__ tier map: basename(lower w/ ext) -> BASE/SOURCE/EDITOR
 assert_dir={}
 if srcpaths and os.path.exists(srcpaths):
@@ -125,11 +139,16 @@ for va,raw in pubs:
         if not (TVA and TVA<=ptr<TEND): break
         slots.append((i,ptr,name_at.get(ptr,f"sub_{ptr:08x}"),cls_of(name_at.get(ptr,"")))); cur+=4; i+=1
     if slots: vtables[C]=slots; vt_addr[C]=va
+is_pure=lambda fn:"purecall" in fn.lower()
 def infer_base(C):
     vC=vtables[C]; best=None; bestscore=(0,-1)
     for B,vB in vtables.items():
         if B==C or len(vB)>len(vC): continue
-        shared=sum(1 for i in range(len(vB)) if vC[i][1]==vB[i][1])
+        # Only count slots that share a REAL fn pointer. Matching __purecall is meaningless:
+        # two UNRELATED abstract classes coincidentally share the one __purecall thunk, which
+        # used to invent bogus bases like `baseManager : widget` (both are all-__purecall).
+        shared=sum(1 for i in range(len(vB))
+                   if vC[i][1]==vB[i][1] and not is_pure(vB[i][2]))
         if shared>0 and (shared,len(vB))>bestscore: best,bestscore=B,(shared,len(vB))
     return best
 vbase={C:infer_base(C) for C in vtables}
@@ -137,7 +156,6 @@ _own=lambda X:sum(1 for s in vtables[X] if s[3]==X)
 for C in list(vbase):
     B=vbase[C]
     if B and vbase.get(B)==C: vbase[C if _own(C)>=_own(B) else B]=None
-is_pure=lambda fn:"purecall" in fn.lower()
 abstract={C for C in vtables if vtables[C] and all(is_pure(s[2]) for s in vtables[C])}
 def slot0name(C):
     s=cleandecl(vtables[C][0][2]); return s.split('::')[-1].split('(')[0] if '::' in s else ''
@@ -194,11 +212,12 @@ for C in classes:
 class_tier={C: placement_tier(home.get(C)) for C in classes}
 
 def sanitize(c): return re.sub(r'[^A-Za-z0-9_]','_',c)
-def render_member(ret,name,params,virtual,override,cls):
+def render_member(ret,name,params,virtual,override,cls,pure=False):
     if name=="constructor": core=f"{cls}({params})"
     elif is_dtor(name): core=f"~{cls}()"
     else: core=f"{ret+' ' if ret else ''}{name}({params})"
-    return (("virtual " if virtual else "")+core+(" OVERRIDE" if override else ""))+";"
+    tail=" = 0" if pure else (" OVERRIDE" if override else "")
+    return (("virtual " if virtual else "")+core+tail)+";"
 def referenced_types(sigs):
     t=set()
     for s in sigs:
@@ -209,6 +228,47 @@ def inc_path(frm, cls):
     if not t: return None
     return f'"{sanitize(cls)}.h"' if t==frm else f'"../{t}/{sanitize(cls)}.h"'
 
+# is a symbol-backed method virtual / an override / pure, for class C?  A method whose own
+# vtable slot holds real code is a concrete virtual (fc==C => in ownv); one that is virtual
+# by mangling but is NOT its own slot's target has a __purecall slot => pure-virtual-with-body.
+def method_flags(C,va):
+    inv = va in ownv.get(C,{})
+    virtual = inv or virtual_by_mangling(va)
+    return virtual, (inv and is_override(C,va)), (virtual and not inv)
+
+# ---------- recover an abstract base's pure virtuals from its derived overrides ----------
+# An abstract class's own vtable is all __purecall, so its virtuals cannot be read from its
+# own slots. Each direct child overrides those slots with real fns, revealing slot order +
+# signatures. For a bodyless pure virtual (NO symbol anywhere, e.g. widget::Draw or
+# baseManager::Open/Close/Main) this is the ONLY recovery path; for a pure-virtual-WITH-body
+# (widget::Main, widget/resource ~dtor) we prefer the base's own symbol signature.
+def child_override_at(C,i):
+    for D,sl in vtables.items():
+        if D==C or vbase.get(D)!=C: continue
+        if i<len(sl) and sl[i][3]==D and not is_pure(sl[i][2]): return sl[i][2]
+    return None
+abstract_pv=defaultdict(list)   # C -> [(slot_i, ret, name, params, is_dtor)] in vtable order
+for C in abstract:
+    own_by_name={m[2]:m for m in methods.get(C,[])}
+    own_virt=[m for m in methods.get(C,[]) if virtual_by_mangling(m[0])]
+    for i,ptr,fn,fc in vtables[C]:
+        ov=child_override_at(C,i)
+        r=split_method(cleandecl(ov)) if ov else None
+        if r:
+            ret,_dc,mname,params=r
+            if is_dtor(mname):                    abstract_pv[C].append((i,"","~"+C,"",True))
+            elif mname in own_by_name:            # pure-with-body: prefer base's own signature
+                _,oret,onm,opar=own_by_name[mname]; abstract_pv[C].append((i,oret,onm,opar,False))
+            else:                                 abstract_pv[C].append((i,ret,mname,params,False))
+        else:
+            # no wired child override (e.g. resource, whose asset subclasses aren't linked to
+            # it yet). Fall back to the base's own virtual symbols; a lone slot is unambiguous.
+            dtor_syms=[m for m in own_virt if is_dtor(m[2])]
+            if len(vtables[C])==1 and dtor_syms:  abstract_pv[C].append((i,"","~"+C,"",True))
+            elif len(vtables[C])==1 and own_virt:
+                _,oret,onm,opar=own_virt[0];      abstract_pv[C].append((i,oret,onm,opar,False))
+            else:                                 abstract_pv[C].append((i,"void",f"vfn{i}","",False))
+
 # ---------- emit ----------
 open(os.path.join(outdir,"_macros.h"),"w").write(
     "#pragma once\n// No-op annotation macros.\n"
@@ -218,14 +278,18 @@ for C in classes:
     tier=class_tier[C]; base=vbase.get(C)
     os.makedirs(os.path.join(outdir,tier),exist_ok=True)
     ms=sorted(methods.get(C,[]), key=lambda x:x[0]); ds=sorted(statics.get(C,[]), key=lambda x:x[0])
+    is_abs=C in abstract; apv=abstract_pv.get(C,[]) if is_abs else []
+    apv_names={name for _,_,name,_,isd in apv if not isd}   # own-symbol virtuals folded into apv
     ctors=[m for m in ms if m[2]=="constructor"]; dtors=[m for m in ms if is_dtor(m[2])]
-    rest =[m for m in ms if m not in ctors and m not in dtors]
-    virt =sorted([m for m in rest if m[0] in ownv.get(C,{})], key=lambda m:ownv[C][m[0]])
-    nonv =[m for m in rest if m[0] not in ownv.get(C,{})]
-    refs={(k,n) for (k,n) in referenced_types([f"{r} {n}({p})" for _,r,n,p in ms]+[t for _,t,_ in ds]) if n!=C}
+    rest =[m for m in ms if m not in ctors and m not in dtors and not (is_abs and m[2] in apv_names)]
+    virt =sorted([m for m in rest if method_flags(C,m[0])[0]], key=lambda m:ownv.get(C,{}).get(m[0],1<<20))
+    nonv =[m for m in rest if not method_flags(C,m[0])[0]]
+    apv_sigs=[f"{r} {n}({p})" for _,r,n,p,isd in apv if not isd]
+    refs={(k,n) for (k,n) in referenced_types([f"{r} {n}({p})" for _,r,n,p in ms]+[t for _,t,_ in ds]+apv_sigs) if n!=C}
+    n_own_virtual=len(apv) if is_abs else len(virt)
     L=["#pragma once",
        f"// Reconstructed class ({tier}) from CodeView NB09 of {os.path.basename(pe)} — NOT original source.",
-       f"// {len(ms)} methods, {len(virt)} own-virtual, {len(ds)} static data.",
+       f"// {len(ms)} methods, {n_own_virtual} own-virtual, {len(ds)} static data.",
        '#include "../_macros.h"']
     if base and inc_path(tier,base): L.append(f"#include {inc_path(tier,base)}")
     fwd=sorted(refs-({("class",base)} if base else set()))
@@ -237,13 +301,22 @@ for C in classes:
         if not group: return
         L.append(f"    // --- {hdr} ---")
         for va,ret,name,params in group:
-            v=va in ownv.get(C,{}); o=v and is_override(C,va)
-            L.append("    "+render_member(ret,name,params,v,o,C))
+            v,o,p=method_flags(C,va)
+            L.append("    "+render_member(ret,name,params,v,o,C,pure=p))
     emit(ctors,"constructors")
-    if dtors:
-        dv=any(m[0] in ownv.get(C,{}) for m in dtors); do=dv and any(is_override(C,m[0]) for m in dtors)
-        L.append("    "+("virtual " if dv else "")+f"~{C}()"+(" OVERRIDE" if do else "")+";")
-    emit(virt,"virtual methods (vtable order)"); emit(nonv,"methods")
+    if is_abs:
+        # abstract base: emit the pure virtuals recovered from derived overrides, in slot order
+        if apv:
+            L.append("    // --- virtual methods (vtable order) ---")
+            for i,ret,name,params,isd in apv:
+                if isd: L.append(f"    virtual ~{C}(void) = 0;")
+                else:   L.append("    "+render_member(ret,name,params,True,False,C,pure=True))
+        emit(nonv,"methods")
+    else:
+        if dtors:
+            dv=any(method_flags(C,m[0])[0] for m in dtors); do=any(method_flags(C,m[0])[1] for m in dtors)
+            L.append("    "+("virtual " if dv else "")+f"~{C}()"+(" OVERRIDE" if do else "")+";")
+        emit(virt,"virtual methods (vtable order)"); emit(nonv,"methods")
     if ds:
         L.append("    // --- static data members ---")
         L+=[f"    static {t} {n};" for _,t,n in ds]
