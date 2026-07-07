@@ -6,7 +6,15 @@
 #include <va.h>
 #include <BASE/button.h>
 VA(0x004dd440, 0x34)
-button::button(void) {}
+button::button(void) : widget(0, 0, 0, 0, 0, 0)
+{
+    field_0x24 = 0;
+    field_0x26 = 0;
+    field_0x2c = 0;
+    field_0x28 = 0;
+    field_0x2a = -1;
+    field_0x20 = 0;
+}
 
 VA(0x004dd4c0, 0x6e)
 button::button(short int, short int, short int, short int, unsigned long int, short int, short int, short int, short int, short int, short int) {}
