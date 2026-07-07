@@ -6,7 +6,14 @@
 #include <va.h>
 #include <BASE/textWidget.h>
 VA(0x004d1060, 0x3e)
-textWidget::textWidget(void) {}
+textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, 0)
+{
+    field_0x28 = 1;
+    field_0x2a = 1;
+    field_0x24 = 0;
+    field_0x20 = 0;
+    field_0x14 = 0x200;
+}
 
 VA(0x004d10f0, 0x64)
 textWidget::textWidget(short int, short int, short int, short int, char *, char *, short int, short int, short int, short int) {}
