@@ -31,5 +31,5 @@ struct _MDI_DRIVER *hMDI;
 int CurrentMidiFile;
 unsigned char *bGotMidi;
 long lLastMIDIPollTickCount;
-class MIDIWrap **pMIDIWrap;
-struct _SEQUENCE **hSequence;
+class MIDIWrap *pMIDIWrap[60];
+struct _SEQUENCE *hSequence[60];

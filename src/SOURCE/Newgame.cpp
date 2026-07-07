@@ -61,5 +61,5 @@ char *cNGKPDisplay;
 int gbNewGameShadowHidden;
 char *cNGKPCore;
 int NGKPcursorIndex;
-char **cTextReceivedBuffer;
+char *cTextReceivedBuffer[3];
 class icon *NGKPBkg;

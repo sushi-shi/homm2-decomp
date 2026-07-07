@@ -268,7 +268,7 @@ DATA(0x004ee054) extern struct _SAMPLE *hOldWalkSample;
 DATA(0x004ee058) extern struct _SAMPLE *hNewWalkSample;
 DATA(0x004ee05c) extern int EveryOther;
 DATA(0x004ee060) extern int *startVals;
-DATA(0x004f11b8) extern signed char (*iVWHalf)[6][2];
+DATA(0x004f11b8) extern signed char iVWHalf[3][6][2];
 DATA(0x004f11dc) extern int giViewWorldScale;
 DATA(0x004f11e0) extern int giViewWorldScaleLookup;
 DATA(0x004f11e4) extern int gbInViewWorld;

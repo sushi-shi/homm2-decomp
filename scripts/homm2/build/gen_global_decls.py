@@ -57,8 +57,24 @@ def reconstruct(dem, name, size):
     Skip only user-defined-type VALUES and UDT arrays (defining one needs the *complete* struct,
     which the owner header may not have); a plain pointer to a UDT is fine (forward-decl)."""
     dem = dem.strip()
+    # Decayed ARRAY forms are dense (size == true storage), so reconstruct the real array — it
+    # mangles identically to the decayed pointer (verified: void*[0x60] and void** both -> PAPAXA)
+    # but is faithful + usable (a ctor can write name[i]).
+    #   PAY: 'T (*name)[inner...]'  -> 'T name[outer][inner...]'   (only for scalar element T)
+    m = re.match(r'^(.*?)\s*\(\*' + re.escape(name) + r'\)((?:\[\d+\])+)$', dem)
+    if m and m.group(1).strip() in SCALAR:
+        base, dims = m.group(1).strip(), m.group(2)
+        stride = SCALAR[base]
+        for d in re.findall(r'\[(\d+)\]', dims):
+            stride *= int(d)
+        if size % stride == 0 and size > stride:
+            return "%s %s[%d]%s;" % (base, name, size // stride, dims)
+    #   PAPAX etc.: 'T **...name' (>=2 stars) -> 'T *...name[outer]'   (1D array of pointers)
+    m = re.match(r'^(.*?)(\*{2,})\s*' + re.escape(name) + r'$', dem)
+    if m and size > PTR and size % PTR == 0:
+        return "%s %s%s[%d];" % (m.group(1).strip(), '*' * (len(m.group(2)) - 1), name, size // PTR)
+    # everything else verbatim (scalars, single-ptr handles, struct ptrs); skip UDT values/arrays
     if re.match(r'^(struct|class|union|enum)\b', dem):
-        # safe only as a simple pointer to the UDT (no array, no by-value)
         if re.match(r'^(struct|class|union|enum)\s+[\w:]+\s*\*+\s*' + re.escape(name) + r'$', dem):
             return dem + ";"
         return None

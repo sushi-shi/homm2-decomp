@@ -38,4 +38,4 @@ int iLastDynamicType;
 int iLastDynamicTop;
 int iOverviewItems;
 int *giOverviewItems;
-class textWidget **textWidgetTitle;
+class textWidget *textWidgetTitle[4];

@@ -118,8 +118,9 @@ int soundManager::MusicPlaying(void) { return 0; }
 VTBL(soundManager, 0x004eba20);
 
 // ---- globals (definitions, RVA order) ----
-char **digitalDriverNames;
+char *digitalDriverNames[14];
 struct SampleChannelStruct *SCS;
+char CDPreviousPosition[60][15];
 int CDWaiting;
 int CDPlaying;
 int iCalibrateLoop;

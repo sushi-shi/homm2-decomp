@@ -16,5 +16,5 @@ void UpdateArenaIcons(void) {}
 
 // ---- globals (definitions, RVA order) ----
 int choice;
-class iconWidget **skillWidget;
+class iconWidget *skillWidget[3];
 class heroWindow *arenaWinPtr;

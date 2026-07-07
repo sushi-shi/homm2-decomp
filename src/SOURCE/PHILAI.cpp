@@ -907,6 +907,7 @@ float *gfHeroInteractionBonus;
 int gbBerserk;
 int giCurAIHeroMorale;
 signed char giBuildBoatStuffTurn[6];
+int iPlacesVisited[30][2];
 int gbReduceByReload;
 int gbTroopReload;
 int giCurAIHeroLuck;

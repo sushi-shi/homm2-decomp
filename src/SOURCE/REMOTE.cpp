@@ -72,5 +72,5 @@ long *lLastHeartbeatReceive;
 char *packet;
 SNetPlayerInfo gsNetPlayerInfo[1];
 char *rcvBufIn;
-char **rcvBuf;
+char *rcvBuf[138];
 int bGotGameType;
