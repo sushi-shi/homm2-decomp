@@ -108,7 +108,8 @@ the EXE + our known symbols. Needs the dev shell's Ghidra env (in the flake).
 - One TU per CodeView compiland under `src/<TIER>/<TU>.cpp` (TIER ∈ BASE, SOURCE,
   EDITOR), shared headers in `include/<TIER>/`. Define functions in **retail-RVA order**.
 - Above each function: **`VA(0x........, 0x..)`** (8-hex-digit zero-padded address,
-  unpadded size); globals/vtables: **`DATA(0x........)`**. Macros vanish under MSVC
+  unpadded size); globals: **`DATA(0x........)`** on the `extern` in the owner header; a class
+  vtable: **`VTBL(class, 0x........)`** census marker at the owner TU's tail. Macros vanish under MSVC
   (`include/va.h`). A *placeholder* is `VA(...)` then a `// signature;` comment; a
   *reconstruction* has a real body.
 - Mark a parked-below-100% match with **`// @early-stop`** + a byte-level reason line
