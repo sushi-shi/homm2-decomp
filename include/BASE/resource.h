@@ -8,7 +8,7 @@
 // their own ??_E deleting destructor. (Those subclass headers do not yet declare
 // `: public resource` — the header-gen base heuristic only maps slot-0 Draw->widget /
 // Open->baseManager, not a dtor slot -> resource; wire that up when reconstructing them.)
-#include "../_macros.h"
+#include <va.h>
 
 class resource /* abstract */ {
 public:

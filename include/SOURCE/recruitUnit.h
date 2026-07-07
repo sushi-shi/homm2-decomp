@@ -2,7 +2,7 @@
 #define HOMM2_SOURCE_RECRUITUNIT_H
 // Reconstructed class (SOURCE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // 6 methods, 3 own-virtual, 0 static data.
-#include "../_macros.h"
+#include <va.h>
 #include "../BASE/baseManager.h"
 // forward declarations:
 class armyGroup;

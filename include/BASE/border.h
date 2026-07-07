@@ -2,7 +2,7 @@
 #define HOMM2_BASE_BORDER_H
 // Reconstructed class (BASE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // 7 methods, 2 own-virtual, 0 static data.
-#include "../_macros.h"
+#include <va.h>
 #include "widget.h"
 // forward declarations:
 struct tag_message;
