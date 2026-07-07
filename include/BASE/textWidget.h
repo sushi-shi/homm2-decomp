@@ -7,8 +7,16 @@
 // forward declarations:
 struct tag_message;
 
+#pragma pack(push, 1)  // recovered layout is byte-packed
 class textWidget : public widget {
 public:
+    // --- members (offsets from Ghidra this+off access-analysis; widths are
+    // access-widths, NOT confirmed types; refine during byte-matching) ---
+    // (derived: base widget = 0x20 bytes at 0x00 via ': public widget'; own fields below)
+    int    field_0x20;  // +0x20
+    int    field_0x24;  // +0x24
+    short  field_0x28;  // +0x28
+    char   field_0x2a;  // +0x2a
     // --- constructors ---
     textWidget(void);
     textWidget(short int, short int, short int, short int, char *, char *, short int, short int, short int, short int);
@@ -21,4 +29,6 @@ public:
     void SetColorIndex(short int);
     void SetText(char *);
 };
+#pragma pack(pop)
+SIZE(textWidget, 0x2b);
 #endif // HOMM2_BASE_TEXTWIDGET_H

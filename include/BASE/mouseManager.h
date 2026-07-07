@@ -7,8 +7,32 @@
 // forward declarations:
 struct tag_message;
 
+#pragma pack(push, 1)  // recovered layout is byte-packed
 class mouseManager : public baseManager {
 public:
+    // --- members (offsets from Ghidra this+off access-analysis; widths are
+    // access-widths, NOT confirmed types; refine during byte-matching) ---
+    // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
+    int    field_0x36;  // +0x36
+    int    field_0x3a;  // +0x3a
+    int    field_0x3e;  // +0x3e
+    int    field_0x42;  // +0x42
+    int    field_0x46;  // +0x46
+    int    field_0x4a;  // +0x4a
+    char _pad_0x4e[0x8];
+    int    field_0x56;  // +0x56
+    int    field_0x5a;  // +0x5a
+    int    field_0x5e;  // +0x5e
+    int    field_0x62;  // +0x62
+    int    field_0x66;  // +0x66
+    int    field_0x6a;  // +0x6a
+    int    field_0x6e;  // +0x6e
+    int    field_0x72;  // +0x72
+    int    field_0x76;  // +0x76
+    int    field_0x7a;  // +0x7a
+    int    field_0x7e;  // +0x7e
+    int    field_0x82;  // +0x82
+    int    field_0x86;  // +0x86
     // --- constructors ---
     mouseManager(void);
     // --- virtual methods (vtable order) ---
@@ -30,4 +54,6 @@ public:
     void CheckUpdateMousePos(void);
     void SetColorMice(int);
 };
+#pragma pack(pop)
+SIZE(mouseManager, 0x8a);
 #endif // HOMM2_BASE_MOUSEMANAGER_H

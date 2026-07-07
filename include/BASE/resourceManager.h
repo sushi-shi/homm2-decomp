@@ -16,8 +16,21 @@ class sample;
 class tileset;
 struct tag_message;
 
+#pragma pack(push, 1)  // recovered layout is byte-packed
 class resourceManager : public baseManager {
 public:
+    // --- members (offsets from Ghidra this+off access-analysis; widths are
+    // access-widths, NOT confirmed types; refine during byte-matching) ---
+    // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
+    int    field_0x36;  // +0x36
+    int    field_0x3a;  // +0x3a
+    int    field_0x3e;  // +0x3e
+    char _pad_0x42[0x18];
+    int    field_0x5a;  // +0x5a
+    char _pad_0x5e[0x4];
+    char   field_0x62;  // +0x62
+    char _pad_0x63[0x3b];
+    int    field_0x9e;  // +0x9e
     // --- constructors ---
     resourceManager(void);
     // --- virtual methods (vtable order) ---
@@ -53,4 +66,6 @@ public:
     void Read13(signed char *);
     void ReadBlock(signed char *, unsigned long int);
 };
+#pragma pack(pop)
+SIZE(resourceManager, 0xa2);
 #endif // HOMM2_BASE_RESOURCEMANAGER_H

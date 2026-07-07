@@ -7,8 +7,18 @@
 // forward declarations:
 struct tag_message;
 
+#pragma pack(push, 1)  // recovered layout is byte-packed
 class button : public widget {
 public:
+    // --- members (offsets from Ghidra this+off access-analysis; widths are
+    // access-widths, NOT confirmed types; refine during byte-matching) ---
+    // (derived: base widget = 0x20 bytes at 0x00 via ': public widget'; own fields below)
+    int    field_0x20;  // +0x20
+    short  field_0x24;  // +0x24
+    short  field_0x26;  // +0x26
+    short  field_0x28;  // +0x28
+    short  field_0x2a;  // +0x2a
+    int    field_0x2c;  // +0x2c
     // --- constructors ---
     button(void);
     button(short int, short int, short int, short int, unsigned long int, short int, short int, short int, short int, short int, short int);
@@ -22,4 +32,6 @@ public:
     short int Select(struct tag_message &);
     short int Deselect(struct tag_message &);
 };
+#pragma pack(pop)
+SIZE(button, 0x30);
 #endif // HOMM2_BASE_BUTTON_H

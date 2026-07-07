@@ -6,8 +6,15 @@
 // forward declarations:
 class baseManager;
 
+#pragma pack(push, 1)  // recovered layout is byte-packed
 class executive {
 public:
+    // --- members (offsets from Ghidra this+off access-analysis; widths are
+    // access-widths, NOT confirmed types; refine during byte-matching) ---
+    int    field_0x0;  // +0x00
+    int    field_0x4;  // +0x04
+    int    field_0x8;  // +0x08
+    int    field_0xc;  // +0x0c
     // --- constructors ---
     executive(void);
     // --- methods ---
@@ -21,4 +28,6 @@ public:
     void MainLoop(void);
     void Terminate(void);
 };
+#pragma pack(pop)
+SIZE(executive, 0x10);
 #endif // HOMM2_BASE_EXECUTIVE_H

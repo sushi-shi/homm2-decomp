@@ -7,8 +7,14 @@
 class hero;
 class town;
 
+#pragma pack(push, 1)  // recovered layout is byte-packed
 class armyGroup {
 public:
+    // --- members (offsets from Ghidra this+off access-analysis; widths are
+    // access-widths, NOT confirmed types; refine during byte-matching) ---
+    // NOTE: sparse this-access recovery (few/no this-relative probes).
+    int    field_0x0;  // +0x00
+    char _pad_0x4[0xb];  // tail pad to sizeof
     // --- constructors ---
     armyGroup(void);
     // --- methods ---
@@ -25,4 +31,6 @@ public:
     void Swap(int, class armyGroup *, int);
     void DamageGroup(float);
 };
+#pragma pack(pop)
+SIZE(armyGroup, 0xf);
 #endif // HOMM2_SOURCE_ARMYGROUP_H

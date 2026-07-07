@@ -14,8 +14,26 @@ class town;
 struct SBolt;
 struct tag_message;
 
+#pragma pack(push, 1)  // recovered layout is byte-packed
 class combatManager : public baseManager {
 public:
+    // --- members (offsets from Ghidra this+off access-analysis; widths are
+    // access-widths, NOT confirmed types; refine during byte-matching) ---
+    // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
+    int    field_0x36;  // +0x36
+    char _pad_0x3a[0x85a];
+    char   field_0x894;  // +0x894
+    char _pad_0x895[0xc5];
+    char   field_0x95a;  // +0x95a
+    char _pad_0x95b[0x125];
+    char   field_0xa80;  // +0xa80
+    char _pad_0xa81[0x30d];
+    char   field_0xd8e;  // +0xd8e
+    char _pad_0xd8f[0xc5];
+    char   field_0xe54;  // +0xe54
+    char _pad_0xe55[0x125];
+    char   field_0xf7a;  // +0xf7a
+    char _pad_0xf7b[0xe8fc];  // tail pad to sizeof
     // --- constructors ---
     combatManager(void);
     // --- virtual methods (vtable order) ---
@@ -169,4 +187,6 @@ public:
     int WalkTowardArmyFront(class army *, int, int);
     int WalkTowardArmy(class army *, int, int);
 };
+#pragma pack(pop)
+SIZE(combatManager, 0xf877);
 #endif // HOMM2_SOURCE_COMBATMANAGER_H

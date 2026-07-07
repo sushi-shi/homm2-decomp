@@ -7,8 +7,12 @@
 // forward declarations:
 struct tag_message;
 
+#pragma pack(push, 1)  // recovered layout is byte-packed
 class dimmerWidget : public widget {
 public:
+    // --- members (offsets from Ghidra this+off access-analysis; widths are
+    // access-widths, NOT confirmed types; refine during byte-matching) ---
+    // (derived: base widget = 0x20 bytes at 0x00 via ': public widget'; own fields below)
     // --- constructors ---
     dimmerWidget(void);
     dimmerWidget(short int, short int, short int, short int, short int, short int);
@@ -21,4 +25,6 @@ public:
     // --- methods ---
     void Read(void);
 };
+#pragma pack(pop)
+SIZE(dimmerWidget, 0x20);
 #endif // HOMM2_BASE_DIMMERWIDGET_H

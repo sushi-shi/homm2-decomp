@@ -14,8 +14,19 @@
 // forward declarations:
 struct tag_message;
 
+#pragma pack(push, 1)  // recovered layout is byte-packed
 class baseManager /* abstract */ {
 public:
+    // --- members (offsets from Ghidra this+off access-analysis; widths are
+    // access-widths, NOT confirmed types; refine during byte-matching) ---
+    // (vptr auto-emitted at 0x00; own data starts at 0x04)
+    int    field_0x4;  // +0x04
+    int    field_0x8;  // +0x08
+    int    field_0xc;  // +0x0c
+    int    field_0x10;  // +0x10
+    char   field_0x14;  // +0x14
+    char _pad_0x15[0x1d];
+    int    field_0x32;  // +0x32
     // --- constructors ---
     baseManager(void);
     // --- virtual methods (vtable order) ---
@@ -23,4 +34,6 @@ public:
     virtual void Close(void) = 0;
     virtual int Main(struct tag_message &) = 0;
 };
+#pragma pack(pop)
+SIZE(baseManager, 0x36);
 #endif // HOMM2_BASE_BASEMANAGER_H

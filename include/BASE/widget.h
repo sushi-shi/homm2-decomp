@@ -12,8 +12,23 @@
 class heroWindow;
 struct tag_message;
 
+#pragma pack(push, 1)  // recovered layout is byte-packed
 class widget /* abstract */ {
 public:
+    // --- members (offsets from Ghidra this+off access-analysis; widths are
+    // access-widths, NOT confirmed types; refine during byte-matching) ---
+    // (vptr auto-emitted at 0x00; own data starts at 0x04)
+    int    field_0x4;  // +0x04
+    int    field_0x8;  // +0x08
+    int    field_0xc;  // +0x0c
+    short  field_0x10;  // +0x10
+    short  field_0x12;  // +0x12
+    short  field_0x14;  // +0x14
+    short  field_0x16;  // +0x16
+    short  field_0x18;  // +0x18
+    short  field_0x1a;  // +0x1a
+    short  field_0x1c;  // +0x1c
+    short  field_0x1e;  // +0x1e
     // --- constructors ---
     widget(short int, short int, short int, short int, short int, short int);
     widget(void);
@@ -26,4 +41,6 @@ public:
     void Close(void);
     void Dim(void);
 };
+#pragma pack(pop)
+SIZE(widget, 0x20);
 #endif // HOMM2_BASE_WIDGET_H

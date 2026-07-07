@@ -7,8 +7,15 @@
 // forward declarations:
 struct tag_message;
 
+#pragma pack(push, 1)  // recovered layout is byte-packed
 class border : public widget {
 public:
+    // --- members (offsets from Ghidra this+off access-analysis; widths are
+    // access-widths, NOT confirmed types; refine during byte-matching) ---
+    // (derived: base widget = 0x20 bytes at 0x00 via ': public widget'; own fields below)
+    int    field_0x20;  // +0x20
+    int    field_0x24;  // +0x24
+    short  field_0x28;  // +0x28
     // --- constructors ---
     border(void);
     border(short int, short int, short int, short int, short int, short int, short int, char *);
@@ -19,4 +26,6 @@ public:
     // --- methods ---
     void Read(void);
 };
+#pragma pack(pop)
+SIZE(border, 0x2a);
 #endif // HOMM2_BASE_BORDER_H
