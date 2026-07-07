@@ -7,6 +7,7 @@
 // forward declarations:
 struct tag_message;
 class bitmap;
+class resource;
 
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class mouseManager : public baseManager {
@@ -16,7 +17,7 @@ public:
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
     bitmap *field_0x36;  // +0x36  saved-underlying bitmap
     int    field_0x3a;  // +0x3a
-    int    field_0x3e;  // +0x3e
+    resource *field_0x3e;  // +0x3e  the loaded cursor resource
     int    field_0x42;  // +0x42
     int    field_0x46;  // +0x46
     int    field_0x4a;  // +0x4a
