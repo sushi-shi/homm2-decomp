@@ -6,6 +6,7 @@
 #include <va.h>
 #include <BASE/mouseManager.h>
 #include <string.h>
+#include <stdio.h>
 #include <windows.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <BASE/bitmap.h>
@@ -102,7 +103,43 @@ VA(0x004c94e0, 0x5)
 int mouseManager::Main(struct tag_message &) { return 0; }
 
 VA(0x004c94f0, 0x135)
-void mouseManager::SetPointer(char *, int, int) {}
+void mouseManager::SetPointer(char *name, int param_2, int param_3)
+{
+    if (field_0x7e == 0) {
+        gbPutzingWithMouseCtr++;
+        gpResourceManager->SavePosition();
+        if (param_3 == -999) {
+            if (giCurExe == 1 || *name == 'a' || *name == 'A')
+                param_3 = 0;
+            else if (*name == 's' || *name == 'S')
+                param_3 = 2;
+            else
+                param_3 = 1;
+        }
+        if (field_0x42 != param_3 && (field_0x42 = param_3, gbColorMice != 0)) {
+            int saved82 = field_0x82;
+            field_0x82 = 0;
+            if (field_0x3e != 0)
+                gpResourceManager->Dispose(field_0x3e);
+            char *fmt;
+            if (field_0x42 == 0)
+                fmt = "ADVMCO.ICN";
+            else if (field_0x42 == 2)
+                fmt = "SPELCO.ICN";
+            else
+                fmt = "CMSECO.ICN";
+            char local_10[16];
+            sprintf(local_10, fmt);
+            field_0x3e = gpResourceManager->GetIcon(local_10);
+            ProcessAssert(param_2 != 1000, __FILE__, __LINE__);
+            field_0x3a = -1;
+            field_0x82 = saved82;
+        }
+        SetPointer(param_2);
+        gpResourceManager->RestorePosition();
+        gbPutzingWithMouseCtr--;
+    }
+}
 
 VA(0x004c9630, 0x405)
 void mouseManager::SetPointer(int) {}
