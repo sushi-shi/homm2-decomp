@@ -6,10 +6,15 @@
 #include <va.h>
 #include <BASE/dimmerWidget.h>
 VA(0x004dd330, 0x1e)
-dimmerWidget::dimmerWidget(void) {}
+dimmerWidget::dimmerWidget(void) : widget(0, 0, 0, 0, 0, 0)
+{
+}
 
 VA(0x004dd350, 0x34)
-dimmerWidget::dimmerWidget(short int, short int, short int, short int, short int, short int) {}
+dimmerWidget::dimmerWidget(short int a, short int b, short int c, short int d, short int e, short int f)
+    : widget(a, b, c, d, e, f)
+{
+}
 
 VA(0x004dd390, 0x5f)
 void dimmerWidget::Read(void) {}
