@@ -9,6 +9,7 @@
 #include <BASE/widget.h>
 #include <BASE/bitmap.h>
 #include <SOURCE/KB.h>
+#include <stdlib.h>
 VA(0x004ceb70, 0xaa)
 heroWindow::heroWindow(void) {}
 
@@ -90,5 +91,33 @@ void heroWindow::RestoreBackground(void)
 }
 
 VA(0x004cf950, 0x186)
-void heroWindow::MoveWindow(int, int) {}
+void heroWindow::MoveWindow(int dx, int dy)
+{
+    int oldX = field_0x28;
+    int oldY = field_0x2c;
+    int oldW = field_0x30;
+    int oldH = field_0x34;
+    int newX = field_0x28 + dx;
+    int newY = field_0x2c + dy;
+    if (newX < 0)
+        newX = 0;
+    if (newY < 0)
+        newY = 0;
+    if (640 < field_0x30 + newX)
+        newX = 640 - field_0x30;
+    if (480 < field_0x34 + newY)
+        newY = 480 - field_0x34;
+    field_0x40->DrawToBuffer(field_0x28, field_0x2c);
+    field_0x28 = newX;
+    field_0x2c = newY;
+    field_0x40->GrabBitmap(gpWindowManager->field_0x46, field_0x28, field_0x2c);
+    DrawWindow(0);
+    int movedX = abs(field_0x28 - oldX);
+    int movedY = abs(field_0x2c - oldY);
+    if (field_0x28 < oldX)
+        oldX = field_0x28;
+    if (field_0x2c < oldY)
+        oldY = field_0x2c;
+    gpWindowManager->UpdateScreenRegion(oldX, oldY, oldW + movedX, oldH + movedY);
+}
 
