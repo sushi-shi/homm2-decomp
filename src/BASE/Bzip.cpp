@@ -1793,3 +1793,8 @@ long DecodeData(char *dst, char *src, unsigned long srcLen)
 
     return flen;
 }
+
+// ---- globals (definitions, RVA order) ----
+UInt32 crc32Table[256];
+char inName[1024];
+char outName[1024];

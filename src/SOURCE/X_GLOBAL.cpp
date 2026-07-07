@@ -4,3 +4,10 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+
+// ---- globals (definitions, RVA order) ----
+char *xNecromancerShrine;
+char *xNecromancerShrineDesc;
+int xShrineBuildingCost[2334];
+int xPasswordStringsIndex[8];
+signed char xIsExpansionMap;
