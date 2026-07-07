@@ -23,7 +23,7 @@ flags = "o2"
 [[unit]]
 unit = "BASE/BITS"
 source = "src/BASE/BITS.cpp"
-flags = "base"
+flags = "o2"
 
 [[unit]]
 unit = "BASE/BORDER"
