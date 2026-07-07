@@ -45,13 +45,6 @@ DATA(0x004ffb20) extern char *cBuildingInfoNeutral[];
 DATA(0x005331c8) extern char *cDEDest;
 DATA(0x00528ca4) extern char cNetBoxColor[];
 DATA(0x005286f8) extern char cNetBoxLine[][140];
-DATA(0x004eb2a0) extern float  const_000eb2a0;         // 0.0f
-DATA(0x004eb2a4) extern float  const_000eb2a4;         // 2.0f
-DATA(0x004eb338) extern double const_000eb338;         // 0.5
-DATA(0x004eb368) extern float  const_000eb368;         // 100.0f
-DATA(0x004eb4a8) extern double const_000eb4a8;         // 1.5
-DATA(0x004eb4c0) extern float  const_000eb4c0;         // 1250.0f
-DATA(0x004eb4c4) extern float  const_000eb4c4;         // 48.0f
 // (const_00127c14/c1c/c20 removed — they were gafAITurnCostResource[3|5|6]; indexed directly now.)
 DATA(0x00528d38) extern int const_00128d38;            // 13-byte BSS flag buffer (??_C@_0N@PMOM@...)
 DATA(0x004ffe80) extern char *cOutOfMemory;

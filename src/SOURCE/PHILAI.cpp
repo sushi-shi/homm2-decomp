@@ -276,7 +276,7 @@ void philAI::GetBestBuilding(town *t, BHC &bhc, float &fOut) {
                 ValueOfBuyingBuilding(t, node, cost, idx);
                 if (*(int *)((char *)gpCurPlayer + 0xf) == 1)
                     cost = (int)(cost * 1.3);
-                score = (Random(1, 5) + 0x5f) * idx / const_000eb368;
+                score = (Random(1, 5) + 0x5f) * idx / 100.0f;
                 if (score > kn) {
                     jb = node;
                     nb = idx;
@@ -439,7 +439,7 @@ int philAI::ValueOfTown(town *t) {
         if (((townView *)t)->buildings & (1 << idx))
             sum += GetBuildingBaseResourceValue(((townView *)t)->race, idx, ((townView *)t)->buildState);
     }
-    sum = (int)(gafAITurnCostResource[RES_GOLD] * const_000eb4c0 * const_000eb4a8 + sum);
+    sum = (int)(gafAITurnCostResource[RES_GOLD] * 1250.0f * 1.5 + sum);
     sum += 0x2ee;
     if (((gameTV *)gpGame)->f2cb == 1 &&
         ((townView *)t)->castleX == ((gameTV *)gpGame)->f2cc &&
@@ -476,7 +476,7 @@ void philAI::TurnCostResource(int player) {
     for (nb = 0; nb < 7; nb++) {
         jb[nb] = (float)cost[nb] / idx;
         gafAITurnCostResource[nb] =
-            (float)((jb[nb] / const_000eb2a4 + const_000eb338) / gResourceBaseValue[nb]);
+            (float)((jb[nb] / 2.0f + 0.5) / gResourceBaseValue[nb]);
     }
 }
 
@@ -491,12 +491,12 @@ float philAI::TurnValueOfObelisk(int player) {
         jb <<= 1;
     idx = jb / 0x6e;
     if (*(signed char *)((char *)gpGame + 0x6397) == -1)
-        return const_000eb2a0;
+        return 0.0f;
     ta->field50 = idx * 48 / *(signed char *)((char *)gpGame + 0xb52);
     if (*(int *)((char *)gpCurPlayer + 0xf) == 2)
         ta->field50 = (int)(ta->field50 * 1.4);
-    ta->field50 = (int)((const_000eb4a8 -
-        abs(0x30 - gpGame->SetupPuzzlePieces(giCurPlayer, 1)) / const_000eb4c4) * ta->field50);
+    ta->field50 = (int)((1.5 -
+        abs(0x30 - gpGame->SetupPuzzlePieces(giCurPlayer, 1)) / 48.0f) * ta->field50);
     ta->field50 = (int)((ta->f14 + 0.66) * ta->field50);
     return (float)ta->field50;
 }
