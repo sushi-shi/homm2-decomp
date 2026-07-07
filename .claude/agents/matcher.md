@@ -1,7 +1,7 @@
 ---
 name: matcher
 tools: Bash, Read, Edit, Write, Grep, Glob
-description: Byte-matches one function / TU of HoMM2 against retail HEROES2W.EXE — reconstructs C++ that, compiled with MSVC 4.2 (/Od /MT /Gr /G5 /Ob1) under wine, produces COFF identical to retail (verified with objdiff). Spawned by the orchestrator with a TU + retail RVAs (authoritative names/sizes/class-layouts come from CodeView — no Ghidra). Holds the /Od reconstruction doctrine: real types over casts, real Win32 headers, the SOLVED stack-slot hash (scripts/od_slots.py), inline accessors (/Ob1 jmp $+0 fingerprint), reloc-masking, fastcall.
+description: Byte-matches one function / TU of HoMM2 against retail HEROES2W.EXE — reconstructs C++ that, compiled with MSVC 4.2 (/Od /MT /Gr /G5 /Ob1) under wine, produces COFF identical to retail (verified with objdiff). Spawned by the orchestrator with a TU + retail RVAs (authoritative names/sizes/class-layouts come from CodeView — no Ghidra). Holds the /Od reconstruction doctrine: real types over casts, custom minimal Win32 headers (win/windows.h), owner-header discipline (no local decls), the SOLVED stack-slot hash (scripts/od_slots.py), inline accessors (/Ob1 jmp $+0 fingerprint), reloc-masking, fastcall.
 ---
 
 # matcher — reconstruct one byte-matching TU (MSVC 4.2 /Od)
@@ -141,8 +141,13 @@ the per-call-site continuation jumps of **inlined in-class accessors**.
   recovered header; member-type changes are matching-NEUTRAL (same size/offset/
   mangling) and recover the devs' shape. Reserve casts for reinterpretations the
   binary proves (ptr↔DWORD storage, fn-ptr→void* params).
-- **Real headers.** Use the recovered `include/<TIER>/*.h` and real `<windows.h>`/
-  `<io.h>`/`<string.h>` signatures so arg push/load bytes match.
+- **Headers, not local decls (gate-enforced).** Types come from the recovered
+  `include/<TIER>/*.h`; call a cross-TU function via its owner header `<TIER>/<TU>.h`; CRT from
+  real `<io.h>`/`<string.h>`; Win32 from the custom minimal `include/win/windows.h` — **NOT**
+  real `<windows.h>` (its huge preamble shifts cumulative state and perturbs matched fns;
+  measured). Include the SPECIFIC headers you use (no `_all.h`). Put NO local
+  `class/struct/enum`/`extern`/forward-decl in a .cpp — `homm2 build`'s header-discipline gates
+  reject them; declare your TU's free fns in its owner header (`gen_module_header.py` bootstraps it).
 - **Define functions in retail-RVA order** within the TU (the link order the
   baseline expects).
 
