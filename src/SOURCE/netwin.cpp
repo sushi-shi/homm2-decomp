@@ -4,10 +4,29 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <windows.h>
+#include <nb30.h>
+#include <string.h>
 #include <SOURCE/netwin.h>
 #include <_globals_model.h>
 VA(0x004a6be0, 0xa8)
-int is_netbios_avail(void) { return 0; }
+int is_netbios_avail(void)
+{
+    NCB ncb;
+    memset(&ncb, 0, sizeof(NCB));
+    for (gNetbiosLana = 0; gNetbiosLana < 0xfe; gNetbiosLana++) {
+        memset(&ncb, 0, sizeof(NCB));
+        ncb.ncb_command = 0x7f;
+        ncb.ncb_lana_num = gNetbiosLana;
+        if (Netbios(&ncb) == 3)
+            break;
+    }
+    if (gNetbiosLana < 0xfe) {
+        gNetbiosAvail = 1;
+        return 1;
+    }
+    return 0;
+}
 
 VA(0x004a6c88, 0x244)
 extern "C" int __fastcall nb_init(int, int) { return 0; }
