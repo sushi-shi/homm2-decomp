@@ -13,6 +13,7 @@
 #include <BASE/palette.h>
 #include <BASE/inputManager.h>
 #include <stdio.h>
+#include <_globals_model.h>
 #include <SOURCE/KB.h>
 VA(0x004ca6d0, 0x3a3)
 void CycleColors(int) {}
@@ -187,7 +188,27 @@ void heroWindowManager::RedrawScreen(void)
 }
 
 VA(0x004cb030, 0x80)
-void heroWindowManager::FadeScreen(int, int, class palette *) {}
+void heroWindowManager::FadeScreen(int param_1, int param_2, class palette *pal)
+{
+    if (pal != 0)
+        SetPalette(pal->field_0x10, 0);
+    if (param_1 != 0) {
+        if (param_1 == 1) {
+            gFadeSavedUpdate = field_0x56;
+            field_0x56 = 0;
+            PollSound();
+            FadeOut(param_2);
+            PollSound();
+        } else {
+            unsigned int saved = field_0x56;
+            field_0x56 = 0;
+            PollSound();
+            FadeIn(param_2);
+            field_0x56 = gFadeSavedUpdate | saved;
+            PollSound();
+        }
+    }
+}
 
 VA(0x004cb0b0, 0x53)
 void heroWindowManager::ScreenShot(void)
