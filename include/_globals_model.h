@@ -8,12 +8,10 @@
 // Kept OUT of _globals.h (which is CodeView-backed) — assert_globals_data exempts these.
 #include <_types.h>
 
-DATA(0x004faeb8) extern SCreatureInfo gCreatureInfo[];   // monster-DB view (game::ExperienceValueOfStack reloc)
-
-// DATA-PENDING (matcher resolves exact VA when the referencing fn is matched):
-extern monsterRV gMonsterInfo[100];   // monster-DB view (philAI::ComputeUpgradeValue, computed base)
-extern float gRVWeightOre;            // .rdata float literal (??_C@_..), p[2] weight in philAI::RVConversion
-extern float gRVWeightMerc;           // .rdata float literal, p[1] weight
-extern float gRVWeightCrystal;        // .rdata float literal, p[4] weight
+// VAs pinned from the retail disassembly of the referencing fns (no CodeView symbol of their own):
+DATA(0x004faeb8) extern SCreatureInfo gCreatureInfo[];   // monster-DB view (game::ExperienceValueOfStack)
+DATA(0x004faeb2) extern monsterRV gMonsterInfo[100];     // monster-DB view, 26B recs (philAI::ComputeUpgradeValue)
+// (gRVWeightOre/Merc/Crystal removed — they were just gafAITurnCostResource[2|1|4]; the code
+//  now indexes the array directly via the RES_* enum, which matches the retail byte-for-byte.)
 
 #endif // HOMM2_GLOBALS_MODEL_H
