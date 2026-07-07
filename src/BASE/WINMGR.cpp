@@ -6,6 +6,9 @@
 #include <va.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/WINMGR.h>
+#include <BASE/bitmap.h>
+#include <BASE/Misc.h>
+#include <SOURCE/KB.h>
 VA(0x004ca6d0, 0x3a3)
 void CycleColors(int) {}
 
@@ -37,7 +40,12 @@ VA(0x004cadd0, 0x1cf)
 int heroWindowManager::DoDialog(class heroWindow *, int (*)(struct tag_message &), int) { return 0; }
 
 VA(0x004cafa0, 0x17)
-void heroWindowManager::UpdateScreen(void) {}
+void heroWindowManager::UpdateScreen(void)
+{
+    PollSound();
+    BitmapToScreen(field_0x46);
+    PollSound();
+}
 
 VA(0x004cafc0, 0x4f)
 void heroWindowManager::UpdateScreenRegion(int, int, int, int) {}
@@ -61,7 +69,12 @@ VA(0x004cb1e0, 0x402)
 void heroWindowManager::FizzleForward(int, int, int, int, int, signed char *, signed char *) {}
 
 VA(0x004cb5f0, 0x19)
-void heroWindowManager::ReleaseFizzleSource(void) {}
+void heroWindowManager::ReleaseFizzleSource(void)
+{
+    if (field_0x4a != 0)
+        delete field_0x4a;
+    field_0x4a = 0;
+}
 
 VA(0x004cb610, 0x1)
 void CreateColorTables(void) {}
