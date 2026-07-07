@@ -16,7 +16,6 @@
 #include <_globals.h>
 #include <io.h>
 #include <string.h>
-#include <_all.h>
 #include <stdio.h>
 #include <SOURCE/game.h>
 #include <SOURCE/playerData.h>

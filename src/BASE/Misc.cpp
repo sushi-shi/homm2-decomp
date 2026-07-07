@@ -4,6 +4,8 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <BASE/heroWindow.h>
+#include <BASE/mouseManager.h>
 #include <BASE/Misc.h>        // this TU's own free functions + indexArray/IconEntry
 #include <SOURCE/KB.h>        // EventWindowHandler, FileError, ShutDown
 #include <SOURCE/wingraph.h>  // SetFullScreenStatus

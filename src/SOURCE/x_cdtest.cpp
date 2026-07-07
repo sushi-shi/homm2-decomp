@@ -5,7 +5,6 @@
 
 #include <va.h>
 #include <SOURCE/x_cdtest.h>
-#include <_all.h>
 VA(0x00449f80, 0x3b)
 int CDTest_Init(void) { return 0; }
 

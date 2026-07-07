@@ -5,7 +5,6 @@
 
 #include <va.h>
 #include <BASE/bmap2.h>
-#include <_all.h>
 VA(0x004ca3d0, 0x80)
 void FillBitmapArea(class bitmap *, int, int, int, int, int) {}
 

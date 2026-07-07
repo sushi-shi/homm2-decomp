@@ -5,7 +5,6 @@
 
 #include <va.h>
 #include <BASE/Blur.h>
-#include <_all.h>
 VA(0x004d28e0, 0x6a4)
 void DoBlur(class bitmap *, class bitmap *, int, int, int, int) {}
 

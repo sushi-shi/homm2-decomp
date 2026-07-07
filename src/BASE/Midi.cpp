@@ -4,7 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
-#include <_all.h>
+#include <BASE/soundManager.h>
 VA(0x004d3850, 0xb8)
 void soundManager::MIDIStartup(void) {}
 

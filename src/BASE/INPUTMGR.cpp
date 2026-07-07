@@ -4,8 +4,8 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <BASE/inputManager.h>
 #include <BASE/INPUTMGR.h>
-#include <_all.h>
 #include <_carcass_types.h>
 VA(0x004cdb50, 0x308)
 int KeyboardMessageHandler(void *, unsigned int, unsigned int, long int) { return 0; }

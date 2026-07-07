@@ -5,7 +5,6 @@
 
 #include <va.h>
 #include <SOURCE/SMACKMGR.h>
-#include <_all.h>
 VA(0x00401000, 0x4e)
 void ConvertSmackerPalette(unsigned char *) {}
 

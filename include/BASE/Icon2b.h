@@ -2,7 +2,9 @@
 #define HOMM2_ICON2B_H
 // Declarations of the free functions DEFINED in Icon2b.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
-#include <_all.h>
+// forward declarations (was <_all.h>):
+class bitmap;
+class icon;
 
 void IconToBitmap(class icon *, class bitmap *, int, int, int, int, int, int, int, int, int);
 

@@ -2,7 +2,6 @@
 #define HOMM2_REMOTE_H
 // Declarations of the free functions DEFINED in REMOTE.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
-#include <_all.h>
 
 void RemoteCleanup(void);
 void RemoteMain(int);

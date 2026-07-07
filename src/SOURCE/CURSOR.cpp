@@ -4,8 +4,8 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <SOURCE/advManager.h>
 #include <SOURCE/CURSOR.h>
-#include <_all.h>
 #include <_carcass_types.h>
 VA(0x0040d5e0, 0x138)
 void advManager::StartCursor(int) {}

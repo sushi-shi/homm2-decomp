@@ -5,7 +5,6 @@
 
 #include <va.h>
 #include <SOURCE/Wsnetwin.h>
-#include <_all.h>
 VA(0x004068b0, 0x5b5)
 short int wsnet_init(void) { return 0; }
 

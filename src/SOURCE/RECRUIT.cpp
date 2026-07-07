@@ -4,8 +4,8 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <SOURCE/recruitUnit.h>
 #include <SOURCE/RECRUIT.h>
-#include <_all.h>
 VA(0x0048b310, 0x18c)
 void SetupRecruitWin(class heroWindow *, int, int, int, int, int) {}
 

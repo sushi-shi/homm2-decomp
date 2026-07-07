@@ -4,7 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
-#include <_all.h>
+#include <SOURCE/armyGroup.h>
 VA(0x0048c040, 0x3c)
 armyGroup::armyGroup(void) {}
 

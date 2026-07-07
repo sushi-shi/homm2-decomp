@@ -2,7 +2,16 @@
 #define HOMM2_KB_H
 // Declarations of the free functions DEFINED in KB.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
-#include <_all.h>
+// forward declarations (was <_all.h>):
+struct SAMPLE2;
+struct SNetPlayerInfo;
+struct SSpellInfo;
+struct SWinSetup;
+class hero;
+class heroWindow;
+struct tag_message;
+struct tag_monsterInfo;
+class town;
 #include <_types.h>
 #include <_carcass_types.h>
 

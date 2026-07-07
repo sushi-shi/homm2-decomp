@@ -5,7 +5,6 @@
 
 #include <va.h>
 #include <BASE/Icondf2b.h>
-#include <_all.h>
 VA(0x004daa20, 0x23b)
 void FlipDimIconToBitmap(class icon *, class bitmap *, int, int, int, int, int, int, int, int, int) {}
 

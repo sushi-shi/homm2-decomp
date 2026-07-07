@@ -5,7 +5,6 @@
 
 #include <va.h>
 #include <SOURCE/wingraph.h>
-#include <_all.h>
 VA(0x00435290, 0x55)
 void DDRestoreDisplayMode(void) {}
 

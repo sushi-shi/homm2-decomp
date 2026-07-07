@@ -2,7 +2,9 @@
 #define HOMM2_ADVMGR_H
 // Declarations of the free functions DEFINED in ADVMGR.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
-#include <_all.h>
+// forward declarations (was <_all.h>):
+class mapCell;
+struct tag_message;
 
 int SaveGame(void);
 int DimensionDoorHandler(struct tag_message &);

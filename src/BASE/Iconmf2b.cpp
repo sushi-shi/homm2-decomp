@@ -5,7 +5,6 @@
 
 #include <va.h>
 #include <BASE/Iconmf2b.h>
-#include <_all.h>
 VA(0x004da800, 0x212)
 void FlipMonoIconToBitmap(class icon *, class bitmap *, int, int, int, int, int, int, int, int, int) {}
 

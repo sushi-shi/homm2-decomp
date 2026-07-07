@@ -4,8 +4,8 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <SOURCE/combatManager.h>
 #include <SOURCE/COMMAND.h>
-#include <_all.h>
 VA(0x0042a6d0, 0x36d)
 int combatManager::Main(struct tag_message &) { return 0; }
 

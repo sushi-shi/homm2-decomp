@@ -4,6 +4,11 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <SOURCE/town.h>
+#include <SOURCE/townManager.h>
+#include <BASE/executive.h>
+#include <BASE/mouseManager.h>
+#include <SOURCE/game.h>
 #include <BASE/Misc.h>
 #include <BASE/WINMGR.h>
 #include <SOURCE/ADVMGR.h>

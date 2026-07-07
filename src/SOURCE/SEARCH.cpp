@@ -4,7 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
-#include <_all.h>
+#include <SOURCE/searchArray.h>
 VA(0x004a25e0, 0xc0)
 int searchArray::BuildPath(int, int, int, int, int) { return 0; }
 

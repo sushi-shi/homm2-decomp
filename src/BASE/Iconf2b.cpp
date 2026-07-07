@@ -5,7 +5,6 @@
 
 #include <va.h>
 #include <BASE/Iconf2b.h>
-#include <_all.h>
 VA(0x004d1ba0, 0x4f1)
 void FlipIconToBitmap(class icon *, class bitmap *, int, int, int, int, int, int, int, int, int) {}
 

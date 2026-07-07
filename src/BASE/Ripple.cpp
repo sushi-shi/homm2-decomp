@@ -5,7 +5,6 @@
 
 #include <va.h>
 #include <BASE/Ripple.h>
-#include <_all.h>
 VA(0x004d26a0, 0x23f)
 void DoRipple(class bitmap *, class bitmap *, int, int) {}
 

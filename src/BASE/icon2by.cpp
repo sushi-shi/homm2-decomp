@@ -5,7 +5,6 @@
 
 #include <va.h>
 #include <BASE/icon2by.h>
-#include <_all.h>
 VA(0x004da270, 0x588)
 void IconToBitmapYModify(class icon *, class bitmap *, int, int, int, int, int, int, int, int, int, signed char *) {}
 

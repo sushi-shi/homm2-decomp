@@ -4,8 +4,8 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <SOURCE/fileRequester.h>
 #include <SOURCE/REQUEST.h>
-#include <_all.h>
 VA(0x0048c920, 0x80)
 int GetMapHeader(char *, struct SMapHeader *) { return 0; }
 

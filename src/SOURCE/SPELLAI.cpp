@@ -4,7 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
-#include <_all.h>
+#include <SOURCE/combatManager.h>
 VA(0x004867c0, 0x279)
 int combatManager::DoSpellAI(int, int) { return 0; }
 
