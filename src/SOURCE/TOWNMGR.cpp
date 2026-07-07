@@ -106,9 +106,6 @@ void GetCategoryStats(int, long int * const, signed char * const) {}
 VA(0x0041bbfc, 0xd9)
 void SortStats(long int * const, signed char * const) {}
 
-// ---- data / globals / vtables ----
-DATA(0x004eb140)  // const townManager::vftable
-DATA(0x004ee750)  // struct SBuildingInfo (*)[32] sBuildingInfo
 
 // ===== vtable townManager : public baseManager  (3 slots) =====
 //  [ 0] VA(0x00414109, 0x1ef)  int townManager::Open(int)   <- override (implements baseManager pure virtual)

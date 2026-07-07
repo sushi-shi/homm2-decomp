@@ -41,8 +41,6 @@ void bitmap::CopyTo(class bitmap *, int, int, int, int, int, int) {}
 VA(0x004d0500, 0x65)
 void bitmap::CopyToCareful(class bitmap *, int, int, int, int, int, int) {}
 
-// ---- data / globals / vtables ----
-DATA(0x004eba3c)  // const bitmap::vftable
 
 // ===== vtable bitmap (root)  (1 slots) =====
 //  [ 0] VA(0x004cfff0, 0x41)  void * bitmap::scalar_dtor(unsigned int)   <- introduces virtual

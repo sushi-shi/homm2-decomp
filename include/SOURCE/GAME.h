@@ -1,10 +1,10 @@
 #ifndef HOMM2_GAME_H
 #define HOMM2_GAME_H
+#include <va.h>
+#include <_types.h>
 // Declarations of the free functions DEFINED in GAME.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
-struct SCreatureInfo;
-struct configStruct;
 struct tag_message;
 
 // GAME-private types (configStruct / SCreatureInfo are shared, in _types.h).
@@ -29,5 +29,9 @@ int CalcFileCRC(char *filename);
 void CompressTest2(void);
 void CompressTest(void);
 void CompressTest3(void);
+
+
+// --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
+DATA(0x004f7a08) extern char bMapInitialized;
 
 #endif // HOMM2_GAME_H

@@ -4,6 +4,8 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <SOURCE/PHILAI.h>
+#include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/GAME.h>
 #include <_types.h>
 #include <_globals_model.h>
@@ -13,7 +15,6 @@
 #include <SOURCE/FINDPATH.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/REMOTE.h>
-#include <_globals.h>
 #include <io.h>
 #include <string.h>
 #include <stdio.h>
@@ -899,31 +900,3 @@ int game::CountShrines(int player)
     }
     return count;
 }
-
-// ---- data / globals / vtables ----
-DATA(0x004f70e0)  // int gbGameOver
-DATA(0x004f7550)  // signed char * giMonType
-DATA(0x004f7a08)  // char bMapInitialized
-DATA(0x005280e8)  // int iViewArmyNumTroops
-DATA(0x005280ec)  // signed char * gbNGHeroType
-DATA(0x005280f8)  // struct SMonFrameInfo sViewArmyMonFrameInfo
-DATA(0x00528430)  // short int giUABaseX
-DATA(0x00528434)  // short int giUABaseY
-DATA(0x00528438)  // int giEndSequence
-DATA(0x0052843c)  // int gbDismissArmy
-DATA(0x00528440)  // signed char * gbNGHuman
-DATA(0x00528448)  // int iViewArmyFrame
-DATA(0x0052844c)  // int gbAllowUpgrade
-DATA(0x00528450)  // int iViewArmyType
-DATA(0x00528454)  // class hero * viewSpellsHero
-DATA(0x00528458)  // int gbUpgradeArmy
-DATA(0x00528460)  // short int * RandMineQty
-DATA(0x00528470)  // char * gcCurMapName
-DATA(0x00528480)  // signed char * gbNGDifficulty
-DATA(0x00528488)  // int iViewArmyUpgradeToType
-DATA(0x0052848c)  // int viewArmyBaseX
-DATA(0x00528490)  // int viewArmyBaseY
-DATA(0x00528498)  // signed char * gbNGColor
-DATA(0x005284a0)  // short int giUARadius
-DATA(0x005284a8)  // signed char * gbNGPlayerPos
-DATA(0x005284b0)  // int viewArmyFacingWIPXMod

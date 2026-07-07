@@ -29,8 +29,6 @@ void listBoxWidget::DrawLBStuff(int) {}
 VA(0x004dbbe0, 0x312)
 int listBoxWidget::ProcessMouseMessage(struct tag_message &) { return 0; }
 
-// ---- data / globals / vtables ----
-DATA(0x004ebac0)  // const listBoxWidget::vftable
 
 // ===== vtable listBoxWidget : public widget  (3 slots) =====
 //  [ 0] VA(0x004db890, 0x8)  void listBoxWidget::Draw(void)   <- override (implements widget pure virtual)

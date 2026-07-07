@@ -44,8 +44,6 @@ void swapManager::Update(void) {}
 VA(0x00455fbd, 0x388)
 void swapManager::SplitMons(void) {}
 
-// ---- data / globals / vtables ----
-DATA(0x004eb650)  // const swapManager::vftable
 
 // ===== vtable swapManager : public baseManager  (3 slots) =====
 //  [ 0] VA(0x00454502, 0x3bc)  int swapManager::Open(int)   <- override (implements baseManager pure virtual)

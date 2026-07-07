@@ -1,16 +1,13 @@
 #ifndef HOMM2_PHILAI_TU_H
 #define HOMM2_PHILAI_TU_H
+#include <va.h>
 // AI view/record structs + free functions DEFINED in PHILAI.cpp — single home.
 // (tag_tilePoint / monsterRV are shared, in _types.h.)
 // forward declarations (was <_all.h>):
 class army;
-class armyGroup;
-class game;
 class hero;
-class mapCell;
-struct monsterRV;
 class playerData;
-struct tag_tilePoint;
+class searchArray;
 class town;
 #include <_types.h>
 
@@ -105,5 +102,27 @@ void ValidateHero(hero *pHero);
 void InitAIMapVars(void);
 void CloseAIMapVars(void);
 int OnMySide(int);
+
+
+// --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
+DATA(0x0052564c) extern int bHeroBuiltThisTurn;
+DATA(0x00527c08) extern float gafAITurnCostResource[7];
+DATA(0x004f2100) extern signed char *gaiEnemyHeroReachable;
+DATA(0x004f20f8) extern short *gaiHeroEventStratRVOfPos;
+DATA(0x004f20f4) extern short *gaiHeroStrategicRVOfPos;
+DATA(0x004f20f0) extern short *gaiLiveChanceOfPos;
+DATA(0x004f20fc) extern signed char *gaiTurnValueOfMine;
+DATA(0x00527e10) extern int gbReduceByReload;
+DATA(0x00525638) extern signed char giBuildBoat[6];
+DATA(0x00527d18) extern signed char giBuildBoatStuffTurn[6];
+DATA(0x0052562c) extern signed char giBuildShipyard[6];
+DATA(0x00525628) extern int giCurPlayer;
+DATA(0x005256c0) extern int giCurTurn;
+DATA(0x004f2110) extern hero *gpCurAIHero;
+DATA(0x00527c34) extern playerData *gpCurPlayer;
+DATA(0x005256e4) extern int iAlphaMale;
+DATA(0x005256e8) extern int iDummy;
+DATA(0x004f211c) extern int iLastFrameRateTimer;
+DATA(0x005256f0) extern searchArray SVSearchArray;
 
 #endif // HOMM2_PHILAI_TU_H

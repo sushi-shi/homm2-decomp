@@ -98,11 +98,6 @@ void resourceManager::Read13(signed char *) {}
 VA(0x004c91b0, 0xbd)
 void resourceManager::ReadBlock(signed char *, unsigned long int) {}
 
-// ---- data / globals / vtables ----
-DATA(0x004eb9f0)  // const resourceManager::vftable
-DATA(0x0051e99c)  // int iSaveCtr
-DATA(0x005331e8)  // int * lastAggZ
-DATA(0x00533210)  // long int * lastPositionZ
 
 // ===== vtable resourceManager : public baseManager  (3 slots) =====
 //  [ 0] VA(0x004c88a0, 0xab)  int resourceManager::Open(int)   <- override (implements baseManager pure virtual)

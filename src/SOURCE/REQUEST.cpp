@@ -54,13 +54,6 @@ void fileRequester::Update(int) {}
 VA(0x0048fbc4, 0x15b)
 char * fileRequester::GetFilename(void) { return 0; }
 
-// ---- data / globals / vtables ----
-DATA(0x004eb888)  // const fileRequester::vftable
-DATA(0x004f8674)  // int giMapSizeFilter
-DATA(0x004f88c4)  // char * cFRDummy
-DATA(0x0052857c)  // float fGutterMinY
-DATA(0x00528580)  // float fGutterTravelLength
-DATA(0x00528584)  // int iMaxListSize
 
 // ===== vtable fileRequester : public baseManager  (3 slots) =====
 //  [ 0] VA(0x0048d5e1, 0x466)  int fileRequester::Open(int)   <- override (implements baseManager pure virtual)

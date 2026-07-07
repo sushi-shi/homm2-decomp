@@ -26,8 +26,6 @@ void icon::FillToBuffer(int, int, int, int, int, struct SLimitData *) {}
 VA(0x004c7f60, 0x3e)
 void icon::DimToBuffer(int, int, int, int) {}
 
-// ---- data / globals / vtables ----
-DATA(0x004eb9e8)  // const icon::vftable
 
 // ===== vtable icon (root)  (1 slots) =====
 //  [ 0] VA(0x004c7a90, 0x36)  void * icon::scalar_dtor(unsigned int)   <- introduces virtual

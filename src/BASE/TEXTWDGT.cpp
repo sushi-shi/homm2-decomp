@@ -29,8 +29,6 @@ void textWidget::SetColorIndex(short int) {}
 VA(0x004d14f0, 0xa2)
 void textWidget::SetText(char *) {}
 
-// ---- data / globals / vtables ----
-DATA(0x004eba50)  // const textWidget::vftable
 
 // ===== vtable textWidget : public widget  (3 slots) =====
 //  [ 0] VA(0x004d1490, 0x49)  void textWidget::Draw(void)   <- override (implements widget pure virtual)

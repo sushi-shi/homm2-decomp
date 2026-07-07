@@ -25,11 +25,3 @@ void soundManager::MIDISetVolume(void) {}
 
 VA(0x004d4040, 0x1)
 void soundManager::MIDIPoll(void) {}
-
-// ---- data / globals / vtables ----
-DATA(0x0051fec8)  // struct _MDI_DRIVER * hMDI
-DATA(0x0051fecc)  // int CurrentMidiFile
-DATA(0x0051fed0)  // unsigned char * bGotMidi
-DATA(0x0051ff0c)  // long int lLastMIDIPollTickCount
-DATA(0x00534cf0)  // class MIDIWrap * * pMIDIWrap
-DATA(0x00534de0)  // struct _SEQUENCE * * hSequence

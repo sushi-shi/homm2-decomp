@@ -10,6 +10,3 @@ extern "C" void __fastcall BlitBitmapToScreenVesa(int, int, int, int, int, int, 
 
 VA(0x004d8730, 0x4)
 short int AutoInitSVGA(void) { return 0; }
-
-// ---- data / globals / vtables ----
-DATA(0x00538080)  // struct tagPAINTSTRUCT ps

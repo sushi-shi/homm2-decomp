@@ -1,5 +1,6 @@
 #ifndef HOMM2_ADVMGR_H
 #define HOMM2_ADVMGR_H
+#include <va.h>
 // Declarations of the free functions DEFINED in ADVMGR.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
@@ -18,5 +19,9 @@ int SystemOptionsHandler(struct tag_message &);
 int GetMobilityFrame(int);
 int GetManaFrame(int);
 unsigned char StopOnTrigger(class mapCell *);
+
+
+// --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
+DATA(0x004f57d0) extern int iCurHourGlassPhase;
 
 #endif // HOMM2_ADVMGR_H

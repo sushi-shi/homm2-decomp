@@ -26,8 +26,6 @@ int widget::Main(struct tag_message &) { return 0; }
 VA(0x004de1e0, 0x47)
 void widget::Dim(void) {}
 
-// ---- data / globals / vtables ----
-DATA(0x004ebb00)  // const widget::vftable
 
 // ===== vtable widget (root)  (3 slots) =====
 //  [ 0] VA(0x004e1560, 0xb)  __purecall   <- = 0 (pure virtual)

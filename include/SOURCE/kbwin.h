@@ -1,5 +1,6 @@
 #ifndef HOMM2_KBWIN_H
 #define HOMM2_KBWIN_H
+#include <va.h>
 // Declarations of the free functions DEFINED in kbwin.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 
@@ -19,5 +20,12 @@ void SetNoDialogMenus(int);
 void SetMenus(void *, int);
 long int KBTickCount(void);
 void InitVideo(void);
+
+
+// --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
+DATA(0x004ef500) extern void *gEventHandle;
+DATA(0x00524c08) extern void *hInstApp;
+DATA(0x004ef4fc) extern void *hmnuApp;
+DATA(0x004ef4f8) extern void *hwndApp;
 
 #endif // HOMM2_KBWIN_H

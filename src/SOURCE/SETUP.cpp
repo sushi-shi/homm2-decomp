@@ -74,6 +74,3 @@ int ExpStdGameHandler(struct tag_message &) { return 0; }
 
 VA(0x004131fd, 0xf0)
 int BaseSetupHandler(struct tag_message &) { return 0; }
-
-// ---- data / globals / vtables ----
-DATA(0x004ee248)  // int gbDoModemConfig

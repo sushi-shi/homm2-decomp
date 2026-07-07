@@ -69,16 +69,6 @@ void CreateColorTables(void) {}
 VA(0x004cb620, 0x1)
 void CreateColorLookupTables(void) {}
 
-// ---- data / globals / vtables ----
-DATA(0x004eba10)  // const heroWindowManager::vftable
-DATA(0x0051ef28)  // int iCombatCycleFrame
-DATA(0x0051ef2c)  // int gbEveryOtherCycle
-DATA(0x0051ef30)  // int iCycle1Count
-DATA(0x0051ef34)  // int iCycle2Count
-DATA(0x0051ef38)  // int iCycle3Count
-DATA(0x0051ef3c)  // int iDialogNestCount
-DATA(0x00534908)  // signed char * gCyclePal
-DATA(0x00534968)  // short int memSelector
 
 // ===== vtable heroWindowManager : public baseManager  (3 slots) =====
 //  [ 0] VA(0x004caad0, 0xd6)  int heroWindowManager::Open(int)   <- override (implements baseManager pure virtual)

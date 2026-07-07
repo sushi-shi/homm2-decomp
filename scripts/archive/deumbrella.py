@@ -29,6 +29,8 @@ def declify_header(h):
     defined = {m.group(2) for line in text.splitlines() if (m := DEF.match(strip_c(line)))}
     body = BLOCK_RE.sub("", text)         # ignore any prior fwd block when scanning for refs
     body = re.sub(r'#include [<"]_all\.h[>"]\n', "", body)
+    body = re.sub(r"//.*", "", body)
+    body = re.sub(r"/\*.*?\*/", "", body, flags=re.S)  # comment mentions are not real uses
     words = set(re.findall(r'\b([A-Za-z_]\w*)\b', body))
     refs = sorted(nm for nm in words if nm in kind_of and nm not in defined)
     fwds = "".join("%s %s;\n" % (kind_of[nm], nm) for nm in refs)

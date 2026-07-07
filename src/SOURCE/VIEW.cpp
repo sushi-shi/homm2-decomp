@@ -14,6 +14,3 @@ int HandleViewGeneral(struct tag_message &) { return 0; }
 
 VA(0x0040c784, 0x165)
 void combatManager::ViewArmy(class army *, int) {}
-
-// ---- data / globals / vtables ----
-DATA(0x004eddf4)  // int iViewGeneralWhichSide

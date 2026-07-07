@@ -11,8 +11,3 @@ void townManager::SetupCastle(class heroWindow *, int) {}
 
 VA(0x0041e0fb, 0xca3)
 int CastleHandler(struct tag_message &) { return 0; }
-
-// ---- data / globals / vtables ----
-DATA(0x004ef5e0)  // unsigned char * castleSlotsBase
-DATA(0x00525040)  // class heroWindow * casWin
-DATA(0x00525048)  // unsigned char * castleSlotsUse

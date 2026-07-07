@@ -29,8 +29,6 @@ int font::LineLength(char *, int) { return 0; }
 VA(0x004c7950, 0xc4)
 int font::LineWidth(char *) { return 0; }
 
-// ---- data / globals / vtables ----
-DATA(0x004eb9e4)  // const font::vftable
 
 // ===== vtable font (root)  (1 slots) =====
 //  [ 0] VA(0x004c70a0, 0x39)  void * font::scalar_dtor(unsigned int)   <- introduces virtual

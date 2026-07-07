@@ -32,9 +32,6 @@ short int button::Deselect(struct tag_message &) { return 0; }
 VA(0x004ddda0, 0x55)
 void button::Draw(void) {}
 
-// ---- data / globals / vtables ----
-DATA(0x004ebaf0)  // const button::vftable
-DATA(0x0052125c)  // int iLeftRightSave
 
 // ===== vtable button : public widget  (3 slots) =====
 //  [ 0] VA(0x004ddda0, 0x55)  void button::Draw(void)   <- override (implements widget pure virtual)

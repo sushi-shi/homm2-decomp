@@ -26,11 +26,3 @@ void game::InitEntireCampaign(int) {}
 
 VA(0x004493ba, 0xbb7)
 void game::InitCampaignMap(void) {}
-
-// ---- data / globals / vtables ----
-DATA(0x004f4f28)  // short int (*)[13][2] trackXY
-DATA(0x004f4f90)  // class heroWindow * campWin
-DATA(0x00527ea4)  // int iCurViewSide
-DATA(0x00527ea8)  // int iCampaignTrackType
-DATA(0x00527eac)  // int bCampaignViewOnly
-DATA(0x00527eb0)  // int iCurViewMap

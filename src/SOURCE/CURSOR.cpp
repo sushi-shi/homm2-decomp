@@ -60,18 +60,3 @@ void advManager::UnwindMapChangeQueue(int, int) {}
 
 VA(0x00410d72, 0x11a)
 void SendMapChange(int, signed char, unsigned char, unsigned char, int, unsigned char, unsigned char) {}
-
-// ---- data / globals / vtables ----
-DATA(0x004ee020)  // int bMoveSoundMade
-DATA(0x004ee028)  // int * giPixelsPerStep
-DATA(0x004ee040)  // int * giStepDelay
-DATA(0x004ee054)  // struct _SAMPLE * hOldWalkSample
-DATA(0x004ee058)  // struct _SAMPLE * hNewWalkSample
-DATA(0x004ee05c)  // int EveryOther
-DATA(0x004ee060)  // int * startVals
-DATA(0x00524bc0)  // int S1cursorCycle
-DATA(0x00524bc4)  // int S1cursorFrameCount
-DATA(0x00524bc8)  // int S1cursorTurning
-DATA(0x00524bcc)  // int S1cursorBaseFrame
-DATA(0x00524bd0)  // int S1cursorDirection
-DATA(0x00524bd8)  // struct SMapChange * sMapChangeLastFew

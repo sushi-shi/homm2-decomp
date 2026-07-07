@@ -113,20 +113,3 @@ void combatManager::SetupSmallView(void) {}
 
 VA(0x00431f1f, 0x304)
 void combatManager::ViewBallista(int) {}
-
-// ---- data / globals / vtables ----
-DATA(0x005250b8)  // int gbThisNetHasControl
-DATA(0x005250bc)  // int iCurTransferArtifact
-DATA(0x005250c0)  // signed char * iTransferArtifactsInfo
-DATA(0x005250d0)  // int gbWhichAnimationPlaying
-DATA(0x005250d4)  // int iMaxTransferArtifacts
-DATA(0x005250d8)  // int giNextActionExtra
-DATA(0x005250dc)  // int bSkeletonsShown
-DATA(0x005250e0)  // int gbShowingLoseWindow
-DATA(0x005250e4)  // int giWinCmbtFrame
-DATA(0x005250e8)  // int giNextActionGridIndex
-DATA(0x005250ec)  // int giSurrenderCost
-DATA(0x005250f0)  // int giSkeletonsCreated
-DATA(0x005250f8)  // signed char * iTransferArtifacts
-DATA(0x00525108)  // int giNextAction
-DATA(0x0052510c)  // int giNextActionGridIndex2

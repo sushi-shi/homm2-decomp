@@ -52,30 +52,3 @@ int dpWaitForHost(void) { return 0; }
 
 VA(0x0041fecd, 0x5eb)
 void DPSD(int, char *, int) {}
-
-// ---- data / globals / vtables ----
-DATA(0x004ef7c8)  // struct IDirectPlay * lpIDC
-DATA(0x004ef7cc)  // unsigned long int dcoID
-DATA(0x004ef7d0)  // struct _GUID * IPXGuid
-DATA(0x004ef7d4)  // struct _GUID * TCPGuid
-DATA(0x004ef7d8)  // void * dphEvent
-DATA(0x004ef7dc)  // int iDPRcvBufferHead
-DATA(0x004ef7e0)  // int iDPRcvBufferTail
-DATA(0x004ef7e4)  // unsigned char * * ppDPRcvBuffer
-DATA(0x004ef7e8)  // int * piDPRcvBufferSize
-DATA(0x004ef7ec)  // int bStartUpInfoReceived
-DATA(0x004ef7f0)  // void * hinstDplayx
-DATA(0x004ef7f4)  // int iDPWaitForFirstGuestStatus
-DATA(0x004ef7f8)  // int iDPWaitForHostStatus
-DATA(0x004ef7fc)  // int iWaitForHostWaitCount
-DATA(0x004ef800)  // int iEnumCount
-DATA(0x004ef804)  // int iLastHereIAmTickCount
-DATA(0x004ef808)  // int bInDPSD
-DATA(0x004ef80c)  // int iGUIDCount
-DATA(0x004ef810)  // int iLastMsgNumHumanPlayers
-DATA(0x00525060)  // int iMaxSession
-DATA(0x00525064)  // int giHostAcceptStatus
-DATA(0x00525068)  // struct _GUID * g_lpGuid
-DATA(0x00525070)  // int * giNetPosToDCOPos
-DATA(0x00525088)  // int iSessionToTry
-DATA(0x00525090)  // long int * lSessions

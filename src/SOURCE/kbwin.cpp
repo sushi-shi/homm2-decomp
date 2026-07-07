@@ -52,26 +52,3 @@ long int KBTickCount(void) { return 0; }
 
 VA(0x0041d027, 0x10)
 void InitVideo(void) {}
-
-// ---- data / globals / vtables ----
-DATA(0x004ef4c8)  // char * szAppName
-DATA(0x004ef4d8)  // char * szTitle
-DATA(0x004ef4f8)  // void * hwndApp
-DATA(0x004ef4fc)  // void * hmnuApp
-DATA(0x004ef500)  // void * gEventHandle
-DATA(0x004ef588)  // long int lLastGTimerTickCount
-DATA(0x004ef58c)  // long int lLastCycleColorsTickCount
-DATA(0x004ef590)  // int bRestartMusic
-DATA(0x004ef594)  // int iLastMusic
-DATA(0x004ef5b8)  // long int lLastGetMessage
-DATA(0x004ef5bc)  // long int lLastAilServe
-DATA(0x004ef5dc)  // int gbNoDialogMenusOn
-DATA(0x00524c08)  // void * hInstApp
-DATA(0x00524c10)  // struct tagRECT rcTemp
-DATA(0x00524c20)  // int iMainWinScreenHeight
-DATA(0x00524c24)  // void * hmnuCurrent
-DATA(0x00524c28)  // int iTempX
-DATA(0x00524c2c)  // int iTempY
-DATA(0x00524c30)  // long int lTemp
-DATA(0x00524c38)  // unsigned char * bProcessMessage
-DATA(0x00525038)  // int iMainWinScreenWidth

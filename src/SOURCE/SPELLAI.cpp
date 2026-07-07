@@ -37,8 +37,3 @@ void combatManager::EffectSpellResurrect(int *, int, int) {}
 
 VA(0x00488d58, 0xcc9)
 void combatManager::EffectSpellDamage(int *, int, int) {}
-
-// ---- data / globals / vtables ----
-DATA(0x004f80b8)  // float * gfDurationMods
-DATA(0x004f80e8)  // float * gfCancelDurationMods
-DATA(0x005284b4)  // int giCurrSpellGroup

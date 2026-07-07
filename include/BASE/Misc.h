@@ -1,9 +1,12 @@
 #ifndef HOMM2_MISC_H
 #define HOMM2_MISC_H
+#include <va.h>
+#include <_types.h>
 // Declarations of the free functions DEFINED in Misc.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
 class bitmap;
+class heroWindow;
 class icon;
 struct tag_message;
 
@@ -57,5 +60,17 @@ int SGenRand(void);
 int MemSize(int);
 void GetDataEntry(char *, char *, int, char *, int, int);
 int DataEntryWindowHandler(struct tag_message &message);
+
+
+// --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
+DATA(0x005331d8) extern int bDataEntryTime;
+DATA(0x005331c8) extern char *cDEDest;
+DATA(0x005331c4) extern class heroWindow *DataEntryWin;
+DATA(0x0051dcec) extern MemEntry *gpMemEntry;
+DATA(0x005331d4) extern int iDEMaxLen;
+DATA(0x0051dd08) extern int iLastSeed;
+DATA(0x0051dce8) extern int iMemEntries;
+DATA(0x005331dc) extern int inBoxX;
+DATA(0x005331e0) extern int inBoxY;
 
 #endif // HOMM2_MISC_H

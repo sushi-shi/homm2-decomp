@@ -23,8 +23,6 @@ int border::Main(struct tag_message &) { return 0; }
 VA(0x004d2480, 0xab)
 void border::Draw(void) {}
 
-// ---- data / globals / vtables ----
-DATA(0x004eba60)  // const border::vftable
 
 // ===== vtable border : public widget  (3 slots) =====
 //  [ 0] VA(0x004d2480, 0xab)  void border::Draw(void)   <- override (implements widget pure virtual)

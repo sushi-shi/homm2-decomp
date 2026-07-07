@@ -11,8 +11,6 @@ tileset::tileset(unsigned long int) {}
 VA(0x004dad30, 0x21)
 tileset::~tileset() {}
 
-// ---- data / globals / vtables ----
-DATA(0x004ebab0)  // const tileset::vftable
 
 // ===== vtable tileset (root)  (1 slots) =====
 //  [ 0] VA(0x004dacf0, 0x36)  void * tileset::scalar_dtor(unsigned int)   <- introduces virtual
