@@ -4,6 +4,10 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <BASE/BITS.h>
+#include <SOURCE/KB.h>
+#include <_globals.h>
+#include <win/windows.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -18,112 +22,13 @@
 #include <BASE/soundManager.h>
 #include <BASE/icon.h>
 
-struct tag_message {
-    int type;
-    int field4;
-    int field8;
-    int fieldC;
-    int field10;
-    int field14;
-    char *text;
-};
-
-struct SAMPLE2 {
-    class sample *pSample;
-    struct _SAMPLE *pMem;
-};
-
-// 100-byte per-castle record indexed off game (array at game+0xb53).
-struct townSlot {
-    char m_pad[0x64];
-};
-
-class combatManager;
-
-class game {
-public:
-    int TransmitSaveGame(int, int, int);
-    int ReceiveSaveGame(int, int, int, int);
-    void ClaimMine(int, int);
-    void ShowMoraleInfo(class hero *, int);
-    void ShowLuckInfo(class hero *, int);
-};
-
-class mouseManager {
-public:
-    void ReallyHidePointer(void);
-    void ReallyShowPointer(void);
-    void NewUpdate(int);
-    void ShowColorPointer(void);
-    void SetColorMice(int);
-};
-
-class townManager {
-public:
-    void RedrawTownScreen(void);
-};
-
-class town {
-public:
-    int CanBuildDock(void);
-};
-
-class executive {
-public:
-    void ShutDownSystem(void);
-};
-
-class palette;
-class font;
-
-// hero storage is 250 bytes (the recovered hero class carries no data members).
-struct heroRec {
-    char m_pad[250];
-};
-
-// ---- TU-local structs (sizes/offsets from retail disasm) ----
-struct tag_monsterInfo {
-    short m_0;
-    char m_pad[24];
-};                                  // sizeof 26
-
-struct SSpellInfo {
-    char m_pad0[14];
-    unsigned char m_e;
-    char m_pad1[7];
-};                                  // sizeof 22
-
-#pragma pack(push, 1)
-struct SWinSetup {
-    unsigned char m_0;
-    unsigned short m_1;
-    char *m_3;
-};                                  // packed, sizeof 7
-#pragma pack(pop)
-
-struct SPlayerExit {
-    signed char m_0, m_1, m_2, m_3, m_4, m_5, m_6;
-};                                  // sizeof 7
-
-struct SNetPlayerInfo {
-    char m_pad[0xcc];
-};
-
-#pragma pack(push, 1)
-struct playerRec {
-    char m_pad0[0x8f];
-    int resources[7];               // offset 0x8f
-    char m_pad1[0x70];
-};                                  // packed, sizeof 283
-#pragma pack(pop)
+// Types now from headers: game/mouseManager/townManager/town/executive + combatManager/
+// palette/font -> _all.h; tag_message -> _carcass_types.h; SAMPLE2/tag_monsterInfo/SSpellInfo/
+// SWinSetup/SNetPlayerInfo -> _types.h; townSlot/heroRec/SPlayerExit/playerRec -> KB.h.
 
 #define KBFILE ((char *)"I:\\Projects\\Heroes\\Prog\\SOURCE\\KB.CPP")
 #define KBLINE (*(short *)"\xBE\x0C")
 
-extern "C" void PollSound(void);
-extern "C" __declspec(dllimport) int __stdcall MessageBoxA(void *, const char *, const char *, unsigned int);
-extern "C" __declspec(dllimport) int __stdcall SetMenu(void *, void *);
-extern "C" __declspec(dllimport) int __stdcall DestroyMenu(void *);
 
 long KBTickCount(void);
 void InitMainClasses(void);
@@ -149,121 +54,12 @@ void BaseFree(void *, char *, int);
 void SetupDynamicWindow(int, int, int, int, int, int, int, int *, int *, int *, int *, int *, int *, class heroWindow **, int);
 void ReceiveRemotePlayerExit(SPlayerExit);
 
-extern game *gpGame;
-extern advManager *gpAdvManager;
-extern combatManager *gpCombatManager;
-extern townManager *gpTownManager;
-extern resourceManager *gpResourceManager;
-extern soundManager *gpSoundManager;
-extern heroWindowManager *gpWindowManager;
-extern heroWindow *pNormalDialogWindow;
-extern icon *gBuyBuildIcons;
-extern icon *gSystemIcons;
-extern icon *gShingleAnim;
 
-extern int giBottomViewOverride;
-extern int giBottomViewOverrideEndTime;
-extern int giBottomViewResource;
-extern int giBottomViewResourceQty;
-extern char gcBottomViewText[];
-extern signed char gbGamePosToNetPos[];
-extern int gbHumanPlayer[];
-extern char *gArmyNames[];
-extern int gbInMemError;
-extern char *cOutOfMemory;
-extern char gText[];
-extern int iCDRomErr;
-extern int bEarlySetupDone;
-extern int giNumHumanPlayers;
-extern int giThisNetPos;
-extern void *hmnuAdv;
-extern void *hwndApp;
-extern int gbClosingApp;
-extern int giTotalHighMem;
-extern int giHighMemBuffer;
-extern int iNextShingleAnim;
-extern int iShingleAnimFrame;
 
-extern inputManager *gpInputManager;
-extern mouseManager *gpMouseManager;
-extern int giCurPlayer;
-extern int giThisGamePos;
-extern int gbGameInitialized;
-extern int gbRemoteOn;
-extern int gbThisNetGotAdventureControl;
-extern char gbUseRegularCompression;
-extern char gbUseDiffCompression;
-extern int iMaxMapExtra;
-extern void **ppMapExtra;
-extern short *pwSizeOfMapExtra;
-extern void *hmnuApp;
-extern void *hmnuDflt;
-extern void *hmnuCmbt;
-extern void *hmnuTown;
-extern char *xNecromancerShrine;
-extern char *gWellExtraNames[];
-extern char *gSpecialBuildingNames[];
-extern char *gNeutralBuildingNames[];
-extern char *gDwellingNames[][12];
-extern int gMageBuildingCosts[][7];
-extern int gSpecialBuildingCosts[][7];
-extern int gNeutralBuildingCosts[][7];
-extern int gDwellingCosts[][12][7];
-extern int xShrineBuildingCost[];
-extern int gMageBaseResourceValues[];
-extern int gSpecialBuildingBaseResourceValues[];
-extern int gNeutralBaseResourceValues[];
-extern int gDwellingBaseResourceValues[][12];
-extern tag_monsterInfo gMonsterDatabase[];
-extern short giScoreMon[][2];
-extern short giScoreCampaignMon[][2];
-extern SWinSetup gWinSetup[];
-extern SSpellInfo gsSpellInfo[];
-extern SNetPlayerInfo gsNetPlayerInfo[];
-extern char cNetBoxLine[][140];
-extern char cNetBoxColor[];
 
-// ---- additions for this batch ----
-struct MemEntry;
 
-extern int bInShutDown;
 
-extern executive *gpExec;
-extern palette *gPalette;
-extern font *bigFont;
-extern font *smallFont;
-extern MemEntry *gpMemEntry;
-extern unsigned char *mapExtra;
-extern SAMPLE2 NULL_SAMPLE2;
 
-extern int gbInPollSound;
-extern int gbPutzingWithMouseCtr;
-extern int giCycleType;
-extern int bDoColorCycle;
-extern int giGraphicsType;
-extern int giMainVideoModeColorDepth;
-extern int gbHeroMoving;
-extern int gbForegroundApp;
-extern int giTCPHostStatus;
-extern int gbNoCDRom;
-extern int gbNoSound;
-extern int gbFunctionComplete;
-extern int giWaitType;
-extern int gbCheatMenus;
-extern int gbInNewGameSetup;
-extern int gGameCommand;
-extern signed char gbCombatSurrender;
-extern signed char gbRetreatWin;
-extern signed char xIsExpansionMap;
-extern int glTimers[];
-extern void *hInstApp;
-extern void *gEventHandle;
-extern char *xNecromancerShrineDesc;
-extern char *gArmyNamesPlural[];
-extern char *gBuildingInfoSpecial[];
-extern char *cBuildingInfoNeutral[];
-extern signed char gDwellingType[][12];
-extern unsigned long gHierarchyMask[][12];
 
 void CycleColors(int);
 void PollRemote(void);
@@ -299,9 +95,6 @@ void CheckShingleUpdate(void);
 void HandleRemoteDeadPlayerExit(int);
 void UnloadSystemwideIcons(void);
 void HandleRemoteSuddenExit(void);
-extern "C" int __cdecl BitTest(void *, int);
-extern "C" __declspec(dllimport) void *__stdcall LoadMenuA(void *, const char *);
-extern "C" __declspec(dllimport) int __stdcall CloseHandle(void *);
 
 static long glNextPollTime;
 static long glNextMouseTime;
