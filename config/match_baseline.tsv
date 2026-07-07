@@ -271,7 +271,7 @@ BASE/RESMGR	?GetBitmap@resourceManager@@QAEPAVbitmap@@PAD@Z	27.3061	288b167bf1a3
 BASE/RESMGR	?GetFileSize@resourceManager@@QAEKK@Z	18.8451	983b7e296d99
 BASE/RESMGR	?GetFont@resourceManager@@QAEPAVfont@@PAD@Z	27.3061	8d01d875f639
 BASE/RESMGR	?GetIcon@resourceManager@@QAEPAVicon@@K@Z	31.1163	501f2df66d17
-BASE/RESMGR	?GetIcon@resourceManager@@QAEPAVicon@@PAD@Z	63.8095	16e733d67680
+BASE/RESMGR	?GetIcon@resourceManager@@QAEPAVicon@@PAD@Z	100.0000	2223175c48ad
 BASE/RESMGR	?GetMIDIWrap@resourceManager@@QAEPAVMIDIWrap@@PAD@Z	27.3061	275cfe2efa20
 BASE/RESMGR	?GetMouse@resourceManager@@QAEPAVmouse@@PAD@Z	100.0000	7d91b412c973
 BASE/RESMGR	?GetPalette@resourceManager@@QAEPAVpalette@@PAD@Z	27.3061	1234c41eb511

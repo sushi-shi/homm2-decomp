@@ -21,7 +21,7 @@ VA(0x004c82b0, 0x97)
 class bitmap * resourceManager::GetBitmap(char *) { return 0; }
 
 VA(0x004c8350, 0x2f)
-class icon * resourceManager::GetIcon(char *) { return 0; }
+class icon * resourceManager::GetIcon(char *name) { return GetIcon(MakeId(name, 1)); }
 
 VA(0x004c8380, 0x86)
 class icon * resourceManager::GetIcon(unsigned long int) { return 0; }
