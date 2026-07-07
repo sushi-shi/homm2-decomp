@@ -123,10 +123,10 @@ void font::DrawBoundedString(char *str, int x, int y, int w, int h, int mode, in
     int lineWidth = 0;
     int v2 = 0;
     char *s = str;
-    int a = align;
+    int m = mode;
     int breakPt;
-    if (a & 4) {
-        a -= 4;
+    if (align & 4) {
+        align -= 4;
         int lines = LineLength(s, w);
         if (field_0x10 * lines < h)
             yOff = (h - field_0x10 * lines) / 2;
@@ -157,13 +157,13 @@ void font::DrawBoundedString(char *str, int x, int y, int w, int h, int mode, in
         }
         char saved = s[i];
         s[i] = 0;
-        if (a == 0)
+        if (align == 0)
             xOff = 0;
-        else if (a == 1)
+        else if (align == 1)
             xOff = (w - lineWidth) / 2;
-        else if (a == 2)
+        else if (align == 2)
             xOff = w - lineWidth;
-        DrawStringExecute(s + lineStart, xOff + x, yOff + y, mode, x, y, w, h);
+        DrawStringExecute(s + lineStart, xOff + x, yOff + y, m, x, y, w, h);
         s[i] = saved;
         yOff += field_0x10;
         i++;
