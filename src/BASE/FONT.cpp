@@ -118,11 +118,13 @@ void font::DrawBoundedString(char *str, int x, int y, int w, int h, int mode, in
     int xOff = 0;
     int yOff = 0;
     int lineStart = 0;
-    int lineWidth = 0;
+    int v1 = 0;
     int i = 0;
-    int breakPt = 0;
+    int lineWidth = 0;
+    int v2 = 0;
     char *s = str;
     int a = align;
+    int breakPt;
     if (a & 4) {
         a -= 4;
         int lines = LineLength(s, w);
