@@ -4,6 +4,17 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <SOURCE/GAME.h>
+#include <_types.h>
+#include <BASE/Icon2b.h>
+#include <BASE/Misc.h>
+#include <SOURCE/CURSOR.h>
+#include <SOURCE/FINDPATH.h>
+#include <SOURCE/KB.h>
+#include <SOURCE/REMOTE.h>
+#include <_globals.h>
+#include <io.h>
+#include <string.h>
 #include <_all.h>
 #include <stdio.h>
 #include <SOURCE/game.h>
@@ -18,47 +29,8 @@
 #include <BASE/resourceManager.h>
 #include <BASE/heroWindowManager.h>
 
-extern soundManager *gpSoundManager;
-extern game *gpGame;
-extern advManager *gpAdvManager;
-extern resourceManager *gpResourceManager;
-extern heroWindowManager *gpWindowManager;
 
-extern int Random(int, int);
-extern int xPasswordStringsIndex[];
-extern int bShowIt;
-extern void AiPrint(char *);
-extern void IconToBitmap(class icon *, class bitmap *, int, int, int, int, int, int, int, int, int);
-void CompressTest2(void);
-
-// --- globals referenced below ---
-extern int MAP_WIDTH;
-extern int MAP_HEIGHT;
-extern unsigned char *mapExtra;
-extern unsigned char giGroundToTerrain[];
-extern signed char gbThisNetHumanPlayer[];
-extern int giCurPlayer;
-extern int gbAllBlack;
-extern void **ppMapExtra;
-extern signed char xIsExpansionMap;
-extern char bMapInitialized;
-extern searchArray *gpSearchArray;
-struct configStruct { char pad[0x1a0]; };
-extern configStruct gConfig;
-struct EventExtra;
-
-// --- free functions referenced below ---
-extern int CalcTerrainCost(int, int, int, int, int, int);
-extern void SendMapChange(int, signed char, unsigned char, unsigned char, int, unsigned char, unsigned char);
-extern void *BaseAlloc(unsigned int, char *, int);
-extern void BaseFree(void *, char *, int);
-extern long FileSize(char *);
-extern int calc_crc_long(unsigned char *, int);
-extern void FileError(char *);
-extern "C" int __cdecl _open(const char *, int);
-extern "C" int __cdecl _read(int, void *, unsigned int);
-extern "C" int __cdecl _close(int);
-extern "C" void *__cdecl memset(void *, int, unsigned int);
+// configStruct/SCreatureInfo shared in _types.h; EventExtra/SThievesData in SOURCE/GAME.h.
 
 // GAME's BaseAlloc/BaseFree pass __FILE__ + a source line number. The retail
 // encodes the base line as a 2-byte string read via movswl, then adds a per-call
@@ -73,17 +45,6 @@ extern "C" void *__cdecl memset(void *, int, unsigned int);
 // + a per-call `jmp $+0`), so they are free inline helpers, not game methods.
 inline town *GetCastle(int idx) { return (town *)((char *)gpGame + idx * 100 + 0xb53); }
 inline signed char PlayerEventByte(signed char color) { return ((signed char *)gpGame)[color * 283 + 0x49c]; }
-
-struct SCreatureInfo {
-    unsigned short value;
-    char pad[24];
-};
-extern SCreatureInfo gCreatureInfo[];
-
-struct SThievesData {
-    char pad[0x4e3];
-    signed char list[8][283];
-};
 
 VA(0x004708b0, 0x23d)
 void playerData::Write(int) {}

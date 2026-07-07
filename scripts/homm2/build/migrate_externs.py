@@ -29,15 +29,25 @@ def ident(decl):
     ids = re.findall(r'[A-Za-z_]\w*', decl.split('(')[0].split('[')[0])
     return ids[-1] if ids else None
 
+CRT = {'memset': '<string.h>', 'memcpy': '<string.h>', 'memmove': '<string.h>',
+       'strlen': '<string.h>', 'strcpy': '<string.h>', 'strcat': '<string.h>',
+       'strcmp': '<string.h>', 'strncmp': '<string.h>', 'strncpy': '<string.h>',
+       '_open': '<io.h>', '_close': '<io.h>', '_read': '<io.h>', '_write': '<io.h>',
+       '_lseek': '<io.h>', 'malloc': '<stdlib.h>', 'free': '<stdlib.h>',
+       'rand': '<stdlib.h>', 'srand': '<stdlib.h>', 'sprintf': '<stdio.h>'}
+
 def route(decl):
     if '__declspec(dllimport)' in decl:
         return '<win/windows.h>'
-    if re.search(r'extern "C".*\b_[a-z]', decl) and '(' in decl:
-        return '<io.h>'
     nm = ident(decl)
-    if nm and '(' in decl and nm in unit_of:
-        return '<%s.h>' % unit_of[nm]
-    return '<_globals.h>'
+    if '(' in decl:                              # a function
+        if nm in CRT:
+            return CRT[nm]
+        if nm in unit_of:
+            return '<%s.h>' % unit_of[nm]
+        if re.search(r'extern "C".*\b_[a-z]', decl):
+            return '<io.h>'
+    return '<_globals.h>'                          # variable (or unknown -> globals staging)
 
 def main(path):
     lines = open(path).read().split('\n')
