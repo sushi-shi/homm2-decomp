@@ -11,7 +11,7 @@
 #include <SOURCE/KB.h>        // EventWindowHandler, FileError, ShutDown
 #include <SOURCE/wingraph.h>  // SetFullScreenStatus
 #include <_carcass_types.h>   // tag_message (member access)
-#include <win/windows.h>      // MessageBoxA
+#include <windows.h>      // MessageBoxA
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
