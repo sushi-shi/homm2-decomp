@@ -6,6 +6,8 @@
 #include <va.h>
 #include <BASE/mouseManager.h>
 #include <string.h>
+#include <windows.h>
+#include <SOURCE/X_GLOBAL.h>
 VA(0x004c9270, 0xd9)
 mouseManager::mouseManager(void) : baseManager()
 {
@@ -62,7 +64,17 @@ VA(0x004c9fd0, 0x29)
 void mouseManager::RestoreUnderlying(void) {}
 
 VA(0x004ca000, 0x2c)
-void mouseManager::ReallyHidePointer(void) {}
+void mouseManager::ReallyHidePointer(void)
+{
+    if (gbColorMice == 0) {
+        ShowCursor(0);
+        return;
+    }
+    int old = field_0x86;
+    field_0x86 = old + 1;
+    if (old + 1 == 1)
+        NewUpdate(1);
+}
 
 VA(0x004ca030, 0xb9)
 void mouseManager::ReallyShowPointer(void) {}
