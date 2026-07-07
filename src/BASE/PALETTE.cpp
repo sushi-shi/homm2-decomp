@@ -23,7 +23,12 @@ palette::palette(unsigned long int id) : resource(2, id, 1, 0)
 }
 
 VA(0x004d2660, 0x2c)
-palette::~palette() {}
+palette::~palette()
+{
+    if (field_0x10 != 0)
+        BaseFree(field_0x10, __FILE__, __LINE__);
+    field_0x10 = 0;
+}
 
 VA(0x004d2690, 0x4)
 signed char * palette::Data(void) { return field_0x10; }
