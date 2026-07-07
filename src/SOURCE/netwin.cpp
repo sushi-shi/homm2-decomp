@@ -104,8 +104,45 @@ extern "C" unsigned short __fastcall nb_rcv(short session, void *buf)
     return 0;
 }
 
+// Static helper (retail RVA 0x004a79c6, no CodeView symbol) — re-registers the netbios group name
+// for the current session. Defined here (ahead of its retail position) so nb_snd can call it
+// without a forward declaration. Only issued when the control NCB's last command completed.
+static void nb_add_name(void)
+{
+    if (gNbCtlNcb.ncb_cmd_cplt != 0xff) {
+        strcpy((char *)gNbSessBuf, gNbGroupName);
+        memcpy(gNbSessBuf + strlen(gNbGroupName), &gNbNameBuf[gNbMaxSess * 0x10], 0x10);
+        memset(&gNbCtlNcb, 0, 0x40);
+        gNbCtlNcb.ncb_command = 0xa2;
+        gNbCtlNcb.ncb_num = gNbLocalNum;
+        gNbCtlNcb.ncb_length = strlen(gNbGroupName) + 0x10;
+        gNbCtlNcb.ncb_buffer = gNbSessBuf;
+        gNbCtlNcb.ncb_lana_num = gNetbiosLana;
+        Netbios(&gNbCtlNcb);
+    }
+}
+
 VA(0x004a7186, 0xe4)
-extern "C" int __fastcall nb_snd(int, int, int) { return 0; }
+extern "C" unsigned short __fastcall nb_snd(short session, short len, void *data)
+{
+    tag_Node *node;
+
+    if (gNbMaxSess == session && len == 0) {
+        nb_add_name();
+        return 0;
+    }
+    if ((gNetStatus[session] & 1) == 0)
+        return 8;
+    node = (tag_Node *)BaseAlloc(len + 0xb, "I:\\Projects\\Heroes\\Prog\\SOURCE\\netwin.cpp", __LINE__);
+    node->len = len;
+    node->field_0xa = (unsigned char)session;
+    memcpy(node->data, data, len);
+    EnterCriticalSection(&gNbSndLock);
+    add_node(&gNbSndQueue, node);
+    LeaveCriticalSection(&gNbSndLock);
+    SetEvent(gNbEvents[0]);
+    return 0;
+}
 
 VA(0x004a726a, 0x4cd)
 extern "C" int __cdecl nb_sess(void) { return 0; }
