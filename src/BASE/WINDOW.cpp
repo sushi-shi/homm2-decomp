@@ -30,7 +30,22 @@ heroWindow::heroWindow(void)
 }
 
 VA(0x004cec20, 0xa5)
-heroWindow::heroWindow(int, int, int, int, int) {}
+heroWindow::heroWindow(int x, int y, int w, int h, int flags)
+{
+    strcpy(name, "Dynamic Construct");
+    field_0x8 = 0;
+    field_0x4 = field_0x8;
+    field_0x0 = -1;
+    field_0x28 = x;
+    field_0x2c = y;
+    field_0x30 = w;
+    field_0x34 = h;
+    field_0x20 = flags;
+    field_0x24 = 0;
+    field_0x3c = 0;
+    field_0x38 = field_0x3c;
+    field_0x40 = 0;
+}
 
 VA(0x004cecd0, 0x521)
 heroWindow::heroWindow(int, int, char *) {}
