@@ -1177,6 +1177,7 @@ int MAP_WIDTH;
 int MAP_HEIGHT;
 unsigned char *mapExtra;
 int gbClosingApp;
+int gbDrawWindowBackground;
 int gbForegroundApp;
 int giMainVideoModeColorDepth;
 font *smallFont;
