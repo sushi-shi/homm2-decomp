@@ -41,3 +41,6 @@ int searchArray::FindCombatPath(int, int, class army *, int, int) { return 0; }
 
 VA(0x004a5800, 0x100)
 void searchArray::PushCombatPoint(int, int, int, int) {}
+
+// ---- globals (definitions, RVA order) ----
+unsigned char *bIsMoatSlowed;

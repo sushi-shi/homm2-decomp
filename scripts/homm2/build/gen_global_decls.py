@@ -48,43 +48,21 @@ def owner_header(src):
     return None
 
 def reconstruct(dem, name, size):
-    """demangled decl + byte size -> a 'type name[dims]' declaration string, or None to skip."""
+    """The demangled decl IS the declared type — it round-trips to the CodeView mangled name, so
+    the linker/asserts see the exact symbol. Emit it verbatim as `<type> <name>;`. `size` is
+    UNRELIABLE (often the span to the next symbol, e.g. a scalar `int` with size 0x248), so it is
+    NOT used to synthesise array dims; the demangled form already carries the true dims (MSVC decays
+    a global array's outer dim, keeping inner dims: `char[0x60][2]` -> `char (*x)[2]`).
+
+    Skip only user-defined-type VALUES and UDT arrays (defining one needs the *complete* struct,
+    which the owner header may not have); a plain pointer to a UDT is fine (forward-decl)."""
     dem = dem.strip()
-    # form: ptr-to-array   'BASE (*name)[N]'
-    m = re.match(r'^(.*?)\s*\(\*' + re.escape(name) + r'\)((?:\[\d+\])+)$', dem)
-    if m:
-        base, dims = m.group(1).strip(), m.group(2)
-        inner = [int(d) for d in re.findall(r'\[(\d+)\]', dims)]
-        es = SCALAR.get(base)
-        if not es:
-            return None
-        stride = es
-        for d in inner:
-            stride *= d
-        if size % stride:
-            return None
-        return "%s %s[%d]%s;" % (base, name, size // stride, dims)
-    # form: scalar / pointer   'BASE *...name'  or  'BASE name'
-    m = re.match(r'^(.*?)([\*\s]*)' + re.escape(name) + r'$', dem)
-    if m:
-        base, stars = m.group(1).strip(), m.group(2).count('*')
-        if stars == 0:                                   # plain scalar
-            es = SCALAR.get(base)
-            if es and size == es:
-                return "%s %s;" % (base, name)
-            if es and size % es == 0 and size > es:      # scalar array recorded w/o decay
-                return "%s %s[%d];" % (base, name, size // es)
-            return None
-        # pointer(s): element is BASE with one fewer star
-        elem_is_ptr = stars > 1
-        es = PTR if elem_is_ptr else SCALAR.get(base)
-        star_kept = '*' * (stars - 1)
-        if size == PTR:                                  # genuine scalar pointer
-            return "%s %s%s;" % (base, '*' * stars, name)
-        if es and size % es == 0:                        # array of (BASE + fewer stars)
-            return "%s %s%s[%d];" % (base, star_kept + ('' if elem_is_ptr else ''), name, size // es) \
-                if not elem_is_ptr else "%s *%s[%d];" % (base, name, size // es)
-    return None
+    if re.match(r'^(struct|class|union|enum)\b', dem):
+        # safe only as a simple pointer to the UDT (no array, no by-value)
+        if re.match(r'^(struct|class|union|enum)\s+[\w:]+\s*\*+\s*' + re.escape(name) + r'$', dem):
+            return dem + ";"
+        return None
+    return dem + ";"
 
 def main():
     write = '--write' in sys.argv
@@ -95,10 +73,32 @@ def main():
     # already-declared names anywhere (dedup; hand-written decls win)
     declared = set()
     for h in glob_headers():
+        in_block = False                                  # skip OUR managed block (idempotent re-runs)
         for line in open(h):
+            if 'globals (declarations' in line:
+                in_block = True; continue
+            if in_block:
+                if line.startswith('DATA(') or not line.strip():
+                    continue
+                in_block = False
             mm = re.search(r'\bextern\b.*?([A-Za-z_]\w*)\s*(\[[^;]*\])*\s*;', line.split('//')[0])
             if mm:
                 declared.add(mm.group(1))
+    # also skip globals already DEFINED file-scope in a .cpp (else gen_global_defs redefines them)
+    for src in set(units.values()):
+        if not os.path.exists(src):
+            continue
+        for line in open(src):
+            if 'globals (definitions' in line:                # gen_global_defs block runs to EOF
+                break
+            if not (line[:1].isalpha() or line[:1] == '_'):   # file-scope defs begin at col 0 w/ a type
+                continue
+            code = line.split('//')[0]
+            if '(' in code or '=' in code or ';' not in code:  # skip functions / initialised / non-decls
+                continue
+            dm = re.match(r'^[A-Za-z_][\w\s\*]*?[\s\*]([A-Za-z_]\w*)\s*(\[[^\]]*\])*\s*;', code)
+            if dm:
+                declared.add(dm.group(1))
 
     rows = [r for r in csv.DictReader(open('build/gen/symbol_names.csv')) if r['kind'] == 'data']
     mangled = sorted({r['name'] for r in rows if r['name'].startswith('?') and '@@3' in r['name']})

@@ -70,3 +70,14 @@ void mouseManager::SetColorMice(int) {}
 
 // ---- vtables (compiler-emitted; census) ----
 VTBL(mouseManager, 0x004eba00);
+
+// ---- globals (definitions, RVA order) ----
+int *iMouseOffset;
+int gbInSetPointer;
+int bInNewMouseUpdate;
+struct tagBITMAP *bmpAndMask;
+void **hMouseCursor;
+void **cAndBits;
+void **cColorBits;
+struct _ICONINFO *IconInfo;
+void **hbmpAndMask;

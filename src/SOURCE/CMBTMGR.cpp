@@ -128,3 +128,11 @@ int CombatSystemOptionsHandler(struct tag_message &) { return 0; }
 
 // ---- vtables (compiler-emitted; census) ----
 VTBL(combatManager, 0x004eb898);
+
+// ---- globals (definitions, RVA order) ----
+int bInHighMoraleBonus;
+int giSeed;
+unsigned char *wallHex;
+int bMouseWasVis;
+class heroWindow *CSPanel;
+int bCPrefsChanged;

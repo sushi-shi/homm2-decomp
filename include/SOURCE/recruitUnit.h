@@ -45,4 +45,7 @@ public:
 };
 #pragma pack(pop)
 SIZE(recruitUnit, 0x7e);
+// ---- globals (declarations, RVA order) ----
+DATA(0x00528578) extern void *hmnuRecruitSave;
+
 #endif // HOMM2_SOURCE_RECRUITUNIT_H

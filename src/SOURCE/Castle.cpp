@@ -11,3 +11,8 @@ void townManager::SetupCastle(class heroWindow *, int) {}
 
 VA(0x0041e0fb, 0xca3)
 int CastleHandler(struct tag_message &) { return 0; }
+
+// ---- globals (definitions, RVA order) ----
+unsigned char *castleSlotsBase;
+class heroWindow *casWin;
+unsigned char *castleSlotsUse;

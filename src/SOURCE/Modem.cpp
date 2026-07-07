@@ -49,3 +49,25 @@ char ReadPacket(void) { return 0; }
 
 VA(0x0040d4df, 0xff)
 void WriteModemPacket(char *, int) {}
+
+// ---- globals (definitions, RVA order) ----
+int iBaudBits;
+int inescape;
+int newpacket;
+int packetlen;
+char *idstr;
+int GUIMRc;
+int iModemCommandPos;
+int GUIMRrespptr;
+int localstage;
+char *numbuf;
+int WFDCStage;
+char *remoteidstr;
+int stime;
+char *cModemCommand;
+int iLastDialPos;
+int remotestage;
+char *GUIMRresp;
+int oldsec;
+int iLastActionTime;
+char *GUIMRresponse;

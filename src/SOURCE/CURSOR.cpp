@@ -60,3 +60,18 @@ void advManager::UnwindMapChangeQueue(int, int) {}
 
 VA(0x00410d72, 0x11a)
 void SendMapChange(int, signed char, unsigned char, unsigned char, int, unsigned char, unsigned char) {}
+
+// ---- globals (definitions, RVA order) ----
+int bMoveSoundMade;
+int *giPixelsPerStep;
+int *giStepDelay;
+struct _SAMPLE *hOldWalkSample;
+struct _SAMPLE *hNewWalkSample;
+int EveryOther;
+int *startVals;
+int S1cursorCycle;
+int S1cursorFrameCount;
+int S1cursorTurning;
+int S1cursorBaseFrame;
+int S1cursorDirection;
+struct SMapChange *sMapChangeLastFew;

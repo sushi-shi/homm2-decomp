@@ -183,4 +183,8 @@ public:
 };
 #pragma pack(pop)
 SIZE(army, 0x482);
+// ---- globals (declarations, RVA order) ----
+DATA(0x004f54a8) extern int bSecondAttack;
+DATA(0x00527eb4) extern int gbGenieHalf;
+
 #endif // HOMM2_SOURCE_ARMY_H

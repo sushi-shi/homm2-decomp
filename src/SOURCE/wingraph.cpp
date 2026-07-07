@@ -102,4 +102,25 @@ VA(0x00437595, 0x286)
 int SetGraphicsType(int) { return 0; }
 
 // ---- globals (definitions, RVA order) ----
+int gbWinGAttached;
+int gbDDrawAttached;
 int giGraphicsType;
+long Orientation;
+void *lpInitWin;
+int bPaletteInitialized;
+int giTtlBlts;
+int gbWinGraphBusy;
+struct IDirectDraw *lpDD;
+struct IDirectDrawSurface *lpDDSPrimary;
+struct IDirectDrawSurface *lpDDSOne;
+struct IDirectDrawClipper *lpClipper;
+struct IDirectDrawPalette *lpDDPal;
+int iBusyRetry;
+int bInDDSD;
+void *hdcImage;
+void *gbmOldMonoBitmap;
+void *hpalApp;
+void *hWinGLibrary;
+void *hDDrawLibrary;
+long lDelayRefresh;
+long lPaintStart;

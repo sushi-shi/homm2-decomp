@@ -125,4 +125,30 @@ DATA(0x005256e8) extern int iDummy;
 DATA(0x004f211c) extern int iLastFrameRateTimer;
 DATA(0x005256f0) extern searchArray SVSearchArray;
 
+// ---- globals (declarations, RVA order) ----
+DATA(0x004f70e0) extern int gbGameOver;
+DATA(0x004f7550) extern signed char *giMonType;
+DATA(0x005280e8) extern int iViewArmyNumTroops;
+DATA(0x005280ec) extern signed char *gbNGHeroType;
+DATA(0x00528430) extern short giUABaseX;
+DATA(0x00528434) extern short giUABaseY;
+DATA(0x00528438) extern int giEndSequence;
+DATA(0x0052843c) extern int gbDismissArmy;
+DATA(0x00528440) extern signed char *gbNGHuman;
+DATA(0x00528448) extern int iViewArmyFrame;
+DATA(0x0052844c) extern int gbAllowUpgrade;
+DATA(0x00528450) extern int iViewArmyType;
+DATA(0x00528454) extern class hero *viewSpellsHero;
+DATA(0x00528458) extern int gbUpgradeArmy;
+DATA(0x00528460) extern short *RandMineQty;
+DATA(0x00528470) extern char *gcCurMapName;
+DATA(0x00528480) extern signed char *gbNGDifficulty;
+DATA(0x00528488) extern int iViewArmyUpgradeToType;
+DATA(0x0052848c) extern int viewArmyBaseX;
+DATA(0x00528490) extern int viewArmyBaseY;
+DATA(0x00528498) extern signed char *gbNGColor;
+DATA(0x005284a0) extern short giUARadius;
+DATA(0x005284a8) extern signed char *gbNGPlayerPos;
+DATA(0x005284b0) extern int viewArmyFacingWIPXMod;
+
 #endif // HOMM2_PHILAI_TU_H

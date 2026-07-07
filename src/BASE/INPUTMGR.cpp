@@ -60,3 +60,10 @@ void inputManager::ForceMouseMove(void) {}
 
 // ---- vtables (compiler-emitted; census) ----
 VTBL(inputManager, 0x004eba30);
+
+// ---- globals (definitions, RVA order) ----
+int iCurSwapPalette;
+int bLastMouseOffscreen;
+int bLastOnscreenMouseColor;
+int bInCheckChangeCursor;
+int iLastBWOnScreenCheck;

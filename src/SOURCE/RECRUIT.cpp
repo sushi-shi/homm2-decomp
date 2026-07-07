@@ -38,3 +38,6 @@ void QuickViewRecruit(class town *, int) {}
 
 // ---- vtables (compiler-emitted; census) ----
 VTBL(recruitUnit, 0x004eb848);
+
+// ---- globals (definitions, RVA order) ----
+void *hmnuRecruitSave;

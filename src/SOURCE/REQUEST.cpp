@@ -62,3 +62,10 @@ char * fileRequester::GetFilename(void) { return 0; }
 
 // ---- vtables (compiler-emitted; census) ----
 VTBL(fileRequester, 0x004eb888);
+
+// ---- globals (definitions, RVA order) ----
+int giMapSizeFilter;
+char *cFRDummy;
+float fGutterMinY;
+float fGutterTravelLength;
+int iMaxListSize;

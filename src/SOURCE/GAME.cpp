@@ -902,4 +902,28 @@ int game::CountShrines(int player)
 }
 
 // ---- globals (definitions, RVA order) ----
+int gbGameOver;
+signed char *giMonType;
 char bMapInitialized;
+int iViewArmyNumTroops;
+signed char *gbNGHeroType;
+short giUABaseX;
+short giUABaseY;
+int giEndSequence;
+int gbDismissArmy;
+signed char *gbNGHuman;
+int iViewArmyFrame;
+int gbAllowUpgrade;
+int iViewArmyType;
+class hero *viewSpellsHero;
+int gbUpgradeArmy;
+short *RandMineQty;
+char *gcCurMapName;
+signed char *gbNGDifficulty;
+int iViewArmyUpgradeToType;
+int viewArmyBaseX;
+int viewArmyBaseY;
+signed char *gbNGColor;
+short giUARadius;
+signed char *gbNGPlayerPos;
+int viewArmyFacingWIPXMod;

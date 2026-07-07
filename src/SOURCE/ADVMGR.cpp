@@ -288,8 +288,36 @@ unsigned char StopOnTrigger(class mapCell *) { return 0; }
 //  [ 1] VA(0x00457028, 0x40a)  void advManager::Close(void)   <- override (implements baseManager pure virtual)
 //  [ 2] VA(0x00457d6c, 0xfda)  int advManager::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
 
-// ---- globals (definitions, RVA order) ----
-int iCurHourGlassPhase;
-
 // ---- vtables (compiler-emitted; census) ----
 VTBL(advManager, 0x004eb6c8);
+
+// ---- globals (definitions, RVA order) ----
+int giLimitUpdMinX;
+int iLastScrollTime;
+int iSandAnim;
+int giLastHourGlassUpdateTime;
+int TrigX;
+int TrigY;
+int iCurBottomView;
+int iCurBottomViewEnemy;
+int iCurHourGlassPhase;
+int iLastHourGlassPhase;
+int gbForceUpdate;
+int giCheatSeq;
+int iQWE;
+unsigned char *monAnimDrawFrame;
+int iLastSandAnimTime;
+int iLastNewSandAnimTime;
+int giFrameCount;
+class heroWindow *cPanel;
+int iThisMaxY;
+int giTownPortalChoice;
+int iThisMinY;
+class heroWindow *townPortalWin;
+int giFrameStep;
+char *cArmySizeName;
+int giLimitUpdMaxX;
+int giLimitUpdMaxY;
+int bPrefsChanged;
+int giLimitUpdMinY;
+int iLastAnimFrame;

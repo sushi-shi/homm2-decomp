@@ -35,7 +35,7 @@ def make_def(rest, name):
     rest = rest.rstrip(';').strip()
     m = re.match(r'^(.*?)([A-Za-z_]\w*)\s*((?:\[[^\]]*\])*)$', rest)
     if not m:
-        return None
+        return rest + ";"                              # ptr-to-array / fn-ptr: the decl (sans extern) IS the def
     typ, nm, dims = m.group(1), m.group(2), m.group(3)
     if nm != name or '[]' not in dims:
         return rest + ";"                              # scalar/ptr/sized -> already a definition

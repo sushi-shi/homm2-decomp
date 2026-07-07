@@ -116,3 +116,12 @@ void combatManager::Earthquake(void) {}
 
 VA(0x0042a411, 0x2b1)
 void combatManager::ShowSpellMessage(int, int, class army *) {}
+
+// ---- globals (definitions, RVA order) ----
+int castX;
+int castY;
+int bInTeleportGetDest;
+int indexToCastOn;
+unsigned char *uRedBeam;
+unsigned char *uRainbow;
+signed char *gyModify;

@@ -52,3 +52,30 @@ int dpWaitForHost(void) { return 0; }
 
 VA(0x0041fecd, 0x5eb)
 void DPSD(int, char *, int) {}
+
+// ---- globals (definitions, RVA order) ----
+struct IDirectPlay *lpIDC;
+unsigned long dcoID;
+struct _GUID *IPXGuid;
+struct _GUID *TCPGuid;
+void *dphEvent;
+int iDPRcvBufferHead;
+int iDPRcvBufferTail;
+unsigned char **ppDPRcvBuffer;
+int *piDPRcvBufferSize;
+int bStartUpInfoReceived;
+void *hinstDplayx;
+int iDPWaitForFirstGuestStatus;
+int iDPWaitForHostStatus;
+int iWaitForHostWaitCount;
+int iEnumCount;
+int iLastHereIAmTickCount;
+int bInDPSD;
+int iGUIDCount;
+int iLastMsgNumHumanPlayers;
+int iMaxSession;
+int giHostAcceptStatus;
+struct _GUID *g_lpGuid;
+int *giNetPosToDCOPos;
+int iSessionToTry;
+long *lSessions;

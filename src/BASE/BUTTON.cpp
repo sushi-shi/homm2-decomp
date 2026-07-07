@@ -69,3 +69,6 @@ void button::Draw(void) {}
 
 // ---- vtables (compiler-emitted; census) ----
 VTBL(button, 0x004ebaf0);
+
+// ---- globals (definitions, RVA order) ----
+int iLeftRightSave;

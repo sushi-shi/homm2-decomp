@@ -136,4 +136,11 @@ public:
 };
 #pragma pack(pop)
 SIZE(inputManager, 0x86a);
+// ---- globals (declarations, RVA order) ----
+DATA(0x0051f980) extern int iCurSwapPalette;
+DATA(0x0051f984) extern int bLastMouseOffscreen;
+DATA(0x0051f988) extern int bLastOnscreenMouseColor;
+DATA(0x0051f98c) extern int bInCheckChangeCursor;
+DATA(0x00534bc8) extern int iLastBWOnScreenCheck;
+
 #endif // HOMM2_BASE_INPUTMANAGER_H

@@ -1796,5 +1796,9 @@ long DecodeData(char *dst, char *src, unsigned long srcLen)
 
 // ---- globals (definitions, RVA order) ----
 UInt32 crc32Table[256];
+int longestFileName;
+int opMode;
 char inName[1024];
 char outName[1024];
+char *progNameReally;
+int keepInputFiles;

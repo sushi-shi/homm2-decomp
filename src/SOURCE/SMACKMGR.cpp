@@ -28,3 +28,16 @@ signed char PointInRect(int, int, struct tag_rect *) { return 0; }
 
 VA(0x004026bc, 0x251)
 void PrintSummaryInfo(struct SmackSumTag *) {}
+
+// ---- globals (definitions, RVA order) ----
+int bSmackSound;
+class icon *brotherIcon;
+class icon *backImage;
+struct SSmackOptions *SmackOptions;
+int bTesting;
+struct SmackTag *smk1;
+struct SmackTag *smk2;
+signed char bSmackNum;
+int gbLastFramePlayed;
+int gbPlayedThrough;
+signed char bMainDone;

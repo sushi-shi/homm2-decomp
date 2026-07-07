@@ -37,3 +37,8 @@ void combatManager::EffectSpellResurrect(int *, int, int) {}
 
 VA(0x00488d58, 0xcc9)
 void combatManager::EffectSpellDamage(int *, int, int) {}
+
+// ---- globals (definitions, RVA order) ----
+float *gfDurationMods;
+float *gfCancelDurationMods;
+int giCurrSpellGroup;
