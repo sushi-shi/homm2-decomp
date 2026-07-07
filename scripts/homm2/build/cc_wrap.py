@@ -10,10 +10,35 @@ Toolchain + prefix come from `nix develop .#build` (MSVC_DIR, WINEPREFIX).
 Usage (emitted into build.ninja by configure.py):
     cc_wrap.py --out <obj> --src <src> -- <cl flags...>
 """
-import argparse, os, shutil, signal, subprocess, sys, tempfile
+import argparse, os, re, shutil, signal, subprocess, sys, tempfile
 from pathlib import Path
 SCRIPT_DIR = Path(__file__).resolve().parent
 HOMM2_DIR = next((p for p in SCRIPT_DIR.parents if (p / "flake.nix").exists()), SCRIPT_DIR)
+
+_INC_RE = re.compile(r'^[ \t]*#[ \t]*include[ \t]*[<"]([^>"]+)[>"]', re.M)
+
+def scan_header_deps(src, inc_root):
+    """MSVC 4.2 has no /showIncludes, so recover header deps ourselves: recursively resolve
+    every `#include` against the repo include root (+ each file's own dir for "quoted"
+    includes) and return the repo headers reached. System headers (<string.h> etc.) don't
+    resolve under inc_root and are skipped — they never change. Over-approximates (ignores
+    #if), which is SAFE for a depfile: worst case an extra rebuild, never a stale obj."""
+    src = Path(src).resolve(); inc_root = Path(inc_root)
+    seen = set(); stack = [src]
+    while stack:
+        f = stack.pop()
+        if f in seen:
+            continue
+        seen.add(f)
+        try:
+            text = f.read_text(errors="replace")
+        except OSError:
+            continue
+        for inc in _INC_RE.findall(text):
+            for cand in (f.parent / inc, inc_root / inc):
+                if cand.is_file():
+                    stack.append(cand.resolve()); break
+    return sorted(str(p) for p in seen if p != src)
 
 def die(m): print(f"[cc_wrap] ERROR: {m}", file=sys.stderr); sys.exit(1)
 def find_ci(d, name):
@@ -72,6 +97,12 @@ def main():
     if not out.exists():
         sys.stderr.write(f"[cc_wrap] FAILED {src.name} -> {out}\n" + "\n".join(output.strip().splitlines()[-15:]) + "\n")
         sys.exit(rc or 1)
+    # Emit a depfile of the repo headers this obj pulls in, so ninja recompiles on header
+    # edits (ninja doesn't track header deps, and MSVC 4.2 can't /showIncludes). `deps=gcc`
+    # in build.ninja consumes it. Target must be the obj path AS ninja passed it (a.out).
+    deps = scan_header_deps(src, HOMM2_DIR / "include")
+    dep_list = " ".join(d.replace(" ", "\\ ") for d in deps)
+    Path(str(out) + ".d").write_text(f"{a.out}: {dep_list}\n")
     sys.exit(0)
 
 if __name__ == "__main__": main()
