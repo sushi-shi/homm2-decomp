@@ -7,6 +7,7 @@
 #include <BASE/resourceManager.h>
 #include <BASE/resource.h>
 #include <BASE/tileset.h>
+#include <BASE/font.h>
 VA(0x004c7fa0, 0xdb)
 resourceManager::resourceManager(void) {}
 
@@ -46,7 +47,18 @@ VA(0x004c84b0, 0x1a)
 class mouse * resourceManager::GetMouse(char *) { return 0; }
 
 VA(0x004c84d0, 0x97)
-class font * resourceManager::GetFont(char *) { return 0; }
+class font * resourceManager::GetFont(char *name)
+{
+    unsigned long id = MakeId(name, 1);
+    resource *r = Query(id);
+    if (r != 0) {
+        r->field_0x6++;
+    } else {
+        r = new font(id);
+        AddResource(r);
+    }
+    return static_cast<font *>(r);
+}
 
 VA(0x004c8570, 0x9d)
 class sample * resourceManager::GetSample(char *) { return 0; }
