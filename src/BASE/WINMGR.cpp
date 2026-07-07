@@ -13,6 +13,10 @@
 #include <BASE/palette.h>
 #include <BASE/inputManager.h>
 #include <stdio.h>
+#include <string.h>
+#include <SOURCE/kbwin.h>
+#include <SOURCE/wingraph.h>
+#include <SOURCE/X_GLOBAL.h>
 #include <_globals_model.h>
 #include <SOURCE/KB.h>
 VA(0x004ca6d0, 0x3a3)
@@ -36,7 +40,34 @@ heroWindowManager::heroWindowManager(void) : baseManager()
 }
 
 VA(0x004caad0, 0xd6)
-int heroWindowManager::Open(int) { return 0; }
+int heroWindowManager::Open(int param_1)
+{
+    int i;
+    InitVideo();
+    int *pal = reinterpret_cast<int *>(gpBufferPalette->field_0x10);
+    for (i = 0xc0; i != 0; i--) {
+        *pal = 0;
+        pal++;
+    }
+    SetPalette(gpBufferPalette->field_0x10, 1);
+    field_0x46 = new bitmap();
+    if (field_0x46 == 0)
+        MemError();
+    field_0x46->field_0x10 = 0x21;
+    field_0x46->field_0x12 = 0x280;
+    field_0x46->field_0x14 = 0x1e0;
+    field_0x46->field_0x16 = reinterpret_cast<unsigned char *>(lpInitWin);
+    int *fb = reinterpret_cast<int *>(field_0x46->field_0x16);
+    for (i = 0x12c00; i != 0; i--) {
+        *fb = 0x24242424;
+        fb++;
+    }
+    field_0x10 = param_1;
+    field_0xc = 0x20;
+    field_0x32 = 1;
+    strcpy(name, "heroWindowManager");
+    return 0;
+}
 
 VA(0x004cabb0, 0x45)
 void heroWindowManager::Close(void)
