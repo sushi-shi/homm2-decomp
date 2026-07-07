@@ -9,6 +9,8 @@
 #include <windows.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <BASE/bitmap.h>
+#include <BASE/Misc.h>
+#include <BASE/resourceManager.h>
 #include <BASE/heroWindowManager.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/kbwin.h>
@@ -66,7 +68,33 @@ int mouseManager::Open(int id)
 }
 
 VA(0x004c93f0, 0xed)
-void mouseManager::Close(void) {}
+void mouseManager::Close(void)
+{
+    if (field_0x32 == 1) {
+        field_0x32 = 0;
+        if (field_0x36 != 0)
+            delete field_0x36;
+        field_0x36 = 0;
+        SetCursor(LoadCursorA(0, IDC_ARROW));
+        for (int i = 0; i < 0x60; i++) {
+            if (hMouseCursor[i] != 0)
+                DestroyIcon(hMouseCursor[i]);
+            hMouseCursor[i] = 0;
+            if (cAndBits[i] != 0)
+                BaseFree(cAndBits[i], __FILE__, __LINE__);
+            cAndBits[i] = 0;
+            if (cColorBits[i] != 0)
+                BaseFree(cColorBits[i], __FILE__, __LINE__);
+            cColorBits[i] = 0;
+            if (hbmpAndMask[i] != 0)
+                DeleteObject(hbmpAndMask[i]);
+            hbmpAndMask[i] = 0;
+        }
+        if (field_0x3e != 0)
+            gpResourceManager->Dispose(field_0x3e);
+        field_0x3e = 0;
+    }
+}
 
 VA(0x004c94e0, 0x5)
 int mouseManager::Main(struct tag_message &) { return 0; }
