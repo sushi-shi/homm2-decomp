@@ -123,8 +123,8 @@ BASE/Bzip	?uncompressOutOfMemory@@YIXHH@Z	100.0000	8f100aadde89
 BASE/Bzip	?uncompressStream@@YIHPAU_iobuf@@0@Z	88.1355	cdd368dd207e
 BASE/Bzip	?undoReversibleTransformation@@YIXXZ	97.3165	0482d6e07bc7
 BASE/Bzip	?updateModel@@YIXPAUModel@@H@Z	100.0000	0c7adcf987e8
-BASE/DIMMER	??0dimmerWidget@@QAE@FFFFFF@Z	30.2381	f30c993fb4d2
-BASE/DIMMER	??0dimmerWidget@@QAE@XZ	53.8462	a8a9a58a6483
+BASE/DIMMER	??0dimmerWidget@@QAE@FFFFFF@Z	100.0000	d40ae30749ab
+BASE/DIMMER	??0dimmerWidget@@QAE@XZ	100.0000	ecc550c0d114
 BASE/DIMMER	??_EdimmerWidget@@UAEPAXI@Z	0.0000	
 BASE/DIMMER	?Draw@dimmerWidget@@UAEXXZ	40.0000	9559c3a6a83d
 BASE/DIMMER	?Main@dimmerWidget@@UAEHAAUtag_message@@@Z	35.0000	2fcbb8d6ab63
