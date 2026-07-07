@@ -5,8 +5,17 @@
 
 #include <va.h>
 #include <BASE/baseManager.h>
+#include <string.h>
 VA(0x004d2530, 0x47)
-baseManager::baseManager(void) {}
+baseManager::baseManager(void)
+{
+    field_0x4 = 0;
+    field_0x8 = 0;
+    field_0x10 = -1;
+    field_0xc = -1;
+    field_0x32 = 0;
+    strcpy(name, "Unknown");
+}
 
 
 // ===== vtable baseManager : public widget  (3 slots) =====

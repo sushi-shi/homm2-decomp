@@ -24,8 +24,7 @@ public:
     int    field_0x8;  // +0x08
     int    field_0xc;  // +0x0c
     int    field_0x10;  // +0x10
-    char   field_0x14;  // +0x14
-    char _pad_0x15[0x1d];
+    char   name[0x1e];  // +0x14  manager name (strcpy'd, e.g. "Unknown")
     int    field_0x32;  // +0x32
     // --- constructors ---
     baseManager(void);
