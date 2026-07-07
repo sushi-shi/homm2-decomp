@@ -80,8 +80,70 @@ extern "C" unsigned short __fastcall nb_init(unsigned short param1, unsigned sho
     return 0;
 }
 
+// Static helper (retail RVA 0x004a8268, no CodeView symbol) — tears down one session: cancel any
+// pending receive NCB, then hang up the session and clear its active bit. Shared by nb_term/nb_sess.
+static void __fastcall nb_close_session(int session)
+{
+    NCB ncb;
+    if (gNbSessNcb[session].ncb_cmd_cplt == 0xff) {
+        memset(&ncb, 0, 0x40);
+        ncb.ncb_command = 0x35;
+        ncb.ncb_lana_num = gNetbiosLana;
+        ncb.ncb_buffer = (unsigned char *)&gNbSessNcb[session];
+        Netbios(&ncb);
+    }
+    if (gNbSessLsn[session] != 0xff) {
+        memset(&ncb, 0, 0x40);
+        ncb.ncb_lsn = gNbSessLsn[session];
+        ncb.ncb_command = 0x12;
+        ncb.ncb_lana_num = gNetbiosLana;
+        Netbios(&ncb);
+        gNetStatus[session] &= 0xfe;
+    }
+}
+
 VA(0x004a6ecc, 0x207)
-extern "C" int __fastcall nb_term(void) { return 0; }
+extern "C" void __fastcall nb_term(void)
+{
+    NCB ncb;
+    int i;
+    tag_Node *node;
+
+    for (i = 0; i < 7; i++)
+        nb_close_session(i);
+    if (gNbCtlNcb.ncb_cmd_cplt == 0xff) {
+        memset(&ncb, 0, 0x40);
+        ncb.ncb_command = 0x35;
+        ncb.ncb_lana_num = gNetbiosLana;
+        ncb.ncb_buffer = (unsigned char *)&gNbCtlNcb;
+        Netbios(&ncb);
+    }
+    if ((gNetStatus[gNbMaxSess] & 2) != 0) {
+        memset(&ncb, 0, 0x40);
+        memcpy(ncb.ncb_name, &gNbNameBuf[gNbMaxSess * 0x10], 0x10);
+        ncb.ncb_command = 0x31;
+        ncb.ncb_lana_num = gNetbiosLana;
+        Netbios(&ncb);
+    }
+    EnterCriticalSection(&gNbSndLock);
+    while ((node = pop_node(&gNbSndQueue)) != 0)
+        BaseFree(node, "I:\\Projects\\Heroes\\Prog\\SOURCE\\netwin.cpp", __LINE__);
+    while ((node = pop_node(&gNbFreeQueue)) != 0)
+        BaseFree(node, "I:\\Projects\\Heroes\\Prog\\SOURCE\\netwin.cpp", __LINE__);
+    LeaveCriticalSection(&gNbSndLock);
+    DeleteCriticalSection(&gNbSndLock);
+    for (i = 0; i < 9; i++) {
+        CloseHandle(gNbEvents[i]);
+        gNbEvents[i] = 0;
+    }
+    gNbShutdown |= 1;
+    SetEvent(gNbEvents[0]);
+    EnterCriticalSection(&gNbRcvLock);
+    while ((node = pop_node(&gNbRcvQueue)) != 0)
+        BaseFree(node, "I:\\Projects\\Heroes\\Prog\\SOURCE\\netwin.cpp", __LINE__);
+    LeaveCriticalSection(&gNbRcvLock);
+    DeleteCriticalSection(&gNbRcvLock);
+}
 
 VA(0x004a70d3, 0xb3)
 extern "C" unsigned short __fastcall nb_rcv(short session, void *buf)
