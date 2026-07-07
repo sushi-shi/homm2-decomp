@@ -3,21 +3,19 @@
 // Reconstructed class (BASE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // 9 methods, 0 own-virtual, 0 static data.
 #include <va.h>
+#include <BASE/resource.h>
+// forward declarations:
+class icon;
 
 #pragma pack(push, 1)  // recovered layout is byte-packed
-class font {
+// font is an asset subclass of resource (base ctor resource(5,K,1,0); slot-0 dtor override).
+class font : public resource {
 public:
-    // --- members (offsets from Ghidra this+off access-analysis; widths are
-    // access-widths, NOT confirmed types; refine during byte-matching) ---
-    // (vptr auto-emitted at 0x00; own data starts at 0x04)
-    short  field_0x4;  // +0x04
-    short  field_0x6;  // +0x06
-    int    field_0x8;  // +0x08
-    int    field_0xc;  // +0x0c
+    // --- own members (base resource occupies 0x00..0x10; widths from access-analysis) ---
     int    field_0x10;  // +0x10
     int    field_0x14;  // +0x14
     int    field_0x18;  // +0x18
-    int    field_0x1c;  // +0x1c
+    icon  *field_0x1c;  // +0x1c  (resourceManager::GetIcon result)
     // --- constructors ---
     font(unsigned long int);
     virtual ~font();
