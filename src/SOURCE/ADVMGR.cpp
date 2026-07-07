@@ -290,3 +290,6 @@ unsigned char StopOnTrigger(class mapCell *) { return 0; }
 
 // ---- globals (definitions, RVA order) ----
 int iCurHourGlassPhase;
+
+// ---- vtables (compiler-emitted; census) ----
+VTBL(advManager, 0x004eb6c8);

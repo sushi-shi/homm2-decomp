@@ -28,3 +28,6 @@ void border::Draw(void) {}
 //  [ 0] VA(0x004d2480, 0xab)  void border::Draw(void)   <- override (implements widget pure virtual)
 //  [ 1] VA(0x004d20e0, 0x4d)  void * border::scalar_dtor(unsigned int)   <- override (implements widget pure virtual)
 //  [ 2] VA(0x004d22f0, 0x181)  int border::Main(struct tag_message &)   <- override (implements widget pure virtual)
+
+// ---- vtables (compiler-emitted; census) ----
+VTBL(border, 0x004eba60);

@@ -34,3 +34,6 @@ int listBoxWidget::ProcessMouseMessage(struct tag_message &) { return 0; }
 //  [ 0] VA(0x004db890, 0x8)  void listBoxWidget::Draw(void)   <- override (implements widget pure virtual)
 //  [ 1] VA(0x004db0b0, 0x1f)  void * listBoxWidget::scalar_dtor(unsigned int)   <- override (implements widget pure virtual)
 //  [ 2] VA(0x004db520, 0x368)  int listBoxWidget::Main(struct tag_message &)   <- override (implements widget pure virtual)
+
+// ---- vtables (compiler-emitted; census) ----
+VTBL(listBoxWidget, 0x004ebac0);

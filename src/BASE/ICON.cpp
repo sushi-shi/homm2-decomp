@@ -29,3 +29,6 @@ void icon::DimToBuffer(int, int, int, int) {}
 
 // ===== vtable icon (root)  (1 slots) =====
 //  [ 0] VA(0x004c7a90, 0x36)  void * icon::scalar_dtor(unsigned int)   <- introduces virtual
+
+// ---- vtables (compiler-emitted; census) ----
+VTBL(icon, 0x004eb9e8);

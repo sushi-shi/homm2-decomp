@@ -25,3 +25,6 @@ void highScoreManager::Update(void) {}
 //  [ 0] VA(0x00489a96, 0x14c)  int highScoreManager::Open(int)   <- override (implements baseManager pure virtual)
 //  [ 1] VA(0x00489be2, 0x5e)  void highScoreManager::Close(void)   <- override (implements baseManager pure virtual)
 //  [ 2] VA(0x00489c40, 0x22a)  int highScoreManager::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
+
+// ---- vtables (compiler-emitted; census) ----
+VTBL(highScoreManager, 0x004eb838);

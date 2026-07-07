@@ -12,6 +12,10 @@
 //   SYMBOL(mangled)  - explicit mangled-name override when clang's MS-mangling
 //                      differs from the retail symbol.
 //   DATA(addr)       - on an `extern` decl of a matched GLOBAL (also a VA).
+//   VTBL(cls, va)    - census marker at a TU's tail: "this TU emits class `cls`'s vtable at
+//                      VA `va`". Vtables are compiler-emitted (not hand-written), so this is a
+//                      pure source-level claim the vtable gate cross-checks against CodeView +
+//                      the emitted objects. Expands to NOTHING under clang AND MSVC.
 //   SIZE(type,bytes) - file-scope sizeof assert; a REAL compile-time check under
 //                      BOTH clang and MSVC 4.2 (whose sizeof is matching ground
 //                      truth). Emits no code -> matching-neutral.
@@ -35,6 +39,7 @@
 #define VAU(addr) __attribute__((annotate("va:" #addr)))
 #define SYMBOL(mangled) __attribute__((annotate("symbol:" #mangled)))
 #define DATA(addr) __attribute__((annotate("data:" #addr)))
+#define VTBL(cls, va)
 #define OVERRIDE override
 #define SIZE(type, bytes) static_assert(sizeof(type) == (bytes), "sizeof(" #type ") != " #bytes)
 
@@ -44,6 +49,7 @@
 #define VAU(addr)
 #define SYMBOL(mangled)
 #define DATA(addr)
+#define VTBL(cls, va)
 #define OVERRIDE
 
 // MSVC 4.2 has no static_assert: classic negative-size typedef, name uniquified

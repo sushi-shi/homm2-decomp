@@ -49,3 +49,6 @@ void swapManager::SplitMons(void) {}
 //  [ 0] VA(0x00454502, 0x3bc)  int swapManager::Open(int)   <- override (implements baseManager pure virtual)
 //  [ 1] VA(0x004548be, 0x12d)  void swapManager::Close(void)   <- override (implements baseManager pure virtual)
 //  [ 2] VA(0x00454be3, 0xaf0)  int swapManager::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
+
+// ---- vtables (compiler-emitted; census) ----
+VTBL(swapManager, 0x004eb650);

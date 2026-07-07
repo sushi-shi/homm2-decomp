@@ -34,3 +34,6 @@ void textWidget::SetText(char *) {}
 //  [ 0] VA(0x004d1490, 0x49)  void textWidget::Draw(void)   <- override (implements widget pure virtual)
 //  [ 1] VA(0x004d10a0, 0x45)  void * textWidget::scalar_dtor(unsigned int)   <- override (implements widget pure virtual)
 //  [ 2] VA(0x004d1280, 0x210)  int textWidget::Main(struct tag_message &)   <- override (implements widget pure virtual)
+
+// ---- vtables (compiler-emitted; census) ----
+VTBL(textWidget, 0x004eba50);

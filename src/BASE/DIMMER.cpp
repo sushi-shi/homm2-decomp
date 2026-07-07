@@ -25,3 +25,6 @@ void dimmerWidget::Draw(void) {}
 //  [ 0] VA(0x004dd400, 0x5)  void dimmerWidget::Draw(void)   <- override (implements widget pure virtual)
 //  [ 1] VA(0x004dd410, 0x25)  void * dimmerWidget::scalar_dtor(unsigned int)   <- override (implements widget pure virtual)
 //  [ 2] VA(0x004dd3f0, 0xd)  int dimmerWidget::Main(struct tag_message &)   <- override (implements widget pure virtual)
+
+// ---- vtables (compiler-emitted; census) ----
+VTBL(dimmerWidget, 0x004ebae0);

@@ -35,3 +35,6 @@ void QuickViewRecruit(class town *, int) {}
 //  [ 0] VA(0x0048b49c, 0x24b)  int recruitUnit::Open(int)   <- override (implements baseManager pure virtual)
 //  [ 1] VA(0x0048b6e7, 0xe7)  void recruitUnit::Close(void)   <- override (implements baseManager pure virtual)
 //  [ 2] VA(0x0048b8f0, 0x41b)  int recruitUnit::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
+
+// ---- vtables (compiler-emitted; census) ----
+VTBL(recruitUnit, 0x004eb848);
