@@ -52,9 +52,14 @@ def route(decl):
 def main(path):
     lines = open(path).read().split('\n')
     out = []; needed = set(); removed = 0
+    FWD = re.compile(r'^[A-Za-z_][\w\s\*&:<>]*\b[A-Za-z_]\w*\s*\([^{;=]*\)\s*(const\s*)?;')
+    SKIP = re.compile(r'^(VA|VAU|DATA|SIZE|SYMBOL|return|typedef|extern)\b')
     for ln in lines:
         code = ln.split('//')[0].rstrip()             # ignore trailing // comment
-        if re.match(r'^\s*extern\b', ln) and '{' not in code and code.endswith(';'):
+        is_extern = re.match(r'^\s*extern\b', ln) and '{' not in code and code.endswith(';')
+        is_fwd = (code and code[0] not in ' \t}' and not SKIP.match(code)
+                  and code.endswith(';') and FWD.match(code))
+        if is_extern or is_fwd:
             needed.add(route(ln)); removed += 1
             continue
         out.append(ln)

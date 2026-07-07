@@ -11,18 +11,25 @@ import re, sys, glob, os
 TYPE_RE = re.compile(r'^\s*(class|struct)\s+\w+\s*(\{|:|;)')
 # an extern DECLARATION (statement ending in ';' with no body) — not a linkage block/def
 EXTERN_DECL_RE = re.compile(r'^\s*extern\b')
+# a FILE-SCOPE function forward-declaration (no 'extern' keyword) — must live in a header too.
+# Column-0 (bodies/statements are indented), `<ret> name(params);`, no body, no '=' (that's a
+# definition/initializer), and not an annotation macro or control keyword.
+FWD_DECL_RE = re.compile(r'^[A-Za-z_][\w\s\*&:<>]*\b[A-Za-z_]\w*\s*\([^{;=]*\)\s*(const\s*)?;')
+_FWD_SKIP = re.compile(r'^\s*(VA|VAU|DATA|SIZE|SYMBOL|return|typedef|extern)\b')
 
 def violations(path):
     out = []
     for i, line in enumerate(open(path), 1):
         s = line.rstrip('\n')
+        code = s.split('//')[0].rstrip()              # ignore trailing // comment
         if TYPE_RE.match(s):
             out.append((i, s.strip()))
         elif EXTERN_DECL_RE.match(s):
-            # allow definitions ('{' present) and linkage-block openers ('extern "C" {')
-            code = s.split('//')[0].rstrip()          # ignore trailing // comment
             if '{' not in code and code.endswith(';'):
                 out.append((i, s.strip()))
+        elif code and code[0] not in ' \t}' and not _FWD_SKIP.match(code) \
+                and code.endswith(';') and FWD_DECL_RE.match(code):
+            out.append((i, s.strip()))                 # local function forward-declaration
     return out
 
 if __name__ == "__main__":

@@ -332,13 +332,8 @@ for C in emitted: visit(C)
 with open(os.path.join(outdir,"_all.h"),"w") as f:
     f.write("#pragma once\n// every reconstructed class, base-before-derived\n")
     for C in order: f.write(f'#include "{class_tier[C]}/{sanitize(C)}.h"\n')
-with open(os.path.join(outdir,"_hierarchy.txt"),"w") as f:
-    kids=defaultdict(list)
-    for C in emitted: kids[vbase.get(C)].append(C)
-    def tree(C,ind=0):
-        f.write("  "*ind+f"{C} [{class_tier[C]}]"+(" (abstract)" if C in abstract else "")+f"  {len(methods.get(C,[]))} methods\n")
-        for k in sorted(kids.get(C,[])): tree(k,ind+1)
-    for root in sorted(kids.get(None,[])): tree(root)
+# (class hierarchy is implicit in _all.h + the class headers; no _hierarchy.txt)
+
 print(f"emitted {len(emitted)} class headers into {outdir}/ (BASE/SOURCE/EDITOR tiers)")
 by=defaultdict(int)
 for C in emitted: by[class_tier[C]]+=1

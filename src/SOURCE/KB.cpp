@@ -4,6 +4,22 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <BASE/Misc.h>
+#include <BASE/WINMGR.h>
+#include <SOURCE/ADVMGR.h>
+#include <SOURCE/CURSOR.h>
+#include <SOURCE/HERO.h>
+#include <SOURCE/KB.h>
+#include <SOURCE/Modem.h>
+#include <SOURCE/NOOPT.h>
+#include <SOURCE/Netbios.h>
+#include <SOURCE/PHILAI.h>
+#include <SOURCE/REMOTE.h>
+#include <SOURCE/SMACKMGR.h>
+#include <SOURCE/Wsnetwin.h>
+#include <SOURCE/dpnetwin.h>
+#include <SOURCE/kbwin.h>
+#include <SOURCE/wingraph.h>
 #include <BASE/BITS.h>
 #include <SOURCE/KB.h>
 #include <_globals.h>
@@ -30,29 +46,6 @@
 #define KBLINE (*(short *)"\xBE\x0C")
 
 
-long KBTickCount(void);
-void InitMainClasses(void);
-void GetGraphicsInfo(void);
-void ReadPrefs(void);
-int InterpretCommandLine(void);
-void LogTruncate(void);
-void LogStr(char *);
-int SetupCDDrive(void);
-void InitVars(void);
-void AiPrint(char *);
-void RemoteCleanup(void);
-void ComputeAdvNetControl(void);
-void Process1WindowsMessage(void);
-void ShutDown(char *);
-void UpdateSystemOptionsMenu(void);
-int EventWindowHandler(struct tag_message &);
-char *GetRemoteData(signed char);
-int TransmitRemoteData(char *, int, int, signed char, signed char, signed char, signed char);
-void DelayMilli(long);
-void LogInt(char *, int, int, int, int, int, int, int);
-void BaseFree(void *, char *, int);
-void SetupDynamicWindow(int, int, int, int, int, int, int, int *, int *, int *, int *, int *, int *, class heroWindow **, int);
-void ReceiveRemotePlayerExit(SPlayerExit);
 
 
 
@@ -61,40 +54,6 @@ void ReceiveRemotePlayerExit(SPlayerExit);
 
 
 
-void CycleColors(int);
-void PollRemote(void);
-void SetPalette(signed char *, int);
-void NormalDialog(char *, int, int, int, int, int, int, int, int, int);
-int HeroView(int, int, int);
-void ShutDownSmacker(void);
-void SetFullScreenStatus(int);
-void CloseAIMapVars(void);
-void DeleteMainClasses(void);
-void AppExit(void);
-void PrintMemoryLeaks(void);
-void FadeTo(unsigned char *, unsigned char *, int);
-void UpdatePalette(unsigned char *);
-void *BaseAlloc(unsigned int, char *, int);
-void SendMapChange(int, signed char, unsigned char, unsigned char, int, unsigned char, unsigned char);
-int WaitForOtherPlayer(void);
-signed char WaitForHost(void);
-signed char WaitForGuest(void);
-signed char InitNetGuest(void);
-signed char InitNetHost(void);
-signed char GUIModemCommandExec(void);
-signed char GUIModemResponseExec(void);
-int WaitForDirectConnect(void);
-int dpWaitForFirstGuest(void);
-int dpWaitForExtraGuests(void);
-int dpWaitForHost(void);
-int wsWaitForFirstGuest(void);
-int wsWaitForExtraGuests(void);
-int wsWaitForHost(void);
-char *GetBuildingName(int, int);
-void CheckShingleUpdate(void);
-void HandleRemoteDeadPlayerExit(int);
-void UnloadSystemwideIcons(void);
-void HandleRemoteSuddenExit(void);
 
 static long glNextPollTime;
 static long glNextMouseTime;
@@ -901,7 +860,7 @@ void SmackFade(unsigned char *src, unsigned char *dst)
         }
     }
     gpWindowManager->UpdateScreen();
-    UpdatePalette(dst);
+    UpdatePalette((signed char *)dst);   // real sig is signed char* (?UpdatePalette@@YIXPAC@Z)
     BaseFree(a, KBFILE, (*(short *)"\x61\x0f") + 0x31);
     BaseFree(f, KBFILE, (*(short *)"\x61\x0f") + 0x32);
 }
