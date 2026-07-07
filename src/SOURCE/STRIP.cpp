@@ -4,27 +4,28 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <_all.h>
 VA(0x00432230, 0x27e)
-// void strip::constructor(int, int, int, unsigned long int, int, class armyGroup *, int, int, int);
+strip::strip(int, int, int, unsigned long int, int, class armyGroup *, int, int, int) {}
 
 VA(0x004324ae, 0x144)
-// void strip::~destructor(void);
+strip::~strip() {}
 
 VA(0x004325f2, 0x40)
-// void strip::Draw(void);
+void strip::Draw(void) {}
 
 VA(0x00432632, 0x3d3)
-// void strip::DrawIcons(int);
+void strip::DrawIcons(int) {}
 
 VA(0x00432a05, 0x33)
-// void strip::DrawFrame(void);
+void strip::DrawFrame(void) {}
 
 VA(0x00432a38, 0xb2)
-// void bankBox::constructor(int, int, class playerData *);
+bankBox::bankBox(int, int, class playerData *) {}
 
 VA(0x00432aea, 0x43)
-// void bankBox::~destructor(void);
+bankBox::~bankBox() {}
 
 VA(0x00432b2d, 0xcd)
-// void bankBox::Update(int);
+void bankBox::Update(int) {}
 

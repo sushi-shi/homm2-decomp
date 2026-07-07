@@ -5,17 +5,9 @@
 
 #include <va.h>
 #include "EDITOR/fullMap.h"
+#include "EDITOR/mapcell.h"
 #include <string.h>
 #include <io.h>
-
-// Legacy on-disk record sizes (Read's convert path streams the old layout and
-// copies the leading bytes into the new packed records).
-struct oldMapCell {
-    u8 raw[20];
-};
-struct oldMapCellExtra {
-    u8 raw[15];
-};
 
 VA(0x0040b070, 0x36)
 fullMap::fullMap(void)

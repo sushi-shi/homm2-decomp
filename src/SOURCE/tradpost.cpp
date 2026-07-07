@@ -4,23 +4,25 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <_all.h>
+#include <_carcass_types.h>
 VA(0x004bf340, 0x165)
-// void DoTradingPost(int, float);
+void DoTradingPost(int, float) {}
 
 VA(0x004bf4a5, 0x596)
-// void UpdateTradingPost(int);
+void UpdateTradingPost(int) {}
 
 VA(0x004bfa3b, 0xfe)
-// void ComputeTradeRatios(int, int, int *, int *, int *);
+void ComputeTradeRatios(int, int, int *, int *, int *) {}
 
 VA(0x004bfb39, 0x148)
-// void DoTradeKnob(struct tag_message);
+void DoTradeKnob(struct tag_message) {}
 
 VA(0x004bfc81, 0x3a)
-// void SetupNewTrade(void);
+void SetupNewTrade(void) {}
 
 VA(0x004bfcbb, 0x3b6)
-// int TradingPostHandler(struct tag_message &);
+int TradingPostHandler(struct tag_message &) { return 0; }
 
 // ---- data / globals / vtables ----
 DATA(0x0051d9d0)  // unsigned short int * coreRatio

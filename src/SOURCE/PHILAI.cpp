@@ -4,6 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <_all.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -188,7 +189,7 @@ struct gameView {
 };
 
 VA(0x0043781b, 0x1b5)
-// void ResetHeroRVs(int, int, int);
+void ResetHeroRVs(int, int, int) {}
 
 VA(0x004379d0, 0x180)
 void CheckDoMain(int a1, int doMain) {
@@ -251,19 +252,19 @@ void philAI::DoAllHeroInteractions(void) {
 }
 
 VA(0x00437c61, 0x37e)
-// void philAI::CheckForCreatureUpgrades(void);
+void philAI::CheckForCreatureUpgrades(void) {}
 
 VA(0x00437fdf, 0x4be)
-// void philAI::CheckBuyStuff(void);
+void philAI::CheckBuyStuff(void) {}
 
 VA(0x0043849d, 0x2e8)
-// int philAI::GoodAdjacent(int *);
+int philAI::GoodAdjacent(int *) { return 0; }
 
 VA(0x00438785, 0x4b8)
-// void philAI::CheckReload(void);
+void philAI::CheckReload(void) {}
 
 VA(0x00438c3d, 0x302)
-// void philAI::CheckBerserk(void);
+void philAI::CheckBerserk(void) {}
 
 VA(0x00438f3f, 0x71)
 void philAI::DimensionDoorTo(int x, int y) {
@@ -276,7 +277,7 @@ void philAI::DimensionDoorTo(int x, int y) {
 }
 
 VA(0x00438fb0, 0x3f9)
-// int philAI::DoAnywhereDDoorTownGate(int);
+int philAI::DoAnywhereDDoorTownGate(int) { return 0; }
 
 // @early-stop
 // Complete & byte-exact except ONE `movsbl normalDirTable[dir].y`: cl emits disp 0x2
@@ -348,7 +349,7 @@ void ValidateHero(hero *pHero) {
 }
 
 VA(0x00439631, 0xcad)
-// void philAI::DoAI(int);
+void philAI::DoAI(int) {}
 
 VA(0x0043a2de, 0x4b)
 void philAI::GetGameAIVars(void) {
@@ -358,10 +359,10 @@ void philAI::GetGameAIVars(void) {
 }
 
 VA(0x0043a329, 0xe2b)
-// void philAI::GetTurnAIVars(int);
+void philAI::GetTurnAIVars(int) {}
 
 VA(0x0043b154, 0x5f4)
-// void philAI::GetBestBHC(int, struct BHC &);
+void philAI::GetBestBHC(int, struct BHC &) {}
 
 // @early-stop
 // Complete & correct; two residuals are /Od codegen-shape picks (verified via scratch cl,
@@ -395,10 +396,10 @@ hero *philAI::DetermineHeroToMove(int player) {
 }
 
 VA(0x0043b865, 0xe7d)
-// int philAI::DetermineTargetPosition(int &, int &, int, int &);
+int philAI::DetermineTargetPosition(int &, int &, int, int &) { return 0; }
 
 VA(0x0043c6e2, 0x791)
-// void philAI::ProbableOutcomeOfBattle(class armyGroup *, class hero *, class armyGroup *, class hero *, class armyGroup *, int, int, int, float &, int &, int &, int &, int &, int &);
+void philAI::ProbableOutcomeOfBattle(class armyGroup *, class hero *, class armyGroup *, class hero *, class armyGroup *, int, int, int, float &, int &, int &, int &, int &, int &) {}
 
 VA(0x0043ce73, 0x1e)
 float philAI::GetOddsOfWinning(int) {
@@ -406,7 +407,7 @@ float philAI::GetOddsOfWinning(int) {
 }
 
 VA(0x0043ce91, 0x826)
-// void philAI::ValueOfBuyingBuilding(class town *, int, int &, float &);
+void philAI::ValueOfBuyingBuilding(class town *, int, int &, float &) {}
 
 // @early-stop
 // Complete & correct except ONE store/compare pair: cl emits `fcoms kn; fstps score`
@@ -452,10 +453,10 @@ void philAI::GetBestBuilding(town *t, BHC &bhc, float &fOut) {
 }
 
 VA(0x0043d852, 0x306)
-// void philAI::ValueOfBuyingCreature(class town *, int, int &, int, float &);
+void philAI::ValueOfBuyingCreature(class town *, int, int &, int, float &) {}
 
 VA(0x0043db58, 0x35b)
-// void philAI::GetBestCreature(class town *, struct BHC &, float &);
+void philAI::GetBestCreature(class town *, struct BHC &, float &) {}
 
 VA(0x0043deb3, 0x48)
 int philAI::CreaturesToBuy(town *t, int level) {
@@ -499,10 +500,10 @@ int philAI::MaxBuyableCreatures(int level) {
 }
 
 VA(0x0043dff6, 0x2b2)
-// void philAI::ValueOfBuyingHero(class town *, class hero *, int &, float &);
+void philAI::ValueOfBuyingHero(class town *, class hero *, int &, float &) {}
 
 VA(0x0043e2a8, 0x1b1)
-// void philAI::GetBestHero(class town *, struct BHC &, float &);
+void philAI::GetBestHero(class town *, struct BHC &, float &) {}
 
 VA(0x0043e459, 0x65)
 void philAI::LikelihoodOfEnemyAttacking(town *, hero *, float &chanceA, float &chanceB,
@@ -519,7 +520,7 @@ VA(0x0043e4be, 0x1a)
 int philAI::MeanRVOfUnexploredTerritory(int) { return 0; }
 
 VA(0x0043e4d8, 0x1d8)
-// void philAI::GetGameAttentionValue(int);
+void philAI::GetGameAttentionValue(int) {}
 
 VA(0x0043e6b0, 0xf2)
 void philAI::GetTurnAttentionValue(int player) {
@@ -576,10 +577,10 @@ float philAI::TurnsToBuy(int *const p) {
 }
 
 VA(0x0043e918, 0x62d)
-// int philAI::RVOfPosition(int, int, int, int, int, int, int, int, int, int);
+int philAI::RVOfPosition(int, int, int, int, int, int, int, int, int, int) { return 0; }
 
 VA(0x0043ef45, 0xaf9)
-// int philAI::StrategicValueOfPosition(int, int, int, int, int *, int);
+int philAI::StrategicValueOfPosition(int, int, int, int, int *, int) { return 0; }
 
 // @early-stop
 // Complete & correct except the two castle-match `==` compares: cl unconditionally loads
@@ -666,22 +667,22 @@ float philAI::FutureDeflator(int *const p) {
 }
 
 VA(0x0043fed2, 0xbf8)
-// int philAI::FightValueOfStack(class armyGroup *, class hero *, int, int, int, int);
+int philAI::FightValueOfStack(class armyGroup *, class hero *, int, int, int, int) { return 0; }
 
 VA(0x00440aca, 0x1e7)
-// void philAI::EvaluateOneTimeCreaturePurchase(int, int, int, int &, int &, int &);
+void philAI::EvaluateOneTimeCreaturePurchase(int, int, int, int &, int &, int &) {}
 
 VA(0x00440cb1, 0x768)
-// int philAI::QuickCombat(class armyGroup *, class hero *, class armyGroup *, class hero *, int, int, float &, float &);
+int philAI::QuickCombat(class armyGroup *, class hero *, class armyGroup *, class hero *, int, int, float &, float &) { return 0; }
 
 VA(0x00441419, 0x422)
-// void philAI::HeroInteractionAtHero(class hero *, class hero *, int, int *);
+void philAI::HeroInteractionAtHero(class hero *, class hero *, int, int *) {}
 
 VA(0x0044183b, 0x882)
-// void philAI::HeroInteractionAtTown(class hero *, class town *, int, int *);
+void philAI::HeroInteractionAtTown(class hero *, class town *, int, int *) {}
 
 VA(0x004420bd, 0x4ba)
-// void philAI::RedistributeTroops(class armyGroup *, class armyGroup *, int, int, int, int, int);
+void philAI::RedistributeTroops(class armyGroup *, class armyGroup *, int, int, int, int, int) {}
 
 VA(0x00442577, 0x39)
 int philAI::ChooseGoldOrExperience(int, int) {
@@ -767,10 +768,10 @@ void philAI::BuildBuilding(town *t, int building) {
 }
 
 VA(0x004428b8, 0x328)
-// void philAI::BuildHero(class town *, int);
+void philAI::BuildHero(class town *, int) {}
 
 VA(0x00442be0, 0x2cd)
-// void philAI::BuildCreature(class town *, int, int);
+void philAI::BuildCreature(class town *, int, int) {}
 
 VA(0x00442ead, 0x15a)
 int philAI::CanBuyBHC(BHC &bhc) {
@@ -831,7 +832,7 @@ int philAI::CombatMonsterEvent(hero *h, int monType, int *pCount, mapCell *cell)
 }
 
 VA(0x0044316b, 0x6d7)
-// int philAI::FightEvent(class hero *, class mapCell *, int);
+int philAI::FightEvent(class hero *, class mapCell *, int) { return 0; }
 
 VA(0x00443842, 0x73)
 int philAI::DamageGroup(armyGroup *ag, hero *loser, hero *, float dmg) {
@@ -866,7 +867,7 @@ void philAI::IncrementHourGlass(void) {
 }
 
 VA(0x00443980, 0x227)
-// void philAI::TownEvent(class mapCell *, class hero *, int, int);
+void philAI::TownEvent(class mapCell *, class hero *, int, int) {}
 
 VA(0x00443ba7, 0xad)
 int philAI::ComputeUpgradeValue(int a1, int a2) {
@@ -881,7 +882,7 @@ int philAI::ComputeUpgradeValue(int a1, int a2) {
 }
 
 VA(0x00443c54, 0x271)
-// int philAI::ComputeValueOfSS(class hero *, int, int);
+int philAI::ComputeValueOfSS(class hero *, int, int) { return 0; }
 
 VA(0x00443ec5, 0x59)
 int philAI::ComputeValueOfFreeSS(hero *h, int ss) {
@@ -905,10 +906,10 @@ int philAI::ManaRefreshValue(hero *h, int level) {
 }
 
 VA(0x00443fc4, 0x1ac5)
-// int philAI::ValueOfEventAtPosition(int, int, int, int *);
+int philAI::ValueOfEventAtPosition(int, int, int, int *) { return 0; }
 
 VA(0x00445a89, 0x299)
-// int philAI::EvaluateGenericSite(class mapCell *);
+int philAI::EvaluateGenericSite(class mapCell *) { return 0; }
 
 VA(0x00445d22, 0x5e)
 int philAI::EvaluateBarrier(mapCell *cell) {
@@ -998,22 +999,22 @@ void CloseAIMapVars(void) {
 }
 
 VA(0x004460f8, 0x26a)
-// int OnMySide(int);
+int OnMySide(int) { return 0; }
 
 VA(0x00446362, 0x2bc)
-// int philAI::EvaluateArtifactEvent(int, int);
+int philAI::EvaluateArtifactEvent(int, int) { return 0; }
 
 VA(0x0044661e, 0x30a)
-// int philAI::EvaluateMineEvent(int, int, int, int *);
+int philAI::EvaluateMineEvent(int, int, int, int *) { return 0; }
 
 VA(0x00446928, 0x33e)
-// int philAI::EvaluateMonsterEvent(int, int, int *);
+int philAI::EvaluateMonsterEvent(int, int, int *) { return 0; }
 
 VA(0x00446c66, 0x5ab)
-// int philAI::EvaluateHeroEvent(int, int, int, int, int *);
+int philAI::EvaluateHeroEvent(int, int, int, int, int *) { return 0; }
 
 VA(0x00447211, 0x4fa)
-// int philAI::EvaluateTownEvent(int, int, int, int, int *);
+int philAI::EvaluateTownEvent(int, int, int, int, int *) { return 0; }
 
 // ---- data / globals / vtables ----
 DATA(0x004f20e0)  // float fFirstWeekTownFV

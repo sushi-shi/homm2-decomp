@@ -4,6 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <_all.h>
 VA(0x004d1ba0, 0x4f1)
-// void FlipIconToBitmap(class icon *, class bitmap *, int, int, int, int, int, int, int, int, int);
+void FlipIconToBitmap(class icon *, class bitmap *, int, int, int, int, int, int, int, int, int) {}
 

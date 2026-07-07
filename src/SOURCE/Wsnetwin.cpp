@@ -4,35 +4,36 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <_all.h>
 VA(0x004068b0, 0x5b5)
-// short int wsnet_init(void);
+short int wsnet_init(void) { return 0; }
 
 VA(0x00406e65, 0xd2)
-// void wsnet_term(void);
+void wsnet_term(void) {}
 
 VA(0x00406f37, 0x1f5)
-// void wsSendMessage(int, unsigned char, unsigned short int, void *);
+void wsSendMessage(int, unsigned char, unsigned short int, void *) {}
 
 VA(0x0040712c, 0x61)
-// int wsnet_snd(int, int, void *);
+int wsnet_snd(int, int, void *) { return 0; }
 
 VA(0x0040718d, 0xa7)
-// short int wsnet_rcv(short int, unsigned short int, void *);
+short int wsnet_rcv(short int, unsigned short int, void *) { return 0; }
 
 VA(0x00407234, 0xaf)
-// void wsProcessMessages(void);
+void wsProcessMessages(void) {}
 
 VA(0x004072e3, 0x37d)
-// void wsEvaluateMessage(unsigned long int, int);
+void wsEvaluateMessage(unsigned long int, int) {}
 
 VA(0x00407660, 0x2e)
-// int wsWaitForFirstGuest(void);
+int wsWaitForFirstGuest(void) { return 0; }
 
 VA(0x0040768e, 0xb8)
-// int wsWaitForExtraGuests(void);
+int wsWaitForExtraGuests(void) { return 0; }
 
 VA(0x00407746, 0x126)
-// int wsWaitForHost(void);
+int wsWaitForHost(void) { return 0; }
 
 // ---- data / globals / vtables ----
 DATA(0x004ed2ac)  // int bHostFound

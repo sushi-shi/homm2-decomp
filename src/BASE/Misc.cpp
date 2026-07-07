@@ -4,6 +4,8 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <_all.h>
+#include <_carcass_types.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -12,15 +14,6 @@
 #include <BASE/heroWindowManager.h>
 #include <BASE/mouseManager.h>
 
-struct tag_message {
-    int type;
-    int field4;
-    int field8;
-    int fieldC;
-    int field10;
-    int field14;
-    char *text;
-};
 
 struct MemEntry;
 struct indexArray {
@@ -68,16 +61,16 @@ void InitMemEntry(void)
 }
 
 VA(0x004c3d70, 0x20f)
-// void * BaseAlloc(unsigned int, char *, int);
+void * BaseAlloc(unsigned int, char *, int) { return 0; }
 
 VA(0x004c3f80, 0x386)
-// void BaseFree(void *, char *, int);
+void BaseFree(void *, char *, int) {}
 
 VA(0x004c4310, 0x134)
-// void PrintMemoryLeaks(void);
+void PrintMemoryLeaks(void) {}
 
 VA(0x004c4450, 0x91)
-// void ShowMemoryStatus(void);
+void ShowMemoryStatus(void) {}
 
 VA(0x004c44f0, 0x48)
 unsigned long int MAKEFILEID(char *text)
@@ -120,10 +113,10 @@ int FindIndex(struct indexArray *entries, int low, int high, int key)
 }
 
 VA(0x004c45e0, 0xea)
-// void FadeIn(int);
+void FadeIn(int) {}
 
 VA(0x004c46d0, 0xe6)
-// void FadeOut(int);
+void FadeOut(int) {}
 
 VA(0x004c47c0, 0x28)
 int Random(int low, int high)
@@ -192,67 +185,67 @@ char * FindLastToken(char *text, char token)
 }
 
 VA(0x004c4930, 0x6c)
-// void SetInstallDefaults(void);
+void SetInstallDefaults(void) {}
 
 VA(0x004c49a0, 0x1b5)
-// void SetGameDefaults(void);
+void SetGameDefaults(void) {}
 
 VA(0x004c4b60, 0x13f)
-// void ReadPrefsFromFile(void);
+void ReadPrefsFromFile(void) {}
 
 VA(0x004c4ca0, 0x7ab)
-// void ReadPrefsFromRegistry(void);
+void ReadPrefsFromRegistry(void) {}
 
 VA(0x004c5450, 0xa1)
-// void ReadPrefs(void);
+void ReadPrefs(void) {}
 
 VA(0x004c5500, 0x6a)
-// void WritePrefsToFile(void);
+void WritePrefsToFile(void) {}
 
 VA(0x004c5570, 0x491)
-// void WritePrefsToRegistry(void);
+void WritePrefsToRegistry(void) {}
 
 VA(0x004c5a10, 0xa)
-// void WritePrefs(void);
+void WritePrefs(void) {}
 
 VA(0x004c5a20, 0x3c)
-// int IsCDDrive(int);
+int IsCDDrive(int) { return 0; }
 
 VA(0x004c5a60, 0x3ed)
-// int SetupCDDrive(void);
+int SetupCDDrive(void) { return 0; }
 
 VA(0x004c5e50, 0x18)
-// void BitmapToScreen(class bitmap *);
+void BitmapToScreen(class bitmap *) {}
 
 VA(0x004c5e70, 0x3d)
-// void SetPalette(signed char *, int);
+void SetPalette(signed char *, int) {}
 
 VA(0x004c5eb0, 0x25)
-// void BlitBitmapToScreenNoMouseCheck(class bitmap *, int, int, int, int, int, int);
+void BlitBitmapToScreenNoMouseCheck(class bitmap *, int, int, int, int, int, int) {}
 
 VA(0x004c5ee0, 0x18b)
-// void BlitBitmapToScreen(class bitmap *, int, int, int, int, int, int);
+void BlitBitmapToScreen(class bitmap *, int, int, int, int, int, int) {}
 
 VA(0x004c6070, 0xa6)
-// void LogTruncate(void);
+void LogTruncate(void) {}
 
 VA(0x004c6120, 0x9e)
-// void LogStr(char *);
+void LogStr(char *) {}
 
 VA(0x004c61c0, 0x224)
-// void LogInt(char *, int, int, int, int, int, int, int);
+void LogInt(char *, int, int, int, int, int, int, int) {}
 
 VA(0x004c63f0, 0x6c)
-// void AiPrint(char *);
+void AiPrint(char *) {}
 
 VA(0x004c6460, 0x7a)
-// void AbsAiPrint(char *);
+void AbsAiPrint(char *) {}
 
 VA(0x004c64e0, 0xf8)
-// void FadeTo(unsigned char *, unsigned char *, int);
+void FadeTo(unsigned char *, unsigned char *, int) {}
 
 VA(0x004c65e0, 0xb8)
-// void FadeToColorTable(unsigned char *, int);
+void FadeToColorTable(unsigned char *, int) {}
 
 VA(0x004c66a0, 0x29)
 int IsCycleColor(int color)
@@ -264,7 +257,7 @@ int IsCycleColor(int color)
 }
 
 VA(0x004c66d0, 0x1ee)
-// void CreatePCXFile(char *, unsigned char *, int, int, unsigned char *);
+void CreatePCXFile(char *, unsigned char *, int, int, unsigned char *) {}
 
 VA(0x004c68c0, 0x52)
 long int FileSize(char *filename)
@@ -358,7 +351,7 @@ int MemSize(int)
 }
 
 VA(0x004c6ac0, 0x386)
-// void GetDataEntry(char *, char *, int, char *, int, int);
+void GetDataEntry(char *, char *, int, char *, int, int) {}
 
 VA(0x004c6e50, 0x173)
 int DataEntryWindowHandler(struct tag_message &message)

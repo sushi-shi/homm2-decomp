@@ -4,44 +4,45 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <_all.h>
 VA(0x004543c0, 0x84)
-// void swapManager::constructor(void);
+swapManager::swapManager(void) {}
 
 VA(0x00454444, 0x3e)
-// void swapManager::constructor(class hero *, class hero *);
+swapManager::swapManager(class hero *, class hero *) {}
 
 VA(0x00454482, 0x50)
-// void swapManager::Reset(void);
+void swapManager::Reset(void) {}
 
 VA(0x004544d2, 0x30)
-// int swapManager::DrawSwapWin(void);
+int swapManager::DrawSwapWin(void) { return 0; }
 
 VA(0x00454502, 0x3bc)
-// int swapManager::Open(int);   // virtual [override (implements baseManager pure virtual)]
+int swapManager::Open(int) { return 0; }
 
 VA(0x004548be, 0x12d)
-// void swapManager::Close(void);   // virtual [override (implements baseManager pure virtual)]
+void swapManager::Close(void) {}
 
 VA(0x004549eb, 0x1f8)
-// void swapManager::DrawSelector(void);
+void swapManager::DrawSelector(void) {}
 
 VA(0x00454be3, 0xaf0)
-// int swapManager::Main(struct tag_message &);   // virtual [override (implements baseManager pure virtual)]
+int swapManager::Main(struct tag_message &) { return 0; }
 
 VA(0x004556d3, 0xa3)
-// void swapManager::ViewMon(void);
+void swapManager::ViewMon(void) {}
 
 VA(0x00455776, 0x255)
-// void swapManager::SwapArtifacts(void);
+void swapManager::SwapArtifacts(void) {}
 
 VA(0x004559cb, 0x177)
-// void swapManager::SwapMons(void);
+void swapManager::SwapMons(void) {}
 
 VA(0x00455b42, 0x47b)
-// void swapManager::Update(void);
+void swapManager::Update(void) {}
 
 VA(0x00455fbd, 0x388)
-// void swapManager::SplitMons(void);
+void swapManager::SplitMons(void) {}
 
 // ---- data / globals / vtables ----
 DATA(0x004eb650)  // const swapManager::vftable

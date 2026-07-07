@@ -45,6 +45,8 @@ public:
     int TransmitSaveGame(int, int, int);
     int ReceiveSaveGame(int, int, int, int);
     void ClaimMine(int, int);
+    void ShowMoraleInfo(class hero *, int);
+    void ShowLuckInfo(class hero *, int);
 };
 
 class mouseManager {
@@ -358,10 +360,10 @@ void ForcePollSound(void)
 }
 
 VA(0x004965be, 0x39e)
-// void InitMainClasses(void);
+void InitMainClasses(void) {}
 
 VA(0x0049695c, 0x344)
-// void DeleteMainClasses(void);
+void DeleteMainClasses(void) {}
 
 VA(0x00496ca0, 0x39)
 void EarlyShutdown(char *caption, char *text)
@@ -421,7 +423,7 @@ int EarlySetup(void)
 }
 
 VA(0x00496e98, 0x16c0)
-// int oldmain(void);
+int oldmain(void) { return 0; }
 
 VA(0x00498558, 0x44)
 char toupper(char c)
@@ -433,10 +435,10 @@ char toupper(char c)
 }
 
 VA(0x0049859c, 0x791)
-// int InterpretCommandLine(void);
+int InterpretCommandLine(void) { return 0; }
 
 VA(0x00498d2d, 0x698)
-// int InitMenuHandler(struct tag_message &);
+int InitMenuHandler(struct tag_message &) { return 0; }
 
 VA(0x004993c5, 0x1b)
 int NullHandler(struct tag_message &msg)
@@ -774,7 +776,7 @@ int WaitHandler(tag_message &msg)
 }
 
 VA(0x0049a09f, 0x472)
-// int EventWindowHandler(struct tag_message &);
+int EventWindowHandler(struct tag_message &) { return 0; }
 
 VA(0x0049a511, 0x1e)
 int TrueFalseDialogHandler(struct tag_message &msg)
@@ -811,7 +813,7 @@ void PlayerDead(int player)
 }
 
 VA(0x0049a6c1, 0x19bb)
-// void CheckEndGame(int, int);
+void CheckEndGame(int, int) {}
 
 VA(0x0049c07c, 0x95)
 void QuickViewWait(void)
@@ -873,10 +875,10 @@ void InitVars(void)
 }
 
 VA(0x0049c312, 0x61b)
-// void game::ShowMoraleInfo(class hero *, int);
+void game::ShowMoraleInfo(class hero *, int) {}
 
 VA(0x0049c92d, 0x371)
-// void game::ShowLuckInfo(class hero *, int);
+void game::ShowLuckInfo(class hero *, int) {}
 
 VA(0x0049cc9e, 0xd7)
 void ClearMapExtra(void)
@@ -912,7 +914,7 @@ int GetMonType(int score, int campaign)
 }
 
 VA(0x0049ce14, 0x4ac)
-// int AddScoreToHighScore(int, int, int, int, char *);
+int AddScoreToHighScore(int, int, int, int, char *) { return 0; }
 
 VA(0x0049d2c0, 0x66)
 void BVResMsg(char *s, int res, int qty)
@@ -967,7 +969,7 @@ int WaitForOtherPlayer(void)
 }
 
 VA(0x0049d4a6, 0xb85)
-// void PopNetBox(char *, int);
+void PopNetBox(char *, int) {}
 
 VA(0x0049e02b, 0xc7)
 void AddNetBoxLine(char *str, char color)
@@ -1112,7 +1114,7 @@ void SmackFade(unsigned char *src, unsigned char *dst)
 }
 
 VA(0x0049e5fd, 0x303)
-// void ShowCongrats(int);
+void ShowCongrats(int) {}
 
 VA(0x0049e900, 0x99)
 void CongratsWait(void)
@@ -1208,10 +1210,10 @@ int GameUnsaved(void)
 }
 
 VA(0x0049ec05, 0xa18)
-// int HandleAppSpecificMenuCommands(int);
+int HandleAppSpecificMenuCommands(int) { return 0; }
 
 VA(0x0049f61d, 0x310)
-// void UpdateSystemOptionsMenu(void);
+void UpdateSystemOptionsMenu(void) {}
 
 VA(0x0049f92d, 0x99)
 void CleanUpMenus(void)
@@ -1251,7 +1253,7 @@ int InMapArea(int x, int y)
 }
 
 VA(0x0049fa70, 0x6bc)
-// void SetupDynamicWindow(int, int, int, int, int, int, int, int *, int *, int *, int *, int *, int *, class heroWindow * *, int);
+void SetupDynamicWindow(int, int, int, int, int, int, int, int *, int *, int *, int *, int *, int *, class heroWindow * *, int) {}
 
 VA(0x004a012c, 0x108)
 void TestDynamicWindow(int p1, int p2)
@@ -1331,10 +1333,10 @@ void DropDownToOnePlayer(void)
 }
 
 VA(0x004a03d1, 0x412)
-// void ReceiveHostReportsPlayerExit(int, struct SPlayerExit, int);
+void ReceiveHostReportsPlayerExit(int, struct SPlayerExit, int) {}
 
 VA(0x004a07e3, 0x361)
-// void ReceiveRemotePlayerExit(struct SPlayerExit);
+void ReceiveRemotePlayerExit(struct SPlayerExit) {}
 
 VA(0x004a0b44, 0x29)
 int CheckMem(void)
@@ -1393,7 +1395,7 @@ void CheckShingleUpdate(void)
 }
 
 VA(0x004a0d9f, 0x17c6)
-// void NormalDialog(char *, int, int, int, int, int, int, int, int, int);
+void NormalDialog(char *, int, int, int, int, int, int, int, int, int) {}
 
 VA(0x004a2565, 0x71)
 void UpdateNormalDialog(char *text)

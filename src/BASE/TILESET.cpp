@@ -4,17 +4,12 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <_all.h>
 VA(0x004dac60, 0x8f)
-// void tileset::constructor(unsigned long int);
-
-VA(0x004dacf0, 0x36)
-// void * tileset::scalar_dtor(unsigned int);   // virtual [introduces virtual]
-
-VA(0x004dacf0, 0x36)
-// void * tileset::scalar_dtor(unsigned int);   // virtual [introduces virtual]
+tileset::tileset(unsigned long int) {}
 
 VA(0x004dad30, 0x21)
-// void tileset::~destructor(void);
+tileset::~tileset() {}
 
 // ---- data / globals / vtables ----
 DATA(0x004ebab0)  // const tileset::vftable

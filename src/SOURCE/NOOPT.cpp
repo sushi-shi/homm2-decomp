@@ -4,12 +4,13 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <_all.h>
 VA(0x00435200, 0x35)
-// void DelayTil(int *);
+void DelayTil(int *) {}
 
 VA(0x00435235, 0x25)
-// void DelayMilli(long int);
+void DelayMilli(long int) {}
 
 VA(0x0043525a, 0x33)
-// void DelayTilMilli(long int);
+void DelayTilMilli(long int) {}
 

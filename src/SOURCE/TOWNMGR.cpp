@@ -4,104 +4,105 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <_all.h>
 VA(0x00413900, 0x16a)
-// void townObject::constructor(int, int, char *);
+townObject::townObject(int, int, char *) {}
 
 VA(0x00413a6a, 0x60)
-// void townObject::~destructor(void);
+townObject::~townObject() {}
 
 VA(0x00413aca, 0x437)
-// void townObject::Draw(int);
+void townObject::Draw(int) {}
 
 VA(0x00413f01, 0x68)
-// void townManager::constructor(void);
+townManager::townManager(void) {}
 
 VA(0x00413f69, 0x1a0)
-// void townManager::SetupExtraStuff(void);
+void townManager::SetupExtraStuff(void) {}
 
 VA(0x00414109, 0x1ef)
-// int townManager::Open(int);   // virtual [override (implements baseManager pure virtual)]
+int townManager::Open(int) { return 0; }
 
 VA(0x004142f8, 0x77)
-// void townManager::ChangeTown(void);
+void townManager::ChangeTown(void) {}
 
 VA(0x0041436f, 0x95a)
-// void townManager::SetupTown(void);
+void townManager::SetupTown(void) {}
 
 VA(0x00414cc9, 0x1cf)
-// void townManager::UnloadTown(void);
+void townManager::UnloadTown(void) {}
 
 VA(0x00414e98, 0xca)
-// void townManager::Close(void);   // virtual [override (implements baseManager pure virtual)]
+void townManager::Close(void) {}
 
 VA(0x00414f62, 0x3b9)
-// void townManager::SetArmyCommand(int);
+void townManager::SetArmyCommand(int) {}
 
 VA(0x0041531b, 0x5c5)
-// void townManager::SetCommandAndText(struct tag_message &);
+void townManager::SetCommandAndText(struct tag_message &) {}
 
 VA(0x004158e0, 0x7d)
-// void townManager::ShowText(char *);
+void townManager::ShowText(char *) {}
 
 VA(0x0041595d, 0x1830)
-// int townManager::Main(struct tag_message &);   // virtual [override (implements baseManager pure virtual)]
+int townManager::Main(struct tag_message &) { return 0; }
 
 VA(0x0041718d, 0x4e3)
-// void townManager::DoCommand(int);
+void townManager::DoCommand(int) {}
 
 VA(0x00417670, 0xad)
-// void townManager::RedrawTownScreen(void);
+void townManager::RedrawTownScreen(void) {}
 
 VA(0x0041771d, 0x374)
-// void townManager::SplitArmy(void);
+void townManager::SplitArmy(void) {}
 
 VA(0x00417a91, 0x21)
-// void townManager::ShiftQualChange(void);
+void townManager::ShiftQualChange(void) {}
 
 VA(0x00417ab2, 0xb0)
-// void townManager::ResetStrips(void);
+void townManager::ResetStrips(void) {}
 
 VA(0x00417b62, 0x7b)
-// void townManager::Toggle(int);
+void townManager::Toggle(int) {}
 
 VA(0x00417bdd, 0xc0)
-// void townManager::DrawTown(int, int);
+void townManager::DrawTown(int, int) {}
 
 VA(0x00417c9d, 0xf35)
-// int townManager::BuyBuild(int, int, int);
+int townManager::BuyBuild(int, int, int) { return 0; }
 
 VA(0x00418bd2, 0x3e9)
-// void townManager::BuildObj(int);
+void townManager::BuildObj(int) {}
 
 VA(0x00418fbb, 0x3d8)
-// void townManager::SetupMage(class heroWindow *);
+void townManager::SetupMage(class heroWindow *) {}
 
 VA(0x00419393, 0x190)
-// int MageGuildHandler(struct tag_message &);
+int MageGuildHandler(struct tag_message &) { return 0; }
 
 VA(0x00419523, 0x706)
-// int townManager::RecruitHero(int, int);
+int townManager::RecruitHero(int, int) { return 0; }
 
 VA(0x00419c29, 0x153)
-// int TavernHandler(struct tag_message &);
+int TavernHandler(struct tag_message &) { return 0; }
 
 VA(0x00419d7c, 0x110)
-// void townManager::DoTavern(void);
+void townManager::DoTavern(void) {}
 
 VA(0x00419e8c, 0x328)
-// int SplitArmyHandler(struct tag_message &);
+int SplitArmyHandler(struct tag_message &) { return 0; }
 
 VA(0x0041a1b4, 0x5cf)
-// void townManager::SetupWell(class heroWindow *);
+void townManager::SetupWell(class heroWindow *) {}
 
 VA(0x0041a783, 0xf0f)
-// void townManager::SetupThievesGuild(class heroWindow *, int);
+void townManager::SetupThievesGuild(class heroWindow *, int) {}
 
 VA(0x0041b692, 0x56a)
-// void GetCategoryStats(int, long int * const, signed char * const);
+void GetCategoryStats(int, long int * const, signed char * const) {}
 
 VA(0x0041bbfc, 0xd9)
-// void SortStats(long int * const, signed char * const);
+void SortStats(long int * const, signed char * const) {}
 
 // ---- data / globals / vtables ----
 DATA(0x004eb140)  // const townManager::vftable

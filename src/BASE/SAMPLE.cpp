@@ -4,29 +4,18 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <_all.h>
 VA(0x004dad60, 0x181)
-// void sample::constructor(char *, long int, long int, long int);
-
-VA(0x004daef0, 0x41)
-// void * sample::scalar_dtor(unsigned int);   // virtual [introduces virtual]
-
-VA(0x004daef0, 0x41)
-// void * sample::scalar_dtor(unsigned int);   // virtual [introduces virtual]
+sample::sample(char *, long int, long int, long int) {}
 
 VA(0x004daf40, 0x2c)
-// void sample::~destructor(void);
+sample::~sample() {}
 
 VA(0x004daf70, 0x72)
-// void MIDIWrap::constructor(char *);
-
-VA(0x004daff0, 0x3d)
-// void * MIDIWrap::scalar_dtor(unsigned int);   // virtual [introduces virtual]
-
-VA(0x004daff0, 0x3d)
-// void * MIDIWrap::scalar_dtor(unsigned int);   // virtual [introduces virtual]
+MIDIWrap::MIDIWrap(char *) {}
 
 VA(0x004db030, 0x28)
-// void MIDIWrap::~destructor(void);
+MIDIWrap::~MIDIWrap() {}
 
 // ---- data / globals / vtables ----
 DATA(0x004ebab4)  // const sample::vftable
