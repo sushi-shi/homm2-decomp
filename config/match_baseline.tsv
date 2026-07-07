@@ -346,7 +346,7 @@ BASE/WINDOW	?RestoreBackground@heroWindow@@QAEXXZ	100.0000	1ad6adddfb67
 BASE/WINDOW	?SaveBackground@heroWindow@@QAEHXZ	100.0000	b4aefb12dfaa
 BASE/WINMGR	??0heroWindowManager@@QAE@XZ	100.0000	41337786b991
 BASE/WINMGR	?AddWindow@heroWindowManager@@QAEXPAVheroWindow@@HH@Z	75.0946	d38ba83b65aa
-BASE/WINMGR	?BroadcastMessage@heroWindowManager@@QAEHHHHH@Z	8.2353	450c19fd2af4
+BASE/WINMGR	?BroadcastMessage@heroWindowManager@@QAEHHHHH@Z	81.1765	89a4bfb5663a
 BASE/WINMGR	?Close@heroWindowManager@@UAEXXZ	3.5714	b88807443073
 BASE/WINMGR	?ConvertToHover@heroWindowManager@@QAEHAAUtag_message@@@Z	20.0000	965da9c36dfd
 BASE/WINMGR	?CycleColors@@YIXH@Z	0.3831	1f732f273509

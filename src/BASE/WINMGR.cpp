@@ -44,7 +44,15 @@ VA(0x004cac30, 0xf)
 int heroWindowManager::ConvertToHover(struct tag_message &) { return 0; }
 
 VA(0x004cac40, 0x35)
-int heroWindowManager::BroadcastMessage(int, int, int, int) { return 0; }
+int heroWindowManager::BroadcastMessage(int type, int p2, int p3, int p4)
+{
+    tag_message msg;
+    msg.type = type;
+    msg.field4 = p2;
+    msg.field8 = p3;
+    msg.text = reinterpret_cast<char *>(p4);
+    return Main(msg);
+}
 
 VA(0x004cac80, 0xbc)
 void heroWindowManager::AddWindow(class heroWindow *w, int param_2, int param_3)
