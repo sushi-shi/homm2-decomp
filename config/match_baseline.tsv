@@ -361,7 +361,7 @@ BASE/WINMGR	?RemoveWindow@heroWindowManager@@QAEXPAVheroWindow@@@Z	2.0408	a49f9a
 BASE/WINMGR	?SaveFizzleSource@heroWindowManager@@QAEXHHHH@Z	1.4085	263a2d0d013d
 BASE/WINMGR	?ScreenShot@heroWindowManager@@QAEXXZ	3.8462	19a11dd50ceb
 BASE/WINMGR	?UpdateScreen@heroWindowManager@@QAEXXZ	100.0000	4077d1619d5f
-BASE/WINMGR	?UpdateScreenRegion@heroWindowManager@@QAEXHHHH@Z	4.3478	0e297ef57143
+BASE/WINMGR	?UpdateScreenRegion@heroWindowManager@@QAEXHHHH@Z	100.0000	540656621367
 BASE/WINMGR	empty_stub	0.0000	
 BASE/bmap2	?BlitBitmap@@YIXPAVbitmap@@HHHH0HH@Z	2.0000	9d7ab0fe5bbc
 BASE/bmap2	?DimBitmapArea@@YIXPAVbitmap@@HHHHH@Z	2.0000	07a572122f32

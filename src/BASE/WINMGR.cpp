@@ -8,6 +8,7 @@
 #include <BASE/WINMGR.h>
 #include <BASE/bitmap.h>
 #include <BASE/Misc.h>
+#include <BASE/mouseManager.h>
 #include <SOURCE/KB.h>
 VA(0x004ca6d0, 0x3a3)
 void CycleColors(int) {}
@@ -48,7 +49,14 @@ void heroWindowManager::UpdateScreen(void)
 }
 
 VA(0x004cafc0, 0x4f)
-void heroWindowManager::UpdateScreenRegion(int, int, int, int) {}
+void heroWindowManager::UpdateScreenRegion(int x, int y, int w, int h)
+{
+    gpMouseManager->field_0x82 = 0;
+    PollSound();
+    BlitBitmapToScreen(field_0x46, x, y, w, h, x, y);
+    gpMouseManager->field_0x82 = 1;
+    PollSound();
+}
 
 VA(0x004cb010, 0x18)
 void heroWindowManager::RedrawScreen(void) {}
