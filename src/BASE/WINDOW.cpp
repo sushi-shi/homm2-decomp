@@ -6,6 +6,7 @@
 #include <va.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
+#include <BASE/widget.h>
 #include <BASE/bitmap.h>
 #include <SOURCE/KB.h>
 VA(0x004ceb70, 0xaa)
@@ -34,7 +35,20 @@ VA(0x004cf280, 0x90)
 void heroWindow::RemoveAndDeleteWidget(int) {}
 
 VA(0x004cf310, 0xaa)
-void heroWindow::Close(void) {}
+void heroWindow::Close(void)
+{
+    widget *w, *next;
+    if ((field_0x20 & 2) != 0 && (field_0x24 & 1) != 0)
+        RestoreBackground();
+    next = field_0x3c;
+    while ((w = next) != 0) {
+        next = w->field_0x8;
+        RemoveWidget(w);
+        if ((field_0x20 & 0x4000) != 0 && w != 0)
+            delete w;
+    }
+    field_0x24 = 0;
+}
 
 VA(0x004cf3c0, 0x13c)
 void heroWindow::AddWidget(class widget *, int) {}
