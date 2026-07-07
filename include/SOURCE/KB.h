@@ -138,6 +138,7 @@ DATA(0x00500150) extern int gbGameInitialized;
 DATA(0x0052a1d0) extern signed char gbGamePosToNetPos[];
 DATA(0x004fbd3c) extern int gbHeroMoving;
 DATA(0x00528598) extern int gbHumanPlayer[];
+DATA(0x004fbb28) extern int gbLoadingMonoIcon;
 DATA(0x00516810) extern int gbInMemError;
 DATA(0x00528c98) extern int gbInNewGameSetup;
 DATA(0x00500174) extern int gbInPollSound;
