@@ -53,7 +53,8 @@ def main(path):
     lines = open(path).read().split('\n')
     out = []; needed = set(); removed = 0
     for ln in lines:
-        if re.match(r'^\s*extern\b', ln) and '{' not in ln and ln.rstrip().endswith(';'):
+        code = ln.split('//')[0].rstrip()             # ignore trailing // comment
+        if re.match(r'^\s*extern\b', ln) and '{' not in code and code.endswith(';'):
             needed.add(route(ln)); removed += 1
             continue
         out.append(ln)

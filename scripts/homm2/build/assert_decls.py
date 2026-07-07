@@ -20,7 +20,8 @@ def violations(path):
             out.append((i, s.strip()))
         elif EXTERN_DECL_RE.match(s):
             # allow definitions ('{' present) and linkage-block openers ('extern "C" {')
-            if '{' not in s and s.rstrip().endswith(';'):
+            code = s.split('//')[0].rstrip()          # ignore trailing // comment
+            if '{' not in code and code.endswith(';'):
                 out.append((i, s.strip()))
     return out
 
