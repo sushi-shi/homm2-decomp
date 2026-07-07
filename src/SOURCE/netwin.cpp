@@ -82,6 +82,7 @@ extern "C" unsigned short __fastcall nb_init(unsigned short param1, unsigned sho
 
 // Static helper (retail RVA 0x004a8268, no CodeView symbol) — tears down one session: cancel any
 // pending receive NCB, then hang up the session and clear its active bit. Shared by nb_term/nb_sess.
+VA(0x004a8268, 0xc2)
 static void __fastcall nb_close_session(int session)
 {
     NCB ncb;
@@ -169,6 +170,7 @@ extern "C" unsigned short __fastcall nb_rcv(short session, void *buf)
 // Static helper (retail RVA 0x004a79c6, no CodeView symbol) — re-registers the netbios group name
 // for the current session. Defined here (ahead of its retail position) so nb_snd can call it
 // without a forward declaration. Only issued when the control NCB's last command completed.
+VA(0x004a79c6, 0xbb)
 static void nb_add_name(void)
 {
     if (gNbCtlNcb.ncb_cmd_cplt != 0xff) {

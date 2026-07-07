@@ -1425,8 +1425,8 @@ SOURCE/kbwin	?UpdateDfltMenu@@YIXPAX@Z	23.6000	69202ee28942
 SOURCE/kbwin	_WinMain@16	12.8152	f8e0bc7dbda6
 SOURCE/netwin	?is_netbios_avail@@YIHXZ	100.0000	1aee44949a90
 SOURCE/netwin	?nb_thr_ctl@@YIXXZ	0.4851	b1cab9bdb34b
-SOURCE/netwin	@nb_init@8	93.4522	0c772cb928e7
-SOURCE/netwin	@nb_rcv@8	96.2727	ea17ebc08e5f
+SOURCE/netwin	@nb_init@8	93.4522	fd0fb67fc552
+SOURCE/netwin	@nb_rcv@8	96.2727	ada62b9a7694
 SOURCE/netwin	@nb_snd@12	94.3939	a2285ab2a91b
 SOURCE/netwin	@nb_stat@4	100.0000	b7e40499c98f
 SOURCE/netwin	@nb_term@0	93.9470	de064d2df1ea
