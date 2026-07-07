@@ -5,6 +5,7 @@
 
 #include <va.h>
 #include <SOURCE/netwin.h>
+#include <_globals_model.h>
 VA(0x004a6be0, 0xa8)
 int is_netbios_avail(void) { return 0; }
 
@@ -24,7 +25,7 @@ VA(0x004a726a, 0x4cd)
 extern "C" int __cdecl nb_sess(void) { return 0; }
 
 VA(0x004a7737, 0x21)
-extern "C" int __fastcall nb_stat(int) { return 0; }
+extern "C" char __fastcall nb_stat(short session) { return gNetStatus[session]; }
 
 VA(0x004a7758, 0xdd2)
 void nb_thr_ctl(void) {}

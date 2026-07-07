@@ -24,4 +24,7 @@ DATA(0x00528d38) extern int const_00128d38;            // 13-byte BSS flag buffe
 DATA(0x0051fec0) extern unsigned int gTileMode;
 DATA(0x0051fec4) extern int gTileRowCtr;
 
+// netwin.cpp netbios per-session status byte array (no CodeView symbol), indexed by session id.
+DATA(0x005173b4) extern char gNetStatus[];
+
 #endif // HOMM2_GLOBALS_MODEL_H

@@ -1428,7 +1428,7 @@ SOURCE/netwin	?nb_thr_ctl@@YIXXZ	0.4851	b1cab9bdb34b
 SOURCE/netwin	@nb_init@8	9.4076	390a02c88904
 SOURCE/netwin	@nb_rcv@8	26.9455	4b1ad78a639e
 SOURCE/netwin	@nb_snd@12	22.5303	a98f0a02961e
-SOURCE/netwin	@nb_stat@4	89.0000	3c162adf06a5
+SOURCE/netwin	@nb_stat@4	100.0000	b7e40499c98f
 SOURCE/netwin	@nb_term@0	8.9773	de99a4dd7713
 SOURCE/netwin	_nb_sess	2.4972	b75dbb27ef22
 SOURCE/tradpost	?ComputeTradeRatios@@YIXHHPAH00@Z	19.4028	fe1ff3678624
