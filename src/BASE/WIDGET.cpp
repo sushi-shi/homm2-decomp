@@ -5,6 +5,11 @@
 
 #include <va.h>
 #include <BASE/widget.h>
+#include <BASE/heroWindow.h>
+#include <BASE/heroWindowManager.h>
+#include <BASE/bitmap.h>
+#include <BASE/bmap2.h>
+#include <SOURCE/KB.h>
 VA(0x004dde00, 0x5a)
 widget::widget(short int x, short int y, short int w, short int h, short int p5, short int kind)
 {
@@ -55,7 +60,15 @@ VA(0x004ddee0, 0x2f4)
 int widget::Main(struct tag_message &) { return 0; }
 
 VA(0x004de1e0, 0x47)
-void widget::Dim(void) {}
+void widget::Dim(void)
+{
+    if (field_0x14 != 8 && field_0x14 != 0x200) {
+        DimBitmapArea(gpWindowManager->field_0x46,
+                      static_cast<short>(field_0x4->field_0x28 + field_0x18),
+                      static_cast<short>(field_0x1a + field_0x4->field_0x2c),
+                      field_0x1c, field_0x1e, 0);
+    }
+}
 
 
 // ===== vtable widget (root)  (3 slots) =====
