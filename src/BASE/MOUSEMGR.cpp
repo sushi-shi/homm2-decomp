@@ -223,7 +223,54 @@ void mouseManager::CheckUpdateMousePos(void)
 }
 
 VA(0x004ca230, 0x191)
-void mouseManager::SetColorMice(int) {}
+void mouseManager::SetColorMice(int param_1)
+{
+    if (param_1 != gbColorMice) {
+        int savedWM56 = gpWindowManager->field_0x56;
+        gpWindowManager->field_0x56 = 0;
+        int savedInNew = bInNewMouseUpdate;
+        gbPutzingWithMouseCtr++;
+        bInNewMouseUpdate = 0;
+        if (gbColorMice == 0) {
+            ShowCursor(0);
+        } else {
+            int old = field_0x86;
+            field_0x86 = old + 1;
+            if (old + 1 == 1)
+                NewUpdate(1);
+        }
+        int savedX = field_0x3a;
+        int savedY = field_0x42;
+        int saved7e = field_0x7e;
+        field_0x82 = 0;
+        gbColorMice = param_1;
+        field_0x3a = -99;
+        field_0x42 = -1;
+        field_0x7e = 0;
+        SetPointer(gDefaultCursorName, savedX, savedY);
+        field_0x82 = 1;
+        field_0x7e = saved7e;
+        if (gbColorMice == 0) {
+            ShowCursor(1);
+        } else if (field_0x86 > 0 && --field_0x86 == 0) {
+            gbPutzingWithMouseCtr++;
+            if (gbColorMice != 0) {
+                GetCursorPos(&gMouseCheckPt);
+                ScreenToClient(hwndApp, &gMouseCheckPt);
+                int x = (gMouseCheckPt.x * 640) / iMainWinScreenWidth;
+                field_0x56 = x;
+                int y = (gMouseCheckPt.y * 480) / iMainWinScreenHeight;
+                field_0x5a = y;
+                CheckChangeCursor(x, y, 0);
+            }
+            NewUpdate(1);
+            gbPutzingWithMouseCtr--;
+        }
+        gbPutzingWithMouseCtr--;
+        bInNewMouseUpdate = savedInNew;
+        gpWindowManager->field_0x56 = savedWM56;
+    }
+}
 
 
 // ===== vtable mouseManager : public baseManager  (3 slots) =====
