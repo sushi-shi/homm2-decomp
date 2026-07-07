@@ -66,14 +66,27 @@
         fi
       '';
 
-      # Analysis + diffing tools (no Ghidra, no JDK - we have CodeView symbols).
+      # Analysis + diffing tools. Ghidra (headless, via PyGhidra) backs `homm2 sema`
+      # xref/decomp: it supplies the WHOLE-.text function-boundary map (incl. the
+      # library/runtime funcs CodeView omits) and the decompiler. Our CodeView symbols
+      # stay authoritative for names; Ghidra never discovers - it's fed the EXE (+ our
+      # known names). Ghidra 12.0.4 + pyghidra + jdk21 pin-match gruntz (same nixpkgs
+      # rev) so they're store cache hits, not a rebuild.
       commonTools = [ homm2-cli rust objdiff objdiff-cli vostok-delinker ] ++ (with pkgs; [
-        python3
+        (python3.withPackages (ps: [ ps.pyghidra ]))  # pyghidra + jpype1: headless Ghidra scripting
+        ghidra jdk21                      # Ghidra 12.0.4 headless + JRE (homm2 sema xref/decomp)
         ninja
         llvm                              # llvm-pdbutil (synth_pdb yaml2pdb)
         llvmPackages.clang-unwrapped      # clangd + clang-format + clang driver (UNWRAPPED: no host gcc/glibc include shadowing)
         ripgrep file xxd jq binutils
       ]);
+
+      # PyGhidra env, shared by both shells: pyghidra.start() reads GHIDRA_INSTALL_DIR
+      # to boot the Ghidra JVM via jpype (JAVA_HOME picks the JRE).
+      ghidraEnvHook = ''
+        export GHIDRA_INSTALL_DIR="${pkgs.ghidra}/lib/ghidra"
+        export JAVA_HOME="${pkgs.jdk21}/lib/openjdk"
+      '';
     in {
       packages.${system} = { inherit vostok-delinker objdiff objdiff-cli; default = vostok-delinker; };
 
@@ -92,9 +105,10 @@
               git -C "$HOMM2_DIR" config --local core.hooksPath .githooks 2>/dev/null \
                 && echo "[homm2] hooks      : pre-commit auto-format on (.githooks)" >&2
             fi
+            ${ghidraEnvHook}
             echo "[homm2] target EXE : $HOMM2_EXE (CodeView NB09 - symbols are authoritative)" >&2
-            echo "[homm2] tools      : vostok-delinker, objdiff(-cli), llvm-pdbutil, clang(d)" >&2
-            echo "[homm2] cli        : 'homm2 <cmd>' (status/clangd/format/...)" >&2
+            echo "[homm2] tools      : vostok-delinker, objdiff(-cli), llvm-pdbutil, clang(d), ghidra" >&2
+            echo "[homm2] cli        : 'homm2 <cmd>' (status/clangd/sema/ghidra/format/...)" >&2
             echo "[homm2] build/MSVC : 'nix develop .#build' for 'homm2 build' (VC4.2 + wine)" >&2
             ${nvimShimHook}
           '';
@@ -123,8 +137,9 @@
             if [ ! -f "$MSVC_DIR/bin/CL.EXE" ] && [ ! -f "$MSVC_DIR/bin/cl.exe" ]; then
               echo "[homm2] MSVC 4.2   : NOT PROVISIONED - run scripts/make-toolchain.sh on the en_vc42ent discs" >&2
             fi
+            ${ghidraEnvHook}
             echo "[homm2] target EXE : $HOMM2_EXE" >&2
-            echo "[homm2] cli        : 'homm2 <cmd>' (build/configure/status/...)" >&2
+            echo "[homm2] cli        : 'homm2 <cmd>' (build/configure/status/sema/ghidra/...)" >&2
             ${nvimShimHook}
           '';
         };
