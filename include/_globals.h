@@ -52,9 +52,7 @@ DATA(0x004eb368) extern float  const_000eb368;         // 100.0f
 DATA(0x004eb4a8) extern double const_000eb4a8;         // 1.5
 DATA(0x004eb4c0) extern float  const_000eb4c0;         // 1250.0f
 DATA(0x004eb4c4) extern float  const_000eb4c4;         // 48.0f
-DATA(0x00527c14) extern float const_00127c14;          // gafAITurnCostResource[3]
-DATA(0x00527c1c) extern float const_00127c1c;          // gafAITurnCostResource[5]
-DATA(0x00527c20) extern float const_00127c20;          // gafAITurnCostResource[6]
+// (const_00127c14/c1c/c20 removed — they were gafAITurnCostResource[3|5|6]; indexed directly now.)
 DATA(0x00528d38) extern int const_00128d38;            // 13-byte BSS flag buffer (??_C@_0N@PMOM@...)
 DATA(0x004ffe80) extern char *cOutOfMemory;
 DATA(0x0051ff50) extern UInt32 crc32Table[256];

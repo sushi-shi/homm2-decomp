@@ -9,6 +9,12 @@
 // forward declarations (was <_all.h>):
 class sample;
 
+// Resource-type index for the game's per-resource arrays (gafAITurnCostResource, p[] amounts,
+// etc.), in the standard HoMM2 order. MERCURY/ORE/CRYSTAL are confirmed by the retail's
+// per-element .rdata float symbols referenced in philAI::RVConversion; the rest follow the
+// canonical order.
+enum { RES_WOOD, RES_MERCURY, RES_ORE, RES_SULFUR, RES_CRYSTAL, RES_GEMS, RES_GOLD };
+
 typedef unsigned int UInt32;   // crc32Table[]
 struct MemEntry;               // gpMemEntry — full def not yet reconstructed; used via pointer
 struct _SAMPLE;                // SAMPLE2::pMem — opaque

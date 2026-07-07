@@ -393,13 +393,13 @@ VA(0x0043e7a2, 0xa6)
 int philAI::RVConversion(int *const p) {
     // explicit left-grouping: a flat `+` chain is reassociated by /Od to a fixed
     // canonical order; nesting forces strict left-to-right (retail) evaluation.
-    return (int)((((((((float)p[2] * gRVWeightOre)
-               + (float)p[5] * const_00127c1c)
-               + (float)p[1] * gRVWeightMerc)
-               + (float)p[6] * const_00127c20)
-               + (float)p[0] * gafAITurnCostResource[0])
-               + (float)p[3] * const_00127c14)
-               + (float)p[4] * gRVWeightCrystal);
+    return (int)((((((((float)p[RES_ORE]     * gafAITurnCostResource[RES_ORE])
+               + (float)p[RES_GEMS]    * gafAITurnCostResource[RES_GEMS])
+               + (float)p[RES_MERCURY] * gafAITurnCostResource[RES_MERCURY])
+               + (float)p[RES_GOLD]    * gafAITurnCostResource[RES_GOLD])
+               + (float)p[RES_WOOD]    * gafAITurnCostResource[RES_WOOD])
+               + (float)p[RES_SULFUR]  * gafAITurnCostResource[RES_SULFUR])
+               + (float)p[RES_CRYSTAL] * gafAITurnCostResource[RES_CRYSTAL]);
 }
 
 VA(0x0043e848, 0xd0)
@@ -439,7 +439,7 @@ int philAI::ValueOfTown(town *t) {
         if (((townView *)t)->buildings & (1 << idx))
             sum += GetBuildingBaseResourceValue(((townView *)t)->race, idx, ((townView *)t)->buildState);
     }
-    sum = (int)(const_00127c20 * const_000eb4c0 * const_000eb4a8 + sum);
+    sum = (int)(gafAITurnCostResource[RES_GOLD] * const_000eb4c0 * const_000eb4a8 + sum);
     sum += 0x2ee;
     if (((gameTV *)gpGame)->f2cb == 1 &&
         ((townView *)t)->castleX == ((gameTV *)gpGame)->f2cc &&
@@ -587,7 +587,7 @@ int philAI::ChooseToFightForArtifact(int a, int b, int c) {
 VA(0x00442771, 0x53)
 int philAI::NetValueOfArtifact(int a1, int a2, int a3, int a4) {
     return (int)((float)gArtifactBaseRV[a1]
-               - ((float)a4 * gafAITurnCostResource[a3] + (float)a2 * const_00127c20));
+               - ((float)a4 * gafAITurnCostResource[a3] + (float)a2 * gafAITurnCostResource[RES_GOLD]));
 }
 
 VA(0x004427c4, 0x1d)

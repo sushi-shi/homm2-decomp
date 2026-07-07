@@ -9,6 +9,8 @@ import re, sys, glob, os
 
 # a real type definition or forward decl living in a .cpp
 TYPE_RE = re.compile(r'^\s*(class|struct)\s+\w+\s*(\{|:|;)')
+# an enum definition (named or anonymous) living in a .cpp — also belongs in a header
+ENUM_RE = re.compile(r'^\s*enum\b[^;{]*\{')
 # an extern DECLARATION (statement ending in ';' with no body) — not a linkage block/def
 EXTERN_DECL_RE = re.compile(r'^\s*extern\b')
 # a FILE-SCOPE function forward-declaration (no 'extern' keyword) — must live in a header too.
@@ -22,7 +24,7 @@ def violations(path):
     for i, line in enumerate(open(path), 1):
         s = line.rstrip('\n')
         code = s.split('//')[0].rstrip()              # ignore trailing // comment
-        if TYPE_RE.match(s):
+        if TYPE_RE.match(s) or ENUM_RE.match(code):
             out.append((i, s.strip()))
         elif EXTERN_DECL_RE.match(s):
             if '{' not in code and code.endswith(';'):
