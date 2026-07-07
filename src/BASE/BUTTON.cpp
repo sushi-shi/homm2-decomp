@@ -5,6 +5,8 @@
 
 #include <va.h>
 #include <BASE/button.h>
+#include <BASE/resourceManager.h>
+#include <SOURCE/KB.h>
 VA(0x004dd440, 0x34)
 button::button(void) : widget(0, 0, 0, 0, 0, 0)
 {
@@ -17,10 +19,29 @@ button::button(void) : widget(0, 0, 0, 0, 0, 0)
 }
 
 VA(0x004dd4c0, 0x6e)
-button::button(short int, short int, short int, short int, unsigned long int, short int, short int, short int, short int, short int, short int) {}
+button::button(short int x, short int y, short int w, short int h, unsigned long int iconId, short int p6, short int p7, short int p8, short int p9, short int p10, short int p11)
+    : widget(x, y, w, h, p10, p11)
+{
+    field_0x2c = iconId;
+    field_0x20 = gpResourceManager->GetIcon(iconId);
+    field_0x24 = p6;
+    field_0x26 = p7;
+    field_0x28 = p8;
+    field_0x2a = p9;
+}
 
 VA(0x004dd530, 0x7c)
-button::button(short int, short int, short int, short int, char *, short int, short int, short int, short int, short int, short int) {}
+button::button(short int x, short int y, short int w, short int h, char *name, short int p6, short int p7, short int p8, short int p9, short int p10, short int p11)
+    : widget(x, y, w, h, p10, p11)
+{
+    unsigned long id = gpResourceManager->MakeId(name, 1);
+    field_0x2c = id;
+    field_0x20 = gpResourceManager->GetIcon(id);
+    field_0x24 = p6;
+    field_0x26 = p7;
+    field_0x28 = p8;
+    field_0x2a = p9;
+}
 
 VA(0x004dd5b0, 0xeb)
 void button::Read(void) {}

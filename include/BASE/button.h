@@ -4,6 +4,7 @@
 // 10 methods, 2 own-virtual, 0 static data.
 #include <va.h>
 #include "widget.h"
+class icon;
 // forward declarations:
 struct tag_message;
 
@@ -13,7 +14,7 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base widget = 0x20 bytes at 0x00 via ': public widget'; own fields below)
-    int    field_0x20;  // +0x20
+    icon  *field_0x20;  // +0x20  button icon
     short  field_0x24;  // +0x24
     short  field_0x26;  // +0x26
     short  field_0x28;  // +0x28
