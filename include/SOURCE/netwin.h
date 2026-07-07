@@ -9,7 +9,7 @@ extern "C" int __fastcall nb_term(void);
 extern "C" int __fastcall nb_rcv(int, int);
 extern "C" int __fastcall nb_snd(int, int, int);
 extern "C" int __cdecl nb_sess(void);
-extern "C" int __fastcall nb_stat(int);
+extern "C" char __fastcall nb_stat(short);
 void nb_thr_ctl(void);
 
 #endif // HOMM2_NETWIN_H
