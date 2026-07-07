@@ -357,7 +357,7 @@ BASE/WINMGR	?Main@heroWindowManager@@UAEHAAUtag_message@@@Z	10.0000	697639b3fd05
 BASE/WINMGR	?Open@heroWindowManager@@UAEHH@Z	3.0303	f851275ed02d
 BASE/WINMGR	?RedrawScreen@heroWindowManager@@QAEXXZ	100.0000	d123d235bd7e
 BASE/WINMGR	?ReleaseFizzleSource@heroWindowManager@@QAEXXZ	100.0000	ccbdef6cd22c
-BASE/WINMGR	?RemoveWindow@heroWindowManager@@QAEXPAVheroWindow@@@Z	2.0408	a49f9aaf9f5e
+BASE/WINMGR	?RemoveWindow@heroWindowManager@@QAEXPAVheroWindow@@@Z	89.6939	b6f4108fa5d3
 BASE/WINMGR	?SaveFizzleSource@heroWindowManager@@QAEXHHHH@Z	1.4085	263a2d0d013d
 BASE/WINMGR	?ScreenShot@heroWindowManager@@QAEXXZ	3.8462	19a11dd50ceb
 BASE/WINMGR	?UpdateScreen@heroWindowManager@@QAEXXZ	100.0000	4077d1619d5f

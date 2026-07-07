@@ -50,7 +50,37 @@ VA(0x004cac80, 0xbc)
 void heroWindowManager::AddWindow(class heroWindow *, int, int) {}
 
 VA(0x004cad40, 0x87)
-void heroWindowManager::RemoveWindow(class heroWindow *) {}
+void heroWindowManager::RemoveWindow(class heroWindow *w)
+{
+    if (w != 0) {
+        w->Close();
+        if (field_0x36 == w) {
+            heroWindow *next = w->field_0x4;
+            field_0x36 = next;
+            if (next == 0)
+                field_0x3a = 0;
+            else
+                next->field_0x8 = 0;
+        } else {
+            heroWindow *prev = w->field_0x8;
+            if (field_0x3a == w) {
+                field_0x3a = prev;
+                prev->field_0x4 = 0;
+            } else {
+                prev->field_0x4 = w->field_0x4;
+            }
+            if (w->field_0x4 != 0)
+                w->field_0x4->field_0x8 = w->field_0x8;
+        }
+        if (field_0x42 == w)
+            field_0x42 = 0;
+        if (field_0x42 == 0) {
+            field_0x3e = field_0x3a;
+            return;
+        }
+        field_0x3e = field_0x42;
+    }
+}
 
 VA(0x004cadd0, 0x1cf)
 int heroWindowManager::DoDialog(class heroWindow *, int (*)(struct tag_message &), int) { return 0; }
