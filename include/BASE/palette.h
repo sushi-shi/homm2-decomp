@@ -11,7 +11,7 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (vptr auto-emitted at 0x00; own data starts at 0x04)
-    int    field_0x10;  // +0x10
+    signed char *field_0x10;  // +0x10  palette data (256*3 RGB)
     // --- constructors ---
     palette(void);
     palette(unsigned long int);

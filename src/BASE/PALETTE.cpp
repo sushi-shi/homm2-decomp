@@ -5,17 +5,28 @@
 
 #include <va.h>
 #include <BASE/palette.h>
+#include <BASE/resourceManager.h>
+#include <BASE/Misc.h>
+#include <SOURCE/KB.h>
 VA(0x004d2580, 0x2e)
-palette::palette(void) {}
+palette::palette(void) : resource(2, 0, 1, 0)
+{
+    field_0x10 = static_cast<signed char *>(BaseAlloc(0x300, __FILE__, __LINE__));
+}
 
 VA(0x004d2600, 0x55)
-palette::palette(unsigned long int) {}
+palette::palette(unsigned long int id) : resource(2, id, 1, 0)
+{
+    field_0x10 = static_cast<signed char *>(BaseAlloc(0x300, __FILE__, __LINE__));
+    gpResourceManager->PointToFile(id);
+    gpResourceManager->ReadBlock(field_0x10, 0x300);
+}
 
 VA(0x004d2660, 0x2c)
 palette::~palette() {}
 
 VA(0x004d2690, 0x4)
-signed char * palette::Data(void) { return 0; }
+signed char * palette::Data(void) { return field_0x10; }
 
 
 // ===== vtable palette (root)  (1 slots) =====
