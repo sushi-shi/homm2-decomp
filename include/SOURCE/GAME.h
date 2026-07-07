@@ -2,7 +2,10 @@
 #define HOMM2_GAME_H
 // Declarations of the free functions DEFINED in GAME.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
-#include <_all.h>
+// forward declarations (was <_all.h>):
+struct SCreatureInfo;
+struct configStruct;
+struct tag_message;
 
 // GAME-private types (configStruct / SCreatureInfo are shared, in _types.h).
 struct EventExtra;

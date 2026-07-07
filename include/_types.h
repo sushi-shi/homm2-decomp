@@ -6,7 +6,8 @@
 // typedefs). Move each type below to its owning module header as ownership becomes clear.
 // Included by _globals.h.
 #include <Ints.h>
-#include <_all.h>
+// forward declarations (was <_all.h>):
+class sample;
 
 typedef unsigned int UInt32;   // crc32Table[]
 struct MemEntry;               // gpMemEntry — full def not yet reconstructed; used via pointer

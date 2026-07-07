@@ -5,7 +5,6 @@
 
 #include <va.h>
 #include <SOURCE/tradpost.h>
-#include <_all.h>
 #include <_carcass_types.h>
 VA(0x004bf340, 0x165)
 void DoTradingPost(int, float) {}

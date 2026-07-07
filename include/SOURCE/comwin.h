@@ -2,7 +2,7 @@
 #define HOMM2_COMWIN_H
 // Declarations of the free functions DEFINED in comwin.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
-#include <_all.h>
+// forward declarations (was <_all.h>):
 
 void add_node(struct tag_Anchor *, struct tag_Node *);
 struct tag_Node * pop_node(struct tag_Anchor *);

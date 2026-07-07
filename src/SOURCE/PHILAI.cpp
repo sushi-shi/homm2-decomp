@@ -12,7 +12,6 @@
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/KB.h>
 #include <_globals.h>
-#include <_all.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>

@@ -3,7 +3,33 @@
 // Consolidated extern declarations of retail globals/.rdata constants referenced
 // across TUs. Single source of truth so declarations cannot drift between TUs.
 // Staging location — move a global to its owning module header once that is known.
-#include <_all.h>
+// forward declarations (was <_all.h>):
+struct SAMPLE2;
+struct SNetPlayerInfo;
+struct SSpellInfo;
+struct SWinSetup;
+class advManager;
+class armyGroup;
+class combatManager;
+struct configStruct;
+class executive;
+class font;
+class game;
+class hero;
+class heroWindow;
+class heroWindowManager;
+class icon;
+class inputManager;
+class mouseManager;
+class palette;
+class philAI;
+class playerData;
+class resourceManager;
+class searchArray;
+class soundManager;
+struct tag_monsterInfo;
+struct tag_tilePoint;
+class townManager;
 #include <_types.h>   // record/model structs referenced by the globals below
 
 DATA(0x005331d8) extern int bDataEntryTime;

@@ -5,7 +5,6 @@
 
 #include <va.h>
 #include <SOURCE/kbwin.h>
-#include <_all.h>
 VA(0x0041bce0, 0x146)
 extern "C" int __stdcall WinMain(void *, void *, char *, int) { return 0; }
 

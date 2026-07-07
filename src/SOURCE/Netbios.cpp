@@ -5,7 +5,6 @@
 
 #include <va.h>
 #include <SOURCE/Netbios.h>
-#include <_all.h>
 VA(0x004132f0, 0x155)
 signed char InitNetHost(void) { return 0; }
 

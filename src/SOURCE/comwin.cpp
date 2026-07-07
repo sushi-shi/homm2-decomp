@@ -5,7 +5,6 @@
 
 #include <va.h>
 #include <SOURCE/comwin.h>
-#include <_all.h>
 VA(0x0048a640, 0x74)
 void add_node(struct tag_Anchor *, struct tag_Node *) {}
 

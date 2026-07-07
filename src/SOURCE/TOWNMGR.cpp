@@ -4,8 +4,9 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <SOURCE/townObject.h>
+#include <SOURCE/townManager.h>
 #include <SOURCE/TOWNMGR.h>
-#include <_all.h>
 VA(0x00413900, 0x16a)
 townObject::townObject(int, int, char *) {}
 

@@ -4,8 +4,8 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <SOURCE/game.h>
 #include <SOURCE/Newgame.h>
-#include <_all.h>
 VA(0x004b6f40, 0x1d5)
 void game::GetMap(void) {}
 

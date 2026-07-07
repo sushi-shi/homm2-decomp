@@ -6,7 +6,6 @@
 // They DO have retail addresses; those marked DATA-PENDING are pinned from the reloc when
 // their user function is byte-matched (they alias object-local literals / computed bases).
 // Kept OUT of _globals.h (which is CodeView-backed) — assert_globals_data exempts these.
-#include <_all.h>
 #include <_types.h>
 
 DATA(0x004faeb8) extern SCreatureInfo gCreatureInfo[];   // monster-DB view (game::ExperienceValueOfStack reloc)

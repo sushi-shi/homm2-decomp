@@ -5,7 +5,6 @@
 
 #include <va.h>
 #include <BASE/Iconm2b.h>
-#include <_all.h>
 VA(0x004cfae0, 0x266)
 void MonoIconToBitmap(class icon *, class bitmap *, int, int, int, int, int, int, int, int, int) {}
 

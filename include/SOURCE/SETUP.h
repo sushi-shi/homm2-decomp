@@ -2,7 +2,8 @@
 #define HOMM2_SETUP_H
 // Declarations of the free functions DEFINED in SETUP.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
-#include <_all.h>
+// forward declarations (was <_all.h>):
+struct tag_message;
 
 int SetupCampaignGameHandler(struct tag_message &);
 int SetupComPortHandler(struct tag_message &);

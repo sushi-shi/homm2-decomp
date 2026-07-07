@@ -4,7 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
-#include <_all.h>
+#include <BASE/mouseManager.h>
 VA(0x004c9270, 0xd9)
 mouseManager::mouseManager(void) {}
 

@@ -2,7 +2,16 @@
 #define HOMM2_PHILAI_TU_H
 // AI view/record structs + free functions DEFINED in PHILAI.cpp — single home.
 // (tag_tilePoint / monsterRV are shared, in _types.h.)
-#include <_all.h>
+// forward declarations (was <_all.h>):
+class army;
+class armyGroup;
+class game;
+class hero;
+class mapCell;
+struct monsterRV;
+class playerData;
+struct tag_tilePoint;
+class town;
 #include <_types.h>
 
 struct BHC {

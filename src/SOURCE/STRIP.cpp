@@ -4,7 +4,8 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
-#include <_all.h>
+#include <SOURCE/bankBox.h>
+#include <SOURCE/strip.h>
 VA(0x00432230, 0x27e)
 strip::strip(int, int, int, unsigned long int, int, class armyGroup *, int, int, int) {}
 

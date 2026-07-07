@@ -2,7 +2,6 @@
 #define HOMM2_BASE_BZIP_H
 // bzip-0.21 (Julian Seward, 1996) types + records for BASE/Bzip, plus the free functions
 // DEFINED in Bzip.cpp — their single declaration home. Callers include this header.
-#include <_all.h>
 #include <stdio.h>   // FILE (BitStream::handle)
 
 typedef int            Int32;

@@ -4,7 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
-#include <_all.h>
+#include <BASE/icon.h>
 VA(0x004c7a20, 0x67)
 icon::icon(unsigned long int) {}
 

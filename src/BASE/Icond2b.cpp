@@ -5,7 +5,6 @@
 
 #include <va.h>
 #include <BASE/Icond2b.h>
-#include <_all.h>
 VA(0x004cfd50, 0x26e)
 void DimIconToBitmap(class icon *, class bitmap *, int, int, int, int, int, int, int, int, int) {}
 

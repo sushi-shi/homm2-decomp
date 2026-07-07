@@ -4,8 +4,8 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <SOURCE/advManager.h>
 #include <SOURCE/ADVMGR.h>
-#include <_all.h>
 VA(0x00456350, 0x30f)
 advManager::advManager(void) {}
 

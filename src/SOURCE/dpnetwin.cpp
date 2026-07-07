@@ -5,7 +5,6 @@
 
 #include <va.h>
 #include <SOURCE/dpnetwin.h>
-#include <_all.h>
 VA(0x0041eda0, 0x95)
 int __stdcall dpEnumServiceProvider(struct _GUID *, char *, unsigned long int, unsigned long int, void *) { return 0; }
 

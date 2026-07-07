@@ -5,7 +5,6 @@
 
 #include <va.h>
 #include <BASE/icon2bc.h>
-#include <_all.h>
 VA(0x004d32a0, 0x5af)
 void IconToBitmapColorTable(class icon *, class bitmap *, int, int, int, int, int, int, int, int, int, unsigned char *, int) {}
 

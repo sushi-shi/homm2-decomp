@@ -2,7 +2,6 @@
 #define HOMM2_KBWIN_H
 // Declarations of the free functions DEFINED in kbwin.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
-#include <_all.h>
 
 extern "C" int __stdcall WinMain(void *, void *, char *, int);
 int AppInit(void *, void *, int, char *);

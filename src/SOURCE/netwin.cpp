@@ -5,7 +5,6 @@
 
 #include <va.h>
 #include <SOURCE/netwin.h>
-#include <_all.h>
 VA(0x004a6be0, 0xa8)
 int is_netbios_avail(void) { return 0; }
 

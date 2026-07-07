@@ -4,7 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
-#include <_all.h>
+#include <BASE/resource.h>
 VA(0x004d9730, 0x19)
 resource::resource(void) {}
 

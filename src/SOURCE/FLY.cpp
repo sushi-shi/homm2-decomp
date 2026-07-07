@@ -4,7 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
-#include <_all.h>
+#include <SOURCE/army.h>
 VA(0x004a5900, 0x295)
 int army::CanFit(int, int, int *) { return 0; }
 

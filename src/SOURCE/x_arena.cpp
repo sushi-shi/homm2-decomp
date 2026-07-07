@@ -5,7 +5,6 @@
 
 #include <va.h>
 #include <SOURCE/x_arena.h>
-#include <_all.h>
 VA(0x004c0080, 0x35c)
 int DoArenaDialog(void) { return 0; }
 
