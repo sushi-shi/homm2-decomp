@@ -9,6 +9,8 @@
 #include <windows.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <BASE/bitmap.h>
+#include <BASE/icon.h>
+#include <BASE/Icon2b.h>
 #include <BASE/Misc.h>
 #include <BASE/resourceManager.h>
 #include <BASE/heroWindowManager.h>
@@ -118,7 +120,21 @@ void mouseManager::MouseCoords(int &x, int &y)
 }
 
 VA(0x004c9f20, 0xa2)
-void mouseManager::SaveAndDraw(void) {}
+void mouseManager::SaveAndDraw(void)
+{
+    int w = iMouseSize[field_0x46][0];
+    if (640 < field_0x66 + w)
+        w = 640 - field_0x66;
+    field_0x76 = w;
+    int h = iMouseSize[field_0x46][1];
+    if (480 < field_0x6a + h)
+        h = 480 - field_0x6a;
+    field_0x7a = h;
+    gpWindowManager->field_0x46->CopyToCareful(field_0x36, 0, 0, field_0x5e, field_0x62,
+                                               field_0x76, field_0x7a);
+    IconToBitmap(field_0x3e, gpWindowManager->field_0x46, field_0x66, field_0x6a, field_0x3a,
+                 1, 0, 0, 640, 480, 0);
+}
 
 VA(0x004c9fd0, 0x29)
 void mouseManager::RestoreUnderlying(void)
