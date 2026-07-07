@@ -88,9 +88,16 @@ def main():
     if not Path(os.environ.get("WINEPREFIX", "")).is_dir():   # same anti-stale anchor
         os.environ["WINEPREFIX"] = str(HOMM2_DIR / "build/wineprefix")
     ensure_wineserver()
-    # INCLUDE = MSVC headers + repo include/ (cl reads INCLUDE for <...> system headers).
+    # INCLUDE = MSVC headers + repo include/ + vendored middleware SDK headers (cl reads
+    # INCLUDE for <...> system headers). Each vendor/<sdk>/ dir (e.g. vendor/miles-3.6,
+    # vendor/smacker-3.0g, vendor/wing-1.0) is added like the original toolchain's SDK
+    # dirs so `#include <mss.h>` / `<smack.h>` / `<wing.h>` resolves; these are the
+    # closed middleware DLLs HEROES2W.EXE imports (mss32/smackw32/WING32) — headers only,
+    # never built as units. See docs/vendor-middleware.md.
     incs = [msvc / "include"]
     if (HOMM2_DIR / "include").is_dir(): incs.append(HOMM2_DIR / "include")
+    if (HOMM2_DIR / "vendor").is_dir():
+        incs += sorted(d for d in (HOMM2_DIR / "vendor").iterdir() if d.is_dir())
     os.environ["INCLUDE"] = ";".join(winepath_w(p) for p in incs)
     cmd = ["wine", str(cl), *flags, f"/Fo{winepath_w(out)}", winepath_w(src)]
     output, rc = _run_cl(cmd, out)
