@@ -26,10 +26,10 @@ class palette * resourceManager::GetPalette(char *name)
     resource *r = Query(id);
     if (r != 0) {
         r->field_0x6++;
-    } else {
-        r = new palette(id);
-        AddResource(r);
+        return static_cast<palette *>(r);
     }
+    r = new palette(id);
+    AddResource(r);
     return static_cast<palette *>(r);
 }
 
@@ -40,10 +40,10 @@ class bitmap * resourceManager::GetBitmap(char *name)
     resource *r = Query(id);
     if (r != 0) {
         r->field_0x6++;
-    } else {
-        r = new bitmap(id);
-        AddResource(r);
+        return static_cast<bitmap *>(r);
     }
+    r = new bitmap(id);
+    AddResource(r);
     return static_cast<bitmap *>(r);
 }
 
@@ -60,10 +60,10 @@ class tileset * resourceManager::GetTileset(char *name)
     resource *r = Query(id);
     if (r != 0) {
         r->field_0x6++;
-    } else {
-        r = new tileset(id);
-        AddResource(r);
+        return static_cast<tileset *>(r);
     }
+    r = new tileset(id);
+    AddResource(r);
     return static_cast<tileset *>(r);
 }
 
@@ -77,10 +77,10 @@ class font * resourceManager::GetFont(char *name)
     resource *r = Query(id);
     if (r != 0) {
         r->field_0x6++;
-    } else {
-        r = new font(id);
-        AddResource(r);
+        return static_cast<font *>(r);
     }
+    r = new font(id);
+    AddResource(r);
     return static_cast<font *>(r);
 }
 
