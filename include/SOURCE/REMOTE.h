@@ -50,7 +50,7 @@ DATA(0x0052a840) extern char *gcThisNetName;
 DATA(0x0052a860) extern long *lLastHeartbeatReceive;
 DATA(0x0052a878) extern char *packet;
 DATA(0x0052aa58) extern char *rcvBufIn;
-DATA(0x0052ab68) extern char **rcvBuf;
+DATA(0x0052ab68) extern char *rcvBuf[138];
 DATA(0x0052ad90) extern int bGotGameType;
 
 #endif // HOMM2_REMOTE_H

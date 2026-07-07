@@ -11,7 +11,7 @@ void UpdateArenaIcons(void);
 
 // ---- globals (declarations, RVA order) ----
 DATA(0x005331a8) extern int choice;
-DATA(0x005331b0) extern class iconWidget **skillWidget;
+DATA(0x005331b0) extern class iconWidget *skillWidget[3];
 DATA(0x005331bc) extern class heroWindow *arenaWinPtr;
 
 #endif // HOMM2_X_ARENA_H

@@ -22,6 +22,7 @@ VA(0x00434c1a, 0x5e2)
 int ViewWorldDialogHandler(struct tag_message &) { return 0; }
 
 // ---- globals (definitions, RVA order) ----
+signed char iVWHalf[3][6][2];
 int giViewWorldScale;
 int giViewWorldScaleLookup;
 int gbInViewWorld;

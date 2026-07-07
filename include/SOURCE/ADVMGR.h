@@ -53,7 +53,7 @@ DATA(0x00527c30) extern unsigned char giCurWatchPlayerBit;
 DATA(0x00527c38) extern float *gfHeroInteractionBonus;
 DATA(0x00527d10) extern int gbBerserk;
 DATA(0x00527d14) extern int giCurAIHeroMorale;
-DATA(0x00527d20) extern int (*iPlacesVisited)[2];
+DATA(0x00527d20) extern int iPlacesVisited[30][2];
 DATA(0x00527e14) extern int gbTroopReload;
 DATA(0x00527e18) extern int giCurAIHeroLuck;
 DATA(0x00527e1c) extern int gbActualShipyardFound;

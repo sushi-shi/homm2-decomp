@@ -73,11 +73,13 @@ VTBL(mouseManager, 0x004eba00);
 
 // ---- globals (definitions, RVA order) ----
 int *iMouseOffset;
+signed char iMouseSize[96][2];
+signed char iHotSpot[96][2];
 int gbInSetPointer;
 int bInNewMouseUpdate;
 struct tagBITMAP *bmpAndMask;
-void **hMouseCursor;
-void **cAndBits;
-void **cColorBits;
+void *hMouseCursor[96];
+void *cAndBits[96];
+void *cColorBits[98];
 struct _ICONINFO *IconInfo;
-void **hbmpAndMask;
+void *hbmpAndMask[106];

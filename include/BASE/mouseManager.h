@@ -58,15 +58,15 @@ public:
 SIZE(mouseManager, 0x8a);
 // ---- globals (declarations, RVA order) ----
 DATA(0x0051ebc8) extern int *iMouseOffset;
-DATA(0x0051ebd8) extern signed char (*iMouseSize)[2];
-DATA(0x0051ec98) extern signed char (*iHotSpot)[2];
+DATA(0x0051ebd8) extern signed char iMouseSize[96][2];
+DATA(0x0051ec98) extern signed char iHotSpot[96][2];
 DATA(0x0051ed58) extern int gbInSetPointer;
 DATA(0x0051ed5c) extern int bInNewMouseUpdate;
 DATA(0x00533240) extern struct tagBITMAP *bmpAndMask;
-DATA(0x00533b58) extern void **hMouseCursor;
-DATA(0x00533cd8) extern void **cAndBits;
-DATA(0x00533e58) extern void **cColorBits;
+DATA(0x00533b58) extern void *hMouseCursor[96];
+DATA(0x00533cd8) extern void *cAndBits[96];
+DATA(0x00533e58) extern void *cColorBits[98];
 DATA(0x00533fe0) extern struct _ICONINFO *IconInfo;
-DATA(0x00534760) extern void **hbmpAndMask;
+DATA(0x00534760) extern void *hbmpAndMask[106];
 
 #endif // HOMM2_BASE_MOUSEMANAGER_H

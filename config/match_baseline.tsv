@@ -704,7 +704,7 @@ SOURCE/CURSOR	?ValidMoveWithEvent@advManager@@QAEHPAVhero@@H@Z	15.3077	8191579bf
 SOURCE/Campaign	?CampaignHandler@@YIHAAUtag_message@@@Z	1.3930	426272a631b5
 SOURCE/Campaign	?CampaignInfoUpdate@game@@QAEXH@Z	0.9726	2d510f744480
 SOURCE/Campaign	?HandleCampaignWin@game@@QAEHXZ	1.2060	1f588fe27f9f
-SOURCE/Campaign	?InitCampaignMap@game@@QAEXXZ	0.6195	226283b44d06
+SOURCE/Campaign	?InitCampaignMap@game@@QAEXXZ	0.6195	0527549fe8eb
 SOURCE/Campaign	?InitEntireCampaign@game@@QAEXH@Z	46.4286	0020a0b9cb23
 SOURCE/Campaign	?PlayPreScenarioSmacker@game@@QAEXHH@Z	2.1239	fead5ff663bb
 SOURCE/Campaign	?ShowCampaignInfo@game@@QAEXHH@Z	4.5385	870ba26486d2
@@ -997,7 +997,7 @@ SOURCE/KB	?TestDynamicWindow@@YIXHH@Z	100.0000	f5ab1abce453
 SOURCE/KB	?TrueFalseDialogHandler@@YIHAAUtag_message@@@Z	100.0000	686bb54969b1
 SOURCE/KB	?UnloadSystemwideIcons@@YIXXZ	100.0000	e5593a1d663f
 SOURCE/KB	?UpdateAppSpecificMenus@@YIXPAX@Z	100.0000	f40021f3ef8a
-SOURCE/KB	?UpdateNormalDialog@@YIXPAD@Z	100.0000	1f975c66eaa0
+SOURCE/KB	?UpdateNormalDialog@@YIXPAD@Z	100.0000	afa86adf41ce
 SOURCE/KB	?UpdateSystemOptionsMenu@@YIXXZ	1.6336	4c293b8d0bfe
 SOURCE/KB	?WaitEndSample@@YIXUSAMPLE2@@H@Z	100.0000	7e1d559a1d28
 SOURCE/KB	?WaitForOtherPlayer@@YIHXZ	100.0000	7d299bc1df68
@@ -1032,7 +1032,7 @@ SOURCE/Newgame	?CleanUpNewGameWindow@game@@QAEXXZ	17.7808	91fea9ac6aed
 SOURCE/Newgame	?DrawNGKPDisplayString@game@@QAEXH@Z	28.8889	bdf45fcda23f
 SOURCE/Newgame	?GetLossConditionText@game@@QAEXPAD@Z	9.1408	812434b48834
 SOURCE/Newgame	?GetMap@game@@QAEXXZ	9.8333	7f528543d1fa
-SOURCE/Newgame	?GetSideDesc@game@@QAEHPADHH@Z	7.6264	9c8541c914b1
+SOURCE/Newgame	?GetSideDesc@game@@QAEHPADHH@Z	7.6264	112a68fa0e47
 SOURCE/Newgame	?GetVictoryConditionText@game@@QAEXPAD@Z	3.7239	720955391f6a
 SOURCE/Newgame	?InitNewGame@game@@QAEXPAUSMapHeader@@@Z	4.8609	a9dcf18453e4
 SOURCE/Newgame	?InitNewGameWindow@game@@QAEXXZ	2.7212	2e1ecbdeb8fd
@@ -1047,7 +1047,7 @@ SOURCE/Newgame	?UpdateNewGameWindow@game@@QAEXXZ	3.8289	c577bdc6cafc
 SOURCE/Overview	?DoKnob@game@@QAEXXZ	6.5888	6ddabb1c999c
 SOURCE/Overview	?Overview@game@@QAEXXZ	4.4913	a75d22ee2c4b
 SOURCE/Overview	?OverviewHandler@@YIHAAUtag_message@@@Z	1.5298	802444b8eb73
-SOURCE/Overview	?ProcessIconSelect@game@@QAEHHH@Z	4.1731	df8dc6cd4e27
+SOURCE/Overview	?ProcessIconSelect@game@@QAEHHH@Z	4.1731	55761f85838a
 SOURCE/Overview	?SetupDynamicStuff@game@@QAEXHHH@Z	0.1879	dc38e85e0415
 SOURCE/Overview	?SetupNewOverviewType@game@@QAEXHH@Z	6.5226	01b24975aeef
 SOURCE/Overview	?SetupResources@game@@QAEXXZ	35.0811	4ba81d80fcea
@@ -1102,7 +1102,7 @@ SOURCE/PHILAI	?EvaluateMonsterEvent@philAI@@QAEHHHPAH@Z	5.8565	37fef51f0208
 SOURCE/PHILAI	?EvaluateOneTimeCreaturePurchase@philAI@@QAEXHHHAAH00@Z	9.6148	723a6678a4c2
 SOURCE/PHILAI	?EvaluatePassword@philAI@@QAEHPAVmapCell@@@Z	100.0000	51f246f43d7c
 SOURCE/PHILAI	?EvaluateRecruitSite@philAI@@QAEHPAVmapCell@@@Z	99.6809	5fe7a76ca076
-SOURCE/PHILAI	?EvaluateTownEvent@philAI@@QAEHHHHHPAH@Z	3.6584	1ced9a6ef99e
+SOURCE/PHILAI	?EvaluateTownEvent@philAI@@QAEHHHHHPAH@Z	3.6584	8239c81e8070
 SOURCE/PHILAI	?FightEvent@philAI@@QAEHPAVhero@@PAVmapCell@@H@Z	1.0074	92558f73d8bb
 SOURCE/PHILAI	?FightValueOfStack@philAI@@QAEHPAVarmyGroup@@PAVhero@@HHHH@Z	1.9278	8a6b06810a2d
 SOURCE/PHILAI	?FutureDeflator@philAI@@QAEMQAH@Z	100.0000	2267f44d08ff
@@ -1161,7 +1161,7 @@ SOURCE/REMOTE	?ReceiveRemoteData@@YIHPAE0H@Z	12.1633	ad13f376f7db
 SOURCE/REMOTE	?RemoteCleanup@@YIXXZ	4.3923	8fbf3694173a
 SOURCE/REMOTE	?RemoteMain@@YIXH@Z	1.1641	a4a91d93ca9e
 SOURCE/REMOTE	?SendRemoteData@@YIHPAE0HH@Z	11.2453	f7555320f8db
-SOURCE/REMOTE	?TransmitAndWait@@YIHPADHHCCPAPAD@Z	15.2340	0f06f39c8a62
+SOURCE/REMOTE	?TransmitAndWait@@YIHPADHHCCPAPAD@Z	15.2340	3fc1471b0985
 SOURCE/REMOTE	?TransmitRemoteData@@YIHPADHHCCCC@Z	12.4958	6af690052303
 SOURCE/REMOTE	?UnloadRemoteDriver@@YIXF@Z	37.1143	6d9e38a7f761
 SOURCE/REMOTE	?calc_crc@@YIXPAGPAEH@Z	73.6842	a602e6ab5568
@@ -1333,7 +1333,7 @@ SOURCE/Viewwrld	?VWCleanup@advManager@@QAEXXZ	44.8276	b4947606a16b
 SOURCE/Viewwrld	?VWCompleteDraw@advManager@@QAEXXZ	0.2501	fc1fa5dd173d
 SOURCE/Viewwrld	?VWInit@advManager@@QAEXHH@Z	10.2362	8b907d42ea10
 SOURCE/Viewwrld	?ViewWorld@advManager@@QAEXHHH@Z	9.8333	deef349f27cb
-SOURCE/Viewwrld	?ViewWorldDialogHandler@@YIHAAUtag_message@@@Z	4.4774	95d7326c1c3e
+SOURCE/Viewwrld	?ViewWorldDialogHandler@@YIHAAUtag_message@@@Z	4.4774	a85d47919ad1
 SOURCE/Wsnetwin	?wsEvaluateMessage@@YIXKH@Z	4.7895	a67a6e641d7e
 SOURCE/Wsnetwin	?wsProcessMessages@@YIXXZ	24.1111	35d1a255fe12
 SOURCE/Wsnetwin	?wsSendMessage@@YIXHEGPAX@Z	9.7692	002b2e7db020
@@ -1471,7 +1471,7 @@ SOURCE/wingraph	?WGQueryNewPalette@@YIHXZ	27.1136	10b155f41834
 SOURCE/wingraph	?WGUpdatePalette@@YIXPAC@Z	10.3840	9f0659bc1c16
 SOURCE/x_arena	?ArenaWindowHandler@@YIHAAUtag_message@@@Z	9.7746	04c63cb14292
 SOURCE/x_arena	?DoArenaDialog@@YIHXZ	5.2396	3de182c3bd91
-SOURCE/x_arena	?UpdateArenaIcons@@YIXXZ	11.7527	3fdbf632d29f
+SOURCE/x_arena	?UpdateArenaIcons@@YIXXZ	11.7527	2ab358619b53
 SOURCE/x_cdtest	?CDTest_Cleanup@@YIXXZ	64.7059	c53f1b4f1904
 SOURCE/x_cdtest	?CDTest_GenerateTable@@YIHPAD@Z	5.7531	78159afdc544
 SOURCE/x_cdtest	?CDTest_Init@@YIHXZ	60.0000	b47291495f16
