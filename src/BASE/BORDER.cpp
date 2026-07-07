@@ -6,6 +6,10 @@
 #include <va.h>
 #include <BASE/border.h>
 #include <BASE/resourceManager.h>
+#include <BASE/bmap2.h>
+#include <BASE/icon.h>
+#include <BASE/heroWindow.h>
+#include <BASE/heroWindowManager.h>
 #include <SOURCE/KB.h>
 VA(0x004d20a0, 0x32)
 border::border(void) : widget(0, 0, 0, 0, 0, 0)
@@ -64,7 +68,25 @@ VA(0x004d22f0, 0x181)
 int border::Main(struct tag_message &) { return 0; }
 
 VA(0x004d2480, 0xab)
-void border::Draw(void) {}
+void border::Draw(void)
+{
+    short y = field_0x1a + field_0x4->field_0x2c;
+    short x = field_0x18 + field_0x4->field_0x28;
+    short kind = field_0x14;
+    if (kind == 0x400) {
+        FillBitmapArea(gpWindowManager->field_0x46, x, y, field_0x1c, field_0x1e, field_0x28);
+        return;
+    }
+    if (kind != 0x800) {
+        if (kind != 0x801)
+            return;
+        field_0x24->DrawToBuffer(x, y, 0, 0);
+        return;
+    }
+    PollSound();
+    BlitBitmap(field_0x20, 0, 0, field_0x1c, field_0x1e, gpWindowManager->field_0x46, x, y);
+    PollSound();
+}
 
 
 // ===== vtable border : public widget  (3 slots) =====
