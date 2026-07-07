@@ -9,6 +9,7 @@
 #include <BASE/bitmap.h>
 #include <BASE/Misc.h>
 #include <BASE/mouseManager.h>
+#include <BASE/heroWindow.h>
 #include <SOURCE/KB.h>
 VA(0x004ca6d0, 0x3a3)
 void CycleColors(int) {}
@@ -59,7 +60,11 @@ void heroWindowManager::UpdateScreenRegion(int x, int y, int w, int h)
 }
 
 VA(0x004cb010, 0x18)
-void heroWindowManager::RedrawScreen(void) {}
+void heroWindowManager::RedrawScreen(void)
+{
+    for (heroWindow *w = field_0x36; w != 0; w = w->field_0x4)
+        w->DrawWindow();
+}
 
 VA(0x004cb030, 0x80)
 void heroWindowManager::FadeScreen(int, int, class palette *) {}

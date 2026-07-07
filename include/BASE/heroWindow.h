@@ -14,8 +14,8 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     int    field_0x0;  // +0x00
-    int    field_0x4;  // +0x04
-    int    field_0x8;  // +0x08
+    heroWindow *field_0x4;  // +0x04  next window in the manager list
+    heroWindow *field_0x8;  // +0x08  prev window in the manager list
     char   name[0x14];  // +0x0c  window name (strcpy'd, e.g. "Default Construct")
     int    field_0x20;  // +0x20  !union: conflicting widths
     int    field_0x24;  // +0x24  !union: conflicting widths

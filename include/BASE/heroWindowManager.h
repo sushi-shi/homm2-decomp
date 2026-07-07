@@ -16,7 +16,7 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
-    int    field_0x36;  // +0x36
+    heroWindow *field_0x36;  // +0x36  window-list head
     int    field_0x3a;  // +0x3a
     int    field_0x3e;  // +0x3e
     int    field_0x42;  // +0x42
