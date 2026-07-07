@@ -16,14 +16,14 @@ public:
     int    field_0x0;  // +0x00
     int    field_0x4;  // +0x04
     int    field_0x8;  // +0x08
-    char _pad_0xc[0x14];
+    char   name[0x14];  // +0x0c  window name (strcpy'd, e.g. "Default Construct")
     int    field_0x20;  // +0x20  !union: conflicting widths
     int    field_0x24;  // +0x24  !union: conflicting widths
     int    field_0x28;  // +0x28
     int    field_0x2c;  // +0x2c
     int    field_0x30;  // +0x30
     int    field_0x34;  // +0x34
-    int    field_0x38;  // +0x38
+    widget *field_0x38;  // +0x38  widget-list tail
     widget *field_0x3c;  // +0x3c  head of the widget list
     bitmap *field_0x40;  // +0x40  saved-background bitmap
     // size >= 0x44 (accessed lower bound; no ctor/stride oracle)
