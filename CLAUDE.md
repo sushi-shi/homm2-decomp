@@ -134,11 +134,18 @@ the EXE + our known symbols. Needs the dev shell's Ghidra env (in the flake).
   for stack naming; reports a diff. Single worker — never spawns subagents.
 - Queue: `python3 -m homm2.match.gen_queue` → `config/match-queue.md` (CodeView funcs
   not yet bodied, size-band order).
-- Baseline: `homm2 status update` blesses best fuzzy% to `config/match_baseline.tsv`;
-  `homm2 status check` gates regressions at integration.
+- Baseline: `homm2 status update` records each function's **max fuzzy% keyed by a hash of its
+  SOURCE block** to `config/match_baseline.tsv` (`unit<TAB>fn<TAB>max%<TAB>src_hash`). Max% only
+  resets when THAT function's own source changes; a sibling edit that perturbs it (tu-cumulative)
+  leaves the hash — and the max — intact. So **you don't chase %**: match a function to 100%, and
+  even if a later sibling drops its live %, its max% stays 100% and current recovers in a second
+  pass. **max% == 100% for every function ⇒ essentially done.**
+- `homm2 status check` fails ONLY when an *edited* function (hash changed) fell below its former
+  max% — i.e. your edit lost ground. tu-cumulative dips are not flagged (no more blanket
+  `--accept-regressions`). README shows **Fuzzy** (live) and **Fuzzy-max** side by side.
 - Status shows **Functions exact** (completion) + **Fuzzy** (weighted progress — the
-  signal that moves as you grind). No exact-byte "Code" column (it's a restatement of
-  Functions-exact that stays ~0 until the hard functions finish).
+  signal that moves as you grind) + **functions-at-max-100%**. No exact-byte "Code" column (it's a
+  restatement of Functions-exact that stays ~0 until the hard functions finish).
 - **⚠️ Fuzzy% lies about frame slots.** It gives partial credit for a wrong `-0xN(%ebp)`
   displacement, so a function with EVERY local mis-slotted can read 97%+. When grinding
   the last few %, **diff your obj vs the target with `(%ebp)` displacements VISIBLE**
