@@ -193,7 +193,7 @@ BASE/MOUSEMGR	?IsVis@mouseManager@@QAEHXZ	100.0000	9461e339108c
 BASE/MOUSEMGR	?Main@mouseManager@@UAEHAAUtag_message@@@Z	100.0000	ce27712ee3a3
 BASE/MOUSEMGR	?MouseCoords@mouseManager@@QAEXAAH0@Z	100.0000	fe83d164f97f
 BASE/MOUSEMGR	?NewUpdate@mouseManager@@QAEXH@Z	0.3096	71be8363a247
-BASE/MOUSEMGR	?Open@mouseManager@@UAEHH@Z	4.6512	7b0da0436299
+BASE/MOUSEMGR	?Open@mouseManager@@UAEHH@Z	93.3256	ced2b257ffa6
 BASE/MOUSEMGR	?ReallyHidePointer@mouseManager@@QAEXXZ	19.5000	387e4cd809cf
 BASE/MOUSEMGR	?ReallyShowPointer@mouseManager@@QAEXXZ	1.8182	c4a89ada1d79
 BASE/MOUSEMGR	?RestoreUnderlying@mouseManager@@QAEXXZ	100.0000	83aff91e470c

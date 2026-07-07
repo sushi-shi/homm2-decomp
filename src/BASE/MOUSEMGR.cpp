@@ -43,7 +43,27 @@ mouseManager::mouseManager(void) : baseManager()
 }
 
 VA(0x004c9350, 0x94)
-int mouseManager::Open(int) { return 0; }
+int mouseManager::Open(int id)
+{
+    field_0x7e = 0;
+    field_0x36 = new bitmap(0x21, 0x42, 0x40);
+    field_0x5e = 0x13f;
+    field_0x62 = 0xef;
+    field_0x6e = 0x140;
+    field_0x66 = 0x13f;
+    field_0x6a = 0xef;
+    field_0x56 = 0x140;
+    field_0x46 = 0;
+    field_0x4a = 0;
+    field_0x72 = 0xf0;
+    field_0x5a = 0xf0;
+    if (gbColorMice != 0)
+        ShowCursor(0);
+    field_0xc = 0x40;
+    field_0x32 = 1;
+    field_0x10 = id;
+    return 0;
+}
 
 VA(0x004c93f0, 0xed)
 void mouseManager::Close(void) {}
