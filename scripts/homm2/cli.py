@@ -18,6 +18,10 @@ def main(argv=None):
     if cmd == "build":
         if sh("python3", "configure.py"): return 1
         if sh("ninja", *rest): return 1
+        # HARD gates: every declaration comes from a header (no drift), and every emitted
+        # function symbol exists in CodeView (no invented/fake labels).
+        if sh("python3", "-m", "homm2.build.assert_decls"): return 1
+        if sh("python3", "-m", "homm2.build.assert_no_fake_labels"): return 1
         from homm2.match.status import main as st
         st(["--write-readme"]); return st([])   # refresh README % block + print summary
     if cmd == "status":
