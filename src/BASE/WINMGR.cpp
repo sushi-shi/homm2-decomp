@@ -38,7 +38,21 @@ VA(0x004caad0, 0xd6)
 int heroWindowManager::Open(int) { return 0; }
 
 VA(0x004cabb0, 0x45)
-void heroWindowManager::Close(void) {}
+void heroWindowManager::Close(void)
+{
+    if (field_0x32 == 1) {
+        heroWindow *w = field_0x3a;
+        while (w != 0) {
+            heroWindow *prev = w->field_0x8;
+            RemoveWindow(w);
+            w = prev;
+        }
+        field_0x46->field_0x16 = 0;
+        if (field_0x46 != 0)
+            delete field_0x46;
+        field_0x32 = 0;
+    }
+}
 
 VA(0x004cac00, 0x2d)
 int heroWindowManager::Main(struct tag_message &msg)
