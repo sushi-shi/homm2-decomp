@@ -6,7 +6,14 @@
 #include <va.h>
 #include <BASE/listBoxWidget.h>
 VA(0x004db060, 0x42)
-listBoxWidget::listBoxWidget(void) {}
+listBoxWidget::listBoxWidget(void) : widget(0, 0, 0, 0, 0, 0)
+{
+    field_0x3c = 0;
+    field_0x8e = 0;
+    field_0x32 = 0;
+    field_0x34 = -1;
+    field_0x36 = -1;
+}
 
 VA(0x004db0d0, 0x86)
 listBoxWidget::~listBoxWidget() {}
