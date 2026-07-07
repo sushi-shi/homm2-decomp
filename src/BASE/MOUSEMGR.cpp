@@ -153,7 +153,23 @@ void mouseManager::HideColorPointer(void)
 }
 
 VA(0x004ca110, 0x98)
-void mouseManager::ShowColorPointer(void) {}
+void mouseManager::ShowColorPointer(void)
+{
+    if (field_0x86 > 0 && --field_0x86 == 0) {
+        gbPutzingWithMouseCtr++;
+        if (gbColorMice != 0) {
+            GetCursorPos(&gMouseCheckPt);
+            ScreenToClient(hwndApp, &gMouseCheckPt);
+            int x = (gMouseCheckPt.x * 640) / iMainWinScreenWidth;
+            field_0x56 = x;
+            int y = (gMouseCheckPt.y * 480) / iMainWinScreenHeight;
+            field_0x5a = y;
+            CheckChangeCursor(x, y, 0);
+        }
+        NewUpdate(1);
+        gbPutzingWithMouseCtr--;
+    }
+}
 
 VA(0x004ca1b0, 0xc)
 int mouseManager::IsVis(void) { return field_0x86 == 0; }
