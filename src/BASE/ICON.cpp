@@ -5,8 +5,19 @@
 
 #include <va.h>
 #include <BASE/icon.h>
+#include <BASE/resource.h>
+#include <BASE/resourceManager.h>
+#include <BASE/Misc.h>
+#include <SOURCE/KB.h>
 VA(0x004c7a20, 0x67)
-icon::icon(unsigned long int) {}
+icon::icon(unsigned long int id) : resource(1, id, 1, 0)
+{
+    gpResourceManager->PointToFile(id);
+    field_0x10 = gpResourceManager->ReadWord();
+    unsigned int len = gpResourceManager->ReadLong();
+    field_0x12 = static_cast<char *>(BaseAlloc(len, __FILE__, __LINE__));
+    gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(field_0x12), len);
+}
 
 VA(0x004c7ad0, 0x21)
 icon::~icon() {}
