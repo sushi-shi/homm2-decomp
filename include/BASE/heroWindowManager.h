@@ -7,6 +7,7 @@
 // forward declarations:
 class heroWindow;
 class palette;
+class bitmap;
 struct tag_message;
 
 #pragma pack(push, 1)  // recovered layout is byte-packed
@@ -19,7 +20,7 @@ public:
     int    field_0x3a;  // +0x3a
     int    field_0x3e;  // +0x3e
     int    field_0x42;  // +0x42
-    int    field_0x46;  // +0x46
+    bitmap *field_0x46;  // +0x46  (target screen bitmap)
     int    field_0x4a;  // +0x4a
     int    field_0x4e;  // +0x4e
     int    field_0x52;  // +0x52

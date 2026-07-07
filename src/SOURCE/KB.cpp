@@ -1170,6 +1170,9 @@ void UpdateNormalDialog(char *text)
 
 // ---- globals (definitions, RVA order) ----
 unsigned char giGroundToTerrain[432];
+unsigned char gColorTableYellow[256];
+unsigned char gColorTableScenWin[256];
+unsigned char gColorTableDarkGray[256];
 int MAP_WIDTH;
 int MAP_HEIGHT;
 unsigned char *mapExtra;
@@ -1193,6 +1196,7 @@ tag_monsterInfo gMonsterDatabase[66];
 int gbDrawSavedCursor;
 short giScoreMon[66][2];
 short giScoreCampaignMon[66][2];
+int gbLoadingMonoIcon;
 int gbHeroMoving;
 void *hmnuDflt;
 void *hmnuCmbt;
@@ -1236,7 +1240,6 @@ int bDoColorCycle;
 inputManager *gpInputManager;
 SAMPLE2 NULL_SAMPLE2;
 int iMaxMapExtra;
-int gbLoadingMonoIcon;
 palette *gPalette;
 resourceManager *gpResourceManager;
 int bSpecialHideCursor;
