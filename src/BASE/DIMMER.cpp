@@ -20,8 +20,6 @@ int dimmerWidget::Main(struct tag_message &) { return 0; }
 VA(0x004dd400, 0x5)
 void dimmerWidget::Draw(void) {}
 
-// ---- data / globals / vtables ----
-DATA(0x004ebae0)  // const dimmerWidget::vftable
 
 // ===== vtable dimmerWidget : public widget  (3 slots) =====
 //  [ 0] VA(0x004dd400, 0x5)  void dimmerWidget::Draw(void)   <- override (implements widget pure virtual)

@@ -30,9 +30,6 @@ recruitUnit::recruitUnit(class town *, int, int) {}
 VA(0x0048bee5, 0x14f)
 void QuickViewRecruit(class town *, int) {}
 
-// ---- data / globals / vtables ----
-DATA(0x004eb848)  // const recruitUnit::vftable
-DATA(0x00528578)  // void * hmnuRecruitSave
 
 // ===== vtable recruitUnit : public baseManager  (3 slots) =====
 //  [ 0] VA(0x0048b49c, 0x24b)  int recruitUnit::Open(int)   <- override (implements baseManager pure virtual)

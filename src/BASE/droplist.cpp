@@ -35,8 +35,6 @@ void dropListWidget::RestoreDropBackground(void) {}
 VA(0x004dcb10, 0x81f)
 void dropListWidget::ProcessSelectDialog(void) {}
 
-// ---- data / globals / vtables ----
-DATA(0x004ebad0)  // const dropListWidget::vftable
 
 // ===== vtable dropListWidget : public widget  (3 slots) =====
 //  [ 0] VA(0x004dc630, 0xaf)  void dropListWidget::Draw(void)   <- override (implements widget pure virtual)

@@ -56,19 +56,6 @@ void mouseManager::CheckUpdateMousePos(void) {}
 VA(0x004ca230, 0x191)
 void mouseManager::SetColorMice(int) {}
 
-// ---- data / globals / vtables ----
-DATA(0x004eba00)  // const mouseManager::vftable
-DATA(0x0051ebc8)  // int * iMouseOffset
-DATA(0x0051ebd8)  // signed char (*)[2] iMouseSize
-DATA(0x0051ec98)  // signed char (*)[2] iHotSpot
-DATA(0x0051ed58)  // int gbInSetPointer
-DATA(0x0051ed5c)  // int bInNewMouseUpdate
-DATA(0x00533240)  // struct tagBITMAP * bmpAndMask
-DATA(0x00533b58)  // void * * hMouseCursor
-DATA(0x00533cd8)  // void * * cAndBits
-DATA(0x00533e58)  // void * * cColorBits
-DATA(0x00533fe0)  // struct _ICONINFO * IconInfo
-DATA(0x00534760)  // void * * hbmpAndMask
 
 // ===== vtable mouseManager : public baseManager  (3 slots) =====
 //  [ 0] VA(0x004c9350, 0x94)  int mouseManager::Open(int)   <- override (implements baseManager pure virtual)

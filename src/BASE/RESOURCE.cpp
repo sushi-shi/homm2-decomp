@@ -14,8 +14,6 @@ resource::resource(short int, unsigned long int, short int, class resource *) {}
 VA(0x004d9780, 0x7)
 resource::~resource() {}
 
-// ---- data / globals / vtables ----
-DATA(0x004ebaac)  // const resource::vftable
 
 // ===== vtable resource (root)  (1 slots) =====
 //  [ 0] VA(0x004e1560, 0xb)  __purecall   <- = 0 (pure virtual)

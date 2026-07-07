@@ -112,6 +112,3 @@ signed char ExpCampaign::IsSpecialUA(void) { return 0; }
 
 VA(0x004bdb71, 0x73)
 signed char ExpCampaign::IsSpecialLossCondition(int) { return 0; }
-
-// ---- data / globals / vtables ----
-DATA(0x0051d560)  // struct SCampaignChoice (*)[8][3] xCampaignChoices

@@ -1,17 +1,35 @@
 #ifndef HOMM2_KB_H
 #define HOMM2_KB_H
+#include <va.h>
 // Declarations of the free functions DEFINED in KB.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
 struct SAMPLE2;
-struct SNetPlayerInfo;
 struct SSpellInfo;
 struct SWinSetup;
+class advManager;
+class armyGroup;
+class combatManager;
+struct configStruct;
+class executive;
+class font;
+class game;
 class hero;
 class heroWindow;
+class heroWindowManager;
+class icon;
+class inputManager;
+class mouseManager;
+class palette;
+class philAI;
+class resourceManager;
+class searchArray;
+class soundManager;
 struct tag_message;
 struct tag_monsterInfo;
+struct tag_tilePoint;
 class town;
+class townManager;
 #include <_types.h>
 #include <_carcass_types.h>
 
@@ -93,5 +111,119 @@ void SetWinText(heroWindow *j, int id);
 void CheckShingleUpdate(void);
 void NormalDialog(char *, int, int, int, int, int, int, int, int, int);
 void UpdateNormalDialog(char *text);
+
+
+// --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
+DATA(0x00528624) extern int bDoColorCycle;
+DATA(0x005157ac) extern int bEarlySetupDone;
+DATA(0x004fa64c) extern font *bigFont;
+DATA(0x005165dc) extern int bInShutDown;
+DATA(0x005298b8) extern int bShowIt;
+DATA(0x005286e0) extern int bSpecialHideCursor;
+DATA(0x004ffb20) extern char *cBuildingInfoNeutral[];
+DATA(0x00528ca4) extern char cNetBoxColor[];
+DATA(0x005286f8) extern char cNetBoxLine[][140];
+DATA(0x004ffe80) extern char *cOutOfMemory;
+DATA(0x004fe8d8) extern char *gArmyNames[];
+DATA(0x004fe9e0) extern char *gArmyNamesPlural[];
+DATA(0x004fad08) extern int gArtifactBaseRV[100];
+DATA(0x00500128) extern int gbAllBlack;
+DATA(0x004fa980) extern int gbCheatMenus;
+DATA(0x004f96c4) extern int gbClosingApp;
+DATA(0x0052895c) extern signed char gbCombatSurrender;
+DATA(0x004fb79c) extern int gbDrawSavedCursor;
+DATA(0x004f96c8) extern int gbForegroundApp;
+DATA(0x0052976c) extern int gbFunctionComplete;
+DATA(0x00500150) extern int gbGameInitialized;
+DATA(0x0052a1d0) extern signed char gbGamePosToNetPos[];
+DATA(0x004fbd3c) extern int gbHeroMoving;
+DATA(0x00528598) extern int gbHumanPlayer[];
+DATA(0x00516810) extern int gbInMemError;
+DATA(0x00528c98) extern int gbInNewGameSetup;
+DATA(0x00500174) extern int gbInPollSound;
+DATA(0x004fa974) extern int gbNoCDRom;
+DATA(0x00529280) extern int gbNoSound;
+DATA(0x004fa944) extern int gbPutzingWithMouseCtr;
+DATA(0x0050014c) extern int gbRemoteOn;
+DATA(0x005290ac) extern signed char gbRetreatWin;
+DATA(0x00529774) extern int gbTextEntryEscaped;
+DATA(0x00529910) extern int gbThisNetGotAdventureControl;
+DATA(0x00529600) extern signed char gbThisNetHumanPlayer[];
+DATA(0x004ffb70) extern char *gBuildingInfoSpecial[];
+DATA(0x0052927c) extern icon *gBuyBuildIcons;
+DATA(0x005293f8) extern char gcBottomViewText[];
+DATA(0x00528d20) extern configStruct gConfig;
+DATA(0x004fce20) extern int gDwellingBaseResourceValues[][12];
+DATA(0x004fcf40) extern int gDwellingCosts[][12][7];
+DATA(0x004ff958) extern char *gDwellingNames[][12];
+DATA(0x004fca48) extern signed char gDwellingType[20][12];
+DATA(0x005295f0) extern int gGameCommand;
+DATA(0x004faa60) extern int gHeroGoldCost;
+DATA(0x004fd720) extern unsigned long gHierarchyMask[][12];
+DATA(0x005290f4) extern int giBottomViewOverride;
+DATA(0x005285d0) extern int giBottomViewOverrideEndTime;
+DATA(0x00528600) extern int giBottomViewResource;
+DATA(0x00529908) extern int giBottomViewResourceQty;
+DATA(0x004fa658) extern int giCycleType;
+DATA(0x004faea8) extern int giDebugLevel;
+DATA(0x004f8c58) extern unsigned char giGroundToTerrain[];
+DATA(0x00500164) extern int giHighMemBuffer;
+DATA(0x004f96cc) extern int giMainVideoModeColorDepth;
+DATA(0x005295d0) extern int giNumHumanPlayers;
+DATA(0x004fb9e8) extern short giScoreCampaignMon[][2];
+DATA(0x004fb8e0) extern short giScoreMon[][2];
+DATA(0x00528964) extern int giTCPHostStatus;
+DATA(0x005295cc) extern int giThisGamePos;
+DATA(0x00529454) extern int giThisNetPos;
+DATA(0x00529778) extern int giTotalHighMem;
+DATA(0x005290b0) extern int giWaitType;
+DATA(0x00528cf0) extern int glTimers[];
+DATA(0x004fcda0) extern int gMageBaseResourceValues[];
+DATA(0x004fca90) extern int gMageBuildingCosts[][7];
+DATA(0x004faeb0) extern tag_monsterInfo gMonsterDatabase[];
+DATA(0x004fcdb8) extern int gNeutralBaseResourceValues[];
+DATA(0x004fcbe0) extern int gNeutralBuildingCosts[][7];
+DATA(0x004ff8c8) extern char *gNeutralBuildingNames[];
+DATA(0x0052a1c8) extern advManager *gpAdvManager;
+DATA(0x0052863c) extern palette *gPalette;
+DATA(0x005295dc) extern combatManager *gpCombatManager;
+DATA(0x005295e4) extern executive *gpExec;
+DATA(0x005290a8) extern game *gpGame;
+DATA(0x00528628) extern inputManager *gpInputManager;
+DATA(0x00528d1c) extern armyGroup *gpMonGroup;
+DATA(0x0052893c) extern class mouseManager *gpMouseManager;
+DATA(0x00528930) extern philAI *gpPhilAI;
+DATA(0x00528640) extern resourceManager *gpResourceManager;
+DATA(0x005286e4) extern searchArray *gpSearchArray;
+DATA(0x0052990c) extern soundManager *gpSoundManager;
+DATA(0x0052a1c4) extern townManager *gpTownManager;
+DATA(0x005298c0) extern class heroWindowManager *gpWindowManager;
+DATA(0x004faa98) extern int gResourceBaseValue[];
+DATA(0x004fa964) extern icon *gShingleAnim;
+DATA(0x004fce08) extern int gSpecialBuildingBaseResourceValues[];
+DATA(0x004fcb38) extern int gSpecialBuildingCosts[][7];
+DATA(0x004ff938) extern char *gSpecialBuildingNames[];
+DATA(0x004fbe78) extern SSpellInfo gsSpellInfo[];
+DATA(0x00528958) extern icon *gSystemIcons;
+DATA(0x00528998) extern char gText[];
+DATA(0x004ff918) extern char *gWellExtraNames[];
+DATA(0x004fff10) extern SWinSetup gWinSetup[];
+DATA(0x004fbd58) extern void *hmnuAdv;
+DATA(0x004fbd54) extern void *hmnuCmbt;
+DATA(0x004fbd50) extern void *hmnuDflt;
+DATA(0x004fbd5c) extern void *hmnuTown;
+DATA(0x005157a8) extern int iCDRomErr;
+DATA(0x00528638) extern int iMaxMapExtra;
+DATA(0x004fa968) extern int iNextShingleAnim;
+DATA(0x00516d1c) extern int iShingleAnimFrame;
+DATA(0x004f96bc) extern int MAP_HEIGHT;
+DATA(0x004f96b8) extern int MAP_WIDTH;
+DATA(0x004f96c0) extern unsigned char *mapExtra;
+DATA(0x004faa78) extern tag_tilePoint normalDirTable[];
+DATA(0x00528630) extern SAMPLE2 NULL_SAMPLE2;
+DATA(0x00528960) extern heroWindow *pNormalDialogWindow;
+DATA(0x005293f4) extern void **ppMapExtra;
+DATA(0x00528988) extern short *pwSizeOfMapExtra;
+DATA(0x004fa648) extern font *smallFont;
 
 #endif // HOMM2_KB_H

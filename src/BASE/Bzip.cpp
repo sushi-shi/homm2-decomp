@@ -7,7 +7,6 @@
 #include <BASE/Bzip.h>       // bzip types/records + this TU's free-function decls
 #include <BASE/Misc.h>       // LogStr, BaseAlloc, BaseFree, Random
 #include <SOURCE/KB.h>       // FileError
-#include <_globals.h>        // crc32Table, inName, outName, gText
 #include <io.h>              // _open, _write, _close
 #include <stdio.h>
 #include <errno.h>
@@ -1794,37 +1793,3 @@ long DecodeData(char *dst, char *src, unsigned long srcLen)
 
     return flen;
 }
-
-// ---- data / globals / vtables ----
-DATA(0x0051ff50)  // unsigned int * crc32Table
-DATA(0x00520350)  // unsigned int * words
-DATA(0x00520354)  // int * zptr
-DATA(0x00520358)  // int * ftab
-DATA(0x0052035c)  // unsigned char * block
-DATA(0x00520360)  // unsigned char * ll
-DATA(0x00534ed0)  // struct BitStream aBitStreamBuffer
-DATA(0x00534ee0)  // int origPtr
-DATA(0x00534ee4)  // int longestFileName
-DATA(0x00534ee8)  // int opMode
-DATA(0x00534ef0)  // struct Model * models
-DATA(0x00537010)  // unsigned int bitsOutstanding
-DATA(0x00537014)  // int veryVerbose
-DATA(0x00537018)  // unsigned int bigD
-DATA(0x0053701c)  // unsigned int bigL
-DATA(0x00537020)  // unsigned int bigR
-DATA(0x00537024)  // struct _iobuf * outputHandleJustInCase
-DATA(0x00537028)  // char * inName
-DATA(0x00537428)  // int bytesOut
-DATA(0x00537430)  // char * outName
-DATA(0x00537830)  // struct Model bogusModel
-DATA(0x00537c54)  // int verbose
-DATA(0x00537c58)  // char * progNameReally
-DATA(0x00538058)  // int blockSize100k
-DATA(0x0053805c)  // int lastPP
-DATA(0x00538060)  // int bytesIn
-DATA(0x00538064)  // int compressing
-DATA(0x00538068)  // int last
-DATA(0x0053806c)  // int bsInUse
-DATA(0x00538070)  // unsigned int globalCrc
-DATA(0x00538074)  // char * progName
-DATA(0x00538078)  // int keepInputFiles

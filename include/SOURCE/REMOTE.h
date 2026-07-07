@@ -1,5 +1,7 @@
 #ifndef HOMM2_REMOTE_H
 #define HOMM2_REMOTE_H
+#include <va.h>
+#include <_types.h>
 // Declarations of the free functions DEFINED in REMOTE.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 
@@ -16,5 +18,11 @@ int TransmitRemoteData(char *, int, int, signed char, signed char, signed char, 
 char * GetRemoteData(signed char);
 void PollRemote(void);
 int TransmitAndWait(char *, int, int, signed char, signed char, char * *);
+
+
+// --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
+DATA(0x0052a4fc) extern char gbUseDiffCompression;
+DATA(0x0052a500) extern char gbUseRegularCompression;
+DATA(0x0052a988) extern SNetPlayerInfo gsNetPlayerInfo[];
 
 #endif // HOMM2_REMOTE_H

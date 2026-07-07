@@ -20,8 +20,6 @@ int highScoreManager::Main(struct tag_message &) { return 0; }
 VA(0x00489e6a, 0x7d3)
 void highScoreManager::Update(void) {}
 
-// ---- data / globals / vtables ----
-DATA(0x004eb838)  // const highScoreManager::vftable
 
 // ===== vtable highScoreManager : public baseManager  (3 slots) =====
 //  [ 0] VA(0x00489a96, 0x14c)  int highScoreManager::Open(int)   <- override (implements baseManager pure virtual)

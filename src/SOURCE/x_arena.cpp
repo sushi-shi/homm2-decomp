@@ -13,8 +13,3 @@ int ArenaWindowHandler(struct tag_message &) { return 0; }
 
 VA(0x004c063b, 0x150)
 void UpdateArenaIcons(void) {}
-
-// ---- data / globals / vtables ----
-DATA(0x005331a8)  // int choice
-DATA(0x005331b0)  // class iconWidget * * skillWidget
-DATA(0x005331bc)  // class heroWindow * arenaWinPtr

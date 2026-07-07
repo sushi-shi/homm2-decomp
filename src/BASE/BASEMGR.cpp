@@ -8,8 +8,6 @@
 VA(0x004d2530, 0x47)
 baseManager::baseManager(void) {}
 
-// ---- data / globals / vtables ----
-DATA(0x004eba70)  // const baseManager::vftable
 
 // ===== vtable baseManager : public widget  (3 slots) =====
 //  [ 0] VA(0x004e1560, 0xb)  __purecall   <- = 0 (pure virtual)

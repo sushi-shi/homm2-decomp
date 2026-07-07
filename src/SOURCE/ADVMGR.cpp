@@ -282,40 +282,6 @@ int advManager::IsCrystalBallInEffect(int, int, int) { return 0; }
 VA(0x0046c318, 0x85)
 unsigned char StopOnTrigger(class mapCell *) { return 0; }
 
-// ---- data / globals / vtables ----
-DATA(0x004eb6c8)  // const advManager::vftable
-DATA(0x004f57b0)  // int giLimitUpdMinX
-DATA(0x004f57b4)  // int iLastScrollTime
-DATA(0x004f57b8)  // int iSandAnim
-DATA(0x004f57bc)  // int giLastHourGlassUpdateTime
-DATA(0x004f57c0)  // int TrigX
-DATA(0x004f57c4)  // int TrigY
-DATA(0x004f57c8)  // int iCurBottomView
-DATA(0x004f57cc)  // int iCurBottomViewEnemy
-DATA(0x004f57d0)  // int iCurHourGlassPhase
-DATA(0x004f57d4)  // int iLastHourGlassPhase
-DATA(0x004f57d8)  // int gbForceUpdate
-DATA(0x004f59e8)  // int giCheatSeq
-DATA(0x004f59ec)  // int iQWE
-DATA(0x004f5e38)  // unsigned char * monAnimDrawFrame
-DATA(0x004f60e0)  // int iLastSandAnimTime
-DATA(0x004f60e4)  // int iLastNewSandAnimTime
-DATA(0x004f6720)  // int giFrameCount
-DATA(0x00527ec8)  // class heroWindow * cPanel
-DATA(0x00527ed0)  // int iThisMaxY
-DATA(0x00527edc)  // int giTownPortalChoice
-DATA(0x00527ee0)  // int iThisMinY
-DATA(0x00527ee8)  // class heroWindow * townPortalWin
-DATA(0x00527ef0)  // struct tag_message USMsg
-DATA(0x00527f14)  // int giFrameStep
-DATA(0x00527f28)  // char * cArmySizeName
-DATA(0x00527f34)  // int giLimitUpdMaxX
-DATA(0x00527f38)  // int giLimitUpdMaxY
-DATA(0x00527f40)  // int bPrefsChanged
-DATA(0x00527f4c)  // int giLimitUpdMinY
-DATA(0x00527f50)  // signed char (*)[18] bComboDraw
-DATA(0x005280b0)  // struct tag_message CDMsg
-DATA(0x005280d4)  // int iLastAnimFrame
 
 // ===== vtable advManager : public baseManager  (3 slots) =====
 //  [ 0] VA(0x0045665f, 0x9c9)  int advManager::Open(int)   <- override (implements baseManager pure virtual)

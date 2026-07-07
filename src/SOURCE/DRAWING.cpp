@@ -43,7 +43,3 @@ void combatManager::DrawFrame(int, int, int, int, int, int, int) {}
 
 VA(0x00405d0b, 0xb99)
 void combatManager::DrawSmallView(int, int) {}
-
-// ---- data / globals / vtables ----
-DATA(0x004ed25c)  // int bGridWasShowing
-DATA(0x004ed290)  // int gbInDrawSmallView

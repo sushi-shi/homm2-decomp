@@ -116,12 +116,3 @@ void combatManager::Earthquake(void) {}
 
 VA(0x0042a411, 0x2b1)
 void combatManager::ShowSpellMessage(int, int, class army *) {}
-
-// ---- data / globals / vtables ----
-DATA(0x004f00b0)  // int castX
-DATA(0x004f00b4)  // int castY
-DATA(0x004f00b8)  // int bInTeleportGetDest
-DATA(0x004f0278)  // int indexToCastOn
-DATA(0x004f04c0)  // unsigned char * uRedBeam
-DATA(0x004f04c8)  // unsigned char * uRainbow
-DATA(0x004f04e0)  // signed char * gyModify

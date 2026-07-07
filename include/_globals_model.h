@@ -1,5 +1,6 @@
 #ifndef HOMM2_GLOBALS_MODEL_H
 #define HOMM2_GLOBALS_MODEL_H
+#include <va.h>
 // Synthetic / MODELLING globals — readable aliases the matcher introduced for data that has
 // NO CodeView symbol of its own: overlay views of the monster-database region, and .rdata
 // float literals (MSVC-hashed ??_C@ names) referenced as named consts for reloc control.
@@ -13,5 +14,9 @@ DATA(0x004faeb8) extern SCreatureInfo gCreatureInfo[];   // monster-DB view (gam
 DATA(0x004faeb2) extern monsterRV gMonsterInfo[100];     // monster-DB view, 26B recs (philAI::ComputeUpgradeValue)
 // (gRVWeightOre/Merc/Crystal removed — they were just gafAITurnCostResource[2|1|4]; the code
 //  now indexes the array directly via the RES_* enum, which matches the retail byte-for-byte.)
+
+
+// --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
+DATA(0x00528d38) extern int const_00128d38;            // 13-byte BSS flag buffer (??_C@_0N@PMOM@...)
 
 #endif // HOMM2_GLOBALS_MODEL_H

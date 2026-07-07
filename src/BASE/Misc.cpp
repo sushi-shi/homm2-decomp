@@ -4,12 +4,12 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <SOURCE/kbwin.h>
 #include <BASE/heroWindow.h>
 #include <BASE/mouseManager.h>
 #include <BASE/Misc.h>        // this TU's own free functions + indexArray/IconEntry
 #include <SOURCE/KB.h>        // EventWindowHandler, FileError, ShutDown
 #include <SOURCE/wingraph.h>  // SetFullScreenStatus
-#include <_globals.h>         // iMemEntries, gpMemEntry, iLastSeed, gpMouseManager, gpWindowManager, ...
 #include <_carcass_types.h>   // tag_message (member access)
 #include <win/windows.h>      // MessageBoxA
 #include <stdlib.h>
@@ -378,16 +378,3 @@ int DataEntryWindowHandler(struct tag_message &message)
     message.field4 = 0xA;
     return 2;
 }
-
-// ---- data / globals / vtables ----
-DATA(0x0051dce8)  // int iMemEntries
-DATA(0x0051dcec)  // struct MemEntry * gpMemEntry
-DATA(0x0051dcf0)  // int giTotalMemAllocated
-DATA(0x0051dcf8)  // unsigned char * giChangeThreshold
-DATA(0x0051dd08)  // int iLastSeed
-DATA(0x005331c4)  // class heroWindow * DataEntryWin
-DATA(0x005331c8)  // char * cDEDest
-DATA(0x005331d4)  // int iDEMaxLen
-DATA(0x005331d8)  // int bDataEntryTime
-DATA(0x005331dc)  // int inBoxX
-DATA(0x005331e0)  // int inBoxY

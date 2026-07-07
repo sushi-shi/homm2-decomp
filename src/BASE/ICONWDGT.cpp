@@ -26,8 +26,6 @@ int iconWidget::Main(struct tag_message &) { return 0; }
 VA(0x004d0f70, 0xe5)
 void iconWidget::Draw(void) {}
 
-// ---- data / globals / vtables ----
-DATA(0x004eba40)  // const iconWidget::vftable
 
 // ===== vtable iconWidget : public widget  (3 slots) =====
 //  [ 0] VA(0x004d0f70, 0xe5)  void iconWidget::Draw(void)   <- override (implements widget pure virtual)

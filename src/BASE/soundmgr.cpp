@@ -108,18 +108,6 @@ void soundManager::ServiceSound(void) {}
 VA(0x004cdad0, 0x7f)
 int soundManager::MusicPlaying(void) { return 0; }
 
-// ---- data / globals / vtables ----
-DATA(0x004eba20)  // const soundManager::vftable
-DATA(0x0051f018)  // char * * digitalDriverNames
-DATA(0x0051f050)  // struct SampleChannelStruct * SCS
-DATA(0x0051f080)  // char (*)[15] CDPreviousPosition
-DATA(0x0051f404)  // int CDWaiting
-DATA(0x0051f408)  // int CDPlaying
-DATA(0x0051f40c)  // int iCalibrateLoop
-DATA(0x00534980)  // char * lpszReturnString
-DATA(0x00534a80)  // unsigned long int nMCIError
-DATA(0x00534a88)  // short int * iLastVolume
-DATA(0x00534ac8)  // char * CommandString
 
 // ===== vtable soundManager : public baseManager  (3 slots) =====
 //  [ 0] VA(0x004cc560, 0x3a8)  int soundManager::Open(int)   <- override (implements baseManager pure virtual)

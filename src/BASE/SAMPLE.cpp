@@ -18,9 +18,6 @@ MIDIWrap::MIDIWrap(char *) {}
 VA(0x004db030, 0x28)
 MIDIWrap::~MIDIWrap() {}
 
-// ---- data / globals / vtables ----
-DATA(0x004ebab4)  // const sample::vftable
-DATA(0x004ebab8)  // const MIDIWrap::vftable
 
 // ===== vtable MIDIWrap (root)  (1 slots) =====
 //  [ 0] VA(0x004daff0, 0x3d)  void * MIDIWrap::scalar_dtor(unsigned int)   <- introduces virtual

@@ -4,6 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <SOURCE/ADVMGR.h>
 #include <SOURCE/PHILAI.h>
 #include <_types.h>
 #include <_globals_model.h>
@@ -11,7 +12,6 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/KB.h>
-#include <_globals.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -859,56 +859,3 @@ int philAI::EvaluateHeroEvent(int, int, int, int, int *) { return 0; }
 
 VA(0x00447211, 0x4fa)
 int philAI::EvaluateTownEvent(int, int, int, int, int *) { return 0; }
-
-// ---- data / globals / vtables ----
-DATA(0x004f20e0)  // float fFirstWeekTownFV
-DATA(0x004f20e4)  // int iVepCacheHits
-DATA(0x004f20e8)  // int iTotalVepHits
-DATA(0x004f20ec)  // int giShowComputerRoute
-DATA(0x004f20f0)  // short int * gaiLiveChanceOfPos
-DATA(0x004f20f4)  // short int * gaiHeroStrategicRVOfPos
-DATA(0x004f20f8)  // short int * gaiHeroEventStratRVOfPos
-DATA(0x004f20fc)  // signed char * gaiTurnValueOfMine
-DATA(0x004f2100)  // signed char * gaiEnemyHeroReachable
-DATA(0x004f2104)  // long int glLastStartTick
-DATA(0x004f2108)  // long int glCurTicks
-DATA(0x004f210c)  // long int glTotalTicks
-DATA(0x004f2110)  // class hero * gpCurAIHero
-DATA(0x004f2114)  // float gfAttackHumanBonus
-DATA(0x004f2118)  // float gfAttackComputerBonus
-DATA(0x004f211c)  // int iLastFrameRateTimer
-DATA(0x004f22bc)  // int bSVSearchArrayInUse
-DATA(0x004f2340)  // int bEvaluatingTravelGates
-DATA(0x00525620)  // int gbReduceByBerserk
-DATA(0x00525624)  // float fBerserkFactor
-DATA(0x00525628)  // int giCurPlayer
-DATA(0x0052562c)  // signed char * giBuildShipyard
-DATA(0x00525634)  // int giMaxHeroesForThisPlayer
-DATA(0x00525638)  // signed char * giBuildBoat
-DATA(0x00525640)  // float fReduceFactor
-DATA(0x00525644)  // unsigned char giCurPlayerBit
-DATA(0x00525648)  // int giBestShipyardDist
-DATA(0x0052564c)  // int bHeroBuiltThisTurn
-DATA(0x00525650)  // short int * gaiHeroLiveChance
-DATA(0x005256bc)  // int giHumanTownConquered
-DATA(0x005256c0)  // int giCurTurn
-DATA(0x005256c8)  // int * costTemp
-DATA(0x005256e4)  // int iAlphaMale
-DATA(0x005256e8)  // int iDummy
-DATA(0x005256ec)  // int gbPossibleShipyardFound
-DATA(0x005256f0)  // class searchArray SVSearchArray
-DATA(0x00527c08)  // float * gafAITurnCostResource
-DATA(0x00527c24)  // int iCurPlaceToVisit
-DATA(0x00527c28)  // int giBestShipyardId
-DATA(0x00527c2c)  // int gbActualBoatFound
-DATA(0x00527c30)  // unsigned char giCurWatchPlayerBit
-DATA(0x00527c34)  // class playerData * gpCurPlayer
-DATA(0x00527c38)  // float * gfHeroInteractionBonus
-DATA(0x00527d10)  // int gbBerserk
-DATA(0x00527d14)  // int giCurAIHeroMorale
-DATA(0x00527d18)  // signed char * giBuildBoatStuffTurn
-DATA(0x00527d20)  // int (*)[2] iPlacesVisited
-DATA(0x00527e10)  // int gbReduceByReload
-DATA(0x00527e14)  // int gbTroopReload
-DATA(0x00527e18)  // int giCurAIHeroLuck
-DATA(0x00527e1c)  // int gbActualShipyardFound

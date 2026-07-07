@@ -120,14 +120,6 @@ void UpdateCombatSystemOptions(int) {}
 VA(0x004960a9, 0x39a)
 int CombatSystemOptionsHandler(struct tag_message &) { return 0; }
 
-// ---- data / globals / vtables ----
-DATA(0x004eb898)  // const combatManager::vftable
-DATA(0x004f8900)  // int bInHighMoraleBonus
-DATA(0x004f8904)  // int giSeed
-DATA(0x004f8c1c)  // unsigned char * wallHex
-DATA(0x00528588)  // int bMouseWasVis
-DATA(0x0052858c)  // class heroWindow * CSPanel
-DATA(0x00528590)  // int bCPrefsChanged
 
 // ===== vtable combatManager : public baseManager  (3 slots) =====
 //  [ 0] VA(0x00490aa0, 0x43f)  int combatManager::Open(int)   <- override (implements baseManager pure virtual)

@@ -1,5 +1,6 @@
 #ifndef HOMM2_WINGRAPH_H
 #define HOMM2_WINGRAPH_H
+#include <va.h>
 // Declarations of the free functions DEFINED in wingraph.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
@@ -36,5 +37,9 @@ void CleanUpWinGraphics(void);
 void SetFullScreenStatus(int);
 int QueryNewPalette(void);
 int SetGraphicsType(int);
+
+
+// --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
+DATA(0x004f1290) extern int giGraphicsType;
 
 #endif // HOMM2_WINGRAPH_H

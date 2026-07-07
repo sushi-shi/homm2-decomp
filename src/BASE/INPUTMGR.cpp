@@ -52,13 +52,6 @@ void CheckChangeCursor(int, int, int) {}
 VA(0x004cea80, 0xe9)
 void inputManager::ForceMouseMove(void) {}
 
-// ---- data / globals / vtables ----
-DATA(0x004eba30)  // const inputManager::vftable
-DATA(0x0051f980)  // int iCurSwapPalette
-DATA(0x0051f984)  // int bLastMouseOffscreen
-DATA(0x0051f988)  // int bLastOnscreenMouseColor
-DATA(0x0051f98c)  // int bInCheckChangeCursor
-DATA(0x00534bc8)  // int iLastBWOnScreenCheck
 
 // ===== vtable inputManager : public baseManager  (3 slots) =====
 //  [ 0] VA(0x004ce230, 0x78)  int inputManager::Open(int)   <- override (implements baseManager pure virtual)

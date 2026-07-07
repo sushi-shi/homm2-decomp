@@ -26,8 +26,6 @@ void textEntryWidget::Draw(void) {}
 VA(0x004d9570, 0x1be)
 void textEntryWidget::SetupDisplayString(char *, unsigned short int) {}
 
-// ---- data / globals / vtables ----
-DATA(0x004ebaa0)  // const textEntryWidget::vftable
 
 // ===== vtable textEntryWidget : public widget  (3 slots) =====
 //  [ 0] VA(0x004d9410, 0x160)  void textEntryWidget::Draw(void)   <- override (implements widget pure virtual)

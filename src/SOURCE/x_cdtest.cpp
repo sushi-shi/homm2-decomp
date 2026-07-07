@@ -22,6 +22,3 @@ int CDTest_VerifyTrack(int) { return 0; }
 
 VA(0x0044a0f0, 0x2ce)
 int CDTest_GenerateTable(char *) { return 0; }
-
-// ---- data / globals / vtables ----
-DATA(0x004f5188)  // struct sCDTest_Track_Data * cdTestTrackData
