@@ -17,6 +17,7 @@ DATA(0x004faeb8) extern SCreatureInfo gCreatureInfo[];   // monster-DB view (gam
 DATA(0x004faeb2) extern monsterRV gMonsterInfo[100];     // monster-DB view, 26B recs (philAI::ComputeUpgradeValue)
 // (gRVWeightOre/Merc/Crystal removed — they were just gafAITurnCostResource[2|1|4]; the code
 //  now indexes the array directly via the RES_* enum, which matches the retail byte-for-byte.)
+DATA(0x00533b40) extern POINT gMouseScreenPt;    // GetCursorPos scratch (mouseManager::MouseCoords)
 
 
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---

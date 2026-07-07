@@ -11,6 +11,8 @@
 #include <BASE/bitmap.h>
 #include <BASE/heroWindowManager.h>
 #include <SOURCE/KB.h>
+#include <SOURCE/kbwin.h>
+#include <_globals_model.h>
 VA(0x004c9270, 0xd9)
 mouseManager::mouseManager(void) : baseManager()
 {
@@ -58,7 +60,13 @@ VA(0x004c9a40, 0x47a)
 void mouseManager::NewUpdate(int) {}
 
 VA(0x004c9ec0, 0x56)
-void mouseManager::MouseCoords(int &, int &) {}
+void mouseManager::MouseCoords(int &x, int &y)
+{
+    GetCursorPos(&gMouseScreenPt);
+    ScreenToClient(hwndApp, &gMouseScreenPt);
+    x = (gMouseScreenPt.x * 640) / iMainWinScreenWidth;
+    y = (gMouseScreenPt.y * 480) / iMainWinScreenHeight;
+}
 
 VA(0x004c9f20, 0xa2)
 void mouseManager::SaveAndDraw(void) {}
