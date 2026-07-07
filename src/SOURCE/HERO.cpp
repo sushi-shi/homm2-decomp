@@ -4,6 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <SOURCE/HERO.h>
 #include <_all.h>
 VA(0x0046c3a0, 0x6f)
 hero::hero(void) {}

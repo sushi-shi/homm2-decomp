@@ -4,6 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <SOURCE/tradpost.h>
 #include <_all.h>
 #include <_carcass_types.h>
 VA(0x004bf340, 0x165)

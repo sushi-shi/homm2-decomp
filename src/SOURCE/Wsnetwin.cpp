@@ -4,6 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <SOURCE/Wsnetwin.h>
 #include <_all.h>
 VA(0x004068b0, 0x5b5)
 short int wsnet_init(void) { return 0; }

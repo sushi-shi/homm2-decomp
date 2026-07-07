@@ -4,6 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <BASE/TILE.h>
 VA(0x004d310c, 0x18f)
 extern "C" void __cdecl TileToBitmap(void) {}
 

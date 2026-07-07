@@ -4,6 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <SOURCE/REMOTE.h>
 #include <_all.h>
 VA(0x004a3080, 0x188)
 void RemoteCleanup(void) {}

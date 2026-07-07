@@ -4,6 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <SOURCE/VIEW.h>
 #include <_all.h>
 VA(0x0040bd60, 0x6d3)
 int combatManager::ViewGeneral(int, int, int) { return 0; }

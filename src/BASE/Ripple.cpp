@@ -4,6 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <BASE/Ripple.h>
 #include <_all.h>
 VA(0x004d26a0, 0x23f)
 void DoRipple(class bitmap *, class bitmap *, int, int) {}

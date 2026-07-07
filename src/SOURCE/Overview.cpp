@@ -4,6 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <SOURCE/Overview.h>
 #include <_all.h>
 VA(0x00407870, 0x223e)
 void game::SetupDynamicStuff(int, int, int) {}

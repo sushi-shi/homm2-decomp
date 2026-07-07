@@ -4,6 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <SOURCE/Castle.h>
 #include <_all.h>
 VA(0x0041d040, 0x10bb)
 void townManager::SetupCastle(class heroWindow *, int) {}

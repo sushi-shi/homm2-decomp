@@ -4,6 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <SOURCE/netwin.h>
 #include <_all.h>
 VA(0x004a6be0, 0xa8)
 int is_netbios_avail(void) { return 0; }
