@@ -32,3 +32,6 @@ int font::LineWidth(char *) { return 0; }
 
 // ===== vtable font (root)  (1 slots) =====
 //  [ 0] VA(0x004c70a0, 0x39)  void * font::scalar_dtor(unsigned int)   <- introduces virtual
+
+// ---- vtables (compiler-emitted; census) ----
+VTBL(font, 0x004eb9e4);

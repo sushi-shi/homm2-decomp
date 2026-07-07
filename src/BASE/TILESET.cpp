@@ -14,3 +14,6 @@ tileset::~tileset() {}
 
 // ===== vtable tileset (root)  (1 slots) =====
 //  [ 0] VA(0x004dacf0, 0x36)  void * tileset::scalar_dtor(unsigned int)   <- introduces virtual
+
+// ---- vtables (compiler-emitted; census) ----
+VTBL(tileset, 0x004ebab0);

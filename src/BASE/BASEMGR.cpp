@@ -13,3 +13,6 @@ baseManager::baseManager(void) {}
 //  [ 0] VA(0x004e1560, 0xb)  __purecall   <- = 0 (pure virtual)
 //  [ 1] VA(0x004e1560, 0xb)  __purecall   <- = 0 (pure virtual)
 //  [ 2] VA(0x004e1560, 0xb)  __purecall   <- = 0 (pure virtual)
+
+// ---- vtables (compiler-emitted; census) ----
+VTBL(baseManager, 0x004eba70);

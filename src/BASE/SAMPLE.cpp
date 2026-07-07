@@ -24,3 +24,7 @@ MIDIWrap::~MIDIWrap() {}
 
 // ===== vtable sample (root)  (1 slots) =====
 //  [ 0] VA(0x004daef0, 0x41)  void * sample::scalar_dtor(unsigned int)   <- introduces virtual
+
+// ---- vtables (compiler-emitted; census) ----
+VTBL(sample, 0x004ebab4);
+VTBL(MIDIWrap, 0x004ebab8);

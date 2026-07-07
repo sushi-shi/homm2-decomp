@@ -37,3 +37,6 @@ void button::Draw(void) {}
 //  [ 0] VA(0x004ddda0, 0x55)  void button::Draw(void)   <- override (implements widget pure virtual)
 //  [ 1] VA(0x004dd480, 0x36)  void * button::scalar_dtor(unsigned int)   <- override (implements widget pure virtual)
 //  [ 2] VA(0x004dd6d0, 0x595)  int button::Main(struct tag_message &)   <- override (implements widget pure virtual)
+
+// ---- vtables (compiler-emitted; census) ----
+VTBL(button, 0x004ebaf0);

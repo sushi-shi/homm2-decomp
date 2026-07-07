@@ -74,3 +74,6 @@ void CreateColorLookupTables(void) {}
 //  [ 0] VA(0x004caad0, 0xd6)  int heroWindowManager::Open(int)   <- override (implements baseManager pure virtual)
 //  [ 1] VA(0x004cabb0, 0x45)  void heroWindowManager::Close(void)   <- override (implements baseManager pure virtual)
 //  [ 2] VA(0x004cac00, 0x2d)  int heroWindowManager::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
+
+// ---- vtables (compiler-emitted; census) ----
+VTBL(heroWindowManager, 0x004eba10);

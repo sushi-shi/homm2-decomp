@@ -20,3 +20,6 @@ signed char * palette::Data(void) { return 0; }
 
 // ===== vtable palette (root)  (1 slots) =====
 //  [ 0] VA(0x004d25b0, 0x41)  void * palette::scalar_dtor(unsigned int)   <- introduces virtual
+
+// ---- vtables (compiler-emitted; census) ----
+VTBL(palette, 0x004eba7c);

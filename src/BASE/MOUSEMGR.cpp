@@ -61,3 +61,6 @@ void mouseManager::SetColorMice(int) {}
 //  [ 0] VA(0x004c9350, 0x94)  int mouseManager::Open(int)   <- override (implements baseManager pure virtual)
 //  [ 1] VA(0x004c93f0, 0xed)  void mouseManager::Close(void)   <- override (implements baseManager pure virtual)
 //  [ 2] VA(0x004c94e0, 0x5)  int mouseManager::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
+
+// ---- vtables (compiler-emitted; census) ----
+VTBL(mouseManager, 0x004eba00);

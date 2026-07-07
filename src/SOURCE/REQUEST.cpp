@@ -59,3 +59,6 @@ char * fileRequester::GetFilename(void) { return 0; }
 //  [ 0] VA(0x0048d5e1, 0x466)  int fileRequester::Open(int)   <- override (implements baseManager pure virtual)
 //  [ 1] VA(0x0048d556, 0x8b)  void fileRequester::Close(void)   <- override (implements baseManager pure virtual)
 //  [ 2] VA(0x0048daec, 0x11ae)  int fileRequester::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
+
+// ---- vtables (compiler-emitted; census) ----
+VTBL(fileRequester, 0x004eb888);

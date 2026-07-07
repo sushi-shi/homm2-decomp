@@ -17,3 +17,6 @@ resource::~resource() {}
 
 // ===== vtable resource (root)  (1 slots) =====
 //  [ 0] VA(0x004e1560, 0xb)  __purecall   <- = 0 (pure virtual)
+
+// ---- vtables (compiler-emitted; census) ----
+VTBL(resource, 0x004ebaac);

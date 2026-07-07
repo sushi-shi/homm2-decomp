@@ -111,3 +111,6 @@ void SortStats(long int * const, signed char * const) {}
 //  [ 0] VA(0x00414109, 0x1ef)  int townManager::Open(int)   <- override (implements baseManager pure virtual)
 //  [ 1] VA(0x00414e98, 0xca)  void townManager::Close(void)   <- override (implements baseManager pure virtual)
 //  [ 2] VA(0x0041595d, 0x1830)  int townManager::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
+
+// ---- vtables (compiler-emitted; census) ----
+VTBL(townManager, 0x004eb140);

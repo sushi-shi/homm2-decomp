@@ -40,3 +40,6 @@ void dropListWidget::ProcessSelectDialog(void) {}
 //  [ 0] VA(0x004dc630, 0xaf)  void dropListWidget::Draw(void)   <- override (implements widget pure virtual)
 //  [ 1] VA(0x004dbf40, 0x1f)  void * dropListWidget::scalar_dtor(unsigned int)   <- override (implements widget pure virtual)
 //  [ 2] VA(0x004dc2e0, 0x350)  int dropListWidget::Main(struct tag_message &)   <- override (implements widget pure virtual)
+
+// ---- vtables (compiler-emitted; census) ----
+VTBL(dropListWidget, 0x004ebad0);
