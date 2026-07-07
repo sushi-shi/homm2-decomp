@@ -41,10 +41,20 @@ VA(0x004cabb0, 0x45)
 void heroWindowManager::Close(void) {}
 
 VA(0x004cac00, 0x2d)
-int heroWindowManager::Main(struct tag_message &) { return 0; }
+int heroWindowManager::Main(struct tag_message &msg)
+{
+    int result = 0;
+    heroWindow *w = field_0x3a;
+    while (w != 0 && (result = w->BroadcastMessage(msg), result < 1 || result > 2))
+        w = w->field_0x8;
+    return result;
+}
 
 VA(0x004cac30, 0xf)
-int heroWindowManager::ConvertToHover(struct tag_message &) { return 0; }
+int heroWindowManager::ConvertToHover(struct tag_message &msg)
+{
+    return Main(msg);
+}
 
 VA(0x004cac40, 0x35)
 int heroWindowManager::BroadcastMessage(int type, int p2, int p3, int p4)
