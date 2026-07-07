@@ -7,6 +7,7 @@
 #include <BASE/border.h>
 #include <BASE/resourceManager.h>
 #include <BASE/bmap2.h>
+#include <BASE/bitmap.h>
 #include <BASE/icon.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
@@ -32,7 +33,13 @@ border::border(short int x, short int y, short int w, short int h, short int e, 
 }
 
 VA(0x004d21a0, 0x38)
-border::~border() {}
+border::~border()
+{
+    if (field_0x20 != 0)
+        gpResourceManager->Dispose(field_0x20);
+    if (field_0x24 != 0)
+        gpResourceManager->Dispose(field_0x24);
+}
 
 VA(0x004d21e0, 0x10e)
 void border::Read(void)
