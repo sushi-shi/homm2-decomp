@@ -21,4 +21,31 @@ int dpWaitForExtraGuests(void);
 int dpWaitForHost(void);
 void DPSD(int, char *, int);
 
+// ---- globals (declarations, RVA order) ----
+DATA(0x004ef7c8) extern struct IDirectPlay *lpIDC;
+DATA(0x004ef7cc) extern unsigned long dcoID;
+DATA(0x004ef7d0) extern struct _GUID *IPXGuid;
+DATA(0x004ef7d4) extern struct _GUID *TCPGuid;
+DATA(0x004ef7d8) extern void *dphEvent;
+DATA(0x004ef7dc) extern int iDPRcvBufferHead;
+DATA(0x004ef7e0) extern int iDPRcvBufferTail;
+DATA(0x004ef7e4) extern unsigned char **ppDPRcvBuffer;
+DATA(0x004ef7e8) extern int *piDPRcvBufferSize;
+DATA(0x004ef7ec) extern int bStartUpInfoReceived;
+DATA(0x004ef7f0) extern void *hinstDplayx;
+DATA(0x004ef7f4) extern int iDPWaitForFirstGuestStatus;
+DATA(0x004ef7f8) extern int iDPWaitForHostStatus;
+DATA(0x004ef7fc) extern int iWaitForHostWaitCount;
+DATA(0x004ef800) extern int iEnumCount;
+DATA(0x004ef804) extern int iLastHereIAmTickCount;
+DATA(0x004ef808) extern int bInDPSD;
+DATA(0x004ef80c) extern int iGUIDCount;
+DATA(0x004ef810) extern int iLastMsgNumHumanPlayers;
+DATA(0x00525060) extern int iMaxSession;
+DATA(0x00525064) extern int giHostAcceptStatus;
+DATA(0x00525068) extern struct _GUID *g_lpGuid;
+DATA(0x00525070) extern int *giNetPosToDCOPos;
+DATA(0x00525088) extern int iSessionToTry;
+DATA(0x00525090) extern long *lSessions;
+
 #endif // HOMM2_DPNETWIN_H

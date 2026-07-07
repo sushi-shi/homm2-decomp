@@ -382,6 +382,8 @@ int DataEntryWindowHandler(struct tag_message &message)
 // ---- globals (definitions, RVA order) ----
 int iMemEntries;
 MemEntry *gpMemEntry;
+int giTotalMemAllocated;
+unsigned char *giChangeThreshold;
 int iLastSeed;
 class heroWindow *DataEntryWin;
 char *cDEDest;

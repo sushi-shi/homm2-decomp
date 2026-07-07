@@ -85,4 +85,11 @@ public:
     void CheckAnduranPieces(int);
 };
 #pragma pack(pop)
+// ---- globals (declarations, RVA order) ----
+DATA(0x004f6c88) extern class hero *gpHVHero;
+DATA(0x004f6c8c) extern class heroWindow *gheroWin;
+DATA(0x004f6cd0) extern short *gMinExpForLevel;
+DATA(0x005280dc) extern int iOrigHeroViewID;
+DATA(0x005280e0) extern int gbNoDismiss;
+
 #endif // HOMM2_SOURCE_HERO_H

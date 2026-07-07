@@ -54,7 +54,23 @@ VA(0x0041d027, 0x10)
 void InitVideo(void) {}
 
 // ---- globals (definitions, RVA order) ----
+char *szAppName;
+char *szTitle;
 void *hwndApp;
 void *hmnuApp;
 void *gEventHandle;
+long lLastGTimerTickCount;
+long lLastCycleColorsTickCount;
+int bRestartMusic;
+int iLastMusic;
+long lLastGetMessage;
+long lLastAilServe;
+int gbNoDialogMenusOn;
 void *hInstApp;
+int iMainWinScreenHeight;
+void *hmnuCurrent;
+int iTempX;
+int iTempY;
+long lTemp;
+unsigned char *bProcessMessage;
+int iMainWinScreenWidth;

@@ -26,3 +26,16 @@ int OverviewHandler(struct tag_message &) { return 0; }
 
 VA(0x0040ab6c, 0x4fa)
 int game::ProcessIconSelect(int, int) { return 0; }
+
+// ---- globals (definitions, RVA order) ----
+class heroWindow *overWin;
+class textWidget **textWidgetDynamic;
+class iconWidget **iconWidgetDynamic;
+int giOverviewType;
+int *giOverviewTop;
+class iconWidget *OVScrollKnob;
+int iLastDynamicType;
+int iLastDynamicTop;
+int iOverviewItems;
+int *giOverviewItems;
+class textWidget **textWidgetTitle;

@@ -36,4 +36,7 @@ public:
 };
 #pragma pack(pop)
 SIZE(searchArray, 0x2518);
+// ---- globals (declarations, RVA order) ----
+DATA(0x0052adc8) extern unsigned char *bIsMoatSlowed;
+
 #endif // HOMM2_SOURCE_SEARCHARRAY_H

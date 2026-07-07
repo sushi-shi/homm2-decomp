@@ -25,3 +25,11 @@ void soundManager::MIDISetVolume(void) {}
 
 VA(0x004d4040, 0x1)
 void soundManager::MIDIPoll(void) {}
+
+// ---- globals (definitions, RVA order) ----
+struct _MDI_DRIVER *hMDI;
+int CurrentMidiFile;
+unsigned char *bGotMidi;
+long lLastMIDIPollTickCount;
+class MIDIWrap **pMIDIWrap;
+struct _SEQUENCE **hSequence;

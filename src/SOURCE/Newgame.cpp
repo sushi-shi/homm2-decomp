@@ -53,3 +53,13 @@ void game::GetVictoryConditionText(char *) {}
 
 VA(0x004bb3cf, 0x2a7)
 int game::GetSideDesc(char *, int, int) { return 0; }
+
+// ---- globals (definitions, RVA order) ----
+int gbNewGameDialogOver;
+int NGKPcursorFlashOn;
+char *cNGKPDisplay;
+int gbNewGameShadowHidden;
+char *cNGKPCore;
+int NGKPcursorIndex;
+char **cTextReceivedBuffer;
+class icon *NGKPBkg;

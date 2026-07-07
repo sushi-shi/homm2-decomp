@@ -242,4 +242,32 @@ public:
     int GetSideDesc(char *, int, int);
 };
 #pragma pack(pop)
+// ---- globals (declarations, RVA order) ----
+DATA(0x004ed9e8) extern class heroWindow *overWin;
+DATA(0x004ed9ec) extern class textWidget **textWidgetDynamic;
+DATA(0x004ed9f0) extern class iconWidget **iconWidgetDynamic;
+DATA(0x004ed9f4) extern int giOverviewType;
+DATA(0x004ed9f8) extern int *giOverviewTop;
+DATA(0x004eda00) extern class iconWidget *OVScrollKnob;
+DATA(0x004ee248) extern int gbDoModemConfig;
+DATA(0x004f4f28) extern short (*trackXY)[13][2];
+DATA(0x004f4f90) extern class heroWindow *campWin;
+DATA(0x0051cd20) extern int gbNewGameDialogOver;
+DATA(0x0051cd24) extern int NGKPcursorFlashOn;
+DATA(0x00523258) extern int iLastDynamicType;
+DATA(0x0052325c) extern int iLastDynamicTop;
+DATA(0x00523260) extern int iOverviewItems;
+DATA(0x00523268) extern int *giOverviewItems;
+DATA(0x00523270) extern class textWidget **textWidgetTitle;
+DATA(0x00527ea4) extern int iCurViewSide;
+DATA(0x00527ea8) extern int iCampaignTrackType;
+DATA(0x00527eac) extern int bCampaignViewOnly;
+DATA(0x00527eb0) extern int iCurViewMap;
+DATA(0x00533150) extern char *cNGKPDisplay;
+DATA(0x00533154) extern int gbNewGameShadowHidden;
+DATA(0x00533158) extern char *cNGKPCore;
+DATA(0x0053315c) extern int NGKPcursorIndex;
+DATA(0x00533160) extern char **cTextReceivedBuffer;
+DATA(0x0053316c) extern class icon *NGKPBkg;
+
 #endif // HOMM2_SOURCE_GAME_H

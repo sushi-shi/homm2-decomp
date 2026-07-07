@@ -155,3 +155,8 @@ void resourceManager::ReadBlock(signed char *, unsigned long int) {}
 
 // ---- vtables (compiler-emitted; census) ----
 VTBL(resourceManager, 0x004eb9f0);
+
+// ---- globals (definitions, RVA order) ----
+int iSaveCtr;
+int *lastAggZ;
+long *lastPositionZ;

@@ -140,3 +140,7 @@ void ModifyFrameInfo(struct SMonFrameInfo *, int) {}
 
 VA(0x004542f8, 0xbe)
 int army::GetPowBaseY(void) { return 0; }
+
+// ---- globals (definitions, RVA order) ----
+int bSecondAttack;
+int gbGenieHalf;

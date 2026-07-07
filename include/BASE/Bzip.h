@@ -128,4 +128,10 @@ DATA(0x0051ff50) extern UInt32 crc32Table[256];
 DATA(0x00537028) extern char inName[];
 DATA(0x00537430) extern char outName[];
 
+// ---- globals (declarations, RVA order) ----
+DATA(0x00534ee4) extern int longestFileName;
+DATA(0x00534ee8) extern int opMode;
+DATA(0x00537c58) extern char *progNameReally;
+DATA(0x00538078) extern int keepInputFiles;
+
 #endif // HOMM2_BASE_BZIP_H

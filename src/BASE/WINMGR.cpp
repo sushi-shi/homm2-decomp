@@ -77,3 +77,13 @@ void CreateColorLookupTables(void) {}
 
 // ---- vtables (compiler-emitted; census) ----
 VTBL(heroWindowManager, 0x004eba10);
+
+// ---- globals (definitions, RVA order) ----
+int iCombatCycleFrame;
+int gbEveryOtherCycle;
+int iCycle1Count;
+int iCycle2Count;
+int iCycle3Count;
+int iDialogNestCount;
+signed char *gCyclePal;
+short memSelector;

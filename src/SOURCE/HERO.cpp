@@ -128,3 +128,10 @@ void hero::DoSSLevelDialog(int, int) {}
 
 VA(0x00470779, 0x12f)
 void hero::CheckAnduranPieces(int) {}
+
+// ---- globals (definitions, RVA order) ----
+class hero *gpHVHero;
+class heroWindow *gheroWin;
+short *gMinExpForLevel;
+int iOrigHeroViewID;
+int gbNoDismiss;

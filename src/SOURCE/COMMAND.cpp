@@ -113,3 +113,20 @@ void combatManager::SetupSmallView(void) {}
 
 VA(0x00431f1f, 0x304)
 void combatManager::ViewBallista(int) {}
+
+// ---- globals (definitions, RVA order) ----
+int gbThisNetHasControl;
+int iCurTransferArtifact;
+signed char *iTransferArtifactsInfo;
+int gbWhichAnimationPlaying;
+int iMaxTransferArtifacts;
+int giNextActionExtra;
+int bSkeletonsShown;
+int gbShowingLoseWindow;
+int giWinCmbtFrame;
+int giNextActionGridIndex;
+int giSurrenderCost;
+int giSkeletonsCreated;
+signed char *iTransferArtifacts;
+int giNextAction;
+int giNextActionGridIndex2;

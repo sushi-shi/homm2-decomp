@@ -50,4 +50,14 @@ public:
 };
 #pragma pack(pop)
 SIZE(heroWindowManager, 0x62);
+// ---- globals (declarations, RVA order) ----
+DATA(0x0051ef28) extern int iCombatCycleFrame;
+DATA(0x0051ef2c) extern int gbEveryOtherCycle;
+DATA(0x0051ef30) extern int iCycle1Count;
+DATA(0x0051ef34) extern int iCycle2Count;
+DATA(0x0051ef38) extern int iCycle3Count;
+DATA(0x0051ef3c) extern int iDialogNestCount;
+DATA(0x00534908) extern signed char *gCyclePal;
+DATA(0x00534968) extern short memSelector;
+
 #endif // HOMM2_BASE_HEROWINDOWMANAGER_H

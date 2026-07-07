@@ -45,6 +45,32 @@ VA(0x004a48e0, 0x163)
 int TransmitAndWait(char *, int, int, signed char, signed char, char * *) { return 0; }
 
 // ---- globals (definitions, RVA order) ----
+int iInOrderCtr;
+int iCurLastID;
+int giLastConfirm;
+unsigned char GameMode;
+long lLastHeartbeatSend;
+int gbInRemoteMain;
+int gbInRemoteCleanup;
+int iIDCtr;
+int iTimesDropped;
+signed char gbInNetSetup;
+int bUseDirectPlay;
+int bUseWinsock;
+signed char bInTimeoutFail;
+int *iBaud;
+int *iIRQ;
+char *rcvBufOut;
+int *iLastIds;
+char *PacketSend;
 char gbUseDiffCompression;
 char gbUseRegularCompression;
+int *iInOrder;
+char *sndBuf;
+char *gcThisNetName;
+long *lLastHeartbeatReceive;
+char *packet;
 SNetPlayerInfo gsNetPlayerInfo[1];
+char *rcvBufIn;
+char **rcvBuf;
+int bGotGameType;

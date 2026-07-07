@@ -34,3 +34,15 @@ int wsWaitForExtraGuests(void) { return 0; }
 
 VA(0x00407746, 0x126)
 int wsWaitForHost(void) { return 0; }
+
+// ---- globals (definitions, RVA order) ----
+int bHostFound;
+unsigned int sd_dg;
+int iWSLastMsgNumHumanPlayers;
+int iWSAttempts;
+int iWSNextTickCount;
+int iWSWaitForHostStatus;
+int iRc;
+char *cWSTextBuffer;
+unsigned short wVer;
+int iAddrLen;

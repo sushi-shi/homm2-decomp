@@ -20,3 +20,21 @@ void advManager::VWCompleteDraw(void) {}
 
 VA(0x00434c1a, 0x5e2)
 int ViewWorldDialogHandler(struct tag_message &) { return 0; }
+
+// ---- globals (definitions, RVA order) ----
+int giViewWorldScale;
+int giViewWorldScaleLookup;
+int gbInViewWorld;
+class icon *pVWMisc;
+class icon *pVWLetters;
+int iVWYPixelOffset;
+class icon *pVWGround;
+int iVWViewableCells;
+class icon *pVWFlags;
+int iVWDrawAllTerrains;
+int iVWWhatToDraw;
+int iVWDrawAllObjs;
+int iVWMapOriginX;
+int iVWMapOriginY;
+int iVWCenterOffset;
+int iVWXPixelOffset;

@@ -26,3 +26,10 @@ void game::InitEntireCampaign(int) {}
 
 VA(0x004493ba, 0xbb7)
 void game::InitCampaignMap(void) {}
+
+// ---- globals (definitions, RVA order) ----
+class heroWindow *campWin;
+int iCurViewSide;
+int iCampaignTrackType;
+int bCampaignViewOnly;
+int iCurViewMap;

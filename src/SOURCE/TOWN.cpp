@@ -31,3 +31,6 @@ int town::CanBuildDock(void) { return 0; }
 
 VA(0x00433315, 0x9f)
 void town::CalcNumLevelArchers(int *, int *) {}
+
+// ---- globals (definitions, RVA order) ----
+int bEnteringTown;

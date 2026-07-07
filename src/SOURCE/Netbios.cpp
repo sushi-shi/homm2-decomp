@@ -19,3 +19,11 @@ signed char WaitForGuest(void) { return 0; }
 
 VA(0x00413738, 0x1ba)
 int nbnet_init(void) { return 0; }
+
+// ---- globals (definitions, RVA order) ----
+signed char iInitNetHostStatus;
+signed char iInitNetGuestStatus;
+int iNameRetryCount;
+signed char iWaitForHostStatus;
+signed char iWaitForGuestStatus;
+int iLastBroadcastTime;

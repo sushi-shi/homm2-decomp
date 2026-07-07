@@ -23,3 +23,20 @@ void SetupNewTrade(void) {}
 
 VA(0x004bfcbb, 0x3b6)
 int TradingPostHandler(struct tag_message &) { return 0; }
+
+// ---- globals (definitions, RVA order) ----
+unsigned short *coreRatio;
+class iconWidget *tradeKnob;
+int qtyToTrade;
+int leftResource;
+int iTradeRatio;
+int bTradeMade;
+float fTradingPostEfficiency;
+int tpX;
+int tpY;
+int bIsMarketPlace;
+int bLeftDenominated;
+class heroWindow *tpWindow;
+int rightResource;
+int iMaxUnitsToTrade;
+int maxUnitsToTrade;
