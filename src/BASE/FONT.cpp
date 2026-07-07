@@ -107,7 +107,56 @@ int font::GetCharacterWidth(unsigned char c)
 }
 
 VA(0x004c7470, 0x313)
-void font::DrawBoundedString(char *, int, int, int, int, int, int) {}
+void font::DrawBoundedString(char *str, int x, int y, int w, int h, int mode, int align)
+{
+    int len = strlen(str);
+    int xOff = 0;
+    int yOff = 0;
+    int i = 0;
+    if (align & 4) {
+        align -= 4;
+        int lines = LineLength(str, w);
+        if (field_0x10 * lines < h)
+            yOff = (h - field_0x10 * lines) / 2;
+    }
+    field_0x18 = 0;
+    while (1) {
+        int lineStart = i;
+        int lineWidth = 0;
+        if (len <= i || str[i] == 0 || (h < field_0x10 + yOff && yOff != 0))
+            return;
+        while (str[i] != 0 && str[i] != '\n' && lineWidth <= w) {
+            lineWidth += GetCharacterWidth(str[i]);
+            i++;
+        }
+        if (w < lineWidth) {
+            int breakPt = 0;
+            while (i--, str[i] != ' ' && lineStart <= i) {
+                lineWidth -= GetCharacterWidth(str[i]);
+                if (h < field_0x10 * 2 + yOff && lineWidth < w)
+                    break;
+                if (breakPt == 0 && lineWidth < w)
+                    breakPt = i;
+            }
+            if (i <= lineStart)
+                i = breakPt;
+            if (str[i] == ' ')
+                lineWidth -= GetCharacterWidth(str[i]);
+        }
+        char saved = str[i];
+        str[i] = 0;
+        if (align == 0)
+            xOff = 0;
+        else if (align == 1)
+            xOff = (w - lineWidth) / 2;
+        else if (align == 2)
+            xOff = w - lineWidth;
+        DrawStringExecute(str + lineStart, xOff + x, yOff + y, mode, x, y, w, h);
+        str[i] = saved;
+        yOff += field_0x10;
+        i++;
+    }
+}
 
 VA(0x004c7790, 0x1b3)
 int font::LineLength(char *str, int maxW)
