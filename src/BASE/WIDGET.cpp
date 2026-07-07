@@ -6,7 +6,20 @@
 #include <va.h>
 #include <BASE/widget.h>
 VA(0x004dde00, 0x5a)
-widget::widget(short int, short int, short int, short int, short int, short int) {}
+widget::widget(short int x, short int y, short int w, short int h, short int p5, short int kind)
+{
+    field_0x18 = x;
+    field_0x4 = 0;
+    field_0x1a = y;
+    field_0x8 = 0;
+    field_0xc = 0;
+    field_0x16 = 6;
+    field_0x12 = -1;
+    field_0x1c = w;
+    field_0x1e = h;
+    field_0x10 = p5;
+    field_0x14 = kind;
+}
 
 VA(0x004dde60, 0x3f)
 widget::widget(void)
