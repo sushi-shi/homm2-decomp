@@ -155,12 +155,17 @@ void font::DrawBoundedString(char *str, int x, int y, int w, int h, int mode, in
         }
         char saved = s[i];
         s[i] = 0;
-        if (align == 0)
+        switch (align) {
+        case 0:
             xOff = 0;
-        else if (align == 1)
+            break;
+        case 1:
             xOff = (w - lineWidth) / 2;
-        else if (align == 2)
+            break;
+        case 2:
             xOff = w - lineWidth;
+            break;
+        }
         DrawStringExecute(s + lineStart, xOff + x, yOff + y, m, x, y, w, h);
         s[i] = saved;
         yOff += field_0x10;
