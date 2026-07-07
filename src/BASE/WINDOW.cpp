@@ -15,7 +15,17 @@ VA(0x004cecd0, 0x521)
 heroWindow::heroWindow(int, int, char *) {}
 
 VA(0x004cf200, 0x73)
-int heroWindow::Open(int, int) { return 0; }
+int heroWindow::Open(int x, int flags)
+{
+    if (field_0x24 & 1)
+        return 3;
+    if ((field_0x20 & 2) != 0 && SaveBackground() != 0)
+        return 3;
+    field_0x0 = x;
+    DrawWindow(flags);
+    field_0x24 |= 1;
+    return 0;
+}
 
 VA(0x004cf280, 0x90)
 void heroWindow::RemoveAndDeleteWidget(int) {}
