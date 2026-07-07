@@ -5,8 +5,34 @@
 
 #include <va.h>
 #include <BASE/mouseManager.h>
+#include <string.h>
 VA(0x004c9270, 0xd9)
-mouseManager::mouseManager(void) {}
+mouseManager::mouseManager(void) : baseManager()
+{
+    int i;
+    field_0x36 = 0;
+    field_0x32 = 0;
+    field_0x42 = -1;
+    strcpy(name, "mouseManager");
+    field_0x3a = 0;
+    field_0x82 = 1;
+    field_0x3e = 0;
+    for (i = 0; i < 0x60; i++)
+        hbmpAndMask[i] = 0;
+    for (i = 0; i < 0x60; i++)
+        hMouseCursor[i] = 0;
+    for (i = 0; i < 0x60; i++)
+        cColorBits[i] = 0;
+    for (i = 0; i < 0x60; i++)
+        cAndBits[i] = 0;
+    for (i = 0; i < 0x60; i++) {
+        if (iHotSpot[i][0] == -1)
+            iHotSpot[i][0] = iMouseSize[i][1] / 2;
+        if (iHotSpot[i][1] == -1)
+            iHotSpot[i][1] = iMouseSize[i][1] / 2;
+    }
+    field_0x86 = 1;
+}
 
 VA(0x004c9350, 0x94)
 int mouseManager::Open(int) { return 0; }

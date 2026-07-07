@@ -185,7 +185,7 @@ BASE/Icondf2b	?FlipDimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	0.6024	c4
 BASE/Iconf2b	?FlipIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	0.2653	3c59bbcd3a73
 BASE/Iconm2b	?MonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	0.5525	55b09710d7a1
 BASE/Iconmf2b	?FlipMonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	0.5988	cd02c210f51a
-BASE/MOUSEMGR	??0mouseManager@@QAE@XZ	9.3846	5229a254ae31
+BASE/MOUSEMGR	??0mouseManager@@QAE@XZ	100.0000	cd5abb5d46d3
 BASE/MOUSEMGR	?CheckUpdateMousePos@mouseManager@@QAEXXZ	3.1250	94861ce89cbc
 BASE/MOUSEMGR	?Close@mouseManager@@UAEXXZ	1.5385	eb07ff9283b8
 BASE/MOUSEMGR	?HideColorPointer@mouseManager@@QAEXXZ	66.8750	688ccea1eb03
