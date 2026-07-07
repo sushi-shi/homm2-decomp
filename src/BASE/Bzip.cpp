@@ -4,6 +4,11 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <BASE/Bzip.h>       // bzip types/records + this TU's free-function decls
+#include <BASE/Misc.h>       // LogStr, BaseAlloc, BaseFree, Random
+#include <SOURCE/KB.h>       // FileError
+#include <_globals.h>        // crc32Table, inName, outName, gText
+#include <io.h>              // _open, _write, _close
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -13,46 +18,17 @@
 // rep movs, not calls), so intrinsics are on for this TU.
 #pragma intrinsic(strcpy, strcat, strlen, memcpy)
 
-// bzip-0.21 (Julian Seward, 1996) — the original arithmetic-coding bzip the
-// retail Bzip.obj is built from. Types/macros mirror the reference so bodies
-// transcribe near-verbatim (same names -> matching /Od stack slots).
-typedef int            Int32;
-typedef unsigned int   UInt32;
-typedef short          Int16;
-typedef unsigned short UInt16;
-typedef char           Char;
-typedef unsigned char  UChar;
-typedef int            Bool;
-typedef int            IntNative;
+// bzip-0.21 types/records live in BASE/Bzip.h (included above). Body-only macros stay here.
 #define True  1
 #define False 0
 #define ERROR_IF_EOF(i)       { if ((i) == EOF)  ioError(); }
 #define ERROR_IF_NOT_ZERO(i)  { if ((i) != 0)    ioError(); }
 #define ERROR_IF_MINUS_ONE(i) { if ((i) == (-1)) ioError(); }
 
-#define MAX_SYMBOLS 256
 #define TWO_TO_THE(n) (1 << (n))
 #define MAX_BITS_OUTSTANDING 500000000
 #define smallB 26
 #define smallF 18
-
-struct BitStream {
-    FILE  *handle;
-    Int32  buffer;
-    Int32  buffLive;
-    Char   mode;
-};
-
-struct Model {
-    UInt32  numScalings;
-    UInt32  numTraffic;
-    UInt32  totFreq;
-    UInt32  numSymbols;
-    UInt32  incValue;
-    UInt32  noExceed;
-    Char   *name;
-    UInt32  freq[MAX_SYMBOLS + 2];
-};
 
 unsigned int globalCrc;
 int bsInUse;
@@ -107,9 +83,6 @@ Int32   compressing;
 Int32   bytesIn;
 Int32   verbose;
 FILE   *outputHandleJustInCase;
-extern UInt32 crc32Table[256];
-extern char inName[];
-extern char outName[];
 
 #define MY_EOF 257
 #define UPDATE_CRC(crcVar,cha)              \
@@ -126,26 +99,9 @@ extern char outName[];
 #define GETFIRST16(a)  ((UInt32)(words[a] >> 16))
 #define GETREST16(a)   (words[a] & 0x0000ffff)
 
-void blockOverrun(void);
-void unblockError(void);
-void crcError(UInt32 crcStored, UInt32 crcComputed);
-void setDecompressStructureSizes(Int32 newSize100k);
-void compressOutOfMemory(Int32 draw, Int32 blockSize);
-void uncompressOutOfMemory(Int32 draw, Int32 blockSize);
-
-void panic(char *s);
-void ioError(void);
-void compressedStreamEOF(void);
-void bitStreamEOF(void);
-extern char gText[];
-extern void LogStr(char *);
-extern void *BaseAlloc(unsigned int size, char *file, int line);
-extern void BaseFree(void *ptr, char *file, int line);
-extern void FileError(char *);
-extern int Random(int, int);
-extern "C" int _open(const char *, int, int);
-extern "C" int _write(int, const void *, unsigned int);
-extern "C" int _close(int);
+// (Bzip's own free-function declarations are in BASE/Bzip.h; the externs they used —
+// gText, LogStr, BaseAlloc, BaseFree, FileError, Random — come from Misc.h/KB.h/_globals.h;
+// _open/_write/_close from <io.h>.)
 // NWC wraps malloc/free in BaseAlloc/BaseFree(ptr, __FILE__, __LINE__). __FILE__ is
 // the original build path (reloc-masked); __LINE__ immediates are hardcoded from the
 // retail disasm since our line layout differs.
