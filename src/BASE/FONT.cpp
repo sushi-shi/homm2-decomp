@@ -144,7 +144,7 @@ void font::DrawBoundedString(char *str, int x, int y, int w, int h, int mode, in
             while (i--, s[i] != ' ' && lineStart <= i) {
                 lineWidth -= GetCharacterWidth(s[i]);
                 if (h < field_0x10 * 2 + yOff && lineWidth < w)
-                    break;
+                    return;
                 if (breakPt == 0 && lineWidth < w)
                     breakPt = i;
             }
