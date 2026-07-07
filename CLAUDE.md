@@ -60,7 +60,14 @@ homm2 status    # per-unit + overall match %   (also: status update | status che
 ```
 
 `homm2 build` compiles each `config/units.toml` unit to `build/objdiff/base/<unit>.obj`
-and diffs it against the delinked retail target `build/delink/<unit>.c.obj`.
+and diffs it against the delinked retail target `build/delink/<unit>.c.obj`. ninja **tracks
+header deps** (MSVC 4.2 has no `/showIncludes`, so `cc_wrap.py` scans each TU's `#include`
+graph into a depfile) — editing a shared header recompiles exactly its includers, so a header
+change can't leave a stale obj. It then runs **four hard header-discipline gates** (a red gate
+fails the build): `assert_decls` (no local `class/struct/enum`/`extern`/fwd-decl in any .cpp),
+`assert_no_fake_labels` (no emitted fn symbol absent from CodeView), `assert_globals_data`
+(every global carries a unique `DATA(<VA>)`), `assert_defs_declared` (every free-fn definition
+is declared in its owner header). Scripts: `scripts/homm2/build/assert_*.py`.
 
 ## `homm2 sema` — semantic navigation (matcher's read-only toolbox)
 
@@ -104,6 +111,14 @@ the EXE + our known symbols. Needs the dev shell's Ghidra env (in the flake).
   *reconstruction* has a real body.
 - Mark a parked-below-100% match with **`// @early-stop`** + a byte-level reason line
   (see matcher.md). `rg '@early-stop' src` is the deferred set.
+- **Header discipline (owner-header model, gate-enforced):** a symbol defined in `<TU>.cpp`
+  is declared ONLY in its owner header `include/<TIER>/<TU>.h`; callers `#include` that. A .cpp
+  carries **no** local `class/struct/enum`/`extern`/forward-decls — types come from the recovered
+  class headers, cross-TU functions from their owner header, globals from `_globals.h`
+  (each `DATA(<VA>)`-annotated; synthetic/modelling globals in `_globals_model.h`), Win32 from
+  the custom minimal `include/win/windows.h`, CRT from real `<io.h>`/`<string.h>`. Include the
+  **specific** headers a TU uses — there is no `_all.h` umbrella. The four build gates enforce
+  all of this; regenerate an owner header with `scripts/homm2/build/gen_module_header.py`.
 
 ## Matching campaign (parallel by default)
 

@@ -53,9 +53,12 @@ The matching toolchain (VC4.2) is provisioned into `build/toolchain/` from the
 `en_vc42ent` discs; `clang`/`clangd` is editor tooling only — the wine MSVC 4.2 build is the
 sole verdict on a match.
 
-`homm2 build` also runs three **hard header-discipline gates** (a red gate fails the build):
-no TU declares types/externs/forward-decls locally (all come from headers), no object emits a
-function symbol absent from CodeView, and every global carries a unique `DATA(<its VA>)`.
+ninja **tracks header dependencies** (via `cc_wrap.py`, since MSVC 4.2 has no `/showIncludes`),
+so editing a shared header recompiles exactly its includers — no stale objects. `homm2 build`
+then runs four **hard header-discipline gates** (a red gate fails the build): no TU declares
+types/enums/externs/forward-decls locally (all come from headers), no object emits a function
+symbol absent from CodeView, every global carries a unique `DATA(<its VA>)`, and every free
+function is declared in its owner header.
 
 ## Navigate (`homm2 sema`)
 
