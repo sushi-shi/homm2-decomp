@@ -7,7 +7,7 @@ int is_netbios_avail(void);
 extern "C" unsigned short __fastcall nb_init(unsigned short, unsigned short);
 extern "C" int __fastcall nb_term(void);
 extern "C" unsigned short __fastcall nb_rcv(short, void *);
-extern "C" int __fastcall nb_snd(int, int, int);
+extern "C" unsigned short __fastcall nb_snd(short, short, void *);
 extern "C" int __cdecl nb_sess(void);
 extern "C" char __fastcall nb_stat(short);
 void nb_thr_ctl(void);
