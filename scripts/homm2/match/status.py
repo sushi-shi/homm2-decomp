@@ -50,11 +50,69 @@ def _rva_to_sym():
     return out
 
 
+def _class_members():
+    """{class: (base|None, {member_name: 'off'})} parsed from include/ headers. Members carry a
+    `// +0xNN` offset comment; the class line may say `: public Base`. Used to map member names to
+    their OFFSET so a rename (field_0x4 -> width) is invisible to the hash (offset unchanged)."""
+    cls = {}
+    memre = re.compile(r"^\s*[A-Za-z_][\w\s\*]*?\b([A-Za-z_]\w*)\s*(?:\[[^\]]*\])?\s*;\s*//\s*\+0x([0-9a-fA-F]+)")
+    clsre = re.compile(r"^class\s+(\w+)\b(?:\s*:\s*public\s+(\w+))?")
+    for h in sorted((REPO / "include").rglob("*.h")):
+        cur = None
+        for ln in h.read_text(errors="replace").splitlines():
+            m = clsre.match(ln)
+            if m and "{" in ln:
+                cur = m.group(1); cls.setdefault(cur, [m.group(2), {}])
+                continue
+            if cur:
+                mm = memre.match(ln)
+                if mm:
+                    cls[cur][1][mm.group(1)] = mm.group(2).lower()
+    return cls
+
+
+def _members_of(clsname, cmap, _seen=None):
+    """member_name -> off for a class and all its bases (flattened)."""
+    _seen = _seen or set()
+    if clsname in _seen or clsname not in cmap:
+        return {}
+    _seen.add(clsname)
+    base, mem = cmap[clsname]
+    out = dict(_members_of(base, cmap, _seen)) if base else {}
+    out.update(mem)
+    return out
+
+
+def _normalize(block, cmap):
+    """Make the hash independent of codegen-NEUTRAL renames: arg names -> a0,a1,... (position) and
+    member names -> m<off> (offset). LOCAL names are kept — they drive the /Od stack slot, so a
+    local rename that shifts a slot legitimately changes codegen (and must reset max%)."""
+    # arg names from the `Class::method(args)` signature
+    args = []
+    sig = re.search(r"::[~\w]+\s*\(([^)]*)\)", block)
+    if sig:
+        for a in sig.group(1).split(","):
+            nm = re.search(r"([A-Za-z_]\w*)\s*$", a.strip())
+            if nm:
+                args.append(nm.group(1))
+    # owner class from `ret Class::method(`  (map its + base members)
+    mem = {}
+    cm = re.search(r"\b(\w+)::[~\w]+\s*\(", block)
+    if cm:
+        mem = _members_of(cm.group(1), cmap)
+    n = re.sub(r"\bfield_0x([0-9a-fA-F]+)\b", lambda m: "m0x" + m.group(1).lower(), block)
+    for name, off in mem.items():
+        n = re.sub(r"\b" + re.escape(name) + r"\b", "m0x" + off, n)
+    for i, a in enumerate(args):
+        n = re.sub(r"\b" + re.escape(a) + r"\b", "a%d" % i, n)
+    return n
+
+
 def source_hashes():
-    """{(unit, function): 12-hex sha1 of that function's SOURCE block}. A block runs from its
-    VA(...) marker to the next VA/DATA/VTBL/section marker, so editing one function changes only
-    its own hash — a sibling edit leaves it untouched (that is what keeps max% stable)."""
-    sym = _rva_to_sym()
+    """{(unit, function): 12-hex sha1 of that function's NORMALIZED source block}. A block runs from
+    its VA(...) marker to the next VA/DATA/VTBL/section marker; names are normalized (see _normalize)
+    so editing one function changes only its own hash, and codegen-neutral arg/member renames don't."""
+    sym = _rva_to_sym(); cmap = _class_members()
     out = {}
     for cpp in sorted((REPO / "src").rglob("*.cpp")):
         text = cpp.read_text(errors="replace")
@@ -68,7 +126,8 @@ def source_hashes():
             block = re.split(r"(?m)^\s*(?:DATA\(|VTBL\(|// ===|#endif)", block)[0]
             key = sym.get(rva)
             if key:
-                out[key] = hashlib.sha1(block.encode("utf-8", "replace")).hexdigest()[:12]
+                norm = _normalize(block, cmap)
+                out[key] = hashlib.sha1(norm.encode("utf-8", "replace")).hexdigest()[:12]
     return out
 
 
