@@ -1,0 +1,71 @@
+# What `homm2 build` asserts
+
+`homm2 build` is `configure.py` → `ninja` (compile every TU with wine MSVC 4.2 via
+`cc_wrap.py`) → **hard gates** → objdiff/README refresh. A **red gate exits non-zero and fails
+the build** — they are not warnings. All gate scripts live in `scripts/homm2/build/` and run
+from the repo root; each is independently runnable (`python3 -m homm2.build.<name>`).
+
+Ordering in `cli.py`: compile must succeed first (ninja), then the five gates below in order.
+
+## 0. Compile + header-dependency tracking (ninja)
+
+Every `config/units.toml` unit must compile to `build/objdiff/base/<unit>.obj`; a compile
+error fails the build. MSVC 4.2 has no `/showIncludes`, so `cc_wrap.py` scans each TU's
+`#include` graph and writes a depfile (`deps=gcc` in `build.ninja`) — **editing a shared
+header recompiles exactly its includers**, so a header change can never leave a stale object
+(this previously masked drift). See `docs/patterns/` and the `cc_wrap.py` header.
+
+## The five hard gates
+
+### 1. `assert_decls` — header discipline (no local declarations)
+No `.cpp` may carry its own `class` / `struct` / `enum` definition, `extern` declaration, or
+file-scope function forward-declaration. Everything is declared in a header so two TUs cannot
+drift by declaring the same entity differently (the retail already had `_open` 2-arg vs 3-arg,
+`gDwellingType[][12]` vs `[20][12]`). Allowed in a `.cpp`: function **definitions** (incl.
+`extern "C" T f(){}` and linkage blocks) and `#include`s.
+
+### 2. `assert_no_fake_labels` — no invented symbols
+Every external **function** symbol a `.cpp` emits (defined, `.text`) must exist in CodeView
+(`build/gen/symbol_names.csv`). Catches hand-written functions/labels that don't correspond to
+a real retail symbol — the source may only reconstruct symbols the binary actually has.
+
+### 3. `assert_globals_data` — DATA(VA) discipline
+For globals (now distributed across owner-TU headers + `_globals_model.h`, since `_globals.h`
+was dissolved):
+- every `extern` global that **is** a CodeView data symbol carries `DATA(0x<its exact VA>)`;
+- a global with **no** CodeView symbol lives only in `include/_globals_model.h` (still with a
+  `DATA()`, VA pinned from the retail — it can't be attributed to a TU);
+- every `DATA()` VA is **unique across all headers** (one VA == one global, no repeats);
+- **no `DATA()` in any `.cpp`** — the address annotation belongs on the header declaration.
+
+### 4. `assert_defs_declared` — every definition has a header declaration
+Every free function **defined** in a `.cpp` is **declared** in that TU's owner header
+`include/<TIER>/<TU>.h`, and the `.cpp` `#include`s its own header. Member functions are
+exempt (declared in their class header). Closes the loop with gate 1: a definition's prototype
+lives in a header, so callers share the one canonical declaration. Owner headers are
+bootstrapped by `gen_module_header.py`.
+
+### 5. `assert_globals_defined` — link-completeness
+Every global **declared** `extern` in a header has a **definition** in its owner TU's object
+(symbol defined, section > 0, in `build/objdiff/base/<owner>.obj`) — so the project has no
+unresolved externals and can link. Synthetic globals (`_globals_model.h`) and the `_const`
+pseudo-unit are exempt (they alias real storage / have no owning TU). Definitions are generated
+by `gen_global_defs.py` (plain `T g;` in retail-RVA order; the header keeps the `DATA(VA)`).
+
+## The owner model these enforce
+
+- A symbol defined in `<TU>.cpp` is **declared only** in `include/<TIER>/<TU>.h`; callers
+  `#include` that specific header (there is no `_all.h` / `_globals.h` umbrella).
+- Types come from the recovered class headers; globals from their owner-TU headers
+  (`DATA(VA) extern`) + a plain definition in the owner `.cpp`; Win32 from
+  `include/win/windows.h`; CRT from real `<io.h>`/`<string.h>`; owner-less globals from
+  `include/_globals_model.h`.
+
+## Related checks (not wired as build gates)
+
+- `verify_carcass.py` — every CodeView **function** symbol is present in its object (carcass
+  completeness). Was the carcass-phase acceptance check; run it manually
+  (`python3 scripts/homm2/match/verify_carcass.py`).
+- `homm2 status check` — gates **match-percentage** regressions vs `config/match_baseline.tsv`
+  at integration (soft `tu-cumulative-eval-order` drift is blessed with
+  `status update --accept-regressions`; it is *not* one of the hard build gates).
