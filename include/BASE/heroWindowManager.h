@@ -17,9 +17,9 @@ public:
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
     heroWindow *field_0x36;  // +0x36  window-list head
-    int    field_0x3a;  // +0x3a
-    int    field_0x3e;  // +0x3e
-    int    field_0x42;  // +0x42
+    heroWindow *field_0x3a;  // +0x3a  window-list tail
+    heroWindow *field_0x3e;  // +0x3e  focus window
+    heroWindow *field_0x42;  // +0x42  active window
     bitmap *field_0x46;  // +0x46  (target screen bitmap)
     bitmap *field_0x4a;  // +0x4a  fizzle-source saved bitmap
     int    field_0x4e;  // +0x4e
