@@ -63,12 +63,13 @@ homm2 status    # per-unit + overall match %   (also: status update | status che
 and diffs it against the delinked retail target `build/delink/<unit>.c.obj`. ninja **tracks
 header deps** (MSVC 4.2 has no `/showIncludes`, so `cc_wrap.py` scans each TU's `#include`
 graph into a depfile) — editing a shared header recompiles exactly its includers, so a header
-change can't leave a stale obj. It then runs **five hard gates** (a red gate fails the build):
+change can't leave a stale obj. It then runs **six hard gates** (a red gate fails the build):
 `assert_decls` (no local `class/struct/enum`/`extern`/fwd-decl in any .cpp), `assert_no_fake_labels`
 (no emitted fn symbol absent from CodeView), `assert_globals_data` (every global carries a unique
 `DATA(<VA>)`; none in a .cpp), `assert_defs_declared` (every free-fn definition is declared in its
 owner header), `assert_globals_defined` (every extern global has a definition in its owner TU —
-link-completeness). Full catalog + rationale: **`docs/build-asserts.md`**.
+link-completeness), `assert_vtables` (every class vtable is claimed by a `VTBL()` census marker in
+its owner TU — no drift, no fake classes). Full catalog + rationale: **`docs/build-asserts.md`**.
 
 ## `homm2 sema` — semantic navigation (matcher's read-only toolbox)
 
@@ -120,7 +121,7 @@ the EXE + our known symbols. Needs the dev shell's Ghidra env (in the flake).
   **definition** in that owner `.cpp`; globals with no CodeView symbol go in `_globals_model.h`.
   Win32 from the custom minimal `include/win/windows.h`, CRT from real `<io.h>`/`<string.h>`.
   Include the **specific** headers a TU uses — there is no `_all.h` or `_globals.h` umbrella (both
-  dissolved). The five build gates (`docs/build-asserts.md`) enforce all of this; bootstrap an
+  dissolved). The six build gates (`docs/build-asserts.md`) enforce all of this; bootstrap an
   owner header with `gen_module_header.py`, global defs with `gen_global_defs.py`.
 
 ## Matching campaign (parallel by default)
