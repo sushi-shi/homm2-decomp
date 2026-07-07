@@ -335,9 +335,9 @@ BASE/WINDOW	??0heroWindow@@QAE@XZ	28.0000	1a663d8117bd
 BASE/WINDOW	?AddWidget@heroWindow@@QAEXPAVwidget@@H@Z	13.8085	3f9ab5e0906e
 BASE/WINDOW	?BroadcastMessage@heroWindow@@QAEHAAUtag_message@@@Z	29.7333	c4dd66fd12a4
 BASE/WINDOW	?Close@heroWindow@@QAEXXZ	24.4906	33c78b7305af
-BASE/WINDOW	?DrawWindow@heroWindow@@QAEXH@Z	68.4210	da57d1813511
+BASE/WINDOW	?DrawWindow@heroWindow@@QAEXH@Z	100.0000	fc92f6b38f7d
 BASE/WINDOW	?DrawWindow@heroWindow@@QAEXHHH@Z	16.8571	9335b11f5019
-BASE/WINDOW	?DrawWindow@heroWindow@@QAEXXZ	81.2500	55bff43a14e3
+BASE/WINDOW	?DrawWindow@heroWindow@@QAEXXZ	100.0000	05354f94dd26
 BASE/WINDOW	?MoveWindow@heroWindow@@QAEXHH@Z	10.3840	c50bae354869
 BASE/WINDOW	?Open@heroWindow@@QAEHHH@Z	37.8378	e70068912d6b
 BASE/WINDOW	?RemoveAndDeleteWidget@heroWindow@@QAEXH@Z	27.6170	756c797eb96f

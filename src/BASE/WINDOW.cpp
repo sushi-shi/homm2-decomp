@@ -33,10 +33,10 @@ VA(0x004cf620, 0x95)
 int heroWindow::BroadcastMessage(struct tag_message &) { return 0; }
 
 VA(0x004cf6c0, 0x20)
-void heroWindow::DrawWindow(void) {}
+void heroWindow::DrawWindow(void) { DrawWindow(1); }
 
 VA(0x004cf6e0, 0x2e)
-void heroWindow::DrawWindow(int) {}
+void heroWindow::DrawWindow(int flags) { DrawWindow(flags, -0xffff, 0xffff); }
 
 VA(0x004cf710, 0x116)
 void heroWindow::DrawWindow(int, int, int) {}
