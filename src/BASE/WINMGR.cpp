@@ -8,6 +8,7 @@
 #include <BASE/WINMGR.h>
 #include <BASE/bitmap.h>
 #include <BASE/Misc.h>
+#include <BASE/bmap2.h>
 #include <BASE/mouseManager.h>
 #include <BASE/heroWindow.h>
 #include <BASE/palette.h>
@@ -253,7 +254,31 @@ void heroWindowManager::ScreenShot(void)
 }
 
 VA(0x004cb110, 0xc0)
-void heroWindowManager::SaveFizzleSource(int, int, int, int) {}
+void heroWindowManager::SaveFizzleSource(int param_1, int param_2, int param_3, int param_4)
+{
+    int origX = param_1;
+    if (bShowIt != 0) {
+        if (param_1 < 0) {
+            param_1 = 0;
+            param_3 = param_3 + origX;
+        }
+        if (param_2 < 0) {
+            param_4 = param_4 + param_2;
+            param_2 = 0;
+        }
+        if (640 < param_1 + param_3)
+            param_3 = 640 - param_1;
+        if (480 < param_2 + param_4)
+            param_4 = 480 - param_2;
+        if (param_3 > 0 && param_4 > 0) {
+            if (field_0x4a != 0)
+                delete field_0x4a;
+            field_0x4a = new bitmap(0, param_3, param_4);
+            BlitBitmap(gpWindowManager->field_0x46, param_1, param_2, param_3, param_4,
+                       field_0x4a, 0, 0);
+        }
+    }
+}
 
 VA(0x004cb1d0, 0x1)
 void CreateFizzleTables(void) {}
