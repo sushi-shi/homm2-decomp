@@ -10,8 +10,24 @@
 #include <BASE/bitmap.h>
 #include <SOURCE/KB.h>
 #include <stdlib.h>
+#include <string.h>
 VA(0x004ceb70, 0xaa)
-heroWindow::heroWindow(void) {}
+heroWindow::heroWindow(void)
+{
+    strcpy(name, "Default Construct");
+    field_0x8 = 0;
+    field_0x4 = field_0x8;
+    field_0x0 = -1;
+    field_0x2c = 0;
+    field_0x28 = field_0x2c;
+    field_0x30 = 640;
+    field_0x34 = 480;
+    field_0x20 = 1;
+    field_0x24 = 0;
+    field_0x3c = 0;
+    field_0x38 = field_0x3c;
+    field_0x40 = 0;
+}
 
 VA(0x004cec20, 0xa5)
 heroWindow::heroWindow(int, int, int, int, int) {}
