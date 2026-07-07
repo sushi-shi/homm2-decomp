@@ -6,6 +6,7 @@
 #include <va.h>
 #include <SOURCE/GAME.h>
 #include <_types.h>
+#include <_globals_model.h>
 #include <BASE/Icon2b.h>
 #include <BASE/Misc.h>
 #include <SOURCE/CURSOR.h>
