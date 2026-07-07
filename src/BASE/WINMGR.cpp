@@ -15,7 +15,21 @@ VA(0x004ca6d0, 0x3a3)
 void CycleColors(int) {}
 
 VA(0x004caa80, 0x41)
-heroWindowManager::heroWindowManager(void) {}
+heroWindowManager::heroWindowManager(void) : baseManager()
+{
+    field_0x32 = 0;
+    field_0x42 = 0;
+    field_0x3e = 0;
+    field_0x3a = 0;
+    field_0x36 = 0;
+    field_0x46 = 0;
+    field_0x56 = 0;
+    field_0x4a = 0;
+    field_0x52 = 1;
+    field_0x4e = 0;
+    field_0x5e = -1;
+    field_0x5a = -1;
+}
 
 VA(0x004caad0, 0xd6)
 int heroWindowManager::Open(int) { return 0; }
