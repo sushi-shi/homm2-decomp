@@ -20,6 +20,7 @@ DATA(0x004faeb2) extern monsterRV gMonsterInfo[100];     // monster-DB view, 26B
 DATA(0x00533b40) extern POINT gMouseScreenPt;    // GetCursorPos scratch (mouseManager::MouseCoords)
 DATA(0x00533b48) extern POINT gMouseCheckPt;     // GetCursorPos scratch (mouseManager::CheckUpdateMousePos/ShowColorPointer)
 DATA(0x0051ef24) extern char gDefaultCursorName[]; // default cursor resource name (mouseManager::SetColorMice)
+DATA(0x0053496c) extern unsigned int gFadeSavedUpdate; // saved update flag across a fade (heroWindowManager::FadeScreen)
 
 
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
