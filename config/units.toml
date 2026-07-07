@@ -153,7 +153,7 @@ flags = "o2"
 [[unit]]
 unit = "BASE/TILE"
 source = "src/BASE/TILE.cpp"
-flags = "base"
+flags = "o2"
 
 [[unit]]
 unit = "BASE/TILESET"

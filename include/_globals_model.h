@@ -19,4 +19,9 @@ DATA(0x004faeb2) extern monsterRV gMonsterInfo[100];     // monster-DB view, 26B
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
 DATA(0x00528d38) extern int const_00128d38;            // 13-byte BSS flag buffer (??_C@_0N@PMOM@...)
 
+// TILE.cpp inline-asm scratch (no CodeView symbol): the blitter parks the mode word and a
+// mirror-path row counter in static storage between its __asm sections.
+DATA(0x0051fec0) extern unsigned int gTileMode;
+DATA(0x0051fec4) extern int gTileRowCtr;
+
 #endif // HOMM2_GLOBALS_MODEL_H
