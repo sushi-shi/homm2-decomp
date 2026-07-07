@@ -4,7 +4,7 @@
 // symbols. Other TUs call them by including this header (no local externs).
 
 int is_netbios_avail(void);
-extern "C" int __fastcall nb_init(int, int);
+extern "C" unsigned short __fastcall nb_init(unsigned short, unsigned short);
 extern "C" int __fastcall nb_term(void);
 extern "C" int __fastcall nb_rcv(int, int);
 extern "C" int __fastcall nb_snd(int, int, int);
