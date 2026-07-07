@@ -133,8 +133,6 @@ void font::DrawBoundedString(char *str, int x, int y, int w, int h, int mode, in
     }
     field_0x18 = 0;
     while (1) {
-        lineStart = i;
-        lineWidth = 0;
         if (len <= i || s[i] == 0 || (h < field_0x10 + yOff && yOff != 0))
             return;
         while (s[i] != 0 && s[i] != '\n' && lineWidth <= w) {
@@ -167,6 +165,8 @@ void font::DrawBoundedString(char *str, int x, int y, int w, int h, int mode, in
         s[i] = saved;
         yOff += field_0x10;
         i++;
+        lineStart = i;
+        lineWidth = 0;
     }
 }
 
