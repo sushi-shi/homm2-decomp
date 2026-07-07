@@ -9,7 +9,9 @@
 #include <string.h>
 #include <SOURCE/comwin.h>
 #include <SOURCE/netwin.h>
+#include <SOURCE/KB.h>
 #include <BASE/Misc.h>
+#include <stdio.h>
 #include <_globals_model.h>
 VA(0x004a6be0, 0xa8)
 int is_netbios_avail(void)
@@ -208,8 +210,261 @@ extern "C" unsigned short __fastcall nb_snd(short session, short len, void *data
     return 0;
 }
 
+// ===== netbios async session state machine (retail RVAs in the 0x4a79c6-0x4a852a static block, no
+// CodeView symbols -> file-statics). nb_sess posts async NCBs whose ncb_post callback (also a static
+// here) runs on the receiver thread. Defined callback-before-referencer so no forward decls needed. =
+
+// FUN_004a8119 — (re)arm an async receive on a session, retrying transient netbios errors.
+VA(0x004a8119, 0x13b)
+static void __fastcall nb_arm_recv(int session)
+{
+    unsigned char rc;
+    for (;;) {
+        ProcessAssert(gNbSessNcb[session].ncb_retcode != 0xff,
+                      "I:\\Projects\\Heroes\\Prog\\SOURCE\\netwin.cpp", __LINE__);
+        memset(&gNbSessNcb[session], 0, 0x40);
+        gNbSessNcb[session].ncb_command = 0x95;
+        gNbSessNcb[session].ncb_lsn = gNbSessLsn[session];
+        gNbSessNcb[session].ncb_buffer = &gNbRcvData[session * 0x1000];
+        gNbSessNcb[session].ncb_length = 0x1000;
+        gNbSessNcb[session].ncb_lana_num = gNetbiosLana;
+        gNbSessNcb[session].ncb_event = gNbEvents[session + 2];
+        rc = Netbios(&gNbSessNcb[session]);
+        if (rc < 9) {
+            if (rc == 8 || rc == 0)
+                return;
+        } else {
+            if (rc == 10 || rc == 0x18 || rc == 0xff)
+                return;
+        }
+        Sleep(0x32);
+    }
+}
+
+// FUN_004a7fe9 — ncb_post callback for a completed CALL/LISTEN: on success record the LSN + peer name
+// and arm the receive; else retry a bounded number of times.
+VA(0x004a7fe9, 0x126)
+static void __stdcall nb_call_done(PNCB ncb)
+{
+    int i;
+    char rc;
+    for (i = 0; i < 7 && &gNbSessNcb[i] != ncb; i++)
+        ;
+    if (i < 7) {
+        rc = gNbSessNcb[i].ncb_retcode;
+        if (rc == 0) {
+            gNbSessLsn[i] = gNbSessNcb[i].ncb_lsn;
+            memcpy(&gNbNameBuf[i * 0x10], gNbSessNcb[i].ncb_callname, 0x10);
+            gNetStatus[i] |= 9;
+            nb_arm_recv(i);
+        } else if (rc != 0xb && rc != 0x24 && (gNbCallRetries++, gNbCallRetries < 0x14)) {
+            Sleep(100);
+            Netbios(&gNbSessNcb[i]);
+        }
+    }
+}
+
+// FUN_004a7e4b — issue an async netbios CALL to a named peer on a session.
+VA(0x004a7e4b, 0xcf)
+static unsigned char __fastcall nb_call(int session, void *name)
+{
+    memset(&gNbSessNcb[session], 0, 0x40);
+    memcpy(gNbSessNcb[session].ncb_callname, name, 0x10);
+    memcpy(gNbSessNcb[session].ncb_name, &gNbNameBuf[gNbMaxSess * 0x10], 0x10);
+    gNbSessNcb[session].ncb_command = 0x90;
+    gNbSessNcb[session].ncb_cmd_cplt = 0xff;
+    gNbSessNcb[session].ncb_post = nb_call_done;
+    gNbSessNcb[session].ncb_lana_num = gNetbiosLana;
+    gNbCallRetries = 0;
+    return Netbios(&gNbSessNcb[session]);
+}
+
+// FUN_004a7f1a — issue an async netbios LISTEN for an incoming call on a session.
+VA(0x004a7f1a, 0xcf)
+static unsigned char __fastcall nb_listen(int session, void *name)
+{
+    memset(&gNbSessNcb[session], 0, 0x40);
+    memcpy(gNbSessNcb[session].ncb_callname, name, 0x10);
+    memcpy(gNbSessNcb[session].ncb_name, &gNbNameBuf[gNbMaxSess * 0x10], 0x10);
+    gNbSessNcb[session].ncb_command = 0x91;
+    gNbSessNcb[session].ncb_cmd_cplt = 0xff;
+    gNbSessNcb[session].ncb_post = nb_call_done;
+    gNbSessNcb[session].ncb_lana_num = gNetbiosLana;
+    gNbCallRetries = 0;
+    return Netbios(&gNbSessNcb[session]);
+}
+
+// FUN_004a7d09 — ncb_post callback for a completed RECEIVE-ANY: if the datagram carries our group
+// name, promote it to a real CALL; otherwise re-post the receive.
+VA(0x004a7d09, 0x142)
+static void __stdcall nb_recv_any_done(PNCB ncb)
+{
+    int i;
+    for (i = 0; i < 7 && &gNbSessNcb[i] != ncb; i++)
+        ;
+    if (i < 7) {
+        if (gNbSessNcb[i].ncb_retcode == 0) {
+            if (memcmp(&gNbRcvData[i * 0x1000], gNbGroupName, strlen(gNbGroupName)) == 0) {
+                memcpy(&gNbNameBuf[i * 0x10], &gNbRcvData[i * 0x1000] + strlen(gNbGroupName), 0x10);
+                nb_call(i, &gNbNameBuf[i * 0x10]);
+            } else {
+                Netbios(&gNbSessNcb[i]);
+            }
+        } else if (gNbSessNcb[i].ncb_retcode != 0xb && gNbSessNcb[i].ncb_retcode != 0x24) {
+            Netbios(&gNbSessNcb[i]);
+        }
+    }
+}
+
+// FUN_004a7c4b — arm an async RECEIVE-DATAGRAM (any source) on a session.
+VA(0x004a7c4b, 0xbe)
+static unsigned char __fastcall nb_recv_any(int session)
+{
+    if (gNbSessNcb[session].ncb_cmd_cplt != 0xff) {
+        memset(&gNbSessNcb[session], 0, 0x40);
+        gNbSessNcb[session].ncb_command = 0xa3;
+        gNbSessNcb[session].ncb_num = gNbLocalNum;
+        gNbSessNcb[session].ncb_length = 0x1000;
+        gNbSessNcb[session].ncb_buffer = &gNbRcvData[session * 0x1000];
+        gNbSessNcb[session].ncb_post = nb_recv_any_done;
+        Netbios(&gNbSessNcb[session]);
+    }
+    return gNbSessNcb[session].ncb_cmd_cplt;
+}
+
+// FUN_004a7a81 — ncb_post callback for a completed ADD-NAME.
+VA(0x004a7a81, 0x174)
+static void __stdcall nb_add_name_done(PNCB ncb)
+{
+    int j;
+    ProcessAssert(&gNbCtlNcb == ncb, "I:\\Projects\\Heroes\\Prog\\SOURCE\\netwin.cpp", __LINE__);
+    switch (ncb->ncb_retcode) {
+    case 0x00:
+    case 0x24:
+        gNbLocalNum = ncb->ncb_num;
+        memcpy(&gNbNameBuf[gNbMaxSess * 0x10], ncb->ncb_name, 0x10);
+        gNetStatus[gNbMaxSess] |= 2;
+        break;
+    case 0x0b:
+        break;
+    case 0x0d:
+    case 0x16:
+    case 0x19:
+    case 0x30:
+        for (j = 0xf; j >= 0 && (ncb->ncb_name[j] = ncb->ncb_name[j] + 1,
+                                 gNbNameBuf[j + gNbMaxSess * 0x10] == ncb->ncb_name[j]); j--)
+            ;
+        Netbios(ncb);
+        break;
+    default:
+        sprintf(gText, "Add Name Error: %02x", ncb->ncb_retcode);
+        ShutDown(gText);
+        gNetStatus[gNbMaxSess] |= 0x80;
+        break;
+    }
+}
+
+// FUN_004a84a3 — format a 16-byte netbios name field: copy up to 15 chars, space-pad the rest.
+VA(0x004a84a3, 0x87)
+static void __fastcall nb_format_name(char *src, unsigned char *dst)
+{
+    char *p;
+    unsigned int i;
+    memset(dst, 0, 0x10);
+    i = 0;
+    for (p = src; i < 0xf && *p != '\0'; p++) {
+        dst[i] = *p;
+        i++;
+    }
+    for (; i < 0xf; i++)
+        dst[i] = 0x20;
+}
+
 VA(0x004a726a, 0x4cd)
-extern "C" int __cdecl nb_sess(void) { return 0; }
+extern "C" int __cdecl nb_sess(int cmd, int session, char *name, int detach)
+{
+    unsigned short result;
+    NCB ncb;
+
+    switch (cmd) {
+    case 0:
+        gNetStatus[gNbMaxSess] &= 0x7f;
+        nb_format_name(name, &gNbNameBuf[gNbMaxSess * 0x10]);
+        memset(&gNbSessNcb[gNbMaxSess], 0, 0x40);
+        memcpy(gNbSessNcb[gNbMaxSess].ncb_name, &gNbNameBuf[gNbMaxSess * 0x10], 0x10);
+        gNbSessNcb[gNbMaxSess].ncb_command = 0xb0;
+        gNbSessNcb[gNbMaxSess].ncb_post = nb_add_name_done;
+        gNbSessNcb[gNbMaxSess].ncb_cmd_cplt = 0xff;
+        gNbSessNcb[gNbMaxSess].ncb_lana_num = gNetbiosLana;
+        result = Netbios(&gNbSessNcb[gNbMaxSess]);
+        break;
+    case 1:
+        if (gNbSessNcb[session].ncb_cmd_cplt == 0xff) {
+            if ((gNbSessNcb[session].ncb_command & 0x7f) == 0x10 ||
+                (gNbSessNcb[session].ncb_command & 0x7f) == 0x23)
+                return 0;
+            memset(&ncb, 0, 0x40);
+            ncb.ncb_command = 0x35;
+            ncb.ncb_lana_num = gNetbiosLana;
+            ncb.ncb_buffer = (unsigned char *)&gNbSessNcb[session];
+            Netbios(&ncb);
+        }
+        result = nb_recv_any(session);
+        break;
+    case 2:
+        nb_format_name(name, &gNbNameBuf[session * 0x10]);
+        result = nb_call(session, &gNbNameBuf[session * 0x10]);
+        break;
+    case 3:
+        nb_snd(gNbMaxSess, 0, 0);
+        result = nb_listen(session, gNbListenName);
+        break;
+    case 4:
+        nb_format_name(name, &gNbNameBuf[session * 0x10]);
+        result = nb_listen(session, &gNbNameBuf[session * 0x10]);
+        break;
+    case 5:
+        if (gNbMaxSess == session)
+            gNbMaxSess = (unsigned char)(unsigned int)name;
+        if (gNbSessLsn[session] == 0xff)
+            return 0;
+        gNbSessLsn[(int)name] = gNbSessLsn[session];
+        gNetStatus[(int)name] = gNetStatus[session];
+        memcpy(&gNbNameBuf[(int)name * 0x10], &gNbNameBuf[session * 0x10], 0x10);
+        nb_arm_recv((int)name);
+        if (detach != 0) {
+            gNbSessLsn[session] = 0xff;
+            gNetStatus[session] = 0;
+            memset(&gNbNameBuf[session * 0x10], 0, 0x10);
+        }
+        result = 0;
+        break;
+    case 6:
+        if (gNbSessNcb[session].ncb_cmd_cplt == 0xff) {
+            memset(&ncb, 0, 0x40);
+            ncb.ncb_command = 0x35;
+            ncb.ncb_lana_num = gNetbiosLana;
+            ncb.ncb_buffer = (unsigned char *)&gNbSessNcb[session];
+            Netbios(&ncb);
+        }
+        nb_close_session(session);
+        result = 0;
+        break;
+    case 7:
+        gNetStatus[session] &= 0xf7;
+        result = 0;
+        break;
+    case 9:
+        memcpy(name, &gNbNameBuf[session * 0x10], 0x10);
+        result = 0;
+        break;
+    default:
+        return 1;
+    }
+    if (result == 0xff)
+        result = 0;
+    return result;
+}
 
 VA(0x004a7737, 0x21)
 extern "C" char __fastcall nb_stat(short session) { return gNetStatus[session]; }

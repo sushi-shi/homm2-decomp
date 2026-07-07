@@ -1427,10 +1427,10 @@ SOURCE/netwin	?is_netbios_avail@@YIHXZ	100.0000	1aee44949a90
 SOURCE/netwin	?nb_thr_ctl@@YIXXZ	0.4851	b1cab9bdb34b
 SOURCE/netwin	@nb_init@8	93.4522	fd0fb67fc552
 SOURCE/netwin	@nb_rcv@8	96.2727	ada62b9a7694
-SOURCE/netwin	@nb_snd@12	94.3939	a2285ab2a91b
+SOURCE/netwin	@nb_snd@12	94.3939	b9c5bed452bd
 SOURCE/netwin	@nb_stat@4	100.0000	b7e40499c98f
 SOURCE/netwin	@nb_term@0	93.9470	de064d2df1ea
-SOURCE/netwin	_nb_sess	2.4972	b75dbb27ef22
+SOURCE/netwin	_nb_sess	74.1469	06da8d1a3a8b
 SOURCE/tradpost	?ComputeTradeRatios@@YIXHHPAH00@Z	19.4028	fe1ff3678624
 SOURCE/tradpost	?DoTradeKnob@@YIXUtag_message@@@Z	12.6163	3331af4483ff
 SOURCE/tradpost	?DoTradingPost@@YIXHM@Z	14.9195	71e16e08f040
