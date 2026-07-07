@@ -70,20 +70,21 @@ VA(0x004c7790, 0x1b3)
 int font::LineLength(char *, int) { return 0; }
 
 VA(0x004c7950, 0xc4)
-int font::LineWidth(char *s)
+int font::LineWidth(char *str)
 {
-    int len = strlen(s);
-    int a = 0, b = 0, cc = 0, d = 0;   // zeroed alongside the counters (vestigial, cf. LineLength)
-    int i = 0;
-    int width = 0;
-    char *p = s;
-    while (i < len && p[i] != 0) {
-        while (p[i] != 0 && p[i] != '\n') {
-            width += GetCharacterWidth(p[i]);
-            i++;
+    // 10 locals (frame 0x2c): local names carry the /Od slot hashes (od_slots); `q`/`u` are
+    // declared-but-unused (reserved, not zeroed) — vestigial, as in the sibling string routines.
+    int s = strlen(str);                        // len @ -0x10
+    int q, u;                                   // unused @ -0x8, -0x18
+    int y = 0, t = 0, r = 0, x = 0, p = 0, w = 0;  // zeroed in this order: -0x28,-0x14,-0xc,-0x24,-0x4(i),-0x20(width)
+    char *v = str;                              // @ -0x1c
+    while (p < s && v[p] != 0) {
+        while (v[p] != 0 && v[p] != '\n') {
+            w += GetCharacterWidth(v[p]);
+            p++;
         }
     }
-    return width;
+    return w;
 }
 
 
