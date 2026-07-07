@@ -5,6 +5,8 @@
 
 #include <va.h>
 #include <BASE/dimmerWidget.h>
+#include <BASE/resourceManager.h>
+#include <SOURCE/KB.h>
 VA(0x004dd330, 0x1e)
 dimmerWidget::dimmerWidget(void) : widget(0, 0, 0, 0, 0, 0)
 {
@@ -17,13 +19,27 @@ dimmerWidget::dimmerWidget(short int a, short int b, short int c, short int d, s
 }
 
 VA(0x004dd390, 0x5f)
-void dimmerWidget::Read(void) {}
+void dimmerWidget::Read(void)
+{
+    field_0x18 = gpResourceManager->ReadWord();
+    field_0x1a = gpResourceManager->ReadWord();
+    field_0x1c = gpResourceManager->ReadWord();
+    field_0x1e = gpResourceManager->ReadWord();
+    field_0x10 = gpResourceManager->ReadWord();
+    field_0x14 = gpResourceManager->ReadWord();
+}
 
 VA(0x004dd3f0, 0xd)
-int dimmerWidget::Main(struct tag_message &) { return 0; }
+int dimmerWidget::Main(struct tag_message &msg)
+{
+    return widget::Main(msg);
+}
 
 VA(0x004dd400, 0x5)
-void dimmerWidget::Draw(void) {}
+void dimmerWidget::Draw(void)
+{
+    Dim();
+}
 
 
 // ===== vtable dimmerWidget : public widget  (3 slots) =====
