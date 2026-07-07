@@ -381,7 +381,7 @@ static void __fastcall nb_format_name(char *src, unsigned char *dst)
 }
 
 VA(0x004a726a, 0x4cd)
-extern "C" int __cdecl nb_sess(int cmd, int session, char *name, int detach)
+extern "C" int __cdecl nb_sess(short cmd, int session, char *name, int detach)
 {
     unsigned short result;
     NCB ncb;
