@@ -109,30 +109,40 @@ int font::GetCharacterWidth(unsigned char c)
 VA(0x004c7470, 0x313)
 void font::DrawBoundedString(char *str, int x, int y, int w, int h, int mode, int align)
 {
+    // Locals declared at function scope (period C89 style): the retail's /Od frame (0x4c) spills
+    // all of them up-front, incl. two write-once vestigials (glyph pointer, a ' ') and local copies
+    // of str/align — the same reserved-local pattern as LineWidth/LineLength.
     int len = strlen(str);
+    char *glyph = field_0x1c->field_0x12;
+    char sp = ' ';
     int xOff = 0;
     int yOff = 0;
+    int lineStart = 0;
+    int lineWidth = 0;
     int i = 0;
-    if (align & 4) {
-        align -= 4;
-        int lines = LineLength(str, w);
+    int breakPt = 0;
+    char *s = str;
+    int a = align;
+    if (a & 4) {
+        a -= 4;
+        int lines = LineLength(s, w);
         if (field_0x10 * lines < h)
             yOff = (h - field_0x10 * lines) / 2;
     }
     field_0x18 = 0;
     while (1) {
-        int lineStart = i;
-        int lineWidth = 0;
-        if (len <= i || str[i] == 0 || (h < field_0x10 + yOff && yOff != 0))
+        lineStart = i;
+        lineWidth = 0;
+        if (len <= i || s[i] == 0 || (h < field_0x10 + yOff && yOff != 0))
             return;
-        while (str[i] != 0 && str[i] != '\n' && lineWidth <= w) {
-            lineWidth += GetCharacterWidth(str[i]);
+        while (s[i] != 0 && s[i] != '\n' && lineWidth <= w) {
+            lineWidth += GetCharacterWidth(s[i]);
             i++;
         }
         if (w < lineWidth) {
-            int breakPt = 0;
-            while (i--, str[i] != ' ' && lineStart <= i) {
-                lineWidth -= GetCharacterWidth(str[i]);
+            breakPt = 0;
+            while (i--, s[i] != ' ' && lineStart <= i) {
+                lineWidth -= GetCharacterWidth(s[i]);
                 if (h < field_0x10 * 2 + yOff && lineWidth < w)
                     break;
                 if (breakPt == 0 && lineWidth < w)
@@ -140,19 +150,19 @@ void font::DrawBoundedString(char *str, int x, int y, int w, int h, int mode, in
             }
             if (i <= lineStart)
                 i = breakPt;
-            if (str[i] == ' ')
-                lineWidth -= GetCharacterWidth(str[i]);
+            if (s[i] == ' ')
+                lineWidth -= GetCharacterWidth(s[i]);
         }
-        char saved = str[i];
-        str[i] = 0;
-        if (align == 0)
+        char saved = s[i];
+        s[i] = 0;
+        if (a == 0)
             xOff = 0;
-        else if (align == 1)
+        else if (a == 1)
             xOff = (w - lineWidth) / 2;
-        else if (align == 2)
+        else if (a == 2)
             xOff = w - lineWidth;
-        DrawStringExecute(str + lineStart, xOff + x, yOff + y, mode, x, y, w, h);
-        str[i] = saved;
+        DrawStringExecute(s + lineStart, xOff + x, yOff + y, mode, x, y, w, h);
+        s[i] = saved;
         yOff += field_0x10;
         i++;
     }
