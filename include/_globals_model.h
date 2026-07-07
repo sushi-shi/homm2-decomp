@@ -39,8 +39,10 @@ DATA(0x005173a4) extern unsigned char gNetbiosLana;
 // Sizes are confirmed by the address tiling (NCB=0x40, CRITICAL_SECTION=0x18, buffers adjacent).
 DATA(0x005173a8) extern unsigned char gNbShutdown;         // shutdown flag, cleared by nb_init
 DATA(0x005173ac) extern unsigned char gNbMaxSess;          // max session count (nb_init param2)
+DATA(0x0051739c) extern int           gNbCallRetries;      // FUN_004a7fe9 retry counter (cap 0x14)
 DATA(0x005173b0) extern unsigned char gNbLocalNum;         // local netbios name number
 DATA(0x005173c0) extern char         *gNbGroupName;        // netbios group name ("Empire Too")
+DATA(0x005173c4) extern char         *gNbListenName;       // netbios listen/any name (nb_sess case 3)
 DATA(0x0052ae68) extern tag_Anchor    gNbFreeQueue;        // queue anchor (init_anchor)
 DATA(0x0052ae70) extern unsigned char gNbSessLsn[7];       // per-session LSN, 0xff = free slot
 DATA(0x0052ae78) extern unsigned char gNbRcvData[0x7000];  // receive data pool, init 0xff

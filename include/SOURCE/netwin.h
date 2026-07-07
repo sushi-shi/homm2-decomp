@@ -8,7 +8,7 @@ extern "C" unsigned short __fastcall nb_init(unsigned short, unsigned short);
 extern "C" void __fastcall nb_term(void);
 extern "C" unsigned short __fastcall nb_rcv(short, void *);
 extern "C" unsigned short __fastcall nb_snd(short, short, void *);
-extern "C" int __cdecl nb_sess(void);
+extern "C" int __cdecl nb_sess(int, int, char *, int);
 extern "C" char __fastcall nb_stat(short);
 void nb_thr_ctl(void);
 
