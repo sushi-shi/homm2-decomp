@@ -9,7 +9,20 @@ VA(0x004dde00, 0x5a)
 widget::widget(short int, short int, short int, short int, short int, short int) {}
 
 VA(0x004dde60, 0x3f)
-widget::widget(void) {}
+widget::widget(void)
+{
+    field_0x10 = 0;
+    field_0x4 = 0;
+    field_0x8 = 0;
+    field_0xc = 0;
+    field_0x16 = 6;
+    field_0x12 = -1;
+    field_0x14 = 2;
+    field_0x1a = 0;
+    field_0x18 = 0;
+    field_0x1c = 0x10;
+    field_0x1e = 0x10;
+}
 
 VA(0x004ddea0, 0x7)
 widget::~widget() {}
