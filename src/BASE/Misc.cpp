@@ -4,49 +4,17 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
-#include <_all.h>
-#include <_carcass_types.h>
+#include <BASE/Misc.h>        // this TU's own free functions + indexArray/IconEntry
+#include <SOURCE/KB.h>        // EventWindowHandler, FileError, ShutDown
+#include <SOURCE/wingraph.h>  // SetFullScreenStatus
+#include <_globals.h>         // iMemEntries, gpMemEntry, iLastSeed, gpMouseManager, gpWindowManager, ...
+#include <_carcass_types.h>   // tag_message (member access)
+#include <win/windows.h>      // MessageBoxA
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
-#include <BASE/heroWindow.h>
-#include <BASE/heroWindowManager.h>
-#include <BASE/mouseManager.h>
-
-
-struct MemEntry;
-struct indexArray {
-    unsigned short field0;
-    unsigned short field2;
-};
-struct IconEntry {
-    char pad[13];
-};
-
 static int giFindMid;
-
-extern int iMemEntries;
-extern MemEntry *gpMemEntry;
-extern void LogInt(char *, int, int, int, int, int, int, int);
-extern int EventWindowHandler(struct tag_message &);
-extern void FileError(char *);
-extern int iLastSeed;
-extern class mouseManager *gpMouseManager;
-extern void SetFullScreenStatus(int);
-extern void ShutDown(char *);
-extern void *hwndApp;
-extern char gText[];
-extern "C" __declspec(dllimport) int __stdcall MessageBoxA(void *, const char *, const char *, unsigned int);
-
-extern class heroWindow *DataEntryWin;
-extern char *cDEDest;
-extern int iDEMaxLen;
-extern int bDataEntryTime;
-extern int inBoxX;
-extern int inBoxY;
-extern int gbTextEntryEscaped;
-extern class heroWindowManager *gpWindowManager;
 
 VA(0x004c3d10, 0x58)
 void InitMemEntry(void)
