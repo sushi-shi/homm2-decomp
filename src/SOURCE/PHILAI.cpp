@@ -859,3 +859,24 @@ int philAI::EvaluateHeroEvent(int, int, int, int, int *) { return 0; }
 
 VA(0x00447211, 0x4fa)
 int philAI::EvaluateTownEvent(int, int, int, int, int *) { return 0; }
+
+// ---- globals (definitions, RVA order) ----
+short *gaiLiveChanceOfPos;
+short *gaiHeroStrategicRVOfPos;
+short *gaiHeroEventStratRVOfPos;
+signed char *gaiTurnValueOfMine;
+signed char *gaiEnemyHeroReachable;
+hero *gpCurAIHero;
+int iLastFrameRateTimer;
+int giCurPlayer;
+signed char giBuildShipyard[6];
+signed char giBuildBoat[6];
+int bHeroBuiltThisTurn;
+int giCurTurn;
+int iAlphaMale;
+int iDummy;
+searchArray SVSearchArray;
+float gafAITurnCostResource[7];
+playerData *gpCurPlayer;
+signed char giBuildBoatStuffTurn[6];
+int gbReduceByReload;

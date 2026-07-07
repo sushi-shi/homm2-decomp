@@ -287,3 +287,6 @@ unsigned char StopOnTrigger(class mapCell *) { return 0; }
 //  [ 0] VA(0x0045665f, 0x9c9)  int advManager::Open(int)   <- override (implements baseManager pure virtual)
 //  [ 1] VA(0x00457028, 0x40a)  void advManager::Close(void)   <- override (implements baseManager pure virtual)
 //  [ 2] VA(0x00457d6c, 0xfda)  int advManager::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
+
+// ---- globals (definitions, RVA order) ----
+int iCurHourGlassPhase;

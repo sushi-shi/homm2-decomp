@@ -100,3 +100,6 @@ int QueryNewPalette(void) { return 0; }
 
 VA(0x00437595, 0x286)
 int SetGraphicsType(int) { return 0; }
+
+// ---- globals (definitions, RVA order) ----
+int giGraphicsType;

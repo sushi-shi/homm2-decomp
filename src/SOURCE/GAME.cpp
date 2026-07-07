@@ -900,3 +900,6 @@ int game::CountShrines(int player)
     }
     return count;
 }
+
+// ---- globals (definitions, RVA order) ----
+char bMapInitialized;

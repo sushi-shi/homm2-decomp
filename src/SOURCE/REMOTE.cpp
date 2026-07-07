@@ -43,3 +43,8 @@ void PollRemote(void) {}
 
 VA(0x004a48e0, 0x163)
 int TransmitAndWait(char *, int, int, signed char, signed char, char * *) { return 0; }
+
+// ---- globals (definitions, RVA order) ----
+char gbUseDiffCompression;
+char gbUseRegularCompression;
+SNetPlayerInfo gsNetPlayerInfo[1];

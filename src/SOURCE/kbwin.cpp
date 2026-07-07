@@ -52,3 +52,9 @@ long int KBTickCount(void) { return 0; }
 
 VA(0x0041d027, 0x10)
 void InitVideo(void) {}
+
+// ---- globals (definitions, RVA order) ----
+void *hwndApp;
+void *hmnuApp;
+void *gEventHandle;
+void *hInstApp;

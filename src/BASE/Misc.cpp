@@ -378,3 +378,14 @@ int DataEntryWindowHandler(struct tag_message &message)
     message.field4 = 0xA;
     return 2;
 }
+
+// ---- globals (definitions, RVA order) ----
+int iMemEntries;
+MemEntry *gpMemEntry;
+int iLastSeed;
+class heroWindow *DataEntryWin;
+char *cDEDest;
+int iDEMaxLen;
+int bDataEntryTime;
+int inBoxX;
+int inBoxY;
