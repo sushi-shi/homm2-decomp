@@ -42,13 +42,19 @@ VA(0x004ca030, 0xb9)
 void mouseManager::ReallyShowPointer(void) {}
 
 VA(0x004ca0f0, 0x1a)
-void mouseManager::HideColorPointer(void) {}
+void mouseManager::HideColorPointer(void)
+{
+    int old = field_0x86;
+    field_0x86 = old + 1;
+    if (old + 1 == 1)
+        NewUpdate(1);
+}
 
 VA(0x004ca110, 0x98)
 void mouseManager::ShowColorPointer(void) {}
 
 VA(0x004ca1b0, 0xc)
-int mouseManager::IsVis(void) { return 0; }
+int mouseManager::IsVis(void) { return field_0x86 == 0; }
 
 VA(0x004ca1c0, 0x66)
 void mouseManager::CheckUpdateMousePos(void) {}
