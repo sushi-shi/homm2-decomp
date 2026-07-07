@@ -267,14 +267,14 @@ BASE/RESMGR	?Dispose@resourceManager@@QAEXPAVresource@@@Z	30.1860	8e52f61304e1
 BASE/RESMGR	?Expunge@resourceManager@@QAEXXZ	28.8444	8aa5d977d25f
 BASE/RESMGR	?GetBackdrop@resourceManager@@QAEXPADPAVbitmap@@H@Z	23.1786	bcc6d0bea71b
 BASE/RESMGR	?GetBackdropAtLoc@resourceManager@@QAEXPADPAVbitmap@@HHH@Z	18.2817	bbda354f7e41
-BASE/RESMGR	?GetBitmap@resourceManager@@QAEPAVbitmap@@PAD@Z	27.3061	288b167bf1a3
+BASE/RESMGR	?GetBitmap@resourceManager@@QAEPAVbitmap@@PAD@Z	95.8163	41b32c7776bd
 BASE/RESMGR	?GetFileSize@resourceManager@@QAEKK@Z	18.8451	983b7e296d99
 BASE/RESMGR	?GetFont@resourceManager@@QAEPAVfont@@PAD@Z	95.6122	da98db53d815
 BASE/RESMGR	?GetIcon@resourceManager@@QAEPAVicon@@K@Z	31.1163	501f2df66d17
 BASE/RESMGR	?GetIcon@resourceManager@@QAEPAVicon@@PAD@Z	100.0000	2223175c48ad
 BASE/RESMGR	?GetMIDIWrap@resourceManager@@QAEPAVMIDIWrap@@PAD@Z	27.3061	275cfe2efa20
 BASE/RESMGR	?GetMouse@resourceManager@@QAEPAVmouse@@PAD@Z	100.0000	7d91b412c973
-BASE/RESMGR	?GetPalette@resourceManager@@QAEPAVpalette@@PAD@Z	27.3061	1234c41eb511
+BASE/RESMGR	?GetPalette@resourceManager@@QAEPAVpalette@@PAD@Z	95.8163	78926c15bb45
 BASE/RESMGR	?GetSample@resourceManager@@QAEPAVsample@@PAD@Z	25.7308	df9b6e390f91
 BASE/RESMGR	?GetTileset@resourceManager@@QAEPAVtileset@@PAD@Z	95.8163	762ccd58d41e
 BASE/RESMGR	?LoadAggregateHeader@resourceManager@@QAEHPAD@Z	14.1212	27e817d79b18
