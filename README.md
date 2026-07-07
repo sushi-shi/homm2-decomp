@@ -55,11 +55,11 @@ sole verdict on a match.
 
 ninja **tracks header dependencies** (via `cc_wrap.py`, since MSVC 4.2 has no `/showIncludes`),
 so editing a shared header recompiles exactly its includers — no stale objects. `homm2 build`
-then runs five **hard gates** (a red gate fails the build): no TU declares types/enums/externs/
+then runs six **hard gates** (a red gate fails the build): no TU declares types/enums/externs/
 forward-decls locally (all come from headers), no object emits a function symbol absent from
 CodeView, every global carries a unique `DATA(<its VA>)`, every free function is declared in its
-owner header, and every extern global has a definition in its owner TU (link-completeness). Full
-catalog: `docs/build-asserts.md`.
+owner header, and every extern global has a definition in its owner TU (link-completeness), and every class
+vtable is claimed by a `VTBL()` census marker in its owner TU. Full catalog: `docs/build-asserts.md`.
 
 ## Navigate (`homm2 sema`)
 
