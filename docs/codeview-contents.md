@@ -47,11 +47,13 @@ Two details worth remembering:
   machine 0x386. There is **no per-compiland compiler record**, which is exactly why the opt
   level (`/Od` vs `/O2`) is absent from CodeView and `gen_manifest.py` infers it from the
   prologue (FPO vs full `ebp` frame).
-- **`S_THUNK32` = 182 named import thunks** — the Win32/multimedia IAT jump-stubs
-  (`waveOutGetNumDevs`, `mciSendStringA`, `GetFileAttributesA`, … each a 6-byte
-  `jmp [__imp__…]`). The API *names* are already in `symbol_names.csv` via the `__imp__` IAT
-  entries; the thunk-*stub* addresses are not (a direct `call <thunk>` currently hits an
-  unnamed target). Extractable if we want to name them.
+- **`S_THUNK32` = 182 import thunks** — the Win32/multimedia/WinG IAT jump-stubs
+  (`_waveOutGetNumDevs@0`, `_WinGBitBlt@32`, `_GetFileAttributesA@4`, … each a 6-byte
+  `jmp [__imp__…]`). **Already fully captured**: the linker emits an `S_PUB32` public for each
+  thunk stub, so they're already in `symbol_names.csv` as decorated `func` rows (`_X@N`,
+  attributed to their DLL/`.def`), alongside the `__imp__X@N` IAT `data` entries. So `sstAlignSym`
+  holds nothing we don't already have — a direct `call <thunk>` resolves to the named stub.
+  (Miles' `AIL_*` have no thunk — called indirectly via `__imp__` — also already in the CSV.)
 
 ## Decisively ABSENT (checked every byte)
 
