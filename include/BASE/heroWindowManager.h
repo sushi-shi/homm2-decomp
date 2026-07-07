@@ -21,7 +21,7 @@ public:
     int    field_0x3e;  // +0x3e
     int    field_0x42;  // +0x42
     bitmap *field_0x46;  // +0x46  (target screen bitmap)
-    int    field_0x4a;  // +0x4a
+    bitmap *field_0x4a;  // +0x4a  fizzle-source saved bitmap
     int    field_0x4e;  // +0x4e
     int    field_0x52;  // +0x52
     int    field_0x56;  // +0x56
