@@ -41,10 +41,13 @@ are GROUND TRUTH, already extracted — never re-derive or guess them:
 
 ## The loop
 
-1. **Pull the target's retail bytes.** Disassemble the function from the delinked
-   target object (`build/delink/<TIER>/<TU>.c.obj`) or the exe:
-   `llvm-objdump -dr --start-address=<rva> --stop-address=<rva+size> ...`. Read the
-   class layout from `include/<TIER>/<TU>.h` (already recovered).
+1. **Pull the target's retail bytes.** Prefer **`homm2 sema`** for navigation (semantic;
+   grep is lexical): `homm2 sema disasm <rva> --diff` (our compiled vs retail asm, side by
+   side), `homm2 sema xref <rva>` (callers/callees), `homm2 sema decomp <rva>` (Ghidra C with
+   our names), `homm2 sema strings <rva>`, `homm2 sema rva <rva>` (claim/src/match dossier) —
+   see `homm2 sema -h`. Raw fallback: `llvm-objdump -dr --start-address=<rva>
+   --stop-address=<rva+size> build/delink/<TIER>/<TU>.c.obj`. Read the class layout from
+   `include/<TIER>/<TU>.h` (already recovered).
 2. **Reconstruct types + bodies.** Write C++ that lowers to the same instruction
    selection. `/Od` is **literal**: each statement compiles straight down, full
    `ebp` frames, every local spilled to the stack — so the body usually maps 1:1

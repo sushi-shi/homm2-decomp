@@ -52,3 +52,26 @@ homm2 status                   # per-unit + overall match %
 The matching toolchain (VC4.2) is provisioned into `build/toolchain/` from the
 `en_vc42ent` discs; `clang`/`clangd` is editor tooling only — the wine MSVC 4.2 build is the
 sole verdict on a match.
+
+`homm2 build` also runs three **hard header-discipline gates** (a red gate fails the build):
+no TU declares types/externs/forward-decls locally (all come from headers), no object emits a
+function symbol absent from CodeView, and every global carries a unique `DATA(<its VA>)`.
+
+## Navigate (`homm2 sema`)
+
+Semantic questions about the source/target — grep is lexical only. `homm2 sema -h` lists all;
+addresses are RVAs (a full `VA(0x..)` also works for `rva`/`decomp`):
+
+```sh
+homm2 sema xref   0x0004a3c0        # who calls this fn (--callees | --tree)
+homm2 sema disasm 0x0004a3c0 --diff # our (compiled) vs retail asm, side by side
+homm2 sema decomp 0x0004a3c0        # Ghidra decompiler C (seeded with our CodeView names)
+homm2 sema strings 0x0004a3c0       # a fn's string set (--find TEXT = reverse lookup)
+homm2 sema match  SOURCE/KB         # per-fn match % of a unit (or an 0x RVA)
+homm2 sema rva    0x0004a3c0        # dossier: claim / src loc / ghidra / match %
+homm2 sema symbol combatManager     # fuzzy workspace-symbol search (clangd)
+homm2 sema def|refs|hover src/… L C # clangd LSP at a point
+```
+
+xref/disasm/strings/match/rva/clangd need no Ghidra; `decomp` (+ xref library boundaries) need
+a one-time `homm2 ghidra` project (imports the EXE, applies our CodeView names).
