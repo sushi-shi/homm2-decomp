@@ -15,7 +15,12 @@ VA(0x004ddea0, 0x7)
 widget::~widget() {}
 
 VA(0x004ddeb0, 0x14)
-int widget::Open(int, class heroWindow *) { return 0; }
+int widget::Open(int id, class heroWindow *win)
+{
+    field_0x12 = id;
+    field_0x4 = win;
+    return 0;
+}
 
 VA(0x004dded0, 0x1)
 void widget::Close(void) {}
