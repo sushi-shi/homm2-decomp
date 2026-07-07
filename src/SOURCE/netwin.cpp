@@ -84,7 +84,25 @@ VA(0x004a6ecc, 0x207)
 extern "C" int __fastcall nb_term(void) { return 0; }
 
 VA(0x004a70d3, 0xb3)
-extern "C" int __fastcall nb_rcv(int, int) { return 0; }
+extern "C" unsigned short __fastcall nb_rcv(short session, void *buf)
+{
+    tag_Node *node;
+    int len;
+
+    EnterCriticalSection(&gNbRcvLock);
+    node = pop_node(&gNbRcvQueue);
+    LeaveCriticalSection(&gNbRcvLock);
+    if (node) {
+        if (node->len >= session)
+            len = (unsigned short)session;
+        else
+            len = node->len;
+        memcpy(buf, node->data, len);
+        BaseFree(node, "I:\\Projects\\Heroes\\Prog\\SOURCE\\netwin.cpp", __LINE__);
+        return len;
+    }
+    return 0;
+}
 
 VA(0x004a7186, 0xe4)
 extern "C" int __fastcall nb_snd(int, int, int) { return 0; }
