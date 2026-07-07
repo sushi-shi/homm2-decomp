@@ -6,7 +6,12 @@
 #include <va.h>
 #include <BASE/border.h>
 VA(0x004d20a0, 0x32)
-border::border(void) {}
+border::border(void) : widget(0, 0, 0, 0, 0, 0)
+{
+    field_0x20 = 0;
+    field_0x24 = 0;
+    field_0x28 = 0;
+}
 
 VA(0x004d2130, 0x64)
 border::border(short int, short int, short int, short int, short int, short int, short int, char *) {}
