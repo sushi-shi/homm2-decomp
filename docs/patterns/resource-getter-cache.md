@@ -12,13 +12,13 @@ tileset * resourceManager::GetTileset(char *name)
 {
     unsigned long id = MakeId(name, 1);
     resource *r = Query(id);
-    if (r != 0) {                 // CACHE HIT is the fall-through branch
-        r->field_0x6++;           // bump refcount
-    } else {
-        r = new tileset(id);
-        AddResource(r);
+    if (r != 0) {                 // cache hit: bump refcount and return EARLY
+        r->field_0x6++;
+        return static_cast<tileset *>(r);   // hierarchy downcast, NOT a C-cast
     }
-    return static_cast<tileset *>(r);   // hierarchy downcast, NOT a C-cast
+    r = new tileset(id);          // miss: construct + register
+    AddResource(r);
+    return static_cast<tileset *>(r);
 }
 ```
 
