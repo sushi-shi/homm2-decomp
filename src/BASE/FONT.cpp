@@ -127,9 +127,9 @@ void font::DrawBoundedString(char *str, int x, int y, int w, int h, int mode, in
     int breakPt;
     if (align & 4) {
         align -= 4;
-        int lines = LineLength(s, w);
-        if (field_0x10 * lines < h)
-            yOff = (h - field_0x10 * lines) / 2;
+        int totalH = field_0x10 * LineLength(s, w);
+        if (totalH < h)
+            yOff = (h - totalH) / 2;
     }
     field_0x18 = 0;
     while (1) {
