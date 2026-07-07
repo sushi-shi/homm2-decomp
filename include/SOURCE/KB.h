@@ -115,6 +115,7 @@ void UpdateNormalDialog(char *text);
 
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
 DATA(0x00528624) extern int bDoColorCycle;
+DATA(0x004fa97c) extern int gbDrawWindowBackground;
 DATA(0x005157ac) extern int bEarlySetupDone;
 DATA(0x004fa64c) extern font *bigFont;
 DATA(0x005165dc) extern int bInShutDown;

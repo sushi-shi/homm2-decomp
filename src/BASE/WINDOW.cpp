@@ -5,6 +5,7 @@
 
 #include <va.h>
 #include <BASE/heroWindow.h>
+#include <BASE/heroWindowManager.h>
 #include <BASE/bitmap.h>
 #include <SOURCE/KB.h>
 VA(0x004ceb70, 0xaa)
@@ -64,7 +65,15 @@ int heroWindow::SaveBackground(void)
 }
 
 VA(0x004cf8b0, 0x97)
-void heroWindow::RestoreBackground(void) {}
+void heroWindow::RestoreBackground(void)
+{
+    if (gbDrawWindowBackground) {
+        field_0x40->DrawToBuffer(field_0x28, field_0x2c);
+        gpWindowManager->UpdateScreenRegion(field_0x28, field_0x2c, field_0x30, field_0x34);
+    }
+    delete field_0x40;
+    field_0x40 = 0;
+}
 
 VA(0x004cf950, 0x186)
 void heroWindow::MoveWindow(int, int) {}

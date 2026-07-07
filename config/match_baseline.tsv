@@ -41,7 +41,7 @@ BASE/Bzip	?FreeCompressStructures@@YIXXZ	100.0000	6366b31afd44
 BASE/Bzip	?FreeDecompressStructures@@YIXXZ	100.0000	c648d65de280
 BASE/Bzip	?GETALL@@YIIH@Z	100.0000	8b6ee0567d61
 BASE/Bzip	?NORMALISE@@YIHH@Z	88.0000	14976abbdbcd
-BASE/Bzip	?NORMALISEHI@@YIHH@Z	91.0000	29c4cebad2da
+BASE/Bzip	?NORMALISEHI@@YIHH@Z	100.0000	29c4cebad2da
 BASE/Bzip	?NORMALISELO@@YIHH@Z	100.0000	7738af6fb9e4
 BASE/Bzip	?SETFIRST16@@YIXHI@Z	100.0000	487c5383c87c
 BASE/Bzip	?SETFIRST@@YIXHE@Z	100.0000	b552c86f630b
@@ -342,7 +342,7 @@ BASE/WINDOW	?MoveWindow@heroWindow@@QAEXHH@Z	10.3840	c50bae354869
 BASE/WINDOW	?Open@heroWindow@@QAEHHH@Z	100.0000	34bc686e4c39
 BASE/WINDOW	?RemoveAndDeleteWidget@heroWindow@@QAEXH@Z	27.6170	756c797eb96f
 BASE/WINDOW	?RemoveWidget@heroWindow@@QAEXPAVwidget@@@Z	16.0247	a1e1ac785a8f
-BASE/WINDOW	?RestoreBackground@heroWindow@@QAEXXZ	24.4906	0a14d0fabc4a
+BASE/WINDOW	?RestoreBackground@heroWindow@@QAEXXZ	100.0000	1ad6adddfb67
 BASE/WINDOW	?SaveBackground@heroWindow@@QAEHXZ	100.0000	b4aefb12dfaa
 BASE/WINMGR	??0heroWindowManager@@QAE@XZ	27.6190	365049ddf29a
 BASE/WINMGR	?AddWindow@heroWindowManager@@QAEXPAVheroWindow@@HH@Z	1.3514	e65bfcde03c2
@@ -997,7 +997,7 @@ SOURCE/KB	?TestDynamicWindow@@YIXHH@Z	100.0000	f5ab1abce453
 SOURCE/KB	?TrueFalseDialogHandler@@YIHAAUtag_message@@@Z	100.0000	686bb54969b1
 SOURCE/KB	?UnloadSystemwideIcons@@YIXXZ	100.0000	e5593a1d663f
 SOURCE/KB	?UpdateAppSpecificMenus@@YIXPAX@Z	100.0000	f40021f3ef8a
-SOURCE/KB	?UpdateNormalDialog@@YIXPAD@Z	100.0000	60d46581e63e
+SOURCE/KB	?UpdateNormalDialog@@YIXPAD@Z	100.0000	3a138fbbd809
 SOURCE/KB	?UpdateSystemOptionsMenu@@YIXXZ	1.6336	4c293b8d0bfe
 SOURCE/KB	?WaitEndSample@@YIXUSAMPLE2@@H@Z	100.0000	7e1d559a1d28
 SOURCE/KB	?WaitForOtherPlayer@@YIHXZ	100.0000	7d299bc1df68
