@@ -1424,11 +1424,11 @@ SOURCE/kbwin	?SetNoDialogMenus@@YIXH@Z	40.6250	dc385ec48fd5
 SOURCE/kbwin	?UpdateDfltMenu@@YIXPAX@Z	23.6000	69202ee28942
 SOURCE/kbwin	_WinMain@16	12.8152	f8e0bc7dbda6
 SOURCE/netwin	?is_netbios_avail@@YIHXZ	100.0000	1aee44949a90
-SOURCE/netwin	?nb_thr_ctl@@YIXXZ	0.4851	b1cab9bdb34b
+SOURCE/netwin	?nb_thr_ctl@@YIXXZ	5.6049	d67be83ba055
 SOURCE/netwin	@nb_init@8	93.4522	fd0fb67fc552
 SOURCE/netwin	@nb_rcv@8	96.2727	ada62b9a7694
 SOURCE/netwin	@nb_snd@12	94.3939	b9c5bed452bd
-SOURCE/netwin	@nb_stat@4	100.0000	b7e40499c98f
+SOURCE/netwin	@nb_stat@4	100.0000	6eeda73f0d79
 SOURCE/netwin	@nb_term@0	93.9470	de064d2df1ea
 SOURCE/netwin	_nb_sess	74.1921	deacc1a446d1
 SOURCE/tradpost	?ComputeTradeRatios@@YIXHHPAH00@Z	19.4028	fe1ff3678624

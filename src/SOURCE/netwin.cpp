@@ -469,6 +469,98 @@ extern "C" int __cdecl nb_sess(short cmd, int session, char *name, int detach)
 VA(0x004a7737, 0x21)
 extern "C" char __fastcall nb_stat(short session) { return gNetStatus[session]; }
 
+// FUN_004a832a — a session's async RECEIVE completed: enqueue its payload for nb_rcv, then re-arm.
+VA(0x004a832a, 0x147)
+static void __fastcall nb_recv_complete(int session)
+{
+    tag_Node *node;
+    if ((gNbSessNcb[session].ncb_command & 0x7f) == 0x15) {
+        switch (gNbSessNcb[session].ncb_retcode) {
+        case 0:
+            node = (tag_Node *)BaseAlloc(gNbSessNcb[session].ncb_length + 0xb,
+                                         "I:\\Projects\\Heroes\\Prog\\SOURCE\\netwin.cpp", __LINE__);
+            if (node != 0) {
+                node->len = gNbSessNcb[session].ncb_length;
+                node->field_0xa = (unsigned char)session;
+                memcpy(node->data, &gNbRcvData[session * 0x1000], node->len);
+                EnterCriticalSection(&gNbRcvLock);
+                add_node(&gNbRcvQueue, node);
+                LeaveCriticalSection(&gNbRcvLock);
+            }
+            nb_arm_recv(session);
+            break;
+        default:
+            nb_arm_recv(session);
+            break;
+        case 8:
+        case 10:
+        case 0x18:
+            gNetStatus[session] &= 0xfe;
+        }
+    }
+}
+
+// nb_thr_ctl — the receiver-thread pump: drain completed per-session receives into the rcv queue,
+// then drain the send/free queues, issuing a synchronous NCBSEND for each queued packet.
 VA(0x004a7758, 0xdd2)
-void nb_thr_ctl(void) {}
+void nb_thr_ctl(void)
+{
+    int running;
+    DWORD r;
+    int i;
+    tag_Node *node;
+    unsigned char rc;
+    int done;
+
+    running = 1;
+    r = WaitForMultipleObjects(9, gNbEvents, 0, 0);
+    if (r != 0x102) {
+        r = WaitForSingleObject(gNbEvents[0], 0);
+        if (r == 0)
+            ResetEvent(gNbEvents[0]);
+        for (i = 0; i < 5; i++) {
+            r = WaitForSingleObject(gNbEvents[i + 2], 0);
+            if (r == 0) {
+                ResetEvent(gNbEvents[i + 2]);
+                nb_recv_complete(i);
+            }
+        }
+        while (running) {
+            EnterCriticalSection(&gNbSndLock);
+            node = pop_node(&gNbFreeQueue);
+            if (node == 0)
+                node = pop_node(&gNbSndQueue);
+            LeaveCriticalSection(&gNbSndLock);
+            if (node == 0) {
+                running = 0;
+            } else {
+                memset(&gNbCtlNcb, 0, 0x40);
+                gNbCtlNcb.ncb_lsn = gNbSessLsn[node->field_0xa];
+                if (gNbCtlNcb.ncb_lsn != 0xff) {
+                    memcpy(gNbSessBuf, node->data, node->len);
+                    gNbCtlNcb.ncb_buffer = gNbSessBuf;
+                    gNbCtlNcb.ncb_length = node->len;
+                    gNbCtlNcb.ncb_command = 0x14;
+                    gNbCtlNcb.ncb_lana_num = gNetbiosLana;
+                    done = 0;
+                    while (!done) {
+                        rc = Netbios(&gNbCtlNcb);
+                        if (rc < 9) {
+                            if (rc == 8)
+                                gNetStatus[node->field_0xa] &= 0xfe;
+                            else if (rc == 0)
+                                done = 1;
+                        } else {
+                            if (rc == 10 || rc == 0x18)
+                                gNetStatus[node->field_0xa] &= 0xfe;
+                            else if (rc == 0xff)
+                                ProcessAssert(0, "I:\\Projects\\Heroes\\Prog\\SOURCE\\netwin.cpp", __LINE__);
+                        }
+                    }
+                }
+                BaseFree(node, "I:\\Projects\\Heroes\\Prog\\SOURCE\\netwin.cpp", __LINE__);
+            }
+        }
+    }
+}
 
