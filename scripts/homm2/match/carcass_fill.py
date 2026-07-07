@@ -93,8 +93,9 @@ def transform(path):
                 bare += 1
         out.append(line); i += 1
     text = '\n'.join(out)
-    if filled and '<_all.h>' not in text:
-        text = text.replace('#include <va.h>\n', '#include <va.h>\n#include <_all.h>\n', 1)
+    # NOTE: type includes are no longer added here. Since the <_all.h> umbrella was removed,
+    # a filled TU gets its specific class headers from own_header_pass.py + resolve_includes.py
+    # (compiler-driven). Adding <_all.h> here would reintroduce the deleted umbrella.
     return text, filled, bare, dropped
 
 if __name__ == "__main__":
