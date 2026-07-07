@@ -8,6 +8,9 @@
 #include <BASE/font.h>
 #include <BASE/resourceManager.h>
 #include <BASE/icon.h>
+#include <BASE/Icon2b.h>
+#include <BASE/icon2bc.h>
+#include <BASE/heroWindowManager.h>
 #include <SOURCE/KB.h>
 
 VA(0x004c6fd0, 0xc8)
@@ -36,7 +39,47 @@ font::~font()
 }
 
 VA(0x004c7120, 0x24a)
-void font::DrawStringExecute(char *, int, int, int, int, int, int, int) {}
+void font::DrawStringExecute(char *str, int x, int y, int mode,
+                            int clipL, int clipT, int clipR, int clipB)
+{
+    char c = 0;
+    int pos = x;
+    int i = 0;
+    while (str[i] != 0) {
+        c = str[i];
+        if (c == 0x1f) {
+            pos += GetCharacterWidth(str[i]);
+            goto next;
+        } else if (c == '{') {
+            field_0x18 = 1;
+            goto next;
+        } else if (c == '}') {
+            field_0x18 = 0;
+            goto next;
+        } else {
+            c -= 0x20;
+            if (c < 0 || c > 0x5f)
+                c = 0x5f;
+            if (c != 0) {
+                if (mode == 1 && field_0x18 == 0)
+                    IconToBitmap(field_0x1c, gpWindowManager->field_0x46, pos, y, c, 1,
+                                 clipL, clipT, clipR, clipB, 0);
+                else if (mode == 2 || (mode == 1 && field_0x18 != 0))
+                    IconToBitmapColorTable(field_0x1c, gpWindowManager->field_0x46, pos, y, c, 1,
+                                           clipL, clipT, clipR, clipB, 0, gColorTableYellow, 1);
+                else if (mode == 4)
+                    IconToBitmapColorTable(field_0x1c, gpWindowManager->field_0x46, pos, y, c, 1,
+                                           clipL, clipT, clipR, clipB, 0, gColorTableScenWin, 0);
+                else
+                    IconToBitmapColorTable(field_0x1c, gpWindowManager->field_0x46, pos, y, c, 1,
+                                           clipL, clipT, clipR, clipB, 0, gColorTableDarkGray, 1);
+            }
+            pos += GetCharacterWidth(str[i]);
+        }
+    next:
+        i++;
+    }
+}
 
 VA(0x004c7370, 0x48)
 void font::DrawString(char *s, int x, int y, int c)
