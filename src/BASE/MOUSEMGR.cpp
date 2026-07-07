@@ -12,6 +12,7 @@
 #include <BASE/heroWindowManager.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/kbwin.h>
+#include <BASE/INPUTMGR.h>
 #include <_globals_model.h>
 VA(0x004c9270, 0xd9)
 mouseManager::mouseManager(void) : baseManager()
@@ -110,7 +111,18 @@ VA(0x004ca1b0, 0xc)
 int mouseManager::IsVis(void) { return field_0x86 == 0; }
 
 VA(0x004ca1c0, 0x66)
-void mouseManager::CheckUpdateMousePos(void) {}
+void mouseManager::CheckUpdateMousePos(void)
+{
+    if (gbColorMice != 0) {
+        GetCursorPos(&gMouseCheckPt);
+        ScreenToClient(hwndApp, &gMouseCheckPt);
+        int x = (gMouseCheckPt.x * 640) / iMainWinScreenWidth;
+        field_0x56 = x;
+        int y = (gMouseCheckPt.y * 480) / iMainWinScreenHeight;
+        field_0x5a = y;
+        CheckChangeCursor(x, y, 0);
+    }
+}
 
 VA(0x004ca230, 0x191)
 void mouseManager::SetColorMice(int) {}
