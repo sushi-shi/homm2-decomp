@@ -3,20 +3,17 @@
 // Reconstructed class (BASE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // 8 methods, 2 own-virtual, 0 static data.
 #include <va.h>
+#include <BASE/textWidget.h>
 #include "widget.h"
 // forward declarations:
 struct tag_message;
 
 #pragma pack(push, 1)  // recovered layout is byte-packed
-class textEntryWidget : public widget {
+class textEntryWidget : public textWidget {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base widget = 0x20 bytes at 0x00 via ': public widget'; own fields below)
-    int    field_0x20;  // +0x20
-    int    field_0x24;  // +0x24
-    short  field_0x28;  // +0x28
-    char   field_0x2a;  // +0x2a
     int    field_0x2b;  // +0x2b
     short  field_0x2f;  // +0x2f
     short  field_0x31;  // +0x31
