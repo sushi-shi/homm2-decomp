@@ -6,7 +6,13 @@
 #include <va.h>
 #include <BASE/bitmap.h>
 VA(0x004cffc0, 0x2a)
-bitmap::bitmap(void) {}
+bitmap::bitmap(void) : resource(0, 0, -1, 0)
+{
+    field_0x10 = 0;
+    field_0x12 = 0;
+    field_0x14 = 0;
+    field_0x16 = 0;
+}
 
 VA(0x004d0040, 0x53)
 bitmap::bitmap(short int, short int, short int) {}
