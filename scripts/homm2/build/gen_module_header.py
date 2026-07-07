@@ -24,8 +24,9 @@ def free_decls(path):
         if '(' not in sig or not HEAD_RE.search(sig):
             continue
         namepart = sig[:sig.index('(')]
-        # free functions only: members (Class::name) live in class headers; skip ctor/dtor
-        if '::' in namepart or '~' in namepart:
+        # free functions only: members (Class::name) live in class headers; skip ctor/dtor; skip
+        # file-static helpers (file-local — no CodeView symbol, never declared in the owner header)
+        if '::' in namepart or '~' in namepart or namepart.split()[:1] == ['static']:
             continue
         out.append(sig + ';')
     return out
