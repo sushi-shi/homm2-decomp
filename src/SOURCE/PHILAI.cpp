@@ -4,6 +4,13 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <SOURCE/PHILAI.h>
+#include <_types.h>
+#include <BASE/Misc.h>
+#include <SOURCE/kbwin.h>
+#include <SOURCE/NOOPT.h>
+#include <SOURCE/KB.h>
+#include <_globals.h>
 #include <_all.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,176 +24,13 @@
 #include <SOURCE/playerData.h>
 #include <SOURCE/searchArray.h>
 
-// ---- globals referenced by this TU (storage types fixed by mangled names) ----
-extern game *gpGame;
-extern hero *gpCurAIHero;
-extern playerData *gpCurPlayer;
-extern advManager *gpAdvManager;
-extern philAI *gpPhilAI;
-extern searchArray *gpSearchArray;
-extern searchArray SVSearchArray;
-extern armyGroup *gpMonGroup;
-extern int iDummy;
-extern int iAlphaMale;
-extern float gafAITurnCostResource[7];
-// gafAITurnCostResource[3]/[5]/[6] reach the linker as their own constant symbols
-// (zero addend) — declared distinctly so the fmuls displacement is 0 like retail.
-extern float const_00127c14;          // gafAITurnCostResource[3]
-extern float const_00127c1c;          // gafAITurnCostResource[5]
-extern float const_00127c20;          // gafAITurnCostResource[6]
-// RVConversion weights for ore/mercury/crystal are their own .rdata float consts;
-// referencing them as symbols (not inline literals) keeps /Od term order in-source.
-extern float gRVWeightOre;            // p[2]
-extern float gRVWeightMerc;           // p[1]
-extern float gRVWeightCrystal;        // p[4]
-extern int gArtifactBaseRV[100];
-extern signed char giBuildShipyard[6];
-extern signed char giBuildBoat[6];
-extern signed char giBuildBoatStuffTurn[6];
-extern signed char gDwellingType[20][12];
-
-// .rdata float/double constants referenced as their own symbols (name-exact relocs).
-extern float  const_000eb2a0;         // 0.0f
-extern float  const_000eb2a4;         // 2.0f
-extern double const_000eb338;         // 0.5
-extern float  const_000eb368;         // 100.0f
-extern double const_000eb4a8;         // 1.5
-extern float  const_000eb4c0;         // 1250.0f
-extern float  const_000eb4c4;         // 48.0f
-
-// other globals
-extern int glTimers[];
-extern int iLastFrameRateTimer;
-extern int bShowIt;
-extern int gbDrawSavedCursor;
-extern int gbRemoteOn;
-extern int bSpecialHideCursor;
-extern int const_00128d38;            // 13-byte BSS flag buffer (??_C@_0N@PMOM@...)
-extern int giDebugLevel;
-extern char gText[];
-extern int gResourceBaseValue[];
-extern int giCurPlayer;
-extern int giCurTurn;
-extern int gHeroGoldCost;
-extern int bHeroBuiltThisTurn;
-extern int gbReduceByReload;
-extern int iCurHourGlassPhase;
-extern int MAP_WIDTH;
-extern int MAP_HEIGHT;
-extern short *gaiLiveChanceOfPos;
-extern short *gaiHeroStrategicRVOfPos;
-extern short *gaiHeroEventStratRVOfPos;
-extern signed char *gaiTurnValueOfMine;
-extern signed char *gaiEnemyHeroReachable;
-
-struct tag_tilePoint { signed char x; signed char _1; signed char y; signed char _3; };
-extern tag_tilePoint normalDirTable[];
-
-// free functions (mangling fixed by the call-site relocs)
-long KBTickCount(void);
-void Process1WindowsMessage(void);
-extern "C" void PollSound(void);
-int Random(int, int);
-int CanBuild(town *, int);
-int CanBuy(town *, int);
-char *GetBuildingName(int, int);
-void GetBuildingCost(int, int, int *const, int);
-int GetBuildingBaseResourceValue(int, int, int);
-void LogStr(char *);
-void AiPrint(char *);
-void DelayMilli(long);
-void *BaseAlloc(unsigned int, char *, int);
-void BaseFree(void *, char *, int);
-void GetMonsterCost(int, int *const);
-void CloseAIMapVars(void);
+// Globals -> _globals.h; tag_tilePoint/monsterRV -> _types.h; called free functions
+// from owner headers (Misc.h/KB.h/kbwin.h/NOOPT.h); PHILAI's own -> SOURCE/PHILAI.h.
 
 // __FILE__ for the NWC BaseAlloc/BaseFree memory tracking (reloc-masked path string).
 #define PHFILE ((char *)"I:\\Projects\\Heroes\\Prog\\SOURCE\\PHILAI.CPP")
 
-// "Best Hero/Creature" selection record (passed by ref to the GetBest* / CanBuy* methods).
-struct BHC {
-    town *pTown;     // 0x00
-    int type;        // 0x04  (0=building, 1=hero, 2=creature)
-    int what;        // 0x08
-    int num;         // 0x0c
-};
-
-// ---- AI member views: the recovered classes carry no field layout, so model the
-// exact offsets the /Od code touches as packed views and cast to them. ----
-#pragma pack(push, 1)
-struct monsterRV { int rv; char pad[22]; };          // 26-byte record (pack 1)
-extern monsterRV gMonsterInfo[100];
-struct pdView {                  // playerData
-    char _0;
-    signed char numHeroes;       // 0x01
-    char _2[2];
-    signed char heroIds[8];      // 0x04
-    char _c[0x44 - 0x0c];
-    signed char numCastles;      // 0x44
-    char _45[2];
-    signed char castleIds[8];    // 0x47
-    char _4f[0x8f - 0x4f];
-    int resources[7];            // 0x8f (gold = [6] @ 0xa7)
-    char _ab;
-    signed char barrierTents;    // 0xac
-    char _ad[0x10f - 0xad];
-    float upgradeFactor;         // 0x10f
-    signed char getHeroId(int i) { return heroIds[i]; }
-    signed char getCastleId(int i) { return castleIds[i]; }
-};
-struct heroView {                // hero
-    signed short curMana;        // 0x00
-    unsigned char heroId;        // 0x02
-    char _3[0x65 - 0x03];
-    signed char army[0x74 - 0x65]; // 0x65 (embedded armyGroup creature types)
-    signed char skills[0x90 - 0x74]; // 0x74
-    int level;                   // 0x90
-};
-struct townView {                // town
-    signed char id;              // 0x00
-    char _1[2];
-    signed char race;            // 0x03
-    unsigned char castleX;       // 0x04
-    unsigned char castleY;       // 0x05
-    char _6[0x17 - 0x06];
-    signed char visitingHero;    // 0x17
-    int buildings;               // 0x18
-    signed char buildState;      // 0x1c
-    char _1d;
-    signed short garrison[5];    // 0x1e
-    signed char getVisitingHero() { return visitingHero; }
-};
-struct taView {                  // per-player AI "turn attention" record (gpGame+0x49e + player*283)
-    float f0, f4, f8, fc, f10, f14; // 0x00..0x14
-    char _18[0x34 - 0x18];
-    int field34[7];              // 0x34..0x4f
-    int field50;                 // 0x50
-};
-struct mapCellView {             // mapCell
-    char _0[4];
-    unsigned short _bits : 3;
-    unsigned short tentColor : 13; // bits 3..15 of word @ 0x04
-};
-struct gameTV {                  // game fields used by ValueOfTown (modelled so /Od evals L->R)
-    char _0[0x2c6];
-    unsigned char f2c6;          // 0x2c6
-    char _2c7[2];
-    unsigned short f2c9;         // 0x2c9
-    unsigned char f2cb;          // 0x2cb
-    unsigned short f2cc;         // 0x2cc
-    char _2ce[0x2d5 - 0x2ce];
-    unsigned short f2d5;         // 0x2d5
-    unsigned short f2d7;         // 0x2d7
-};
-#pragma pack(pop)
-
-// gpGame view for the per-player AI hero-slot 2D array at 0x4a0 (row stride 283),
-// modelled as a struct member so /Od keeps 0x4a0 as the load displacement and folds
-// the row multiply with the column index.
-struct gameView {
-    char _0[0x4a0];
-    signed char heroSlots[40][283];  // 0x4a0
-};
+// AI view/record structs (BHC/pdView/.../gameView) -> SOURCE/PHILAI.h.
 
 VA(0x0043781b, 0x1b5)
 void ResetHeroRVs(int, int, int) {}
