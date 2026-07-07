@@ -6,7 +6,13 @@
 #include <va.h>
 #include <BASE/dropListWidget.h>
 VA(0x004dbf00, 0x3b)
-dropListWidget::dropListWidget(void) {}
+dropListWidget::dropListWidget(void) : widget(0, 0, 0, 0, 0, 0)
+{
+    field_0x40 = 0;
+    field_0xb0 = 0;
+    field_0x3c = 0;
+    field_0x3e = -1;
+}
 
 VA(0x004dbf60, 0x7c)
 dropListWidget::~dropListWidget() {}
