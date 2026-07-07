@@ -65,7 +65,49 @@ void border::Read(void)
 }
 
 VA(0x004d22f0, 0x181)
-int border::Main(struct tag_message &) { return 0; }
+int border::Main(struct tag_message &msg)
+{
+    unsigned short flags = field_0x16;
+    int type = msg.type;
+    if ((flags & 2) == 0) {
+        if (type == 0x200)
+            return widget::Main(msg);
+        return 0;
+    }
+    switch (type) {
+    case 8:
+    case 0x20:
+        break;
+    default:
+        return widget::Main(msg);
+    case 0x10:
+    case 0x40:
+        if ((flags & 1) != 0) {
+            field_0x16 = flags & 0xfffe;
+            msg.type = 0x200;
+            msg.field4 = 0xd;
+            msg.field8 = field_0x10;
+            return 2;
+        }
+        return 0;
+    }
+    short mx = static_cast<short>(msg.field4) - field_0x4->field_0x28;
+    short my = static_cast<short>(msg.field8) - field_0x4->field_0x2c;
+    if (field_0x18 <= mx && field_0x1a <= my &&
+        mx < field_0x1c + field_0x18 && my < field_0x1e + field_0x1a) {
+        if (type == 0x20) {
+            msg.fieldC = 0x200;
+            msg.field4 = 0xe;
+        } else {
+            field_0x16 = flags | 1;
+            msg.field4 = 0xc;
+        }
+        msg.type = 0x200;
+        msg.field8 = field_0x10;
+        return 2;
+    }
+    return 0;
+}
 
 VA(0x004d2480, 0xab)
 void border::Draw(void)
