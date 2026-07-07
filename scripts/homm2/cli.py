@@ -26,5 +26,9 @@ def main(argv=None):
         st(["--write-readme"]); return st([])   # refresh README % block + print summary
     if cmd == "status":
         from homm2.match.status import main as st; return st(rest)
-    print("usage: homm2 {init|configure|build|clangd|status}", file=sys.stderr)
+    if cmd == "sema":
+        from homm2.analysis.sema import main as m; return m(rest)
+    if cmd == "ghidra":
+        from homm2.ghidra.driver import cli_main as m; return m(rest)
+    print("usage: homm2 {init|configure|build|clangd|status|sema|ghidra}", file=sys.stderr)
     return 0 if cmd in ("help", "-h", "--help") else 1

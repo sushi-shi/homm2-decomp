@@ -62,6 +62,38 @@ homm2 status    # per-unit + overall match %   (also: status update | status che
 `homm2 build` compiles each `config/units.toml` unit to `build/objdiff/base/<unit>.obj`
 and diffs it against the delinked retail target `build/delink/<unit>.c.obj`.
 
+## `homm2 sema` — semantic navigation (matcher's read-only toolbox)
+
+One discoverable entrypoint for source/target navigation (**`homm2 sema -h`** lists all;
+every invocation is logged to `build/homm2_sema.log`). SEMANTIC questions go here — grep is
+lexical-only. Each subcommand is a thin wrapper over a `homm2.analysis.<...>` module.
+
+```sh
+homm2 sema xref   0x0004a3c0        # who calls this fn (--callees | --tree | --raw)
+homm2 sema decomp 0x0004a3c0        # Ghidra decompiler C (names from our CodeView seeding)
+homm2 sema disasm 0x0004a3c0 --diff # base(compiled) vs target(retail) asm (--base|--lite|--rich)
+homm2 sema strings 0x0000126d       # a fn's string set   (--find TEXT = reverse lookup)
+homm2 sema match  SOURCE/KB         # per-fn % of a unit (or an 0x RVA)
+homm2 sema rva    0x0004a3c0        # address dossier (claim / src loc / ghidra / match %)
+homm2 sema symbol combatManager     # fuzzy workspace-symbol search (clangd)
+homm2 sema def|refs|hover src/… L C # clangd LSP at a point;  rename … --dry-run
+```
+
+Addresses are **RVAs** (as in `symbol_names.csv`); `rva`/`decomp` also accept a full VA (the
+`VA(0x..)` macro form). xref/disasm/strings/match/rva/clangd need **no** Ghidra.
+
+**Ghidra (optional, powers `xref` boundaries + `decomp`).** `homm2 sema decomp` and the
+library-boundary half of `xref` need a one-time Ghidra project. Build it with:
+
+```sh
+homm2 ghidra          # ONE-TIME: import HEROES2W.EXE -> auto-analyze -> apply OUR CodeView
+                      # names -> export build/ghidra/exports/functions.csv  (SEVERAL MINUTES)
+homm2 ghidra --no-analyze   # re-apply names + re-export instantly (no re-analysis)
+```
+
+Ghidra is read-only here — it never *discovers* names (CodeView is authoritative); it's fed
+the EXE + our known symbols. Needs the dev shell's Ghidra env (in the flake).
+
 ## Conventions
 
 - One TU per CodeView compiland under `src/<TIER>/<TU>.cpp` (TIER ∈ BASE, SOURCE,
@@ -99,4 +131,6 @@ and diffs it against the delinked retail target `build/delink/<unit>.c.obj`.
 - `docs/patterns/INDEX.md` — codegen idiom catalog (grep by symptom/tag when a diff row sticks).
 - `docs/compiler-detection.md`, `docs/linker-flags.md` — toolchain facts.
 - `scripts/od_slots.py` (predict/solve slots) · `scripts/od_oracle.py` (verify vs real cl).
+- `homm2 sema <cmd>` — semantic navigation (xref/decomp/disasm/strings/match/rva/clangd; see
+  Build loop). Modules in `scripts/homm2/analysis/`; Ghidra pipeline in `scripts/homm2/ghidra/`.
 - `editor/nvim` — `:Homm2` in-editor diff/build/status (auto-loaded by the dev-shell).
