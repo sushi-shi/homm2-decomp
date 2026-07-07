@@ -28,7 +28,7 @@
 #include <SOURCE/wingraph.h>
 #include <BASE/BITS.h>
 #include <SOURCE/KB.h>
-#include <win/windows.h>
+#include <windows.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
