@@ -5,6 +5,8 @@
 
 #include <va.h>
 #include <BASE/heroWindow.h>
+#include <BASE/bitmap.h>
+#include <SOURCE/KB.h>
 VA(0x004ceb70, 0xaa)
 heroWindow::heroWindow(void) {}
 
@@ -52,7 +54,14 @@ VA(0x004cf710, 0x116)
 void heroWindow::DrawWindow(int, int, int) {}
 
 VA(0x004cf830, 0x7f)
-int heroWindow::SaveBackground(void) { return 0; }
+int heroWindow::SaveBackground(void)
+{
+    field_0x40 = new bitmap(0x21, field_0x30, field_0x34);
+    PollSound();
+    field_0x40->GrabScreen(field_0x28, field_0x2c);
+    PollSound();
+    return 0;
+}
 
 VA(0x004cf8b0, 0x97)
 void heroWindow::RestoreBackground(void) {}

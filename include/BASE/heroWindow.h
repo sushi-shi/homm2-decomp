@@ -5,6 +5,7 @@
 #include <va.h>
 // forward declarations:
 class widget;
+class bitmap;
 struct tag_message;
 
 #pragma pack(push, 1)  // recovered layout is byte-packed
@@ -24,7 +25,7 @@ public:
     int    field_0x34;  // +0x34
     int    field_0x38;  // +0x38
     int    field_0x3c;  // +0x3c
-    int    field_0x40;  // +0x40
+    bitmap *field_0x40;  // +0x40  saved-background bitmap
     // size >= 0x44 (accessed lower bound; no ctor/stride oracle)
     // --- constructors ---
     heroWindow(void);
