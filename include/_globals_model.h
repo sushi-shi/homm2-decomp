@@ -27,4 +27,9 @@ DATA(0x0051fec4) extern int gTileRowCtr;
 // netwin.cpp netbios per-session status byte array (no CodeView symbol), indexed by session id.
 DATA(0x005173b4) extern char gNetStatus[];
 
+// netwin.cpp netbios probe state (no CodeView symbol): the LANA number netbios was found on,
+// and the "netbios present" flag, set by is_netbios_avail and read by nb_init.
+DATA(0x005173a0) extern unsigned char gNetbiosAvail;
+DATA(0x005173a4) extern unsigned char gNetbiosLana;
+
 #endif // HOMM2_GLOBALS_MODEL_H

@@ -1082,7 +1082,7 @@ SOURCE/PHILAI	?CombatMonsterEvent@philAI@@QAEHPAVhero@@HPAHPAVmapCell@@@Z	100.00
 SOURCE/PHILAI	?ComputeUpgradeValue@philAI@@QAEHHH@Z	100.0000	accc998d53fe
 SOURCE/PHILAI	?ComputeValueOfFreeSS@philAI@@QAEHPAVhero@@H@Z	100.0000	e91d281944b5
 SOURCE/PHILAI	?ComputeValueOfSS@philAI@@QAEHPAVhero@@HH@Z	5.5870	9e9e47bbb198
-SOURCE/PHILAI	?CreaturesToBuy@philAI@@QAEHHH@Z	97.7500	6b9ea4620c5a
+SOURCE/PHILAI	?CreaturesToBuy@philAI@@QAEHHH@Z	100.0000	6b9ea4620c5a
 SOURCE/PHILAI	?CreaturesToBuy@philAI@@QAEHPAVtown@@H@Z	100.0000	c0fcb827495e
 SOURCE/PHILAI	?DamageGroup@philAI@@QAEHPAVarmyGroup@@PAVhero@@1M@Z	100.0000	f5f9f7242847
 SOURCE/PHILAI	?DetermineHeroToMove@philAI@@QAEPAVhero@@H@Z	89.9487	7867d5903d00
@@ -1136,7 +1136,7 @@ SOURCE/PHILAI	?SetupRelativeHeroStrengths@philAI@@QAEXXZ	100.0000	e5e17c2812ec
 SOURCE/PHILAI	?ShowStatus@@YIXXZ	100.0000	b6ed09fab8fa
 SOURCE/PHILAI	?StrategicValueOfPosition@philAI@@QAEHHHHHPAHH@Z	1.9660	0915461794e2
 SOURCE/PHILAI	?TownEvent@philAI@@QAEXPAVmapCell@@PAVhero@@HH@Z	7.8667	0bb4174cdc98
-SOURCE/PHILAI	?TurnCostResource@philAI@@QAEXH@Z	96.5273	02e0effdfaed
+SOURCE/PHILAI	?TurnCostResource@philAI@@QAEXH@Z	99.4455	02e0effdfaed
 SOURCE/PHILAI	?TurnValueOfObelisk@philAI@@QAEMH@Z	100.0000	e84bc062333b
 SOURCE/PHILAI	?TurnsToBuy@philAI@@QAEMQAH@Z	100.0000	4a523ff00de7
 SOURCE/PHILAI	?ValidateHero@@YIXPAVhero@@@Z	100.0000	6b3d4676d808
@@ -1423,7 +1423,7 @@ SOURCE/kbwin	?SetMenus@@YIXPAXH@Z	14.2551	6ee5d9245c10
 SOURCE/kbwin	?SetNoDialogMenus@@YIXH@Z	40.6250	dc385ec48fd5
 SOURCE/kbwin	?UpdateDfltMenu@@YIXPAX@Z	23.6000	69202ee28942
 SOURCE/kbwin	_WinMain@16	12.8152	f8e0bc7dbda6
-SOURCE/netwin	?is_netbios_avail@@YIHXZ	23.3922	5499a9a57af2
+SOURCE/netwin	?is_netbios_avail@@YIHXZ	100.0000	1aee44949a90
 SOURCE/netwin	?nb_thr_ctl@@YIXXZ	0.4851	b1cab9bdb34b
 SOURCE/netwin	@nb_init@8	9.4076	390a02c88904
 SOURCE/netwin	@nb_rcv@8	26.9455	4b1ad78a639e
