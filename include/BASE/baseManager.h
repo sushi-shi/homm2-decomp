@@ -10,7 +10,7 @@
 // bodyless-pure (no symbols); identities recovered from the manager overrides
 // (resourceManager, inputManager, advManager, heroWindowManager, mouseManager,
 // soundManager, combatManager, townManager, ...). No virtual destructor.
-#include "../_macros.h"
+#include <va.h>
 // forward declarations:
 struct tag_message;
 

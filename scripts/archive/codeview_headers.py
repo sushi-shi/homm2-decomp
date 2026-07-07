@@ -270,9 +270,7 @@ for C in abstract:
             else:                                 abstract_pv[C].append((i,"void",f"vfn{i}","",False))
 
 # ---------- emit ----------
-open(os.path.join(outdir,"_macros.h"),"w").write(
-    "#pragma once\n// No-op annotation macros.\n"
-    "#define VA(addr, size)\n#define DATA(addr)\n#define OVERRIDE\n")
+# (headers #include <va.h> directly for VA/DATA/OVERRIDE/SIZE — no separate _macros.h)
 emitted=[]
 for C in classes:
     tier=class_tier[C]; base=vbase.get(C)
@@ -290,7 +288,7 @@ for C in classes:
     L=["#pragma once",
        f"// Reconstructed class ({tier}) from CodeView NB09 of {os.path.basename(pe)} — NOT original source.",
        f"// {len(ms)} methods, {n_own_virtual} own-virtual, {len(ds)} static data.",
-       '#include "../_macros.h"']
+       '#include <va.h>']
     if base and inc_path(tier,base): L.append(f"#include {inc_path(tier,base)}")
     fwd=sorted(refs-({("class",base)} if base else set()))
     if fwd: L.append("// forward declarations:"); L+= [f"{kw} {nm};" for kw,nm in fwd]

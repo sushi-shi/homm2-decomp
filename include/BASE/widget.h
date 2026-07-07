@@ -7,7 +7,7 @@
 // NO body (emits no symbol); ~widget (??1widget@@UAE, 0x7) and Main (?Main@widget@@UAE,
 // 0x2f4) are pure-virtual-WITH-body. Declaration order == vtable slot order; derived
 // classes (border, iconWidget, textWidget, dimmerWidget, ...) override these 3 slots.
-#include "../_macros.h"
+#include <va.h>
 // forward declarations:
 class heroWindow;
 struct tag_message;
