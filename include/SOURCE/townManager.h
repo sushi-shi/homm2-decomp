@@ -39,12 +39,12 @@ public:
     int    field_0x156;  // +0x156
     int    field_0x15a;  // +0x15a
     int    field_0x15e;  // +0x15e
-    int    field_0x162;  // +0x162
-    int    field_0x166;  // +0x166
+    heroWindow *field_0x162;  // +0x162  hero portrait window (redrawn on recruit)
+    heroWindow *field_0x166;  // +0x166  hero portrait window (redrawn on recruit)
     int    field_0x16a;  // +0x16a
     int    field_0x16e;  // +0x16e
-    int    field_0x172;  // +0x172
-    int    field_0x176;  // +0x176
+    int    field_0x172;  // +0x172  recruit slot / selection state
+    char  *field_0x176;  // +0x176  selected hero record (byte [2] = hero id)
     // --- constructors ---
     townManager(void);
     // --- virtual methods (vtable order) ---

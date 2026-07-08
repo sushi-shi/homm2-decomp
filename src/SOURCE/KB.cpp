@@ -215,10 +215,10 @@ int RecruitHeroHandler(tag_message &msg)
         case 0xc:
             switch (msg.field8) {
             case 2:
-                HeroView((unsigned char)(*(char **)((char *)gpTownManager + 0x176))[2], 1, 0);
+                HeroView(static_cast<unsigned char>(gpTownManager->field_0x176[2]), 1, 0);
                 gpTownManager->RedrawTownScreen();
-                (*(heroWindow **)((char *)gpTownManager + 0x162))->DrawWindow();
-                (*(heroWindow **)((char *)gpTownManager + 0x166))->DrawWindow();
+                gpTownManager->field_0x162->DrawWindow();
+                gpTownManager->field_0x166->DrawWindow();
                 gpWindowManager->FadeScreen(0, 8, 0);
                 break;
             default:
@@ -228,11 +228,11 @@ int RecruitHeroHandler(tag_message &msg)
         case 0xd:
             switch (msg.field8) {
             case 0x7801:
-                *(int *)((char *)gpTownManager + 0x172) = -1;
+                gpTownManager->field_0x172 = -1;
                 a = 1;
                 break;
             case 0x7802:
-                *(int *)((char *)gpTownManager + 0x172) = 0;
+                gpTownManager->field_0x172 = 0;
                 *(int *)((char *)gpWindowManager + 0x5a) = msg.field8;
                 a = 1;
                 break;
