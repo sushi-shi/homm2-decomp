@@ -11,6 +11,7 @@
 #include <SOURCE/KB.h>
 #include <BASE/mss.h>
 #include <stdio.h>
+#include <string.h>
 #include <windows.h>
 #include <BASE/Misc.h>
 VA(0x004cb630, 0x68)
@@ -31,7 +32,25 @@ VA(0x004cb770, 0x13c)
 void soundManager::CDStop(void) {}
 
 VA(0x004cb8b0, 0xb3)
-int soundManager::CDIsPlaying(void) { return 0; }
+int soundManager::CDIsPlaying(void)
+{
+    unsigned int uVar1;
+    if (gbNoSound == 0) {
+        if (field_0x69a == 0) {
+            uVar1 = 0;
+        } else {
+            wsprintfA(reinterpret_cast<char *>(&CommandString), "status CD mode");
+            nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
+                                       reinterpret_cast<char *>(&lpszReturnString), 0xff, 0);
+            if (nMCIError != 0)
+                HandleMCIError(nMCIError, reinterpret_cast<char *>(&CommandString));
+            uVar1 = (stricmp(reinterpret_cast<char *>(&lpszReturnString), "playing") == 0);
+        }
+    } else {
+        uVar1 = 0;
+    }
+    return uVar1;
+}
 
 VA(0x004cb970, 0xf3)
 void soundManager::CDStartup(void) {}
