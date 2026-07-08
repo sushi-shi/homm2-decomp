@@ -79,7 +79,6 @@ lexical-only. Each subcommand is a thin wrapper over a `homm2.analysis.<...>` mo
 
 ```sh
 homm2 sema xref   0x0004a3c0        # who calls this fn (--callees | --tree | --raw)
-homm2 sema decomp 0x0004a3c0        # Ghidra decompiler C (names from our CodeView seeding)
 homm2 sema disasm 0x0004a3c0 --diff # base(compiled) vs target(retail) asm (--base|--lite|--rich)
 homm2 sema strings 0x0000126d       # a fn's string set   (--find TEXT = reverse lookup)
 homm2 sema match  SOURCE/KB         # per-fn % of a unit (or an 0x RVA)
@@ -88,11 +87,11 @@ homm2 sema symbol combatManager     # fuzzy workspace-symbol search (clangd)
 homm2 sema def|refs|hover src/… L C # clangd LSP at a point;  rename … --dry-run
 ```
 
-Addresses are **RVAs** (as in `symbol_names.csv`); `rva`/`decomp` also accept a full VA (the
+Addresses are **RVAs** (as in `symbol_names.csv`); `rva` also accepts a full VA (the
 `VA(0x..)` macro form). xref/disasm/strings/match/rva/clangd need **no** Ghidra.
 
-**Ghidra (optional, powers `xref` boundaries + `decomp`).** `homm2 sema decomp` and the
-library-boundary half of `xref` need a one-time Ghidra project. Build it with:
+**Ghidra (optional, powers `xref` boundaries).** The
+library-boundary half of `xref` needs a one-time Ghidra project. Build it with:
 
 ```sh
 homm2 ghidra          # ONE-TIME: import HEROES2W.EXE -> auto-analyze -> apply OUR CodeView
@@ -159,6 +158,6 @@ the EXE + our known symbols. Needs the dev shell's Ghidra env (in the flake).
 - `docs/patterns/INDEX.md` — codegen idiom catalog (grep by symptom/tag when a diff row sticks).
 - `docs/compiler-detection.md`, `docs/linker-flags.md` — toolchain facts.
 - `scripts/od_slots.py` (predict/solve slots) · `scripts/od_oracle.py` (verify vs real cl).
-- `homm2 sema <cmd>` — semantic navigation (xref/decomp/disasm/strings/match/rva/clangd; see
+- `homm2 sema <cmd>` — semantic navigation (xref/disasm/strings/match/rva/clangd; see
   Build loop). Modules in `scripts/homm2/analysis/`; Ghidra pipeline in `scripts/homm2/ghidra/`.
 - `editor/nvim` — `:Homm2` in-editor diff/build/status (auto-loaded by the dev-shell).

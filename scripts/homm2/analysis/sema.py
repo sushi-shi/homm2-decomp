@@ -2,7 +2,7 @@
 """homm2 sema <cmd> - semantic navigation for matchers (source & target).
 
 ONE discoverable entrypoint for the read-only navigation tools a matcher reaches for:
-the retail xref graph, the Ghidra decompiler, clangd LSP (symbol/def/refs/hover/rename),
+the retail xref graph, clangd LSP (symbol/def/refs/hover/rename),
 target/base disasm, strings, per-fn match %, and an address dossier. Each subcommand is a
 THIN delegation to a homm2.analysis / homm2.match module (all still runnable as
 `python -m homm2.analysis.<...>`); nothing here re-implements analysis.
@@ -138,11 +138,6 @@ def cmd_rva(args) -> None:
     sys.exit(_sema_tool("homm2.analysis.rva", [args.addr]))
 
 
-def cmd_decomp(args) -> None:
-    argv = [args.rva]
-    if args.force:
-        argv.append("--force")
-    sys.exit(_sema_tool("homm2.analysis.decomp", argv))
 
 
 def cmd_match(args) -> None:
@@ -206,7 +201,6 @@ def _build_parser() -> argparse.ArgumentParser:
         "  homm2 sema xref 0x0004a3c0            who calls this fn (attribution)\n"
         "  homm2 sema xref --callees 0x0000126d  its own call targets\n"
         "  homm2 sema xref --tree 0x0004a3c0     caller ancestry tree\n"
-        "  homm2 sema decomp 0x0004a3c0          Ghidra decompiler C for a fn\n"
         "  homm2 sema disasm 0x0004a3c0          retail disasm (--base/--diff/--rich/--lite)\n"
         "  homm2 sema strings 0x0000126d         the string set of a fn\n"
         "  homm2 sema strings --find Smack       reverse literal lookup\n"
@@ -228,11 +222,6 @@ def _build_parser() -> argparse.ArgumentParser:
                     help="--tree expansion cap (default 4; 0 = unlimited)")
     sx.set_defaults(func=cmd_xref)
 
-    sdc = ss.add_parser("decomp", help="Ghidra decompiler C for a fn (needs `homm2 ghidra`)")
-    sdc.add_argument("rva", help="RVA (0x..) of the function to decompile")
-    sdc.add_argument("--force", action="store_true",
-                     help="create a function at the RVA first if Ghidra found none")
-    sdc.set_defaults(func=cmd_decomp)
 
     sy = ss.add_parser("symbol", help="fuzzy workspace-symbol search (clangd)")
     sy.add_argument("query")
