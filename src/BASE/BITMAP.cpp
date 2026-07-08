@@ -19,13 +19,24 @@ bitmap::bitmap(void) : resource(0, 0, -1, 0)
 }
 
 VA(0x004d0040, 0x53)
-bitmap::bitmap(short int, short int, short int) {}
+bitmap::bitmap(short p1, short p2, short p3) : resource(0, 0, -1, 0)
+{
+    field_0x10 = p1;
+    field_0x12 = p2;
+    field_0x14 = p3;
+    field_0x16 = static_cast<unsigned char *>(BaseAlloc(p3 * p2, __FILE__, __LINE__));
+}
 
 VA(0x004d00a0, 0x8f)
 bitmap::bitmap(unsigned long int) {}
 
 VA(0x004d0130, 0x2c)
-bitmap::~bitmap() {}
+bitmap::~bitmap()
+{
+    if (field_0x16 != 0)
+        BaseFree(field_0x16, __FILE__, __LINE__);
+    field_0x16 = 0;
+}
 
 VA(0x004d0160, 0xff)
 void bitmap::DrawToBufferCareful(short int, short int) {}
