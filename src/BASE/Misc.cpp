@@ -176,7 +176,17 @@ VA(0x004c4ca0, 0x7ab)
 void ReadPrefsFromRegistry(void) {}
 
 VA(0x004c5450, 0xa1)
-void ReadPrefs(void) {}
+void ReadPrefs(void)
+{
+    memset(&gConfig, 0, 0x19d);
+    ReadPrefsFromRegistry();
+    sprintf(&gConfig.pad[0x13a], "RMT%sRL.BIN", &gConfig.pad[0x122]);
+    sprintf(&gConfig.pad[0x147], "RMT%sRC.BIN", &gConfig.pad[0x122]);
+    sprintf(&gConfig.pad[0x154], "RMT%sRD.BIN", &gConfig.pad[0x122]);
+    sprintf(&gConfig.pad[0x161], "RMT%sSL.BIN", &gConfig.pad[0x122]);
+    sprintf(&gConfig.pad[0x16e], "RMT%sSC.BIN", &gConfig.pad[0x122]);
+    sprintf(&gConfig.pad[0x17b], "RMT%sSD.BIN", &gConfig.pad[0x122]);
+}
 
 VA(0x004c5500, 0x6a)
 void WritePrefsToFile(void)
