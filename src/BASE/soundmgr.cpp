@@ -21,8 +21,8 @@
 VA(0x004cb630, 0x68)
 void HandleMCIError(int param_1, char *param_2)
 {
-    mciGetErrorStringA(param_1, reinterpret_cast<char *>(&lpszReturnString), 0xff);
-    sprintf(gText, "CD MUSIC ERROR\nDescription: %s\nCall: %s", reinterpret_cast<char *>(&lpszReturnString), param_2);
+    mciGetErrorStringA(param_1, lpszReturnString, 0xff);
+    sprintf(gText, "CD MUSIC ERROR\nDescription: %s\nCall: %s", lpszReturnString, param_2);
     gMciErrorFlag = 1;
     gCdMusic = 0;
     WritePrefs();
@@ -58,17 +58,17 @@ void soundManager::CDStop(void)
         return;
     if (m_cdReady == 0)
         return;
-    wsprintfA(reinterpret_cast<char *>(&CommandString), "stop CD wait");
-    nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
-                               reinterpret_cast<char *>(&lpszReturnString), 0xff, 0);
+    wsprintfA(CommandString, "stop CD wait");
+    nMCIError = mciSendStringA(CommandString,
+                               lpszReturnString, 0xff, 0);
     if (nMCIError != 0)
-        HandleMCIError(nMCIError, reinterpret_cast<char *>(&CommandString));
-    if (stricmp(reinterpret_cast<char *>(&lpszReturnString), "stopped") != 0 && m_currentTrack >= 0) {
-        wsprintfA(reinterpret_cast<char *>(&CommandString), "status CD position");
-        nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
+        HandleMCIError(nMCIError, CommandString);
+    if (stricmp(lpszReturnString, "stopped") != 0 && m_currentTrack >= 0) {
+        wsprintfA(CommandString, "status CD position");
+        nMCIError = mciSendStringA(CommandString,
                                    reinterpret_cast<char *>(local_18), 0x14, 0);
         if (nMCIError != 0)
-            HandleMCIError(nMCIError, reinterpret_cast<char *>(&CommandString));
+            HandleMCIError(nMCIError, CommandString);
         strcpy(CDPreviousPosition[m_currentTrack], reinterpret_cast<char *>(local_18));
         ValidatePreviousPosition(m_currentTrack);
     }
@@ -82,12 +82,12 @@ int soundManager::CDIsPlaying(void)
         return 0;
     if (m_cdReady == 0)
         return 0;
-    wsprintfA(reinterpret_cast<char *>(&CommandString), "status CD mode");
-    nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
-                               reinterpret_cast<char *>(&lpszReturnString), 0xff, 0);
+    wsprintfA(CommandString, "status CD mode");
+    nMCIError = mciSendStringA(CommandString,
+                               lpszReturnString, 0xff, 0);
     if (nMCIError != 0)
-        HandleMCIError(nMCIError, reinterpret_cast<char *>(&CommandString));
-    return stricmp(reinterpret_cast<char *>(&lpszReturnString), "playing") == 0;
+        HandleMCIError(nMCIError, CommandString);
+    return stricmp(lpszReturnString, "playing") == 0;
 }
 
 VA(0x004cb970, 0xf3)
@@ -103,10 +103,10 @@ void soundManager::CDStartup(void)
         return;
     if (gbDontTryRedbook != 0)
         return;
-    wsprintfA(reinterpret_cast<char *>(&CommandString),
+    wsprintfA(CommandString,
               "open %c: type cdaudio alias CD shareable", gcAnimPath[0]);
-    nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
-                               reinterpret_cast<char *>(&lpszReturnString), 0xff, 0);
+    nMCIError = mciSendStringA(CommandString,
+                               lpszReturnString, 0xff, 0);
     if (nMCIError == 0) {
         m_cdReady = 1;
     } else {
@@ -124,16 +124,16 @@ void soundManager::CDShutdown(void)
         return;
     if (m_cdReady == 0)
         return;
-    wsprintfA(reinterpret_cast<char *>(&CommandString), "stop CD");
-    nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
-                               reinterpret_cast<char *>(&lpszReturnString), 0xff, 0);
+    wsprintfA(CommandString, "stop CD");
+    nMCIError = mciSendStringA(CommandString,
+                               lpszReturnString, 0xff, 0);
     if (nMCIError != 0)
-        HandleMCIError(nMCIError, reinterpret_cast<char *>(&CommandString));
-    wsprintfA(reinterpret_cast<char *>(&CommandString), "close CD");
-    nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
-                               reinterpret_cast<char *>(&lpszReturnString), 0xff, 0);
+        HandleMCIError(nMCIError, CommandString);
+    wsprintfA(CommandString, "close CD");
+    nMCIError = mciSendStringA(CommandString,
+                               lpszReturnString, 0xff, 0);
     if (nMCIError != 0)
-        HandleMCIError(nMCIError, reinterpret_cast<char *>(&CommandString));
+        HandleMCIError(nMCIError, CommandString);
 }
 
 VA(0x004cbb50, 0xe5)
@@ -190,23 +190,23 @@ void soundManager::CDPlay(int param_1, int param_2, int param_3, int param_4)
         Process1WindowsMessage();
         ServiceSound();
         local_8 = KBTickCount();
-        wsprintfA(reinterpret_cast<char *>(&CommandString), "set CD time format tmsf");
-        nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
-                                   reinterpret_cast<char *>(&lpszReturnString), 0xff, 0);
+        wsprintfA(CommandString, "set CD time format tmsf");
+        nMCIError = mciSendStringA(CommandString,
+                                   lpszReturnString, 0xff, 0);
         if (nMCIError != 0)
-            HandleMCIError(nMCIError, reinterpret_cast<char *>(&CommandString));
-        wsprintfA(reinterpret_cast<char *>(&CommandString), "status CD mode");
-        nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
-                                   reinterpret_cast<char *>(&lpszReturnString), 0xff, 0);
+            HandleMCIError(nMCIError, CommandString);
+        wsprintfA(CommandString, "status CD mode");
+        nMCIError = mciSendStringA(CommandString,
+                                   lpszReturnString, 0xff, 0);
         if (nMCIError != 0)
-            HandleMCIError(nMCIError, reinterpret_cast<char *>(&CommandString));
-        iVar2 = stricmp(reinterpret_cast<char *>(&lpszReturnString), "stopped");
+            HandleMCIError(nMCIError, CommandString);
+        iVar2 = stricmp(lpszReturnString, "stopped");
         if (iVar2 != 0) {
-            wsprintfA(reinterpret_cast<char *>(&CommandString), "status CD position");
-            nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
+            wsprintfA(CommandString, "status CD position");
+            nMCIError = mciSendStringA(CommandString,
                                        reinterpret_cast<char *>(local_24), 0x14, 0);
             if (nMCIError != 0)
-                HandleMCIError(nMCIError, reinterpret_cast<char *>(&CommandString));
+                HandleMCIError(nMCIError, CommandString);
             strcpy(CDPreviousPosition[m_currentTrack], reinterpret_cast<char *>(local_24));
             ValidatePreviousPosition(m_currentTrack);
         }
@@ -216,35 +216,35 @@ void soundManager::CDPlay(int param_1, int param_2, int param_3, int param_4)
         ServiceSound();
         if (param_4 == 0 && param_2 != 0 && CDPreviousPosition[param_1][0] != 0) {
             if (param_1 == 0x2b)
-                wsprintfA(reinterpret_cast<char *>(&CommandString), "play CD from %s %s",
+                wsprintfA(CommandString, "play CD from %s %s",
                           CDPreviousPosition[param_1], "notify" + (((cVar1 != 0) - 1) & 8));
             else
-                wsprintfA(reinterpret_cast<char *>(&CommandString), "play CD from %s to %d %s",
+                wsprintfA(CommandString, "play CD from %s to %d %s",
                           CDPreviousPosition[param_1], param_1 + 1,
                           "notify" + (((cVar1 != 0) - 1) & 8));
             if (cVar1 == 0)
                 local_2c = 0;
             else
                 local_2c = ghWndMain;
-            nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
-                                       reinterpret_cast<char *>(&lpszReturnString), 0xff, local_2c);
+            nMCIError = mciSendStringA(CommandString,
+                                       lpszReturnString, 0xff, local_2c);
             if (nMCIError != 0)
-                HandleMCIError(nMCIError, reinterpret_cast<char *>(&CommandString));
+                HandleMCIError(nMCIError, CommandString);
         } else {
             if (param_1 == 0x2b)
-                wsprintfA(reinterpret_cast<char *>(&CommandString), "play CD from %d %s",
+                wsprintfA(CommandString, "play CD from %d %s",
                           0x2b, "notify" + (((cVar1 != 0) - 1) & 8));
             else
-                wsprintfA(reinterpret_cast<char *>(&CommandString), "play CD from %d to %d %s",
+                wsprintfA(CommandString, "play CD from %d to %d %s",
                           param_1, param_1 + 1, "notify" + (((cVar1 != 0) - 1) & 8));
             if (cVar1 == 0)
                 local_30 = 0;
             else
                 local_30 = ghWndMain;
-            nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
-                                       reinterpret_cast<char *>(&lpszReturnString), 0xff, local_30);
+            nMCIError = mciSendStringA(CommandString,
+                                       lpszReturnString, 0xff, local_30);
             if (nMCIError != 0)
-                HandleMCIError(nMCIError, reinterpret_cast<char *>(&CommandString));
+                HandleMCIError(nMCIError, CommandString);
         }
         local_10 = KBTickCount();
         CDPlaying = 1;
@@ -333,7 +333,7 @@ soundManager::soundManager(void) : baseManager()
     m_fadeSteps = 0;
     field_0x56c = 0;
     for (local_8 = 0; local_8 < 0x20; local_8++)
-        reinterpret_cast<short *>(&iLastVolume)[local_8] = 0;
+        iLastVolume[local_8] = 0;
     memset(&field_0x3e, 0, 0xae);
     m_samplesReady = 0;
     m_digitalDriver = 0;
@@ -599,7 +599,7 @@ void soundManager::ModifySample(struct _SAMPLE *param_1, short param_2, long par
         iVar1 = ConvertVolume(param_3, 100);
         _AIL_set_sample_volume_8(param_1, iVar1);
         if (local_8 >= 0)
-            reinterpret_cast<short *>(&iLastVolume)[local_8] = static_cast<short>(param_3);
+            iLastVolume[local_8] = static_cast<short>(param_3);
         break;
     case 5:
         _AIL_start_sample_4(param_1);
@@ -609,7 +609,7 @@ void soundManager::ModifySample(struct _SAMPLE *param_1, short param_2, long par
         iVar1 = ConvertVolume(param_3, 0x65);
         _AIL_set_sample_volume_8(param_1, iVar1);
         if (local_8 >= 0)
-            reinterpret_cast<short *>(&iLastVolume)[local_8] = static_cast<short>(param_3);
+            iLastVolume[local_8] = static_cast<short>(param_3);
     }
     Process1WindowsMessage();
     LogStr("Modify Sample 2");
@@ -646,7 +646,7 @@ void soundManager::AdjustSoundVolumes(void)
         struct _SAMPLE *p_Var1 = m_sampleHandles[local_c];
         if (gSampleVolume != 0) {
             if (DigitalReport(p_Var1, 4) != 0)
-                ModifySample(p_Var1, 100, reinterpret_cast<short *>(&iLastVolume)[local_c]);
+                ModifySample(p_Var1, 100, iLastVolume[local_c]);
         } else {
             ModifySample(p_Var1, 1, 0);
         }
@@ -876,7 +876,7 @@ struct _SAMPLE *soundManager::MemorySample(class sample *param_1)
             }
             p_Var2 = m_sampleHandles[local_10];
             m_channelVolumes[local_10] = static_cast<char>(param_1->field_0x28);
-            reinterpret_cast<short *>(&iLastVolume)[local_10] = static_cast<short>(param_1->field_0x28);
+            iLastVolume[local_10] = static_cast<short>(param_1->field_0x28);
             _AIL_init_sample_4(p_Var2);
             _AIL_set_sample_type_12(p_Var2, param_1->m_format, 0);
             _AIL_set_sample_playback_rate_8(p_Var2, param_1->m_sampleRate);
@@ -939,7 +939,7 @@ char CDPreviousPosition[60][15];
 int CDWaiting;
 int CDPlaying;
 int iCalibrateLoop;
-char *lpszReturnString;
+char lpszReturnString[0x100];
 unsigned long nMCIError;
-short *iLastVolume;
-char *CommandString;
+short iLastVolume[0x20];
+char CommandString[0x100];

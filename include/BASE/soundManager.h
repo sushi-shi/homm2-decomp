@@ -112,10 +112,10 @@ DATA(0x0051fec8) extern struct _MDI_DRIVER *hMDI;
 DATA(0x0051fecc) extern int CurrentMidiFile;
 DATA(0x0051fed0) extern unsigned char *bGotMidi;
 DATA(0x0051ff0c) extern long lLastMIDIPollTickCount;
-DATA(0x00534980) extern char *lpszReturnString;
+DATA(0x00534980) extern char lpszReturnString[0x100];
 DATA(0x00534a80) extern unsigned long nMCIError;
-DATA(0x00534a88) extern short *iLastVolume;
-DATA(0x00534ac8) extern char *CommandString;
+DATA(0x00534a88) extern short iLastVolume[0x20];
+DATA(0x00534ac8) extern char CommandString[0x100];
 DATA(0x00534cf0) extern class MIDIWrap *pMIDIWrap[60];
 DATA(0x00534de0) extern struct _SEQUENCE *hSequence[60];
 
