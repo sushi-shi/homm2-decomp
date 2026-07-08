@@ -363,11 +363,11 @@ struct _DIG_DRIVER *WAVE_init_driver(unsigned long param_1, unsigned short param
         local_8 = _AIL_waveOutOpen_16(&local_40, 0, 0, &gWaveFormat);
         if (local_8 != 0) {
             if (param_4 != 0)
-                MessageBoxA(ghWndMain, _AIL_last_error_0(), "Sound initialization error:", 0);
+                MessageBoxA(ghWndMain, _AIL_last_error_0(), "Sound initialization error!", 0);
             local_40 = 0;
         }
     } else {
-        MessageBoxA(ghWndMain, "Sound initialization error: No wave device", "Startup Error", 0);
+        MessageBoxA(ghWndMain, "Sound initialization error!  No wave devices found.", "Startup Error", 0);
         local_40 = 0;
     }
     return local_40;
