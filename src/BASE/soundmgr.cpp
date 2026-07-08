@@ -97,19 +97,23 @@ void soundManager::CDStartup(void)
         return;
     m_cdStarted = 1;
     m_cdReady = 0;
-    if (gbNoCDRom == 0 && gMciErrorFlag == 0 && gbDontTryRedbook == 0) {
-        wsprintfA(reinterpret_cast<char *>(&CommandString),
-                  "open %c: type cdaudio alias CD shareable", gcAnimPath[0]);
-        nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
-                                   reinterpret_cast<char *>(&lpszReturnString), 0xff, 0);
-        if (nMCIError == 0) {
-            m_cdReady = 1;
-        } else {
-            m_cdReady = 0;
-            gMciErrorFlag = 1;
-            gCdMusic = 0;
-            WritePrefs();
-        }
+    if (gbNoCDRom != 0)
+        return;
+    if (gMciErrorFlag != 0)
+        return;
+    if (gbDontTryRedbook != 0)
+        return;
+    wsprintfA(reinterpret_cast<char *>(&CommandString),
+              "open %c: type cdaudio alias CD shareable", gcAnimPath[0]);
+    nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
+                               reinterpret_cast<char *>(&lpszReturnString), 0xff, 0);
+    if (nMCIError == 0) {
+        m_cdReady = 1;
+    } else {
+        m_cdReady = 0;
+        gMciErrorFlag = 1;
+        gCdMusic = 0;
+        WritePrefs();
     }
 }
 

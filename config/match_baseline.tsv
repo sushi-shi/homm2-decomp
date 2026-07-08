@@ -403,14 +403,14 @@ BASE/soundmgr	?CDPlay@soundManager@@QAEXHHHH@Z	82.0932	62fbbef353fb
 BASE/soundmgr	?CDPoll@soundManager@@QAEXXZ	97.3770	ecabe6034244
 BASE/soundmgr	?CDSetVolume@soundManager@@QAEXHH@Z	83.6774	f21d607e2cdc
 BASE/soundmgr	?CDShutdown@soundManager@@QAEXXZ	100.0000	94625fe3dd87
-BASE/soundmgr	?CDStartup@soundManager@@QAEXXZ	71.2885	cd4e862e5a9c
+BASE/soundmgr	?CDStartup@soundManager@@QAEXXZ	86.2885	0bd5163e6dda
 BASE/soundmgr	?CDStop@soundManager@@QAEXXZ	100.0000	e48aa4ca9583
 BASE/soundmgr	?Close@soundManager@@UAEXXZ	90.3947	4cbf90a16cb2
 BASE/soundmgr	?ConvertVolume@soundManager@@QAEHHH@Z	100.0000	f491b7b1f33d
 BASE/soundmgr	?DigitalReport@soundManager@@QAEJPAU_SAMPLE@@F@Z	96.3913	4d0ead671efb
 BASE/soundmgr	?ForcePollSound@soundManager@@QAEXXZ	100.0000	2fbc860cf1db
 BASE/soundmgr	?GetNumberCDDrives@soundManager@@QAEXXZ	100.0000	fde24968c623
-BASE/soundmgr	?HandleMCIError@@YIXHPAD@Z	99.8387	01384b3bfb23
+BASE/soundmgr	?HandleMCIError@@YIXHPAD@Z	100.0000	01384b3bfb23
 BASE/soundmgr	?Main@soundManager@@UAEHAAUtag_message@@@Z	100.0000	e76ae8c4e766
 BASE/soundmgr	?MemorySample@soundManager@@QAEPAU_SAMPLE@@PAVsample@@@Z	80.8487	d8123a3b1242
 BASE/soundmgr	?ModifySample@soundManager@@QAEXPAU_SAMPLE@@FJ@Z	93.5509	f45ab9f9f6c8
