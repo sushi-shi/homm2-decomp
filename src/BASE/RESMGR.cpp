@@ -10,6 +10,8 @@
 #include <errno.h>
 #include <BASE/resourceManager.h>
 #include <BASE/Misc.h>
+#include <SOURCE/X_GLOBAL.h>
+#include <BASE/baseManager.h>
 #include <BASE/resource.h>
 #include <BASE/tileset.h>
 #include <BASE/font.h>
@@ -139,7 +141,25 @@ VA(0x004c8880, 0x1a)
 int resourceManager::Main(struct tag_message &) { return 0; }
 
 VA(0x004c88a0, 0xab)
-int resourceManager::Open(int) { return 0; }
+int resourceManager::Open(int param_1)
+{
+    int iVar2 = LoadAggregateHeader(EXPANSION_AGGREGATE_NAME);
+    if (iVar2 == 0) {
+        iVar2 = LoadAggregateHeader(DEFAULT_AGGREGATE_NAME);
+        if (iVar2 == 0) {
+            field_0xc = 0x80;
+            field_0x10 = param_1;
+            field_0x32 = 1;
+            strcpy(name, "resourceManager");
+            iVar2 = 0;
+        } else {
+            iVar2 = 3;
+        }
+    } else {
+        iVar2 = 3;
+    }
+    return iVar2;
+}
 
 VA(0x004c8950, 0x88)
 void resourceManager::RemoveResource(class resource *param_1)
