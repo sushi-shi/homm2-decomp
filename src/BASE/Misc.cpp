@@ -373,7 +373,18 @@ void BlitBitmapToScreen(class bitmap *param_1, int param_2, int param_3, int par
 }
 
 VA(0x004c6070, 0xa6)
-void LogTruncate(void) {}
+void LogTruncate(void)
+{
+    char local_1f4[500];
+    if (1 < giDebugLevel) {
+        int _FileHandle = _open("KB.LOG", 0x4301, 0x80);
+        if (_FileHandle != -1) {
+            strcpy(local_1f4, "===========New Log==========\n");
+            _write(_FileHandle, local_1f4, strlen(local_1f4));
+            _close(_FileHandle);
+        }
+    }
+}
 
 VA(0x004c6120, 0x9e)
 void LogStr(char *param_1)
