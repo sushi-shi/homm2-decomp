@@ -6,6 +6,8 @@
 #include <va.h>
 #include <BASE/button.h>
 #include <BASE/resourceManager.h>
+#include <BASE/icon.h>
+#include <BASE/heroWindow.h>
 #include <SOURCE/KB.h>
 VA(0x004dd440, 0x34)
 button::button(void) : widget(0, 0, 0, 0, 0, 0)
@@ -47,7 +49,10 @@ VA(0x004dd5b0, 0xeb)
 void button::Read(void) {}
 
 VA(0x004dd6a0, 0x21)
-button::~button() {}
+button::~button()
+{
+    gpResourceManager->Dispose(field_0x20);
+}
 
 VA(0x004dd6d0, 0x595)
 int button::Main(struct tag_message &) { return 0; }
@@ -59,7 +64,17 @@ VA(0x004ddd10, 0x83)
 short int button::Deselect(struct tag_message &) { return 0; }
 
 VA(0x004ddda0, 0x55)
-void button::Draw(void) {}
+void button::Draw(void)
+{
+    heroWindow *win = field_0x4;
+    if ((field_0x16 & 1) != 0) {
+        field_0x20->DrawToBuffer(field_0x18 + win->field_0x28, field_0x1a + win->field_0x2c,
+                                 field_0x26, 0);
+        return;
+    }
+    field_0x20->DrawToBuffer(field_0x18 + win->field_0x28, field_0x1a + win->field_0x2c,
+                             field_0x24, 0);
+}
 
 
 // ===== vtable button : public widget  (3 slots) =====
