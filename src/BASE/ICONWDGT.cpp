@@ -13,11 +13,11 @@
 VA(0x004d0a60, 0x2d)
 iconWidget::iconWidget(void) : widget(0, 0, 0, 0, 0, 0)
 {
-    field_0x24 = 0;
+    m_frame = 0;
     field_0x27 = 0;
-    field_0x20 = 0;
+    m_icon = 0;
     field_0x26 = 0;
-    field_0x29 = 0;
+    m_iconId = 0;
 }
 
 // @early-stop ~16% — prologue through GetIcon is byte-identical; only the final 5 field
@@ -30,9 +30,9 @@ iconWidget::iconWidget(short int param_1, short int param_2, short int param_3, 
                        short int param_8, short int param_9, short int param_10)
     : widget(param_1, param_2, param_3, param_4, param_8, param_9)
 {
-    field_0x29 = param_5;
-    field_0x20 = gpResourceManager->GetIcon(param_5);
-    field_0x24 = param_6;
+    m_iconId = param_5;
+    m_icon = gpResourceManager->GetIcon(param_5);
+    m_frame = param_6;
     field_0x26 = param_7;
     field_0x27 = param_10;
     field_0x14 = param_9;
@@ -47,9 +47,9 @@ iconWidget::iconWidget(short int param_1, short int param_2, short int param_3, 
     : widget(param_1, param_2, param_3, param_4, param_8, param_9)
 {
     unsigned long int uVar1 = gpResourceManager->MakeId(param_5, 1);
-    field_0x29 = uVar1;
-    field_0x20 = gpResourceManager->GetIcon(uVar1);
-    field_0x24 = param_6;
+    m_iconId = uVar1;
+    m_icon = gpResourceManager->GetIcon(uVar1);
+    m_frame = param_6;
     field_0x26 = param_7;
     field_0x27 = param_10;
     field_0x14 = param_9;
@@ -59,16 +59,16 @@ VA(0x004d0bc0, 0xdf)
 void iconWidget::Read(void)
 {
     char local_10[16];
-    field_0x18 = gpResourceManager->ReadWord();
-    field_0x1a = gpResourceManager->ReadWord();
-    field_0x1c = gpResourceManager->ReadWord();
-    field_0x1e = gpResourceManager->ReadWord();
+    m_x = gpResourceManager->ReadWord();
+    m_y = gpResourceManager->ReadWord();
+    m_width = gpResourceManager->ReadWord();
+    m_height = gpResourceManager->ReadWord();
     gpResourceManager->Read13(reinterpret_cast<signed char *>(local_10));
     gpResourceManager->SavePosition();
     unsigned long id = gpResourceManager->MakeId(local_10, 1);
-    field_0x20 = gpResourceManager->GetIcon(id);
+    m_icon = gpResourceManager->GetIcon(id);
     gpResourceManager->RestorePosition();
-    field_0x24 = gpResourceManager->ReadWord();
+    m_frame = gpResourceManager->ReadWord();
     field_0x26 = static_cast<char>(gpResourceManager->ReadWord());
     m_id = gpResourceManager->ReadWord();
     field_0x14 = gpResourceManager->ReadWord();
@@ -78,7 +78,7 @@ void iconWidget::Read(void)
 VA(0x004d0ca0, 0x21)
 iconWidget::~iconWidget()
 {
-    gpResourceManager->Dispose(field_0x20);
+    gpResourceManager->Dispose(m_icon);
 }
 
 VA(0x004d0cd0, 0x291)
@@ -116,7 +116,7 @@ LAB_widgetmain:
                 switch (param_1.field4) {
                 case 4:
                     if (m_id == param_1.field8) {
-                        field_0x24 = static_cast<short>(reinterpret_cast<int>(param_1.text));
+                        m_frame = static_cast<short>(reinterpret_cast<int>(param_1.text));
                         return 1;
                     }
                     break;
@@ -128,18 +128,18 @@ LAB_widgetmain:
                     break;
                 case 9:
                     if (m_id == param_1.field8) {
-                        if (field_0x20 != 0) {
-                            gpResourceManager->Dispose(field_0x20);
-                            field_0x20 = gpResourceManager->GetIcon(param_1.text);
+                        if (m_icon != 0) {
+                            gpResourceManager->Dispose(m_icon);
+                            m_icon = gpResourceManager->GetIcon(param_1.text);
                         }
                         return 1;
                     }
                     break;
                 case 0x3c:
-                    if (param_1.field8 == field_0x29) {
-                        field_0x29 = reinterpret_cast<int>(param_1.text);
-                        gpResourceManager->Dispose(field_0x20);
-                        field_0x20 = gpResourceManager->GetIcon(reinterpret_cast<unsigned long>(param_1.text));
+                    if (param_1.field8 == m_iconId) {
+                        m_iconId = reinterpret_cast<int>(param_1.text);
+                        gpResourceManager->Dispose(m_icon);
+                        m_icon = gpResourceManager->GetIcon(reinterpret_cast<unsigned long>(param_1.text));
                     }
                     return 0;
                 }
@@ -150,8 +150,8 @@ LAB_widgetmain:
     }
     sVar2 = static_cast<short>(param_1.field4) - m_owner->m_posX;
     sVar5 = static_cast<short>(param_1.field8) - m_owner->m_posY;
-    if (field_0x18 <= sVar2 && field_0x1a <= sVar5 && sVar2 < field_0x1c + field_0x18 &&
-        sVar5 < field_0x1e + field_0x1a) {
+    if (m_x <= sVar2 && m_y <= sVar5 && sVar2 < m_width + m_x &&
+        sVar5 < m_height + m_y) {
         if (iVar3 == 0x20) {
             param_1.fieldC = 0x200;
             param_1.field4 = 0xe;
@@ -170,26 +170,26 @@ VA(0x004d0f70, 0xe5)
 void iconWidget::Draw(void)
 {
     short type = field_0x14;
-    short x = m_owner->m_posX + field_0x18;
-    short y = m_owner->m_posY + field_0x1a;
+    short x = m_owner->m_posX + m_x;
+    short y = m_owner->m_posY + m_y;
     if (type == 0x10) {
-        field_0x20->DrawToBuffer(x, y, field_0x24, field_0x26);
+        m_icon->DrawToBuffer(x, y, m_frame, field_0x26);
         return;
     }
     if (type != 0x11) {
         if (type != 0x80)
             return;
-        field_0x20->FillToBuffer(x, y, field_0x24, field_0x27, field_0x26, 0);
+        m_icon->FillToBuffer(x, y, m_frame, field_0x27, field_0x26, 0);
         return;
     }
-    short *entry = reinterpret_cast<short *>(GetIconEntry(field_0x20, field_0x24));
+    short *entry = reinterpret_cast<short *>(GetIconEntry(m_icon, m_frame));
     y = y - entry[1];
     x = x - entry[0];
-    if (entry[2] < field_0x1c)
-        x = x + (short)((field_0x1c - entry[2]) >> 1);
-    if (entry[3] + 2 < field_0x1e)
-        y = y + (field_0x1e - entry[3]) - 2;
-    field_0x20->DrawToBuffer(x, y, field_0x24, field_0x26);
+    if (entry[2] < m_width)
+        x = x + (short)((m_width - entry[2]) >> 1);
+    if (entry[3] + 2 < m_height)
+        y = y + (m_height - entry[3]) - 2;
+    m_icon->DrawToBuffer(x, y, m_frame, field_0x26);
 }
 
 

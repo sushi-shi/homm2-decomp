@@ -47,10 +47,10 @@ void listBoxWidget::Read(void)
     short sVar3, sVar4, sVar7, sVar8;
     int *piVar9;
     char local_10[16];
-    field_0x18 = gpResourceManager->ReadWord();
-    field_0x1a = gpResourceManager->ReadWord();
-    field_0x1c = gpResourceManager->ReadWord();
-    field_0x1e = gpResourceManager->ReadWord();
+    m_x = gpResourceManager->ReadWord();
+    m_y = gpResourceManager->ReadWord();
+    m_width = gpResourceManager->ReadWord();
+    m_height = gpResourceManager->ReadWord();
     gpResourceManager->Read13(reinterpret_cast<signed char *>(local_10));
     gpResourceManager->SavePosition();
     field_0x20 = gpResourceManager->GetFont(local_10);
@@ -87,8 +87,8 @@ void listBoxWidget::Read(void)
     field_0x5c = sVar8;
     sVar7 = *reinterpret_cast<short *>(*piVar9 + 0x20);
     field_0x5e = sVar7;
-    field_0x60 = field_0x18;
-    field_0x62 = field_0x1a;
+    field_0x60 = m_x;
+    field_0x62 = m_y;
     field_0x64 = *reinterpret_cast<short *>(*piVar9 + 4);
     field_0x66 = (field_0x28 - 2) * sVar8 + sVar4 + sVar7;
     iVar2 = *piVar9;
@@ -99,16 +99,16 @@ void listBoxWidget::Read(void)
     iVar2 = *piVar9;
     uVar1 = *reinterpret_cast<unsigned short *>(iVar2 + 0x45);
     field_0x7c = uVar1;
-    sVar7 = (field_0x1c - sVar4) + field_0x18;
+    sVar7 = (m_width - sVar4) + m_x;
     sVar4 = *reinterpret_cast<short *>(iVar2 + 0x47);
     field_0x7e = sVar4;
     field_0x68 = sVar7;
-    field_0x6a = field_0x1a;
+    field_0x6a = m_y;
     field_0x78 = sVar7;
-    sVar4 = field_0x1a + (field_0x1e - sVar4);
+    sVar4 = m_y + (m_height - sVar4);
     field_0x7a = sVar4;
     field_0x70 = sVar7;
-    sVar8 = field_0x1a + sVar8;
+    sVar8 = m_y + sVar8;
     sVar4 = sVar4 - sVar8;
     field_0x8a = 0;
     field_0x8b = 0;
@@ -196,8 +196,8 @@ LAB_004db5a2:
             if ((uVar2 & 4) != 0) {
                 sVar3 = static_cast<short>(param_1.field4) - m_owner->m_posX;
                 sVar10 = static_cast<short>(param_1.field8) - m_owner->m_posY;
-                if (field_0x18 <= sVar3 && field_0x1a <= sVar10 && sVar3 < field_0x1c + field_0x18 &&
-                    sVar10 < field_0x1e + field_0x1a) {
+                if (m_x <= sVar3 && m_y <= sVar10 && sVar3 < m_width + m_x &&
+                    sVar10 < m_height + m_y) {
                     if (iVar4 == 0x20) {
                         param_1.field4 = 0xe;
                         param_1.type = 0x200;
@@ -395,8 +395,8 @@ LAB_004dba0b:
     field_0x82 = sVar1;
     field_0x24->DrawToBuffer(sVar4, sVar1, field_0x58, 0);
     if (param_1 != 0)
-        gpWindowManager->UpdateScreenRegion(field_0x18 + m_owner->m_posX,
-                                            field_0x1a + m_owner->m_posY, field_0x1c, field_0x1e);
+        gpWindowManager->UpdateScreenRegion(m_x + m_owner->m_posX,
+                                            m_y + m_owner->m_posY, m_width, m_height);
 }
 
 VA(0x004dbbe0, 0x312)

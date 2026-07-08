@@ -42,10 +42,10 @@ void dropListWidget::Read(void)
     short sVar2;
     int *piVar5;
     char local_10[16];
-    field_0x18 = gpResourceManager->ReadWord();
-    field_0x1a = gpResourceManager->ReadWord();
-    field_0x1c = gpResourceManager->ReadWord();
-    field_0x1e = gpResourceManager->ReadWord();
+    m_x = gpResourceManager->ReadWord();
+    m_y = gpResourceManager->ReadWord();
+    m_width = gpResourceManager->ReadWord();
+    m_height = gpResourceManager->ReadWord();
     gpResourceManager->Read13(reinterpret_cast<signed char *>(local_10));
     gpResourceManager->SavePosition();
     field_0x20 = gpResourceManager->GetFont(local_10);
@@ -54,8 +54,8 @@ void dropListWidget::Read(void)
     gpResourceManager->SavePosition();
     field_0x24 = gpResourceManager->GetIcon(local_10);
     gpResourceManager->RestorePosition();
-    field_0x28 = field_0x18 + gpResourceManager->ReadWord();
-    field_0x2a = field_0x1a + gpResourceManager->ReadWord();
+    field_0x28 = m_x + gpResourceManager->ReadWord();
+    field_0x2a = m_y + gpResourceManager->ReadWord();
     field_0x2c = gpResourceManager->ReadWord();
     field_0x2e = gpResourceManager->ReadWord();
     field_0x30 = gpResourceManager->ReadWord();
@@ -81,14 +81,14 @@ void dropListWidget::Read(void)
     field_0x60 = 0xc;
     field_0x62 = 0xd;
     iVar1 = *piVar5;
-    field_0x6c = field_0x18;
-    field_0x6e = field_0x1a;
+    field_0x6c = m_x;
+    field_0x6e = m_y;
     sVar2 = *reinterpret_cast<short *>(iVar1 + 4);
     field_0x70 = sVar2;
     field_0x72 = *reinterpret_cast<short *>(iVar1 + 6);
     iVar1 = *piVar5;
-    field_0x64 = sVar2 + field_0x18;
-    field_0x66 = field_0x1a;
+    field_0x64 = sVar2 + m_x;
+    field_0x66 = m_y;
     field_0x68 = *reinterpret_cast<short *>(iVar1 + 0x11);
     field_0x6a = *reinterpret_cast<short *>(iVar1 + 0x13);
     iVar1 = *piVar5;
@@ -164,8 +164,8 @@ int dropListWidget::Main(tag_message &param_1)
                 }
                 return 0;
             }
-            if (field_0x18 <= sVar8 && field_0x1a <= sVar5 && sVar8 < field_0x1c + field_0x18 &&
-                sVar5 < field_0x1e + field_0x1a) {
+            if (m_x <= sVar8 && m_y <= sVar5 && sVar8 < m_width + m_x &&
+                sVar5 < m_height + m_y) {
                 param_1.field4 = 0xe;
                 param_1.type = 0x200;
                 param_1.fieldC = 0x200;
@@ -333,7 +333,7 @@ void dropListWidget::DrawDropStuff(void)
         field_0xa4 = sVar2;
         field_0x24->DrawToBuffer(sVar3, sVar2, field_0x62, 0);
     }
-    gpWindowManager->UpdateScreenRegion(field_0x18, field_0x1a, field_0x1c, field_0x80 + field_0x1e);
+    gpWindowManager->UpdateScreenRegion(m_x, m_y, m_width, field_0x80 + m_height);
 }
 
 VA(0x004dca60, 0x50)

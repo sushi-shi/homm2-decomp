@@ -36,19 +36,19 @@ textEntryWidget::textEntryWidget(short p1, short p2, short p3, short p4, short p
     field_0x45 = 1;
     field_0x47 = 0;
     field_0x28 = 1;
-    field_0x35 = field_0x18;
-    field_0x37 = field_0x1a;
-    field_0x39 = field_0x1c;
+    field_0x35 = m_x;
+    field_0x37 = m_y;
+    field_0x39 = m_width;
     field_0x33 = p5;
-    field_0x3b = field_0x1e;
+    field_0x3b = m_height;
     field_0x20 = static_cast<char *>(BaseAlloc(p5 + 5, __FILE__, __LINE__));
     strcpy(field_0x20, p6);
     if (p13 == 4) {
         field_0x47 = 1;
-        field_0x41 = field_0x18 + p14;
-        field_0x43 = field_0x1a + p15;
-        field_0x3d = field_0x1c + p14 * -2;
-        field_0x3f = field_0x1e;
+        field_0x41 = m_x + p14;
+        field_0x43 = m_y + p15;
+        field_0x3d = m_width + p14 * -2;
+        field_0x3f = m_height;
     }
 }
 
@@ -64,10 +64,10 @@ void textEntryWidget::Read(int param_1)
     short sVar1;
     unsigned short uVar2;
     char local_10[16];
-    field_0x18 = gpResourceManager->ReadWord();
-    field_0x1a = gpResourceManager->ReadWord();
-    field_0x1c = gpResourceManager->ReadWord();
-    field_0x1e = gpResourceManager->ReadWord();
+    m_x = gpResourceManager->ReadWord();
+    m_y = gpResourceManager->ReadWord();
+    m_width = gpResourceManager->ReadWord();
+    m_height = gpResourceManager->ReadWord();
     uVar2 = gpResourceManager->ReadWord();
     field_0x33 = uVar2;
     field_0x20 = static_cast<char *>(BaseAlloc(uVar2 + 5, __FILE__, __LINE__));
@@ -93,30 +93,30 @@ void textEntryWidget::Read(int param_1)
         field_0x45 = gpResourceManager->ReadWord();
         field_0x47 = gpResourceManager->ReadWord();
     } else {
-        field_0x35 = field_0x18;
-        field_0x37 = field_0x1a;
-        field_0x39 = field_0x1c;
-        field_0x3b = field_0x1e;
+        field_0x35 = m_x;
+        field_0x37 = m_y;
+        field_0x39 = m_width;
+        field_0x3b = m_height;
         field_0x45 = 1;
         field_0x47 = 1;
         if (param_1 != 3)
             field_0x47 = 0;
     }
     if (param_1 == 4) {
-        field_0x41 = field_0x18 + 7;
-        field_0x43 = field_0x1a + 5;
-        field_0x3d = field_0x1c - 0xe;
-        field_0x3f = field_0x1e;
+        field_0x41 = m_x + 7;
+        field_0x43 = m_y + 5;
+        field_0x3d = m_width - 0xe;
+        field_0x3f = m_height;
     } else if (param_1 == 5) {
-        field_0x41 = field_0x18 + 7;
-        field_0x43 = field_0x1a + 4;
-        field_0x3d = field_0x1c - 0xe;
-        field_0x3f = field_0x1e;
+        field_0x41 = m_x + 7;
+        field_0x43 = m_y + 4;
+        field_0x3d = m_width - 0xe;
+        field_0x3f = m_height;
     } else {
-        field_0x41 = field_0x18;
-        field_0x43 = field_0x1a;
-        field_0x3d = field_0x1c;
-        field_0x3f = field_0x1e;
+        field_0x41 = m_x;
+        field_0x43 = m_y;
+        field_0x3d = m_width;
+        field_0x3f = m_height;
     }
     field_0x2f = gpResourceManager->ReadWord();
     m_id = gpResourceManager->ReadWord();

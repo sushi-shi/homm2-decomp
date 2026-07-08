@@ -54,10 +54,10 @@ VA(0x004dd5b0, 0xeb)
 void button::Read(void)
 {
     char local_10[16];
-    field_0x18 = gpResourceManager->ReadWord();
-    field_0x1a = gpResourceManager->ReadWord();
-    field_0x1c = gpResourceManager->ReadWord();
-    field_0x1e = gpResourceManager->ReadWord();
+    m_x = gpResourceManager->ReadWord();
+    m_y = gpResourceManager->ReadWord();
+    m_width = gpResourceManager->ReadWord();
+    m_height = gpResourceManager->ReadWord();
     gpResourceManager->Read13(reinterpret_cast<signed char *>(local_10));
     gpResourceManager->SavePosition();
     field_0x2c = gpResourceManager->MakeId(local_10, 1);
@@ -90,8 +90,8 @@ int button::Main(tag_message &param_1)
             return 0;
         m_flags = m_flags & 0xfffe;
         Draw();
-        gpWindowManager->UpdateScreenRegion(m_owner->m_posX + field_0x18,
-                                            m_owner->m_posY + field_0x1a, field_0x1c, field_0x1e);
+        gpWindowManager->UpdateScreenRegion(m_owner->m_posX + m_x,
+                                            m_owner->m_posY + m_y, m_width, m_height);
         param_1.field4 = 0xd;
         param_1.type = 0x200;
         param_1.field8 = m_id;
@@ -120,9 +120,9 @@ int button::Main(tag_message &param_1)
                         return 0;
                     m_flags = uVar1 & 0xfffe;
                     Draw();
-                    gpWindowManager->UpdateScreenRegion(m_owner->m_posX + field_0x18,
-                                                        m_owner->m_posY + field_0x1a,
-                                                        field_0x1c, field_0x1e);
+                    gpWindowManager->UpdateScreenRegion(m_owner->m_posX + m_x,
+                                                        m_owner->m_posY + m_y,
+                                                        m_width, m_height);
                     param_1.field4 = 0xd;
                     param_1.type = 0x200;
                     param_1.field8 = m_id;
@@ -139,9 +139,9 @@ int button::Main(tag_message &param_1)
             if ((uVar1 & 4) != 0 && (uVar1 & 1) != 0) {
                 m_flags = uVar1 & 0xfffe;
                 Draw();
-                gpWindowManager->UpdateScreenRegion(field_0x18 + m_owner->m_posX,
-                                                    field_0x1a + m_owner->m_posY, field_0x1c,
-                                                    field_0x1e);
+                gpWindowManager->UpdateScreenRegion(m_x + m_owner->m_posX,
+                                                    m_y + m_owner->m_posY, m_width,
+                                                    m_height);
                 param_1.field4 = 0xd;
                 param_1.type = 0x200;
                 param_1.field8 = m_id;
@@ -167,8 +167,8 @@ int button::Main(tag_message &param_1)
         sVar7 = static_cast<short>(param_1.field4) - m_owner->m_posX;
         sVar2 = static_cast<short>(param_1.field8) - m_owner->m_posY;
         if (iVar4 == 0x20) {
-            if (field_0x18 <= sVar7 && field_0x1a <= sVar2 && sVar7 < field_0x1c + field_0x18 &&
-                sVar2 < field_0x1e + field_0x1a) {
+            if (m_x <= sVar7 && m_y <= sVar2 && sVar7 < m_width + m_x &&
+                sVar2 < m_height + m_y) {
                 param_1.field4 = 0xe;
                 param_1.type = 0x200;
                 param_1.fieldC = 0x200;
@@ -177,8 +177,8 @@ int button::Main(tag_message &param_1)
             }
             return 0;
         }
-        if ((uVar1 & 8) == 0 && field_0x18 <= sVar7 && field_0x1a <= sVar2 &&
-            sVar7 < field_0x1c + field_0x18 && sVar2 < field_0x1e + field_0x1a) {
+        if ((uVar1 & 8) == 0 && m_x <= sVar7 && m_y <= sVar2 &&
+            sVar7 < m_width + m_x && sVar2 < m_height + m_y) {
             Select(param_1);
             iVar4 = param_1.type;
             while (iVar4 != 0x10 && param_1.type != 0x40) {
@@ -187,14 +187,14 @@ int button::Main(tag_message &param_1)
                 if (param_1.type == 4) {
                     sVar2 = static_cast<short>(param_1.field4) - m_owner->m_posX;
                     sVar7 = static_cast<short>(param_1.field8) - m_owner->m_posY;
-                    if (sVar2 < field_0x18 || sVar7 < field_0x1a ||
-                        field_0x1c + field_0x18 <= sVar2 || field_0x1e + field_0x1a <= sVar7) {
+                    if (sVar2 < m_x || sVar7 < m_y ||
+                        m_width + m_x <= sVar2 || m_height + m_y <= sVar7) {
                         if ((m_flags & 1) != 0) {
                             m_flags = m_flags & 0xfffe;
                             Draw();
                             gpWindowManager->UpdateScreenRegion(
-                                m_owner->m_posX + field_0x18, m_owner->m_posY + field_0x1a,
-                                field_0x1c, field_0x1e);
+                                m_owner->m_posX + m_x, m_owner->m_posY + m_y,
+                                m_width, m_height);
                             param_1.field4 = 0xd;
                             param_1.type = 0x200;
                             param_1.field8 = m_id;
@@ -212,9 +212,9 @@ int button::Main(tag_message &param_1)
             if ((m_flags & 1) != 0) {
                 m_flags = m_flags & 0xfffe;
                 Draw();
-                gpWindowManager->UpdateScreenRegion(m_owner->m_posX + field_0x18,
-                                                    m_owner->m_posY + field_0x1a, field_0x1c,
-                                                    field_0x1e);
+                gpWindowManager->UpdateScreenRegion(m_owner->m_posX + m_x,
+                                                    m_owner->m_posY + m_y, m_width,
+                                                    m_height);
                 param_1.field4 = 0xd;
                 param_1.type = 0x200;
                 param_1.field8 = m_id;
@@ -233,10 +233,10 @@ LAB_004dd7d8:
 VA(0x004ddc70, 0x96)
 short button::Select(struct tag_message &msg)
 {
-    short x = m_owner->m_posX + field_0x18;
-    short y = field_0x1a + m_owner->m_posY;
+    short x = m_owner->m_posX + m_x;
+    short y = m_y + m_owner->m_posY;
     field_0x20->DrawToBuffer(x, y, field_0x26, 0);
-    gpWindowManager->UpdateScreenRegion(x, y, field_0x1c, field_0x1e);
+    gpWindowManager->UpdateScreenRegion(x, y, m_width, m_height);
     m_flags |= 1;
     msg.type = 0x200;
     msg.field8 = m_id;
@@ -255,8 +255,8 @@ short button::Deselect(struct tag_message &msg)
         return 0;
     m_flags &= 0xfffe;
     Draw();
-    gpWindowManager->UpdateScreenRegion(field_0x18 + m_owner->m_posX,
-                                        field_0x1a + m_owner->m_posY, field_0x1c, field_0x1e);
+    gpWindowManager->UpdateScreenRegion(m_x + m_owner->m_posX,
+                                        m_y + m_owner->m_posY, m_width, m_height);
     msg.field4 = 0xd;
     msg.type = 0x200;
     msg.field8 = m_id;
@@ -270,11 +270,11 @@ void button::Draw(void)
 {
     heroWindow *win = m_owner;
     if ((m_flags & 1) != 0) {
-        field_0x20->DrawToBuffer(field_0x18 + win->m_posX, field_0x1a + win->m_posY,
+        field_0x20->DrawToBuffer(m_x + win->m_posX, m_y + win->m_posY,
                                  field_0x26, 0);
         return;
     }
-    field_0x20->DrawToBuffer(field_0x18 + win->m_posX, field_0x1a + win->m_posY,
+    field_0x20->DrawToBuffer(m_x + win->m_posX, m_y + win->m_posY,
                              field_0x24, 0);
 }
 
