@@ -17,6 +17,12 @@ class tileset;
 struct tag_message;
 
 #pragma pack(push, 1)  // recovered layout is byte-packed
+struct aggEntry {  // one .agg directory record (0xc bytes)
+    unsigned long id;
+    long offset;
+    unsigned long size;
+};
+
 class resourceManager : public baseManager {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
@@ -26,7 +32,7 @@ public:
     int    field_0x3a;  // +0x3a
     int    field_0x3e;  // +0x3e
     int    field_0x42[2];  // +0x42  per-aggregate file descriptors
-    void  *field_0x4a[2];  // +0x4a  per-aggregate header buffers
+    aggEntry *field_0x4a[2];  // +0x4a  per-aggregate directory
     int    field_0x52[2];  // +0x52
     int    field_0x5a;  // +0x5a
     char _pad_0x5e[0x4];

@@ -22,7 +22,7 @@ BASE/BORDER	??0border@@QAE@XZ	100.0000	14d2f43c4ad7
 BASE/BORDER	??1border@@UAE@XZ	100.0000	136e4cd08a33
 BASE/BORDER	??_Eborder@@UAEPAXI@Z	0.0000	
 BASE/BORDER	?Draw@border@@UAEXXZ	52.0000	833f71774b11
-BASE/BORDER	?Main@border@@UAEHAAUtag_message@@@Z	80.0230	9df18938ff2e
+BASE/BORDER	?Main@border@@UAEHAAUtag_message@@@Z	80.1379	9df18938ff2e
 BASE/BORDER	?Read@border@@QAEXXZ	100.0000	ccbb4ecfe601
 BASE/BUTTON	??0button@@QAE@FFFFKFFFFFF@Z	100.0000	83f17308dd9f
 BASE/BUTTON	??0button@@QAE@FFFFPADFFFFFF@Z	100.0000	edbf318db47b
@@ -31,7 +31,7 @@ BASE/BUTTON	??1button@@UAE@XZ	100.0000	8a3d69d9cecc
 BASE/BUTTON	??_Ebutton@@UAEPAXI@Z	0.0000	
 BASE/BUTTON	?Deselect@button@@QAEFAAUtag_message@@@Z	99.7778	e8ce6d04c130
 BASE/BUTTON	?Draw@button@@UAEXXZ	100.0000	a37ab97966ca
-BASE/BUTTON	?Main@button@@UAEHAAUtag_message@@@Z	62.1927	bef69c1984a3
+BASE/BUTTON	?Main@button@@UAEHAAUtag_message@@@Z	62.2677	bef69c1984a3
 BASE/BUTTON	?Read@button@@QAEXXZ	100.0000	6f9b62d2ea46
 BASE/BUTTON	?Select@button@@QAEFAAUtag_message@@@Z	94.3478	c33cbf4bb5f2
 BASE/Blur	?DoBlur@@YIXPAVbitmap@@0HHHH@Z	64.8966	377869681399
@@ -268,7 +268,7 @@ BASE/RESMGR	?Expunge@resourceManager@@QAEXXZ	80.6000	61fcaa327304
 BASE/RESMGR	?GetBackdrop@resourceManager@@QAEXPADPAVbitmap@@H@Z	44.6071	6c8ebdd1f671
 BASE/RESMGR	?GetBackdropAtLoc@resourceManager@@QAEXPADPAVbitmap@@HHH@Z	18.2817	bbda354f7e41
 BASE/RESMGR	?GetBitmap@resourceManager@@QAEPAVbitmap@@PAD@Z	97.9592	80893a48441f
-BASE/RESMGR	?GetFileSize@resourceManager@@QAEKK@Z	18.8451	983b7e296d99
+BASE/RESMGR	?GetFileSize@resourceManager@@QAEKK@Z	90.8028	a6bd9bc83c76
 BASE/RESMGR	?GetFont@resourceManager@@QAEPAVfont@@PAD@Z	97.7347	58803e4abb6d
 BASE/RESMGR	?GetIcon@resourceManager@@QAEPAVicon@@K@Z	73.0233	2fa0ea29c9e3
 BASE/RESMGR	?GetIcon@resourceManager@@QAEPAVicon@@PAD@Z	100.0000	a2cd94727669
@@ -281,7 +281,7 @@ BASE/RESMGR	?LoadAggregateHeader@resourceManager@@QAEHPAD@Z	14.1212	27e817d79b18
 BASE/RESMGR	?Main@resourceManager@@UAEHAAUtag_message@@@Z	100.0000	434bea8a6023
 BASE/RESMGR	?MakeId@resourceManager@@QAEKPADH@Z	18.0811	a198536f2cd3
 BASE/RESMGR	?Open@resourceManager@@UAEHH@Z	50.8727	0d5a5db3efc2
-BASE/RESMGR	?PointToFile@resourceManager@@QAEXK@Z	15.6386	297c6b474c3c
+BASE/RESMGR	?PointToFile@resourceManager@@QAEXK@Z	90.8313	3d20d5dcb709
 BASE/RESMGR	?Query@resourceManager@@QAEPAVresource@@K@Z	86.0000	832861b1b724
 BASE/RESMGR	?Read13@resourceManager@@QAEXPAC@Z	100.0000	fb46d6f443a3
 BASE/RESMGR	?ReadBlock@resourceManager@@QAEXPACK@Z	90.1936	1c7ec26d15ae
@@ -388,9 +388,9 @@ BASE/listbox	??1listBoxWidget@@UAE@XZ	98.5909	b3cd962bd994
 BASE/listbox	??_ElistBoxWidget@@UAEPAXI@Z	0.0000	
 BASE/listbox	?DeleteItem@listBoxWidget@@QAEXH@Z	55.3980	8ef6cc5d31ef
 BASE/listbox	?Draw@listBoxWidget@@UAEXXZ	100.0000	230100bbcc4e
-BASE/listbox	?DrawLBStuff@listBoxWidget@@QAEXH@Z	71.4916	75f217fe2e0f
+BASE/listbox	?DrawLBStuff@listBoxWidget@@QAEXH@Z	71.7273	75f217fe2e0f
 BASE/listbox	?Main@listBoxWidget@@UAEHAAUtag_message@@@Z	54.0767	07473c97aebf
-BASE/listbox	?ProcessMouseMessage@listBoxWidget@@QAEHAAUtag_message@@@Z	50.5289	0855861a89a9
+BASE/listbox	?ProcessMouseMessage@listBoxWidget@@QAEHAAUtag_message@@@Z	53.6942	0855861a89a9
 BASE/listbox	?Read@listBoxWidget@@QAEXXZ	89.8843	723df75d15ed
 BASE/miscwin	?AutoInitSVGA@@YIFXZ	100.0000	ba21e7c98ba3
 BASE/miscwin	@BlitBitmapToScreenVesa@28	0.6579	10b3cea2382c
@@ -992,7 +992,7 @@ SOURCE/KB	?ShowCongrats@@YIXH@Z	6.4900	f20748af656f
 SOURCE/KB	?ShowLuckInfo@game@@QAEXPAVhero@@H@Z	5.5708	03e971529b3e
 SOURCE/KB	?ShowMoraleInfo@game@@QAEXPAVhero@@H@Z	3.3239	253999ad15e8
 SOURCE/KB	?ShutDown@@YIXPAD@Z	100.0000	4a79cb05b671
-SOURCE/KB	?SmackFade@@YIXPAE0@Z	98.2235	41511f1339c3
+SOURCE/KB	?SmackFade@@YIXPAE0@Z	98.5882	41511f1339c3
 SOURCE/KB	?TestDynamicWindow@@YIXHH@Z	100.0000	f5ab1abce453
 SOURCE/KB	?TrueFalseDialogHandler@@YIHAAUtag_message@@@Z	100.0000	686bb54969b1
 SOURCE/KB	?UnloadSystemwideIcons@@YIXXZ	100.0000	e5593a1d663f
