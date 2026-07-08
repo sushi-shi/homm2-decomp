@@ -9,6 +9,8 @@ extern "C" void _AIL_shutdown_0(void);
 extern "C" struct _SAMPLE *_AIL_allocate_sample_handle_4(int);
 extern "C" int _AIL_sample_status_4(struct _SAMPLE *);
 extern "C" int _AIL_sample_volume_4(struct _SAMPLE *);
+extern "C" void _AIL_set_sample_volume_8(struct _SAMPLE *, int);
+extern "C" void _AIL_start_sample_4(struct _SAMPLE *);
 extern "C" void _AIL_end_sample_4(struct _SAMPLE *);
 struct _SEQUENCE;
 extern "C" int _AIL_sequence_status_4(struct _SEQUENCE *);
