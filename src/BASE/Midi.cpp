@@ -13,7 +13,24 @@
 #include <BASE/MIDIWrap.h>
 #include <BASE/Misc.h>
 VA(0x004d3850, 0xb8)
-void soundManager::MIDIStartup(void) {}
+void soundManager::MIDIStartup(void)
+{
+    int i;
+    LogStr("MIDIStartup");
+    if (gbNoSound == 0 && (field_0x6a6 = 1, gbDontTryMIDI == 0)) {
+        LogStr("Clearing MIDI slots");
+        for (i = 0; i < 60; i++)
+            pMIDIWrap[i] = 0;
+        for (i = 0; i < 60; i++)
+            hSequence[i] = 0;
+        field_0x69e = 1;
+        LogStr("Opening MIDI output");
+        i = _AIL_midiOutOpen_12(&hMDI, 0, 0xffffffff);
+        LogInt("midiOutOpen = %d", i, -999, -999, -999, -999, -999, -999);
+        if (i != 0)
+            field_0x69e = 0;
+    }
+}
 
 VA(0x004d3910, 0x1a9)
 void soundManager::MIDIShutdown(void)

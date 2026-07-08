@@ -12,4 +12,5 @@ extern "C" void _AIL_set_XMIDI_master_volume_8(struct _MDI_DRIVER *, int);
 extern "C" void _AIL_stop_sequence_4(struct _SEQUENCE *);
 extern "C" void _AIL_release_sequence_handle_4(struct _SEQUENCE *);
 extern "C" void _AIL_midiOutClose_4(struct _MDI_DRIVER *);
+extern "C" int _AIL_midiOutOpen_12(struct _MDI_DRIVER **, int, unsigned long);
 #endif // HOMM2_BASE_MSS_H
