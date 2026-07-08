@@ -107,13 +107,13 @@ void soundManager::CDStartup(void)
               "open %c: type cdaudio alias CD shareable", gcAnimPath[0]);
     nMCIError = mciSendStringA(CommandString,
                                lpszReturnString, 0xff, 0);
-    if (nMCIError == 0) {
-        m_cdReady = 1;
-    } else {
+    if (nMCIError != 0) {
         m_cdReady = 0;
         gMciErrorFlag = 1;
         gCdMusic = 0;
         WritePrefs();
+    } else {
+        m_cdReady = 1;
     }
 }
 
