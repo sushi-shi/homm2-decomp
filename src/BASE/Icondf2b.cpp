@@ -74,10 +74,10 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, 
                 if (cmd != 0) {
                     unsigned int cnt = cmd;
                     do {
+                        int px = *dp++;
                         cnt--;
-                        gFDDst = dp + 1;
-                        *dp = (reinterpret_cast<unsigned char *>(uDimPal) + color * 0x100)[*dp];
-                        dp = dp + 1;
+                        gFDDst = dp;
+                        dp[-1] = (reinterpret_cast<unsigned char *>(uDimPal) + color * 0x100)[px];
                     } while (cnt != 0);
                 }
             } else {
@@ -99,10 +99,10 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, 
                         gFDCnt = cn;
                         unsigned int cnt = cn;
                         do {
+                            int px = *dp++;
                             cnt--;
-                            gFDDst = dp + 1;
-                            *dp = (reinterpret_cast<unsigned char *>(uDimPal) + color * 0x100)[*dp];
-                            dp = dp + 1;
+                            gFDDst = dp;
+                            dp[-1] = (reinterpret_cast<unsigned char *>(uDimPal) + color * 0x100)[px];
                         } while (cnt != 0);
                     }
                 }
