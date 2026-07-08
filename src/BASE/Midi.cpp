@@ -12,6 +12,7 @@
 #include <BASE/resourceManager.h>
 #include <BASE/MIDIWrap.h>
 #include <BASE/Misc.h>
+#include <stdio.h>
 VA(0x004d3850, 0xb8)
 void soundManager::MIDIStartup(void)
 {
@@ -74,7 +75,87 @@ void soundManager::MIDIShutdown(void)
 }
 
 VA(0x004d3ac0, 0x3ab)
-void soundManager::MIDIPlay(int) {}
+void soundManager::MIDIPlay(int param_1)
+{
+    char local_10[16];
+    if (gbNoSound == 0 && field_0x69e != 0 && gMidiEnabled != 0) {
+        LogStr("MIDIPlay");
+        if (bGotMidi[param_1] == 0)
+            param_1 = -1;
+        if (param_1 == -1) {
+        if (field_0x69e != 0 && CurrentMidiFile != -1) {
+            if (gMidiEnabled != 0 && field_0x69e != 0 && CurrentMidiFile != -1 &&
+                hSequence[CurrentMidiFile] != 0 &&
+                _AIL_sequence_status_4(hSequence[CurrentMidiFile]) == 4 &&
+                hSequence[CurrentMidiFile] != 0 &&
+                (_AIL_stop_sequence_4(hSequence[CurrentMidiFile]),
+                 gbLowMemory != 0 || bSaveMusicPosition[CurrentMidiFile] == 0)) {
+                _AIL_release_sequence_handle_4(hSequence[CurrentMidiFile]);
+                int iVar1 = CurrentMidiFile;
+                hSequence[CurrentMidiFile] = 0;
+                if (pMIDIWrap[iVar1] != 0)
+                    gpResourceManager->Dispose(pMIDIWrap[iVar1]);
+                pMIDIWrap[CurrentMidiFile] = 0;
+            }
+            CurrentMidiFile = -1;
+            field_0x578 = 0xff;
+        }
+            return;
+        }
+        if (param_1 != CurrentMidiFile) {
+        if (field_0x69e != 0 && CurrentMidiFile != -1) {
+            if (gMidiEnabled != 0 && field_0x69e != 0 && CurrentMidiFile != -1 &&
+                hSequence[CurrentMidiFile] != 0 &&
+                _AIL_sequence_status_4(hSequence[CurrentMidiFile]) == 4 &&
+                hSequence[CurrentMidiFile] != 0 &&
+                (_AIL_stop_sequence_4(hSequence[CurrentMidiFile]),
+                 gbLowMemory != 0 || bSaveMusicPosition[CurrentMidiFile] == 0)) {
+                _AIL_release_sequence_handle_4(hSequence[CurrentMidiFile]);
+                int iVar1 = CurrentMidiFile;
+                hSequence[CurrentMidiFile] = 0;
+                if (pMIDIWrap[iVar1] != 0)
+                    gpResourceManager->Dispose(pMIDIWrap[iVar1]);
+                pMIDIWrap[CurrentMidiFile] = 0;
+            }
+            CurrentMidiFile = -1;
+            field_0x578 = 0xff;
+        }
+            sprintf(local_10, "MIDI%04d.XMI", param_1);
+            if (hSequence[param_1] == 0) {
+                hSequence[param_1] = _AIL_allocate_sequence_handle_4(hMDI);
+                if (hSequence[param_1] == 0)
+                    MIDIShutdown();
+                MIDIWrap *w = gpResourceManager->GetMIDIWrap(local_10);
+                pMIDIWrap[param_1] = w;
+                _AIL_init_sequence_12(hSequence[param_1], w->field_0x10, 0);
+            }
+            if (gbNoSound == 0 && field_0x69e != 0) {
+                int iVar4 = 0x7f;
+                int iVar1 = field_0x688;
+                if (iVar1 > 0) {
+                    if (iVar1 < 0xb) {
+                        iVar4 = 0xb;
+                        iVar1 = 0xb - iVar1;
+                    } else {
+                        iVar1 = iVar1 - 10;
+                        iVar4 = 6;
+                    }
+                    iVar4 = (iVar1 * 0x7f) / iVar4;
+                }
+                iVar1 = ConvertVolume(iVar4, 0x65);
+                _AIL_set_XMIDI_master_volume_8(hMDI, iVar1);
+            }
+            _AIL_start_sequence_4(hSequence[param_1]);
+            if (bMusicIsLooping[param_1] == 0)
+                _AIL_set_sequence_loop_count_8(hSequence[param_1], 1);
+            else
+                _AIL_set_sequence_loop_count_8(hSequence[param_1], 0);
+            _AIL_resume_sequence_4(hSequence[param_1]);
+            CurrentMidiFile = param_1;
+            field_0x578 = static_cast<char>(param_1);
+        }
+    }
+}
 
 VA(0x004d3e70, 0x108)
 void soundManager::MIDIStop(void)
