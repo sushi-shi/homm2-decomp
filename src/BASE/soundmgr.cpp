@@ -349,9 +349,14 @@ struct _DIG_DRIVER *WAVE_init_driver(unsigned long param_1, unsigned short param
     struct _DIG_DRIVER *local_40;
     tagWAVEOUTCAPSA local_3c;
     int local_8;
-    if (waveOutGetNumDevs() == 0) {
+    int local_44;
+    local_44 = waveOutGetNumDevs();
+    if (local_44 == 0) {
         local_40 = 0;
-    } else if (waveOutGetDevCapsA(0, &local_3c, 0x34) == 0) {
+    } else if (waveOutGetDevCapsA(0, &local_3c, 0x34) != 0) {
+        MessageBoxA(hwndApp, "Sound initialization error!  No wave devices found.", "Startup Error", 0);
+        local_40 = 0;
+    } else {
         if (gbUseWaveout != 0)
             _AIL_set_preference_8(0xf, 1);
         gWaveFormat.wFormatTag = 1;
@@ -363,12 +368,9 @@ struct _DIG_DRIVER *WAVE_init_driver(unsigned long param_1, unsigned short param
         local_8 = _AIL_waveOutOpen_16(&local_40, 0, 0, &gWaveFormat);
         if (local_8 != 0) {
             if (param_4 != 0)
-                MessageBoxA(ghWndMain, _AIL_last_error_0(), "Sound initialization error!", 0);
+                MessageBoxA(hwndApp, _AIL_last_error_0(), "Sound initialization error!", 0);
             local_40 = 0;
         }
-    } else {
-        MessageBoxA(ghWndMain, "Sound initialization error!  No wave devices found.", "Startup Error", 0);
-        local_40 = 0;
     }
     return local_40;
 }
