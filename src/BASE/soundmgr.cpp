@@ -295,7 +295,22 @@ void soundManager::StopAllSamples(int param_1)
 }
 
 VA(0x004ccbc0, 0xb1)
-void soundManager::StopSample(struct _SAMPLE *) {}
+void soundManager::StopSample(struct _SAMPLE *param_1)
+{
+    int local_c;
+    if (gbNoSound == 0 && field_0x36 != 0) {
+        LogStr("Stop Sample 1");
+        struct _SAMPLE *p_Var1 = field_0x54[0];
+        _AIL_end_sample_4(param_1);
+        if (p_Var1 == param_1) {
+            for (local_c = 0; local_c < 10; local_c++) {
+                ServiceSound();
+                DelayMilli(1);
+            }
+        }
+        LogStr("Stop Sample 2");
+    }
+}
 
 VA(0x004ccc80, 0x202)
 void soundManager::ModifySample(struct _SAMPLE *, short int, long int) {}

@@ -20,7 +20,7 @@ public:
     int    field_0x3e;  // +0x3e
     char _pad_0x42[0xe];
     int    field_0x50;  // +0x50
-    int    field_0x54[14];  // +0x54  sample handles
+    struct _SAMPLE *field_0x54[14];  // +0x54  sample handles
     char _pad_0x8c[0x8];
     int    field_0x94;  // +0x94
     char _pad_0x98[0x4d4];
