@@ -338,7 +338,23 @@ VA(0x004ccf40, 0xe8)
 void soundManager::AdjustSoundVolumes(void) {}
 
 VA(0x004cd030, 0xee)
-void soundManager::AdjustMusicVolumes(void) {}
+void soundManager::AdjustMusicVolumes(void)
+{
+    if (gbNoSound == 0 && field_0x684 != 0 && field_0x578 >= 0) {
+        LogStr("Adjust Music Volumes 1");
+        if (gMidiEnabled == 0) {
+            if (gCdMusic == 0)
+                MIDISetVolume();
+            else
+                CDSetVolume(-1, 0);
+        } else if (gCdMusic == 0) {
+            MIDISetVolume();
+        } else {
+            CDSetVolume(-1, 0);
+        }
+        LogStr("Adjust Music Volumes 2");
+    }
+}
 
 VA(0x004cd120, 0x3a)
 void soundManager::ForcePollSound(void)
