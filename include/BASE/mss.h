@@ -6,6 +6,7 @@
 // AIL_* calls are recovered from the soundManager methods.
 extern "C" void _AIL_serve_0(void);
 extern "C" void _AIL_shutdown_0(void);
+extern "C" int _AIL_allocate_sample_handle_4(int);
 struct _SEQUENCE;
 extern "C" int _AIL_sequence_status_4(struct _SEQUENCE *);
 struct _MDI_DRIVER;
