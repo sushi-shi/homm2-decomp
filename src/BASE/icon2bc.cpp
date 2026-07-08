@@ -47,7 +47,7 @@ void IconToBitmapColorTable(class icon *param_1, class bitmap *param_2, int para
     gCTEntry = &entries[param_5];
     gCTSrc = reinterpret_cast<unsigned char *>(param_1->field_0x12) + gCTEntry->srcOffset;
     gCTX0 = param_3 + gCTEntry->x;
-    gCTPitch = param_2->field_0x12;
+    gCTPitch = param_2->width;
     gCTY = gCTEntry->y + param_4;
     if (param_6 != 0) {
         if (gCTX0 < param_7 || param_9 + param_7 < gCTEntry->w + gCTX0 || gCTY < param_8 ||
@@ -59,7 +59,7 @@ void IconToBitmapColorTable(class icon *param_1, class bitmap *param_2, int para
             param_6 = 0;
         }
     }
-    gCTRow = gCTPitch * gCTY + reinterpret_cast<int>(param_2->field_0x16);
+    gCTRow = gCTPitch * gCTY + reinterpret_cast<int>(param_2->pixels);
     gCTX = gCTX0;
     do {
         while (1) {

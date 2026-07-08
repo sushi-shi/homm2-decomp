@@ -60,8 +60,8 @@ void FlipIconToBitmapColorTable(class icon *param_1, class bitmap *param_2, int 
             param_6 = 0;
         }
     }
-    short sVar2 = param_2->field_0x12;
-    gFCRow = gFCY * sVar2 + reinterpret_cast<int>(param_2->field_0x16);
+    short sVar2 = param_2->width;
+    gFCRow = gFCY * sVar2 + reinterpret_cast<int>(param_2->pixels);
     gFCX = gFCXEnd;
     pbVar13 = reinterpret_cast<unsigned char *>(param_1->field_0x12) + gFCEntry->srcOffset;
 LAB_004d987c:

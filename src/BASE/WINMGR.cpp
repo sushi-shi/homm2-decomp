@@ -55,10 +55,10 @@ int heroWindowManager::Open(int param_1)
     if (field_0x46 == 0)
         MemError();
     field_0x46->field_0x10 = 0x21;
-    field_0x46->field_0x12 = 0x280;
-    field_0x46->field_0x14 = 0x1e0;
-    field_0x46->field_0x16 = reinterpret_cast<unsigned char *>(lpInitWin);
-    int *fb = reinterpret_cast<int *>(field_0x46->field_0x16);
+    field_0x46->width = 0x280;
+    field_0x46->height = 0x1e0;
+    field_0x46->pixels = reinterpret_cast<unsigned char *>(lpInitWin);
+    int *fb = reinterpret_cast<int *>(field_0x46->pixels);
     for (i = 0x12c00; i != 0; i--) {
         *fb = 0x24242424;
         fb++;
@@ -80,7 +80,7 @@ void heroWindowManager::Close(void)
             RemoveWindow(w);
             w = prev;
         }
-        field_0x46->field_0x16 = 0;
+        field_0x46->pixels = 0;
         if (field_0x46 != 0)
             delete field_0x46;
         field_0x32 = 0;
@@ -298,7 +298,7 @@ void heroWindowManager::ScreenShot(void)
 {
     char local_10[16];
     sprintf(local_10, "SHOT%04d.PCX", field_0x52);
-    CreatePCXFile(local_10, field_0x46->field_0x16, 640, 480,
+    CreatePCXFile(local_10, field_0x46->pixels, 640, 480,
                   reinterpret_cast<unsigned char *>(gPalette->field_0x10));
     field_0x52++;
     gpInputManager->Flush();

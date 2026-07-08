@@ -17,9 +17,9 @@ public:
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (vptr auto-emitted at 0x00; own data starts at 0x04)
     short     field_0x4;  // +0x04
-    short     field_0x6;  // +0x06
-    int       field_0x8;  // +0x08
-    resource* field_0xc;  // +0x0c
+    short     refCount;  // +0x06
+    int       id;  // +0x08
+    resource* next;  // +0x0c
     // size >= 0x10 (accessed lower bound; no ctor/stride oracle)
     // --- constructors ---
     resource(void);

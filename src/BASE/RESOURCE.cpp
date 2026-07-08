@@ -10,18 +10,18 @@ VA(0x004d9730, 0x19)
 resource::resource(void)
 {
   field_0x4 = 0;
-  field_0x8 = 0;
-  field_0x6 = 0;
-  field_0xc = 0;
+  id = 0;
+  refCount = 0;
+  next = 0;
 }
 
 VA(0x004d9750, 0x2d)
 resource::resource(short int a1, unsigned long int a2, short int a3, resource* a4)
 {
   field_0x4 = a1;
-  field_0x8 = a2;
-  field_0x6 = a3;
-  field_0xc = a4;
+  id = a2;
+  refCount = a3;
+  next = a4;
 }
 
 VA(0x004d9780, 0x7)

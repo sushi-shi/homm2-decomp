@@ -59,7 +59,7 @@ void IconToBitmap(class icon *param_1, class bitmap *param_2, int param_3, int p
     gIcSrc = reinterpret_cast<unsigned char *>(param_1->field_0x12) + entries[param_5].srcOffset;
     gIcX0 = param_3 + entries[param_5].x;
     gIcY = entries[param_5].y + param_4;
-    gIcPitch = param_2->field_0x12;
+    gIcPitch = param_2->width;
     if (param_6 != 0) {
         if (gIcX0 < param_7 || param_9 + param_7 < entries[param_5].w + gIcX0 ||
             gIcY < param_8 || param_8 + param_10 < entries[param_5].h + gIcY) {
@@ -70,7 +70,7 @@ void IconToBitmap(class icon *param_1, class bitmap *param_2, int param_3, int p
             param_6 = 0;
         }
     }
-    gIcRow = gIcPitch * gIcY + reinterpret_cast<int>(param_2->field_0x16);
+    gIcRow = gIcPitch * gIcY + reinterpret_cast<int>(param_2->pixels);
     gIcX = gIcX0;
 LAB_0651:
     do {

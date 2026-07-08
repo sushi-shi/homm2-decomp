@@ -443,7 +443,7 @@ int SetupCDDrive(void) { return 0; }
 VA(0x004c5e50, 0x18)
 void BitmapToScreen(class bitmap *bmp)
 {
-    BlitBitmapToScreen(bmp, 0, 0, bmp->field_0x12, bmp->field_0x14, 0, 0);
+    BlitBitmapToScreen(bmp, 0, 0, bmp->width, bmp->height, 0, 0);
 }
 
 VA(0x004c5e70, 0x3d)
@@ -661,7 +661,7 @@ void FadeToColorTable(unsigned char *param_1, int param_2)
     } while (puVar4 < auStack_300 + 0x300);
     iVar8 = 0x1e0;
     FadeTo(puVar2, auStack_300, param_2);
-    unsigned char *pbVar7 = gpWindowManager->field_0x46->field_0x16;
+    unsigned char *pbVar7 = gpWindowManager->field_0x46->pixels;
     do {
         int iVar5 = 0x280;
         unsigned char *pbVar6 = pbVar7;
