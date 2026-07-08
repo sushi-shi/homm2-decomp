@@ -12,6 +12,7 @@
 #include <BASE/font.h>
 #include <BASE/bitmap.h>
 #include <BASE/palette.h>
+#include <_globals_model.h>
 VA(0x004c7fa0, 0xdb)
 resourceManager::resourceManager(void) {}
 
@@ -96,7 +97,16 @@ VA(0x004c86b0, 0x87)
 void resourceManager::Dispose(class resource *) {}
 
 VA(0x004c8740, 0x55)
-void resourceManager::AddResource(class resource *) {}
+void resourceManager::AddResource(class resource *param_1)
+{
+    if (field_0x36 == 0) {
+        field_0x36 = param_1;
+        field_0x36->field_0xc = 0;
+    } else {
+        param_1->field_0xc = field_0x36;
+        field_0x36 = param_1;
+    }
+}
 
 VA(0x004c87a0, 0x8b)
 void resourceManager::Expunge(void) {}
@@ -126,10 +136,20 @@ VA(0x004c8d20, 0xfa)
 unsigned long int resourceManager::GetFileSize(unsigned long int) { return 0; }
 
 VA(0x004c8e20, 0x52)
-void resourceManager::SavePosition(void) {}
+void resourceManager::SavePosition(void)
+{
+    lastPositionZ[gResPositionStackIdx] = _tell(field_0x42[field_0x3e]);
+    lastAggZ[gResPositionStackIdx] = field_0x3e;
+    gResPositionStackIdx = gResPositionStackIdx + 1;
+}
 
 VA(0x004c8e80, 0x53)
-void resourceManager::RestorePosition(void) {}
+void resourceManager::RestorePosition(void)
+{
+    gResPositionStackIdx = gResPositionStackIdx - 1;
+    field_0x3e = lastAggZ[gResPositionStackIdx];
+    _lseek(field_0x42[field_0x3e], lastPositionZ[gResPositionStackIdx], 0);
+}
 
 VA(0x004c8ee0, 0x81)
 signed char resourceManager::ReadByte(void)
@@ -184,5 +204,5 @@ VTBL(resourceManager, 0x004eb9f0);
 
 // ---- globals (definitions, RVA order) ----
 int iSaveCtr;
-int *lastAggZ;
-long *lastPositionZ;
+int lastAggZ[10];
+long lastPositionZ[12];

@@ -22,7 +22,7 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
-    int    field_0x36;  // +0x36
+    resource *field_0x36;  // +0x36  resource-list head
     int    field_0x3a;  // +0x3a
     int    field_0x3e;  // +0x3e
     int    field_0x42[6];  // +0x42  per-aggregate file descriptors
@@ -70,7 +70,7 @@ public:
 SIZE(resourceManager, 0xa2);
 // ---- globals (declarations, RVA order) ----
 DATA(0x0051e99c) extern int iSaveCtr;
-DATA(0x005331e8) extern int *lastAggZ;
-DATA(0x00533210) extern long *lastPositionZ;
+DATA(0x005331e8) extern int lastAggZ[10];
+DATA(0x00533210) extern long lastPositionZ[12];
 
 #endif // HOMM2_BASE_RESOURCEMANAGER_H

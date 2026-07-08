@@ -1,5 +1,6 @@
 #ifndef HOMM2_GLOBALS_MODEL_H
 #define HOMM2_GLOBALS_MODEL_H
+DATA(0x0051e99c) extern int gResPositionStackIdx; // resourceManager Save/RestorePosition stack depth
 #include <va.h>
 // Synthetic / MODELLING globals — readable aliases the matcher introduced for data that has
 // NO CodeView symbol of its own: overlay views of the monster-database region, and .rdata
