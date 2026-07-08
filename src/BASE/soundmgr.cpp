@@ -730,9 +730,10 @@ void soundManager::PollSound(void)
     int iVar1;
     long lVar2;
     int local_8;
-    if (gbNoSound == 0) {
-        if (gCdMusic != 0)
-            CDPoll();
+    if (gbNoSound != 0)
+        return;
+    if (gCdMusic != 0)
+        CDPoll();
         if ((m_pollRequested != 0 || field_0x688 != 0) && gMidiEnabled != 0) {
             LogStr("Poll Sound 1");
             if (field_0x688 > 0) {
@@ -789,7 +790,6 @@ void soundManager::PollSound(void)
             LogStr("Poll Sound 2");
             m_pollRequested = 0;
         }
-    }
 }
 
 VA(0x004cd6b0, 0x138)
