@@ -105,15 +105,15 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
                 if (clipY <= gCTY && gCTClipB >= gCTY &&
                     (right = X + count, clipX < right) && gCTClipR >= X) {
                     if (clipX > X) {
-                        unsigned int cn = clipW;
-                        if (right <= gCTClipR)
-                            cn = (count - clipX) + X;
-                        memset(row + clipX, gCTColor, cn);
-                    } else {
-                        unsigned int cn = count;
                         if (gCTClipR < right)
-                            cn = (gCTClipR - X) + 1;
-                        memset(row + X, gCTColor, cn);
+                            memset(row + clipX, gCTColor, clipW);
+                        else
+                            memset(row + clipX, gCTColor, (count - clipX) + X);
+                    } else {
+                        if (gCTClipR < right)
+                            memset(row + X, gCTColor, (gCTClipR - X) + 1);
+                        else
+                            memset(row + X, gCTColor, count);
                     }
                 }
             }

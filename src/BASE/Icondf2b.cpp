@@ -37,8 +37,8 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, 
     int w = entries[frame].w;
     gFDEntry = &entries[frame];
     gFDSrc = data + entries[frame].srcOffset;
-    gFDY = y + entries[frame].y;
     gFDX0 = ((x - entries[frame].x) - w) + 1;
+    gFDY = y + entries[frame].y;
     gFDXEnd = w + gFDX0 - 1;
     if (clip != 0) {
         if (gFDX0 < clipX || clipW + clipX < w + gFDX0 || gFDY < clipY ||
@@ -51,14 +51,12 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, 
         }
     }
     short pitch = dest->m_width;
-    unsigned char *row =
-        reinterpret_cast<unsigned char *>(gFDY * pitch + reinterpret_cast<int>(dest->m_pixels));
+    gFDRow = gFDY * pitch + reinterpret_cast<int>(dest->m_pixels);
     int X = gFDXEnd;
     for (;;) {
         gFDX = X;
         int cmd = *gFDSrc++;
         if (static_cast<signed char>(cmd) < 0) {
-            gFDRow = reinterpret_cast<int>(row);
             gFDRun = cmd;
             int n = cmd & 0x7f;
             if (n == 0)
@@ -70,7 +68,7 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, 
         if (cmd != 0) {
             if (clip == 0) {
                 gFDCnt = 0;
-                unsigned char *dp = (row - cmd) + 1 + X;
+                unsigned char *dp = reinterpret_cast<unsigned char *>((gFDRow - cmd) + 1 + X);
                 gFDDst = dp;
                 gFDCnt = cmd;
                 if (cmd != 0) {
@@ -89,10 +87,10 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, 
                     unsigned int cn;
                     unsigned char *dp;
                     if (left < clipX) {
-                        dp = row + clipX;
+                        dp = reinterpret_cast<unsigned char *>(gFDRow + clipX);
                         cn = (X - clipX) + 1;
                     } else {
-                        dp = (row - cmd) + 1 + X;
+                        dp = reinterpret_cast<unsigned char *>((gFDRow - cmd) + 1 + X);
                         cn = cmd;
                     }
                     gFDCnt = 0;
@@ -114,7 +112,7 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, 
         }
         // newline
         X = gFDXEnd;
-        row = row + pitch;
+        gFDRow = gFDRow + pitch;
         gFDY = gFDY + 1;
     }
 }
