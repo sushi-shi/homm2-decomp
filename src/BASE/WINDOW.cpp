@@ -193,10 +193,65 @@ void heroWindow::Close(void)
 }
 
 VA(0x004cf3c0, 0x13c)
-void heroWindow::AddWidget(class widget *, int) {}
+void heroWindow::AddWidget(class widget *param_1, int param_2)
+{
+    int iVar1;
+    widget *local_8 = field_0x3c;
+    if (param_2 == -1) {
+        if (local_8 == 0)
+            param_2 = 0;
+        else
+            param_2 = local_8->field_0x12 + 1;
+    }
+    iVar1 = param_1->Open(param_2, this);
+    if (iVar1 == 0) {
+        for (; local_8 != 0 && param_2 < local_8->field_0x12; local_8 = local_8->field_0x8) {
+        }
+        if (local_8 == 0) {
+            param_1->field_0xc = field_0x38;
+            param_1->field_0x8 = 0;
+            field_0x38 = param_1;
+            if (field_0x3c == 0)
+                field_0x3c = param_1;
+        } else {
+            param_1->field_0x8 = local_8;
+            param_1->field_0xc = local_8->field_0xc;
+            local_8->field_0xc->field_0x8 = param_1;
+            local_8->field_0xc = param_1;
+        }
+    }
+}
 
 VA(0x004cf500, 0x116)
-void heroWindow::RemoveWidget(class widget *) {}
+void heroWindow::RemoveWidget(class widget *param_1)
+{
+    widget *iVar1;
+    if (param_1 != 0) {
+        param_1->Close();
+        if (field_0x38 == param_1) {
+            field_0x38 = param_1->field_0xc;
+            if (field_0x38 == 0)
+                field_0x3c = 0;
+            else
+                field_0x38->field_0x8 = 0;
+        } else if (field_0x3c == param_1) {
+            field_0x3c = param_1->field_0x8;
+            field_0x3c->field_0xc = 0;
+        } else {
+            param_1->field_0x8->field_0xc = param_1->field_0xc;
+            param_1->field_0xc->field_0x8 = param_1->field_0x8;
+        }
+        iVar1 = param_1->field_0x8;
+        if (iVar1 == 0) {
+            field_0x3c = 0;
+            field_0x38 = field_0x3c;
+        } else {
+            iVar1->field_0xc = param_1->field_0xc;
+            if (iVar1->field_0xc != 0)
+                iVar1->field_0xc->field_0x8 = iVar1;
+        }
+    }
+}
 
 VA(0x004cf620, 0x95)
 int heroWindow::BroadcastMessage(struct tag_message &) { return 0; }

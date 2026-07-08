@@ -20,7 +20,7 @@ public:
     // (vptr auto-emitted at 0x00; own data starts at 0x04)
     heroWindow *field_0x4;  // +0x04  owning window
     widget *field_0x8;  // +0x08  next widget in the owner window's list
-    int    field_0xc;  // +0x0c
+    widget *field_0xc;  // +0x0c  prev widget in the owner window's list
     short  field_0x10;  // +0x10
     short  field_0x12;  // +0x12
     short  field_0x14;  // +0x14

@@ -332,7 +332,7 @@ BASE/WIDGET	empty_stub	0.0000
 BASE/WINDOW	??0heroWindow@@QAE@HHHHH@Z	100.0000	261e1576d646
 BASE/WINDOW	??0heroWindow@@QAE@HHPAD@Z	85.4861	0389cb1b8db0
 BASE/WINDOW	??0heroWindow@@QAE@XZ	100.0000	bec0cd8154d6
-BASE/WINDOW	?AddWidget@heroWindow@@QAEXPAVwidget@@H@Z	13.8085	3f9ab5e0906e
+BASE/WINDOW	?AddWidget@heroWindow@@QAEXPAVwidget@@H@Z	71.0426	02e47c1daaef
 BASE/WINDOW	?BroadcastMessage@heroWindow@@QAEHAAUtag_message@@@Z	29.7333	c4dd66fd12a4
 BASE/WINDOW	?Close@heroWindow@@QAEXXZ	88.4717	f756d6e1ad70
 BASE/WINDOW	?DrawWindow@heroWindow@@QAEXH@Z	100.0000	fc92f6b38f7d
@@ -341,7 +341,7 @@ BASE/WINDOW	?DrawWindow@heroWindow@@QAEXXZ	100.0000	05354f94dd26
 BASE/WINDOW	?MoveWindow@heroWindow@@QAEXHH@Z	94.4720	f8648c385367
 BASE/WINDOW	?Open@heroWindow@@QAEHHH@Z	100.0000	34bc686e4c39
 BASE/WINDOW	?RemoveAndDeleteWidget@heroWindow@@QAEXH@Z	27.6170	756c797eb96f
-BASE/WINDOW	?RemoveWidget@heroWindow@@QAEXPAVwidget@@@Z	16.0247	a1e1ac785a8f
+BASE/WINDOW	?RemoveWidget@heroWindow@@QAEXPAVwidget@@@Z	98.0247	9a01f187415b
 BASE/WINDOW	?RestoreBackground@heroWindow@@QAEXXZ	100.0000	1ad6adddfb67
 BASE/WINDOW	?SaveBackground@heroWindow@@QAEHXZ	100.0000	b4aefb12dfaa
 BASE/WINMGR	??0heroWindowManager@@QAE@XZ	100.0000	41337786b991
