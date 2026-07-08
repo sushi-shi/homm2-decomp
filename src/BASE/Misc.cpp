@@ -150,7 +150,33 @@ void BaseFree(void *param_1, char *param_2, int param_3)
 }
 
 VA(0x004c4310, 0x134)
-void PrintMemoryLeaks(void) {}
+void PrintMemoryLeaks(void)
+{
+    char local_1f4[500];
+    if (0 < giDebugLevel && gpMemEntry != 0) {
+        LogInt("Total Memory Leaks", iMemEntries, -999, -999, -999, -999, -999, -999);
+        int i = 0;
+        do {
+            if (gpMemEntry[i].used != 0) {
+                sprintf(gText, "Memory Leak,  File '%13s'  Line % 4d, ptr %12d   size %6d",
+                        gpMemEntry[i].file, gpMemEntry[i].line, reinterpret_cast<int>(gpMemEntry[i].ptr),
+                        gpMemEntry[i].size);
+                if (1 < giDebugLevel) {
+                    FILE *_File = fopen("KB.LOG", "a");
+                    if (_File != 0) {
+                        strcpy(local_1f4, gText);
+                        strcat(local_1f4, "\n");
+                        fputs(local_1f4, _File);
+                        fclose(_File);
+                        if (giDebugLevel == 4)
+                            OutputDebugStringA(local_1f4);
+                    }
+                }
+            }
+            i = i + 1;
+        } while (i < 2000);
+    }
+}
 
 VA(0x004c4450, 0x91)
 void ShowMemoryStatus(void)
