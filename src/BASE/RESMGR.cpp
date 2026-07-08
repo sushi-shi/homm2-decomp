@@ -397,30 +397,39 @@ void resourceManager::RestorePosition(void)
 VA(0x004c8ee0, 0x81)
 signed char resourceManager::ReadByte(void)
 {
+    int iVar1;
     char local_8[4];
     ProcessAssert(field_0x42[field_0x3e] != -1, __FILE__, __LINE__);
     local_8[0] = 0;
-    _read(field_0x42[field_0x3e], local_8, 1);
+    iVar1 = _read(field_0x42[field_0x3e], local_8, 1);
+    if (iVar1 == 0)
+        _errno();
     return local_8[0];
 }
 
 VA(0x004c8f70, 0x84)
 short resourceManager::ReadWord(void)
 {
+    int iVar1;
     short local_8[2];
     ProcessAssert(field_0x42[field_0x3e] != -1, __FILE__, __LINE__);
     local_8[0] = 0;
-    _read(field_0x42[field_0x3e], local_8, 2);
+    iVar1 = _read(field_0x42[field_0x3e], local_8, 2);
+    if (iVar1 == 0)
+        _errno();
     return local_8[0];
 }
 
 VA(0x004c9000, 0x84)
 long resourceManager::ReadLong(void)
 {
+    int iVar1;
     long local_8;
     ProcessAssert(field_0x42[field_0x3e] != -1, __FILE__, __LINE__);
     local_8 = 0;
-    _read(field_0x42[field_0x3e], &local_8, 4);
+    iVar1 = _read(field_0x42[field_0x3e], &local_8, 4);
+    if (iVar1 == 0)
+        _errno();
     return local_8;
 }
 
