@@ -405,7 +405,7 @@ BASE/soundmgr	?CDSetVolume@soundManager@@QAEXHH@Z	75.9355	d537624ee148
 BASE/soundmgr	?CDShutdown@soundManager@@QAEXXZ	100.0000	94625fe3dd87
 BASE/soundmgr	?CDStartup@soundManager@@QAEXXZ	71.2885	cd4e862e5a9c
 BASE/soundmgr	?CDStop@soundManager@@QAEXXZ	100.0000	e48aa4ca9583
-BASE/soundmgr	?Close@soundManager@@UAEXXZ	84.6053	3f023007c7e3
+BASE/soundmgr	?Close@soundManager@@UAEXXZ	88.8158	4cbf90a16cb2
 BASE/soundmgr	?ConvertVolume@soundManager@@QAEHHH@Z	75.7115	402e179e57e9
 BASE/soundmgr	?DigitalReport@soundManager@@QAEJPAU_SAMPLE@@F@Z	67.0000	fcaddd4d3e10
 BASE/soundmgr	?ForcePollSound@soundManager@@QAEXXZ	100.0000	2fbc860cf1db
@@ -420,7 +420,7 @@ BASE/soundmgr	?PlayAmbientMusic@soundManager@@QAEXHJH@Z	68.4340	b017d2087167
 BASE/soundmgr	?PollSound@soundManager@@QAEXXZ	77.5841	9ed143ab0383
 BASE/soundmgr	?ServiceSound@soundManager@@QAEXXZ	96.4706	65800eaa0fc0
 BASE/soundmgr	?SetMusicQuality@soundManager@@QAEXH@Z	59.4407	604754b87654
-BASE/soundmgr	?SetReady2Poll@@YGXK@Z	67.2000	7c89bbe06950
+BASE/soundmgr	?SetReady2Poll@@YGXK@Z	100.0000	ca166714905b
 BASE/soundmgr	?StartSample@soundManager@@QAEPAU_SAMPLE@@PADPAPADFFHHJ@Z	100.0000	0b90298d2458
 BASE/soundmgr	?StopAllSamples@soundManager@@QAEXH@Z	89.7000	db7aee88fde4
 BASE/soundmgr	?StopSample@soundManager@@QAEXPAU_SAMPLE@@@Z	81.8000	5f73d74d33ec

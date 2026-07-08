@@ -283,8 +283,10 @@ int soundManager::ConvertVolume(int param_1, int param_2)
 VA(0x004cc2a0, 0x5e)
 void __stdcall SetReady2Poll(unsigned long int)
 {
-    if (gpSoundManager != 0 &&
-        (gpSoundManager->field_0x57b ^= 1, gpSoundManager->field_0x57b != 0))
+    if (gpSoundManager == 0)
+        return;
+    gpSoundManager->field_0x57b ^= 1;
+    if (gpSoundManager->field_0x57b != 0)
         gpSoundManager->field_0x57a = 1;
 }
 
@@ -474,19 +476,19 @@ void soundManager::AllocateSampleHandles(void)
 VA(0x004cc9b0, 0x96)
 void soundManager::Close(void)
 {
-    if (field_0x32 == 1) {
-        if (gbNoSound == 0) {
-            LogStr("Shutting down CD audio");
-            CDShutdown();
-            LogStr("Shutting down MIDI");
-            MIDIShutdown();
-            LogStr("Shutting down AIL");
-            _AIL_shutdown_0();
-            LogStr("Sound shut down");
-        }
-        field_0x32 = 0;
-        gbNoSound = 1;
+    if (field_0x32 != 1)
+        return;
+    if (gbNoSound == 0) {
+        LogStr("Shutting down CD audio");
+        CDShutdown();
+        LogStr("Shutting down MIDI");
+        MIDIShutdown();
+        LogStr("Shutting down AIL");
+        _AIL_shutdown_0();
+        LogStr("Sound shut down");
     }
+    field_0x32 = 0;
+    gbNoSound = 1;
 }
 
 VA(0x004cca50, 0x1a)
