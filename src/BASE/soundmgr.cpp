@@ -746,62 +746,64 @@ void soundManager::PollSound(void)
         return;
     if (gCdMusic != 0)
         CDPoll();
-        if ((m_pollRequested != 0 || m_fadeSteps != 0) && gMidiEnabled != 0) {
-            LogStr("Poll Sound 1");
-            if (m_fadeSteps > 0) {
-                LogStr("Poll Sound 1a");
-                Process1WindowsMessage();
-                if (m_currentTrack < 8 || 0xf < m_currentTrack)
+    if (m_pollRequested == 0 && m_fadeSteps == 0)
+        return;
+    if (gMidiEnabled == 0)
+        return;
+        LogStr("Poll Sound 1");
+        if (m_fadeSteps > 0) {
+            LogStr("Poll Sound 1a");
+            Process1WindowsMessage();
+            if (m_currentTrack < 8 || 0xf < m_currentTrack)
+                gMusicFadeTimer = KBTickCount();
+            iVar1 = gMusicFadeTimer;
+            lVar2 = KBTickCount();
+            m_fadeSteps = (iVar1 - lVar2) / 0x3c;
+            if (m_fadeSteps < 1)
+                m_fadeSteps = 0;
+            LogStr("Poll Sound 1b");
+            if (m_fadeSteps < 0xb && m_currentTrack != m_fadeTargetTrack) {
+                if (m_midiFile == 0 || bSaveMusicPosition[m_currentTrack] == 0) {
                     gMusicFadeTimer = KBTickCount();
+                } else if (gCdMusic == 0) {
+                    ProcessAssert(m_midiFile, __FILE__, __LINE__);
+                    field_0x590[m_currentTrack] = ftell(reinterpret_cast<FILE *>(m_midiFile));
+                }
+                m_fading = 1;
+                if (bSaveMusicPosition[m_fadeTargetTrack] == 0)
+                    PlayAmbientMusic(m_fadeTargetTrack, 0, -1);
+                else
+                    PlayAmbientMusic(m_fadeTargetTrack, field_0x590[m_fadeTargetTrack], -1);
                 iVar1 = gMusicFadeTimer;
                 lVar2 = KBTickCount();
                 m_fadeSteps = (iVar1 - lVar2) / 0x3c;
                 if (m_fadeSteps < 1)
                     m_fadeSteps = 0;
-                LogStr("Poll Sound 1b");
-                if (m_fadeSteps < 0xb && m_currentTrack != m_fadeTargetTrack) {
-                    if (m_midiFile == 0 || bSaveMusicPosition[m_currentTrack] == 0) {
-                        gMusicFadeTimer = KBTickCount();
-                    } else if (gCdMusic == 0) {
-                        ProcessAssert(m_midiFile, __FILE__, __LINE__);
-                        field_0x590[m_currentTrack] = ftell(reinterpret_cast<FILE *>(m_midiFile));
-                    }
-                    m_fading = 1;
-                    if (bSaveMusicPosition[m_fadeTargetTrack] == 0)
-                        PlayAmbientMusic(m_fadeTargetTrack, 0, -1);
-                    else
-                        PlayAmbientMusic(m_fadeTargetTrack, field_0x590[m_fadeTargetTrack], -1);
-                    iVar1 = gMusicFadeTimer;
-                    lVar2 = KBTickCount();
-                    m_fadeSteps = (iVar1 - lVar2) / 0x3c;
-                    if (m_fadeSteps < 1)
-                        m_fadeSteps = 0;
-                    m_currentTrack = static_cast<char>(m_fadeTargetTrack);
-                }
-                if (m_fadeSteps < 0xb)
-                    local_8 = ((0xb - m_fadeSteps) * 0x40) / 0xb;
-                else
-                    local_8 = ((m_fadeSteps - 10) * 0x40) / 6;
-                if (0x40 < local_8)
-                    local_8 = 0x40;
+                m_currentTrack = static_cast<char>(m_fadeTargetTrack);
+            }
+            if (m_fadeSteps < 0xb)
+                local_8 = ((0xb - m_fadeSteps) * 0x40) / 0xb;
+            else
+                local_8 = ((m_fadeSteps - 10) * 0x40) / 6;
+            if (0x40 < local_8)
+                local_8 = 0x40;
+            if (local_8 < 0)
+                local_8 = 0;
+            LogStr("Poll Sound 1c");
+            if (gCdMusic == 0) {
+                MIDISetVolume();
+            } else {
+                local_8 = ((0xb - gMidiEnabled) * local_8 * 0x7f) / 0x280;
+                if (0x7f < local_8)
+                    local_8 = 0x7f;
                 if (local_8 < 0)
                     local_8 = 0;
-                LogStr("Poll Sound 1c");
-                if (gCdMusic == 0) {
-                    MIDISetVolume();
-                } else {
-                    local_8 = ((0xb - gMidiEnabled) * local_8 * 0x7f) / 0x280;
-                    if (0x7f < local_8)
-                        local_8 = 0x7f;
-                    if (local_8 < 0)
-                        local_8 = 0;
-                    CDSetVolume(local_8, 1);
-                }
-                LogStr("Poll Sound 1d");
+                CDSetVolume(local_8, 1);
             }
-            LogStr("Poll Sound 2");
-            m_pollRequested = 0;
+            LogStr("Poll Sound 1d");
         }
+        LogStr("Poll Sound 2");
+        m_pollRequested = 0;
 }
 
 VA(0x004cd6b0, 0x138)
