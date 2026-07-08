@@ -6,6 +6,9 @@
 #include <va.h>
 #include <BASE/soundManager.h>
 #include <BASE/soundmgr.h>
+#include <SOURCE/X_GLOBAL.h>
+#include <_globals_model.h>
+#include <SOURCE/KB.h>
 VA(0x004cb630, 0x68)
 void HandleMCIError(int, char *) {}
 
@@ -40,7 +43,12 @@ VA(0x004cc2a0, 0x5e)
 void __stdcall SetReady2Poll(unsigned long int) {}
 
 VA(0x004cc300, 0x26)
-void __stdcall UpdateTimers(unsigned long int) {}
+void __stdcall UpdateTimers(unsigned long int)
+{
+    iCalibrateLoop++;
+    glMilliCounter += 0x10;
+    SetReady2Poll(0);
+}
 
 VA(0x004cc330, 0xd7)
 soundManager::soundManager(void) {}
@@ -82,7 +90,13 @@ VA(0x004cd030, 0xee)
 void soundManager::AdjustMusicVolumes(void) {}
 
 VA(0x004cd120, 0x3a)
-void soundManager::ForcePollSound(void) {}
+void soundManager::ForcePollSound(void)
+{
+    if (gbNoSound == 0) {
+        field_0x579 = 1;
+        PollSound();
+    }
+}
 
 VA(0x004cd160, 0xe3)
 void soundManager::SetMusicQuality(int) {}
