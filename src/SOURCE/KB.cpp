@@ -1207,7 +1207,7 @@ int gbColorMice;
 unsigned long *gTownEligibleBuildMask;
 unsigned char *giMapSizes;
 int gbUseEvilInterface;
-char *gcAnimPath;
+char gcAnimPath[0x160];
 char *gcGamePath;
 char *gcMapPath;
 int gbPutzingWithMouseCtr;
