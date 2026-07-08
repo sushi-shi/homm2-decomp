@@ -58,7 +58,27 @@ void resourceManager::GetBackdrop(char *param_1, class bitmap *param_2, int para
 }
 
 VA(0x004c8130, 0xd2)
-void resourceManager::GetBackdropAtLoc(char *, class bitmap *, int, int, int) {}
+void resourceManager::GetBackdropAtLoc(char *param_1, class bitmap *param_2, int param_3, int param_4,
+                                       int param_5)
+{
+    short sVar1, sVar2;
+    int local_8;
+    if (param_5 == 0) {
+        unsigned long uVar3 = MakeId(param_1, 1);
+        PointToFile(uVar3);
+        ReadWord();
+        sVar1 = ReadWord();
+        sVar2 = ReadWord();
+        for (local_8 = param_4; local_8 < sVar2 + param_4; local_8++) {
+            ReadBlock(reinterpret_cast<signed char *>(local_8 * 0x280 + param_2->field_0x16 + param_3),
+                      sVar1);
+        }
+    } else {
+        icon *this_00 = GetIcon(param_1);
+        this_00->DrawToBuffer(param_3, param_4, 0, 0);
+        Dispose(this_00);
+    }
+}
 
 VA(0x004c8210, 0x97)
 class palette * resourceManager::GetPalette(char *name)
