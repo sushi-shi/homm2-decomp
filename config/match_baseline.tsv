@@ -419,7 +419,7 @@ BASE/soundmgr	?Open@soundManager@@UAEHH@Z	7.3968	5365b6996957
 BASE/soundmgr	?PlayAmbientMusic@soundManager@@QAEXHJH@Z	68.4340	b017d2087167
 BASE/soundmgr	?PollSound@soundManager@@QAEXXZ	6.0654	1f2f9ddee54f
 BASE/soundmgr	?ServiceSound@soundManager@@QAEXXZ	87.0588	ea6ca50ae947
-BASE/soundmgr	?SetMusicQuality@soundManager@@QAEXH@Z	22.0000	9d4230adfd96
+BASE/soundmgr	?SetMusicQuality@soundManager@@QAEXH@Z	59.4407	604754b87654
 BASE/soundmgr	?SetReady2Poll@@YGXK@Z	67.2000	7c89bbe06950
 BASE/soundmgr	?StartSample@soundManager@@QAEPAU_SAMPLE@@PADPAPADFFHHJ@Z	100.0000	0b90298d2458
 BASE/soundmgr	?StopAllSamples@soundManager@@QAEXH@Z	82.8429	ebd92c0ecfb5

@@ -382,7 +382,26 @@ void soundManager::ForcePollSound(void)
 }
 
 VA(0x004cd160, 0xe3)
-void soundManager::SetMusicQuality(int) {}
+void soundManager::SetMusicQuality(int param_1)
+{
+    char sVar1;
+    int local_8;
+    if (gbNoSound == 0 && field_0x3e != 0 && gMidiEnabled != 0 && field_0x69a != 0) {
+        if (gCdMusic == 0) {
+            sVar1 = field_0x578;
+            MIDIStop();
+        } else {
+            sVar1 = field_0x578;
+            CDStop();
+            field_0x578 = static_cast<char>(0xff);
+        }
+        local_8 = sVar1;
+        memset(field_0x590, 0, 0xf0);
+        gCdMusic = param_1;
+        if (local_8 >= 0)
+            PlayAmbientMusic(local_8, 0, -1);
+    }
+}
 
 VA(0x004cd250, 0xc5)
 void soundManager::PlayAmbientMusic(int param_1, long param_2, int param_3)
