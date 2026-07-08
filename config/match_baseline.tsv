@@ -175,7 +175,7 @@ BASE/INPUTMGR	?KeyboardMessageHandler@@YIHPAXIIJ@Z	0.7692	845586c84abc
 BASE/INPUTMGR	?Main@inputManager@@UAEHAAUtag_message@@@Z	100.0000	67af33cf7aae
 BASE/INPUTMGR	?MakeScanCodeTable@inputManager@@QAEXXZ	1.0101	d0f31f566a60
 BASE/INPUTMGR	?MouseMessageHandler@@YIHPAXIIJ@Z	0.8263	88ec63f33c7c
-BASE/INPUTMGR	?Open@inputManager@@UAEHH@Z	5.2632	0e654d241d6c
+BASE/INPUTMGR	?Open@inputManager@@UAEHH@Z	100.0000	7e895b8bcf01
 BASE/INPUTMGR	?PeekEvent@inputManager@@QAE?AUtag_message@@XZ	100.0000	a501783f4af3
 BASE/INPUTMGR	?SetKeyCodeType@inputManager@@QAEXH@Z	100.0000	6342f2fae2a5
 BASE/INPUTMGR	?SetMouseCoords@inputManager@@QAEXHH@Z	100.0000	d6158d77293b
