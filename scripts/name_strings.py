@@ -52,7 +52,6 @@ def main():
     for i,ln in enumerate(body):
         f=ln.split(",")
         if len(f)<5 or f[2]!="_const": continue
-        if not f[1].startswith("const_"): continue  # skip gen_manifest CONST_ALIASES (real globals inside a struct, e.g. gCdMusic in gConfig) — don't re-label them as strings
         rva=int(f[0],16); s=read_str(d,secs,rva)
         if s is None: continue
         const_rows.append((i,rva,s)); uniq.setdefault(bytes(s),None)
