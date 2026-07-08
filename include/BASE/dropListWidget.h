@@ -10,12 +10,13 @@ struct tag_message;
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class bitmap;
 class icon;
+class font;
 class dropListWidget : public widget {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base widget = 0x20 bytes at 0x00 via ': public widget'; own fields below)
-    int    field_0x20;  // +0x20
+    font   *field_0x20;  // +0x20  the list font
     icon   *field_0x24;  // +0x24  drop button icon
     short  field_0x28;  // +0x28
     short  field_0x2a;  // +0x2a
@@ -29,7 +30,7 @@ public:
     short  field_0x3a;  // +0x3a
     short  field_0x3c;  // +0x3c
     short  field_0x3e;  // +0x3e
-    int    field_0x40;  // +0x40
+    char   **field_0x40;  // +0x40  item-string array
     short  field_0x44;  // +0x44
     short  field_0x46;  // +0x46
     short  field_0x48;  // +0x48

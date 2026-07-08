@@ -7,6 +7,7 @@
 #include <BASE/dropListWidget.h>
 #include <BASE/bitmap.h>
 #include <BASE/icon.h>
+#include <BASE/font.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
 #include <SOURCE/KB.h>
@@ -32,7 +33,22 @@ VA(0x004dc2e0, 0x350)
 int dropListWidget::Main(struct tag_message &) { return 0; }
 
 VA(0x004dc630, 0xaf)
-void dropListWidget::Draw(void) {}
+void dropListWidget::Draw(void)
+{
+    field_0x24->DrawToBuffer(field_0x6c + field_0x4->field_0x28, field_0x6e + field_0x4->field_0x2c,
+                             field_0x48, 0);
+    field_0x24->DrawToBuffer(field_0x64 + field_0x4->field_0x28, field_0x66 + field_0x4->field_0x2c,
+                             field_0x4a, 0);
+    if (field_0x3c > 0 && field_0x3e >= 0) {
+        int color = 3;
+        if ((field_0x16 & 8) == 0)
+            color = field_0x34;
+        field_0x20->DrawBoundedString(field_0x40[field_0x3e],
+                                      field_0x28 + field_0x4->field_0x28,
+                                      field_0x2a + field_0x4->field_0x2c,
+                                      field_0x2c, field_0x2e, color, field_0x3a);
+    }
+}
 
 VA(0x004dc6e0, 0x378)
 void dropListWidget::DrawDropStuff(void) {}
