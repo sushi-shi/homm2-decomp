@@ -21,7 +21,7 @@ listBoxWidget::listBoxWidget(void) : widget(0, 0, 0, 0, 0, 0)
 {
     m_items = 0;
     m_scrollbar = 0;
-    field_0x32 = 0;
+    m_itemCount = 0;
     m_selectedIndex = -1;
     field_0x36 = -1;
 }
@@ -33,7 +33,7 @@ listBoxWidget::~listBoxWidget()
     gpResourceManager->Dispose(m_icon);
     if (m_scrollbar != 0)
         delete m_scrollbar;
-    for (int i = 0; i < field_0x32; i++)
+    for (int i = 0; i < m_itemCount; i++)
         BaseFree(m_items[i], __FILE__, __LINE__);
     BaseFree(m_items, __FILE__, __LINE__);
     gbSendMouseMoveMessages = 0;
@@ -129,7 +129,7 @@ void listBoxWidget::DeleteItem(int param_1)
     short sVar2, sVar3;
     void **puVar4, **puVar6, **puVar7;
     unsigned int uVar5;
-    sVar2 = field_0x32;
+    sVar2 = m_itemCount;
     if (param_1 < sVar2) {
         if (m_selectedIndex == param_1)
             m_selectedIndex = -1;
@@ -151,12 +151,12 @@ void listBoxWidget::DeleteItem(int param_1)
             puVar4 = static_cast<void **>(BaseAlloc(sVar2 * 4 - 4, __FILE__, __LINE__));
             puVar6 = m_items;
             puVar7 = puVar4;
-            for (uVar5 = (field_0x32 * 4 - 4U) >> 2; uVar5 != 0; uVar5--) {
+            for (uVar5 = (m_itemCount * 4 - 4U) >> 2; uVar5 != 0; uVar5--) {
                 *puVar7 = *puVar6;
                 puVar6 = puVar6 + 1;
                 puVar7 = puVar7 + 1;
             }
-            uVar5 = (field_0x32 - param_1) - 1;
+            uVar5 = (m_itemCount - param_1) - 1;
             if (0 < static_cast<int>(uVar5)) {
                 puVar6 = m_items + param_1 + 1;
                 puVar7 = puVar4 + param_1;
@@ -170,7 +170,7 @@ void listBoxWidget::DeleteItem(int param_1)
                 BaseFree(m_items, __FILE__, __LINE__);
             m_items = puVar4;
         }
-        field_0x32 = field_0x32 - 1;
+        m_itemCount = m_itemCount - 1;
     }
 }
 
@@ -232,24 +232,24 @@ LAB_004db5a2:
                 case 0x38:
                     if (m_id == param_1.field8) {
                         pcVar12 = param_1.text;
-                        puVar5 = static_cast<void **>(BaseAlloc(field_0x32 * 4 + 4, __FILE__, __LINE__));
-                        if (field_0x32 != 0) {
+                        puVar5 = static_cast<void **>(BaseAlloc(m_itemCount * 4 + 4, __FILE__, __LINE__));
+                        if (m_itemCount != 0) {
                             puVar11 = m_items;
                             puVar13 = puVar5;
-                            for (uVar8 = field_0x32 & 0x3fffffff; uVar8 != 0; uVar8--) {
+                            for (uVar8 = m_itemCount & 0x3fffffff; uVar8 != 0; uVar8--) {
                                 *puVar13 = *puVar11;
                                 puVar11 = puVar11 + 1;
                                 puVar13 = puVar13 + 1;
                             }
                         }
-                        puVar5[field_0x32] = BaseAlloc(strlen(pcVar12) + 1, __FILE__, __LINE__);
-                        strcpy(static_cast<char *>(puVar5[field_0x32]), pcVar12);
-                        field_0x32 = field_0x32 + 1;
+                        puVar5[m_itemCount] = BaseAlloc(strlen(pcVar12) + 1, __FILE__, __LINE__);
+                        strcpy(static_cast<char *>(puVar5[m_itemCount]), pcVar12);
+                        m_itemCount = m_itemCount + 1;
                         if (m_items != 0)
                             BaseFree(m_items, __FILE__, __LINE__);
                         sVar3 = field_0x28;
                         m_items = puVar5;
-                        sVar10 = field_0x32;
+                        sVar10 = m_itemCount;
                         if (sVar3 < sVar10) {
                             sVar7 = sVar10 - sVar3;
                             field_0x42 = sVar7;
@@ -268,7 +268,7 @@ LAB_004db5a2:
                 case 0x39:
                     if (m_id == param_1.field8) {
                         pcVar12 = param_1.text;
-                        if (param_1.fieldC < field_0x32) {
+                        if (param_1.fieldC < m_itemCount) {
                             BaseFree(m_items[param_1.fieldC], __FILE__, __LINE__);
                             m_items[param_1.fieldC] = BaseAlloc(strlen(pcVar12) + 1, __FILE__, __LINE__);
                             strcpy(static_cast<char *>(m_items[param_1.fieldC]), pcVar12);
@@ -281,10 +281,10 @@ LAB_004db5a2:
                     break;
                 case 0x3b:
                     if (m_id == param_1.field8) {
-                        sVar3 = field_0x32;
+                        sVar3 = m_itemCount;
                         while (sVar3 != 0) {
                             DeleteItem(0);
-                            sVar3 = field_0x32;
+                            sVar3 = m_itemCount;
                         }
                     }
                 }
@@ -437,7 +437,7 @@ int listBoxWidget::ProcessMouseMessage(tag_message &param_1)
             m_selectedIndex = static_cast<short>(iVar6) + m_topIndex;
         }
     } else if (iVar6 == 8) {
-        if (field_0x32 == 0)
+        if (m_itemCount == 0)
             return 1;
         if (iVar7 < m_listX || iVar5 < iVar8 || field_0x64 + m_listX <= iVar7 ||
             field_0x66 + iVar8 <= iVar5) {
@@ -468,7 +468,7 @@ int listBoxWidget::ProcessMouseMessage(tag_message &param_1)
                 iVar6 = m_topIndex + 1 + (iVar3 - field_0x5a) / field_0x5c;
             else
                 iVar6 = m_topIndex;
-            if (field_0x32 <= iVar6)
+            if (m_itemCount <= iVar6)
                 return 1;
             field_0x8d = 1;
             gbSendMouseMoveMessages = 1;

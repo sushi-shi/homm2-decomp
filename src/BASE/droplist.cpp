@@ -19,7 +19,7 @@ dropListWidget::dropListWidget(void) : widget(0, 0, 0, 0, 0, 0)
 {
     m_items = 0;
     m_savedBackground = 0;
-    field_0x3c = 0;
+    m_itemCount = 0;
     m_selectedIndex = -1;
 }
 
@@ -30,7 +30,7 @@ dropListWidget::~dropListWidget()
     gpResourceManager->Dispose(m_icon);
     if (m_savedBackground != 0)
         delete m_savedBackground;
-    for (int i = 0; i < field_0x3c; i++)
+    for (int i = 0; i < m_itemCount; i++)
         BaseFree(m_items[i], __FILE__, __LINE__);
     BaseFree(m_items, __FILE__, __LINE__);
 }
@@ -102,7 +102,7 @@ void dropListWidget::DeleteItem(int param_1)
     short sVar1;
     char **puVar2, **puVar4, **puVar5;
     unsigned int uVar3;
-    sVar1 = field_0x3c;
+    sVar1 = m_itemCount;
     if (param_1 < sVar1) {
         if (m_selectedIndex == param_1)
             m_selectedIndex = -1;
@@ -114,12 +114,12 @@ void dropListWidget::DeleteItem(int param_1)
             puVar2 = static_cast<char **>(BaseAlloc(sVar1 * 4 - 4, __FILE__, __LINE__));
             puVar4 = m_items;
             puVar5 = puVar2;
-            for (uVar3 = (field_0x3c * 4 - 4U) >> 2; uVar3 != 0; uVar3--) {
+            for (uVar3 = (m_itemCount * 4 - 4U) >> 2; uVar3 != 0; uVar3--) {
                 *puVar5 = *puVar4;
                 puVar4 = puVar4 + 1;
                 puVar5 = puVar5 + 1;
             }
-            uVar3 = (field_0x3c - param_1) - 1;
+            uVar3 = (m_itemCount - param_1) - 1;
             if (0 < static_cast<int>(uVar3)) {
                 puVar4 = m_items + param_1 + 1;
                 puVar5 = puVar2 + param_1;
@@ -133,7 +133,7 @@ void dropListWidget::DeleteItem(int param_1)
                 BaseFree(m_items, __FILE__, __LINE__);
             m_items = puVar2;
         }
-        field_0x3c = field_0x3c - 1;
+        m_itemCount = m_itemCount - 1;
     }
 }
 
@@ -191,19 +191,19 @@ int dropListWidget::Main(tag_message &param_1)
         case 0x38:
             if (m_id == param_1.field8) {
                 pcVar10 = param_1.text;
-                puVar3 = static_cast<char **>(BaseAlloc(field_0x3c * 4 + 4, __FILE__, __LINE__));
-                if (field_0x3c != 0) {
+                puVar3 = static_cast<char **>(BaseAlloc(m_itemCount * 4 + 4, __FILE__, __LINE__));
+                if (m_itemCount != 0) {
                     puVar9 = m_items;
                     puVar11 = puVar3;
-                    for (uVar6 = field_0x3c & 0x3fffffff; uVar6 != 0; uVar6--) {
+                    for (uVar6 = m_itemCount & 0x3fffffff; uVar6 != 0; uVar6--) {
                         *puVar11 = *puVar9;
                         puVar9 = puVar9 + 1;
                         puVar11 = puVar11 + 1;
                     }
                 }
-                puVar3[field_0x3c] = static_cast<char *>(BaseAlloc(strlen(pcVar10) + 1, __FILE__, __LINE__));
-                strcpy(puVar3[field_0x3c], pcVar10);
-                field_0x3c = field_0x3c + 1;
+                puVar3[m_itemCount] = static_cast<char *>(BaseAlloc(strlen(pcVar10) + 1, __FILE__, __LINE__));
+                strcpy(puVar3[m_itemCount], pcVar10);
+                m_itemCount = m_itemCount + 1;
                 if (m_items != 0)
                     BaseFree(m_items, __FILE__, __LINE__);
                 m_items = puVar3;
@@ -212,7 +212,7 @@ int dropListWidget::Main(tag_message &param_1)
         case 0x39:
             if (m_id == param_1.field8) {
                 pcVar10 = param_1.text;
-                if (param_1.fieldC < field_0x3c) {
+                if (param_1.fieldC < m_itemCount) {
                     BaseFree(m_items[param_1.fieldC], __FILE__, __LINE__);
                     m_items[param_1.fieldC] = static_cast<char *>(BaseAlloc(strlen(pcVar10) + 1, __FILE__, __LINE__));
                     strcpy(m_items[param_1.fieldC], pcVar10);
@@ -225,10 +225,10 @@ int dropListWidget::Main(tag_message &param_1)
             break;
         case 0x3b:
             if (m_id == param_1.field8) {
-                sVar5 = field_0x3c;
+                sVar5 = m_itemCount;
                 while (sVar5 != 0) {
                     DeleteItem(0);
-                    sVar5 = field_0x3c;
+                    sVar5 = m_itemCount;
                 }
             }
         }
@@ -243,7 +243,7 @@ void dropListWidget::Draw(void)
                              field_0x48, 0);
     m_icon->DrawToBuffer(field_0x64 + m_owner->m_posX, field_0x66 + m_owner->m_posY,
                              field_0x4a, 0);
-    if (field_0x3c > 0 && m_selectedIndex >= 0) {
+    if (m_itemCount > 0 && m_selectedIndex >= 0) {
         int color = 3;
         if ((m_flags & 8) == 0)
             color = m_normalColor;
@@ -272,7 +272,7 @@ void dropListWidget::DrawDropStuff(void)
     iVar5 = iVar5 + field_0x74;
     if (1 < field_0x32 - 1) {
         do {
-            if (field_0x3c <= m_topIndex + iVar4)
+            if (m_itemCount <= m_topIndex + iVar4)
                 break;
             m_icon->DrawToBuffer(m_owner->m_posX + field_0x82, iVar5, field_0x50, 0);
             iVar1 = m_topIndex + iVar4;
@@ -289,7 +289,7 @@ void dropListWidget::DrawDropStuff(void)
     }
     m_icon->DrawToBuffer(m_owner->m_posX + field_0x82, iVar5, field_0x52, 0);
     iVar4 = m_topIndex + iVar4;
-    if (iVar4 < field_0x3c) {
+    if (iVar4 < m_itemCount) {
         if (m_selectedIndex == iVar4)
             sVar2 = m_selColor;
         else
