@@ -7,6 +7,7 @@
 #include <BASE/bitmap.h>
 #include <BASE/bmap2.h>
 #include <BASE/Misc.h>
+#include <BASE/resourceManager.h>
 #include <BASE/heroWindowManager.h>
 #include <SOURCE/KB.h>
 VA(0x004cffc0, 0x2a)
@@ -28,7 +29,17 @@ bitmap::bitmap(short p1, short p2, short p3) : resource(0, 0, -1, 0)
 }
 
 VA(0x004d00a0, 0x8f)
-bitmap::bitmap(unsigned long int) {}
+bitmap::bitmap(unsigned long id) : resource(0, id, 1, 0)
+{
+    gpResourceManager->PointToFile(id);
+    field_0x10 = gpResourceManager->ReadWord();
+    field_0x12 = gpResourceManager->ReadWord();
+    field_0x14 = gpResourceManager->ReadWord();
+    field_0x16 = static_cast<unsigned char *>(BaseAlloc(field_0x14 * field_0x12, __FILE__, __LINE__));
+    PollSound();
+    gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(field_0x16), field_0x14 * field_0x12);
+    PollSound();
+}
 
 VA(0x004d0130, 0x2c)
 bitmap::~bitmap()
