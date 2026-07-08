@@ -365,7 +365,7 @@ BASE/WINMGR	?UpdateScreenRegion@heroWindowManager@@QAEXHHHH@Z	100.0000	540656621
 BASE/WINMGR	empty_stub	0.0000	
 BASE/bmap2	?BlitBitmap@@YIXPAVbitmap@@HHHH0HH@Z	2.0000	9d7ab0fe5bbc
 BASE/bmap2	?DimBitmapArea@@YIXPAVbitmap@@HHHHH@Z	2.0000	07a572122f32
-BASE/bmap2	?FillBitmapArea@@YIXPAVbitmap@@HHHHH@Z	2.2727	011110ab25dd
+BASE/bmap2	?FillBitmapArea@@YIXPAVbitmap@@HHHHH@Z	95.4545	c9fee5b7b412
 BASE/bmap2	?FillBitmapAreaClip@@YIXPAVbitmap@@HHHHHHHHH@Z	1.1111	0caa2ba514d3
 BASE/droplist	??0dropListWidget@@QAE@XZ	100.0000	36ab848d613b
 BASE/droplist	??1dropListWidget@@UAE@XZ	99.9535	2a86be8a60bf

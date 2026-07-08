@@ -32,6 +32,10 @@ DATA(0x00528d38) extern int const_00128d38;            // 13-byte BSS flag buffe
 DATA(0x0051fec0) extern unsigned int gTileMode;
 DATA(0x0051fec4) extern int gTileRowCtr;
 
+// bmap2.cpp FillBitmapArea file-static fill state (no CodeView symbol):
+DATA(0x005348f0) extern int gFillRow;
+DATA(0x005348f8) extern unsigned char *gFillPtr;
+
 // netwin.cpp netbios per-session status byte array (no CodeView symbol), indexed by session id.
 DATA(0x005173b4) extern char gNetStatus[];
 
