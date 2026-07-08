@@ -119,7 +119,55 @@ void listBoxWidget::Read(void)
 }
 
 VA(0x004db3d0, 0x142)
-void listBoxWidget::DeleteItem(int) {}
+void listBoxWidget::DeleteItem(int param_1)
+{
+    short sVar2, sVar3;
+    void **puVar4, **puVar6, **puVar7;
+    unsigned int uVar5;
+    sVar2 = field_0x32;
+    if (param_1 < sVar2) {
+        if (field_0x34 == param_1)
+            field_0x34 = -1;
+        sVar3 = field_0x40;
+        if (sVar3 == param_1 && field_0x42 <= sVar3)
+            field_0x40 = sVar3 - 1;
+        field_0x42 = field_0x42 - 1;
+        if (field_0x42 < 0)
+            field_0x42 = 0;
+        if (field_0x40 < 0)
+            field_0x40 = 0;
+        if (field_0x42 < field_0x40)
+            field_0x40 = field_0x42;
+        if (sVar2 == 1) {
+            BaseFree(field_0x3c[0], __FILE__, __LINE__);
+            BaseFree(field_0x3c, __FILE__, __LINE__);
+            field_0x3c = 0;
+        } else {
+            puVar4 = static_cast<void **>(BaseAlloc(sVar2 * 4 - 4, __FILE__, __LINE__));
+            puVar6 = field_0x3c;
+            puVar7 = puVar4;
+            for (uVar5 = (field_0x32 * 4 - 4U) >> 2; uVar5 != 0; uVar5--) {
+                *puVar7 = *puVar6;
+                puVar6 = puVar6 + 1;
+                puVar7 = puVar7 + 1;
+            }
+            uVar5 = (field_0x32 - param_1) - 1;
+            if (0 < static_cast<int>(uVar5)) {
+                puVar6 = field_0x3c + param_1 + 1;
+                puVar7 = puVar4 + param_1;
+                for (uVar5 = uVar5 & 0x3fffffff; uVar5 != 0; uVar5--) {
+                    *puVar7 = *puVar6;
+                    puVar6 = puVar6 + 1;
+                    puVar7 = puVar7 + 1;
+                }
+            }
+            if (field_0x3c != 0)
+                BaseFree(field_0x3c, __FILE__, __LINE__);
+            field_0x3c = puVar4;
+        }
+        field_0x32 = field_0x32 - 1;
+    }
+}
 
 VA(0x004db520, 0x368)
 int listBoxWidget::Main(struct tag_message &) { return 0; }
