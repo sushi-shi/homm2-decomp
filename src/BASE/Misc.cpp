@@ -7,6 +7,7 @@
 #include <SOURCE/kbwin.h>
 #include <BASE/heroWindow.h>
 #include <BASE/mouseManager.h>
+#include <_globals_model.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/bitmap.h>
 #include <BASE/bmap2.h>
@@ -249,7 +250,43 @@ void BlitBitmapToScreenNoMouseCheck(class bitmap *bmp, int p2, int p3, int p4, i
 }
 
 VA(0x004c5ee0, 0x18b)
-void BlitBitmapToScreen(class bitmap *, int, int, int, int, int, int) {}
+void BlitBitmapToScreen(class bitmap *param_1, int param_2, int param_3, int param_4, int param_5,
+                        int param_6, int param_7)
+{
+    int local_8;
+    if (gbColorMice == 0) {
+        BlitBitmapToScreenVesa(reinterpret_cast<int>(param_1), param_2, param_3, param_4, param_5,
+                               param_6, param_7);
+        return;
+    }
+    if (gBlitClipX != 0 || (local_8 = param_2, gBlitClipY != 0)) {
+        param_4 = 0x1c0;
+        local_8 = gBlitClipX + 0x10;
+        param_3 = gBlitClipY + 0x10;
+        param_5 = 0x1c0;
+    }
+    gBlitRight = param_4 + param_6 - 1;
+    gBlitBottom = param_5 + param_7 - 1;
+    if (gpMouseManager->IsVis() != 0 && gpMouseManager->field_0x5e <= gBlitRight &&
+        param_6 <= gpMouseManager->field_0x6e && gpMouseManager->field_0x62 <= gBlitBottom &&
+        param_7 <= gpMouseManager->field_0x72) {
+        gpMouseManager->SaveAndDraw();
+        BlitBitmapToScreenVesa(reinterpret_cast<int>(param_1), local_8, param_3, param_4, param_5,
+                               param_6, param_7);
+        if (gBlitRight < gpMouseManager->field_0x6e || gpMouseManager->field_0x5e < param_6 ||
+            gBlitBottom < gpMouseManager->field_0x72 || gpMouseManager->field_0x62 < param_7) {
+            int iVar1 = gpMouseManager->field_0x62;
+            int iVar2 = gpMouseManager->field_0x5e;
+            BlitBitmapToScreenVesa(reinterpret_cast<int>(param_1), iVar2, iVar1,
+                                   gpMouseManager->field_0x6e - iVar2 + 1,
+                                   gpMouseManager->field_0x72 - iVar1 + 1, iVar2, iVar1);
+        }
+        gpMouseManager->RestoreUnderlying();
+        return;
+    }
+    BlitBitmapToScreenVesa(reinterpret_cast<int>(param_1), local_8, param_3, param_4, param_5, param_6,
+                           param_7);
+}
 
 VA(0x004c6070, 0xa6)
 void LogTruncate(void) {}

@@ -31,7 +31,7 @@ BASE/BUTTON	??1button@@UAE@XZ	100.0000	8a3d69d9cecc
 BASE/BUTTON	??_Ebutton@@UAEPAXI@Z	0.0000	
 BASE/BUTTON	?Deselect@button@@QAEFAAUtag_message@@@Z	99.7778	e8ce6d04c130
 BASE/BUTTON	?Draw@button@@UAEXXZ	100.0000	a37ab97966ca
-BASE/BUTTON	?Main@button@@UAEHAAUtag_message@@@Z	62.2677	bef69c1984a3
+BASE/BUTTON	?Main@button@@UAEHAAUtag_message@@@Z	64.1242	bef69c1984a3
 BASE/BUTTON	?Read@button@@QAEXXZ	100.0000	6f9b62d2ea46
 BASE/BUTTON	?Select@button@@QAEFAAUtag_message@@@Z	94.3478	c33cbf4bb5f2
 BASE/Blur	?DoBlur@@YIXPAVbitmap@@0HHHH@Z	64.8966	377869681399
@@ -214,7 +214,7 @@ BASE/Misc	?AiPrint@@YIXPAD@Z	98.1515	1eb753bf87e9
 BASE/Misc	?BaseAlloc@@YIPAXIPADH@Z	1.3514	97fd4270d81d
 BASE/Misc	?BaseFree@@YIXPAXPADH@Z	0.4016	2b9ec52efc7d
 BASE/Misc	?BitmapToScreen@@YIXPAVbitmap@@@Z	100.0000	f09b276e5242
-BASE/Misc	?BlitBitmapToScreen@@YIXPAVbitmap@@HHHHHH@Z	0.7407	2a5c183635b9
+BASE/Misc	?BlitBitmapToScreen@@YIXPAVbitmap@@HHHHHH@Z	86.6445	3d5808d9852f
 BASE/Misc	?BlitBitmapToScreenNoMouseCheck@@YIXPAVbitmap@@HHHHHH@Z	100.0000	7fb876351370
 BASE/Misc	?CreatePCXFile@@YIXPADPAEHH1@Z	0.6757	4210bc117b31
 BASE/Misc	?DataEntryWindowHandler@@YIHAAUtag_message@@@Z	50.8426	38a07a5696c5
@@ -358,7 +358,7 @@ BASE/WINMGR	?Open@heroWindowManager@@UAEHH@Z	94.1364	cd81033cdfb7
 BASE/WINMGR	?RedrawScreen@heroWindowManager@@QAEXXZ	100.0000	d123d235bd7e
 BASE/WINMGR	?ReleaseFizzleSource@heroWindowManager@@QAEXXZ	100.0000	ccbdef6cd22c
 BASE/WINMGR	?RemoveWindow@heroWindowManager@@QAEXPAVheroWindow@@@Z	89.6939	b6f4108fa5d3
-BASE/WINMGR	?SaveFizzleSource@heroWindowManager@@QAEXHHHH@Z	75.1831	f68572df3d4d
+BASE/WINMGR	?SaveFizzleSource@heroWindowManager@@QAEXHHHH@Z	79.8591	f68572df3d4d
 BASE/WINMGR	?ScreenShot@heroWindowManager@@QAEXXZ	100.0000	6a1436975481
 BASE/WINMGR	?UpdateScreen@heroWindowManager@@QAEXXZ	100.0000	4077d1619d5f
 BASE/WINMGR	?UpdateScreenRegion@heroWindowManager@@QAEXHHHH@Z	100.0000	540656621367
@@ -380,9 +380,9 @@ BASE/droplist	?RestoreDropBackground@dropListWidget@@QAEXXZ	100.0000	fdd690daaab
 BASE/droplist	?SaveDropBackground@dropListWidget@@QAEXXZ	100.0000	b3d5c9e1b5dd
 BASE/icon2bc	?IconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAEH@Z	0.0000	fd19c8e59ddc
 BASE/icon2bs	?IconToBitmapScale@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	30.6099	eb1e264b9364
-BASE/icon2by	?IconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	4.2233	f075f38e1d80
+BASE/icon2by	?IconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	6.5558	f075f38e1d80
 BASE/iconf2bc	?FlipIconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAE@Z	0.0000	2dbef4f67793
-BASE/iconf2by	?FlipIconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	11.2493	122ef1a4bd08
+BASE/iconf2by	?FlipIconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	11.5952	122ef1a4bd08
 BASE/listbox	??0listBoxWidget@@QAE@XZ	97.3684	2d787e1f30f9
 BASE/listbox	??1listBoxWidget@@UAE@XZ	98.5909	b3cd962bd994
 BASE/listbox	??_ElistBoxWidget@@UAEPAXI@Z	0.0000	
