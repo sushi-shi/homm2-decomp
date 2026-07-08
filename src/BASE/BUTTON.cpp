@@ -9,7 +9,9 @@
 #include <BASE/icon.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
+#include <SOURCE/kbwin.h>
 #include <SOURCE/KB.h>
+#include <_globals_model.h>
 VA(0x004dd440, 0x34)
 button::button(void) : widget(0, 0, 0, 0, 0, 0)
 {
@@ -77,7 +79,22 @@ VA(0x004dd6d0, 0x595)
 int button::Main(struct tag_message &) { return 0; }
 
 VA(0x004ddc70, 0x96)
-short int button::Select(struct tag_message &) { return 0; }
+short button::Select(struct tag_message &msg)
+{
+    short x = field_0x4->field_0x28 + field_0x18;
+    short y = field_0x1a + field_0x4->field_0x2c;
+    field_0x20->DrawToBuffer(x, y, field_0x26, 0);
+    gpWindowManager->UpdateScreenRegion(x, y, field_0x1c, field_0x1e);
+    field_0x16 |= 1;
+    msg.type = 0x200;
+    msg.field8 = field_0x10;
+    msg.field4 = 10;
+    if (field_0x28 != 1)
+        msg.field4 = 0xc;
+    gButtonRepeatTime = KBTickCount() + 0x3c;
+    iLeftRightSave = msg.fieldC & 0x300;
+    return 2;
+}
 
 VA(0x004ddd10, 0x83)
 short button::Deselect(struct tag_message &msg)
