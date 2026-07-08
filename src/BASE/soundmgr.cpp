@@ -13,6 +13,7 @@
 #include <BASE/mss.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <windows.h>
 #include <BASE/Misc.h>
 VA(0x004cb630, 0x68)
@@ -27,7 +28,25 @@ void HandleMCIError(int param_1, char *param_2)
 }
 
 VA(0x004cb6a0, 0xc7)
-void soundManager::ValidatePreviousPosition(int) {}
+void soundManager::ValidatePreviousPosition(int param_1)
+{
+    unsigned int local_18[5];
+    int local_20;
+    if (param_1 < 0 || 0x3b < param_1)
+        local_20 = 0;
+    else
+        local_20 = 1;
+    ProcessAssert(local_20, __FILE__, __LINE__);
+    if (CDPreviousPosition[param_1][0] != 0) {
+        strcpy(reinterpret_cast<char *>(local_18), CDPreviousPosition[param_1]);
+        char *pcVar1 = FindToken(reinterpret_cast<char *>(local_18), ':');
+        if (pcVar1 != 0)
+            *pcVar1 = 0;
+        int iVar2 = atoi(reinterpret_cast<char *>(local_18));
+        if (iVar2 != param_1)
+            CDPreviousPosition[param_1][0] = 0;
+    }
+}
 
 VA(0x004cb770, 0x13c)
 void soundManager::CDStop(void)
