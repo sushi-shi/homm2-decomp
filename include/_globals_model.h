@@ -22,7 +22,7 @@ DATA(0x00533b40) extern POINT gMouseScreenPt;    // GetCursorPos scratch (mouseM
 DATA(0x00533b48) extern POINT gMouseCheckPt;     // GetCursorPos scratch (mouseManager::CheckUpdateMousePos/ShowColorPointer)
 DATA(0x0051ef24) extern char gDefaultCursorName[]; // default cursor resource name (mouseManager::SetColorMice)
 DATA(0x0053496c) extern unsigned int gFadeSavedUpdate; // saved update flag across a fade (heroWindowManager::FadeScreen)
-DATA(0x00528dca) extern char gCdMusic; // CD-vs-MIDI music mode (soundManager::MusicPlaying)
+DATA(0x00528dca) extern int gCdMusic; // CD-vs-MIDI music mode (dword-accessed) (soundManager::MusicPlaying)
 DATA(0x00528d28) extern int gMidiEnabled; // MIDI music volume 0-10 (0=off) (soundManager::MIDIIsPlaying/ConvertVolume)
 DATA(0x00528d2c) extern int gSampleVolume; // sample/CD music volume 0-10 (soundManager::ConvertVolume)
 DATA(0x00534970) extern WAVEFORMATEX gWaveFormat; // digital-driver PCM format (WAVE_init_driver)
