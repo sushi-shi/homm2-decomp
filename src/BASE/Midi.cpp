@@ -5,6 +5,9 @@
 
 #include <va.h>
 #include <BASE/soundManager.h>
+#include <BASE/mss.h>
+#include <SOURCE/KB.h>
+#include <_globals_model.h>
 VA(0x004d3850, 0xb8)
 void soundManager::MIDIStartup(void) {}
 
@@ -18,7 +21,14 @@ VA(0x004d3e70, 0x108)
 void soundManager::MIDIStop(void) {}
 
 VA(0x004d3f80, 0x46)
-int soundManager::MIDIIsPlaying(void) { return 0; }
+int soundManager::MIDIIsPlaying(void)
+{
+    if (gbNoSound == 0 && gMidiEnabled != 0 && field_0x69e != 0 &&
+        CurrentMidiFile != -1 && hSequence[CurrentMidiFile] != 0) {
+        return _AIL_sequence_status_4(hSequence[CurrentMidiFile]) == 4;
+    }
+    return 0;
+}
 
 VA(0x004d3fd0, 0x68)
 void soundManager::MIDISetVolume(void) {}

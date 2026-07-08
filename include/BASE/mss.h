@@ -5,4 +5,6 @@
 // here like the Win32 imports so the sound-manager TU can link. Extend as more
 // AIL_* calls are recovered from the soundManager methods.
 extern "C" void _AIL_serve_0(void);
+struct _SEQUENCE;
+extern "C" int _AIL_sequence_status_4(struct _SEQUENCE *);
 #endif // HOMM2_BASE_MSS_H
