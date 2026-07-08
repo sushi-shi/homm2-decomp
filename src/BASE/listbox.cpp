@@ -8,8 +8,11 @@
 #include <BASE/resourceManager.h>
 #include <BASE/icon.h>
 #include <BASE/font.h>
+#include <BASE/heroWindow.h>
+#include <BASE/widget.h>
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
+#include <string.h>
 #include <SOURCE/X_GLOBAL.h>
 VA(0x004db060, 0x42)
 listBoxWidget::listBoxWidget(void) : widget(0, 0, 0, 0, 0, 0)
@@ -170,7 +173,129 @@ void listBoxWidget::DeleteItem(int param_1)
 }
 
 VA(0x004db520, 0x368)
-int listBoxWidget::Main(struct tag_message &) { return 0; }
+int listBoxWidget::Main(tag_message &param_1)
+{
+    unsigned short uVar2;
+    short sVar3, sVar7, sVar10;
+    int iVar4;
+    unsigned int uVar8;
+    void **puVar5, **puVar11, **puVar13;
+    char *pcVar12;
+    uVar2 = field_0x16;
+    if ((uVar2 & 2) == 0) {
+        if (param_1.type == 0x200)
+            return widget::Main(param_1);
+        return 0;
+    }
+    iVar4 = param_1.type;
+    if (iVar4 < 9) {
+        if (iVar4 == 8) {
+LAB_004db5a2:
+            if ((uVar2 & 4) != 0) {
+                sVar3 = static_cast<short>(param_1.field4) - field_0x4->field_0x28;
+                sVar10 = static_cast<short>(param_1.field8) - field_0x4->field_0x2c;
+                if (field_0x18 <= sVar3 && field_0x1a <= sVar10 && sVar3 < field_0x1c + field_0x18 &&
+                    sVar10 < field_0x1e + field_0x1a) {
+                    if (iVar4 == 0x20) {
+                        param_1.field4 = 0xe;
+                        param_1.type = 0x200;
+                        param_1.field8 = field_0x10;
+                        param_1.fieldC = 0x200;
+                        return 2;
+                    }
+                    return ProcessMouseMessage(param_1);
+                }
+                return 0;
+            }
+            goto switchD_default;
+        }
+        if (iVar4 != 4)
+            goto switchD_default;
+    } else if (iVar4 != 0x10) {
+        if (iVar4 != 0x20) {
+            if (iVar4 == 0x200) {
+                switch (param_1.field4) {
+                case 0x36:
+                    if (field_0x10 == param_1.field8) {
+                        field_0x34 = static_cast<short>(reinterpret_cast<int>(param_1.text));
+                        return 1;
+                    }
+                    break;
+                case 0x37:
+                    if (field_0x10 == param_1.field8) {
+                        param_1.text = reinterpret_cast<char *>(static_cast<int>(field_0x34));
+                        return 1;
+                    }
+                    break;
+                case 0x38:
+                    if (field_0x10 == param_1.field8) {
+                        pcVar12 = param_1.text;
+                        puVar5 = static_cast<void **>(BaseAlloc(field_0x32 * 4 + 4, __FILE__, __LINE__));
+                        if (field_0x32 != 0) {
+                            puVar11 = field_0x3c;
+                            puVar13 = puVar5;
+                            for (uVar8 = field_0x32 & 0x3fffffff; uVar8 != 0; uVar8--) {
+                                *puVar13 = *puVar11;
+                                puVar11 = puVar11 + 1;
+                                puVar13 = puVar13 + 1;
+                            }
+                        }
+                        puVar5[field_0x32] = BaseAlloc(strlen(pcVar12) + 1, __FILE__, __LINE__);
+                        strcpy(static_cast<char *>(puVar5[field_0x32]), pcVar12);
+                        field_0x32 = field_0x32 + 1;
+                        if (field_0x3c != 0)
+                            BaseFree(field_0x3c, __FILE__, __LINE__);
+                        sVar3 = field_0x28;
+                        field_0x3c = puVar5;
+                        sVar10 = field_0x32;
+                        if (sVar3 < sVar10) {
+                            sVar7 = sVar10 - sVar3;
+                            field_0x42 = sVar7;
+                            field_0x40 = field_0x34;
+                            if (field_0x34 < 0)
+                                field_0x40 = 0;
+                            if (sVar7 < field_0x40)
+                                field_0x40 = sVar7;
+                        }
+                        if (field_0x42 < 1)
+                            field_0x2a = sVar10;
+                        else
+                            field_0x2a = sVar3;
+                    }
+                    break;
+                case 0x39:
+                    if (field_0x10 == param_1.field8) {
+                        pcVar12 = param_1.text;
+                        if (param_1.fieldC < field_0x32) {
+                            BaseFree(field_0x3c[param_1.fieldC], __FILE__, __LINE__);
+                            field_0x3c[param_1.fieldC] = BaseAlloc(strlen(pcVar12) + 1, __FILE__, __LINE__);
+                            strcpy(static_cast<char *>(field_0x3c[param_1.fieldC]), pcVar12);
+                        }
+                    }
+                    break;
+                case 0x3a:
+                    if (field_0x10 == param_1.field8)
+                        DeleteItem(param_1.fieldC);
+                    break;
+                case 0x3b:
+                    if (field_0x10 == param_1.field8) {
+                        sVar3 = field_0x32;
+                        while (sVar3 != 0) {
+                            DeleteItem(0);
+                            sVar3 = field_0x32;
+                        }
+                    }
+                }
+            }
+            goto switchD_default;
+        }
+        goto LAB_004db5a2;
+    }
+    if ((uVar2 & 4) != 0)
+        return ProcessMouseMessage(param_1);
+switchD_default:
+    return widget::Main(param_1);
+}
 
 VA(0x004db890, 0x8)
 void listBoxWidget::Draw(void)
