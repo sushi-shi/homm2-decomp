@@ -22,7 +22,7 @@ listBoxWidget::listBoxWidget(void) : widget(0, 0, 0, 0, 0, 0)
     m_items = 0;
     m_scrollbar = 0;
     field_0x32 = 0;
-    field_0x34 = -1;
+    m_selectedIndex = -1;
     field_0x36 = -1;
 }
 
@@ -87,8 +87,8 @@ void listBoxWidget::Read(void)
     field_0x5c = sVar8;
     sVar7 = *reinterpret_cast<short *>(*piVar9 + 0x20);
     field_0x5e = sVar7;
-    field_0x60 = m_x;
-    field_0x62 = m_y;
+    m_listX = m_x;
+    m_listY = m_y;
     field_0x64 = *reinterpret_cast<short *>(*piVar9 + 4);
     field_0x66 = (field_0x28 - 2) * sVar8 + sVar4 + sVar7;
     iVar2 = *piVar9;
@@ -114,7 +114,7 @@ void listBoxWidget::Read(void)
     field_0x8b = 0;
     field_0x8d = 0;
     field_0x8c = 0;
-    field_0x40 = 0;
+    m_topIndex = 0;
     field_0x42 = 0;
     field_0x2a = 0;
     field_0x72 = sVar8;
@@ -131,18 +131,18 @@ void listBoxWidget::DeleteItem(int param_1)
     unsigned int uVar5;
     sVar2 = field_0x32;
     if (param_1 < sVar2) {
-        if (field_0x34 == param_1)
-            field_0x34 = -1;
-        sVar3 = field_0x40;
+        if (m_selectedIndex == param_1)
+            m_selectedIndex = -1;
+        sVar3 = m_topIndex;
         if (sVar3 == param_1 && field_0x42 <= sVar3)
-            field_0x40 = sVar3 - 1;
+            m_topIndex = sVar3 - 1;
         field_0x42 = field_0x42 - 1;
         if (field_0x42 < 0)
             field_0x42 = 0;
-        if (field_0x40 < 0)
-            field_0x40 = 0;
-        if (field_0x42 < field_0x40)
-            field_0x40 = field_0x42;
+        if (m_topIndex < 0)
+            m_topIndex = 0;
+        if (field_0x42 < m_topIndex)
+            m_topIndex = field_0x42;
         if (sVar2 == 1) {
             BaseFree(m_items[0], __FILE__, __LINE__);
             BaseFree(m_items, __FILE__, __LINE__);
@@ -219,13 +219,13 @@ LAB_004db5a2:
                 switch (param_1.field4) {
                 case 0x36:
                     if (m_id == param_1.field8) {
-                        field_0x34 = static_cast<short>(reinterpret_cast<int>(param_1.text));
+                        m_selectedIndex = static_cast<short>(reinterpret_cast<int>(param_1.text));
                         return 1;
                     }
                     break;
                 case 0x37:
                     if (m_id == param_1.field8) {
-                        param_1.text = reinterpret_cast<char *>(static_cast<int>(field_0x34));
+                        param_1.text = reinterpret_cast<char *>(static_cast<int>(m_selectedIndex));
                         return 1;
                     }
                     break;
@@ -253,11 +253,11 @@ LAB_004db5a2:
                         if (sVar3 < sVar10) {
                             sVar7 = sVar10 - sVar3;
                             field_0x42 = sVar7;
-                            field_0x40 = field_0x34;
-                            if (field_0x34 < 0)
-                                field_0x40 = 0;
-                            if (sVar7 < field_0x40)
-                                field_0x40 = sVar7;
+                            m_topIndex = m_selectedIndex;
+                            if (m_selectedIndex < 0)
+                                m_topIndex = 0;
+                            if (sVar7 < m_topIndex)
+                                m_topIndex = sVar7;
                         }
                         if (field_0x42 < 1)
                             field_0x2a = sVar10;
@@ -310,19 +310,19 @@ void listBoxWidget::DrawLBStuff(int param_1)
 {
     short sVar1, sVar4;
     int iVar2, iVar3, iVar5;
-    iVar2 = field_0x60 + m_owner->m_posX;
-    iVar5 = field_0x62 + m_owner->m_posY;
+    iVar2 = m_listX + m_owner->m_posX;
+    iVar5 = m_listY + m_owner->m_posY;
     iVar3 = 0;
     if (0 < field_0x28) {
         do {
             if (iVar3 == 0) {
                 m_icon->DrawToBuffer(iVar2, iVar5, field_0x44, 0);
                 if (0 < field_0x2a) {
-                    if (field_0x34 == field_0x40)
+                    if (m_selectedIndex == m_topIndex)
                         sVar4 = field_0x2e;
                     else
                         sVar4 = field_0x2c;
-                    m_font->DrawBoundedString(static_cast<char *>(m_items[field_0x40]),
+                    m_font->DrawBoundedString(static_cast<char *>(m_items[m_topIndex]),
                                                   iVar2 + 5, iVar5 + 4, field_0x64 - 10,
                                                   m_font->m_height + 1, sVar4, field_0x30);
                 }
@@ -333,12 +333,12 @@ LAB_004dba0b:
                 if (field_0x28 - iVar3 != 1) {
                     m_icon->DrawToBuffer(iVar2, iVar5, field_0x46, 0);
                     if (iVar3 < field_0x2a) {
-                        if (field_0x34 == field_0x40 + iVar3)
+                        if (m_selectedIndex == m_topIndex + iVar3)
                             sVar4 = field_0x2e;
                         else
                             sVar4 = field_0x2c;
                         m_font->DrawBoundedString(
-                            static_cast<char *>(m_items[field_0x40 + iVar3]), iVar2 + 5, iVar5 + 2,
+                            static_cast<char *>(m_items[m_topIndex + iVar3]), iVar2 + 5, iVar5 + 2,
                             field_0x64 - 10, m_font->m_height + 1, sVar4, field_0x30);
                     }
                     sVar4 = field_0x5c;
@@ -346,11 +346,11 @@ LAB_004dba0b:
                 }
                 m_icon->DrawToBuffer(iVar2, iVar5, field_0x48, 0);
                 if (iVar3 < field_0x2a) {
-                    if (field_0x34 == field_0x40 + iVar3)
+                    if (m_selectedIndex == m_topIndex + iVar3)
                         sVar4 = field_0x2e;
                     else
                         sVar4 = field_0x2c;
-                    m_font->DrawBoundedString(static_cast<char *>(m_items[field_0x40 + iVar3]),
+                    m_font->DrawBoundedString(static_cast<char *>(m_items[m_topIndex + iVar3]),
                                                   iVar2 + 5, iVar5 + 2, field_0x64 - 10,
                                                   m_font->m_height + 1, sVar4, field_0x30);
                 }
@@ -390,7 +390,7 @@ LAB_004dba0b:
     if (field_0x42 < 1)
         sVar1 = field_0x88 / 2;
     else
-        sVar1 = static_cast<short>((field_0x40 * field_0x88) / field_0x42);
+        sVar1 = static_cast<short>((m_topIndex * field_0x88) / field_0x42);
     sVar1 = static_cast<short>(m_owner->m_posY) + field_0x72 + 3 + sVar1;
     field_0x82 = sVar1;
     m_icon->DrawToBuffer(sVar4, sVar1, field_0x58, 0);
@@ -408,7 +408,7 @@ int listBoxWidget::ProcessMouseMessage(tag_message &param_1)
     iVar6 = param_1.type;
     iVar7 = param_1.field10 - m_owner->m_posX;
     iVar5 = param_1.field14 - m_owner->m_posY;
-    iVar8 = field_0x62;
+    iVar8 = m_listY;
     iVar3 = iVar5 - iVar8;
     if (iVar6 == 4) {
         if (field_0x8d == 0) {
@@ -420,9 +420,9 @@ int listBoxWidget::ProcessMouseMessage(tag_message &param_1)
                 iVar6 = 0;
             if (iVar3 < iVar6)
                 iVar6 = iVar3;
-            if (field_0x40 == iVar6)
+            if (m_topIndex == iVar6)
                 return 1;
-            field_0x40 = static_cast<short>(iVar6);
+            m_topIndex = static_cast<short>(iVar6);
         } else {
             if (field_0x5a < iVar3)
                 iVar6 = (iVar3 - field_0x5a) / field_0x5c + 1;
@@ -432,18 +432,18 @@ int listBoxWidget::ProcessMouseMessage(tag_message &param_1)
                 iVar6 = 0;
             if (field_0x2a <= iVar6)
                 iVar6 = field_0x2a - 1;
-            if (field_0x40 + iVar6 == field_0x34)
+            if (m_topIndex + iVar6 == m_selectedIndex)
                 return 1;
-            field_0x34 = static_cast<short>(iVar6) + field_0x40;
+            m_selectedIndex = static_cast<short>(iVar6) + m_topIndex;
         }
     } else if (iVar6 == 8) {
         if (field_0x32 == 0)
             return 1;
-        if (iVar7 < field_0x60 || iVar5 < iVar8 || field_0x64 + field_0x60 <= iVar7 ||
+        if (iVar7 < m_listX || iVar5 < iVar8 || field_0x64 + m_listX <= iVar7 ||
             field_0x66 + iVar8 <= iVar5) {
             if (iVar5 < field_0x6a + field_0x6e) {
-                if (0 < field_0x40)
-                    field_0x40 = field_0x40 - 1;
+                if (0 < m_topIndex)
+                    m_topIndex = m_topIndex - 1;
                 field_0x8a = 1;
             } else if (iVar5 < field_0x7a) {
                 if (field_0x82 <= iVar5 && iVar5 < field_0x86 + field_0x82) {
@@ -453,30 +453,30 @@ int listBoxWidget::ProcessMouseMessage(tag_message &param_1)
                 sVar1 = field_0x42;
                 sVar2 = static_cast<short>(((((iVar5 - field_0x86 / 2) - field_0x72) - 4) * (sVar1 + 1)) /
                                            field_0x88);
-                field_0x40 = sVar2;
+                m_topIndex = sVar2;
                 if (sVar2 < 0)
-                    field_0x40 = 0;
-                if (sVar1 < field_0x40)
-                    field_0x40 = sVar1;
+                    m_topIndex = 0;
+                if (sVar1 < m_topIndex)
+                    m_topIndex = sVar1;
             } else {
-                if (field_0x40 < field_0x42)
-                    field_0x40 = field_0x40 + 1;
+                if (m_topIndex < field_0x42)
+                    m_topIndex = m_topIndex + 1;
                 field_0x8b = 1;
             }
         } else {
             if (field_0x5a < iVar3)
-                iVar6 = field_0x40 + 1 + (iVar3 - field_0x5a) / field_0x5c;
+                iVar6 = m_topIndex + 1 + (iVar3 - field_0x5a) / field_0x5c;
             else
-                iVar6 = field_0x40;
+                iVar6 = m_topIndex;
             if (field_0x32 <= iVar6)
                 return 1;
             field_0x8d = 1;
             gbSendMouseMoveMessages = 1;
-            if (field_0x34 == iVar6) {
+            if (m_selectedIndex == iVar6) {
                 gbSendMouseMoveMessages = 1;
                 return 1;
             }
-            field_0x34 = static_cast<short>(iVar6);
+            m_selectedIndex = static_cast<short>(iVar6);
         }
     } else {
         if (iVar6 != 0x10)
@@ -488,13 +488,13 @@ int listBoxWidget::ProcessMouseMessage(tag_message &param_1)
                 param_1.field4 = 0xc;
                 param_1.type = 0x200;
                 param_1.field8 = m_id;
-                sVar1 = field_0x34;
+                sVar1 = m_selectedIndex;
                 param_1.fieldC = 1;
                 param_1.text = reinterpret_cast<char *>(static_cast<int>(sVar1));
-                if (field_0x36 == field_0x34 &&
+                if (field_0x36 == m_selectedIndex &&
                     (iVar6 = field_0x38, lVar4 = KBTickCount(), lVar4 < iVar6 + 400))
                     param_1.fieldC = 2;
-                field_0x36 = field_0x34;
+                field_0x36 = m_selectedIndex;
                 field_0x38 = KBTickCount();
                 return 2;
             }

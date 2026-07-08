@@ -25,11 +25,11 @@ public:
     short  field_0x2e;  // +0x2e
     short  field_0x30;  // +0x30
     short  field_0x32;  // +0x32
-    short  field_0x34;  // +0x34
+    short  m_selectedIndex;  // +0x34
     short  field_0x36;  // +0x36
     int    field_0x38;  // +0x38
     void   **m_items;  // +0x3c  item-string array
-    short  field_0x40;  // +0x40
+    short  m_topIndex;  // +0x40
     short  field_0x42;  // +0x42
     short  field_0x44;  // +0x44
     short  field_0x46;  // +0x46
@@ -45,8 +45,8 @@ public:
     short  field_0x5a;  // +0x5a
     short  field_0x5c;  // +0x5c
     short  field_0x5e;  // +0x5e
-    short  field_0x60;  // +0x60
-    short  field_0x62;  // +0x62
+    short  m_listX;  // +0x60
+    short  m_listY;  // +0x62
     short  field_0x64;  // +0x64
     short  field_0x66;  // +0x66
     short  field_0x68;  // +0x68
