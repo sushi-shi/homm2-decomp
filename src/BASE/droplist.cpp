@@ -20,7 +20,7 @@ dropListWidget::dropListWidget(void) : widget(0, 0, 0, 0, 0, 0)
     m_items = 0;
     m_savedBackground = 0;
     field_0x3c = 0;
-    field_0x3e = -1;
+    m_selectedIndex = -1;
 }
 
 VA(0x004dbf60, 0x7c)
@@ -104,8 +104,8 @@ void dropListWidget::DeleteItem(int param_1)
     unsigned int uVar3;
     sVar1 = field_0x3c;
     if (param_1 < sVar1) {
-        if (field_0x3e == param_1)
-            field_0x3e = -1;
+        if (m_selectedIndex == param_1)
+            m_selectedIndex = -1;
         if (sVar1 == 1) {
             BaseFree(m_items[0], __FILE__, __LINE__);
             BaseFree(m_items, __FILE__, __LINE__);
@@ -178,13 +178,13 @@ int dropListWidget::Main(tag_message &param_1)
         switch (param_1.field4) {
         case 0x36:
             if (m_id == param_1.field8) {
-                field_0x3e = static_cast<short>(reinterpret_cast<int>(param_1.text));
+                m_selectedIndex = static_cast<short>(reinterpret_cast<int>(param_1.text));
                 return 1;
             }
             break;
         case 0x37:
             if (m_id == param_1.field8) {
-                param_1.text = reinterpret_cast<char *>(static_cast<int>(field_0x3e));
+                param_1.text = reinterpret_cast<char *>(static_cast<int>(m_selectedIndex));
                 return 1;
             }
             break;
@@ -243,11 +243,11 @@ void dropListWidget::Draw(void)
                              field_0x48, 0);
     m_icon->DrawToBuffer(field_0x64 + m_owner->m_posX, field_0x66 + m_owner->m_posY,
                              field_0x4a, 0);
-    if (field_0x3c > 0 && field_0x3e >= 0) {
+    if (field_0x3c > 0 && m_selectedIndex >= 0) {
         int color = 3;
         if ((m_flags & 8) == 0)
             color = field_0x34;
-        m_font->DrawBoundedString(m_items[field_0x3e],
+        m_font->DrawBoundedString(m_items[m_selectedIndex],
                                       m_contentX + m_owner->m_posX,
                                       m_contentY + m_owner->m_posY,
                                       field_0x2c, field_0x2e, color, field_0x3a);
@@ -261,22 +261,22 @@ void dropListWidget::DrawDropStuff(void)
     short sVar2, sVar3;
     iVar5 = field_0x84 + m_owner->m_posY;
     m_icon->DrawToBuffer(m_owner->m_posX + field_0x82, iVar5, field_0x4e, 0);
-    if (field_0x3e == field_0x44)
+    if (m_selectedIndex == m_topIndex)
         sVar2 = field_0x36;
     else
         sVar2 = field_0x34;
     iVar4 = 1;
-    m_font->DrawBoundedString(m_items[field_0x44], m_owner->m_posX + field_0x82 + 5,
+    m_font->DrawBoundedString(m_items[m_topIndex], m_owner->m_posX + field_0x82 + 5,
                                   iVar5 + 4, field_0x86 - 10, m_font->m_height + 1, sVar2,
                                   field_0x3a);
     iVar5 = iVar5 + field_0x74;
     if (1 < field_0x32 - 1) {
         do {
-            if (field_0x3c <= field_0x44 + iVar4)
+            if (field_0x3c <= m_topIndex + iVar4)
                 break;
             m_icon->DrawToBuffer(m_owner->m_posX + field_0x82, iVar5, field_0x50, 0);
-            iVar1 = field_0x44 + iVar4;
-            if (field_0x3e == iVar1)
+            iVar1 = m_topIndex + iVar4;
+            if (m_selectedIndex == iVar1)
                 sVar2 = field_0x36;
             else
                 sVar2 = field_0x34;
@@ -288,9 +288,9 @@ void dropListWidget::DrawDropStuff(void)
         } while (iVar4 < field_0x32 - 1);
     }
     m_icon->DrawToBuffer(m_owner->m_posX + field_0x82, iVar5, field_0x52, 0);
-    iVar4 = field_0x44 + iVar4;
+    iVar4 = m_topIndex + iVar4;
     if (iVar4 < field_0x3c) {
-        if (field_0x3e == iVar4)
+        if (m_selectedIndex == iVar4)
             sVar2 = field_0x36;
         else
             sVar2 = field_0x34;
@@ -329,7 +329,7 @@ void dropListWidget::DrawDropStuff(void)
         sVar3 = static_cast<short>(m_owner->m_posX) + 5 + field_0x92;
         field_0xa2 = sVar3;
         sVar2 = static_cast<short>(m_owner->m_posY) +
-                static_cast<short>((field_0xaa * field_0x44) / field_0x46) + 3 + field_0x94;
+                static_cast<short>((field_0xaa * m_topIndex) / field_0x46) + 3 + field_0x94;
         field_0xa4 = sVar2;
         m_icon->DrawToBuffer(sVar3, sVar2, field_0x62, 0);
     }

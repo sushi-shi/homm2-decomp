@@ -29,9 +29,9 @@ public:
     short  field_0x38;  // +0x38
     short  field_0x3a;  // +0x3a
     short  field_0x3c;  // +0x3c
-    short  field_0x3e;  // +0x3e
+    short  m_selectedIndex;  // +0x3e
     char   **m_items;  // +0x40  item-string array
-    short  field_0x44;  // +0x44
+    short  m_topIndex;  // +0x44
     short  field_0x46;  // +0x46
     short  field_0x48;  // +0x48
     short  field_0x4a;  // +0x4a
