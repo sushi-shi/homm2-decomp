@@ -40,6 +40,10 @@ DATA(0x005348e8) extern int gDimRow;
 DATA(0x005348e4) extern int gDimCol;
 DATA(0x005348f4) extern unsigned char *gDimPtr;
 DATA(0x00534900) extern unsigned char *gDimNext;
+// bmap2.cpp BlitBitmap file-static blit state (no CodeView symbol):
+DATA(0x005348ec) extern unsigned char *gBlitSrc;
+DATA(0x005348e0) extern unsigned char *gBlitDst;
+DATA(0x005348fc) extern int gBlitRow;
 
 // netwin.cpp netbios per-session status byte array (no CodeView symbol), indexed by session id.
 DATA(0x005173b4) extern char gNetStatus[];
