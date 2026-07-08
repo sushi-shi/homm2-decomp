@@ -22,7 +22,22 @@
 #include <BASE/palette.h>
 #include <_globals_model.h>
 VA(0x004c7fa0, 0xdb)
-resourceManager::resourceManager(void) {}
+resourceManager::resourceManager(void) : baseManager()
+{
+    int local_8;
+    field_0x32 = 0;
+    field_0x36 = 0;
+    field_0x5a = 0;
+    strcpy(name, "resourceManager");
+    field_0x9e = 0;
+    for (local_8 = 0; local_8 < 2; local_8++) {
+        field_0x42[local_8] = -1;
+        field_0x4a[local_8] = 0;
+        field_0x52[local_8] = 0;
+    }
+    field_0x3a = 0;
+    field_0x3e = 0;
+}
 
 VA(0x004c8080, 0xa2)
 void resourceManager::GetBackdrop(char *, class bitmap *, int) {}
