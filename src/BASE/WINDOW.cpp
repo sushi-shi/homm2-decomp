@@ -27,36 +27,36 @@ VA(0x004ceb70, 0xaa)
 heroWindow::heroWindow(void)
 {
     strcpy(name, "Default Construct");
-    field_0x8 = 0;
-    field_0x4 = field_0x8;
-    field_0x0 = -1;
-    field_0x2c = 0;
-    field_0x28 = field_0x2c;
-    field_0x30 = 640;
-    field_0x34 = 480;
-    field_0x20 = 1;
-    field_0x24 = 0;
-    field_0x3c = 0;
-    field_0x38 = field_0x3c;
-    field_0x40 = 0;
+    prevWindow = 0;
+    nextWindow = prevWindow;
+    zOrder = -1;
+    posY = 0;
+    posX = posY;
+    winWidth = 640;
+    winHeight = 480;
+    winFlags = 1;
+    winState = 0;
+    widgetListHead = 0;
+    widgetListTail = widgetListHead;
+    savedBackground = 0;
 }
 
 VA(0x004cec20, 0xa5)
 heroWindow::heroWindow(int x, int y, int w, int h, int flags)
 {
     strcpy(name, "Dynamic Construct");
-    field_0x8 = 0;
-    field_0x4 = field_0x8;
-    field_0x0 = -1;
-    field_0x28 = x;
-    field_0x2c = y;
-    field_0x30 = w;
-    field_0x34 = h;
-    field_0x20 = flags;
-    field_0x24 = 0;
-    field_0x3c = 0;
-    field_0x38 = field_0x3c;
-    field_0x40 = 0;
+    prevWindow = 0;
+    nextWindow = prevWindow;
+    zOrder = -1;
+    posX = x;
+    posY = y;
+    winWidth = w;
+    winHeight = h;
+    winFlags = flags;
+    winState = 0;
+    widgetListHead = 0;
+    widgetListTail = widgetListHead;
+    savedBackground = 0;
 }
 
 // @early-stop 85% — the widget-factory dispatch is structurally correct, but retail keeps
@@ -72,19 +72,19 @@ heroWindow::heroWindow(int param_1, int param_2, char *param_3)
     strcpy(name, param_3);
     unsigned long uVar3 = gpResourceManager->MakeId(param_3, 1);
     gpResourceManager->PointToFile(uVar3);
-    field_0x40 = 0;
-    field_0x8 = 0;
-    field_0x4 = field_0x8;
-    field_0x24 = 0;
-    field_0x0 = -1;
-    field_0x28 = param_1;
-    field_0x2c = param_2;
-    field_0x30 = gpResourceManager->ReadWord();
-    field_0x34 = gpResourceManager->ReadWord();
-    field_0x20 = gpResourceManager->ReadWord();
-    field_0x20 = field_0x20 | 0x4000;
-    field_0x3c = 0;
-    field_0x38 = field_0x3c;
+    savedBackground = 0;
+    prevWindow = 0;
+    nextWindow = prevWindow;
+    winState = 0;
+    zOrder = -1;
+    posX = param_1;
+    posY = param_2;
+    winWidth = gpResourceManager->ReadWord();
+    winHeight = gpResourceManager->ReadWord();
+    winFlags = gpResourceManager->ReadWord();
+    winFlags = winFlags | 0x4000;
+    widgetListHead = 0;
+    widgetListTail = widgetListHead;
     bVar1 = 0;
     while (!bVar1) {
         PollSound();
@@ -169,13 +169,13 @@ heroWindow::heroWindow(int param_1, int param_2, char *param_3)
 VA(0x004cf200, 0x73)
 int heroWindow::Open(int x, int flags)
 {
-    if (field_0x24 & 1)
+    if (winState & 1)
         return 3;
-    if ((field_0x20 & 2) != 0 && SaveBackground() != 0)
+    if ((winFlags & 2) != 0 && SaveBackground() != 0)
         return 3;
-    field_0x0 = x;
+    zOrder = x;
     DrawWindow(flags);
-    field_0x24 |= 1;
+    winState |= 1;
     return 0;
 }
 
@@ -183,12 +183,12 @@ VA(0x004cf280, 0x90)
 void heroWindow::RemoveAndDeleteWidget(int param_1)
 {
     widget *pwVar1, *local_8;
-    local_8 = field_0x3c;
+    local_8 = widgetListHead;
     while (local_8 != 0) {
         pwVar1 = local_8->field_0x8;
         if (local_8->field_0x10 == param_1) {
             RemoveWidget(local_8);
-            if ((field_0x20 & 0x4000) != 0) {
+            if ((winFlags & 0x4000) != 0) {
                 delete local_8;
             }
         }
@@ -200,24 +200,24 @@ VA(0x004cf310, 0xaa)
 void heroWindow::Close(void)
 {
     widget *w, *next;
-    if ((field_0x20 & 2) != 0 && (field_0x24 & 1) != 0)
+    if ((winFlags & 2) != 0 && (winState & 1) != 0)
         RestoreBackground();
-    w = field_0x3c;
+    w = widgetListHead;
     while (w != 0) {
         next = w->field_0x8;
         RemoveWidget(w);
-        if ((field_0x20 & 0x4000) != 0) {
+        if ((winFlags & 0x4000) != 0) {
             delete w;
         }
         w = next;
     }
-    field_0x24 = 0;
+    winState = 0;
 }
 
 VA(0x004cf3c0, 0x13c)
 void heroWindow::AddWidget(class widget *param_1, int param_2)
 {
-    widget *local_8 = field_0x3c;
+    widget *local_8 = widgetListHead;
     if (param_2 == -1) {
         if (local_8 == 0)
             param_2 = 0;
@@ -230,16 +230,16 @@ void heroWindow::AddWidget(class widget *param_1, int param_2)
         local_8 = local_8->field_0x8;
     }
     if (local_8 == 0) {
-        param_1->field_0xc = field_0x38;
+        param_1->field_0xc = widgetListTail;
         param_1->field_0x8 = 0;
-        field_0x38 = param_1;
-        if (field_0x3c == 0)
-            field_0x3c = param_1;
+        widgetListTail = param_1;
+        if (widgetListHead == 0)
+            widgetListHead = param_1;
     } else if (local_8->field_0xc == 0) {
-        param_1->field_0x8 = field_0x3c;
+        param_1->field_0x8 = widgetListHead;
         param_1->field_0xc = 0;
-        field_0x3c->field_0xc = param_1;
-        field_0x3c = param_1;
+        widgetListHead->field_0xc = param_1;
+        widgetListHead = param_1;
     } else {
         param_1->field_0x8 = local_8;
         param_1->field_0xc = local_8->field_0xc;
@@ -255,23 +255,23 @@ void heroWindow::RemoveWidget(class widget *param_1)
     if (param_1 == 0)
         return;
     param_1->Close();
-    if (field_0x38 == param_1) {
-        field_0x38 = param_1->field_0xc;
-        if (field_0x38 == 0)
-            field_0x3c = 0;
+    if (widgetListTail == param_1) {
+        widgetListTail = param_1->field_0xc;
+        if (widgetListTail == 0)
+            widgetListHead = 0;
         else
-            field_0x38->field_0x8 = 0;
-    } else if (field_0x3c == param_1) {
-        field_0x3c = param_1->field_0x8;
-        field_0x3c->field_0xc = 0;
+            widgetListTail->field_0x8 = 0;
+    } else if (widgetListHead == param_1) {
+        widgetListHead = param_1->field_0x8;
+        widgetListHead->field_0xc = 0;
     } else {
         param_1->field_0x8->field_0xc = param_1->field_0xc;
         param_1->field_0xc->field_0x8 = param_1->field_0x8;
     }
     iVar1 = param_1->field_0x8;
     if (iVar1 == 0) {
-        field_0x3c = 0;
-        field_0x38 = field_0x3c;
+        widgetListHead = 0;
+        widgetListTail = widgetListHead;
     } else {
         iVar1->field_0xc = param_1->field_0xc;
         if (iVar1->field_0xc != 0)
@@ -286,7 +286,7 @@ int heroWindow::BroadcastMessage(struct tag_message &param_1)
     // temp before AND-ing with local_c!=0 (a /Od boolean-codegen shape not reachable from
     // the natural compound condition). Same wall as heroWindowManager::Main.
     int local_8 = 0;
-    widget *local_c = field_0x3c;
+    widget *local_c = widgetListHead;
     while (local_c != 0 && ((local_8 = local_c->Main(param_1)) < 1 || 2 < local_8)) {
         local_c = local_c->field_0x8;
     }
@@ -305,7 +305,7 @@ void heroWindow::DrawWindow(int param_1, int param_2, int param_3)
     tag_message local_24;
     widget *local_8;
     gpMouseManager->field_0x82 = 0;
-    local_8 = field_0x38;
+    local_8 = widgetListTail;
     local_24.type = 0x200;
     local_24.field4 = 2;
     // @early-stop 91% — retail duplicates this Main() call across the two guards
@@ -321,8 +321,8 @@ void heroWindow::DrawWindow(int param_1, int param_2, int param_3)
         local_8 = local_8->field_0xc;
     }
     PollSound();
-    if (param_1 != 0 && (field_0x20 & 0x7fff) != 1) {
-        gpWindowManager->UpdateScreenRegion(field_0x28, field_0x2c, field_0x30, field_0x34);
+    if (param_1 != 0 && (winFlags & 0x7fff) != 1) {
+        gpWindowManager->UpdateScreenRegion(posX, posY, winWidth, winHeight);
         PollSound();
     }
     gpMouseManager->field_0x82 = 1;
@@ -331,9 +331,9 @@ void heroWindow::DrawWindow(int param_1, int param_2, int param_3)
 VA(0x004cf830, 0x7f)
 int heroWindow::SaveBackground(void)
 {
-    field_0x40 = new bitmap(0x21, field_0x30, field_0x34);
+    savedBackground = new bitmap(0x21, winWidth, winHeight);
     PollSound();
-    field_0x40->GrabScreen(field_0x28, field_0x2c);
+    savedBackground->GrabScreen(posX, posY);
     PollSound();
     return 0;
 }
@@ -342,41 +342,41 @@ VA(0x004cf8b0, 0x97)
 void heroWindow::RestoreBackground(void)
 {
     if (gbDrawWindowBackground) {
-        field_0x40->DrawToBuffer(field_0x28, field_0x2c);
-        gpWindowManager->UpdateScreenRegion(field_0x28, field_0x2c, field_0x30, field_0x34);
+        savedBackground->DrawToBuffer(posX, posY);
+        gpWindowManager->UpdateScreenRegion(posX, posY, winWidth, winHeight);
     }
-    delete field_0x40;
-    field_0x40 = 0;
+    delete savedBackground;
+    savedBackground = 0;
 }
 
 VA(0x004cf950, 0x186)
 void heroWindow::MoveWindow(int dx, int dy)
 {
-    int oldX = field_0x28;
-    int oldY = field_0x2c;
-    int oldW = field_0x30;
-    int oldH = field_0x34;
-    int newX = field_0x28 + dx;
-    int newY = field_0x2c + dy;
+    int oldX = posX;
+    int oldY = posY;
+    int oldW = winWidth;
+    int oldH = winHeight;
+    int newX = posX + dx;
+    int newY = posY + dy;
     if (newX < 0)
         newX = 0;
     if (newY < 0)
         newY = 0;
-    if (640 < field_0x30 + newX)
-        newX = 640 - field_0x30;
-    if (480 < field_0x34 + newY)
-        newY = 480 - field_0x34;
-    field_0x40->DrawToBuffer(field_0x28, field_0x2c);
-    field_0x28 = newX;
-    field_0x2c = newY;
-    field_0x40->GrabBitmap(gpWindowManager->field_0x46, field_0x28, field_0x2c);
+    if (640 < winWidth + newX)
+        newX = 640 - winWidth;
+    if (480 < winHeight + newY)
+        newY = 480 - winHeight;
+    savedBackground->DrawToBuffer(posX, posY);
+    posX = newX;
+    posY = newY;
+    savedBackground->GrabBitmap(gpWindowManager->field_0x46, posX, posY);
     DrawWindow(0);
-    oldW = oldW + abs(field_0x28 - oldX);
-    oldH = oldH + abs(field_0x2c - oldY);
-    if (field_0x28 < oldX)
-        oldX = field_0x28;
-    if (field_0x2c < oldY)
-        oldY = field_0x2c;
+    oldW = oldW + abs(posX - oldX);
+    oldH = oldH + abs(posY - oldY);
+    if (posX < oldX)
+        oldX = posX;
+    if (posY < oldY)
+        oldY = posY;
     gpWindowManager->UpdateScreenRegion(oldX, oldY, oldW, oldH);
 }
 

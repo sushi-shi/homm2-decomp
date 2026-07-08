@@ -90,8 +90,8 @@ int button::Main(tag_message &param_1)
             return 0;
         field_0x16 = field_0x16 & 0xfffe;
         Draw();
-        gpWindowManager->UpdateScreenRegion(field_0x4->field_0x28 + field_0x18,
-                                            field_0x4->field_0x2c + field_0x1a, field_0x1c, field_0x1e);
+        gpWindowManager->UpdateScreenRegion(field_0x4->posX + field_0x18,
+                                            field_0x4->posY + field_0x1a, field_0x1c, field_0x1e);
         param_1.field4 = 0xd;
         param_1.type = 0x200;
         param_1.field8 = field_0x10;
@@ -120,8 +120,8 @@ int button::Main(tag_message &param_1)
                         return 0;
                     field_0x16 = uVar1 & 0xfffe;
                     Draw();
-                    gpWindowManager->UpdateScreenRegion(field_0x4->field_0x28 + field_0x18,
-                                                        field_0x4->field_0x2c + field_0x1a,
+                    gpWindowManager->UpdateScreenRegion(field_0x4->posX + field_0x18,
+                                                        field_0x4->posY + field_0x1a,
                                                         field_0x1c, field_0x1e);
                     param_1.field4 = 0xd;
                     param_1.type = 0x200;
@@ -139,8 +139,8 @@ int button::Main(tag_message &param_1)
             if ((uVar1 & 4) != 0 && (uVar1 & 1) != 0) {
                 field_0x16 = uVar1 & 0xfffe;
                 Draw();
-                gpWindowManager->UpdateScreenRegion(field_0x18 + field_0x4->field_0x28,
-                                                    field_0x1a + field_0x4->field_0x2c, field_0x1c,
+                gpWindowManager->UpdateScreenRegion(field_0x18 + field_0x4->posX,
+                                                    field_0x1a + field_0x4->posY, field_0x1c,
                                                     field_0x1e);
                 param_1.field4 = 0xd;
                 param_1.type = 0x200;
@@ -164,8 +164,8 @@ int button::Main(tag_message &param_1)
         }
     }
     if ((uVar1 & 4) != 0) {
-        sVar7 = static_cast<short>(param_1.field4) - field_0x4->field_0x28;
-        sVar2 = static_cast<short>(param_1.field8) - field_0x4->field_0x2c;
+        sVar7 = static_cast<short>(param_1.field4) - field_0x4->posX;
+        sVar2 = static_cast<short>(param_1.field8) - field_0x4->posY;
         if (iVar4 == 0x20) {
             if (field_0x18 <= sVar7 && field_0x1a <= sVar2 && sVar7 < field_0x1c + field_0x18 &&
                 sVar2 < field_0x1e + field_0x1a) {
@@ -185,15 +185,15 @@ int button::Main(tag_message &param_1)
                 PollSound();
                 gpMouseManager->Main(param_1);
                 if (param_1.type == 4) {
-                    sVar2 = static_cast<short>(param_1.field4) - field_0x4->field_0x28;
-                    sVar7 = static_cast<short>(param_1.field8) - field_0x4->field_0x2c;
+                    sVar2 = static_cast<short>(param_1.field4) - field_0x4->posX;
+                    sVar7 = static_cast<short>(param_1.field8) - field_0x4->posY;
                     if (sVar2 < field_0x18 || sVar7 < field_0x1a ||
                         field_0x1c + field_0x18 <= sVar2 || field_0x1e + field_0x1a <= sVar7) {
                         if ((field_0x16 & 1) != 0) {
                             field_0x16 = field_0x16 & 0xfffe;
                             Draw();
                             gpWindowManager->UpdateScreenRegion(
-                                field_0x4->field_0x28 + field_0x18, field_0x4->field_0x2c + field_0x1a,
+                                field_0x4->posX + field_0x18, field_0x4->posY + field_0x1a,
                                 field_0x1c, field_0x1e);
                             param_1.field4 = 0xd;
                             param_1.type = 0x200;
@@ -212,8 +212,8 @@ int button::Main(tag_message &param_1)
             if ((field_0x16 & 1) != 0) {
                 field_0x16 = field_0x16 & 0xfffe;
                 Draw();
-                gpWindowManager->UpdateScreenRegion(field_0x4->field_0x28 + field_0x18,
-                                                    field_0x4->field_0x2c + field_0x1a, field_0x1c,
+                gpWindowManager->UpdateScreenRegion(field_0x4->posX + field_0x18,
+                                                    field_0x4->posY + field_0x1a, field_0x1c,
                                                     field_0x1e);
                 param_1.field4 = 0xd;
                 param_1.type = 0x200;
@@ -233,8 +233,8 @@ LAB_004dd7d8:
 VA(0x004ddc70, 0x96)
 short button::Select(struct tag_message &msg)
 {
-    short x = field_0x4->field_0x28 + field_0x18;
-    short y = field_0x1a + field_0x4->field_0x2c;
+    short x = field_0x4->posX + field_0x18;
+    short y = field_0x1a + field_0x4->posY;
     field_0x20->DrawToBuffer(x, y, field_0x26, 0);
     gpWindowManager->UpdateScreenRegion(x, y, field_0x1c, field_0x1e);
     field_0x16 |= 1;
@@ -255,8 +255,8 @@ short button::Deselect(struct tag_message &msg)
         return 0;
     field_0x16 &= 0xfffe;
     Draw();
-    gpWindowManager->UpdateScreenRegion(field_0x18 + field_0x4->field_0x28,
-                                        field_0x1a + field_0x4->field_0x2c, field_0x1c, field_0x1e);
+    gpWindowManager->UpdateScreenRegion(field_0x18 + field_0x4->posX,
+                                        field_0x1a + field_0x4->posY, field_0x1c, field_0x1e);
     msg.field4 = 0xd;
     msg.type = 0x200;
     msg.field8 = field_0x10;
@@ -270,11 +270,11 @@ void button::Draw(void)
 {
     heroWindow *win = field_0x4;
     if ((field_0x16 & 1) != 0) {
-        field_0x20->DrawToBuffer(field_0x18 + win->field_0x28, field_0x1a + win->field_0x2c,
+        field_0x20->DrawToBuffer(field_0x18 + win->posX, field_0x1a + win->posY,
                                  field_0x26, 0);
         return;
     }
-    field_0x20->DrawToBuffer(field_0x18 + win->field_0x28, field_0x1a + win->field_0x2c,
+    field_0x20->DrawToBuffer(field_0x18 + win->posX, field_0x1a + win->posY,
                              field_0x24, 0);
 }
 
