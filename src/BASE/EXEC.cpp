@@ -14,6 +14,7 @@
 #include <BASE/heroWindowManager.h>
 #include <BASE/mouseManager.h>
 #include <SOURCE/KB.h>
+#include <SOURCE/kbwin.h>
 #include <SOURCE/X_GLOBAL.h>
 VA(0x004d1610, 0x10)
 executive::executive(void)
@@ -63,7 +64,53 @@ void executive::ShutDownSystem(void)
 }
 
 VA(0x004d1750, 0xfb)
-int executive::DoDialog(class baseManager *) { return 0; }
+int executive::DoDialog(class baseManager *param_1)
+{
+    baseManager *aiStack_f0[20];
+    baseManager *auStack_a0[20];
+    baseManager *aiStack_50[20];
+    executive local_100;
+    int iVar5, iVar3;
+    baseManager *pmVar;
+    iVar5 = 0;
+    local_100.field_0x0 = 0;
+    local_100.field_0x4 = 0;
+    local_100.field_0x8 = 0;
+    local_100.field_0xc = 0;
+    pmVar = field_0x0;
+    if (pmVar != 0) {
+        iVar3 = 0;
+        do {
+            aiStack_f0[iVar3] = pmVar;
+            auStack_a0[iVar3] = pmVar->field_0x8;
+            pmVar = pmVar->field_0x4;
+            aiStack_50[iVar3] = pmVar;
+            iVar3 = iVar3 + 1;
+            iVar5 = iVar5 + 1;
+        } while (pmVar != 0);
+    }
+    if (AddManager(param_1, -1) != 0)
+        ShutDown("Can't add manager!");
+    if (local_100.AddManager(gpMouseManager, -1) != 0)
+        ShutDown("Can't add manager!");
+    if (local_100.AddManager(gpWindowManager, -1) != 0)
+        ShutDown("Can't add manager!");
+    if (local_100.AddManager(param_1, -1) != 0)
+        ShutDown("Can't add manager!");
+    local_100.MainLoop();
+    RemoveManager(param_1);
+    if (0 < iVar5) {
+        iVar3 = 0;
+        do {
+            pmVar = aiStack_f0[iVar3];
+            pmVar->field_0x8 = auStack_a0[iVar3];
+            pmVar->field_0x4 = aiStack_50[iVar3];
+            iVar3 = iVar3 + 1;
+            iVar5 = iVar5 - 1;
+        } while (iVar5 != 0);
+    }
+    return local_100.field_0xc;
+}
 
 VA(0x004d1850, 0x86)
 void executive::PrintManagerList(void)
@@ -172,7 +219,47 @@ void executive::CallManager(class baseManager *mgr)
 }
 
 VA(0x004d1a90, 0xfa)
-void executive::MainLoop(void) {}
+void executive::MainLoop(void)
+{
+    tag_message local_38;
+    int bVar2, bVar3, iVar5;
+    baseManager *phVar1;
+    bVar3 = 0;
+    if (field_0x0 != 0) {
+        gpInputManager->Flush();
+        do {
+            Process1WindowsMessage();
+            local_38 = gpInputManager->GetEvent();
+            bVar2 = 1;
+            field_0x8 = field_0x0;
+            if (field_0x0 == 0)
+                return;
+            while (bVar2) {
+                if (bVar3)
+                    return;
+                phVar1 = field_0x8;
+                if (phVar1->field_0x32 == 1 && (local_38.type != 4 || gpWindowManager != phVar1)) {
+                    iVar5 = phVar1->Main(local_38);
+                    if (iVar5 == 1) {
+                        bVar2 = 0;
+                    } else if (iVar5 == 2 && (local_38.type & 0x4000) != 0) {
+                        if (local_38.field4 == 1) {
+                            bVar3 = 1;
+                        } else if (local_38.field4 == 2) {
+                            RemoveManager(field_0x8);
+                            field_0x8 = 0;
+                        } else if (local_38.field4 == 4) {
+                            field_0xc = reinterpret_cast<int>(local_38.text);
+                            bVar3 = 1;
+                        }
+                    }
+                }
+                if (field_0x8 == 0 || (field_0x8 = field_0x8->field_0x4, field_0x8 == 0))
+                    break;
+            }
+        } while (!bVar3);
+    }
+}
 
 VA(0x004d1b90, 0xa)
 void executive::Terminate(void)
