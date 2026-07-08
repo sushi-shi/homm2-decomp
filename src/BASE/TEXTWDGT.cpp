@@ -5,6 +5,9 @@
 
 #include <va.h>
 #include <BASE/textWidget.h>
+#include <BASE/resourceManager.h>
+#include <BASE/Misc.h>
+#include <SOURCE/KB.h>
 VA(0x004d1060, 0x3e)
 textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, 0)
 {
@@ -22,7 +25,11 @@ VA(0x004d1160, 0xef)
 void textWidget::Read(void) {}
 
 VA(0x004d1250, 0x30)
-textWidget::~textWidget() {}
+textWidget::~textWidget()
+{
+    gpResourceManager->Dispose(field_0x24);
+    BaseFree(field_0x20, __FILE__, __LINE__);
+}
 
 VA(0x004d1280, 0x210)
 int textWidget::Main(struct tag_message &) { return 0; }
@@ -31,7 +38,10 @@ VA(0x004d1490, 0x49)
 void textWidget::Draw(void) {}
 
 VA(0x004d14e0, 0xc)
-void textWidget::SetColorIndex(short int) {}
+void textWidget::SetColorIndex(short int param_1)
+{
+    field_0x28 = param_1;
+}
 
 VA(0x004d14f0, 0xa2)
 void textWidget::SetText(char *) {}
