@@ -4,6 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <string.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/KB.h>
 #include <BASE/inputManager.h>
@@ -31,7 +32,20 @@ inputManager::inputManager(void) : baseManager()
 }
 
 VA(0x004ce230, 0x78)
-int inputManager::Open(int) { return 0; }
+int inputManager::Open(int param_1)
+{
+    memset(field_0x36, 0, sizeof(field_0x36));
+    field_0x73a = 0;
+    field_0x736 = 0;
+    field_0x852 = param_1;
+    field_0x85e = 0;
+    MakeScanCodeTable();
+    field_0xc = 4;
+    field_0x10 = -1;
+    field_0x32 = 1;
+    strcpy(name, "inputManager");
+    return 0;
+}
 
 VA(0x004ce2b0, 0x20)
 void inputManager::Close(void)
