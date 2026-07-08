@@ -71,7 +71,12 @@ VA(0x004cc1c0, 0xdd)
 int soundManager::ConvertVolume(int, int) { return 0; }
 
 VA(0x004cc2a0, 0x5e)
-void __stdcall SetReady2Poll(unsigned long int) {}
+void __stdcall SetReady2Poll(unsigned long int)
+{
+    if (gpSoundManager != 0 &&
+        (gpSoundManager->field_0x57b ^= 1, gpSoundManager->field_0x57b != 0))
+        gpSoundManager->field_0x57a = 1;
+}
 
 VA(0x004cc300, 0x26)
 void __stdcall UpdateTimers(unsigned long int)
