@@ -42,7 +42,55 @@ void InitMemEntry(void)
 }
 
 VA(0x004c3d70, 0x20f)
-void * BaseAlloc(unsigned int, char *, int) { return 0; }
+void *BaseAlloc(unsigned int param_1, char *param_2, int param_3)
+{
+    char local_2bc[200];
+    char local_1f4[500];
+    void *pvVar2;
+    if (param_1 == 0) {
+        pvVar2 = 0;
+    } else {
+        if (gpMemEntry == 0) {
+            LogInt("Memory tracking table allocated, entries", iMemEntries, -999, -999, -999, -999,
+                   -999, -999);
+            gpMemEntry = static_cast<MemEntry *>(malloc(0x24220));
+            for (int i = 0; i < 2000; i++)
+                gpMemEntry[i].used = 0;
+        }
+        giTotalMemAllocated = giTotalMemAllocated + param_1;
+        pvVar2 = malloc(param_1);
+        if (pvVar2 == 0) {
+            MemError();
+            pvVar2 = 0;
+        } else {
+            iMemEntries = iMemEntries + 1;
+            for (int i = 0; i < 2000; i++) {
+                if (gpMemEntry[i].used == 0) {
+                    gpMemEntry[i].used = 1;
+                    gpMemEntry[i].ptr = pvVar2;
+                    gpMemEntry[i].size = param_1;
+                    strcpy(gpMemEntry[i].file, param_2);
+                    gpMemEntry[i].line = param_3;
+                    i = 99999;
+                }
+            }
+            FILE *_File;
+            if (giDebugLevel == 4 &&
+                (sprintf(local_2bc, "KBAlloc    Size %d   Ptr %d   File %s  Line %d", param_1, pvVar2,
+                         param_2, param_3),
+                 1 < giDebugLevel) &&
+                (_File = fopen("KB.LOG", "a"), _File != 0)) {
+                strcpy(local_1f4, local_2bc);
+                strcat(local_1f4, "\n");
+                fputs(local_1f4, _File);
+                fclose(_File);
+                if (giDebugLevel == 4)
+                    OutputDebugStringA(local_1f4);
+            }
+        }
+    }
+    return pvVar2;
+}
 
 VA(0x004c3f80, 0x386)
 void BaseFree(void *, char *, int) {}

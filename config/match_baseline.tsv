@@ -97,7 +97,7 @@ BASE/Bzip	?initialiseCRC@@YIXXZ	100.0000	ce17ec65f433
 BASE/Bzip	?ioError@@YIXXZ	100.0000	5f300e223749
 BASE/Bzip	?loadAndRLEsource@@YIHPAU_iobuf@@@Z	99.7946	e9dcd0cd38a5
 BASE/Bzip	?minUInt32@@YIIII@Z	100.0000	5d5539bf1e6c
-BASE/Bzip	?moveToFrontCodeAndSend@@YIXPAUBitStream@@H@Z	99.6344	70f8a4ee3a3c
+BASE/Bzip	?moveToFrontCodeAndSend@@YIXPAUBitStream@@H@Z	99.6452	70f8a4ee3a3c
 BASE/Bzip	?mySIGSEGVorSIGBUScatcher@@YIXPAH@Z	100.0000	35c4ee4971a6
 BASE/Bzip	?mySignalCatcher@@YAXPAH@Z	100.0000	006f05825fe8
 BASE/Bzip	?panic@@YIXPAD@Z	100.0000	696a81c06956
@@ -161,7 +161,7 @@ BASE/ICONWDGT	??0iconWidget@@QAE@FFFFPADFCFFF@Z	12.7500	b219c0c3a1c9
 BASE/ICONWDGT	??0iconWidget@@QAE@XZ	100.0000	765a2f81e63c
 BASE/ICONWDGT	??1iconWidget@@UAE@XZ	100.0000	fa6e0d29754e
 BASE/ICONWDGT	??_EiconWidget@@UAEPAXI@Z	0.0000	
-BASE/ICONWDGT	?Draw@iconWidget@@UAEXXZ	54.8192	86c389ef4b0f
+BASE/ICONWDGT	?Draw@iconWidget@@UAEXXZ	54.8830	86c389ef4b0f
 BASE/ICONWDGT	?Main@iconWidget@@UAEHAAUtag_message@@@Z	19.7266	45b76b257108
 BASE/ICONWDGT	?Read@iconWidget@@QAEXXZ	96.9231	8d8e07c5baa9
 BASE/INPUTMGR	??0inputManager@@QAE@XZ	100.0000	c3c0a79e362d
@@ -183,7 +183,7 @@ BASE/Icon2b	?IconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	0.0000	d0d056ab934
 BASE/Icond2b	?DimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	0.0000	4ad06e73ab42
 BASE/Icondf2b	?FlipDimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	0.0000	3a9083993c9c
 BASE/Iconf2b	?FlipIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	0.0000	3abcce4cbc58
-BASE/Iconm2b	?MonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	38.8895	3d9fa402f004
+BASE/Iconm2b	?MonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	41.4088	3d9fa402f004
 BASE/Iconmf2b	?FlipMonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	21.1138	06612948ff51
 BASE/MOUSEMGR	??0mouseManager@@QAE@XZ	100.0000	cd5abb5d46d3
 BASE/MOUSEMGR	?CheckUpdateMousePos@mouseManager@@QAEXXZ	100.0000	651624228ccc
@@ -211,7 +211,7 @@ BASE/Midi	?MIDIStop@soundManager@@QAEXXZ	75.8594	9b08e9e778fe
 BASE/Midi	empty_stub	0.0000	
 BASE/Misc	?AbsAiPrint@@YIXPAD@Z	100.0000	607d030c5b22
 BASE/Misc	?AiPrint@@YIXPAD@Z	98.1515	1eb753bf87e9
-BASE/Misc	?BaseAlloc@@YIPAXIPADH@Z	1.3514	97fd4270d81d
+BASE/Misc	?BaseAlloc@@YIPAXIPADH@Z	85.1554	e75071845b7e
 BASE/Misc	?BaseFree@@YIXPAXPADH@Z	0.4016	2b9ec52efc7d
 BASE/Misc	?BitmapToScreen@@YIXPAVbitmap@@@Z	100.0000	f09b276e5242
 BASE/Misc	?BlitBitmapToScreen@@YIXPAVbitmap@@HHHHHH@Z	86.6445	3d5808d9852f
@@ -266,7 +266,7 @@ BASE/RESMGR	?Close@resourceManager@@UAEXXZ	97.0185	5f36b5814ef1
 BASE/RESMGR	?Dispose@resourceManager@@QAEXPAVresource@@@Z	55.4884	88b2eb89165e
 BASE/RESMGR	?Expunge@resourceManager@@QAEXXZ	80.6000	61fcaa327304
 BASE/RESMGR	?GetBackdrop@resourceManager@@QAEXPADPAVbitmap@@H@Z	44.6071	6c8ebdd1f671
-BASE/RESMGR	?GetBackdropAtLoc@resourceManager@@QAEXPADPAVbitmap@@HHH@Z	38.1127	687a9a2a12b5
+BASE/RESMGR	?GetBackdropAtLoc@resourceManager@@QAEXPADPAVbitmap@@HHH@Z	45.6620	687a9a2a12b5
 BASE/RESMGR	?GetBitmap@resourceManager@@QAEPAVbitmap@@PAD@Z	97.9592	80893a48441f
 BASE/RESMGR	?GetFileSize@resourceManager@@QAEKK@Z	90.8028	a6bd9bc83c76
 BASE/RESMGR	?GetFont@resourceManager@@QAEPAVfont@@PAD@Z	97.7347	58803e4abb6d
@@ -375,7 +375,7 @@ BASE/droplist	?Draw@dropListWidget@@UAEXXZ	100.0000	70f443d99378
 BASE/droplist	?DrawDropStuff@dropListWidget@@QAEXXZ	82.2644	ba50ab0ed65f
 BASE/droplist	?Main@dropListWidget@@UAEHAAUtag_message@@@Z	30.1147	33f4e8926a9f
 BASE/droplist	?ProcessSelectDialog@dropListWidget@@QAEXXZ	0.1678	39a568398497
-BASE/droplist	?Read@dropListWidget@@QAEXXZ	90.2377	9dc25823a2a5
+BASE/droplist	?Read@dropListWidget@@QAEXXZ	93.7787	9dc25823a2a5
 BASE/droplist	?RestoreDropBackground@dropListWidget@@QAEXXZ	100.0000	fdd690daaab3
 BASE/droplist	?SaveDropBackground@dropListWidget@@QAEXXZ	100.0000	b3d5c9e1b5dd
 BASE/icon2bc	?IconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAEH@Z	0.0000	fd19c8e59ddc
@@ -390,7 +390,7 @@ BASE/listbox	?DeleteItem@listBoxWidget@@QAEXH@Z	55.3980	8ef6cc5d31ef
 BASE/listbox	?Draw@listBoxWidget@@UAEXXZ	100.0000	230100bbcc4e
 BASE/listbox	?DrawLBStuff@listBoxWidget@@QAEXH@Z	71.7273	75f217fe2e0f
 BASE/listbox	?Main@listBoxWidget@@UAEHAAUtag_message@@@Z	54.0767	07473c97aebf
-BASE/listbox	?ProcessMouseMessage@listBoxWidget@@QAEHAAUtag_message@@@Z	53.6942	0855861a89a9
+BASE/listbox	?ProcessMouseMessage@listBoxWidget@@QAEHAAUtag_message@@@Z	53.7562	0855861a89a9
 BASE/listbox	?Read@listBoxWidget@@QAEXXZ	89.8843	723df75d15ed
 BASE/miscwin	?AutoInitSVGA@@YIFXZ	100.0000	ba21e7c98ba3
 BASE/miscwin	@BlitBitmapToScreenVesa@28	0.6579	10b3cea2382c
