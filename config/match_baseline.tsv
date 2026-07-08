@@ -203,11 +203,11 @@ BASE/MOUSEMGR	?SetPointer@mouseManager@@QAEXH@Z	0.3759	7b60d8396f3e
 BASE/MOUSEMGR	?SetPointer@mouseManager@@QAEXPADHH@Z	97.2418	57fafe6cd329
 BASE/MOUSEMGR	?ShowColorPointer@mouseManager@@QAEXXZ	100.0000	f56b43291986
 BASE/Midi	?MIDIIsPlaying@soundManager@@QAEHXZ	92.7083	83c30248b74e
-BASE/Midi	?MIDIPlay@soundManager@@QAEXH@Z	72.7778	759c73d63660
+BASE/Midi	?MIDIPlay@soundManager@@QAEXH@Z	74.6708	759c73d63660
 BASE/Midi	?MIDISetVolume@soundManager@@QAEXXZ	79.0263	7f1fa6f17e96
-BASE/Midi	?MIDIShutdown@soundManager@@QAEXXZ	74.4175	36fe41a039c0
+BASE/Midi	?MIDIShutdown@soundManager@@QAEXXZ	76.0680	36fe41a039c0
 BASE/Midi	?MIDIStartup@soundManager@@QAEXXZ	96.0870	e0c99d7d5b62
-BASE/Midi	?MIDIStop@soundManager@@QAEXXZ	73.2031	9b08e9e778fe
+BASE/Midi	?MIDIStop@soundManager@@QAEXXZ	75.8594	9b08e9e778fe
 BASE/Midi	empty_stub	0.0000	
 BASE/Misc	?AbsAiPrint@@YIXPAD@Z	100.0000	607d030c5b22
 BASE/Misc	?AiPrint@@YIXPAD@Z	98.1515	1eb753bf87e9
@@ -415,9 +415,9 @@ BASE/soundmgr	?Main@soundManager@@UAEHAAUtag_message@@@Z	100.0000	e76ae8c4e766
 BASE/soundmgr	?MemorySample@soundManager@@QAEPAU_SAMPLE@@PAVsample@@@Z	66.1081	2f55a8be4f98
 BASE/soundmgr	?ModifySample@soundManager@@QAEXPAU_SAMPLE@@FJ@Z	89.2917	bdccc6afd390
 BASE/soundmgr	?MusicPlaying@soundManager@@QAEHXZ	81.6571	6c17f307e6df
-BASE/soundmgr	?Open@soundManager@@UAEHH@Z	7.3968	5365b6996957
+BASE/soundmgr	?Open@soundManager@@UAEHH@Z	88.8042	c74653f47c45
 BASE/soundmgr	?PlayAmbientMusic@soundManager@@QAEXHJH@Z	68.4340	b017d2087167
-BASE/soundmgr	?PollSound@soundManager@@QAEXXZ	77.0327	9ed143ab0383
+BASE/soundmgr	?PollSound@soundManager@@QAEXXZ	77.5841	9ed143ab0383
 BASE/soundmgr	?ServiceSound@soundManager@@QAEXXZ	87.0588	ea6ca50ae947
 BASE/soundmgr	?SetMusicQuality@soundManager@@QAEXH@Z	59.4407	604754b87654
 BASE/soundmgr	?SetReady2Poll@@YGXK@Z	67.2000	7c89bbe06950
@@ -997,7 +997,7 @@ SOURCE/KB	?TestDynamicWindow@@YIXHH@Z	100.0000	f5ab1abce453
 SOURCE/KB	?TrueFalseDialogHandler@@YIHAAUtag_message@@@Z	100.0000	686bb54969b1
 SOURCE/KB	?UnloadSystemwideIcons@@YIXXZ	100.0000	e5593a1d663f
 SOURCE/KB	?UpdateAppSpecificMenus@@YIXPAX@Z	100.0000	f40021f3ef8a
-SOURCE/KB	?UpdateNormalDialog@@YIXPAD@Z	100.0000	afa86adf41ce
+SOURCE/KB	?UpdateNormalDialog@@YIXPAD@Z	100.0000	69b9c6d25968
 SOURCE/KB	?UpdateSystemOptionsMenu@@YIXXZ	1.6336	4c293b8d0bfe
 SOURCE/KB	?WaitEndSample@@YIXUSAMPLE2@@H@Z	100.0000	7e1d559a1d28
 SOURCE/KB	?WaitForOtherPlayer@@YIHXZ	100.0000	7d299bc1df68

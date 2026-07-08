@@ -4,6 +4,7 @@
 // These are NOT defined in our code (they come from the Miles .lib); declared
 // here like the Win32 imports so the sound-manager TU can link. Extend as more
 // AIL_* calls are recovered from the soundManager methods.
+extern "C" void _AIL_startup_0(void);
 extern "C" void _AIL_serve_0(void);
 struct _DIG_DRIVER;
 extern "C" void _AIL_set_preference_8(int, int);
