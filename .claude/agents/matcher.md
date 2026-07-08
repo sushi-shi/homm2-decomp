@@ -43,8 +43,7 @@ are GROUND TRUTH, already extracted — never re-derive or guess them:
 
 1. **Pull the target's retail bytes.** Prefer **`homm2 sema`** for navigation (semantic;
    grep is lexical): `homm2 sema disasm <rva> --diff` (our compiled vs retail asm, side by
-   side), `homm2 sema xref <rva>` (callers/callees), `homm2 sema decomp <rva>` (Ghidra C with
-   our names), `homm2 sema strings <rva>`, `homm2 sema rva <rva>` (claim/src/match dossier) —
+   side), `homm2 sema xref <rva>` (callers/callees), `homm2 sema strings <rva>`, `homm2 sema rva <rva>` (claim/src/match dossier) —
    see `homm2 sema -h`. Raw fallback: `llvm-objdump -dr --start-address=<rva>
    --stop-address=<rva+size> build/delink/<TIER>/<TU>.c.obj`. Read the class layout from
    `include/<TIER>/<TU>.h` (already recovered).

@@ -67,14 +67,14 @@
       '';
 
       # Analysis + diffing tools. Ghidra (headless, via PyGhidra) backs `homm2 sema`
-      # xref/decomp: it supplies the WHOLE-.text function-boundary map (incl. the
-      # library/runtime funcs CodeView omits) and the decompiler. Our CodeView symbols
+      # xref: it supplies the WHOLE-.text function-boundary map (incl. the
+      # library/runtime funcs CodeView omits). Our CodeView symbols
       # stay authoritative for names; Ghidra never discovers - it's fed the EXE (+ our
       # known names). Ghidra 12.0.4 + pyghidra + jdk21 pin-match gruntz (same nixpkgs
       # rev) so they're store cache hits, not a rebuild.
       commonTools = [ homm2-cli rust objdiff objdiff-cli vostok-delinker ] ++ (with pkgs; [
         (python3.withPackages (ps: [ ps.pyghidra ]))  # pyghidra + jpype1: headless Ghidra scripting
-        ghidra jdk21                      # Ghidra 12.0.4 headless + JRE (homm2 sema xref/decomp)
+        ghidra jdk21                      # Ghidra 12.0.4 headless + JRE (homm2 sema xref)
         ninja
         llvm                              # llvm-pdbutil (synth_pdb yaml2pdb)
         llvmPackages.clang-unwrapped      # clangd + clang-format + clang driver (UNWRAPPED: no host gcc/glibc include shadowing)

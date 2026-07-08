@@ -64,12 +64,11 @@ vtable is claimed by a `VTBL()` census marker in its owner TU. Full catalog: `do
 ## Navigate (`homm2 sema`)
 
 Semantic questions about the source/target — grep is lexical only. `homm2 sema -h` lists all;
-addresses are RVAs (a full `VA(0x..)` also works for `rva`/`decomp`):
+addresses are RVAs (a full `VA(0x..)` also works for `rva`):
 
 ```sh
 homm2 sema xref   0x0004a3c0        # who calls this fn (--callees | --tree)
 homm2 sema disasm 0x0004a3c0 --diff # our (compiled) vs retail asm, side by side
-homm2 sema decomp 0x0004a3c0        # Ghidra decompiler C (seeded with our CodeView names)
 homm2 sema strings 0x0004a3c0       # a fn's string set (--find TEXT = reverse lookup)
 homm2 sema match  SOURCE/KB         # per-fn match % of a unit (or an 0x RVA)
 homm2 sema rva    0x0004a3c0        # dossier: claim / src loc / ghidra / match %
@@ -77,5 +76,5 @@ homm2 sema symbol combatManager     # fuzzy workspace-symbol search (clangd)
 homm2 sema def|refs|hover src/… L C # clangd LSP at a point
 ```
 
-xref/disasm/strings/match/rva/clangd need no Ghidra; `decomp` (+ xref library boundaries) need
+xref/disasm/strings/match/rva/clangd need no Ghidra; xref library boundaries need
 a one-time `homm2 ghidra` project (imports the EXE, applies our CodeView names).
