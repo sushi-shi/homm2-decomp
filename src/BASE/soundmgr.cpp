@@ -527,18 +527,20 @@ VA(0x004ccbc0, 0xb1)
 void soundManager::StopSample(struct _SAMPLE *param_1)
 {
     int local_c;
-    if (gbNoSound == 0 && field_0x36 != 0) {
-        LogStr("Stop Sample 1");
-        struct _SAMPLE *p_Var1 = field_0x54[0];
-        _AIL_end_sample_4(param_1);
-        if (p_Var1 == param_1) {
-            for (local_c = 0; local_c < 10; local_c++) {
-                ServiceSound();
-                DelayMilli(1);
-            }
+    if (gbNoSound != 0)
+        return;
+    if (field_0x36 == 0)
+        return;
+    LogStr("Stop Sample 1");
+    struct _SAMPLE *p_Var1 = field_0x54[0];
+    _AIL_end_sample_4(param_1);
+    if (p_Var1 == param_1) {
+        for (local_c = 0; local_c < 10; local_c++) {
+            ServiceSound();
+            DelayMilli(1);
         }
-        LogStr("Stop Sample 2");
     }
+    LogStr("Stop Sample 2");
 }
 
 VA(0x004ccc80, 0x202)
@@ -580,20 +582,15 @@ void soundManager::ModifySample(struct _SAMPLE *param_1, short param_2, long par
 VA(0x004cce90, 0xa3)
 long soundManager::DigitalReport(struct _SAMPLE *param_1, short param_2)
 {
-    unsigned int uVar1;
-    if (gbNoSound == 0) {
-        if (field_0x36 == 0)
-            uVar1 = 0;
-        else if (param_2 == 1)
-            uVar1 = _AIL_sample_volume_4(param_1);
-        else if (param_2 == 4)
-            uVar1 = _AIL_sample_status_4(param_1) == 4;
-        else
-            uVar1 = 0;
-    } else {
-        uVar1 = 0;
-    }
-    return uVar1;
+    if (gbNoSound != 0)
+        return 0;
+    if (field_0x36 == 0)
+        return 0;
+    if (param_2 == 1)
+        return _AIL_sample_volume_4(param_1);
+    if (param_2 == 4)
+        return _AIL_sample_status_4(param_1) == 4;
+    return 0;
 }
 
 VA(0x004ccf40, 0xe8)
