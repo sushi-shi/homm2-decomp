@@ -691,7 +691,6 @@ void soundManager::ForcePollSound(void)
 VA(0x004cd160, 0xe3)
 void soundManager::SetMusicQuality(int param_1)
 {
-    char sVar1;
     int local_8;
     if (gbNoSound != 0)
         return;
@@ -701,15 +700,14 @@ void soundManager::SetMusicQuality(int param_1)
         return;
     if (m_cdReady == 0)
         return;
-    if (gCdMusic == 0) {
-        sVar1 = m_currentTrack;
-        MIDIStop();
-    } else {
-        sVar1 = m_currentTrack;
+    if (gCdMusic != 0) {
+        local_8 = m_currentTrack;
         CDStop();
         m_currentTrack = static_cast<char>(0xff);
+    } else {
+        local_8 = m_currentTrack;
+        MIDIStop();
     }
-    local_8 = sVar1;
     memset(field_0x590, 0, 0xf0);
     gCdMusic = param_1;
     if (local_8 >= 0)
