@@ -607,19 +607,23 @@ VA(0x004ccf40, 0xe8)
 void soundManager::AdjustSoundVolumes(void)
 {
     int local_c;
-    if (gbNoSound == 0 && field_0x36 != 0 && field_0x684 != 0) {
-        LogStr("Adjust Sound Volumes 1");
-        for (local_c = 1; local_c < field_0x94; local_c++) {
-            struct _SAMPLE *p_Var1 = field_0x54[local_c];
-            if (gSampleVolume == 0) {
-                ModifySample(p_Var1, 1, 0);
-            } else {
-                if (DigitalReport(p_Var1, 4) != 0)
-                    ModifySample(p_Var1, 100, reinterpret_cast<short *>(&iLastVolume)[local_c]);
-            }
+    if (gbNoSound != 0)
+        return;
+    if (field_0x36 == 0)
+        return;
+    if (field_0x684 == 0)
+        return;
+    LogStr("Adjust Sound Volumes 1");
+    for (local_c = 1; local_c < field_0x94; local_c++) {
+        struct _SAMPLE *p_Var1 = field_0x54[local_c];
+        if (gSampleVolume == 0) {
+            ModifySample(p_Var1, 1, 0);
+        } else {
+            if (DigitalReport(p_Var1, 4) != 0)
+                ModifySample(p_Var1, 100, reinterpret_cast<short *>(&iLastVolume)[local_c]);
         }
-        LogStr("Adjust Sound Volumes 2");
     }
+    LogStr("Adjust Sound Volumes 2");
 }
 
 VA(0x004cd030, 0xee)
@@ -655,21 +659,27 @@ void soundManager::SetMusicQuality(int param_1)
 {
     char sVar1;
     int local_8;
-    if (gbNoSound == 0 && field_0x3e != 0 && gMidiEnabled != 0 && field_0x69a != 0) {
-        if (gCdMusic == 0) {
-            sVar1 = field_0x578;
-            MIDIStop();
-        } else {
-            sVar1 = field_0x578;
-            CDStop();
-            field_0x578 = static_cast<char>(0xff);
-        }
-        local_8 = sVar1;
-        memset(field_0x590, 0, 0xf0);
-        gCdMusic = param_1;
-        if (local_8 >= 0)
-            PlayAmbientMusic(local_8, 0, -1);
+    if (gbNoSound != 0)
+        return;
+    if (field_0x3e == 0)
+        return;
+    if (gMidiEnabled == 0)
+        return;
+    if (field_0x69a == 0)
+        return;
+    if (gCdMusic == 0) {
+        sVar1 = field_0x578;
+        MIDIStop();
+    } else {
+        sVar1 = field_0x578;
+        CDStop();
+        field_0x578 = static_cast<char>(0xff);
     }
+    local_8 = sVar1;
+    memset(field_0x590, 0, 0xf0);
+    gCdMusic = param_1;
+    if (local_8 >= 0)
+        PlayAmbientMusic(local_8, 0, -1);
 }
 
 VA(0x004cd250, 0xc5)
