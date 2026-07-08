@@ -33,30 +33,30 @@ sample::sample(char *param_1, long int param_2, long int param_3, long int param
     int iVar6 = 0;
     do {
         switch (local_20[iVar6]) {
-        case '1': field_0x20 = hz11; break;     // 11025 Hz
-        case '2': field_0x20 = hz22; break;     // 22050 Hz
-        case '4': field_0x20 = 0xac44; break;   // 44100 Hz
-        case '6': field_0x24 = 1; break;        // 16-bit
-        case '8': field_0x24 = 0; break;        // 8-bit
+        case '1': m_sampleRate = hz11; break;     // 11025 Hz
+        case '2': m_sampleRate = hz22; break;     // 22050 Hz
+        case '4': m_sampleRate = 0xac44; break;   // 44100 Hz
+        case '6': m_format = 1; break;        // 16-bit
+        case '8': m_format = 0; break;        // 8-bit
         case 'M':
         case 'm': iVar7 = 0; break;             // mono
         }
         iVar6 = iVar6 + 1;
     } while (iVar6 < 3);
-    field_0x24 = field_0x24 + iVar7;
+    m_format = m_format + iVar7;
     unsigned long size = gpResourceManager->GetFileSize(m_id);
-    field_0x14 = static_cast<char *>(BaseAlloc(size, __FILE__, __LINE__));
-    field_0x18 = size;
+    m_data = static_cast<char *>(BaseAlloc(size, __FILE__, __LINE__));
+    m_size = size;
     gpResourceManager->PointToFile(m_id);
-    gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(field_0x14), size);
+    gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(m_data), size);
 }
 
 VA(0x004daf40, 0x2c)
 sample::~sample()
 {
-    BaseFree(field_0x14, __FILE__, __LINE__);
-    field_0x14 = 0;
-    field_0x18 = 0;
+    BaseFree(m_data, __FILE__, __LINE__);
+    m_data = 0;
+    m_size = 0;
     field_0x28 = 0;
 }
 
@@ -64,16 +64,16 @@ VA(0x004daf70, 0x72)
 MIDIWrap::MIDIWrap(char *name) : resource(6, gpResourceManager->MakeId(name, 1), 1, 0)
 {
     unsigned long size = gpResourceManager->GetFileSize(m_id);
-    field_0x10 = static_cast<char *>(BaseAlloc(size, __FILE__, __LINE__));
+    m_data = static_cast<char *>(BaseAlloc(size, __FILE__, __LINE__));
     gpResourceManager->PointToFile(m_id);
-    gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(field_0x10), size);
+    gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(m_data), size);
 }
 
 VA(0x004db030, 0x28)
 MIDIWrap::~MIDIWrap()
 {
-    BaseFree(field_0x10, __FILE__, __LINE__);
-    field_0x10 = 0;
+    BaseFree(m_data, __FILE__, __LINE__);
+    m_data = 0;
 }
 
 

@@ -102,7 +102,7 @@ int font::GetCharacterWidth(unsigned char c)
         if (c < 0 || c > 0x5f)
             c = 0x5f;
         // stride-13 char-metrics table in the glyph icon; width is the short at +4.
-        return *(short *)(field_0x1c->field_0x12 + c * 13 + 4) + field_0x14;
+        return *(short *)(field_0x1c->m_data + c * 13 + 4) + field_0x14;
     }
 }
 
@@ -113,7 +113,7 @@ void font::DrawBoundedString(char *str, int x, int y, int w, int h, int mode, in
     // all of them up-front, incl. two write-once vestigials (glyph pointer, a ' ') and local copies
     // of str/align — the same reserved-local pattern as LineWidth/LineLength.
     int len = strlen(str);
-    char *glyph = field_0x1c->field_0x12;
+    char *glyph = field_0x1c->m_data;
     char sp = ' ';
     int xOff = 0;
     int yOff = 0;

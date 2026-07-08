@@ -50,12 +50,12 @@ public:
     int    m_samplesReady;  // +0x684
     int    field_0x688;  // +0x688
     int    field_0x68c;  // +0x68c
-    int    field_0x690;  // +0x690
+    int    m_cdTrack;  // +0x690
     int    field_0x694;  // +0x694
-    short  field_0x698;  // +0x698
+    short  m_auxDevice;  // +0x698
     int    m_cdReady;  // +0x69a
     int    field_0x69e;  // +0x69e
-    int    field_0x6a2;  // +0x6a2
+    int    m_cdStarted;  // +0x6a2
     int    field_0x6a6;  // +0x6a6
     int    field_0x6aa;  // +0x6aa
     // --- constructors ---

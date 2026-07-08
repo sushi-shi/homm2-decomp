@@ -26,7 +26,7 @@ VA(0x004c7fa0, 0xdb)
 resourceManager::resourceManager(void) : baseManager()
 {
     int local_8;
-    field_0x32 = 0;
+    m_active = 0;
     m_resourceListHead = 0;
     m_expunging = 0;
     strcpy(name, "resourceManager");
@@ -254,7 +254,7 @@ int resourceManager::Open(int param_1)
         return 3;
     field_0xc = 0x80;
     field_0x10 = param_1;
-    field_0x32 = 1;
+    m_active = 1;
     strcpy(name, "resourceManager");
     return 0;
 }
@@ -279,7 +279,7 @@ VA(0x004c89e0, 0xc8)
 void resourceManager::Close(void)
 {
     int local_8;
-    if (field_0x32 == 1) {
+    if (m_active == 1) {
         Expunge();
         m_resourceListHead = 0;
         for (local_8 = 0; local_8 < 2; local_8++) {
@@ -291,7 +291,7 @@ void resourceManager::Close(void)
             }
         }
         m_numAggregates = 0;
-        field_0x32 = 0;
+        m_active = 0;
     }
 }
 

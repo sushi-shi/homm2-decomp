@@ -44,7 +44,7 @@ void FlipIconToBitmap(class icon *param_1, class bitmap *param_2, int param_3, i
     unsigned int uVar5, uVar7, uVar9;
     unsigned char *pbVar8;
     int *puVar10;
-    IconEntry *entries = reinterpret_cast<IconEntry *>(param_1->field_0x12);
+    IconEntry *entries = reinterpret_cast<IconEntry *>(param_1->m_data);
     int iVar4 = entries[param_5].w;
     gFlipEntry = &entries[param_5];
     gFlipX0 = ((param_3 - gFlipEntry->x) - iVar4) + 1;
@@ -63,7 +63,7 @@ void FlipIconToBitmap(class icon *param_1, class bitmap *param_2, int param_3, i
     short sVar2 = param_2->m_width;
     gFlipRow = gFlipY * sVar2 + reinterpret_cast<int>(param_2->m_pixels);
     gFlipX = gFlipXEnd;
-    pbVar8 = reinterpret_cast<unsigned char *>(param_1->field_0x12) + gFlipEntry->srcOffset;
+    pbVar8 = reinterpret_cast<unsigned char *>(param_1->m_data) + gFlipEntry->srcOffset;
 LAB_004d1c83:
     do {
         while (1) {

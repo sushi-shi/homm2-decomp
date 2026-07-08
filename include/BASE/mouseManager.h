@@ -16,9 +16,9 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
-    bitmap *field_0x36;  // +0x36  saved-underlying bitmap
+    bitmap *m_savedUnderlying;  // +0x36  saved-underlying bitmap
     int    field_0x3a;  // +0x3a
-    icon  *field_0x3e;  // +0x3e  the loaded cursor icon
+    icon  *m_cursorIcon;  // +0x3e  the loaded cursor icon
     int    field_0x42;  // +0x42
     int    field_0x46;  // +0x46
     int    field_0x4a;  // +0x4a

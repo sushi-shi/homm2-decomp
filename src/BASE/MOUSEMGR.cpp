@@ -23,13 +23,13 @@ VA(0x004c9270, 0xd9)
 mouseManager::mouseManager(void) : baseManager()
 {
     int i;
-    field_0x36 = 0;
-    field_0x32 = 0;
+    m_savedUnderlying = 0;
+    m_active = 0;
     field_0x42 = -1;
     strcpy(name, "mouseManager");
     field_0x3a = 0;
     field_0x82 = 1;
-    field_0x3e = 0;
+    m_cursorIcon = 0;
     for (i = 0; i < 0x60; i++)
         hbmpAndMask[i] = 0;
     for (i = 0; i < 0x60; i++)
@@ -51,7 +51,7 @@ VA(0x004c9350, 0x94)
 int mouseManager::Open(int id)
 {
     field_0x7e = 0;
-    field_0x36 = new bitmap(0x21, 0x42, 0x40);
+    m_savedUnderlying = new bitmap(0x21, 0x42, 0x40);
     field_0x5e = 0x13f;
     field_0x62 = 0xef;
     field_0x6e = 0x140;
@@ -65,7 +65,7 @@ int mouseManager::Open(int id)
     if (gbColorMice != 0)
         ShowCursor(0);
     field_0xc = 0x40;
-    field_0x32 = 1;
+    m_active = 1;
     field_0x10 = id;
     return 0;
 }
@@ -73,11 +73,11 @@ int mouseManager::Open(int id)
 VA(0x004c93f0, 0xed)
 void mouseManager::Close(void)
 {
-    if (field_0x32 == 1) {
-        field_0x32 = 0;
-        if (field_0x36 != 0)
-            delete field_0x36;
-        field_0x36 = 0;
+    if (m_active == 1) {
+        m_active = 0;
+        if (m_savedUnderlying != 0)
+            delete m_savedUnderlying;
+        m_savedUnderlying = 0;
         SetCursor(LoadCursorA(0, IDC_ARROW));
         for (int i = 0; i < 0x60; i++) {
             if (hMouseCursor[i] != 0)
@@ -93,9 +93,9 @@ void mouseManager::Close(void)
                 DeleteObject(hbmpAndMask[i]);
             hbmpAndMask[i] = 0;
         }
-        if (field_0x3e != 0)
-            gpResourceManager->Dispose(field_0x3e);
-        field_0x3e = 0;
+        if (m_cursorIcon != 0)
+            gpResourceManager->Dispose(m_cursorIcon);
+        m_cursorIcon = 0;
     }
 }
 
@@ -119,8 +119,8 @@ void mouseManager::SetPointer(char *name, int param_2, int param_3)
         if (field_0x42 != param_3 && (field_0x42 = param_3, gbColorMice != 0)) {
             int saved82 = field_0x82;
             field_0x82 = 0;
-            if (field_0x3e != 0)
-                gpResourceManager->Dispose(field_0x3e);
+            if (m_cursorIcon != 0)
+                gpResourceManager->Dispose(m_cursorIcon);
             char *fmt;
             if (field_0x42 == 0)
                 fmt = "ADVMCO.ICN";
@@ -130,7 +130,7 @@ void mouseManager::SetPointer(char *name, int param_2, int param_3)
                 fmt = "CMSECO.ICN";
             char local_10[16];
             sprintf(local_10, fmt);
-            field_0x3e = gpResourceManager->GetIcon(local_10);
+            m_cursorIcon = gpResourceManager->GetIcon(local_10);
             ProcessAssert(param_2 != 1000, __FILE__, __LINE__);
             field_0x3a = -1;
             field_0x82 = saved82;
@@ -167,16 +167,16 @@ void mouseManager::SaveAndDraw(void)
     if (480 < field_0x6a + h)
         h = 480 - field_0x6a;
     field_0x7a = h;
-    gpWindowManager->m_screen->CopyToCareful(field_0x36, 0, 0, field_0x5e, field_0x62,
+    gpWindowManager->m_screen->CopyToCareful(m_savedUnderlying, 0, 0, field_0x5e, field_0x62,
                                                field_0x76, field_0x7a);
-    IconToBitmap(field_0x3e, gpWindowManager->m_screen, field_0x66, field_0x6a, field_0x3a,
+    IconToBitmap(m_cursorIcon, gpWindowManager->m_screen, field_0x66, field_0x6a, field_0x3a,
                  1, 0, 0, 640, 480, 0);
 }
 
 VA(0x004c9fd0, 0x29)
 void mouseManager::RestoreUnderlying(void)
 {
-    field_0x36->CopyToCareful(gpWindowManager->m_screen, field_0x5e, field_0x62, 0, 0,
+    m_savedUnderlying->CopyToCareful(gpWindowManager->m_screen, field_0x5e, field_0x62, 0, 0,
                               field_0x76, field_0x7a);
 }
 

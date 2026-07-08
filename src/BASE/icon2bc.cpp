@@ -43,9 +43,9 @@ void IconToBitmapColorTable(class icon *param_1, class bitmap *param_2, int para
     unsigned int uVar4, uVar5, uVar6, uVar7;
     unsigned char *pbVar8;
     int *puVar9;
-    IconEntry *entries = reinterpret_cast<IconEntry *>(param_1->field_0x12);
+    IconEntry *entries = reinterpret_cast<IconEntry *>(param_1->m_data);
     gCTEntry = &entries[param_5];
-    gCTSrc = reinterpret_cast<unsigned char *>(param_1->field_0x12) + gCTEntry->srcOffset;
+    gCTSrc = reinterpret_cast<unsigned char *>(param_1->m_data) + gCTEntry->srcOffset;
     gCTX0 = param_3 + gCTEntry->x;
     gCTPitch = param_2->m_width;
     gCTY = gCTEntry->y + param_4;

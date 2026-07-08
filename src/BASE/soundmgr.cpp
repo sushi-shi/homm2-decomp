@@ -95,7 +95,7 @@ void soundManager::CDStartup(void)
 {
     if (gbNoSound != 0)
         return;
-    field_0x6a2 = 1;
+    m_cdStarted = 1;
     m_cdReady = 0;
     if (gbNoCDRom == 0 && gMciErrorFlag == 0 && gbDontTryRedbook == 0) {
         wsprintfA(reinterpret_cast<char *>(&CommandString),
@@ -137,7 +137,7 @@ void soundManager::CDSetVolume(int param_1, int param_2)
 {
     int local_c;
     unsigned long local_8;
-    if (gbNoSound == 0 && m_cdReady != 0 && field_0x698 != -1) {
+    if (gbNoSound == 0 && m_cdReady != 0 && m_auxDevice != -1) {
         if (param_1 == -1)
             local_c = gMidiEnabled;
         else
@@ -150,7 +150,7 @@ void soundManager::CDSetVolume(int param_1, int param_2)
             int local_10 = 0xc - local_c;
             local_8 = local_10 * 0x10000000 | local_10 * 0x1000;
         }
-        auxSetVolume(field_0x698, local_8);
+        auxSetVolume(m_auxDevice, local_8);
     }
 }
 
@@ -170,7 +170,7 @@ void soundManager::CDPlay(int param_1, int param_2, int param_3, int param_4)
         if (param_1 == -1) {
             CDStop();
         } else if (m_currentTrack != param_1 || CDPlaying == 0 || param_4 != 0) {
-            field_0x690 = param_1;
+            m_cdTrack = param_1;
             field_0x694 = param_3;
             Process1WindowsMessage();
             ServiceSound();
@@ -257,7 +257,7 @@ void soundManager::CDPoll(void)
         field_0x6aa + 3000 <= KBTickCount()) {
         field_0x6aa = KBTickCount();
         if (CDIsPlaying() == 0)
-            CDPlay(field_0x690, 0, field_0x694, 1);
+            CDPlay(m_cdTrack, 0, field_0x694, 1);
     }
 }
 
@@ -303,7 +303,7 @@ soundManager::soundManager(void) : baseManager()
 {
     int local_8;
     field_0x574 = 1;
-    field_0x32 = 0;
+    m_active = 0;
     field_0x688 = 0;
     field_0x56c = 0;
     for (local_8 = 0; local_8 < 0x20; local_8++)
@@ -312,7 +312,7 @@ soundManager::soundManager(void) : baseManager()
     m_samplesReady = 0;
     m_digitalDriver = 0;
     field_0x3a = 0;
-    field_0x690 = 0;
+    m_cdTrack = 0;
     field_0x694 = 0;
 }
 
@@ -354,7 +354,7 @@ int soundManager::Open(int param_1)
     struct _DIG_DRIVER *p_Var2;
     int local_c;
     char cStack_7;
-    field_0x6a2 = 0;
+    m_cdStarted = 0;
     field_0x6a6 = 0;
     m_cdReady = 0;
     field_0x69e = 0;
@@ -452,7 +452,7 @@ int soundManager::Open(int param_1)
     }
     field_0xc = 0x10;
     field_0x10 = -1;
-    field_0x32 = 1;
+    m_active = 1;
     strcpy(name, "soundManager");
     return 0;
 }
@@ -476,7 +476,7 @@ void soundManager::AllocateSampleHandles(void)
 VA(0x004cc9b0, 0x96)
 void soundManager::Close(void)
 {
-    if (field_0x32 != 1)
+    if (m_active != 1)
         return;
     if (gbNoSound == 0) {
         LogStr("Shutting down CD audio");
@@ -487,7 +487,7 @@ void soundManager::Close(void)
         _AIL_shutdown_0();
         LogStr("Sound shut down");
     }
-    field_0x32 = 0;
+    m_active = 0;
     gbNoSound = 1;
 }
 
@@ -834,10 +834,10 @@ struct _SAMPLE *soundManager::MemorySample(class sample *param_1)
             field_0xd8[local_10] = static_cast<char>(param_1->field_0x28);
             reinterpret_cast<short *>(&iLastVolume)[local_10] = static_cast<short>(param_1->field_0x28);
             _AIL_init_sample_4(p_Var2);
-            _AIL_set_sample_type_12(p_Var2, param_1->field_0x24, 0);
-            _AIL_set_sample_playback_rate_8(p_Var2, param_1->field_0x20);
+            _AIL_set_sample_type_12(p_Var2, param_1->m_format, 0);
+            _AIL_set_sample_playback_rate_8(p_Var2, param_1->m_sampleRate);
             _AIL_set_sample_loop_count_8(p_Var2, param_1->field_0x2c);
-            _AIL_set_sample_address_12(p_Var2, reinterpret_cast<int>(param_1->field_0x14), param_1->field_0x18);
+            _AIL_set_sample_address_12(p_Var2, reinterpret_cast<int>(param_1->m_data), param_1->m_size);
             if (gSampleVolume == 0) {
                 _AIL_set_sample_volume_8(p_Var2, 0);
             } else {
@@ -845,10 +845,10 @@ struct _SAMPLE *soundManager::MemorySample(class sample *param_1)
                 _AIL_set_sample_volume_8(p_Var2, iVar4);
             }
             _AIL_start_sample_4(p_Var2);
-            param_1->field_0x10 = p_Var2;
+            param_1->m_activeSample = p_Var2;
             field_0xec[local_10] = p_Var2;
-            field_0x12c[local_10] = reinterpret_cast<int>(param_1->field_0x14);
-            field_0x16c[local_10] = param_1->field_0x18;
+            field_0x12c[local_10] = reinterpret_cast<int>(param_1->m_data);
+            field_0x16c[local_10] = param_1->m_size;
             LogStr("Memory Sample 2b");
     return p_Var2;
 }

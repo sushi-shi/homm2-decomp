@@ -36,9 +36,9 @@ void DimIconToBitmap(class icon *param_1, class bitmap *param_2, int param_3, in
     int iVar3;
     unsigned int uVar5;
     unsigned char *pbVar6;
-    IconEntry *entries = reinterpret_cast<IconEntry *>(param_1->field_0x12);
+    IconEntry *entries = reinterpret_cast<IconEntry *>(param_1->m_data);
     gDimEntry = &entries[param_5];
-    gDimSrc = reinterpret_cast<unsigned char *>(param_1->field_0x12) + gDimEntry->srcOffset;
+    gDimSrc = reinterpret_cast<unsigned char *>(param_1->m_data) + gDimEntry->srcOffset;
     gDimX0 = param_3 + gDimEntry->x;
     gDimY = param_4 + gDimEntry->y;
     if (param_7 != 0) {

@@ -38,9 +38,9 @@ void FlipDimIconToBitmap(class icon *param_1, class bitmap *param_2, int param_3
     int iVar3;
     unsigned int uVar4;
     unsigned char *pbVar5;
-    IconEntry *entries = reinterpret_cast<IconEntry *>(param_1->field_0x12);
+    IconEntry *entries = reinterpret_cast<IconEntry *>(param_1->m_data);
     gFDEntry = &entries[param_5];
-    gFDSrc = reinterpret_cast<unsigned char *>(param_1->field_0x12) + gFDEntry->srcOffset;
+    gFDSrc = reinterpret_cast<unsigned char *>(param_1->m_data) + gFDEntry->srcOffset;
     iVar3 = gFDEntry->w;
     gFDY = param_4 + gFDEntry->y;
     gFDX0 = ((param_3 - gFDEntry->x) - iVar3) + 1;

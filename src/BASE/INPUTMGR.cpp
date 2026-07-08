@@ -20,7 +20,7 @@ int MouseMessageHandler(void *, unsigned int, unsigned int, long int) { return 0
 VA(0x004ce1d0, 0x56)
 inputManager::inputManager(void) : baseManager()
 {
-    field_0x32 = 0;
+    m_active = 0;
     field_0x73e = 0;
     field_0x852 = 1;
     field_0x84e = 0;
@@ -35,15 +35,15 @@ inputManager::inputManager(void) : baseManager()
 VA(0x004ce230, 0x78)
 int inputManager::Open(int param_1)
 {
-    memset(field_0x36, 0, sizeof(field_0x36));
+    memset(m_eventRing, 0, sizeof(m_eventRing));
     field_0x73a = 0;
-    field_0x736 = 0;
+    m_readIndex = 0;
     field_0x852 = param_1;
     field_0x85e = 0;
     MakeScanCodeTable();
     field_0xc = 4;
     field_0x10 = -1;
-    field_0x32 = 1;
+    m_active = 1;
     strcpy(name, "inputManager");
     return 0;
 }
@@ -51,11 +51,11 @@ int inputManager::Open(int param_1)
 VA(0x004ce2b0, 0x20)
 void inputManager::Close(void)
 {
-    if (field_0x32 == 1) {
+    if (m_active == 1) {
         field_0x73a = 0;
-        field_0x736 = 0;
+        m_readIndex = 0;
         field_0x852 = 0;
-        field_0x32 = 0;
+        m_active = 0;
     }
 }
 
@@ -66,7 +66,7 @@ VA(0x004ce2e0, 0xf)
 void inputManager::Flush(void)
 {
     field_0x73a = 0;
-    field_0x736 = 0;
+    m_readIndex = 0;
 }
 
 VA(0x004ce2f0, 0xa8)
@@ -74,11 +74,11 @@ tag_message inputManager::GetEvent(void)
 {
     tag_message local_1c;
     PollSound();
-    if (gpInputManager->field_0x32 == 1 && field_0x736 != field_0x73a) {
-        int iVar3 = field_0x736;
-        local_1c = field_0x36[iVar3];
-        field_0x736 = iVar3 + 1;
-        field_0x736 = field_0x736 % 0x40;
+    if (gpInputManager->m_active == 1 && m_readIndex != field_0x73a) {
+        int iVar3 = m_readIndex;
+        local_1c = m_eventRing[iVar3];
+        m_readIndex = iVar3 + 1;
+        m_readIndex = m_readIndex % 0x40;
         if (local_1c.type == 1 && field_0x856 == 0)
             AsciiConvert(local_1c);
     } else {
@@ -95,9 +95,9 @@ tag_message inputManager::PeekEvent(void)
 {
     tag_message local_1c;
     PollSound();
-    if (gpInputManager->field_0x32 == 1 && field_0x736 != field_0x73a) {
-        local_1c = field_0x36[field_0x736];
-        field_0x736 = field_0x736 % 0x40;
+    if (gpInputManager->m_active == 1 && m_readIndex != field_0x73a) {
+        local_1c = m_eventRing[m_readIndex];
+        m_readIndex = m_readIndex % 0x40;
         if (local_1c.type == 1 && field_0x856 == 0)
             AsciiConvert(local_1c);
     } else {
@@ -117,7 +117,7 @@ void inputManager::SetKeyCodeType(int param_1)
 {
     field_0x856 = param_1;
     field_0x73a = 0;
-    field_0x736 = 0;
+    m_readIndex = 0;
 }
 
 VA(0x004ce480, 0x1cb)
@@ -135,7 +135,7 @@ void inputManager::ForceMouseMove(void)
     if (gpInputManager->field_0x73e == 0) {
         gpInputManager->field_0x73e = 1;
         int iVar4 = gpInputManager->field_0x73a;
-        tag_message *ev = &gpInputManager->field_0x36[iVar4];
+        tag_message *ev = &gpInputManager->m_eventRing[iVar4];
         ev->type = 4;
         gpMouseManager->MouseCoords(ev->field4, ev->field8);
         ev->field10 = ev->field4;
@@ -143,9 +143,9 @@ void inputManager::ForceMouseMove(void)
         ev->fieldC = gpInputManager->field_0x85e;
         gpInputManager->field_0x73a = gpInputManager->field_0x73a + 1;
         gpInputManager->field_0x73a = gpInputManager->field_0x73a % 0x40;
-        if (gpInputManager->field_0x73a == gpInputManager->field_0x736) {
-            gpInputManager->field_0x736 = gpInputManager->field_0x736 + 1;
-            gpInputManager->field_0x736 = gpInputManager->field_0x736 % 0x40;
+        if (gpInputManager->field_0x73a == gpInputManager->m_readIndex) {
+            gpInputManager->m_readIndex = gpInputManager->m_readIndex + 1;
+            gpInputManager->m_readIndex = gpInputManager->m_readIndex % 0x40;
         }
         gpInputManager->field_0x73e = 0;
     }

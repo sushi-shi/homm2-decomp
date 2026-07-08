@@ -15,8 +15,8 @@
 VA(0x004d20a0, 0x32)
 border::border(void) : widget(0, 0, 0, 0, 0, 0)
 {
-    field_0x20 = 0;
-    field_0x24 = 0;
+    m_backgroundBitmap = 0;
+    m_backgroundIcon = 0;
     field_0x28 = 0;
 }
 
@@ -25,20 +25,20 @@ border::border(short int x, short int y, short int w, short int h, short int e, 
     : widget(x, y, w, h, e, f)
 {
     if (name == 0)
-        field_0x20 = 0;
+        m_backgroundBitmap = 0;
     else
-        field_0x20 = gpResourceManager->GetBitmap(name);
-    field_0x24 = 0;
+        m_backgroundBitmap = gpResourceManager->GetBitmap(name);
+    m_backgroundIcon = 0;
     field_0x28 = p7;
 }
 
 VA(0x004d21a0, 0x38)
 border::~border()
 {
-    if (field_0x20 != 0)
-        gpResourceManager->Dispose(field_0x20);
-    if (field_0x24 != 0)
-        gpResourceManager->Dispose(field_0x24);
+    if (m_backgroundBitmap != 0)
+        gpResourceManager->Dispose(m_backgroundBitmap);
+    if (m_backgroundIcon != 0)
+        gpResourceManager->Dispose(m_backgroundIcon);
 }
 
 VA(0x004d21e0, 0x10e)
@@ -50,21 +50,21 @@ void border::Read(void)
     m_height = gpResourceManager->ReadWord();
     m_id = gpResourceManager->ReadWord();
     short kind = gpResourceManager->ReadWord();
-    field_0x20 = 0;
-    field_0x24 = 0;
+    m_backgroundBitmap = 0;
+    m_backgroundIcon = 0;
     field_0x14 = kind;
     char name[16];
     if (kind == 0x800) {
         gpResourceManager->Read13(reinterpret_cast<signed char *>(name));
         gpResourceManager->SavePosition();
-        field_0x20 = gpResourceManager->GetBitmap(name);
+        m_backgroundBitmap = gpResourceManager->GetBitmap(name);
         gpResourceManager->RestorePosition();
         return;
     }
     if (kind == 0x801) {
         gpResourceManager->Read13(reinterpret_cast<signed char *>(name));
         gpResourceManager->SavePosition();
-        field_0x24 = gpResourceManager->GetIcon(name);
+        m_backgroundIcon = gpResourceManager->GetIcon(name);
         gpResourceManager->RestorePosition();
         return;
     }
@@ -129,11 +129,11 @@ void border::Draw(void)
     if (kind != 0x800) {
         if (kind != 0x801)
             return;
-        field_0x24->DrawToBuffer(x, y, 0, 0);
+        m_backgroundIcon->DrawToBuffer(x, y, 0, 0);
         return;
     }
     PollSound();
-    BlitBitmap(field_0x20, 0, 0, m_width, m_height, gpWindowManager->m_screen, x, y);
+    BlitBitmap(m_backgroundBitmap, 0, 0, m_width, m_height, gpWindowManager->m_screen, x, y);
     PollSound();
 }
 

@@ -12,18 +12,18 @@ VA(0x004dac60, 0x8f)
 tileset::tileset(unsigned long id) : resource(3, id, 1, 0)
 {
     gpResourceManager->PointToFile(id);
-    field_0x10 = gpResourceManager->ReadWord();
-    field_0x12 = gpResourceManager->ReadWord();
-    field_0x14 = gpResourceManager->ReadWord();
-    unsigned int size = field_0x14 * field_0x10 * field_0x12;
-    field_0x16 = static_cast<char *>(BaseAlloc(size, __FILE__, __LINE__));
-    gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(field_0x16), size);
+    m_tileWidth = gpResourceManager->ReadWord();
+    m_tileHeight = gpResourceManager->ReadWord();
+    m_tileCount = gpResourceManager->ReadWord();
+    unsigned int size = m_tileCount * m_tileWidth * m_tileHeight;
+    m_data = static_cast<char *>(BaseAlloc(size, __FILE__, __LINE__));
+    gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(m_data), size);
 }
 
 VA(0x004dad30, 0x21)
 tileset::~tileset()
 {
-    BaseFree(field_0x16, __FILE__, __LINE__);
+    BaseFree(m_data, __FILE__, __LINE__);
 }
 
 

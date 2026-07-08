@@ -44,7 +44,7 @@ void FlipIconToBitmapColorTable(class icon *param_1, class bitmap *param_2, int 
     unsigned int uVar5, uVar7, uVar9, uVar10;
     unsigned char *pbVar11, *pbVar13;
     int *puVar12;
-    IconEntry *entries = reinterpret_cast<IconEntry *>(param_1->field_0x12);
+    IconEntry *entries = reinterpret_cast<IconEntry *>(param_1->m_data);
     gFCEntry = &entries[param_5];
     int iVar6 = gFCEntry->w;
     gFCX0 = ((param_3 - gFCEntry->x) - iVar6) + 1;
@@ -63,7 +63,7 @@ void FlipIconToBitmapColorTable(class icon *param_1, class bitmap *param_2, int 
     short sVar2 = param_2->m_width;
     gFCRow = gFCY * sVar2 + reinterpret_cast<int>(param_2->m_pixels);
     gFCX = gFCXEnd;
-    pbVar13 = reinterpret_cast<unsigned char *>(param_1->field_0x12) + gFCEntry->srcOffset;
+    pbVar13 = reinterpret_cast<unsigned char *>(param_1->m_data) + gFCEntry->srcOffset;
 LAB_004d987c:
     do {
         while (1) {
