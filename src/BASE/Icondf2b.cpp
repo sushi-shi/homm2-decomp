@@ -8,13 +8,11 @@
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <_globals_model.h>
 #include <BASE/Misc.h>
-// Per-call decoder scratch — its own 0x5381b8+ block.
+// Per-call decoder scratch — its own file-static block.
 static int gFDX0;
-static unsigned int gFDCnt;
 static int gFDXEnd;
-static unsigned char *gFDDst;
+static unsigned int gFDCnt;
 static unsigned int gFDCnt2;
 static int gFDRow;
 static IconEntry *gFDEntry;
@@ -22,11 +20,101 @@ static int gFDClipR;
 static int gFDX;
 static int gFDClipB;
 static unsigned char *gFDSrc;
+static unsigned char *gFDDst;
 static int gFDY;
 static unsigned int gFDRun;
 
+// @early-stop
+// Flip + dim variant: horizontal-flip decoder where every literal run remaps the DESTINATION pixels
+// through the dim palette row (uDimPal + color*0x100)[dst], drawn right-to-left from (X-count+1);
+// negative = skip (mask 0x7f). X/row are register-locals; the per-pixel dim loop uses a local ptr.
 VA(0x004daa20, 0x23b)
-// void FlipDimIconToBitmap(class icon *param_1, class bitmap *param_2, int param_3, int param_4,
-//                          int param_5, int param_6, int param_7, int param_8, int param_9, int param_10,
-//                          int param_11);
-
+void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
+                         int color, int clip, int clipX, int clipY, int clipW, int clipH)
+{
+    unsigned char *data = reinterpret_cast<unsigned char *>(srcIcon->m_data);
+    IconEntry *entries = reinterpret_cast<IconEntry *>(data);
+    int w = entries[frame].w;
+    gFDEntry = &entries[frame];
+    gFDSrc = data + entries[frame].srcOffset;
+    gFDY = y + entries[frame].y;
+    gFDX0 = ((x - entries[frame].x) - w) + 1;
+    gFDXEnd = w + gFDX0 - 1;
+    if (clip != 0) {
+        if (gFDX0 < clipX || clipW + clipX < w + gFDX0 || gFDY < clipY ||
+            clipY + clipH < entries[frame].h + gFDY) {
+            clip = 1;
+            gFDClipR = clipX + clipW - 1;
+            gFDClipB = clipY + clipH - 1;
+        } else {
+            clip = 0;
+        }
+    }
+    short pitch = dest->m_width;
+    unsigned char *row =
+        reinterpret_cast<unsigned char *>(gFDY * pitch + reinterpret_cast<int>(dest->m_pixels));
+    int X = gFDXEnd;
+    for (;;) {
+        gFDX = X;
+        int cmd = *gFDSrc++;
+        if (static_cast<signed char>(cmd) < 0) {
+            gFDRow = reinterpret_cast<int>(row);
+            gFDRun = cmd;
+            int n = cmd & 0x7f;
+            if (n == 0)
+                return;
+            X = X - n;
+            continue;
+        }
+        gFDRun = cmd;
+        if (cmd != 0) {
+            if (clip == 0) {
+                gFDCnt = 0;
+                unsigned char *dp = (row - cmd) + 1 + X;
+                gFDDst = dp;
+                gFDCnt = cmd;
+                if (cmd != 0) {
+                    unsigned int cnt = cmd;
+                    do {
+                        cnt--;
+                        gFDDst = dp + 1;
+                        *dp = (reinterpret_cast<unsigned char *>(uDimPal) + color * 0x100)[*dp];
+                        dp = dp + 1;
+                    } while (cnt != 0);
+                }
+            } else {
+                int left;
+                if (clipY <= gFDY && gFDY <= gFDClipB &&
+                    (left = (X - cmd) + 1, clipX <= left) && X <= gFDClipR) {
+                    unsigned int cn;
+                    unsigned char *dp;
+                    if (left < clipX) {
+                        dp = row + clipX;
+                        cn = (X - clipX) + 1;
+                    } else {
+                        dp = (row - cmd) + 1 + X;
+                        cn = cmd;
+                    }
+                    gFDCnt = 0;
+                    gFDCnt2 = cn;
+                    if (static_cast<int>(cn) > 0) {
+                        gFDCnt = cn;
+                        unsigned int cnt = cn;
+                        do {
+                            cnt--;
+                            gFDDst = dp + 1;
+                            *dp = (reinterpret_cast<unsigned char *>(uDimPal) + color * 0x100)[*dp];
+                            dp = dp + 1;
+                        } while (cnt != 0);
+                    }
+                }
+            }
+            X = X - cmd;
+            continue;
+        }
+        // newline
+        X = gFDXEnd;
+        row = row + pitch;
+        gFDY = gFDY + 1;
+    }
+}

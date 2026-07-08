@@ -7,99 +7,87 @@
 #include <BASE/Iconmf2b.h>
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
-#include <_globals_model.h>
 #include <BASE/Misc.h>
-// Per-call decoder scratch — its own 0x538190+ block.
+#include <string.h>
+// Per-call decoder scratch — its own file-static block.
 static unsigned int gFMRun;
 static unsigned char *gFMSrc;
 static IconEntry *gFMEntry;
 static int gFMX;
 static int gFMX0;
+static int gFMXEnd;
 static int gFMClipB;
 static int gFMRow;
 static int gFMY;
 static int gFMClipR;
-static int gFMXEnd;
 
 // @early-stop
-// Flip+Mono variant of IconToBitmap: fills each RLE run with a single colour (param_6) in the flipped
-// run position ((row-run)+1+X, X decrements). Full logic recovered; 0% for the shared Icon*2b* /O2
-// register-fusion codegen wall documented in Icon2b.cpp. Kept per breadth mandate.
+// Flip + mono variant: horizontal-flip silhouette. Every literal run is a solid single-colour fill
+// (the `color` param) drawn right-to-left from (X-count+1); negative = skip (mask 0x7f). Working X
+// lives in global gFMX (starts at gFMXEnd, decreases); row base is a register-local. /O2 reg wall.
 VA(0x004da800, 0x212)
-void FlipMonoIconToBitmap(class icon *param_1, class bitmap *param_2, int param_3, int param_4,
-                          int param_5, int param_6, int param_7, int param_8, int param_9, int param_10,
-                          int param_11)
+void FlipMonoIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
+                          int color, int clip, int clipX, int clipY, int clipW, int clipH)
 {
-    unsigned char bVar1;
-    unsigned char *pbVar3;
-    unsigned int uVar4;
-    int iVar5;
-    unsigned int uVar6, uVar7;
-    unsigned char uVar8;
-    int *puVar9;
-    IconEntry *entries = reinterpret_cast<IconEntry *>(param_1->m_data);
-    gFMEntry = &entries[param_5];
-    gFMSrc = reinterpret_cast<unsigned char *>(param_1->m_data) + gFMEntry->srcOffset;
-    gFMX0 = (param_3 - gFMEntry->x) - gFMEntry->w;
-    iVar5 = gFMEntry->w + 1 + gFMX0;
-    gFMX0 = gFMX0 + 1;
-    gFMXEnd = iVar5 - 1;
-    gFMY = param_4 + gFMEntry->y;
-    if (param_7 != 0) {
-        if (gFMX0 < param_8 || param_10 + param_8 < iVar5 || gFMY < param_9 ||
-            param_9 + param_11 < gFMEntry->h + gFMY) {
-            param_7 = 1;
-            gFMClipR = param_8 - 1 + param_10;
-            gFMClipB = param_9 - 1 + param_11;
+    unsigned char *data = reinterpret_cast<unsigned char *>(srcIcon->m_data);
+    IconEntry *entries = reinterpret_cast<IconEntry *>(data);
+    int w = entries[frame].w;
+    gFMEntry = &entries[frame];
+    gFMSrc = data + entries[frame].srcOffset;
+    gFMX0 = ((x - entries[frame].x) - w) + 1;
+    gFMXEnd = w + gFMX0 - 1;
+    gFMY = y + entries[frame].y;
+    if (clip != 0) {
+        if (gFMX0 < clipX || clipW + clipX < gFMX0 + w || gFMY < clipY ||
+            clipY + clipH < entries[frame].h + gFMY) {
+            clip = 1;
+            gFMClipR = clipX + clipW - 1;
+            gFMClipB = clipY + clipH - 1;
         } else {
-            param_7 = 0;
+            clip = 0;
         }
     }
-    short sVar2 = param_2->m_width;
-    gFMRow = gFMY * sVar2 + reinterpret_cast<int>(param_2->m_pixels);
+    short pitch = dest->m_width;
+    unsigned char *row =
+        reinterpret_cast<unsigned char *>(gFMY * pitch + reinterpret_cast<int>(dest->m_pixels));
     gFMX = gFMXEnd;
-    do {
-        while (1) {
-            while (1) {
-                pbVar3 = gFMSrc;
-                gFMSrc = gFMSrc + 1;
-                bVar1 = *pbVar3;
-                gFMRun = bVar1;
-                if (-1 < static_cast<signed char>(bVar1))
-                    break;
-                if ((bVar1 & 0x7f) == 0)
-                    return;
-                gFMX = gFMX - (bVar1 & 0x7f);
-            }
-            if (gFMRun != 0)
-                break;
-            gFMY = gFMY + 1;
-            gFMRow = gFMRow + sVar2;
-            gFMX = gFMXEnd;
+    for (;;) {
+        int cmd = *gFMSrc++;
+        if (static_cast<signed char>(cmd) < 0) {
+            gFMRow = reinterpret_cast<int>(row);
+            gFMRun = cmd;
+            int n = cmd & 0x7f;
+            if (n == 0)
+                return;
+            gFMX = gFMX - n;
+            continue;
         }
-        uVar8 = static_cast<unsigned char>(param_6);
-        uVar7 = gFMRun;
-        if (param_7 == 0) {
-            uVar4 = uVar8 * 0x01010101;
-            puVar9 = reinterpret_cast<int *>((gFMRow - gFMRun) + 1 + gFMX);
-LAB_004da9c5:
-            for (uVar6 = uVar7 >> 2; uVar6 != 0; uVar6--)
-                *puVar9++ = uVar4;
-            for (uVar7 = uVar7 & 3; uVar7 != 0; uVar7--)
-                *reinterpret_cast<char *>(puVar9) = static_cast<char>(uVar4),
-                puVar9 = reinterpret_cast<int *>(reinterpret_cast<char *>(puVar9) + 1);
-        } else if (param_9 <= gFMY && gFMY <= gFMClipB &&
-                   (iVar5 = (gFMX - gFMRun) + 1, param_8 <= iVar5 && gFMX <= gFMClipR)) {
-            if (iVar5 < param_8) {
-                uVar7 = (gFMX - param_8) + 1;
-                uVar4 = uVar8 * 0x01010101;
-                puVar9 = reinterpret_cast<int *>(param_8 + gFMRow);
+        gFMRun = cmd;
+        if (cmd != 0) {
+            if (clip == 0) {
+                memset((row - cmd) + 1 + gFMX, color, cmd);
             } else {
-                uVar4 = uVar8 * 0x01010101;
-                puVar9 = reinterpret_cast<int *>((gFMRow - gFMRun) + 1 + gFMX);
+                int left;
+                if (clipY <= gFMY && gFMY <= gFMClipB &&
+                    (left = (gFMX - cmd) + 1, clipX <= left) && gFMX <= gFMClipR) {
+                    unsigned int cn = cmd;
+                    unsigned char *dst;
+                    if (left < clipX) {
+                        cn = (gFMX - clipX) + 1;
+                        dst = row + clipX;
+                    } else {
+                        dst = (row - cmd) + 1 + gFMX;
+                    }
+                    memset(dst, color, cn);
+                }
             }
-            goto LAB_004da9c5;
+            gFMRun = cmd;
+            gFMX = gFMX - cmd;
+            continue;
         }
-        gFMX = gFMX - gFMRun;
-    } while (1);
+        // newline
+        gFMX = gFMXEnd;
+        row = row + pitch;
+        gFMY = gFMY + 1;
+    }
 }

@@ -8,9 +8,9 @@
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <_globals_model.h>
 #include <BASE/Misc.h>
-// Per-call decoder scratch — its own 0x538150+ block.
+#include <string.h>
+// Per-call decoder scratch — its own file-static block.
 static int gYMClipB;
 static int gYMDimIdx;
 static int gYMPitch;
@@ -29,184 +29,146 @@ static unsigned int gYMDimLen2;
 static int gYMClipR;
 
 // @early-stop
-// Y-modify variant of IconToBitmap: each row is sheared horizontally by param_12[Y] (a signed per-row
-// X offset; 0x7f = skip-row). Clip-only rendering (no fast path). Own 0x538150 scratch block. Full logic
-// recovered; 0% for the shared Icon*2b* /O2 register-fusion codegen wall (Icon2b.cpp). Kept per breadth.
+// Y-shear variant of IconToBitmap: each scanline's X origin is offset by shear[Y] (0x7f = skip this
+// line). Always clips (no fast path); X and row live in globals gYMX/gYMRow. Literal copy = memcpy,
+// solid run = memset, dim = per-pixel uDimPal remap. Residual is the /O2 register-fusion wall.
 VA(0x004da270, 0x588)
-void IconToBitmapYModify(class icon *param_1, class bitmap *param_2, int param_3, int param_4,
-                         int param_5, int param_6, int param_7, int param_8, int param_9, int param_10,
-                         int param_11, signed char *param_12)
+void IconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int y, int frame, int clip,
+                         int clipX, int clipY, int clipW, int clipH, int color, signed char *shear)
 {
-    unsigned char bVar1;
-    int iVar2, iVar3;
-    unsigned int uVar4, uVar5, uVar6;
-    unsigned char *pbVar7, *pbVar9;
-    int *puVar8;
-    IconEntry *entries = reinterpret_cast<IconEntry *>(param_1->m_data);
-    gYMEntry = &entries[param_5];
-    gYMSrc = reinterpret_cast<unsigned char *>(param_1->m_data) + gYMEntry->srcOffset;
-    gYMX0 = gYMEntry->x + param_3;
-    gYMPitch = param_2->m_width;
-    gYMY = gYMEntry->y + param_4;
-    gYMX = param_12[gYMY] + gYMX0;
-    gYMClipB = param_8 + param_10 - 1;
-    gYMClipR = param_7 + param_9 - 1;
-    gYMRow = gYMPitch * gYMY + reinterpret_cast<int>(param_2->m_pixels);
-    do {
-        while (1) {
-            while (1) {
-                while (1) {
-                    pbVar7 = gYMSrc;
-                    bVar1 = *gYMSrc;
-                    uVar6 = bVar1;
-                    gYMSrc = gYMSrc + 1;
-                    gYMRun = uVar6;
-                    if (static_cast<signed char>(bVar1) < 0)
-                        break;
-                    if (uVar6 == 0) {
-                        gYMX = param_12[gYMY] + gYMX0;
-                        gYMRow = gYMRow + gYMPitch;
-                        gYMY = gYMY + 1;
-                    } else {
-                        if (param_12[gYMY] != 0x7f && param_8 <= gYMY && gYMY <= gYMClipB &&
-                            (iVar3 = gYMX + uVar6, param_7 < iVar3 && gYMX <= gYMClipR)) {
-                            if (gYMX < param_7) {
-                                if (gYMClipR < iVar3) {
-                                    pbVar7 = gYMSrc + (param_7 - gYMX);
-                                    pbVar9 = reinterpret_cast<unsigned char *>(gYMRow + param_7);
-                                    for (uVar5 = static_cast<unsigned int>(param_9) >> 2; uVar6 = param_9, uVar5 != 0; uVar5--) {
-                                        *reinterpret_cast<int *>(pbVar9) = *reinterpret_cast<int *>(pbVar7);
-                                        pbVar7 += 4;
-                                        pbVar9 += 4;
-                                    }
-                                } else {
-                                    uVar6 = (uVar6 - param_7) + gYMX;
-                                    pbVar7 = gYMSrc + (param_7 - gYMX);
-                                    pbVar9 = reinterpret_cast<unsigned char *>(gYMRow + param_7);
-                                    for (uVar5 = uVar6 >> 2; uVar5 != 0; uVar5--) {
-                                        *reinterpret_cast<int *>(pbVar9) = *reinterpret_cast<int *>(pbVar7);
-                                        pbVar7 += 4;
-                                        pbVar9 += 4;
-                                    }
-                                }
-                            } else {
-                                pbVar7 = gYMSrc;
-                                if (gYMClipR < iVar3) {
-                                    uVar6 = (gYMClipR - gYMX) + 1;
-                                    pbVar9 = reinterpret_cast<unsigned char *>(gYMRow + gYMX);
-                                    for (uVar5 = uVar6 >> 2; uVar5 != 0; uVar5--) {
-                                        *reinterpret_cast<int *>(pbVar9) = *reinterpret_cast<int *>(pbVar7);
-                                        pbVar7 += 4;
-                                        pbVar9 += 4;
-                                    }
-                                } else {
-                                    pbVar9 = reinterpret_cast<unsigned char *>(gYMRow + gYMX);
-                                    for (uVar5 = bVar1 >> 2; uVar5 != 0; uVar5--) {
-                                        *reinterpret_cast<int *>(pbVar9) = *reinterpret_cast<int *>(pbVar7);
-                                        pbVar7 += 4;
-                                        pbVar9 += 4;
-                                    }
-                                }
-                            }
-                            for (uVar6 = uVar6 & 3; uVar6 != 0; uVar6--) {
-                                *pbVar9 = *pbVar7;
-                                pbVar7 = pbVar7 + 1;
-                                pbVar9 = pbVar9 + 1;
-                            }
-                        }
-                        gYMX = gYMX + gYMRun;
-                        gYMSrc = gYMSrc + gYMRun;
-                    }
-                }
-                if ((bVar1 & 0x40) != 0)
-                    break;
-                if ((bVar1 & 0x3f) == 0)
+    IconEntry *entries = reinterpret_cast<IconEntry *>(srcIcon->m_data);
+    gYMEntry = &entries[frame];
+    gYMSrc = reinterpret_cast<unsigned char *>(srcIcon->m_data) + gYMEntry->srcOffset;
+    gYMX0 = gYMEntry->x + x;
+    gYMPitch = dest->m_width;
+    gYMY = gYMEntry->y + y;
+    gYMX = shear[gYMY] + gYMX0;
+    gYMClipB = clipY + clipH - 1;
+    gYMClipR = clipX + clipW - 1;
+    gYMRow = gYMPitch * gYMY + reinterpret_cast<int>(dest->m_pixels);
+    for (;;) {
+        int cmd = *gYMSrc++;
+        if (static_cast<signed char>(cmd) < 0) {
+            gYMRun = cmd;
+            if ((cmd & 0x40) == 0) {
+                if ((cmd & 0x3f) == 0)
                     return;
-                gYMX = gYMX + (uVar6 & 0x3f);
+                gYMX = gYMX + (cmd & 0x3f);
+                continue;
             }
-            gYMRun = uVar6 & 0x3f;
-            if ((bVar1 & 0x3f) == 0)
-                break;
-            if (uVar6 == 0xc1) {
-                gYMRun = *gYMSrc;
-                gYMSrc = pbVar7 + 2;
-            }
-            gYMColor = *gYMSrc;
-            gYMSrc = gYMSrc + 1;
-LAB_004da401:
-            uVar6 = gYMRun;
-            if (param_12[gYMY] != 0x7f && param_8 <= gYMY && gYMY <= gYMClipB &&
-                (iVar3 = gYMX + gYMRun, param_7 < iVar3 && gYMX <= gYMClipR)) {
-                if (gYMX < param_7) {
-                    if (gYMClipR < iVar3) {
-                        uVar4 = gYMColor * 0x01010101;
-                        puVar8 = reinterpret_cast<int *>(gYMRow + param_7);
-                        for (uVar5 = static_cast<unsigned int>(param_9) >> 2; uVar6 = param_9, uVar5 != 0; uVar5--)
-                            *puVar8++ = uVar4;
-                    } else {
-                        uVar6 = (gYMRun - param_7) + gYMX;
-                        uVar4 = gYMColor * 0x01010101;
-                        puVar8 = reinterpret_cast<int *>(gYMRow + param_7);
-                        for (uVar5 = uVar6 >> 2; uVar5 != 0; uVar5--)
-                            *puVar8++ = uVar4;
-                    }
-                } else if (gYMClipR < iVar3) {
-                    uVar6 = (gYMClipR - gYMX) + 1;
-                    uVar4 = gYMColor * 0x01010101;
-                    puVar8 = reinterpret_cast<int *>(gYMRow + gYMX);
-                    for (uVar5 = uVar6 >> 2; uVar5 != 0; uVar5--)
-                        *puVar8++ = uVar4;
-                } else {
-                    uVar4 = gYMColor * 0x01010101;
-                    puVar8 = reinterpret_cast<int *>(gYMRow + gYMX);
-                    for (uVar5 = gYMRun >> 2; uVar5 != 0; uVar5--)
-                        *puVar8++ = uVar4;
+            // 0xc0 - 0xff
+            unsigned int count = cmd & 0x3f;
+            gYMRun = count;
+            int flags = 0;
+            if (count != 0) {
+                if (cmd == 0xc1) {
+                    gYMRun = *gYMSrc;
+                    gYMSrc = gYMSrc + 1;
                 }
-                for (uVar6 = uVar6 & 3; uVar6 != 0; uVar6--)
-                    *reinterpret_cast<char *>(puVar8) = static_cast<char>(uVar4),
-                    puVar8 = reinterpret_cast<int *>(reinterpret_cast<char *>(puVar8) + 1);
+                gYMColor = *gYMSrc;
+                gYMSrc = gYMSrc + 1;
+                goto do_fill;
+            }
+            flags = *gYMSrc;
+            gYMSrc = gYMSrc + 1;
+            gYMDimLen = flags & 3;
+            if ((flags & 3) == 0) {
+                gYMDimLen = *gYMSrc;
+                gYMSrc = gYMSrc + 1;
+            }
+            gYMDimLen2 = gYMDimLen;
+            if (color != 0 && (flags & 0x80) != 0) {
+                gYMColor = static_cast<unsigned char>(color);
+                gYMRun = gYMDimLen;
+                goto do_fill;
+            }
+            if ((flags & 0x40) != 0) {
+                gYMDimPal = reinterpret_cast<unsigned char *>(uDimPal) + (flags & 0x3c) * 0x40;
+                if (shear[gYMY] != 0x7f && clipY <= gYMY && gYMY <= gYMClipB &&
+                    (int)(gYMDimLen + gYMX) > clipX && gYMX <= gYMClipR) {
+                    int right = gYMDimLen + gYMX;
+                    int at;
+                    if (gYMX < clipX) {
+                        at = clipX;
+                        if (gYMClipR < right)
+                            gYMDimLen = clipW;
+                        else
+                            gYMDimLen = gYMDimLen + (gYMX - clipX);
+                    } else {
+                        at = gYMX;
+                        if (gYMClipR < right)
+                            gYMDimLen = (gYMClipR - gYMX) + 1;
+                    }
+                    gYMDimDst = reinterpret_cast<unsigned char *>(gYMRow + at);
+                    gYMDimIdx = 0;
+                    if (0 < static_cast<int>(gYMDimLen)) {
+                        do {
+                            *gYMDimDst = gYMDimPal[*gYMDimDst];
+                            gYMDimDst = gYMDimDst + 1;
+                            gYMDimIdx = gYMDimIdx + 1;
+                        } while (gYMDimIdx < static_cast<int>(gYMDimLen));
+                    }
+                }
+            }
+            gYMX = gYMX + gYMDimLen2;
+            continue;
+        do_fill:
+            if (shear[gYMY] != 0x7f && clipY <= gYMY && gYMY <= gYMClipB &&
+                (int)(gYMX + gYMRun) > clipX && gYMX <= gYMClipR) {
+                int right = gYMX + gYMRun;
+                unsigned int cn;
+                unsigned char *dst;
+                if (gYMX < clipX) {
+                    if (gYMClipR < right)
+                        cn = clipW;
+                    else
+                        cn = (gYMRun - clipX) + gYMX;
+                    dst = reinterpret_cast<unsigned char *>(gYMRow + clipX);
+                } else {
+                    if (gYMClipR < right)
+                        cn = (gYMClipR - gYMX) + 1;
+                    else
+                        cn = gYMRun;
+                    dst = reinterpret_cast<unsigned char *>(gYMRow + gYMX);
+                }
+                memset(dst, gYMColor, cn);
             }
             gYMX = gYMX + gYMRun;
+            continue;
         }
-        bVar1 = *gYMSrc;
-        gYMSrc = pbVar7 + 2;
-        gYMDimLen = bVar1 & 3;
-        if ((bVar1 & 3) == 0) {
-            gYMDimLen = *gYMSrc;
-            gYMSrc = pbVar7 + 3;
-        }
-        gYMDimLen2 = gYMDimLen;
-        if (param_11 != 0 && (bVar1 & 0x80) != 0) {
-            gYMColor = static_cast<unsigned char>(param_11);
-            gYMRun = gYMDimLen;
-            goto LAB_004da401;
-        }
-        if ((bVar1 & 0x40) != 0 &&
-            (gYMDimPal = reinterpret_cast<unsigned char *>(uDimPal) + (bVar1 & 0x3c) * 0x40,
-             param_12[gYMY] != 0x7f) &&
-            param_8 <= gYMY &&
-            gYMY <= gYMClipB && (iVar3 = gYMDimLen + gYMX, param_7 < iVar3) && gYMX <= gYMClipR) {
-            if (gYMX < param_7) {
-                iVar2 = param_7;
-                if (gYMClipR < iVar3)
-                    gYMDimLen = param_9;
-                else
-                    gYMDimLen = gYMDimLen + (gYMX - param_7);
-            } else {
-                iVar2 = gYMX;
-                if (gYMClipR < iVar3)
-                    gYMDimLen = (gYMClipR - gYMX) + 1;
+        // ---- positive command : literal copy / newline ----
+        gYMRun = cmd;
+        if (cmd != 0) {
+            if (shear[gYMY] != 0x7f && clipY <= gYMY && gYMY <= gYMClipB &&
+                (int)(gYMX + cmd) > clipX && gYMX <= gYMClipR) {
+                int right = gYMX + cmd;
+                unsigned int cn;
+                unsigned char *src2;
+                unsigned char *dst;
+                if (gYMX < clipX) {
+                    if (gYMClipR < right)
+                        cn = clipW;
+                    else
+                        cn = (cmd - clipX) + gYMX;
+                    src2 = gYMSrc + (clipX - gYMX);
+                    dst = reinterpret_cast<unsigned char *>(gYMRow + clipX);
+                } else {
+                    src2 = gYMSrc;
+                    if (gYMClipR < right)
+                        cn = (gYMClipR - gYMX) + 1;
+                    else
+                        cn = cmd;
+                    dst = reinterpret_cast<unsigned char *>(gYMRow + gYMX);
+                }
+                memcpy(dst, src2, cn);
             }
-            gYMDimDst = reinterpret_cast<unsigned char *>(gYMRow + iVar2);
-            gYMDimIdx = 0;
-            if (0 < static_cast<int>(gYMDimLen)) {
-                do {
-                    *gYMDimDst = gYMDimPal[*gYMDimDst];
-                    gYMDimDst = gYMDimDst + 1;
-                    gYMDimIdx = gYMDimIdx + 1;
-                } while (gYMDimIdx < static_cast<int>(gYMDimLen));
-            }
+            gYMX = gYMX + cmd;
+            gYMSrc = gYMSrc + cmd;
+            continue;
         }
-        gYMX = gYMX + gYMDimLen2;
-    } while (1);
+        // newline
+        gYMX = shear[gYMY] + gYMX0;
+        gYMRow = gYMRow + gYMPitch;
+        gYMY = gYMY + 1;
+    }
 }
