@@ -11,11 +11,50 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <BASE/resourceManager.h>
 #include <BASE/MIDIWrap.h>
+#include <BASE/Misc.h>
 VA(0x004d3850, 0xb8)
 void soundManager::MIDIStartup(void) {}
 
 VA(0x004d3910, 0x1a9)
-void soundManager::MIDIShutdown(void) {}
+void soundManager::MIDIShutdown(void)
+{
+    int i;
+    if (gbNoSound == 0 && field_0x69e != 0) {
+        if (field_0x69e != 0 && CurrentMidiFile != -1) {
+            if (gMidiEnabled != 0 && field_0x69e != 0 && CurrentMidiFile != -1 &&
+                hSequence[CurrentMidiFile] != 0 &&
+                _AIL_sequence_status_4(hSequence[CurrentMidiFile]) == 4 &&
+                hSequence[CurrentMidiFile] != 0 &&
+                (_AIL_stop_sequence_4(hSequence[CurrentMidiFile]),
+                 gbLowMemory != 0 || bSaveMusicPosition[CurrentMidiFile] == 0)) {
+                _AIL_release_sequence_handle_4(hSequence[CurrentMidiFile]);
+                int iVar1 = CurrentMidiFile;
+                hSequence[CurrentMidiFile] = 0;
+                if (pMIDIWrap[iVar1] != 0)
+                    gpResourceManager->Dispose(pMIDIWrap[iVar1]);
+                pMIDIWrap[CurrentMidiFile] = 0;
+            }
+            CurrentMidiFile = -1;
+            field_0x578 = 0xff;
+        }
+        LogStr("Releasing MIDI sequences");
+        for (i = 0; i < 60; i++) {
+            if (hSequence[i] != 0)
+                _AIL_release_sequence_handle_4(hSequence[i]);
+            hSequence[i] = 0;
+        }
+        LogStr("Closing MIDI output");
+        _AIL_midiOutClose_4(hMDI);
+        hMDI = 0;
+        field_0x69e = 0;
+        for (i = 0; i < 60; i++) {
+            if (pMIDIWrap[i] != 0)
+                gpResourceManager->Dispose(pMIDIWrap[i]);
+            pMIDIWrap[i] = 0;
+        }
+        LogStr("MIDI shut down");
+    }
+}
 
 VA(0x004d3ac0, 0x3ab)
 void soundManager::MIDIPlay(int) {}
