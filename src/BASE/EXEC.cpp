@@ -29,7 +29,50 @@ VA(0x004d1850, 0x86)
 void executive::PrintManagerList(void) {}
 
 VA(0x004d18e0, 0xce)
-int executive::AddManager(class baseManager *, int) { return 0; }
+int executive::AddManager(class baseManager *mgr, int param_2)
+{
+    if (mgr == 0)
+        return 3;
+    if (param_2 == -1) {
+        param_2 = 0;
+        if (field_0x4 != 0)
+            param_2 = field_0x4->field_0x10 + 1;
+    }
+    if (mgr->field_0x32 == 0 && mgr->Open(param_2) != 0)
+        return 3;
+    baseManager *tail = field_0x4;
+    baseManager *cur = tail;
+    if (tail != 0) {
+        do {
+            if (cur->field_0x10 <= param_2)
+                break;
+            cur = cur->field_0x8;
+        } while (cur != 0);
+        if (cur != 0) {
+            if (cur->field_0x4 != 0) {
+                mgr->field_0x8 = cur;
+                mgr->field_0x4 = cur->field_0x4;
+                cur->field_0x4->field_0x8 = mgr;
+                cur->field_0x4 = mgr;
+                return 0;
+            }
+            mgr->field_0x4 = 0;
+            mgr->field_0x8 = tail;
+            field_0x4->field_0x4 = mgr;
+            field_0x4 = mgr;
+            return 0;
+        }
+    }
+    mgr->field_0x8 = 0;
+    mgr->field_0x4 = field_0x0;
+    if (field_0x0 != 0)
+        field_0x0->field_0x8 = mgr;
+    field_0x0 = mgr;
+    if (field_0x4 != 0)
+        return 0;
+    field_0x4 = mgr;
+    return 0;
+}
 
 VA(0x004d19b0, 0x76)
 void executive::RemoveManager(class baseManager *mgr)
