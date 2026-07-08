@@ -27,7 +27,24 @@ VA(0x004d0b40, 0x78)
 iconWidget::iconWidget(short int, short int, short int, short int, char *, short int, signed char, short int, short int, short int) {}
 
 VA(0x004d0bc0, 0xdf)
-void iconWidget::Read(void) {}
+void iconWidget::Read(void)
+{
+    char local_10[16];
+    field_0x18 = gpResourceManager->ReadWord();
+    field_0x1a = gpResourceManager->ReadWord();
+    field_0x1c = gpResourceManager->ReadWord();
+    field_0x1e = gpResourceManager->ReadWord();
+    gpResourceManager->Read13(reinterpret_cast<signed char *>(local_10));
+    gpResourceManager->SavePosition();
+    unsigned long id = gpResourceManager->MakeId(local_10, 1);
+    field_0x20 = gpResourceManager->GetIcon(id);
+    gpResourceManager->RestorePosition();
+    field_0x24 = gpResourceManager->ReadWord();
+    field_0x26 = static_cast<char>(gpResourceManager->ReadWord());
+    field_0x10 = gpResourceManager->ReadWord();
+    field_0x14 = gpResourceManager->ReadWord();
+    field_0x27 = gpResourceManager->ReadWord() & 0xff;
+}
 
 VA(0x004d0ca0, 0x21)
 iconWidget::~iconWidget()
