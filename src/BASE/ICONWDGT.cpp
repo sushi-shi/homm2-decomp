@@ -16,7 +16,7 @@ iconWidget::iconWidget(void) : widget(0, 0, 0, 0, 0, 0)
     m_frame = 0;
     field_0x27 = 0;
     m_icon = 0;
-    field_0x26 = 0;
+    m_flip = 0;
     m_iconId = 0;
 }
 
@@ -33,7 +33,7 @@ iconWidget::iconWidget(short int param_1, short int param_2, short int param_3, 
     m_iconId = param_5;
     m_icon = gpResourceManager->GetIcon(param_5);
     m_frame = param_6;
-    field_0x26 = param_7;
+    m_flip = param_7;
     field_0x27 = param_10;
     field_0x14 = param_9;
 }
@@ -50,7 +50,7 @@ iconWidget::iconWidget(short int param_1, short int param_2, short int param_3, 
     m_iconId = uVar1;
     m_icon = gpResourceManager->GetIcon(uVar1);
     m_frame = param_6;
-    field_0x26 = param_7;
+    m_flip = param_7;
     field_0x27 = param_10;
     field_0x14 = param_9;
 }
@@ -69,7 +69,7 @@ void iconWidget::Read(void)
     m_icon = gpResourceManager->GetIcon(id);
     gpResourceManager->RestorePosition();
     m_frame = gpResourceManager->ReadWord();
-    field_0x26 = static_cast<char>(gpResourceManager->ReadWord());
+    m_flip = static_cast<char>(gpResourceManager->ReadWord());
     m_id = gpResourceManager->ReadWord();
     field_0x14 = gpResourceManager->ReadWord();
     field_0x27 = gpResourceManager->ReadWord() & 0xff;
@@ -173,13 +173,13 @@ void iconWidget::Draw(void)
     short x = m_owner->m_posX + m_x;
     short y = m_owner->m_posY + m_y;
     if (type == 0x10) {
-        m_icon->DrawToBuffer(x, y, m_frame, field_0x26);
+        m_icon->DrawToBuffer(x, y, m_frame, m_flip);
         return;
     }
     if (type != 0x11) {
         if (type != 0x80)
             return;
-        m_icon->FillToBuffer(x, y, m_frame, field_0x27, field_0x26, 0);
+        m_icon->FillToBuffer(x, y, m_frame, field_0x27, m_flip, 0);
         return;
     }
     short *entry = reinterpret_cast<short *>(GetIconEntry(m_icon, m_frame));
@@ -189,7 +189,7 @@ void iconWidget::Draw(void)
         x = x + (short)((m_width - entry[2]) >> 1);
     if (entry[3] + 2 < m_height)
         y = y + (m_height - entry[3]) - 2;
-    m_icon->DrawToBuffer(x, y, m_frame, field_0x26);
+    m_icon->DrawToBuffer(x, y, m_frame, m_flip);
 }
 
 

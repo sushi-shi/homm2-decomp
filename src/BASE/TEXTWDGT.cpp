@@ -14,7 +14,7 @@
 VA(0x004d1060, 0x3e)
 textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, 0)
 {
-    field_0x28 = 1;
+    m_color = 1;
     field_0x2a = 1;
     m_font = 0;
     m_text = 0;
@@ -27,7 +27,7 @@ textWidget::textWidget(short p1, short p2, short p3, short p4, char *p5, char *p
     : widget(p1, p2, p3, p4, p8, p9)
 {
     m_font = gpResourceManager->GetFont(p6);
-    field_0x28 = p7;
+    m_color = p7;
     field_0x2a = static_cast<char>(p10);
     field_0x14 = 0x200;
     m_text = p5;
@@ -48,7 +48,7 @@ void textWidget::Read(void)
     gpResourceManager->SavePosition();
     m_font = gpResourceManager->GetFont(local_10);
     gpResourceManager->RestorePosition();
-    field_0x28 = gpResourceManager->ReadWord() & 0xff;
+    m_color = gpResourceManager->ReadWord() & 0xff;
     field_0x2a = static_cast<char>(gpResourceManager->ReadWord());
     m_id = gpResourceManager->ReadWord();
     gpResourceManager->ReadWord();
@@ -114,7 +114,7 @@ LAB_004d12c4:
                         return 1;
                     }
                 } else if (param_1.field4 == 8 && m_id == param_1.field8) {
-                    field_0x28 = static_cast<short>(reinterpret_cast<int>(param_1.text));
+                    m_color = static_cast<short>(reinterpret_cast<int>(param_1.text));
                     return 1;
                 }
             }
@@ -142,7 +142,7 @@ void textWidget::Draw(void)
 {
     int color = 3;
     if ((m_flags & 8) == 0)
-        color = field_0x28;
+        color = m_color;
     m_font->DrawBoundedString(m_text, m_x + m_owner->m_posX,
                                   m_y + m_owner->m_posY, m_width, m_height,
                                   color, field_0x2a);
@@ -151,7 +151,7 @@ void textWidget::Draw(void)
 VA(0x004d14e0, 0xc)
 void textWidget::SetColorIndex(short int param_1)
 {
-    field_0x28 = param_1;
+    m_color = param_1;
 }
 
 VA(0x004d14f0, 0xa2)
