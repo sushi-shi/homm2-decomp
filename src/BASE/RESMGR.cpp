@@ -118,13 +118,14 @@ VA(0x004c8380, 0x86)
 class icon *resourceManager::GetIcon(unsigned long param_1)
 {
     resource *local_8 = Query(param_1);
-    if (local_8 == 0) {
+    if (local_8 != 0) {
+        local_8->field_0x6++;
+        return static_cast<icon *>(local_8);
+    } else {
         local_8 = new icon(param_1);
         AddResource(local_8);
-    } else {
-        local_8->field_0x6 = local_8->field_0x6 + 1;
+        return static_cast<icon *>(local_8);
     }
-    return static_cast<icon *>(local_8);
 }
 
 VA(0x004c8410, 0x97)
@@ -165,13 +166,14 @@ class sample *resourceManager::GetSample(char *param_1)
 {
     unsigned long uVar1 = MakeId(param_1, 1);
     resource *local_8 = Query(uVar1);
-    if (local_8 == 0) {
+    if (local_8 != 0) {
+        local_8->field_0x6++;
+        return static_cast<sample *>(local_8);
+    } else {
         local_8 = new sample(param_1, 0, 0x7f, 1);
         AddResource(local_8);
-    } else {
-        local_8->field_0x6 = local_8->field_0x6 + 1;
+        return static_cast<sample *>(local_8);
     }
-    return static_cast<sample *>(local_8);
 }
 
 VA(0x004c8610, 0x97)
@@ -179,13 +181,14 @@ class MIDIWrap *resourceManager::GetMIDIWrap(char *param_1)
 {
     unsigned long uVar1 = MakeId(param_1, 1);
     resource *local_8 = Query(uVar1);
-    if (local_8 == 0) {
+    if (local_8 != 0) {
+        local_8->field_0x6++;
+        return static_cast<MIDIWrap *>(local_8);
+    } else {
         local_8 = new MIDIWrap(param_1);
         AddResource(local_8);
-    } else {
-        local_8->field_0x6 = local_8->field_0x6 + 1;
+        return static_cast<MIDIWrap *>(local_8);
     }
-    return static_cast<MIDIWrap *>(local_8);
 }
 
 VA(0x004c86b0, 0x87)

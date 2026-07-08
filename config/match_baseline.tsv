@@ -270,12 +270,12 @@ BASE/RESMGR	?GetBackdropAtLoc@resourceManager@@QAEXPADPAVbitmap@@HHH@Z	45.6620	6
 BASE/RESMGR	?GetBitmap@resourceManager@@QAEPAVbitmap@@PAD@Z	100.0000	e5cfce941783
 BASE/RESMGR	?GetFileSize@resourceManager@@QAEKK@Z	90.8028	a6bd9bc83c76
 BASE/RESMGR	?GetFont@resourceManager@@QAEPAVfont@@PAD@Z	99.7755	a98ac8688d6c
-BASE/RESMGR	?GetIcon@resourceManager@@QAEPAVicon@@K@Z	73.0233	2fa0ea29c9e3
+BASE/RESMGR	?GetIcon@resourceManager@@QAEPAVicon@@K@Z	100.0000	040871496c4e
 BASE/RESMGR	?GetIcon@resourceManager@@QAEPAVicon@@PAD@Z	100.0000	a2cd94727669
-BASE/RESMGR	?GetMIDIWrap@resourceManager@@QAEPAVMIDIWrap@@PAD@Z	76.3265	6dc3754ac2a7
+BASE/RESMGR	?GetMIDIWrap@resourceManager@@QAEPAVMIDIWrap@@PAD@Z	100.0000	fadac8839452
 BASE/RESMGR	?GetMouse@resourceManager@@QAEPAVmouse@@PAD@Z	100.0000	7d91b412c973
 BASE/RESMGR	?GetPalette@resourceManager@@QAEPAVpalette@@PAD@Z	100.0000	f0b5b6a043fb
-BASE/RESMGR	?GetSample@resourceManager@@QAEPAVsample@@PAD@Z	77.6923	fa55d1744f74
+BASE/RESMGR	?GetSample@resourceManager@@QAEPAVsample@@PAD@Z	100.0000	6554ed8b67fb
 BASE/RESMGR	?GetTileset@resourceManager@@QAEPAVtileset@@PAD@Z	100.0000	6130367f673e
 BASE/RESMGR	?LoadAggregateHeader@resourceManager@@QAEHPAD@Z	78.7273	e9ebb21a0cf4
 BASE/RESMGR	?Main@resourceManager@@UAEHAAUtag_message@@@Z	100.0000	434bea8a6023
