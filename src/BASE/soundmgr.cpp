@@ -334,7 +334,7 @@ soundManager::soundManager(void) : baseManager()
     field_0x56c = 0;
     for (local_8 = 0; local_8 < 0x20; local_8++)
         iLastVolume[local_8] = 0;
-    memset(&field_0x3e, 0, 0xae);
+    memset(&m_ready, 0, 0xae);
     m_samplesReady = 0;
     m_digitalDriver = 0;
     field_0x3a = 0;
@@ -461,7 +461,7 @@ int soundManager::Open(int param_1)
             }
         }
         m_samplesReady = 1;
-        memset(&field_0x3e, 0, 0xae);
+        memset(&m_ready, 0, 0xae);
         if (gbDontTryDigital == 0 && m_digitalDriver == 0) {
             p_Var2 = WAVE_init_driver(0x5622, 8, 1, 0);
             m_digitalDriver = reinterpret_cast<int>(p_Var2);
@@ -471,7 +471,7 @@ int soundManager::Open(int param_1)
             WritePrefs();
         }
         AllocateSampleHandles();
-        field_0x3e = 1;
+        m_ready = 1;
         m_midiFile = 0;
         memset(m_savedTrackPositions, 0, 0xf0);
         m_fading = 1;
@@ -585,7 +585,7 @@ void soundManager::ModifySample(struct _SAMPLE *param_1, short param_2, long par
         return;
     if (m_samplesReady == 0)
         return;
-    if (field_0x3e == 0)
+    if (m_ready == 0)
         return;
     LogStr("Modify Sample 1");
     local_8 = -1;
@@ -696,7 +696,7 @@ void soundManager::SetMusicQuality(int param_1)
     int local_8;
     if (gbNoSound != 0)
         return;
-    if (field_0x3e == 0)
+    if (m_ready == 0)
         return;
     if (gMidiEnabled == 0)
         return;
@@ -723,7 +723,7 @@ void soundManager::PlayAmbientMusic(int param_1, long param_2, int param_3)
         return;
     if (m_samplesReady == 0)
         return;
-    if (field_0x3e == 0)
+    if (m_ready == 0)
         return;
     if (m_currentTrack == param_1)
         return;
@@ -850,7 +850,7 @@ struct _SAMPLE *soundManager::MemorySample(class sample *param_1)
         return 0;
     if (gSampleVolume == 0)
         return 0;
-    if (field_0x3e == 0 || param_1->m_volume == 0)
+    if (m_ready == 0 || param_1->m_volume == 0)
         return 0;
     LogStr("Memory Sample 1");
             iVar1 = param_1->m_channelType;
