@@ -403,7 +403,51 @@ void LogStr(char *param_1)
 }
 
 VA(0x004c61c0, 0x224)
-void LogInt(char *, int, int, int, int, int, int, int) {}
+void LogInt(char *param_1, int param_2, int param_3, int param_4, int param_5, int param_6,
+            int param_7, int param_8)
+{
+    char local_2bc[200];
+    char local_1f4[500];
+    if (param_8 == -999) {
+        if (param_7 == -999) {
+            if (param_6 == -999) {
+                if (param_5 == -999) {
+                    if (param_4 == -999) {
+                        if (param_3 == -999)
+                            sprintf(local_2bc, "%s : % 8d", param_1, param_2);
+                        else
+                            sprintf(local_2bc, "%s : % 8d % 8d", param_1, param_2, param_3);
+                    } else {
+                        sprintf(local_2bc, "%s : % 8d % 8d % 8d", param_1, param_2, param_3, param_4);
+                    }
+                } else {
+                    sprintf(local_2bc, "%s : % 8d % 8d % 8d % 8d", param_1, param_2, param_3, param_4,
+                            param_5);
+                }
+            } else {
+                sprintf(local_2bc, "%s : % 8d % 8d % 8d % 8d % 8d", param_1, param_2, param_3, param_4,
+                        param_5, param_6);
+            }
+        } else {
+            sprintf(local_2bc, "%s : % 8d % 8d % 8d % 8d % 8d % 8d", param_1, param_2, param_3, param_4,
+                    param_5, param_6, param_7);
+        }
+    } else {
+        sprintf(local_2bc, "%s : % 8d % 8d % 8d % 8d % 8d % 8d % 8d", param_1, param_2, param_3,
+                param_4, param_5, param_6, param_7, param_8);
+    }
+    if (1 < giDebugLevel) {
+        FILE *_File = fopen("KB.LOG", "a");
+        if (_File != 0) {
+            strcpy(local_1f4, local_2bc);
+            strcat(local_1f4, "\n");
+            fputs(local_1f4, _File);
+            fclose(_File);
+            if (giDebugLevel == 4)
+                OutputDebugStringA(local_1f4);
+        }
+    }
+}
 
 VA(0x004c63f0, 0x6c)
 void AiPrint(char *param_1)
