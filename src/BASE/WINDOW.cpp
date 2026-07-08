@@ -301,13 +301,17 @@ void heroWindow::DrawWindow(int param_1, int param_2, int param_3)
     local_8 = field_0x38;
     local_24.type = 0x200;
     local_24.field4 = 2;
-    for (; local_8 != 0; local_8 = local_8->field_0xc) {
+    // @early-stop 91% — retail duplicates this Main() call across the two guards
+    // (if/else-if codegen: the all-widgets body placed after the range body, reached by a
+    // forward je); the equivalent || form shares one call and aligns closer. The exact
+    // basic-block ordering isn't source-forcible.
+    while (local_8 != 0) {
         PollSound();
-        if (param_2 == -0xffff && param_3 == 0xffff) {
-            local_8->Main(local_24);
-        } else if (param_2 <= local_8->field_0x10 && local_8->field_0x10 <= param_3) {
+        if ((param_2 == -0xffff && param_3 == 0xffff) ||
+            (param_2 <= local_8->field_0x10 && local_8->field_0x10 <= param_3)) {
             local_8->Main(local_24);
         }
+        local_8 = local_8->field_0xc;
     }
     PollSound();
     if (param_1 != 0 && (field_0x20 & 0x7fff) != 1) {
