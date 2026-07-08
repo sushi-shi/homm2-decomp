@@ -24,10 +24,10 @@ public:
     short  field_0x2e;  // +0x2e
     short  field_0x30;  // +0x30
     short  field_0x32;  // +0x32
-    short  field_0x34;  // +0x34
-    short  field_0x36;  // +0x36
+    short  m_normalColor;  // +0x34
+    short  m_selColor;  // +0x36
     short  field_0x38;  // +0x38
-    short  field_0x3a;  // +0x3a
+    short  m_textMode;  // +0x3a
     short  field_0x3c;  // +0x3c
     short  m_selectedIndex;  // +0x3e
     char   **m_items;  // +0x40  item-string array
