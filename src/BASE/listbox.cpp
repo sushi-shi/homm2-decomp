@@ -65,7 +65,7 @@ void listBoxWidget::Read(void)
     field_0x30 = gpResourceManager->ReadWord();
     sVar3 = gpResourceManager->ReadWord();
     field_0x44 = 0;
-    field_0x10 = sVar3;
+    m_id = sVar3;
     field_0x46 = 1;
     field_0x48 = 2;
     field_0x4a = 3;
@@ -183,7 +183,7 @@ int listBoxWidget::Main(tag_message &param_1)
     unsigned int uVar8;
     void **puVar5, **puVar11, **puVar13;
     char *pcVar12;
-    uVar2 = field_0x16;
+    uVar2 = m_flags;
     if ((uVar2 & 2) == 0) {
         if (param_1.type == 0x200)
             return widget::Main(param_1);
@@ -194,14 +194,14 @@ int listBoxWidget::Main(tag_message &param_1)
         if (iVar4 == 8) {
 LAB_004db5a2:
             if ((uVar2 & 4) != 0) {
-                sVar3 = static_cast<short>(param_1.field4) - field_0x4->m_posX;
-                sVar10 = static_cast<short>(param_1.field8) - field_0x4->m_posY;
+                sVar3 = static_cast<short>(param_1.field4) - m_owner->m_posX;
+                sVar10 = static_cast<short>(param_1.field8) - m_owner->m_posY;
                 if (field_0x18 <= sVar3 && field_0x1a <= sVar10 && sVar3 < field_0x1c + field_0x18 &&
                     sVar10 < field_0x1e + field_0x1a) {
                     if (iVar4 == 0x20) {
                         param_1.field4 = 0xe;
                         param_1.type = 0x200;
-                        param_1.field8 = field_0x10;
+                        param_1.field8 = m_id;
                         param_1.fieldC = 0x200;
                         return 2;
                     }
@@ -218,19 +218,19 @@ LAB_004db5a2:
             if (iVar4 == 0x200) {
                 switch (param_1.field4) {
                 case 0x36:
-                    if (field_0x10 == param_1.field8) {
+                    if (m_id == param_1.field8) {
                         field_0x34 = static_cast<short>(reinterpret_cast<int>(param_1.text));
                         return 1;
                     }
                     break;
                 case 0x37:
-                    if (field_0x10 == param_1.field8) {
+                    if (m_id == param_1.field8) {
                         param_1.text = reinterpret_cast<char *>(static_cast<int>(field_0x34));
                         return 1;
                     }
                     break;
                 case 0x38:
-                    if (field_0x10 == param_1.field8) {
+                    if (m_id == param_1.field8) {
                         pcVar12 = param_1.text;
                         puVar5 = static_cast<void **>(BaseAlloc(field_0x32 * 4 + 4, __FILE__, __LINE__));
                         if (field_0x32 != 0) {
@@ -266,7 +266,7 @@ LAB_004db5a2:
                     }
                     break;
                 case 0x39:
-                    if (field_0x10 == param_1.field8) {
+                    if (m_id == param_1.field8) {
                         pcVar12 = param_1.text;
                         if (param_1.fieldC < field_0x32) {
                             BaseFree(field_0x3c[param_1.fieldC], __FILE__, __LINE__);
@@ -276,11 +276,11 @@ LAB_004db5a2:
                     }
                     break;
                 case 0x3a:
-                    if (field_0x10 == param_1.field8)
+                    if (m_id == param_1.field8)
                         DeleteItem(param_1.fieldC);
                     break;
                 case 0x3b:
-                    if (field_0x10 == param_1.field8) {
+                    if (m_id == param_1.field8) {
                         sVar3 = field_0x32;
                         while (sVar3 != 0) {
                             DeleteItem(0);
@@ -310,8 +310,8 @@ void listBoxWidget::DrawLBStuff(int param_1)
 {
     short sVar1, sVar4;
     int iVar2, iVar3, iVar5;
-    iVar2 = field_0x60 + field_0x4->m_posX;
-    iVar5 = field_0x62 + field_0x4->m_posY;
+    iVar2 = field_0x60 + m_owner->m_posX;
+    iVar5 = field_0x62 + m_owner->m_posY;
     iVar3 = 0;
     if (0 < field_0x28) {
         do {
@@ -362,41 +362,41 @@ LAB_004dba0b:
         sVar4 = field_0x4a;
     else
         sVar4 = field_0x4c;
-    field_0x24->DrawToBuffer(field_0x68 + field_0x4->m_posX, field_0x6a + field_0x4->m_posY,
+    field_0x24->DrawToBuffer(field_0x68 + m_owner->m_posX, field_0x6a + m_owner->m_posY,
                              sVar4, 0);
     iVar2 = 2;
-    field_0x24->DrawToBuffer(field_0x4->m_posX + field_0x70, field_0x4->m_posY + field_0x72,
+    field_0x24->DrawToBuffer(m_owner->m_posX + field_0x70, m_owner->m_posY + field_0x72,
                              field_0x52, 0);
     if (2 < field_0x28 - 2) {
         do {
             iVar3 = iVar2 - 1;
             iVar2 = iVar2 + 1;
-            field_0x24->DrawToBuffer(field_0x4->m_posX + field_0x70,
-                                     field_0x5c * iVar3 + field_0x4->m_posY + field_0x72,
+            field_0x24->DrawToBuffer(m_owner->m_posX + field_0x70,
+                                     field_0x5c * iVar3 + m_owner->m_posY + field_0x72,
                                      field_0x54, 0);
         } while (iVar2 < field_0x28 - 2);
     }
-    field_0x24->DrawToBuffer(field_0x4->m_posX + field_0x70,
-                             field_0x5c * (iVar2 - 1) + field_0x4->m_posY + field_0x72, field_0x56,
+    field_0x24->DrawToBuffer(m_owner->m_posX + field_0x70,
+                             field_0x5c * (iVar2 - 1) + m_owner->m_posY + field_0x72, field_0x56,
                              0);
     if (field_0x8b == 0)
         sVar4 = field_0x4e;
     else
         sVar4 = field_0x50;
-    field_0x24->DrawToBuffer(field_0x78 + field_0x4->m_posX, field_0x7a + field_0x4->m_posY,
+    field_0x24->DrawToBuffer(field_0x78 + m_owner->m_posX, field_0x7a + m_owner->m_posY,
                              sVar4, 0);
-    sVar4 = static_cast<short>(field_0x4->m_posX) + 5 + field_0x70;
+    sVar4 = static_cast<short>(m_owner->m_posX) + 5 + field_0x70;
     field_0x80 = sVar4;
     if (field_0x42 < 1)
         sVar1 = field_0x88 / 2;
     else
         sVar1 = static_cast<short>((field_0x40 * field_0x88) / field_0x42);
-    sVar1 = static_cast<short>(field_0x4->m_posY) + field_0x72 + 3 + sVar1;
+    sVar1 = static_cast<short>(m_owner->m_posY) + field_0x72 + 3 + sVar1;
     field_0x82 = sVar1;
     field_0x24->DrawToBuffer(sVar4, sVar1, field_0x58, 0);
     if (param_1 != 0)
-        gpWindowManager->UpdateScreenRegion(field_0x18 + field_0x4->m_posX,
-                                            field_0x1a + field_0x4->m_posY, field_0x1c, field_0x1e);
+        gpWindowManager->UpdateScreenRegion(field_0x18 + m_owner->m_posX,
+                                            field_0x1a + m_owner->m_posY, field_0x1c, field_0x1e);
 }
 
 VA(0x004dbbe0, 0x312)
@@ -406,8 +406,8 @@ int listBoxWidget::ProcessMouseMessage(tag_message &param_1)
     int iVar3, iVar5, iVar6, iVar7, iVar8;
     long lVar4;
     iVar6 = param_1.type;
-    iVar7 = param_1.field10 - field_0x4->m_posX;
-    iVar5 = param_1.field14 - field_0x4->m_posY;
+    iVar7 = param_1.field10 - m_owner->m_posX;
+    iVar5 = param_1.field14 - m_owner->m_posY;
     iVar8 = field_0x62;
     iVar3 = iVar5 - iVar8;
     if (iVar6 == 4) {
@@ -487,7 +487,7 @@ int listBoxWidget::ProcessMouseMessage(tag_message &param_1)
                 field_0x8d = 0;
                 param_1.field4 = 0xc;
                 param_1.type = 0x200;
-                param_1.field8 = field_0x10;
+                param_1.field8 = m_id;
                 sVar1 = field_0x34;
                 param_1.fieldC = 1;
                 param_1.text = reinterpret_cast<char *>(static_cast<int>(sVar1));

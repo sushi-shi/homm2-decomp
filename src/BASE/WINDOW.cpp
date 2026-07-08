@@ -185,8 +185,8 @@ void heroWindow::RemoveAndDeleteWidget(int param_1)
     widget *pwVar1, *local_8;
     local_8 = m_widgetListHead;
     while (local_8 != 0) {
-        pwVar1 = local_8->field_0x8;
-        if (local_8->field_0x10 == param_1) {
+        pwVar1 = local_8->m_next;
+        if (local_8->m_id == param_1) {
             RemoveWidget(local_8);
             if ((m_winFlags & 0x4000) != 0) {
                 delete local_8;
@@ -204,7 +204,7 @@ void heroWindow::Close(void)
         RestoreBackground();
     w = m_widgetListHead;
     while (w != 0) {
-        next = w->field_0x8;
+        next = w->m_next;
         RemoveWidget(w);
         if ((m_winFlags & 0x4000) != 0) {
             delete w;
@@ -222,29 +222,29 @@ void heroWindow::AddWidget(class widget *param_1, int param_2)
         if (local_8 == 0)
             param_2 = 0;
         else
-            param_2 = local_8->field_0x12 + 1;
+            param_2 = local_8->m_zOrder + 1;
     }
     if (param_1->Open(param_2, this) != 0)
         return;
-    while (local_8 != 0 && param_2 < local_8->field_0x12) {
-        local_8 = local_8->field_0x8;
+    while (local_8 != 0 && param_2 < local_8->m_zOrder) {
+        local_8 = local_8->m_next;
     }
     if (local_8 == 0) {
-        param_1->field_0xc = m_widgetListTail;
-        param_1->field_0x8 = 0;
+        param_1->m_prev = m_widgetListTail;
+        param_1->m_next = 0;
         m_widgetListTail = param_1;
         if (m_widgetListHead == 0)
             m_widgetListHead = param_1;
-    } else if (local_8->field_0xc == 0) {
-        param_1->field_0x8 = m_widgetListHead;
-        param_1->field_0xc = 0;
-        m_widgetListHead->field_0xc = param_1;
+    } else if (local_8->m_prev == 0) {
+        param_1->m_next = m_widgetListHead;
+        param_1->m_prev = 0;
+        m_widgetListHead->m_prev = param_1;
         m_widgetListHead = param_1;
     } else {
-        param_1->field_0x8 = local_8;
-        param_1->field_0xc = local_8->field_0xc;
-        local_8->field_0xc->field_0x8 = param_1;
-        local_8->field_0xc = param_1;
+        param_1->m_next = local_8;
+        param_1->m_prev = local_8->m_prev;
+        local_8->m_prev->m_next = param_1;
+        local_8->m_prev = param_1;
     }
 }
 
@@ -256,26 +256,26 @@ void heroWindow::RemoveWidget(class widget *param_1)
         return;
     param_1->Close();
     if (m_widgetListTail == param_1) {
-        m_widgetListTail = param_1->field_0xc;
+        m_widgetListTail = param_1->m_prev;
         if (m_widgetListTail == 0)
             m_widgetListHead = 0;
         else
-            m_widgetListTail->field_0x8 = 0;
+            m_widgetListTail->m_next = 0;
     } else if (m_widgetListHead == param_1) {
-        m_widgetListHead = param_1->field_0x8;
-        m_widgetListHead->field_0xc = 0;
+        m_widgetListHead = param_1->m_next;
+        m_widgetListHead->m_prev = 0;
     } else {
-        param_1->field_0x8->field_0xc = param_1->field_0xc;
-        param_1->field_0xc->field_0x8 = param_1->field_0x8;
+        param_1->m_next->m_prev = param_1->m_prev;
+        param_1->m_prev->m_next = param_1->m_next;
     }
-    iVar1 = param_1->field_0x8;
+    iVar1 = param_1->m_next;
     if (iVar1 == 0) {
         m_widgetListHead = 0;
         m_widgetListTail = m_widgetListHead;
     } else {
-        iVar1->field_0xc = param_1->field_0xc;
-        if (iVar1->field_0xc != 0)
-            iVar1->field_0xc->field_0x8 = iVar1;
+        iVar1->m_prev = param_1->m_prev;
+        if (iVar1->m_prev != 0)
+            iVar1->m_prev->m_next = iVar1;
     }
 }
 
@@ -288,7 +288,7 @@ int heroWindow::BroadcastMessage(struct tag_message &param_1)
     int local_8 = 0;
     widget *local_c = m_widgetListHead;
     while (local_c != 0 && ((local_8 = local_c->Main(param_1)) < 1 || 2 < local_8)) {
-        local_c = local_c->field_0x8;
+        local_c = local_c->m_next;
     }
     return local_8;
 }
@@ -315,10 +315,10 @@ void heroWindow::DrawWindow(int param_1, int param_2, int param_3)
     while (local_8 != 0) {
         PollSound();
         if ((param_2 == -0xffff && param_3 == 0xffff) ||
-            (param_2 <= local_8->field_0x10 && local_8->field_0x10 <= param_3)) {
+            (param_2 <= local_8->m_id && local_8->m_id <= param_3)) {
             local_8->Main(local_24);
         }
-        local_8 = local_8->field_0xc;
+        local_8 = local_8->m_prev;
     }
     PollSound();
     if (param_1 != 0 && (m_winFlags & 0x7fff) != 1) {

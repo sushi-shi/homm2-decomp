@@ -18,13 +18,13 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (vptr auto-emitted at 0x00; own data starts at 0x04)
-    heroWindow *field_0x4;  // +0x04  owning window
-    widget *field_0x8;  // +0x08  next widget in the owner window's list
-    widget *field_0xc;  // +0x0c  prev widget in the owner window's list
-    short  field_0x10;  // +0x10
-    short  field_0x12;  // +0x12
+    heroWindow *m_owner;  // +0x04  owning window
+    widget *m_next;  // +0x08  next widget in the owner window's list
+    widget *m_prev;  // +0x0c  prev widget in the owner window's list
+    short  m_id;  // +0x10
+    short  m_zOrder;  // +0x12
     short  field_0x14;  // +0x14
-    short  field_0x16;  // +0x16
+    short  m_flags;  // +0x16
     short  field_0x18;  // +0x18
     short  field_0x1a;  // +0x1a
     short  field_0x1c;  // +0x1c

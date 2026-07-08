@@ -50,7 +50,7 @@ void textWidget::Read(void)
     gpResourceManager->RestorePosition();
     field_0x28 = gpResourceManager->ReadWord() & 0xff;
     field_0x2a = static_cast<char>(gpResourceManager->ReadWord());
-    field_0x10 = gpResourceManager->ReadWord();
+    m_id = gpResourceManager->ReadWord();
     gpResourceManager->ReadWord();
     field_0x14 = 0x200;
 }
@@ -70,7 +70,7 @@ int textWidget::Main(tag_message &param_1)
     unsigned int uVar5, uVar6;
     short sVar7, sVar9;
     char *pcVar8;
-    uVar2 = field_0x16;
+    uVar2 = m_flags;
     iVar3 = param_1.type;
     if ((uVar2 & 2) == 0) {
         if (iVar3 != 0x200)
@@ -82,12 +82,12 @@ int textWidget::Main(tag_message &param_1)
 LAB_004d136b:
             if ((uVar2 & 1) == 0)
                 return 0;
-            field_0x16 = uVar2 & 0xfffe;
+            m_flags = uVar2 & 0xfffe;
             if (param_1.type == 0x40)
                 param_1.fieldC = 0x200;
             param_1.type = 0x200;
             param_1.field4 = 0xd;
-            param_1.field8 = field_0x10;
+            param_1.field8 = m_id;
             return 2;
         }
         if (iVar3 != 8) {
@@ -98,7 +98,7 @@ LAB_004d12c4:
         if (iVar3 != 0x40) {
             if (iVar3 == 0x200) {
                 if (param_1.field4 == 3) {
-                    if (field_0x10 == param_1.field8) {
+                    if (m_id == param_1.field8) {
                         pcVar8 = param_1.text;
                         if (field_0x14 != 0x200 && field_0x14 != 0x4000) {
                             field_0x20 = pcVar8;
@@ -113,7 +113,7 @@ LAB_004d12c4:
                         strcpy(field_0x20, pcVar8);
                         return 1;
                     }
-                } else if (param_1.field4 == 8 && field_0x10 == param_1.field8) {
+                } else if (param_1.field4 == 8 && m_id == param_1.field8) {
                     field_0x28 = static_cast<short>(reinterpret_cast<int>(param_1.text));
                     return 1;
                 }
@@ -122,16 +122,16 @@ LAB_004d12c4:
         }
         goto LAB_004d136b;
     }
-    sVar9 = static_cast<short>(param_1.field4) - field_0x4->m_posX;
-    sVar7 = static_cast<short>(param_1.field8) - field_0x4->m_posY;
+    sVar9 = static_cast<short>(param_1.field4) - m_owner->m_posX;
+    sVar7 = static_cast<short>(param_1.field8) - m_owner->m_posY;
     if (field_0x18 <= sVar9 && field_0x1a <= sVar7 && sVar9 < field_0x1c + field_0x18 &&
         sVar7 < field_0x1e + field_0x1a) {
-        field_0x16 = uVar2 | 1;
+        m_flags = uVar2 | 1;
         if (param_1.type == 0x20)
             param_1.fieldC = 0x200;
         param_1.type = 0x200;
         param_1.field4 = 0xc;
-        param_1.field8 = field_0x10;
+        param_1.field8 = m_id;
         return 2;
     }
     return 0;
@@ -141,10 +141,10 @@ VA(0x004d1490, 0x49)
 void textWidget::Draw(void)
 {
     int color = 3;
-    if ((field_0x16 & 8) == 0)
+    if ((m_flags & 8) == 0)
         color = field_0x28;
-    field_0x24->DrawBoundedString(field_0x20, field_0x18 + field_0x4->m_posX,
-                                  field_0x1a + field_0x4->m_posY, field_0x1c, field_0x1e,
+    field_0x24->DrawBoundedString(field_0x20, field_0x18 + m_owner->m_posX,
+                                  field_0x1a + m_owner->m_posY, field_0x1c, field_0x1e,
                                   color, field_0x2a);
 }
 
