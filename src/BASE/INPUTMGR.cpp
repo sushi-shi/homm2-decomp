@@ -5,6 +5,7 @@
 
 #include <va.h>
 #include <string.h>
+#include <BASE/mouseManager.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/KB.h>
 #include <BASE/inputManager.h>
@@ -129,7 +130,26 @@ VA(0x004ce990, 0xe4)
 void CheckChangeCursor(int, int, int) {}
 
 VA(0x004cea80, 0xe9)
-void inputManager::ForceMouseMove(void) {}
+void inputManager::ForceMouseMove(void)
+{
+    if (gpInputManager->field_0x73e == 0) {
+        gpInputManager->field_0x73e = 1;
+        int iVar4 = gpInputManager->field_0x73a;
+        tag_message *ev = &gpInputManager->field_0x36[iVar4];
+        ev->type = 4;
+        gpMouseManager->MouseCoords(ev->field4, ev->field8);
+        ev->field10 = ev->field4;
+        ev->field14 = ev->field8;
+        ev->fieldC = gpInputManager->field_0x85e;
+        gpInputManager->field_0x73a = gpInputManager->field_0x73a + 1;
+        gpInputManager->field_0x73a = gpInputManager->field_0x73a % 0x40;
+        if (gpInputManager->field_0x73a == gpInputManager->field_0x736) {
+            gpInputManager->field_0x736 = gpInputManager->field_0x736 + 1;
+            gpInputManager->field_0x736 = gpInputManager->field_0x736 % 0x40;
+        }
+        gpInputManager->field_0x73e = 0;
+    }
+}
 
 
 // ===== vtable inputManager : public baseManager  (3 slots) =====
