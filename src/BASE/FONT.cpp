@@ -17,25 +17,25 @@ VA(0x004c6fd0, 0xc8)
 font::font(unsigned long id) : resource(5, id, 1, 0)
 {
     gpResourceManager->PointToFile(id);
-    field_0x10 = gpResourceManager->ReadWord();
+    m_height = gpResourceManager->ReadWord();
     int h = gpResourceManager->ReadWord();
-    if (field_0x10 >= 14)
-        field_0x14 = 1;
+    if (m_height >= 14)
+        m_isLarge = 1;
     else
-        field_0x14 = 0;
+        m_isLarge = 0;
     char fname[13];
     // Read13 takes signed char*, GetIcon char* — one filename buffer feeds both, so bridge the
     // API signedness once (codegen-identical: both are byte pointers).
     gpResourceManager->Read13((signed char *)fname);
     gbLoadingMonoIcon = 1;
-    field_0x1c = gpResourceManager->GetIcon(fname);
+    m_glyphIcon = gpResourceManager->GetIcon(fname);
     gbLoadingMonoIcon = 0;
 }
 
 VA(0x004c70e0, 0x39)
 font::~font()
 {
-    gpResourceManager->Dispose(field_0x1c);
+    gpResourceManager->Dispose(m_glyphIcon);
 }
 
 VA(0x004c7120, 0x24a)
@@ -51,27 +51,27 @@ void font::DrawStringExecute(char *str, int x, int y, int mode,
             pos += GetCharacterWidth(str[i]);
             goto next;
         } else if (c == '{') {
-            field_0x18 = 1;
+            m_suppressDraw = 1;
             goto next;
         } else if (c == '}') {
-            field_0x18 = 0;
+            m_suppressDraw = 0;
             goto next;
         } else {
             c -= 0x20;
             if (c < 0 || c > 0x5f)
                 c = 0x5f;
             if (c != 0) {
-                if (mode == 1 && field_0x18 == 0)
-                    IconToBitmap(field_0x1c, gpWindowManager->m_screen, pos, y, c, 1,
+                if (mode == 1 && m_suppressDraw == 0)
+                    IconToBitmap(m_glyphIcon, gpWindowManager->m_screen, pos, y, c, 1,
                                  clipL, clipT, clipR, clipB, 0);
-                else if (mode == 2 || (mode == 1 && field_0x18 != 0))
-                    IconToBitmapColorTable(field_0x1c, gpWindowManager->m_screen, pos, y, c, 1,
+                else if (mode == 2 || (mode == 1 && m_suppressDraw != 0))
+                    IconToBitmapColorTable(m_glyphIcon, gpWindowManager->m_screen, pos, y, c, 1,
                                            clipL, clipT, clipR, clipB, 0, gColorTableYellow, 1);
                 else if (mode == 4)
-                    IconToBitmapColorTable(field_0x1c, gpWindowManager->m_screen, pos, y, c, 1,
+                    IconToBitmapColorTable(m_glyphIcon, gpWindowManager->m_screen, pos, y, c, 1,
                                            clipL, clipT, clipR, clipB, 0, gColorTableScenWin, 0);
                 else
-                    IconToBitmapColorTable(field_0x1c, gpWindowManager->m_screen, pos, y, c, 1,
+                    IconToBitmapColorTable(m_glyphIcon, gpWindowManager->m_screen, pos, y, c, 1,
                                            clipL, clipT, clipR, clipB, 0, gColorTableDarkGray, 1);
             }
             pos += GetCharacterWidth(str[i]);
@@ -84,7 +84,7 @@ void font::DrawStringExecute(char *str, int x, int y, int mode,
 VA(0x004c7370, 0x48)
 void font::DrawString(char *s, int x, int y, int c)
 {
-    field_0x18 = 0;
+    m_suppressDraw = 0;
     DrawStringExecute(s, x, y, c, 0, 0, 0x280, 0x1e0);
 }
 
@@ -102,7 +102,7 @@ int font::GetCharacterWidth(unsigned char c)
         if (c < 0 || c > 0x5f)
             c = 0x5f;
         // stride-13 char-metrics table in the glyph icon; width is the short at +4.
-        return *(short *)(field_0x1c->m_data + c * 13 + 4) + field_0x14;
+        return *(short *)(m_glyphIcon->m_data + c * 13 + 4) + m_isLarge;
     }
 }
 
@@ -113,7 +113,7 @@ void font::DrawBoundedString(char *str, int x, int y, int w, int h, int mode, in
     // all of them up-front, incl. two write-once vestigials (glyph pointer, a ' ') and local copies
     // of str/align — the same reserved-local pattern as LineWidth/LineLength.
     int len = strlen(str);
-    char *glyph = field_0x1c->m_data;
+    char *glyph = m_glyphIcon->m_data;
     char sp = ' ';
     int xOff = 0;
     int yOff = 0;
@@ -127,13 +127,13 @@ void font::DrawBoundedString(char *str, int x, int y, int w, int h, int mode, in
     int breakPt;
     if (align & 4) {
         align -= 4;
-        int totalH = field_0x10 * LineLength(s, w);
+        int totalH = m_height * LineLength(s, w);
         if (totalH < h)
             yOff = (h - totalH) / 2;
     }
-    field_0x18 = 0;
+    m_suppressDraw = 0;
     while (1) {
-        if (len <= i || s[i] == 0 || (h < field_0x10 + yOff && yOff != 0))
+        if (len <= i || s[i] == 0 || (h < m_height + yOff && yOff != 0))
             return;
         while (s[i] != 0 && s[i] != '\n' && lineWidth <= w) {
             lineWidth += GetCharacterWidth(s[i]);
@@ -143,7 +143,7 @@ void font::DrawBoundedString(char *str, int x, int y, int w, int h, int mode, in
             breakPt = 0;
             while (i--, s[i] != ' ' && lineStart <= i) {
                 lineWidth -= GetCharacterWidth(s[i]);
-                if (h < field_0x10 * 2 + yOff && lineWidth < w)
+                if (h < m_height * 2 + yOff && lineWidth < w)
                     return;
                 if (breakPt == 0 && lineWidth < w)
                     breakPt = i;
@@ -168,7 +168,7 @@ void font::DrawBoundedString(char *str, int x, int y, int w, int h, int mode, in
         }
         DrawStringExecute(s + lineStart, xOff + x, yOff + y, m, x, y, w, h);
         s[i] = saved;
-        yOff += field_0x10;
+        yOff += m_height;
         i++;
         lineStart = i;
         lineWidth = 0;

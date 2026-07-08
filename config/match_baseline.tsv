@@ -372,7 +372,7 @@ BASE/droplist	??1dropListWidget@@UAE@XZ	99.9535	2a86be8a60bf
 BASE/droplist	??_EdropListWidget@@UAEPAXI@Z	0.0000	
 BASE/droplist	?DeleteItem@dropListWidget@@QAEXH@Z	50.2836	fa8e27296f78
 BASE/droplist	?Draw@dropListWidget@@UAEXXZ	100.0000	a9f68c5f29e3
-BASE/droplist	?DrawDropStuff@dropListWidget@@QAEXXZ	82.2644	b5580a4d0a48
+BASE/droplist	?DrawDropStuff@dropListWidget@@QAEXXZ	82.2644	e8b77bfae6b9
 BASE/droplist	?Main@dropListWidget@@UAEHAAUtag_message@@@Z	30.1147	56ef8aecee71
 BASE/droplist	?ProcessSelectDialog@dropListWidget@@QAEXXZ	0.1678	39a568398497
 BASE/droplist	?Read@dropListWidget@@QAEXXZ	93.7787	f015b1cfab41
@@ -388,7 +388,7 @@ BASE/listbox	??1listBoxWidget@@UAE@XZ	98.5909	b3cd962bd994
 BASE/listbox	??_ElistBoxWidget@@UAEPAXI@Z	0.0000	
 BASE/listbox	?DeleteItem@listBoxWidget@@QAEXH@Z	55.3980	8ef6cc5d31ef
 BASE/listbox	?Draw@listBoxWidget@@UAEXXZ	100.0000	230100bbcc4e
-BASE/listbox	?DrawLBStuff@listBoxWidget@@QAEXH@Z	71.7273	11f1e18d690f
+BASE/listbox	?DrawLBStuff@listBoxWidget@@QAEXH@Z	71.7273	42f4b5cb6c1b
 BASE/listbox	?Main@listBoxWidget@@UAEHAAUtag_message@@@Z	54.0732	d7c0ce20ae97
 BASE/listbox	?ProcessMouseMessage@listBoxWidget@@QAEHAAUtag_message@@@Z	53.7562	a6a7f5221583
 BASE/listbox	?Read@listBoxWidget@@QAEXXZ	89.8843	7fdc7a9c652c
