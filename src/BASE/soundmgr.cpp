@@ -9,6 +9,7 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <_globals_model.h>
 #include <SOURCE/KB.h>
+#include <BASE/mss.h>
 VA(0x004cb630, 0x68)
 void HandleMCIError(int, char *) {}
 
@@ -117,7 +118,11 @@ VA(0x004cda80, 0x16)
 void soundManager::GetNumberCDDrives(void) {}
 
 VA(0x004cdaa0, 0x2e)
-void soundManager::ServiceSound(void) {}
+void soundManager::ServiceSound(void)
+{
+    if (gbNoSound == 0)
+        _AIL_serve_0();
+}
 
 VA(0x004cdad0, 0x7f)
 int soundManager::MusicPlaying(void) { return 0; }
