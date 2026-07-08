@@ -11,10 +11,10 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (vptr auto-emitted at 0x00; own data starts at 0x04)
-    short  field_0x10;  // +0x10
-    short  field_0x12;  // +0x12
-    short  field_0x14;  // +0x14
-    int    field_0x16;  // +0x16
+    unsigned short field_0x10;  // +0x10  tile width
+    unsigned short field_0x12;  // +0x12  tile height
+    unsigned short field_0x14;  // +0x14  tile count
+    char   *field_0x16;  // +0x16  tile pixel data
     // --- constructors ---
     tileset(unsigned long int);
     virtual ~tileset();
