@@ -23,7 +23,7 @@ public:
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
     int    m_digitalDriver;  // +0x36
     int    field_0x3a;  // +0x3a
-    int    field_0x3e;  // +0x3e
+    int    m_ready;  // +0x3e
     char _pad_0x42[0xe];
     int    m_midiFile;  // +0x50
     struct _SAMPLE *m_sampleHandles[14];  // +0x54  sample handles
