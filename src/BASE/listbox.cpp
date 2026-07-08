@@ -9,6 +9,7 @@
 #include <BASE/icon.h>
 #include <BASE/font.h>
 #include <BASE/heroWindow.h>
+#include <BASE/heroWindowManager.h>
 #include <BASE/widget.h>
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
@@ -305,7 +306,98 @@ void listBoxWidget::Draw(void)
 }
 
 VA(0x004db8a0, 0x334)
-void listBoxWidget::DrawLBStuff(int) {}
+void listBoxWidget::DrawLBStuff(int param_1)
+{
+    short sVar1, sVar4;
+    int iVar2, iVar3, iVar5;
+    iVar2 = field_0x60 + field_0x4->field_0x28;
+    iVar5 = field_0x62 + field_0x4->field_0x2c;
+    iVar3 = 0;
+    if (0 < field_0x28) {
+        do {
+            if (iVar3 == 0) {
+                field_0x24->DrawToBuffer(iVar2, iVar5, field_0x44, 0);
+                if (0 < field_0x2a) {
+                    if (field_0x34 == field_0x40)
+                        sVar4 = field_0x2e;
+                    else
+                        sVar4 = field_0x2c;
+                    field_0x20->DrawBoundedString(static_cast<char *>(field_0x3c[field_0x40]),
+                                                  iVar2 + 5, iVar5 + 4, field_0x64 - 10,
+                                                  field_0x20->field_0x10 + 1, sVar4, field_0x30);
+                }
+                sVar4 = field_0x5a;
+LAB_004dba0b:
+                iVar5 = iVar5 + sVar4;
+            } else {
+                if (field_0x28 - iVar3 != 1) {
+                    field_0x24->DrawToBuffer(iVar2, iVar5, field_0x46, 0);
+                    if (iVar3 < field_0x2a) {
+                        if (field_0x34 == field_0x40 + iVar3)
+                            sVar4 = field_0x2e;
+                        else
+                            sVar4 = field_0x2c;
+                        field_0x20->DrawBoundedString(
+                            static_cast<char *>(field_0x3c[field_0x40 + iVar3]), iVar2 + 5, iVar5 + 2,
+                            field_0x64 - 10, field_0x20->field_0x10 + 1, sVar4, field_0x30);
+                    }
+                    sVar4 = field_0x5c;
+                    goto LAB_004dba0b;
+                }
+                field_0x24->DrawToBuffer(iVar2, iVar5, field_0x48, 0);
+                if (iVar3 < field_0x2a) {
+                    if (field_0x34 == field_0x40 + iVar3)
+                        sVar4 = field_0x2e;
+                    else
+                        sVar4 = field_0x2c;
+                    field_0x20->DrawBoundedString(static_cast<char *>(field_0x3c[field_0x40 + iVar3]),
+                                                  iVar2 + 5, iVar5 + 2, field_0x64 - 10,
+                                                  field_0x20->field_0x10 + 1, sVar4, field_0x30);
+                }
+            }
+            iVar3 = iVar3 + 1;
+        } while (iVar3 < field_0x28);
+    }
+    if (field_0x8a == 0)
+        sVar4 = field_0x4a;
+    else
+        sVar4 = field_0x4c;
+    field_0x24->DrawToBuffer(field_0x68 + field_0x4->field_0x28, field_0x6a + field_0x4->field_0x2c,
+                             sVar4, 0);
+    iVar2 = 2;
+    field_0x24->DrawToBuffer(field_0x4->field_0x28 + field_0x70, field_0x4->field_0x2c + field_0x72,
+                             field_0x52, 0);
+    if (2 < field_0x28 - 2) {
+        do {
+            iVar3 = iVar2 - 1;
+            iVar2 = iVar2 + 1;
+            field_0x24->DrawToBuffer(field_0x4->field_0x28 + field_0x70,
+                                     field_0x5c * iVar3 + field_0x4->field_0x2c + field_0x72,
+                                     field_0x54, 0);
+        } while (iVar2 < field_0x28 - 2);
+    }
+    field_0x24->DrawToBuffer(field_0x4->field_0x28 + field_0x70,
+                             field_0x5c * (iVar2 - 1) + field_0x4->field_0x2c + field_0x72, field_0x56,
+                             0);
+    if (field_0x8b == 0)
+        sVar4 = field_0x4e;
+    else
+        sVar4 = field_0x50;
+    field_0x24->DrawToBuffer(field_0x78 + field_0x4->field_0x28, field_0x7a + field_0x4->field_0x2c,
+                             sVar4, 0);
+    sVar4 = static_cast<short>(field_0x4->field_0x28) + 5 + field_0x70;
+    field_0x80 = sVar4;
+    if (field_0x42 < 1)
+        sVar1 = field_0x88 / 2;
+    else
+        sVar1 = static_cast<short>((field_0x40 * field_0x88) / field_0x42);
+    sVar1 = static_cast<short>(field_0x4->field_0x2c) + field_0x72 + 3 + sVar1;
+    field_0x82 = sVar1;
+    field_0x24->DrawToBuffer(sVar4, sVar1, field_0x58, 0);
+    if (param_1 != 0)
+        gpWindowManager->UpdateScreenRegion(field_0x18 + field_0x4->field_0x28,
+                                            field_0x1a + field_0x4->field_0x2c, field_0x1c, field_0x1e);
+}
 
 VA(0x004dbbe0, 0x312)
 int listBoxWidget::ProcessMouseMessage(tag_message &param_1)
