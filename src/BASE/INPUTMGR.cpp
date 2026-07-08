@@ -36,7 +36,7 @@ VA(0x004ce230, 0x78)
 int inputManager::Open(int param_1)
 {
     memset(m_eventRing, 0, sizeof(m_eventRing));
-    field_0x73a = 0;
+    m_writeIndex = 0;
     m_readIndex = 0;
     field_0x852 = param_1;
     field_0x85e = 0;
@@ -52,7 +52,7 @@ VA(0x004ce2b0, 0x20)
 void inputManager::Close(void)
 {
     if (m_active == 1) {
-        field_0x73a = 0;
+        m_writeIndex = 0;
         m_readIndex = 0;
         field_0x852 = 0;
         m_active = 0;
@@ -65,7 +65,7 @@ int inputManager::Main(struct tag_message &) { return 0; }
 VA(0x004ce2e0, 0xf)
 void inputManager::Flush(void)
 {
-    field_0x73a = 0;
+    m_writeIndex = 0;
     m_readIndex = 0;
 }
 
@@ -74,7 +74,7 @@ tag_message inputManager::GetEvent(void)
 {
     tag_message local_1c;
     PollSound();
-    if (gpInputManager->m_active == 1 && m_readIndex != field_0x73a) {
+    if (gpInputManager->m_active == 1 && m_readIndex != m_writeIndex) {
         int iVar3 = m_readIndex;
         local_1c = m_eventRing[iVar3];
         m_readIndex = iVar3 + 1;
@@ -95,7 +95,7 @@ tag_message inputManager::PeekEvent(void)
 {
     tag_message local_1c;
     PollSound();
-    if (gpInputManager->m_active == 1 && m_readIndex != field_0x73a) {
+    if (gpInputManager->m_active == 1 && m_readIndex != m_writeIndex) {
         local_1c = m_eventRing[m_readIndex];
         m_readIndex = m_readIndex % 0x40;
         if (local_1c.type == 1 && field_0x856 == 0)
@@ -116,7 +116,7 @@ VA(0x004ce460, 0x1b)
 void inputManager::SetKeyCodeType(int param_1)
 {
     field_0x856 = param_1;
-    field_0x73a = 0;
+    m_writeIndex = 0;
     m_readIndex = 0;
 }
 
@@ -134,16 +134,16 @@ void inputManager::ForceMouseMove(void)
 {
     if (gpInputManager->field_0x73e == 0) {
         gpInputManager->field_0x73e = 1;
-        int iVar4 = gpInputManager->field_0x73a;
+        int iVar4 = gpInputManager->m_writeIndex;
         tag_message *ev = &gpInputManager->m_eventRing[iVar4];
         ev->type = 4;
         gpMouseManager->MouseCoords(ev->field4, ev->field8);
         ev->field10 = ev->field4;
         ev->field14 = ev->field8;
         ev->fieldC = gpInputManager->field_0x85e;
-        gpInputManager->field_0x73a = gpInputManager->field_0x73a + 1;
-        gpInputManager->field_0x73a = gpInputManager->field_0x73a % 0x40;
-        if (gpInputManager->field_0x73a == gpInputManager->m_readIndex) {
+        gpInputManager->m_writeIndex = gpInputManager->m_writeIndex + 1;
+        gpInputManager->m_writeIndex = gpInputManager->m_writeIndex % 0x40;
+        if (gpInputManager->m_writeIndex == gpInputManager->m_readIndex) {
             gpInputManager->m_readIndex = gpInputManager->m_readIndex + 1;
             gpInputManager->m_readIndex = gpInputManager->m_readIndex % 0x40;
         }
