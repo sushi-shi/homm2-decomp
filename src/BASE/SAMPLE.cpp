@@ -21,9 +21,9 @@ sample::sample(char *param_1, long int param_2, long int param_3, long int param
 {
     char local_20[32];
     int iVar7 = 2;
-    field_0x1c = param_2;
-    field_0x28 = param_3;
-    field_0x2c = param_4;
+    m_channelType = param_2;
+    m_volume = param_3;
+    m_loopCount = param_4;
     int hz11 = 0x2b11;   // 11025 Hz  — kept live across the loop (hoisted to esi)
     int hz22 = 0x5622;   // 22050 Hz  — hoisted to edi
     // The last three chars of the filename (extension, e.g. ".82M") encode the
@@ -57,7 +57,7 @@ sample::~sample()
     BaseFree(m_data, __FILE__, __LINE__);
     m_data = 0;
     m_size = 0;
-    field_0x28 = 0;
+    m_volume = 0;
 }
 
 VA(0x004daf70, 0x72)

@@ -850,17 +850,17 @@ struct _SAMPLE *soundManager::MemorySample(class sample *param_1)
         return 0;
     if (gSampleVolume == 0)
         return 0;
-    if (field_0x3e == 0 || param_1->field_0x28 == 0)
+    if (field_0x3e == 0 || param_1->m_volume == 0)
         return 0;
     LogStr("Memory Sample 1");
-            iVar1 = param_1->field_0x1c;
+            iVar1 = param_1->m_channelType;
             iVar4 = iVar1 * 0xc;
             local_10 = static_cast<short>(SCS[iVar1].startChannel);
             while (local_10 < SCS[iVar1].endChannel &&
                    _AIL_sample_status_4(m_sampleHandles[local_10]) != 2)
                 local_10++;
             if (SCS[iVar1].endChannel == local_10) {
-                if (param_1->field_0x1c == 4) {
+                if (param_1->m_channelType == 4) {
                     LogStr("Memory Sample 2a");
                     return 0;
                 }
@@ -875,17 +875,17 @@ struct _SAMPLE *soundManager::MemorySample(class sample *param_1)
                 StopSample(m_sampleHandles[local_10]);
             }
             p_Var2 = m_sampleHandles[local_10];
-            m_channelVolumes[local_10] = static_cast<char>(param_1->field_0x28);
-            iLastVolume[local_10] = static_cast<short>(param_1->field_0x28);
+            m_channelVolumes[local_10] = static_cast<char>(param_1->m_volume);
+            iLastVolume[local_10] = static_cast<short>(param_1->m_volume);
             _AIL_init_sample_4(p_Var2);
             _AIL_set_sample_type_12(p_Var2, param_1->m_format, 0);
             _AIL_set_sample_playback_rate_8(p_Var2, param_1->m_sampleRate);
-            _AIL_set_sample_loop_count_8(p_Var2, param_1->field_0x2c);
+            _AIL_set_sample_loop_count_8(p_Var2, param_1->m_loopCount);
             _AIL_set_sample_address_12(p_Var2, reinterpret_cast<int>(param_1->m_data), param_1->m_size);
             if (gSampleVolume == 0) {
                 _AIL_set_sample_volume_8(p_Var2, 0);
             } else {
-                iVar4 = ConvertVolume(param_1->field_0x28, 100);
+                iVar4 = ConvertVolume(param_1->m_volume, 100);
                 _AIL_set_sample_volume_8(p_Var2, iVar4);
             }
             _AIL_start_sample_4(p_Var2);
