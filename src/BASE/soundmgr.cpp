@@ -689,16 +689,22 @@ void soundManager::SetMusicQuality(int param_1)
 VA(0x004cd250, 0xc5)
 void soundManager::PlayAmbientMusic(int param_1, long param_2, int param_3)
 {
-    if (gbNoSound == 0 && m_samplesReady != 0 && field_0x3e != 0 && m_currentTrack != param_1) {
-        if (gMidiEnabled == 0) {
-            m_currentTrack = static_cast<char>(param_1);
-        } else {
-            if (gCdMusic == 0)
-                MIDIPlay(param_1);
-            else
-                CDPlay(param_1, param_2, -1, 0);
-            m_currentTrack = static_cast<char>(param_1);
-        }
+    if (gbNoSound != 0)
+        return;
+    if (m_samplesReady == 0)
+        return;
+    if (field_0x3e == 0)
+        return;
+    if (m_currentTrack == param_1)
+        return;
+    if (gMidiEnabled == 0) {
+        m_currentTrack = static_cast<char>(param_1);
+    } else {
+        if (gCdMusic == 0)
+            MIDIPlay(param_1);
+        else
+            CDPlay(param_1, param_2, -1, 0);
+        m_currentTrack = static_cast<char>(param_1);
     }
 }
 
