@@ -13,6 +13,9 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <BASE/baseManager.h>
 #include <BASE/resource.h>
+#include <BASE/icon.h>
+#include <BASE/MIDIWrap.h>
+#include <BASE/sample.h>
 #include <BASE/tileset.h>
 #include <BASE/font.h>
 #include <BASE/bitmap.h>
@@ -59,7 +62,17 @@ VA(0x004c8350, 0x2f)
 class icon * resourceManager::GetIcon(char *name) { return GetIcon(MakeId(name, 1)); }
 
 VA(0x004c8380, 0x86)
-class icon * resourceManager::GetIcon(unsigned long int) { return 0; }
+class icon *resourceManager::GetIcon(unsigned long param_1)
+{
+    resource *local_8 = Query(param_1);
+    if (local_8 == 0) {
+        local_8 = new icon(param_1);
+        AddResource(local_8);
+    } else {
+        local_8->field_0x6 = local_8->field_0x6 + 1;
+    }
+    return static_cast<icon *>(local_8);
+}
 
 VA(0x004c8410, 0x97)
 class tileset * resourceManager::GetTileset(char *name)
@@ -93,10 +106,32 @@ class font * resourceManager::GetFont(char *name)
 }
 
 VA(0x004c8570, 0x9d)
-class sample * resourceManager::GetSample(char *) { return 0; }
+class sample *resourceManager::GetSample(char *param_1)
+{
+    unsigned long uVar1 = MakeId(param_1, 1);
+    resource *local_8 = Query(uVar1);
+    if (local_8 == 0) {
+        local_8 = new sample(param_1, 0, 0x7f, 1);
+        AddResource(local_8);
+    } else {
+        local_8->field_0x6 = local_8->field_0x6 + 1;
+    }
+    return static_cast<sample *>(local_8);
+}
 
 VA(0x004c8610, 0x97)
-class MIDIWrap * resourceManager::GetMIDIWrap(char *) { return 0; }
+class MIDIWrap *resourceManager::GetMIDIWrap(char *param_1)
+{
+    unsigned long uVar1 = MakeId(param_1, 1);
+    resource *local_8 = Query(uVar1);
+    if (local_8 == 0) {
+        local_8 = new MIDIWrap(param_1);
+        AddResource(local_8);
+    } else {
+        local_8->field_0x6 = local_8->field_0x6 + 1;
+    }
+    return static_cast<MIDIWrap *>(local_8);
+}
 
 VA(0x004c86b0, 0x87)
 void resourceManager::Dispose(class resource *param_1)
@@ -135,7 +170,14 @@ void resourceManager::Expunge(void)
 }
 
 VA(0x004c8830, 0x4b)
-class resource * resourceManager::Query(unsigned long int) { return 0; }
+class resource *resourceManager::Query(unsigned long param_1)
+{
+    resource *local_8;
+    for (local_8 = field_0x36; local_8 != 0 && local_8->field_0x8 != param_1;
+         local_8 = local_8->field_0xc) {
+    }
+    return local_8;
+}
 
 VA(0x004c8880, 0x1a)
 int resourceManager::Main(struct tag_message &) { return 0; }
