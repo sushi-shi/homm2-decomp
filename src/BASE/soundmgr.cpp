@@ -328,7 +328,29 @@ VA(0x004cd320, 0x38f)
 void soundManager::PollSound(void) {}
 
 VA(0x004cd6b0, 0x138)
-void soundManager::SwitchAmbientMusic(int) {}
+void soundManager::SwitchAmbientMusic(int param_1)
+{
+    if (gbNoSound == 0 && field_0x684 != 0) {
+        if (gMidiEnabled == 0) {
+            field_0x578 = static_cast<char>(param_1);
+        } else if (MusicPlaying() == 0) {
+            PlayAmbientMusic(param_1, 0, -1);
+        } else if (field_0x578 != param_1) {
+            LogStr("Switch Ambient Music 1");
+            Process1WindowsMessage();
+            if ((field_0x688 != 0 && field_0x68c != param_1) ||
+                (field_0x688 == 0 && field_0x578 != param_1)) {
+                if (field_0x688 < 0xb) {
+                    field_0x688 = 0xb;
+                    gMusicFadeTimer = KBTickCount() + 900;
+                }
+                field_0x68c = param_1;
+                PollSound();
+            }
+            LogStr("Switch Ambient Music 2");
+        }
+    }
+}
 
 VA(0x004cd7f0, 0x28f)
 struct _SAMPLE * soundManager::MemorySample(class sample *) { return 0; }
