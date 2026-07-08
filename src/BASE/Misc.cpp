@@ -181,7 +181,11 @@ VA(0x004c5570, 0x491)
 void WritePrefsToRegistry(void) {}
 
 VA(0x004c5a10, 0xa)
-void WritePrefs(void) {}
+void WritePrefs(void)
+{
+    UpdateSystemOptionsMenu();
+    WritePrefsToRegistry();
+}
 
 VA(0x004c5a20, 0x3c)
 int IsCDDrive(int param_1)
