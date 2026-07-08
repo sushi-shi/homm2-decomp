@@ -34,7 +34,35 @@ void FillBitmapArea(class bitmap *bmp, int x, int y, int w, int h, int color)
 }
 
 VA(0x004ca450, 0x114)
-void FillBitmapAreaClip(class bitmap *, int, int, int, int, int, int, int, int, int) {}
+void FillBitmapAreaClip(class bitmap *bmp, int x, int y, int w, int h, int color, int clipx,
+                        int clipy, int clipw, int cliph)
+{
+    int cx2 = clipx - 1 + clipw;
+    int cy2;
+    if (x < cx2 && clipx < x - 1 + w && (cy2 = clipy - 1 + cliph, y < cy2) && clipy < y - 1 + h) {
+        if (cx2 <= x - 1 + w)
+            w = clipx + (clipw - x);
+        if (x < clipx) {
+            w = (w - clipx) + x;
+            x = clipx;
+        }
+        if (cy2 <= y - 1 + h)
+            h = (cliph - y) + clipy;
+        if (y < clipy) {
+            h = (h - clipy) + y;
+            y = clipy;
+        }
+        gFillRow = 0;
+        gFillPtr = bmp->field_0x16 + bmp->field_0x12 * y + x;
+        if (h > 0) {
+            do {
+                memset(gFillPtr, color, w);
+                gFillPtr += bmp->field_0x12;
+                gFillRow++;
+            } while (gFillRow < h);
+        }
+    }
+}
 
 VA(0x004ca570, 0xa6)
 void BlitBitmap(class bitmap *src, int sx, int sy, int w, int h, class bitmap *dst, int dx, int dy)
