@@ -13,15 +13,15 @@
 VA(0x004dde00, 0x5a)
 widget::widget(short int x, short int y, short int w, short int h, short int p5, short int kind)
 {
-    field_0x18 = x;
+    m_x = x;
     m_owner = 0;
-    field_0x1a = y;
+    m_y = y;
     m_next = 0;
     m_prev = 0;
     m_flags = 6;
     m_zOrder = -1;
-    field_0x1c = w;
-    field_0x1e = h;
+    m_width = w;
+    m_height = h;
     m_id = p5;
     field_0x14 = kind;
 }
@@ -36,10 +36,10 @@ widget::widget(void)
     m_flags = 6;
     m_zOrder = -1;
     field_0x14 = 2;
-    field_0x1a = 0;
-    field_0x18 = 0;
-    field_0x1c = 0x10;
-    field_0x1e = 0x10;
+    m_y = 0;
+    m_x = 0;
+    m_width = 0x10;
+    m_height = 0x10;
 }
 
 VA(0x004ddea0, 0x7)
@@ -66,8 +66,8 @@ int widget::Main(tag_message &param_1)
     if (param_1.type == 4) {
         sVar3 = static_cast<short>(param_1.field4) - m_owner->m_posX;
         sVar4 = static_cast<short>(param_1.field8) - m_owner->m_posY;
-        if (field_0x18 <= sVar3 && field_0x1a <= sVar4 && sVar3 < field_0x1c + field_0x18 &&
-            sVar4 < field_0x1e + field_0x1a) {
+        if (m_x <= sVar3 && m_y <= sVar4 && sVar3 < m_width + m_x &&
+            sVar4 < m_height + m_y) {
             param_1.field8 = m_id;
             return 2;
         }
@@ -77,9 +77,9 @@ int widget::Main(tag_message &param_1)
             if ((m_flags & 4) != 0)
                 Draw();
             if ((m_flags & 8) != 0 && field_0x14 != 8 && field_0x14 != 0x200) {
-                short x = field_0x18 + m_owner->m_posX;
-                short y = field_0x1a + m_owner->m_posY;
-                DimBitmapArea(gpWindowManager->m_screen, x, y, field_0x1c, field_0x1e, 0);
+                short x = m_x + m_owner->m_posX;
+                short y = m_y + m_owner->m_posY;
+                DimBitmapArea(gpWindowManager->m_screen, x, y, m_width, m_height, 0);
                 return 0;
             }
             break;
@@ -94,15 +94,15 @@ int widget::Main(tag_message &param_1)
                 if ((uVar2 & 8) != 0) {
                     Draw();
                     if (field_0x14 != 8 && field_0x14 != 0x200) {
-                        short x = field_0x18 + m_owner->m_posX;
-                        short y = field_0x1a + m_owner->m_posY;
-                        DimBitmapArea(gpWindowManager->m_screen, x, y, field_0x1c, field_0x1e, 0);
+                        short x = m_x + m_owner->m_posX;
+                        short y = m_y + m_owner->m_posY;
+                        DimBitmapArea(gpWindowManager->m_screen, x, y, m_width, m_height, 0);
                     }
                 }
                 if ((*pFlagsHi & 0x40) != 0) {
-                    gpWindowManager->UpdateScreenRegion(field_0x18 + m_owner->m_posX,
-                                                        field_0x1a + m_owner->m_posY,
-                                                        field_0x1c, field_0x1e);
+                    gpWindowManager->UpdateScreenRegion(m_x + m_owner->m_posX,
+                                                        m_y + m_owner->m_posY,
+                                                        m_width, m_height);
                     *pFlagsHi = *pFlagsHi & 0xbf;
                 }
                 return 1;
@@ -119,27 +119,27 @@ int widget::Main(tag_message &param_1)
                 if ((uVar1 & 8) != 0)
                     Draw();
                 if ((uVar1 & 0x4000) != 0)
-                    gpWindowManager->UpdateScreenRegion(field_0x18 + m_owner->m_posX,
-                                                        field_0x1a + m_owner->m_posY,
-                                                        field_0x1c, field_0x1e);
+                    gpWindowManager->UpdateScreenRegion(m_x + m_owner->m_posX,
+                                                        m_y + m_owner->m_posY,
+                                                        m_width, m_height);
                 return 1;
             }
             break;
         case 0x34:
             if (m_id == param_1.field8) {
-                field_0x18 = static_cast<short>(reinterpret_cast<int>(param_1.text));
+                m_x = static_cast<short>(reinterpret_cast<int>(param_1.text));
                 return 1;
             }
             break;
         case 0x35:
             if (m_id == param_1.field8) {
-                field_0x1a = static_cast<short>(reinterpret_cast<int>(param_1.text));
+                m_y = static_cast<short>(reinterpret_cast<int>(param_1.text));
                 return 1;
             }
             break;
         case 0x3d:
             if (m_id == param_1.field8) {
-                field_0x1c = static_cast<short>(reinterpret_cast<int>(param_1.text));
+                m_width = static_cast<short>(reinterpret_cast<int>(param_1.text));
                 return 1;
             }
         }
@@ -151,9 +151,9 @@ VA(0x004de1e0, 0x47)
 void widget::Dim(void)
 {
     if (field_0x14 != 8 && field_0x14 != 0x200) {
-        short x = m_owner->m_posX + field_0x18;
-        short y = field_0x1a + m_owner->m_posY;
-        DimBitmapArea(gpWindowManager->m_screen, x, y, field_0x1c, field_0x1e, 0);
+        short x = m_owner->m_posX + m_x;
+        short y = m_y + m_owner->m_posY;
+        DimBitmapArea(gpWindowManager->m_screen, x, y, m_width, m_height, 0);
     }
 }
 

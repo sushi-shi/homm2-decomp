@@ -37,10 +37,10 @@ VA(0x004d1160, 0xef)
 void textWidget::Read(void)
 {
     char local_10[16];
-    field_0x18 = gpResourceManager->ReadWord();
-    field_0x1a = gpResourceManager->ReadWord();
-    field_0x1c = gpResourceManager->ReadWord();
-    field_0x1e = gpResourceManager->ReadWord();
+    m_x = gpResourceManager->ReadWord();
+    m_y = gpResourceManager->ReadWord();
+    m_width = gpResourceManager->ReadWord();
+    m_height = gpResourceManager->ReadWord();
     short len = gpResourceManager->ReadWord();
     field_0x20 = static_cast<char *>(BaseAlloc(len, __FILE__, __LINE__));
     gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(field_0x20), len);
@@ -124,8 +124,8 @@ LAB_004d12c4:
     }
     sVar9 = static_cast<short>(param_1.field4) - m_owner->m_posX;
     sVar7 = static_cast<short>(param_1.field8) - m_owner->m_posY;
-    if (field_0x18 <= sVar9 && field_0x1a <= sVar7 && sVar9 < field_0x1c + field_0x18 &&
-        sVar7 < field_0x1e + field_0x1a) {
+    if (m_x <= sVar9 && m_y <= sVar7 && sVar9 < m_width + m_x &&
+        sVar7 < m_height + m_y) {
         m_flags = uVar2 | 1;
         if (param_1.type == 0x20)
             param_1.fieldC = 0x200;
@@ -143,8 +143,8 @@ void textWidget::Draw(void)
     int color = 3;
     if ((m_flags & 8) == 0)
         color = field_0x28;
-    field_0x24->DrawBoundedString(field_0x20, field_0x18 + m_owner->m_posX,
-                                  field_0x1a + m_owner->m_posY, field_0x1c, field_0x1e,
+    field_0x24->DrawBoundedString(field_0x20, m_x + m_owner->m_posX,
+                                  m_y + m_owner->m_posY, m_width, m_height,
                                   color, field_0x2a);
 }
 

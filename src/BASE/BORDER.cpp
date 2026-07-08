@@ -44,10 +44,10 @@ border::~border()
 VA(0x004d21e0, 0x10e)
 void border::Read(void)
 {
-    field_0x18 = gpResourceManager->ReadWord();
-    field_0x1a = gpResourceManager->ReadWord();
-    field_0x1c = gpResourceManager->ReadWord();
-    field_0x1e = gpResourceManager->ReadWord();
+    m_x = gpResourceManager->ReadWord();
+    m_y = gpResourceManager->ReadWord();
+    m_width = gpResourceManager->ReadWord();
+    m_height = gpResourceManager->ReadWord();
     m_id = gpResourceManager->ReadWord();
     short kind = gpResourceManager->ReadWord();
     field_0x20 = 0;
@@ -100,8 +100,8 @@ int border::Main(struct tag_message &msg)
     }
     short mx = static_cast<short>(msg.field4) - m_owner->m_posX;
     short my = static_cast<short>(msg.field8) - m_owner->m_posY;
-    if (field_0x18 <= mx && field_0x1a <= my &&
-        mx < field_0x1c + field_0x18 && my < field_0x1e + field_0x1a) {
+    if (m_x <= mx && m_y <= my &&
+        mx < m_width + m_x && my < m_height + m_y) {
         if (type == 0x20) {
             msg.fieldC = 0x200;
             msg.field4 = 0xe;
@@ -119,11 +119,11 @@ int border::Main(struct tag_message &msg)
 VA(0x004d2480, 0xab)
 void border::Draw(void)
 {
-    short y = field_0x1a + m_owner->m_posY;
-    short x = field_0x18 + m_owner->m_posX;
+    short y = m_y + m_owner->m_posY;
+    short x = m_x + m_owner->m_posX;
     short kind = field_0x14;
     if (kind == 0x400) {
-        FillBitmapArea(gpWindowManager->m_screen, x, y, field_0x1c, field_0x1e, field_0x28);
+        FillBitmapArea(gpWindowManager->m_screen, x, y, m_width, m_height, field_0x28);
         return;
     }
     if (kind != 0x800) {
@@ -133,7 +133,7 @@ void border::Draw(void)
         return;
     }
     PollSound();
-    BlitBitmap(field_0x20, 0, 0, field_0x1c, field_0x1e, gpWindowManager->m_screen, x, y);
+    BlitBitmap(field_0x20, 0, 0, m_width, m_height, gpWindowManager->m_screen, x, y);
     PollSound();
 }
 

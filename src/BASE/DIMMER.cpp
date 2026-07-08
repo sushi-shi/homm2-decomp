@@ -21,10 +21,10 @@ dimmerWidget::dimmerWidget(short int a, short int b, short int c, short int d, s
 VA(0x004dd390, 0x5f)
 void dimmerWidget::Read(void)
 {
-    field_0x18 = gpResourceManager->ReadWord();
-    field_0x1a = gpResourceManager->ReadWord();
-    field_0x1c = gpResourceManager->ReadWord();
-    field_0x1e = gpResourceManager->ReadWord();
+    m_x = gpResourceManager->ReadWord();
+    m_y = gpResourceManager->ReadWord();
+    m_width = gpResourceManager->ReadWord();
+    m_height = gpResourceManager->ReadWord();
     m_id = gpResourceManager->ReadWord();
     field_0x14 = gpResourceManager->ReadWord();
 }

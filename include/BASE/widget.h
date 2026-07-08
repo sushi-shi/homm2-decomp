@@ -25,10 +25,10 @@ public:
     short  m_zOrder;  // +0x12
     short  field_0x14;  // +0x14
     short  m_flags;  // +0x16
-    short  field_0x18;  // +0x18
-    short  field_0x1a;  // +0x1a
-    short  field_0x1c;  // +0x1c
-    short  field_0x1e;  // +0x1e
+    short  m_x;  // +0x18
+    short  m_y;  // +0x1a
+    short  m_width;  // +0x1c
+    short  m_height;  // +0x1e
     // --- constructors ---
     widget(short int, short int, short int, short int, short int, short int);
     widget(void);
