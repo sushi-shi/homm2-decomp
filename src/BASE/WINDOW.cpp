@@ -60,10 +60,12 @@ heroWindow::heroWindow(int x, int y, int w, int h, int flags)
 }
 
 // @early-stop 85.6% — RESTRUCTURED to the retail's design: nine distinct function-scope
-// widget-type pointer locals (ptw/pbd/pbtn/pdim/pic/pte/pdl/plb), one per widget class,
-// instead of the block-scoped `w`. Residual is purely the /Od name-hash: these names need to
-// hash to the retail frame slots (local_10..local_34) — an od_slots.py solve for the ~9
-// pointers (their current names land on different buckets). Structure now matches retail.
+// widget-type pointer locals (ptw/pbd/pbtn/pdim/pic/pte/pdl/plb), one per widget class.
+// SCOPE (measured): retail frame is sub esp,0x68 = 26 slots. The 9 widget pointers sit at
+// -0x8/-0xc(textEntry,5x)/-0x14/-0x18/-0x1c/-0x20/-0x28/-0x2c/-0x30, INTERLEAVED with ~17
+// /Ob1-inlined locals (widget Read()/ctor/MakeId/strcpy temps). A full match needs those
+// inlined locals reconstructed AND all 26 slots od_slots-named as one global bucket order —
+// bigger than a "9-local" solve. Structure is correct; the 26-slot frame-solve is the wall.
 VA(0x004cecd0, 0x521)
 heroWindow::heroWindow(int param_1, int param_2, char *param_3)
 {
