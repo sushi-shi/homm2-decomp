@@ -384,7 +384,42 @@ void FadeTo(unsigned char *param_1, unsigned char *param_2, int param_3)
 }
 
 VA(0x004c65e0, 0xb8)
-void FadeToColorTable(unsigned char *, int) {}
+void FadeToColorTable(unsigned char *param_1, int param_2)
+{
+    unsigned char auStack_300[768];
+    int uVar1 = gpWindowManager->field_0x56;
+    gpWindowManager->field_0x56 = 0;
+    int iVar8 = 0;
+    unsigned char *puVar2 = reinterpret_cast<unsigned char *>(gpBufferPalette->field_0x10);
+    unsigned char *puVar3 = auStack_300;
+    unsigned char *puVar4;
+    do {
+        puVar4 = puVar3 + 3;
+        int iVar5 = static_cast<unsigned int>(param_1[iVar8]) * 3;
+        iVar8++;
+        *puVar3 = puVar2[iVar5];
+        puVar3[1] = puVar2[iVar5 + 1];
+        puVar3[2] = puVar2[iVar5 + 2];
+        puVar3 = puVar4;
+    } while (puVar4 < auStack_300 + 0x300);
+    iVar8 = 0x1e0;
+    FadeTo(puVar2, auStack_300, param_2);
+    unsigned char *pbVar7 = gpWindowManager->field_0x46->field_0x16;
+    do {
+        int iVar5 = 0x280;
+        unsigned char *pbVar6 = pbVar7;
+        do {
+            pbVar7 = pbVar6 + 1;
+            iVar5--;
+            *pbVar6 = param_1[*pbVar6];
+            pbVar6 = pbVar7;
+        } while (iVar5 != 0);
+        iVar8--;
+    } while (iVar8 != 0);
+    gpWindowManager->UpdateScreen();
+    UpdatePalette(reinterpret_cast<signed char *>(puVar2));
+    gpWindowManager->field_0x56 = uVar1;
+}
 
 VA(0x004c66a0, 0x29)
 int IsCycleColor(int color)
