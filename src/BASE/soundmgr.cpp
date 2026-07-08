@@ -376,10 +376,9 @@ struct _DIG_DRIVER *WAVE_init_driver(unsigned long param_1, unsigned short param
 VA(0x004cc560, 0x3a8)
 int soundManager::Open(int param_1)
 {
-    int SVar1;
+    union { int i; unsigned char b[4]; } SVar1;
     struct _DIG_DRIVER *p_Var2;
     int local_c;
-    char cStack_7;
     m_cdStarted = 0;
     field_0x6a6 = 0;
     m_cdReady = 0;
@@ -417,15 +416,13 @@ int soundManager::Open(int param_1)
     bMusicIsLooping[0x18] = 1;
     for (local_c = 2; local_c < 5; local_c++)
         bMusicIsLooping[local_c] = 1;
-    SVar1 = GetAsyncKeyState(0x75);
-    cStack_7 = static_cast<char>(static_cast<unsigned short>(SVar1) >> 8);
-    if (cStack_7 != 0) {
+    SVar1.i = GetAsyncKeyState(0x75);
+    if (SVar1.b[1] != 0) {
         gCdMusic = 0;
         WritePrefs();
     }
-    SVar1 = GetAsyncKeyState(0x76);
-    cStack_7 = static_cast<char>(static_cast<unsigned short>(SVar1) >> 8);
-    if (cStack_7 != 0) {
+    SVar1.i = GetAsyncKeyState(0x76);
+    if (SVar1.b[1] != 0) {
         gCdMusic = 1;
         WritePrefs();
     }
