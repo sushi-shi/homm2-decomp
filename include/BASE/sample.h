@@ -14,11 +14,11 @@ public:
     struct _SAMPLE *m_activeSample;  // +0x10  active AIL sample
     char   *m_data;  // +0x14  sample data buffer
     int    m_size;  // +0x18
-    int    field_0x1c;  // +0x1c
+    int    m_channelType;  // +0x1c
     int    m_sampleRate;  // +0x20
     int    m_format;  // +0x24
-    int    field_0x28;  // +0x28
-    int    field_0x2c;  // +0x2c
+    int    m_volume;  // +0x28
+    int    m_loopCount;  // +0x2c
     // --- constructors ---
     sample(char *, long int, long int, long int);
     virtual ~sample();

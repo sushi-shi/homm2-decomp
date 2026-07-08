@@ -412,7 +412,7 @@ BASE/soundmgr	?ForcePollSound@soundManager@@QAEXXZ	100.0000	2fbc860cf1db
 BASE/soundmgr	?GetNumberCDDrives@soundManager@@QAEXXZ	100.0000	fde24968c623
 BASE/soundmgr	?HandleMCIError@@YIXHPAD@Z	100.0000	d92d338d12b6
 BASE/soundmgr	?Main@soundManager@@UAEHAAUtag_message@@@Z	100.0000	e76ae8c4e766
-BASE/soundmgr	?MemorySample@soundManager@@QAEPAU_SAMPLE@@PAVsample@@@Z	79.7676	bfa7b5fc14d9
+BASE/soundmgr	?MemorySample@soundManager@@QAEPAU_SAMPLE@@PAVsample@@@Z	79.7676	45f3f7bc2a0b
 BASE/soundmgr	?ModifySample@soundManager@@QAEXPAU_SAMPLE@@FJ@Z	93.5139	8b70bd6a66de
 BASE/soundmgr	?MusicPlaying@soundManager@@QAEHXZ	95.3714	34ea777f04c6
 BASE/soundmgr	?Open@soundManager@@UAEHH@Z	91.4762	a42e6b0be713
