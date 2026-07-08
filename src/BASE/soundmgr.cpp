@@ -180,7 +180,7 @@ void soundManager::CDPlay(int param_1, int param_2, int param_3, int param_4)
             CDStop();
         } else if (m_currentTrack != param_1 || CDPlaying == 0 || param_4 != 0) {
             m_cdTrack = param_1;
-            field_0x694 = param_3;
+            m_cdPlayFrame = param_3;
             Process1WindowsMessage();
             ServiceSound();
             local_8 = KBTickCount();
@@ -244,10 +244,10 @@ void soundManager::CDPlay(int param_1, int param_2, int param_3, int param_4)
             CDPlaying = 1;
             Process1WindowsMessage();
             ServiceSound();
-            if (field_0x688 < 1) {
+            if (m_fadeSteps < 1) {
                 CDSetVolume(param_3, 0);
             } else {
-                field_0x688 = 0xb;
+                m_fadeSteps = 0xb;
                 lVar3 = KBTickCount();
                 gMusicFadeTimer = lVar3 + 0x1e0;
                 CDSetVolume(10, 0);
@@ -271,11 +271,11 @@ void soundManager::CDPoll(void)
         return;
     if (bMusicIsLooping[m_currentTrack] == 0)
         return;
-    if (field_0x6aa + 3000 > KBTickCount())
+    if (m_pollTimer + 3000 > KBTickCount())
         return;
-    field_0x6aa = KBTickCount();
+    m_pollTimer = KBTickCount();
     if (CDIsPlaying() == 0)
-        CDPlay(m_cdTrack, 0, field_0x694, 1);
+        CDPlay(m_cdTrack, 0, m_cdPlayFrame, 1);
 }
 
 VA(0x004cc1c0, 0xdd)
@@ -324,7 +324,7 @@ soundManager::soundManager(void) : baseManager()
     int local_8;
     field_0x574 = 1;
     m_active = 0;
-    field_0x688 = 0;
+    m_fadeSteps = 0;
     field_0x56c = 0;
     for (local_8 = 0; local_8 < 0x20; local_8++)
         reinterpret_cast<short *>(&iLastVolume)[local_8] = 0;
@@ -333,7 +333,7 @@ soundManager::soundManager(void) : baseManager()
     m_digitalDriver = 0;
     field_0x3a = 0;
     m_cdTrack = 0;
-    field_0x694 = 0;
+    m_cdPlayFrame = 0;
 }
 
 VA(0x004cc410, 0x14a)
@@ -466,9 +466,9 @@ int soundManager::Open(int param_1)
         }
         AllocateSampleHandles();
         field_0x3e = 1;
-        field_0x50 = 0;
+        m_midiFile = 0;
         memset(field_0x590, 0, 0xf0);
-        field_0x680 = 1;
+        m_fading = 1;
     }
     field_0xc = 0x10;
     field_0x10 = -1;
@@ -533,7 +533,7 @@ void soundManager::StopAllSamples(int param_1)
         if (_AIL_sample_status_4(m_sampleHandles[local_8]) == 4)
             _AIL_end_sample_4(m_sampleHandles[local_8]);
     }
-    field_0x688 = 0;
+    m_fadeSteps = 0;
     if (param_1 != 0) {
         if (gCdMusic == 0)
             MIDIStop();
@@ -738,42 +738,42 @@ void soundManager::PollSound(void)
         return;
     if (gCdMusic != 0)
         CDPoll();
-        if ((m_pollRequested != 0 || field_0x688 != 0) && gMidiEnabled != 0) {
+        if ((m_pollRequested != 0 || m_fadeSteps != 0) && gMidiEnabled != 0) {
             LogStr("Poll Sound 1");
-            if (field_0x688 > 0) {
+            if (m_fadeSteps > 0) {
                 LogStr("Poll Sound 1a");
                 Process1WindowsMessage();
                 if (m_currentTrack < 8 || 0xf < m_currentTrack)
                     gMusicFadeTimer = KBTickCount();
                 iVar1 = gMusicFadeTimer;
                 lVar2 = KBTickCount();
-                field_0x688 = (iVar1 - lVar2) / 0x3c;
-                if (field_0x688 < 1)
-                    field_0x688 = 0;
+                m_fadeSteps = (iVar1 - lVar2) / 0x3c;
+                if (m_fadeSteps < 1)
+                    m_fadeSteps = 0;
                 LogStr("Poll Sound 1b");
-                if (field_0x688 < 0xb && m_currentTrack != field_0x68c) {
-                    if (field_0x50 == 0 || bSaveMusicPosition[m_currentTrack] == 0) {
+                if (m_fadeSteps < 0xb && m_currentTrack != m_fadeTargetTrack) {
+                    if (m_midiFile == 0 || bSaveMusicPosition[m_currentTrack] == 0) {
                         gMusicFadeTimer = KBTickCount();
                     } else if (gCdMusic == 0) {
-                        ProcessAssert(field_0x50, __FILE__, __LINE__);
-                        field_0x590[m_currentTrack] = ftell(reinterpret_cast<FILE *>(field_0x50));
+                        ProcessAssert(m_midiFile, __FILE__, __LINE__);
+                        field_0x590[m_currentTrack] = ftell(reinterpret_cast<FILE *>(m_midiFile));
                     }
-                    field_0x680 = 1;
-                    if (bSaveMusicPosition[field_0x68c] == 0)
-                        PlayAmbientMusic(field_0x68c, 0, -1);
+                    m_fading = 1;
+                    if (bSaveMusicPosition[m_fadeTargetTrack] == 0)
+                        PlayAmbientMusic(m_fadeTargetTrack, 0, -1);
                     else
-                        PlayAmbientMusic(field_0x68c, field_0x590[field_0x68c], -1);
+                        PlayAmbientMusic(m_fadeTargetTrack, field_0x590[m_fadeTargetTrack], -1);
                     iVar1 = gMusicFadeTimer;
                     lVar2 = KBTickCount();
-                    field_0x688 = (iVar1 - lVar2) / 0x3c;
-                    if (field_0x688 < 1)
-                        field_0x688 = 0;
-                    m_currentTrack = static_cast<char>(field_0x68c);
+                    m_fadeSteps = (iVar1 - lVar2) / 0x3c;
+                    if (m_fadeSteps < 1)
+                        m_fadeSteps = 0;
+                    m_currentTrack = static_cast<char>(m_fadeTargetTrack);
                 }
-                if (field_0x688 < 0xb)
-                    local_8 = ((0xb - field_0x688) * 0x40) / 0xb;
+                if (m_fadeSteps < 0xb)
+                    local_8 = ((0xb - m_fadeSteps) * 0x40) / 0xb;
                 else
-                    local_8 = ((field_0x688 - 10) * 0x40) / 6;
+                    local_8 = ((m_fadeSteps - 10) * 0x40) / 6;
                 if (0x40 < local_8)
                     local_8 = 0x40;
                 if (local_8 < 0)
@@ -810,13 +810,13 @@ void soundManager::SwitchAmbientMusic(int param_1)
     } else if (m_currentTrack != param_1) {
         LogStr("Switch Ambient Music 1");
         Process1WindowsMessage();
-        if ((field_0x688 != 0 && field_0x68c != param_1) ||
-            (field_0x688 == 0 && m_currentTrack != param_1)) {
-            if (field_0x688 < 0xb) {
-                field_0x688 = 0xb;
+        if ((m_fadeSteps != 0 && m_fadeTargetTrack != param_1) ||
+            (m_fadeSteps == 0 && m_currentTrack != param_1)) {
+            if (m_fadeSteps < 0xb) {
+                m_fadeSteps = 0xb;
                 gMusicFadeTimer = KBTickCount() + 900;
             }
-            field_0x68c = param_1;
+            m_fadeTargetTrack = param_1;
             PollSound();
         }
         LogStr("Switch Ambient Music 2");

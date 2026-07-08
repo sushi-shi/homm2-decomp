@@ -131,7 +131,7 @@ void soundManager::MIDIPlay(int param_1)
             }
             if (gbNoSound == 0 && field_0x69e != 0) {
                 int iVar4 = 0x7f;
-                int iVar1 = field_0x688;
+                int iVar1 = m_fadeSteps;
                 if (iVar1 > 0) {
                     if (iVar1 < 0xb) {
                         iVar4 = 0xb;
@@ -194,7 +194,7 @@ void soundManager::MIDISetVolume(void)
 {
     if (gbNoSound == 0 && field_0x69e != 0) {
         int iVar1 = 0x7f;
-        int iVar2 = field_0x688;
+        int iVar2 = m_fadeSteps;
         if (iVar2 > 0) {
             if (iVar2 < 0xb) {
                 iVar1 = 0xb;
