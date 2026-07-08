@@ -5,6 +5,9 @@
 
 #include <va.h>
 #include <io.h>
+#include <SOURCE/KB.h>
+#include <stdio.h>
+#include <errno.h>
 #include <BASE/resourceManager.h>
 #include <BASE/Misc.h>
 #include <BASE/resource.h>
@@ -121,7 +124,19 @@ VA(0x004c88a0, 0xab)
 int resourceManager::Open(int) { return 0; }
 
 VA(0x004c8950, 0x88)
-void resourceManager::RemoveResource(class resource *) {}
+void resourceManager::RemoveResource(class resource *param_1)
+{
+    resource *local_8;
+    if (field_0x36 == param_1) {
+        field_0x36 = param_1->field_0xc;
+    } else {
+        for (local_8 = field_0x36; local_8 != 0 && local_8->field_0xc != param_1;
+             local_8 = local_8->field_0xc) {
+        }
+        if (local_8 != 0)
+            local_8->field_0xc = param_1->field_0xc;
+    }
+}
 
 VA(0x004c89e0, 0xc8)
 void resourceManager::Close(void) {}
@@ -191,7 +206,19 @@ void resourceManager::Read13(signed char *param_1)
 }
 
 VA(0x004c91b0, 0xbd)
-void resourceManager::ReadBlock(signed char *, unsigned long int) {}
+void resourceManager::ReadBlock(signed char *param_1, unsigned long param_2)
+{
+    unsigned long uVar1;
+    ProcessAssert(field_0x42[field_0x3e] != -1, __FILE__, __LINE__);
+    PollSound();
+    uVar1 = _read(field_0x42[field_0x3e], param_1, param_2);
+    if (uVar1 != param_2) {
+        sprintf(gText, "File error: bytes read %d, bytes wanted %d, errno %d, aggregate %s", uVar1,
+                param_2, errno, &field_0x62);
+        LogStr(gText);
+    }
+    PollSound();
+}
 
 
 // ===== vtable resourceManager : public baseManager  (3 slots) =====
