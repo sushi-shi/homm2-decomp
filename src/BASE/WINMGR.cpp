@@ -192,7 +192,58 @@ void heroWindowManager::RemoveWindow(class heroWindow *w)
 }
 
 VA(0x004cadd0, 0x1cf)
-int heroWindowManager::DoDialog(class heroWindow *, int (*)(struct tag_message &), int) { return 0; }
+int heroWindowManager::DoDialog(class heroWindow *param_1, int (*param_2)(struct tag_message &),
+                                int param_3)
+{
+    tag_message local_38;
+    int bVar2;
+    int iVar5;
+    gbInDialog = 1;
+    if (iDialogNestCount == 0)
+        SetNoDialogMenus(0);
+    iDialogNestCount = iDialogNestCount + 1;
+    field_0x5e = -1;
+    if (param_1 != 0)
+        AddWindow(param_1, -1, 1);
+    if (param_3 != 0) {
+        if (gPalette != 0)
+            SetPalette(gPalette->field_0x10, 0);
+        unsigned int uVar1 = gpWindowManager->field_0x56;
+        gpWindowManager->field_0x56 = 0;
+        PollSound();
+        FadeIn(8);
+        gpWindowManager->field_0x56 = gFadeSavedUpdate | uVar1;
+        PollSound();
+    }
+    bVar2 = 0;
+    gpInputManager->Flush();
+    field_0x5a = -1;
+    do {
+        PollSound();
+        Process1WindowsMessage();
+        local_38 = gpInputManager->GetEvent();
+        gpMouseManager->Main(local_38);
+        if (param_1 != 0 && (local_38.type != 4 || gbSendMouseMoveMessages != 0)) {
+            iVar5 = param_1->BroadcastMessage(local_38);
+            if (iVar5 == 2 && local_38.type == 0x200 && local_38.field4 == 10) {
+                bVar2 = 1;
+                field_0x5a = local_38.field8;
+            }
+        }
+        iVar5 = param_2(local_38);
+        if (iVar5 == 2 && local_38.type == 0x200 && local_38.field4 == 10) {
+            bVar2 = 1;
+        }
+    } while (!bVar2);
+    if (param_1 != 0)
+        RemoveWindow(param_1);
+    gpInputManager->Flush();
+    gbInDialog = 0;
+    iDialogNestCount = iDialogNestCount - 1;
+    if (iDialogNestCount == 0)
+        SetNoDialogMenus(1);
+    return field_0x5a;
+}
 
 VA(0x004cafa0, 0x17)
 void heroWindowManager::UpdateScreen(void)
