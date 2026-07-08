@@ -97,7 +97,14 @@ VA(0x004c8610, 0x97)
 class MIDIWrap * resourceManager::GetMIDIWrap(char *) { return 0; }
 
 VA(0x004c86b0, 0x87)
-void resourceManager::Dispose(class resource *) {}
+void resourceManager::Dispose(class resource *param_1)
+{
+    if (field_0x5a == 0 && param_1 != 0 &&
+        (param_1->field_0x6 = param_1->field_0x6 - 1, param_1->field_0x6 < 1) &&
+        (RemoveResource(param_1), param_1 != 0)) {
+        delete param_1;
+    }
+}
 
 VA(0x004c8740, 0x55)
 void resourceManager::AddResource(class resource *param_1)
@@ -112,7 +119,18 @@ void resourceManager::AddResource(class resource *param_1)
 }
 
 VA(0x004c87a0, 0x8b)
-void resourceManager::Expunge(void) {}
+void resourceManager::Expunge(void)
+{
+    resource *prVar1, *local_8;
+    field_0x5a = 1;
+    prVar1 = field_0x36;
+    while (local_8 = prVar1, local_8 != 0) {
+        prVar1 = local_8->field_0xc;
+        RemoveResource(local_8);
+        delete local_8;
+    }
+    field_0x5a = 0;
+}
 
 VA(0x004c8830, 0x4b)
 class resource * resourceManager::Query(unsigned long int) { return 0; }
