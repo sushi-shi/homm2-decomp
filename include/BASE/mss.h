@@ -13,4 +13,9 @@ extern "C" void _AIL_stop_sequence_4(struct _SEQUENCE *);
 extern "C" void _AIL_release_sequence_handle_4(struct _SEQUENCE *);
 extern "C" void _AIL_midiOutClose_4(struct _MDI_DRIVER *);
 extern "C" int _AIL_midiOutOpen_12(struct _MDI_DRIVER **, int, unsigned long);
+extern "C" struct _SEQUENCE *_AIL_allocate_sequence_handle_4(struct _MDI_DRIVER *);
+extern "C" int _AIL_init_sequence_12(struct _SEQUENCE *, void *, int);
+extern "C" void _AIL_start_sequence_4(struct _SEQUENCE *);
+extern "C" void _AIL_set_sequence_loop_count_8(struct _SEQUENCE *, int);
+extern "C" void _AIL_resume_sequence_4(struct _SEQUENCE *);
 #endif // HOMM2_BASE_MSS_H
