@@ -298,33 +298,29 @@ void resourceManager::Close(void)
 VA(0x004c8ab0, 0x143)
 int resourceManager::LoadAggregateHeader(char *param_1)
 {
-    int iVar1;
     short local_10[2];
     int local_c;
     unsigned int local_8;
-    if (field_0x3a < 2) {
-        local_c = _open(param_1, 0x8000);
-        if (local_c == -1) {
-            sprintf(gText, "Can't open file '%s'", param_1);
-            ShutDown(gText);
-            iVar1 = 3;
-        } else {
-            field_0x3e = field_0x3a;
-            field_0x3a = field_0x3a + 1;
-            field_0x42[field_0x3e] = local_c;
-            _read(field_0x42[field_0x3e], local_10, 2);
-            field_0x52[field_0x3e] = local_10[0];
-            local_8 = field_0x52[field_0x3e] * 0xc;
-            field_0x4a[field_0x3e] = static_cast<aggEntry *>(BaseAlloc(local_8, __FILE__, __LINE__));
-            _read(field_0x42[field_0x3e], field_0x4a[field_0x3e], local_8);
-            iVar1 = 0;
-        }
-    } else {
+    if (field_0x3a >= 2) {
         sprintf(gText, "Only %d AGG files can be used at once", 2);
         ShutDown(gText);
-        iVar1 = 3;
+        return 3;
     }
-    return iVar1;
+    local_c = _open(param_1, 0x8000);
+    if (local_c == -1) {
+        sprintf(gText, "Can't open file '%s'", param_1);
+        ShutDown(gText);
+        return 3;
+    }
+    field_0x3e = field_0x3a;
+    field_0x3a = field_0x3a + 1;
+    field_0x42[field_0x3e] = local_c;
+    _read(field_0x42[field_0x3e], local_10, 2);
+    field_0x52[field_0x3e] = local_10[0];
+    local_8 = field_0x52[field_0x3e] * 0xc;
+    field_0x4a[field_0x3e] = static_cast<aggEntry *>(BaseAlloc(local_8, __FILE__, __LINE__));
+    _read(field_0x42[field_0x3e], field_0x4a[field_0x3e], local_8);
+    return 0;
 }
 
 VA(0x004c8c00, 0x11c)

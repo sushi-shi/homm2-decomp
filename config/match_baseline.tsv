@@ -277,7 +277,7 @@ BASE/RESMGR	?GetMouse@resourceManager@@QAEPAVmouse@@PAD@Z	100.0000	7d91b412c973
 BASE/RESMGR	?GetPalette@resourceManager@@QAEPAVpalette@@PAD@Z	100.0000	f0b5b6a043fb
 BASE/RESMGR	?GetSample@resourceManager@@QAEPAVsample@@PAD@Z	100.0000	6554ed8b67fb
 BASE/RESMGR	?GetTileset@resourceManager@@QAEPAVtileset@@PAD@Z	100.0000	6130367f673e
-BASE/RESMGR	?LoadAggregateHeader@resourceManager@@QAEHPAD@Z	78.7273	e9ebb21a0cf4
+BASE/RESMGR	?LoadAggregateHeader@resourceManager@@QAEHPAD@Z	99.9394	448dbccffd27
 BASE/RESMGR	?Main@resourceManager@@UAEHAAUtag_message@@@Z	100.0000	434bea8a6023
 BASE/RESMGR	?MakeId@resourceManager@@QAEKPADH@Z	100.0000	12be80625e0d
 BASE/RESMGR	?Open@resourceManager@@UAEHH@Z	96.3636	7a513d8256c7
