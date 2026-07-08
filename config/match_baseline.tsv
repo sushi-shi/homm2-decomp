@@ -984,7 +984,7 @@ SOURCE/KB	?PopNetBox@@YIXPADH@Z	2.4638	ee2906135bfe
 SOURCE/KB	?QuickViewWait@@YIXXZ	100.0000	6119bf14432c
 SOURCE/KB	?ReceiveHostReportsPlayerExit@@YIXHUSPlayerExit@@H@Z	5.2322	2b76c8b47ecb
 SOURCE/KB	?ReceiveRemotePlayerExit@@YIXUSPlayerExit@@@Z	4.6957	1f88f8319cae
-SOURCE/KB	?RecruitHeroHandler@@YIHAAUtag_message@@@Z	100.0000	a5441ea2f82b
+SOURCE/KB	?RecruitHeroHandler@@YIHAAUtag_message@@@Z	100.0000	ec3d51707db8
 SOURCE/KB	?SetWinText@@YIXPAVheroWindow@@H@Z	100.0000	fce90af3ba5f
 SOURCE/KB	?SetupCDRom@@YIXXZ	100.0000	8d54750df930
 SOURCE/KB	?SetupDynamicWindow@@YIXHHHHHHHPAH00000PAPAVheroWindow@@H@Z	2.7773	1d978c7f06f2
