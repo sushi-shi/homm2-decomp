@@ -105,7 +105,7 @@ void DoRipple(class bitmap *param_1, class bitmap *param_2, int param_3, int par
         if (0x280 < iVar3 + iVar2)
             iVar2 = 0x280 - iVar3;
         if (iVar2 > 0) {
-            BlitBitmapToScreen(gpWindowManager->field_0x46, iVar3, 0, iVar2, param_3, iVar3, 0);
+            BlitBitmapToScreen(gpWindowManager->m_screen, iVar3, 0, iVar2, param_3, iVar3, 0);
             DelayTil(&local_28c);
         }
         local_2c4 += 4;

@@ -123,7 +123,7 @@ void border::Draw(void)
     short x = field_0x18 + m_owner->m_posX;
     short kind = field_0x14;
     if (kind == 0x400) {
-        FillBitmapArea(gpWindowManager->field_0x46, x, y, field_0x1c, field_0x1e, field_0x28);
+        FillBitmapArea(gpWindowManager->m_screen, x, y, field_0x1c, field_0x1e, field_0x28);
         return;
     }
     if (kind != 0x800) {
@@ -133,7 +133,7 @@ void border::Draw(void)
         return;
     }
     PollSound();
-    BlitBitmap(field_0x20, 0, 0, field_0x1c, field_0x1e, gpWindowManager->field_0x46, x, y);
+    BlitBitmap(field_0x20, 0, 0, field_0x1c, field_0x1e, gpWindowManager->m_screen, x, y);
     PollSound();
 }
 

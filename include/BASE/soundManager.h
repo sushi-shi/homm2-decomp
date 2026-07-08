@@ -21,14 +21,14 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
-    int    field_0x36;  // +0x36
+    int    m_digitalDriver;  // +0x36
     int    field_0x3a;  // +0x3a
     int    field_0x3e;  // +0x3e
     char _pad_0x42[0xe];
     int    field_0x50;  // +0x50
-    struct _SAMPLE *field_0x54[14];  // +0x54  sample handles
+    struct _SAMPLE *m_sampleHandles[14];  // +0x54  sample handles
     char _pad_0x8c[0x8];
-    int    field_0x94;  // +0x94
+    int    m_numSampleHandles;  // +0x94
     char _pad_0x98[0x40];             // 0x98..0xd8
     char   field_0xd8[0x14];          // 0xd8  per-channel volume byte
     struct _SAMPLE *field_0xec[14];   // 0xec  active sample per channel
@@ -40,20 +40,20 @@ public:
     int    field_0x56c;  // +0x56c
     char _pad_0x570[0x4];
     int    field_0x574;  // +0x574
-    char   field_0x578;  // +0x578
-    char   field_0x579;  // +0x579
+    char   m_currentTrack;  // +0x578
+    char   m_pollRequested;  // +0x579
     char   field_0x57a;  // +0x57a
     char   field_0x57b;  // +0x57b
     char _pad_0x57c[0x14];
     long   field_0x590[0x3c];  // +0x590  saved music file positions per track
     int    field_0x680;  // +0x680
-    int    field_0x684;  // +0x684
+    int    m_samplesReady;  // +0x684
     int    field_0x688;  // +0x688
     int    field_0x68c;  // +0x68c
     int    field_0x690;  // +0x690
     int    field_0x694;  // +0x694
     short  field_0x698;  // +0x698
-    int    field_0x69a;  // +0x69a
+    int    m_cdReady;  // +0x69a
     int    field_0x69e;  // +0x69e
     int    field_0x6a2;  // +0x6a2
     int    field_0x6a6;  // +0x6a6

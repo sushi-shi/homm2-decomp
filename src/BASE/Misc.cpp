@@ -184,9 +184,9 @@ void ShowMemoryStatus(void)
     sprintf(gText, "Mem Left %dK", 0x3ea2);
     int iVar1 = giDebugLevel;
     giDebugLevel = 9;
-    FillBitmapArea(gpWindowManager->field_0x46, 0, 0x1cc, 0x280, 0x14, 0);
+    FillBitmapArea(gpWindowManager->m_screen, 0, 0x1cc, 0x280, 0x14, 0);
     gDebugFont->DrawBoundedString(gText, 0, 0x1d0, 0x280, 0x10, 1, 0);
-    BlitBitmapToScreen(gpWindowManager->field_0x46, 0, 0x1cc, 0x280, 0x14, 0, 0x1cc);
+    BlitBitmapToScreen(gpWindowManager->m_screen, 0, 0x1cc, 0x280, 0x14, 0, 0x1cc);
     giDebugLevel = iVar1;
 }
 
@@ -581,9 +581,9 @@ VA(0x004c63f0, 0x6c)
 void AiPrint(char *param_1)
 {
     if (giDebugLevel > 1) {
-        FillBitmapArea(gpWindowManager->field_0x46, 0, 0x1cc, 0x280, 0x14, 0);
+        FillBitmapArea(gpWindowManager->m_screen, 0, 0x1cc, 0x280, 0x14, 0);
         smallFont->DrawBoundedString(param_1, 0, 0x1d0, 0x280, 0x10, 1, 0);
-        BlitBitmapToScreen(gpWindowManager->field_0x46, 0, 0x1cc, 0x280, 0x14, 0, 0x1cc);
+        BlitBitmapToScreen(gpWindowManager->m_screen, 0, 0x1cc, 0x280, 0x14, 0, 0x1cc);
     }
 }
 
@@ -592,9 +592,9 @@ void AbsAiPrint(char *param_1)
 {
     int saved = giDebugLevel;
     giDebugLevel = 9;
-    FillBitmapArea(gpWindowManager->field_0x46, 0, 0x1cc, 0x280, 0x14, 0);
+    FillBitmapArea(gpWindowManager->m_screen, 0, 0x1cc, 0x280, 0x14, 0);
     smallFont->DrawBoundedString(param_1, 0, 0x1d0, 0x280, 0x10, 1, 0);
-    BlitBitmapToScreen(gpWindowManager->field_0x46, 0, 0x1cc, 0x280, 0x14, 0, 0x1cc);
+    BlitBitmapToScreen(gpWindowManager->m_screen, 0, 0x1cc, 0x280, 0x14, 0, 0x1cc);
     giDebugLevel = saved;
 }
 
@@ -644,8 +644,8 @@ VA(0x004c65e0, 0xb8)
 void FadeToColorTable(unsigned char *param_1, int param_2)
 {
     unsigned char auStack_300[768];
-    int uVar1 = gpWindowManager->field_0x56;
-    gpWindowManager->field_0x56 = 0;
+    int uVar1 = gpWindowManager->m_updateFlags;
+    gpWindowManager->m_updateFlags = 0;
     int iVar8 = 0;
     unsigned char *puVar2 = reinterpret_cast<unsigned char *>(gpBufferPalette->field_0x10);
     unsigned char *puVar3 = auStack_300;
@@ -661,7 +661,7 @@ void FadeToColorTable(unsigned char *param_1, int param_2)
     } while (puVar4 < auStack_300 + 0x300);
     iVar8 = 0x1e0;
     FadeTo(puVar2, auStack_300, param_2);
-    unsigned char *pbVar7 = gpWindowManager->field_0x46->m_pixels;
+    unsigned char *pbVar7 = gpWindowManager->m_screen->m_pixels;
     do {
         int iVar5 = 0x280;
         unsigned char *pbVar6 = pbVar7;
@@ -675,7 +675,7 @@ void FadeToColorTable(unsigned char *param_1, int param_2)
     } while (iVar8 != 0);
     gpWindowManager->UpdateScreen();
     UpdatePalette(reinterpret_cast<signed char *>(puVar2));
-    gpWindowManager->field_0x56 = uVar1;
+    gpWindowManager->m_updateFlags = uVar1;
 }
 
 VA(0x004c66a0, 0x29)

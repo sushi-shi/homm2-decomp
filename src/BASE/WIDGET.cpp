@@ -79,7 +79,7 @@ int widget::Main(tag_message &param_1)
             if ((m_flags & 8) != 0 && field_0x14 != 8 && field_0x14 != 0x200) {
                 short x = field_0x18 + m_owner->m_posX;
                 short y = field_0x1a + m_owner->m_posY;
-                DimBitmapArea(gpWindowManager->field_0x46, x, y, field_0x1c, field_0x1e, 0);
+                DimBitmapArea(gpWindowManager->m_screen, x, y, field_0x1c, field_0x1e, 0);
                 return 0;
             }
             break;
@@ -96,7 +96,7 @@ int widget::Main(tag_message &param_1)
                     if (field_0x14 != 8 && field_0x14 != 0x200) {
                         short x = field_0x18 + m_owner->m_posX;
                         short y = field_0x1a + m_owner->m_posY;
-                        DimBitmapArea(gpWindowManager->field_0x46, x, y, field_0x1c, field_0x1e, 0);
+                        DimBitmapArea(gpWindowManager->m_screen, x, y, field_0x1c, field_0x1e, 0);
                     }
                 }
                 if ((*pFlagsHi & 0x40) != 0) {
@@ -153,7 +153,7 @@ void widget::Dim(void)
     if (field_0x14 != 8 && field_0x14 != 0x200) {
         short x = m_owner->m_posX + field_0x18;
         short y = field_0x1a + m_owner->m_posY;
-        DimBitmapArea(gpWindowManager->field_0x46, x, y, field_0x1c, field_0x1e, 0);
+        DimBitmapArea(gpWindowManager->m_screen, x, y, field_0x1c, field_0x1e, 0);
     }
 }
 
