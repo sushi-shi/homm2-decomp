@@ -128,7 +128,7 @@ flags = "o2"
 [[unit]]
 unit = "BASE/RESMGR"
 source = "src/BASE/RESMGR.cpp"
-flags = "base"
+flags = "base_oi"
 
 [[unit]]
 unit = "BASE/RESOURCE"

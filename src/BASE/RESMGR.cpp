@@ -426,13 +426,14 @@ unsigned long resourceManager::MakeId(char *param_1, int param_2)
     strcpy(&field_0x62, param_1);
     if (gbUseEvilInterface != 0 && param_2 != 0) {
         for (local_c = 0; local_c < 0x25; local_c++) {
-            if (_stricmp(&field_0x62, cEvilTranslate[local_c][0]) == 0) {
+            if (_strcmpi(&field_0x62, cEvilTranslate[local_c][0]) == 0) {
                 strcpy(&field_0x62, cEvilTranslate[local_c][1]);
             }
         }
     }
-    field_0x9e = MAKEFILEID(&field_0x62);
-    return field_0x9e;
+    unsigned long uVar1 = MAKEFILEID(&field_0x62);
+    field_0x9e = uVar1;
+    return uVar1;
 }
 
 VA(0x004c9180, 0x26)

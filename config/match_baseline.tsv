@@ -260,7 +260,7 @@ BASE/PALETTE	??0palette@@QAE@XZ	99.9375	c76712802bcd
 BASE/PALETTE	??1palette@@UAE@XZ	99.9286	3684d9000eaa
 BASE/PALETTE	??_Epalette@@UAEPAXI@Z	0.0000	
 BASE/PALETTE	?Data@palette@@QAEPACXZ	100.0000	3bb1f3ed4160
-BASE/RESMGR	??0resourceManager@@QAE@XZ	78.5902	a84038ee2184
+BASE/RESMGR	??0resourceManager@@QAE@XZ	99.9836	a84038ee2184
 BASE/RESMGR	?AddResource@resourceManager@@QAEXPAVresource@@@Z	100.0000	417403dd6517
 BASE/RESMGR	?Close@resourceManager@@UAEXXZ	97.0185	5f36b5814ef1
 BASE/RESMGR	?Dispose@resourceManager@@QAEXPAVresource@@@Z	55.4884	88b2eb89165e
@@ -279,8 +279,8 @@ BASE/RESMGR	?GetSample@resourceManager@@QAEPAVsample@@PAD@Z	77.6923	fa55d1744f74
 BASE/RESMGR	?GetTileset@resourceManager@@QAEPAVtileset@@PAD@Z	97.9592	9998aa0d596a
 BASE/RESMGR	?LoadAggregateHeader@resourceManager@@QAEHPAD@Z	78.7273	e9ebb21a0cf4
 BASE/RESMGR	?Main@resourceManager@@UAEHAAUtag_message@@@Z	100.0000	434bea8a6023
-BASE/RESMGR	?MakeId@resourceManager@@QAEKPADH@Z	63.5946	9e3cc9008bcd
-BASE/RESMGR	?Open@resourceManager@@UAEHH@Z	50.8727	0d5a5db3efc2
+BASE/RESMGR	?MakeId@resourceManager@@QAEKPADH@Z	100.0000	12be80625e0d
+BASE/RESMGR	?Open@resourceManager@@UAEHH@Z	74.0909	0d5a5db3efc2
 BASE/RESMGR	?PointToFile@resourceManager@@QAEXK@Z	90.8313	3d20d5dcb709
 BASE/RESMGR	?Query@resourceManager@@QAEPAVresource@@K@Z	86.0000	832861b1b724
 BASE/RESMGR	?Read13@resourceManager@@QAEXPAC@Z	100.0000	fb46d6f443a3

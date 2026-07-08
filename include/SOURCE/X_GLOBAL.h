@@ -36,7 +36,7 @@ DATA(0x004fa668) extern int gbColorMice;
 DATA(0x004fa670) extern unsigned long *gTownEligibleBuildMask;
 DATA(0x004fa688) extern unsigned char *giMapSizes;
 DATA(0x004fa68c) extern int gbUseEvilInterface;
-DATA(0x004fa690) extern char *(*cEvilTranslate)[2];
+DATA(0x004fa690) extern char *cEvilTranslate[37][2];  // CodeView size 0x128 = 37*2*4; array-decayed mangling
 DATA(0x004fa7b8) extern char *gcAnimPath;
 DATA(0x004fa918) extern char *gcGamePath;
 DATA(0x004fa930) extern char *gcMapPath;
