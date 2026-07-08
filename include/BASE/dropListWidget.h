@@ -28,7 +28,7 @@ public:
     short  m_selColor;  // +0x36
     short  field_0x38;  // +0x38
     short  m_textMode;  // +0x3a
-    short  field_0x3c;  // +0x3c
+    short  m_itemCount;  // +0x3c
     short  m_selectedIndex;  // +0x3e
     char   **m_items;  // +0x40  item-string array
     short  m_topIndex;  // +0x44

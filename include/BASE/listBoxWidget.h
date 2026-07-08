@@ -24,7 +24,7 @@ public:
     short  field_0x2c;  // +0x2c
     short  field_0x2e;  // +0x2e
     short  field_0x30;  // +0x30
-    short  field_0x32;  // +0x32
+    short  m_itemCount;  // +0x32
     short  m_selectedIndex;  // +0x34
     short  field_0x36;  // +0x36
     int    field_0x38;  // +0x38
