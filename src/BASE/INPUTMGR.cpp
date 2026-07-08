@@ -32,7 +32,15 @@ VA(0x004ce230, 0x78)
 int inputManager::Open(int) { return 0; }
 
 VA(0x004ce2b0, 0x20)
-void inputManager::Close(void) {}
+void inputManager::Close(void)
+{
+    if (field_0x32 == 1) {
+        field_0x73a = 0;
+        field_0x736 = 0;
+        field_0x852 = 0;
+        field_0x32 = 0;
+    }
+}
 
 VA(0x004ce2d0, 0x5)
 int inputManager::Main(struct tag_message &) { return 0; }
