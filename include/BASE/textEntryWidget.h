@@ -10,13 +10,14 @@ struct tag_message;
 
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class resource;
+class icon;
 
 class textEntryWidget : public textWidget {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base widget = 0x20 bytes at 0x00 via ': public widget'; own fields below)
-    resource *field_0x2b;  // +0x2b  the loaded resource (disposed in dtor)
+    icon   *field_0x2b;  // +0x2b  the loaded icon (disposed in dtor)
     short  field_0x2f;  // +0x2f
     short  field_0x31;  // +0x31
     short  field_0x33;  // +0x33

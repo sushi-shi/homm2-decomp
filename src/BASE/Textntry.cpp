@@ -59,7 +59,70 @@ textEntryWidget::~textEntryWidget()
 }
 
 VA(0x004d8920, 0x26c)
-void textEntryWidget::Read(int) {}
+void textEntryWidget::Read(int param_1)
+{
+    short sVar1;
+    unsigned short uVar2;
+    char local_10[16];
+    field_0x18 = gpResourceManager->ReadWord();
+    field_0x1a = gpResourceManager->ReadWord();
+    field_0x1c = gpResourceManager->ReadWord();
+    field_0x1e = gpResourceManager->ReadWord();
+    uVar2 = gpResourceManager->ReadWord();
+    field_0x33 = uVar2;
+    field_0x20 = static_cast<char *>(BaseAlloc(uVar2 + 5, __FILE__, __LINE__));
+    gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(field_0x20), field_0x33);
+    gpResourceManager->Read13(reinterpret_cast<signed char *>(local_10));
+    gpResourceManager->SavePosition();
+    field_0x24 = gpResourceManager->GetFont(local_10);
+    gpResourceManager->RestorePosition();
+    uVar2 = gpResourceManager->ReadWord();
+    field_0x28 = uVar2 & 0xff;
+    sVar1 = gpResourceManager->ReadWord();
+    field_0x2a = static_cast<char>(sVar1);
+    gpResourceManager->Read13(reinterpret_cast<signed char *>(local_10));
+    gpResourceManager->SavePosition();
+    field_0x2b = gpResourceManager->GetIcon(local_10);
+    gpResourceManager->RestorePosition();
+    field_0x49 = static_cast<short>(param_1);
+    if (param_1 == 2) {
+        field_0x35 = gpResourceManager->ReadWord();
+        field_0x37 = gpResourceManager->ReadWord();
+        field_0x39 = gpResourceManager->ReadWord();
+        field_0x3b = gpResourceManager->ReadWord();
+        field_0x45 = gpResourceManager->ReadWord();
+        field_0x47 = gpResourceManager->ReadWord();
+    } else {
+        field_0x35 = field_0x18;
+        field_0x37 = field_0x1a;
+        field_0x39 = field_0x1c;
+        field_0x3b = field_0x1e;
+        field_0x45 = 1;
+        field_0x47 = 1;
+        if (param_1 != 3)
+            field_0x47 = 0;
+    }
+    if (param_1 == 4) {
+        field_0x41 = field_0x18 + 7;
+        field_0x43 = field_0x1a + 5;
+        field_0x3d = field_0x1c - 0xe;
+        field_0x3f = field_0x1e;
+    } else if (param_1 == 5) {
+        field_0x41 = field_0x18 + 7;
+        field_0x43 = field_0x1a + 4;
+        field_0x3d = field_0x1c - 0xe;
+        field_0x3f = field_0x1e;
+    } else {
+        field_0x41 = field_0x18;
+        field_0x43 = field_0x1a;
+        field_0x3d = field_0x1c;
+        field_0x3f = field_0x1e;
+    }
+    field_0x2f = gpResourceManager->ReadWord();
+    field_0x10 = gpResourceManager->ReadWord();
+    gpResourceManager->ReadWord();
+    field_0x14 = 0x4000;
+}
 
 VA(0x004d8b90, 0x874)
 int textEntryWidget::Main(struct tag_message &) { return 0; }
