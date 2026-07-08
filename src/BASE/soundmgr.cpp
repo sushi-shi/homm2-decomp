@@ -642,11 +642,11 @@ void soundManager::AdjustSoundVolumes(void)
     LogStr("Adjust Sound Volumes 1");
     for (local_c = 1; local_c < m_numSampleHandles; local_c++) {
         struct _SAMPLE *p_Var1 = m_sampleHandles[local_c];
-        if (gSampleVolume == 0) {
-            ModifySample(p_Var1, 1, 0);
-        } else {
+        if (gSampleVolume != 0) {
             if (DigitalReport(p_Var1, 4) != 0)
                 ModifySample(p_Var1, 100, reinterpret_cast<short *>(&iLastVolume)[local_c]);
+        } else {
+            ModifySample(p_Var1, 1, 0);
         }
     }
     LogStr("Adjust Sound Volumes 2");
