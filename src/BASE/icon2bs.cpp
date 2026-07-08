@@ -9,53 +9,53 @@
 #include <BASE/bitmap.h>
 #include <BASE/Icon2b.h>
 
-// Scale wrapper: render the icon full-size into a temp 0x40x0x40 bitmap via IconToBitmap, then
-// point-sample it down to param_11 x param_11 into the destination (skipping transparent pixels).
-// param_11 == 0x20 is the identity fast-path (straight IconToBitmap).
+// @early-stop
+// Scale wrapper (NOT an RLE decoder): render the icon full-size into a temp 0x40x0x40 bitmap via
+// IconToBitmap, then point-sample it down to `scale` x `scale` into the destination (skipping
+// transparent pixels). scale == 0x20 is the identity fast-path (straight IconToBitmap). Residual is
+// the /O2 register wall around the new/delete + downsample loop (not source-steerable).
 VA(0x004d2f90, 0x179)
-void IconToBitmapScale(class icon *param_1, class bitmap *param_2, int param_3, int param_4, int param_5,
-                       int param_6, int param_7, int param_8, int param_9, int param_10, int param_11)
+void IconToBitmapScale(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
+                       int clip, int clipX, int clipY, int clipW, int clipH, int scale)
 {
-    if (param_11 != 0x20) {
-        int iVar2 = 0x20 / param_11;
-        bitmap *local_18 = new bitmap(0, 0x40, 0x40);
-        int iVar3 = reinterpret_cast<int>(local_18->m_pixels);
-        int iVar5 = 0;
+    if (scale != 0x20) {
+        int step = 0x20 / scale;
+        bitmap *tmp = new bitmap(0, 0x40, 0x40);
+        int tmpPixels = reinterpret_cast<int>(tmp->m_pixels);
+        int rowOff = 0;
         do {
-            int *puVar8 = reinterpret_cast<int *>(iVar3 + iVar5);
-            for (int iVar4 = 8; iVar4 != 0; iVar4--)
-                *puVar8++ = 0;
-            iVar5 = iVar5 + 0x20;
-        } while (iVar5 < 0x800);
-        IconToBitmap(param_1, local_18, 0, 0, param_5, 1, 0, 0, 0x20, 0x20, 0);
-        short sVar1 = param_2->m_width;
-        char *local_c = reinterpret_cast<char *>(param_3 + param_4 * sVar1 +
-                                                 reinterpret_cast<int>(param_2->m_pixels));
-        char *pcVar6 = reinterpret_cast<char *>((((1 - param_11) * iVar2 + 0x20) >> 1) * 0x41 +
-                                                reinterpret_cast<int>(local_18->m_pixels));
-        if (0 < param_11) {
-            int local_14 = param_11;
+            int *p = reinterpret_cast<int *>(tmpPixels + rowOff);
+            for (int k = 8; k != 0; k--)
+                *p++ = 0;
+            rowOff = rowOff + 0x20;
+        } while (rowOff < 0x800);
+        IconToBitmap(srcIcon, tmp, 0, 0, frame, 1, 0, 0, 0x20, 0x20, 0);
+        short pitch = dest->m_width;
+        char *dstRow = reinterpret_cast<char *>(x + y * pitch + reinterpret_cast<int>(dest->m_pixels));
+        char *srcRow = reinterpret_cast<char *>((((1 - scale) * step + 0x20) >> 1) * 0x41 +
+                                                reinterpret_cast<int>(tmp->m_pixels));
+        if (0 < scale) {
+            int rows = scale;
             do {
-                int iVar4 = param_11;
-                char *pcVar7 = local_c;
-                char *pcVar9 = pcVar6;
-                if (0 < param_11) {
+                int cols = scale;
+                char *dstPix = dstRow;
+                char *srcPix = srcRow;
+                if (0 < scale) {
                     do {
-                        if (*pcVar9 != 0)
-                            *pcVar7 = *pcVar9;
-                        iVar4 = iVar4 - 1;
-                        pcVar7 = pcVar7 + 1;
-                        pcVar9 = pcVar9 + iVar2;
-                    } while (iVar4 != 0);
+                        if (*srcPix != 0)
+                            *dstPix = *srcPix;
+                        cols = cols - 1;
+                        dstPix = dstPix + 1;
+                        srcPix = srcPix + step;
+                    } while (cols != 0);
                 }
-                pcVar6 = pcVar6 + iVar2 * 0x40;
-                local_c = local_c + sVar1;
-                local_14 = local_14 - 1;
-            } while (local_14 != 0);
+                srcRow = srcRow + step * 0x40;
+                dstRow = dstRow + pitch;
+                rows = rows - 1;
+            } while (rows != 0);
         }
-        delete local_18;
+        delete tmp;
     } else {
-        IconToBitmap(param_1, param_2, param_3, param_4, param_5, param_6, param_7, param_8, param_9,
-                     param_10, 0);
+        IconToBitmap(srcIcon, dest, x, y, frame, clip, clipX, clipY, clipW, clipH, 0);
     }
 }
