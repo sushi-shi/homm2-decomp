@@ -10,6 +10,12 @@ struct _SAMPLE;
 struct tag_message;
 
 #pragma pack(push, 1)  // recovered layout is byte-packed
+struct SampleChannelStruct {
+    int startChannel;
+    int endChannel;
+    int currentChannel;
+};
+
 class soundManager : public baseManager {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
@@ -23,7 +29,14 @@ public:
     struct _SAMPLE *field_0x54[14];  // +0x54  sample handles
     char _pad_0x8c[0x8];
     int    field_0x94;  // +0x94
-    char _pad_0x98[0x4d4];
+    char _pad_0x98[0x40];             // 0x98..0xd8
+    char   field_0xd8[0x14];          // 0xd8  per-channel volume byte
+    struct _SAMPLE *field_0xec[14];   // 0xec  active sample per channel
+    char _pad_0x124[0x8];             // 0x124..0x12c
+    int    field_0x12c[14];           // 0x12c  sample address low per channel
+    char _pad_0x164[0x8];             // 0x164..0x16c
+    int    field_0x16c[14];           // 0x16c  sample address high per channel
+    char _pad_0x1a4[0x3c8];           // 0x1a4..0x56c
     int    field_0x56c;  // +0x56c
     char _pad_0x570[0x4];
     int    field_0x574;  // +0x574

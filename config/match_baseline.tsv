@@ -137,7 +137,7 @@ BASE/EXEC	?InitSystem@executive@@QAEHXZ	100.0000	c5081f20d60e
 BASE/EXEC	?MainLoop@executive@@QAEXXZ	1.1494	3c515846ece9
 BASE/EXEC	?PrintManagerList@executive@@QAEXXZ	100.0000	bf0a26582477
 BASE/EXEC	?RemoveManager@executive@@QAEXPAVbaseManager@@@Z	98.5897	5c183c1b0596
-BASE/EXEC	?ShutDownSystem@executive@@QAEXXZ	99.8000	492f80f84f17
+BASE/EXEC	?ShutDownSystem@executive@@QAEXXZ	100.0000	492f80f84f17
 BASE/EXEC	?Terminate@executive@@QAEXXZ	100.0000	d33a5cc384b3
 BASE/FONT	??0font@@QAE@K@Z	100.0000	67411d2f90da
 BASE/FONT	??1font@@UAE@XZ	100.0000	088279c525b8
@@ -412,7 +412,7 @@ BASE/soundmgr	?ForcePollSound@soundManager@@QAEXXZ	92.0000	9e09935a2881
 BASE/soundmgr	?GetNumberCDDrives@soundManager@@QAEXXZ	100.0000	fde24968c623
 BASE/soundmgr	?HandleMCIError@@YIXHPAD@Z	99.6774	01384b3bfb23
 BASE/soundmgr	?Main@soundManager@@UAEHAAUtag_message@@@Z	100.0000	e76ae8c4e766
-BASE/soundmgr	?MemorySample@soundManager@@QAEPAU_SAMPLE@@PAVsample@@@Z	7.5568	973d9a2e43b5
+BASE/soundmgr	?MemorySample@soundManager@@QAEPAU_SAMPLE@@PAVsample@@@Z	66.1081	2f55a8be4f98
 BASE/soundmgr	?ModifySample@soundManager@@QAEXPAU_SAMPLE@@FJ@Z	89.2917	bdccc6afd390
 BASE/soundmgr	?MusicPlaying@soundManager@@QAEHXZ	81.6571	6c17f307e6df
 BASE/soundmgr	?Open@soundManager@@UAEHH@Z	7.3968	5365b6996957
