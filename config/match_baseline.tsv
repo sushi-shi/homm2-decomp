@@ -280,7 +280,7 @@ BASE/RESMGR	?GetTileset@resourceManager@@QAEPAVtileset@@PAD@Z	97.9592	9998aa0d59
 BASE/RESMGR	?LoadAggregateHeader@resourceManager@@QAEHPAD@Z	14.1212	27e817d79b18
 BASE/RESMGR	?Main@resourceManager@@UAEHAAUtag_message@@@Z	100.0000	434bea8a6023
 BASE/RESMGR	?MakeId@resourceManager@@QAEKPADH@Z	18.0811	a198536f2cd3
-BASE/RESMGR	?Open@resourceManager@@UAEHH@Z	25.4545	40ee1fb966e7
+BASE/RESMGR	?Open@resourceManager@@UAEHH@Z	50.8727	0d5a5db3efc2
 BASE/RESMGR	?PointToFile@resourceManager@@QAEXK@Z	15.6386	297c6b474c3c
 BASE/RESMGR	?Query@resourceManager@@QAEPAVresource@@K@Z	49.5556	4084ded02cf1
 BASE/RESMGR	?Read13@resourceManager@@QAEXPAC@Z	100.0000	fb46d6f443a3
