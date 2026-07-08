@@ -401,7 +401,7 @@ BASE/soundmgr	?AllocateSampleHandles@soundManager@@QAEXXZ	95.9756	6e9c75674c51
 BASE/soundmgr	?CDIsPlaying@soundManager@@QAEHXZ	100.0000	11990711b1ec
 BASE/soundmgr	?CDPlay@soundManager@@QAEXHHHH@Z	79.8136	214244b1a8ad
 BASE/soundmgr	?CDPoll@soundManager@@QAEXXZ	79.6721	0384855e2f40
-BASE/soundmgr	?CDSetVolume@soundManager@@QAEXHH@Z	75.9355	d537624ee148
+BASE/soundmgr	?CDSetVolume@soundManager@@QAEXHH@Z	83.6774	f21d607e2cdc
 BASE/soundmgr	?CDShutdown@soundManager@@QAEXXZ	100.0000	94625fe3dd87
 BASE/soundmgr	?CDStartup@soundManager@@QAEXXZ	71.2885	cd4e862e5a9c
 BASE/soundmgr	?CDStop@soundManager@@QAEXXZ	100.0000	e48aa4ca9583
@@ -424,7 +424,7 @@ BASE/soundmgr	?SetReady2Poll@@YGXK@Z	100.0000	ca166714905b
 BASE/soundmgr	?StartSample@soundManager@@QAEPAU_SAMPLE@@PADPAPADFFHHJ@Z	100.0000	0b90298d2458
 BASE/soundmgr	?StopAllSamples@soundManager@@QAEXH@Z	89.7000	db7aee88fde4
 BASE/soundmgr	?StopSample@soundManager@@QAEXPAU_SAMPLE@@@Z	81.8000	5f73d74d33ec
-BASE/soundmgr	?SwitchAmbientMusic@soundManager@@QAEXH@Z	92.5541	8e40ee0b54cd
+BASE/soundmgr	?SwitchAmbientMusic@soundManager@@QAEXH@Z	96.8784	1b223d273f34
 BASE/soundmgr	?UpdateTimers@@YGXK@Z	100.0000	ad5307a49083
 BASE/soundmgr	?ValidatePreviousPosition@soundManager@@QAEXH@Z	91.8571	c809c9018b27
 BASE/soundmgr	?WAVE_init_driver@@YIPAU_DIG_DRIVER@@KGGG@Z	61.9535	53e539d4de86
