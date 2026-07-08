@@ -59,16 +59,25 @@ heroWindow::heroWindow(int x, int y, int w, int h, int flags)
     m_savedBackground = 0;
 }
 
-// @early-stop 85% — the widget-factory dispatch is structurally correct, but retail keeps
-// nine distinct function-scope widget-type pointer locals (local_10..local_34, one per
-// widget class) rather than the block-scoped `w` here, so the /Od name-hash assigns
-// different frame slots — a full od_slots.py frame solve for ~9 locals. Deferred wall.
+// @early-stop 85.6% — RESTRUCTURED to the retail's design: nine distinct function-scope
+// widget-type pointer locals (ptw/pbd/pbtn/pdim/pic/pte/pdl/plb), one per widget class,
+// instead of the block-scoped `w`. Residual is purely the /Od name-hash: these names need to
+// hash to the retail frame slots (local_10..local_34) — an od_slots.py solve for the ~9
+// pointers (their current names land on different buckets). Structure now matches retail.
 VA(0x004cecd0, 0x521)
 heroWindow::heroWindow(int param_1, int param_2, char *param_3)
 {
     int bVar1;
     int iVar4;
     widget *local_28;
+    textWidget *ptw;
+    border *pbd;
+    button *pbtn;
+    dimmerWidget *pdim;
+    iconWidget *pic;
+    textEntryWidget *pte;
+    dropListWidget *pdl;
+    listBoxWidget *plb;
     strcpy(name, param_3);
     unsigned long uVar3 = gpResourceManager->MakeId(param_3, 1);
     gpResourceManager->PointToFile(uVar3);
@@ -92,70 +101,70 @@ heroWindow::heroWindow(int param_1, int param_2, char *param_3)
         local_28 = 0;
         if (iVar4 < 9) {
             if (iVar4 == 8) {
-                textWidget *w = new textWidget();
-                w->Read();
-                local_28 = w;
+                ptw = new textWidget();
+                ptw->Read();
+                local_28 = ptw;
             } else if (iVar4 == 0) {
                 bVar1 = 1;
             } else if (iVar4 == 1) {
-                border *w = new border();
-                w->Read();
-                local_28 = w;
+                pbd = new border();
+                pbd->Read();
+                local_28 = pbd;
             } else if (iVar4 == 2) {
-                button *w = new button();
-                w->Read();
-                local_28 = w;
+                pbtn = new button();
+                pbtn->Read();
+                local_28 = pbtn;
             }
         } else if (iVar4 < 0x41) {
             if (iVar4 == 0x40) {
-                dimmerWidget *w = new dimmerWidget();
-                w->Read();
-                local_28 = w;
+                pdim = new dimmerWidget();
+                pdim->Read();
+                local_28 = pdim;
             } else if (iVar4 == 0x10) {
-                iconWidget *w = new iconWidget();
-                w->Read();
-                local_28 = w;
+                pic = new iconWidget();
+                pic->Read();
+                local_28 = pic;
             }
         } else if (iVar4 < 0x202) {
             if (iVar4 == 0x201) {
-                textEntryWidget *w = new textEntryWidget();
-                w->Read(2);
-                local_28 = w;
+                pte = new textEntryWidget();
+                pte->Read(2);
+                local_28 = pte;
             } else if (iVar4 == 0x100) {
-                textEntryWidget *w = new textEntryWidget();
-                w->Read(1);
-                local_28 = w;
+                pte = new textEntryWidget();
+                pte->Read(1);
+                local_28 = pte;
             }
         } else {
             switch (iVar4) {
             case 0x202: {
-                textEntryWidget *w = new textEntryWidget();
-                w->Read(3);
-                local_28 = w;
+                pte = new textEntryWidget();
+                pte->Read(3);
+                local_28 = pte;
                 break;
             }
             case 0x203: {
-                dropListWidget *w = new dropListWidget();
-                w->Read();
-                local_28 = w;
+                pdl = new dropListWidget();
+                pdl->Read();
+                local_28 = pdl;
                 break;
             }
             case 0x204: {
-                textEntryWidget *w = new textEntryWidget();
-                w->Read(4);
-                local_28 = w;
+                pte = new textEntryWidget();
+                pte->Read(4);
+                local_28 = pte;
                 break;
             }
             case 0x205: {
-                listBoxWidget *w = new listBoxWidget();
-                w->Read();
-                local_28 = w;
+                plb = new listBoxWidget();
+                plb->Read();
+                local_28 = plb;
                 break;
             }
             case 0x206: {
-                textEntryWidget *w = new textEntryWidget();
-                w->Read(5);
-                local_28 = w;
+                pte = new textEntryWidget();
+                pte->Read(5);
+                local_28 = pte;
                 break;
             }
             }
