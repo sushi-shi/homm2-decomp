@@ -35,6 +35,11 @@ DATA(0x0051fec4) extern int gTileRowCtr;
 // bmap2.cpp FillBitmapArea file-static fill state (no CodeView symbol):
 DATA(0x005348f0) extern int gFillRow;
 DATA(0x005348f8) extern unsigned char *gFillPtr;
+// bmap2.cpp DimBitmapArea file-static dim state (no CodeView symbol):
+DATA(0x005348e8) extern int gDimRow;
+DATA(0x005348e4) extern int gDimCol;
+DATA(0x005348f4) extern unsigned char *gDimPtr;
+DATA(0x00534900) extern unsigned char *gDimNext;
 
 // netwin.cpp netbios per-session status byte array (no CodeView symbol), indexed by session id.
 DATA(0x005173b4) extern char gNetStatus[];
