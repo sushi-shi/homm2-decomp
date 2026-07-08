@@ -94,7 +94,26 @@ void soundManager::CDShutdown(void)
 }
 
 VA(0x004cbb50, 0xe5)
-void soundManager::CDSetVolume(int, int) {}
+void soundManager::CDSetVolume(int param_1, int param_2)
+{
+    int local_c;
+    unsigned long local_8;
+    if (gbNoSound == 0 && field_0x69a != 0 && field_0x698 != -1) {
+        if (param_1 == -1)
+            local_c = gMidiEnabled;
+        else
+            local_c = param_1;
+        if (local_c == 0) {
+            local_8 = 0;
+        } else {
+            if (param_2 != 0)
+                local_c = 0xb - local_c / 0xc;
+            int local_10 = 0xc - local_c;
+            local_8 = local_10 * 0x10000000 | local_10 * 0x1000;
+        }
+        auxSetVolume(field_0x698, local_8);
+    }
+}
 
 VA(0x004cbc40, 0x473)
 void soundManager::CDPlay(int, int, int, int) {}
