@@ -89,10 +89,11 @@ class palette * resourceManager::GetPalette(char *name)
     if (r != 0) {
         r->field_0x6++;
         return static_cast<palette *>(r);
+    } else {
+        r = new palette(id);
+        AddResource(r);
+        return static_cast<palette *>(r);
     }
-    r = new palette(id);
-    AddResource(r);
-    return static_cast<palette *>(r);
 }
 
 VA(0x004c82b0, 0x97)
@@ -103,10 +104,11 @@ class bitmap * resourceManager::GetBitmap(char *name)
     if (r != 0) {
         r->field_0x6++;
         return static_cast<bitmap *>(r);
+    } else {
+        r = new bitmap(id);
+        AddResource(r);
+        return static_cast<bitmap *>(r);
     }
-    r = new bitmap(id);
-    AddResource(r);
-    return static_cast<bitmap *>(r);
 }
 
 VA(0x004c8350, 0x2f)
@@ -133,10 +135,11 @@ class tileset * resourceManager::GetTileset(char *name)
     if (r != 0) {
         r->field_0x6++;
         return static_cast<tileset *>(r);
+    } else {
+        r = new tileset(id);
+        AddResource(r);
+        return static_cast<tileset *>(r);
     }
-    r = new tileset(id);
-    AddResource(r);
-    return static_cast<tileset *>(r);
 }
 
 VA(0x004c84b0, 0x1a)
@@ -150,10 +153,11 @@ class font * resourceManager::GetFont(char *name)
     if (r != 0) {
         r->field_0x6++;
         return static_cast<font *>(r);
+    } else {
+        r = new font(id);
+        AddResource(r);
+        return static_cast<font *>(r);
     }
-    r = new font(id);
-    AddResource(r);
-    return static_cast<font *>(r);
 }
 
 VA(0x004c8570, 0x9d)
