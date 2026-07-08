@@ -7,6 +7,8 @@
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/widget.h>
+#include <_carcass_types.h>
+#include <BASE/mouseManager.h>
 #include <SOURCE/kbwin.h>
 #include <BASE/listBoxWidget.h>
 #include <BASE/dropListWidget.h>
@@ -282,7 +284,29 @@ VA(0x004cf6e0, 0x2e)
 void heroWindow::DrawWindow(int flags) { DrawWindow(flags, -0xffff, 0xffff); }
 
 VA(0x004cf710, 0x116)
-void heroWindow::DrawWindow(int, int, int) {}
+void heroWindow::DrawWindow(int param_1, int param_2, int param_3)
+{
+    tag_message local_24;
+    widget *local_8;
+    gpMouseManager->field_0x82 = 0;
+    local_8 = field_0x38;
+    local_24.type = 0x200;
+    local_24.field4 = 2;
+    for (; local_8 != 0; local_8 = local_8->field_0xc) {
+        PollSound();
+        if (param_2 == -0xffff && param_3 == 0xffff) {
+            local_8->Main(local_24);
+        } else if (param_2 <= local_8->field_0x10 && local_8->field_0x10 <= param_3) {
+            local_8->Main(local_24);
+        }
+    }
+    PollSound();
+    if (param_1 != 0 && (field_0x20 & 0x7fff) != 1) {
+        gpWindowManager->UpdateScreenRegion(field_0x28, field_0x2c, field_0x30, field_0x34);
+        PollSound();
+    }
+    gpMouseManager->field_0x82 = 1;
+}
 
 VA(0x004cf830, 0x7f)
 int heroWindow::SaveBackground(void)
