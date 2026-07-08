@@ -40,6 +40,24 @@ DATA(0x005348e8) extern int gDimRow;
 DATA(0x005348e4) extern int gDimCol;
 DATA(0x005348f4) extern unsigned char *gDimPtr;
 DATA(0x00534900) extern unsigned char *gDimNext;
+// Icon2b.cpp IconToBitmap RLE-decoder file-static state (no CodeView symbols) - the sprite blit
+// state machine shared by the Icon*2b* family. Base 0x534c20.
+DATA(0x00534c20) extern int gIcRow;
+DATA(0x00534c24) extern int gIcPitch;
+DATA(0x00534c28) extern unsigned char gIcColor;
+DATA(0x00534c2c) extern unsigned char *gIcDimPal;
+DATA(0x00534c30) extern unsigned int gIcRun;
+DATA(0x00534c34) extern unsigned int gIcCnt;
+DATA(0x00534c38) extern unsigned char *gIcSrc;
+DATA(0x00534c3c) extern unsigned char *gIcDimDst;
+DATA(0x00534c40) extern int gIcClipR;
+DATA(0x00534c44) extern int gIcClipB;
+DATA(0x00534c48) extern int gIcX0;
+DATA(0x00534c4c) extern unsigned int gIcDimLen;
+DATA(0x00534c50) extern int gIcY;
+DATA(0x00534c54) extern int gIcX;
+DATA(0x00534c58) extern unsigned char *gIcEntry;
+DATA(0x00534c5c) extern unsigned int gIcCnt2;
 // bmap2.cpp BlitBitmap file-static blit state (no CodeView symbol):
 DATA(0x005348ec) extern unsigned char *gBlitSrc;
 DATA(0x005348e0) extern unsigned char *gBlitDst;
