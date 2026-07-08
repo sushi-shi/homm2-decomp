@@ -629,20 +629,24 @@ void soundManager::AdjustSoundVolumes(void)
 VA(0x004cd030, 0xee)
 void soundManager::AdjustMusicVolumes(void)
 {
-    if (gbNoSound == 0 && m_samplesReady != 0 && m_currentTrack >= 0) {
-        LogStr("Adjust Music Volumes 1");
-        if (gMidiEnabled == 0) {
-            if (gCdMusic == 0)
-                MIDISetVolume();
-            else
-                CDSetVolume(-1, 0);
-        } else if (gCdMusic == 0) {
+    if (gbNoSound != 0)
+        return;
+    if (m_samplesReady == 0)
+        return;
+    if (m_currentTrack < 0)
+        return;
+    LogStr("Adjust Music Volumes 1");
+    if (gMidiEnabled == 0) {
+        if (gCdMusic == 0)
             MIDISetVolume();
-        } else {
+        else
             CDSetVolume(-1, 0);
-        }
-        LogStr("Adjust Music Volumes 2");
+    } else if (gCdMusic == 0) {
+        MIDISetVolume();
+    } else {
+        CDSetVolume(-1, 0);
     }
+    LogStr("Adjust Music Volumes 2");
 }
 
 VA(0x004cd120, 0x3a)
