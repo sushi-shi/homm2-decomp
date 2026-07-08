@@ -31,7 +31,25 @@ int soundManager::MIDIIsPlaying(void)
 }
 
 VA(0x004d3fd0, 0x68)
-void soundManager::MIDISetVolume(void) {}
+void soundManager::MIDISetVolume(void)
+{
+    if (gbNoSound == 0 && field_0x69e != 0) {
+        int iVar1 = 0x7f;
+        int iVar2 = field_0x688;
+        if (iVar2 > 0) {
+            if (iVar2 < 0xb) {
+                iVar1 = 0xb;
+                iVar2 = 0xb - iVar2;
+            } else {
+                iVar2 = iVar2 - 10;
+                iVar1 = 6;
+            }
+            iVar1 = (iVar2 * 0x7f) / iVar1;
+        }
+        iVar2 = ConvertVolume(iVar1, 0x65);
+        _AIL_set_XMIDI_master_volume_8(hMDI, iVar2);
+    }
+}
 
 VA(0x004d4040, 0x1)
 void soundManager::MIDIPoll(void) {}

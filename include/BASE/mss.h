@@ -7,4 +7,6 @@
 extern "C" void _AIL_serve_0(void);
 struct _SEQUENCE;
 extern "C" int _AIL_sequence_status_4(struct _SEQUENCE *);
+struct _MDI_DRIVER;
+extern "C" void _AIL_set_XMIDI_master_volume_8(struct _MDI_DRIVER *, int);
 #endif // HOMM2_BASE_MSS_H
