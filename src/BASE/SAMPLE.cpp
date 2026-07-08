@@ -6,17 +6,28 @@
 #include <va.h>
 #include <BASE/MIDIWrap.h>
 #include <BASE/sample.h>
+#include <BASE/Misc.h>
 VA(0x004dad60, 0x181)
 sample::sample(char *, long int, long int, long int) {}
 
 VA(0x004daf40, 0x2c)
-sample::~sample() {}
+sample::~sample()
+{
+    BaseFree(field_0x14, __FILE__, __LINE__);
+    field_0x14 = 0;
+    field_0x18 = 0;
+    field_0x28 = 0;
+}
 
 VA(0x004daf70, 0x72)
 MIDIWrap::MIDIWrap(char *) {}
 
 VA(0x004db030, 0x28)
-MIDIWrap::~MIDIWrap() {}
+MIDIWrap::~MIDIWrap()
+{
+    BaseFree(field_0x10, __FILE__, __LINE__);
+    field_0x10 = 0;
+}
 
 
 // ===== vtable MIDIWrap (root)  (1 slots) =====

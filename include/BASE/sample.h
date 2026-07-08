@@ -12,7 +12,7 @@ public:
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (vptr auto-emitted at 0x00; own data starts at 0x04)
     char _pad_0x10[0x4];
-    int    field_0x14;  // +0x14
+    char   *field_0x14;  // +0x14  sample data buffer
     int    field_0x18;  // +0x18
     int    field_0x1c;  // +0x1c
     int    field_0x20;  // +0x20
