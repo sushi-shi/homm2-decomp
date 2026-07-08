@@ -5,14 +5,27 @@
 
 #include <va.h>
 #include <BASE/textEntryWidget.h>
+#include <BASE/resourceManager.h>
+#include <SOURCE/KB.h>
 VA(0x004d8740, 0x2d)
-textEntryWidget::textEntryWidget(void) {}
+textEntryWidget::textEntryWidget(void) : textWidget()
+{
+    field_0x31 = 0;
+    field_0x2b = 0;
+    field_0x14 = 0x4000;
+    field_0x33 = 0;
+    field_0x2f = 0;
+    field_0x4b = 0;
+}
 
 VA(0x004d87b0, 0x134)
 textEntryWidget::textEntryWidget(short int, short int, short int, short int, short int, char *, char *, short int, char *, short int, short int, short int, short int, int, int) {}
 
 VA(0x004d88f0, 0x21)
-textEntryWidget::~textEntryWidget() {}
+textEntryWidget::~textEntryWidget()
+{
+    gpResourceManager->Dispose(field_0x2b);
+}
 
 VA(0x004d8920, 0x26c)
 void textEntryWidget::Read(int) {}
