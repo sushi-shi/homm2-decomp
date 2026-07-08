@@ -8,6 +8,9 @@
 #include <BASE/mss.h>
 #include <SOURCE/KB.h>
 #include <_globals_model.h>
+#include <SOURCE/X_GLOBAL.h>
+#include <BASE/resourceManager.h>
+#include <BASE/MIDIWrap.h>
 VA(0x004d3850, 0xb8)
 void soundManager::MIDIStartup(void) {}
 
@@ -18,7 +21,26 @@ VA(0x004d3ac0, 0x3ab)
 void soundManager::MIDIPlay(int) {}
 
 VA(0x004d3e70, 0x108)
-void soundManager::MIDIStop(void) {}
+void soundManager::MIDIStop(void)
+{
+    if (gbNoSound == 0 && field_0x69e != 0 && CurrentMidiFile != -1) {
+        if (gMidiEnabled != 0 && field_0x69e != 0 && CurrentMidiFile != -1 &&
+            hSequence[CurrentMidiFile] != 0 &&
+            _AIL_sequence_status_4(hSequence[CurrentMidiFile]) == 4 &&
+            hSequence[CurrentMidiFile] != 0 &&
+            (_AIL_stop_sequence_4(hSequence[CurrentMidiFile]),
+             gbLowMemory != 0 || bSaveMusicPosition[CurrentMidiFile] == 0)) {
+            _AIL_release_sequence_handle_4(hSequence[CurrentMidiFile]);
+            int iVar1 = CurrentMidiFile;
+            hSequence[CurrentMidiFile] = 0;
+            if (pMIDIWrap[iVar1] != 0)
+                gpResourceManager->Dispose(pMIDIWrap[iVar1]);
+            pMIDIWrap[CurrentMidiFile] = 0;
+        }
+        CurrentMidiFile = -1;
+        field_0x578 = 0xff;
+    }
+}
 
 VA(0x004d3f80, 0x46)
 int soundManager::MIDIIsPlaying(void)
