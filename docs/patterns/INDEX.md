@@ -23,3 +23,4 @@
 | od-cell-access-and-block-jmps | topic:od cpp:array cpp:inline | 2D access needs an inline `Row(y)[x]` accessor (raw reassociates); block jmps SOLVED (see inline-accessors) |
 | tu-cumulative-eval-order | topic:od topic:early-stop reverse-pattern | **REVERSE pattern (early-stop signal):** commutative operand load-order that's NOT source-steerable — resolves as sibling TU functions land. Confirm slots+logic, park soft. SIB-index variant IS fixable via `i[(T*)p]` |
 | short-local-coord-truncation | topic:o2 cpp:short topic:widget | /O2 widget parent-relative coord `(short)(win->off + this->pos)` stuck 30–90% -> use a `short` LOCAL, not inline `static_cast<short>` (local reproduces the (short)operand+operand truncation) |
+| codeview-array-decayed-to-pointer | topic:globals topic:o2 topic:od | a global `T*` whose CodeView symbol SIZE>4 is really `T[]`; change decl+def to array -> indexed `g[i]` becomes direct `[g+i]`, byte-exact |
