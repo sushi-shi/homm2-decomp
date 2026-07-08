@@ -395,7 +395,7 @@ BASE/listbox	?Read@listBoxWidget@@QAEXXZ	0.6803	c56aaa938cc4
 BASE/miscwin	?AutoInitSVGA@@YIFXZ	100.0000	ba21e7c98ba3
 BASE/miscwin	@BlitBitmapToScreenVesa@28	0.6579	10b3cea2382c
 BASE/soundmgr	??0soundManager@@QAE@XZ	97.6471	4d8a78f253b1
-BASE/soundmgr	?AdjustMusicVolumes@soundManager@@QAEXXZ	22.3793	5169edb7ad12
+BASE/soundmgr	?AdjustMusicVolumes@soundManager@@QAEXXZ	63.4138	af1ac5344575
 BASE/soundmgr	?AdjustSoundVolumes@soundManager@@QAEXXZ	20.2812	b3e9e2d74fc0
 BASE/soundmgr	?AllocateSampleHandles@soundManager@@QAEXXZ	76.3415	abc7de213da5
 BASE/soundmgr	?CDIsPlaying@soundManager@@QAEHXZ	83.6304	8ba81d155475
