@@ -103,7 +103,46 @@ int FindIndex(struct indexArray *entries, int low, int high, int key)
 }
 
 VA(0x004c45e0, 0xea)
-void FadeIn(int) {}
+void FadeIn(int param_1)
+{
+    palette *pal = new palette();
+    if (pal == 0)
+        MemError();
+    int done = 0;
+    int local_8 = param_1;
+    if (reinterpret_cast<int *>(&gConfig.pad[0x30])[giCurExe * 7] == 0)
+        local_8 = param_1 * 2;
+    memset(pal->field_0x10, 0, 0x300);
+    int iVar3 = 0;
+    do {
+        if (0x3f < iVar3) {
+            if (done) {
+                delete pal;
+                return;
+            }
+            iVar3 = 0x3f;
+        }
+        int local_4 = KBTickCount() + 0x14;
+        PollSound();
+        signed char *pcVar4;
+        if (iVar3 == 0x3f) {
+            done = 1;
+            pcVar4 = gpBufferPalette->field_0x10;
+        } else {
+            int iVar5 = 0;
+            do {
+                if (0x3f - iVar3 < static_cast<int>(gpBufferPalette->field_0x10[iVar5]))
+                    pal->field_0x10[iVar5] =
+                        gpBufferPalette->field_0x10[iVar5] - static_cast<char>(0x3f - iVar3);
+                iVar5++;
+            } while (iVar5 < 0x300);
+            pcVar4 = pal->field_0x10;
+        }
+        UpdatePalette(pcVar4);
+        DelayTil(&local_4);
+        iVar3 = iVar3 + local_8;
+    } while (1);
+}
 
 VA(0x004c46d0, 0xe6)
 void FadeOut(int) {}
