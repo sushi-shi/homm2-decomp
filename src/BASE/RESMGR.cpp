@@ -243,22 +243,15 @@ int resourceManager::Main(struct tag_message &) { return 0; }
 VA(0x004c88a0, 0xab)
 int resourceManager::Open(int param_1)
 {
-    int iVar2 = LoadAggregateHeader(EXPANSION_AGGREGATE_NAME);
-    if (iVar2 == 0) {
-        iVar2 = LoadAggregateHeader(DEFAULT_AGGREGATE_NAME);
-        if (iVar2 == 0) {
-            field_0xc = 0x80;
-            field_0x10 = param_1;
-            field_0x32 = 1;
-            strcpy(name, "resourceManager");
-            iVar2 = 0;
-        } else {
-            iVar2 = 3;
-        }
-    } else {
-        iVar2 = 3;
-    }
-    return iVar2;
+    if (LoadAggregateHeader(EXPANSION_AGGREGATE_NAME) != 0)
+        return 3;
+    if (LoadAggregateHeader(DEFAULT_AGGREGATE_NAME) != 0)
+        return 3;
+    field_0xc = 0x80;
+    field_0x10 = param_1;
+    field_0x32 = 1;
+    strcpy(name, "resourceManager");
+    return 0;
 }
 
 VA(0x004c8950, 0x88)
@@ -332,7 +325,7 @@ int resourceManager::LoadAggregateHeader(char *param_1)
 VA(0x004c8c00, 0x11c)
 void resourceManager::PointToFile(unsigned long param_1)
 {
-    int bVar1 = 0;
+    char bVar1 = 0;
     int local_10, local_8;
     for (local_10 = 0; local_10 < 2; local_10++) {
         if (field_0x4a[local_10] != 0) {
@@ -358,7 +351,7 @@ void resourceManager::PointToFile(unsigned long param_1)
 VA(0x004c8d20, 0xfa)
 unsigned long resourceManager::GetFileSize(unsigned long param_1)
 {
-    int bVar1 = 0;
+    char bVar1 = 0;
     int local_14, local_10, local_8;
     for (local_14 = 0; local_14 < 2; local_14++) {
         if (field_0x4a[local_14] != 0) {
