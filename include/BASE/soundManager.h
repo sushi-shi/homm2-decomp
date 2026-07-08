@@ -42,8 +42,8 @@ public:
     int    field_0x574;  // +0x574
     char   m_currentTrack;  // +0x578
     char   m_pollRequested;  // +0x579
-    char   field_0x57a;  // +0x57a
-    char   field_0x57b;  // +0x57b
+    char   m_pollDue;  // +0x57a
+    char   m_pollToggle;  // +0x57b
     char _pad_0x57c[0x14];
     long   m_savedTrackPositions[0x3c];  // +0x590  saved music file positions per track
     int    m_fading;  // +0x680

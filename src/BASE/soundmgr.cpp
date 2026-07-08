@@ -311,9 +311,9 @@ void __stdcall SetReady2Poll(unsigned long int)
 {
     if (gpSoundManager == 0)
         return;
-    gpSoundManager->field_0x57b ^= 1;
-    if (gpSoundManager->field_0x57b != 0)
-        gpSoundManager->field_0x57a = 1;
+    gpSoundManager->m_pollToggle ^= 1;
+    if (gpSoundManager->m_pollToggle != 0)
+        gpSoundManager->m_pollDue = 1;
 }
 
 VA(0x004cc300, 0x26)
@@ -432,8 +432,8 @@ int soundManager::Open(int param_1)
     m_currentTrack = static_cast<char>(0xff);
     if (gbNoSound == 0) {
         m_pollRequested = 0;
-        field_0x57a = m_pollRequested;
-        field_0x57b = field_0x57a;
+        m_pollDue = m_pollRequested;
+        m_pollToggle = m_pollDue;
         _AIL_startup_0();
         if (gCdMusic == 0) {
             MIDIStartup();
