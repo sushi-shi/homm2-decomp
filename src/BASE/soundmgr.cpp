@@ -255,14 +255,23 @@ void soundManager::CDPlay(int param_1, int param_2, int param_3, int param_4)
 VA(0x004cc0c0, 0xf1)
 void soundManager::CDPoll(void)
 {
-    if (gbNoSound == 0 && gMidiEnabled != 0 && m_cdReady != 0 &&
-        CDPlaying != 0 && m_currentTrack >= 0 &&
-        bMusicIsLooping[m_currentTrack] != 0 &&
-        field_0x6aa + 3000 <= KBTickCount()) {
-        field_0x6aa = KBTickCount();
-        if (CDIsPlaying() == 0)
-            CDPlay(m_cdTrack, 0, field_0x694, 1);
-    }
+    if (gbNoSound != 0)
+        return;
+    if (gMidiEnabled == 0)
+        return;
+    if (m_cdReady == 0)
+        return;
+    if (CDPlaying == 0)
+        return;
+    if (m_currentTrack < 0)
+        return;
+    if (bMusicIsLooping[m_currentTrack] == 0)
+        return;
+    if (field_0x6aa + 3000 > KBTickCount())
+        return;
+    field_0x6aa = KBTickCount();
+    if (CDIsPlaying() == 0)
+        CDPlay(m_cdTrack, 0, field_0x694, 1);
 }
 
 VA(0x004cc1c0, 0xdd)
