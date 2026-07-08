@@ -13,7 +13,7 @@ public:
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     int    field_0x0;  // +0x00
     int    field_0x4;  // +0x04
-    int    field_0x8;  // +0x08
+    baseManager *field_0x8;  // +0x08  the current/active manager
     int    field_0xc;  // +0x0c
     // --- constructors ---
     executive(void);

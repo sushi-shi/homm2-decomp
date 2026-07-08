@@ -5,8 +5,15 @@
 
 #include <va.h>
 #include <BASE/executive.h>
+#include <SOURCE/KB.h>
 VA(0x004d1610, 0x10)
-executive::executive(void) {}
+executive::executive(void)
+{
+    field_0x0 = 0;
+    field_0x4 = 0;
+    field_0x8 = 0;
+    field_0xc = 0;
+}
 
 VA(0x004d1620, 0x9e)
 int executive::InitSystem(void) { return 0; }
@@ -27,7 +34,18 @@ VA(0x004d19b0, 0x76)
 void executive::RemoveManager(class baseManager *) {}
 
 VA(0x004d1a30, 0x5a)
-void executive::CallManager(class baseManager *) {}
+void executive::CallManager(class baseManager *mgr)
+{
+    baseManager *saved = field_0x8;
+    RemoveManager(saved);
+    if (AddManager(mgr, -1) != 0)
+        ShutDown("Can't add manager!");
+    MainLoop();
+    RemoveManager(mgr);
+    if (AddManager(saved, -1) != 0)
+        ShutDown("Can't add manager!");
+    field_0x8 = saved;
+}
 
 VA(0x004d1a90, 0xfa)
 void executive::MainLoop(void) {}
