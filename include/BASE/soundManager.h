@@ -103,7 +103,7 @@ public:
 SIZE(soundManager, 0x6ae);
 // ---- globals (declarations, RVA order) ----
 DATA(0x0051f018) extern char *digitalDriverNames[14];
-DATA(0x0051f050) extern struct SampleChannelStruct *SCS;
+DATA(0x0051f050) extern SampleChannelStruct SCS[4];
 DATA(0x0051f080) extern char CDPreviousPosition[60][15];
 DATA(0x0051f404) extern int CDWaiting;
 DATA(0x0051f408) extern int CDPlaying;
