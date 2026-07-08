@@ -496,25 +496,29 @@ void soundManager::StopAllSamples(int param_1)
 {
     short local_8;
     int local_c;
-    if (gbNoSound == 0 && field_0x36 != 0 && field_0x684 != 0) {
-        LogStr("SAS 1");
-        for (local_8 = 0; local_8 < field_0x94; local_8++) {
-            if (_AIL_sample_status_4(field_0x54[local_8]) == 4)
-                _AIL_end_sample_4(field_0x54[local_8]);
-        }
-        field_0x688 = 0;
-        if (param_1 != 0) {
-            if (gCdMusic == 0)
-                MIDIStop();
-            else
-                CDStop();
-        }
-        for (local_c = 0; local_c < 5; local_c++) {
-            ServiceSound();
-            DelayMilli(1);
-        }
-        LogStr("SAS 2");
+    if (gbNoSound != 0)
+        return;
+    if (field_0x36 == 0)
+        return;
+    if (field_0x684 == 0)
+        return;
+    LogStr("SAS 1");
+    for (local_8 = 0; local_8 < field_0x94; local_8++) {
+        if (_AIL_sample_status_4(field_0x54[local_8]) == 4)
+            _AIL_end_sample_4(field_0x54[local_8]);
     }
+    field_0x688 = 0;
+    if (param_1 != 0) {
+        if (gCdMusic == 0)
+            MIDIStop();
+        else
+            CDStop();
+    }
+    for (local_c = 0; local_c < 5; local_c++) {
+        ServiceSound();
+        DelayMilli(1);
+    }
+    LogStr("SAS 2");
 }
 
 VA(0x004ccbc0, 0xb1)
