@@ -48,7 +48,7 @@ void border::Read(void)
     field_0x1a = gpResourceManager->ReadWord();
     field_0x1c = gpResourceManager->ReadWord();
     field_0x1e = gpResourceManager->ReadWord();
-    field_0x10 = gpResourceManager->ReadWord();
+    m_id = gpResourceManager->ReadWord();
     short kind = gpResourceManager->ReadWord();
     field_0x20 = 0;
     field_0x24 = 0;
@@ -74,7 +74,7 @@ void border::Read(void)
 VA(0x004d22f0, 0x181)
 int border::Main(struct tag_message &msg)
 {
-    unsigned short flags = field_0x16;
+    unsigned short flags = m_flags;
     int type = msg.type;
     if ((flags & 2) == 0) {
         if (type == 0x200)
@@ -90,27 +90,27 @@ int border::Main(struct tag_message &msg)
     case 0x10:
     case 0x40:
         if ((flags & 1) != 0) {
-            field_0x16 = flags & 0xfffe;
+            m_flags = flags & 0xfffe;
             msg.type = 0x200;
             msg.field4 = 0xd;
-            msg.field8 = field_0x10;
+            msg.field8 = m_id;
             return 2;
         }
         return 0;
     }
-    short mx = static_cast<short>(msg.field4) - field_0x4->m_posX;
-    short my = static_cast<short>(msg.field8) - field_0x4->m_posY;
+    short mx = static_cast<short>(msg.field4) - m_owner->m_posX;
+    short my = static_cast<short>(msg.field8) - m_owner->m_posY;
     if (field_0x18 <= mx && field_0x1a <= my &&
         mx < field_0x1c + field_0x18 && my < field_0x1e + field_0x1a) {
         if (type == 0x20) {
             msg.fieldC = 0x200;
             msg.field4 = 0xe;
         } else {
-            field_0x16 = flags | 1;
+            m_flags = flags | 1;
             msg.field4 = 0xc;
         }
         msg.type = 0x200;
-        msg.field8 = field_0x10;
+        msg.field8 = m_id;
         return 2;
     }
     return 0;
@@ -119,8 +119,8 @@ int border::Main(struct tag_message &msg)
 VA(0x004d2480, 0xab)
 void border::Draw(void)
 {
-    short y = field_0x1a + field_0x4->m_posY;
-    short x = field_0x18 + field_0x4->m_posX;
+    short y = field_0x1a + m_owner->m_posY;
+    short x = field_0x18 + m_owner->m_posX;
     short kind = field_0x14;
     if (kind == 0x400) {
         FillBitmapArea(gpWindowManager->field_0x46, x, y, field_0x1c, field_0x1e, field_0x28);

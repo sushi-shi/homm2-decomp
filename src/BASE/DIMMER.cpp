@@ -25,7 +25,7 @@ void dimmerWidget::Read(void)
     field_0x1a = gpResourceManager->ReadWord();
     field_0x1c = gpResourceManager->ReadWord();
     field_0x1e = gpResourceManager->ReadWord();
-    field_0x10 = gpResourceManager->ReadWord();
+    m_id = gpResourceManager->ReadWord();
     field_0x14 = gpResourceManager->ReadWord();
 }
 

@@ -75,7 +75,7 @@ void dropListWidget::Read(void)
     field_0x58 = 8;
     field_0x5a = 9;
     field_0x5c = 10;
-    field_0x10 = sVar2;
+    m_id = sVar2;
     piVar5 = reinterpret_cast<int *>(&field_0x24->field_0x12);
     field_0x5e = 0xb;
     field_0x60 = 0xc;
@@ -145,21 +145,21 @@ int dropListWidget::Main(tag_message &param_1)
     short sVar5, sVar8;
     char *pcVar10, *pcVar12;
     char **puVar3, **puVar9, **puVar11;
-    if ((field_0x16 & 2) == 0) {
+    if ((m_flags & 2) == 0) {
         if (param_1.type == 0x200)
             return widget::Main(param_1);
         return 0;
     } else if (param_1.type == 8 || param_1.type == 0x20) {
-        if ((field_0x16 & 4) != 0) {
-            sVar8 = static_cast<short>(param_1.field4) - field_0x4->m_posX;
-            sVar5 = static_cast<short>(param_1.field8) - field_0x4->m_posY;
+        if ((m_flags & 4) != 0) {
+            sVar8 = static_cast<short>(param_1.field4) - m_owner->m_posX;
+            sVar5 = static_cast<short>(param_1.field8) - m_owner->m_posY;
             if (param_1.type != 0x20) {
                 if (field_0x64 <= sVar8 && field_0x66 <= sVar5 &&
                     sVar8 < field_0x68 + field_0x64 && sVar5 < field_0x6a + field_0x66) {
                     ProcessSelectDialog();
                     param_1.field4 = 0xc;
                     param_1.type = 0x200;
-                    param_1.field8 = field_0x10;
+                    param_1.field8 = m_id;
                     return 2;
                 }
                 return 0;
@@ -169,7 +169,7 @@ int dropListWidget::Main(tag_message &param_1)
                 param_1.field4 = 0xe;
                 param_1.type = 0x200;
                 param_1.fieldC = 0x200;
-                param_1.field8 = field_0x10;
+                param_1.field8 = m_id;
                 return 2;
             }
             return 0;
@@ -177,19 +177,19 @@ int dropListWidget::Main(tag_message &param_1)
     } else if (param_1.type == 0x200) {
         switch (param_1.field4) {
         case 0x36:
-            if (field_0x10 == param_1.field8) {
+            if (m_id == param_1.field8) {
                 field_0x3e = static_cast<short>(reinterpret_cast<int>(param_1.text));
                 return 1;
             }
             break;
         case 0x37:
-            if (field_0x10 == param_1.field8) {
+            if (m_id == param_1.field8) {
                 param_1.text = reinterpret_cast<char *>(static_cast<int>(field_0x3e));
                 return 1;
             }
             break;
         case 0x38:
-            if (field_0x10 == param_1.field8) {
+            if (m_id == param_1.field8) {
                 pcVar10 = param_1.text;
                 puVar3 = static_cast<char **>(BaseAlloc(field_0x3c * 4 + 4, __FILE__, __LINE__));
                 if (field_0x3c != 0) {
@@ -210,7 +210,7 @@ int dropListWidget::Main(tag_message &param_1)
             }
             break;
         case 0x39:
-            if (field_0x10 == param_1.field8) {
+            if (m_id == param_1.field8) {
                 pcVar10 = param_1.text;
                 if (param_1.fieldC < field_0x3c) {
                     BaseFree(field_0x40[param_1.fieldC], __FILE__, __LINE__);
@@ -220,11 +220,11 @@ int dropListWidget::Main(tag_message &param_1)
             }
             break;
         case 0x3a:
-            if (field_0x10 == param_1.field8)
+            if (m_id == param_1.field8)
                 DeleteItem(param_1.fieldC);
             break;
         case 0x3b:
-            if (field_0x10 == param_1.field8) {
+            if (m_id == param_1.field8) {
                 sVar5 = field_0x3c;
                 while (sVar5 != 0) {
                     DeleteItem(0);
@@ -239,17 +239,17 @@ int dropListWidget::Main(tag_message &param_1)
 VA(0x004dc630, 0xaf)
 void dropListWidget::Draw(void)
 {
-    field_0x24->DrawToBuffer(field_0x6c + field_0x4->m_posX, field_0x6e + field_0x4->m_posY,
+    field_0x24->DrawToBuffer(field_0x6c + m_owner->m_posX, field_0x6e + m_owner->m_posY,
                              field_0x48, 0);
-    field_0x24->DrawToBuffer(field_0x64 + field_0x4->m_posX, field_0x66 + field_0x4->m_posY,
+    field_0x24->DrawToBuffer(field_0x64 + m_owner->m_posX, field_0x66 + m_owner->m_posY,
                              field_0x4a, 0);
     if (field_0x3c > 0 && field_0x3e >= 0) {
         int color = 3;
-        if ((field_0x16 & 8) == 0)
+        if ((m_flags & 8) == 0)
             color = field_0x34;
         field_0x20->DrawBoundedString(field_0x40[field_0x3e],
-                                      field_0x28 + field_0x4->m_posX,
-                                      field_0x2a + field_0x4->m_posY,
+                                      field_0x28 + m_owner->m_posX,
+                                      field_0x2a + m_owner->m_posY,
                                       field_0x2c, field_0x2e, color, field_0x3a);
     }
 }
@@ -259,14 +259,14 @@ void dropListWidget::DrawDropStuff(void)
 {
     int iVar1, iVar4, iVar5;
     short sVar2, sVar3;
-    iVar5 = field_0x84 + field_0x4->m_posY;
-    field_0x24->DrawToBuffer(field_0x4->m_posX + field_0x82, iVar5, field_0x4e, 0);
+    iVar5 = field_0x84 + m_owner->m_posY;
+    field_0x24->DrawToBuffer(m_owner->m_posX + field_0x82, iVar5, field_0x4e, 0);
     if (field_0x3e == field_0x44)
         sVar2 = field_0x36;
     else
         sVar2 = field_0x34;
     iVar4 = 1;
-    field_0x20->DrawBoundedString(field_0x40[field_0x44], field_0x4->m_posX + field_0x82 + 5,
+    field_0x20->DrawBoundedString(field_0x40[field_0x44], m_owner->m_posX + field_0x82 + 5,
                                   iVar5 + 4, field_0x86 - 10, field_0x20->field_0x10 + 1, sVar2,
                                   field_0x3a);
     iVar5 = iVar5 + field_0x74;
@@ -274,27 +274,27 @@ void dropListWidget::DrawDropStuff(void)
         do {
             if (field_0x3c <= field_0x44 + iVar4)
                 break;
-            field_0x24->DrawToBuffer(field_0x4->m_posX + field_0x82, iVar5, field_0x50, 0);
+            field_0x24->DrawToBuffer(m_owner->m_posX + field_0x82, iVar5, field_0x50, 0);
             iVar1 = field_0x44 + iVar4;
             if (field_0x3e == iVar1)
                 sVar2 = field_0x36;
             else
                 sVar2 = field_0x34;
             iVar4 = iVar4 + 1;
-            field_0x20->DrawBoundedString(field_0x40[iVar1], field_0x4->m_posX + field_0x82 + 5,
+            field_0x20->DrawBoundedString(field_0x40[iVar1], m_owner->m_posX + field_0x82 + 5,
                                           iVar5 + 2, field_0x86 - 10, field_0x20->field_0x10 + 1,
                                           sVar2, field_0x3a);
             iVar5 = iVar5 + field_0x76;
         } while (iVar4 < field_0x32 - 1);
     }
-    field_0x24->DrawToBuffer(field_0x4->m_posX + field_0x82, iVar5, field_0x52, 0);
+    field_0x24->DrawToBuffer(m_owner->m_posX + field_0x82, iVar5, field_0x52, 0);
     iVar4 = field_0x44 + iVar4;
     if (iVar4 < field_0x3c) {
         if (field_0x3e == iVar4)
             sVar2 = field_0x36;
         else
             sVar2 = field_0x34;
-        field_0x20->DrawBoundedString(field_0x40[iVar4], field_0x4->m_posX + field_0x82 + 5,
+        field_0x20->DrawBoundedString(field_0x40[iVar4], m_owner->m_posX + field_0x82 + 5,
                                       iVar5 + 2, field_0x86 - 10, field_0x20->field_0x10 + 1, sVar2,
                                       field_0x3a);
     }
@@ -303,32 +303,32 @@ void dropListWidget::DrawDropStuff(void)
             sVar2 = field_0x54;
         else
             sVar2 = field_0x56;
-        field_0x24->DrawToBuffer(field_0x8a + field_0x4->m_posX, field_0x8c + field_0x4->m_posY,
+        field_0x24->DrawToBuffer(field_0x8a + m_owner->m_posX, field_0x8c + m_owner->m_posY,
                                  sVar2, 0);
         iVar5 = 2;
-        field_0x24->DrawToBuffer(field_0x4->m_posX + field_0x92, field_0x4->m_posY + field_0x94,
+        field_0x24->DrawToBuffer(m_owner->m_posX + field_0x92, m_owner->m_posY + field_0x94,
                                  field_0x5c, 0);
         if (2 < field_0x32 - 2) {
             do {
                 iVar4 = iVar5 - 1;
                 iVar5 = iVar5 + 1;
-                field_0x24->DrawToBuffer(field_0x4->m_posX + field_0x92,
-                                         field_0x76 * iVar4 + field_0x4->m_posY + field_0x94,
+                field_0x24->DrawToBuffer(m_owner->m_posX + field_0x92,
+                                         field_0x76 * iVar4 + m_owner->m_posY + field_0x94,
                                          field_0x5e, 0);
             } while (iVar5 < field_0x32 - 2);
         }
-        field_0x24->DrawToBuffer(field_0x4->m_posX + field_0x92,
-                                 field_0x76 * (iVar5 - 1) + field_0x4->m_posY + field_0x94,
+        field_0x24->DrawToBuffer(m_owner->m_posX + field_0x92,
+                                 field_0x76 * (iVar5 - 1) + m_owner->m_posY + field_0x94,
                                  field_0x60, 0);
         if (field_0xad == 0)
             sVar2 = field_0x58;
         else
             sVar2 = field_0x5a;
-        field_0x24->DrawToBuffer(field_0x9a + field_0x4->m_posX, field_0x9c + field_0x4->m_posY,
+        field_0x24->DrawToBuffer(field_0x9a + m_owner->m_posX, field_0x9c + m_owner->m_posY,
                                  sVar2, 0);
-        sVar3 = static_cast<short>(field_0x4->m_posX) + 5 + field_0x92;
+        sVar3 = static_cast<short>(m_owner->m_posX) + 5 + field_0x92;
         field_0xa2 = sVar3;
-        sVar2 = static_cast<short>(field_0x4->m_posY) +
+        sVar2 = static_cast<short>(m_owner->m_posY) +
                 static_cast<short>((field_0xaa * field_0x44) / field_0x46) + 3 + field_0x94;
         field_0xa4 = sVar2;
         field_0x24->DrawToBuffer(sVar3, sVar2, field_0x62, 0);

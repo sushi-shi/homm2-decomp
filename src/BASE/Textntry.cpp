@@ -119,7 +119,7 @@ void textEntryWidget::Read(int param_1)
         field_0x3f = field_0x1e;
     }
     field_0x2f = gpResourceManager->ReadWord();
-    field_0x10 = gpResourceManager->ReadWord();
+    m_id = gpResourceManager->ReadWord();
     gpResourceManager->ReadWord();
     field_0x14 = 0x4000;
 }
