@@ -32,7 +32,7 @@ BASE/BUTTON	??_Ebutton@@UAEPAXI@Z	0.0000
 BASE/BUTTON	?Deselect@button@@QAEFAAUtag_message@@@Z	4.4444	4b952b3b5d9a
 BASE/BUTTON	?Draw@button@@UAEXXZ	100.0000	a37ab97966ca
 BASE/BUTTON	?Main@button@@UAEHAAUtag_message@@@Z	0.4283	b5c312b1afb8
-BASE/BUTTON	?Read@button@@QAEXXZ	1.8519	8f963362d3c2
+BASE/BUTTON	?Read@button@@QAEXXZ	100.0000	6f9b62d2ea46
 BASE/BUTTON	?Select@button@@QAEFAAUtag_message@@@Z	3.0435	fc2cdbc30c45
 BASE/Blur	?DoBlur@@YIXPAVbitmap@@0HHHH@Z	0.2110	b9234691ed71
 BASE/Bzip	?DecodeData@@YIJPAD0K@Z	96.1685	3aaf27d17bb6
