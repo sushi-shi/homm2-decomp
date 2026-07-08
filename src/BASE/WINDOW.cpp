@@ -59,6 +59,10 @@ heroWindow::heroWindow(int x, int y, int w, int h, int flags)
     field_0x40 = 0;
 }
 
+// @early-stop 85% — the widget-factory dispatch is structurally correct, but retail keeps
+// nine distinct function-scope widget-type pointer locals (local_10..local_34, one per
+// widget class) rather than the block-scoped `w` here, so the /Od name-hash assigns
+// different frame slots — a full od_slots.py frame solve for ~9 locals. Deferred wall.
 VA(0x004cecd0, 0x521)
 heroWindow::heroWindow(int param_1, int param_2, char *param_3)
 {
