@@ -46,7 +46,25 @@ button::button(short int x, short int y, short int w, short int h, char *name, s
 }
 
 VA(0x004dd5b0, 0xeb)
-void button::Read(void) {}
+void button::Read(void)
+{
+    char local_10[16];
+    field_0x18 = gpResourceManager->ReadWord();
+    field_0x1a = gpResourceManager->ReadWord();
+    field_0x1c = gpResourceManager->ReadWord();
+    field_0x1e = gpResourceManager->ReadWord();
+    gpResourceManager->Read13(reinterpret_cast<signed char *>(local_10));
+    gpResourceManager->SavePosition();
+    field_0x2c = gpResourceManager->MakeId(local_10, 1);
+    field_0x20 = gpResourceManager->GetIcon(field_0x2c);
+    gpResourceManager->RestorePosition();
+    field_0x24 = gpResourceManager->ReadWord();
+    field_0x26 = gpResourceManager->ReadWord();
+    field_0x28 = gpResourceManager->ReadWord();
+    field_0x2a = gpResourceManager->ReadWord();
+    field_0x10 = gpResourceManager->ReadWord();
+    field_0x14 = gpResourceManager->ReadWord();
+}
 
 VA(0x004dd6a0, 0x21)
 button::~button()
