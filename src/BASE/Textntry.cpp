@@ -7,6 +7,9 @@
 #include <BASE/textEntryWidget.h>
 #include <BASE/resourceManager.h>
 #include <SOURCE/KB.h>
+#include <BASE/Misc.h>
+#include <BASE/icon.h>
+#include <string.h>
 VA(0x004d8740, 0x2d)
 textEntryWidget::textEntryWidget(void) : textWidget()
 {
@@ -19,7 +22,35 @@ textEntryWidget::textEntryWidget(void) : textWidget()
 }
 
 VA(0x004d87b0, 0x134)
-textEntryWidget::textEntryWidget(short int, short int, short int, short int, short int, char *, char *, short int, char *, short int, short int, short int, short int, int, int) {}
+textEntryWidget::textEntryWidget(short p1, short p2, short p3, short p4, short p5, char *p6,
+                                 char *p7, short p8, char *p9, short p10, short p11, short p12,
+                                 short p13, int p14, int p15)
+    : textWidget(p1, p2, p3, p4, p6, p7, p8, p11, p12, 1)
+{
+    field_0x33 = p5;
+    field_0x31 = 0;
+    field_0x2b = gpResourceManager->GetIcon(p9);
+    field_0x4b = 0;
+    field_0x14 = 0x4000;
+    field_0x2f = p10;
+    field_0x45 = 1;
+    field_0x47 = 0;
+    field_0x28 = 1;
+    field_0x35 = field_0x18;
+    field_0x37 = field_0x1a;
+    field_0x39 = field_0x1c;
+    field_0x33 = p5;
+    field_0x3b = field_0x1e;
+    field_0x20 = static_cast<char *>(BaseAlloc(p5 + 5, __FILE__, __LINE__));
+    strcpy(field_0x20, p6);
+    if (p13 == 4) {
+        field_0x47 = 1;
+        field_0x41 = field_0x18 + p14;
+        field_0x43 = field_0x1a + p15;
+        field_0x3d = field_0x1c + p14 * -2;
+        field_0x3f = field_0x1e;
+    }
+}
 
 VA(0x004d88f0, 0x21)
 textEntryWidget::~textEntryWidget()
