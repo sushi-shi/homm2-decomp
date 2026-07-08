@@ -130,7 +130,22 @@ VA(0x004cc910, 0x91)
 void soundManager::AllocateSampleHandles(void) {}
 
 VA(0x004cc9b0, 0x96)
-void soundManager::Close(void) {}
+void soundManager::Close(void)
+{
+    if (field_0x32 == 1) {
+        if (gbNoSound == 0) {
+            LogStr("Shutting down CD audio");
+            CDShutdown();
+            LogStr("Shutting down MIDI");
+            MIDIShutdown();
+            LogStr("Shutting down AIL");
+            _AIL_shutdown_0();
+            LogStr("Sound shut down");
+        }
+        field_0x32 = 0;
+        gbNoSound = 1;
+    }
+}
 
 VA(0x004cca50, 0x1a)
 int soundManager::Main(struct tag_message &) { return 0; }
