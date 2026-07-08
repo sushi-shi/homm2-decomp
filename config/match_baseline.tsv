@@ -219,7 +219,7 @@ BASE/Misc	?BlitBitmapToScreenNoMouseCheck@@YIXPAVbitmap@@HHHHHH@Z	100.0000	7fb87
 BASE/Misc	?CreatePCXFile@@YIXPADPAEHH1@Z	0.6757	4210bc117b31
 BASE/Misc	?DataEntryWindowHandler@@YIHAAUtag_message@@@Z	50.8426	e2b477bed470
 BASE/Misc	?FadeIn@@YIXH@Z	87.3210	1c32defc579d
-BASE/Misc	?FadeOut@@YIXH@Z	1.2346	a99cbed38d92
+BASE/Misc	?FadeOut@@YIXH@Z	72.8025	459393cff647
 BASE/Misc	?FadeTo@@YIXPAE0H@Z	80.2857	58996ea833c4
 BASE/Misc	?FadeToColorTable@@YIXPAEH@Z	65.9839	c6634bd3bc01
 BASE/Misc	?FileSize@@YIJPAD@Z	100.0000	e9d9ef6eb16e

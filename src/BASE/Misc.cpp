@@ -145,7 +145,42 @@ void FadeIn(int param_1)
 }
 
 VA(0x004c46d0, 0xe6)
-void FadeOut(int) {}
+void FadeOut(int param_1)
+{
+    palette *pal = new palette();
+    if (pal == 0)
+        MemError();
+    int bVar3 = 0;
+    memcpy(pal->field_0x10, gpBufferPalette->field_0x10, 0x300);
+    int iVar5 = 0;
+    do {
+        if (0x3f < iVar5) {
+            if (bVar3) {
+                delete pal;
+                return;
+            }
+            iVar5 = 0x3f;
+        }
+        int local_4 = KBTickCount() + 0x14;
+        PollSound();
+        if (iVar5 == 0x3f)
+            bVar3 = 1;
+        int iVar6 = 0;
+        do {
+            char cVar2 = pal->field_0x10[iVar6];
+            if (cVar2 > 0) {
+                if (static_cast<char>(param_1) < cVar2)
+                    pal->field_0x10[iVar6] = cVar2 - static_cast<char>(param_1);
+                else
+                    pal->field_0x10[iVar6] = 0;
+            }
+            iVar6++;
+        } while (iVar6 < 0x300);
+        iVar5 = iVar5 + param_1;
+        UpdatePalette(pal->field_0x10);
+        DelayTil(&local_4);
+    } while (1);
+}
 
 VA(0x004c47c0, 0x28)
 int Random(int low, int high)
