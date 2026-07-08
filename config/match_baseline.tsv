@@ -377,7 +377,7 @@ BASE/droplist	?Main@dropListWidget@@UAEHAAUtag_message@@@Z	0.7168	f26868af2389
 BASE/droplist	?ProcessSelectDialog@dropListWidget@@QAEXXZ	0.1678	39a568398497
 BASE/droplist	?Read@dropListWidget@@QAEXXZ	0.8197	6f0d0bc0bc2e
 BASE/droplist	?RestoreDropBackground@dropListWidget@@QAEXXZ	100.0000	fdd690daaab3
-BASE/droplist	?SaveDropBackground@dropListWidget@@QAEXXZ	4.0000	84894f48e4e2
+BASE/droplist	?SaveDropBackground@dropListWidget@@QAEXXZ	100.0000	b3d5c9e1b5dd
 BASE/icon2bc	?IconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAEH@Z	0.2347	d72dd7fff63f
 BASE/icon2bs	?IconToBitmapScale@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	0.7092	48669e2e1303
 BASE/icon2by	?IconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	0.2538	4b4639609b51

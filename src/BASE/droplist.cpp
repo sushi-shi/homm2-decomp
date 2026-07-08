@@ -38,7 +38,11 @@ VA(0x004dc6e0, 0x378)
 void dropListWidget::DrawDropStuff(void) {}
 
 VA(0x004dca60, 0x50)
-void dropListWidget::SaveDropBackground(void) {}
+void dropListWidget::SaveDropBackground(void)
+{
+    field_0xb0 = new bitmap(0, field_0x7e, field_0x80);
+    field_0xb0->GrabScreen(field_0x7a, field_0x7c);
+}
 
 VA(0x004dcab0, 0x56)
 void dropListWidget::RestoreDropBackground(void)
