@@ -14,7 +14,19 @@ VA(0x004cde60, 0x36c)
 int MouseMessageHandler(void *, unsigned int, unsigned int, long int) { return 0; }
 
 VA(0x004ce1d0, 0x56)
-inputManager::inputManager(void) {}
+inputManager::inputManager(void) : baseManager()
+{
+    field_0x32 = 0;
+    field_0x73e = 0;
+    field_0x852 = 1;
+    field_0x84e = 0;
+    field_0x742 = 0;
+    field_0x746 = 0;
+    field_0x74a = 1;
+    field_0x856 = 1;
+    field_0x866 = 0;
+    field_0x862 = -1;
+}
 
 VA(0x004ce230, 0x78)
 int inputManager::Open(int) { return 0; }
@@ -26,7 +38,11 @@ VA(0x004ce2d0, 0x5)
 int inputManager::Main(struct tag_message &) { return 0; }
 
 VA(0x004ce2e0, 0xf)
-void inputManager::Flush(void) {}
+void inputManager::Flush(void)
+{
+    field_0x73a = 0;
+    field_0x736 = 0;
+}
 
 VA(0x004ce2f0, 0xa8)
 struct tag_message inputManager::GetEvent(void) { return *(struct tag_message *)0; }
@@ -38,7 +54,12 @@ VA(0x004ce450, 0x3)
 void inputManager::SetMouseCoords(int, int) {}
 
 VA(0x004ce460, 0x1b)
-void inputManager::SetKeyCodeType(int) {}
+void inputManager::SetKeyCodeType(int param_1)
+{
+    field_0x856 = param_1;
+    field_0x73a = 0;
+    field_0x736 = 0;
+}
 
 VA(0x004ce480, 0x1cb)
 void inputManager::AsciiConvert(struct tag_message &) {}
