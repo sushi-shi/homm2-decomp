@@ -16,7 +16,7 @@ textEntryWidget::textEntryWidget(void) : textWidget()
     field_0x31 = 0;
     m_icon = 0;
     field_0x14 = 0x4000;
-    field_0x33 = 0;
+    m_maxLength = 0;
     field_0x2f = 0;
     field_0x4b = 0;
 }
@@ -27,28 +27,28 @@ textEntryWidget::textEntryWidget(short p1, short p2, short p3, short p4, short p
                                  short p13, int p14, int p15)
     : textWidget(p1, p2, p3, p4, p6, p7, p8, p11, p12, 1)
 {
-    field_0x33 = p5;
+    m_maxLength = p5;
     field_0x31 = 0;
     m_icon = gpResourceManager->GetIcon(p9);
     field_0x4b = 0;
     field_0x14 = 0x4000;
     field_0x2f = p10;
     field_0x45 = 1;
-    field_0x47 = 0;
-    field_0x28 = 1;
-    field_0x35 = m_x;
-    field_0x37 = m_y;
-    field_0x39 = m_width;
-    field_0x33 = p5;
-    field_0x3b = m_height;
+    m_hasInset = 0;
+    m_color = 1;
+    m_rectX = m_x;
+    m_rectY = m_y;
+    m_rectW = m_width;
+    m_maxLength = p5;
+    m_rectH = m_height;
     m_text = static_cast<char *>(BaseAlloc(p5 + 5, __FILE__, __LINE__));
     strcpy(m_text, p6);
     if (p13 == 4) {
-        field_0x47 = 1;
-        field_0x41 = m_x + p14;
-        field_0x43 = m_y + p15;
-        field_0x3d = m_width + p14 * -2;
-        field_0x3f = m_height;
+        m_hasInset = 1;
+        m_innerX = m_x + p14;
+        m_innerY = m_y + p15;
+        m_innerW = m_width + p14 * -2;
+        m_innerH = m_height;
     }
 }
 
@@ -69,15 +69,15 @@ void textEntryWidget::Read(int param_1)
     m_width = gpResourceManager->ReadWord();
     m_height = gpResourceManager->ReadWord();
     uVar2 = gpResourceManager->ReadWord();
-    field_0x33 = uVar2;
+    m_maxLength = uVar2;
     m_text = static_cast<char *>(BaseAlloc(uVar2 + 5, __FILE__, __LINE__));
-    gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(m_text), field_0x33);
+    gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(m_text), m_maxLength);
     gpResourceManager->Read13(reinterpret_cast<signed char *>(local_10));
     gpResourceManager->SavePosition();
     m_font = gpResourceManager->GetFont(local_10);
     gpResourceManager->RestorePosition();
     uVar2 = gpResourceManager->ReadWord();
-    field_0x28 = uVar2 & 0xff;
+    m_color = uVar2 & 0xff;
     sVar1 = gpResourceManager->ReadWord();
     field_0x2a = static_cast<char>(sVar1);
     gpResourceManager->Read13(reinterpret_cast<signed char *>(local_10));
@@ -86,37 +86,37 @@ void textEntryWidget::Read(int param_1)
     gpResourceManager->RestorePosition();
     field_0x49 = static_cast<short>(param_1);
     if (param_1 == 2) {
-        field_0x35 = gpResourceManager->ReadWord();
-        field_0x37 = gpResourceManager->ReadWord();
-        field_0x39 = gpResourceManager->ReadWord();
-        field_0x3b = gpResourceManager->ReadWord();
+        m_rectX = gpResourceManager->ReadWord();
+        m_rectY = gpResourceManager->ReadWord();
+        m_rectW = gpResourceManager->ReadWord();
+        m_rectH = gpResourceManager->ReadWord();
         field_0x45 = gpResourceManager->ReadWord();
-        field_0x47 = gpResourceManager->ReadWord();
+        m_hasInset = gpResourceManager->ReadWord();
     } else {
-        field_0x35 = m_x;
-        field_0x37 = m_y;
-        field_0x39 = m_width;
-        field_0x3b = m_height;
+        m_rectX = m_x;
+        m_rectY = m_y;
+        m_rectW = m_width;
+        m_rectH = m_height;
         field_0x45 = 1;
-        field_0x47 = 1;
+        m_hasInset = 1;
         if (param_1 != 3)
-            field_0x47 = 0;
+            m_hasInset = 0;
     }
     if (param_1 == 4) {
-        field_0x41 = m_x + 7;
-        field_0x43 = m_y + 5;
-        field_0x3d = m_width - 0xe;
-        field_0x3f = m_height;
+        m_innerX = m_x + 7;
+        m_innerY = m_y + 5;
+        m_innerW = m_width - 0xe;
+        m_innerH = m_height;
     } else if (param_1 == 5) {
-        field_0x41 = m_x + 7;
-        field_0x43 = m_y + 4;
-        field_0x3d = m_width - 0xe;
-        field_0x3f = m_height;
+        m_innerX = m_x + 7;
+        m_innerY = m_y + 4;
+        m_innerW = m_width - 0xe;
+        m_innerH = m_height;
     } else {
-        field_0x41 = m_x;
-        field_0x43 = m_y;
-        field_0x3d = m_width;
-        field_0x3f = m_height;
+        m_innerX = m_x;
+        m_innerY = m_y;
+        m_innerW = m_width;
+        m_innerH = m_height;
     }
     field_0x2f = gpResourceManager->ReadWord();
     m_id = gpResourceManager->ReadWord();
