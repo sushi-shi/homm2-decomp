@@ -202,7 +202,7 @@ BASE/MOUSEMGR	?SetColorMice@mouseManager@@QAEXH@Z	77.8857	9e43c7cfdcf6
 BASE/MOUSEMGR	?SetPointer@mouseManager@@QAEXH@Z	0.3759	7b60d8396f3e
 BASE/MOUSEMGR	?SetPointer@mouseManager@@QAEXPADHH@Z	97.2418	57fafe6cd329
 BASE/MOUSEMGR	?ShowColorPointer@mouseManager@@QAEXXZ	100.0000	f56b43291986
-BASE/Midi	?MIDIIsPlaying@soundManager@@QAEHXZ	8.3333	9c6f9b83e9d3
+BASE/Midi	?MIDIIsPlaying@soundManager@@QAEHXZ	92.7083	83c30248b74e
 BASE/Midi	?MIDIPlay@soundManager@@QAEXH@Z	0.4115	2edde2efd07f
 BASE/Midi	?MIDISetVolume@soundManager@@QAEXXZ	2.6316	ca630a4bc4c5
 BASE/Midi	?MIDIShutdown@soundManager@@QAEXXZ	0.9709	de1e04f80927
@@ -366,7 +366,7 @@ BASE/WINMGR	empty_stub	0.0000
 BASE/bmap2	?BlitBitmap@@YIXPAVbitmap@@HHHH0HH@Z	88.0000	12e9d721d9ce
 BASE/bmap2	?DimBitmapArea@@YIXPAVbitmap@@HHHHH@Z	84.2000	f38a7483416e
 BASE/bmap2	?FillBitmapArea@@YIXPAVbitmap@@HHHHH@Z	95.4545	c9fee5b7b412
-BASE/bmap2	?FillBitmapAreaClip@@YIXPAVbitmap@@HHHHHHHHH@Z	92.1111	5e98d96015af
+BASE/bmap2	?FillBitmapAreaClip@@YIXPAVbitmap@@HHHHHHHHH@Z	92.6667	5e98d96015af
 BASE/droplist	??0dropListWidget@@QAE@XZ	100.0000	36ab848d613b
 BASE/droplist	??1dropListWidget@@UAE@XZ	99.9535	2a86be8a60bf
 BASE/droplist	??_EdropListWidget@@UAEPAXI@Z	0.0000	
