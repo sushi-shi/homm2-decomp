@@ -556,14 +556,17 @@ VA(0x004ccbc0, 0xb1)
 void soundManager::StopSample(struct _SAMPLE *param_1)
 {
     int local_c;
+    int local_10;
     if (gbNoSound != 0)
         return;
     if (m_digitalDriver == 0)
         return;
+    local_10 = 0;
     LogStr("Stop Sample 1");
-    struct _SAMPLE *p_Var1 = m_sampleHandles[0];
+    if (m_sampleHandles[0] == param_1)
+        local_10 = 1;
     _AIL_end_sample_4(param_1);
-    if (p_Var1 == param_1) {
+    if (local_10 != 0) {
         for (local_c = 0; local_c < 10; local_c++) {
             ServiceSound();
             DelayMilli(1);
