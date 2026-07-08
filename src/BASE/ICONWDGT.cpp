@@ -53,7 +53,89 @@ iconWidget::~iconWidget()
 }
 
 VA(0x004d0cd0, 0x291)
-int iconWidget::Main(struct tag_message &) { return 0; }
+int iconWidget::Main(tag_message &param_1)
+{
+    unsigned short uVar1;
+    short sVar2, sVar5;
+    int iVar3;
+    uVar1 = field_0x16;
+    if ((uVar1 & 2) == 0) {
+        if (param_1.type != 0x200)
+            return 0;
+        if (param_1.field4 != 0x3c)
+            return widget::Main(param_1);
+    }
+    iVar3 = param_1.type;
+    if (iVar3 < 0x11) {
+        if (iVar3 == 0x10) {
+LAB_004d0df0:
+            if ((uVar1 & 1) == 0)
+                return 0;
+            field_0x16 = uVar1 & 0xfffe;
+            param_1.field4 = 0xd;
+            param_1.type = 0x200;
+            param_1.field8 = field_0x10;
+            return 2;
+        }
+        if (iVar3 != 8) {
+LAB_widgetmain:
+            return widget::Main(param_1);
+        }
+    } else if (iVar3 != 0x20) {
+        if (iVar3 != 0x40) {
+            if (iVar3 == 0x200) {
+                switch (param_1.field4) {
+                case 4:
+                    if (field_0x10 == param_1.field8) {
+                        field_0x24 = static_cast<short>(reinterpret_cast<int>(param_1.text));
+                        return 1;
+                    }
+                    break;
+                case 8:
+                    if (field_0x10 == param_1.field8) {
+                        field_0x27 = static_cast<unsigned short>(reinterpret_cast<int>(param_1.text)) & 0xff;
+                        return 1;
+                    }
+                    break;
+                case 9:
+                    if (field_0x10 == param_1.field8) {
+                        if (field_0x20 != 0) {
+                            gpResourceManager->Dispose(field_0x20);
+                            field_0x20 = gpResourceManager->GetIcon(param_1.text);
+                        }
+                        return 1;
+                    }
+                    break;
+                case 0x3c:
+                    if (param_1.field8 == field_0x29) {
+                        field_0x29 = reinterpret_cast<int>(param_1.text);
+                        gpResourceManager->Dispose(field_0x20);
+                        field_0x20 = gpResourceManager->GetIcon(reinterpret_cast<unsigned long>(param_1.text));
+                    }
+                    return 0;
+                }
+            }
+            goto LAB_widgetmain;
+        }
+        goto LAB_004d0df0;
+    }
+    sVar2 = static_cast<short>(param_1.field4) - field_0x4->field_0x28;
+    sVar5 = static_cast<short>(param_1.field8) - field_0x4->field_0x2c;
+    if (field_0x18 <= sVar2 && field_0x1a <= sVar5 && sVar2 < field_0x1c + field_0x18 &&
+        sVar5 < field_0x1e + field_0x1a) {
+        if (iVar3 == 0x20) {
+            param_1.fieldC = 0x200;
+            param_1.field4 = 0xe;
+        } else {
+            field_0x16 = uVar1 | 1;
+            param_1.field4 = 0xc;
+        }
+        param_1.type = 0x200;
+        param_1.field8 = field_0x10;
+        return 2;
+    }
+    return 0;
+}
 
 VA(0x004d0f70, 0xe5)
 void iconWidget::Draw(void)
