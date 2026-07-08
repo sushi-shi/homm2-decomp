@@ -76,22 +76,16 @@ void soundManager::CDStop(void)
 VA(0x004cb8b0, 0xb3)
 int soundManager::CDIsPlaying(void)
 {
-    unsigned int uVar1;
-    if (gbNoSound == 0) {
-        if (field_0x69a == 0) {
-            uVar1 = 0;
-        } else {
-            wsprintfA(reinterpret_cast<char *>(&CommandString), "status CD mode");
-            nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
-                                       reinterpret_cast<char *>(&lpszReturnString), 0xff, 0);
-            if (nMCIError != 0)
-                HandleMCIError(nMCIError, reinterpret_cast<char *>(&CommandString));
-            uVar1 = (stricmp(reinterpret_cast<char *>(&lpszReturnString), "playing") == 0);
-        }
-    } else {
-        uVar1 = 0;
-    }
-    return uVar1;
+    if (gbNoSound != 0)
+        return 0;
+    if (field_0x69a == 0)
+        return 0;
+    wsprintfA(reinterpret_cast<char *>(&CommandString), "status CD mode");
+    nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
+                               reinterpret_cast<char *>(&lpszReturnString), 0xff, 0);
+    if (nMCIError != 0)
+        HandleMCIError(nMCIError, reinterpret_cast<char *>(&CommandString));
+    return stricmp(reinterpret_cast<char *>(&lpszReturnString), "playing") == 0;
 }
 
 VA(0x004cb970, 0xf3)
@@ -851,17 +845,16 @@ void soundManager::ServiceSound(void)
 VA(0x004cdad0, 0x7f)
 int soundManager::MusicPlaying(void)
 {
-    if (gbNoSound == 0) {
-        if (gCdMusic == 0) {
-            if (field_0x69e == 0)
-                return 0;
-            return MIDIIsPlaying();
-        }
-        if (field_0x69a == 0)
+    if (gbNoSound != 0)
+        return 0;
+    if (gCdMusic == 0) {
+        if (field_0x69e == 0)
             return 0;
-        return CDIsPlaying();
+        return MIDIIsPlaying();
     }
-    return 0;
+    if (field_0x69a == 0)
+        return 0;
+    return CDIsPlaying();
 }
 
 
