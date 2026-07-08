@@ -27,17 +27,17 @@ resourceManager::resourceManager(void) : baseManager()
 {
     int local_8;
     field_0x32 = 0;
-    field_0x36 = 0;
-    field_0x5a = 0;
+    resourceListHead = 0;
+    expunging = 0;
     strcpy(name, "resourceManager");
-    field_0x9e = 0;
+    lastFileId = 0;
     for (local_8 = 0; local_8 < 2; local_8++) {
-        field_0x42[local_8] = -1;
-        field_0x4a[local_8] = 0;
-        field_0x52[local_8] = 0;
+        aggregateFd[local_8] = -1;
+        aggregateDir[local_8] = 0;
+        aggregateEntryCount[local_8] = 0;
     }
-    field_0x3a = 0;
-    field_0x3e = 0;
+    numAggregates = 0;
+    curAggregate = 0;
 }
 
 VA(0x004c8080, 0xa2)
@@ -194,7 +194,7 @@ class MIDIWrap *resourceManager::GetMIDIWrap(char *param_1)
 VA(0x004c86b0, 0x87)
 void resourceManager::Dispose(class resource *param_1)
 {
-    if (field_0x5a != 0)
+    if (expunging != 0)
         return;
     if (param_1 == 0)
         return;
@@ -209,12 +209,12 @@ void resourceManager::Dispose(class resource *param_1)
 VA(0x004c8740, 0x55)
 void resourceManager::AddResource(class resource *param_1)
 {
-    if (field_0x36 == 0) {
-        field_0x36 = param_1;
-        field_0x36->field_0xc = 0;
+    if (resourceListHead == 0) {
+        resourceListHead = param_1;
+        resourceListHead->field_0xc = 0;
     } else {
-        param_1->field_0xc = field_0x36;
-        field_0x36 = param_1;
+        param_1->field_0xc = resourceListHead;
+        resourceListHead = param_1;
     }
 }
 
@@ -222,20 +222,20 @@ VA(0x004c87a0, 0x8b)
 void resourceManager::Expunge(void)
 {
     resource *prVar1, *local_8;
-    field_0x5a = 1;
-    prVar1 = field_0x36;
+    expunging = 1;
+    prVar1 = resourceListHead;
     while (local_8 = prVar1, local_8 != 0) {
         prVar1 = local_8->field_0xc;
         RemoveResource(local_8);
         delete local_8;
     }
-    field_0x5a = 0;
+    expunging = 0;
 }
 
 VA(0x004c8830, 0x4b)
 class resource *resourceManager::Query(unsigned long param_1)
 {
-    resource *local_8 = field_0x36;
+    resource *local_8 = resourceListHead;
     while (local_8 != 0 && local_8->field_0x8 != param_1) {
         local_8 = local_8->field_0xc;
     }
@@ -263,10 +263,10 @@ VA(0x004c8950, 0x88)
 void resourceManager::RemoveResource(class resource *param_1)
 {
     resource *local_8;
-    if (field_0x36 == param_1) {
-        field_0x36 = param_1->field_0xc;
+    if (resourceListHead == param_1) {
+        resourceListHead = param_1->field_0xc;
     } else {
-        local_8 = field_0x36;
+        local_8 = resourceListHead;
         while (local_8 != 0 && local_8->field_0xc != param_1) {
             local_8 = local_8->field_0xc;
         }
@@ -281,16 +281,16 @@ void resourceManager::Close(void)
     int local_8;
     if (field_0x32 == 1) {
         Expunge();
-        field_0x36 = 0;
+        resourceListHead = 0;
         for (local_8 = 0; local_8 < 2; local_8++) {
-            if (field_0x4a[local_8] != 0)
-                BaseFree(field_0x4a[local_8], __FILE__, __LINE__);
-            if (field_0x42[local_8] != -1) {
-                _close(field_0x42[local_8]);
-                field_0x42[local_8] = -1;
+            if (aggregateDir[local_8] != 0)
+                BaseFree(aggregateDir[local_8], __FILE__, __LINE__);
+            if (aggregateFd[local_8] != -1) {
+                _close(aggregateFd[local_8]);
+                aggregateFd[local_8] = -1;
             }
         }
-        field_0x3a = 0;
+        numAggregates = 0;
         field_0x32 = 0;
     }
 }
@@ -301,7 +301,7 @@ int resourceManager::LoadAggregateHeader(char *param_1)
     short local_10[2];
     int local_c;
     unsigned int local_8;
-    if (field_0x3a >= 2) {
+    if (numAggregates >= 2) {
         sprintf(gText, "Only %d AGG files can be used at once", 2);
         ShutDown(gText);
         return 3;
@@ -312,14 +312,14 @@ int resourceManager::LoadAggregateHeader(char *param_1)
         ShutDown(gText);
         return 3;
     }
-    field_0x3e = field_0x3a;
-    field_0x3a = field_0x3a + 1;
-    field_0x42[field_0x3e] = local_c;
-    _read(field_0x42[field_0x3e], local_10, 2);
-    field_0x52[field_0x3e] = local_10[0];
-    local_8 = field_0x52[field_0x3e] * 0xc;
-    field_0x4a[field_0x3e] = static_cast<aggEntry *>(BaseAlloc(local_8, __FILE__, __LINE__));
-    _read(field_0x42[field_0x3e], field_0x4a[field_0x3e], local_8);
+    curAggregate = numAggregates;
+    numAggregates = numAggregates + 1;
+    aggregateFd[curAggregate] = local_c;
+    _read(aggregateFd[curAggregate], local_10, 2);
+    aggregateEntryCount[curAggregate] = local_10[0];
+    local_8 = aggregateEntryCount[curAggregate] * 0xc;
+    aggregateDir[curAggregate] = static_cast<aggEntry *>(BaseAlloc(local_8, __FILE__, __LINE__));
+    _read(aggregateFd[curAggregate], aggregateDir[curAggregate], local_8);
     return 0;
 }
 
@@ -329,11 +329,11 @@ void resourceManager::PointToFile(unsigned long param_1)
     char bVar1 = 0;
     int local_10, local_8;
     for (local_10 = 0; local_10 < 2; local_10++) {
-        if (field_0x4a[local_10] != 0) {
-            for (local_8 = 0; local_8 < field_0x52[local_10]; local_8++) {
-                if (field_0x4a[local_10][local_8].id == param_1) {
+        if (aggregateDir[local_10] != 0) {
+            for (local_8 = 0; local_8 < aggregateEntryCount[local_10]; local_8++) {
+                if (aggregateDir[local_10][local_8].id == param_1) {
                     bVar1 = 1;
-                    field_0x3e = local_10;
+                    curAggregate = local_10;
                     break;
                 }
             }
@@ -343,10 +343,10 @@ void resourceManager::PointToFile(unsigned long param_1)
     }
     if (!bVar1) {
         sprintf(gText, "ResMgr::PointToFile failure. This resource (%lu) is not in aggregate %s", param_1,
-                field_0x9e, &field_0x62);
+                lastFileId, &aggregateName);
         ShutDown(gText);
     }
-    _lseek(field_0x42[field_0x3e], field_0x4a[field_0x3e][local_8].offset, 0);
+    _lseek(aggregateFd[curAggregate], aggregateDir[curAggregate][local_8].offset, 0);
 }
 
 VA(0x004c8d20, 0xfa)
@@ -355,9 +355,9 @@ unsigned long resourceManager::GetFileSize(unsigned long param_1)
     char bVar1 = 0;
     int local_14, local_10, local_8;
     for (local_14 = 0; local_14 < 2; local_14++) {
-        if (field_0x4a[local_14] != 0) {
-            for (local_8 = 0; local_8 < field_0x52[local_14]; local_8++) {
-                if (field_0x4a[local_14][local_8].id == param_1) {
+        if (aggregateDir[local_14] != 0) {
+            for (local_8 = 0; local_8 < aggregateEntryCount[local_14]; local_8++) {
+                if (aggregateDir[local_14][local_8].id == param_1) {
                     bVar1 = 1;
                     local_10 = local_14;
                     break;
@@ -369,17 +369,17 @@ unsigned long resourceManager::GetFileSize(unsigned long param_1)
     }
     if (!bVar1) {
         sprintf(gText, "ResMgr::PointToFile failure. This resource (%lu) is not in aggregate %s", param_1,
-                field_0x9e, &field_0x62);
+                lastFileId, &aggregateName);
         ShutDown(gText);
     }
-    return field_0x4a[local_10][local_8].size;
+    return aggregateDir[local_10][local_8].size;
 }
 
 VA(0x004c8e20, 0x52)
 void resourceManager::SavePosition(void)
 {
-    lastPositionZ[gResPositionStackIdx] = _tell(field_0x42[field_0x3e]);
-    lastAggZ[gResPositionStackIdx] = field_0x3e;
+    lastPositionZ[gResPositionStackIdx] = _tell(aggregateFd[curAggregate]);
+    lastAggZ[gResPositionStackIdx] = curAggregate;
     gResPositionStackIdx = gResPositionStackIdx + 1;
 }
 
@@ -387,8 +387,8 @@ VA(0x004c8e80, 0x53)
 void resourceManager::RestorePosition(void)
 {
     gResPositionStackIdx = gResPositionStackIdx - 1;
-    field_0x3e = lastAggZ[gResPositionStackIdx];
-    _lseek(field_0x42[field_0x3e], lastPositionZ[gResPositionStackIdx], 0);
+    curAggregate = lastAggZ[gResPositionStackIdx];
+    _lseek(aggregateFd[curAggregate], lastPositionZ[gResPositionStackIdx], 0);
 }
 
 VA(0x004c8ee0, 0x81)
@@ -396,9 +396,9 @@ signed char resourceManager::ReadByte(void)
 {
     int iVar1;
     char local_8[4];
-    ProcessAssert(field_0x42[field_0x3e] != -1, __FILE__, __LINE__);
+    ProcessAssert(aggregateFd[curAggregate] != -1, __FILE__, __LINE__);
     local_8[0] = 0;
-    iVar1 = _read(field_0x42[field_0x3e], local_8, 1);
+    iVar1 = _read(aggregateFd[curAggregate], local_8, 1);
     if (iVar1 == 0)
         _errno();
     return local_8[0];
@@ -409,9 +409,9 @@ short resourceManager::ReadWord(void)
 {
     int iVar1;
     short local_8[2];
-    ProcessAssert(field_0x42[field_0x3e] != -1, __FILE__, __LINE__);
+    ProcessAssert(aggregateFd[curAggregate] != -1, __FILE__, __LINE__);
     local_8[0] = 0;
-    iVar1 = _read(field_0x42[field_0x3e], local_8, 2);
+    iVar1 = _read(aggregateFd[curAggregate], local_8, 2);
     if (iVar1 == 0)
         _errno();
     return local_8[0];
@@ -422,9 +422,9 @@ long resourceManager::ReadLong(void)
 {
     int iVar1;
     long local_8;
-    ProcessAssert(field_0x42[field_0x3e] != -1, __FILE__, __LINE__);
+    ProcessAssert(aggregateFd[curAggregate] != -1, __FILE__, __LINE__);
     local_8 = 0;
-    iVar1 = _read(field_0x42[field_0x3e], &local_8, 4);
+    iVar1 = _read(aggregateFd[curAggregate], &local_8, 4);
     if (iVar1 == 0)
         _errno();
     return local_8;
@@ -434,16 +434,16 @@ VA(0x004c9090, 0xe3)
 unsigned long resourceManager::MakeId(char *param_1, int param_2)
 {
     int local_c;
-    strcpy(&field_0x62, param_1);
+    strcpy(&aggregateName, param_1);
     if (gbUseEvilInterface != 0 && param_2 != 0) {
         for (local_c = 0; local_c < 0x25; local_c++) {
-            if (_strcmpi(&field_0x62, cEvilTranslate[local_c][0]) == 0) {
-                strcpy(&field_0x62, cEvilTranslate[local_c][1]);
+            if (_strcmpi(&aggregateName, cEvilTranslate[local_c][0]) == 0) {
+                strcpy(&aggregateName, cEvilTranslate[local_c][1]);
             }
         }
     }
-    unsigned long uVar1 = MAKEFILEID(&field_0x62);
-    field_0x9e = uVar1;
+    unsigned long uVar1 = MAKEFILEID(&aggregateName);
+    lastFileId = uVar1;
     return uVar1;
 }
 
@@ -457,12 +457,12 @@ VA(0x004c91b0, 0xbd)
 void resourceManager::ReadBlock(signed char *param_1, unsigned long param_2)
 {
     unsigned long uVar1;
-    ProcessAssert(field_0x42[field_0x3e] != -1, __FILE__, __LINE__);
+    ProcessAssert(aggregateFd[curAggregate] != -1, __FILE__, __LINE__);
     PollSound();
-    uVar1 = _read(field_0x42[field_0x3e], param_1, param_2);
+    uVar1 = _read(aggregateFd[curAggregate], param_1, param_2);
     if (uVar1 != param_2) {
         sprintf(gText, "File error: bytes read %d, bytes wanted %d, errno %d, aggregate %s", uVar1,
-                param_2, errno, &field_0x62);
+                param_2, errno, &aggregateName);
         LogStr(gText);
     }
     PollSound();
