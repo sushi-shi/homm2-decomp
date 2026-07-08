@@ -68,7 +68,23 @@ VA(0x004cc0c0, 0xf1)
 void soundManager::CDPoll(void) {}
 
 VA(0x004cc1c0, 0xdd)
-int soundManager::ConvertVolume(int, int) { return 0; }
+int soundManager::ConvertVolume(int param_1, int param_2)
+{
+    int local_8 = 0;
+    if (param_2 == 0x65) {
+        if (gMidiEnabled > 0 && gMidiEnabled < 0xb &&
+            (local_8 = ((0xb - gMidiEnabled) * param_1) / 10, local_8 < 1))
+            local_8 = 1;
+    } else if (gSampleVolume > 0 && gSampleVolume < 0xb &&
+               (local_8 = ((0xb - gSampleVolume) * param_1) / 10, local_8 < 1)) {
+        local_8 = 1;
+    }
+    if (local_8 < 0)
+        local_8 = 0;
+    if (0x7f < local_8)
+        local_8 = 0x7f;
+    return local_8;
+}
 
 VA(0x004cc2a0, 0x5e)
 void __stdcall SetReady2Poll(unsigned long int)

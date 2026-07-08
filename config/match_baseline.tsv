@@ -366,7 +366,7 @@ BASE/WINMGR	empty_stub	0.0000
 BASE/bmap2	?BlitBitmap@@YIXPAVbitmap@@HHHH0HH@Z	88.0000	12e9d721d9ce
 BASE/bmap2	?DimBitmapArea@@YIXPAVbitmap@@HHHHH@Z	84.2000	f38a7483416e
 BASE/bmap2	?FillBitmapArea@@YIXPAVbitmap@@HHHHH@Z	95.4545	c9fee5b7b412
-BASE/bmap2	?FillBitmapAreaClip@@YIXPAVbitmap@@HHHHHHHHH@Z	92.6667	5e98d96015af
+BASE/bmap2	?FillBitmapAreaClip@@YIXPAVbitmap@@HHHHHHHHH@Z	93.2222	5e98d96015af
 BASE/droplist	??0dropListWidget@@QAE@XZ	100.0000	36ab848d613b
 BASE/droplist	??1dropListWidget@@UAE@XZ	99.9535	2a86be8a60bf
 BASE/droplist	??_EdropListWidget@@UAEPAXI@Z	0.0000	
@@ -406,7 +406,7 @@ BASE/soundmgr	?CDShutdown@soundManager@@QAEXXZ	26.0000	a9ad9b64418b
 BASE/soundmgr	?CDStartup@soundManager@@QAEXXZ	25.0000	b3b9c6d63883
 BASE/soundmgr	?CDStop@soundManager@@QAEXXZ	16.8571	15e16b3c2967
 BASE/soundmgr	?Close@soundManager@@UAEXXZ	34.0789	ae5b54c5a673
-BASE/soundmgr	?ConvertVolume@soundManager@@QAEHHH@Z	25.7308	c9539caf3b73
+BASE/soundmgr	?ConvertVolume@soundManager@@QAEHHH@Z	75.7115	402e179e57e9
 BASE/soundmgr	?DigitalReport@soundManager@@QAEJPAU_SAMPLE@@F@Z	30.3913	47d4a23e620b
 BASE/soundmgr	?ForcePollSound@soundManager@@QAEXXZ	92.0000	9e09935a2881
 BASE/soundmgr	?GetNumberCDDrives@soundManager@@QAEXXZ	100.0000	fde24968c623
