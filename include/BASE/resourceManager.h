@@ -25,7 +25,9 @@ public:
     resource *field_0x36;  // +0x36  resource-list head
     int    field_0x3a;  // +0x3a
     int    field_0x3e;  // +0x3e
-    int    field_0x42[6];  // +0x42  per-aggregate file descriptors
+    int    field_0x42[2];  // +0x42  per-aggregate file descriptors
+    void  *field_0x4a[2];  // +0x4a  per-aggregate header buffers
+    char _pad_0x52[0x8];
     int    field_0x5a;  // +0x5a
     char _pad_0x5e[0x4];
     char   field_0x62;  // +0x62

@@ -262,7 +262,7 @@ BASE/PALETTE	??_Epalette@@UAEPAXI@Z	0.0000
 BASE/PALETTE	?Data@palette@@QAEPACXZ	100.0000	3bb1f3ed4160
 BASE/RESMGR	??0resourceManager@@QAE@XZ	29.4262	a55c25dc64af
 BASE/RESMGR	?AddResource@resourceManager@@QAEXPAVresource@@@Z	100.0000	417403dd6517
-BASE/RESMGR	?Close@resourceManager@@UAEXXZ	24.0370	9a9a3bb05a54
+BASE/RESMGR	?Close@resourceManager@@UAEXXZ	97.0185	5f36b5814ef1
 BASE/RESMGR	?Dispose@resourceManager@@QAEXPAVresource@@@Z	55.4884	88b2eb89165e
 BASE/RESMGR	?Expunge@resourceManager@@QAEXXZ	80.6000	61fcaa327304
 BASE/RESMGR	?GetBackdrop@resourceManager@@QAEXPADPAVbitmap@@H@Z	23.1786	bcc6d0bea71b

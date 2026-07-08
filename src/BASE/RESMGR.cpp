@@ -157,7 +157,24 @@ void resourceManager::RemoveResource(class resource *param_1)
 }
 
 VA(0x004c89e0, 0xc8)
-void resourceManager::Close(void) {}
+void resourceManager::Close(void)
+{
+    int local_8;
+    if (field_0x32 == 1) {
+        Expunge();
+        field_0x36 = 0;
+        for (local_8 = 0; local_8 < 2; local_8++) {
+            if (field_0x4a[local_8] != 0)
+                BaseFree(field_0x4a[local_8], __FILE__, __LINE__);
+            if (field_0x42[local_8] != -1) {
+                _close(field_0x42[local_8]);
+                field_0x42[local_8] = -1;
+            }
+        }
+        field_0x3a = 0;
+        field_0x32 = 0;
+    }
+}
 
 VA(0x004c8ab0, 0x143)
 int resourceManager::LoadAggregateHeader(char *) { return 0; }
