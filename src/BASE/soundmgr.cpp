@@ -10,6 +10,7 @@
 #include <_globals_model.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/kbwin.h>
+#include <SOURCE/NOOPT.h>
 #include <BASE/mss.h>
 #include <stdio.h>
 #include <string.h>
@@ -268,7 +269,30 @@ VA(0x004cca70, 0x1a)
 struct _SAMPLE * soundManager::StartSample(char *, char * *, short int, short int, int, int, long int) { return 0; }
 
 VA(0x004cca90, 0x126)
-void soundManager::StopAllSamples(int) {}
+void soundManager::StopAllSamples(int param_1)
+{
+    short local_8;
+    int local_c;
+    if (gbNoSound == 0 && field_0x36 != 0 && field_0x684 != 0) {
+        LogStr("SAS 1");
+        for (local_8 = 0; local_8 < field_0x94; local_8++) {
+            if (_AIL_sample_status_4(field_0x54[local_8]) == 4)
+                _AIL_end_sample_4(field_0x54[local_8]);
+        }
+        field_0x688 = 0;
+        if (param_1 != 0) {
+            if (gCdMusic == 0)
+                MIDIStop();
+            else
+                CDStop();
+        }
+        for (local_c = 0; local_c < 5; local_c++) {
+            ServiceSound();
+            DelayMilli(1);
+        }
+        LogStr("SAS 2");
+    }
+}
 
 VA(0x004ccbc0, 0xb1)
 void soundManager::StopSample(struct _SAMPLE *) {}
