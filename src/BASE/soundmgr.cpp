@@ -170,8 +170,13 @@ void soundManager::CDPlay(int param_1, int param_2, int param_3, int param_4)
     long local_10;
     long local_c;
     long local_8;
-    if (gbNoSound == 0 && m_cdReady != 0 && gMidiEnabled != 0) {
-        if (param_1 == -1) {
+    if (gbNoSound != 0)
+        return;
+    if (m_cdReady == 0)
+        return;
+    if (gMidiEnabled == 0)
+        return;
+    if (param_1 == -1) {
             CDStop();
         } else if (m_currentTrack != param_1 || CDPlaying == 0 || param_4 != 0) {
             m_cdTrack = param_1;
@@ -249,7 +254,6 @@ void soundManager::CDPlay(int param_1, int param_2, int param_3, int param_4)
             }
             m_currentTrack = static_cast<char>(param_1);
         }
-    }
 }
 
 VA(0x004cc0c0, 0xf1)
