@@ -93,7 +93,61 @@ void *BaseAlloc(unsigned int param_1, char *param_2, int param_3)
 }
 
 VA(0x004c3f80, 0x386)
-void BaseFree(void *, char *, int) {}
+void BaseFree(void *param_1, char *param_2, int param_3)
+{
+    char local_2bc[500];
+    char local_c8[200];
+    if (gpMemEntry == 0) {
+        LogInt("Memory tracking table allocated, entries", iMemEntries, -999, -999, -999, -999, -999,
+               -999);
+        gpMemEntry = static_cast<MemEntry *>(malloc(0x24220));
+        for (int i = 0; i < 2000; i++)
+            gpMemEntry[i].used = 0;
+    }
+    if (giDebugLevel == 4)
+        LogInt("Free ", reinterpret_cast<int>(param_1), -999, -999, -999, -999, -999, -999);
+    if (param_1 == 0) {
+        if (1 < giDebugLevel) {
+            FILE *_File = fopen("KB.LOG", "a");
+            if (_File != 0) {
+                strcpy(local_2bc, "NULL POINTER");
+                strcat(local_2bc, "\n");
+                fputs(local_2bc, _File);
+                fclose(_File);
+                if (giDebugLevel == 4)
+                    OutputDebugStringA(local_2bc);
+            }
+        }
+    } else {
+        iMemEntries = iMemEntries - 1;
+        if (iMemEntries < 0)
+            LogInt("MemEntries Below 0", iMemEntries, -999, -999, -999, -999, -999, -999);
+        int iVar6 = 0;
+        do {
+            if (gpMemEntry[iVar6].ptr == param_1) {
+                FILE *_File;
+                if (giDebugLevel == 4 &&
+                    (sprintf(local_c8, "KBFree    Size %d   Ptr %d   File %s  Line %d",
+                             gpMemEntry[iVar6].size, param_1, gpMemEntry[iVar6].file,
+                             gpMemEntry[iVar6].line),
+                     1 < giDebugLevel) &&
+                    (_File = fopen("KB.LOG", "a"), _File != 0)) {
+                    strcpy(local_2bc, local_c8);
+                    strcat(local_2bc, "\n");
+                    fputs(local_2bc, _File);
+                    fclose(_File);
+                    if (giDebugLevel == 4)
+                        OutputDebugStringA(local_2bc);
+                }
+                gpMemEntry[iVar6].used = 0;
+                giTotalMemAllocated = giTotalMemAllocated - gpMemEntry[iVar6].size;
+                iVar6 = 99999;
+            }
+            iVar6 = iVar6 + 1;
+        } while (iVar6 < 2000);
+        free(param_1);
+    }
+}
 
 VA(0x004c4310, 0x134)
 void PrintMemoryLeaks(void) {}
