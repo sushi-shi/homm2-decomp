@@ -396,7 +396,7 @@ BASE/miscwin	?AutoInitSVGA@@YIFXZ	100.0000	ba21e7c98ba3
 BASE/miscwin	@BlitBitmapToScreenVesa@28	0.6579	10b3cea2382c
 BASE/soundmgr	??0soundManager@@QAE@XZ	97.6471	4d8a78f253b1
 BASE/soundmgr	?AdjustMusicVolumes@soundManager@@QAEXXZ	100.0000	542b919812cb
-BASE/soundmgr	?AdjustSoundVolumes@soundManager@@QAEXXZ	76.9844	88625004e3a9
+BASE/soundmgr	?AdjustSoundVolumes@soundManager@@QAEXXZ	99.8594	e3b446dd44e0
 BASE/soundmgr	?AllocateSampleHandles@soundManager@@QAEXXZ	100.0000	6e9c75674c51
 BASE/soundmgr	?CDIsPlaying@soundManager@@QAEHXZ	100.0000	11990711b1ec
 BASE/soundmgr	?CDPlay@soundManager@@QAEXHHHH@Z	82.0932	62fbbef353fb
