@@ -240,7 +240,7 @@ BASE/Misc	?MemSize@@YIHH@Z	100.0000	debd0b6c4c55
 BASE/Misc	?PrintMemoryLeaks@@YIXXZ	1.0989	d14c51db5347
 BASE/Misc	?ProcessAssert@@YIXHPADH@Z	100.0000	c6e6b2f8aaa4
 BASE/Misc	?Random@@YIHHH@Z	100.0000	32d778785300
-BASE/Misc	?ReadPrefs@@YIXXZ	2.5641	553e9261fb77
+BASE/Misc	?ReadPrefs@@YIXXZ	100.0000	4aaa32ca229c
 BASE/Misc	?ReadPrefsFromFile@@YIXXZ	0.9709	83d20d4c3269
 BASE/Misc	?ReadPrefsFromRegistry@@YIXXZ	0.1555	cd2c07d338ca
 BASE/Misc	?SGenRand@@YIHXZ	90.6364	40cd1294eedf
