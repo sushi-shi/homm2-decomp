@@ -12,7 +12,16 @@ struct tag_message;
 
 // Misc-private record structs (params of the functions above).
 struct indexArray { unsigned short field0; unsigned short field2; };
-struct IconEntry { char pad[13]; };
+#pragma pack(push, 1)
+struct IconEntry {          // one sprite frame header in the icon entry table (13B, indexed by frame)
+    short x;                // +0  x offset
+    short y;                // +2  y offset
+    short w;                // +4  width
+    short h;                // +6  height
+    unsigned char flags;    // +8
+    int srcOffset;          // +9  offset of this frame's RLE data within the icon blob
+};
+#pragma pack(pop)
 
 void InitMemEntry(void);
 void * BaseAlloc(unsigned int, char *, int);
