@@ -304,7 +304,7 @@ void heroWindow::DrawWindow(int param_1, int param_2, int param_3)
 {
     tag_message local_24;
     widget *local_8;
-    gpMouseManager->field_0x82 = 0;
+    gpMouseManager->m_cursorReady = 0;
     local_8 = m_widgetListTail;
     local_24.type = 0x200;
     local_24.field4 = 2;
@@ -325,7 +325,7 @@ void heroWindow::DrawWindow(int param_1, int param_2, int param_3)
         gpWindowManager->UpdateScreenRegion(m_posX, m_posY, m_winWidth, m_winHeight);
         PollSound();
     }
-    gpMouseManager->field_0x82 = 1;
+    gpMouseManager->m_cursorReady = 1;
 }
 
 VA(0x004cf830, 0x7f)
