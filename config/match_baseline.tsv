@@ -372,7 +372,7 @@ BASE/droplist	??1dropListWidget@@UAE@XZ	99.9535	2a86be8a60bf
 BASE/droplist	??_EdropListWidget@@UAEPAXI@Z	0.0000	
 BASE/droplist	?DeleteItem@dropListWidget@@QAEXH@Z	50.2836	fa8e27296f78
 BASE/droplist	?Draw@dropListWidget@@UAEXXZ	100.0000	70f443d99378
-BASE/droplist	?DrawDropStuff@dropListWidget@@QAEXXZ	0.3390	b7ae9bfc77d7
+BASE/droplist	?DrawDropStuff@dropListWidget@@QAEXXZ	82.2644	ba50ab0ed65f
 BASE/droplist	?Main@dropListWidget@@UAEHAAUtag_message@@@Z	30.1147	33f4e8926a9f
 BASE/droplist	?ProcessSelectDialog@dropListWidget@@QAEXXZ	0.1678	39a568398497
 BASE/droplist	?Read@dropListWidget@@QAEXXZ	90.2377	9dc25823a2a5
