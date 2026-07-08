@@ -335,7 +335,23 @@ long soundManager::DigitalReport(struct _SAMPLE *param_1, short param_2)
 }
 
 VA(0x004ccf40, 0xe8)
-void soundManager::AdjustSoundVolumes(void) {}
+void soundManager::AdjustSoundVolumes(void)
+{
+    int local_c;
+    if (gbNoSound == 0 && field_0x36 != 0 && field_0x684 != 0) {
+        LogStr("Adjust Sound Volumes 1");
+        for (local_c = 1; local_c < field_0x94; local_c++) {
+            struct _SAMPLE *p_Var1 = field_0x54[local_c];
+            if (gSampleVolume == 0) {
+                ModifySample(p_Var1, 1, 0);
+            } else {
+                if (DigitalReport(p_Var1, 4) != 0)
+                    ModifySample(p_Var1, 100, reinterpret_cast<short *>(&iLastVolume)[local_c]);
+            }
+        }
+        LogStr("Adjust Sound Volumes 2");
+    }
+}
 
 VA(0x004cd030, 0xee)
 void soundManager::AdjustMusicVolumes(void)
