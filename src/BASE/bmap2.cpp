@@ -5,8 +5,25 @@
 
 #include <va.h>
 #include <BASE/bmap2.h>
+#include <BASE/bitmap.h>
+#include <_globals_model.h>
+#include <string.h>
+int gFillRow;
+unsigned char *gFillPtr;
+
 VA(0x004ca3d0, 0x80)
-void FillBitmapArea(class bitmap *, int, int, int, int, int) {}
+void FillBitmapArea(class bitmap *bmp, int x, int y, int w, int h, int color)
+{
+    gFillRow = 0;
+    gFillPtr = bmp->field_0x16 + bmp->field_0x12 * y + x;
+    if (h > 0) {
+        do {
+            memset(gFillPtr, color, w);
+            gFillPtr += bmp->field_0x12;
+            gFillRow++;
+        } while (gFillRow < h);
+    }
+}
 
 VA(0x004ca450, 0x114)
 void FillBitmapAreaClip(class bitmap *, int, int, int, int, int, int, int, int, int) {}
