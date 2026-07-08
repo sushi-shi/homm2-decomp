@@ -40,7 +40,22 @@ resourceManager::resourceManager(void) : baseManager()
 }
 
 VA(0x004c8080, 0xa2)
-void resourceManager::GetBackdrop(char *, class bitmap *, int) {}
+void resourceManager::GetBackdrop(char *param_1, class bitmap *param_2, int param_3)
+{
+    if (param_3 == 0) {
+        unsigned long uVar1 = MakeId(param_1, 1);
+        PointToFile(uVar1);
+        ReadWord();
+        ReadWord();
+        ReadWord();
+        ReadBlock(reinterpret_cast<signed char *>(param_2->field_0x16),
+                  param_2->field_0x14 * param_2->field_0x12);
+    } else {
+        icon *this_00 = GetIcon(param_1);
+        this_00->DrawToBuffer(0, 0, 0, 0);
+        Dispose(this_00);
+    }
+}
 
 VA(0x004c8130, 0xd2)
 void resourceManager::GetBackdropAtLoc(char *, class bitmap *, int, int, int) {}
