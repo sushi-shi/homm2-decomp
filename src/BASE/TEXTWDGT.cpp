@@ -63,7 +63,79 @@ textWidget::~textWidget()
 }
 
 VA(0x004d1280, 0x210)
-int textWidget::Main(struct tag_message &) { return 0; }
+int textWidget::Main(tag_message &param_1)
+{
+    unsigned short uVar2;
+    int iVar3;
+    unsigned int uVar5, uVar6;
+    short sVar7, sVar9;
+    char *pcVar8;
+    uVar2 = field_0x16;
+    iVar3 = param_1.type;
+    if ((uVar2 & 2) == 0) {
+        if (iVar3 != 0x200)
+            return 0;
+        return widget::Main(param_1);
+    }
+    if (iVar3 < 0x11) {
+        if (iVar3 == 0x10) {
+LAB_004d136b:
+            if ((uVar2 & 1) == 0)
+                return 0;
+            field_0x16 = uVar2 & 0xfffe;
+            if (param_1.type == 0x40)
+                param_1.fieldC = 0x200;
+            param_1.type = 0x200;
+            param_1.field4 = 0xd;
+            param_1.field8 = field_0x10;
+            return 2;
+        }
+        if (iVar3 != 8) {
+LAB_004d12c4:
+            return widget::Main(param_1);
+        }
+    } else if (iVar3 != 0x20) {
+        if (iVar3 != 0x40) {
+            if (iVar3 == 0x200) {
+                if (param_1.field4 == 3) {
+                    if (field_0x10 == param_1.field8) {
+                        pcVar8 = param_1.text;
+                        if (field_0x14 != 0x200 && field_0x14 != 0x4000) {
+                            field_0x20 = pcVar8;
+                            return 1;
+                        }
+                        uVar5 = strlen(pcVar8) & 0xffff;
+                        uVar6 = strlen(field_0x20);
+                        if (uVar6 < uVar5) {
+                            BaseFree(field_0x20, __FILE__, __LINE__);
+                            field_0x20 = static_cast<char *>(BaseAlloc(uVar5 + 5, __FILE__, __LINE__));
+                        }
+                        strcpy(field_0x20, pcVar8);
+                        return 1;
+                    }
+                } else if (param_1.field4 == 8 && field_0x10 == param_1.field8) {
+                    field_0x28 = static_cast<short>(reinterpret_cast<int>(param_1.text));
+                    return 1;
+                }
+            }
+            goto LAB_004d12c4;
+        }
+        goto LAB_004d136b;
+    }
+    sVar9 = static_cast<short>(param_1.field4) - field_0x4->field_0x28;
+    sVar7 = static_cast<short>(param_1.field8) - field_0x4->field_0x2c;
+    if (field_0x18 <= sVar9 && field_0x1a <= sVar7 && sVar9 < field_0x1c + field_0x18 &&
+        sVar7 < field_0x1e + field_0x1a) {
+        field_0x16 = uVar2 | 1;
+        if (param_1.type == 0x20)
+            param_1.fieldC = 0x200;
+        param_1.type = 0x200;
+        param_1.field4 = 0xc;
+        param_1.field8 = field_0x10;
+        return 2;
+    }
+    return 0;
+}
 
 VA(0x004d1490, 0x49)
 void textWidget::Draw(void)
