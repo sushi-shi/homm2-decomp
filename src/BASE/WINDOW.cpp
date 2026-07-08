@@ -7,6 +7,16 @@
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/widget.h>
+#include <SOURCE/kbwin.h>
+#include <BASE/listBoxWidget.h>
+#include <BASE/dropListWidget.h>
+#include <BASE/textEntryWidget.h>
+#include <BASE/textWidget.h>
+#include <BASE/iconWidget.h>
+#include <BASE/dimmerWidget.h>
+#include <BASE/button.h>
+#include <BASE/border.h>
+#include <BASE/resourceManager.h>
 #include <BASE/bitmap.h>
 #include <SOURCE/KB.h>
 #include <stdlib.h>
@@ -48,7 +58,107 @@ heroWindow::heroWindow(int x, int y, int w, int h, int flags)
 }
 
 VA(0x004cecd0, 0x521)
-heroWindow::heroWindow(int, int, char *) {}
+heroWindow::heroWindow(int param_1, int param_2, char *param_3)
+{
+    int bVar1;
+    int iVar4;
+    widget *local_28;
+    strcpy(name, param_3);
+    unsigned long uVar3 = gpResourceManager->MakeId(param_3, 1);
+    gpResourceManager->PointToFile(uVar3);
+    field_0x40 = 0;
+    field_0x8 = 0;
+    field_0x4 = field_0x8;
+    field_0x24 = 0;
+    field_0x0 = -1;
+    field_0x28 = param_1;
+    field_0x2c = param_2;
+    field_0x30 = gpResourceManager->ReadWord();
+    field_0x34 = gpResourceManager->ReadWord();
+    field_0x20 = gpResourceManager->ReadWord();
+    field_0x20 = field_0x20 | 0x4000;
+    field_0x3c = 0;
+    field_0x38 = field_0x3c;
+    bVar1 = 0;
+    while (!bVar1) {
+        PollSound();
+        iVar4 = gpResourceManager->ReadWord();
+        local_28 = 0;
+        if (iVar4 < 9) {
+            if (iVar4 == 8) {
+                textWidget *w = new textWidget();
+                w->Read();
+                local_28 = w;
+            } else if (iVar4 == 0) {
+                bVar1 = 1;
+            } else if (iVar4 == 1) {
+                border *w = new border();
+                w->Read();
+                local_28 = w;
+            } else if (iVar4 == 2) {
+                button *w = new button();
+                w->Read();
+                local_28 = w;
+            }
+        } else if (iVar4 < 0x41) {
+            if (iVar4 == 0x40) {
+                dimmerWidget *w = new dimmerWidget();
+                w->Read();
+                local_28 = w;
+            } else if (iVar4 == 0x10) {
+                iconWidget *w = new iconWidget();
+                w->Read();
+                local_28 = w;
+            }
+        } else if (iVar4 < 0x202) {
+            if (iVar4 == 0x201) {
+                textEntryWidget *w = new textEntryWidget();
+                w->Read(2);
+                local_28 = w;
+            } else if (iVar4 == 0x100) {
+                textEntryWidget *w = new textEntryWidget();
+                w->Read(1);
+                local_28 = w;
+            }
+        } else {
+            switch (iVar4) {
+            case 0x202: {
+                textEntryWidget *w = new textEntryWidget();
+                w->Read(3);
+                local_28 = w;
+                break;
+            }
+            case 0x203: {
+                dropListWidget *w = new dropListWidget();
+                w->Read();
+                local_28 = w;
+                break;
+            }
+            case 0x204: {
+                textEntryWidget *w = new textEntryWidget();
+                w->Read(4);
+                local_28 = w;
+                break;
+            }
+            case 0x205: {
+                listBoxWidget *w = new listBoxWidget();
+                w->Read();
+                local_28 = w;
+                break;
+            }
+            case 0x206: {
+                textEntryWidget *w = new textEntryWidget();
+                w->Read(5);
+                local_28 = w;
+                break;
+            }
+            }
+        }
+        if (!bVar1 && local_28 != 0) {
+            AddWidget(local_28, -1);
+        }
+    }
+}
 
 VA(0x004cf200, 0x73)
 int heroWindow::Open(int x, int flags)
