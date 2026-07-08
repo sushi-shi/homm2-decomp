@@ -402,7 +402,7 @@ BASE/soundmgr	?CDIsPlaying@soundManager@@QAEHXZ	83.6304	8ba81d155475
 BASE/soundmgr	?CDPlay@soundManager@@QAEXHHHH@Z	4.6523	11d156e55a95
 BASE/soundmgr	?CDPoll@soundManager@@QAEXXZ	21.3115	3a8d0ea558fb
 BASE/soundmgr	?CDSetVolume@soundManager@@QAEXHH@Z	20.9355	321849d1feef
-BASE/soundmgr	?CDShutdown@soundManager@@QAEXXZ	26.0000	a9ad9b64418b
+BASE/soundmgr	?CDShutdown@soundManager@@QAEXXZ	86.7000	49ece490b489
 BASE/soundmgr	?CDStartup@soundManager@@QAEXXZ	25.0000	b3b9c6d63883
 BASE/soundmgr	?CDStop@soundManager@@QAEXXZ	16.8571	15e16b3c2967
 BASE/soundmgr	?Close@soundManager@@UAEXXZ	84.6053	3f023007c7e3
