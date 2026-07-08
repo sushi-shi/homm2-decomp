@@ -100,4 +100,9 @@ DATA(0x005330f8) extern CRITICAL_SECTION gNbRcvLock;       // guards gNbRcvQueue
 DATA(0x00533110) extern HANDLE        gNbEvents[9];         // manual-reset events
 DATA(0x00533138) extern CRITICAL_SECTION gNbSndLock;       // guards gNbSndQueue
 
+DATA(0x004fbb30) extern int gBlitClipX;   // BlitBitmapToScreen full-screen clip origin x
+DATA(0x004fbb34) extern int gBlitClipY;   // BlitBitmapToScreen full-screen clip origin y
+DATA(0x005331cc) extern int gBlitRight;   // BlitBitmapToScreen computed blit-rect right edge
+DATA(0x005331d0) extern int gBlitBottom;  // BlitBitmapToScreen computed blit-rect bottom edge
+
 #endif // HOMM2_GLOBALS_MODEL_H
