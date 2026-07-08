@@ -8,6 +8,7 @@
 #include <BASE/resourceManager.h>
 #include <BASE/icon.h>
 #include <BASE/heroWindow.h>
+#include <BASE/heroWindowManager.h>
 #include <SOURCE/KB.h>
 VA(0x004dd440, 0x34)
 button::button(void) : widget(0, 0, 0, 0, 0, 0)
@@ -79,7 +80,21 @@ VA(0x004ddc70, 0x96)
 short int button::Select(struct tag_message &) { return 0; }
 
 VA(0x004ddd10, 0x83)
-short int button::Deselect(struct tag_message &) { return 0; }
+short button::Deselect(struct tag_message &msg)
+{
+    if ((field_0x16 & 1) == 0)
+        return 0;
+    field_0x16 &= 0xfffe;
+    Draw();
+    gpWindowManager->UpdateScreenRegion(field_0x18 + field_0x4->field_0x28,
+                                        field_0x1a + field_0x4->field_0x2c, field_0x1c, field_0x1e);
+    msg.field4 = 0xd;
+    msg.type = 0x200;
+    msg.field8 = field_0x10;
+    msg.fieldC = iLeftRightSave;
+    iLeftRightSave = 0;
+    return 2;
+}
 
 VA(0x004ddda0, 0x55)
 void button::Draw(void)
