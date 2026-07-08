@@ -28,7 +28,7 @@ DATA(0x00528d2c) extern int gSampleVolume; // sample/CD music volume 0-10 (sound
 DATA(0x00534970) extern WAVEFORMATEX gWaveFormat; // digital-driver PCM format (WAVE_init_driver)
 DATA(0x004ef4f8) extern HWND ghWndMain; // main window (WAVE_init_driver MessageBox owner)
 DATA(0x00528d00) extern long gMusicFadeTimer; // ambient-music fade deadline tick (soundManager::SwitchAmbientMusic)
-DATA(0x00528db6) extern int gMciErrorFlag; // MCI error latch (HandleMCIError)
+DATA(0x00528db6) extern char gMciErrorFlag; // MCI error latch (byte-accessed) (HandleMCIError)
 DATA(0x00528cf8) extern long gButtonRepeatTime; // button auto-repeat deadline tick (button::Select)
 
 
