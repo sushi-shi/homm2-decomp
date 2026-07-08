@@ -6,6 +6,8 @@
 #include <va.h>
 #include <BASE/executive.h>
 #include <BASE/baseManager.h>
+#include <BASE/Misc.h>
+#include <stdio.h>
 #include <SOURCE/KB.h>
 VA(0x004d1610, 0x10)
 executive::executive(void)
@@ -26,7 +28,20 @@ VA(0x004d1750, 0xfb)
 int executive::DoDialog(class baseManager *) { return 0; }
 
 VA(0x004d1850, 0x86)
-void executive::PrintManagerList(void) {}
+void executive::PrintManagerList(void)
+{
+    LogStr("----- Manager List Start -----");
+    LogStr("-----");
+    sprintf(gText, "Head: %d Tail: %d", field_0x0, field_0x4);
+    LogStr(gText);
+    LogStr("-----");
+    for (baseManager *m = field_0x0; m != 0; m = m->field_0x4) {
+        sprintf(gText, "Manager: %20s this: %d prev: %d next: %d", m->name, m,
+                m->field_0x8, m->field_0x4);
+        LogStr(gText);
+    }
+    LogStr("----- Manager List Stop -----");
+}
 
 VA(0x004d18e0, 0xce)
 int executive::AddManager(class baseManager *mgr, int param_2)
@@ -122,5 +137,8 @@ VA(0x004d1a90, 0xfa)
 void executive::MainLoop(void) {}
 
 VA(0x004d1b90, 0xa)
-void executive::Terminate(void) {}
+void executive::Terminate(void)
+{
+    ShutDown("Terminated");
+}
 
