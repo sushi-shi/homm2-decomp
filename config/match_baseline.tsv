@@ -363,8 +363,8 @@ BASE/WINMGR	?ScreenShot@heroWindowManager@@QAEXXZ	100.0000	6a1436975481
 BASE/WINMGR	?UpdateScreen@heroWindowManager@@QAEXXZ	100.0000	4077d1619d5f
 BASE/WINMGR	?UpdateScreenRegion@heroWindowManager@@QAEXHHHH@Z	100.0000	540656621367
 BASE/WINMGR	empty_stub	0.0000	
-BASE/bmap2	?BlitBitmap@@YIXPAVbitmap@@HHHH0HH@Z	2.0000	9d7ab0fe5bbc
-BASE/bmap2	?DimBitmapArea@@YIXPAVbitmap@@HHHHH@Z	81.8000	f38a7483416e
+BASE/bmap2	?BlitBitmap@@YIXPAVbitmap@@HHHH0HH@Z	88.0000	12e9d721d9ce
+BASE/bmap2	?DimBitmapArea@@YIXPAVbitmap@@HHHHH@Z	84.2000	f38a7483416e
 BASE/bmap2	?FillBitmapArea@@YIXPAVbitmap@@HHHHH@Z	95.4545	c9fee5b7b412
 BASE/bmap2	?FillBitmapAreaClip@@YIXPAVbitmap@@HHHHHHHHH@Z	1.1111	0caa2ba514d3
 BASE/droplist	??0dropListWidget@@QAE@XZ	100.0000	36ab848d613b

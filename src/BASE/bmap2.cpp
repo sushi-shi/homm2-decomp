@@ -15,6 +15,9 @@ int gDimRow;
 int gDimCol;
 unsigned char *gDimPtr;
 unsigned char *gDimNext;
+unsigned char *gBlitSrc;
+unsigned char *gBlitDst;
+int gBlitRow;
 
 VA(0x004ca3d0, 0x80)
 void FillBitmapArea(class bitmap *bmp, int x, int y, int w, int h, int color)
@@ -34,7 +37,20 @@ VA(0x004ca450, 0x114)
 void FillBitmapAreaClip(class bitmap *, int, int, int, int, int, int, int, int, int) {}
 
 VA(0x004ca570, 0xa6)
-void BlitBitmap(class bitmap *, int, int, int, int, class bitmap *, int, int) {}
+void BlitBitmap(class bitmap *src, int sx, int sy, int w, int h, class bitmap *dst, int dx, int dy)
+{
+    gBlitSrc = src->field_0x16 + src->field_0x12 * sy + sx;
+    gBlitRow = 0;
+    gBlitDst = dst->field_0x16 + dst->field_0x12 * dy + dx;
+    if (h > 0) {
+        do {
+            memcpy(gBlitDst, gBlitSrc, w);
+            gBlitSrc += src->field_0x12;
+            gBlitDst += dst->field_0x12;
+            gBlitRow++;
+        } while (gBlitRow < h);
+    }
+}
 
 VA(0x004ca620, 0xa8)
 void DimBitmapArea(class bitmap *bmp, int x, int y, int w, int h, int level)
