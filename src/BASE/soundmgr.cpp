@@ -116,18 +116,20 @@ void soundManager::CDStartup(void)
 VA(0x004cba70, 0xd5)
 void soundManager::CDShutdown(void)
 {
-    if (gbNoSound == 0 && field_0x69a != 0) {
-        wsprintfA(reinterpret_cast<char *>(&CommandString), "stop CD");
-        nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
-                                   reinterpret_cast<char *>(&lpszReturnString), 0xff, 0);
-        if (nMCIError != 0)
-            HandleMCIError(nMCIError, reinterpret_cast<char *>(&CommandString));
-        wsprintfA(reinterpret_cast<char *>(&CommandString), "close CD");
-        nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
-                                   reinterpret_cast<char *>(&lpszReturnString), 0xff, 0);
-        if (nMCIError != 0)
-            HandleMCIError(nMCIError, reinterpret_cast<char *>(&CommandString));
-    }
+    if (gbNoSound != 0)
+        return;
+    if (field_0x69a == 0)
+        return;
+    wsprintfA(reinterpret_cast<char *>(&CommandString), "stop CD");
+    nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
+                               reinterpret_cast<char *>(&lpszReturnString), 0xff, 0);
+    if (nMCIError != 0)
+        HandleMCIError(nMCIError, reinterpret_cast<char *>(&CommandString));
+    wsprintfA(reinterpret_cast<char *>(&CommandString), "close CD");
+    nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
+                               reinterpret_cast<char *>(&lpszReturnString), 0xff, 0);
+    if (nMCIError != 0)
+        HandleMCIError(nMCIError, reinterpret_cast<char *>(&CommandString));
 }
 
 VA(0x004cbb50, 0xe5)
