@@ -5,6 +5,7 @@
 
 #include <va.h>
 #include <io.h>
+#include <string.h>
 #include <SOURCE/KB.h>
 #include <stdio.h>
 #include <errno.h>
@@ -419,7 +420,20 @@ long resourceManager::ReadLong(void)
 }
 
 VA(0x004c9090, 0xe3)
-unsigned long int resourceManager::MakeId(char *, int) { return 0; }
+unsigned long resourceManager::MakeId(char *param_1, int param_2)
+{
+    int local_c;
+    strcpy(&field_0x62, param_1);
+    if (gbUseEvilInterface != 0 && param_2 != 0) {
+        for (local_c = 0; local_c < 0x25; local_c++) {
+            if (_stricmp(&field_0x62, cEvilTranslate[local_c][0]) == 0) {
+                strcpy(&field_0x62, cEvilTranslate[local_c][1]);
+            }
+        }
+    }
+    field_0x9e = MAKEFILEID(&field_0x62);
+    return field_0x9e;
+}
 
 VA(0x004c9180, 0x26)
 void resourceManager::Read13(signed char *param_1)
