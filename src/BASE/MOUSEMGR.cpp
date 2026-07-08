@@ -52,16 +52,16 @@ int mouseManager::Open(int id)
 {
     field_0x7e = 0;
     m_savedUnderlying = new bitmap(0x21, 0x42, 0x40);
-    field_0x5e = 0x13f;
-    field_0x62 = 0xef;
+    m_savedW = 0x13f;
+    m_savedH = 0xef;
     field_0x6e = 0x140;
     field_0x66 = 0x13f;
     field_0x6a = 0xef;
-    field_0x56 = 0x140;
-    field_0x46 = 0;
+    m_mouseX = 0x140;
+    m_cursorSizeIndex = 0;
     field_0x4a = 0;
     field_0x72 = 0xf0;
-    field_0x5a = 0xf0;
+    m_mouseY = 0xf0;
     if (gbColorMice != 0)
         ShowCursor(0);
     field_0xc = 0x40;
@@ -159,15 +159,15 @@ void mouseManager::MouseCoords(int &x, int &y)
 VA(0x004c9f20, 0xa2)
 void mouseManager::SaveAndDraw(void)
 {
-    int w = iMouseSize[field_0x46][0];
+    int w = iMouseSize[m_cursorSizeIndex][0];
     if (640 < field_0x66 + w)
         w = 640 - field_0x66;
     field_0x76 = w;
-    int h = iMouseSize[field_0x46][1];
+    int h = iMouseSize[m_cursorSizeIndex][1];
     if (480 < field_0x6a + h)
         h = 480 - field_0x6a;
     field_0x7a = h;
-    gpWindowManager->m_screen->CopyToCareful(m_savedUnderlying, 0, 0, field_0x5e, field_0x62,
+    gpWindowManager->m_screen->CopyToCareful(m_savedUnderlying, 0, 0, m_savedW, m_savedH,
                                                field_0x76, field_0x7a);
     IconToBitmap(m_cursorIcon, gpWindowManager->m_screen, field_0x66, field_0x6a, m_cursorFrame,
                  1, 0, 0, 640, 480, 0);
@@ -176,7 +176,7 @@ void mouseManager::SaveAndDraw(void)
 VA(0x004c9fd0, 0x29)
 void mouseManager::RestoreUnderlying(void)
 {
-    m_savedUnderlying->CopyToCareful(gpWindowManager->m_screen, field_0x5e, field_0x62, 0, 0,
+    m_savedUnderlying->CopyToCareful(gpWindowManager->m_screen, m_savedW, m_savedH, 0, 0,
                               field_0x76, field_0x7a);
 }
 
@@ -204,9 +204,9 @@ void mouseManager::ReallyShowPointer(void)
             GetCursorPos(&gMouseCheckPt);
             ScreenToClient(hwndApp, &gMouseCheckPt);
             int x = (gMouseCheckPt.x * 640) / iMainWinScreenWidth;
-            field_0x56 = x;
+            m_mouseX = x;
             int y = (gMouseCheckPt.y * 480) / iMainWinScreenHeight;
-            field_0x5a = y;
+            m_mouseY = y;
             CheckChangeCursor(x, y, 0);
         }
         NewUpdate(1);
@@ -232,9 +232,9 @@ void mouseManager::ShowColorPointer(void)
             GetCursorPos(&gMouseCheckPt);
             ScreenToClient(hwndApp, &gMouseCheckPt);
             int x = (gMouseCheckPt.x * 640) / iMainWinScreenWidth;
-            field_0x56 = x;
+            m_mouseX = x;
             int y = (gMouseCheckPt.y * 480) / iMainWinScreenHeight;
-            field_0x5a = y;
+            m_mouseY = y;
             CheckChangeCursor(x, y, 0);
         }
         NewUpdate(1);
@@ -252,9 +252,9 @@ void mouseManager::CheckUpdateMousePos(void)
         GetCursorPos(&gMouseCheckPt);
         ScreenToClient(hwndApp, &gMouseCheckPt);
         int x = (gMouseCheckPt.x * 640) / iMainWinScreenWidth;
-        field_0x56 = x;
+        m_mouseX = x;
         int y = (gMouseCheckPt.y * 480) / iMainWinScreenHeight;
-        field_0x5a = y;
+        m_mouseY = y;
         CheckChangeCursor(x, y, 0);
     }
 }
@@ -295,9 +295,9 @@ void mouseManager::SetColorMice(int param_1)
                 GetCursorPos(&gMouseCheckPt);
                 ScreenToClient(hwndApp, &gMouseCheckPt);
                 int x = (gMouseCheckPt.x * 640) / iMainWinScreenWidth;
-                field_0x56 = x;
+                m_mouseX = x;
                 int y = (gMouseCheckPt.y * 480) / iMainWinScreenHeight;
-                field_0x5a = y;
+                m_mouseY = y;
                 CheckChangeCursor(x, y, 0);
             }
             NewUpdate(1);

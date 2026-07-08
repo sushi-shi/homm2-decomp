@@ -20,13 +20,13 @@ public:
     int    m_cursorFrame;  // +0x3a
     icon  *m_cursorIcon;  // +0x3e  the loaded cursor icon
     int    m_cursorType;  // +0x42
-    int    field_0x46;  // +0x46
+    int    m_cursorSizeIndex;  // +0x46
     int    field_0x4a;  // +0x4a
     char _pad_0x4e[0x8];
-    int    field_0x56;  // +0x56
-    int    field_0x5a;  // +0x5a
-    int    field_0x5e;  // +0x5e
-    int    field_0x62;  // +0x62
+    int    m_mouseX;  // +0x56
+    int    m_mouseY;  // +0x5a
+    int    m_savedW;  // +0x5e
+    int    m_savedH;  // +0x62
     int    field_0x66;  // +0x66
     int    field_0x6a;  // +0x6a
     int    field_0x6e;  // +0x6e
