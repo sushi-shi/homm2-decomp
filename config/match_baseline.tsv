@@ -366,7 +366,7 @@ BASE/WINMGR	empty_stub	0.0000
 BASE/bmap2	?BlitBitmap@@YIXPAVbitmap@@HHHH0HH@Z	88.0000	12e9d721d9ce
 BASE/bmap2	?DimBitmapArea@@YIXPAVbitmap@@HHHHH@Z	84.2000	f38a7483416e
 BASE/bmap2	?FillBitmapArea@@YIXPAVbitmap@@HHHHH@Z	95.4545	c9fee5b7b412
-BASE/bmap2	?FillBitmapAreaClip@@YIXPAVbitmap@@HHHHHHHHH@Z	94.2222	5e98d96015af
+BASE/bmap2	?FillBitmapAreaClip@@YIXPAVbitmap@@HHHHHHHHH@Z	94.4444	5e98d96015af
 BASE/droplist	??0dropListWidget@@QAE@XZ	100.0000	36ab848d613b
 BASE/droplist	??1dropListWidget@@UAE@XZ	99.9535	2a86be8a60bf
 BASE/droplist	??_EdropListWidget@@UAEPAXI@Z	0.0000	
@@ -427,7 +427,7 @@ BASE/soundmgr	?StopSample@soundManager@@QAEXPAU_SAMPLE@@@Z	68.3555	c732e7d994b1
 BASE/soundmgr	?SwitchAmbientMusic@soundManager@@QAEXH@Z	92.5541	8e40ee0b54cd
 BASE/soundmgr	?UpdateTimers@@YGXK@Z	100.0000	ad5307a49083
 BASE/soundmgr	?ValidatePreviousPosition@soundManager@@QAEXH@Z	91.8571	6f113b1a1b11
-BASE/soundmgr	?WAVE_init_driver@@YIPAU_DIG_DRIVER@@KGGG@Z	17.4070	f0a1a104f5d0
+BASE/soundmgr	?WAVE_init_driver@@YIPAU_DIG_DRIVER@@KGGG@Z	61.9535	53e539d4de86
 EDITOR/mapcell	??0fullMap@@QAE@XZ	100.0000	45ce230d46da
 EDITOR/mapcell	??1fullMap@@QAE@XZ	100.0000	4a7136cc2d4e
 EDITOR/mapcell	?ChangeTilesetIndex@fullMap@@QAEXPAVmapCell@@HHHHHH@Z	99.0950	f923299e804c
