@@ -404,11 +404,11 @@ BASE/soundmgr	?CDPoll@soundManager@@QAEXXZ	79.6721	0384855e2f40
 BASE/soundmgr	?CDSetVolume@soundManager@@QAEXHH@Z	75.9355	d537624ee148
 BASE/soundmgr	?CDShutdown@soundManager@@QAEXXZ	86.7000	49ece490b489
 BASE/soundmgr	?CDStartup@soundManager@@QAEXXZ	73.5961	de7c73a3f01d
-BASE/soundmgr	?CDStop@soundManager@@QAEXXZ	91.3636	7190f600b180
+BASE/soundmgr	?CDStop@soundManager@@QAEXXZ	100.0000	e48aa4ca9583
 BASE/soundmgr	?Close@soundManager@@UAEXXZ	84.6053	3f023007c7e3
 BASE/soundmgr	?ConvertVolume@soundManager@@QAEHHH@Z	75.7115	402e179e57e9
 BASE/soundmgr	?DigitalReport@soundManager@@QAEJPAU_SAMPLE@@F@Z	54.5435	d44850ca587f
-BASE/soundmgr	?ForcePollSound@soundManager@@QAEXXZ	92.0000	9e09935a2881
+BASE/soundmgr	?ForcePollSound@soundManager@@QAEXXZ	100.0000	2fbc860cf1db
 BASE/soundmgr	?GetNumberCDDrives@soundManager@@QAEXXZ	100.0000	fde24968c623
 BASE/soundmgr	?HandleMCIError@@YIXHPAD@Z	99.6774	01384b3bfb23
 BASE/soundmgr	?Main@soundManager@@UAEHAAUtag_message@@@Z	100.0000	e76ae8c4e766
@@ -426,7 +426,7 @@ BASE/soundmgr	?StopAllSamples@soundManager@@QAEXH@Z	82.8429	ebd92c0ecfb5
 BASE/soundmgr	?StopSample@soundManager@@QAEXPAU_SAMPLE@@@Z	68.3555	c732e7d994b1
 BASE/soundmgr	?SwitchAmbientMusic@soundManager@@QAEXH@Z	92.5541	8e40ee0b54cd
 BASE/soundmgr	?UpdateTimers@@YGXK@Z	100.0000	ad5307a49083
-BASE/soundmgr	?ValidatePreviousPosition@soundManager@@QAEXH@Z	91.8571	6f113b1a1b11
+BASE/soundmgr	?ValidatePreviousPosition@soundManager@@QAEXH@Z	91.8571	c809c9018b27
 BASE/soundmgr	?WAVE_init_driver@@YIPAU_DIG_DRIVER@@KGGG@Z	61.9535	53e539d4de86
 EDITOR/mapcell	??0fullMap@@QAE@XZ	100.0000	45ce230d46da
 EDITOR/mapcell	??1fullMap@@QAE@XZ	100.0000	4a7136cc2d4e

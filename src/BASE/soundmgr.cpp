@@ -34,7 +34,7 @@ void soundManager::ValidatePreviousPosition(int param_1)
 {
     unsigned int local_18[5];
     int local_20;
-    if (param_1 < 0 || 0x3b < param_1)
+    if (param_1 < 0 || 0x3b <= param_1)
         local_20 = 0;
     else
         local_20 = 1;
@@ -54,23 +54,25 @@ VA(0x004cb770, 0x13c)
 void soundManager::CDStop(void)
 {
     unsigned int local_18[5];
-    if (gbNoSound == 0 && field_0x69a != 0) {
-        wsprintfA(reinterpret_cast<char *>(&CommandString), "stop CD wait");
+    if (gbNoSound != 0)
+        return;
+    if (field_0x69a == 0)
+        return;
+    wsprintfA(reinterpret_cast<char *>(&CommandString), "stop CD wait");
+    nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
+                               reinterpret_cast<char *>(&lpszReturnString), 0xff, 0);
+    if (nMCIError != 0)
+        HandleMCIError(nMCIError, reinterpret_cast<char *>(&CommandString));
+    if (stricmp(reinterpret_cast<char *>(&lpszReturnString), "stopped") != 0 && field_0x578 >= 0) {
+        wsprintfA(reinterpret_cast<char *>(&CommandString), "status CD position");
         nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
-                                   reinterpret_cast<char *>(&lpszReturnString), 0xff, 0);
+                                   reinterpret_cast<char *>(local_18), 0x14, 0);
         if (nMCIError != 0)
             HandleMCIError(nMCIError, reinterpret_cast<char *>(&CommandString));
-        if (stricmp(reinterpret_cast<char *>(&lpszReturnString), "stopped") != 0 && field_0x578 >= 0) {
-            wsprintfA(reinterpret_cast<char *>(&CommandString), "status CD position");
-            nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
-                                       reinterpret_cast<char *>(local_18), 0x14, 0);
-            if (nMCIError != 0)
-                HandleMCIError(nMCIError, reinterpret_cast<char *>(&CommandString));
-            strcpy(CDPreviousPosition[field_0x578], reinterpret_cast<char *>(local_18));
-            ValidatePreviousPosition(field_0x578);
-        }
-        CDPlaying = 0;
+        strcpy(CDPreviousPosition[field_0x578], reinterpret_cast<char *>(local_18));
+        ValidatePreviousPosition(field_0x578);
     }
+    CDPlaying = 0;
 }
 
 VA(0x004cb8b0, 0xb3)
@@ -629,10 +631,10 @@ void soundManager::AdjustMusicVolumes(void)
 VA(0x004cd120, 0x3a)
 void soundManager::ForcePollSound(void)
 {
-    if (gbNoSound == 0) {
-        field_0x579 = 1;
-        PollSound();
-    }
+    if (gbNoSound != 0)
+        return;
+    field_0x579 = 1;
+    PollSound();
 }
 
 VA(0x004cd160, 0xe3)
