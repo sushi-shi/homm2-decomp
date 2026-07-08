@@ -6,6 +6,8 @@
 #include <va.h>
 #include <BASE/dropListWidget.h>
 #include <BASE/bitmap.h>
+#include <BASE/resourceManager.h>
+#include <BASE/Misc.h>
 #include <BASE/icon.h>
 #include <BASE/font.h>
 #include <BASE/heroWindow.h>
@@ -21,7 +23,16 @@ dropListWidget::dropListWidget(void) : widget(0, 0, 0, 0, 0, 0)
 }
 
 VA(0x004dbf60, 0x7c)
-dropListWidget::~dropListWidget() {}
+dropListWidget::~dropListWidget()
+{
+    gpResourceManager->Dispose(field_0x20);
+    gpResourceManager->Dispose(field_0x24);
+    if (field_0xb0 != 0)
+        delete field_0xb0;
+    for (int i = 0; i < field_0x3c; i++)
+        BaseFree(field_0x40[i], __FILE__, __LINE__);
+    BaseFree(field_0x40, __FILE__, __LINE__);
+}
 
 VA(0x004dbfe0, 0x21d)
 void dropListWidget::Read(void) {}
