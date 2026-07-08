@@ -616,10 +616,12 @@ long soundManager::DigitalReport(struct _SAMPLE *param_1, short param_2)
         return 0;
     if (m_digitalDriver == 0)
         return 0;
-    if (param_2 == 1)
+    switch (param_2) {
+    case 1:
         return _AIL_sample_volume_4(param_1);
-    if (param_2 == 4)
+    case 4:
         return _AIL_sample_status_4(param_1) == 4;
+    }
     return 0;
 }
 

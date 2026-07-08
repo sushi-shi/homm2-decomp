@@ -407,7 +407,7 @@ BASE/soundmgr	?CDStartup@soundManager@@QAEXXZ	71.2885	cd4e862e5a9c
 BASE/soundmgr	?CDStop@soundManager@@QAEXXZ	100.0000	e48aa4ca9583
 BASE/soundmgr	?Close@soundManager@@UAEXXZ	90.3947	4cbf90a16cb2
 BASE/soundmgr	?ConvertVolume@soundManager@@QAEHHH@Z	100.0000	f491b7b1f33d
-BASE/soundmgr	?DigitalReport@soundManager@@QAEJPAU_SAMPLE@@F@Z	69.6087	fcaddd4d3e10
+BASE/soundmgr	?DigitalReport@soundManager@@QAEJPAU_SAMPLE@@F@Z	91.8261	4d0ead671efb
 BASE/soundmgr	?ForcePollSound@soundManager@@QAEXXZ	100.0000	2fbc860cf1db
 BASE/soundmgr	?GetNumberCDDrives@soundManager@@QAEXXZ	100.0000	fde24968c623
 BASE/soundmgr	?HandleMCIError@@YIXHPAD@Z	99.8387	01384b3bfb23
