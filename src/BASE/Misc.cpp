@@ -213,7 +213,20 @@ VA(0x004c6070, 0xa6)
 void LogTruncate(void) {}
 
 VA(0x004c6120, 0x9e)
-void LogStr(char *) {}
+void LogStr(char *param_1)
+{
+    char local_1f4[500];
+    if (giDebugLevel > 1) {
+        FILE *f = fopen("KB.LOG", "a");
+        if (f != 0) {
+            strcpy(local_1f4, param_1);
+            strcat(local_1f4, "\n");
+            fputs(local_1f4, f);
+            fclose(f);
+        }
+        OutputDebugStringA(local_1f4);
+    }
+}
 
 VA(0x004c61c0, 0x224)
 void LogInt(char *, int, int, int, int, int, int, int) {}
