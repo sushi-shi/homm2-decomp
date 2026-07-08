@@ -129,9 +129,9 @@ BASE/DIMMER	??_EdimmerWidget@@UAEPAXI@Z	0.0000
 BASE/DIMMER	?Draw@dimmerWidget@@UAEXXZ	100.0000	a1b9b89be0a2
 BASE/DIMMER	?Main@dimmerWidget@@UAEHAAUtag_message@@@Z	100.0000	01068e5417a9
 BASE/DIMMER	?Read@dimmerWidget@@QAEXXZ	100.0000	0459d1442580
-BASE/EXEC	??0executive@@QAE@XZ	28.5714	98bd04bb73cc
+BASE/EXEC	??0executive@@QAE@XZ	100.0000	30f736b29c54
 BASE/EXEC	?AddManager@executive@@QAEHPAVbaseManager@@H@Z	2.2727	ba56d597b932
-BASE/EXEC	?CallManager@executive@@QAEXPAVbaseManager@@@Z	2.9412	30045ed6d82c
+BASE/EXEC	?CallManager@executive@@QAEXPAVbaseManager@@@Z	100.0000	391245ea8bb3
 BASE/EXEC	?DoDialog@executive@@QAEHPAVbaseManager@@@Z	2.3750	a8496415c620
 BASE/EXEC	?InitSystem@executive@@QAEHXZ	3.6364	94d03986546b
 BASE/EXEC	?MainLoop@executive@@QAEXXZ	1.1494	3c515846ece9
