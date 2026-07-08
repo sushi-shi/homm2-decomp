@@ -27,10 +27,18 @@ unsigned char * gIcEntry;
 unsigned int gIcCnt2;
 
 // @early-stop
-// Full RLE sprite decoder recovered + compiles, but /O2 codegen is ~2x retail (503 vs 232 instr)
-// -> 0%: the 16 file-static scratch globals + row-ptr arithmetic need structural tuning to match
-// the retail register/global usage. Logic is faithful; kept for codegen-matching. Unlocks the 11-TU
-// Icon*2b* family once tuned (all share this decoder).
+// Full RLE sprite decoder recovered + compiles, but /O2 codegen is ~2x-3x retail -> 0%.
+// INVESTIGATED (findings for the next codegen pass; unlocks the 11-TU Icon*2b* family — all share this):
+//   1. The scratch state IS global (retail stores to 0x534c20+ via DIR32 relocs — the delinker just
+//      NAMES them ?_C@_0..@ string-constant-style, not ?gIc*). So keep them file-static globals here;
+//      making them locals is WRONG (the /O2 DCE elides the dead stores -> even further off). Confirmed
+//      via `llvm-objdump -r build/delink/BASE/Icon2b.c.obj` (relocs: ?_C@... + ?uDimPal, no ?gIc*).
+//   2. The real gap is the ENTRY ACCESS: retail keeps the bitmap base (esi) and 13*index (ebx=lea
+//      [eax+4*(eax*3)]) in SEPARATE registers and reads fields via SIB `[ebx+esi+off]`; mine
+//      materialises `iEntry = base + index*0xd` then reads `[iEntry+off]` (extra adds/spills).
+//      FIX TO TRY: model the icon entry table as a packed 13-byte struct ARRAY and index it
+//      (entries[param_5].member) so the compiler emits base+index*stride+off SIB instead of a
+//      materialised pointer. Same shape likely fixes gIcSrc/gIcRow addressing.
 VA(0x004d0570, 0x4ed)
 void IconToBitmap(class icon *param_1, class bitmap *param_2, int param_3, int param_4, int param_5,
                   int param_6, int param_7, int param_8, int param_9, int param_10, int param_11)
