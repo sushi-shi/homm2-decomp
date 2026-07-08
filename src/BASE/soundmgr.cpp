@@ -728,10 +728,10 @@ void soundManager::PlayAmbientMusic(int param_1, long param_2, int param_3)
     if (gMidiEnabled == 0) {
         m_currentTrack = static_cast<char>(param_1);
     } else {
-        if (gCdMusic == 0)
-            MIDIPlay(param_1);
-        else
+        if (gCdMusic != 0)
             CDPlay(param_1, param_2, -1, 0);
+        else
+            MIDIPlay(param_1);
         m_currentTrack = static_cast<char>(param_1);
     }
 }
