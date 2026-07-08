@@ -30,7 +30,27 @@ VA(0x004cb6a0, 0xc7)
 void soundManager::ValidatePreviousPosition(int) {}
 
 VA(0x004cb770, 0x13c)
-void soundManager::CDStop(void) {}
+void soundManager::CDStop(void)
+{
+    unsigned int local_18[5];
+    if (gbNoSound == 0 && field_0x69a != 0) {
+        wsprintfA(reinterpret_cast<char *>(&CommandString), "stop CD wait");
+        nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
+                                   reinterpret_cast<char *>(&lpszReturnString), 0xff, 0);
+        if (nMCIError != 0)
+            HandleMCIError(nMCIError, reinterpret_cast<char *>(&CommandString));
+        if (stricmp(reinterpret_cast<char *>(&lpszReturnString), "stopped") != 0 && field_0x578 >= 0) {
+            wsprintfA(reinterpret_cast<char *>(&CommandString), "status CD position");
+            nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
+                                       reinterpret_cast<char *>(local_18), 0x14, 0);
+            if (nMCIError != 0)
+                HandleMCIError(nMCIError, reinterpret_cast<char *>(&CommandString));
+            strcpy(CDPreviousPosition[field_0x578], reinterpret_cast<char *>(local_18));
+            ValidatePreviousPosition(field_0x578);
+        }
+        CDPlaying = 0;
+    }
+}
 
 VA(0x004cb8b0, 0xb3)
 int soundManager::CDIsPlaying(void)
