@@ -76,7 +76,7 @@ void heroWindowManager::Close(void)
     if (field_0x32 == 1) {
         heroWindow *w = field_0x3a;
         while (w != 0) {
-            heroWindow *prev = w->field_0x8;
+            heroWindow *prev = w->prevWindow;
             RemoveWindow(w);
             w = prev;
         }
@@ -93,7 +93,7 @@ int heroWindowManager::Main(struct tag_message &msg)
     int result = 0;
     heroWindow *w = field_0x3a;
     while (w != 0 && (result = w->BroadcastMessage(msg), result < 1 || result > 2))
-        w = w->field_0x8;
+        w = w->prevWindow;
     return result;
 }
 
@@ -119,37 +119,37 @@ void heroWindowManager::AddWindow(class heroWindow *w, int param_2, int param_3)
 {
     heroWindow *cur = field_0x3a;
     int z = 0;
-    if ((w->field_0x20 & 1) == 0)
+    if ((w->winFlags & 1) == 0)
         z = param_2;
     if (z == -1 && (z = 0, cur != 0))
-        z = cur->field_0x0 + 1;
+        z = cur->zOrder + 1;
     if (z != 0 && field_0x36 == 0)
         return;
     if (w->Open(z, param_3) != 0)
         return;
     if (cur != 0) {
         do {
-            if (cur->field_0x0 <= z)
+            if (cur->zOrder <= z)
                 break;
-            cur = cur->field_0x8;
+            cur = cur->prevWindow;
         } while (cur != 0);
         if (cur != 0) {
-            if (cur->field_0x4 == 0) {
-                w->field_0x4 = 0;
-                w->field_0x8 = field_0x3a;
-                field_0x3a->field_0x4 = w;
+            if (cur->nextWindow == 0) {
+                w->nextWindow = 0;
+                w->prevWindow = field_0x3a;
+                field_0x3a->nextWindow = w;
                 field_0x3a = w;
             } else {
-                w->field_0x8 = cur;
-                w->field_0x4 = cur->field_0x4;
-                cur->field_0x4->field_0x8 = w;
-                cur->field_0x4 = w;
+                w->prevWindow = cur;
+                w->nextWindow = cur->nextWindow;
+                cur->nextWindow->prevWindow = w;
+                cur->nextWindow = w;
             }
             goto done;
         }
     }
-    w->field_0x8 = 0;
-    w->field_0x4 = field_0x36;
+    w->prevWindow = 0;
+    w->nextWindow = field_0x36;
     field_0x36 = w;
     if (field_0x3a == 0)
         field_0x3a = w;
@@ -164,22 +164,22 @@ void heroWindowManager::RemoveWindow(class heroWindow *w)
     if (w != 0) {
         w->Close();
         if (field_0x36 == w) {
-            heroWindow *next = w->field_0x4;
+            heroWindow *next = w->nextWindow;
             field_0x36 = next;
             if (next == 0)
                 field_0x3a = 0;
             else
-                next->field_0x8 = 0;
+                next->prevWindow = 0;
         } else {
-            heroWindow *prev = w->field_0x8;
+            heroWindow *prev = w->prevWindow;
             if (field_0x3a == w) {
                 field_0x3a = prev;
-                prev->field_0x4 = 0;
+                prev->nextWindow = 0;
             } else {
-                prev->field_0x4 = w->field_0x4;
+                prev->nextWindow = w->nextWindow;
             }
-            if (w->field_0x4 != 0)
-                w->field_0x4->field_0x8 = w->field_0x8;
+            if (w->nextWindow != 0)
+                w->nextWindow->prevWindow = w->prevWindow;
         }
         if (field_0x42 == w)
             field_0x42 = 0;
@@ -266,7 +266,7 @@ void heroWindowManager::UpdateScreenRegion(int x, int y, int w, int h)
 VA(0x004cb010, 0x18)
 void heroWindowManager::RedrawScreen(void)
 {
-    for (heroWindow *w = field_0x36; w != 0; w = w->field_0x4)
+    for (heroWindow *w = field_0x36; w != 0; w = w->nextWindow)
         w->DrawWindow();
 }
 
