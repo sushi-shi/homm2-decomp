@@ -190,6 +190,7 @@ with open(os.path.join(REPO,"build","gen","symbol_names.csv"),"w") as f:
     CONST_ALIASES = {
         0x128d28: "?gMidiEnabled@@3HA",    # gConfig+0x08  int  MIDI music volume 0-10
         0x128d2c: "?gSampleVolume@@3HA",   # gConfig+0x0c  int  sample/CD volume 0-10
+        0x128dca: "?gCdMusic@@3DA",        # gConfig+0xaa  char CD-vs-MIDI music mode
     }
     for tgt in sorted(consts):
         rva = tgt - imgbase
