@@ -257,7 +257,114 @@ struct _DIG_DRIVER *WAVE_init_driver(unsigned long param_1, unsigned short param
 }
 
 VA(0x004cc560, 0x3a8)
-int soundManager::Open(int) { return 0; }
+int soundManager::Open(int param_1)
+{
+    SHORT SVar1;
+    struct _DIG_DRIVER *p_Var2;
+    int local_c;
+    char cStack_7;
+    field_0x6a2 = 0;
+    field_0x6a6 = 0;
+    field_0x69a = 0;
+    field_0x69e = 0;
+    memset(bSaveMusicPosition, 0, 0x3c);
+    memset(bMusicIsLooping, 0, 0x3c);
+    bSaveMusicPosition[0x10] = 1;
+    bSaveMusicPosition[0x12] = 1;
+    bSaveMusicPosition[0xe] = 1;
+    bSaveMusicPosition[0xf] = 1;
+    bSaveMusicPosition[0xb] = 1;
+    bSaveMusicPosition[0xd] = 1;
+    bSaveMusicPosition[0x11] = 1;
+    bSaveMusicPosition[0xc] = 1;
+    bSaveMusicPosition[0x1c] = 1;
+    bSaveMusicPosition[0x2a] = 1;
+    bMusicIsLooping[0x10] = 1;
+    bMusicIsLooping[0x12] = 1;
+    bMusicIsLooping[0xe] = 1;
+    bMusicIsLooping[0xf] = 1;
+    bMusicIsLooping[0xb] = 1;
+    bMusicIsLooping[0xd] = 1;
+    bMusicIsLooping[0x11] = 1;
+    bMusicIsLooping[0xc] = 1;
+    bMusicIsLooping[8] = 1;
+    bMusicIsLooping[9] = 1;
+    bMusicIsLooping[5] = 1;
+    bMusicIsLooping[6] = 1;
+    bMusicIsLooping[0xa] = 1;
+    bMusicIsLooping[7] = 1;
+    bMusicIsLooping[0x2a] = 1;
+    bMusicIsLooping[0x1c] = 1;
+    bMusicIsLooping[0x2b] = 1;
+    bMusicIsLooping[0x16] = 1;
+    bMusicIsLooping[0x18] = 1;
+    for (local_c = 2; local_c < 5; local_c++)
+        bMusicIsLooping[local_c] = 1;
+    SVar1 = GetAsyncKeyState(0x75);
+    cStack_7 = static_cast<char>(static_cast<unsigned short>(SVar1) >> 8);
+    if (cStack_7 != 0) {
+        gCdMusic = 0;
+        WritePrefs();
+    }
+    SVar1 = GetAsyncKeyState(0x76);
+    cStack_7 = static_cast<char>(static_cast<unsigned short>(SVar1) >> 8);
+    if (cStack_7 != 0) {
+        gCdMusic = 1;
+        WritePrefs();
+    }
+    field_0x578 = static_cast<char>(0xff);
+    if (gbNoSound == 0) {
+        field_0x579 = 0;
+        field_0x57a = field_0x579;
+        field_0x57b = field_0x57a;
+        _AIL_startup_0();
+        if (gCdMusic == 0) {
+            MIDIStartup();
+            if (field_0x69e == 0) {
+                CDStartup();
+                if (field_0x69a == 0) {
+                    gMidiEnabled = 0;
+                    WritePrefs();
+                } else {
+                    gCdMusic = 1;
+                    WritePrefs();
+                }
+            }
+        } else {
+            CDStartup();
+            if (field_0x69a == 0) {
+                MIDIStartup();
+                if (field_0x69e == 0) {
+                    gMidiEnabled = 0;
+                    WritePrefs();
+                } else {
+                    gCdMusic = 0;
+                    WritePrefs();
+                }
+            }
+        }
+        field_0x684 = 1;
+        memset(&field_0x3e, 0, 0xae);
+        if (gbDontTryDigital == 0 && field_0x36 == 0) {
+            p_Var2 = WAVE_init_driver(0x5622, 8, 1, 0);
+            field_0x36 = reinterpret_cast<int>(p_Var2);
+        }
+        if (field_0x36 == 0) {
+            gSampleVolume = 0;
+            WritePrefs();
+        }
+        AllocateSampleHandles();
+        field_0x3e = 1;
+        field_0x50 = 0;
+        memset(field_0x590, 0, 0xf0);
+        field_0x680 = 1;
+    }
+    field_0xc = 0x10;
+    field_0x10 = -1;
+    field_0x32 = 1;
+    strcpy(name, "soundManager");
+    return 0;
+}
 
 VA(0x004cc910, 0x91)
 void soundManager::AllocateSampleHandles(void)

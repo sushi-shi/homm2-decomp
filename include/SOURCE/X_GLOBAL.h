@@ -300,7 +300,7 @@ DATA(0x00529020) extern unsigned long gTimeMark;
 DATA(0x00529024) extern char *EXPANSION_AGGREGATE_NAME;
 DATA(0x00529028) extern char (*cPlayerNames)[21];
 DATA(0x005290b4) extern class icon *gCurLoadedSpellIcon;
-DATA(0x005290b8) extern unsigned char *bSaveMusicPosition;
+DATA(0x005290b8) extern unsigned char bSaveMusicPosition[0x3c];
 DATA(0x005290f8) extern char *gcTCPAddress;
 DATA(0x00529110) extern unsigned char giSetupGameType;
 DATA(0x00529118) extern char *gLastFilename;
@@ -334,6 +334,6 @@ DATA(0x005298c8) extern char *gcCommandLine;
 DATA(0x00529914) extern int giMapChangeCtr;
 DATA(0x00529918) extern struct SMapChange *sMapChangeQueue;
 DATA(0x0052a184) extern int gbWaitForRemoteReceive;
-DATA(0x0052a188) extern unsigned char *bMusicIsLooping;
+DATA(0x0052a188) extern unsigned char bMusicIsLooping[0x3c];
 
 #endif // HOMM2_X_GLOBAL_H
