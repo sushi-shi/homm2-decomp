@@ -10,13 +10,15 @@ struct tag_message;
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class resource;
 class widget;
+class font;
+class icon;
 class listBoxWidget : public widget {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base widget = 0x20 bytes at 0x00 via ': public widget'; own fields below)
-    resource *field_0x20;  // +0x20  disposed resource
-    resource *field_0x24;  // +0x24  disposed resource
+    font   *field_0x20;  // +0x20  the list font
+    icon   *field_0x24;  // +0x24  the list icon
     short  field_0x28;  // +0x28
     short  field_0x2a;  // +0x2a
     short  field_0x2c;  // +0x2c
