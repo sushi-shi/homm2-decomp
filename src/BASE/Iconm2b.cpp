@@ -35,9 +35,9 @@ void MonoIconToBitmap(class icon *param_1, class bitmap *param_2, int param_3, i
     unsigned int uVar6, uVar7;
     unsigned char uVar8;
     int *puVar10;
-    IconEntry *entries = reinterpret_cast<IconEntry *>(param_1->field_0x12);
+    IconEntry *entries = reinterpret_cast<IconEntry *>(param_1->m_data);
     gMonoEntry = &entries[param_5];
-    gMonoSrc = reinterpret_cast<unsigned char *>(param_1->field_0x12) + gMonoEntry->srcOffset;
+    gMonoSrc = reinterpret_cast<unsigned char *>(param_1->m_data) + gMonoEntry->srcOffset;
     gMonoX0 = param_3 + gMonoEntry->x;
     gMonoY = param_4 + gMonoEntry->y;
     if (param_7 != 0) {

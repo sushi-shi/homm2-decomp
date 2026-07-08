@@ -16,8 +16,8 @@ textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, 0)
 {
     field_0x28 = 1;
     field_0x2a = 1;
-    field_0x24 = 0;
-    field_0x20 = 0;
+    m_font = 0;
+    m_text = 0;
     field_0x14 = 0x200;
 }
 
@@ -26,11 +26,11 @@ textWidget::textWidget(short p1, short p2, short p3, short p4, char *p5, char *p
                        short p8, short p9, short p10)
     : widget(p1, p2, p3, p4, p8, p9)
 {
-    field_0x24 = gpResourceManager->GetFont(p6);
+    m_font = gpResourceManager->GetFont(p6);
     field_0x28 = p7;
     field_0x2a = static_cast<char>(p10);
     field_0x14 = 0x200;
-    field_0x20 = p5;
+    m_text = p5;
 }
 
 VA(0x004d1160, 0xef)
@@ -42,11 +42,11 @@ void textWidget::Read(void)
     m_width = gpResourceManager->ReadWord();
     m_height = gpResourceManager->ReadWord();
     short len = gpResourceManager->ReadWord();
-    field_0x20 = static_cast<char *>(BaseAlloc(len, __FILE__, __LINE__));
-    gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(field_0x20), len);
+    m_text = static_cast<char *>(BaseAlloc(len, __FILE__, __LINE__));
+    gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(m_text), len);
     gpResourceManager->Read13(reinterpret_cast<signed char *>(local_10));
     gpResourceManager->SavePosition();
-    field_0x24 = gpResourceManager->GetFont(local_10);
+    m_font = gpResourceManager->GetFont(local_10);
     gpResourceManager->RestorePosition();
     field_0x28 = gpResourceManager->ReadWord() & 0xff;
     field_0x2a = static_cast<char>(gpResourceManager->ReadWord());
@@ -58,8 +58,8 @@ void textWidget::Read(void)
 VA(0x004d1250, 0x30)
 textWidget::~textWidget()
 {
-    gpResourceManager->Dispose(field_0x24);
-    BaseFree(field_0x20, __FILE__, __LINE__);
+    gpResourceManager->Dispose(m_font);
+    BaseFree(m_text, __FILE__, __LINE__);
 }
 
 VA(0x004d1280, 0x210)
@@ -101,16 +101,16 @@ LAB_004d12c4:
                     if (m_id == param_1.field8) {
                         pcVar8 = param_1.text;
                         if (field_0x14 != 0x200 && field_0x14 != 0x4000) {
-                            field_0x20 = pcVar8;
+                            m_text = pcVar8;
                             return 1;
                         }
                         uVar5 = strlen(pcVar8) & 0xffff;
-                        uVar6 = strlen(field_0x20);
+                        uVar6 = strlen(m_text);
                         if (uVar6 < uVar5) {
-                            BaseFree(field_0x20, __FILE__, __LINE__);
-                            field_0x20 = static_cast<char *>(BaseAlloc(uVar5 + 5, __FILE__, __LINE__));
+                            BaseFree(m_text, __FILE__, __LINE__);
+                            m_text = static_cast<char *>(BaseAlloc(uVar5 + 5, __FILE__, __LINE__));
                         }
-                        strcpy(field_0x20, pcVar8);
+                        strcpy(m_text, pcVar8);
                         return 1;
                     }
                 } else if (param_1.field4 == 8 && m_id == param_1.field8) {
@@ -143,7 +143,7 @@ void textWidget::Draw(void)
     int color = 3;
     if ((m_flags & 8) == 0)
         color = field_0x28;
-    field_0x24->DrawBoundedString(field_0x20, m_x + m_owner->m_posX,
+    m_font->DrawBoundedString(m_text, m_x + m_owner->m_posX,
                                   m_y + m_owner->m_posY, m_width, m_height,
                                   color, field_0x2a);
 }
@@ -158,15 +158,15 @@ VA(0x004d14f0, 0xa2)
 void textWidget::SetText(char *param_1)
 {
     if (field_0x14 != 0x200 && field_0x14 != 0x4000) {
-        field_0x20 = param_1;
+        m_text = param_1;
         return;
     }
     unsigned short newLen = strlen(param_1);
-    if (strlen(field_0x20) < newLen) {
-        BaseFree(field_0x20, __FILE__, __LINE__);
-        field_0x20 = static_cast<char *>(BaseAlloc(newLen + 5, __FILE__, __LINE__));
+    if (strlen(m_text) < newLen) {
+        BaseFree(m_text, __FILE__, __LINE__);
+        m_text = static_cast<char *>(BaseAlloc(newLen + 5, __FILE__, __LINE__));
     }
-    strcpy(field_0x20, param_1);
+    strcpy(m_text, param_1);
 }
 
 

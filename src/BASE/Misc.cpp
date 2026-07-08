@@ -240,7 +240,7 @@ void FadeIn(int param_1)
     int local_8 = param_1;
     if (reinterpret_cast<int *>(&gConfig.pad[0x30])[giCurExe * 7] == 0)
         local_8 = param_1 * 2;
-    memset(pal->field_0x10, 0, 0x300);
+    memset(pal->m_data, 0, 0x300);
     int iVar3 = 0;
     do {
         if (0x3f < iVar3) {
@@ -255,16 +255,16 @@ void FadeIn(int param_1)
         signed char *pcVar4;
         if (iVar3 == 0x3f) {
             done = 1;
-            pcVar4 = gpBufferPalette->field_0x10;
+            pcVar4 = gpBufferPalette->m_data;
         } else {
             int iVar5 = 0;
             do {
-                if (0x3f - iVar3 < static_cast<int>(gpBufferPalette->field_0x10[iVar5]))
-                    pal->field_0x10[iVar5] =
-                        gpBufferPalette->field_0x10[iVar5] - static_cast<char>(0x3f - iVar3);
+                if (0x3f - iVar3 < static_cast<int>(gpBufferPalette->m_data[iVar5]))
+                    pal->m_data[iVar5] =
+                        gpBufferPalette->m_data[iVar5] - static_cast<char>(0x3f - iVar3);
                 iVar5++;
             } while (iVar5 < 0x300);
-            pcVar4 = pal->field_0x10;
+            pcVar4 = pal->m_data;
         }
         UpdatePalette(pcVar4);
         DelayTil(&local_4);
@@ -279,7 +279,7 @@ void FadeOut(int param_1)
     if (pal == 0)
         MemError();
     int bVar3 = 0;
-    memcpy(pal->field_0x10, gpBufferPalette->field_0x10, 0x300);
+    memcpy(pal->m_data, gpBufferPalette->m_data, 0x300);
     int iVar5 = 0;
     do {
         if (0x3f < iVar5) {
@@ -295,17 +295,17 @@ void FadeOut(int param_1)
             bVar3 = 1;
         int iVar6 = 0;
         do {
-            char cVar2 = pal->field_0x10[iVar6];
+            char cVar2 = pal->m_data[iVar6];
             if (cVar2 > 0) {
                 if (static_cast<char>(param_1) < cVar2)
-                    pal->field_0x10[iVar6] = cVar2 - static_cast<char>(param_1);
+                    pal->m_data[iVar6] = cVar2 - static_cast<char>(param_1);
                 else
-                    pal->field_0x10[iVar6] = 0;
+                    pal->m_data[iVar6] = 0;
             }
             iVar6++;
         } while (iVar6 < 0x300);
         iVar5 = iVar5 + param_1;
-        UpdatePalette(pal->field_0x10);
+        UpdatePalette(pal->m_data);
         DelayTil(&local_4);
     } while (1);
 }
@@ -449,10 +449,10 @@ void BitmapToScreen(class bitmap *bmp)
 VA(0x004c5e70, 0x3d)
 void SetPalette(signed char *param_1, int param_2)
 {
-    memcpy(gpBufferPalette->field_0x10, param_1, 0x300);
+    memcpy(gpBufferPalette->m_data, param_1, 0x300);
     memcpy(gCyclePal, param_1 + 0x282, 0x60);
     if (param_2 != 0)
-        UpdatePalette(gpBufferPalette->field_0x10);
+        UpdatePalette(gpBufferPalette->m_data);
 }
 
 VA(0x004c5eb0, 0x25)
@@ -647,7 +647,7 @@ void FadeToColorTable(unsigned char *param_1, int param_2)
     int uVar1 = gpWindowManager->m_updateFlags;
     gpWindowManager->m_updateFlags = 0;
     int iVar8 = 0;
-    unsigned char *puVar2 = reinterpret_cast<unsigned char *>(gpBufferPalette->field_0x10);
+    unsigned char *puVar2 = reinterpret_cast<unsigned char *>(gpBufferPalette->m_data);
     unsigned char *puVar3 = auStack_300;
     unsigned char *puVar4;
     do {

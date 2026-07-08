@@ -26,7 +26,7 @@ void CycleColors(int) {}
 VA(0x004caa80, 0x41)
 heroWindowManager::heroWindowManager(void) : baseManager()
 {
-    field_0x32 = 0;
+    m_active = 0;
     m_activeWindow = 0;
     m_focusWindow = 0;
     m_windowListTail = 0;
@@ -45,12 +45,12 @@ int heroWindowManager::Open(int param_1)
 {
     int i;
     InitVideo();
-    int *pal = reinterpret_cast<int *>(gpBufferPalette->field_0x10);
+    int *pal = reinterpret_cast<int *>(gpBufferPalette->m_data);
     for (i = 0xc0; i != 0; i--) {
         *pal = 0;
         pal++;
     }
-    SetPalette(gpBufferPalette->field_0x10, 1);
+    SetPalette(gpBufferPalette->m_data, 1);
     m_screen = new bitmap();
     if (m_screen == 0)
         MemError();
@@ -65,7 +65,7 @@ int heroWindowManager::Open(int param_1)
     }
     field_0x10 = param_1;
     field_0xc = 0x20;
-    field_0x32 = 1;
+    m_active = 1;
     strcpy(name, "heroWindowManager");
     return 0;
 }
@@ -73,7 +73,7 @@ int heroWindowManager::Open(int param_1)
 VA(0x004cabb0, 0x45)
 void heroWindowManager::Close(void)
 {
-    if (field_0x32 == 1) {
+    if (m_active == 1) {
         heroWindow *w = m_windowListTail;
         while (w != 0) {
             heroWindow *prev = w->m_prevWindow;
@@ -83,7 +83,7 @@ void heroWindowManager::Close(void)
         m_screen->m_pixels = 0;
         if (m_screen != 0)
             delete m_screen;
-        field_0x32 = 0;
+        m_active = 0;
     }
 }
 
@@ -207,7 +207,7 @@ int heroWindowManager::DoDialog(class heroWindow *param_1, int (*param_2)(struct
         AddWindow(param_1, -1, 1);
     if (param_3 != 0) {
         if (gPalette != 0)
-            SetPalette(gPalette->field_0x10, 0);
+            SetPalette(gPalette->m_data, 0);
         unsigned int uVar1 = gpWindowManager->m_updateFlags;
         gpWindowManager->m_updateFlags = 0;
         PollSound();
@@ -274,7 +274,7 @@ VA(0x004cb030, 0x80)
 void heroWindowManager::FadeScreen(int param_1, int param_2, class palette *pal)
 {
     if (pal != 0)
-        SetPalette(pal->field_0x10, 0);
+        SetPalette(pal->m_data, 0);
     if (param_1 != 0) {
         if (param_1 == 1) {
             gFadeSavedUpdate = m_updateFlags;
@@ -299,7 +299,7 @@ void heroWindowManager::ScreenShot(void)
     char local_10[16];
     sprintf(local_10, "SHOT%04d.PCX", m_screenshotIndex);
     CreatePCXFile(local_10, m_screen->m_pixels, 640, 480,
-                  reinterpret_cast<unsigned char *>(gPalette->field_0x10));
+                  reinterpret_cast<unsigned char *>(gPalette->m_data));
     m_screenshotIndex++;
     gpInputManager->Flush();
 }

@@ -22,7 +22,7 @@ button::button(void) : widget(0, 0, 0, 0, 0, 0)
     field_0x2c = 0;
     field_0x28 = 0;
     field_0x2a = -1;
-    field_0x20 = 0;
+    m_icon = 0;
 }
 
 VA(0x004dd4c0, 0x6e)
@@ -30,7 +30,7 @@ button::button(short int x, short int y, short int w, short int h, unsigned long
     : widget(x, y, w, h, p10, p11)
 {
     field_0x2c = iconId;
-    field_0x20 = gpResourceManager->GetIcon(iconId);
+    m_icon = gpResourceManager->GetIcon(iconId);
     field_0x24 = p6;
     field_0x26 = p7;
     field_0x28 = p8;
@@ -43,7 +43,7 @@ button::button(short int x, short int y, short int w, short int h, char *name, s
 {
     unsigned long id = gpResourceManager->MakeId(name, 1);
     field_0x2c = id;
-    field_0x20 = gpResourceManager->GetIcon(id);
+    m_icon = gpResourceManager->GetIcon(id);
     field_0x24 = p6;
     field_0x26 = p7;
     field_0x28 = p8;
@@ -61,7 +61,7 @@ void button::Read(void)
     gpResourceManager->Read13(reinterpret_cast<signed char *>(local_10));
     gpResourceManager->SavePosition();
     field_0x2c = gpResourceManager->MakeId(local_10, 1);
-    field_0x20 = gpResourceManager->GetIcon(field_0x2c);
+    m_icon = gpResourceManager->GetIcon(field_0x2c);
     gpResourceManager->RestorePosition();
     field_0x24 = gpResourceManager->ReadWord();
     field_0x26 = gpResourceManager->ReadWord();
@@ -74,7 +74,7 @@ void button::Read(void)
 VA(0x004dd6a0, 0x21)
 button::~button()
 {
-    gpResourceManager->Dispose(field_0x20);
+    gpResourceManager->Dispose(m_icon);
 }
 
 VA(0x004dd6d0, 0x595)
@@ -155,8 +155,8 @@ int button::Main(tag_message &param_1)
             if (iVar4 == 0x200 && param_1.field4 == 0x3c) {
                 if (param_1.field8 == field_0x2c) {
                     field_0x2c = reinterpret_cast<int>(param_1.text);
-                    gpResourceManager->Dispose(field_0x20);
-                    field_0x20 = gpResourceManager->GetIcon(reinterpret_cast<unsigned long>(param_1.text));
+                    gpResourceManager->Dispose(m_icon);
+                    m_icon = gpResourceManager->GetIcon(reinterpret_cast<unsigned long>(param_1.text));
                 }
                 return 0;
             }
@@ -235,7 +235,7 @@ short button::Select(struct tag_message &msg)
 {
     short x = m_owner->m_posX + m_x;
     short y = m_y + m_owner->m_posY;
-    field_0x20->DrawToBuffer(x, y, field_0x26, 0);
+    m_icon->DrawToBuffer(x, y, field_0x26, 0);
     gpWindowManager->UpdateScreenRegion(x, y, m_width, m_height);
     m_flags |= 1;
     msg.type = 0x200;
@@ -270,11 +270,11 @@ void button::Draw(void)
 {
     heroWindow *win = m_owner;
     if ((m_flags & 1) != 0) {
-        field_0x20->DrawToBuffer(m_x + win->m_posX, m_y + win->m_posY,
+        m_icon->DrawToBuffer(m_x + win->m_posX, m_y + win->m_posY,
                                  field_0x26, 0);
         return;
     }
-    field_0x20->DrawToBuffer(m_x + win->m_posX, m_y + win->m_posY,
+    m_icon->DrawToBuffer(m_x + win->m_posX, m_y + win->m_posY,
                              field_0x24, 0);
 }
 

@@ -37,9 +37,9 @@ void FlipMonoIconToBitmap(class icon *param_1, class bitmap *param_2, int param_
     unsigned int uVar6, uVar7;
     unsigned char uVar8;
     int *puVar9;
-    IconEntry *entries = reinterpret_cast<IconEntry *>(param_1->field_0x12);
+    IconEntry *entries = reinterpret_cast<IconEntry *>(param_1->m_data);
     gFMEntry = &entries[param_5];
-    gFMSrc = reinterpret_cast<unsigned char *>(param_1->field_0x12) + gFMEntry->srcOffset;
+    gFMSrc = reinterpret_cast<unsigned char *>(param_1->m_data) + gFMEntry->srcOffset;
     gFMX0 = (param_3 - gFMEntry->x) - gFMEntry->w;
     iVar5 = gFMEntry->w + 1 + gFMX0;
     gFMX0 = gFMX0 + 1;

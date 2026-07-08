@@ -14,8 +14,8 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
-    tag_message field_0x36[64];  // +0x36  event ring (64 x 0x1c)
-    int    field_0x736;  // +0x736
+    tag_message m_eventRing[64];  // +0x36  event ring (64 x 0x1c)
+    int    m_readIndex;  // +0x736
     int    field_0x73a;  // +0x73a
     int    field_0x73e;  // +0x73e
     int    field_0x742;  // +0x742

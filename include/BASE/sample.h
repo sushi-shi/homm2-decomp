@@ -11,12 +11,12 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (vptr auto-emitted at 0x00; own data starts at 0x04)
-    struct _SAMPLE *field_0x10;  // +0x10  active AIL sample
-    char   *field_0x14;  // +0x14  sample data buffer
-    int    field_0x18;  // +0x18
+    struct _SAMPLE *m_activeSample;  // +0x10  active AIL sample
+    char   *m_data;  // +0x14  sample data buffer
+    int    m_size;  // +0x18
     int    field_0x1c;  // +0x1c
-    int    field_0x20;  // +0x20
-    int    field_0x24;  // +0x24
+    int    m_sampleRate;  // +0x20
+    int    m_format;  // +0x24
     int    field_0x28;  // +0x28
     int    field_0x2c;  // +0x2c
     // --- constructors ---

@@ -11,27 +11,27 @@
 VA(0x004d2580, 0x2e)
 palette::palette(void) : resource(2, 0, 1, 0)
 {
-    field_0x10 = static_cast<signed char *>(BaseAlloc(0x300, __FILE__, __LINE__));
+    m_data = static_cast<signed char *>(BaseAlloc(0x300, __FILE__, __LINE__));
 }
 
 VA(0x004d2600, 0x55)
 palette::palette(unsigned long int id) : resource(2, id, 1, 0)
 {
-    field_0x10 = static_cast<signed char *>(BaseAlloc(0x300, __FILE__, __LINE__));
+    m_data = static_cast<signed char *>(BaseAlloc(0x300, __FILE__, __LINE__));
     gpResourceManager->PointToFile(id);
-    gpResourceManager->ReadBlock(field_0x10, 0x300);
+    gpResourceManager->ReadBlock(m_data, 0x300);
 }
 
 VA(0x004d2660, 0x2c)
 palette::~palette()
 {
-    if (field_0x10 != 0)
-        BaseFree(field_0x10, __FILE__, __LINE__);
-    field_0x10 = 0;
+    if (m_data != 0)
+        BaseFree(m_data, __FILE__, __LINE__);
+    m_data = 0;
 }
 
 VA(0x004d2690, 0x4)
-signed char * palette::Data(void) { return field_0x10; }
+signed char * palette::Data(void) { return m_data; }
 
 
 // ===== vtable palette (root)  (1 slots) =====

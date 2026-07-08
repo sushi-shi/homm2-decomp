@@ -9,11 +9,11 @@
 VA(0x004d2530, 0x47)
 baseManager::baseManager(void)
 {
-    field_0x4 = 0;
-    field_0x8 = 0;
+    m_next = 0;
+    m_prev = 0;
     field_0x10 = -1;
     field_0xc = -1;
-    field_0x32 = 0;
+    m_active = 0;
     strcpy(name, "Unknown");
 }
 

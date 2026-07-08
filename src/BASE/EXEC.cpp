@@ -19,9 +19,9 @@
 VA(0x004d1610, 0x10)
 executive::executive(void)
 {
-    field_0x0 = 0;
-    field_0x4 = 0;
-    field_0x8 = 0;
+    m_managerListHead = 0;
+    m_managerListTail = 0;
+    m_activeManager = 0;
     field_0xc = 0;
 }
 
@@ -48,16 +48,16 @@ void executive::ShutDownSystem(void)
 {
     EarlyShutDownSystem();
     gpSoundManager->Close();
-    baseManager *next = field_0x0;
+    baseManager *next = m_managerListHead;
     baseManager *cur;
     while ((cur = next) != 0) {
-        next = cur->field_0x4;
+        next = cur->m_next;
         if (cur != gpWindowManager && cur != gpMouseManager)
             RemoveManager(cur);
     }
-    if (gpWindowManager->field_0x32 == 1)
+    if (gpWindowManager->m_active == 1)
         RemoveManager(gpWindowManager);
-    if (gpMouseManager->field_0x32 == 1)
+    if (gpMouseManager->m_active == 1)
         RemoveManager(gpMouseManager);
     gpInputManager->Close();
     gpResourceManager->Close();
@@ -73,17 +73,17 @@ int executive::DoDialog(class baseManager *param_1)
     int iVar5, iVar3;
     baseManager *pmVar;
     iVar5 = 0;
-    local_100.field_0x0 = 0;
-    local_100.field_0x4 = 0;
-    local_100.field_0x8 = 0;
+    local_100.m_managerListHead = 0;
+    local_100.m_managerListTail = 0;
+    local_100.m_activeManager = 0;
     local_100.field_0xc = 0;
-    pmVar = field_0x0;
+    pmVar = m_managerListHead;
     if (pmVar != 0) {
         iVar3 = 0;
         do {
             aiStack_f0[iVar3] = pmVar;
-            auStack_a0[iVar3] = pmVar->field_0x8;
-            pmVar = pmVar->field_0x4;
+            auStack_a0[iVar3] = pmVar->m_prev;
+            pmVar = pmVar->m_next;
             aiStack_50[iVar3] = pmVar;
             iVar3 = iVar3 + 1;
             iVar5 = iVar5 + 1;
@@ -103,8 +103,8 @@ int executive::DoDialog(class baseManager *param_1)
         iVar3 = 0;
         do {
             pmVar = aiStack_f0[iVar3];
-            pmVar->field_0x8 = auStack_a0[iVar3];
-            pmVar->field_0x4 = aiStack_50[iVar3];
+            pmVar->m_prev = auStack_a0[iVar3];
+            pmVar->m_next = aiStack_50[iVar3];
             iVar3 = iVar3 + 1;
             iVar5 = iVar5 - 1;
         } while (iVar5 != 0);
@@ -117,12 +117,12 @@ void executive::PrintManagerList(void)
 {
     LogStr("----- Manager List Start -----");
     LogStr("-----");
-    sprintf(gText, "Head: %d Tail: %d", field_0x0, field_0x4);
+    sprintf(gText, "Head: %d Tail: %d", m_managerListHead, m_managerListTail);
     LogStr(gText);
     LogStr("-----");
-    for (baseManager *m = field_0x0; m != 0; m = m->field_0x4) {
+    for (baseManager *m = m_managerListHead; m != 0; m = m->m_next) {
         sprintf(gText, "Manager: %20s this: %d prev: %d next: %d", m->name, m,
-                m->field_0x8, m->field_0x4);
+                m->m_prev, m->m_next);
         LogStr(gText);
     }
     LogStr("----- Manager List Stop -----");
@@ -135,42 +135,42 @@ int executive::AddManager(class baseManager *mgr, int param_2)
         return 3;
     if (param_2 == -1) {
         param_2 = 0;
-        if (field_0x4 != 0)
-            param_2 = field_0x4->field_0x10 + 1;
+        if (m_managerListTail != 0)
+            param_2 = m_managerListTail->field_0x10 + 1;
     }
-    if (mgr->field_0x32 == 0 && mgr->Open(param_2) != 0)
+    if (mgr->m_active == 0 && mgr->Open(param_2) != 0)
         return 3;
-    baseManager *tail = field_0x4;
+    baseManager *tail = m_managerListTail;
     baseManager *cur = tail;
     if (tail != 0) {
         do {
             if (cur->field_0x10 <= param_2)
                 break;
-            cur = cur->field_0x8;
+            cur = cur->m_prev;
         } while (cur != 0);
         if (cur != 0) {
-            if (cur->field_0x4 != 0) {
-                mgr->field_0x8 = cur;
-                mgr->field_0x4 = cur->field_0x4;
-                cur->field_0x4->field_0x8 = mgr;
-                cur->field_0x4 = mgr;
+            if (cur->m_next != 0) {
+                mgr->m_prev = cur;
+                mgr->m_next = cur->m_next;
+                cur->m_next->m_prev = mgr;
+                cur->m_next = mgr;
                 return 0;
             }
-            mgr->field_0x4 = 0;
-            mgr->field_0x8 = tail;
-            field_0x4->field_0x4 = mgr;
-            field_0x4 = mgr;
+            mgr->m_next = 0;
+            mgr->m_prev = tail;
+            m_managerListTail->m_next = mgr;
+            m_managerListTail = mgr;
             return 0;
         }
     }
-    mgr->field_0x8 = 0;
-    mgr->field_0x4 = field_0x0;
-    if (field_0x0 != 0)
-        field_0x0->field_0x8 = mgr;
-    field_0x0 = mgr;
-    if (field_0x4 != 0)
+    mgr->m_prev = 0;
+    mgr->m_next = m_managerListHead;
+    if (m_managerListHead != 0)
+        m_managerListHead->m_prev = mgr;
+    m_managerListHead = mgr;
+    if (m_managerListTail != 0)
         return 0;
-    field_0x4 = mgr;
+    m_managerListTail = mgr;
     return 0;
 }
 
@@ -179,35 +179,35 @@ void executive::RemoveManager(class baseManager *mgr)
 {
     if (mgr != 0) {
         mgr->Close();
-        baseManager *prev = mgr->field_0x8;
+        baseManager *prev = mgr->m_prev;
         if (prev == 0) {
-            if (field_0x0 == field_0x4) {
-                field_0x4 = 0;
-                field_0x0 = 0;
+            if (m_managerListHead == m_managerListTail) {
+                m_managerListTail = 0;
+                m_managerListHead = 0;
             } else {
-                baseManager *next = mgr->field_0x4;
-                field_0x0 = next;
-                next->field_0x8 = 0;
+                baseManager *next = mgr->m_next;
+                m_managerListHead = next;
+                next->m_prev = 0;
             }
-            mgr->field_0x8 = 0;
-            mgr->field_0x4 = 0;
+            mgr->m_prev = 0;
+            mgr->m_next = 0;
             return;
         }
-        baseManager *next = mgr->field_0x4;
-        prev->field_0x4 = next;
+        baseManager *next = mgr->m_next;
+        prev->m_next = next;
         if (next == 0)
-            field_0x4 = prev;
+            m_managerListTail = prev;
         else
-            next->field_0x8 = prev;
-        mgr->field_0x8 = 0;
-        mgr->field_0x4 = 0;
+            next->m_prev = prev;
+        mgr->m_prev = 0;
+        mgr->m_next = 0;
     }
 }
 
 VA(0x004d1a30, 0x5a)
 void executive::CallManager(class baseManager *mgr)
 {
-    baseManager *saved = field_0x8;
+    baseManager *saved = m_activeManager;
     RemoveManager(saved);
     if (AddManager(mgr, -1) != 0)
         ShutDown("Can't add manager!");
@@ -215,7 +215,7 @@ void executive::CallManager(class baseManager *mgr)
     RemoveManager(mgr);
     if (AddManager(saved, -1) != 0)
         ShutDown("Can't add manager!");
-    field_0x8 = saved;
+    m_activeManager = saved;
 }
 
 VA(0x004d1a90, 0xfa)
@@ -225,20 +225,20 @@ void executive::MainLoop(void)
     int bVar2, bVar3, iVar5;
     baseManager *phVar1;
     bVar3 = 0;
-    if (field_0x0 != 0) {
+    if (m_managerListHead != 0) {
         gpInputManager->Flush();
         do {
             Process1WindowsMessage();
             local_38 = gpInputManager->GetEvent();
             bVar2 = 1;
-            field_0x8 = field_0x0;
-            if (field_0x0 == 0)
+            m_activeManager = m_managerListHead;
+            if (m_managerListHead == 0)
                 return;
             while (bVar2) {
                 if (bVar3)
                     return;
-                phVar1 = field_0x8;
-                if (phVar1->field_0x32 == 1 && (local_38.type != 4 || gpWindowManager != phVar1)) {
+                phVar1 = m_activeManager;
+                if (phVar1->m_active == 1 && (local_38.type != 4 || gpWindowManager != phVar1)) {
                     iVar5 = phVar1->Main(local_38);
                     if (iVar5 == 1) {
                         bVar2 = 0;
@@ -246,15 +246,15 @@ void executive::MainLoop(void)
                         if (local_38.field4 == 1) {
                             bVar3 = 1;
                         } else if (local_38.field4 == 2) {
-                            RemoveManager(field_0x8);
-                            field_0x8 = 0;
+                            RemoveManager(m_activeManager);
+                            m_activeManager = 0;
                         } else if (local_38.field4 == 4) {
                             field_0xc = reinterpret_cast<int>(local_38.text);
                             bVar3 = 1;
                         }
                     }
                 }
-                if (field_0x8 == 0 || (field_0x8 = field_0x8->field_0x4, field_0x8 == 0))
+                if (m_activeManager == 0 || (m_activeManager = m_activeManager->m_next, m_activeManager == 0))
                     break;
             }
         } while (!bVar3);

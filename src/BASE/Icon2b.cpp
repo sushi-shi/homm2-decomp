@@ -54,9 +54,9 @@ void IconToBitmap(class icon *param_1, class bitmap *param_2, int param_3, int p
     unsigned char *ppuVar1;
     unsigned int uVar5;
     int *puVar10;
-    IconEntry *entries = reinterpret_cast<IconEntry *>(param_1->field_0x12);
+    IconEntry *entries = reinterpret_cast<IconEntry *>(param_1->m_data);
     gIcEntry = reinterpret_cast<unsigned char *>(&entries[param_5]);
-    gIcSrc = reinterpret_cast<unsigned char *>(param_1->field_0x12) + entries[param_5].srcOffset;
+    gIcSrc = reinterpret_cast<unsigned char *>(param_1->m_data) + entries[param_5].srcOffset;
     gIcX0 = param_3 + entries[param_5].x;
     gIcY = entries[param_5].y + param_4;
     gIcPitch = param_2->m_width;

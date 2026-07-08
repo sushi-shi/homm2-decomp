@@ -14,7 +14,7 @@ VA(0x004d8740, 0x2d)
 textEntryWidget::textEntryWidget(void) : textWidget()
 {
     field_0x31 = 0;
-    field_0x2b = 0;
+    m_icon = 0;
     field_0x14 = 0x4000;
     field_0x33 = 0;
     field_0x2f = 0;
@@ -29,7 +29,7 @@ textEntryWidget::textEntryWidget(short p1, short p2, short p3, short p4, short p
 {
     field_0x33 = p5;
     field_0x31 = 0;
-    field_0x2b = gpResourceManager->GetIcon(p9);
+    m_icon = gpResourceManager->GetIcon(p9);
     field_0x4b = 0;
     field_0x14 = 0x4000;
     field_0x2f = p10;
@@ -41,8 +41,8 @@ textEntryWidget::textEntryWidget(short p1, short p2, short p3, short p4, short p
     field_0x39 = m_width;
     field_0x33 = p5;
     field_0x3b = m_height;
-    field_0x20 = static_cast<char *>(BaseAlloc(p5 + 5, __FILE__, __LINE__));
-    strcpy(field_0x20, p6);
+    m_text = static_cast<char *>(BaseAlloc(p5 + 5, __FILE__, __LINE__));
+    strcpy(m_text, p6);
     if (p13 == 4) {
         field_0x47 = 1;
         field_0x41 = m_x + p14;
@@ -55,7 +55,7 @@ textEntryWidget::textEntryWidget(short p1, short p2, short p3, short p4, short p
 VA(0x004d88f0, 0x21)
 textEntryWidget::~textEntryWidget()
 {
-    gpResourceManager->Dispose(field_0x2b);
+    gpResourceManager->Dispose(m_icon);
 }
 
 VA(0x004d8920, 0x26c)
@@ -70,11 +70,11 @@ void textEntryWidget::Read(int param_1)
     m_height = gpResourceManager->ReadWord();
     uVar2 = gpResourceManager->ReadWord();
     field_0x33 = uVar2;
-    field_0x20 = static_cast<char *>(BaseAlloc(uVar2 + 5, __FILE__, __LINE__));
-    gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(field_0x20), field_0x33);
+    m_text = static_cast<char *>(BaseAlloc(uVar2 + 5, __FILE__, __LINE__));
+    gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(m_text), field_0x33);
     gpResourceManager->Read13(reinterpret_cast<signed char *>(local_10));
     gpResourceManager->SavePosition();
-    field_0x24 = gpResourceManager->GetFont(local_10);
+    m_font = gpResourceManager->GetFont(local_10);
     gpResourceManager->RestorePosition();
     uVar2 = gpResourceManager->ReadWord();
     field_0x28 = uVar2 & 0xff;
@@ -82,7 +82,7 @@ void textEntryWidget::Read(int param_1)
     field_0x2a = static_cast<char>(sVar1);
     gpResourceManager->Read13(reinterpret_cast<signed char *>(local_10));
     gpResourceManager->SavePosition();
-    field_0x2b = gpResourceManager->GetIcon(local_10);
+    m_icon = gpResourceManager->GetIcon(local_10);
     gpResourceManager->RestorePosition();
     field_0x49 = static_cast<short>(param_1);
     if (param_1 == 2) {

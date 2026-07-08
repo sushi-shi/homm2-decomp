@@ -21,14 +21,14 @@ icon::icon(unsigned long int id) : resource(1, id, 1, 0)
     gpResourceManager->PointToFile(id);
     field_0x10 = gpResourceManager->ReadWord();
     unsigned int len = gpResourceManager->ReadLong();
-    field_0x12 = static_cast<char *>(BaseAlloc(len, __FILE__, __LINE__));
-    gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(field_0x12), len);
+    m_data = static_cast<char *>(BaseAlloc(len, __FILE__, __LINE__));
+    gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(m_data), len);
 }
 
 VA(0x004c7ad0, 0x21)
 icon::~icon()
 {
-    BaseFree(field_0x12, __FILE__, __LINE__);
+    BaseFree(m_data, __FILE__, __LINE__);
 }
 
 VA(0x004c7b00, 0x44)

@@ -127,7 +127,7 @@ void soundManager::MIDIPlay(int param_1)
                     MIDIShutdown();
                 MIDIWrap *w = gpResourceManager->GetMIDIWrap(local_10);
                 pMIDIWrap[param_1] = w;
-                _AIL_init_sequence_12(hSequence[param_1], w->field_0x10, 0);
+                _AIL_init_sequence_12(hSequence[param_1], w->m_data, 0);
             }
             if (gbNoSound == 0 && field_0x69e != 0) {
                 int iVar4 = 0x7f;

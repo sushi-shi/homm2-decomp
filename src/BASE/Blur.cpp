@@ -30,7 +30,7 @@ void DoBlur(class bitmap *param_1, class bitmap *param_2, int param_3, int param
     unsigned int nbytes = param_3 * 0x280;
     memcpy(work->m_pixels, param_2->m_pixels, nbytes);
     char *pcVar18 = static_cast<char *>(BaseAlloc(0x8000, __FILE__, __LINE__));
-    unsigned char *pbVar26 = reinterpret_cast<unsigned char *>(gpBufferPalette->field_0x10);
+    unsigned char *pbVar26 = reinterpret_cast<unsigned char *>(gpBufferPalette->m_data);
     for (i = 0; i < 0x100; i++) {
         local_c00[i] = pbVar26[0];
         auStack_800[i] = pbVar26[1];
@@ -75,7 +75,7 @@ void DoBlur(class bitmap *param_1, class bitmap *param_2, int param_3, int param
     PollSound();
     char *pcVar21 = static_cast<char *>(BaseAlloc(0x300, __FILE__, __LINE__));
     char *pcVar22 = static_cast<char *>(BaseAlloc(0x300, __FILE__, __LINE__));
-    memcpy(pcVar21, gPalette->field_0x10, 0x300);
+    memcpy(pcVar21, gPalette->m_data, 0x300);
     char *pcVar23 = pcVar21;
     char *pcVar27 = pcVar22;
     for (i = 0x100; i != 0; i--) {

@@ -17,8 +17,8 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base widget = 0x20 bytes at 0x00 via ': public widget'; own fields below)
-    font   *field_0x20;  // +0x20  the list font
-    icon   *field_0x24;  // +0x24  the list icon
+    font   *m_font;  // +0x20  the list font
+    icon   *m_icon;  // +0x24  the list icon
     short  field_0x28;  // +0x28
     short  field_0x2a;  // +0x2a
     short  field_0x2c;  // +0x2c
@@ -28,7 +28,7 @@ public:
     short  field_0x34;  // +0x34
     short  field_0x36;  // +0x36
     int    field_0x38;  // +0x38
-    void   **field_0x3c;  // +0x3c  item-string array
+    void   **m_items;  // +0x3c  item-string array
     short  field_0x40;  // +0x40
     short  field_0x42;  // +0x42
     short  field_0x44;  // +0x44
@@ -70,7 +70,7 @@ public:
     char   field_0x8b;  // +0x8b
     char   field_0x8c;  // +0x8c
     char   field_0x8d;  // +0x8d
-    widget *field_0x8e;  // +0x8e  child widget (scrollbar)
+    widget *m_scrollbar;  // +0x8e  child widget (scrollbar)
     // --- constructors ---
     listBoxWidget(void);
     virtual ~listBoxWidget() OVERRIDE;

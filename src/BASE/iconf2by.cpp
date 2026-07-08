@@ -44,9 +44,9 @@ void FlipIconToBitmapYModify(class icon *param_1, class bitmap *param_2, int par
     unsigned int uVar3, uVar5, uVar6;
     unsigned char *pbVar2;
     int *puVar7;
-    IconEntry *entries = reinterpret_cast<IconEntry *>(param_1->field_0x12);
+    IconEntry *entries = reinterpret_cast<IconEntry *>(param_1->m_data);
     gFYEntry = &entries[param_5];
-    gFYSrc = reinterpret_cast<unsigned char *>(param_1->field_0x12) + gFYEntry->srcOffset;
+    gFYSrc = reinterpret_cast<unsigned char *>(param_1->m_data) + gFYEntry->srcOffset;
     gFYX0 = ((param_3 - gFYEntry->w) - gFYEntry->x) + 1;
     gFYXEnd = gFYEntry->w + gFYX0 - 1;
     gFYY = gFYEntry->y + param_4;

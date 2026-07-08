@@ -42,9 +42,9 @@ void IconToBitmapYModify(class icon *param_1, class bitmap *param_2, int param_3
     unsigned int uVar4, uVar5, uVar6;
     unsigned char *pbVar7, *pbVar9;
     int *puVar8;
-    IconEntry *entries = reinterpret_cast<IconEntry *>(param_1->field_0x12);
+    IconEntry *entries = reinterpret_cast<IconEntry *>(param_1->m_data);
     gYMEntry = &entries[param_5];
-    gYMSrc = reinterpret_cast<unsigned char *>(param_1->field_0x12) + gYMEntry->srcOffset;
+    gYMSrc = reinterpret_cast<unsigned char *>(param_1->m_data) + gYMEntry->srcOffset;
     gYMX0 = gYMEntry->x + param_3;
     gYMPitch = param_2->m_width;
     gYMY = gYMEntry->y + param_4;

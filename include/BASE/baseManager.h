@@ -20,12 +20,12 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (vptr auto-emitted at 0x00; own data starts at 0x04)
-    baseManager *field_0x4;  // +0x04  next in the executive manager list
-    baseManager *field_0x8;  // +0x08  prev in the executive manager list
+    baseManager *m_next;  // +0x04  next in the executive manager list
+    baseManager *m_prev;  // +0x08  prev in the executive manager list
     int    field_0xc;  // +0x0c
     int    field_0x10;  // +0x10
     char   name[0x1e];  // +0x14  manager name (strcpy'd, e.g. "Unknown")
-    int    field_0x32;  // +0x32
+    int    m_active;  // +0x32
     // --- constructors ---
     baseManager(void);
     // --- virtual methods (vtable order) ---
