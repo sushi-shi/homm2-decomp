@@ -34,7 +34,26 @@ textWidget::textWidget(short p1, short p2, short p3, short p4, char *p5, char *p
 }
 
 VA(0x004d1160, 0xef)
-void textWidget::Read(void) {}
+void textWidget::Read(void)
+{
+    char local_10[16];
+    field_0x18 = gpResourceManager->ReadWord();
+    field_0x1a = gpResourceManager->ReadWord();
+    field_0x1c = gpResourceManager->ReadWord();
+    field_0x1e = gpResourceManager->ReadWord();
+    short len = gpResourceManager->ReadWord();
+    field_0x20 = static_cast<char *>(BaseAlloc(len, __FILE__, __LINE__));
+    gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(field_0x20), len);
+    gpResourceManager->Read13(reinterpret_cast<signed char *>(local_10));
+    gpResourceManager->SavePosition();
+    field_0x24 = gpResourceManager->GetFont(local_10);
+    gpResourceManager->RestorePosition();
+    field_0x28 = gpResourceManager->ReadWord() & 0xff;
+    field_0x2a = static_cast<char>(gpResourceManager->ReadWord());
+    field_0x10 = gpResourceManager->ReadWord();
+    gpResourceManager->ReadWord();
+    field_0x14 = 0x200;
+}
 
 VA(0x004d1250, 0x30)
 textWidget::~textWidget()
