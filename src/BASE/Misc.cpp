@@ -181,7 +181,12 @@ VA(0x004c5a10, 0xa)
 void WritePrefs(void) {}
 
 VA(0x004c5a20, 0x3c)
-int IsCDDrive(int) { return 0; }
+int IsCDDrive(int param_1)
+{
+    sprintf(gText, "A:\\");
+    gText[0] = gText[0] + param_1;
+    return GetDriveTypeA(gText) == DRIVE_CDROM;
+}
 
 VA(0x004c5a60, 0x3ed)
 int SetupCDDrive(void) { return 0; }
