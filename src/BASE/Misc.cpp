@@ -50,7 +50,16 @@ VA(0x004c4310, 0x134)
 void PrintMemoryLeaks(void) {}
 
 VA(0x004c4450, 0x91)
-void ShowMemoryStatus(void) {}
+void ShowMemoryStatus(void)
+{
+    sprintf(gText, "Mem Left %dK", 0x3ea2);
+    int iVar1 = giDebugLevel;
+    giDebugLevel = 9;
+    FillBitmapArea(gpWindowManager->field_0x46, 0, 0x1cc, 0x280, 0x14, 0);
+    gDebugFont->DrawBoundedString(gText, 0, 0x1d0, 0x280, 0x10, 1, 0);
+    BlitBitmapToScreen(gpWindowManager->field_0x46, 0, 0x1cc, 0x280, 0x14, 0, 0x1cc);
+    giDebugLevel = iVar1;
+}
 
 VA(0x004c44f0, 0x48)
 unsigned long int MAKEFILEID(char *text)

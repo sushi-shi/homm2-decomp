@@ -183,7 +183,7 @@ BASE/Icon2b	?IconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	0.0000	d0d056ab934
 BASE/Icond2b	?DimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	0.0000	4ad06e73ab42
 BASE/Icondf2b	?FlipDimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	0.0000	3a9083993c9c
 BASE/Iconf2b	?FlipIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	0.0000	3abcce4cbc58
-BASE/Iconm2b	?MonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	38.2541	3d9fa402f004
+BASE/Iconm2b	?MonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	38.8895	3d9fa402f004
 BASE/Iconmf2b	?FlipMonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	21.1138	06612948ff51
 BASE/MOUSEMGR	??0mouseManager@@QAE@XZ	100.0000	cd5abb5d46d3
 BASE/MOUSEMGR	?CheckUpdateMousePos@mouseManager@@QAEXXZ	100.0000	651624228ccc
@@ -251,7 +251,7 @@ BASE/Misc	?SetGameDefaults@@YIXXZ	0.8772	c6c9bf0b1108
 BASE/Misc	?SetInstallDefaults@@YIXXZ	2.5641	c594e057afaf
 BASE/Misc	?SetPalette@@YIXPACH@Z	100.0000	0cb7a5a5c203
 BASE/Misc	?SetupCDDrive@@YIHXZ	0.6452	fe57117dc197
-BASE/Misc	?ShowMemoryStatus@@YIXXZ	2.7027	db90e44da890
+BASE/Misc	?ShowMemoryStatus@@YIXXZ	100.0000	b9e6261964b0
 BASE/Misc	?WritePrefs@@YIXXZ	100.0000	6f635428f11a
 BASE/Misc	?WritePrefsToFile@@YIXXZ	100.0000	f355fbe92539
 BASE/Misc	?WritePrefsToRegistry@@YIXXZ	0.2469	c882e4d5d964
@@ -380,7 +380,7 @@ BASE/droplist	?RestoreDropBackground@dropListWidget@@QAEXXZ	100.0000	fdd690daaab
 BASE/droplist	?SaveDropBackground@dropListWidget@@QAEXXZ	100.0000	b3d5c9e1b5dd
 BASE/icon2bc	?IconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAEH@Z	0.0000	fd19c8e59ddc
 BASE/icon2bs	?IconToBitmapScale@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	30.6099	eb1e264b9364
-BASE/icon2by	?IconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	6.5558	f075f38e1d80
+BASE/icon2by	?IconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	6.7462	f075f38e1d80
 BASE/iconf2bc	?FlipIconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAE@Z	0.0000	2dbef4f67793
 BASE/iconf2by	?FlipIconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	11.5952	122ef1a4bd08
 BASE/listbox	??0listBoxWidget@@QAE@XZ	97.3684	2d787e1f30f9
@@ -831,7 +831,7 @@ SOURCE/GAME	?IsCursedItem@@YIHH@Z	100.0000	17fd79c7d173
 SOURCE/GAME	?IsMobile@game@@QAEHH@Z	100.0000	9a0e451241a0
 SOURCE/GAME	?LoadGame@game@@QAEXPADHH@Z	1.6857	5be11e3f64b2
 SOURCE/GAME	?LoadMap@game@@QAEHPAD@Z	4.2883	3d5afb1616b8
-SOURCE/GAME	?MakeAllWaterVisible@game@@QAEXH@Z	96.9492	d5e5f18372d2
+SOURCE/GAME	?MakeAllWaterVisible@game@@QAEXH@Z	100.0000	d5e5f18372d2
 SOURCE/GAME	?MineTypesOwned@game@@QAEHHH@Z	100.0000	ec1737a7c6cc
 SOURCE/GAME	?NewMap@game@@QAEXPAD@Z	0.6462	64769d4f35b2
 SOURCE/GAME	?NextHero@playerData@@QAEHH@Z	17.1538	c57bbbef152d

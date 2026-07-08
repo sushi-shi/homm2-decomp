@@ -105,4 +105,6 @@ DATA(0x004fbb34) extern int gBlitClipY;   // BlitBitmapToScreen full-screen clip
 DATA(0x005331cc) extern int gBlitRight;   // BlitBitmapToScreen computed blit-rect right edge
 DATA(0x005331d0) extern int gBlitBottom;  // BlitBitmapToScreen computed blit-rect bottom edge
 
+DATA(0x004fa648) extern class font *gDebugFont;  // ShowMemoryStatus debug text font
+
 #endif // HOMM2_GLOBALS_MODEL_H
