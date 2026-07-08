@@ -283,11 +283,11 @@ BASE/RESMGR	?MakeId@resourceManager@@QAEKPADH@Z	18.0811	a198536f2cd3
 BASE/RESMGR	?Open@resourceManager@@UAEHH@Z	25.4545	40ee1fb966e7
 BASE/RESMGR	?PointToFile@resourceManager@@QAEXK@Z	15.6386	297c6b474c3c
 BASE/RESMGR	?Query@resourceManager@@QAEPAVresource@@K@Z	49.5556	4084ded02cf1
-BASE/RESMGR	?Read13@resourceManager@@QAEXPAC@Z	72.2222	caf39b385a68
+BASE/RESMGR	?Read13@resourceManager@@QAEXPAC@Z	100.0000	fb46d6f443a3
 BASE/RESMGR	?ReadBlock@resourceManager@@QAEXPACK@Z	20.9355	38f08e4a3db8
-BASE/RESMGR	?ReadByte@resourceManager@@QAECXZ	31.5455	570155abfa11
-BASE/RESMGR	?ReadLong@resourceManager@@QAEJXZ	31.5455	b01987f66162
-BASE/RESMGR	?ReadWord@resourceManager@@QAEFXZ	31.5455	2e34b615182a
+BASE/RESMGR	?ReadByte@resourceManager@@QAECXZ	79.0227	d4af2f3da499
+BASE/RESMGR	?ReadLong@resourceManager@@QAEJXZ	79.0227	2df3a32e1c1f
+BASE/RESMGR	?ReadWord@resourceManager@@QAEFXZ	79.0227	ded9cf969a5a
 BASE/RESMGR	?RemoveResource@resourceManager@@QAEXPAVresource@@@Z	30.1860	7487f94c9dee
 BASE/RESMGR	?RestorePosition@resourceManager@@QAEXXZ	44.8276	78ee3ebc10e4
 BASE/RESMGR	?SavePosition@resourceManager@@QAEXXZ	48.1481	b3a124ea37ab
