@@ -778,17 +778,17 @@ struct _SAMPLE *soundManager::MemorySample(class sample *param_1)
     struct _SAMPLE *p_Var2;
     int iVar4;
     short local_10;
-    if (gbNoSound == 0) {
-        if (field_0x36 == 0) {
-            p_Var2 = 0;
-        } else if (field_0x684 == 0) {
-            p_Var2 = 0;
-        } else if (gSampleVolume == 0) {
-            p_Var2 = 0;
-        } else if (field_0x3e == 0 || param_1->field_0x28 == 0) {
-            p_Var2 = 0;
-        } else {
-            LogStr("Memory Sample 1");
+    if (gbNoSound != 0)
+        return 0;
+    if (field_0x36 == 0)
+        return 0;
+    if (field_0x684 == 0)
+        return 0;
+    if (gSampleVolume == 0)
+        return 0;
+    if (field_0x3e == 0 || param_1->field_0x28 == 0)
+        return 0;
+    LogStr("Memory Sample 1");
             iVar1 = param_1->field_0x1c;
             iVar4 = iVar1 * 0xc;
             local_10 = static_cast<short>(reinterpret_cast<SampleChannelStruct *>(&SCS)[iVar1].startChannel);
@@ -830,10 +830,6 @@ struct _SAMPLE *soundManager::MemorySample(class sample *param_1)
             field_0x12c[local_10] = reinterpret_cast<int>(param_1->field_0x14);
             field_0x16c[local_10] = param_1->field_0x18;
             LogStr("Memory Sample 2b");
-        }
-    } else {
-        p_Var2 = 0;
-    }
     return p_Var2;
 }
 
