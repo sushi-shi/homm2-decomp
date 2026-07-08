@@ -268,7 +268,7 @@ BASE/RESMGR	?Expunge@resourceManager@@QAEXXZ	80.6000	61fcaa327304
 BASE/RESMGR	?GetBackdrop@resourceManager@@QAEXPADPAVbitmap@@H@Z	44.6071	6c8ebdd1f671
 BASE/RESMGR	?GetBackdropAtLoc@resourceManager@@QAEXPADPAVbitmap@@HHH@Z	45.6620	687a9a2a12b5
 BASE/RESMGR	?GetBitmap@resourceManager@@QAEPAVbitmap@@PAD@Z	100.0000	e5cfce941783
-BASE/RESMGR	?GetFileSize@resourceManager@@QAEKK@Z	90.8028	a6bd9bc83c76
+BASE/RESMGR	?GetFileSize@resourceManager@@QAEKK@Z	95.5634	680635033f1f
 BASE/RESMGR	?GetFont@resourceManager@@QAEPAVfont@@PAD@Z	99.7755	a98ac8688d6c
 BASE/RESMGR	?GetIcon@resourceManager@@QAEPAVicon@@K@Z	100.0000	040871496c4e
 BASE/RESMGR	?GetIcon@resourceManager@@QAEPAVicon@@PAD@Z	100.0000	a2cd94727669
@@ -280,8 +280,8 @@ BASE/RESMGR	?GetTileset@resourceManager@@QAEPAVtileset@@PAD@Z	100.0000	6130367f6
 BASE/RESMGR	?LoadAggregateHeader@resourceManager@@QAEHPAD@Z	78.7273	e9ebb21a0cf4
 BASE/RESMGR	?Main@resourceManager@@UAEHAAUtag_message@@@Z	100.0000	434bea8a6023
 BASE/RESMGR	?MakeId@resourceManager@@QAEKPADH@Z	100.0000	12be80625e0d
-BASE/RESMGR	?Open@resourceManager@@UAEHH@Z	74.0909	0d5a5db3efc2
-BASE/RESMGR	?PointToFile@resourceManager@@QAEXK@Z	90.8313	3d20d5dcb709
+BASE/RESMGR	?Open@resourceManager@@UAEHH@Z	96.3636	7a513d8256c7
+BASE/RESMGR	?PointToFile@resourceManager@@QAEXK@Z	94.9036	950c617bf25f
 BASE/RESMGR	?Query@resourceManager@@QAEPAVresource@@K@Z	100.0000	7128cc6f0862
 BASE/RESMGR	?Read13@resourceManager@@QAEXPAC@Z	100.0000	fb46d6f443a3
 BASE/RESMGR	?ReadBlock@resourceManager@@QAEXPACK@Z	90.1936	1c7ec26d15ae
