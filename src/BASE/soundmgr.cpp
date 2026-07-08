@@ -9,6 +9,7 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <_globals_model.h>
 #include <SOURCE/KB.h>
+#include <SOURCE/kbwin.h>
 #include <BASE/mss.h>
 #include <stdio.h>
 #include <string.h>
@@ -99,7 +100,17 @@ VA(0x004cbc40, 0x473)
 void soundManager::CDPlay(int, int, int, int) {}
 
 VA(0x004cc0c0, 0xf1)
-void soundManager::CDPoll(void) {}
+void soundManager::CDPoll(void)
+{
+    if (gbNoSound == 0 && gMidiEnabled != 0 && field_0x69a != 0 &&
+        CDPlaying != 0 && field_0x578 >= 0 &&
+        bMusicIsLooping[field_0x578] != 0 &&
+        field_0x6aa + 3000 <= KBTickCount()) {
+        field_0x6aa = KBTickCount();
+        if (CDIsPlaying() == 0)
+            CDPlay(field_0x690, 0, field_0x694, 1);
+    }
+}
 
 VA(0x004cc1c0, 0xdd)
 int soundManager::ConvertVolume(int param_1, int param_2)
