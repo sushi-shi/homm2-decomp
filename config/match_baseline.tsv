@@ -336,7 +336,7 @@ BASE/WINDOW	?AddWidget@heroWindow@@QAEXPAVwidget@@H@Z	100.0000	cd3f531425a3
 BASE/WINDOW	?BroadcastMessage@heroWindow@@QAEHAAUtag_message@@@Z	77.6000	6c9c32bdf40e
 BASE/WINDOW	?Close@heroWindow@@QAEXXZ	100.0000	77b4930962fb
 BASE/WINDOW	?DrawWindow@heroWindow@@QAEXH@Z	100.0000	fc92f6b38f7d
-BASE/WINDOW	?DrawWindow@heroWindow@@QAEXHHH@Z	90.8442	0ba9f0a98645
+BASE/WINDOW	?DrawWindow@heroWindow@@QAEXHHH@Z	90.8442	9a5a5c04355e
 BASE/WINDOW	?DrawWindow@heroWindow@@QAEXXZ	100.0000	05354f94dd26
 BASE/WINDOW	?MoveWindow@heroWindow@@QAEXHH@Z	100.0000	76418dac5ff6
 BASE/WINDOW	?Open@heroWindow@@QAEHHH@Z	100.0000	127d04be21ab
@@ -361,7 +361,7 @@ BASE/WINMGR	?RemoveWindow@heroWindowManager@@QAEXPAVheroWindow@@@Z	89.6939	d4609
 BASE/WINMGR	?SaveFizzleSource@heroWindowManager@@QAEXHHHH@Z	79.8591	f68572df3d4d
 BASE/WINMGR	?ScreenShot@heroWindowManager@@QAEXXZ	100.0000	8c9c7dc7ada5
 BASE/WINMGR	?UpdateScreen@heroWindowManager@@QAEXXZ	100.0000	4077d1619d5f
-BASE/WINMGR	?UpdateScreenRegion@heroWindowManager@@QAEXHHHH@Z	100.0000	540656621367
+BASE/WINMGR	?UpdateScreenRegion@heroWindowManager@@QAEXHHHH@Z	100.0000	67a73e466f64
 BASE/WINMGR	empty_stub	0.0000	
 BASE/bmap2	?BlitBitmap@@YIXPAVbitmap@@HHHH0HH@Z	86.6000	85943241bc9f
 BASE/bmap2	?DimBitmapArea@@YIXPAVbitmap@@HHHHH@Z	81.8000	16228a92fc65

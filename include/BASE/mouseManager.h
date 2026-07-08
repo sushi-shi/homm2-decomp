@@ -17,9 +17,9 @@ public:
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
     bitmap *m_savedUnderlying;  // +0x36  saved-underlying bitmap
-    int    field_0x3a;  // +0x3a
+    int    m_cursorFrame;  // +0x3a
     icon  *m_cursorIcon;  // +0x3e  the loaded cursor icon
-    int    field_0x42;  // +0x42
+    int    m_cursorType;  // +0x42
     int    field_0x46;  // +0x46
     int    field_0x4a;  // +0x4a
     char _pad_0x4e[0x8];
@@ -34,8 +34,8 @@ public:
     int    field_0x76;  // +0x76
     int    field_0x7a;  // +0x7a
     int    field_0x7e;  // +0x7e
-    int    field_0x82;  // +0x82
-    int    field_0x86;  // +0x86
+    int    m_cursorReady;  // +0x82
+    int    m_hideCount;  // +0x86
     // --- constructors ---
     mouseManager(void);
     // --- virtual methods (vtable order) ---

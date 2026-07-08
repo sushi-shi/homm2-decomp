@@ -256,10 +256,10 @@ void heroWindowManager::UpdateScreen(void)
 VA(0x004cafc0, 0x4f)
 void heroWindowManager::UpdateScreenRegion(int x, int y, int w, int h)
 {
-    gpMouseManager->field_0x82 = 0;
+    gpMouseManager->m_cursorReady = 0;
     PollSound();
     BlitBitmapToScreen(m_screen, x, y, w, h, x, y);
-    gpMouseManager->field_0x82 = 1;
+    gpMouseManager->m_cursorReady = 1;
     PollSound();
 }
 

@@ -25,10 +25,10 @@ mouseManager::mouseManager(void) : baseManager()
     int i;
     m_savedUnderlying = 0;
     m_active = 0;
-    field_0x42 = -1;
+    m_cursorType = -1;
     strcpy(name, "mouseManager");
-    field_0x3a = 0;
-    field_0x82 = 1;
+    m_cursorFrame = 0;
+    m_cursorReady = 1;
     m_cursorIcon = 0;
     for (i = 0; i < 0x60; i++)
         hbmpAndMask[i] = 0;
@@ -44,7 +44,7 @@ mouseManager::mouseManager(void) : baseManager()
         if (iHotSpot[i][1] == -1)
             iHotSpot[i][1] = iMouseSize[i][1] / 2;
     }
-    field_0x86 = 1;
+    m_hideCount = 1;
 }
 
 VA(0x004c9350, 0x94)
@@ -116,15 +116,15 @@ void mouseManager::SetPointer(char *name, int param_2, int param_3)
             else
                 param_3 = 1;
         }
-        if (field_0x42 != param_3 && (field_0x42 = param_3, gbColorMice != 0)) {
-            int saved82 = field_0x82;
-            field_0x82 = 0;
+        if (m_cursorType != param_3 && (m_cursorType = param_3, gbColorMice != 0)) {
+            int saved82 = m_cursorReady;
+            m_cursorReady = 0;
             if (m_cursorIcon != 0)
                 gpResourceManager->Dispose(m_cursorIcon);
             char *fmt;
-            if (field_0x42 == 0)
+            if (m_cursorType == 0)
                 fmt = "ADVMCO.ICN";
-            else if (field_0x42 == 2)
+            else if (m_cursorType == 2)
                 fmt = "SPELCO.ICN";
             else
                 fmt = "CMSECO.ICN";
@@ -132,8 +132,8 @@ void mouseManager::SetPointer(char *name, int param_2, int param_3)
             sprintf(local_10, fmt);
             m_cursorIcon = gpResourceManager->GetIcon(local_10);
             ProcessAssert(param_2 != 1000, __FILE__, __LINE__);
-            field_0x3a = -1;
-            field_0x82 = saved82;
+            m_cursorFrame = -1;
+            m_cursorReady = saved82;
         }
         SetPointer(param_2);
         gpResourceManager->RestorePosition();
@@ -169,7 +169,7 @@ void mouseManager::SaveAndDraw(void)
     field_0x7a = h;
     gpWindowManager->m_screen->CopyToCareful(m_savedUnderlying, 0, 0, field_0x5e, field_0x62,
                                                field_0x76, field_0x7a);
-    IconToBitmap(m_cursorIcon, gpWindowManager->m_screen, field_0x66, field_0x6a, field_0x3a,
+    IconToBitmap(m_cursorIcon, gpWindowManager->m_screen, field_0x66, field_0x6a, m_cursorFrame,
                  1, 0, 0, 640, 480, 0);
 }
 
@@ -187,8 +187,8 @@ void mouseManager::ReallyHidePointer(void)
         ShowCursor(0);
         return;
     }
-    int old = field_0x86;
-    field_0x86 = old + 1;
+    int old = m_hideCount;
+    m_hideCount = old + 1;
     if (old + 1 == 1)
         NewUpdate(1);
 }
@@ -198,7 +198,7 @@ void mouseManager::ReallyShowPointer(void)
 {
     if (gbColorMice == 0) {
         ShowCursor(1);
-    } else if (field_0x86 > 0 && --field_0x86 == 0) {
+    } else if (m_hideCount > 0 && --m_hideCount == 0) {
         gbPutzingWithMouseCtr++;
         if (gbColorMice != 0) {
             GetCursorPos(&gMouseCheckPt);
@@ -217,8 +217,8 @@ void mouseManager::ReallyShowPointer(void)
 VA(0x004ca0f0, 0x1a)
 void mouseManager::HideColorPointer(void)
 {
-    int old = field_0x86;
-    field_0x86 = old + 1;
+    int old = m_hideCount;
+    m_hideCount = old + 1;
     if (old + 1 == 1)
         NewUpdate(1);
 }
@@ -226,7 +226,7 @@ void mouseManager::HideColorPointer(void)
 VA(0x004ca110, 0x98)
 void mouseManager::ShowColorPointer(void)
 {
-    if (field_0x86 > 0 && --field_0x86 == 0) {
+    if (m_hideCount > 0 && --m_hideCount == 0) {
         gbPutzingWithMouseCtr++;
         if (gbColorMice != 0) {
             GetCursorPos(&gMouseCheckPt);
@@ -243,7 +243,7 @@ void mouseManager::ShowColorPointer(void)
 }
 
 VA(0x004ca1b0, 0xc)
-int mouseManager::IsVis(void) { return field_0x86 == 0; }
+int mouseManager::IsVis(void) { return m_hideCount == 0; }
 
 VA(0x004ca1c0, 0x66)
 void mouseManager::CheckUpdateMousePos(void)
@@ -271,25 +271,25 @@ void mouseManager::SetColorMice(int param_1)
         if (gbColorMice == 0) {
             ShowCursor(0);
         } else {
-            int old = field_0x86;
-            field_0x86 = old + 1;
+            int old = m_hideCount;
+            m_hideCount = old + 1;
             if (old + 1 == 1)
                 NewUpdate(1);
         }
-        int savedX = field_0x3a;
-        int savedY = field_0x42;
+        int savedX = m_cursorFrame;
+        int savedY = m_cursorType;
         int saved7e = field_0x7e;
-        field_0x82 = 0;
+        m_cursorReady = 0;
         gbColorMice = param_1;
-        field_0x3a = -99;
-        field_0x42 = -1;
+        m_cursorFrame = -99;
+        m_cursorType = -1;
         field_0x7e = 0;
         SetPointer(gDefaultCursorName, savedX, savedY);
-        field_0x82 = 1;
+        m_cursorReady = 1;
         field_0x7e = saved7e;
         if (gbColorMice == 0) {
             ShowCursor(1);
-        } else if (field_0x86 > 0 && --field_0x86 == 0) {
+        } else if (m_hideCount > 0 && --m_hideCount == 0) {
             gbPutzingWithMouseCtr++;
             if (gbColorMice != 0) {
                 GetCursorPos(&gMouseCheckPt);
