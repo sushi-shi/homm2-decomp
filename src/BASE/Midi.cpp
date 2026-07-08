@@ -53,7 +53,7 @@ void soundManager::MIDIShutdown(void)
                 pMIDIWrap[CurrentMidiFile] = 0;
             }
             CurrentMidiFile = -1;
-            field_0x578 = 0xff;
+            m_currentTrack = 0xff;
         }
         LogStr("Releasing MIDI sequences");
         for (i = 0; i < 60; i++) {
@@ -98,7 +98,7 @@ void soundManager::MIDIPlay(int param_1)
                 pMIDIWrap[CurrentMidiFile] = 0;
             }
             CurrentMidiFile = -1;
-            field_0x578 = 0xff;
+            m_currentTrack = 0xff;
         }
             return;
         }
@@ -118,7 +118,7 @@ void soundManager::MIDIPlay(int param_1)
                 pMIDIWrap[CurrentMidiFile] = 0;
             }
             CurrentMidiFile = -1;
-            field_0x578 = 0xff;
+            m_currentTrack = 0xff;
         }
             sprintf(local_10, "MIDI%04d.XMI", param_1);
             if (hSequence[param_1] == 0) {
@@ -152,7 +152,7 @@ void soundManager::MIDIPlay(int param_1)
                 _AIL_set_sequence_loop_count_8(hSequence[param_1], 0);
             _AIL_resume_sequence_4(hSequence[param_1]);
             CurrentMidiFile = param_1;
-            field_0x578 = static_cast<char>(param_1);
+            m_currentTrack = static_cast<char>(param_1);
         }
     }
 }
@@ -175,7 +175,7 @@ void soundManager::MIDIStop(void)
             pMIDIWrap[CurrentMidiFile] = 0;
         }
         CurrentMidiFile = -1;
-        field_0x578 = 0xff;
+        m_currentTrack = 0xff;
     }
 }
 

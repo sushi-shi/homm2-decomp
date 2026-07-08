@@ -56,21 +56,21 @@ void soundManager::CDStop(void)
     unsigned int local_18[5];
     if (gbNoSound != 0)
         return;
-    if (field_0x69a == 0)
+    if (m_cdReady == 0)
         return;
     wsprintfA(reinterpret_cast<char *>(&CommandString), "stop CD wait");
     nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
                                reinterpret_cast<char *>(&lpszReturnString), 0xff, 0);
     if (nMCIError != 0)
         HandleMCIError(nMCIError, reinterpret_cast<char *>(&CommandString));
-    if (stricmp(reinterpret_cast<char *>(&lpszReturnString), "stopped") != 0 && field_0x578 >= 0) {
+    if (stricmp(reinterpret_cast<char *>(&lpszReturnString), "stopped") != 0 && m_currentTrack >= 0) {
         wsprintfA(reinterpret_cast<char *>(&CommandString), "status CD position");
         nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
                                    reinterpret_cast<char *>(local_18), 0x14, 0);
         if (nMCIError != 0)
             HandleMCIError(nMCIError, reinterpret_cast<char *>(&CommandString));
-        strcpy(CDPreviousPosition[field_0x578], reinterpret_cast<char *>(local_18));
-        ValidatePreviousPosition(field_0x578);
+        strcpy(CDPreviousPosition[m_currentTrack], reinterpret_cast<char *>(local_18));
+        ValidatePreviousPosition(m_currentTrack);
     }
     CDPlaying = 0;
 }
@@ -80,7 +80,7 @@ int soundManager::CDIsPlaying(void)
 {
     if (gbNoSound != 0)
         return 0;
-    if (field_0x69a == 0)
+    if (m_cdReady == 0)
         return 0;
     wsprintfA(reinterpret_cast<char *>(&CommandString), "status CD mode");
     nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
@@ -96,16 +96,16 @@ void soundManager::CDStartup(void)
     if (gbNoSound != 0)
         return;
     field_0x6a2 = 1;
-    field_0x69a = 0;
+    m_cdReady = 0;
     if (gbNoCDRom == 0 && gMciErrorFlag == 0 && gbDontTryRedbook == 0) {
         wsprintfA(reinterpret_cast<char *>(&CommandString),
                   "open %c: type cdaudio alias CD shareable", gcAnimPath[0]);
         nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
                                    reinterpret_cast<char *>(&lpszReturnString), 0xff, 0);
         if (nMCIError == 0) {
-            field_0x69a = 1;
+            m_cdReady = 1;
         } else {
-            field_0x69a = 0;
+            m_cdReady = 0;
             gMciErrorFlag = 1;
             gCdMusic = 0;
             WritePrefs();
@@ -118,7 +118,7 @@ void soundManager::CDShutdown(void)
 {
     if (gbNoSound != 0)
         return;
-    if (field_0x69a == 0)
+    if (m_cdReady == 0)
         return;
     wsprintfA(reinterpret_cast<char *>(&CommandString), "stop CD");
     nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
@@ -137,7 +137,7 @@ void soundManager::CDSetVolume(int param_1, int param_2)
 {
     int local_c;
     unsigned long local_8;
-    if (gbNoSound == 0 && field_0x69a != 0 && field_0x698 != -1) {
+    if (gbNoSound == 0 && m_cdReady != 0 && field_0x698 != -1) {
         if (param_1 == -1)
             local_c = gMidiEnabled;
         else
@@ -166,10 +166,10 @@ void soundManager::CDPlay(int param_1, int param_2, int param_3, int param_4)
     long local_10;
     long local_c;
     long local_8;
-    if (gbNoSound == 0 && field_0x69a != 0 && gMidiEnabled != 0) {
+    if (gbNoSound == 0 && m_cdReady != 0 && gMidiEnabled != 0) {
         if (param_1 == -1) {
             CDStop();
-        } else if (field_0x578 != param_1 || CDPlaying == 0 || param_4 != 0) {
+        } else if (m_currentTrack != param_1 || CDPlaying == 0 || param_4 != 0) {
             field_0x690 = param_1;
             field_0x694 = param_3;
             Process1WindowsMessage();
@@ -192,8 +192,8 @@ void soundManager::CDPlay(int param_1, int param_2, int param_3, int param_4)
                                            reinterpret_cast<char *>(local_24), 0x14, 0);
                 if (nMCIError != 0)
                     HandleMCIError(nMCIError, reinterpret_cast<char *>(&CommandString));
-                strcpy(CDPreviousPosition[field_0x578], reinterpret_cast<char *>(local_24));
-                ValidatePreviousPosition(field_0x578);
+                strcpy(CDPreviousPosition[m_currentTrack], reinterpret_cast<char *>(local_24));
+                ValidatePreviousPosition(m_currentTrack);
             }
             local_c = KBTickCount();
             cVar1 = bMusicIsLooping[param_1];
@@ -243,7 +243,7 @@ void soundManager::CDPlay(int param_1, int param_2, int param_3, int param_4)
                 gMusicFadeTimer = lVar3 + 0x1e0;
                 CDSetVolume(10, 0);
             }
-            field_0x578 = static_cast<char>(param_1);
+            m_currentTrack = static_cast<char>(param_1);
         }
     }
 }
@@ -251,9 +251,9 @@ void soundManager::CDPlay(int param_1, int param_2, int param_3, int param_4)
 VA(0x004cc0c0, 0xf1)
 void soundManager::CDPoll(void)
 {
-    if (gbNoSound == 0 && gMidiEnabled != 0 && field_0x69a != 0 &&
-        CDPlaying != 0 && field_0x578 >= 0 &&
-        bMusicIsLooping[field_0x578] != 0 &&
+    if (gbNoSound == 0 && gMidiEnabled != 0 && m_cdReady != 0 &&
+        CDPlaying != 0 && m_currentTrack >= 0 &&
+        bMusicIsLooping[m_currentTrack] != 0 &&
         field_0x6aa + 3000 <= KBTickCount()) {
         field_0x6aa = KBTickCount();
         if (CDIsPlaying() == 0)
@@ -309,8 +309,8 @@ soundManager::soundManager(void) : baseManager()
     for (local_8 = 0; local_8 < 0x20; local_8++)
         reinterpret_cast<short *>(&iLastVolume)[local_8] = 0;
     memset(&field_0x3e, 0, 0xae);
-    field_0x684 = 0;
-    field_0x36 = 0;
+    m_samplesReady = 0;
+    m_digitalDriver = 0;
     field_0x3a = 0;
     field_0x690 = 0;
     field_0x694 = 0;
@@ -356,7 +356,7 @@ int soundManager::Open(int param_1)
     char cStack_7;
     field_0x6a2 = 0;
     field_0x6a6 = 0;
-    field_0x69a = 0;
+    m_cdReady = 0;
     field_0x69e = 0;
     memset(bSaveMusicPosition, 0, 0x3c);
     memset(bMusicIsLooping, 0, 0x3c);
@@ -403,17 +403,17 @@ int soundManager::Open(int param_1)
         gCdMusic = 1;
         WritePrefs();
     }
-    field_0x578 = static_cast<char>(0xff);
+    m_currentTrack = static_cast<char>(0xff);
     if (gbNoSound == 0) {
-        field_0x579 = 0;
-        field_0x57a = field_0x579;
+        m_pollRequested = 0;
+        field_0x57a = m_pollRequested;
         field_0x57b = field_0x57a;
         _AIL_startup_0();
         if (gCdMusic == 0) {
             MIDIStartup();
             if (field_0x69e == 0) {
                 CDStartup();
-                if (field_0x69a == 0) {
+                if (m_cdReady == 0) {
                     gMidiEnabled = 0;
                     WritePrefs();
                 } else {
@@ -423,7 +423,7 @@ int soundManager::Open(int param_1)
             }
         } else {
             CDStartup();
-            if (field_0x69a == 0) {
+            if (m_cdReady == 0) {
                 MIDIStartup();
                 if (field_0x69e == 0) {
                     gMidiEnabled = 0;
@@ -434,13 +434,13 @@ int soundManager::Open(int param_1)
                 }
             }
         }
-        field_0x684 = 1;
+        m_samplesReady = 1;
         memset(&field_0x3e, 0, 0xae);
-        if (gbDontTryDigital == 0 && field_0x36 == 0) {
+        if (gbDontTryDigital == 0 && m_digitalDriver == 0) {
             p_Var2 = WAVE_init_driver(0x5622, 8, 1, 0);
-            field_0x36 = reinterpret_cast<int>(p_Var2);
+            m_digitalDriver = reinterpret_cast<int>(p_Var2);
         }
-        if (field_0x36 == 0) {
+        if (m_digitalDriver == 0) {
             gSampleVolume = 0;
             WritePrefs();
         }
@@ -463,14 +463,14 @@ void soundManager::AllocateSampleHandles(void)
     int local_8;
     if (gbNoSound != 0)
         return;
-    if (field_0x36 == 0)
+    if (m_digitalDriver == 0)
         return;
     for (local_8 = 0; local_8 < 0xe; local_8++) {
-        field_0x54[local_8] = _AIL_allocate_sample_handle_4(field_0x36);
-        if (field_0x54[local_8] == 0)
+        m_sampleHandles[local_8] = _AIL_allocate_sample_handle_4(m_digitalDriver);
+        if (m_sampleHandles[local_8] == 0)
             break;
     }
-    field_0x94 = local_8;
+    m_numSampleHandles = local_8;
 }
 
 VA(0x004cc9b0, 0x96)
@@ -504,14 +504,14 @@ void soundManager::StopAllSamples(int param_1)
     int local_c;
     if (gbNoSound != 0)
         return;
-    if (field_0x36 == 0)
+    if (m_digitalDriver == 0)
         return;
-    if (field_0x684 == 0)
+    if (m_samplesReady == 0)
         return;
     LogStr("SAS 1");
-    for (local_8 = 0; local_8 < field_0x94; local_8++) {
-        if (_AIL_sample_status_4(field_0x54[local_8]) == 4)
-            _AIL_end_sample_4(field_0x54[local_8]);
+    for (local_8 = 0; local_8 < m_numSampleHandles; local_8++) {
+        if (_AIL_sample_status_4(m_sampleHandles[local_8]) == 4)
+            _AIL_end_sample_4(m_sampleHandles[local_8]);
     }
     field_0x688 = 0;
     if (param_1 != 0) {
@@ -533,10 +533,10 @@ void soundManager::StopSample(struct _SAMPLE *param_1)
     int local_c;
     if (gbNoSound != 0)
         return;
-    if (field_0x36 == 0)
+    if (m_digitalDriver == 0)
         return;
     LogStr("Stop Sample 1");
-    struct _SAMPLE *p_Var1 = field_0x54[0];
+    struct _SAMPLE *p_Var1 = m_sampleHandles[0];
     _AIL_end_sample_4(param_1);
     if (p_Var1 == param_1) {
         for (local_c = 0; local_c < 10; local_c++) {
@@ -555,16 +555,16 @@ void soundManager::ModifySample(struct _SAMPLE *param_1, short param_2, long par
     int local_8;
     if (gbNoSound != 0)
         return;
-    if (field_0x36 == 0)
+    if (m_digitalDriver == 0)
         return;
-    if (field_0x684 == 0)
+    if (m_samplesReady == 0)
         return;
     if (field_0x3e == 0)
         return;
     LogStr("Modify Sample 1");
     local_8 = -1;
-    for (local_10 = 0; local_10 < field_0x94; local_10++) {
-        if (field_0x54[local_10] == param_1)
+    for (local_10 = 0; local_10 < m_numSampleHandles; local_10++) {
+        if (m_sampleHandles[local_10] == param_1)
             local_8 = local_10;
     }
     switch (param_2) {
@@ -594,7 +594,7 @@ long soundManager::DigitalReport(struct _SAMPLE *param_1, short param_2)
 {
     if (gbNoSound != 0)
         return 0;
-    if (field_0x36 == 0)
+    if (m_digitalDriver == 0)
         return 0;
     if (param_2 == 1)
         return _AIL_sample_volume_4(param_1);
@@ -609,13 +609,13 @@ void soundManager::AdjustSoundVolumes(void)
     int local_c;
     if (gbNoSound != 0)
         return;
-    if (field_0x36 == 0)
+    if (m_digitalDriver == 0)
         return;
-    if (field_0x684 == 0)
+    if (m_samplesReady == 0)
         return;
     LogStr("Adjust Sound Volumes 1");
-    for (local_c = 1; local_c < field_0x94; local_c++) {
-        struct _SAMPLE *p_Var1 = field_0x54[local_c];
+    for (local_c = 1; local_c < m_numSampleHandles; local_c++) {
+        struct _SAMPLE *p_Var1 = m_sampleHandles[local_c];
         if (gSampleVolume == 0) {
             ModifySample(p_Var1, 1, 0);
         } else {
@@ -629,7 +629,7 @@ void soundManager::AdjustSoundVolumes(void)
 VA(0x004cd030, 0xee)
 void soundManager::AdjustMusicVolumes(void)
 {
-    if (gbNoSound == 0 && field_0x684 != 0 && field_0x578 >= 0) {
+    if (gbNoSound == 0 && m_samplesReady != 0 && m_currentTrack >= 0) {
         LogStr("Adjust Music Volumes 1");
         if (gMidiEnabled == 0) {
             if (gCdMusic == 0)
@@ -650,7 +650,7 @@ void soundManager::ForcePollSound(void)
 {
     if (gbNoSound != 0)
         return;
-    field_0x579 = 1;
+    m_pollRequested = 1;
     PollSound();
 }
 
@@ -665,15 +665,15 @@ void soundManager::SetMusicQuality(int param_1)
         return;
     if (gMidiEnabled == 0)
         return;
-    if (field_0x69a == 0)
+    if (m_cdReady == 0)
         return;
     if (gCdMusic == 0) {
-        sVar1 = field_0x578;
+        sVar1 = m_currentTrack;
         MIDIStop();
     } else {
-        sVar1 = field_0x578;
+        sVar1 = m_currentTrack;
         CDStop();
-        field_0x578 = static_cast<char>(0xff);
+        m_currentTrack = static_cast<char>(0xff);
     }
     local_8 = sVar1;
     memset(field_0x590, 0, 0xf0);
@@ -685,15 +685,15 @@ void soundManager::SetMusicQuality(int param_1)
 VA(0x004cd250, 0xc5)
 void soundManager::PlayAmbientMusic(int param_1, long param_2, int param_3)
 {
-    if (gbNoSound == 0 && field_0x684 != 0 && field_0x3e != 0 && field_0x578 != param_1) {
+    if (gbNoSound == 0 && m_samplesReady != 0 && field_0x3e != 0 && m_currentTrack != param_1) {
         if (gMidiEnabled == 0) {
-            field_0x578 = static_cast<char>(param_1);
+            m_currentTrack = static_cast<char>(param_1);
         } else {
             if (gCdMusic == 0)
                 MIDIPlay(param_1);
             else
                 CDPlay(param_1, param_2, -1, 0);
-            field_0x578 = static_cast<char>(param_1);
+            m_currentTrack = static_cast<char>(param_1);
         }
     }
 }
@@ -707,12 +707,12 @@ void soundManager::PollSound(void)
     if (gbNoSound == 0) {
         if (gCdMusic != 0)
             CDPoll();
-        if ((field_0x579 != 0 || field_0x688 != 0) && gMidiEnabled != 0) {
+        if ((m_pollRequested != 0 || field_0x688 != 0) && gMidiEnabled != 0) {
             LogStr("Poll Sound 1");
             if (field_0x688 > 0) {
                 LogStr("Poll Sound 1a");
                 Process1WindowsMessage();
-                if (field_0x578 < 8 || 0xf < field_0x578)
+                if (m_currentTrack < 8 || 0xf < m_currentTrack)
                     gMusicFadeTimer = KBTickCount();
                 iVar1 = gMusicFadeTimer;
                 lVar2 = KBTickCount();
@@ -720,12 +720,12 @@ void soundManager::PollSound(void)
                 if (field_0x688 < 1)
                     field_0x688 = 0;
                 LogStr("Poll Sound 1b");
-                if (field_0x688 < 0xb && field_0x578 != field_0x68c) {
-                    if (field_0x50 == 0 || bSaveMusicPosition[field_0x578] == 0) {
+                if (field_0x688 < 0xb && m_currentTrack != field_0x68c) {
+                    if (field_0x50 == 0 || bSaveMusicPosition[m_currentTrack] == 0) {
                         gMusicFadeTimer = KBTickCount();
                     } else if (gCdMusic == 0) {
                         ProcessAssert(field_0x50, __FILE__, __LINE__);
-                        field_0x590[field_0x578] = ftell(reinterpret_cast<FILE *>(field_0x50));
+                        field_0x590[m_currentTrack] = ftell(reinterpret_cast<FILE *>(field_0x50));
                     }
                     field_0x680 = 1;
                     if (bSaveMusicPosition[field_0x68c] == 0)
@@ -737,7 +737,7 @@ void soundManager::PollSound(void)
                     field_0x688 = (iVar1 - lVar2) / 0x3c;
                     if (field_0x688 < 1)
                         field_0x688 = 0;
-                    field_0x578 = static_cast<char>(field_0x68c);
+                    m_currentTrack = static_cast<char>(field_0x68c);
                 }
                 if (field_0x688 < 0xb)
                     local_8 = ((0xb - field_0x688) * 0x40) / 0xb;
@@ -761,7 +761,7 @@ void soundManager::PollSound(void)
                 LogStr("Poll Sound 1d");
             }
             LogStr("Poll Sound 2");
-            field_0x579 = 0;
+            m_pollRequested = 0;
         }
     }
 }
@@ -769,16 +769,16 @@ void soundManager::PollSound(void)
 VA(0x004cd6b0, 0x138)
 void soundManager::SwitchAmbientMusic(int param_1)
 {
-    if (gbNoSound == 0 && field_0x684 != 0) {
+    if (gbNoSound == 0 && m_samplesReady != 0) {
         if (gMidiEnabled == 0) {
-            field_0x578 = static_cast<char>(param_1);
+            m_currentTrack = static_cast<char>(param_1);
         } else if (MusicPlaying() == 0) {
             PlayAmbientMusic(param_1, 0, -1);
-        } else if (field_0x578 != param_1) {
+        } else if (m_currentTrack != param_1) {
             LogStr("Switch Ambient Music 1");
             Process1WindowsMessage();
             if ((field_0x688 != 0 && field_0x68c != param_1) ||
-                (field_0x688 == 0 && field_0x578 != param_1)) {
+                (field_0x688 == 0 && m_currentTrack != param_1)) {
                 if (field_0x688 < 0xb) {
                     field_0x688 = 0xb;
                     gMusicFadeTimer = KBTickCount() + 900;
@@ -800,9 +800,9 @@ struct _SAMPLE *soundManager::MemorySample(class sample *param_1)
     short local_10;
     if (gbNoSound != 0)
         return 0;
-    if (field_0x36 == 0)
+    if (m_digitalDriver == 0)
         return 0;
-    if (field_0x684 == 0)
+    if (m_samplesReady == 0)
         return 0;
     if (gSampleVolume == 0)
         return 0;
@@ -813,7 +813,7 @@ struct _SAMPLE *soundManager::MemorySample(class sample *param_1)
             iVar4 = iVar1 * 0xc;
             local_10 = static_cast<short>(reinterpret_cast<SampleChannelStruct *>(&SCS)[iVar1].startChannel);
             while (local_10 < reinterpret_cast<SampleChannelStruct *>(&SCS)[iVar1].endChannel &&
-                   _AIL_sample_status_4(field_0x54[local_10]) != 2)
+                   _AIL_sample_status_4(m_sampleHandles[local_10]) != 2)
                 local_10++;
             if (reinterpret_cast<SampleChannelStruct *>(&SCS)[iVar1].endChannel == local_10) {
                 if (param_1->field_0x1c == 4) {
@@ -828,9 +828,9 @@ struct _SAMPLE *soundManager::MemorySample(class sample *param_1)
                         reinterpret_cast<SampleChannelStruct *>(&SCS)[iVar1].startChannel;
                     local_10 = static_cast<short>(reinterpret_cast<SampleChannelStruct *>(&SCS)[iVar1].currentChannel);
                 }
-                StopSample(field_0x54[local_10]);
+                StopSample(m_sampleHandles[local_10]);
             }
-            p_Var2 = field_0x54[local_10];
+            p_Var2 = m_sampleHandles[local_10];
             field_0xd8[local_10] = static_cast<char>(param_1->field_0x28);
             reinterpret_cast<short *>(&iLastVolume)[local_10] = static_cast<short>(param_1->field_0x28);
             _AIL_init_sample_4(p_Var2);
@@ -874,7 +874,7 @@ int soundManager::MusicPlaying(void)
             return 0;
         return MIDIIsPlaying();
     }
-    if (field_0x69a == 0)
+    if (m_cdReady == 0)
         return 0;
     return CDIsPlaying();
 }

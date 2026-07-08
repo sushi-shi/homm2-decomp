@@ -62,16 +62,16 @@ void font::DrawStringExecute(char *str, int x, int y, int mode,
                 c = 0x5f;
             if (c != 0) {
                 if (mode == 1 && field_0x18 == 0)
-                    IconToBitmap(field_0x1c, gpWindowManager->field_0x46, pos, y, c, 1,
+                    IconToBitmap(field_0x1c, gpWindowManager->m_screen, pos, y, c, 1,
                                  clipL, clipT, clipR, clipB, 0);
                 else if (mode == 2 || (mode == 1 && field_0x18 != 0))
-                    IconToBitmapColorTable(field_0x1c, gpWindowManager->field_0x46, pos, y, c, 1,
+                    IconToBitmapColorTable(field_0x1c, gpWindowManager->m_screen, pos, y, c, 1,
                                            clipL, clipT, clipR, clipB, 0, gColorTableYellow, 1);
                 else if (mode == 4)
-                    IconToBitmapColorTable(field_0x1c, gpWindowManager->field_0x46, pos, y, c, 1,
+                    IconToBitmapColorTable(field_0x1c, gpWindowManager->m_screen, pos, y, c, 1,
                                            clipL, clipT, clipR, clipB, 0, gColorTableScenWin, 0);
                 else
-                    IconToBitmapColorTable(field_0x1c, gpWindowManager->field_0x46, pos, y, c, 1,
+                    IconToBitmapColorTable(field_0x1c, gpWindowManager->m_screen, pos, y, c, 1,
                                            clipL, clipT, clipR, clipB, 0, gColorTableDarkGray, 1);
             }
             pos += GetCharacterWidth(str[i]);

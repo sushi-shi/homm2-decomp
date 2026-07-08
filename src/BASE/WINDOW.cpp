@@ -369,7 +369,7 @@ void heroWindow::MoveWindow(int dx, int dy)
     m_savedBackground->DrawToBuffer(m_posX, m_posY);
     m_posX = newX;
     m_posY = newY;
-    m_savedBackground->GrabBitmap(gpWindowManager->field_0x46, m_posX, m_posY);
+    m_savedBackground->GrabBitmap(gpWindowManager->m_screen, m_posX, m_posY);
     DrawWindow(0);
     oldW = oldW + abs(m_posX - oldX);
     oldH = oldH + abs(m_posY - oldY);

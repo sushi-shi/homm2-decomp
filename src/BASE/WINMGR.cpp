@@ -27,17 +27,17 @@ VA(0x004caa80, 0x41)
 heroWindowManager::heroWindowManager(void) : baseManager()
 {
     field_0x32 = 0;
-    field_0x42 = 0;
-    field_0x3e = 0;
-    field_0x3a = 0;
-    field_0x36 = 0;
-    field_0x46 = 0;
-    field_0x56 = 0;
-    field_0x4a = 0;
-    field_0x52 = 1;
+    m_activeWindow = 0;
+    m_focusWindow = 0;
+    m_windowListTail = 0;
+    m_windowListHead = 0;
+    m_screen = 0;
+    m_updateFlags = 0;
+    m_fizzleSource = 0;
+    m_screenshotIndex = 1;
     field_0x4e = 0;
     field_0x5e = -1;
-    field_0x5a = -1;
+    m_dialogResult = -1;
 }
 
 VA(0x004caad0, 0xd6)
@@ -51,14 +51,14 @@ int heroWindowManager::Open(int param_1)
         pal++;
     }
     SetPalette(gpBufferPalette->field_0x10, 1);
-    field_0x46 = new bitmap();
-    if (field_0x46 == 0)
+    m_screen = new bitmap();
+    if (m_screen == 0)
         MemError();
-    field_0x46->field_0x10 = 0x21;
-    field_0x46->m_width = 0x280;
-    field_0x46->m_height = 0x1e0;
-    field_0x46->m_pixels = reinterpret_cast<unsigned char *>(lpInitWin);
-    int *fb = reinterpret_cast<int *>(field_0x46->m_pixels);
+    m_screen->field_0x10 = 0x21;
+    m_screen->m_width = 0x280;
+    m_screen->m_height = 0x1e0;
+    m_screen->m_pixels = reinterpret_cast<unsigned char *>(lpInitWin);
+    int *fb = reinterpret_cast<int *>(m_screen->m_pixels);
     for (i = 0x12c00; i != 0; i--) {
         *fb = 0x24242424;
         fb++;
@@ -74,15 +74,15 @@ VA(0x004cabb0, 0x45)
 void heroWindowManager::Close(void)
 {
     if (field_0x32 == 1) {
-        heroWindow *w = field_0x3a;
+        heroWindow *w = m_windowListTail;
         while (w != 0) {
             heroWindow *prev = w->m_prevWindow;
             RemoveWindow(w);
             w = prev;
         }
-        field_0x46->m_pixels = 0;
-        if (field_0x46 != 0)
-            delete field_0x46;
+        m_screen->m_pixels = 0;
+        if (m_screen != 0)
+            delete m_screen;
         field_0x32 = 0;
     }
 }
@@ -91,7 +91,7 @@ VA(0x004cac00, 0x2d)
 int heroWindowManager::Main(struct tag_message &msg)
 {
     int result = 0;
-    heroWindow *w = field_0x3a;
+    heroWindow *w = m_windowListTail;
     while (w != 0 && (result = w->BroadcastMessage(msg), result < 1 || result > 2))
         w = w->m_prevWindow;
     return result;
@@ -117,13 +117,13 @@ int heroWindowManager::BroadcastMessage(int type, int p2, int p3, int p4)
 VA(0x004cac80, 0xbc)
 void heroWindowManager::AddWindow(class heroWindow *w, int param_2, int param_3)
 {
-    heroWindow *cur = field_0x3a;
+    heroWindow *cur = m_windowListTail;
     int z = 0;
     if ((w->m_winFlags & 1) == 0)
         z = param_2;
     if (z == -1 && (z = 0, cur != 0))
         z = cur->m_zOrder + 1;
-    if (z != 0 && field_0x36 == 0)
+    if (z != 0 && m_windowListHead == 0)
         return;
     if (w->Open(z, param_3) != 0)
         return;
@@ -136,9 +136,9 @@ void heroWindowManager::AddWindow(class heroWindow *w, int param_2, int param_3)
         if (cur != 0) {
             if (cur->m_nextWindow == 0) {
                 w->m_nextWindow = 0;
-                w->m_prevWindow = field_0x3a;
-                field_0x3a->m_nextWindow = w;
-                field_0x3a = w;
+                w->m_prevWindow = m_windowListTail;
+                m_windowListTail->m_nextWindow = w;
+                m_windowListTail = w;
             } else {
                 w->m_prevWindow = cur;
                 w->m_nextWindow = cur->m_nextWindow;
@@ -149,13 +149,13 @@ void heroWindowManager::AddWindow(class heroWindow *w, int param_2, int param_3)
         }
     }
     w->m_prevWindow = 0;
-    w->m_nextWindow = field_0x36;
-    field_0x36 = w;
-    if (field_0x3a == 0)
-        field_0x3a = w;
+    w->m_nextWindow = m_windowListHead;
+    m_windowListHead = w;
+    if (m_windowListTail == 0)
+        m_windowListTail = w;
 done:
-    field_0x42 = field_0x3e;
-    field_0x3e = w;
+    m_activeWindow = m_focusWindow;
+    m_focusWindow = w;
 }
 
 VA(0x004cad40, 0x87)
@@ -163,17 +163,17 @@ void heroWindowManager::RemoveWindow(class heroWindow *w)
 {
     if (w != 0) {
         w->Close();
-        if (field_0x36 == w) {
+        if (m_windowListHead == w) {
             heroWindow *next = w->m_nextWindow;
-            field_0x36 = next;
+            m_windowListHead = next;
             if (next == 0)
-                field_0x3a = 0;
+                m_windowListTail = 0;
             else
                 next->m_prevWindow = 0;
         } else {
             heroWindow *prev = w->m_prevWindow;
-            if (field_0x3a == w) {
-                field_0x3a = prev;
+            if (m_windowListTail == w) {
+                m_windowListTail = prev;
                 prev->m_nextWindow = 0;
             } else {
                 prev->m_nextWindow = w->m_nextWindow;
@@ -181,13 +181,13 @@ void heroWindowManager::RemoveWindow(class heroWindow *w)
             if (w->m_nextWindow != 0)
                 w->m_nextWindow->m_prevWindow = w->m_prevWindow;
         }
-        if (field_0x42 == w)
-            field_0x42 = 0;
-        if (field_0x42 == 0) {
-            field_0x3e = field_0x3a;
+        if (m_activeWindow == w)
+            m_activeWindow = 0;
+        if (m_activeWindow == 0) {
+            m_focusWindow = m_windowListTail;
             return;
         }
-        field_0x3e = field_0x42;
+        m_focusWindow = m_activeWindow;
     }
 }
 
@@ -208,16 +208,16 @@ int heroWindowManager::DoDialog(class heroWindow *param_1, int (*param_2)(struct
     if (param_3 != 0) {
         if (gPalette != 0)
             SetPalette(gPalette->field_0x10, 0);
-        unsigned int uVar1 = gpWindowManager->field_0x56;
-        gpWindowManager->field_0x56 = 0;
+        unsigned int uVar1 = gpWindowManager->m_updateFlags;
+        gpWindowManager->m_updateFlags = 0;
         PollSound();
         FadeIn(8);
-        gpWindowManager->field_0x56 = gFadeSavedUpdate | uVar1;
+        gpWindowManager->m_updateFlags = gFadeSavedUpdate | uVar1;
         PollSound();
     }
     bVar2 = 0;
     gpInputManager->Flush();
-    field_0x5a = -1;
+    m_dialogResult = -1;
     do {
         PollSound();
         Process1WindowsMessage();
@@ -227,7 +227,7 @@ int heroWindowManager::DoDialog(class heroWindow *param_1, int (*param_2)(struct
             iVar5 = param_1->BroadcastMessage(local_38);
             if (iVar5 == 2 && local_38.type == 0x200 && local_38.field4 == 10) {
                 bVar2 = 1;
-                field_0x5a = local_38.field8;
+                m_dialogResult = local_38.field8;
             }
         }
         iVar5 = param_2(local_38);
@@ -242,14 +242,14 @@ int heroWindowManager::DoDialog(class heroWindow *param_1, int (*param_2)(struct
     iDialogNestCount = iDialogNestCount - 1;
     if (iDialogNestCount == 0)
         SetNoDialogMenus(1);
-    return field_0x5a;
+    return m_dialogResult;
 }
 
 VA(0x004cafa0, 0x17)
 void heroWindowManager::UpdateScreen(void)
 {
     PollSound();
-    BitmapToScreen(field_0x46);
+    BitmapToScreen(m_screen);
     PollSound();
 }
 
@@ -258,7 +258,7 @@ void heroWindowManager::UpdateScreenRegion(int x, int y, int w, int h)
 {
     gpMouseManager->field_0x82 = 0;
     PollSound();
-    BlitBitmapToScreen(field_0x46, x, y, w, h, x, y);
+    BlitBitmapToScreen(m_screen, x, y, w, h, x, y);
     gpMouseManager->field_0x82 = 1;
     PollSound();
 }
@@ -266,7 +266,7 @@ void heroWindowManager::UpdateScreenRegion(int x, int y, int w, int h)
 VA(0x004cb010, 0x18)
 void heroWindowManager::RedrawScreen(void)
 {
-    for (heroWindow *w = field_0x36; w != 0; w = w->m_nextWindow)
+    for (heroWindow *w = m_windowListHead; w != 0; w = w->m_nextWindow)
         w->DrawWindow();
 }
 
@@ -277,17 +277,17 @@ void heroWindowManager::FadeScreen(int param_1, int param_2, class palette *pal)
         SetPalette(pal->field_0x10, 0);
     if (param_1 != 0) {
         if (param_1 == 1) {
-            gFadeSavedUpdate = field_0x56;
-            field_0x56 = 0;
+            gFadeSavedUpdate = m_updateFlags;
+            m_updateFlags = 0;
             PollSound();
             FadeOut(param_2);
             PollSound();
         } else {
-            unsigned int saved = field_0x56;
-            field_0x56 = 0;
+            unsigned int saved = m_updateFlags;
+            m_updateFlags = 0;
             PollSound();
             FadeIn(param_2);
-            field_0x56 = gFadeSavedUpdate | saved;
+            m_updateFlags = gFadeSavedUpdate | saved;
             PollSound();
         }
     }
@@ -297,10 +297,10 @@ VA(0x004cb0b0, 0x53)
 void heroWindowManager::ScreenShot(void)
 {
     char local_10[16];
-    sprintf(local_10, "SHOT%04d.PCX", field_0x52);
-    CreatePCXFile(local_10, field_0x46->m_pixels, 640, 480,
+    sprintf(local_10, "SHOT%04d.PCX", m_screenshotIndex);
+    CreatePCXFile(local_10, m_screen->m_pixels, 640, 480,
                   reinterpret_cast<unsigned char *>(gPalette->field_0x10));
-    field_0x52++;
+    m_screenshotIndex++;
     gpInputManager->Flush();
 }
 
@@ -322,11 +322,11 @@ void heroWindowManager::SaveFizzleSource(int param_1, int param_2, int param_3, 
         if (480 < param_2 + param_4)
             param_4 = 480 - param_2;
         if (param_3 > 0 && param_4 > 0) {
-            if (field_0x4a != 0)
-                delete field_0x4a;
-            field_0x4a = new bitmap(0, param_3, param_4);
-            BlitBitmap(gpWindowManager->field_0x46, param_1, param_2, param_3, param_4,
-                       field_0x4a, 0, 0);
+            if (m_fizzleSource != 0)
+                delete m_fizzleSource;
+            m_fizzleSource = new bitmap(0, param_3, param_4);
+            BlitBitmap(gpWindowManager->m_screen, param_1, param_2, param_3, param_4,
+                       m_fizzleSource, 0, 0);
         }
     }
 }
@@ -340,9 +340,9 @@ void heroWindowManager::FizzleForward(int, int, int, int, int, signed char *, si
 VA(0x004cb5f0, 0x19)
 void heroWindowManager::ReleaseFizzleSource(void)
 {
-    if (field_0x4a != 0)
-        delete field_0x4a;
-    field_0x4a = 0;
+    if (m_fizzleSource != 0)
+        delete m_fizzleSource;
+    m_fizzleSource = 0;
 }
 
 VA(0x004cb610, 0x1)

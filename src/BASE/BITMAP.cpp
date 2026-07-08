@@ -57,10 +57,10 @@ VA(0x004d0160, 0xff)
 void bitmap::DrawToBufferCareful(short int param_1, short int param_2)
 {
     if (param_1 >= 0) {
-        if (m_width + param_1 <= gpWindowManager->field_0x46->m_width && param_2 >= 0 &&
-            m_height + param_2 <= gpWindowManager->field_0x46->m_height) {
+        if (m_width + param_1 <= gpWindowManager->m_screen->m_width && param_2 >= 0 &&
+            m_height + param_2 <= gpWindowManager->m_screen->m_height) {
             PollSound();
-            BlitBitmap(this, 0, 0, m_width, m_height, gpWindowManager->field_0x46, param_1,
+            BlitBitmap(this, 0, 0, m_width, m_height, gpWindowManager->m_screen, param_1,
                        param_2);
             PollSound();
             return;
@@ -78,7 +78,7 @@ void bitmap::DrawToBufferCareful(short int param_1, short int param_2)
         local_8 = 0;
         iVar4 = iVar4 + param_2;
     }
-    bitmap *pbVar1 = gpWindowManager->field_0x46;
+    bitmap *pbVar1 = gpWindowManager->m_screen;
     if (pbVar1->m_width < iVar2 + iVar3) {
         iVar3 = pbVar1->m_width - iVar2;
     }
@@ -94,7 +94,7 @@ VA(0x004d0260, 0x3c)
 void bitmap::DrawToBuffer(short x, short y)
 {
     PollSound();
-    BlitBitmap(this, 0, 0, m_width, m_height, gpWindowManager->field_0x46, x, y);
+    BlitBitmap(this, 0, 0, m_width, m_height, gpWindowManager->m_screen, x, y);
     PollSound();
 }
 
@@ -109,7 +109,7 @@ void bitmap::DrawToScreen(short x, short y)
 VA(0x004d02e0, 0x2d)
 void bitmap::GrabScreen(short x, short y)
 {
-    BlitBitmap(gpWindowManager->field_0x46, x, y, m_width, m_height, this, 0, 0);
+    BlitBitmap(gpWindowManager->m_screen, x, y, m_width, m_height, this, 0, 0);
 }
 
 VA(0x004d0310, 0x26)

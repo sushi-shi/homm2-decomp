@@ -16,16 +16,16 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
-    heroWindow *field_0x36;  // +0x36  window-list head
-    heroWindow *field_0x3a;  // +0x3a  window-list tail
-    heroWindow *field_0x3e;  // +0x3e  focus window
-    heroWindow *field_0x42;  // +0x42  active window
-    bitmap *field_0x46;  // +0x46  (target screen bitmap)
-    bitmap *field_0x4a;  // +0x4a  fizzle-source saved bitmap
+    heroWindow *m_windowListHead;  // +0x36  window-list head
+    heroWindow *m_windowListTail;  // +0x3a  window-list tail
+    heroWindow *m_focusWindow;  // +0x3e  focus window
+    heroWindow *m_activeWindow;  // +0x42  active window
+    bitmap *m_screen;  // +0x46  (target screen bitmap)
+    bitmap *m_fizzleSource;  // +0x4a  fizzle-source saved bitmap
     int    field_0x4e;  // +0x4e
-    int    field_0x52;  // +0x52
-    int    field_0x56;  // +0x56
-    int    field_0x5a;  // +0x5a
+    int    m_screenshotIndex;  // +0x52
+    int    m_updateFlags;  // +0x56
+    int    m_dialogResult;  // +0x5a
     int    field_0x5e;  // +0x5e
     // --- constructors ---
     heroWindowManager(void);

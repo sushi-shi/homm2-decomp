@@ -167,16 +167,16 @@ void mouseManager::SaveAndDraw(void)
     if (480 < field_0x6a + h)
         h = 480 - field_0x6a;
     field_0x7a = h;
-    gpWindowManager->field_0x46->CopyToCareful(field_0x36, 0, 0, field_0x5e, field_0x62,
+    gpWindowManager->m_screen->CopyToCareful(field_0x36, 0, 0, field_0x5e, field_0x62,
                                                field_0x76, field_0x7a);
-    IconToBitmap(field_0x3e, gpWindowManager->field_0x46, field_0x66, field_0x6a, field_0x3a,
+    IconToBitmap(field_0x3e, gpWindowManager->m_screen, field_0x66, field_0x6a, field_0x3a,
                  1, 0, 0, 640, 480, 0);
 }
 
 VA(0x004c9fd0, 0x29)
 void mouseManager::RestoreUnderlying(void)
 {
-    field_0x36->CopyToCareful(gpWindowManager->field_0x46, field_0x5e, field_0x62, 0, 0,
+    field_0x36->CopyToCareful(gpWindowManager->m_screen, field_0x5e, field_0x62, 0, 0,
                               field_0x76, field_0x7a);
 }
 
@@ -263,8 +263,8 @@ VA(0x004ca230, 0x191)
 void mouseManager::SetColorMice(int param_1)
 {
     if (param_1 != gbColorMice) {
-        int savedWM56 = gpWindowManager->field_0x56;
-        gpWindowManager->field_0x56 = 0;
+        int savedWM56 = gpWindowManager->m_updateFlags;
+        gpWindowManager->m_updateFlags = 0;
         int savedInNew = bInNewMouseUpdate;
         gbPutzingWithMouseCtr++;
         bInNewMouseUpdate = 0;
@@ -305,7 +305,7 @@ void mouseManager::SetColorMice(int param_1)
         }
         gbPutzingWithMouseCtr--;
         bInNewMouseUpdate = savedInNew;
-        gpWindowManager->field_0x56 = savedWM56;
+        gpWindowManager->m_updateFlags = savedWM56;
     }
 }
 
