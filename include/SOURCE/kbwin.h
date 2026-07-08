@@ -39,7 +39,7 @@ DATA(0x004ef5b8) extern long lLastGetMessage;
 DATA(0x004ef5bc) extern long lLastAilServe;
 DATA(0x004ef5dc) extern int gbNoDialogMenusOn;
 DATA(0x0051dcf0) extern int giTotalMemAllocated;
-DATA(0x0051dcf8) extern unsigned char *giChangeThreshold;
+DATA(0x0051dcf8) extern unsigned char giChangeThreshold[16];
 DATA(0x00524c20) extern int iMainWinScreenHeight;
 DATA(0x00524c24) extern void *hmnuCurrent;
 DATA(0x00524c28) extern int iTempX;

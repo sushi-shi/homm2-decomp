@@ -15,7 +15,8 @@
 #include <BASE/Misc.h>
 #include <BASE/miscwin.h>        // this TU's own free functions + indexArray/IconEntry
 #include <SOURCE/KB.h>        // EventWindowHandler, FileError, ShutDown
-#include <SOURCE/wingraph.h>  // SetFullScreenStatus
+#include <SOURCE/wingraph.h>
+#include <SOURCE/NOOPT.h>  // SetFullScreenStatus
 #include <_carcass_types.h>   // tag_message (member access)
 #include <windows.h>      // MessageBoxA
 #include <stdlib.h>
@@ -341,7 +342,46 @@ void AbsAiPrint(char *param_1)
 }
 
 VA(0x004c64e0, 0xf8)
-void FadeTo(unsigned char *, unsigned char *, int) {}
+void FadeTo(unsigned char *param_1, unsigned char *param_2, int param_3)
+{
+    int local_310, local_304;
+    unsigned char local_300[768];
+    memcpy(local_300, param_1, 0x300);
+    param_3 = param_3 >> 2;
+    if (param_3 < 1)
+        param_3 = 1;
+    local_310 = 0x30;
+    do {
+        local_304 = KBTickCount() + 0x32;
+        PollSound();
+        int iVar6 = (0x40 - local_310) - param_3;
+        if (iVar6 < 0)
+            iVar6 = 0;
+        unsigned char *pbVar8 = local_300;
+        unsigned char bVar1 = giChangeThreshold[iVar6];
+        iVar6 = 0x300;
+        unsigned char *pbVar9 = param_2;
+        do {
+            unsigned char bVar2 = *pbVar8;
+            unsigned int uVar7 = (unsigned int)*pbVar9 - (unsigned int)bVar2;
+            int iVar5 = (uVar7 ^ ((int)uVar7 >> 0x1f)) - ((int)uVar7 >> 0x1f);
+            if (static_cast<int>(bVar1) < iVar5) {
+                char cVar3 = (char)iVar5 - bVar1;
+                if ((int)uVar7 < 1)
+                    *pbVar8 = bVar2 - cVar3;
+                else
+                    *pbVar8 = cVar3 + bVar2;
+            }
+            pbVar8++;
+            pbVar9++;
+            iVar6--;
+        } while (iVar6 != 0);
+        UpdatePalette(reinterpret_cast<signed char *>(local_300));
+        DelayTil(&local_304);
+        local_310 = local_310 + param_3;
+    } while (local_310 < 0x40);
+    UpdatePalette(reinterpret_cast<signed char *>(param_2));
+}
 
 VA(0x004c65e0, 0xb8)
 void FadeToColorTable(unsigned char *, int) {}
@@ -512,7 +552,7 @@ int DataEntryWindowHandler(struct tag_message &message)
 int iMemEntries;
 MemEntry *gpMemEntry;
 int giTotalMemAllocated;
-unsigned char *giChangeThreshold;
+unsigned char giChangeThreshold[16];
 int iLastSeed;
 class heroWindow *DataEntryWin;
 char *cDEDest;
