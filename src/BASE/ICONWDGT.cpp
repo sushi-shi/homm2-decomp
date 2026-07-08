@@ -6,6 +6,8 @@
 #include <va.h>
 #include <BASE/iconWidget.h>
 #include <BASE/icon.h>
+#include <BASE/heroWindow.h>
+#include <BASE/Misc.h>
 #include <BASE/resourceManager.h>
 #include <SOURCE/KB.h>
 VA(0x004d0a60, 0x2d)
@@ -37,7 +39,30 @@ VA(0x004d0cd0, 0x291)
 int iconWidget::Main(struct tag_message &) { return 0; }
 
 VA(0x004d0f70, 0xe5)
-void iconWidget::Draw(void) {}
+void iconWidget::Draw(void)
+{
+    short type = field_0x14;
+    short x = field_0x4->field_0x28 + field_0x18;
+    short y = field_0x4->field_0x2c + field_0x1a;
+    if (type == 0x10) {
+        field_0x20->DrawToBuffer(x, y, field_0x24, field_0x26);
+        return;
+    }
+    if (type != 0x11) {
+        if (type != 0x80)
+            return;
+        field_0x20->FillToBuffer(x, y, field_0x24, field_0x27, field_0x26, 0);
+        return;
+    }
+    short *entry = reinterpret_cast<short *>(GetIconEntry(field_0x20, field_0x24));
+    y = y - entry[1];
+    x = x - entry[0];
+    if (entry[2] < field_0x1c)
+        x = x + (short)((field_0x1c - entry[2]) >> 1);
+    if (entry[3] + 2 < field_0x1e)
+        y = y + (field_0x1e - entry[3]) - 2;
+    field_0x20->DrawToBuffer(x, y, field_0x24, field_0x26);
+}
 
 
 // ===== vtable iconWidget : public widget  (3 slots) =====
