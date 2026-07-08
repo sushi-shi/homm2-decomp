@@ -18,7 +18,7 @@ public:
     // (derived: base widget = 0x20 bytes at 0x00 via ': public widget'; own fields below)
     char   *m_text;  // +0x20  the text buffer (BaseAlloc'd)
     font   *m_font;  // +0x24  the loaded font (disposed as resource in dtor)
-    short  field_0x28;  // +0x28
+    short  m_color;  // +0x28
     char   field_0x2a;  // +0x2a
     // --- constructors ---
     textWidget(void);
