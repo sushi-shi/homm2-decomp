@@ -48,46 +48,45 @@ void FlipMonoIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y,
         }
     }
     short pitch = dest->m_width;
-    unsigned char *row =
-        reinterpret_cast<unsigned char *>(gFMY * pitch + reinterpret_cast<int>(dest->m_pixels));
-    gFMX = gFMXEnd;
+    gFMRow = gFMY * pitch + reinterpret_cast<int>(dest->m_pixels);
+    int X = gFMXEnd;
     for (;;) {
+        gFMX = X;
         int cmd = *gFMSrc++;
         if (static_cast<signed char>(cmd) < 0) {
-            gFMRow = reinterpret_cast<int>(row);
             gFMRun = cmd;
             int n = cmd & 0x7f;
             if (n == 0)
                 return;
-            gFMX = gFMX - n;
+            X = X - n;
             continue;
         }
         gFMRun = cmd;
         if (cmd != 0) {
             if (clip == 0) {
-                memset((row - cmd) + 1 + gFMX, color, cmd);
+                memset(reinterpret_cast<unsigned char *>((gFMRow - cmd) + 1 + X), color, cmd);
             } else {
                 int left;
                 if (clipY <= gFMY && gFMY <= gFMClipB &&
-                    (left = (gFMX - cmd) + 1, clipX <= left) && gFMX <= gFMClipR) {
+                    (left = (X - cmd) + 1, clipX <= left) && X <= gFMClipR) {
                     unsigned int cn = cmd;
                     unsigned char *dst;
                     if (left < clipX) {
-                        cn = (gFMX - clipX) + 1;
-                        dst = row + clipX;
+                        cn = (X - clipX) + 1;
+                        dst = reinterpret_cast<unsigned char *>(gFMRow + clipX);
                     } else {
-                        dst = (row - cmd) + 1 + gFMX;
+                        dst = reinterpret_cast<unsigned char *>((gFMRow - cmd) + 1 + X);
                     }
                     memset(dst, color, cn);
                 }
             }
             gFMRun = cmd;
-            gFMX = gFMX - cmd;
+            X = X - cmd;
             continue;
         }
         // newline
-        gFMX = gFMXEnd;
-        row = row + pitch;
+        X = gFMXEnd;
+        gFMRow = gFMRow + pitch;
         gFMY = gFMY + 1;
     }
 }

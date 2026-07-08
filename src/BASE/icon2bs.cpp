@@ -18,44 +18,45 @@ VA(0x004d2f90, 0x179)
 void IconToBitmapScale(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                        int clip, int clipX, int clipY, int clipW, int clipH, int scale)
 {
-    if (scale != 0x20) {
-        int step = 0x20 / scale;
-        bitmap *tmp = new bitmap(0, 0x40, 0x40);
-        int tmpPixels = reinterpret_cast<int>(tmp->m_pixels);
-        int rowOff = 0;
-        do {
-            int *p = reinterpret_cast<int *>(tmpPixels + rowOff);
-            for (int k = 8; k != 0; k--)
-                *p++ = 0;
-            rowOff = rowOff + 0x20;
-        } while (rowOff < 0x800);
-        IconToBitmap(srcIcon, tmp, 0, 0, frame, 1, 0, 0, 0x20, 0x20, 0);
-        short pitch = dest->m_width;
-        char *dstRow = reinterpret_cast<char *>(x + y * pitch + reinterpret_cast<int>(dest->m_pixels));
-        char *srcRow = reinterpret_cast<char *>((((1 - scale) * step + 0x20) >> 1) * 0x41 +
-                                                reinterpret_cast<int>(tmp->m_pixels));
-        if (0 < scale) {
-            int rows = scale;
-            do {
-                int cols = scale;
-                char *dstPix = dstRow;
-                char *srcPix = srcRow;
-                if (0 < scale) {
-                    do {
-                        if (*srcPix != 0)
-                            *dstPix = *srcPix;
-                        cols = cols - 1;
-                        dstPix = dstPix + 1;
-                        srcPix = srcPix + step;
-                    } while (cols != 0);
-                }
-                srcRow = srcRow + step * 0x40;
-                dstRow = dstRow + pitch;
-                rows = rows - 1;
-            } while (rows != 0);
-        }
-        delete tmp;
-    } else {
+    if (scale == 0x20) {
         IconToBitmap(srcIcon, dest, x, y, frame, clip, clipX, clipY, clipW, clipH, 0);
+        return;
     }
+    int step = 0x20 / scale;
+    int srcBase = ((1 - scale) * step + 0x20) >> 1;
+    int srcAdv = step * 0x40;
+    bitmap *tmp = new bitmap(0, 0x40, 0x40);
+    int tmpPixels = reinterpret_cast<int>(tmp->m_pixels);
+    int rowOff = 0;
+    do {
+        int *p = reinterpret_cast<int *>(tmpPixels + rowOff);
+        for (int k = 8; k != 0; k--)
+            *p++ = 0;
+        rowOff = rowOff + 0x20;
+    } while (rowOff < 0x800);
+    IconToBitmap(srcIcon, tmp, 0, 0, frame, 1, 0, 0, 0x20, 0x20, 0);
+    short pitch = dest->m_width;
+    char *dstRow = reinterpret_cast<char *>(x + y * pitch + reinterpret_cast<int>(dest->m_pixels));
+    char *srcRow = reinterpret_cast<char *>(srcBase * 0x41 + reinterpret_cast<int>(tmp->m_pixels));
+    if (0 < scale) {
+        int rows = scale;
+        do {
+            int cols = scale;
+            char *dstPix = dstRow;
+            char *srcPix = srcRow;
+            if (0 < scale) {
+                do {
+                    if (*srcPix != 0)
+                        *dstPix = *srcPix;
+                    cols = cols - 1;
+                    dstPix = dstPix + 1;
+                    srcPix = srcPix + step;
+                } while (cols != 0);
+            }
+            srcRow = srcRow + srcAdv;
+            dstRow = dstRow + pitch;
+            rows = rows - 1;
+        } while (rows != 0);
+    }
+    delete tmp;
 }
