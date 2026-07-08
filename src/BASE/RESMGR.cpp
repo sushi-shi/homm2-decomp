@@ -227,9 +227,9 @@ void resourceManager::Expunge(void)
 VA(0x004c8830, 0x4b)
 class resource *resourceManager::Query(unsigned long param_1)
 {
-    resource *local_8;
-    for (local_8 = field_0x36; local_8 != 0 && local_8->field_0x8 != param_1;
-         local_8 = local_8->field_0xc) {
+    resource *local_8 = field_0x36;
+    while (local_8 != 0 && local_8->field_0x8 != param_1) {
+        local_8 = local_8->field_0xc;
     }
     return local_8;
 }
@@ -265,8 +265,9 @@ void resourceManager::RemoveResource(class resource *param_1)
     if (field_0x36 == param_1) {
         field_0x36 = param_1->field_0xc;
     } else {
-        for (local_8 = field_0x36; local_8 != 0 && local_8->field_0xc != param_1;
-             local_8 = local_8->field_0xc) {
+        local_8 = field_0x36;
+        while (local_8 != 0 && local_8->field_0xc != param_1) {
+            local_8 = local_8->field_0xc;
         }
         if (local_8 != 0)
             local_8->field_0xc = param_1->field_0xc;
