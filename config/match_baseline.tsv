@@ -366,7 +366,7 @@ BASE/WINMGR	empty_stub	0.0000
 BASE/bmap2	?BlitBitmap@@YIXPAVbitmap@@HHHH0HH@Z	88.0000	12e9d721d9ce
 BASE/bmap2	?DimBitmapArea@@YIXPAVbitmap@@HHHHH@Z	84.2000	f38a7483416e
 BASE/bmap2	?FillBitmapArea@@YIXPAVbitmap@@HHHHH@Z	95.4545	c9fee5b7b412
-BASE/bmap2	?FillBitmapAreaClip@@YIXPAVbitmap@@HHHHHHHHH@Z	93.2222	5e98d96015af
+BASE/bmap2	?FillBitmapAreaClip@@YIXPAVbitmap@@HHHHHHHHH@Z	94.2222	5e98d96015af
 BASE/droplist	??0dropListWidget@@QAE@XZ	100.0000	36ab848d613b
 BASE/droplist	??1dropListWidget@@UAE@XZ	99.9535	2a86be8a60bf
 BASE/droplist	??_EdropListWidget@@UAEPAXI@Z	0.0000	
@@ -424,7 +424,7 @@ BASE/soundmgr	?SetReady2Poll@@YGXK@Z	67.2000	7c89bbe06950
 BASE/soundmgr	?StartSample@soundManager@@QAEPAU_SAMPLE@@PADPAPADFFHHJ@Z	100.0000	0b90298d2458
 BASE/soundmgr	?StopAllSamples@soundManager@@QAEXH@Z	82.8429	ebd92c0ecfb5
 BASE/soundmgr	?StopSample@soundManager@@QAEXPAU_SAMPLE@@@Z	28.8444	684360f3169b
-BASE/soundmgr	?SwitchAmbientMusic@soundManager@@QAEXH@Z	17.5676	f1e39df55931
+BASE/soundmgr	?SwitchAmbientMusic@soundManager@@QAEXH@Z	92.5541	8e40ee0b54cd
 BASE/soundmgr	?UpdateTimers@@YGXK@Z	100.0000	ad5307a49083
 BASE/soundmgr	?ValidatePreviousPosition@soundManager@@QAEXH@Z	91.8571	6f113b1a1b11
 BASE/soundmgr	?WAVE_init_driver@@YIPAU_DIG_DRIVER@@KGGG@Z	17.4070	f0a1a104f5d0
