@@ -4,6 +4,8 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <SOURCE/kbwin.h>
+#include <SOURCE/KB.h>
 #include <BASE/inputManager.h>
 #include <BASE/INPUTMGR.h>
 #include <_carcass_types.h>
@@ -53,10 +55,44 @@ void inputManager::Flush(void)
 }
 
 VA(0x004ce2f0, 0xa8)
-struct tag_message inputManager::GetEvent(void) { return *(struct tag_message *)0; }
+tag_message inputManager::GetEvent(void)
+{
+    tag_message local_1c;
+    PollSound();
+    if (gpInputManager->field_0x32 == 1 && field_0x736 != field_0x73a) {
+        int iVar3 = field_0x736;
+        local_1c = field_0x36[iVar3];
+        field_0x736 = iVar3 + 1;
+        field_0x736 = field_0x736 % 0x40;
+        if (local_1c.type == 1 && field_0x856 == 0)
+            AsciiConvert(local_1c);
+    } else {
+        local_1c.type = 0;
+        local_1c.field8 = 0;
+        local_1c.field4 = 0;
+        local_1c.fieldC = 0;
+    }
+    return local_1c;
+}
 
 VA(0x004ce3a0, 0xa1)
-struct tag_message inputManager::PeekEvent(void) { return *(struct tag_message *)0; }
+tag_message inputManager::PeekEvent(void)
+{
+    tag_message local_1c;
+    PollSound();
+    if (gpInputManager->field_0x32 == 1 && field_0x736 != field_0x73a) {
+        local_1c = field_0x36[field_0x736];
+        field_0x736 = field_0x736 % 0x40;
+        if (local_1c.type == 1 && field_0x856 == 0)
+            AsciiConvert(local_1c);
+    } else {
+        local_1c.type = 0;
+        local_1c.field8 = 0;
+        local_1c.field4 = 0;
+        local_1c.fieldC = 0;
+    }
+    return local_1c;
+}
 
 VA(0x004ce450, 0x3)
 void inputManager::SetMouseCoords(int, int) {}
