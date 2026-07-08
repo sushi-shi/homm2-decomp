@@ -68,12 +68,12 @@ static char cBlank0[4], cBlank1[4], cBlank2[4], cBlank3[4];
 
 inline townSlot *GetCastleRec(int i)
 {
-    return (townSlot *)((char *)(i + (townSlot *)gpGame) + 0xb53);
+    return &gpGame->m_castleRecs[i];
 }
 
 inline hero *GetHeroSlot(int i)
 {
-    return (hero *)((heroRec *)((char *)gpGame + 0x27c4) + i);
+    return reinterpret_cast<hero *>(&gpGame->m_heroRecs[i]);
 }
 
 VA(0x00496450, 0x14e)

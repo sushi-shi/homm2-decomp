@@ -14,6 +14,13 @@ class town;
 struct SMapHeader;
 struct tag_message;
 
+// game data records owned by the game struct (also declared in KB.h under the same guard)
+#ifndef HOMM2_GAME_RECORD_TYPES
+#define HOMM2_GAME_RECORD_TYPES
+struct townSlot { char m_pad[0x64]; };
+struct heroRec  { char m_pad[250]; };
+#endif
+
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class game {
 public:
@@ -124,7 +131,9 @@ public:
     int    field_0xb4a;  // +0xb4a
     char _pad_0xb4e[0x4];
     char   field_0xb52;  // +0xb52
-    // size >= 0xb53 (accessed lower bound; no ctor/stride oracle)
+    townSlot m_castleRecs[72];  // 0xb53  castle/town record slots (GetCastleRec)
+    char _pad_0x2773[0x51];     // 0x2773..0x27c4
+    heroRec  m_heroRecs[72];    // 0x27c4  hero record slots (GetHeroSlot)
     // --- methods ---
     void SetupDynamicStuff(int, int, int);
     void SetupNewOverviewType(int, int);

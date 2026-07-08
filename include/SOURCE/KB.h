@@ -35,8 +35,11 @@ class townManager;
 
 // KB-private record structs (shared ones — tag_message/SAMPLE2/tag_monsterInfo/SSpellInfo/
 // SWinSetup/SNetPlayerInfo — live in _types.h / _carcass_types.h).
+#ifndef HOMM2_GAME_RECORD_TYPES
+#define HOMM2_GAME_RECORD_TYPES
 struct townSlot { char m_pad[0x64]; };
 struct heroRec  { char m_pad[250]; };
+#endif
 struct SPlayerExit { signed char m_0, m_1, m_2, m_3, m_4, m_5, m_6; };
 #pragma pack(push, 1)
 struct playerRec { char m_pad0[0x8f]; int resources[7]; char m_pad1[0x70]; };
