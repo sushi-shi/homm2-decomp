@@ -93,22 +93,22 @@ int soundManager::CDIsPlaying(void)
 VA(0x004cb970, 0xf3)
 void soundManager::CDStartup(void)
 {
-    if (gbNoSound == 0) {
-        field_0x6a2 = 1;
-        field_0x69a = 0;
-        if (gbNoCDRom == 0 && gMciErrorFlag == 0 && gbDontTryRedbook == 0) {
-            wsprintfA(reinterpret_cast<char *>(&CommandString),
-                      "open %c: type cdaudio alias CD shareable", gcAnimPath[0]);
-            nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
-                                       reinterpret_cast<char *>(&lpszReturnString), 0xff, 0);
-            if (nMCIError == 0) {
-                field_0x69a = 1;
-            } else {
-                field_0x69a = 0;
-                gMciErrorFlag = 1;
-                gCdMusic = 0;
-                WritePrefs();
-            }
+    if (gbNoSound != 0)
+        return;
+    field_0x6a2 = 1;
+    field_0x69a = 0;
+    if (gbNoCDRom == 0 && gMciErrorFlag == 0 && gbDontTryRedbook == 0) {
+        wsprintfA(reinterpret_cast<char *>(&CommandString),
+                  "open %c: type cdaudio alias CD shareable", gcAnimPath[0]);
+        nMCIError = mciSendStringA(reinterpret_cast<char *>(&CommandString),
+                                   reinterpret_cast<char *>(&lpszReturnString), 0xff, 0);
+        if (nMCIError == 0) {
+            field_0x69a = 1;
+        } else {
+            field_0x69a = 0;
+            gMciErrorFlag = 1;
+            gCdMusic = 0;
+            WritePrefs();
         }
     }
 }
@@ -459,14 +459,16 @@ VA(0x004cc910, 0x91)
 void soundManager::AllocateSampleHandles(void)
 {
     int local_8;
-    if (gbNoSound == 0 && field_0x36 != 0) {
-        for (local_8 = 0; local_8 < 0xe; local_8++) {
-            field_0x54[local_8] = _AIL_allocate_sample_handle_4(field_0x36);
-            if (field_0x54[local_8] == 0)
-                break;
-        }
-        field_0x94 = local_8;
+    if (gbNoSound != 0)
+        return;
+    if (field_0x36 == 0)
+        return;
+    for (local_8 = 0; local_8 < 0xe; local_8++) {
+        field_0x54[local_8] = _AIL_allocate_sample_handle_4(field_0x36);
+        if (field_0x54[local_8] == 0)
+            break;
     }
+    field_0x94 = local_8;
 }
 
 VA(0x004cc9b0, 0x96)
