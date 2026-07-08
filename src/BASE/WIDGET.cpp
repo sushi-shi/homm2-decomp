@@ -63,10 +63,9 @@ VA(0x004de1e0, 0x47)
 void widget::Dim(void)
 {
     if (field_0x14 != 8 && field_0x14 != 0x200) {
-        DimBitmapArea(gpWindowManager->field_0x46,
-                      static_cast<short>(field_0x4->field_0x28 + field_0x18),
-                      static_cast<short>(field_0x1a + field_0x4->field_0x2c),
-                      field_0x1c, field_0x1e, 0);
+        short x = field_0x4->field_0x28 + field_0x18;
+        short y = field_0x1a + field_0x4->field_0x2c;
+        DimBitmapArea(gpWindowManager->field_0x46, x, y, field_0x1c, field_0x1e, 0);
     }
 }
 
