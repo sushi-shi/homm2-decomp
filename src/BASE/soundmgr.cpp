@@ -659,7 +659,7 @@ void soundManager::AdjustMusicVolumes(void)
     int local_4 = 0;
     if (bSaveMusicPosition[m_currentTrack] != 0)
         local_4 = 1;
-    if (gMidiEnabled == 0) {
+    if (gMidiEnabled != 0) {
         if (gCdMusic == 0)
             MIDISetVolume();
         else
