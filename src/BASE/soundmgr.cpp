@@ -151,13 +151,13 @@ void soundManager::CDSetVolume(int param_1, int param_2)
         local_c = gMidiEnabled;
     else
         local_c = param_1;
-    if (local_c == 0) {
-        local_8 = 0;
-    } else {
+    if (local_c != 0) {
         if (param_2 != 0)
-            local_c = 0xb - local_c / 0xc;
+            local_c = 0xb - (0xc - local_c / 0xc);
         int local_10 = 0xc - local_c;
-        local_8 = local_10 * 0x10000000 | local_10 * 0x1000;
+        local_8 = local_10 << 0x1c | local_10 << 0xc;
+    } else {
+        local_8 = 0;
     }
     auxSetVolume(m_auxDevice, local_8);
 }
