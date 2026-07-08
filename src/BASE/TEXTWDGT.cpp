@@ -7,6 +7,7 @@
 #include <BASE/textWidget.h>
 #include <BASE/resourceManager.h>
 #include <BASE/Misc.h>
+#include <BASE/font.h>
 #include <SOURCE/KB.h>
 #include <string.h>
 VA(0x004d1060, 0x3e)
@@ -20,7 +21,16 @@ textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, 0)
 }
 
 VA(0x004d10f0, 0x64)
-textWidget::textWidget(short int, short int, short int, short int, char *, char *, short int, short int, short int, short int) {}
+textWidget::textWidget(short p1, short p2, short p3, short p4, char *p5, char *p6, short p7,
+                       short p8, short p9, short p10)
+    : widget(p1, p2, p3, p4, p8, p9)
+{
+    field_0x24 = gpResourceManager->GetFont(p6);
+    field_0x28 = p7;
+    field_0x2a = static_cast<char>(p10);
+    field_0x14 = 0x200;
+    field_0x20 = p5;
+}
 
 VA(0x004d1160, 0xef)
 void textWidget::Read(void) {}
