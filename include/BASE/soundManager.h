@@ -25,7 +25,7 @@ public:
     int    field_0x3a;  // +0x3a
     int    field_0x3e;  // +0x3e
     char _pad_0x42[0xe];
-    int    field_0x50;  // +0x50
+    int    m_midiFile;  // +0x50
     struct _SAMPLE *m_sampleHandles[14];  // +0x54  sample handles
     char _pad_0x8c[0x8];
     int    m_numSampleHandles;  // +0x94
@@ -46,18 +46,18 @@ public:
     char   field_0x57b;  // +0x57b
     char _pad_0x57c[0x14];
     long   field_0x590[0x3c];  // +0x590  saved music file positions per track
-    int    field_0x680;  // +0x680
+    int    m_fading;  // +0x680
     int    m_samplesReady;  // +0x684
-    int    field_0x688;  // +0x688
-    int    field_0x68c;  // +0x68c
+    int    m_fadeSteps;  // +0x688
+    int    m_fadeTargetTrack;  // +0x68c
     int    m_cdTrack;  // +0x690
-    int    field_0x694;  // +0x694
+    int    m_cdPlayFrame;  // +0x694
     short  m_auxDevice;  // +0x698
     int    m_cdReady;  // +0x69a
     int    field_0x69e;  // +0x69e
     int    m_cdStarted;  // +0x6a2
     int    field_0x6a6;  // +0x6a6
-    int    field_0x6aa;  // +0x6aa
+    int    m_pollTimer;  // +0x6aa
     // --- constructors ---
     soundManager(void);
     // --- virtual methods (vtable order) ---
