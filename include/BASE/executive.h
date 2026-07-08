@@ -11,8 +11,8 @@ class executive {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
-    int    field_0x0;  // +0x00
-    int    field_0x4;  // +0x04
+    baseManager *field_0x0;  // +0x00  manager-list head
+    baseManager *field_0x4;  // +0x04  manager-list tail
     baseManager *field_0x8;  // +0x08  the current/active manager
     int    field_0xc;  // +0x0c
     // --- constructors ---
