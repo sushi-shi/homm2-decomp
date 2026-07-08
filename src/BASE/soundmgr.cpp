@@ -376,7 +376,7 @@ struct _DIG_DRIVER *WAVE_init_driver(unsigned long param_1, unsigned short param
 VA(0x004cc560, 0x3a8)
 int soundManager::Open(int param_1)
 {
-    SHORT SVar1;
+    int SVar1;
     struct _DIG_DRIVER *p_Var2;
     int local_c;
     char cStack_7;
