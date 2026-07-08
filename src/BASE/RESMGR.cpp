@@ -43,7 +43,11 @@ resourceManager::resourceManager(void) : baseManager()
 VA(0x004c8080, 0xa2)
 void resourceManager::GetBackdrop(char *param_1, class bitmap *param_2, int param_3)
 {
-    if (param_3 == 0) {
+    if (param_3 != 0) {
+        icon *this_00 = GetIcon(param_1);
+        this_00->DrawToBuffer(0, 0, 0, 0);
+        Dispose(this_00);
+    } else {
         unsigned long uVar1 = MakeId(param_1, 1);
         PointToFile(uVar1);
         ReadWord();
@@ -51,10 +55,6 @@ void resourceManager::GetBackdrop(char *param_1, class bitmap *param_2, int para
         ReadWord();
         ReadBlock(reinterpret_cast<signed char *>(param_2->field_0x16),
                   param_2->field_0x14 * param_2->field_0x12);
-    } else {
-        icon *this_00 = GetIcon(param_1);
-        this_00->DrawToBuffer(0, 0, 0, 0);
-        Dispose(this_00);
     }
 }
 
@@ -64,7 +64,11 @@ void resourceManager::GetBackdropAtLoc(char *param_1, class bitmap *param_2, int
 {
     short sVar1, sVar2;
     int local_8;
-    if (param_5 == 0) {
+    if (param_5 != 0) {
+        icon *this_00 = GetIcon(param_1);
+        this_00->DrawToBuffer(param_3, param_4, 0, 0);
+        Dispose(this_00);
+    } else {
         unsigned long uVar3 = MakeId(param_1, 1);
         PointToFile(uVar3);
         ReadWord();
@@ -74,10 +78,6 @@ void resourceManager::GetBackdropAtLoc(char *param_1, class bitmap *param_2, int
             ReadBlock(reinterpret_cast<signed char *>(local_8 * 0x280 + param_2->field_0x16 + param_3),
                       sVar1);
         }
-    } else {
-        icon *this_00 = GetIcon(param_1);
-        this_00->DrawToBuffer(param_3, param_4, 0, 0);
-        Dispose(this_00);
     }
 }
 
@@ -194,10 +194,15 @@ class MIDIWrap *resourceManager::GetMIDIWrap(char *param_1)
 VA(0x004c86b0, 0x87)
 void resourceManager::Dispose(class resource *param_1)
 {
-    if (field_0x5a == 0 && param_1 != 0 &&
-        (param_1->field_0x6 = param_1->field_0x6 - 1, param_1->field_0x6 < 1) &&
-        (RemoveResource(param_1), param_1 != 0)) {
-        delete param_1;
+    if (field_0x5a != 0)
+        return;
+    if (param_1 == 0)
+        return;
+    param_1->field_0x6--;
+    if (param_1->field_0x6 <= 0) {
+        RemoveResource(param_1);
+        if (param_1 != 0)
+            delete param_1;
     }
 }
 
