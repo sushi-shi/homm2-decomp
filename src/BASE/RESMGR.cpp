@@ -272,10 +272,56 @@ VA(0x004c8ab0, 0x143)
 int resourceManager::LoadAggregateHeader(char *) { return 0; }
 
 VA(0x004c8c00, 0x11c)
-void resourceManager::PointToFile(unsigned long int) {}
+void resourceManager::PointToFile(unsigned long param_1)
+{
+    int bVar1 = 0;
+    int local_10, local_8;
+    for (local_10 = 0; local_10 < 2; local_10++) {
+        if (field_0x4a[local_10] != 0) {
+            for (local_8 = 0; local_8 < field_0x52[local_10]; local_8++) {
+                if (field_0x4a[local_10][local_8].id == param_1) {
+                    bVar1 = 1;
+                    field_0x3e = local_10;
+                    break;
+                }
+            }
+        }
+        if (bVar1)
+            break;
+    }
+    if (!bVar1) {
+        sprintf(gText, "ResMgr::PointToFile failure. This resource (%lu) is not in aggregate %s", param_1,
+                field_0x9e, &field_0x62);
+        ShutDown(gText);
+    }
+    _lseek(field_0x42[field_0x3e], field_0x4a[field_0x3e][local_8].offset, 0);
+}
 
 VA(0x004c8d20, 0xfa)
-unsigned long int resourceManager::GetFileSize(unsigned long int) { return 0; }
+unsigned long resourceManager::GetFileSize(unsigned long param_1)
+{
+    int bVar1 = 0;
+    int local_14, local_10, local_8;
+    for (local_14 = 0; local_14 < 2; local_14++) {
+        if (field_0x4a[local_14] != 0) {
+            for (local_8 = 0; local_8 < field_0x52[local_14]; local_8++) {
+                if (field_0x4a[local_14][local_8].id == param_1) {
+                    bVar1 = 1;
+                    local_10 = local_14;
+                    break;
+                }
+            }
+        }
+        if (bVar1)
+            break;
+    }
+    if (!bVar1) {
+        sprintf(gText, "ResMgr::PointToFile failure. This resource (%lu) is not in aggregate %s", param_1,
+                field_0x9e, &field_0x62);
+        ShutDown(gText);
+    }
+    return field_0x4a[local_10][local_8].size;
+}
 
 VA(0x004c8e20, 0x52)
 void resourceManager::SavePosition(void)
