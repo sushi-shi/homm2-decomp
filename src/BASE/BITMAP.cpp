@@ -5,6 +5,10 @@
 
 #include <va.h>
 #include <BASE/bitmap.h>
+#include <BASE/bmap2.h>
+#include <BASE/Misc.h>
+#include <BASE/heroWindowManager.h>
+#include <SOURCE/KB.h>
 VA(0x004cffc0, 0x2a)
 bitmap::bitmap(void) : resource(0, 0, -1, 0)
 {
@@ -27,16 +31,32 @@ VA(0x004d0160, 0xff)
 void bitmap::DrawToBufferCareful(short int, short int) {}
 
 VA(0x004d0260, 0x3c)
-void bitmap::DrawToBuffer(short int, short int) {}
+void bitmap::DrawToBuffer(short x, short y)
+{
+    PollSound();
+    BlitBitmap(this, 0, 0, field_0x12, field_0x14, gpWindowManager->field_0x46, x, y);
+    PollSound();
+}
 
 VA(0x004d02a0, 0x32)
-void bitmap::DrawToScreen(short int, short int) {}
+void bitmap::DrawToScreen(short x, short y)
+{
+    PollSound();
+    BlitBitmapToScreen(this, 0, 0, field_0x12, field_0x14, x, y);
+    PollSound();
+}
 
 VA(0x004d02e0, 0x2d)
-void bitmap::GrabScreen(short int, short int) {}
+void bitmap::GrabScreen(short x, short y)
+{
+    BlitBitmap(gpWindowManager->field_0x46, x, y, field_0x12, field_0x14, this, 0, 0);
+}
 
 VA(0x004d0310, 0x26)
-void bitmap::GrabBitmap(class bitmap *, short int, short int) {}
+void bitmap::GrabBitmap(class bitmap *src, short x, short y)
+{
+    BlitBitmap(src, x, y, field_0x12, field_0x14, this, 0, 0);
+}
 
 VA(0x004d0340, 0xf0)
 void bitmap::GrabBitmapCareful(class bitmap *, short int, short int) {}
