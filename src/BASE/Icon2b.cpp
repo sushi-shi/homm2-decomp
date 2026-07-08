@@ -9,6 +9,7 @@
 #include <BASE/bitmap.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <_globals_model.h>
+#include <BASE/Misc.h>
 int gIcRow;
 int gIcPitch;
 unsigned char gIcColor;
@@ -33,12 +34,15 @@ unsigned int gIcCnt2;
 //      NAMES them ?_C@_0..@ string-constant-style, not ?gIc*). So keep them file-static globals here;
 //      making them locals is WRONG (the /O2 DCE elides the dead stores -> even further off). Confirmed
 //      via `llvm-objdump -r build/delink/BASE/Icon2b.c.obj` (relocs: ?_C@... + ?uDimPal, no ?gIc*).
-//   2. The real gap is the ENTRY ACCESS: retail keeps the bitmap base (esi) and 13*index (ebx=lea
-//      [eax+4*(eax*3)]) in SEPARATE registers and reads fields via SIB `[ebx+esi+off]`; mine
-//      materialises `iEntry = base + index*0xd` then reads `[iEntry+off]` (extra adds/spills).
-//      FIX TO TRY: model the icon entry table as a packed 13-byte struct ARRAY and index it
-//      (entries[param_5].member) so the compiler emits base+index*stride+off SIB instead of a
-//      materialised pointer. Same shape likely fixes gIcSrc/gIcRow addressing.
+//   2. The gap is the ENTRY ACCESS + loop scheduling: retail keeps the bitmap base (esi) and 13*index
+//      (ebx=lea [eax+4*(eax*3)]) in SEPARATE registers and reads fields via SIB `[ebx+esi+off]`; mine
+//      materialises `base + index*0xd` into one reg (add esi,ebx) and reads `[esi+off]`.
+//      TRIED: modelled the table as a packed IconEntry[] (Misc.h) + index it (entries[i].member) —
+//      correct model + cleaner (kept), BUT /O2 STILL fuses base+13*i into one reg (it CSEs &entries[i]
+//      for the gIcEntry store), so instr count is unchanged (505 vs 161). The wall is the optimizer's
+//      register allocation across the whole decoder loop, not source-steerable via the struct alone;
+//      needs a codegen-level pass (maybe: don't store gIcEntry, or access fields off gIcSrc/base+idx
+//      without a shared pointer temp). Handed off with the diff isolated.
 VA(0x004d0570, 0x4ed)
 void IconToBitmap(class icon *param_1, class bitmap *param_2, int param_3, int param_4, int param_5,
                   int param_6, int param_7, int param_8, int param_9, int param_10, int param_11)
@@ -50,15 +54,15 @@ void IconToBitmap(class icon *param_1, class bitmap *param_2, int param_3, int p
     unsigned char *ppuVar1;
     unsigned int uVar5;
     int *puVar10;
-    unsigned char *iEntry = reinterpret_cast<unsigned char *>(param_1->field_0x12) + param_5 * 0xd;
-    gIcEntry = iEntry;
-    gIcSrc = reinterpret_cast<unsigned char *>(param_1->field_0x12) + *reinterpret_cast<int *>(iEntry + 9);
-    gIcX0 = param_3 + *reinterpret_cast<short *>(iEntry);
-    gIcY = *reinterpret_cast<short *>(gIcEntry + 2) + param_4;
+    IconEntry *entries = reinterpret_cast<IconEntry *>(param_1->field_0x12);
+    gIcEntry = reinterpret_cast<unsigned char *>(&entries[param_5]);
+    gIcSrc = reinterpret_cast<unsigned char *>(param_1->field_0x12) + entries[param_5].srcOffset;
+    gIcX0 = param_3 + entries[param_5].x;
+    gIcY = entries[param_5].y + param_4;
     gIcPitch = param_2->field_0x12;
     if (param_6 != 0) {
-        if (gIcX0 < param_7 || param_9 + param_7 < *reinterpret_cast<short *>(gIcEntry + 4) + gIcX0 ||
-            gIcY < param_8 || param_8 + param_10 < *reinterpret_cast<short *>(gIcEntry + 6) + gIcY) {
+        if (gIcX0 < param_7 || param_9 + param_7 < entries[param_5].w + gIcX0 ||
+            gIcY < param_8 || param_8 + param_10 < entries[param_5].h + gIcY) {
             param_6 = 1;
             gIcClipR = param_7 - 1 + param_9;
             gIcClipB = param_8 - 1 + param_10;
