@@ -482,7 +482,72 @@ void soundManager::PlayAmbientMusic(int param_1, long param_2, int param_3)
 }
 
 VA(0x004cd320, 0x38f)
-void soundManager::PollSound(void) {}
+void soundManager::PollSound(void)
+{
+    int iVar1;
+    long lVar2;
+    int local_8;
+    if (gbNoSound == 0) {
+        if (gCdMusic != 0)
+            CDPoll();
+        if ((field_0x579 != 0 || field_0x688 != 0) && gMidiEnabled != 0) {
+            LogStr("Poll Sound 1");
+            if (field_0x688 > 0) {
+                LogStr("Poll Sound 1a");
+                Process1WindowsMessage();
+                if (field_0x578 < 8 || 0xf < field_0x578)
+                    gMusicFadeTimer = KBTickCount();
+                iVar1 = gMusicFadeTimer;
+                lVar2 = KBTickCount();
+                field_0x688 = (iVar1 - lVar2) / 0x3c;
+                if (field_0x688 < 1)
+                    field_0x688 = 0;
+                LogStr("Poll Sound 1b");
+                if (field_0x688 < 0xb && field_0x578 != field_0x68c) {
+                    if (field_0x50 == 0 || bSaveMusicPosition[field_0x578] == 0) {
+                        gMusicFadeTimer = KBTickCount();
+                    } else if (gCdMusic == 0) {
+                        ProcessAssert(field_0x50, __FILE__, __LINE__);
+                        field_0x590[field_0x578] = ftell(reinterpret_cast<FILE *>(field_0x50));
+                    }
+                    field_0x680 = 1;
+                    if (bSaveMusicPosition[field_0x68c] == 0)
+                        PlayAmbientMusic(field_0x68c, 0, -1);
+                    else
+                        PlayAmbientMusic(field_0x68c, field_0x590[field_0x68c], -1);
+                    iVar1 = gMusicFadeTimer;
+                    lVar2 = KBTickCount();
+                    field_0x688 = (iVar1 - lVar2) / 0x3c;
+                    if (field_0x688 < 1)
+                        field_0x688 = 0;
+                    field_0x578 = static_cast<char>(field_0x68c);
+                }
+                if (field_0x688 < 0xb)
+                    local_8 = ((0xb - field_0x688) * 0x40) / 0xb;
+                else
+                    local_8 = ((field_0x688 - 10) * 0x40) / 6;
+                if (0x40 < local_8)
+                    local_8 = 0x40;
+                if (local_8 < 0)
+                    local_8 = 0;
+                LogStr("Poll Sound 1c");
+                if (gCdMusic == 0) {
+                    MIDISetVolume();
+                } else {
+                    local_8 = ((0xb - gMidiEnabled) * local_8 * 0x7f) / 0x280;
+                    if (0x7f < local_8)
+                        local_8 = 0x7f;
+                    if (local_8 < 0)
+                        local_8 = 0;
+                    CDSetVolume(local_8, 1);
+                }
+                LogStr("Poll Sound 1d");
+            }
+            LogStr("Poll Sound 2");
+            field_0x579 = 0;
+        }
+    }
+}
 
 VA(0x004cd6b0, 0x138)
 void soundManager::SwitchAmbientMusic(int param_1)
