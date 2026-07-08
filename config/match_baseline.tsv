@@ -332,7 +332,7 @@ BASE/WIDGET	empty_stub	0.0000
 BASE/WINDOW	??0heroWindow@@QAE@HHHHH@Z	100.0000	261e1576d646
 BASE/WINDOW	??0heroWindow@@QAE@HHPAD@Z	85.4861	0389cb1b8db0
 BASE/WINDOW	??0heroWindow@@QAE@XZ	100.0000	bec0cd8154d6
-BASE/WINDOW	?AddWidget@heroWindow@@QAEXPAVwidget@@H@Z	71.0426	02e47c1daaef
+BASE/WINDOW	?AddWidget@heroWindow@@QAEXPAVwidget@@H@Z	100.0000	1f67c9d15cc1
 BASE/WINDOW	?BroadcastMessage@heroWindow@@QAEHAAUtag_message@@@Z	77.6000	cf443c61b542
 BASE/WINDOW	?Close@heroWindow@@QAEXXZ	100.0000	5090fc08f70a
 BASE/WINDOW	?DrawWindow@heroWindow@@QAEXH@Z	100.0000	fc92f6b38f7d

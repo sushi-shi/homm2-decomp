@@ -213,7 +213,6 @@ void heroWindow::Close(void)
 VA(0x004cf3c0, 0x13c)
 void heroWindow::AddWidget(class widget *param_1, int param_2)
 {
-    int iVar1;
     widget *local_8 = field_0x3c;
     if (param_2 == -1) {
         if (local_8 == 0)
@@ -221,22 +220,27 @@ void heroWindow::AddWidget(class widget *param_1, int param_2)
         else
             param_2 = local_8->field_0x12 + 1;
     }
-    iVar1 = param_1->Open(param_2, this);
-    if (iVar1 == 0) {
-        for (; local_8 != 0 && param_2 < local_8->field_0x12; local_8 = local_8->field_0x8) {
-        }
-        if (local_8 == 0) {
-            param_1->field_0xc = field_0x38;
-            param_1->field_0x8 = 0;
-            field_0x38 = param_1;
-            if (field_0x3c == 0)
-                field_0x3c = param_1;
-        } else {
-            param_1->field_0x8 = local_8;
-            param_1->field_0xc = local_8->field_0xc;
-            local_8->field_0xc->field_0x8 = param_1;
-            local_8->field_0xc = param_1;
-        }
+    if (param_1->Open(param_2, this) != 0)
+        return;
+    while (local_8 != 0 && param_2 < local_8->field_0x12) {
+        local_8 = local_8->field_0x8;
+    }
+    if (local_8 == 0) {
+        param_1->field_0xc = field_0x38;
+        param_1->field_0x8 = 0;
+        field_0x38 = param_1;
+        if (field_0x3c == 0)
+            field_0x3c = param_1;
+    } else if (local_8->field_0xc == 0) {
+        param_1->field_0x8 = field_0x3c;
+        param_1->field_0xc = 0;
+        field_0x3c->field_0xc = param_1;
+        field_0x3c = param_1;
+    } else {
+        param_1->field_0x8 = local_8;
+        param_1->field_0xc = local_8->field_0xc;
+        local_8->field_0xc->field_0x8 = param_1;
+        local_8->field_0xc = param_1;
     }
 }
 
