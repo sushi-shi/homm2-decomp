@@ -179,13 +179,16 @@ VA(0x004cf280, 0x90)
 void heroWindow::RemoveAndDeleteWidget(int param_1)
 {
     widget *pwVar1, *local_8;
-    pwVar1 = field_0x3c;
-    while (local_8 = pwVar1, local_8 != 0) {
+    local_8 = field_0x3c;
+    while (local_8 != 0) {
         pwVar1 = local_8->field_0x8;
-        if (local_8->field_0x10 == param_1 && (RemoveWidget(local_8), (field_0x20 & 0x4000) != 0) &&
-            local_8 != 0) {
-            delete local_8;
+        if (local_8->field_0x10 == param_1) {
+            RemoveWidget(local_8);
+            if ((field_0x20 & 0x4000) != 0) {
+                delete local_8;
+            }
         }
+        local_8 = pwVar1;
     }
 }
 
@@ -195,12 +198,14 @@ void heroWindow::Close(void)
     widget *w, *next;
     if ((field_0x20 & 2) != 0 && (field_0x24 & 1) != 0)
         RestoreBackground();
-    next = field_0x3c;
-    while ((w = next) != 0) {
+    w = field_0x3c;
+    while (w != 0) {
         next = w->field_0x8;
         RemoveWidget(w);
-        if ((field_0x20 & 0x4000) != 0 && w != 0)
+        if ((field_0x20 & 0x4000) != 0) {
             delete w;
+        }
+        w = next;
     }
     field_0x24 = 0;
 }
