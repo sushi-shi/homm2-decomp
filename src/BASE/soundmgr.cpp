@@ -549,34 +549,40 @@ void soundManager::ModifySample(struct _SAMPLE *param_1, short param_2, long par
     int iVar1;
     int local_10;
     int local_8;
-    if (gbNoSound == 0 && field_0x36 != 0 && field_0x684 != 0 && field_0x3e != 0) {
-        LogStr("Modify Sample 1");
-        local_8 = -1;
-        for (local_10 = 0; local_10 < field_0x94; local_10++) {
-            if (field_0x54[local_10] == param_1)
-                local_8 = local_10;
-        }
-        switch (param_2) {
-        case 1:
-        case 100:
-            iVar1 = ConvertVolume(param_3, 100);
-            _AIL_set_sample_volume_8(param_1, iVar1);
-            if (local_8 >= 0)
-                reinterpret_cast<short *>(&iLastVolume)[local_8] = static_cast<short>(param_3);
-            break;
-        case 5:
-            _AIL_start_sample_4(param_1);
-            break;
-        case 0x65:
-            ProcessAssert(gCdMusic == 0, __FILE__, __LINE__);
-            iVar1 = ConvertVolume(param_3, 0x65);
-            _AIL_set_sample_volume_8(param_1, iVar1);
-            if (local_8 >= 0)
-                reinterpret_cast<short *>(&iLastVolume)[local_8] = static_cast<short>(param_3);
-        }
-        Process1WindowsMessage();
-        LogStr("Modify Sample 2");
+    if (gbNoSound != 0)
+        return;
+    if (field_0x36 == 0)
+        return;
+    if (field_0x684 == 0)
+        return;
+    if (field_0x3e == 0)
+        return;
+    LogStr("Modify Sample 1");
+    local_8 = -1;
+    for (local_10 = 0; local_10 < field_0x94; local_10++) {
+        if (field_0x54[local_10] == param_1)
+            local_8 = local_10;
     }
+    switch (param_2) {
+    case 1:
+    case 100:
+        iVar1 = ConvertVolume(param_3, 100);
+        _AIL_set_sample_volume_8(param_1, iVar1);
+        if (local_8 >= 0)
+            reinterpret_cast<short *>(&iLastVolume)[local_8] = static_cast<short>(param_3);
+        break;
+    case 5:
+        _AIL_start_sample_4(param_1);
+        break;
+    case 0x65:
+        ProcessAssert(gCdMusic == 0, __FILE__, __LINE__);
+        iVar1 = ConvertVolume(param_3, 0x65);
+        _AIL_set_sample_volume_8(param_1, iVar1);
+        if (local_8 >= 0)
+            reinterpret_cast<short *>(&iLastVolume)[local_8] = static_cast<short>(param_3);
+    }
+    Process1WindowsMessage();
+    LogStr("Modify Sample 2");
 }
 
 VA(0x004cce90, 0xa3)
@@ -839,8 +845,9 @@ void soundManager::GetNumberCDDrives(void) {}
 VA(0x004cdaa0, 0x2e)
 void soundManager::ServiceSound(void)
 {
-    if (gbNoSound == 0)
-        _AIL_serve_0();
+    if (gbNoSound != 0)
+        return;
+    _AIL_serve_0();
 }
 
 VA(0x004cdad0, 0x7f)
