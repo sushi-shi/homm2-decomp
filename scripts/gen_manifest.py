@@ -183,9 +183,18 @@ with open(os.path.join(REPO,"build","gen","symbol_names.csv"),"w") as f:
             kind="func"; size=fsize(va); n_func+=1
         f.write(f"0x{rva:x},{raw},{unit},0x{size:x},{kind}\n")
     n_const = 0
+    # Manual aliases for reloc targets that fall INSIDE a CodeView struct (e.g. gConfig at
+    # 0x128d20, size 0x1a0) and so get no public symbol of their own — the delinker would
+    # name them const_<rva>, which can never match a named C++ global. Naming them here makes
+    # the delinked target reloc equal our obj's reloc so the config-flag functions can match.
+    CONST_ALIASES = {
+        0x128d28: "?gMidiEnabled@@3HA",    # gConfig+0x08  int  MIDI music volume 0-10
+        0x128d2c: "?gSampleVolume@@3HA",   # gConfig+0x0c  int  sample/CD volume 0-10
+    }
     for tgt in sorted(consts):
         rva = tgt - imgbase
-        f.write(f"0x{rva:x},const_{rva:08x},_const,0x0,data\n"); n_const += 1; n_data += 1
+        name = CONST_ALIASES.get(rva, f"const_{rva:08x}")
+        f.write(f"0x{rva:x},{name},_const,0x0,data\n"); n_const += 1; n_data += 1
 
 # ---- emit units.toml (NWC reconstruction units only) ----
 units=[]

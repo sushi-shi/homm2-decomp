@@ -266,12 +266,15 @@ int soundManager::ConvertVolume(int param_1, int param_2)
 {
     int local_8 = 0;
     if (param_2 == 0x65) {
-        if (gMidiEnabled > 0 && gMidiEnabled < 0xb &&
-            (local_8 = ((0xb - gMidiEnabled) * param_1) / 10, local_8 < 1))
+        if (gMidiEnabled >= 1 && gMidiEnabled <= 0xa) {
+            local_8 = ((0xb - gMidiEnabled) * param_1) / 10;
+            if (local_8 < 1)
+                local_8 = 1;
+        }
+    } else if (gSampleVolume >= 1 && gSampleVolume <= 0xa) {
+        local_8 = ((0xb - gSampleVolume) * param_1) / 10;
+        if (local_8 < 1)
             local_8 = 1;
-    } else if (gSampleVolume > 0 && gSampleVolume < 0xb &&
-               (local_8 = ((0xb - gSampleVolume) * param_1) / 10, local_8 < 1)) {
-        local_8 = 1;
     }
     if (local_8 < 0)
         local_8 = 0;
