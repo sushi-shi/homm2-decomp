@@ -5,6 +5,10 @@
 
 #include <va.h>
 #include <BASE/listBoxWidget.h>
+#include <BASE/resourceManager.h>
+#include <BASE/Misc.h>
+#include <SOURCE/KB.h>
+#include <SOURCE/X_GLOBAL.h>
 VA(0x004db060, 0x42)
 listBoxWidget::listBoxWidget(void) : widget(0, 0, 0, 0, 0, 0)
 {
@@ -16,7 +20,17 @@ listBoxWidget::listBoxWidget(void) : widget(0, 0, 0, 0, 0, 0)
 }
 
 VA(0x004db0d0, 0x86)
-listBoxWidget::~listBoxWidget() {}
+listBoxWidget::~listBoxWidget()
+{
+    gpResourceManager->Dispose(field_0x20);
+    gpResourceManager->Dispose(field_0x24);
+    if (field_0x8e != 0)
+        delete field_0x8e;
+    for (int i = 0; i < field_0x32; i++)
+        BaseFree(field_0x3c[i], __FILE__, __LINE__);
+    BaseFree(field_0x3c, __FILE__, __LINE__);
+    gbSendMouseMoveMessages = 0;
+}
 
 VA(0x004db160, 0x26e)
 void listBoxWidget::Read(void) {}
