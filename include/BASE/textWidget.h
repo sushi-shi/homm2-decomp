@@ -8,6 +8,7 @@
 struct tag_message;
 
 class resource;
+class font;
 
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class textWidget : public widget {
@@ -16,7 +17,7 @@ public:
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base widget = 0x20 bytes at 0x00 via ': public widget'; own fields below)
     char   *field_0x20;  // +0x20  the text buffer (BaseAlloc'd)
-    resource *field_0x24;  // +0x24  the loaded resource (disposed in dtor)
+    font   *field_0x24;  // +0x24  the loaded font (disposed as resource in dtor)
     short  field_0x28;  // +0x28
     char   field_0x2a;  // +0x2a
     // --- constructors ---

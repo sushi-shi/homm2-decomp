@@ -8,6 +8,7 @@
 #include <BASE/resourceManager.h>
 #include <BASE/Misc.h>
 #include <BASE/font.h>
+#include <BASE/heroWindow.h>
 #include <SOURCE/KB.h>
 #include <string.h>
 VA(0x004d1060, 0x3e)
@@ -46,7 +47,15 @@ VA(0x004d1280, 0x210)
 int textWidget::Main(struct tag_message &) { return 0; }
 
 VA(0x004d1490, 0x49)
-void textWidget::Draw(void) {}
+void textWidget::Draw(void)
+{
+    int color = 3;
+    if ((field_0x16 & 8) == 0)
+        color = field_0x28;
+    field_0x24->DrawBoundedString(field_0x20, field_0x18 + field_0x4->field_0x28,
+                                  field_0x1a + field_0x4->field_0x2c, field_0x1c, field_0x1e,
+                                  color, field_0x2a);
+}
 
 VA(0x004d14e0, 0xc)
 void textWidget::SetColorIndex(short int param_1)
