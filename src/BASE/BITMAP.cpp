@@ -10,6 +10,7 @@
 #include <BASE/resourceManager.h>
 #include <BASE/heroWindowManager.h>
 #include <SOURCE/KB.h>
+#include <string.h>
 VA(0x004cffc0, 0x2a)
 bitmap::bitmap(void) : resource(0, 0, -1, 0)
 {
@@ -49,8 +50,45 @@ bitmap::~bitmap()
     field_0x16 = 0;
 }
 
+// @early-stop 1% — semantically exact clip-then-BlitBitmap (guards use >=0 to match the
+// retail test/jl). /O2 assigns this/params to different base registers than retail from
+// the first instruction, so every downstream byte differs — pervasive regalloc wall.
 VA(0x004d0160, 0xff)
-void bitmap::DrawToBufferCareful(short int, short int) {}
+void bitmap::DrawToBufferCareful(short int param_1, short int param_2)
+{
+    if (param_1 >= 0) {
+        if (field_0x12 + param_1 <= gpWindowManager->field_0x46->field_0x12 && param_2 >= 0 &&
+            field_0x14 + param_2 <= gpWindowManager->field_0x46->field_0x14) {
+            PollSound();
+            BlitBitmap(this, 0, 0, field_0x12, field_0x14, gpWindowManager->field_0x46, param_1,
+                       param_2);
+            PollSound();
+            return;
+        }
+    }
+    int iVar3 = field_0x12;
+    int iVar4 = field_0x14;
+    int iVar2 = param_1;
+    if (param_1 < 0) {
+        iVar3 = iVar3 + iVar2;
+        iVar2 = 0;
+    }
+    int local_8 = param_2;
+    if (param_2 < 0) {
+        local_8 = 0;
+        iVar4 = iVar4 + param_2;
+    }
+    bitmap *pbVar1 = gpWindowManager->field_0x46;
+    if (pbVar1->field_0x12 < iVar2 + iVar3) {
+        iVar3 = pbVar1->field_0x12 - iVar2;
+    }
+    if (pbVar1->field_0x14 < local_8 + iVar4) {
+        iVar4 = pbVar1->field_0x14 - local_8;
+    }
+    if (iVar3 >= 0 && iVar4 >= 0) {
+        BlitBitmap(this, 0, 0, iVar3, iVar4, pbVar1, iVar2, local_8);
+    }
+}
 
 VA(0x004d0260, 0x3c)
 void bitmap::DrawToBuffer(short x, short y)
@@ -80,14 +118,97 @@ void bitmap::GrabBitmap(class bitmap *src, short x, short y)
     BlitBitmap(src, x, y, field_0x12, field_0x14, this, 0, 0);
 }
 
+// @early-stop 1% — same clip-then-BlitBitmap shape and /O2 base-register wall as
+// DrawToBufferCareful above.
 VA(0x004d0340, 0xf0)
-void bitmap::GrabBitmapCareful(class bitmap *, short int, short int) {}
+void bitmap::GrabBitmapCareful(class bitmap *param_1, short int param_2, short int param_3)
+{
+    if (param_2 >= 0) {
+        if (param_2 + field_0x12 <= param_1->field_0x12 && param_3 >= 0) {
+            if (param_3 + field_0x14 <= param_1->field_0x14) {
+                BlitBitmap(param_1, param_2, param_3, field_0x12, field_0x14, this, 0, 0);
+                return;
+            }
+        }
+    }
+    int iVar1, iVar2;
+    int iVar3 = field_0x12;
+    int iVar4 = field_0x14;
+    if (param_2 < 0) {
+        iVar3 = iVar3 + param_2;
+        iVar1 = 0;
+    } else {
+        iVar1 = param_2;
+    }
+    if (param_3 < 0) {
+        iVar4 = iVar4 + param_3;
+        iVar2 = 0;
+    } else {
+        iVar2 = param_3;
+    }
+    if (param_1->field_0x12 < iVar1 + iVar3) {
+        iVar3 = param_1->field_0x12 - iVar1;
+    }
+    if (param_1->field_0x14 < iVar2 + iVar4) {
+        iVar4 = param_1->field_0x14 - iVar2;
+    }
+    if (iVar3 >= 0 && iVar4 >= 0) {
+        BlitBitmap(param_1, iVar1, iVar2, iVar3, iVar4, this, 0, 0);
+    }
+}
 
+// @early-stop 1% — semantically exact: both memcpys inline to the retail rep movs (the
+// full-width fast path even drops rep movsb since param_7*0x280 is a compile-time multiple
+// of 4, matching the dead byte-remainder in the decomp). Only the per-row address
+// arithmetic differs by /O2 register allocation — same loop-body regalloc wall as
+// CopyToCareful, not source-controllable.
 VA(0x004d0430, 0xcb)
-void bitmap::CopyTo(class bitmap *, int, int, int, int, int, int) {}
+void bitmap::CopyTo(class bitmap *param_1, int param_2, int param_3, int param_4, int param_5,
+                    int param_6, int param_7)
+{
+    PollSound();
+    if (param_6 == 0x280) {
+        // full-width (640) blit: source and dest rows are contiguous, one flat copy.
+        unsigned char *puVar5 = field_0x16 + param_4 + param_5 * 0x280;
+        unsigned char *puVar6 = param_1->field_0x16 + param_2 + param_3 * 0x280;
+        memcpy(puVar6, puVar5, param_7 * 0x280);
+    } else if (param_7 > 0) {
+        int iVar4 = param_5 * 0x280;
+        int iVar1 = param_3 * 0x280;
+        do {
+            int iVar2 = reinterpret_cast<int>(field_0x16) + iVar4;
+            iVar4 = iVar4 + 0x280;
+            unsigned char *puVar5 = reinterpret_cast<unsigned char *>(param_4 + iVar2);
+            unsigned char *puVar6 = param_1->field_0x16 + iVar1 + param_2;
+            memcpy(puVar6, puVar5, param_6);
+            iVar1 = iVar1 + 0x280;
+            param_7 = param_7 - 1;
+        } while (param_7 != 0);
+    }
+    PollSound();
+}
 
+// @early-stop 2% — semantically exact (memcpy inlines to the retail rep movsd/movsb,
+// prologue byte-identical, comma-guard iVar3=0 placement matches). The per-row address
+// math in the loop body differs only by /O2 register allocation (retail interleaves
+// index→addr per row; MSVC 4.2 schedules both indices first regardless of how the source
+// is written — verified across three expression forms). Loop-body regalloc wall.
 VA(0x004d0500, 0x65)
-void bitmap::CopyToCareful(class bitmap *, int, int, int, int, int, int) {}
+void bitmap::CopyToCareful(class bitmap *param_1, int param_2, int param_3, int param_4,
+                           int param_5, int param_6, int param_7)
+{
+    int iVar3;
+    if (param_6 > 0 && (iVar3 = 0, param_7 > 0)) {
+        do {
+            int iVar1 = param_5 + iVar3;
+            int iVar4 = param_3 + iVar3;
+            iVar3 = iVar3 + 1;
+            unsigned char *puVar5 = field_0x16 + iVar1 * field_0x12 + param_4;
+            unsigned char *puVar6 = param_1->field_0x16 + iVar4 * param_1->field_0x12 + param_2;
+            memcpy(puVar6, puVar5, param_6);
+        } while (iVar3 < param_7);
+    }
+}
 
 
 // ===== vtable bitmap (root)  (1 slots) =====
