@@ -57,7 +57,95 @@ VA(0x004dded0, 0x1)
 void widget::Close(void) {}
 
 VA(0x004ddee0, 0x2f4)
-int widget::Main(struct tag_message &) { return 0; }
+int widget::Main(tag_message &param_1)
+{
+    unsigned int uVar1;
+    unsigned short uVar2;
+    short sVar3, sVar4;
+    unsigned char *pFlagsHi = reinterpret_cast<unsigned char *>(&field_0x16) + 1;
+    if (param_1.type == 4) {
+        sVar3 = static_cast<short>(param_1.field4) - field_0x4->field_0x28;
+        sVar4 = static_cast<short>(param_1.field8) - field_0x4->field_0x2c;
+        if (field_0x18 <= sVar3 && field_0x1a <= sVar4 && sVar3 < field_0x1c + field_0x18 &&
+            sVar4 < field_0x1e + field_0x1a) {
+            param_1.field8 = field_0x10;
+            return 2;
+        }
+    } else if (param_1.type == 0x200) {
+        switch (param_1.field4) {
+        case 2:
+            if ((field_0x16 & 4) != 0)
+                Draw();
+            if ((field_0x16 & 8) != 0 && field_0x14 != 8 && field_0x14 != 0x200) {
+                short x = field_0x18 + field_0x4->field_0x28;
+                short y = field_0x1a + field_0x4->field_0x2c;
+                DimBitmapArea(gpWindowManager->field_0x46, x, y, field_0x1c, field_0x1e, 0);
+                return 0;
+            }
+            break;
+        case 5:
+            if (field_0x10 == param_1.field8) {
+                if (reinterpret_cast<int>(param_1.text) == 0x1000) {
+                    field_0x16 = field_0x16 | 8;
+                    return 1;
+                }
+                uVar2 = field_0x16 | static_cast<unsigned short>(reinterpret_cast<int>(param_1.text));
+                field_0x16 = uVar2;
+                if ((uVar2 & 8) != 0) {
+                    Draw();
+                    if (field_0x14 != 8 && field_0x14 != 0x200) {
+                        short x = field_0x18 + field_0x4->field_0x28;
+                        short y = field_0x1a + field_0x4->field_0x2c;
+                        DimBitmapArea(gpWindowManager->field_0x46, x, y, field_0x1c, field_0x1e, 0);
+                    }
+                }
+                if ((*pFlagsHi & 0x40) != 0) {
+                    gpWindowManager->UpdateScreenRegion(field_0x18 + field_0x4->field_0x28,
+                                                        field_0x1a + field_0x4->field_0x2c,
+                                                        field_0x1c, field_0x1e);
+                    *pFlagsHi = *pFlagsHi & 0xbf;
+                }
+                return 1;
+            }
+            break;
+        case 6:
+            if (field_0x10 == param_1.field8) {
+                uVar1 = reinterpret_cast<int>(param_1.text);
+                if (uVar1 == 0x1000) {
+                    field_0x16 = field_0x16 & 0xf7;
+                    return 1;
+                }
+                field_0x16 = field_0x16 & ~static_cast<unsigned short>(uVar1);
+                if ((uVar1 & 8) != 0)
+                    Draw();
+                if ((uVar1 & 0x4000) != 0)
+                    gpWindowManager->UpdateScreenRegion(field_0x18 + field_0x4->field_0x28,
+                                                        field_0x1a + field_0x4->field_0x2c,
+                                                        field_0x1c, field_0x1e);
+                return 1;
+            }
+            break;
+        case 0x34:
+            if (field_0x10 == param_1.field8) {
+                field_0x18 = static_cast<short>(reinterpret_cast<int>(param_1.text));
+                return 1;
+            }
+            break;
+        case 0x35:
+            if (field_0x10 == param_1.field8) {
+                field_0x1a = static_cast<short>(reinterpret_cast<int>(param_1.text));
+                return 1;
+            }
+            break;
+        case 0x3d:
+            if (field_0x10 == param_1.field8) {
+                field_0x1c = static_cast<short>(reinterpret_cast<int>(param_1.text));
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
 
 VA(0x004de1e0, 0x47)
 void widget::Dim(void)
