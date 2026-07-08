@@ -10,8 +10,19 @@
 #include <_globals_model.h>
 #include <SOURCE/KB.h>
 #include <BASE/mss.h>
+#include <stdio.h>
+#include <windows.h>
+#include <BASE/Misc.h>
 VA(0x004cb630, 0x68)
-void HandleMCIError(int, char *) {}
+void HandleMCIError(int param_1, char *param_2)
+{
+    mciGetErrorStringA(param_1, reinterpret_cast<char *>(&lpszReturnString), 0xff);
+    sprintf(gText, "CD MUSIC ERROR\nDescription: %s\nCall: %s", reinterpret_cast<char *>(&lpszReturnString), param_2);
+    gMciErrorFlag = 1;
+    gCdMusic = 0;
+    WritePrefs();
+    ShutDown(gText);
+}
 
 VA(0x004cb6a0, 0xc7)
 void soundManager::ValidatePreviousPosition(int) {}
