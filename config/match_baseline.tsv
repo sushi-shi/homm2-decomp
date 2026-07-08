@@ -413,12 +413,12 @@ BASE/soundmgr	?GetNumberCDDrives@soundManager@@QAEXXZ	100.0000	fde24968c623
 BASE/soundmgr	?HandleMCIError@@YIXHPAD@Z	99.6774	01384b3bfb23
 BASE/soundmgr	?Main@soundManager@@UAEHAAUtag_message@@@Z	100.0000	e76ae8c4e766
 BASE/soundmgr	?MemorySample@soundManager@@QAEPAU_SAMPLE@@PAVsample@@@Z	71.0486	e44e887e5ac1
-BASE/soundmgr	?ModifySample@soundManager@@QAEXPAU_SAMPLE@@FJ@Z	89.2917	bdccc6afd390
+BASE/soundmgr	?ModifySample@soundManager@@QAEXPAU_SAMPLE@@FJ@Z	92.2546	f45ab9f9f6c8
 BASE/soundmgr	?MusicPlaying@soundManager@@QAEHXZ	90.8000	34ea777f04c6
 BASE/soundmgr	?Open@soundManager@@UAEHH@Z	88.8042	c74653f47c45
 BASE/soundmgr	?PlayAmbientMusic@soundManager@@QAEXHJH@Z	68.4340	b017d2087167
 BASE/soundmgr	?PollSound@soundManager@@QAEXXZ	77.5841	9ed143ab0383
-BASE/soundmgr	?ServiceSound@soundManager@@QAEXXZ	87.0588	ea6ca50ae947
+BASE/soundmgr	?ServiceSound@soundManager@@QAEXXZ	96.4706	65800eaa0fc0
 BASE/soundmgr	?SetMusicQuality@soundManager@@QAEXH@Z	59.4407	604754b87654
 BASE/soundmgr	?SetReady2Poll@@YGXK@Z	67.2000	7c89bbe06950
 BASE/soundmgr	?StartSample@soundManager@@QAEPAU_SAMPLE@@PADPAPADFFHHJ@Z	100.0000	0b90298d2458
