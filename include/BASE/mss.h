@@ -5,6 +5,10 @@
 // here like the Win32 imports so the sound-manager TU can link. Extend as more
 // AIL_* calls are recovered from the soundManager methods.
 extern "C" void _AIL_serve_0(void);
+struct _DIG_DRIVER;
+extern "C" void _AIL_set_preference_8(int, int);
+extern "C" int _AIL_waveOutOpen_16(struct _DIG_DRIVER **, int, int, void *);
+extern "C" char *_AIL_last_error_0(void);
 extern "C" void _AIL_shutdown_0(void);
 extern "C" struct _SAMPLE *_AIL_allocate_sample_handle_4(int);
 extern "C" int _AIL_sample_status_4(struct _SAMPLE *);
