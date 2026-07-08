@@ -367,5 +367,5 @@ int iCycle1Count;
 int iCycle2Count;
 int iCycle3Count;
 int iDialogNestCount;
-signed char *gCyclePal;
+signed char *gCyclePal[24];
 short memSelector;

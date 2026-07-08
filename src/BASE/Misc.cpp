@@ -22,6 +22,8 @@
 #include <io.h>
 #include <fcntl.h>
 #include <string.h>
+#include <BASE/palette.h>
+#include <SOURCE/X_GLOBAL.h>
 
 static int giFindMid;
 
@@ -222,7 +224,13 @@ void BitmapToScreen(class bitmap *bmp)
 }
 
 VA(0x004c5e70, 0x3d)
-void SetPalette(signed char *, int) {}
+void SetPalette(signed char *param_1, int param_2)
+{
+    memcpy(gpBufferPalette->field_0x10, param_1, 0x300);
+    memcpy(gCyclePal, param_1 + 0x282, 0x60);
+    if (param_2 != 0)
+        UpdatePalette(gpBufferPalette->field_0x10);
+}
 
 VA(0x004c5eb0, 0x25)
 void BlitBitmapToScreenNoMouseCheck(class bitmap *bmp, int p2, int p3, int p4, int p5, int p6, int p7)

@@ -57,7 +57,7 @@ DATA(0x0051ef30) extern int iCycle1Count;
 DATA(0x0051ef34) extern int iCycle2Count;
 DATA(0x0051ef38) extern int iCycle3Count;
 DATA(0x0051ef3c) extern int iDialogNestCount;
-DATA(0x00534908) extern signed char *gCyclePal;
+DATA(0x00534908) extern signed char *gCyclePal[24];
 DATA(0x00534968) extern short memSelector;
 
 #endif // HOMM2_BASE_HEROWINDOWMANAGER_H
