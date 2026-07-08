@@ -137,21 +137,25 @@ void soundManager::CDSetVolume(int param_1, int param_2)
 {
     int local_c;
     unsigned long local_8;
-    if (gbNoSound == 0 && m_cdReady != 0 && m_auxDevice != -1) {
-        if (param_1 == -1)
-            local_c = gMidiEnabled;
-        else
-            local_c = param_1;
-        if (local_c == 0) {
-            local_8 = 0;
-        } else {
-            if (param_2 != 0)
-                local_c = 0xb - local_c / 0xc;
-            int local_10 = 0xc - local_c;
-            local_8 = local_10 * 0x10000000 | local_10 * 0x1000;
-        }
-        auxSetVolume(m_auxDevice, local_8);
+    if (gbNoSound != 0)
+        return;
+    if (m_cdReady == 0)
+        return;
+    if (m_auxDevice == -1)
+        return;
+    if (param_1 == -1)
+        local_c = gMidiEnabled;
+    else
+        local_c = param_1;
+    if (local_c == 0) {
+        local_8 = 0;
+    } else {
+        if (param_2 != 0)
+            local_c = 0xb - local_c / 0xc;
+        int local_10 = 0xc - local_c;
+        local_8 = local_10 * 0x10000000 | local_10 * 0x1000;
     }
+    auxSetVolume(m_auxDevice, local_8);
 }
 
 VA(0x004cbc40, 0x473)
@@ -782,25 +786,27 @@ void soundManager::PollSound(void)
 VA(0x004cd6b0, 0x138)
 void soundManager::SwitchAmbientMusic(int param_1)
 {
-    if (gbNoSound == 0 && m_samplesReady != 0) {
-        if (gMidiEnabled == 0) {
-            m_currentTrack = static_cast<char>(param_1);
-        } else if (MusicPlaying() == 0) {
-            PlayAmbientMusic(param_1, 0, -1);
-        } else if (m_currentTrack != param_1) {
-            LogStr("Switch Ambient Music 1");
-            Process1WindowsMessage();
-            if ((field_0x688 != 0 && field_0x68c != param_1) ||
-                (field_0x688 == 0 && m_currentTrack != param_1)) {
-                if (field_0x688 < 0xb) {
-                    field_0x688 = 0xb;
-                    gMusicFadeTimer = KBTickCount() + 900;
-                }
-                field_0x68c = param_1;
-                PollSound();
+    if (gbNoSound != 0)
+        return;
+    if (m_samplesReady == 0)
+        return;
+    if (gMidiEnabled == 0) {
+        m_currentTrack = static_cast<char>(param_1);
+    } else if (MusicPlaying() == 0) {
+        PlayAmbientMusic(param_1, 0, -1);
+    } else if (m_currentTrack != param_1) {
+        LogStr("Switch Ambient Music 1");
+        Process1WindowsMessage();
+        if ((field_0x688 != 0 && field_0x68c != param_1) ||
+            (field_0x688 == 0 && m_currentTrack != param_1)) {
+            if (field_0x688 < 0xb) {
+                field_0x688 = 0xb;
+                gMusicFadeTimer = KBTickCount() + 900;
             }
-            LogStr("Switch Ambient Music 2");
+            field_0x68c = param_1;
+            PollSound();
         }
+        LogStr("Switch Ambient Music 2");
     }
 }
 
