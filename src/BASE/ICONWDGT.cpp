@@ -20,11 +20,40 @@ iconWidget::iconWidget(void) : widget(0, 0, 0, 0, 0, 0)
     field_0x29 = 0;
 }
 
+// @early-stop ~16% — prologue through GetIcon is byte-identical; only the final 5 field
+// stores differ, purely /O2 register allocation (retail loads param_6→cx first for an
+// ascending-offset store order; ours loads param_10→cx first, descending). Not
+// source-controllable — reordering the assignments produces byte-identical output.
 VA(0x004d0ad0, 0x6a)
-iconWidget::iconWidget(short int, short int, short int, short int, unsigned long int, short int, signed char, short int, short int, short int) {}
+iconWidget::iconWidget(short int param_1, short int param_2, short int param_3, short int param_4,
+                       unsigned long int param_5, short int param_6, signed char param_7,
+                       short int param_8, short int param_9, short int param_10)
+    : widget(param_1, param_2, param_3, param_4, param_8, param_9)
+{
+    field_0x29 = param_5;
+    field_0x20 = gpResourceManager->GetIcon(param_5);
+    field_0x24 = param_6;
+    field_0x26 = param_7;
+    field_0x27 = param_10;
+    field_0x14 = param_9;
+}
 
+// @early-stop ~13% — same /O2 register-scheduling wall as the sibling ctor above; body
+// is semantically exact (MakeId+GetIcon then the same field stores).
 VA(0x004d0b40, 0x78)
-iconWidget::iconWidget(short int, short int, short int, short int, char *, short int, signed char, short int, short int, short int) {}
+iconWidget::iconWidget(short int param_1, short int param_2, short int param_3, short int param_4,
+                       char *param_5, short int param_6, signed char param_7, short int param_8,
+                       short int param_9, short int param_10)
+    : widget(param_1, param_2, param_3, param_4, param_8, param_9)
+{
+    unsigned long int uVar1 = gpResourceManager->MakeId(param_5, 1);
+    field_0x29 = uVar1;
+    field_0x20 = gpResourceManager->GetIcon(uVar1);
+    field_0x24 = param_6;
+    field_0x26 = param_7;
+    field_0x27 = param_10;
+    field_0x14 = param_9;
+}
 
 VA(0x004d0bc0, 0xdf)
 void iconWidget::Read(void)
