@@ -204,7 +204,7 @@ BASE/MOUSEMGR	?SetPointer@mouseManager@@QAEXPADHH@Z	97.2418	57fafe6cd329
 BASE/MOUSEMGR	?ShowColorPointer@mouseManager@@QAEXXZ	100.0000	f56b43291986
 BASE/Midi	?MIDIIsPlaying@soundManager@@QAEHXZ	92.7083	83c30248b74e
 BASE/Midi	?MIDIPlay@soundManager@@QAEXH@Z	0.4115	2edde2efd07f
-BASE/Midi	?MIDISetVolume@soundManager@@QAEXXZ	2.6316	ca630a4bc4c5
+BASE/Midi	?MIDISetVolume@soundManager@@QAEXXZ	79.0263	7f1fa6f17e96
 BASE/Midi	?MIDIShutdown@soundManager@@QAEXXZ	0.9709	de1e04f80927
 BASE/Midi	?MIDIStartup@soundManager@@QAEXXZ	2.1739	303f4868d975
 BASE/Midi	?MIDIStop@soundManager@@QAEXXZ	1.5625	8c879e75644d
