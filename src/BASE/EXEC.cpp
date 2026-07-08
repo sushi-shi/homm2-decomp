@@ -8,7 +8,13 @@
 #include <BASE/baseManager.h>
 #include <BASE/Misc.h>
 #include <stdio.h>
+#include <BASE/resourceManager.h>
+#include <BASE/inputManager.h>
+#include <BASE/soundManager.h>
+#include <BASE/heroWindowManager.h>
+#include <BASE/mouseManager.h>
 #include <SOURCE/KB.h>
+#include <SOURCE/X_GLOBAL.h>
 VA(0x004d1610, 0x10)
 executive::executive(void)
 {
@@ -19,10 +25,42 @@ executive::executive(void)
 }
 
 VA(0x004d1620, 0x9e)
-int executive::InitSystem(void) { return 0; }
+int executive::InitSystem(void)
+{
+    if (gpResourceManager->Open(-1) != 0)
+        ShutDown("Unable to initialize resources!");
+    if (gpInputManager->Open(-1) != 0)
+        ShutDown("Unable to initialize input devices!");
+    if (giCurExe == 1) {
+        if (gpSoundManager->Open(-1) != 0)
+            ShutDown("Unable to initialize sound!");
+    }
+    if (AddManager(gpMouseManager, -1) != 0)
+        ShutDown("Unable to initialize mouse!");
+    if (AddManager(gpWindowManager, -1) != 0)
+        ShutDown("Unable to initialize windows!  Perhaps you are low on memory?");
+    return 0;
+}
 
 VA(0x004d16c0, 0x86)
-void executive::ShutDownSystem(void) {}
+void executive::ShutDownSystem(void)
+{
+    EarlyShutDownSystem();
+    gpSoundManager->Close();
+    baseManager *next = field_0x0;
+    baseManager *cur;
+    while ((cur = next) != 0) {
+        next = cur->field_0x4;
+        if (cur != gpWindowManager && cur != gpMouseManager)
+            RemoveManager(cur);
+    }
+    if (gpWindowManager->field_0x32 == 1)
+        RemoveManager(gpWindowManager);
+    if (gpMouseManager->field_0x32 == 1)
+        RemoveManager(gpMouseManager);
+    gpInputManager->Close();
+    gpResourceManager->Close();
+}
 
 VA(0x004d1750, 0xfb)
 int executive::DoDialog(class baseManager *) { return 0; }
