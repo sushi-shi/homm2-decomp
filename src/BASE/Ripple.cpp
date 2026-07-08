@@ -86,9 +86,9 @@ void DoRipple(class bitmap *param_1, class bitmap *param_2, int param_3, int par
         for (iVar2 = 0; iVar2 < 0x33; iVar2++) {
             iVar3 = iVar2 - 0x19 + local_2c4;
             if (iVar3 >= 0 && iVar3 < 0x280 && local_2c0[iVar3 + 0x40] != local_2c0[iVar2]) {
-                unsigned char *puVar4 = local_288->pixels + iVar3;
+                unsigned char *puVar4 = local_288->m_pixels + iVar3;
                 int iVar1 = local_2c0[iVar2] * param_4;
-                unsigned char *puVar5 = local_284->pixels + iVar1 * 0x280 + iVar3;
+                unsigned char *puVar5 = local_284->m_pixels + iVar1 * 0x280 + iVar3;
                 for (; iVar1 < param_3 && (*puVar4 = *puVar5, iVar1 - param_3 != -1); iVar1++) {
                     puVar4 += 0x280;
                     puVar5 += 0x280;

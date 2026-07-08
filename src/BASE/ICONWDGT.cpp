@@ -148,8 +148,8 @@ LAB_widgetmain:
         }
         goto LAB_004d0df0;
     }
-    sVar2 = static_cast<short>(param_1.field4) - field_0x4->posX;
-    sVar5 = static_cast<short>(param_1.field8) - field_0x4->posY;
+    sVar2 = static_cast<short>(param_1.field4) - field_0x4->m_posX;
+    sVar5 = static_cast<short>(param_1.field8) - field_0x4->m_posY;
     if (field_0x18 <= sVar2 && field_0x1a <= sVar5 && sVar2 < field_0x1c + field_0x18 &&
         sVar5 < field_0x1e + field_0x1a) {
         if (iVar3 == 0x20) {
@@ -170,8 +170,8 @@ VA(0x004d0f70, 0xe5)
 void iconWidget::Draw(void)
 {
     short type = field_0x14;
-    short x = field_0x4->posX + field_0x18;
-    short y = field_0x4->posY + field_0x1a;
+    short x = field_0x4->m_posX + field_0x18;
+    short y = field_0x4->m_posY + field_0x1a;
     if (type == 0x10) {
         field_0x20->DrawToBuffer(x, y, field_0x24, field_0x26);
         return;

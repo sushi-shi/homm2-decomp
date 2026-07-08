@@ -122,8 +122,8 @@ LAB_004d12c4:
         }
         goto LAB_004d136b;
     }
-    sVar9 = static_cast<short>(param_1.field4) - field_0x4->posX;
-    sVar7 = static_cast<short>(param_1.field8) - field_0x4->posY;
+    sVar9 = static_cast<short>(param_1.field4) - field_0x4->m_posX;
+    sVar7 = static_cast<short>(param_1.field8) - field_0x4->m_posY;
     if (field_0x18 <= sVar9 && field_0x1a <= sVar7 && sVar9 < field_0x1c + field_0x18 &&
         sVar7 < field_0x1e + field_0x1a) {
         field_0x16 = uVar2 | 1;
@@ -143,8 +143,8 @@ void textWidget::Draw(void)
     int color = 3;
     if ((field_0x16 & 8) == 0)
         color = field_0x28;
-    field_0x24->DrawBoundedString(field_0x20, field_0x18 + field_0x4->posX,
-                                  field_0x1a + field_0x4->posY, field_0x1c, field_0x1e,
+    field_0x24->DrawBoundedString(field_0x20, field_0x18 + field_0x4->m_posX,
+                                  field_0x1a + field_0x4->m_posY, field_0x1c, field_0x1e,
                                   color, field_0x2a);
 }
 

@@ -13,19 +13,19 @@ class heroWindow {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
-    int    zOrder;  // +0x00
-    heroWindow *nextWindow;  // +0x04  next window in the manager list
-    heroWindow *prevWindow;  // +0x08  prev window in the manager list
+    int    m_zOrder;  // +0x00
+    heroWindow *m_nextWindow;  // +0x04  next window in the manager list
+    heroWindow *m_prevWindow;  // +0x08  prev window in the manager list
     char   name[0x14];  // +0x0c  window name (strcpy'd, e.g. "Default Construct")
-    int    winFlags;  // +0x20  !union: conflicting widths
-    int    winState;  // +0x24  !union: conflicting widths
-    int    posX;  // +0x28
-    int    posY;  // +0x2c
-    int    winWidth;  // +0x30
-    int    winHeight;  // +0x34
-    widget *widgetListTail;  // +0x38  widget-list tail
-    widget *widgetListHead;  // +0x3c  head of the widget list
-    bitmap *savedBackground;  // +0x40  saved-background bitmap
+    int    m_winFlags;  // +0x20  !union: conflicting widths
+    int    m_winState;  // +0x24  !union: conflicting widths
+    int    m_posX;  // +0x28
+    int    m_posY;  // +0x2c
+    int    m_winWidth;  // +0x30
+    int    m_winHeight;  // +0x34
+    widget *m_widgetListTail;  // +0x38  widget-list tail
+    widget *m_widgetListHead;  // +0x3c  head of the widget list
+    bitmap *m_savedBackground;  // +0x40  saved-background bitmap
     // size >= 0x44 (accessed lower bound; no ctor/stride oracle)
     // --- constructors ---
     heroWindow(void);

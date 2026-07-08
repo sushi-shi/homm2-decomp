@@ -44,10 +44,10 @@ sample::sample(char *param_1, long int param_2, long int param_3, long int param
         iVar6 = iVar6 + 1;
     } while (iVar6 < 3);
     field_0x24 = field_0x24 + iVar7;
-    unsigned long size = gpResourceManager->GetFileSize(id);
+    unsigned long size = gpResourceManager->GetFileSize(m_id);
     field_0x14 = static_cast<char *>(BaseAlloc(size, __FILE__, __LINE__));
     field_0x18 = size;
-    gpResourceManager->PointToFile(id);
+    gpResourceManager->PointToFile(m_id);
     gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(field_0x14), size);
 }
 
@@ -63,9 +63,9 @@ sample::~sample()
 VA(0x004daf70, 0x72)
 MIDIWrap::MIDIWrap(char *name) : resource(6, gpResourceManager->MakeId(name, 1), 1, 0)
 {
-    unsigned long size = gpResourceManager->GetFileSize(id);
+    unsigned long size = gpResourceManager->GetFileSize(m_id);
     field_0x10 = static_cast<char *>(BaseAlloc(size, __FILE__, __LINE__));
-    gpResourceManager->PointToFile(id);
+    gpResourceManager->PointToFile(m_id);
     gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(field_0x10), size);
 }
 

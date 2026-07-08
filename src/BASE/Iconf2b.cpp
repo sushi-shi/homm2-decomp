@@ -60,8 +60,8 @@ void FlipIconToBitmap(class icon *param_1, class bitmap *param_2, int param_3, i
             param_6 = 0;
         }
     }
-    short sVar2 = param_2->width;
-    gFlipRow = gFlipY * sVar2 + reinterpret_cast<int>(param_2->pixels);
+    short sVar2 = param_2->m_width;
+    gFlipRow = gFlipY * sVar2 + reinterpret_cast<int>(param_2->m_pixels);
     gFlipX = gFlipXEnd;
     pbVar8 = reinterpret_cast<unsigned char *>(param_1->field_0x12) + gFlipEntry->srcOffset;
 LAB_004d1c83:

@@ -55,8 +55,8 @@ void FlipMonoIconToBitmap(class icon *param_1, class bitmap *param_2, int param_
             param_7 = 0;
         }
     }
-    short sVar2 = param_2->width;
-    gFMRow = gFMY * sVar2 + reinterpret_cast<int>(param_2->pixels);
+    short sVar2 = param_2->m_width;
+    gFMRow = gFMY * sVar2 + reinterpret_cast<int>(param_2->m_pixels);
     gFMX = gFMXEnd;
     do {
         while (1) {

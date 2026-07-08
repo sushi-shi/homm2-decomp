@@ -19,7 +19,7 @@ void IconToBitmapScale(class icon *param_1, class bitmap *param_2, int param_3, 
     if (param_11 != 0x20) {
         int iVar2 = 0x20 / param_11;
         bitmap *local_18 = new bitmap(0, 0x40, 0x40);
-        int iVar3 = reinterpret_cast<int>(local_18->pixels);
+        int iVar3 = reinterpret_cast<int>(local_18->m_pixels);
         int iVar5 = 0;
         do {
             int *puVar8 = reinterpret_cast<int *>(iVar3 + iVar5);
@@ -28,11 +28,11 @@ void IconToBitmapScale(class icon *param_1, class bitmap *param_2, int param_3, 
             iVar5 = iVar5 + 0x20;
         } while (iVar5 < 0x800);
         IconToBitmap(param_1, local_18, 0, 0, param_5, 1, 0, 0, 0x20, 0x20, 0);
-        short sVar1 = param_2->width;
+        short sVar1 = param_2->m_width;
         char *local_c = reinterpret_cast<char *>(param_3 + param_4 * sVar1 +
-                                                 reinterpret_cast<int>(param_2->pixels));
+                                                 reinterpret_cast<int>(param_2->m_pixels));
         char *pcVar6 = reinterpret_cast<char *>((((1 - param_11) * iVar2 + 0x20) >> 1) * 0x41 +
-                                                reinterpret_cast<int>(local_18->pixels));
+                                                reinterpret_cast<int>(local_18->m_pixels));
         if (0 < param_11) {
             int local_14 = param_11;
             do {

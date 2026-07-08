@@ -28,17 +28,17 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
-    resource *resourceListHead;  // +0x36  resource-list head
-    int    numAggregates;  // +0x3a
-    int    curAggregate;  // +0x3e
-    int    aggregateFd[2];  // +0x42  per-aggregate file descriptors
-    aggEntry *aggregateDir[2];  // +0x4a  per-aggregate directory
-    int    aggregateEntryCount[2];  // +0x52
-    int    expunging;  // +0x5a
+    resource *m_resourceListHead;  // +0x36  resource-list head
+    int    m_numAggregates;  // +0x3a
+    int    m_curAggregate;  // +0x3e
+    int    m_aggregateFd[2];  // +0x42  per-aggregate file descriptors
+    aggEntry *m_aggregateDir[2];  // +0x4a  per-aggregate directory
+    int    m_aggregateEntryCount[2];  // +0x52
+    int    m_expunging;  // +0x5a
     char _pad_0x5e[0x4];
-    char   aggregateName;  // +0x62
+    char   m_aggregateName;  // +0x62
     char _pad_0x63[0x3b];
-    int    lastFileId;  // +0x9e
+    int    m_lastFileId;  // +0x9e
     // --- constructors ---
     resourceManager(void);
     // --- virtual methods (vtable order) ---

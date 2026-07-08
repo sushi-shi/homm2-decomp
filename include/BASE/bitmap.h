@@ -12,9 +12,9 @@ public:
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (vptr auto-emitted at 0x00; own data starts at 0x04)
     short  field_0x10;  // +0x10
-    short  width;  // +0x12
-    short  height;  // +0x14
-    unsigned char *pixels;  // +0x16  pixel data
+    short  m_width;  // +0x12
+    short  m_height;  // +0x14
+    unsigned char *m_pixels;  // +0x16  pixel data
     // --- constructors ---
     bitmap(void);
     bitmap(short int, short int, short int);
