@@ -51,8 +51,8 @@ void DimIconToBitmap(class icon *param_1, class bitmap *param_2, int param_3, in
             param_7 = 0;
         }
     }
-    short sVar2 = param_2->width;
-    gDimRow = gDimY * sVar2 + reinterpret_cast<int>(param_2->pixels);
+    short sVar2 = param_2->m_width;
+    gDimRow = gDimY * sVar2 + reinterpret_cast<int>(param_2->m_pixels);
     gDimX = gDimX0;
     while (1) {
         while (1) {

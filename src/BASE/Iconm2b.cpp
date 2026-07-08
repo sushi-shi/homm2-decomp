@@ -50,8 +50,8 @@ void MonoIconToBitmap(class icon *param_1, class bitmap *param_2, int param_3, i
             param_7 = 0;
         }
     }
-    short sVar2 = param_2->width;
-    gMonoRow = gMonoY * sVar2 + reinterpret_cast<int>(param_2->pixels);
+    short sVar2 = param_2->m_width;
+    gMonoRow = gMonoY * sVar2 + reinterpret_cast<int>(param_2->m_pixels);
     gMonoX = gMonoX0;
     do {
         while (1) {

@@ -28,7 +28,7 @@ void DoBlur(class bitmap *param_1, class bitmap *param_2, int param_3, int param
     gpWindowManager->SaveFizzleSource(0, 0, 0x280, param_3);
     bitmap *work = new bitmap(0, 0x280, param_3);
     unsigned int nbytes = param_3 * 0x280;
-    memcpy(work->pixels, param_2->pixels, nbytes);
+    memcpy(work->m_pixels, param_2->m_pixels, nbytes);
     char *pcVar18 = static_cast<char *>(BaseAlloc(0x8000, __FILE__, __LINE__));
     unsigned char *pbVar26 = reinterpret_cast<unsigned char *>(gpBufferPalette->field_0x10);
     for (i = 0; i < 0x100; i++) {
@@ -40,13 +40,13 @@ void DoBlur(class bitmap *param_1, class bitmap *param_2, int param_3, int param
     unsigned long id = gpResourceManager->MakeId("RGBLOOKP.BIN", 1);
     gpResourceManager->PointToFile(id);
     gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(pcVar18), 0x8000);
-    memcpy(param_1->pixels, param_2->pixels, nbytes);
+    memcpy(param_1->m_pixels, param_2->m_pixels, nbytes);
     PollSound();
     for (y = 4; y < param_3 - 4; y++) {
         if ((y & 0x3f) == 0x3f)
             PollSound();
-        unsigned char *iVar25 = param_1->pixels + 4 + y * 0x280;
-        char *dstRow = reinterpret_cast<char *>(param_2->pixels) + 4 + y * 0x280;
+        unsigned char *iVar25 = param_1->m_pixels + 4 + y * 0x280;
+        char *dstRow = reinterpret_cast<char *>(param_2->m_pixels) + 4 + y * 0x280;
         for (x = 0x278; x != 0; x--) {
             bVar1 = iVar25[0x280];
             bVar2 = iVar25[-0xa00];

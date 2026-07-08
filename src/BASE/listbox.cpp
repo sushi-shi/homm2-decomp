@@ -194,8 +194,8 @@ int listBoxWidget::Main(tag_message &param_1)
         if (iVar4 == 8) {
 LAB_004db5a2:
             if ((uVar2 & 4) != 0) {
-                sVar3 = static_cast<short>(param_1.field4) - field_0x4->posX;
-                sVar10 = static_cast<short>(param_1.field8) - field_0x4->posY;
+                sVar3 = static_cast<short>(param_1.field4) - field_0x4->m_posX;
+                sVar10 = static_cast<short>(param_1.field8) - field_0x4->m_posY;
                 if (field_0x18 <= sVar3 && field_0x1a <= sVar10 && sVar3 < field_0x1c + field_0x18 &&
                     sVar10 < field_0x1e + field_0x1a) {
                     if (iVar4 == 0x20) {
@@ -310,8 +310,8 @@ void listBoxWidget::DrawLBStuff(int param_1)
 {
     short sVar1, sVar4;
     int iVar2, iVar3, iVar5;
-    iVar2 = field_0x60 + field_0x4->posX;
-    iVar5 = field_0x62 + field_0x4->posY;
+    iVar2 = field_0x60 + field_0x4->m_posX;
+    iVar5 = field_0x62 + field_0x4->m_posY;
     iVar3 = 0;
     if (0 < field_0x28) {
         do {
@@ -362,41 +362,41 @@ LAB_004dba0b:
         sVar4 = field_0x4a;
     else
         sVar4 = field_0x4c;
-    field_0x24->DrawToBuffer(field_0x68 + field_0x4->posX, field_0x6a + field_0x4->posY,
+    field_0x24->DrawToBuffer(field_0x68 + field_0x4->m_posX, field_0x6a + field_0x4->m_posY,
                              sVar4, 0);
     iVar2 = 2;
-    field_0x24->DrawToBuffer(field_0x4->posX + field_0x70, field_0x4->posY + field_0x72,
+    field_0x24->DrawToBuffer(field_0x4->m_posX + field_0x70, field_0x4->m_posY + field_0x72,
                              field_0x52, 0);
     if (2 < field_0x28 - 2) {
         do {
             iVar3 = iVar2 - 1;
             iVar2 = iVar2 + 1;
-            field_0x24->DrawToBuffer(field_0x4->posX + field_0x70,
-                                     field_0x5c * iVar3 + field_0x4->posY + field_0x72,
+            field_0x24->DrawToBuffer(field_0x4->m_posX + field_0x70,
+                                     field_0x5c * iVar3 + field_0x4->m_posY + field_0x72,
                                      field_0x54, 0);
         } while (iVar2 < field_0x28 - 2);
     }
-    field_0x24->DrawToBuffer(field_0x4->posX + field_0x70,
-                             field_0x5c * (iVar2 - 1) + field_0x4->posY + field_0x72, field_0x56,
+    field_0x24->DrawToBuffer(field_0x4->m_posX + field_0x70,
+                             field_0x5c * (iVar2 - 1) + field_0x4->m_posY + field_0x72, field_0x56,
                              0);
     if (field_0x8b == 0)
         sVar4 = field_0x4e;
     else
         sVar4 = field_0x50;
-    field_0x24->DrawToBuffer(field_0x78 + field_0x4->posX, field_0x7a + field_0x4->posY,
+    field_0x24->DrawToBuffer(field_0x78 + field_0x4->m_posX, field_0x7a + field_0x4->m_posY,
                              sVar4, 0);
-    sVar4 = static_cast<short>(field_0x4->posX) + 5 + field_0x70;
+    sVar4 = static_cast<short>(field_0x4->m_posX) + 5 + field_0x70;
     field_0x80 = sVar4;
     if (field_0x42 < 1)
         sVar1 = field_0x88 / 2;
     else
         sVar1 = static_cast<short>((field_0x40 * field_0x88) / field_0x42);
-    sVar1 = static_cast<short>(field_0x4->posY) + field_0x72 + 3 + sVar1;
+    sVar1 = static_cast<short>(field_0x4->m_posY) + field_0x72 + 3 + sVar1;
     field_0x82 = sVar1;
     field_0x24->DrawToBuffer(sVar4, sVar1, field_0x58, 0);
     if (param_1 != 0)
-        gpWindowManager->UpdateScreenRegion(field_0x18 + field_0x4->posX,
-                                            field_0x1a + field_0x4->posY, field_0x1c, field_0x1e);
+        gpWindowManager->UpdateScreenRegion(field_0x18 + field_0x4->m_posX,
+                                            field_0x1a + field_0x4->m_posY, field_0x1c, field_0x1e);
 }
 
 VA(0x004dbbe0, 0x312)
@@ -406,8 +406,8 @@ int listBoxWidget::ProcessMouseMessage(tag_message &param_1)
     int iVar3, iVar5, iVar6, iVar7, iVar8;
     long lVar4;
     iVar6 = param_1.type;
-    iVar7 = param_1.field10 - field_0x4->posX;
-    iVar5 = param_1.field14 - field_0x4->posY;
+    iVar7 = param_1.field10 - field_0x4->m_posX;
+    iVar5 = param_1.field14 - field_0x4->m_posY;
     iVar8 = field_0x62;
     iVar3 = iVar5 - iVar8;
     if (iVar6 == 4) {

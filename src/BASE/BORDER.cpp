@@ -98,8 +98,8 @@ int border::Main(struct tag_message &msg)
         }
         return 0;
     }
-    short mx = static_cast<short>(msg.field4) - field_0x4->posX;
-    short my = static_cast<short>(msg.field8) - field_0x4->posY;
+    short mx = static_cast<short>(msg.field4) - field_0x4->m_posX;
+    short my = static_cast<short>(msg.field8) - field_0x4->m_posY;
     if (field_0x18 <= mx && field_0x1a <= my &&
         mx < field_0x1c + field_0x18 && my < field_0x1e + field_0x1a) {
         if (type == 0x20) {
@@ -119,8 +119,8 @@ int border::Main(struct tag_message &msg)
 VA(0x004d2480, 0xab)
 void border::Draw(void)
 {
-    short y = field_0x1a + field_0x4->posY;
-    short x = field_0x18 + field_0x4->posX;
+    short y = field_0x1a + field_0x4->m_posY;
+    short x = field_0x18 + field_0x4->m_posX;
     short kind = field_0x14;
     if (kind == 0x400) {
         FillBitmapArea(gpWindowManager->field_0x46, x, y, field_0x1c, field_0x1e, field_0x28);

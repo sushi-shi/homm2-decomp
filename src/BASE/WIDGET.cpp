@@ -64,8 +64,8 @@ int widget::Main(tag_message &param_1)
     short sVar3, sVar4;
     unsigned char *pFlagsHi = reinterpret_cast<unsigned char *>(&field_0x16) + 1;
     if (param_1.type == 4) {
-        sVar3 = static_cast<short>(param_1.field4) - field_0x4->posX;
-        sVar4 = static_cast<short>(param_1.field8) - field_0x4->posY;
+        sVar3 = static_cast<short>(param_1.field4) - field_0x4->m_posX;
+        sVar4 = static_cast<short>(param_1.field8) - field_0x4->m_posY;
         if (field_0x18 <= sVar3 && field_0x1a <= sVar4 && sVar3 < field_0x1c + field_0x18 &&
             sVar4 < field_0x1e + field_0x1a) {
             param_1.field8 = field_0x10;
@@ -77,8 +77,8 @@ int widget::Main(tag_message &param_1)
             if ((field_0x16 & 4) != 0)
                 Draw();
             if ((field_0x16 & 8) != 0 && field_0x14 != 8 && field_0x14 != 0x200) {
-                short x = field_0x18 + field_0x4->posX;
-                short y = field_0x1a + field_0x4->posY;
+                short x = field_0x18 + field_0x4->m_posX;
+                short y = field_0x1a + field_0x4->m_posY;
                 DimBitmapArea(gpWindowManager->field_0x46, x, y, field_0x1c, field_0x1e, 0);
                 return 0;
             }
@@ -94,14 +94,14 @@ int widget::Main(tag_message &param_1)
                 if ((uVar2 & 8) != 0) {
                     Draw();
                     if (field_0x14 != 8 && field_0x14 != 0x200) {
-                        short x = field_0x18 + field_0x4->posX;
-                        short y = field_0x1a + field_0x4->posY;
+                        short x = field_0x18 + field_0x4->m_posX;
+                        short y = field_0x1a + field_0x4->m_posY;
                         DimBitmapArea(gpWindowManager->field_0x46, x, y, field_0x1c, field_0x1e, 0);
                     }
                 }
                 if ((*pFlagsHi & 0x40) != 0) {
-                    gpWindowManager->UpdateScreenRegion(field_0x18 + field_0x4->posX,
-                                                        field_0x1a + field_0x4->posY,
+                    gpWindowManager->UpdateScreenRegion(field_0x18 + field_0x4->m_posX,
+                                                        field_0x1a + field_0x4->m_posY,
                                                         field_0x1c, field_0x1e);
                     *pFlagsHi = *pFlagsHi & 0xbf;
                 }
@@ -119,8 +119,8 @@ int widget::Main(tag_message &param_1)
                 if ((uVar1 & 8) != 0)
                     Draw();
                 if ((uVar1 & 0x4000) != 0)
-                    gpWindowManager->UpdateScreenRegion(field_0x18 + field_0x4->posX,
-                                                        field_0x1a + field_0x4->posY,
+                    gpWindowManager->UpdateScreenRegion(field_0x18 + field_0x4->m_posX,
+                                                        field_0x1a + field_0x4->m_posY,
                                                         field_0x1c, field_0x1e);
                 return 1;
             }
@@ -151,8 +151,8 @@ VA(0x004de1e0, 0x47)
 void widget::Dim(void)
 {
     if (field_0x14 != 8 && field_0x14 != 0x200) {
-        short x = field_0x4->posX + field_0x18;
-        short y = field_0x1a + field_0x4->posY;
+        short x = field_0x4->m_posX + field_0x18;
+        short y = field_0x1a + field_0x4->m_posY;
         DimBitmapArea(gpWindowManager->field_0x46, x, y, field_0x1c, field_0x1e, 0);
     }
 }

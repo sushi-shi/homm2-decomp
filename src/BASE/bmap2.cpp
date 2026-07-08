@@ -23,11 +23,11 @@ VA(0x004ca3d0, 0x80)
 void FillBitmapArea(class bitmap *bmp, int x, int y, int w, int h, int color)
 {
     gFillRow = 0;
-    gFillPtr = bmp->pixels + bmp->width * y + x;
+    gFillPtr = bmp->m_pixels + bmp->m_width * y + x;
     if (h > 0) {
         do {
             memset(gFillPtr, color, w);
-            gFillPtr += bmp->width;
+            gFillPtr += bmp->m_width;
             gFillRow++;
         } while (gFillRow < h);
     }
@@ -53,11 +53,11 @@ void FillBitmapAreaClip(class bitmap *bmp, int x, int y, int w, int h, int color
             y = clipy;
         }
         gFillRow = 0;
-        gFillPtr = bmp->pixels + bmp->width * y + x;
+        gFillPtr = bmp->m_pixels + bmp->m_width * y + x;
         if (h > 0) {
             do {
                 memset(gFillPtr, color, w);
-                gFillPtr += bmp->width;
+                gFillPtr += bmp->m_width;
                 gFillRow++;
             } while (gFillRow < h);
         }
@@ -67,14 +67,14 @@ void FillBitmapAreaClip(class bitmap *bmp, int x, int y, int w, int h, int color
 VA(0x004ca570, 0xa6)
 void BlitBitmap(class bitmap *src, int sx, int sy, int w, int h, class bitmap *dst, int dx, int dy)
 {
-    gBlitSrc = src->pixels + src->width * sy + sx;
+    gBlitSrc = src->m_pixels + src->m_width * sy + sx;
     gBlitRow = 0;
-    gBlitDst = dst->pixels + dst->width * dy + dx;
+    gBlitDst = dst->m_pixels + dst->m_width * dy + dx;
     if (h > 0) {
         do {
             memcpy(gBlitDst, gBlitSrc, w);
-            gBlitSrc += src->width;
-            gBlitDst += dst->width;
+            gBlitSrc += src->m_width;
+            gBlitDst += dst->m_width;
             gBlitRow++;
         } while (gBlitRow < h);
     }
@@ -84,11 +84,11 @@ VA(0x004ca620, 0xa8)
 void DimBitmapArea(class bitmap *bmp, int x, int y, int w, int h, int level)
 {
     gDimRow = 0;
-    gDimPtr = bmp->pixels + bmp->width * y + x;
+    gDimPtr = bmp->m_pixels + bmp->m_width * y + x;
     if (h > 0) {
         do {
             gDimCol = 0;
-            gDimNext = gDimPtr + bmp->width;
+            gDimNext = gDimPtr + bmp->m_width;
             if (w > 0) {
                 do {
                     *gDimPtr = uDimPal[0][0][level * 256 + *gDimPtr];
