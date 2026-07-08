@@ -172,7 +172,18 @@ VA(0x004cc560, 0x3a8)
 int soundManager::Open(int) { return 0; }
 
 VA(0x004cc910, 0x91)
-void soundManager::AllocateSampleHandles(void) {}
+void soundManager::AllocateSampleHandles(void)
+{
+    int local_8;
+    if (gbNoSound == 0 && field_0x36 != 0) {
+        for (local_8 = 0; local_8 < 0xe; local_8++) {
+            field_0x54[local_8] = _AIL_allocate_sample_handle_4(field_0x36);
+            if (field_0x54[local_8] == 0)
+                break;
+        }
+        field_0x94 = local_8;
+    }
+}
 
 VA(0x004cc9b0, 0x96)
 void soundManager::Close(void)
