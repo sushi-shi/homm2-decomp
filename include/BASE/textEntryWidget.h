@@ -20,17 +20,17 @@ public:
     icon   *m_icon;  // +0x2b  the loaded icon (disposed in dtor)
     short  field_0x2f;  // +0x2f
     short  field_0x31;  // +0x31
-    short  field_0x33;  // +0x33
-    short  field_0x35;  // +0x35
-    short  field_0x37;  // +0x37
-    short  field_0x39;  // +0x39
-    short  field_0x3b;  // +0x3b
-    short  field_0x3d;  // +0x3d
-    short  field_0x3f;  // +0x3f
-    short  field_0x41;  // +0x41
-    short  field_0x43;  // +0x43
+    short  m_maxLength;  // +0x33
+    short  m_rectX;  // +0x35
+    short  m_rectY;  // +0x37
+    short  m_rectW;  // +0x39
+    short  m_rectH;  // +0x3b
+    short  m_innerW;  // +0x3d
+    short  m_innerH;  // +0x3f
+    short  m_innerX;  // +0x41
+    short  m_innerY;  // +0x43
     short  field_0x45;  // +0x45
-    short  field_0x47;  // +0x47  !union: conflicting widths
+    short  m_hasInset;  // +0x47  !union: conflicting widths
     short  field_0x49;  // +0x49
     short  field_0x4b;  // +0x4b
     char   field_0x4d;  // +0x4d
