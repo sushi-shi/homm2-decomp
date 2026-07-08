@@ -18,8 +18,8 @@ public:
     // (derived: base widget = 0x20 bytes at 0x00 via ': public widget'; own fields below)
     font   *m_font;  // +0x20  the list font
     icon   *m_icon;  // +0x24  drop button icon
-    short  field_0x28;  // +0x28
-    short  field_0x2a;  // +0x2a
+    short  m_contentX;  // +0x28
+    short  m_contentY;  // +0x2a
     short  field_0x2c;  // +0x2c
     short  field_0x2e;  // +0x2e
     short  field_0x30;  // +0x30
@@ -51,8 +51,8 @@ public:
     short  field_0x66;  // +0x66
     short  field_0x68;  // +0x68
     short  field_0x6a;  // +0x6a
-    short  field_0x6c;  // +0x6c
-    short  field_0x6e;  // +0x6e
+    short  m_iconX;  // +0x6c
+    short  m_iconY;  // +0x6e
     short  field_0x70;  // +0x70
     short  field_0x72;  // +0x72
     short  field_0x74;  // +0x74

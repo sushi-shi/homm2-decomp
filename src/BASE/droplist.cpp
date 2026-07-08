@@ -54,8 +54,8 @@ void dropListWidget::Read(void)
     gpResourceManager->SavePosition();
     m_icon = gpResourceManager->GetIcon(local_10);
     gpResourceManager->RestorePosition();
-    field_0x28 = m_x + gpResourceManager->ReadWord();
-    field_0x2a = m_y + gpResourceManager->ReadWord();
+    m_contentX = m_x + gpResourceManager->ReadWord();
+    m_contentY = m_y + gpResourceManager->ReadWord();
     field_0x2c = gpResourceManager->ReadWord();
     field_0x2e = gpResourceManager->ReadWord();
     field_0x30 = gpResourceManager->ReadWord();
@@ -81,8 +81,8 @@ void dropListWidget::Read(void)
     field_0x60 = 0xc;
     field_0x62 = 0xd;
     iVar1 = *piVar5;
-    field_0x6c = m_x;
-    field_0x6e = m_y;
+    m_iconX = m_x;
+    m_iconY = m_y;
     sVar2 = *reinterpret_cast<short *>(iVar1 + 4);
     field_0x70 = sVar2;
     field_0x72 = *reinterpret_cast<short *>(iVar1 + 6);
@@ -239,7 +239,7 @@ int dropListWidget::Main(tag_message &param_1)
 VA(0x004dc630, 0xaf)
 void dropListWidget::Draw(void)
 {
-    m_icon->DrawToBuffer(field_0x6c + m_owner->m_posX, field_0x6e + m_owner->m_posY,
+    m_icon->DrawToBuffer(m_iconX + m_owner->m_posX, m_iconY + m_owner->m_posY,
                              field_0x48, 0);
     m_icon->DrawToBuffer(field_0x64 + m_owner->m_posX, field_0x66 + m_owner->m_posY,
                              field_0x4a, 0);
@@ -248,8 +248,8 @@ void dropListWidget::Draw(void)
         if ((m_flags & 8) == 0)
             color = field_0x34;
         m_font->DrawBoundedString(m_items[field_0x3e],
-                                      field_0x28 + m_owner->m_posX,
-                                      field_0x2a + m_owner->m_posY,
+                                      m_contentX + m_owner->m_posX,
+                                      m_contentY + m_owner->m_posY,
                                       field_0x2c, field_0x2e, color, field_0x3a);
     }
 }
