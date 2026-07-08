@@ -5,6 +5,11 @@
 
 #include <va.h>
 #include <BASE/dropListWidget.h>
+#include <BASE/bitmap.h>
+#include <BASE/icon.h>
+#include <BASE/heroWindow.h>
+#include <BASE/heroWindowManager.h>
+#include <SOURCE/KB.h>
 VA(0x004dbf00, 0x3b)
 dropListWidget::dropListWidget(void) : widget(0, 0, 0, 0, 0, 0)
 {
@@ -36,7 +41,14 @@ VA(0x004dca60, 0x50)
 void dropListWidget::SaveDropBackground(void) {}
 
 VA(0x004dcab0, 0x56)
-void dropListWidget::RestoreDropBackground(void) {}
+void dropListWidget::RestoreDropBackground(void)
+{
+    field_0xb0->DrawToBuffer(field_0x7a, field_0x7c);
+    gpWindowManager->UpdateScreenRegion(field_0x7a, field_0x7c, field_0x7e, field_0x80);
+    if (field_0xb0 != 0)
+        delete field_0xb0;
+    field_0xb0 = 0;
+}
 
 VA(0x004dcb10, 0x81f)
 void dropListWidget::ProcessSelectDialog(void) {}
