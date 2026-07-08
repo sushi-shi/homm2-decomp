@@ -125,7 +125,20 @@ void soundManager::ServiceSound(void)
 }
 
 VA(0x004cdad0, 0x7f)
-int soundManager::MusicPlaying(void) { return 0; }
+int soundManager::MusicPlaying(void)
+{
+    if (gbNoSound == 0) {
+        if (gCdMusic == 0) {
+            if (field_0x69e == 0)
+                return 0;
+            return MIDIIsPlaying();
+        }
+        if (field_0x69a == 0)
+            return 0;
+        return CDIsPlaying();
+    }
+    return 0;
+}
 
 
 // ===== vtable soundManager : public baseManager  (3 slots) =====
