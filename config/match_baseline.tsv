@@ -403,7 +403,7 @@ BASE/soundmgr	?CDPlay@soundManager@@QAEXHHHH@Z	82.1111	eaa309d630ee
 BASE/soundmgr	?CDPoll@soundManager@@QAEXXZ	97.3770	ecabe6034244
 BASE/soundmgr	?CDSetVolume@soundManager@@QAEXHH@Z	94.6129	579a76b1152f
 BASE/soundmgr	?CDShutdown@soundManager@@QAEXXZ	100.0000	1b8700e97a6f
-BASE/soundmgr	?CDStartup@soundManager@@QAEXXZ	86.2885	39f3282cf284
+BASE/soundmgr	?CDStartup@soundManager@@QAEXXZ	88.3077	39f3282cf284
 BASE/soundmgr	?CDStop@soundManager@@QAEXXZ	100.0000	32484d138b59
 BASE/soundmgr	?Close@soundManager@@UAEXXZ	90.3947	4cbf90a16cb2
 BASE/soundmgr	?ConvertVolume@soundManager@@QAEHHH@Z	100.0000	f491b7b1f33d
@@ -997,7 +997,7 @@ SOURCE/KB	?TestDynamicWindow@@YIXHH@Z	100.0000	f5ab1abce453
 SOURCE/KB	?TrueFalseDialogHandler@@YIHAAUtag_message@@@Z	100.0000	686bb54969b1
 SOURCE/KB	?UnloadSystemwideIcons@@YIXXZ	100.0000	e5593a1d663f
 SOURCE/KB	?UpdateAppSpecificMenus@@YIXPAX@Z	100.0000	f40021f3ef8a
-SOURCE/KB	?UpdateNormalDialog@@YIXPAD@Z	100.0000	69b9c6d25968
+SOURCE/KB	?UpdateNormalDialog@@YIXPAD@Z	100.0000	deccca8f8266
 SOURCE/KB	?UpdateSystemOptionsMenu@@YIXXZ	1.6336	4c293b8d0bfe
 SOURCE/KB	?WaitEndSample@@YIXUSAMPLE2@@H@Z	100.0000	7e1d559a1d28
 SOURCE/KB	?WaitForOtherPlayer@@YIHXZ	100.0000	7d299bc1df68
