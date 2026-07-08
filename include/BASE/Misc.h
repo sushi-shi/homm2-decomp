@@ -12,6 +12,17 @@ struct tag_message;
 
 // Misc-private record structs (params of the functions above).
 struct indexArray { unsigned short field0; unsigned short field2; };
+
+// Leak-tracking allocation record (BaseAlloc/BaseFree). Packed: ptr sits at +1 (unaligned).
+#pragma pack(push, 1)
+struct MemEntry {
+    char used;          // +0x00  in-use flag
+    void *ptr;          // +0x01  allocated block
+    unsigned int size;  // +0x05  block size
+    char file[0x3d];    // +0x09  caller __FILE__
+    int line;           // +0x46  caller __LINE__
+};
+#pragma pack(pop)
 #pragma pack(push, 1)
 struct IconEntry {          // one sprite frame header in the icon entry table (13B, indexed by frame)
     short x;                // +0  x offset
