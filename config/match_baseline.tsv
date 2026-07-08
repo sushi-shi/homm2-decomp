@@ -164,11 +164,11 @@ BASE/ICONWDGT	??_EiconWidget@@UAEPAXI@Z	0.0000
 BASE/ICONWDGT	?Draw@iconWidget@@UAEXXZ	1.0638	8755fe5ea7a4
 BASE/ICONWDGT	?Main@iconWidget@@UAEHAAUtag_message@@@Z	0.7491	db5195de4db5
 BASE/ICONWDGT	?Read@iconWidget@@QAEXXZ	1.9231	6556d392f3fe
-BASE/INPUTMGR	??0inputManager@@QAE@XZ	30.5263	4781f4bba8c4
+BASE/INPUTMGR	??0inputManager@@QAE@XZ	100.0000	c3c0a79e362d
 BASE/INPUTMGR	?AsciiConvert@inputManager@@QAEXAAUtag_message@@@Z	0.6623	d68deff2594d
 BASE/INPUTMGR	?CheckChangeCursor@@YIXHHH@Z	1.7544	360d0302cd92
 BASE/INPUTMGR	?Close@inputManager@@UAEXXZ	11.1111	f49f9b64b003
-BASE/INPUTMGR	?Flush@inputManager@@QAEXXZ	25.0000	9f1c25ccf12e
+BASE/INPUTMGR	?Flush@inputManager@@QAEXXZ	100.0000	712b56c709ae
 BASE/INPUTMGR	?ForceMouseMove@inputManager@@QAEXXZ	1.4706	d02439714678
 BASE/INPUTMGR	?GetEvent@inputManager@@QAE?AUtag_message@@XZ	13.5455	ee1c0853ac3b
 BASE/INPUTMGR	?KeyboardMessageHandler@@YIHPAXIIJ@Z	0.7692	845586c84abc
@@ -177,7 +177,7 @@ BASE/INPUTMGR	?MakeScanCodeTable@inputManager@@QAEXXZ	1.0101	d0f31f566a60
 BASE/INPUTMGR	?MouseMessageHandler@@YIHPAXIIJ@Z	0.8263	88ec63f33c7c
 BASE/INPUTMGR	?Open@inputManager@@UAEHH@Z	5.2632	0e654d241d6c
 BASE/INPUTMGR	?PeekEvent@inputManager@@QAE?AUtag_message@@XZ	14.0566	07568a994c87
-BASE/INPUTMGR	?SetKeyCodeType@inputManager@@QAEXH@Z	16.6667	20b51687687f
+BASE/INPUTMGR	?SetKeyCodeType@inputManager@@QAEXH@Z	100.0000	6342f2fae2a5
 BASE/INPUTMGR	?SetMouseCoords@inputManager@@QAEXHH@Z	100.0000	d6158d77293b
 BASE/Icon2b	?IconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	0.2747	cbb10acc2b37
 BASE/Icond2b	?DimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	0.5747	4c2bff716596
