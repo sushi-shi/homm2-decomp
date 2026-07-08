@@ -7,7 +7,10 @@
 #include <SOURCE/kbwin.h>
 #include <BASE/heroWindow.h>
 #include <BASE/mouseManager.h>
+#include <BASE/heroWindowManager.h>
 #include <BASE/bitmap.h>
+#include <BASE/bmap2.h>
+#include <BASE/font.h>
 #include <BASE/Misc.h>
 #include <BASE/miscwin.h>        // this TU's own free functions + indexArray/IconEntry
 #include <SOURCE/KB.h>        // EventWindowHandler, FileError, ShutDown
@@ -232,10 +235,25 @@ VA(0x004c61c0, 0x224)
 void LogInt(char *, int, int, int, int, int, int, int) {}
 
 VA(0x004c63f0, 0x6c)
-void AiPrint(char *) {}
+void AiPrint(char *param_1)
+{
+    if (giDebugLevel > 1) {
+        FillBitmapArea(gpWindowManager->field_0x46, 0, 0x1cc, 0x280, 0x14, 0);
+        smallFont->DrawBoundedString(param_1, 0, 0x1d0, 0x280, 0x10, 1, 0);
+        BlitBitmapToScreen(gpWindowManager->field_0x46, 0, 0x1cc, 0x280, 0x14, 0, 0x1cc);
+    }
+}
 
 VA(0x004c6460, 0x7a)
-void AbsAiPrint(char *) {}
+void AbsAiPrint(char *param_1)
+{
+    int saved = giDebugLevel;
+    giDebugLevel = 9;
+    FillBitmapArea(gpWindowManager->field_0x46, 0, 0x1cc, 0x280, 0x14, 0);
+    smallFont->DrawBoundedString(param_1, 0, 0x1d0, 0x280, 0x10, 1, 0);
+    BlitBitmapToScreen(gpWindowManager->field_0x46, 0, 0x1cc, 0x280, 0x14, 0, 0x1cc);
+    giDebugLevel = saved;
+}
 
 VA(0x004c64e0, 0xf8)
 void FadeTo(unsigned char *, unsigned char *, int) {}

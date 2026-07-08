@@ -209,8 +209,8 @@ BASE/Midi	?MIDIShutdown@soundManager@@QAEXXZ	0.9709	de1e04f80927
 BASE/Midi	?MIDIStartup@soundManager@@QAEXXZ	2.1739	303f4868d975
 BASE/Midi	?MIDIStop@soundManager@@QAEXXZ	1.5625	8c879e75644d
 BASE/Midi	empty_stub	0.0000	
-BASE/Misc	?AbsAiPrint@@YIXPAD@Z	2.8571	d8f5953fba85
-BASE/Misc	?AiPrint@@YIXPAD@Z	3.0303	7e8608a82d25
+BASE/Misc	?AbsAiPrint@@YIXPAD@Z	100.0000	607d030c5b22
+BASE/Misc	?AiPrint@@YIXPAD@Z	98.1515	1eb753bf87e9
 BASE/Misc	?BaseAlloc@@YIPAXIPADH@Z	1.3514	97fd4270d81d
 BASE/Misc	?BaseFree@@YIXPAXPADH@Z	0.4016	2b9ec52efc7d
 BASE/Misc	?BitmapToScreen@@YIXPAVbitmap@@@Z	100.0000	f09b276e5242
