@@ -5,8 +5,18 @@
 
 #include <va.h>
 #include <BASE/iconWidget.h>
+#include <BASE/icon.h>
+#include <BASE/resourceManager.h>
+#include <SOURCE/KB.h>
 VA(0x004d0a60, 0x2d)
-iconWidget::iconWidget(void) {}
+iconWidget::iconWidget(void) : widget(0, 0, 0, 0, 0, 0)
+{
+    field_0x24 = 0;
+    field_0x27 = 0;
+    field_0x20 = 0;
+    field_0x26 = 0;
+    field_0x29 = 0;
+}
 
 VA(0x004d0ad0, 0x6a)
 iconWidget::iconWidget(short int, short int, short int, short int, unsigned long int, short int, signed char, short int, short int, short int) {}
@@ -18,7 +28,10 @@ VA(0x004d0bc0, 0xdf)
 void iconWidget::Read(void) {}
 
 VA(0x004d0ca0, 0x21)
-iconWidget::~iconWidget() {}
+iconWidget::~iconWidget()
+{
+    gpResourceManager->Dispose(field_0x20);
+}
 
 VA(0x004d0cd0, 0x291)
 int iconWidget::Main(struct tag_message &) { return 0; }
