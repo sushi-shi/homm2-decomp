@@ -471,7 +471,7 @@ int soundManager::Open(int param_1)
         AllocateSampleHandles();
         field_0x3e = 1;
         m_midiFile = 0;
-        memset(field_0x590, 0, 0xf0);
+        memset(m_savedTrackPositions, 0, 0xf0);
         m_fading = 1;
     }
     field_0xc = 0x10;
@@ -708,7 +708,7 @@ void soundManager::SetMusicQuality(int param_1)
         local_8 = m_currentTrack;
         MIDIStop();
     }
-    memset(field_0x590, 0, 0xf0);
+    memset(m_savedTrackPositions, 0, 0xf0);
     gCdMusic = param_1;
     if (local_8 >= 0)
         PlayAmbientMusic(local_8, 0, -1);
@@ -767,13 +767,13 @@ void soundManager::PollSound(void)
                     gMusicFadeTimer = KBTickCount();
                 } else if (gCdMusic == 0) {
                     ProcessAssert(m_midiFile, __FILE__, __LINE__);
-                    field_0x590[m_currentTrack] = ftell(reinterpret_cast<FILE *>(m_midiFile));
+                    m_savedTrackPositions[m_currentTrack] = ftell(reinterpret_cast<FILE *>(m_midiFile));
                 }
                 m_fading = 1;
                 if (bSaveMusicPosition[m_fadeTargetTrack] == 0)
                     PlayAmbientMusic(m_fadeTargetTrack, 0, -1);
                 else
-                    PlayAmbientMusic(m_fadeTargetTrack, field_0x590[m_fadeTargetTrack], -1);
+                    PlayAmbientMusic(m_fadeTargetTrack, m_savedTrackPositions[m_fadeTargetTrack], -1);
                 iVar1 = gMusicFadeTimer;
                 lVar2 = KBTickCount();
                 m_fadeSteps = (iVar1 - lVar2) / 0x3c;
@@ -873,7 +873,7 @@ struct _SAMPLE *soundManager::MemorySample(class sample *param_1)
                 StopSample(m_sampleHandles[local_10]);
             }
             p_Var2 = m_sampleHandles[local_10];
-            field_0xd8[local_10] = static_cast<char>(param_1->field_0x28);
+            m_channelVolumes[local_10] = static_cast<char>(param_1->field_0x28);
             reinterpret_cast<short *>(&iLastVolume)[local_10] = static_cast<short>(param_1->field_0x28);
             _AIL_init_sample_4(p_Var2);
             _AIL_set_sample_type_12(p_Var2, param_1->m_format, 0);
@@ -888,9 +888,9 @@ struct _SAMPLE *soundManager::MemorySample(class sample *param_1)
             }
             _AIL_start_sample_4(p_Var2);
             param_1->m_activeSample = p_Var2;
-            field_0xec[local_10] = p_Var2;
-            field_0x12c[local_10] = reinterpret_cast<int>(param_1->m_data);
-            field_0x16c[local_10] = param_1->m_size;
+            m_channelSamples[local_10] = p_Var2;
+            m_sampleAddrLow[local_10] = reinterpret_cast<int>(param_1->m_data);
+            m_sampleAddrHigh[local_10] = param_1->m_size;
             LogStr("Memory Sample 2b");
     return p_Var2;
 }
