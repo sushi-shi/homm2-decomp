@@ -174,7 +174,18 @@ int heroWindow::Open(int x, int flags)
 }
 
 VA(0x004cf280, 0x90)
-void heroWindow::RemoveAndDeleteWidget(int) {}
+void heroWindow::RemoveAndDeleteWidget(int param_1)
+{
+    widget *pwVar1, *local_8;
+    pwVar1 = field_0x3c;
+    while (local_8 = pwVar1, local_8 != 0) {
+        pwVar1 = local_8->field_0x8;
+        if (local_8->field_0x10 == param_1 && (RemoveWidget(local_8), (field_0x20 & 0x4000) != 0) &&
+            local_8 != 0) {
+            delete local_8;
+        }
+    }
+}
 
 VA(0x004cf310, 0xaa)
 void heroWindow::Close(void)
@@ -254,7 +265,15 @@ void heroWindow::RemoveWidget(class widget *param_1)
 }
 
 VA(0x004cf620, 0x95)
-int heroWindow::BroadcastMessage(struct tag_message &) { return 0; }
+int heroWindow::BroadcastMessage(struct tag_message &param_1)
+{
+    int local_8 = 0;
+    widget *local_c = field_0x3c;
+    while (local_c != 0 && ((local_8 = local_c->Main(param_1)) < 1 || 2 < local_8)) {
+        local_c = local_c->field_0x8;
+    }
+    return local_8;
+}
 
 VA(0x004cf6c0, 0x20)
 void heroWindow::DrawWindow(void) { DrawWindow(1); }
