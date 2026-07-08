@@ -855,22 +855,22 @@ struct _SAMPLE *soundManager::MemorySample(class sample *param_1)
     LogStr("Memory Sample 1");
             iVar1 = param_1->field_0x1c;
             iVar4 = iVar1 * 0xc;
-            local_10 = static_cast<short>(reinterpret_cast<SampleChannelStruct *>(&SCS)[iVar1].startChannel);
-            while (local_10 < reinterpret_cast<SampleChannelStruct *>(&SCS)[iVar1].endChannel &&
+            local_10 = static_cast<short>(SCS[iVar1].startChannel);
+            while (local_10 < SCS[iVar1].endChannel &&
                    _AIL_sample_status_4(m_sampleHandles[local_10]) != 2)
                 local_10++;
-            if (reinterpret_cast<SampleChannelStruct *>(&SCS)[iVar1].endChannel == local_10) {
+            if (SCS[iVar1].endChannel == local_10) {
                 if (param_1->field_0x1c == 4) {
                     LogStr("Memory Sample 2a");
                     return 0;
                 }
-                local_10 = static_cast<short>(reinterpret_cast<SampleChannelStruct *>(&SCS)[iVar1].currentChannel);
-                reinterpret_cast<SampleChannelStruct *>(&SCS)[iVar1].currentChannel++;
-                if (reinterpret_cast<SampleChannelStruct *>(&SCS)[iVar1].endChannel <=
-                    reinterpret_cast<SampleChannelStruct *>(&SCS)[iVar1].currentChannel) {
-                    reinterpret_cast<SampleChannelStruct *>(&SCS)[iVar1].currentChannel =
-                        reinterpret_cast<SampleChannelStruct *>(&SCS)[iVar1].startChannel;
-                    local_10 = static_cast<short>(reinterpret_cast<SampleChannelStruct *>(&SCS)[iVar1].currentChannel);
+                local_10 = static_cast<short>(SCS[iVar1].currentChannel);
+                SCS[iVar1].currentChannel++;
+                if (SCS[iVar1].endChannel <=
+                    SCS[iVar1].currentChannel) {
+                    SCS[iVar1].currentChannel =
+                        SCS[iVar1].startChannel;
+                    local_10 = static_cast<short>(SCS[iVar1].currentChannel);
                 }
                 StopSample(m_sampleHandles[local_10]);
             }
@@ -934,7 +934,7 @@ VTBL(soundManager, 0x004eba20);
 
 // ---- globals (definitions, RVA order) ----
 char *digitalDriverNames[14];
-struct SampleChannelStruct *SCS;
+SampleChannelStruct SCS[4];
 char CDPreviousPosition[60][15];
 int CDWaiting;
 int CDPlaying;
