@@ -330,7 +330,7 @@ BASE/WIDGET	?Main@widget@@UAEHAAUtag_message@@@Z	85.8767	fed6933b5735
 BASE/WIDGET	?Open@widget@@QAEHHPAVheroWindow@@@Z	100.0000	49eb90a3e044
 BASE/WIDGET	empty_stub	0.0000	
 BASE/WINDOW	??0heroWindow@@QAE@HHHHH@Z	100.0000	261e1576d646
-BASE/WINDOW	??0heroWindow@@QAE@HHPAD@Z	2.9917	f4081703ac92
+BASE/WINDOW	??0heroWindow@@QAE@HHPAD@Z	85.4861	0389cb1b8db0
 BASE/WINDOW	??0heroWindow@@QAE@XZ	100.0000	bec0cd8154d6
 BASE/WINDOW	?AddWidget@heroWindow@@QAEXPAVwidget@@H@Z	13.8085	3f9ab5e0906e
 BASE/WINDOW	?BroadcastMessage@heroWindow@@QAEHAAUtag_message@@@Z	29.7333	c4dd66fd12a4
