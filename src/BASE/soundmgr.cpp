@@ -660,15 +660,15 @@ void soundManager::AdjustMusicVolumes(void)
     if (bSaveMusicPosition[m_currentTrack] != 0)
         local_4 = 1;
     if (gMidiEnabled != 0) {
-        if (gCdMusic == 0)
-            MIDISetVolume();
-        else
+        if (gCdMusic != 0)
             CDSetVolume(-1, 0);
+        else
+            MIDISetVolume();
     } else {
-        if (gCdMusic == 0)
-            MIDISetVolume();
-        else
+        if (gCdMusic != 0)
             CDSetVolume(-1, 0);
+        else
+            MIDISetVolume();
     }
     LogStr("Adjust Music Volumes 2");
 }
