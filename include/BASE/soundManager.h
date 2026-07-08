@@ -30,12 +30,12 @@ public:
     char _pad_0x8c[0x8];
     int    m_numSampleHandles;  // +0x94
     char _pad_0x98[0x40];             // 0x98..0xd8
-    char   field_0xd8[0x14];          // 0xd8  per-channel volume byte
-    struct _SAMPLE *field_0xec[14];   // 0xec  active sample per channel
+    char   m_channelVolumes[0x14];          // 0xd8  per-channel volume byte
+    struct _SAMPLE *m_channelSamples[14];   // 0xec  active sample per channel
     char _pad_0x124[0x8];             // 0x124..0x12c
-    int    field_0x12c[14];           // 0x12c  sample address low per channel
+    int    m_sampleAddrLow[14];           // 0x12c  sample address low per channel
     char _pad_0x164[0x8];             // 0x164..0x16c
-    int    field_0x16c[14];           // 0x16c  sample address high per channel
+    int    m_sampleAddrHigh[14];           // 0x16c  sample address high per channel
     char _pad_0x1a4[0x3c8];           // 0x1a4..0x56c
     int    field_0x56c;  // +0x56c
     char _pad_0x570[0x4];
@@ -45,7 +45,7 @@ public:
     char   field_0x57a;  // +0x57a
     char   field_0x57b;  // +0x57b
     char _pad_0x57c[0x14];
-    long   field_0x590[0x3c];  // +0x590  saved music file positions per track
+    long   m_savedTrackPositions[0x3c];  // +0x590  saved music file positions per track
     int    m_fading;  // +0x680
     int    m_samplesReady;  // +0x684
     int    m_fadeSteps;  // +0x688
