@@ -55,8 +55,8 @@ void FlipDimIconToBitmap(class icon *param_1, class bitmap *param_2, int param_3
             param_7 = 0;
         }
     }
-    short sVar2 = param_2->field_0x12;
-    gFDRow = gFDY * sVar2 + reinterpret_cast<int>(param_2->field_0x16);
+    short sVar2 = param_2->width;
+    gFDRow = gFDY * sVar2 + reinterpret_cast<int>(param_2->pixels);
     gFDX = gFDXEnd;
     while (1) {
         while (1) {

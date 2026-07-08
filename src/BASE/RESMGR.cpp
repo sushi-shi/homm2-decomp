@@ -53,8 +53,8 @@ void resourceManager::GetBackdrop(char *param_1, class bitmap *param_2, int para
         ReadWord();
         ReadWord();
         ReadWord();
-        ReadBlock(reinterpret_cast<signed char *>(param_2->field_0x16),
-                  param_2->field_0x14 * param_2->field_0x12);
+        ReadBlock(reinterpret_cast<signed char *>(param_2->pixels),
+                  param_2->height * param_2->width);
     }
 }
 
@@ -75,7 +75,7 @@ void resourceManager::GetBackdropAtLoc(char *param_1, class bitmap *param_2, int
         sVar1 = ReadWord();
         sVar2 = ReadWord();
         for (local_8 = param_4; local_8 < sVar2 + param_4; local_8++) {
-            ReadBlock(reinterpret_cast<signed char *>(local_8 * 0x280 + param_2->field_0x16 + param_3),
+            ReadBlock(reinterpret_cast<signed char *>(local_8 * 0x280 + param_2->pixels + param_3),
                       sVar1);
         }
     }
@@ -87,7 +87,7 @@ class palette * resourceManager::GetPalette(char *name)
     unsigned long id = MakeId(name, 1);
     resource *r = Query(id);
     if (r != 0) {
-        r->field_0x6++;
+        r->refCount++;
         return static_cast<palette *>(r);
     } else {
         r = new palette(id);
@@ -102,7 +102,7 @@ class bitmap * resourceManager::GetBitmap(char *name)
     unsigned long id = MakeId(name, 1);
     resource *r = Query(id);
     if (r != 0) {
-        r->field_0x6++;
+        r->refCount++;
         return static_cast<bitmap *>(r);
     } else {
         r = new bitmap(id);
@@ -119,7 +119,7 @@ class icon *resourceManager::GetIcon(unsigned long param_1)
 {
     resource *local_8 = Query(param_1);
     if (local_8 != 0) {
-        local_8->field_0x6++;
+        local_8->refCount++;
         return static_cast<icon *>(local_8);
     } else {
         local_8 = new icon(param_1);
@@ -134,7 +134,7 @@ class tileset * resourceManager::GetTileset(char *name)
     unsigned long id = MakeId(name, 1);
     resource *r = Query(id);
     if (r != 0) {
-        r->field_0x6++;
+        r->refCount++;
         return static_cast<tileset *>(r);
     } else {
         r = new tileset(id);
@@ -152,7 +152,7 @@ class font * resourceManager::GetFont(char *name)
     unsigned long id = MakeId(name, 1);
     resource *r = Query(id);
     if (r != 0) {
-        r->field_0x6++;
+        r->refCount++;
         return static_cast<font *>(r);
     } else {
         r = new font(id);
@@ -167,7 +167,7 @@ class sample *resourceManager::GetSample(char *param_1)
     unsigned long uVar1 = MakeId(param_1, 1);
     resource *local_8 = Query(uVar1);
     if (local_8 != 0) {
-        local_8->field_0x6++;
+        local_8->refCount++;
         return static_cast<sample *>(local_8);
     } else {
         local_8 = new sample(param_1, 0, 0x7f, 1);
@@ -182,7 +182,7 @@ class MIDIWrap *resourceManager::GetMIDIWrap(char *param_1)
     unsigned long uVar1 = MakeId(param_1, 1);
     resource *local_8 = Query(uVar1);
     if (local_8 != 0) {
-        local_8->field_0x6++;
+        local_8->refCount++;
         return static_cast<MIDIWrap *>(local_8);
     } else {
         local_8 = new MIDIWrap(param_1);
@@ -198,8 +198,8 @@ void resourceManager::Dispose(class resource *param_1)
         return;
     if (param_1 == 0)
         return;
-    param_1->field_0x6--;
-    if (param_1->field_0x6 <= 0) {
+    param_1->refCount--;
+    if (param_1->refCount <= 0) {
         RemoveResource(param_1);
         if (param_1 != 0)
             delete param_1;
@@ -211,9 +211,9 @@ void resourceManager::AddResource(class resource *param_1)
 {
     if (resourceListHead == 0) {
         resourceListHead = param_1;
-        resourceListHead->field_0xc = 0;
+        resourceListHead->next = 0;
     } else {
-        param_1->field_0xc = resourceListHead;
+        param_1->next = resourceListHead;
         resourceListHead = param_1;
     }
 }
@@ -225,7 +225,7 @@ void resourceManager::Expunge(void)
     expunging = 1;
     prVar1 = resourceListHead;
     while (local_8 = prVar1, local_8 != 0) {
-        prVar1 = local_8->field_0xc;
+        prVar1 = local_8->next;
         RemoveResource(local_8);
         delete local_8;
     }
@@ -236,8 +236,8 @@ VA(0x004c8830, 0x4b)
 class resource *resourceManager::Query(unsigned long param_1)
 {
     resource *local_8 = resourceListHead;
-    while (local_8 != 0 && local_8->field_0x8 != param_1) {
-        local_8 = local_8->field_0xc;
+    while (local_8 != 0 && local_8->id != param_1) {
+        local_8 = local_8->next;
     }
     return local_8;
 }
@@ -264,14 +264,14 @@ void resourceManager::RemoveResource(class resource *param_1)
 {
     resource *local_8;
     if (resourceListHead == param_1) {
-        resourceListHead = param_1->field_0xc;
+        resourceListHead = param_1->next;
     } else {
         local_8 = resourceListHead;
-        while (local_8 != 0 && local_8->field_0xc != param_1) {
-            local_8 = local_8->field_0xc;
+        while (local_8 != 0 && local_8->next != param_1) {
+            local_8 = local_8->next;
         }
         if (local_8 != 0)
-            local_8->field_0xc = param_1->field_0xc;
+            local_8->next = param_1->next;
     }
 }
 

@@ -46,12 +46,12 @@ void IconToBitmapYModify(class icon *param_1, class bitmap *param_2, int param_3
     gYMEntry = &entries[param_5];
     gYMSrc = reinterpret_cast<unsigned char *>(param_1->field_0x12) + gYMEntry->srcOffset;
     gYMX0 = gYMEntry->x + param_3;
-    gYMPitch = param_2->field_0x12;
+    gYMPitch = param_2->width;
     gYMY = gYMEntry->y + param_4;
     gYMX = param_12[gYMY] + gYMX0;
     gYMClipB = param_8 + param_10 - 1;
     gYMClipR = param_7 + param_9 - 1;
-    gYMRow = gYMPitch * gYMY + reinterpret_cast<int>(param_2->field_0x16);
+    gYMRow = gYMPitch * gYMY + reinterpret_cast<int>(param_2->pixels);
     do {
         while (1) {
             while (1) {

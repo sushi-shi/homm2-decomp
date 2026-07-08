@@ -53,8 +53,8 @@ void FlipIconToBitmapYModify(class icon *param_1, class bitmap *param_2, int par
     gFYX = gFYXEnd - param_12[gFYY];
     gFYClipR = param_7 + param_9 - 1;
     gFYClipB = param_8 + param_10 - 1;
-    short sVar2 = param_2->field_0x12;
-    gFYRow = sVar2 * gFYY + reinterpret_cast<int>(param_2->field_0x16);
+    short sVar2 = param_2->width;
+    gFYRow = sVar2 * gFYY + reinterpret_cast<int>(param_2->pixels);
     do {
         while (1) {
             while (1) {

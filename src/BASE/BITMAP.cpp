@@ -15,18 +15,18 @@ VA(0x004cffc0, 0x2a)
 bitmap::bitmap(void) : resource(0, 0, -1, 0)
 {
     field_0x10 = 0;
-    field_0x12 = 0;
-    field_0x14 = 0;
-    field_0x16 = 0;
+    width = 0;
+    height = 0;
+    pixels = 0;
 }
 
 VA(0x004d0040, 0x53)
 bitmap::bitmap(short p1, short p2, short p3) : resource(0, 0, -1, 0)
 {
     field_0x10 = p1;
-    field_0x12 = p2;
-    field_0x14 = p3;
-    field_0x16 = static_cast<unsigned char *>(BaseAlloc(p3 * p2, __FILE__, __LINE__));
+    width = p2;
+    height = p3;
+    pixels = static_cast<unsigned char *>(BaseAlloc(p3 * p2, __FILE__, __LINE__));
 }
 
 VA(0x004d00a0, 0x8f)
@@ -34,20 +34,20 @@ bitmap::bitmap(unsigned long id) : resource(0, id, 1, 0)
 {
     gpResourceManager->PointToFile(id);
     field_0x10 = gpResourceManager->ReadWord();
-    field_0x12 = gpResourceManager->ReadWord();
-    field_0x14 = gpResourceManager->ReadWord();
-    field_0x16 = static_cast<unsigned char *>(BaseAlloc(field_0x14 * field_0x12, __FILE__, __LINE__));
+    width = gpResourceManager->ReadWord();
+    height = gpResourceManager->ReadWord();
+    pixels = static_cast<unsigned char *>(BaseAlloc(height * width, __FILE__, __LINE__));
     PollSound();
-    gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(field_0x16), field_0x14 * field_0x12);
+    gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(pixels), height * width);
     PollSound();
 }
 
 VA(0x004d0130, 0x2c)
 bitmap::~bitmap()
 {
-    if (field_0x16 != 0)
-        BaseFree(field_0x16, __FILE__, __LINE__);
-    field_0x16 = 0;
+    if (pixels != 0)
+        BaseFree(pixels, __FILE__, __LINE__);
+    pixels = 0;
 }
 
 // @early-stop 1% — semantically exact clip-then-BlitBitmap (guards use >=0 to match the
@@ -57,17 +57,17 @@ VA(0x004d0160, 0xff)
 void bitmap::DrawToBufferCareful(short int param_1, short int param_2)
 {
     if (param_1 >= 0) {
-        if (field_0x12 + param_1 <= gpWindowManager->field_0x46->field_0x12 && param_2 >= 0 &&
-            field_0x14 + param_2 <= gpWindowManager->field_0x46->field_0x14) {
+        if (width + param_1 <= gpWindowManager->field_0x46->width && param_2 >= 0 &&
+            height + param_2 <= gpWindowManager->field_0x46->height) {
             PollSound();
-            BlitBitmap(this, 0, 0, field_0x12, field_0x14, gpWindowManager->field_0x46, param_1,
+            BlitBitmap(this, 0, 0, width, height, gpWindowManager->field_0x46, param_1,
                        param_2);
             PollSound();
             return;
         }
     }
-    int iVar3 = field_0x12;
-    int iVar4 = field_0x14;
+    int iVar3 = width;
+    int iVar4 = height;
     int iVar2 = param_1;
     if (param_1 < 0) {
         iVar3 = iVar3 + iVar2;
@@ -79,11 +79,11 @@ void bitmap::DrawToBufferCareful(short int param_1, short int param_2)
         iVar4 = iVar4 + param_2;
     }
     bitmap *pbVar1 = gpWindowManager->field_0x46;
-    if (pbVar1->field_0x12 < iVar2 + iVar3) {
-        iVar3 = pbVar1->field_0x12 - iVar2;
+    if (pbVar1->width < iVar2 + iVar3) {
+        iVar3 = pbVar1->width - iVar2;
     }
-    if (pbVar1->field_0x14 < local_8 + iVar4) {
-        iVar4 = pbVar1->field_0x14 - local_8;
+    if (pbVar1->height < local_8 + iVar4) {
+        iVar4 = pbVar1->height - local_8;
     }
     if (iVar3 >= 0 && iVar4 >= 0) {
         BlitBitmap(this, 0, 0, iVar3, iVar4, pbVar1, iVar2, local_8);
@@ -94,7 +94,7 @@ VA(0x004d0260, 0x3c)
 void bitmap::DrawToBuffer(short x, short y)
 {
     PollSound();
-    BlitBitmap(this, 0, 0, field_0x12, field_0x14, gpWindowManager->field_0x46, x, y);
+    BlitBitmap(this, 0, 0, width, height, gpWindowManager->field_0x46, x, y);
     PollSound();
 }
 
@@ -102,20 +102,20 @@ VA(0x004d02a0, 0x32)
 void bitmap::DrawToScreen(short x, short y)
 {
     PollSound();
-    BlitBitmapToScreen(this, 0, 0, field_0x12, field_0x14, x, y);
+    BlitBitmapToScreen(this, 0, 0, width, height, x, y);
     PollSound();
 }
 
 VA(0x004d02e0, 0x2d)
 void bitmap::GrabScreen(short x, short y)
 {
-    BlitBitmap(gpWindowManager->field_0x46, x, y, field_0x12, field_0x14, this, 0, 0);
+    BlitBitmap(gpWindowManager->field_0x46, x, y, width, height, this, 0, 0);
 }
 
 VA(0x004d0310, 0x26)
 void bitmap::GrabBitmap(class bitmap *src, short x, short y)
 {
-    BlitBitmap(src, x, y, field_0x12, field_0x14, this, 0, 0);
+    BlitBitmap(src, x, y, width, height, this, 0, 0);
 }
 
 // @early-stop 1% — same clip-then-BlitBitmap shape and /O2 base-register wall as
@@ -124,16 +124,16 @@ VA(0x004d0340, 0xf0)
 void bitmap::GrabBitmapCareful(class bitmap *param_1, short int param_2, short int param_3)
 {
     if (param_2 >= 0) {
-        if (param_2 + field_0x12 <= param_1->field_0x12 && param_3 >= 0) {
-            if (param_3 + field_0x14 <= param_1->field_0x14) {
-                BlitBitmap(param_1, param_2, param_3, field_0x12, field_0x14, this, 0, 0);
+        if (param_2 + width <= param_1->width && param_3 >= 0) {
+            if (param_3 + height <= param_1->height) {
+                BlitBitmap(param_1, param_2, param_3, width, height, this, 0, 0);
                 return;
             }
         }
     }
     int iVar1, iVar2;
-    int iVar3 = field_0x12;
-    int iVar4 = field_0x14;
+    int iVar3 = width;
+    int iVar4 = height;
     if (param_2 < 0) {
         iVar3 = iVar3 + param_2;
         iVar1 = 0;
@@ -146,11 +146,11 @@ void bitmap::GrabBitmapCareful(class bitmap *param_1, short int param_2, short i
     } else {
         iVar2 = param_3;
     }
-    if (param_1->field_0x12 < iVar1 + iVar3) {
-        iVar3 = param_1->field_0x12 - iVar1;
+    if (param_1->width < iVar1 + iVar3) {
+        iVar3 = param_1->width - iVar1;
     }
-    if (param_1->field_0x14 < iVar2 + iVar4) {
-        iVar4 = param_1->field_0x14 - iVar2;
+    if (param_1->height < iVar2 + iVar4) {
+        iVar4 = param_1->height - iVar2;
     }
     if (iVar3 >= 0 && iVar4 >= 0) {
         BlitBitmap(param_1, iVar1, iVar2, iVar3, iVar4, this, 0, 0);
@@ -169,17 +169,17 @@ void bitmap::CopyTo(class bitmap *param_1, int param_2, int param_3, int param_4
     PollSound();
     if (param_6 == 0x280) {
         // full-width (640) blit: source and dest rows are contiguous, one flat copy.
-        unsigned char *puVar5 = field_0x16 + param_4 + param_5 * 0x280;
-        unsigned char *puVar6 = param_1->field_0x16 + param_2 + param_3 * 0x280;
+        unsigned char *puVar5 = pixels + param_4 + param_5 * 0x280;
+        unsigned char *puVar6 = param_1->pixels + param_2 + param_3 * 0x280;
         memcpy(puVar6, puVar5, param_7 * 0x280);
     } else if (param_7 > 0) {
         int iVar4 = param_5 * 0x280;
         int iVar1 = param_3 * 0x280;
         do {
-            int iVar2 = reinterpret_cast<int>(field_0x16) + iVar4;
+            int iVar2 = reinterpret_cast<int>(pixels) + iVar4;
             iVar4 = iVar4 + 0x280;
             unsigned char *puVar5 = reinterpret_cast<unsigned char *>(param_4 + iVar2);
-            unsigned char *puVar6 = param_1->field_0x16 + iVar1 + param_2;
+            unsigned char *puVar6 = param_1->pixels + iVar1 + param_2;
             memcpy(puVar6, puVar5, param_6);
             iVar1 = iVar1 + 0x280;
             param_7 = param_7 - 1;
@@ -203,8 +203,8 @@ void bitmap::CopyToCareful(class bitmap *param_1, int param_2, int param_3, int 
             int iVar1 = param_5 + iVar3;
             int iVar4 = param_3 + iVar3;
             iVar3 = iVar3 + 1;
-            unsigned char *puVar5 = field_0x16 + iVar1 * field_0x12 + param_4;
-            unsigned char *puVar6 = param_1->field_0x16 + iVar4 * param_1->field_0x12 + param_2;
+            unsigned char *puVar5 = pixels + iVar1 * width + param_4;
+            unsigned char *puVar6 = param_1->pixels + iVar4 * param_1->width + param_2;
             memcpy(puVar6, puVar5, param_6);
         } while (iVar3 < param_7);
     }
