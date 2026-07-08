@@ -7,7 +7,9 @@
 #include <SOURCE/kbwin.h>
 #include <BASE/heroWindow.h>
 #include <BASE/mouseManager.h>
-#include <BASE/Misc.h>        // this TU's own free functions + indexArray/IconEntry
+#include <BASE/bitmap.h>
+#include <BASE/Misc.h>
+#include <BASE/miscwin.h>        // this TU's own free functions + indexArray/IconEntry
 #include <SOURCE/KB.h>        // EventWindowHandler, FileError, ShutDown
 #include <SOURCE/wingraph.h>  // SetFullScreenStatus
 #include <_carcass_types.h>   // tag_message (member access)
@@ -185,13 +187,19 @@ VA(0x004c5a60, 0x3ed)
 int SetupCDDrive(void) { return 0; }
 
 VA(0x004c5e50, 0x18)
-void BitmapToScreen(class bitmap *) {}
+void BitmapToScreen(class bitmap *bmp)
+{
+    BlitBitmapToScreen(bmp, 0, 0, bmp->field_0x12, bmp->field_0x14, 0, 0);
+}
 
 VA(0x004c5e70, 0x3d)
 void SetPalette(signed char *, int) {}
 
 VA(0x004c5eb0, 0x25)
-void BlitBitmapToScreenNoMouseCheck(class bitmap *, int, int, int, int, int, int) {}
+void BlitBitmapToScreenNoMouseCheck(class bitmap *bmp, int p2, int p3, int p4, int p5, int p6, int p7)
+{
+    BlitBitmapToScreenVesa(reinterpret_cast<int>(bmp), p2, p3, p4, p5, p6, p7);
+}
 
 VA(0x004c5ee0, 0x18b)
 void BlitBitmapToScreen(class bitmap *, int, int, int, int, int, int) {}
