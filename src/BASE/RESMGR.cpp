@@ -4,7 +4,9 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <io.h>
 #include <BASE/resourceManager.h>
+#include <BASE/Misc.h>
 #include <BASE/resource.h>
 #include <BASE/tileset.h>
 #include <BASE/font.h>
@@ -130,19 +132,43 @@ VA(0x004c8e80, 0x53)
 void resourceManager::RestorePosition(void) {}
 
 VA(0x004c8ee0, 0x81)
-signed char resourceManager::ReadByte(void) { return 0; }
+signed char resourceManager::ReadByte(void)
+{
+    char local_8[4];
+    ProcessAssert(field_0x42[field_0x3e] != -1, __FILE__, __LINE__);
+    local_8[0] = 0;
+    _read(field_0x42[field_0x3e], local_8, 1);
+    return local_8[0];
+}
 
 VA(0x004c8f70, 0x84)
-short int resourceManager::ReadWord(void) { return 0; }
+short resourceManager::ReadWord(void)
+{
+    short local_8[2];
+    ProcessAssert(field_0x42[field_0x3e] != -1, __FILE__, __LINE__);
+    local_8[0] = 0;
+    _read(field_0x42[field_0x3e], local_8, 2);
+    return local_8[0];
+}
 
 VA(0x004c9000, 0x84)
-long int resourceManager::ReadLong(void) { return 0; }
+long resourceManager::ReadLong(void)
+{
+    long local_8;
+    ProcessAssert(field_0x42[field_0x3e] != -1, __FILE__, __LINE__);
+    local_8 = 0;
+    _read(field_0x42[field_0x3e], &local_8, 4);
+    return local_8;
+}
 
 VA(0x004c9090, 0xe3)
 unsigned long int resourceManager::MakeId(char *, int) { return 0; }
 
 VA(0x004c9180, 0x26)
-void resourceManager::Read13(signed char *) {}
+void resourceManager::Read13(signed char *param_1)
+{
+    ReadBlock(param_1, 0xd);
+}
 
 VA(0x004c91b0, 0xbd)
 void resourceManager::ReadBlock(signed char *, unsigned long int) {}
