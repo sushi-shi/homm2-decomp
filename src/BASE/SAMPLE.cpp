@@ -7,6 +7,8 @@
 #include <BASE/MIDIWrap.h>
 #include <BASE/sample.h>
 #include <BASE/Misc.h>
+#include <BASE/resourceManager.h>
+#include <SOURCE/KB.h>
 VA(0x004dad60, 0x181)
 sample::sample(char *, long int, long int, long int) {}
 
@@ -20,7 +22,13 @@ sample::~sample()
 }
 
 VA(0x004daf70, 0x72)
-MIDIWrap::MIDIWrap(char *) {}
+MIDIWrap::MIDIWrap(char *name) : resource(6, gpResourceManager->MakeId(name, 1), 1, 0)
+{
+    unsigned long size = gpResourceManager->GetFileSize(field_0x8);
+    field_0x10 = static_cast<char *>(BaseAlloc(size, __FILE__, __LINE__));
+    gpResourceManager->PointToFile(field_0x8);
+    gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(field_0x10), size);
+}
 
 VA(0x004db030, 0x28)
 MIDIWrap::~MIDIWrap()
