@@ -324,7 +324,7 @@ void listBoxWidget::DrawLBStuff(int param_1)
                         sVar4 = field_0x2c;
                     m_font->DrawBoundedString(static_cast<char *>(m_items[field_0x40]),
                                                   iVar2 + 5, iVar5 + 4, field_0x64 - 10,
-                                                  m_font->field_0x10 + 1, sVar4, field_0x30);
+                                                  m_font->m_height + 1, sVar4, field_0x30);
                 }
                 sVar4 = field_0x5a;
 LAB_004dba0b:
@@ -339,7 +339,7 @@ LAB_004dba0b:
                             sVar4 = field_0x2c;
                         m_font->DrawBoundedString(
                             static_cast<char *>(m_items[field_0x40 + iVar3]), iVar2 + 5, iVar5 + 2,
-                            field_0x64 - 10, m_font->field_0x10 + 1, sVar4, field_0x30);
+                            field_0x64 - 10, m_font->m_height + 1, sVar4, field_0x30);
                     }
                     sVar4 = field_0x5c;
                     goto LAB_004dba0b;
@@ -352,7 +352,7 @@ LAB_004dba0b:
                         sVar4 = field_0x2c;
                     m_font->DrawBoundedString(static_cast<char *>(m_items[field_0x40 + iVar3]),
                                                   iVar2 + 5, iVar5 + 2, field_0x64 - 10,
-                                                  m_font->field_0x10 + 1, sVar4, field_0x30);
+                                                  m_font->m_height + 1, sVar4, field_0x30);
                 }
             }
             iVar3 = iVar3 + 1;

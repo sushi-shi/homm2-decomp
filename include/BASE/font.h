@@ -12,10 +12,10 @@ class icon;
 class font : public resource {
 public:
     // --- own members (base resource occupies 0x00..0x10; widths from access-analysis) ---
-    int    field_0x10;  // +0x10
-    int    field_0x14;  // +0x14
-    int    field_0x18;  // +0x18
-    icon  *field_0x1c;  // +0x1c  (resourceManager::GetIcon result)
+    int    m_height;  // +0x10
+    int    m_isLarge;  // +0x14
+    int    m_suppressDraw;  // +0x18
+    icon  *m_glyphIcon;  // +0x1c  (resourceManager::GetIcon result)
     // --- constructors ---
     font(unsigned long int);
     virtual ~font();

@@ -267,7 +267,7 @@ void dropListWidget::DrawDropStuff(void)
         sVar2 = field_0x34;
     iVar4 = 1;
     m_font->DrawBoundedString(m_items[field_0x44], m_owner->m_posX + field_0x82 + 5,
-                                  iVar5 + 4, field_0x86 - 10, m_font->field_0x10 + 1, sVar2,
+                                  iVar5 + 4, field_0x86 - 10, m_font->m_height + 1, sVar2,
                                   field_0x3a);
     iVar5 = iVar5 + field_0x74;
     if (1 < field_0x32 - 1) {
@@ -282,7 +282,7 @@ void dropListWidget::DrawDropStuff(void)
                 sVar2 = field_0x34;
             iVar4 = iVar4 + 1;
             m_font->DrawBoundedString(m_items[iVar1], m_owner->m_posX + field_0x82 + 5,
-                                          iVar5 + 2, field_0x86 - 10, m_font->field_0x10 + 1,
+                                          iVar5 + 2, field_0x86 - 10, m_font->m_height + 1,
                                           sVar2, field_0x3a);
             iVar5 = iVar5 + field_0x76;
         } while (iVar4 < field_0x32 - 1);
@@ -295,7 +295,7 @@ void dropListWidget::DrawDropStuff(void)
         else
             sVar2 = field_0x34;
         m_font->DrawBoundedString(m_items[iVar4], m_owner->m_posX + field_0x82 + 5,
-                                      iVar5 + 2, field_0x86 - 10, m_font->field_0x10 + 1, sVar2,
+                                      iVar5 + 2, field_0x86 - 10, m_font->m_height + 1, sVar2,
                                       field_0x3a);
     }
     if (0 < field_0x46) {

@@ -17,11 +17,11 @@
 VA(0x004dd440, 0x34)
 button::button(void) : widget(0, 0, 0, 0, 0, 0)
 {
-    field_0x24 = 0;
-    field_0x26 = 0;
-    field_0x2c = 0;
+    m_pressedFrame = 0;
+    m_normalFrame = 0;
+    m_iconId = 0;
     field_0x28 = 0;
-    field_0x2a = -1;
+    m_hotkey = -1;
     m_icon = 0;
 }
 
@@ -29,12 +29,12 @@ VA(0x004dd4c0, 0x6e)
 button::button(short int x, short int y, short int w, short int h, unsigned long int iconId, short int p6, short int p7, short int p8, short int p9, short int p10, short int p11)
     : widget(x, y, w, h, p10, p11)
 {
-    field_0x2c = iconId;
+    m_iconId = iconId;
     m_icon = gpResourceManager->GetIcon(iconId);
-    field_0x24 = p6;
-    field_0x26 = p7;
+    m_pressedFrame = p6;
+    m_normalFrame = p7;
     field_0x28 = p8;
-    field_0x2a = p9;
+    m_hotkey = p9;
 }
 
 VA(0x004dd530, 0x7c)
@@ -42,12 +42,12 @@ button::button(short int x, short int y, short int w, short int h, char *name, s
     : widget(x, y, w, h, p10, p11)
 {
     unsigned long id = gpResourceManager->MakeId(name, 1);
-    field_0x2c = id;
+    m_iconId = id;
     m_icon = gpResourceManager->GetIcon(id);
-    field_0x24 = p6;
-    field_0x26 = p7;
+    m_pressedFrame = p6;
+    m_normalFrame = p7;
     field_0x28 = p8;
-    field_0x2a = p9;
+    m_hotkey = p9;
 }
 
 VA(0x004dd5b0, 0xeb)
@@ -60,13 +60,13 @@ void button::Read(void)
     m_height = gpResourceManager->ReadWord();
     gpResourceManager->Read13(reinterpret_cast<signed char *>(local_10));
     gpResourceManager->SavePosition();
-    field_0x2c = gpResourceManager->MakeId(local_10, 1);
-    m_icon = gpResourceManager->GetIcon(field_0x2c);
+    m_iconId = gpResourceManager->MakeId(local_10, 1);
+    m_icon = gpResourceManager->GetIcon(m_iconId);
     gpResourceManager->RestorePosition();
-    field_0x24 = gpResourceManager->ReadWord();
-    field_0x26 = gpResourceManager->ReadWord();
+    m_pressedFrame = gpResourceManager->ReadWord();
+    m_normalFrame = gpResourceManager->ReadWord();
     field_0x28 = gpResourceManager->ReadWord();
-    field_0x2a = gpResourceManager->ReadWord();
+    m_hotkey = gpResourceManager->ReadWord();
     m_id = gpResourceManager->ReadWord();
     field_0x14 = gpResourceManager->ReadWord();
 }
@@ -110,12 +110,12 @@ int button::Main(tag_message &param_1)
         if (iVar4 != 8) {
             if (iVar4 == 1) {
                 if ((uVar1 & 2) != 0 && (uVar1 & 4) != 0 && (uVar1 & 8) == 0) {
-                    if (field_0x2a != -1 && field_0x2a == param_1.field4)
+                    if (m_hotkey != -1 && m_hotkey == param_1.field4)
                         return Select(param_1);
                     return 0;
                 }
             } else if (iVar4 == 2 && (uVar1 & 2) != 0 && (uVar1 & 4) != 0 && (uVar1 & 8) == 0) {
-                if (field_0x2a != -1 && field_0x2a == param_1.field4) {
+                if (m_hotkey != -1 && m_hotkey == param_1.field4) {
                     if ((uVar1 & 1) == 0)
                         return 0;
                     m_flags = uVar1 & 0xfffe;
@@ -153,8 +153,8 @@ int button::Main(tag_message &param_1)
         }
         if (iVar4 != 0x20) {
             if (iVar4 == 0x200 && param_1.field4 == 0x3c) {
-                if (param_1.field8 == field_0x2c) {
-                    field_0x2c = reinterpret_cast<int>(param_1.text);
+                if (param_1.field8 == m_iconId) {
+                    m_iconId = reinterpret_cast<int>(param_1.text);
                     gpResourceManager->Dispose(m_icon);
                     m_icon = gpResourceManager->GetIcon(reinterpret_cast<unsigned long>(param_1.text));
                 }
@@ -235,7 +235,7 @@ short button::Select(struct tag_message &msg)
 {
     short x = m_owner->m_posX + m_x;
     short y = m_y + m_owner->m_posY;
-    m_icon->DrawToBuffer(x, y, field_0x26, 0);
+    m_icon->DrawToBuffer(x, y, m_normalFrame, 0);
     gpWindowManager->UpdateScreenRegion(x, y, m_width, m_height);
     m_flags |= 1;
     msg.type = 0x200;
@@ -271,11 +271,11 @@ void button::Draw(void)
     heroWindow *win = m_owner;
     if ((m_flags & 1) != 0) {
         m_icon->DrawToBuffer(m_x + win->m_posX, m_y + win->m_posY,
-                                 field_0x26, 0);
+                                 m_normalFrame, 0);
         return;
     }
     m_icon->DrawToBuffer(m_x + win->m_posX, m_y + win->m_posY,
-                             field_0x24, 0);
+                             m_pressedFrame, 0);
 }
 
 

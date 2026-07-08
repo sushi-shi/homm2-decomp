@@ -15,11 +15,11 @@ public:
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base widget = 0x20 bytes at 0x00 via ': public widget'; own fields below)
     icon  *m_icon;  // +0x20  button icon
-    short  field_0x24;  // +0x24
-    short  field_0x26;  // +0x26
+    short  m_pressedFrame;  // +0x24
+    short  m_normalFrame;  // +0x26
     short  field_0x28;  // +0x28
-    short  field_0x2a;  // +0x2a
-    int    field_0x2c;  // +0x2c
+    short  m_hotkey;  // +0x2a
+    int    m_iconId;  // +0x2c
     // --- constructors ---
     button(void);
     button(short int, short int, short int, short int, unsigned long int, short int, short int, short int, short int, short int, short int);
