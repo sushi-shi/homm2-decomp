@@ -386,11 +386,11 @@ BASE/iconf2by	?FlipIconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	11
 BASE/listbox	??0listBoxWidget@@QAE@XZ	97.3684	2d787e1f30f9
 BASE/listbox	??1listBoxWidget@@UAE@XZ	98.5909	b3cd962bd994
 BASE/listbox	??_ElistBoxWidget@@UAEPAXI@Z	0.0000	
-BASE/listbox	?DeleteItem@listBoxWidget@@QAEXH@Z	55.3878	8ef6cc5d31ef
+BASE/listbox	?DeleteItem@listBoxWidget@@QAEXH@Z	55.3980	8ef6cc5d31ef
 BASE/listbox	?Draw@listBoxWidget@@UAEXXZ	100.0000	230100bbcc4e
 BASE/listbox	?DrawLBStuff@listBoxWidget@@QAEXH@Z	0.3367	7e38fe8c1036
 BASE/listbox	?Main@listBoxWidget@@UAEHAAUtag_message@@@Z	54.0767	07473c97aebf
-BASE/listbox	?ProcessMouseMessage@listBoxWidget@@QAEHAAUtag_message@@@Z	0.8264	ceb5e98f6441
+BASE/listbox	?ProcessMouseMessage@listBoxWidget@@QAEHAAUtag_message@@@Z	50.5289	0855861a89a9
 BASE/listbox	?Read@listBoxWidget@@QAEXXZ	89.8843	723df75d15ed
 BASE/miscwin	?AutoInitSVGA@@YIFXZ	100.0000	ba21e7c98ba3
 BASE/miscwin	@BlitBitmapToScreenVesa@28	0.6579	10b3cea2382c

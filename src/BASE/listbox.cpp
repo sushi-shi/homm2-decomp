@@ -12,6 +12,7 @@
 #include <BASE/widget.h>
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
+#include <SOURCE/kbwin.h>
 #include <string.h>
 #include <SOURCE/X_GLOBAL.h>
 VA(0x004db060, 0x42)
@@ -307,7 +308,113 @@ VA(0x004db8a0, 0x334)
 void listBoxWidget::DrawLBStuff(int) {}
 
 VA(0x004dbbe0, 0x312)
-int listBoxWidget::ProcessMouseMessage(struct tag_message &) { return 0; }
+int listBoxWidget::ProcessMouseMessage(tag_message &param_1)
+{
+    short sVar1, sVar2;
+    int iVar3, iVar5, iVar6, iVar7, iVar8;
+    long lVar4;
+    iVar6 = param_1.type;
+    iVar7 = param_1.field10 - field_0x4->field_0x28;
+    iVar5 = param_1.field14 - field_0x4->field_0x2c;
+    iVar8 = field_0x62;
+    iVar3 = iVar5 - iVar8;
+    if (iVar6 == 4) {
+        if (field_0x8d == 0) {
+            if (field_0x8c == 0)
+                return 0;
+            iVar3 = field_0x42;
+            iVar6 = ((((iVar5 - field_0x86 / 2) - field_0x72) - 4) * (iVar3 + 1)) / field_0x88;
+            if (iVar6 < 0)
+                iVar6 = 0;
+            if (iVar3 < iVar6)
+                iVar6 = iVar3;
+            if (field_0x40 == iVar6)
+                return 1;
+            field_0x40 = static_cast<short>(iVar6);
+        } else {
+            if (field_0x5a < iVar3)
+                iVar6 = (iVar3 - field_0x5a) / field_0x5c + 1;
+            else
+                iVar6 = 0;
+            if (iVar6 < 0)
+                iVar6 = 0;
+            if (field_0x2a <= iVar6)
+                iVar6 = field_0x2a - 1;
+            if (field_0x40 + iVar6 == field_0x34)
+                return 1;
+            field_0x34 = static_cast<short>(iVar6) + field_0x40;
+        }
+    } else if (iVar6 == 8) {
+        if (field_0x32 == 0)
+            return 1;
+        if (iVar7 < field_0x60 || iVar5 < iVar8 || field_0x64 + field_0x60 <= iVar7 ||
+            field_0x66 + iVar8 <= iVar5) {
+            if (iVar5 < field_0x6a + field_0x6e) {
+                if (0 < field_0x40)
+                    field_0x40 = field_0x40 - 1;
+                field_0x8a = 1;
+            } else if (iVar5 < field_0x7a) {
+                if (field_0x82 <= iVar5 && iVar5 < field_0x86 + field_0x82) {
+                    field_0x8c = 1;
+                    gbSendMouseMoveMessages = 1;
+                }
+                sVar1 = field_0x42;
+                sVar2 = static_cast<short>(((((iVar5 - field_0x86 / 2) - field_0x72) - 4) * (sVar1 + 1)) /
+                                           field_0x88);
+                field_0x40 = sVar2;
+                if (sVar2 < 0)
+                    field_0x40 = 0;
+                if (sVar1 < field_0x40)
+                    field_0x40 = sVar1;
+            } else {
+                if (field_0x40 < field_0x42)
+                    field_0x40 = field_0x40 + 1;
+                field_0x8b = 1;
+            }
+        } else {
+            if (field_0x5a < iVar3)
+                iVar6 = field_0x40 + 1 + (iVar3 - field_0x5a) / field_0x5c;
+            else
+                iVar6 = field_0x40;
+            if (field_0x32 <= iVar6)
+                return 1;
+            field_0x8d = 1;
+            gbSendMouseMoveMessages = 1;
+            if (field_0x34 == iVar6) {
+                gbSendMouseMoveMessages = 1;
+                return 1;
+            }
+            field_0x34 = static_cast<short>(iVar6);
+        }
+    } else {
+        if (iVar6 != 0x10)
+            return 1;
+        gbSendMouseMoveMessages = 0;
+        if (field_0x8a == 0 && field_0x8b == 0 && field_0x8c == 0) {
+            if (field_0x8d != 0) {
+                field_0x8d = 0;
+                param_1.field4 = 0xc;
+                param_1.type = 0x200;
+                param_1.field8 = field_0x10;
+                sVar1 = field_0x34;
+                param_1.fieldC = 1;
+                param_1.text = reinterpret_cast<char *>(static_cast<int>(sVar1));
+                if (field_0x36 == field_0x34 &&
+                    (iVar6 = field_0x38, lVar4 = KBTickCount(), lVar4 < iVar6 + 400))
+                    param_1.fieldC = 2;
+                field_0x36 = field_0x34;
+                field_0x38 = KBTickCount();
+                return 2;
+            }
+            return 0;
+        }
+        field_0x8c = 0;
+        field_0x8b = 0;
+        field_0x8a = 0;
+    }
+    DrawLBStuff(1);
+    return 1;
+}
 
 
 // ===== vtable listBoxWidget : public widget  (3 slots) =====
