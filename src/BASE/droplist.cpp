@@ -59,10 +59,10 @@ void dropListWidget::Read(void)
     field_0x2c = gpResourceManager->ReadWord();
     field_0x2e = gpResourceManager->ReadWord();
     field_0x30 = gpResourceManager->ReadWord();
-    field_0x34 = gpResourceManager->ReadWord();
-    field_0x36 = gpResourceManager->ReadWord();
+    m_normalColor = gpResourceManager->ReadWord();
+    m_selColor = gpResourceManager->ReadWord();
     field_0x38 = gpResourceManager->ReadWord();
-    field_0x3a = gpResourceManager->ReadWord();
+    m_textMode = gpResourceManager->ReadWord();
     sVar2 = gpResourceManager->ReadWord();
     field_0x48 = 0;
     field_0x4a = 1;
@@ -246,11 +246,11 @@ void dropListWidget::Draw(void)
     if (field_0x3c > 0 && m_selectedIndex >= 0) {
         int color = 3;
         if ((m_flags & 8) == 0)
-            color = field_0x34;
+            color = m_normalColor;
         m_font->DrawBoundedString(m_items[m_selectedIndex],
                                       m_contentX + m_owner->m_posX,
                                       m_contentY + m_owner->m_posY,
-                                      field_0x2c, field_0x2e, color, field_0x3a);
+                                      field_0x2c, field_0x2e, color, m_textMode);
     }
 }
 
@@ -262,13 +262,13 @@ void dropListWidget::DrawDropStuff(void)
     iVar5 = field_0x84 + m_owner->m_posY;
     m_icon->DrawToBuffer(m_owner->m_posX + field_0x82, iVar5, field_0x4e, 0);
     if (m_selectedIndex == m_topIndex)
-        sVar2 = field_0x36;
+        sVar2 = m_selColor;
     else
-        sVar2 = field_0x34;
+        sVar2 = m_normalColor;
     iVar4 = 1;
     m_font->DrawBoundedString(m_items[m_topIndex], m_owner->m_posX + field_0x82 + 5,
                                   iVar5 + 4, field_0x86 - 10, m_font->m_height + 1, sVar2,
-                                  field_0x3a);
+                                  m_textMode);
     iVar5 = iVar5 + field_0x74;
     if (1 < field_0x32 - 1) {
         do {
@@ -277,13 +277,13 @@ void dropListWidget::DrawDropStuff(void)
             m_icon->DrawToBuffer(m_owner->m_posX + field_0x82, iVar5, field_0x50, 0);
             iVar1 = m_topIndex + iVar4;
             if (m_selectedIndex == iVar1)
-                sVar2 = field_0x36;
+                sVar2 = m_selColor;
             else
-                sVar2 = field_0x34;
+                sVar2 = m_normalColor;
             iVar4 = iVar4 + 1;
             m_font->DrawBoundedString(m_items[iVar1], m_owner->m_posX + field_0x82 + 5,
                                           iVar5 + 2, field_0x86 - 10, m_font->m_height + 1,
-                                          sVar2, field_0x3a);
+                                          sVar2, m_textMode);
             iVar5 = iVar5 + field_0x76;
         } while (iVar4 < field_0x32 - 1);
     }
@@ -291,12 +291,12 @@ void dropListWidget::DrawDropStuff(void)
     iVar4 = m_topIndex + iVar4;
     if (iVar4 < field_0x3c) {
         if (m_selectedIndex == iVar4)
-            sVar2 = field_0x36;
+            sVar2 = m_selColor;
         else
-            sVar2 = field_0x34;
+            sVar2 = m_normalColor;
         m_font->DrawBoundedString(m_items[iVar4], m_owner->m_posX + field_0x82 + 5,
                                       iVar5 + 2, field_0x86 - 10, m_font->m_height + 1, sVar2,
-                                      field_0x3a);
+                                      m_textMode);
     }
     if (0 < field_0x46) {
         if (field_0xac == 0)
