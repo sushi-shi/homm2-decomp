@@ -248,36 +248,39 @@ VA(0x004cf500, 0x116)
 void heroWindow::RemoveWidget(class widget *param_1)
 {
     widget *iVar1;
-    if (param_1 != 0) {
-        param_1->Close();
-        if (field_0x38 == param_1) {
-            field_0x38 = param_1->field_0xc;
-            if (field_0x38 == 0)
-                field_0x3c = 0;
-            else
-                field_0x38->field_0x8 = 0;
-        } else if (field_0x3c == param_1) {
-            field_0x3c = param_1->field_0x8;
-            field_0x3c->field_0xc = 0;
-        } else {
-            param_1->field_0x8->field_0xc = param_1->field_0xc;
-            param_1->field_0xc->field_0x8 = param_1->field_0x8;
-        }
-        iVar1 = param_1->field_0x8;
-        if (iVar1 == 0) {
+    if (param_1 == 0)
+        return;
+    param_1->Close();
+    if (field_0x38 == param_1) {
+        field_0x38 = param_1->field_0xc;
+        if (field_0x38 == 0)
             field_0x3c = 0;
-            field_0x38 = field_0x3c;
-        } else {
-            iVar1->field_0xc = param_1->field_0xc;
-            if (iVar1->field_0xc != 0)
-                iVar1->field_0xc->field_0x8 = iVar1;
-        }
+        else
+            field_0x38->field_0x8 = 0;
+    } else if (field_0x3c == param_1) {
+        field_0x3c = param_1->field_0x8;
+        field_0x3c->field_0xc = 0;
+    } else {
+        param_1->field_0x8->field_0xc = param_1->field_0xc;
+        param_1->field_0xc->field_0x8 = param_1->field_0x8;
+    }
+    iVar1 = param_1->field_0x8;
+    if (iVar1 == 0) {
+        field_0x3c = 0;
+        field_0x38 = field_0x3c;
+    } else {
+        iVar1->field_0xc = param_1->field_0xc;
+        if (iVar1->field_0xc != 0)
+            iVar1->field_0xc->field_0x8 = iVar1;
     }
 }
 
 VA(0x004cf620, 0x95)
 int heroWindow::BroadcastMessage(struct tag_message &param_1)
 {
+    // @early-stop 78% — retail materializes the (result<1 || 2<result) guard into a bool
+    // temp before AND-ing with local_c!=0 (a /Od boolean-codegen shape not reachable from
+    // the natural compound condition). Same wall as heroWindowManager::Main.
     int local_8 = 0;
     widget *local_c = field_0x3c;
     while (local_c != 0 && ((local_8 = local_c->Main(param_1)) < 1 || 2 < local_8)) {
@@ -364,12 +367,12 @@ void heroWindow::MoveWindow(int dx, int dy)
     field_0x2c = newY;
     field_0x40->GrabBitmap(gpWindowManager->field_0x46, field_0x28, field_0x2c);
     DrawWindow(0);
-    int movedX = abs(field_0x28 - oldX);
-    int movedY = abs(field_0x2c - oldY);
+    oldW = oldW + abs(field_0x28 - oldX);
+    oldH = oldH + abs(field_0x2c - oldY);
     if (field_0x28 < oldX)
         oldX = field_0x28;
     if (field_0x2c < oldY)
         oldY = field_0x2c;
-    gpWindowManager->UpdateScreenRegion(oldX, oldY, oldW + movedX, oldH + movedY);
+    gpWindowManager->UpdateScreenRegion(oldX, oldY, oldW, oldH);
 }
 
