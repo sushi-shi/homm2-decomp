@@ -167,7 +167,7 @@ BASE/ICONWDGT	?Read@iconWidget@@QAEXXZ	1.9231	6556d392f3fe
 BASE/INPUTMGR	??0inputManager@@QAE@XZ	100.0000	c3c0a79e362d
 BASE/INPUTMGR	?AsciiConvert@inputManager@@QAEXAAUtag_message@@@Z	0.6623	d68deff2594d
 BASE/INPUTMGR	?CheckChangeCursor@@YIXHHH@Z	1.7544	360d0302cd92
-BASE/INPUTMGR	?Close@inputManager@@UAEXXZ	11.1111	f49f9b64b003
+BASE/INPUTMGR	?Close@inputManager@@UAEXXZ	100.0000	8f852ea0c1cf
 BASE/INPUTMGR	?Flush@inputManager@@QAEXXZ	100.0000	712b56c709ae
 BASE/INPUTMGR	?ForceMouseMove@inputManager@@QAEXXZ	1.4706	d02439714678
 BASE/INPUTMGR	?GetEvent@inputManager@@QAE?AUtag_message@@XZ	13.5455	ee1c0853ac3b
