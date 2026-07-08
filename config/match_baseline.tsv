@@ -183,7 +183,7 @@ BASE/Icon2b	?IconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	0.0000	d0d056ab934
 BASE/Icond2b	?DimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	0.0000	4ad06e73ab42
 BASE/Icondf2b	?FlipDimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	0.6024	c48e63b2b65c
 BASE/Iconf2b	?FlipIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	0.0000	3abcce4cbc58
-BASE/Iconm2b	?MonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	0.5525	55b09710d7a1
+BASE/Iconm2b	?MonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	38.2541	3d9fa402f004
 BASE/Iconmf2b	?FlipMonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	0.5988	cd02c210f51a
 BASE/MOUSEMGR	??0mouseManager@@QAE@XZ	100.0000	cd5abb5d46d3
 BASE/MOUSEMGR	?CheckUpdateMousePos@mouseManager@@QAEXXZ	100.0000	651624228ccc
