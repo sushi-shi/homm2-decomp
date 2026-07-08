@@ -103,7 +103,22 @@ void __stdcall UpdateTimers(unsigned long int)
 }
 
 VA(0x004cc330, 0xd7)
-soundManager::soundManager(void) {}
+soundManager::soundManager(void) : baseManager()
+{
+    int local_8;
+    field_0x574 = 1;
+    field_0x32 = 0;
+    field_0x688 = 0;
+    field_0x56c = 0;
+    for (local_8 = 0; local_8 < 0x20; local_8++)
+        reinterpret_cast<short *>(&iLastVolume)[local_8] = 0;
+    memset(&field_0x3e, 0, 0xae);
+    field_0x684 = 0;
+    field_0x36 = 0;
+    field_0x3a = 0;
+    field_0x690 = 0;
+    field_0x694 = 0;
+}
 
 VA(0x004cc410, 0x14a)
 struct _DIG_DRIVER * WAVE_init_driver(unsigned long int, unsigned short int, unsigned short int, unsigned short int) { return 0; }
