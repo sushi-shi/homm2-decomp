@@ -136,7 +136,7 @@ BASE/EXEC	?DoDialog@executive@@QAEHPAVbaseManager@@@Z	2.3750	a8496415c620
 BASE/EXEC	?InitSystem@executive@@QAEHXZ	3.6364	94d03986546b
 BASE/EXEC	?MainLoop@executive@@QAEXXZ	1.1494	3c515846ece9
 BASE/EXEC	?PrintManagerList@executive@@QAEXXZ	2.4390	6456aec69467
-BASE/EXEC	?RemoveManager@executive@@QAEXPAVbaseManager@@@Z	2.5641	9e7f8fcc32d6
+BASE/EXEC	?RemoveManager@executive@@QAEXPAVbaseManager@@@Z	95.5128	5c183c1b0596
 BASE/EXEC	?ShutDownSystem@executive@@QAEXXZ	2.0000	7e515c666fd9
 BASE/EXEC	?Terminate@executive@@QAEXXZ	20.0000	fe922d1f3c5a
 BASE/FONT	??0font@@QAE@K@Z	100.0000	67411d2f90da

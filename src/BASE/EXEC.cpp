@@ -5,6 +5,7 @@
 
 #include <va.h>
 #include <BASE/executive.h>
+#include <BASE/baseManager.h>
 #include <SOURCE/KB.h>
 VA(0x004d1610, 0x10)
 executive::executive(void)
@@ -31,7 +32,34 @@ VA(0x004d18e0, 0xce)
 int executive::AddManager(class baseManager *, int) { return 0; }
 
 VA(0x004d19b0, 0x76)
-void executive::RemoveManager(class baseManager *) {}
+void executive::RemoveManager(class baseManager *mgr)
+{
+    if (mgr != 0) {
+        mgr->Close();
+        baseManager *prev = mgr->field_0x8;
+        if (prev == 0) {
+            if (field_0x0 == field_0x4) {
+                field_0x4 = 0;
+                field_0x0 = 0;
+            } else {
+                baseManager *next = mgr->field_0x4;
+                field_0x0 = next;
+                next->field_0x8 = 0;
+            }
+            mgr->field_0x8 = 0;
+            mgr->field_0x4 = 0;
+            return;
+        }
+        baseManager *next = mgr->field_0x4;
+        prev->field_0x4 = next;
+        if (next == 0)
+            field_0x4 = prev;
+        else
+            next->field_0x8 = prev;
+        mgr->field_0x8 = 0;
+        mgr->field_0x4 = 0;
+    }
+}
 
 VA(0x004d1a30, 0x5a)
 void executive::CallManager(class baseManager *mgr)
