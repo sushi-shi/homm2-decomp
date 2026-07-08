@@ -322,7 +322,20 @@ VA(0x004cd160, 0xe3)
 void soundManager::SetMusicQuality(int) {}
 
 VA(0x004cd250, 0xc5)
-void soundManager::PlayAmbientMusic(int, long int, int) {}
+void soundManager::PlayAmbientMusic(int param_1, long param_2, int param_3)
+{
+    if (gbNoSound == 0 && field_0x684 != 0 && field_0x3e != 0 && field_0x578 != param_1) {
+        if (gMidiEnabled == 0) {
+            field_0x578 = static_cast<char>(param_1);
+        } else {
+            if (gCdMusic == 0)
+                MIDIPlay(param_1);
+            else
+                CDPlay(param_1, param_2, -1, 0);
+            field_0x578 = static_cast<char>(param_1);
+        }
+    }
+}
 
 VA(0x004cd320, 0x38f)
 void soundManager::PollSound(void) {}
