@@ -8,6 +8,7 @@
 #include <BASE/resourceManager.h>
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
+#include <string.h>
 VA(0x004d1060, 0x3e)
 textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, 0)
 {
@@ -44,7 +45,19 @@ void textWidget::SetColorIndex(short int param_1)
 }
 
 VA(0x004d14f0, 0xa2)
-void textWidget::SetText(char *) {}
+void textWidget::SetText(char *param_1)
+{
+    if (field_0x14 != 0x200 && field_0x14 != 0x4000) {
+        field_0x20 = param_1;
+        return;
+    }
+    unsigned short newLen = strlen(param_1);
+    if (strlen(field_0x20) < newLen) {
+        BaseFree(field_0x20, __FILE__, __LINE__);
+        field_0x20 = static_cast<char *>(BaseAlloc(newLen + 5, __FILE__, __LINE__));
+    }
+    strcpy(field_0x20, param_1);
+}
 
 
 // ===== vtable textWidget : public widget  (3 slots) =====
