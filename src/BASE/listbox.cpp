@@ -42,7 +42,10 @@ VA(0x004db520, 0x368)
 int listBoxWidget::Main(struct tag_message &) { return 0; }
 
 VA(0x004db890, 0x8)
-void listBoxWidget::Draw(void) {}
+void listBoxWidget::Draw(void)
+{
+    DrawLBStuff(0);
+}
 
 VA(0x004db8a0, 0x334)
 void listBoxWidget::DrawLBStuff(int) {}
