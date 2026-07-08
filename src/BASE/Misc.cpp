@@ -19,6 +19,8 @@
 #include <windows.h>      // MessageBoxA
 #include <stdlib.h>
 #include <stdio.h>
+#include <io.h>
+#include <fcntl.h>
 #include <string.h>
 
 static int giFindMid;
@@ -175,7 +177,22 @@ VA(0x004c5450, 0xa1)
 void ReadPrefs(void) {}
 
 VA(0x004c5500, 0x6a)
-void WritePrefsToFile(void) {}
+void WritePrefsToFile(void)
+{
+    int local_64[25];
+    int i;
+    int *p = local_64;
+    for (i = 0x19; i != 0; i--) {
+        *p = 0;
+        p++;
+    }
+    sprintf(gText, "%s", "HEROES2.CFG");
+    int fd = _open(gText, 0x8301, 0x80);
+    if (fd != -1) {
+        _write(fd, &gConfig, 0x19d);
+        _close(fd);
+    }
+}
 
 VA(0x004c5570, 0x491)
 void WritePrefsToRegistry(void) {}
