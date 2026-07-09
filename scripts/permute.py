@@ -60,6 +60,35 @@ def _load_flags(tu):
 FLAGS = _load_flags(TU)
 
 
+def _target_va_prefix():
+    """`VA(0x........,` marker prefix for the target fn (via symbol_names.csv), or None.
+    Used to SCOPE mutations to just that function's body — a huge speedup on big multi-fn TUs
+    (a mutation in some other function can never improve the target, only waste a compile)."""
+    try:
+        for line in open("build/gen/symbol_names.csv"):
+            c = line.rstrip("\n").split(",")
+            if len(c) >= 2 and c[1] == SYM and c[0].startswith("0x"):
+                return f"VA(0x{int(c[0], 16) + 0x400000:08x},"
+    except Exception:
+        pass
+    return None
+
+
+_TARGET_VA = _target_va_prefix()
+
+
+def _span(text):
+    """(start, end) char offsets of the target fn's body: its VA marker -> the next VA marker
+    (or EOF). Whole file if the marker can't be found, so this only ever narrows, never breaks."""
+    if not _TARGET_VA:
+        return 0, len(text)
+    i = text.find(_TARGET_VA)
+    if i < 0:
+        return 0, len(text)
+    j = text.find("\nVA(0x", i + 1)
+    return i, (j if j >= 0 else len(text))
+
+
 def _symmap(d):
     """{symbol_name: match_percent} for every named function symbol on the right (our build)."""
     res = {}
@@ -114,18 +143,21 @@ def idents(s):
 
 
 def gen_variants(text):
+    s, e = _span(text)                       # mutate ONLY the target function's body
+    pre, body, suf = text[:s], text[s:e], text[e:]
     out = []
+    def emit(nb):
+        out.append(pre + nb + suf)
     # 1) commutative-operand swaps
     for op in COMM:
-        esc = re.escape(op)
-        pat = re.compile(r'(?<![\w>&|^=!<+*-])(' + OPD + r') ' + esc + r' (' + OPD + r')(?![\w])')
-        for m in pat.finditer(text):
+        pat = re.compile(r'(?<![\w>&|^=!<+*-])(' + OPD + r') ' + re.escape(op) + r' (' + OPD + r')(?![\w])')
+        for m in pat.finditer(body):
             a, b = m.group(1), m.group(2)
             if a == b:
                 continue
-            out.append(text[:m.start()] + f"{b} {op} {a}" + text[m.end():])
+            emit(body[:m.start()] + f"{b} {op} {a}" + body[m.end():])
     # 2) reorder adjacent independent scalar/global assignment lines (value-preserving)
-    lines = text.split("\n")
+    lines = body.split("\n")
     for i in range(len(lines) - 1):
         m1, m2 = ASSIGN.match(lines[i]), ASSIGN.match(lines[i + 1])
         if not (m1 and m2):
@@ -135,28 +167,26 @@ def gen_variants(text):
             continue
         l1, r1 = m1.group(2), m1.group(3)
         l2, r2 = m2.group(2), m2.group(3)
-        if l1 == l2:            # write-after-write to same lhs: order matters
-            continue
-        # independent iff neither lhs is used by the other statement
-        if l1 in idents(r2) or l2 in idents(r1):
+        # skip write-after-write to same lhs, or a data dependency between the two
+        if l1 == l2 or l1 in idents(r2) or l2 in idents(r1):
             continue
         nl = lines[:]
         nl[i], nl[i + 1] = lines[i + 1], lines[i]
-        out.append("\n".join(nl))
+        emit("\n".join(nl))
     # 3) reassociation of 3-term additive chains  a + b + c  (int + is assoc mod 2^32)
-    for m in re.finditer(r'(?<![\w>])(' + OPD + r') \+ (' + OPD + r') \+ (' + OPD + r')(?![\w])', text):
+    for m in re.finditer(r'(?<![\w>])(' + OPD + r') \+ (' + OPD + r') \+ (' + OPD + r')(?![\w])', body):
         a, b, c = m.groups()
         for perm in (f"{a} + {c} + {b}", f"{b} + {a} + {c}", f"{c} + {b} + {a}"):
-            out.append(text[:m.start()] + perm + text[m.end():])
+            emit(body[:m.start()] + perm + body[m.end():])
     # 4) declaration split: `TYPE V = E;` -> `TYPE V;` + `V = E;` (moves materialisation point)
     DECL = re.compile(r'^(\s*)((?:unsigned )?(?:int|short|char)\**|IconEntry \*) (\w+) = (.+);\s*$')
     for i, ln in enumerate(lines):
         m = DECL.match(ln)
         if not m or any(t in ln for t in ("*=", "new ", "[", "(")):
             continue
-        ind, ty, v, e = m.groups()
-        nl = lines[:i] + [f"{ind}{ty} {v};", f"{ind}{v} = {e};"] + lines[i + 1:]
-        out.append("\n".join(nl))
+        ind, ty, v, ex = m.groups()
+        nl = lines[:i] + [f"{ind}{ty} {v};", f"{ind}{v} = {ex};"] + lines[i + 1:]
+        emit("\n".join(nl))
     return out
 
 
