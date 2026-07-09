@@ -216,8 +216,8 @@ void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, 
             continue;
         }
         // newline
-        X = gFCXEnd;
         gFCRow = gFCRow + pitch;
+        X = gFCXEnd;
         gFCY = gFCY + 1;
     }
 }

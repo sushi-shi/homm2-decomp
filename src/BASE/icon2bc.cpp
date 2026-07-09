@@ -156,8 +156,8 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
                     }
                     gCTCnt = 0;
                     gCTCnt = cn;
-                    gCTCnt2 = cn;
                     gCTDst = dp;
+                    gCTCnt2 = cn;
                     for (unsigned int k = cn; k != 0; k--) {
                         if (dimGate != 0)
                             *dp = palette[*dp];
@@ -206,14 +206,14 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
                     dp = dp + 1;
                 } while (cnt != 0);
             }
-            gCTSrc = gCTSrc + cmd;
             X = X + cmd;
+            gCTSrc = gCTSrc + cmd;
             gCTRun = cmd;
             continue;
         }
         // newline
-        X = gCTX0;
         row = row + gCTPitch;
+        X = gCTX0;
         gCTY = gCTY + 1;
     }
 }

@@ -41,8 +41,8 @@ void FlipMonoIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y,
         if (gFMX0 < clipX || clipW + clipX < gFMX0 + w || gFMY < clipY ||
             clipY + clipH < entries[frame].h + gFMY) {
             clip = 1;
-            gFMClipR = clipX + clipW - 1;
             gFMClipB = clipY + clipH - 1;
+            gFMClipR = clipX + clipW - 1;
         } else {
             clip = 0;
         }
@@ -86,7 +86,7 @@ void FlipMonoIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y,
         }
         // newline
         X = gFMXEnd;
-        gFMRow = gFMRow + pitch;
         gFMY = gFMY + 1;
+        gFMRow = gFMRow + pitch;
     }
 }

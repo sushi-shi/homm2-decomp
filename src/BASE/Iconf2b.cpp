@@ -49,8 +49,8 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int
         if (gFlipX0 < clipX || clipW + clipX < gFlipX0 + w || gFlipY < clipY ||
             clipY + clipH < entries[frame].h + gFlipY) {
             clip = 1;
-            gFlipClipR = clipX + clipW - 1;
             gFlipClipB = clipY + clipH - 1;
+            gFlipClipR = clipX + clipW - 1;
         } else {
             clip = 0;
         }
@@ -220,8 +220,8 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int
             continue;
         }
         // newline
-        X = gFlipXEnd;
         gFlipRow = gFlipRow + pitch;
+        X = gFlipXEnd;
         gFlipY = gFlipY + 1;
     }
 }

@@ -165,8 +165,8 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int fra
                                 cn = (gIcClipR - X) + 1;
                             dst = row + X;
                         }
-                        gIcCnt = cn;
                         gIcDimDst = dst;
+                        gIcCnt = cn;
                         gIcDimPal = palette;
                         gIcDimLen = 0;
                         if (static_cast<int>(cn) > 0) {
@@ -206,14 +206,14 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int fra
                     cn = (gIcClipR - X) + 1;
                 memcpy(row + X, gIcSrc, cn);
             }
-            gIcSrc = gIcSrc + cmd;
             X = X + cmd;
+            gIcSrc = gIcSrc + cmd;
             gIcRun = cmd;
             continue;
         }
         // newline
         X = gIcX0;
-        row = row + gIcPitch;
         gIcY = gIcY + 1;
+        row = row + gIcPitch;
     }
 }
