@@ -10,9 +10,15 @@ by construction, so a higher byte-score can never come from a semantically-wrong
 Unlike the classic pycparser-based decomp-permuter, it never parses the language, so C++
 (class / reinterpret_cast / templates) is fine.
 
-ONLY useful on /O2 TUs - /Od functions have no regalloc wall (use scripts/od_slots.py).
-Gains are incremental: a mutation helps only when it flips a key lea base/index or a
-callee-saved coloring; the core residue (which reg holds a given value) is out of reach.
+Auto-detects the TU's build profile (base=/Od, o2=/O2, base_oi=/Od+/Oi) from
+config/units.toml, so it works on BOTH tiers:
+  - /O2: nudges register allocation / scheduling; gains are usually incremental (the
+    optimizer resists source steering, and the core register-coloring residue - which
+    reg holds a given value - is out of reach) and stay below byte-identical.
+  - /Od: lowering is literal, so the order mutations map DIRECTLY to codegen; the
+    commutative-operand-swap targets the documented /Od operand-load-order residual, and
+    completions here are TRUE byte-identical 100%. It will NOT fix a /Od stack-slot miss
+    (that's scripts/od_slots.py) or a control-flow-shape mismatch.
 
 Usage (inside `nix develop .#build`, run from the repo/worktree root - HOMM2_DIR is pinned
 at shell entry, so cd to the tree FIRST):
@@ -31,10 +37,27 @@ SRC   = sys.argv[1]                # e.g. src/BASE/Icondf2b.cpp
 TU    = sys.argv[2]                # e.g. BASE/Icondf2b
 SYM   = sys.argv[3]                # mangled symbol
 ITERS = int(sys.argv[4]) if len(sys.argv) > 4 else 400
-FLAGS = "/nologo /c /O2 /MT /Gr /G5 /QIfdiv".split()
 OBJ   = f"build/objdiff/base/{TU}.obj"
 TGT   = f"build/delink/{TU}.c.obj"
 os.chdir(ROOT)
+
+
+def _load_flags(tu):
+    """Compile flags for a TU = its config/units.toml profile (base=/Od, o2=/O2, base_oi)."""
+    toml = open("config/units.toml").read()
+    profiles = {m.group(1): re.findall(r'"([^"]+)"', m.group(2))
+                for m in re.finditer(r'^(base|o2|base_oi) = \[([^\]]+)\]', toml, re.M)}
+    unit_flags = {}
+    for blk in toml.split("[[unit]]"):
+        um = re.search(r'unit = "([^"]+)"', blk)
+        fm = re.search(r'flags = "(\w+)"', blk)
+        if um and fm:
+            unit_flags[um.group(1)] = fm.group(1)
+    prof = unit_flags.get(tu, "o2")
+    return profiles.get(prof, "/nologo /c /O2 /MT /Gr /G5 /QIfdiv".split())
+
+
+FLAGS = _load_flags(TU)
 
 
 def score(text):
