@@ -10,12 +10,13 @@ decomp-permuter, it never parses the language, so C++ (class / reinterpret_cast 
 is fine — the transforms are regex-local subsets of decomp-permuter's passes:
   commutative-operand swap · relational-operand swap (with operator flip) · inequality +/-1
   rewrite · additive reassociation · independent-line reorder · declaration split · compound-
-  assignment toggle · index rewrite (a[i]<->*(a+i)<->i[a]) · identity-op (x -> x|0 / x+0) ·
-  block-scope wrap.
-All are value-preserving by construction EXCEPT the inequality +/-1 rewrite (differs at integer
-overflow) - but a byte-match to retail is ground truth (a matched variant reproduces retail's
-actual code), so every kept result is a correct reconstruction. A bad/invalid mutation simply
-fails to compile and is rejected, and any variant that regresses a matched sibling is rejected.
+  assignment toggle.
+Transforms are deliberately limited to ones that leave PLAUSIBLE, CLEAN source when kept —
+no identity-op (x|0), index/SIB (i[a], *(a+i)), or block-scope hacks, which would win a byte
+but leave ugly code in the reconstruction. All are value-preserving EXCEPT the inequality +/-1
+rewrite (differs at integer overflow) — but a byte-match to retail is ground truth (a matched
+variant reproduces retail's actual code), so every kept result is a correct reconstruction. A
+bad/invalid mutation just fails to compile and is rejected, as is any sibling regression.
 
 Auto-detects the TU's build profile (base=/Od, o2=/O2, base_oi=/Od+/Oi) from
 config/units.toml, so it works on BOTH tiers:
@@ -223,27 +224,6 @@ def gen_variants(text):
         if um:
             ind, v, op, y = um.groups()
             nl = lines[:]; nl[i] = f"{ind}{v} = {v} {op} {y};"; emit("\n".join(nl))
-    # 6) index rewrites: a[i] <-> *(a + i) <-> i[a]  (identical in C; nudges SIB base/index choice;
-    #    invalid forms, e.g. before a `.`/`->`, just fail to compile and are rejected)
-    for m in re.finditer(r'(?<![\w\]\)])([A-Za-z_]\w*)\[(' + OPD + r')\]', body):
-        a, i = m.group(1), m.group(2)
-        emit(body[:m.start()] + f"*({a} + {i})" + body[m.end():])
-        emit(body[:m.start()] + f"{i}[{a}]" + body[m.end():])
-    # 7) identity-op on a single-OPD assignment rhs: x = y -> x = y | 0 / y + 0 (no-op; nudges regalloc)
-    _ID = re.compile(r'^(\s*)([A-Za-z_]\w*) = (' + OPD + r');\s*$')
-    for i, ln in enumerate(lines):
-        idm = _ID.match(ln)
-        if idm:
-            ind, v, y = idm.groups()
-            for ins in (f"{y} | 0", f"{y} + 0"):
-                nl = lines[:]; nl[i] = f"{ind}{v} = {ins};"; emit("\n".join(nl))
-    # 8) block-scope wrap: `stmt;` -> `{ stmt; }`  (shifts /O2 variable lifetime; value-preserving)
-    for i, ln in enumerate(lines):
-        s = ln.strip()
-        if (s.endswith(";") and "{" not in ln and "}" not in ln
-                and not s.startswith(("//", "#", "return", "break", "continue", "goto", "case"))):
-            ind = ln[:len(ln) - len(ln.lstrip())]
-            nl = lines[:]; nl[i] = f"{ind}{{ {s} }}"; emit("\n".join(nl))
     return out
 
 
