@@ -36,7 +36,7 @@ void IconToBitmapScale(class icon *srcIcon, class bitmap *dest, int x, int y, in
     } while (rowOff < 0x800);
     IconToBitmap(srcIcon, tmp, 0, 0, frame, 1, 0, 0, 0x20, 0x20, 0);
     short pitch = dest->m_width;
-    char *dstRow = reinterpret_cast<char *>(y + x * pitch + reinterpret_cast<int>(dest->m_pixels));
+    char *dstRow = reinterpret_cast<char *>(x + y * pitch + reinterpret_cast<int>(dest->m_pixels));
     char *srcRow = reinterpret_cast<char *>(srcBase * 0x41 + reinterpret_cast<int>(tmp->m_pixels));
     if (0 < scale) {
         int rows = scale;
