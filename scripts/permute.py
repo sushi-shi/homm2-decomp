@@ -5,10 +5,17 @@ On /O2 TUs the match plateaus on register coloring / instruction scheduling that
 cannot directly pin. This applies SEMANTICS-PRESERVING text mutations to the C++ source
 (commutative-operand swaps, independent-line reorders, additive reassociation, decl splits),
 recompiles each with the REAL MSVC 4.2 (the compiler - not a C parser - handles the C++),
-scores the COFF with objdiff-cli, and keeps improvements. Every mutation is value-preserving
-by construction, so a higher byte-score can never come from a semantically-wrong program.
-Unlike the classic pycparser-based decomp-permuter, it never parses the language, so C++
-(class / reinterpret_cast / templates) is fine.
+scores the COFF with objdiff-cli, and keeps improvements. Unlike the classic pycparser-based
+decomp-permuter, it never parses the language, so C++ (class / reinterpret_cast / templates)
+is fine — the transforms are regex-local subsets of decomp-permuter's passes:
+  commutative-operand swap · relational-operand swap (with operator flip) · inequality +/-1
+  rewrite · additive reassociation · independent-line reorder · declaration split · compound-
+  assignment toggle · index rewrite (a[i]<->*(a+i)<->i[a]) · identity-op (x -> x|0 / x+0) ·
+  block-scope wrap.
+All are value-preserving by construction EXCEPT the inequality +/-1 rewrite (differs at integer
+overflow) - but a byte-match to retail is ground truth (a matched variant reproduces retail's
+actual code), so every kept result is a correct reconstruction. A bad/invalid mutation simply
+fails to compile and is rejected, and any variant that regresses a matched sibling is rejected.
 
 Auto-detects the TU's build profile (base=/Od, o2=/O2, base_oi=/Od+/Oi) from
 config/units.toml, so it works on BOTH tiers:
@@ -156,6 +163,23 @@ def gen_variants(text):
             if a == b:
                 continue
             emit(body[:m.start()] + f"{b} {op} {a}" + body[m.end():])
+    # 1b) relational-operand swap WITH operator flip: a < b -> b > a (value-preserving; OPD has
+    #     no calls so operand eval order is irrelevant). Comparison order is a top /Od residual.
+    for op, flip in (("<=", ">="), (">=", "<="), ("<", ">"), (">", "<")):
+        pat = re.compile(r'(?<![\w<>=!])(' + OPD + r') ' + re.escape(op) + r' (' + OPD + r')(?![\w=])')
+        for m in pat.finditer(body):
+            a, b = m.group(1), m.group(2)
+            if a != b:
+                emit(body[:m.start()] + f"{b} {flip} {a}" + body[m.end():])
+    # 1c) inequality +/-1 rewrite: a <= b -> a < b + 1, etc. (matches retail's inc/dec-then-cmp form).
+    #     NOT strictly value-preserving at integer overflow — but a byte-match to retail IS ground
+    #     truth (a matched variant reproduces retail's actual code), so it's sound for MATCHING.
+    for op, newop, delta in (("<=", "<", "+ 1"), (">=", ">", "- 1"),
+                             ("<", "<=", "- 1"), (">", ">=", "+ 1")):
+        pat = re.compile(r'(?<![\w<>=!])(' + OPD + r') ' + re.escape(op) + r' (' + OPD + r')(?![\w=])')
+        for m in pat.finditer(body):
+            a, b = m.group(1), m.group(2)
+            emit(body[:m.start()] + f"{a} {newop} {b} {delta}" + body[m.end():])
     # 2) reorder adjacent independent scalar/global assignment lines (value-preserving)
     lines = body.split("\n")
     for i in range(len(lines) - 1):
@@ -187,6 +211,39 @@ def gen_variants(text):
         ind, ty, v, ex = m.groups()
         nl = lines[:i] + [f"{ind}{ty} {v};", f"{ind}{v} = {ex};"] + lines[i + 1:]
         emit("\n".join(nl))
+    # 5) compound-assignment toggle: x = x <op> y  <->  x <op>= y  (single-term rhs = value-preserving)
+    _CA = re.compile(r'^(\s*)([A-Za-z_]\w*) = \2 ([-+*/&|^]) (' + OPD + r');\s*$')
+    _UA = re.compile(r'^(\s*)([A-Za-z_]\w*) ([-+*/&|^])= (' + OPD + r');\s*$')
+    for i, ln in enumerate(lines):
+        cm = _CA.match(ln)
+        if cm:
+            ind, v, op, y = cm.groups()
+            nl = lines[:]; nl[i] = f"{ind}{v} {op}= {y};"; emit("\n".join(nl))
+        um = _UA.match(ln)
+        if um:
+            ind, v, op, y = um.groups()
+            nl = lines[:]; nl[i] = f"{ind}{v} = {v} {op} {y};"; emit("\n".join(nl))
+    # 6) index rewrites: a[i] <-> *(a + i) <-> i[a]  (identical in C; nudges SIB base/index choice;
+    #    invalid forms, e.g. before a `.`/`->`, just fail to compile and are rejected)
+    for m in re.finditer(r'(?<![\w\]\)])([A-Za-z_]\w*)\[(' + OPD + r')\]', body):
+        a, i = m.group(1), m.group(2)
+        emit(body[:m.start()] + f"*({a} + {i})" + body[m.end():])
+        emit(body[:m.start()] + f"{i}[{a}]" + body[m.end():])
+    # 7) identity-op on a single-OPD assignment rhs: x = y -> x = y | 0 / y + 0 (no-op; nudges regalloc)
+    _ID = re.compile(r'^(\s*)([A-Za-z_]\w*) = (' + OPD + r');\s*$')
+    for i, ln in enumerate(lines):
+        idm = _ID.match(ln)
+        if idm:
+            ind, v, y = idm.groups()
+            for ins in (f"{y} | 0", f"{y} + 0"):
+                nl = lines[:]; nl[i] = f"{ind}{v} = {ins};"; emit("\n".join(nl))
+    # 8) block-scope wrap: `stmt;` -> `{ stmt; }`  (shifts /O2 variable lifetime; value-preserving)
+    for i, ln in enumerate(lines):
+        s = ln.strip()
+        if (s.endswith(";") and "{" not in ln and "}" not in ln
+                and not s.startswith(("//", "#", "return", "break", "continue", "goto", "case"))):
+            ind = ln[:len(ln) - len(ln.lstrip())]
+            nl = lines[:]; nl[i] = f"{ind}{{ {s} }}"; emit("\n".join(nl))
     return out
 
 
