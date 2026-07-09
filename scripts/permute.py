@@ -150,6 +150,27 @@ def idents(s):
     return set(re.findall(r'[A-Za-z_]\w*', s))
 
 
+_TIGHT = set("+-*/%&|^")
+
+
+def _clean_swap(text, s, e):
+    """Reject swapping/rewriting an operand pair [s,e) if it touches an arithmetic/bitwise
+    operator on EITHER outer side (skipping spaces). The regex only sees single OPD tokens, so a
+    neighbouring `* / % + - & | ^` means an operand is bound to a tighter/other grouping the regex
+    can't see; swapping across it changes the value (the /Od sweep caught real corruptions like
+    `cells + width * y + x` -> `cells + y * x + width`). Conservative: same-operator additive
+    chains that this rejects are covered by the reassociation pass instead."""
+    i = s - 1
+    while i >= 0 and text[i] in " \t":
+        i -= 1
+    if i >= 0 and text[i] in _TIGHT:
+        return False
+    j = e
+    while j < len(text) and text[j] in " \t":
+        j += 1
+    return not (j < len(text) and text[j] in _TIGHT)
+
+
 def gen_variants(text):
     s, e = _span(text)                       # mutate ONLY the target function's body
     pre, body, suf = text[:s], text[s:e], text[e:]
@@ -161,7 +182,7 @@ def gen_variants(text):
         pat = re.compile(r'(?<![\w>&|^=!<+*-])(' + OPD + r') ' + re.escape(op) + r' (' + OPD + r')(?![\w])')
         for m in pat.finditer(body):
             a, b = m.group(1), m.group(2)
-            if a == b:
+            if a == b or not _clean_swap(body, m.start(), m.end()):
                 continue
             emit(body[:m.start()] + f"{b} {op} {a}" + body[m.end():])
     # 1b) relational-operand swap WITH operator flip: a < b -> b > a (value-preserving; OPD has
@@ -170,7 +191,7 @@ def gen_variants(text):
         pat = re.compile(r'(?<![\w<>=!])(' + OPD + r') ' + re.escape(op) + r' (' + OPD + r')(?![\w=])')
         for m in pat.finditer(body):
             a, b = m.group(1), m.group(2)
-            if a != b:
+            if a != b and _clean_swap(body, m.start(), m.end()):
                 emit(body[:m.start()] + f"{b} {flip} {a}" + body[m.end():])
     # 1c) inequality +/-1 rewrite: a <= b -> a < b + 1, etc. (matches retail's inc/dec-then-cmp form).
     #     NOT strictly value-preserving at integer overflow — but a byte-match to retail IS ground
@@ -180,7 +201,8 @@ def gen_variants(text):
         pat = re.compile(r'(?<![\w<>=!])(' + OPD + r') ' + re.escape(op) + r' (' + OPD + r')(?![\w=])')
         for m in pat.finditer(body):
             a, b = m.group(1), m.group(2)
-            emit(body[:m.start()] + f"{a} {newop} {b} {delta}" + body[m.end():])
+            if _clean_swap(body, m.start(), m.end()):
+                emit(body[:m.start()] + f"{a} {newop} {b} {delta}" + body[m.end():])
     # 2) reorder adjacent independent scalar/global assignment lines (value-preserving)
     lines = body.split("\n")
     for i in range(len(lines) - 1):
@@ -200,6 +222,8 @@ def gen_variants(text):
         emit("\n".join(nl))
     # 3) reassociation of 3-term additive chains  a + b + c  (int + is assoc mod 2^32)
     for m in re.finditer(r'(?<![\w>])(' + OPD + r') \+ (' + OPD + r') \+ (' + OPD + r')(?![\w])', body):
+        if not _clean_swap(body, m.start(), m.end()):
+            continue
         a, b, c = m.groups()
         for perm in (f"{a} + {c} + {b}", f"{b} + {a} + {c}", f"{c} + {b} + {a}"):
             emit(body[:m.start()] + perm + body[m.end():])
