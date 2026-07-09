@@ -158,6 +158,8 @@ the EXE + our known symbols. Needs the dev shell's Ghidra env (in the flake).
 - `docs/patterns/INDEX.md` — codegen idiom catalog (grep by symptom/tag when a diff row sticks).
 - `docs/compiler-detection.md`, `docs/linker-flags.md` — toolchain facts.
 - `scripts/od_slots.py` (predict/solve slots) · `scripts/od_oracle.py` (verify vs real cl).
+- `scripts/permute.py` — /O2 register-alloc wall: semantics-preserving source-permutation
+  hill-climber (swap/reorder/reassoc/decl-split → real MSVC → objdiff score; keeps gains).
 - `homm2 sema <cmd>` — semantic navigation (xref/disasm/strings/match/rva/clangd; see
   Build loop). Modules in `scripts/homm2/analysis/`; Ghidra pipeline in `scripts/homm2/ghidra/`.
 - `editor/nvim` — `:Homm2` in-editor diff/build/status (auto-loaded by the dev-shell).
