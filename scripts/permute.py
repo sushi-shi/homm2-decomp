@@ -60,28 +60,47 @@ def _load_flags(tu):
 FLAGS = _load_flags(TU)
 
 
-def score(text):
+def _symmap(d):
+    """{symbol_name: match_percent} for every named function symbol on the right (our build)."""
+    res = {}
+    for sym in d.get("right", {}).get("symbols", []):
+        n, mp = sym.get("name"), sym.get("match_percent")
+        if isinstance(n, str) and mp is not None:
+            res[n] = mp
+    return res
+
+
+def score_full(text):
+    """(target match_percent, {sym: match_percent}) or (-1.0, {}) on failure.
+    objdiff-cli IGNORES its <symbol> arg for JSON output, so we key the target by SYM name
+    ourselves — taking the global max would saturate at 100 on any already-matched sibling."""
     open(SRC, "w").write(text)
     r = subprocess.run(["python3", "-m", "homm2.build.cc_wrap", "--out", OBJ, "--src", SRC, "--", *FLAGS],
                        capture_output=True, text=True)
     if r.returncode != 0:
-        return -1.0
+        return -1.0, {}
     r = subprocess.run(["objdiff-cli", "diff", "-1", TGT, "-2", OBJ, SYM, "-o", "-", "--format", "json"],
                        capture_output=True, text=True)
     try:
         d = json.loads(r.stdout)
     except Exception:
-        return -1.0
-    vals = []
-    def walk(o):
-        if isinstance(o, dict):
-            for k, v in o.items():
-                if k == "match_percent": vals.append(v)
-                walk(v)
-        elif isinstance(o, list):
-            for x in o: walk(x)
-    walk(d)
-    return max(vals) if vals else -1.0
+        return -1.0, {}
+    m = _symmap(d)
+    return (m[SYM], m) if SYM in m else (-1.0, m)
+
+
+_BASE_SIBS = {}   # sibling baseline (from the original source); no sibling may drop below these
+
+
+def score(text):
+    """Target symbol match_percent, or -1 if the compile failed OR any sibling regressed."""
+    tgt, sibs = score_full(text)
+    if tgt < 0:
+        return tgt
+    for name, base_mp in _BASE_SIBS.items():
+        if name != SYM and sibs.get(name) is not None and sibs[name] < base_mp - 1e-4:
+            return -1.0
+    return tgt
 
 
 OPD = r'(?:0x[0-9a-fA-F]+|\d+|[A-Za-z_]\w*(?:\[[A-Za-z0-9_ +*-]+\]|->\w+|\.\w+)*)'
@@ -142,10 +161,13 @@ def gen_variants(text):
 
 
 def main():
+    global _BASE_SIBS
     best = open(SRC).read()
     orig = best
-    bscore = score(best)
-    print(f"start {bscore:.3f}", flush=True)
+    t0, sibs0 = score_full(best)          # baseline: target % + all sibling %s (before any mutation)
+    _BASE_SIBS = dict(sibs0)
+    bscore = t0
+    print(f"start {bscore:.3f} (target {SYM}); {len(_BASE_SIBS)} symbols pinned", flush=True)
     improved = True
     seen = set()
     rounds = 0
@@ -194,7 +216,12 @@ def main():
                         again = True
                         break
     open(SRC, "w").write(best)
-    score(best)
+    _, sibs_final = score_full(best)
+    dump = os.environ.get("PERMUTE_DUMP")   # optional before/after sibling maps for external re-check
+    if dump:
+        json.dump({"sym": SYM, "changed": best != orig, "target_before": t0,
+                   "target_after": bscore, "before": sibs0, "after": sibs_final},
+                  open(dump, "w"), indent=0)
     print(f"FINAL {bscore:.3f} ({'improved' if best != orig else 'no change'})", flush=True)
 
 
