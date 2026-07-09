@@ -33,16 +33,19 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, 
                          int color, int clip, int clipX, int clipY, int clipW, int clipH)
 {
     unsigned char *data = reinterpret_cast<unsigned char *>(srcIcon->m_data);
-    IconEntry *entries = reinterpret_cast<IconEntry *>(data);
-    int w = entries[frame].w;
-    gFDEntry = &entries[frame];
-    gFDSrc = data + entries[frame].srcOffset;
-    gFDX0 = ((x - entries[frame].x) - w) + 1;
-    gFDY = y + entries[frame].y;
+    int off = frame * 13;
+    gFDSrc = data + *reinterpret_cast<int *>(data + off + 9);
+    IconEntry *e = reinterpret_cast<IconEntry *>(data + off);
+    gFDEntry = e;
+    int w = e->w;
+    int ex = e->x;
+    int ey = e->y;
+    gFDX0 = ((x - ex) - w) + 1;
     gFDXEnd = w + gFDX0 - 1;
+    gFDY = y + ey;
     if (clip != 0) {
         if (gFDX0 < clipX || clipW + clipX < w + gFDX0 || gFDY < clipY ||
-            clipY + clipH < entries[frame].h + gFDY) {
+            clipY + clipH < e->h + gFDY) {
             clip = 1;
             gFDClipR = clipX + clipW - 1;
             gFDClipB = clipY + clipH - 1;
@@ -112,7 +115,7 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, 
         }
         // newline
         X = gFDXEnd;
-        gFDRow = gFDRow + pitch;
         gFDY = gFDY + 1;
+        gFDRow = gFDRow + pitch;
     }
 }

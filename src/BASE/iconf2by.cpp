@@ -173,7 +173,7 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
         }
         // newline
         gFYX = gFYXEnd - shear[gFYY];
-        gFYRow = gFYRow + pitch;
         gFYY = gFYY + 1;
+        gFYRow = gFYRow + pitch;
     }
 }

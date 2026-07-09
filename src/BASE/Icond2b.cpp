@@ -118,7 +118,7 @@ void DimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int 
         }
         // newline
         X = gDimX0;
-        row = row + pitch;
         gDimY = gDimY + 1;
+        row = row + pitch;
     }
 }

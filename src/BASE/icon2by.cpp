@@ -43,8 +43,8 @@ void IconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int y, 
     gYMPitch = dest->m_width;
     gYMY = gYMEntry->y + y;
     gYMX = shear[gYMY] + gYMX0;
-    gYMClipB = clipY + clipH - 1;
     gYMClipR = clipX + clipW - 1;
+    gYMClipB = clipY + clipH - 1;
     gYMRow = gYMPitch * gYMY + reinterpret_cast<int>(dest->m_pixels);
     for (;;) {
         int cmd = *gYMSrc++;
@@ -70,8 +70,8 @@ void IconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int y, 
                 goto do_fill;
             }
             flags = *gYMSrc;
-            gYMSrc = gYMSrc + 1;
             gYMDimLen = flags & 3;
+            gYMSrc = gYMSrc + 1;
             if ((flags & 3) == 0) {
                 gYMDimLen = *gYMSrc;
                 gYMSrc = gYMSrc + 1;
@@ -104,7 +104,7 @@ void IconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int y, 
                     if (0 < static_cast<int>(gYMDimLen)) {
                         do {
                             *gYMDimDst = gYMDimPal[*gYMDimDst];
-                            gYMDimDst = gYMDimDst + 1;
+                            gYMDimDst = 1 + gYMDimDst;
                             gYMDimIdx = gYMDimIdx + 1;
                         } while (gYMDimIdx < static_cast<int>(gYMDimLen));
                     }
@@ -168,7 +168,7 @@ void IconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int y, 
         }
         // newline
         gYMX = shear[gYMY] + gYMX0;
-        gYMRow = gYMRow + gYMPitch;
         gYMY = gYMY + 1;
+        gYMRow = gYMRow + gYMPitch;
     }
 }
