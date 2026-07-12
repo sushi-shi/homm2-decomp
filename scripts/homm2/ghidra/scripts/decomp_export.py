@@ -5,8 +5,8 @@
 # and callees (names come from apply_names.py's CodeView seeding). READ-ONLY unless
 # HOMM2_DECOMP_FORCE=1, which creates a function at an RVA Ghidra left unwrapped first.
 #
-# Reads  /tmp/homm2_decomp_targets.txt  (one 0xRVA per line)
-# Writes /tmp/homm2_decomp_out.txt
+# Reads/writes paths from HOMM2_DECOMP_TARGETS/HOMM2_DECOMP_OUT. The defaults
+# preserve direct Ghidra-script use, while the wrapper supplies per-process paths.
 # Runs as a GhidraScript under PyGhidra (currentProgram + monitor bound by the driver).
 #@category Homm2
 import os
@@ -16,6 +16,8 @@ from ghidra.util.task import ConsoleTaskMonitor
 
 IMAGE_BASE = 0x400000
 FORCE = os.environ.get("HOMM2_DECOMP_FORCE") == "1"
+TARGETS = os.environ.get("HOMM2_DECOMP_TARGETS", "/tmp/homm2_decomp_targets.txt")
+OUT = os.environ.get("HOMM2_DECOMP_OUT", "/tmp/homm2_decomp_out.txt")
 prog = currentProgram
 fm = prog.getFunctionManager()
 af = prog.getAddressFactory().getDefaultAddressSpace()
@@ -23,9 +25,9 @@ mon = ConsoleTaskMonitor()
 ifc = DecompInterface()
 ifc.openProgram(prog)
 
-targets = [int(ln.strip(), 16) for ln in open("/tmp/homm2_decomp_targets.txt")
+targets = [int(ln.strip(), 16) for ln in open(TARGETS)
            if ln.strip().startswith("0x")]
-out = open("/tmp/homm2_decomp_out.txt", "w")
+out = open(OUT, "w")
 
 
 def w(s):
@@ -74,4 +76,4 @@ for rva in targets:
         w("/* decompile exception: %s */" % e)
 
 out.close()
-print("[decomp_export] wrote /tmp/homm2_decomp_out.txt for %d target(s)" % len(targets))
+print("[decomp_export] wrote %s for %d target(s)" % (OUT, len(targets)))
