@@ -9,6 +9,7 @@ class ExpCampaign;
 extern signed char xIsExpansionMap;
 extern unsigned char xIsPlayingExpansionCampaign;
 extern class ExpCampaign xCampaign;
+extern int xTheSpell;
 extern char *xNecromancerShrine;
 extern char *xNecromancerShrineDesc;
 extern int xPasswordStringsIndex[];

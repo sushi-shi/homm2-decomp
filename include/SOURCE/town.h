@@ -11,7 +11,7 @@ class town {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
-    char   field_0x0;  // +0x00
+    char   m_id;  // +0x00
     char   field_0x1;  // +0x01
     char _pad_0x2[0x1];
     char   field_0x3;  // +0x03
@@ -19,7 +19,7 @@ public:
     char   field_0x5;  // +0x05
     char   field_0x6;  // +0x06
     char _pad_0x7[0x10];
-    char   field_0x17;  // +0x17
+    char   m_occupyingHeroId;  // +0x17
     int    field_0x18;  // +0x18  !union: conflicting widths
     char   field_0x1c;  // +0x1c
     char   field_0x1d;  // +0x1d
