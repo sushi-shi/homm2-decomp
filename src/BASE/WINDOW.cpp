@@ -59,15 +59,117 @@ heroWindow::heroWindow(int x, int y, int w, int h, int flags)
     m_savedBackground = 0;
 }
 
-// @early-stop 85.6% — RESTRUCTURED to the retail's design: nine distinct function-scope
-// widget-type pointer locals (ptw/pbd/pbtn/pdim/pic/pte/pdl/plb), one per widget class.
-// SCOPE (measured): retail frame is sub esp,0x68 = 26 slots. The 9 widget pointers sit at
-// -0x8/-0xc(textEntry,5x)/-0x14/-0x18/-0x1c/-0x20/-0x28/-0x2c/-0x30, INTERLEAVED with ~17
-// /Ob1-inlined locals (widget Read()/ctor/MakeId/strcpy temps). A full match needs those
-// inlined locals reconstructed AND all 26 slots od_slots-named as one global bucket order —
-// bigger than a "9-local" solve. Structure is correct; the 26-slot frame-solve is the wall.
+// @early-stop
+// 99.92%: all 320 instructions byte-exact (llvm-objdump -dr, base vs target). Sole residual is
+// the switch jump-table jmp: mine `ff 24 85 00000000` reloc=$L2210 (MSVC-emitted local table
+// symbol, addend 0) vs delink `ff 24 85 d7040000` reloc=??0heroWindow+0x4d7 (same func+0x4d7
+// table, identical 5 handler entries). A required jump table (retail dispatches 0x202..0x206
+// via one); objdiff can't mask the differing table-reloc symbol — a delinker reloc-naming artifact.
 VA(0x004cecd0, 0x521)
-// heroWindow::heroWindow(int, int, char *);
+heroWindow::heroWindow(int param_1, int param_2, char *param_3)
+{
+    unsigned long jb;
+    int idx;
+    textEntryWidget *pte;
+    textWidget *ptw;
+    int type;
+    button *pbtn;
+    dropListWidget *pdl;
+    border *pbd;
+    widget *pwdg;
+    iconWidget *picn;
+    listBoxWidget *plist;
+    dimmerWidget *pdim;
+    strcpy(name, param_3);
+    jb = gpResourceManager->MakeId(param_3, 1);
+    gpResourceManager->PointToFile(jb);
+    m_savedBackground = 0;
+    m_prevWindow = 0;
+    m_nextWindow = m_prevWindow;
+    m_winState = 0;
+    m_zOrder = -1;
+    m_posX = param_1;
+    m_posY = param_2;
+    m_winWidth = gpResourceManager->ReadWord();
+    m_winHeight = gpResourceManager->ReadWord();
+    m_winFlags = gpResourceManager->ReadWord();
+    m_winFlags |= 0x4000;
+    m_widgetListHead = 0;
+    m_widgetListTail = m_widgetListHead;
+    idx = 0;
+    while (idx == 0) {
+        PollSound();
+        type = gpResourceManager->ReadWord();
+        pwdg = 0;
+        switch (type) {
+        case 0:
+            idx++;
+            break;
+        case 1:
+            pbd = new border();
+            pbd->Read();
+            pwdg = pbd;
+            break;
+        case 2:
+            pbtn = new button();
+            pbtn->Read();
+            pwdg = pbtn;
+            break;
+        case 0x10:
+            picn = new iconWidget();
+            picn->Read();
+            pwdg = picn;
+            break;
+        case 0x40:
+            pdim = new dimmerWidget();
+            pdim->Read();
+            pwdg = pdim;
+            break;
+        case 8:
+            ptw = new textWidget();
+            ptw->Read();
+            pwdg = ptw;
+            break;
+        case 0x100:
+            pte = new textEntryWidget();
+            pte->Read(1);
+            pwdg = pte;
+            break;
+        case 0x201:
+            pte = new textEntryWidget();
+            pte->Read(2);
+            pwdg = pte;
+            break;
+        case 0x202:
+            pte = new textEntryWidget();
+            pte->Read(3);
+            pwdg = pte;
+            break;
+        case 0x203:
+            pte = new textEntryWidget();
+            pte->Read(4);
+            pwdg = pte;
+            break;
+        case 0x204:
+            pte = new textEntryWidget();
+            pte->Read(5);
+            pwdg = pte;
+            break;
+        case 0x205:
+            pdl = new dropListWidget();
+            pdl->Read();
+            pwdg = pdl;
+            break;
+        case 0x206:
+            plist = new listBoxWidget();
+            plist->Read();
+            pwdg = plist;
+            break;
+        }
+        if (idx == 0 && pwdg != 0)
+            AddWidget(pwdg, -1);
+    }
+}
 
 VA(0x004cf200, 0x73)
 int heroWindow::Open(int x, int flags)
