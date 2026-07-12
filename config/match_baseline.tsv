@@ -384,14 +384,14 @@ BASE/icon2by	?IconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	64.0178
 BASE/iconf2bc	?FlipIconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAE@Z	60.5768	81967a8a5cfd
 BASE/iconf2by	?FlipIconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	67.5362	774d85a1f3f0
 BASE/listbox	??0listBoxWidget@@QAE@XZ	97.3684	2d787e1f30f9
-BASE/listbox	??1listBoxWidget@@UAE@XZ	98.5909	b3cd962bd994
+BASE/listbox	??1listBoxWidget@@UAE@XZ	97.5682	eb8cbc77afb4
 BASE/listbox	??_ElistBoxWidget@@UAEPAXI@Z	0.0000	
-BASE/listbox	?DeleteItem@listBoxWidget@@QAEXH@Z	0.0000	2718d20db088
-BASE/listbox	?Draw@listBoxWidget@@UAEXXZ	100.0000	230100bbcc4e
-BASE/listbox	?DrawLBStuff@listBoxWidget@@QAEXH@Z	0.0000	b8b03cc4fa84
-BASE/listbox	?Main@listBoxWidget@@UAEHAAUtag_message@@@Z	0.0000	3b70e10ad3a2
-BASE/listbox	?ProcessMouseMessage@listBoxWidget@@QAEHAAUtag_message@@@Z	0.0000	9acb29c7bef0
-BASE/listbox	?Read@listBoxWidget@@QAEXXZ	0.0000	42863342f6d6
+BASE/listbox	?DeleteItem@listBoxWidget@@QAEXH@Z	100.0000	9568e028c0c1
+BASE/listbox	?Draw@listBoxWidget@@UAEXXZ	100.0000	dfba5050ab21
+BASE/listbox	?DrawLBStuff@listBoxWidget@@QAEXH@Z	97.5219	91072ddb88d7
+BASE/listbox	?Main@listBoxWidget@@UAEHAAUtag_message@@@Z	95.5679	e77c1008e932
+BASE/listbox	?ProcessMouseMessage@listBoxWidget@@QAEHAAUtag_message@@@Z	92.2727	a297f5fc9ad8
+BASE/listbox	?Read@listBoxWidget@@QAEXXZ	85.5034	824c804dfb00
 BASE/miscwin	?AutoInitSVGA@@YIFXZ	100.0000	ba21e7c98ba3
 BASE/miscwin	@BlitBitmapToScreenVesa@28	0.6579	10b3cea2382c
 BASE/soundmgr	??0soundManager@@QAE@XZ	97.6471	2cb5eafa76dd
