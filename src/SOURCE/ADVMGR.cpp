@@ -131,24 +131,24 @@ void advManager::RedrawAdvScreen(int, int) {}
 VA(0x00463ef5, 0x1f)
 void advManager::DeactivateCurrTown(void)
 {
-    gpCurPlayer->currentTown = -1;
+    gpCurPlayer->m_currentTown = -1;
 }
 
 VA(0x00463f14, 0x27)
 void advManager::DeactivateCurrHero(void)
 {
     DemobilizeCurrHero();
-    gpCurPlayer->currentHero = -1;
+    gpCurPlayer->m_currentHero = -1;
 }
 
 VA(0x00463f3b, 0x5a)
 void advManager::MobilizeCurrHero(int update)
 {
-    if (gpCurPlayer->currentHero == ADVMGR_INVALID_HERO)
+    if (gpCurPlayer->m_currentHero == ADVMGR_INVALID_HERO)
         return;
     if (heroContextLocked)
         return;
-    SetHeroContext(gpCurPlayer->currentHero, update);
+    SetHeroContext(gpCurPlayer->m_currentHero, update);
 }
 
 VA(0x00463f95, 0x16c)

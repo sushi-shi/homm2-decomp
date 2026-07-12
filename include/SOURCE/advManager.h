@@ -96,11 +96,11 @@ public:
     int    field_0x266;  // +0x266
     int    field_0x26a;  // +0x26a
     int    field_0x26e;  // +0x26e
-    int    field_0x272;  // +0x272
+    int    m_cursorActive;  // +0x272
     int    field_0x276;  // +0x276
-    int    field_0x27a;  // +0x27a
-    int    field_0x27e;  // +0x27e  !union: conflicting widths
-    int    field_0x282;  // +0x282
+    int    m_cursorType;  // +0x27a
+    int    m_cursorDirection;  // +0x27e  !union: conflicting widths
+    int    m_cursorFrame;  // +0x282
     int    field_0x286;  // +0x286
     int    field_0x28a;  // +0x28a
     int    field_0x28e;  // +0x28e

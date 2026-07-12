@@ -1,6 +1,6 @@
 # Codex Matching Guide
 
-Read `CLAUDE.md` and `docs/matcher-instructions.md` before changing code. They are
+Read `CLAUDE.md` and `.claude/agents/matcher.md` before changing code. They are
 authoritative. This file is the short, restart-ready Codex workflow.
 
 ## Objective
@@ -13,10 +13,14 @@ authoritative. This file is the short, restart-ready Codex workflow.
 
 ## Matching Workflow
 
-1. Build a queue from `build/objdiff/report.json` using size-weighted match deficit. Prioritize
-   large functions with the lowest weighted match percentage, where each improvement moves the
-   overall score most. Parse `size` numerically, never lexically.
-2. Inspect the target before writing source:
+1. Build a queue from `build/objdiff/report.json`. Select the largest 20% of SOURCE functions by
+   retail byte size, then prioritize the lowest size-weighted match percentage within that set;
+   this is where matching work usually recovers the most bytes. Parse `size` numerically, never
+   lexically, and recompute the cutoff whenever the report changes materially.
+2. For every selected function, add all functions preceding it in the same translation unit to the
+   queue and match them in source order. These predecessors can control cumulative compiler and
+   register-allocation state even when they are smaller or already have a high fuzzy score.
+3. Inspect the target before writing source:
    - `homm2 sema rva 0x<RVA>`
    - `homm2 sema xref --callees 0x<RVA>`
    - `homm2 sema strings 0x<RVA>`
@@ -24,17 +28,17 @@ authoritative. This file is the short, restart-ready Codex workflow.
    - `python3 -m homm2.analysis.decomp 0x<RVA>` when semantic structure is unclear. The documented
      `homm2 sema decomp` command is currently not registered, but the module works with the cached
      Ghidra project and must be run without reanalysis.
-3. Reconstruct real types, fields, enums, and inline accessors before using pointer arithmetic.
-4. Compile rapidly with `ninja` while iterating. Run `homm2 status` before trusting
+4. Reconstruct real types, fields, enums, and inline accessors before using pointer arithmetic.
+5. Compile rapidly with `ninja` while iterating. Run `homm2 status` before trusting
    `homm2 sema match`, because a bare `ninja` leaves `report.json` stale.
-5. Use `homm2 sema disasm 0x<RVA> --diff --lite` to advance from the first structural divergence.
-6. Run a relocation-masked raw-byte comparison for near-exact functions. objdiff masks relocation
+6. Use `homm2 sema disasm 0x<RVA> --diff --lite` to advance from the first structural divergence.
+7. Run a relocation-masked raw-byte comparison for near-exact functions. objdiff masks relocation
    bytes and can report less than 100% for delinked local-label identity even when every code byte is
    identical.
-7. Audit relocation targets with `homm2 relocs 0x<RVA>`. If the helper misidentifies a delinked
+8. Audit relocation targets with `homm2 relocs 0x<RVA>`. If the helper misidentifies a delinked
    boundary, compare `llvm-objdump -r` entries manually over the function ranges. Jump-table local
    labels may be delinked as the containing function; external globals and callees must agree.
-8. Run the full `homm2 build` and `git diff --check` before committing. A one-unit full build is
+9. Run the full `homm2 build` and `git diff --check` before committing. A one-unit full build is
    about 4-5 seconds; do not optimize the build unless it exceeds 10 seconds in real shell time.
 
 ## Compiler Constraints
@@ -48,6 +52,9 @@ authoritative. This file is the short, restart-ready Codex workflow.
   coordinate temporaries; scalar or struct-member spellings changed later inline code generation.
 - TU-cumulative compiler state can move fuzzy scores after an unrelated type/source addition. The
   source-hash max model intentionally preserves prior maxima. Always use raw bytes for final proof.
+- When a later change lowers the live fuzzy score of an already matched function, keep its retained
+  source-hash maximum and continue forward. Do not spend time restoring the live percentage unless
+  raw-byte or relocation evidence proves that the function itself actually regressed.
 - Mark `@early-stop` only for 100% matches or a byte-proven residual such as delinked local-label or
   constant-pool naming. Document the exact byte span and reason.
 
