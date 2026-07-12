@@ -75,7 +75,9 @@ struct configStruct {                    // gConfig, 0x1a0 bytes
 #pragma pack(pop)
 struct SCreatureInfo { unsigned short value; char pad[24]; };               // gCreatureInfo[]
 struct tag_tilePoint { signed char x; signed char _1; signed char y; signed char _3; };  // normalDirTable[]
-struct tag_monsterInfo { short m_0; char m_pad[24]; };                      // gMonsterDatabase[] (sizeof 26)
+#pragma pack(push, 1)
+struct tag_monsterInfo { short cost; int fightValue; char m_pad[20]; };     // gMonsterDatabase[] (sizeof 26)
+#pragma pack(pop)
 struct SSpellInfo { char m_pad0[14]; unsigned char m_e; char m_pad1[7]; };  // gsSpellInfo[] (sizeof 22)
 struct SNetPlayerInfo { char m_pad[0xcc]; };                                // gsNetPlayerInfo[]
 struct SAMPLE2 { class sample *pSample; struct _SAMPLE *pMem; };            // NULL_SAMPLE2

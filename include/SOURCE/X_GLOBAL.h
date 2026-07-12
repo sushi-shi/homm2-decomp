@@ -3,8 +3,12 @@
 // Globals owned by this data-only TU (from CodeView).
 #include <va.h>
 
+class ExpCampaign;
+
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
 extern signed char xIsExpansionMap;
+extern unsigned char xIsPlayingExpansionCampaign;
+extern class ExpCampaign xCampaign;
 extern char *xNecromancerShrine;
 extern char *xNecromancerShrineDesc;
 extern int xPasswordStringsIndex[];

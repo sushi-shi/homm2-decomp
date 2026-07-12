@@ -4,14 +4,22 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <stdio.h>
 #include <string.h>
+#include <BASE/heroWindowManager.h>
+#include <BASE/mouseManager.h>
 #include <BASE/soundManager.h>
 #include <EDITOR/fullMap.h>
 #include <SOURCE/advManager.h>
+#include <SOURCE/armyGroup.h>
 #include <SOURCE/CURSOR.h>
 #include <SOURCE/EVENTS.h>
+#include <SOURCE/ExpCampaign.h>
 #include <SOURCE/game.h>
+#include <SOURCE/hero.h>
 #include <SOURCE/KB.h>
+#include <SOURCE/philAI.h>
+#include <SOURCE/X_GLOBAL.h>
 VA(0x004a8530, 0x5adb)
 void advManager::DoEvent(class mapCell *, int, int) {}
 
@@ -92,7 +100,7 @@ void advManager::EraseObj(class mapCell *cell, int x, int y)
 
         if (cellX_b[0] >= 0) {
         if (cellY_e[0] >= 0) {
-        cells_h[i_e] = gpGame->worldMap.Row(cellY_e[0]) + cellX_b[0];
+        cells_h[i_e] = gpGame->m_worldMap.Row(cellY_e[0]) + cellX_b[0];
         if (i_e > 1) {
             cells_h[i_e]->ovlTileset = 0;
             cells_h[i_e]->ovlIndex = ERASE_EMPTY_INDEX;
@@ -104,8 +112,8 @@ void advManager::EraseObj(class mapCell *cell, int x, int y)
             cells_h[i_e]->objFlag0 = 0;
         }
 
-        if (cells_h[i_e]->extra && mapData->Extra(cells_h[i_e]->extra)->objIndex != ERASE_EMPTY_INDEX)
-            extras_b[i_e] = mapData->Extra(cells_h[i_e]->extra);
+        if (cells_h[i_e]->extra && m_mapData->Extra(cells_h[i_e]->extra)->objIndex != ERASE_EMPTY_INDEX)
+            extras_b[i_e] = m_mapData->Extra(cells_h[i_e]->extra);
         else
             extras_b[i_e] = 0;
 
@@ -116,8 +124,8 @@ void advManager::EraseObj(class mapCell *cell, int x, int y)
                 extras_b[i_e]->objFlag = 0;
             }
 
-            if (extras_b[i_e]->index && mapData->Extra(extras_b[i_e]->index)->objIndex != ERASE_EMPTY_INDEX)
-                extras_b[i_e] = mapData->Extra(extras_b[i_e]->index);
+            if (extras_b[i_e]->index && m_mapData->Extra(extras_b[i_e]->index)->objIndex != ERASE_EMPTY_INDEX)
+                extras_b[i_e] = m_mapData->Extra(extras_b[i_e]->index);
             else
                 extras_b[i_e] = 0;
         }
@@ -139,8 +147,8 @@ void advManager::EraseObj(class mapCell *cell, int x, int y)
         if (currentCell_k->objTileset != ERASE_CLEARED_TILESET)
             continue;
 
-        if (currentCell_k->extra && mapData->Extra(currentCell_k->extra)->objIndex != ERASE_EMPTY_INDEX)
-            extra_i = mapData->Extra(currentCell_k->extra);
+        if (currentCell_k->extra && m_mapData->Extra(currentCell_k->extra)->objIndex != ERASE_EMPTY_INDEX)
+            extra_i = m_mapData->Extra(currentCell_k->extra);
         else
             continue;
 
@@ -166,8 +174,8 @@ void advManager::EraseObj(class mapCell *cell, int x, int y)
             currentCell_k->objIndex != ERASE_EMPTY_INDEX && !currentCell_k->w4b)
             goto cellDone;
 
-        if (currentCell_k->extra && mapData->Extra(currentCell_k->extra)->objIndex != ERASE_EMPTY_INDEX)
-            extra_i = mapData->Extra(currentCell_k->extra);
+        if (currentCell_k->extra && m_mapData->Extra(currentCell_k->extra)->objIndex != ERASE_EMPTY_INDEX)
+            extra_i = m_mapData->Extra(currentCell_k->extra);
         else
             extra_i = 0;
 
@@ -176,8 +184,8 @@ void advManager::EraseObj(class mapCell *cell, int x, int y)
                 extra_i->objIndex != ERASE_EMPTY_INDEX && !extra_i->f4b)
                 goto cellDone;
 
-            if (extra_i->index && mapData->Extra(extra_i->index)->objIndex != ERASE_EMPTY_INDEX)
-                extra_i = mapData->Extra(extra_i->index);
+            if (extra_i->index && m_mapData->Extra(extra_i->index)->objIndex != ERASE_EMPTY_INDEX)
+                extra_i = m_mapData->Extra(extra_i->index);
             else
                 extra_i = 0;
         }
@@ -473,7 +481,173 @@ VA(0x004b4e33, 0x1a2)
 void advManager::JailAIEvent(class mapCell *, class hero *, int, int) {}
 
 VA(0x004b4fd5, 0x82b)
-void advManager::PlayerMonsterInteract(class mapCell *, class mapCell *, class hero *, int *, int, int, int, int, int) {}
+void advManager::PlayerMonsterInteract(mapCell *cell, mapCell *combatCell, hero *eventHero,
+                                       int *handled, int x, int y, int unused,
+                                       int combatX, int combatY)
+{
+    static char *followerText =
+        "{Followers}\n\nA group of %s with a desire for greater glory wish to join you. Do you accept? ";
+    int monster_n;
+    float strengthRatio_p;
+    int combatResult_f;
+    int forcedJoin_f;
+    int joining;
+    int monsterCount_n;
+    int joiningCost_i;
+    char offerText_g[MONSTER_OFFER_BUFFER_SIZE];
+
+    unused = 0;
+    gpMouseManager->ShowColorPointer();
+    monster_n = cell->objIndex;
+    forcedJoin_f = cell->w4hi & MONSTER_JOIN_FORCED;
+    monsterCount_n = cell->w4hi & MONSTER_COUNT_MASK;
+    strengthRatio_p = static_cast<float>(gpPhilAI->FightValueOfStack(&eventHero->m_army, eventHero, 0, 0, 0, 0)) /
+                      static_cast<float>(gMonsterDatabase[monster_n].fightValue * monsterCount_n);
+
+    if (gbInCampaign &&
+        ((gpGame->m_dwarfAlliance && (monster_n == MONSTER_DWARF || monster_n == MONSTER_BATTLE_DWARF)) ||
+         (gpGame->m_ogreAlliance && (monster_n == MONSTER_OGRE || monster_n == MONSTER_OGRE_LORD)) ||
+         (gpGame->m_dragonAlliance && (monster_n == MONSTER_GREEN_DRAGON || monster_n == MONSTER_RED_DRAGON ||
+                                       monster_n == MONSTER_BLACK_DRAGON)))) {
+        if (!eventHero->m_army.CanJoin(monster_n)) {
+            if (monster_n == MONSTER_DWARF || monster_n == MONSTER_BATTLE_DWARF)
+                NormalDialog("The dwarves hail you, \"Any friend of Roland is a friend of ours.  You may pass.\"",
+                             1, -1, -1, -1, 0, -1, 0, -1, 0);
+            else if (monster_n == MONSTER_OGRE || monster_n == MONSTER_OGRE_LORD)
+                NormalDialog("The ogres give you a grunt of recognition, \"Archibald's allies may pass.\"",
+                             1, -1, -1, -1, 0, -1, 0, -1, 0);
+            else
+                NormalDialog("The dragons see you and call out.  \"Our alliance with Archibald compels us to join you.  Unfortunately you have no room.  A pity!\"  They quickly scatter.",
+                             1, -1, -1, -1, 0, -1, 0, -1, 0);
+            *handled = 1;
+        }
+        else {
+            if (monster_n == MONSTER_DWARF || monster_n == MONSTER_BATTLE_DWARF)
+                NormalDialog("The dwarves recognize their allies and gladly join your forces.",
+                             1, -1, -1, -1, 0, -1, 0, -1, 0);
+            else if (monster_n == MONSTER_OGRE || monster_n == MONSTER_OGRE_LORD)
+                NormalDialog("The ogres recognize you as the Dwarfbane and lumber over to join you.",
+                             1, -1, -1, -1, 0, -1, 0, -1, 0);
+            else
+                NormalDialog("The dragons, snarling and growling, agree to join forces with you, their 'Ally'.",
+                             1, -1, -1, -1, 0, -1, 0, -1, 0);
+            eventHero->m_army.Add(monster_n, monsterCount_n, -1);
+            *handled = 1;
+        }
+        return;
+    }
+
+    if (gbInCampaign && gpGame->m_dwarfbane &&
+        (monster_n == MONSTER_DWARF || monster_n == MONSTER_BATTLE_DWARF)) {
+        NormalDialog("\"The Dwarfbane!!!!, run for your lives.\"", 1, -1, -1, -1, 0, -1, 0, -1, 0);
+        *handled = 1;
+        return;
+    }
+
+    if (xIsPlayingExpansionCampaign && xCampaign.HasAward(0) &&
+        (monster_n == MONSTER_ELF || monster_n == MONSTER_GRAND_ELF)) {
+        *handled = 1;
+        if (eventHero->m_army.CanJoin(monster_n)) {
+            NormalDialog("As you approach the group of elves, their leader calls them all to attention.  He shouts to them, \"Who of you is brave enough to join this fearless ally of ours?\"  The group explodes with cheers as they run to join your ranks.",
+                         1, -1, -1, -1, 0, -1, 0, -1, 0);
+            eventHero->m_army.Add(monster_n, monsterCount_n, -1);
+        }
+        else {
+            NormalDialog("The elves stand at attention as you approach.  Their leader calls to you and says, \"Let us not impede your progress, ally!  Move on, and may victory be yours.\"",
+                         1, -1, -1, -1, 0, -1, 0, -1, 0);
+        }
+        return;
+    }
+
+    if (eventHero->m_army.CanJoin(monster_n) && strengthRatio_p > MONSTER_STRENGTH_JOIN &&
+        !eventHero->HasArtifact(MONSTER_NO_JOIN_ARTIFACT) &&
+        monster_n != MONSTER_GENIE && monster_n != MONSTER_EARTH_ELEMENTAL &&
+        monster_n != MONSTER_AIR_ELEMENTAL && monster_n != MONSTER_FIRE_ELEMENTAL &&
+        monster_n != MONSTER_WATER_ELEMENTAL) {
+        if (forcedJoin_f) {
+            sprintf(gText, followerText, gArmyNamesPlural[monster_n]);
+            EventWindow(-1, 2, gText, -1, 0, -1, 0, -1);
+            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+                eventHero->m_army.Add(monster_n, monsterCount_n, -1);
+                *handled = 1;
+                return;
+            }
+            else {
+                EventWindow(0x43, 1, "Insulted by your refusal of their offer, the monsters attack!",
+                            -1, 0, -1, 0, -1);
+                goto fightMonsters;
+            }
+        }
+        else if (eventHero->m_diplomacy != MONSTER_DIPLOMACY_NONE) {
+            if (eventHero->m_diplomacy == MONSTER_DIPLOMACY_EXPERT)
+                joining = monsterCount_n;
+            else if (eventHero->m_diplomacy == MONSTER_DIPLOMACY_ADVANCED)
+                joining = monsterCount_n / 2;
+            else
+                joining = monsterCount_n / 4;
+            if (!joining)
+                joining = 1;
+
+            joiningCost_i = gMonsterDatabase[monster_n].cost * monsterCount_n;
+            if (joiningCost_i > gpGame->m_players[eventHero->m_owner].resources[RES_GOLD]) {
+                if (strengthRatio_p > MONSTER_STRENGTH_FLEE)
+                    goto monstersFlee;
+                else
+                    goto fightMonsters;
+            }
+
+            if (monsterCount_n == 1) {
+                sprintf(gText,
+                        "The %s is swayed by your diplomatic tongue, and offers to join your army for the sum of %d gold.  Do you accept?",
+                        gArmyNames[monster_n], joiningCost_i);
+            }
+            else {
+                sprintf(gText,
+                        "The creatures are swayed by your diplomatic tongue, and make you an offer:\n\n");
+                if (monsterCount_n == joining)
+                    sprintf(offerText_g,
+                            "All %d of the %s will join your army for the sum of %d gold.  Do you accept?",
+                            monsterCount_n, gArmyNamesPlural[monster_n], joiningCost_i);
+                else
+                    sprintf(offerText_g,
+                            "%d of the %d %s will join your army, and the rest will leave you alone, for the sum of %d gold.  Do you accept?",
+                            joining, monsterCount_n, gArmyNamesPlural[monster_n], joiningCost_i);
+                strcat(gText, offerText_g);
+            }
+
+            NormalDialog(gText, 2, -1, -1, RES_GOLD, joiningCost_i, -1, 0, -1, 0);
+            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+                eventHero->m_army.Add(monster_n, joining, -1);
+                *handled = 1;
+                gpGame->m_players[eventHero->m_owner].resources[RES_GOLD] -= joiningCost_i;
+                return;
+            }
+            else {
+                EventWindow(0x43, 1, "Insulted by your refusal of their offer, the monsters attack!",
+                            -1, 0, -1, 0, -1);
+                goto fightMonsters;
+            }
+        }
+    }
+
+    if (strengthRatio_p > MONSTER_STRENGTH_FLEE) {
+monstersFlee:
+        sprintf(gText,
+                "The %s, awed by the power of your forces, begin to scatter.  Do you wish to pursue and engage them?",
+                gArmyNamesPlural[monster_n]);
+        EventWindow(-1, 2, gText, -1, 0, -1, 0, -1);
+        if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
+            goto fightMonsters;
+        *handled = 1;
+        return;
+    }
+
+fightMonsters:
+    combatResult_f = CombatMonsterEvent(eventHero, monster_n, monsterCount_n, combatCell, x, y, unused,
+                                        combatX, combatY, -1, 0, 0, -1, 0, 0);
+    if (combatResult_f == 0 || combatResult_f == -1)
+        *handled = 1;
+}
 
 VA(0x004b5800, 0x440)
 void advManager::ComputerMonsterInteract(class mapCell *, class hero *, int *) {}

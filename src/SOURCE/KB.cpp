@@ -332,7 +332,7 @@ void GetMonsterCost(int monster, int *const cost)
     int idx;
     for (idx = 0; idx < 7; idx++)
         cost[idx] = 0;
-    cost[6] = gMonsterDatabase[monster].m_0;
+    cost[6] = gMonsterDatabase[monster].cost;
     switch (monster) {
     case 60:
         cost[5] = 1;
