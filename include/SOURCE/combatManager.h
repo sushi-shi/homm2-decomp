@@ -4,8 +4,9 @@
 // 149 methods, 3 own-virtual, 0 static data.
 #include <va.h>
 #include "../BASE/baseManager.h"
+#include "../BASE/icon.h"
+#include "army.h"
 // forward declarations:
-class army;
 class armyGroup;
 class hero;
 class heroWindow;
@@ -33,7 +34,15 @@ public:
     char   field_0xe54;  // +0xe54
     char _pad_0xe55[0x125];
     char   field_0xf7a;  // +0xf7a
-    char _pad_0xf7b[0xe8fc];  // tail pad to sizeof
+    char _pad_0xf7b[0x228f];
+    class icon *towerIcon;  // +0x320a
+    char _pad_0x320e[0x24];
+    class icon *obstacleIcons[1];  // +0x3232
+    char _pad_0x3236[0x319];
+    class army armies[2][21];  // +0x354f
+    int currentArmySide;  // +0xf2a3
+    int currentArmyIndex;  // +0xf2a7
+    char _pad_0xf2ab[0x5cc];  // tail pad to sizeof
     // --- constructors ---
     combatManager(void);
     // --- virtual methods (vtable order) ---

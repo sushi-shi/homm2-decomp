@@ -142,7 +142,7 @@ BASE/EXEC	?Terminate@executive@@QAEXXZ	100.0000	d33a5cc384b3
 BASE/FONT	??0font@@QAE@K@Z	100.0000	67411d2f90da
 BASE/FONT	??1font@@UAE@XZ	100.0000	088279c525b8
 BASE/FONT	??_Efont@@UAEPAXI@Z	0.0000	
-BASE/FONT	?DrawBoundedString@font@@QAEXPADHHHHHH@Z	89.2112	502ca0d59bd6
+BASE/FONT	?DrawBoundedString@font@@QAEXPADHHHHHH@Z	89.4483	502ca0d59bd6
 BASE/FONT	?DrawString@font@@QAEXPADHHH@Z	100.0000	9c9349c5622f
 BASE/FONT	?DrawStringExecute@font@@IAEXPADHHHHHHH@Z	98.2609	9857ad77791a
 BASE/FONT	?GetCharacterWidth@font@@QAEHE@Z	86.9310	d7bc07a9749b
@@ -181,9 +181,9 @@ BASE/INPUTMGR	?SetKeyCodeType@inputManager@@QAEXH@Z	100.0000	6342f2fae2a5
 BASE/INPUTMGR	?SetMouseCoords@inputManager@@QAEXHH@Z	100.0000	d6158d77293b
 BASE/Icon2b	?IconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	61.2830	74b5c517cdec
 BASE/Icond2b	?DimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	65.3621	66d2dc1051cd
-BASE/Icondf2b	?FlipDimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	58.6386	2198fcd16c8a
+BASE/Icondf2b	?FlipDimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	60.7470	2198fcd16c8a
 BASE/Iconf2b	?FlipIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	59.4085	229d4cf4d270
-BASE/Iconm2b	?MonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	68.0221	345eaf36d7a0
+BASE/Iconm2b	?MonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	68.5801	345eaf36d7a0
 BASE/Iconmf2b	?FlipMonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	66.3293	a7c8b50283d1
 BASE/MOUSEMGR	??0mouseManager@@QAE@XZ	100.0000	cd5abb5d46d3
 BASE/MOUSEMGR	?CheckUpdateMousePos@mouseManager@@QAEXXZ	100.0000	651624228ccc
@@ -379,19 +379,19 @@ BASE/droplist	?Read@dropListWidget@@QAEXXZ	0.0000	c0280e1a8689
 BASE/droplist	?RestoreDropBackground@dropListWidget@@QAEXXZ	100.0000	fdd690daaab3
 BASE/droplist	?SaveDropBackground@dropListWidget@@QAEXXZ	100.0000	b3d5c9e1b5dd
 BASE/icon2bc	?IconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAEH@Z	58.8357	d218a782e049
-BASE/icon2bs	?IconToBitmapScale@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	75.1206	a49d5fdfa818
+BASE/icon2bs	?IconToBitmapScale@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	76.3262	a49d5fdfa818
 BASE/icon2by	?IconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	64.0178	beaeeca30cbb
-BASE/iconf2bc	?FlipIconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAE@Z	60.5768	81967a8a5cfd
+BASE/iconf2bc	?FlipIconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAE@Z	61.1814	81967a8a5cfd
 BASE/iconf2by	?FlipIconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	67.5362	774d85a1f3f0
 BASE/listbox	??0listBoxWidget@@QAE@XZ	97.3684	2d787e1f30f9
-BASE/listbox	??1listBoxWidget@@UAE@XZ	97.5682	eb8cbc77afb4
+BASE/listbox	??1listBoxWidget@@UAE@XZ	98.5909	eb8cbc77afb4
 BASE/listbox	??_ElistBoxWidget@@UAEPAXI@Z	0.0000	
 BASE/listbox	?DeleteItem@listBoxWidget@@QAEXH@Z	100.0000	9568e028c0c1
 BASE/listbox	?Draw@listBoxWidget@@UAEXXZ	100.0000	dfba5050ab21
 BASE/listbox	?DrawLBStuff@listBoxWidget@@QAEXH@Z	97.5219	91072ddb88d7
-BASE/listbox	?Main@listBoxWidget@@UAEHAAUtag_message@@@Z	95.5679	e77c1008e932
+BASE/listbox	?Main@listBoxWidget@@UAEHAAUtag_message@@@Z	95.8118	e77c1008e932
 BASE/listbox	?ProcessMouseMessage@listBoxWidget@@QAEHAAUtag_message@@@Z	92.2727	a297f5fc9ad8
-BASE/listbox	?Read@listBoxWidget@@QAEXXZ	85.5034	824c804dfb00
+BASE/listbox	?Read@listBoxWidget@@QAEXXZ	86.0204	824c804dfb00
 BASE/miscwin	?AutoInitSVGA@@YIFXZ	100.0000	ba21e7c98ba3
 BASE/miscwin	@BlitBitmapToScreenVesa@28	0.6579	10b3cea2382c
 BASE/soundmgr	??0soundManager@@QAE@XZ	97.6471	2cb5eafa76dd
@@ -608,8 +608,8 @@ SOURCE/ARMYGRP	?IsHomogeneous@armyGroup@@QAEHH@Z	16.2558	22f9c1519ce3
 SOURCE/ARMYGRP	?IsMember@armyGroup@@QAEHH@Z	51.7778	5023544b6410
 SOURCE/ARMYGRP	?Swap@armyGroup@@QAEXHPAV1@H@Z	31.6585	7c7b2a086054
 SOURCE/ARMYGRP	?View@armyGroup@@QAEXH@Z	100.0000	10ef94b0363f
-SOURCE/CMBTMGR	??0combatManager@@QAE@XZ	17.7423	c563bfde5083
-SOURCE/CMBTMGR	??_H@YGXPAXIHP6EX0@Z@Z	0.0000	
+SOURCE/CMBTMGR	??0combatManager@@QAE@XZ	29.5979	c563bfde5083
+SOURCE/CMBTMGR	??_H@YGXPAXIHP6EX0@Z@Z	100.0000	
 SOURCE/CMBTMGR	?CatAttack@combatManager@@QAEXH@Z	1.4743	9b7a4f9c1171
 SOURCE/CMBTMGR	?CheckApplyBadMorale@combatManager@@QAEHHH@Z	11.4590	2ed3d3426717
 SOURCE/CMBTMGR	?CheckApplyGoodMorale@combatManager@@QAEXHH@Z	10.8167	364e0daf9c92
@@ -921,14 +921,14 @@ SOURCE/HERO	?UseSpell@hero@@QAEXH@Z	30.9524	0114d880489a
 SOURCE/HERO	?ViewArtifact@hero@@QAEXHHH@Z	24.0741	0b71c53f2e95
 SOURCE/HERO	?ViewStat@hero@@QAEXHH@Z	46.4286	34785468494d
 SOURCE/HERO	?Write@hero@@QAEXHC@Z	41.9355	a6202a5f350f
-SOURCE/HEXCELL	??0hexcell@@QAE@XZ	53.8462	1656412791ea
+SOURCE/HEXCELL	??0hexcell@@QAE@XZ	100.0000	bf46d7c8e5da
 SOURCE/HEXCELL	?DrawClouds@hexcell@@QAEXXZ	100.0000	8a8c27ac90a7
 SOURCE/HEXCELL	?DrawGround@hexcell@@QAEXXZ	100.0000	968022126cf5
-SOURCE/HEXCELL	?DrawLowerDeadOccupants@hexcell@@QAEXXZ	20.2812	1b93e765b892
-SOURCE/HEXCELL	?DrawObstacle@hexcell@@QAEXXZ	40.6250	afaedb42b62b
-SOURCE/HEXCELL	?DrawOccupant@hexcell@@QAEXHH@Z	12.5000	972e8cc4d98f
-SOURCE/HEXCELL	?DrawTower@hexcell@@QAEXH@Z	12.2453	6fb41f1eacb9
-SOURCE/HEXCELL	?DrawUpperDeadOccupant@hexcell@@QAEXXZ	19.6667	39d491a9d889
+SOURCE/HEXCELL	?DrawLowerDeadOccupants@hexcell@@QAEXXZ	100.0000	cb1ea396d867
+SOURCE/HEXCELL	?DrawObstacle@hexcell@@QAEXXZ	100.0000	5bfb56b18dad
+SOURCE/HEXCELL	?DrawOccupant@hexcell@@QAEXHH@Z	100.0000	2a521e2d9d4d
+SOURCE/HEXCELL	?DrawTower@hexcell@@QAEXH@Z	100.0000	d3354a19c98f
+SOURCE/HEXCELL	?DrawUpperDeadOccupant@hexcell@@QAEXXZ	90.5152	6b6269de1091
 SOURCE/HISCORE	??0highScoreManager@@QAE@XZ	56.0938	e19aa444a806
 SOURCE/HISCORE	?Close@highScoreManager@@UAEXXZ	38.1765	b5d8b52cb529
 SOURCE/HISCORE	?Main@highScoreManager@@UAEHAAUtag_message@@@Z	10.1314	6efa6d3f6527
