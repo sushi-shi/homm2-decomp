@@ -78,8 +78,8 @@ public:
 #pragma pack(pop)
 SIZE(townManager, 0x17a);
 // ---- globals (declarations, RVA order) ----
-DATA(0x004ef5e0) extern unsigned char *castleSlotsBase;
-DATA(0x00525040) extern class heroWindow *casWin;
-DATA(0x00525048) extern unsigned char *castleSlotsUse;
+extern unsigned char *castleSlotsBase;
+extern class heroWindow *casWin;
+extern unsigned char *castleSlotsUse;
 
 #endif // HOMM2_SOURCE_TOWNMANAGER_H

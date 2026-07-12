@@ -9,15 +9,17 @@
 #include <_globals_model.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <string.h>
-int gFillRow;
-unsigned char *gFillPtr;
-int gDimRow;
-int gDimCol;
-unsigned char *gDimPtr;
-unsigned char *gDimNext;
-unsigned char *gBlitSrc;
-unsigned char *gBlitDst;
-int gBlitRow;
+DATA(0x005348f0) static int gFillRow;
+DATA(0x005348f8) static unsigned char *gFillPtr;
+DATA(0x005348e8) static int gDimRow;
+DATA(0x005348e4) static int gDimCol;
+DATA(0x005348f4) static unsigned char *gDimPtr;
+DATA(0x00534900) static unsigned char *gDimNext;
+DATA(0x005348ec) static unsigned char *gBlitSrc;
+DATA(0x005348e0) static unsigned char *gBlitDst;
+DATA(0x005348fc) static int gBlitRow;
+
+
 
 VA(0x004ca3d0, 0x80)
 void FillBitmapArea(class bitmap *bmp, int x, int y, int w, int h, int color)

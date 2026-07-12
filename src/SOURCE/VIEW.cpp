@@ -16,4 +16,4 @@ VA(0x0040c784, 0x165)
 void combatManager::ViewArmy(class army *, int) {}
 
 // ---- globals (definitions, RVA order) ----
-int iViewGeneralWhichSide;
+DATA(0x004eddf4) int iViewGeneralWhichSide;

@@ -33,4 +33,4 @@ VA(0x00433315, 0x9f)
 void town::CalcNumLevelArchers(int *, int *) {}
 
 // ---- globals (definitions, RVA order) ----
-int bEnteringTown;
+DATA(0x004f11b0) int bEnteringTown;

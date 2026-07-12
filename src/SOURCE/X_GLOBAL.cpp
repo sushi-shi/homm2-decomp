@@ -6,8 +6,8 @@
 #include <va.h>
 
 // ---- globals (definitions, RVA order) ----
-char *xNecromancerShrine;
-char *xNecromancerShrineDesc;
-int xShrineBuildingCost[2334];
-int xPasswordStringsIndex[8];
-signed char xIsExpansionMap;
+DATA(0x004f26f4) char *xNecromancerShrine;
+DATA(0x004f26f8) char *xNecromancerShrineDesc;
+DATA(0x004f2ab0) int xShrineBuildingCost[2334];
+DATA(0x00527e78) int xPasswordStringsIndex[8];
+DATA(0x00527e98) signed char xIsExpansionMap;

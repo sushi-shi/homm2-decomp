@@ -102,21 +102,21 @@ public:
 #pragma pack(pop)
 SIZE(soundManager, 0x6ae);
 // ---- globals (declarations, RVA order) ----
-DATA(0x0051f018) extern char *digitalDriverNames[14];
-DATA(0x0051f050) extern SampleChannelStruct SCS[4];
-DATA(0x0051f080) extern char CDPreviousPosition[60][15];
-DATA(0x0051f404) extern int CDWaiting;
-DATA(0x0051f408) extern int CDPlaying;
-DATA(0x0051f40c) extern int iCalibrateLoop;
-DATA(0x0051fec8) extern struct _MDI_DRIVER *hMDI;
-DATA(0x0051fecc) extern int CurrentMidiFile;
-DATA(0x0051fed0) extern unsigned char *bGotMidi;
-DATA(0x0051ff0c) extern long lLastMIDIPollTickCount;
-DATA(0x00534980) extern char lpszReturnString[0x100];
-DATA(0x00534a80) extern unsigned long nMCIError;
-DATA(0x00534a88) extern short iLastVolume[0x20];
-DATA(0x00534ac8) extern char CommandString[0x100];
-DATA(0x00534cf0) extern class MIDIWrap *pMIDIWrap[60];
-DATA(0x00534de0) extern struct _SEQUENCE *hSequence[60];
+extern char *digitalDriverNames[14];
+extern SampleChannelStruct SCS[4];
+extern char CDPreviousPosition[60][15];
+extern int CDWaiting;
+extern int CDPlaying;
+extern int iCalibrateLoop;
+extern struct _MDI_DRIVER *hMDI;
+extern int CurrentMidiFile;
+extern unsigned char *bGotMidi;
+extern long lLastMIDIPollTickCount;
+extern char lpszReturnString[0x100];
+extern unsigned long nMCIError;
+extern short iLastVolume[0x20];
+extern char CommandString[0x100];
+extern class MIDIWrap *pMIDIWrap[60];
+extern struct _SEQUENCE *hSequence[60];
 
 #endif // HOMM2_BASE_SOUNDMANAGER_H

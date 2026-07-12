@@ -32,6 +32,6 @@ void CompressTest3(void);
 
 
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
-DATA(0x004f7a08) extern char bMapInitialized;
+extern char bMapInitialized;
 
 #endif // HOMM2_GAME_H

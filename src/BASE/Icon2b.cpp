@@ -12,22 +12,22 @@
 #include <BASE/Misc.h>
 #include <string.h>
 // Per-call decoder scratch — its own 0x534c20+ global block (modeled in _globals_model.h).
-int gIcRow;
-int gIcPitch;
-unsigned char gIcColor;
-unsigned char *gIcDimPal;
-unsigned int gIcRun;
-unsigned int gIcCnt;
-unsigned char *gIcSrc;
-unsigned char *gIcDimDst;
-int gIcClipR;
-int gIcClipB;
-int gIcX0;
-unsigned int gIcDimLen;
-int gIcY;
-int gIcX;
-unsigned char *gIcEntry;
-unsigned int gIcCnt2;
+DATA(0x00534c20) static int gIcRow;
+DATA(0x00534c24) static int gIcPitch;
+DATA(0x00534c28) static unsigned char gIcColor;
+DATA(0x00534c2c) static unsigned char *gIcDimPal;
+DATA(0x00534c30) static unsigned int gIcRun;
+DATA(0x00534c34) static unsigned int gIcCnt;
+DATA(0x00534c38) static unsigned char *gIcSrc;
+DATA(0x00534c3c) static unsigned char *gIcDimDst;
+DATA(0x00534c40) static int gIcClipR;
+DATA(0x00534c44) static int gIcClipB;
+DATA(0x00534c48) static int gIcX0;
+DATA(0x00534c4c) static unsigned int gIcDimLen;
+DATA(0x00534c50) static int gIcY;
+DATA(0x00534c54) static int gIcX;
+DATA(0x00534c58) static unsigned char *gIcEntry;
+DATA(0x00534c5c) static unsigned int gIcCnt2;
 
 // @early-stop
 // RLE icon->bitmap blitter with per-scanline clip (base of the Icon*2b* /O2 family). Full logic
@@ -35,6 +35,8 @@ unsigned int gIcCnt2;
 // wall: MSVC allocates srcIcon->m_data to esi in retail but edi here, and that reg-coloring choice
 // cascades into scratch-register (eax/ecx/edx/esi/edi) mismatches through the whole loop body. The
 // documented family wall (Iconm2b peaked at 41%; this reaches ~59%).
+
+
 VA(0x004d0570, 0x4ed)
 void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                   int clip, int clipX, int clipY, int clipW, int clipH, int color)

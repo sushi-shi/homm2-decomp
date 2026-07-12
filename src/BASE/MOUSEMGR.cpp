@@ -19,6 +19,13 @@
 #include <SOURCE/kbwin.h>
 #include <BASE/INPUTMGR.h>
 #include <_globals_model.h>
+
+
+
+// ---- module-private synthetic globals (retail xref: single-module) ----
+DATA(0x00533b40) static POINT gMouseScreenPt;    // GetCursorPos scratch (mouseManager::MouseCoords)
+DATA(0x00533b48) static POINT gMouseCheckPt;     // GetCursorPos scratch (mouseManager::CheckUpdateMousePos/ShowColorPointer)
+
 VA(0x004c9270, 0xd9)
 mouseManager::mouseManager(void) : baseManager()
 {
@@ -319,14 +326,14 @@ void mouseManager::SetColorMice(int param_1)
 VTBL(mouseManager, 0x004eba00);
 
 // ---- globals (definitions, RVA order) ----
-int *iMouseOffset;
-signed char iMouseSize[96][2];
-signed char iHotSpot[96][2];
-int gbInSetPointer;
-int bInNewMouseUpdate;
-struct tagBITMAP *bmpAndMask;
-void *hMouseCursor[96];
-void *cAndBits[96];
-void *cColorBits[98];
-struct _ICONINFO *IconInfo;
-void *hbmpAndMask[106];
+DATA(0x0051ebc8) int *iMouseOffset;
+DATA(0x0051ebd8) signed char iMouseSize[96][2];
+DATA(0x0051ec98) signed char iHotSpot[96][2];
+DATA(0x0051ed58) int gbInSetPointer;
+DATA(0x0051ed5c) int bInNewMouseUpdate;
+DATA(0x00533240) struct tagBITMAP *bmpAndMask;
+DATA(0x00533b58) void *hMouseCursor[96];
+DATA(0x00533cd8) void *cAndBits[96];
+DATA(0x00533e58) void *cColorBits[98];
+DATA(0x00533fe0) struct _ICONINFO *IconInfo;
+DATA(0x00534760) void *hbmpAndMask[106];

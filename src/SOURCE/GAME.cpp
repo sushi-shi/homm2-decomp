@@ -534,7 +534,7 @@ void game::CancelComputerScreen(void)
 VA(0x00481271, 0xed)
 void game::ShowComputerScreen(void)
 {
-    if (*(int *)((char *)&gConfig + 0x18)) {
+    if (gConfig.blackoutComputer) {
         int saved = gbThisNetHumanPlayer[giCurPlayer];
         gbThisNetHumanPlayer[giCurPlayer] = 1;
         int i;
@@ -902,28 +902,28 @@ int game::CountShrines(int player)
 }
 
 // ---- globals (definitions, RVA order) ----
-int gbGameOver;
-signed char *giMonType;
-char bMapInitialized;
-int iViewArmyNumTroops;
-signed char *gbNGHeroType;
-short giUABaseX;
-short giUABaseY;
-int giEndSequence;
-int gbDismissArmy;
-signed char *gbNGHuman;
-int iViewArmyFrame;
-int gbAllowUpgrade;
-int iViewArmyType;
-class hero *viewSpellsHero;
-int gbUpgradeArmy;
-short *RandMineQty;
-char *gcCurMapName;
-signed char *gbNGDifficulty;
-int iViewArmyUpgradeToType;
-int viewArmyBaseX;
-int viewArmyBaseY;
-signed char *gbNGColor;
-short giUARadius;
-signed char *gbNGPlayerPos;
-int viewArmyFacingWIPXMod;
+DATA(0x004f70e0) int gbGameOver;
+DATA(0x004f7550) signed char *giMonType;
+DATA(0x004f7a08) char bMapInitialized;
+DATA(0x005280e8) int iViewArmyNumTroops;
+DATA(0x005280ec) signed char *gbNGHeroType;
+DATA(0x00528430) short giUABaseX;
+DATA(0x00528434) short giUABaseY;
+DATA(0x00528438) int giEndSequence;
+DATA(0x0052843c) int gbDismissArmy;
+DATA(0x00528440) signed char *gbNGHuman;
+DATA(0x00528448) int iViewArmyFrame;
+DATA(0x0052844c) int gbAllowUpgrade;
+DATA(0x00528450) int iViewArmyType;
+DATA(0x00528454) class hero *viewSpellsHero;
+DATA(0x00528458) int gbUpgradeArmy;
+DATA(0x00528460) short *RandMineQty;
+DATA(0x00528470) char *gcCurMapName;
+DATA(0x00528480) signed char *gbNGDifficulty;
+DATA(0x00528488) int iViewArmyUpgradeToType;
+DATA(0x0052848c) int viewArmyBaseX;
+DATA(0x00528490) int viewArmyBaseY;
+DATA(0x00528498) signed char *gbNGColor;
+DATA(0x005284a0) short giUARadius;
+DATA(0x005284a8) signed char *gbNGPlayerPos;
+DATA(0x005284b0) int viewArmyFacingWIPXMod;

@@ -142,5 +142,5 @@ VA(0x004542f8, 0xbe)
 int army::GetPowBaseY(void) { return 0; }
 
 // ---- globals (definitions, RVA order) ----
-int bSecondAttack;
-int gbGenieHalf;
+DATA(0x004f54a8) int bSecondAttack;
+DATA(0x00527eb4) int gbGenieHalf;

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """gen_global_decls.py — EAGER global declarations.
 
-Every CodeView-owned data symbol gets a `DATA(<VA>) extern <type> <name>;` in its owner header
-UP FRONT, so matching a TU never requires hand-adding globals (the old lazy model). Reads
+Every CodeView-owned data symbol gets a plain `extern <type> <name>;` in its owner header UP FRONT
+(the DATA(<VA>) lives on the .cpp DEFINITION — see gen_global_defs.py), so matching a TU never
+requires hand-adding globals (the old lazy model). Reads
 build/gen/symbol_names.csv (kind==data), demangles each via llvm-undname, reconstructs array
 dims from the recorded byte size (MSVC 4.2 records array globals as *decayed pointers* + a size,
 e.g. `void**`+0x180 == `void*[0x60]`, `char(*)[2]`+0xc0 == `char[0x60][2]`), and writes a managed
@@ -94,7 +95,7 @@ def main():
             if 'globals (declarations' in line:
                 in_block = True; continue
             if in_block:
-                if line.startswith('DATA(') or not line.strip():
+                if line.startswith('extern ') or not line.strip():
                     continue
                 in_block = False
             mm = re.search(r'\bextern\b.*?([A-Za-z_]\w*)\s*(\[[^;]*\])*\s*;', line.split('//')[0])
@@ -135,11 +136,10 @@ def main():
         decl = reconstruct(dem[nm], name, int(r['size'], 0))
         if not decl:
             skipped.append((name, 'unresolved: %s (size 0x%x)' % (dem[nm], int(r['size'], 0)))); continue
-        va = int(r['rva'], 0) + IMAGE_BASE
-        by_header[hdr].append((int(r['rva'], 0), "DATA(0x%08x) extern %s" % (va, decl)))
+        by_header[hdr].append((int(r['rva'], 0), "extern %s" % decl))   # DATA lives on the .cpp def now
         declared.add(name)
 
-    BLOCK = re.compile(r'\n// ---- globals \(declarations, RVA order\) ----\n(?:DATA\(.*\n)*', re.M)
+    BLOCK = re.compile(r'\n// ---- globals \(declarations, RVA order\) ----\n(?:extern .*\n)*', re.M)
     for hdr, decls in sorted(by_header.items()):
         decls.sort()
         block = "\n// ---- globals (declarations, RVA order) ----\n" + "\n".join(d for _, d in decls) + "\n"

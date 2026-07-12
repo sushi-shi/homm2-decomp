@@ -14,6 +14,12 @@
 #include <BASE/inputManager.h>
 #include <SOURCE/KB.h>
 #include <_globals_model.h>
+
+
+
+// ---- module-private synthetic globals (retail xref: single-module) ----
+DATA(0x00528cf8) static long gButtonRepeatTime; // button auto-repeat deadline tick (button::Select)
+
 VA(0x004dd440, 0x34)
 button::button(void) : widget(0, 0, 0, 0, 0, 0)
 {
@@ -78,157 +84,7 @@ button::~button()
 }
 
 VA(0x004dd6d0, 0x595)
-int button::Main(tag_message &param_1)
-{
-    unsigned short uVar1;
-    short sVar2, sVar7;
-    long lVar3;
-    int iVar4;
-    if (field_0x14 == 0x1000 && (m_flags & 1) != 0 &&
-        (lVar3 = KBTickCount(), gButtonRepeatTime < lVar3)) {
-        if ((m_flags & 1) == 0)
-            return 0;
-        m_flags = m_flags & 0xfffe;
-        Draw();
-        gpWindowManager->UpdateScreenRegion(m_owner->m_posX + m_x,
-                                            m_owner->m_posY + m_y, m_width, m_height);
-        param_1.field4 = 0xd;
-        param_1.type = 0x200;
-        param_1.field8 = m_id;
-        param_1.fieldC = iLeftRightSave;
-        iLeftRightSave = 0;
-        return 2;
-    }
-    uVar1 = m_flags;
-    if ((uVar1 & 2) == 0) {
-        if (param_1.type == 0x200)
-            return widget::Main(param_1);
-        return 0;
-    }
-    iVar4 = param_1.type;
-    if (iVar4 < 9) {
-        if (iVar4 != 8) {
-            if (iVar4 == 1) {
-                if ((uVar1 & 2) != 0 && (uVar1 & 4) != 0 && (uVar1 & 8) == 0) {
-                    if (m_hotkey != -1 && m_hotkey == param_1.field4)
-                        return Select(param_1);
-                    return 0;
-                }
-            } else if (iVar4 == 2 && (uVar1 & 2) != 0 && (uVar1 & 4) != 0 && (uVar1 & 8) == 0) {
-                if (m_hotkey != -1 && m_hotkey == param_1.field4) {
-                    if ((uVar1 & 1) == 0)
-                        return 0;
-                    m_flags = uVar1 & 0xfffe;
-                    Draw();
-                    gpWindowManager->UpdateScreenRegion(m_owner->m_posX + m_x,
-                                                        m_owner->m_posY + m_y,
-                                                        m_width, m_height);
-                    param_1.field4 = 0xd;
-                    param_1.type = 0x200;
-                    param_1.field8 = m_id;
-                    param_1.fieldC = iLeftRightSave;
-                    iLeftRightSave = 0;
-                    return 2;
-                }
-                return 0;
-            }
-            goto LAB_004dd7d8;
-        }
-    } else {
-        if (iVar4 == 0x10) {
-            if ((uVar1 & 4) != 0 && (uVar1 & 1) != 0) {
-                m_flags = uVar1 & 0xfffe;
-                Draw();
-                gpWindowManager->UpdateScreenRegion(m_x + m_owner->m_posX,
-                                                    m_y + m_owner->m_posY, m_width,
-                                                    m_height);
-                param_1.field4 = 0xd;
-                param_1.type = 0x200;
-                param_1.field8 = m_id;
-                param_1.fieldC = iLeftRightSave;
-                iLeftRightSave = 0;
-                return 2;
-            }
-            goto LAB_004dd7d8;
-        }
-        if (iVar4 != 0x20) {
-            if (iVar4 == 0x200 && param_1.field4 == 0x3c) {
-                if (param_1.field8 == m_iconId) {
-                    m_iconId = reinterpret_cast<int>(param_1.text);
-                    gpResourceManager->Dispose(m_icon);
-                    m_icon = gpResourceManager->GetIcon(reinterpret_cast<unsigned long>(param_1.text));
-                }
-                return 0;
-            }
-            goto LAB_004dd7d8;
-        }
-    }
-    if ((uVar1 & 4) != 0) {
-        sVar7 = static_cast<short>(param_1.field4) - m_owner->m_posX;
-        sVar2 = static_cast<short>(param_1.field8) - m_owner->m_posY;
-        if (iVar4 == 0x20) {
-            if (m_x <= sVar7 && m_y <= sVar2 && sVar7 < m_width + m_x &&
-                sVar2 < m_height + m_y) {
-                param_1.field4 = 0xe;
-                param_1.type = 0x200;
-                param_1.fieldC = 0x200;
-                param_1.field8 = m_id;
-                return 2;
-            }
-            return 0;
-        }
-        if ((uVar1 & 8) == 0 && m_x <= sVar7 && m_y <= sVar2 &&
-            sVar7 < m_width + m_x && sVar2 < m_height + m_y) {
-            Select(param_1);
-            iVar4 = param_1.type;
-            while (iVar4 != 0x10 && param_1.type != 0x40) {
-                PollSound();
-                gpMouseManager->Main(param_1);
-                if (param_1.type == 4) {
-                    sVar2 = static_cast<short>(param_1.field4) - m_owner->m_posX;
-                    sVar7 = static_cast<short>(param_1.field8) - m_owner->m_posY;
-                    if (sVar2 < m_x || sVar7 < m_y ||
-                        m_width + m_x <= sVar2 || m_height + m_y <= sVar7) {
-                        if ((m_flags & 1) != 0) {
-                            m_flags = m_flags & 0xfffe;
-                            Draw();
-                            gpWindowManager->UpdateScreenRegion(
-                                m_owner->m_posX + m_x, m_owner->m_posY + m_y,
-                                m_width, m_height);
-                            param_1.field4 = 0xd;
-                            param_1.type = 0x200;
-                            param_1.field8 = m_id;
-                            param_1.fieldC = iLeftRightSave;
-                            iLeftRightSave = 0;
-                        }
-                    } else if ((m_flags & 1) == 0) {
-                        Select(param_1);
-                    }
-                }
-                Process1WindowsMessage();
-                param_1 = gpInputManager->GetEvent();
-                iVar4 = param_1.type;
-            }
-            if ((m_flags & 1) != 0) {
-                m_flags = m_flags & 0xfffe;
-                Draw();
-                gpWindowManager->UpdateScreenRegion(m_owner->m_posX + m_x,
-                                                    m_owner->m_posY + m_y, m_width,
-                                                    m_height);
-                param_1.field4 = 0xd;
-                param_1.type = 0x200;
-                param_1.field8 = m_id;
-                param_1.fieldC = iLeftRightSave;
-                iLeftRightSave = 0;
-                return 2;
-            }
-            return 1;
-        }
-        return 0;
-    }
-LAB_004dd7d8:
-    return widget::Main(param_1);
-}
+// int button::Main(tag_message &);
 
 VA(0x004ddc70, 0x96)
 short button::Select(struct tag_message &msg)
@@ -288,4 +144,4 @@ void button::Draw(void)
 VTBL(button, 0x004ebaf0);
 
 // ---- globals (definitions, RVA order) ----
-int iLeftRightSave;
+DATA(0x0052125c) int iLeftRightSave;

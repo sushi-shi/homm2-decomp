@@ -30,14 +30,14 @@ VA(0x004026bc, 0x251)
 void PrintSummaryInfo(struct SmackSumTag *) {}
 
 // ---- globals (definitions, RVA order) ----
-int bSmackSound;
-class icon *brotherIcon;
-class icon *backImage;
-struct SSmackOptions *SmackOptions;
-int bTesting;
-struct SmackTag *smk1;
-struct SmackTag *smk2;
-signed char bSmackNum;
-int gbLastFramePlayed;
-int gbPlayedThrough;
-signed char bMainDone;
+DATA(0x004ec040) int bSmackSound;
+DATA(0x004ec044) class icon *brotherIcon;
+DATA(0x004ec068) class icon *backImage;
+DATA(0x004ec070) struct SSmackOptions *SmackOptions;
+DATA(0x004ecd48) int bTesting;
+DATA(0x004ecd4c) struct SmackTag *smk1;
+DATA(0x004ecd50) struct SmackTag *smk2;
+DATA(0x00522f20) signed char bSmackNum;
+DATA(0x00522f24) int gbLastFramePlayed;
+DATA(0x00522f80) int gbPlayedThrough;
+DATA(0x00522f84) signed char bMainDone;

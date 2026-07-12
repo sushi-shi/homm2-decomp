@@ -18,6 +18,14 @@
 #include <stdlib.h>
 #include <windows.h>
 #include <BASE/Misc.h>
+
+
+
+// ---- module-private synthetic globals (retail xref: single-module) ----
+DATA(0x00528d00) static long gMusicFadeTimer; // ambient-music fade deadline tick (soundManager::SwitchAmbientMusic)
+DATA(0x00528db6) static char gMciErrorFlag; // MCI error latch (byte-accessed) (HandleMCIError)
+DATA(0x00534970) static WAVEFORMATEX gWaveFormat; // digital-driver PCM format (WAVE_init_driver)
+
 VA(0x004cb630, 0x68)
 void HandleMCIError(int param_1, char *param_2)
 {
@@ -30,25 +38,7 @@ void HandleMCIError(int param_1, char *param_2)
 }
 
 VA(0x004cb6a0, 0xc7)
-void soundManager::ValidatePreviousPosition(int param_1)
-{
-    unsigned int local_18[5];
-    int local_20;
-    if (param_1 < 0 || 0x3b <= param_1)
-        local_20 = 0;
-    else
-        local_20 = 1;
-    ProcessAssert(local_20, __FILE__, __LINE__);
-    if (CDPreviousPosition[param_1][0] != 0) {
-        strcpy(reinterpret_cast<char *>(local_18), CDPreviousPosition[param_1]);
-        char *pcVar1 = FindToken(reinterpret_cast<char *>(local_18), ':');
-        if (pcVar1 != 0)
-            *pcVar1 = 0;
-        int iVar2 = atoi(reinterpret_cast<char *>(local_18));
-        if (iVar2 != param_1)
-            CDPreviousPosition[param_1][0] = 0;
-    }
-}
+// void soundManager::ValidatePreviousPosition(int);
 
 VA(0x004cb770, 0x13c)
 void soundManager::CDStop(void)
@@ -163,104 +153,7 @@ void soundManager::CDSetVolume(int param_1, int param_2)
 }
 
 VA(0x004cbc40, 0x473)
-void soundManager::CDPlay(int param_1, int param_2, int param_3, int param_4)
-{
-    char cVar1;
-    int iVar2;
-    long lVar3;
-    HWND local_30;
-    HWND local_2c;
-    unsigned int local_24[5];
-    long local_10;
-    long local_c;
-    long local_8;
-    if (gbNoSound != 0)
-        return;
-    if (m_cdReady == 0)
-        return;
-    if (gMidiEnabled == 0)
-        return;
-    if (param_1 == -1) {
-        CDStop();
-        return;
-    }
-    if (m_currentTrack != param_1 || CDPlaying == 0 || param_4 != 0) {
-        m_cdTrack = param_1;
-        m_cdPlayFrame = param_3;
-        Process1WindowsMessage();
-        ServiceSound();
-        local_8 = KBTickCount();
-        wsprintfA(CommandString, "set CD time format tmsf");
-        nMCIError = mciSendStringA(CommandString,
-                                   lpszReturnString, 0xff, 0);
-        if (nMCIError != 0)
-            HandleMCIError(nMCIError, CommandString);
-        wsprintfA(CommandString, "status CD mode");
-        nMCIError = mciSendStringA(CommandString,
-                                   lpszReturnString, 0xff, 0);
-        if (nMCIError != 0)
-            HandleMCIError(nMCIError, CommandString);
-        iVar2 = stricmp(lpszReturnString, "stopped");
-        if (iVar2 != 0) {
-            wsprintfA(CommandString, "status CD position");
-            nMCIError = mciSendStringA(CommandString,
-                                       reinterpret_cast<char *>(local_24), 0x14, 0);
-            if (nMCIError != 0)
-                HandleMCIError(nMCIError, CommandString);
-            strcpy(CDPreviousPosition[m_currentTrack], reinterpret_cast<char *>(local_24));
-            ValidatePreviousPosition(m_currentTrack);
-        }
-        local_c = KBTickCount();
-        cVar1 = bMusicIsLooping[param_1];
-        Process1WindowsMessage();
-        ServiceSound();
-        if (param_4 == 0 && param_2 != 0 && CDPreviousPosition[param_1][0] != 0) {
-            if (param_1 == 0x2b)
-                wsprintfA(CommandString, "play CD from %s %s",
-                          CDPreviousPosition[param_1], "notify" + (((cVar1 != 0) - 1) & 8));
-            else
-                wsprintfA(CommandString, "play CD from %s to %d %s",
-                          CDPreviousPosition[param_1], param_1 + 1,
-                          "notify" + (((cVar1 != 0) - 1) & 8));
-            if (cVar1 == 0)
-                local_2c = 0;
-            else
-                local_2c = ghWndMain;
-            nMCIError = mciSendStringA(CommandString,
-                                       lpszReturnString, 0xff, local_2c);
-            if (nMCIError != 0)
-                HandleMCIError(nMCIError, CommandString);
-        } else {
-            if (param_1 == 0x2b)
-                wsprintfA(CommandString, "play CD from %d %s",
-                          0x2b, "notify" + (((cVar1 != 0) - 1) & 8));
-            else
-                wsprintfA(CommandString, "play CD from %d to %d %s",
-                          param_1, param_1 + 1, "notify" + (((cVar1 != 0) - 1) & 8));
-            if (cVar1 == 0)
-                local_30 = 0;
-            else
-                local_30 = ghWndMain;
-            nMCIError = mciSendStringA(CommandString,
-                                       lpszReturnString, 0xff, local_30);
-            if (nMCIError != 0)
-                HandleMCIError(nMCIError, CommandString);
-        }
-        local_10 = KBTickCount();
-        CDPlaying = 1;
-        Process1WindowsMessage();
-        ServiceSound();
-        if (m_fadeSteps < 1) {
-            CDSetVolume(param_3, 0);
-        } else {
-            m_fadeSteps = 0xb;
-            lVar3 = KBTickCount();
-            gMusicFadeTimer = lVar3 + 0x1e0;
-            CDSetVolume(10, 0);
-        }
-        m_currentTrack = static_cast<char>(param_1);
-        }
-}
+// void soundManager::CDPlay(int, int, int, int);
 
 VA(0x004cc0c0, 0xf1)
 void soundManager::CDPoll(void)
@@ -343,37 +236,7 @@ soundManager::soundManager(void) : baseManager()
 }
 
 VA(0x004cc410, 0x14a)
-struct _DIG_DRIVER *WAVE_init_driver(unsigned long param_1, unsigned short param_2,
-                                     unsigned short param_3, unsigned short param_4)
-{
-    struct _DIG_DRIVER *local_40;
-    tagWAVEOUTCAPSA local_3c;
-    int local_8;
-    int local_44;
-    local_44 = waveOutGetNumDevs();
-    if (local_44 == 0) {
-        local_40 = 0;
-    } else if (waveOutGetDevCapsA(0, &local_3c, 0x34) != 0) {
-        MessageBoxA(hwndApp, "Sound initialization error!  No wave devices found.", "Startup Error", 0);
-        local_40 = 0;
-    } else {
-        if (gbUseWaveout != 0)
-            _AIL_set_preference_8(0xf, 1);
-        gWaveFormat.wFormatTag = 1;
-        gWaveFormat.nChannels = param_3;
-        gWaveFormat.nAvgBytesPerSec = (param_2 >> 3) * param_3 * param_1;
-        gWaveFormat.nBlockAlign = (param_2 >> 3) * param_3;
-        gWaveFormat.nSamplesPerSec = param_1;
-        gWaveFormat.wBitsPerSample = param_2;
-        local_8 = _AIL_waveOutOpen_16(&local_40, 0, 0, &gWaveFormat);
-        if (local_8 != 0) {
-            if (param_4 != 0)
-                MessageBoxA(hwndApp, _AIL_last_error_0(), "Sound initialization error!", 0);
-            local_40 = 0;
-        }
-    }
-    return local_40;
-}
+// struct _DIG_DRIVER *WAVE_init_driver(unsigned long, unsigned short, unsigned short, unsigned short);
 
 VA(0x004cc560, 0x3a8)
 int soundManager::Open(int param_1)
@@ -741,74 +604,7 @@ void soundManager::PlayAmbientMusic(int param_1, long param_2, int param_3)
 }
 
 VA(0x004cd320, 0x38f)
-void soundManager::PollSound(void)
-{
-    int iVar1;
-    long lVar2;
-    int local_8;
-    if (gbNoSound != 0)
-        return;
-    if (gCdMusic != 0)
-        CDPoll();
-    if (m_pollRequested == 0 && m_fadeSteps == 0)
-        return;
-    if (gMidiEnabled == 0)
-        return;
-        LogStr("Poll Sound 1");
-        if (m_fadeSteps > 0) {
-            LogStr("Poll Sound 1a");
-            Process1WindowsMessage();
-            if (m_currentTrack < 8 || 0xf < m_currentTrack)
-                gMusicFadeTimer = KBTickCount();
-            iVar1 = gMusicFadeTimer;
-            lVar2 = KBTickCount();
-            m_fadeSteps = (iVar1 - lVar2) / 0x3c;
-            if (m_fadeSteps < 1)
-                m_fadeSteps = 0;
-            LogStr("Poll Sound 1b");
-            if (m_fadeSteps < 0xb && m_currentTrack != m_fadeTargetTrack) {
-                if (m_midiFile == 0 || bSaveMusicPosition[m_currentTrack] == 0) {
-                    gMusicFadeTimer = KBTickCount();
-                } else if (gCdMusic == 0) {
-                    ProcessAssert(m_midiFile, __FILE__, __LINE__);
-                    m_savedTrackPositions[m_currentTrack] = ftell(reinterpret_cast<FILE *>(m_midiFile));
-                }
-                m_fading = 1;
-                if (bSaveMusicPosition[m_fadeTargetTrack] == 0)
-                    PlayAmbientMusic(m_fadeTargetTrack, 0, -1);
-                else
-                    PlayAmbientMusic(m_fadeTargetTrack, m_savedTrackPositions[m_fadeTargetTrack], -1);
-                iVar1 = gMusicFadeTimer;
-                lVar2 = KBTickCount();
-                m_fadeSteps = (iVar1 - lVar2) / 0x3c;
-                if (m_fadeSteps < 1)
-                    m_fadeSteps = 0;
-                m_currentTrack = static_cast<char>(m_fadeTargetTrack);
-            }
-            if (m_fadeSteps < 0xb)
-                local_8 = ((0xb - m_fadeSteps) * 0x40) / 0xb;
-            else
-                local_8 = ((m_fadeSteps - 10) * 0x40) / 6;
-            if (0x40 < local_8)
-                local_8 = 0x40;
-            if (local_8 < 0)
-                local_8 = 0;
-            LogStr("Poll Sound 1c");
-            if (gCdMusic == 0) {
-                MIDISetVolume();
-            } else {
-                local_8 = ((0xb - gMidiEnabled) * local_8 * 0x7f) / 0x280;
-                if (0x7f < local_8)
-                    local_8 = 0x7f;
-                if (local_8 < 0)
-                    local_8 = 0;
-                CDSetVolume(local_8, 1);
-            }
-            LogStr("Poll Sound 1d");
-        }
-        LogStr("Poll Sound 2");
-        m_pollRequested = 0;
-}
+// void soundManager::PollSound(void);
 
 VA(0x004cd6b0, 0x138)
 void soundManager::SwitchAmbientMusic(int param_1)
@@ -838,66 +634,7 @@ void soundManager::SwitchAmbientMusic(int param_1)
 }
 
 VA(0x004cd7f0, 0x28f)
-struct _SAMPLE *soundManager::MemorySample(class sample *param_1)
-{
-    int iVar1;
-    struct _SAMPLE *p_Var2;
-    int iVar4;
-    short local_10;
-    if (gbNoSound != 0)
-        return 0;
-    if (m_digitalDriver == 0)
-        return 0;
-    if (m_samplesReady == 0)
-        return 0;
-    if (gSampleVolume == 0)
-        return 0;
-    if (m_ready == 0 || param_1->m_volume == 0)
-        return 0;
-    LogStr("Memory Sample 1");
-            iVar1 = param_1->m_channelType;
-            iVar4 = iVar1 * 0xc;
-            local_10 = static_cast<short>(SCS[iVar1].startChannel);
-            while (local_10 < SCS[iVar1].endChannel &&
-                   _AIL_sample_status_4(m_sampleHandles[local_10]) != 2)
-                local_10++;
-            if (SCS[iVar1].endChannel == local_10) {
-                if (param_1->m_channelType == 4) {
-                    LogStr("Memory Sample 2a");
-                    return 0;
-                }
-                local_10 = static_cast<short>(SCS[iVar1].currentChannel);
-                SCS[iVar1].currentChannel++;
-                if (SCS[iVar1].endChannel <=
-                    SCS[iVar1].currentChannel) {
-                    SCS[iVar1].currentChannel =
-                        SCS[iVar1].startChannel;
-                    local_10 = static_cast<short>(SCS[iVar1].currentChannel);
-                }
-                StopSample(m_sampleHandles[local_10]);
-            }
-            p_Var2 = m_sampleHandles[local_10];
-            m_channelVolumes[local_10] = static_cast<char>(param_1->m_volume);
-            iLastVolume[local_10] = static_cast<short>(param_1->m_volume);
-            _AIL_init_sample_4(p_Var2);
-            _AIL_set_sample_type_12(p_Var2, param_1->m_format, 0);
-            _AIL_set_sample_playback_rate_8(p_Var2, param_1->m_sampleRate);
-            _AIL_set_sample_loop_count_8(p_Var2, param_1->m_loopCount);
-            _AIL_set_sample_address_12(p_Var2, reinterpret_cast<int>(param_1->m_data), param_1->m_size);
-            if (gSampleVolume == 0) {
-                _AIL_set_sample_volume_8(p_Var2, 0);
-            } else {
-                iVar4 = ConvertVolume(param_1->m_volume, 100);
-                _AIL_set_sample_volume_8(p_Var2, iVar4);
-            }
-            _AIL_start_sample_4(p_Var2);
-            param_1->m_activeSample = p_Var2;
-            m_channelSamples[local_10] = p_Var2;
-            m_sampleAddrLow[local_10] = reinterpret_cast<int>(param_1->m_data);
-            m_sampleAddrHigh[local_10] = param_1->m_size;
-            LogStr("Memory Sample 2b");
-    return p_Var2;
-}
+// struct _SAMPLE *soundManager::MemorySample(class sample *);
 
 VA(0x004cda80, 0x16)
 void soundManager::GetNumberCDDrives(void) {}
@@ -935,13 +672,13 @@ int soundManager::MusicPlaying(void)
 VTBL(soundManager, 0x004eba20);
 
 // ---- globals (definitions, RVA order) ----
-char *digitalDriverNames[14];
-SampleChannelStruct SCS[4];
-char CDPreviousPosition[60][15];
-int CDWaiting;
-int CDPlaying;
-int iCalibrateLoop;
-char lpszReturnString[0x100];
-unsigned long nMCIError;
-short iLastVolume[0x20];
-char CommandString[0x100];
+DATA(0x0051f018) char *digitalDriverNames[14];
+DATA(0x0051f050) SampleChannelStruct SCS[4];
+DATA(0x0051f080) char CDPreviousPosition[60][15];
+DATA(0x0051f404) int CDWaiting;
+DATA(0x0051f408) int CDPlaying;
+DATA(0x0051f40c) int iCalibrateLoop;
+DATA(0x00534980) char lpszReturnString[0x100];
+DATA(0x00534a80) unsigned long nMCIError;
+DATA(0x00534a88) short iLastVolume[0x20];
+DATA(0x00534ac8) char CommandString[0x100];

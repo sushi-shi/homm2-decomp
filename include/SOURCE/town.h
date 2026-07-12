@@ -41,6 +41,6 @@ public:
 };
 #pragma pack(pop)
 // ---- globals (declarations, RVA order) ----
-DATA(0x004f11b0) extern int bEnteringTown;
+extern int bEnteringTown;
 
 #endif // HOMM2_SOURCE_TOWN_H

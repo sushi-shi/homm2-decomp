@@ -9,6 +9,9 @@ sys.path.insert(0, "scripts")
 from homm2.build.gen_module_header import free_decls
 
 def fname(decl):
+    # __declspec(naked) etc. is a definition-only attribute (not part of the header
+    # declaration); strip it so the name regex doesn't grab "__declspec" as the fn name.
+    decl = re.sub(r'__declspec\s*\([^)]*\)', ' ', decl)
     return re.search(r'\b([A-Za-z_]\w*)\s*\(', decl).group(1)
 
 bad = []

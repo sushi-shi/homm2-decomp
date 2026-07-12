@@ -252,31 +252,31 @@ public:
 };
 #pragma pack(pop)
 // ---- globals (declarations, RVA order) ----
-DATA(0x004ed9e8) extern class heroWindow *overWin;
-DATA(0x004ed9ec) extern class textWidget **textWidgetDynamic;
-DATA(0x004ed9f0) extern class iconWidget **iconWidgetDynamic;
-DATA(0x004ed9f4) extern int giOverviewType;
-DATA(0x004ed9f8) extern int *giOverviewTop;
-DATA(0x004eda00) extern class iconWidget *OVScrollKnob;
-DATA(0x004ee248) extern int gbDoModemConfig;
-DATA(0x004f4f28) extern short trackXY[2][13][2];
-DATA(0x004f4f90) extern class heroWindow *campWin;
-DATA(0x0051cd20) extern int gbNewGameDialogOver;
-DATA(0x0051cd24) extern int NGKPcursorFlashOn;
-DATA(0x00523258) extern int iLastDynamicType;
-DATA(0x0052325c) extern int iLastDynamicTop;
-DATA(0x00523260) extern int iOverviewItems;
-DATA(0x00523268) extern int *giOverviewItems;
-DATA(0x00523270) extern class textWidget *textWidgetTitle[4];
-DATA(0x00527ea4) extern int iCurViewSide;
-DATA(0x00527ea8) extern int iCampaignTrackType;
-DATA(0x00527eac) extern int bCampaignViewOnly;
-DATA(0x00527eb0) extern int iCurViewMap;
-DATA(0x00533150) extern char *cNGKPDisplay;
-DATA(0x00533154) extern int gbNewGameShadowHidden;
-DATA(0x00533158) extern char *cNGKPCore;
-DATA(0x0053315c) extern int NGKPcursorIndex;
-DATA(0x00533160) extern char *cTextReceivedBuffer[3];
-DATA(0x0053316c) extern class icon *NGKPBkg;
+extern class heroWindow *overWin;
+extern class textWidget **textWidgetDynamic;
+extern class iconWidget **iconWidgetDynamic;
+extern int giOverviewType;
+extern int *giOverviewTop;
+extern class iconWidget *OVScrollKnob;
+extern int gbDoModemConfig;
+extern short trackXY[2][13][2];
+extern class heroWindow *campWin;
+extern int gbNewGameDialogOver;
+extern int NGKPcursorFlashOn;
+extern int iLastDynamicType;
+extern int iLastDynamicTop;
+extern int iOverviewItems;
+extern int *giOverviewItems;
+extern class textWidget *textWidgetTitle[4];
+extern int iCurViewSide;
+extern int iCampaignTrackType;
+extern int bCampaignViewOnly;
+extern int iCurViewMap;
+extern char *cNGKPDisplay;
+extern int gbNewGameShadowHidden;
+extern char *cNGKPCore;
+extern int NGKPcursorIndex;
+extern char *cTextReceivedBuffer[3];
+extern class icon *NGKPBkg;
 
 #endif // HOMM2_SOURCE_GAME_H

@@ -43,4 +43,4 @@ VA(0x004a5800, 0x100)
 void searchArray::PushCombatPoint(int, int, int, int) {}
 
 // ---- globals (definitions, RVA order) ----
-unsigned char *bIsMoatSlowed;
+DATA(0x0052adc8) unsigned char *bIsMoatSlowed;

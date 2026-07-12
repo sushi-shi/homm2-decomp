@@ -11,6 +11,6 @@ int CDTest_VerifyTrack(int);
 int CDTest_GenerateTable(char *);
 
 // ---- globals (declarations, RVA order) ----
-DATA(0x004f5188) extern struct sCDTest_Track_Data *cdTestTrackData;
+extern struct sCDTest_Track_Data *cdTestTrackData;
 
 #endif // HOMM2_X_CDTEST_H

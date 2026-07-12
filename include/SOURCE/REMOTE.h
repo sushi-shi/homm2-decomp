@@ -21,36 +21,36 @@ int TransmitAndWait(char *, int, int, signed char, signed char, char * *);
 
 
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
-DATA(0x0052a4fc) extern char gbUseDiffCompression;
-DATA(0x0052a500) extern char gbUseRegularCompression;
-DATA(0x0052a988) extern SNetPlayerInfo gsNetPlayerInfo[];
+extern char gbUseDiffCompression;
+extern char gbUseRegularCompression;
+extern SNetPlayerInfo gsNetPlayerInfo[];
 
 // ---- globals (declarations, RVA order) ----
-DATA(0x00516f60) extern int iInOrderCtr;
-DATA(0x00516f64) extern int iCurLastID;
-DATA(0x00516f68) extern int giLastConfirm;
-DATA(0x00516f6c) extern unsigned char GameMode;
-DATA(0x00516f70) extern long lLastHeartbeatSend;
-DATA(0x00516f74) extern int gbInRemoteMain;
-DATA(0x00516f78) extern int gbInRemoteCleanup;
-DATA(0x00516f7c) extern int iIDCtr;
-DATA(0x00516f80) extern int iTimesDropped;
-DATA(0x00516f84) extern signed char gbInNetSetup;
-DATA(0x00516f88) extern int bUseDirectPlay;
-DATA(0x00516f8c) extern int bUseWinsock;
-DATA(0x00516f90) extern signed char bInTimeoutFail;
-DATA(0x00516f98) extern int *iBaud;
-DATA(0x00516fb8) extern int *iIRQ;
-DATA(0x0052a268) extern char *rcvBufOut;
-DATA(0x0052a378) extern int *iLastIds;
-DATA(0x0052a3f0) extern char *PacketSend;
-DATA(0x0052a508) extern int *iInOrder;
-DATA(0x0052a730) extern char *sndBuf;
-DATA(0x0052a840) extern char *gcThisNetName;
-DATA(0x0052a860) extern long *lLastHeartbeatReceive;
-DATA(0x0052a878) extern char *packet;
-DATA(0x0052aa58) extern char *rcvBufIn;
-DATA(0x0052ab68) extern char *rcvBuf[138];
-DATA(0x0052ad90) extern int bGotGameType;
+extern int iInOrderCtr;
+extern int iCurLastID;
+extern int giLastConfirm;
+extern unsigned char GameMode;
+extern long lLastHeartbeatSend;
+extern int gbInRemoteMain;
+extern int gbInRemoteCleanup;
+extern int iIDCtr;
+extern int iTimesDropped;
+extern signed char gbInNetSetup;
+extern int bUseDirectPlay;
+extern int bUseWinsock;
+extern signed char bInTimeoutFail;
+extern int *iBaud;
+extern int *iIRQ;
+extern char *rcvBufOut;
+extern int *iLastIds;
+extern char *PacketSend;
+extern int *iInOrder;
+extern char *sndBuf;
+extern char *gcThisNetName;
+extern long *lLastHeartbeatReceive;
+extern char *packet;
+extern char *rcvBufIn;
+extern char *rcvBuf[138];
+extern int bGotGameType;
 
 #endif // HOMM2_REMOTE_H

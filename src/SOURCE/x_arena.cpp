@@ -15,6 +15,6 @@ VA(0x004c063b, 0x150)
 void UpdateArenaIcons(void) {}
 
 // ---- globals (definitions, RVA order) ----
-int choice;
-class iconWidget *skillWidget[3];
-class heroWindow *arenaWinPtr;
+DATA(0x005331a8) int choice;
+DATA(0x005331b0) class iconWidget *skillWidget[3];
+DATA(0x005331bc) class heroWindow *arenaWinPtr;

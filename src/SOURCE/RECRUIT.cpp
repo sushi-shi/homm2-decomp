@@ -40,4 +40,4 @@ void QuickViewRecruit(class town *, int) {}
 VTBL(recruitUnit, 0x004eb848);
 
 // ---- globals (definitions, RVA order) ----
-void *hmnuRecruitSave;
+DATA(0x00528578) void *hmnuRecruitSave;
