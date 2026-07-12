@@ -4,8 +4,10 @@
 // 8 methods, 0 own-virtual, 0 static data.
 #include <va.h>
 #include <BASE/resource.h>
-// forward declarations:
-struct SLimitData;
+struct SLimitData {
+    char data[0x20];
+};
+SIZE(SLimitData, 0x20);
 
 #pragma pack(push, 1)  // recovered layout is byte-packed
 // icon is an asset subclass of resource (slot-0 dtor override).
