@@ -68,7 +68,7 @@ void advManager::CompleteDraw(int, int, int, int) {}
 VA(0x0045b799, 0x3a)
 void advManager::CompleteDraw(int update)
 {
-    CompleteDraw(mapOriginX, mapOriginY, update, 1);
+    CompleteDraw(m_mapOriginX, m_mapOriginY, update, 1);
 }
 
 VA(0x0045b7d3, 0x3a9)
@@ -184,7 +184,7 @@ int advManager::ComboDraw(int, int, int) { return 0; }
 VA(0x00466656, 0x38)
 int advManager::ComboDraw(int update)
 {
-    return ComboDraw(mapOriginX, mapOriginY, update);
+    return ComboDraw(m_mapOriginX, m_mapOriginY, update);
 }
 
 VA(0x0046668e, 0x338)

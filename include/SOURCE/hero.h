@@ -30,14 +30,15 @@ public:
     char _pad_0x29[0x4];
     short  field_0x2d;  // +0x2d
     short  field_0x2f;  // +0x2f
-    char _pad_0x31[0x8];
+    int m_mobility;  // +0x31
+    int m_remainingMobility;  // +0x35
     int    field_0x39;  // +0x39
     short  field_0x3d;  // +0x3d
     char _pad_0x3f[0x2];
     char   field_0x41;  // +0x41
     char _pad_0x42[0x2];
-    char   field_0x44;  // +0x44
-    char   field_0x45;  // +0x45
+    signed char m_morale;  // +0x44
+    signed char m_luck;  // +0x45
     char _pad_0x46[0x1d];
     char   field_0x63;  // +0x63
     char   field_0x64;  // +0x64
@@ -49,8 +50,8 @@ public:
     char _pad_0x7c[0x14];
     int    field_0x90;  // +0x90
     char _pad_0x94[0x4f];
-    int    field_0xe3;  // +0xe3  !union: conflicting widths
-    // size >= 0xe7 (accessed lower bound; no ctor/stride oracle)
+    unsigned int m_eventFlags;  // +0xe3
+    char m_pad_0xe7[0x13];
     // --- constructors ---
     hero(void);
     // --- methods ---
@@ -89,6 +90,7 @@ public:
     void CheckAnduranPieces(int);
 };
 #pragma pack(pop)
+SIZE(hero, 250);
 // ---- globals (declarations, RVA order) ----
 extern class hero *gpHVHero;
 extern class heroWindow *gheroWin;

@@ -28,6 +28,7 @@ class soundManager;
 struct tag_message;
 struct tag_monsterInfo;
 struct tag_tilePoint;
+struct mapEventExtra;
 class town;
 class townManager;
 #include <_types.h>

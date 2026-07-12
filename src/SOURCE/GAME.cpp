@@ -820,7 +820,7 @@ EventExtra *GetMapEvent(int x, int y)
 {
     int i;
     for (i = 0; i < *(unsigned short *)((char *)gpGame + 0x657b); i++) {
-        EventExtra *ev = (EventExtra *)ppMapExtra[*(unsigned short *)((char *)gpGame + 0x657d + i * 2)];
+        EventExtra *ev = reinterpret_cast<EventExtra *>(ppMapExtra[*(unsigned short *)((char *)gpGame + 0x657d + i * 2)]);
         if (*(unsigned short *)((char *)ev + 0x26) == x &&
             *(unsigned short *)((char *)ev + 0x28) == y &&
             ((signed char *)ev)[0x25] != 0 &&
