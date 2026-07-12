@@ -1472,9 +1472,9 @@ SOURCE/wingraph	?WGUpdatePalette@@YIXPAC@Z	10.3840	9f0659bc1c16
 SOURCE/x_arena	?ArenaWindowHandler@@YIHAAUtag_message@@@Z	9.7746	04c63cb14292
 SOURCE/x_arena	?DoArenaDialog@@YIHXZ	5.2396	3de182c3bd91
 SOURCE/x_arena	?UpdateArenaIcons@@YIXXZ	11.7527	ad506427bed7
-SOURCE/x_cdtest	?CDTest_Cleanup@@YIXXZ	64.7059	c53f1b4f1904
-SOURCE/x_cdtest	?CDTest_GenerateTable@@YIHPAD@Z	5.7531	f083c156fc94
-SOURCE/x_cdtest	?CDTest_Init@@YIHXZ	60.0000	b47291495f16
-SOURCE/x_cdtest	?CDTest_VerifyCDQuick@@YIHXZ	71.2500	337cf01fe7ed
-SOURCE/x_cdtest	?CDTest_VerifyCDThorough@@YIHXZ	48.0000	0348bdc93273
-SOURCE/x_cdtest	?CDTest_VerifyTrack@@YIHH@Z	32.5116	74bc9e187754
+SOURCE/x_cdtest	?CDTest_Cleanup@@YIXXZ	100.0000	039192159cc0
+SOURCE/x_cdtest	?CDTest_GenerateTable@@YIHPAD@Z	100.0000	56ac090e88f1
+SOURCE/x_cdtest	?CDTest_Init@@YIHXZ	100.0000	f423c0afb724
+SOURCE/x_cdtest	?CDTest_VerifyCDQuick@@YIHXZ	100.0000	77b32b2a7a9f
+SOURCE/x_cdtest	?CDTest_VerifyCDThorough@@YIHXZ	100.0000	f9974ea1e275
+SOURCE/x_cdtest	?CDTest_VerifyTrack@@YIHH@Z	100.0000	d7b05c47bf0e
