@@ -162,6 +162,27 @@ typedef enum EventSoundVariant {
     EVENT_SOUND_VARIANT_6 = 6
 } EventSoundVariant;
 
+typedef enum EraseObjectConstant {
+    ERASE_NEIGHBOR_COUNT = 4,
+    ERASE_CELL_COUNT = 5,
+    ERASE_NO_FRAME = -1,
+    ERASE_EMPTY_INDEX = 0xff,
+    ERASE_CLEARED_TILESET = 47,
+    ERASE_MAP_CHANGE_OBJECT = 5,
+    ERASE_MAP_CHANGE_VALUE = -999,
+    ERASE_ENVIRONMENT_BORDER = 7
+} EraseObjectConstant;
+
+typedef enum EraseObjectTileset {
+    ERASE_TILESET_11 = 11,
+    ERASE_TILESET_46 = 46,
+    ERASE_TILESET_50 = 50,
+    ERASE_TILESET_55 = 55,
+    ERASE_TILESET_59 = 59,
+    ERASE_TILESET_62 = 62,
+    ERASE_TILESET_63 = 63
+} EraseObjectTileset;
+
 signed char StrEqNoCase(char *, char *);
 int GiveArtifact(class hero *, int, int, signed char);
 void GiveTakeArtifactStat(class hero *, int, int);

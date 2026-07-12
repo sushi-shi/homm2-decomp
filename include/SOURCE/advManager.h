@@ -8,6 +8,7 @@
 class armyGroup;
 class hero;
 class mapCell;
+class fullMap;
 class sample;
 class town;
 class heroWindow;
@@ -37,7 +38,7 @@ public:
     int    field_0xa2;  // +0xa2
     int    field_0xa6;  // +0xa6
     char _pad_0xaa[0x4];
-    int    field_0xae;  // +0xae
+    class fullMap *mapData;  // +0xae
     int    field_0xb2;  // +0xb2
     int    field_0xb6;  // +0xb6
     unsigned char *adventureBorder;  // +0xba

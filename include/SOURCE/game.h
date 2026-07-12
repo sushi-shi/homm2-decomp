@@ -3,6 +3,7 @@
 // Reconstructed class (SOURCE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // 114 methods, 0 own-virtual, 0 static data.
 #include <va.h>
+#include <EDITOR/fullMap.h>
 // forward declarations:
 class army;
 class armyGroup;
@@ -125,11 +126,7 @@ public:
     char _pad_0x548[0x2a9];
     char   field_0x7f1;  // +0x7f1
     char _pad_0x7f2[0x34c];
-    int    field_0xb3e;  // +0xb3e
-    int    field_0xb42;  // +0xb42
-    int    field_0xb46;  // +0xb46
-    int    field_0xb4a;  // +0xb4a
-    char _pad_0xb4e[0x4];
+    class fullMap worldMap;  // +0xb3e
     char   field_0xb52;  // +0xb52
     townSlot m_castleRecs[72];  // 0xb53  castle/town record slots (GetCastleRec)
     char _pad_0x2773[0x51];     // 0x2773..0x27c4

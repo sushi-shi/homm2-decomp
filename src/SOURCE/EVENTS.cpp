@@ -6,14 +6,192 @@
 #include <va.h>
 #include <string.h>
 #include <BASE/soundManager.h>
+#include <EDITOR/fullMap.h>
 #include <SOURCE/advManager.h>
+#include <SOURCE/CURSOR.h>
 #include <SOURCE/EVENTS.h>
+#include <SOURCE/game.h>
 #include <SOURCE/KB.h>
 VA(0x004a8530, 0x5adb)
 void advManager::DoEvent(class mapCell *, int, int) {}
 
+// @early-stop
+// reloc-masked: all 0x9f7 code bytes identical; residual is delinked local-label naming
 VA(0x004ae00b, 0x9f7)
-void advManager::EraseObj(class mapCell *, int, int) {}
+void advManager::EraseObj(class mapCell *cell, int x, int y)
+{
+    int erased_a = 0;
+    int frame_k = ERASE_NO_FRAME;
+    signed char isWide_d = 0;
+    mapCell *cells_h[ERASE_NEIGHBOR_COUNT];
+    mapCellExtra *extras_b[ERASE_NEIGHBOR_COUNT];
+    int i_e;
+    int cellX_b[2];
+    int cellY_e[2];
+    mapCell *currentCell_k;
+    mapCellExtra *extra_i;
+    volatile int changed_i;
+
+    for (i_e = 0; i_e < ERASE_NEIGHBOR_COUNT; i_e++) {
+        cells_h[i_e] = 0;
+        extras_b[i_e] = 0;
+    }
+
+    erased_a = 1;
+    if (cell->objTileset == ERASE_TILESET_11)
+        frame_k = cell->objIndex - 1;
+    if (cell->objTileset == ERASE_TILESET_63)
+        frame_k = cell->objIndex - 1;
+    if (cell->objTileset == ERASE_TILESET_62 && cell->objIndex == 9) {
+        frame_k = 9;
+        isWide_d = 1;
+    }
+    if (cell->objTileset == ERASE_TILESET_59 && cell->objIndex == 131)
+        frame_k = 124;
+    if (cell->objTileset == ERASE_TILESET_55 && cell->objIndex == 61)
+        frame_k = 54;
+    if (cell->objTileset == ERASE_TILESET_50 && cell->objIndex == 45)
+        frame_k = 38;
+    if (cell->objTileset == ERASE_TILESET_50 && cell->objIndex == 19)
+        frame_k = 12;
+    if (cell->objTileset == ERASE_TILESET_46) {
+        switch (cell->objIndex) {
+        case 1: frame_k = 0; break;
+        case 3: frame_k = 2; break;
+        case 5: frame_k = 4; break;
+        case 7: frame_k = 6; break;
+        case 9: frame_k = 8; break;
+        case 11: frame_k = 10; break;
+        case 13: frame_k = 12; break;
+        case 15: frame_k = 14; break;
+        case 19: frame_k = 18; break;
+        }
+    }
+
+    for (i_e = 0; i_e < ERASE_NEIGHBOR_COUNT; i_e++) {
+        if (isWide_d)
+            frame_k--;
+        else if (i_e > 0)
+            break;
+
+        if (frame_k != ERASE_NO_FRAME) {
+        if (isWide_d) {
+            if (frame_k > 6)
+                cellX_b[0] = frame_k - 9 + x;
+            else
+                cellX_b[0] = frame_k - 6 + x;
+            if (frame_k > 6)
+                cellY_e[0] = y;
+            else
+                cellY_e[0] = y - 1;
+        }
+        else {
+            cellX_b[0] = x - 1;
+            cellY_e[0] = y;
+        }
+
+        if (cellX_b[0] >= 0) {
+        if (cellY_e[0] >= 0) {
+        cells_h[i_e] = gpGame->worldMap.Row(cellY_e[0]) + cellX_b[0];
+        if (i_e > 1) {
+            cells_h[i_e]->ovlTileset = 0;
+            cells_h[i_e]->ovlIndex = ERASE_EMPTY_INDEX;
+        }
+        else if (cells_h[i_e]->objIndex != ERASE_EMPTY_INDEX) {
+        if (cells_h[i_e]->objIndex == frame_k && cells_h[i_e]->objTileset == cell->objTileset) {
+            cells_h[i_e]->objIndex = 0;
+            cells_h[i_e]->objTileset = ERASE_CLEARED_TILESET;
+            cells_h[i_e]->objFlag0 = 0;
+        }
+
+        if (cells_h[i_e]->extra && mapData->Extra(cells_h[i_e]->extra)->objIndex != ERASE_EMPTY_INDEX)
+            extras_b[i_e] = mapData->Extra(cells_h[i_e]->extra);
+        else
+            extras_b[i_e] = 0;
+
+        while (extras_b[i_e]) {
+            if (extras_b[i_e]->objIndex == frame_k && extras_b[i_e]->objTileset == cell->objTileset) {
+                extras_b[i_e]->objIndex = 0;
+                extras_b[i_e]->objTileset = ERASE_CLEARED_TILESET;
+                extras_b[i_e]->objFlag = 0;
+            }
+
+            if (extras_b[i_e]->index && mapData->Extra(extras_b[i_e]->index)->objIndex != ERASE_EMPTY_INDEX)
+                extras_b[i_e] = mapData->Extra(extras_b[i_e]->index);
+            else
+                extras_b[i_e] = 0;
+        }
+        }
+        }
+        }
+        }
+    }
+
+    cell->triggerType = 0;
+    cell->objIndex = 0;
+    cell->objTileset = ERASE_CLEARED_TILESET;
+    cell->objFlag0 = 0;
+
+    for (i_e = 0; i_e < ERASE_CELL_COUNT; i_e++) {
+        currentCell_k = i_e == 0 ? cell : cells_h[i_e - 1];
+        if (!currentCell_k)
+            continue;
+        if (currentCell_k->objTileset != ERASE_CLEARED_TILESET)
+            continue;
+
+        if (currentCell_k->extra && mapData->Extra(currentCell_k->extra)->objIndex != ERASE_EMPTY_INDEX)
+            extra_i = mapData->Extra(currentCell_k->extra);
+        else
+            continue;
+
+        if (extra_i->objTileset == ERASE_CLEARED_TILESET || extra_i->objIndex == ERASE_EMPTY_INDEX)
+            continue;
+
+            currentCell_k->objIndex = extra_i->objIndex;
+            currentCell_k->objTileset = extra_i->objTileset;
+            currentCell_k->objFlag0 = extra_i->objFlag;
+            currentCell_k->w4a = extra_i->f4a;
+            currentCell_k->w4b = extra_i->f4b;
+            extra_i->objIndex = 0;
+            extra_i->objTileset = ERASE_CLEARED_TILESET;
+            extra_i->objFlag = 0;
+    }
+
+    for (i_e = 0; i_e < ERASE_CELL_COUNT; i_e++) {
+        currentCell_k = i_e == 0 ? cell : cells_h[i_e - 1];
+        if (!currentCell_k)
+            continue;
+
+        if (currentCell_k->objTileset != ERASE_CLEARED_TILESET &&
+            currentCell_k->objIndex != ERASE_EMPTY_INDEX && !currentCell_k->w4b)
+            goto cellDone;
+
+        if (currentCell_k->extra && mapData->Extra(currentCell_k->extra)->objIndex != ERASE_EMPTY_INDEX)
+            extra_i = mapData->Extra(currentCell_k->extra);
+        else
+            extra_i = 0;
+
+        while (extra_i) {
+            if (extra_i->objTileset != ERASE_CLEARED_TILESET &&
+                extra_i->objIndex != ERASE_EMPTY_INDEX && !extra_i->f4b)
+                goto cellDone;
+
+            if (extra_i->index && mapData->Extra(extra_i->index)->objIndex != ERASE_EMPTY_INDEX)
+                extra_i = mapData->Extra(extra_i->index);
+            else
+                extra_i = 0;
+        }
+
+        currentCell_k->field8 |= 0x80;
+cellDone:
+        changed_i = 0;
+    }
+
+    SendMapChange(ERASE_MAP_CHANGE_OBJECT, 0, x, y, ERASE_MAP_CHANGE_VALUE, 0, 0);
+    SetEnvironmentOrigin(mapOriginX + ERASE_ENVIRONMENT_BORDER,
+                         mapOriginY + ERASE_ENVIRONMENT_BORDER, 1);
+    gpGame->SetupAdjacentMons();
+}
 
 VA(0x004aea02, 0x90)
 void advManager::HeroSwap(class hero *, class hero *) {}
