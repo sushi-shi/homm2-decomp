@@ -36,7 +36,7 @@ public:
     class heroWindow *adventureWindow;  // +0x9a
     int    field_0x9e;  // +0x9e
     int    field_0xa2;  // +0xa2
-    int    field_0xa6;  // +0xa6
+    unsigned char *m_currentTerrain;  // +0xa6
     char _pad_0xaa[0x4];
     class fullMap *m_mapData;  // +0xae
     int    field_0xb2;  // +0xb2
@@ -57,8 +57,8 @@ public:
     char _pad_0x16e[0x60];
     int    field_0x1ce;  // +0x1ce
     int    field_0x1d2;  // +0x1d2
-    int    mapOriginX;  // +0x1d6
-    int    mapOriginY;  // +0x1da
+    int    m_mapOriginX;  // +0x1d6
+    int    m_mapOriginY;  // +0x1da
     int    field_0x1de;  // +0x1de
     int    field_0x1e2;  // +0x1e2
     int    lastHoverCell;  // +0x1e6
