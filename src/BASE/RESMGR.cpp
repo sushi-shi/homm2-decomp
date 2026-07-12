@@ -194,15 +194,14 @@ class MIDIWrap *resourceManager::GetMIDIWrap(char *param_1)
 VA(0x004c86b0, 0x87)
 void resourceManager::Dispose(class resource *param_1)
 {
-    if (m_expunging != 0)
-        return;
-    if (param_1 == 0)
-        return;
-    param_1->m_refCount--;
-    if (param_1->m_refCount <= 0) {
-        RemoveResource(param_1);
-        if (param_1 != 0)
-            delete param_1;
+    if (m_expunging == 0) {
+        if (param_1 != 0) {
+            param_1->m_refCount--;
+            if (param_1->m_refCount <= 0) {
+                RemoveResource(param_1);
+                delete param_1;
+            }
+        }
     }
 }
 
@@ -378,29 +377,35 @@ unsigned long resourceManager::GetFileSize(unsigned long param_1)
 VA(0x004c8e20, 0x52)
 void resourceManager::SavePosition(void)
 {
-    lastPositionZ[gResPositionStackIdx] = _tell(m_aggregateFd[m_curAggregate]);
-    lastAggZ[gResPositionStackIdx] = m_curAggregate;
-    gResPositionStackIdx = gResPositionStackIdx + 1;
+    lastPositionZ[iSaveCtr] = _tell(m_aggregateFd[m_curAggregate]);
+    lastAggZ[iSaveCtr] = m_curAggregate;
+    iSaveCtr = iSaveCtr + 1;
 }
 
 VA(0x004c8e80, 0x53)
 void resourceManager::RestorePosition(void)
 {
-    gResPositionStackIdx = gResPositionStackIdx - 1;
-    m_curAggregate = lastAggZ[gResPositionStackIdx];
-    _lseek(m_aggregateFd[m_curAggregate], lastPositionZ[gResPositionStackIdx], 0);
+    iSaveCtr = iSaveCtr - 1;
+    m_curAggregate = lastAggZ[iSaveCtr];
+    _lseek(m_aggregateFd[m_curAggregate], lastPositionZ[iSaveCtr], 0);
 }
 
 VA(0x004c8ee0, 0x81)
 signed char resourceManager::ReadByte(void)
 {
     int iVar1;
+    int local_c;
+    int local_10;
     char local_8[4];
     ProcessAssert(m_aggregateFd[m_curAggregate] != -1, __FILE__, __LINE__);
     local_8[0] = 0;
     iVar1 = _read(m_aggregateFd[m_curAggregate], local_8, 1);
-    if (iVar1 == 0)
-        _errno();
+    if (iVar1 == 0) {
+        local_c = *_errno();
+        local_10 = 0;
+        local_10++;
+        local_10++;
+    }
     return local_8[0];
 }
 
@@ -408,12 +413,18 @@ VA(0x004c8f70, 0x84)
 short resourceManager::ReadWord(void)
 {
     int iVar1;
+    int local_c;
+    int local_10;
     short local_8[2];
     ProcessAssert(m_aggregateFd[m_curAggregate] != -1, __FILE__, __LINE__);
     local_8[0] = 0;
     iVar1 = _read(m_aggregateFd[m_curAggregate], local_8, 2);
-    if (iVar1 == 0)
-        _errno();
+    if (iVar1 == 0) {
+        local_c = *_errno();
+        local_10 = 0;
+        local_10++;
+        local_10++;
+    }
     return local_8[0];
 }
 
@@ -421,12 +432,18 @@ VA(0x004c9000, 0x84)
 long resourceManager::ReadLong(void)
 {
     int iVar1;
+    int local_c;
+    int local_10;
     long local_8;
     ProcessAssert(m_aggregateFd[m_curAggregate] != -1, __FILE__, __LINE__);
     local_8 = 0;
     iVar1 = _read(m_aggregateFd[m_curAggregate], &local_8, 4);
-    if (iVar1 == 0)
-        _errno();
+    if (iVar1 == 0) {
+        local_c = *_errno();
+        local_10 = 0;
+        local_10++;
+        local_10++;
+    }
     return local_8;
 }
 
@@ -478,6 +495,6 @@ void resourceManager::ReadBlock(signed char *param_1, unsigned long param_2)
 VTBL(resourceManager, 0x004eb9f0);
 
 // ---- globals (definitions, RVA order) ----
-int iSaveCtr;
-int lastAggZ[10];
-long lastPositionZ[12];
+DATA(0x0051e99c) int iSaveCtr;
+DATA(0x005331e8) int lastAggZ[10];
+DATA(0x00533210) long lastPositionZ[12];

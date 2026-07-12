@@ -133,4 +133,4 @@ VA(0x004b6e83, 0xb8)
 int RiddleStringsEqual(char *, char *) { return 0; }
 
 // ---- globals (definitions, RVA order) ----
-int gbNoShowCombat;
+DATA(0x0051cc0c) int gbNoShowCombat;

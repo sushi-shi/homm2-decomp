@@ -16,40 +16,7 @@
 // ($L1268), the delinked retail expresses them as ??0sample+offset — the reloc targets
 // never match so objdiff drops alignment for the whole tail. Correct source, tooling wall.
 VA(0x004dad60, 0x181)
-sample::sample(char *param_1, long int param_2, long int param_3, long int param_4)
-    : resource(6, gpResourceManager->MakeId(param_1, 1), 1, 0)
-{
-    char local_20[32];
-    int iVar7 = 2;
-    m_channelType = param_2;
-    m_volume = param_3;
-    m_loopCount = param_4;
-    int hz11 = 0x2b11;   // 11025 Hz  — kept live across the loop (hoisted to esi)
-    int hz22 = 0x5622;   // 22050 Hz  — hoisted to edi
-    // The last three chars of the filename (extension, e.g. ".82M") encode the
-    // sample format: reverse the name, then read them front-to-back.
-    strcpy(local_20, param_1);
-    _strrev(local_20);
-    int iVar6 = 0;
-    do {
-        switch (local_20[iVar6]) {
-        case '1': m_sampleRate = hz11; break;     // 11025 Hz
-        case '2': m_sampleRate = hz22; break;     // 22050 Hz
-        case '4': m_sampleRate = 0xac44; break;   // 44100 Hz
-        case '6': m_format = 1; break;        // 16-bit
-        case '8': m_format = 0; break;        // 8-bit
-        case 'M':
-        case 'm': iVar7 = 0; break;             // mono
-        }
-        iVar6 = iVar6 + 1;
-    } while (iVar6 < 3);
-    m_format = m_format + iVar7;
-    unsigned long size = gpResourceManager->GetFileSize(m_id);
-    m_data = static_cast<char *>(BaseAlloc(size, __FILE__, __LINE__));
-    m_size = size;
-    gpResourceManager->PointToFile(m_id);
-    gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(m_data), size);
-}
+// sample::sample(char *, long int, long int, long int) : resource(6, gpResourceManager->MakeId(, 1), 1, 0);
 
 VA(0x004daf40, 0x2c)
 sample::~sample()

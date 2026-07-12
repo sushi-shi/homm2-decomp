@@ -64,53 +64,7 @@ void executive::ShutDownSystem(void)
 }
 
 VA(0x004d1750, 0xfb)
-int executive::DoDialog(class baseManager *param_1)
-{
-    baseManager *aiStack_f0[20];
-    baseManager *auStack_a0[20];
-    baseManager *aiStack_50[20];
-    executive local_100;
-    int iVar5, iVar3;
-    baseManager *pmVar;
-    iVar5 = 0;
-    local_100.m_managerListHead = 0;
-    local_100.m_managerListTail = 0;
-    local_100.m_activeManager = 0;
-    local_100.field_0xc = 0;
-    pmVar = m_managerListHead;
-    if (pmVar != 0) {
-        iVar3 = 0;
-        do {
-            aiStack_f0[iVar3] = pmVar;
-            auStack_a0[iVar3] = pmVar->m_prev;
-            pmVar = pmVar->m_next;
-            aiStack_50[iVar3] = pmVar;
-            iVar3 = iVar3 + 1;
-            iVar5 = iVar5 + 1;
-        } while (pmVar != 0);
-    }
-    if (AddManager(param_1, -1) != 0)
-        ShutDown("Can't add manager!");
-    if (local_100.AddManager(gpMouseManager, -1) != 0)
-        ShutDown("Can't add manager!");
-    if (local_100.AddManager(gpWindowManager, -1) != 0)
-        ShutDown("Can't add manager!");
-    if (local_100.AddManager(param_1, -1) != 0)
-        ShutDown("Can't add manager!");
-    local_100.MainLoop();
-    RemoveManager(param_1);
-    if (0 < iVar5) {
-        iVar3 = 0;
-        do {
-            pmVar = aiStack_f0[iVar3];
-            pmVar->m_prev = auStack_a0[iVar3];
-            pmVar->m_next = aiStack_50[iVar3];
-            iVar3 = iVar3 + 1;
-            iVar5 = iVar5 - 1;
-        } while (iVar5 != 0);
-    }
-    return local_100.field_0xc;
-}
+// int executive::DoDialog(class baseManager *);
 
 VA(0x004d1850, 0x86)
 void executive::PrintManagerList(void)
@@ -219,47 +173,7 @@ void executive::CallManager(class baseManager *mgr)
 }
 
 VA(0x004d1a90, 0xfa)
-void executive::MainLoop(void)
-{
-    tag_message local_38;
-    int bVar2, bVar3, iVar5;
-    baseManager *phVar1;
-    bVar3 = 0;
-    if (m_managerListHead != 0) {
-        gpInputManager->Flush();
-        do {
-            Process1WindowsMessage();
-            local_38 = gpInputManager->GetEvent();
-            bVar2 = 1;
-            m_activeManager = m_managerListHead;
-            if (m_managerListHead == 0)
-                return;
-            while (bVar2) {
-                if (bVar3)
-                    return;
-                phVar1 = m_activeManager;
-                if (phVar1->m_active == 1 && (local_38.type != 4 || gpWindowManager != phVar1)) {
-                    iVar5 = phVar1->Main(local_38);
-                    if (iVar5 == 1) {
-                        bVar2 = 0;
-                    } else if (iVar5 == 2 && (local_38.type & 0x4000) != 0) {
-                        if (local_38.field4 == 1) {
-                            bVar3 = 1;
-                        } else if (local_38.field4 == 2) {
-                            RemoveManager(m_activeManager);
-                            m_activeManager = 0;
-                        } else if (local_38.field4 == 4) {
-                            field_0xc = reinterpret_cast<int>(local_38.text);
-                            bVar3 = 1;
-                        }
-                    }
-                }
-                if (m_activeManager == 0 || (m_activeManager = m_activeManager->m_next, m_activeManager == 0))
-                    break;
-            }
-        } while (!bVar3);
-    }
-}
+// void executive::MainLoop(void);
 
 VA(0x004d1b90, 0xa)
 void executive::Terminate(void)

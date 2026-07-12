@@ -51,23 +51,23 @@ VA(0x0040d4df, 0xff)
 void WriteModemPacket(char *, int) {}
 
 // ---- globals (definitions, RVA order) ----
-int iBaudBits;
-int inescape;
-int newpacket;
-int packetlen;
-char *idstr;
-int GUIMRc;
-int iModemCommandPos;
-int GUIMRrespptr;
-int localstage;
-char *numbuf;
-int WFDCStage;
-char *remoteidstr;
-int stime;
-char *cModemCommand;
-int iLastDialPos;
-int remotestage;
-char *GUIMRresp;
-int oldsec;
-int iLastActionTime;
-char *GUIMRresponse;
+DATA(0x004ede50) int iBaudBits;
+DATA(0x004ede54) int inescape;
+DATA(0x004ede58) int newpacket;
+DATA(0x004ede5c) int packetlen;
+DATA(0x00523280) char *idstr;
+DATA(0x00523288) int GUIMRc;
+DATA(0x0052328c) int iModemCommandPos;
+DATA(0x00523290) int GUIMRrespptr;
+DATA(0x00523294) int localstage;
+DATA(0x00523298) char *numbuf;
+DATA(0x005232bc) int WFDCStage;
+DATA(0x005232c0) char *remoteidstr;
+DATA(0x005232c8) int stime;
+DATA(0x005232d0) char *cModemCommand;
+DATA(0x005232f8) int iLastDialPos;
+DATA(0x005232fc) int remotestage;
+DATA(0x00523300) char *GUIMRresp;
+DATA(0x00523350) int oldsec;
+DATA(0x00524360) int iLastActionTime;
+DATA(0x00524368) char *GUIMRresponse;

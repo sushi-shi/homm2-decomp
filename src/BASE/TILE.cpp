@@ -22,14 +22,28 @@
 //     case 0x8000:  // horizontal flip: write each row right-to-left, byte by byte (lodsb)
 //     case 0xC000:  // 180-degree: both flips, source read backward with the direction flag (std)
 //   }
-// @early-stop 94%: body + all jumps byte-exact under /O2. Residual is one prologue byte — the retail
-// uses ebx but does NOT save it (hand-asm clobber), whereas MSVC 4.2 always emits `push ebx` for an
-// __asm that writes ebx (verified under C / C++ / /O2 / /Od). That extra push shifts every /O2
-// loop-alignment nop. Likely a compiler minor-version policy diff (NWC's toolchain vs our 4.2).
+// Byte-identical via __declspec(naked). The retail hand-asm clobbers ebx WITHOUT saving it (a
+// calling-convention violation NWC got away with), but MSVC 4.2's auto-prologue always emits
+// `push ebx` when an __asm writes ebx and appends a dead auto-epilogue — which capped the match at
+// 94%. naked lets us write the frame ourselves: prologue pushes esi/edi only (no ebx), and the sole
+// epilogue is the manual one at `epi`. The four `xchg ebx,ebx`/`nop` fillers before the loop/branch
+// entries (fwd, path_v, path_h, path_hv) are NWC's own loop-alignment pads — MSVC's inline assembler
+// won't synthesize them, so they must be emitted explicitly to reproduce retail's exact byte layout.
+
+
+
+// ---- module-private synthetic globals (retail xref: single-module) ----
+DATA(0x0051fec0) static unsigned int gTileMode;
+DATA(0x0051fec4) static int gTileRowCtr;
+
 VA(0x004d310c, 0x18f)
-extern "C" void __cdecl TileToBitmap(bitmap *src, unsigned int flags, bitmap *dst, int x, int y)
+extern "C" __declspec(naked) void __cdecl TileToBitmap(bitmap *src, unsigned int flags, bitmap *dst, int x, int y)
 {
     __asm {
+        push    ebp
+        mov     ebp, esp
+        push    esi
+        push    edi
         mov     edi, dst
         movzx   ebx, word ptr [edi+12h]
         mov     eax, y
@@ -60,6 +74,8 @@ extern "C" void __cdecl TileToBitmap(bitmap *src, unsigned int flags, bitmap *ds
         jne     path_v
         mov     eax, ecx
         shr     eax, 2
+        xchg    ebx, ebx
+        nop
     fwd:
         mov ecx, eax
         rep movsd
@@ -116,6 +132,7 @@ extern "C" void __cdecl TileToBitmap(bitmap *src, unsigned int flags, bitmap *ds
         pop     esi
         pop     ebp
         ret
+        xchg    ebx, ebx
     path_v:
         mov     eax, ecx
         dec     eax
@@ -133,6 +150,7 @@ extern "C" void __cdecl TileToBitmap(bitmap *src, unsigned int flags, bitmap *ds
         dec     dx
         jne     v_loop
         jmp     epi
+        nop
     path_h:
         mov     eax, gTileMode
         and     eax, 4000h
@@ -176,6 +194,7 @@ extern "C" void __cdecl TileToBitmap(bitmap *src, unsigned int flags, bitmap *ds
         dec     gTileRowCtr
         jne     h_outer
         jmp     epi
+        xchg    ebx, ebx
     path_hv:
         mov     eax, ecx
         mul     ecx

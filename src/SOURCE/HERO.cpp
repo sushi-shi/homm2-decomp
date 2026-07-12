@@ -130,8 +130,8 @@ VA(0x00470779, 0x12f)
 void hero::CheckAnduranPieces(int) {}
 
 // ---- globals (definitions, RVA order) ----
-class hero *gpHVHero;
-class heroWindow *gheroWin;
-short *gMinExpForLevel;
-int iOrigHeroViewID;
-int gbNoDismiss;
+DATA(0x004f6c88) class hero *gpHVHero;
+DATA(0x004f6c8c) class heroWindow *gheroWin;
+DATA(0x004f6cd0) short *gMinExpForLevel;
+DATA(0x005280dc) int iOrigHeroViewID;
+DATA(0x005280e0) int gbNoDismiss;

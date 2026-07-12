@@ -1,6 +1,5 @@
 #ifndef HOMM2_GLOBALS_MODEL_H
 #define HOMM2_GLOBALS_MODEL_H
-DATA(0x0051e99c) extern int gResPositionStackIdx; // resourceManager Save/RestorePosition stack depth
 #include <va.h>
 // Synthetic / MODELLING globals — readable aliases the matcher introduced for data that has
 // NO CodeView symbol of its own: overlay views of the monster-database region, and .rdata
@@ -18,18 +17,10 @@ DATA(0x004faeb8) extern SCreatureInfo gCreatureInfo[];   // monster-DB view (gam
 DATA(0x004faeb2) extern monsterRV gMonsterInfo[100];     // monster-DB view, 26B recs (philAI::ComputeUpgradeValue)
 // (gRVWeightOre/Merc/Crystal removed — they were just gafAITurnCostResource[2|1|4]; the code
 //  now indexes the array directly via the RES_* enum, which matches the retail byte-for-byte.)
-DATA(0x00533b40) extern POINT gMouseScreenPt;    // GetCursorPos scratch (mouseManager::MouseCoords)
-DATA(0x00533b48) extern POINT gMouseCheckPt;     // GetCursorPos scratch (mouseManager::CheckUpdateMousePos/ShowColorPointer)
 DATA(0x0051ef24) extern char gDefaultCursorName[]; // default cursor resource name (mouseManager::SetColorMice)
-DATA(0x0053496c) extern unsigned int gFadeSavedUpdate; // saved update flag across a fade (heroWindowManager::FadeScreen)
 DATA(0x00528dca) extern int gCdMusic; // CD-vs-MIDI music mode (dword-accessed) (soundManager::MusicPlaying)
 DATA(0x00528d28) extern int gMidiEnabled; // MIDI music volume 0-10 (0=off) (soundManager::MIDIIsPlaying/ConvertVolume)
 DATA(0x00528d2c) extern int gSampleVolume; // sample/CD music volume 0-10 (soundManager::ConvertVolume)
-DATA(0x00534970) extern WAVEFORMATEX gWaveFormat; // digital-driver PCM format (WAVE_init_driver)
-DATA(0x004ef4f8) extern HWND ghWndMain; // main window (WAVE_init_driver MessageBox owner)
-DATA(0x00528d00) extern long gMusicFadeTimer; // ambient-music fade deadline tick (soundManager::SwitchAmbientMusic)
-DATA(0x00528db6) extern char gMciErrorFlag; // MCI error latch (byte-accessed) (HandleMCIError)
-DATA(0x00528cf8) extern long gButtonRepeatTime; // button auto-repeat deadline tick (button::Select)
 
 
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
@@ -37,74 +28,21 @@ DATA(0x00528d38) extern int const_00128d38;            // 13-byte BSS flag buffe
 
 // TILE.cpp inline-asm scratch (no CodeView symbol): the blitter parks the mode word and a
 // mirror-path row counter in static storage between its __asm sections.
-DATA(0x0051fec0) extern unsigned int gTileMode;
-DATA(0x0051fec4) extern int gTileRowCtr;
 
 // bmap2.cpp FillBitmapArea file-static fill state (no CodeView symbol):
-DATA(0x005348f0) extern int gFillRow;
-DATA(0x005348f8) extern unsigned char *gFillPtr;
 // bmap2.cpp DimBitmapArea file-static dim state (no CodeView symbol):
-DATA(0x005348e8) extern int gDimRow;
-DATA(0x005348e4) extern int gDimCol;
-DATA(0x005348f4) extern unsigned char *gDimPtr;
-DATA(0x00534900) extern unsigned char *gDimNext;
 // Icon2b.cpp IconToBitmap RLE-decoder file-static state (no CodeView symbols) - the sprite blit
 // state machine shared by the Icon*2b* family. Base 0x534c20.
-DATA(0x00534c20) extern int gIcRow;
-DATA(0x00534c24) extern int gIcPitch;
-DATA(0x00534c28) extern unsigned char gIcColor;
-DATA(0x00534c2c) extern unsigned char *gIcDimPal;
-DATA(0x00534c30) extern unsigned int gIcRun;
-DATA(0x00534c34) extern unsigned int gIcCnt;
-DATA(0x00534c38) extern unsigned char *gIcSrc;
-DATA(0x00534c3c) extern unsigned char *gIcDimDst;
-DATA(0x00534c40) extern int gIcClipR;
-DATA(0x00534c44) extern int gIcClipB;
-DATA(0x00534c48) extern int gIcX0;
-DATA(0x00534c4c) extern unsigned int gIcDimLen;
-DATA(0x00534c50) extern int gIcY;
-DATA(0x00534c54) extern int gIcX;
-DATA(0x00534c58) extern unsigned char *gIcEntry;
-DATA(0x00534c5c) extern unsigned int gIcCnt2;
 // bmap2.cpp BlitBitmap file-static blit state (no CodeView symbol):
-DATA(0x005348ec) extern unsigned char *gBlitSrc;
-DATA(0x005348e0) extern unsigned char *gBlitDst;
-DATA(0x005348fc) extern int gBlitRow;
 
 // netwin.cpp netbios per-session status byte array (no CodeView symbol), indexed by session id.
 DATA(0x005173b4) extern char gNetStatus[];
 
 // netwin.cpp netbios probe state (no CodeView symbol): the LANA number netbios was found on,
 // and the "netbios present" flag, set by is_netbios_avail and read by nb_init.
-DATA(0x005173a0) extern unsigned char gNetbiosAvail;
-DATA(0x005173a4) extern unsigned char gNetbiosLana;
 
 // netwin.cpp netbios subsystem state (no CodeView symbols — file-scope statics in netwin.c).
 // Sizes are confirmed by the address tiling (NCB=0x40, CRITICAL_SECTION=0x18, buffers adjacent).
-DATA(0x005173a8) extern unsigned char gNbShutdown;         // shutdown flag, cleared by nb_init
-DATA(0x005173ac) extern unsigned char gNbMaxSess;          // max session count (nb_init param2)
-DATA(0x0051739c) extern int           gNbCallRetries;      // FUN_004a7fe9 retry counter (cap 0x14)
-DATA(0x005173b0) extern unsigned char gNbLocalNum;         // local netbios name number
-DATA(0x005173c0) extern char         *gNbGroupName;        // netbios group name ("Empire Too")
-DATA(0x005173c4) extern char         *gNbListenName;       // netbios listen/any name (nb_sess case 3)
-DATA(0x0052ae68) extern tag_Anchor    gNbFreeQueue;        // queue anchor (init_anchor)
-DATA(0x0052ae70) extern unsigned char gNbSessLsn[7];       // per-session LSN, 0xff = free slot
-DATA(0x0052ae78) extern unsigned char gNbRcvData[0x7000];  // receive data pool, init 0xff
-DATA(0x00531e78) extern unsigned char gNbNameBuf[0x70];    // name scratch, init 0
-DATA(0x00531ee8) extern unsigned char gNbSessBuf[0x1000];  // session scratch, init 0xff
-DATA(0x00532ee8) extern NCB           gNbSessNcb[7];        // per-session NCB
-DATA(0x005330a8) extern NCB           gNbCtlNcb;            // control NCB
-DATA(0x005330e8) extern tag_Anchor    gNbRcvQueue;         // receive queue (nb_rcv pops it)
-DATA(0x005330f0) extern tag_Anchor    gNbSndQueue;         // send queue
-DATA(0x005330f8) extern CRITICAL_SECTION gNbRcvLock;       // guards gNbRcvQueue
-DATA(0x00533110) extern HANDLE        gNbEvents[9];         // manual-reset events
-DATA(0x00533138) extern CRITICAL_SECTION gNbSndLock;       // guards gNbSndQueue
 
-DATA(0x004fbb30) extern int gBlitClipX;   // BlitBitmapToScreen full-screen clip origin x
-DATA(0x004fbb34) extern int gBlitClipY;   // BlitBitmapToScreen full-screen clip origin y
-DATA(0x005331cc) extern int gBlitRight;   // BlitBitmapToScreen computed blit-rect right edge
-DATA(0x005331d0) extern int gBlitBottom;  // BlitBitmapToScreen computed blit-rect bottom edge
-
-DATA(0x004fa648) extern class font *gDebugFont;  // ShowMemoryStatus debug text font
 
 #endif // HOMM2_GLOBALS_MODEL_H

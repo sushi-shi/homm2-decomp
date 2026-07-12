@@ -130,9 +130,9 @@ int CombatSystemOptionsHandler(struct tag_message &) { return 0; }
 VTBL(combatManager, 0x004eb898);
 
 // ---- globals (definitions, RVA order) ----
-int bInHighMoraleBonus;
-int giSeed;
-unsigned char *wallHex;
-int bMouseWasVis;
-class heroWindow *CSPanel;
-int bCPrefsChanged;
+DATA(0x004f8900) int bInHighMoraleBonus;
+DATA(0x004f8904) int giSeed;
+DATA(0x004f8c1c) unsigned char *wallHex;
+DATA(0x00528588) int bMouseWasVis;
+DATA(0x0052858c) class heroWindow *CSPanel;
+DATA(0x00528590) int bCPrefsChanged;

@@ -50,10 +50,10 @@ public:
 #pragma pack(pop)
 SIZE(fileRequester, 0x42f);
 // ---- globals (declarations, RVA order) ----
-DATA(0x004f8674) extern int giMapSizeFilter;
-DATA(0x004f88c4) extern char *cFRDummy;
-DATA(0x0052857c) extern float fGutterMinY;
-DATA(0x00528580) extern float fGutterTravelLength;
-DATA(0x00528584) extern int iMaxListSize;
+extern int giMapSizeFilter;
+extern char *cFRDummy;
+extern float fGutterMinY;
+extern float fGutterTravelLength;
+extern int iMaxListSize;
 
 #endif // HOMM2_SOURCE_FILEREQUESTER_H

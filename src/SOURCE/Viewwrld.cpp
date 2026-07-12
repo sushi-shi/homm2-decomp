@@ -22,20 +22,20 @@ VA(0x00434c1a, 0x5e2)
 int ViewWorldDialogHandler(struct tag_message &) { return 0; }
 
 // ---- globals (definitions, RVA order) ----
-signed char iVWHalf[3][6][2];
-int giViewWorldScale;
-int giViewWorldScaleLookup;
-int gbInViewWorld;
-class icon *pVWMisc;
-class icon *pVWLetters;
-int iVWYPixelOffset;
-class icon *pVWGround;
-int iVWViewableCells;
-class icon *pVWFlags;
-int iVWDrawAllTerrains;
-int iVWWhatToDraw;
-int iVWDrawAllObjs;
-int iVWMapOriginX;
-int iVWMapOriginY;
-int iVWCenterOffset;
-int iVWXPixelOffset;
+DATA(0x004f11b8) signed char iVWHalf[3][6][2];
+DATA(0x004f11dc) int giViewWorldScale;
+DATA(0x004f11e0) int giViewWorldScaleLookup;
+DATA(0x004f11e4) int gbInViewWorld;
+DATA(0x00525110) class icon *pVWMisc;
+DATA(0x00525114) class icon *pVWLetters;
+DATA(0x00525118) int iVWYPixelOffset;
+DATA(0x0052511c) class icon *pVWGround;
+DATA(0x00525120) int iVWViewableCells;
+DATA(0x00525124) class icon *pVWFlags;
+DATA(0x00525128) int iVWDrawAllTerrains;
+DATA(0x0052512c) int iVWWhatToDraw;
+DATA(0x00525130) int iVWDrawAllObjs;
+DATA(0x00525134) int iVWMapOriginX;
+DATA(0x00525138) int iVWMapOriginY;
+DATA(0x0052513c) int iVWCenterOffset;
+DATA(0x00525140) int iVWXPixelOffset;

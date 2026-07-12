@@ -13,6 +13,31 @@
 #include <BASE/Misc.h>
 #include <stdio.h>
 #include <_globals_model.h>
+
+
+
+// ---- module-private synthetic globals (retail xref: single-module) ----
+DATA(0x0051739c) static int           gNbCallRetries;      // FUN_004a7fe9 retry counter (cap 0x14)
+DATA(0x005173a0) static unsigned char gNetbiosAvail;
+DATA(0x005173a4) static unsigned char gNetbiosLana;
+DATA(0x005173a8) static unsigned char gNbShutdown;         // shutdown flag, cleared by nb_init
+DATA(0x005173ac) static unsigned char gNbMaxSess;          // max session count (nb_init param2)
+DATA(0x005173b0) static unsigned char gNbLocalNum;         // local netbios name number
+DATA(0x005173c0) static char         *gNbGroupName;        // netbios group name ("Empire Too")
+DATA(0x005173c4) static char         *gNbListenName;       // netbios listen/any name (nb_sess case 3)
+DATA(0x0052ae68) static tag_Anchor    gNbFreeQueue;        // queue anchor (init_anchor)
+DATA(0x0052ae70) static unsigned char gNbSessLsn[7];       // per-session LSN, 0xff = free slot
+DATA(0x0052ae78) static unsigned char gNbRcvData[0x7000];  // receive data pool, init 0xff
+DATA(0x00531e78) static unsigned char gNbNameBuf[0x70];    // name scratch, init 0
+DATA(0x00531ee8) static unsigned char gNbSessBuf[0x1000];  // session scratch, init 0xff
+DATA(0x00532ee8) static NCB           gNbSessNcb[7];        // per-session NCB
+DATA(0x005330a8) static NCB           gNbCtlNcb;            // control NCB
+DATA(0x005330e8) static tag_Anchor    gNbRcvQueue;         // receive queue (nb_rcv pops it)
+DATA(0x005330f0) static tag_Anchor    gNbSndQueue;         // send queue
+DATA(0x005330f8) static CRITICAL_SECTION gNbRcvLock;       // guards gNbRcvQueue
+DATA(0x00533110) static HANDLE        gNbEvents[9];         // manual-reset events
+DATA(0x00533138) static CRITICAL_SECTION gNbSndLock;       // guards gNbSndQueue
+
 VA(0x004a6be0, 0xa8)
 int is_netbios_avail(void)
 {

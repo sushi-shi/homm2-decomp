@@ -19,7 +19,60 @@ typedef unsigned int UInt32;   // crc32Table[]
 struct MemEntry;               // gpMemEntry — full def not yet reconstructed; used via pointer
 struct _SAMPLE;                // SAMPLE2::pMem — opaque
 
-struct configStruct { char pad[0x1a0]; };                                   // gConfig
+// gConfig — game/editor preferences (persisted to the registry; field names are the
+// retail registry value names, recovered from ReadPrefsFromRegistry/WritePrefsToRegistry).
+#pragma pack(push, 1)
+struct exeGfxConfig {          // per-exe window config (Main Game = [0], Editor = [1]); 28B, indexed giCurExe
+    int showMenu;              // +0x00  "<exe> Show Menu"
+    int x;                     // +0x04  "<exe> X"
+    int y;                     // +0x08  "<exe> Y"
+    int width;                 // +0x0c  "<exe> Width"
+    int height;                // +0x10  "<exe> Height"
+    int fullScreen;            // +0x14  "<exe> Full Screen"
+    int colorMouseCursor;      // +0x18  "<exe> Color Mouse Cursor"
+};
+struct configStruct {                    // gConfig, 0x1a0 bytes
+    int computerWalkSpeed;               // 0x00  "Computer Walk Speed"
+    int walkSpeed;                       // 0x04  "Walk Speed"
+    int musicVolume;                     // 0x08  "Music Volume"
+    int soundVolume;                     // 0x0c  "Sound Volume"
+    int autosave;                        // 0x10  "Autosave"
+    int showRoute;                       // 0x14  "Show Route"
+    int blackoutComputer;                // 0x18  "Blackout Computer"
+    exeGfxConfig gfx[2];                 // 0x1c "Main Game *", 0x38 "Editor *"
+    int firstMapOffset;                  // 0x54  "First Map Offset"
+    int currentMapOffset;                // 0x58  "Current Map Offset"
+    int showObjectBoxes;                 // 0x5c  "Show Object Boxes"
+    int editorScreenAnimation;           // 0x60  "Editor Screen Animation"
+    int editorPaletteCycling;            // 0x64  "Editor Palette Cycling"
+    int showCombatGrid;                  // 0x68  "Show Combat Grid"
+    int showCombatMouseHex;              // 0x6c  "Show Combat Mouse Hex"
+    int combatShadeLevel;                // 0x70  "Combat Shade Level"
+    int combatArmyInfoLevel;             // 0x74  "Combat Army Info Level"
+    int evilInterfaceUsage;              // 0x78  "Evil Interface Usage"
+    char autoLoadName[0xd];              // 0x7c  default "AUTO"
+    char autoSaveName[0x21];             // 0x89  default "AUTO"
+    int soundQuality;                    // 0xaa  "Sound Quality"
+    char modemInitString[0x64];          // 0xae  "Modem Init String"
+    int modemComPort;                    // 0x112 "Modem Com Port"
+    int directConnectComPort;            // 0x116 "Direct Connect Com Port"
+    int modemBaudRate;                   // 0x11a "Modem Baud Rate"
+    int directConnectBaudRate;           // 0x11e "Direct Connect Baud Rate"
+    char uniqueSystemID[4];              // 0x122 "Unique System ID" (map-file name prefix)
+    int useOpera;                        // 0x126 "Use Opera"
+    int quickCombatLevel;                // 0x12a "Quick Combat Level"
+    int combatSpeed;                     // 0x12e "Combat Speed"
+    int autoCombatUseSpells;             // 0x132 "Auto Combat Use Spells"
+    int slowVideo;                       // 0x136 "Slow Video"
+    char rmtRLName[0xd];                 // 0x13a "RMT<id>RL.BIN"
+    char rmtRCName[0xd];                 // 0x147 "RMT<id>RC.BIN"
+    char rmtRDName[0xd];                 // 0x154 "RMT<id>RD.BIN"
+    char rmtSLName[0xd];                 // 0x161 "RMT<id>SL.BIN"
+    char rmtSCName[0xd];                 // 0x16e "RMT<id>SC.BIN"
+    char rmtSDName[0xd];                 // 0x17b "RMT<id>SD.BIN"
+    char networkDefaultName[0x18];       // 0x188 "Network Default Name"
+};
+#pragma pack(pop)
 struct SCreatureInfo { unsigned short value; char pad[24]; };               // gCreatureInfo[]
 struct tag_tilePoint { signed char x; signed char _1; signed char y; signed char _3; };  // normalDirTable[]
 struct tag_monsterInfo { short m_0; char m_pad[24]; };                      // gMonsterDatabase[] (sizeof 26)

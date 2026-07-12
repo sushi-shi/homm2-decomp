@@ -59,70 +59,7 @@ textEntryWidget::~textEntryWidget()
 }
 
 VA(0x004d8920, 0x26c)
-void textEntryWidget::Read(int param_1)
-{
-    short sVar1;
-    unsigned short uVar2;
-    char local_10[16];
-    m_x = gpResourceManager->ReadWord();
-    m_y = gpResourceManager->ReadWord();
-    m_width = gpResourceManager->ReadWord();
-    m_height = gpResourceManager->ReadWord();
-    uVar2 = gpResourceManager->ReadWord();
-    m_maxLength = uVar2;
-    m_text = static_cast<char *>(BaseAlloc(uVar2 + 5, __FILE__, __LINE__));
-    gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(m_text), m_maxLength);
-    gpResourceManager->Read13(reinterpret_cast<signed char *>(local_10));
-    gpResourceManager->SavePosition();
-    m_font = gpResourceManager->GetFont(local_10);
-    gpResourceManager->RestorePosition();
-    uVar2 = gpResourceManager->ReadWord();
-    m_color = uVar2 & 0xff;
-    sVar1 = gpResourceManager->ReadWord();
-    field_0x2a = static_cast<char>(sVar1);
-    gpResourceManager->Read13(reinterpret_cast<signed char *>(local_10));
-    gpResourceManager->SavePosition();
-    m_icon = gpResourceManager->GetIcon(local_10);
-    gpResourceManager->RestorePosition();
-    field_0x49 = static_cast<short>(param_1);
-    if (param_1 == 2) {
-        m_rectX = gpResourceManager->ReadWord();
-        m_rectY = gpResourceManager->ReadWord();
-        m_rectW = gpResourceManager->ReadWord();
-        m_rectH = gpResourceManager->ReadWord();
-        field_0x45 = gpResourceManager->ReadWord();
-        m_hasInset = gpResourceManager->ReadWord();
-    } else {
-        m_rectX = m_x;
-        m_rectY = m_y;
-        m_rectW = m_width;
-        m_rectH = m_height;
-        field_0x45 = 1;
-        m_hasInset = 1;
-        if (param_1 != 3)
-            m_hasInset = 0;
-    }
-    if (param_1 == 4) {
-        m_innerX = m_x + 7;
-        m_innerY = m_y + 5;
-        m_innerW = m_width - 0xe;
-        m_innerH = m_height;
-    } else if (param_1 == 5) {
-        m_innerX = m_x + 7;
-        m_innerY = m_y + 4;
-        m_innerW = m_width - 0xe;
-        m_innerH = m_height;
-    } else {
-        m_innerX = m_x;
-        m_innerY = m_y;
-        m_innerW = m_width;
-        m_innerH = m_height;
-    }
-    field_0x2f = gpResourceManager->ReadWord();
-    m_id = gpResourceManager->ReadWord();
-    gpResourceManager->ReadWord();
-    field_0x14 = 0x4000;
-}
+// void textEntryWidget::Read(int);
 
 VA(0x004d8b90, 0x874)
 int textEntryWidget::Main(struct tag_message &) { return 0; }

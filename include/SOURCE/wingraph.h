@@ -40,30 +40,30 @@ int SetGraphicsType(int);
 
 
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
-DATA(0x004f1290) extern int giGraphicsType;
+extern int giGraphicsType;
 
 // ---- globals (declarations, RVA order) ----
-DATA(0x004f1288) extern int gbWinGAttached;
-DATA(0x004f128c) extern int gbDDrawAttached;
-DATA(0x004f1294) extern long Orientation;
-DATA(0x004f169c) extern void *lpInitWin;
-DATA(0x004f16a0) extern int bPaletteInitialized;
-DATA(0x004f16a4) extern int giTtlBlts;
-DATA(0x004f16a8) extern int gbWinGraphBusy;
+extern int gbWinGAttached;
+extern int gbDDrawAttached;
+extern long Orientation;
+extern void *lpInitWin;
+extern int bPaletteInitialized;
+extern int giTtlBlts;
+extern int gbWinGraphBusy;
 DATA(0x004f16ac) extern long (__stdcall *lpDirectDrawCreate)(struct _GUID *, struct IDirectDraw **, struct IUnknown *);
-DATA(0x004f16b0) extern struct IDirectDraw *lpDD;
-DATA(0x004f16b4) extern struct IDirectDrawSurface *lpDDSPrimary;
-DATA(0x004f16b8) extern struct IDirectDrawSurface *lpDDSOne;
-DATA(0x004f16bc) extern struct IDirectDrawClipper *lpClipper;
-DATA(0x004f16c0) extern struct IDirectDrawPalette *lpDDPal;
-DATA(0x004f17b0) extern int iBusyRetry;
-DATA(0x004f1a14) extern int bInDDSD;
-DATA(0x004f1e78) extern void *hdcImage;
-DATA(0x004f1e7c) extern void *gbmOldMonoBitmap;
-DATA(0x004f1e80) extern void *hpalApp;
-DATA(0x004f1f60) extern void *hWinGLibrary;
-DATA(0x004f1f64) extern void *hDDrawLibrary;
-DATA(0x004f2080) extern long lDelayRefresh;
-DATA(0x00525168) extern long lPaintStart;
+extern struct IDirectDraw *lpDD;
+extern struct IDirectDrawSurface *lpDDSPrimary;
+extern struct IDirectDrawSurface *lpDDSOne;
+extern struct IDirectDrawClipper *lpClipper;
+extern struct IDirectDrawPalette *lpDDPal;
+extern int iBusyRetry;
+extern int bInDDSD;
+extern void *hdcImage;
+extern void *gbmOldMonoBitmap;
+extern void *hpalApp;
+extern void *hWinGLibrary;
+extern void *hDDrawLibrary;
+extern long lDelayRefresh;
+extern long lPaintStart;
 
 #endif // HOMM2_WINGRAPH_H

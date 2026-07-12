@@ -28,14 +28,14 @@ VA(0x0040ab6c, 0x4fa)
 int game::ProcessIconSelect(int, int) { return 0; }
 
 // ---- globals (definitions, RVA order) ----
-class heroWindow *overWin;
-class textWidget **textWidgetDynamic;
-class iconWidget **iconWidgetDynamic;
-int giOverviewType;
-int *giOverviewTop;
-class iconWidget *OVScrollKnob;
-int iLastDynamicType;
-int iLastDynamicTop;
-int iOverviewItems;
-int *giOverviewItems;
-class textWidget *textWidgetTitle[4];
+DATA(0x004ed9e8) class heroWindow *overWin;
+DATA(0x004ed9ec) class textWidget **textWidgetDynamic;
+DATA(0x004ed9f0) class iconWidget **iconWidgetDynamic;
+DATA(0x004ed9f4) int giOverviewType;
+DATA(0x004ed9f8) int *giOverviewTop;
+DATA(0x004eda00) class iconWidget *OVScrollKnob;
+DATA(0x00523258) int iLastDynamicType;
+DATA(0x0052325c) int iLastDynamicTop;
+DATA(0x00523260) int iOverviewItems;
+DATA(0x00523268) int *giOverviewItems;
+DATA(0x00523270) class textWidget *textWidgetTitle[4];

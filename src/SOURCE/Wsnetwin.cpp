@@ -36,13 +36,13 @@ VA(0x00407746, 0x126)
 int wsWaitForHost(void) { return 0; }
 
 // ---- globals (definitions, RVA order) ----
-int bHostFound;
-unsigned int sd_dg;
-int iWSLastMsgNumHumanPlayers;
-int iWSAttempts;
-int iWSNextTickCount;
-int iWSWaitForHostStatus;
-int iRc;
-char *cWSTextBuffer;
-unsigned short wVer;
-int iAddrLen;
+DATA(0x004ed2ac) int bHostFound;
+DATA(0x004ed2b0) unsigned int sd_dg;
+DATA(0x004ed2b4) int iWSLastMsgNumHumanPlayers;
+DATA(0x004ed2b8) int iWSAttempts;
+DATA(0x004ed2bc) int iWSNextTickCount;
+DATA(0x004ed2c0) int iWSWaitForHostStatus;
+DATA(0x00522f88) int iRc;
+DATA(0x00522f90) char *cWSTextBuffer;
+DATA(0x005230a0) unsigned short wVer;
+DATA(0x00523250) int iAddrLen;

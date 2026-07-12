@@ -21,9 +21,9 @@ VA(0x00413738, 0x1ba)
 int nbnet_init(void) { return 0; }
 
 // ---- globals (definitions, RVA order) ----
-signed char iInitNetHostStatus;
-signed char iInitNetGuestStatus;
-int iNameRetryCount;
-signed char iWaitForHostStatus;
-signed char iWaitForGuestStatus;
-int iLastBroadcastTime;
+DATA(0x004ee5c8) signed char iInitNetHostStatus;
+DATA(0x004ee5cc) signed char iInitNetGuestStatus;
+DATA(0x004ee5d0) int iNameRetryCount;
+DATA(0x004ee614) signed char iWaitForHostStatus;
+DATA(0x004ee658) signed char iWaitForGuestStatus;
+DATA(0x004ee65c) int iLastBroadcastTime;

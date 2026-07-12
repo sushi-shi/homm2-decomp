@@ -77,8 +77,8 @@ public:
 #pragma pack(pop)
 SIZE(resourceManager, 0xa2);
 // ---- globals (declarations, RVA order) ----
-DATA(0x0051e99c) extern int iSaveCtr;
-DATA(0x005331e8) extern int lastAggZ[10];
-DATA(0x00533210) extern long lastPositionZ[12];
+extern int iSaveCtr;
+extern int lastAggZ[10];
+extern long lastPositionZ[12];
 
 #endif // HOMM2_BASE_RESOURCEMANAGER_H

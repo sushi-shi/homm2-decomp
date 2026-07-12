@@ -36,6 +36,6 @@ public:
 #pragma pack(pop)
 SIZE(button, 0x30);
 // ---- globals (declarations, RVA order) ----
-DATA(0x0052125c) extern int iLeftRightSave;
+extern int iLeftRightSave;
 
 #endif // HOMM2_BASE_BUTTON_H

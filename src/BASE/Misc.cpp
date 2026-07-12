@@ -29,125 +29,21 @@
 
 static int giFindMid;
 
+
+
+
+// ---- module-private synthetic globals (retail xref: single-module) ----
+DATA(0x005331cc) static int gBlitRight;   // BlitBitmapToScreen computed blit-rect right edge
+DATA(0x005331d0) static int gBlitBottom;  // BlitBitmapToScreen computed blit-rect bottom edge
+
 VA(0x004c3d10, 0x58)
-void InitMemEntry(void)
-{
-    LogInt((char *)"IME", iMemEntries, -999, -999, -999, -999, -999, -999);
-    gpMemEntry = (MemEntry *)malloc(0x24220);
-    int i = 0;
-    do {
-        i += 0x4a;
-        ((char *)gpMemEntry)[i - 0x4a] = 0;
-    } while (i < 0x24220);
-}
+// void InitMemEntry(void);
 
 VA(0x004c3d70, 0x20f)
-void *BaseAlloc(unsigned int param_1, char *param_2, int param_3)
-{
-    char local_2bc[200];
-    char local_1f4[500];
-    void *pvVar2;
-    if (param_1 == 0) {
-        pvVar2 = 0;
-    } else {
-        if (gpMemEntry == 0) {
-            LogInt("Memory tracking table allocated, entries", iMemEntries, -999, -999, -999, -999,
-                   -999, -999);
-            gpMemEntry = static_cast<MemEntry *>(malloc(0x24220));
-            for (int i = 0; i < 2000; i++)
-                gpMemEntry[i].used = 0;
-        }
-        giTotalMemAllocated = giTotalMemAllocated + param_1;
-        pvVar2 = malloc(param_1);
-        if (pvVar2 == 0) {
-            MemError();
-            pvVar2 = 0;
-        } else {
-            iMemEntries = iMemEntries + 1;
-            for (int i = 0; i < 2000; i++) {
-                if (gpMemEntry[i].used == 0) {
-                    gpMemEntry[i].used = 1;
-                    gpMemEntry[i].ptr = pvVar2;
-                    gpMemEntry[i].size = param_1;
-                    strcpy(gpMemEntry[i].file, param_2);
-                    gpMemEntry[i].line = param_3;
-                    i = 99999;
-                }
-            }
-            FILE *_File;
-            if (giDebugLevel == 4 &&
-                (sprintf(local_2bc, "KBAlloc    Size %d   Ptr %d   File %s  Line %d", param_1, pvVar2,
-                         param_2, param_3),
-                 1 < giDebugLevel) &&
-                (_File = fopen("KB.LOG", "a"), _File != 0)) {
-                strcpy(local_1f4, local_2bc);
-                strcat(local_1f4, "\n");
-                fputs(local_1f4, _File);
-                fclose(_File);
-                if (giDebugLevel == 4)
-                    OutputDebugStringA(local_1f4);
-            }
-        }
-    }
-    return pvVar2;
-}
+// void *BaseAlloc(unsigned int, char *, int);
 
 VA(0x004c3f80, 0x386)
-void BaseFree(void *param_1, char *param_2, int param_3)
-{
-    char local_2bc[500];
-    char local_c8[200];
-    if (gpMemEntry == 0) {
-        LogInt("Memory tracking table allocated, entries", iMemEntries, -999, -999, -999, -999, -999,
-               -999);
-        gpMemEntry = static_cast<MemEntry *>(malloc(0x24220));
-        for (int i = 0; i < 2000; i++)
-            gpMemEntry[i].used = 0;
-    }
-    if (giDebugLevel == 4)
-        LogInt("Free ", reinterpret_cast<int>(param_1), -999, -999, -999, -999, -999, -999);
-    if (param_1 == 0) {
-        if (1 < giDebugLevel) {
-            FILE *_File = fopen("KB.LOG", "a");
-            if (_File != 0) {
-                strcpy(local_2bc, "NULL POINTER");
-                strcat(local_2bc, "\n");
-                fputs(local_2bc, _File);
-                fclose(_File);
-                if (giDebugLevel == 4)
-                    OutputDebugStringA(local_2bc);
-            }
-        }
-    } else {
-        iMemEntries = iMemEntries - 1;
-        if (iMemEntries < 0)
-            LogInt("MemEntries Below 0", iMemEntries, -999, -999, -999, -999, -999, -999);
-        int iVar6 = 0;
-        do {
-            if (gpMemEntry[iVar6].ptr == param_1) {
-                FILE *_File;
-                if (giDebugLevel == 4 &&
-                    (sprintf(local_c8, "KBFree    Size %d   Ptr %d   File %s  Line %d",
-                             gpMemEntry[iVar6].size, param_1, gpMemEntry[iVar6].file,
-                             gpMemEntry[iVar6].line),
-                     1 < giDebugLevel) &&
-                    (_File = fopen("KB.LOG", "a"), _File != 0)) {
-                    strcpy(local_2bc, local_c8);
-                    strcat(local_2bc, "\n");
-                    fputs(local_2bc, _File);
-                    fclose(_File);
-                    if (giDebugLevel == 4)
-                        OutputDebugStringA(local_2bc);
-                }
-                gpMemEntry[iVar6].used = 0;
-                giTotalMemAllocated = giTotalMemAllocated - gpMemEntry[iVar6].size;
-                iVar6 = 99999;
-            }
-            iVar6 = iVar6 + 1;
-        } while (iVar6 < 2000);
-        free(param_1);
-    }
-}
+// void BaseFree(void *, char *, int);
 
 VA(0x004c4310, 0x134)
 void PrintMemoryLeaks(void)
@@ -185,7 +81,7 @@ void ShowMemoryStatus(void)
     int iVar1 = giDebugLevel;
     giDebugLevel = 9;
     FillBitmapArea(gpWindowManager->m_screen, 0, 0x1cc, 0x280, 0x14, 0);
-    gDebugFont->DrawBoundedString(gText, 0, 0x1d0, 0x280, 0x10, 1, 0);
+    smallFont->DrawBoundedString(gText, 0, 0x1d0, 0x280, 0x10, 1, 0);
     BlitBitmapToScreen(gpWindowManager->m_screen, 0, 0x1cc, 0x280, 0x14, 0, 0x1cc);
     giDebugLevel = iVar1;
 }
@@ -231,84 +127,10 @@ int FindIndex(struct indexArray *entries, int low, int high, int key)
 }
 
 VA(0x004c45e0, 0xea)
-void FadeIn(int param_1)
-{
-    palette *pal = new palette();
-    if (pal == 0)
-        MemError();
-    int done = 0;
-    int local_8 = param_1;
-    if (reinterpret_cast<int *>(&gConfig.pad[0x30])[giCurExe * 7] == 0)
-        local_8 = param_1 * 2;
-    memset(pal->m_data, 0, 0x300);
-    int iVar3 = 0;
-    do {
-        if (0x3f < iVar3) {
-            if (done) {
-                delete pal;
-                return;
-            }
-            iVar3 = 0x3f;
-        }
-        int local_4 = KBTickCount() + 0x14;
-        PollSound();
-        signed char *pcVar4;
-        if (iVar3 == 0x3f) {
-            done = 1;
-            pcVar4 = gpBufferPalette->m_data;
-        } else {
-            int iVar5 = 0;
-            do {
-                if (0x3f - iVar3 < static_cast<int>(gpBufferPalette->m_data[iVar5]))
-                    pal->m_data[iVar5] =
-                        gpBufferPalette->m_data[iVar5] - static_cast<char>(0x3f - iVar3);
-                iVar5++;
-            } while (iVar5 < 0x300);
-            pcVar4 = pal->m_data;
-        }
-        UpdatePalette(pcVar4);
-        DelayTil(&local_4);
-        iVar3 = iVar3 + local_8;
-    } while (1);
-}
+// void FadeIn(int);
 
 VA(0x004c46d0, 0xe6)
-void FadeOut(int param_1)
-{
-    palette *pal = new palette();
-    if (pal == 0)
-        MemError();
-    int bVar3 = 0;
-    memcpy(pal->m_data, gpBufferPalette->m_data, 0x300);
-    int iVar5 = 0;
-    do {
-        if (0x3f < iVar5) {
-            if (bVar3) {
-                delete pal;
-                return;
-            }
-            iVar5 = 0x3f;
-        }
-        int local_4 = KBTickCount() + 0x14;
-        PollSound();
-        if (iVar5 == 0x3f)
-            bVar3 = 1;
-        int iVar6 = 0;
-        do {
-            char cVar2 = pal->m_data[iVar6];
-            if (cVar2 > 0) {
-                if (static_cast<char>(param_1) < cVar2)
-                    pal->m_data[iVar6] = cVar2 - static_cast<char>(param_1);
-                else
-                    pal->m_data[iVar6] = 0;
-            }
-            iVar6++;
-        } while (iVar6 < 0x300);
-        iVar5 = iVar5 + param_1;
-        UpdatePalette(pal->m_data);
-        DelayTil(&local_4);
-    } while (1);
-}
+// void FadeOut(int);
 
 VA(0x004c47c0, 0x28)
 int Random(int low, int high)
@@ -377,28 +199,157 @@ char * FindLastToken(char *text, char token)
 }
 
 VA(0x004c4930, 0x6c)
-void SetInstallDefaults(void) {}
+void SetInstallDefaults(void)
+{
+    memset(&gConfig, 0, 0x19d);
+    strcpy(gConfig.autoLoadName, "AUTO");
+    strcpy(gConfig.autoSaveName, "AUTO");
+    gConfig.soundQuality = 1;
+}
 
 VA(0x004c49a0, 0x1b5)
 void SetGameDefaults(void) {}
 
 VA(0x004c4b60, 0x13f)
-void ReadPrefsFromFile(void) {}
+void ReadPrefsFromFile(void)
+{
+    sprintf(gText, "%s", "HEROES2.CFG");
+    if (_access(gText, 0) == -1) {
+        memset(&gConfig, 0, 0x19d);
+        strcpy(gConfig.autoLoadName, "AUTO");
+        strcpy(gConfig.autoSaveName, "AUTO");
+        gConfig.soundQuality = 1;
+    } else {
+        FILE *f = fopen(gText, "rb");
+        if (f == 0)
+            FileError(gText);
+        fread(&gConfig, 0x19d, 1, f);
+        fclose(f);
+        if (gConfig.autoSaveName[0xe] == 0)
+            goto skipDefaults;
+    }
+    SetGameDefaults();
+    UpdateSystemOptionsMenu();
+    WritePrefsToRegistry();
+skipDefaults:
+    strcpy(gcRegCDRomPath, "");
+    strcpy(gcRegAppPath, "");
+}
+
+// Byte counts the registry string values are written with (hard-coded in retail; not the
+// same as the in-struct buffer sizes).
+#define REG_MODEM_INIT_STRING_SIZE   0x62   // 98 bytes
+#define REG_UNIQUE_SYSTEM_ID_SIZE    4      // 4 bytes
+#define REG_NETWORK_DEFAULT_NAME_SIZE 0x1e  // 30 bytes
 
 VA(0x004c4ca0, 0x7ab)
-void ReadPrefsFromRegistry(void) {}
+void ReadPrefsFromRegistry(void)
+{
+    HKEY hKey;
+    unsigned long dwType;
+    unsigned long dwSize;
+    char szKey[100];
+    char szScratch[88];
+
+    strcpy(szScratch, "");
+    strcpy(szKey, "SOFTWARE\\New World Computing\\Heroes of Might and Magic 2\\1.0");
+    hKey = 0;
+    if (RegOpenKeyA(HKEY_LOCAL_MACHINE, szKey, &hKey) != 0)
+        return;
+    dwSize = 4;
+    if (RegQueryValueExA(hKey, "Music Volume", 0, &dwType,
+                         reinterpret_cast<unsigned char *>(&gConfig.musicVolume), &dwSize) != 0) {
+        memset(&gConfig, 0, 0x19d);
+        memset(&gConfig, 0, 0x19d);
+        strcpy(gConfig.autoLoadName, "AUTO");
+        strcpy(gConfig.autoSaveName, "AUTO");
+        gConfig.soundQuality = 1;
+        SetGameDefaults();
+        RegCloseKey(hKey);
+        UpdateSystemOptionsMenu();
+        WritePrefsToRegistry();
+        return;
+    }
+    RegQueryValueExA(hKey, "Music Volume", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.musicVolume), &dwSize);
+    RegQueryValueExA(hKey, "Sound Volume", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.soundVolume), &dwSize);
+    RegQueryValueExA(hKey, "Walk Speed", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.walkSpeed), &dwSize);
+    RegQueryValueExA(hKey, "Computer Walk Speed", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.computerWalkSpeed), &dwSize);
+    RegQueryValueExA(hKey, "Show Route", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.showRoute), &dwSize);
+    RegQueryValueExA(hKey, "Blackout Computer", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.blackoutComputer), &dwSize);
+    RegQueryValueExA(hKey, "Sound Quality", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.soundQuality), &dwSize);
+    RegQueryValueExA(hKey, "Use Opera", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.useOpera), &dwSize);
+    RegQueryValueExA(hKey, "Direct Connect Com Port", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.directConnectComPort), &dwSize);
+    RegQueryValueExA(hKey, "Direct Connect Baud Rate", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.directConnectBaudRate), &dwSize);
+    RegQueryValueExA(hKey, "Modem Com Port", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.modemComPort), &dwSize);
+    RegQueryValueExA(hKey, "Modem Baud Rate", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.modemBaudRate), &dwSize);
+    dwSize = 0x63;
+    RegQueryValueExA(hKey, "Modem Init String", 0, &dwType, reinterpret_cast<unsigned char *>(gConfig.modemInitString), &dwSize);
+    dwSize = 4;
+    RegQueryValueExA(hKey, "Unique System ID", 0, &dwType, reinterpret_cast<unsigned char *>(gConfig.uniqueSystemID), &dwSize);
+    dwSize = 0x1f;
+    RegQueryValueExA(hKey, "Network Default Name", 0, &dwType, reinterpret_cast<unsigned char *>(gConfig.networkDefaultName), &dwSize);
+    dwSize = 4;
+    RegQueryValueExA(hKey, "Autosave", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.autosave), &dwSize);
+    RegQueryValueExA(hKey, "Slow Video", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.slowVideo), &dwSize);
+    RegQueryValueExA(hKey, "Show Combat Grid", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.showCombatGrid), &dwSize);
+    RegQueryValueExA(hKey, "Show Combat Mouse Hex", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.showCombatMouseHex), &dwSize);
+    RegQueryValueExA(hKey, "Combat Shade Level", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.combatShadeLevel), &dwSize);
+    RegQueryValueExA(hKey, "Combat Army Info Level", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.combatArmyInfoLevel), &dwSize);
+    RegQueryValueExA(hKey, "Evil Interface Usage", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.evilInterfaceUsage), &dwSize);
+    RegQueryValueExA(hKey, "Quick Combat Level", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.quickCombatLevel), &dwSize);
+    RegQueryValueExA(hKey, "Combat Speed", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.combatSpeed), &dwSize);
+    RegQueryValueExA(hKey, "Auto Combat Use Spells", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.autoCombatUseSpells), &dwSize);
+    RegQueryValueExA(hKey, "First Map Offset", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.firstMapOffset), &dwSize);
+    RegQueryValueExA(hKey, "Current Map Offset", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.currentMapOffset), &dwSize);
+    RegQueryValueExA(hKey, "Show Object Boxes", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.showObjectBoxes), &dwSize);
+    RegQueryValueExA(hKey, "Editor Screen Animation", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.editorScreenAnimation), &dwSize);
+    RegQueryValueExA(hKey, "Editor Palette Cycling", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.editorPaletteCycling), &dwSize);
+    RegQueryValueExA(hKey, "Main Game Show Menu", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].showMenu), &dwSize);
+    RegQueryValueExA(hKey, "Main Game X", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].x), &dwSize);
+    RegQueryValueExA(hKey, "Main Game Y", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].y), &dwSize);
+    RegQueryValueExA(hKey, "Main Game Width", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].width), &dwSize);
+    RegQueryValueExA(hKey, "Main Game Height", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].height), &dwSize);
+    RegQueryValueExA(hKey, "Main Game Full Screen", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].fullScreen), &dwSize);
+    RegQueryValueExA(hKey, "Main Game Color Mouse Cursor", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].colorMouseCursor), &dwSize);
+    RegQueryValueExA(hKey, "Editor Show Menu", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].showMenu), &dwSize);
+    RegQueryValueExA(hKey, "Editor X", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].x), &dwSize);
+    RegQueryValueExA(hKey, "Editor Y", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].y), &dwSize);
+    RegQueryValueExA(hKey, "Editor Width", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].width), &dwSize);
+    RegQueryValueExA(hKey, "Editor Height", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].height), &dwSize);
+    RegQueryValueExA(hKey, "Editor Full Screen", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].fullScreen), &dwSize);
+    RegQueryValueExA(hKey, "Editor Color Mouse Cursor", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].colorMouseCursor), &dwSize);
+    dwSize = 0x63;
+    if (RegQueryValueExA(hKey, "AppPath", 0, &dwType, reinterpret_cast<unsigned char *>(gcRegAppPath), &dwSize) != 0)
+        strcpy(gcRegAppPath, "");
+    if (RegQueryValueExA(hKey, "CDDrive", 0, &dwType, reinterpret_cast<unsigned char *>(gcRegCDRomPath), &dwSize) != 0)
+        strcpy(gcRegCDRomPath, "");
+    RegCloseKey(hKey);
+    // Clamp the saved window geometry to sane defaults / on-screen bounds.
+    if (gConfig.gfx[giCurExe].width <= 0)
+        gConfig.gfx[giCurExe].width = 0x140;            // default 320 wide
+    if (gConfig.gfx[giCurExe].height <= 0)
+        gConfig.gfx[giCurExe].height = 0xf0;            // default 240 tall
+    if (gConfig.gfx[giCurExe].x < 0)
+        gConfig.gfx[giCurExe].x = 0;
+    if (gConfig.gfx[giCurExe].x > giMainVideoModeHeight - 0xc8)   // keep >= 200px on-screen
+        gConfig.gfx[giCurExe].x = giMainVideoModeHeight - 0xc8;
+    if (gConfig.gfx[giCurExe].y < 0)
+        gConfig.gfx[giCurExe].y = 0;
+    if (gConfig.gfx[giCurExe].y > giMainVideoModeWidth - 0xc8)
+        gConfig.gfx[giCurExe].y = giMainVideoModeWidth - 0xc8;
+}
 
 VA(0x004c5450, 0xa1)
 void ReadPrefs(void)
 {
     memset(&gConfig, 0, 0x19d);
     ReadPrefsFromRegistry();
-    sprintf(&gConfig.pad[0x13a], "RMT%sRL.BIN", &gConfig.pad[0x122]);
-    sprintf(&gConfig.pad[0x147], "RMT%sRC.BIN", &gConfig.pad[0x122]);
-    sprintf(&gConfig.pad[0x154], "RMT%sRD.BIN", &gConfig.pad[0x122]);
-    sprintf(&gConfig.pad[0x161], "RMT%sSL.BIN", &gConfig.pad[0x122]);
-    sprintf(&gConfig.pad[0x16e], "RMT%sSC.BIN", &gConfig.pad[0x122]);
-    sprintf(&gConfig.pad[0x17b], "RMT%sSD.BIN", &gConfig.pad[0x122]);
+    sprintf(gConfig.rmtRLName, "RMT%sRL.BIN", gConfig.uniqueSystemID);
+    sprintf(gConfig.rmtRCName, "RMT%sRC.BIN", gConfig.uniqueSystemID);
+    sprintf(gConfig.rmtRDName, "RMT%sRD.BIN", gConfig.uniqueSystemID);
+    sprintf(gConfig.rmtSLName, "RMT%sSL.BIN", gConfig.uniqueSystemID);
+    sprintf(gConfig.rmtSCName, "RMT%sSC.BIN", gConfig.uniqueSystemID);
+    sprintf(gConfig.rmtSDName, "RMT%sSD.BIN", gConfig.uniqueSystemID);
 }
 
 VA(0x004c5500, 0x6a)
@@ -420,7 +371,63 @@ void WritePrefsToFile(void)
 }
 
 VA(0x004c5570, 0x491)
-void WritePrefsToRegistry(void) {}
+void WritePrefsToRegistry(void)
+{
+    HKEY hKey;
+    char szKey[100];
+    char szScratch[88];
+
+    strcpy(szScratch, "");
+    strcpy(szKey, "SOFTWARE\\New World Computing\\Heroes of Might and Magic 2\\1.0");
+    hKey = 0;
+    if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, szKey, 0, KEY_ALL_ACCESS, &hKey) != 0)
+        return;
+    RegSetValueExA(hKey, "Music Volume", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.musicVolume), 4);
+    RegSetValueExA(hKey, "Sound Volume", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.soundVolume), 4);
+    RegSetValueExA(hKey, "Walk Speed", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.walkSpeed), 4);
+    RegSetValueExA(hKey, "Computer Walk Speed", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.computerWalkSpeed), 4);
+    RegSetValueExA(hKey, "Show Route", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.showRoute), 4);
+    RegSetValueExA(hKey, "Blackout Computer", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.blackoutComputer), 4);
+    RegSetValueExA(hKey, "Sound Quality", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.soundQuality), 4);
+    RegSetValueExA(hKey, "Use Opera", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.useOpera), 4);
+    RegSetValueExA(hKey, "Direct Connect Com Port", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.directConnectComPort), 4);
+    RegSetValueExA(hKey, "Direct Connect Baud Rate", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.directConnectBaudRate), 4);
+    RegSetValueExA(hKey, "Modem Com Port", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.modemComPort), 4);
+    RegSetValueExA(hKey, "Modem Baud Rate", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.modemBaudRate), 4);
+    RegSetValueExA(hKey, "Modem Init String", 0, REG_SZ, reinterpret_cast<unsigned char *>(gConfig.modemInitString), REG_MODEM_INIT_STRING_SIZE);
+    RegSetValueExA(hKey, "Unique System ID", 0, REG_SZ, reinterpret_cast<unsigned char *>(gConfig.uniqueSystemID), REG_UNIQUE_SYSTEM_ID_SIZE);
+    RegSetValueExA(hKey, "Network Default Name", 0, REG_SZ, reinterpret_cast<unsigned char *>(gConfig.networkDefaultName), REG_NETWORK_DEFAULT_NAME_SIZE);
+    RegSetValueExA(hKey, "Autosave", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.autosave), 4);
+    RegSetValueExA(hKey, "Slow Video", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.slowVideo), 4);
+    RegSetValueExA(hKey, "Show Combat Grid", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.showCombatGrid), 4);
+    RegSetValueExA(hKey, "Show Combat Mouse Hex", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.showCombatMouseHex), 4);
+    RegSetValueExA(hKey, "Combat Shade Level", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.combatShadeLevel), 4);
+    RegSetValueExA(hKey, "Combat Army Info Level", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.combatArmyInfoLevel), 4);
+    RegSetValueExA(hKey, "Evil Interface Usage", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.evilInterfaceUsage), 4);
+    RegSetValueExA(hKey, "Quick Combat Level", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.quickCombatLevel), 4);
+    RegSetValueExA(hKey, "Combat Speed", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.combatSpeed), 4);
+    RegSetValueExA(hKey, "Auto Combat Use Spells", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.autoCombatUseSpells), 4);
+    RegSetValueExA(hKey, "First Map Offset", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.firstMapOffset), 4);
+    RegSetValueExA(hKey, "Current Map Offset", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.currentMapOffset), 4);
+    RegSetValueExA(hKey, "Show Object Boxes", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.showObjectBoxes), 4);
+    RegSetValueExA(hKey, "Editor Screen Animation", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.editorScreenAnimation), 4);
+    RegSetValueExA(hKey, "Editor Palette Cycling", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.editorPaletteCycling), 4);
+    RegSetValueExA(hKey, "Main Game Show Menu", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].showMenu), 4);
+    RegSetValueExA(hKey, "Main Game X", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].x), 4);
+    RegSetValueExA(hKey, "Main Game Y", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].y), 4);
+    RegSetValueExA(hKey, "Main Game Width", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].width), 4);
+    RegSetValueExA(hKey, "Main Game Height", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].height), 4);
+    RegSetValueExA(hKey, "Main Game Full Screen", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].fullScreen), 4);
+    RegSetValueExA(hKey, "Main Game Color Mouse Cursor", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].colorMouseCursor), 4);
+    RegSetValueExA(hKey, "Editor Show Menu", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].showMenu), 4);
+    RegSetValueExA(hKey, "Editor X", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].x), 4);
+    RegSetValueExA(hKey, "Editor Y", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].y), 4);
+    RegSetValueExA(hKey, "Editor Width", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].width), 4);
+    RegSetValueExA(hKey, "Editor Height", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].height), 4);
+    RegSetValueExA(hKey, "Editor Full Screen", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].fullScreen), 4);
+    RegSetValueExA(hKey, "Editor Color Mouse Cursor", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].colorMouseCursor), 4);
+    RegCloseKey(hKey);
+}
 
 VA(0x004c5a10, 0xa)
 void WritePrefs(void)
@@ -471,24 +478,24 @@ void BlitBitmapToScreen(class bitmap *param_1, int param_2, int param_3, int par
                                param_6, param_7);
         return;
     }
-    if (gBlitClipX != 0 || (local_8 = param_2, gBlitClipY != 0)) {
+    if (giScrollX != 0 || (local_8 = param_2, giScrollY != 0)) {
         param_4 = 0x1c0;
-        local_8 = gBlitClipX + 0x10;
-        param_3 = gBlitClipY + 0x10;
+        local_8 = giScrollX + 0x10;
+        param_3 = giScrollY + 0x10;
         param_5 = 0x1c0;
     }
     gBlitRight = param_4 + param_6 - 1;
     gBlitBottom = param_5 + param_7 - 1;
-    if (gpMouseManager->IsVis() != 0 && gpMouseManager->field_0x5e <= gBlitRight &&
-        param_6 <= gpMouseManager->field_0x6e && gpMouseManager->field_0x62 <= gBlitBottom &&
+    if (gpMouseManager->IsVis() != 0 && gpMouseManager->m_savedW <= gBlitRight &&
+        param_6 <= gpMouseManager->field_0x6e && gpMouseManager->m_savedH <= gBlitBottom &&
         param_7 <= gpMouseManager->field_0x72) {
         gpMouseManager->SaveAndDraw();
         BlitBitmapToScreenVesa(reinterpret_cast<int>(param_1), local_8, param_3, param_4, param_5,
                                param_6, param_7);
-        if (gBlitRight < gpMouseManager->field_0x6e || gpMouseManager->field_0x5e < param_6 ||
-            gBlitBottom < gpMouseManager->field_0x72 || gpMouseManager->field_0x62 < param_7) {
-            int iVar1 = gpMouseManager->field_0x62;
-            int iVar2 = gpMouseManager->field_0x5e;
+        if (gBlitRight < gpMouseManager->field_0x6e || gpMouseManager->m_savedW < param_6 ||
+            gBlitBottom < gpMouseManager->field_0x72 || gpMouseManager->m_savedH < param_7) {
+            int iVar1 = gpMouseManager->m_savedH;
+            int iVar2 = gpMouseManager->m_savedW;
             BlitBitmapToScreenVesa(reinterpret_cast<int>(param_1), iVar2, iVar1,
                                    gpMouseManager->field_0x6e - iVar2 + 1,
                                    gpMouseManager->field_0x72 - iVar1 + 1, iVar2, iVar1);
@@ -531,51 +538,7 @@ void LogStr(char *param_1)
 }
 
 VA(0x004c61c0, 0x224)
-void LogInt(char *param_1, int param_2, int param_3, int param_4, int param_5, int param_6,
-            int param_7, int param_8)
-{
-    char local_2bc[200];
-    char local_1f4[500];
-    if (param_8 == -999) {
-        if (param_7 == -999) {
-            if (param_6 == -999) {
-                if (param_5 == -999) {
-                    if (param_4 == -999) {
-                        if (param_3 == -999)
-                            sprintf(local_2bc, "%s : % 8d", param_1, param_2);
-                        else
-                            sprintf(local_2bc, "%s : % 8d % 8d", param_1, param_2, param_3);
-                    } else {
-                        sprintf(local_2bc, "%s : % 8d % 8d % 8d", param_1, param_2, param_3, param_4);
-                    }
-                } else {
-                    sprintf(local_2bc, "%s : % 8d % 8d % 8d % 8d", param_1, param_2, param_3, param_4,
-                            param_5);
-                }
-            } else {
-                sprintf(local_2bc, "%s : % 8d % 8d % 8d % 8d % 8d", param_1, param_2, param_3, param_4,
-                        param_5, param_6);
-            }
-        } else {
-            sprintf(local_2bc, "%s : % 8d % 8d % 8d % 8d % 8d % 8d", param_1, param_2, param_3, param_4,
-                    param_5, param_6, param_7);
-        }
-    } else {
-        sprintf(local_2bc, "%s : % 8d % 8d % 8d % 8d % 8d % 8d % 8d", param_1, param_2, param_3,
-                param_4, param_5, param_6, param_7, param_8);
-    }
-    if (1 < giDebugLevel) {
-        FILE *_File = fopen("KB.LOG", "a");
-        if (_File != 0) {
-            strcpy(local_1f4, local_2bc);
-            strcat(local_1f4, "\n");
-            fputs(local_1f4, _File);
-            fclose(_File);
-            if (giDebugLevel == 4)
-                OutputDebugStringA(local_1f4);
-        }
-    }
-}
+// void LogInt(char *, int, int, int, int, int, int, int);
 
 VA(0x004c63f0, 0x6c)
 void AiPrint(char *param_1)
@@ -841,14 +804,14 @@ int DataEntryWindowHandler(struct tag_message &message)
 }
 
 // ---- globals (definitions, RVA order) ----
-int iMemEntries;
-MemEntry *gpMemEntry;
-int giTotalMemAllocated;
-unsigned char giChangeThreshold[16];
-int iLastSeed;
-class heroWindow *DataEntryWin;
-char *cDEDest;
-int iDEMaxLen;
-int bDataEntryTime;
-int inBoxX;
-int inBoxY;
+DATA(0x0051dce8) int iMemEntries;
+DATA(0x0051dcec) MemEntry *gpMemEntry;
+DATA(0x0051dcf0) int giTotalMemAllocated;
+DATA(0x0051dcf8) unsigned char giChangeThreshold[16];
+DATA(0x0051dd08) int iLastSeed;
+DATA(0x005331c4) class heroWindow *DataEntryWin;
+DATA(0x005331c8) char *cDEDest;
+DATA(0x005331d4) int iDEMaxLen;
+DATA(0x005331d8) int bDataEntryTime;
+DATA(0x005331dc) int inBoxX;
+DATA(0x005331e0) int inBoxY;

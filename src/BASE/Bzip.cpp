@@ -29,15 +29,15 @@
 #define smallB 26
 #define smallF 18
 
-unsigned int globalCrc;
-int bsInUse;
-BitStream aBitStreamBuffer;
-int bytesOut;
-UInt32 bigL;
-UInt32 bigR;
-UInt32 bigD;
-UInt32 bitsOutstanding;
-Model bogusModel;
+DATA(0x00538070) unsigned int globalCrc;
+DATA(0x0053806c) int bsInUse;
+DATA(0x00534ed0) BitStream aBitStreamBuffer;
+DATA(0x00537428) int bytesOut;
+DATA(0x0053701c) UInt32 bigL;
+DATA(0x00537020) UInt32 bigR;
+DATA(0x00537018) UInt32 bigD;
+DATA(0x00537010) UInt32 bitsOutstanding;
+DATA(0x00537830) Model bogusModel;
 
 #define BASIS         0
 #define MODEL_2_3     1
@@ -47,7 +47,7 @@ Model bogusModel;
 #define MODEL_32_63   5
 #define MODEL_64_127  6
 #define MODEL_128_255 7
-Model models[8];
+DATA(0x00534ef0) Model models[8];
 
 #define VAL_RUNA    1
 #define VAL_RUNB    2
@@ -67,21 +67,21 @@ Model models[8];
 
 #define NUM_FULLGT_UNROLLINGS 4
 #define MAX_DENORM_OFFSET (4 * NUM_FULLGT_UNROLLINGS)
-UInt32 *words;
-Int32  *zptr;
-Int32  *ftab;
-UChar  *block;
-UChar  *ll;
-Int32   last;
-Int32   lastPP;
-Int32   origPtr;
-Int32   blockSize100k;
-Int32   veryVerbose;
-Char   *progName;
-Int32   compressing;
-Int32   bytesIn;
-Int32   verbose;
-FILE   *outputHandleJustInCase;
+DATA(0x00520350) UInt32 *words;
+DATA(0x00520354) Int32  *zptr;
+DATA(0x00520358) Int32  *ftab;
+DATA(0x0052035c) UChar  *block;
+DATA(0x00520360) UChar  *ll;
+DATA(0x00538068) Int32   last;
+DATA(0x0053805c) Int32   lastPP;
+DATA(0x00534ee0) Int32   origPtr;
+DATA(0x00538058) Int32   blockSize100k;
+DATA(0x00537014) Int32   veryVerbose;
+DATA(0x00538074) Char   *progName;
+DATA(0x00538064) Int32   compressing;
+DATA(0x00538060) Int32   bytesIn;
+DATA(0x00537c54) Int32   verbose;
+DATA(0x00537024) FILE   *outputHandleJustInCase;
 
 #define MY_EOF 257
 #define UPDATE_CRC(crcVar,cha)              \
@@ -1795,10 +1795,10 @@ long DecodeData(char *dst, char *src, unsigned long srcLen)
 }
 
 // ---- globals (definitions, RVA order) ----
-UInt32 crc32Table[256];
-int longestFileName;
-int opMode;
-char inName[1024];
-char outName[1024];
-char *progNameReally;
-int keepInputFiles;
+DATA(0x0051ff50) UInt32 crc32Table[256];
+DATA(0x00534ee4) int longestFileName;
+DATA(0x00534ee8) int opMode;
+DATA(0x00537028) char inName[1024];
+DATA(0x00537430) char outName[1024];
+DATA(0x00537c58) char *progNameReally;
+DATA(0x00538078) int keepInputFiles;

@@ -54,23 +54,23 @@ VA(0x0041d027, 0x10)
 void InitVideo(void) {}
 
 // ---- globals (definitions, RVA order) ----
-char *szAppName;
-char *szTitle;
-void *hwndApp;
-void *hmnuApp;
-void *gEventHandle;
-long lLastGTimerTickCount;
-long lLastCycleColorsTickCount;
-int bRestartMusic;
-int iLastMusic;
-long lLastGetMessage;
-long lLastAilServe;
-int gbNoDialogMenusOn;
-void *hInstApp;
-int iMainWinScreenHeight;
-void *hmnuCurrent;
-int iTempX;
-int iTempY;
-long lTemp;
-unsigned char *bProcessMessage;
-int iMainWinScreenWidth;
+DATA(0x004ef4c8) char *szAppName;
+DATA(0x004ef4d8) char *szTitle;
+DATA(0x004ef4f8) void *hwndApp;
+DATA(0x004ef4fc) void *hmnuApp;
+DATA(0x004ef500) void *gEventHandle;
+DATA(0x004ef588) long lLastGTimerTickCount;
+DATA(0x004ef58c) long lLastCycleColorsTickCount;
+DATA(0x004ef590) int bRestartMusic;
+DATA(0x004ef594) int iLastMusic;
+DATA(0x004ef5b8) long lLastGetMessage;
+DATA(0x004ef5bc) long lLastAilServe;
+DATA(0x004ef5dc) int gbNoDialogMenusOn;
+DATA(0x00524c08) void *hInstApp;
+DATA(0x00524c20) int iMainWinScreenHeight;
+DATA(0x00524c24) void *hmnuCurrent;
+DATA(0x00524c28) int iTempX;
+DATA(0x00524c2c) int iTempY;
+DATA(0x00524c30) long lTemp;
+DATA(0x00524c38) unsigned char *bProcessMessage;
+DATA(0x00525038) int iMainWinScreenWidth;

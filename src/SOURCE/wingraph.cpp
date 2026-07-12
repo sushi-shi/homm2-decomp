@@ -102,25 +102,25 @@ VA(0x00437595, 0x286)
 int SetGraphicsType(int) { return 0; }
 
 // ---- globals (definitions, RVA order) ----
-int gbWinGAttached;
-int gbDDrawAttached;
-int giGraphicsType;
-long Orientation;
-void *lpInitWin;
-int bPaletteInitialized;
-int giTtlBlts;
-int gbWinGraphBusy;
-struct IDirectDraw *lpDD;
-struct IDirectDrawSurface *lpDDSPrimary;
-struct IDirectDrawSurface *lpDDSOne;
-struct IDirectDrawClipper *lpClipper;
-struct IDirectDrawPalette *lpDDPal;
-int iBusyRetry;
-int bInDDSD;
-void *hdcImage;
-void *gbmOldMonoBitmap;
-void *hpalApp;
-void *hWinGLibrary;
-void *hDDrawLibrary;
-long lDelayRefresh;
-long lPaintStart;
+DATA(0x004f1288) int gbWinGAttached;
+DATA(0x004f128c) int gbDDrawAttached;
+DATA(0x004f1290) int giGraphicsType;
+DATA(0x004f1294) long Orientation;
+DATA(0x004f169c) void *lpInitWin;
+DATA(0x004f16a0) int bPaletteInitialized;
+DATA(0x004f16a4) int giTtlBlts;
+DATA(0x004f16a8) int gbWinGraphBusy;
+DATA(0x004f16b0) struct IDirectDraw *lpDD;
+DATA(0x004f16b4) struct IDirectDrawSurface *lpDDSPrimary;
+DATA(0x004f16b8) struct IDirectDrawSurface *lpDDSOne;
+DATA(0x004f16bc) struct IDirectDrawClipper *lpClipper;
+DATA(0x004f16c0) struct IDirectDrawPalette *lpDDPal;
+DATA(0x004f17b0) int iBusyRetry;
+DATA(0x004f1a14) int bInDDSD;
+DATA(0x004f1e78) void *hdcImage;
+DATA(0x004f1e7c) void *gbmOldMonoBitmap;
+DATA(0x004f1e80) void *hpalApp;
+DATA(0x004f1f60) void *hWinGLibrary;
+DATA(0x004f1f64) void *hDDrawLibrary;
+DATA(0x004f2080) long lDelayRefresh;
+DATA(0x00525168) long lPaintStart;

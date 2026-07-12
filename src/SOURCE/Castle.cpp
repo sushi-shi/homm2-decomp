@@ -13,6 +13,6 @@ VA(0x0041e0fb, 0xca3)
 int CastleHandler(struct tag_message &) { return 0; }
 
 // ---- globals (definitions, RVA order) ----
-unsigned char *castleSlotsBase;
-class heroWindow *casWin;
-unsigned char *castleSlotsUse;
+DATA(0x004ef5e0) unsigned char *castleSlotsBase;
+DATA(0x00525040) class heroWindow *casWin;
+DATA(0x00525048) unsigned char *castleSlotsUse;

@@ -20,6 +20,12 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <_globals_model.h>
 #include <SOURCE/KB.h>
+
+
+
+// ---- module-private synthetic globals (retail xref: single-module) ----
+DATA(0x0053496c) static unsigned int gFadeSavedUpdate; // saved update flag across a fade (heroWindowManager::FadeScreen)
+
 VA(0x004ca6d0, 0x3a3)
 void CycleColors(int) {}
 
@@ -192,58 +198,7 @@ void heroWindowManager::RemoveWindow(class heroWindow *w)
 }
 
 VA(0x004cadd0, 0x1cf)
-int heroWindowManager::DoDialog(class heroWindow *param_1, int (*param_2)(struct tag_message &),
-                                int param_3)
-{
-    tag_message local_38;
-    int bVar2;
-    int iVar5;
-    gbInDialog = 1;
-    if (iDialogNestCount == 0)
-        SetNoDialogMenus(0);
-    iDialogNestCount = iDialogNestCount + 1;
-    field_0x5e = -1;
-    if (param_1 != 0)
-        AddWindow(param_1, -1, 1);
-    if (param_3 != 0) {
-        if (gPalette != 0)
-            SetPalette(gPalette->m_data, 0);
-        unsigned int uVar1 = gpWindowManager->m_updateFlags;
-        gpWindowManager->m_updateFlags = 0;
-        PollSound();
-        FadeIn(8);
-        gpWindowManager->m_updateFlags = gFadeSavedUpdate | uVar1;
-        PollSound();
-    }
-    bVar2 = 0;
-    gpInputManager->Flush();
-    m_dialogResult = -1;
-    do {
-        PollSound();
-        Process1WindowsMessage();
-        local_38 = gpInputManager->GetEvent();
-        gpMouseManager->Main(local_38);
-        if (param_1 != 0 && (local_38.type != 4 || gbSendMouseMoveMessages != 0)) {
-            iVar5 = param_1->BroadcastMessage(local_38);
-            if (iVar5 == 2 && local_38.type == 0x200 && local_38.field4 == 10) {
-                bVar2 = 1;
-                m_dialogResult = local_38.field8;
-            }
-        }
-        iVar5 = param_2(local_38);
-        if (iVar5 == 2 && local_38.type == 0x200 && local_38.field4 == 10) {
-            bVar2 = 1;
-        }
-    } while (!bVar2);
-    if (param_1 != 0)
-        RemoveWindow(param_1);
-    gpInputManager->Flush();
-    gbInDialog = 0;
-    iDialogNestCount = iDialogNestCount - 1;
-    if (iDialogNestCount == 0)
-        SetNoDialogMenus(1);
-    return m_dialogResult;
-}
+// int heroWindowManager::DoDialog(class heroWindow *, int (*)(struct tag_message &), int);
 
 VA(0x004cafa0, 0x17)
 void heroWindowManager::UpdateScreen(void)
@@ -305,31 +260,7 @@ void heroWindowManager::ScreenShot(void)
 }
 
 VA(0x004cb110, 0xc0)
-void heroWindowManager::SaveFizzleSource(int param_1, int param_2, int param_3, int param_4)
-{
-    int origX = param_1;
-    if (bShowIt != 0) {
-        if (param_1 < 0) {
-            param_1 = 0;
-            param_3 = param_3 + origX;
-        }
-        if (param_2 < 0) {
-            param_4 = param_4 + param_2;
-            param_2 = 0;
-        }
-        if (640 < param_1 + param_3)
-            param_3 = 640 - param_1;
-        if (480 < param_2 + param_4)
-            param_4 = 480 - param_2;
-        if (param_3 > 0 && param_4 > 0) {
-            if (m_fizzleSource != 0)
-                delete m_fizzleSource;
-            m_fizzleSource = new bitmap(0, param_3, param_4);
-            BlitBitmap(gpWindowManager->m_screen, param_1, param_2, param_3, param_4,
-                       m_fizzleSource, 0, 0);
-        }
-    }
-}
+// void heroWindowManager::SaveFizzleSource(int, int, int, int);
 
 VA(0x004cb1d0, 0x1)
 void CreateFizzleTables(void) {}
@@ -361,11 +292,11 @@ void CreateColorLookupTables(void) {}
 VTBL(heroWindowManager, 0x004eba10);
 
 // ---- globals (definitions, RVA order) ----
-int iCombatCycleFrame;
-int gbEveryOtherCycle;
-int iCycle1Count;
-int iCycle2Count;
-int iCycle3Count;
-int iDialogNestCount;
-signed char *gCyclePal[24];
-short memSelector;
+DATA(0x0051ef28) int iCombatCycleFrame;
+DATA(0x0051ef2c) int gbEveryOtherCycle;
+DATA(0x0051ef30) int iCycle1Count;
+DATA(0x0051ef34) int iCycle2Count;
+DATA(0x0051ef38) int iCycle3Count;
+DATA(0x0051ef3c) int iDialogNestCount;
+DATA(0x00534908) signed char gCyclePal[0x60];
+DATA(0x00534968) short memSelector;

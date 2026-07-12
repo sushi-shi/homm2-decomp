@@ -65,11 +65,21 @@ header deps** (MSVC 4.2 has no `/showIncludes`, so `cc_wrap.py` scans each TU's 
 graph into a depfile) — editing a shared header recompiles exactly its includers, so a header
 change can't leave a stale obj. It then runs **six hard gates** (a red gate fails the build):
 `assert_decls` (no local `class/struct/enum`/`extern`/fwd-decl in any .cpp), `assert_no_fake_labels`
-(no emitted fn symbol absent from CodeView), `assert_globals_data` (every global carries a unique
-`DATA(<VA>)`; none in a .cpp), `assert_defs_declared` (every free-fn definition is declared in its
+(no emitted fn symbol absent from CodeView), `assert_globals_data` (every global's **definition**
+carries a unique `DATA(<VA>)`; no `DATA()` on a header `extern` bar `_globals_model.h`),
+`assert_defs_declared` (every free-fn definition is declared in its
 owner header), `assert_globals_defined` (every extern global has a definition in its owner TU —
 link-completeness), `assert_vtables` (every class vtable is claimed by a `VTBL()` census marker in
 its owner TU — no drift, no fake classes). Full catalog + rationale: **`docs/build-asserts.md`**.
+
+**`homm2 relocs` — OPT-IN reloc-target audit (not a build gate).** objdiff **MASKS every relocation**
+when scoring — it never checks a reloc's *target* — so a 100%-exact fn can silently read the wrong
+global/field or call a fabricated/wrong function and still score 100%. `homm2 relocs` resolves every
+near-exact fn's reloc targets (via `symbol_names.csv` + header `DATA()` VAs) and flags any address
+base references that retail never does. It's OPT-IN, not a hard gate, because it also surfaces
+unreproducible link artifacts — chiefly the delinker's `empty_stub` (the synthetic name for a
+COMDAT-folded empty `ret` fn that base still calls by its own CodeView name). `homm2 relocs 0x<rva>`
+reviews one function. See `[[objdiff-masks-all-relocs]]`.
 
 ## `homm2 sema` — semantic navigation (matcher's read-only toolbox)
 
@@ -107,7 +117,8 @@ the EXE + our known symbols. Needs the dev shell's Ghidra env (in the flake).
 - One TU per CodeView compiland under `src/<TIER>/<TU>.cpp` (TIER ∈ BASE, SOURCE,
   EDITOR), shared headers in `include/<TIER>/`. Define functions in **retail-RVA order**.
 - Above each function: **`VA(0x........, 0x..)`** (8-hex-digit zero-padded address,
-  unpadded size); globals: **`DATA(0x........)`** on the `extern` in the owner header; a class
+  unpadded size); globals: **`DATA(0x........)`** on the **definition** in the owner `.cpp` (the
+  header `extern` is plain); a class
   vtable: **`VTBL(class, 0x........)`** census marker at the owner TU's tail. Macros vanish under MSVC
   (`include/va.h`). A *placeholder* is `VA(...)` then a `// signature;` comment; a
   *reconstruction* has a real body.
@@ -117,8 +128,11 @@ the EXE + our known symbols. Needs the dev shell's Ghidra env (in the flake).
   declared ONLY in its owner header `include/<TIER>/<TU>.h`; callers `#include` that. A .cpp
   carries **no** local `class/struct/enum`/`extern`/forward-decls — types come from the recovered
   class headers, cross-TU functions from their owner header. **Globals** live on their owner TU:
-  `DATA(<VA>) extern T g;` in `<TIER>/<TU>.h` (CodeView says which TU owns each) + a plain `T g;`
-  **definition** in that owner `.cpp`; globals with no CodeView symbol go in `_globals_model.h`.
+  a plain `extern T g;` in `<TIER>/<TU>.h` (CodeView says which TU owns each) + the **definition**
+  `DATA(<VA>) T g;` in that owner `.cpp` (the VA rides the definition, not the extern). Globals with
+  no CodeView symbol go in `_globals_model.h` — UNLESS the retail binary references one from a single
+  module (`homm2 relocs`/`move_model_singletons.py` xref), in which case it becomes a module-private
+  `DATA(<VA>) static T g;`. `_globals_model.h` keeps only genuinely cross-module / def-less synthetics.
   Win32 from the custom minimal `include/win/windows.h`, CRT from real `<io.h>`/`<string.h>`.
   Include the **specific** headers a TU uses — there is no `_all.h` or `_globals.h` umbrella (both
   dissolved). The six build gates (`docs/build-asserts.md`) enforce all of this; bootstrap an

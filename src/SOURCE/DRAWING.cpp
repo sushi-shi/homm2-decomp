@@ -45,5 +45,5 @@ VA(0x00405d0b, 0xb99)
 void combatManager::DrawSmallView(int, int) {}
 
 // ---- globals (definitions, RVA order) ----
-int bGridWasShowing;
-int gbInDrawSmallView;
+DATA(0x004ed25c) int bGridWasShowing;
+DATA(0x004ed290) int gbInDrawSmallView;

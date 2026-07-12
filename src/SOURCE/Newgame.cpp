@@ -55,11 +55,11 @@ VA(0x004bb3cf, 0x2a7)
 int game::GetSideDesc(char *, int, int) { return 0; }
 
 // ---- globals (definitions, RVA order) ----
-int gbNewGameDialogOver;
-int NGKPcursorFlashOn;
-char *cNGKPDisplay;
-int gbNewGameShadowHidden;
-char *cNGKPCore;
-int NGKPcursorIndex;
-char *cTextReceivedBuffer[3];
-class icon *NGKPBkg;
+DATA(0x0051cd20) int gbNewGameDialogOver;
+DATA(0x0051cd24) int NGKPcursorFlashOn;
+DATA(0x00533150) char *cNGKPDisplay;
+DATA(0x00533154) int gbNewGameShadowHidden;
+DATA(0x00533158) char *cNGKPCore;
+DATA(0x0053315c) int NGKPcursorIndex;
+DATA(0x00533160) char *cTextReceivedBuffer[3];
+DATA(0x0053316c) class icon *NGKPBkg;

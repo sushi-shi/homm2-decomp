@@ -23,29 +23,29 @@ void InitVideo(void);
 
 
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
-DATA(0x004ef500) extern void *gEventHandle;
-DATA(0x00524c08) extern void *hInstApp;
-DATA(0x004ef4fc) extern void *hmnuApp;
-DATA(0x004ef4f8) extern void *hwndApp;
+extern void *gEventHandle;
+extern void *hInstApp;
+extern void *hmnuApp;
+extern void *hwndApp;
 
 // ---- globals (declarations, RVA order) ----
-DATA(0x004ef4c8) extern char *szAppName;
-DATA(0x004ef4d8) extern char *szTitle;
-DATA(0x004ef588) extern long lLastGTimerTickCount;
-DATA(0x004ef58c) extern long lLastCycleColorsTickCount;
-DATA(0x004ef590) extern int bRestartMusic;
-DATA(0x004ef594) extern int iLastMusic;
-DATA(0x004ef5b8) extern long lLastGetMessage;
-DATA(0x004ef5bc) extern long lLastAilServe;
-DATA(0x004ef5dc) extern int gbNoDialogMenusOn;
-DATA(0x0051dcf0) extern int giTotalMemAllocated;
-DATA(0x0051dcf8) extern unsigned char giChangeThreshold[16];
-DATA(0x00524c20) extern int iMainWinScreenHeight;
-DATA(0x00524c24) extern void *hmnuCurrent;
-DATA(0x00524c28) extern int iTempX;
-DATA(0x00524c2c) extern int iTempY;
-DATA(0x00524c30) extern long lTemp;
-DATA(0x00524c38) extern unsigned char *bProcessMessage;
-DATA(0x00525038) extern int iMainWinScreenWidth;
+extern char *szAppName;
+extern char *szTitle;
+extern long lLastGTimerTickCount;
+extern long lLastCycleColorsTickCount;
+extern int bRestartMusic;
+extern int iLastMusic;
+extern long lLastGetMessage;
+extern long lLastAilServe;
+extern int gbNoDialogMenusOn;
+extern int giTotalMemAllocated;
+extern unsigned char giChangeThreshold[16];
+extern int iMainWinScreenHeight;
+extern void *hmnuCurrent;
+extern int iTempX;
+extern int iTempY;
+extern long lTemp;
+extern unsigned char *bProcessMessage;
+extern int iMainWinScreenWidth;
 
 #endif // HOMM2_KBWIN_H

@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """gen_global_defs.py — give every CodeView-owned global a DEFINITION in its owner .cpp, so the
-project links (headers only DECLARE them: `DATA(VA) extern T g;`). The definition is plain
-`T g;` (no DATA — the header carries the VA, so the RVA isn't repeated), emitted in retail-RVA
-order in a data section at the owner .cpp's tail. Scalars/pointers/sized-arrays are the header
-decl minus `extern`; unsized `T g[]` gets its outer dim from the CodeView byte size. Synthetic
-globals (no CodeView symbol -> _globals_model.h) alias real storage and get no definition.
-Idempotent: replaces the generated block. Run from repo root."""
+project links (headers only DECLARE them: plain `extern T g;`). The definition carries the address:
+`DATA(0x<VA>) T g;`, emitted in retail-RVA order in a data section at the owner .cpp's tail.
+Scalars/pointers/sized-arrays are the header decl minus `extern`; unsized `T g[]` gets its outer dim
+from the CodeView byte size. Synthetic globals (no CodeView symbol -> _globals_model.h) alias real
+storage and get no definition. Idempotent: replaces the generated block. Run from repo root."""
 import csv, re, os, glob
 from collections import defaultdict
 
@@ -55,7 +54,7 @@ for h in glob.glob("include/**/*.h", recursive=True):
     if os.path.basename(h) == "_globals_model.h":
         continue                                       # synthetic aliases: no definition
     for line in open(h):
-        m = re.match(r'^DATA\(0x[0-9a-fA-F]+\)\s+extern\s+(.*;)', line)
+        m = re.match(r'^extern\s+(.*;)', line)     # DATA now goes on the def we emit, not the header
         if not m:
             continue
         nm = re.search(r'([A-Za-z_]\w*)\s*(\[[^;]*\])*\s*;', m.group(1))
@@ -67,7 +66,7 @@ for h in glob.glob("include/**/*.h", recursive=True):
             continue
         d = make_def(m.group(1), name)
         if d:
-            by_cpp["src/%s.cpp" % u].append((rva_of[name], d))
+            by_cpp["src/%s.cpp" % u].append((rva_of[name], "DATA(0x%08x) %s" % (rva_of[name] + 0x400000, d)))
 
 made = 0
 for cpp, defs in sorted(by_cpp.items()):
