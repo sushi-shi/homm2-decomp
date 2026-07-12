@@ -27,7 +27,9 @@ typedef enum AdventureButtonConstant {
     ADVMGR_BUTTON_SLOT_3 = 3,
     ADVMGR_BUTTON_SLOT_4 = 4,
     ADVMGR_BUTTON_SLOT_5 = 5,
-    ADVMGR_BUTTON_SLOT_6 = 6
+    ADVMGR_BUTTON_SLOT_6 = 6,
+    ADVMGR_BUTTON_BROADCAST_ARG = 1,
+    ADVMGR_BUTTON_BROADCAST_FLAGS = 0x4008
 } AdventureButtonConstant;
 
 typedef enum AdventureTriggerConstant {
@@ -56,6 +58,7 @@ typedef enum AdventureFrameConstant {
 
 typedef enum AdventureStateConstant {
     ADVMGR_INVALID_CELL = -1,
+    ADVMGR_INVALID_HERO = -1,
     ADVMGR_LOOPING_SOUND_LIMIT = 4
 } AdventureStateConstant;
 

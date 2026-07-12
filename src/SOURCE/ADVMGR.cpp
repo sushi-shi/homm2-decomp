@@ -17,6 +17,7 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/ADVMGR.h>
+#include <SOURCE/game.h>
 #include <SOURCE/playerData.h>
 #include <stdio.h>
 VA(0x00456350, 0x30f)
@@ -141,7 +142,14 @@ void advManager::DeactivateCurrHero(void)
 }
 
 VA(0x00463f3b, 0x5a)
-void advManager::MobilizeCurrHero(int) {}
+void advManager::MobilizeCurrHero(int update)
+{
+    if (gpCurPlayer->currentHero == ADVMGR_INVALID_HERO)
+        return;
+    if (heroContextLocked)
+        return;
+    SetHeroContext(gpCurPlayer->currentHero, update);
+}
 
 VA(0x00463f95, 0x16c)
 void advManager::DemobilizeCurrHero(void) {}
@@ -219,11 +227,34 @@ void advManager::ShowRoute(int, int, int) {}
 VA(0x00468720, 0x107)
 void advManager::HideRoute(int, int, int) {}
 
+// @early-stop
+// all 52 instructions, both inline-continuation jumps, and ten relocation targets match
 VA(0x00468827, 0x8d)
-void advManager::CheckDimHero(void) {}
+void advManager::CheckDimHero(void)
+{
+    if (gbThisNetHumanPlayer[giCurPlayer]) {
+        if (gpCurPlayer->CurrentHero() == ADVMGR_INVALID_HERO)
+            return;
+        if (!gpGame->IsMobile(gpCurPlayer->CurrentHero())) {
+            ShowRoute(1, 0, 0);
+            UpdateHeroLocators(1, 1);
+            gpAdvManager->CheckDimNextHeroBut();
+        }
+    }
+}
 
 VA(0x004688b4, 0x6b)
-void advManager::CheckDimNextHeroBut(void) {}
+void advManager::CheckDimNextHeroBut(void)
+{
+    int frame;
+    if (!gbThisNetHumanPlayer[giCurPlayer] || !gpCurPlayer->HasMobileHero())
+        frame = ADVMGR_BUTTON_ENABLE;
+    else
+        frame = ADVMGR_BUTTON_DISABLE;
+    gpWindowManager->BroadcastMessage(ADVMGR_BUTTON_MESSAGE, frame,
+                                      ADVMGR_BUTTON_BROADCAST_ARG,
+                                      ADVMGR_BUTTON_BROADCAST_FLAGS);
+}
 
 VA(0x0046891f, 0x138)
 void advManager::SeedTo(int, int) {}

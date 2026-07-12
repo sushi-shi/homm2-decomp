@@ -108,7 +108,7 @@ public:
     int    field_0x29a;  // +0x29a
     int    field_0x29e;  // +0x29e
     int    field_0x2a2;  // +0x2a2
-    int    field_0x2a6;  // +0x2a6
+    int    heroContextLocked;  // +0x2a6
     int    field_0x2aa;  // +0x2aa
     int    field_0x2ae;  // +0x2ae
     int    field_0x2b2;  // +0x2b2
