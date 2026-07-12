@@ -4,6 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <SOURCE/ExpCampaign.h>
 
 // ---- globals (definitions, RVA order) ----
 DATA(0x004f26f4) char *xNecromancerShrine;
@@ -11,3 +12,5 @@ DATA(0x004f26f8) char *xNecromancerShrineDesc;
 DATA(0x004f2ab0) int xShrineBuildingCost[2334];
 DATA(0x00527e78) int xPasswordStringsIndex[8];
 DATA(0x00527e98) signed char xIsExpansionMap;
+DATA(0x00527e20) unsigned char xIsPlayingExpansionCampaign;
+DATA(0x00527e28) ExpCampaign xCampaign;

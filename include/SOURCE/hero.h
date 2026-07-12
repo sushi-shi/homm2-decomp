@@ -3,6 +3,7 @@
 // Reconstructed class (SOURCE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // 34 methods, 0 own-virtual, 0 static data.
 #include <va.h>
+#include <SOURCE/armyGroup.h>
 // forward declarations:
 class town;
 
@@ -13,7 +14,7 @@ public:
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     short  field_0x0;  // +0x00
     char   field_0x2;  // +0x02
-    char   field_0x3;  // +0x03
+    char   m_owner;  // +0x03
     short  field_0x4;  // +0x04
     char _pad_0x6[0x1];
     short  field_0x7;  // +0x07
@@ -40,7 +41,10 @@ public:
     char _pad_0x46[0x1d];
     char   field_0x63;  // +0x63
     char   field_0x64;  // +0x64
-    char _pad_0x65[0x16];
+    class armyGroup m_army;  // +0x65
+    char _pad_0x74[0x4];
+    signed char m_diplomacy;  // +0x78
+    char _pad_0x79[0x2];
     char   field_0x7b;  // +0x7b
     char _pad_0x7c[0x14];
     int    field_0x90;  // +0x90
