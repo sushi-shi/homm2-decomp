@@ -157,6 +157,7 @@ extern signed char gbRetreatWin;
 extern int gbTextEntryEscaped;
 extern int gbThisNetGotAdventureControl;
 extern signed char gbThisNetHumanPlayer[];
+extern unsigned char bStopOnTrigger[128];
 extern char *gBuildingInfoSpecial[];
 extern icon *gBuyBuildIcons;
 extern char gcBottomViewText[];

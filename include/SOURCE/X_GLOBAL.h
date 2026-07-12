@@ -108,7 +108,6 @@ extern float *gfSSAIArcheryMod;
 extern signed char *giVisRange;
 DATA(0x004fc7d0) extern unsigned char (*gStartingHeroStats)[5];
 extern int giTerrainCost[10][4][2];
-extern unsigned char *bStopOnTrigger;
 extern char *gTownPrefixNames[6];
 extern char *gTownObjNames[32];
 extern int giDebugBuildingToBuild;

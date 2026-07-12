@@ -44,7 +44,8 @@ public:
     u8  ovlFlag1   : 1;     // +6 bit1
     u8  ovlTileset : 6;     // +6 bits2-7
     u8  ovlIndex;           // +7  overlay sprite index (0xFF == none)
-    u16 unk8;               // +8
+    u8  field8;             // +8
+    u8  triggerType;        // +9 (high bit is a flag)
     u16 extra;              // +0xa  head index into the extras chain
 };
 SIZE(mapCell, 12);

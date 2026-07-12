@@ -11,9 +11,11 @@ public:
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     char _pad_0x0[0x1];
     char   field_0x1;  // +0x01
-    char _pad_0x2[0x42];
+    signed char currentHero;  // +0x02
+    char _pad_0x3[0x41];
     char   field_0x44;  // +0x44
-    // size >= 0x45 (accessed lower bound; no ctor/stride oracle)
+    signed char currentTown;  // +0x45
+    // size >= 0x46 (accessed lower bound; no ctor/stride oracle)
     // --- methods ---
     void Write(int);
     void Read(int);

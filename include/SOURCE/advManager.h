@@ -8,7 +8,10 @@
 class armyGroup;
 class hero;
 class mapCell;
+class sample;
 class town;
+class heroWindow;
+class icon;
 struct SAMPLE2;
 struct SMapChange;
 struct tag_message;
@@ -29,7 +32,7 @@ public:
     int    field_0x6a;  // +0x6a
     int    field_0x6e;  // +0x6e
     char _pad_0x72[0x28];
-    int    field_0x9a;  // +0x9a
+    class heroWindow *adventureWindow;  // +0x9a
     int    field_0x9e;  // +0x9e
     int    field_0xa2;  // +0xa2
     int    field_0xa6;  // +0xa6
@@ -37,7 +40,7 @@ public:
     int    field_0xae;  // +0xae
     int    field_0xb2;  // +0xb2
     int    field_0xb6;  // +0xb6
-    int    field_0xba;  // +0xba
+    unsigned char *adventureBorder;  // +0xba
     char _pad_0xbe[0x4];
     int    field_0xc2;  // +0xc2
     int    field_0xc6;  // +0xc6
@@ -45,7 +48,7 @@ public:
     char _pad_0xce[0x28];
     int    field_0xf6;  // +0xf6
     char _pad_0xfa[0x18];
-    int    field_0x112;  // +0x112
+    class icon *puzzleIcon;  // +0x112
     char _pad_0x116[0x8];
     int    field_0x11e;  // +0x11e
     char _pad_0x122[0x48];
@@ -53,11 +56,11 @@ public:
     char _pad_0x16e[0x60];
     int    field_0x1ce;  // +0x1ce
     int    field_0x1d2;  // +0x1d2
-    int    field_0x1d6;  // +0x1d6
-    int    field_0x1da;  // +0x1da
+    int    mapOriginX;  // +0x1d6
+    int    mapOriginY;  // +0x1da
     int    field_0x1de;  // +0x1de
     int    field_0x1e2;  // +0x1e2
-    int    field_0x1e6;  // +0x1e6
+    int    lastHoverCell;  // +0x1e6
     int    field_0x1ea;  // +0x1ea
     int    field_0x1ee;  // +0x1ee
     int    field_0x1f2;  // +0x1f2
@@ -112,7 +115,9 @@ public:
     int    field_0x2b6;  // +0x2b6
     int    field_0x2ba;  // +0x2ba
     int    field_0x2be;  // +0x2be
-    char _pad_0x2c2[0xb4];
+    char _pad_0x2c2[0x20];
+    class sample *loopingSamples[5];  // +0x2e2
+    char _pad_0x2f6[0x80];
     int    field_0x376;  // +0x376
     int    field_0x37a;  // +0x37a
     // --- constructors ---
