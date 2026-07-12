@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <BASE/heroWindowManager.h>
+#include <BASE/Misc.h>
 #include <BASE/mouseManager.h>
 #include <BASE/soundManager.h>
 #include <EDITOR/fullMap.h>
@@ -18,10 +19,413 @@
 #include <SOURCE/game.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/KB.h>
+#include <SOURCE/PHILAI.h>
 #include <SOURCE/philAI.h>
+#include <SOURCE/playerData.h>
+#include <SOURCE/tradpost.h>
 #include <SOURCE/X_GLOBAL.h>
 VA(0x004a8530, 0x5adb)
-void advManager::DoEvent(class mapCell *, int, int) {}
+void advManager::DoEvent(mapCell *cell, int x, int y)
+{
+    hero *eventHero;
+    int eventType;
+    int eraseObject;
+    int fizzleType;
+    SAMPLE2 playedSample;
+    SAMPLE2 eventSample;
+    mapEventExtra *eventExtra;
+    char sphinxAnswer[SPHINX_ANSWER_BUFFER_SIZE];
+    int answerIndex;
+    int correctAnswer;
+    int primaryReward;
+    int primaryAmount;
+    int secondaryReward;
+    int secondaryAmount;
+    int thirdUpgrade;
+    int secondUpgrade;
+    int firstUpgrade;
+
+    eventHero = &gpGame->m_heroRecs[gpCurPlayer->CurrentHero()];
+    eventType = cell->triggerType & MAP_EVENT_TYPE_MASK;
+    eraseObject = 0;
+    fizzleType = 0;
+    playedSample = NULL_SAMPLE2;
+    gpMouseManager->ShowColorPointer();
+    gpMouseManager->SetPointer(0);
+    eventSample = NULL_SAMPLE2;
+
+    switch (eventType) {
+    case MAP_EVENT_BUOY:
+        if (!(eventHero->m_eventFlags & HERO_EVENT_BUOY)) {
+            EventSound(eventType, cell->w4hi, &eventSample);
+            eventHero->m_eventFlags |= HERO_EVENT_BUOY;
+            eventHero->m_morale++;
+            EventWindow(3, 1, "", 12, 0, -1, 0, -1);
+        }
+        else {
+            EventWindow(2, 1, "", -1, 0, -1, 0, -1);
+        }
+        break;
+
+    case MAP_EVENT_FAERIE_RING:
+        if (!(eventHero->m_eventFlags & HERO_EVENT_FAERIE_RING)) {
+            EventSound(eventType, cell->w4hi, &eventSample);
+            eventHero->m_eventFlags |= HERO_EVENT_FAERIE_RING;
+            eventHero->m_luck++;
+            EventWindow(13, 1, "", 10, 0, -1, 0, -1);
+        }
+        else {
+            EventWindow(12, 1, "", -1, 0, -1, 0, -1);
+        }
+        break;
+
+    case MAP_EVENT_CAMPFIRE:
+        EventWindow(14, 1, "", RES_GOLD,
+                    (cell->w4hi >> CAMPFIRE_AMOUNT_SHIFT) * CAMPFIRE_GOLD_MULTIPLIER,
+                    cell->w4hi & CAMPFIRE_RESOURCE_MASK,
+                    cell->w4hi >> CAMPFIRE_AMOUNT_SHIFT, -1);
+        GiveResource(eventHero, RES_GOLD,
+                     (cell->w4hi >> CAMPFIRE_AMOUNT_SHIFT) * CAMPFIRE_GOLD_MULTIPLIER);
+        GiveResource(eventHero, cell->w4hi & CAMPFIRE_RESOURCE_MASK,
+                     cell->w4hi >> CAMPFIRE_AMOUNT_SHIFT);
+        eraseObject = 1;
+        fizzleType = 1;
+        SetEnvironmentOrigin(m_mapOriginX + ERASE_ENVIRONMENT_BORDER,
+                             m_mapOriginY + ERASE_ENVIRONMENT_BORDER, 1);
+        break;
+
+    case MAP_EVENT_FOUNTAIN:
+        if (!(eventHero->m_eventFlags & HERO_EVENT_FOUNTAIN)) {
+            EventSound(eventType, cell->w4hi, &eventSample);
+            eventHero->m_eventFlags |= HERO_EVENT_FOUNTAIN;
+            eventHero->m_luck++;
+            EventWindow(16, 1, "", 10, 0, -1, 0, -1);
+        }
+        else {
+            EventWindow(15, 1, "", -1, 0, -1, 0, -1);
+        }
+        break;
+
+    case MAP_EVENT_OASIS:
+        if (!(eventHero->m_eventFlags & HERO_EVENT_OASIS)) {
+            EventSound(eventType, cell->w4hi, &eventSample);
+            eventHero->m_eventFlags |= HERO_EVENT_OASIS;
+            eventHero->m_morale++;
+            eventHero->m_mobility += OASIS_MOBILITY_BONUS;
+            eventHero->m_remainingMobility += OASIS_MOBILITY_BONUS;
+            EventWindow(-1, 1,
+                        "{Oasis}\n\nA drink at the oasis fills your troops with strength and lifts their spirits.  You can travel a bit further today.",
+                        12, 0, -1, 0, -1);
+        }
+        else {
+            EventWindow(-1, 1,
+                        "{Oasis}\n\nThe drink at the oasis is refreshing, but offers no further benefit.  The oasis might help again if you fought a battle first.",
+                        -1, 0, -1, 0, -1);
+        }
+        break;
+
+    case MAP_EVENT_ANCIENT_LAMP:
+        EventSound(eventType, cell->w4hi, &eventSample);
+        EventWindow(19, 2, "", -1, 0, -1, 0, -1);
+        if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+            RecruitEvent(eventHero, EVENT_RECRUIT_GENIE, cell);
+            if (!cell->w4hi) {
+                eraseObject = 1;
+                fizzleType = 1;
+            }
+        }
+        break;
+
+    case MAP_EVENT_WATER_WHEEL:
+        if (!cell->w4hi) {
+            EventWindow(59, 1, "", -1, 0, -1, 0, -1);
+        }
+        else {
+            EventSound(eventType, cell->w4hi, &eventSample);
+            EventWindow(60, 1, "", RES_GOLD, cell->w4hi * MAP_EVENT_GOLD_AMOUNT,
+                        -1, 0, -1);
+            GiveResource(eventHero, RES_GOLD, cell->w4hi * MAP_EVENT_GOLD_AMOUNT);
+            cell->w4hi = 0;
+        }
+        break;
+
+    case MAP_EVENT_DESERT_TENT:
+        if (!cell->w4hi) {
+            EventWindow(81, 1, "", -1, 0, -1, 0, -1);
+        }
+        else {
+            EventSound(eventType, cell->w4hi, &eventSample);
+            EventWindow(82, 2, "", -1, 0, -1, 0, -1);
+            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
+                RecruitEvent(eventHero, EVENT_RECRUIT_NOMAD, cell);
+        }
+        break;
+
+    case MAP_EVENT_WAGON_CAMP:
+        if (!cell->w4hi) {
+            EventWindow(83, 1, "", -1, 0, -1, 0, -1);
+        }
+        else {
+            EventSound(eventType, cell->w4hi, &eventSample);
+            EventWindow(84, 2, "", -1, 0, -1, 0, -1);
+            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
+                RecruitEvent(eventHero, EVENT_RECRUIT_ROGUE, cell);
+        }
+        break;
+
+    case MAP_EVENT_TREE_CITY:
+        if (!cell->w4hi) {
+            EventWindow(-1, 1,
+                        "{Tree City}\n\nYou've found a Sprite Tree City.  Unfortunately, none of the Sprites living there wish to join an army.  Maybe next week.",
+                        -1, 0, -1, 0, -1);
+        }
+        else {
+            EventSound(eventType, cell->w4hi, &eventSample);
+            EventWindow(-1, 2,
+                        "{Tree City}\n\nSome of the Sprites living in the tree city are willing to join your army for a price.  Do you want to recruit Sprites?",
+                        -1, 0, -1, 0, -1);
+            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
+                RecruitEvent(eventHero, EVENT_RECRUIT_SPRITE, cell);
+        }
+        break;
+
+    case MAP_EVENT_RUINS:
+        if (!cell->w4hi) {
+            EventWindow(-1, 1,
+                        "{Ruins}\n\nYou search the ruins, but the Medusas that used to live here are gone.  Perhaps there will be more next week.",
+                        -1, 0, -1, 0, -1);
+        }
+        else {
+            EventSound(eventType, cell->w4hi, &eventSample);
+            EventWindow(-1, 2,
+                        "{Ruins}\n\nYou've found some Medusas living in the ruins.  They are willing to join your army for a price.  Do you want to recruit Medusas?",
+                        -1, 0, -1, 0, -1);
+            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
+                RecruitEvent(eventHero, EVENT_RECRUIT_MEDUSA, cell);
+        }
+        break;
+
+    case MAP_EVENT_MONSTER:
+        PlayerMonsterInteract(cell, cell, eventHero, &eraseObject, x, y, 0, x, y);
+        break;
+
+    case MAP_EVENT_CASTLE:
+        TownEvent(cell, x, y);
+        break;
+
+    case MAP_EVENT_ARCHER_HOUSE:
+    case MAP_EVENT_GOBLIN_HUT:
+    case MAP_EVENT_DWARF_COTTAGE:
+    case MAP_EVENT_PEASANT_HUT:
+    case MAP_EVENT_LOG_CABIN:
+    case MAP_EVENT_WATCH_TOWER:
+    case MAP_EVENT_TREE_HOUSE:
+    case MAP_EVENT_SIRENS:
+    case MAP_EVENT_HALFLING_HOLE:
+    case MAP_EVENT_EXCAVATION:
+    case MAP_EVENT_CAVE:
+        if (cell->w4hi)
+            EventSound(eventType, cell->w4hi, &eventSample);
+        HouseEvent(eventHero, cell);
+        break;
+
+    case MAP_EVENT_TRADING_POST:
+        EventSound(eventType, cell->w4hi, &eventSample);
+        DoTradingPost(0, 0.2f);
+        break;
+
+    case MAP_EVENT_MAGIC_GARDEN:
+        if (cell->w4hi == MAP_EVENT_DATA_EMPTY) {
+            EventWindow(-1, 1,
+                        "{Magic Garden}\n\nYou've found a magic garden, the kind of place that leprechauns and faeries like to cavort in, but there is no one here today.  Perhaps you should try again next week.",
+                        -1, 0, -1, 0, -1);
+        }
+        else {
+            EventSound(eventType, cell->w4hi, &eventSample);
+            EventWindow(-1, 1,
+                        "{Magic Garden}\n\nYou catch a leprechaun foolishly sleeping amidst a cluster of magic mushrooms.  In exchange for his freedom, he guides you to a small pot filled with precious things.",
+                        cell->w4hi - MAP_EVENT_RESOURCE_OFFSET,
+                        cell->w4hi - MAP_EVENT_RESOURCE_OFFSET == RES_GOLD
+                            ? MAP_EVENT_GOLD_AMOUNT
+                            : MAP_EVENT_RESOURCE_AMOUNT,
+                        -1, 0, -1);
+            GiveResource(eventHero, cell->w4hi - MAP_EVENT_RESOURCE_OFFSET,
+                         cell->w4hi - MAP_EVENT_RESOURCE_OFFSET == RES_GOLD
+                             ? MAP_EVENT_GOLD_AMOUNT
+                             : MAP_EVENT_RESOURCE_AMOUNT);
+            cell->w4hi = MAP_EVENT_DATA_EMPTY;
+        }
+        break;
+
+    case MAP_EVENT_SPHINX:
+        EventSound(eventType, cell->w4hi, &eventSample);
+        eventExtra = reinterpret_cast<mapEventExtra *>(ppMapExtra[cell->w4hi]);
+        if (!eventExtra->active) {
+            NormalDialog("{Sphinx}\n\nYou come across a giant Sphinx.  The Sphinx remains strangely quiet.",
+                         1, -1, -1, -1, 0, -1, 0, -1, 0);
+        }
+        else {
+            sprintf(gText,
+                    "\"I have a riddle for you,\" the Sphinx says.  \"Answer correctly, and you shall be rewarded.  Answer incorrectly, and you shall be eaten.  Do you accept the challenge?\"");
+            NormalDialog(gText, 2, -1, -1, -1, 0, -1, 0, -1, 0);
+            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+                sprintf(gText,
+                        "The Sphinx asks you the following riddle:\n\n'%s'\n\nYour answer?",
+                        eventExtra->riddle);
+                GetDataEntry(gText, sphinxAnswer, SPHINX_INPUT_LENGTH, 0, 0, 1);
+                correctAnswer = 0;
+                for (answerIndex = 0; answerIndex < eventExtra->answerCount; answerIndex++) {
+                    if (RiddleStringsEqual(sphinxAnswer, eventExtra->answers[answerIndex]))
+                        correctAnswer = 1;
+                }
+
+                if (correctAnswer) {
+                    primaryReward = MAP_EVENT_REWARD_NONE;
+                    primaryAmount = 0;
+                    secondaryReward = MAP_EVENT_REWARD_NONE;
+                    secondaryAmount = 0;
+                    for (answerIndex = 0; answerIndex < SPHINX_RESOURCE_COUNT; answerIndex++) {
+                        gpGame->m_players[giCurPlayer].resources[answerIndex] += eventExtra->resources[answerIndex];
+                        if (gpGame->m_players[giCurPlayer].resources[answerIndex] < 0)
+                            gpGame->m_players[giCurPlayer].resources[answerIndex] = 0;
+                        if (eventExtra->resources[answerIndex] != 0) {
+                            if (primaryReward != MAP_EVENT_REWARD_NONE) {
+                                secondaryReward = primaryReward;
+                                secondaryAmount = primaryAmount;
+                            }
+                            primaryReward = answerIndex;
+                            primaryAmount = eventExtra->resources[answerIndex];
+                        }
+                    }
+
+                    if (eventExtra->artifact != MAP_EVENT_REWARD_NONE &&
+                        eventHero->NumArtifacts() < 14) {
+                        GiveArtifact(eventHero, eventExtra->artifact, 1, -1);
+                        if (primaryReward != MAP_EVENT_REWARD_NONE) {
+                            secondaryReward = primaryReward;
+                            secondaryAmount = primaryAmount;
+                        }
+                        primaryReward = MAP_EVENT_REWARD_ARTIFACT;
+                        primaryAmount = eventExtra->artifact;
+                    }
+
+                    NormalDialog("Looking somewhat disappointed, the Sphinx sighs.  You've answered my riddle so here's your reward.  Now begone.",
+                                 1, -1, -1, primaryReward, primaryAmount,
+                                 secondaryReward, secondaryAmount, -1, 0);
+                    eventExtra->active = 0;
+                }
+                else {
+                    NormalDialog("\"You guessed incorrectly,\" the Sphinx says, smiling.  The Sphinx swipes at you with a paw, knocking you to the ground.  Another blow makes the world go black, and you know no more.",
+                                 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                    HeroLoses(eventHero);
+                }
+            }
+        }
+        break;
+
+    case MAP_EVENT_OBSERVATION_TOWER:
+        EventSound(eventType, cell->w4hi, &eventSample);
+        NormalDialog("{Observation Tower}\n\nFrom the observation tower, you are able to see distant lands.",
+                     1, -1, -1, -1, 0, -1, 0, -1, 0);
+        gpGame->SetVisibility(x, y, giCurPlayer, OBSERVATION_TOWER_RADIUS);
+        CompleteDraw(0);
+        UpdateScreen(0, 0);
+        break;
+
+    case MAP_EVENT_FREEMANS_FOUNDRY:
+        thirdUpgrade = -1;
+        secondUpgrade = -1;
+        firstUpgrade = -1;
+        if (eventHero->CreatureTypeCount(FOUNDRY_PIKEMAN))
+            firstUpgrade = FOUNDRY_PIKEMAN;
+        if (eventHero->CreatureTypeCount(FOUNDRY_SWORDSMAN)) {
+            if (firstUpgrade == -1)
+                firstUpgrade = FOUNDRY_SWORDSMAN;
+            else
+                secondUpgrade = FOUNDRY_SWORDSMAN;
+        }
+        if (eventHero->CreatureTypeCount(FOUNDRY_IRON_GOLEM)) {
+            if (firstUpgrade == -1)
+                firstUpgrade = FOUNDRY_IRON_GOLEM;
+            else if (secondUpgrade == -1)
+                secondUpgrade = FOUNDRY_IRON_GOLEM;
+            else
+                thirdUpgrade = FOUNDRY_IRON_GOLEM;
+        }
+
+        if (firstUpgrade == -1) {
+            EventWindow(-1, 1,
+                        "{Freeman's Foundry}\n\nA blacksmith working at the foundry offers to convert all Pikemen and Swordsmen's weapons brought to him from iron to steel. He also says that he knows a process that will convert Iron Golems into Steel Golems.  Unfortunately, you have none of these troops in your army, so he can't help you.",
+                        -1, 0, -1, 0, -1);
+        }
+        else {
+            EventSound(eventType, cell->w4hi, &eventSample);
+            eventHero->UpgradeCreatures(FOUNDRY_PIKEMAN, FOUNDRY_VETERAN_PIKEMAN);
+            eventHero->UpgradeCreatures(FOUNDRY_SWORDSMAN, FOUNDRY_MASTER_SWORDSMAN);
+            eventHero->UpgradeCreatures(FOUNDRY_IRON_GOLEM, FOUNDRY_STEEL_GOLEM);
+            if (thirdUpgrade == -1) {
+                if (secondUpgrade == -1) {
+                    sprintf(gText,
+                            "{Freeman's Foundry}\n\nAll of your %s have been upgraded into %s.",
+                            gArmyNamesPlural[firstUpgrade], gArmyNamesPlural[firstUpgrade + 1]);
+                }
+                else {
+                    sprintf(gText,
+                            "{Freeman's Foundry}\n\nAll of your %s and %s have been upgraded into %s and %s.",
+                            gArmyNamesPlural[firstUpgrade], gArmyNamesPlural[secondUpgrade],
+                            gArmyNamesPlural[firstUpgrade + 1], gArmyNamesPlural[secondUpgrade + 1]);
+                }
+            }
+            else {
+                sprintf(gText,
+                        "{Freeman's Foundry}\n\nAll of your  %s, %s and %s have been upgraded into %s, %s, and %s.",
+                        gArmyNamesPlural[firstUpgrade], gArmyNamesPlural[secondUpgrade],
+                        gArmyNamesPlural[thirdUpgrade], gArmyNamesPlural[firstUpgrade + 1],
+                        gArmyNamesPlural[secondUpgrade + 1], gArmyNamesPlural[thirdUpgrade + 1]);
+            }
+            EventWindow(-1, 1, gText, FOUNDRY_DIALOG_CREATURE, firstUpgrade + 1,
+                        secondUpgrade == -1 ? -1 : FOUNDRY_DIALOG_CREATURE,
+                        secondUpgrade + 1, -1);
+        }
+        break;
+
+    case MAP_EVENT_BARRIER:
+        eraseObject = BarrierEvent(cell, eventHero);
+        break;
+
+    case MAP_EVENT_TRAVELER_TENT:
+        PasswordEvent(cell, eventHero);
+        break;
+
+    case MAP_EVENT_EXPANSION_DWELLING:
+        RecruitSiteEvent(cell, eventHero);
+        break;
+
+    case MAP_EVENT_EXPANSION_OBJECT:
+        GenericSiteEvent(cell, eventHero);
+        break;
+
+    case MAP_EVENT_JAIL:
+        JailEvent(cell, eventHero, x, y);
+    }
+
+    playedSample = eventSample;
+    UpdateRadar(1, 0);
+    UpdateHeroLocators(1, 1);
+    UpdateTownLocators(1, 1);
+    UpdBottomView(1, 1, 1);
+    if (eraseObject) {
+        EraseObj(cell, x, y);
+        FizzleCenter(fizzleType);
+    }
+    else {
+        CompleteDraw(0);
+    }
+    UpdateScreen(0, 0);
+    gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[*m_currentTerrain]);
+    WaitEndSample(playedSample, -1);
+    CheckEndGame(0, 0);
+}
 
 // @early-stop
 // reloc-masked: all 0x9f7 code bytes identical; residual is delinked local-label naming
@@ -196,8 +600,8 @@ cellDone:
     }
 
     SendMapChange(ERASE_MAP_CHANGE_OBJECT, 0, x, y, ERASE_MAP_CHANGE_VALUE, 0, 0);
-    SetEnvironmentOrigin(mapOriginX + ERASE_ENVIRONMENT_BORDER,
-                         mapOriginY + ERASE_ENVIRONMENT_BORDER, 1);
+    SetEnvironmentOrigin(m_mapOriginX + ERASE_ENVIRONMENT_BORDER,
+                         m_mapOriginY + ERASE_ENVIRONMENT_BORDER, 1);
     gpGame->SetupAdjacentMons();
 }
 
@@ -341,13 +745,13 @@ void advManager::EventSound(int eventType, int eventData, struct SAMPLE2 *outSam
     case MAP_EVENT_FREEMANS_FOUNDRY:
         musicTrack_e = EVENT_SOUND_TRACK_35;
         break;
-    case MAP_EVENT_EXPANSION_DWELLING:
+    case MAP_EVENT_BARRIER:
+        musicTrack_e = experienceSound_o;
+        break;
+    case MAP_EVENT_TRAVELER_TENT:
         musicTrack_e = experienceSound_o;
         break;
     case MAP_EVENT_EXPANSION_OBJECT:
-        musicTrack_e = experienceSound_o;
-        break;
-    case MAP_EVENT_EXPANSION_ALTAR:
         switch (eventData) {
         case EVENT_SOUND_VARIANT_0:
             musicTrack_e = experienceSound_o;
@@ -373,10 +777,10 @@ void advManager::EventSound(int eventType, int eventData, struct SAMPLE2 *outSam
             ;
         }
         break;
-    case MAP_EVENT_JAIL:
+    case MAP_EVENT_EXPANSION_DWELLING:
         musicTrack_e = experienceSound_o;
         break;
-    case MAP_EVENT_EXPANSION_SITE:
+    case MAP_EVENT_JAIL:
         musicTrack_e = experienceSound_o;
         break;
     default:

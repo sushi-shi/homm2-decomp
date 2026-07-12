@@ -4,6 +4,7 @@
 // 114 methods, 0 own-virtual, 0 static data.
 #include <va.h>
 #include <EDITOR/fullMap.h>
+#include <SOURCE/hero.h>
 // forward declarations:
 class army;
 class armyGroup;
@@ -19,7 +20,6 @@ struct tag_message;
 #ifndef HOMM2_GAME_RECORD_TYPES
 #define HOMM2_GAME_RECORD_TYPES
 struct townSlot { char m_pad[0x64]; };
-struct heroRec  { char m_pad[250]; };
 #endif
 
 #ifndef HOMM2_PLAYER_RECORD_TYPE
@@ -123,7 +123,7 @@ public:
     char   field_0xb52;  // +0xb52
     townSlot m_castleRecs[72];  // 0xb53  castle/town record slots (GetCastleRec)
     char _pad_0x2773[0x51];     // 0x2773..0x27c4
-    heroRec  m_heroRecs[72];    // 0x27c4  hero record slots (GetHeroSlot)
+    hero m_heroRecs[72];         // 0x27c4  hero record slots (GetHeroSlot)
     // --- methods ---
     void SetupDynamicStuff(int, int, int);
     void SetupNewOverviewType(int, int);

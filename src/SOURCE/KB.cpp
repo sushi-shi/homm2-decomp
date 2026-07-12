@@ -73,7 +73,7 @@ inline townSlot *GetCastleRec(int i)
 
 inline hero *GetHeroSlot(int i)
 {
-    return reinterpret_cast<hero *>(&gpGame->m_heroRecs[i]);
+    return &gpGame->m_heroRecs[i];
 }
 
 VA(0x00496450, 0x14e)
