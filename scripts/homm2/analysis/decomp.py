@@ -18,8 +18,6 @@ REPO = Path(os.environ.get("HOMM2_DIR")) if os.environ.get("HOMM2_DIR") else \
     next((p for p in Path(__file__).resolve().parents if (p / "flake.nix").exists()),
          Path(__file__).resolve().parents[3])
 IMAGEBASE = 0x400000
-TARGETS = Path("/tmp/homm2_decomp_targets.txt")
-OUT = Path("/tmp/homm2_decomp_out.txt")
 
 
 def main():
@@ -33,6 +31,9 @@ def main():
     if not (PROJ_DIR / f"{PROJ_NAME}.rep").is_dir():
         sys.exit("[decomp] no Ghidra project - run `homm2 ghidra` first (one-time, minutes)")
 
+    token = "%d" % os.getpid()
+    targets = Path("/tmp/homm2_decomp_%s_targets.txt" % token)
+    out = Path("/tmp/homm2_decomp_%s_out.txt" % token)
     lines = []
     for a in rvas:
         try:
@@ -40,18 +41,23 @@ def main():
         except ValueError:
             sys.exit(f"[decomp] '{a}' is not a hex address")
         lines.append("0x%x" % (n - IMAGEBASE if n >= IMAGEBASE else n))
-    TARGETS.write_text("\n".join(lines) + "\n")
-    if OUT.exists():
-        OUT.unlink()
+    targets.write_text("\n".join(lines) + "\n")
+    if out.exists():
+        out.unlink()
+    os.environ["HOMM2_DECOMP_TARGETS"] = str(targets)
+    os.environ["HOMM2_DECOMP_OUT"] = str(out)
     if force:
         os.environ["HOMM2_DECOMP_FORCE"] = "1"
 
     print("[decomp] opening Ghidra project (no re-analysis) ...", file=sys.stderr, flush=True)
-    run_scripts([DECOMP_EXPORT], analyze=False)
-
-    if not OUT.is_file():
-        sys.exit("[decomp] Ghidra produced no output (see log above)")
-    sys.stdout.write(OUT.read_text())
+    try:
+        run_scripts([DECOMP_EXPORT], analyze=False)
+        if not out.is_file():
+            sys.exit("[decomp] Ghidra produced no output (see log above)")
+        sys.stdout.write(out.read_text())
+    finally:
+        targets.unlink(missing_ok=True)
+        out.unlink(missing_ok=True)
 
 
 if __name__ == "__main__":
