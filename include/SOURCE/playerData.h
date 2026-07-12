@@ -23,6 +23,7 @@ public:
     int HasMobileHero(void);
     int BuildingsOwned(int, int, int);
     int NumOfGivenArtifact(int);
+    signed char CurrentHero(void) { return currentHero; }
 };
 #pragma pack(pop)
 #endif // HOMM2_SOURCE_PLAYERDATA_H
