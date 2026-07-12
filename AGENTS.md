@@ -41,6 +41,26 @@ authoritative. This file is the short, restart-ready Codex workflow.
 9. Run the full `homm2 build` and `git diff --check` before committing. A one-unit full build is
    about 4-5 seconds; do not optimize the build unless it exceeds 10 seconds in real shell time.
 
+## Orchestration Campaign
+
+- When the active goal is campaign orchestration, the root agent does not match functions itself.
+  It builds the weighted queue, dispatches matcher workers, reviews and integrates their diffs,
+  verifies master, blesses the baseline, commits, and immediately refills the freed lane.
+- Reuse four persistent worktrees with independent incremental `build/` and Wine state. The active
+  SOURCE pool is `.claude/worktrees/source-matcher-1` through `source-matcher-4`; reset a lane to the
+  latest `source-decomp` only after its prior result has been integrated. Do not modify or reset the
+  older dirty `matcher-1` through `matcher-4` BASE worktrees.
+- Keep each translation unit in one lane and never run workers on the same source file. Assign
+  bounded retail-order batches, including required predecessors, and keep the lane on that TU until
+  it is complete.
+- For a hardest-first campaign, rank SOURCE work by unmatched weighted bytes using the retained
+  source-hash maximum, not a transient live dip. Prefer `/Od` units until they are drained; start
+  `/O2` units when only optimizer/register-allocation work remains.
+- Integrate exactly one worker at a time. Apply only its declared source/header files; never copy a
+  worker's `README.md`, `config/match_baseline.tsv`, or transient queue. On `source-decomp`, run the
+  full build, verify the reported functions, run `homm2 status update`, stage the worker files plus
+  the root-generated README/baseline, and create one linear `match:` commit.
+
 ## Compiler Constraints
 
 - Retail is MSVC 4.2 with `/Od /Ob1`. Inlining is enabled even though optimization is disabled.
