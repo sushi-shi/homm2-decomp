@@ -183,6 +183,38 @@ typedef enum EraseObjectTileset {
     ERASE_TILESET_63 = 63
 } EraseObjectTileset;
 
+typedef enum MonsterInteractionConstant {
+    MONSTER_JOIN_FORCED = 0x1000,
+    MONSTER_COUNT_MASK = 0xfff,
+    MONSTER_DIPLOMACY_NONE = 0,
+    MONSTER_DIPLOMACY_BASIC = 1,
+    MONSTER_DIPLOMACY_ADVANCED = 2,
+    MONSTER_DIPLOMACY_EXPERT = 3,
+    MONSTER_NO_JOIN_ARTIFACT = 0x46,
+    MONSTER_DIALOG_YES = 0x7805,
+    MONSTER_OFFER_BUFFER_SIZE = 300
+} MonsterInteractionConstant;
+
+#define MONSTER_STRENGTH_JOIN 2.0
+#define MONSTER_STRENGTH_FLEE 5.0
+
+typedef enum MonsterInteractionType {
+    MONSTER_OGRE = 0x0f,
+    MONSTER_OGRE_LORD = 0x10,
+    MONSTER_DWARF = 0x15,
+    MONSTER_BATTLE_DWARF = 0x16,
+    MONSTER_ELF = 0x17,
+    MONSTER_GRAND_ELF = 0x18,
+    MONSTER_GREEN_DRAGON = 0x23,
+    MONSTER_RED_DRAGON = 0x24,
+    MONSTER_BLACK_DRAGON = 0x25,
+    MONSTER_GENIE = 0x3b,
+    MONSTER_EARTH_ELEMENTAL = 0x3e,
+    MONSTER_AIR_ELEMENTAL = 0x3f,
+    MONSTER_FIRE_ELEMENTAL = 0x40,
+    MONSTER_WATER_ELEMENTAL = 0x41
+} MonsterInteractionType;
+
 signed char StrEqNoCase(char *, char *);
 int GiveArtifact(class hero *, int, int, signed char);
 void GiveTakeArtifactStat(class hero *, int, int);

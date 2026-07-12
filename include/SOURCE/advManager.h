@@ -38,7 +38,7 @@ public:
     int    field_0xa2;  // +0xa2
     int    field_0xa6;  // +0xa6
     char _pad_0xaa[0x4];
-    class fullMap *mapData;  // +0xae
+    class fullMap *m_mapData;  // +0xae
     int    field_0xb2;  // +0xb2
     int    field_0xb6;  // +0xb6
     unsigned char *adventureBorder;  // +0xba

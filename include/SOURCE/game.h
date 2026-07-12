@@ -22,6 +22,13 @@ struct townSlot { char m_pad[0x64]; };
 struct heroRec  { char m_pad[250]; };
 #endif
 
+#ifndef HOMM2_PLAYER_RECORD_TYPE
+#define HOMM2_PLAYER_RECORD_TYPE
+#pragma pack(push, 1)
+struct playerRec { char pad0[0x8f]; int resources[7]; char pad1[0x70]; };
+#pragma pack(pop)
+#endif
+
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class game {
 public:
@@ -34,16 +41,16 @@ public:
     char _pad_0x5[0xe];
     char   field_0x13;  // +0x13
     char _pad_0x14[0x6a];
-    char   field_0x7e;  // +0x7e
+    unsigned char m_dwarfAlliance;  // +0x7e
     char   field_0x7f;  // +0x7f
     char   field_0x80;  // +0x80
     char   field_0x81;  // +0x81
     char   field_0x82;  // +0x82
     char   field_0x83;  // +0x83
     char   field_0x84;  // +0x84
-    char   field_0x85;  // +0x85
-    char   field_0x86;  // +0x86
-    char   field_0x87;  // +0x87
+    unsigned char m_dwarfbane;  // +0x85
+    unsigned char m_ogreAlliance;  // +0x86
+    unsigned char m_dragonAlliance;  // +0x87
     char   field_0x88;  // +0x88
     char   field_0x89;  // +0x89
     char _pad_0x8a[0x18];
@@ -111,22 +118,8 @@ public:
     short  field_0x496;  // +0x496
     short  field_0x498;  // +0x498
     short  field_0x49a;  // +0x49a
-    char _pad_0x49c[0x1];
-    char   field_0x49d;  // +0x49d
-    char _pad_0x49e[0x2];
-    char   field_0x4a0;  // +0x4a0
-    char _pad_0x4a1[0x7];
-    char   field_0x4a8;  // +0x4a8
-    char _pad_0x4a9[0x6];
-    char   field_0x4af;  // +0x4af
-    char _pad_0x4b0[0x7b];
-    int    field_0x52b;  // +0x52b
-    char _pad_0x52f[0x18];
-    char   field_0x547;  // +0x547
-    char _pad_0x548[0x2a9];
-    char   field_0x7f1;  // +0x7f1
-    char _pad_0x7f2[0x34c];
-    class fullMap worldMap;  // +0xb3e
+    struct playerRec m_players[6];  // +0x49c
+    class fullMap m_worldMap;  // +0xb3e
     char   field_0xb52;  // +0xb52
     townSlot m_castleRecs[72];  // 0xb53  castle/town record slots (GetCastleRec)
     char _pad_0x2773[0x51];     // 0x2773..0x27c4
