@@ -181,8 +181,8 @@ BASE/INPUTMGR	?SetKeyCodeType@inputManager@@QAEXH@Z	100.0000	6342f2fae2a5
 BASE/INPUTMGR	?SetMouseCoords@inputManager@@QAEXHH@Z	100.0000	d6158d77293b
 BASE/Icon2b	?IconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	61.2830	74b5c517cdec
 BASE/Icond2b	?DimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	65.3621	66d2dc1051cd
-BASE/Icondf2b	?FlipDimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	60.8976	2198fcd16c8a
-BASE/Iconf2b	?FlipIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	59.4085	229d4cf4d270
+BASE/Icondf2b	?FlipDimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	61.8855	2198fcd16c8a
+BASE/Iconf2b	?FlipIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	59.9761	229d4cf4d270
 BASE/Iconm2b	?MonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	68.5801	345eaf36d7a0
 BASE/Iconmf2b	?FlipMonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	66.3293	a7c8b50283d1
 BASE/MOUSEMGR	??0mouseManager@@QAE@XZ	100.0000	cd5abb5d46d3
@@ -380,7 +380,7 @@ BASE/droplist	?RestoreDropBackground@dropListWidget@@QAEXXZ	100.0000	fdd690daaab
 BASE/droplist	?SaveDropBackground@dropListWidget@@QAEXXZ	100.0000	b3d5c9e1b5dd
 BASE/icon2bc	?IconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAEH@Z	58.8357	d218a782e049
 BASE/icon2bs	?IconToBitmapScale@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	76.3262	a49d5fdfa818
-BASE/icon2by	?IconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	64.0178	beaeeca30cbb
+BASE/icon2by	?IconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	64.7919	beaeeca30cbb
 BASE/iconf2bc	?FlipIconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAE@Z	61.1814	81967a8a5cfd
 BASE/iconf2by	?FlipIconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	68.3405	774d85a1f3f0
 BASE/listbox	??0listBoxWidget@@QAE@XZ	97.3684	2d787e1f30f9
@@ -460,8 +460,8 @@ SOURCE/ADVMGR	?CompleteDraw@advManager@@QAEXH@Z	100.0000	3dd382a41d95
 SOURCE/ADVMGR	?CompleteDraw@advManager@@QAEXHHHH@Z	3.6563	c1cb89afeae7
 SOURCE/ADVMGR	?ComputeAdvNetControl@@YIXXZ	15.0685	b5182625922b
 SOURCE/ADVMGR	?ControlPanel@advManager@@QAEHXZ	6.2293	5e307b405784
-SOURCE/ADVMGR	?DeactivateCurrHero@advManager@@QAEXXZ	100.0000	c30c6eae9534
-SOURCE/ADVMGR	?DeactivateCurrTown@advManager@@QAEXXZ	100.0000	1a74b32bc9d1
+SOURCE/ADVMGR	?DeactivateCurrHero@advManager@@QAEXXZ	100.0000	5d350ed465dd
+SOURCE/ADVMGR	?DeactivateCurrTown@advManager@@QAEXXZ	100.0000	b8067be323b6
 SOURCE/ADVMGR	?DemobilizeCurrHero@advManager@@QAEXXZ	12.6019	1d6c9b137943
 SOURCE/ADVMGR	?DimensionDoor@advManager@@QAEXXZ	8.9517	c343f22e3f9a
 SOURCE/ADVMGR	?DimensionDoorHandler@@YIHAAUtag_message@@@Z	7.3439	9102e79d9bc9
@@ -489,7 +489,7 @@ SOURCE/ADVMGR	?IsCrystalBallInEffect@advManager@@QAEHHHH@Z	21.5077	0a516f0d991c
 SOURCE/ADVMGR	?LoadRemote@advManager@@QAEXXZ	12.3810	486a6fc160e1
 SOURCE/ADVMGR	?Main@advManager@@UAEHAAUtag_message@@@Z	0.3670	44ff390747a3
 SOURCE/ADVMGR	?MapExtraPosAndAdjacentsSet@@YIHHHE@Z	95.8310	55dca7ececa9
-SOURCE/ADVMGR	?MobilizeCurrHero@advManager@@QAEXH@Z	100.0000	8b445ea7fac5
+SOURCE/ADVMGR	?MobilizeCurrHero@advManager@@QAEXH@Z	100.0000	1beafa12e3d6
 SOURCE/ADVMGR	?MouseInScrollZone@advManager@@QAEHXZ	100.0000	504169b33aa3
 SOURCE/ADVMGR	?Open@advManager@@UAEHH@Z	2.6328	a3b86c95dbcf
 SOURCE/ADVMGR	?ProcessDeSelect@advManager@@QAEHPAUtag_message@@PAHPAPAVmapCell@@@Z	2.5636	1a900f7f616e
@@ -730,11 +730,11 @@ SOURCE/EVENTS	?CombatMonsterEvent@advManager@@QAEHPAVhero@@HHPAVmapCell@@HHHHHHH
 SOURCE/EVENTS	?ComputerMonsterInteract@advManager@@QAEXPAVmapCell@@PAVhero@@PAH@Z	4.0918	68ff21e70357
 SOURCE/EVENTS	?DoAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	0.1269	f0987c16d219
 SOURCE/EVENTS	?DoCombat@advManager@@QAEHHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHH@Z	2.0668	2180a6a2e575
-SOURCE/EVENTS	?DoEvent@advManager@@QAEXPAVmapCell@@HH@Z	0.0542	464fa90189ac
+SOURCE/EVENTS	?DoEvent@advManager@@QAEXPAVmapCell@@HH@Z	97.7684	57416df93c2e
 SOURCE/EVENTS	?DoNetCombat@advManager@@QAEHPAD@Z	8.9200	be23ad7e9310
 SOURCE/EVENTS	?DoWhirlpool@advManager@@QAEXPAVhero@@@Z	16.0247	0d48def2eef3
-SOURCE/EVENTS	?EraseObj@advManager@@QAEXPAVmapCell@@HH@Z	0.4877	61ddf978a1df
-SOURCE/EVENTS	?EventSound@advManager@@QAEXHHPAUSAMPLE2@@@Z	1.5207	42f47c886f71
+SOURCE/EVENTS	?EraseObj@advManager@@QAEXPAVmapCell@@HH@Z	98.5083	c7e56d42d2f3
+SOURCE/EVENTS	?EventSound@advManager@@QAEXHHPAUSAMPLE2@@@Z	99.3201	72aac3347965
 SOURCE/EVENTS	?EventWindow@advManager@@QAEXHHPADHHHHH@Z	22.0000	e7de72f6946e
 SOURCE/EVENTS	?ExpansionRecruitEvent@advManager@@QAEXPAVhero@@HPAF@Z	28.2174	0893eb34fc78
 SOURCE/EVENTS	?FizzleCenter@advManager@@QAEXH@Z	15.8293	01431b8a166e
@@ -753,7 +753,7 @@ SOURCE/EVENTS	?JailAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	10.6393	b8e
 SOURCE/EVENTS	?JailEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	7.6805	1e7d053c1729
 SOURCE/EVENTS	?PasswordAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	48.0741	b5628d9f8e78
 SOURCE/EVENTS	?PasswordEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	18.8116	5f657c2c442c
-SOURCE/EVENTS	?PlayerMonsterInteract@advManager@@QAEXPAVmapCell@@0PAVhero@@PAHHHHHH@Z	2.2103	24d5174cade2
+SOURCE/EVENTS	?PlayerMonsterInteract@advManager@@QAEXPAVmapCell@@0PAVhero@@PAHHHHHH@Z	100.0000	633df0f44e3b
 SOURCE/EVENTS	?ReceiveHeroTownData@advManager@@QAEXPADPAH11PAPAVhero@@PAPAVarmyGroup@@PAPAVtown@@23111PAC55@Z	4.1338	5ade8e4c8d1e
 SOURCE/EVENTS	?RecruitEvent@advManager@@QAEXPAVhero@@HPAVmapCell@@@Z	22.0000	5261e784e3a3
 SOURCE/EVENTS	?RecruitSiteAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	4.0040	04dc8de02873
@@ -762,7 +762,7 @@ SOURCE/EVENTS	?RiddleStringsEqual@@YIHPAD0@Z	24.9500	017a9584f657
 SOURCE/EVENTS	?SendHeroTownData@advManager@@QAEXHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHHHHH@Z	4.9167	1d5a27f7a327
 SOURCE/EVENTS	?SkeletonEvent@advManager@@QAEHPAVhero@@PAVmapCell@@PADHH@Z	6.4722	f2f75ddd1dbf
 SOURCE/EVENTS	?StrEqNoCase@@YICPAD0@Z	29.9400	455d4bb38f2a
-SOURCE/EVENTS	?TownEvent@advManager@@QAEXPAVmapCell@@HH@Z	9.2057	88717407f346
+SOURCE/EVENTS	?TownEvent@advManager@@QAEXPAVmapCell@@HH@Z	9.2057	24d782520586
 SOURCE/EVENTS	?TransferArtifacts@advManager@@QAEXPAVhero@@0@Z	11.0000	f3c66c983484
 SOURCE/EVENTS	?ZombieEvent@advManager@@QAEHPAVhero@@PAVmapCell@@PADHH@Z	5.9237	56d708800b79
 SOURCE/FINDPATH	??0searchArray@@QAE@XZ	33.3333	3cbf5a1233c8
@@ -808,7 +808,7 @@ SOURCE/GAME	?ExperienceValueOfStack@game@@QAEHPAVarmyGroup@@PAVhero@@@Z	100.0000
 SOURCE/GAME	?GenerateStandardFileName@@YIXPAD0@Z	16.0575	051f753afb94
 SOURCE/GAME	?GetBoatsBuilt@game@@QAEHXZ	100.0000	2ac414a310d9
 SOURCE/GAME	?GetLuck@game@@QAEHPAVhero@@PAVarmy@@PAVtown@@@Z	17.4750	dd7310c53452
-SOURCE/GAME	?GetMapEvent@@YIPAUEventExtra@@HH@Z	100.0000	89fdb5841bb6
+SOURCE/GAME	?GetMapEvent@@YIPAUEventExtra@@HH@Z	100.0000	c750d46c1af0
 SOURCE/GAME	?GetMineId@game@@QAEHHH@Z	100.0000	e9d7c3a33ecb
 SOURCE/GAME	?GetNewHeroId@game@@QAEHHHH@Z	10.8438	e3a6805a4d5c
 SOURCE/GAME	?GetNumObelisks@@YIHH@Z	100.0000	db23965452ba
@@ -880,7 +880,7 @@ SOURCE/GAME	?WeeklyGenericSite@game@@QAEXPAVmapCell@@@Z	100.0000	ce0267d940e0
 SOURCE/GAME	?WeeklyRecruitSite@game@@QAEXPAVmapCell@@@Z	7.6977	9731a8ad9fbb
 SOURCE/GAME	?Write@playerData@@QAEXH@Z	5.9816	191cb570bebc
 SOURCE/GAME	?WriteDiffHeaderInfo@@YIXEHPAEPAH@Z	94.1839	c140b2a06733
-SOURCE/HERO	??0hero@@QAE@XZ	42.4242	2056e5c468b3
+SOURCE/HERO	??0hero@@QAE@XZ	51.5152	2056e5c468b3
 SOURCE/HERO	?AddSpell@hero@@QAEXHH@Z	81.2500	d0780fb42ac1
 SOURCE/HERO	?ApplyBattleLossTemps@hero@@QAEXXZ	86.6667	5cfee9f60402
 SOURCE/HERO	?ApplyBattleWinTemps@hero@@QAEXXZ	8.9041	0d9e66a5f9e7
@@ -928,7 +928,7 @@ SOURCE/HEXCELL	?DrawLowerDeadOccupants@hexcell@@QAEXXZ	100.0000	cb1ea396d867
 SOURCE/HEXCELL	?DrawObstacle@hexcell@@QAEXXZ	100.0000	5bfb56b18dad
 SOURCE/HEXCELL	?DrawOccupant@hexcell@@QAEXHH@Z	100.0000	2a521e2d9d4d
 SOURCE/HEXCELL	?DrawTower@hexcell@@QAEXH@Z	100.0000	d3354a19c98f
-SOURCE/HEXCELL	?DrawUpperDeadOccupant@hexcell@@QAEXXZ	90.5152	6b6269de1091
+SOURCE/HEXCELL	?DrawUpperDeadOccupant@hexcell@@QAEXXZ	100.0000	6b6269de1091
 SOURCE/HISCORE	??0highScoreManager@@QAE@XZ	56.0938	e19aa444a806
 SOURCE/HISCORE	?Close@highScoreManager@@UAEXXZ	38.1765	b5d8b52cb529
 SOURCE/HISCORE	?Main@highScoreManager@@UAEHAAUtag_message@@@Z	10.1314	6efa6d3f6527
@@ -962,7 +962,7 @@ SOURCE/KB	?GetBuildingInfo@@YIPADHHH@Z	100.0000	f7906f078416
 SOURCE/KB	?GetBuildingName@@YIPADHH@Z	100.0000	f32cd5689a96
 SOURCE/KB	?GetManaCost@@YIHHPAVhero@@@Z	100.0000	38a07c9fbbae
 SOURCE/KB	?GetMonType@@YIHHH@Z	100.0000	4158c55561e9
-SOURCE/KB	?GetMonsterCost@@YIXHQAH@Z	99.5690	f09d265c97a9
+SOURCE/KB	?GetMonsterCost@@YIXHQAH@Z	99.5690	721db9734a5d
 SOURCE/KB	?GetMonsterName@@YIPADH@Z	100.0000	4bed126d3379
 SOURCE/KB	?GetTownName@@YIPADH@Z	100.0000	8cb1e3007501
 SOURCE/KB	?HandleAppSpecificMenuCommands@@YIHH@Z	1.4222	404661446a59
