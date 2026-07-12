@@ -1298,7 +1298,7 @@ DATA(0x004fc7a8) float *gfSSArcheryMod;
 DATA(0x004fc7b8) float *gfSSAIArcheryMod;
 DATA(0x004fc7c8) signed char *giVisRange;
 DATA(0x004fc7f0) int giTerrainCost[10][4][2];
-DATA(0x004fc930) unsigned char *bStopOnTrigger;
+DATA(0x004fc930) unsigned char bStopOnTrigger[128];
 DATA(0x004fc9b0) char *gTownPrefixNames[6];
 DATA(0x004fc9c8) char *gTownObjNames[32];
 DATA(0x004fca48) signed char gDwellingType[20][12];

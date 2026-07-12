@@ -4,8 +4,21 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <_carcass_types.h>
+#include <BASE/Icon2b.h>
+#include <BASE/Misc.h>
+#include <BASE/heroWindow.h>
+#include <BASE/heroWindowManager.h>
+#include <BASE/mouseManager.h>
+#include <BASE/resourceManager.h>
+#include <EDITOR/mapcell.h>
+#include <SOURCE/KB.h>
+#include <SOURCE/PHILAI.h>
+#include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/ADVMGR.h>
+#include <SOURCE/playerData.h>
+#include <stdio.h>
 VA(0x00456350, 0x30f)
 advManager::advManager(void) {}
 
@@ -28,7 +41,10 @@ VA(0x00457d6c, 0xfda)
 int advManager::Main(struct tag_message &) { return 0; }
 
 VA(0x00458d46, 0x22)
-void advManager::Reseed(int, int) {}
+void advManager::Reseed(int, int)
+{
+    giSeedingValid = 0;
+}
 
 VA(0x00458d68, 0xeb1)
 int advManager::ProcessSelect(struct tag_message *, class mapCell * *) { return 0; }
@@ -49,7 +65,10 @@ VA(0x0045b2ae, 0x4eb)
 void advManager::CompleteDraw(int, int, int, int) {}
 
 VA(0x0045b799, 0x3a)
-void advManager::CompleteDraw(int) {}
+void advManager::CompleteDraw(int update)
+{
+    CompleteDraw(mapOriginX, mapOriginY, update, 1);
+}
 
 VA(0x0045b7d3, 0x3a9)
 int advManager::GetCloudLookup(int, int) { return 0; }
@@ -109,10 +128,17 @@ VA(0x00463dd6, 0x11f)
 void advManager::RedrawAdvScreen(int, int) {}
 
 VA(0x00463ef5, 0x1f)
-void advManager::DeactivateCurrTown(void) {}
+void advManager::DeactivateCurrTown(void)
+{
+    gpCurPlayer->currentTown = -1;
+}
 
 VA(0x00463f14, 0x27)
-void advManager::DeactivateCurrHero(void) {}
+void advManager::DeactivateCurrHero(void)
+{
+    DemobilizeCurrHero();
+    gpCurPlayer->currentHero = -1;
+}
 
 VA(0x00463f3b, 0x5a)
 void advManager::MobilizeCurrHero(int) {}
@@ -148,13 +174,23 @@ VA(0x004654ad, 0x11a9)
 int advManager::ComboDraw(int, int, int) { return 0; }
 
 VA(0x00466656, 0x38)
-int advManager::ComboDraw(int) { return 0; }
+int advManager::ComboDraw(int update)
+{
+    return ComboDraw(mapOriginX, mapOriginY, update);
+}
 
 VA(0x0046668e, 0x338)
 void advManager::SetEnvironmentOrigin(int, int, int) {}
 
 VA(0x004669c6, 0x69)
-void advManager::CheckLoadSample(int) {}
+void advManager::CheckLoadSample(int index)
+{
+    if (loopingSamples[index] == 0) {
+        TrimLoopingSounds(ADVMGR_LOOPING_SOUND_LIMIT);
+        sprintf(gText, "loop%04d.82M", index);
+        loopingSamples[index] = gpResourceManager->GetSample(gText);
+    }
+}
 
 VA(0x00466a2f, 0x4c1)
 int advManager::GetSoundId(int, int) { return 0; }
@@ -193,7 +229,17 @@ VA(0x0046891f, 0x138)
 void advManager::SeedTo(int, int) {}
 
 VA(0x00468a57, 0x5f)
-void advManager::ForceNewHover(void) {}
+void advManager::ForceNewHover(void)
+{
+    int x;
+    int y;
+
+    if (!gbThisNetHumanPlayer[giCurPlayer])
+        return;
+    gpMouseManager->MouseCoords(x, y);
+    lastHoverCell = ADVMGR_INVALID_CELL;
+    ProcessHover(x, y);
+}
 
 VA(0x00468ab6, 0x1a6)
 void advManager::ScreenScroll(int, int) {}
@@ -202,7 +248,19 @@ VA(0x00468c5c, 0x1bb)
 void advManager::CheckScreenScroll(void) {}
 
 VA(0x00468e17, 0x91)
-int advManager::MouseInScrollZone(void) { return 0; }
+int advManager::MouseInScrollZone(void)
+{
+    int x;
+    int y;
+
+    gpMouseManager->MouseCoords(x, y);
+    if (x >= 0 && x < ADVMGR_SCREEN_WIDTH && y >= 0 && y < ADVMGR_SCREEN_HEIGHT) {
+        if (x < ADVMGR_SCROLL_BORDER || x > ADVMGR_SCREEN_WIDTH - ADVMGR_SCROLL_BORDER - 1
+            || y < ADVMGR_SCROLL_BORDER || y > ADVMGR_SCREEN_HEIGHT - ADVMGR_SCROLL_BORDER)
+            return 1;
+    }
+    return 0;
+}
 
 VA(0x00468ea8, 0x2b8)
 void advManager::SetInitialMapOrigin(void) {}
@@ -220,10 +278,38 @@ VA(0x004695f7, 0x1d5)
 void advManager::TrimLoopingSounds(int) {}
 
 VA(0x004697cc, 0xd5)
-void advManager::DisableButtons(void) {}
+void advManager::DisableButtons(void)
+{
+    if (gpAdvManager->m_active != 1)
+        return;
+    tag_message msg;
+    msg.type = ADVMGR_BUTTON_MESSAGE;
+    msg.field4 = ADVMGR_BUTTON_DISABLE;
+    msg.field18 = ADVMGR_BUTTON_TARGET;
+    msg.field8 = ADVMGR_BUTTON_SLOT_1; adventureWindow->BroadcastMessage(msg);
+    msg.field8 = ADVMGR_BUTTON_SLOT_2; adventureWindow->BroadcastMessage(msg);
+    msg.field8 = ADVMGR_BUTTON_SLOT_3; adventureWindow->BroadcastMessage(msg);
+    msg.field8 = ADVMGR_BUTTON_SLOT_4; adventureWindow->BroadcastMessage(msg);
+    msg.field8 = ADVMGR_BUTTON_SLOT_5; adventureWindow->BroadcastMessage(msg);
+    msg.field8 = ADVMGR_BUTTON_SLOT_6; adventureWindow->BroadcastMessage(msg);
+}
 
 VA(0x004698a1, 0xd5)
-void advManager::EnableButtons(void) {}
+void advManager::EnableButtons(void)
+{
+    if (gpAdvManager->m_active != 1)
+        return;
+    tag_message msg;
+    msg.type = ADVMGR_BUTTON_MESSAGE;
+    msg.field4 = ADVMGR_BUTTON_ENABLE;
+    msg.field18 = ADVMGR_BUTTON_TARGET;
+    msg.field8 = ADVMGR_BUTTON_SLOT_1; adventureWindow->BroadcastMessage(msg);
+    msg.field8 = ADVMGR_BUTTON_SLOT_2; adventureWindow->BroadcastMessage(msg);
+    msg.field8 = ADVMGR_BUTTON_SLOT_3; adventureWindow->BroadcastMessage(msg);
+    msg.field8 = ADVMGR_BUTTON_SLOT_4; adventureWindow->BroadcastMessage(msg);
+    msg.field8 = ADVMGR_BUTTON_SLOT_5; adventureWindow->BroadcastMessage(msg);
+    msg.field8 = ADVMGR_BUTTON_SLOT_6; adventureWindow->BroadcastMessage(msg);
+}
 
 VA(0x00469976, 0x145)
 void advManager::SaveAdventureBorder(void) {}
@@ -237,14 +323,42 @@ int advManager::FindAdjacentMonster(int, int, int *, int *, int, int) { return 0
 VA(0x00469fc2, 0x125)
 void ComputeAdvNetControl(void) {}
 
+// @early-stop
+// target loads MAP_WIDTH/MAP_HEIGHT before the local operand; base loads the local first
 VA(0x0046a0e7, 0xf6)
-int MapExtraPosAndAdjacentsSet(int, int, unsigned char) { return 0; }
+int MapExtraPosAndAdjacentsSet(int x, int y, unsigned char mask)
+{
+    if (mapExtra[MAP_WIDTH * y + x] & mask)
+        return 1;
+    for (int checkX = x - 1; checkX <= x + 1; ++checkX) {
+        if (checkX < 0 || checkX >= MAP_WIDTH)
+            continue;
+        for (int checkY = y - 1; checkY <= y + 1; ++checkY) {
+            if (checkY < 0 || checkY > MAP_HEIGHT - 1)
+                continue;
+            if (mapExtra[checkY * MAP_WIDTH + checkX] & mask)
+                return 1;
+        }
+    }
+    return 0;
+}
 
 VA(0x0046a1dd, 0x4c6)
 void advManager::ViewPuzzle(void) {}
 
+// @early-stop
+// all 49 instructions and five relocation targets match; residual is the TU object span
 VA(0x0046a6a3, 0x81)
-void advManager::PuzzleDraw(int, int, int, int) {}
+void advManager::PuzzleDraw(int left, int top, int right, int bottom)
+{
+    gbDrawingPuzzle = 1;
+    CompleteDraw(left, top, 0, 0);
+    gbDrawingPuzzle = 0;
+    IconToBitmap(puzzleIcon, gpWindowManager->m_screen,
+                 (right - left) * ADVMGR_PUZZLE_TILE_SIZE - ADVMGR_PUZZLE_X_TRIM,
+                 (bottom - top) * ADVMGR_PUZZLE_TILE_SIZE, 0, 1, 0, 0,
+                 ADVMGR_SCREEN_HEIGHT, ADVMGR_SCREEN_HEIGHT, 0);
+}
 
 VA(0x0046a724, 0x2ac)
 void advManager::AdvPanel(void) {}
@@ -268,10 +382,34 @@ VA(0x0046b578, 0x672)
 int SystemOptionsHandler(struct tag_message &) { return 0; }
 
 VA(0x0046bbea, 0x7f)
-int GetMobilityFrame(int) { return 0; }
+int GetMobilityFrame(int mobility)
+{
+    int frame = mobility * ADVMGR_MOBILITY_SCALE / ADVMGR_MOBILITY_DIVISOR;
+    if (frame < 0)
+        frame = 0;
+    if (frame > ADVMGR_MOBILITY_TOP_THRESHOLD)
+        frame = ADVMGR_FRAME_TOP;
+    else if (frame > ADVMGR_MOBILITY_HIGH_THRESHOLD)
+        frame = ADVMGR_FRAME_HIGH;
+    else if (frame > ADVMGR_MOBILITY_MID_THRESHOLD)
+        frame = ADVMGR_FRAME_MID;
+    return frame;
+}
 
 VA(0x0046bc69, 0x7f)
-int GetManaFrame(int) { return 0; }
+int GetManaFrame(int mana)
+{
+    int frame = mana / ADVMGR_MANA_DIVISOR;
+    if (frame == 0 && mana >= ADVMGR_MANA_MIN_VISIBLE)
+        frame = 1;
+    if (frame > ADVMGR_MANA_TOP_THRESHOLD)
+        frame = ADVMGR_FRAME_TOP;
+    else if (frame > ADVMGR_MANA_HIGH_THRESHOLD)
+        frame = ADVMGR_FRAME_HIGH;
+    else if (frame > ADVMGR_MANA_MID_THRESHOLD)
+        frame = ADVMGR_FRAME_MID;
+    return frame;
+}
 
 VA(0x0046bce8, 0x559)
 int advManager::DoVisions(class hero *) { return 0; }
@@ -280,7 +418,21 @@ VA(0x0046c241, 0xd7)
 int advManager::IsCrystalBallInEffect(int, int, int) { return 0; }
 
 VA(0x0046c318, 0x85)
-unsigned char StopOnTrigger(class mapCell *) { return 0; }
+unsigned char StopOnTrigger(class mapCell *cell)
+{
+    int type = cell->triggerType & ADVMGR_TRIGGER_TYPE_MASK;
+    if (type != ADVMGR_SPECIAL_TRIGGER)
+        return bStopOnTrigger[type];
+
+    int trigger = cell->w4hi;
+    trigger &= ADVMGR_SPECIAL_TRIGGER_MASK;
+    switch (trigger) {
+    case ADVMGR_TRIGGER_EVENT_5:
+    case ADVMGR_TRIGGER_EVENT_6:
+        return 1;
+    }
+    return 0;
+}
 
 
 // ===== vtable advManager : public baseManager  (3 slots) =====

@@ -7,6 +7,58 @@
 class mapCell;
 struct tag_message;
 
+typedef enum AdventureScreenConstant {
+    ADVMGR_SCREEN_WIDTH = 640,
+    ADVMGR_SCREEN_HEIGHT = 480,
+    ADVMGR_SCROLL_BORDER = 16,
+    ADVMGR_PUZZLE_TILE_SIZE = 32,
+    ADVMGR_PUZZLE_X_TRIM = 12
+} AdventureScreenConstant;
+
+typedef enum AdventureButtonConstant {
+    ADVMGR_BUTTON_MESSAGE = 0x200,
+    ADVMGR_BUTTON_ENABLE = 5,
+    ADVMGR_BUTTON_DISABLE = 6,
+    ADVMGR_BUTTON_FIRST = 1,
+    ADVMGR_BUTTON_LAST = 6,
+    ADVMGR_BUTTON_TARGET = 2,
+    ADVMGR_BUTTON_SLOT_1 = 1,
+    ADVMGR_BUTTON_SLOT_2 = 2,
+    ADVMGR_BUTTON_SLOT_3 = 3,
+    ADVMGR_BUTTON_SLOT_4 = 4,
+    ADVMGR_BUTTON_SLOT_5 = 5,
+    ADVMGR_BUTTON_SLOT_6 = 6
+} AdventureButtonConstant;
+
+typedef enum AdventureTriggerConstant {
+    ADVMGR_TRIGGER_TYPE_MASK = 0x7f,
+    ADVMGR_SPECIAL_TRIGGER = 0x7a,
+    ADVMGR_SPECIAL_TRIGGER_MASK = 0x3f,
+    ADVMGR_TRIGGER_EVENT_5 = 5,
+    ADVMGR_TRIGGER_EVENT_6 = 6
+} AdventureTriggerConstant;
+
+typedef enum AdventureFrameConstant {
+    ADVMGR_MOBILITY_SCALE = 22,
+    ADVMGR_MOBILITY_DIVISOR = 1500,
+    ADVMGR_MANA_DIVISOR = 5,
+    ADVMGR_MANA_MIN_VISIBLE = 3,
+    ADVMGR_MOBILITY_TOP_THRESHOLD = 30,
+    ADVMGR_MOBILITY_HIGH_THRESHOLD = 26,
+    ADVMGR_MOBILITY_MID_THRESHOLD = 23,
+    ADVMGR_MANA_TOP_THRESHOLD = 33,
+    ADVMGR_MANA_HIGH_THRESHOLD = 28,
+    ADVMGR_MANA_MID_THRESHOLD = 23,
+    ADVMGR_FRAME_TOP = 25,
+    ADVMGR_FRAME_HIGH = 24,
+    ADVMGR_FRAME_MID = 23
+} AdventureFrameConstant;
+
+typedef enum AdventureStateConstant {
+    ADVMGR_INVALID_CELL = -1,
+    ADVMGR_LOOPING_SOUND_LIMIT = 4
+} AdventureStateConstant;
+
 int SaveGame(void);
 int DimensionDoorHandler(struct tag_message &);
 int TownPortalHandler(struct tag_message &);
