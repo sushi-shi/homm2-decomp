@@ -14,3 +14,4 @@ DATA(0x00527e78) int xPasswordStringsIndex[8];
 DATA(0x00527e98) signed char xIsExpansionMap;
 DATA(0x00527e20) unsigned char xIsPlayingExpansionCampaign;
 DATA(0x00527e28) ExpCampaign xCampaign;
+DATA(0x00527ea0) int xTheSpell;

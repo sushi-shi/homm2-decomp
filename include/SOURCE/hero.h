@@ -7,13 +7,19 @@
 // forward declarations:
 class town;
 
+typedef enum HeroSecondarySkill {
+    HERO_SKILL_DIPLOMACY = 4,
+    HERO_SKILL_LEADERSHIP = 6,
+    HERO_SKILL_WISDOM = 7
+} HeroSecondarySkill;
+
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class hero {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
-    short  field_0x0;  // +0x00
-    char   field_0x2;  // +0x02
+    short  m_spellPoints;  // +0x00
+    char   m_id;  // +0x02
     char   m_owner;  // +0x03
     short  field_0x4;  // +0x04
     char _pad_0x6[0x1];
@@ -21,34 +27,41 @@ public:
     char _pad_0x9[0x1];
     char   field_0xa;  // +0x0a
     char _pad_0xb[0xc];
-    char   field_0x17;  // +0x17
+    unsigned char m_cursorType;  // +0x17
     char   field_0x18;  // +0x18
     int    field_0x19;  // +0x19
     int    field_0x1d;  // +0x1d
     int    field_0x21;  // +0x21
     int    field_0x25;  // +0x25
-    char _pad_0x29[0x4];
-    short  field_0x2d;  // +0x2d
-    short  field_0x2f;  // +0x2f
+    char _pad_0x29[0x3];
+    unsigned char m_direction;  // +0x2c
+    short  m_locationType;  // +0x2d
+    short  m_occupiedTown;  // +0x2f
     int m_mobility;  // +0x31
     int m_remainingMobility;  // +0x35
-    int    field_0x39;  // +0x39
-    short  field_0x3d;  // +0x3d
-    char _pad_0x3f[0x2];
-    char   field_0x41;  // +0x41
-    char _pad_0x42[0x2];
+    int m_experience;  // +0x39
+    short m_level;  // +0x3d
+    signed char m_attack;  // +0x3f
+    signed char m_defense;  // +0x40
+    signed char m_spellPower;  // +0x41
+    signed char m_knowledge;  // +0x42
+    char _pad_0x43[0x1];
     signed char m_morale;  // +0x44
     signed char m_luck;  // +0x45
-    char _pad_0x46[0x1d];
+    char _pad_0x46[0x1];
+    unsigned int m_gazeboVisits;  // +0x47
+    unsigned int m_fortVisits;  // +0x4b
+    unsigned int m_witchDoctorVisits;  // +0x4f
+    unsigned int m_mercenaryCampVisits;  // +0x53
+    unsigned int m_standingStoneVisits;  // +0x57
+    unsigned int m_treeKnowledgeVisits;  // +0x5b
+    unsigned int m_xanaduVisits;  // +0x5f
     char   field_0x63;  // +0x63
     char   field_0x64;  // +0x64
     class armyGroup m_army;  // +0x65
-    char _pad_0x74[0x4];
-    signed char m_diplomacy;  // +0x78
-    char _pad_0x79[0x2];
-    char   field_0x7b;  // +0x7b
-    char _pad_0x7c[0x14];
-    int    field_0x90;  // +0x90
+    signed char m_secondarySkills[14];  // +0x74
+    char _pad_0x82[0xe];
+    int m_secondarySkillCount;  // +0x90
     char _pad_0x94[0x4f];
     unsigned int m_eventFlags;  // +0xe3
     char m_pad_0xe7[0x13];

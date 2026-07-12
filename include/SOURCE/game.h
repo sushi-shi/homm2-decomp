@@ -22,6 +22,26 @@ struct tag_message;
 struct townSlot { char m_pad[0x64]; };
 #endif
 
+#pragma pack(push, 1)
+struct mineRecord {
+    signed char resourceType;
+    signed char guardianType;
+    unsigned char guardianCount;
+    char pad[4];
+};
+struct boatRecord {
+    signed char id;
+    signed char x;
+    signed char y;
+    signed char direction;
+    unsigned char savedTriggerType;
+    unsigned char savedEventData;
+    signed char heroId;
+    signed char owner;
+};
+#pragma pack(pop)
+SIZE(boatRecord, 8);
+
 #ifndef HOMM2_PLAYER_RECORD_TYPE
 #define HOMM2_PLAYER_RECORD_TYPE
 #pragma pack(push, 1)
@@ -35,9 +55,9 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     short  field_0x0;  // +0x00
-    char   field_0x2;  // +0x02
+    unsigned char m_campaignType;  // +0x02
     char   field_0x3;  // +0x03
-    char   field_0x4;  // +0x04
+    unsigned char m_campaignScenario;  // +0x04
     char _pad_0x5[0xe];
     char   field_0x13;  // +0x13
     char _pad_0x14[0x6a];
@@ -123,7 +143,15 @@ public:
     char   field_0xb52;  // +0xb52
     townSlot m_castleRecs[72];  // 0xb53  castle/town record slots (GetCastleRec)
     char _pad_0x2773[0x51];     // 0x2773..0x27c4
-    hero m_heroRecs[72];         // 0x27c4  hero record slots (GetHeroSlot)
+    hero m_heroRecs[54];         // 0x27c4  hero record slots (GetHeroSlot)
+    char m_pad_0x5c80[0x38];
+    mineRecord m_mines[72];      // 0x5cb8
+    char m_pad_0x5eb0[0x1f6];
+    signed char m_mineOwners[72];  // 0x60a6
+    char m_pad_0x60ee[0xaf];
+    boatRecord m_boats[48];        // 0x619d
+    char m_pad_0x631d[0x2f];
+    unsigned char m_obeliskVisitors[72];  // 0x634c
     // --- methods ---
     void SetupDynamicStuff(int, int, int);
     void SetupNewOverviewType(int, int);
