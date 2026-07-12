@@ -64,6 +64,9 @@ authoritative. This file is the short, restart-ready Codex workflow.
   prior batch produced substantive, verified matching code, preferably continuing the same TU. If
   its handoff was comments-only, stub-only, or otherwise lacked real matching progress, reject that
   result and assign the lane to a fresh matcher agent instead.
+- A worker does not escape deferred targets. Return every unfinished or improperly parked function
+  to that same worker and lane before assigning new work; advance only after each target reaches
+  100% or a byte-proven permitted wall under `.claude/agents/matcher.md`.
 
 ## Compiler Constraints
 
