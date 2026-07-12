@@ -53,6 +53,9 @@ authoritative. This file is the short, restart-ready Codex workflow.
 - Keep each translation unit in one lane and never run workers on the same source file. Assign
   bounded retail-order batches, including required predecessors, and keep the lane on that TU until
   it is complete.
+- Workers may modify any necessary owner or shared header even when another lane also touches it;
+  they must not avoid a correct type/layout reconstruction to reduce overlap. The orchestrator owns
+  semantic conflict resolution, combined-layout review, serial application, and rebuild validation.
 - For a hardest-first campaign, rank SOURCE work by unmatched weighted bytes using the retained
   source-hash maximum, not a transient live dip. Prefer `/Od` units until they are drained; start
   `/O2` units when only optimizer/register-allocation work remains.
