@@ -60,6 +60,10 @@ authoritative. This file is the short, restart-ready Codex workflow.
   worker's `README.md`, `config/match_baseline.tsv`, or transient queue. On `source-decomp`, run the
   full build, verify the reported functions, run `homm2 status update`, stage the worker files plus
   the root-generated README/baseline, and create one linear `match:` commit.
+- Refill a lane immediately after serial integration. Reuse a worker with `followup_task` when its
+  prior batch produced substantive, verified matching code, preferably continuing the same TU. If
+  its handoff was comments-only, stub-only, or otherwise lacked real matching progress, reject that
+  result and assign the lane to a fresh matcher agent instead.
 
 ## Compiler Constraints
 
