@@ -8,7 +8,23 @@
 struct tag_message;
 
 // GAME-private types (configStruct / SCreatureInfo are shared, in _types.h).
-struct EventExtra;
+#pragma pack(push, 1)
+struct EventExtra {
+    unsigned char unknown00;
+    int resources[7];
+    short artifact;
+    unsigned char applyToComputer;
+    unsigned char cancelAfterVisit;
+    char unknown21[4];
+    unsigned char active;
+    unsigned short x;
+    unsigned short y;
+    unsigned char unknown2a;
+    unsigned char players[6];
+    char message[1];
+};
+#pragma pack(pop)
+SIZE(EventExtra, 0x32);
 struct SThievesData { char pad[0x4e3]; signed char list[8][283]; };
 struct RandomHeroArmyRange {
     short creature;
