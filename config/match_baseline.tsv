@@ -367,16 +367,16 @@ BASE/bmap2	?BlitBitmap@@YIXPAVbitmap@@HHHH0HH@Z	88.0000	85943241bc9f
 BASE/bmap2	?DimBitmapArea@@YIXPAVbitmap@@HHHHH@Z	82.9000	16228a92fc65
 BASE/bmap2	?FillBitmapArea@@YIXPAVbitmap@@HHHHH@Z	95.4545	abf87a174727
 BASE/bmap2	?FillBitmapAreaClip@@YIXPAVbitmap@@HHHHHHHHH@Z	94.4444	5a8565510c2c
-BASE/droplist	??0dropListWidget@@QAE@XZ	100.0000	8963338f9e27
-BASE/droplist	??1dropListWidget@@UAE@XZ	100.0000	c6942e81374b
+BASE/droplist	??0dropListWidget@@QAE@XZ	100.0000	36ab848d613b
+BASE/droplist	??1dropListWidget@@UAE@XZ	100.0000	5858ec8679b2
 BASE/droplist	??_EdropListWidget@@UAEPAXI@Z	0.0000	
 BASE/droplist	?DeleteItem@dropListWidget@@QAEXH@Z	100.0000	9c6f4628e789
-BASE/droplist	?Draw@dropListWidget@@UAEXXZ	100.0000	ae786193d7f4
-BASE/droplist	?DrawDropStuff@dropListWidget@@QAEXXZ	95.3898	713fe5940cdf
+BASE/droplist	?Draw@dropListWidget@@UAEXXZ	100.0000	a9f68c5f29e3
+BASE/droplist	?DrawDropStuff@dropListWidget@@QAEXXZ	100.0000	02e6e36033be
 BASE/droplist	?Main@dropListWidget@@UAEHAAUtag_message@@@Z	99.8745	5d9d3d64c2fe
-BASE/droplist	?ProcessSelectDialog@dropListWidget@@QAEXXZ	51.6695	f03844cbcb29
-BASE/droplist	?Read@dropListWidget@@QAEXXZ	86.7295	a6adea89d9f8
-BASE/droplist	?RestoreDropBackground@dropListWidget@@QAEXXZ	100.0000	557314065439
+BASE/droplist	?ProcessSelectDialog@dropListWidget@@QAEXXZ	54.5419	cdcf18ed3d2a
+BASE/droplist	?Read@dropListWidget@@QAEXXZ	93.9098	ceed3f4934c7
+BASE/droplist	?RestoreDropBackground@dropListWidget@@QAEXXZ	100.0000	fdd690daaab3
 BASE/droplist	?SaveDropBackground@dropListWidget@@QAEXXZ	100.0000	b3d5c9e1b5dd
 BASE/icon2bc	?IconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAEH@Z	66.2606	9414ca6a14aa
 BASE/icon2bs	?IconToBitmapScale@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	76.3262	a49d5fdfa818
