@@ -22,6 +22,8 @@
 #include <BASE/bitmap.h>
 #include <BASE/palette.h>
 #include <_globals_model.h>
+// @early-stop
+// reloc-masked: code bytes agree; the manager-name literal is $SG31246 vs retail const_0011e9a0.
 VA(0x004c7fa0, 0xdb)
 resourceManager::resourceManager(void) : baseManager()
 {
@@ -41,42 +43,44 @@ resourceManager::resourceManager(void) : baseManager()
 }
 
 VA(0x004c8080, 0xa2)
-void resourceManager::GetBackdrop(char *param_1, class bitmap *param_2, int param_3)
+void resourceManager::GetBackdrop(char *name, class bitmap *backdrop, int useIcon)
 {
-    if (param_3 != 0) {
-        icon *this_00 = GetIcon(param_1);
-        this_00->DrawToBuffer(0, 0, 0, 0);
-        Dispose(this_00);
+    if (useIcon != 0) {
+        icon *backdropIcon = GetIcon(name);
+        backdropIcon->DrawToBuffer(0, 0, 0, 0);
+        Dispose(backdropIcon);
     } else {
-        unsigned long uVar1 = MakeId(param_1, 1);
-        PointToFile(uVar1);
+        PointToFile(MakeId(name, 1));
         ReadWord();
         ReadWord();
         ReadWord();
-        ReadBlock(reinterpret_cast<signed char *>(param_2->m_pixels),
-                  param_2->m_height * param_2->m_width);
+        ReadBlock(reinterpret_cast<signed char *>(backdrop->m_pixels),
+                  backdrop->m_width * backdrop->m_height);
     }
 }
 
+// relative +0x93..+0xb8: frame/slots/CFG and values agree; only /Od commutative load
+// order differs for height+y and row*640+pixels (base +2 bytes); all 9 relocs agree.
 VA(0x004c8130, 0xd2)
-void resourceManager::GetBackdropAtLoc(char *param_1, class bitmap *param_2, int param_3, int param_4,
-                                       int param_5)
+void resourceManager::GetBackdropAtLoc(char *name, class bitmap *backdrop, int x, int y,
+                                       int useIcon)
 {
-    short sVar1, sVar2;
-    int local_8;
-    if (param_5 != 0) {
-        icon *this_00 = GetIcon(param_1);
-        this_00->DrawToBuffer(param_3, param_4, 0, 0);
-        Dispose(this_00);
+    icon *backdropIcon;
+    int dataWidth;
+    int imageHeight;
+    int row;
+    if (useIcon != 0) {
+        backdropIcon = GetIcon(name);
+        backdropIcon->DrawToBuffer(x, y, 0, 0);
+        Dispose(backdropIcon);
     } else {
-        unsigned long uVar3 = MakeId(param_1, 1);
-        PointToFile(uVar3);
+        PointToFile(MakeId(name, 1));
         ReadWord();
-        sVar1 = ReadWord();
-        sVar2 = ReadWord();
-        for (local_8 = param_4; local_8 < sVar2 + param_4; local_8++) {
-            ReadBlock(reinterpret_cast<signed char *>(local_8 * 0x280 + param_2->m_pixels + param_3),
-                      sVar1);
+        dataWidth = ReadWord();
+        imageHeight = ReadWord();
+        for (row = y; row < imageHeight + y; row++) {
+            ReadBlock(reinterpret_cast<signed char *>(backdrop->m_pixels + row * 640 + x),
+                      dataWidth);
         }
     }
 }
@@ -146,6 +150,8 @@ class tileset * resourceManager::GetTileset(char *name)
 VA(0x004c84b0, 0x1a)
 class mouse * resourceManager::GetMouse(char *) { return 0; }
 
+// @early-stop
+// reloc-masked: all 54 instructions and all 5 relocation targets agree; only delink span identity remains.
 VA(0x004c84d0, 0x97)
 class font * resourceManager::GetFont(char *name)
 {
@@ -162,45 +168,47 @@ class font * resourceManager::GetFont(char *name)
 }
 
 VA(0x004c8570, 0x9d)
-class sample *resourceManager::GetSample(char *param_1)
+class sample *resourceManager::GetSample(char *name)
 {
-    unsigned long uVar1 = MakeId(param_1, 1);
-    resource *local_8 = Query(uVar1);
-    if (local_8 != 0) {
-        local_8->m_refCount++;
-        return static_cast<sample *>(local_8);
+    unsigned long id = MakeId(name, 1);
+    resource *r = Query(id);
+    if (r != 0) {
+        r->m_refCount++;
+        return static_cast<sample *>(r);
     } else {
-        local_8 = new sample(param_1, 0, 0x7f, 1);
-        AddResource(local_8);
-        return static_cast<sample *>(local_8);
+        r = new sample(name, 0, 0x7f, 1);
+        AddResource(r);
+        return static_cast<sample *>(r);
     }
 }
 
 VA(0x004c8610, 0x97)
-class MIDIWrap *resourceManager::GetMIDIWrap(char *param_1)
+class MIDIWrap *resourceManager::GetMIDIWrap(char *name)
 {
-    unsigned long uVar1 = MakeId(param_1, 1);
-    resource *local_8 = Query(uVar1);
-    if (local_8 != 0) {
-        local_8->m_refCount++;
-        return static_cast<MIDIWrap *>(local_8);
+    unsigned long id = MakeId(name, 1);
+    resource *r = Query(id);
+    if (r != 0) {
+        r->m_refCount++;
+        return static_cast<MIDIWrap *>(r);
     } else {
-        local_8 = new MIDIWrap(param_1);
-        AddResource(local_8);
-        return static_cast<MIDIWrap *>(local_8);
+        r = new MIDIWrap(name);
+        AddResource(r);
+        return static_cast<MIDIWrap *>(r);
     }
 }
 
 VA(0x004c86b0, 0x87)
 void resourceManager::Dispose(class resource *param_1)
 {
-    if (m_expunging == 0) {
-        if (param_1 != 0) {
-            param_1->m_refCount--;
-            if (param_1->m_refCount <= 0) {
-                RemoveResource(param_1);
-                delete param_1;
-            }
+    if (m_expunging != 0)
+        return;
+    if (param_1 != 0) {
+        param_1->m_refCount--;
+        if (param_1->m_refCount > 0) {
+            return;
+        } else {
+            RemoveResource(param_1);
+            delete param_1;
         }
     }
 }
@@ -220,13 +228,14 @@ void resourceManager::AddResource(class resource *param_1)
 VA(0x004c87a0, 0x8b)
 void resourceManager::Expunge(void)
 {
-    resource *prVar1, *local_8;
     m_expunging = 1;
-    prVar1 = m_resourceListHead;
-    while (local_8 = prVar1, local_8 != 0) {
-        prVar1 = local_8->m_next;
-        RemoveResource(local_8);
-        delete local_8;
+    resource *currentResource = m_resourceListHead;
+    resource *nextResource = 0;
+    while (currentResource != 0) {
+        nextResource = currentResource->m_next;
+        RemoveResource(currentResource);
+        delete currentResource;
+        currentResource = nextResource;
     }
     m_expunging = 0;
 }
@@ -255,9 +264,12 @@ int resourceManager::Open(int param_1)
     field_0x10 = param_1;
     m_active = 1;
     strcpy(name, "resourceManager");
+    m_resourceListHead = 0;
     return 0;
 }
 
+// @early-stop
+// raw bytes: only relative +0x28 differs (local branch target 0x50 vs 0x55); no external relocs.
 VA(0x004c8950, 0x88)
 void resourceManager::RemoveResource(class resource *param_1)
 {
@@ -269,31 +281,38 @@ void resourceManager::RemoveResource(class resource *param_1)
         while (local_8 != 0 && local_8->m_next != param_1) {
             local_8 = local_8->m_next;
         }
-        if (local_8 != 0)
+        if (local_8 == 0) {
+            return;
+        } else {
             local_8->m_next = param_1->m_next;
+        }
     }
 }
 
+// @early-stop
+// reloc-masked: code bytes agree; __FILE__ is $SG31418 vs retail's named constant; all 4 relocs agree.
 VA(0x004c89e0, 0xc8)
 void resourceManager::Close(void)
 {
     int local_8;
-    if (m_active == 1) {
-        Expunge();
-        m_resourceListHead = 0;
-        for (local_8 = 0; local_8 < 2; local_8++) {
-            if (m_aggregateDir[local_8] != 0)
-                BaseFree(m_aggregateDir[local_8], __FILE__, __LINE__);
-            if (m_aggregateFd[local_8] != -1) {
-                _close(m_aggregateFd[local_8]);
-                m_aggregateFd[local_8] = -1;
-            }
+    if (m_active != 1)
+        return;
+    Expunge();
+    m_resourceListHead = 0;
+    for (local_8 = 0; local_8 < 2; local_8++) {
+        if (m_aggregateDir[local_8] != 0)
+            BaseFree(m_aggregateDir[local_8], __FILE__, __LINE__);
+        if (m_aggregateFd[local_8] != -1) {
+            _close(m_aggregateFd[local_8]);
+            m_aggregateFd[local_8] = -1;
         }
-        m_numAggregates = 0;
-        m_active = 0;
     }
+    m_numAggregates = 0;
+    m_active = 0;
 }
 
+// @early-stop
+// reloc-masked: code bytes agree; three string-pool identities differ; all 15 relocs agree.
 VA(0x004c8ab0, 0x143)
 int resourceManager::LoadAggregateHeader(char *param_1)
 {
@@ -323,55 +342,65 @@ int resourceManager::LoadAggregateHeader(char *param_1)
 }
 
 VA(0x004c8c00, 0x11c)
-void resourceManager::PointToFile(unsigned long param_1)
+void resourceManager::PointToFile(unsigned long fileId)
 {
-    char bVar1 = 0;
-    int local_10, local_8;
-    for (local_10 = 0; local_10 < 2; local_10++) {
-        if (m_aggregateDir[local_10] != 0) {
-            for (local_8 = 0; local_8 < m_aggregateEntryCount[local_10]; local_8++) {
-                if (m_aggregateDir[local_10][local_8].id == param_1) {
-                    bVar1 = 1;
-                    m_curAggregate = local_10;
+    char isFound = 0;
+    int entryIndex;
+    int aggregateIndex;
+    for (aggregateIndex = 0; aggregateIndex < 2; aggregateIndex++) {
+        if (m_aggregateDir[aggregateIndex] != 0) {
+            entryIndex = 0;
+            while (entryIndex < m_aggregateEntryCount[aggregateIndex]) {
+                if (m_aggregateDir[aggregateIndex][entryIndex].id == fileId) {
+                    isFound = 1;
+                    m_curAggregate = aggregateIndex;
                     break;
                 }
+                entryIndex++;
             }
         }
-        if (bVar1)
+        if (isFound)
             break;
     }
-    if (!bVar1) {
-        sprintf(gText, "ResMgr::PointToFile failure. This resource (%lu) is not in aggregate %s", param_1,
-                m_lastFileId, &m_aggregateName);
+    if (!isFound) {
+        sprintf(gText,
+                "ResMgr::PointToFile failure!  ThisFileId:%d  LastFileId:%d  LastFileName:%s",
+                fileId, m_lastFileId, m_lastFileName);
         ShutDown(gText);
     }
-    _lseek(m_aggregateFd[m_curAggregate], m_aggregateDir[m_curAggregate][local_8].offset, 0);
+    long ignoredPosition = _lseek(m_aggregateFd[m_curAggregate],
+                                  m_aggregateDir[m_curAggregate][entryIndex].offset, 0);
 }
 
 VA(0x004c8d20, 0xfa)
-unsigned long resourceManager::GetFileSize(unsigned long param_1)
+unsigned long resourceManager::GetFileSize(unsigned long fileId)
 {
-    char bVar1 = 0;
-    int local_14, local_10, local_8;
-    for (local_14 = 0; local_14 < 2; local_14++) {
-        if (m_aggregateDir[local_14] != 0) {
-            for (local_8 = 0; local_8 < m_aggregateEntryCount[local_14]; local_8++) {
-                if (m_aggregateDir[local_14][local_8].id == param_1) {
-                    bVar1 = 1;
-                    local_10 = local_14;
+    char isFound = 0;
+    int entryIndex;
+    int matchedAggregate;
+    int fileIndex;
+    for (fileIndex = 0; fileIndex < 2; fileIndex++) {
+        if (m_aggregateDir[fileIndex] != 0) {
+            entryIndex = 0;
+            while (entryIndex < m_aggregateEntryCount[fileIndex]) {
+                if (m_aggregateDir[fileIndex][entryIndex].id == fileId) {
+                    isFound = 1;
+                    matchedAggregate = fileIndex;
                     break;
                 }
+                entryIndex++;
             }
         }
-        if (bVar1)
+        if (isFound)
             break;
     }
-    if (!bVar1) {
-        sprintf(gText, "ResMgr::PointToFile failure. This resource (%lu) is not in aggregate %s", param_1,
-                m_lastFileId, &m_aggregateName);
+    if (!isFound) {
+        sprintf(gText,
+                "ResMgr::PointToFile failure!  ThisFileId:%d  LastFileId:%d  LastFileName:%s",
+                fileId, m_lastFileId, m_lastFileName);
         ShutDown(gText);
     }
-    return m_aggregateDir[local_10][local_8].size;
+    return m_aggregateDir[matchedAggregate][entryIndex].size;
 }
 
 VA(0x004c8e20, 0x52)
@@ -393,75 +422,61 @@ void resourceManager::RestorePosition(void)
 VA(0x004c8ee0, 0x81)
 signed char resourceManager::ReadByte(void)
 {
-    int iVar1;
-    int local_c;
-    int local_10;
-    char local_8[4];
-    ProcessAssert(m_aggregateFd[m_curAggregate] != -1, __FILE__, __LINE__);
-    local_8[0] = 0;
-    iVar1 = _read(m_aggregateFd[m_curAggregate], local_8, 1);
-    if (iVar1 == 0) {
-        local_c = *_errno();
-        local_10 = 0;
-        local_10++;
-        local_10++;
+    ProcessAssert(m_aggregateFd[m_curAggregate] != -1, __FILE__, 0x2bf);
+    signed char value = 0;
+    int bytesRead = _read(m_aggregateFd[m_curAggregate], &value, 1);
+    if (bytesRead == 0) {
+        int errorCode = errno;
+        int debugTrap = 0;
+        debugTrap++;
+        debugTrap++;
     }
-    return local_8[0];
+    return value;
 }
 
 VA(0x004c8f70, 0x84)
 short resourceManager::ReadWord(void)
 {
-    int iVar1;
-    int local_c;
-    int local_10;
-    short local_8[2];
-    ProcessAssert(m_aggregateFd[m_curAggregate] != -1, __FILE__, __LINE__);
-    local_8[0] = 0;
-    iVar1 = _read(m_aggregateFd[m_curAggregate], local_8, 2);
-    if (iVar1 == 0) {
-        local_c = *_errno();
-        local_10 = 0;
-        local_10++;
-        local_10++;
+    ProcessAssert(m_aggregateFd[m_curAggregate] != -1, __FILE__, 0x2dc);
+    short value = 0;
+    int bytesRead = _read(m_aggregateFd[m_curAggregate], &value, 2);
+    if (bytesRead == 0) {
+        int errorCode = errno;
+        int debugTrap = 0;
+        debugTrap++;
+        debugTrap++;
     }
-    return local_8[0];
+    return value;
 }
 
 VA(0x004c9000, 0x84)
 long resourceManager::ReadLong(void)
 {
-    int iVar1;
-    int local_c;
-    int local_10;
-    long local_8;
-    ProcessAssert(m_aggregateFd[m_curAggregate] != -1, __FILE__, __LINE__);
-    local_8 = 0;
-    iVar1 = _read(m_aggregateFd[m_curAggregate], &local_8, 4);
-    if (iVar1 == 0) {
-        local_c = *_errno();
-        local_10 = 0;
-        local_10++;
-        local_10++;
+    ProcessAssert(m_aggregateFd[m_curAggregate] != -1, __FILE__, 0x2f8);
+    long value = 0;
+    int bytesRead = _read(m_aggregateFd[m_curAggregate], &value, 4);
+    if (bytesRead == 0) {
+        int errorCode = errno;
+        int debugTrap = 0;
+        debugTrap++;
+        debugTrap++;
     }
-    return local_8;
+    return value;
 }
 
 VA(0x004c9090, 0xe3)
-unsigned long resourceManager::MakeId(char *param_1, int param_2)
+unsigned long resourceManager::MakeId(char *name, int translate)
 {
-    int local_c;
-    strcpy(&m_aggregateName, param_1);
-    if (gbUseEvilInterface != 0 && param_2 != 0) {
-        for (local_c = 0; local_c < 0x25; local_c++) {
-            if (_strcmpi(&m_aggregateName, cEvilTranslate[local_c][0]) == 0) {
-                strcpy(&m_aggregateName, cEvilTranslate[local_c][1]);
-            }
+    strcpy(m_lastFileName, name);
+    if (gbUseEvilInterface != 0 && translate != 0) {
+        for (int translatedIndex = 0; translatedIndex < 37; translatedIndex++) {
+            if (_stricmp(m_lastFileName, cEvilTranslate[translatedIndex][0]) == 0)
+                strcpy(m_lastFileName, cEvilTranslate[translatedIndex][1]);
         }
     }
-    unsigned long uVar1 = MAKEFILEID(&m_aggregateName);
-    m_lastFileId = uVar1;
-    return uVar1;
+    unsigned long result = MAKEFILEID(m_lastFileName);
+    m_lastFileId = result;
+    return result;
 }
 
 VA(0x004c9180, 0x26)
@@ -471,16 +486,20 @@ void resourceManager::Read13(signed char *param_1)
 }
 
 VA(0x004c91b0, 0xbd)
-void resourceManager::ReadBlock(signed char *param_1, unsigned long param_2)
+void resourceManager::ReadBlock(signed char *destination, unsigned long size)
 {
-    unsigned long uVar1;
-    ProcessAssert(m_aggregateFd[m_curAggregate] != -1, __FILE__, __LINE__);
+    ProcessAssert(m_aggregateFd[m_curAggregate] != -1, __FILE__, 0x330);
     PollSound();
-    uVar1 = _read(m_aggregateFd[m_curAggregate], param_1, param_2);
-    if (uVar1 != param_2) {
-        sprintf(gText, "File error: bytes read %d, bytes wanted %d, errno %d, aggregate %s", uVar1,
-                param_2, errno, &m_aggregateName);
+    int bytesRead = _read(m_aggregateFd[m_curAggregate], destination, size);
+    if (bytesRead != size) {
+        int errorCode = errno;
+        sprintf(gText,
+                "File error - bytes read %d, bytes requested %d, errno %d, last file '%s'",
+                bytesRead, size, errno, m_lastFileName);
         LogStr(gText);
+        int debugTrap = 0;
+        debugTrap++;
+        debugTrap++;
     }
     PollSound();
 }
