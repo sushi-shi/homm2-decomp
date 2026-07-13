@@ -106,16 +106,16 @@ void listBoxWidget::Read(void)
     field_0x70 = rightX;
     topY = m_y + field_0x6e;
     bottomY -= topY;
+    field_0x72 = topY;
+    field_0x74 = field_0x7c;
+    field_0x76 = bottomY;
     field_0x8a = 0;
     field_0x8b = 0;
     field_0x8d = 0;
     field_0x8c = 0;
     m_topIndex = 0;
     field_0x42 = 0;
-    field_0x72 = topY;
     field_0x2a = 0;
-    field_0x74 = field_0x7c;
-    field_0x76 = bottomY;
     field_0x88 = field_0x76 - frameHeight[0] - 7;
 }
 
