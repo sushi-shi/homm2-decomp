@@ -22,6 +22,19 @@ struct rumourEventExtra {
     char pad[8];
     char text[1];
 };
+struct timeEventExtra {
+    char unknown00;
+    int resources[7];
+    char unknown1d[2];
+    unsigned char appliesToComputer;
+    char unknown20;
+    unsigned short firstDay;
+    unsigned short repeatInterval;
+    char unknown25[5];
+    unsigned char appliesToHuman;
+    unsigned char players[6];
+    char message[1];
+};
 struct mapHeroExtra {
     signed char owner;
     unsigned char hasCustomArmy;

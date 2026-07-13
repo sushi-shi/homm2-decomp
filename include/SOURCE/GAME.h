@@ -226,6 +226,25 @@ typedef enum GameWaitConstant {
     WAIT_DIALOG_TYPE = 9
 } GameWaitConstant;
 
+typedef enum GameTimeEventConstant {
+    TIME_EVENT_DAYS_PER_WEEK = 7,
+    TIME_EVENT_DAYS_PER_MONTH = 28,
+    TIME_EVENT_RESOURCE_COUNT = 7,
+    TIME_EVENT_RESOURCE_PENALTY = 100000
+} GameTimeEventConstant;
+
+typedef enum GameHeroPoolConstant {
+    AVAILABLE_HERO_SLOTS = 2
+} GameHeroPoolConstant;
+
+typedef enum GameCompressionTestConstant {
+    COMPRESSION_TEST_RANDOM_SIZE_MIN = 20000,
+    COMPRESSION_TEST_RANDOM_SIZE_MAX = 100000,
+    COMPRESSION_TEST_RANDOM_BUFFER_EXTRA = 5000,
+    COMPRESSION_TEST_FILE_BUFFER_EXTRA = 2000,
+    COMPRESSION_TEST_FILENAME_SIZE = 32
+} GameCompressionTestConstant;
+
 int GetNumObelisks(int color);
 void ComputeUALoc(int);
 void GenerateStandardFileName(char *, char *);
