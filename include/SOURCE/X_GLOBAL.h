@@ -8,7 +8,11 @@ class ExpCampaign;
 
 enum {
     HERO_TYPE_INITIAL_COUNT = 8,
-    EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT = 4
+    EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT = 4,
+    GLOBAL_MAP_NAME_SIZE = 0x18,
+    GLOBAL_TCP_TEXT_SIZE = 0x18,
+    GLOBAL_AGGREGATE_PATH_SIZE = 0x160,
+    GLOBAL_COMMAND_LINE_SIZE = 0x40
 };
 
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
@@ -303,8 +307,8 @@ extern int gbCampaignSideChoice;
 extern int giMonthTypeExtra;
 extern int iMPExtendedType;
 extern signed char gcColorToSetupPos[8];
-extern char *gFullMapName;
-extern char *gcTCPName;
+extern char gFullMapName[GLOBAL_MAP_NAME_SIZE];
+extern char gcTCPName[GLOBAL_TCP_TEXT_SIZE];
 extern int giShowIntro;
 extern int giScore;
 extern char gcRegAppPath[0x160];  // CodeView size 0x160; typed char* (array-decayed)
@@ -313,12 +317,12 @@ extern char *EXPANSION_AGGREGATE_NAME;
 extern char cPlayerNames[6][21];
 extern class icon *gCurLoadedSpellIcon;
 extern unsigned char bSaveMusicPosition[0x3c];
-extern char *gcTCPAddress;
+extern char gcTCPAddress[GLOBAL_TCP_TEXT_SIZE];
 extern unsigned char giSetupGameType;
 extern char *gLastFilename;
 extern int giFullySeeded;
 extern int *iCombatControlNetPos;
-extern char *cExpAggPathName;
+extern char cExpAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
 extern int gbMoveShown;
 extern signed char gbSetupGamePosToRealGamePos[8];
 extern char gcRegCDRomPath[0x160];  // CodeView size 0x160; typed char* (array-decayed)
@@ -333,7 +337,7 @@ extern int giCurWindowsStyleFlags;
 extern int giMonthType;
 extern char *DEFAULT_AGGREGATE_NAME;
 extern int gCurSpellEffectFrame;
-extern char *cAggPathName;
+extern char cAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
 extern class highScoreManager *gpHighScoreManager;
 extern int gbIAmGreatest;
 extern int gMapX;
@@ -342,7 +346,7 @@ extern char *gcWinText;
 extern int bFreshSave;
 extern int gLowPageScreenSelector;
 extern int giCurWatchPlayer;
-extern char *gcCommandLine;
+extern char gcCommandLine[GLOBAL_COMMAND_LINE_SIZE];
 extern int giMapChangeCtr;
 extern struct SMapChange *sMapChangeQueue;
 extern int gbWaitForRemoteReceive;
