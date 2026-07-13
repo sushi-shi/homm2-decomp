@@ -92,7 +92,7 @@ void playerData::Write(int file)
     _write(file, &m_currentHero, 1);
     _write(file, &m_heroLocatorPage, 1);
     _write(file, m_heroIds, 8);
-    _write(file, m_unknown0c, 2);
+    _write(file, m_availableHeroIds, 2);
     memset(unused, 0, 48);
     _write(file, unused, 42);
     _write(file, &gpGame->m_cheated, 1);
@@ -125,7 +125,7 @@ void playerData::Read(int file)
     _read(file, &m_currentHero, 1);
     _read(file, &m_heroLocatorPage, 1);
     _read(file, m_heroIds, 8);
-    _read(file, m_unknown0c, 2);
+    _read(file, m_availableHeroIds, 2);
     _read(file, unused, 42);
     _read(file, &gpGame->m_cheated, 1);
     _read(file, &m_cheatValue, 1);
@@ -2866,8 +2866,8 @@ void game::NextPlayer(void)
     int humanCount;
     int index;
 
-    m_heroRecs[gpCurPlayer->m_unknown0c[0]].m_weeklyVisit = 0;
-    m_heroRecs[gpCurPlayer->m_unknown0c[1]].m_weeklyVisit = 0;
+    m_heroRecs[gpCurPlayer->m_availableHeroIds[0]].m_weeklyVisit = 0;
+    m_heroRecs[gpCurPlayer->m_availableHeroIds[1]].m_weeklyVisit = 0;
     iCurHourGlassPhase = 0;
 
     if (gbThisNetHumanPlayer[giCurPlayer] && gConfig.autosave) {

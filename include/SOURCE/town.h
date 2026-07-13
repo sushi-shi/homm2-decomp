@@ -22,11 +22,9 @@ public:
     armyGroup m_army;  // +0x08
     char   m_occupyingHeroId;  // +0x17
     int    m_buildings;  // +0x18
-    char   m_field_0x1c;  // +0x1c
-    char   m_field_0x1d;  // +0x1d
-    char _pad_0x1e[0x14];
-    short  field_0x32;  // +0x32
-    short  field_0x34;  // +0x34
+    signed char m_buildState;  // +0x1c
+    char m_unknown1d;  // +0x1d
+    short m_garrison[12];  // +0x1e
     char m_pad_0x36[0x2e];
     // size >= 0x36 (accessed lower bound; no ctor/stride oracle)
     // --- constructors ---
