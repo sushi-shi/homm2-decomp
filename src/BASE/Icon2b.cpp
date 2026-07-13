@@ -29,15 +29,6 @@ DATA(0x00534c54) static int gIcX;
 DATA(0x00534c58) static unsigned char *gIcEntry;
 DATA(0x00534c5c) static unsigned int gIcCnt2;
 
-// @early-stop
-// /O2 register-allocation wall after byte-level semantic recovery. Base is 0x4d8 versus retail
-// 0x4ed, with no stack frame on either side; dispatch starts at +0xdd/+0xe1, fill at +0x1a6/+0x1b1,
-// dim at +0x292/+0x2ae, literal copy at +0x3d5/+0x3f1, newline at +0x4b3/+0x4c8, and return at
-// +0x4d1/+0x4e6. Base/retail have 80/83 relocations and no base-only external target. Retail keeps
-// data/entry in esi/edi while MSVC colors them edi/esi here; the dim spans are both 0x143 bytes but
-// use different accumulator/palette registers. Tried global/local X and entry forms, source-read
-// postincrement forms, relational reversals, split/common intrinsics, targeted volatile scratch
-// forms, explicit offset temporaries, and 180 AST permutations (nine improving rounds).
 VA(0x004d0570, 0x4ed)
 void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                   int clip, int clipX, int clipY, int clipW, int clipH, int color)
@@ -45,11 +36,12 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int fra
     IconEntry *entry = reinterpret_cast<IconEntry *>(srcIcon->m_data) + frame;
     unsigned char *data = reinterpret_cast<unsigned char *>(srcIcon->m_data);
     int X = x + entry->x;
+    int Y = entry->y + y;
     gIcSrc = data + entry->srcOffset;
     gIcEntry = reinterpret_cast<unsigned char *>(entry);
     gIcX0 = X;
-    gIcY = entry->y + y;
     gIcPitch = dest->m_width;
+    gIcY = Y;
     if (clip != 0) {
         if (gIcX0 < clipX || clipW + clipX < entry->w + X || gIcY < clipY ||
             clipY + clipH < entry->h + gIcY) {
@@ -63,7 +55,8 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int fra
     unsigned char *row =
         reinterpret_cast<unsigned char *>(gIcPitch * gIcY + reinterpret_cast<int>(dest->m_pixels));
     for (;;) {
-        int cmd = *gIcSrc++;
+        gIcSrc++;
+        int cmd = gIcSrc[-1];
         if (static_cast<signed char>(cmd) < 0) {
             // ---- negative command ----
             if ((cmd & 0x40) == 0) {
@@ -114,17 +107,17 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int fra
             } else {
                 int right;
                 if (clipY <= gIcY && gIcClipB >= gIcY &&
-                    (right = X + count, clipX < right) && gIcClipR > X - 1) {
-                    if (clipX >= X + 1) {
+                    (right = X + count, clipX < right) && gIcClipR >= X) {
+                    if (clipX <= X) {
+                        if (gIcClipR < right)
+                            memset(row + X, gIcColor, (gIcClipR - X) + 1);
+                        else
+                            memset(row + X, gIcColor, count);
+                    } else {
                         unsigned int cn = clipW;
                         if (right <= gIcClipR)
                             cn = (count - clipX) + X;
                         memset(row + clipX, gIcColor, cn);
-                    } else {
-                        unsigned int cn = count;
-                        if (gIcClipR < right)
-                            cn = (gIcClipR - X) + 1;
-                        memset(row + X, gIcColor, cn);
                     }
                 }
             }
@@ -157,21 +150,21 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int fra
                     gIcDimPal = palette;
                     int right;
                     if (clipY <= gIcY && gIcClipB >= gIcY &&
-                        (right = X + count, clipX <= right - 1) && gIcClipR >= X) {
+                        (right = X + count, clipX < right) && gIcClipR >= X) {
                         unsigned int cn;
                         unsigned char *dst;
-                        if (clipX >= X + 1) {
-                            gIcCnt2 = count;
-                            if (gIcClipR <= right - 1)
-                                cn = clipW;
-                            else
-                                cn = (count - clipX) + X;
-                            dst = row + clipX;
-                        } else {
+                        if (clipX <= X) {
                             cn = count;
                             if (gIcClipR < right)
                                 cn = (gIcClipR - X) + 1;
                             dst = row + X;
+                        } else {
+                            gIcCnt2 = count;
+                            if (gIcClipR < right)
+                                cn = clipW;
+                            else
+                                cn = (count - clipX) + X;
+                            dst = row + clipX;
                         }
                         gIcCnt2 = cn;
                         gIcDimDst = dst;
@@ -198,22 +191,26 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int fra
         gIcRun = cmd;
         if (cmd != 0) {
             int right;
-            if (clip == 0) {
-                memcpy(row + X, gIcSrc, cmd);
-            } else if (gIcY < clipY || gIcClipB < gIcY ||
-                       (right = X + cmd, right <= clipX) || gIcClipR < X) {
-                // fully clipped out
-            } else if (clipX > X) {
-                unsigned int cn = clipW;
-                if (right <= gIcClipR)
-                    cn = (cmd - clipX) + X;
-                memcpy(row + clipX, gIcSrc + (clipX - X), cn);
-            } else {
-                unsigned int cn = cmd;
-                if (gIcClipR < right)
-                    cn = (gIcClipR - X) + 1;
-                memcpy(row + X, gIcSrc, cn);
+            unsigned int cn = cmd;
+            unsigned char *copyDst = row + X;
+            unsigned char *copySrc = gIcSrc;
+            if (clip != 0) {
+                if (gIcY < clipY || gIcClipB < gIcY ||
+                    (right = X + cmd, right <= clipX) || gIcClipR < X) {
+                    cn = 0;
+                } else if (clipX <= X) {
+                    if (gIcClipR < right)
+                        cn = (gIcClipR - X) + 1;
+                } else {
+                    cn = clipW;
+                    if (right <= gIcClipR)
+                        cn = (cmd - clipX) + X;
+                    copyDst = row + clipX;
+                    copySrc = gIcSrc + (clipX - X);
+                }
             }
+            if (cn != 0)
+                memcpy(copyDst, copySrc, cn);
             X = X + cmd;
             gIcSrc = gIcSrc + cmd;
             gIcRun = cmd;
