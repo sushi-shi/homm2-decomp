@@ -14,6 +14,7 @@
 #include <BASE/soundManager.h>
 #include <EDITOR/fullMap.h>
 #include <SOURCE/advManager.h>
+#include <SOURCE/ARMY.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/CURSOR.h>
 #include <SOURCE/EVENTS.h>
@@ -2212,23 +2213,483 @@ int advManager::GhostEvent(class hero *, class mapCell *, char *, int, int) { re
 VA(0x004b0add, 0x274)
 void advManager::HouseEvent(class hero *, class mapCell *) {}
 
+// @early-stop
+// raw instructions/slots identical; gMonsterDatabase+0x16 and const_000faec6 resolve to the same address
 VA(0x004b0d51, 0x62f)
-int advManager::CombatMonsterEvent(class hero *, int, int, class mapCell *, int, int, int, int, int, int, int, int, int, int, int) { return 0; }
+int advManager::CombatMonsterEvent(hero *eventHero, int monsterType,
+                                   int monsterCount, mapCell *, int mapX,
+                                   int mapY, int defender, int combatX,
+                                   int combatY, int secondaryType,
+                                   int secondaryCount, int secondaryStacks,
+                                   int tertiaryType, int tertiaryCount,
+                                   int tertiaryStacks)
+{
+    int stackCount;
+    int stackIndex9;
+    int combatResult7;
+    int lastStackCount;
+    int temporaryTypes7[COMBAT_MONSTER_ARMY_SLOTS];
+    int temporaryCounts[COMBAT_MONSTER_ARMY_SLOTS];
+    int placement4[COMBAT_MONSTER_ARMY_SLOTS + 1];
+    int groupCount;
+    int stackTotal;
 
+    DemobilizeCurrHero();
+    if (combatX == -1) {
+        combatX = mapX;
+        combatY = mapY;
+    } else {
+        m_lastQuickViewX = combatX;
+        m_lastQuickViewY = combatY;
+        if (eventHero->m_x >= combatX)
+            m_field_0x2ba = 0;
+        else
+            m_field_0x2ba = 1;
+        if (ComboDraw(0))
+            UpdateScreen(0, 0);
+        m_lastQuickViewX = -1;
+    }
+
+    memset(gpMonGroup->m_creatureTypes, COMBAT_MONSTER_INVALID_TYPE,
+           COMBAT_MONSTER_ARMY_SLOTS);
+    memset(gpMonGroup->m_creatureCounts, 0,
+           COMBAT_MONSTER_ARMY_SLOTS * sizeof(short));
+    stackCount = COMBAT_MONSTER_ARMY_SLOTS - secondaryStacks - tertiaryStacks;
+    if (stackCount < 1)
+        stackCount = 1;
+    placement4[COMBAT_MONSTER_ARMY_SLOTS] = 0;
+    SRand(combatX + combatY);
+    if (stackCount == COMBAT_MONSTER_ARMY_SLOTS &&
+        (gMonsterDatabase[monsterType].flags.all & MONSTER_FLAGS_SHOOTER) == 0) {
+        int roll = SRandom(0, COMBAT_MONSTER_RANDOM_MAX);
+        if (roll < COMBAT_MONSTER_REDUCED_STACK_CHANCE)
+            stackCount = 3;
+        else if (roll < COMBAT_MONSTER_FOUR_STACK_THRESHOLD)
+            stackCount = 4;
+    }
+
+    for (stackIndex9 = 0; stackIndex9 < stackCount; stackIndex9++) {
+        if (stackIndex9 == (stackCount >> 1) &&
+            (monsterType == ARMY_CREATURE_ARCHER || monsterType == ARMY_CREATURE_PIKEMAN ||
+             monsterType == ARMY_CREATURE_SWORDSMAN || monsterType == ARMY_CREATURE_CAVALRY ||
+             monsterType == ARMY_CREATURE_PALADIN || monsterType == ARMY_CREATURE_ORC ||
+             monsterType == ARMY_CREATURE_OGRE || monsterType == ARMY_CREATURE_TROLL ||
+             monsterType == ARMY_CREATURE_DWARF || monsterType == ARMY_CREATURE_ELF ||
+             monsterType == ARMY_CREATURE_DRUID || monsterType == ARMY_CREATURE_MINOTAUR ||
+             monsterType == ARMY_CREATURE_GREEN_DRAGON || monsterType == ARMY_CREATURE_RED_DRAGON ||
+             monsterType == ARMY_CREATURE_IRON_GOLEM || monsterType == ARMY_CREATURE_MAGE ||
+             monsterType == ARMY_CREATURE_GIANT || monsterType == ARMY_CREATURE_ZOMBIE ||
+             monsterType == ARMY_CREATURE_MUMMY || monsterType == ARMY_CREATURE_VAMPIRE ||
+             monsterType == ARMY_CREATURE_LICH) &&
+            SRandom(0, COMBAT_MONSTER_RANDOM_MAX) < COMBAT_MONSTER_UPGRADE_CHANCE &&
+            secondaryCount == 0 && tertiaryCount == 0)
+            gpMonGroup->m_creatureTypes[placement4[COMBAT_MONSTER_ARMY_SLOTS] + stackIndex9] =
+                static_cast<signed char>(monsterType + 1);
+        else
+            gpMonGroup->m_creatureTypes[placement4[COMBAT_MONSTER_ARMY_SLOTS] + stackIndex9] =
+                static_cast<signed char>(monsterType);
+        gpMonGroup->m_creatureCounts[placement4[COMBAT_MONSTER_ARMY_SLOTS] + stackIndex9] =
+            static_cast<short>((stackIndex9 < monsterCount % stackCount) +
+                               monsterCount / stackCount);
+    }
+
+    placement4[COMBAT_MONSTER_ARMY_SLOTS] += stackCount;
+    if (secondaryStacks != 0) {
+        stackCount = secondaryStacks;
+        for (stackIndex9 = 0; stackIndex9 < stackCount; stackIndex9++) {
+            gpMonGroup->m_creatureTypes[placement4[COMBAT_MONSTER_ARMY_SLOTS] + stackIndex9] =
+                static_cast<signed char>(secondaryType);
+            gpMonGroup->m_creatureCounts[placement4[COMBAT_MONSTER_ARMY_SLOTS] + stackIndex9] =
+                static_cast<short>((stackIndex9 < secondaryCount % stackCount) +
+                                   secondaryCount / stackCount);
+        }
+    }
+
+    placement4[COMBAT_MONSTER_ARMY_SLOTS] += stackCount;
+    if (tertiaryStacks != 0) {
+        stackCount = tertiaryStacks;
+        for (stackIndex9 = 0; stackIndex9 < stackCount; stackIndex9++) {
+            gpMonGroup->m_creatureTypes[placement4[COMBAT_MONSTER_ARMY_SLOTS] + stackIndex9] =
+                static_cast<signed char>(tertiaryType);
+            gpMonGroup->m_creatureCounts[placement4[COMBAT_MONSTER_ARMY_SLOTS] + stackIndex9] =
+                static_cast<short>((stackIndex9 < secondaryCount % stackCount) +
+                                   tertiaryCount / stackCount);
+        }
+    }
+    lastStackCount = stackCount;
+
+    for (stackIndex9 = 0; stackIndex9 < COMBAT_MONSTER_ARMY_SLOTS; stackIndex9++) {
+        if (gpMonGroup->m_creatureCounts[stackIndex9] <= 0)
+            gpMonGroup->m_creatureTypes[stackIndex9] = COMBAT_MONSTER_INVALID_TYPE;
+    }
+    for (stackIndex9 = 0; stackIndex9 < COMBAT_MONSTER_ARMY_SLOTS; stackIndex9++)
+        placement4[stackIndex9] = stackIndex9;
+
+    if (stackCount == 1) {
+        placement4[2] = 0;
+        placement4[0] = 2;
+    } else if (stackCount == 2) {
+        placement4[1] = 1;
+        placement4[3] = 0;
+        placement4[0] = 3;
+    } else if (stackCount == 3) {
+        placement4[0] = 3;
+        placement4[1] = 0;
+        placement4[2] = 1;
+        placement4[3] = 2;
+    } else if (tertiaryStacks == 1 && secondaryStacks == 1) {
+        placement4[1] = 4;
+        placement4[4] = 1;
+    } else if (tertiaryStacks == 1 && secondaryStacks == 2) {
+        placement4[1] = 2;
+        placement4[2] = 4;
+        placement4[3] = 3;
+        placement4[4] = 1;
+    } else if (secondaryStacks == 2) {
+        placement4[1] = 4;
+        placement4[4] = 1;
+    }
+
+    for (stackIndex9 = 0; stackIndex9 < COMBAT_MONSTER_ARMY_SLOTS; stackIndex9++) {
+        temporaryTypes7[stackIndex9] = gpMonGroup->m_creatureTypes[stackIndex9];
+        temporaryCounts[stackIndex9] = gpMonGroup->m_creatureCounts[stackIndex9];
+    }
+    for (stackIndex9 = 0; stackIndex9 < COMBAT_MONSTER_ARMY_SLOTS; stackIndex9++) {
+        gpMonGroup->m_creatureTypes[stackIndex9] =
+            static_cast<signed char>(temporaryTypes7[placement4[stackIndex9]]);
+        gpMonGroup->m_creatureCounts[stackIndex9] =
+            static_cast<short>(temporaryCounts[placement4[stackIndex9]]);
+    }
+
+    if (defender != 0)
+        combatResult7 = DoCombat(combatX, combatY, 0, gpMonGroup,
+                                0, eventHero, &eventHero->m_army, mapX, mapY,
+                                combatX + combatY, 1);
+    else
+        combatResult7 = DoCombat(combatX, combatY, eventHero, &eventHero->m_army,
+                                0, 0, gpMonGroup, mapX, mapY,
+                                combatX + combatY, 1);
+    MobilizeCurrHero(0);
+    return combatResult7;
+}
+
+// @early-stop
+// non-table instructions/slots identical; 103 table entries differ only by delinked local-label identity
 VA(0x004b1380, 0x5f3)
-void GiveTakeArtifactStat(class hero *, int, int) {}
+void GiveTakeArtifactStat(hero *targetHero, int artifact, int take)
+{
+    int statChanges[EVENT_ARTIFACT_PRIMARY_STAT_COUNT + 1];
+    int maxSpellPoints;
 
+    if (artifact == EVENT_ARTIFACT_NONE)
+        return;
+    statChanges[HERO_PRIMARY_ATTACK] = 0;
+    statChanges[HERO_PRIMARY_DEFENSE] = 0;
+    statChanges[HERO_PRIMARY_SPELL_POWER] = 0;
+    statChanges[HERO_PRIMARY_KNOWLEDGE] = 0;
+
+    switch (artifact) {
+    case EVENT_ARTIFACT_ULTIMATE_BOOK: statChanges[HERO_PRIMARY_KNOWLEDGE] = 12; break;
+    case EVENT_ARTIFACT_ULTIMATE_SWORD: statChanges[HERO_PRIMARY_ATTACK] = 12; break;
+    case EVENT_ARTIFACT_ULTIMATE_CLOAK: statChanges[HERO_PRIMARY_DEFENSE] = 12; break;
+    case EVENT_ARTIFACT_ULTIMATE_WAND: statChanges[HERO_PRIMARY_SPELL_POWER] = 12; break;
+    case EVENT_ARTIFACT_ULTIMATE_SHIELD:
+        statChanges[HERO_PRIMARY_ATTACK] = 6;
+        statChanges[HERO_PRIMARY_DEFENSE] = 6;
+        break;
+    case EVENT_ARTIFACT_ULTIMATE_STAFF:
+        statChanges[HERO_PRIMARY_SPELL_POWER] = 6;
+        statChanges[HERO_PRIMARY_KNOWLEDGE] = 6;
+        break;
+    case EVENT_ARTIFACT_ULTIMATE_CROWN:
+        statChanges[HERO_PRIMARY_ATTACK] = 4;
+        statChanges[HERO_PRIMARY_DEFENSE] = 4;
+        statChanges[HERO_PRIMARY_SPELL_POWER] = 4;
+        statChanges[HERO_PRIMARY_KNOWLEDGE] = 4;
+        break;
+    case EVENT_ARTIFACT_GOLDEN_GOOSE: break;
+    case EVENT_ARTIFACT_ARCANE_NECKLACE: statChanges[HERO_PRIMARY_SPELL_POWER] = 4; break;
+    case EVENT_ARTIFACT_CASTER_BRACELET: statChanges[HERO_PRIMARY_SPELL_POWER] = 2; break;
+    case EVENT_ARTIFACT_MAGE_RING: statChanges[HERO_PRIMARY_SPELL_POWER] = 2; break;
+    case EVENT_ARTIFACT_WITCHES_BROACH: statChanges[HERO_PRIMARY_SPELL_POWER] = 3; break;
+    case EVENT_ARTIFACT_MEDAL_VALOR: break;
+    case EVENT_ARTIFACT_MEDAL_COURAGE: break;
+    case EVENT_ARTIFACT_MEDAL_HONOR: break;
+    case EVENT_ARTIFACT_MEDAL_DISTINCTION: break;
+    case EVENT_ARTIFACT_FIZBIN_MISFORTUNE: break;
+    case EVENT_ARTIFACT_THUNDER_MACE: statChanges[HERO_PRIMARY_ATTACK] = 1; break;
+    case EVENT_ARTIFACT_ARMORED_GAUNTLETS: statChanges[HERO_PRIMARY_DEFENSE] = 1; break;
+    case EVENT_ARTIFACT_DEFENDER_HELM: statChanges[HERO_PRIMARY_DEFENSE] = 1; break;
+    case EVENT_ARTIFACT_GIANT_FLAIL: statChanges[HERO_PRIMARY_ATTACK] = 1; break;
+    case EVENT_ARTIFACT_BALLISTA: break;
+    case EVENT_ARTIFACT_STEALTH_SHIELD: statChanges[HERO_PRIMARY_DEFENSE] = 2; break;
+    case EVENT_ARTIFACT_DRAGON_SWORD: statChanges[HERO_PRIMARY_ATTACK] = 3; break;
+    case EVENT_ARTIFACT_POWER_AXE: statChanges[HERO_PRIMARY_ATTACK] = 2; break;
+    case EVENT_ARTIFACT_DIVINE_BREASTPLATE: statChanges[HERO_PRIMARY_DEFENSE] = 3; break;
+    case EVENT_ARTIFACT_MINOR_SCROLL: statChanges[HERO_PRIMARY_KNOWLEDGE] = 2; break;
+    case EVENT_ARTIFACT_MAJOR_SCROLL: statChanges[HERO_PRIMARY_KNOWLEDGE] = 3; break;
+    case EVENT_ARTIFACT_SUPERIOR_SCROLL: statChanges[HERO_PRIMARY_KNOWLEDGE] = 4; break;
+    case EVENT_ARTIFACT_FOREMOST_SCROLL: statChanges[HERO_PRIMARY_KNOWLEDGE] = 5; break;
+    case EVENT_ARTIFACT_ENDLESS_SACK_GOLD: break;
+    case EVENT_ARTIFACT_ENDLESS_BAG_GOLD: break;
+    case EVENT_ARTIFACT_ENDLESS_PURSE_GOLD: break;
+    case EVENT_ARTIFACT_NOMAD_BOOTS: break;
+    case EVENT_ARTIFACT_TRAVELER_BOOTS: break;
+    case EVENT_ARTIFACT_RABBIT_FOOT: break;
+    case EVENT_ARTIFACT_GOLDEN_HORSESHOE: break;
+    case EVENT_ARTIFACT_GAMBLERS_COIN: break;
+    case EVENT_ARTIFACT_FOUR_LEAF_CLOVER: break;
+    case EVENT_ARTIFACT_TRUE_COMPASS: break;
+    case EVENT_ARTIFACT_SAILORS_ASTROLABE: break;
+    case EVENT_ARTIFACT_EVIL_EYE: break;
+    case EVENT_ARTIFACT_ENCHANTED_HOURGLASS: break;
+    case EVENT_ARTIFACT_GOLD_WATCH: break;
+    case EVENT_ARTIFACT_SKULLCAP: break;
+    case EVENT_ARTIFACT_ICE_CLOAK: break;
+    case EVENT_ARTIFACT_FIRE_CLOAK: break;
+    case EVENT_ARTIFACT_LIGHTNING_HELM: break;
+    case EVENT_ARTIFACT_EVERCOLD_ICICLE: break;
+    case EVENT_ARTIFACT_EVERHOT_LAVA_ROCK: break;
+    case EVENT_ARTIFACT_LIGHTNING_ROD: break;
+    case EVENT_ARTIFACT_SNAKE_RING: break;
+    case EVENT_ARTIFACT_ANKH: break;
+    case EVENT_ARTIFACT_BOOK_ELEMENTS: break;
+    case EVENT_ARTIFACT_ELEMENTAL_RING: break;
+    case EVENT_ARTIFACT_HOLY_PENDANT: break;
+    case EVENT_ARTIFACT_PENDANT_FREE_WILL: break;
+    case EVENT_ARTIFACT_PENDANT_LIFE: break;
+    case EVENT_ARTIFACT_SERENITY_PENDANT: break;
+    case EVENT_ARTIFACT_SEEING_EYE_PENDANT: break;
+    case EVENT_ARTIFACT_KINETIC_PENDANT: break;
+    case EVENT_ARTIFACT_PENDANT_DEATH: break;
+    case EVENT_ARTIFACT_WAND_NEGATION: break;
+    case EVENT_ARTIFACT_GOLDEN_BOW: break;
+    case EVENT_ARTIFACT_TELESCOPE: break;
+    case EVENT_ARTIFACT_STATESMAN_QUILL: break;
+    case EVENT_ARTIFACT_WIZARD_HAT: break;
+    case EVENT_ARTIFACT_POWER_RING: break;
+    case EVENT_ARTIFACT_AMMO_CART: break;
+    case EVENT_ARTIFACT_TAX_LIEN: break;
+    case EVENT_ARTIFACT_HIDEOUS_MASK: break;
+    case EVENT_ARTIFACT_ENDLESS_POUCH_SULFUR: break;
+    case EVENT_ARTIFACT_ENDLESS_VIAL_MERCURY: break;
+    case EVENT_ARTIFACT_ENDLESS_POUCH_GEMS: break;
+    case EVENT_ARTIFACT_ENDLESS_CORD_WOOD: break;
+    case EVENT_ARTIFACT_ENDLESS_CART_ORE: break;
+    case EVENT_ARTIFACT_ENDLESS_POUCH_CRYSTAL: break;
+    case EVENT_ARTIFACT_SPIKED_HELM:
+        statChanges[HERO_PRIMARY_ATTACK] = 1;
+        statChanges[HERO_PRIMARY_DEFENSE] = 1;
+        break;
+    case EVENT_ARTIFACT_SPIKED_SHIELD:
+        statChanges[HERO_PRIMARY_ATTACK] = 2;
+        statChanges[HERO_PRIMARY_DEFENSE] = 2;
+        break;
+    case EVENT_ARTIFACT_WHITE_PEARL:
+        statChanges[HERO_PRIMARY_SPELL_POWER] = 1;
+        statChanges[HERO_PRIMARY_KNOWLEDGE] = 1;
+        break;
+    case EVENT_ARTIFACT_BLACK_PEARL:
+        statChanges[HERO_PRIMARY_SPELL_POWER] = 2;
+        statChanges[HERO_PRIMARY_KNOWLEDGE] = 2;
+        break;
+    case EVENT_ARTIFACT_MAGIC_BOOK: break;
+    case EVENT_ARTIFACT_EDITOR_ANY_ULTIMATE:
+    case EVENT_ARTIFACT_EDITOR_UNUSED_84:
+    case EVENT_ARTIFACT_EDITOR_UNUSED_85:
+    case EVENT_ARTIFACT_EDITOR_UNUSED_86:
+    case EVENT_ARTIFACT_SPELL_SCROLL:
+        break;
+    case EVENT_ARTIFACT_ARM_OF_MARTYR: statChanges[HERO_PRIMARY_SPELL_POWER] = 3; break;
+    case EVENT_ARTIFACT_BREASTPLATE_ANDURAN: statChanges[HERO_PRIMARY_DEFENSE] = 5; break;
+    case EVENT_ARTIFACT_BROACH_SHIELDING: statChanges[HERO_PRIMARY_SPELL_POWER] = -2; break;
+    case EVENT_ARTIFACT_BATTLE_GARB:
+        statChanges[HERO_PRIMARY_SPELL_POWER] = 5;
+        statChanges[HERO_PRIMARY_DEFENSE] = 5;
+        statChanges[HERO_PRIMARY_ATTACK] = 5;
+        break;
+    case EVENT_ARTIFACT_CRYSTAL_BALL: break;
+    case EVENT_ARTIFACT_HEART_FIRE: break;
+    case EVENT_ARTIFACT_HEART_ICE: break;
+    case EVENT_ARTIFACT_HELMET_ANDURAN: statChanges[HERO_PRIMARY_SPELL_POWER] = 5; break;
+    case EVENT_ARTIFACT_HOLY_HAMMER: statChanges[HERO_PRIMARY_ATTACK] = 5; break;
+    case EVENT_ARTIFACT_LEGENDARY_SCEPTER:
+        statChanges[HERO_PRIMARY_SPELL_POWER] = 2;
+        statChanges[HERO_PRIMARY_ATTACK] = 2;
+        statChanges[HERO_PRIMARY_DEFENSE] = 2;
+        statChanges[HERO_PRIMARY_KNOWLEDGE] = 2;
+        break;
+    case EVENT_ARTIFACT_MASTHEAD: break;
+    case EVENT_ARTIFACT_SPHERE_NEGATION: break;
+    case EVENT_ARTIFACT_STAFF_WIZARDRY: statChanges[HERO_PRIMARY_SPELL_POWER] = 5; break;
+    case EVENT_ARTIFACT_SWORD_BREAKER:
+        statChanges[HERO_PRIMARY_DEFENSE] = 4;
+        statChanges[HERO_PRIMARY_ATTACK] = 1;
+        break;
+    case EVENT_ARTIFACT_SWORD_ANDURAN: statChanges[HERO_PRIMARY_ATTACK] = 5; break;
+    case EVENT_ARTIFACT_SPADE_NECROMANCY: break;
+    default: break;
+    }
+
+    for (statChanges[EVENT_ARTIFACT_PRIMARY_STAT_COUNT] = 0;
+         statChanges[EVENT_ARTIFACT_PRIMARY_STAT_COUNT] < EVENT_ARTIFACT_PRIMARY_STAT_COUNT;
+         statChanges[EVENT_ARTIFACT_PRIMARY_STAT_COUNT]++) {
+        *(&targetHero->m_attack + statChanges[EVENT_ARTIFACT_PRIMARY_STAT_COUNT]) +=
+            statChanges[statChanges[EVENT_ARTIFACT_PRIMARY_STAT_COUNT]] *
+            (take == EVENT_ARTIFACT_TAKE ? -1 : 1);
+        if (statChanges[EVENT_ARTIFACT_PRIMARY_STAT_COUNT] == HERO_PRIMARY_KNOWLEDGE &&
+            take == EVENT_ARTIFACT_TAKE) {
+            maxSpellPoints = targetHero->Stats(HERO_PRIMARY_KNOWLEDGE) *
+                             EVENT_ARTIFACT_SPELL_POINT_MULTIPLIER;
+            if (targetHero->m_spellPoints > maxSpellPoints)
+                targetHero->m_spellPoints = static_cast<short>(maxSpellPoints);
+        }
+    }
+}
+
+// @early-stop
+// reloc-masked instructions/slots identical; only the string-literal symbol identity differs
 VA(0x004b1973, 0x1dd)
-void advManager::TransferArtifacts(class hero *, class hero *) {}
+void advManager::TransferArtifacts(hero *sourceHero, hero *destinationHero)
+{
+    int targetSlot;
+    int sourceArtifactSlot;
 
+    if (sourceHero != 0) {
+        if (destinationHero == 0) {
+        } else {
+            for (targetSlot = 0; targetSlot < EVENT_ARTIFACT_SLOT_COUNT;
+                 targetSlot++) {
+                if (destinationHero->m_artifacts[targetSlot] == EVENT_ARTIFACT_NONE) {
+                    for (sourceArtifactSlot = 0;
+                         sourceArtifactSlot < EVENT_ARTIFACT_SLOT_COUNT;
+                         sourceArtifactSlot++) {
+                        if (sourceHero->m_artifacts[sourceArtifactSlot] != EVENT_ARTIFACT_NONE &&
+                            sourceHero->m_artifacts[sourceArtifactSlot] != EVENT_ARTIFACT_MAGIC_BOOK) {
+                            if (sourceHero->m_artifacts[sourceArtifactSlot] <=
+                                EVENT_ARTIFACT_NON_TRANSFERABLE_LAST) {
+                                if (gbThisNetHumanPlayer[sourceHero->m_owner] ||
+                                    gbThisNetHumanPlayer[destinationHero->m_owner]) {
+                                    sprintf(gText,
+                                            "As you reach for the %s, it mysteriously disappears.",
+                                            gArtifactNames[sourceHero->m_artifacts[sourceArtifactSlot]]);
+                                    NormalDialog(gText, 1, -1, -1, 7,
+                                                 sourceHero->m_artifacts[sourceArtifactSlot],
+                                                 -1, 0, -1, 0);
+                                }
+                            } else {
+                                GiveTakeArtifactStat(
+                                    destinationHero,
+                                    sourceHero->m_artifacts[sourceArtifactSlot], 0);
+                                destinationHero->m_artifacts[targetSlot] =
+                                    sourceHero->m_artifacts[sourceArtifactSlot];
+                                destinationHero->m_artifactExtra[targetSlot] =
+                                    sourceHero->m_artifactExtra[sourceArtifactSlot];
+                            }
+                            GiveTakeArtifactStat(sourceHero,
+                                                 sourceHero->m_artifacts[sourceArtifactSlot], 1);
+                            sourceHero->m_artifacts[sourceArtifactSlot] = EVENT_ARTIFACT_NONE;
+                            sourceHero->m_artifactExtra[sourceArtifactSlot] = EVENT_ARTIFACT_NONE;
+                            break;
+                        }
+                    }
+                }
+            }
+            destinationHero->CheckAnduranPieces(0);
+        }
+    }
+}
+
+// @early-stop
+// raw instructions identical; retail carries one trailing function-boundary nop
 VA(0x004b1b50, 0x7f)
-void advManager::HeroLoses(class hero *) {}
+void advManager::HeroLoses(hero *lostHero)
+{
+    if (lostHero == 0) {
+    } else {
+        CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
+        UpdateScreen(0, 0);
+        lostHero->Deallocate(1);
+        FizzleCenter(EVENT_FIZZLE_HERO_LOSS);
+        UpdateRadar(1, 0);
+        UpdateHeroLocators(1, 1);
+    }
+}
 
+// @early-stop
+// raw instructions/slots identical; the fight-value relocation names the same interior database address
 VA(0x004b1bcf, 0x132)
-void advManager::DoWhirlpool(class hero *) {}
+void advManager::DoWhirlpool(hero *eventHero)
+{
+    int armyValue;
+    int weakestValue;
+    int selectedSlot;
+    int slotIndex;
+    int groupValues[COMBAT_MONSTER_ARMY_SLOTS];
 
+    if (gbHumanPlayer[eventHero->m_owner] == 0) {
+    } else {
+        if (Random(EVENT_WHIRLPOOL_TRIGGER_ROLL, EVENT_WHIRLPOOL_TRIGGER_MAX) !=
+            EVENT_WHIRLPOOL_TRIGGER_ROLL) {
+        } else {
+            weakestValue = EVENT_WHIRLPOOL_ARMY_VALUE_LIMIT;
+            selectedSlot = -1;
+            for (slotIndex = 0; slotIndex < COMBAT_MONSTER_ARMY_SLOTS; slotIndex++) {
+                if (eventHero->m_army.m_creatureCounts[slotIndex] > 0) {
+                    armyValue =
+                        gMonsterDatabase[eventHero->m_army.m_creatureTypes[slotIndex]].fightValue *
+                        eventHero->m_army.m_creatureCounts[slotIndex];
+                    if (weakestValue > armyValue) {
+                        weakestValue = armyValue;
+                        selectedSlot = slotIndex;
+                    }
+                }
+            }
+            if (eventHero->m_army.GetNumArmies() > 1) {
+                eventHero->m_army.m_creatureCounts[selectedSlot] >>= 1;
+                if (eventHero->m_army.m_creatureCounts[selectedSlot] == 0)
+                    eventHero->m_army.m_creatureTypes[selectedSlot] = COMBAT_MONSTER_INVALID_TYPE;
+            } else if (eventHero->m_army.m_creatureCounts[selectedSlot] > 1) {
+                eventHero->m_army.m_creatureCounts[selectedSlot] >>= 1;
+            }
+        }
+    }
+}
+
+// @early-stop
+// reloc-masked instructions/slots identical; only literal and interior aggregate relocation identities differ
 VA(0x004b1d01, 0x142)
-void advManager::FizzleCenter(int) {}
+void advManager::FizzleCenter(int fizzleType)
+{
+    SAMPLE2 playedSample;
+    int fizzleSteps;
+
+    if (bShowIt == 0) {
+    } else {
+        switch (fizzleType) {
+        case EVENT_FIZZLE_HERO_LOSS:
+            sprintf(gText, "killfade.82M");
+            break;
+        case EVENT_FIZZLE_ARTIFACT:
+            sprintf(gText, "pickup%02d.82M", Random(1, 7));
+            break;
+        default:
+            return;
+        }
+        playedSample = NULL_SAMPLE2;
+        playedSample = LoadPlaySample(gText);
+        gpMouseManager->HideColorPointer();
+        gpWindowManager->SaveFizzleSource(EVENT_FIZZLE_X, EVENT_FIZZLE_Y,
+                                          EVENT_FIZZLE_WIDTH, EVENT_FIZZLE_HEIGHT);
+        CompleteDraw(0);
+        fizzleSteps = EVENT_FIZZLE_STEPS;
+        gpWindowManager->FizzleForward(EVENT_FIZZLE_X, EVENT_FIZZLE_Y,
+                                       EVENT_FIZZLE_WIDTH, EVENT_FIZZLE_HEIGHT,
+                                       fizzleSteps, 0, 0);
+        gpMouseManager->ShowColorPointer();
+        WaitEndSample(playedSample, -1);
+    }
+}
 
 VA(0x004b1e43, 0x2a40)
 void advManager::DoAIEvent(mapCell *cell, hero *eventHero, int x, int y)

@@ -138,7 +138,7 @@ public:
     };
     unsigned char m_isCaptain;  // +0xe7
     float m_aiFightValue;  // +0xe8
-    char m_pad_0xec[0xe];
+    signed char m_artifactExtra[14];  // +0xec
     int IsEmbarked(void) { return m_eventFlags & HERO_EVENT_EMBARKED; }
     // --- constructors ---
     hero(void);
