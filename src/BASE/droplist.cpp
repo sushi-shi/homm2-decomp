@@ -85,25 +85,19 @@ void dropListWidget::Read(void)
     entries = &m_icon->m_data;
     short iconX = m_x;
     short iconY = m_y;
+    IconEntry *topEntry = reinterpret_cast<IconEntry *>(*entries);
     m_iconX = iconX;
     m_iconY = iconY;
-    {
-        IconEntry *entry = reinterpret_cast<IconEntry *>(*entries);
-        field_0x70 = entry->w;
-        field_0x72 = entry->h;
-        field_0x64 = iconX + field_0x70;
-    }
+    field_0x70 = topEntry->w;
+    field_0x72 = topEntry->h;
+    IconEntry *middleEntry = reinterpret_cast<IconEntry *>(*entries) + 1;
+    field_0x64 = iconX + field_0x70;
     field_0x66 = iconY;
-    {
-        IconEntry *entry = reinterpret_cast<IconEntry *>(*entries) + 1;
-        field_0x68 = entry->w;
-        field_0x6a = entry->h;
-    }
-    {
-        IconEntry *entry = reinterpret_cast<IconEntry *>(*entries) + 13;
-        field_0xa6 = entry->w;
-        field_0xa8 = entry->h;
-    }
+    field_0x68 = middleEntry->w;
+    field_0x6a = middleEntry->h;
+    IconEntry *bottomEntry = reinterpret_cast<IconEntry *>(*entries) + 13;
+    field_0xa6 = bottomEntry->w;
+    field_0xa8 = bottomEntry->h;
 }
 
 VA(0x004dc200, 0xd5)
@@ -350,9 +344,12 @@ void dropListWidget::ProcessSelectDialog(void)
         field_0x32 = numItems;
     }
 
-    field_0x74 = reinterpret_cast<IconEntry *>(m_icon->m_data)[field_0x4e].h;
-    field_0x76 = reinterpret_cast<IconEntry *>(m_icon->m_data)[field_0x50].h;
-    field_0x78 = reinterpret_cast<IconEntry *>(m_icon->m_data)[field_0x52].h;
+    short topHeight = reinterpret_cast<IconEntry *>(m_icon->m_data)[field_0x4e].h;
+    field_0x74 = topHeight;
+    short middleHeight = reinterpret_cast<IconEntry *>(m_icon->m_data)[field_0x50].h;
+    field_0x76 = middleHeight;
+    short bottomHeight = reinterpret_cast<IconEntry *>(m_icon->m_data)[field_0x52].h;
+    field_0x78 = bottomHeight;
     field_0x82 = m_iconX;
     field_0x84 = m_iconY + field_0x72;
     field_0x86 = reinterpret_cast<IconEntry *>(m_icon->m_data)[field_0x4e].w;
@@ -373,15 +370,19 @@ void dropListWidget::ProcessSelectDialog(void)
     field_0x80 = field_0x88;
 
     if (field_0x46 > 0) {
-        field_0x8a = m_x + m_width - scrollWidth[0];
+        short scrollX = m_x + m_width - scrollWidth[0];
+        field_0x8a = scrollX;
         field_0x8c = field_0x84;
-        field_0x9a = field_0x8a;
-        field_0x9c = field_0x84 - scrollBottomHeight + field_0x88;
-        field_0x92 = field_0x8a;
-        field_0x94 = field_0x84 + scrollTopHeight[0];
+        field_0x9a = scrollX;
+        short bottomY = field_0x84 - scrollBottomHeight + field_0x88;
+        field_0x9c = bottomY;
+        field_0x92 = scrollX;
+        short topY = field_0x84 + scrollTopHeight[0];
+        field_0x94 = topY;
         field_0x96 = scrollBottomWidth[0];
-        field_0x98 = field_0x9c - field_0x94;
-        field_0xaa = field_0x98 - field_0xa8 - 7;
+        bottomY -= topY;
+        field_0x98 = bottomY;
+        field_0xaa = bottomY - field_0xa8 - 7;
     }
 
     m_icon->DrawToBuffer(m_owner->m_posX + field_0x64, m_owner->m_posY + field_0x66,
