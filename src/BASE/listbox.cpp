@@ -5,6 +5,7 @@
 
 #include <va.h>
 #include <BASE/listBoxWidget.h>
+#include <BASE/bitmap.h>
 #include <BASE/resourceManager.h>
 #include <BASE/icon.h>
 #include <BASE/font.h>
@@ -21,42 +22,47 @@ listBoxWidget::listBoxWidget(void) : widget(0, 0, 0, 0, 0, 0)
 {
     m_items = 0;
     m_scrollbar = 0;
-    m_itemCount = 0;
     m_selectedIndex = -1;
-    field_0x36 = -1;
+    m_itemCount = 0;
+    m_lastSelectedIndex = -1;
 }
 
 VA(0x004db0d0, 0x86)
 listBoxWidget::~listBoxWidget()
 {
+    int i;
     gpResourceManager->Dispose(m_font);
     gpResourceManager->Dispose(m_icon);
     if (m_scrollbar != 0)
         delete m_scrollbar;
-    for (int i = 0; i < m_itemCount; i++)
+    for (i = 0; i < m_itemCount; i++)
+#line 25
         BaseFree(m_items[i], __FILE__, __LINE__);
+#line 27
     BaseFree(m_items, __FILE__, __LINE__);
     gbSendMouseMoveMessages = 0;
 }
 
-// @early-stop
-// /O2 regalloc wall: logic + field store-order byte-exact; icon-geometry value CSEs (entries[N].h/.w, m_x/m_y) color into different callee-saved regs than retail (di/ax/dx) and the h10 short spills to a 2-aligned frame slot (0x12) vs retail's dword slot (0x10) — not source-steerable.
 VA(0x004db160, 0x26e)
 void listBoxWidget::Read(void)
 {
-    short h10;
-    char buf[13];
+    short frameHeight[2];
+    signed char iconName[16];
+    IconEntry *iconEntry;
+    short bottomY;
+    short topY;
+    short rightX;
     m_x = gpResourceManager->ReadWord();
     m_y = gpResourceManager->ReadWord();
     m_width = gpResourceManager->ReadWord();
     m_height = gpResourceManager->ReadWord();
-    gpResourceManager->Read13(reinterpret_cast<signed char *>(buf));
+    gpResourceManager->Read13(iconName);
     gpResourceManager->SavePosition();
-    m_font = gpResourceManager->GetFont(buf);
+    m_font = gpResourceManager->GetFont(reinterpret_cast<char *>(iconName));
     gpResourceManager->RestorePosition();
-    gpResourceManager->Read13(reinterpret_cast<signed char *>(buf));
+    gpResourceManager->Read13(iconName);
     gpResourceManager->SavePosition();
-    m_icon = gpResourceManager->GetIcon(buf);
+    m_icon = gpResourceManager->GetIcon(reinterpret_cast<char *>(iconName));
     gpResourceManager->RestorePosition();
     field_0x28 = gpResourceManager->ReadWord();
     field_0x2c = gpResourceManager->ReadWord();
@@ -74,43 +80,43 @@ void listBoxWidget::Read(void)
     field_0x54 = 8;
     field_0x56 = 9;
     field_0x58 = 10;
-    IconEntry *e10 = reinterpret_cast<IconEntry *>(m_icon->m_data) + 10;
-    field_0x84 = e10->w;
-    h10 = e10->h;
-    field_0x86 = h10;
-    short e0h = reinterpret_cast<IconEntry *>(m_icon->m_data)[0].h;
-    field_0x5a = e0h;
-    short e1h = reinterpret_cast<IconEntry *>(m_icon->m_data)[1].h;
-    field_0x5c = e1h;
-    short e2h = reinterpret_cast<IconEntry *>(m_icon->m_data)[2].h;
-    field_0x5e = e2h;
+    iconEntry = reinterpret_cast<IconEntry *>(m_icon->m_data) + 10;
+    field_0x84 = iconEntry->w;
+    frameHeight[0] = iconEntry->h;
+    field_0x86 = frameHeight[0];
+    m_rowHeight = reinterpret_cast<IconEntry *>(m_icon->m_data)[1].h;
+    m_firstRowHeight = reinterpret_cast<IconEntry *>(m_icon->m_data)[0].h;
     m_listX = m_x;
     m_listY = m_y;
+    m_lastRowHeight = reinterpret_cast<IconEntry *>(m_icon->m_data)[2].h;
     field_0x64 = reinterpret_cast<IconEntry *>(m_icon->m_data)[0].w;
-    field_0x66 = (field_0x28 - 2) * e1h + e0h + e2h;
-    short e3w = reinterpret_cast<IconEntry *>(m_icon->m_data)[3].w;
-    field_0x6c = e3w;
-    short e3h = reinterpret_cast<IconEntry *>(m_icon->m_data)[3].h;
-    field_0x6e = e3h;
-    field_0x7c = reinterpret_cast<IconEntry *>(m_icon->m_data)[5].w;
-    field_0x68 = m_width - e3w + m_x;
-    short e5h = reinterpret_cast<IconEntry *>(m_icon->m_data)[5].h;
-    field_0x7e = e5h;
+    field_0x66 = (field_0x28 - 2) * m_rowHeight + m_firstRowHeight + m_lastRowHeight;
+    iconEntry = reinterpret_cast<IconEntry *>(m_icon->m_data) + 3;
+    field_0x6c = iconEntry->w;
+    field_0x6e = iconEntry->h;
+    iconEntry = reinterpret_cast<IconEntry *>(m_icon->m_data) + 5;
+    field_0x7c = iconEntry->w;
+    field_0x7e = iconEntry->h;
+    rightX = m_width - field_0x6c + m_x;
+    field_0x68 = rightX;
     field_0x6a = m_y;
-    field_0x78 = field_0x68;
-    field_0x7a = m_y + m_height - e5h;
-    field_0x70 = field_0x68;
+    field_0x78 = rightX;
+    bottomY = m_y + m_height - field_0x7e;
+    field_0x7a = bottomY;
+    field_0x70 = rightX;
+    topY = m_y + field_0x6e;
+    bottomY -= topY;
     field_0x8a = 0;
     field_0x8b = 0;
     field_0x8d = 0;
     field_0x8c = 0;
     m_topIndex = 0;
     field_0x42 = 0;
+    field_0x72 = topY;
     field_0x2a = 0;
-    field_0x72 = m_y + e3h;
     field_0x74 = field_0x7c;
-    field_0x76 = field_0x7a - field_0x72;
-    field_0x88 = field_0x76 - h10 - 7;
+    field_0x76 = bottomY;
+    field_0x88 = field_0x76 - frameHeight[0] - 7;
 }
 
 VA(0x004db3d0, 0x142)
@@ -134,7 +140,7 @@ void listBoxWidget::DeleteItem(int index)
         BaseFree(m_items, __FILE__, __LINE__);
         m_items = 0;
     } else {
-        void **newItems = static_cast<void **>(BaseAlloc((m_itemCount - 1) * 4,
+        char **newItems = static_cast<char **>(BaseAlloc((m_itemCount - 1) * 4,
 #line 162
                                                          __FILE__, __LINE__));
         memcpy(newItems, m_items, (m_itemCount - 1) * 4);
@@ -153,7 +159,9 @@ void listBoxWidget::DeleteItem(int index)
 }
 
 // @early-stop
-// /O2 delinker artifact: the switch jump-table is emitted as a separate $L local symbol, so mine's Main spans 0x350 vs retail's 0x368 (delinker folds the table into Main and names its relocs Main-relative); table + jmp reloc unmatchable. Residual: 1 commutative hit-test compare (cmp m_x,mx;jg vs cmp mx,m_x;jl).
+// reloc-masked: all 0x368 bytes are identical and both objects have 23 relocations. MSVC
+// names the jump-table base (+0x12a) and six entries (+0x350-364) as $L locals; the delinked
+// retail object names those same in-function targets Main-relative.
 VA(0x004db520, 0x368)
 int listBoxWidget::Main(tag_message &message)
 {
@@ -174,17 +182,16 @@ int listBoxWidget::Main(tag_message &message)
             break;
         short mx = message.field4 - m_owner->m_posX;
         short my = message.field8 - m_owner->m_posY;
-        if (m_x <= mx && m_y <= my && m_x + m_width > mx && m_y + m_height > my) {
-            if (message.type == 0x20) {
-                message.field4 = 0xe;
-                message.type = 0x200;
-                message.field8 = m_id;
-                message.fieldC = 0x200;
-                return 2;
-            }
-            return ProcessMouseMessage(message);
+        if (m_x > mx || m_y > my || m_x + m_width <= mx || m_y + m_height <= my)
+            return 0;
+        if (message.type == 0x20) {
+            message.field4 = 0xe;
+            message.type = 0x200;
+            message.field8 = m_id;
+            message.fieldC = 0x200;
+            return 2;
         }
-        return 0;
+        return ProcessMouseMessage(message);
     }
     case 0x200:
         switch (message.field4) {
@@ -201,25 +208,28 @@ int listBoxWidget::Main(tag_message &message)
             }
             break;
         case 0x39:
-            if (m_id == message.field8 && m_itemCount > message.fieldC) {
+            if (m_id == message.field8) {
+                char *text = message.text;
+                if (m_itemCount <= message.fieldC)
+                    break;
 #line 222
                 BaseFree(m_items[message.fieldC], __FILE__, __LINE__);
-                m_items[message.fieldC] = BaseAlloc(strlen(message.text) + 1, __FILE__, __LINE__);
-                strcpy(static_cast<char *>(m_items[message.fieldC]), message.text);
+                m_items[message.fieldC] = static_cast<char *>(BaseAlloc(strlen(text) + 1, __FILE__, __LINE__));
+                strcpy(m_items[message.fieldC], text);
             }
             break;
         case 0x38:
             if (m_id == message.field8) {
                 char *text = message.text;
-                void **newItems = static_cast<void **>(BaseAlloc((m_itemCount + 1) * 4,
+                char **newItems = static_cast<char **>(BaseAlloc((m_itemCount + 1) * 4,
 #line 233
                                                                  __FILE__, __LINE__));
                 if (m_itemCount != 0)
                     memcpy(newItems, m_items, m_itemCount * 4);
-                newItems[m_itemCount] = BaseAlloc(strlen(text) + 1,
+                newItems[m_itemCount] = static_cast<char *>(BaseAlloc(strlen(text) + 1,
 #line 236
-                                                  __FILE__, __LINE__);
-                strcpy(static_cast<char *>(newItems[m_itemCount]), text);
+                                                                      __FILE__, __LINE__));
+                strcpy(newItems[m_itemCount], text);
                 m_itemCount++;
                 if (m_items != 0)
 #line 240
@@ -260,42 +270,42 @@ void listBoxWidget::Draw(void)
     DrawLBStuff(0);
 }
 
-// @early-stop
-// /O2 regalloc wall: logic + call sequence byte-exact; the baseX/baseY/m_posX/m_posY quad colors into ebx/edi/ecx/edx matching only 2-of-4 either way, plus one 16-bit thumb-X load the optimizer proves upper-zero (mov ax vs movsx) — not source-steerable.
 VA(0x004db8a0, 0x334)
 void listBoxWidget::DrawLBStuff(int doUpdate)
 {
-    int baseY = m_listY + m_owner->m_posY;
-    int baseX = m_listX + m_owner->m_posX;
+    int y;
+    int x;
+    x = m_listX + m_owner->m_posX;
+    y = m_listY + m_owner->m_posY;
     for (int i = 0; i < field_0x28; i++) {
         if (i == 0) {
-            m_icon->DrawToBuffer(baseX, baseY, field_0x44, 0);
+            m_icon->DrawToBuffer(x, y, field_0x44, 0);
             if (i < field_0x2a) {
                 int color = m_selectedIndex == m_topIndex ? field_0x2e : field_0x2c;
-                m_font->DrawBoundedString(static_cast<char *>(m_items[m_topIndex]), baseX + 5,
-                                          baseY + 4, field_0x64 - 10, m_font->m_height + 1, color,
+                m_font->DrawBoundedString(m_items[m_topIndex], x + 5,
+                                          y + 4, field_0x64 - 10, m_font->m_height + 1, color,
                                           field_0x30);
             }
-            baseY += field_0x5a;
-        } else if (field_0x28 - i == 1) {
-            m_icon->DrawToBuffer(baseX, baseY, field_0x48, 0);
-            if (i < field_0x2a) {
+            y += m_firstRowHeight;
+        } else if (1 == field_0x28 - i) {
+            m_icon->DrawToBuffer(x, y, field_0x48, 0);
+            if (field_0x2a > i) {
                 int itemIndex = m_topIndex + i;
                 int color = m_selectedIndex == itemIndex ? field_0x2e : field_0x2c;
-                m_font->DrawBoundedString(static_cast<char *>(m_items[itemIndex]), baseX + 5,
-                                          baseY + 2, field_0x64 - 10, m_font->m_height + 1, color,
+                m_font->DrawBoundedString(m_items[itemIndex], x + 5,
+                                          y + 2, field_0x64 - 10, m_font->m_height + 1, color,
                                           field_0x30);
             }
         } else {
-            m_icon->DrawToBuffer(baseX, baseY, field_0x46, 0);
+            m_icon->DrawToBuffer(x, y, field_0x46, 0);
             if (i < field_0x2a) {
                 int itemIndex = m_topIndex + i;
                 int color = m_selectedIndex == itemIndex ? field_0x2e : field_0x2c;
-                m_font->DrawBoundedString(static_cast<char *>(m_items[itemIndex]), baseX + 5,
-                                          baseY + 2, field_0x64 - 10, m_font->m_height + 1, color,
+                m_font->DrawBoundedString(m_items[itemIndex], x + 5,
+                                          y + 2, field_0x64 - 10, m_font->m_height + 1, color,
                                           field_0x30);
             }
-            baseY += field_0x5c;
+            y += m_rowHeight;
         }
     }
     int upFrame = field_0x8a ? field_0x4c : field_0x4a;
@@ -304,19 +314,19 @@ void listBoxWidget::DrawLBStuff(int doUpdate)
     int j;
     for (j = 2; j < field_0x28 - 2; j++)
         m_icon->DrawToBuffer(field_0x70 + m_owner->m_posX,
-                             (j - 1) * field_0x5c + field_0x72 + m_owner->m_posY, field_0x54, 0);
+                             (j - 1) * m_rowHeight + field_0x72 + m_owner->m_posY, field_0x54, 0);
     m_icon->DrawToBuffer(field_0x70 + m_owner->m_posX,
-                         (j - 1) * field_0x5c + field_0x72 + m_owner->m_posY, field_0x56, 0);
+                         (j - 1) * m_rowHeight + field_0x72 + m_owner->m_posY, field_0x56, 0);
     int downFrame = field_0x8b ? field_0x50 : field_0x4e;
     m_icon->DrawToBuffer(field_0x78 + m_owner->m_posX, field_0x7a + m_owner->m_posY, downFrame, 0);
-    int thumbX = m_owner->m_posX + field_0x70 + 5;
+    short thumbX = m_owner->m_posX + field_0x70 + 5;
     field_0x80 = thumbX;
     int offset;
     if (field_0x42 > 0)
         offset = m_topIndex * field_0x88 / field_0x42;
     else
         offset = field_0x88 / 2;
-    int thumbY = m_owner->m_posY + field_0x72 + offset + 3;
+    short thumbY = offset + m_owner->m_posY + field_0x72 + 3;
     field_0x82 = thumbY;
     m_icon->DrawToBuffer(thumbX, thumbY, field_0x58, 0);
     if (doUpdate)
@@ -324,8 +334,6 @@ void listBoxWidget::DrawLBStuff(int doUpdate)
                                             m_height);
 }
 
-// @early-stop
-// /O2 wall: logic + shared-exit (goto redraw/done) structure byte-exact; residual is commutative compare operand order (cmp A,B;jg vs cmp B,A;jl) in the hit-test + case-0x10 constant-store scheduling/block layout — not source-steerable.
 VA(0x004dbbe0, 0x312)
 int listBoxWidget::ProcessMouseMessage(tag_message &message)
 {
@@ -336,8 +344,9 @@ int listBoxWidget::ProcessMouseMessage(tag_message &message)
     case 4:
         if (field_0x8d) {
             int row;
-            if (adjY > field_0x5a)
-                row = (adjY - field_0x5a) / field_0x5c + 1;
+            int firstRowHeight = m_firstRowHeight;
+            if (adjY > firstRowHeight)
+                row = (adjY - firstRowHeight) / m_rowHeight + 1;
             else
                 row = 0;
             if (row < 0)
@@ -366,8 +375,8 @@ int listBoxWidget::ProcessMouseMessage(tag_message &message)
         if (m_listX <= mouseX && m_listY <= mouseY && mouseX < m_listX + field_0x64
             && mouseY < m_listY + field_0x66) {
             int clickedIndex;
-            if (adjY > field_0x5a)
-                clickedIndex = m_topIndex + (adjY - field_0x5a) / field_0x5c + 1;
+            if (adjY > m_firstRowHeight)
+                clickedIndex = m_topIndex + (adjY - m_firstRowHeight) / m_rowHeight + 1;
             else
                 clickedIndex = m_topIndex;
             if (m_itemCount <= clickedIndex)
@@ -405,22 +414,25 @@ int listBoxWidget::ProcessMouseMessage(tag_message &message)
             field_0x8a = 0;
             goto redraw;
         }
-        if (!field_0x8d)
-            return 0;
-        field_0x8d = 0;
-        message.field4 = 0xc;
-        message.type = 0x200;
-        message.field8 = m_id;
-        message.fieldC = 1;
-        message.text = reinterpret_cast<char *>(static_cast<int>(m_selectedIndex));
-        if (field_0x36 == m_selectedIndex) {
-            int lastTick = field_0x38;
-            if (lastTick + 0x190 > KBTickCount())
-                message.fieldC = 2;
+        if (field_0x8d) {
+            field_0x8d = 0;
+            message.field4 = 0xc;
+            message.type = 0x200;
+            message.field8 = m_id;
+            int selectedIndex = m_selectedIndex;
+            message.fieldC = 1;
+            message.text = reinterpret_cast<char *>(selectedIndex);
+            if (m_lastSelectedIndex == m_selectedIndex) {
+                int lastTick = m_lastClickTime;
+                int currentTick = KBTickCount();
+                if (lastTick + 0x190 > currentTick)
+                    message.fieldC = 2;
+            }
+            m_lastSelectedIndex = m_selectedIndex;
+            m_lastClickTime = KBTickCount();
+            return 2;
         }
-        field_0x36 = m_selectedIndex;
-        field_0x38 = KBTickCount();
-        return 2;
+        return 0;
     }
     goto done;
 redraw:
