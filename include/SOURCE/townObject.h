@@ -11,8 +11,8 @@ public:
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     int    field_0x0;  // +0x00
     int    field_0x4;  // +0x04
-    int    field_0x8;  // +0x08
-    int    field_0xc;  // +0x0c
+    int m_visible;  // +0x08
+    int m_buildingId;  // +0x0c
     int    field_0x10;  // +0x10
     int    field_0x14;  // +0x14
     // --- constructors ---
