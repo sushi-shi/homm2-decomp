@@ -219,7 +219,7 @@ public:
     char   field_0x47b;  // +0x47b
     char _pad_0x47c[0x12];
     signed char m_playerCount;  // +0x48e
-    signed char m_humanPlayerCount;  // +0x48f
+    signed char m_deadPlayerCount;  // +0x48f
     signed char m_playerDead[6];  // +0x490
     unsigned short m_day;  // +0x496
     unsigned short m_week;  // +0x498
