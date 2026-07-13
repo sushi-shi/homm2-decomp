@@ -1,5 +1,6 @@
 #ifndef HOMM2_CURSOR_H
 #define HOMM2_CURSOR_H
+#include <va.h>
 // Declarations of the free functions DEFINED in CURSOR.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 
@@ -29,6 +30,9 @@ typedef enum CursorConstant {
     CURSOR_SLOW_TURN_MULTIPLIER = 3,
     CURSOR_MAP_VISIBLE_FLAG = 0x40,
     CURSOR_CELL_UNCOVERED_FLAG = 0x04,
+    CURSOR_CELL_BLOCKED_FLAG = 0x08,
+    CURSOR_OBJECT_PASSABLE_FLAG = 0x80,
+    CURSOR_WATER_TERRAIN = 0,
     CURSOR_BOAT_COUNT = 48,
     CURSOR_MOVE_HALF_TILE_PIXELS = 16,
     CURSOR_ARTIFACT_CAPACITY = 14,
@@ -39,8 +43,48 @@ typedef enum CursorConstant {
     CURSOR_FIZZLE_WIDTH = 0x60,
     CURSOR_FIZZLE_HEIGHT = 0x60,
     CURSOR_FIZZLE_COMPUTER_TYPE = 50,
-    CURSOR_INVALID_POSITION = -1
+    CURSOR_INVALID_POSITION = -1,
+    CURSOR_EMPTY_OBJECT_INDEX = 0xff,
+    CURSOR_PASSABLE_OBJECT_TILESET = 0x2f,
+    CURSOR_NORTH_DIRECTION_MASK = 0x83,
+    CURSOR_SOUTH_DIRECTION_MASK = 0x38,
+    CURSOR_MAP_CHANGE_RECENT_COUNT = 4,
+    CURSOR_MAP_CHANGE_QUEUE_COUNT = 196,
+    CURSOR_LOG_UNUSED = -999,
+    CURSOR_PLAYER_COUNT = 6,
+    CURSOR_RECRUIT_HERO_DIRECTION = 2,
+    CURSOR_DEAD_PLAYER_DIALOG_TIME = 5000
 } CursorConstant;
+
+typedef enum MapChangeType {
+    MAP_CHANGE_MOVE_HERO = 1,
+    MAP_CHANGE_UNUSED = 2,
+    MAP_CHANGE_RECRUIT_HERO = 3,
+    MAP_CHANGE_BUILD_BOAT = 4,
+    MAP_CHANGE_ERASE_OBJECT = 5,
+    MAP_CHANGE_DEAD_HERO = 6,
+    MAP_CHANGE_CLAIM_TOWN = 7,
+    MAP_CHANGE_CLAIM_MINE = 8,
+    MAP_CHANGE_TELEPORT_HERO = 9,
+    MAP_CHANGE_DEAD_PLAYER = 10,
+    MAP_CHANGE_MY_TURN = 11
+} MapChangeType;
+
+#pragma pack(push, 1)
+struct SMapChange {
+    unsigned char type;
+    signed char id;
+    unsigned char x;
+    unsigned char y;
+    signed char direction;
+    signed char stopAfterMove;
+    signed char player;
+    int sequence;
+};
+#pragma pack(pop)
+SIZE(SMapChange, 11);
+
+extern SMapChange sMapChangeLastFew[CURSOR_MAP_CHANGE_RECENT_COUNT];
 
 void SendMapChange(int, signed char, unsigned char, unsigned char, int, unsigned char, unsigned char);
 

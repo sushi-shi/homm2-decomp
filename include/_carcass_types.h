@@ -10,6 +10,4 @@ struct tag_message {
     int type, field4, field8, fieldC, field10, field14;
     union { char *text; int field18; };
 };
-struct SMapChange { char _pad[64]; };
-
 #endif // HOMM2_CARCASS_TYPES_H
