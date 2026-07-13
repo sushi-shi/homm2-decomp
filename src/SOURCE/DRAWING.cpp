@@ -198,14 +198,14 @@ void combatManager::CombatMessage(int messageType)
                     static_cast<int>(currentArmyPtr->m_monster.shots));
             break;
         case COMBAT_MESSAGE_COMMAND_OPTIONS:
-            if (m_heroes[m_currentSide] != 0 && m_heroes[m_currentSide]->m_unknownE7 != 0)
+            if (m_heroes[m_currentSide] != 0 && m_heroes[m_currentSide]->m_isCaptain != 0)
                 strcpy(gText, cCombatMessage[COMBAT_MESSAGE_TEXT_CAPTAIN_OPTIONS]);
             else
                 strcpy(gText, cCombatMessage[COMBAT_MESSAGE_TEXT_HERO_OPTIONS]);
             break;
         case COMBAT_MESSAGE_COMMAND_OPPOSING_OPTIONS:
             if (m_heroes[1 - m_currentSide] != 0 &&
-                m_heroes[1 - m_currentSide]->m_unknownE7 != 0)
+                m_heroes[1 - m_currentSide]->m_isCaptain != 0)
                 strcpy(gText, cCombatMessage[COMBAT_MESSAGE_TEXT_OPPOSING_CAPTAIN]);
             else
                 strcpy(gText, cCombatMessage[COMBAT_MESSAGE_TEXT_OPPOSING_HERO]);
@@ -471,7 +471,8 @@ void combatManager::DrawBackground(void)
         gpResourceManager->Dispose(backgroundIcon);
     }
     if (m_inCastleCombat != 0) {
-        sprintf(gText, "castbkg%c.icn", cHeroTypeInitial[m_castle->m_type]);
+        sprintf(gText, "castbkg%c.icn",
+                cHeroTypeInitial[m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type]);
         backgroundIcon = gpResourceManager->GetIcon(gText);
         IconToBitmap(backgroundIcon, m_backgroundBuffer, 0, 0,
                      COMBAT_CASTLE_BACKGROUND_BASE_FRAME, 0, 0, 0,
@@ -479,8 +480,9 @@ void combatManager::DrawBackground(void)
         if (m_drawbridgeBackgroundVisible != 0)
             IconToBitmap(m_drawbridgeIcon, m_backgroundBuffer, 0, 0, 0, 0, 0, 0,
                          COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT, 0);
-        if (m_castle->m_type == TOWN_TYPE_KNIGHT &&
-            (m_castle->m_buildings & TOWN_BUILDING_RAINBOW) != 0)
+        if (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type == TOWN_TYPE_KNIGHT &&
+            (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings &
+             TOWN_BUILDING_RAINBOW) != 0)
             IconToBitmap(backgroundIcon, m_backgroundBuffer, 0, 0,
                          COMBAT_CASTLE_BACKGROUND_BUILDING_FRAME, 0, 0, 0,
                          COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT, 0);
@@ -688,10 +690,10 @@ void combatManager::DrawFrame(int updateScreen, int computeExtent, int redrawExt
                     heroY = COMBAT_HERO_LEFT_Y;
                     heroX = COMBAT_HERO_LEFT_X;
                 } else {
-                    heroY = ((m_heroes[side]->m_unknownE7 < 1) - 1 &
+                    heroY = ((m_heroes[side]->m_isCaptain < 1) - 1 &
                              (COMBAT_HERO_RIGHT_ALT_Y - COMBAT_HERO_RIGHT_Y)) +
                             COMBAT_HERO_RIGHT_Y;
-                    heroX = ((m_heroes[side]->m_unknownE7 < 1) - 1 &
+                    heroX = ((m_heroes[side]->m_isCaptain < 1) - 1 &
                              (COMBAT_HERO_RIGHT_ALT_X - COMBAT_HERO_RIGHT_X)) +
                             COMBAT_HERO_RIGHT_X;
                 }
@@ -745,10 +747,10 @@ void combatManager::DrawFrame(int updateScreen, int computeExtent, int redrawExt
     for (row = 0; row < COMBAT_DRAW_LAYER_COUNT; row++) {
         if (row == COMBAT_DRAW_RIGHT_HERO_LAYER && m_heroes[1] != 0) {
             m_heroIcons[1]->CombatClipDrawToBuffer(
-                ((m_heroes[1]->m_unknownE7 < 1) - 1 &
+                ((m_heroes[1]->m_isCaptain < 1) - 1 &
                  (COMBAT_HERO_RIGHT_ALT_X - COMBAT_HERO_RIGHT_X)) +
                     COMBAT_HERO_RIGHT_X,
-                ((m_heroes[1]->m_unknownE7 < 1) - 1 &
+                ((m_heroes[1]->m_isCaptain < 1) - 1 &
                  (COMBAT_HERO_RIGHT_ALT_Y - COMBAT_HERO_RIGHT_Y)) +
                     COMBAT_HERO_RIGHT_Y,
                 sCmbtHero[m_heroSpriteIndex[1]]
@@ -860,24 +862,36 @@ void combatManager::DrawFrame(int updateScreen, int computeExtent, int redrawExt
                         wallFrame = wallFrameOffsets[m_wallStates[7]] + 8;
                         break;
                     case COMBAT_CASTLE_HEX_TOP_WALL:
-                        wallFrame = m_wallStates[0] + 0x11;
-                        wallX = wallCoordinates[m_castle->m_type][0];
-                        wallY = wallCoordinates[m_castle->m_type][1];
+                        wallFrame =
+                            m_wallStates[0] + COMBAT_CASTLE_WALL_BASE_FRAME;
+                        wallX = wallCoordinates[
+                            m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type][0];
+                        wallY = wallCoordinates[
+                            m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type][1];
                         break;
                     case COMBAT_CASTLE_HEX_SECOND_WALL:
-                        wallFrame = m_wallStates[1] + 0x11;
-                        wallX = wallCoordinates[m_castle->m_type][2];
-                        wallY = wallCoordinates[m_castle->m_type][3];
+                        wallFrame =
+                            m_wallStates[1] + COMBAT_CASTLE_WALL_BASE_FRAME;
+                        wallX = wallCoordinates[
+                            m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type][2];
+                        wallY = wallCoordinates[
+                            m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type][3];
                         break;
                     case COMBAT_CASTLE_HEX_THIRD_WALL:
-                        wallFrame = m_wallStates[2] + 0x11;
-                        wallX = wallCoordinates[m_castle->m_type][4];
-                        wallY = wallCoordinates[m_castle->m_type][5];
+                        wallFrame =
+                            m_wallStates[2] + COMBAT_CASTLE_WALL_BASE_FRAME;
+                        wallX = wallCoordinates[
+                            m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type][4];
+                        wallY = wallCoordinates[
+                            m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type][5];
                         break;
                     case COMBAT_CASTLE_HEX_BOTTOM_WALL:
-                        wallFrame = m_wallStates[3] + 0x11;
-                        wallX = wallCoordinates[m_castle->m_type][6];
-                        wallY = wallCoordinates[m_castle->m_type][7];
+                        wallFrame =
+                            m_wallStates[3] + COMBAT_CASTLE_WALL_BASE_FRAME;
+                        wallX = wallCoordinates[
+                            m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type][6];
+                        wallY = wallCoordinates[
+                            m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type][7];
                         break;
                     case COMBAT_CASTLE_HEX_GATE:
                         if (m_drawbridgeState != COMBAT_CASTLE_GATE_HIDDEN)
@@ -903,7 +917,8 @@ void combatManager::DrawFrame(int updateScreen, int computeExtent, int redrawExt
         }
 
         if (m_inCastleCombat != 0 &&
-            (m_castle->m_buildings & TOWN_BUILDING_MOAT) != 0 &&
+            (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings &
+             TOWN_BUILDING_MOAT) != 0 &&
             (row != COMBAT_CASTLE_GATE_ROW ||
              m_drawbridgeState == COMBAT_CASTLE_GATE_OPEN)) {
             if (moatCell[row] == giWalkingTo || moatCell[row] == giWalkingTo2 ||

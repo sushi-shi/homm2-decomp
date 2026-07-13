@@ -182,7 +182,7 @@ BASE/INPUTMGR	?SetMouseCoords@inputManager@@QAEXHH@Z	100.0000	d6158d77293b
 BASE/Icon2b	?IconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	61.9176	74b5c517cdec
 BASE/Icond2b	?DimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	65.4483	66d2dc1051cd
 BASE/Icondf2b	?FlipDimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	61.8855	2198fcd16c8a
-BASE/Iconf2b	?FlipIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	59.9761	229d4cf4d270
+BASE/Iconf2b	?FlipIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	60.8621	229d4cf4d270
 BASE/Iconm2b	?MonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	68.8011	345eaf36d7a0
 BASE/Iconmf2b	?FlipMonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	67.7066	a7c8b50283d1
 BASE/MOUSEMGR	??0mouseManager@@QAE@XZ	100.0000	cd5abb5d46d3
@@ -531,10 +531,10 @@ SOURCE/ADVMGR	?UpdateScreen@advManager@@QAEXHH@Z	99.9603	74696926f666
 SOURCE/ADVMGR	?UpdateSystemOptions@@YIXH@Z	6.7254	2e7d92760372
 SOURCE/ADVMGR	?UpdateTownLocators@advManager@@QAEXHH@Z	7.3333	73a51efb4b88
 SOURCE/ADVMGR	?ViewPuzzle@advManager@@QAEXXZ	4.0818	cefaa5f0f413
-SOURCE/AI	?AICheckRetreat@combatManager@@QAEHXZ	2.9682	fdfd81f0ad86
+SOURCE/AI	?AICheckRetreat@combatManager@@QAEHXZ	99.7431	c67556bb40ad
 SOURCE/AI	?AttemptAdjacentAttack@combatManager@@QAEHPAVarmy@@@Z	12.3717	4667718ab9ac
 SOURCE/AI	?AttemptAttack@combatManager@@QAEHPAVarmy@@HH@Z	10.2044	2601357ce2ab
-SOURCE/AI	?DoCompAI@combatManager@@QAEXH@Z	1.1089	125a9305012d
+SOURCE/AI	?DoCompAI@combatManager@@QAEXH@Z	92.0592	fcecd47088cd
 SOURCE/AI	?DoLichShot@combatManager@@QAEXPAVarmy@@@Z	5.6190	de65ace497f8
 SOURCE/AI	?GetAllMask@combatManager@@QAEHH@Z	24.3273	97b13849751f
 SOURCE/AI	?GetBestArmy@combatManager@@QAEHHH@Z	8.7848	99cb4e3e1035
@@ -548,7 +548,7 @@ SOURCE/AI	?GetStrength@combatManager@@QAEKHH@Z	23.8929	8a18332cce69
 SOURCE/AI	?GetTraitorMask@combatManager@@QAEHH@Z	22.3871	d15cfa30e0bf
 SOURCE/AI	?GetWalkerMask@combatManager@@QAEHH@Z	15.9540	034d3ea6cc87
 SOURCE/AI	?GetWorstArmy@combatManager@@QAEHHH@Z	23.4737	41356e98b71d
-SOURCE/AI	?WalkTowardArmy@combatManager@@QAEHPAVarmy@@HH@Z	8.6832	1bf413f6072d
+SOURCE/AI	?WalkTowardArmy@combatManager@@QAEHPAVarmy@@HH@Z	8.6832	5be0fd7bc64f
 SOURCE/AI	?WalkTowardArmyFront@combatManager@@QAEHPAVarmy@@HH@Z	8.3713	971bb71d757d
 SOURCE/ARMY	??0army@@QAE@XZ	100.0000	61bfa2249129
 SOURCE/ARMY	?AttackTo@army@@QAEHH@Z	10.6718	c6d65c30688b
@@ -569,7 +569,7 @@ SOURCE/ARMY	?DrawToBuffer@army@@QAEXHHH@Z	91.8877	bce17a487b49
 SOURCE/ARMY	?FreeResources@army@@QAEXXZ	100.0000	92380b082c4a
 SOURCE/ARMY	?GetPowBaseY@army@@QAEHXZ	28.4681	11add529c186
 SOURCE/ARMY	?GoBerserk@army@@QAEXXZ	3.2005	2cc2fd0f9ebf
-SOURCE/ARMY	?Init@army@@QAEXHHHHHH@Z	99.9887	a2c6c5a8ce65
+SOURCE/ARMY	?Init@army@@QAEXHHHHHH@Z	99.9962	bd1f2e34aeff
 SOURCE/ARMY	?InitClean@army@@QAEXXZ	100.0000	c77557b070c0
 SOURCE/ARMY	?LeaveNoBody@army@@QAEHXZ	45.1613	38d46cd5ef5f
 SOURCE/ARMY	?LeftX@army@@QAEHXZ	23.1034	5db10da53ddc
@@ -712,10 +712,10 @@ SOURCE/Castle	?CastleHandler@@YIHAAUtag_message@@@Z	0.5791	8fdd668fe90c
 SOURCE/Castle	?SetupCastle@townManager@@QAEXPAVheroWindow@@H@Z	1.6044	153ae4077ade
 SOURCE/DRAWING	?CheckUpdateCombatMessages@combatManager@@QAEXXZ	100.0000	2c0eb8526f88
 SOURCE/DRAWING	?ClearCombatMessages@combatManager@@QAEXH@Z	100.0000	a13385b2bc8b
-SOURCE/DRAWING	?CombatMessage@combatManager@@QAEXH@Z	99.8103	d96e31a27902
+SOURCE/DRAWING	?CombatMessage@combatManager@@QAEXH@Z	99.8103	b431be4bdee0
 SOURCE/DRAWING	?CombatMessage@combatManager@@QAEXPADHHH@Z	100.0000	76951881d016
-SOURCE/DRAWING	?DrawBackground@combatManager@@QAEXXZ	99.8655	0953a1d6fe00
-SOURCE/DRAWING	?DrawFrame@combatManager@@QAEXHHHHHHH@Z	91.2536	751acbe2f56e
+SOURCE/DRAWING	?DrawBackground@combatManager@@QAEXXZ	99.8655	c471b1bedebe
+SOURCE/DRAWING	?DrawFrame@combatManager@@QAEXHHHHHHH@Z	91.2536	208f1c7b522b
 SOURCE/DRAWING	?DrawSmallView@combatManager@@QAEXHH@Z	99.9244	3bd2c7cc2cd7
 SOURCE/DRAWING	?NoShowCombatLog@combatManager@@QAEXPAD@Z	100.0000	3de47f29d606
 SOURCE/DRAWING	?ResetLimitCreature@combatManager@@QAEXXZ	100.0000	1f50e7bb3f02
