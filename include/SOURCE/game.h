@@ -5,6 +5,7 @@
 #include <va.h>
 #include <EDITOR/fullMap.h>
 #include <SOURCE/hero.h>
+#include <SOURCE/town.h>
 // forward declarations:
 class army;
 class armyGroup;
@@ -226,7 +227,7 @@ public:
     struct playerRec m_players[6];  // +0x49c
     class fullMap m_worldMap;  // +0xb3e
     signed char m_obeliskCount;  // +0xb52
-    townSlot m_castleRecs[72];  // 0xb53
+    town m_castleRecs[72];  // 0xb53
     union {
         signed char m_castleOwners[72];  // +0x2773
         signed char m_townOwners[72];
@@ -298,13 +299,12 @@ public:
     int GetNewHeroId(int, int, int);
     int GetTownId(int, int);
     hero *GetHero(int id) { return &m_heroRecs[id]; }
-    town *GetTown(int id) { return reinterpret_cast<town *>(&m_castleRecs[id]); }
+    town *GetTown(int id) { return &m_castleRecs[id]; }
     hero *GetPlayerHero(int player, int index) {
         return &m_heroRecs[m_players[player].heroes[index]];
     }
     town *GetPlayerTown(int player, int index) {
-        return reinterpret_cast<town *>(
-            &m_castleRecs[m_players[player].towns[index]]);
+        return &m_castleRecs[m_players[player].towns[index]];
     }
     signed char GetPlayerColor(int player) { return m_players[player].color; }
     int GetMineId(int, int);

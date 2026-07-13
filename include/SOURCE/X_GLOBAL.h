@@ -5,12 +5,16 @@
 
 class ExpCampaign;
 
-enum { HERO_TYPE_INITIAL_COUNT = 8 };
+enum {
+    HERO_TYPE_INITIAL_COUNT = 8,
+    EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT = 4
+};
 
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
 extern signed char xIsExpansionMap;
 extern unsigned char xIsPlayingExpansionCampaign;
 extern class ExpCampaign xCampaign;
+extern char *xHSCampaignNames[EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT];
 extern int xTheSpell;
 extern char *xNecromancerShrine;
 extern char *xNecromancerShrineDesc;

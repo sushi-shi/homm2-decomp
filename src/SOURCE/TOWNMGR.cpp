@@ -1757,7 +1757,7 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
     int stat;
     int townPosition;
     int armySlot;
-    townSlot *playerTown;
+    town *playerTown;
     int strongestCreature;
     int strongestCreatureValue;
 
@@ -1950,20 +1950,20 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
                             for (armySlot = 0;
                                  armySlot < TOWN_ARMY_SLOT_COUNT; ++armySlot) {
                                 if (playerTown->m_army
-                                            .m_troopTypes[armySlot] != -1 &&
+                                            .m_creatureTypes[armySlot] != -1 &&
                                     playerTown->m_army
                                             .m_creatureCounts[armySlot] > 0 &&
                                     strongestCreatureValue <
                                         gMonsterDatabase[
                                             playerTown->m_army
-                                                .m_troopTypes[armySlot]]
+                                                .m_creatureTypes[armySlot]]
                                             .fightValue) {
                                     strongestCreature = playerTown->m_army
-                                                            .m_troopTypes[armySlot];
+                                                            .m_creatureTypes[armySlot];
                                     strongestCreatureValue =
                                         gMonsterDatabase[
                                             playerTown->m_army
-                                                .m_troopTypes[armySlot]]
+                                                .m_creatureTypes[armySlot]]
                                             .fightValue;
                                 }
                             }
@@ -2039,8 +2039,8 @@ void GetCategoryStats(int category, long int * const stats,
             case TOWN_THIEVES_CATEGORY_TOWNS:
                 for (townIndex_c = 0; townIndex_c < GAME_TOWN_COUNT;
                      ++townIndex_c) {
-                    if (gpGame->m_castleRecs[townIndex_c].owner == player &&
-                        (gpGame->m_castleRecs[townIndex_c].buildings &
+                    if (gpGame->m_castleRecs[townIndex_c].m_owner == player &&
+                        (gpGame->m_castleRecs[townIndex_c].m_buildings &
                          TOWN_BUILDING_TENT)) {
                         ++townCount_k;
                     }
@@ -2050,8 +2050,8 @@ void GetCategoryStats(int category, long int * const stats,
             case TOWN_THIEVES_CATEGORY_CASTLES:
                 for (townIndex_c = 0; townIndex_c < GAME_TOWN_COUNT;
                      ++townIndex_c) {
-                    if (gpGame->m_castleRecs[townIndex_c].owner == player &&
-                        (gpGame->m_castleRecs[townIndex_c].buildings &
+                    if (gpGame->m_castleRecs[townIndex_c].m_owner == player &&
+                        (gpGame->m_castleRecs[townIndex_c].m_buildings &
                          TOWN_BUILDING_CASTLE)) {
                         ++castleCount_p;
                     }

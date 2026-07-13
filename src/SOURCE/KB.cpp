@@ -30,6 +30,7 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/wingraph.h>
 #include <BASE/BITS.h>
+#include <BASE/bmap2.h>
 #include <SOURCE/KB.h>
 #include <windows.h>
 #include <stdlib.h>
@@ -42,7 +43,10 @@
 #include <SOURCE/advManager.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/hero.h>
+#include <SOURCE/highScoreManager.h>
+#include <SOURCE/philAI.h>
 #include <SOURCE/playerData.h>
+#include <SOURCE/searchArray.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/iconWidget.h>
@@ -80,7 +84,7 @@ static char cBlank0[4], cBlank1[4], cBlank2[4], cBlank3[4];
 
 inline townSlot *GetCastleRec(int i)
 {
-    return &gpGame->m_castleRecs[i];
+    return reinterpret_cast<townSlot *>(&gpGame->m_castleRecs[i]);
 }
 
 inline hero *GetHeroSlot(int i)
@@ -129,10 +133,74 @@ void ForcePollSound(void)
 }
 
 VA(0x004965be, 0x39e)
-void InitMainClasses(void) {}
+void InitMainClasses(void)
+{
+    gpExec = new executive;
+    gpInputManager = new inputManager;
+    gpMouseManager = new mouseManager;
+    gpWindowManager = new heroWindowManager;
+    gpResourceManager = new resourceManager;
+    gpSoundManager = new soundManager;
+    gpHighScoreManager = new highScoreManager;
+    gpGame = new game;
+    gpAdvManager = new advManager;
+    gpCombatManager = new combatManager;
+    gpTownManager = new townManager;
+    gpSearchArray = new searchArray;
+    gpPhilAI = new philAI;
+    gpMonGroup = new armyGroup;
+    gpBufferPalette = new palette;
+}
 
 VA(0x0049695c, 0x344)
-void DeleteMainClasses(void) {}
+void DeleteMainClasses(void)
+{
+    if (gpBufferPalette)
+        delete gpBufferPalette;
+    gpBufferPalette = 0;
+    if (gpMonGroup)
+        delete gpMonGroup;
+    gpMonGroup = 0;
+    if (gpPhilAI)
+        delete gpPhilAI;
+    gpPhilAI = 0;
+    if (gpSearchArray)
+        delete gpSearchArray;
+    gpSearchArray = 0;
+    if (gpTownManager)
+        delete gpTownManager;
+    gpTownManager = 0;
+    if (gpCombatManager)
+        delete gpCombatManager;
+    gpCombatManager = 0;
+    if (gpAdvManager)
+        delete gpAdvManager;
+    gpAdvManager = 0;
+    if (gpGame)
+        delete gpGame;
+    gpGame = 0;
+    if (gpHighScoreManager)
+        delete gpHighScoreManager;
+    gpHighScoreManager = 0;
+    if (gpSoundManager)
+        delete gpSoundManager;
+    gpSoundManager = 0;
+    if (gpWindowManager)
+        delete gpWindowManager;
+    gpWindowManager = 0;
+    if (gpMouseManager)
+        delete gpMouseManager;
+    gpMouseManager = 0;
+    if (gpInputManager)
+        delete gpInputManager;
+    gpInputManager = 0;
+    if (gpExec)
+        delete gpExec;
+    gpExec = 0;
+    if (gpResourceManager)
+        delete gpResourceManager;
+    gpResourceManager = 0;
+}
 
 VA(0x00496ca0, 0x39)
 void EarlyShutdown(char *caption, char *text)
@@ -192,7 +260,516 @@ int EarlySetup(void)
 }
 
 VA(0x00496e98, 0x16c0)
-int oldmain(void) { return 0; }
+int oldmain(void)
+{
+    int command;
+    int quit;
+    int mainScreenLoaded;
+    int firstMainScreen;
+    int savedUpdateFlags;
+    int player;
+    int netPlayer;
+    int gamePlayer;
+    int result;
+    int firstFreeGamePlayer;
+    int transmissionResult;
+    char matchedNetPlayers[OLD_MAIN_MATCH_BUFFER_SIZE];
+    char matchedGamePlayers[OLD_MAIN_MATCH_BUFFER_SIZE];
+    OldMainNetSetup netSetup;
+
+    if (bKBDone)
+        return 0;
+    bKBDone = 1;
+    LogStr("OM1");
+    LogStr("OM2");
+    command = -1;
+    if (gpExec->InitSystem())
+        ShutDown("Initialization failed!");
+    LogStr("OM3");
+    KBChangeMenu(hmnuDflt);
+    gPalette = gpResourceManager->GetPalette("kb.pal");
+    gpWindowManager->m_updateFlags = 1;
+    smallFont = gpResourceManager->GetFont("smalfont.fnt");
+    bigFont = gpResourceManager->GetFont("bigfont.fnt");
+    gpMouseManager->SetPointer("advmice.mse", 0, OLD_MAIN_POINTER_TYPE);
+    gpMouseManager->SetColorMice(gConfig.gfx[giCurExe].colorMouseCursor);
+    LogStr("OM4");
+    SetupCDRom();
+    LogStr("OM5");
+    if (gpSoundManager->Open(-1))
+        ShutDown("Unable to initialize sound.");
+    if (giDebugLevel < OLD_MAIN_DEBUG_MEMORY_CHECK_LEVEL)
+        CheckMem();
+    LogStr("OM6");
+
+    if (giShowIntro) {
+        FillBitmapArea(gpWindowManager->m_screen, 0, 0,
+                       OLD_MAIN_SCREEN_WIDTH, OLD_MAIN_SCREEN_HEIGHT, 0);
+        BlitBitmapToScreen(gpWindowManager->m_screen, 0, 0,
+                           OLD_MAIN_SCREEN_WIDTH, OLD_MAIN_SCREEN_HEIGHT, 0, 0);
+        if (!gbSkipIntro) {
+            savedUpdateFlags = gpWindowManager->m_updateFlags;
+            gpWindowManager->m_updateFlags = 0;
+            if (PlaySmacker(OLD_MAIN_INTRO_PRIMARY_VIDEO))
+                PlaySmacker(OLD_MAIN_INTRO_FALLBACK_VIDEO);
+            PlaySmacker(OLD_MAIN_INTRO_SECONDARY_VIDEO);
+            gpWindowManager->m_updateFlags = savedUpdateFlags;
+        }
+    }
+
+    LoadSystemwideIcons();
+    memset(gbThisNetHumanPlayer, 0, OLD_MAIN_PLAYER_COUNT);
+    gpMouseManager->ShowColorPointer();
+    quit = 0;
+    mainScreenLoaded = 0;
+    firstMainScreen = 1;
+
+    while (!quit) {
+main_menu:
+        if (!gShingleAnim)
+            gShingleAnim = gpResourceManager->GetIcon("shnganim.icn");
+        if (gGameCommand != OLD_MAIN_EXIT)
+            gpSoundManager->SwitchAmbientMusic(OLD_MAIN_MAIN_MUSIC);
+
+        if (!mainScreenLoaded) {
+            if (gGameCommand != OLD_MAIN_EXIT) {
+                gpResourceManager->GetBackdrop("heroes.icn", gpWindowManager->m_screen, 1);
+                gpWindowManager->UpdateScreenRegion(0, 0,
+                                                    OLD_MAIN_SCREEN_WIDTH,
+                                                    OLD_MAIN_SCREEN_HEIGHT);
+                if (firstMainScreen)
+                    SetPalette(gPalette->m_data, 1);
+                else
+                    gpWindowManager->FadeScreen(0, OLD_MAIN_FADE_SPEED,
+                                                gPalette);
+                firstMainScreen = 0;
+            }
+            gpMouseManager->SetPointer("advmice.mse", 0, OLD_MAIN_POINTER_TYPE);
+        }
+        mainScreenLoaded = 1;
+        if (gGameCommand != OLD_MAIN_EXIT)
+            gpWindowManager->m_updateFlags = 1;
+
+        if (giTCPHostStatus != -1 && gbTCPFirstTime) {
+            gbTCPFirstTime = 0;
+            giNumHumanPlayers = 1;
+            iMPBaseType = OLD_MAIN_MULTIPLAYER_NETWORK;
+            iMPNetProtocol = OLD_MAIN_NETWORK_PROTOCOL;
+            iMPExtendedType = giTCPHostStatus ? OLD_MAIN_REMOTE_HOST
+                                             : OLD_MAIN_REMOTE_CLIENT;
+            giSetupGameType = static_cast<unsigned char>(giTCPType);
+            RemoteMain(iMPExtendedType);
+            gbWaitForRemoteReceive =
+                iMPExtendedType == OLD_MAIN_REMOTE_CLIENT;
+            giTCPHostStatus = -1;
+            result = giSetupGameType;
+            switch (result) {
+            case OLD_MAIN_SETUP_NEW:
+                if (!gpGame->NewGame())
+                    goto main_menu;
+                break;
+            case OLD_MAIN_SETUP_LOAD:
+                if (!gpGame->PickLoadGame())
+                    goto main_menu;
+                break;
+            }
+            command = -1;
+            goto game_setup_complete;
+        }
+
+process_menu_command:
+        if (giMenuCommand != -1) {
+            switch (giMenuCommand) {
+            case APP_MENU_LOAD_0:
+            case APP_MENU_LOAD_1:
+            case APP_MENU_LOAD_2:
+            case APP_MENU_LOAD_3:
+            case APP_MENU_LOAD_4:
+            case APP_MENU_LOAD_5:
+            case APP_MENU_LOAD_6:
+            case APP_MENU_LOAD_7:
+            case APP_MENU_LOAD_8:
+            case APP_MENU_LOAD_9:
+            case APP_MENU_LOAD_10:
+                result = gpGame->PickLoadGame();
+                break;
+            case APP_MENU_RESTART_0:
+            case APP_MENU_RESTART_1:
+            case APP_MENU_RESTART_2:
+            case APP_MENU_RESTART_3:
+            case APP_MENU_RESTART_4:
+            case APP_MENU_RESTART_5:
+            case APP_MENU_RESTART_6:
+            case APP_MENU_RESTART_7:
+            case APP_MENU_RESTART_8:
+            case APP_MENU_RESTART_9:
+            case APP_MENU_RESTART_10:
+            case APP_MENU_RESTART_11:
+            case APP_MENU_RESTART_12:
+            case APP_MENU_RESTART_13:
+                result = gpGame->NewGame();
+                break;
+            default:
+                result = 1;
+                break;
+            }
+            if (!result)
+                goto main_menu;
+            command = -1;
+            goto game_setup_complete;
+        }
+
+        if (gGameCommand == -1) {
+            gpInitWin = new heroWindow(0, 0, "stpmain.bin");
+            if (!gpInitWin)
+                MemError();
+            gbInSetupDialog = 1;
+            gpWindowManager->DoDialog(gpInitWin, InitMenuHandler, 0);
+            delete gpInitWin;
+            gpInitWin = 0;
+            command = gpWindowManager->m_dialogResult;
+            gbInSetupDialog = 0;
+        } else {
+            command = gGameCommand;
+            gGameCommand = -1;
+        }
+        if (giMenuCommand != -1)
+            goto process_menu_command;
+
+        switch (command) {
+        case OLD_MAIN_NEW_GAME:
+            giSetupGameType = OLD_MAIN_SETUP_NEW;
+            break;
+        case OLD_MAIN_LOAD_GAME:
+            giSetupGameType = OLD_MAIN_SETUP_LOAD;
+            break;
+        case OLD_MAIN_HIGH_SCORES:
+            goto show_high_scores;
+        case OLD_MAIN_CREDITS:
+            goto show_credits;
+        case OLD_MAIN_EXIT:
+            quit = 1;
+            continue;
+        default:
+            goto game_setup_complete;
+        }
+
+        for (player = 0; player < OLD_MAIN_PLAYER_COUNT; player++)
+            sprintf(cPlayerNames[player], "");
+        if (!gpGame->SetupGame())
+            goto main_menu;
+
+        result = giSetupGameType;
+        if (result == OLD_MAIN_SETUP_NEW) {
+            if (gbInCampaign) {
+                gpGame->InitEntireCampaign(gbCampaignSideChoice);
+                if (gpGame->HandleCampaignWin()) {
+                    gpGame->InitCampaignMap();
+                    goto initialize_game;
+                } else {
+                    gpWindowManager->FadeScreen(1, OLD_MAIN_FADE_SPEED,
+                                                gPalette);
+                    mainScreenLoaded = 0;
+                    goto main_menu;
+                }
+            }
+            if (xIsPlayingExpansionCampaign) {
+                if (xCampaign.HandleVictory()) {
+                    xCampaign.InitMap();
+                    goto initialize_game;
+                }
+                gpWindowManager->FadeScreen(1, OLD_MAIN_FADE_SPEED, gPalette);
+                mainScreenLoaded = 0;
+                goto main_menu;
+            }
+            LogStr("New Game 1");
+            if (!gpGame->NewGame())
+                goto main_menu;
+            LogStr("New Game 2");
+        } else if (result == OLD_MAIN_SETUP_LOAD) {
+            LogStr("Load Game 1");
+            if (!gpGame->PickLoadGame())
+                goto main_menu;
+            LogStr("Load Game 2");
+        }
+
+        goto game_setup_complete;
+
+show_high_scores:
+        if (gpExec->AddManager(gpHighScoreManager, -1))
+            ShutDown("Can't add manager!");
+        gpExec->MainLoop();
+        gpExec->RemoveManager(gpHighScoreManager);
+        mainScreenLoaded = 0;
+        goto main_menu;
+
+show_credits:
+        gpWindowManager->FadeScreen(1, OLD_MAIN_FADE_SPEED, gPalette);
+        PlaySmacker(OLD_MAIN_CREDITS_FIRST_VIDEO);
+        PlaySmacker(OLD_MAIN_CREDITS_SECOND_VIDEO);
+        mainScreenLoaded = 0;
+        gpWindowManager->FadeScreen(1, OLD_MAIN_LONG_FADE_SPEED, gPalette);
+        goto main_menu;
+
+game_setup_complete:
+        if (giMenuCommand == -1) {
+            LogStr("DWM 1");
+            if (quit)
+                goto game_finished;
+            LogStr("DWM 2");
+            if (gbRemoteOn && giThisNetPos == 0) {
+                LogStr("DWM 3");
+                memset(matchedGamePlayers, 0, OLD_MAIN_PLAYER_COUNT);
+                memset(matchedNetPlayers, 0, OLD_MAIN_PLAYER_COUNT);
+                for (netPlayer = 0; netPlayer < OLD_MAIN_PLAYER_COUNT; netPlayer++) {
+                    if (gbHumanPlayer[netPlayer]) {
+                        for (gamePlayer = 0; gamePlayer < OLD_MAIN_PLAYER_COUNT; gamePlayer++) {
+                            char *defaultName =
+                                &gpGame->m_defaultPlayerNames[
+                                    gamePlayer * OLD_MAIN_DEFAULT_NAME_STRIDE];
+                            if (strlen(defaultName) == OLD_MAIN_DEFAULT_NAME_LENGTH &&
+                                !strcmp(defaultName, gsNetPlayerInfo[netPlayer].name) &&
+                                !gpGame->m_playerDead[gamePlayer] &&
+                                !matchedGamePlayers[gamePlayer] &&
+                                !matchedNetPlayers[netPlayer]) {
+                                matchedGamePlayers[gamePlayer] = 1;
+                                matchedNetPlayers[netPlayer] = 1;
+                                gbGamePosToNetPos[gamePlayer] = static_cast<signed char>(netPlayer);
+                            }
+                        }
+                    }
+                }
+                for (firstFreeGamePlayer = 0;
+                     firstFreeGamePlayer < OLD_MAIN_PLAYER_COUNT &&
+                         matchedGamePlayers[firstFreeGamePlayer];
+                     firstFreeGamePlayer++) {
+                }
+                for (netPlayer = 0; netPlayer < OLD_MAIN_PLAYER_COUNT; netPlayer++) {
+                    if (!matchedNetPlayers[netPlayer]) {
+                        if (!gbHumanPlayer[netPlayer]) {
+                            gbGamePosToNetPos[netPlayer] = -1;
+                        } else {
+                            gbGamePosToNetPos[netPlayer] =
+                                static_cast<signed char>(firstFreeGamePlayer);
+                            strcpy(&gpGame->m_defaultPlayerNames[
+                                       firstFreeGamePlayer *
+                                       OLD_MAIN_DEFAULT_NAME_STRIDE],
+                                   gsNetPlayerInfo[netPlayer].name);
+                            for (firstFreeGamePlayer++;
+                                 firstFreeGamePlayer < OLD_MAIN_PLAYER_COUNT &&
+                                     matchedGamePlayers[firstFreeGamePlayer];
+                                 firstFreeGamePlayer++) {
+                            }
+                        }
+                    }
+                }
+
+                memcpy(netSetup.gamePosToNetPos, gbGamePosToNetPos, OLD_MAIN_PLAYER_COUNT);
+                memcpy(netSetup.players, gsNetPlayerInfo, sizeof(netSetup.players));
+                giThisGamePos = NetPosToGamePos(0);
+                gbUseDiffCompression = 1;
+                gbUseRegularCompression =
+                    giHighMemBuffer > OLD_MAIN_REGULAR_COMPRESSION_MEMORY_LIMIT;
+                for (netPlayer = 0; netPlayer < giNumHumanPlayers; netPlayer++) {
+                    if (!gsNetPlayerInfo[netPlayer].useRegularCompression)
+                        gbUseRegularCompression = 0;
+                    if (!gsNetPlayerInfo[netPlayer].useDiffCompression)
+                        gbUseDiffCompression = 0;
+                }
+                netSetup.useRegularCompression = gbUseRegularCompression;
+                netSetup.useDiffCompression = gbUseDiffCompression;
+                for (netPlayer = 1; netPlayer < giNumHumanPlayers; netPlayer++) {
+                    transmissionResult = TransmitRemoteData(
+                        reinterpret_cast<char *>(&netSetup), netPlayer,
+                        sizeof(netSetup), OLD_MAIN_NETWORK_PACKET, 1, 1, -1);
+                    if (!transmissionResult)
+                        ShutDown(0);
+                }
+                for (netPlayer = 1; netPlayer < giNumHumanPlayers; netPlayer++) {
+                    if (!gpGame->TransmitSaveGame(netPlayer, 0, 1))
+                        ShutDown(0);
+                }
+                memset(gbThisNetHumanPlayer, 0, OLD_MAIN_PLAYER_COUNT);
+                gbThisNetHumanPlayer[giThisGamePos] = 1;
+                iLastDiffSendTo = -1;
+                gpGame->SaveGame(gConfig.rmtRLName, 0, 0);
+            }
+            LogStr("DWM 4");
+            if (gbRemoteOn && gbWaitForRemoteReceive) {
+                LogStr("DWM 5");
+                giWaitType = 0;
+                NormalDialog("Waiting to receive game data.", OLD_MAIN_DIALOG_WAIT,
+                             -1, -1, -1, 0, -1, 0, -1, 0);
+                if (!gbFunctionComplete)
+                    ShutDown(0);
+                gpGame->LoadGame(gConfig.rmtRCName, 0, 1);
+                sprintf(gpGame->m_saveName, "NEWGAME");
+                iLastDiffSendTo = -1;
+                gpGame->SaveGame(gConfig.rmtSLName, 0, 0);
+            }
+        }
+
+initialize_game:
+        gpWindowManager->m_updateFlags = 1;
+        if (gShingleAnim)
+            gpResourceManager->Dispose(gShingleAnim);
+        gShingleAnim = 0;
+
+        if (giNumHumanPlayers > 1) {
+            for (player = 0; player < giNumHumanPlayers; player++) {
+                if (iMPBaseType != OLD_MAIN_MULTIPLAYER_LOCAL)
+                    strcpy(cPlayerNames[NetPosToGamePos(player)],
+                           gsNetPlayerInfo[player].name);
+            }
+        }
+        for (player = 0; player < gpGame->m_playerCount; player++) {
+            if (!strlen(cPlayerNames[player])) {
+                sprintf(cPlayerNames[player], "%s player",
+                        gColors[gpGame->m_players[player].color]);
+                cPlayerNames[player][0] -= ' ';
+            }
+        }
+        ComputeAdvNetControl();
+        gbGameInitialized = 1;
+        mainScreenLoaded = 0;
+        gpSoundManager->StopAllSamples(1);
+        gpWindowManager->FadeScreen(1, OLD_MAIN_FADE_SPEED, 0);
+        gMapX = 0;
+        gMapY = 0;
+        for (giCurWatchPlayer = giCurPlayer;
+             !gbThisNetHumanPlayer[giCurWatchPlayer];
+             giCurWatchPlayer = (giCurWatchPlayer + 1) % gpGame->m_playerCount) {
+        }
+        giCurWatchPlayerBit = static_cast<unsigned char>(1 << giCurWatchPlayer);
+
+        if (gbInCampaign && gpGame->m_campaignScenarioWon) {
+            giEndSequence = 1;
+        } else if (xIsPlayingExpansionCampaign && xCampaign.IsThisMapCompleted()) {
+            giEndSequence = 1;
+        } else {
+            if (gpExec->AddManager(gpAdvManager, -1))
+                ShutDown("Can't add manager!");
+            if (command == OLD_MAIN_NEW_GAME) {
+                gpAdvManager->SetHeroContext(
+                    reinterpret_cast<playerData *>(&gpGame->m_players[0])->NextHero(0), 0);
+            }
+            if (command == OLD_MAIN_NEW_GAME || bForceCheckTimeEvent) {
+                bForceCheckTimeEvent = 0;
+                gpGame->CheckForTimeEvent();
+            }
+            gpExec->MainLoop();
+            gMapX = gpAdvManager->m_mapOriginX;
+            gMapY = gpAdvManager->m_mapOriginY;
+            gpExec->RemoveManager(gpAdvManager);
+            gpWindowManager->FadeScreen(1, OLD_MAIN_FADE_SPEED, gPalette);
+            if (!gbGameOver)
+                goto game_finished;
+        }
+
+        RemoteCleanup();
+        bShowIt = 1;
+        gpMouseManager->SetPointer("advmice.mse", 0, OLD_MAIN_POINTER_TYPE);
+        sprintf(reinterpret_cast<char *>(&gcWinText),
+                "My heroes, our foes have been scattered, their castles broken and laid bare.  The great campaign is now complete, and I stand before you as the undisputed High King!",
+                giCurTurn);
+
+        if (giEndSequence != 1) {
+            gpWindowManager->m_updateFlags = 0;
+            if (!xIsExpansionMap)
+                PlaySmacker(OLD_MAIN_STANDARD_VICTORY_VIDEO);
+            else
+                PlaySmacker(OLD_MAIN_EXPANSION_VICTORY_VIDEO);
+            gpWindowManager->FadeScreen(1, OLD_MAIN_LONG_FADE_SPEED, gPalette);
+            gpResourceManager->GetBackdrop("heroes.icn", gpWindowManager->m_screen, 1);
+            gpWindowManager->UpdateScreenRegion(0, 0,
+                                                OLD_MAIN_SCREEN_WIDTH,
+                                                OLD_MAIN_SCREEN_HEIGHT);
+            gpWindowManager->FadeScreen(0, OLD_MAIN_FADE_SPEED, gPalette);
+            gpWindowManager->m_updateFlags = 1;
+            mainScreenLoaded = 1;
+            gpSoundManager->PlayAmbientMusic(OLD_MAIN_MAIN_MUSIC, 0, -1);
+        } else if (gbInCampaign) {
+            result = gpGame->HandleCampaignWin();
+            if ((gpGame->m_campaignScenario == OLD_MAIN_ARCHIBALD_FINAL_SCENARIO &&
+                 gpGame->m_campaignScenarioCompleted[gpGame->m_campaignType]
+                                                    [OLD_MAIN_ARCHIBALD_FINAL_SCENARIO]) ||
+                (gpGame->m_campaignScenario == OLD_MAIN_ROLAND_FINAL_SCENARIO &&
+                 gpGame->m_campaignType == OLD_MAIN_ROLAND_CAMPAIGN &&
+                 gpGame->m_campaignScenarioCompleted[OLD_MAIN_ROLAND_CAMPAIGN]
+                                                    [OLD_MAIN_ROLAND_FINAL_SCENARIO])) {
+                gbShowHighScore = 1;
+                ShowCongrats(CONGRATS_CAMPAIGN);
+                AddScoreToHighScore(gpGame->m_campaignScore,
+                                    gpGame->m_campaignScore, 0,
+                                    CONGRATS_CAMPAIGN,
+                                    gpGame->m_campaignType ? "Archibald" : "Roland");
+            }
+            if (result) {
+                for (player = 0; player < OLD_MAIN_PLAYER_COUNT; player++)
+                    sprintf(cPlayerNames[player], "");
+                gpGame->InitCampaignMap();
+                gbGameOver = 0;
+                bForceCheckTimeEvent = 1;
+                goto initialize_game;
+            }
+        } else if (xIsPlayingExpansionCampaign) {
+            result = xCampaign.HandleVictory();
+            if (xCampaign.IsCompleted()) {
+                gbShowHighScore = 1;
+                ShowCongrats(CONGRATS_EXPANSION_CAMPAIGN);
+                AddScoreToHighScore(xCampaign.Days(), xCampaign.Days(), 0,
+                                    CONGRATS_EXPANSION_CAMPAIGN,
+                                    xHSCampaignNames[xCampaign.CampaignID()]);
+            }
+            if (result) {
+                for (player = 0; player < OLD_MAIN_PLAYER_COUNT; player++)
+                    sprintf(cPlayerNames[player], "");
+                xCampaign.InitMap();
+                gbGameOver = 0;
+                bForceCheckTimeEvent = 1;
+                goto initialize_game;
+            }
+        } else {
+            ShowCongrats(CONGRATS_STANDARD);
+            if (!gbShowHighScore) {
+                gpWindowManager->FadeScreen(1, OLD_MAIN_FADE_SPEED, gPalette);
+                gpResourceManager->GetBackdrop("heroes.icn", gpWindowManager->m_screen, 1);
+                gpWindowManager->UpdateScreenRegion(
+                    0, 0, OLD_MAIN_SCREEN_WIDTH, OLD_MAIN_SCREEN_HEIGHT);
+                gpWindowManager->FadeScreen(0, OLD_MAIN_FADE_SPEED, gPalette);
+                gpWindowManager->m_updateFlags = 1;
+                mainScreenLoaded = 1;
+                gpSoundManager->PlayAmbientMusic(OLD_MAIN_MAIN_MUSIC, 0, -1);
+            } else {
+                gpSoundManager->PlayAmbientMusic(OLD_MAIN_HIGH_SCORE_MUSIC, 0, -1);
+            }
+        }
+
+        gbGameOver = 0;
+        if (gbShowHighScore) {
+            gbShowHighScore = 0;
+            if (gpExec->AddManager(gpHighScoreManager, -1))
+                ShutDown("Can't add manager!");
+            gpExec->MainLoop();
+            gpExec->RemoveManager(gpHighScoreManager);
+            giHighScoreRank = -1;
+            gpSoundManager->SwitchAmbientMusic(OLD_MAIN_MAIN_MUSIC);
+            gpResourceManager->GetBackdrop("heroes.icn", gpWindowManager->m_screen, 1);
+            gpWindowManager->UpdateScreenRegion(0, 0,
+                                                OLD_MAIN_SCREEN_WIDTH,
+                                                OLD_MAIN_SCREEN_HEIGHT);
+            gpWindowManager->FadeScreen(0, OLD_MAIN_FADE_SPEED, gPalette);
+            mainScreenLoaded = 1;
+        }
+
+game_finished:
+        if (gbRemoteOn)
+            quit = 1;
+    }
+
+    ShutDown(0);
+    return 0;
+}
 
 VA(0x00498558, 0x44)
 char toupper(char c)
