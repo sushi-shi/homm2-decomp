@@ -174,8 +174,8 @@ sites. The current residual is a soft defer, not a permitted wall.
 
 ## BASE/Icon2b: IconToBitmap
 
-Status: active; this section records superseded axes while the same lane continues. It is not a
-soft defer or an accepted wall.
+Status: clean soft defer pending a shared icon/header or compiler-state change. It is not an
+accepted wall and must not receive `@early-stop`.
 
 Canonical source state:
 
@@ -232,9 +232,20 @@ New axes measured after `c164dcf`:
 - sinkable right/count plus extended Y lifetime: 73.8654%, reverted;
 - `currentY` alias alone: no code change.
 
+Final axes measured after `4498053`:
+
+- signed `cn`: 74.35714%, reverted;
+- preinitialized then mutated `cn`: byte-identical to the checkpoint;
+- external linkage for `gIcX0`/`gIcY`: byte-identical with wrong symbol identity;
+- explicit `goto` dim-tail join: byte-identical;
+- `gIcClipR` snapshot plus embedded `gIcCnt2` publication: byte-identical;
+- retained final-assignment result plus a separate signed-test local: byte-identical;
+- signed decoded `count`: 73.04%, reverted.
+
 ### Remaining concrete evidence
 
 The known missing sites are setup `gIcX0`/`gIcY` CSE reloads and the fifth dim
 `gIcCnt2` store. The literal quadrants now share the retail-style full-copy tail. Continue from
-the remaining concrete setup/dim sites; do not repeat the axes above unless a shared
-header/compiler state changes.
+the remaining concrete setup/dim sites only after a shared header/compiler state changes or an
+adjacent decoder reveals a new retail-proven lifetime. Do not repeat the axes above while the
+canonical hash agrees. This is a scheduling defer, not proof that the residual is impossible.
