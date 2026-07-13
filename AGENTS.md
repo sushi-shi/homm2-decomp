@@ -70,6 +70,10 @@ authoritative. This file is the short, restart-ready Codex workflow.
 - A worker does not escape deferred targets. Return every unfinished or improperly parked function
   to that same worker and lane before assigning new work; advance only after each target reaches
   100% or a byte-proven permitted wall under `.claude/agents/matcher.md`.
+- Do not repeatedly poll worker worktrees, reports, or percentages while a batch is active. Rely on
+  matcher milestone/completion messages and let workers tune uninterrupted. Inspect a lane only for
+  serial integration, a reported blocker/coordination need, or after a genuinely long silent period
+  that suggests the worker or build has failed.
 
 ## Compiler Constraints
 
