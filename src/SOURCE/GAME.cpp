@@ -599,7 +599,7 @@ int game::SaveGame(char *filename, int generateName, signed char expansionFormat
     char currentPlayerInfo[4];
     currentPlayerInfo[0] = static_cast<char>(giCurPlayer);
     _write(fileInfo, currentPlayerInfo, 1);
-    _write(fileInfo, &m_humanPlayerCount, 1);
+    _write(fileInfo, &m_deadPlayerCount, 1);
     _write(fileInfo, m_playerDead, 6);
 
     char humanFlagsLocal[8];
@@ -687,7 +687,7 @@ void game::SetupOrigData(void)
     giMapChangeCtr = 1;
     strcpy(m_saveName, "NEWGAME");
     m_playerCount = 4;
-    m_humanPlayerCount = 0;
+    m_deadPlayerCount = 0;
     memset(m_playerDead, 0, GAME_PLAYER_COUNT);
     m_month = 1;
     m_week = m_month;
@@ -880,7 +880,7 @@ void game::LoadGame(char *filename, int loadFromFile, int)
         char currentPlayer[8];
         _read(file, currentPlayer, 1);
         giCurPlayer = currentPlayer[0];
-        _read(file, &m_humanPlayerCount, 1);
+        _read(file, &m_deadPlayerCount, 1);
         _read(file, m_playerDead, 6);
 
         char humanFlags[8];
@@ -1159,7 +1159,7 @@ void game::NewMap(char *filename)
         m_players[player2].unknownac = 0;
     RandomizeEvents();
     ProcessOnMapHeroes();
-    m_humanPlayerCount = 0;
+    m_deadPlayerCount = 0;
     for (player2 = m_playerCount; player2 < GAME_PLAYER_COUNT; player2++)
         m_playerDead[player2] = 1;
 
