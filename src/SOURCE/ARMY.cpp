@@ -28,6 +28,7 @@
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/PATH.h>
 #include <SOURCE/searchArray.h>
+#include <SOURCE/SPELLS.h>
 #include <SOURCE/X_GLOBAL.h>
 
 VA(0x0044a8c0, 0xcf)
@@ -1935,7 +1936,7 @@ void army::PowEffect(int effect, int resetLimits, int effectX, int effectY)
             current = &gpCombatManager->m_armies[side][index];
             if (current->m_monsterType == ARMY_CREATURE_PHOENIX ||
                 current->m_monsterType == ARMY_CREATURE_GARGOYLE ||
-                current->m_monsterType == ARMY_CREATURE_MINOTAUR_KING) {
+                current->m_monsterType == ARMY_CREATURE_MINOTAUR) {
                 current->m_animationCycle = 1;
             } else {
                 current->m_animationCycle = 0;
@@ -2750,44 +2751,546 @@ finish:
     gpCombatManager->m_limitCreature = 1;
 }
 
+// @early-stop
+// The instruction stream and all 59/59 relocations align; only TU-local
+// floating-constant relocation identities differ.
 VA(0x00452eca, 0x931)
-float army::SpellCastWorkChance(int) { return 0; }
+float army::SpellCastWorkChance(int spell)
+{
+    int foundSpell;
+    int i;
+    int resurrectPower;
+    int hypnotizeHitPoints;
+
+    if ((m_monster.flags.all & MONSTER_FLAGS_MIRROR_IMAGE) &&
+        (spell == SPELL_MIRROR_IMAGE || spell == SPELL_ANTI_MAGIC)) {
+        return ARMY_SPELL_CHANCE_NONE;
+    }
+    if (spell == SPELL_DISPEL || spell == SPELL_MASS_DISPEL) {
+        foundSpell = 0;
+        for (i = 0; i < ARMY_SPELL_INFLUENCE_COUNT; i++) {
+            if (m_spellInfluence[i]) {
+                foundSpell = 1;
+                break;
+            }
+        }
+        if (!foundSpell) {
+            return ARMY_SPELL_CHANCE_NONE;
+        }
+    }
+    if (m_spellInfluence[ARMY_SPELL_INFLUENCE_ANTI_MAGIC] ||
+        ((m_monster.flags.all & MONSTER_FLAGS_DEAD) &&
+         spell != SPELL_RESURRECT && spell != SPELL_TRUE_RESURRECT &&
+         spell != SPELL_ANIMATE_DEAD) ||
+        m_deathPending ||
+        m_monsterType == ARMY_CREATURE_GREEN_DRAGON ||
+        m_monsterType == ARMY_CREATURE_RED_DRAGON ||
+        m_monsterType == ARMY_CREATURE_BLACK_DRAGON) {
+        return ARMY_SPELL_CHANCE_NONE;
+    }
+    if (spell == SPELL_MIRROR_IMAGE && m_mirrorImageIndex != -1) {
+        return ARMY_SPELL_CHANCE_NONE;
+    }
+    if ((spell == SPELL_RESURRECT || spell == SPELL_TRUE_RESURRECT) &&
+        ((m_monster.flags.all & MONSTER_FLAGS_UNDEAD) ||
+         m_initialQuantity == m_quantity)) {
+        return ARMY_SPELL_CHANCE_NONE;
+    }
+    if (spell == SPELL_ANIMATE_DEAD &&
+        (!(m_monster.flags.all & MONSTER_FLAGS_UNDEAD) ||
+         m_initialQuantity == m_quantity)) {
+        return ARMY_SPELL_CHANCE_NONE;
+    }
+    if ((spell == SPELL_HOLY_WORD || spell == SPELL_HOLY_SHOUT) &&
+        !(m_monster.flags.all & MONSTER_FLAGS_UNDEAD)) {
+        return ARMY_SPELL_CHANCE_NONE;
+    }
+    if ((spell == SPELL_DEATH_RIPPLE || spell == SPELL_DEATH_WAVE) &&
+        (m_monster.flags.all & MONSTER_FLAGS_UNDEAD)) {
+        return ARMY_SPELL_CHANCE_NONE;
+    }
+    if (m_monsterType == ARMY_CREATURE_PHOENIX &&
+        spell != SPELL_FIREBALL && spell != SPELL_FIREBLAST &&
+        spell != SPELL_LIGHTNING_BOLT && spell != SPELL_CHAIN_LIGHTNING &&
+        spell != SPELL_COLD_RAY && spell != SPELL_COLD_RING &&
+        spell != SPELL_ELEMENTAL_STORM) {
+        return ARMY_SPELL_CHANCE_NONE;
+    }
+    if (m_monsterType == ARMY_CREATURE_CRUSADER &&
+        (spell == SPELL_CURSE || spell == SPELL_MASS_CURSE)) {
+        return ARMY_SPELL_CHANCE_NONE;
+    }
+    if (((m_monster.flags.all & MONSTER_FLAGS_UNDEAD) ||
+         m_monsterType == ARMY_CREATURE_EARTH_ELEMENTAL ||
+         m_monsterType == ARMY_CREATURE_AIR_ELEMENTAL ||
+         m_monsterType == ARMY_CREATURE_FIRE_ELEMENTAL ||
+         m_monsterType == ARMY_CREATURE_WATER_ELEMENTAL ||
+         m_monsterType == ARMY_CREATURE_GIANT ||
+         m_monsterType == ARMY_CREATURE_TITAN) &&
+        (spell == SPELL_BERSERKER || spell == SPELL_HYPNOTIZE ||
+         spell == SPELL_PARALYZE || spell == SPELL_BLIND)) {
+        return ARMY_SPELL_CHANCE_NONE;
+    }
+    if ((m_monster.flags.all & MONSTER_FLAGS_UNDEAD) &&
+        (spell == SPELL_CURSE || spell == SPELL_MASS_CURSE ||
+         spell == SPELL_BLESS || spell == SPELL_MASS_BLESS)) {
+        return ARMY_SPELL_CHANCE_NONE;
+    }
+    if (m_monsterType == ARMY_CREATURE_EARTH_ELEMENTAL &&
+        (spell == SPELL_LIGHTNING_BOLT || spell == SPELL_CHAIN_LIGHTNING ||
+         spell == SPELL_METEOR_SHOWER)) {
+        return ARMY_SPELL_CHANCE_NONE;
+    }
+    if (m_monsterType == ARMY_CREATURE_AIR_ELEMENTAL &&
+        spell == SPELL_METEOR_SHOWER) {
+        return ARMY_SPELL_CHANCE_NONE;
+    }
+    if (m_monsterType == ARMY_CREATURE_FIRE_ELEMENTAL &&
+        (spell == SPELL_FIREBALL || spell == SPELL_FIREBLAST)) {
+        return ARMY_SPELL_CHANCE_NONE;
+    }
+    if (m_monsterType == ARMY_CREATURE_WATER_ELEMENTAL &&
+        (spell == SPELL_COLD_RAY || spell == SPELL_COLD_RING)) {
+        return ARMY_SPELL_CHANCE_NONE;
+    }
+    if (gpCombatManager->m_heroes[m_side]) {
+        if (gpCombatManager->m_heroes[m_side]->HasArtifact(
+                SPELL_ARTIFACT_HOLY_PENDANT) &&
+            (spell == SPELL_CURSE || spell == SPELL_MASS_CURSE)) {
+            return ARMY_SPELL_CHANCE_NONE;
+        }
+        if (gpCombatManager->m_heroes[m_side]->HasArtifact(
+                SPELL_ARTIFACT_PENDANT_FREE_WILL) &&
+            spell == SPELL_HYPNOTIZE) {
+            return ARMY_SPELL_CHANCE_NONE;
+        }
+        if (gpCombatManager->m_heroes[m_side]->HasArtifact(
+                SPELL_ARTIFACT_PENDANT_LIFE) &&
+            (spell == SPELL_DEATH_RIPPLE || spell == SPELL_DEATH_WAVE)) {
+            return ARMY_SPELL_CHANCE_NONE;
+        }
+        if (gpCombatManager->m_heroes[m_side]->HasArtifact(
+                SPELL_ARTIFACT_SERENITY_PENDANT) &&
+            spell == SPELL_BERSERKER) {
+            return ARMY_SPELL_CHANCE_NONE;
+        }
+        if (gpCombatManager->m_heroes[m_side]->HasArtifact(
+                SPELL_ARTIFACT_SEEING_EYE_PENDANT) &&
+            spell == SPELL_BLIND) {
+            return ARMY_SPELL_CHANCE_NONE;
+        }
+        if (gpCombatManager->m_heroes[m_side]->HasArtifact(
+                SPELL_ARTIFACT_KINETIC_PENDANT) &&
+            spell == SPELL_PARALYZE) {
+            return ARMY_SPELL_CHANCE_NONE;
+        }
+        if (gpCombatManager->m_heroes[m_side]->HasArtifact(
+                SPELL_ARTIFACT_PENDANT_DEATH) &&
+            (spell == SPELL_HOLY_WORD || spell == SPELL_HOLY_SHOUT)) {
+            return ARMY_SPELL_CHANCE_NONE;
+        }
+        if (gpCombatManager->m_heroes[m_side]->HasArtifact(
+                SPELL_ARTIFACT_WAND_NEGATION) &&
+            (spell == SPELL_DISPEL || spell == SPELL_MASS_DISPEL ||
+             spell == SPELL_CREATURE_DISPEL)) {
+            return ARMY_SPELL_CHANCE_NONE;
+        }
+    }
+    if (m_quantity == 0 &&
+        (spell == SPELL_RESURRECT || spell == SPELL_TRUE_RESURRECT ||
+         spell == SPELL_ANIMATE_DEAD)) {
+        resurrectPower = gpCombatManager->m_spellPower[
+                             gpCombatManager->m_currentSide] *
+                         ARMY_RESURRECT_POWER_PER_SPELL_POWER;
+        if (gpCombatManager->m_heroes[gpCombatManager->m_currentSide] &&
+            gpCombatManager->m_heroes[gpCombatManager->m_currentSide]
+                ->HasArtifact(SPELL_ARTIFACT_ANKH)) {
+            resurrectPower *= ARMY_ARTIFACT_POWER_MULTIPLIER;
+        }
+        if (resurrectPower < m_monster.hitPoints) {
+            return ARMY_SPELL_CHANCE_NONE;
+        }
+    }
+    if (spell == SPELL_CREATURE_DISPEL &&
+        !m_spellInfluence[ARMY_SPELL_INFLUENCE_HASTE] &&
+        !m_spellInfluence[ARMY_SPELL_INFLUENCE_BLESS] &&
+        !m_spellInfluence[ARMY_SPELL_INFLUENCE_DRAGON_SLAYER] &&
+        !m_spellInfluence[ARMY_SPELL_INFLUENCE_BLOODLUST] &&
+        !m_spellInfluence[ARMY_SPELL_INFLUENCE_SHIELD] &&
+        !m_spellInfluence[ARMY_SPELL_INFLUENCE_ANTI_MAGIC] &&
+        !m_spellInfluence[ARMY_SPELL_INFLUENCE_STONESKIN] &&
+        !m_spellInfluence[ARMY_SPELL_INFLUENCE_STEELSKIN]) {
+        return ARMY_SPELL_CHANCE_NONE;
+    }
+    if (spell == SPELL_HYPNOTIZE) {
+        hypnotizeHitPoints = gpCombatManager->m_heroes[
+                                  gpCombatManager->m_currentSide]
+                                  ->Stats(HERO_PRIMARY_SPELL_POWER) *
+                              ARMY_HYPNOTIZE_HIT_POINTS_PER_POWER;
+        if (gpCombatManager->m_heroes[gpCombatManager->m_currentSide]
+                ->HasArtifact(SPELL_ARTIFACT_GOLD_WATCH)) {
+            hypnotizeHitPoints *= ARMY_ARTIFACT_POWER_MULTIPLIER;
+        }
+        if (m_monster.hitPoints * m_quantity > hypnotizeHitPoints) {
+            return ARMY_SPELL_CHANCE_NONE;
+        }
+    }
+    if ((m_monsterType == ARMY_CREATURE_DWARF ||
+         m_monsterType == ARMY_CREATURE_BATTLE_DWARF) &&
+        spell != SPELL_TELEPORT && spell != SPELL_CURE &&
+        spell != SPELL_MASS_CURE && spell != SPELL_RESURRECT &&
+        spell != SPELL_TRUE_RESURRECT && spell != SPELL_HASTE &&
+        spell != SPELL_MASS_HASTE && spell != SPELL_BLESS &&
+        spell != SPELL_MASS_BLESS && spell != SPELL_STONE_SKIN &&
+        spell != SPELL_STEEL_SKIN && spell != SPELL_ANTI_MAGIC &&
+        spell != SPELL_DRAGON_SLAYER && spell != SPELL_BLOOD_LUST &&
+        spell != SPELL_MIRROR_IMAGE && spell != SPELL_SHIELD &&
+        spell != SPELL_MASS_SHIELD) {
+        return ARMY_SPELL_CHANCE_DWARF;
+    }
+    return ARMY_SPELL_CHANCE_ALWAYS;
+}
 
 VA(0x004537fb, 0x56)
-int army::SpellCastWorks(int) { return 0; }
+int army::SpellCastWorks(int spell)
+{
+    int chance;
+
+    chance = static_cast<int>(SpellCastWorkChance(spell) *
+                              ARMY_SPELL_CHANCE_PERCENT);
+    return SRandom(1, ARMY_RANDOM_SPELL_ROLL_MAX) <= chance;
+}
 
 VA(0x00453851, 0x39e)
-void BuildTempWalkSeq(struct SMonFrameInfo *, int, int) {}
+void BuildTempWalkSeq(struct SMonFrameInfo *frameInfo, int finishStanding,
+                      int skipDrawing)
+{
+    frameInfo->animationFrameCount[ARMY_ANIMATION_WALK] = 0;
+    if (!skipDrawing && finishStanding) {
+        if (frameInfo->animationFrameCount[ARMY_WALK_SEGMENT_STAND] > 0) {
+            memcpy(&frameInfo->animationFrames[ARMY_ANIMATION_WALK]
+                                                [frameInfo->animationFrameCount[
+                                                    ARMY_ANIMATION_WALK]],
+                   frameInfo->animationFrames[ARMY_WALK_SEGMENT_STAND],
+                   frameInfo->animationFrameCount[ARMY_WALK_SEGMENT_STAND]);
+            memcpy(&frameInfo->walkXOffsets[frameInfo->animationFrameCount[
+                                                ARMY_ANIMATION_WALK]],
+                   frameInfo->animationXOffsets[ARMY_WALK_SEGMENT_STAND],
+                   frameInfo->animationFrameCount[ARMY_WALK_SEGMENT_STAND]);
+            frameInfo->animationFrameCount[ARMY_ANIMATION_WALK] +=
+                frameInfo->animationFrameCount[ARMY_WALK_SEGMENT_STAND];
+        }
+    } else {
+        if (!skipDrawing) {
+            if (frameInfo->animationFrameCount[ARMY_WALK_SEGMENT_BEGIN] > 0) {
+                memcpy(&frameInfo->animationFrames[ARMY_ANIMATION_WALK]
+                                                    [frameInfo->animationFrameCount[
+                                                        ARMY_ANIMATION_WALK]],
+                       frameInfo->animationFrames[ARMY_WALK_SEGMENT_BEGIN],
+                       frameInfo->animationFrameCount[ARMY_WALK_SEGMENT_BEGIN]);
+                memcpy(&frameInfo->walkXOffsets[frameInfo->animationFrameCount[
+                                                    ARMY_ANIMATION_WALK]],
+                       frameInfo->animationXOffsets[ARMY_WALK_SEGMENT_BEGIN],
+                       frameInfo->animationFrameCount[ARMY_WALK_SEGMENT_BEGIN]);
+                frameInfo->animationFrameCount[ARMY_ANIMATION_WALK] +=
+                    frameInfo->animationFrameCount[ARMY_WALK_SEGMENT_BEGIN];
+            }
+        } else if (frameInfo->animationFrameCount[
+                       ARMY_WALK_SEGMENT_BEGIN_STANDING] > 0) {
+            memcpy(&frameInfo->animationFrames[ARMY_ANIMATION_WALK]
+                                                [frameInfo->animationFrameCount[
+                                                    ARMY_ANIMATION_WALK]],
+                   frameInfo->animationFrames[ARMY_WALK_SEGMENT_BEGIN_STANDING],
+                   frameInfo->animationFrameCount[
+                       ARMY_WALK_SEGMENT_BEGIN_STANDING]);
+            memcpy(&frameInfo->walkXOffsets[frameInfo->animationFrameCount[
+                                                ARMY_ANIMATION_WALK]],
+                   frameInfo->animationXOffsets[ARMY_WALK_SEGMENT_BEGIN_STANDING],
+                   frameInfo->animationFrameCount[
+                       ARMY_WALK_SEGMENT_BEGIN_STANDING]);
+            frameInfo->animationFrameCount[ARMY_ANIMATION_WALK] +=
+                frameInfo->animationFrameCount[
+                    ARMY_WALK_SEGMENT_BEGIN_STANDING];
+        }
+        if (frameInfo->animationFrameCount[ARMY_WALK_SEGMENT_MIDDLE] > 0) {
+            memcpy(&frameInfo->animationFrames[ARMY_ANIMATION_WALK]
+                                                [frameInfo->animationFrameCount[
+                                                    ARMY_ANIMATION_WALK]],
+                   frameInfo->animationFrames[ARMY_WALK_SEGMENT_MIDDLE],
+                   frameInfo->animationFrameCount[ARMY_WALK_SEGMENT_MIDDLE]);
+            memcpy(&frameInfo->walkXOffsets[frameInfo->animationFrameCount[
+                                                ARMY_ANIMATION_WALK]],
+                   frameInfo->animationXOffsets[ARMY_WALK_SEGMENT_MIDDLE],
+                   frameInfo->animationFrameCount[ARMY_WALK_SEGMENT_MIDDLE]);
+            frameInfo->animationFrameCount[ARMY_ANIMATION_WALK] +=
+                frameInfo->animationFrameCount[ARMY_WALK_SEGMENT_MIDDLE];
+        }
+        if (finishStanding) {
+            if (frameInfo->animationFrameCount[
+                    ARMY_WALK_SEGMENT_END_STANDING] > 0) {
+                memcpy(&frameInfo->animationFrames[ARMY_ANIMATION_WALK]
+                                                    [frameInfo->animationFrameCount[
+                                                        ARMY_ANIMATION_WALK]],
+                       frameInfo->animationFrames[
+                           ARMY_WALK_SEGMENT_END_STANDING],
+                       frameInfo->animationFrameCount[
+                           ARMY_WALK_SEGMENT_END_STANDING]);
+                memcpy(&frameInfo->walkXOffsets[frameInfo->animationFrameCount[
+                                                    ARMY_ANIMATION_WALK]],
+                       frameInfo->animationXOffsets[
+                           ARMY_WALK_SEGMENT_END_STANDING],
+                       frameInfo->animationFrameCount[
+                           ARMY_WALK_SEGMENT_END_STANDING]);
+                frameInfo->animationFrameCount[ARMY_ANIMATION_WALK] +=
+                    frameInfo->animationFrameCount[
+                        ARMY_WALK_SEGMENT_END_STANDING];
+            }
+        } else if (frameInfo->animationFrameCount[
+                       ARMY_WALK_SEGMENT_END] > 0) {
+            memcpy(&frameInfo->animationFrames[ARMY_ANIMATION_WALK]
+                                                [frameInfo->animationFrameCount[
+                                                    ARMY_ANIMATION_WALK]],
+                   frameInfo->animationFrames[ARMY_WALK_SEGMENT_END],
+                   frameInfo->animationFrameCount[ARMY_WALK_SEGMENT_END]);
+            memcpy(&frameInfo->walkXOffsets[frameInfo->animationFrameCount[
+                                                ARMY_ANIMATION_WALK]],
+                   frameInfo->animationXOffsets[ARMY_WALK_SEGMENT_END],
+                   frameInfo->animationFrameCount[ARMY_WALK_SEGMENT_END]);
+            frameInfo->animationFrameCount[ARMY_ANIMATION_WALK] +=
+                frameInfo->animationFrameCount[ARMY_WALK_SEGMENT_END];
+        }
+    }
+}
 
 VA(0x00453bef, 0x66)
-void army::DispelGood(void) {}
+void army::DispelGood(void)
+{
+    CancelIndividualSpell(ARMY_SPELL_INFLUENCE_HASTE);
+    CancelIndividualSpell(ARMY_SPELL_INFLUENCE_BLESS);
+    CancelIndividualSpell(ARMY_SPELL_INFLUENCE_DRAGON_SLAYER);
+    CancelIndividualSpell(ARMY_SPELL_INFLUENCE_BLOODLUST);
+    CancelIndividualSpell(ARMY_SPELL_INFLUENCE_SHIELD);
+    CancelIndividualSpell(ARMY_SPELL_INFLUENCE_ANTI_MAGIC);
+    CancelIndividualSpell(ARMY_SPELL_INFLUENCE_STONESKIN);
+    CancelIndividualSpell(ARMY_SPELL_INFLUENCE_STEELSKIN);
+}
 
 VA(0x00453c55, 0x90)
-void army::Cure(int) {}
+void army::Cure(int amount)
+{
+    CancelIndividualSpell(ARMY_SPELL_INFLUENCE_SLOW);
+    CancelIndividualSpell(ARMY_SPELL_INFLUENCE_BLIND);
+    CancelIndividualSpell(ARMY_SPELL_INFLUENCE_CURSE);
+    CancelIndividualSpell(ARMY_SPELL_INFLUENCE_BERSERK);
+    CancelIndividualSpell(ARMY_SPELL_INFLUENCE_PARALYZE);
+    CancelIndividualSpell(ARMY_SPELL_INFLUENCE_HYPNOTIZE);
+    CancelIndividualSpell(ARMY_SPELL_INFLUENCE_PETRIFIED);
+    m_hitPointsLost -= amount * ARMY_CURE_HIT_POINTS_PER_POWER;
+    if (m_hitPointsLost < 0) {
+        m_hitPointsLost = 0;
+    }
+}
 
 VA(0x00453ce5, 0x79)
-int army::MidX(void) { return 0; }
+int army::MidX(void)
+{
+    int wideOffset;
+
+    if (m_monster.flags.all & MONSTER_FLAGS_WIDE) {
+        if (m_facing == 1) {
+            wideOffset = ARMY_WIDE_CREATURE_HALF_WIDTH;
+        } else {
+            wideOffset = -ARMY_WIDE_CREATURE_HALF_WIDTH;
+        }
+    } else {
+        wideOffset = 0;
+    }
+    return gpCombatManager->m_hexCells[m_hex].m_x + wideOffset;
+}
 
 VA(0x00453d5e, 0x59)
-int army::MidY(void) { return 0; }
+int army::MidY(void)
+{
+    return gpCombatManager->m_hexCells[m_hex].m_y -
+           (GetIconEntry(
+                m_creatureIcon,
+                m_frameInfo.animationFrames[ARMY_ANIMATION_STAND][0])
+                ->h >>
+            1);
+}
 
 VA(0x00453db7, 0x57)
-int army::TopY(void) { return 0; }
+int army::TopY(void)
+{
+    return gpCombatManager->m_hexCells[m_hex].m_y -
+           GetIconEntry(
+               m_creatureIcon,
+               m_frameInfo.animationFrames[ARMY_ANIMATION_STAND][0])
+               ->h;
+}
 
 VA(0x00453e0e, 0xcc)
-int army::RightX(void) { return 0; }
+int army::RightX(void)
+{
+    if (m_facing == 1) {
+        return gpCombatManager->m_hexCells[m_hex].m_x +
+               GetIconEntry(
+                   m_creatureIcon,
+                   m_frameInfo.animationFrames[ARMY_ANIMATION_STAND][0])
+                   ->w +
+               GetIconEntry(
+                   m_creatureIcon,
+                   m_frameInfo.animationFrames[ARMY_ANIMATION_STAND][0])
+                   ->x;
+    } else {
+        return gpCombatManager->m_hexCells[m_hex].m_x -
+               GetIconEntry(
+                   m_creatureIcon,
+                   m_frameInfo.animationFrames[ARMY_ANIMATION_STAND][0])
+                   ->x;
+    }
+}
 
 VA(0x00453eda, 0xcc)
-int army::LeftX(void) { return 0; }
+int army::LeftX(void)
+{
+    if (m_facing == 1) {
+        return gpCombatManager->m_hexCells[m_hex].m_x +
+               GetIconEntry(
+                   m_creatureIcon,
+                   m_frameInfo.animationFrames[ARMY_ANIMATION_STAND][0])
+                   ->x;
+    } else {
+        return gpCombatManager->m_hexCells[m_hex].m_x -
+               (GetIconEntry(
+                    m_creatureIcon,
+                    m_frameInfo.animationFrames[ARMY_ANIMATION_STAND][0])
+                    ->w +
+                GetIconEntry(
+                    m_creatureIcon,
+                    m_frameInfo.animationFrames[ARMY_ANIMATION_STAND][0])
+                    ->x);
+    }
+}
 
+// @early-stop
+// At the retained 99.92% pass, the relocation-masked instruction stream and
+// all 3/3 relocations aligned. Exact sibling edits only changed the live
+// two-dimensional army-array address evaluation order.
 VA(0x00453fa6, 0x171)
-int army::OtherArmyAdjacent(int, int) { return 0; }
+int army::OtherArmyAdjacent(int side, int index)
+{
+    army *otherArmy1;
+    int otherHex1;
+    int otherRearHex;
+    int adjacentHex;
+    int rearHex;
+    int directionResult;
 
+    otherArmy1 = &gpCombatManager->m_armies[side][index];
+    otherHex1 = otherArmy1->m_hex;
+    if (otherArmy1->m_monster.flags.all & MONSTER_FLAGS_WIDE) {
+        otherRearHex = otherHex1 + (otherArmy1->m_side == 0 ? 1 : -1);
+    } else {
+        otherRearHex = -1;
+    }
+    for (directionResult = 0; directionResult < ARMY_ADJACENT_DIRECTION_COUNT;
+         directionResult++) {
+        adjacentHex = GetAdjacentCellIndex(m_hex, directionResult);
+        if (adjacentHex == otherHex1 ||
+            (adjacentHex != -1 && adjacentHex == otherRearHex)) {
+            return 1;
+        }
+    }
+    if (m_monster.flags.all & MONSTER_FLAGS_WIDE) {
+        rearHex = m_hex + (m_side == 0 ? 1 : -1);
+        for (directionResult = 0;
+             directionResult < ARMY_ADJACENT_DIRECTION_COUNT;
+             directionResult++) {
+            adjacentHex = GetAdjacentCellIndex(rearHex, directionResult);
+            if (adjacentHex == otherHex1 ||
+                (adjacentHex != -1 && adjacentHex == otherRearHex)) {
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+// @early-stop
+// Code bytes and all 12/12 relocation targets align; only delinked
+// gMonsterDatabase/float-constant relocation identities differ.
 VA(0x00454117, 0x1e1)
-void ModifyFrameInfo(struct SMonFrameInfo *, int) {}
+void ModifyFrameInfo(struct SMonFrameInfo *frameInfo, int monsterType)
+{
+    int speedDifference;
+
+    speedDifference = 0;
+    if (monsterType == ARMY_CREATURE_RANGER ||
+        monsterType == ARMY_CREATURE_VETERAN_PIKEMAN ||
+        monsterType == ARMY_CREATURE_MASTER_SWORDSMAN ||
+        monsterType == ARMY_CREATURE_CHAMPION ||
+        monsterType == ARMY_CREATURE_CRUSADER ||
+        monsterType == ARMY_CREATURE_ORC_CHIEF ||
+        monsterType == ARMY_CREATURE_OGRE_LORD ||
+        monsterType == ARMY_CREATURE_WAR_TROLL ||
+        monsterType == ARMY_CREATURE_BATTLE_DWARF ||
+        monsterType == ARMY_CREATURE_GRAND_ELF ||
+        monsterType == ARMY_CREATURE_GREATER_DRUID ||
+        monsterType == ARMY_CREATURE_MINOTAUR_KING ||
+        monsterType == ARMY_CREATURE_STEEL_GOLEM ||
+        monsterType == ARMY_CREATURE_ARCHMAGE ||
+        monsterType == ARMY_CREATURE_MUTANT_ZOMBIE ||
+        monsterType == ARMY_CREATURE_ROYAL_MUMMY ||
+        monsterType == ARMY_CREATURE_VAMPIRE_LORD ||
+        monsterType == ARMY_CREATURE_POWER_LICH) {
+        speedDifference = gMonsterDatabase[monsterType].speed -
+                          gMonsterDatabase[monsterType - 1].speed;
+    }
+    if (monsterType == ARMY_CREATURE_EARTH_ELEMENTAL ||
+        monsterType == ARMY_CREATURE_AIR_ELEMENTAL ||
+        monsterType == ARMY_CREATURE_WATER_ELEMENTAL) {
+        speedDifference = gMonsterDatabase[monsterType].speed -
+                          gMonsterDatabase[ARMY_CREATURE_FIRE_ELEMENTAL].speed;
+    }
+    if (speedDifference) {
+        if (monsterType == ARMY_CREATURE_RANGER) {
+            frameInfo->attackDuration = static_cast<int>(
+                frameInfo->attackDuration * ARMY_RANGER_ATTACK_DURATION_SCALE);
+        } else {
+            frameInfo->attackDuration = static_cast<int>(
+                (ARMY_DURATION_BASE_SCALE -
+                 speedDifference * ARMY_ATTACK_DURATION_SPEED_SCALE) *
+                frameInfo->attackDuration);
+        }
+        frameInfo->walkDuration = static_cast<int>(
+            (ARMY_DURATION_BASE_SCALE -
+             speedDifference * ARMY_WALK_DURATION_SPEED_SCALE) *
+            frameInfo->walkDuration);
+    }
+}
 
 VA(0x004542f8, 0xbe)
-int army::GetPowBaseY(void) { return 0; }
+int army::GetPowBaseY(void)
+{
+    int y;
+
+    y = MidY();
+    if (gCurLoadedSpellEffect == SPELL_BERSERKER ||
+        gCurLoadedSpellEffect == SPELL_MAGIC_ARROW ||
+        gCurLoadedSpellEffect == SPELL_HOLY_SHOUT ||
+        gCurLoadedSpellEffect == SPELL_METEOR_SHOWER ||
+        gCurLoadedSpellEffect == SPELL_ARMAGEDDON ||
+        gCurLoadedSpellEffect == SPELL_ANTI_MAGIC) {
+        y = TopY();
+    }
+    if (gCurLoadedSpellEffect == SPELL_PARALYZE ||
+        gCurLoadedSpellEffect == SPELL_HYPNOTIZE) {
+        y = gpCombatManager->m_hexCells[m_hex].m_y +
+            ARMY_CONTROL_EFFECT_Y_OFFSET;
+    }
+    return y;
+}
 
 // ---- globals (definitions, RVA order) ----
 DATA(0x004f54a8) int bSecondAttack;
