@@ -29,6 +29,7 @@
 #include <BASE/soundManager.h>
 #include <BASE/resourceManager.h>
 #include <BASE/heroWindowManager.h>
+#include <BASE/BITS.h>
 
 
 // configStruct/SCreatureInfo shared in _types.h; EventExtra/SThievesData in SOURCE/GAME.h.
@@ -36,32 +37,114 @@
 // GAME's BaseAlloc/BaseFree pass __FILE__ + a source line number. The retail
 // encodes the base line as a 2-byte string read via movswl, then adds a per-call
 // delta; reproduce byte-exactly. __FILE__ is the original build path (reloc-masked).
-#define GFILE ((char *)"I:\\Projects\\Heroes\\Prog\\SOURCE\\GAME.CPP")
+#define GFILE const_cast<char *>("I:\\Projects\\Heroes\\Prog\\SOURCE\\GAME.CPP")
+#define GSAVELINE (*reinterpret_cast<const short *>("\x94\x02"))
+#define GLOADLINE (*reinterpret_cast<const short *>("\x4f\x04"))
 
 // fullMap is embedded in `game` at this+0xb3e; the retail folds the +0xb3e into the
 // member offsets and inlines Row/Extra (/Ob1), so access it inline via the cast.
-#define WORLDMAP ((fullMap *)((char *)this + 0xb3e))
+#define WORLDMAP (reinterpret_cast<fullMap *>(reinterpret_cast<char *>(this) + 0xb3e))
 
 // Inline accessors that reference gpGame directly (the retail emits `add [gpGame]`
 // + a per-call `jmp $+0`), so they are free inline helpers, not game methods.
-inline town *GetCastle(int idx) { return (town *)((char *)gpGame + idx * 100 + 0xb53); }
-inline signed char PlayerEventByte(signed char color) { return ((signed char *)gpGame)[color * 283 + 0x49c]; }
+inline town *GetCastle(int idx) { return reinterpret_cast<town *>(reinterpret_cast<char *>(gpGame) + idx * 100 + 0xb53); }
+inline signed char PlayerEventByte(signed char color) { return reinterpret_cast<signed char *>(gpGame)[color * 283 + 0x49c]; }
 
 VA(0x004708b0, 0x23d)
-void playerData::Write(int) {}
+void playerData::Write(int file)
+{
+    char unused[52];
+
+    _write(file, &m_color, 1);
+    _write(file, &m_heroCount, 1);
+    _write(file, &m_currentHero, 1);
+    _write(file, &m_heroWindowTop, 1);
+    _write(file, m_heroes, 8);
+    _write(file, m_unknown0c, 2);
+    memset(unused, 0, 48);
+    _write(file, unused, 42);
+    _write(file, &gpGame->m_unknown639d, 1);
+    _write(file, &m_unknown13, 1);
+    _write(file, &m_unknown0f, 4);
+    _write(file, &m_unknown0e, 1);
+    _write(file, &m_unknownab, 1);
+    _write(file, &m_unknown40, 1);
+    _write(file, &m_unknown41, 1);
+    _write(file, &m_unknown42, 1);
+    _write(file, &m_unknown43, 1);
+    _write(file, &m_townCount, 1);
+    _write(file, &m_currentTown, 1);
+    _write(file, &m_townWindowTop, 1);
+    _write(file, m_towns, 72);
+    _write(file, m_resources, 28);
+    _write(file, m_secondaryResources, 28);
+    _write(file, &m_unknownac, 1);
+    _write(file, &m_unknownac, 1);
+    _write(file, m_unknownad, 6);
+}
 
 VA(0x00470aed, 0x22d)
-void playerData::Read(int) {}
+void playerData::Read(int file)
+{
+    char unused[52];
+
+    _read(file, &m_color, 1);
+    _read(file, &m_heroCount, 1);
+    _read(file, &m_currentHero, 1);
+    _read(file, &m_heroWindowTop, 1);
+    _read(file, m_heroes, 8);
+    _read(file, m_unknown0c, 2);
+    _read(file, unused, 42);
+    _read(file, &gpGame->m_unknown639d, 1);
+    _read(file, &m_unknown13, 1);
+    _read(file, &m_unknown0f, 4);
+    _read(file, &m_unknown0e, 1);
+    _read(file, &m_unknownab, 1);
+    _read(file, &m_unknown40, 1);
+    _read(file, &m_unknown41, 1);
+    _read(file, &m_unknown42, 1);
+    _read(file, &m_unknown43, 1);
+    _read(file, &m_townCount, 1);
+    _read(file, &m_currentTown, 1);
+    _read(file, &m_townWindowTop, 1);
+    _read(file, m_towns, 72);
+    _read(file, m_resources, 28);
+    _read(file, m_secondaryResources, 28);
+    _read(file, &m_unknownac, 1);
+    _read(file, &m_unknownac, 1);
+    _read(file, m_unknownad, 6);
+}
 
 VA(0x00470d1a, 0x12d)
-int playerData::NextHero(int) { return 0; }
+int playerData::NextHero(int)
+{
+    int current = -1;
+    int i;
+
+    if (gpCurPlayer->m_currentHero != -1) {
+        for (i = 0; i < gpCurPlayer->m_heroCount; i++) {
+            if (gpCurPlayer->m_heroes[i] == gpCurPlayer->m_currentHero)
+                current = i;
+        }
+    }
+
+    for (i = current + 1; i < gpCurPlayer->m_heroCount; i++) {
+        if (gpGame->IsMobile(gpCurPlayer->m_heroes[i]))
+            return m_heroes[i];
+    }
+    for (i = 0; i < current + 1; i++) {
+        if (gpGame->IsMobile(gpCurPlayer->m_heroes[i]))
+            return m_heroes[i];
+    }
+    return -1;
+}
 
 VA(0x00470e47, 0x65)
 int playerData::HasMobileHero(void)
 {
     int i;
-    for (i = 0; i < ((signed char *)this)[1]; i++) {
-        if (gpGame->IsMobile(((signed char *)this)[i + 4]))
+    for (i = 0; i < reinterpret_cast<signed char *>(this)[1]; i++) {
+        if (gpGame->IsMobile(reinterpret_cast<signed char *>(this)[i + 4]))
             return 1;
     }
     return 0;
@@ -73,7 +156,7 @@ int GetNumObelisks(int color)
     int count = 0;
     int i;
     for (i = 0; i < 0x30; i++) {
-        if (((signed char *)gpGame)[i + 0x634d] & (1 << color))
+        if (reinterpret_cast<signed char *>(gpGame)[i + 0x634d] & (1 << color))
             count++;
     }
     return count;
@@ -84,16 +167,16 @@ int playerData::BuildingsOwned(int a, int b, int c)
 {
     int count = 0;
     int i;
-    for (i = 0; i < ((signed char *)this)[0x44]; i++) {
-        signed char *town = (signed char *)((char *)gpGame + ((signed char *)this)[i + 0x47] * 100 + 0xb53);
+    for (i = 0; i < reinterpret_cast<signed char *>(this)[0x44]; i++) {
+        signed char *town = reinterpret_cast<signed char *>(reinterpret_cast<char *>(gpGame) + reinterpret_cast<signed char *>(this)[i + 0x47] * 100 + 0xb53);
         if (b < 0x13 || town[3] == a) {
             if (b == 0) {
-                if (*(int *)(town + 0x18) & 1) {
+                if (*reinterpret_cast<int *>(town + 0x18) & 1) {
                     if (town[0x1c] == c)
                         count++;
                 }
             } else {
-                if (*(int *)(town + 0x18) & (1 << b))
+                if (*reinterpret_cast<int *>(town + 0x18) & (1 << b))
                     count++;
             }
         }
@@ -106,10 +189,10 @@ int playerData::NumOfGivenArtifact(int artifact)
 {
     int count = 0;
     int i;
-    for (i = 0; i < ((signed char *)this)[1]; i++) {
+    for (i = 0; i < reinterpret_cast<signed char *>(this)[1]; i++) {
         int j;
         for (j = 0; j < 0xe; j++) {
-            if (((signed char *)gpGame)[((signed char *)this)[i + 4] * 250 + j + 0x2899] == artifact)
+            if (reinterpret_cast<signed char *>(gpGame)[reinterpret_cast<signed char *>(this)[i + 4] * 250 + j + 0x2899] == artifact)
                 count++;
         }
     }
@@ -122,54 +205,156 @@ int game::MineTypesOwned(int col, int row)
     int num = 0;
     int i;
     for (i = 0; i < 0x90; i++) {
-        if (((signed char *)this)[i * 7 + 0x5cb7] == col &&
-            ((signed char *)this)[i * 7 + 0x5cb8] == row)
+        if (reinterpret_cast<signed char *>(this)[i * 7 + 0x5cb7] == col &&
+            reinterpret_cast<signed char *>(this)[i * 7 + 0x5cb8] == row)
             num++;
     }
     return num;
 }
 
+// @early-stop
+// reloc-masked: identical 0x40d-byte instruction stream; 36/36 relocation targets agree, residual is delinked local-label identity
 VA(0x004710f3, 0x40d)
-void ComputeUALoc(int) {}
+void ComputeUALoc(int player)
+{
+    int result = gpGame->SetupPuzzlePieces(player, 1);
+    if (result < 8 || gpGame->m_ultimateArtifactId == -1) {
+        gpGame->m_players[player].unknown40 = 0;
+        gpGame->m_players[player].unknown41 = -1;
+        gpGame->m_players[player].unknown42 = -1;
+        return;
+    }
+
+    int probability = (result - 8) * 4;
+    if (probability > 100)
+        probability = 100;
+    if (probability < 1)
+        probability = 1;
+    gpGame->m_players[player].unknown40 = static_cast<signed char>(probability);
+
+    if (Random(1, 100) <= gpGame->m_players[player].unknown40) {
+        gpGame->m_players[player].unknown41 = gpGame->m_ultimateArtifactX;
+        gpGame->m_players[player].unknown42 = gpGame->m_ultimateArtifactY;
+        return;
+    }
+
+    int x = -1;
+    int y = -1;
+    int direction = 0;
+    int tries = 0;
+    while (!(x >= 0 && (&x)[0] < MAP_WIDTH && y >= 0 && (&y)[0] < MAP_HEIGHT &&
+             gpGame->m_worldMap.Row(y)[x].triggerType == 0 &&
+             gpGame->m_worldMap.Row(y)[x].objIndex == 0xff &&
+             gpGame->m_worldMap.Row(y)[x].ovlIndex == 0xff &&
+             giGroundToTerrain[gpGame->m_worldMap.Row(y)[x].tile] != 0)) {
+        tries++;
+        direction = 0;
+        while (direction == 0)
+            direction = 3 - Random(0, 2) - Random(0, 2) - Random(0, 2);
+        x = gpGame->m_ultimateArtifactX + direction;
+        direction = 0;
+        while (direction == 0)
+            direction = 3 - Random(0, 2) - Random(0, 2) - Random(0, 2);
+        y = gpGame->m_ultimateArtifactY + direction;
+        if (tries >= 200) {
+            x = gpGame->m_ultimateArtifactX;
+            y = gpGame->m_ultimateArtifactY;
+            goto saveLocation;
+        }
+    }
+saveLocation:
+    gpGame->m_players[player].unknown41 = static_cast<signed char>(x);
+    gpGame->m_players[player].unknown42 = static_cast<signed char>(y);
+}
 
 VA(0x00471500, 0x2ac)
-int game::SetupPuzzlePieces(int, int) { return 0; }
+int game::SetupPuzzlePieces(int player, int justCount)
+{
+    int pieceCountTotal = GetNumObelisks(player);
+    int unvisitedObelisks = 48 - m_obeliskCount;
+    float ratio = static_cast<float>(GetNumObelisks(player)) /
+                  m_obeliskCount;
+    float interpolation = (ratio * ratio + ratio) / 2.0f;
+    pieceCountTotal = static_cast<int>(pieceCountTotal +
+                                      unvisitedObelisks * interpolation);
+
+    if (GetNumObelisks(player) == m_obeliskCount)
+        pieceCountTotal = 48;
+    pieceCountTotal += m_players[player].unknown13;
+    if (pieceCountTotal > 48)
+        pieceCountTotal = 48;
+    if (justCount)
+        return pieceCountTotal;
+
+    memset(puzzlePiecesRemoved, 0, 6);
+    SRand(m_players[player].color + m_players[player].padab[0] * 3);
+    int tries;
+    int fallbackNum;
+    int pieceValue;
+    int i;
+    for (i = 0; (&i)[0] < pieceCountTotal; i++) {
+        for (pieceValue = 0; pieceValue < 48;
+             pieceValue += SRandom(1, 5)) {
+            if (!BitTest(puzzlePiecesRemoved, pieceValue))
+                break;
+        }
+
+        for (tries = 0; tries < 100; tries++) {
+            fallbackNum = SRandom(0, 47);
+            if (!BitTest(puzzlePiecesRemoved, fallbackNum))
+                break;
+        }
+        if (tries >= 100) {
+            for (fallbackNum = 0; fallbackNum < 48; fallbackNum++) {
+                if (!BitTest(puzzlePiecesRemoved, fallbackNum))
+                    break;
+            }
+        }
+        if (fallbackNum >= 48)
+            fallbackNum = 0;
+        if (pieceValue < 48)
+            BitSet(puzzlePiecesRemoved, pieceValue);
+        else
+            BitSet(puzzlePiecesRemoved, fallbackNum);
+    }
+    return pieceCountTotal;
+}
 
 VA(0x004717ac, 0xb5)
 int game::IsMobile(int heroId)
 {
     if (heroId == -1)
         return 0;
-    char *hp = (char *)this + heroId * 250 + 0x27c4;
-    mapCell *cp = gpAdvManager->GetCell(*(int *)(hp + 0x19), *(int *)(hp + 0x1d));
-    return CalcTerrainCost(giGroundToTerrain[cp->tile], 1, *(int *)(hp + 0x35),
-                           ((signed char *)hp)[0x74], cp->objFlag1, 0) <= *(int *)(hp + 0x35);
+    char *hp = reinterpret_cast<char *>(this) + heroId * 250 + 0x27c4;
+    mapCell *cp = gpAdvManager->GetCell(*reinterpret_cast<int *>(hp + 0x19), *reinterpret_cast<int *>(hp + 0x1d));
+    return CalcTerrainCost(giGroundToTerrain[cp->tile], 1, *reinterpret_cast<int *>(hp + 0x35),
+                           reinterpret_cast<signed char *>(hp)[0x74], cp->objFlag1, 0) <= *reinterpret_cast<int *>(hp + 0x35);
 }
 
 VA(0x00471861, 0x1e)
 fullMap *game::GetWorldMapData(void)
 {
-    return (fullMap *)((char *)this + 0xb3e);
+    return reinterpret_cast<fullMap *>(reinterpret_cast<char *>(this) + 0xb3e);
 }
 
 VA(0x0047187f, 0x11e)
 int game::CreateBoat(int x, int y, int notify)
 {
-    int boatIdx = Scan((signed char *)this + 0x631d, 0, 0x30);
+    int boatIdx = Scan(reinterpret_cast<signed char *>(this) + 0x631d, 0, 0x30);
     if (boatIdx != -1) {
         if (notify == 0)
             SendMapChange(4, 0, x, y, -999, 0, 0);
-        ((char *)this)[boatIdx + 0x631d] = (char)boatIdx;
-        char *boat = (char *)this + boatIdx * 8 + 0x619d;
-        boat[0] = (char)boatIdx;
-        boat[1] = (char)x;
-        boat[2] = (char)y;
+        reinterpret_cast<char *>(this)[boatIdx + 0x631d] = static_cast<char>(boatIdx);
+        char *boat = reinterpret_cast<char *>(this) + boatIdx * 8 + 0x619d;
+        boat[0] = static_cast<char>(boatIdx);
+        boat[1] = static_cast<char>(x);
+        boat[2] = static_cast<char>(y);
         boat[3] = 2;
-        boat[7] = (char)giCurPlayer;
+        boat[7] = static_cast<char>(giCurPlayer);
         mapCell *cell = WORLDMAP->Row(y) + x;
-        boat[4] = ((char *)cell)[9];
-        boat[5] = (char)cell->w4hi;
-        ((char *)cell)[9] = (char)0xab;
+        boat[4] = reinterpret_cast<char *>(cell)[9];
+        boat[5] = static_cast<char>(cell->w4hi);
+        reinterpret_cast<char *>(cell)[9] = static_cast<char>(0xab);
         cell->w4hi = boatIdx;
     }
     return boatIdx;
@@ -200,15 +385,47 @@ int game::RandomScan(signed char *array, int start, int range, int unused, signe
 }
 
 VA(0x00471a6d, 0x213)
-int game::GetNewHeroId(int, int, int) { return 0; }
+int game::GetNewHeroId(int, int heroClass, int requireExperienced)
+{
+    int result = -1;
+    int previousHero;
+    int heroId = -1;
+    int attempts = 0;
+    int oldHeroId;
+    while (attempts < 2000) {
+        attempts++;
+        heroId = Random(0, 53);
+        if (m_availableHeroes[heroId] != -1 &&
+            m_availableHeroes[heroId] != 64)
+            continue;
+        if (m_availableHeroes[heroId] == 64 && attempts < 1500)
+            continue;
+        if (heroClass >= 0 && heroClass <= 5 && attempts < 100 &&
+            m_heroRecs[heroId].m_cursorType != heroClass)
+            continue;
+        if (requireExperienced && attempts < 40 &&
+            m_heroRecs[heroId].m_experience < 1000 &&
+            (m_heroRecs[heroId].m_artifacts[0] == -1 ||
+             m_heroRecs[heroId].m_artifacts[0] == 81) &&
+            (m_heroRecs[heroId].m_artifacts[1] == -1 ||
+             m_heroRecs[heroId].m_artifacts[1] == 81))
+            continue;
+        if (gbInCampaign && attempts < 500 &&
+            m_heroRecs[heroId].m_unknown18 >= 54 &&
+            m_heroRecs[heroId].m_unknown18 <= 59)
+            continue;
+        break;
+    }
+    return heroId;
+}
 
 VA(0x00471c80, 0x85)
 int game::GetTownId(int col, int row)
 {
     int i;
     for (i = 0; i < 0x48; i++) {
-        if (((unsigned char *)this)[i * 100 + 0xb57] == col &&
-            ((unsigned char *)this)[i * 100 + 0xb58] == row)
+        if (reinterpret_cast<unsigned char *>(this)[i * 100 + 0xb57] == col &&
+            reinterpret_cast<unsigned char *>(this)[i * 100 + 0xb58] == row)
             return i;
     }
     return -1;
@@ -219,24 +436,513 @@ int game::GetMineId(int col, int row)
 {
     int i;
     for (i = 0; i < 0x90; i++) {
-        if (((unsigned char *)this)[i * 7 + 0x5cbb] == col &&
-            ((unsigned char *)this)[i * 7 + 0x5cbc] == row)
+        if (reinterpret_cast<unsigned char *>(this)[i * 7 + 0x5cbb] == col &&
+            reinterpret_cast<unsigned char *>(this)[i * 7 + 0x5cbc] == row)
             return i;
     }
     return -1;
 }
 
 VA(0x00471d89, 0x12e)
-void GenerateStandardFileName(char *, char *) {}
+void GenerateStandardFileName(char *source, char *destination)
+{
+    char *extension = FindLastToken(source, '.');
+    if (extension == 0) {
+        strcpy(destination, source);
+        return;
+    }
 
+    *extension = 0;
+    int indexOut = 0;
+    int sourceLength = strlen(source);
+    int i;
+    char c;
+    for (i = 0; i < (&sourceLength)[0]; i++) {
+        c = source[i];
+        if (c >= 'a' && c <= 'z')
+            c -= 'a' - 'A';
+        if ((c >= 'A' && c <= 'Z') ||
+            (c >= '0' && c <= '9') || c == '_') {
+            destination[indexOut] = c;
+            indexOut++;
+        }
+        if (indexOut >= 8)
+            i = 999;
+    }
+    *extension = '.';
+    strcpy(destination + indexOut, extension);
+}
+
+// @early-stop
+// reloc-masked: identical 0xbc4-byte code/frame; 135/135 targets agree, only compiler literal/constant symbol identities differ
 VA(0x00471eb7, 0xbc4)
-int game::SaveGame(char *, int, signed char) { return 0; }
+int game::SaveGame(char *filename, int generateName, signed char expansionFormat)
+{
+    void *emptyPayload = BaseAlloc(GAME_SAVE_BUFFER_SIZE, GFILE, GSAVELINE + 10);
+    memset(emptyPayload, 0, GAME_SAVE_BUFFER_SIZE);
+    if (!xIsExpansionMap)
+        expansionFormat = 1;
+    gpAdvManager->DemobilizeCurrHero();
 
+    char savePathValue[452];
+    char generatedNameStorage[452];
+    int humanPlayersVar;
+    int indexFile;
+    int unusedTemp;
+    int oldFlag;
+    int saveValue;
+    int filePadding;
+    int compatibilityReserved;
+    if (generateName) {
+        if (gbInCampaign) {
+            sprintf(generatedNameStorage, "%s.%s", filename, "GMC");
+        } else if (xIsPlayingExpansionCampaign) {
+            sprintf(generatedNameStorage, "%s.%s", filename, "GXC");
+        } else {
+            humanPlayersVar = 0;
+            for (indexFile = 0; indexFile < GAME_PLAYER_COUNT; indexFile++) {
+                if (m_playerDead[indexFile] == 0 && gbHumanPlayer[indexFile])
+                    humanPlayersVar++;
+            }
+            if (xIsExpansionMap && !expansionFormat)
+                sprintf(generatedNameStorage, "%s.GX%d", filename, humanPlayersVar);
+            else
+                sprintf(generatedNameStorage, "%s.GM%d", filename, humanPlayersVar);
+        }
+    } else {
+        sprintf(generatedNameStorage, filename);
+    }
+
+    if (_strnicmp(generatedNameStorage, "RMT", 3) == 0) {
+        sprintf(savePathValue, "%s%s", ".\\DATA\\", generatedNameStorage);
+    } else {
+        sprintf(savePathValue, "%s%s", gcGamePath, generatedNameStorage);
+        if (_strnicmp(generatedNameStorage, "AUTOSAVE", 8) != 0 &&
+            _strnicmp(generatedNameStorage, "PLYREXIT", 8) != 0)
+            strcpy(gpGame->m_saveName, filename);
+    }
+
+    int fileInfo = _open(savePathValue, 0x8301, 0x80);
+    if (fileInfo == -1)
+        FileError(savePathValue);
+
+    int legacyMarkerTemp = -1;
+    if (!expansionFormat)
+        _write(fileInfo, &legacyMarkerTemp, 4);
+    _write(fileInfo, &m_worldMap.width, 4);
+    _write(fileInfo, &m_worldMap.height, 4);
+    _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x2a9, 0x1a4);
+    _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x44d, 0x41);
+    _write(fileInfo, &gbIAmGreatest, 1);
+    _write(fileInfo, this, 2);
+    _write(fileInfo, &giMonthType, 1);
+    _write(fileInfo, &giMonthTypeExtra, 1);
+    _write(fileInfo, &giWeekType, 1);
+    _write(fileInfo, &giWeekTypeExtra, 1);
+    _write(fileInfo, cPlayerNames, 126);
+
+    char legacyData[100];
+    memset(legacyData, 0, 40);
+    _write(fileInfo, legacyData, 36);
+    if (xIsPlayingExpansionCampaign) {
+        int campaignTypeInfo = 2;
+        _write(fileInfo, &campaignTypeInfo, 4);
+        _write(fileInfo, &xCampaign, 0x4f);
+    } else {
+        _write(fileInfo, &gbInCampaign, 4);
+        if (gbInCampaign)
+            _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 2, 0x147);
+    }
+    if (!expansionFormat)
+        _write(fileInfo, &xIsExpansionMap, 1);
+
+    gpAdvManager->PurgeMapChangeQueue();
+    _write(fileInfo, &giMapChangeCtr, 4);
+    GenerateStandardFileName(m_saveName, legacyData);
+    _write(fileInfo, legacyData, 14);
+    _write(fileInfo, &m_playerCount, 1);
+    char currentPlayerInfo[4];
+    currentPlayerInfo[0] = static_cast<char>(giCurPlayer);
+    _write(fileInfo, currentPlayerInfo, 1);
+    _write(fileInfo, &m_unknown48f, 1);
+    _write(fileInfo, m_playerDead, 6);
+
+    char humanFlagsLocal[8];
+    for (indexFile = 0; indexFile < GAME_PLAYER_COUNT; indexFile++) {
+        humanFlagsLocal[indexFile] = static_cast<char>(gbHumanPlayer[indexFile]);
+        if (m_playerDead[indexFile] != 0)
+            humanFlagsLocal[indexFile] = 0;
+    }
+    _write(fileInfo, humanFlagsLocal, 6);
+    _write(fileInfo, &m_day, 2);
+    _write(fileInfo, &m_week, 2);
+    _write(fileInfo, &m_month, 2);
+    for (indexFile = 0; indexFile < GAME_PLAYER_COUNT; indexFile++)
+        reinterpret_cast<playerData *>(&m_players[indexFile])->Write(fileInfo);
+
+    _write(fileInfo, &m_obeliskCount, 1);
+    for (indexFile = 0; indexFile < GAME_HERO_COUNT; indexFile++)
+        m_heroRecs[indexFile].Write(fileInfo, !expansionFormat);
+    _write(fileInfo, m_availableHeroes, GAME_HERO_COUNT);
+    _write(fileInfo, m_castleRecs, 0x1c20);
+    _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x2773, 0x48);
+    _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x27bb, 9);
+    _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x5cb6, 0x3f0);
+    _write(fileInfo, m_mineOwners, 0x90);
+    if (!expansionFormat)
+        _write(fileInfo, m_randomArtifacts, 0x67);
+    else
+        _write(fileInfo, m_randomArtifacts, 0x52);
+    _write(fileInfo, m_boats, 0x180);
+    _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x631d, 0x30);
+    _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x634d, 0x30);
+    _write(fileInfo, &m_ultimateArtifactX, 1);
+    _write(fileInfo, &m_ultimateArtifactY, 1);
+    _write(fileInfo, &m_ultimateArtifactId, 1);
+    _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x63aa, 0x12d);
+    _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x637d, 0x18);
+    _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x64d7, 4);
+    _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x64d9,
+           *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x64d7) * 2);
+    _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x6515, 4);
+    _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x6517,
+           *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x6515) * 2);
+    _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x657b, 4);
+    _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x657d,
+           *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x657b) * 2);
+
+    int markerBuffer[3];
+    markerBuffer[0] = GAME_FILE_MARKER;
+    int unusedMarkerInfo = GAME_UNUSED_FILE_MARKER;
+    _write(fileInfo, markerBuffer, 4);
+    _write(fileInfo, &iMaxMapExtra, 4);
+    _write(fileInfo, markerBuffer, 4);
+    for (indexFile = 1; indexFile < iMaxMapExtra; indexFile++) {
+        _write(fileInfo, markerBuffer, 4);
+        _write(fileInfo, pwSizeOfMapExtra + indexFile, 2);
+        if (ppMapExtra[indexFile] != 0)
+            _write(fileInfo, ppMapExtra[indexFile], pwSizeOfMapExtra[indexFile]);
+        else
+            _write(fileInfo, emptyPayload, pwSizeOfMapExtra[indexFile]);
+    }
+    _write(fileInfo, markerBuffer, 4);
+    _write(fileInfo, mapExtra, MAP_WIDTH * MAP_HEIGHT);
+    _write(fileInfo, markerBuffer, 4);
+    m_worldMap.Write(fileInfo);
+    _write(fileInfo, markerBuffer, 4);
+    _close(fileInfo);
+    BaseFree(emptyPayload, GFILE, GSAVELINE + 0xed);
+    return 1;
+}
+
+// @early-stop
+// reloc-masked: identical 0xb44-byte code/frame; 75/75 targets agree, only compiler literal/constant symbol identities differ
 VA(0x00472a7b, 0xb44)
-void game::SetupOrigData(void) {}
+void game::SetupOrigData(void)
+{
+    ClearMapExtra();
+    gbIAmGreatest = 0;
+    field_0x0 = 1;
+    giMonthType = 0;
+    giMonthTypeExtra = 0;
+    giWeekType = 0;
+    giWeekTypeExtra = 0;
+    m_unknown639d = 0;
+    gpAdvManager->PurgeMapChangeQueue();
+    giMapChangeCtr = 1;
+    strcpy(m_saveName, "NEWGAME");
+    m_playerCount = 4;
+    m_unknown48f = 0;
+    memset(m_playerDead, 0, GAME_PLAYER_COUNT);
+    m_month = 1;
+    m_week = m_month;
+    m_day = m_week;
+    giCurTurn = 1;
 
+    int i;
+    int j;
+    for (i = 0; i < GAME_PLAYER_COUNT; i++) {
+        strcpy(m_defaultPlayerNames + i * 4, "Lord");
+        if (i < (&giNumHumanPlayers)[0]) {
+            if (i == 0 || iMPBaseType == 2)
+                gbThisNetHumanPlayer[i] = 1;
+            else
+                gbThisNetHumanPlayer[i] = 0;
+            gbHumanPlayer[i] = 1;
+        } else {
+            gbThisNetHumanPlayer[i] = 0;
+            gbHumanPlayer[i] = 0;
+        }
+        memset(&m_players[i], 0, sizeof(m_players[i]));
+        m_players[i].color = static_cast<signed char>(i);
+        m_players[i].heroCount = 0;
+        m_players[i].townCount = 0;
+        m_players[i].unknown43 = -1;
+        m_players[i].unknown13 = 0;
+        memset(m_players[i].unknown0c, -1, 2);
+        memset(m_players[i].heroes, -1, 8);
+        memset(m_players[i].towns, -1, GAME_TOWN_COUNT);
+    }
+
+    m_obeliskCount = 0;
+    gpAdvManager->heroContextLocked = 0;
+    memset(m_availableHeroes, -1, GAME_HERO_COUNT);
+    for (i = 0; i < GAME_HERO_COUNT; i++) {
+        memset(&m_heroRecs[i], 0, sizeof(m_heroRecs[i]));
+        memset(reinterpret_cast<unsigned char *>(&m_heroRecs[i]) + 0x94, 0, 0x41);
+        memset(m_heroRecs[i].m_artifacts, -1, 14);
+        m_heroRecs[i].m_unknown2a = -1;
+        m_heroRecs[i].m_unknown29 = m_heroRecs[i].m_unknown2a;
+        m_heroRecs[i].m_id = static_cast<signed char>(i);
+        m_heroRecs[i].m_unknown18 = static_cast<unsigned char>(i);
+        m_heroRecs[i].m_owner = -1;
+        m_heroRecs[i].m_direction = 2;
+        strcpy(m_heroRecs[i].m_name, gHeroDefaultNames[i]);
+        m_heroRecs[i].m_cursorType = static_cast<unsigned char>(i / 9);
+        for (j = 0; j < 5; j++)
+            reinterpret_cast<unsigned char *>(&m_heroRecs[i].m_attack)[j] =
+                gStartingHeroStats[m_heroRecs[i].m_cursorType][j];
+        for (j = 0; j < 5; j++)
+            reinterpret_cast<signed char *>(&m_heroRecs[i].m_army)[j] = -1;
+        m_heroRecs[i].field_0x25 = -1;
+        m_heroRecs[i].field_0x21 = m_heroRecs[i].field_0x25;
+        m_heroRecs[i].m_level = 1;
+        m_heroRecs[i].m_spellPoints = m_heroRecs[i].Stats(3) * 10;
+        m_heroRecs[i].m_secondarySkillCount = 0;
+        for (j = 0; j < 14; j++) {
+            m_heroRecs[i].m_secondarySkills[j] = 0;
+            m_heroRecs[i].m_secondarySkillOrder[j] = 0;
+        }
+        if (m_heroRecs[i].m_cursorType == 0) {
+            m_heroRecs[i].GiveSS(HERO_SKILL_LEADERSHIP, 1);
+            m_heroRecs[i].GiveSS(HERO_SKILL_BALLISTICS, 1);
+        }
+        if (m_heroRecs[i].m_cursorType == 2) {
+            m_heroRecs[i].m_artifacts[0] = 81;
+            m_heroRecs[i].GiveSS(HERO_SKILL_MYSTICISM, 2);
+            m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, 1);
+        }
+        if (m_heroRecs[i].m_cursorType == 1)
+            m_heroRecs[i].GiveSS(HERO_SKILL_PATHFINDING, 2);
+        if (m_heroRecs[i].m_cursorType == 3) {
+            m_heroRecs[i].m_artifacts[0] = 81;
+            m_heroRecs[i].GiveSS(HERO_SKILL_ARCHERY, 2);
+            m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, 1);
+        }
+        if (m_heroRecs[i].m_cursorType == 4) {
+            m_heroRecs[i].m_artifacts[0] = 81;
+            m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, 2);
+        }
+        if (m_heroRecs[i].m_cursorType == 5) {
+            m_heroRecs[i].m_artifacts[0] = 81;
+            m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, 1);
+            m_heroRecs[i].GiveSS(HERO_SKILL_NECROMANCY, 1);
+        }
+    }
+
+    memset(reinterpret_cast<unsigned char *>(this) + 0x2773, -1, GAME_TOWN_COUNT);
+    for (i = 0; i < GAME_TOWN_COUNT; i++) {
+        memset(&m_castleRecs[i], 0, 100);
+        reinterpret_cast<unsigned char *>(&m_castleRecs[i])[0x36] = 0;
+        reinterpret_cast<unsigned char *>(&m_castleRecs[i])[0] = static_cast<unsigned char>(i);
+        reinterpret_cast<unsigned char *>(&m_castleRecs[i])[1] = 0xff;
+        reinterpret_cast<unsigned char *>(&m_castleRecs[i])[3] = static_cast<unsigned char>(i / 9);
+        reinterpret_cast<unsigned char *>(&m_castleRecs[i])[0x17] = 0xff;
+        for (j = 0; j < 5; j++)
+            reinterpret_cast<unsigned char *>(this)[(&j)[0] + i * 100 + 0xb5b] = 0xff;
+    }
+    for (i = 0; i < GAME_MINE_COUNT; i++)
+        memset(&m_mines[i], -1, sizeof(m_mines[i]));
+    memset(m_mineOwners, -1, GAME_MINE_COUNT);
+    for (i = 0; i < GAME_BOAT_COUNT; i++) {
+        memset(&m_boats[i], 0, sizeof(m_boats[i]));
+        m_boats[i].id = static_cast<signed char>(i);
+        m_boats[i].heroId = -1;
+    }
+    memset(reinterpret_cast<unsigned char *>(this) + 0x27bb, 0, 9);
+    memset(reinterpret_cast<unsigned char *>(this) + 0x631d, -1, GAME_BOAT_COUNT);
+    m_ultimateArtifactY = -1;
+    m_ultimateArtifactX = m_ultimateArtifactY;
+    memset(m_obeliskVisitors, 0, 48);
+    strcpy(gpGame->m_saveName, "NEWGAME");
+    giCurPlayer = 0;
+    gpCurPlayer = reinterpret_cast<playerData *>(&gpGame->m_players[giCurPlayer]);
+    giCurPlayerBit = static_cast<unsigned char>(1 << giCurPlayer);
+    giCurWatchPlayer = giCurPlayer;
+    while (!gbThisNetHumanPlayer[giCurWatchPlayer])
+        giCurWatchPlayer = (giCurWatchPlayer + 1) % m_playerCount;
+    giCurWatchPlayerBit = static_cast<unsigned char>(1 << giCurWatchPlayer);
+    gpAdvManager->CheckSetEvilInterface(0, -1);
+    bShowIt = gbThisNetHumanPlayer[giCurPlayer];
+}
+
+// @early-stop
+// reloc-masked: identical 0xc27-byte code/frame; 164/164 targets agree, only compiler literal/constant symbol identities differ
 VA(0x004735bf, 0xc27)
-void game::LoadGame(char *, int, int) {}
+void game::LoadGame(char *filename, int loadFromFile, int)
+{
+    LogStr("LG1");
+    if (loadFromFile) {
+        SetupOrigData();
+        return;
+    }
+    LogStr("LG2");
+        int humansLoaded = 0;
+        gbGameOver = 0;
+        reinterpret_cast<unsigned char *>(this)[0x660e] = 1;
+
+        char path[452];
+        if (!loadFromFile && _strnicmp(filename, "RMT", 3) == 0)
+            sprintf(path, "%s%s", ".\\DATA\\", filename);
+        else
+            sprintf(path, "%s%s", gcGamePath, filename);
+
+        int file = _open(path, 0x8000);
+        if (file == -1)
+            FileError(path);
+        ClearMapExtra();
+
+        signed char expansionMarker = 0;
+        int width;
+        int height[11];
+        _read(file, &width, 4);
+        if (width == -1) {
+            expansionMarker = 1;
+            _read(file, &width, 4);
+        }
+        _read(file, height, 4);
+        SetMapSize(width, height[0]);
+        _read(file, reinterpret_cast<unsigned char *>(this) + 0x2a9, 0x1a4);
+        _read(file, reinterpret_cast<unsigned char *>(this) + 0x44d, 0x41);
+        _read(file, &gbIAmGreatest, 1);
+        _read(file, this, 2);
+        _read(file, &giMonthType, 1);
+        _read(file, &giMonthTypeExtra, 1);
+        _read(file, &giWeekType, 1);
+        _read(file, &giWeekTypeExtra, 1);
+        _read(file, cPlayerNames, 126);
+
+        char oldData[40];
+        _read(file, oldData, 36);
+        _read(file, &gbInCampaign, 4);
+        if (gbInCampaign == 1) {
+            _read(file, reinterpret_cast<unsigned char *>(this) + 2, 0x147);
+        } else if (gbInCampaign == 2) {
+            xIsPlayingExpansionCampaign = 1;
+            gbInCampaign = 0;
+            _read(file, &xCampaign, 0x4f);
+        }
+        if (expansionMarker)
+            _read(file, &xIsExpansionMap, 1);
+
+        gpAdvManager->PurgeMapChangeQueue();
+        _read(file, &giMapChangeCtr, 4);
+        _read(file, oldData, 14);
+        if (_strnicmp(filename, "RMT", 3) != 0)
+            sprintf(gpGame->m_saveName, filename);
+        _read(file, &m_playerCount, 1);
+
+        char currentPlayer[8];
+        _read(file, currentPlayer, 1);
+        giCurPlayer = currentPlayer[0];
+        _read(file, &m_unknown48f, 1);
+        _read(file, m_playerDead, 6);
+
+        char humanFlags[8];
+        _read(file, humanFlags, 6);
+        int i;
+        for (i = 0; i < GAME_PLAYER_COUNT; i++) {
+            if (humanFlags[i] && humansLoaded < (&giNumHumanPlayers)[0]) {
+                humansLoaded++;
+                gbHumanPlayer[i] = 1;
+            } else {
+                gbHumanPlayer[i] = 0;
+            }
+        }
+        for (i = 0; i < GAME_PLAYER_COUNT; i++) {
+            if (gbHumanPlayer[i]) {
+                if (!gbRemoteOn || (&i)[0] == giThisGamePos)
+                    gbThisNetHumanPlayer[i] = 1;
+                else
+                    gbThisNetHumanPlayer[i] = 0;
+            } else {
+                gbThisNetHumanPlayer[i] = 0;
+            }
+        }
+
+        _read(file, &m_day, 2);
+        _read(file, &m_week, 2);
+        _read(file, &m_month, 2);
+        giCurTurn = (m_week - 1) * 7 + (m_month - 1) * 28 + m_day;
+        for (i = 0; i < GAME_PLAYER_COUNT; i++)
+            reinterpret_cast<playerData *>(&m_players[i])->Read(file);
+
+        _read(file, &m_obeliskCount, 1);
+        for (i = 0; i < GAME_HERO_COUNT; i++)
+            m_heroRecs[i].Read(file, expansionMarker);
+        _read(file, m_availableHeroes, GAME_HERO_COUNT);
+        _read(file, m_castleRecs, 0x1c20);
+        _read(file, reinterpret_cast<unsigned char *>(this) + 0x2773, 0x48);
+        _read(file, reinterpret_cast<unsigned char *>(this) + 0x27bb, 9);
+        _read(file, m_mines, 0x3f0);
+        _read(file, m_mineOwners, 0x90);
+        if (expansionMarker)
+            _read(file, m_randomArtifacts, 0x67);
+        else
+            _read(file, m_randomArtifacts, 0x52);
+        _read(file, m_boats, 0x180);
+        _read(file, reinterpret_cast<unsigned char *>(this) + 0x631d, 0x30);
+        _read(file, m_obeliskVisitors, 0x30);
+        _read(file, &m_ultimateArtifactX, 1);
+        _read(file, &m_ultimateArtifactY, 1);
+        _read(file, &m_ultimateArtifactId, 1);
+        _read(file, reinterpret_cast<unsigned char *>(this) + 0x63aa, 0x12d);
+        _read(file, m_defaultPlayerNames, 0x18);
+        _read(file, reinterpret_cast<unsigned char *>(this) + 0x64d7, 4);
+        _read(file, reinterpret_cast<unsigned char *>(this) + 0x64d9,
+              *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x64d7) * 2);
+        _read(file, reinterpret_cast<unsigned char *>(this) + 0x6515, 4);
+        _read(file, reinterpret_cast<unsigned char *>(this) + 0x6517,
+              *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x6515) * 2);
+        _read(file, reinterpret_cast<unsigned char *>(this) + 0x657b, 4);
+        _read(file, reinterpret_cast<unsigned char *>(this) + 0x657d,
+              *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x657b) * 2);
+
+        char marker[8];
+        _read(file, marker, 4);
+        _read(file, &iMaxMapExtra, 4);
+        _read(file, marker, 4);
+        ppMapExtra = reinterpret_cast<void **>(
+            BaseAlloc(iMaxMapExtra * 4, GFILE, GLOADLINE + 0xcb));
+        pwSizeOfMapExtra = reinterpret_cast<short *>(
+            BaseAlloc(iMaxMapExtra * 2, GFILE, GLOADLINE + 0xcc));
+        memset(ppMapExtra, 0, iMaxMapExtra * 4);
+        memset(pwSizeOfMapExtra, 0, iMaxMapExtra * 2);
+        for (i = 1; (&i)[0] < iMaxMapExtra; i++) {
+            _read(file, marker, 4);
+            _read(file, pwSizeOfMapExtra + i, 2);
+            ppMapExtra[i] = BaseAlloc(pwSizeOfMapExtra[i], GFILE, GLOADLINE + 0xd5);
+            _read(file, ppMapExtra[i], pwSizeOfMapExtra[i]);
+        }
+        _read(file, marker, 4);
+        _read(file, mapExtra, MAP_WIDTH * MAP_HEIGHT);
+        _read(file, marker, 4);
+        m_worldMap.Read(file, 0);
+        _read(file, marker, 4);
+        _close(file);
+
+        gpAdvManager->heroContextLocked = 0;
+        gpCurPlayer = reinterpret_cast<playerData *>(&gpGame->m_players[giCurPlayer]);
+        giCurPlayerBit = static_cast<unsigned char>(1 << giCurPlayer);
+        giCurWatchPlayer = giCurPlayer;
+        while (!gbThisNetHumanPlayer[giCurWatchPlayer])
+            giCurWatchPlayer = (giCurWatchPlayer + 1) % m_playerCount;
+        giCurWatchPlayerBit = static_cast<unsigned char>(1 << giCurWatchPlayer);
+        bShowIt = gbThisNetHumanPlayer[giCurPlayer];
+        SetupAdjacentMons();
+        LogStr("LG3");
+        gpAdvManager->CheckSetEvilInterface(0, -1);
+}
 
 VA(0x004741e6, 0x3ee)
 void game::GiveTroopsToNeutralTown(int) {}
