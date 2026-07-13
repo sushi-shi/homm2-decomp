@@ -29,11 +29,13 @@
 #include <EDITOR/fullMap.h>
 #include <EDITOR/mapcell.h>
 #include <SOURCE/KB.h>
+#include <SOURCE/CURSOR.h>
 #include <SOURCE/HERO.h>
 #include <SOURCE/EVENTS.h>
 #include <SOURCE/ExpCampaign.h>
 #include <SOURCE/GAME.h>
 #include <SOURCE/PHILAI.h>
+#include <SOURCE/NOOPT.h>
 #include <SOURCE/philAI.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/advManager.h>
@@ -4655,11 +4657,191 @@ int advManager::GetSoundId(int x, int y)
     return ADVMGR_ENVIRONMENT_SOUND_NONE;
 }
 
+// @early-stop
+// Exact frame and instruction stream outside +0x2e..+0x3c. Retail evaluates
+// MAP_HEIGHT > mapY as a 15-byte reversed compare; MSVC emits the equivalent
+// 14-byte compare here. The resulting size delta is one byte, all 9 external
+// relocation addresses agree, and semantics-preserving AST operand swaps were
+// exhausted. The constant-pool relocation spelling differs but its address agrees.
 VA(0x00466ef0, 0x23a)
-void advManager::InsertSound(int, int, int, int) {}
+void advManager::InsertSound(int x, int mapY, int distance, int soundLayer)
+{
+    int soundSlot;
+    int distanceLimit;
+    int activeIndex;
+    int soundId;
 
+    if (!(x >= 0 && mapY >= 0 && x < MAP_WIDTH && MAP_HEIGHT > mapY))
+        return;
+
+    soundId = GetSoundId(x, mapY);
+    if (soundId == ADVMGR_ENVIRONMENT_SOUND_NONE)
+        return;
+
+    for (activeIndex = 0; activeIndex < ADVMGR_SOUND_CELL_COUNT; ++activeIndex) {
+        if (m_activeSounds[activeIndex].soundId == soundId) {
+            if (m_activeSounds[activeIndex].volume > distance) {
+                m_activeSounds[activeIndex].volume = distance;
+                m_activeSoundMask |=
+                    1 << m_activeSounds[activeIndex].soundId;
+            }
+            return;
+        }
+    }
+
+    if (soundLayer == ADVMGR_ENVIRONMENT_SOUND_FIRST_LAYER)
+        return;
+
+    distanceLimit = distance;
+    soundSlot = ADVMGR_ENVIRONMENT_SOUND_NONE;
+    for (activeIndex = 0; activeIndex < ADVMGR_SOUND_CELL_COUNT;
+         ++activeIndex) {
+        if (m_activeSounds[activeIndex].volume > distanceLimit) {
+            distanceLimit = m_activeSounds[activeIndex].volume;
+            soundSlot = activeIndex;
+        }
+    }
+
+    if (soundSlot != ADVMGR_ENVIRONMENT_SOUND_NONE) {
+        if (m_activeSounds[soundSlot].soundId !=
+            ADVMGR_ENVIRONMENT_SOUND_NONE) {
+            gpSoundManager->StopSample(
+                m_loopingSamples[m_activeSounds[soundSlot].soundId]
+                    ->m_activeSample);
+        }
+        m_activeSounds[soundSlot].soundId = soundId;
+        m_activeSounds[soundSlot].volume = distance;
+        CheckLoadSample(soundId);
+        m_loopingSamples[soundId]->m_volume =
+            ADVMGR_ENVIRONMENT_VOLUME(distance);
+        m_loopingSamples[soundId]->m_loopCount = 0;
+        m_loopingSamples[soundId]->m_channelType =
+            ADVMGR_ENVIRONMENT_SOUND_CHANNEL_TYPE;
+        gpSoundManager->MemorySample(m_loopingSamples[soundId]);
+        m_activeSoundMask ^=
+            1 << m_activeSounds[soundSlot].soundId;
+    }
+}
+
+// @early-stop
+// Exact 0x24 frame and instruction stream outside +0x343..+0x359. Retail emits
+// a 23-byte load/OR/store for m_eventFlags; MSVC folds every value-preserving
+// direct spelling tested to the equivalent 13-byte memory OR. The size delta is
+// exactly 10 bytes and all 44 external relocation addresses agree.
 VA(0x0046712a, 0x40f)
-void advManager::TeleportTo(class hero *, int, int, int, int) {}
+void advManager::TeleportTo(hero *mapHero, int destinationX, int destinationY,
+                            int, int skipMapChange)
+{
+    int savedShow11;
+    int terrain5;
+    mapCell *oldCell2;
+    int oldCellFlag26;
+    int unused47;
+    mapCell *destinationCell29;
+    int fizzleTime36;
+    town *occupiedTown47;
+
+    savedShow11 = bShowIt;
+    if (skipMapChange == 0) {
+        SendMapChange(ADVMGR_TELEPORT_MAP_CHANGE, mapHero->m_id,
+                      static_cast<unsigned char>(destinationX),
+                      static_cast<unsigned char>(destinationY),
+                      ADVMGR_TELEPORT_MAP_CHANGE_VALUE, 0, 0);
+    }
+
+    destinationCell29 = GetCell(destinationX, destinationY);
+    oldCell2 = GetCell(mapHero->m_x, mapHero->m_y);
+    if (mapHero->m_locationType == HERO_TOWN_LOCATION) {
+        occupiedTown47 = gpGame->GetTown(mapHero->m_occupiedTown);
+        occupiedTown47->m_occupyingHeroId = ADVMGR_INVALID_HERO;
+    }
+
+    oldCellFlag26 = 0;
+    if (oldCell2->field8 & ADVMGR_TELEPORT_CELL_OBJECT_FLAG) {
+        oldCell2->field8 -= ADVMGR_TELEPORT_CELL_OBJECT_FLAG;
+        oldCellFlag26 = 1;
+    } else {
+        gpGame->RestoreCell(mapHero->m_x, mapHero->m_y,
+                            mapHero->m_locationType, mapHero->m_occupiedTown,
+                            0, ADVMGR_TELEPORT_RESTORE_MODE);
+    }
+
+    CompleteDraw(0);
+    if (gbThisNetHumanPlayer[giCurPlayer] == 0) {
+        if ((const_00128d38 == 0 &&
+             MapExtraPosAndAdjacentsSet(mapHero->m_x, mapHero->m_y,
+                                        giCurWatchPlayerBit)) ||
+            MapExtraPosAndAdjacentsSet(destinationX, destinationY,
+                                       giCurWatchPlayerBit)) {
+            bShowIt = 1;
+        } else {
+            bShowIt = 0;
+        }
+    }
+
+    if (savedShow11 != 0)
+        HideRoute(1, 1, 1);
+
+    if (bShowIt != 0) {
+        m_mapOriginX = destinationX - ADVMGR_TELEPORT_VIEW_CENTER;
+        m_mapOriginY = destinationY - ADVMGR_TELEPORT_VIEW_CENTER;
+        DelayMilli(ADVMGR_TELEPORT_DELAY);
+    }
+
+    mapHero->m_x = destinationX;
+    mapHero->m_y = destinationY;
+    gpGame->SetVisibility(
+        m_mapOriginX + ADVMGR_TELEPORT_VIEW_CENTER,
+        m_mapOriginY + ADVMGR_TELEPORT_VIEW_CENTER, giCurPlayer,
+        giVisRange[mapHero->m_secondarySkills[HERO_SKILL_SCOUTING]] +
+            (static_cast<unsigned int>(mapHero->HasArtifact(
+                 ADVMGR_TELEPORT_TELESCOPE_ARTIFACT)) >= 1));
+
+    if (bShowIt != 0) {
+        destinationCell29->field8 |= ADVMGR_TELEPORT_CELL_OBJECT_FLAG;
+        gpWindowManager->SaveFizzleSource(
+            ADVMGR_UPDATE_VIEWPORT_ORIGIN, ADVMGR_UPDATE_VIEWPORT_ORIGIN,
+            ADVMGR_UPDATE_VIEWPORT_SIZE, ADVMGR_UPDATE_VIEWPORT_SIZE);
+        CompleteDraw(0);
+        PollSound();
+        fizzleTime36 = ADVMGR_TELEPORT_FIZZLE_TIME;
+        if (gbThisNetHumanPlayer[giCurPlayer] == 0)
+            fizzleTime36 -= ADVMGR_TELEPORT_REMOTE_FIZZLE_ADJUSTMENT;
+        gpWindowManager->FizzleForward(
+            ADVMGR_UPDATE_VIEWPORT_ORIGIN, ADVMGR_UPDATE_VIEWPORT_ORIGIN,
+            ADVMGR_UPDATE_VIEWPORT_SIZE, ADVMGR_UPDATE_VIEWPORT_SIZE,
+            ADVMGR_ENVIRONMENT_SOUND_NONE, 0, 0);
+        PollSound();
+    } else {
+        mapHero->m_locationType = destinationCell29->triggerType;
+        mapHero->m_occupiedTown = destinationCell29->w4hi;
+        if (oldCellFlag26 != 0) {
+            destinationCell29->field8 |= ADVMGR_TELEPORT_CELL_OBJECT_FLAG;
+        } else {
+            destinationCell29->triggerType = ADVMGR_HERO_TRIGGER;
+            destinationCell29->w4hi =
+                static_cast<unsigned char>(mapHero->m_id);
+        }
+        if (m_cursorType == BOAT_CURSOR_TYPE) {
+            mapHero->m_eventFlags =
+                HERO_EVENT_EMBARKED | mapHero->m_eventFlags;
+        }
+        m_cursorActive = 0;
+    }
+
+    SetEnvironmentOrigin(m_mapOriginX + ADVMGR_TELEPORT_VIEW_CENTER,
+                         m_mapOriginY + ADVMGR_TELEPORT_VIEW_CENTER, 1);
+    terrain5 = giGroundToTerrain[destinationCell29->tile];
+    if (m_currentTerrain != terrain5) {
+        m_currentTerrain = terrain5;
+        gpSoundManager->SwitchAmbientMusic(
+            giTerrainToMusicTrack[m_currentTerrain]);
+    }
+    Reseed(0, 0);
+    UpdateRadar(1, 0);
+    CompleteDraw(0);
+    ForceNewHover();
+}
 
 VA(0x00467539, 0x1fb)
 void advManager::DimensionDoor(void) {}
