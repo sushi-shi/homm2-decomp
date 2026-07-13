@@ -116,7 +116,7 @@ extern int giTerrainCost[10][4][2];
 extern char *gTownPrefixNames[6];
 extern char *gTownObjNames[32];
 extern int giDebugBuildingToBuild;
-extern unsigned char *giTerrainToMusicTrack;
+extern unsigned char giTerrainToMusicTrack[16];
 extern char *cHeroTypeShortName[6];
 extern char *cHeroTypeInitial;
 extern int giDeferObjDrawX;

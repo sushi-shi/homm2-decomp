@@ -227,6 +227,7 @@ extern int MAP_WIDTH;
 extern unsigned char *mapExtra;
 extern tag_tilePoint normalDirTable[];
 extern SAMPLE2 NULL_SAMPLE2;
+inline SAMPLE2 &GetNullSample(void) { return NULL_SAMPLE2; }
 extern heroWindow *pNormalDialogWindow;
 extern void **ppMapExtra;
 extern short *pwSizeOfMapExtra;

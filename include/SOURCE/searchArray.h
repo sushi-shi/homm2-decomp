@@ -5,6 +5,25 @@
 #include <va.h>
 // forward declarations:
 class army;
+extern int MAP_WIDTH;
+
+#pragma pack(push, 1)
+struct searchCell {
+    unsigned short cost;
+    unsigned short previous;
+    unsigned char flags : 1;
+    char pad[4];
+};
+#pragma pack(pop)
+SIZE(searchCell, 9);
+
+union searchStorage {
+    struct searchCell *cells;
+    struct {
+        char pad[3];
+        unsigned char directions[0x101];
+    } path;
+};
 
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class searchArray {
@@ -13,11 +32,12 @@ public:
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     int    field_0x0;  // +0x00
     int    field_0x4;  // +0x04
-    int    field_0x8;  // +0x08
+    int    m_pathLength;  // +0x08
     int    field_0xc;  // +0x0c
     int    field_0x10;  // +0x10
     int    field_0x14;  // +0x14
-    char _pad_0x18[0x2500];  // tail pad to sizeof
+    char _pad_0x18[0x23fc];
+    searchStorage m_storage;  // +0x2414, path directions overlap the search-cell pointer
     // --- constructors ---
     searchArray(void);
     ~searchArray();
@@ -33,6 +53,7 @@ public:
     void SeedCombatPosition(class army *);
     int FindCombatPath(int, int, class army *, int, int);
     void PushCombatPoint(int, int, int, int);
+    searchCell &GetCell(int x, int y) { return (m_storage.cells + y * MAP_WIDTH)[x]; }
 };
 #pragma pack(pop)
 SIZE(searchArray, 0x2518);

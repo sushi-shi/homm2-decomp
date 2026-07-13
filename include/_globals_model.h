@@ -19,8 +19,14 @@ DATA(0x004faeb2) extern monsterRV gMonsterInfo[100];     // monster-DB view, 26B
 //  now indexes the array directly via the RES_* enum, which matches the retail byte-for-byte.)
 DATA(0x0051ef24) extern char gDefaultCursorName[]; // default cursor resource name (mouseManager::SetColorMice)
 DATA(0x00528dca) extern int gCdMusic; // CD-vs-MIDI music mode (dword-accessed) (soundManager::MusicPlaying)
-DATA(0x00528d28) extern int gMidiEnabled; // MIDI music volume 0-10 (0=off) (soundManager::MIDIIsPlaying/ConvertVolume)
-DATA(0x00528d2c) extern int gSampleVolume; // sample/CD music volume 0-10 (soundManager::ConvertVolume)
+DATA(0x00528d28) extern int const_00128d28; // MIDI music volume 0-10 (0=off)
+#define gMidiEnabled const_00128d28
+DATA(0x00528d2c) extern int const_00128d2c; // sample/CD music volume 0-10
+#define gSampleVolume const_00128d2c
+DATA(0x00528d24) extern int const_00128d24;
+#define gCursorSampleSet const_00128d24
+DATA(0x00528e46) extern int gSoundTransition;
+DATA(0x004f59a8) extern short const_000f59a8;
 
 
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---

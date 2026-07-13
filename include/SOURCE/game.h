@@ -65,7 +65,8 @@ struct playerRec {
     signed char townWindowTop;
     signed char towns[72];
     int resources[7];
-    char padab[0x70];
+    signed char evilInterface;
+    char padac[0x6f];
 };
 #pragma pack(pop)
 #endif
@@ -120,7 +121,9 @@ public:
     char   field_0xb8;  // +0xb8
     char   field_0xb9;  // +0xb9
     short  field_0xba;  // +0xba
-    char _pad_0xbc[0x8e];
+    char _pad_0xbc[0x15];
+    unsigned char m_campaignCheated;  // +0xd1
+    char _pad_0xd2[0x78];
     char m_saveName[0x15f];  // +0x14a
     int    field_0x2a9;  // +0x2a9
     char   field_0x2ad;  // +0x2ad
@@ -178,7 +181,7 @@ public:
     signed char m_ultimateArtifactY;  // +0x6396
     signed char m_ultimateArtifactId;  // +0x6397
     char m_pad_0x6398[5];
-    signed char m_unknown639d;
+    unsigned char m_cheated;  // +0x639d
     // --- methods ---
     void SetupDynamicStuff(int, int, int);
     void SetupNewOverviewType(int, int);
@@ -211,6 +214,8 @@ public:
     int RandomScan(signed char *, int, int, int, signed char);
     int GetNewHeroId(int, int, int);
     int GetTownId(int, int);
+    hero *GetHero(int id) { return &m_heroRecs[id]; }
+    town *GetTown(int id) { return reinterpret_cast<town *>(&m_castleRecs[id]); }
     int GetMineId(int, int);
     int SaveGame(char *, int, signed char);
     void SetupOrigData(void);

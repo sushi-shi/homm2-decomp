@@ -13,9 +13,16 @@ class sample;
 class town;
 class heroWindow;
 class icon;
+class iconWidget;
+class tileset;
 struct SAMPLE2;
 struct SMapChange;
 struct tag_message;
+
+struct adventureSoundCell {
+    int soundId;
+    int volume;
+};
 
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class advManager : public baseManager {
@@ -23,104 +30,72 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
-    int    field_0x36;  // +0x36
-    int    field_0x3a;  // +0x3a
-    int    field_0x3e;  // +0x3e
-    int    field_0x42;  // +0x42
-    int    field_0x46;  // +0x46
-    int    field_0x4a;  // +0x4a
-    char _pad_0x4e[0x1c];
-    int    field_0x6a;  // +0x6a
-    int    field_0x6e;  // +0x6e
-    char _pad_0x72[0x28];
-    class heroWindow *adventureWindow;  // +0x9a
-    int    field_0x9e;  // +0x9e
-    int    field_0xa2;  // +0xa2
-    unsigned char *m_currentTerrain;  // +0xa6
+    int    m_selectedCell;  // +0x36
+    int    m_heroLocatorState[12];  // +0x3a
+    int    m_townLocatorState[12];  // +0x6a
+    class heroWindow *m_adventureWindow;  // +0x9a
+    unsigned short *m_visibilityMap;  // +0x9e
+    int    m_visibilityMapValid;  // +0xa2
+    int m_currentTerrain;  // +0xa6, index into giTerrainToMusicTrack
     char _pad_0xaa[0x4];
     class fullMap *m_mapData;  // +0xae
-    int    field_0xb2;  // +0xb2
-    int    field_0xb6;  // +0xb6
-    unsigned char *adventureBorder;  // +0xba
+    class iconWidget *m_scrollLeftButton;  // +0xb2
+    class iconWidget *m_scrollRightButton;  // +0xb6
+    unsigned char *m_adventureBorder;  // +0xba
     char _pad_0xbe[0x4];
-    int    field_0xc2;  // +0xc2
-    int    field_0xc6;  // +0xc6
-    int    field_0xca;  // +0xca
-    char _pad_0xce[0x28];
-    int    field_0xf6;  // +0xf6
-    char _pad_0xfa[0x18];
-    class icon *puzzleIcon;  // +0x112
-    char _pad_0x116[0x8];
-    int    field_0x11e;  // +0x11e
-    char _pad_0x122[0x48];
-    int    field_0x16a;  // +0x16a
-    char _pad_0x16e[0x60];
-    int    field_0x1ce;  // +0x1ce
-    int    field_0x1d2;  // +0x1d2
+    class tileset *m_groundTiles;  // +0xc2
+    class tileset *m_cloudTiles;  // +0xc6
+    class tileset *m_stoneTiles;  // +0xca
+    class icon *m_objectIcons[64];  // +0xce
+    class icon *m_puzzleIcon;  // +0x1ce
+    class icon *m_cloudOverlayIcon;  // +0x1d2
     int    m_mapOriginX;  // +0x1d6
     int    m_mapOriginY;  // +0x1da
-    int    field_0x1de;  // +0x1de
-    int    field_0x1e2;  // +0x1e2
-    int    lastHoverCell;  // +0x1e6
-    int    field_0x1ea;  // +0x1ea
-    int    field_0x1ee;  // +0x1ee
-    int    field_0x1f2;  // +0x1f2
-    int    field_0x1f6;  // +0x1f6
-    int    field_0x1fa;  // +0x1fa
-    int    field_0x1fe;  // +0x1fe
-    int    field_0x202;  // +0x202
-    int    field_0x206;  // +0x206
-    int    field_0x20a;  // +0x20a
-    int    field_0x20e;  // +0x20e
-    int    field_0x212;  // +0x212
-    int    field_0x216;  // +0x216
-    int    field_0x21a;  // +0x21a
-    int    field_0x21e;  // +0x21e
-    int    field_0x222;  // +0x222
-    int    field_0x226;  // +0x226
-    int    field_0x22a;  // +0x22a
-    int    field_0x22e;  // +0x22e
-    int    field_0x232;  // +0x232
-    int    field_0x236;  // +0x236
-    int    field_0x23a;  // +0x23a
-    int    field_0x23e;  // +0x23e
-    int    field_0x242;  // +0x242
-    int    field_0x246;  // +0x246
-    int    field_0x24a;  // +0x24a
-    int    field_0x24e;  // +0x24e
-    int    field_0x252;  // +0x252
-    int    field_0x256;  // +0x256
-    int    field_0x25a;  // +0x25a
-    int    field_0x25e;  // +0x25e
-    int    field_0x262;  // +0x262
-    int    field_0x266;  // +0x266
-    int    field_0x26a;  // +0x26a
-    int    field_0x26e;  // +0x26e
+    int    m_field_0x1de;  // +0x1de
+    int    m_field_0x1e2;  // +0x1e2
+    int    m_lastHoverCell;  // +0x1e6
+    int    m_hoverCellY;  // +0x1ea
+    int    m_commandTargetX;  // +0x1ee
+    int    m_commandTargetY;  // +0x1f2
+    int    m_updateMinX;  // +0x1f6
+    int    m_updateMinY;  // +0x1fa
+    int    m_updateMaxX;  // +0x1fe
+    int    m_updateMaxY;  // +0x202
+    int    m_updatePending;  // +0x206
+    int    m_viewLeft;  // +0x20a
+    int    m_viewTop;  // +0x20e
+    int    m_viewRight;  // +0x212
+    int    m_viewBottom;  // +0x216
+    class icon *m_heroIcons[8];  // +0x21a
+    class icon *m_shadowIcon;  // +0x23a
+    class icon *m_boatShadowIcon;  // +0x23e
+    class icon *m_flagIcons[6];  // +0x242
+    class icon *m_boatFlagIcons[6];  // +0x25a
     int    m_cursorActive;  // +0x272
-    int    field_0x276;  // +0x276
+    int    m_field_0x276;  // +0x276
     int    m_cursorType;  // +0x27a
     int    m_cursorDirection;  // +0x27e  !union: conflicting widths
     int    m_cursorFrame;  // +0x282
-    int    field_0x286;  // +0x286
-    int    field_0x28a;  // +0x28a
-    int    field_0x28e;  // +0x28e
-    int    field_0x292;  // +0x292
-    int    field_0x296;  // +0x296
-    int    field_0x29a;  // +0x29a
-    int    field_0x29e;  // +0x29e
-    int    field_0x2a2;  // +0x2a2
-    int    heroContextLocked;  // +0x2a6
-    int    field_0x2aa;  // +0x2aa
-    int    field_0x2ae;  // +0x2ae
-    int    field_0x2b2;  // +0x2b2
-    int    field_0x2b6;  // +0x2b6
-    int    field_0x2ba;  // +0x2ba
-    int    field_0x2be;  // +0x2be
-    char _pad_0x2c2[0x20];
-    class sample *loopingSamples[5];  // +0x2e2
-    char _pad_0x2f6[0x80];
-    int    field_0x376;  // +0x376
-    int    field_0x37a;  // +0x37a
+    int    m_cursorCellX;  // +0x286
+    int    m_cursorCellY;  // +0x28a
+    int    m_cursorCellIndex;  // +0x28e
+    int    m_field_0x292;  // +0x292
+    int    m_field_0x296;  // +0x296
+    int    m_field_0x29a;  // +0x29a
+    int    m_field_0x29e;  // +0x29e
+    int    m_field_0x2a2;  // +0x2a2
+    int    m_heroContextLocked;  // +0x2a6
+    int    m_townContextLocked;  // +0x2aa
+    int    m_field_0x2ae;  // +0x2ae
+    int    m_lastQuickViewX;  // +0x2b2
+    int    m_lastQuickViewY;  // +0x2b6
+    int    m_field_0x2ba;  // +0x2ba
+    int    m_activeSoundCount;  // +0x2be
+    adventureSoundCell m_activeSounds[4];  // +0x2c2
+    class sample *m_loopingSamples[28];  // +0x2e2
+    class sample *m_cursorSamples[9];  // +0x352
+    int    m_currentSampleSet;  // +0x376
+    int    m_openState;  // +0x37a
     // --- constructors ---
     advManager(void);
     // --- virtual methods (vtable order) ---
@@ -151,6 +126,8 @@ public:
     void VWCompleteDraw(void);
     void GetCursorSampleSet(int);
     class mapCell * DoAdvCommand(void);
+    int GetCommandTargetX(void) { return m_commandTargetX; }
+    int GetCommandTargetY(void) { return m_commandTargetY; }
     void CheckSetEvilInterface(int, int);
     void Reseed(int, int);
     int ProcessSelect(struct tag_message *, class mapCell * *);
