@@ -7,9 +7,13 @@ authoritative. This file is the short, restart-ready Codex workflow.
 
 - Work on branch `source-decomp`.
 - Reconstruct and byte-match functions in `SOURCE`, hardest/largest unresolved functions first.
+- Continue the matching campaign autonomously for as long as useful work remains. Finishing one
+  function or batch is a checkpoint, not a reason to stop; rebuild the queue and continue.
 - Carry each change through implementation, build verification, relocation review, and a focused
   commit. Do not leave completed work uncommitted.
 - Existing `.claude/worktrees/` content is unrelated and must not be staged or changed.
+- Keep this guide durable and restart-ready. Do not add transient progress, current assignments,
+  queue snapshots, or "next actions"; reconstruct those from the report and repository state.
 
 ## Matching Workflow
 
