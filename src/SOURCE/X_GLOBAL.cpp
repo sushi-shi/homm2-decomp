@@ -5,8 +5,10 @@
 
 #include <va.h>
 #include <SOURCE/ExpCampaign.h>
+#include <SOURCE/X_GLOBAL.h>
 
 // ---- globals (definitions, RVA order) ----
+DATA(0x004f26b8) char *xHSCampaignNames[EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT];
 DATA(0x004f26f4) char *xNecromancerShrine;
 DATA(0x004f26f8) char *xNecromancerShrineDesc;
 DATA(0x004f2ab0) int xShrineBuildingCost[2334];

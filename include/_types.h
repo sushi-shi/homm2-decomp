@@ -133,9 +133,17 @@ struct SSpellInfo {
     unsigned char m_e;
 };  // gsSpellInfo[] (sizeof 22)
 #pragma pack(push, 1)
+typedef enum NetPlayerInfoConstant {
+    NET_PLAYER_INFO_NAME_SIZE = 22,
+    NET_PLAYER_INFO_RESERVED_SIZE = 6
+} NetPlayerInfoConstant;
+
 struct SNetPlayerInfo {
     int networkId;
-    char name[30];
+    char name[NET_PLAYER_INFO_NAME_SIZE];
+    signed char useRegularCompression;
+    signed char useDiffCompression;
+    char reserved[NET_PLAYER_INFO_RESERVED_SIZE];
 };
 #pragma pack(pop)
 SIZE(SNetPlayerInfo, 34);
