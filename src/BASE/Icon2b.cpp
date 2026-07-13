@@ -191,26 +191,41 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int fra
         gIcRun = cmd;
         if (cmd != 0) {
             int right;
-            if (clip == 0) {
-                memcpy(row + X, gIcSrc, cmd);
-            } else if (clipY <= gIcY && gIcClipB >= gIcY) {
-                right = X + cmd;
-                unsigned int copyCount = cmd;
-                if (clipX < right && gIcClipR >= X) {
+            unsigned int copyCount;
+            unsigned char *copyDst;
+            unsigned char *copySrc;
+            do {
+                if (clip == 0) {
+                    copyCount = cmd;
+                    copyDst = row + X;
+                    copySrc = gIcSrc;
+                } else {
+                    if (gIcY < clipY || gIcClipB < gIcY)
+                        break;
+                    right = X + cmd;
+                    if (right <= clipX || gIcClipR < X)
+                        break;
                     if (clipX <= X) {
-                        if (gIcClipR >= right)
-                            memcpy(row + X, gIcSrc, copyCount);
-                        else
-                            memcpy(row + X, gIcSrc, (gIcClipR - X) + 1);
+                        if (gIcClipR >= right) {
+                            copyCount = cmd;
+                            copyDst = row + X;
+                            copySrc = gIcSrc;
+                        } else {
+                            copyCount = (gIcClipR - X) + 1;
+                            copyDst = row + X;
+                            copySrc = gIcSrc;
+                        }
                     } else {
                         if (gIcClipR >= right)
-                            memcpy(row + clipX, gIcSrc + (clipX - X),
-                                   (copyCount - clipX) + X);
+                            copyCount = (cmd - clipX) + X;
                         else
-                            memcpy(row + clipX, gIcSrc + (clipX - X), clipW);
+                            copyCount = clipW;
+                        copySrc = gIcSrc + (clipX - X);
+                        copyDst = row + clipX;
                     }
                 }
-            }
+                memcpy(copyDst, copySrc, copyCount);
+            } while (0);
             X = X + cmd;
             gIcSrc = gIcSrc + cmd;
             gIcRun = cmd;
