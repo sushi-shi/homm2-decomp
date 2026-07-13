@@ -11,7 +11,9 @@ authoritative. This file is the short, restart-ready Codex workflow.
   function or batch is a checkpoint, not a reason to stop; rebuild the queue and continue.
 - Carry each change through implementation, build verification, relocation review, and a focused
   commit. Do not leave completed work uncommitted.
-- Existing `.claude/worktrees/` content is unrelated and must not be staged or changed.
+- Legacy `.claude/worktrees/matcher-1` through `matcher-4` content is unrelated and must not be
+  staged or changed; the persistent `source-matcher-1` through `source-matcher-4` pool is managed
+  by the orchestration campaign below.
 - Keep this guide durable and restart-ready. Do not add transient progress, current assignments,
   queue snapshots, or "next actions"; reconstruct those from the report and repository state.
 
