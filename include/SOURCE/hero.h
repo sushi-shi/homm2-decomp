@@ -42,6 +42,13 @@ typedef enum HeroClassType {
     HERO_CLASS_COUNT = 6
 } HeroClassType;
 
+typedef enum HeroPrimaryStat {
+    HERO_PRIMARY_ATTACK = 0,
+    HERO_PRIMARY_DEFENSE = 1,
+    HERO_PRIMARY_SPELL_POWER = 2,
+    HERO_PRIMARY_KNOWLEDGE = 3
+} HeroPrimaryStat;
+
 typedef enum HeroEventFlag {
     HERO_EVENT_BUOY = 0x2,
     HERO_EVENT_FOUNTAIN = 0x4,
