@@ -5,9 +5,9 @@
 #include <va.h>
 #include <BASE/resource.h>
 struct SLimitData {
-    char data[0x20];
+    char data[0x10];
 };
-SIZE(SLimitData, 0x20);
+SIZE(SLimitData, 0x10);
 
 #pragma pack(push, 1)  // recovered layout is byte-packed
 // icon is an asset subclass of resource (slot-0 dtor override).

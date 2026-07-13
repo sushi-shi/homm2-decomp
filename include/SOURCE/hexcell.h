@@ -23,7 +23,7 @@ public:
     signed char m_deadOccupantIndices[14];  // +0x25
     signed char m_deadOccupantFrames[14];  // +0x33
     char m_unknown41;
-    struct SLimitData m_limits;  // +0x42
+    struct SLimitData m_limits[2];  // +0x42
     // --- constructors ---
     hexcell(void);
     // --- methods ---
