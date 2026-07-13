@@ -20,7 +20,7 @@ public:
     signed char m_canDig;  // +0x40
     signed char m_unknown41;  // +0x41
     signed char m_unknown42;  // +0x42
-    signed char m_unknown43;  // +0x43
+    signed char m_daysLeft;  // +0x43
     signed char m_townCount;  // +0x44
     signed char m_currentTown;  // +0x45
     signed char m_townLocatorPage;  // +0x46

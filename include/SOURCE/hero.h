@@ -16,7 +16,8 @@ typedef enum HeroSecondarySkill {
     HERO_SKILL_LEADERSHIP = 6,
     HERO_SKILL_WISDOM = 7,
     HERO_SKILL_BALLISTICS = 10,
-    HERO_SKILL_NECROMANCY = 12
+    HERO_SKILL_NECROMANCY = 12,
+    HERO_SKILL_ESTATES = 13
 } HeroSecondarySkill;
 
 typedef enum HeroSkillLevel {
@@ -103,7 +104,14 @@ public:
     int m_secondarySkillCount;  // +0x90
     char _pad_0x94[0x41];
     signed char m_artifacts[14];  // +0xd5
-    unsigned int m_eventFlags;  // +0xe3
+    union {
+        unsigned int m_eventFlags;  // +0xe3
+        struct {
+            unsigned int m_eventFlagsLow : 16;
+            unsigned int m_weeklyVisit : 1;
+            unsigned int m_eventFlagsHigh : 15;
+        };
+    };
     char m_unknownE7;  // +0xe7
     float m_aiFightValue;  // +0xe8
     char m_pad_0xec[0xe];

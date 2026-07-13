@@ -24,6 +24,7 @@
 #include <SOURCE/town.h>
 #include <SOURCE/searchArray.h>
 #include <SOURCE/advManager.h>
+#include <SOURCE/ADVMGR.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/army.h>
 #include <SOURCE/combatManager.h>
@@ -40,6 +41,9 @@
 #include <BASE/iconWidget.h>
 #include <BASE/BITS.h>
 #include <BASE/Bzip.h>
+#include <BASE/INPUTMGR.h>
+#include <BASE/inputManager.h>
+#include <BASE/mouseManager.h>
 #include <SOURCE/ARMY.h>
 #include <SOURCE/kbwin.h>
 
@@ -55,6 +59,7 @@
 #define GMAPLINE (*reinterpret_cast<const short *>("\n"))
 #define GTRANSMITLINE (*reinterpret_cast<const short *>("N\""))
 #define GRECEIVELINE (*reinterpret_cast<const short *>("-["))
+#define GDIFFLINE (*reinterpret_cast<const short *>("f\x1d"))
 #define VIEW_ARMY_FRAMES \
     "\x37\x3a\x37\x62\x37\x8a\x37\xb9\x37\xc0\x37\xc6\x37\x0d\x38\x11\x38\x15\x38\x19" \
     "\x38\x1d\x38\x21\x38\x25\x38\x29\x38\x2d\x38\x31\x38\x35\x38\x39\x38\x3d\x38\x41" \
@@ -96,7 +101,7 @@ void playerData::Write(int file)
     _write(file, &m_canDig, 1);
     _write(file, &m_unknown41, 1);
     _write(file, &m_unknown42, 1);
-    _write(file, &m_unknown43, 1);
+    _write(file, &m_daysLeft, 1);
     _write(file, &m_townCount, 1);
     _write(file, &m_currentTown, 1);
     _write(file, &m_townLocatorPage, 1);
@@ -128,7 +133,7 @@ void playerData::Read(int file)
     _read(file, &m_canDig, 1);
     _read(file, &m_unknown41, 1);
     _read(file, &m_unknown42, 1);
-    _read(file, &m_unknown43, 1);
+    _read(file, &m_daysLeft, 1);
     _read(file, &m_townCount, 1);
     _read(file, &m_currentTown, 1);
     _read(file, &m_townLocatorPage, 1);
@@ -702,7 +707,7 @@ void game::SetupOrigData(void)
         m_players[i].color = static_cast<signed char>(i);
         m_players[i].heroCount = 0;
         m_players[i].townCount = 0;
-        m_players[i].unknown43 = -1;
+        m_players[i].daysLeft = -1;
         m_players[i].unknown13 = 0;
         memset(m_players[i].unknown0c, -1, 2);
         memset(m_players[i].heroes, -1, 8);
@@ -2564,11 +2569,174 @@ void game::TurnOffAIMusic(void)
     *(int *)((char *)gpSoundManager + 0x684) = 1;
 }
 
+// @early-stop
+// The reconstructed body realigns after each of the first two flag clears and thereafter
+// matches instruction-for-instruction. Retail expands each clear into a 0x1e-byte longer
+// address/load/and/address/store sequence (114 relocations versus 112); direct, bitfield,
+// accessor, and volatile spellings either collapse it or over-expand it under this /Od TU.
 VA(0x0047bd99, 0x596)
-void game::NextPlayer(void) {}
+void game::NextPlayer(void)
+{
+    int humanCount;
+    int index;
 
+    m_heroRecs[gpCurPlayer->m_unknown0c[0]].m_weeklyVisit = 0;
+    m_heroRecs[gpCurPlayer->m_unknown0c[1]].m_weeklyVisit = 0;
+    iCurHourGlassPhase = 0;
+
+    if (gbThisNetHumanPlayer[giCurPlayer] && gConfig.autosave) {
+        humanCount = 0;
+        for (index = 0; index < 6; index++) {
+            if (m_playerDead[index] == 0 && gbHumanPlayer[index])
+                humanCount++;
+        }
+        SaveGame(const_cast<char *>("AUTOSAVE"), 1, 0);
+    }
+
+    gpAdvManager->m_currentSampleSet = 0;
+    if (gpGame->m_players[giCurPlayer].daysLeft > 0)
+        gpGame->m_players[giCurPlayer].daysLeft--;
+    CheckEndGame(0, 0);
+    gpAdvManager->DeactivateCurrTown();
+    gpAdvManager->DeactivateCurrHero();
+
+    do {
+        giCurPlayer++;
+        if (giCurPlayer >= m_playerCount) {
+            giCurPlayer = 0;
+            PerDay();
+        }
+    } while (gpGame->m_playerDead[giCurPlayer]);
+
+    gpCurPlayer = reinterpret_cast<playerData *>(&gpGame->m_players[giCurPlayer]);
+    giCurPlayerBit = static_cast<unsigned char>(1 << giCurPlayer);
+    for (index = 0; index < m_players[giCurPlayer].heroCount; index++) {
+        hero *currentHero = &m_heroRecs[m_players[giCurPlayer].heroes[index]];
+        currentHero->m_mobility = currentHero->CalcMobility();
+        currentHero->m_remainingMobility = currentHero->m_mobility;
+    }
+
+    if (!gbThisNetHumanPlayer[giCurPlayer]) {
+        gpMouseManager->SetPointer(1);
+        gpAdvManager->HideRoute(1, 0, 1);
+        gpAdvManager->CheckDimNextHeroBut();
+        TurnOnAIMusic();
+        SetNoDialogMenus(0);
+        giBottomViewOverride = 6;
+        ShowComputerScreen();
+        bShowIt = 0;
+        if (gbRemoteOn && gbHumanPlayer[giCurPlayer]) {
+            gbThisNetGotAdventureControl = 0;
+            int remotePlayer = gbGamePosToNetPos[giCurPlayer];
+            if (!gpGame->TransmitSaveGame(remotePlayer, 0, 0))
+                ShutDown(0);
+        }
+        if (giBottomViewOverride == 6)
+            giBottomViewOverride = 0;
+    } else {
+        SetNoDialogMenus(1);
+        gpInputManager->Flush();
+        gbAllBlack = 1;
+        gpAdvManager->CheckSetEvilInterface(1, giCurPlayer);
+        gbAllBlack = 0;
+        if (gbBlackoutPlayer && giNumHumanPlayers > 1) {
+            sprintf(gText, "%s's turn.", cPlayerNames[giCurPlayer]);
+            WaitForPlayer(gText, giCurPlayer);
+        }
+        if (gbThisNetHumanPlayer[giCurPlayer])
+            CancelComputerScreen();
+        giCurWatchPlayerBit = giCurPlayerBit;
+        giCurWatchPlayer = giCurPlayer;
+    }
+
+    if (gbThisNetHumanPlayer[giCurPlayer] && gbRemoteOn &&
+        m_day != 1 && giForceSwitchMusic == -1) {
+        gpSoundManager->SwitchAmbientMusic(21);
+        giForceSwitchMusic = KBTickCount();
+        gpSoundManager->m_samplesReady = 0;
+    }
+    if (m_day == 1 && giCurTurn != 1)
+        gpSoundManager->m_samplesReady = 0;
+
+    DoNewTurn();
+    CheckEndGame(0, 0);
+    if (gbThisNetHumanPlayer[giCurPlayer] &&
+        gpSoundManager->m_samplesReady == 0 && giForceSwitchMusic == -1) {
+        gpSoundManager->m_samplesReady = 1;
+        gpSoundManager->SwitchAmbientMusic(
+            giTerrainToMusicTrack[gpAdvManager->m_currentTerrain]);
+        gpAdvManager->SetEnvironmentOrigin(
+            gpAdvManager->m_mapOriginX + 7,
+            gpAdvManager->m_mapOriginY + 7, 1);
+    }
+    if (gbThisNetHumanPlayer[giCurPlayer])
+        gpAdvManager->ForceNewHover();
+}
+
+// @early-stop
+// Relocation-masked comparison is identical for the full 0x432-byte span; both objects
+// contain 25 relocation sites and objdiff reports 100%.
 VA(0x0047c32f, 0x432)
-int game::ComputeDailyGold(int) { return 0; }
+int game::ComputeDailyGold(int player)
+{
+    int heroIndex;
+    int gold = 0;
+    int index;
+
+    for (index = 0; index < 144; index++) {
+        if (m_mines[index].owner == player) {
+            if (m_mines[index].resourceType == 6)
+                gold += 1000;
+            if (m_mines[index].resourceType == 101)
+                gold += 1000;
+        }
+    }
+
+    for (index = 0; index < 72; index++) {
+        if (m_castleRecs[index].owner == player) {
+            if (m_castleRecs[index].buildings & 0x20)
+                gold += 250;
+            else
+                gold += 1000;
+            if (m_castleRecs[index].buildings & 0x80)
+                gold += 250;
+            if (m_castleRecs[index].race == 3 &&
+                (m_castleRecs[index].buildings & 0x2000))
+                gold += 500;
+        }
+    }
+
+    gold += reinterpret_cast<class playerData *>(&m_players[player])->NumOfGivenArtifact(30) * 1000;
+    gold += reinterpret_cast<class playerData *>(&m_players[player])->NumOfGivenArtifact(31) * 750;
+    gold += reinterpret_cast<class playerData *>(&m_players[player])->NumOfGivenArtifact(32) * 500;
+    gold += reinterpret_cast<class playerData *>(&m_players[player])->NumOfGivenArtifact(7) * 10000;
+    gold += reinterpret_cast<class playerData *>(&m_players[player])->NumOfGivenArtifact(69) * -250;
+
+    for (heroIndex = 0; heroIndex < m_players[player].heroCount; heroIndex++) {
+        gold += gEstatesGoldLevel[
+            gpGame->m_heroRecs[m_players[player].heroes[heroIndex]]
+                .m_secondarySkills[HERO_SKILL_ESTATES]];
+    }
+
+    if (!gbHumanPlayer[player]) {
+        if (gpGame->m_difficulty == 0)
+            gold = static_cast<int>(gold * 0.75);
+        if (gpGame->m_difficulty == 1) {
+        }
+        if (gpGame->m_difficulty == 2)
+            gold = static_cast<int>(gold * 1.29);
+        if (gpGame->m_difficulty == 3)
+            gold = static_cast<int>(gold * 1.45);
+        if (gpGame->m_difficulty == 4)
+            gold = static_cast<int>(gold * 1.6);
+    }
+
+    if (m_playerHandicap[player] == 1)
+        gold = static_cast<int>(gold * 0.15);
+    else if (m_playerHandicap[player] == 2)
+        gold = static_cast<int>(gold * 0.3);
+    return gold;
+}
 
 // @early-stop
 // Frame/slots and 30 relocations are exact. The only residual is target 0x47ce94..0x47cec2:
@@ -2986,8 +3154,84 @@ void game::WeeklyGenericSite(mapCell *cell)
 VA(0x0047ec44, 0x375)
 void game::PerMonth(void) {}
 
+// @early-stop
+// The complete control flow and both relocations align. The AST-permuted bounds spelling
+// improves the match to 99.19%: this 0x472-byte body materializes y + 1 with a one-byte inc,
+// while retail's 0x476-byte body compares y directly and retains a five-byte continuation.
 VA(0x0047efb9, 0x476)
-void game::ConvertObject(int, int, int, int, int, int, int, int, int, int, int) {}
+void game::ConvertObject(int left, int top, int right, int bottom,
+                         int oldTileset, int oldFirstIndex, int oldLastIndex,
+                         int newTileset, int newFirstIndex,
+                         int oldTrigger, int newTrigger)
+{
+    int x;
+    int y;
+    mapCell *cell;
+    mapCellExtra *extra;
+
+    for (x = left; right >= x; x++) {
+        for (y = top; bottom >= y; y++) {
+            if (x >= 0 && x < MAP_WIDTH && y >= 0 && MAP_HEIGHT >= y + 1) {
+                cell = WORLDMAP->GetCell(x, y);
+                if (cell->objIndex != static_cast<unsigned char>(-1) &&
+                    cell->objTileset == oldTileset &&
+                    cell->objIndex >= oldFirstIndex && cell->objIndex <= oldLastIndex) {
+                    cell->objTileset = static_cast<unsigned char>(newTileset);
+                    cell->objIndex = static_cast<unsigned char>(
+                        cell->objIndex - oldFirstIndex + newFirstIndex);
+                }
+                if ((cell->triggerType & 0x7f) == oldTrigger)
+                    cell->triggerType = static_cast<unsigned char>(
+                        (cell->triggerType & 0x80) | newTrigger);
+
+                if (cell->extra != 0 &&
+                    WORLDMAP->Extra(cell->extra)->objIndex != static_cast<unsigned char>(-1))
+                    extra = WORLDMAP->Extra(cell->extra);
+                else
+                    extra = 0;
+                while (extra != 0) {
+                    if (extra->objTileset == oldTileset &&
+                        extra->objIndex >= oldFirstIndex && extra->objIndex <= oldLastIndex) {
+                        extra->objTileset = static_cast<unsigned char>(newTileset);
+                        extra->objIndex = static_cast<unsigned char>(
+                            extra->objIndex - oldFirstIndex + newFirstIndex);
+                    }
+                    if (extra->index != 0 &&
+                        WORLDMAP->Extra(extra->index)->objIndex != static_cast<unsigned char>(-1))
+                        extra = WORLDMAP->Extra(extra->index);
+                    else
+                        extra = 0;
+                }
+
+                if (cell->ovlIndex != static_cast<unsigned char>(-1) &&
+                    cell->ovlTileset == oldTileset &&
+                    cell->ovlIndex >= oldFirstIndex && cell->ovlIndex <= oldLastIndex) {
+                    cell->ovlTileset = static_cast<unsigned char>(newTileset);
+                    cell->ovlIndex = static_cast<unsigned char>(
+                        cell->ovlIndex - oldFirstIndex + newFirstIndex);
+                }
+                if (cell->extra != 0 &&
+                    WORLDMAP->Extra(cell->extra)->ovlIndex != static_cast<unsigned char>(-1))
+                    extra = WORLDMAP->Extra(cell->extra);
+                else
+                    extra = 0;
+                while (extra != 0) {
+                    if (extra->ovlTileset == oldTileset &&
+                        extra->ovlIndex >= oldFirstIndex && extra->ovlIndex <= oldLastIndex) {
+                        extra->ovlTileset = static_cast<unsigned char>(newTileset);
+                        extra->ovlIndex = static_cast<unsigned char>(
+                            extra->ovlIndex - oldFirstIndex + newFirstIndex);
+                    }
+                    if (extra->index != 0 &&
+                        WORLDMAP->Extra(extra->index)->ovlIndex != static_cast<unsigned char>(-1))
+                        extra = WORLDMAP->Extra(extra->index);
+                    else
+                        extra = 0;
+                }
+            }
+        }
+    }
+}
 
 VA(0x0047f42f, 0x1c2)
 void game::RandomizeTown(int, int, int) {}
@@ -3884,8 +4128,94 @@ void game::ProcessOnMapHeroes(void)
     }
 }
 
+// @early-stop
+// Frame layout and all seven relocations are exact. The 0x8-byte size residual is one
+// five-byte inlined hero-bounds continuation plus three bytes of equivalent commutative
+// packed-record index arithmetic; every ownership, repair, and army check realigns.
 VA(0x00482cbb, 0x55e)
-void game::CheckHeroConsistency(void) {}
+void game::CheckHeroConsistency(void)
+{
+    hero *mapHero3;
+    mapCell *cell1;
+    int x11;
+    int y8;
+    int player3;
+    int slot1;
+    int total26 = 0;
+    int consistent13;
+    town *occupiedTown9;
+
+    for (player3 = 0; player3 < m_playerCount; player3++) {
+        if (m_playerDead[player3] != 0)
+            continue;
+        total26 += m_players[player3].heroCount;
+        for (slot1 = 0; slot1 < m_players[player3].heroCount; slot1++) {
+            if (m_heroRecs[m_players[player3].heroes[slot1]].m_owner != player3)
+                consistent13 = 0;
+        }
+    }
+
+    for (player3 = 0; player3 < m_playerCount; player3++) {
+        if (m_playerDead[player3] == 0) {
+            for (slot1 = 0; slot1 < 2; slot1++) {
+                if ((m_availableHeroes[m_players[player3].unknown0c[slot1]] >= 0 &&
+                     m_availableHeroes[m_players[player3].unknown0c[slot1]] <= 5) ||
+                    (total26 < 40 &&
+                     m_availableHeroes[m_players[player3].unknown0c[slot1]] == -1)) {
+                    m_players[player3].unknown0c[slot1] =
+                        static_cast<signed char>(GetNewHeroId(player3, -1, 0));
+                    m_availableHeroes[m_players[player3].unknown0c[slot1]] = 64;
+                }
+            }
+        }
+    }
+
+    for (x11 = 0; x11 < MAP_WIDTH; x11++) {
+        for (y8 = 0; y8 < MAP_HEIGHT; y8++) {
+            cell1 = gpAdvManager->GetCell(x11, y8);
+            if (cell1->triggerType == 0xaa) {
+                if (cell1->w4hi >= 0 && cell1->w4hi < 54) {
+                    mapHero3 = &m_heroRecs[cell1->w4hi];
+                    if (mapHero3->m_x != x11 || mapHero3->m_y != y8) {
+                        cell1->triggerType = 0;
+                        cell1->w4hi = 0;
+                    }
+                    if (mapHero3->m_owner < 0 || mapHero3->m_owner >= 6) {
+                        if (mapHero3->m_locationType == 0xa3) {
+                            occupiedTown9 = GetCastle(mapHero3->m_occupiedTown);
+                            occupiedTown9->m_occupyingHeroId = -1;
+                        }
+                        if (mapHero3->m_x == x11 && mapHero3->m_y == y8) {
+                            RestoreCell(mapHero3->m_x, mapHero3->m_y,
+                                        mapHero3->m_locationType,
+                                        mapHero3->m_occupiedTown, 0, 1);
+                        } else {
+                            cell1->triggerType = 0;
+                            cell1->w4hi = 0;
+                        }
+                    }
+                } else {
+                    cell1->triggerType = 0;
+                }
+            }
+        }
+    }
+
+    for (player3 = 0; player3 < 54; player3++) {
+        for (slot1 = 0; slot1 < 5; slot1++) {
+            if (m_heroRecs[player3].m_army.m_troopTypes[slot1] == -1 ||
+                m_heroRecs[player3].m_army.m_creatureCounts[slot1] < 0)
+                m_heroRecs[player3].m_army.m_creatureCounts[slot1] = 0;
+        }
+    }
+    for (player3 = 0; player3 < 72; player3++) {
+        for (slot1 = 0; slot1 < 5; slot1++) {
+            if (m_castleRecs[player3].m_army.m_troopTypes[slot1] == -1 ||
+                m_castleRecs[player3].m_army.m_creatureCounts[slot1] < 0)
+                m_castleRecs[player3].m_army.m_creatureCounts[slot1] = 0;
+        }
+    }
+}
 
 #define done done36
 #define fileData fileData9
@@ -4311,8 +4641,92 @@ int game::ReceiveSaveGame(int dataSize, int expectedCrc, int expectedTransmitCrc
 #undef samplesReady
 #undef success
 
+// @early-stop
+// Both objects have an exact 0x455-byte span and 102 relocation sites. The sole masked
+// byte difference is the +0x32 local epilogue-branch displacement, a delinked-label identity.
 VA(0x00483fc4, 0x455)
-void game::DoNewTurn(void) {}
+void game::DoNewTurn(void)
+{
+    char musicFile18[16];
+    char lowerName19[52];
+    int musicTrack2;
+
+    CheckForTimeEvent();
+    if (!gbThisNetHumanPlayer[giCurPlayer]) {
+        CheckEndGame(0, 0);
+    } else {
+        giBottomViewOverrideEndTime = KBTickCount() + 3000;
+        giBottomViewOverride = 1;
+        gpAdvManager->UpdBottomView(1, 1, 1);
+        gpAdvManager->SetInitialMapOrigin();
+        gpAdvManager->CompleteDraw(0);
+        gpAdvManager->UpdateScreen(0, 0);
+        CheckEndGame(0, 0);
+
+        if (gpCurPlayer->m_daysLeft >= 0) {
+            if (gpCurPlayer->m_daysLeft == 1) {
+                sprintf(gText, cNewTurn[1], cPlayerNames[giCurPlayer]);
+            } else {
+                sprintf(gText, cNewTurn[0], cPlayerNames[giCurPlayer],
+                        gpCurPlayer->m_daysLeft);
+            }
+            NormalDialog(gText, 1, -1, -1, 9,
+                         gpGame->GetPlayerColor(static_cast<signed char>(giCurPlayer)),
+                         -1, 0, -1, 0);
+        }
+
+        if (gpCurPlayer->m_heroCount > 0) {
+            gpAdvManager->SetHeroContext(gpCurPlayer->NextHero(0), 0);
+        } else if (gpCurPlayer->m_townCount > 0) {
+            gpAdvManager->SetTownContext(gpCurPlayer->m_townIds[0]);
+        }
+        gpAdvManager->CheckDimNextHeroBut();
+
+        if (m_day == 1 &&
+            (m_month != 1 || m_week != 1 || m_day != 1)) {
+            if (gbThisNetHumanPlayer[giCurPlayer])
+                gpSoundManager->m_samplesReady = 1;
+            if (giWeekType != -1) {
+                musicTrack2 = -1;
+                if (m_week == 1) {
+                    musicTrack2 = 21;
+                    strcpy(musicFile18, "newmonth.82m");
+                    if (giMonthType == 0) {
+                        sprintf(gText, cNewTurn[2], gMonthNames[giMonthTypeExtra]);
+                    } else if (giMonthType == 1) {
+                        strcpy(lowerName19, gArmyNames[giMonthTypeExtra]);
+                        lowerName19[0] -= 0x20;
+                        sprintf(gText, cNewTurn[3],
+                                gArmyNames[giMonthTypeExtra], lowerName19);
+                    } else {
+                        sprintf(gText, cNewTurn[4]);
+                    }
+                } else {
+                    musicTrack2 = 20;
+                    strcpy(musicFile18, "newweek.82m");
+                    if (giWeekType == 0) {
+                        sprintf(gText, cNewTurn[5], gWeekNames[giWeekTypeExtra]);
+                    } else {
+                        strcpy(lowerName19, gArmyNames[giWeekTypeExtra]);
+                        lowerName19[0] -= 0x20;
+                        sprintf(gText, cNewTurn[6],
+                                gArmyNames[giWeekTypeExtra], lowerName19);
+                    }
+                }
+                gpSoundManager->PlayAmbientMusic(musicTrack2, 0, -1);
+                gpMouseManager->SetPointer(0);
+                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                gpSoundManager->SwitchAmbientMusic(
+                    giTerrainToMusicTrack[gpAdvManager->m_currentTerrain]);
+            }
+        }
+        gpSoundManager->SwitchAmbientMusic(
+            giTerrainToMusicTrack[gpAdvManager->m_currentTerrain]);
+        gpAdvManager->SetEnvironmentOrigin(
+            gpAdvManager->m_mapOriginX + 7,
+            gpAdvManager->m_mapOriginY + 7, 1);
+    }
+}
 
 VA(0x00484419, 0x58)
 int game::GetBoatsBuilt(void)
@@ -4465,8 +4879,159 @@ int GetSkipCopyLen(unsigned char *buf, int *pos)
     return len;
 }
 
+// @early-stop
+// The 0x44-byte frame and all 83 relocations are exact. Retail retains one additional
+// five-byte local jump at +0x5ae (0x5ba versus 0x5b5); explicit return and continue
+// spellings are folded by this /Od TU, while all allocation, CRC, diff, write, and cleanup
+// paths realign around the delinked local-label placement.
 VA(0x00484b4d, 0x5ba)
-void CreateDiffFile(char *, char *, char *, int, int) {}
+void CreateDiffFile(char *oldName, char *joinName, char *diffName,
+                    int remotePlayer, int forceWhole)
+{
+    unsigned char *diffData6;
+    // Retail's debug frame contains two otherwise unused words before joinData29.
+    int unusedFirst0;
+    int unusedSecond4;
+    unsigned char *joinData29;
+    int joinSize36;
+    int joinFile1;
+    int copyLength28;
+    long startTime11;
+    int diffSize29;
+    unsigned char *oldData13;
+    int oldSize37;
+    int compareOffset4;
+    int position1;
+    int sendWhole4;
+    int oldFile17;
+
+    startTime11 = KBTickCount();
+    oldData13 = 0;
+    joinData29 = 0;
+    diffData6 = 0;
+    oldSize37 = 0;
+    joinSize36 = 0;
+    diffSize29 = 0;
+    sendWhole4 = 0;
+
+    if (forceWhole ||
+        (iLastDiffSendTo != -1 && remotePlayer != iLastDiffSendTo))
+        sendWhole4 = 1;
+    iLastDiffSendTo = remotePlayer;
+
+    sprintf(gText, "%s%s", ".\\DATA\\", joinName);
+    joinSize36 = FileSize(gText);
+    joinData29 = static_cast<unsigned char *>(
+        BaseAlloc(joinSize36, GFILE, GDIFFLINE + 0x18));
+    sprintf(gText, "%s%s", ".\\DATA\\", joinName);
+    joinFile1 = _open(gText, 0x8000);
+    if (joinFile1 == -1)
+        FileError(gText);
+    _read(joinFile1, joinData29, joinSize36);
+    _close(joinFile1);
+    LogInt(const_cast<char *>("Orig Join CRC"),
+           calc_crc_long(joinData29, joinSize36), joinSize36,
+           -999, -999, -999, -999, -999);
+
+    if (!forceWhole) {
+        sprintf(gText, "%s%s", ".\\DATA\\", oldName);
+        oldSize37 = FileSize(gText);
+        oldData13 = static_cast<unsigned char *>(
+            BaseAlloc(oldSize37, GFILE, GDIFFLINE + 0x2d));
+        sprintf(gText, "%s%s", ".\\DATA\\", oldName);
+        oldFile17 = _open(gText, 0x8000);
+        if (oldFile17 == -1)
+            FileError(gText);
+        _read(oldFile17, oldData13, oldSize37);
+        _close(oldFile17);
+    }
+
+    diffData6 = static_cast<unsigned char *>(
+        BaseAlloc((oldSize37 > joinSize36 ? oldSize37 : joinSize36) + 5000,
+                  GFILE, GDIFFLINE + 0x37));
+    if (sendWhole4) {
+        diffData6[0] = 0;
+        diffData6[1] = 0;
+        memcpy(diffData6 + 2, joinData29, joinSize36);
+        diffSize29 = joinSize36 + 2;
+    } else {
+        diffData6[0] = 1;
+        diffData6[1] = 0;
+        diffSize29 = 2;
+        position1 = 0;
+        copyLength28 = 0;
+        compareOffset4 = copyLength28;
+        while (1) {
+            if (position1 + copyLength28 >= oldSize37 ||
+                position1 + copyLength28 >= joinSize36) {
+                copyLength28 = oldSize37 - position1;
+                WriteDiffHeaderInfo(1, copyLength28, diffData6, &diffSize29);
+                memcpy(diffData6 + diffSize29,
+                       joinData29 + position1, copyLength28);
+                diffSize29 += copyLength28;
+                position1 += copyLength28;
+                copyLength28 = 0;
+                break;
+            }
+            if (oldData13[position1 + copyLength28] ==
+                joinData29[position1 + copyLength28]) {
+                compareOffset4 = 1;
+                while (position1 + compareOffset4 + copyLength28 < oldSize37 &&
+                       position1 + compareOffset4 + copyLength28 < joinSize36 &&
+                       oldData13[position1 + compareOffset4 + copyLength28] ==
+                           joinData29[position1 + compareOffset4 + copyLength28])
+                    compareOffset4++;
+                if (compareOffset4 <= 3) {
+                    copyLength28 += compareOffset4;
+                    compareOffset4 = 0;
+                    continue;
+                } else {
+                    if (copyLength28 != 0) {
+                        WriteDiffHeaderInfo(1, copyLength28,
+                                            diffData6, &diffSize29);
+                        memcpy(diffData6 + diffSize29,
+                               joinData29 + position1, copyLength28);
+                        diffSize29 += copyLength28;
+                        position1 += copyLength28;
+                        copyLength28 = 0;
+                    }
+                    WriteDiffHeaderInfo(0, compareOffset4,
+                                        diffData6, &diffSize29);
+                    position1 += compareOffset4;
+                    compareOffset4 = 0;
+                }
+            } else {
+                while (position1 + copyLength28 < oldSize37 &&
+                       position1 + copyLength28 < joinSize36 &&
+                       oldData13[position1 + copyLength28] !=
+                           joinData29[position1 + copyLength28])
+                    copyLength28++;
+            }
+        }
+    }
+
+    sprintf(gText, "%s%s", ".\\DATA\\", diffName);
+    joinFile1 = _open(gText, 0x8301, 0x80);
+    if (joinFile1 == -1)
+        FileError(gText);
+    _write(joinFile1, diffData6, diffSize29);
+    _close(joinFile1);
+
+    sprintf(gText, "%s%s", ".\\DATA\\", oldName);
+    joinFile1 = _open(gText, 0x8301, 0x80);
+    if (joinFile1 == -1)
+        FileError(gText);
+    _write(joinFile1, joinData29, joinSize36);
+    _close(joinFile1);
+
+    if (oldData13 != 0)
+        BaseFree(oldData13, GFILE, GDIFFLINE + 0xa1);
+    if (joinData29 != 0)
+        BaseFree(joinData29, GFILE, GDIFFLINE + 0xa3);
+    if (diffData6 != 0)
+        BaseFree(diffData6, GFILE, GDIFFLINE + 0xa5);
+    return;
+}
 
 VA(0x00485107, 0x3ce)
 void CreateJoinFile(char *, char *, char *) {}
