@@ -19,7 +19,7 @@ public:
     // (derived: base widget = 0x20 bytes at 0x00 via ': public widget'; own fields below)
     icon   *m_icon;  // +0x2b  the loaded icon (disposed in dtor)
     short  field_0x2f;  // +0x2f
-    short  field_0x31;  // +0x31
+    unsigned short field_0x31;  // +0x31  text cursor position
     unsigned short m_maxLength;  // +0x33
     short  m_rectX;  // +0x35
     short  m_rectY;  // +0x37
@@ -33,7 +33,7 @@ public:
     short  m_hasInset;  // +0x47  !union: conflicting widths
     short  field_0x49;  // +0x49
     short  field_0x4b;  // +0x4b
-    char   field_0x4d;  // +0x4d
+    char   m_cursorBlink;  // +0x4d
     // --- constructors ---
     textEntryWidget(void);
     textEntryWidget(short int, short int, short int, short int, short int, char *, char *, short int, char *, short int, short int, short int, short int, int, int);
