@@ -191,26 +191,26 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int fra
         gIcRun = cmd;
         if (cmd != 0) {
             int right;
-            unsigned int cn = cmd;
-            unsigned char *copyDst = row + X;
-            unsigned char *copySrc = gIcSrc;
-            if (clip != 0) {
-                if (gIcY < clipY || gIcClipB < gIcY ||
-                    (right = X + cmd, right <= clipX) || gIcClipR < X) {
-                    cn = 0;
-                } else if (clipX <= X) {
-                    if (gIcClipR < right)
-                        cn = (gIcClipR - X) + 1;
-                } else {
-                    cn = clipW;
-                    if (right <= gIcClipR)
-                        cn = (cmd - clipX) + X;
-                    copyDst = row + clipX;
-                    copySrc = gIcSrc + (clipX - X);
+            if (clip == 0) {
+                memcpy(row + X, gIcSrc, cmd);
+            } else if (clipY <= gIcY && gIcClipB >= gIcY) {
+                right = X + cmd;
+                unsigned int copyCount = cmd;
+                if (clipX < right && gIcClipR >= X) {
+                    if (clipX <= X) {
+                        if (gIcClipR >= right)
+                            memcpy(row + X, gIcSrc, copyCount);
+                        else
+                            memcpy(row + X, gIcSrc, (gIcClipR - X) + 1);
+                    } else {
+                        if (gIcClipR >= right)
+                            memcpy(row + clipX, gIcSrc + (clipX - X),
+                                   (copyCount - clipX) + X);
+                        else
+                            memcpy(row + clipX, gIcSrc + (clipX - X), clipW);
+                    }
                 }
             }
-            if (cn != 0)
-                memcpy(copyDst, copySrc, cn);
             X = X + cmd;
             gIcSrc = gIcSrc + cmd;
             gIcRun = cmd;
