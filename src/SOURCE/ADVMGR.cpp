@@ -180,7 +180,7 @@ int advManager::Open(int id)
         gpMouseManager->SetPointer("advmice.mse", 1, ADVMGR_DEFAULT_POINTER_FRAME);
 
     if (m_visibilityMap == 0) {
-        m_visibilityMap = new unsigned char[MAP_WIDTH * MAP_HEIGHT * 2];
+        m_visibilityMap = new unsigned short[MAP_WIDTH * MAP_HEIGHT];
         if (m_visibilityMap == 0)
             MemError();
     }
@@ -2041,22 +2041,18 @@ void advManager::DrawCell(int mapX, int mapY, int screenX, int screenY,
                              0, 0, 0, 0, 0, 0);
             }
         } else if (m_visibilityMapValid &&
-                   *reinterpret_cast<unsigned short *>(
-                       m_visibilityMap + mapX * 2 + mapY * MAP_WIDTH * 2) != 0) {
-            if ((*reinterpret_cast<unsigned short *>(
-                     m_visibilityMap + mapX * 2 + mapY * MAP_WIDTH * 2) & 0x100) != 0) {
+                   m_visibilityMap[mapY * MAP_WIDTH + mapX] != 0) {
+            if ((m_visibilityMap[mapY * MAP_WIDTH + mapX] & 0x100) != 0) {
                 IconToBitmapColorTable(
                     m_objectIcons[17], gpWindowManager->m_screen,
                     s_drawPixelX - 12, s_drawPixelY + 2,
-                    (*reinterpret_cast<unsigned short *>(
-                         m_visibilityMap + mapX * 2 + mapY * MAP_WIDTH * 2) - 1) & 0xff,
+                    (m_visibilityMap[mapY * MAP_WIDTH + mapX] - 1) & 0xff,
                     1, 0, 0, ADVMGR_DRAW_CLIP_WIDTH, ADVMGR_DRAW_CLIP_HEIGHT,
                     0, gColorTableRed, 1);
             } else {
                 IconToBitmap(m_objectIcons[17], gpWindowManager->m_screen,
                              s_drawPixelX - 12, s_drawPixelY + 2,
-                             (*reinterpret_cast<unsigned short *>(
-                                  m_visibilityMap + mapX * 2 + mapY * MAP_WIDTH * 2) - 1) & 0xff,
+                             (m_visibilityMap[mapY * MAP_WIDTH + mapX] - 1) & 0xff,
                              1, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
                              ADVMGR_DRAW_CLIP_HEIGHT, 0);
             }
@@ -4316,13 +4312,9 @@ int advManager::ComboDraw(int originX, int originY, int animate)
                 if (mapCellX < 0 || mapCellX > MAP_WIDTH - 1 || mapYValue < 1 ||
                     mapYValue > MAP_HEIGHT - 2)
                     continue;
-                if (*reinterpret_cast<unsigned short *>(
-                        m_visibilityMap + mapCellX * 2 +
-                        mapYValue * MAP_WIDTH * 2) != 0)
+                if (m_visibilityMap[mapYValue * MAP_WIDTH + mapCellX] != 0)
                     ++bComboDraw[column][mapRow + 1];
-                if (*reinterpret_cast<unsigned short *>(
-                        m_visibilityMap + mapCellX * 2 +
-                        (mapYValue - 1) * MAP_WIDTH * 2) != 0)
+                if (m_visibilityMap[(mapYValue - 1) * MAP_WIDTH + mapCellX] != 0)
                     ++bComboDraw[column][mapRow - 1];
             }
         }
@@ -5319,13 +5311,11 @@ void advManager::ShowRoute(int redraw, int, int updateButton)
             }
 
             if (pathIndex == 0) {
-                reinterpret_cast<unsigned short *>(m_visibilityMap)
-                    [routeY1 * (MAP_WIDTH | 0) + routeX1] = 1;
+                m_visibilityMap[routeY1 * (MAP_WIDTH | 0) + routeX1] = 1;
             } else {
                 previousDirection0 =
                     gpSearchArray->m_storage.path.directions[pathIndex];
-                reinterpret_cast<unsigned short *>(m_visibilityMap)
-                    [routeY1 * (MAP_WIDTH | 0) + routeX1] =
+                m_visibilityMap[routeY1 * (MAP_WIDTH | 0) + routeX1] =
                     static_cast<unsigned short>(
                         gbArrow[previousDirection0][direction | 0] +
                         routeFrame * ADVMGR_ROUTE_ARROW_FRAME_STRIDE +
@@ -5333,8 +5323,7 @@ void advManager::ShowRoute(int redraw, int, int updateButton)
             }
 
             if (remainingMobility2 < 0) {
-                reinterpret_cast<unsigned short *>(m_visibilityMap)
-                    [routeY1 * (MAP_WIDTH | 0) + routeX1] +=
+                m_visibilityMap[routeY1 * (MAP_WIDTH | 0) + routeX1] +=
                     ADVMGR_ROUTE_DAY_MASK;
             } else {
                 routeReachable8 = 1;

@@ -50,7 +50,7 @@ public:
         };
     };
     class heroWindow *m_adventureWindow;  // +0x9a
-    unsigned char *m_visibilityMap;  // +0x9e, packed 16-bit cell values
+    unsigned short *m_visibilityMap;  // +0x9e, packed route display cells
     int    m_visibilityMapValid;  // +0xa2
     int m_currentTerrain;  // +0xa6, index into giTerrainToMusicTrack
     char _pad_0xaa[0x4];
@@ -291,7 +291,6 @@ extern int S1cursorFrameCount;
 extern int S1cursorTurning;
 extern int S1cursorBaseFrame;
 extern int S1cursorDirection;
-extern struct SMapChange *sMapChangeLastFew;
 extern class icon *pVWMisc;
 extern class icon *pVWLetters;
 extern int iVWYPixelOffset;
