@@ -13,6 +13,7 @@
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/KB.h>
 #include <stdlib.h>
+#include <math.h>
 #include <string.h>
 #include <stdio.h>
 #include <SOURCE/philAI.h>
@@ -1686,8 +1687,196 @@ candidate_scored:
     return bestValue;
 }
 
+// @early-stop
+// Relocation-masked raw bytes differ only at +0x4ee/+0x4f1 and +0x62a/+0x62d:
+// MSVC loads the two commutative hero-artifact address operands into eax/ecx in
+// the opposite order. The effective addresses agree, as do all 84 relocations.
 VA(0x0043c6e2, 0x791)
-void philAI::ProbableOutcomeOfBattle(class armyGroup *, class hero *, class armyGroup *, class hero *, class armyGroup *, int, int, int, float &, int &, int &, int &, int &, int &) {}
+void philAI::ProbableOutcomeOfBattle(armyGroup *attacker, hero *attackerHero,
+                                     armyGroup *defender, hero *defenderHero,
+                                     armyGroup *townArmy, int useTown,
+                                     int townId, int enemyPlayer,
+                                     float &winChance, int &attackerLoss,
+                                     int &defenderLoss, int &attackerRemaining,
+                                     int &defenderRemaining, int &outcomeValue)
+{
+    int unusedValue29;
+    int attackerArtifacts7 = 0;
+    int defenderArtifacts18 = 0;
+    float defenderFightValue5;
+    float attackerFightValue26;
+    float defenderPower19;
+    float attackerStrength0;
+    int experienceValue1;
+    int artifactIndex15;
+    float defenderRawValue4;
+    float attackerRawValue7;
+    float defenderStrength4;
+    float difficultyFactor5;
+    float exponent1;
+    float attackerPower17;
+    float attackBonus13;
+
+    attackerFightValue26 = static_cast<float>(
+        FightValueOfStack(attacker, attackerHero, 1, 0, 0, useTown));
+    defenderFightValue5 = static_cast<float>(
+        FightValueOfStack(defender, defenderHero, 1, useTown, townId, 0));
+    if (townArmy != 0)
+        defenderFightValue5 += static_cast<float>(
+            FightValueOfStack(townArmy, 0, 1, 0, 0, 0));
+
+    attackerRawValue7 = static_cast<float>(
+        FightValueOfStack(attacker, attackerHero, 0, 0, 0, 0));
+    defenderRawValue4 = static_cast<float>(
+        FightValueOfStack(defender, defenderHero, 0, 0, 0, 0));
+    if (townArmy != 0)
+        defenderRawValue4 += static_cast<float>(
+            FightValueOfStack(townArmy, 0, 0, 0, 0, 0));
+
+    if (useTown != 0)
+        defenderFightValue5 = static_cast<float>(
+            defenderFightValue5 * AI_BATTLE_TOWN_DEFENDER_FACTOR);
+
+    defenderStrength4 = defenderFightValue5;
+    if (enemyPlayer == AI_BATTLE_NO_PLAYER) {
+        attackerStrength0 = static_cast<float>(
+            (gpGame->m_difficulty * AI_BATTLE_DIFFICULTY_STEP +
+             AI_BATTLE_BASE_STRENGTH_FACTOR) * attackerFightValue26);
+        if (reinterpret_cast<pdView *>(gpCurPlayer)->difficulty ==
+            AI_BATTLE_EASY_DIFFICULTY)
+            attackerStrength0 = static_cast<float>(
+                attackerStrength0 * AI_BATTLE_EASY_STRENGTH_FACTOR);
+    } else {
+        attackerStrength0 = attackerFightValue26;
+        if (gbHumanPlayer[enemyPlayer] != 0) {
+            defenderStrength4 = static_cast<float>(
+                defenderStrength4 * AI_BATTLE_HUMAN_DEFENDER_FACTOR);
+        } else if (reinterpret_cast<pdView *>(gpCurPlayer)->difficulty ==
+                   AI_BATTLE_EASY_DIFFICULTY) {
+            attackerStrength0 = static_cast<float>(
+                attackerStrength0 * AI_BATTLE_EASY_STRENGTH_FACTOR);
+        }
+    }
+
+    if (attackerStrength0 < AI_BATTLE_MINIMUM_STRENGTH)
+        attackerStrength0 = AI_BATTLE_MINIMUM_STRENGTH;
+    if (defenderStrength4 < AI_BATTLE_MINIMUM_STRENGTH)
+        defenderStrength4 = AI_BATTLE_MINIMUM_STRENGTH;
+
+    exponent1 = AI_BATTLE_NORMAL_POWER;
+    if (AI_BATTLE_LARGE_STRENGTH < attackerStrength0 ||
+        AI_BATTLE_LARGE_STRENGTH < defenderStrength4)
+        exponent1 = AI_BATTLE_LARGE_POWER;
+
+    attackerPower17 = static_cast<float>(
+        pow(static_cast<double>(attackerStrength0), static_cast<double>(exponent1)));
+    defenderPower19 = static_cast<float>(
+        pow(static_cast<double>(defenderStrength4), static_cast<double>(exponent1)));
+    winChance = attackerPower17 / (defenderPower19 + attackerPower17);
+
+    if (winChance < AI_BATTLE_ZERO_CHANCE) {
+        winChance = 0.0f;
+    } else if (winChance < AI_BATTLE_LOW_CHANCE) {
+        winChance = static_cast<float>(winChance - AI_BATTLE_LOW_PENALTY);
+    } else if (winChance < AI_BATTLE_MEDIUM_CHANCE) {
+        winChance = static_cast<float>(winChance - AI_BATTLE_MEDIUM_PENALTY);
+    } else if (winChance < AI_BATTLE_HIGH_CHANCE) {
+        winChance = static_cast<float>(winChance - AI_BATTLE_HIGH_PENALTY);
+    } else if (winChance < AI_BATTLE_TOP_CHANCE) {
+        winChance = static_cast<float>(winChance - AI_BATTLE_TOP_PENALTY);
+    }
+
+    attackerLoss = static_cast<int>((1.0 - winChance) * attackerRawValue7);
+    defenderLoss = static_cast<int>((+defenderRawValue4) * winChance);
+    attackerRemaining = static_cast<int>(
+        (1.0f - winChance) * attackerRawValue7 + attackerLoss * winChance);
+    defenderRemaining = static_cast<int>(
+        (1.0f - winChance) * defenderLoss + (+defenderRawValue4) * winChance);
+
+    difficultyFactor5 = static_cast<float>(
+        AI_BATTLE_LOSS_FACTOR_BASE -
+        reinterpret_cast<pdView *>(gpCurPlayer)->baseUpgradeFactor);
+    outcomeValue = static_cast<int>(
+        -attackerRemaining * difficultyFactor5 * difficultyFactor5);
+    if (enemyPlayer >= 0) {
+        difficultyFactor5 = static_cast<float>(
+            reinterpret_cast<pdView *>(gpCurPlayer)->baseUpgradeFactor +
+            AI_BATTLE_PLAYER_FACTOR_BASE);
+        if (gbHumanPlayer[enemyPlayer] != 0)
+            outcomeValue = static_cast<int>(
+                defenderRemaining * gfAttackHumanBonus * difficultyFactor5 *
+                    difficultyFactor5 + outcomeValue);
+        else
+            outcomeValue = static_cast<int>(
+                defenderRemaining * gfAttackComputerBonus * difficultyFactor5 *
+                    difficultyFactor5 + outcomeValue);
+    }
+    outcomeValue = static_cast<int>(
+        outcomeValue * reinterpret_cast<pdView *>(gpCurPlayer)->upgradeFactor);
+
+    if (attackerHero != 0) {
+        for (artifactIndex15 = 0;
+             artifactIndex15 < AI_BATTLE_ARTIFACT_SLOT_COUNT;
+             artifactIndex15++) {
+            if (attackerHero->m_artifacts[artifactIndex15] >= 0 &&
+                attackerHero->m_artifacts[artifactIndex15] <
+                    AI_BATTLE_BASE_ARTIFACT_LIMIT)
+                attackerArtifacts7 +=
+                    gArtifactBaseRV[attackerHero->m_artifacts[artifactIndex15]];
+        }
+        if (reinterpret_cast<gameTV *>(gpGame)->f2c6 ==
+                AI_BATTLE_SPECIAL_ARTIFACT_STATE &&
+            static_cast<unsigned char>(attackerHero->m_id) ==
+                reinterpret_cast<gameTV *>(gpGame)->f2c9)
+            attackerArtifacts7 += AI_BATTLE_SPECIAL_ARTIFACT_VALUE;
+
+        outcomeValue = static_cast<int>(
+            outcomeValue - (AI_BATTLE_FULL_CHANCE - winChance) *
+                (attackerArtifacts7 + AI_BATTLE_ATTACKER_ARTIFACT_BASE));
+        experienceValue1 = gpGame->ExperienceValueOfStack(defender, defenderHero);
+        outcomeValue = static_cast<int>(
+            experienceValue1 * attackerHero->m_aiFightValue * winChance *
+                AI_BATTLE_HERO_EXPERIENCE_FACTOR + outcomeValue);
+    }
+
+    if (defenderHero != 0) {
+        for (artifactIndex15 = 0;
+             artifactIndex15 < AI_BATTLE_ARTIFACT_SLOT_COUNT;
+             artifactIndex15++) {
+            if (defenderHero->m_artifacts[artifactIndex15] >= 0 &&
+                defenderHero->m_artifacts[artifactIndex15] <
+                    AI_BATTLE_BASE_ARTIFACT_LIMIT)
+                defenderArtifacts18 +=
+                    gArtifactBaseRV[defenderHero->m_artifacts[artifactIndex15]];
+        }
+        if (reinterpret_cast<gameTV *>(gpGame)->f2cb ==
+                AI_BATTLE_SPECIAL_ARTIFACT_STATE &&
+            static_cast<unsigned char>(defenderHero->m_id) ==
+                reinterpret_cast<gameTV *>(gpGame)->f2cc)
+            defenderArtifacts18 += AI_BATTLE_SPECIAL_ARTIFACT_VALUE;
+
+        if (gbHumanPlayer[defenderHero->m_owner] != 0)
+            attackBonus13 = gfAttackHumanBonus;
+        else
+            attackBonus13 = gfAttackComputerBonus;
+        outcomeValue = static_cast<int>(
+            winChance * ((defenderArtifacts18 + AI_BATTLE_DEFENDER_ARTIFACT_BASE) *
+                         attackBonus13) + outcomeValue);
+    }
+
+    if (giDebugLevel >= AI_BATTLE_DEBUG_LEVEL) {
+        LogInt("POBA", static_cast<int>(attackerStrength0),
+               static_cast<int>(defenderStrength4),
+               static_cast<int>(reinterpret_cast<pdView *>(gpCurPlayer)->baseUpgradeFactor *
+                                AI_BATTLE_PERCENT_SCALE),
+               0, attackerArtifacts7, defenderArtifacts18,
+               static_cast<int>(reinterpret_cast<pdView *>(gpCurPlayer)->upgradeFactor));
+        LogInt("POB", static_cast<int>(attackerFightValue26),
+               static_cast<int>(defenderFightValue5),
+               static_cast<int>(winChance * AI_BATTLE_PERCENT_SCALE),
+               defenderLoss, attackerRemaining, defenderRemaining, outcomeValue);
+    }
+}
 
 VA(0x0043ce73, 0x1e)
 float philAI::GetOddsOfWinning(int) {
