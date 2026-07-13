@@ -3562,7 +3562,7 @@ DATA(0x004fd720) unsigned long gHierarchyMask[6][12];
 DATA(0x004fd840) int giDebugBuildingToBuild;
 DATA(0x004fd848) unsigned char giTerrainToMusicTrack[16];
 DATA(0x004fd858) char *cHeroTypeShortName[6];
-DATA(0x004fd870) char *cHeroTypeInitial;
+DATA(0x004fd870) char cHeroTypeInitial[HERO_TYPE_INITIAL_COUNT];
 DATA(0x004fd878) int giDeferObjDrawX;
 DATA(0x004fd87c) int giDeferObjDrawY;
 DATA(0x004fd880) class heroWindow *gpInitWin;

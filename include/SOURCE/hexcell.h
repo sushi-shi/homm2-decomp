@@ -12,7 +12,11 @@ public:
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     short  m_x;  // +0x00
     short  m_y;  // +0x02
-    char _pad_0x4[0xa];
+    short m_gridLeft;  // +0x04
+    short m_gridTop;  // +0x06
+    short m_gridRight;  // +0x08
+    char _pad_0xa[0x2];
+    short m_gridBottom;  // +0x0c
     char   m_blocked;  // +0x0e
     signed char m_obstacleIndex;  // +0x0f
     signed char m_occupantSide;  // +0x10
@@ -22,7 +26,7 @@ public:
     signed char m_deadOccupantSides[14];  // +0x17
     signed char m_deadOccupantIndices[14];  // +0x25
     signed char m_deadOccupantFrames[14];  // +0x33
-    char m_unknown41;
+    unsigned char m_pathReachable;  // +0x41
     struct SLimitData m_limits[2];  // +0x42
     // --- constructors ---
     hexcell(void);

@@ -141,8 +141,32 @@ enum {
     COMBAT_MESSAGE_BROADCAST_EVENT = 0x200,
     COMBAT_MESSAGE_TEXT_ACTION = 3,
     COMBAT_MESSAGE_DRAW_FIRST_WIDGET = 10,
-    COMBAT_BALLISTA_HEX = 77
+    COMBAT_BALLISTA_HEX = 77,
+    COMBAT_HEX_COUNT = 117,
+    COMBAT_GRID_COPY_LEFT = 67,
+    COMBAT_GRID_COPY_TOP = 63,
+    COMBAT_GRID_COPY_RIGHT = 573,
+    COMBAT_GRID_COPY_BOTTOM = 442,
+    COMBAT_GRID_LINE_FRAME = 0,
+    COMBAT_GRID_LINE_COLOR = 0xe2,
+    COMBAT_GRID_MOUSE_FRAME = 2,
+    COMBAT_MOUSE_HEX_WIDTH = 44,
+    COMBAT_MOUSE_HEX_HEIGHT = 52,
+    COMBAT_MOUSE_HEX_MAX_X_OFFSET = 43,
+    COMBAT_MOUSE_HEX_MAX_Y_OFFSET = 51,
+    COMBAT_MOUSE_REDRAW_DELAY = 75,
+    COMBAT_BACKGROUND_COPY_WIDTH = 507,
+    COMBAT_BACKGROUND_COPY_HEIGHT = 380,
+    COMBAT_CASTLE_BACKGROUND_BASE_FRAME = 1,
+    COMBAT_CASTLE_BACKGROUND_BUILDING_FRAME = 4,
+    COMBAT_CASTLE_BACKGROUND_DEFAULT_FRAME = 3
 };
+
+typedef enum CombatGridShade {
+    COMBAT_GRID_SHADE_NONE = 0,
+    COMBAT_GRID_SHADE_REACHABLE = 1,
+    COMBAT_GRID_SHADE_EMPTY_BLOCKED = 3
+} CombatGridShade;
 
 typedef enum CombatMessageCommand {
     COMBAT_MESSAGE_COMMAND_DEFAULT = 0,
@@ -180,15 +204,19 @@ public:
     char _pad_0x3a[0x300];
     char m_previousCombatMessage[COMBAT_MESSAGE_LINE_SIZE];  // +0x33a
     char m_currentCombatMessage[COMBAT_MESSAGE_LINE_SIZE];  // +0x3b2
-    char _pad_0x42a[0xea];
-    hexcell m_hexCells[117];  // +0x514
-    char _pad_0x31de[0x14];
+    unsigned char m_previousGridState[COMBAT_HEX_COUNT];  // +0x42a
+    unsigned char m_gridState[COMBAT_HEX_COUNT];  // +0x49f
+    hexcell m_hexCells[COMBAT_HEX_COUNT];  // +0x514
+    char _pad_0x31de[0x4];
+    int m_battlefieldFringe;  // +0x31e2
+    char _pad_0x31e6[0xc];
     int m_debugFormation;  // +0x31f2
     char _pad_0x31f6[0xc];
     class icon *m_catapultIcon;  // +0x3202
     char _pad_0x3206[0x4];
     class icon *m_towerIcon;  // +0x320a
-    char _pad_0x320e[0x10];
+    char _pad_0x320e[0xc];
+    class icon *m_gridIcon;  // +0x321a
     class icon *m_smallViewBackgroundIcon;  // +0x321e
     class icon *m_smallViewModifierIcon;  // +0x3222
     class icon *m_smallViewSpellIcon;  // +0x3226
@@ -201,14 +229,16 @@ public:
     unsigned char m_wallStates[9];  // +0x3262
     class bitmap *m_combatBuffer;  // +0x326b
     class bitmap *m_backgroundBuffer;  // +0x326f
-    char _pad_0x3273[0x4];
+    class bitmap *m_mouseGridBuffer;  // +0x3273
     int m_backgroundDrawn;  // +0x3277
     char _pad_0x327b[0x8];
     class town *m_castle;  // +0x3283
     class hero *m_heroes[2];  // +0x3287
     char _pad_0x328f[0xfa];
     int m_spellPower[2];  // +0x3389
-    char _pad_0x3391[0x14];
+    char _pad_0x3391[0x8];
+    int m_mouseGridHex;  // +0x3399
+    char _pad_0x339d[0x8];
     int m_heroAnimationState[2];  // +0x33a5
     int m_heroAnimationFrame[2];  // +0x33ad
     int m_heroSpriteIndex[2];  // +0x33b5
@@ -222,7 +252,9 @@ public:
     long m_previousCombatMessageExpiration;  // +0x34ad
     long m_combatMessageExpiration;  // +0x34b1
     int m_combatMessagePending;  // +0x34b5
-    char _pad_0x34b9[0x86];
+    char _pad_0x34b9[0x76];
+    int m_playerId[2];  // +0x352f
+    char _pad_0x3537[0x8];
     int m_heroCastSpell[2];  // +0x353f
     int m_armyCount[2];  // +0x3547
     class army m_armies[2][21];  // +0x354f
@@ -230,7 +262,7 @@ public:
     int m_currentArmyIndex;  // +0xf2a7
     char _pad_0xf2ab[0x4];
     int m_currentSide;  // +0xf2af
-    char _pad_0xf2b3[0x4];
+    int m_gridSelectionDisabled;  // +0xf2b3
     int m_limitCreature;  // +0xf2b7
     int m_limitCreatureHex;  // +0xf2bb
     char _pad_0xf2bf[0x4];
@@ -261,7 +293,9 @@ public:
     int m_smallViewLastY[2];  // +0xf55b
     int m_smallViewWidth[2];  // +0xf563
     int m_smallViewHeight[2];  // +0xf56b
-    char _pad_0xf573[0x304];
+    char _pad_0xf573[0x2d];
+    char m_battlefieldBackgroundName[13];  // +0xf5a0
+    char _pad_0xf5ad[0x2ca];
     // --- constructors ---
     combatManager(void);
     // --- virtual methods (vtable order) ---
