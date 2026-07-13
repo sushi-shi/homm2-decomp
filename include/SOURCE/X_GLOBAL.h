@@ -5,6 +5,8 @@
 
 class ExpCampaign;
 
+enum { HERO_TYPE_INITIAL_COUNT = 8 };
+
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
 extern signed char xIsExpansionMap;
 extern unsigned char xIsPlayingExpansionCampaign;
@@ -118,7 +120,7 @@ extern char *gTownObjNames[32];
 extern int giDebugBuildingToBuild;
 extern unsigned char giTerrainToMusicTrack[16];
 extern char *cHeroTypeShortName[6];
-extern char *cHeroTypeInitial;
+extern char cHeroTypeInitial[HERO_TYPE_INITIAL_COUNT];
 extern int giDeferObjDrawX;
 extern int giDeferObjDrawY;
 extern class heroWindow *gpInitWin;

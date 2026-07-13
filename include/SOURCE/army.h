@@ -59,8 +59,8 @@ public:
     int    m_animationValue2;  // +0xda
     int    m_animationValue3;  // +0xde
     int    field_0xe2;  // +0xe2
-    int    m_effectX;  // +0xe6
-    int    m_effectY;  // +0xea
+    int    m_side;  // +0xe6
+    int    m_index;  // +0xea
     int    field_0xee;  // +0xee
     int    m_morale;  // +0xf2
     int    m_luck;  // +0xf6
