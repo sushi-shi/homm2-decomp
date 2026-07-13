@@ -677,7 +677,7 @@ void game::SetupOrigData(void)
 {
     ClearMapExtra();
     gbIAmGreatest = 0;
-    field_0x0 = 1;
+    m_difficultyRating = 1;
     giMonthType = 0;
     giMonthTypeExtra = 0;
     giWeekType = 0;
