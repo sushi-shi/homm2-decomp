@@ -446,8 +446,8 @@ int game::GetNewHeroId(int, int heroClass, int requireExperienced)
              m_heroRecs[heroId].m_artifacts[1] == 81))
             continue;
         if (gbInCampaign && attempts < 500 &&
-            m_heroRecs[heroId].m_unknown18 >= 54 &&
-            m_heroRecs[heroId].m_unknown18 <= 59)
+            m_heroRecs[heroId].m_portrait >= 54 &&
+            m_heroRecs[heroId].m_portrait <= 59)
             continue;
         break;
     }
@@ -729,7 +729,7 @@ void game::SetupOrigData(void)
         m_heroRecs[i].m_patrolY = -1;
         m_heroRecs[i].m_patrolX = m_heroRecs[i].m_patrolY;
         m_heroRecs[i].m_id = static_cast<signed char>(i);
-        m_heroRecs[i].m_unknown18 = static_cast<unsigned char>(i);
+        m_heroRecs[i].m_portrait = static_cast<unsigned char>(i);
         m_heroRecs[i].m_owner = -1;
         m_heroRecs[i].m_direction = 2;
         strcpy(m_heroRecs[i].m_name, gHeroDefaultNames[i]);
@@ -1242,12 +1242,12 @@ void game::NewMap(char *filename)
                     m_heroRecs[campaignHero15].m_experience += 5000;
                     m_heroRecs[campaignHero15].CheckLevel();
                     strcpy(m_heroRecs[campaignHero15].m_name, "Sister Eliza");
-                    m_heroRecs[campaignHero15].m_unknown18 = 56;
+                    m_heroRecs[campaignHero15].m_portrait = 56;
                 } else {
                     m_heroRecs[campaignHero15].m_experience += 5000;
                     m_heroRecs[campaignHero15].CheckLevel();
                     strcpy(m_heroRecs[campaignHero15].m_name, "Brother Brax");
-                    m_heroRecs[campaignHero15].m_unknown18 = 59;
+                    m_heroRecs[campaignHero15].m_portrait = 59;
                 }
                 m_players[player2].availableHeroes[0] = static_cast<char>(campaignHero15);
                 m_availableHeroes[m_players[player2].availableHeroes[0]] = 64;
@@ -1277,7 +1277,7 @@ void game::NewMap(char *filename)
                         m_heroRecs[campaignHero15].m_experience = 5000;
                         m_heroRecs[campaignHero15].CheckLevel();
                         strcpy(m_heroRecs[campaignHero15].m_name, specialName3);
-                        m_heroRecs[campaignHero15].m_unknown18 = specialPortrait6;
+                        m_heroRecs[campaignHero15].m_portrait = specialPortrait6;
                         m_players[player2].availableHeroes[0] = static_cast<char>(campaignHero15);
                         m_availableHeroes[m_players[player2].availableHeroes[0]] = 64;
                         heroClass5 = m_heroRecs[campaignHero15].m_cursorType;
@@ -3866,7 +3866,7 @@ int game::GetRandomArtifactId(int levelMask, int allowCursed)
                 continue;
         }
         if (m_victoryConditionType != VICTORY_CONDITION_ARTIFACT ||
-            m_victoryArtifact - VICTORY_ARTIFACT_ID_OFFSET != artifact)
+            m_victoryConditionValue - VICTORY_ARTIFACT_ID_OFFSET != artifact)
             break;
     }
 
@@ -4790,7 +4790,7 @@ void game::ProcessOnMapHeroes(void)
                         mapHero = GetHero(heroId);
                         mapHero->m_cursorType = static_cast<unsigned char>(heroClass);
                         if (extra->hasCustomHero && extra->heroId >= GAME_HERO_COUNT)
-                            mapHero->m_unknown18 = extra->heroId;
+                            mapHero->m_portrait = extra->heroId;
                         extra->heroId = static_cast<signed char>(heroId);
                     }
                 }

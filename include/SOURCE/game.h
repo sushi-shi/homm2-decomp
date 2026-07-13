@@ -133,9 +133,10 @@ public:
     unsigned char m_campaignType;  // +0x02
     char   field_0x3;  // +0x03
     signed char m_campaignScenario;  // +0x04
-    char _pad_0x5[0xe];
-    char   field_0x13;  // +0x13
-    char _pad_0x14[0x6a];
+    unsigned char m_campaignScenarioCompleted[2][12];  // +0x05
+    short m_campaignScenarioBonus[2][12];  // +0x1d
+    short m_campaignScenarioDays[2][12];  // +0x4d
+    char m_unknown7d;  // +0x7d
     unsigned char m_dwarfAlliance;  // +0x7e
     char   field_0x7f;  // +0x7f
     char   field_0x80;  // +0x80
@@ -173,8 +174,10 @@ public:
     char   field_0xb7;  // +0xb7
     char   field_0xb8;  // +0xb8
     char   field_0xb9;  // +0xb9
-    short  field_0xba;  // +0xba
-    char _pad_0xbc[0x15];
+    short m_campaignScore;  // +0xba
+    short m_campaignCarryoverCreatureTypes[5];  // +0xbc
+    short m_campaignCarryoverCreatureCounts[5];  // +0xc6
+    unsigned char m_campaignScenarioWon;  // +0xd0
     unsigned char m_campaignCheated;  // +0xd1
     char _pad_0xd2[0x78];
     char m_saveName[0x15f];  // +0x14a
@@ -190,15 +193,15 @@ public:
     char   field_0x2c4;  // +0x2c4
     char   field_0x2c5;  // +0x2c5
     unsigned char m_victoryConditionType;  // +0x2c6
-    char   field_0x2c7;  // +0x2c7
-    char   field_0x2c8;  // +0x2c8
-    unsigned short m_victoryArtifact;  // +0x2c9, one-based artifact id
-    char   field_0x2cb;  // +0x2cb
-    short  field_0x2cc;  // +0x2cc
+    unsigned char m_computerAlsoWins;  // +0x2c7
+    unsigned char m_allowNormalVictory;  // +0x2c8
+    unsigned short m_victoryConditionValue;  // +0x2c9
+    unsigned char m_lossConditionType;  // +0x2cb
+    unsigned short m_lossConditionValue;  // +0x2cc
     char   field_0x2ce;  // +0x2ce
     char _pad_0x2cf[0x6];
-    short  field_0x2d5;  // +0x2d5
-    short  field_0x2d7;  // +0x2d7
+    unsigned short m_victoryTownY;  // +0x2d5
+    unsigned short m_lossTownY;  // +0x2d7
     unsigned short m_victorySideThreshold;  // +0x2d9
     char _pad_0x2db[0x170];
     char   field_0x44b;  // +0x44b
