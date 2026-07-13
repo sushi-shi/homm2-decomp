@@ -5,6 +5,18 @@
 #include <va.h>
 #include <BASE/resource.h>
 
+enum sampleAudioFormat {
+    SAMPLE_FORMAT_8_BIT = 0,
+    SAMPLE_FORMAT_16_BIT = 1,
+    SAMPLE_FORMAT_STEREO = 2
+};
+
+enum samplePlaybackRate {
+    SAMPLE_RATE_11025 = 11025,
+    SAMPLE_RATE_22050 = 22050,
+    SAMPLE_RATE_44100 = 44100
+};
+
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class sample : public resource {
 public:
@@ -21,7 +33,9 @@ public:
     int    m_loopCount;  // +0x2c
     // --- constructors ---
     sample(char *, long int, long int, long int);
-    virtual ~sample();
+    // Inline lets the compiler fold the body into ??_G; dllexport also retains the
+    // standalone ??1 body required by retail.
+    __declspec(dllexport) virtual inline ~sample() OVERRIDE;
 };
 #pragma pack(pop)
 SIZE(sample, 0x30);
