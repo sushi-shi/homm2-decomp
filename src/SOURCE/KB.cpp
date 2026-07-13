@@ -3452,6 +3452,10 @@ void CleanUpMenus(void)
     hmnuApp = 0;
 }
 
+// @early-stop
+// Frame 0x4, CFG, and every instruction role align; only the symmetric hMenu /
+// hmnuAdv comparison load order differs, making retail one byte longer. Reversing
+// the operands compiles identically in this TU.
 VA(0x0049f9c6, 0x2a)
 void UpdateAppSpecificMenus(void *hMenu)
 {
@@ -3472,6 +3476,10 @@ int InMapArea(int x, int y)
     return (x >= 16 && x < 448 && y >= 16 && y < 448);
 }
 
+// @early-stop
+// Explicit-range comparison finds 503 aligned instructions, exact 0x6bc span,
+// 0x90 frame, and every stack slot. The sole code residual is one equivalent
+// inner-loop comparison operand order; reversing the relation compiles identically.
 VA(0x0049fa70, 0x6bc)
 void SetupDynamicWindow(int x, int y, int centered, int boundsWidth, int boundsHeight,
                         int contentWidth, int contentHeight, int *windowWidth,
@@ -3479,156 +3487,155 @@ void SetupDynamicWindow(int x, int y, int centered, int boundsWidth, int boundsH
                         int *contentRight, int *contentBottom, heroWindow **window,
                         int windowType)
 {
-    int columns;
-    int rows;
-    int centeredWidth;
-    int centeredHeight;
     int leftOffset;
-    int topOffset;
+    int bottomCornerPaddingNum;
+    int numRows;
+    widget *newWidgetTemp;
+    int columnsSize;
+    int topOffsetNum;
+    int contentXPaddingCount;
+    int centeredHeightCount;
+    int centeredPadding;
+    int topCornerPaddingCount;
+    int bottomOffsetLocal;
     int rightOffset;
-    int bottomOffset;
-    int row;
-    int column;
+    int contentYPadding;
     int edge;
-    widget *newWidget;
+    int tileRowPos;
+    int centeredWidthValue;
+    int leftCornerPaddingLocal;
+    int rightCornerPaddingValue;
+    int stoneWidgetColorSize;
+    int columnIndex;
+    int bottomEdgeOffset;
     int tileWidth;
     int tileHeight;
-    int topEdgeOffset;
-    int bottomEdgeOffset;
-    int contentXPadding;
-    int contentYPadding;
-    int topCornerPadding;
-    int bottomCornerPadding;
-    int leftCornerPadding;
-    int rightCornerPadding;
-    int centeredPadding;
-    int stoneWidgetColor;
-    int dynamicWindowType;
+    int topEdgeInset;
 
     tileWidth = DYNAMIC_TILE_SIZE;
     tileHeight = DYNAMIC_TILE_SIZE;
-    topEdgeOffset = -DYNAMIC_EDGE_OFFSET;
+    topEdgeInset = -DYNAMIC_EDGE_OFFSET;
     bottomEdgeOffset = -DYNAMIC_EDGE_OFFSET;
-    contentXPadding = DYNAMIC_CONTENT_LEFT;
+    contentXPaddingCount = DYNAMIC_CONTENT_LEFT;
     contentYPadding = DYNAMIC_CONTENT_TOP;
-    topCornerPadding = DYNAMIC_CONTENT_TOP;
-    bottomCornerPadding = DYNAMIC_CONTENT_TOP;
-    leftCornerPadding = DYNAMIC_CONTENT_TOP;
-    rightCornerPadding = DYNAMIC_CONTENT_TOP;
+    topCornerPaddingCount = DYNAMIC_CONTENT_TOP;
+    bottomCornerPaddingNum = DYNAMIC_CONTENT_TOP;
+    leftCornerPaddingLocal = DYNAMIC_CONTENT_TOP;
+    rightCornerPaddingValue = DYNAMIC_CONTENT_TOP;
     centeredPadding = DYNAMIC_CONTENT_LEFT;
-    stoneWidgetColor = DYNAMIC_WIDGET_COLOR;
-    dynamicWindowType = 0;
-    columns = (contentWidth - 1) / DYNAMIC_TILE_SIZE + 1;
-    rows = (contentHeight - 1) / DYNAMIC_TILE_SIZE + 1;
-    *windowWidth = columns * DYNAMIC_TILE_SIZE + DYNAMIC_WINDOW_PADDING;
-    *windowHeight = rows * DYNAMIC_TILE_SIZE + DYNAMIC_WINDOW_PADDING;
-    centeredWidth = columns * DYNAMIC_TILE_SIZE + DYNAMIC_CONTENT_LEFT;
-    centeredHeight = rows * DYNAMIC_TILE_SIZE + DYNAMIC_CONTENT_LEFT;
+    stoneWidgetColorSize = DYNAMIC_WIDGET_COLOR;
+    newWidgetTemp = 0;
+    columnsSize = (contentWidth - 1) / DYNAMIC_TILE_SIZE + 1;
+    numRows = (contentHeight - 1) / DYNAMIC_TILE_SIZE + 1;
+    *windowWidth = columnsSize * DYNAMIC_TILE_SIZE + DYNAMIC_WINDOW_PADDING;
+    *windowHeight = numRows * DYNAMIC_TILE_SIZE + DYNAMIC_WINDOW_PADDING;
+    centeredWidthValue = columnsSize * DYNAMIC_TILE_SIZE + DYNAMIC_CONTENT_LEFT;
+    centeredHeightCount = numRows * DYNAMIC_TILE_SIZE + DYNAMIC_CONTENT_LEFT;
     if (centered) {
-        x += ((boundsWidth - centeredWidth) >> 1) - DYNAMIC_CONTENT_TOP;
-        y += (boundsHeight - centeredHeight) >> 1;
+        x += ((boundsWidth - centeredWidthValue) >> 1) - DYNAMIC_CONTENT_TOP;
+        y += (boundsHeight - centeredHeightCount) >> 1;
     }
     *contentLeft = x + DYNAMIC_CONTENT_LEFT;
     *contentTop = y + DYNAMIC_CONTENT_TOP;
-    *contentRight = columns * DYNAMIC_TILE_SIZE + *contentLeft - 1;
-    *contentBottom = rows * DYNAMIC_TILE_SIZE + *contentTop - 1;
+    *contentRight = columnsSize * DYNAMIC_TILE_SIZE + *contentLeft - 1;
+    *contentBottom = numRows * DYNAMIC_TILE_SIZE + *contentTop - 1;
 
     if (windowType != 0)
         return;
     *window = new heroWindow(x, y, *windowWidth, *windowHeight,
                              DYNAMIC_WINDOW_FLAGS);
     leftOffset = *contentLeft - x;
-    topOffset = *contentTop - y;
+    topOffsetNum = *contentTop - y;
     rightOffset = *contentRight - x;
-    bottomOffset = *contentBottom - y;
+    bottomOffsetLocal = *contentBottom - y;
 
-    for (row = 0; row < rows; row++) {
-        for (column = 0; column < columns; column++) {
-            newWidget = new iconWidget(
-                column * DYNAMIC_TILE_SIZE + leftOffset,
-                row * DYNAMIC_TILE_SIZE + topOffset,
+    for (tileRowPos = 0; tileRowPos < numRows; tileRowPos++) {
+        for (columnIndex = 0; columnIndex < columnsSize; columnIndex++) {
+            newWidgetTemp = new iconWidget(
+                columnIndex * DYNAMIC_TILE_SIZE + leftOffset,
+                tileRowPos * DYNAMIC_TILE_SIZE + topOffsetNum,
                 DYNAMIC_TILE_SIZE, DYNAMIC_TILE_SIZE, "stonebk2.icn",
                 DYNAMIC_BACKGROUND_FRAME, 0, -1, DYNAMIC_WIDGET_COLOR, 1);
-            if (newWidget == 0)
+            if (newWidgetTemp == 0)
                 MemError();
-            (*window)->AddWidget(newWidget, -1);
+            (*window)->AddWidget(newWidgetTemp, -1);
         }
     }
 
-    newWidget = new iconWidget(leftOffset - DYNAMIC_CORNER_LEFT,
-                               topOffset - DYNAMIC_CORNER_LEFT,
-                               DYNAMIC_CORNER_SIZE, DYNAMIC_CORNER_SIZE,
-                               "stonebk2.icn", 0, 0, -1, DYNAMIC_WIDGET_COLOR, 1);
-    if (newWidget == 0)
+    newWidgetTemp = new iconWidget(leftOffset - DYNAMIC_CORNER_LEFT,
+                                   topOffsetNum - DYNAMIC_CORNER_LEFT,
+                                   DYNAMIC_CORNER_SIZE, DYNAMIC_CORNER_SIZE,
+                                   "stonebk2.icn", 0, 0, -1, DYNAMIC_WIDGET_COLOR, 1);
+    if (newWidgetTemp == 0)
         MemError();
-    (*window)->AddWidget(newWidget, -1);
+    (*window)->AddWidget(newWidgetTemp, -1);
 
-    newWidget = new iconWidget(rightOffset - DYNAMIC_CORNER_RIGHT,
-                               topOffset - DYNAMIC_CORNER_LEFT,
-                               DYNAMIC_CORNER_SIZE, DYNAMIC_CORNER_SIZE,
-                               "stonebk2.icn", 1, 0, -1, DYNAMIC_WIDGET_COLOR, 1);
-    if (newWidget == 0)
+    newWidgetTemp = new iconWidget(rightOffset - DYNAMIC_CORNER_RIGHT,
+                                   topOffsetNum - DYNAMIC_CORNER_LEFT,
+                                   DYNAMIC_CORNER_SIZE, DYNAMIC_CORNER_SIZE,
+                                   "stonebk2.icn", 1, 0, -1, DYNAMIC_WIDGET_COLOR, 1);
+    if (newWidgetTemp == 0)
         MemError();
-    (*window)->AddWidget(newWidget, -1);
+    (*window)->AddWidget(newWidgetTemp, -1);
 
-    newWidget = new iconWidget(rightOffset - DYNAMIC_CORNER_RIGHT,
-                               bottomOffset - DYNAMIC_CORNER_RIGHT,
-                               DYNAMIC_CORNER_SIZE, DYNAMIC_CORNER_SIZE,
-                               "stonebk2.icn", 2, 0, -1, DYNAMIC_WIDGET_COLOR, 1);
-    if (newWidget == 0)
+    newWidgetTemp = new iconWidget(rightOffset - DYNAMIC_CORNER_RIGHT,
+                                   bottomOffsetLocal - DYNAMIC_CORNER_RIGHT,
+                                   DYNAMIC_CORNER_SIZE, DYNAMIC_CORNER_SIZE,
+                                   "stonebk2.icn", 2, 0, -1, DYNAMIC_WIDGET_COLOR, 1);
+    if (newWidgetTemp == 0)
         MemError();
-    (*window)->AddWidget(newWidget, -1);
+    (*window)->AddWidget(newWidgetTemp, -1);
 
-    newWidget = new iconWidget(leftOffset - DYNAMIC_CORNER_LEFT,
-                               bottomOffset - DYNAMIC_CORNER_RIGHT,
-                               DYNAMIC_CORNER_SIZE, DYNAMIC_CORNER_SIZE,
-                               "stonebk2.icn", 3, 0, -1, DYNAMIC_WIDGET_COLOR, 1);
-    if (newWidget == 0)
+    newWidgetTemp = new iconWidget(leftOffset - DYNAMIC_CORNER_LEFT,
+                                   bottomOffsetLocal - DYNAMIC_CORNER_RIGHT,
+                                   DYNAMIC_CORNER_SIZE, DYNAMIC_CORNER_SIZE,
+                                   "stonebk2.icn", 3, 0, -1, DYNAMIC_WIDGET_COLOR, 1);
+    if (newWidgetTemp == 0)
         MemError();
-    (*window)->AddWidget(newWidget, -1);
+    (*window)->AddWidget(newWidgetTemp, -1);
 
-    for (edge = 0; edge < columns; edge++) {
-        newWidget = new iconWidget(
+    for (edge = 0; edge < columnsSize; edge++) {
+        newWidgetTemp = new iconWidget(
             edge * DYNAMIC_TILE_SIZE + leftOffset - DYNAMIC_EDGE_OFFSET,
-            topOffset - DYNAMIC_CORNER_LEFT,
+            topOffsetNum - DYNAMIC_CORNER_LEFT,
             DYNAMIC_CORNER_SIZE, DYNAMIC_CORNER_SIZE, "stonebk2.icn",
             Random(DYNAMIC_TOP_FRAME_FIRST, DYNAMIC_TOP_FRAME_LAST), 0, -1,
             DYNAMIC_WIDGET_COLOR, 1);
-        if (newWidget == 0)
+        if (newWidgetTemp == 0)
             MemError();
-        (*window)->AddWidget(newWidget, -1);
+        (*window)->AddWidget(newWidgetTemp, -1);
 
-        newWidget = new iconWidget(
+        newWidgetTemp = new iconWidget(
             edge * DYNAMIC_TILE_SIZE + leftOffset - DYNAMIC_EDGE_OFFSET,
-            bottomOffset - DYNAMIC_CORNER_RIGHT,
+            bottomOffsetLocal - DYNAMIC_CORNER_RIGHT,
             DYNAMIC_CORNER_SIZE, DYNAMIC_CORNER_SIZE, "stonebk2.icn",
             Random(DYNAMIC_BOTTOM_FRAME_FIRST, DYNAMIC_BOTTOM_FRAME_LAST), 0, -1,
             DYNAMIC_WIDGET_COLOR, 1);
-        if (newWidget == 0)
+        if (newWidgetTemp == 0)
             MemError();
-        (*window)->AddWidget(newWidget, -1);
+        (*window)->AddWidget(newWidgetTemp, -1);
     }
 
-    for (edge = 0; edge < rows; edge++) {
-        newWidget = new iconWidget(
+    for (edge = 0; edge < numRows; edge++) {
+        newWidgetTemp = new iconWidget(
             leftOffset - DYNAMIC_CORNER_LEFT,
-            edge * DYNAMIC_TILE_SIZE + topOffset - DYNAMIC_EDGE_OFFSET,
+            edge * DYNAMIC_TILE_SIZE + topOffsetNum - DYNAMIC_EDGE_OFFSET,
             DYNAMIC_CORNER_SIZE, DYNAMIC_CORNER_SIZE, "stonebk2.icn",
             Random(DYNAMIC_LEFT_FRAME_FIRST, DYNAMIC_LEFT_FRAME_LAST), 0, -1,
             DYNAMIC_WIDGET_COLOR, 1);
-        if (newWidget == 0)
+        if (newWidgetTemp == 0)
             MemError();
-        (*window)->AddWidget(newWidget, -1);
+        (*window)->AddWidget(newWidgetTemp, -1);
 
-        newWidget = new iconWidget(
+        newWidgetTemp = new iconWidget(
             rightOffset - DYNAMIC_CORNER_RIGHT,
-            edge * DYNAMIC_TILE_SIZE + topOffset - DYNAMIC_EDGE_OFFSET,
+            edge * DYNAMIC_TILE_SIZE + topOffsetNum - DYNAMIC_EDGE_OFFSET,
             DYNAMIC_CORNER_SIZE, DYNAMIC_CORNER_SIZE, "stonebk2.icn",
             Random(DYNAMIC_RIGHT_FRAME_FIRST, DYNAMIC_RIGHT_FRAME_LAST), 0, -1,
             DYNAMIC_WIDGET_COLOR, 1);
-        if (newWidget == 0)
+        if (newWidgetTemp == 0)
             MemError();
-        (*window)->AddWidget(newWidget, -1);
+        (*window)->AddWidget(newWidgetTemp, -1);
     }
 }
 
@@ -3655,6 +3662,10 @@ void TestDynamicWindow(int p1, int p2)
     delete p;
 }
 
+// @early-stop
+// Frame 0xc, packet slots, and CFG align; only the symmetric pos / giThisGamePos
+// comparison load order differs, making retail one byte longer. Reversed operands
+// and the value-|0 spelling compile identically in this TU.
 VA(0x004a0234, 0x91)
 void HandleRemoteDeadPlayerExit(int pos)
 {
@@ -3698,6 +3709,10 @@ void HandleRemoteSuddenExit(void)
     DelayMilli(500);
 }
 
+// @early-stop
+// Frame 0x4, loop CFG, and all stack uses align; only the symmetric loop-index /
+// giThisNetPos comparison load order differs, making retail one byte longer.
+// Reversed operands and the value-|0 spelling compile identically in this TU.
 VA(0x004a036f, 0x62)
 void DropDownToOnePlayer(void)
 {
@@ -3714,7 +3729,7 @@ void ReceiveHostReportsPlayerExit(int hostNetPosition, SPlayerExit exitInfo,
                                   int forwardedReport)
 {
     int showExitMessage;
-    char exitMessage[PLAYER_EXIT_MESSAGE_LENGTH];
+    char playerExitMessage[PLAYER_EXIT_MESSAGE_LENGTH];
     int netPosition;
 
     showExitMessage = 0;
@@ -3753,14 +3768,14 @@ void ReceiveHostReportsPlayerExit(int hostNetPosition, SPlayerExit exitInfo,
         } else {
             if (exitInfo.timedOut) {
                 sprintf(
-                    exitMessage,
+                    playerExitMessage,
                     "Host player %s reports that player %s has been timed out of the game.  The game will continue with a computer player filling in for %s.",
                     gsNetPlayerInfo[hostNetPosition].name,
                     gsNetPlayerInfo[exitInfo.netPosition].name,
                     gsNetPlayerInfo[exitInfo.netPosition].name);
             } else {
                 sprintf(
-                    exitMessage,
+                    playerExitMessage,
                     "Host player %s reports that player %s has exited the game.  The game will continue with a computer player filling in for %s.",
                     gsNetPlayerInfo[hostNetPosition].name,
                     gsNetPlayerInfo[exitInfo.netPosition].name,
@@ -3796,15 +3811,20 @@ void ReceiveHostReportsPlayerExit(int hostNetPosition, SPlayerExit exitInfo,
         ComputeAdvNetControl();
 
     if (showExitMessage)
-        NormalDialog(exitMessage, PLAYER_EXIT_DIALOG_INFO, -1, -1, -1, -1,
+        NormalDialog(playerExitMessage, PLAYER_EXIT_DIALOG_INFO, -1, -1, -1, -1,
                      -1, -1, -1, PLAYER_EXIT_MESSAGE_TIME);
 }
 
+// @early-stop
+// Explicit-range comparison finds all 230 instructions aligned over the exact
+// 0x361 span, with frame 0x10 and every stack slot matching. All 45 relocations
+// agree by offset/type/target; the residual is delinked literal/local identity.
 VA(0x004a07e3, 0x361)
 void ReceiveRemotePlayerExit(SPlayerExit exitInfo)
 {
     int localPlayerLost;
     int sendReturn;
+    int unusedPacketResult;
     int recipient;
 
     localPlayerLost = 0;
@@ -3815,14 +3835,14 @@ void ReceiveRemotePlayerExit(SPlayerExit exitInfo)
         exitInfo.continueGame = 1;
         if (exitInfo.netPosition == giThisNetPos) {
             localPlayerLost = 1;
-        } else {
-            sprintf(gText, "%s has been vanquished!",
-                    gsNetPlayerInfo[exitInfo.netPosition].name);
-            NormalDialog(gText, PLAYER_EXIT_DIALOG_INFO, -1, -1, 9,
-                         gpGame->GetPlayerColor(exitInfo.gamePosition), -1, -1,
-                         -1, PLAYER_EXIT_MESSAGE_TIME);
-            exitInfo.continueGame = 1;
+            goto exitInfoProcessed;
         }
+        sprintf(gText, "%s has been vanquished!",
+                gsNetPlayerInfo[exitInfo.netPosition].name);
+        NormalDialog(gText, PLAYER_EXIT_DIALOG_INFO, -1, -1, 9,
+                     gpGame->GetPlayerColor(exitInfo.gamePosition), -1, -1,
+                     -1, PLAYER_EXIT_MESSAGE_TIME);
+        exitInfo.continueGame = 1;
     } else {
         if (exitInfo.timedOut) {
             sprintf(
@@ -3845,19 +3865,19 @@ void ReceiveRemotePlayerExit(SPlayerExit exitInfo)
             exitInfo.continueGame = 0;
     }
 
+exitInfoProcessed:
     if (giNumHumanPlayers == 2) {
         if (exitInfo.eliminated && !exitInfo.hostReported) {
             sendReturn = TransmitRemoteData(
                 reinterpret_cast<char *>(&exitInfo), 1 - giThisNetPos,
                 PLAYER_EXIT_PACKET_TYPE, PLAYER_EXIT_PACKET_COMMAND, 1, 1, -1);
         }
-        if (localPlayerLost) {
-        } else {
-            giNumHumanPlayers--;
-            gbHumanPlayer[exitInfo.gamePosition] = 0;
-            RemoteCleanup();
-            ComputeAdvNetControl();
-        }
+        if (localPlayerLost)
+            goto playerExitHandled;
+        giNumHumanPlayers--;
+        gbHumanPlayer[exitInfo.gamePosition] = 0;
+        RemoteCleanup();
+        ComputeAdvNetControl();
     } else {
         for (recipient = 0; recipient < PLAYER_EXIT_NETWORK_SLOTS; recipient++) {
             if ((exitInfo.netPosition == recipient && exitInfo.eliminated &&
@@ -3869,12 +3889,12 @@ void ReceiveRemotePlayerExit(SPlayerExit exitInfo)
                     PLAYER_EXIT_PACKET_TYPE, PLAYER_EXIT_PACKET_COMMAND, 1, 1, -1);
             }
         }
-        if (localPlayerLost) {
-        } else {
-            ReceiveHostReportsPlayerExit(0, exitInfo, 1);
-        }
+        if (localPlayerLost)
+            goto playerExitHandled;
+        ReceiveHostReportsPlayerExit(0, exitInfo, 1);
     }
 
+playerExitHandled:
     if (localPlayerLost) {
         sprintf(gText, "You have been eliminated from the game!!!");
         RemoteCleanup();
