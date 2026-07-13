@@ -4822,8 +4822,89 @@ creature_purchase:
     return value_h;
 }
 
+// @early-stop: all 0x299 bytes match after masking 33 aligned COFF relocations.
+// The residual is constant/field symbol identity plus jump-table labels delinked
+// as this function; all external calls and globals agree.
 VA(0x00445a89, 0x299)
-int philAI::EvaluateGenericSite(class mapCell *) { return 0; }
+int philAI::EvaluateGenericSite(mapCell *cell) {
+    int unusedValue29;
+    int artifactIndex1;
+    int siteLevel5;
+    int siteType0;
+    int value1;
+    int cursedArtifactCount2;
+    int creatureType2;
+    int removedQuantity3;
+    int quantity6;
+    int armyValue7;
+
+    cursedArtifactCount2 = 0;
+    siteType0 = reinterpret_cast<mapCellView *>(cell)->tentColor;
+    siteType0 &= AI_GENERIC_SITE_TYPE_MASK;
+    siteLevel5 = reinterpret_cast<mapCellView *>(cell)->tentColor;
+    siteLevel5 >>= AI_GENERIC_SITE_LEVEL_SHIFT;
+    value1 = 0;
+
+    switch (siteType0) {
+    case AI_GENERIC_SITE_CURSED_ARTIFACTS:
+        for (artifactIndex1 = 0;
+             artifactIndex1 < AI_BATTLE_ARTIFACT_SLOT_COUNT;
+             artifactIndex1++) {
+            if (IsCursedItem(gpCurAIHero->m_artifacts[artifactIndex1]))
+                cursedArtifactCount2++;
+        }
+        if (reinterpret_cast<pdView *>(gpCurPlayer)->resources[RES_GOLD] >
+            AI_GENERIC_SITE_GOLD_THRESHOLD) {
+            value1 = cursedArtifactCount2 * AI_GENERIC_SITE_CURSED_ARTIFACT_VALUE;
+        }
+        break;
+    case AI_GENERIC_SITE_SHIPWRECK:
+        if (!(gpCurAIHero->m_eventFlags & AI_GENERIC_SITE_SHIPWRECK_FLAG)) {
+            value1 = static_cast<int>(gpCurAIHero->m_aiFightValue *
+                                      AI_GENERIC_SITE_SHIPWRECK_VALUE);
+        }
+        break;
+    case AI_GENERIC_SITE_FAERIE_RING:
+        if (!(gpCurAIHero->m_eventFlags & AI_GENERIC_SITE_FAERIE_RING_FLAG) &&
+            giCurAIHeroLuck < AI_GENERIC_SITE_MAX_LUCK) {
+            value1 = static_cast<int>(gpCurAIHero->m_aiFightValue *
+                                      AI_GENERIC_SITE_FAERIE_RING_VALUE);
+        }
+        break;
+    case AI_GENERIC_SITE_UNUSED_2:
+    case AI_GENERIC_SITE_UNUSED_3:
+        break;
+    case AI_GENERIC_SITE_GRAVEYARD:
+        if (!(gpCurAIHero->m_eventFlags & AI_GENERIC_SITE_GRAVEYARD_FLAG)) {
+            armyValue7 = 0;
+            for (artifactIndex1 = 0;
+                 artifactIndex1 < AI_GENERIC_SITE_ARMY_SLOTS;
+                 artifactIndex1++) {
+                creatureType2 = gpCurAIHero->m_army.m_creatureTypes[artifactIndex1];
+                if (creatureType2 != AI_TROOP_EMPTY_SLOT) {
+                    quantity6 = gpCurAIHero->m_army.m_quantities[artifactIndex1];
+                    removedQuantity3 = static_cast<int>(
+                        quantity6 * AI_GENERIC_SITE_GRAVEYARD_REMAINING);
+                    armyValue7 += gMonsterDatabase[creatureType2].hitPoints *
+                                  (quantity6 - removedQuantity3);
+                }
+            }
+            value1 = static_cast<int>(armyValue7 * gpCurAIHero->m_aiFightValue);
+        }
+        break;
+    case AI_GENERIC_SITE_CREATURE_UPGRADE:
+        value1 = ComputeUpgradeValue(AI_GENERIC_SITE_UPGRADE_FROM,
+                                     AI_GENERIC_SITE_UPGRADE_TO);
+        if (!(gpCurAIHero->m_eventFlags & AI_GENERIC_SITE_CREATURE_UPGRADE_FLAG)) {
+            value1 = static_cast<int>(
+                value1 +
+                (AI_GENERIC_SITE_WEEK_END - gpGame->m_day) *
+                    AI_GENERIC_SITE_DAY_VALUE * gpCurAIHero->m_aiFightValue);
+        }
+        break;
+    }
+    return value1;
+}
 
 VA(0x00445d22, 0x5e)
 int philAI::EvaluateBarrier(mapCell *cell) {
@@ -4913,7 +4994,41 @@ void CloseAIMapVars(void) {
 }
 
 VA(0x004460f8, 0x26a)
-int OnMySide(int) { return 0; }
+int OnMySide(int player) {
+    if (player != AI_SIDE_NO_PLAYER &&
+        (player == giCurPlayer ||
+         (gbInCampaign &&
+          gpGame->m_campaignType == AI_SIDE_CAMPAIGN_TYPE_ZERO &&
+          gpGame->m_campaignScenario + AI_SIDE_CAMPAIGN_SCENARIO_OFFSET ==
+              AI_SIDE_CAMPAIGN_SCENARIO_TEN &&
+          player != AI_SIDE_PRIMARY_PLAYER) ||
+         (gbInCampaign &&
+          gpGame->m_campaignType == AI_SIDE_CAMPAIGN_TYPE_ONE &&
+          gpGame->m_campaignScenario + AI_SIDE_CAMPAIGN_SCENARIO_OFFSET ==
+              AI_SIDE_CAMPAIGN_SCENARIO_ELEVEN &&
+          player != AI_SIDE_PRIMARY_PLAYER) ||
+         (gpGame->m_victoryConditionType == AI_SIDE_VICTORY_CONDITION &&
+          ((gpGame->m_victoryArtifact == AI_SIDE_VICTORY_SPECIAL_VALUE &&
+            player != AI_SIDE_PRIMARY_PLAYER) ||
+           (gpGame->m_victoryArtifact != AI_SIDE_VICTORY_SPECIAL_VALUE &&
+            ((gpGame->m_players[giCurPlayer].color <
+                  gpGame->m_victorySideThreshold &&
+              gpGame->m_players[player].color <
+                  gpGame->m_victorySideThreshold) ||
+             (gpGame->m_players[giCurPlayer].color >=
+                  gpGame->m_victorySideThreshold &&
+              gpGame->m_players[player].color >=
+                  gpGame->m_victorySideThreshold))))) ||
+         (gbInCampaign &&
+          gpGame->m_campaignType == AI_SIDE_CAMPAIGN_TYPE_ZERO &&
+          gpGame->m_campaignScenario + AI_SIDE_CAMPAIGN_SCENARIO_OFFSET ==
+              AI_SIDE_CAMPAIGN_SCENARIO_NINE &&
+          gpGame->m_players[player].color != AI_SIDE_FIRST_COLOR &&
+          gpGame->m_players[player].color != AI_SIDE_FOURTH_COLOR))) {
+        return 1;
+    } else
+        return 0;
+}
 
 VA(0x00446362, 0x2bc)
 int philAI::EvaluateArtifactEvent(int, int) { return 0; }
