@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <io.h>
+#include <direct.h>
 #include <fcntl.h>
 #include <string.h>
 #include <BASE/palette.h>
@@ -37,19 +38,166 @@ DATA(0x005331cc) static int gBlitRight;   // BlitBitmapToScreen computed blit-re
 DATA(0x005331d0) static int gBlitBottom;  // BlitBitmapToScreen computed blit-rect bottom edge
 
 VA(0x004c3d10, 0x58)
-// void InitMemEntry(void);
+void InitMemEntry(void)
+{
+    LogInt("IME", iMemEntries, -999, -999, -999, -999, -999, -999);
+    gpMemEntry = static_cast<MemEntry *>(malloc(2000 * sizeof(MemEntry)));
+    for (int i = 0; i < 2000; ++i)
+        gpMemEntry[i].used = 0;
+}
 
+// @early-stop
+// /O2 intrinsic-shape wall: base COMDAT .text is 0x202 bytes versus retail 0x20f.
+// The complete allocation/tracking flow and calls match (LogInt, malloc x2, MemError,
+// sprintf, fopen/fputs/fclose, OutputDebugStringA). The remaining source divergence is
+// the newline append at base +0x1ab..+0x1cb versus retail +0x1b2..+0x1d5: base loads
+// "\n" before `repne scasb` and addresses the end through `not ecx`; retail scans first,
+// loads the same relocated word afterward, and stores it at `[edi-1]`. `strcat`,
+// `strcpy(buf+strlen)`, `memcpy(...,2)`, direct/named word stores, volatile loads, and a
+// manual end scan were compiled; none selected retail's hybrid intrinsic sequence.
 VA(0x004c3d70, 0x20f)
-// void *BaseAlloc(unsigned int, char *, int);
+void *BaseAlloc(unsigned int size, char *file, int line)
+{
+    char text[200];
+    char logText[500];
+    if (size == 0)
+        return 0;
+    if (gpMemEntry == 0) {
+        LogInt("IME", iMemEntries, -999, -999, -999, -999, -999, -999);
+        gpMemEntry = static_cast<MemEntry *>(malloc(2000 * sizeof(MemEntry)));
+        for (int initIndex = 0; initIndex < 2000; ++initIndex)
+            gpMemEntry[initIndex].used = 0;
+    }
+    giTotalMemAllocated += size;
+    void *ptr = malloc(size);
+    if (ptr == 0) {
+        MemError();
+        return 0;
+    }
+    ++iMemEntries;
+    int i;
+    for (i = 0; i < 2000; ++i) {
+        if (!gpMemEntry[i].used) {
+            gpMemEntry[i].used = 1;
+            gpMemEntry[i].ptr = ptr;
+            gpMemEntry[i].size = size;
+            strcpy(gpMemEntry[i].file, file);
+            gpMemEntry[i].line = line;
+            i = 99999;
+        }
+    }
+    if (giDebugLevel == 4) {
+        sprintf(text, "KBAlloc    Size %d   Ptr %d   File %s  Line %d", size, ptr, file, line);
+        if (giDebugLevel >= 2) {
+            FILE *f = fopen("KB.LOG", "at+");
+            if (f != 0) {
+                strcpy(logText, text);
+                *reinterpret_cast<unsigned short *>(logText + strlen(logText)) =
+                    *reinterpret_cast<const unsigned short *>("\n");
+                fputs(logText, f);
+                fclose(f);
+                if (giDebugLevel == 4)
+                    OutputDebugStringA(logText);
+            }
+        }
+    }
+    return ptr;
+}
 
+// @early-stop
+// /O2 intrinsic-shape wall: base COMDAT .text is 0x38f bytes versus retail 0x386.
+// The three equivalent newline-append clusters load the same `"\n"` relocation at
+// base +0x105/+0x23a/+0x330 (reloc operands +0x108/+0x23d/+0x333) versus retail
+// +0x113/+0x244/+0x338 (operands +0x116/+0x247/+0x33b); retail keeps the post-scan
+// pointer in EDI while base materializes the strlen result. All LogInt/malloc/free,
+// sprintf, fopen/fputs/fclose and OutputDebugStringA sites and tracked MemEntry fields
+// agree. The same six append spellings documented on BaseAlloc were exhausted.
 VA(0x004c3f80, 0x386)
-// void BaseFree(void *, char *, int);
+void BaseFree(void *ptr, char *file, int line)
+{
+    char logText[500];
+    char text[200];
+    if (gpMemEntry == 0) {
+        LogInt("IME", iMemEntries, -999, -999, -999, -999, -999, -999);
+        gpMemEntry = static_cast<MemEntry *>(malloc(2000 * sizeof(MemEntry)));
+        for (int initIndex = 0; initIndex < 2000; ++initIndex)
+            gpMemEntry[initIndex].used = 0;
+    }
+    if (giDebugLevel == 4)
+        LogInt("Free ", reinterpret_cast<int>(ptr), -999, -999, -999, -999, -999, -999);
+    if (ptr == 0) {
+        if (giDebugLevel >= 2) {
+            FILE *f = fopen("KB.LOG", "at+");
+            if (f != 0) {
+                strcpy(logText, "NULL POINTER");
+                *reinterpret_cast<unsigned short *>(logText + strlen(logText)) =
+                    *reinterpret_cast<const unsigned short *>("\n");
+                fputs(logText, f);
+                fclose(f);
+                if (giDebugLevel == 4)
+                    OutputDebugStringA(logText);
+            }
+        }
+        return;
+    }
+    --iMemEntries;
+    if (iMemEntries < 0)
+        LogInt("MemEntries Below 0", iMemEntries, -999, -999, -999, -999, -999, -999);
+    int i;
+    for (i = 0; i < 2000; ++i) {
+        if (gpMemEntry[i].ptr == ptr) {
+            if (giDebugLevel == 4) {
+                sprintf(text, "KBFree    Size %d   Ptr %d   File %s  Line %d", gpMemEntry[i].size,
+                        ptr, gpMemEntry[i].file, gpMemEntry[i].line);
+                if (giDebugLevel >= 2) {
+                    FILE *f = fopen("KB.LOG", "at+");
+                    if (f != 0) {
+                        strcpy(logText, text);
+                        *reinterpret_cast<unsigned short *>(logText + strlen(logText)) =
+                            *reinterpret_cast<const unsigned short *>("\n");
+                        fputs(logText, f);
+                        fclose(f);
+                        if (giDebugLevel == 4)
+                            OutputDebugStringA(logText);
+                    }
+                }
+            }
+            gpMemEntry[i].used = 0;
+            giTotalMemAllocated -= gpMemEntry[i].size;
+            i = 99999;
+        }
+    }
+    if (i < 99999) {
+        sprintf(gText, "Bad Delete,  File '%13s'  Line % 4d, ptr %12d", file, line, ptr);
+        if (giDebugLevel >= 2) {
+            FILE *f = fopen("KB.LOG", "at+");
+            if (f != 0) {
+                strcpy(logText, gText);
+                *reinterpret_cast<unsigned short *>(logText + strlen(logText)) =
+                    *reinterpret_cast<const unsigned short *>("\n");
+                fputs(logText, f);
+                fclose(f);
+                if (giDebugLevel == 4)
+                    OutputDebugStringA(logText);
+            }
+        }
+    } else {
+        free(ptr);
+    }
+}
 
+// @early-stop
+// /O2 intrinsic-shape wall: base COMDAT .text is 0x137 bytes versus retail 0x134.
+// Only the completed log-line append differs: base loads `"\n"` at +0xd6 (reloc
+// +0xd9) before deriving `buf+strlen`, while retail loads it at +0xe3 (reloc +0xe6)
+// after `repne scasb` and stores through `[edi-1]`. LogInt, sprintf, fopen/fputs/
+// fclose and OutputDebugStringA targets are otherwise identical. `strcat`, strlen+
+// strcpy/memcpy, direct and named word stores, volatile load, and manual scan tried.
 VA(0x004c4310, 0x134)
 void PrintMemoryLeaks(void)
 {
     char local_1f4[500];
-    if (0 < giDebugLevel && gpMemEntry != 0) {
+    if (giDebugLevel >= 1 && gpMemEntry != 0) {
         LogInt("Total Memory Leaks", iMemEntries, -999, -999, -999, -999, -999, -999);
         int i = 0;
         do {
@@ -57,11 +205,12 @@ void PrintMemoryLeaks(void)
                 sprintf(gText, "Memory Leak,  File '%13s'  Line % 4d, ptr %12d   size %6d",
                         gpMemEntry[i].file, gpMemEntry[i].line, reinterpret_cast<int>(gpMemEntry[i].ptr),
                         gpMemEntry[i].size);
-                if (1 < giDebugLevel) {
-                    FILE *_File = fopen("KB.LOG", "a");
+                if (giDebugLevel >= 2) {
+                    FILE *_File = fopen("KB.LOG", "at+");
                     if (_File != 0) {
                         strcpy(local_1f4, gText);
-                        strcat(local_1f4, "\n");
+                        *reinterpret_cast<unsigned short *>(local_1f4 + strlen(local_1f4)) =
+                            *reinterpret_cast<const unsigned short *>("\n");
                         fputs(local_1f4, _File);
                         fclose(_File);
                         if (giDebugLevel == 4)
@@ -78,12 +227,12 @@ VA(0x004c4450, 0x91)
 void ShowMemoryStatus(void)
 {
     sprintf(gText, "Mem Left %dK", 0x3ea2);
-    int iVar1 = giDebugLevel;
+    int savedDebugLevel = giDebugLevel;
     giDebugLevel = 9;
     FillBitmapArea(gpWindowManager->m_screen, 0, 0x1cc, 0x280, 0x14, 0);
     smallFont->DrawBoundedString(gText, 0, 0x1d0, 0x280, 0x10, 1, 0);
     BlitBitmapToScreen(gpWindowManager->m_screen, 0, 0x1cc, 0x280, 0x14, 0, 0x1cc);
-    giDebugLevel = iVar1;
+    giDebugLevel = savedDebugLevel;
 }
 
 VA(0x004c44f0, 0x48)
@@ -102,18 +251,26 @@ unsigned long int MAKEFILEID(char *text)
     return hash;
 }
 
+// @early-stop
+// /O2 flag-reuse wall: base COMDAT .text is 0x97 bytes versus retail 0x95.
+// Base alone emits `3b c7` (`cmp eax,edi`) at +0x38..+0x39 before the equality
+// `jge`; retail reuses flags from the identical +0x2a comparison. Everything after
+// that differs only by the resulting two-byte jump displacements. There are no calls;
+// all four giFindMid relocations resolve to the same 0x5331c0 storage (retail delinks
+// it as const_001331c0). Direct field tests, saved int/ushort values, nested ==/>=,
+// reversed relational operands, comma/combined conditions, and three-way forms tried.
 VA(0x004c4540, 0x95)
 int FindIndex(struct indexArray *entries, int low, int high, int key)
 {
     giFindMid = (low + high) >> 1;
     while (high - low > 1) {
-        if (entries[giFindMid].field0 <= key) {
-            low = giFindMid;
-            if (entries[giFindMid].field0 == key) {
-                return entries[low].field2;
-            }
-        } else {
+        int value = entries[giFindMid].field0;
+        if (value > key) {
             high = giFindMid;
+        } else {
+            low = giFindMid;
+            if (value >= key)
+                return entries[low].field2;
         }
         giFindMid = (low + high) >> 1;
     }
@@ -126,11 +283,90 @@ int FindIndex(struct indexArray *entries, int low, int high, int key)
     return 0xFFFF;
 }
 
+// @early-stop
+// /O2 register/instruction-selection wall: base COMDAT .text is 0xee bytes versus
+// retail 0xea. Register allocation differs throughout +0x0b..+0x68 (base palette/done/
+// level ESI/EBX/EDI; retail EBX/EBP/ESI). The value update at base +0x92..+0xc3 uses
+// `lea eax,[eax+edi]; sub al,0x3f`, while retail +0x92..+0xbf uses threshold EAX and
+// `sub cl,al`, accounting for the four-byte size delta; later call offsets shift by
+// four only. All seven callees and 11 relocations agree, including gConfig+0x30 (retail
+// delink name const_00128d50). Separate/repeated color loads, signed/unsigned locals,
+// threshold locals, branch inversion, update ordering, and explicit pointer init tried.
 VA(0x004c45e0, 0xea)
-// void FadeIn(int);
+void FadeIn(int increment)
+{
+    palette *fadePalette = new palette;
+    if (fadePalette == 0)
+        MemError();
+    int done = 0;
+    if (gConfig.gfx[giCurExe].fullScreen == 0)
+        increment *= 2;
+    memset(fadePalette->m_data, 0, 0x300);
+    int level = 0;
+    for (;;) {
+        if (level >= 0x40) {
+            if (done) {
+                delete fadePalette;
+                return;
+            }
+            level = 0x3f;
+        }
+        int delayUntil = KBTickCount() + 0x14;
+        PollSound();
+        signed char *colors;
+        if (level == 0x3f) {
+            done = 1;
+            colors = gpBufferPalette->m_data;
+        } else {
+            for (int i = 0; i < 0x300; ++i) {
+                signed char color = gpBufferPalette->m_data[i];
+                if (color > 0x3f - level)
+                    fadePalette->m_data[i] = color - (0x3f - level);
+            }
+            colors = fadePalette->m_data;
+        }
+        UpdatePalette(colors);
+        DelayTil(&delayUntil);
+        level += increment;
+    }
+}
 
 VA(0x004c46d0, 0xe6)
-// void FadeOut(int);
+void FadeOut(int increment)
+{
+    palette *fadePalette = new palette;
+    if (fadePalette == 0)
+        MemError();
+    int done = 0;
+    if (gConfig.gfx[giCurExe].fullScreen == 0)
+        increment *= 2;
+    memcpy(fadePalette->m_data, gpBufferPalette->m_data, 0x300);
+    int level = 0;
+    for (;;) {
+        if (level >= 0x40) {
+            if (done) {
+                delete fadePalette;
+                return;
+            }
+            level = 0x3f;
+        }
+        int delayUntil = KBTickCount() + 0x14;
+        PollSound();
+        if (level == 0x3f)
+            done = 1;
+        for (int i = 0; i < 0x300; ++i) {
+            if (fadePalette->m_data[i] > 0) {
+                if (fadePalette->m_data[i] > increment)
+                    fadePalette->m_data[i] -= increment;
+                else
+                    fadePalette->m_data[i] = 0;
+            }
+        }
+        UpdatePalette(fadePalette->m_data);
+        level += increment;
+        DelayTil(&delayUntil);
+    }
+}
 
 VA(0x004c47c0, 0x28)
 int Random(int low, int high)
@@ -161,28 +397,49 @@ void ProcessAssert(int condition, char *file, int line)
     }
 }
 
+// @early-stop
+// /O2 register-allocation wall with equal 0x66-byte sections. Base +0x09..+0x34
+// retains text/count in EBX/EBP; retail uses EBP/EBX and schedules the two intrinsic
+// strlen scans differently. Equivalent SIB bytes consequently differ at +0x3c..+0x3e
+// and +0x5b..+0x5d; the loop backedge at +0x4d..+0x50 is `cmp esi,ebp; jl` versus
+// retail `cmp ebx,esi; jg`. The sole call is strncmp at +0x40 with the same relocation
+// and arguments. for/while/do forms, count|0, >=1+i, operand swaps and AST permutations
+// were exhausted without changing the allocation.
 VA(0x004c4850, 0x66)
 char * FindStringInString(char *text, char *pattern)
 {
     int text_len = strlen(text);
     int pattern_len = strlen(pattern);
     int count = text_len - pattern_len + 1;
-    for (int i = 0; i < count; ++i) {
-        if (strncmp(text + i, pattern, pattern_len) == 0) {
-            return text + i;
-        }
+    int i = 0;
+    if (count > 0) {
+        do {
+            if (strncmp(text + i, pattern, pattern_len) == 0)
+                return text + i;
+            ++i;
+        } while (count > i);
     }
     return 0;
 }
 
+// @early-stop
+// /O2 relational-encoding wall with equal 0x31-byte sections and no relocations/calls.
+// The only bytes that differ are +0x21..+0x24: base `3b c1 7c f4`
+// (`cmp eax,ecx; jl`) versus retail `3b c8 7f f4` (`cmp ecx,eax; jg`). They are the
+// same signed `index < length` condition. for/while/do loops, explicit backedges,
+// `length|0`, `>= 1+index`, reversed operands/returns, SIB spelling, and the AST
+// relational permuter all retained this canonical base encoding.
 VA(0x004c48c0, 0x31)
 char * FindToken(char *text, char token)
 {
     int len = strlen(text);
-    for (int i = 0; len > i; ++i) {
-        if (text[i] == token) {
-            return text + i;
-        }
+    int i = 0;
+    if (len > 0) {
+        do {
+            if (text[i] == token)
+                return text + i;
+            ++i;
+        } while (len > i);
     }
     return 0;
 }
@@ -207,8 +464,75 @@ void SetInstallDefaults(void)
     gConfig.soundQuality = 1;
 }
 
+// @early-stop
+// /O2 induction/register wall: base COMDAT .text is 0x1b9 bytes versus retail 0x1b5.
+// At +0x03..+0x68 base induces from exeGfxConfig start and uses positive offsets;
+// retail +0x03..+0x6c induces from `fullScreen` and uses -0x14..+4, while writing the
+// same two records/fields and constants. The later four-byte skew is scheduling only
+// (notably default-name setup at base +0xd2..+0x123 versus retail +0xd4..+0x147);
+// all four rand and three KBTickCount calls match. Relocations resolve to the same
+// gConfig field VAs despite delinked const/string labels (`homm2 relocs`: base 43,
+// retail 42; helper-only 0x128d3c/0x128d74/0x128dca are respectively the loop anchor
+// and direct fields visible under retail's const labels). Indexed/pointer loops, field
+// orders, <641/>640/<=640 branches, and split/combined random-tick expressions tried.
 VA(0x004c49a0, 0x1b5)
-void SetGameDefaults(void) {}
+void SetGameDefaults(void)
+{
+    gConfig.musicVolume = 1;
+    gConfig.soundVolume = 1;
+    gConfig.autosave = 1;
+    gConfig.showRoute = 1;
+    exeGfxConfig *gfx = gConfig.gfx;
+    do {
+        gfx->showMenu = 1;
+        gfx->x = 10;
+        gfx->y = 10;
+        gfx->fullScreen = 1;
+        gfx->colorMouseCursor = 0;
+        if (giMainVideoModeWidth <= 0x280) {
+            gfx->width = 0x1e0;
+            gfx->height = 0x168;
+        } else {
+            gfx->width = 0x280;
+            gfx->height = 0x1e0;
+        }
+        ++gfx;
+    } while (gfx < gConfig.gfx + 2);
+    gConfig.showCombatGrid = 0;
+    gConfig.showCombatMouseHex = 0;
+    gConfig.combatShadeLevel = 0;
+    gConfig.combatArmyInfoLevel = 0;
+    gConfig.evilInterfaceUsage = 0;
+    gConfig.useOpera = 1;
+    gConfig.quickCombatLevel = 0;
+    gConfig.combatSpeed = 0;
+    gConfig.autoCombatUseSpells = 0;
+    gConfig.blackoutComputer = 0;
+    gConfig.currentMapOffset = 0;
+    gConfig.firstMapOffset = rand() % 32001;
+    gConfig.showObjectBoxes = 0;
+    gConfig.editorScreenAnimation = 0;
+    gConfig.editorPaletteCycling = 0;
+    gbFirstTimeThrough = 1;
+    gConfig.slowVideo = 3;
+    gConfig.soundQuality = 3;
+    gConfig.computerWalkSpeed = 3;
+    gConfig.walkSpeed = 2;
+    strcpy(gConfig.networkDefaultName, "The Unknown Hero");
+    *reinterpret_cast<int *>(gConfig.uniqueSystemID) = 0;
+    int idSeed = rand() % 999999 + 1;
+    idSeed += KBTickCount();
+    gConfig.uniqueSystemID[2] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[idSeed % 36];
+    int idAdd = rand() % 999999 + 1;
+    idAdd += KBTickCount();
+    idSeed += idAdd;
+    gConfig.uniqueSystemID[1] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[idSeed % 36];
+    idAdd = rand() % 999999 + 1;
+    idAdd += KBTickCount();
+    idSeed += idAdd;
+    gConfig.uniqueSystemID[0] = static_cast<char>(idSeed % 26 + 'A');
+    gConfig.autoSaveName[14] = 0;
+}
 
 VA(0x004c4b60, 0x13f)
 void ReadPrefsFromFile(void)
@@ -286,6 +610,7 @@ void ReadPrefsFromRegistry(void)
     RegQueryValueExA(hKey, "Modem Init String", 0, &dwType, reinterpret_cast<unsigned char *>(gConfig.modemInitString), &dwSize);
     dwSize = 4;
     RegQueryValueExA(hKey, "Unique System ID", 0, &dwType, reinterpret_cast<unsigned char *>(gConfig.uniqueSystemID), &dwSize);
+    gConfig.modemInitString[98] = 0;
     dwSize = 0x1f;
     RegQueryValueExA(hKey, "Network Default Name", 0, &dwType, reinterpret_cast<unsigned char *>(gConfig.networkDefaultName), &dwSize);
     dwSize = 4;
@@ -444,8 +769,94 @@ int IsCDDrive(int param_1)
     return GetDriveTypeA(gText) == DRIVE_CDROM;
 }
 
+// @early-stop
+// reloc-masked: base COMDAT .text is 0x3fc including tail padding versus the retail
+// 0x3ed code symbol; every instruction within the retail span is identical. Only
+// +0x16a..+0x16d names the same
+// `gText + 2` operand as `const_0012899a` in the delinked retail object. Retail's raw
+// IAT operands also lack several import relocation names; the audit pairs all 51/51
+// relocations with only-base=0 and every call opcode/target slot is unchanged.
 VA(0x004c5a60, 0x3ed)
-int SetupCDDrive(void) { return 0; }
+int SetupCDDrive(void)
+{
+    sprintf(gText, ".\\DATA\\HEROES2.AGG");
+    int file = _open(gText, 0x8000);
+    if (file == -1) {
+        if (_chdir(gcRegAppPath) == -1)
+            return 3;
+        file = _open(gText, 0x8000);
+        if (file == -1)
+            return 4;
+    }
+    _close(file);
+
+    unsigned long logicalDrives = GetLogicalDrives();
+    int cdDriveCount = 0;
+    char cdDrives[26];
+    memset(cdDrives, 0, sizeof(cdDrives));
+    for (int drive = 2; drive < 26; ++drive) {
+        if (logicalDrives & (1 << drive)) {
+            sprintf(gText, "A:\\");
+            gText[0] += static_cast<char>(drive);
+            if (GetDriveTypeA(gText) == DRIVE_CDROM) {
+                ++cdDriveCount;
+                cdDrives[cdDriveCount - 1] = static_cast<char>(drive);
+            }
+        }
+    }
+    char count = static_cast<char>(cdDriveCount);
+
+    if (strlen(gcRegCDRomPath) != 0) {
+        sprintf(gText, "%s\\heroes2\\anim\\voy24.smk", gcRegCDRomPath);
+        file = _open(gText, 0x8000);
+        if (file != -1) {
+            _close(file);
+            sprintf(gText + 2, "%s", gcAnimPath);
+            strcpy(gcAnimPath, gText);
+            return 0;
+        }
+    }
+
+    int attempts = 0;
+    int resultBuffer[64];
+    char command[256];
+    for (;;) {
+        for (int index = 0; index < count; ++index) {
+            wsprintfA(command, "open %c: type cdaudio alias CD", cdDrives[index] + 'A');
+            if (mciSendStringA(command, reinterpret_cast<char *>(resultBuffer), 0xff, 0) == 0) {
+                wsprintfA(command, "info CD UPC wait");
+                mciSendStringA(command, reinterpret_cast<char *>(resultBuffer), 0xff, 0);
+                wsprintfA(command, "close CD");
+                mciSendStringA(command, reinterpret_cast<char *>(resultBuffer), 0xff, 0);
+            }
+            sprintf(gText, "%c:\\heroes2\\anim\\voy24.smk", cdDrives[index] + 'A');
+            file = _open(gText, 0x8000);
+            if (file != -1) {
+                if (_lseek(file, 0, 2) != -1 && _lseek(file, -100, 1) != -1)
+                    _read(file, resultBuffer, 100);
+                _close(file);
+
+                char registryKey[100];
+                strcpy(registryKey, "SOFTWARE\\New World Computing\\Heroes of Might and Magic 2\\1.0");
+                HKEY key = 0;
+                if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, registryKey, 0, 0x20006, &key) == 0) {
+                    unsigned char registryPath[100];
+                    wsprintfA(reinterpret_cast<char *>(registryPath), "%c:", cdDrives[index] + 'A');
+                    RegSetValueExA(key, "CDDrive", 0, REG_SZ, registryPath,
+                                   lstrlenA(reinterpret_cast<char *>(registryPath)) + 1);
+                    RegCloseKey(key);
+                }
+                sprintf(gText, "%c:%s", cdDrives[index] + 'A', gcAnimPath);
+                strcpy(gcAnimPath, gText);
+                return 0;
+            }
+        }
+        Sleep(3000);
+        ++attempts;
+        if (attempts >= 2)
+            return 2;
+    }
+}
 
 VA(0x004c5e50, 0x18)
 void BitmapToScreen(class bitmap *bmp)
@@ -469,43 +880,7 @@ void BlitBitmapToScreenNoMouseCheck(class bitmap *bmp, int p2, int p3, int p4, i
 }
 
 VA(0x004c5ee0, 0x18b)
-void BlitBitmapToScreen(class bitmap *param_1, int param_2, int param_3, int param_4, int param_5,
-                        int param_6, int param_7)
-{
-    int local_8;
-    if (gbColorMice == 0) {
-        BlitBitmapToScreenVesa(reinterpret_cast<int>(param_1), param_2, param_3, param_4, param_5,
-                               param_6, param_7);
-        return;
-    }
-    if (giScrollX != 0 || (local_8 = param_2, giScrollY != 0)) {
-        param_4 = 0x1c0;
-        local_8 = giScrollX + 0x10;
-        param_3 = giScrollY + 0x10;
-        param_5 = 0x1c0;
-    }
-    gBlitRight = param_4 + param_6 - 1;
-    gBlitBottom = param_5 + param_7 - 1;
-    if (gpMouseManager->IsVis() != 0 && gpMouseManager->m_savedW <= gBlitRight &&
-        param_6 <= gpMouseManager->field_0x6e && gpMouseManager->m_savedH <= gBlitBottom &&
-        param_7 <= gpMouseManager->field_0x72) {
-        gpMouseManager->SaveAndDraw();
-        BlitBitmapToScreenVesa(reinterpret_cast<int>(param_1), local_8, param_3, param_4, param_5,
-                               param_6, param_7);
-        if (gBlitRight < gpMouseManager->field_0x6e || gpMouseManager->m_savedW < param_6 ||
-            gBlitBottom < gpMouseManager->field_0x72 || gpMouseManager->m_savedH < param_7) {
-            int iVar1 = gpMouseManager->m_savedH;
-            int iVar2 = gpMouseManager->m_savedW;
-            BlitBitmapToScreenVesa(reinterpret_cast<int>(param_1), iVar2, iVar1,
-                                   gpMouseManager->field_0x6e - iVar2 + 1,
-                                   gpMouseManager->field_0x72 - iVar1 + 1, iVar2, iVar1);
-        }
-        gpMouseManager->RestoreUnderlying();
-        return;
-    }
-    BlitBitmapToScreenVesa(reinterpret_cast<int>(param_1), local_8, param_3, param_4, param_5, param_6,
-                           param_7);
-}
+// void BlitBitmapToScreen(class bitmap *, int, int, int, int, int, int);
 
 VA(0x004c6070, 0xa6)
 void LogTruncate(void)
@@ -562,84 +937,10 @@ void AbsAiPrint(char *param_1)
 }
 
 VA(0x004c64e0, 0xf8)
-void FadeTo(unsigned char *param_1, unsigned char *param_2, int param_3)
-{
-    int local_310, local_304;
-    unsigned char local_300[768];
-    memcpy(local_300, param_1, 0x300);
-    param_3 = param_3 >> 2;
-    if (param_3 < 1)
-        param_3 = 1;
-    local_310 = 0x30;
-    do {
-        local_304 = KBTickCount() + 0x32;
-        PollSound();
-        int iVar6 = (0x40 - local_310) - param_3;
-        if (iVar6 < 0)
-            iVar6 = 0;
-        unsigned char *pbVar8 = local_300;
-        unsigned char bVar1 = giChangeThreshold[iVar6];
-        iVar6 = 0x300;
-        unsigned char *pbVar9 = param_2;
-        do {
-            unsigned char bVar2 = *pbVar8;
-            unsigned int uVar7 = (unsigned int)*pbVar9 - (unsigned int)bVar2;
-            int iVar5 = (uVar7 ^ ((int)uVar7 >> 0x1f)) - ((int)uVar7 >> 0x1f);
-            if (static_cast<int>(bVar1) < iVar5) {
-                char cVar3 = (char)iVar5 - bVar1;
-                if ((int)uVar7 < 1)
-                    *pbVar8 = bVar2 - cVar3;
-                else
-                    *pbVar8 = cVar3 + bVar2;
-            }
-            pbVar8++;
-            pbVar9++;
-            iVar6--;
-        } while (iVar6 != 0);
-        UpdatePalette(reinterpret_cast<signed char *>(local_300));
-        DelayTil(&local_304);
-        local_310 = local_310 + param_3;
-    } while (local_310 < 0x40);
-    UpdatePalette(reinterpret_cast<signed char *>(param_2));
-}
+// void FadeTo(unsigned char *, unsigned char *, int);
 
 VA(0x004c65e0, 0xb8)
-void FadeToColorTable(unsigned char *param_1, int param_2)
-{
-    unsigned char auStack_300[768];
-    int uVar1 = gpWindowManager->m_updateFlags;
-    gpWindowManager->m_updateFlags = 0;
-    int iVar8 = 0;
-    unsigned char *puVar2 = reinterpret_cast<unsigned char *>(gpBufferPalette->m_data);
-    unsigned char *puVar3 = auStack_300;
-    unsigned char *puVar4;
-    do {
-        puVar4 = puVar3 + 3;
-        int iVar5 = static_cast<unsigned int>(param_1[iVar8]) * 3;
-        iVar8++;
-        *puVar3 = puVar2[iVar5];
-        puVar3[1] = puVar2[iVar5 + 1];
-        puVar3[2] = puVar2[iVar5 + 2];
-        puVar3 = puVar4;
-    } while (puVar4 < auStack_300 + 0x300);
-    iVar8 = 0x1e0;
-    FadeTo(puVar2, auStack_300, param_2);
-    unsigned char *pbVar7 = gpWindowManager->m_screen->m_pixels;
-    do {
-        int iVar5 = 0x280;
-        unsigned char *pbVar6 = pbVar7;
-        do {
-            pbVar7 = pbVar6 + 1;
-            iVar5--;
-            *pbVar6 = param_1[*pbVar6];
-            pbVar6 = pbVar7;
-        } while (iVar5 != 0);
-        iVar8--;
-    } while (iVar8 != 0);
-    gpWindowManager->UpdateScreen();
-    UpdatePalette(reinterpret_cast<signed char *>(puVar2));
-    gpWindowManager->m_updateFlags = uVar1;
-}
+// void FadeToColorTable(unsigned char *, int);
 
 VA(0x004c66a0, 0x29)
 int IsCycleColor(int color)
