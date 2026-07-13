@@ -3636,7 +3636,47 @@ void game::ConvertObject(int left, int top, int right, int bottom,
 }
 
 VA(0x0047f42f, 0x1c2)
-void game::RandomizeTown(int, int, int) {}
+void game::RandomizeTown(int x, int y, int)
+{
+    int unused6[2];  // Two unaddressed words are present in the retail /Od frame.
+    int townId0 = GetTownId(x, y);
+    townSlot *castle0 = reinterpret_cast<townSlot *>(GetTown(townId0));
+    mapTownExtra *extra = reinterpret_cast<mapTownExtra *>(
+        ppMapExtra[WORLDMAP->GetCell(x, y)->w4hi]);
+    int race0;
+
+    if (extra->color == RANDOM_TOWN_UNOWNED_COLOR)
+        race0 = Random(RANDOM_TOWN_RACE_MIN, RANDOM_TOWN_RACE_MAX);
+    else
+        race0 = m_setupPlayerRace[gcColorToSetupPos[extra->color]];
+
+    castle0->unknown55 = RANDOM_TOWN_AGE;
+    ConvertObject(x + RANDOM_TOWN_LEFT, y + RANDOM_TOWN_TOP,
+                  x + RANDOM_TOWN_RIGHT, y + RANDOM_TOWN_BOTTOM,
+                  RANDOM_TOWN_SOURCE_TILESET,
+                  RANDOM_TOWN_OBJECT_SOURCE_FIRST, RANDOM_TOWN_OBJECT_SOURCE_LAST,
+                  RANDOM_TOWN_OBJECT_TILESET, race0 << RANDOM_TOWN_RACE_FRAME_SHIFT,
+                  RANDOM_TOWN_FIRST_TRIGGER, RANDOM_TOWN_TRIGGER);
+    ConvertObject(x + RANDOM_TOWN_LEFT, y + RANDOM_TOWN_TOP,
+                  x + RANDOM_TOWN_RIGHT, y + RANDOM_TOWN_BOTTOM,
+                  RANDOM_TOWN_SOURCE_TILESET,
+                  RANDOM_TOWN_OVERLAY_SOURCE_FIRST, RANDOM_TOWN_OVERLAY_SOURCE_LAST,
+                  RANDOM_TOWN_OVERLAY_TILESET, race0 << RANDOM_TOWN_RACE_FRAME_SHIFT,
+                  RANDOM_TOWN_FIRST_TRIGGER, RANDOM_TOWN_TRIGGER);
+    ConvertObject(x + RANDOM_TOWN_LEFT, y + RANDOM_TOWN_TOP,
+                  x + RANDOM_TOWN_RIGHT, y + RANDOM_TOWN_BOTTOM,
+                  RANDOM_TOWN_SOURCE_TILESET,
+                  RANDOM_TOWN_OBJECT_SOURCE_FIRST, RANDOM_TOWN_OBJECT_SOURCE_LAST,
+                  RANDOM_TOWN_OBJECT_TILESET, race0 << RANDOM_TOWN_RACE_FRAME_SHIFT,
+                  RANDOM_TOWN_SECOND_TRIGGER, RANDOM_TOWN_TRIGGER);
+    ConvertObject(x + RANDOM_TOWN_LEFT, y + RANDOM_TOWN_TOP,
+                  x + RANDOM_TOWN_RIGHT, y + RANDOM_TOWN_BOTTOM,
+                  RANDOM_TOWN_SOURCE_TILESET,
+                  RANDOM_TOWN_OVERLAY_SOURCE_FIRST, RANDOM_TOWN_OVERLAY_SOURCE_LAST,
+                  RANDOM_TOWN_OVERLAY_TILESET, race0 << RANDOM_TOWN_RACE_FRAME_SHIFT,
+                  RANDOM_TOWN_SECOND_TRIGGER, RANDOM_TOWN_TRIGGER);
+    m_castleRecs[townId0].race = static_cast<signed char>(race0);
+}
 
 // @early-stop
 // Exact 0x619-byte span and 22 relocation sites. The remaining /Od differences
@@ -3788,7 +3828,48 @@ void game::InitRandomArtifacts(void)
 }
 
 VA(0x0047fcd0, 0x17f)
-int game::GetRandomArtifactId(int, int) { return 0; }
+int game::GetRandomArtifactId(int levelMask, int allowCursed)
+{
+    int attempts = 0;
+    int artifact;
+
+    while (1) {
+        if (xIsExpansionMap)
+            artifact = Random(RANDOM_ARTIFACT_FIRST, RANDOM_ARTIFACT_EXPANSION_LAST);
+        else
+            artifact = Random(RANDOM_ARTIFACT_FIRST, RANDOM_ARTIFACT_BASE_LAST);
+
+        if (!(levelMask & gArtifactLevel[artifact]))
+            continue;
+        if (artifact == ARTIFACT_EDITOR_ANY_ULTIMATE ||
+            artifact == ARTIFACT_EDITOR_UNUSED_84 ||
+            artifact == ARTIFACT_EDITOR_UNUSED_85 ||
+            artifact == ARTIFACT_EDITOR_UNUSED_86 ||
+            artifact == ARTIFACT_RANDOM_SPELL_SCROLL ||
+            artifact == ARTIFACT_BREASTPLATE_ANDURAN ||
+            artifact == ARTIFACT_BATTLE_GARB ||
+            artifact == ARTIFACT_HELMET_ANDURAN ||
+            artifact == ARTIFACT_SWORD_ANDURAN ||
+            artifact == ARTIFACT_SPHERE_NEGATION)
+            continue;
+        if (attempts++ < RANDOM_ARTIFACT_UNIQUE_RETRIES &&
+            m_randomArtifacts[artifact])
+            continue;
+        if (IsCursedItem(artifact)) {
+            if (!allowCursed)
+                continue;
+            if (Random(RANDOM_ARTIFACT_FIRST, RANDOM_ARTIFACT_CURSED_ROLL_MAX) <
+                RANDOM_ARTIFACT_CURSED_REJECT_CHANCE)
+                continue;
+        }
+        if (m_victoryConditionType != VICTORY_CONDITION_ARTIFACT ||
+            m_victoryArtifact - VICTORY_ARTIFACT_ID_OFFSET != artifact)
+            break;
+    }
+
+    m_randomArtifacts[artifact] = 1;
+    return artifact;
+}
 
 VA(0x0047fe4f, 0x68)
 int IsCursedItem(int item)
@@ -3800,10 +3881,96 @@ int IsCursedItem(int item)
 }
 
 VA(0x0047feb7, 0x1ef)
-void game::RandomizeHeroPool(void) {}
+void game::RandomizeHeroPool(void)
+{
+    for (int heroId = 0; heroId < RANDOM_HERO_COUNT; heroId++) {
+        m_heroRecs[heroId].m_experience =
+            Random(RANDOM_HERO_EXPERIENCE_MIN, RANDOM_HERO_EXPERIENCE_MAX) +
+            RANDOM_HERO_EXPERIENCE_BASE;
+        SetRandomHeroArmies(heroId, RANDOM_HERO_NORMAL_ARMY);
+        m_heroRecs[heroId].m_remainingMobility = m_heroRecs[heroId].CalcMobility();
+        m_heroRecs[heroId].m_mobility = m_heroRecs[heroId].m_remainingMobility;
+        m_heroRecs[heroId].m_randomSeed = static_cast<unsigned char>(
+            Random(RANDOM_HERO_SEED_MIN, RANDOM_HERO_SEED_MAX));
+        m_heroRecs[heroId].m_enabled = RANDOM_HERO_ENABLED;
+
+        if (m_heroRecs[heroId].m_cursorType == HERO_CLASS_SORCERESS)
+            m_heroRecs[heroId].m_spells[RANDOM_HERO_SORCERESS_STARTING_SPELL] =
+                RANDOM_HERO_STARTING_SPELL_KNOWN;
+        else if (m_heroRecs[heroId].m_cursorType == HERO_CLASS_WARLOCK)
+            m_heroRecs[heroId].m_spells[RANDOM_HERO_WARLOCK_STARTING_SPELL] =
+                RANDOM_HERO_STARTING_SPELL_KNOWN;
+        else if (m_heroRecs[heroId].m_cursorType == HERO_CLASS_NECROMANCER)
+            m_heroRecs[heroId].m_spells[RANDOM_HERO_NECROMANCER_STARTING_SPELL] =
+                RANDOM_HERO_STARTING_SPELL_KNOWN;
+        else if (m_heroRecs[heroId].m_cursorType == HERO_CLASS_WIZARD)
+            m_heroRecs[heroId].m_spells[RANDOM_HERO_WIZARD_STARTING_SPELL] =
+                RANDOM_HERO_STARTING_SPELL_KNOWN;
+    }
+}
 
 VA(0x004800a6, 0x378)
-void game::SetRandomHeroArmies(int, int) {}
+void game::SetRandomHeroArmies(int heroId, int strongArmy)
+{
+    armyGroup *army2 = &m_heroRecs[heroId].m_army;
+    int armySlot7 = 0;
+    RandomHeroArmyRange armyTable7[HERO_CLASS_COUNT][RANDOM_HERO_ARMY_OPTION_COUNT] = {
+        {{RANDOM_HERO_KNIGHT_FIRST, 30, 50},
+         {RANDOM_HERO_KNIGHT_SECOND, 3, 5},
+         {RANDOM_HERO_KNIGHT_THIRD, 2, 4}},
+        {{RANDOM_HERO_BARBARIAN_FIRST, 15, 25},
+         {RANDOM_HERO_BARBARIAN_SECOND, 3, 5},
+         {RANDOM_HERO_BARBARIAN_THIRD, 2, 3}},
+        {{RANDOM_HERO_SORCERESS_FIRST, 10, 20},
+         {RANDOM_HERO_SORCERESS_SECOND, 2, 4},
+         {RANDOM_HERO_SORCERESS_THIRD, 1, 2}},
+        {{RANDOM_HERO_WARLOCK_FIRST, 6, 10},
+         {RANDOM_HERO_WARLOCK_SECOND, 2, 4},
+         {RANDOM_HERO_WARLOCK_THIRD, 1, 2}},
+        {{RANDOM_HERO_WIZARD_FIRST, 6, 10},
+         {RANDOM_HERO_WIZARD_SECOND, 2, 4},
+         {RANDOM_HERO_WIZARD_THIRD, 1, 2}},
+        {{RANDOM_HERO_NECROMANCER_FIRST, 6, 10},
+         {RANDOM_HERO_NECROMANCER_SECOND, 2, 4},
+         {RANDOM_HERO_NECROMANCER_THIRD, 1, 2}}
+    };
+    int selected9[3];
+    int index9;
+    int minimum5;
+    int maximum5;
+
+    selected9[0] = RANDOM_HERO_STACK_SELECTED;
+    selected9[1] = RANDOM_HERO_FIRST_STACK_CHANCE +
+        (strongArmy ? RANDOM_HERO_FIRST_STACK_BONUS_CHANCE : 0) >
+        Random(RANDOM_HERO_PERCENT_MIN, RANDOM_HERO_PERCENT_MAX);
+    selected9[2] = Random(RANDOM_HERO_PERCENT_MIN, RANDOM_HERO_PERCENT_MAX) <
+        RANDOM_HERO_SECOND_STACK_CHANCE +
+        (strongArmy ? RANDOM_HERO_SECOND_STACK_BONUS_CHANCE : 0);
+    if (!selected9[2])
+        selected9[1] = RANDOM_HERO_STACK_SELECTED;
+
+    for (index9 = 0; index9 < RANDOM_HERO_ARMY_SLOT_COUNT; index9++) {
+        army2->m_creatureTypes[index9] = RANDOM_HERO_EMPTY_CREATURE;
+        army2->m_creatureCounts[index9] = RANDOM_HERO_EMPTY_COUNT;
+    }
+
+    for (index9 = 0; index9 < RANDOM_HERO_ARMY_SELECTION_COUNT; index9++) {
+        if (selected9[index9]) {
+            army2->m_creatureTypes[armySlot7] = static_cast<signed char>(
+                armyTable7[m_heroRecs[heroId].m_cursorType][index9].creature);
+            minimum5 = armyTable7[m_heroRecs[heroId].m_cursorType][index9].minimum *
+                       RANDOM_HERO_COUNT_SCALE;
+            maximum5 = armyTable7[m_heroRecs[heroId].m_cursorType][index9].maximum *
+                           RANDOM_HERO_COUNT_SCALE +
+                       RANDOM_HERO_COUNT_ROUNDING;
+            if (strongArmy)
+                minimum5 = ((minimum5 | 0) + maximum5) / 2;
+            army2->m_creatureCounts[armySlot7] = static_cast<short>(
+                Random(minimum5, maximum5) / RANDOM_HERO_COUNT_SCALE);
+            armySlot7++;
+        }
+    }
+}
 
 // @early-stop
 // Exact 0x746-byte span and 56 relocation sites. The retained source-hash build
