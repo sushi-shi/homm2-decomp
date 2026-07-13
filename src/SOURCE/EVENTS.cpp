@@ -1785,7 +1785,7 @@ daemonExperienceGold:
         CompleteDraw(0);
     }
     UpdateScreen(0, 0);
-    gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[*m_currentTerrain]);
+    gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
     WaitEndSample(playedSample, -1);
     CheckEndGame(0, 0);
 }

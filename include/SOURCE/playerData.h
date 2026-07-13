@@ -10,21 +10,21 @@ public:
     signed char m_color;  // +0x00
     signed char m_heroCount;  // +0x01
     signed char m_currentHero;  // +0x02
-    signed char m_heroWindowTop;  // +0x03
-    signed char m_heroes[8];  // +0x04
+    signed char m_heroLocatorPage;  // +0x03
+    signed char m_heroIds[8];  // +0x04
     char m_unknown0c[2];  // +0x0c
     signed char m_unknown0e;  // +0x0e
     int m_unknown0f;  // +0x0f
-    signed char m_unknown13;  // +0x13
+    signed char m_cheatValue;  // +0x13
     char m_unusedSaveData[0x2c];  // +0x14
-    signed char m_unknown40;  // +0x40
+    signed char m_canDig;  // +0x40
     signed char m_unknown41;  // +0x41
     signed char m_unknown42;  // +0x42
     signed char m_unknown43;  // +0x43
     signed char m_townCount;  // +0x44
     signed char m_currentTown;  // +0x45
-    signed char m_townWindowTop;  // +0x46
-    signed char m_towns[72];  // +0x47
+    signed char m_townLocatorPage;  // +0x46
+    signed char m_townIds[72];  // +0x47
     int m_resources[7];  // +0x8f
     signed char m_unknownab;  // +0xab
     signed char m_unknownac;  // +0xac
@@ -40,6 +40,8 @@ public:
     int BuildingsOwned(int, int, int);
     int NumOfGivenArtifact(int);
     signed char CurrentHero(void) { return m_currentHero; }
+    signed char CurrentTown(void) { return m_currentTown; }
+    signed char TownId(int index) { return m_townIds[index]; }
 };
 #pragma pack(pop)
 SIZE(playerData, 0x11b);

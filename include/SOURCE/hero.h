@@ -33,10 +33,10 @@ public:
     char m_name[13];  // +0x0a
     unsigned char m_cursorType;  // +0x17
     unsigned char m_unknown18;  // +0x18
-    int    field_0x19;  // +0x19
-    int    field_0x1d;  // +0x1d
-    int    field_0x21;  // +0x21
-    int    field_0x25;  // +0x25
+    int    m_x;  // +0x19
+    int    m_y;  // +0x1d
+    int    m_destinationX;  // +0x21
+    int    m_destinationY;  // +0x25
     signed char m_unknown29;  // +0x29
     signed char m_unknown2a;  // +0x2a
     char m_pad_0x2b[1];
