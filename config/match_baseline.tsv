@@ -7,7 +7,7 @@ BASE/BITMAP	??0bitmap@@QAE@XZ	100.0000	8e389e9cb8fc
 BASE/BITMAP	??1bitmap@@UAE@XZ	99.9286	aaf286ed5b43
 BASE/BITMAP	??_Ebitmap@@UAEPAXI@Z	0.0000	
 BASE/BITMAP	?CopyTo@bitmap@@QAEXPAV1@HHHHHH@Z	27.0000	df6fbde7ed80
-BASE/BITMAP	?CopyToCareful@bitmap@@QAEXPAV1@HHHHHH@Z	62.0732	a5bdab8f1622
+BASE/BITMAP	?CopyToCareful@bitmap@@QAEXPAV1@HHHHHH@Z	64.6342	a5bdab8f1622
 BASE/BITMAP	?DrawToBuffer@bitmap@@QAEXFF@Z	100.0000	a83de65e9aa4
 BASE/BITMAP	?DrawToBufferCareful@bitmap@@QAEXFF@Z	85.3980	70a624c205ae
 BASE/BITMAP	?DrawToScreen@bitmap@@QAEXFF@Z	100.0000	fa3eea90f2d2
@@ -136,7 +136,7 @@ BASE/EXEC	?DoDialog@executive@@QAEHPAVbaseManager@@@Z	0.0000	4afc1868d1e0
 BASE/EXEC	?InitSystem@executive@@QAEHXZ	100.0000	c5081f20d60e
 BASE/EXEC	?MainLoop@executive@@QAEXXZ	0.0000	caa33c66d4aa
 BASE/EXEC	?PrintManagerList@executive@@QAEXXZ	100.0000	2b59959ae41d
-BASE/EXEC	?RemoveManager@executive@@QAEXPAVbaseManager@@@Z	98.5897	f747d69c18bc
+BASE/EXEC	?RemoveManager@executive@@QAEXPAVbaseManager@@@Z	100.0000	f747d69c18bc
 BASE/EXEC	?ShutDownSystem@executive@@QAEXXZ	100.0000	8787bbebb46d
 BASE/EXEC	?Terminate@executive@@QAEXXZ	100.0000	d33a5cc384b3
 BASE/FONT	??0font@@QAE@K@Z	100.0000	67411d2f90da
@@ -447,7 +447,7 @@ SOURCE/ADVMGR	?CastSpell@advManager@@QAEXH@Z	3.0994	4521b4a1a555
 SOURCE/ADVMGR	?CheckCastSpell@advManager@@QAEXXZ	25.4902	f4738ba9e433
 SOURCE/ADVMGR	?CheckDimHero@advManager@@QAEXXZ	99.8809	6921e03d10a2
 SOURCE/ADVMGR	?CheckDimNextHeroBut@advManager@@QAEXXZ	100.0000	e900fb0d3a60
-SOURCE/ADVMGR	?CheckHandleNet@advManager@@QAEPADXZ	99.7594	843aecfc1f77
+SOURCE/ADVMGR	?CheckHandleNet@advManager@@QAEPADXZ	99.7594	ec4892d03124
 SOURCE/ADVMGR	?CheckHandleNetPlayerWait@advManager@@QAEHAAUtag_message@@H@Z	100.0000	26f35b045437
 SOURCE/ADVMGR	?CheckLoadSample@advManager@@QAEXH@Z	100.0000	dbcfb3de838c
 SOURCE/ADVMGR	?CheckScreenScroll@advManager@@QAEXXZ	100.0000	e15473559735
@@ -966,7 +966,7 @@ SOURCE/KB	?GetMonsterCost@@YIXHQAH@Z	99.5690	721db9734a5d
 SOURCE/KB	?GetMonsterName@@YIPADH@Z	100.0000	4bed126d3379
 SOURCE/KB	?GetTownName@@YIPADH@Z	100.0000	8cb1e3007501
 SOURCE/KB	?HandleAppSpecificMenuCommands@@YIHH@Z	95.8196	c253348a51ed
-SOURCE/KB	?HandleRemoteDeadPlayerExit@@YIXH@Z	100.0000	40aa39c353d2
+SOURCE/KB	?HandleRemoteDeadPlayerExit@@YIXH@Z	100.0000	ab7636d5cbe1
 SOURCE/KB	?HandleRemoteSuddenExit@@YIXXZ	100.0000	d2f613624d9a
 SOURCE/KB	?InMapArea@@YIHHH@Z	100.0000	859568a5858c
 SOURCE/KB	?InitMainClasses@@YIXXZ	5.4307	b3972c6e54e2
@@ -977,13 +977,13 @@ SOURCE/KB	?LoadPlaySample@@YI?AUSAMPLE2@@PAD@Z	100.0000	98ffe613df26
 SOURCE/KB	?LoadSystemwideIcons@@YIXXZ	100.0000	f2e395b197a1
 SOURCE/KB	?MemError@@YIXXZ	100.0000	edfbbab37541
 SOURCE/KB	?NetPosToGamePos@@YIHH@Z	100.0000	94cbbdc7b96d
-SOURCE/KB	?NormalDialog@@YIXPADHHHHHHHHH@Z	0.2280	703b714800a9
+SOURCE/KB	?NormalDialog@@YIXPADHHHHHHHHH@Z	95.4568	fdb89bc532a7
 SOURCE/KB	?NullHandler@@YIHAAUtag_message@@@Z	100.0000	eebf0bb4a776
 SOURCE/KB	?PlayerDead@@YIXH@Z	100.0000	f66bc6059c52
 SOURCE/KB	?PopNetBox@@YIXPADH@Z	96.5996	c3dd7670b417
 SOURCE/KB	?QuickViewWait@@YIXXZ	100.0000	6119bf14432c
-SOURCE/KB	?ReceiveHostReportsPlayerExit@@YIXHUSPlayerExit@@H@Z	5.2322	2b76c8b47ecb
-SOURCE/KB	?ReceiveRemotePlayerExit@@YIXUSPlayerExit@@@Z	4.6957	1f88f8319cae
+SOURCE/KB	?ReceiveHostReportsPlayerExit@@YIXHUSPlayerExit@@H@Z	99.9775	92e016d6bae9
+SOURCE/KB	?ReceiveRemotePlayerExit@@YIXUSPlayerExit@@@Z	97.2783	0a109961b85c
 SOURCE/KB	?RecruitHeroHandler@@YIHAAUtag_message@@@Z	100.0000	8b0f6544663a
 SOURCE/KB	?SetWinText@@YIXPAVheroWindow@@H@Z	100.0000	fce90af3ba5f
 SOURCE/KB	?SetupCDRom@@YIXXZ	100.0000	8d54750df930
@@ -1305,7 +1305,7 @@ SOURCE/TOWNMGR	?DoTavern@townManager@@QAEXXZ	100.0000	1ca473929a8e
 SOURCE/TOWNMGR	?Draw@townObject@@QAEXH@Z	4.7372	cc0706624c31
 SOURCE/TOWNMGR	?DrawTown@townManager@@QAEXHH@Z	100.0000	62b1c00af284
 SOURCE/TOWNMGR	?GetCategoryStats@@YIXHQAJQAC@Z	2.9120	f17658385837
-SOURCE/TOWNMGR	?MageGuildHandler@@YIHAAUtag_message@@@Z	93.7565	7655bc59e9d3
+SOURCE/TOWNMGR	?MageGuildHandler@@YIHAAUtag_message@@@Z	94.8957	7655bc59e9d3
 SOURCE/TOWNMGR	?Main@townManager@@UAEHAAUtag_message@@@Z	95.0358	2efea8bc650e
 SOURCE/TOWNMGR	?Open@townManager@@UAEHH@Z	12.9444	7c45a47aa613
 SOURCE/TOWNMGR	?RecruitHero@townManager@@QAEHHH@Z	99.5788	ac0d4de6b308
@@ -1314,8 +1314,8 @@ SOURCE/TOWNMGR	?ResetStrips@townManager@@QAEXXZ	100.0000	48437c7d6a3c
 SOURCE/TOWNMGR	?SetArmyCommand@townManager@@QAEXH@Z	5.8733	c035e26664c1
 SOURCE/TOWNMGR	?SetCommandAndText@townManager@@QAEXAAUtag_message@@@Z	2.0474	a7b9aaceb839
 SOURCE/TOWNMGR	?SetupExtraStuff@townManager@@QAEXXZ	11.3043	fd2e85612c8e
-SOURCE/TOWNMGR	?SetupMage@townManager@@QAEXPAVheroWindow@@@Z	99.0440	ffeb279516de
-SOURCE/TOWNMGR	?SetupThievesGuild@townManager@@QAEXPAVheroWindow@@H@Z	91.8057	2f59890b00ad
+SOURCE/TOWNMGR	?SetupMage@townManager@@QAEXPAVheroWindow@@@Z	99.1480	ffeb279516de
+SOURCE/TOWNMGR	?SetupThievesGuild@townManager@@QAEXPAVheroWindow@@H@Z	92.2534	2f59890b00ad
 SOURCE/TOWNMGR	?SetupTown@townManager@@QAEXXZ	2.1963	1aa94671d25a
 SOURCE/TOWNMGR	?SetupWell@townManager@@QAEXPAVheroWindow@@@Z	99.7057	86dabaee541b
 SOURCE/TOWNMGR	?ShiftQualChange@townManager@@QAEXXZ	100.0000	779a7397c541
