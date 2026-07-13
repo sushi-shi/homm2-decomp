@@ -79,7 +79,7 @@ public:
     unsigned char m_visitedTownId;  // +0x09
     char m_name[13];  // +0x0a
     unsigned char m_cursorType;  // +0x17
-    unsigned char m_unknown18;  // +0x18
+    unsigned char m_portrait;  // +0x18
     int    m_x;  // +0x19
     int    m_y;  // +0x1d
     int    m_destinationX;  // +0x21

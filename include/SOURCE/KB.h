@@ -85,6 +85,62 @@ SIZE(townSlot, 0x64);
 struct heroRec  { char m_pad[250]; };
 #endif
 struct SPlayerExit { signed char m_0, m_1, m_2, m_3, m_4, m_5, m_6; };
+
+typedef enum CheckEndGameVictoryCondition {
+    CHECK_END_GAME_VICTORY_STANDARD = 0,
+    CHECK_END_GAME_VICTORY_CAPTURE_TOWN = 1,
+    CHECK_END_GAME_VICTORY_DEFEAT_HERO = 2,
+    CHECK_END_GAME_VICTORY_ARTIFACT = 3,
+    CHECK_END_GAME_VICTORY_SIDE = 4,
+    CHECK_END_GAME_VICTORY_GOLD = 5
+} CheckEndGameVictoryCondition;
+
+typedef enum CheckEndGameLossCondition {
+    CHECK_END_GAME_LOSS_NONE = 0,
+    CHECK_END_GAME_LOSS_TOWN = 1,
+    CHECK_END_GAME_LOSS_HERO = 2,
+    CHECK_END_GAME_LOSS_TIME = 3
+} CheckEndGameLossCondition;
+
+typedef enum CheckEndGameConstants {
+    CHECK_END_GAME_NO_PLAYER = -1,
+    CHECK_END_GAME_EMPTY_ARMY = -1,
+    CHECK_END_GAME_PLAYER_COUNT = 6,
+    CHECK_END_GAME_HERO_COUNT = 54,
+    CHECK_END_GAME_ARMY_SLOTS = 5,
+    CHECK_END_GAME_GOLD_RESOURCE = 6,
+    CHECK_END_GAME_GRACE_DAYS = 7,
+    CHECK_END_GAME_DAYS_PER_WEEK = 7,
+    CHECK_END_GAME_DAYS_PER_MONTH = 28,
+    CHECK_END_GAME_GOLD_SCALE = 1000,
+    CHECK_END_GAME_ULTIMATE_ARTIFACT = 0,
+    CHECK_END_GAME_LAST_ULTIMATE_PART = 7,
+    CHECK_END_GAME_SIDE_SPECIAL_VALUE = 99,
+    CHECK_END_GAME_PLAYER_DIALOG_ICON = 9,
+    CHECK_END_GAME_REMOTE_DIALOG_TIME = 5000,
+    CHECK_END_GAME_DWARF_TOWN = 2,
+    CHECK_END_GAME_ROLAND_HERO = 54
+} CheckEndGameConstants;
+
+typedef enum CheckEndGameCampaignConstants {
+    CHECK_END_GAME_ROLAND_CAMPAIGN = 0,
+    CHECK_END_GAME_ARCHIBALD_CAMPAIGN = 1,
+    CHECK_END_GAME_SCENARIO_OFFSET = 1,
+    CHECK_END_GAME_DWARF_SCENARIO = 3,
+    CHECK_END_GAME_SIDE_SCENARIO = 7,
+    CHECK_END_GAME_ROLAND_CAPTURE_SCENARIO = 9,
+    CHECK_END_GAME_FIRST_NO_SAVE_SCENARIO = 10,
+    CHECK_END_GAME_LAST_SCENARIO = 11,
+    CHECK_END_GAME_ROLAND_COLOR = 0,
+    CHECK_END_GAME_ALLY_COLOR = 3
+} CheckEndGameCampaignConstants;
+
+typedef enum CheckEndGameForcedResult {
+    CHECK_END_GAME_FORCE_NONE = 0,
+    CHECK_END_GAME_FORCE_VICTORY = 1,
+    CHECK_END_GAME_FORCE_DEFEAT = 2
+} CheckEndGameForcedResult;
+
 extern "C" void PollSound(void);
 void ForcePollSound(void);
 void InitMainClasses(void);
