@@ -113,17 +113,29 @@ struct tag_monsterInfo {
 struct SSpellInfo {
     char m_pad0[9];
     unsigned char level;
-    char m_pad_a[2];
-    short value;
-    unsigned char m_e;
+    char m_pad1[2];
+    short aiValue;
     unsigned char raceChance[6];
     unsigned char attributes;
+    unsigned char m_e;
 };  // gsSpellInfo[] (sizeof 22)
 struct SNetPlayerInfo { char m_pad[0xcc]; };                                // gsNetPlayerInfo[]
 struct SAMPLE2 { class sample *pSample; struct _SAMPLE *pMem; };            // NULL_SAMPLE2
 
+typedef enum MonsterAttribute {
+    MONSTER_ATTRIBUTE_UNKNOWN = 0x01,
+    MONSTER_ATTRIBUTE_FLYING = 0x02,
+    MONSTER_ATTRIBUTE_RANGED = 0x04
+} MonsterAttribute;
+
 #pragma pack(push, 1)
-struct monsterRV { int rv; char pad[22]; };                                 // gMonsterInfo[] (26B, pack 1)
+struct monsterRV {
+    int rv;
+    signed char level;
+    char pad5[15];
+    int attributes;
+    char pad24[2];
+};                                                                          // gMonsterInfo[] (26B, pack 1)
 struct SWinSetup { unsigned char m_0; unsigned short m_1; char *m_3; };     // gWinSetup[] (7B, pack 1)
 #pragma pack(pop)
 

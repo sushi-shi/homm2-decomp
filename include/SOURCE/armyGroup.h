@@ -20,6 +20,7 @@ public:
     union {
         short m_creatureCounts[5];       // +0x05
         unsigned short m_troopCounts[5];
+        signed short m_quantities[5];
     };
     // --- constructors ---
     armyGroup(void);

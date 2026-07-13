@@ -35,7 +35,10 @@ struct searchNode {
     char pad0[2];
     unsigned short distance;
     unsigned char visited : 1;
-    unsigned char flags : 7;
+    unsigned char unknownFlag : 1;
+    unsigned char rvFlag1 : 1;
+    unsigned char rvFlag2 : 1;
+    unsigned char flags : 4;
     char pad1[4];
 };
 #pragma pack(pop)
@@ -55,6 +58,9 @@ public:
     char _pad_0x18[0x23fc];
     searchStorage m_storage;  // +0x2414, path directions overlap the search-cell pointer
     searchNode *GetRow(int y, int width) { return m_storage.nodes + y * (width | 0); }
+    searchNode &GetNode(int x, int y) {
+        return *(m_storage.nodes + y * (MAP_WIDTH | 0) + x);
+    }
     // --- constructors ---
     searchArray(void);
     ~searchArray();

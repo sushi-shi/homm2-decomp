@@ -23,15 +23,99 @@ typedef enum AIResourceValue {
     AI_NEARBY_RADIUS = 10,
     AI_HERO_COUNT = 54,
     AI_MAP_SIZE_SMALL = 36,
-    AI_MAP_SIZE_LARGE = 108
+    AI_MAP_SIZE_LARGE = 108,
+    AI_MAP_SIZE_XLARGE = 144
 } AIResourceValue;
 
 typedef enum AIObjectType {
+    AI_OBJECT_ALCHEMIST_LAB = 0x01,
+    AI_OBJECT_SIGN = 0x02,
+    AI_OBJECT_BUOY = 0x03,
+    AI_OBJECT_SKELETON = 0x04,
+    AI_OBJECT_DAEMON_CAVE = 0x05,
+    AI_OBJECT_TREASURE_CHEST = 0x06,
+    AI_OBJECT_FAERIE_RING = 0x07,
+    AI_OBJECT_CAMPFIRE = 0x08,
+    AI_OBJECT_FOUNTAIN = 0x09,
+    AI_OBJECT_GAZEBO = 0x0a,
+    AI_OBJECT_GENIE_LAMP = 0x0b,
+    AI_OBJECT_GRAVEYARD = 0x0c,
+    AI_OBJECT_ARCHER_HOUSE = 0x0d,
+    AI_OBJECT_GOBLIN_HUT = 0x0e,
+    AI_OBJECT_DWARF_COTTAGE = 0x0f,
+    AI_OBJECT_PEASANT_HUT = 0x10,
+    AI_OBJECT_DRAGON_CITY = 0x14,
+    AI_OBJECT_LIGHTHOUSE = 0x15,
+    AI_OBJECT_WATER_WHEEL = 0x16,
+    AI_OBJECT_MINE = 0x17,
+    AI_OBJECT_MONSTER = 0x18,
+    AI_OBJECT_TOWN_EVENT = 0x23,
+    AI_OBJECT_ARTIFACT = 0x29,
+    AI_OBJECT_HERO_EVENT = 0x2a,
+    AI_OBJECT_BOAT_EVENT = 0x2b,
     AI_OBJECT_TOWN = 0xa3,
     AI_OBJECT_HERO = 0xaa,
-    AI_OBJECT_MONSTER = 0x24,
-    AI_OBJECT_ARTIFACT = 0x27,
-    AI_OBJECT_BOAT = 0x2a,
+    AI_OBJECT_BOAT = 0xab,
+    AI_OBJECT_BOAT_TRIGGER = 0x1c,
+    AI_OBJECT_OBELISK = 0x19,
+    AI_OBJECT_OASIS = 0x1a,
+    AI_OBJECT_RESOURCE = 0x1b,
+    AI_OBJECT_SAWMILL = 0x1d,
+    AI_OBJECT_SHRINE_FIRST = 0x1f,
+    AI_OBJECT_SHIPWRECK = 0x20,
+    AI_OBJECT_SEA_CHEST = 0x21,
+    AI_OBJECT_DESERT_TENT = 0x22,
+    AI_OBJECT_CASTLE = 0x23,
+    AI_OBJECT_STONE_LITHS = 0x24,
+    AI_OBJECT_WAGON_CAMP = 0x25,
+    AI_OBJECT_HUT_OF_MAGI = 0x26,
+    AI_OBJECT_WHIRLPOOL = 0x27,
+    AI_OBJECT_WINDMILL = 0x28,
+    AI_OBJECT_RANDOM_ULTIMATE_ARTIFACT = 0x2c,
+    AI_OBJECT_WATCH_TOWER = 0x3a,
+    AI_OBJECT_TREE_HOUSE = 0x3b,
+    AI_OBJECT_TREE_CITY = 0x3c,
+    AI_OBJECT_RUINS = 0x3d,
+    AI_OBJECT_FORT = 0x3e,
+    AI_OBJECT_TRADING_POST = 0x3f,
+    AI_OBJECT_ABANDONED_MINE = 0x40,
+    AI_OBJECT_SIRENS = 0x41,
+    AI_OBJECT_STANDING_STONES = 0x42,
+    AI_OBJECT_IDOL = 0x43,
+    AI_OBJECT_TREE_OF_KNOWLEDGE = 0x44,
+    AI_OBJECT_WITCH_DOCTORS_HUT = 0x45,
+    AI_OBJECT_TEMPLE = 0x46,
+    AI_OBJECT_HILL_FORT = 0x47,
+    AI_OBJECT_HALFLING_HOLE = 0x48,
+    AI_OBJECT_MERCENARY_CAMP = 0x49,
+    AI_OBJECT_SHRINE_SECOND = 0x4a,
+    AI_OBJECT_SHRINE_THIRD = 0x4b,
+    AI_OBJECT_PYRAMID = 0x4c,
+    AI_OBJECT_CITY_OF_DEAD = 0x4d,
+    AI_OBJECT_EXCAVATION = 0x4e,
+    AI_OBJECT_SPHINX = 0x4f,
+    AI_OBJECT_WAGON = 0x50,
+    AI_OBJECT_ARTESIAN_SPRING = 0x52,
+    AI_OBJECT_TROLL_BRIDGE = 0x53,
+    AI_OBJECT_WATERING_HOLE = 0x54,
+    AI_OBJECT_WITCHS_HUT = 0x55,
+    AI_OBJECT_XANADU = 0x56,
+    AI_OBJECT_CAVE = 0x57,
+    AI_OBJECT_LEAN_TO = 0x58,
+    AI_OBJECT_MAGELLANS_MAPS = 0x59,
+    AI_OBJECT_FLOTSAM = 0x5a,
+    AI_OBJECT_DERELICT_SHIP = 0x5b,
+    AI_OBJECT_SHIPWRECK_SURVIVOR = 0x5c,
+    AI_OBJECT_BOTTLE = 0x5d,
+    AI_OBJECT_MAGIC_WELL = 0x5e,
+    AI_OBJECT_MAGIC_GARDEN = 0x5f,
+    AI_OBJECT_OBSERVATION_TOWER = 0x60,
+    AI_OBJECT_FREEMANS_FOUNDRY = 0x61,
+    AI_OBJECT_BARRIER = 0x77,
+    AI_OBJECT_TRAVELLER_TENT = 0x78,
+    AI_OBJECT_EXPANSION_DWELLING = 0x79,
+    AI_OBJECT_EXPANSION_OBJECT = 0x7a,
+    AI_OBJECT_JAIL = 0x7b,
     AI_EXPANSION_OBJECT_THRESHOLD = 108
 } AIObjectType;
 
@@ -39,11 +123,60 @@ typedef enum AISpellType {
     AI_SPELL_DIMENSION_DOOR = 0x38
 } AISpellType;
 
+typedef enum AIArtifactType {
+    AI_ARTIFACT_MAGIC_BOOK = 0x51
+} AIArtifactType;
+
+typedef enum AICreatureType {
+    AI_CREATURE_PEASANT = 0x00,
+    AI_CREATURE_ARCHER = 0x01,
+    AI_CREATURE_PIKEMAN = 0x03,
+    AI_CREATURE_VETERAN_PIKEMAN = 0x04,
+    AI_CREATURE_SWORDSMAN = 0x05,
+    AI_CREATURE_MASTER_SWORDSMAN = 0x06,
+    AI_CREATURE_GOBLIN = 0x0b,
+    AI_CREATURE_ORC = 0x0c,
+    AI_CREATURE_ORC_CHIEF = 0x0d,
+    AI_CREATURE_OGRE = 0x0f,
+    AI_CREATURE_OGRE_LORD = 0x10,
+    AI_CREATURE_TROLL = 0x11,
+    AI_CREATURE_SPRITE = 0x14,
+    AI_CREATURE_DWARF = 0x15,
+    AI_CREATURE_BATTLE_DWARF = 0x16,
+    AI_CREATURE_CENTAUR = 0x1d,
+    AI_CREATURE_RED_DRAGON = 0x24,
+    AI_CREATURE_HALFLING = 0x26,
+    AI_CREATURE_IRON_GOLEM = 0x28,
+    AI_CREATURE_STEEL_GOLEM = 0x29,
+    AI_CREATURE_SKELETON = 0x2f,
+    AI_CREATURE_POWER_LICH = 0x37,
+    AI_CREATURE_ROGUE = 0x39,
+    AI_CREATURE_NOMAD = 0x3a,
+    AI_CREATURE_GENIE = 0x3c,
+    AI_CREATURE_MEDUSA = 0x3d
+} AICreatureType;
+
 typedef enum AIPurchaseType {
     AI_PURCHASE_BUILDING = 0,
     AI_PURCHASE_HERO = 1,
     AI_PURCHASE_CREATURE = 2
 } AIPurchaseType;
+
+typedef enum AIBuildingType {
+    AI_BUILDING_MAGE_GUILD = 0,
+    AI_BUILDING_SPECIAL_ONE = 1,
+    AI_BUILDING_SPECIAL_TWO = 2,
+    AI_BUILDING_SPECIAL_THREE = 3,
+    AI_BUILDING_SPECIAL_FOUR = 4,
+    AI_BUILDING_SPECIAL_SIX = 6,
+    AI_BUILDING_SPECIAL_SEVEN = 7,
+    AI_BUILDING_FIRST_DWELLING = 19,
+    AI_BUILDING_SECOND_DWELLING = 20,
+    AI_BUILDING_THIRD_DWELLING = 21,
+    AI_BUILDING_FIRST_UPGRADE = 25,
+    AI_BUILDING_LAST_UPGRADE = 29,
+    AI_BUILDING_LAST_DWELLING = 30
+} AIBuildingType;
 
 #define AI_MINIMUM_FIGHT_VALUE 100
 #define AI_BERSERK_THRESHOLD 30000
@@ -62,6 +195,61 @@ typedef enum AIPurchaseType {
 #define AI_MINIMUM_PURCHASE_VALUE 0.02
 #define AI_PLAYER_HERO_IDS_BASE 0x4a0
 #define AI_DIMENSION_DOOR_SPELL_POINTS 30
+#define AI_MAX_MAGE_GUILD_LEVEL 5
+#define AI_TOWN_ARMY_SLOTS 5
+#define AI_BUILDING_MAGE_GUILD_MASK 0x00000001
+#define AI_BUILDING_SHIPYARD_MASK 0x00000008
+#define AI_BUILDING_CASTLE_MASK 0x40
+#define AI_BUILDING_LEFT_TURRET_MASK 0x00000100
+#define AI_BUILDING_RIGHT_TURRET_MASK 0x00000200
+#define AI_MAGIC_BOOK_COST 500
+#define AI_MANA_PER_KNOWLEDGE 10
+#define AI_EARLY_TOWN_SHARE_TURN 7
+#define AI_SECOND_WEEK_END_TURN 14
+#define AI_THIRD_WEEK_END_TURN 21
+#define AI_MINIMUM_TOWN_SHARE_DIFFERENCE 0.08
+#define AI_TOWN_SHARE_DIFFERENCE_FACTOR 0.15
+#define AI_TOWN_TRANSFER_BONUS 0.05
+#define AI_WEAKER_ARMY_TRANSFER_FACTOR 0.25f
+#define AI_STRONGER_ARMY_TRANSFER_FACTOR 0.13f
+#define AI_TOWN_TRANSFER_CURVE_OFFSET 1.0f
+#define AI_TOWN_TRANSFER_CURVE_CENTER 0.22
+#define AI_CONQUERED_HERO_MOBILITY_LIMIT 20
+#define AI_UNGUARDED_TOWN_VALUE 500
+#define AI_DWELLING_LEVELS 12
+#define AI_GOLD_RESOURCE_MULTIPLIER 100
+#define AI_CAMPFIRE_RESOURCE_AMOUNT 4.0f
+#define AI_CAMPFIRE_GOLD_AMOUNT 400.0f
+#define AI_CAMPFIRE_AVERAGE_DIVISOR 2.0f
+#define AI_OASIS_VALUE_FACTOR 350.0f
+#define AI_MORALE_LUCK_SITE_VALUE_FACTOR 200.0f
+#define AI_WATERING_HOLE_VALUE_FACTOR 400.0f
+#define AI_GAZEBO_VALUE_FACTOR 1000.0f
+#define AI_TRAINING_SITE_VALUE_FACTOR 1000.0f
+#define AI_TREE_KNOWLEDGE_VALUE_FACTOR 1500.0f
+#define AI_TREE_KNOWLEDGE_GOLD_COST 2000.0f
+#define AI_TREE_KNOWLEDGE_GEM_COST 10.0f
+#define AI_XANADU_VALUE_FACTOR 8000.0f
+#define AI_TRAVEL_GATE_INITIAL_VALUE -9999
+#define AI_TRAVEL_GATE_EXIT_SCALE 0.75
+#define AI_TRAVEL_GATE_EXIT_RADIUS 3
+#define AI_TRAVEL_GATE_EXIT_DEPTH 700
+#define AI_TRAVEL_GATE_CURRENT_DEPTH 500
+#define AI_TRAVEL_GATE_PENALTY 200
+#define AI_MAX_BATTLE_STAT 40
+#define AI_DAEMON_FIGHT_VALUE_FACTOR 300.0
+#define AI_DAEMON_SECONDARY_FIGHT_VALUE_FACTOR 100.0
+#define AI_DAEMON_GOLD_VALUE_FACTOR 2500.0f
+#define AI_DAEMON_GOLD_PENALTY -750.0
+#define AI_DAEMON_CAVE_GOLD_REQUIRED 2500
+#define AI_MAGIC_GARDEN_GOLD_AMOUNT 175.0f
+#define AI_FLOTSAM_GOLD_AMOUNT 175.0f
+#define AI_FLOTSAM_WOOD_AMOUNT 5.0f
+#define AI_SEA_CHEST_ARTIFACT_GOLD_AMOUNT 1000.0f
+#define AI_SEA_CHEST_LARGE_GOLD_AMOUNT 1500.0f
+#define AI_SEA_CHEST_SMALL_GOLD_AMOUNT 200.0f
+#define AI_SEA_CHEST_MINIMUM_VALUE 150
+#define AI_WATER_WHEEL_GOLD_AMOUNT 500
 
 // ---- AI member views: the recovered classes carry no field layout, so model the
 // exact offsets the /Od code touches as packed views and cast to them. ----
@@ -86,7 +274,8 @@ struct pdView {                  // playerData
     int resources[7];            // 0x8f (gold = [6] @ 0xa7)
     char _ab;
     signed char barrierTents;    // 0xac
-    char _ad[0xc3 - 0xad];
+    char _ad[0xbf - 0xad];
+    float buildingFactor;        // 0xbf
     float baseUpgradeFactor;     // 0xc3
     char _c7[0xe7 - 0xc7];
     int income[7];               // 0xe7
@@ -99,6 +288,10 @@ struct pdView {                  // playerData
     signed char getHeroId(int i) { return heroIds[i]; }
     signed char getCastleId(int i) { return castleIds[i]; }
 };
+struct gameObeliskView {         // game
+    char _0[0x634c];
+    signed char obeliskFlags[1]; // 0x634c
+};
 struct heroView {                // hero
     signed short curMana;        // 0x00
     unsigned char heroId;        // 0x02
@@ -106,6 +299,20 @@ struct heroView {                // hero
     signed char army[0x74 - 0x65]; // 0x65 (embedded armyGroup creature types)
     signed char skills[0x90 - 0x74]; // 0x74
     int level;                   // 0x90
+};
+struct aiHeroPositionRecord {
+    char _0[0x19];
+    int x;                       // 0x19
+    int y;                       // 0x1d
+    char _21[250 - 0x21];
+};
+struct gameHeroPositionView {    // game hero position records used by PHILAI
+    char _0[0x27cc];
+    aiHeroPositionRecord heroRecs[AI_HERO_COUNT];
+};
+struct armyView {                // armyGroup
+    signed char creatureTypes[5]; // 0x00
+    signed short quantities[5];   // 0x05
 };
 struct townView {                // town
     signed char id;              // 0x00
@@ -116,19 +323,17 @@ struct townView {                // town
     unsigned char castleY;       // 0x05
     unsigned char dockX;         // 0x06
     unsigned char dockY;         // 0x07
-    char _8[0x17 - 0x08];
+    armyView army;               // 0x08
     signed char visitingHero;    // 0x17
     int buildings;               // 0x18
     signed char buildState;      // 0x1c
     char _1d;
     signed short garrison[5];    // 0x1e
-    char _28[0x55 - 0x28];
+    char _28[0x3c - 0x28];
+    signed char mageGuildSpells[AI_MAX_MAGE_GUILD_LEVEL * 4]; // 0x3c
+    signed char mageGuildSpellCounts[AI_MAX_MAGE_GUILD_LEVEL]; // 0x50
     unsigned short turnsOwned;   // 0x55
     signed char getVisitingHero() { return visitingHero; }
-};
-struct armyView {                // armyGroup
-    signed char creatureTypes[5]; // 0x00
-    signed short quantities[5];   // 0x05
 };
 struct taView {                  // per-player AI "turn attention" record (gpGame+0x49e + player*283)
     float f0, f4, f8, fc, f10, f14; // 0x00..0x14
