@@ -7,16 +7,31 @@
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class playerData {
 public:
-    // --- members (offsets from Ghidra this+off access-analysis; widths are
-    // access-widths, NOT confirmed types; refine during byte-matching) ---
-    char _pad_0x0[0x1];
-    char   field_0x1;  // +0x01
+    signed char m_color;  // +0x00
+    signed char m_heroCount;  // +0x01
     signed char m_currentHero;  // +0x02
-    char _pad_0x3[0x41];
-    char   field_0x44;  // +0x44
+    signed char m_heroWindowTop;  // +0x03
+    signed char m_heroes[8];  // +0x04
+    char m_unknown0c[2];  // +0x0c
+    signed char m_unknown0e;  // +0x0e
+    int m_unknown0f;  // +0x0f
+    signed char m_unknown13;  // +0x13
+    char m_unusedSaveData[0x2c];  // +0x14
+    signed char m_unknown40;  // +0x40
+    signed char m_unknown41;  // +0x41
+    signed char m_unknown42;  // +0x42
+    signed char m_unknown43;  // +0x43
+    signed char m_townCount;  // +0x44
     signed char m_currentTown;  // +0x45
-    char m_pad_0x46[0x49];
+    signed char m_townWindowTop;  // +0x46
+    signed char m_towns[72];  // +0x47
     int m_resources[7];  // +0x8f
+    signed char m_unknownab;  // +0xab
+    signed char m_unknownac;  // +0xac
+    char m_unknownad[6];  // +0xad
+    char m_pad_0xb3[0x34];
+    int m_secondaryResources[7];  // +0xe7
+    char m_pad_0x103[0x18];
     // --- methods ---
     void Write(int);
     void Read(int);
@@ -27,4 +42,5 @@ public:
     signed char CurrentHero(void) { return m_currentHero; }
 };
 #pragma pack(pop)
+SIZE(playerData, 0x11b);
 #endif // HOMM2_SOURCE_PLAYERDATA_H

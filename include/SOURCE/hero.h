@@ -8,9 +8,14 @@
 class town;
 
 typedef enum HeroSecondarySkill {
+    HERO_SKILL_PATHFINDING = 0,
+    HERO_SKILL_ARCHERY = 3,
     HERO_SKILL_DIPLOMACY = 4,
+    HERO_SKILL_MYSTICISM = 5,
     HERO_SKILL_LEADERSHIP = 6,
-    HERO_SKILL_WISDOM = 7
+    HERO_SKILL_WISDOM = 7,
+    HERO_SKILL_BALLISTICS = 10,
+    HERO_SKILL_NECROMANCY = 12
 } HeroSecondarySkill;
 
 #pragma pack(push, 1)  // recovered layout is byte-packed
@@ -25,15 +30,16 @@ public:
     char _pad_0x6[0x1];
     short  field_0x7;  // +0x07
     char _pad_0x9[0x1];
-    char   field_0xa;  // +0x0a
-    char _pad_0xb[0xc];
+    char m_name[13];  // +0x0a
     unsigned char m_cursorType;  // +0x17
-    char   field_0x18;  // +0x18
+    unsigned char m_unknown18;  // +0x18
     int    field_0x19;  // +0x19
     int    field_0x1d;  // +0x1d
     int    field_0x21;  // +0x21
     int    field_0x25;  // +0x25
-    char _pad_0x29[0x3];
+    signed char m_unknown29;  // +0x29
+    signed char m_unknown2a;  // +0x2a
+    char m_pad_0x2b[1];
     unsigned char m_direction;  // +0x2c
     short  m_locationType;  // +0x2d
     short  m_occupiedTown;  // +0x2f
@@ -60,9 +66,10 @@ public:
     char   field_0x64;  // +0x64
     class armyGroup m_army;  // +0x65
     signed char m_secondarySkills[14];  // +0x74
-    char _pad_0x82[0xe];
+    signed char m_secondarySkillOrder[14];  // +0x82
     int m_secondarySkillCount;  // +0x90
-    char _pad_0x94[0x4f];
+    char _pad_0x94[0x41];
+    signed char m_artifacts[14];  // +0xd5
     unsigned int m_eventFlags;  // +0xe3
     char m_pad_0xe7[0x13];
     // --- constructors ---

@@ -11,6 +11,19 @@ struct tag_message;
 struct EventExtra;
 struct SThievesData { char pad[0x4e3]; signed char list[8][283]; };
 
+typedef enum GameSerializationConstant {
+    GAME_SOURCE_LINE = 660,
+    GAME_LOAD_SOURCE_LINE = 1103,
+    GAME_SAVE_BUFFER_SIZE = 50000,
+    GAME_FILE_MARKER = 1234,
+    GAME_UNUSED_FILE_MARKER = 9999,
+    GAME_PLAYER_COUNT = 6,
+    GAME_HERO_COUNT = 54,
+    GAME_TOWN_COUNT = 72,
+    GAME_MINE_COUNT = 144,
+    GAME_BOAT_COUNT = 48
+} GameSerializationConstant;
+
 int GetNumObelisks(int color);
 void ComputeUALoc(int);
 void GenerateStandardFileName(char *, char *);

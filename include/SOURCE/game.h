@@ -45,7 +45,28 @@ SIZE(boatRecord, 8);
 #ifndef HOMM2_PLAYER_RECORD_TYPE
 #define HOMM2_PLAYER_RECORD_TYPE
 #pragma pack(push, 1)
-struct playerRec { char pad0[0x8f]; int resources[7]; char pad1[0x70]; };
+struct playerRec {
+    signed char color;
+    signed char heroCount;
+    signed char currentHero;
+    signed char heroWindowTop;
+    signed char heroes[8];
+    char unknown0c[2];
+    signed char unknown0e;
+    int unknown0f;
+    signed char unknown13;
+    char pad14[0x2c];
+    signed char unknown40;
+    signed char unknown41;
+    signed char unknown42;
+    signed char unknown43;
+    signed char townCount;
+    signed char currentTown;
+    signed char townWindowTop;
+    signed char towns[72];
+    int resources[7];
+    char padab[0x70];
+};
 #pragma pack(pop)
 #endif
 
@@ -99,7 +120,8 @@ public:
     char   field_0xb8;  // +0xb8
     char   field_0xb9;  // +0xb9
     short  field_0xba;  // +0xba
-    char _pad_0xbc[0x1ed];
+    char _pad_0xbc[0x8e];
+    char m_saveName[0x15f];  // +0x14a
     int    field_0x2a9;  // +0x2a9
     char   field_0x2ad;  // +0x2ad
     char _pad_0x2ae[0x1];
@@ -132,26 +154,31 @@ public:
     char   field_0x47a;  // +0x47a
     char   field_0x47b;  // +0x47b
     char _pad_0x47c[0x12];
-    char   field_0x48e;  // +0x48e
-    char   field_0x48f;  // +0x48f
-    char _pad_0x490[0x6];
-    short  field_0x496;  // +0x496
-    short  field_0x498;  // +0x498
-    short  field_0x49a;  // +0x49a
+    signed char m_playerCount;  // +0x48e
+    signed char m_unknown48f;  // +0x48f
+    signed char m_playerDead[6];  // +0x490
+    unsigned short m_day;  // +0x496
+    unsigned short m_week;  // +0x498
+    unsigned short m_month;  // +0x49a
     struct playerRec m_players[6];  // +0x49c
     class fullMap m_worldMap;  // +0xb3e
-    char   field_0xb52;  // +0xb52
+    signed char m_obeliskCount;  // +0xb52
     townSlot m_castleRecs[72];  // 0xb53  castle/town record slots (GetCastleRec)
     char _pad_0x2773[0x51];     // 0x2773..0x27c4
     hero m_heroRecs[54];         // 0x27c4  hero record slots (GetHeroSlot)
-    char m_pad_0x5c80[0x38];
-    mineRecord m_mines[72];      // 0x5cb8
-    char m_pad_0x5eb0[0x1f6];
-    signed char m_mineOwners[72];  // 0x60a6
-    char m_pad_0x60ee[0xaf];
+    signed char m_availableHeroes[54];  // +0x5c80
+    mineRecord m_mines[144];      // 0x5cb6
+    signed char m_mineOwners[144];  // 0x60a6
+    char m_randomArtifacts[0x67];  // 0x6136
     boatRecord m_boats[48];        // 0x619d
-    char m_pad_0x631d[0x2f];
-    unsigned char m_obeliskVisitors[72];  // 0x634c
+    char m_pad_0x631d[0x30];
+    unsigned char m_obeliskVisitors[48];  // 0x634d
+    char m_defaultPlayerNames[24];  // +0x637d
+    signed char m_ultimateArtifactX;  // +0x6395
+    signed char m_ultimateArtifactY;  // +0x6396
+    signed char m_ultimateArtifactId;  // +0x6397
+    char m_pad_0x6398[5];
+    signed char m_unknown639d;
     // --- methods ---
     void SetupDynamicStuff(int, int, int);
     void SetupNewOverviewType(int, int);
