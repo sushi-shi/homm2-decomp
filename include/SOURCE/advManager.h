@@ -85,17 +85,17 @@ public:
     class icon *m_flagIcons[6];  // +0x242
     class icon *m_boatFlagIcons[6];  // +0x25a
     int    m_cursorActive;  // +0x272
-    int    m_field_0x276;  // +0x276
+    int    m_drawHeroShadows;  // +0x276
     int    m_cursorType;  // +0x27a
     int    m_cursorDirection;  // +0x27e  !union: conflicting widths
     int    m_cursorFrame;  // +0x282
-    int    m_cursorCellX;  // +0x286
-    int    m_cursorCellY;  // +0x28a
-    int    m_cursorCellIndex;  // +0x28e
-    int    m_field_0x292;  // +0x292
-    int    m_field_0x296;  // +0x296
-    int    m_field_0x29a;  // +0x29a
-    int    m_field_0x29e;  // +0x29e
+    int    m_cursorFrameCount;  // +0x286
+    int    m_cursorCycle;  // +0x28a
+    int    m_cursorTurning;  // +0x28e
+    int    m_cursorMapX;  // +0x292
+    int    m_previousCursorMapX;  // +0x296
+    int    m_cursorMapY;  // +0x29a
+    int    m_previousCursorMapY;  // +0x29e
     int    m_comboHeroDrawn;  // +0x2a2
     int    m_heroContextLocked;  // +0x2a6
     int    m_townContextLocked;  // +0x2aa
@@ -258,12 +258,12 @@ public:
 SIZE(advManager, 0x37e);
 // ---- globals (declarations, RVA order) ----
 extern int bMoveSoundMade;
-extern int *giPixelsPerStep;
-extern int *giStepDelay;
+extern int giPixelsPerStep[6];
+extern int giStepDelay[5];
 extern struct _SAMPLE *hOldWalkSample;
 extern struct _SAMPLE *hNewWalkSample;
 extern int EveryOther;
-extern int *startVals;
+extern int startVals[3];
 extern signed char iVWHalf[3][6][2];
 extern int giViewWorldScale;
 extern int giViewWorldScaleLookup;
