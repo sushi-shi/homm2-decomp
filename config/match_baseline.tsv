@@ -386,12 +386,12 @@ BASE/iconf2by	?FlipIconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	76
 BASE/listbox	??0listBoxWidget@@QAE@XZ	100.0000	1ce71b4c4e2c
 BASE/listbox	??1listBoxWidget@@UAE@XZ	100.0000	ddc8822b41ec
 BASE/listbox	??_ElistBoxWidget@@UAEPAXI@Z	0.0000	
-BASE/listbox	?DeleteItem@listBoxWidget@@QAEXH@Z	100.0000	64c20168af2a
+BASE/listbox	?DeleteItem@listBoxWidget@@QAEXH@Z	100.0000	a42726bdc9f1
 BASE/listbox	?Draw@listBoxWidget@@UAEXXZ	100.0000	230100bbcc4e
 BASE/listbox	?DrawLBStuff@listBoxWidget@@QAEXH@Z	100.0000	bd3903067b29
-BASE/listbox	?Main@listBoxWidget@@UAEHAAUtag_message@@@Z	99.8781	3acda66be35c
-BASE/listbox	?ProcessMouseMessage@listBoxWidget@@QAEHAAUtag_message@@@Z	99.1322	6cfc4fc273b9
-BASE/listbox	?Read@listBoxWidget@@QAEXXZ	89.2517	2a94105916a2
+BASE/listbox	?Main@listBoxWidget@@UAEHAAUtag_message@@@Z	99.6132	8199173fc92c
+BASE/listbox	?ProcessMouseMessage@listBoxWidget@@QAEHAAUtag_message@@@Z	100.0000	815d494e6125
+BASE/listbox	?Read@listBoxWidget@@QAEXXZ	100.0000	5405bf8476ce
 BASE/miscwin	?AutoInitSVGA@@YIFXZ	100.0000	ba21e7c98ba3
 BASE/miscwin	@BlitBitmapToScreenVesa@28	100.0000	d63e894c78f3
 BASE/soundmgr	??0soundManager@@QAE@XZ	97.6471	2cb5eafa76dd
