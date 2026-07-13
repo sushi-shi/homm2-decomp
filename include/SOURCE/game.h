@@ -20,6 +20,10 @@ struct tag_message;
 #ifndef HOMM2_GAME_RECORD_TYPES
 #define HOMM2_GAME_RECORD_TYPES
 #pragma pack(push, 1)
+struct townArmyRecord {
+    signed char m_troopTypes[5];
+    unsigned short m_troopCounts[5];
+};
 struct townSlot {
     signed char id;
     signed char owner;
@@ -29,16 +33,29 @@ struct townSlot {
     unsigned char y;
     signed char unknown6;
     signed char unknown7;
-    signed char army[15];
+    union {
+        townArmyRecord m_army;
+        signed char army[15];
+    };
     signed char occupyingHeroId;
     int buildings;
     char unknown1c;
     char unknown1d;
-    char pad1e[0x1a];
+    short dwellingGrowth[12];
+    unsigned char m_onMap;
+    signed char m_unknown37;
     signed char unknown38;
-    char pad39[0x1c];
+    signed char m_originalOwner;
+    unsigned short m_extraIndex;
+    union {
+        signed char m_spells[5][4];
+        struct {
+            char m_spellPad[19];
+            signed char m_spellCounts[6];
+        };
+    };
     short unknown55;
-    char pad57[0xd];
+    char m_name[13];
 };
 #pragma pack(pop)
 SIZE(townSlot, 0x64);
@@ -92,7 +109,9 @@ struct playerRec {
     int resources[7];
     signed char evilInterface;
     signed char unknownac;
-    char padad[0x6e];
+    char padad[0x3a];
+    int secondaryResources[7];
+    char pad103[0x18];
 
     signed char Town(int index) { return towns[index]; }
     signed char Hero(int index) { return heroes[index]; }
@@ -159,8 +178,8 @@ public:
     int    field_0x2a9;  // +0x2a9
     char   field_0x2ad;  // +0x2ad
     char _pad_0x2ae[0x1];
-    char   field_0x2af;  // +0x2af
-    char   field_0x2b0;  // +0x2b0
+    unsigned char m_mapWidth;  // +0x2af
+    unsigned char m_mapHeight;  // +0x2b0
     char   field_0x2b1;  // +0x2b1
     char   field_0x2b2;  // +0x2b2
     char _pad_0x2b3[0x10];
@@ -181,8 +200,11 @@ public:
     char _pad_0x2db[0x170];
     char   field_0x44b;  // +0x44b
     char   field_0x44c;  // +0x44c
-    char _pad_0x44d[0x18];
-    signed char m_aiSpeed;  // +0x465
+    char _pad_0x44d[0x6];
+    signed char m_playerHandicap[6];  // +0x453
+    signed char m_setupPlayerRace[6];  // +0x459
+    char _pad_0x45f[6];
+    signed char m_difficulty;  // +0x465
     char _pad_0x466[0x13];
     char   field_0x479;  // +0x479
     char   field_0x47a;  // +0x47a
@@ -199,7 +221,7 @@ public:
     signed char m_obeliskCount;  // +0xb52
     townSlot m_castleRecs[72];  // 0xb53
     signed char m_castleOwners[72];  // +0x2773
-    char m_pad_0x27bb[9];
+    char m_dailyEventFlags[9];  // +0x27bb
     hero m_heroRecs[54];         // 0x27c4  hero record slots (GetHeroSlot)
     signed char m_availableHeroes[54];  // +0x5c80
     mineRecord m_mines[144];      // 0x5cb6
@@ -214,6 +236,13 @@ public:
     signed char m_ultimateArtifactId;  // +0x6397
     char m_pad_0x6398[5];
     unsigned char m_cheated;  // +0x639d
+    char m_pad_0x639e[0xc];
+    char m_rumour[0x12d];  // +0x63aa
+    unsigned short m_rumourEventCount;  // +0x64d7
+    unsigned short m_rumourEventIndices[81];  // +0x64d9
+    char m_pad_0x657b[0x66];
+    class heroWindow *m_viewArmyWindow;  // +0x65e1
+    int m_viewArmyResult;  // +0x65e5
     // --- methods ---
     void SetupDynamicStuff(int, int, int);
     void SetupNewOverviewType(int, int);

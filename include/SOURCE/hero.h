@@ -37,9 +37,18 @@ public:
     int    m_y;  // +0x1d
     int    m_destinationX;  // +0x21
     int    m_destinationY;  // +0x25
-    unsigned char m_boatId;  // +0x29
-    char m_unknown2a;  // +0x2a
-    signed char m_unknown2b;  // +0x2b
+    union {
+        struct {
+            unsigned char m_boatId;  // +0x29
+            char m_unknown2a;  // +0x2a
+            signed char m_unknown2b;  // +0x2b
+        };
+        struct {
+            signed char m_patrolX;  // +0x29
+            signed char m_patrolY;  // +0x2a
+            signed char m_patrolRadius;  // +0x2b
+        };
+    };
     unsigned char m_direction;  // +0x2c
     short  m_locationType;  // +0x2d
     short  m_occupiedTown;  // +0x2f

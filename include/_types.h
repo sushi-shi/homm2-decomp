@@ -14,6 +14,10 @@ class sample;
 // per-element .rdata float symbols referenced in philAI::RVConversion; the rest follow the
 // canonical order.
 enum { RES_WOOD, RES_MERCURY, RES_ORE, RES_SULFUR, RES_CRYSTAL, RES_GEMS, RES_GOLD };
+enum {
+    MONSTER_FLAGS_SHOOTER = 0x00040000,
+    MONSTER_FLAGS_NO_MORALE = 0x04000000
+};
 
 typedef unsigned int UInt32;   // crc32Table[]
 struct MemEntry;               // gpMemEntry — full def not yet reconstructed; used via pointer
@@ -76,14 +80,39 @@ struct configStruct {                    // gConfig, 0x1a0 bytes
 struct SCreatureInfo { unsigned short value; char pad[24]; };               // gCreatureInfo[]
 struct tag_tilePoint { signed char x; signed char _1; signed char y; signed char _3; };  // normalDirTable[]
 #pragma pack(push, 1)
-struct tag_monsterInfo { short cost; int fightValue; char m_pad[20]; };     // gMonsterDatabase[] (sizeof 26)
+struct tag_monsterInfo {
+    short cost;
+    int fightValue;
+    signed char unknown06;
+    signed char growth;
+    unsigned short hitPoints;
+    signed char unknown0a;
+    signed char speed;
+    signed char attack;
+    signed char defense;
+    signed char damageMin;
+    signed char damageMax;
+    signed char shots;
+    char unknown11[3];
+    union {
+        int all;
+        struct {
+            char unknown14[2];
+            signed char abilities;
+            signed char attributes;
+        } bytes;
+    } flags;
+    char unknown18[2];
+};
 #pragma pack(pop)
 struct SSpellInfo {
     char m_pad0[9];
     unsigned char level;
-    char m_pad1[4];
+    char m_pad_a[2];
+    short value;
     unsigned char m_e;
-    char m_pad2[7];
+    unsigned char raceChance[6];
+    unsigned char attributes;
 };  // gsSpellInfo[] (sizeof 22)
 struct SNetPlayerInfo { char m_pad[0xcc]; };                                // gsNetPlayerInfo[]
 struct SAMPLE2 { class sample *pSample; struct _SAMPLE *pMem; };            // NULL_SAMPLE2

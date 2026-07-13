@@ -24,6 +24,33 @@ typedef enum GameSerializationConstant {
     GAME_BOAT_COUNT = 48
 } GameSerializationConstant;
 
+typedef enum GameDifficultyConstant {
+    GAME_DIFFICULTY_HARD = 2,
+    GAME_DIFFICULTY_EXPERT = 3,
+    GAME_DIFFICULTY_IMPOSSIBLE = 4
+} GameDifficultyConstant;
+
+typedef enum GameDailyArtifactConstant {
+    ARTIFACT_POWER_RING = 0x43,
+    ARTIFACT_ENDLESS_POUCH_SULFUR = 0x47,
+    ARTIFACT_ENDLESS_VIAL_MERCURY = 0x48,
+    ARTIFACT_ENDLESS_POUCH_GEMS = 0x49,
+    ARTIFACT_ENDLESS_CORD_WOOD = 0x4a,
+    ARTIFACT_ENDLESS_CART_ORE = 0x4b,
+    ARTIFACT_ENDLESS_POUCH_CRYSTAL = 0x4c
+} GameDailyArtifactConstant;
+
+typedef enum GameWeeklyConstant {
+    WEEKLY_FIRST_DWELLING = 19,
+    WEEKLY_LAST_DWELLING = 30,
+    WEEKLY_GROWTH_LIMIT = 0x1feb,
+    WEEKLY_DRAGON_CITY_LIMIT = 220,
+    WEEKLY_MONSTER_LIMIT = 4000,
+    WEEKLY_AVAILABLE_HERO = 64,
+    WEEKLY_HERO_RESERVED_FLAG = 0x10000,
+    WEEKLY_HERO_VISIT_FLAG = 0x800000
+} GameWeeklyConstant;
+
 int GetNumObelisks(int color);
 void ComputeUALoc(int);
 void GenerateStandardFileName(char *, char *);

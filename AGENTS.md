@@ -111,6 +111,9 @@ authoritative. This file is the short, restart-ready Codex workflow.
 - When a later change lowers the live fuzzy score of an already matched function, keep its retained
   source-hash maximum and continue forward. Do not spend time restoring the live percentage unless
   raw-byte or relocation evidence proves that the function itself actually regressed.
+- When an intentional shared type/layout edit changes an affected sibling's normalized source hash,
+  run `homm2 status update --accept-regressions` so the new hash inherits the retained maximum.
+  Use plain `homm2 status update` for direct function edits that should establish a new maximum.
 - Mark `@early-stop` only for 100% matches or a byte-proven residual such as delinked local-label or
   constant-pool naming. Document the exact byte span and reason.
 - A jump-only early stop must be proved after excluding known jump-table data: every non-jump

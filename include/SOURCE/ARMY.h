@@ -4,6 +4,11 @@
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
 
+#pragma pack(push, 1)
+struct SMonFrameInfo { char data[0x338]; };
+#pragma pack(pop)
+extern SMonFrameInfo sViewArmyMonFrameInfo;
+
 void BuildTempWalkSeq(struct SMonFrameInfo *, int, int);
 void ModifyFrameInfo(struct SMonFrameInfo *, int);
 

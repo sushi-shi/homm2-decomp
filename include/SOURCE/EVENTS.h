@@ -18,6 +18,43 @@ struct signEventExtra {
     char pad[9];
     char text[1];
 };
+struct rumourEventExtra {
+    char pad[8];
+    char text[1];
+};
+struct mapHeroExtra {
+    signed char owner;
+    unsigned char hasCustomArmy;
+    signed char troopTypes[5];
+    unsigned short troopCounts[5];
+    unsigned char hasCustomHero;
+    signed char heroId;
+    signed char artifacts[3];
+    int experience;
+    unsigned char hasCustomSkills;
+    signed char skillTypes[8];
+    signed char skillLevels[8];
+    char unused2c;
+    unsigned char hasCustomName;
+    char name[13];
+    unsigned char hasPatrol;
+    signed char patrolRadius;
+    signed char heroClass;
+    signed char hasAssignedHero;
+};
+struct mapTownExtra {
+    signed char color;
+    unsigned char hasCustomBuildings;
+    unsigned int buildings;
+    signed char mageGuildLevel;
+    signed char hasCustomArmy;
+    signed char troopTypes[5];
+    unsigned short troopCounts[5];
+    unsigned char hasShrine;
+    char unused18;
+    char name[15];
+    signed char unknown28;
+};
 #pragma pack(pop)
 
 typedef enum MapEventType {
@@ -148,6 +185,7 @@ typedef enum MapEventType {
 } MapEventType;
 
 typedef enum MapEventConstant {
+    MAP_EVENT_ACTION_FLAG = 0x80,
     MAP_EVENT_TYPE_MASK = 0x7f,
     MAP_EVENT_DATA_EMPTY = 0,
     MAP_EVENT_DATA_SHIFT = 3,
