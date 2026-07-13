@@ -249,6 +249,14 @@ public:
     char m_pad_0x657b[0x66];
     class heroWindow *m_viewArmyWindow;  // +0x65e1
     int m_viewArmyResult;  // +0x65e5
+    class heroWindow *m_viewSpellsWindow;  // +0x65e9
+    class hero *m_viewSpellsHero;  // +0x65ed
+    int m_viewSpellsType;  // +0x65f1
+    int m_viewSpellsTop[2];  // +0x65f5
+    int m_viewSpellsCount[2];  // +0x65fd
+    int m_viewSpell;  // +0x6605
+    int (*m_viewSpellsCallback)(struct tag_message &);  // +0x6609
+    signed char m_viewSpellsReadOnly;  // +0x660d
     // --- methods ---
     void SetupDynamicStuff(int, int, int);
     void SetupNewOverviewType(int, int);

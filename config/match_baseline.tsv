@@ -108,7 +108,7 @@ BASE/Bzip	?putUInt32@@YIXPAUBitStream@@I@Z	100.0000	c4d1e9f80830
 BASE/Bzip	?qsortFull@@YIXHH@Z	99.5181	5cd8907ca4eb
 BASE/Bzip	?sendMTFVal@@YIXPAUBitStream@@H@Z	100.0000	9c4c2a839717
 BASE/Bzip	?sendZeroes@@YIXPAUBitStream@@H@Z	100.0000	3019438ce86d
-BASE/Bzip	?setDecompressStructureSizes@@YIXH@Z	98.0645	a643af526923
+BASE/Bzip	?setDecompressStructureSizes@@YIXH@Z	100.0000	a643af526923
 BASE/Bzip	?setGlobalCRC@@YIXI@Z	100.0000	7c06c85327ae
 BASE/Bzip	?shellTrivial@@YIXXZ	99.5556	ccdfd2078f6d
 BASE/Bzip	?showFileNames@@YIXXZ	100.0000	b9fa0d9cd37f
@@ -144,7 +144,7 @@ BASE/FONT	??1font@@UAE@XZ	100.0000	088279c525b8
 BASE/FONT	??_Efont@@UAEPAXI@Z	0.0000	
 BASE/FONT	?DrawBoundedString@font@@QAEXPADHHHHHH@Z	89.4483	502ca0d59bd6
 BASE/FONT	?DrawString@font@@QAEXPADHHH@Z	100.0000	9c9349c5622f
-BASE/FONT	?DrawStringExecute@font@@IAEXPADHHHHHHH@Z	98.2609	9857ad77791a
+BASE/FONT	?DrawStringExecute@font@@IAEXPADHHHHHHH@Z	98.3696	9857ad77791a
 BASE/FONT	?GetCharacterWidth@font@@QAEHE@Z	86.9310	d7bc07a9749b
 BASE/FONT	?LineLength@font@@QAEHPADH@Z	100.0000	bc7d795341b8
 BASE/FONT	?LineWidth@font@@QAEHPAD@Z	100.0000	dc722c2ee70e
@@ -364,7 +364,7 @@ BASE/WINMGR	?UpdateScreen@heroWindowManager@@QAEXXZ	100.0000	4077d1619d5f
 BASE/WINMGR	?UpdateScreenRegion@heroWindowManager@@QAEXHHHH@Z	100.0000	67a73e466f64
 BASE/WINMGR	empty_stub	0.0000	
 BASE/bmap2	?BlitBitmap@@YIXPAVbitmap@@HHHH0HH@Z	88.0000	85943241bc9f
-BASE/bmap2	?DimBitmapArea@@YIXPAVbitmap@@HHHHH@Z	82.9000	16228a92fc65
+BASE/bmap2	?DimBitmapArea@@YIXPAVbitmap@@HHHHH@Z	84.2000	16228a92fc65
 BASE/bmap2	?FillBitmapArea@@YIXPAVbitmap@@HHHHH@Z	95.4545	abf87a174727
 BASE/bmap2	?FillBitmapAreaClip@@YIXPAVbitmap@@HHHHHHHHH@Z	94.4444	5a8565510c2c
 BASE/droplist	??0dropListWidget@@QAE@XZ	100.0000	36ab848d613b
@@ -390,7 +390,7 @@ BASE/listbox	?DeleteItem@listBoxWidget@@QAEXH@Z	100.0000	9568e028c0c1
 BASE/listbox	?Draw@listBoxWidget@@UAEXXZ	100.0000	dfba5050ab21
 BASE/listbox	?DrawLBStuff@listBoxWidget@@QAEXH@Z	97.5219	91072ddb88d7
 BASE/listbox	?Main@listBoxWidget@@UAEHAAUtag_message@@@Z	95.8118	e77c1008e932
-BASE/listbox	?ProcessMouseMessage@listBoxWidget@@QAEHAAUtag_message@@@Z	92.5620	a297f5fc9ad8
+BASE/listbox	?ProcessMouseMessage@listBoxWidget@@QAEHAAUtag_message@@@Z	93.1157	a297f5fc9ad8
 BASE/listbox	?Read@listBoxWidget@@QAEXXZ	86.0204	824c804dfb00
 BASE/miscwin	?AutoInitSVGA@@YIFXZ	100.0000	ba21e7c98ba3
 BASE/miscwin	@BlitBitmapToScreenVesa@28	0.6579	10b3cea2382c
@@ -482,7 +482,7 @@ SOURCE/ADVMGR	?GetCursorSampleSet@advManager@@QAEXH@Z	100.0000	c41fdf262977
 SOURCE/ADVMGR	?GetManaFrame@@YIHH@Z	100.0000	76e995801386
 SOURCE/ADVMGR	?GetMobilityFrame@@YIHH@Z	100.0000	b26e8a07768f
 SOURCE/ADVMGR	?GetSoundId@advManager@@QAEHHH@Z	1.5997	932e13cc2c4d
-SOURCE/ADVMGR	?HeroQuickView@advManager@@QAEXHHHH@Z	99.7152	4c83bebba13e
+SOURCE/ADVMGR	?HeroQuickView@advManager@@QAEXHHHH@Z	99.8681	4c83bebba13e
 SOURCE/ADVMGR	?HideRoute@advManager@@QAEXHHH@Z	19.9692	9906af14e238
 SOURCE/ADVMGR	?InsertSound@advManager@@QAEXHHHH@Z	9.3381	4d01c50e24d5
 SOURCE/ADVMGR	?IsCrystalBallInEffect@advManager@@QAEHHHH@Z	21.5077	0a516f0d991c
@@ -516,7 +516,7 @@ SOURCE/ADVMGR	?SystemOptionsHandler@@YIHAAUtag_message@@@Z	0.9494	cd55c61507c2
 SOURCE/ADVMGR	?TeleportTo@advManager@@QAEXPAVhero@@HHHH@Z	4.5226	d8235a849804
 SOURCE/ADVMGR	?TownGate@advManager@@QAEXH@Z	4.7200	586c6b036298
 SOURCE/ADVMGR	?TownPortalHandler@@YIHAAUtag_message@@@Z	19.0137	5fcbd67a4ca6
-SOURCE/ADVMGR	?TownQuickView@advManager@@QAEXHHHH@Z	99.9100	b4532cc6b04c
+SOURCE/ADVMGR	?TownQuickView@advManager@@QAEXHHHH@Z	99.9918	b4532cc6b04c
 SOURCE/ADVMGR	?TrimLoopingSounds@advManager@@QAEXH@Z	11.6486	27f649ba3eaa
 SOURCE/ADVMGR	?UpdBottomView@advManager@@QAEXHHH@Z	12.0841	a3564a10349d
 SOURCE/ADVMGR	?UpdBottomViewEnemyTurn@advManager@@QAEHXZ	4.3161	739b89e59783
@@ -787,7 +787,7 @@ SOURCE/GAME	?CalcDifficultyRating@game@@QAEHXZ	100.0000	d38831f13057
 SOURCE/GAME	?CalcFileCRC@@YIHPAD@Z	100.0000	0efc0c160140
 SOURCE/GAME	?CancelComputerScreen@game@@QAEXXZ	100.0000	8282b2922653
 SOURCE/GAME	?CheckForTimeEvent@game@@QAEXXZ	5.6190	45c86f540407
-SOURCE/GAME	?CheckHeroConsistency@game@@QAEXXZ	3.6056	ab8f6be2bc6d
+SOURCE/GAME	?CheckHeroConsistency@game@@QAEXXZ	3.6056	efbbd2ebc2ec
 SOURCE/GAME	?CheckValidAvailableHeroes@@YIXXZ	12.5632	b5eeaa426256
 SOURCE/GAME	?ClaimMine@game@@QAEXHH@Z	99.0842	b071f7dc74f7
 SOURCE/GAME	?ClaimTown@game@@QAEXHHH@Z	99.2190	c56f80539d8b
@@ -814,7 +814,7 @@ SOURCE/GAME	?GetNewHeroId@game@@QAEHHHH@Z	100.0000	99f0c86d164f
 SOURCE/GAME	?GetNumObelisks@@YIHH@Z	100.0000	81bcfd0a9098
 SOURCE/GAME	?GetNumThievesGuilds@game@@QAEHH@Z	92.3191	b946754d5c5f
 SOURCE/GAME	?GetRandomArtifactId@game@@QAEHHH@Z	14.7660	bd1b06df8e73
-SOURCE/GAME	?GetRandomNumTroops@game@@QAEHH@Z	2.9209	e7c34770d0d4
+SOURCE/GAME	?GetRandomNumTroops@game@@QAEHH@Z	99.0537	a94faa36c897
 SOURCE/GAME	?GetSkipCopyLen@@YIHPAEPAH@Z	100.0000	e1b653c498d8
 SOURCE/GAME	?GetTownId@game@@QAEHHH@Z	100.0000	b40eaad84ec7
 SOURCE/GAME	?GetWorldMapData@game@@QAEPAVfullMap@@XZ	100.0000	645c5053f291
@@ -837,26 +837,26 @@ SOURCE/GAME	?NewMap@game@@QAEXPAD@Z	99.5202	578882f3643c
 SOURCE/GAME	?NextHero@playerData@@QAEHH@Z	100.0000	57212bf594b4
 SOURCE/GAME	?NextPlayer@game@@QAEXXZ	4.0436	29cd315d468f
 SOURCE/GAME	?NumOfGivenArtifact@playerData@@QAEHH@Z	100.0000	38a5448fcb19
-SOURCE/GAME	?PerDay@game@@QAEXXZ	97.1437	cad129fcebc9
+SOURCE/GAME	?PerDay@game@@QAEXXZ	98.3056	cad129fcebc9
 SOURCE/GAME	?PerMonth@game@@QAEXXZ	5.8468	71f9cc8e7296
 SOURCE/GAME	?PerWeek@game@@QAEXXZ	98.5623	f1c0d871e09e
 SOURCE/GAME	?ProcessMapExtra@game@@QAEXXZ	7.3333	7e88d0c28d5a
 SOURCE/GAME	?ProcessOnMapHeroes@game@@QAEXXZ	99.3140	9bb3095bf4d0
-SOURCE/GAME	?ProcessRandomObjects@game@@QAEXXZ	0.8073	506aa5cd6a9b
+SOURCE/GAME	?ProcessRandomObjects@game@@QAEXXZ	99.6163	dbd601c0e015
 SOURCE/GAME	?RandomScan@game@@QAEHPACHHHC@Z	100.0000	efed9e32a38a
 SOURCE/GAME	?RandomizeBarrier@game@@QAEXPAVmapCell@@@Z	100.0000	2651caa9d4c9
-SOURCE/GAME	?RandomizeEvents@game@@QAEXXZ	99.4564	b2e694b98296
+SOURCE/GAME	?RandomizeEvents@game@@QAEXXZ	99.5113	b2e694b98296
 SOURCE/GAME	?RandomizeHeroPool@game@@QAEXXZ	9.4745	7d1dac0861c9
-SOURCE/GAME	?RandomizeMine@game@@QAEXHH@Z	0.7538	2e11aa60a044
+SOURCE/GAME	?RandomizeMine@game@@QAEXHH@Z	99.4146	89d31f98656c
 SOURCE/GAME	?RandomizePassword@game@@QAEXPAVmapCell@@@Z	100.0000	6867fcefcab8
-SOURCE/GAME	?RandomizeTown@game@@QAEXHHH@Z	8.1125	a6c9a9bc3f19
+SOURCE/GAME	?RandomizeTown@game@@QAEXHHH@Z	8.1125	887903da69d2
 SOURCE/GAME	?Read@playerData@@QAEXH@Z	100.0000	4cf8ca182dea
-SOURCE/GAME	?ReceiveSaveGame@game@@QAEHHHHH@Z	3.4700	5af469db821b
+SOURCE/GAME	?ReceiveSaveGame@game@@QAEHHHHH@Z	100.0000	d795a0a11de7
 SOURCE/GAME	?RestoreCell@game@@QAEXHHHHPAVmapCell@@H@Z	99.9107	5097cf11799e
 SOURCE/GAME	?SaveGame@game@@QAEHPADHC@Z	99.8678	ea69d1e99ca2
 SOURCE/GAME	?Scan@game@@QAEHPACHH@Z	100.0000	2c910e8a7326
 SOURCE/GAME	?SetMapSize@game@@QAEXHH@Z	96.3158	4416b25963fb
-SOURCE/GAME	?SetRandomHeroArmies@game@@QAEXHH@Z	6.6907	241c05423519
+SOURCE/GAME	?SetRandomHeroArmies@game@@QAEXHH@Z	6.6907	110e2aee63d9
 SOURCE/GAME	?SetVisibility@game@@QAEXHHHH@Z	8.9517	2ddea60ab239
 SOURCE/GAME	?SetupAdjacentMons@game@@QAEXXZ	100.0000	03ca24a74e61
 SOURCE/GAME	?SetupNewRumour@game@@QAEXXZ	100.0000	def9ae6da8c3
@@ -866,15 +866,15 @@ SOURCE/GAME	?SetupTowns@game@@QAEXXZ	99.5935	c496779bffcb
 SOURCE/GAME	?ShowComputerScreen@game@@QAEXXZ	100.0000	c57a787a7d98
 SOURCE/GAME	?ShowHeroesLogo@game@@QAEXXZ	100.0000	5892d434abc4
 SOURCE/GAME	?TownIDToTownPos@game@@QAEHPAVplayerData@@H@Z	100.0000	6dcc6e1e1888
-SOURCE/GAME	?TransmitSaveGame@game@@QAEHHHH@Z	2.9742	1fa7d118e270
+SOURCE/GAME	?TransmitSaveGame@game@@QAEHHHH@Z	99.8624	403c6958d5df
 SOURCE/GAME	?TurnOffAIMusic@game@@QAEXXZ	100.0000	9a897eeb25ea
 SOURCE/GAME	?TurnOnAIMusic@game@@QAEXXZ	100.0000	edabc8644009
-SOURCE/GAME	?UpdateSpellWidgets@game@@QAEXXZ	5.1102	afcda2699e25
-SOURCE/GAME	?ViewArmy@game@@QAEXHHHHPAVtown@@HHHPAVhero@@PAVarmy@@PAVarmyGroup@@H@Z	99.9973	5434468a9d2a
-SOURCE/GAME	?ViewArmyHandler@@YIHAAUtag_message@@@Z	5.7295	4ce8db6a0fb1
+SOURCE/GAME	?UpdateSpellWidgets@game@@QAEXXZ	5.1102	c94523f6eb72
+SOURCE/GAME	?ViewArmy@game@@QAEXHHHHPAVtown@@HHHPAVhero@@PAVarmy@@PAVarmyGroup@@H@Z	100.0000	5434468a9d2a
+SOURCE/GAME	?ViewArmyHandler@@YIHAAUtag_message@@@Z	5.7295	2256471f404d
 SOURCE/GAME	?ViewSpecialHandler@@YIHAAUtag_message@@@Z	8.0909	cd3ac5769f2e
 SOURCE/GAME	?ViewSpells@game@@QAEHPAVhero@@HP6IHAAUtag_message@@@ZH@Z	11.0579	1db6fac45a37
-SOURCE/GAME	?ViewSpellsHandler@@YIHAAUtag_message@@@Z	0.9959	2af01b71dd29
+SOURCE/GAME	?ViewSpellsHandler@@YIHAAUtag_message@@@Z	99.7841	5e6e603ccd60
 SOURCE/GAME	?WaitForPlayer@game@@QAEXPADH@Z	16.4557	4355a82c15de
 SOURCE/GAME	?WeeklyGenericSite@game@@QAEXPAVmapCell@@@Z	100.0000	ce0267d940e0
 SOURCE/GAME	?WeeklyRecruitSite@game@@QAEXPAVmapCell@@@Z	7.6977	9731a8ad9fbb
@@ -1072,7 +1072,7 @@ SOURCE/PHILAI	?CheckBerserk@philAI@@QAEXXZ	100.0000	6c6ba4765dba
 SOURCE/PHILAI	?CheckBuyStuff@philAI@@QAEXXZ	99.9815	266321f80c24
 SOURCE/PHILAI	?CheckDoMain@@YIXHH@Z	100.0000	ebe352756929
 SOURCE/PHILAI	?CheckForCreatureUpgrades@philAI@@QAEXXZ	99.5650	d32ae5df9c6d
-SOURCE/PHILAI	?CheckReload@philAI@@QAEXXZ	98.9254	2b0b6c9a3163
+SOURCE/PHILAI	?CheckReload@philAI@@QAEXXZ	100.0000	2b0b6c9a3163
 SOURCE/PHILAI	?ChooseEvaluateBattle@philAI@@QAEXPAVarmyGroup@@PAVhero@@01HHHAAH2@Z	100.0000	a8209ef62520
 SOURCE/PHILAI	?ChooseGoldOrExperience@philAI@@QAEHHH@Z	100.0000	385d4899582e
 SOURCE/PHILAI	?ChooseToFightForArtifact@philAI@@QAEHHHH@Z	100.0000	8c9e768169c3
@@ -1131,7 +1131,7 @@ SOURCE/PHILAI	?QuickCombat@philAI@@QAEHPAVarmyGroup@@PAVhero@@01HHAAM2@Z	2.7377	
 SOURCE/PHILAI	?RVConversion@philAI@@QAEHQAH@Z	100.0000	fb86df9db148
 SOURCE/PHILAI	?RVOfPosition@philAI@@QAEHHHHHHHHHHH@Z	3.2659	005fbda598a3
 SOURCE/PHILAI	?RedistributeTroops@philAI@@QAEXPAVarmyGroup@@0HHHHH@Z	4.1206	34e5c4179c47
-SOURCE/PHILAI	?ResetHeroRVs@@YIXHHH@Z	93.5268	a42390aeda58
+SOURCE/PHILAI	?ResetHeroRVs@@YIXHHH@Z	99.8482	a42390aeda58
 SOURCE/PHILAI	?SetupRelativeHeroStrengths@philAI@@QAEXXZ	100.0000	e5e17c2812ec
 SOURCE/PHILAI	?ShowStatus@@YIXXZ	100.0000	b6ed09fab8fa
 SOURCE/PHILAI	?StrategicValueOfPosition@philAI@@QAEHHHHHPAHH@Z	1.9660	0915461794e2
