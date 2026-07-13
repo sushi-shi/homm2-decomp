@@ -95,7 +95,7 @@ advManager::advManager(void)
     m_selectedCell = ADVMGR_INVALID_CELL;
     m_cursorActive = 0;
     m_currentSampleSet = 0;
-    m_field_0x276 = 1;
+    m_drawHeroShadows = 1;
     m_adventureBorder = 0;
 
     int index;
@@ -133,9 +133,9 @@ advManager::advManager(void)
     m_mapData = gpGame->GetWorldMapData();
     gMapX = 0;
     gMapY = 0;
-    m_cursorCellX = 0;
-    m_cursorCellY = 0;
-    m_cursorCellIndex = 0;
+    m_cursorFrameCount = 0;
+    m_cursorCycle = 0;
+    m_cursorTurning = 0;
 }
 
 // @early-stop
@@ -2313,7 +2313,7 @@ void advManager::DrawCell(int mapX, int mapY, int screenX, int screenY,
             if (s_drawHasHero) {
                 if (s_drawHeroFrame & 0x80) {
                     if (drawMask & ADVMGR_DRAW_HERO_SHADOW) {
-                        if (m_field_0x276 != 0 &&
+                        if (m_drawHeroShadows != 0 &&
                             s_drawHeroType != ADVMGR_HERO_TYPE_BOAT) {
                             cursorFrame = s_drawHeroFrame & 0x7f;
                             if (cursorFrame == 51)
@@ -2338,7 +2338,7 @@ void advManager::DrawCell(int mapX, int mapY, int screenX, int screenY,
                                          ADVMGR_DRAW_CLIP_WIDTH,
                                          ADVMGR_DRAW_CLIP_HEIGHT, 0);
                         }
-                        if (m_field_0x276 != 0 &&
+                        if (m_drawHeroShadows != 0 &&
                             s_drawHeroType == ADVMGR_HERO_TYPE_BOAT) {
                             boatFrameIndex = s_drawHeroFrame & 0x7f;
                             if (boatFrameIndex >= 9 &&
@@ -2393,7 +2393,7 @@ void advManager::DrawCell(int mapX, int mapY, int screenX, int screenY,
                     }
                 } else {
                     if (drawMask & ADVMGR_DRAW_HERO_SHADOW) {
-                        if (m_field_0x276 != 0 &&
+                        if (m_drawHeroShadows != 0 &&
                             s_drawHeroType != ADVMGR_HERO_TYPE_BOAT &&
                             (drawMask & ADVMGR_DRAW_HERO_SHADOW)) {
                             IconToBitmap(m_shadowIcon, gpWindowManager->m_screen,
@@ -2402,7 +2402,7 @@ void advManager::DrawCell(int mapX, int mapY, int screenX, int screenY,
                                          ADVMGR_DRAW_CLIP_WIDTH,
                                          ADVMGR_DRAW_CLIP_HEIGHT, 0);
                         }
-                        if (m_field_0x276 != 0 &&
+                        if (m_drawHeroShadows != 0 &&
                             s_drawHeroType == ADVMGR_HERO_TYPE_BOAT) {
                             IconToBitmap(m_boatShadowIcon, gpWindowManager->m_screen,
                                          s_drawPixelX,
