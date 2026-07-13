@@ -4844,13 +4844,212 @@ void advManager::TeleportTo(hero *mapHero, int destinationX, int destinationY,
 }
 
 VA(0x00467539, 0x1fb)
-void advManager::DimensionDoor(void) {}
+void advManager::DimensionDoor(void)
+{
+    hero *targetHero;
+    heroWindow *dimensionDoorWindow;
+    int x;
+    int y;
+    mapCell *targetCell;
+
+    dimensionDoorWindow = new heroWindow(0, 0, "dimdoor.bin");
+    if (dimensionDoorWindow == 0)
+        MemError();
+    gpWindowManager->DoDialog(dimensionDoorWindow, DimensionDoorHandler, 0);
+    delete dimensionDoorWindow;
+
+    targetHero = gpGame->GetHero(gpCurPlayer->m_currentHero);
+    if (gpWindowManager->m_dialogResult == ADVMGR_TRAVEL_DIALOG_ACCEPT) {
+        x = m_lastHoverCell + m_mapOriginX;
+        y = m_hoverCellY + m_mapOriginY;
+        targetCell = GetCell(x, y);
+        if (((targetHero->m_eventFlags & HERO_EVENT_EMBARKED) &&
+             giGroundToTerrain[targetCell->tile]) ||
+            (!(targetHero->m_eventFlags & HERO_EVENT_EMBARKED) &&
+             !giGroundToTerrain[targetCell->tile])) {
+            NormalDialog("Dimension Door failed!!!",
+                         ADVMGR_OPTION_DIALOG_MESSAGE,
+                         ADVMGR_OPTION_DIALOG_NONE,
+                         ADVMGR_OPTION_DIALOG_NONE,
+                         ADVMGR_OPTION_DIALOG_NONE, 0,
+                         ADVMGR_OPTION_DIALOG_NONE, 0,
+                         ADVMGR_OPTION_DIALOG_NONE, 0);
+            UpdateRadar(1, 0);
+        } else {
+            gpSoundManager->SwitchAmbientMusic(ADVMGR_TRAVEL_MUSIC);
+            TeleportTo(targetHero, x, y, 0, 0);
+            gpSoundManager->SwitchAmbientMusic(
+                giTerrainToMusicTrack[m_currentTerrain]);
+        }
+        gpGame->GetHero(gpCurPlayer->m_currentHero)
+            ->UseSpell(ADVMGR_DIMENSION_DOOR_SPELL);
+    } else {
+        UpdateRadar(1, 0);
+    }
+}
 
 VA(0x00467734, 0x129)
-int TownPortalHandler(struct tag_message &) { return 0; }
+int TownPortalHandler(tag_message &message)
+{
+    tag_message choiceMessage;
 
+    if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active == 1) {
+        gpSoundManager->SwitchAmbientMusic(
+            giTerrainToMusicTrack[gpAdvManager->m_currentTerrain]);
+    }
+
+    if (message.type == ADVMGR_TOWN_PORTAL_MESSAGE) {
+        switch (message.field4) {
+        case ADVMGR_TOWN_PORTAL_COMMAND_SELECT:
+            switch (message.field8) {
+            case ADVMGR_TOWN_PORTAL_FIRST_CHOICE:
+            case ADVMGR_TOWN_PORTAL_LAST_CHOICE:
+                choiceMessage.type = ADVMGR_TOWN_PORTAL_MESSAGE;
+                choiceMessage.field8 = ADVMGR_TOWN_PORTAL_CHOICE_WIDGET;
+                choiceMessage.field4 = ADVMGR_TOWN_PORTAL_COMMAND_CHOICE;
+                townPortalWin->BroadcastMessage(choiceMessage);
+                giTownPortalChoice = choiceMessage.field18;
+                gpWindowManager->m_dialogResult = message.field8;
+                message.field8 = ADVMGR_TOWN_PORTAL_CLOSE_COMMAND;
+                message.field4 = message.field8;
+                return ADVMGR_TOWN_PORTAL_HANDLED;
+            default:
+                break;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+    return ADVMGR_TOWN_PORTAL_UNHANDLED;
+}
+
+// @early-stop
+// Exact 0x40 frame, 0x43e size, CFG, and all bytes outside the signed loop
+// comparison at +0x2bb..+0x2c7. Retail has `8b45d4 3945f8 0f8d`; ours has
+// the equivalent operand-reversed `8b45f8 3945d4 0f8e`. Direct/reversed,
+// negated, empty-arm, `| 0`, semantic-name, and AST permutations do not steer
+// this TU-cumulative /Od operand order (tu-cumulative-eval-order.md).
 VA(0x0046785d, 0x43e)
-void advManager::TownGate(int) {}
+void advManager::TownGate(int spellId)
+{
+    int distance0;
+    hero *targetHero;
+    tag_message message;
+    int selectedTownIndex;
+    int nearestDistance;
+    int townListIndex;
+
+    nearestDistance = ADVMGR_TOWN_PORTAL_DISTANCE_LIMIT;
+    selectedTownIndex = ADVMGR_INVALID_HERO;
+    targetHero = gpGame->GetHero(gpCurPlayer->m_currentHero);
+
+    if (gpCurPlayer->m_townCount == 0) {
+        NormalDialog("No available town.  Spell Failed!!!",
+                     ADVMGR_OPTION_DIALOG_MESSAGE,
+                     ADVMGR_OPTION_DIALOG_NONE,
+                     ADVMGR_OPTION_DIALOG_NONE,
+                     ADVMGR_OPTION_DIALOG_NONE, 0,
+                     ADVMGR_OPTION_DIALOG_NONE, 0,
+                     ADVMGR_OPTION_DIALOG_NONE, 0);
+        return;
+    }
+    if (targetHero->m_eventFlags & HERO_EVENT_EMBARKED) {
+        NormalDialog(
+            "Spell Failed!!!  You must be on land for this spell to work.",
+            ADVMGR_OPTION_DIALOG_MESSAGE,
+            ADVMGR_OPTION_DIALOG_NONE,
+            ADVMGR_OPTION_DIALOG_NONE,
+            ADVMGR_OPTION_DIALOG_NONE, 0,
+            ADVMGR_OPTION_DIALOG_NONE, 0,
+            ADVMGR_OPTION_DIALOG_NONE, 0);
+        return;
+    }
+
+    if (spellId == ADVMGR_TOWN_PORTAL_SPELL) {
+        townPortalWin = new heroWindow(ADVMGR_TOWN_PORTAL_WINDOW_X,
+                                       ADVMGR_TOWN_PORTAL_WINDOW_Y,
+                                       "townport.bin");
+        sprintf(gText, "{Town Portal}\n\nSelect town to port to.");
+        message.type = ADVMGR_TOWN_PORTAL_MESSAGE;
+        message.field4 = ADVMGR_TOWN_PORTAL_COMMAND_TEXT;
+        message.field8 = ADVMGR_TOWN_PORTAL_TITLE_WIDGET;
+        message.text = gText;
+        townPortalWin->BroadcastMessage(message);
+
+        for (townListIndex = 0;
+             townListIndex < gpCurPlayer->m_townCount;
+             ++townListIndex) {
+            sprintf(gText, gpGame->m_castleRecs[
+                               gpCurPlayer->TownId(townListIndex)].m_name);
+            message.type = ADVMGR_TOWN_PORTAL_MESSAGE;
+            message.field4 = ADVMGR_TOWN_PORTAL_COMMAND_ADD_TOWN;
+            message.field8 = ADVMGR_TOWN_PORTAL_CHOICE_WIDGET;
+            message.text = gText;
+            townPortalWin->BroadcastMessage(message);
+        }
+        message.field4 = ADVMGR_TOWN_PORTAL_COMMAND_FINISH;
+        message.text = 0;
+        townPortalWin->BroadcastMessage(message);
+        gpWindowManager->DoDialog(townPortalWin, TownPortalHandler, 0);
+        selectedTownIndex = giTownPortalChoice;
+        delete townPortalWin;
+        if (gpWindowManager->m_dialogResult ==
+            ADVMGR_TOWN_PORTAL_FIRST_CHOICE) {
+            return;
+        }
+    } else {
+        for (townListIndex = 0;
+             townListIndex < gpCurPlayer->m_townCount;
+             ++townListIndex) {
+            distance0 =
+                abs(gpGame->m_castleRecs[
+                        gpCurPlayer->m_townIds[townListIndex]].y -
+                    targetHero->m_y) +
+                abs(gpGame->m_castleRecs[
+                        gpCurPlayer->m_townIds[townListIndex]].x -
+                    targetHero->m_x);
+            if (distance0 < nearestDistance) {
+                nearestDistance = distance0;
+                selectedTownIndex = townListIndex;
+            }
+        }
+    }
+
+    if (gpGame->m_castleRecs[
+            gpCurPlayer->m_townIds[selectedTownIndex]].occupyingHeroId !=
+        ADVMGR_INVALID_HERO) {
+        NormalDialog("Nearest town occupied.  Spell Failed!!!",
+                     ADVMGR_OPTION_DIALOG_MESSAGE,
+                     ADVMGR_OPTION_DIALOG_NONE,
+                     ADVMGR_OPTION_DIALOG_NONE,
+                     ADVMGR_OPTION_DIALOG_NONE, 0,
+                     ADVMGR_OPTION_DIALOG_NONE, 0,
+                     ADVMGR_OPTION_DIALOG_NONE, 0);
+        return;
+    }
+
+    gpSoundManager->SwitchAmbientMusic(ADVMGR_TRAVEL_MUSIC);
+    TeleportTo(
+        targetHero,
+        gpGame->m_castleRecs[
+            gpCurPlayer->m_townIds[selectedTownIndex]].x,
+        gpGame->m_castleRecs[
+            gpCurPlayer->m_townIds[selectedTownIndex]].y,
+        0, 0);
+    targetHero->UseSpell(spellId);
+    gpGame->m_castleRecs[
+        gpCurPlayer->m_townIds[selectedTownIndex]].occupyingHeroId =
+        targetHero->m_id;
+    reinterpret_cast<town *>(&gpGame->m_castleRecs[
+        gpCurPlayer->m_townIds[selectedTownIndex]])->GiveSpells(0);
+    targetHero->m_locationType = HERO_TOWN_LOCATION;
+    targetHero->m_occupiedTown =
+        gpCurPlayer->m_townIds[selectedTownIndex];
+    gpSoundManager->SwitchAmbientMusic(
+        giTerrainToMusicTrack[m_currentTerrain]);
+}
 
 VA(0x00467c9b, 0x5ac)
 // @early-stop exact size and 41 relocation sites. Residuals are the
