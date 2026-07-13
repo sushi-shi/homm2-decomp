@@ -185,19 +185,18 @@ int heroWindow::Open(int x, int flags)
 }
 
 VA(0x004cf280, 0x90)
-void heroWindow::RemoveAndDeleteWidget(int param_1)
+void heroWindow::RemoveAndDeleteWidget(int id)
 {
-    widget *pwVar1, *local_8;
-    local_8 = m_widgetListHead;
-    while (local_8 != 0) {
-        pwVar1 = local_8->m_next;
-        if (local_8->m_id == param_1) {
-            RemoveWidget(local_8);
-            if ((m_winFlags & 0x4000) != 0) {
-                delete local_8;
-            }
+    widget *w, *next;
+    w = m_widgetListHead;
+    while (w != 0) {
+        next = w->m_next;
+        if (w->m_id == id) {
+            RemoveWidget(w);
+            if ((m_winFlags & 0x4000) != 0)
+                delete w;
         }
-        local_8 = pwVar1;
+        w = next;
     }
 }
 
@@ -254,45 +253,48 @@ void heroWindow::AddWidget(class widget *param_1, int param_2)
 }
 
 VA(0x004cf500, 0x116)
-void heroWindow::RemoveWidget(class widget *param_1)
+void heroWindow::RemoveWidget(class widget *w)
 {
-    widget *iVar1;
-    if (param_1 == 0)
+    if (w == 0)
         return;
-    param_1->Close();
-    if (m_widgetListTail == param_1) {
-        m_widgetListTail = param_1->m_prev;
+    w->Close();
+    if (m_widgetListTail == w) {
+        m_widgetListTail = w->m_prev;
         if (m_widgetListTail == 0)
             m_widgetListHead = 0;
         else
             m_widgetListTail->m_next = 0;
-    } else if (m_widgetListHead == param_1) {
-        m_widgetListHead = param_1->m_next;
+    } else if (m_widgetListHead == w) {
+        m_widgetListHead = w->m_next;
         m_widgetListHead->m_prev = 0;
     } else {
-        param_1->m_next->m_prev = param_1->m_prev;
-        param_1->m_prev->m_next = param_1->m_next;
+        w->m_next->m_prev = w->m_prev;
+        w->m_prev->m_next = w->m_next;
     }
-    iVar1 = param_1->m_next;
-    if (iVar1 == 0) {
+    widget *nextWidget = w->m_next;
+    if (nextWidget == 0) {
         m_widgetListHead = 0;
         m_widgetListTail = m_widgetListHead;
     } else {
-        iVar1->m_prev = param_1->m_prev;
-        if (iVar1->m_prev != 0)
-            iVar1->m_prev->m_next = iVar1;
+        nextWidget->m_prev = w->m_prev;
+        if (nextWidget->m_prev != 0)
+            nextWidget->m_prev->m_next = nextWidget;
     }
 }
 
 VA(0x004cf620, 0x95)
 int heroWindow::BroadcastMessage(struct tag_message &param_1)
 {
-    // @early-stop 78% — retail materializes the (result<1 || 2<result) guard into a bool
-    // temp before AND-ing with local_c!=0 (a /Od boolean-codegen shape not reachable from
-    // the natural compound condition). Same wall as heroWindowManager::Main.
     int local_8 = 0;
     widget *local_c = m_widgetListHead;
-    while (local_c != 0 && ((local_8 = local_c->Main(param_1)) < 1 || 2 < local_8)) {
+    while (local_c != 0) {
+        switch (local_8 = local_c->Main(param_1)) {
+        case 0:
+            break;
+        case 1:
+        case 2:
+            return local_8;
+        }
         local_c = local_c->m_next;
     }
     return local_8;
@@ -313,16 +315,13 @@ void heroWindow::DrawWindow(int param_1, int param_2, int param_3)
     local_8 = m_widgetListTail;
     local_24.type = 0x200;
     local_24.field4 = 2;
-    // @early-stop 91% — retail duplicates this Main() call across the two guards
-    // (if/else-if codegen: the all-widgets body placed after the range body, reached by a
-    // forward je); the equivalent || form shares one call and aligns closer. The exact
-    // basic-block ordering isn't source-forcible.
     while (local_8 != 0) {
         PollSound();
-        if ((param_2 == -0xffff && param_3 == 0xffff) ||
-            (param_2 <= local_8->m_id && local_8->m_id <= param_3)) {
+        if (param_2 != -0xffff || param_3 != 0xffff) {
+            if (param_2 <= local_8->m_id && local_8->m_id <= param_3)
+                local_8->Main(local_24);
+        } else
             local_8->Main(local_24);
-        }
         local_8 = local_8->m_prev;
     }
     PollSound();
@@ -384,4 +383,3 @@ void heroWindow::MoveWindow(int dx, int dy)
         oldY = m_posY;
     gpWindowManager->UpdateScreenRegion(oldX, oldY, oldW, oldH);
 }
-
