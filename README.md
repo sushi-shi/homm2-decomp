@@ -22,7 +22,7 @@ _**Functions exact** = byte-identical. **Fuzzy** = live size-weighted instructio
 | Module   | Units |    Functions exact |  Fuzzy | Fuzzy-max |
 | :------- | ----: | -----------------: | -----: | --------: |
 | `SOURCE` |    50 | 157 / 1039 (15.1%) |  12.3% |     12.3% |
-| `BASE`   |    44 |  270 / 445 (60.7%) |  91.9% |     92.3% |
+| `BASE`   |    44 |  270 / 445 (60.7%) |  91.9% |     92.4% |
 | `EDITOR` |     1 |   11 / 11 (100.0%) | 100.0% |    100.0% |
 
 <!-- match-score:end -->
