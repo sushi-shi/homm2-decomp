@@ -487,9 +487,9 @@ void combatManager::CastSpell(int spell, int targetHex, int castByCreature, int 
     for (side_i = 0; side_i < COMBAT_SIDE_COUNT; side_i++) {
         for (armyIndex = 0; armyIndex < m_armyCount[side_i]; armyIndex++) {
             army &combatArmy = m_armies[side_i][armyIndex];
-            combatArmy.m_animationValue2 = 0;
-            combatArmy.m_animationValue3 = combatArmy.m_animationValue2;
-            combatArmy.m_animationValue1 = combatArmy.m_animationValue3;
+            combatArmy.m_killPending = 0;
+            combatArmy.m_deathPending = combatArmy.m_killPending;
+            combatArmy.m_damagePending = combatArmy.m_deathPending;
             combatArmy.m_drawState = 1;
             combatArmy.m_animationState = 0;
             combatArmy.m_lastTargetHex = COMBAT_HEX_EMPTY;
