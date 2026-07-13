@@ -30,28 +30,28 @@ static unsigned char gFlipColor;
 static int gFlipClipR;
 static unsigned char *gFlipDst;
 
-// @early-stop
-// /O2 register-allocation wall after semantic recovery. Final base is 0x509 bytes versus retail
-// 0x4f1, with the same 8-byte frame; the decode loop starts at +0xde versus +0xe3, the positive-run
-// path at +0x394 versus +0x35f, newline at +0x4d5 versus +0x4bf, and return at +0x4ff versus
-// +0x4e7. Relocations are 88 versus 81, with no base-only external target. A local dim-pointer form
-// reaches the exact 0x4f1 size and 83 relocations but changes the frame to 4 bytes and drops objdiff
-// similarity. Also tried local/global x bounds, early/late source formation, volatile width/run,
-// split/common clipped fills, local/global dim loops, offset temporaries, and 180 AST permutations.
 VA(0x004d1ba0, 0x4f1)
 void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                       int clip, int clipX, int clipY, int clipW, int clipH, int color)
 {
     unsigned char *data = reinterpret_cast<unsigned char *>(srcIcon->m_data);
     IconEntry *entries = reinterpret_cast<IconEntry *>(data);
-    int w = entries[frame].w;
-    gFlipX0 = ((x - entries[frame].x) - w) + 1;
-    gFlipEntry = &entries[frame];
-    gFlipXEnd = w + gFlipX0 - 1;
-    gFlipY = y + entries[frame].y;
+    IconEntry *entry = &entries[frame];
+    int x0 = x;
+    int w = entry->w;
+    unsigned char *src = data + entry->srcOffset;
+    int entryY = entry->y;
+    x0 = x0 - entry->x;
+    x0 = x0 - w;
+    gFlipEntry = entry;
+    x0++;
+    gFlipX0 = x0;
+    int X = w + x0 - 1;
+    gFlipXEnd = X;
+    gFlipY = y + entryY;
     if (clip != 0) {
         if (gFlipX0 < clipX || clipW + clipX < gFlipX0 + w || gFlipY < clipY ||
-            clipY + clipH < entries[frame].h + gFlipY) {
+            clipY + clipH < entry->h + gFlipY) {
             clip = 1;
             gFlipClipB = clipY + clipH - 1;
             gFlipClipR = clipX + clipW - 1;
@@ -61,8 +61,6 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int
     }
     short pitch = dest->m_width;
     gFlipRow = gFlipY * pitch + reinterpret_cast<int>(dest->m_pixels);
-    int X = gFlipXEnd;
-    unsigned char *src = data + entries[frame].srcOffset;
     for (;;) {
         int cmd = *src++;
         if (static_cast<signed char>(cmd) < 0) {
@@ -109,14 +107,14 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int
                        count);
             } else {
                 int left;
-                if (clipY <= gFlipY && gFlipY <= gFlipClipB &&
+                if (clipY <= (left = gFlipY) && left <= gFlipClipB &&
                     (left = (X - count) + 1, clipX <= left) && X <= gFlipClipR) {
-                    if (left < clipX) {
-                        memset(reinterpret_cast<unsigned char *>(gFlipRow + clipX), gFlipColor,
-                               (X - clipX) + 1);
-                    } else {
+                    if (clipX <= left) {
                         memset(reinterpret_cast<unsigned char *>((gFlipRow - count) + 1 + X),
                                gFlipColor, count);
+                    } else {
+                        memset(reinterpret_cast<unsigned char *>(gFlipRow + clipX), gFlipColor,
+                               (X - clipX) + 1);
                     }
                 }
             }
@@ -131,39 +129,52 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int
                     reinterpret_cast<unsigned char *>(uDimPal) + (flags & 0x3c) * 0x40;
                 gFlipDimPal = palette;
                 if (clip == 0) {
+                    unsigned char *dp =
+                        reinterpret_cast<unsigned char *>((gFlipRow - count) + 1 + X);
                     gFlipCnt = 0;
-                    gFlipDimDst = reinterpret_cast<unsigned char *>((gFlipRow - count) + 1 + X);
-                    if (static_cast<int>(count) > 0) {
-                        gFlipCnt = count;
+                    int dimCount = count;
+                    gFlipDimDst = dp;
+                    if (dimCount > 0) {
+                        gFlipCnt = dimCount;
                         do {
-                            *gFlipDimDst = gFlipDimPal[*gFlipDimDst];
-                            gFlipDimDst++;
+                            unsigned char *dimPalette = gFlipDimPal;
+                            int px = *dp++;
                             count--;
+                            gFlipDimDst = dp;
+                            dp[-1] = dimPalette[px];
                         } while (count != 0);
                     }
-                } else if (clipY <= gFlipY && gFlipY <= gFlipClipB &&
-                           clipX <= static_cast<int>((X - count) + 1) && X <= gFlipClipR) {
-                    int left = (X - count) + 1;
-                    if (left < clipX) {
-                        gFlipDimDst = reinterpret_cast<unsigned char *>(gFlipRow + clipX);
-                        count = (X - clipX) + 1;
-                    } else {
-                        gFlipDimDst =
-                            reinterpret_cast<unsigned char *>((gFlipRow - count) + 1 + X);
-                    }
-                    gFlipCnt2 = count;
-                    gFlipCnt = 0;
-                    if (static_cast<int>(count) > 0) {
-                        gFlipCnt = count;
-                        do {
-                            *gFlipDimDst = gFlipDimPal[*gFlipDimDst];
-                            gFlipDimDst++;
-                            count--;
-                        } while (count != 0);
+                } else {
+                    const int currentY = gFlipY;
+                    gFlipDimLen = count;
+                    if (clipY <= currentY && currentY <= gFlipClipB &&
+                        clipX <= static_cast<int>((X - count) + 1) && X <= gFlipClipR) {
+                        int left = (X - count) + 1;
+                        unsigned char *dp;
+                        if (clipX <= left) {
+                            dp = reinterpret_cast<unsigned char *>((gFlipRow - count) + 1 + X);
+                        } else {
+                            count = (X - clipX) + 1;
+                            dp = reinterpret_cast<unsigned char *>(gFlipRow + clipX);
+                        }
+                        int dimCount = count;
+                        gFlipDimLen = count;
+                        gFlipDimDst = dp;
+                        gFlipCnt = 0;
+                        if (dimCount > 0) {
+                            gFlipCnt = dimCount;
+                            do {
+                                unsigned char *dimPalette = gFlipDimPal;
+                                int px = *dp++;
+                                count--;
+                                gFlipDimDst = dp;
+                                dp[-1] = dimPalette[px];
+                            } while (count != 0);
+                        }
                     }
                 }
             }
-            X = X - gFlipDimLen;
+            X = X - gFlipCnt2;
             continue;
         }
         // ---- positive command : literal copy / newline ----
@@ -174,7 +185,7 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int
                 gFlipCnt = 0;
                 unsigned char *dst = reinterpret_cast<unsigned char *>(gFlipRow + X);
                 gFlipDst = dst;
-                if (cmd >= 0 + 1) {
+                if (cmd > 0) {
                     gFlipCnt = cmd;
                     int k = cmd;
                     do {
@@ -184,55 +195,59 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int
                         k--;
                     } while (k != 0);
                 }
-            } else if (clipY <= gFlipY && gFlipY <= gFlipClipB) {
-                int left = (X - cmd) + 1;
-                if (left <= gFlipClipR && clipX <= X) {
-                    unsigned int cn;
-                    unsigned char *dst;
-                    if (gFlipClipR < X) {
-                        dst = reinterpret_cast<unsigned char *>(gFlipRow + gFlipClipR);
-                        src = src + (X - gFlipClipR);
-                        if ((X - cmd) < clipX) {
-                            gFlipSkip = gFlipClipR + ((cmd - X) - clipW);
-                            cn = clipW;
+            } else {
+                int currentY = gFlipY;
+                if (clipY <= currentY && currentY <= gFlipClipB) {
+                    int left = (X - cmd) + 1;
+                    if (left <= gFlipClipR && clipX <= X) {
+                        unsigned int cn;
+                        if (X <= gFlipClipR) {
+                            gFlipDst = reinterpret_cast<unsigned char *>(gFlipRow + X);
+                            if (clipX <= left) {
+                                gFlipSkip = 0;
+                                cn = cmd;
+                            } else {
+                                cn = (X - clipX) + 1;
+                                gFlipSkip = cmd - cn;
+                            }
                         } else {
-                            gFlipSkip = 0;
-                            cn = (cmd - X) + gFlipClipR;
+                            cn = gFlipClipR;
+                            src = src + (X - cn);
+                            gFlipDst =
+                                reinterpret_cast<unsigned char *>(gFlipRow + cn);
+                            if (clipX <= (X - cmd)) {
+                                gFlipSkip = 0;
+                                cn = (cmd - X) + cn;
+                            } else {
+                                gFlipSkip = gFlipClipR + ((cmd - X) - clipW);
+                                cn = clipW;
+                            }
                         }
+                        gFlipCnt = 0;
+                        gFlipDimLen = cn;
+                        if (static_cast<int>(cn) > 0) {
+                            gFlipCnt = cn;
+                            do {
+                                unsigned char c = *src++;
+                                (gFlipDst = gFlipDst - 1)[1] = c;
+                                cn--;
+                            } while (cn != 0);
+                        }
+                        src = src + gFlipSkip;
                     } else {
-                        dst = reinterpret_cast<unsigned char *>(gFlipRow + X);
-                        if (left < clipX) {
-                            cn = (X - clipX) + 1;
-                            gFlipSkip = cmd - cn;
-                        } else {
-                            gFlipSkip = 0;
-                            cn = cmd;
-                        }
+                        src = src + cmd;
                     }
-                    gFlipCnt = 0;
-                    gFlipCnt2 = cn;
-                    if (static_cast<int>(cn) > 0) {
-                        gFlipCnt = cn;
-                        for (unsigned int k = cn; k != 0; k--) {
-                            unsigned char c = *src++;
-                            *dst-- = c;
-                            gFlipDst = dst;
-                        }
-                    }
-                    src = src + gFlipSkip;
                 } else {
                     src = src + cmd;
                 }
-            } else {
-                src = src + cmd;
             }
             X = X - cmd;
             gFlipRun = cmd;
             continue;
         }
         // newline
-        gFlipRow = gFlipRow + pitch;
         X = gFlipXEnd;
         gFlipY = gFlipY + 1;
+        gFlipRow = gFlipRow + pitch;
     }
 }
