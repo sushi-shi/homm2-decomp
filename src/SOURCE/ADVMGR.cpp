@@ -36,6 +36,7 @@
 #include <SOURCE/FINDPATH.h>
 #include <SOURCE/GAME.h>
 #include <SOURCE/PHILAI.h>
+#include <SOURCE/REMOTE.h>
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/philAI.h>
 #include <SOURCE/X_GLOBAL.h>
@@ -5655,16 +5656,200 @@ void advManager::SetInitialMapOrigin(void)
 }
 
 VA(0x00469160, 0x1be)
-void advManager::LoadRemote(void) {}
+void advManager::LoadRemote(void)
+{
+    if (gbThisNetHumanPlayer[giCurPlayer]) {
+        gpMouseManager->SetPointer(
+            "advmice.mse", ADVMGR_POINTER_DEFAULT,
+            ADVMGR_DEFAULT_POINTER_FRAME);
+    }
 
+    gpGame->LoadGame(gConfig.rmtRCName, 0, 1);
+    if ((gpGame->m_day != 1 ||
+         (gpGame->m_week == 1 && gpGame->m_month == 1)) &&
+        gbRemoteOn && gbThisNetHumanPlayer[giCurPlayer]) {
+        gpSoundManager->m_samplesReady = 1;
+        gpSoundManager->SwitchAmbientMusic(WAIT_AMBIENT_MUSIC);
+        gpSoundManager->m_samplesReady = 0;
+        giForceSwitchMusic = KBTickCount();
+    }
+
+    if (gpGame->m_playerDead[giCurPlayer])
+        ComputeAdvNetControl();
+
+    if (gbThisNetHumanPlayer[giCurPlayer]) {
+        gpGame->CancelComputerScreen();
+        gbThisNetGotAdventureControl = 1;
+        gpSoundManager->m_samplesReady = 0;
+    }
+
+    gpGame->DoNewTurn();
+    UpdateHeroLocators(1, 1);
+    UpdateTownLocators(1, 1);
+    UpdateRadar(1, 0);
+    UpdBottomView(1, 1, 1);
+    gpAdvManager->ForceNewHover();
+    SendMapChange(
+        ADVMGR_REMOTE_LOAD_MAP_CHANGE, 0, 0, 0,
+        ADVMGR_DEFAULT_POINTER_FRAME, 0, 0);
+    gpSoundManager->m_samplesReady = 1;
+}
+
+// @early-stop
+// All non-table bytes and 17 external targets match. The command lookup and
+// seven case offsets match; retail delinks nine local relocations as this function.
 VA(0x0046931e, 0x20c)
-char * advManager::CheckHandleNet(void) { return 0; }
+char * advManager::CheckHandleNet(void)
+{
+    AdventureRemotePacket *packet9;
+    int playerExited5;
+    SPlayerExit exitInfo4;
+
+    packet9 = reinterpret_cast<AdventureRemotePacket *>(
+        GetRemoteData(ADVMGR_REMOTE_DATA_REQUEST));
+    if (packet9 &&
+        (packet9->type == ADVMGR_REMOTE_PACKET_TYPE_GAME ||
+         packet9->type == ADVMGR_REMOTE_PACKET_TYPE_ALT)) {
+        switch (packet9->command) {
+        case ADVMGR_REMOTE_COMMAND_SAVE_GAME:
+            playerExited5 = packet9->savePlayerExited;
+            if (!gpGame->ReceiveSaveGame(
+                    packet9->saveDataSize, packet9->saveCrc,
+                    packet9->saveTransmitCrc, packet9->sender)) {
+                ShutDown(0);
+            }
+            if (playerExited5) {
+                exitInfo4.m_0 = packet9->sender;
+                exitInfo4.m_1 = static_cast<signed char>(
+                    NetPosToGamePos(packet9->sender));
+                exitInfo4.m_2 = 0;
+                exitInfo4.m_4 = 1;
+                exitInfo4.m_5 = 1;
+                exitInfo4.m_3 = 1;
+                ReceiveRemotePlayerExit(exitInfo4);
+            }
+            LoadRemote();
+            break;
+
+        case ADVMGR_REMOTE_COMMAND_POP_NET_BOX:
+            PopNetBox(packet9->payload, packet9->sender);
+            break;
+
+        case ADVMGR_REMOTE_COMMAND_COMBAT:
+            if (gbInCombat) {
+                return reinterpret_cast<char *>(packet9);
+            } else {
+                DoNetCombat(reinterpret_cast<char *>(packet9));
+            }
+            break;
+
+        case ADVMGR_REMOTE_COMMAND_PLAYER_EXIT:
+            LogStr("Receive Remote Player Exit");
+            ReceiveRemotePlayerExit(
+                *reinterpret_cast<SPlayerExit *>(packet9->payload));
+            break;
+
+        case ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT:
+            LogStr("Host Reports Player Exit");
+            ReceiveHostReportsPlayerExit(
+                packet9->sender,
+                *reinterpret_cast<SPlayerExit *>(packet9->payload), 0);
+            break;
+
+        case ADVMGR_REMOTE_COMMAND_GROUP_MAP_CHANGE:
+            ProcessIncomingGroupMapChange(packet9->payload);
+            break;
+
+        default:
+            return reinterpret_cast<char *>(packet9);
+        }
+    }
+    return 0;
+}
 
 VA(0x0046952a, 0xcd)
-int advManager::CheckHandleNetPlayerWait(struct tag_message &, int) { return 0; }
+int advManager::CheckHandleNetPlayerWait(
+    struct tag_message &message, int doMain)
+{
+    if (message.type == ADVMGR_REMOTE_WAIT_MOUSE_MESSAGE)
+        gpMouseManager->Main(message);
 
+    CheckDoMain(1, doMain);
+    if (message.type == ADVMGR_REMOTE_WAIT_COMMAND_MESSAGE) {
+        switch (message.field4) {
+        case ADVMGR_REMOTE_WAIT_POP_NET_BOX_COMMAND:
+            PopNetBox(0, -1);
+            break;
+
+        case ADVMGR_REMOTE_WAIT_EXIT_COMMAND:
+            if (message.fieldC & ADVMGR_REMOTE_WAIT_EXIT_MODIFIER_MASK) {
+                message.type = ADVMGR_REMOTE_WAIT_EXIT_MESSAGE;
+                message.field4 = 1;
+                return ADVMGR_REMOTE_WAIT_EXIT_RESULT;
+            }
+
+        default:
+            break;
+        }
+    }
+
+    UpdBottomView(0, 1, 1);
+    return 0;
+}
+
+// @early-stop
+// Retail adds continuation jumps at +0x14e and +0x1c9. Excluding those two
+// five-byte jumps, every opcode/operand and all six relocation targets match.
 VA(0x004695f7, 0x1d5)
-void advManager::TrimLoopingSounds(int) {}
+void advManager::TrimLoopingSounds(int maxSamples)
+{
+    if (giHighMemBuffer > 0)
+        maxSamples += giHighMemBuffer / ADVMGR_HIGH_MEMORY_BUFFER_DIVISOR;
+
+    if (MAP_WIDTH != ADVMGR_XLARGE_MAP_SIZE)
+        ++maxSamples;
+
+    if (maxSamples >= ADVMGR_LOOPING_SAMPLE_COUNT)
+        return;
+
+    int loadedSampleCount = 0;
+    char retainedSamples[ADVMGR_LOOPING_SAMPLE_COUNT];
+    memset(retainedSamples, 0, sizeof(retainedSamples));
+
+    int soundIndex;
+    for (soundIndex = 0; soundIndex < ADVMGR_SOUND_CELL_COUNT; ++soundIndex) {
+        if (m_activeSounds[soundIndex].soundId >= 0 &&
+            m_activeSounds[soundIndex].soundId < ADVMGR_LOOPING_SAMPLE_COUNT) {
+            ++retainedSamples[m_activeSounds[soundIndex].soundId];
+        }
+    }
+
+    for (soundIndex = 0; soundIndex < ADVMGR_LOOPING_SAMPLE_COUNT; ++soundIndex) {
+        if (retainedSamples[soundIndex] != 0)
+            ++loadedSampleCount;
+    }
+
+    if (loadedSampleCount < maxSamples) {
+        for (soundIndex = 0; soundIndex < ADVMGR_LOOPING_SAMPLE_COUNT;
+             ++soundIndex) {
+            if (retainedSamples[soundIndex] == 0 &&
+                m_loopingSamples[soundIndex] != 0) {
+                ++retainedSamples[soundIndex];
+                ++loadedSampleCount;
+                if (loadedSampleCount >= maxSamples)
+                    break;
+            }
+        }
+    }
+
+    for (soundIndex = 0; soundIndex < ADVMGR_LOOPING_SAMPLE_COUNT; ++soundIndex) {
+        if (m_loopingSamples[soundIndex] != 0 &&
+            retainedSamples[soundIndex] == 0) {
+            gpResourceManager->Dispose(m_loopingSamples[soundIndex]);
+            m_loopingSamples[soundIndex] = 0;
+        }
+    }
+}
 
 VA(0x004697cc, 0xd5)
 void advManager::DisableButtons(void)

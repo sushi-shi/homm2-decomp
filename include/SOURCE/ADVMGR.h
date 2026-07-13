@@ -124,6 +124,8 @@ typedef enum AdventureStateConstant {
     ADVMGR_LOOPING_SAMPLE_COUNT = 28,
     ADVMGR_CURSOR_SAMPLE_COUNT = 9,
     ADVMGR_SOUND_CELL_COUNT = 4,
+    ADVMGR_HIGH_MEMORY_BUFFER_DIVISOR = 100,
+    ADVMGR_XLARGE_MAP_SIZE = 144,
     ADVMGR_CURSOR_SAMPLE_VOLUME = 64,
     ADVMGR_CURSOR_SAMPLE_CHANNEL = 2,
     ADVMGR_QUICK_VIEW_NONE = -99,
@@ -131,6 +133,48 @@ typedef enum AdventureStateConstant {
     ADVMGR_UNUSED_OBJECT_ICON_1 = 21,
     ADVMGR_UNUSED_OBJECT_ICON_2 = 38
 } AdventureStateConstant;
+
+typedef enum AdventureRemoteConstant {
+    ADVMGR_REMOTE_DATA_REQUEST = 1,
+    ADVMGR_REMOTE_PACKET_TYPE_GAME = 2,
+    ADVMGR_REMOTE_PACKET_TYPE_ALT = 3,
+    ADVMGR_REMOTE_COMMAND_SAVE_GAME = 1,
+    ADVMGR_REMOTE_COMMAND_POP_NET_BOX = 11,
+    ADVMGR_REMOTE_COMMAND_COMBAT = 21,
+    ADVMGR_REMOTE_COMMAND_PLAYER_EXIT = 31,
+    ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT = 33,
+    ADVMGR_REMOTE_COMMAND_GROUP_MAP_CHANGE = 41,
+    ADVMGR_REMOTE_LOAD_MAP_CHANGE = 11
+} AdventureRemoteConstant;
+
+typedef enum AdventureRemoteWaitConstant {
+    ADVMGR_REMOTE_WAIT_COMMAND_MESSAGE = 1,
+    ADVMGR_REMOTE_WAIT_MOUSE_MESSAGE = 4,
+    ADVMGR_REMOTE_WAIT_EXIT_COMMAND = 16,
+    ADVMGR_REMOTE_WAIT_POP_NET_BOX_COMMAND = 60,
+    ADVMGR_REMOTE_WAIT_EXIT_MODIFIER_MASK = 0x0c,
+    ADVMGR_REMOTE_WAIT_EXIT_MESSAGE = 0x4000,
+    ADVMGR_REMOTE_WAIT_EXIT_RESULT = 2
+} AdventureRemoteWaitConstant;
+
+#pragma pack(push, 1)
+struct AdventureRemotePacket {
+    signed char sender;
+    char unknown1[4];
+    signed char type;
+    signed char command;
+    char unknown7[2];
+    union {
+        char payload[16];
+        struct {
+            int saveDataSize;
+            int saveCrc;
+            int saveTransmitCrc;
+            int savePlayerExited;
+        };
+    };
+};
+#pragma pack(pop)
 
 typedef enum AdventureEnvironmentSoundConstant {
     ADVMGR_ENVIRONMENT_SOUND_NONE = -1,
