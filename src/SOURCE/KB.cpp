@@ -1190,15 +1190,15 @@ VA(0x00499589, 0x1a7)
 char *GetBuildingInfo(int race, int building, int mode)
 {
     char buf[400];
-    if (race == 5 && building == 2) {
+    if (race == TOWN_TYPE_NECROMANCER && building == KB_BUILDING_NECROMANCER_SHRINE) {
         sprintf(buf, xNecromancerShrineDesc);
-    } else if (building == 0xb) {
+    } else if (building == KB_BUILDING_WELL_EXTRA) {
         sprintf(buf, "The %s increases production of %s by 8 per week.",
                 GetBuildingName(race, building),
                 gArmyNamesPlural[gDwellingType[race][0]]);
-    } else if (building == 0xd) {
+    } else if (building == KB_BUILDING_SPECIAL) {
         sprintf(buf, gBuildingInfoSpecial[race]);
-    } else if (building < 0x13) {
+    } else if (building < KB_BUILDING_DWELLING_FIRST) {
         sprintf(buf, cBuildingInfoNeutral[building]);
     } else {
         sprintf(gText, "The %s produces %s.",
@@ -1217,16 +1217,16 @@ char *GetBuildingInfo(int race, int building, int mode)
 VA(0x00499730, 0xa4)
 char *GetBuildingName(int race, int building)
 {
-    if (race == 5 && building == 2)
+    if (race == TOWN_TYPE_NECROMANCER && building == KB_BUILDING_NECROMANCER_SHRINE)
         return xNecromancerShrine;
-    if (building == 0xb)
+    if (building == KB_BUILDING_WELL_EXTRA)
         return gWellExtraNames[race];
-    else if (building == 0xd)
+    else if (building == KB_BUILDING_SPECIAL)
         return gSpecialBuildingNames[race];
-    else if (building < 0x13)
+    else if (building < KB_BUILDING_DWELLING_FIRST)
         return gNeutralBuildingNames[building];
     else
-        return gDwellingNames[race][building - 0x13];
+        return gDwellingNames[race][building - KB_BUILDING_DWELLING_FIRST];
 }
 
 // @early-stop
@@ -1237,19 +1237,20 @@ VA(0x004997d4, 0x138)
 void GetBuildingCost(int race, int building, int *const dest, int mageLevel)
 {
     int level;
-    if (building == 2 && race == 5) {
-        memcpy(dest, xShrineBuildingCost, 0x1c);
-    } else if (building >= 0x13 && building <= 0x1e) {
-        memcpy(dest, gDwellingCosts[race][building - 0x13], 0x1c);
-    } else if (building == 0) {
+    if (building == KB_BUILDING_NECROMANCER_SHRINE && race == TOWN_TYPE_NECROMANCER) {
+        memcpy(dest, xShrineBuildingCost, KB_BUILDING_RESOURCE_COUNT * sizeof(int));
+    } else if (building >= KB_BUILDING_DWELLING_FIRST && building <= KB_BUILDING_DWELLING_LAST) {
+        memcpy(dest, gDwellingCosts[race][building - KB_BUILDING_DWELLING_FIRST],
+               KB_BUILDING_RESOURCE_COUNT * sizeof(int));
+    } else if (building == KB_BUILDING_MAGE_GUILD) {
         level = mageLevel + 1;
-        if (level > 5)
-            level = 5;
-        memcpy(dest, gMageBuildingCosts[mageLevel + 1], 0x1c);
-    } else if (building == 0xd) {
-        memcpy(dest, gSpecialBuildingCosts[race], 0x1c);
-    } else if (building < 0x10) {
-        memcpy(dest, gNeutralBuildingCosts[building], 0x1c);
+        if (level > KB_MAGE_GUILD_MAX_LEVEL)
+            level = KB_MAGE_GUILD_MAX_LEVEL;
+        memcpy(dest, gMageBuildingCosts[mageLevel + 1], KB_BUILDING_RESOURCE_COUNT * sizeof(int));
+    } else if (building == KB_BUILDING_SPECIAL) {
+        memcpy(dest, gSpecialBuildingCosts[race], KB_BUILDING_RESOURCE_COUNT * sizeof(int));
+    } else if (building < KB_BUILDING_NEUTRAL_LIMIT) {
+        memcpy(dest, gNeutralBuildingCosts[building], KB_BUILDING_RESOURCE_COUNT * sizeof(int));
     }
 }
 
@@ -1266,31 +1267,31 @@ VA(0x0049992c, 0x140)
 void GetMonsterCost(int monster, int *const cost)
 {
     int idx;
-    for (idx = 0; idx < 7; idx++)
+    for (idx = 0; idx < KB_BUILDING_RESOURCE_COUNT; idx++)
         cost[idx] = 0;
-    cost[6] = gMonsterDatabase[monster].cost;
+    cost[RES_GOLD] = gMonsterDatabase[monster].cost;
     switch (monster) {
-    case 60:
-        cost[5] = 1;
+    case KB_MONSTER_NEEDS_GEMS_EXPANSION:
+        cost[RES_GEMS] = 1;
         break;
-    case 28:
-        cost[1] = 1;
+    case KB_MONSTER_NEEDS_MERCURY:
+        cost[RES_MERCURY] = 1;
         break;
-    case 19:
-        cost[4] = 1;
+    case KB_MONSTER_NEEDS_CRYSTAL:
+        cost[RES_CRYSTAL] = 1;
         break;
-    case 35:
-    case 36:
-        cost[3] = 1;
+    case KB_MONSTER_NEEDS_SULFUR_FIRST:
+    case KB_MONSTER_NEEDS_SULFUR_SECOND:
+        cost[RES_SULFUR] = 1;
         break;
-    case 37:
-        cost[3] = 2;
+    case KB_MONSTER_NEEDS_TWO_SULFUR:
+        cost[RES_SULFUR] = 2;
         break;
-    case 45:
-        cost[5] = 1;
+    case KB_MONSTER_NEEDS_GEMS:
+        cost[RES_GEMS] = 1;
         break;
-    case 46:
-        cost[5] = 2;
+    case KB_MONSTER_NEEDS_TWO_GEMS:
+        cost[RES_GEMS] = 2;
         break;
     }
 }
@@ -1305,49 +1306,58 @@ int CanBuild(town *t, int building)
 {
     int reqMask;
     int haveMask;
-    if (BitTest((char *)gpGame + 0x27bb, *(signed char *)t))
+    if (BitTest(gpGame->m_knownTowns, t->m_id))
         return 0;
-    if (building != 6 && !(*(int *)((char *)t + 0x18) & 0x40))
+    if (building != KB_BUILDING_CASTLE && !(t->m_buildings & TOWN_BUILDING_CASTLE))
         return 0;
-    if (!xIsExpansionMap && building == 2 && *((signed char *)t + 3) == 5)
+    if (!xIsExpansionMap && building == KB_BUILDING_NECROMANCER_SHRINE &&
+        t->m_type == TOWN_TYPE_NECROMANCER)
         return 0;
-    if (building == 3) {
+    if (building == KB_BUILDING_DOCK) {
         if (t->CanBuildDock())
             return 1;
         else
             return 0;
     }
-    if (building == 0 && *((signed char *)t + 0x1c) >= 5)
+    if (building == KB_BUILDING_MAGE_GUILD && t->m_buildState >= KB_MAGE_GUILD_MAX_LEVEL)
         return 0;
-    if (building == 5 || building == 0xe || building == 0x10 || building == 0x11 ||
-        building == 0x12 || building == 0x1f)
+    if (building == KB_BUILDING_UPGRADE_CASTLE || building == KB_BUILDING_DISABLED_FIRST ||
+        building == KB_BUILDING_DISABLED_SECOND || building == KB_BUILDING_DISABLED_THIRD ||
+        building == KB_BUILDING_DISABLED_FOURTH || building == KB_BUILDING_DISABLED_LAST)
         return 0;
-    if (building < 0x13 || building > 0x1e)
+    if (building < KB_BUILDING_DWELLING_FIRST || building > KB_BUILDING_DWELLING_LAST)
         return 1;
-    if ((building == 0x14 && (*(int *)((char *)t + 0x18) & 0x02000000)) ||
-        (building == 0x15 && (*(int *)((char *)t + 0x18) & 0x04000000)) ||
-        (building == 0x16 && (*(int *)((char *)t + 0x18) & 0x08000000)) ||
-        (building == 0x17 && (*(int *)((char *)t + 0x18) & 0x10000000)) ||
-        (building == 0x18 && ((*(int *)((char *)t + 0x18) & 0x20000000) ||
-                              (*(int *)((char *)t + 0x18) & 0x40000000))) ||
-        (building == 0x1d && (*(int *)((char *)t + 0x18) & 0x40000000)))
+    if ((building == KB_BUILDING_DWELLING_SECOND &&
+         (t->m_buildings & KB_DWELLING_UPGRADE_FIRST_FLAG)) ||
+        (building == KB_BUILDING_DWELLING_THIRD &&
+         (t->m_buildings & KB_DWELLING_UPGRADE_SECOND_FLAG)) ||
+        (building == KB_BUILDING_DWELLING_FOURTH &&
+         (t->m_buildings & KB_DWELLING_UPGRADE_THIRD_FLAG)) ||
+        (building == KB_BUILDING_DWELLING_FIFTH &&
+         (t->m_buildings & KB_DWELLING_UPGRADE_FOURTH_FLAG)) ||
+        (building == KB_BUILDING_DWELLING_SIXTH &&
+         ((t->m_buildings & KB_DWELLING_UPGRADE_FIFTH_FLAG) ||
+          (t->m_buildings & KB_DWELLING_UPGRADE_SIXTH_FLAG))) ||
+        (building == KB_BUILDING_UPGRADE_LAST &&
+         (t->m_buildings & KB_DWELLING_UPGRADE_SIXTH_FLAG)))
         return 0;
-    reqMask = gHierarchyMask[*((signed char *)t + 3)][building - 0x13];
-    haveMask = *(int *)((char *)t + 0x18);
-    if (haveMask & 0x02000000)
-        haveMask |= 0x100000;
-    if (haveMask & 0x04000000)
-        haveMask |= 0x200000;
-    if (haveMask & 0x08000000)
-        haveMask |= 0x400000;
-    if (haveMask & 0x10000000)
-        haveMask |= 0x800000;
-    if (haveMask & 0x40000000)
-        haveMask |= 0x20000000;
-    if (haveMask & 0x20000000)
-        haveMask |= 0x1000000;
+    reqMask = gHierarchyMask[t->m_type][building - KB_BUILDING_DWELLING_FIRST];
+    haveMask = t->m_buildings;
+    if (haveMask & KB_DWELLING_UPGRADE_FIRST_FLAG)
+        haveMask |= KB_DWELLING_FIRST_FLAG;
+    if (haveMask & KB_DWELLING_UPGRADE_SECOND_FLAG)
+        haveMask |= KB_DWELLING_SECOND_FLAG;
+    if (haveMask & KB_DWELLING_UPGRADE_THIRD_FLAG)
+        haveMask |= KB_DWELLING_THIRD_FLAG;
+    if (haveMask & KB_DWELLING_UPGRADE_FOURTH_FLAG)
+        haveMask |= KB_DWELLING_FOURTH_FLAG;
+    if (haveMask & KB_DWELLING_UPGRADE_SIXTH_FLAG)
+        haveMask |= KB_DWELLING_UPGRADE_FIFTH_FLAG;
+    if (haveMask & KB_DWELLING_UPGRADE_FIFTH_FLAG)
+        haveMask |= KB_DWELLING_FIFTH_FLAG;
     if ((reqMask & haveMask) == reqMask) {
-        if (*((signed char *)t + 3) == 5 && building == 0x1c && *((signed char *)t + 0x1c) <= 1)
+        if (t->m_type == TOWN_TYPE_NECROMANCER &&
+            building == KB_BUILDING_NECROMANCER_MAGE_PREREQUISITE && t->m_buildState <= 1)
             return 0;
         return 1;
     }
@@ -1357,12 +1367,12 @@ int CanBuild(town *t, int building)
 VA(0x00499d21, 0x9a)
 int CanBuy(town *t, int type)
 {
-    int buf[7];
+    int buf[KB_BUILDING_RESOURCE_COUNT];
     playerRec *ptr;
     int idx;
-    GetBuildingCost(*((signed char *)t + 3), type, buf, *((signed char *)t + 0x1c));
-    ptr = (playerRec *)((char *)(giCurPlayer + (playerRec *)gpGame) + 0x49c);
-    for (idx = 0; idx < 7; idx++)
+    GetBuildingCost(t->m_type, type, buf, t->m_buildState);
+    ptr = &gpGame->m_players[giCurPlayer];
+    for (idx = 0; idx < KB_BUILDING_RESOURCE_COUNT; idx++)
         if (ptr->resources[idx] < buf[idx])
             return 0;
     return 1;
@@ -1371,19 +1381,19 @@ int CanBuy(town *t, int type)
 VA(0x00499dbb, 0xc6)
 int GetBuildingBaseResourceValue(int race, int building, int level)
 {
-    if (race == 5 && building == 5)
+    if (race == TOWN_TYPE_NECROMANCER && building == KB_BUILDING_UPGRADE_CASTLE)
         return 1000;
-    if (building < 0x13 || building > 0x1e) {
-        if (building > 0xf)
+    if (building < KB_BUILDING_DWELLING_FIRST || building > KB_BUILDING_DWELLING_LAST) {
+        if (building > KB_BUILDING_NEUTRAL_LAST)
             return 0;
-        else if (building == 0)
+        else if (building == KB_BUILDING_MAGE_GUILD)
             return gMageBaseResourceValues[level];
-        else if (building == 0xd)
+        else if (building == KB_BUILDING_SPECIAL)
             return gSpecialBuildingBaseResourceValues[race];
         else
             return gNeutralBaseResourceValues[building];
     } else {
-        return gDwellingBaseResourceValues[race][building - 0x13];
+        return gDwellingBaseResourceValues[race][building - KB_BUILDING_DWELLING_FIRST];
     }
 }
 
@@ -1398,13 +1408,13 @@ int WaitHandler(tag_message &msg)
     int result = 0;
     gbFunctionComplete = 1;
     PollSound();
-    if (msg.type == 0x200) {
+    if (msg.type == EVENT_WINDOW_MESSAGE) {
         switch (msg.field4) {
-        case 0xd:
+        case EVENT_WINDOW_CLICK_COMMAND:
             switch (msg.field8) {
-            case 0x7800:
-            case 0x7801:
-            case 0x7802:
+            case EVENT_WINDOW_FIRST_BUTTON:
+            case EVENT_WINDOW_SECOND_BUTTON:
+            case EVENT_WINDOW_THIRD_BUTTON:
                 gbFunctionComplete = 0;
                 result = 1;
                 break;
@@ -1459,17 +1469,137 @@ int WaitHandler(tag_message &msg)
     }
     CheckShingleUpdate();
     if (result != 0) {
-        *(int *)((char *)gpWindowManager + 0x5a) = 0x7801;
-        msg.type = 0x200;
-        msg.field8 = 0xa;
+        gpWindowManager->m_dialogResult = EVENT_WINDOW_SECOND_BUTTON;
+        msg.type = EVENT_WINDOW_MESSAGE;
+        msg.field8 = EVENT_WINDOW_CLOSE_COMMAND;
         msg.field4 = msg.field8;
         return 2;
     }
     return 1;
 }
 
+// @early-stop
+// 99.8%: explicit-range comparison excluding jump-table data at function offsets
+// [0x35d,0x3a3) and [0x41c,0x431) finds all 283 instructions identical after
+// normalizing only branch destinations and relocation identities. External relocations
+// agree in order; residual names are local tables, string literals, and the equivalent
+// cLuckInfo[2]/cMoraleInfo[2] array-element aliases used by the retail delinker.
 VA(0x0049a09f, 0x472)
-int EventWindowHandler(struct tag_message &) { return 0; }
+int EventWindowHandler(struct tag_message &msg)
+{
+    int type;
+    int extra;
+
+    if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active == 1)
+        gpSoundManager->SwitchAmbientMusic(
+            giTerrainToMusicTrack[gpAdvManager->m_currentTerrain]);
+    if (giDialogTimeout != 0 && KBTickCount() > giDialogTimeout) {
+        msg.type = EVENT_WINDOW_MESSAGE;
+        gpWindowManager->m_dialogResult = msg.field8;
+        msg.field8 = EVENT_WINDOW_CLOSE_COMMAND;
+        msg.field4 = msg.field8;
+        giDialogTimeout = 0;
+        return EVENT_WINDOW_CLOSE;
+    }
+    if (msg.type == EVENT_WINDOW_MESSAGE) {
+        switch (msg.field4) {
+        case EVENT_WINDOW_HOVER_COMMAND:
+        case EVENT_WINDOW_HELP_COMMAND:
+            type = NORMAL_DIALOG_NO_RESOURCE;
+            extra = NORMAL_DIALOG_NO_VALUE;
+            if (msg.fieldC & EVENT_WINDOW_RESOURCE_FLAG) {
+                switch (msg.field8) {
+                case EVENT_WINDOW_FIRST_RESOURCE_WIDGET:
+                    type = giResType1;
+                    extra = giResExtra1;
+                    break;
+                case EVENT_WINDOW_SECOND_RESOURCE_WIDGET:
+                    type = giResType2;
+                    extra = giResExtra2;
+                    break;
+                }
+                switch (type) {
+            case EVENT_WINDOW_LUCK:
+                NormalDialog(cLuckInfo[LUCK_INFO_GOOD], NORMAL_DIALOG_QUICK_VIEW,
+                             -1, -1, -1, 0, -1, 0, -1, 0);
+                break;
+            case EVENT_WINDOW_BAD_LUCK:
+                NormalDialog(cLuckInfo[LUCK_INFO_BAD], NORMAL_DIALOG_QUICK_VIEW,
+                             -1, -1, -1, 0, -1, 0, -1, 0);
+                break;
+            case EVENT_WINDOW_MORALE:
+                NormalDialog(cMoraleInfo[MORALE_INFO_GOOD], NORMAL_DIALOG_QUICK_VIEW,
+                             -1, -1, -1, 0, -1, 0, -1, 0);
+                break;
+            case EVENT_WINDOW_BAD_MORALE:
+                NormalDialog(cMoraleInfo[MORALE_INFO_BAD], NORMAL_DIALOG_QUICK_VIEW,
+                             -1, -1, -1, 0, -1, 0, -1, 0);
+                break;
+            case EVENT_WINDOW_EXPERIENCE:
+                NormalDialog("{Experience}\n\nExperience allows your heroes to go up levels, increasing their primary and secondary skills.",
+                             NORMAL_DIALOG_QUICK_VIEW, -1, -1, -1, 0, -1, 0, -1, 0);
+                break;
+            case NORMAL_DIALOG_ARTIFACT:
+                if (extra == EVENT_WINDOW_SPELL_SCROLL) {
+                    sprintf(gText, gArtifactDesc[extra], gSpellNames[xTheSpell]);
+                    NormalDialog(gText, NORMAL_DIALOG_QUICK_VIEW,
+                                 -1, -1, -1, 0, -1, 0, -1, 0);
+                } else {
+                    NormalDialog(gArtifactDesc[extra], NORMAL_DIALOG_QUICK_VIEW,
+                                 -1, -1, -1, 0, -1, 0, -1, 0);
+                }
+                break;
+            case NORMAL_DIALOG_SPELL:
+                NormalDialog(gSpellDesc[extra], NORMAL_DIALOG_QUICK_VIEW,
+                             -1, -1, -1, 0, -1, 0, -1, 0);
+                break;
+            case NORMAL_DIALOG_SECONDARY_SKILL:
+                NormalDialog(cSecSkillDesc[extra / 3][extra % 3], NORMAL_DIALOG_QUICK_VIEW,
+                             -1, -1, -1, 0, -1, 0, -1, 0);
+                break;
+            case NORMAL_DIALOG_PRIMARY_SKILL:
+                NormalDialog(gStatDesc[extra], NORMAL_DIALOG_QUICK_VIEW,
+                             -1, -1, -1, 0, -1, 0, -1, 0);
+                break;
+            case RES_WOOD:
+            case RES_MERCURY:
+            case RES_ORE:
+            case RES_SULFUR:
+            case RES_CRYSTAL:
+            case RES_GEMS:
+            case RES_GOLD:
+                NormalDialog("{Resources}\n\nThere are seven resources in Heroes 2, used to build and improves castles, purchase troops and recruit heroes.  Gold is the most common, required for virtually everything.  Wood and ore are used for most buildings.  Gems, Mercury, Sulfur and Crystal are rare magical resources used for the most powerful creatures and buildings.",
+                             NORMAL_DIALOG_QUICK_VIEW, -1, -1, -1, 0, -1, 0, -1, 0);
+                break;
+                }
+            }
+            break;
+        case EVENT_WINDOW_CLICK_COMMAND:
+            switch (msg.field8) {
+            case EVENT_WINDOW_FIRST_BUTTON:
+            case EVENT_WINDOW_SECOND_BUTTON:
+            case EVENT_WINDOW_THIRD_BUTTON:
+            case EVENT_WINDOW_FOURTH_BUTTON:
+            case EVENT_WINDOW_FIFTH_BUTTON:
+            case EVENT_WINDOW_SIXTH_BUTTON:
+            case EVENT_WINDOW_SEVENTH_BUTTON:
+            case EVENT_WINDOW_EIGHTH_BUTTON:
+                gpWindowManager->m_dialogResult = msg.field8;
+                msg.field8 = EVENT_WINDOW_CLOSE_COMMAND;
+                msg.field4 = msg.field8;
+                giDialogTimeout = 0;
+                return EVENT_WINDOW_CLOSE;
+            case EVENT_WINDOW_IGNORED_BUTTON:
+            default:
+                break;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+    return EVENT_WINDOW_CONTINUE;
+}
 
 VA(0x0049a511, 0x1e)
 int TrueFalseDialogHandler(struct tag_message &msg)
@@ -4581,6 +4711,7 @@ DATA(0x004ff8c8) char *gNeutralBuildingNames[20];
 DATA(0x004ff918) char *gWellExtraNames[8];
 DATA(0x004ff938) char *gSpecialBuildingNames[8];
 DATA(0x004ff958) char *gDwellingNames[6][12];
+DATA(0x004ffa78) char *cSecSkillDesc[14][3];
 DATA(0x004ffb20) char *cBuildingInfoNeutral[20];
 DATA(0x004ffb70) char *gBuildingInfoSpecial[6];
 DATA(0x004ffb88) char *cDirections[10];
