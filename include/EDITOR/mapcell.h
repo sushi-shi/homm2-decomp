@@ -32,14 +32,25 @@ SIZE(mapCellExtra, 7);
 class mapCell {            // 12 bytes (CodeView mangles every use as PAVmapCell -> class)
 public:
     u16 tile;               // +0
-    u8  objFlag0   : 1;     // +2 bit0
-    u8  objFlag1   : 1;     // +2 bit1
-    u8  objTileset : 6;     // +2 bits2-7
+    union {
+        char m_objType;      // +2 complete object attribute byte
+        u8 m_objTypeBits;
+        struct {
+            u8 objFlag0   : 1; // +2 bit0
+            u8 objFlag1   : 1; // +2 bit1
+            u8 objTileset : 6; // +2 bits2-7
+        };
+    };
     u8  objIndex;           // +3  object sprite index (0xFF == none)
-    u16 w4a : 1;            // +4 bit0
-    u16 w4b : 1;            // +4 bit1
-    u16 w4c : 1;            // +4 bit2
-    u16 w4hi : 13;          // +4 bits3-15
+    union {
+        u16 m_objectData;    // +4 complete object data word
+        struct {
+            u16 w4a : 1;    // +4 bit0
+            u16 w4b : 1;    // +4 bit1
+            u16 w4c : 1;    // +4 bit2
+            u16 w4hi : 13;  // +4 bits3-15
+        };
+    };
     u8  ovlFlag0   : 1;     // +6 bit0
     u8  ovlFlag1   : 1;     // +6 bit1
     u8  ovlTileset : 6;     // +6 bits2-7
