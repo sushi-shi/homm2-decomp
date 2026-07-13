@@ -116,7 +116,9 @@ struct SCmbtHero {
     short y[2];
     char unknown8;
     signed char animationFrameCount[8];
-    char unknown11[0x70];
+    char unknown11[4];
+    signed char animationFrames[8][9];
+    char unknown5d[0x24];
 };
 SIZE(SCmbtHero, 0x81);
 #pragma pack(pop)
