@@ -715,8 +715,8 @@ SOURCE/DRAWING	?ClearCombatMessages@combatManager@@QAEXH@Z	21.6667	ef52b5847730
 SOURCE/DRAWING	?CombatMessage@combatManager@@QAEXH@Z	3.4241	b526076ef458
 SOURCE/DRAWING	?CombatMessage@combatManager@@QAEXPADHHH@Z	5.7181	50e594ca3eb9
 SOURCE/DRAWING	?DrawBackground@combatManager@@QAEXXZ	5.4538	d4a479166209
-SOURCE/DRAWING	?DrawFrame@combatManager@@QAEXHHHHHHH@Z	90.3917	751acbe2f56e
-SOURCE/DRAWING	?DrawSmallView@combatManager@@QAEXHH@Z	1.6620	df6ed96b4dd6
+SOURCE/DRAWING	?DrawFrame@combatManager@@QAEXHHHHHHH@Z	91.1636	751acbe2f56e
+SOURCE/DRAWING	?DrawSmallView@combatManager@@QAEXHH@Z	99.8412	401a7c83df3d
 SOURCE/DRAWING	?NoShowCombatLog@combatManager@@QAEXPAD@Z	59.0000	81fefdd42238
 SOURCE/DRAWING	?ResetLimitCreature@combatManager@@QAEXXZ	18.2817	dfe8966fc781
 SOURCE/DRAWING	?SetupGridForArmy@combatManager@@QAEXPAVarmy@@@Z	8.8904	a2432f9d824c

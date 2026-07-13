@@ -40,6 +40,27 @@ typedef enum CombatCastleHex {
     COMBAT_CASTLE_SPECIAL_HEX_SECOND = 115
 } CombatCastleHex;
 
+typedef enum CombatSmallViewText {
+    COMBAT_SMALL_VIEW_TEXT_QUANTITY_PLURAL = 0,
+    COMBAT_SMALL_VIEW_TEXT_QUANTITY_SINGULAR = 1,
+    COMBAT_SMALL_VIEW_TEXT_ATTACK = 2,
+    COMBAT_SMALL_VIEW_TEXT_DEFENSE = 3,
+    COMBAT_SMALL_VIEW_TEXT_HIT_POINTS = 4,
+    COMBAT_SMALL_VIEW_TEXT_DAMAGE = 5,
+    COMBAT_SMALL_VIEW_TEXT_MORALE = 6,
+    COMBAT_SMALL_VIEW_TEXT_LUCK = 7,
+    COMBAT_SMALL_VIEW_TEXT_SHOTS = 8
+} CombatSmallViewText;
+
+typedef enum CombatSmallViewModifierFrame {
+    COMBAT_SMALL_VIEW_BAD_LUCK_FRAME = 0,
+    COMBAT_SMALL_VIEW_GOOD_LUCK_FRAME = 1,
+    COMBAT_SMALL_VIEW_NEUTRAL_LUCK_FRAME = 2,
+    COMBAT_SMALL_VIEW_BAD_MORALE_FRAME = 3,
+    COMBAT_SMALL_VIEW_GOOD_MORALE_FRAME = 4,
+    COMBAT_SMALL_VIEW_NEUTRAL_MORALE_FRAME = 5
+} CombatSmallViewModifierFrame;
+
 enum {
     COMBAT_GRID_ROW_COUNT = 9,
     COMBAT_GRID_ROW_LENGTH = 13,
@@ -69,7 +90,43 @@ enum {
     COMBAT_SCREEN_WIDTH = 0x280,
     COMBAT_AREA_HEIGHT = 0x1bb,
     COMBAT_MAX_EXTENT_X = 0x27f,
-    COMBAT_MAX_EXTENT_Y = 0x1ba
+    COMBAT_MAX_EXTENT_Y = 0x1ba,
+    COMBAT_SMALL_VIEW_FULL_INFO = 2,
+    COMBAT_SMALL_VIEW_LEFT_X = 5,
+    COMBAT_SMALL_VIEW_RIGHT_X = 555,
+    COMBAT_SMALL_VIEW_FULL_Y = 299,
+    COMBAT_SMALL_VIEW_FULL_RIGHT_Y = 154,
+    COMBAT_SMALL_VIEW_COMPACT_Y = 366,
+    COMBAT_SMALL_VIEW_COMPACT_RIGHT_Y = 288,
+    COMBAT_SMALL_VIEW_WIDTH = 83,
+    COMBAT_SMALL_VIEW_FULL_HEIGHT = 141,
+    COMBAT_SMALL_VIEW_COMPACT_HEIGHT = 74,
+    COMBAT_SMALL_VIEW_ICON_SIZE = 19,
+    COMBAT_SMALL_VIEW_MAX_SPELLS = 6,
+    COMBAT_SMALL_VIEW_UNUSED_POSITION = 255,
+    COMBAT_SMALL_VIEW_SPELL_X_FIRST = 1,
+    COMBAT_SMALL_VIEW_SPELL_X_SECOND = 11,
+    COMBAT_SMALL_VIEW_SPELL_X_THIRD = 22,
+    COMBAT_SMALL_VIEW_SPELL_X_FOURTH = 32,
+    COMBAT_SMALL_VIEW_SPELL_X_FIFTH = 43,
+    COMBAT_SMALL_VIEW_SPELL_Y_FIRST = 0,
+    COMBAT_SMALL_VIEW_SPELL_Y_SECOND = 10,
+    COMBAT_SMALL_VIEW_SPELL_Y_THIRD = 21,
+    COMBAT_SMALL_VIEW_INSET_X = 6,
+    COMBAT_SMALL_VIEW_TEXT_X = 8,
+    COMBAT_SMALL_VIEW_TEXT_WIDTH = 57,
+    COMBAT_SMALL_VIEW_TEXT_HEIGHT = 12,
+    COMBAT_SMALL_VIEW_QUANTITY_Y = 7,
+    COMBAT_SMALL_VIEW_FIRST_STAT_Y = 20,
+    COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT = 9,
+    COMBAT_SMALL_VIEW_SHOTS_Y = 74,
+    COMBAT_SMALL_VIEW_FULL_SPELL_Y = 86,
+    COMBAT_SMALL_VIEW_COMPACT_SPELL_Y = 19,
+    COMBAT_SMALL_VIEW_MODIFIER_STEP = 10,
+    COMBAT_SMALL_VIEW_MODIFIER_RIGHT_X = 57,
+    COMBAT_SMALL_VIEW_NEUTRAL_MORALE_X = 45,
+    COMBAT_SMALL_VIEW_NEUTRAL_LUCK_X = 50,
+    COMBAT_ARMY_FLAG_SHOOTER = 4
 };
 
 #pragma pack(push, 1)  // recovered layout is byte-packed
@@ -85,7 +142,10 @@ public:
     class icon *m_catapultIcon;  // +0x3202
     char _pad_0x3206[0x4];
     class icon *m_towerIcon;  // +0x320a
-    char _pad_0x320e[0x1c];
+    char _pad_0x320e[0x10];
+    class icon *m_smallViewBackgroundIcon;  // +0x321e
+    class icon *m_smallViewModifierIcon;  // +0x3222
+    class icon *m_smallViewSpellIcon;  // +0x3226
     class icon *m_moatIcon;  // +0x322a
     class icon *m_drawbridgeIcon;  // +0x322e
     class icon *m_obstacleIcons[9];  // +0x3232
@@ -145,7 +205,10 @@ public:
     int m_smallViewSide[2];  // +0xf543
     int m_smallViewArmyIndex[2];  // +0xf54b
     int m_smallViewLastX[2];  // +0xf553
-    char _pad_0xf55b[0x31c];
+    int m_smallViewLastY[2];  // +0xf55b
+    int m_smallViewWidth[2];  // +0xf563
+    int m_smallViewHeight[2];  // +0xf56b
+    char _pad_0xf573[0x304];
     // --- constructors ---
     combatManager(void);
     // --- virtual methods (vtable order) ---
