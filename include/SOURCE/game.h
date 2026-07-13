@@ -22,7 +22,10 @@ struct tag_message;
 #pragma pack(push, 1)
 struct townArmyRecord {
     signed char m_troopTypes[5];
-    unsigned short m_troopCounts[5];
+    union {
+        unsigned short m_troopCounts[5];
+        short m_creatureCounts[5];
+    };
 };
 struct townSlot {
     signed char id;
@@ -101,7 +104,7 @@ struct playerRec {
     signed char unknown40;
     signed char unknown41;
     signed char unknown42;
-    signed char unknown43;
+    signed char daysLeft;
     signed char townCount;
     signed char currentTown;
     signed char townWindowTop;

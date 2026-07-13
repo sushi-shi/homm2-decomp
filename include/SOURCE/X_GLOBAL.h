@@ -105,7 +105,7 @@ extern int giSpellEffectShowType;
 extern signed char gcColorToPlayerPos[8];
 extern char *cCombatBkgNames[20];
 extern struct SCmbtObstacle *sCmbtObstacles;
-extern int *gEstatesGoldLevel;
+extern int gEstatesGoldLevel[4];
 extern float *gfSSLogisticsMod;
 extern float *gfSSNavigationMod;
 extern float *gfSSArcheryMod;
