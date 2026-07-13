@@ -20,7 +20,7 @@ public:
     icon   *m_icon;  // +0x2b  the loaded icon (disposed in dtor)
     short  field_0x2f;  // +0x2f
     short  field_0x31;  // +0x31
-    short  m_maxLength;  // +0x33
+    unsigned short m_maxLength;  // +0x33
     short  m_rectX;  // +0x35
     short  m_rectY;  // +0x37
     short  m_rectW;  // +0x39
