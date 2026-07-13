@@ -20,6 +20,23 @@ typedef enum AdventureScreenConstant {
     ADVMGR_PUZZLE_X_TRIM = 12
 } AdventureScreenConstant;
 
+typedef enum AdventureScrollDirection {
+    ADVMGR_SCROLL_NORTH = 0,
+    ADVMGR_SCROLL_NORTH_EAST = 1,
+    ADVMGR_SCROLL_EAST = 2,
+    ADVMGR_SCROLL_SOUTH_EAST = 3,
+    ADVMGR_SCROLL_SOUTH = 4,
+    ADVMGR_SCROLL_SOUTH_WEST = 5,
+    ADVMGR_SCROLL_WEST = 6,
+    ADVMGR_SCROLL_NORTH_WEST = 7
+} AdventureScrollDirection;
+
+typedef enum AdventureScrollConstant {
+    ADVMGR_SCROLL_MIN_ORIGIN = 1 - ADVMGR_VIEW_EDGE_MARGIN,
+    ADVMGR_VIEW_CENTER_OFFSET = ADVMGR_VIEW_EDGE_MARGIN - 1,
+    ADVMGR_SCROLL_TICK_INTERVAL = 70
+} AdventureScrollConstant;
+
 typedef enum AdventureButtonConstant {
     ADVMGR_BUTTON_MESSAGE = 0x200,
     ADVMGR_BUTTON_ENABLE = 5,
