@@ -382,9 +382,9 @@ int soundManager::Open(int param_1)
     struct _DIG_DRIVER *p_Var2;
     int local_c;
     m_cdStarted = 0;
-    field_0x6a6 = 0;
+    m_midiStarted = 0;
     m_cdReady = 0;
-    field_0x69e = 0;
+    m_midiReady = 0;
     memset(bSaveMusicPosition, 0, 0x3c);
     memset(bMusicIsLooping, 0, 0x3c);
     bSaveMusicPosition[0x10] = 1;
@@ -436,7 +436,7 @@ int soundManager::Open(int param_1)
         _AIL_startup_0();
         if (gCdMusic == 0) {
             MIDIStartup();
-            if (field_0x69e == 0) {
+            if (m_midiReady == 0) {
                 CDStartup();
                 if (m_cdReady == 0) {
                     gMidiEnabled = 0;
@@ -450,7 +450,7 @@ int soundManager::Open(int param_1)
             CDStartup();
             if (m_cdReady == 0) {
                 MIDIStartup();
-                if (field_0x69e == 0) {
+                if (m_midiReady == 0) {
                     gMidiEnabled = 0;
                     WritePrefs();
                 } else {
@@ -918,7 +918,7 @@ int soundManager::MusicPlaying(void)
     if (gbNoSound != 0)
         return 0;
     if (gCdMusic == 0) {
-        if (field_0x69e == 0)
+        if (m_midiReady == 0)
             return 0;
         return MIDIIsPlaying();
     }

@@ -365,21 +365,21 @@ fullMap *game::GetWorldMapData(void)
 VA(0x0047187f, 0x11e)
 int game::CreateBoat(int x, int y, int notify)
 {
-    int boatIdx = Scan(reinterpret_cast<signed char *>(this) + 0x631d, 0, 0x30);
+    int boatIdx = Scan(m_boatSlots, 0, GAME_BOAT_COUNT);
     if (boatIdx != -1) {
         if (notify == 0)
             SendMapChange(4, 0, x, y, -999, 0, 0);
-        reinterpret_cast<char *>(this)[boatIdx + 0x631d] = static_cast<char>(boatIdx);
-        char *boat = reinterpret_cast<char *>(this) + boatIdx * 8 + 0x619d;
-        boat[0] = static_cast<char>(boatIdx);
-        boat[1] = static_cast<char>(x);
-        boat[2] = static_cast<char>(y);
-        boat[3] = 2;
-        boat[7] = static_cast<char>(giCurPlayer);
+        m_boatSlots[boatIdx] = static_cast<signed char>(boatIdx);
+        boatRecord *boat = &m_boats[boatIdx];
+        boat->id = static_cast<signed char>(boatIdx);
+        boat->x = static_cast<signed char>(x);
+        boat->y = static_cast<signed char>(y);
+        boat->direction = 2;
+        boat->owner = static_cast<signed char>(giCurPlayer);
         mapCell *cell = WORLDMAP->Row(y) + x;
-        boat[4] = reinterpret_cast<char *>(cell)[9];
-        boat[5] = static_cast<char>(cell->w4hi);
-        reinterpret_cast<char *>(cell)[9] = static_cast<char>(0xab);
+        boat->savedTriggerType = cell->triggerType;
+        boat->savedEventData = static_cast<unsigned char>(cell->w4hi);
+        cell->triggerType = 0xab;
         cell->w4hi = boatIdx;
     }
     return boatIdx;
@@ -619,7 +619,7 @@ int game::SaveGame(char *filename, int generateName, signed char expansionFormat
     else
         _write(fileInfo, m_randomArtifacts, 0x52);
     _write(fileInfo, m_boats, 0x180);
-    _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x631d, 0x30);
+    _write(fileInfo, m_boatSlots, sizeof(m_boatSlots));
     _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x634d, 0x30);
     _write(fileInfo, &m_ultimateArtifactX, 1);
     _write(fileInfo, &m_ultimateArtifactY, 1);
@@ -785,7 +785,7 @@ void game::SetupOrigData(void)
         m_boats[i].heroId = -1;
     }
     memset(reinterpret_cast<unsigned char *>(this) + 0x27bb, 0, 9);
-    memset(reinterpret_cast<unsigned char *>(this) + 0x631d, -1, GAME_BOAT_COUNT);
+    memset(m_boatSlots, -1, sizeof(m_boatSlots));
     m_ultimateArtifactY = -1;
     m_ultimateArtifactX = m_ultimateArtifactY;
     memset(m_obeliskVisitors, 0, 48);
@@ -916,7 +916,7 @@ void game::LoadGame(char *filename, int loadFromFile, int)
         else
             _read(file, m_randomArtifacts, 0x52);
         _read(file, m_boats, 0x180);
-        _read(file, reinterpret_cast<unsigned char *>(this) + 0x631d, 0x30);
+        _read(file, m_boatSlots, sizeof(m_boatSlots));
         _read(file, m_obeliskVisitors, 0x30);
         _read(file, &m_ultimateArtifactX, 1);
         _read(file, &m_ultimateArtifactY, 1);
@@ -4319,8 +4319,8 @@ int game::GetBoatsBuilt(void)
 {
     int count = 0;
     int i;
-    for (i = 0; i < 0x30; i++) {
-        if (((signed char *)this)[i + 0x631d] != -1)
+    for (i = 0; i < GAME_BOAT_COUNT; i++) {
+        if (m_boatSlots[i] != -1)
             count++;
     }
     return count;
