@@ -2,6 +2,7 @@
 #define HOMM2_X_GLOBAL_H
 // Globals owned by this data-only TU (from CodeView).
 #include <va.h>
+#include <SOURCE/hero.h>
 
 class ExpCampaign;
 
@@ -114,7 +115,7 @@ extern struct SCmbtObstacle *sCmbtObstacles;
 extern int gEstatesGoldLevel[4];
 extern float *gfSSLogisticsMod;
 extern float *gfSSNavigationMod;
-extern float *gfSSArcheryMod;
+extern float gfSSArcheryMod[HERO_SKILL_LEVEL_COUNT];
 extern float gfSSAIArcheryMod[4];
 extern signed char giVisRange[8];
 extern unsigned char gStartingHeroStats[6][5];

@@ -4118,7 +4118,7 @@ DATA(0x004fc5b8) struct SCmbtObstacle *sCmbtObstacles;
 DATA(0x004fc778) int gEstatesGoldLevel[4];
 DATA(0x004fc788) float *gfSSLogisticsMod;
 DATA(0x004fc798) float *gfSSNavigationMod;
-DATA(0x004fc7a8) float *gfSSArcheryMod;
+DATA(0x004fc7a8) float gfSSArcheryMod[HERO_SKILL_LEVEL_COUNT];
 DATA(0x004fc7b8) float gfSSAIArcheryMod[4];
 DATA(0x004fc7c8) signed char giVisRange[8];
 DATA(0x004fc7d0) unsigned char gStartingHeroStats[6][5];

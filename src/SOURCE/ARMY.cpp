@@ -110,8 +110,8 @@ void army::Init(int monsterType, int quantity, int side, int index, int hex, int
     m_index = index;
     m_morale = gpCombatManager->m_armyGroups[m_side]->GetMorale(
         gpCombatManager->m_heroes[m_side],
-        gpCombatManager->m_towns[m_side],
-        gpCombatManager->m_armyGroups[1 - m_side]);
+        gpCombatManager->m_combatTowns[m_side],
+        gpCombatManager->m_armyGroups[COMBAT_DEFENDER_SIDE - m_side]);
     if (m_monsterType == ARMY_CREATURE_EARTH_ELEMENTAL ||
         m_monsterType == ARMY_CREATURE_AIR_ELEMENTAL ||
         m_monsterType == ARMY_CREATURE_FIRE_ELEMENTAL ||
@@ -120,7 +120,8 @@ void army::Init(int monsterType, int quantity, int side, int index, int hex, int
         m_morale = 0;
     }
     m_luck = gpGame->GetLuck(
-        gpCombatManager->m_heroes[m_side], this, gpCombatManager->m_towns[m_side]);
+        gpCombatManager->m_heroes[m_side], this,
+        gpCombatManager->m_combatTowns[m_side]);
     m_hex = hex;
     gpCombatManager->m_hexCells[m_hex].m_occupantSide = m_side;
     gpCombatManager->m_hexCells[m_hex].m_occupantIndex = m_index;
