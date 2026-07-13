@@ -16,7 +16,7 @@ extern int xPasswordStringsIndex[];
 extern int xShrineBuildingCost[];
 
 // ---- globals (declarations, RVA order) ----
-extern unsigned char *giGroundShape;
+extern unsigned char giGroundShape[432];
 extern unsigned char *gColorTableTan;
 extern unsigned char *gColorTableGray;
 extern unsigned char gColorTableRed[256];
