@@ -1215,7 +1215,7 @@ DATA(0x004fa944) int gbPutzingWithMouseCtr;
 DATA(0x004fa948) int gbDontTryRedbook;
 DATA(0x004fa94c) int gbDontTryMIDI;
 DATA(0x004fa950) int gbDontTryDigital;
-DATA(0x004fa958) float *gfCombatSpeedMod;
+DATA(0x004fa958) float gfCombatSpeedMod[3];
 DATA(0x004fa964) icon *gShingleAnim;
 DATA(0x004fa968) int iNextShingleAnim;
 DATA(0x004fa96c) int giDialogTimeout;
