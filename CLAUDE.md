@@ -174,12 +174,13 @@ the EXE + our known symbols. Needs the dev shell's Ghidra env (in the flake).
 - `scripts/od_slots.py` (predict/solve slots) · `scripts/od_oracle.py` (verify vs real cl).
 - `scripts/permute_ast.py` — **preferred** permutation-search hill-climber: mutates via the
   real clang AST (`clang.cindex`), swapping *true operand source ranges*, so precedence/parens
-  are handled and swaps are correct BY CONSTRUCTION (no false-match class). Parses with clangd's
-  own flags. `scripts/permute.py` is the regex fallback — swap/reorder/reassoc/decl-split → real
+  are handled without the regex tool's precedence-crossing false-match class. AST-correct ranges
+  do not prove semantic equivalence, so audit every retained mutation; unsafe inequality +/-1
+  rewrites are disabled. Parses with clangd's own flags. `scripts/permute.py` is the regex fallback — swap/reorder/reassoc/decl-split → real
   MSVC → objdiff score; keeps gains; auto-detects /Od|/O2; on /Od can complete a near-100% fn to
   TRUE byte-identical (won't fix a slot miss — that's `od_slots.py`). Its operand swaps are
-  precedence-guarded (`_clean_swap`), but AST is the trustworthy tool — permuter %-gains from the
-  regex tool need a per-diff value-preservation audit; AST gains do not.
+  precedence-guarded (`_clean_swap`), but every retained gain from either tool needs a per-diff
+  value-preservation audit.
 - `homm2 sema <cmd>` — semantic navigation (xref/disasm/strings/match/rva/clangd; see
   Build loop). Modules in `scripts/homm2/analysis/`; Ghidra pipeline in `scripts/homm2/ghidra/`.
 - `editor/nvim` — `:Homm2` in-editor diff/build/status (auto-loaded by the dev-shell).
