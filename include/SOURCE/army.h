@@ -134,6 +134,7 @@ public:
     int GetAdjacentCellIndex(int, int);
     int ValidRange(int);
     int GetBestDirection(int, int, int);
+    int IsAlive(void) { return m_monsterType >= 0 && m_quantity > 0; }
 };
 #pragma pack(pop)
 SIZE(army, 0x482);

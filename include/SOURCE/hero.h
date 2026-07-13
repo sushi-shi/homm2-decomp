@@ -29,7 +29,8 @@ typedef enum HeroSkillLevel {
     HERO_SKILL_LEVEL_NONE = 0,
     HERO_SKILL_LEVEL_BASIC = 1,
     HERO_SKILL_LEVEL_ADVANCED = 2,
-    HERO_SKILL_LEVEL_EXPERT = 3
+    HERO_SKILL_LEVEL_EXPERT = 3,
+    HERO_SKILL_LEVEL_COUNT = 4
 } HeroSkillLevel;
 
 typedef enum HeroClassType {
@@ -135,7 +136,7 @@ public:
             unsigned int m_eventFlagsHigh : 15;
         };
     };
-    unsigned char m_unknownE7;  // +0xe7
+    unsigned char m_isCaptain;  // +0xe7
     float m_aiFightValue;  // +0xe8
     char m_pad_0xec[0xe];
     int IsEmbarked(void) { return m_eventFlags & HERO_EVENT_EMBARKED; }
