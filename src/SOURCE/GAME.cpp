@@ -2525,7 +2525,7 @@ void game::ViewArmy(int x, int y, int monsterType, int numTroops, town *castle,
     if (theHero)
         modifier15 += theHero->Stats(0);
     if (theArmy)
-        modifier15 = theArmy->m_monsterAttack - monster8->attack;
+        modifier15 = theArmy->m_monster.attack - monster8->attack;
     if (modifier15) {
         sprintf(gText, " (%d)", monster8->attack + modifier15);
         strcat(details9, gText);
@@ -2537,7 +2537,7 @@ void game::ViewArmy(int x, int y, int monsterType, int numTroops, town *castle,
     if (theHero)
         modifier15 += theHero->Stats(1);
     if (theArmy)
-        modifier15 = theArmy->m_monsterDefense - monster8->defense;
+        modifier15 = theArmy->m_monster.defense - monster8->defense;
     if (modifier15) {
         sprintf(gText, " (%d)", monster8->defense + modifier15);
         strcat(details9, gText);
@@ -2749,8 +2749,11 @@ int ViewArmyHandler(tag_message &msg)
         msg.field4 = 4;
         msg.field8 = 5;
         iViewArmyFrame =
-            (iViewArmyFrame + 1) % sViewArmyMonFrameInfo.walkFrameCount;
-        msg.field18 = sViewArmyMonFrameInfo.walkFrames[iViewArmyFrame];
+            (iViewArmyFrame + 1) %
+            sViewArmyMonFrameInfo.animationFrameCount[ARMY_ANIMATION_WALK];
+        msg.field18 =
+            sViewArmyMonFrameInfo.animationFrames[ARMY_ANIMATION_WALK]
+                                                 [iViewArmyFrame];
         gpGame->m_viewArmyWindow->BroadcastMessage(msg);
         msg.field4 = 52;
         msg.field18 =
@@ -2762,7 +2765,7 @@ int ViewArmyHandler(tag_message &msg)
         glTimers[0] = static_cast<int>(
             KBTickCount() +
             sViewArmyMonFrameInfo.walkDuration * 0.1 /
-                sViewArmyMonFrameInfo.walkFrameCount);
+                sViewArmyMonFrameInfo.animationFrameCount[ARMY_ANIMATION_WALK]);
     }
     return 1;
 }

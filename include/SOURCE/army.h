@@ -3,6 +3,11 @@
 // Reconstructed class (SOURCE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // 57 methods, 0 own-virtual, 0 static data.
 #include <va.h>
+#include <_types.h>
+#include <BASE/icon.h>
+#include <SOURCE/ARMY.h>
+
+class sample;
 
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class army {
@@ -14,8 +19,12 @@ public:
     char   field_0x2;  // +0x02
     char _pad_0x3[0x3];
     int    m_drawState;  // +0x06
-    char _pad_0xa[0x44];
-    int    field_0x4e;  // +0x4e
+    struct SLimitData m_creatureLimits;  // +0x0a
+    struct SLimitData m_quantityLimits;  // +0x1a
+    struct SLimitData m_spriteLimits;  // +0x2a
+    struct SLimitData m_spellLimits;  // +0x3a
+    char m_padding4A[4];
+    int    m_showQuantity;  // +0x4e
     int    m_targetSide;  // +0x52
     int    m_targetIndex;  // +0x56
     int    field_0x5a;  // +0x5a
@@ -27,86 +36,45 @@ public:
     int    field_0x72;  // +0x72
     int    m_monsterType;  // +0x76
     int    m_hex;  // +0x7a
-    int    field_0x7e;  // +0x7e
-    int    field_0x82;  // +0x82
+    int    m_animationSequence;  // +0x7e
+    int    m_animationFrame;  // +0x82
     int    m_facing;  // +0x86
-    int    field_0x8a;  // +0x8a
-    int    field_0x8e;  // +0x8e
-    int    field_0x92;  // +0x92
+    int    m_walkDirection;  // +0x8a
+    int    m_facingChanged;  // +0x8e
+    int    m_initialQuantity;  // +0x92
     int    m_quantity;  // +0x96
     int    m_lastTargetHex;  // +0x9a
     int    field_0x9e;  // +0x9e
     int    m_hitPointsLost;  // +0xa2
     int    field_0xa6;  // +0xa6
     int    field_0xaa;  // +0xaa
-    int    field_0xae;  // +0xae  !union: conflicting widths
-    int    field_0xb2;  // +0xb2
+    int    m_speed;  // +0xae
+    int    m_walkDuration;  // +0xb2
     int    field_0xb6;  // +0xb6
-    short  m_monsterHitPoints;  // +0xba
-    char _pad_0xbc[0x6];
-    unsigned short m_currentHitPoints;  // +0xc2
-    char m_unknownC4;  // +0xc4
-    signed char m_monsterSpeed;  // +0xc5
-    signed char m_monsterAttack;  // +0xc6
-    signed char m_monsterDefense;  // +0xc7
-    signed char m_monsterDamageMin;  // +0xc8
-    signed char m_monsterDamageMax;  // +0xc9
-    signed char m_shots;  // +0xca
-    char _pad_0xcb[0x5];
-    int    m_flags;  // +0xd0
+    struct tag_monsterInfo m_monster;  // +0xba
     short  field_0xd4;  // +0xd4
     int    m_animationValue1;  // +0xd6
     int    m_animationValue2;  // +0xda
     int    m_animationValue3;  // +0xde
-    int    field_0xe2;  // +0xe2
+    int    m_spellEffect;  // +0xe2
     int    m_side;  // +0xe6
     int    m_index;  // +0xea
-    int    field_0xee;  // +0xee
+    int    m_lastAnimationTime;  // +0xee
     int    m_morale;  // +0xf2
     int    m_luck;  // +0xf6
     int    field_0xfa;  // +0xfa
-    int    field_0xfe;  // +0xfe
-    int    field_0x102;  // +0x102
+    int    m_yOffset;  // +0xfe
+    int    m_xOffset;  // +0x102
     int    m_spellCount;  // +0x106
-    unsigned char m_spellInfluence[15];  // +0x10a
+    unsigned char m_spellInfluence[ARMY_SPELL_INFLUENCE_COUNT];  // +0x10a
     char _pad_0x119[0x4];
-    int    field_0x11d;  // +0x11d
+    int    m_drawEnabled;  // +0x11d
     char _pad_0x121[0x4];
-    int    field_0x125;  // +0x125
-    char _pad_0x129[0x1];
-    short  field_0x12a;  // +0x12a
-    short  field_0x12c;  // +0x12c
-    char _pad_0x12e[0x9d];
-    int    field_0x1cb;  // +0x1cb
-    char _pad_0x1cf[0x4];
-    int    field_0x1d3;  // +0x1d3
-    char _pad_0x1d7[0x4];
-    short  field_0x1db;  // +0x1db
-    short  field_0x1dd;  // +0x1dd
-    char _pad_0x1df[0x4];
-    char   field_0x1e3;  // +0x1e3
-    char _pad_0x1e4[0x38];
-    char   field_0x21c;  // +0x21c
-    char _pad_0x21d[0x1];
-    char   field_0x21e;  // +0x21e
-    char   field_0x21f;  // +0x21f
-    char _pad_0x220[0x2];
-    char   field_0x222;  // +0x222
-    char _pad_0x223[0x7];
-    char   field_0x22a;  // +0x22a
-    char   field_0x22b;  // +0x22b
-    char _pad_0x22c[0x82];
-    char   field_0x2ae;  // +0x2ae
-    char _pad_0x2af[0x1af];
-    int    field_0x45e;  // +0x45e
-    int    field_0x462;  // +0x462
-    int    field_0x466;  // +0x466
-    int    field_0x46a;  // +0x46a
-    int    field_0x46e;  // +0x46e
-    int    field_0x472;  // +0x472
-    int    field_0x476;  // +0x476
-    int    field_0x47a;  // +0x47a
-    int    field_0x47e;  // +0x47e
+    signed char *m_palette;  // +0x125
+    struct SMonFrameInfo m_frameInfo;  // +0x129
+    class icon *m_creatureIcon;  // +0x45e
+    class icon *m_missileIcon;  // +0x462
+    class sample *m_samples[ARMY_SAMPLE_COUNT];  // +0x466
     // --- constructors ---
     army(void);
     // --- methods ---
