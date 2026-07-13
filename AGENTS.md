@@ -38,14 +38,15 @@ authoritative. This file is the short, restart-ready Codex workflow.
 5. Compile rapidly with `ninja` while iterating. Run `homm2 status` before trusting
    `homm2 sema match`, because a bare `ninja` leaves `report.json` stale.
 6. Use `homm2 sema disasm 0x<RVA> --diff --lite` to advance from the first structural divergence.
-   Once a function is roughly 96-97% or better and its semantics, frame, stack slots, and CFG are
-   already aligned, use `scripts/permute_ast.py` for residual operand/comparison order, independent
-   statement order, and related source-shape steering. This libclang AST permuter is preferred because
-   its operand ranges are syntax-aware, but AST-correct edits are not automatically value-preserving:
-   audit every retained mutation. Inequality +/-1 rewrites are disabled because they are invalid for
-   floats and can cross integer overflow boundaries. Do not use the regex permuter for this campaign
-   unless every retained mutation receives the same audit. The permuter does not replace `od_slots.py`
-   or manual control-flow reconstruction.
+   The campaign has two global phases. Until total SOURCE fuzzy reaches **95%**, recover complete
+   bodies, real types/layouts, frames, stack slots, CFG, inline accessors, and relocation targets.
+   At a compiler-shape wall, try only a few obvious semantics-preserving spellings, record the
+   byte-level residual, and move on. Do not run extended compile searches or permutation passes:
+   later shared-header/layout recovery can invalidate carefully tuned matches. At 95% total fuzzy,
+   start the last-mile phase and use `scripts/permute_ast.py` on structurally aligned 96-99% functions.
+   Its ranges are syntax-aware, but audit every retained mutation. Inequality +/-1 rewrites are
+   disabled because they are invalid for floats and can cross integer overflow boundaries. Do not
+   use the regex permuter unless every retained mutation receives the same audit.
 7. Run a relocation-masked raw-byte comparison for near-exact functions. objdiff masks relocation
    bytes and can report less than 100% for delinked local-label identity even when every code byte is
    identical.
@@ -81,6 +82,11 @@ authoritative. This file is the short, restart-ready Codex workflow.
 - For a hardest-first campaign, rank SOURCE work by unmatched weighted bytes using the retained
   source-hash maximum, not a transient live dip. Prefer `/Od` units until they are drained; start
   `/O2` units when only optimizer/register-allocation work remains.
+- Before total SOURCE fuzzy reaches **95%**, prioritize structural recovery over wall grinding.
+  A semantically complete function at a proven compiler wall leaves the active queue after only a
+  few obvious steering attempts, even if it is 96-99%. Systematic wall breaking and AST permutation
+  begin only at 95% total fuzzy. This prevents later shared-header and class-layout discoveries from
+  invalidating carefully crafted byte matches.
 - Integrate exactly one worker at a time. Apply only its declared source/header files; never copy a
   worker's `README.md`, `config/match_baseline.tsv`, or transient queue. On `source-decomp`, run the
   full build, verify the reported functions, run `homm2 status update`, stage the worker files plus
@@ -124,6 +130,8 @@ authoritative. This file is the short, restart-ready Codex workflow.
   Use plain `homm2 status update` for direct function edits that should establish a new maximum.
 - Mark `@early-stop` only for 100% matches or a byte-proven residual such as delinked local-label or
   constant-pool naming. Document the exact byte span and reason.
+- Before the 95% phase switch, a wall proof requires complete semantics/frame/slots/CFG and relocation
+  review, but only a few obvious source-shape attempts. Do not exhaustively permute or brute-force it.
 - A jump-only early stop must be proved after excluding known jump-table data: every non-jump
   opcode and operand must match, the remaining size delta must equal the counted five-byte
   continuation/trampoline jumps, and external relocation targets must be audited manually when

@@ -150,25 +150,29 @@ the per-call-site continuation jumps of **inlined in-class accessors**.
 - **Define functions in retail-RVA order** within the TU (the link order the
   baseline expects).
 
-## Push every function to 100% — chase each wall, do NOT bail early
+## Recover every body first; grind walls after 95% total fuzzy
 
 This is an unoptimized `/Od` build: unlike a /O2 decomp there is **no EH wall and no
 scheduler/regalloc puzzle to plateau on**. The two levers that DO matter are both
 understood: stack-slot order (`od_slots.py`) and inline accessors (`/Ob1` `jmp $+0`).
-So **the default outcome is 100%.** Do NOT bank a partial and move on; do NOT stop at
-the first plateau. **Before deciding a function is "stuck on slots/jmps", re-diff with
+So **the default eventual outcome is 100%.** Until total SOURCE fuzzy reaches **95%**,
+the priority is complete semantic and type/layout coverage. Do not spend extended compile
+searches or permutation runs on a 96-99% function while large bodies remain unreconstructed:
+later shared-header and class-layout recovery can perturb that tuning. **Before deciding a
+function is "stuck on slots/jmps", re-diff with
 `(%ebp)` displacements visible** (fuzzy hides slot misses) and check for the inline-
 accessor `jmp $+0` fingerprint — most plateaus are one of these two, both fixable.
 
-1. **Push every function to 100%.** A plateau is almost always a fixable codegen-
-   shape bug in *your* source — iterate different spellings, re-check the slot names
-   with `od_slots`, re-read the disasm. Chase each diff row down, one at a time.
-2. **Chase each wall to the highest % it can reach.** When a row sticks, GREP
-   `docs/patterns/INDEX.md` for the idiom and try the cataloged spelling; a genuinely
-   new idiom → add `docs/patterns/<name>.md` + one INDEX line in the SAME change.
-   Keep going until the only thing left is provably not your code.
-3. **Size is not a reason to defer.** Reconstruct large bodies leaf-first, in full.
-4. **Acceptable non-100% comes in exactly two `@early-stop` flavors — never a partial
+1. **Recover every assigned function completely.** Semantics, real fields/types, frame,
+   stack slots, CFG, inline-accessor structure, and external relocations must be accounted for.
+2. **At a wall, try a few obvious cases and move on.** Re-check `od_slots`, try the source
+   polarity/operand/accessor spelling directly indicated by the diff, and consult the pattern
+   catalog. If the residual is then byte-proven, document it and hand off. Do not run extended
+   permutation or brute-force searches before total SOURCE fuzzy reaches 95%.
+3. **At 95% total fuzzy, start the last-mile pass.** Return to the proven wall set, use the
+   audited AST permuter where appropriate, and push each residual to its highest reproducible match.
+4. **Size is not a reason to defer.** Reconstruct large bodies leaf-first, in full.
+5. **Acceptable non-100% comes in exactly two `@early-stop` flavors — never a partial
    that under-counts because you stopped guessing.** Mark it `// @early-stop` (marker
    line above the `VA()`, the byte-level reason on the next line, no %):
    - **(a) Permanent artifact** — code bytes proven byte-exact with `llvm-objdump -dr`
