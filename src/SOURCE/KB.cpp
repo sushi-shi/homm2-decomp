@@ -4931,7 +4931,7 @@ DATA(0x00529908) int giBottomViewResourceQty;
 DATA(0x0052990c) soundManager *gpSoundManager;
 DATA(0x00529910) int gbThisNetGotAdventureControl;
 DATA(0x00529914) int giMapChangeCtr;
-DATA(0x00529918) struct SMapChange *sMapChangeQueue;
+DATA(0x00529918) SMapChange sMapChangeQueue[CURSOR_MAP_CHANGE_QUEUE_COUNT];
 DATA(0x0052a184) int gbWaitForRemoteReceive;
 DATA(0x0052a188) unsigned char bMusicIsLooping[0x3c];
 DATA(0x0052a1c4) townManager *gpTownManager;

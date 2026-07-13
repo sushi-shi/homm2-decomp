@@ -2,6 +2,7 @@
 #define HOMM2_X_GLOBAL_H
 // Globals owned by this data-only TU (from CodeView).
 #include <va.h>
+#include <SOURCE/CURSOR.h>
 #include <SOURCE/hero.h>
 
 class ExpCampaign;
@@ -348,7 +349,7 @@ extern int gLowPageScreenSelector;
 extern int giCurWatchPlayer;
 extern char gcCommandLine[GLOBAL_COMMAND_LINE_SIZE];
 extern int giMapChangeCtr;
-extern struct SMapChange *sMapChangeQueue;
+extern SMapChange sMapChangeQueue[CURSOR_MAP_CHANGE_QUEUE_COUNT];
 extern int gbWaitForRemoteReceive;
 extern unsigned char bMusicIsLooping[0x3c];
 
