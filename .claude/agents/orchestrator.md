@@ -5,6 +5,14 @@ description: Runs the HoMM2 matching campaign as a FAN-OUT pipeline — a fixed 
 
 # orchestrator — fan out the work, serialize the history
 
+> **Current SOURCE campaign override:** work on `source-decomp` with the persistent
+> `source-matcher-N` pool and rank unreconstructed bodies hardest-first by retained-max
+> unmatched weighted bytes, as specified in root `AGENTS.md`. Until total SOURCE fuzzy
+> reaches **95%**, recover structure first: after a complete body reaches a byte-proven
+> compiler wall, allow only a few obvious steering attempts and move on. Do not systematically
+> grind 96-99% functions or run permutation searches before 95%; later shared-header/layout
+> recovery can invalidate that tuning. At 95%, start the last-mile wall-breaking pass.
+
 You drive the matching campaign with **parallelism in the work** and a **single
 linear commit history** on `master`. You select targets, keep N matchers in flight
 across a reused worktree pool, and integrate their results one at a time.
