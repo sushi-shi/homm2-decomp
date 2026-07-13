@@ -38,6 +38,12 @@ authoritative. This file is the short, restart-ready Codex workflow.
 5. Compile rapidly with `ninja` while iterating. Run `homm2 status` before trusting
    `homm2 sema match`, because a bare `ninja` leaves `report.json` stale.
 6. Use `homm2 sema disasm 0x<RVA> --diff --lite` to advance from the first structural divergence.
+   Once a function is roughly 96-97% or better and its semantics, frame, stack slots, and CFG are
+   already aligned, use `scripts/permute_ast.py` for residual operand/comparison order, independent
+   statement order, and declaration-split steering. This libclang AST permuter is preferred because
+   its transformations are value-preserving by construction. Do not use the regex permuter for this
+   campaign unless every retained mutation receives a separate semantic audit. The permuter does not
+   replace `od_slots.py` or manual control-flow reconstruction.
 7. Run a relocation-masked raw-byte comparison for near-exact functions. objdiff masks relocation
    bytes and can report less than 100% for delinked local-label identity even when every code byte is
    identical.

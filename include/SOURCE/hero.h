@@ -4,6 +4,7 @@
 // 34 methods, 0 own-virtual, 0 static data.
 #include <va.h>
 #include <SOURCE/armyGroup.h>
+
 // forward declarations:
 class town;
 
@@ -18,6 +19,29 @@ typedef enum HeroSecondarySkill {
     HERO_SKILL_NECROMANCY = 12
 } HeroSecondarySkill;
 
+typedef enum HeroSkillLevel {
+    HERO_SKILL_LEVEL_NONE = 0,
+    HERO_SKILL_LEVEL_BASIC = 1,
+    HERO_SKILL_LEVEL_ADVANCED = 2,
+    HERO_SKILL_LEVEL_EXPERT = 3
+} HeroSkillLevel;
+
+typedef enum HeroEventFlag {
+    HERO_EVENT_BUOY = 0x2,
+    HERO_EVENT_FOUNTAIN = 0x4,
+    HERO_EVENT_OASIS = 0x8,
+    HERO_EVENT_FAERIE_RING = 0x10,
+    HERO_EVENT_GRAVEYARD = 0x20,
+    HERO_EVENT_SHIPWRECK = 0x40,
+    HERO_EVENT_EMBARKED = 0x80,
+    HERO_EVENT_TEMPLE = 0x100,
+    HERO_EVENT_WATERING_HOLE = 0x200,
+    HERO_EVENT_DERELICT_SHIP = 0x400,
+    HERO_EVENT_MAGIC_WELL = 0x1000,
+    HERO_EVENT_IDOL = 0x2000,
+    HERO_EVENT_PYRAMID = 0x4000
+} HeroEventFlag;
+
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class hero {
 public:
@@ -29,7 +53,7 @@ public:
     short  field_0x4;  // +0x04
     char _pad_0x6[0x1];
     short  field_0x7;  // +0x07
-    char _pad_0x9[0x1];
+    unsigned char m_visitedTownId;  // +0x09
     char m_name[13];  // +0x0a
     unsigned char m_cursorType;  // +0x17
     unsigned char m_unknown18;  // +0x18
@@ -83,6 +107,7 @@ public:
     char m_unknownE7;  // +0xe7
     float m_aiFightValue;  // +0xe8
     char m_pad_0xec[0xe];
+    int IsEmbarked(void) { return m_eventFlags & HERO_EVENT_EMBARKED; }
     // --- constructors ---
     hero(void);
     // --- methods ---

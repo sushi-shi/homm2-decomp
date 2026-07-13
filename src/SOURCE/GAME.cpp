@@ -3685,7 +3685,7 @@ void game::SetupTowns(void)
                         if (castle->owner != -1 && !gbHumanPlayer[castle->owner])
                             spellValue =
                                 (gsSpellInfo[spell].attributes & 1 ? 4 : 1) *
-                                    gsSpellInfo[spell].value +
+                                    gsSpellInfo[spell].aiValue +
                                 50;
                         else
                             spellValue = 1500;
