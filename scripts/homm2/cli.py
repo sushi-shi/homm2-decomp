@@ -26,8 +26,12 @@ def main(argv=None):
         if sh("python3", "-m", "homm2.build.assert_defs_declared"): return 1
         if sh("python3", "-m", "homm2.build.assert_globals_defined"): return 1
         if sh("python3", "-m", "homm2.build.assert_vtables"): return 1
-        from homm2.match.status import main as st
-        st(["--write-readme"]); return st([])   # refresh README % block + print summary
+        from homm2.match.status import load_report, main as st
+        report = load_report()
+        if report is None:
+            return 1
+        st(["--write-readme"], report)
+        return st([], report)   # refresh README % block + print summary
     if cmd == "relocs":
         # OPT-IN reloc-target audit (NOT a hard build gate): objdiff masks every relocation, so a
         # 100%-exact fn can silently read the wrong global/field or call a fabricated fn. This checks

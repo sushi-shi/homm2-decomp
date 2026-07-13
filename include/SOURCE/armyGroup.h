@@ -13,8 +13,14 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // NOTE: sparse this-access recovery (few/no this-relative probes).
-    signed char m_troopTypes[5];
-    unsigned short m_troopCounts[5];
+    union {
+        signed char m_creatureTypes[5];  // +0x00
+        signed char m_troopTypes[5];
+    };
+    union {
+        short m_creatureCounts[5];       // +0x05
+        unsigned short m_troopCounts[5];
+    };
     // --- constructors ---
     armyGroup(void);
     // --- methods ---

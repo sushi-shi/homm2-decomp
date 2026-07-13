@@ -270,9 +270,10 @@ def cmd_check(data, eps=0.05):
     print("[status] no regressions (tu-cumulative dips ignored; max% preserved)."); return 0
 
 
-def main(argv=None):
+def main(argv=None, data=None):
     argv = list(argv or [])
-    data = load_report()
+    if data is None:
+        data = load_report()
     if data is None:
         print("[status] no report (run 'homm2 build' first)"); return 1
     if argv and argv[0] == "update":

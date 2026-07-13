@@ -37,7 +37,7 @@ DATA(0x0051fec0) static unsigned int gTileMode;
 DATA(0x0051fec4) static int gTileRowCtr;
 
 VA(0x004d310c, 0x18f)
-extern "C" __declspec(naked) void __cdecl TileToBitmap(bitmap *src, unsigned int flags, bitmap *dst, int x, int y)
+extern "C" __declspec(naked) void __cdecl TileToBitmap(tileset *src, unsigned int flags, bitmap *dst, int x, int y)
 {
     __asm {
         push    ebp

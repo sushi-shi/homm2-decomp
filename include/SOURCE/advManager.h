@@ -34,7 +34,7 @@ public:
     int    m_heroLocatorState[12];  // +0x3a
     int    m_townLocatorState[12];  // +0x6a
     class heroWindow *m_adventureWindow;  // +0x9a
-    unsigned short *m_visibilityMap;  // +0x9e
+    unsigned char *m_visibilityMap;  // +0x9e, packed 16-bit cell values
     int    m_visibilityMapValid;  // +0xa2
     int m_currentTerrain;  // +0xa6, index into giTerrainToMusicTrack
     char _pad_0xaa[0x4];
@@ -51,8 +51,8 @@ public:
     class icon *m_cloudOverlayIcon;  // +0x1d2
     int    m_mapOriginX;  // +0x1d6
     int    m_mapOriginY;  // +0x1da
-    int    m_field_0x1de;  // +0x1de
-    int    m_field_0x1e2;  // +0x1e2
+    int    m_previousOriginX;  // +0x1de
+    int    m_previousOriginY;  // +0x1e2
     int    m_lastHoverCell;  // +0x1e6
     int    m_hoverCellY;  // +0x1ea
     int    m_commandTargetX;  // +0x1ee
@@ -62,10 +62,7 @@ public:
     int    m_updateMaxX;  // +0x1fe
     int    m_updateMaxY;  // +0x202
     int    m_updatePending;  // +0x206
-    int    m_viewLeft;  // +0x20a
-    int    m_viewTop;  // +0x20e
-    int    m_viewRight;  // +0x212
-    int    m_viewBottom;  // +0x216
+    int    m_viewBounds[4];  // +0x20a
     class icon *m_heroIcons[8];  // +0x21a
     class icon *m_shadowIcon;  // +0x23a
     class icon *m_boatShadowIcon;  // +0x23e
@@ -83,10 +80,10 @@ public:
     int    m_field_0x296;  // +0x296
     int    m_field_0x29a;  // +0x29a
     int    m_field_0x29e;  // +0x29e
-    int    m_field_0x2a2;  // +0x2a2
+    int    m_comboHeroDrawn;  // +0x2a2
     int    m_heroContextLocked;  // +0x2a6
     int    m_townContextLocked;  // +0x2aa
-    int    m_field_0x2ae;  // +0x2ae
+    int    m_forceCompleteDraw;  // +0x2ae
     int    m_lastQuickViewX;  // +0x2b2
     int    m_lastQuickViewY;  // +0x2b6
     int    m_field_0x2ba;  // +0x2ba
@@ -267,7 +264,7 @@ extern int iLastHourGlassPhase;
 extern int gbForceUpdate;
 extern int giCheatSeq;
 extern int iQWE;
-extern unsigned char *monAnimDrawFrame;
+extern unsigned char monAnimDrawFrame[15];
 extern int iLastSandAnimTime;
 extern int iLastNewSandAnimTime;
 extern int giFrameCount;
@@ -297,12 +294,12 @@ extern int giTownPortalChoice;
 extern int iThisMinY;
 extern class heroWindow *townPortalWin;
 extern int giFrameStep;
-extern char *cArmySizeName;
+extern char cArmySizeName[12];
 extern int giLimitUpdMaxX;
 extern int giLimitUpdMaxY;
 extern int bPrefsChanged;
 extern int giLimitUpdMinY;
-DATA(0x00527f50) extern signed char (*bComboDraw)[18];
+extern signed char bComboDraw[18][18];
 extern int iLastAnimFrame;
 
 #endif // HOMM2_SOURCE_ADVMANAGER_H
