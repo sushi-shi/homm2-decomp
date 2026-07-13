@@ -1666,10 +1666,213 @@ int advManager::ProcessHover(int mouseX, int mouseY) {
 }
 
 VA(0x0045b094, 0x21a)
-void advManager::UpdateScreen(int, int) {}
+// @early-stop identical assembly and all 31 relocation targets. The sole
+// reloc-masked byte difference is the branch displacement at +0x42: retail
+// jumps to the epilogue while this build targets the adjacent jmp-to-epilogue.
+void advManager::UpdateScreen(int, int forceUpdate)
+{
+    if (forceUpdate == 0 && bShowIt == 0) {
+        if (KBTickCount() > glTimers[0])
+            glTimers[0] = KBTickCount() + ADVMGR_TIMER_DELAY;
+    } else {
+        PollSound();
+        giScrollX = m_updateMinX;
+        giScrollY = m_updateMinY;
+        if (giLimitUpdMinX == ADVMGR_UPDATE_NONE) {
+            BlitBitmapToScreen(
+                gpWindowManager->m_screen, ADVMGR_UPDATE_VIEWPORT_ORIGIN,
+                ADVMGR_UPDATE_VIEWPORT_ORIGIN, ADVMGR_UPDATE_VIEWPORT_SIZE,
+                ADVMGR_UPDATE_VIEWPORT_SIZE, ADVMGR_UPDATE_VIEWPORT_ORIGIN,
+                ADVMGR_UPDATE_VIEWPORT_ORIGIN);
+        } else {
+            BlitBitmapToScreen(
+                gpWindowManager->m_screen, giLimitUpdMinX, giLimitUpdMinY,
+                giLimitUpdMaxX - giLimitUpdMinX,
+                giLimitUpdMaxY - giLimitUpdMinY, giLimitUpdMinX,
+                giLimitUpdMinY);
+        }
+        giScrollY = 0;
+        giScrollX = giScrollY;
+        PollSound();
+
+        if (KBTickCount() > glTimers[0]) {
+            ++m_updateMaxY;
+            ++m_updateMaxX;
+            if (m_updateMaxX >= ADVMGR_UPDATE_ANIMATION_PHASES)
+                m_updateMaxX = 0;
+            glTimers[0] = KBTickCount() + ADVMGR_TIMER_DELAY;
+
+            if (m_updateMaxX == 1 || m_updateMaxX == 3 ||
+                m_updateMaxX == 5) {
+                ++m_viewBounds[1];
+                m_viewBounds[1] %= ADVMGR_UPDATE_FRAME_CYCLE;
+                ++m_viewBounds[3];
+                m_viewBounds[3] %= ADVMGR_UPDATE_FRAME_CYCLE;
+            } else {
+                ++m_viewBounds[0];
+                m_viewBounds[0] %= ADVMGR_UPDATE_FRAME_CYCLE;
+                ++m_viewBounds[2];
+                m_viewBounds[2] %= ADVMGR_UPDATE_FRAME_CYCLE;
+            }
+        }
+        giLimitUpdMinX = ADVMGR_UPDATE_NONE;
+        Process1WindowsMessage();
+    }
+}
 
 VA(0x0045b2ae, 0x4eb)
-void advManager::CompleteDraw(int, int, int, int) {}
+// @early-stop exact size and all 23 relocation targets. Reloc-masked bytes
+// differ only in twelve commutative X-coordinate additions: operand bytes
+// +0xf9/+0xfc, +0x15c/+0x15f, +0x19e/+0x1a1, +0x210/+0x213,
+// +0x254/+0x257, +0x29d/+0x2a0, +0x2e1/+0x2e4, +0x323/+0x326,
+// +0x368/+0x36b, +0x3a8/+0x3ab, +0x403/+0x406, and +0x463/+0x466
+// exchange the equivalent [ebp-4] drawX and [ebp+8] originX operands.
+void advManager::CompleteDraw(int originX, int originY, int forceDraw, int updateBottomView) {
+    int drawY;
+    int drawX;
+
+    PollSound();
+    if (forceDraw == 0 && bShowIt == 0) {
+        return;
+    }
+
+    giLimitUpdMinX = ADVMGR_UPDATE_NONE;
+    m_previousOriginX = m_mapOriginX;
+    m_previousOriginY = m_mapOriginY;
+    if (gbAllBlack != 0) {
+        m_mapOriginY = 0;
+        m_mapOriginX = m_mapOriginY;
+    }
+
+    gpMouseManager->m_cursorReady = 0;
+    m_comboHeroDrawn = 0;
+    m_forceCompleteDraw = 0;
+
+    for (drawY = 0; drawY < ADVMGR_DRAW_VIEW_CELLS; ++drawY) {
+        for (drawX = 0; drawX < ADVMGR_DRAW_VIEW_CELLS; ++drawX) {
+            DrawCell(originX + drawX, originY + drawY, drawX, drawY, ADVMGR_DRAW_GROUND, forceDraw);
+        }
+    }
+
+    for (drawY = 0; drawY < ADVMGR_DRAW_VIEW_CELLS; ++drawY) {
+        for (drawX = 0; drawX < ADVMGR_DRAW_VIEW_CELLS; ++drawX) {
+            DrawCell(
+                originX + drawX,
+                originY + drawY,
+                drawX,
+                drawY,
+                ADVMGR_DRAW_HERO_SHADOW,
+                forceDraw
+            );
+        }
+    }
+
+    for (drawX = 0; drawX < ADVMGR_DRAW_VIEW_CELLS; ++drawX) {
+        DrawCell(originX + drawX, originY, drawX, 0, ADVMGR_DRAW_OBJECT, forceDraw);
+    }
+
+    for (drawY = 1; drawY < ADVMGR_DRAW_VIEW_CELLS; ++drawY) {
+        PollSound();
+        if (m_cursorDirection > ADVMGR_DRAW_FORWARD_DIRECTION_MAX) {
+            for (drawX = 0; drawX < ADVMGR_DRAW_VIEW_CELLS; ++drawX) {
+                DrawCell(
+                    originX + drawX,
+                    originY + drawY - 1,
+                    drawX,
+                    drawY - 1,
+                    ADVMGR_DRAW_HERO,
+                    forceDraw
+                );
+            }
+            for (drawX = 0; drawX < ADVMGR_DRAW_VIEW_CELLS; ++drawX) {
+                DrawCell(
+                    originX + drawX,
+                    originY + drawY - 1,
+                    drawX,
+                    drawY - 1,
+                    ADVMGR_DRAW_OVERLAY,
+                    forceDraw
+                );
+            }
+        } else {
+            for (drawX = ADVMGR_DRAW_LAST_CELL; drawX >= 0; --drawX) {
+                DrawCell(
+                    originX + drawX,
+                    originY + drawY - 1,
+                    drawX,
+                    drawY - 1,
+                    ADVMGR_DRAW_HERO,
+                    forceDraw
+                );
+            }
+            for (drawX = ADVMGR_DRAW_LAST_CELL; drawX >= 0; --drawX) {
+                DrawCell(
+                    originX + drawX,
+                    originY + drawY - 1,
+                    drawX,
+                    drawY - 1,
+                    ADVMGR_DRAW_OVERLAY,
+                    forceDraw
+                );
+            }
+        }
+
+        for (drawX = 0; drawX < ADVMGR_DRAW_VIEW_CELLS; ++drawX) {
+            DrawCell(originX + drawX, originY + drawY, drawX, drawY, ADVMGR_DRAW_OBJECT, forceDraw);
+        }
+    }
+
+    for (drawX = 0; drawX < ADVMGR_DRAW_VIEW_CELLS; ++drawX) {
+        DrawCell(
+            originX + drawX,
+            originY + ADVMGR_DRAW_LAST_CELL,
+            drawX,
+            ADVMGR_DRAW_LAST_CELL,
+            ADVMGR_DRAW_HERO,
+            forceDraw
+        );
+    }
+    for (drawX = 0; drawX < ADVMGR_DRAW_VIEW_CELLS; ++drawX) {
+        DrawCell(
+            originX + drawX,
+            originY + ADVMGR_DRAW_LAST_CELL,
+            drawX,
+            ADVMGR_DRAW_LAST_CELL,
+            ADVMGR_DRAW_OVERLAY,
+            forceDraw
+        );
+    }
+
+    for (drawY = 0; drawY < ADVMGR_DRAW_VIEW_CELLS; ++drawY) {
+        for (drawX = 0; drawX < ADVMGR_DRAW_VIEW_CELLS; ++drawX) {
+            DrawCell(
+                originX + drawX,
+                originY + drawY,
+                drawX,
+                drawY,
+                ADVMGR_DRAW_OVERLAY_TOP,
+                forceDraw
+            );
+        }
+    }
+    for (drawY = 0; drawY < ADVMGR_DRAW_VIEW_CELLS; ++drawY) {
+        for (drawX = 0; drawX < ADVMGR_DRAW_VIEW_CELLS; ++drawX) {
+            DrawCell(originX + drawX, originY + drawY, drawX, drawY, ADVMGR_DRAW_CLOUD, forceDraw);
+        }
+    }
+
+    DrawAdventureBorder();
+    gpMouseManager->m_cursorReady = 1;
+    PollSound();
+    if (updateBottomView != 0) {
+        UpdBottomView(0, 1, 1);
+    }
+
+    if (gbAllBlack != 0) {
+        m_mapOriginX = m_previousOriginX;
+        m_mapOriginY = m_previousOriginY;
+    }
+}
 
 VA(0x0045b799, 0x3a)
 void advManager::CompleteDraw(int update)
