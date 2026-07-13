@@ -23,17 +23,10 @@ struct MemEntry {
     int line;           // +0x46  caller __LINE__
 };
 #pragma pack(pop)
-#pragma pack(push, 1)
-struct IconEntry {          // one sprite frame header in the icon entry table (13B, indexed by frame)
-    short x;                // +0  x offset
-    short y;                // +2  y offset
-    short w;                // +4  width
-    short h;                // +6  height
-    unsigned char flags;    // +8
-    int srcOffset;          // +9  offset of this frame's RLE data within the icon blob
-};
-#pragma pack(pop)
-
+// Preserve IconEntry's original declaration position in this compiler-sensitive header.
+#define HOMM2_BASE_ICONENTRY_NO_SIZE
+#include <BASE/IconEntry.h>
+#undef HOMM2_BASE_ICONENTRY_NO_SIZE
 #pragma pack(push, 1)
 struct PCXHeader {
     unsigned char manufacturer, version, encoding, bitsPerPixel;

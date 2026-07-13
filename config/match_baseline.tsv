@@ -140,12 +140,12 @@ BASE/EXEC	?RemoveManager@executive@@QAEXPAVbaseManager@@@Z	100.0000	f747d69c18bc
 BASE/EXEC	?ShutDownSystem@executive@@QAEXXZ	100.0000	de8dbe738b06
 BASE/EXEC	?Terminate@executive@@QAEXXZ	100.0000	687bac529063
 BASE/FONT	??0font@@QAE@K@Z	100.0000	67411d2f90da
-BASE/FONT	??1font@@UAE@XZ	100.0000	088279c525b8
+BASE/FONT	??1font@@UAE@XZ	100.0000	b2dff336e84d
 BASE/FONT	??_Efont@@UAEPAXI@Z	0.0000	
-BASE/FONT	?DrawBoundedString@font@@QAEXPADHHHHHH@Z	89.4483	502ca0d59bd6
+BASE/FONT	?DrawBoundedString@font@@QAEXPADHHHHHH@Z	72.3836	db0b3090d31b
 BASE/FONT	?DrawString@font@@QAEXPADHHH@Z	100.0000	9c9349c5622f
-BASE/FONT	?DrawStringExecute@font@@IAEXPADHHHHHHH@Z	98.2609	9857ad77791a
-BASE/FONT	?GetCharacterWidth@font@@QAEHE@Z	86.9310	d7bc07a9749b
+BASE/FONT	?DrawStringExecute@font@@IAEXPADHHHHHHH@Z	100.0000	bb27b6a3fdcd
+BASE/FONT	?GetCharacterWidth@font@@QAEHE@Z	100.0000	646087952c5e
 BASE/FONT	?LineLength@font@@QAEHPADH@Z	100.0000	bc7d795341b8
 BASE/FONT	?LineWidth@font@@QAEHPAD@Z	100.0000	dc722c2ee70e
 BASE/ICON	??0icon@@QAE@K@Z	100.0000	1c578b23ddd6
@@ -184,7 +184,7 @@ BASE/Icond2b	?DimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	65.3621	66d2dc
 BASE/Icondf2b	?FlipDimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	72.1084	d1bb47d01157
 BASE/Iconf2b	?FlipIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	67.0796	857f953ee729
 BASE/Iconm2b	?MonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	81.5359	2c3b0c682a1a
-BASE/Iconmf2b	?FlipMonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	64.7066	5f43e8f1edb3
+BASE/Iconmf2b	?FlipMonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	69.4671	5f43e8f1edb3
 BASE/MOUSEMGR	??0mouseManager@@QAE@XZ	100.0000	124d6deb22fe
 BASE/MOUSEMGR	?CheckUpdateMousePos@mouseManager@@QAEXXZ	100.0000	8a6d837f4cbb
 BASE/MOUSEMGR	?Close@mouseManager@@UAEXXZ	98.8308	ad455fb0cc23
@@ -214,7 +214,7 @@ BASE/Misc	?AiPrint@@YIXPAD@Z	100.0000	f80a0304e1ce
 BASE/Misc	?BaseAlloc@@YIPAXIPADH@Z	95.7297	76b822ca1a5d
 BASE/Misc	?BaseFree@@YIXPAXPADH@Z	94.0482	14f32c73e842
 BASE/Misc	?BitmapToScreen@@YIXPAVbitmap@@@Z	100.0000	ddaa22cc3922
-BASE/Misc	?BlitBitmapToScreen@@YIXPAVbitmap@@HHHHHH@Z	81.4296	eb817732384a
+BASE/Misc	?BlitBitmapToScreen@@YIXPAVbitmap@@HHHHHH@Z	82.5407	eb817732384a
 BASE/Misc	?BlitBitmapToScreenNoMouseCheck@@YIXPAVbitmap@@HHHHHH@Z	100.0000	a77d17bb0be8
 BASE/Misc	?CreatePCXFile@@YIXPADPAEHH1@Z	98.0405	373afdf4ba54
 BASE/Misc	?DataEntryWindowHandler@@YIHAAUtag_message@@@Z	86.7593	ed321183ca8e
@@ -246,7 +246,7 @@ BASE/Misc	?ReadPrefsFromRegistry@@YIXXZ	99.9953	fd5e385d105c
 BASE/Misc	?SGenRand@@YIHXZ	90.6364	6596b97003fb
 BASE/Misc	?SIncRandomize@@YIXHH@Z	54.8125	2b5bf7e2efed
 BASE/Misc	?SRand@@YIXH@Z	100.0000	ff197547fafe
-BASE/Misc	?SRandom@@YIHHH@Z	66.8667	6fea36da0655
+BASE/Misc	?SRandom@@YIHHH@Z	85.1333	6fea36da0655
 BASE/Misc	?SetGameDefaults@@YIXXZ	90.2105	803cfb12ce07
 BASE/Misc	?SetInstallDefaults@@YIXXZ	100.0000	60e0537a4432
 BASE/Misc	?SetPalette@@YIXPACH@Z	100.0000	d5a4568ce548
