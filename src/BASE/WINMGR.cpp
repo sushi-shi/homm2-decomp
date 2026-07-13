@@ -13,6 +13,7 @@
 #include <BASE/heroWindow.h>
 #include <BASE/palette.h>
 #include <BASE/inputManager.h>
+#include <BASE/resourceManager.h>
 #include <stdio.h>
 #include <string.h>
 #include <SOURCE/kbwin.h>
@@ -20,14 +21,101 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <_globals_model.h>
 #include <SOURCE/KB.h>
+#include <SOURCE/NOOPT.h>
 
 
 
 // ---- module-private synthetic globals (retail xref: single-module) ----
 DATA(0x0053496c) static unsigned int gFadeSavedUpdate; // saved update flag across a fade (heroWindowManager::FadeScreen)
 
+// @early-stop
+// /O2 regalloc wall: retail 0x3a3 vs base 0x398; first residual is the 8-color loop's ecx/esi induction-register exchange, followed by relocation-name-only gCyclePal subobject aliases. All six memmove spans, three frame modulo/reflection paths, final 84-byte copy, counters, and UpdatePalette call match.
 VA(0x004ca6d0, 0x3a3)
-void CycleColors(int) {}
+void CycleColors(int forceUpdate)
+{
+    unsigned char savedColor[3];
+    iCycle1Count++;
+    if (gpWindowManager == 0 || gpBufferPalette == 0 || gpWindowManager->m_active != 1)
+        return;
+    if (gpWindowManager->m_updateFlags == 0 && forceUpdate == 0)
+        return;
+
+    if (giCycleType == 0)
+        gbEveryOtherCycle = 1;
+    else
+        gbEveryOtherCycle = 1 - gbEveryOtherCycle;
+
+    if (gbEveryOtherCycle != 0) {
+        if (giCycleType == 2) {
+            iCombatCycleFrame = (iCombatCycleFrame + 1) % 8;
+            int frame = iCombatCycleFrame;
+            if (frame >= 4)
+                frame = 8 - frame;
+            else
+                frame = iCombatCycleFrame;
+            unsigned char cycleIndices[8] = { 0x98, 0x43, 0x59, 0xb5, 0x70, 0xdb, 0x87, 0x10 };
+            for (int i = 0; i < 8; i++) {
+                signed char *src = gpBufferPalette->m_data + (cycleIndices[i] + frame * 3) * 3;
+                memcpy(gCyclePal + i * 3, src, 3);
+            }
+            goto updatePalette;
+        }
+
+        memcpy(savedColor, gCyclePal + 9, 3);
+        memmove(gCyclePal + 3, gCyclePal, 9);
+        memcpy(gCyclePal, savedColor, 3);
+
+        memcpy(savedColor, gCyclePal + 21, 3);
+        memmove(gCyclePal + 15, gCyclePal + 12, 9);
+        memcpy(gCyclePal + 12, savedColor, 3);
+
+        memcpy(savedColor, gCyclePal + 51, 3);
+        memmove(gCyclePal + 51, gCyclePal + 54, 12);
+        memcpy(gCyclePal + 63, savedColor, 3);
+
+        memcpy(savedColor, gCyclePal + 81, 3);
+        memmove(gCyclePal + 75, gCyclePal + 72, 9);
+        memcpy(gCyclePal + 72, savedColor, 3);
+
+        memcpy(savedColor, gCyclePal + 93, 3);
+        memmove(gCyclePal + 87, gCyclePal + 84, 9);
+        memcpy(gCyclePal + 84, savedColor, 3);
+    }
+
+    memcpy(savedColor, gCyclePal + 69, 3);
+    if (giCycleType == 0) {
+        memmove(gCyclePal + 69, gCyclePal + 66, 3);
+        memcpy(gCyclePal + 66, savedColor, 3);
+    } else {
+        signed char *src;
+        if (giCycleType == 1) {
+            iCombatCycleFrame = (iCombatCycleFrame + 1) % 8;
+            int frame = iCombatCycleFrame;
+            if (frame >= 4)
+                frame = 8 - frame;
+            else
+                frame = iCombatCycleFrame;
+            src = gpBufferPalette->m_data + 0x14a + frame * 12;
+        } else {
+            if (giCycleType != 3)
+                goto updatePalette;
+            iCombatCycleFrame = (iCombatCycleFrame + 1) % 6;
+            int frame = iCombatCycleFrame;
+            if (frame >= 3)
+                frame = 6 - frame;
+            src = gpBufferPalette->m_data + 0x144 + frame * 21;
+        }
+        memcpy(gCyclePal + 66, src, 3);
+    }
+
+updatePalette:
+    memcpy(gpBufferPalette->m_data + 0x282, gCyclePal, 84);
+    iCycle2Count++;
+    if (forceUpdate == 0) {
+        iCycle3Count++;
+        UpdatePalette(gpBufferPalette->m_data);
+    }
+}
 
 VA(0x004caa80, 0x41)
 heroWindowManager::heroWindowManager(void) : baseManager()
@@ -41,11 +129,13 @@ heroWindowManager::heroWindowManager(void) : baseManager()
     m_updateFlags = 0;
     m_fizzleSource = 0;
     m_screenshotIndex = 1;
-    field_0x4e = 0;
+    m_fizzleWork = 0;
     field_0x5e = -1;
     m_dialogResult = -1;
 }
 
+// @early-stop
+// /O2 scheduling wall: both spans are 0xd6 and bytes through the framebuffer rep stosd match; only the final 14-instruction manager-field/string-copy block schedules the Open argument in ecx vs eax around the same three stores.
 VA(0x004caad0, 0xd6)
 int heroWindowManager::Open(int param_1)
 {
@@ -98,8 +188,12 @@ int heroWindowManager::Main(struct tag_message &msg)
 {
     int result = 0;
     heroWindow *w = m_windowListTail;
-    while (w != 0 && (result = w->BroadcastMessage(msg), result < 1 || result > 2))
+    while (w != 0) {
+        result = w->BroadcastMessage(msg);
+        if (result >= 1 && result <= 2)
+            break;
         w = w->m_prevWindow;
+    }
     return result;
 }
 
@@ -109,6 +203,8 @@ int heroWindowManager::ConvertToHover(struct tag_message &msg)
     return Main(msg);
 }
 
+// @early-stop
+// /O2 scheduling wall: both spans are 0x35; the sole residual moves the vtable load across the message.field18 store (retail load/store, base store/load), with identical stack fields and slot-2 virtual call.
 VA(0x004cac40, 0x35)
 int heroWindowManager::BroadcastMessage(int type, int p2, int p3, int p4)
 {
@@ -120,6 +216,8 @@ int heroWindowManager::BroadcastMessage(int type, int p2, int p3, int p4)
     return Main(msg);
 }
 
+// @early-stop
+// /O2 regalloc wall: retail 0xbc vs base 0xb3; the nine bytes are two mov ebp,0 encodings vs xor ebp,ebp plus head-insertion load/store scheduling. Open call, list search, and all head/tail/middle links match.
 VA(0x004cac80, 0xbc)
 void heroWindowManager::AddWindow(class heroWindow *w, int param_2, int param_3)
 {
@@ -139,31 +237,31 @@ void heroWindowManager::AddWindow(class heroWindow *w, int param_2, int param_3)
                 break;
             cur = cur->m_prevWindow;
         } while (cur != 0);
-        if (cur != 0) {
-            if (cur->m_nextWindow == 0) {
-                w->m_nextWindow = 0;
-                w->m_prevWindow = m_windowListTail;
-                m_windowListTail->m_nextWindow = w;
-                m_windowListTail = w;
-            } else {
-                w->m_prevWindow = cur;
-                w->m_nextWindow = cur->m_nextWindow;
-                cur->m_nextWindow->m_prevWindow = w;
-                cur->m_nextWindow = w;
-            }
-            goto done;
-        }
     }
-    w->m_prevWindow = 0;
-    w->m_nextWindow = m_windowListHead;
-    m_windowListHead = w;
-    if (m_windowListTail == 0)
+    if (cur == 0) {
+        heroWindow *head = m_windowListHead;
+        w->m_prevWindow = 0;
+        w->m_nextWindow = head;
+        m_windowListHead = w;
+        if (head == 0)
+            m_windowListTail = w;
+    } else if (cur->m_nextWindow == 0) {
+        w->m_nextWindow = 0;
+        w->m_prevWindow = m_windowListTail;
+        m_windowListTail->m_nextWindow = w;
         m_windowListTail = w;
-done:
+    } else {
+        w->m_prevWindow = cur;
+        w->m_nextWindow = cur->m_nextWindow;
+        cur->m_nextWindow->m_prevWindow = w;
+        cur->m_nextWindow = w;
+    }
     m_activeWindow = m_focusWindow;
     m_focusWindow = w;
 }
 
+// @early-stop
+// /O2 scheduling wall: retail 0x87 vs base 0x89; only cmp [this+tail],window vs mov ecx,[this+tail];cmp ecx,window differs (+2 bytes). Close call and every link/focus store match.
 VA(0x004cad40, 0x87)
 void heroWindowManager::RemoveWindow(class heroWindow *w)
 {
@@ -182,7 +280,8 @@ void heroWindowManager::RemoveWindow(class heroWindow *w)
                 m_windowListTail = prev;
                 prev->m_nextWindow = 0;
             } else {
-                prev->m_nextWindow = w->m_nextWindow;
+                if (prev != 0)
+                    prev->m_nextWindow = w->m_nextWindow;
             }
             if (w->m_nextWindow != 0)
                 w->m_nextWindow->m_prevWindow = w->m_prevWindow;
@@ -197,8 +296,78 @@ void heroWindowManager::RemoveWindow(class heroWindow *w)
     }
 }
 
+// @early-stop
+// /O2 scheduling + synthetic-reloc wall: both spans are 0x1cf; residual code is one message.field8 load moved across mov ebp,1. The two gFadeSavedUpdate relocs name the same DATA(0x0053496c) address; all dialog calls/control flow match.
 VA(0x004cadd0, 0x1cf)
-// int heroWindowManager::DoDialog(class heroWindow *, int (*)(struct tag_message &), int);
+int heroWindowManager::DoDialog(class heroWindow *window, int (*handler)(struct tag_message &),
+                                int fade)
+{
+    tag_message message;
+    int done;
+    int result;
+
+    gbInDialog = 1;
+    if (iDialogNestCount == 0)
+        SetNoDialogMenus(0);
+    iDialogNestCount++;
+    field_0x5e = -1;
+    if (window != 0)
+        AddWindow(window, -1, 1);
+    if (fade != 0) {
+        palette *dialogPalette = gPalette;
+        heroWindowManager *manager = gpWindowManager;
+        if (dialogPalette != 0)
+            SetPalette(dialogPalette->m_data, 0);
+        int fadeType = 0;
+        switch (fadeType) {
+        case 0: {
+            unsigned int savedUpdate = manager->m_updateFlags;
+            manager->m_updateFlags = 0;
+            PollSound();
+            FadeIn(8);
+            manager->m_updateFlags = gFadeSavedUpdate | savedUpdate;
+            break;
+        }
+        case 1:
+            gFadeSavedUpdate = manager->m_updateFlags;
+            manager->m_updateFlags = 0;
+            PollSound();
+            FadeOut(8);
+            break;
+        default:
+            break;
+        }
+        PollSound();
+    }
+    gpInputManager->Flush();
+    done = 0;
+    m_dialogResult = -1;
+    do {
+        PollSound();
+        Process1WindowsMessage();
+        message = gpInputManager->GetEvent();
+        gpMouseManager->Main(message);
+        if (window != 0 && (message.type != 4 || gbSendMouseMoveMessages != 0)) {
+            result = window->BroadcastMessage(message);
+            if (result == 2 && message.type == 0x200 && message.field4 == 10) {
+                int dialogResult = message.field8;
+                done = 1;
+                m_dialogResult = dialogResult;
+            }
+        }
+        result = handler(message);
+        if (result == 2 && message.type == 0x200 && message.field4 == 10)
+            done = 1;
+    } while (done == 0);
+    if (window != 0)
+        RemoveWindow(window);
+    gpInputManager->Flush();
+    gbInDialog = 0;
+    iDialogNestCount--;
+    if (iDialogNestCount == 0)
+        SetNoDialogMenus(1);
+    return 0;
+}
 
 VA(0x004cafa0, 0x17)
 void heroWindowManager::UpdateScreen(void)
@@ -230,21 +399,26 @@ void heroWindowManager::FadeScreen(int param_1, int param_2, class palette *pal)
 {
     if (pal != 0)
         SetPalette(pal->m_data, 0);
-    if (param_1 != 0) {
-        if (param_1 == 1) {
-            gFadeSavedUpdate = m_updateFlags;
-            m_updateFlags = 0;
-            PollSound();
-            FadeOut(param_2);
-            PollSound();
-        } else {
-            unsigned int saved = m_updateFlags;
-            m_updateFlags = 0;
-            PollSound();
-            FadeIn(param_2);
-            m_updateFlags = gFadeSavedUpdate | saved;
-            PollSound();
-        }
+    switch (param_1) {
+    case 0: {
+        unsigned int saved = m_updateFlags;
+        m_updateFlags = 0;
+        PollSound();
+        FadeIn(param_2);
+        m_updateFlags = gFadeSavedUpdate | saved;
+        PollSound();
+        break;
+    }
+    case 1:
+        gFadeSavedUpdate = m_updateFlags;
+        m_updateFlags = 0;
+        PollSound();
+        FadeOut(param_2);
+        PollSound();
+        break;
+    default:
+        PollSound();
+        break;
     }
 }
 
@@ -259,14 +433,128 @@ void heroWindowManager::ScreenShot(void)
     gpInputManager->Flush();
 }
 
+// @early-stop
+// /O2 regalloc wall: retail 0xc0 vs base 0xc6; clipping and allocation/call sequence match, while this/height color as ebp/ebx in retail vs ebx/ebp in base, perturbing six bytes of encodings and push scheduling.
 VA(0x004cb110, 0xc0)
-// void heroWindowManager::SaveFizzleSource(int, int, int, int);
+void heroWindowManager::SaveFizzleSource(int x, int y, int width, int height)
+{
+    if (bShowIt != 0) {
+        int originalX = x;
+        if (x < 0) {
+            x = 0;
+            width += originalX;
+        }
+        if (y < 0) {
+            height += y;
+            y = 0;
+        }
+        if (x + width > 640)
+            width = 640 - x;
+        if (y + height > 480)
+            height = 480 - y;
+        if (width > 0 && height > 0) {
+            if (m_fizzleSource != 0)
+                delete m_fizzleSource;
+            m_fizzleSource = new bitmap(0, static_cast<short>(width), static_cast<short>(height));
+            BlitBitmap(gpWindowManager->m_screen, x, y, width, height, m_fizzleSource, 0, 0);
+        }
+    }
+}
 
 VA(0x004cb1d0, 0x1)
 void CreateFizzleTables(void) {}
 
+// @early-stop
+// /O2 regalloc wall: retail 0x402 vs base 0x41e; complete clipping, 8-frame resource/read/pixel/palette loops, delays, blits, deletes, and frees match. Residuals are stack/register coloring plus equivalent SIB/order in the 16-bit color-table index loop; no calls or stores are missing.
 VA(0x004cb1e0, 0x402)
-void heroWindowManager::FizzleForward(int, int, int, int, int, signed char *, signed char *) {}
+void heroWindowManager::FizzleForward(int x, int y, int width, int height, int delay,
+                                      signed char *startPalette, signed char *endPalette)
+{
+    if (bShowIt != 0) {
+        int originalX = x;
+        int originalY = y;
+        gbEnlargeScreenBlit = 0;
+        int tick = 0;
+        if (x < 0) {
+            x = 0;
+            width += originalX;
+        }
+        if (y < 0) {
+            y = 0;
+            height += originalY;
+        }
+        if (x + width > 640)
+            width = 640 - x;
+        if (y + height > 480)
+            height = 480 - y;
+        if (width > 0 && height > 0) {
+            unsigned int savedUpdate = m_updateFlags;
+            m_updateFlags = 0;
+            if (delay == -1)
+                delay = 150;
+            signed char *fadePalette = static_cast<signed char *>(BaseAlloc(0x300, __FILE__, 808));
+            m_fizzleWork = new bitmap(0, static_cast<short>(width), static_cast<short>(height));
+            signed char *cycleTable = static_cast<signed char *>(BaseAlloc(0x10000, __FILE__, 810));
+            BlitBitmap(m_screen, x, y, width, height, m_fizzleWork, 0, 0);
+
+            for (int frame = 0; frame < 8; frame++) {
+                sprintf(gText, "CCYCLE%02d.BIN", frame);
+                unsigned long id = gpResourceManager->MakeId(gText, 1);
+                gpResourceManager->PointToFile(id);
+                gpResourceManager->ReadBlock(cycleTable, 0x10000);
+                int sourceY = y;
+                if (sourceY < y + height) {
+                    int screenOffset = y * 640;
+                    int workOffset = 0;
+                    do {
+                        signed char *savedPixel = reinterpret_cast<signed char *>(m_fizzleSource->m_pixels) +
+                            m_fizzleSource->m_width * (sourceY - y);
+                        signed char *screenPixel = reinterpret_cast<signed char *>(m_screen->m_pixels) +
+                            x + screenOffset;
+                        signed char *workPixel = reinterpret_cast<signed char *>(m_fizzleWork->m_pixels) + workOffset;
+                        int remaining = width;
+                        if (x < x + width) {
+                            do {
+                                unsigned short lookup = static_cast<unsigned char>(*savedPixel++);
+                                lookup <<= 8;
+                                lookup |= static_cast<unsigned char>(*workPixel++);
+                                *screenPixel++ = cycleTable[lookup];
+                                remaining--;
+                            } while (remaining != 0);
+                        }
+                        screenOffset += 640;
+                        workOffset += width;
+                        sourceY++;
+                    } while (sourceY < y + height);
+                }
+                PollSound();
+                DelayTilMilli(delay + tick);
+                tick = KBTickCount();
+                BlitBitmapToScreen(m_screen, x, y, width, height, x, y);
+                if (startPalette != 0) {
+                    memcpy(fadePalette, startPalette, 0x300);
+                    for (int i = 0; i < 0x300; i++)
+                        fadePalette[i] += (endPalette[i] - startPalette[i]) * (frame + 1) / 8;
+                    UpdatePalette(fadePalette);
+                }
+                PollSound();
+            }
+            DelayTilMilli(delay + tick);
+            BlitBitmap(m_fizzleWork, 0, 0, width, height, m_screen, x, y);
+            BlitBitmapToScreen(m_screen, x, y, width, height, x, y);
+            gbEnlargeScreenBlit = 1;
+            m_updateFlags = savedUpdate;
+            if (m_fizzleSource != 0)
+                delete m_fizzleSource;
+            m_fizzleSource = 0;
+            if (m_fizzleWork != 0)
+                delete m_fizzleWork;
+            m_fizzleWork = 0;
+            BaseFree(cycleTable, __FILE__, 897);
+            BaseFree(fadePalette, __FILE__, 898);
+        }
+    }
+}
 
 VA(0x004cb5f0, 0x19)
 void heroWindowManager::ReleaseFizzleSource(void)
