@@ -7,6 +7,14 @@
 // forward declarations:
 class hero;
 
+typedef enum TownType {
+    TOWN_TYPE_SORCERESS = 2
+} TownType;
+
+typedef enum TownBuilding {
+    TOWN_BUILDING_RAINBOW = 0x2000
+} TownBuilding;
+
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class town {
 public:

@@ -18,6 +18,7 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/REMOTE.h>
 #include <io.h>
+#include <math.h>
 #include <string.h>
 #include <stdio.h>
 #include <SOURCE/game.h>
@@ -4124,8 +4125,59 @@ monsterBoundsReady:
     }
 }
 
+// @early-stop
+// Logic and frame slots are byte-exact. The only residual is the TU-cumulative /Od
+// polarity/load order of cutoff <= visibility: retail emits cmp cutoff,visibility; jg,
+// while this partial TU emits the relationally equivalent cmp visibility,cutoff; jl.
+// Relational swaps, negation, an empty else arm, |0 steering, and the fixed AST permuter
+// do not alter it; the other loop/index order differences disappeared as header state landed.
 VA(0x00480b64, 0x230)
-void game::SetVisibility(int, int, int, int) {}
+void game::SetVisibility(int x, int y, int player, int radius)
+{
+    int col;
+    int cutoff;
+    int row;
+    unsigned char mask = static_cast<unsigned char>(1 << player);
+    int visibility;
+
+    if (!gbHumanPlayer[player]) {
+        if (giCurTurn > VISIBILITY_MIDDLE_TURN_LAST) {
+            radius += VISIBILITY_LATE_AI_BONUS;
+        } else {
+            if (giCurTurn > VISIBILITY_EARLY_TURN_LAST)
+                radius += VISIBILITY_MIDDLE_AI_BONUS;
+            else
+                radius += VISIBILITY_EARLY_AI_BONUS;
+        }
+    }
+
+    if (radius >= VISIBILITY_SMALL_RADIUS_LIMIT)
+        cutoff = VISIBILITY_LARGE_RADIUS_THRESHOLD;
+    else
+        cutoff = VISIBILITY_SMALL_RADIUS_THRESHOLD;
+
+    if (radius >= VISIBILITY_RADIAL_RADIUS_LIMIT) {
+        for (row = 0; row < MAP_HEIGHT; row++) {
+            for (col = 0; col < MAP_WIDTH; col++) {
+                int distance = static_cast<int>(sqrt(static_cast<double>(
+                    (x - col) * (x - col) + (y - row) * (y - row))));
+                if (distance < radius) {
+                    mapExtra[(MAP_WIDTH | 0) * row + col] |= mask;
+                }
+            }
+        }
+    } else {
+        for (row = y - radius; row <= y + radius; row++) {
+            for (col = x - radius; col <= x + radius; col++) {
+                visibility = radius - abs(y - row) + radius - abs(x - col);
+                if (visibility >= cutoff && col >= 0 && row >= 0 &&
+                    col < MAP_WIDTH && row < MAP_HEIGHT) {
+                    mapExtra[(MAP_WIDTH | 0) * row + col] |= mask;
+                }
+            }
+        }
+    }
+}
 
 // @early-stop
 // Logic + frame slots byte-exact; residual is 3 commutative operand-load swaps (the
@@ -4200,7 +4252,38 @@ int game::ExperienceValueOfStack(armyGroup *group, hero *h)
 }
 
 VA(0x00480ff9, 0x126)
-int game::GetLuck(class hero *, class army *, class town *) { return 0; }
+int game::GetLuck(hero *h, army *, town *castle)
+{
+    int luck;
+    if (h == 0)
+        return LUCK_NEUTRAL;
+    luck = LUCK_NEUTRAL;
+    if (h->HasArtifact(ARTIFACT_RABBIT_FOOT))
+        luck++;
+    if (h->HasArtifact(ARTIFACT_GOLDEN_HORSESHOE))
+        luck++;
+    if (h->HasArtifact(ARTIFACT_GAMBLERS_LUCKY_COIN))
+        luck++;
+    if (h->HasArtifact(ARTIFACT_FOUR_LEAF_CLOVER))
+        luck++;
+    if (h->HasArtifact(ARTIFACT_MASTHEAD) &&
+        (h->m_eventFlags & HERO_EVENT_EMBARKED)) {
+        luck++;
+    }
+    luck += h->m_luck;
+    luck += h->m_secondarySkills[HERO_SKILL_LUCK];
+    if (luck < LUCK_MINIMUM)
+        luck = LUCK_MINIMUM;
+    if (luck > LUCK_MAXIMUM)
+        luck = LUCK_MAXIMUM;
+    if (h->HasArtifact(ARTIFACT_BATTLE_GARB))
+        luck = LUCK_MAXIMUM;
+    if (castle != 0 && castle->m_type == TOWN_TYPE_SORCERESS &&
+        (castle->m_buildings & TOWN_BUILDING_RAINBOW)) {
+        luck += LUCK_RAINBOW_BONUS;
+    }
+    return luck;
+}
 
 // @early-stop
 // Logic + frame slots byte-exact (col/row/mask + nested x/y land on retail's -0x4..-0x14
@@ -4273,7 +4356,27 @@ void game::ShowHeroesLogo(void)
 }
 
 VA(0x004813fe, 0x143)
-void game::WaitForPlayer(char *, int) {}
+void game::WaitForPlayer(char *text, int player)
+{
+    if (gbBlackoutPlayer && giNumHumanPlayers > 1 && !gbRemoteOn) {
+        gpMouseManager->SetPointer(0);
+        gbAllBlack = 1;
+        giBottomViewOverrideEndTime = KBTickCount() + WAIT_BOTTOM_VIEW_TIMEOUT;
+        giBottomViewOverride = gbThisNetHumanPlayer[giCurPlayer] != 0;
+        gpSoundManager->m_samplesReady = 1;
+        gpSoundManager->SwitchAmbientMusic(WAIT_AMBIENT_MUSIC);
+        gpAdvManager->CompleteDraw(1);
+        gpAdvManager->UpdateHeroLocators(1, 1);
+        gpAdvManager->UpdateTownLocators(1, 1);
+        gpAdvManager->UpdateScreen(0, 1);
+        ShowHeroesLogo();
+        gbAllBlack = 0;
+        NormalDialog(text, 1, -1, -1, WAIT_DIALOG_TYPE,
+                     static_cast<signed char>(gpGame->m_players[player].color),
+                     -1, 0, -1, 0);
+        gpSoundManager->SwitchAmbientMusic(-1);
+    }
+}
 
 // @early-stop
 // Computation byte-exact; residual is 2 inline-accessor jmp$+0 brackets the /Ob1
@@ -4295,11 +4398,42 @@ int game::HasLateOverlay(int col, int row)
     return 0;
 }
 
+// @early-stop
+// Instruction stream, frame slots, and traversal are byte-exact after excluding two
+// five-byte Extra() inline continuation jumps. Both jumps exist on each side, but C2
+// places ours trailing and retail's leading; there are no relocations in either function.
 VA(0x00481645, 0x120)
-void game::ConvertFlagToLateOverlay(int, int) {}
+void game::ConvertFlagToLateOverlay(int col, int row)
+{
+    mapCell *cell = WORLDMAP->Row(row) + col;
+    if (cell->ovlTileset == MAP_TILESET_FLAG)
+        cell->ovlFlag1 = 1;
+    mapCellExtra *extra = cell->extra ? WORLDMAP->Extra(cell->extra) : 0;
+    while (extra) {
+        if (extra->ovlTileset == MAP_TILESET_FLAG)
+            extra->ovlFlag1 = 1;
+        extra = extra->index ? WORLDMAP->Extra(extra->index) : 0;
+    }
+}
 
+// @early-stop
+// Instruction stream, frame slots, and traversal are byte-exact after excluding two
+// five-byte Extra() inline continuation jumps. Both jumps exist on each side, but C2
+// places ours trailing and retail's leading; there are no relocations in either function.
 VA(0x00481765, 0x13b)
-int game::HasObjectTilesetIndex(int, int, int, int) { return 0; }
+int game::HasObjectTilesetIndex(int col, int row, int tileset, int index)
+{
+    mapCell *cell = WORLDMAP->Row(row) + col;
+    if (cell->objTileset == tileset && cell->objIndex == index)
+        return 1;
+    mapCellExtra *extra = cell->extra ? WORLDMAP->Extra(cell->extra) : 0;
+    while (extra) {
+        if (extra->objTileset == tileset && extra->objIndex == index)
+            return 1;
+        extra = extra->index ? WORLDMAP->Extra(extra->index) : 0;
+    }
+    return 0;
+}
 
 // @early-stop
 // Twin of HasLateOverlay: computation byte-exact; only the 2 inline-accessor jmp$+0
@@ -4319,8 +4453,59 @@ void game::ConvertAllToLateOverlay(int col, int row)
     }
 }
 
+// @early-stop
+// Logic is complete. The residual is one coupled TU-cumulative /Od lowering choice:
+// retail evaluates the packed w4hi lvalue first and reserves two hidden temporary words;
+// this partial TU evaluates townId first and omits them. The same parity flips the three
+// inner MAP_WIDTH comparisons. Direct packed-word spellings, |0 steering, relational
+// swaps, and the fixed AST permuter did not reproduce the retail field-first lowering;
+// anonymous source padding would conceal rather than reconstruct this compiler state.
 VA(0x004819b2, 0x295)
-void game::ProcessMapExtra(void) {}
+void game::ProcessMapExtra(void)
+{
+    int row;
+    int col;
+    int townId;
+    mapCell *cell;
+
+    for (row = 0; row < MAP_HEIGHT; row++) {
+        for (col = 0; MAP_WIDTH > col; col++) {
+            cell = WORLDMAP->Row(row) + col;
+            switch (cell->triggerType) {
+            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_CASTLE:
+            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_RANDOM_TOWN:
+            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_RANDOM_CASTLE:
+                townId = GetTownId(col, row);
+                m_castleRecs[townId].m_extraIndex = cell->w4hi;
+                cell->w4hi = townId;
+                break;
+            }
+        }
+    }
+
+    for (row = 0; row < MAP_HEIGHT; row++) {
+        for (col = 0; MAP_WIDTH > col; col++) {
+            cell = WORLDMAP->Row(row) + col;
+            if (cell->triggerType == (MAP_EVENT_ACTION_FLAG | MAP_EVENT_MINE) &&
+                row > 0 && HasLateOverlay(col, row - 1)) {
+                ConvertFlagToLateOverlay(col, row);
+            }
+            if (cell->triggerType == (MAP_EVENT_ACTION_FLAG | MAP_EVENT_ALCHEMIST_LAB)) {
+                if (row > 0)
+                    ConvertFlagToLateOverlay(col, row - 1);
+                if (row > 1)
+                    ConvertFlagToLateOverlay(col, row - 2);
+            }
+        }
+    }
+
+    for (row = 0; row < MAP_HEIGHT; row++) {
+        for (col = 0; MAP_WIDTH > col; col++) {
+            if (HasLateOverlay(col, row))
+                ConvertAllToLateOverlay(col, row);
+        }
+    }
+}
 
 // @early-stop
 // reloc-masked: identical frame/instruction stream and all 39 relocation sites align.
