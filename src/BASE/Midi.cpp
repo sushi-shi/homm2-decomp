@@ -18,18 +18,18 @@ void soundManager::MIDIStartup(void)
 {
     int i;
     LogStr("MIDIStartup");
-    if (gbNoSound == 0 && (field_0x6a6 = 1, gbDontTryMIDI == 0)) {
+    if (gbNoSound == 0 && (m_midiStarted = 1, gbDontTryMIDI == 0)) {
         LogStr("Clearing MIDI slots");
         for (i = 0; i < 60; i++)
             pMIDIWrap[i] = 0;
         for (i = 0; i < 60; i++)
             hSequence[i] = 0;
-        field_0x69e = 1;
+        m_midiReady = 1;
         LogStr("Opening MIDI output");
         i = _AIL_midiOutOpen_12(&hMDI, 0, 0xffffffff);
         LogInt("midiOutOpen = %d", i, -999, -999, -999, -999, -999, -999);
         if (i != 0)
-            field_0x69e = 0;
+            m_midiReady = 0;
     }
 }
 
@@ -37,9 +37,9 @@ VA(0x004d3910, 0x1a9)
 void soundManager::MIDIShutdown(void)
 {
     int i;
-    if (gbNoSound == 0 && field_0x69e != 0) {
-        if (field_0x69e != 0 && CurrentMidiFile != -1) {
-            if (gMidiEnabled != 0 && field_0x69e != 0 && CurrentMidiFile != -1 &&
+    if (gbNoSound == 0 && m_midiReady != 0) {
+        if (m_midiReady != 0 && CurrentMidiFile != -1) {
+            if (gMidiEnabled != 0 && m_midiReady != 0 && CurrentMidiFile != -1 &&
                 hSequence[CurrentMidiFile] != 0 &&
                 _AIL_sequence_status_4(hSequence[CurrentMidiFile]) == 4 &&
                 hSequence[CurrentMidiFile] != 0 &&
@@ -64,7 +64,7 @@ void soundManager::MIDIShutdown(void)
         LogStr("Closing MIDI output");
         _AIL_midiOutClose_4(hMDI);
         hMDI = 0;
-        field_0x69e = 0;
+        m_midiReady = 0;
         for (i = 0; i < 60; i++) {
             if (pMIDIWrap[i] != 0)
                 gpResourceManager->Dispose(pMIDIWrap[i]);
@@ -78,13 +78,13 @@ VA(0x004d3ac0, 0x3ab)
 void soundManager::MIDIPlay(int param_1)
 {
     char local_10[16];
-    if (gbNoSound == 0 && field_0x69e != 0 && gMidiEnabled != 0) {
+    if (gbNoSound == 0 && m_midiReady != 0 && gMidiEnabled != 0) {
         LogStr("MIDIPlay");
         if (bGotMidi[param_1] == 0)
             param_1 = -1;
         if (param_1 == -1) {
-        if (field_0x69e != 0 && CurrentMidiFile != -1) {
-            if (gMidiEnabled != 0 && field_0x69e != 0 && CurrentMidiFile != -1 &&
+        if (m_midiReady != 0 && CurrentMidiFile != -1) {
+            if (gMidiEnabled != 0 && m_midiReady != 0 && CurrentMidiFile != -1 &&
                 hSequence[CurrentMidiFile] != 0 &&
                 _AIL_sequence_status_4(hSequence[CurrentMidiFile]) == 4 &&
                 hSequence[CurrentMidiFile] != 0 &&
@@ -103,8 +103,8 @@ void soundManager::MIDIPlay(int param_1)
             return;
         }
         if (param_1 != CurrentMidiFile) {
-        if (field_0x69e != 0 && CurrentMidiFile != -1) {
-            if (gMidiEnabled != 0 && field_0x69e != 0 && CurrentMidiFile != -1 &&
+        if (m_midiReady != 0 && CurrentMidiFile != -1) {
+            if (gMidiEnabled != 0 && m_midiReady != 0 && CurrentMidiFile != -1 &&
                 hSequence[CurrentMidiFile] != 0 &&
                 _AIL_sequence_status_4(hSequence[CurrentMidiFile]) == 4 &&
                 hSequence[CurrentMidiFile] != 0 &&
@@ -129,7 +129,7 @@ void soundManager::MIDIPlay(int param_1)
                 pMIDIWrap[param_1] = w;
                 _AIL_init_sequence_12(hSequence[param_1], w->m_data, 0);
             }
-            if (gbNoSound == 0 && field_0x69e != 0) {
+            if (gbNoSound == 0 && m_midiReady != 0) {
                 int iVar4 = 0x7f;
                 int iVar1 = m_fadeSteps;
                 if (iVar1 > 0) {
@@ -160,8 +160,8 @@ void soundManager::MIDIPlay(int param_1)
 VA(0x004d3e70, 0x108)
 void soundManager::MIDIStop(void)
 {
-    if (gbNoSound == 0 && field_0x69e != 0 && CurrentMidiFile != -1) {
-        if (gMidiEnabled != 0 && field_0x69e != 0 && CurrentMidiFile != -1 &&
+    if (gbNoSound == 0 && m_midiReady != 0 && CurrentMidiFile != -1) {
+        if (gMidiEnabled != 0 && m_midiReady != 0 && CurrentMidiFile != -1 &&
             hSequence[CurrentMidiFile] != 0 &&
             _AIL_sequence_status_4(hSequence[CurrentMidiFile]) == 4 &&
             hSequence[CurrentMidiFile] != 0 &&
@@ -182,7 +182,7 @@ void soundManager::MIDIStop(void)
 VA(0x004d3f80, 0x46)
 int soundManager::MIDIIsPlaying(void)
 {
-    if (gbNoSound == 0 && gMidiEnabled != 0 && field_0x69e != 0 &&
+    if (gbNoSound == 0 && gMidiEnabled != 0 && m_midiReady != 0 &&
         CurrentMidiFile != -1 && hSequence[CurrentMidiFile] != 0) {
         return _AIL_sequence_status_4(hSequence[CurrentMidiFile]) == 4;
     }
@@ -192,7 +192,7 @@ int soundManager::MIDIIsPlaying(void)
 VA(0x004d3fd0, 0x68)
 void soundManager::MIDISetVolume(void)
 {
-    if (gbNoSound == 0 && field_0x69e != 0) {
+    if (gbNoSound == 0 && m_midiReady != 0) {
         int iVar1 = 0x7f;
         int iVar2 = m_fadeSteps;
         if (iVar2 > 0) {

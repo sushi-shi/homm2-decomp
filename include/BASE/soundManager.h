@@ -54,9 +54,9 @@ public:
     int    m_cdPlayFrame;  // +0x694
     short  m_auxDevice;  // +0x698
     int    m_cdReady;  // +0x69a
-    int    field_0x69e;  // +0x69e
+    int    m_midiReady;  // +0x69e
     int    m_cdStarted;  // +0x6a2
-    int    field_0x6a6;  // +0x6a6
+    int    m_midiStarted;  // +0x6a6
     int    m_pollTimer;  // +0x6aa
     // --- constructors ---
     soundManager(void);

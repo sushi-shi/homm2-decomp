@@ -14,6 +14,7 @@ class town;
 class heroWindow;
 class icon;
 class iconWidget;
+class textWidget;
 class tileset;
 struct SAMPLE2;
 struct SMapChange;
@@ -31,8 +32,23 @@ public:
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
     int    m_selectedCell;  // +0x36
-    int    m_heroLocatorState[12];  // +0x3a
-    int    m_townLocatorState[12];  // +0x6a
+    union {
+        int m_heroLocatorState[12];  // +0x3a
+        struct {
+            class iconWidget *m_bottomViewBackground;  // +0x3a
+            class iconWidget *m_bottomViewHourglassBackground;  // +0x3e
+            class iconWidget *m_bottomViewIcons[5];  // +0x42
+            char m_bottomViewIconPadding[0x14];  // +0x56
+        };
+    };
+    union {
+        int m_townLocatorState[12];  // +0x6a
+        struct {
+            int m_bottomViewTextReserved;  // +0x6a
+            class textWidget *m_bottomViewTexts[5];  // +0x6e
+            char m_bottomViewTextPadding[0x18];  // +0x82
+        };
+    };
     class heroWindow *m_adventureWindow;  // +0x9a
     unsigned char *m_visibilityMap;  // +0x9e, packed 16-bit cell values
     int    m_visibilityMapValid;  // +0xa2
@@ -260,6 +276,7 @@ extern int TrigX;
 extern int TrigY;
 extern int iCurBottomView;
 extern int iCurBottomViewEnemy;
+extern int iCurHourGlassPhase;
 extern int iLastHourGlassPhase;
 extern int gbForceUpdate;
 extern int giCheatSeq;

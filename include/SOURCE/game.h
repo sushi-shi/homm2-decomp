@@ -234,7 +234,7 @@ public:
     signed char m_mineOwners[144];  // 0x60a6
     char m_randomArtifacts[0x67];  // 0x6136
     boatRecord m_boats[48];        // 0x619d
-    char m_pad_0x631d[0x30];
+    signed char m_boatSlots[48];   // 0x631d, active boat record indices
     signed char m_obeliskVisitors[48];  // 0x634d
     char m_defaultPlayerNames[24];  // +0x637d
     signed char m_ultimateArtifactX;  // +0x6395

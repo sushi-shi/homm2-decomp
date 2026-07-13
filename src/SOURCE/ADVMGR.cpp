@@ -7,6 +7,7 @@
 #include <_carcass_types.h>
 #include <_globals_model.h>
 #include <BASE/icon.h>
+#include <BASE/font.h>
 #include <BASE/bitmap.h>
 #include <BASE/BITS.h>
 #include <BASE/iconWidget.h>
@@ -50,6 +51,7 @@
 #define ADVMGR_SOURCE_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\ADVMGR.CPP"
 #define ADVMGR_QUICK_VIEW_LINE (*reinterpret_cast<const short *>("\x76\x21"))
 #define ADVMGR_TOWN_VIEW_LINE (*reinterpret_cast<const short *>("\x5f\x5e"))
+#define ADVMGR_BOTTOM_HERO_LINE (*reinterpret_cast<const short *>("\x5f\x21"))
 
 DATA(0x00527eb8) static unsigned short s_drawGroundTile;
 DATA(0x00527ec0) static int s_drawPixelY;
@@ -1416,7 +1418,252 @@ search_end:
 }
 
 VA(0x0045a644, 0xa50)
-int advManager::ProcessHover(int, int) { return 0; }
+// @early-stop reloc-masked bytes differ only at +0xc5, +0x2d8, +0x9df, and
+// +0x9fb: four displacement bytes selecting equivalent local return
+// trampolines. All 106 relocation sites and external targets agree.
+int advManager::ProcessHover(int mouseX, int mouseY) {
+    int heroXHero;
+    int heroYCoordinate;
+    int cellXPosition;
+    int cellYCurrent;
+    town* hoverTownCell;
+    mapCell* hoverCellLocal;
+    int routeDaysCount;
+    hero* hoverHeroLocal;
+    int pointerBaseCursor;
+
+    if (InMapArea(mouseX, mouseY)) {
+        if (mouseX > ADVMGR_DRAW_CLIP_WIDTH) {
+            gpMouseManager->SetPointer(ADVMGR_POINTER_DEFAULT);
+            return 1;
+        }
+
+        cellXPosition = mouseX / ADVMGR_CELL_PIXELS;
+        cellYCurrent = mouseY / ADVMGR_CELL_PIXELS;
+        if (cellXPosition < 0) {
+            cellXPosition = 0;
+        }
+        if (cellYCurrent < 0) {
+            cellYCurrent = 0;
+        }
+        if (cellXPosition > ADVMGR_HOVER_MAX_CELL) {
+            cellXPosition = ADVMGR_HOVER_MAX_CELL;
+        }
+        if (cellYCurrent > ADVMGR_HOVER_MAX_CELL) {
+            cellYCurrent = ADVMGR_HOVER_MAX_CELL;
+        }
+
+        if (m_lastHoverCell != cellXPosition || m_hoverCellY != cellYCurrent) {
+
+            m_selectedCell = ADVMGR_COMMAND_NONE;
+            m_lastHoverCell = cellXPosition;
+            m_hoverCellY = cellYCurrent;
+            m_commandTargetX = m_mapOriginX + cellXPosition;
+            m_commandTargetY = m_mapOriginY + cellYCurrent;
+
+            if (m_commandTargetX < 0 || m_commandTargetY < 0 || m_commandTargetX > MAP_WIDTH - 1
+                || m_commandTargetY > MAP_HEIGHT - 1
+                || !(giCurPlayerBit & mapExtra[m_commandTargetY * MAP_WIDTH + m_commandTargetX])) {
+                gpMouseManager->SetPointer(ADVMGR_POINTER_DEFAULT);
+                return 1;
+            }
+
+            hoverCellLocal = GetCell(m_commandTargetX, m_commandTargetY);
+            if (gpCurPlayer->m_currentHero == ADVMGR_INVALID_HERO) {
+                if ((hoverCellLocal->triggerType & ADVMGR_TRIGGER_TYPE_MASK) == ADVMGR_HOVER_TOWN
+                    && gpGame->GetTown(hoverCellLocal->w4hi)->m_owner == giCurPlayer) {
+                    gpMouseManager->SetPointer(ADVMGR_POINTER_TOWN);
+                    m_selectedCell = ADVMGR_COMMAND_TOWN_VIEW;
+                    return 1;
+                } else {
+                    if ((hoverCellLocal->triggerType & ADVMGR_TRIGGER_TYPE_MASK)
+                            == ADVMGR_HOVER_HERO
+                        && gpGame->GetHero(hoverCellLocal->w4hi)->m_owner == giCurPlayer) {
+                        gpMouseManager->SetPointer(ADVMGR_POINTER_HERO);
+                        m_selectedCell = ADVMGR_COMMAND_HERO_VIEW;
+                        return 1;
+                    } else {
+                        gpMouseManager->SetPointer(ADVMGR_POINTER_DEFAULT);
+                        return 1;
+                    }
+                }
+            } else {
+                hoverHeroLocal = gpGame->GetHero(gpCurPlayer->m_currentHero);
+                heroXHero = hoverHeroLocal->m_x - m_mapOriginX;
+                heroYCoordinate = hoverHeroLocal->m_y - m_mapOriginY;
+                if (cellXPosition == heroXHero && cellYCurrent == heroYCoordinate) {
+                    gpMouseManager->SetPointer(ADVMGR_POINTER_HERO);
+                    m_selectedCell = ADVMGR_COMMAND_HERO_VIEW;
+                    return 1;
+                }
+
+                if (hoverCellLocal->field8 & ADVMGR_HOVER_OBJECT_BLOCKED) {
+                    if ((hoverCellLocal->triggerType & ADVMGR_TRIGGER_TYPE_MASK)
+                        == ADVMGR_HOVER_TOWN) {
+                        hoverTownCell = gpGame->GetTown(hoverCellLocal->w4hi);
+                        if (hoverTownCell->m_owner == giCurPlayer) {
+                            gpMouseManager->SetPointer(ADVMGR_POINTER_TOWN);
+                            m_selectedCell = ADVMGR_COMMAND_SELECT_TOWN;
+                            return 1;
+                        }
+                    }
+                    gpSearchArray->m_pathLength = 0;
+                    gpMouseManager->SetPointer(ADVMGR_POINTER_DEFAULT);
+                    return 1;
+                }
+
+                if (!((m_cursorType == ADVMGR_CURSOR_ROUTE
+                       || giGroundToTerrain[hoverCellLocal->tile]
+                       || hoverCellLocal->triggerType == ADVMGR_HERO_TRIGGER
+                       || hoverCellLocal->triggerType == ADVMGR_BOAT_TRIGGER
+                       || hoverCellLocal->triggerType == ADVMGR_HOVER_SHIPWRECK_TRIGGER)
+                      && (m_cursorType != ADVMGR_CURSOR_ROUTE
+                          || !giGroundToTerrain[hoverCellLocal->tile]
+                          || hoverCellLocal->triggerType == ADVMGR_HOVER_COAST))) {
+                    gpSearchArray->m_pathLength = 0;
+                    gpMouseManager->SetPointer(ADVMGR_POINTER_DEFAULT);
+                    return 1;
+                }
+                SeedTo(m_commandTargetX, m_commandTargetY);
+                if (gpSearchArray->GetCell(m_commandTargetX, m_commandTargetY).flags) {
+                    if (gpSearchArray->GetCell(m_commandTargetX, m_commandTargetY).previous
+                        <= hoverHeroLocal->m_remainingMobility) {
+                        routeDaysCount = 0;
+                    } else {
+                        routeDaysCount =
+                            (gpSearchArray->GetCell(m_commandTargetX, m_commandTargetY).previous
+                             - hoverHeroLocal->m_remainingMobility)
+                                / hoverHeroLocal->m_mobility
+                            + 1;
+                        if (routeDaysCount > ADVMGR_HOVER_ROUTE_DAY_LIMIT) {
+                            routeDaysCount = ADVMGR_HOVER_ROUTE_DAY_LIMIT;
+                        }
+                    }
+                    pointerBaseCursor = routeDaysCount * ADVMGR_HOVER_ROUTE_FRAMES_PER_DAY;
+
+                    switch (hoverCellLocal->triggerType & ADVMGR_TRIGGER_TYPE_MASK) {
+                        case ADVMGR_HOVER_BOAT:
+                            if (m_cursorType != ADVMGR_CURSOR_ROUTE) {
+                                gpMouseManager->SetPointer(pointerBaseCursor + ADVMGR_POINTER_SAIL);
+                                m_selectedCell = ADVMGR_COMMAND_MOVE_TO;
+                            } else {
+                                gpMouseManager->SetPointer(pointerBaseCursor);
+                            }
+                            break;
+                        case ADVMGR_HOVER_COAST:
+                            if (m_cursorType == ADVMGR_CURSOR_ROUTE) {
+                                gpMouseManager->SetPointer(
+                                    pointerBaseCursor + ADVMGR_POINTER_DISEMBARK
+                                );
+                            } else if (mapExtra[m_commandTargetY * MAP_WIDTH + m_commandTargetX]
+                                       & ADVMGR_HOVER_UNREACHABLE) {
+                                gpMouseManager->SetPointer(
+                                    pointerBaseCursor + ADVMGR_POINTER_ATTACK
+                                );
+                            } else {
+                                gpMouseManager->SetPointer(pointerBaseCursor + ADVMGR_POINTER_MOVE);
+                            }
+                            m_selectedCell = ADVMGR_COMMAND_MOVE_TO;
+                            break;
+                        case ADVMGR_HOVER_MONSTER:
+                            gpMouseManager->SetPointer(pointerBaseCursor + ADVMGR_POINTER_ATTACK);
+                            m_selectedCell = ADVMGR_COMMAND_MOVE_TO;
+                            break;
+                        case ADVMGR_HOVER_HERO:
+                            if (gpGame->GetHero(hoverCellLocal->w4hi)->m_owner != giCurPlayer) {
+                                gpMouseManager->SetPointer(
+                                    pointerBaseCursor + ADVMGR_POINTER_ATTACK
+                                );
+                                m_selectedCell = ADVMGR_COMMAND_MOVE_TO;
+                            } else {
+                                gpMouseManager->SetPointer(
+                                    pointerBaseCursor + ADVMGR_POINTER_SELECT_HERO
+                                );
+                                m_selectedCell = ADVMGR_COMMAND_MOVE_TO;
+                            }
+                            break;
+                        case ADVMGR_HOVER_TOWN:
+                            hoverTownCell = gpGame->GetTown(hoverCellLocal->w4hi);
+                            if ((hoverCellLocal->triggerType & ADVMGR_TRIGGER_ACTION_FLAG)
+                                && hoverTownCell->m_owner != giCurPlayer
+                                && hoverTownCell->HasGarrison()) {
+                                gpMouseManager->SetPointer(
+                                    pointerBaseCursor + ADVMGR_POINTER_ATTACK
+                                );
+                                m_selectedCell = ADVMGR_COMMAND_MOVE_TO;
+                                break;
+                            }
+                            goto process_default_hover;
+                        default:
+                        process_default_hover:
+                            if (!((mapExtra[m_commandTargetY * MAP_WIDTH + m_commandTargetX]
+                                   & ADVMGR_HOVER_UNREACHABLE)
+                                  && m_cursorType != ADVMGR_CURSOR_ROUTE
+                                  && (!(hoverCellLocal->triggerType & ADVMGR_TRIGGER_ACTION_FLAG)
+                                      || !StopOnTrigger(hoverCellLocal))
+                                  && (gpMouseManager->SetPointer(
+                                          pointerBaseCursor + ADVMGR_POINTER_ATTACK
+                                      ),
+                                      1))) {
+                                if (hoverCellLocal->triggerType & ADVMGR_TRIGGER_ACTION_FLAG) {
+                                    if (m_cursorType != ADVMGR_CURSOR_ROUTE) {
+                                        if (giGroundToTerrain[hoverCellLocal->tile]) {
+                                            gpMouseManager->SetPointer(
+                                                pointerBaseCursor + ADVMGR_POINTER_ACTION
+                                            );
+                                        } else if (hoverCellLocal->triggerType
+                                                   == ADVMGR_HOVER_SHIPWRECK_TRIGGER) {
+                                            gpMouseManager->SetPointer(
+                                                pointerBaseCursor + ADVMGR_POINTER_ACTION
+                                            );
+                                        } else {
+                                            gpMouseManager->SetPointer(
+                                                pointerBaseCursor + ADVMGR_POINTER_MOVE
+                                            );
+                                            break;
+                                        }
+                                    } else {
+                                        if (!giGroundToTerrain[hoverCellLocal->tile]) {
+                                            gpMouseManager->SetPointer(
+                                                routeDaysCount + ADVMGR_POINTER_WATER_ACTION
+                                            );
+                                        } else {
+                                            gpMouseManager->SetPointer(
+                                                pointerBaseCursor + ADVMGR_POINTER_SAIL
+                                            );
+                                        }
+                                    }
+                                } else {
+                                    if (m_cursorType == ADVMGR_CURSOR_ROUTE) {
+                                        gpMouseManager->SetPointer(
+                                            pointerBaseCursor + ADVMGR_POINTER_SAIL
+                                        );
+                                    } else {
+                                        gpMouseManager->SetPointer(
+                                            pointerBaseCursor + ADVMGR_POINTER_MOVE
+                                        );
+                                    }
+                                }
+                            }
+                            m_selectedCell = ADVMGR_COMMAND_MOVE_TO;
+                            break;
+                    }
+                    return 1;
+                } else {
+                    gpMouseManager->SetPointer(ADVMGR_POINTER_DEFAULT);
+                }
+            }
+        }
+        return 1;
+    } else {
+        if (!(gpMouseManager->m_cursorFrame >= ADVMGR_HOVER_SCROLL_FRAME_FIRST
+              && gpMouseManager->m_cursorFrame < ADVMGR_HOVER_SCROLL_FRAME_END
+              && MouseInScrollZone())) {
+            gpMouseManager->SetPointer(ADVMGR_POINTER_DEFAULT);
+        }
+        return 1;
+    }
+}
 
 VA(0x0045b094, 0x21a)
 void advManager::UpdateScreen(int, int) {}
@@ -2835,7 +3082,131 @@ VA(0x00460d63, 0x132)
 void advManager::ClearBottomView(void) {}
 
 VA(0x00460e95, 0x51b)
-int advManager::UpdBottomViewEnemyTurn(void) { return 0; }
+// @early-stop exact size and 73 relocation sites. Residuals are the
+// GetPlayerColor /Ob1 continuation at +0x2f5..+0x320 (leading versus trailing)
+// and equivalent commutative global comparisons at +0x29e..+0x2c6 and
+// +0x3ef..+0x418; the only unmasked bytes outside the moved continuation are
+// the equivalent relational opcodes at +0x3fa and +0x418.
+int advManager::UpdBottomViewEnemyTurn(void)
+{
+    int updated;
+    tag_message message;
+
+    updated = 0;
+    message.type = ADVMGR_ENEMY_TURN_MESSAGE_TYPE;
+    if (iCurBottomView != ADVMGR_ENEMY_TURN_VIEW_ID) {
+        updated = 1;
+        gbForceUpdate = 1;
+        ClearBottomView();
+        iCurBottomView = ADVMGR_ENEMY_TURN_VIEW_ID;
+
+        m_bottomViewBackground = new iconWidget(
+            ADVMGR_ENEMY_TURN_BACKGROUND_X, ADVMGR_ENEMY_TURN_BACKGROUND_Y,
+            ADVMGR_ENEMY_TURN_BACKGROUND_WIDTH, ADVMGR_ENEMY_TURN_BACKGROUND_HEIGHT,
+            "stonback.icn", 0, 0, ADVMGR_ENEMY_TURN_BACKGROUND_ID,
+            ADVMGR_ENEMY_TURN_WIDGET_FLAGS, 1);
+        if (m_bottomViewBackground == 0)
+            MemError();
+        m_adventureWindow->AddWidget(
+            m_bottomViewBackground, ADVMGR_ENEMY_TURN_BACKGROUND_Z);
+
+        m_bottomViewHourglassBackground = new iconWidget(
+            ADVMGR_ENEMY_TURN_HOURGLASS_X, ADVMGR_ENEMY_TURN_HOURGLASS_Y,
+            ADVMGR_ENEMY_TURN_HOURGLASS_WIDTH, ADVMGR_ENEMY_TURN_HOURGLASS_HEIGHT,
+            "hourglas.icn", 0, 0, ADVMGR_ENEMY_TURN_HOURGLASS_ID,
+            ADVMGR_ENEMY_TURN_WIDGET_FLAGS, 1);
+        if (m_bottomViewHourglassBackground == 0)
+            MemError();
+        m_adventureWindow->AddWidget(
+            m_bottomViewHourglassBackground, ADVMGR_ENEMY_TURN_HOURGLASS_Z);
+    }
+
+    if (gbForceUpdate ||
+        KBTickCount() - iLastSandAnimTime > ADVMGR_ENEMY_TURN_ANIMATION_DELAY) {
+        iLastSandAnimTime = KBTickCount();
+        iLastAnimFrame = m_updateMaxX;
+        if (KBTickCount() - iLastNewSandAnimTime >
+            ADVMGR_ENEMY_TURN_ANIMATION_DELAY) {
+            iLastNewSandAnimTime = KBTickCount();
+            ++iSandAnim;
+            if (iSandAnim >= ADVMGR_ENEMY_TURN_SAND_FRAME_LIMIT)
+                iSandAnim = ADVMGR_ENEMY_TURN_SAND_RESTART_FRAME;
+            updated = 1;
+
+            if (m_bottomViewIcons[1] != 0) {
+                message.field4 = ADVMGR_ENEMY_TURN_MESSAGE_SET_FRAME;
+                message.field8 = ADVMGR_ENEMY_TURN_SAND_ID;
+                message.field18 = iSandAnim + ADVMGR_ENEMY_TURN_SAND_FRAME_OFFSET;
+                m_adventureWindow->BroadcastMessage(message);
+            } else {
+                m_bottomViewIcons[1] = new iconWidget(
+                    ADVMGR_ENEMY_TURN_ANIMATION_X, ADVMGR_ENEMY_TURN_ANIMATION_Y,
+                    ADVMGR_ENEMY_TURN_ANIMATION_WIDTH,
+                    ADVMGR_ENEMY_TURN_ANIMATION_HEIGHT, "hourglas.icn",
+                    iSandAnim + ADVMGR_ENEMY_TURN_SAND_FRAME_OFFSET, 0,
+                    ADVMGR_ENEMY_TURN_SAND_ID, ADVMGR_ENEMY_TURN_WIDGET_FLAGS, 1);
+                if (m_bottomViewIcons[1] == 0)
+                    MemError();
+                m_adventureWindow->AddWidget(
+                    m_bottomViewIcons[1], ADVMGR_ENEMY_TURN_SAND_Z);
+            }
+        }
+    }
+
+    if (gbForceUpdate || iCurBottomViewEnemy != giCurPlayer) {
+        updated = 1;
+        iCurBottomViewEnemy = giCurPlayer;
+        if (iCurBottomViewEnemy != giCurPlayer)
+            iCurHourGlassPhase = 0;
+        if (m_bottomViewIcons[0] != 0) {
+            message.field4 = ADVMGR_ENEMY_TURN_MESSAGE_SET_FRAME;
+            message.field8 = ADVMGR_ENEMY_TURN_CREST_ID;
+            message.field18 =
+                gpGame->GetPlayerColor(static_cast<char>(giCurPlayer));
+            m_adventureWindow->BroadcastMessage(message);
+        } else {
+            m_bottomViewIcons[0] = new iconWidget(
+                ADVMGR_ENEMY_TURN_CREST_X, ADVMGR_ENEMY_TURN_ANIMATION_Y,
+                ADVMGR_ENEMY_TURN_ANIMATION_WIDTH,
+                ADVMGR_ENEMY_TURN_ANIMATION_HEIGHT, "brcrest.icn",
+                gpGame->GetPlayerColor(static_cast<char>(giCurPlayer)), 0,
+                ADVMGR_ENEMY_TURN_CREST_ID, ADVMGR_ENEMY_TURN_WIDGET_FLAGS, 1);
+            if (m_bottomViewIcons[0] == 0)
+                MemError();
+            m_adventureWindow->AddWidget(
+                m_bottomViewIcons[0], ADVMGR_ENEMY_TURN_CREST_Z);
+        }
+    }
+
+    if (gbForceUpdate || iLastHourGlassPhase > iCurHourGlassPhase ||
+        iLastHourGlassPhase < 0 ||
+        (iCurHourGlassPhase > iLastHourGlassPhase &&
+         KBTickCount() - giLastHourGlassUpdateTime >=
+             ADVMGR_ENEMY_TURN_PHASE_DELAY)) {
+        updated = 1;
+        iLastHourGlassPhase = iCurHourGlassPhase;
+        giLastHourGlassUpdateTime = KBTickCount();
+        if (m_bottomViewIcons[2] != 0) {
+            message.field4 = ADVMGR_ENEMY_TURN_MESSAGE_SET_FRAME;
+            message.field8 = ADVMGR_ENEMY_TURN_PHASE_ID;
+            message.field18 =
+                iCurHourGlassPhase + ADVMGR_ENEMY_TURN_PHASE_FRAME_OFFSET;
+            m_adventureWindow->BroadcastMessage(message);
+        } else {
+            m_bottomViewIcons[2] = new iconWidget(
+                ADVMGR_ENEMY_TURN_ANIMATION_X, ADVMGR_ENEMY_TURN_ANIMATION_Y,
+                ADVMGR_ENEMY_TURN_ANIMATION_WIDTH,
+                ADVMGR_ENEMY_TURN_ANIMATION_HEIGHT, "hourglas.icn",
+                iCurHourGlassPhase + ADVMGR_ENEMY_TURN_PHASE_FRAME_OFFSET, 0,
+                ADVMGR_ENEMY_TURN_PHASE_ID, ADVMGR_ENEMY_TURN_WIDGET_FLAGS, 1);
+            if (m_bottomViewIcons[2] == 0)
+                MemError();
+            m_adventureWindow->AddWidget(
+                m_bottomViewIcons[2], ADVMGR_ENEMY_TURN_PHASE_Z);
+        }
+    }
+    return updated;
+}
 
 VA(0x004613b0, 0x366)
 int advManager::UpdBottomViewNewTurn(void) { return 0; }
@@ -2847,7 +3218,134 @@ VA(0x00461a75, 0x363)
 int advManager::UpdBottomViewKingdom(void) { return 0; }
 
 VA(0x00461dd8, 0x583)
-int advManager::UpdBottomViewHero(void) { return 0; }
+// @early-stop exact bytes and all 36 relocation targets
+int advManager::UpdBottomViewHero(void)
+{
+    char *armyCountLabelsResult[ADVMGR_BOTTOM_HERO_ARMY_SLOTS];
+    icon *monsterIconsLocal;
+    int occupiedSlotsLocal;
+    hero *targetHero;
+    int armySlot;
+    int displayIndexData;
+    int creature;
+    IconEntry *iconEntryValue;
+    int groupWidthRef;
+    int layoutIndexIndex;
+    int iconX;
+    int iconY;
+    int labelY;
+    int labelWidthCount;
+    int labelX;
+    int creatureBoundsLocal[2];
+
+    if (!gbForceUpdate && iCurBottomView == ADVMGR_BOTTOM_HERO_VIEW_ID)
+        return 0;
+
+    ClearBottomView();
+    iCurBottomView = ADVMGR_BOTTOM_HERO_VIEW_ID;
+    targetHero = gpGame->GetHero(gpCurPlayer->CurrentHero());
+    occupiedSlotsLocal = 0;
+
+    m_bottomViewBackground = new iconWidget(
+        ADVMGR_BOTTOM_HERO_PANEL_X, ADVMGR_BOTTOM_HERO_PANEL_Y,
+        ADVMGR_BOTTOM_HERO_PANEL_WIDTH, ADVMGR_BOTTOM_HERO_PANEL_HEIGHT,
+        "stonback.icn", 0, 0, ADVMGR_BOTTOM_VIEW_FIRST_MESSAGE,
+        ADVMGR_BOTTOM_HERO_WIDGET_FLAGS, 1);
+    if (m_bottomViewBackground == 0)
+        MemError();
+    m_adventureWindow->AddWidget(m_bottomViewBackground, -1);
+
+    for (armySlot = 0; armySlot < ADVMGR_BOTTOM_HERO_ARMY_SLOTS; ++armySlot) {
+        if (targetHero->m_army.m_creatureTypes[armySlot] != ADVMGR_BOTTOM_HERO_EMPTY_SLOT)
+            ++occupiedSlotsLocal;
+    }
+
+    if (occupiedSlotsLocal != 0) {
+        displayIndexData = 0;
+        monsterIconsLocal = gpResourceManager->GetIcon("mons32.icn");
+        for (armySlot = 0; armySlot < ADVMGR_BOTTOM_HERO_ARMY_SLOTS; ++armySlot) {
+            creature = targetHero->m_army.m_creatureTypes[armySlot];
+            if (creature != ADVMGR_BOTTOM_HERO_EMPTY_SLOT) {
+                unsigned char iconPositions[16] = {
+                    50, 3, 96, 3, 50, 17, 73, 17,
+                    96, 17, 27, 32, 73, 32, 119, 32
+                };
+                signed char armyLayouts[ADVMGR_BOTTOM_HERO_ARMY_SLOTS]
+                                             [ADVMGR_BOTTOM_HERO_ARMY_SLOTS] = {
+                    {3, -1, -1, -1, -1},
+                    {2, 4, -1, -1, -1},
+                    {0, 1, 6, -1, -1},
+                    {0, 1, 5, 6, -1},
+                    {0, 1, 5, 6, 7}
+                };
+
+                armyCountLabelsResult[displayIndexData] = static_cast<char *>(BaseAlloc(
+                    ADVMGR_BOTTOM_HERO_LABEL_BYTES, ADVMGR_SOURCE_FILE,
+                    ADVMGR_BOTTOM_HERO_LINE + 0x44));
+                if (targetHero->m_army.m_creatureCounts[armySlot] >
+                    ADVMGR_BOTTOM_HERO_MAX_FULL_COUNT) {
+                    sprintf(armyCountLabelsResult[displayIndexData], "%dk",
+                            targetHero->m_army.m_creatureCounts[armySlot] /
+                                ADVMGR_BOTTOM_HERO_COUNT_DIVISOR);
+                } else {
+                    sprintf(armyCountLabelsResult[displayIndexData], "%d",
+                            targetHero->m_army.m_creatureCounts[armySlot]);
+                }
+
+                layoutIndexIndex = armyLayouts[occupiedSlotsLocal - 1][displayIndexData];
+                iconX = iconPositions[layoutIndexIndex * 2];
+                iconY = iconPositions[layoutIndexIndex * 2 + 1];
+                labelY = iconY + ADVMGR_BOTTOM_HERO_LABEL_Y_OFFSET;
+                iconEntryValue = reinterpret_cast<IconEntry *>(
+                    creature * sizeof(IconEntry) + monsterIconsLocal->m_data);
+                if (layoutIndexIndex == 0 || layoutIndexIndex == 1) {
+                    labelY -= ADVMGR_BOTTOM_HERO_TOP_LABEL_SHIFT;
+                    if (iconEntryValue->h < ADVMGR_BOTTOM_HERO_TOP_MIN_HEIGHT)
+                        iconY += ADVMGR_BOTTOM_HERO_TOP_MIN_HEIGHT - iconEntryValue->h;
+                } else if (iconEntryValue->h < ADVMGR_BOTTOM_HERO_LOWER_MIN_HEIGHT) {
+                    iconY += ADVMGR_BOTTOM_HERO_LOWER_MIN_HEIGHT - iconEntryValue->h;
+                }
+
+                labelWidthCount = smallFont->LineWidth(armyCountLabelsResult[displayIndexData]);
+                groupWidthRef = iconEntryValue->w + labelWidthCount;
+                if (groupWidthRef > ADVMGR_BOTTOM_HERO_GROUP_WIDTH)
+                    groupWidthRef = ADVMGR_BOTTOM_HERO_GROUP_WIDTH;
+                iconX -= (groupWidthRef + 1) / 2;
+                labelX = groupWidthRef - 1 + iconX - (labelWidthCount - 1);
+
+                m_bottomViewIcons[displayIndexData] = new iconWidget(
+                    iconX + ADVMGR_BOTTOM_HERO_PANEL_X,
+                    iconY + ADVMGR_BOTTOM_HERO_PANEL_Y,
+                    ADVMGR_BOTTOM_HERO_ICON_WIDTH, ADVMGR_BOTTOM_HERO_ICON_HEIGHT,
+                    "mons32.icn", creature, 0,
+                    displayIndexData + ADVMGR_BOTTOM_HERO_FIRST_ICON_ID,
+                    ADVMGR_BOTTOM_HERO_WIDGET_FLAGS, 1);
+                if (m_bottomViewIcons[displayIndexData] == 0)
+                    MemError();
+
+                m_bottomViewTexts[displayIndexData] = new textWidget(
+                    labelX + ADVMGR_BOTTOM_HERO_PANEL_X,
+                    labelY + ADVMGR_BOTTOM_HERO_PANEL_Y,
+                    ((targetHero->m_army.m_creatureCounts[armySlot] <=
+                       ADVMGR_BOTTOM_HERO_MAX_FULL_COUNT) - 1 & 4) +
+                        strlen(armyCountLabelsResult[displayIndexData]) *
+                            ADVMGR_BOTTOM_HERO_CHARACTER_WIDTH,
+                    ADVMGR_BOTTOM_HERO_LABEL_HEIGHT, armyCountLabelsResult[displayIndexData],
+                    "smalfont.fnt", 1,
+                    displayIndexData + ADVMGR_BOTTOM_HERO_FIRST_TEXT_ID,
+                    ADVMGR_BOTTOM_HERO_TEXT_ALIGNMENT, 1);
+                if (m_bottomViewTexts[displayIndexData] == 0)
+                    MemError();
+
+                m_adventureWindow->AddWidget(m_bottomViewIcons[displayIndexData], -1);
+                m_adventureWindow->AddWidget(m_bottomViewTexts[displayIndexData], -1);
+                ++displayIndexData;
+            }
+        }
+        gpResourceManager->Dispose(monsterIconsLocal);
+    }
+    return 1;
+}
 
 // @early-stop
 // raw-masked: exact frame/body and 109 relocations; only loop-compare/multiply operand
@@ -3766,7 +4264,172 @@ VA(0x0046785d, 0x43e)
 void advManager::TownGate(int) {}
 
 VA(0x00467c9b, 0x5ac)
-void advManager::SummonBoat(void) {}
+// @early-stop exact size and 41 relocation sites. Residuals are the
+// CurrentHero /Ob1 continuation at +0x174..+0x184, equivalent w4hi bitfield
+// read-modify-write evaluation order at +0x4de..+0x4ed, and the unreachable
+// post-return local jump at +0x5a3..+0x5a6. Retail's +0xc2 and +0x4a2
+// relocations are delinked as a string but address normalDirTable in context.
+void advManager::SummonBoat(void) {
+    int boatIndex9;
+    mapCell* destinationCell;
+    int foundBoat;
+    hero* currentHero11;
+    int destinationX10;
+    int direction5;
+    int destinationY15;
+    int foundDestination9;
+    int currentHeroId3;
+    boatRecord* boat1;
+    mapCell* oldBoatCell26;
+    int screenX4;
+    int screenY3;
+    int fizzleHeight;
+    int fizzleWidth;
+
+    currentHero11 = gpGame->GetHero(gpCurPlayer->m_currentHero);
+    foundDestination9 = 0;
+    foundBoat = 0;
+    destinationCell = GetCell(
+        m_mapOriginX + ADVMGR_SUMMON_CENTER_OFFSET,
+        m_mapOriginY + ADVMGR_SUMMON_CENTER_OFFSET
+    );
+    if (!giGroundToTerrain[destinationCell->tile]) {
+        return;
+    } else {
+
+        for (direction5 = 0; direction5 < ADVMGR_SUMMON_DIRECTION_COUNT; ++direction5) {
+            destinationX10 =
+                normalDirTable[direction5].x + m_mapOriginX + ADVMGR_SUMMON_CENTER_OFFSET;
+            destinationY15 =
+                normalDirTable[direction5].y + m_mapOriginY + ADVMGR_SUMMON_CENTER_OFFSET;
+            if (destinationX10 < 0 || destinationX10 >= MAP_WIDTH || destinationY15 < 0
+                || destinationY15 >= MAP_HEIGHT) {
+                continue;
+            }
+
+            destinationCell = GetCell(destinationX10, destinationY15);
+            if (destinationCell->objIndex == 0xff && destinationCell->triggerType == 0
+                && !giGroundToTerrain[destinationCell->tile]) {
+                foundDestination9 = 1;
+                break;
+            }
+        }
+
+        if (foundDestination9) {
+            currentHeroId3 = gpCurPlayer->CurrentHero();
+            for (boatIndex9 = 0; boatIndex9 < ADVMGR_SUMMON_BOAT_COUNT; ++boatIndex9) {
+                if (gpGame->m_boatSlots[boatIndex9] != -1
+                    && gpGame->m_boats[boatIndex9].heroId
+                           == (currentHeroId3 | ADVMGR_SUMMON_OCCUPIED_FLAG)) {
+                    foundBoat = 1;
+                    break;
+                }
+            }
+
+            if (!foundBoat) {
+                for (boatIndex9 = 0; boatIndex9 < ADVMGR_SUMMON_BOAT_COUNT; ++boatIndex9) {
+                    if (gpGame->m_boatSlots[boatIndex9] != -1
+                        && (gpGame->m_boats[boatIndex9].heroId & ADVMGR_SUMMON_OCCUPIED_FLAG)
+                        && gpGame->m_boats[boatIndex9].owner == giCurPlayer
+                        && abs(gpGame->m_boats[boatIndex9].y - currentHero11->m_y)
+                                   + abs(gpGame->m_boats[boatIndex9].x - currentHero11->m_x)
+                               > ADVMGR_SUMMON_MIN_DISTANCE) {
+                        foundBoat = 1;
+                        break;
+                    }
+                }
+            }
+
+            if (foundBoat) {
+                boat1 = &gpGame->m_boats[boatIndex9];
+                oldBoatCell26 = GetCell(boat1->x, boat1->y);
+                gpGame->RestoreCell(
+                    boat1->x,
+                    boat1->y,
+                    boat1->savedTriggerType,
+                    boat1->savedEventData,
+                    0,
+                    ADVMGR_SUMMON_RESTORE_MODE
+                );
+
+                if (boat1->x >= m_mapOriginX && boat1->x < m_mapOriginX + ADVMGR_HOVER_VIEW_CELLS
+                    && boat1->y >= m_mapOriginY
+                    && boat1->y < m_mapOriginY + ADVMGR_HOVER_VIEW_CELLS) {
+                    screenX4 = (boat1->x - m_mapOriginX) * ADVMGR_CELL_PIXELS
+                               - ADVMGR_SUMMON_FIZZLE_X_OFFSET;
+                    if (screenX4 < ADVMGR_SUMMON_SCREEN_MARGIN) {
+                        screenX4 = ADVMGR_SUMMON_SCREEN_MARGIN;
+                    }
+                    screenY3 = (boat1->y - m_mapOriginY) * ADVMGR_CELL_PIXELS
+                               - ADVMGR_SUMMON_FIZZLE_X_OFFSET;
+                    if (screenY3 < ADVMGR_SUMMON_SCREEN_MARGIN) {
+                        screenY3 = ADVMGR_SUMMON_SCREEN_MARGIN;
+                    }
+
+                    fizzleWidth = ADVMGR_SUMMON_FIZZLE_WIDTH;
+                    fizzleHeight = ADVMGR_SUMMON_FIZZLE_HEIGHT;
+                    if (screenX4 + fizzleWidth >= ADVMGR_SUMMON_SCREEN_LIMIT) {
+                        fizzleWidth = ADVMGR_SUMMON_SCREEN_LIMIT - screenX4;
+                    }
+                    if (screenY3 + fizzleHeight >= ADVMGR_SUMMON_SCREEN_LIMIT) {
+                        fizzleHeight = ADVMGR_SUMMON_SCREEN_LIMIT - screenY3;
+                    }
+                    gpWindowManager
+                        ->SaveFizzleSource(screenX4, screenY3, fizzleWidth, fizzleHeight);
+                    CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
+                    gpWindowManager
+                        ->FizzleForward(screenX4, screenY3, fizzleWidth, fizzleHeight, -1, 0, 0);
+                }
+
+                boat1->x = static_cast<signed char>(
+                    normalDirTable[direction5].x + m_mapOriginX + ADVMGR_SUMMON_CENTER_OFFSET
+                );
+                boat1->y = static_cast<signed char>(
+                    normalDirTable[direction5].y + m_mapOriginY + ADVMGR_SUMMON_CENTER_OFFSET
+                );
+                boat1->savedTriggerType = destinationCell->triggerType;
+                boat1->savedEventData = static_cast<unsigned char>(destinationCell->w4hi);
+                destinationCell->triggerType = ADVMGR_SUMMON_BOAT_TRIGGER;
+                destinationCell->w4hi = boatIndex9;
+
+                gpWindowManager->SaveFizzleSource(
+                    ADVMGR_SUMMON_TARGET_X,
+                    ADVMGR_SUMMON_TARGET_Y,
+                    ADVMGR_SUMMON_TARGET_WIDTH,
+                    ADVMGR_SUMMON_TARGET_HEIGHT
+                );
+                CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
+                gpWindowManager->FizzleForward(
+                    ADVMGR_SUMMON_TARGET_X,
+                    ADVMGR_SUMMON_TARGET_Y,
+                    ADVMGR_SUMMON_TARGET_WIDTH,
+                    ADVMGR_SUMMON_TARGET_HEIGHT,
+                    -1,
+                    0,
+                    0
+                );
+            }
+        }
+
+        UpdateScreen(0, 0);
+        Reseed(0, 0);
+        if (!foundBoat) {
+            NormalDialog(
+                "Summon Boat failed!!!",
+                ADVMGR_OPTION_DIALOG_MESSAGE,
+                ADVMGR_OPTION_DIALOG_NONE,
+                ADVMGR_OPTION_DIALOG_NONE,
+                ADVMGR_OPTION_DIALOG_NONE,
+                0,
+                ADVMGR_OPTION_DIALOG_NONE,
+                0,
+                ADVMGR_OPTION_DIALOG_NONE,
+                0
+            );
+        }
+        return;
+    }
+}
 
 VA(0x00468247, 0x4d9)
 void advManager::ShowRoute(int, int, int) {}
@@ -3777,11 +4440,11 @@ void advManager::HideRoute(int, int, int) {}
 // @early-stop
 // all 52 instructions, both inline-continuation jumps, and ten relocation targets match
 VA(0x00468827, 0x8d)
-void advManager::CheckDimHero(void)
-{
+void advManager::CheckDimHero(void) {
     if (gbThisNetHumanPlayer[giCurPlayer]) {
-        if (gpCurPlayer->CurrentHero() == ADVMGR_INVALID_HERO)
+        if (gpCurPlayer->CurrentHero() == ADVMGR_INVALID_HERO) {
             return;
+        }
         if (!gpGame->IsMobile(gpCurPlayer->CurrentHero())) {
             ShowRoute(1, 0, 0);
             UpdateHeroLocators(1, 1);
@@ -3791,8 +4454,7 @@ void advManager::CheckDimHero(void)
 }
 
 VA(0x004688b4, 0x6b)
-void advManager::CheckDimNextHeroBut(void)
-{
+void advManager::CheckDimNextHeroBut(void) {
     int frame;
     if (!gbThisNetHumanPlayer[giCurPlayer] || !gpCurPlayer->HasMobileHero())
         frame = ADVMGR_BUTTON_ENABLE;
@@ -3956,27 +4618,271 @@ void advManager::SystemOptions(void) {}
 VA(0x0046b219, 0x35f)
 void UpdateSystemOptions(int) {}
 
+// @early-stop
+// Exact size, all non-relocation bytes, and all 94 relocation sites match. Residuals are
+// delinked jump-table labels, gConfig field overlays, and string-pool symbol names.
 VA(0x0046b578, 0x672)
-int SystemOptionsHandler(struct tag_message &) { return 0; }
+int SystemOptionsHandler(struct tag_message& message) {
+    int preferencesChanged = 0;
+    char textData[120];
+    int accepted = 0;
+
+    if (message.type == ADVMGR_SYSTEM_OPTIONS_MESSAGE) {
+        if (message.fieldC & ADVMGR_SYSTEM_OPTIONS_CONTEXT_FLAG) {
+            if (message.field4 == ADVMGR_SYSTEM_OPTIONS_ACTIVATE
+                || message.field4 == ADVMGR_SYSTEM_OPTIONS_HOVER) {
+                int helpIndex = ADVMGR_OPTION_DIALOG_NONE;
+
+                switch (message.field8) {
+                    case ADVMGR_SYSTEM_OPTIONS_DIALOG_ACCEPT:
+                        helpIndex = 0;
+                        break;
+                    case ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME:
+                        helpIndex = 1;
+                        break;
+                    case ADVMGR_SYSTEM_OPTION_SOUND_VOLUME:
+                        helpIndex = 2;
+                        break;
+                    case ADVMGR_SYSTEM_OPTION_HERO_SPEED:
+                        helpIndex = 3;
+                        break;
+                    case ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE:
+                        helpIndex = 4;
+                        break;
+                    case ADVMGR_SYSTEM_OPTION_SHOW_ROUTE:
+                        helpIndex = 5;
+                        break;
+                    case ADVMGR_SYSTEM_OPTION_COMPUTER_SPEED:
+                        helpIndex = 6;
+                        break;
+                    case ADVMGR_SYSTEM_OPTION_INTERFACE:
+                        helpIndex = 7;
+                        break;
+                    case ADVMGR_SYSTEM_OPTION_VIDEO:
+                        helpIndex = 8;
+                        break;
+                    case ADVMGR_SYSTEM_OPTION_COLOR_CURSOR:
+                        helpIndex = 9;
+                        break;
+                }
+
+                if (helpIndex >= 0) {
+                    NormalDialog(
+                        gSPanelHelp[helpIndex],
+                        ADVMGR_OPTION_DIALOG_HELP,
+                        ADVMGR_OPTION_DIALOG_NONE,
+                        ADVMGR_OPTION_DIALOG_NONE,
+                        ADVMGR_OPTION_DIALOG_NONE,
+                        0,
+                        ADVMGR_OPTION_DIALOG_NONE,
+                        0,
+                        ADVMGR_OPTION_DIALOG_NONE,
+                        0
+                    );
+                }
+            }
+        } else {
+            switch (message.field4) {
+                case ADVMGR_SYSTEM_OPTIONS_ACCEPT:
+                    switch (message.field8) {
+                        case ADVMGR_SYSTEM_OPTIONS_DIALOG_ACCEPT:
+                            accepted = 1;
+                            break;
+                    }
+                    break;
+
+                case ADVMGR_SYSTEM_OPTIONS_ACTIVATE: {
+                    switch (message.field8) {
+                        case ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME:
+                            if (gConfig.musicVolume == 0 && gpSoundManager->m_cdReady == 0
+                                && gpSoundManager->m_midiReady == 0) {
+                                NormalDialog(
+                                    "Neither MIDI nor Redbook music is currently available on this "
+                                    "system.",
+                                    ADVMGR_OPTION_DIALOG_MESSAGE,
+                                    ADVMGR_OPTION_DIALOG_NONE,
+                                    ADVMGR_OPTION_DIALOG_NONE,
+                                    ADVMGR_OPTION_DIALOG_NONE,
+                                    0,
+                                    ADVMGR_OPTION_DIALOG_NONE,
+                                    0,
+                                    ADVMGR_OPTION_DIALOG_NONE,
+                                    0
+                                );
+                                break;
+                            }
+                            gConfig.musicVolume =
+                                (gConfig.musicVolume + 1) % ADVMGR_OPTION_VOLUME_LEVELS;
+                            gpSoundManager->AdjustMusicVolumes();
+                            preferencesChanged = 1;
+                            bPrefsChanged = 1;
+                            break;
+
+                        case ADVMGR_SYSTEM_OPTION_SOUND_VOLUME:
+                            if (gConfig.soundVolume == 0 && gpSoundManager->m_digitalDriver == 0) {
+                                NormalDialog(
+                                    "Digital sound is not currently available on this system.",
+                                    ADVMGR_OPTION_DIALOG_MESSAGE,
+                                    ADVMGR_OPTION_DIALOG_NONE,
+                                    ADVMGR_OPTION_DIALOG_NONE,
+                                    ADVMGR_OPTION_DIALOG_NONE,
+                                    0,
+                                    ADVMGR_OPTION_DIALOG_NONE,
+                                    0,
+                                    ADVMGR_OPTION_DIALOG_NONE,
+                                    0
+                                );
+                                break;
+                            }
+                            gConfig.soundVolume =
+                                (gConfig.soundVolume + 1) % ADVMGR_OPTION_VOLUME_LEVELS;
+                            gpSoundManager->AdjustSoundVolumes();
+                            preferencesChanged = 1;
+                            bPrefsChanged = 1;
+                            break;
+
+                        case ADVMGR_SYSTEM_OPTION_HERO_SPEED:
+                            ++gConfig.walkSpeed;
+                            gConfig.walkSpeed %= ADVMGR_OPTION_HERO_SPEED_LEVELS;
+                            preferencesChanged = 1;
+                            bPrefsChanged = 1;
+                            break;
+
+                        case ADVMGR_SYSTEM_OPTION_COMPUTER_SPEED:
+                            if (gConfig.blackoutComputer) {
+                                gConfig.blackoutComputer = 0;
+                                gConfig.computerWalkSpeed = ADVMGR_OPTION_COMPUTER_SPEED_DEFAULT;
+                            } else if (gConfig.computerWalkSpeed
+                                       < ADVMGR_OPTION_COMPUTER_SPEED_MAX) {
+                                ++gConfig.computerWalkSpeed;
+                            } else {
+                                gConfig.blackoutComputer = 1;
+                            }
+                            preferencesChanged = 1;
+                            bPrefsChanged = 1;
+                            break;
+
+                        case ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE:
+                            if (gConfig.soundQuality == ADVMGR_OPTION_MUSIC_MIDI) {
+                                if (gpSoundManager->m_cdStarted == 0) {
+                                    gpSoundManager->CDStartup();
+                                }
+                                if (gpSoundManager->m_cdReady == 0) {
+                                    NormalDialog(
+                                        "Unable to set up CD stereo music.  Your CD player might "
+                                        "be in use by another program, or your sound driver might "
+                                        "not support CD stereo.",
+                                        ADVMGR_OPTION_DIALOG_MESSAGE,
+                                        ADVMGR_OPTION_DIALOG_NONE,
+                                        ADVMGR_OPTION_DIALOG_NONE,
+                                        ADVMGR_OPTION_DIALOG_NONE,
+                                        0,
+                                        ADVMGR_OPTION_DIALOG_NONE,
+                                        0,
+                                        ADVMGR_OPTION_DIALOG_NONE,
+                                        0
+                                    );
+                                    break;
+                                }
+                                gpSoundManager->SetMusicQuality(ADVMGR_OPTION_MUSIC_CD);
+                                gConfig.useOpera = 0;
+                            } else if (gConfig.useOpera == 0) {
+                                gConfig.useOpera = 1;
+                            } else {
+                                if (gpSoundManager->m_midiStarted == 0) {
+                                    gpSoundManager->MIDIStartup();
+                                }
+                                if (gpSoundManager->m_midiReady == 0) {
+                                    gConfig.useOpera = 1 - gConfig.useOpera;
+                                } else {
+                                    gpSoundManager->SetMusicQuality(ADVMGR_OPTION_MUSIC_MIDI);
+                                }
+                            }
+                            preferencesChanged = 1;
+                            bPrefsChanged = 1;
+                            break;
+
+                        case ADVMGR_SYSTEM_OPTION_SHOW_ROUTE:
+                            gConfig.showRoute = 1 - gConfig.showRoute;
+                            preferencesChanged = 1;
+                            bPrefsChanged = 1;
+                            break;
+
+                        case ADVMGR_SYSTEM_OPTION_INTERFACE:
+                            gConfig.evilInterfaceUsage =
+                                (gConfig.evilInterfaceUsage + 1) % ADVMGR_OPTION_INTERFACE_COUNT;
+                            preferencesChanged = 1;
+                            bPrefsChanged = 1;
+                            break;
+
+                        case ADVMGR_SYSTEM_OPTION_VIDEO:
+                            if (gbLowMemory) {
+                                NormalDialog(
+                                    "You don't have enough memory for non-interlaced video.",
+                                    ADVMGR_OPTION_DIALOG_MESSAGE,
+                                    ADVMGR_OPTION_DIALOG_NONE,
+                                    ADVMGR_OPTION_DIALOG_NONE,
+                                    ADVMGR_OPTION_DIALOG_NONE,
+                                    0,
+                                    ADVMGR_OPTION_DIALOG_NONE,
+                                    0,
+                                    ADVMGR_OPTION_DIALOG_NONE,
+                                    0
+                                );
+                                break;
+                            }
+                            if (gConfig.slowVideo) {
+                                gConfig.slowVideo = 0;
+                            } else {
+                                gConfig.slowVideo = 1;
+                            }
+                            preferencesChanged = 1;
+                            bPrefsChanged = 1;
+                            break;
+
+                        case ADVMGR_SYSTEM_OPTION_COLOR_CURSOR:
+                            gConfig.gfx[0].colorMouseCursor = 1 - gConfig.gfx[0].colorMouseCursor;
+                            preferencesChanged = 1;
+                            bPrefsChanged = 1;
+                            gpMouseManager->SetColorMice(gConfig.gfx[0].colorMouseCursor);
+                            break;
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    if (preferencesChanged) {
+        UpdateSystemOptions(0);
+    }
+    if (accepted) {
+        gpWindowManager->m_dialogResult = message.field8;
+        message.field8 = ADVMGR_SYSTEM_OPTION_FIRST;
+        message.field4 = message.field8;
+        return ADVMGR_SYSTEM_OPTIONS_HANDLED;
+    }
+    return ADVMGR_SYSTEM_OPTIONS_UNHANDLED;
+}
 
 VA(0x0046bbea, 0x7f)
-int GetMobilityFrame(int mobility)
-{
+int GetMobilityFrame(int mobility) {
     int frame = mobility * ADVMGR_MOBILITY_SCALE / ADVMGR_MOBILITY_DIVISOR;
-    if (frame < 0)
+    if (frame < 0) {
         frame = 0;
-    if (frame > ADVMGR_MOBILITY_TOP_THRESHOLD)
+    }
+    if (frame > ADVMGR_MOBILITY_TOP_THRESHOLD) {
         frame = ADVMGR_FRAME_TOP;
-    else if (frame > ADVMGR_MOBILITY_HIGH_THRESHOLD)
+    } else if (frame > ADVMGR_MOBILITY_HIGH_THRESHOLD) {
         frame = ADVMGR_FRAME_HIGH;
-    else if (frame > ADVMGR_MOBILITY_MID_THRESHOLD)
+    } else if (frame > ADVMGR_MOBILITY_MID_THRESHOLD) {
         frame = ADVMGR_FRAME_MID;
+    }
     return frame;
 }
 
 VA(0x0046bc69, 0x7f)
-int GetManaFrame(int mana)
-{
+int GetManaFrame(int mana) {
     int frame = mana / ADVMGR_MANA_DIVISOR;
     if (frame == 0 && mana >= ADVMGR_MANA_MIN_VISIBLE)
         frame = 1;
@@ -3990,7 +4896,124 @@ int GetManaFrame(int mana)
 }
 
 VA(0x0046bce8, 0x559)
-int advManager::DoVisions(class hero *) { return 0; }
+// @early-stop exact bytes and all 42 relocation targets
+int advManager::DoVisions(hero *visionHero)
+{
+    char visionMessageResult[ADVMGR_VISIONS_MESSAGE_BUFFER_SIZE];
+    int creatureData;
+    int nearestDistanceState;
+    int nearestXId;
+    int nearestYData;
+    int scanXType;
+    int scanYLocal;
+    mapCell *cellData;
+    int joiningCount;
+    int monsterCountIndex;
+    int currentDistanceId;
+    int forcedJoinState;
+    float strengthRatioCurrent;
+    int joiningCostIndex;
+
+    nearestDistanceState = ADVMGR_VISIONS_NO_MONSTER_DISTANCE;
+    nearestYData = -1;
+    nearestXId = nearestYData;
+    for (scanXType = visionHero->m_x - ADVMGR_VISIONS_RADIUS;
+         scanXType <= visionHero->m_x + ADVMGR_VISIONS_RADIUS; ++scanXType) {
+        for (scanYLocal = visionHero->m_y - ADVMGR_VISIONS_RADIUS;
+             scanYLocal <= visionHero->m_y + ADVMGR_VISIONS_RADIUS; ++scanYLocal) {
+            cellData = GetCell(scanXType, scanYLocal);
+            if (cellData->triggerType == ADVMGR_VISIONS_MONSTER_TRIGGER) {
+                if (nearestDistanceState >
+                    (currentDistanceId = abs(visionHero->m_x - scanXType) +
+                                         abs(visionHero->m_y - scanYLocal))) {
+                    nearestDistanceState = currentDistanceId;
+                    nearestXId = scanXType;
+                    nearestYData = scanYLocal;
+                }
+            }
+        }
+    }
+
+    if (nearestDistanceState == ADVMGR_VISIONS_NO_MONSTER_DISTANCE) {
+        NormalDialog(
+            "You must be within 3 spaces of a monster for the Visions spell to work.",
+            1, -1, -1, -1, 0, -1, 0, -1, 0);
+        return 0;
+    }
+
+    cellData = GetCell(nearestXId, nearestYData);
+    creatureData = cellData->objIndex;
+    forcedJoinState = cellData->w4hi & MONSTER_JOIN_FORCED;
+    monsterCountIndex = cellData->w4hi & MONSTER_COUNT_MASK;
+    sprintf(gText, "{%d %s}\n\n", monsterCountIndex, gArmyNamesPlural[creatureData]);
+    strengthRatioCurrent = static_cast<float>(
+        gpPhilAI->FightValueOfStack(&visionHero->m_army, visionHero, 0, 0, 0, 0)) /
+        static_cast<float>(gMonsterDatabase[creatureData].fightValue * monsterCountIndex);
+
+    if (visionHero->m_army.CanJoin(creatureData) &&
+        strengthRatioCurrent > MONSTER_STRENGTH_JOIN &&
+        !visionHero->HasArtifact(MONSTER_NO_JOIN_ARTIFACT) &&
+        creatureData != MONSTER_GENIE && creatureData != MONSTER_EARTH_ELEMENTAL &&
+        creatureData != MONSTER_AIR_ELEMENTAL && creatureData != MONSTER_FIRE_ELEMENTAL &&
+        creatureData != MONSTER_WATER_ELEMENTAL) {
+        if (forcedJoinState) {
+            sprintf(visionMessageResult, "The creatures are willing to join us!");
+            strcat(gText, visionMessageResult);
+            goto showVision;
+        } else if (visionHero->m_secondarySkills[HERO_SKILL_DIPLOMACY] !=
+                   MONSTER_DIPLOMACY_NONE) {
+            if (visionHero->m_secondarySkills[HERO_SKILL_DIPLOMACY] ==
+                MONSTER_DIPLOMACY_EXPERT) {
+                joiningCount = monsterCountIndex;
+            } else if (visionHero->m_secondarySkills[HERO_SKILL_DIPLOMACY] ==
+                       MONSTER_DIPLOMACY_ADVANCED) {
+                joiningCount = monsterCountIndex / 2;
+            } else {
+                joiningCount = monsterCountIndex / 4;
+            }
+            if (joiningCount == 0)
+                joiningCount = 1;
+
+            joiningCostIndex = gMonsterDatabase[creatureData].cost * monsterCountIndex * 2;
+            if (joiningCostIndex >
+                gpGame->m_players[visionHero->m_owner].resources[RES_GOLD]) {
+                if (strengthRatioCurrent > MONSTER_STRENGTH_FLEE) {
+                    goto creaturesFlee;
+                } else {
+                    goto creaturesFight;
+                }
+            }
+
+            if (joiningCount == monsterCountIndex) {
+                sprintf(visionMessageResult,
+                        "All the creatures will join us...", joiningCostIndex);
+            } else {
+                sprintf(visionMessageResult,
+                        "%d of the creatures will join us...",
+                        monsterCountIndex, joiningCostIndex);
+            }
+            strcat(gText, visionMessageResult);
+            goto showVision;
+        }
+    }
+
+    if (strengthRatioCurrent > MONSTER_STRENGTH_FLEE) {
+creaturesFlee:
+        sprintf(visionMessageResult,
+                "These weak creatures will surely flee before us.");
+        strcat(gText, visionMessageResult);
+        goto showVision;
+    }
+creaturesFight:
+    sprintf(visionMessageResult,
+            "I fear these creatures are in the mood for a fight.");
+    strcat(gText, visionMessageResult);
+    goto showVision;
+
+showVision:
+    NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+    return 1;
+}
 
 VA(0x0046c241, 0xd7)
 int advManager::IsCrystalBallInEffect(int, int, int) { return 0; }
