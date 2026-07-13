@@ -34,6 +34,7 @@
 #include <SOURCE/hero.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/playerData.h>
+#include <SOURCE/philAI.h>
 #include <SOURCE/recruitUnit.h>
 #include <SOURCE/strip.h>
 #include <SOURCE/town.h>
@@ -1589,11 +1590,430 @@ update_amount:
     return 1;
 }
 
+// @early-stop
+// reloc-masked: instruction streams identical; only local-string/interior-global relocation identities differ
 VA(0x0041a1b4, 0x5cf)
-void townManager::SetupWell(class heroWindow *) {}
+void townManager::SetupWell(heroWindow *window)
+{
+    short unusedFirstIcon = 1;
+    short unusedFirstName = TOWN_WELL_FIRST_NAME_CONTROL;
+    short unusedFirstMonsterIcon = TOWN_WELL_FIRST_MONSTER_ICON_CONTROL;
+    short unusedFirstCreature = TOWN_WELL_FIRST_CREATURE_CONTROL;
+    short unusedFirstDetail = TOWN_WELL_FIRST_DETAIL_CONTROL;
+    short unusedFirstAvailable = TOWN_WELL_FIRST_AVAILABLE_CONTROL;
+    short unusedFirstAvailableCount = TOWN_WELL_FIRST_AVAILABLE_COUNT_CONTROL;
+    unsigned char dwellingTypes[8];
+    int available;
+    int dwelling;
+    tag_message message;
+    char iconName[16];
+    char detailText[40];
+    tag_monsterInfo monsterInfo;
+    int growth;
+
+    for (dwelling = 0; dwelling < TOWN_WELL_DWELLING_COUNT; ++dwelling) {
+        if (dwelling == TOWN_WELL_DWELLING_COUNT - 1 &&
+            (m_town->m_buildings &
+             (1L << TOWN_WELL_LAST_UPGRADE_BUILDING))) {
+            dwellingTypes[dwelling] = TOWN_WELL_DWELLING_COUNT * 2 - 1;
+        } else if (dwelling >= 1 &&
+                   (m_town->m_buildings &
+                    (1L << (dwelling + TOWN_WELL_FIRST_UPGRADE_BUILDING)))) {
+            dwellingTypes[dwelling] = static_cast<unsigned char>(
+                dwelling + TOWN_WELL_FIRST_UPGRADE_OFFSET);
+        } else {
+            dwellingTypes[dwelling] = static_cast<unsigned char>(dwelling);
+        }
+    }
+
+    message.type = TOWN_MESSAGE_SELECT;
+    message.field4 = 9;
+    sprintf(iconName, "cstl%s.icn", cHeroTypeShortName[m_town->m_type]);
+    message.text = iconName;
+    for (dwelling = 0; dwelling < TOWN_WELL_DWELLING_COUNT; ++dwelling) {
+        message.field8 = dwelling + 1;
+        window->BroadcastMessage(message);
+    }
+
+    for (dwelling = 0; dwelling < TOWN_WELL_DWELLING_COUNT; ++dwelling) {
+        message.field4 = 4;
+        message.field8 = dwelling + 1;
+        message.field18 = dwellingTypes[dwelling] +
+                          TOWN_COMMAND_FIRST_DWELLING;
+        window->BroadcastMessage(message);
+        sprintf(gText, "monh%04d.icn",
+                gDwellingType[m_town->m_type][dwellingTypes[dwelling]]);
+        message.field4 = 9;
+        message.field8 = dwelling + TOWN_WELL_FIRST_MONSTER_ICON_CONTROL;
+        message.text = gText;
+        window->BroadcastMessage(message);
+    }
+
+    message.type = TOWN_MESSAGE_SELECT;
+    message.field4 = 3;
+    for (dwelling = 0; dwelling < TOWN_WELL_DWELLING_COUNT; ++dwelling) {
+        sprintf(gText, GetBuildingName(
+            m_town->m_type,
+            dwellingTypes[dwelling] + TOWN_COMMAND_FIRST_DWELLING));
+        message.field8 = dwelling + TOWN_WELL_FIRST_NAME_CONTROL;
+        message.text = gText;
+        window->BroadcastMessage(message);
+
+        if (m_town->m_buildings &
+            (1L << (dwellingTypes[dwelling] +
+                    TOWN_COMMAND_FIRST_DWELLING))) {
+            available = m_town->m_garrison[dwellingTypes[dwelling]];
+            sprintf(gText, "Available:");
+            message.field8 = dwelling + TOWN_WELL_FIRST_AVAILABLE_CONTROL;
+            message.text = gText;
+            window->BroadcastMessage(message);
+            sprintf(gText, "%d", available);
+            message.field8 = dwelling +
+                             TOWN_WELL_FIRST_AVAILABLE_COUNT_CONTROL;
+            message.text = gText;
+            window->BroadcastMessage(message);
+        }
+
+        message.field8 = dwelling + TOWN_WELL_FIRST_CREATURE_CONTROL;
+        strcpy(gText, gArmyNamesPlural[
+            gDwellingType[m_town->m_type][dwellingTypes[dwelling]]]);
+        gText[0] -= ' ';
+        message.text = gText;
+        window->BroadcastMessage(message);
+    }
+
+    for (dwelling = 0; dwelling < TOWN_WELL_DWELLING_COUNT; ++dwelling) {
+        monsterInfo = gMonsterDatabase[
+            gDwellingType[m_town->m_type][dwellingTypes[dwelling]]];
+        strcpy(gText, "");
+        sprintf(detailText, "%s%d", cWellDetail[0], monsterInfo.attack);
+        strcat(gText, detailText);
+        sprintf(detailText, "\n%s%d", cWellDetail[1], monsterInfo.defense);
+        strcat(gText, detailText);
+        sprintf(detailText, "\n%s%d", cWellDetail[3], monsterInfo.damageMin);
+        strcat(gText, detailText);
+        if (monsterInfo.damageMin != monsterInfo.damageMax) {
+            sprintf(detailText, "-%d", monsterInfo.damageMax);
+            strcat(gText, detailText);
+        }
+        sprintf(detailText, "\n%s%d", cWellDetail[4], monsterInfo.hitPoints);
+        strcat(gText, detailText);
+        sprintf(detailText, cWellDetail[7], speedText[monsterInfo.speed]);
+        strcat(gText, detailText);
+        if (m_town->m_buildings &
+            (1L << (dwellingTypes[dwelling] +
+                    TOWN_COMMAND_FIRST_DWELLING))) {
+            growth = gMonsterDatabase[
+                gDwellingType[m_town->m_type][dwellingTypes[dwelling]]].growth;
+            growth += TOWN_WELL_BASE_GROWTH_BONUS;
+            if (dwelling == 0 &&
+                (m_town->m_buildings &
+                 (1L << TOWN_WELL_FIRST_DWELLING_GROWTH_BUILDING)))
+                growth += TOWN_WELL_FIRST_DWELLING_GROWTH_BONUS;
+            sprintf(detailText, cWellDetail[8], growth);
+            strcat(gText, detailText);
+        }
+        message.field4 = 3;
+        message.field8 = dwelling + TOWN_WELL_FIRST_DETAIL_CONTROL;
+        message.text = gText;
+        window->BroadcastMessage(message);
+    }
+}
 
 VA(0x0041a783, 0xf0f)
-void townManager::SetupThievesGuild(class heroWindow *, int) {}
+void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
+{
+    short unusedRankX = 0x102;
+    short unusedRankWidth = 0x44;
+    short unusedRankY = 0x1b;
+    short unusedRankHeight = 0x18;
+    short unusedIconWidth = 0x12;
+    short unusedPlayerWidth = 0x48;
+    short unusedFirstRankControl = TOWN_THIEVES_FIRST_RANK_CONTROL;
+    short unusedFirstPlayerControl = TOWN_THIEVES_FIRST_PLAYER_CONTROL;
+    short unusedCreatureY = 0x1a2;
+    int maxCategories;
+    int category;
+    long categoryStats[TOWN_THIEVES_PLAYER_COUNT];
+    signed char categoryOrder[TOWN_THIEVES_ORDER_BUFFER_SIZE];
+    int rank;
+    int firstAtRank;
+    int lastAtRank;
+    int tiedCount;
+    int rankX;
+    int position;
+    widget *iconControl;
+    tag_message message;
+    int playerIndex;
+    int displayPlayer;
+    int heroPosition;
+    int strongestHeroPosition;
+    int strongestHeroValue;
+    int heroValue;
+    hero *strongestHero;
+    char *widgetText;
+    widget *textControl;
+    char statText[200];
+    int stat;
+    int townPosition;
+    int armySlot;
+    townSlot *playerTown;
+    int strongestCreature;
+    int strongestCreatureValue;
+
+    if (informationLevel == -1)
+        informationLevel = gpGame->GetNumThievesGuilds(giCurPlayer);
+
+    if (informationLevel >= TOWN_THIEVES_INFO_ALL_CATEGORIES) {
+        maxCategories = TOWN_THIEVES_MAX_CATEGORIES;
+    } else {
+        if (informationLevel == TOWN_THIEVES_INFO_STRONGEST_CREATURE)
+            maxCategories = TOWN_THIEVES_CREATURE_CATEGORY_COUNT;
+        else if (informationLevel == TOWN_THIEVES_INFO_PERSONALITY)
+            maxCategories = TOWN_THIEVES_PERSONALITY_CATEGORY_COUNT;
+        else if (informationLevel == TOWN_THIEVES_INFO_PRIMARY_STATS)
+            maxCategories = TOWN_THIEVES_PRIMARY_CATEGORY_COUNT;
+        else
+            maxCategories = TOWN_THIEVES_BASIC_CATEGORY_COUNT;
+    }
+
+    for (position = gpGame->m_playerCount - gpGame->m_humanPlayerCount;
+         position < TOWN_THIEVES_PLAYER_COUNT; ++position) {
+        message.type = TOWN_MESSAGE_SELECT;
+        message.field4 = 6;
+        message.field8 = position + TOWN_THIEVES_FIRST_RANK_CONTROL;
+        message.field18 = 4;
+        window->BroadcastMessage(message);
+        message.field8 = position + TOWN_THIEVES_FIRST_PLAYER_CONTROL;
+        window->BroadcastMessage(message);
+    }
+    for (position = gpGame->m_playerCount - gpGame->m_humanPlayerCount;
+         position < TOWN_THIEVES_PLAYER_COUNT; ++position) {
+        message.type = TOWN_MESSAGE_SELECT;
+        message.field4 = 6;
+        message.field8 = position + TOWN_THIEVES_FIRST_PLAYER_CONTROL;
+        message.field18 = 4;
+        window->BroadcastMessage(message);
+    }
+
+    for (category = 0; category < maxCategories; ++category) {
+        GetCategoryStats(category, categoryStats, categoryOrder);
+        SortStats(categoryStats, categoryOrder);
+        firstAtRank = 0;
+        for (rank = 0;
+             rank < TOWN_THIEVES_PLAYER_COUNT &&
+             gpGame->m_playerCount - gpGame->m_humanPlayerCount !=
+                 firstAtRank;
+             ++rank) {
+            tiedCount = 1;
+            for (lastAtRank = firstAtRank;
+                 lastAtRank + 1 < gpGame->m_playerCount &&
+                 categoryStats[lastAtRank] == categoryStats[lastAtRank + 1];
+                 ++lastAtRank)
+                ++tiedCount;
+            rankX = rank * 0x44 + 0x102 - (tiedCount * 9 - 9);
+            for (position = firstAtRank; position <= lastAtRank; ++position) {
+                iconControl = new iconWidget(
+                    static_cast<short>(
+                        (position - firstAtRank) * 0x12 + rankX),
+                    static_cast<short>(category * 0x18 + 0x1b),
+                    0x12, 0x16, "townwind.icn",
+                    static_cast<short>(
+                        gpGame->m_players[categoryOrder[position]].color +
+                        TOWN_THIEVES_RANK_ICON_FRAME_BASE),
+                    0, -1, 0x10, 1);
+                if (iconControl == 0)
+                    MemError();
+                window->AddWidget(iconControl, -1);
+            }
+            firstAtRank = lastAtRank + 1;
+        }
+    }
+
+    playerIndex = 0;
+    for (displayPlayer = 0;
+         displayPlayer <
+             gpGame->m_playerCount - gpGame->m_humanPlayerCount;
+         ++displayPlayer) {
+        while (gpGame->m_playerDead[playerIndex] != 0)
+            ++playerIndex;
+        sprintf(gText, gColors[gpGame->m_players[playerIndex].color]);
+        gText[0] -= ' ';
+        message.type = TOWN_MESSAGE_SELECT;
+        message.field4 = 3;
+        message.field8 = displayPlayer + TOWN_THIEVES_FIRST_PLAYER_CONTROL;
+        message.text = gText;
+        window->BroadcastMessage(message);
+
+        if (informationLevel < TOWN_THIEVES_INFO_STRONGEST_HERO) {
+        } else {
+            strongestHeroPosition = -1;
+            strongestHeroValue = 0;
+            for (heroPosition = 0;
+                 heroPosition < gpGame->m_players[playerIndex].heroCount;
+                 ++heroPosition) {
+                strongestHero = &gpGame->m_heroRecs[
+                    gpGame->m_players[playerIndex].heroes[heroPosition]];
+                heroValue = gpPhilAI->FightValueOfStack(
+                    &strongestHero->m_army, strongestHero, 0, 0, 0, 0);
+                if (strongestHeroValue < heroValue) {
+                    strongestHeroPosition = heroPosition;
+                    strongestHeroValue = heroValue;
+                }
+            }
+
+            if (strongestHeroPosition != -1) {
+                strongestHero = &gpGame->m_heroRecs[
+                    gpGame->m_players[playerIndex]
+                        .heroes[strongestHeroPosition]];
+                iconControl = new iconWidget(
+                    static_cast<short>(displayPlayer * 0x44 + 0xf6),
+                    0x12d, 0, 0, "locators.icn", 0x16, 0, -1, 0x10, 1);
+                if (iconControl == 0)
+                    MemError();
+                window->AddWidget(iconControl, -1);
+                iconControl = new iconWidget(
+                    static_cast<short>(displayPlayer * 0x44 + 0xed),
+                    300, 0, 0, "miniport.icn",
+                    strongestHero->m_portrait, 0, -1, 0x10, 1);
+                if (iconControl == 0)
+                    MemError();
+                window->AddWidget(iconControl, -1);
+            }
+
+            if (informationLevel < TOWN_THIEVES_INFO_PRIMARY_STATS) {
+            } else {
+                if (strongestHeroPosition != -1) {
+                    strongestHero = &gpGame->m_heroRecs[
+                        gpGame->m_players[playerIndex]
+                            .heroes[strongestHeroPosition]];
+                    sprintf(gText, "Att.\nDef.\nPower\nKnowl.");
+                    widgetText = static_cast<char *>(BaseAlloc(
+                        strlen(gText) + 1,
+                        "I:\\Projects\\Heroes\\Prog\\SOURCE\\TOWNMGR.CPP",
+                        *reinterpret_cast<short *>("\x0e\x0e") +
+                            TOWN_THIEVES_SOURCE_LINE_HERO_LABELS));
+                    strcpy(widgetText, gText);
+                    textControl = new textWidget(
+                        static_cast<short>(displayPlayer * 0x44 + 0xef),
+                        0x153, 0x28, 0x30, widgetText, "smalfont.fnt",
+                        1, -1, 0x200, 0);
+                    window->AddWidget(textControl, -1);
+
+                    sprintf(gText, "");
+                    for (stat = 0; stat < TOWN_THIEVES_PRIMARY_STAT_COUNT;
+                         ++stat) {
+                        sprintf(statText, "%d\n", strongestHero->Stats(stat));
+                        strcat(gText, statText);
+                    }
+                    widgetText = static_cast<char *>(BaseAlloc(
+                        strlen(gText) + 1,
+                        "I:\\Projects\\Heroes\\Prog\\SOURCE\\TOWNMGR.CPP",
+                        *reinterpret_cast<short *>("\x0e\x0e") +
+                            TOWN_THIEVES_SOURCE_LINE_HERO_STATS));
+                    strcpy(widgetText, gText);
+                    textControl = new textWidget(
+                        static_cast<short>(displayPlayer * 0x44 + 0x11c),
+                        0x153, 0xf, 0x30, widgetText, "smalfont.fnt",
+                        1, -1, 0x200, 0);
+                    window->AddWidget(textControl, -1);
+                }
+
+                if (informationLevel < TOWN_THIEVES_INFO_PERSONALITY) {
+                } else {
+                    strcpy(gText, cPersonality[
+                        gpGame->m_players[playerIndex].unknown0f]);
+                    widgetText = static_cast<char *>(BaseAlloc(
+                        strlen(gText) + 1,
+                        "I:\\Projects\\Heroes\\Prog\\SOURCE\\TOWNMGR.CPP",
+                        *reinterpret_cast<short *>("\x0e\x0e") +
+                            TOWN_THIEVES_SOURCE_LINE_PERSONALITY));
+                    strcpy(widgetText, gText);
+                    textControl = new textWidget(
+                        static_cast<short>(displayPlayer * 0x44 + 0xe3),
+                        0x18d, 0x4a, 0x10, widgetText, "smalfont.fnt",
+                        1, -1, 8, 1);
+                    window->AddWidget(textControl, -1);
+
+                    if (informationLevel <
+                        TOWN_THIEVES_INFO_STRONGEST_CREATURE) {
+                    } else {
+                        strongestCreature = -1;
+                        strongestCreatureValue = 0;
+                        for (townPosition = 0;
+                             townPosition <
+                             gpGame->m_players[playerIndex].townCount;
+                             ++townPosition) {
+                            playerTown = &gpGame->m_castleRecs[
+                                gpGame->m_players[playerIndex]
+                                    .towns[townPosition]];
+                            for (armySlot = 0;
+                                 armySlot < TOWN_ARMY_SLOT_COUNT; ++armySlot) {
+                                if (playerTown->m_army
+                                            .m_troopTypes[armySlot] != -1 &&
+                                    playerTown->m_army
+                                            .m_creatureCounts[armySlot] > 0 &&
+                                    strongestCreatureValue <
+                                        gMonsterDatabase[
+                                            playerTown->m_army
+                                                .m_troopTypes[armySlot]]
+                                            .fightValue) {
+                                    strongestCreature = playerTown->m_army
+                                                            .m_troopTypes[armySlot];
+                                    strongestCreatureValue =
+                                        gMonsterDatabase[
+                                            playerTown->m_army
+                                                .m_troopTypes[armySlot]]
+                                            .fightValue;
+                                }
+                            }
+                        }
+                        for (heroPosition = 0;
+                             heroPosition <
+                             gpGame->m_players[playerIndex].heroCount;
+                             ++heroPosition) {
+                            strongestHero = &gpGame->m_heroRecs[
+                                gpGame->m_players[playerIndex]
+                                    .heroes[heroPosition]];
+                            for (armySlot = 0;
+                                 armySlot < TOWN_ARMY_SLOT_COUNT; ++armySlot) {
+                                if (strongestHero->m_army
+                                            .m_creatureTypes[armySlot] != -1 &&
+                                    strongestHero->m_army
+                                            .m_creatureCounts[armySlot] > 0 &&
+                                    strongestCreatureValue <
+                                        gMonsterDatabase[
+                                            strongestHero->m_army
+                                                .m_creatureTypes[armySlot]]
+                                            .fightValue) {
+                                    strongestCreature = strongestHero->m_army
+                                                            .m_creatureTypes[armySlot];
+                                    strongestCreatureValue =
+                                        gMonsterDatabase[
+                                            strongestHero->m_army
+                                                .m_creatureTypes[armySlot]]
+                                            .fightValue;
+                                }
+                            }
+                        }
+                        if (strongestCreature != -1) {
+                            iconControl = new iconWidget(
+                                static_cast<short>(
+                                    displayPlayer * 0x44 + 0xf4),
+                                0x1a2, 0x28, 0x22, "mons32.icn",
+                                static_cast<short>(strongestCreature),
+                                0, -1, 0x11, 1);
+                            if (iconControl == 0)
+                                MemError();
+                            window->AddWidget(iconControl, -1);
+                        }
+                    }
+                }
+            }
+        }
+        ++playerIndex;
+    }
+}
 
 VA(0x0041b692, 0x56a)
 void GetCategoryStats(int, long int * const, signed char * const) {}

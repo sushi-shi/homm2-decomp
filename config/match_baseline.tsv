@@ -1315,14 +1315,14 @@ SOURCE/TOWNMGR	?SetArmyCommand@townManager@@QAEXH@Z	5.8733	c035e26664c1
 SOURCE/TOWNMGR	?SetCommandAndText@townManager@@QAEXAAUtag_message@@@Z	2.0474	a7b9aaceb839
 SOURCE/TOWNMGR	?SetupExtraStuff@townManager@@QAEXXZ	11.3043	fd2e85612c8e
 SOURCE/TOWNMGR	?SetupMage@townManager@@QAEXPAVheroWindow@@@Z	99.0440	ffeb279516de
-SOURCE/TOWNMGR	?SetupThievesGuild@townManager@@QAEXPAVheroWindow@@H@Z	1.5904	b3025645258b
+SOURCE/TOWNMGR	?SetupThievesGuild@townManager@@QAEXPAVheroWindow@@H@Z	91.8057	2f59890b00ad
 SOURCE/TOWNMGR	?SetupTown@townManager@@QAEXXZ	2.1963	1aa94671d25a
-SOURCE/TOWNMGR	?SetupWell@townManager@@QAEXPAVheroWindow@@@Z	3.3802	48eee2a8a959
+SOURCE/TOWNMGR	?SetupWell@townManager@@QAEXPAVheroWindow@@@Z	99.7057	86dabaee541b
 SOURCE/TOWNMGR	?ShiftQualChange@townManager@@QAEXXZ	100.0000	779a7397c541
 SOURCE/TOWNMGR	?ShowText@townManager@@QAEXPAD@Z	36.0556	26e25b992d92
 SOURCE/TOWNMGR	?SortStats@@YIXQAJQAC@Z	20.5441	730725d960c4
 SOURCE/TOWNMGR	?SplitArmy@townManager@@QAEXXZ	99.9183	5383164328b3
-SOURCE/TOWNMGR	?SplitArmyHandler@@YIHAAUtag_message@@@Z	94.7674	6ab4fa4ba862
+SOURCE/TOWNMGR	?SplitArmyHandler@@YIHAAUtag_message@@@Z	94.7674	cb3a476aa78b
 SOURCE/TOWNMGR	?TavernHandler@@YIHAAUtag_message@@@Z	92.5357	89c5f1810e8a
 SOURCE/TOWNMGR	?Toggle@townManager@@QAEXH@Z	100.0000	5fbbe5a21ff8
 SOURCE/TOWNMGR	?UnloadTown@townManager@@QAEXXZ	11.0000	234150c5bedc
