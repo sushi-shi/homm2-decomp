@@ -42,7 +42,10 @@ class townManager;
 #pragma pack(push, 1)
 struct townArmyRecord {
     signed char m_troopTypes[5];
-    unsigned short m_troopCounts[5];
+    union {
+        unsigned short m_troopCounts[5];
+        short m_creatureCounts[5];
+    };
 };
 struct townSlot {
     signed char id;

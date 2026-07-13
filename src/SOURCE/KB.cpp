@@ -1293,7 +1293,7 @@ DATA(0x004fc558) int giSpellEffectShowType;
 DATA(0x004fc560) signed char gcColorToPlayerPos[8];
 DATA(0x004fc568) char *cCombatBkgNames[20];
 DATA(0x004fc5b8) struct SCmbtObstacle *sCmbtObstacles;
-DATA(0x004fc778) int *gEstatesGoldLevel;
+DATA(0x004fc778) int gEstatesGoldLevel[4];
 DATA(0x004fc788) float *gfSSLogisticsMod;
 DATA(0x004fc798) float *gfSSNavigationMod;
 DATA(0x004fc7a8) float *gfSSArcheryMod;
