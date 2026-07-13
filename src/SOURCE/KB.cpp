@@ -1321,7 +1321,7 @@ DATA(0x004fd870) char *cHeroTypeInitial;
 DATA(0x004fd878) int giDeferObjDrawX;
 DATA(0x004fd87c) int giDeferObjDrawY;
 DATA(0x004fd880) class heroWindow *gpInitWin;
-DATA(0x004fd8e0) struct SCmbtHero *sCmbtHero;
+DATA(0x004fd8e0) struct SCmbtHero sCmbtHero[12];
 DATA(0x004fdeec) unsigned char *iWallToHexCell;
 DATA(0x004fdef0) unsigned char *iTowerToHexCell;
 DATA(0x004fdef8) unsigned short wallPos[4][2];

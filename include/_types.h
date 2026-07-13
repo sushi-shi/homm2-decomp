@@ -110,11 +110,21 @@ struct tag_monsterInfo {
     char unknown18[2];
 };
 #pragma pack(pop)
+#pragma pack(push, 1)
+struct SCmbtHero {
+    short x[2];
+    short y[2];
+    char unknown8;
+    signed char animationFrameCount[8];
+    char unknown11[0x70];
+};
+SIZE(SCmbtHero, 0x81);
+#pragma pack(pop)
 struct SSpellInfo {
-    char m_pad0[9];
+    char soundName[9];
     unsigned char level;
     unsigned char iconIndex;
-    char m_pad1;
+    unsigned char combatEffect;
     short aiValue;
     unsigned char raceChance[6];
     unsigned char attributes;

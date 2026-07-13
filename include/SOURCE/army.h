@@ -9,11 +9,11 @@ class army {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
-    char   field_0x0;  // +0x00
+    char   m_animationState;  // +0x00
     char _pad_0x1[0x1];
     char   field_0x2;  // +0x02
     char _pad_0x3[0x3];
-    int    field_0x6;  // +0x06
+    int    m_drawState;  // +0x06
     char _pad_0xa[0x44];
     int    field_0x4e;  // +0x4e
     int    field_0x52;  // +0x52
@@ -25,16 +25,16 @@ public:
     int    field_0x6a;  // +0x6a
     int    field_0x6e;  // +0x6e
     int    field_0x72;  // +0x72
-    int    field_0x76;  // +0x76
-    int    field_0x7a;  // +0x7a
+    int    m_monsterType;  // +0x76
+    int    m_hex;  // +0x7a
     int    field_0x7e;  // +0x7e
     int    field_0x82;  // +0x82
-    int    field_0x86;  // +0x86
+    int    m_facing;  // +0x86
     int    field_0x8a;  // +0x8a
     int    field_0x8e;  // +0x8e
     int    field_0x92;  // +0x92
-    int    field_0x96;  // +0x96
-    int    field_0x9a;  // +0x9a
+    int    m_quantity;  // +0x96
+    int    m_lastTargetHex;  // +0x9a
     int    field_0x9e;  // +0x9e
     int    m_hitPointsLost;  // +0xa2
     int    field_0xa6;  // +0xa6
@@ -51,14 +51,14 @@ public:
     char   field_0xc9;  // +0xc9
     signed char m_shots;  // +0xca
     char _pad_0xcb[0x5];
-    int    field_0xd0;  // +0xd0  !union: conflicting widths
+    int    m_flags;  // +0xd0
     short  field_0xd4;  // +0xd4
-    int    field_0xd6;  // +0xd6
-    int    field_0xda;  // +0xda
-    int    field_0xde;  // +0xde
+    int    m_animationValue1;  // +0xd6
+    int    m_animationValue2;  // +0xda
+    int    m_animationValue3;  // +0xde
     int    field_0xe2;  // +0xe2
-    int    field_0xe6;  // +0xe6
-    int    field_0xea;  // +0xea  !union: conflicting widths
+    int    m_effectX;  // +0xe6
+    int    m_effectY;  // +0xea
     int    field_0xee;  // +0xee
     int    field_0xf2;  // +0xf2
     int    field_0xf6;  // +0xf6

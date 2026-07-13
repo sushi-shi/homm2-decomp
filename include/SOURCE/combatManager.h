@@ -6,6 +6,7 @@
 #include "../BASE/baseManager.h"
 #include "../BASE/icon.h"
 #include "army.h"
+#include "hexcell.h"
 // forward declarations:
 class armyGroup;
 class hero;
@@ -21,28 +22,37 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
-    int    field_0x36;  // +0x36
-    char _pad_0x3a[0x85a];
-    char   field_0x894;  // +0x894
-    char _pad_0x895[0xc5];
-    char   field_0x95a;  // +0x95a
-    char _pad_0x95b[0x125];
-    char   field_0xa80;  // +0xa80
-    char _pad_0xa81[0x30d];
-    char   field_0xd8e;  // +0xd8e
-    char _pad_0xd8f[0xc5];
-    char   field_0xe54;  // +0xe54
-    char _pad_0xe55[0x125];
-    char   field_0xf7a;  // +0xf7a
-    char _pad_0xf7b[0x228f];
-    class icon *towerIcon;  // +0x320a
+    int    m_unknown36;  // +0x36
+    char _pad_0x3a[0x4da];
+    hexcell m_hexCells[99];  // +0x514
+    char _pad_0x2afa[0x710];
+    class icon *m_towerIcon;  // +0x320a
     char _pad_0x320e[0x24];
-    class icon *obstacleIcons[1];  // +0x3232
-    char _pad_0x3236[0x319];
-    class army armies[2][21];  // +0x354f
-    int currentArmySide;  // +0xf2a3
-    int currentArmyIndex;  // +0xf2a7
-    char _pad_0xf2ab[0x5cc];  // tail pad to sizeof
+    class icon *m_obstacleIcons[1];  // +0x3232
+    char _pad_0x3236[0x20];
+    short m_eagleEyeSpell[2];  // +0x3256
+    char _pad_0x325a[0x2d];
+    class hero *m_heroes[2];  // +0x3287
+    char _pad_0x328f[0xfa];
+    int m_spellPower[2];  // +0x3389
+    char _pad_0x3391[0x14];
+    int m_heroAnimationState[2];  // +0x33a5
+    int m_heroAnimationFrame[2];  // +0x33ad
+    int m_heroSpriteIndex[2];  // +0x33b5
+    char _pad_0x33bd[0x182];
+    int m_heroCastSpell[2];  // +0x353f
+    int m_armyCount[2];  // +0x3547
+    class army m_armies[2][21];  // +0x354f
+    int m_currentArmySide;  // +0xf2a3
+    int m_currentArmyIndex;  // +0xf2a7
+    char _pad_0xf2ab[0x4];
+    int m_currentSide;  // +0xf2af
+    char _pad_0xf2b3[0x4];
+    int m_limitCreature;  // +0xf2b7
+    int m_limitCreatureHex;  // +0xf2bb
+    char _pad_0xf2bf[0xc0];
+    int m_limitCreatureCount[2][20];  // +0xf37f
+    char _pad_0xf41f[0x458];
     // --- constructors ---
     combatManager(void);
     // --- virtual methods (vtable order) ---
