@@ -21,7 +21,9 @@ struct BHC {
 typedef enum AIResourceValue {
     AI_RV_UNSET = -32001,
     AI_NEARBY_RADIUS = 10,
-    AI_HERO_COUNT = 54
+    AI_HERO_COUNT = 54,
+    AI_MAP_SIZE_SMALL = 36,
+    AI_MAP_SIZE_LARGE = 108
 } AIResourceValue;
 
 typedef enum AIObjectType {

@@ -1,6 +1,7 @@
 #ifndef HOMM2_KB_H
 #define HOMM2_KB_H
 #include <va.h>
+#include <SOURCE/armyGroup.h>
 // Declarations of the free functions DEFINED in KB.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
@@ -39,6 +40,10 @@ class townManager;
 #ifndef HOMM2_GAME_RECORD_TYPES
 #define HOMM2_GAME_RECORD_TYPES
 #pragma pack(push, 1)
+struct townArmyRecord {
+    signed char m_troopTypes[5];
+    unsigned short m_troopCounts[5];
+};
 struct townSlot {
     signed char id;
     signed char owner;
@@ -48,16 +53,29 @@ struct townSlot {
     unsigned char y;
     signed char unknown6;
     signed char unknown7;
-    signed char army[15];
+    union {
+        townArmyRecord m_army;
+        signed char army[15];
+    };
     signed char occupyingHeroId;
     int buildings;
     char unknown1c;
     char unknown1d;
-    char pad1e[0x1a];
+    short dwellingGrowth[12];
+    unsigned char m_onMap;
+    signed char m_unknown37;
     signed char unknown38;
-    char pad39[0x1c];
+    signed char m_originalOwner;
+    unsigned short m_extraIndex;
+    union {
+        signed char m_spells[5][4];
+        struct {
+            char m_spellPad[19];
+            signed char m_spellCounts[6];
+        };
+    };
     short unknown55;
-    char pad57[0xd];
+    char m_name[13];
 };
 #pragma pack(pop)
 SIZE(townSlot, 0x64);

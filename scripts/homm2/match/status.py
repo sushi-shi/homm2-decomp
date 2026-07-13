@@ -226,9 +226,10 @@ def write_baseline(base):
     BASELINE.write_text("\n".join(lines) + "\n")
 
 
-def cmd_update(data, _accept_ignored=False):
+def cmd_update(data, accept_regressions=False):
     """max% keyed by source hash: same hash -> max(old, current); changed hash -> reset to current.
-    No blessing needed for tu-cumulative dips (same hash keeps its max)."""
+    With --accept-regressions, intentional shared-layout edits adopt the new hash without discarding
+    the retained maximum. No blessing is needed for tu-cumulative dips (same hash keeps its max)."""
     cur = _fn_fuzzy(data); base = load_baseline(); sh = source_hashes()
     out = {}
     for k, c in cur.items():
@@ -236,7 +237,10 @@ def cmd_update(data, _accept_ignored=False):
         old_mx, old_h = base.get(k, (0.0, None))
         # reset only when a KNOWN hash actually changed (the function's own source was edited);
         # on first-time migration (old_h None) or an unchanged hash, keep the accumulated max.
-        mx = c if (old_h and h != old_h) else max(old_mx, c)
+        if old_h and h != old_h:
+            mx = max(old_mx, c) if accept_regressions else c
+        else:
+            mx = max(old_mx, c)
         out[k] = (mx, h)
     write_baseline(out)
     at100 = sum(1 for (mx, _) in out.values() if mx >= 99.995)
