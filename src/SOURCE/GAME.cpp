@@ -39,6 +39,7 @@
 #include <BASE/heroWindow.h>
 #include <BASE/iconWidget.h>
 #include <BASE/BITS.h>
+#include <BASE/Bzip.h>
 #include <SOURCE/ARMY.h>
 #include <SOURCE/kbwin.h>
 
@@ -52,6 +53,8 @@
 #define GSAVELINE (*reinterpret_cast<const short *>("\x94\x02"))
 #define GLOADLINE (*reinterpret_cast<const short *>("\x4f\x04"))
 #define GMAPLINE (*reinterpret_cast<const short *>("\n"))
+#define GTRANSMITLINE (*reinterpret_cast<const short *>("N\""))
+#define GRECEIVELINE (*reinterpret_cast<const short *>("-["))
 #define VIEW_ARMY_FRAMES \
     "\x37\x3a\x37\x62\x37\x8a\x37\xb9\x37\xc0\x37\xc6\x37\x0d\x38\x11\x38\x15\x38\x19" \
     "\x38\x1d\x38\x21\x38\x25\x38\x29\x38\x2d\x38\x31\x38\x35\x38\x39\x38\x3d\x38\x41" \
@@ -2071,8 +2074,158 @@ int game::ViewSpells(class hero *, int, int (*)(struct tag_message &), int) { re
 VA(0x00479a38, 0x403)
 void game::UpdateSpellWidgets(void) {}
 
+// @early-stop
+// Exact 0x692-byte span and 101 relocation sites. The live residual is the
+// commutative equality at +0x14: retail loads the window-manager field before
+// msg.field8, while this TU loads msg.field8 first. Both source operand orders
+// emit the same sequence; this is an /Od TU-cumulative evaluation-order choice.
 VA(0x00479e3b, 0x692)
-int ViewSpellsHandler(struct tag_message &) { return 0; }
+int ViewSpellsHandler(tag_message &msg)
+{
+    int spell;
+
+    if (msg.type == 4) {
+        gpWindowManager->ConvertToHover(msg);
+        if (msg.field8 == gpWindowManager->field_0x5e) {
+            return 1;
+        } else {
+            return gpGame->m_viewSpellsCallback(msg);
+        }
+    }
+    if (msg.type == 0x200) {
+      switch (msg.field4) {
+    case 13:
+        if (msg.field4 == 14 || (msg.fieldC & 0x200) != 0)
+            break;
+        {
+            switch (msg.field8) {
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+                sprintf(gText, cSpellHelp[8], viewSpellsHero->m_spellPoints);
+                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                break;
+            case 2:
+                if (gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType] == 0)
+                    break;
+                gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType] -= 12;
+                if (gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType] < 0)
+                    gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType] = 0;
+                gpGame->UpdateSpellWidgets();
+                gpGame->m_viewSpellsWindow->MoveWindow(0, 0);
+                break;
+            case 3:
+                if (gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType] + 12 <
+                    gpGame->m_viewSpellsCount[gpGame->m_viewSpellsType])
+                    gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType] += 12;
+                gpGame->UpdateSpellWidgets();
+                gpGame->m_viewSpellsWindow->MoveWindow(0, 0);
+                break;
+            case 4:
+                gpGame->m_viewSpellsType = 1;
+                gpGame->UpdateSpellWidgets();
+                gpGame->m_viewSpellsWindow->MoveWindow(0, 0);
+                break;
+            case 5:
+                gpGame->m_viewSpellsType = 0;
+                gpGame->UpdateSpellWidgets();
+                gpGame->m_viewSpellsWindow->MoveWindow(0, 0);
+                break;
+            case 0x7800:
+                msg.field8 = 10;
+                break;
+            }
+        }
+        break;
+    case 12:
+    case 14:
+        if (msg.field4 == 14 || (msg.fieldC & 0x200) != 0) {
+            switch (msg.field8) {
+            case 100:
+            case 101:
+            case 102:
+            case 103:
+            case 104:
+            case 105:
+            case 106:
+            case 107:
+            case 108:
+            case 109:
+            case 110:
+            case 111:
+                spell = gpGame->m_viewSpellsHero->GetNthSpell(
+                    gpGame->m_viewSpellsType,
+                    gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType] +
+                        (msg.field8 - 100) + 1);
+                NormalDialog(gSpellDesc[spell], 4, -1, -1, 8, spell, -1, 0, -1, 0);
+                break;
+            case 2:
+                NormalDialog(cSpellHelp[0], 4, -1, -1, -1, 0, -1, 0, -1, 0);
+                break;
+            case 3:
+                NormalDialog(cSpellHelp[1], 4, -1, -1, -1, 0, -1, 0, -1, 0);
+                break;
+            case 4:
+                NormalDialog(cSpellHelp[2], 4, -1, -1, -1, 0, -1, 0, -1, 0);
+                break;
+            case 5:
+                NormalDialog(cSpellHelp[3], 4, -1, -1, -1, 0, -1, 0, -1, 0);
+                break;
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+                sprintf(gText, cSpellHelp[8], viewSpellsHero->m_spellPoints);
+                NormalDialog(gText, 4, -1, -1, -1, 0, -1, 0, -1, 0);
+                break;
+            }
+        } else {
+          switch (msg.field8) {
+          case 100:
+          case 101:
+          case 102:
+          case 103:
+          case 104:
+          case 105:
+          case 106:
+          case 107:
+          case 108:
+          case 109:
+          case 110:
+          case 111:
+            spell = gpGame->m_viewSpellsHero->GetNthSpell(
+                gpGame->m_viewSpellsType,
+                gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType] +
+                    (msg.field8 - 100) + 1);
+            if (gpGame->m_viewSpellsReadOnly) {
+                NormalDialog(gSpellDesc[spell], 1, -1, -1, 8, spell, -1, 0, -1, 0);
+                return 1;
+            }
+            if (GetManaCost(spell, viewSpellsHero) > viewSpellsHero->m_spellPoints) {
+                sprintf(gText,
+                        "That spell costs %d mana.  You only have %d mana, so you can't cast the spell.",
+                        GetManaCost(spell, viewSpellsHero), viewSpellsHero->m_spellPoints);
+                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                return 0;
+            }
+            gpGame->m_viewSpell = spell;
+            msg.field4 = 10;
+            return 2;
+          }
+        }
+        break;
+    default:
+        break;
+      }
+
+      if (msg.field8 == 10) {
+          msg.field4 = msg.field8;
+          return 2;
+      }
+    }
+    return 1;
+}
 
 VA(0x0047a4cd, 0x17c)
 int ViewSpecialHandler(struct tag_message &) { return 0; }
@@ -2320,8 +2473,82 @@ void game::ViewArmy(int x, int y, int monsterType, int numTroops, town *castle,
 VA(0x0047b2cf, 0x3f5)
 int ViewArmyHandler(struct tag_message &) { return 0; }
 
+// @early-stop
+// Relocation-masked comparison is identical for all 0x671 bytes (133 relocation
+// sites in both objects). The objdiff residual is delinked local-label identity.
 VA(0x0047b6c4, 0x671)
-int game::GetRandomNumTroops(int) { return 0; }
+int game::GetRandomNumTroops(int monsterType)
+{
+    switch (monsterType) {
+    case 0: return Random(40, 80);
+    case 1: return Random(20, 30);
+    case 2: return Random(20, 30);
+    case 3: return Random(20, 30);
+    case 4: return Random(20, 30);
+    case 5: return Random(12, 25);
+    case 6: return Random(12, 25);
+    case 7: return Random(10, 18);
+    case 8: return Random(8, 16);
+    case 9: return Random(6, 12);
+    case 10: return Random(6, 10);
+    case 11: return Random(25, 40);
+    case 12: return Random(15, 30);
+    case 13: return Random(15, 30);
+    case 14: return Random(20, 35);
+    case 15: return Random(12, 25);
+    case 16: return Random(10, 20);
+    case 17: return Random(7, 10);
+    case 18: return Random(7, 10);
+    case 19: return Random(5, 7);
+    case 20: return Random(25, 45);
+    case 21: return Random(12, 25);
+    case 22: return Random(10, 22);
+    case 23: return Random(15, 30);
+    case 24: return Random(12, 28);
+    case 25: return Random(10, 25);
+    case 26: return Random(10, 20);
+    case 27: return Random(8, 15);
+    case 28: return Random(7, 12);
+    case 29: return Random(20, 50);
+    case 30: return Random(15, 30);
+    case 31: return Random(12, 25);
+    case 32: return Random(10, 16);
+    case 33: return Random(9, 16);
+    case 34: return Random(7, 10);
+    case 35: return Random(4, 7);
+    case 36: return Random(3, 7);
+    case 37: return Random(3, 7);
+    case 38: return Random(20, 50);
+    case 39: return Random(15, 30);
+    case 40: return Random(10, 25);
+    case 41: return Random(10, 22);
+    case 42: return Random(10, 16);
+    case 43: return Random(8, 12);
+    case 44: return Random(7, 11);
+    case 45: return Random(5, 8);
+    case 46: return Random(3, 7);
+    case 47: return Random(20, 50);
+    case 48: return Random(15, 30);
+    case 49: return Random(15, 30);
+    case 50: return Random(10, 25);
+    case 51: return Random(10, 25);
+    case 52: return Random(8, 12);
+    case 53: return Random(8, 12);
+    case 54: return Random(6, 10);
+    case 55: return Random(6, 10);
+    case 56: return Random(4, 8);
+    case 57: return Random(20, 40);
+    case 58: return Random(12, 25);
+    case 59: return Random(10, 20);
+    case 60: return Random(5, 10);
+    case 61: return Random(12, 20);
+    case 62: return Random(13, 25);
+    case 63: return Random(13, 25);
+    case 64: return Random(13, 25);
+    case 65: return Random(13, 25);
+    default: return 3;
+    }
+}
 
 VA(0x0047bd35, 0x3f)
 void game::TurnOnAIMusic(void)
@@ -2765,8 +2992,139 @@ void game::ConvertObject(int, int, int, int, int, int, int, int, int, int, int) 
 VA(0x0047f42f, 0x1c2)
 void game::RandomizeTown(int, int, int) {}
 
+// @early-stop
+// Exact 0x619-byte span and 22 relocation sites. The remaining /Od differences
+// are operand evaluation in the inlined GetCell(x + 1, ...) accessors and the
+// columnOffset + x expressions. Both operand spellings were tested unchanged;
+// the residual is TU-cumulative compiler state, not a behavioral difference.
 VA(0x0047f5f1, 0x619)
-void game::RandomizeMine(int, int) {}
+void game::RandomizeMine(int x, int y)
+{
+    unsigned char objectFrame1;
+    int mineId;
+    int mineType29;
+    int terrain3 = giGroundToTerrain[WORLDMAP->GetCell(x, y)->tile];
+    int columnOffset4;
+    int retry4;
+    int rowOffset0;
+    unsigned char mineFrame36;
+    int triggerType19;
+
+    for (retry4 = 0; retry4 < 30; retry4++) {
+        switch (terrain3) {
+        case 1:
+        case 6:
+            mineType29 = Random(1, 6);
+            if (mineType29 == 1)
+                mineType29 = 0;
+            break;
+        case 2:
+            mineType29 = Random(2, 6);
+            break;
+        case 3:
+            mineType29 = Random(0, 6);
+            break;
+        case 4:
+            mineType29 = 1;
+            break;
+        default:
+            mineType29 = Random(1, 6);
+            break;
+        }
+        if (RandMineQty[mineType29] == 0)
+            retry4 = 30;
+    }
+    RandMineQty[mineType29]++;
+
+    switch (mineType29) {
+    case 0:
+        mineFrame36 = 5;
+        break;
+    case 1:
+        mineFrame36 = 25;
+        break;
+    default:
+        switch (terrain3) {
+        case 1:
+            mineFrame36 = 15;
+            break;
+        case 2:
+            mineFrame36 = 19;
+            break;
+        default:
+            mineFrame36 = 9;
+            break;
+        }
+        break;
+    }
+
+    switch (mineType29) {
+    case 0:
+        objectFrame1 = 7;
+        break;
+    case 1:
+        switch (terrain3) {
+        case 3:
+            objectFrame1 = 43;
+            break;
+        case 4:
+            objectFrame1 = 35;
+            break;
+        default:
+            objectFrame1 = 27;
+            break;
+        }
+        break;
+    default:
+        switch (terrain3) {
+        case 1:
+            objectFrame1 = 17;
+            break;
+        case 2:
+            objectFrame1 = 21;
+            break;
+        case 3:
+            objectFrame1 = 23;
+            break;
+        case 5:
+            objectFrame1 = 13;
+            break;
+        default:
+            objectFrame1 = 11;
+            break;
+        }
+        break;
+    }
+
+    WORLDMAP->GetCell(x, y)->objIndex = objectFrame1;
+    WORLDMAP->GetCell(x + 1, y)->objIndex = objectFrame1 + 1;
+    WORLDMAP->GetCell(x, y - 1)->ovlIndex = mineFrame36;
+    WORLDMAP->GetCell(x + 1, y - 1)->ovlIndex = mineFrame36 + 1;
+
+    if (mineType29 == 1) {
+        WORLDMAP->GetCell(x + 1, y)->m_objType |= 1;
+        triggerType19 = 1;
+    } else if (mineType29 == 0) {
+        triggerType19 = 29;
+    } else {
+        m_worldMap.ChangeTilesetIndex(WORLDMAP->GetCell(x + 1, y),
+                                      x + 1, y, 29, mineType29 - 2, 0, -1);
+        triggerType19 = 23;
+    }
+
+    mineId = GetMineId(x, y);
+    for (rowOffset0 = 0; rowOffset0 < 2; rowOffset0++) {
+        for (columnOffset4 = 0; columnOffset4 < 2; columnOffset4++) {
+            if ((WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->triggerType & 0x7f) > 0)
+                if ((WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->triggerType & 0x7f) <= 0x30)
+                    continue;
+            WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->w4hi = mineId;
+            WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->triggerType = triggerType19;
+        }
+    }
+    WORLDMAP->GetCell(x, y)->triggerType |= 0x80;
+    m_mines[mineId].resourceType = static_cast<signed char>(mineType29);
+}
 
 VA(0x0047fc0a, 0xc6)
 void game::InitRandomArtifacts(void)
@@ -2801,8 +3159,157 @@ void game::RandomizeHeroPool(void) {}
 VA(0x004800a6, 0x378)
 void game::SetRandomHeroArmies(int, int) {}
 
+// @early-stop
+// Exact 0x746-byte span and 56 relocation sites. The retained source-hash build
+// was relocation-masked byte-identical; after reconstructing its exact predecessor,
+// the live /Od output differs only in commutative MAP_HEIGHT/MAP_WIDTH loop-bound
+// load order. Reversed comparisons emit the same sequence (TU-cumulative state).
 VA(0x0048041e, 0x746)
-void game::ProcessRandomObjects(void) {}
+void game::ProcessRandomObjects(void)
+{
+    int maxValue17;
+    int x10;
+    int mineIndex8;
+    int y8;
+    int artifactId18;
+    int minValue7;
+    mapCell *cell6;
+    int randomType0;
+    int randomObjectType3;
+
+    giUABaseX = -1;
+    giUABaseY = -1;
+    giUARadius = 0;
+    for (mineIndex8 = 0; mineIndex8 < 7; mineIndex8++)
+        RandMineQty[mineIndex8] = 0;
+
+    for (y8 = 0; MAP_HEIGHT > y8; y8++) {
+        for (x10 = 0; x10 < MAP_WIDTH; x10++) {
+            cell6 = WORLDMAP->GetCell(x10, y8);
+            switch (cell6->triggerType) {
+            case 0xac:
+                giUABaseX = static_cast<short>(x10);
+                giUABaseY = static_cast<short>(y8);
+                giUARadius = static_cast<short>(cell6->w4hi);
+                cell6->triggerType = 0;
+                cell6->objTileset = 0;
+                cell6->objIndex = -1;
+                break;
+            case 0xb0:
+                RandomizeTown(x10, y8, 0);
+                break;
+            case 0xb1:
+                RandomizeTown(x10, y8, 1);
+                break;
+            case 0xaf:
+                minValue7 = 80;
+                maxValue17 = 2000;
+                goto randomMonster;
+            case 0xb3:
+                minValue7 = 0;
+                maxValue17 = 400;
+                goto randomMonster;
+            case 0xb4:
+                minValue7 = 400;
+                maxValue17 = 1000;
+                goto randomMonster;
+            case 0xb5:
+                minValue7 = 1000;
+                maxValue17 = 2500;
+                goto randomMonster;
+            case 0xb6:
+                minValue7 = 2500;
+                maxValue17 = 100000;
+                goto randomMonster;
+randomMonster:
+                if (cell6->objTileset == 12 &&
+                    cell6->objIndex >= 0x43 && cell6->objIndex <= 0x46) {
+                    randomObjectType3 = cell6->objIndex + 0x70;
+                    switch (randomObjectType3) {
+                    case 0xb3:
+                        minValue7 = 0;
+                        maxValue17 = 400;
+                        goto monsterBoundsReady;
+                    case 0xb4:
+                        minValue7 = 400;
+                        maxValue17 = 1000;
+                        goto monsterBoundsReady;
+                    case 0xb5:
+                        minValue7 = 1000;
+                        maxValue17 = 2500;
+                        goto monsterBoundsReady;
+                    case 0xb6:
+                        minValue7 = 2500;
+                        maxValue17 = 100000;
+                        goto monsterBoundsReady;
+                    }
+                }
+monsterBoundsReady:
+                cell6->triggerType = 0x98;
+                cell6->objIndex = static_cast<unsigned char>(Random(0, 65));
+                while (gMonsterDatabase[cell6->objIndex].randomValue <= minValue7 ||
+                       gMonsterDatabase[cell6->objIndex].randomValue >= maxValue17)
+                    cell6->objIndex = static_cast<unsigned char>(Random(0, 65));
+                break;
+            case 0xae:
+                cell6->triggerType = 0x9b;
+                randomType0 = Random(0, 6);
+                ConvertObject(x10 - 1, y8, x10 - 1, y8,
+                              0x2e, 0x10, 0x10, 0x2e, randomType0 * 2, -1, -1);
+                ConvertObject(x10, y8, x10, y8,
+                              0x2e, 0x11, 0x11, 0x2e, randomType0 * 2 + 1, -1, -1);
+                switch (randomType0) {
+                case 0:
+                case 2:
+                    cell6->w4hi = Random(8, 16);
+                    break;
+                case 6:
+                    cell6->w4hi = Random(5, 10);
+                    break;
+                default:
+                    cell6->w4hi = Random(3, 7);
+                    break;
+                }
+                break;
+            case 0xad:
+                artifactId18 = GetRandomArtifactId(14, 0);
+                cell6->triggerType = 0xa9;
+                ConvertObject(x10 - 1, y8, x10 - 1, y8,
+                              11, 0xa2, 0xa2, 11, artifactId18 * 2, -1, -1);
+                ConvertObject(x10, y8, x10, y8,
+                              11, 0xa3, 0xa3, 11, artifactId18 * 2 + 1, -1, -1);
+                break;
+            case 0xf4:
+                artifactId18 = GetRandomArtifactId(8, 0);
+                cell6->triggerType = 0xa9;
+                ConvertObject(x10 - 1, y8, x10 - 1, y8,
+                              11, 0xa6, 0xa6, 11, artifactId18 * 2, -1, -1);
+                ConvertObject(x10, y8, x10, y8,
+                              11, 0xa7, 0xa7, 11, artifactId18 * 2 + 1, -1, -1);
+                break;
+            case 0xf5:
+                artifactId18 = GetRandomArtifactId(4, 0);
+                cell6->triggerType = 0xa9;
+                ConvertObject(x10 - 1, y8, x10 - 1, y8,
+                              11, 0xa8, 0xa8, 11, artifactId18 * 2, -1, -1);
+                ConvertObject(x10, y8, x10, y8,
+                              11, 0xa9, 0xa9, 11, artifactId18 * 2 + 1, -1, -1);
+                break;
+            case 0xf6:
+                artifactId18 = GetRandomArtifactId(2, 0);
+                cell6->triggerType = 0xa9;
+                ConvertObject(x10 - 1, y8, x10 - 1, y8,
+                              11, 0xaa, 0xaa, 11, artifactId18 * 2, -1, -1);
+                ConvertObject(x10, y8, x10, y8,
+                              11, 0xab, 0xab, 11, artifactId18 * 2 + 1, -1, -1);
+                break;
+            case 0xb2:
+                RandomizeMine(x10, y8);
+                break;
+            }
+        }
+    }
+}
 
 VA(0x00480b64, 0x230)
 void game::SetVisibility(int, int, int, int) {}
@@ -3380,11 +3887,429 @@ void game::ProcessOnMapHeroes(void)
 VA(0x00482cbb, 0x55e)
 void game::CheckHeroConsistency(void) {}
 
-VA(0x00483219, 0x71e)
-int game::TransmitSaveGame(int, int, int) { return 0; }
+#define done done36
+#define fileData fileData9
+#define chunkSize chunkSize5
+#define fileSize fileSize6
+#define result result29
+#define fileCrc fileCrc29
+#define acknowledged acknowledged4
+#define reply reply6
+#define transmitCrc transmitCrc18
+#define packetsInBatch packetsInBatch2
+#define header header3
+#define batch batch12
+#define file file37
+#define oldTrack oldTrack12
+#define packetCount packetCount14
+#define packet packet6
+#define batchCount batchCount29
+#define transmitData transmitData3
+#define filename filename8
+#define samplesReady samplesReady1
+#define success success14
 
+// @early-stop
+// Exact 0x71e-byte span with the same 94 relocation sites. Five masked bytes
+// differ: +0x524/+0x527/+0x529 reverse the packet/batch-bound loads, and
+// +0x640/+0x643 reverse the fileData/transmitData equality loads. Both source
+// operand orders emit identically; these are commutative /Od TU-state choices.
+VA(0x00483219, 0x71e)
+int game::TransmitSaveGame(int remotePlayer, int player, int useCurrentSave)
+{
+    int success;
+    int samplesReady;
+    char filename[456];
+    unsigned char *transmitData;
+    int batchCount;
+    int packet;
+    int packetCount;
+    int unused484;
+    int oldTrack;
+    int file;
+    int unused3c12;
+    int batch;
+    int *header;
+    int packetsInBatch;
+    unsigned int transmitCrc;
+    char *reply;
+    void *acknowledged;
+    unsigned int fileCrc;
+    int unused1c3;
+    int result;
+    int unused140;
+    int fileSize;
+    int chunkSize;
+    unsigned char *fileData;
+    int done;
+
+    gpAdvManager->TrimLoopingSounds(4);
+    header = 0;
+    reply = 0;
+    transmitData = 0;
+    fileData = 0;
+    success = 0;
+    result = 0;
+    acknowledged = 0;
+    oldTrack = -1;
+
+    samplesReady = gpSoundManager->m_samplesReady;
+    gpSoundManager->m_samplesReady = 1;
+    oldTrack = static_cast<signed char>(gpSoundManager->m_currentTrack);
+    gpSoundManager->SwitchAmbientMusic(-1);
+    gpSoundManager->m_samplesReady = samplesReady;
+
+    LogStr(const_cast<char *>("Transmit Game Start"));
+    if (gpAdvManager->m_active == 1)
+        BVResMsg(const_cast<char *>("Sending Data"), -1, 0);
+    AiPrint(const_cast<char *>("Transmit Start - Compressing"));
+
+    acknowledged = BaseAlloc(5000, GFILE, GTRANSMITLINE + 0x2b);
+    memset(acknowledged, 0, 5000);
+    SaveGame(gConfig.rmtSCName, 0, 0);
+    if (!gbUseDiffCompression)
+        useCurrentSave = 1;
+    CreateDiffFile(gConfig.rmtSLName, gConfig.rmtSCName, gConfig.rmtSDName,
+                   remotePlayer, useCurrentSave);
+    sprintf(filename, "%s%s", ".\\DATA\\", gConfig.rmtSDName);
+    fileSize = FileSize(filename);
+    LogInt(const_cast<char *>("PostDiffFileSize"), fileSize,
+           -999, -999, -999, -999, -999, -999);
+
+    header = static_cast<int *>(BaseAlloc(0x100, GFILE, GTRANSMITLINE + 0x3f));
+    if (gbUseRegularCompression)
+        transmitData = static_cast<unsigned char *>(
+            BaseAlloc(fileSize + 2000, GFILE, GTRANSMITLINE + 0x41));
+    fileData = static_cast<unsigned char *>(
+        BaseAlloc(fileSize + 2000, GFILE, GTRANSMITLINE + 0x42));
+
+    file = _open(filename, 0x8000);
+    if (file == -1)
+        FileError(filename);
+    if (file == -1) {
+        goto transmitCleanup;
+    }
+    {
+        _read(file, fileData, fileSize);
+        _close(file);
+        fileCrc = calc_crc_long(fileData, fileSize);
+        if (gbUseRegularCompression)
+            fileSize = EncodeData(reinterpret_cast<char *>(transmitData),
+                                  reinterpret_cast<char *>(fileData), fileSize);
+        else
+            transmitData = fileData;
+
+        AiPrint(const_cast<char *>("Transmit Start - Sending"));
+        if (gbUseRegularCompression)
+            transmitCrc = calc_crc_long(transmitData, fileSize);
+        else
+            transmitCrc = fileCrc;
+        LogInt(const_cast<char *>("Send"), fileSize, transmitCrc,
+               -999, -999, -999, -999, -999);
+
+        header[0] = fileSize;
+        header[1] = fileCrc;
+        header[2] = transmitCrc;
+        header[3] = player;
+        result = TransmitAndWait(reinterpret_cast<char *>(header), remotePlayer,
+                                 16, 1, 2, &reply);
+        if (!result)
+            ShutDown(0);
+
+        packetCount = (fileSize - 1) / 200 + 1;
+        batchCount = (packetCount - 1) / 100 + 1;
+        for (batch = 0; batch < batchCount; batch++) {
+            if (batch + 1 == batchCount)
+                packetsInBatch = packetCount - batch * 100;
+            else
+                packetsInBatch = 100;
+
+            done = 0;
+            while (!done) {
+                for (packet = batch * 100;
+                     packet < batch * 100 + packetsInBatch; packet++) {
+                    PollSound();
+                    CheckDoMain(0, 1);
+                    if (!static_cast<char *>(acknowledged)[packet]) {
+                        if (packet + 1 == packetCount)
+                            chunkSize = fileSize - packet * 200;
+                        else
+                            chunkSize = 200;
+                        *reinterpret_cast<short *>(header) = static_cast<short>(packet);
+                        memcpy(reinterpret_cast<char *>(header) + 2,
+                               transmitData + packet * 200, chunkSize);
+                        result = TransmitRemoteData(reinterpret_cast<char *>(header),
+                                                    remotePlayer, chunkSize + 2,
+                                                    3, 0, 1, -1);
+                        if (!result)
+                            ShutDown(0);
+                    }
+                }
+                LogStr(const_cast<char *>("PreWait"));
+                *reinterpret_cast<short *>(header) = static_cast<short>(batch * 100);
+                result = TransmitAndWait(reinterpret_cast<char *>(header), remotePlayer,
+                                         2, 4, 5, &reply);
+                LogStr(const_cast<char *>("PostWait"));
+                if (!result)
+                    ShutDown(0);
+                for (packet = 0; packetsInBatch > packet; packet++) {
+                    if (reply[packet + 9] > 0)
+                        static_cast<char *>(acknowledged)[batch * 100 + packet] = 1;
+                }
+                done = 1;
+                for (packet = batch * 100;
+                     packet < batch * 100 + packetsInBatch; packet++) {
+                    if (!static_cast<char *>(acknowledged)[packet])
+                        done = 0;
+                }
+            }
+        }
+        result = TransmitRemoteData(0, remotePlayer, 0, 6, 1, 1, -1);
+        if (!result)
+            ShutDown(0);
+        success = 1;
+    }
+
+transmitCleanup:
+    if (header)
+        BaseFree(header, GFILE, GTRANSMITLINE + 199);
+    if (transmitData)
+        BaseFree(transmitData, GFILE, GTRANSMITLINE + 200);
+    if (fileData && fileData != transmitData)
+        BaseFree(fileData, GFILE, GTRANSMITLINE + 0xc9);
+    if (acknowledged)
+        BaseFree(acknowledged, GFILE, GTRANSMITLINE + 0xca);
+
+    AiPrint(const_cast<char *>("Transmit End"));
+    if (gpAdvManager->m_active == 1) {
+        giBottomViewOverride = 0;
+        gpAdvManager->UpdBottomView(1, 1, 1);
+    }
+    if (oldTrack != -1) {
+        samplesReady = gpSoundManager->m_samplesReady;
+        gpSoundManager->m_samplesReady = 1;
+        gpSoundManager->SwitchAmbientMusic(oldTrack);
+        gpSoundManager->m_samplesReady = samplesReady;
+    }
+    return success;
+}
+
+#undef done
+#undef fileData
+#undef chunkSize
+#undef fileSize
+#undef result
+#undef fileCrc
+#undef acknowledged
+#undef reply
+#undef transmitCrc
+#undef packetsInBatch
+#undef header
+#undef batch
+#undef file
+#undef oldTrack
+#undef packetCount
+#undef packet
+#undef batchCount
+#undef transmitData
+#undef filename
+#undef samplesReady
+#undef success
+
+#define decodedData decodedData14
+#define packetStart packetStart6
+#define received received29
+#define lastPacketTime lastPacketTime5
+#define result result9
+#define packet packet15
+#define ackBuffer ackBuffer29
+#define receivedCrc receivedCrc7
+#define finished finished26
+#define computedCrc computedCrc1
+#define file file6
+#define oldTrack oldTrack36
+#define index index1
+#define incomingData incomingData36
+#define filename filename7
+#define samplesReady samplesReady0
+#define success success15
+
+// @early-stop
+// Relocation-masked comparison is identical for all 0x68d bytes (102 relocation
+// sites in both objects).
 VA(0x00483937, 0x68d)
-int game::ReceiveSaveGame(int, int, int, int) { return 0; }
+int game::ReceiveSaveGame(int dataSize, int expectedCrc, int expectedTransmitCrc,
+                          int remotePlayer)
+{
+    int unused20819;
+    int success;
+    int samplesReady;
+    char filename[452];
+    unsigned char *incomingData;
+    int index;
+    int oldTrack;
+    int file;
+    int computedCrc;
+    int finished;
+    int receivedCrc;
+    unsigned char *ackBuffer;
+    char *packet;
+    int result;
+    long lastPacketTime;
+    char *received;
+    int packetStart;
+    unsigned char *decodedData;
+
+    LogInt(const_cast<char *>("RSG1"), remotePlayer,
+           -999, -999, -999, -999, -999, -999);
+    LogStr(const_cast<char *>("Receive"));
+    AiPrint(const_cast<char *>("Receive Start - Getting Data"));
+    gpAdvManager->TrimLoopingSounds(4);
+
+    ackBuffer = 0;
+    incomingData = 0;
+    decodedData = 0;
+    packet = 0;
+    file = 0;
+    finished = 0;
+    unused20819 = 0;
+    received = 0;
+    success = 0;
+    oldTrack = -1;
+
+    gpAdvManager->UnwindMapChangeQueue(999, 0);
+    if (gpAdvManager->m_active == 1)
+        BVResMsg(const_cast<char *>("Receiving Data"), -1, 0);
+
+    samplesReady = gpSoundManager->m_samplesReady;
+    oldTrack = static_cast<signed char>(gpSoundManager->m_currentTrack);
+    gpSoundManager->m_samplesReady = 1;
+    gpSoundManager->SwitchAmbientMusic(-1);
+    gpSoundManager->m_samplesReady = samplesReady;
+
+    LogStr(const_cast<char *>("Begin Transmit Init Confirm"));
+    result = TransmitRemoteData(0, remotePlayer, 0, 2, 1, 1, -1);
+    LogStr(const_cast<char *>("End Transmit Init Confirm"));
+    if (!result)
+        ShutDown(0);
+
+    received = static_cast<char *>(BaseAlloc(5000, GFILE, GRECEIVELINE + 0x33));
+    memset(received, 0, 5000);
+    if (gbUseRegularCompression)
+        decodedData = static_cast<unsigned char *>(
+            BaseAlloc(700000, GFILE, GRECEIVELINE + 0x37));
+    ackBuffer = static_cast<unsigned char *>(
+        BaseAlloc(0x100, GFILE, GRECEIVELINE + 0x39));
+    incomingData = static_cast<unsigned char *>(
+        BaseAlloc(dataSize + 2000, GFILE, GRECEIVELINE + 0x3a));
+
+    lastPacketTime = KBTickCount();
+    LogInt(const_cast<char *>("FW2"), remotePlayer,
+           -999, -999, -999, -999, -999, -999);
+    while (!finished) {
+        PollSound();
+        CheckDoMain(0, 1);
+        if (KBTickCount() > lastPacketTime + 90000) {
+            NormalDialog(const_cast<char *>("Error receiving data.  Keep trying?"),
+                         2, -1, -1, -1, 0, -1, 0, -1, 0);
+            if (gpWindowManager->m_dialogResult == 0x7805)
+                lastPacketTime = KBTickCount();
+            else
+                ShutDown(0);
+        }
+
+        packet = GetRemoteData(1);
+        if (packet && (packet[5] == 2 || packet[5] == 3)) {
+            lastPacketTime = KBTickCount();
+            switch (packet[6]) {
+            case 3:
+                packetStart = *reinterpret_cast<short *>(packet + 9);
+                received[packetStart] = 1;
+                memcpy(incomingData + packetStart * 200, packet + 11,
+                       *reinterpret_cast<short *>(packet + 7) - 2);
+                break;
+            case 4:
+                packetStart = *reinterpret_cast<short *>(packet + 9);
+                for (index = packetStart; index < packetStart + 100; index++)
+                    *(ackBuffer + index - packetStart) = received[index];
+                LogInt(const_cast<char *>("FW3"), remotePlayer,
+                       -999, -999, -999, -999, -999, -999);
+                result = TransmitRemoteData(reinterpret_cast<char *>(ackBuffer),
+                                            remotePlayer, 200, 5, 1, 1, -1);
+                if (!result)
+                    ShutDown(0);
+                break;
+            case 6:
+                finished = 1;
+                break;
+            }
+        }
+    }
+
+    AiPrint(const_cast<char *>("Receive Start - Decompressing Data"));
+    receivedCrc = calc_crc_long(incomingData, dataSize);
+    LogInt(const_cast<char *>("Receive"), dataSize, receivedCrc,
+           expectedTransmitCrc, -999, -999, -999, -999);
+    if (gbUseRegularCompression) {
+        dataSize = DecodeData(reinterpret_cast<char *>(decodedData),
+                              reinterpret_cast<char *>(incomingData), dataSize);
+        computedCrc = calc_crc_long(decodedData, dataSize);
+    } else {
+        decodedData = incomingData;
+        computedCrc = receivedCrc;
+    }
+    LogInt(const_cast<char *>("Receive"), dataSize, computedCrc,
+           expectedCrc, -999, -999, -999, -999);
+
+    sprintf(filename, "%s%s", ".\\DATA\\", gConfig.rmtRDName);
+    file = _open(filename, 0x8301, 0x80);
+    if (file == -1)
+        FileError(filename);
+    _write(file, decodedData, dataSize);
+    _close(file);
+    success = 1;
+
+    if (received)
+        BaseFree(received, GFILE, GRECEIVELINE + 0xa1);
+    if (ackBuffer)
+        BaseFree(ackBuffer, GFILE, GRECEIVELINE + 0xa2);
+    if (incomingData)
+        BaseFree(incomingData, GFILE, GRECEIVELINE + 0xa3);
+    if (decodedData && incomingData != decodedData)
+        BaseFree(decodedData, GFILE, GRECEIVELINE + 0xa4);
+
+    CreateJoinFile(gConfig.rmtRLName, gConfig.rmtRDName, gConfig.rmtRCName);
+    AiPrint(const_cast<char *>("Receive End"));
+    if (gpAdvManager->m_active == 1) {
+        giBottomViewOverride = 0;
+        gpAdvManager->UpdBottomView(1, 1, 1);
+    }
+    if (oldTrack != -1) {
+        samplesReady = gpSoundManager->m_samplesReady;
+        gpSoundManager->m_samplesReady = 1;
+        gpSoundManager->SwitchAmbientMusic(oldTrack);
+        gpSoundManager->m_samplesReady = samplesReady;
+    }
+    return success;
+}
+
+#undef decodedData
+#undef packetStart
+#undef received
+#undef lastPacketTime
+#undef result
+#undef packet
+#undef ackBuffer
+#undef receivedCrc
+#undef finished
+#undef computedCrc
+#undef file
+#undef oldTrack
+#undef index
+#undef incomingData
+#undef filename
+#undef samplesReady
+#undef success
 
 VA(0x00483fc4, 0x455)
 void game::DoNewTurn(void) {}
@@ -3772,7 +4697,7 @@ DATA(0x0052844c) int gbAllowUpgrade;
 DATA(0x00528450) int iViewArmyType;
 DATA(0x00528454) class hero *viewSpellsHero;
 DATA(0x00528458) int gbUpgradeArmy;
-DATA(0x00528460) short *RandMineQty;
+DATA(0x00528460) short RandMineQty[8];
 DATA(0x00528470) char *gcCurMapName;
 DATA(0x00528480) signed char *gbNGDifficulty;
 DATA(0x00528488) int iViewArmyUpgradeToType;

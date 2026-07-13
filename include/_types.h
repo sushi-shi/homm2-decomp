@@ -81,8 +81,13 @@ struct SCreatureInfo { unsigned short value; char pad[24]; };               // g
 struct tag_tilePoint { signed char x; signed char _1; signed char y; signed char _3; };  // normalDirTable[]
 #pragma pack(push, 1)
 struct tag_monsterInfo {
-    short cost;
-    int fightValue;
+    union {
+        struct {
+            short cost;
+            int fightValue;
+        };
+        int randomValue;
+    };
     signed char unknown06;
     signed char growth;
     unsigned short hitPoints;
