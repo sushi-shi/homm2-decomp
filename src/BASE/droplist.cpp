@@ -26,8 +26,6 @@ dropListWidget::dropListWidget(void) : widget(0, 0, 0, 0, 0, 0)
     m_selectedIndex = -1;
 }
 
-// @early-stop
-// /O2 regalloc wall: exact 0x7c span and call/store sequence; only the destructor loop's index/4-byte induction variables exchange ebx/edi (retail ebx=byte offset, edi=index; mine reversed).
 VA(0x004dbf60, 0x7c)
 dropListWidget::~dropListWidget()
 {
@@ -40,12 +38,11 @@ dropListWidget::~dropListWidget()
     BaseFree(m_items, __FILE__, 27);
 }
 
-// @early-stop
-// /O2 regalloc wall: 0x00..0x184 is structurally identical; residual 0x185..0x21d is icon-entry geometry CSE/register coloring (retail edx=&m_icon->m_data, bx/di=m_x/m_y; mine ecx with di/dx), with all field values/stores equal.
 VA(0x004dbfe0, 0x21d)
 void dropListWidget::Read(void)
 {
     signed char name[16];
+    char **entries;
 
     m_x = gpResourceManager->ReadWord();
     m_y = gpResourceManager->ReadWord();
@@ -68,7 +65,7 @@ void dropListWidget::Read(void)
     m_selColor = gpResourceManager->ReadWord();
     field_0x38 = gpResourceManager->ReadWord();
     m_textMode = gpResourceManager->ReadWord();
-    m_id = gpResourceManager->ReadWord();
+    short id = gpResourceManager->ReadWord();
 
     field_0x48 = 0;
     field_0x4a = 1;
@@ -81,22 +78,32 @@ void dropListWidget::Read(void)
     field_0x58 = 8;
     field_0x5a = 9;
     field_0x5c = 10;
-    IconEntry **entries = reinterpret_cast<IconEntry **>(&m_icon->m_data);
-    short iconX = m_x;
     field_0x5e = 11;
     field_0x60 = 12;
     field_0x62 = 13;
+    m_id = id;
+    entries = &m_icon->m_data;
+    short iconX = m_x;
     short iconY = m_y;
     m_iconX = iconX;
     m_iconY = iconY;
-    field_0x70 = (*entries)[0].w;
-    field_0x72 = (*entries)[0].h;
-    field_0x64 = iconX + field_0x70;
+    {
+        IconEntry *entry = reinterpret_cast<IconEntry *>(*entries);
+        field_0x70 = entry->w;
+        field_0x72 = entry->h;
+        field_0x64 = iconX + field_0x70;
+    }
     field_0x66 = iconY;
-    field_0x68 = (*entries)[1].w;
-    field_0x6a = (*entries)[1].h;
-    field_0xa6 = (*entries)[13].w;
-    field_0xa8 = (*entries)[13].h;
+    {
+        IconEntry *entry = reinterpret_cast<IconEntry *>(*entries) + 1;
+        field_0x68 = entry->w;
+        field_0x6a = entry->h;
+    }
+    {
+        IconEntry *entry = reinterpret_cast<IconEntry *>(*entries) + 13;
+        field_0xa6 = entry->w;
+        field_0xa8 = entry->h;
+    }
 }
 
 VA(0x004dc200, 0xd5)
@@ -233,25 +240,23 @@ void dropListWidget::Draw(void)
     }
 }
 
-// @early-stop
-// /O2 regalloc wall: complete draw/update call sequence and geometry are byte-aligned; residuals are callee-saved register coloring in DrawBoundedString argument setup plus two scheduler NOP bytes (base section 0x37a, retail code span 0x378).
 VA(0x004dc6e0, 0x378)
 void dropListWidget::DrawDropStuff(void)
 {
     int y = m_owner->m_posY + field_0x84;
     m_icon->DrawToBuffer(m_owner->m_posX + field_0x82, y, field_0x4e, 0);
     int color = m_selectedIndex == m_topIndex ? m_selColor : m_normalColor;
-    int i = 1;
     m_font->DrawBoundedString(m_items[m_topIndex], m_owner->m_posX + field_0x82 + 5,
         y + 4, field_0x86 - 10, m_font->m_height + 1, color, m_textMode);
+    int i = 1;
     y += field_0x74;
     while (i < field_0x32 - 1 && m_topIndex + i < m_itemCount) {
         m_icon->DrawToBuffer(m_owner->m_posX + field_0x82, y, field_0x50, 0);
         int item = m_topIndex + i;
         color = m_selectedIndex == item ? m_selColor : m_normalColor;
-        i++;
         m_font->DrawBoundedString(m_items[item], m_owner->m_posX + field_0x82 + 5,
             y + 2, field_0x86 - 10, m_font->m_height + 1, color, m_textMode);
+        i++;
         y += field_0x76;
     }
     m_icon->DrawToBuffer(m_owner->m_posX + field_0x82, y, field_0x52, 0);
@@ -268,8 +273,8 @@ void dropListWidget::DrawDropStuff(void)
         else
             frame = field_0x54;
         m_icon->DrawToBuffer(m_owner->m_posX + field_0x8a, m_owner->m_posY + field_0x8c, frame, 0);
-        i = 2;
         m_icon->DrawToBuffer(m_owner->m_posX + field_0x92, m_owner->m_posY + field_0x94, field_0x5c, 0);
+        i = 2;
         while (i < field_0x32 - 2) {
             m_icon->DrawToBuffer(m_owner->m_posX + field_0x92,
                 m_owner->m_posY + field_0x94 + field_0x76 * (i - 1), field_0x5e, 0);
@@ -307,11 +312,14 @@ void dropListWidget::RestoreDropBackground(void)
     m_savedBackground = 0;
 }
 
-// @early-stop
-// /O2 + delinker wall: both event switches and all 24 external-call targets match; base has local tables at relocs +0x315/+0x31c/+0x330/+0x337 and +0x7dc..+0x818 vs retail Main-relative +0x31e/+0x325/+0x339/+0x340 and +0x7d4..+0x810. Remaining 8 code bytes are frame/register scheduling (0x82b base vs 0x81f retail), not missing logic.
 VA(0x004dcb10, 0x81f)
 void dropListWidget::ProcessSelectDialog(void)
 {
+    IconEntry *iconEntry;
+    short scrollWidth;
+    short scrollTopHeight;
+    short scrollBottomWidth;
+    short scrollBottomHeight;
     int firstRelease = 1;
     field_0xac = 0;
     field_0xad = 0;
@@ -322,8 +330,7 @@ void dropListWidget::ProcessSelectDialog(void)
 
     short numItems = m_itemCount;
     short maxItems = field_0x30;
-    if (numItems <= maxItems) {
-    } else {
+    if (numItems > maxItems) {
         field_0x46 = numItems - maxItems;
         m_topIndex = m_selectedIndex;
         if (m_selectedIndex < 0)
@@ -346,23 +353,29 @@ void dropListWidget::ProcessSelectDialog(void)
     field_0x84 = m_iconY + field_0x72;
     field_0x86 = reinterpret_cast<IconEntry *>(m_icon->m_data)[field_0x4e].w;
     field_0x88 = (field_0x32 - 2) * field_0x76 + field_0x74 + field_0x78;
-    field_0x8e = reinterpret_cast<IconEntry *>(m_icon->m_data)[field_0x54].w;
-    field_0x90 = reinterpret_cast<IconEntry *>(m_icon->m_data)[field_0x54].h;
-    field_0x9e = reinterpret_cast<IconEntry *>(m_icon->m_data)[field_0x58].w;
-    field_0xa0 = reinterpret_cast<IconEntry *>(m_icon->m_data)[field_0x58].h;
+    iconEntry = reinterpret_cast<IconEntry *>(m_icon->m_data) + field_0x54;
+    scrollWidth = iconEntry->w;
+    field_0x8e = scrollWidth;
+    scrollTopHeight = iconEntry->h;
+    field_0x90 = scrollTopHeight;
+    iconEntry = reinterpret_cast<IconEntry *>(m_icon->m_data) + field_0x58;
+    scrollBottomWidth = iconEntry->w;
+    field_0x9e = scrollBottomWidth;
+    scrollBottomHeight = iconEntry->h;
+    field_0xa0 = scrollBottomHeight;
     field_0x7a = m_iconX;
     field_0x7c = field_0x84;
-    field_0x7e = field_0x46 < 1 ? field_0x86 : field_0x8e + field_0x86;
+    field_0x7e = field_0x46 > 0 ? scrollWidth + field_0x86 : field_0x86;
     field_0x80 = field_0x88;
 
     if (field_0x46 > 0) {
-        field_0x8a = m_x + m_width - field_0x8e;
+        field_0x8a = m_x + m_width - scrollWidth;
         field_0x8c = field_0x84;
         field_0x9a = field_0x8a;
-        field_0x9c = field_0x84 - field_0xa0 + field_0x88;
+        field_0x9c = field_0x84 - scrollBottomHeight + field_0x88;
         field_0x92 = field_0x8a;
-        field_0x94 = field_0x84 + field_0x90;
-        field_0x96 = field_0x9e;
+        field_0x94 = field_0x84 + scrollTopHeight;
+        field_0x96 = scrollBottomWidth;
         field_0x98 = field_0x9c - field_0x94;
         field_0xaa = field_0x98 - field_0xa8 - 7;
     }
