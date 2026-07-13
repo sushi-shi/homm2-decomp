@@ -130,6 +130,9 @@ authoritative. This file is the short, restart-ready Codex workflow.
 - Prefer this repository's naming conventions over names from other projects.
 - Use named constants instead of unexplained numeric values. Typedef enums are ABI/byte neutral in
   suitable expressions, but MSVC's TU-cumulative behavior can still perturb later code; verify.
+- For serialized or deserialized numeric domains with known retail values, prefer a header-level
+  `typedef enum` with explicit values over scattered integer constants. Preserve the proven storage
+  width and packed layout; do not change a field's representation merely to introduce the enum.
 - Type and enum declarations belong in headers, never locally in a translation unit.
 - Preserve layout with packed records and `SIZE` evidence where available. Do not invent classes,
   functions, globals, or labels solely to improve objdiff.
@@ -141,7 +144,6 @@ authoritative. This file is the short, restart-ready Codex workflow.
   secondary naming references for enums, object IDs, and serialization formats. Retail disassembly,
   CodeView, data bytes, and relocations are authoritative. Adapt useful names to this repo's style;
   do not copy its implementation structure.
-
 ## Git Discipline
 
 - Never revert user changes or stage `.claude/worktrees/`.

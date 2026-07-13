@@ -2103,14 +2103,14 @@ void game::ViewArmy(int x, int y, int monsterType, int numTroops, town *castle,
 
     if (castle && (gpAdvManager->m_active == 1 || gpTownManager->m_active == 1)) {
         for (loopIndex0 = 20; loopIndex0 <= 24; loopIndex0++) {
-            if (gDwellingType[static_cast<signed char>(castle->field_0x3)][loopIndex0 - 19] == monsterType &&
-                (castle->field_0x18 & (1 << (loopIndex0 + 5)))) {
+            if (gDwellingType[static_cast<signed char>(castle->m_type)][loopIndex0 - 19] == monsterType &&
+                (castle->m_buildings & (1 << (loopIndex0 + 5)))) {
                 gbAllowUpgrade = 1;
                 iViewArmyUpgradeToType = monsterType + 1;
             }
         }
         if ((monsterType == 35 || monsterType == 36) &&
-            (castle->field_0x18 & 0x40000000)) {
+            (castle->m_buildings & 0x40000000)) {
             gbAllowUpgrade = 1;
             iViewArmyUpgradeToType = 37;
         }
@@ -2484,7 +2484,7 @@ void game::PerDay(void)
 
     for (player = 0; player < GAME_TOWN_COUNT; player++) {
         currentTown4 = GetTown(player);
-        if (!(currentTown4->field_0x18 & 1))
+        if (!(currentTown4->m_buildings & 1))
             continue;
         if (currentTown4->m_occupyingHeroId != -1) {
             townHero12 = GetHero(currentTown4->m_occupyingHeroId);
