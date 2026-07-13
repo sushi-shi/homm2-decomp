@@ -2016,10 +2016,139 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
 }
 
 VA(0x0041b692, 0x56a)
-void GetCategoryStats(int, long int * const, signed char * const) {}
+void GetCategoryStats(int category, long int * const stats,
+                      signed char * const order)
+{
+    int player;
+    int townIndex_c;
+    hero *playerHero_h;
+    int heroIndex_n;
+    int townCount_k;
+    int castleCount_p;
+    int armyStrength;
+    town *playerTown;
+
+    for (player = 0; player < gpGame->m_playerCount; ++player) {
+        townCount_k = 0;
+        castleCount_p = 0;
+        order[player] = static_cast<signed char>(player);
+        if (gpGame->m_playerDead[player]) {
+            stats[player] = TOWN_THIEVES_DEAD_PLAYER_STAT;
+        } else {
+            switch (category) {
+            case TOWN_THIEVES_CATEGORY_TOWNS:
+                for (townIndex_c = 0; townIndex_c < GAME_TOWN_COUNT;
+                     ++townIndex_c) {
+                    if (gpGame->m_castleRecs[townIndex_c].owner == player &&
+                        (gpGame->m_castleRecs[townIndex_c].buildings &
+                         TOWN_BUILDING_TENT)) {
+                        ++townCount_k;
+                    }
+                }
+                stats[player] = townCount_k;
+                break;
+            case TOWN_THIEVES_CATEGORY_CASTLES:
+                for (townIndex_c = 0; townIndex_c < GAME_TOWN_COUNT;
+                     ++townIndex_c) {
+                    if (gpGame->m_castleRecs[townIndex_c].owner == player &&
+                        (gpGame->m_castleRecs[townIndex_c].buildings &
+                         TOWN_BUILDING_CASTLE)) {
+                        ++castleCount_p;
+                    }
+                }
+                stats[player] = castleCount_p;
+                break;
+            case TOWN_THIEVES_CATEGORY_HEROES:
+                stats[player] = gpGame->m_players[player].heroCount;
+                break;
+            case TOWN_THIEVES_CATEGORY_GOLD:
+                stats[player] = gpGame->m_players[player].resources[RES_GOLD];
+                break;
+            case TOWN_THIEVES_CATEGORY_WOOD_AND_ORE:
+                stats[player] =
+                    gpGame->m_players[player].resources[RES_WOOD] +
+                    gpGame->m_players[player].resources[RES_ORE];
+                break;
+            case TOWN_THIEVES_CATEGORY_RARE_RESOURCES:
+                stats[player] =
+                    gpGame->m_players[player].resources[RES_MERCURY] +
+                    gpGame->m_players[player].resources[RES_SULFUR] +
+                    gpGame->m_players[player].resources[RES_CRYSTAL] +
+                    gpGame->m_players[player].resources[RES_GEMS];
+                break;
+            case TOWN_THIEVES_CATEGORY_OBELISKS:
+                stats[player] = GetNumObelisks(player);
+                break;
+            case TOWN_THIEVES_CATEGORY_ARTIFACTS:
+                stats[player] = 0;
+                for (townIndex_c = 0;
+                     townIndex_c < gpGame->m_players[player].heroCount;
+                     ++townIndex_c) {
+                    playerHero_h = gpGame->GetHero(
+                        gpGame->m_players[player].heroes[townIndex_c]);
+                    for (heroIndex_n = 0;
+                         heroIndex_n < TOWN_MAX_ARTIFACTS; ++heroIndex_n) {
+                        if (playerHero_h->m_artifacts[heroIndex_n] != -1 &&
+                            playerHero_h->m_artifacts[heroIndex_n] !=
+                                TOWN_SPELL_BOOK_ARTIFACT) {
+                            ++stats[player];
+                        }
+                    }
+                }
+                break;
+            case TOWN_THIEVES_CATEGORY_ARMY_STRENGTH:
+                armyStrength = 0;
+                for (heroIndex_n = 0;
+                     heroIndex_n < gpGame->m_players[player].heroCount;
+                     ++heroIndex_n) {
+                    playerHero_h =
+                        gpGame->GetPlayerHero(player, heroIndex_n);
+                    armyStrength += gpPhilAI->FightValueOfStack(
+                        &playerHero_h->m_army, playerHero_h, 0, 0, 0, 0);
+                }
+                for (heroIndex_n = 0;
+                     heroIndex_n < gpGame->m_players[player].townCount;
+                     ++heroIndex_n) {
+                    playerTown =
+                        gpGame->GetPlayerTown(player, heroIndex_n);
+                    if (playerTown->HasGarrison()) {
+                        armyStrength += gpPhilAI->FightValueOfStack(
+                            &playerTown->m_army, 0, 0, 0, 0, 0);
+                    }
+                }
+                stats[player] = armyStrength;
+                break;
+            case TOWN_THIEVES_CATEGORY_INCOME:
+                stats[player] = gpGame->ComputeDailyGold(player);
+                break;
+            }
+        }
+    }
+}
 
 VA(0x0041bbfc, 0xd9)
-void SortStats(long int * const, signed char * const) {}
+void SortStats(long int * const stats, signed char * const order)
+{
+    int temporaryOrder;
+    int secondPlayer;
+    int firstPlayer;
+    long tempStat;
+
+    for (firstPlayer = 0; firstPlayer < gpGame->m_playerCount - 1;
+         ++firstPlayer) {
+        for (secondPlayer = firstPlayer + 1;
+             secondPlayer < gpGame->m_playerCount; ++secondPlayer) {
+            if (stats[firstPlayer] < stats[secondPlayer]) {
+                tempStat = stats[firstPlayer];
+                stats[firstPlayer] = stats[secondPlayer];
+                stats[secondPlayer] = tempStat;
+                temporaryOrder = order[firstPlayer];
+                order[firstPlayer] = order[secondPlayer];
+                order[secondPlayer] = static_cast<signed char>(temporaryOrder);
+            }
+        }
+    }
+}
 
 
 // ===== vtable townManager : public baseManager  (3 slots) =====
