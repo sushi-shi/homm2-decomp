@@ -2790,11 +2790,286 @@ int philAI::FightValueOfStack(armyGroup *group, hero *heroPtr, int useHero,
     return armyValue;
 }
 
+// @early-stop
+// Relocation-masked bytes are exact across all 0x1e7 bytes, and all 14
+// relocation sites and targets agree.
 VA(0x00440aca, 0x1e7)
-void philAI::EvaluateOneTimeCreaturePurchase(int, int, int, int &, int &, int &) {}
+void philAI::EvaluateOneTimeCreaturePurchase(int creature, int availableCount,
+                                             int useAvailableCount,
+                                             int &purchaseCount, int &purchaseValue,
+                                             int &replacementSlot)
+{
+    int replacementStackValue7;
+    int leastStackValue3;
+    int purchaseFightValue15;
+    int armyIndex3;
 
+    purchaseCount = 0;
+    purchaseValue = 0;
+    replacementSlot = AI_CREATURE_PURCHASE_NO_SLOT;
+    leastStackValue3 = AI_CREATURE_PURCHASE_VALUE_LIMIT;
+    if (useAvailableCount != 0)
+        purchaseCount = availableCount;
+    else
+        purchaseCount = MaxBuyableCreatures(creature);
+    if (purchaseCount > availableCount)
+        purchaseCount = availableCount;
+
+    if (purchaseCount == 0)
+        return;
+    {
+        purchaseFightValue15 =
+            gMonsterDatabase[creature].fightValue * purchaseCount;
+        if (gpCurAIHero->m_army.CanJoin(creature) == 0) {
+            for (armyIndex3 = 0;
+                 armyIndex3 < AI_CREATURE_PURCHASE_ARMY_SLOT_COUNT;
+                 armyIndex3++) {
+                if (gpCurAIHero->m_army.m_creatureTypes[armyIndex3] == creature) {
+                    replacementSlot = AI_CREATURE_PURCHASE_NO_SLOT;
+                    armyIndex3 = AI_CREATURE_PURCHASE_ARMY_SLOT_COUNT;
+                } else {
+                    replacementStackValue7 =
+                        gpCurAIHero->m_army.m_quantities[armyIndex3] *
+                        gMonsterDatabase[armyIndex3].fightValue;
+                    if (replacementStackValue7 < leastStackValue3) {
+                        leastStackValue3 = replacementStackValue7;
+                        replacementSlot = armyIndex3;
+                    }
+                }
+            }
+        }
+        if (replacementSlot != AI_CREATURE_PURCHASE_NO_SLOT)
+            purchaseFightValue15 -= leastStackValue3;
+
+        purchaseValue = static_cast<int>(
+            purchaseFightValue15 *
+            reinterpret_cast<pdView *>(
+                &gpGame->m_players[gpCurAIHero->m_owner])->upgradeFactor);
+        if (useAvailableCount == 0) {
+            GetMonsterCost(creature, costTemp);
+            purchaseValue -= RVConversion(costTemp) * purchaseCount;
+        }
+        if (purchaseValue < 0) {
+            purchaseValue = 0;
+            purchaseCount = 0;
+        }
+    }
+}
+
+// @early-stop
+// Relocation-masked bytes are exact across all 0x768 bytes, and all 85
+// relocation sites and targets agree.
 VA(0x00440cb1, 0x768)
-int philAI::QuickCombat(class armyGroup *, class hero *, class armyGroup *, class hero *, int, int, float &, float &) { return 0; }
+int philAI::QuickCombat(armyGroup *attacker, hero *attackerHero,
+                        armyGroup *defender, hero *defenderHero,
+                        int townBattle, int townId,
+                        float &attackerDamage, float &defenderDamage)
+{
+    int attackerTroopCount5;
+    hero *victoriousHero4;
+    armyGroup *selectedGroup36;
+    int unusedOutcomeA6;
+    int attackerLoss5;
+    int attackerRemaining7;
+    int defenderLoss8;
+    int attackerWon2;
+    int defenderRemaining19;
+    int armyIndex0;
+    int unusedOutcomeB5;
+    int attackerExperience37;
+    int defenderExperience4;
+    float adjustedDifference1;
+    int defenderTroopCount1;
+    int outcomeValue29;
+    hero *defeatedHero5;
+    float winChance37;
+    int necromancyCount6;
+    float casualtyFraction17;
+    int defenderOwner1;
+    float winnerChance0;
+    float rollDifference8;
+
+    attackerExperience37 =
+        gpGame->ExperienceValueOfStack(attacker, attackerHero);
+    if (townBattle != 0)
+        attackerExperience37 += AI_QUICK_COMBAT_TOWN_EXPERIENCE;
+    defenderExperience4 =
+        gpGame->ExperienceValueOfStack(defender, defenderHero);
+    attackerExperience37 = static_cast<int>(
+        (gpGame->m_difficulty * AI_QUICK_COMBAT_EXPERIENCE_DIFFICULTY_STEP +
+         1.0) * attackerExperience37);
+    defenderExperience4 = static_cast<int>(
+        (gpGame->m_difficulty * AI_QUICK_COMBAT_EXPERIENCE_DIFFICULTY_STEP +
+         1.0) * defenderExperience4);
+
+    attackerWon2 = 0;
+    selectedGroup36 = 0;
+    if (defenderHero != 0)
+        defenderOwner1 = defenderHero->m_owner;
+    else
+        defenderOwner1 = AI_BATTLE_NO_PLAYER;
+    ProbableOutcomeOfBattle(attacker, attackerHero, defender, defenderHero, 0,
+                            townBattle, townId, defenderOwner1, winChance37,
+                            attackerLoss5, defenderLoss8, attackerRemaining7,
+                            defenderRemaining19, outcomeValue29);
+
+    float randomRoll8 = static_cast<float>(
+        Random(0, AI_QUICK_COMBAT_RANDOM_LIMIT) /
+        static_cast<double>(AI_QUICK_COMBAT_RANDOM_LIMIT));
+    if (randomRoll8 < winChance37) {
+        attackerWon2 = 1;
+        winnerChance0 = winChance37;
+        selectedGroup36 = attacker;
+    } else {
+        winnerChance0 = AI_BATTLE_FULL_CHANCE - winChance37;
+        selectedGroup36 = defender;
+    }
+
+    if (winChance37 < randomRoll8)
+        rollDifference8 = randomRoll8 - winChance37;
+    else
+        rollDifference8 = winChance37 - randomRoll8;
+    adjustedDifference1 = rollDifference8;
+    if (attackerWon2 != 0 &&
+        winChance37 > AI_QUICK_COMBAT_WIN_BONUS_THRESHOLD)
+        adjustedDifference1 = static_cast<float>(
+            (winChance37 + AI_QUICK_COMBAT_WIN_BONUS) * adjustedDifference1);
+    if (adjustedDifference1 > AI_BATTLE_FULL_CHANCE)
+        adjustedDifference1 = AI_BATTLE_FULL_CHANCE;
+
+    casualtyFraction17 = static_cast<float>(
+        (1.0 - adjustedDifference1) * (1.0 - adjustedDifference1));
+    if (winnerChance0 > AI_QUICK_COMBAT_HIGH_WIN_CHANCE &&
+        casualtyFraction17 > AI_QUICK_COMBAT_MINIMUM_CASUALTY)
+        casualtyFraction17 *= casualtyFraction17;
+    if (winnerChance0 > AI_QUICK_COMBAT_CASUALTY_CAP_CHANCE &&
+        casualtyFraction17 >
+            (AI_BATTLE_FULL_CHANCE - winnerChance0) /
+                AI_QUICK_COMBAT_CASUALTY_DIVISOR)
+        casualtyFraction17 =
+            (AI_BATTLE_FULL_CHANCE - winnerChance0) /
+            AI_QUICK_COMBAT_CASUALTY_DIVISOR;
+    if (casualtyFraction17 > AI_QUICK_COMBAT_DAMAGE_PENALTY_LOW &&
+        casualtyFraction17 < AI_QUICK_COMBAT_DAMAGE_PENALTY_HIGH)
+        casualtyFraction17 = static_cast<float>(
+            casualtyFraction17 - AI_QUICK_COMBAT_DAMAGE_PENALTY);
+
+    if (attackerWon2 != 0) {
+        if (attackerHero != 0) {
+            gpAdvManager->GiveExperience(attackerHero, defenderExperience4, 1);
+            attackerHero->ApplyBattleWinTemps();
+        }
+        attackerHero->CheckLevel();
+        defenderDamage = AI_BATTLE_FULL_CHANCE;
+        attackerDamage = casualtyFraction17;
+    } else {
+        if (attackerHero != 0) {
+            attackerHero->m_remainingMobility = 0;
+            attackerHero->ApplyBattleLossTemps();
+        }
+        if (defenderHero != 0)
+            attackerHero->ApplyBattleWinTemps();
+        defenderDamage = casualtyFraction17;
+        attackerDamage = AI_BATTLE_FULL_CHANCE;
+        if (attackerDamage >= AI_QUICK_COMBAT_DEFEAT_THRESHOLD &&
+            defenderHero != 0) {
+            gpAdvManager->GiveExperience(defenderHero, defenderExperience4, 1);
+            defenderHero->CheckLevel();
+        }
+    }
+
+    attackerTroopCount5 = 0;
+    defenderTroopCount1 = 0;
+    for (armyIndex0 = 0;
+         armyIndex0 < AI_CREATURE_PURCHASE_ARMY_SLOT_COUNT;
+         armyIndex0++) {
+        if (attackerHero->m_army.m_creatureTypes[armyIndex0] !=
+            AI_CREATURE_PURCHASE_NO_SLOT)
+            attackerTroopCount5 +=
+                attackerHero->m_army.m_quantities[armyIndex0];
+        if (defenderHero != 0 &&
+            defenderHero->m_army.m_creatureTypes[armyIndex0] !=
+                AI_CREATURE_PURCHASE_NO_SLOT)
+            defenderTroopCount1 +=
+                defenderHero->m_army.m_quantities[armyIndex0];
+    }
+
+    gbRetreatWin = 0;
+    if ((attackerWon2 == 0 || defenderHero != 0) &&
+        Random(0, AI_QUICK_COMBAT_RANDOM_LIMIT) <
+            AI_QUICK_COMBAT_RETREAT_CHANCE)
+        gbRetreatWin = 1;
+    if (gbRetreatWin == 0) {
+        if (attackerDamage > AI_QUICK_COMBAT_DEFEAT_THRESHOLD)
+            gpAdvManager->TransferArtifacts(attackerHero, defenderHero);
+        else if (defenderDamage > AI_QUICK_COMBAT_DEFEAT_THRESHOLD)
+            gpAdvManager->TransferArtifacts(defenderHero, attackerHero);
+    }
+
+    DamageGroup(attacker, attackerHero, defenderHero, attackerDamage);
+    DamageGroup(defender, defenderHero, attackerHero, defenderDamage);
+
+    if (attackerWon2 != 0 &&
+        attackerHero->GetSSLevel(HERO_SKILL_NECROMANCY) != 0) {
+        necromancyCount6 = static_cast<int>(
+            static_cast<float>(defenderTroopCount1) *
+            static_cast<float>(
+                attackerHero->GetSSLevel(HERO_SKILL_NECROMANCY)) *
+            AI_QUICK_COMBAT_NECROMANCY_FACTOR);
+        if (necromancyCount6 <= 0)
+            necromancyCount6 = 1;
+        attackerHero->m_army.Add(AI_CREATURE_SKELETON,
+                                 necromancyCount6,
+                                 AI_CREATURE_PURCHASE_NO_SLOT);
+    } else if (defenderHero != 0 &&
+               defenderDamage <= AI_QUICK_COMBAT_NECROMANCY_THRESHOLD &&
+               defenderHero->GetSSLevel(HERO_SKILL_NECROMANCY) != 0) {
+        necromancyCount6 = static_cast<int>(
+            static_cast<float>(attackerTroopCount5) *
+            static_cast<float>(
+                defenderHero->GetSSLevel(HERO_SKILL_NECROMANCY)) *
+            AI_QUICK_COMBAT_NECROMANCY_FACTOR);
+        if (necromancyCount6 <= 0)
+            necromancyCount6 = 1;
+        defenderHero->m_army.Add(AI_CREATURE_SKELETON,
+                                 necromancyCount6,
+                                 AI_CREATURE_PURCHASE_NO_SLOT);
+    }
+
+    defeatedHero5 = 0;
+    victoriousHero4 = 0;
+    if (attackerWon2 != 0) {
+        defeatedHero5 = defenderHero;
+        victoriousHero4 = attackerHero;
+    } else if (defenderDamage <= AI_QUICK_COMBAT_NECROMANCY_THRESHOLD) {
+        defeatedHero5 = attackerHero;
+        victoriousHero4 = defenderHero;
+    }
+    if (defeatedHero5 != 0 &&
+        defeatedHero5->m_secondarySkills[HERO_SKILL_EAGLE_EYE] != 0 &&
+        victoriousHero4 != 0) {
+        for (armyIndex0 = 0; armyIndex0 < AI_QUICK_COMBAT_SPELL_COUNT;
+             armyIndex0++) {
+            if (defeatedHero5->HasSpell(armyIndex0) != 0 &&
+                victoriousHero4->HasSpell(armyIndex0) == 0 &&
+                gsSpellInfo[armyIndex0].level <=
+                    victoriousHero4->m_secondarySkills[HERO_SKILL_EAGLE_EYE] + 1 &&
+                (gsSpellInfo[armyIndex0].m_e &
+                 AI_QUICK_COMBAT_LEARNABLE_SPELL)) {
+                victoriousHero4->m_spells[armyIndex0] = 1;
+                break;
+            }
+        }
+    }
+
+    attackerHero->ApplyBattleWinTemps();
+    if (defenderHero != 0)
+        defenderHero->ApplyBattleWinTemps();
+    if (attackerWon2 != 0 && townBattle != 0)
+        gpGame->ClaimTown(townId, giCurPlayer, 0);
+    gbRetreatWin = 0;
+    return attackerWon2;
+}
 
 VA(0x00441419, 0x422)
 void philAI::HeroInteractionAtHero(class hero *, class hero *, int, int *) {}
@@ -3991,7 +4266,7 @@ DATA(0x0052564c) int bHeroBuiltThisTurn;
 DATA(0x00525650) short gaiHeroLiveChance[54];
 DATA(0x005256bc) int giHumanTownConquered;
 DATA(0x005256c0) int giCurTurn;
-DATA(0x005256c8) int *costTemp;
+DATA(0x005256c8) int costTemp[7];
 DATA(0x005256e4) int iAlphaMale;
 DATA(0x005256e8) int iDummy;
 DATA(0x005256ec) int gbPossibleShipyardFound;
