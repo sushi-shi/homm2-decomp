@@ -325,7 +325,8 @@ public:
     long m_previousCombatMessageExpiration;  // +0x34ad
     long m_combatMessageExpiration;  // +0x34b1
     int m_combatMessagePending;  // +0x34b5
-    char _pad_0x34b9[0x76];
+    char _pad_0x34b9[0x6e];
+    int m_networkArmyPresent[2];  // +0x3527
     int m_playerId[2];  // +0x352f
     char _pad_0x3537[0x8];
     int m_heroCastSpell[2];  // +0x353f
@@ -350,7 +351,8 @@ public:
     int m_inCastleCombat;  // +0xf333
     char _pad_0xf337[0x20];
     int m_nonVisualCombat;  // +0xf357
-    char _pad_0xf35b[0xc];
+    char _pad_0xf35b[0x4];
+    int m_killBenefit[2];  // +0xf35f
     class heroWindow *m_combatWindow;  // +0xf367
     char _pad_0xf36b[0x14];
     int m_limitCreatureCount[2][20];  // +0xf37f
