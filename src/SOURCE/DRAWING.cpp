@@ -4,9 +4,12 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <BASE/Icon2b.h>
+#include <BASE/Misc.h>
 #include <BASE/bitmap.h>
+#include <BASE/font.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/mouseManager.h>
 #include <SOURCE/KB.h>
@@ -444,7 +447,302 @@ finish:
 }
 
 VA(0x00405d0b, 0xb99)
-void combatManager::DrawSmallView(int, int) {}
+void combatManager::DrawSmallView(int viewIndex, int updateScreen)
+{
+    int iconX;
+    int iconY2;
+    int savedLimitToExtent9;
+    army *viewArmy1;
+    int viewX;
+    int spellIndex1;
+    int drawn6;
+    unsigned char spellPositions[6][6][2] = {
+        {{COMBAT_SMALL_VIEW_SPELL_X_THIRD, COMBAT_SMALL_VIEW_SPELL_Y_SECOND},
+         {COMBAT_SMALL_VIEW_UNUSED_POSITION, COMBAT_SMALL_VIEW_UNUSED_POSITION},
+         {COMBAT_SMALL_VIEW_UNUSED_POSITION, COMBAT_SMALL_VIEW_UNUSED_POSITION},
+         {COMBAT_SMALL_VIEW_UNUSED_POSITION, COMBAT_SMALL_VIEW_UNUSED_POSITION},
+         {COMBAT_SMALL_VIEW_UNUSED_POSITION, COMBAT_SMALL_VIEW_UNUSED_POSITION},
+         {COMBAT_SMALL_VIEW_UNUSED_POSITION, COMBAT_SMALL_VIEW_UNUSED_POSITION}},
+        {{COMBAT_SMALL_VIEW_SPELL_X_SECOND, COMBAT_SMALL_VIEW_SPELL_Y_SECOND},
+         {COMBAT_SMALL_VIEW_SPELL_X_FOURTH, COMBAT_SMALL_VIEW_SPELL_Y_SECOND},
+         {COMBAT_SMALL_VIEW_UNUSED_POSITION, COMBAT_SMALL_VIEW_UNUSED_POSITION},
+         {COMBAT_SMALL_VIEW_UNUSED_POSITION, COMBAT_SMALL_VIEW_UNUSED_POSITION},
+         {COMBAT_SMALL_VIEW_UNUSED_POSITION, COMBAT_SMALL_VIEW_UNUSED_POSITION},
+         {COMBAT_SMALL_VIEW_UNUSED_POSITION, COMBAT_SMALL_VIEW_UNUSED_POSITION}},
+        {{COMBAT_SMALL_VIEW_SPELL_X_FIRST, COMBAT_SMALL_VIEW_SPELL_Y_SECOND},
+         {COMBAT_SMALL_VIEW_SPELL_X_THIRD, COMBAT_SMALL_VIEW_SPELL_Y_SECOND},
+         {COMBAT_SMALL_VIEW_SPELL_X_FIFTH, COMBAT_SMALL_VIEW_SPELL_Y_SECOND},
+         {COMBAT_SMALL_VIEW_UNUSED_POSITION, COMBAT_SMALL_VIEW_UNUSED_POSITION},
+         {COMBAT_SMALL_VIEW_UNUSED_POSITION, COMBAT_SMALL_VIEW_UNUSED_POSITION},
+         {COMBAT_SMALL_VIEW_UNUSED_POSITION, COMBAT_SMALL_VIEW_UNUSED_POSITION}},
+        {{COMBAT_SMALL_VIEW_SPELL_X_SECOND, COMBAT_SMALL_VIEW_SPELL_Y_FIRST},
+         {COMBAT_SMALL_VIEW_SPELL_X_FOURTH, COMBAT_SMALL_VIEW_SPELL_Y_FIRST},
+         {COMBAT_SMALL_VIEW_SPELL_X_SECOND, COMBAT_SMALL_VIEW_SPELL_Y_THIRD},
+         {COMBAT_SMALL_VIEW_SPELL_X_FOURTH, COMBAT_SMALL_VIEW_SPELL_Y_THIRD},
+         {COMBAT_SMALL_VIEW_UNUSED_POSITION, COMBAT_SMALL_VIEW_UNUSED_POSITION},
+         {COMBAT_SMALL_VIEW_UNUSED_POSITION, COMBAT_SMALL_VIEW_UNUSED_POSITION}},
+        {{COMBAT_SMALL_VIEW_SPELL_X_FIRST, COMBAT_SMALL_VIEW_SPELL_Y_FIRST},
+         {COMBAT_SMALL_VIEW_SPELL_X_THIRD, COMBAT_SMALL_VIEW_SPELL_Y_FIRST},
+         {COMBAT_SMALL_VIEW_SPELL_X_FIFTH, COMBAT_SMALL_VIEW_SPELL_Y_FIRST},
+         {COMBAT_SMALL_VIEW_SPELL_X_SECOND, COMBAT_SMALL_VIEW_SPELL_Y_THIRD},
+         {COMBAT_SMALL_VIEW_SPELL_X_FOURTH, COMBAT_SMALL_VIEW_SPELL_Y_THIRD},
+         {COMBAT_SMALL_VIEW_UNUSED_POSITION, COMBAT_SMALL_VIEW_UNUSED_POSITION}},
+        {{COMBAT_SMALL_VIEW_SPELL_X_FIRST, COMBAT_SMALL_VIEW_SPELL_Y_FIRST},
+         {COMBAT_SMALL_VIEW_SPELL_X_THIRD, COMBAT_SMALL_VIEW_SPELL_Y_FIRST},
+         {COMBAT_SMALL_VIEW_SPELL_X_FIFTH, COMBAT_SMALL_VIEW_SPELL_Y_FIRST},
+         {COMBAT_SMALL_VIEW_SPELL_X_FIRST, COMBAT_SMALL_VIEW_SPELL_Y_THIRD},
+         {COMBAT_SMALL_VIEW_SPELL_X_THIRD, COMBAT_SMALL_VIEW_SPELL_Y_THIRD},
+         {COMBAT_SMALL_VIEW_SPELL_X_FIFTH, COMBAT_SMALL_VIEW_SPELL_Y_THIRD}}
+    };
+    int viewY2;
+    int spellCount6;
+    int spellFrame1;
+
+    if (gbNoShowCombat != 0)
+        return;
+    if (m_combatWindowOpen == 0)
+        return;
+    if (gConfig.combatArmyInfoLevel == 0)
+        return;
+    if (gbInDrawSmallView != 0)
+        return;
+
+    gbInDrawSmallView = 1;
+    if (m_smallViewSide[viewIndex] == -1 ||
+        (m_smallViewLastX[viewIndex] == COMBAT_SMALL_VIEW_LEFT_X &&
+         m_smallViewSide[viewIndex] == 1) ||
+        (m_smallViewLastX[viewIndex] == COMBAT_SMALL_VIEW_RIGHT_X &&
+         m_smallViewSide[viewIndex] == 0)) {
+        if (m_smallViewLastX[viewIndex] >= 0) {
+            gbLimitToExtent = 1;
+            giMinExtentX = m_smallViewLastX[viewIndex];
+            giMinExtentY = m_smallViewLastY[viewIndex];
+            giMaxExtentX = m_smallViewWidth[viewIndex] + m_smallViewLastX[viewIndex] - 1;
+            giMaxExtentY = m_smallViewHeight[viewIndex] + m_smallViewLastY[viewIndex] - 1;
+            DrawFrame(0, 0, 0, 0, 0, 1, 1);
+            gpWindowManager->UpdateScreenRegion(
+                giMinExtentX, giMinExtentY, giMaxExtentX - giMinExtentX + 1,
+                giMaxExtentY - giMinExtentY + 1);
+            gbLimitToExtent = 0;
+            m_smallViewLastX[viewIndex] = -1;
+        }
+        if (m_smallViewSide[viewIndex] == -1) {
+            gbInDrawSmallView = 0;
+            return;
+        }
+    }
+
+    if (gConfig.combatArmyInfoLevel == COMBAT_SMALL_VIEW_FULL_INFO) {
+        if (viewIndex == 0) {
+            viewX = m_smallViewSide[viewIndex] == 0 ? COMBAT_SMALL_VIEW_LEFT_X
+                                                   : COMBAT_SMALL_VIEW_RIGHT_X;
+            viewY2 = COMBAT_SMALL_VIEW_FULL_Y;
+        } else {
+            viewX = m_smallViewSide[viewIndex] == 0 ? COMBAT_SMALL_VIEW_LEFT_X
+                                                   : COMBAT_SMALL_VIEW_RIGHT_X;
+            viewY2 = m_smallViewSide[1] == m_smallViewSide[0]
+                         ? COMBAT_SMALL_VIEW_FULL_RIGHT_Y
+                         : COMBAT_SMALL_VIEW_FULL_Y;
+        }
+        m_smallViewWidth[viewIndex] = COMBAT_SMALL_VIEW_WIDTH;
+        m_smallViewHeight[viewIndex] = COMBAT_SMALL_VIEW_FULL_HEIGHT;
+    } else {
+        if (viewIndex == 0) {
+            viewX = m_smallViewSide[viewIndex] == 0 ? COMBAT_SMALL_VIEW_LEFT_X
+                                                   : COMBAT_SMALL_VIEW_RIGHT_X;
+            viewY2 = COMBAT_SMALL_VIEW_COMPACT_Y;
+        } else {
+            viewX = m_smallViewSide[viewIndex] == 0 ? COMBAT_SMALL_VIEW_LEFT_X
+                                                   : COMBAT_SMALL_VIEW_RIGHT_X;
+            viewY2 = m_smallViewSide[1] == m_smallViewSide[0]
+                         ? COMBAT_SMALL_VIEW_COMPACT_RIGHT_Y
+                         : COMBAT_SMALL_VIEW_COMPACT_Y;
+        }
+        m_smallViewWidth[viewIndex] = COMBAT_SMALL_VIEW_WIDTH;
+        m_smallViewHeight[viewIndex] = COMBAT_SMALL_VIEW_COMPACT_HEIGHT;
+    }
+
+    m_smallViewLastX[viewIndex] = viewX;
+    m_smallViewLastY[viewIndex] = viewY2;
+    savedLimitToExtent9 = gbLimitToExtent;
+    if (updateScreen != 0)
+        gbLimitToExtent = 0;
+
+    viewArmy1 = &m_armies[m_smallViewSide[viewIndex]][m_smallViewArmyIndex[viewIndex]];
+    drawn6 = m_smallViewBackgroundIcon->CombatClipDrawToBuffer(
+        viewX, viewY2, gConfig.combatArmyInfoLevel != COMBAT_SMALL_VIEW_FULL_INFO,
+        &m_smallViewLimits, 0, 0, 0, 0);
+    viewX += COMBAT_SMALL_VIEW_INSET_X;
+    if (drawn6 != 0) {
+        if (viewArmy1->m_quantity > 1)
+            sprintf(gText, cMiniViewText[COMBAT_SMALL_VIEW_TEXT_QUANTITY_PLURAL],
+                    viewArmy1->m_quantity);
+        else
+            sprintf(gText, cMiniViewText[COMBAT_SMALL_VIEW_TEXT_QUANTITY_SINGULAR],
+                    viewArmy1->m_quantity);
+        smallFont->DrawBoundedString(
+            gText, viewX + COMBAT_SMALL_VIEW_TEXT_X,
+            viewY2 + COMBAT_SMALL_VIEW_QUANTITY_Y, COMBAT_SMALL_VIEW_TEXT_WIDTH,
+            COMBAT_SMALL_VIEW_TEXT_HEIGHT, 1, 1);
+
+        if (gConfig.combatArmyInfoLevel == COMBAT_SMALL_VIEW_FULL_INFO) {
+            smallFont->DrawBoundedString(cMiniViewText[COMBAT_SMALL_VIEW_TEXT_ATTACK],
+                                         viewX + COMBAT_SMALL_VIEW_TEXT_X,
+                                         viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y,
+                                         COMBAT_SMALL_VIEW_TEXT_WIDTH,
+                                         COMBAT_SMALL_VIEW_TEXT_HEIGHT, 1, 0);
+            smallFont->DrawBoundedString(cMiniViewText[COMBAT_SMALL_VIEW_TEXT_DEFENSE],
+                                         viewX + COMBAT_SMALL_VIEW_TEXT_X,
+                                         viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y +
+                                             COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT,
+                                         COMBAT_SMALL_VIEW_TEXT_WIDTH,
+                                         COMBAT_SMALL_VIEW_TEXT_HEIGHT, 1, 0);
+            smallFont->DrawBoundedString(cMiniViewText[COMBAT_SMALL_VIEW_TEXT_HIT_POINTS],
+                                         viewX + COMBAT_SMALL_VIEW_TEXT_X,
+                                         viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y +
+                                             COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * 2,
+                                         COMBAT_SMALL_VIEW_TEXT_WIDTH,
+                                         COMBAT_SMALL_VIEW_TEXT_HEIGHT, 1, 0);
+            smallFont->DrawBoundedString(cMiniViewText[COMBAT_SMALL_VIEW_TEXT_DAMAGE],
+                                         viewX + COMBAT_SMALL_VIEW_TEXT_X,
+                                         viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y +
+                                             COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * 3,
+                                         COMBAT_SMALL_VIEW_TEXT_WIDTH,
+                                         COMBAT_SMALL_VIEW_TEXT_HEIGHT, 1, 0);
+            smallFont->DrawBoundedString(cMiniViewText[COMBAT_SMALL_VIEW_TEXT_MORALE],
+                                         viewX + COMBAT_SMALL_VIEW_TEXT_X,
+                                         viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y +
+                                             COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * 4,
+                                         COMBAT_SMALL_VIEW_TEXT_WIDTH,
+                                         COMBAT_SMALL_VIEW_TEXT_HEIGHT, 1, 0);
+            smallFont->DrawBoundedString(cMiniViewText[COMBAT_SMALL_VIEW_TEXT_LUCK],
+                                         viewX + COMBAT_SMALL_VIEW_TEXT_X,
+                                         viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y +
+                                             COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * 5,
+                                         COMBAT_SMALL_VIEW_TEXT_WIDTH,
+                                         COMBAT_SMALL_VIEW_TEXT_HEIGHT, 1, 0);
+            if (viewArmy1->m_flags & COMBAT_ARMY_FLAG_SHOOTER)
+                smallFont->DrawBoundedString(cMiniViewText[COMBAT_SMALL_VIEW_TEXT_SHOTS],
+                                             viewX + COMBAT_SMALL_VIEW_TEXT_X,
+                                             viewY2 + COMBAT_SMALL_VIEW_SHOTS_Y,
+                                             COMBAT_SMALL_VIEW_TEXT_WIDTH,
+                                             COMBAT_SMALL_VIEW_TEXT_HEIGHT, 1, 0);
+
+            sprintf(gText, "%d", static_cast<int>(viewArmy1->m_monsterAttack));
+            smallFont->DrawBoundedString(gText, viewX + COMBAT_SMALL_VIEW_TEXT_X,
+                                         viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y,
+                                         COMBAT_SMALL_VIEW_TEXT_WIDTH,
+                                         COMBAT_SMALL_VIEW_TEXT_HEIGHT, 1, 2);
+            sprintf(gText, "%d", static_cast<int>(viewArmy1->m_monsterDefense));
+            smallFont->DrawBoundedString(gText, viewX + COMBAT_SMALL_VIEW_TEXT_X,
+                                         viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y +
+                                             COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT,
+                                         COMBAT_SMALL_VIEW_TEXT_WIDTH,
+                                         COMBAT_SMALL_VIEW_TEXT_HEIGHT, 1, 2);
+            sprintf(gText, "%d", static_cast<unsigned int>(viewArmy1->m_currentHitPoints));
+            smallFont->DrawBoundedString(gText, viewX + COMBAT_SMALL_VIEW_TEXT_X,
+                                         viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y +
+                                             COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * 2,
+                                         COMBAT_SMALL_VIEW_TEXT_WIDTH,
+                                         COMBAT_SMALL_VIEW_TEXT_HEIGHT, 1, 2);
+            sprintf(gText, "%d-%d", static_cast<int>(viewArmy1->m_monsterDamageMin),
+                    static_cast<int>(viewArmy1->m_monsterDamageMax));
+            smallFont->DrawBoundedString(gText, viewX + COMBAT_SMALL_VIEW_TEXT_X,
+                                         viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y +
+                                             COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * 3,
+                                         COMBAT_SMALL_VIEW_TEXT_WIDTH,
+                                         COMBAT_SMALL_VIEW_TEXT_HEIGHT, 1, 2);
+
+            spellIndex1 = 0;
+            if (viewArmy1->m_morale > 0) {
+                for (spellIndex1 = 0; spellIndex1 < viewArmy1->m_morale; spellIndex1++)
+                    m_smallViewModifierIcon->DrawToBuffer(
+                        viewX + COMBAT_SMALL_VIEW_MODIFIER_RIGHT_X -
+                            spellIndex1 * COMBAT_SMALL_VIEW_MODIFIER_STEP,
+                        viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y +
+                            COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * 4,
+                        COMBAT_SMALL_VIEW_GOOD_MORALE_FRAME, 0);
+            } else if (viewArmy1->m_morale < 0) {
+                for (spellIndex1 = 0; spellIndex1 < -viewArmy1->m_morale; spellIndex1++)
+                    m_smallViewModifierIcon->DrawToBuffer(
+                        viewX + COMBAT_SMALL_VIEW_MODIFIER_RIGHT_X -
+                            spellIndex1 * COMBAT_SMALL_VIEW_MODIFIER_STEP,
+                        viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y +
+                            COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * 4,
+                        COMBAT_SMALL_VIEW_BAD_MORALE_FRAME, 0);
+            } else {
+                m_smallViewModifierIcon->DrawToBuffer(
+                    viewX + COMBAT_SMALL_VIEW_NEUTRAL_MORALE_X,
+                    viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y +
+                        COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * 4,
+                    COMBAT_SMALL_VIEW_NEUTRAL_MORALE_FRAME, 0);
+            }
+
+            spellIndex1 = 0;
+            if (viewArmy1->m_luck > 0) {
+                for (spellIndex1 = 0; spellIndex1 < viewArmy1->m_luck; spellIndex1++)
+                    m_smallViewModifierIcon->DrawToBuffer(
+                        viewX + COMBAT_SMALL_VIEW_MODIFIER_RIGHT_X -
+                            spellIndex1 * COMBAT_SMALL_VIEW_MODIFIER_STEP,
+                        viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y +
+                            COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * 5,
+                        COMBAT_SMALL_VIEW_GOOD_LUCK_FRAME, 0);
+            } else if (viewArmy1->m_luck < 0) {
+                for (spellIndex1 = 0; spellIndex1 < -viewArmy1->m_luck; spellIndex1++)
+                    m_smallViewModifierIcon->DrawToBuffer(
+                        viewX + COMBAT_SMALL_VIEW_MODIFIER_RIGHT_X -
+                            spellIndex1 * COMBAT_SMALL_VIEW_MODIFIER_STEP,
+                        viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y +
+                            COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * 5,
+                        COMBAT_SMALL_VIEW_BAD_LUCK_FRAME, 0);
+            } else {
+                m_smallViewModifierIcon->DrawToBuffer(
+                    viewX + COMBAT_SMALL_VIEW_NEUTRAL_LUCK_X,
+                    viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y +
+                        COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * 5,
+                    COMBAT_SMALL_VIEW_NEUTRAL_LUCK_FRAME, 0);
+            }
+
+            if (viewArmy1->m_flags & COMBAT_ARMY_FLAG_SHOOTER) {
+                sprintf(gText, "%d", static_cast<int>(viewArmy1->m_shots));
+                smallFont->DrawBoundedString(gText, viewX + COMBAT_SMALL_VIEW_TEXT_X,
+                                             viewY2 + COMBAT_SMALL_VIEW_SHOTS_Y,
+                                             COMBAT_SMALL_VIEW_TEXT_WIDTH,
+                                             COMBAT_SMALL_VIEW_TEXT_HEIGHT, 1, 2);
+            }
+        }
+
+        spellCount6 = viewArmy1->m_spellCount < COMBAT_SMALL_VIEW_MAX_SPELLS
+                          ? viewArmy1->m_spellCount
+                          : COMBAT_SMALL_VIEW_MAX_SPELLS;
+        spellFrame1 = -1;
+        for (spellIndex1 = 0; spellIndex1 < spellCount6; spellIndex1++) {
+            spellFrame1++;
+            while (viewArmy1->m_spellInfluence[spellFrame1] == 0)
+                spellFrame1++;
+
+            iconX = viewX + COMBAT_SMALL_VIEW_INSET_X;
+            if (gConfig.combatArmyInfoLevel == COMBAT_SMALL_VIEW_FULL_INFO)
+                iconY2 = viewY2 + COMBAT_SMALL_VIEW_FULL_SPELL_Y;
+            else
+                iconY2 = viewY2 + COMBAT_SMALL_VIEW_COMPACT_SPELL_Y;
+            iconX += spellPositions[spellCount6 - 1][spellIndex1][0];
+            iconY2 += spellPositions[spellCount6 - 1][spellIndex1][1];
+            iconX += (COMBAT_SMALL_VIEW_ICON_SIZE -
+                      GetIconEntry(m_smallViewSpellIcon, spellFrame1)->w) >> 1;
+            iconY2 += (COMBAT_SMALL_VIEW_ICON_SIZE -
+                       GetIconEntry(m_smallViewSpellIcon, spellFrame1)->h) >> 1;
+            m_smallViewSpellIcon->DrawToBuffer(iconX, iconY2, spellFrame1, 0);
+        }
+    }
+
+    gbLimitToExtent = savedLimitToExtent9;
+    viewX -= COMBAT_SMALL_VIEW_INSET_X;
+    if (updateScreen != 0)
+        gpWindowManager->UpdateScreenRegion(viewX, viewY2, m_smallViewWidth[viewIndex],
+                                            m_smallViewHeight[viewIndex]);
+    gbInDrawSmallView = 0;
+}
 
 // ---- globals (definitions, RVA order) ----
 DATA(0x004ed25c) int bGridWasShowing;
