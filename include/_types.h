@@ -14,10 +14,16 @@ class sample;
 // per-element .rdata float symbols referenced in philAI::RVConversion; the rest follow the
 // canonical order.
 enum { RES_WOOD, RES_MERCURY, RES_ORE, RES_SULFUR, RES_CRYSTAL, RES_GEMS, RES_GOLD };
-enum {
+typedef enum MonsterFlags {
+    MONSTER_FLAGS_WIDE = 0x00000001,
+    MONSTER_FLAGS_FLYING = 0x00000002,
+    MONSTER_FLAGS_LIGHT_PALETTE = 0x00000100,
+    MONSTER_FLAGS_RED_PALETTE = 0x00000200,
+    MONSTER_FLAGS_DARK_BROWN_PALETTE = 0x00002000,
+    MONSTER_FLAGS_GRAY_PALETTE = 0x00004000,
     MONSTER_FLAGS_SHOOTER = 0x00040000,
     MONSTER_FLAGS_NO_MORALE = 0x04000000
-};
+} MonsterFlags;
 
 typedef unsigned int UInt32;   // crc32Table[]
 struct MemEntry;               // gpMemEntry — full def not yet reconstructed; used via pointer

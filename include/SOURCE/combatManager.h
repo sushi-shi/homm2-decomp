@@ -211,7 +211,9 @@ public:
     int m_battlefieldFringe;  // +0x31e2
     char _pad_0x31e6[0xc];
     int m_debugFormation;  // +0x31f2
-    char _pad_0x31f6[0xc];
+    char _pad_0x31f6[0x4];
+    class icon *m_combatStatusIcon;  // +0x31fa
+    char _pad_0x31fe[0x4];
     class icon *m_catapultIcon;  // +0x3202
     char _pad_0x3206[0x4];
     class icon *m_towerIcon;  // +0x320a
@@ -231,12 +233,12 @@ public:
     class bitmap *m_backgroundBuffer;  // +0x326f
     class bitmap *m_mouseGridBuffer;  // +0x3273
     int m_backgroundDrawn;  // +0x3277
-    char _pad_0x327b[0x8];
+    class town *m_towns[2];  // +0x327b
     class town *m_castle;  // +0x3283
     class hero *m_heroes[2];  // +0x3287
     char _pad_0x328f[0xfa];
     int m_spellPower[2];  // +0x3389
-    char _pad_0x3391[0x8];
+    class armyGroup *m_armyGroups[2];  // +0x3391
     int m_mouseGridHex;  // +0x3399
     char _pad_0x339d[0x8];
     int m_heroAnimationState[2];  // +0x33a5
@@ -265,7 +267,7 @@ public:
     int m_gridSelectionDisabled;  // +0xf2b3
     int m_limitCreature;  // +0xf2b7
     int m_limitCreatureHex;  // +0xf2bb
-    char _pad_0xf2bf[0x4];
+    int m_showArmyQuantities;  // +0xf2bf
     int m_selectedHex;  // +0xf2c3
     char _pad_0xf2c7[0xc];
     struct SLimitData m_catapultLimits;  // +0xf2d3

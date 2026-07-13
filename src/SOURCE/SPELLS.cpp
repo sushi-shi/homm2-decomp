@@ -207,7 +207,7 @@ void combatManager::CastSpell(int spell, int targetHex, int castByCreature, int 
                 sprintf(gText, "telptin.82m");
                 spellSample = LoadPlaySample(gText);
             }
-            if ((teleportArmy_i->m_flags & ARMY_FLAG_WIDE) != 0) {
+            if ((teleportArmy_i->m_monster.flags.all & ARMY_FLAG_WIDE) != 0) {
                 adjacentHex_q = teleportDestination;
                 if (teleportArmy_i->m_facing == ARMY_FACING_RIGHT) {
                     adjacentHex_q = teleportArmy_i->GetAdjacentCellIndex(teleportDestination, 1);
@@ -255,12 +255,12 @@ void combatManager::CastSpell(int spell, int targetHex, int castByCreature, int 
             }
             break;
         case SPELL_DISRUPTING_RAY:
-            oldDefense = target_i->m_monsterDefense;
-            target_i->m_monsterDefense -= SPELL_DISRUPTING_RAY_DEFENSE_REDUCTION;
-            if (target_i->m_monsterDefense < SPELL_MINIMUM_DEFENSE)
-                target_i->m_monsterDefense = SPELL_MINIMUM_DEFENSE;
+            oldDefense = target_i->m_monster.defense;
+            target_i->m_monster.defense -= SPELL_DISRUPTING_RAY_DEFENSE_REDUCTION;
+            if (target_i->m_monster.defense < SPELL_MINIMUM_DEFENSE)
+                target_i->m_monster.defense = SPELL_MINIMUM_DEFENSE;
             sprintf(gText, "The disrupting ray reduces defense by %d.",
-                    oldDefense - target_i->m_monsterDefense);
+                    oldDefense - target_i->m_monster.defense);
             CombatMessage(gText, 1, 1, 0);
             DoBlast(targetHex, spell);
             RippleCreature(target_i->m_side, target_i->m_index, 0);

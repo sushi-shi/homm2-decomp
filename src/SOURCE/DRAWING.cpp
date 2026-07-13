@@ -174,8 +174,8 @@ void combatManager::CombatMessage(int messageType)
 
     switch (messageType) {
         case COMBAT_MESSAGE_COMMAND_DEFAULT:
-            if ((currentArmyPtr->m_flags & COMBAT_ARMY_FLAG_SHOOTER) != 0 &&
-                currentArmyPtr->m_shots == 0 && targetArmy != 0)
+            if ((currentArmyPtr->m_monster.flags.all & COMBAT_ARMY_FLAG_SHOOTER) != 0 &&
+                currentArmyPtr->m_monster.shots == 0 && targetArmy != 0)
                 strcpy(gText, cCombatMessage[COMBAT_MESSAGE_TEXT_NO_SHOTS]);
             else
                 strcpy(gText, cCombatMessage[COMBAT_MESSAGE_TEXT_DEFAULT]);
@@ -195,7 +195,7 @@ void combatManager::CombatMessage(int messageType)
         case COMBAT_MESSAGE_COMMAND_SHOOT:
             sprintf(gText, cCombatMessage[COMBAT_MESSAGE_TEXT_SHOOT],
                     gArmyNames[targetMonsterType],
-                    static_cast<int>(currentArmyPtr->m_shots));
+                    static_cast<int>(currentArmyPtr->m_monster.shots));
             break;
         case COMBAT_MESSAGE_COMMAND_OPTIONS:
             if (m_heroes[m_currentSide] != 0 && m_heroes[m_currentSide]->m_unknownE7 != 0)
@@ -237,7 +237,8 @@ void combatManager::ResetLimitCreature(void)
     for (side = 0; side < COMBAT_SIDE_COUNT_DRAWING; side++) {
         for (armySlotIndex = 0; armySlotIndex < COMBAT_ARMY_SLOT_COUNT_DRAWING;
              armySlotIndex++) {
-            if ((m_armies[side][armySlotIndex].m_flags & COMBAT_ARMY_FLAG_MIRROR_IMAGE) != 0)
+            if ((m_armies[side][armySlotIndex].m_monster.flags.all &
+                 COMBAT_ARMY_FLAG_MIRROR_IMAGE) != 0)
                 m_limitCreatureCount[side][armySlotIndex] = -1;
             else
                 m_limitCreatureCount[side][armySlotIndex] = 0;
@@ -1175,32 +1176,33 @@ void combatManager::DrawSmallView(int viewIndex, int updateScreen)
                                              COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * 5,
                                          COMBAT_SMALL_VIEW_TEXT_WIDTH,
                                          COMBAT_SMALL_VIEW_TEXT_HEIGHT, 1, 0);
-            if (viewArmy1->m_flags & COMBAT_ARMY_FLAG_SHOOTER)
+            if (viewArmy1->m_monster.flags.all & COMBAT_ARMY_FLAG_SHOOTER)
                 smallFont->DrawBoundedString(cMiniViewText[COMBAT_SMALL_VIEW_TEXT_SHOTS],
                                              viewX + COMBAT_SMALL_VIEW_TEXT_X,
                                              viewY2 + COMBAT_SMALL_VIEW_SHOTS_Y,
                                              COMBAT_SMALL_VIEW_TEXT_WIDTH,
                                              COMBAT_SMALL_VIEW_TEXT_HEIGHT, 1, 0);
 
-            sprintf(gText, "%d", static_cast<int>(viewArmy1->m_monsterAttack));
+            sprintf(gText, "%d", static_cast<int>(viewArmy1->m_monster.attack));
             smallFont->DrawBoundedString(gText, viewX + COMBAT_SMALL_VIEW_TEXT_X,
                                          viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y,
                                          COMBAT_SMALL_VIEW_TEXT_WIDTH,
                                          COMBAT_SMALL_VIEW_TEXT_HEIGHT, 1, 2);
-            sprintf(gText, "%d", static_cast<int>(viewArmy1->m_monsterDefense));
+            sprintf(gText, "%d", static_cast<int>(viewArmy1->m_monster.defense));
             smallFont->DrawBoundedString(gText, viewX + COMBAT_SMALL_VIEW_TEXT_X,
                                          viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y +
                                              COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT,
                                          COMBAT_SMALL_VIEW_TEXT_WIDTH,
                                          COMBAT_SMALL_VIEW_TEXT_HEIGHT, 1, 2);
-            sprintf(gText, "%d", static_cast<unsigned int>(viewArmy1->m_currentHitPoints));
+            sprintf(gText, "%d",
+                    static_cast<unsigned int>(viewArmy1->m_monster.hitPoints));
             smallFont->DrawBoundedString(gText, viewX + COMBAT_SMALL_VIEW_TEXT_X,
                                          viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y +
                                              COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * 2,
                                          COMBAT_SMALL_VIEW_TEXT_WIDTH,
                                          COMBAT_SMALL_VIEW_TEXT_HEIGHT, 1, 2);
-            sprintf(gText, "%d-%d", static_cast<int>(viewArmy1->m_monsterDamageMin),
-                    static_cast<int>(viewArmy1->m_monsterDamageMax));
+            sprintf(gText, "%d-%d", static_cast<int>(viewArmy1->m_monster.damageMin),
+                    static_cast<int>(viewArmy1->m_monster.damageMax));
             smallFont->DrawBoundedString(gText, viewX + COMBAT_SMALL_VIEW_TEXT_X,
                                          viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y +
                                              COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * 3,
@@ -1257,8 +1259,8 @@ void combatManager::DrawSmallView(int viewIndex, int updateScreen)
                     COMBAT_SMALL_VIEW_NEUTRAL_LUCK_FRAME, 0);
             }
 
-            if (viewArmy1->m_flags & COMBAT_ARMY_FLAG_SHOOTER) {
-                sprintf(gText, "%d", static_cast<int>(viewArmy1->m_shots));
+            if (viewArmy1->m_monster.flags.all & COMBAT_ARMY_FLAG_SHOOTER) {
+                sprintf(gText, "%d", static_cast<int>(viewArmy1->m_monster.shots));
                 smallFont->DrawBoundedString(gText, viewX + COMBAT_SMALL_VIEW_TEXT_X,
                                              viewY2 + COMBAT_SMALL_VIEW_SHOTS_Y,
                                              COMBAT_SMALL_VIEW_TEXT_WIDTH,
