@@ -15,6 +15,10 @@
 // VAs pinned from the retail disassembly of the referencing fns (no CodeView symbol of their own):
 DATA(0x004faeb8) extern SCreatureInfo gCreatureInfo[];   // monster-DB view (game::ExperienceValueOfStack)
 DATA(0x004faeb2) extern monsterRV gMonsterInfo[100];     // monster-DB view, 26B recs (philAI::ComputeUpgradeValue)
+// The retail base includes the zero-level entry used by the one-based skill
+// level index, so an expert value aliases the next row's leading entry.
+#define HERO_SECONDARY_SKILL_VALUE_LEVELS 3
+DATA(0x004fabf4) extern int gSecondarySkillRV[][HERO_SECONDARY_SKILL_VALUE_LEVELS];
 // (gRVWeightOre/Merc/Crystal removed — they were just gafAITurnCostResource[2|1|4]; the code
 //  now indexes the array directly via the RES_* enum, which matches the retail byte-for-byte.)
 DATA(0x0051ef24) extern char gDefaultCursorName[]; // default cursor resource name (mouseManager::SetColorMice)
