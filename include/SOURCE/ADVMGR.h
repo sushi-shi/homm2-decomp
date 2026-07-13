@@ -607,7 +607,7 @@ extern unsigned char giCurPlayerBit;
 extern int giBestShipyardDist;
 extern short gaiHeroLiveChance[54];
 extern int giHumanTownConquered;
-extern int *costTemp;
+extern int costTemp[7];
 extern int gbPossibleShipyardFound;
 extern int iCurPlaceToVisit;
 extern int giBestShipyardId;
