@@ -63,6 +63,8 @@
 #define GTRANSMITLINE (*reinterpret_cast<const short *>("N\""))
 #define GRECEIVELINE (*reinterpret_cast<const short *>("-["))
 #define GDIFFLINE (*reinterpret_cast<const short *>("f\x1d"))
+#define GCOMPRESSTEST2LINE (*reinterpret_cast<const short *>("r\x1f"))
+#define GCOMPRESSTESTLINE (*reinterpret_cast<const short *>("\x95\x1f"))
 #define VIEW_ARMY_FRAMES \
     "\x37\x3a\x37\x62\x37\x8a\x37\xb9\x37\xc0\x37\xc6\x37\x0d\x38\x11\x38\x15\x38\x19" \
     "\x38\x1d\x38\x21\x38\x25\x38\x29\x38\x2d\x38\x31\x38\x35\x38\x39\x38\x3d\x38\x41" \
@@ -712,7 +714,7 @@ void game::SetupOrigData(void)
         m_players[i].townCount = 0;
         m_players[i].daysLeft = -1;
         m_players[i].unknown13 = 0;
-        memset(m_players[i].unknown0c, -1, 2);
+        memset(m_players[i].availableHeroes, -1, 2);
         memset(m_players[i].heroes, -1, 8);
         memset(m_players[i].towns, -1, GAME_TOWN_COUNT);
     }
@@ -1247,8 +1249,8 @@ void game::NewMap(char *filename)
                     strcpy(m_heroRecs[campaignHero15].m_name, "Brother Brax");
                     m_heroRecs[campaignHero15].m_unknown18 = 59;
                 }
-                m_players[player2].unknown0c[0] = static_cast<char>(campaignHero15);
-                m_availableHeroes[m_players[player2].unknown0c[0]] = 64;
+                m_players[player2].availableHeroes[0] = static_cast<char>(campaignHero15);
+                m_availableHeroes[m_players[player2].availableHeroes[0]] = 64;
                 heroClass5 = m_heroRecs[campaignHero15].m_cursorType;
                 goto secondHero;
             }
@@ -1276,8 +1278,8 @@ void game::NewMap(char *filename)
                         m_heroRecs[campaignHero15].CheckLevel();
                         strcpy(m_heroRecs[campaignHero15].m_name, specialName3);
                         m_heroRecs[campaignHero15].m_unknown18 = specialPortrait6;
-                        m_players[player2].unknown0c[0] = static_cast<char>(campaignHero15);
-                        m_availableHeroes[m_players[player2].unknown0c[0]] = 64;
+                        m_players[player2].availableHeroes[0] = static_cast<char>(campaignHero15);
+                        m_availableHeroes[m_players[player2].availableHeroes[0]] = 64;
                         heroClass5 = m_heroRecs[campaignHero15].m_cursorType;
                         goto secondHero;
                     }
@@ -1288,15 +1290,15 @@ void game::NewMap(char *filename)
                     gcColorToSetupPos[m_players[player2].color] + 0x459] < 6)
                 heroClass5 = reinterpret_cast<signed char *>(this)[
                     gcColorToSetupPos[m_players[player2].color] + 0x459];
-            m_players[player2].unknown0c[0] =
+            m_players[player2].availableHeroes[0] =
                 static_cast<char>(GetNewHeroId(player2, heroClass5, 0));
-            m_availableHeroes[m_players[player2].unknown0c[0]] = 64;
+            m_availableHeroes[m_players[player2].availableHeroes[0]] = 64;
         }
 secondHero:
         heroClass5 = (Random(1, 5) + heroClass5) % 6;
-        m_players[player2].unknown0c[1] =
+        m_players[player2].availableHeroes[1] =
             static_cast<char>(GetNewHeroId(player2, heroClass5, 0));
-        m_availableHeroes[m_players[player2].unknown0c[1]] = 64;
+        m_availableHeroes[m_players[player2].availableHeroes[1]] = 64;
     }
 
     for (player2 = 0; player2 < m_playerCount; player2++) {
@@ -3244,7 +3246,7 @@ void game::PerWeek(void)
         for (innerIndex3 = 0; innerIndex3 < 2; innerIndex3++) {
             if (innerIndex3 == 1) {
                 heroClass18 =
-                    m_heroRecs[gpGame->m_players[outerIndex5].unknown0c[0]].m_cursorType;
+                    m_heroRecs[gpGame->m_players[outerIndex5].availableHeroes[0]].m_cursorType;
             }
             heroClass18 = (Random(1, 5) + heroClass18) % 6;
             desiredClass1 = heroClass18;
@@ -3257,12 +3259,12 @@ void game::PerWeek(void)
             if (gpGame->m_availableHeroes[
                     (innerIndex3 - outerIndex5 +
                      outerIndex5 * (sizeof(playerData) + 1))[
-                        gpGame->m_players[0].unknown0c]] ==
+                        gpGame->m_players[0].availableHeroes]] ==
                 WEEKLY_AVAILABLE_HERO) {
                 if (gpGame->m_heroRecs[
                         (innerIndex3 - outerIndex5 +
                          outerIndex5 * (sizeof(playerData) + 1))[
-                            gpGame->m_players[0].unknown0c]]
+                            gpGame->m_players[0].availableHeroes]]
                         .m_eventFlags & WEEKLY_HERO_RESERVED_FLAG)
                     continue;
             }
@@ -3270,12 +3272,12 @@ void game::PerWeek(void)
                 if (gpGame->m_availableHeroes[
                         (innerIndex3 - outerIndex5 +
                          outerIndex5 * (sizeof(playerData) + 1))[
-                            gpGame->m_players[0].unknown0c]] ==
+                            gpGame->m_players[0].availableHeroes]] ==
                     WEEKLY_AVAILABLE_HERO)
                     gpGame->m_availableHeroes[
                         (innerIndex3 - outerIndex5 +
                          outerIndex5 * (sizeof(playerData) + 1))[
-                            gpGame->m_players[0].unknown0c]] =
+                            gpGame->m_players[0].availableHeroes]] =
                         -1;
                 if (innerIndex3 == 1 && !gbHumanPlayer[outerIndex5])
                     desiredClass1 = -1;
@@ -3283,12 +3285,12 @@ void game::PerWeek(void)
                     !gbHumanPlayer[outerIndex5] && gpGame->m_difficulty > 0;
                 (innerIndex3 - outerIndex5 +
                  outerIndex5 * (sizeof(playerData) + 1))[
-                    gpGame->m_players[0].unknown0c] =
+                    gpGame->m_players[0].availableHeroes] =
                     static_cast<signed char>(gpGame->GetNewHeroId(
                         outerIndex5, desiredClass1, useDifficultyBonus3));
                 m_availableHeroes[(innerIndex3 - outerIndex5 +
                                    outerIndex5 * (sizeof(playerData) + 1))[
-                    gpGame->m_players[0].unknown0c]] =
+                    gpGame->m_players[0].availableHeroes]] =
                     WEEKLY_AVAILABLE_HERO;
             }
         }
@@ -4912,13 +4914,13 @@ void game::CheckHeroConsistency(void)
     for (player3 = 0; player3 < m_playerCount; player3++) {
         if (m_playerDead[player3] == 0) {
             for (slot1 = 0; slot1 < 2; slot1++) {
-                if ((m_availableHeroes[m_players[player3].unknown0c[slot1]] >= 0 &&
-                     m_availableHeroes[m_players[player3].unknown0c[slot1]] <= 5) ||
+                if ((m_availableHeroes[m_players[player3].availableHeroes[slot1]] >= 0 &&
+                     m_availableHeroes[m_players[player3].availableHeroes[slot1]] <= 5) ||
                     (total26 < 40 &&
-                     m_availableHeroes[m_players[player3].unknown0c[slot1]] == -1)) {
-                    m_players[player3].unknown0c[slot1] =
+                     m_availableHeroes[m_players[player3].availableHeroes[slot1]] == -1)) {
+                    m_players[player3].availableHeroes[slot1] =
                         static_cast<signed char>(GetNewHeroId(player3, -1, 0));
-                    m_availableHeroes[m_players[player3].unknown0c[slot1]] = 64;
+                    m_availableHeroes[m_players[player3].availableHeroes[slot1]] = 64;
                 }
             }
         }
@@ -6052,11 +6054,115 @@ EventExtra *GetMapEvent(int x, int y)
     return 0;
 }
 
+// @early-stop
+// Frame/CFG/logic match. Only +0xc..+0x37 (calendar term register order) and
+// +0x19d..+0x286 (four equivalent player-resource address orders) are TU-cumulative.
 VA(0x00485e07, 0x34c)
-void game::CheckForTimeEvent(void) {}
+void game::CheckForTimeEvent(void)
+{
+    int dayNumber6;
+    int eventIndex11;
+    int resourceIndex27;
+    timeEventExtra *event15;
+    int primaryType14;
+    int secondaryType18;
+    int primaryAmount12;
+    int secondaryAmount9;
+    int resourceAmount7;
 
+    dayNumber6 = (m_week - 1) * TIME_EVENT_DAYS_PER_WEEK +
+                 (m_month - 1) * TIME_EVENT_DAYS_PER_MONTH + m_day;
+    for (eventIndex11 = 0; eventIndex11 < m_timeEventCount; eventIndex11++) {
+        event15 = static_cast<timeEventExtra *>(
+            ppMapExtra[m_timeEventIndices[eventIndex11]]);
+        if (((gbHumanPlayer[giCurPlayer] && event15->appliesToHuman) ||
+             (!gbHumanPlayer[giCurPlayer] && event15->appliesToComputer)) &&
+            event15->players[
+                GetPlayerColor(static_cast<signed char>(giCurPlayer))] &&
+            (event15->firstDay == dayNumber6 ||
+             (event15->repeatInterval != 0 &&
+              event15->firstDay < dayNumber6 &&
+              (dayNumber6 - event15->firstDay) %
+                      event15->repeatInterval == 0))) {
+            primaryType14 = -1;
+            primaryAmount12 = 0;
+            secondaryType18 = -1;
+            secondaryAmount9 = 0;
+            for (resourceIndex27 = 0;
+                 resourceIndex27 < TIME_EVENT_RESOURCE_COUNT;
+                 resourceIndex27++) {
+                resourceAmount7 = event15->resources[resourceIndex27];
+                if (gpGame->m_players[giCurPlayer].resources[resourceIndex27] <
+                    -resourceAmount7) {
+                    resourceAmount7 =
+                        -gpGame->m_players[giCurPlayer].resources[resourceIndex27];
+                }
+                gpGame->m_players[giCurPlayer].resources[resourceIndex27] +=
+                    event15->resources[resourceIndex27];
+                if (gpGame->m_players[giCurPlayer].resources[resourceIndex27] < 0)
+                    gpGame->m_players[giCurPlayer].resources[resourceIndex27] = 0;
+                if (resourceAmount7 != 0) {
+                    if (primaryType14 != -1) {
+                        secondaryType18 = primaryType14;
+                        secondaryAmount9 = primaryAmount12;
+                    }
+                    primaryType14 = resourceIndex27;
+                    primaryAmount12 = resourceAmount7;
+                }
+            }
+            if (primaryType14 >= 0 &&
+                primaryType14 <= TIME_EVENT_RESOURCE_COUNT - 1 &&
+                primaryAmount12 < 0) {
+                primaryAmount12 -= TIME_EVENT_RESOURCE_PENALTY;
+            }
+            if (secondaryType18 >= 0 &&
+                secondaryType18 <= TIME_EVENT_RESOURCE_COUNT - 1 &&
+                secondaryAmount9 < 0) {
+                secondaryAmount9 -= TIME_EVENT_RESOURCE_PENALTY;
+            }
+            if (gbThisNetHumanPlayer[giCurPlayer]) {
+                NormalDialog(event15->message, 1, -1, -1,
+                             primaryType14, primaryAmount12,
+                             secondaryType18, secondaryAmount9, -1, 0);
+            }
+        }
+    }
+}
+
+// @early-stop
+// Frame/loops match; +0xc5..+0xe8 is only the equivalent packed expression
+// heroIndex + player * 283. Direct, commuted, accessor, and AST variants did not steer it.
 VA(0x00486153, 0x143)
-void CheckValidAvailableHeroes(void) {}
+void CheckValidAvailableHeroes(void)
+{
+    int candidatePlayer0;
+    int heroIndex5;
+    int availableSlot13;
+    int heroPlayer26;
+
+    for (heroPlayer26 = 0; heroPlayer26 < gpGame->m_playerCount; heroPlayer26++) {
+        for (heroIndex5 = 0;
+             heroIndex5 < gpGame->m_players[heroPlayer26].heroCount;
+             heroIndex5++) {
+            for (candidatePlayer0 = 0;
+                 candidatePlayer0 < gpGame->m_playerCount;
+                 candidatePlayer0++) {
+                for (availableSlot13 = 0;
+                     availableSlot13 < AVAILABLE_HERO_SLOTS;
+                     availableSlot13++) {
+                    if (gpGame->m_players[candidatePlayer0]
+                            .availableHeroes[availableSlot13] ==
+                        gpGame->m_players[heroPlayer26].heroes[heroIndex5]) {
+                        gpGame->m_players[candidatePlayer0]
+                            .availableHeroes[availableSlot13] =
+                            static_cast<signed char>(
+                                gpGame->GetNewHeroId(heroPlayer26, -1, 0));
+                    }
+                }
+            }
+        }
+    }
+}
 
 VA(0x00486296, 0xab)
 int CalcFileCRC(char *filename)
@@ -6073,11 +6179,100 @@ int CalcFileCRC(char *filename)
     return crc;
 }
 
+// @early-stop
+// All bytes except +0x8d..+0x99 match; /Od reverses the equivalent index/size
+// loop-test load order and branch polarity. Relational and AST variants did not steer it.
 VA(0x00486341, 0x153)
-void CompressTest2(void) {}
+void CompressTest2(void)
+{
+    int dataSize2;
+    long encodedSize14;
+    long decodedSize17;
+    char *sourceData6;
+    int sourceCrc0;
+    char *decodedData6;
+    int index7;
+    int decodedCrc5;
+    int sourceCrcCheck7;
+    char *encodedData6;
+
+    dataSize2 = Random(COMPRESSION_TEST_RANDOM_SIZE_MIN,
+                       COMPRESSION_TEST_RANDOM_SIZE_MAX);
+    sourceData6 = static_cast<char *>(BaseAlloc(
+        dataSize2 + COMPRESSION_TEST_RANDOM_BUFFER_EXTRA,
+        GFILE, GCOMPRESSTEST2LINE + 7));
+    encodedData6 = static_cast<char *>(BaseAlloc(
+        dataSize2 + COMPRESSION_TEST_RANDOM_BUFFER_EXTRA,
+        GFILE, GCOMPRESSTEST2LINE + 8));
+    decodedData6 = static_cast<char *>(BaseAlloc(
+        dataSize2 + COMPRESSION_TEST_RANDOM_BUFFER_EXTRA,
+        GFILE, GCOMPRESSTEST2LINE + 9));
+    for (index7 = 0; index7 < dataSize2; index7++)
+        sourceData6[index7] = static_cast<char>(Random(0, 255));
+    sourceCrc0 = calc_crc_long(
+        reinterpret_cast<unsigned char *>(sourceData6), dataSize2);
+    encodedSize14 = EncodeData(encodedData6, sourceData6, dataSize2);
+    decodedSize17 = DecodeData(decodedData6, encodedData6, encodedSize14);
+    decodedCrc5 = calc_crc_long(
+        reinterpret_cast<unsigned char *>(decodedData6), dataSize2);
+    sourceCrcCheck7 = calc_crc_long(
+        reinterpret_cast<unsigned char *>(sourceData6), dataSize2);
+    BaseFree(sourceData6, GFILE, GCOMPRESSTEST2LINE + 0x1a);
+    BaseFree(encodedData6, GFILE, GCOMPRESSTEST2LINE + 0x1b);
+    BaseFree(decodedData6, GFILE, GCOMPRESSTEST2LINE + 0x1c);
+}
 
 VA(0x00486494, 0x1be)
-void CompressTest(void) {}
+void CompressTest(void)
+{
+    long fileSize7;
+    long encodedSize14;
+    long decodedSize17;
+    char *sourceData6;
+    int sourceCrc0;
+    char *decodedData6;
+    int fileHandle4;
+    int decodedCrc5;
+    int sourceCrcCheck7;
+    char *encodedData6;
+    char filename3[COMPRESSION_TEST_FILENAME_SIZE];
+
+    LogStr(const_cast<char *>("C1"));
+    strcpy(filename3, "c:\\TEMP\\Z.DIF");
+    fileSize7 = FileSize(filename3);
+    sourceData6 = static_cast<char *>(BaseAlloc(
+        fileSize7 + COMPRESSION_TEST_FILE_BUFFER_EXTRA,
+        GFILE, GCOMPRESSTESTLINE + 9));
+    encodedData6 = static_cast<char *>(BaseAlloc(
+        fileSize7 + COMPRESSION_TEST_FILE_BUFFER_EXTRA,
+        GFILE, GCOMPRESSTESTLINE + 10));
+    decodedData6 = static_cast<char *>(BaseAlloc(
+        fileSize7 + COMPRESSION_TEST_FILE_BUFFER_EXTRA,
+        GFILE, GCOMPRESSTESTLINE + 0xb));
+    LogStr(const_cast<char *>("C2"));
+    fileHandle4 = _open(filename3, 0x8000);
+    if (fileHandle4 == -1)
+        FileError(filename3);
+    _read(fileHandle4, sourceData6, fileSize7);
+    LogStr(const_cast<char *>("C3"));
+    sourceCrc0 = calc_crc_long(
+        reinterpret_cast<unsigned char *>(sourceData6), fileSize7);
+    LogStr(const_cast<char *>("C4"));
+    _close(fileHandle4);
+    LogStr(const_cast<char *>("C5"));
+    encodedSize14 = EncodeData(encodedData6, sourceData6, fileSize7);
+    LogStr(const_cast<char *>("C6"));
+    decodedSize17 = DecodeData(decodedData6, encodedData6, encodedSize14);
+    LogStr(const_cast<char *>("C7"));
+    decodedCrc5 = calc_crc_long(
+        reinterpret_cast<unsigned char *>(decodedData6), fileSize7);
+    sourceCrcCheck7 = calc_crc_long(
+        reinterpret_cast<unsigned char *>(sourceData6), fileSize7);
+    BaseFree(sourceData6, GFILE, GCOMPRESSTESTLINE + 0x24);
+    BaseFree(encodedData6, GFILE, GCOMPRESSTESTLINE + 0x25);
+    BaseFree(decodedData6, GFILE, GCOMPRESSTESTLINE + 0x26);
+    LogStr(const_cast<char *>("C8"));
+}
 
 VA(0x00486652, 0x53)
 void CompressTest3(void)

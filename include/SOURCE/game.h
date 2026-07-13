@@ -96,7 +96,7 @@ struct playerRec {
     signed char currentHero;
     signed char heroWindowTop;
     signed char heroes[8];
-    char unknown0c[2];
+    signed char availableHeroes[2];
     signed char unknown0e;
     int unknown0f;
     signed char unknown13;
@@ -248,8 +248,9 @@ public:
     char m_pad_0x639e[0xc];
     char m_rumour[0x12d];  // +0x63aa
     unsigned short m_rumourEventCount;  // +0x64d7
-    unsigned short m_rumourEventIndices[81];  // +0x64d9
-    char m_pad_0x657b[0x66];
+    unsigned short m_rumourEventIndices[30];  // +0x64d9
+    unsigned short m_timeEventCount;  // +0x6515
+    unsigned short m_timeEventIndices[50];  // +0x6517
     class heroWindow *m_viewArmyWindow;  // +0x65e1
     int m_viewArmyResult;  // +0x65e5
     class heroWindow *m_viewSpellsWindow;  // +0x65e9
