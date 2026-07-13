@@ -52,8 +52,8 @@ public:
     short  m_spellPoints;  // +0x00
     char   m_id;  // +0x02
     char   m_owner;  // +0x03
-    short  field_0x4;  // +0x04
-    char _pad_0x6[0x1];
+    short m_lastHeroInteractionTurn;  // +0x04
+    signed char m_lastInteractionHeroId;  // +0x06
     short  field_0x7;  // +0x07
     unsigned char m_visitedTownId;  // +0x09
     char m_name[13];  // +0x0a

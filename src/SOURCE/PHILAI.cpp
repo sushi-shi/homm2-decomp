@@ -370,7 +370,7 @@ int philAI::GoodAdjacent(int *direction) {
                 if (gpAdvManager->GetCell(kn, nb)->triggerType == AI_OBJECT_HERO) {
                     heroId = gpAdvManager->GetCell(kn, nb)->w4hi;
                     if (GetHeroSlot(heroId)->m_owner == giCurPlayer)
-                        if (gpCurAIHero->field_0x4 == giCurTurn)
+                        if (gpCurAIHero->m_lastHeroInteractionTurn == giCurTurn)
                             continue;
                 }
                 val = ValueOfEventAtPosition(kn, nb, 2, &p);
@@ -3072,7 +3072,145 @@ int philAI::QuickCombat(armyGroup *attacker, hero *attackerHero,
 }
 
 VA(0x00441419, 0x422)
-void philAI::HeroInteractionAtHero(class hero *, class hero *, int, int *) {}
+void philAI::HeroInteractionAtHero(hero *firstHero, hero *secondHero,
+                                   int evaluateOnly, int *value) {
+    hero *dominantHero19;
+    float armyShare0, transferFraction35, dominantShare19, desiredShare6,
+        shareDelta1;
+    int interactionValue8;
+    int artifactType15;
+    int dominantFightValue4;
+    int heroIndex9;
+    int heroValues27[AI_HERO_INTERACTION_HERO_COUNT];
+    hero *recipientHero36;
+    int statIndex8;
+    int recipientFightValue10;
+    hero *currentHero9;
+    hero *savedHero9;
+
+    *value = 0;
+    if (evaluateOnly != 0 &&
+        static_cast<unsigned char>(firstHero->m_id) != iAlphaMale &&
+        static_cast<unsigned char>(secondHero->m_id) != iAlphaMale)
+        return;
+    {
+        if (evaluateOnly == 0) {
+            firstHero->m_lastHeroInteractionTurn =
+                static_cast<short>(giCurTurn);
+            firstHero->m_lastInteractionHeroId = secondHero->m_id;
+            secondHero->m_lastHeroInteractionTurn =
+                static_cast<short>(giCurTurn);
+            secondHero->m_lastInteractionHeroId = firstHero->m_id;
+        }
+
+        for (heroIndex9 = 0;
+             heroIndex9 < AI_HERO_INTERACTION_HERO_COUNT;
+             heroIndex9++) {
+            if (heroIndex9 == 0)
+                currentHero9 = firstHero;
+            else
+                currentHero9 = secondHero;
+            heroValues27[heroIndex9] = 0;
+            for (statIndex8 = 0;
+                 statIndex8 < AI_HERO_INTERACTION_PRIMARY_STAT_COUNT;
+                 statIndex8++) {
+                if (statIndex8 < 2 ||
+                    currentHero9->HasArtifact(AI_ARTIFACT_MAGIC_BOOK))
+                    heroValues27[heroIndex9] +=
+                        currentHero9->Stats(statIndex8) *
+                        AI_HERO_INTERACTION_PRIMARY_STAT_VALUE;
+            }
+            for (statIndex8 = 0;
+                 statIndex8 < AI_BATTLE_ARTIFACT_SLOT_COUNT;
+                 statIndex8++) {
+                if (statIndex8 == HERO_SKILL_ESTATES)
+                    continue;
+                if (currentHero9->m_secondarySkills[statIndex8] !=
+                    HERO_SKILL_LEVEL_NONE) {
+                    heroValues27[heroIndex9] +=
+                        gSecondarySkillRV[statIndex8]
+                            [currentHero9->m_secondarySkills[statIndex8]];
+                }
+            }
+        }
+
+        dominantShare19 = static_cast<float>(heroValues27[0]) /
+            static_cast<float>(heroValues27[0] + heroValues27[1]);
+        if (heroValues27[1] < heroValues27[0]) {
+            dominantHero19 = firstHero;
+            recipientHero36 = secondHero;
+        } else {
+            dominantHero19 = secondHero;
+            recipientHero36 = firstHero;
+            dominantShare19 = static_cast<float>(1.0 - dominantShare19);
+        }
+        if (evaluateOnly != 0 &&
+            static_cast<unsigned char>(recipientHero36->m_id) == iAlphaMale &&
+            dominantShare19 < AI_HERO_INTERACTION_ALPHA_SHARE) {
+            // Preserve retail's assignment order: the saved pointer is not read.
+            savedHero9 = recipientHero36;
+            recipientHero36 = dominantHero19;
+            dominantHero19 = recipientHero36;
+        }
+
+        dominantFightValue4 = FightValueOfStack(
+            &dominantHero19->m_army, 0, 0, 0, 0, 0);
+        recipientFightValue10 = FightValueOfStack(
+            &recipientHero36->m_army, 0, 0, 0, 0, 0);
+        desiredShare6 = AI_HERO_INTERACTION_TARGET_SHARE;
+        armyShare0 = static_cast<float>(dominantFightValue4) /
+            static_cast<float>(dominantFightValue4 + recipientFightValue10);
+        if (armyShare0 <= desiredShare6)
+            shareDelta1 = desiredShare6 - armyShare0;
+        else
+            shareDelta1 = armyShare0 - desiredShare6;
+        transferFraction35 = shareDelta1;
+        if (transferFraction35 < AI_HERO_INTERACTION_MINIMUM_TRANSFER)
+            return;
+        {
+            interactionValue8 = static_cast<int>(
+                reinterpret_cast<pdView *>(gpCurPlayer)->upgradeFactor *
+                (static_cast<float>(dominantFightValue4 +
+                                    recipientFightValue10) *
+                 transferFraction35));
+            if (evaluateOnly != 0) {
+                for (statIndex8 = 0;
+                     statIndex8 < AI_BATTLE_ARTIFACT_SLOT_COUNT;
+                     statIndex8++) {
+                    artifactType15 = recipientHero36->m_artifacts[statIndex8];
+                    if (artifactType15 != -1 &&
+                        artifactType15 != AI_ARTIFACT_MAGIC_BOOK)
+                        interactionValue8 += gArtifactBaseRV[artifactType15];
+                }
+            } else {
+                gpAdvManager->TransferArtifacts(recipientHero36,
+                                                dominantHero19);
+                if (!(armyShare0 <= desiredShare6)) {
+                    RedistributeTroops(
+                        &dominantHero19->m_army,
+                        &recipientHero36->m_army, 1, 1,
+                        dominantFightValue4, recipientFightValue10,
+                        static_cast<int>(
+                            static_cast<float>(dominantFightValue4 +
+                                               recipientFightValue10) *
+                            transferFraction35));
+                } else {
+                    RedistributeTroops(
+                        &recipientHero36->m_army,
+                        &dominantHero19->m_army, 1, 1,
+                        recipientFightValue10, dominantFightValue4,
+                        static_cast<int>(
+                            static_cast<float>(dominantFightValue4 +
+                                               recipientFightValue10) *
+                            transferFraction35));
+                }
+                SetupRelativeHeroStrengths();
+            }
+            *value = static_cast<int>(interactionValue8 *
+                                      AI_HERO_INTERACTION_VALUE_FACTOR);
+        }
+    }
+}
 
 // @early-stop
 // Exact 0x882 span and 0x78 frame; all 71 relocation sites and targets agree. The
