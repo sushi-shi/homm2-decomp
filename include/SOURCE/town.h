@@ -19,6 +19,7 @@ typedef enum TownType {
 typedef enum TownBuilding {
     TOWN_BUILDING_CASTLE = 0x40,
     TOWN_BUILDING_CAPTAIN = 0x80,
+    TOWN_BUILDING_MARKETPLACE = 0x400,
     TOWN_BUILDING_RAINBOW = 0x2000
 } TownBuilding;
 
@@ -33,7 +34,8 @@ public:
     char   m_type;  // +0x03
     unsigned char m_x;  // +0x04
     unsigned char m_y;  // +0x05
-    char m_pad_0x6[2];
+    unsigned char m_boatX;  // +0x06
+    unsigned char m_boatY;  // +0x07
     armyGroup m_army;  // +0x08
     char   m_occupyingHeroId;  // +0x17
     int    m_buildings;  // +0x18

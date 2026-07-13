@@ -26,7 +26,7 @@ public:
     int    field_0x74;  // +0x74
     int    field_0x78;  // +0x78
     int    field_0x7c;  // +0x7c
-    int    field_0x80;  // +0x80
+    armyGroup *m_army;  // +0x80
     // --- constructors ---
     strip(int, int, int, unsigned long int, int, class armyGroup *, int, int, int);
     ~strip();

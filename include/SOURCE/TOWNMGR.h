@@ -5,6 +5,60 @@
 // forward declarations (was <_all.h>):
 struct tag_message;
 
+typedef enum TownManagerMessageType {
+    TOWN_MESSAGE_KEY_DOWN = 1,
+    TOWN_MESSAGE_KEY_UP = 2,
+    TOWN_MESSAGE_HOVER = 4,
+    TOWN_MESSAGE_SELECT = 0x200,
+    TOWN_MESSAGE_EXIT = 0x4000
+} TownManagerMessageType;
+
+typedef enum TownManagerInputCode {
+    TOWN_INPUT_SELECT = 12,
+    TOWN_INPUT_DESELECT = 13,
+    TOWN_INPUT_ALTERNATE_SELECT = 14,
+    TOWN_KEY_SHIFT_LEFT = 0x2a,
+    TOWN_KEY_SHIFT_RIGHT = 0x36,
+    TOWN_CONTROL_PREVIOUS_TOWN = 0x387,
+    TOWN_CONTROL_NEXT_TOWN = 0x388,
+    TOWN_CONTROL_CLOSE = 0x7800,
+    TOWN_DIALOG_BUILD_BOAT = 0x7802,
+    TOWN_DIALOG_BUY_SPELL_BOOK = 0x7805
+} TownManagerInputCode;
+
+typedef enum TownManagerCommand {
+    TOWN_COMMAND_MAGE_GUILD = 0,
+    TOWN_COMMAND_THIEVES_GUILD = 1,
+    TOWN_COMMAND_TAVERN = 2,
+    TOWN_COMMAND_DOCK = 3,
+    TOWN_COMMAND_WELL = 4,
+    TOWN_COMMAND_UPGRADE_CASTLE = 5,
+    TOWN_COMMAND_CASTLE = 6,
+    TOWN_COMMAND_TRADING_POST = 10,
+    TOWN_COMMAND_FIRST_DWELLING = 19,
+    TOWN_COMMAND_LAST_DWELLING = 30
+} TownManagerCommand;
+
+typedef enum TownManagerConstant {
+    TOWN_DEBUG_BUILD_ALL = 100,
+    TOWN_BUILDING_COUNT = 32,
+    TOWN_GARRISON_SLOT_FIRST = 0x75,
+    TOWN_GARRISON_SLOT_LAST = 0x79,
+    TOWN_HERO_SLOT_FIRST = 0x7b,
+    TOWN_HERO_SLOT_LAST = 0x7f,
+    TOWN_ARMY_VIEW_X = 0x77,
+    TOWN_ARMY_VIEW_Y = 0x14,
+    TOWN_MAX_BOATS = 48,
+    TOWN_SPELL_BOOK_ARTIFACT = 0x51,
+    TOWN_MAX_ARTIFACTS = 14,
+    TOWN_SPELL_BOOK_COST = 500,
+    TOWN_BOAT_GOLD_COST = 1000,
+    TOWN_BOAT_WOOD_COST = 10,
+    TOWN_QUICK_VIEW_MODIFIER = 0x200,
+    TOWN_INTERFACE_BROADCAST_FLAGS = 0x4008,
+    TOWN_REDRAW_INTERVAL = 150
+} TownManagerConstant;
+
 int MageGuildHandler(struct tag_message &);
 int TavernHandler(struct tag_message &);
 int SplitArmyHandler(struct tag_message &);
