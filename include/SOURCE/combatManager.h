@@ -16,6 +16,62 @@ class town;
 struct SBolt;
 struct tag_message;
 
+typedef enum CombatDrawLayer {
+    COMBAT_DRAW_LAYER_COUNT = 9,
+    COMBAT_DRAW_RIGHT_HERO_LAYER = 1,
+    COMBAT_DRAW_LEFT_HERO_LAYER = 2,
+    COMBAT_DRAW_WALL_TOP_LAYER = 4,
+    COMBAT_DRAW_WALL_MIDDLE_LAYER = 5,
+    COMBAT_DRAW_GATE_LAYER = 6,
+    COMBAT_DRAW_CATAPULT_LAYER = 7
+} CombatDrawLayer;
+
+typedef enum CombatCastleHex {
+    COMBAT_CASTLE_HEX_TOP_TOWER = 9,
+    COMBAT_CASTLE_HEX_TOP_WALL = 22,
+    COMBAT_CASTLE_HEX_SECOND_TOWER = 34,
+    COMBAT_CASTLE_HEX_SECOND_WALL = 47,
+    COMBAT_CASTLE_HEX_GATE = 59,
+    COMBAT_CASTLE_HEX_THIRD_WALL = 73,
+    COMBAT_CASTLE_HEX_THIRD_TOWER = 86,
+    COMBAT_CASTLE_HEX_BOTTOM_WALL = 100,
+    COMBAT_CASTLE_HEX_BOTTOM_TOWER = 113,
+    COMBAT_CASTLE_SPECIAL_HEX_FIRST = 114,
+    COMBAT_CASTLE_SPECIAL_HEX_SECOND = 115
+} CombatCastleHex;
+
+enum {
+    COMBAT_GRID_ROW_COUNT = 9,
+    COMBAT_GRID_ROW_LENGTH = 13,
+    COMBAT_GRID_FIRST_COLUMN = 1,
+    COMBAT_GRID_COLUMN_END = 12,
+    COMBAT_GRID_REVERSE_FIRST_COLUMN = 11,
+    COMBAT_GRID_REVERSE_COLUMN_END = 0,
+    COMBAT_DRAW_PHASE_COUNT = 4,
+    COMBAT_DRAW_ALL_OCCUPANTS = 100,
+    COMBAT_CASTLE_REVERSE_ROW = 5,
+    COMBAT_CASTLE_GATE_ROW = 4,
+    COMBAT_CASTLE_GATE_OPEN = 4,
+    COMBAT_CASTLE_GATE_HIDDEN = 3,
+    COMBAT_SIDE_COUNT_DRAWING = 2,
+    COMBAT_ARMY_SLOT_COUNT_DRAWING = 20,
+    COMBAT_HERO_LEFT_X = 30,
+    COMBAT_HERO_LEFT_Y = 183,
+    COMBAT_HERO_RIGHT_X = 610,
+    COMBAT_HERO_RIGHT_Y = 148,
+    COMBAT_HERO_RIGHT_ALT_X = 615,
+    COMBAT_HERO_RIGHT_ALT_Y = 135,
+    COMBAT_CATAPULT_X = 22,
+    COMBAT_CATAPULT_Y = 390,
+    COMBAT_CASTLE_TOP_LAYER_FRAME = 0x19,
+    COMBAT_CASTLE_GATE_FRAME = 0x1a,
+    COMBAT_CASTLE_GATE_CLOSED_FRAME = 0x14,
+    COMBAT_SCREEN_WIDTH = 0x280,
+    COMBAT_AREA_HEIGHT = 0x1bb,
+    COMBAT_MAX_EXTENT_X = 0x27f,
+    COMBAT_MAX_EXTENT_Y = 0x1ba
+};
+
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class combatManager : public baseManager {
 public:
@@ -24,14 +80,25 @@ public:
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
     int    m_unknown36;  // +0x36
     char _pad_0x3a[0x4da];
-    hexcell m_hexCells[99];  // +0x514
-    char _pad_0x2afa[0x710];
+    hexcell m_hexCells[117];  // +0x514
+    char _pad_0x31de[0x24];
+    class icon *m_catapultIcon;  // +0x3202
+    char _pad_0x3206[0x4];
     class icon *m_towerIcon;  // +0x320a
-    char _pad_0x320e[0x24];
-    class icon *m_obstacleIcons[1];  // +0x3232
-    char _pad_0x3236[0x20];
+    char _pad_0x320e[0x1c];
+    class icon *m_moatIcon;  // +0x322a
+    class icon *m_drawbridgeIcon;  // +0x322e
+    class icon *m_obstacleIcons[9];  // +0x3232
     short m_eagleEyeSpell[2];  // +0x3256
-    char _pad_0x325a[0x2d];
+    int m_drawbridgeState;  // +0x325a
+    int m_drawbridgeBackgroundVisible;  // +0x325e
+    unsigned char m_wallStates[9];  // +0x3262
+    class bitmap *m_combatBuffer;  // +0x326b
+    class bitmap *m_backgroundBuffer;  // +0x326f
+    char _pad_0x3273[0x4];
+    int m_backgroundDrawn;  // +0x3277
+    char _pad_0x327b[0x8];
+    class town *m_castle;  // +0x3283
     class hero *m_heroes[2];  // +0x3287
     char _pad_0x328f[0xfa];
     int m_spellPower[2];  // +0x3389
@@ -39,7 +106,14 @@ public:
     int m_heroAnimationState[2];  // +0x33a5
     int m_heroAnimationFrame[2];  // +0x33ad
     int m_heroSpriteIndex[2];  // +0x33b5
-    char _pad_0x33bd[0x182];
+    char _pad_0x33bd[0x8];
+    class icon *m_heroIcons[2];  // +0x33c5
+    class icon *m_heroOverlayIcons[2];  // +0x33cd
+    int m_heroOverlayFrame[2];  // +0x33d5
+    struct SLimitData m_heroLimits[2];  // +0x33dd
+    struct SLimitData m_heroOverlayLimits[2];  // +0x33fd
+    struct SLimitData m_moatLimits[9];  // +0x341d
+    char _pad_0x34ad[0x92];
     int m_heroCastSpell[2];  // +0x353f
     int m_armyCount[2];  // +0x3547
     class army m_armies[2][21];  // +0x354f
@@ -50,9 +124,28 @@ public:
     char _pad_0xf2b3[0x4];
     int m_limitCreature;  // +0xf2b7
     int m_limitCreatureHex;  // +0xf2bb
-    char _pad_0xf2bf[0xc0];
+    char _pad_0xf2bf[0x14];
+    struct SLimitData m_catapultLimits;  // +0xf2d3
+    struct SLimitData m_gateLimits;  // +0xf2e3
+    struct SLimitData m_upperWallLimits;  // +0xf2f3
+    struct SLimitData m_middleWallLimits;  // +0xf303
+    int m_catapultFrame;  // +0xf313
+    char _pad_0xf317[0x1c];
+    int m_inCastleCombat;  // +0xf333
+    char _pad_0xf337[0x20];
+    int m_nonVisualCombat;  // +0xf357
+    char _pad_0xf35b[0x24];
     int m_limitCreatureCount[2][20];  // +0xf37f
-    char _pad_0xf41f[0x458];
+    int m_drawHero[2];  // +0xf41f
+    int m_drawHeroOverlay[2];  // +0xf427
+    int m_combatWindowOpen;  // +0xf42f
+    char _pad_0xf433[0xf0];
+    struct SLimitData m_smallViewLimits;  // +0xf523
+    char _pad_0xf533[0x10];
+    int m_smallViewSide[2];  // +0xf543
+    int m_smallViewArmyIndex[2];  // +0xf54b
+    int m_smallViewLastX[2];  // +0xf553
+    char _pad_0xf55b[0x31c];
     // --- constructors ---
     combatManager(void);
     // --- virtual methods (vtable order) ---

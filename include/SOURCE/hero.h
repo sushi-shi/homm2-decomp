@@ -134,7 +134,7 @@ public:
             unsigned int m_eventFlagsHigh : 15;
         };
     };
-    char m_unknownE7;  // +0xe7
+    unsigned char m_unknownE7;  // +0xe7
     float m_aiFightValue;  // +0xe8
     char m_pad_0xec[0xe];
     int IsEmbarked(void) { return m_eventFlags & HERO_EVENT_EMBARKED; }
