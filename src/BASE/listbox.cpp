@@ -52,6 +52,11 @@ void listBoxWidget::Read(void)
     short bottomY;
     short topY;
     short rightX;
+    short firstRowHeight;
+    short listX;
+    short rowHeight;
+    short listY;
+    short lastRowHeight;
     m_x = gpResourceManager->ReadWord();
     m_y = gpResourceManager->ReadWord();
     m_width = gpResourceManager->ReadWord();
@@ -84,11 +89,16 @@ void listBoxWidget::Read(void)
     field_0x84 = iconEntry->w;
     frameHeight[0] = iconEntry->h;
     field_0x86 = frameHeight[0];
-    m_rowHeight = reinterpret_cast<IconEntry *>(m_icon->m_data)[1].h;
-    m_firstRowHeight = reinterpret_cast<IconEntry *>(m_icon->m_data)[0].h;
-    m_listX = m_x;
-    m_listY = m_y;
-    m_lastRowHeight = reinterpret_cast<IconEntry *>(m_icon->m_data)[2].h;
+    firstRowHeight = reinterpret_cast<IconEntry *>(m_icon->m_data)[0].h;
+    m_firstRowHeight = firstRowHeight;
+    listX = m_x;
+    rowHeight = reinterpret_cast<IconEntry *>(m_icon->m_data)[1].h;
+    listY = m_y;
+    m_rowHeight = rowHeight;
+    lastRowHeight = reinterpret_cast<IconEntry *>(m_icon->m_data)[2].h;
+    m_lastRowHeight = lastRowHeight;
+    m_listX = listX;
+    m_listY = listY;
     field_0x64 = reinterpret_cast<IconEntry *>(m_icon->m_data)[0].w;
     field_0x66 = (field_0x28 - 2) * m_rowHeight + m_firstRowHeight + m_lastRowHeight;
     iconEntry = reinterpret_cast<IconEntry *>(m_icon->m_data) + 3;
@@ -109,6 +119,7 @@ void listBoxWidget::Read(void)
     field_0x72 = topY;
     field_0x74 = field_0x7c;
     field_0x76 = bottomY;
+    field_0x88 = field_0x76 - frameHeight[0] - 7;
     field_0x8a = 0;
     field_0x8b = 0;
     field_0x8d = 0;
@@ -116,7 +127,6 @@ void listBoxWidget::Read(void)
     m_topIndex = 0;
     field_0x42 = 0;
     field_0x2a = 0;
-    field_0x88 = field_0x76 - frameHeight[0] - 7;
 }
 
 VA(0x004db3d0, 0x142)
@@ -158,10 +168,13 @@ void listBoxWidget::DeleteItem(int index)
         field_0x2a = m_itemCount;
 }
 
-// @early-stop
-// reloc-masked: all 0x368 bytes are identical and both objects have 23 relocations. MSVC
-// names the jump-table base (+0x12a) and six entries (+0x350-364) as $L locals; the delinked
-// retail object names those same in-function targets Main-relative.
+// Two-byte /O2 compare-polarity residual after the exact Read reconstruction changed TU state.
+// Both sides are 0x368 bytes with 23 relocations at identical offsets and matching external
+// targets. The jump-table base (+0x12a) and six entries (+0x350-364) differ only in local-label
+// identity. After masking them, the only byte differences are +0xa5 (3B versus 39) and +0xa8
+// (7C versus 7F): `cmp dx,[m_y]; jl` versus the equivalent `cmp [m_y],dx; jg`. Direct and
+// reversed relations, positive bounds, declaration order, casts, and libclang AST permutations
+// were tried; the remaining instruction stream is identical.
 VA(0x004db520, 0x368)
 int listBoxWidget::Main(tag_message &message)
 {
@@ -182,7 +195,8 @@ int listBoxWidget::Main(tag_message &message)
             break;
         short mx = message.field4 - m_owner->m_posX;
         short my = message.field8 - m_owner->m_posY;
-        if (m_x > mx || m_y > my || m_x + m_width <= mx || m_y + m_height <= my)
+        short left = m_x;
+        if (left > mx || m_y > my || left + m_width <= mx || m_y + m_height <= my)
             return 0;
         if (message.type == 0x20) {
             message.field4 = 0xe;
@@ -344,7 +358,7 @@ int listBoxWidget::ProcessMouseMessage(tag_message &message)
     case 4:
         if (field_0x8d) {
             int row;
-            int firstRowHeight = m_firstRowHeight;
+            short firstRowHeight = m_firstRowHeight;
             if (adjY > firstRowHeight)
                 row = (adjY - firstRowHeight) / m_rowHeight + 1;
             else
