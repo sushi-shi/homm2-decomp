@@ -463,7 +463,7 @@ SOURCE/ADVMGR	?ControlPanel@advManager@@QAEHXZ	6.2293	5e307b405784
 SOURCE/ADVMGR	?DeactivateCurrHero@advManager@@QAEXXZ	100.0000	5d350ed465dd
 SOURCE/ADVMGR	?DeactivateCurrTown@advManager@@QAEXXZ	100.0000	b8067be323b6
 SOURCE/ADVMGR	?DemobilizeCurrHero@advManager@@QAEXXZ	12.6019	1d6c9b137943
-SOURCE/ADVMGR	?DimensionDoor@advManager@@QAEXXZ	8.9517	c343f22e3f9a
+SOURCE/ADVMGR	?DimensionDoor@advManager@@QAEXXZ	100.0000	7bbda0018f84
 SOURCE/ADVMGR	?DimensionDoorHandler@@YIHAAUtag_message@@@Z	7.3439	4dfe4ab1b3d0
 SOURCE/ADVMGR	?DisableButtons@advManager@@QAEXXZ	100.0000	3d41e7bc3e07
 SOURCE/ADVMGR	?DoAdvCommand@advManager@@QAEPAVmapCell@@XZ	97.2834	02539b4d31fd
@@ -514,8 +514,8 @@ SOURCE/ADVMGR	?SummonBoat@advManager@@QAEXXZ	99.4259	81256383fe41
 SOURCE/ADVMGR	?SystemOptions@advManager@@QAEXXZ	12.8515	bb7f7f1f9970
 SOURCE/ADVMGR	?SystemOptionsHandler@@YIHAAUtag_message@@@Z	99.9081	512a186f2332
 SOURCE/ADVMGR	?TeleportTo@advManager@@QAEXPAVhero@@HHHH@Z	98.7456	c58a33cd4d35
-SOURCE/ADVMGR	?TownGate@advManager@@QAEXH@Z	4.7200	586c6b036298
-SOURCE/ADVMGR	?TownPortalHandler@@YIHAAUtag_message@@@Z	19.0137	5fcbd67a4ca6
+SOURCE/ADVMGR	?TownGate@advManager@@QAEXH@Z	99.7745	1484a163d6ed
+SOURCE/ADVMGR	?TownPortalHandler@@YIHAAUtag_message@@@Z	100.0000	f1e7b91bb0b5
 SOURCE/ADVMGR	?TownQuickView@advManager@@QAEXHHHH@Z	99.9918	b4532cc6b04c
 SOURCE/ADVMGR	?TrimLoopingSounds@advManager@@QAEXH@Z	11.6486	27f649ba3eaa
 SOURCE/ADVMGR	?UpdBottomView@advManager@@QAEXHHH@Z	12.0841	a3564a10349d
@@ -787,7 +787,7 @@ SOURCE/GAME	?CalcDifficultyRating@game@@QAEHXZ	100.0000	d38831f13057
 SOURCE/GAME	?CalcFileCRC@@YIHPAD@Z	100.0000	0efc0c160140
 SOURCE/GAME	?CancelComputerScreen@game@@QAEXXZ	100.0000	8282b2922653
 SOURCE/GAME	?CheckForTimeEvent@game@@QAEXXZ	5.6190	45c86f540407
-SOURCE/GAME	?CheckHeroConsistency@game@@QAEXXZ	91.4222	032db91a3a4d
+SOURCE/GAME	?CheckHeroConsistency@game@@QAEXXZ	99.1667	032db91a3a4d
 SOURCE/GAME	?CheckValidAvailableHeroes@@YIXXZ	12.5632	b5eeaa426256
 SOURCE/GAME	?ClaimMine@game@@QAEXHH@Z	99.0842	a42e429d5ec0
 SOURCE/GAME	?ClaimTown@game@@QAEXHHH@Z	99.2190	c56f80539d8b
