@@ -16,8 +16,8 @@ public:
     int    m_drawState;  // +0x06
     char _pad_0xa[0x44];
     int    field_0x4e;  // +0x4e
-    int    field_0x52;  // +0x52
-    int    field_0x56;  // +0x56
+    int    m_targetSide;  // +0x52
+    int    m_targetIndex;  // +0x56
     int    field_0x5a;  // +0x5a
     int    field_0x5e;  // +0x5e
     int    field_0x62;  // +0x62
