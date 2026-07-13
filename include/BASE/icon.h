@@ -5,7 +5,11 @@
 #include <va.h>
 #include <BASE/resource.h>
 struct SLimitData {
-    char data[0x20];
+    int left;
+    int right;
+    int top;
+    int bottom;
+    int data[4];
 };
 SIZE(SLimitData, 0x20);
 

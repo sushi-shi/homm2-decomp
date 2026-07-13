@@ -148,14 +148,14 @@ BASE/FONT	?DrawStringExecute@font@@IAEXPADHHHHHHH@Z	98.2609	9857ad77791a
 BASE/FONT	?GetCharacterWidth@font@@QAEHE@Z	86.9310	d7bc07a9749b
 BASE/FONT	?LineLength@font@@QAEHPADH@Z	100.0000	bc7d795341b8
 BASE/FONT	?LineWidth@font@@QAEHPAD@Z	100.0000	dc722c2ee70e
-BASE/ICON	??0icon@@QAE@K@Z	99.9688	0560888ac941
-BASE/ICON	??1icon@@UAE@XZ	99.9091	64eb8694f919
+BASE/ICON	??0icon@@QAE@K@Z	100.0000	1c578b23ddd6
+BASE/ICON	??1icon@@UAE@XZ	100.0000	0724fb4c3ee6
 BASE/ICON	??_Eicon@@UAEPAXI@Z	0.0000	
 BASE/ICON	?ClipFillToBuffer@icon@@QAEXHHHHHHHHH@Z	100.0000	d84cbd3c048d
-BASE/ICON	?CombatClipDrawToBuffer@icon@@QAEHHHHPAUSLimitData@@HHPAEPAC@Z	0.8197	a28caa55036f
+BASE/ICON	?CombatClipDrawToBuffer@icon@@QAEHHHHPAUSLimitData@@HHPAEPAC@Z	97.2049	2d302e0e186e
 BASE/ICON	?DimToBuffer@icon@@QAEXHHHH@Z	100.0000	f82980cf1492
-BASE/ICON	?DrawToBuffer@icon@@QAEXHHHH@Z	100.0000	440dfa5c0b7a
-BASE/ICON	?FillToBuffer@icon@@QAEXHHHHHPAUSLimitData@@@Z	1.0753	598c6b3e8abd
+BASE/ICON	?DrawToBuffer@icon@@QAEXHHHH@Z	100.0000	b14faed4c754
+BASE/ICON	?FillToBuffer@icon@@QAEXHHHHHPAUSLimitData@@@Z	100.0000	4effc0dda524
 BASE/ICONWDGT	??0iconWidget@@QAE@FFFFKFCFFF@Z	97.9444	9f06458c4818
 BASE/ICONWDGT	??0iconWidget@@QAE@FFFFPADFCFFF@Z	98.1500	bbc9a1e3c392
 BASE/ICONWDGT	??0iconWidget@@QAE@XZ	100.0000	9387a62ba252
@@ -374,7 +374,7 @@ BASE/droplist	?DeleteItem@dropListWidget@@QAEXH@Z	100.0000	9c6f4628e789
 BASE/droplist	?Draw@dropListWidget@@UAEXXZ	100.0000	ae786193d7f4
 BASE/droplist	?DrawDropStuff@dropListWidget@@QAEXXZ	95.3898	713fe5940cdf
 BASE/droplist	?Main@dropListWidget@@UAEHAAUtag_message@@@Z	99.8745	5d9d3d64c2fe
-BASE/droplist	?ProcessSelectDialog@dropListWidget@@QAEXXZ	51.4681	f03844cbcb29
+BASE/droplist	?ProcessSelectDialog@dropListWidget@@QAEXXZ	51.6695	f03844cbcb29
 BASE/droplist	?Read@dropListWidget@@QAEXXZ	86.7295	a6adea89d9f8
 BASE/droplist	?RestoreDropBackground@dropListWidget@@QAEXXZ	100.0000	557314065439
 BASE/droplist	?SaveDropBackground@dropListWidget@@QAEXXZ	100.0000	b3d5c9e1b5dd
