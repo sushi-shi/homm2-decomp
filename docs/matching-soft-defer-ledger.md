@@ -179,10 +179,10 @@ soft defer or an accepted wall.
 
 Canonical source state:
 
-- checkpoint: `c164dcf`
+- checkpoint: `4498053`
 - target: RVA `0xd0570`, retail size `0x4ed`
-- `src/BASE/Icon2b.cpp`: `7f55d2812ac86e31aa0576d02491f0698c6e0ceb5f1fb9058bcb48c98a1d024e`
-- live checkpoint: 73.60439%, 79 candidate vs 83 retail relocations, no base-only target
+- `src/BASE/Icon2b.cpp`: `b42c0b8e368561082811dbcc7b170ab975483447470c577173ad6a9132f26124`
+- live checkpoint: 74.4533%, 79 candidate vs 83 retail relocations, no base-only target
 - candidate return at `+0x4cc` vs retail `+0x4ea`, with no stack frame on either side
 
 ### Corrections retained at the canonical checkpoint
@@ -192,9 +192,9 @@ Canonical source state:
 - used the retail global-source post-increment;
 - recovered clipped fill/dim body order with `clipX <= X` tested first;
 - recovered the three-call fill shape;
-- rebuilt the literal path as four retail-shaped memcpy quadrants;
-- scoped unsigned `copyCount` only to the clipped literal region;
-- restored all six retail-style literal `gIcSrc` occurrences.
+- rebuilt the literal path as branch-selected quadrants in a one-pass `do/while (0)`;
+- ordered count/destination/source selection so every quadrant reaches one common memcpy tail;
+- restored all six retail-style literal `gIcSrc` occurrences, including the unclipped tail.
 
 ### Searches already exhausted
 
@@ -216,9 +216,25 @@ New source-hash-distinct axes measured after `57254d1`:
 - clipped-region unsigned `copyCount`: 73.60%, retained;
 - signed, unclipped, and current-Y aliases: no code change, reverted.
 
+New axes measured after `c164dcf`:
+
+- literal clipped-first source order: 66.06%, reverted;
+- explicit unclipped width cast: no code change;
+- branch-assigned outer count: no code change;
+- external-linkage `gIcCnt2`: no code change and wrong symbol identity, reverted;
+- signed `gIcCnt2`: 73.5769%, reverted;
+- external-linkage `gIcCnt`: no code change;
+- initial common-tail do-block before operand reordering: 70.15385%;
+- retail operand setup order in the common tail: 74.4533%, retained;
+- clipped count moved after `right`: 73.7967%, reverted;
+- clipped count moved before Y tests: 72.6951%, reverted;
+- published `gIcRun` used as count: 72.6951%, reverted;
+- sinkable right/count plus extended Y lifetime: 73.8654%, reverted;
+- `currentY` alias alone: no code change.
+
 ### Remaining concrete evidence
 
 The known missing sites are setup `gIcX0`/`gIcY` CSE reloads and the fifth dim
-`gIcCnt2` store. The literal CFG and register tail are substantially closer, but retail still
-shares the full-copy tail with the unclipped path. Continue from these concrete sites; do not
-repeat the axes above unless a shared header/compiler state changes.
+`gIcCnt2` store. The literal quadrants now share the retail-style full-copy tail. Continue from
+the remaining concrete setup/dim sites; do not repeat the axes above unless a shared
+header/compiler state changes.
