@@ -3855,8 +3855,196 @@ int philAI::CombatMonsterEvent(hero *h, int monType, int *pCount, mapCell *cell)
     return 0;
 }
 
+// @early-stop
+// All 0x6d7 bytes match with the 102 relocation fields masked. The objdiff
+// residual is delinker naming for switch-local labels, floating constants, and
+// gafAITurnCostResource[RES_GOLD]; every external call/global resolves equally.
 VA(0x0044316b, 0x6d7)
-int philAI::FightEvent(class hero *, class mapCell *, int) { return 0; }
+int philAI::FightEvent(hero *h, mapCell *cell, int evaluateOnly) {
+    int eventType16;
+    int monsterType6;
+    int monsterCount28;
+    int stackIndex7;
+    int rewardValue7;
+    int battleWon29;
+    int battleValue19;
+    float attackerLoss5;
+    float defenderLoss4;
+    int combatResult18;
+    int unusedValue8;
+
+    eventType16 = cell->triggerType & 0x7f;
+    if (cell->w4hi == AI_FIGHT_EVENT_EMPTY)
+        return 0;
+
+    int shipwreckCounts15[AI_FIGHT_EVENT_LEVEL_COUNT] = {
+        AI_FIGHT_EVENT_SHIPWRECK_COUNT_1,
+        AI_FIGHT_EVENT_SHIPWRECK_COUNT_2,
+        AI_FIGHT_EVENT_SHIPWRECK_COUNT_3,
+        AI_FIGHT_EVENT_SHIPWRECK_COUNT_4
+    };
+    int derelictCounts28[AI_FIGHT_EVENT_LEVEL_COUNT] = {
+        AI_FIGHT_EVENT_DERELICT_COUNT_1,
+        AI_FIGHT_EVENT_DERELICT_COUNT_2,
+        AI_FIGHT_EVENT_DERELICT_COUNT_3,
+        AI_FIGHT_EVENT_DERELICT_COUNT_4
+    };
+    int graveyardCounts37[AI_FIGHT_EVENT_LEVEL_COUNT] = {
+        AI_FIGHT_EVENT_GRAVEYARD_COUNT_1,
+        AI_FIGHT_EVENT_GRAVEYARD_COUNT_2,
+        AI_FIGHT_EVENT_GRAVEYARD_COUNT_3,
+        AI_FIGHT_EVENT_GRAVEYARD_COUNT_4
+    };
+
+    switch (eventType16) {
+    case AI_OBJECT_SHIPWRECK:
+        monsterType6 = AI_CREATURE_GHOST;
+        monsterCount28 = shipwreckCounts15[cell->w4hi - AI_FIGHT_EVENT_LEVEL_OFFSET];
+        break;
+    case AI_OBJECT_GRAVEYARD:
+        monsterType6 = AI_CREATURE_ZOMBIE;
+        monsterCount28 = graveyardCounts37[cell->w4hi - AI_FIGHT_EVENT_LEVEL_OFFSET];
+        break;
+    default:
+        monsterType6 = AI_CREATURE_SKELETON;
+        monsterCount28 = derelictCounts28[cell->w4hi - AI_FIGHT_EVENT_LEVEL_OFFSET];
+        break;
+    }
+
+    for (stackIndex7 = 0; stackIndex7 < AI_FIGHT_EVENT_STACKS; stackIndex7++) {
+        gpMonGroup->m_creatureTypes[stackIndex7] = static_cast<signed char>(monsterType6);
+        gpMonGroup->m_quantities[stackIndex7] = static_cast<short>(monsterCount28);
+    }
+
+    rewardValue7 = 0;
+    switch (eventType16) {
+    case AI_OBJECT_GRAVEYARD:
+        switch (cell->w4hi) {
+        case AI_FIGHT_EVENT_LEVEL_1:
+            rewardValue7 = static_cast<int>(
+                gafAITurnCostResource[RES_GOLD] * AI_FIGHT_EVENT_REWARD_500);
+            break;
+        case AI_FIGHT_EVENT_LEVEL_2:
+            rewardValue7 = static_cast<int>(
+                gafAITurnCostResource[RES_GOLD] * AI_FIGHT_EVENT_REWARD_1000);
+            break;
+        case AI_FIGHT_EVENT_LEVEL_3:
+            rewardValue7 = static_cast<int>(
+                gafAITurnCostResource[RES_GOLD] * AI_FIGHT_EVENT_REWARD_3000);
+            break;
+        case AI_FIGHT_EVENT_LEVEL_4:
+            rewardValue7 = static_cast<int>(
+                gafAITurnCostResource[RES_GOLD] * AI_FIGHT_EVENT_REWARD_1000 +
+                reinterpret_cast<pdView *>(gpCurPlayer)->artifactValue);
+            break;
+        }
+        break;
+    case AI_OBJECT_SHIPWRECK:
+        switch (cell->w4hi) {
+        case AI_FIGHT_EVENT_LEVEL_1:
+            rewardValue7 = static_cast<int>(
+                gafAITurnCostResource[RES_GOLD] * AI_FIGHT_EVENT_REWARD_1000);
+            break;
+        case AI_FIGHT_EVENT_LEVEL_2:
+            rewardValue7 = static_cast<int>(
+                gafAITurnCostResource[RES_GOLD] * AI_FIGHT_EVENT_REWARD_2000);
+            break;
+        case AI_FIGHT_EVENT_LEVEL_3:
+            rewardValue7 = static_cast<int>(
+                gafAITurnCostResource[RES_GOLD] * AI_FIGHT_EVENT_REWARD_5000);
+            break;
+        case AI_FIGHT_EVENT_LEVEL_4:
+            rewardValue7 = static_cast<int>(
+                gafAITurnCostResource[RES_GOLD] * AI_FIGHT_EVENT_REWARD_2000 +
+                reinterpret_cast<pdView *>(gpCurPlayer)->artifactValue);
+            break;
+        }
+        break;
+    case AI_OBJECT_DERELICT_SHIP:
+        switch (cell->w4hi) {
+        case AI_FIGHT_EVENT_LEVEL_1:
+            rewardValue7 = static_cast<int>(
+                gafAITurnCostResource[RES_GOLD] * AI_FIGHT_EVENT_REWARD_500);
+            break;
+        case AI_FIGHT_EVENT_LEVEL_2:
+            rewardValue7 = static_cast<int>(
+                gafAITurnCostResource[RES_GOLD] * AI_FIGHT_EVENT_REWARD_1000);
+            break;
+        case AI_FIGHT_EVENT_LEVEL_3:
+            rewardValue7 = static_cast<int>(
+                gafAITurnCostResource[RES_GOLD] * AI_FIGHT_EVENT_REWARD_2000);
+            break;
+        case AI_FIGHT_EVENT_LEVEL_4:
+            rewardValue7 = static_cast<int>(
+                gafAITurnCostResource[RES_GOLD] * AI_FIGHT_EVENT_REWARD_5000);
+            break;
+        }
+        break;
+    }
+
+    ChooseEvaluateBattle(&h->m_army, h, gpMonGroup, 0, 0, 0, rewardValue7,
+                         battleWon29, battleValue19);
+    if (evaluateOnly != 0)
+        return battleValue19;
+    if (battleWon29 != 0 &&
+        (combatResult18 = QuickCombat(&h->m_army, h, gpMonGroup, 0, 0, 0,
+                                      attackerLoss5, defenderLoss4)) != 0) {
+        switch (eventType16) {
+        case AI_OBJECT_SHIPWRECK:
+            switch (cell->w4hi) {
+            case AI_FIGHT_EVENT_LEVEL_1:
+                gpAdvManager->GiveResource(h, RES_GOLD, AI_FIGHT_EVENT_REWARD_1000);
+                break;
+            case AI_FIGHT_EVENT_LEVEL_2:
+                gpAdvManager->GiveResource(h, RES_GOLD, AI_FIGHT_EVENT_REWARD_2000);
+                break;
+            case AI_FIGHT_EVENT_LEVEL_3:
+                gpAdvManager->GiveResource(h, RES_GOLD, AI_FIGHT_EVENT_REWARD_5000);
+                break;
+            case AI_FIGHT_EVENT_LEVEL_4:
+                gpAdvManager->GiveResource(h, RES_GOLD, AI_FIGHT_EVENT_REWARD_2000);
+                gpAdvManager->GiveRandomArtifact(h);
+                break;
+            }
+            break;
+        case AI_OBJECT_GRAVEYARD:
+            switch (cell->w4hi) {
+            case AI_FIGHT_EVENT_LEVEL_1:
+                gpAdvManager->GiveResource(h, RES_GOLD, AI_FIGHT_EVENT_REWARD_500);
+                break;
+            case AI_FIGHT_EVENT_LEVEL_2:
+                gpAdvManager->GiveResource(h, RES_GOLD, AI_FIGHT_EVENT_REWARD_1000);
+                break;
+            case AI_FIGHT_EVENT_LEVEL_3:
+                gpAdvManager->GiveResource(h, RES_GOLD, AI_FIGHT_EVENT_REWARD_3000);
+                break;
+            case AI_FIGHT_EVENT_LEVEL_4:
+                gpAdvManager->GiveResource(h, RES_GOLD, AI_FIGHT_EVENT_REWARD_1000);
+                gpAdvManager->GiveRandomArtifact(h);
+                break;
+            }
+            break;
+        case AI_OBJECT_DERELICT_SHIP:
+            switch (cell->w4hi) {
+            case AI_FIGHT_EVENT_LEVEL_1:
+                gpAdvManager->GiveResource(h, RES_GOLD, AI_FIGHT_EVENT_REWARD_500);
+                break;
+            case AI_FIGHT_EVENT_LEVEL_2:
+                gpAdvManager->GiveResource(h, RES_GOLD, AI_FIGHT_EVENT_REWARD_1000);
+                break;
+            case AI_FIGHT_EVENT_LEVEL_3:
+                gpAdvManager->GiveResource(h, RES_GOLD, AI_FIGHT_EVENT_REWARD_2000);
+                break;
+            case AI_FIGHT_EVENT_LEVEL_4:
+                gpAdvManager->GiveResource(h, RES_GOLD, AI_FIGHT_EVENT_REWARD_5000);
+                break;
+            }
+            break;
+        }
+        cell->w4hi = AI_FIGHT_EVENT_EMPTY;
+    }
+    return 0;
+}
 
 VA(0x00443842, 0x73)
 int philAI::DamageGroup(armyGroup *ag, hero *loser, hero *, float dmg) {
