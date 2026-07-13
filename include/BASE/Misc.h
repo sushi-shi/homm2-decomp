@@ -34,6 +34,19 @@ struct IconEntry {          // one sprite frame header in the icon entry table (
 };
 #pragma pack(pop)
 
+#pragma pack(push, 1)
+struct PCXHeader {
+    unsigned char manufacturer, version, encoding, bitsPerPixel;
+    unsigned short xMin, yMin, xMax, yMax;
+    unsigned short horizontalDpi, verticalDpi;
+    unsigned char palette16[48];
+    unsigned char reserved, planes;
+    unsigned short bytesPerLine, paletteType, horizontalScreenSize, verticalScreenSize;
+    unsigned char filler[54];
+};
+#pragma pack(pop)
+SIZE(PCXHeader, 0x80);
+
 void InitMemEntry(void);
 void * BaseAlloc(unsigned int, char *, int);
 void BaseFree(void *, char *, int);
