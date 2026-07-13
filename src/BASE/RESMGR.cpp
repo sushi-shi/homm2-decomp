@@ -27,16 +27,16 @@
 VA(0x004c7fa0, 0xdb)
 resourceManager::resourceManager(void) : baseManager()
 {
-    int local_8;
+    int aggregateIndex;
     m_active = 0;
     m_resourceListHead = 0;
     m_expunging = 0;
     strcpy(name, "resourceManager");
     m_lastFileId = 0;
-    for (local_8 = 0; local_8 < 2; local_8++) {
-        m_aggregateFd[local_8] = -1;
-        m_aggregateDir[local_8] = 0;
-        m_aggregateEntryCount[local_8] = 0;
+    for (aggregateIndex = 0; aggregateIndex < 2; aggregateIndex++) {
+        m_aggregateFd[aggregateIndex] = -1;
+        m_aggregateDir[aggregateIndex] = 0;
+        m_aggregateEntryCount[aggregateIndex] = 0;
     }
     m_numAggregates = 0;
     m_curAggregate = 0;
@@ -45,7 +45,7 @@ resourceManager::resourceManager(void) : baseManager()
 VA(0x004c8080, 0xa2)
 void resourceManager::GetBackdrop(char *name, class bitmap *backdrop, int useIcon)
 {
-    if (useIcon != 0) {
+    if (useIcon) {
         icon *backdropIcon = GetIcon(name);
         backdropIcon->DrawToBuffer(0, 0, 0, 0);
         Dispose(backdropIcon);
@@ -59,10 +59,9 @@ void resourceManager::GetBackdrop(char *name, class bitmap *backdrop, int useIco
     }
 }
 
-// relative +0x93..+0xb8: frame/slots/CFG and values agree; only /Od commutative load
-// order differs for height+y and row*640+pixels (base +2 bytes); all 9 relocs agree.
 VA(0x004c8130, 0xd2)
-void resourceManager::GetBackdropAtLoc(char *name, class bitmap *backdrop, int x, int y,
+void resourceManager::GetBackdropAtLoc(char *filename, class bitmap *destination,
+                                       int destinationX, int destinationY,
                                        int useIcon)
 {
     icon *backdropIcon;
@@ -70,16 +69,17 @@ void resourceManager::GetBackdropAtLoc(char *name, class bitmap *backdrop, int x
     int imageHeight;
     int row;
     if (useIcon != 0) {
-        backdropIcon = GetIcon(name);
-        backdropIcon->DrawToBuffer(x, y, 0, 0);
+        backdropIcon = GetIcon(filename);
+        backdropIcon->DrawToBuffer(destinationX, destinationY, 0, 0);
         Dispose(backdropIcon);
     } else {
-        PointToFile(MakeId(name, 1));
+        PointToFile(MakeId(filename, 1));
         ReadWord();
         dataWidth = ReadWord();
         imageHeight = ReadWord();
-        for (row = y; row < imageHeight + y; row++) {
-            ReadBlock(reinterpret_cast<signed char *>(backdrop->m_pixels + row * 640 + x),
+        for (row = destinationY; row < (imageHeight | 0) + destinationY; row++) {
+            ReadBlock(((row * 640) | 0) +
+                          reinterpret_cast<signed char *>(destination->m_pixels) + destinationX,
                       dataWidth);
         }
     }

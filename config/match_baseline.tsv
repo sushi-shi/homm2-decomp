@@ -260,13 +260,13 @@ BASE/PALETTE	??0palette@@QAE@XZ	99.9375	c76712802bcd
 BASE/PALETTE	??1palette@@UAE@XZ	99.9286	3684d9000eaa
 BASE/PALETTE	??_Epalette@@UAEPAXI@Z	0.0000	
 BASE/PALETTE	?Data@palette@@QAEPACXZ	100.0000	3bb1f3ed4160
-BASE/RESMGR	??0resourceManager@@QAE@XZ	99.9836	a84038ee2184
+BASE/RESMGR	??0resourceManager@@QAE@XZ	99.9836	aa1e67128689
 BASE/RESMGR	?AddResource@resourceManager@@QAEXPAVresource@@@Z	100.0000	0a30f09b41ba
 BASE/RESMGR	?Close@resourceManager@@UAEXXZ	99.9815	b81dea91255e
 BASE/RESMGR	?Dispose@resourceManager@@QAEXPAVresource@@@Z	100.0000	786c365d3830
 BASE/RESMGR	?Expunge@resourceManager@@QAEXXZ	100.0000	9d04af9a8d6d
-BASE/RESMGR	?GetBackdrop@resourceManager@@QAEXPADPAVbitmap@@H@Z	100.0000	1b5a0e1adca5
-BASE/RESMGR	?GetBackdropAtLoc@resourceManager@@QAEXPADPAVbitmap@@HHH@Z	94.3944	9975750440c7
+BASE/RESMGR	?GetBackdrop@resourceManager@@QAEXPADPAVbitmap@@H@Z	100.0000	77b8852a7f95
+BASE/RESMGR	?GetBackdropAtLoc@resourceManager@@QAEXPADPAVbitmap@@HHH@Z	100.0000	7cd3364f214f
 BASE/RESMGR	?GetBitmap@resourceManager@@QAEPAVbitmap@@PAD@Z	100.0000	212c8db0a2fc
 BASE/RESMGR	?GetFileSize@resourceManager@@QAEKK@Z	100.0000	47cf8856456f
 BASE/RESMGR	?GetFont@resourceManager@@QAEPAVfont@@PAD@Z	99.7755	0e9dbb2445c4
