@@ -327,9 +327,8 @@ void dropListWidget::ProcessSelectDialog(void)
     field_0x46 = 0;
 
     short numItems = m_itemCount;
-    short maxItems = field_0x30;
-    if (numItems > maxItems) {
-        field_0x46 = numItems - maxItems;
+    if (numItems > field_0x30) {
+        field_0x46 = numItems - field_0x30;
         m_topIndex = m_selectedIndex;
         if (m_selectedIndex < 0)
             m_topIndex = 0;
@@ -337,7 +336,7 @@ void dropListWidget::ProcessSelectDialog(void)
             m_topIndex = field_0x46;
     }
     if (field_0x46 > 0) {
-        field_0x32 = maxItems;
+        field_0x32 = field_0x30;
     } else {
         if (numItems <= 3)
             numItems = 3;
@@ -475,7 +474,7 @@ void dropListWidget::ProcessSelectDialog(void)
                     (scrollRange + 1)) / field_0xaa;
                 if (top < 0)
                     top = 0;
-                if (scrollRange < top)
+                if (top > scrollRange)
                     top = scrollRange;
                 if (m_topIndex != top) {
                     m_topIndex = static_cast<short>(top);
@@ -507,7 +506,11 @@ void dropListWidget::ProcessSelectDialog(void)
                     if (m_topIndex > 0)
                         m_topIndex--;
                     field_0xac = 1;
-                } else if (mouseY < field_0x9c) {
+                } else if (mouseY >= field_0x9c) {
+                    if (m_topIndex < field_0x46)
+                        m_topIndex++;
+                    field_0xad = 1;
+                } else {
                     if (mouseY >= field_0xa4 && mouseY < field_0xa4 + field_0xa8)
                         field_0xae = 1;
                     short scrollRange = field_0x46;
@@ -517,10 +520,6 @@ void dropListWidget::ProcessSelectDialog(void)
                         m_topIndex = 0;
                     if (scrollRange < m_topIndex)
                         m_topIndex = scrollRange;
-                } else {
-                    if (m_topIndex < field_0x46)
-                        m_topIndex++;
-                    field_0xad = 1;
                 }
                 DrawDropStuff();
                 continue;
