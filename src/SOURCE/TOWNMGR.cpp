@@ -7,6 +7,7 @@
 #include <_carcass_types.h>
 #include <_types.h>
 #include <BASE/Misc.h>
+#include <BASE/border.h>
 #include <BASE/executive.h>
 #include <BASE/font.h>
 #include <BASE/inputManager.h>
@@ -19,7 +20,9 @@
 #include <EDITOR/mapcell.h>
 #include <SOURCE/ADVMGR.h>
 #include <SOURCE/Castle.h>
+#include <SOURCE/CURSOR.h>
 #include <SOURCE/EVENTS.h>
+#include <SOURCE/GAME.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/PHILAI.h>
 #include <SOURCE/RECRUIT.h>
@@ -39,6 +42,7 @@
 #include <SOURCE/TOWNMGR.h>
 #include <SOURCE/tradpost.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 VA(0x00413900, 0x16a)
 townObject::townObject(int, int, char *) {}
@@ -1066,25 +1070,524 @@ int townManager::BuyBuild(int building, int cannotBuy, int quickView)
 }
 
 VA(0x00418bd2, 0x3e9)
-void townManager::BuildObj(int) {}
+void townManager::BuildObj(int building)
+{
+    int objectIndex;
+    SLimitData limits;
+    int index;
+    SAMPLE2 buildSample;
+    int frame;
+
+    if (((!(m_town->m_buildings & (1L << building))) ||
+         (building == TOWN_COMMAND_MAGE_GUILD &&
+          m_town->m_buildState != TOWN_MAGE_GUILD_MAX_LEVEL)) &&
+        (building != TOWN_COMMAND_DOCK || m_town->CanBuildDock())) {
+        DrawTown(1, 1);
+        m_town->BuildBuilding(building);
+        for (index = 0; index < m_townObjectCount; ++index) {
+            if (m_town->m_buildings &
+                (1L << m_townObjects[index]->m_buildingId)) {
+                m_townObjects[index]->m_visible = 1;
+                m_townObjects[index]->m_border->m_flags |=
+                    TOWN_OBJECT_BORDER_ENABLED;
+            } else {
+                m_townObjects[index]->m_visible = 0;
+                m_townObjects[index]->m_border->m_flags &=
+                    ~TOWN_OBJECT_BORDER_ENABLED;
+            }
+        }
+
+        objectIndex = -1;
+        for (index = 0; index < m_townObjectCount; ++index) {
+            if (m_townObjects[index]->m_buildingId == building)
+                objectIndex = index;
+        }
+
+        giMaxExtentY = 0;
+        giMaxExtentX = giMaxExtentY;
+        giMinExtentX = 0x27f;
+        giMinExtentY = 0xff;
+        gbComputeExtent = 1;
+        gbSaveBiggestExtent = 1;
+        gbReturnAfterComputeExtent = 1;
+        if (building == TOWN_COMMAND_MAGE_GUILD) {
+            if (gpTownManager->m_town->m_type == TOWN_TYPE_NECROMANCER)
+                frame = (gpTownManager->m_town->m_buildState * 3 - 3) << 1;
+            else
+                frame = gpTownManager->m_town->m_buildState - 1;
+            m_townObjects[objectIndex]->m_icon->CombatClipDrawToBuffer(
+                0, 0, frame, &limits, 0, 0, 0, 0);
+            if (m_townObjects[objectIndex]->m_animationFrameCount != 0)
+                m_townObjects[objectIndex]->m_icon->CombatClipDrawToBuffer(
+                    0, 0, frame + 1, &limits, 0, 0, 0, 0);
+        } else {
+            m_townObjects[objectIndex]->m_icon->CombatClipDrawToBuffer(
+                0, 0, 0, &limits, 0, 0, 0, 0);
+            if (m_townObjects[objectIndex]->m_animationFrameCount != 0)
+                m_townObjects[objectIndex]->m_icon->CombatClipDrawToBuffer(
+                    0, 0, 1, &limits, 0, 0, 0, 0);
+        }
+        gbComputeExtent = 0;
+        gbSaveBiggestExtent = 0;
+        gbReturnAfterComputeExtent = 0;
+
+        gpWindowManager->SaveFizzleSource(
+            giMinExtentX, giMinExtentY,
+            giMaxExtentX - giMinExtentX + 1,
+            giMaxExtentY - giMinExtentY + 1);
+        DrawTown(0, 1);
+        buildSample = NULL_SAMPLE2;
+        buildSample = LoadPlaySample("buildtwn.82M");
+        gpWindowManager->FizzleForward(
+            giMinExtentX, giMinExtentY,
+            giMaxExtentX - giMinExtentX + 1,
+            giMaxExtentY - giMinExtentY + 1, -1, 0, 0);
+        WaitEndSample(buildSample, -1);
+        PollSound();
+        m_selectedBuilding = -1;
+        gpWindowManager->BroadcastMessage(
+            TOWN_MESSAGE_SELECT, 6, TOWN_CONTROL_CLOSE,
+            TOWN_INTERFACE_BROADCAST_FLAGS);
+        RedrawTownScreen();
+    }
+}
 
 VA(0x00418fbb, 0x3d8)
-void townManager::SetupMage(class heroWindow *) {}
+void townManager::SetupMage(heroWindow *window)
+{
+    short unusedZero = 0;
+    short unusedAvailable = 1;
+    short unusedInvalid = TOWN_MAGE_SPELL_UNAVAILABLE;
+    short unusedIconState = 2;
+    short unusedFirstSpell = TOWN_MAGE_FIRST_SPELL_CONTROL;
+    short unusedFirstIcon = TOWN_MAGE_FIRST_ICON_CONTROL;
+    short unusedFirstDescription = TOWN_MAGE_FIRST_DESCRIPTION_CONTROL;
+    short unusedGuildIcon = TOWN_MAGE_GUILD_ICON_CONTROL;
+    short unusedDescription = TOWN_MAGE_DESCRIPTION_CONTROL;
+    tag_message message;
+    int level;
+    int slot;
+    int spellState;
+    int hasLibrary;
+    int lineCount;
+    int unusedGuildFrame;
+
+    message.type = TOWN_MESSAGE_SELECT;
+    if (m_town->m_occupyingHeroId == -1) {
+        strcpy(gText, "The above spells are available here.");
+        message.field4 = 3;
+        message.field8 = TOWN_MAGE_DESCRIPTION_CONTROL;
+        message.text = gText;
+        window->BroadcastMessage(message);
+    }
+
+    for (level = 0; level < TOWN_MAGE_GUILD_MAX_LEVEL; ++level) {
+        for (slot = 0; slot < TOWN_MAGE_SPELLS_PER_LEVEL; ++slot) {
+            if (m_town->m_type == TOWN_TYPE_WIZARD &&
+                (m_town->m_buildings & TOWN_WIZARD_LIBRARY_BUILDING_FLAG))
+                hasLibrary = 1;
+            else
+                hasLibrary = 0;
+
+            if (gSpellLimits[level] + hasLibrary <= slot) {
+                spellState = TOWN_MAGE_SPELL_UNAVAILABLE;
+            } else if (m_town->m_spellCounts[level + 1] <= slot) {
+                spellState = 1;
+            } else {
+                spellState = 0;
+            }
+
+            if (spellState == TOWN_MAGE_SPELL_UNAVAILABLE)
+                message.field4 = 6;
+            else
+                message.field4 = 5;
+            message.field8 = level * TOWN_MAGE_SPELLS_PER_LEVEL + slot +
+                             TOWN_MAGE_FIRST_SPELL_CONTROL;
+            message.field18 = 4;
+            window->BroadcastMessage(message);
+
+            if (spellState != TOWN_MAGE_SPELL_UNAVAILABLE) {
+                message.field4 = 4;
+                message.field8 = level * TOWN_MAGE_SPELLS_PER_LEVEL + slot +
+                                 TOWN_MAGE_FIRST_SPELL_CONTROL;
+                message.field18 = spellState;
+                window->BroadcastMessage(message);
+            }
+
+            if (spellState != 0) {
+                message.field4 = 6;
+                message.field18 = 4;
+                message.field8 = level * TOWN_MAGE_SPELLS_PER_LEVEL + slot +
+                                 TOWN_MAGE_FIRST_ICON_CONTROL;
+                window->BroadcastMessage(message);
+                message.field8 = level * TOWN_MAGE_SPELLS_PER_LEVEL + slot +
+                                 TOWN_MAGE_FIRST_DESCRIPTION_CONTROL;
+                window->BroadcastMessage(message);
+            } else {
+                message.field4 = 4;
+                message.field8 = level * TOWN_MAGE_SPELLS_PER_LEVEL + slot +
+                                 TOWN_MAGE_FIRST_ICON_CONTROL;
+                message.field18 = gsSpellInfo[
+                    m_town->m_spells[level][slot]].iconIndex;
+                window->BroadcastMessage(message);
+                lineCount = smallFont->LineLength(
+                    gSpellNames[m_town->m_spells[level][slot]], 0x4a);
+                if (lineCount == 1)
+                    sprintf(gText, "%s\n[%d]",
+                            gSpellNames[m_town->m_spells[level][slot]],
+                            GetManaCost(m_town->m_spells[level][slot], 0));
+                else
+                    sprintf(gText, "%s  [%d]",
+                            gSpellNames[m_town->m_spells[level][slot]],
+                            GetManaCost(m_town->m_spells[level][slot], 0));
+                message.field4 = 3;
+                message.field8 = level * TOWN_MAGE_SPELLS_PER_LEVEL + slot +
+                                 TOWN_MAGE_FIRST_DESCRIPTION_CONTROL;
+                message.text = gText;
+                window->BroadcastMessage(message);
+            }
+        }
+    }
+
+    message.field18 = m_town->m_buildState - 1;
+    message.field4 = 4;
+    message.field8 = TOWN_MAGE_GUILD_ICON_CONTROL;
+    unusedGuildFrame = message.field18;
+    window->BroadcastMessage(message);
+    sprintf(gText, "magegld%c.icn", cHeroTypeInitial[m_town->m_type]);
+    message.field4 = 9;
+    message.field8 = TOWN_MAGE_GUILD_ICON_CONTROL;
+    message.text = gText;
+    window->BroadcastMessage(message);
+}
 
 VA(0x00419393, 0x190)
-int MageGuildHandler(struct tag_message &) { return 0; }
+int MageGuildHandler(tag_message &message)
+{
+    short unusedFirstSpell = TOWN_MAGE_FIRST_SPELL_CONTROL;
+    short unusedFirstIcon = TOWN_MAGE_FIRST_ICON_CONTROL;
+    short unusedFirstDescription = TOWN_MAGE_FIRST_DESCRIPTION_CONTROL;
+    int action;
+    int quickView;
+    int spellSlot;
+    int level;
+    int slot;
+    int spell;
+
+    if (message.type == TOWN_MESSAGE_SELECT) {
+        action = message.field4;
+        switch (action) {
+        case TOWN_INPUT_SELECT:
+        case TOWN_INPUT_ALTERNATE_SELECT:
+            quickView = message.fieldC & TOWN_QUICK_VIEW_MODIFIER;
+            spellSlot = -1;
+            if (message.field8 >= TOWN_MAGE_FIRST_SPELL_CONTROL &&
+                message.field8 < TOWN_MAGE_FIRST_SPELL_CONTROL +
+                                     TOWN_MAGE_GUILD_MAX_LEVEL *
+                                         TOWN_MAGE_SPELLS_PER_LEVEL)
+                spellSlot = message.field8 - TOWN_MAGE_FIRST_SPELL_CONTROL;
+            if (message.field8 >= TOWN_MAGE_FIRST_ICON_CONTROL &&
+                message.field8 < TOWN_MAGE_FIRST_ICON_CONTROL +
+                                     TOWN_MAGE_GUILD_MAX_LEVEL *
+                                         TOWN_MAGE_SPELLS_PER_LEVEL)
+                spellSlot = message.field8 - TOWN_MAGE_FIRST_ICON_CONTROL;
+            if (message.field8 >= TOWN_MAGE_FIRST_DESCRIPTION_CONTROL &&
+                message.field8 < TOWN_MAGE_FIRST_DESCRIPTION_CONTROL +
+                                     TOWN_MAGE_GUILD_MAX_LEVEL *
+                                         TOWN_MAGE_SPELLS_PER_LEVEL)
+                spellSlot = message.field8 -
+                            TOWN_MAGE_FIRST_DESCRIPTION_CONTROL;
+            if (spellSlot != -1) {
+                level = spellSlot / TOWN_MAGE_SPELLS_PER_LEVEL;
+                slot = spellSlot % TOWN_MAGE_SPELLS_PER_LEVEL;
+                if (gpTownManager->m_town->m_spellCounts[level + 1] <= slot)
+                    return 1;
+                spell = gpTownManager->m_town->m_spells[level][slot];
+                NormalDialog(gSpellDesc[spell],
+                             quickView < 1 ? 1 : 4,
+                             -1, -1, 8, spell, -1, 0, -1, 0);
+                return 1;
+            }
+            break;
+        }
+    }
+    return EventWindowHandler(message);
+}
 
 VA(0x00419523, 0x706)
-int townManager::RecruitHero(int, int) { return 0; }
+int townManager::RecruitHero(int availableHeroIndex, int cannotRecruit)
+{
+    short unusedTextControl = 3;
+    short unusedPortraitControl = 7;
+    short unusedTextState = 1;
+    short unusedPortraitState = 2;
+    short unusedIconState = 4;
+    short unusedDimState = 6;
+    short unusedButtonText = 8;
+    short unusedButtonIcon = 9;
+    tag_message message;
+    int artifactCount;
+    int index;
+    int townX;
+    int townY;
+    int newHeroClass;
+
+    m_heroWindow1 = new heroWindow(0xb1, 0x10, "rcrthero.bin");
+    if (m_heroWindow1 == 0)
+        MemError();
+    SetWinText(m_heroWindow1, 0x14);
+    m_recruitHero = &gpGame->m_heroRecs[
+        gpCurPlayer->AvailableHeroId(availableHeroIndex)];
+    m_recruitHero->m_owner = static_cast<char>(giCurPlayer);
+    message.type = TOWN_MESSAGE_SELECT;
+
+    if (cannotRecruit != 0) {
+        message.field4 = 6;
+        message.field18 = 2;
+        message.field8 = 8;
+        m_heroWindow1->BroadcastMessage(message);
+        message.field8 = 9;
+        m_heroWindow1->BroadcastMessage(message);
+        message.field8 = TOWN_DIALOG_CONFIRM;
+        m_heroWindow1->BroadcastMessage(message);
+        message.field4 = 5;
+        message.field18 = 0x1000;
+        message.field8 = 8;
+        m_heroWindow1->BroadcastMessage(message);
+        message.field8 = 9;
+        m_heroWindow1->BroadcastMessage(message);
+        message.field8 = TOWN_DIALOG_CONFIRM;
+        m_heroWindow1->BroadcastMessage(message);
+    }
+
+    artifactCount = 0;
+    for (index = 0; index < TOWN_MAX_ARTIFACTS; ++index) {
+        if (m_recruitHero->m_artifacts[index] != -1 &&
+            m_recruitHero->m_artifacts[index] != TOWN_SPELL_BOOK_ARTIFACT)
+            ++artifactCount;
+    }
+    sprintf(gText, "%s is a level %d %s with %d artifacts.",
+            m_recruitHero->m_name, m_recruitHero->m_level,
+            gAlignmentNames[m_recruitHero->m_cursorType], artifactCount);
+    message.field4 = 3;
+    message.field8 = 1;
+    message.text = gText;
+    m_heroWindow1->BroadcastMessage(message);
+    sprintf(gText, "port%04d.icn", m_recruitHero->m_portrait);
+    message.field4 = 9;
+    message.field8 = 2;
+    message.text = gText;
+    m_heroWindow1->BroadcastMessage(message);
+
+    m_recruitState = -1;
+    gpWindowManager->DoDialog(m_heroWindow1, RecruitHeroHandler, 0);
+    delete m_heroWindow1;
+    if (m_recruitState != -1) {
+        m_recruitState = availableHeroIndex;
+        gpCurPlayer->m_resources[RES_GOLD] -= gHeroGoldCost;
+        gpCurPlayer->m_heroIds[gpCurPlayer->m_heroCount] =
+            gpCurPlayer->m_availableHeroIds[m_recruitState];
+        ++gpCurPlayer->m_heroCount;
+
+        townX = m_town->m_x;
+        townY = m_town->m_y;
+        m_recruitHero->m_x = townX;
+        m_recruitHero->m_y = townY;
+        m_recruitHero->m_eventFlags = 0;
+        m_recruitHero->m_direction = 2;
+        m_recruitHero->m_remainingMobility = m_recruitHero->CalcMobility();
+        m_recruitHero->m_mobility = m_recruitHero->m_remainingMobility;
+        m_recruitHero->m_locationType =
+            gpGame->m_worldMap.GetCell(townX, townY)->triggerType;
+        m_recruitHero->m_occupiedTown =
+            gpGame->m_worldMap.GetCell(townX, townY)->w4hi;
+        gpGame->m_worldMap.GetCell(townX, townY)->triggerType =
+            AI_OBJECT_HERO;
+        gpGame->m_worldMap.GetCell(townX, townY)->w4hi =
+            gpCurPlayer->m_availableHeroIds[m_recruitState];
+        SendMapChange(3, m_recruitHero->m_id, townX, townY,
+                      TOWN_MAP_CHANGE_UNUSED, 0, 0);
+        m_recruitResult = 1;
+        m_town->m_occupyingHeroId = m_recruitHero->m_id;
+        gpGame->m_availableHeroes[
+            gpCurPlayer->m_availableHeroIds[m_recruitState]] =
+            static_cast<signed char>(giCurPlayer);
+        CheckValidAvailableHeroes();
+        if (m_town->m_buildings & 1)
+            m_town->GiveSpells(0);
+
+        newHeroClass =
+            gpCurPlayer->m_availableHeroIds[1 - m_recruitState] / 9;
+        newHeroClass = Random(1, 5) + newHeroClass;
+        newHeroClass %= TOWN_HERO_CLASS_COUNT;
+        gpCurPlayer->m_availableHeroIds[m_recruitState] =
+            static_cast<signed char>(
+                gpGame->GetNewHeroId(giCurPlayer, newHeroClass, 0));
+        gpGame->m_availableHeroes[
+            gpCurPlayer->m_availableHeroIds[m_recruitState]] =
+            AI_HERO_AVAILABLE_FLAG;
+    } else {
+        if (m_castleDialogActive != 0)
+            SetupCastle(m_heroWindow0, 0);
+        if (m_castleDialogActive != 0)
+            m_heroWindow0->DrawWindow();
+    }
+
+    m_bankBox->Update(1);
+    gpWindowManager->BroadcastMessage(
+        TOWN_MESSAGE_SELECT, 6, TOWN_CONTROL_CLOSE,
+        TOWN_INTERFACE_BROADCAST_FLAGS);
+    m_recruitHero->m_owner = -1;
+    if (m_recruitState != -1)
+        m_recruitHero->m_owner = static_cast<char>(giCurPlayer);
+    return m_recruitState != -1;
+}
 
 VA(0x00419c29, 0x153)
-int TavernHandler(struct tag_message &) { return 0; }
+int TavernHandler(tag_message &message)
+{
+    int unusedDelay = TOWN_TAVERN_ANIMATION_DELAY;
+    short unusedFirstFrame = TOWN_TAVERN_FIRST_ANIMATION_FRAME;
+    int action;
+    int control;
+
+    if (message.type == TOWN_MESSAGE_SELECT) {
+        action = message.field4;
+        switch (action) {
+        case TOWN_INPUT_DESELECT:
+            control = message.field8;
+            switch (control) {
+            case 0x7800:
+            case 0x7801:
+            case TOWN_DIALOG_CONFIRM:
+                gpWindowManager->m_dialogResult = message.field8;
+                message.field8 = 10;
+                message.field4 = message.field8;
+                return 2;
+            }
+            break;
+        }
+    }
+    if (static_cast<long>(KBTickCount()) > glTimers[0]) {
+        message.type = TOWN_MESSAGE_SELECT;
+        message.field4 = 4;
+        message.field8 = 2;
+        ++gpGame->m_viewArmyResult;
+        message.field18 =
+            gpGame->m_viewArmyResult % TOWN_TAVERN_ANIMATION_FRAME_COUNT +
+            TOWN_TAVERN_FIRST_ANIMATION_FRAME;
+        gpTownManager->m_heroWindow0->BroadcastMessage(message);
+        gpTownManager->m_heroWindow0->MoveWindow(0, 0);
+        glTimers[0] = static_cast<int>(KBTickCount() +
+                                       TOWN_TAVERN_ANIMATION_DELAY);
+    }
+    return 1;
+}
 
 VA(0x00419d7c, 0x110)
-void townManager::DoTavern(void) {}
+void townManager::DoTavern(void)
+{
+    int unusedValue = 0;
+    tag_message message;
+
+    m_heroWindow0 = new heroWindow(0xa2, 10, "tavwin.bin");
+    if (m_heroWindow0 == 0)
+        MemError();
+    SetWinText(m_heroWindow0, 0x16);
+    sprintf(gText,
+            "A generous tip for the barkeep yields the following rumor:\n\n%s",
+            gpGame->m_rumour);
+    message.type = TOWN_MESSAGE_SELECT;
+    message.field4 = 3;
+    message.field8 = TOWN_TAVERN_RUMOUR_CONTROL;
+    message.text = gText;
+    m_heroWindow0->BroadcastMessage(message);
+    gpWindowManager->DoDialog(m_heroWindow0, TavernHandler, 0);
+    delete m_heroWindow0;
+}
 
 VA(0x00419e8c, 0x328)
-int SplitArmyHandler(struct tag_message &) { return 0; }
+int SplitArmyHandler(tag_message &message)
+{
+    short unusedAmountControl = TOWN_SPLIT_AMOUNT_CONTROL;
+    short unusedIncreaseControl = TOWN_SPLIT_INCREASE_CONTROL;
+    short unusedDecreaseControl = TOWN_SPLIT_DECREASE_CONTROL;
+    int handled = 0;
+    int action;
+    int control;
+
+    if (message.type == TOWN_MESSAGE_SELECT) {
+        action = message.field4;
+        switch (action) {
+        case TOWN_INPUT_SELECT:
+            control = message.field8;
+            switch (control) {
+            case TOWN_SPLIT_AMOUNT_CONTROL:
+                message.field4 = 7;
+                gpTownManager->m_heroWindow1->BroadcastMessage(message);
+                gpTownManager->m_splitAmount = atoi(message.text);
+                if (gpTownManager->m_splitAmount < 0)
+                    gpTownManager->m_splitAmount = 0;
+                if (gpTownManager->m_splitAmount >=
+                    gpTownManager->m_splitMaximum)
+                    gpTownManager->m_splitAmount =
+                        gpTownManager->m_splitMaximum - 1;
+                goto update_amount;
+            }
+            break;
+        case TOWN_INPUT_DESELECT:
+            control = message.field8;
+            switch (control) {
+            case TOWN_SPLIT_INCREASE_CONTROL:
+                ++gpTownManager->m_splitAmount;
+                if (gpTownManager->m_splitAmount >=
+                    gpTownManager->m_splitMaximum)
+                    gpTownManager->m_splitAmount =
+                        gpTownManager->m_splitMaximum - 1;
+                goto update_amount;
+            case TOWN_SPLIT_DECREASE_CONTROL:
+                --gpTownManager->m_splitAmount;
+                if (gpTownManager->m_splitAmount < 0)
+                    gpTownManager->m_splitAmount = 0;
+                goto update_amount;
+            case 0x7800:
+            case 0x7801:
+                gpTownManager->m_splitAmount = 0;
+                gpWindowManager->m_dialogResult = message.field8;
+                handled = 1;
+                break;
+            case TOWN_DIALOG_CONFIRM:
+                if (gpTownManager->m_splitAmount == 0)
+                    gpWindowManager->m_dialogResult = 0x7801;
+                else
+                    gpWindowManager->m_dialogResult = TOWN_DIALOG_CONFIRM;
+                handled = 1;
+                break;
+            default:
+                break;
+            }
+            break;
+        }
+    }
+
+    if (handled != 0) {
+        message.field8 = 10;
+        message.field4 = message.field8;
+        return 2;
+    }
+    return 1;
+
+update_amount:
+    sprintf(gText, "%d", gpTownManager->m_splitAmount);
+    message.type = TOWN_MESSAGE_SELECT;
+    message.field4 = 3;
+    message.field8 = TOWN_SPLIT_AMOUNT_CONTROL;
+    message.text = gText;
+    gpTownManager->m_heroWindow1->BroadcastMessage(message);
+    gpTownManager->m_heroWindow1->DrawWindow(
+        1, TOWN_SPLIT_AMOUNT_CONTROL, TOWN_SPLIT_AMOUNT_CONTROL);
+    return 1;
+}
 
 VA(0x0041a1b4, 0x5cf)
 void townManager::SetupWell(class heroWindow *) {}
