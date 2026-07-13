@@ -52,6 +52,10 @@
 #define ADVMGR_QUICK_VIEW_LINE (*reinterpret_cast<const short *>("\x76\x21"))
 #define ADVMGR_TOWN_VIEW_LINE (*reinterpret_cast<const short *>("\x5f\x5e"))
 #define ADVMGR_BOTTOM_HERO_LINE (*reinterpret_cast<const short *>("\x5f\x21"))
+#define ADVMGR_ENVIRONMENT_VOLUME(distance)                                \
+    (reinterpret_cast<const int *>("\x40\0\0\0\x39\0\0\0\x28\0\0\0" \
+                                   "\x15\0\0\0\x07\0\0\0\x05\0\0\0") \
+         [distance])
 
 DATA(0x00527eb8) static unsigned short s_drawGroundTile;
 DATA(0x00527ec0) static int s_drawPixelY;
@@ -251,9 +255,9 @@ int advManager::Open(int id)
     for (index = 0; index < ADVMGR_LOOPING_SAMPLE_COUNT; ++index)
         m_loopingSamples[index] = 0;
     for (index = 0; index < ADVMGR_SOUND_CELL_COUNT; ++index) {
-        m_activeSounds[index].soundId = -1;
-        m_activeSounds[index].volume = 127;
-        m_activeSoundCount = 0;
+        m_activeSounds[index].soundId = ADVMGR_ENVIRONMENT_SOUND_NONE;
+        m_activeSounds[index].volume = ADVMGR_ENVIRONMENT_SOUND_DEFAULT_VOLUME;
+        m_activeSoundMask = 0;
     }
 
     GetCursorSampleSet(gCursorSampleSet);
@@ -4435,8 +4439,95 @@ int advManager::ComboDraw(int update)
     return ComboDraw(m_mapOriginX, m_mapOriginY, update);
 }
 
+// @early-stop
+// Raw bytes differ only at +0x1dd/+0x1e0, +0x1f4/+0x1f7,
+// +0x1fb/+0x1fe, and +0x215/+0x218: four commutative /Od add operand
+// orders. The frame, size, logic, and all 18 relocation targets agree.
 VA(0x0046668e, 0x338)
-void advManager::SetEnvironmentOrigin(int, int, int) {}
+void advManager::SetEnvironmentOrigin(int originX, int originY, int stopSounds)
+{
+    int soundLayer;
+    int maxSounds = ADVMGR_SOUND_CELL_COUNT;
+    int soundRadius;
+    int edgeOffset;
+
+    if (gpSoundManager->m_samplesReady == 0)
+        return;
+
+    for (edgeOffset = 0; edgeOffset < ADVMGR_SOUND_CELL_COUNT; ++edgeOffset) {
+        if (m_activeSounds[edgeOffset].soundId != ADVMGR_ENVIRONMENT_SOUND_NONE) {
+            LogInt("SEO a", edgeOffset, ADVMGR_ENVIRONMENT_SOUND_LOG_UNUSED,
+                   ADVMGR_ENVIRONMENT_SOUND_LOG_UNUSED,
+                   ADVMGR_ENVIRONMENT_SOUND_LOG_UNUSED,
+                   ADVMGR_ENVIRONMENT_SOUND_LOG_UNUSED,
+                   ADVMGR_ENVIRONMENT_SOUND_LOG_UNUSED,
+                   ADVMGR_ENVIRONMENT_SOUND_LOG_UNUSED);
+            if (stopSounds != 0) {
+                LogInt("SEO b", edgeOffset, ADVMGR_ENVIRONMENT_SOUND_LOG_UNUSED,
+                       ADVMGR_ENVIRONMENT_SOUND_LOG_UNUSED,
+                       ADVMGR_ENVIRONMENT_SOUND_LOG_UNUSED,
+                       ADVMGR_ENVIRONMENT_SOUND_LOG_UNUSED,
+                       ADVMGR_ENVIRONMENT_SOUND_LOG_UNUSED,
+                       ADVMGR_ENVIRONMENT_SOUND_LOG_UNUSED);
+                gpSoundManager->StopSample(
+                    m_loopingSamples[m_activeSounds[edgeOffset].soundId]
+                        ->m_activeSample);
+                m_activeSounds[edgeOffset].soundId = ADVMGR_ENVIRONMENT_SOUND_NONE;
+                m_activeSounds[edgeOffset].volume =
+                    ADVMGR_ENVIRONMENT_SOUND_DEFAULT_VOLUME;
+            } else {
+                m_activeSounds[edgeOffset].volume =
+                    ADVMGR_ENVIRONMENT_SOUND_DEFAULT_VOLUME;
+            }
+        }
+    }
+
+    if (originX == ADVMGR_ENVIRONMENT_SOUND_NONE)
+        return;
+
+    if (gSampleVolume != 0) {
+        m_activeSoundMask = 0;
+        for (soundLayer = ADVMGR_ENVIRONMENT_SOUND_FIRST_LAYER;
+             soundLayer <= ADVMGR_ENVIRONMENT_SOUND_LAYER_COUNT; ++soundLayer) {
+            InsertSound(originX, originY, 0, soundLayer);
+            for (soundRadius = 0; soundRadius < ADVMGR_SOUND_CELL_COUNT;
+                 ++soundRadius) {
+                for (edgeOffset = 0; edgeOffset < soundRadius * 2; ++edgeOffset) {
+                    InsertSound(originX - soundRadius + edgeOffset,
+                                originY - soundRadius, soundRadius, soundLayer);
+                    InsertSound(originX + soundRadius,
+                                originY - soundRadius + edgeOffset, soundRadius,
+                                soundLayer);
+                    InsertSound(originX + soundRadius - edgeOffset,
+                                originY + soundRadius, soundRadius, soundLayer);
+                    InsertSound(originX - soundRadius,
+                                originY + soundRadius - edgeOffset, soundRadius,
+                                soundLayer);
+                }
+            }
+        }
+
+        for (edgeOffset = 0; edgeOffset < ADVMGR_SOUND_CELL_COUNT; ++edgeOffset) {
+            if (m_activeSounds[edgeOffset].soundId != ADVMGR_ENVIRONMENT_SOUND_NONE &&
+                m_activeSounds[edgeOffset].volume >
+                    ADVMGR_ENVIRONMENT_SOUND_MAX_DISTANCE) {
+                gpSoundManager->StopSample(
+                    m_loopingSamples[m_activeSounds[edgeOffset].soundId]
+                        ->m_activeSample);
+                m_activeSounds[edgeOffset].soundId = ADVMGR_ENVIRONMENT_SOUND_NONE;
+            }
+            if (m_activeSounds[edgeOffset].soundId != ADVMGR_ENVIRONMENT_SOUND_NONE &&
+                (m_activeSoundMask &
+                 (1 << m_activeSounds[edgeOffset].soundId)) != 0) {
+                gpSoundManager->ModifySample(
+                    m_loopingSamples[m_activeSounds[edgeOffset].soundId]
+                        ->m_activeSample,
+                    ADVMGR_ENVIRONMENT_SOUND_PAN,
+                    ADVMGR_ENVIRONMENT_VOLUME(m_activeSounds[edgeOffset].volume));
+            }
+        }
+    }
+}
 
 VA(0x004669c6, 0x69)
 void advManager::CheckLoadSample(int index)
@@ -4448,8 +4539,121 @@ void advManager::CheckLoadSample(int index)
     }
 }
 
+// @early-stop
+// All 0x4c1 bytes are identical after masking 39 relocations. Retail delinks
+// 37 switch-table local-label relocations as the containing function.
 VA(0x00466a2f, 0x4c1)
-int advManager::GetSoundId(int, int) { return 0; }
+int advManager::GetSoundId(int x, int y)
+{
+    mapCell *currentCell = &m_mapData->Row(y)[x];
+    int soundId = ADVMGR_ENVIRONMENT_SOUND_NONE;
+
+    if (!giGroundToTerrain[currentCell->tile] &&
+        (giGroundShape[currentCell->tile] & ADVMGR_SOUND_GROUND_SHAPE_MASK))
+        return ADVMGR_SOUND_COASTLINE;
+
+    if (currentCell->triggerType & ADVMGR_TRIGGER_ACTION_FLAG) {
+        switch (currentCell->triggerType & ADVMGR_TRIGGER_TYPE_MASK) {
+        case ADVMGR_SOUND_OBJECT_ARCHER_HOUSE:
+            return ADVMGR_SOUND_DWELLING;
+        case ADVMGR_SOUND_OBJECT_DWARF_COTTAGE:
+            return ADVMGR_SOUND_DWELLING;
+        case ADVMGR_SOUND_OBJECT_PEASANT_HUT:
+            return ADVMGR_SOUND_DWELLING;
+        case ADVMGR_SOUND_OBJECT_LOG_CABIN:
+            return ADVMGR_SOUND_DWELLING;
+        case ADVMGR_SOUND_OBJECT_SIRENS:
+            return ADVMGR_SOUND_DWELLING;
+        case ADVMGR_SOUND_OBJECT_RUINS:
+            return ADVMGR_SOUND_RUINS;
+        case ADVMGR_SOUND_OBJECT_DERELICT_SHIP:
+            return ADVMGR_SOUND_DERELICT_SHIP;
+        case ADVMGR_SOUND_OBJECT_TRADING_POST:
+            return ADVMGR_SOUND_TRADING_POST;
+        case ADVMGR_SOUND_OBJECT_SHRINE_FIRST:
+            return ADVMGR_SOUND_SHRINE;
+        case ADVMGR_SOUND_OBJECT_SHRINE_SECOND:
+            return ADVMGR_SOUND_SHRINE;
+        case ADVMGR_SOUND_OBJECT_SHRINE_THIRD:
+            return ADVMGR_SOUND_SHRINE;
+        case ADVMGR_SOUND_OBJECT_BUOY:
+            return ADVMGR_SOUND_BUOY;
+        case ADVMGR_SOUND_OBJECT_SHIPWRECK:
+            return ADVMGR_SOUND_SHIPWRECK;
+        case ADVMGR_SOUND_OBJECT_WHIRLPOOL:
+            return ADVMGR_SOUND_COAST;
+        case ADVMGR_SOUND_OBJECT_CAMPFIRE:
+            return ADVMGR_SOUND_CAMPFIRE;
+        case ADVMGR_SOUND_OBJECT_WINDMILL:
+            return ADVMGR_SOUND_WINDMILL;
+        case ADVMGR_SOUND_OBJECT_FOUNTAIN:
+            return ADVMGR_SOUND_FOUNTAIN;
+        case ADVMGR_SOUND_OBJECT_ARTESIAN_SPRING:
+            return ADVMGR_SOUND_FOUNTAIN;
+        case ADVMGR_SOUND_OBJECT_WATERING_HOLE:
+            return ADVMGR_SOUND_WATERING_HOLE;
+        case ADVMGR_SOUND_OBJECT_STONE_LITHS:
+            return ADVMGR_SOUND_STONE_LITHS;
+        case ADVMGR_SOUND_OBJECT_ORACLE:
+            return ADVMGR_SOUND_ORACLE;
+        case ADVMGR_SOUND_OBJECT_WATER_WHEEL:
+            return ADVMGR_SOUND_WATER_WHEEL;
+        case ADVMGR_SOUND_OBJECT_ALCHEMIST_LAB:
+            if (currentCell->triggerType & ADVMGR_TRIGGER_ACTION_FLAG)
+                return ADVMGR_SOUND_ALCHEMIST_LAB_ACTION;
+            break;
+        case ADVMGR_SOUND_OBJECT_MINE:
+            if (currentCell->triggerType & ADVMGR_TRIGGER_ACTION_FLAG)
+                return ADVMGR_SOUND_MINE;
+            break;
+        case ADVMGR_SOUND_OBJECT_ABANDONED_MINE:
+            if (currentCell->triggerType & ADVMGR_TRIGGER_ACTION_FLAG)
+                return ADVMGR_SOUND_ABANDONED_MINE;
+            break;
+        case ADVMGR_SOUND_OBJECT_SAWMILL:
+            if (currentCell->triggerType & ADVMGR_TRIGGER_ACTION_FLAG)
+                return ADVMGR_SOUND_SAWMILL;
+            break;
+        case ADVMGR_SOUND_OBJECT_DAEMON_CAVE:
+            if (currentCell->triggerType & ADVMGR_TRIGGER_ACTION_FLAG)
+                return ADVMGR_SOUND_DAEMON_CAVE;
+            break;
+        }
+    } else {
+        switch (currentCell->triggerType) {
+        case ADVMGR_SOUND_OBJECT_TAR_PIT:
+            return ADVMGR_SOUND_TAR_PIT;
+        case ADVMGR_SOUND_OBJECT_LAVA_POOL:
+            if (currentCell->objIndex >= ADVMGR_SOUND_ALCHEMIST_FRAME_FIRST &&
+                currentCell->objIndex <= ADVMGR_SOUND_ALCHEMIST_FRAME_LAST)
+                return ADVMGR_SOUND_ALCHEMIST_LAB;
+            else
+                return ADVMGR_SOUND_LAVA_POOL;
+        case ADVMGR_SOUND_OBJECT_VOLCANO:
+            if (currentCell->objTileset == ADVMGR_SOUND_TILESET_SMALL_VOLCANO ||
+                currentCell->objTileset == ADVMGR_SOUND_TILESET_LARGE_VOLCANO)
+                return ADVMGR_SOUND_LARGE_VOLCANO;
+            else
+                return ADVMGR_SOUND_SMALL_VOLCANO;
+        case ADVMGR_SOUND_OBJECT_WATER_LAKE:
+            if (currentCell->objTileset == ADVMGR_SOUND_TILESET_WATER_LAKE_UNUSED)
+                break;
+            return ADVMGR_SOUND_WATERING_HOLE;
+        }
+
+        switch (currentCell->objTileset) {
+        case ADVMGR_SOUND_TILESET_STREAM:
+            return ADVMGR_SOUND_STREAM;
+        case ADVMGR_SOUND_TILESET_WATER:
+            if (currentCell->objIndex == ADVMGR_SOUND_SEAGULL_FRAME_FIRST ||
+                currentCell->objIndex == ADVMGR_SOUND_SEAGULL_FRAME_LAST)
+                return ADVMGR_SOUND_SEAGULLS;
+            break;
+        }
+    }
+
+    return ADVMGR_ENVIRONMENT_SOUND_NONE;
+}
 
 VA(0x00466ef0, 0x23a)
 void advManager::InsertSound(int, int, int, int) {}

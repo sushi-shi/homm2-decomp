@@ -1170,7 +1170,7 @@ void UpdateNormalDialog(char *text)
 
 // ---- globals (definitions, RVA order) ----
 DATA(0x004f8c58) unsigned char giGroundToTerrain[432];
-DATA(0x004f8e08) unsigned char *giGroundShape;
+DATA(0x004f8e08) unsigned char giGroundShape[432];
 DATA(0x004f8fb8) unsigned char *gColorTableTan;
 DATA(0x004f90b8) unsigned char *gColorTableGray;
 DATA(0x004f91b8) unsigned char gColorTableYellow[256];

@@ -103,7 +103,7 @@ public:
     int    m_lastQuickViewX;  // +0x2b2
     int    m_lastQuickViewY;  // +0x2b6
     int    m_field_0x2ba;  // +0x2ba
-    int    m_activeSoundCount;  // +0x2be
+    int    m_activeSoundMask;  // +0x2be
     adventureSoundCell m_activeSounds[4];  // +0x2c2
     class sample *m_loopingSamples[28];  // +0x2e2
     class sample *m_cursorSamples[9];  // +0x352
