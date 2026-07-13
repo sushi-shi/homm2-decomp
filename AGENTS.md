@@ -132,6 +132,8 @@ authoritative. This file is the short, restart-ready Codex workflow.
   functions, globals, or labels solely to improve objdiff.
 - Use inline accessors when retail emits their `/Ob1` continuation traces. Do not replace them with
   raw offset arithmetic just because the arithmetic is equivalent.
+- The original source code is not available. Do not search the web or other repositories for it;
+  reconstruct from retail disassembly, CodeView, data bytes, relocations, and local project evidence.
 - fheroes2 is available read-only at `/path/to/homm2/fheroes2`. Use it only as a
   secondary naming reference for enums, object IDs, and serialization formats. Retail disassembly,
   CodeView, data bytes, and relocations are authoritative. Adapt useful names to this repo's style;

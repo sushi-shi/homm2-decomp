@@ -37,9 +37,9 @@ public:
     int    m_y;  // +0x1d
     int    m_destinationX;  // +0x21
     int    m_destinationY;  // +0x25
-    signed char m_unknown29;  // +0x29
-    signed char m_unknown2a;  // +0x2a
-    char m_pad_0x2b[1];
+    unsigned char m_boatId;  // +0x29
+    char m_unknown2a;  // +0x2a
+    signed char m_unknown2b;  // +0x2b
     unsigned char m_direction;  // +0x2c
     short  m_locationType;  // +0x2d
     short  m_occupiedTown;  // +0x2f
@@ -71,7 +71,9 @@ public:
     char _pad_0x94[0x41];
     signed char m_artifacts[14];  // +0xd5
     unsigned int m_eventFlags;  // +0xe3
-    char m_pad_0xe7[0x13];
+    char m_unknownE7;  // +0xe7
+    float m_aiFightValue;  // +0xe8
+    char m_pad_0xec[0xe];
     // --- constructors ---
     hero(void);
     // --- methods ---
