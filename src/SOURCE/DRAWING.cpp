@@ -6,10 +6,12 @@
 #include <va.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <BASE/Icon2b.h>
 #include <BASE/Misc.h>
 #include <BASE/bitmap.h>
 #include <BASE/font.h>
+#include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/mouseManager.h>
 #include <SOURCE/KB.h>
@@ -21,22 +23,230 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/town.h>
 VA(0x00402910, 0x41)
-void combatManager::NoShowCombatLog(char *) {}
+void combatManager::NoShowCombatLog(char *message)
+{
+    char logMessage[COMBAT_MESSAGE_LOG_BUFFER_SIZE];
+    sprintf(logMessage, "NC: %s", message);
+    LogStr(logMessage);
+}
 
 VA(0x00402951, 0xda)
-void combatManager::ClearCombatMessages(int) {}
+void combatManager::ClearCombatMessages(int force)
+{
+    m_combatMessagePending = 0;
+    if (strlen(m_currentCombatMessage) <= 1 && strlen(m_previousCombatMessage) <= 1)
+        return;
+    if (force != 0 || m_combatMessageExpiration < KBTickCount()) {
+        strcpy(m_previousCombatMessage, " ");
+        strcpy(m_currentCombatMessage, " ");
+        m_previousCombatMessageExpiration = 0;
+        m_combatMessageExpiration = m_previousCombatMessageExpiration;
+        CombatMessage("", 1, 0, 0);
+    }
+}
 
 VA(0x00402a2b, 0x5d)
-void combatManager::CheckUpdateCombatMessages(void) {}
+void combatManager::CheckUpdateCombatMessages(void)
+{
+    if (m_combatMessagePending != 0 && m_combatMessageExpiration != 0 &&
+        m_combatMessageExpiration < KBTickCount())
+        CombatMessage("", 1, 0, 1);
+}
 
 VA(0x00402a88, 0x3f8)
-void combatManager::CombatMessage(char *, int, int, int) {}
+void combatManager::CombatMessage(char *message, int updateScreen, int retainPrevious,
+                                  int clear)
+{
+    char *newlinePtr;
+    char wrappedMessage[COMBAT_MESSAGE_WRAP_BUFFER_SIZE];
+    tag_message windowMessage;
+    int savedLimitToExtent;
+    int savedComputeExtent;
 
+    if (gbNoShowCombat != 0) {
+        if (retainPrevious != 0)
+            NoShowCombatLog(message);
+        return;
+    }
+    if (m_combatWindowOpen == 0)
+        return;
+    if (m_nonVisualCombat != 0)
+        return;
+
+    if (clear != 0) {
+        strcpy(m_previousCombatMessage, " ");
+        strcpy(m_currentCombatMessage, message);
+        m_previousCombatMessageExpiration = 0;
+        m_combatMessageExpiration = m_previousCombatMessageExpiration;
+        m_combatMessagePending = 0;
+    } else {
+        if (retainPrevious == 0) {
+            if (KBTickCount() < m_combatMessageExpiration) {
+                return;
+            } else {
+                strcpy(m_previousCombatMessage, "");
+                m_previousCombatMessageExpiration = 0;
+                m_combatMessageExpiration = m_previousCombatMessageExpiration;
+            }
+        } else {
+            if (m_combatMessageExpiration != 0)
+                strcpy(m_previousCombatMessage, m_currentCombatMessage);
+            else
+                strcpy(m_previousCombatMessage, " ");
+            m_previousCombatMessageExpiration = m_combatMessageExpiration;
+            m_combatMessageExpiration = KBTickCount() + COMBAT_MESSAGE_TIMEOUT;
+        }
+
+        newlinePtr = FindToken(message, '\n');
+        if (newlinePtr != 0) {
+            *newlinePtr = 0;
+            strcpy(wrappedMessage, message);
+            if (newlinePtr > message && newlinePtr[-1] == '.')
+                strcat(wrappedMessage, "  ");
+            else
+                strcat(wrappedMessage, " ");
+            strcat(wrappedMessage, newlinePtr + 1);
+            if (bigFont->LineLength(wrappedMessage, COMBAT_MESSAGE_LINE_WIDTH) <= 1) {
+                strcpy(m_currentCombatMessage, wrappedMessage);
+            } else {
+                strcpy(m_previousCombatMessage, message);
+                strcpy(m_currentCombatMessage, newlinePtr + 1);
+            }
+            *newlinePtr = '\n';
+        } else {
+            strcpy(m_currentCombatMessage, message);
+        }
+    }
+
+    windowMessage.type = COMBAT_MESSAGE_BROADCAST_EVENT;
+    windowMessage.field4 = COMBAT_MESSAGE_TEXT_ACTION;
+    windowMessage.field8 = COMBAT_MESSAGE_WIDGET_FIRST;
+    windowMessage.text = m_previousCombatMessage;
+    m_combatWindow->BroadcastMessage(windowMessage);
+    windowMessage.field8 = COMBAT_MESSAGE_WIDGET_SECOND;
+    windowMessage.text = m_currentCombatMessage;
+    m_combatWindow->BroadcastMessage(windowMessage);
+
+    savedComputeExtent = gbComputeExtent;
+    savedLimitToExtent = gbLimitToExtent;
+    gbLimitToExtent = 0;
+    gbComputeExtent = gbLimitToExtent;
+    m_combatWindow->DrawWindow(0, COMBAT_MESSAGE_DRAW_FIRST_WIDGET,
+                               COMBAT_MESSAGE_WIDGET_SECOND);
+    SaveCombatBorder();
+    if (updateScreen != 0)
+        gpWindowManager->UpdateScreenRegion(
+            COMBAT_MESSAGE_WINDOW_X, COMBAT_MESSAGE_WINDOW_Y,
+            COMBAT_MESSAGE_LINE_WIDTH, COMBAT_MESSAGE_WINDOW_HEIGHT);
+    gbComputeExtent = savedComputeExtent;
+    gbLimitToExtent = savedLimitToExtent;
+}
+
+// @early-stop
+// reloc-masked: all 0x3fe bytes match after masking 58 aligned COFF relocations,
+// including the jump table. String slots and local case labels delink under different names.
 VA(0x00402e80, 0x3fe)
-void combatManager::CombatMessage(int) {}
+void combatManager::CombatMessage(int messageType)
+{
+    army *currentArmyPtr;
+    army *targetArmy;
+    int actingMonsterType;
+    int targetMonsterType;
+
+    if (m_combatWindowOpen == 0)
+        return;
+    if (gbNoShowCombat != 0)
+        return;
+
+    currentArmyPtr = &m_armies[m_currentArmySide][m_currentArmyIndex];
+    actingMonsterType = currentArmyPtr->m_monsterType;
+    targetArmy = 0;
+    targetMonsterType = 0;
+    if (currentArmyPtr->m_targetSide >= 0 && currentArmyPtr->m_targetIndex >= 0) {
+        targetArmy = &m_armies[currentArmyPtr->m_targetSide][currentArmyPtr->m_targetIndex];
+        targetMonsterType = targetArmy->m_monsterType;
+    }
+
+    switch (messageType) {
+        case COMBAT_MESSAGE_COMMAND_DEFAULT:
+            if ((currentArmyPtr->m_flags & COMBAT_ARMY_FLAG_SHOOTER) != 0 &&
+                currentArmyPtr->m_shots == 0 && targetArmy != 0)
+                strcpy(gText, cCombatMessage[COMBAT_MESSAGE_TEXT_NO_SHOTS]);
+            else
+                strcpy(gText, cCombatMessage[COMBAT_MESSAGE_TEXT_DEFAULT]);
+            break;
+        case COMBAT_MESSAGE_COMMAND_MOVE:
+            sprintf(gText, cCombatMessage[COMBAT_MESSAGE_TEXT_MOVE],
+                    gArmyNames[actingMonsterType]);
+            break;
+        case COMBAT_MESSAGE_COMMAND_FLY:
+            sprintf(gText, cCombatMessage[COMBAT_MESSAGE_TEXT_FLY],
+                    gArmyNames[actingMonsterType]);
+            break;
+        case COMBAT_MESSAGE_COMMAND_ATTACK:
+            sprintf(gText, cCombatMessage[COMBAT_MESSAGE_TEXT_ATTACK],
+                    gArmyNames[targetMonsterType]);
+            break;
+        case COMBAT_MESSAGE_COMMAND_SHOOT:
+            sprintf(gText, cCombatMessage[COMBAT_MESSAGE_TEXT_SHOOT],
+                    gArmyNames[targetMonsterType],
+                    static_cast<int>(currentArmyPtr->m_shots));
+            break;
+        case COMBAT_MESSAGE_COMMAND_OPTIONS:
+            if (m_heroes[m_currentSide] != 0 && m_heroes[m_currentSide]->m_unknownE7 != 0)
+                strcpy(gText, cCombatMessage[COMBAT_MESSAGE_TEXT_CAPTAIN_OPTIONS]);
+            else
+                strcpy(gText, cCombatMessage[COMBAT_MESSAGE_TEXT_HERO_OPTIONS]);
+            break;
+        case COMBAT_MESSAGE_COMMAND_OPPOSING_OPTIONS:
+            if (m_heroes[1 - m_currentSide] != 0 &&
+                m_heroes[1 - m_currentSide]->m_unknownE7 != 0)
+                strcpy(gText, cCombatMessage[COMBAT_MESSAGE_TEXT_OPPOSING_CAPTAIN]);
+            else
+                strcpy(gText, cCombatMessage[COMBAT_MESSAGE_TEXT_OPPOSING_HERO]);
+            break;
+        case COMBAT_MESSAGE_COMMAND_VIEW_INFO:
+            if (m_selectedHex == COMBAT_BALLISTA_HEX) {
+                sprintf(gText, cCombatMessage[COMBAT_MESSAGE_TEXT_BALLISTA]);
+            } else {
+                actingMonsterType =
+                    m_armies[m_currentArmySide][m_hexCells[m_selectedHex].m_occupantIndex]
+                        .m_monsterType;
+                if (actingMonsterType >= 0)
+                    sprintf(gText, cCombatMessage[COMBAT_MESSAGE_TEXT_VIEW_INFO],
+                            gArmyNames[actingMonsterType]);
+                else
+                    sprintf(gText, "");
+            }
+            break;
+    }
+    CombatMessage(gText, 1, 0, 0);
+}
 
 VA(0x0040327e, 0x126)
-void combatManager::ResetLimitCreature(void) {}
+void combatManager::ResetLimitCreature(void)
+{
+    int side;
+    int armySlotIndex;
+
+    for (side = 0; side < COMBAT_SIDE_COUNT_DRAWING; side++) {
+        for (armySlotIndex = 0; armySlotIndex < COMBAT_ARMY_SLOT_COUNT_DRAWING;
+             armySlotIndex++) {
+            if ((m_armies[side][armySlotIndex].m_flags & COMBAT_ARMY_FLAG_MIRROR_IMAGE) != 0)
+                m_limitCreatureCount[side][armySlotIndex] = -1;
+            else
+                m_limitCreatureCount[side][armySlotIndex] = 0;
+        }
+    }
+    m_drawHero[0] = 0;
+    m_drawHero[1] = 0;
+    m_drawHeroOverlay[0] = 0;
+    m_drawHeroOverlay[1] = 0;
+    giMaxExtentY = 0;
+    giMaxExtentX = giMaxExtentY;
+    giMinExtentX = COMBAT_MAX_EXTENT_X;
+    giMinExtentY = COMBAT_MAX_EXTENT_Y;
+}
 
 VA(0x004033a4, 0x6a)
 void combatManager::UpdateCombatArea(void) {}

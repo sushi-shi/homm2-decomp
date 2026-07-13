@@ -126,8 +126,49 @@ enum {
     COMBAT_SMALL_VIEW_MODIFIER_RIGHT_X = 57,
     COMBAT_SMALL_VIEW_NEUTRAL_MORALE_X = 45,
     COMBAT_SMALL_VIEW_NEUTRAL_LUCK_X = 50,
-    COMBAT_ARMY_FLAG_SHOOTER = 4
+    COMBAT_ARMY_FLAG_SHOOTER = 4,
+    COMBAT_ARMY_FLAG_MIRROR_IMAGE = 0x10,
+    COMBAT_MESSAGE_LINE_SIZE = 120,
+    COMBAT_MESSAGE_WRAP_BUFFER_SIZE = 400,
+    COMBAT_MESSAGE_LOG_BUFFER_SIZE = 700,
+    COMBAT_MESSAGE_TIMEOUT = 2500,
+    COMBAT_MESSAGE_LINE_WIDTH = 474,
+    COMBAT_MESSAGE_WINDOW_X = 83,
+    COMBAT_MESSAGE_WINDOW_Y = 446,
+    COMBAT_MESSAGE_WINDOW_HEIGHT = 33,
+    COMBAT_MESSAGE_WIDGET_FIRST = 12,
+    COMBAT_MESSAGE_WIDGET_SECOND = 13,
+    COMBAT_MESSAGE_BROADCAST_EVENT = 0x200,
+    COMBAT_MESSAGE_TEXT_ACTION = 3,
+    COMBAT_MESSAGE_DRAW_FIRST_WIDGET = 10,
+    COMBAT_BALLISTA_HEX = 77
 };
+
+typedef enum CombatMessageCommand {
+    COMBAT_MESSAGE_COMMAND_DEFAULT = 0,
+    COMBAT_MESSAGE_COMMAND_MOVE = 1,
+    COMBAT_MESSAGE_COMMAND_FLY = 2,
+    COMBAT_MESSAGE_COMMAND_SHOOT = 3,
+    COMBAT_MESSAGE_COMMAND_OPTIONS = 4,
+    COMBAT_MESSAGE_COMMAND_VIEW_INFO = 5,
+    COMBAT_MESSAGE_COMMAND_ATTACK = 7,
+    COMBAT_MESSAGE_COMMAND_OPPOSING_OPTIONS = 13
+} CombatMessageCommand;
+
+typedef enum CombatMessageText {
+    COMBAT_MESSAGE_TEXT_DEFAULT = 0,
+    COMBAT_MESSAGE_TEXT_MOVE = 1,
+    COMBAT_MESSAGE_TEXT_FLY = 2,
+    COMBAT_MESSAGE_TEXT_ATTACK = 3,
+    COMBAT_MESSAGE_TEXT_SHOOT = 4,
+    COMBAT_MESSAGE_TEXT_HERO_OPTIONS = 5,
+    COMBAT_MESSAGE_TEXT_OPPOSING_HERO = 6,
+    COMBAT_MESSAGE_TEXT_VIEW_INFO = 7,
+    COMBAT_MESSAGE_TEXT_NO_SHOTS = 8,
+    COMBAT_MESSAGE_TEXT_CAPTAIN_OPTIONS = 9,
+    COMBAT_MESSAGE_TEXT_OPPOSING_CAPTAIN = 10,
+    COMBAT_MESSAGE_TEXT_BALLISTA = 11
+} CombatMessageText;
 
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class combatManager : public baseManager {
@@ -136,7 +177,10 @@ public:
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
     int    m_unknown36;  // +0x36
-    char _pad_0x3a[0x4da];
+    char _pad_0x3a[0x300];
+    char m_previousCombatMessage[COMBAT_MESSAGE_LINE_SIZE];  // +0x33a
+    char m_currentCombatMessage[COMBAT_MESSAGE_LINE_SIZE];  // +0x3b2
+    char _pad_0x42a[0xea];
     hexcell m_hexCells[117];  // +0x514
     char _pad_0x31de[0x14];
     int m_debugFormation;  // +0x31f2
@@ -175,7 +219,10 @@ public:
     struct SLimitData m_heroLimits[2];  // +0x33dd
     struct SLimitData m_heroOverlayLimits[2];  // +0x33fd
     struct SLimitData m_moatLimits[9];  // +0x341d
-    char _pad_0x34ad[0x92];
+    long m_previousCombatMessageExpiration;  // +0x34ad
+    long m_combatMessageExpiration;  // +0x34b1
+    int m_combatMessagePending;  // +0x34b5
+    char _pad_0x34b9[0x86];
     int m_heroCastSpell[2];  // +0x353f
     int m_armyCount[2];  // +0x3547
     class army m_armies[2][21];  // +0x354f
@@ -186,7 +233,9 @@ public:
     char _pad_0xf2b3[0x4];
     int m_limitCreature;  // +0xf2b7
     int m_limitCreatureHex;  // +0xf2bb
-    char _pad_0xf2bf[0x14];
+    char _pad_0xf2bf[0x4];
+    int m_selectedHex;  // +0xf2c3
+    char _pad_0xf2c7[0xc];
     struct SLimitData m_catapultLimits;  // +0xf2d3
     struct SLimitData m_gateLimits;  // +0xf2e3
     struct SLimitData m_upperWallLimits;  // +0xf2f3
@@ -196,7 +245,9 @@ public:
     int m_inCastleCombat;  // +0xf333
     char _pad_0xf337[0x20];
     int m_nonVisualCombat;  // +0xf357
-    char _pad_0xf35b[0x24];
+    char _pad_0xf35b[0xc];
+    class heroWindow *m_combatWindow;  // +0xf367
+    char _pad_0xf36b[0x14];
     int m_limitCreatureCount[2][20];  // +0xf37f
     int m_drawHero[2];  // +0xf41f
     int m_drawHeroOverlay[2];  // +0xf427
