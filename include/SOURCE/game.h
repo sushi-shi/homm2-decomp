@@ -132,7 +132,7 @@ public:
     short  field_0x0;  // +0x00
     unsigned char m_campaignType;  // +0x02
     char   field_0x3;  // +0x03
-    unsigned char m_campaignScenario;  // +0x04
+    signed char m_campaignScenario;  // +0x04
     char _pad_0x5[0xe];
     char   field_0x13;  // +0x13
     char _pad_0x14[0x6a];
@@ -199,7 +199,7 @@ public:
     char _pad_0x2cf[0x6];
     short  field_0x2d5;  // +0x2d5
     short  field_0x2d7;  // +0x2d7
-    short  field_0x2d9;  // +0x2d9
+    unsigned short m_victorySideThreshold;  // +0x2d9
     char _pad_0x2db[0x170];
     char   field_0x44b;  // +0x44b
     char   field_0x44c;  // +0x44c
