@@ -225,7 +225,7 @@ void philAI::CheckForCreatureUpgrades(void) {
 }
 
 inline townSlot *GetCastleSlot(int id) {
-    return &gpGame->m_castleRecs[id];
+    return reinterpret_cast<townSlot *>(&gpGame->m_castleRecs[id]);
 }
 
 // @early-stop

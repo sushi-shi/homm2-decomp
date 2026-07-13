@@ -496,10 +496,9 @@ movement_done:
         DemobilizeCurrHero();
         gpMouseManager->SetPointer(0);
         eventCellState = GetCell(
-            reinterpret_cast<town *>(&gpGame->m_castleRecs[gpCurPlayer->CurrentTown()])->m_x,
-            reinterpret_cast<town *>(&gpGame->m_castleRecs[gpCurPlayer->CurrentTown()])->m_y);
-        reinterpret_cast<town *>(
-            &gpGame->m_castleRecs[gpCurPlayer->CurrentTown()])->View(0);
+            gpGame->m_castleRecs[gpCurPlayer->CurrentTown()].m_x,
+            gpGame->m_castleRecs[gpCurPlayer->CurrentTown()].m_y);
+        gpGame->m_castleRecs[gpCurPlayer->CurrentTown()].View(0);
         eventCellState = 0;
         break;
 
@@ -5007,10 +5006,10 @@ void advManager::TownGate(int spellId)
              ++townListIndex) {
             distance0 =
                 abs(gpGame->m_castleRecs[
-                        gpCurPlayer->m_townIds[townListIndex]].y -
+                        gpCurPlayer->m_townIds[townListIndex]].m_y -
                     targetHero->m_y) +
                 abs(gpGame->m_castleRecs[
-                        gpCurPlayer->m_townIds[townListIndex]].x -
+                        gpCurPlayer->m_townIds[townListIndex]].m_x -
                     targetHero->m_x);
             if (distance0 < nearestDistance) {
                 nearestDistance = distance0;
@@ -5020,7 +5019,7 @@ void advManager::TownGate(int spellId)
     }
 
     if (gpGame->m_castleRecs[
-            gpCurPlayer->m_townIds[selectedTownIndex]].occupyingHeroId !=
+            gpCurPlayer->m_townIds[selectedTownIndex]].m_occupyingHeroId !=
         ADVMGR_INVALID_HERO) {
         NormalDialog("Nearest town occupied.  Spell Failed!!!",
                      ADVMGR_OPTION_DIALOG_MESSAGE,
@@ -5036,16 +5035,16 @@ void advManager::TownGate(int spellId)
     TeleportTo(
         targetHero,
         gpGame->m_castleRecs[
-            gpCurPlayer->m_townIds[selectedTownIndex]].x,
+            gpCurPlayer->m_townIds[selectedTownIndex]].m_x,
         gpGame->m_castleRecs[
-            gpCurPlayer->m_townIds[selectedTownIndex]].y,
+            gpCurPlayer->m_townIds[selectedTownIndex]].m_y,
         0, 0);
     targetHero->UseSpell(spellId);
     gpGame->m_castleRecs[
-        gpCurPlayer->m_townIds[selectedTownIndex]].occupyingHeroId =
+        gpCurPlayer->m_townIds[selectedTownIndex]].m_occupyingHeroId =
         targetHero->m_id;
-    reinterpret_cast<town *>(&gpGame->m_castleRecs[
-        gpCurPlayer->m_townIds[selectedTownIndex]])->GiveSpells(0);
+    gpGame->m_castleRecs[
+        gpCurPlayer->m_townIds[selectedTownIndex]].GiveSpells(0);
     targetHero->m_locationType = HERO_TOWN_LOCATION;
     targetHero->m_occupiedTown =
         gpCurPlayer->m_townIds[selectedTownIndex];

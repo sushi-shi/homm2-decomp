@@ -991,8 +991,8 @@ void game::GiveTroopsToNeutralTown(int townId)
     int cnt;
     int divisor;
 
-    if ((m_castleRecs[townId].x > 0 || m_castleRecs[townId].y > 0) &&
-        m_castleRecs[townId].owner < 0) {
+    if ((m_castleRecs[townId].m_x > 0 || m_castleRecs[townId].m_y > 0) &&
+        m_castleRecs[townId].m_owner < 0) {
         random = Random(1, 15);
         divisor = giCurTurn / 10;
         if (divisor != 0)
@@ -1016,7 +1016,7 @@ void game::GiveTroopsToNeutralTown(int townId)
         }
 
         cnt += giCurTurn / 20;
-        switch (m_castleRecs[townId].race + jb) {
+        switch (m_castleRecs[townId].m_type + jb) {
         case 10: idx = 0; break;
         case 20: idx = 1; break;
         case 30: idx = 3; break;
@@ -1048,7 +1048,7 @@ void game::GiveTroopsToNeutralTown(int townId)
         case 45: idx = 52; break;
         case 55: idx = 54; break;
         }
-        GiveArmy(reinterpret_cast<armyGroup *>(m_castleRecs[townId].army), idx, cnt, -1);
+        GiveArmy(&m_castleRecs[townId].m_army, idx, cnt, -1);
     }
 }
 
@@ -1194,8 +1194,8 @@ void game::NewMap(char *filename)
             for (pass27 = 0; pass27 < 2; pass27++) {
                 for (townIndex9 = 0; townIndex9 < m_players[player2].townCount; townIndex9++) {
                     if (selectedTown14 == -1 &&
-                        m_castleRecs[(m_players + player2)->towns[townIndex9]].occupyingHeroId == -1 &&
-                        ((m_castleRecs[(m_players + player2)->towns[townIndex9]].buildings & 0x40) != 0 ||
+                        m_castleRecs[(m_players + player2)->towns[townIndex9]].m_occupyingHeroId == -1 &&
+                        ((m_castleRecs[(m_players + player2)->towns[townIndex9]].m_buildings & 0x40) != 0 ||
                          pass27 == 1))
                         selectedTown14 = townIndex9;
                 }
@@ -1204,16 +1204,16 @@ void game::NewMap(char *filename)
         if (selectedTown14 != -1) {
             m_players[player2].heroes[m_players[player2].heroCount] =
                 static_cast<signed char>(GetNewHeroId(
-                    player2, m_castleRecs[m_players[player2].towns[selectedTown14]].race, 0));
+                    player2, m_castleRecs[m_players[player2].towns[selectedTown14]].m_type, 0));
             m_availableHeroes[m_players[player2].heroes[m_players[player2].heroCount]] =
                 static_cast<signed char>(player2);
             m_heroRecs[m_players[player2].heroes[m_players[player2].heroCount]].m_owner =
                 static_cast<signed char>(player2);
             m_heroRecs[m_players[player2].heroes[m_players[player2].heroCount]].m_x =
-                m_castleRecs[m_players[player2].towns[selectedTown14]].x;
+                m_castleRecs[m_players[player2].towns[selectedTown14]].m_x;
             m_heroRecs[m_players[player2].heroes[m_players[player2].heroCount]].m_y =
-                m_castleRecs[m_players[player2].towns[selectedTown14]].y;
-            m_castleRecs[m_players[player2].towns[selectedTown14]].occupyingHeroId =
+                m_castleRecs[m_players[player2].towns[selectedTown14]].m_y;
+            m_castleRecs[m_players[player2].towns[selectedTown14]].m_occupyingHeroId =
                 m_players[player2].heroes[m_players[player2].heroCount];
             SetVisibility(m_heroRecs[m_players[player2].heroes[m_players[player2].heroCount]].m_x,
                           m_heroRecs[m_players[player2].heroes[m_players[player2].heroCount]].m_y,
@@ -1416,7 +1416,7 @@ secondHero:
                             gcColorToSetupPos[m_players[player2].color] + 0x459];
                     } else {
                         if (!!m_players[player2].townCount) {
-                            heroClass5 = gpGame->m_castleRecs[m_players[player2].Town(0)].race;
+                            heroClass5 = gpGame->m_castleRecs[m_players[player2].Town(0)].m_type;
                         } else if (!!m_players[player2].heroCount) {
                             heroClass5 = gpGame->m_heroRecs[m_players[player2].Hero(0)].m_cursorType;
                         }
@@ -1441,7 +1441,7 @@ secondHero:
 
 inline townSlot *GetCastleSlot(game *instance, int index)
 {
-    return &instance->m_castleRecs[index];
+    return reinterpret_cast<townSlot *>(&instance->m_castleRecs[index]);
 }
 
 // @early-stop
@@ -1936,14 +1936,14 @@ int game::LoadMap(char *filename)
         _read(file, row, 1);
         _read(file, type, 1);
         if (static_cast<unsigned char>(column[0]) != 0xff) {
-            m_castleRecs[i].unknown38 = 1;
-            m_castleRecs[i].x = static_cast<unsigned char>(column[0]);
-            m_castleRecs[i].y = static_cast<unsigned char>(row[0]);
-            m_castleRecs[i].race = static_cast<signed char>(type[0] & 0x7f);
+            m_castleRecs[i].m_unknown38 = 1;
+            m_castleRecs[i].m_x = static_cast<unsigned char>(column[0]);
+            m_castleRecs[i].m_y = static_cast<unsigned char>(row[0]);
+            m_castleRecs[i].m_type = static_cast<signed char>(type[0] & 0x7f);
             if (type[0] < 0)
-                m_castleRecs[i].buildings |= 0x40;
+                m_castleRecs[i].m_buildings |= 0x40;
             else
-                m_castleRecs[i].buildings |= 0x20;
+                m_castleRecs[i].m_buildings |= 0x20;
         }
     }
 
@@ -2001,7 +2001,7 @@ void game::ClaimTown(int townId, int player, int suppressVisibility)
 
     if (!gbInNewGameSetup)
         SendMapChange(7, static_cast<signed char>(townId), 0, 0, player, 0, 0);
-    townRec = &m_castleRecs[townId];
+    townRec = reinterpret_cast<townSlot *>(&m_castleRecs[townId]);
     if (townRec->owner == player)
         return;
     townRec->unknown38 = 0;
@@ -2011,23 +2011,23 @@ void game::ClaimTown(int townId, int player, int suppressVisibility)
         townRec->army[i] = -1;
         *reinterpret_cast<short *>(townRec->army + 5 + i * 2) = 0;
     }
-    m_castleRecs[townId].unknown55 = m_castleRecs[townId].owner == -1 ? 2 : 0;
-    m_castleRecs[townId].owner = static_cast<signed char>(player);
+    m_castleRecs[townId].m_unknown55 = m_castleRecs[townId].m_owner == -1 ? 2 : 0;
+    m_castleRecs[townId].m_owner = static_cast<signed char>(player);
     m_castleOwners[townId] = static_cast<signed char>(player);
     m_players[player].towns[m_players[player].townCount] = static_cast<signed char>(townId);
     m_players[player].townCount++;
 
-    cell = m_worldMap.GetCell(m_castleRecs[townId].x - 1, m_castleRecs[townId].y);
-    m_worldMap.ChangeTilesetIndex(cell, m_castleRecs[townId].x - 1,
-                                 m_castleRecs[townId].y, 14,
+    cell = m_worldMap.GetCell(m_castleRecs[townId].m_x - 1, m_castleRecs[townId].m_y);
+    m_worldMap.ChangeTilesetIndex(cell, m_castleRecs[townId].m_x - 1,
+                                 m_castleRecs[townId].m_y, 14,
                                  m_players[static_cast<signed char>(player)].color * 2, 1, -1);
-    cell = m_worldMap.GetCell(m_castleRecs[townId].x + 1, m_castleRecs[townId].y);
-    m_worldMap.ChangeTilesetIndex(cell, m_castleRecs[townId].x + 1,
-                                 m_castleRecs[townId].y, 14,
+    cell = m_worldMap.GetCell(m_castleRecs[townId].m_x + 1, m_castleRecs[townId].m_y);
+    m_worldMap.ChangeTilesetIndex(cell, m_castleRecs[townId].m_x + 1,
+                                 m_castleRecs[townId].m_y, 14,
                                  m_players[static_cast<signed char>(player)].color * 2 + 1, 1, -1);
     if (suppressVisibility != 0)
         return;
-    SetVisibility(m_castleRecs[townId].x, m_castleRecs[townId].y,
+    SetVisibility(m_castleRecs[townId].m_x, m_castleRecs[townId].m_y,
                   player, giVisRangeTown);
     CheckEndGame(0, 0);
 }
@@ -2424,7 +2424,7 @@ int ViewSpecialHandler(tag_message &msg)
 VA(0x0047a649, 0xc86)
 void game::ViewArmy(int x, int y, int monsterType, int numTroops, town *castle,
                     int disableUpgrade, int facing, int quickView, hero *theHero,
-                    army *theArmy, armyGroup *theGroup, int groupIndex)
+                    class army *theArmy, armyGroup *theGroup, int groupIndex)
 {
     short baseX7 = 86;
     short quickBaseY3 = 164;
@@ -2982,15 +2982,15 @@ int game::ComputeDailyGold(int player)
     }
 
     for (index = 0; index < 72; index++) {
-        if (m_castleRecs[index].owner == player) {
-            if (m_castleRecs[index].buildings & 0x20)
+        if (m_castleRecs[index].m_owner == player) {
+            if (m_castleRecs[index].m_buildings & 0x20)
                 gold += 250;
             else
                 gold += 1000;
-            if (m_castleRecs[index].buildings & 0x80)
+            if (m_castleRecs[index].m_buildings & 0x80)
                 gold += 250;
-            if (m_castleRecs[index].race == 3 &&
-                (m_castleRecs[index].buildings & 0x2000))
+            if (m_castleRecs[index].m_type == 3 &&
+                (m_castleRecs[index].m_buildings & 0x2000))
                 gold += 500;
         }
     }
@@ -3072,7 +3072,7 @@ void game::PerDay(void)
     }
 
     for (player = 0; player < GAME_TOWN_COUNT; player++)
-        m_castleRecs[player].unknown55++;
+        m_castleRecs[player].m_unknown55++;
 
     for (player = 0; player < m_playerCount; player++) {
         m_players[player].resources[RES_SULFUR] +=
@@ -3678,7 +3678,7 @@ void game::RandomizeTown(int x, int y, int)
                   RANDOM_TOWN_OVERLAY_SOURCE_FIRST, RANDOM_TOWN_OVERLAY_SOURCE_LAST,
                   RANDOM_TOWN_OVERLAY_TILESET, race0 << RANDOM_TOWN_RACE_FRAME_SHIFT,
                   RANDOM_TOWN_SECOND_TRIGGER, RANDOM_TOWN_TRIGGER);
-    m_castleRecs[townId0].race = static_cast<signed char>(race0);
+    m_castleRecs[townId0].m_type = static_cast<signed char>(race0);
 }
 
 // @early-stop
@@ -4254,7 +4254,7 @@ int game::ExperienceValueOfStack(armyGroup *group, hero *h)
 }
 
 VA(0x00480ff9, 0x126)
-int game::GetLuck(hero *h, army *, town *castle)
+int game::GetLuck(hero *h, class army *, town *castle)
 {
     int luck;
     if (h == 0)
