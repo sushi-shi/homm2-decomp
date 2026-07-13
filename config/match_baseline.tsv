@@ -484,7 +484,7 @@ SOURCE/ADVMGR	?GetMobilityFrame@@YIHH@Z	100.0000	0348fb7b62d9
 SOURCE/ADVMGR	?GetSoundId@advManager@@QAEHHH@Z	99.7267	9b04bd43ddbf
 SOURCE/ADVMGR	?HeroQuickView@advManager@@QAEXHHHH@Z	99.8681	4c83bebba13e
 SOURCE/ADVMGR	?HideRoute@advManager@@QAEXHHH@Z	19.9692	9906af14e238
-SOURCE/ADVMGR	?InsertSound@advManager@@QAEXHHHH@Z	98.7050	5460087ac4fd
+SOURCE/ADVMGR	?InsertSound@advManager@@QAEXHHHH@Z	100.0000	5460087ac4fd
 SOURCE/ADVMGR	?IsCrystalBallInEffect@advManager@@QAEHHHH@Z	21.5077	0a516f0d991c
 SOURCE/ADVMGR	?LoadRemote@advManager@@QAEXXZ	12.3810	486a6fc160e1
 SOURCE/ADVMGR	?Main@advManager@@UAEHAAUtag_message@@@Z	96.2511	a7bc11d985ae
@@ -508,13 +508,13 @@ SOURCE/ADVMGR	?SetEnvironmentOrigin@advManager@@QAEXHHH@Z	100.0000	9b743f467ee3
 SOURCE/ADVMGR	?SetHeroContext@advManager@@QAEXHH@Z	5.2339	5cd14b503655
 SOURCE/ADVMGR	?SetInitialMapOrigin@advManager@@QAEXXZ	7.1319	d7bc8e4641e5
 SOURCE/ADVMGR	?SetTownContext@advManager@@QAEXH@Z	8.5395	81e5da9a35b0
-SOURCE/ADVMGR	?ShowRoute@advManager@@QAEXHHH@Z	4.1603	14405fc5f38d
+SOURCE/ADVMGR	?ShowRoute@advManager@@QAEXHHH@Z	100.0000	86591e92723f
 SOURCE/ADVMGR	?StopOnTrigger@@YIEPAVmapCell@@@Z	100.0000	b42be9cad419
-SOURCE/ADVMGR	?SummonBoat@advManager@@QAEXXZ	99.4259	81256383fe41
+SOURCE/ADVMGR	?SummonBoat@advManager@@QAEXXZ	99.4259	d72a068bdbde
 SOURCE/ADVMGR	?SystemOptions@advManager@@QAEXXZ	12.8515	bb7f7f1f9970
 SOURCE/ADVMGR	?SystemOptionsHandler@@YIHAAUtag_message@@@Z	99.9081	512a186f2332
 SOURCE/ADVMGR	?TeleportTo@advManager@@QAEXPAVhero@@HHHH@Z	98.7456	c58a33cd4d35
-SOURCE/ADVMGR	?TownGate@advManager@@QAEXH@Z	99.9855	1484a163d6ed
+SOURCE/ADVMGR	?TownGate@advManager@@QAEXH@Z	99.9855	bdfa4ee069e7
 SOURCE/ADVMGR	?TownPortalHandler@@YIHAAUtag_message@@@Z	100.0000	f1e7b91bb0b5
 SOURCE/ADVMGR	?TownQuickView@advManager@@QAEXHHHH@Z	99.9918	b4532cc6b04c
 SOURCE/ADVMGR	?TrimLoopingSounds@advManager@@QAEXH@Z	11.6486	27f649ba3eaa
