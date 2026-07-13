@@ -19,7 +19,7 @@ VA(0x004c7a20, 0x67)
 icon::icon(unsigned long int id) : resource(1, id, 1, 0)
 {
     gpResourceManager->PointToFile(id);
-    field_0x10 = gpResourceManager->ReadWord();
+    m_frameCount = gpResourceManager->ReadWord();
     unsigned int len = gpResourceManager->ReadLong();
     m_data = static_cast<char *>(BaseAlloc(len, __FILE__, __LINE__));
     gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(m_data), len);

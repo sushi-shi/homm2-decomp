@@ -15,9 +15,11 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     char   m_animationState;  // +0x00
-    char _pad_0x1[0x1];
-    char   m_animationDelay;  // +0x02
-    char _pad_0x3[0x3];
+    char   m_animationCycle;  // +0x01
+    char   m_pendingAnimationSequence;  // +0x02
+    signed char m_effectAnimationStart;  // +0x03
+    signed char m_effectAnimationEnd;  // +0x04
+    signed char m_effectAnimationLength;  // +0x05
     int    m_drawState;  // +0x06
     struct SLimitData m_creatureLimits;  // +0x0a
     struct SLimitData m_quantityLimits;  // +0x1a
@@ -30,10 +32,10 @@ public:
     int    m_attackDirection;  // +0x5a
     int    field_0x5e;  // +0x5e
     int    m_moveTargetHex;  // +0x62
-    int    field_0x66;  // +0x66
-    int    field_0x6a;  // +0x6a
-    int    field_0x6e;  // +0x6e
-    int    field_0x72;  // +0x72
+    int    m_drawSpellEffect;  // +0x66
+    int    m_mirrorSourceIndex;  // +0x6a
+    int    m_mirrorImageIndex;  // +0x6e
+    int    m_roundCounter;  // +0x72
     int    m_monsterType;  // +0x76
     int    m_hex;  // +0x7a
     int    m_animationSequence;  // +0x7e
@@ -53,21 +55,21 @@ public:
     int    m_luckOutcome;  // +0xb6
     struct tag_monsterInfo m_monster;  // +0xba
     short  field_0xd4;  // +0xd4
-    int    m_animationValue1;  // +0xd6
-    int    m_animationValue2;  // +0xda
-    int    m_animationValue3;  // +0xde
+    int    m_damagePending;  // +0xd6
+    int    m_killPending;  // +0xda
+    int    m_deathPending;  // +0xde
     int    m_spellEffect;  // +0xe2
     int    m_side;  // +0xe6
     int    m_index;  // +0xea
     int    m_lastAnimationTime;  // +0xee
     int    m_morale;  // +0xf2
     int    m_luck;  // +0xf6
-    int    field_0xfa;  // +0xfa
+    int    m_spellEffectYOffset;  // +0xfa
     int    m_yOffset;  // +0xfe
     int    m_xOffset;  // +0x102
     int    m_spellCount;  // +0x106
     unsigned char m_spellInfluence[ARMY_SPELL_INFLUENCE_COUNT];  // +0x10a
-    char _pad_0x119[0x4];
+    int m_effectAnimationStarted;  // +0x119
     int    m_drawEnabled;  // +0x11d
     int    m_hitByCreature;  // +0x121
     signed char *m_palette;  // +0x125

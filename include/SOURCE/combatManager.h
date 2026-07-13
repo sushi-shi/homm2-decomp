@@ -326,7 +326,8 @@ public:
     int m_spellPower[2];  // +0x3389
     class armyGroup *m_armyGroups[2];  // +0x3391
     int m_mouseGridHex;  // +0x3399
-    char _pad_0x339d[0x8];
+    unsigned char m_deathFlags[4];  // +0x339d
+    char _pad_0x33a1[0x4];
     int m_heroAnimationState[2];  // +0x33a5
     int m_heroAnimationFrame[2];  // +0x33ad
     int m_heroSpriteIndex[2];  // +0x33b5
@@ -383,7 +384,9 @@ public:
     int m_smallViewLastY[2];  // +0xf55b
     int m_smallViewWidth[2];  // +0xf563
     int m_smallViewHeight[2];  // +0xf56b
-    char _pad_0xf573[0x2d];
+    char _pad_0xf573[0x4];
+    unsigned char m_removedArmies[2][20];  // +0xf577
+    unsigned char m_removedArmyPresent;  // +0xf59f
     char m_battlefieldBackgroundName[13];  // +0xf5a0
     char _pad_0xf5ad[0x2ca];
     // --- constructors ---
