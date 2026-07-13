@@ -16,7 +16,7 @@ public:
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     char   m_animationState;  // +0x00
     char _pad_0x1[0x1];
-    char   field_0x2;  // +0x02
+    char   m_animationDelay;  // +0x02
     char _pad_0x3[0x3];
     int    m_drawState;  // +0x06
     struct SLimitData m_creatureLimits;  // +0x0a
@@ -27,9 +27,9 @@ public:
     int    m_showQuantity;  // +0x4e
     int    m_targetSide;  // +0x52
     int    m_targetIndex;  // +0x56
-    int    field_0x5a;  // +0x5a
+    int    m_attackDirection;  // +0x5a
     int    field_0x5e;  // +0x5e
-    int    field_0x62;  // +0x62
+    int    m_moveTargetHex;  // +0x62
     int    field_0x66;  // +0x66
     int    field_0x6a;  // +0x6a
     int    field_0x6e;  // +0x6e
@@ -47,10 +47,10 @@ public:
     int    field_0x9e;  // +0x9e
     int    m_hitPointsLost;  // +0xa2
     int    field_0xa6;  // +0xa6
-    int    field_0xaa;  // +0xaa
+    int    m_damagePenalty;  // +0xaa
     int    m_speed;  // +0xae
     int    m_walkDuration;  // +0xb2
-    int    field_0xb6;  // +0xb6
+    int    m_luckOutcome;  // +0xb6
     struct tag_monsterInfo m_monster;  // +0xba
     short  field_0xd4;  // +0xd4
     int    m_animationValue1;  // +0xd6
@@ -69,7 +69,7 @@ public:
     unsigned char m_spellInfluence[ARMY_SPELL_INFLUENCE_COUNT];  // +0x10a
     char _pad_0x119[0x4];
     int    m_drawEnabled;  // +0x11d
-    char _pad_0x121[0x4];
+    int    m_hitByCreature;  // +0x121
     signed char *m_palette;  // +0x125
     struct SMonFrameInfo m_frameInfo;  // +0x129
     class icon *m_creatureIcon;  // +0x45e
