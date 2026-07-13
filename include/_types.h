@@ -91,7 +91,7 @@ struct tag_monsterInfo {
     signed char unknown06;
     signed char growth;
     unsigned short hitPoints;
-    signed char unknown0a;
+    signed char race;
     signed char speed;
     signed char attack;
     signed char defense;

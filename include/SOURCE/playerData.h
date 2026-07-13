@@ -12,7 +12,7 @@ public:
     signed char m_currentHero;  // +0x02
     signed char m_heroLocatorPage;  // +0x03
     signed char m_heroIds[8];  // +0x04
-    char m_unknown0c[2];  // +0x0c
+    signed char m_availableHeroIds[2];  // +0x0c
     signed char m_unknown0e;  // +0x0e
     int m_unknown0f;  // +0x0f
     signed char m_cheatValue;  // +0x13
@@ -42,6 +42,7 @@ public:
     signed char CurrentHero(void) { return m_currentHero; }
     signed char CurrentTown(void) { return m_currentTown; }
     signed char TownId(int index) { return m_townIds[index]; }
+    signed char AvailableHeroId(int index) { return m_availableHeroIds[index]; }
 };
 #pragma pack(pop)
 SIZE(playerData, 0x11b);

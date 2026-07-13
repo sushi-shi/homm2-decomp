@@ -22,10 +22,12 @@
 #include <SOURCE/advManager.h>
 #include <SOURCE/town.h>
 #include <SOURCE/game.h>
+#include <SOURCE/GAME.h>
 #include <SOURCE/playerData.h>
 #include <SOURCE/searchArray.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/EVENTS.h>
+#include <SOURCE/CURSOR.h>
 #include <EDITOR/mapcell.h>
 #include <BASE/mouseManager.h>
 
@@ -3665,10 +3667,135 @@ void philAI::BuildBuilding(town *t, int building) {
 }
 
 VA(0x004428b8, 0x328)
-void philAI::BuildHero(class town *, int) {}
+void philAI::BuildHero(town *townPtr, int availableHeroIndex) {
+    int townX37;
+    int townY9;
+    hero *newHero6;
+
+    sprintf(gText, "Player %d built hero in town %d.", giCurPlayer,
+            townPtr->m_id);
+    LogStr(gText);
+    if (giDebugLevel >= AI_PURCHASE_DEBUG_LEVEL) {
+        AiPrint(gText);
+        DelayMilli(AI_PURCHASE_DEBUG_DELAY);
+    }
+
+    gpCurPlayer->m_resources[RES_GOLD] -= gHeroGoldCost;
+    gpCurPlayer->m_heroIds[gpCurPlayer->m_heroCount] =
+        gpCurPlayer->m_availableHeroIds[availableHeroIndex];
+    gpCurPlayer->m_heroCount++;
+
+    townX37 = townPtr->m_x;
+    townY9 = townPtr->m_y;
+    newHero6 = &gpGame->m_heroRecs[
+        gpCurPlayer->AvailableHeroId(availableHeroIndex)];
+    gpGame->SetRandomHeroArmies(static_cast<unsigned char>(newHero6->m_id), 1);
+    newHero6->m_lastHeroInteractionTurn = AI_HERO_BUILD_COORDINATE_UNSET;
+    newHero6->field_0x7 = AI_HERO_BUILD_COORDINATE_UNSET;
+    newHero6->m_owner = static_cast<char>(giCurPlayer);
+    newHero6->m_x = townX37;
+    newHero6->m_y = townY9;
+    newHero6->m_eventFlags = 0;
+    newHero6->m_direction = AI_HERO_BUILD_DIRECTION;
+    newHero6->m_remainingMobility = newHero6->CalcMobility();
+    newHero6->m_mobility = newHero6->m_remainingMobility;
+
+    newHero6->m_locationType =
+        gpGame->m_worldMap.GetCell(townX37, townY9)->triggerType;
+    newHero6->m_occupiedTown =
+        gpGame->m_worldMap.GetCell(townX37, townY9)->w4hi;
+    gpGame->m_worldMap.GetCell(townX37, townY9)->triggerType = AI_OBJECT_HERO;
+    gpGame->m_worldMap.GetCell(townX37, townY9)->w4hi =
+        gpCurPlayer->m_availableHeroIds[availableHeroIndex];
+    gpGame->m_availableHeroes[static_cast<unsigned char>(newHero6->m_id)] =
+        townPtr->m_owner;
+
+    CheckValidAvailableHeroes();
+    SendMapChange(AI_HERO_BUILD_MAP_CHANGE, newHero6->m_id,
+                  static_cast<unsigned char>(newHero6->m_x),
+                  static_cast<unsigned char>(newHero6->m_y),
+                  AI_HERO_BUILD_MAP_CHANGE_VALUE, 0, 0);
+    townPtr->m_occupyingHeroId = newHero6->m_id;
+    townPtr->GiveSpells(0);
+
+    gpCurPlayer->m_availableHeroIds[availableHeroIndex] = static_cast<signed char>(
+        gpGame->GetNewHeroId(giCurPlayer, AI_TROOP_EMPTY_SLOT, 1));
+    gpGame->m_availableHeroes[
+        gpCurPlayer->m_availableHeroIds[availableHeroIndex]] = AI_HERO_AVAILABLE_FLAG;
+    bHeroBuiltThisTurn = 1;
+    HeroInteractionAtTown(newHero6, townPtr, 0, &iDummy);
+    ShowStatus();
+}
 
 VA(0x00442be0, 0x2cd)
-void philAI::BuildCreature(class town *, int, int) {}
+void philAI::BuildCreature(town *townPtr, int dwelling, int purchaseCount) {
+    int canJoin6;
+    int weakestSlot8;
+    int armyIndex4;
+    int creatureType13;
+    float stackValue9;
+    int monsterCosts10[AI_PURCHASE_RESOURCE_COUNT];
+    float weakestValue5;
+
+    sprintf(gText, "Player %d built %d %s in town %d.", giCurPlayer,
+            purchaseCount,
+            GetMonsterName(gDwellingType[townPtr->m_type][dwelling]),
+            townPtr->m_id);
+    LogStr(gText);
+    if (giDebugLevel >= AI_PURCHASE_DEBUG_LEVEL) {
+        AiPrint(gText);
+        DelayMilli(AI_PURCHASE_DEBUG_DELAY);
+    }
+
+    creatureType13 = gDwellingType[townPtr->m_type][dwelling];
+    canJoin6 = 0;
+    for (armyIndex4 = 0; armyIndex4 < AI_TOWN_ARMY_SLOTS; armyIndex4++) {
+        if (townPtr->m_army.m_creatureTypes[armyIndex4] == AI_TROOP_EMPTY_SLOT ||
+            townPtr->m_army.m_creatureTypes[armyIndex4] == creatureType13) {
+            canJoin6 = 1;
+        }
+    }
+
+    weakestValue5 = AI_CREATURE_SELECTION_WORST_VALUE;
+    weakestSlot8 = AI_TROOP_EMPTY_SLOT;
+    if (canJoin6 == 0) {
+        for (armyIndex4 = 0; armyIndex4 < AI_TOWN_ARMY_SLOTS; armyIndex4++) {
+            stackValue9 = static_cast<float>(
+                gMonsterDatabase[townPtr->m_army.m_creatureTypes[armyIndex4]].fightValue *
+                townPtr->m_army.m_quantities[armyIndex4]);
+            if (gMonsterDatabase[townPtr->m_army.m_creatureTypes[armyIndex4]].race !=
+                townPtr->m_type) {
+                stackValue9 = static_cast<float>(
+                    stackValue9 * AI_CREATURE_OFF_RACE_FACTOR);
+            }
+            stackValue9 = static_cast<float>(
+                (gMonsterDatabase[townPtr->m_army.m_creatureTypes[armyIndex4]].fightValue +
+                 AI_CREATURE_SELECTION_BASE_VALUE) /
+                AI_CREATURE_SELECTION_BASE_VALUE * stackValue9);
+            if (stackValue9 < weakestValue5) {
+                weakestValue5 = stackValue9;
+                weakestSlot8 = armyIndex4;
+            }
+        }
+        if (weakestSlot8 == AI_TROOP_EMPTY_SLOT)
+            weakestSlot8 = 0;
+
+        gpCurPlayer->m_resources[RES_GOLD] +=
+            gMonsterDatabase[townPtr->m_army.m_creatureTypes[weakestSlot8]].cost *
+            townPtr->m_army.m_quantities[weakestSlot8];
+        townPtr->m_army.m_creatureTypes[weakestSlot8] = AI_TROOP_EMPTY_SLOT;
+        townPtr->m_army.m_quantities[weakestSlot8] = 0;
+    }
+
+    GetMonsterCost(creatureType13, monsterCosts10);
+    for (armyIndex4 = 0; armyIndex4 < AI_PURCHASE_RESOURCE_COUNT; armyIndex4++) {
+        gpCurPlayer->m_resources[armyIndex4] -=
+            monsterCosts10[armyIndex4] * purchaseCount;
+    }
+    townPtr->m_garrison[dwelling] -= purchaseCount;
+    townPtr->m_army.Add(creatureType13, purchaseCount, AI_TROOP_EMPTY_SLOT);
+    ShowStatus();
+}
 
 VA(0x00442ead, 0x15a)
 int philAI::CanBuyBHC(BHC &bhc) {
