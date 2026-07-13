@@ -14,6 +14,7 @@
 #include <BASE/Misc.h>
 #include <SOURCE/CURSOR.h>
 #include <SOURCE/FINDPATH.h>
+#include <SOURCE/HERO.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/REMOTE.h>
 #include <io.h>
@@ -2370,8 +2371,49 @@ int ViewSpellsHandler(tag_message &msg)
     return 1;
 }
 
+// @early-stop
+// Manual relocation audit finds 35 sites in both objects. This body is 0x17d versus
+// retail's 0x17c solely because the commutative hover equality loads msg first into eax
+// (15 bytes) instead of the window manager first into eax (14 bytes); all later blocks
+// and the jump table realign. Both operand orders and exhaustive AST variants emit alike.
 VA(0x0047a4cd, 0x17c)
-int ViewSpecialHandler(struct tag_message &) { return 0; }
+int ViewSpecialHandler(tag_message &msg)
+{
+    if (msg.type == 4) {
+        if (gpWindowManager->field_0x5e == msg.field8)
+            return 1;
+        gpWindowManager->field_0x5e = msg.field8;
+        switch (msg.field8) {
+        case 2:
+            strcpy(gText, cSpellHelp[0]);
+            break;
+        case 3:
+            strcpy(gText, cSpellHelp[1]);
+            break;
+        case 4:
+            strcpy(gText, cSpellHelp[2]);
+            break;
+        case 5:
+            strcpy(gText, cSpellHelp[3]);
+            break;
+        case 0x7800:
+            strcpy(gText, cSpellHelp[4]);
+            break;
+        case 6:
+        case 7:
+        case 8:
+        case 9:
+            sprintf(gText, cSpellHelp[8], viewSpellsHero->m_spellPoints);
+            break;
+        default:
+            strcpy(gText, cSpellHelp[5]);
+            break;
+        }
+        HeroMessageUpdate(gText);
+        return 1;
+    }
+    return 1;
+}
 
 // @early-stop
 // reloc-masked: identical 0xc86-byte code/frame; the dwelling-table relocation resolves to
@@ -2613,8 +2655,114 @@ void game::ViewArmy(int x, int y, int monsterType, int numTroops, town *castle,
     delete m_viewArmyWindow;
 }
 
+// @early-stop
+// Relocation-masked comparison is identical for the full 0x3f5-byte span;
+// both objects contain the same 52 relocation sites and objdiff reports 100%.
 VA(0x0047b2cf, 0x3f5)
-int ViewArmyHandler(struct tag_message &) { return 0; }
+int ViewArmyHandler(tag_message &msg)
+{
+    int goldCost6;
+    int resourceType0;
+    int resourceCost5;
+
+    gbDismissArmy = 0;
+    gbUpgradeArmy = 0;
+    // Retail reserves a second short word before the aligned upgrade-cost locals.
+    short frameDelay0 = 5;
+    short frameOffset1;
+
+    if (msg.type == 0x200) {
+        switch (msg.field4) {
+        case 13:
+            switch (msg.field8) {
+            case 0x7800:
+            case 0x7801:
+                gpWindowManager->m_dialogResult = msg.field8;
+                msg.field8 = 10;
+                msg.field4 = msg.field8;
+                return 2;
+            case 0x7803:
+                NormalDialog(
+                    const_cast<char *>("Are you sure you want to dismiss this army?"),
+                    2, -1, -1, -1, 0, -1, 0, -1, 0);
+                if (gpWindowManager->m_dialogResult == 0x7805) {
+                    gbDismissArmy = 1;
+                    msg.field8 = 10;
+                    msg.field4 = msg.field8;
+                    return 2;
+                }
+                break;
+            case 500:
+                goldCost6 =
+                    (gMonsterDatabase[iViewArmyUpgradeToType].cost -
+                     gMonsterDatabase[iViewArmyType].cost) *
+                    iViewArmyNumTroops * 2;
+                if (iViewArmyUpgradeToType == MONSTER_BLACK_DRAGON) {
+                    resourceType0 = RES_SULFUR;
+                    resourceCost5 = iViewArmyNumTroops * 2;
+                } else if (iViewArmyUpgradeToType == MONSTER_TITAN) {
+                    resourceType0 = RES_GEMS;
+                    resourceCost5 = iViewArmyNumTroops * 2;
+                } else {
+                    resourceType0 = -1;
+                    resourceCost5 = 0;
+                }
+                if (gpCurPlayer->m_resources[RES_GOLD] >= goldCost6 &&
+                    (resourceType0 == -1 ||
+                     gpCurPlayer->m_resources[resourceType0] >= resourceCost5)) {
+                    NormalDialog(
+                        const_cast<char *>(
+                            "Your troops can be upgraded, but it will cost you dearly.  "
+                            "Do you wish to upgrade them?"),
+                        2, -1, -1, 6, goldCost6, resourceType0,
+                        resourceCost5, -1, 0);
+                    if (gpWindowManager->m_dialogResult == 0x7805) {
+                        gpCurPlayer->m_resources[RES_GOLD] -= goldCost6;
+                        if (resourceType0 != -1)
+                            gpCurPlayer->m_resources[resourceType0] -= resourceCost5;
+                        gbUpgradeArmy = 1;
+                        msg.field8 = 10;
+                        msg.field4 = msg.field8;
+                        return 2;
+                    }
+                } else {
+                    NormalDialog(
+                        const_cast<char *>("You can't afford to upgrade your troops!"),
+                        1, -1, -1, 6, goldCost6, resourceType0,
+                        resourceCost5, -1, 0);
+                }
+                break;
+            default:
+                break;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+    if (!gbLowMemory && KBTickCount() > glTimers[0]) {
+        msg.type = 0x200;
+        msg.field4 = 4;
+        msg.field8 = 5;
+        iViewArmyFrame =
+            (iViewArmyFrame + 1) % sViewArmyMonFrameInfo.walkFrameCount;
+        msg.field18 = sViewArmyMonFrameInfo.walkFrames[iViewArmyFrame];
+        gpGame->m_viewArmyWindow->BroadcastMessage(msg);
+        msg.field4 = 52;
+        msg.field18 =
+            sViewArmyMonFrameInfo.walkXOffsets[iViewArmyFrame] *
+                viewArmyFacingWIPXMod +
+            viewArmyBaseX;
+        gpGame->m_viewArmyWindow->BroadcastMessage(msg);
+        gpGame->m_viewArmyWindow->DrawWindow(1, 0, 0x7fff);
+        glTimers[0] = static_cast<int>(
+            KBTickCount() +
+            sViewArmyMonFrameInfo.walkDuration * 0.1 /
+                sViewArmyMonFrameInfo.walkFrameCount);
+    }
+    return 1;
+}
 
 // @early-stop
 // Relocation-masked comparison is identical for all 0x671 bytes (133 relocation
