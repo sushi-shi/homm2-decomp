@@ -447,8 +447,8 @@ SOURCE/ADVMGR	?CastSpell@advManager@@QAEXH@Z	3.0994	4521b4a1a555
 SOURCE/ADVMGR	?CheckCastSpell@advManager@@QAEXXZ	25.4902	f4738ba9e433
 SOURCE/ADVMGR	?CheckDimHero@advManager@@QAEXXZ	99.8809	6921e03d10a2
 SOURCE/ADVMGR	?CheckDimNextHeroBut@advManager@@QAEXXZ	100.0000	e900fb0d3a60
-SOURCE/ADVMGR	?CheckHandleNet@advManager@@QAEPADXZ	5.7914	09ba7a41625a
-SOURCE/ADVMGR	?CheckHandleNetPlayerWait@advManager@@QAEHAAUtag_message@@H@Z	24.1207	d3c2f9d8d8b8
+SOURCE/ADVMGR	?CheckHandleNet@advManager@@QAEPADXZ	99.7594	843aecfc1f77
+SOURCE/ADVMGR	?CheckHandleNetPlayerWait@advManager@@QAEHAAUtag_message@@H@Z	100.0000	26f35b045437
 SOURCE/ADVMGR	?CheckLoadSample@advManager@@QAEXH@Z	100.0000	dbcfb3de838c
 SOURCE/ADVMGR	?CheckScreenScroll@advManager@@QAEXXZ	100.0000	e15473559735
 SOURCE/ADVMGR	?CheckSetEvilInterface@advManager@@QAEXHH@Z	99.8370	d37df35d4133
@@ -486,7 +486,7 @@ SOURCE/ADVMGR	?HeroQuickView@advManager@@QAEXHHHH@Z	99.8681	4c83bebba13e
 SOURCE/ADVMGR	?HideRoute@advManager@@QAEXHHH@Z	100.0000	e7d9ab08ecde
 SOURCE/ADVMGR	?InsertSound@advManager@@QAEXHHHH@Z	100.0000	5460087ac4fd
 SOURCE/ADVMGR	?IsCrystalBallInEffect@advManager@@QAEHHHH@Z	21.5077	0a516f0d991c
-SOURCE/ADVMGR	?LoadRemote@advManager@@QAEXXZ	12.3810	486a6fc160e1
+SOURCE/ADVMGR	?LoadRemote@advManager@@QAEXXZ	100.0000	9361457fc19f
 SOURCE/ADVMGR	?Main@advManager@@UAEHAAUtag_message@@@Z	96.2511	a7bc11d985ae
 SOURCE/ADVMGR	?MapExtraPosAndAdjacentsSet@@YIHHHE@Z	97.5211	55dca7ececa9
 SOURCE/ADVMGR	?MobilizeCurrHero@advManager@@QAEXH@Z	100.0000	1beafa12e3d6
@@ -517,7 +517,7 @@ SOURCE/ADVMGR	?TeleportTo@advManager@@QAEXPAVhero@@HHHH@Z	98.7456	c58a33cd4d35
 SOURCE/ADVMGR	?TownGate@advManager@@QAEXH@Z	100.0000	bdfa4ee069e7
 SOURCE/ADVMGR	?TownPortalHandler@@YIHAAUtag_message@@@Z	100.0000	f1e7b91bb0b5
 SOURCE/ADVMGR	?TownQuickView@advManager@@QAEXHHHH@Z	99.9918	b4532cc6b04c
-SOURCE/ADVMGR	?TrimLoopingSounds@advManager@@QAEXH@Z	11.6486	27f649ba3eaa
+SOURCE/ADVMGR	?TrimLoopingSounds@advManager@@QAEXH@Z	96.8108	d90d0b816d0f
 SOURCE/ADVMGR	?UpdBottomView@advManager@@QAEXHHH@Z	12.0841	a3564a10349d
 SOURCE/ADVMGR	?UpdBottomViewEnemyTurn@advManager@@QAEHXZ	99.3548	cbffcfb4b6a4
 SOURCE/ADVMGR	?UpdBottomViewHero@advManager@@QAEHXZ	100.0000	edf740e6ca19
@@ -526,7 +526,7 @@ SOURCE/ADVMGR	?UpdBottomViewNewTurn@advManager@@QAEHXZ	6.1416	a42be4888361
 SOURCE/ADVMGR	?UpdBottomViewResMsg@advManager@@QAEHXZ	6.1048	47b9a301790d
 SOURCE/ADVMGR	?UpdateHeroLocator@advManager@@QAEXHHH@Z	6.0939	79dbc6e60b5b
 SOURCE/ADVMGR	?UpdateHeroLocators@advManager@@QAEXHH@Z	19.0882	0c632336e41d
-SOURCE/ADVMGR	?UpdateRadar@advManager@@QAEXHH@Z	99.5582	963bf7621ae9
+SOURCE/ADVMGR	?UpdateRadar@advManager@@QAEXHH@Z	99.5591	963bf7621ae9
 SOURCE/ADVMGR	?UpdateScreen@advManager@@QAEXHH@Z	99.9603	74696926f666
 SOURCE/ADVMGR	?UpdateSystemOptions@@YIXH@Z	6.7254	2e7d92760372
 SOURCE/ADVMGR	?UpdateTownLocators@advManager@@QAEXHH@Z	7.3333	73a51efb4b88
