@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 """permute_ast.py - libclang (clang.cindex) permutation-search hill-climber.
 
-Same idea as scripts/permute.py (semantics-preserving source mutations -> real MSVC 4.2
+Same idea as scripts/permute.py (candidate source mutations -> real MSVC 4.2
 -> objdiff score -> keep improvements), but the mutator walks the REAL clang AST instead of
 regexes. Because libclang gives the exact source RANGE of each operand sub-expression (it
 knows `b*c` and `(x+y)` are single operands, and knows precedence/parens), swapping two
 operand ranges is CORRECT BY CONSTRUCTION - the precedence-crossing false-match class that
 the regex tool needed a conservative guard for simply cannot occur here.
 
-Transforms (all value-preserving): commutative-operand swap (+ * == != & | ^), relational-
-operand swap with operator flip, inequality +/-1 rewrite, independent-statement reorder (real
-AST read/write sets), declaration split. Keeps the scoring / sibling-pin / hill-climb loop.
+Transforms: commutative-operand swap (+ * == != & | ^), relational-operand swap with operator
+flip, and conservative independent-statement reorder using AST read/write sets. AST ranges make
+the edits syntactically reliable, but every retained mutation still needs a semantic audit.
+In particular, inequality +/-1 rewrites are intentionally excluded: they are not equivalent for
+floating-point operands and can differ for integral operands at overflow boundaries.
 
 Parses with the exact flags clangd uses (build/clangd/compile_commands.json, translated to
 clang-driver form). Operates on BYTES (libclang offsets are byte offsets; sources contain
@@ -106,7 +108,6 @@ def score(text):
 # ---- AST mutation (the whole point) ----------------------------------------------
 COMM = {"+", "*", "==", "!=", "&", "|", "^"}
 RELFLIP = {"<": ">", ">": "<", "<=": ">=", ">=": "<="}
-INEQ = {"<=": ("<", "+ 1"), ">=": (">", "- 1"), "<": ("<=", "- 1"), ">": (">=", "+ 1")}
 
 
 def _parse(text):
@@ -184,9 +185,6 @@ def gen_variants(text):
             swap((l0, l1), (r0, r1))                         # a OP b -> b OP a (always valid)
         elif op in RELFLIP:
             splice(l0, r1, f"{rtxt} {RELFLIP[op]} {ltxt}")   # a < b -> b > a
-        if op in INEQ:
-            newop, delta = INEQ[op]
-            splice(l0, r1, f"{ltxt} {newop} {rtxt} {delta}")  # a <= b -> a < b + 1
 
     # independent adjacent-statement reorder (real read/write sets from the AST)
     def rw(stmt):

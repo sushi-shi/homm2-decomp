@@ -40,10 +40,12 @@ authoritative. This file is the short, restart-ready Codex workflow.
 6. Use `homm2 sema disasm 0x<RVA> --diff --lite` to advance from the first structural divergence.
    Once a function is roughly 96-97% or better and its semantics, frame, stack slots, and CFG are
    already aligned, use `scripts/permute_ast.py` for residual operand/comparison order, independent
-   statement order, and declaration-split steering. This libclang AST permuter is preferred because
-   its transformations are value-preserving by construction. Do not use the regex permuter for this
-   campaign unless every retained mutation receives a separate semantic audit. The permuter does not
-   replace `od_slots.py` or manual control-flow reconstruction.
+   statement order, and related source-shape steering. This libclang AST permuter is preferred because
+   its operand ranges are syntax-aware, but AST-correct edits are not automatically value-preserving:
+   audit every retained mutation. Inequality +/-1 rewrites are disabled because they are invalid for
+   floats and can cross integer overflow boundaries. Do not use the regex permuter for this campaign
+   unless every retained mutation receives the same audit. The permuter does not replace `od_slots.py`
+   or manual control-flow reconstruction.
 7. Run a relocation-masked raw-byte comparison for near-exact functions. objdiff masks relocation
    bytes and can report less than 100% for delinked local-label identity even when every code byte is
    identical.
