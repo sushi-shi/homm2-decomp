@@ -25,27 +25,36 @@ static int gFDY;
 static unsigned int gFDRun;
 
 // @early-stop
-// Flip + dim variant: horizontal-flip decoder where every literal run remaps the DESTINATION pixels
-// through the dim palette row (uDimPal + color*0x100)[dst], drawn right-to-left from (X-count+1);
-// negative = skip (mask 0x7f). X/row are register-locals; the per-pixel dim loop uses a local ptr.
+// /O2 register-allocation wall after complete decoder recovery: base and retail are both 0x23b.
+// The relocation/branch-masked command dispatch is byte-identical at base +0xf6..+0x11c versus
+// retail +0xf9..+0x11f (39 bytes). Residual spans are setup/fetch base +0x00..+0xf5 versus retail
+// +0x00..+0xf8, no-clip base +0x11d..+0x170 versus retail +0x120..+0x16f, clipped base
+// +0x171..+0x208 versus retail +0x170..+0x208, and newline/return +0x209..+0x23a in both: retail
+// assigns the setup fields, row/X operands, palette/count loads, and loop load/decrement among
+// EAX/EBX/ESI/EDI differently. Relocations are base 38 versus retail 37; the sole extra is a gFDY
+// reload at base +0x185, with no base-only target, and uDimPal plus all 13 scratch addresses agree.
+// Retail itself gates clipped runs with clipX <= left && X <= clipR, then repeats clipX > left for
+// a dead partial-left arm; exact compare/branch dataflow was verified and the normal overlap gate
+// was rejected. Tried direct/indexed entry forms, local/global X bounds and destination pointers,
+// field/store orders, split source fetches, signed/unsigned counts, palette/count/loop schedules,
+// repeated/local clipping expressions, three AST searches (580 walks), and 120 text variants.
 VA(0x004daa20, 0x23b)
 void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                          int color, int clip, int clipX, int clipY, int clipW, int clipH)
 {
     unsigned char *data = reinterpret_cast<unsigned char *>(srcIcon->m_data);
     int off = frame * 13;
-    gFDSrc = data + *reinterpret_cast<int *>(data + off + 9);
-    IconEntry *e = reinterpret_cast<IconEntry *>(data + off);
+    gFDSrc = data + *reinterpret_cast<int *>(off + data + 9);
+    IconEntry *e = reinterpret_cast<IconEntry *>(off + data);
     gFDEntry = e;
     int w = e->w;
-    int ex = e->x;
-    int ey = e->y;
-    gFDX0 = ((x - ex) - w) + 1;
-    gFDXEnd = w + gFDX0 - 1;
-    gFDY = y + ey;
+    gFDX0 = ((x - e->x) - w) + 1;
+    int X = w + gFDX0 - 1;
+    gFDXEnd = X;
+    gFDY = y + e->y;
     if (clip != 0) {
-        if (gFDX0 < clipX || clipW + clipX < w + gFDX0 || gFDY < clipY ||
-            clipY + clipH < e->h + gFDY) {
+        if (clipX > gFDX0 || clipW + clipX < w + gFDX0 || gFDY < clipY ||
+            e->h + gFDY > clipY + clipH) {
             clip = 1;
             gFDClipR = clipX + clipW - 1;
             gFDClipB = clipY + clipH - 1;
@@ -55,10 +64,11 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, 
     }
     short pitch = dest->m_width;
     gFDRow = gFDY * pitch + reinterpret_cast<int>(dest->m_pixels);
-    int X = gFDXEnd;
     for (;;) {
+        unsigned char *src = gFDSrc + 1;
         gFDX = X;
-        int cmd = *gFDSrc++;
+        gFDSrc = src;
+        int cmd = src[-1];
         if (static_cast<signed char>(cmd) < 0) {
             gFDRun = cmd;
             int n = cmd & 0x7f;
@@ -70,31 +80,33 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, 
         gFDRun = cmd;
         if (cmd != 0) {
             if (clip == 0) {
+                unsigned int cnt;
                 gFDCnt = 0;
-                unsigned char *dp = reinterpret_cast<unsigned char *>((gFDRow - cmd) + 1 + X);
-                gFDDst = dp;
-                gFDCnt = cmd;
-                if (cmd != 0) {
-                    unsigned int cnt = cmd;
+                unsigned char *dst = reinterpret_cast<unsigned char *>((gFDRow - cmd) + X + 1);
+                gFDDst = dst;
+                if (static_cast<int>(cmd) >= 1) {
+                    cnt = cmd;
+                    gFDCnt = cmd;
                     do {
-                        int px = *dp++;
+                        int px = *dst++;
                         cnt--;
-                        gFDDst = dp;
-                        dp[-1] = (reinterpret_cast<unsigned char *>(uDimPal) + color * 0x100)[px];
+                        gFDDst = dst;
+                        dst[-1] =
+                            (color * 0x100 + reinterpret_cast<unsigned char *>(uDimPal))[px];
                     } while (cnt != 0);
                 }
             } else {
                 int left;
                 if (clipY <= gFDY && gFDY <= gFDClipB &&
-                    (left = (X - cmd) + 1, clipX <= left) && X <= gFDClipR) {
+                    (left = (X - cmd) + 1, clipX < left + 1) && X <= gFDClipR) {
                     unsigned int cn;
-                    unsigned char *dp;
+                    unsigned char *dst;
                     if (left < clipX) {
-                        dp = reinterpret_cast<unsigned char *>(gFDRow + clipX);
+                        dst = reinterpret_cast<unsigned char *>(gFDRow + clipX);
                         cn = (X - clipX) + 1;
                     } else {
-                        dp = reinterpret_cast<unsigned char *>((gFDRow - cmd) + 1 + X);
                         cn = cmd;
+                        dst = reinterpret_cast<unsigned char *>((gFDRow - cmd) + X + 1);
                     }
                     gFDCnt = 0;
                     gFDCnt2 = cn;
@@ -102,15 +114,17 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, 
                         gFDCnt = cn;
                         unsigned int cnt = cn;
                         do {
-                            int px = *dp++;
+                            int px = *dst++;
                             cnt--;
-                            gFDDst = dp;
-                            dp[-1] = (reinterpret_cast<unsigned char *>(uDimPal) + color * 0x100)[px];
+                            gFDDst = dst;
+                            dst[-1] =
+                                (reinterpret_cast<unsigned char *>(uDimPal) + color * 0x100)[px];
                         } while (cnt != 0);
                     }
                 }
             }
             X = X - cmd;
+            gFDRun = cmd;
             continue;
         }
         // newline
