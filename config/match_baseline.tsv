@@ -382,7 +382,7 @@ BASE/icon2bc	?IconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAEH@Z	66.
 BASE/icon2bs	?IconToBitmapScale@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	76.3262	a49d5fdfa818
 BASE/icon2by	?IconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	91.5102	e2aeb74dde86
 BASE/iconf2bc	?FlipIconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAE@Z	73.6977	a4bb02681b47
-BASE/iconf2by	?FlipIconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	68.3405	774d85a1f3f0
+BASE/iconf2by	?FlipIconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	76.9303	f6e5ced307ee
 BASE/listbox	??0listBoxWidget@@QAE@XZ	97.3684	2d787e1f30f9
 BASE/listbox	??1listBoxWidget@@UAE@XZ	98.5909	eb8cbc77afb4
 BASE/listbox	??_ElistBoxWidget@@UAEPAXI@Z	0.0000	
