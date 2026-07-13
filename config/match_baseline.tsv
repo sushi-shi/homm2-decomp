@@ -504,7 +504,7 @@ SOURCE/ADVMGR	?SaveAdventureBorder@advManager@@QAEXXZ	15.0930	bab71a4afe03
 SOURCE/ADVMGR	?SaveGame@@YIHXZ	7.5478	8366d9945b3d
 SOURCE/ADVMGR	?ScreenScroll@advManager@@QAEXHH@Z	3.9249	ab6c7a58a85a
 SOURCE/ADVMGR	?SeedTo@advManager@@QAEXHH@Z	13.2449	f15edb470a6d
-SOURCE/ADVMGR	?SetEnvironmentOrigin@advManager@@QAEXHHH@Z	99.7885	9b743f467ee3
+SOURCE/ADVMGR	?SetEnvironmentOrigin@advManager@@QAEXHHH@Z	100.0000	9b743f467ee3
 SOURCE/ADVMGR	?SetHeroContext@advManager@@QAEXHH@Z	5.2339	5cd14b503655
 SOURCE/ADVMGR	?SetInitialMapOrigin@advManager@@QAEXXZ	7.1319	d7bc8e4641e5
 SOURCE/ADVMGR	?SetTownContext@advManager@@QAEXH@Z	8.5395	81e5da9a35b0
@@ -838,8 +838,8 @@ SOURCE/GAME	?NextHero@playerData@@QAEHH@Z	100.0000	57212bf594b4
 SOURCE/GAME	?NextPlayer@game@@QAEXXZ	94.5296	9e22dc7716fa
 SOURCE/GAME	?NumOfGivenArtifact@playerData@@QAEHH@Z	100.0000	38a5448fcb19
 SOURCE/GAME	?PerDay@game@@QAEXXZ	98.3056	cad129fcebc9
-SOURCE/GAME	?PerMonth@game@@QAEXXZ	5.8468	6733f01d0c3a
-SOURCE/GAME	?PerWeek@game@@QAEXXZ	98.5623	f1c0d871e09e
+SOURCE/GAME	?PerMonth@game@@QAEXXZ	99.1892	965212323574
+SOURCE/GAME	?PerWeek@game@@QAEXXZ	98.5623	151b47b3a60e
 SOURCE/GAME	?ProcessMapExtra@game@@QAEXXZ	7.3333	7e88d0c28d5a
 SOURCE/GAME	?ProcessOnMapHeroes@game@@QAEXXZ	99.6486	c58017870749
 SOURCE/GAME	?ProcessRandomObjects@game@@QAEXXZ	99.9106	dbd601c0e015
@@ -872,12 +872,12 @@ SOURCE/GAME	?TurnOnAIMusic@game@@QAEXXZ	100.0000	edabc8644009
 SOURCE/GAME	?UpdateSpellWidgets@game@@QAEXXZ	100.0000	0d9950165bfd
 SOURCE/GAME	?ViewArmy@game@@QAEXHHHHPAVtown@@HHHPAVhero@@PAVarmy@@PAVarmyGroup@@H@Z	100.0000	b934c69ba1fc
 SOURCE/GAME	?ViewArmyHandler@@YIHAAUtag_message@@@Z	100.0000	b3bf36f928c4
-SOURCE/GAME	?ViewSpecialHandler@@YIHAAUtag_message@@@Z	98.6198	6748cd79e33f
+SOURCE/GAME	?ViewSpecialHandler@@YIHAAUtag_message@@@Z	99.6281	6748cd79e33f
 SOURCE/GAME	?ViewSpells@game@@QAEHPAVhero@@HP6IHAAUtag_message@@@ZH@Z	100.0000	89ea33dbadb5
 SOURCE/GAME	?ViewSpellsHandler@@YIHAAUtag_message@@@Z	99.9083	5e88e71a93c4
 SOURCE/GAME	?WaitForPlayer@game@@QAEXPADH@Z	16.4557	4355a82c15de
-SOURCE/GAME	?WeeklyGenericSite@game@@QAEXPAVmapCell@@@Z	100.0000	ce0267d940e0
-SOURCE/GAME	?WeeklyRecruitSite@game@@QAEXPAVmapCell@@@Z	7.6977	9731a8ad9fbb
+SOURCE/GAME	?WeeklyGenericSite@game@@QAEXPAVmapCell@@@Z	100.0000	5e10f6572837
+SOURCE/GAME	?WeeklyRecruitSite@game@@QAEXPAVmapCell@@@Z	99.7674	0aaa954a88ea
 SOURCE/GAME	?Write@playerData@@QAEXH@Z	100.0000	a2ad93d208fd
 SOURCE/GAME	?WriteDiffHeaderInfo@@YIXEHPAEPAH@Z	94.1839	c140b2a06733
 SOURCE/HERO	??0hero@@QAE@XZ	51.5152	2056e5c468b3

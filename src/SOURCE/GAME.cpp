@@ -3422,8 +3422,42 @@ void game::PerWeek(void)
     GiveTroopsToNeutralTowns();
 }
 
+// @early-stop
+// Relocation-masked raw bytes are exact across the 0x12d-byte body. All five
+// Random relocations agree; objdiff's 99.77% is only the six jump-table entries,
+// whose retail local labels are delinked as the containing function.
 VA(0x0047eaa8, 0x12d)
-void game::WeeklyRecruitSite(class mapCell *) {}
+void game::WeeklyRecruitSite(mapCell *cell)
+{
+    int type = cell->w4hi;
+    type &= WEEKLY_RECRUIT_TYPE_MASK;
+    int recruitCount = cell->w4hi;
+    recruitCount >>= WEEKLY_RECRUIT_COUNT_SHIFT;
+    int packed;
+
+    switch (type) {
+    case 0:
+        recruitCount += Random(WEEKLY_RECRUIT_MIN_GROWTH, WEEKLY_RECRUIT_MAX_GROWTH);
+        break;
+    case 1:
+        recruitCount += Random(WEEKLY_RECRUIT_MIN_GROWTH, WEEKLY_RECRUIT_MAX_GROWTH);
+        break;
+    case 2:
+        recruitCount += Random(WEEKLY_RECRUIT_MIN_GROWTH, WEEKLY_RECRUIT_MAX_GROWTH);
+        break;
+    case 3:
+        recruitCount += Random(WEEKLY_RECRUIT_MIN_GROWTH, WEEKLY_RECRUIT_MAX_GROWTH);
+        break;
+    case 4:
+        recruitCount += Random(WEEKLY_RECRUIT_MIN_GROWTH, WEEKLY_RECRUIT_MAX_GROWTH);
+        break;
+    }
+
+    if (recruitCount > WEEKLY_RECRUIT_LIMIT)
+        recruitCount = WEEKLY_RECRUIT_LIMIT;
+    packed = (recruitCount << WEEKLY_RECRUIT_COUNT_SHIFT) | type;
+    cell->w4hi = packed | 0;
+}
 
 VA(0x0047ebd5, 0x6f)
 void game::WeeklyGenericSite(mapCell *cell)
@@ -3437,8 +3471,90 @@ void game::WeeklyGenericSite(mapCell *cell)
     }
 }
 
+// @early-stop
+// Exact 0x375-byte body and 30 relocation sites. The typed dwelling/monster
+// references resolve to retail's folded 0x4fca35 and 0x4faeb7 local symbols.
 VA(0x0047ec44, 0x375)
-void game::PerMonth(void) {}
+void game::PerMonth(void)
+{
+    mapCell *cell0;
+    int mapX8;
+    int mapY5;
+    int townIndex0;
+    int building4;
+    int growth9;
+    townSlot *castle10;
+    int firstCount5;
+    int secondCount4;
+
+    m_month++;
+    townIndex0 = Random(MONTH_ROLL_MIN, MONTH_ROLL_MAX);
+    if (townIndex0 <= MONTH_NORMAL_ROLL_MAX) {
+        giMonthType = MONTH_TYPE_NORMAL;
+        giMonthTypeExtra = Random(MONTH_NORMAL_NAME_MIN, MONTH_NORMAL_NAME_MAX);
+    } else if (townIndex0 <= MONTH_CREATURE_ROLL_MAX) {
+        giMonthType = MONTH_TYPE_CREATURE;
+        giMonthTypeExtra = giMonType[
+            Random(MONTH_CREATURE_LIST_MIN, MONTH_CREATURE_LIST_MAX)];
+    } else {
+        giMonthType = MONTH_TYPE_PLAGUE;
+    }
+
+    for (townIndex0 = 0; townIndex0 < GAME_TOWN_COUNT; townIndex0++) {
+        for (building4 = WEEKLY_FIRST_DWELLING;
+             building4 <= WEEKLY_LAST_DWELLING; building4++) {
+            castle10 = reinterpret_cast<townSlot *>(GetTown(townIndex0));
+            if (castle10->buildings & (1 << building4)) {
+                growth9 = gMonsterDatabase[
+                    gDwellingType[castle10->race][building4 - WEEKLY_FIRST_DWELLING]].growth;
+                if (castle10->buildings & MONTH_WELL_BUILDING)
+                    growth9 += MONTH_WELL_GROWTH;
+                if (building4 == WEEKLY_FIRST_DWELLING &&
+                    (castle10->buildings & MONTH_FIRST_DWELLING_BONUS_BUILDING))
+                    growth9 += MONTH_FIRST_DWELLING_GROWTH;
+
+                if (giMonthType == MONTH_TYPE_CREATURE &&
+                    gDwellingType[castle10->race][building4 - WEEKLY_FIRST_DWELLING] ==
+                        giMonthTypeExtra)
+                    castle10->dwellingGrowth[building4 - WEEKLY_FIRST_DWELLING] *= 2;
+
+                if (giMonthType == MONTH_TYPE_PLAGUE) {
+                    castle10->dwellingGrowth[building4 - WEEKLY_FIRST_DWELLING] -= growth9;
+                    if (castle10->dwellingGrowth[building4 - WEEKLY_FIRST_DWELLING] < 0)
+                        castle10->dwellingGrowth[building4 - WEEKLY_FIRST_DWELLING] = 0;
+                    castle10->dwellingGrowth[building4 - WEEKLY_FIRST_DWELLING] =
+                        castle10->dwellingGrowth[building4 - WEEKLY_FIRST_DWELLING] >> 1;
+                }
+            }
+        }
+    }
+
+    if (giMonthType == MONTH_TYPE_CREATURE) {
+        for (mapX8 = 0; mapX8 < MAP_WIDTH; mapX8++) {
+            for (mapY5 = 0; mapY5 < MAP_HEIGHT; mapY5++) {
+                cell0 = gpAdvManager->GetCell(mapX8, mapY5);
+                if (cell0->triggerType == 0 && !cell0->w4b && !cell0->w4a &&
+                    giGroundToTerrain[cell0->tile] != 0) {
+                    if (Random(MONTH_MONSTER_SPAWN_MIN, MONTH_MONSTER_SPAWN_MAX) ==
+                        MONTH_MONSTER_SPAWN_ROLL) {
+                        cell0->triggerType = MONTH_MONSTER_TRIGGER;
+                        cell0->objTileset = MONTH_MONSTER_TILESET;
+                        cell0->objIndex = static_cast<unsigned char>(giMonthTypeExtra);
+                        firstCount5 = GetRandomNumTroops(giMonthTypeExtra);
+                        secondCount4 = GetRandomNumTroops(giMonthTypeExtra);
+                        cell0->w4hi = ((firstCount5 | 0) + secondCount4) | 0;
+                        if (Random(MONTH_MONSTER_SPAWN_MIN,
+                                   MONTH_MONSTER_GUARD_ROLL_MAX) <
+                            MONTH_MONSTER_GUARD_CHANCE)
+                            cell0->w4hi |= MONTH_MONSTER_GUARD_FLAG;
+                    }
+                }
+            }
+        }
+    }
+
+    gpAdvManager->CompleteDraw(0);
+}
 
 // @early-stop
 // The complete control flow and both relocations align. The AST-permuted bounds spelling
@@ -5533,7 +5649,9 @@ int game::CountShrines(int player)
 
 // ---- globals (definitions, RVA order) ----
 DATA(0x004f70e0) int gbGameOver;
-DATA(0x004f7550) signed char *giMonType;
+DATA(0x004f7550) signed char giMonType[] = {
+    0, 0x11, 0x15, 0x2a, 0x0f, 0x19, 0x34, 0x0e, 0x1d, 0x1e, 0x1b, 0x36
+};
 DATA(0x004f7a08) char bMapInitialized;
 DATA(0x005280e8) int iViewArmyNumTroops;
 DATA(0x005280ec) signed char *gbNGHeroType;
