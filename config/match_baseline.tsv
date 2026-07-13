@@ -1329,11 +1329,11 @@ SOURCE/TOWNMGR	?UnloadTown@townManager@@QAEXXZ	11.0000	234150c5bedc
 SOURCE/VIEW	?HandleViewGeneral@@YIHAAUtag_message@@@Z	7.3830	71681b4ff0a8
 SOURCE/VIEW	?ViewArmy@combatManager@@QAEXPAVarmy@@H@Z	12.8515	b4a29acbdcdf
 SOURCE/VIEW	?ViewGeneral@combatManager@@QAEHHHH@Z	3.2740	72793633b490
-SOURCE/Viewwrld	?VWCleanup@advManager@@QAEXXZ	44.8276	b4947606a16b
-SOURCE/Viewwrld	?VWCompleteDraw@advManager@@QAEXXZ	0.2501	fc1fa5dd173d
-SOURCE/Viewwrld	?VWInit@advManager@@QAEXHH@Z	10.2362	8b907d42ea10
-SOURCE/Viewwrld	?ViewWorld@advManager@@QAEXHHH@Z	9.8333	deef349f27cb
-SOURCE/Viewwrld	?ViewWorldDialogHandler@@YIHAAUtag_message@@@Z	4.4774	e1aab8469b80
+SOURCE/Viewwrld	?VWCleanup@advManager@@QAEXXZ	100.0000	2755ca65f5bf
+SOURCE/Viewwrld	?VWCompleteDraw@advManager@@QAEXXZ	98.0954	5bf7c9e7751d
+SOURCE/Viewwrld	?VWInit@advManager@@QAEXHH@Z	99.5276	cea936b37533
+SOURCE/Viewwrld	?ViewWorld@advManager@@QAEXHHH@Z	99.7803	11da882fba0d
+SOURCE/Viewwrld	?ViewWorldDialogHandler@@YIHAAUtag_message@@@Z	98.8452	1f1b388b3b9d
 SOURCE/Wsnetwin	?wsEvaluateMessage@@YIXKH@Z	4.7895	a67a6e641d7e
 SOURCE/Wsnetwin	?wsProcessMessages@@YIXXZ	24.1111	35d1a255fe12
 SOURCE/Wsnetwin	?wsSendMessage@@YIXHEGPAX@Z	9.7692	002b2e7db020
