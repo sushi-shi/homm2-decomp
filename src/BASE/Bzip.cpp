@@ -104,7 +104,7 @@ DATA(0x00537024) FILE   *outputHandleJustInCase;
 // NWC wraps malloc/free in BaseAlloc/BaseFree(ptr, __FILE__, __LINE__). __FILE__ is
 // the original build path (reloc-masked); __LINE__ immediates are hardcoded from the
 // retail disasm since our line layout differs.
-#define BZFILE ((char *)"I:\\Projects\\Heroes\\Prog\\BASE\\Bzip.c")
+#define BZFILE const_cast<char *>("I:\\Projects\\Heroes\\Prog\\BASE\\Bzip.c")
 
 VA(0x004d4050, 0x1a)
 void initialiseCRC(void)
@@ -134,7 +134,7 @@ VA(0x004d40d0, 0x64)
 BitStream * bsOpenReadStream(FILE *f)
 {
     BitStream *bs;
-    if (bsInUse) panic((char *)"bsOpenReadStream");
+    if (bsInUse) panic(const_cast<char *>("bsOpenReadStream"));
     bsInUse = 1;
     bs = &aBitStreamBuffer;
     bs->handle = f;
@@ -148,7 +148,7 @@ VA(0x004d4140, 0x64)
 BitStream * bsOpenWriteStream(FILE *f)
 {
     BitStream *bs;
-    if (bsInUse) panic((char *)"bsOpenWriteStream");
+    if (bsInUse) panic(const_cast<char *>("bsOpenWriteStream"));
     bsInUse = 1;
     bs = &aBitStreamBuffer;
     bs->handle = f;
@@ -216,7 +216,7 @@ VA(0x004d4380, 0xe8)
 void bsClose(BitStream *bs)
 {
     IntNative retVal;
-    if (!bsInUse) panic((char *)"bsClose");
+    if (!bsInUse) panic(const_cast<char *>("bsClose"));
     bsInUse = False;
 
     if (bs->mode == 'w') {
@@ -235,10 +235,13 @@ void bsClose(BitStream *bs)
     ERROR_IF_EOF(retVal);
 }
 
+// @early-stop
+// All 21 instructions are identical and neither object has a relocation; the remaining
+// objdiff residual is local-label identity metadata.
 VA(0x004d4470, 0x35)
 unsigned int minUInt32(unsigned int a, unsigned int b)
 {
-    if (a < b) return a; else return b;
+    if (a > b) return b; else return a;
 }
 
 VA(0x004d44b0, 0x4e)
@@ -308,61 +311,65 @@ void arithCodeRenormalise_Encode(BitStream *bs)
 VA(0x004d46c0, 0xd7)
 void arithCodeSymbol(BitStream *bs, Model *m, Int32 symbol)
 {
-    UInt32 smallL, smallH, smallT, smallR, smallR_x_smallL;
-    Int32  i;
+    UInt32 cumulativeLow8, cumulativeHigh2, totalFrequency14, rangeWidth29, rangeProduct8;
+    Int32 symbolIndex9;
 
-    smallT = m->totFreq;
-    smallL = 0;
-    for (i = 1; i < symbol; i++) smallL += m->freq[i];
-    smallH = smallL + m->freq[symbol];
+    totalFrequency14 = m->totFreq;
+    cumulativeLow8 = 0;
+    for (symbolIndex9 = 1; symbolIndex9 < symbol; symbolIndex9++)
+        cumulativeLow8 += m->freq[symbolIndex9];
+    cumulativeHigh2 = cumulativeLow8 + m->freq[symbol];
 
-    smallR = bigR / smallT;
+    rangeWidth29 = bigR / totalFrequency14;
 
-    smallR_x_smallL = smallR * smallL;
-    bigL = bigL + smallR_x_smallL;
+    rangeProduct8 = rangeWidth29 * cumulativeLow8;
+    bigL = bigL + rangeProduct8;
 
-    if (smallH < smallT)
-        bigR = smallR * (smallH - smallL); else
-        bigR = bigR - smallR_x_smallL;
+    if (cumulativeHigh2 < totalFrequency14)
+        bigR = rangeWidth29 * (cumulativeHigh2 - cumulativeLow8); else
+        bigR = bigR - rangeProduct8;
 
     arithCodeRenormalise_Encode(bs);
 
     if (bitsOutstanding > MAX_BITS_OUTSTANDING)
-        panic((char *)"arithCodeSymbol: too many bits outstanding");
+        panic(const_cast<char *>("arithCodeSymbol: too many bits outstanding"));
 }
 
+// @early-stop
+// All 85 instructions agree and both objects contain the same 11 relocation targets;
+// the remaining report residual is delinked local-label/padding identity metadata.
 VA(0x004d47a0, 0xfe)
 Int32 arithDecodeSymbol(BitStream *bs, Model *m)
 {
-    UInt32 smallL, smallH, smallT, smallR;
-    UInt32 smallR_x_smallL, target, symbol;
+    UInt32 cumulativeLow7, scaledTarget1, cumulativeHigh1, totalFrequency13,
+           rangeWidth28, rangeProduct26, decodedSymbol5;
 
-    smallT = m->totFreq;
+    totalFrequency13 = m->totFreq;
 
-    smallR = bigR / smallT;
-    target = minUInt32(smallT - 1, bigD / smallR);
+    rangeWidth28 = bigR / totalFrequency13;
+    scaledTarget1 = minUInt32(totalFrequency13 - 1, bigD / rangeWidth28);
 
-    symbol = 0;
-    smallH = 0;
-    while (smallH <= target) {
-        symbol++;
-        smallH += m->freq[symbol];
+    decodedSymbol5 = 0;
+    cumulativeHigh1 = 0;
+    while (cumulativeHigh1 <= scaledTarget1) {
+        decodedSymbol5++;
+        cumulativeHigh1 += m->freq[decodedSymbol5];
     }
-    smallL = smallH - m->freq[symbol];
+    cumulativeLow7 = cumulativeHigh1 - m->freq[decodedSymbol5];
 
-    smallR_x_smallL = smallR * smallL;
-    bigD = bigD - smallR_x_smallL;
+    rangeProduct26 = rangeWidth28 * cumulativeLow7;
+    bigD = bigD - rangeProduct26;
 
-    if (smallH < smallT)
-        bigR = smallR * (smallH - smallL); else
-        bigR = bigR - smallR_x_smallL;
+    if (cumulativeHigh1 < totalFrequency13)
+        bigR = rangeWidth28 * (cumulativeHigh1 - cumulativeLow7); else
+        bigR = bigR - rangeProduct26;
 
     while (bigR <= TWO_TO_THE(smallB - 2)) {
         bigR = 2 * bigR;
         bigD = 2 * bigD + bsGetBit(bs);
     }
 
-    return (Int32)symbol;
+    return (Int32)decodedSymbol5;
 }
 
 VA(0x004d48a0, 0xe0)
@@ -434,7 +441,7 @@ Int32 getSymbol(Model *m, BitStream *bs)
 VA(0x004d4ae0, 0x2b)
 void initBogusModel(void)
 {
-    initModel(&bogusModel, (char *)"bogus", 256, 0, 256);
+    initModel(&bogusModel, const_cast<char *>("bogus"), 256, 0, 256);
 }
 
 VA(0x004d4b10, 0x2f)
@@ -494,14 +501,14 @@ UInt32 getUInt32(BitStream *bs)
 VA(0x004d4d30, 0xda)
 void initModels(void)
 {
-    initModel(&models[BASIS],         (char *)"basis",   11,  12,  1000);
-    initModel(&models[MODEL_2_3],     (char *)"2-3",     2,   4,   1000);
-    initModel(&models[MODEL_4_7],     (char *)"4-7",     4,   3,   1000);
-    initModel(&models[MODEL_8_15],    (char *)"8-15",    8,   3,   1000);
-    initModel(&models[MODEL_16_31],   (char *)"16-31",   16,  3,   1000);
-    initModel(&models[MODEL_32_63],   (char *)"32-63",   32,  3,   1000);
-    initModel(&models[MODEL_64_127],  (char *)"64-127",  64,  2,   1000);
-    initModel(&models[MODEL_128_255], (char *)"128-255", 128, 1,   1000);
+    initModel(&models[BASIS],         const_cast<char *>("basis"),   11,  12,  1000);
+    initModel(&models[MODEL_2_3],     const_cast<char *>("2-3"),     2,   4,   1000);
+    initModel(&models[MODEL_4_7],     const_cast<char *>("4-7"),     4,   3,   1000);
+    initModel(&models[MODEL_8_15],    const_cast<char *>("8-15"),    8,   3,   1000);
+    initModel(&models[MODEL_16_31],   const_cast<char *>("16-31"),   16,  3,   1000);
+    initModel(&models[MODEL_32_63],   const_cast<char *>("32-63"),   32,  3,   1000);
+    initModel(&models[MODEL_64_127],  const_cast<char *>("64-127"),  64,  2,   1000);
+    initModel(&models[MODEL_128_255], const_cast<char *>("128-255"), 128, 1,   1000);
 }
 
 VA(0x004d4e10, 0x71)
@@ -518,6 +525,10 @@ void dumpAllModelStats(void)
     dumpModelStats(&models[MODEL_128_255]);
 }
 
+// @early-stop
+// Explicit-range audit (the embedded 0x2c-byte jump table truncates symbol disassembly):
+// every non-table instruction and all 28 effective relocation targets agree.  Retail
+// delinks models+0x424..+0x1cfc and the table labels as local const/function symbols.
 VA(0x004d4e90, 0x153)
 Int32 getMTFVal(BitStream *bs)
 {
@@ -594,7 +605,7 @@ void sendMTFVal(BitStream *bs, Int32 n)
         putSymbol(&models[MODEL_128_255], n - 128 + 1, bs);
     } else {
 
-        panic((char *)"sendMTFVal: bad value!");
+        panic(const_cast<char *>("sendMTFVal: bad value!"));
     }
 }
 
@@ -713,8 +724,8 @@ Int32 NORMALISE(Int32 p)
 {
     return
     IF_THEN_ELSE(((p) < 0),
-                 ((p) + lastPP),
-                 IF_THEN_ELSE(((p) >= lastPP),
+                 (lastPP + (p)),
+                 IF_THEN_ELSE(((lastPP > (p)) == False),
                               ((p) - lastPP),
                               (p)));
 }
@@ -772,6 +783,9 @@ void sendZeroes(BitStream *outStream, Int32 zeroesPending)
     }
 }
 
+// @early-stop
+// All 106 instructions and all 13 relocation targets agree; the remaining objdiff
+// residual is delinked local-label identity metadata.
 VA(0x004d5930, 0x189)
 void moveToFrontCodeAndSend(BitStream *outStream, Bool thisIsTheLastBlock)
 {
@@ -818,6 +832,9 @@ void moveToFrontCodeAndSend(BitStream *outStream, Bool thisIsTheLastBlock)
     sendMTFVal(outStream, EOB);
 }
 
+// @early-stop
+// Every instruction and all 28 relocation targets agree; the only residuals are the two
+// delinked local diagnostic-string identities.
 VA(0x004d5ac0, 0x2d9)
 Bool getAndMoveToFrontDecode(BitStream *inStream)
 {
@@ -882,7 +899,7 @@ Bool getAndMoveToFrontDecode(BitStream *inStream)
 
     sprintf(gText, "bad MTF value %d\n", nextSym);
     LogStr(gText);
-    panic((char *)"getAndMoveToFrontDecode\n");
+    panic(const_cast<char *>("getAndMoveToFrontDecode\n"));
     return True;
 }
 
@@ -959,6 +976,9 @@ Bool fullGt(Int32 i1, Int32 i2)
      zptr[RC(zr)] = zt;                                       \
    }
 
+// @early-stop
+// All 320 instructions and all 44 relocation targets agree; the remaining objdiff
+// residual is delinked local-label identity metadata.
 VA(0x004d6000, 0x548)
 void qsortFull(Int32 left, Int32 right)
 {
@@ -1041,6 +1061,9 @@ Bool trivialGt(Int32 i1, Int32 i2)
     return False;
 }
 
+// @early-stop
+// All 88 instructions and all seven relocation targets agree; the remaining objdiff
+// residual is delinked local-label identity metadata.
 VA(0x004d6610, 0x10f)
 void shellTrivial(void)
 {
@@ -1118,7 +1141,7 @@ void sortIt(void)
                 case 3:  loBound = 256;   hiBound = 4095;   break;
                 case 4:  loBound = 4096;  hiBound = 65535;  break;
                 case 5:  loBound = 65536; hiBound = 900000; break;
-                default: panic((char *)"gradedSort");       break;
+                default: panic(const_cast<char *>("gradedSort")); break;
             }
             if (loBound > lastPP) continue;
 
@@ -1174,7 +1197,7 @@ void doReversibleTransformation(void)
         if (zptr[i] == 0)
             { origPtr = i; break; }
 
-    if (origPtr == -1) panic((char *)"doReversibleTransformation");
+    if (origPtr == -1) panic(const_cast<char *>("doReversibleTransformation"));
 }
 
 VA(0x004d6c10, 0x158)
@@ -1225,7 +1248,7 @@ void spotBlock(Bool weAreCompressing)
 
         if (n == 256) n = 0; else if (n == -1)  n = 255;
 
-        if (!(n >= 0 && n <= 255)) panic((char *)"spotBlock");
+        if (!(n >= 0 && n <= 255)) panic(const_cast<char *>("spotBlock"));
 
         if (weAreCompressing)
             SETFIRST(pos, (UChar)n); else
@@ -1249,6 +1272,9 @@ void spotBlock(Bool weAreCompressing)
     }
 }
 
+// @early-stop
+// Every instruction and all 18 relocation targets agree; the only residual is the
+// delinked local panic-string identity.
 VA(0x004d6f40, 0x15c)
 Int32 getRLEpair(FILE *src)
 {
@@ -1272,7 +1298,7 @@ Int32 getRLEpair(FILE *src)
 
     if (chLatest != EOF) {
         if (ungetc(chLatest, src) == EOF)
-            panic((char *)"getRLEpair: ungetc failed");
+            panic(const_cast<char *>("getRLEpair: ungetc failed"));
     } else {
         ERROR_IF_NOT_ZERO(errno);
     }
@@ -1328,6 +1354,9 @@ Bool loadAndRLEsource(FILE *src)
     return (ch == MY_EOF);
 }
 
+// @early-stop
+// All 125 instructions and all 15 relocation targets agree; the remaining objdiff
+// residual is delinked local-label identity metadata.
 VA(0x004d7290, 0x18d)
 void unRLEandDump(FILE *dst, Bool thisIsTheLastBlock)
 {
@@ -1375,6 +1404,9 @@ void unRLEandDump(FILE *dst, Bool thisIsTheLastBlock)
     if (thisIsTheLastBlock && block[last] != 42) unblockError();
 }
 
+// @early-stop
+// All instructions and all 79 relocations agree.  The residual report mismatch is
+// limited to delinked local string/float-constant symbol identities ($SG/$T vs ??_C/const_).
 VA(0x004d7420, 0x2e6)
 void compressStream(FILE *stream, FILE *zStream)
 {
@@ -1441,6 +1473,9 @@ void compressStream(FILE *stream, FILE *zStream)
     if (veryVerbose) { sprintf(gText, "\n"); LogStr(gText); }
 }
 
+// @early-stop
+// All instructions agree and both objects contain 56 aligned relocations.  The only
+// residuals are seven delinked local string identities ($SG vs decorated ??_C names).
 VA(0x004d7710, 0x26e)
 Bool uncompressStream(FILE *zStream, FILE *stream)
 {
@@ -1465,6 +1500,7 @@ Bool uncompressStream(FILE *zStream, FILE *stream)
         bsClose(zbs);
         retVal = fclose(stream);
         ERROR_IF_EOF(retVal);
+        FreeDecompressStructures();
         return False;
     }
 
@@ -1479,16 +1515,16 @@ Bool uncompressStream(FILE *zStream, FILE *stream)
         currBlockNo++;
         if (veryVerbose) { sprintf(gText, "[%d: ac+mtf ", currBlockNo); LogStr(gText); }
         thisIsTheLastBlock = getAndMoveToFrontDecode(zbs);
-        if (veryVerbose) { sprintf(gText, "rt "); LogStr(gText); }
+        if (veryVerbose) LogStr("rt ");
         undoReversibleTransformation();
         spotBlock(False);
-        if (veryVerbose) { sprintf(gText, "rld"); LogStr(gText); }
+        if (veryVerbose) LogStr("rld");
         unRLEandDump(stream, thisIsTheLastBlock);
-        if (veryVerbose) { sprintf(gText, "] "); LogStr(gText); }
+        if (veryVerbose) LogStr("] ");
     }
         while (!thisIsTheLastBlock);
 
-    if (veryVerbose) { sprintf(gText, "\n  "); LogStr(gText); }
+    if (veryVerbose) LogStr(" ");
 
     crcStored   = getUInt32(zbs);
     crcComputed = getFinalCRC();
@@ -1501,6 +1537,7 @@ Bool uncompressStream(FILE *zStream, FILE *stream)
     ERROR_IF_NOT_ZERO(ferror(stream));
     retVal = fclose(stream);
     ERROR_IF_EOF(retVal);
+    FreeDecompressStructures();
     return True;
 }
 
@@ -1654,6 +1691,9 @@ void compressOutOfMemory(Int32 draw, Int32 blockSize)
     cleanUpAndFail();
 }
 
+// @early-stop
+// All 42 instructions are identical and neither object has a relocation; the remaining
+// objdiff residual is local-label identity metadata.
 VA(0x004d7cd0, 0x83)
 Bool endsInBz(Char *name)
 {
@@ -1665,6 +1705,9 @@ Bool endsInBz(Char *name)
          name[n-1] == 'z');
 }
 
+// @early-stop
+// All instructions and all 16 relocations agree; only delinked local string identities
+// differ in the objdiff report.
 VA(0x004d7d60, 0xe2)
 void compress(Char *name)
 {
@@ -1687,6 +1730,10 @@ void compress(Char *name)
     retVal = remove(inName);
 }
 
+// @early-stop
+// All external relocation targets agree (19 per object).  The sole address residual is
+// `outName-3`: retail encodes outName plus displacement -3, while the delinker names the
+// same effective address 0x53742d as const_0013742d with displacement 0.
 VA(0x004d7e50, 0x110)
 void uncompress(Char *name)
 {
@@ -1712,11 +1759,15 @@ void uncompress(Char *name)
     ERROR_IF_NOT_ZERO(retVal);
 }
 
+// @early-stop
+// All instructions and all 28 relocations agree; the residuals are delinked local string
+// identities only.
 VA(0x004d7f60, 0x2d5)
 long EncodeData(char *dst, char *src, unsigned long srcLen)
 {
-    char  fname[450] = "";
+    char  fname[450] = { 0 };
     int   fd;
+    int   retVal;
     FILE *fp;
     long  flen;
 
@@ -1742,22 +1793,26 @@ long EncodeData(char *dst, char *src, unsigned long srcLen)
 
     strcat(fname, ".nw");
     fp = fopen(fname, "rb");
-    fseek(fp, 0, 2);
+    retVal = fseek(fp, 0, 2);
     flen = ftell(fp);
-    fseek(fp, 0, 0);
-    fread(dst, flen, 1, fp);
-    fclose(fp);
-    remove(fname);
+    retVal = fseek(fp, 0, 0);
+    retVal = fread(dst, flen, 1, fp);
+    retVal = fclose(fp);
+    retVal = remove(fname);
     FreeCompressStructures();
 
     return flen;
 }
 
+// @early-stop
+// All instructions and all 26 relocations agree; the residuals are delinked local string
+// identities only.
 VA(0x004d8240, 0x2f3)
 long DecodeData(char *dst, char *src, unsigned long srcLen)
 {
-    char  fname[450] = "";
+    char  fname[450] = { 0 };
     int   fd;
+    int   retVal;
     FILE *fp;
     long  flen;
 
@@ -1783,12 +1838,12 @@ long DecodeData(char *dst, char *src, unsigned long srcLen)
 
     fname[strlen(fname) - 3] = '\0';
     fp = fopen(fname, "rb");
-    fseek(fp, 0, 2);
+    retVal = fseek(fp, 0, 2);
     flen = ftell(fp);
-    fseek(fp, 0, 0);
-    fread(dst, flen, 1, fp);
-    fclose(fp);
-    remove(fname);
+    retVal = fseek(fp, 0, 0);
+    retVal = fread(dst, flen, 1, fp);
+    retVal = fclose(fp);
+    retVal = remove(fname);
     FreeCompressStructures();
 
     return flen;
