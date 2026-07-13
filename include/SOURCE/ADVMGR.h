@@ -235,6 +235,9 @@ typedef enum AdventureDrawMask {
 
 typedef enum AdventureDrawConstant {
     ADVMGR_CELL_PIXELS = 32,
+    ADVMGR_DRAW_VIEW_CELLS = 15,
+    ADVMGR_DRAW_LAST_CELL = ADVMGR_DRAW_VIEW_CELLS - 1,
+    ADVMGR_DRAW_FORWARD_DIRECTION_MAX = 4,
     ADVMGR_DRAW_CLIP_WIDTH = 480,
     ADVMGR_DRAW_CLIP_HEIGHT = 480,
     ADVMGR_CLOUD_VARIANTS = 4,
@@ -264,6 +267,14 @@ typedef enum AdventureComboDrawConstant {
     ADVMGR_MONSTER_GHOST = 0x3b,
     ADVMGR_CURSOR_ROUTE = 6
 } AdventureComboDrawConstant;
+
+typedef enum AdventureUpdateScreenConstant {
+    ADVMGR_UPDATE_NONE = -1,
+    ADVMGR_UPDATE_VIEWPORT_ORIGIN = 16,
+    ADVMGR_UPDATE_VIEWPORT_SIZE = 448,
+    ADVMGR_UPDATE_ANIMATION_PHASES = 6,
+    ADVMGR_UPDATE_FRAME_CYCLE = 18
+} AdventureUpdateScreenConstant;
 
 typedef enum AdventureRadarConstant {
     ADVMGR_RADAR_SIZE = 144,
