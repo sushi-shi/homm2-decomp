@@ -48,8 +48,8 @@ public:
     int m_selectedBuilding;  // +0x15e
     heroWindow *m_heroWindow0;  // +0x162  hero portrait window (redrawn on recruit)
     heroWindow *m_heroWindow1;  // +0x166  hero portrait window (redrawn on recruit)
-    int    field_0x16a;  // +0x16a
-    int    field_0x16e;  // +0x16e
+    int m_splitAmount;  // +0x16a
+    int m_splitMaximum;  // +0x16e
     int    m_recruitState;  // +0x172  recruit slot / selection state
     hero *m_recruitHero;  // +0x176
     // --- constructors ---
