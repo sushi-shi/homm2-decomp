@@ -36,6 +36,7 @@ public:
     // `jmp $+0` and the deferred `Row(y)[x]` indexing seen in the retail .text. Fully
     // inlined -> they emit no out-of-line symbol, which is why CodeView lists none.
     mapCell      *Row(int y)   { return cells + width * y; }   // row base ptr; caller does [x]
+    mapCell      *GetCell(int x, int y) { return cells + width * y + x; }
     mapCellExtra *Extra(int i) { return &extras[i]; }          // &extras[i] (stride 7)
 };
 SIZE(fullMap, 20);

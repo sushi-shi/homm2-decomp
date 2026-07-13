@@ -19,15 +19,40 @@ struct tag_message;
 // game data records owned by the game struct (also declared in KB.h under the same guard)
 #ifndef HOMM2_GAME_RECORD_TYPES
 #define HOMM2_GAME_RECORD_TYPES
-struct townSlot { char m_pad[0x64]; };
+#pragma pack(push, 1)
+struct townSlot {
+    signed char id;
+    signed char owner;
+    signed char unknown2;
+    signed char race;
+    unsigned char x;
+    unsigned char y;
+    signed char unknown6;
+    signed char unknown7;
+    signed char army[15];
+    signed char occupyingHeroId;
+    int buildings;
+    char unknown1c;
+    char unknown1d;
+    char pad1e[0x1a];
+    signed char unknown38;
+    char pad39[0x1c];
+    short unknown55;
+    char pad57[0xd];
+};
+#pragma pack(pop)
+SIZE(townSlot, 0x64);
 #endif
 
 #pragma pack(push, 1)
 struct mineRecord {
+    signed char id;
+    signed char owner;
     signed char resourceType;
     signed char guardianType;
     unsigned char guardianCount;
-    char pad[4];
+    unsigned char x;
+    unsigned char y;
 };
 struct boatRecord {
     signed char id;
@@ -66,7 +91,13 @@ struct playerRec {
     signed char towns[72];
     int resources[7];
     signed char evilInterface;
-    char padac[0x6f];
+    signed char unknownac;
+    char padad[0x6e];
+
+    signed char Town(int index) { return towns[index]; }
+    signed char Hero(int index) { return heroes[index]; }
+    signed char TownCount(void) { return townCount; }
+    signed char HeroCount(void) { return heroCount; }
 };
 #pragma pack(pop)
 #endif
@@ -166,8 +197,9 @@ public:
     struct playerRec m_players[6];  // +0x49c
     class fullMap m_worldMap;  // +0xb3e
     signed char m_obeliskCount;  // +0xb52
-    townSlot m_castleRecs[72];  // 0xb53  castle/town record slots (GetCastleRec)
-    char _pad_0x2773[0x51];     // 0x2773..0x27c4
+    townSlot m_castleRecs[72];  // 0xb53
+    signed char m_castleOwners[72];  // +0x2773
+    char m_pad_0x27bb[9];
     hero m_heroRecs[54];         // 0x27c4  hero record slots (GetHeroSlot)
     signed char m_availableHeroes[54];  // +0x5c80
     mineRecord m_mines[144];      // 0x5cb6

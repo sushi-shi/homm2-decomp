@@ -38,7 +38,29 @@ class townManager;
 // SWinSetup/SNetPlayerInfo — live in _types.h / _carcass_types.h).
 #ifndef HOMM2_GAME_RECORD_TYPES
 #define HOMM2_GAME_RECORD_TYPES
-struct townSlot { char m_pad[0x64]; };
+#pragma pack(push, 1)
+struct townSlot {
+    signed char id;
+    signed char owner;
+    signed char unknown2;
+    signed char race;
+    unsigned char x;
+    unsigned char y;
+    signed char unknown6;
+    signed char unknown7;
+    signed char army[15];
+    signed char occupyingHeroId;
+    int buildings;
+    char unknown1c;
+    char unknown1d;
+    char pad1e[0x1a];
+    signed char unknown38;
+    char pad39[0x1c];
+    short unknown55;
+    char pad57[0xd];
+};
+#pragma pack(pop)
+SIZE(townSlot, 0x64);
 struct heroRec  { char m_pad[250]; };
 #endif
 struct SPlayerExit { signed char m_0, m_1, m_2, m_3, m_4, m_5, m_6; };
