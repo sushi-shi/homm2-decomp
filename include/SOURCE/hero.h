@@ -32,6 +32,16 @@ typedef enum HeroSkillLevel {
     HERO_SKILL_LEVEL_EXPERT = 3
 } HeroSkillLevel;
 
+typedef enum HeroClassType {
+    HERO_CLASS_KNIGHT = 0,
+    HERO_CLASS_BARBARIAN = 1,
+    HERO_CLASS_SORCERESS = 2,
+    HERO_CLASS_WARLOCK = 3,
+    HERO_CLASS_WIZARD = 4,
+    HERO_CLASS_NECROMANCER = 5,
+    HERO_CLASS_COUNT = 6
+} HeroClassType;
+
 typedef enum HeroEventFlag {
     HERO_EVENT_BUOY = 0x2,
     HERO_EVENT_FOUNTAIN = 0x4,
@@ -101,8 +111,8 @@ public:
     unsigned int m_standingStoneVisits;  // +0x57
     unsigned int m_treeKnowledgeVisits;  // +0x5b
     unsigned int m_xanaduVisits;  // +0x5f
-    char   field_0x63;  // +0x63
-    char   field_0x64;  // +0x64
+    unsigned char m_randomSeed;  // +0x63
+    unsigned char m_enabled;  // +0x64
     class armyGroup m_army;  // +0x65
     signed char m_secondarySkills[14];  // +0x74
     signed char m_secondarySkillOrder[14];  // +0x82

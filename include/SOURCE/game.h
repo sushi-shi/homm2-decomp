@@ -189,10 +189,10 @@ public:
     char   field_0x2c3;  // +0x2c3
     char   field_0x2c4;  // +0x2c4
     char   field_0x2c5;  // +0x2c5
-    char   field_0x2c6;  // +0x2c6
+    unsigned char m_victoryConditionType;  // +0x2c6
     char   field_0x2c7;  // +0x2c7
     char   field_0x2c8;  // +0x2c8
-    short  field_0x2c9;  // +0x2c9
+    unsigned short m_victoryArtifact;  // +0x2c9, one-based artifact id
     char   field_0x2cb;  // +0x2cb
     short  field_0x2cc;  // +0x2cc
     char   field_0x2ce;  // +0x2ce
