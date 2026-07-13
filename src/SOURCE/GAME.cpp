@@ -38,6 +38,7 @@
 #include <BASE/resourceManager.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/heroWindow.h>
+#include <BASE/font.h>
 #include <BASE/iconWidget.h>
 #include <BASE/BITS.h>
 #include <BASE/Bzip.h>
@@ -2073,11 +2074,148 @@ void game::ClaimMine(int mineId, int player)
     }
 }
 
+// @early-stop
+// Relocation-masked comparison is identical for the full 0x1e2-byte span;
+// both objects contain the same 16 relocation sites and objdiff reports 100%.
 VA(0x00479856, 0x1e2)
-int game::ViewSpells(class hero *, int, int (*)(struct tag_message &), int) { return 0; }
+int game::ViewSpells(hero *spellHero, int spellType,
+                     int (*callback)(tag_message &), int readOnly)
+{
+    tag_message message;
 
+    viewSpellsHero = spellHero;
+    m_viewSpell = -1;
+    if (spellHero->GetNumSpells(spellType) == 0) {
+        NormalDialog(const_cast<char *>("No spells to cast."), 1,
+                     -1, -1, -1, 0, -1, 0, -1, 0);
+    } else {
+        m_viewSpellsCallback = callback;
+        m_viewSpellsReadOnly = static_cast<signed char>(readOnly);
+        m_viewSpellsHero = spellHero;
+        if (spellType == 2)
+            m_viewSpellsType = 1;
+        else
+            m_viewSpellsType = spellType;
+        m_viewSpellsTop[0] = 0;
+        m_viewSpellsCount[0] = spellHero->GetNumSpells(0);
+        m_viewSpellsTop[1] = 0;
+        m_viewSpellsCount[1] = spellHero->GetNumSpells(1);
+        m_viewSpellsWindow = new heroWindow(
+            0x56, 0x57, const_cast<char *>("spellwin.bin"));
+        if (m_viewSpellsWindow == 0)
+            MemError();
+        if (spellType != 2) {
+            message.type = 0x200;
+            message.field4 = 6;
+            if (spellType == 0)
+                message.field8 = 4;
+            else
+                message.field8 = 5;
+            message.field18 = 6;
+            m_viewSpellsWindow->BroadcastMessage(message);
+        }
+        UpdateSpellWidgets();
+        gpWindowManager->DoDialog(m_viewSpellsWindow, ViewSpellsHandler, 0);
+        delete m_viewSpellsWindow;
+    }
+    return m_viewSpell;
+}
+
+// @early-stop
+// Relocation-masked comparison is identical for the full 0x403-byte span;
+// both objects contain the same 42 relocation sites and objdiff reports 100%.
 VA(0x00479a38, 0x403)
-void game::UpdateSpellWidgets(void) {}
+void game::UpdateSpellWidgets(void)
+{
+    tag_message message9;
+    int spellSlot6;
+    int spellPoints0;
+    int spell2;
+    int lineLength0;
+
+    message9.type = 0x200;
+    spellPoints0 = m_viewSpellsHero->m_spellPoints;
+    if (spellPoints0 > 999)
+        spellPoints0 = 999;
+    message9.field18 = 6;
+    if (spellPoints0 > 99)
+        message9.field4 = 5;
+    else
+        message9.field4 = 6;
+    message9.field8 = 7;
+    m_viewSpellsWindow->BroadcastMessage(message9);
+    if (spellPoints0 > 9)
+        message9.field4 = 5;
+    else
+        message9.field4 = 6;
+    message9.field8 = 8;
+    m_viewSpellsWindow->BroadcastMessage(message9);
+
+    sprintf(gText, "%d", (spellPoints0 / 100) % 10);
+    message9.text = gText;
+    message9.field4 = 3;
+    message9.field8 = 7;
+    m_viewSpellsWindow->BroadcastMessage(message9);
+    sprintf(gText, "%d", (spellPoints0 / 10) % 10);
+    message9.text = gText;
+    message9.field4 = 3;
+    message9.field8 = 8;
+    m_viewSpellsWindow->BroadcastMessage(message9);
+    sprintf(gText, "%d", spellPoints0 % 10);
+    message9.text = gText;
+    message9.field4 = 3;
+    message9.field8 = 9;
+    m_viewSpellsWindow->BroadcastMessage(message9);
+
+    for (spellSlot6 = 0; spellSlot6 < 12; spellSlot6++) {
+        if (m_viewSpellsTop[m_viewSpellsType] + spellSlot6 >=
+            m_viewSpellsCount[m_viewSpellsType]) {
+            message9.field4 = 6;
+            message9.field8 = spellSlot6 + 100;
+            message9.field18 = 6;
+            m_viewSpellsWindow->BroadcastMessage(message9);
+            message9.field8 = spellSlot6 + 30;
+            m_viewSpellsWindow->BroadcastMessage(message9);
+        } else {
+            spell2 = m_viewSpellsHero->GetNthSpell(
+                m_viewSpellsType,
+                m_viewSpellsTop[m_viewSpellsType] + spellSlot6 + 1);
+            message9.field4 = 8;
+            message9.field8 = spellSlot6 + 30;
+            if (GetManaCost(spell2, m_viewSpellsHero) >
+                m_viewSpellsHero->m_spellPoints)
+                message9.field18 = 3;
+            else
+                message9.field4 = 1;
+            m_viewSpellsWindow->BroadcastMessage(message9);
+            message9.field4 = 5;
+            message9.field18 = 6;
+            m_viewSpellsWindow->BroadcastMessage(message9);
+            message9.field8 = spellSlot6 + 100;
+            m_viewSpellsWindow->BroadcastMessage(message9);
+            if (m_viewSpellsReadOnly) {
+                message9.field4 = 5;
+                message9.field18 = 2;
+                m_viewSpellsWindow->BroadcastMessage(message9);
+            }
+            message9.field4 = 4;
+            message9.field18 = gsSpellInfo[spell2].iconIndex;
+            m_viewSpellsWindow->BroadcastMessage(message9);
+            lineLength0 = smallFont->LineLength(gSpellNames[spell2], 78);
+            if (lineLength0 == 1) {
+                sprintf(gText, "%s\n[%d]", gSpellNames[spell2],
+                        GetManaCost(spell2, m_viewSpellsHero));
+            } else {
+                sprintf(gText, "%s [%d]", gSpellNames[spell2],
+                        GetManaCost(spell2, m_viewSpellsHero));
+            }
+            message9.field4 = 3;
+            message9.field8 = spellSlot6 + 30;
+            message9.text = gText;
+            m_viewSpellsWindow->BroadcastMessage(message9);
+        }
+    }
+}
 
 // @early-stop
 // Exact 0x692-byte span and 101 relocation sites. The live residual is the

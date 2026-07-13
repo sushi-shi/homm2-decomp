@@ -113,7 +113,8 @@ struct tag_monsterInfo {
 struct SSpellInfo {
     char m_pad0[9];
     unsigned char level;
-    char m_pad1[2];
+    unsigned char iconIndex;
+    char m_pad1;
     short aiValue;
     unsigned char raceChance[6];
     unsigned char attributes;
