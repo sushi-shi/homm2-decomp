@@ -2691,6 +2691,9 @@ void advManager::FizzleCenter(int fizzleType)
     }
 }
 
+// @early-stop
+// Pre-95% structural wall: exact 0x150 frame, four jump tables, and 356/356
+// relocations; 68 localized non-table lowering hunks remain.
 VA(0x004b1e43, 0x2a40)
 void advManager::DoAIEvent(mapCell *cell, hero *eventHero, int x, int y)
 {
@@ -2722,7 +2725,7 @@ void advManager::DoAIEvent(mapCell *cell, hero *eventHero, int x, int y)
     int exitCount;
     mapEventExtra *eventExtra_o;
     unsigned int artifactGuardCount_b;
-    unsigned int survivingCount_a;
+    int survivingCount_a;
     boatRecord *boat_k;
     int savedShowIt_e;
     int mineId_j;
@@ -2793,12 +2796,15 @@ void advManager::DoAIEvent(mapCell *cell, hero *eventHero, int x, int y)
                 index_h = gpGame->m_mines[cell->w4hi].guardianCount;
                 combatResult_d = gpPhilAI->CombatMonsterEvent(
                     eventHero, gpGame->m_mines[cell->w4hi].guardianType,
-                    reinterpret_cast<int *>(&index_h), 0);
-                if (combatResult_d == 0)
+                    &index_h, cell);
+                if (combatResult_d != 0) {
+                    gpGame->m_mines[cell->w4hi].guardianType =
+                        AI_EVENT_NO_CREATURE;
+                    gpGame->m_mines[cell->w4hi].guardianCount = 0;
+                    eventHero->CheckLevel();
+                } else {
                     break;
-                gpGame->m_mines[cell->w4hi].guardianType = AI_EVENT_NO_CREATURE;
-                gpGame->m_mines[cell->w4hi].guardianCount = 0;
-                eventHero->CheckLevel();
+                }
             }
             gpGame->ClaimMine(cell->w4hi, giCurPlayer);
             if (eventType_g == MAP_EVENT_MINE) {
@@ -2825,32 +2831,33 @@ void advManager::DoAIEvent(mapCell *cell, hero *eventHero, int x, int y)
         break;
 
     case MAP_EVENT_LIGHTHOUSE:
-        if (gpGame->m_mineOwners[cell->w4hi] != giCurPlayer)
+        if (gpGame->m_mineOwners[cell->w4hi] == giCurPlayer) {
+        } else {
             gpGame->ClaimMine(cell->w4hi, giCurPlayer);
+        }
         break;
 
     case MAP_EVENT_TREASURE_CHEST:
-        if ((cell->w4hi & CHEST_ARTIFACT_FLAG) == 0) {
+        if (cell->w4hi & CHEST_ARTIFACT_FLAG) {
+            if (eventHero->NumArtifacts() >= AI_EVENT_ARTIFACT_LIMIT) {
+                cell->w4hi = CHEST_GOLD_ONLY;
+                goto chestGoldOrExperience;
+            }
+            GiveArtifact(eventHero, cell->w4hi & CHEST_ARTIFACT_MASK, 1, -1);
+        } else {
 chestGoldOrExperience:
             if (gpPhilAI->ChooseGoldOrExperience(
                     cell->w4hi * CHEST_GOLD_MULTIPLIER,
-                    (cell->w4hi * 4 - 4) * CHEST_EXPERIENCE_MULTIPLIER) == 0) {
+                    (cell->w4hi * 4 - 4) * CHEST_EXPERIENCE_MULTIPLIER)) {
+                GiveResource(eventHero, RES_GOLD,
+                             cell->w4hi * CHEST_GOLD_MULTIPLIER);
+            } else {
                 GiveExperience(eventHero,
                                (cell->w4hi * 4 - 4) *
                                    CHEST_EXPERIENCE_MULTIPLIER,
                                1);
                 eventHero->CheckLevel();
-            } else {
-                GiveResource(eventHero, RES_GOLD,
-                             cell->w4hi * CHEST_GOLD_MULTIPLIER);
             }
-        } else {
-            if (eventHero->NumArtifacts() >= AI_EVENT_ARTIFACT_LIMIT) {
-                cell->m_objectData =
-                    (cell->m_objectData & 7) | 0x10;
-                goto chestGoldOrExperience;
-            }
-            GiveArtifact(eventHero, cell->w4hi & CHEST_ARTIFACT_MASK, 1, -1);
         }
         eventResults[0] = 1;
         break;
@@ -2909,20 +2916,24 @@ chestGoldOrExperience:
         break;
 
     case MAP_EVENT_SKELETON:
-        if (cell->w4hi != SKELETON_EMPTY) {
+        switch (cell->w4hi) {
+        case SKELETON_EMPTY:
+            break;
+        default:
             GiveArtifact(eventHero, cell->w4hi - SKELETON_ARTIFACT_OFFSET,
                          1, -1);
-            cell->m_objectData = (cell->m_objectData & 7) | 8;
+            cell->w4hi = SKELETON_EMPTY;
+            break;
         }
         break;
 
     case MAP_EVENT_MAGIC_GARDEN:
         if (cell->w4hi != MAP_EVENT_DATA_EMPTY) {
-            resourceType_a = cell->w4hi - MAP_EVENT_RESOURCE_OFFSET;
-            GiveResource(eventHero, resourceType_a,
-                         resourceType_a == RES_GOLD ? MAP_EVENT_GOLD_AMOUNT
-                                                  : MAP_EVENT_RESOURCE_AMOUNT);
-            cell->m_objectData &= 7;
+            GiveResource(eventHero, cell->w4hi - MAP_EVENT_RESOURCE_OFFSET,
+                         cell->w4hi - MAP_EVENT_RESOURCE_OFFSET == RES_GOLD
+                             ? MAP_EVENT_GOLD_AMOUNT
+                             : MAP_EVENT_RESOURCE_AMOUNT);
+            cell->w4hi = MAP_EVENT_DATA_EMPTY;
         }
         break;
 
@@ -2932,42 +2943,43 @@ chestGoldOrExperience:
                          (cell->w4hi & ARTIFACT_MODE_MASK) - 1,
                          (cell->w4hi & ARTIFACT_RESOURCE_MASK) >>
                              ARTIFACT_RESOURCE_SHIFT);
-            cell->m_objectData &= 7;
+            cell->w4hi = MAP_EVENT_DATA_EMPTY;
         }
         break;
 
     case MAP_EVENT_WAGON:
         if (cell->w4hi != MAP_EVENT_DATA_EMPTY) {
-            if ((cell->w4hi & WAGON_ARTIFACT_FLAG) == 0) {
+            if (cell->w4hi & WAGON_ARTIFACT_FLAG) {
+                if (eventHero->NumArtifacts() != AI_EVENT_ARTIFACT_LIMIT)
+                    GiveArtifact(eventHero,
+                                 cell->w4hi & WAGON_ARTIFACT_MASK, 1, -1);
+                cell->w4hi = MAP_EVENT_DATA_EMPTY;
+            } else {
                 GiveResource(eventHero,
                              (cell->w4hi & ARTIFACT_MODE_MASK) - 1,
                              (cell->w4hi & ARTIFACT_RESOURCE_MASK) >>
                                  ARTIFACT_RESOURCE_SHIFT);
-                cell->m_objectData &= 7;
-            } else {
-                if (eventHero->NumArtifacts() != AI_EVENT_ARTIFACT_LIMIT)
-                    GiveArtifact(eventHero,
-                                 cell->w4hi & WAGON_ARTIFACT_MASK, 1, -1);
-                cell->m_objectData &= 7;
+                cell->w4hi = MAP_EVENT_DATA_EMPTY;
             }
         }
         break;
 
     case MAP_EVENT_SEA_CHEST:
-        if ((cell->w4hi & CHEST_ARTIFACT_FLAG) == 0 ||
-            eventHero->NumArtifacts() >= AI_EVENT_ARTIFACT_LIMIT) {
-            if (cell->w4hi != 0)
-                GiveResource(eventHero, RES_GOLD, AI_EVENT_SEA_CHEST_GOLD);
-        } else {
+        if ((cell->w4hi & CHEST_ARTIFACT_FLAG) != 0 &&
+            eventHero->NumArtifacts() < AI_EVENT_ARTIFACT_LIMIT) {
             GiveArtifact(eventHero, cell->w4hi & CHEST_ARTIFACT_MASK, 1, -1);
             GiveResource(eventHero, RES_GOLD,
                          AI_EVENT_SEA_CHEST_ARTIFACT_GOLD);
+        } else if (cell->w4hi != 0) {
+            GiveResource(eventHero, RES_GOLD, AI_EVENT_SEA_CHEST_GOLD);
         }
         eventResults[0] = 1;
         break;
 
     case MAP_EVENT_FLOTSAM:
         switch (cell->w4hi) {
+        case 0:
+            break;
         case 1:
             GiveResource(eventHero, RES_WOOD, 5);
             break;
@@ -2979,69 +2991,64 @@ chestGoldOrExperience:
             GiveResource(eventHero, RES_WOOD, 10);
             GiveResource(eventHero, RES_GOLD, 500);
             break;
-        default:
-            break;
         }
         eventResults[0] = 1;
         break;
 
     case MAP_EVENT_CAMPFIRE:
-        resourceType_a = cell->objIndex >> 1;
-        resourceAmount_o = resourceType_a == RES_GOLD
-            ? cell->w4hi * CAMPFIRE_GOLD_MULTIPLIER
-            : cell->w4hi;
-        GiveResource(eventHero, resourceType_a, resourceAmount_o);
+        GiveResource(eventHero, RES_GOLD,
+                     (cell->w4hi >> CAMPFIRE_AMOUNT_SHIFT) *
+                         CAMPFIRE_GOLD_MULTIPLIER);
+        GiveResource(eventHero, cell->w4hi & CAMPFIRE_RESOURCE_MASK,
+                     cell->w4hi >> CAMPFIRE_AMOUNT_SHIFT);
         eventResults[0] = 1;
         break;
 
     case MAP_EVENT_FORT:
-        if ((eventHero->m_fortVisits & (1U << (cell->w4hi & 31))) == 0) {
+        if ((eventHero->m_fortVisits & (1U << cell->w4hi)) == 0) {
             ++eventHero->m_defense;
-            eventHero->m_fortVisits |= 1U << (cell->w4hi & 31);
+            eventHero->m_fortVisits |= 1U << cell->w4hi;
         }
         break;
 
     case MAP_EVENT_XANADU:
-        if ((eventHero->m_xanaduVisits & (1U << (cell->w4hi & 31))) == 0 &&
+        if ((eventHero->m_xanaduVisits & (1U << cell->w4hi)) == 0 &&
             eventHero->m_level +
-                    eventHero->m_secondarySkills[HERO_SKILL_DIPLOMACY] * 2 >
-                9) {
+                    eventHero->m_secondarySkills[HERO_SKILL_DIPLOMACY] * 2 >=
+                XANADU_ADMISSION_LEVEL) {
             ++eventHero->m_attack;
             ++eventHero->m_defense;
             ++eventHero->m_knowledge;
             ++eventHero->m_spellPower;
-            eventHero->m_xanaduVisits |= 1U << (cell->w4hi & 31);
+            eventHero->m_xanaduVisits |= 1U << cell->w4hi;
         }
         break;
 
     case MAP_EVENT_STANDING_STONES:
-        if ((eventHero->m_standingStoneVisits &
-             (1U << (cell->w4hi & 31))) == 0) {
+        if ((eventHero->m_standingStoneVisits & (1U << cell->w4hi)) == 0) {
             ++eventHero->m_spellPower;
-            eventHero->m_standingStoneVisits |= 1U << (cell->w4hi & 31);
+            eventHero->m_standingStoneVisits |= 1U << cell->w4hi;
         }
         break;
 
     case MAP_EVENT_WITCH_DOCTOR_HUT:
-        if ((eventHero->m_witchDoctorVisits &
-             (1U << (cell->w4hi & 31))) == 0) {
+        if ((eventHero->m_witchDoctorVisits & (1U << cell->w4hi)) == 0) {
             ++eventHero->m_knowledge;
-            eventHero->m_witchDoctorVisits |= 1U << (cell->w4hi & 31);
+            eventHero->m_witchDoctorVisits |= 1U << cell->w4hi;
         }
         break;
 
     case MAP_EVENT_MERCENARY_CAMP:
-        if ((eventHero->m_mercenaryCampVisits &
-             (1U << (cell->w4hi & 31))) == 0) {
+        if ((eventHero->m_mercenaryCampVisits & (1U << cell->w4hi)) == 0) {
             ++eventHero->m_attack;
-            eventHero->m_mercenaryCampVisits |= 1U << (cell->w4hi & 31);
+            eventHero->m_mercenaryCampVisits |= 1U << cell->w4hi;
         }
         break;
 
     case MAP_EVENT_GAZEBO:
-        if ((eventHero->m_gazeboVisits & (1U << (cell->w4hi & 31))) == 0) {
+        if ((eventHero->m_gazeboVisits & (1U << cell->w4hi)) == 0) {
             GiveExperience(eventHero, GAZEBO_EXPERIENCE, 1);
-            eventHero->m_gazeboVisits |= 1U << (cell->w4hi & 31);
+            eventHero->m_gazeboVisits |= 1U << cell->w4hi;
             eventHero->CheckLevel();
         }
         break;
@@ -3050,7 +3057,7 @@ chestGoldOrExperience:
         if (cell->w4hi != 0) {
             GiveResource(eventHero, RES_GOLD,
                          cell->w4hi * CHEST_GOLD_MULTIPLIER);
-            cell->m_objectData &= 7;
+            cell->w4hi = MAP_EVENT_DATA_EMPTY;
         }
         break;
 
@@ -3066,7 +3073,7 @@ chestGoldOrExperience:
     case MAP_EVENT_WINDMILL:
         if (cell->w4hi != AI_EVENT_WINDMILL_EMPTY) {
             GiveResource(eventHero, cell->w4hi, WINDMILL_RESOURCE_AMOUNT);
-            cell->m_objectData = (cell->m_objectData & 7) | 0x318;
+            cell->w4hi = AI_EVENT_WINDMILL_EMPTY;
         }
         break;
 
@@ -3225,8 +3232,9 @@ creaturePurchase:
         break;
 
     case MAP_EVENT_OBELISK:
-        if ((giCurPlayerBit & gpGame->m_obeliskVisitors[cell->w4hi]) == 0) {
-            gpGame->m_obeliskVisitors[cell->w4hi] |= giCurPlayerBit;
+        if ((giCurPlayerBit &
+             gpGame->m_obeliskVisitors[cell->w4hi - 1]) == 0) {
+            gpGame->m_obeliskVisitors[cell->w4hi - 1] |= giCurPlayerBit;
             ComputeUALoc(giCurPlayer);
         }
         break;
@@ -3237,11 +3245,10 @@ creaturePurchase:
     case MAP_EVENT_SHRINE_FIRST_CIRCLE:
     case MAP_EVENT_SHRINE_SECOND_CIRCLE:
     case MAP_EVENT_SHRINE_THIRD_CIRCLE:
-        index_h = cell->w4hi - 1;
         if (eventHero->HasArtifact(AI_EVENT_MAGIC_BOOK) &&
-            gsSpellInfo[index_h].level <=
+            gsSpellInfo[cell->w4hi - 1].level <=
                 eventHero->m_secondarySkills[HERO_SKILL_WISDOM] + 2) {
-            eventHero->AddSpell(index_h,
+            eventHero->AddSpell(cell->w4hi - 1,
                                 eventHero->Stats(HERO_PRIMARY_KNOWLEDGE));
         }
         break;
@@ -3256,16 +3263,17 @@ creaturePurchase:
     case MAP_EVENT_STONE_LITHS:
 teleportEvent:
         exitCount = 0;
-        teleportDistance_o = eventType_g == MAP_EVENT_STONE_LITHS
-            ? AI_EVENT_TELEPORT_STONE_DISTANCE
-            : AI_EVENT_TELEPORT_WHIRLPOOL_DISTANCE;
-        for (exitY_d = 0; exitY_d < MAP_HEIGHT; ++exitY_d) {
-            for (exitX = 0; exitX < MAP_WIDTH; ++exitX) {
-                exitCell_d = gpGame->m_worldMap.Row(exitY_d) + exitX;
-                if (exitCell_d->triggerType ==
-                        (eventType_g | MAP_EVENT_ACTION_FLAG) &&
-                    exitCell_d->objIndex == cell->objIndex &&
-                    abs(exitY_d - y) + abs(exitX - x) > teleportDistance_o) {
+        for (exitY_d = 0; MAP_HEIGHT > exitY_d; ++exitY_d) {
+            for (exitX = 0; MAP_WIDTH > exitX; ++exitX) {
+                if (gpGame->m_worldMap.Row(exitY_d)[exitX].triggerType ==
+                        static_cast<unsigned char>(eventType_g |
+                                                   MAP_EVENT_ACTION_FLAG) &&
+                    gpGame->m_worldMap.Row(exitY_d)[exitX].objIndex ==
+                        cell->objIndex &&
+                    abs(exitY_d - y) + abs(exitX - x) >
+                        (eventType_g == MAP_EVENT_STONE_LITHS
+                             ? AI_EVENT_TELEPORT_STONE_DISTANCE
+                             : AI_EVENT_TELEPORT_WHIRLPOOL_DISTANCE)) {
                     ++exitCount;
                 }
             }
@@ -3273,13 +3281,17 @@ teleportEvent:
         if (exitCount > 0) {
             if (exitCount > 1)
                 exitCount = Random(1, exitCount);
-            for (exitY_d = 0; exitY_d < MAP_HEIGHT; ++exitY_d) {
-                for (exitX = 0; exitX < MAP_WIDTH; ++exitX) {
-                    exitCell_d = gpGame->m_worldMap.Row(exitY_d) + exitX;
-                    if (exitCell_d->triggerType ==
-                            (eventType_g | MAP_EVENT_ACTION_FLAG) &&
-                        exitCell_d->objIndex == cell->objIndex &&
-                        abs(exitY_d - y) + abs(exitX - x) > teleportDistance_o &&
+            for (exitY_d = 0; MAP_HEIGHT > exitY_d; ++exitY_d) {
+                for (exitX = 0; MAP_WIDTH > exitX; ++exitX) {
+                    if (gpGame->m_worldMap.Row(exitY_d)[exitX].triggerType ==
+                            static_cast<unsigned char>(eventType_g |
+                                                       MAP_EVENT_ACTION_FLAG) &&
+                        gpGame->m_worldMap.Row(exitY_d)[exitX].objIndex ==
+                            cell->objIndex &&
+                        abs(exitY_d - y) + abs(exitX - x) >
+                            (eventType_g == MAP_EVENT_STONE_LITHS
+                                 ? AI_EVENT_TELEPORT_STONE_DISTANCE
+                                 : AI_EVENT_TELEPORT_WHIRLPOOL_DISTANCE) &&
                         --exitCount < 1) {
                         goto teleportDestination;
                     }
@@ -3299,7 +3311,7 @@ teleportDestination:
         if (eventHero->NumArtifacts() == AI_EVENT_ARTIFACT_LIMIT)
             break;
         if (artifact_g == AI_EVENT_SPELL_SCROLL) {
-            GiveArtifact(eventHero, AI_EVENT_SPELL_SCROLL, 1,
+            GiveArtifact(eventHero, artifact_g, 1,
                          static_cast<signed char>(cell->w4hi));
             eventResults[0] = 1;
             break;
@@ -3310,11 +3322,12 @@ teleportDestination:
             } else {
                 artifactGuardResult_e = 1;
                 if (gpPhilAI->ChooseToFightForArtifact(
-                        artifact_g, artifactGuardCount_b, 0) == 0)
+                        artifact_g, artifactGuardCount_b, 1) == 0)
                     break;
             }
             if (gpPhilAI->CombatMonsterEvent(
-                    eventHero, artifactGuardCount_b, &artifactGuardResult_e, 0) == 0)
+                    eventHero, artifactGuardCount_b, &artifactGuardResult_e,
+                    cell) == 0)
                 break;
             goto artifactPickup;
         }
@@ -3331,7 +3344,7 @@ artifactPickup:
         case ARTIFACT_MODE_GOLD:
             if (gpPhilAI->NetValueOfArtifact(
                     artifact_g, AI_EVENT_ARTIFACT_GOLD, 0, 0)) {
-                gpCurPlayer->m_resources[RES_GOLD] -=
+                gpGame->m_players[eventHero->m_owner].resources[RES_GOLD] -=
                     AI_EVENT_ARTIFACT_GOLD;
                 goto artifactPickup;
             }
@@ -3348,9 +3361,10 @@ artifactPickup:
             if (gpPhilAI->NetValueOfArtifact(
                     artifact_g, AI_EVENT_ARTIFACT_RESOURCE_3_GOLD,
                     artifactResource_p, AI_EVENT_ARTIFACT_RESOURCE_3)) {
-                gpCurPlayer->m_resources[RES_GOLD] -=
+                gpGame->m_players[eventHero->m_owner].resources[RES_GOLD] -=
                     AI_EVENT_ARTIFACT_RESOURCE_3_GOLD;
-                gpCurPlayer->m_resources[artifactResource_p] -=
+                gpGame->m_players[eventHero->m_owner]
+                    .resources[artifactResource_p] -=
                     AI_EVENT_ARTIFACT_RESOURCE_3;
                 goto artifactPickup;
             }
@@ -3359,9 +3373,10 @@ artifactPickup:
             if (gpPhilAI->NetValueOfArtifact(
                     artifact_g, AI_EVENT_ARTIFACT_RESOURCE_5_GOLD,
                     artifactResource_p, AI_EVENT_ARTIFACT_RESOURCE_5)) {
-                gpCurPlayer->m_resources[RES_GOLD] -=
+                gpGame->m_players[eventHero->m_owner].resources[RES_GOLD] -=
                     AI_EVENT_ARTIFACT_RESOURCE_5_GOLD;
-                gpCurPlayer->m_resources[artifactResource_p] -=
+                gpGame->m_players[eventHero->m_owner]
+                    .resources[artifactResource_p] -=
                     AI_EVENT_ARTIFACT_RESOURCE_5;
                 goto artifactPickup;
             }
@@ -3388,14 +3403,14 @@ artifactPickup:
             if (combatResult_d != 0 && occupiedTown_b != 0) {
                 combatResult_d = gpPhilAI->QuickCombat(
                     &eventHero->m_army, eventHero, &occupiedTown_b->m_army, 0,
-                    1, occupiedTown_b->m_owner, attackerLoss_c, defenderLoss_k);
+                    1, occupiedTown_b->m_id, attackerLoss_c, defenderLoss_k);
             }
         } else {
             if (occupiedTown_b != 0)
-                occupiedTown_b->m_occupyingHeroId = otherHero_e->m_owner;
+                occupiedTown_b->m_occupyingHeroId = otherHero_e->m_id;
             heroCombatResult_h = DoCombat(
                 x, y, eventHero, &eventHero->m_army, occupiedTown_b, otherHero_e,
-                &gpGame->m_heroRecs[cell->w4hi].m_army, x, y, -1, 1);
+                &otherHero_e->m_army, x, y, -1, 1);
             if (heroCombatResult_h == 0 && occupiedTown_b != 0)
                 gpGame->ClaimTown(occupiedTown_b->m_id, giCurPlayer, 0);
         }
@@ -3422,26 +3437,27 @@ artifactPickup:
             GiveResource(eventHero, RES_GOLD, AI_EVENT_DAEMON_GOLD);
             break;
         case DAEMON_REWARD_RANSOM:
-            if (gpCurPlayer->m_resources[RES_GOLD] < AI_EVENT_DAEMON_GOLD) {
-                HeroLoses(eventHero);
-            } else {
-                if (gpPhilAI->ChooseToPayRansomOnHero(
-                        AI_EVENT_DAEMON_GOLD) == 0) {
-                    HeroLoses(eventHero);
-                } else {
-                    gpCurPlayer->m_resources[RES_GOLD] -=
+            if (gpGame->m_players[eventHero->m_owner].resources[RES_GOLD] >=
+                AI_EVENT_DAEMON_GOLD) {
+                if (gpPhilAI->ChooseToPayRansomOnHero(AI_EVENT_DAEMON_GOLD)) {
+                    gpGame->m_players[eventHero->m_owner].resources[RES_GOLD] -=
                         AI_EVENT_DAEMON_GOLD;
+                } else {
+                    HeroLoses(eventHero);
                 }
+            } else {
+                HeroLoses(eventHero);
             }
             break;
         }
-        cell->m_objectData = (cell->m_objectData & 7) | 8;
+        cell->w4hi = DAEMON_CAVE_EMPTY;
         break;
 
     case MAP_EVENT_PYRAMID:
         if (cell->w4hi != 0 && eventHero->HasSpell(cell->w4hi - 1) == 0) {
             for (index_h = 0; index_h < AI_EVENT_ARMY_STACK_COUNT; ++index_h) {
-                gpMonGroup->m_creatureTypes[index_h] = AI_CREATURE_POWER_LICH;
+                gpMonGroup->m_creatureTypes[index_h] =
+                    PYRAMID_PRIMARY_MONSTER;
                 gpMonGroup->m_creatureCounts[index_h] = 10;
             }
             index_h = cell->w4hi - 1;
@@ -3461,15 +3477,18 @@ artifactPickup:
             gpPhilAI->ChooseEvaluateBattle(
                 &eventHero->m_army, eventHero, gpMonGroup, 0, 0, 0,
                 pyramidBattleValue_l, battleWon_j, battleResult_l);
-            if (battleWon_j != 0) {
-                survivingCount_a = 50;
+            if (battleWon_j == 0) {
+            } else {
+                index_h = PYRAMID_GUARD_COUNT;
                 combatResult_d = gpPhilAI->CombatMonsterEvent(
-                    eventHero, AI_CREATURE_POWER_LICH,
-                    reinterpret_cast<int *>(&survivingCount_a), 0);
-                if (combatResult_d != 0) {
+                    eventHero, PYRAMID_PRIMARY_MONSTER,
+                    &index_h, cell);
+                if (combatResult_d == 0) {
+                } else {
                     eventHero->AddSpell(
-                        index_h, eventHero->Stats(HERO_PRIMARY_KNOWLEDGE));
-                    cell->m_objectData &= 7;
+                        cell->w4hi - 1,
+                        eventHero->Stats(HERO_PRIMARY_KNOWLEDGE));
+                    cell->w4hi = MAP_EVENT_DATA_EMPTY;
                 }
             }
         }
@@ -3500,12 +3519,13 @@ artifactPickup:
             survivingCount_a = gpGame->m_mines[cell->w4hi].guardianCount;
             combatResult_d = gpPhilAI->CombatMonsterEvent(
                 eventHero, gpGame->m_mines[cell->w4hi].guardianType,
-                reinterpret_cast<int *>(&survivingCount_a), 0);
+                &survivingCount_a, cell);
             if (survivingCount_a > AI_EVENT_GUARD_COUNT_MAX)
                 survivingCount_a = AI_EVENT_GUARD_COUNT_MAX;
             gpGame->m_mines[cell->w4hi].guardianCount =
                 static_cast<unsigned char>(survivingCount_a);
-            if (combatResult_d != 0) {
+            if (combatResult_d == 0) {
+            } else {
                 eventHero->CheckLevel();
                 gpGame->ConvertObject(x - 2, y - 1, x + 1, y - 1,
                                       56, 0, 4, 26, 104, 64, 23);
@@ -3541,7 +3561,7 @@ artifactPickup:
 
     case MAP_EVENT_ARTESIAN_SPRING:
         if (cell->w4hi != 0) {
-            cell->m_objectData &= 7;
+            cell->w4hi = MAP_EVENT_DATA_EMPTY;
             spellPower_j = eventHero->Stats(HERO_PRIMARY_KNOWLEDGE);
             if (eventHero->m_spellPoints < spellPower_j * 20)
                 eventHero->m_spellPoints = static_cast<short>(spellPower_j * 20);
@@ -3550,7 +3570,7 @@ artifactPickup:
 
     case MAP_EVENT_MAGIC_WELL:
         if ((eventHero->m_eventFlags & HERO_EVENT_MAGIC_WELL) == 0) {
-            cell->m_objectData &= 7;
+            cell->w4hi = MAP_EVENT_DATA_EMPTY;
             spellPower_j = eventHero->Stats(HERO_PRIMARY_KNOWLEDGE);
             if (eventHero->m_spellPoints < spellPower_j * 10) {
                 eventHero->m_eventFlags |= HERO_EVENT_MAGIC_WELL;
@@ -3565,11 +3585,6 @@ artifactPickup:
         break;
 
     case MAP_EVENT_MAGELLAN_MAPS:
-        if (cell->w4hi != 0) {
-            GiveResource(eventHero, cell->w4hi - 1,
-                         cell->w4hi == 7 ? 500 : 5);
-            cell->m_objectData &= 7;
-        }
         break;
 
     case MAP_EVENT_SPHINX:
@@ -3578,10 +3593,10 @@ artifactPickup:
             if (Random(0, AI_EVENT_RANDOM_PERCENT_MAX) <
                 AI_EVENT_RANDOM_EVENT_SUCCESS) {
                 for (index_h = 0; index_h < AI_EVENT_RESOURCE_COUNT; ++index_h) {
-                    gpCurPlayer->m_resources[index_h] +=
+                    gpGame->m_players[giCurPlayer].resources[index_h] +=
                         eventExtra_o->resources[index_h];
-                    if (gpCurPlayer->m_resources[index_h] < 0)
-                        gpCurPlayer->m_resources[index_h] = 0;
+                    if (gpGame->m_players[giCurPlayer].resources[index_h] < 0)
+                        gpGame->m_players[giCurPlayer].resources[index_h] = 0;
                 }
                 if (eventExtra_o->artifact != -1 &&
                     eventHero->NumArtifacts() < AI_EVENT_ARTIFACT_LIMIT) {

@@ -685,7 +685,7 @@ SOURCE/COMMAND	?ViewBallista@combatManager@@QAEXH@Z	6.5888	1eb9767b9863
 SOURCE/COMMAND	?WinCombatHandler@@YIHAAUtag_message@@@Z	4.3279	05985356e610
 SOURCE/CURSOR	?CheckAdjacentMon@advManager@@QAEXPAH@Z	10.3016	00a9d4270cfe
 SOURCE/CURSOR	?DrawCursor@advManager@@QAEXXZ	95.0853	5c6f0ab7b5fa
-SOURCE/CURSOR	?DrawCursorShadow@advManager@@QAEXXZ	94.5355	8345dfdd6ada
+SOURCE/CURSOR	?DrawCursorShadow@advManager@@QAEXXZ	94.5450	8345dfdd6ada
 SOURCE/CURSOR	?GetCursorBaseFrame@advManager@@QAEHH@Z	97.2973	82edb34075a3
 SOURCE/CURSOR	?GetMoveShowIt@advManager@@QAEHPAVhero@@H@Z	98.0000	c928290936e7
 SOURCE/CURSOR	?MoveHero@advManager@@QAEPAVmapCell@@HHPAH00H0H@Z	92.9907	dca4e75f1ac9
@@ -696,7 +696,7 @@ SOURCE/CURSOR	?ProcessMapChange@advManager@@QAEXUSMapChange@@@Z	1.8771	f5c8ac5f5
 SOURCE/CURSOR	?PurgeMapChangeQueue@advManager@@QAEXXZ	39.3333	f7bdd888c2da
 SOURCE/CURSOR	?SendMapChange@@YIXHCEEHEE@Z	16.2442	d54bbf4c4b14
 SOURCE/CURSOR	?StartCursor@advManager@@QAEXH@Z	97.1951	c4d8531ddd56
-SOURCE/CURSOR	?StopCursor@advManager@@QAEXH@Z	99.9701	3ef0ff39ef6e
+SOURCE/CURSOR	?StopCursor@advManager@@QAEXH@Z	100.0000	3ef0ff39ef6e
 SOURCE/CURSOR	?TurnTo@advManager@@QAEXH@Z	99.8803	005e9dc77763
 SOURCE/CURSOR	?UnwindMapChangeQueue@advManager@@QAEXHH@Z	10.6393	a3fb6f7b47e2
 SOURCE/CURSOR	?ValidMove@advManager@@QAEHHH@Z	4.0758	4fccf7be9393
@@ -728,7 +728,7 @@ SOURCE/EVENTS	?BarrierAIEvent@advManager@@QAEHPAVmapCell@@PAVhero@@@Z	43.6875	5a
 SOURCE/EVENTS	?BarrierEvent@advManager@@QAEHPAVmapCell@@PAVhero@@@Z	14.8723	57deddb694a2
 SOURCE/EVENTS	?CombatMonsterEvent@advManager@@QAEHPAVhero@@HHPAVmapCell@@HHHHHHHHHHH@Z	99.9924	6128293320da
 SOURCE/EVENTS	?ComputerMonsterInteract@advManager@@QAEXPAVmapCell@@PAVhero@@PAH@Z	4.0918	68ff21e70357
-SOURCE/EVENTS	?DoAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	34.9537	3ae219f43001
+SOURCE/EVENTS	?DoAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	96.8788	917538de4f45
 SOURCE/EVENTS	?DoCombat@advManager@@QAEHHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHH@Z	2.0668	2180a6a2e575
 SOURCE/EVENTS	?DoEvent@advManager@@QAEXPAVmapCell@@HH@Z	97.9046	ea32a3594ca2
 SOURCE/EVENTS	?DoNetCombat@advManager@@QAEHPAD@Z	8.9200	be23ad7e9310
@@ -737,7 +737,7 @@ SOURCE/EVENTS	?EraseObj@advManager@@QAEXPAVmapCell@@HH@Z	99.9705	c7e56d42d2f3
 SOURCE/EVENTS	?EventSound@advManager@@QAEXHHPAUSAMPLE2@@@Z	99.3201	72aac3347965
 SOURCE/EVENTS	?EventWindow@advManager@@QAEXHHPADHHHHH@Z	22.0000	e7de72f6946e
 SOURCE/EVENTS	?ExpansionRecruitEvent@advManager@@QAEXPAVhero@@HPAF@Z	28.2174	0893eb34fc78
-SOURCE/EVENTS	?FizzleCenter@advManager@@QAEXH@Z	99.8415	7c18462481b2
+SOURCE/EVENTS	?FizzleCenter@advManager@@QAEXH@Z	99.8415	0c3725c3f906
 SOURCE/EVENTS	?GenericSiteAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	1.9244	65085fc05441
 SOURCE/EVENTS	?GenericSiteEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	1.9509	a5b2ee9230f5
 SOURCE/EVENTS	?GhostEvent@advManager@@QAEHPAVhero@@PAVmapCell@@PADHH@Z	5.4824	99981ca49796
