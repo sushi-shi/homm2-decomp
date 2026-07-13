@@ -2161,13 +2161,13 @@ void InitVars(void)
     int i;
     int j;
     NULL_SAMPLE2.pSample = 0;
-    NULL_SAMPLE2.pMem = (struct _SAMPLE *)NULL_SAMPLE2.pSample;
+    NULL_SAMPLE2.pMem = reinterpret_cast<struct _SAMPLE *>(NULL_SAMPLE2.pSample);
     gGameCommand = -1;
     gPalette = 0;
     gbCombatSurrender = 0;
-    *(int *)((char *)gpGame + 0x65e5) = 0;
-    strcpy((char *)gpGame + 0x466, "brokena.mp2");
-    *((char *)gpGame + 0x47a) = 0;
+    gpGame->m_viewArmyResult = 0;
+    strcpy(gpGame->m_mapFilename, "brokena.mp2");
+    gpGame->m_mapFilename[sizeof(gpGame->m_mapFilename) - 1] = 0;
     gbInNewGameSetup = 0;
     strcpy(cNetBoxLine[0], cBlank0);
     strcpy(cNetBoxLine[1], cBlank1);
@@ -2203,16 +2203,13 @@ void game::ShowMoraleInfo(hero *h, int dialogType)
     int homogeneous;
     int modifierStart;
     char description[200];
-    int morale;
     int slot;
 
     hasMixedUndead = 0;
-    morale = h->m_army.GetMorale(h, h->GetOccupiedTown(), 0);
-    if (morale > 0)
+    if (h->m_army.GetMorale(h, h->GetOccupiedTown(), 0) > 0)
         sprintf(description, cMoraleInfo[MORALE_INFO_GOOD]);
     else {
-        morale = h->m_army.GetMorale(h, h->GetOccupiedTown(), 0);
-        if (morale == 0)
+        if (h->m_army.GetMorale(h, h->GetOccupiedTown(), 0) == 0)
             sprintf(description, cMoraleInfo[MORALE_INFO_NEUTRAL]);
         else
             sprintf(description, cMoraleInfo[MORALE_INFO_BAD]);
@@ -2331,15 +2328,13 @@ VA(0x0049c92d, 0x371)
 void game::ShowLuckInfo(hero *h, int dialogType)
 {
     char description[200];
-    int luck;
+    int luckValue;
     int modifierStart;
 
-    luck = gpGame->GetLuck(h, 0, h->GetOccupiedTown());
-    if (luck > 0)
+    if (gpGame->GetLuck(h, 0, h->GetOccupiedTown()) > 0)
         sprintf(description, cLuckInfo[LUCK_INFO_GOOD]);
     else {
-        luck = gpGame->GetLuck(h, 0, h->GetOccupiedTown());
-        if (luck == 0)
+        if (gpGame->GetLuck(h, 0, h->GetOccupiedTown()) == 0)
             sprintf(description, cLuckInfo[LUCK_INFO_NEUTRAL]);
         else
             sprintf(description, cLuckInfo[LUCK_INFO_BAD]);
@@ -2421,31 +2416,31 @@ VA(0x0049ce14, 0x4ac)
 int AddScoreToHighScore(int score, int days, int scenario, int highScoreType, char *scenarioName)
 {
     int destination;
-    HighScoreEntry entries[HIGH_SCORE_ENTRY_COUNT];
-    int file;
+    HighScoreEntry entries_a[HIGH_SCORE_ENTRY_COUNT];
+    int file_a;
     int entry;
-    char filename[352];
-    char playerName[20];
+    char filename_a[352];
+    char playerName_c[20];
     int missingFile;
 
     missingFile = 0;
     if (highScoreType == HIGH_SCORE_STANDARD)
-        sprintf(filename, "%sSTANDARD.HS", ".\\DATA\\");
+        sprintf(filename_a, "%sSTANDARD.HS", ".\\DATA\\");
     else
-        sprintf(filename, "%sCAMPAIGN.HS", ".\\DATA\\");
+        sprintf(filename_a, "%sCAMPAIGN.HS", ".\\DATA\\");
 
-    file = _open(filename, HIGH_SCORE_FILE_READ_FLAGS);
-    if (file == -1)
+    file_a = _open(filename_a, HIGH_SCORE_FILE_READ_FLAGS);
+    if (file_a == -1)
         missingFile = 1;
     if (missingFile) {
         for (entry = 0; entry < HIGH_SCORE_ENTRY_COUNT; entry++) {
-            memset(&entries[entry], 0, sizeof(HighScoreEntry));
-            entries[entry].score = HIGH_SCORE_EMPTY;
+            memset(&entries_a[entry], 0, sizeof(HighScoreEntry));
+            entries_a[entry].score = HIGH_SCORE_EMPTY;
         }
     } else {
         for (entry = 0; entry < HIGH_SCORE_ENTRY_COUNT; entry++)
-            _read(file, &entries[entry], sizeof(entries[entry]));
-        _close(file);
+            _read(file_a, &entries_a[entry], sizeof(entries_a[entry]));
+        _close(file_a);
     }
 
     gbShowHighScore = 1;
@@ -2453,10 +2448,10 @@ int AddScoreToHighScore(int score, int days, int scenario, int highScoreType, ch
     giHighScoreRank = HIGH_SCORE_EMPTY;
     giScore = score;
     for (entry = 0; entry < HIGH_SCORE_ENTRY_COUNT; entry++) {
-        if ((entries[entry].score <= score && highScoreType == HIGH_SCORE_STANDARD) ||
-            (score <= entries[entry].score && highScoreType == HIGH_SCORE_CAMPAIGN) ||
-            (score <= entries[entry].score && highScoreType == HIGH_SCORE_EXPANSION_CAMPAIGN) ||
-            entries[entry].score == HIGH_SCORE_EMPTY) {
+        if ((entries_a[entry].score <= score && highScoreType == HIGH_SCORE_STANDARD) ||
+            (score <= entries_a[entry].score && highScoreType == HIGH_SCORE_CAMPAIGN) ||
+            (score <= entries_a[entry].score && highScoreType == HIGH_SCORE_EXPANSION_CAMPAIGN) ||
+            entries_a[entry].score == HIGH_SCORE_EMPTY) {
             giHighScoreRank = entry;
             break;
         }
@@ -2464,26 +2459,26 @@ int AddScoreToHighScore(int score, int days, int scenario, int highScoreType, ch
 
     if (entry < HIGH_SCORE_ENTRY_COUNT) {
         for (destination = HIGH_SCORE_ENTRY_COUNT - 2; destination >= entry; destination--)
-            entries[destination + 1] = entries[destination];
+            entries_a[destination + 1] = entries_a[destination];
 
-        GetDataEntry("Please enter your name for the high score list.", playerName,
+        GetDataEntry("Please enter your name for the high score list.", playerName_c,
                      HIGH_SCORE_NAME_LENGTH, 0, 0, 1);
-        memset(&entries[entry], 0, sizeof(HighScoreEntry));
-        strcpy(entries[entry].playerName, playerName);
-        strcpy(entries[entry].scenarioName, scenarioName);
-        entries[entry].score = score;
-        entries[entry].days = days;
-        entries[entry].scenario = scenario;
-        entries[entry].cheated = gpGame->m_cheated;
+        memset(&entries_a[entry], 0, sizeof(HighScoreEntry));
+        strcpy(entries_a[entry].playerName, playerName_c);
+        strcpy(entries_a[entry].scenarioName, scenarioName);
+        entries_a[entry].score = score;
+        entries_a[entry].days = days;
+        entries_a[entry].scenario = scenario;
+        entries_a[entry].cheated = gpGame->m_cheated;
         if (highScoreType == HIGH_SCORE_CAMPAIGN && gpGame->m_campaignCheated)
-            entries[entry].cheated = 1;
+            entries_a[entry].cheated = 1;
 
-        file = _open(filename, HIGH_SCORE_FILE_WRITE_FLAGS, HIGH_SCORE_FILE_PERMISSIONS);
-        if (file == -1)
-            FileError(filename);
+        file_a = _open(filename_a, HIGH_SCORE_FILE_WRITE_FLAGS, HIGH_SCORE_FILE_PERMISSIONS);
+        if (file_a == -1)
+            FileError(filename_a);
         for (entry = 0; entry < HIGH_SCORE_ENTRY_COUNT; entry++)
-            _write(file, &entries[entry], sizeof(HighScoreEntry));
-        _close(file);
+            _write(file_a, &entries_a[entry], sizeof(HighScoreEntry));
+        _close(file_a);
     } else {
         gbShowHighScore = 0;
     }

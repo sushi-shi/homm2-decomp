@@ -213,9 +213,7 @@ public:
     signed char m_setupPlayerRace[6];  // +0x459
     char _pad_0x45f[6];
     signed char m_difficulty;  // +0x465
-    char _pad_0x466[0x13];
-    char   field_0x479;  // +0x479
-    char   field_0x47a;  // +0x47a
+    char m_mapFilename[21];  // +0x466
     char   field_0x47b;  // +0x47b
     char _pad_0x47c[0x12];
     signed char m_playerCount;  // +0x48e
