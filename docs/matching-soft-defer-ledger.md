@@ -1,6 +1,6 @@
-# Soft-deferred matching search ledger
+# Matching search no-repeat ledger
 
-This ledger records exhausted, value-preserving searches whose results must survive restarts.
+This ledger records exhausted or superseded value-preserving searches whose results must survive restarts.
 It is negative knowledge: the entries are **not** accepted compiler walls and must not receive
 `@early-stop`. They are temporarily deferred only until a stated non-local retest trigger changes
 the compiler state or provides new retail type/lifetime evidence.
@@ -171,3 +171,54 @@ Do not repeat these axes while the canonical source hash agrees. Retest after a 
 reveals a retail-proven lifetime/type/source ordering not represented above. A retest must begin at
 the setup divergence, preserve the retained cursor/literal corrections, and audit all 91 relocation
 sites. The current residual is a soft defer, not a permitted wall.
+
+## BASE/Icon2b: IconToBitmap
+
+Status: active; this section records superseded axes while the same lane continues. It is not a
+soft defer or an accepted wall.
+
+Canonical source state:
+
+- checkpoint: `c164dcf`
+- target: RVA `0xd0570`, retail size `0x4ed`
+- `src/BASE/Icon2b.cpp`: `7f55d2812ac86e31aa0576d02491f0698c6e0ceb5f1fb9058bcb48c98a1d024e`
+- live checkpoint: 73.60439%, 79 candidate vs 83 retail relocations, no base-only target
+- candidate return at `+0x4cc` vs retail `+0x4ea`, with no stack frame on either side
+
+### Corrections retained at the canonical checkpoint
+
+- removed the invalid generic `@early-stop`;
+- introduced the real setup Y lifetime, giving retail ESI/EDI data/entry allocation;
+- used the retail global-source post-increment;
+- recovered clipped fill/dim body order with `clipX <= X` tested first;
+- recovered the three-call fill shape;
+- rebuilt the literal path as four retail-shaped memcpy quadrants;
+- scoped unsigned `copyCount` only to the clipped literal region;
+- restored all six retail-style literal `gIcSrc` occurrences.
+
+### Searches already exhausted
+
+The removed pre-reconstruction wall had already tried global/local X and entry forms,
+source-read post-increment forms, relational reversals, split/common intrinsics, targeted volatile
+scratch, explicit offset temporaries, and 180 historical AST permutations. Those permutations were
+run before the current 96-97% structural gate and must not be repeated at the present score.
+
+New source-hash-distinct axes measured after `57254d1`:
+
+- repeated `entries[frame]` plus global-Y setup: 66.06%, reverted;
+- volatile `gIcCnt`: 60.89% with a spill, reverted;
+- collapsed or predeclared dim palette: no code change;
+- semantic `gIcCnt2` read: 70.05% but an unwanted sixth `gIcCnt2` relocation, reverted;
+- branch-duplicated `gIcCnt2` publication: optimized away;
+- split dim pixel fetch: no code change;
+- exact four-call literal form: 72.57%;
+- function-wide unsigned `copyCount`: 69.46% with a spill, reverted;
+- clipped-region unsigned `copyCount`: 73.60%, retained;
+- signed, unclipped, and current-Y aliases: no code change, reverted.
+
+### Remaining concrete evidence
+
+The known missing sites are setup `gIcX0`/`gIcY` CSE reloads and the fifth dim
+`gIcCnt2` store. The literal CFG and register tail are substantially closer, but retail still
+shares the full-copy tail with the unclipped path. Continue from these concrete sites; do not
+repeat the axes above unless a shared header/compiler state changes.
