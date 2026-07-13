@@ -299,6 +299,13 @@ public:
     int GetTownId(int, int);
     hero *GetHero(int id) { return &m_heroRecs[id]; }
     town *GetTown(int id) { return reinterpret_cast<town *>(&m_castleRecs[id]); }
+    hero *GetPlayerHero(int player, int index) {
+        return &m_heroRecs[m_players[player].heroes[index]];
+    }
+    town *GetPlayerTown(int player, int index) {
+        return reinterpret_cast<town *>(
+            &m_castleRecs[m_players[player].towns[index]]);
+    }
     signed char GetPlayerColor(int player) { return m_players[player].color; }
     int GetMineId(int, int);
     int SaveGame(char *, int, signed char);

@@ -18,6 +18,7 @@ typedef enum TownType {
 
 typedef enum TownBuilding {
     TOWN_BUILDING_TAVERN = 0x4,
+    TOWN_BUILDING_TENT = 0x20,
     TOWN_BUILDING_CASTLE = 0x40,
     TOWN_BUILDING_CAPTAIN = 0x80,
     TOWN_BUILDING_MARKETPLACE = 0x400,
