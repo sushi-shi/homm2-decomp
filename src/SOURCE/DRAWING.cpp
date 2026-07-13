@@ -4,16 +4,20 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <_globals_model.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <BASE/Icon2b.h>
+#include <BASE/Icond2b.h>
+#include <BASE/Iconm2b.h>
 #include <BASE/Misc.h>
 #include <BASE/bitmap.h>
 #include <BASE/font.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/mouseManager.h>
+#include <BASE/resourceManager.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/X_GLOBAL.h>
@@ -21,6 +25,7 @@
 #include <SOURCE/combatManager.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/kbwin.h>
+#include <SOURCE/searchArray.h>
 #include <SOURCE/town.h>
 VA(0x00402910, 0x41)
 void combatManager::NoShowCombatLog(char *message)
@@ -249,19 +254,358 @@ void combatManager::ResetLimitCreature(void)
 }
 
 VA(0x004033a4, 0x6a)
-void combatManager::UpdateCombatArea(void) {}
+void combatManager::UpdateCombatArea(void)
+{
+    if (gbNoShowCombat != 0)
+        return;
+    if (m_combatWindowOpen == 0)
+        return;
+
+    gbEnlargeScreenBlit = 0;
+    gpWindowManager->UpdateScreenRegion(0, 0, COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT);
+    gbEnlargeScreenBlit = 1;
+}
 
 VA(0x0040340e, 0x213)
-void combatManager::SetupGridForArmy(class army *) {}
+void combatManager::SetupGridForArmy(army *armyPtr)
+{
+    int attackMask;
+    int savedTargetSide;
+    int targetIndexSave;
+    int hexIndex;
 
+    if (gbNoShowCombat != 0)
+        return;
+    if (giCombatShadeLevel < 1)
+        return;
+
+    attackMask = armyPtr->GetAttackMask(armyPtr->m_hex, 2, -1);
+    memset(m_gridState, COMBAT_GRID_SHADE_NONE, sizeof(m_gridState));
+    savedTargetSide = armyPtr->m_targetSide;
+    targetIndexSave = armyPtr->m_targetIndex;
+    armyPtr->m_targetSide = -1;
+    armyPtr->m_targetIndex = -1;
+    gpSearchArray->SeedCombatPosition(armyPtr);
+    armyPtr->m_targetSide = savedTargetSide;
+    armyPtr->m_targetIndex = targetIndexSave;
+
+    for (hexIndex = 0; hexIndex < COMBAT_HEX_COUNT; hexIndex++) {
+        if (armyPtr->m_hex == hexIndex) {
+            m_gridState[hexIndex] = COMBAT_GRID_SHADE_REACHABLE;
+        } else if (m_hexCells[hexIndex].m_pathReachable != 0) {
+            if (m_hexCells[hexIndex].m_occupantSide != -1) {
+                if (m_hexCells[hexIndex].m_occupantSide != armyPtr->m_side)
+                    m_gridState[hexIndex] = COMBAT_GRID_SHADE_REACHABLE;
+            } else {
+                m_gridState[hexIndex] = COMBAT_GRID_SHADE_EMPTY_BLOCKED;
+            }
+        } else if (m_hexCells[hexIndex].m_occupantSide != -1 &&
+                   m_hexCells[hexIndex].m_occupantSide != 1 - m_currentSide &&
+                   (attackMask & (1 << m_hexCells[hexIndex].m_occupantIndex)) != 0) {
+            m_gridState[hexIndex] = COMBAT_GRID_SHADE_REACHABLE;
+        }
+    }
+}
+
+// @early-stop
+// Reloc-masked instructions are byte-exact; only delinker symbol identities
+// differ for data VAs 0x00528d88 and 0x00528d90.
 VA(0x00403621, 0x5fb)
-int combatManager::UpdateGrid(int, int) { return 0; }
+int combatManager::UpdateGrid(int resetGridDisplay, int rebuildGrid)
+{
+    int retval;
+    int minX;
+    int minY;
+    int maxX;
+    int maxY;
+    int cellIndex;
+    int gridChanged;
+    int drawShading;
+    int hadOldShade;
 
+    if (gbNoShowCombat != 0)
+        return 0;
+
+    if (rebuildGrid != 0) {
+        if (m_playerId[m_currentSide] == -1 ||
+            gbThisNetHumanPlayer[m_playerId[m_currentSide]] == 0 ||
+            m_gridSelectionDisabled != 0) {
+            memset(m_gridState, COMBAT_GRID_SHADE_NONE, sizeof(m_gridState));
+        } else {
+            SetupGridForArmy(&m_armies[m_currentArmySide][m_currentArmyIndex]);
+        }
+    }
+    if (resetGridDisplay != 0)
+        bGridWasShowing = 0;
+    if (giCombatShadeLevel < 1 && gbShowCombatGrid == 0)
+        return 0;
+
+    retval = 0;
+    minX = COMBAT_MAX_EXTENT_X;
+    minY = COMBAT_MAX_EXTENT_Y;
+    maxX = 0;
+    maxY = 0;
+    drawShading = 0;
+    hadOldShade = 0;
+    gridChanged = 0;
+
+    if (giCombatShadeLevel < 1)
+        goto DrawCombatGrid;
+
+    for (cellIndex = 0; cellIndex < COMBAT_HEX_COUNT; cellIndex++) {
+        if (m_previousGridState[cellIndex] != m_gridState[cellIndex])
+            gridChanged = 1;
+        if (m_gridState[cellIndex] != COMBAT_GRID_SHADE_NONE)
+            drawShading = 1;
+        if (m_previousGridState[cellIndex] != COMBAT_GRID_SHADE_NONE)
+            hadOldShade = 1;
+    }
+
+    if (resetGridDisplay != 0) {
+        if (drawShading == 0)
+            goto DrawCombatGrid;
+    } else {
+        if (gridChanged == 0)
+            return 0;
+        if (hadOldShade != 0) {
+            for (cellIndex = 0; cellIndex < COMBAT_HEX_COUNT; cellIndex++) {
+                if (m_previousGridState[cellIndex] != m_gridState[cellIndex] ||
+                    m_gridState[cellIndex] != COMBAT_GRID_SHADE_NONE) {
+                    if (m_hexCells[cellIndex].m_gridLeft < minX)
+                        minX = m_hexCells[cellIndex].m_gridLeft;
+                    if (m_hexCells[cellIndex].m_gridTop < minY)
+                        minY = m_hexCells[cellIndex].m_gridTop;
+                    if (m_hexCells[cellIndex].m_gridRight > maxX)
+                        maxX = m_hexCells[cellIndex].m_gridRight;
+                    if (m_hexCells[cellIndex].m_gridBottom > maxY)
+                        maxY = m_hexCells[cellIndex].m_gridBottom;
+                }
+            }
+            if (minX < COMBAT_GRID_COPY_LEFT)
+                minX = COMBAT_GRID_COPY_LEFT;
+            if (minY < COMBAT_GRID_COPY_TOP)
+                minY = COMBAT_GRID_COPY_TOP;
+            if (maxX > COMBAT_GRID_COPY_RIGHT)
+                maxX = COMBAT_GRID_COPY_RIGHT;
+            if (maxY > COMBAT_GRID_COPY_BOTTOM)
+                maxY = COMBAT_GRID_COPY_BOTTOM;
+            m_combatBuffer->CopyToCareful(
+                m_backgroundBuffer, minX, minY,
+                minX - COMBAT_GRID_COPY_LEFT, minY - COMBAT_GRID_COPY_TOP,
+                maxX - minX + 1, maxY - minY + 1);
+            retval = 1;
+        }
+    }
+
+    if (drawShading == 0)
+        goto DrawCombatGrid;
+    for (cellIndex = 0; cellIndex < COMBAT_HEX_COUNT; cellIndex++) {
+        if (m_gridState[cellIndex] != COMBAT_GRID_SHADE_NONE) {
+            DimIconToBitmap(
+                m_gridIcon, m_backgroundBuffer, m_hexCells[cellIndex].m_x,
+                m_hexCells[cellIndex].m_y, 1,
+                m_gridState[cellIndex] - 1, 1, 0, 0,
+                COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT);
+            retval = 1;
+        }
+    }
+
+DrawCombatGrid:
+    if (gbShowCombatGrid != 0) {
+        if (bGridWasShowing != 0 && retval == 0)
+            goto CopyGridState;
+        for (cellIndex = 0; cellIndex < COMBAT_HEX_COUNT; cellIndex++) {
+            if (cellIndex % COMBAT_GRID_ROW_LENGTH != 0 &&
+                cellIndex % COMBAT_GRID_ROW_LENGTH != COMBAT_GRID_ROW_LENGTH - 1) {
+                MonoIconToBitmap(
+                    m_gridIcon, m_backgroundBuffer, m_hexCells[cellIndex].m_x,
+                    m_hexCells[cellIndex].m_y, COMBAT_GRID_LINE_FRAME,
+                    COMBAT_GRID_LINE_COLOR, 1, 0, 0,
+                    COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT);
+            }
+        }
+        retval = 1;
+        bGridWasShowing = 1;
+    }
+
+CopyGridState:
+    memcpy(m_previousGridState, m_gridState, sizeof(m_previousGridState));
+    return retval;
+}
+
+// @early-stop
+// Reloc-masked instructions are byte-exact; only the three string-literal
+// relocation symbol identities differ.
 VA(0x00403c1c, 0x364)
-void combatManager::DrawBackground(void) {}
+void combatManager::DrawBackground(void)
+{
+    icon *backgroundIcon;
 
+    if (gbNoShowCombat != 0)
+        return;
+    if (m_backgroundDrawn != 0)
+        return;
+
+    backgroundIcon = gpResourceManager->GetIcon(m_battlefieldBackgroundName);
+    IconToBitmap(backgroundIcon, m_backgroundBuffer, 0, 0, 0, 1, 0, 0,
+                 COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT, 0);
+    gpResourceManager->Dispose(backgroundIcon);
+
+    if (m_debugFormation != 0) {
+        sprintf(gText, "covr%04d.icn", m_debugFormation);
+        backgroundIcon = gpResourceManager->GetIcon(gText);
+        IconToBitmap(backgroundIcon, m_backgroundBuffer, 0, 0, 0, 0, 0, 0,
+                     COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT, 0);
+        gpResourceManager->Dispose(backgroundIcon);
+    }
+    if (m_battlefieldFringe != -1) {
+        sprintf(gText, "frng%04d.icn", m_battlefieldFringe);
+        backgroundIcon = gpResourceManager->GetIcon(gText);
+        if (m_inCastleCombat != 0)
+            IconToBitmap(backgroundIcon, m_backgroundBuffer, 0, 0, 0, 1, 0, 0,
+                         COMBAT_SCREEN_WIDTH / 2, COMBAT_AREA_HEIGHT, 0);
+        else
+            IconToBitmap(backgroundIcon, m_backgroundBuffer, 0, 0, 0, 0, 0, 0,
+                         COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT, 0);
+        gpResourceManager->Dispose(backgroundIcon);
+    }
+    if (m_inCastleCombat != 0) {
+        sprintf(gText, "castbkg%c.icn", cHeroTypeInitial[m_castle->m_type]);
+        backgroundIcon = gpResourceManager->GetIcon(gText);
+        IconToBitmap(backgroundIcon, m_backgroundBuffer, 0, 0,
+                     COMBAT_CASTLE_BACKGROUND_BASE_FRAME, 0, 0, 0,
+                     COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT, 0);
+        if (m_drawbridgeBackgroundVisible != 0)
+            IconToBitmap(m_drawbridgeIcon, m_backgroundBuffer, 0, 0, 0, 0, 0, 0,
+                         COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT, 0);
+        if (m_castle->m_type == TOWN_TYPE_KNIGHT &&
+            (m_castle->m_buildings & TOWN_BUILDING_RAINBOW) != 0)
+            IconToBitmap(backgroundIcon, m_backgroundBuffer, 0, 0,
+                         COMBAT_CASTLE_BACKGROUND_BUILDING_FRAME, 0, 0, 0,
+                         COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT, 0);
+        else
+            IconToBitmap(backgroundIcon, m_backgroundBuffer, 0, 0,
+                         COMBAT_CASTLE_BACKGROUND_DEFAULT_FRAME, 0, 0, 0,
+                         COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT, 0);
+        gpResourceManager->Dispose(backgroundIcon);
+    }
+
+    m_backgroundBuffer->CopyToCareful(
+        m_combatBuffer, COMBAT_GRID_COPY_LEFT, COMBAT_GRID_COPY_TOP, 0, 0,
+        COMBAT_BACKGROUND_COPY_WIDTH, COMBAT_BACKGROUND_COPY_HEIGHT);
+    UpdateGrid(1, 0);
+    m_backgroundBuffer->CopyToCareful(
+        gpWindowManager->m_screen, 0, 0, 0, 0,
+        COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT);
+    m_backgroundDrawn = 1;
+}
+
+// @early-stop
+// Reloc-masked instructions are byte-exact; only the delinker symbol identity
+// differs for data VA 0x00528d8c.
 VA(0x00403f80, 0x64c)
-void combatManager::UpdateMouseGrid(int, int) {}
+void combatManager::UpdateMouseGrid(int hexIndex, int forceUpdate)
+{
+    int oldLimit;
+    int copyHeight;
+    int maxXSave;
+    int oldMinX;
+    int oldMaxYBackup;
+    int savedComputeExtents;
+    int savedExtentMinY;
+
+    if (m_nonVisualCombat != 0)
+        return;
+    if (gbNoShowCombat != 0)
+        return;
+    if (gbShowCombatMouseHex == 0)
+        return;
+    if (gbProcessingCombatAction != 0 && forceUpdate == 0)
+        return;
+
+    if (hexIndex < 0 || hexIndex >= COMBAT_HEX_COUNT ||
+        hexIndex % COMBAT_GRID_ROW_LENGTH == 0 ||
+        hexIndex % COMBAT_GRID_ROW_LENGTH == COMBAT_GRID_ROW_LENGTH - 1)
+        hexIndex = -1;
+    if (m_mouseGridHex == hexIndex)
+        return;
+
+    if (m_mouseGridBuffer == 0)
+        m_mouseGridBuffer = new bitmap(0, COMBAT_MOUSE_HEX_WIDTH, COMBAT_MOUSE_HEX_HEIGHT);
+
+    if (m_mouseGridHex != -1) {
+        if (m_hexCells[m_mouseGridHex].m_y + COMBAT_MOUSE_HEX_MAX_Y_OFFSET >
+            COMBAT_MAX_EXTENT_Y)
+            copyHeight = COMBAT_MAX_EXTENT_Y - m_hexCells[m_mouseGridHex].m_y + 1;
+        else
+            copyHeight = COMBAT_MOUSE_HEX_HEIGHT;
+        m_mouseGridBuffer->CopyToCareful(
+            m_backgroundBuffer, m_hexCells[m_mouseGridHex].m_x,
+            m_hexCells[m_mouseGridHex].m_y, 0, 0,
+            COMBAT_MOUSE_HEX_WIDTH, copyHeight);
+    }
+    if (hexIndex != -1) {
+        if (m_hexCells[hexIndex].m_y + COMBAT_MOUSE_HEX_MAX_Y_OFFSET >
+            COMBAT_MAX_EXTENT_Y)
+            copyHeight = COMBAT_MAX_EXTENT_Y - m_hexCells[hexIndex].m_y + 1;
+        else
+            copyHeight = COMBAT_MOUSE_HEX_HEIGHT;
+        m_backgroundBuffer->CopyToCareful(
+            m_mouseGridBuffer, 0, 0, m_hexCells[hexIndex].m_x,
+            m_hexCells[hexIndex].m_y, COMBAT_MOUSE_HEX_WIDTH, copyHeight);
+        DimIconToBitmap(m_gridIcon, m_backgroundBuffer, m_hexCells[hexIndex].m_x,
+                        m_hexCells[hexIndex].m_y, 1, COMBAT_GRID_MOUSE_FRAME,
+                        1, 0, 0, COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT);
+    }
+
+    oldMinX = giMinExtentX;
+    savedExtentMinY = giMinExtentY;
+    maxXSave = giMaxExtentX;
+    oldMaxYBackup = giMaxExtentY;
+    oldLimit = gbLimitToExtent;
+    savedComputeExtents = gbComputeExtent;
+    if (m_mouseGridHex != -1) {
+        giMinExtentX = m_hexCells[m_mouseGridHex].m_x;
+        giMinExtentY = m_hexCells[m_mouseGridHex].m_y;
+        giMaxExtentX = m_hexCells[m_mouseGridHex].m_x + COMBAT_MOUSE_HEX_MAX_X_OFFSET;
+        giMaxExtentY = m_hexCells[m_mouseGridHex].m_y + COMBAT_MOUSE_HEX_MAX_Y_OFFSET;
+    } else {
+        giMinExtentX = COMBAT_SCREEN_WIDTH;
+        giMinExtentY = 480;
+        giMaxExtentX = 0;
+        giMaxExtentY = 0;
+    }
+    if (hexIndex != -1) {
+        if (m_hexCells[hexIndex].m_x < giMinExtentX)
+            giMinExtentX = m_hexCells[hexIndex].m_x;
+        if (m_hexCells[hexIndex].m_y < giMinExtentY)
+            giMinExtentY = m_hexCells[hexIndex].m_y;
+        if (m_hexCells[hexIndex].m_x + COMBAT_MOUSE_HEX_MAX_X_OFFSET > giMaxExtentX)
+            giMaxExtentX = m_hexCells[hexIndex].m_x + COMBAT_MOUSE_HEX_MAX_X_OFFSET;
+        if (m_hexCells[hexIndex].m_y + COMBAT_MOUSE_HEX_MAX_Y_OFFSET > giMaxExtentY)
+            giMaxExtentY = m_hexCells[hexIndex].m_y + COMBAT_MOUSE_HEX_MAX_Y_OFFSET;
+    }
+    if (giMaxExtentY > COMBAT_MAX_EXTENT_Y)
+        giMaxExtentY = COMBAT_MAX_EXTENT_Y;
+
+    gbLimitToExtent = 1;
+    gbComputeExtent = 1;
+    m_backgroundBuffer->CopyTo(
+        gpWindowManager->m_screen, giMinExtentX, giMinExtentY,
+        giMinExtentX, giMinExtentY, giMaxExtentX - giMinExtentX + 1,
+        giMaxExtentY - giMinExtentY + 1);
+    DrawFrame(0, 0, 0, 0, COMBAT_MOUSE_REDRAW_DELAY, 1, 1);
+    gpWindowManager->UpdateScreenRegion(
+        giMinExtentX, giMinExtentY, giMaxExtentX - giMinExtentX + 1,
+        giMaxExtentY - giMinExtentY + 1);
+    giMinExtentX = oldMinX;
+    giMinExtentY = savedExtentMinY;
+    giMaxExtentX = maxXSave;
+    giMaxExtentY = oldMaxYBackup;
+    gbLimitToExtent = oldLimit;
+    gbComputeExtent = savedComputeExtents;
+    m_mouseGridHex = hexIndex;
+}
 
 VA(0x004045cc, 0x173f)
 void combatManager::DrawFrame(int updateScreen, int computeExtent, int redrawExtent,

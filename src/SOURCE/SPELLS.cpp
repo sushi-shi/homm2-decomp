@@ -191,7 +191,7 @@ void combatManager::CastSpell(int spell, int targetHex, int castByCreature, int 
         case SPELL_TELEPORT:
             teleportArmy_i = target_i;
             targetHex = teleportDestination;
-            RippleCreature(teleportArmy_i->m_effectX, teleportArmy_i->m_effectY, 1);
+            RippleCreature(teleportArmy_i->m_side, teleportArmy_i->m_index, 1);
             m_hexCells[teleportArmy_i->m_hex].m_occupantSide = COMBAT_HEX_EMPTY;
             m_hexCells[teleportArmy_i->m_hex].m_occupantIndex = COMBAT_HEX_EMPTY;
             if (m_hexCells[teleportArmy_i->m_hex].m_occupantFrame == ARMY_FACING_LEFT) {
@@ -245,13 +245,13 @@ void combatManager::CastSpell(int spell, int targetHex, int castByCreature, int 
                     m_hexCells[targetHex + 1].m_occupantIndex = static_cast<signed char>(targetIndex_k);
                     m_hexCells[targetHex + 1].m_occupantFrame = ARMY_FACING_RIGHT;
                 }
-                RippleCreature(teleportArmy_i->m_effectX, teleportArmy_i->m_effectY, 2);
+                RippleCreature(teleportArmy_i->m_side, teleportArmy_i->m_index, 2);
             } else {
                 teleportArmy_i->m_hex = teleportDestination;
                 m_hexCells[teleportArmy_i->m_hex].m_occupantSide = static_cast<signed char>(targetSide_i);
                 m_hexCells[teleportArmy_i->m_hex].m_occupantIndex = static_cast<signed char>(targetIndex_k);
                 m_hexCells[teleportArmy_i->m_hex].m_occupantFrame = COMBAT_HEX_EMPTY;
-                RippleCreature(teleportArmy_i->m_effectX, teleportArmy_i->m_effectY, 2);
+                RippleCreature(teleportArmy_i->m_side, teleportArmy_i->m_index, 2);
             }
             break;
         case SPELL_DISRUPTING_RAY:
@@ -263,7 +263,7 @@ void combatManager::CastSpell(int spell, int targetHex, int castByCreature, int 
                     oldDefense - target_i->m_monsterDefense);
             CombatMessage(gText, 1, 1, 0);
             DoBlast(targetHex, spell);
-            RippleCreature(target_i->m_effectX, target_i->m_effectY, 0);
+            RippleCreature(target_i->m_side, target_i->m_index, 0);
             break;
         case SPELL_COLD_RAY:
             DelayMilli(static_cast<long>(gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_COLD_RAY_DELAY));
