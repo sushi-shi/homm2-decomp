@@ -322,12 +322,12 @@ BASE/Textntry	?Draw@textEntryWidget@@UAEXXZ	99.9924	9ff4f3d8d8c4
 BASE/Textntry	?Main@textEntryWidget@@UAEHAAUtag_message@@@Z	51.3333	91e79cdcc99a
 BASE/Textntry	?Read@textEntryWidget@@QAEXH@Z	96.5232	8698c63fe763
 BASE/Textntry	?SetupDisplayString@textEntryWidget@@QAEXPADG@Z	97.3581	4190acfe45cc
-BASE/WIDGET	??0widget@@QAE@FFFFFF@Z	96.8261	ce8c24384ff9
+BASE/WIDGET	??0widget@@QAE@FFFFFF@Z	96.8261	e72e684243cd
 BASE/WIDGET	??0widget@@QAE@XZ	100.0000	c4c5959c7db6
 BASE/WIDGET	??1widget@@UAE@XZ	100.0000	7e399133b272
 BASE/WIDGET	?Dim@widget@@QAEXXZ	100.0000	48957ebef60e
-BASE/WIDGET	?Main@widget@@UAEHAAUtag_message@@@Z	0.0000	30d2bc4d170b
-BASE/WIDGET	?Open@widget@@QAEHHPAVheroWindow@@@Z	100.0000	1022c3153ead
+BASE/WIDGET	?Main@widget@@UAEHAAUtag_message@@@Z	99.5667	19187008f391
+BASE/WIDGET	?Open@widget@@QAEHHPAVheroWindow@@@Z	100.0000	8a20fb239b00
 BASE/WIDGET	empty_stub	0.0000	
 BASE/WINDOW	??0heroWindow@@QAE@HHHHH@Z	100.0000	0261e2bcc000
 BASE/WINDOW	??0heroWindow@@QAE@HHPAD@Z	99.9167	a289f28315cb
