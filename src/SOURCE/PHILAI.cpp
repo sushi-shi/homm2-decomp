@@ -4079,7 +4079,55 @@ void philAI::IncrementHourGlass(void) {
 }
 
 VA(0x00443980, 0x227)
-void philAI::TownEvent(class mapCell *, class hero *, int, int) {}
+void philAI::TownEvent(mapCell *cell, hero *h, int x, int y) {
+    float attackerLoss6;
+    float defenderLoss5;
+    int currentPlayer26;
+    int quickCombatResult9;
+    town *townPtr2;
+    int combatResult7;
+    hero *defendingHero0;
+
+    townPtr2 = reinterpret_cast<town *>(GetCastleSlot(cell->w4hi));
+    currentPlayer26 = giCurPlayer;
+    gpAdvManager->DemobilizeCurrHero();
+
+    if (townPtr2->m_owner != giCurPlayer) {
+        if (townPtr2->HasGarrison()) {
+            if (townPtr2->m_owner < 0 ||
+                gbHumanPlayer[townPtr2->m_owner] == 0) {
+                quickCombatResult9 = QuickCombat(
+                    &h->m_army, h, &townPtr2->m_army, 0,
+                    AI_TOWN_EVENT_USE_GARRISON, townPtr2->m_id,
+                    defenderLoss5, attackerLoss6);
+            } else {
+                defendingHero0 = townPtr2->m_occupyingHeroId == AI_TOWN_EVENT_NO_HERO
+                    ? 0 : GetHeroSlot(townPtr2->m_occupyingHeroId);
+
+                combatResult7 = gpAdvManager->DoCombat(
+                    x, y, h, &h->m_army, townPtr2, defendingHero0,
+                    &townPtr2->m_army, x, y, AI_BATTLE_NO_PLAYER,
+                    AI_TOWN_EVENT_USE_GARRISON);
+                if (combatResult7 == AI_TOWN_EVENT_ATTACKER_WON) {
+                    gpGame->ClaimTown(townPtr2->m_id, giCurPlayer, 0);
+                    giHumanTownConquered = townPtr2->m_id;
+                }
+            }
+        } else {
+            gpGame->ClaimTown(townPtr2->m_id, giCurPlayer, 0);
+        }
+    }
+
+    if (townPtr2->m_owner == giCurPlayer && h->m_x == x && h->m_y == y) {
+        townPtr2->m_occupyingHeroId = gpCurPlayer->CurrentHero();
+        h->m_locationType = AI_OBJECT_TOWN;
+        h->m_occupiedTown = townPtr2->m_id;
+        HeroInteractionAtTown(h, townPtr2, 0, &iDummy);
+    }
+
+    gpAdvManager->MobilizeCurrHero(0);
+    townPtr2->GiveSpells(0);
+}
 
 VA(0x00443ba7, 0xad)
 int philAI::ComputeUpgradeValue(int a1, int a2) {
@@ -4093,8 +4141,69 @@ int philAI::ComputeUpgradeValue(int a1, int a2) {
     return result;
 }
 
+// @early-stop: all 0x271 bytes match after masking 34 aligned COFF relocations.
+// Objdiff's residual is symbol identity: table/field addends and compiler constant
+// pools resolve to the retail addresses, while jump-table labels delink as this function.
 VA(0x00443c54, 0x271)
-int philAI::ComputeValueOfSS(class hero *, int, int) { return 0; }
+int philAI::ComputeValueOfSS(hero *h, int skill, int level) {
+    int fightValue7;
+    int value28;
+    int armyIndex4;
+    int totalArmyValue2;
+    float rangedShare2;
+    int rangedArmyValue28;
+    int stackValue7;
+
+    value28 = gSSValues[skill][level - AI_SECONDARY_SKILL_LEVEL_OFFSET];
+    fightValue7 = FightValueOfStack(&h->m_army, h, 1, 0, 0, 0);
+    if (skill != HERO_SKILL_ESTATES) {
+        value28 = static_cast<int>(
+            (static_cast<float>(fightValue7) /
+                 reinterpret_cast<pdView *>(gpCurPlayer)->upgradeFactor /
+                 AI_SECONDARY_SKILL_FIGHT_SCALE +
+             AI_SECONDARY_SKILL_BASE_FACTOR) * value28);
+    }
+
+    switch (skill) {
+    case HERO_SKILL_NAVIGATION:
+        if (h->m_eventFlags & HERO_EVENT_EMBARKED)
+            value28 = static_cast<int>(
+                value28 * AI_SECONDARY_SKILL_NAVIGATION_FACTOR);
+        break;
+    case HERO_SKILL_ARCHERY:
+        rangedArmyValue28 = 0;
+        totalArmyValue2 = rangedArmyValue28;
+        for (armyIndex4 = 0;
+             armyIndex4 < AI_SECONDARY_SKILL_ARMY_SLOTS;
+             armyIndex4++) {
+            if (h->m_army.m_creatureTypes[armyIndex4] != AI_TROOP_EMPTY_SLOT) {
+                stackValue7 =
+                    gMonsterDatabase[h->m_army.m_creatureTypes[armyIndex4]].fightValue *
+                    h->m_army.m_quantities[armyIndex4];
+                totalArmyValue2 += stackValue7;
+                if (gMonsterDatabase[h->m_army.m_creatureTypes[armyIndex4]]
+                        .flags.all & AI_SECONDARY_SKILL_RANGED_ATTRIBUTE) {
+                    rangedArmyValue28 += stackValue7;
+                }
+            }
+        }
+        rangedShare2 = static_cast<float>(rangedArmyValue28) /
+                       static_cast<float>(totalArmyValue2);
+        value28 = static_cast<int>(
+            (rangedShare2 / AI_SECONDARY_SKILL_ARCHERY_SHARE +
+             AI_SECONDARY_SKILL_ARCHERY_BASE) * value28);
+        break;
+    case HERO_SKILL_WISDOM:
+    case HERO_SKILL_MYSTICISM:
+        if (!h->HasArtifact(AI_ARTIFACT_MAGIC_BOOK) ||
+            h->Stats(HERO_PRIMARY_KNOWLEDGE) <
+                AI_SECONDARY_SKILL_MINIMUM_KNOWLEDGE) {
+            value28 = static_cast<int>(value28 * AI_SECONDARY_SKILL_BASE_FACTOR);
+        }
+        break;
+    }
+    return value28;
+}
 
 VA(0x00443ec5, 0x59)
 int philAI::ComputeValueOfFreeSS(hero *h, int ss) {
