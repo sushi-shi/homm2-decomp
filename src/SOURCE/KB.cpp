@@ -52,6 +52,8 @@
 #include <BASE/soundManager.h>
 #include <BASE/icon.h>
 #include <BASE/font.h>
+#include <BASE/textWidget.h>
+#include <BASE/border.h>
 
 // Types now from headers: game/mouseManager/townManager/town/executive + combatManager/
 // palette/font -> _all.h; tag_message -> _carcass_types.h; SAMPLE2/tag_monsterInfo/SSpellInfo/
@@ -2576,12 +2578,12 @@ void HandleRemoteDeadPlayerExit(int pos)
             ShutDown(0);
         RemoteCleanup();
     } else {
-        pe.m_0 = gbGamePosToNetPos[pos];
-        pe.m_1 = pos;
-        pe.m_2 = 0;
-        pe.m_3 = 0;
-        pe.m_4 = 1;
-        pe.m_5 = 0;
+        pe.netPosition = gbGamePosToNetPos[pos];
+        pe.gamePosition = pos;
+        pe.updateNetworkControl = 0;
+        pe.timedOut = 0;
+        pe.eliminated = 1;
+        pe.hostReported = 0;
         ReceiveRemotePlayerExit(pe);
     }
 }
@@ -2622,10 +2624,182 @@ void DropDownToOnePlayer(void)
 }
 
 VA(0x004a03d1, 0x412)
-void ReceiveHostReportsPlayerExit(int, struct SPlayerExit, int) {}
+void ReceiveHostReportsPlayerExit(int hostNetPosition, SPlayerExit exitInfo,
+                                  int forwardedReport)
+{
+    int showExitMessage;
+    char exitMessage[PLAYER_EXIT_MESSAGE_LENGTH];
+    int netPosition;
+
+    showExitMessage = 0;
+    if (!forwardedReport) {
+        if (exitInfo.eliminated) {
+            if (exitInfo.netPosition == giThisNetPos) {
+                RemoteCleanup();
+                sprintf(gText, "You have been eliminated from the game!!!");
+                NormalDialog(gText, PLAYER_EXIT_DIALOG_INFO, -1, -1, -1, 0,
+                             -1, 0, -1, 0);
+                gbGameOver = 1;
+                giEndSequence = 0;
+                return;
+            }
+
+            sprintf(gText, "%s has been vanquished!",
+                    gsNetPlayerInfo[exitInfo.netPosition].name);
+            NormalDialog(gText, PLAYER_EXIT_DIALOG_INFO, -1, -1, 9,
+                         gpGame->GetPlayerColor(exitInfo.gamePosition), -1, -1,
+                         -1, PLAYER_EXIT_MESSAGE_TIME);
+        } else if (!exitInfo.continueGame) {
+            gpGame->SaveGame("PLYREXIT", 1, 0);
+            sprintf(
+                gText,
+                "%s left the game, and the %s decided to terminate the entire game.  The game has been saved as 'PLYREXIT'.  Do you wish to play on alone with the computer taking over for all human players?",
+                gsNetPlayerInfo[exitInfo.netPosition].name,
+                gsNetPlayerInfo[hostNetPosition].name);
+            NormalDialog(gText, PLAYER_EXIT_DIALOG_CONFIRM, -1, -1, -1, 0,
+                         -1, 0, -1, 0);
+            if (gpWindowManager->m_dialogResult == PLAYER_EXIT_CONFIRM_OK) {
+                DropDownToOnePlayer();
+            } else {
+                RemoteCleanup();
+                ShutDown(0);
+            }
+        } else {
+            if (exitInfo.timedOut) {
+                sprintf(
+                    exitMessage,
+                    "Host player %s reports that player %s has been timed out of the game.  The game will continue with a computer player filling in for %s.",
+                    gsNetPlayerInfo[hostNetPosition].name,
+                    gsNetPlayerInfo[exitInfo.netPosition].name,
+                    gsNetPlayerInfo[exitInfo.netPosition].name);
+            } else {
+                sprintf(
+                    exitMessage,
+                    "Host player %s reports that player %s has exited the game.  The game will continue with a computer player filling in for %s.",
+                    gsNetPlayerInfo[hostNetPosition].name,
+                    gsNetPlayerInfo[exitInfo.netPosition].name,
+                    gsNetPlayerInfo[exitInfo.netPosition].name);
+            }
+            showExitMessage = 1;
+        }
+    }
+
+    if (exitInfo.netPosition < giThisNetPos)
+        giThisNetPos--;
+    gbHumanPlayer[exitInfo.gamePosition] = 0;
+
+    for (netPosition = exitInfo.netPosition;
+         netPosition < PLAYER_EXIT_SHIFT_SLOTS; netPosition++) {
+        lLastHeartbeatReceive[netPosition] = lLastHeartbeatReceive[netPosition + 1];
+        giNetPosToDCOPos[netPosition] = giNetPosToDCOPos[netPosition + 1];
+        strcpy(gsNetPlayerInfo[netPosition].name,
+               gsNetPlayerInfo[netPosition + 1].name);
+    }
+
+    for (netPosition = 0; netPosition < PLAYER_EXIT_NETWORK_SLOTS;
+         netPosition++) {
+        if (gbGamePosToNetPos[netPosition] == exitInfo.netPosition)
+            gbGamePosToNetPos[netPosition] = -1;
+        else if (gbGamePosToNetPos[netPosition] > exitInfo.netPosition)
+            gbGamePosToNetPos[netPosition]--;
+    }
+
+    giNumHumanPlayers--;
+    iLastDiffSendTo = -2;
+    if (exitInfo.updateNetworkControl)
+        ComputeAdvNetControl();
+
+    if (showExitMessage)
+        NormalDialog(exitMessage, PLAYER_EXIT_DIALOG_INFO, -1, -1, -1, -1,
+                     -1, -1, -1, PLAYER_EXIT_MESSAGE_TIME);
+}
 
 VA(0x004a07e3, 0x361)
-void ReceiveRemotePlayerExit(struct SPlayerExit) {}
+void ReceiveRemotePlayerExit(SPlayerExit exitInfo)
+{
+    int localPlayerLost;
+    int sendReturn;
+    int recipient;
+
+    localPlayerLost = 0;
+    lLastHeartbeatReceive[exitInfo.netPosition] = PLAYER_EXIT_HEARTBEAT_DISABLED;
+    gpGame->SaveGame("PLYREXIT", 1, 0);
+
+    if (exitInfo.eliminated) {
+        exitInfo.continueGame = 1;
+        if (exitInfo.netPosition == giThisNetPos) {
+            localPlayerLost = 1;
+        } else {
+            sprintf(gText, "%s has been vanquished!",
+                    gsNetPlayerInfo[exitInfo.netPosition].name);
+            NormalDialog(gText, PLAYER_EXIT_DIALOG_INFO, -1, -1, 9,
+                         gpGame->GetPlayerColor(exitInfo.gamePosition), -1, -1,
+                         -1, PLAYER_EXIT_MESSAGE_TIME);
+            exitInfo.continueGame = 1;
+        }
+    } else {
+        if (exitInfo.timedOut) {
+            sprintf(
+                gText,
+                "%s has been timed out of the game.  The current game has been saved as 'PLYREXIT'.  Do you wish to continue playing with a computer player filling in for %s?",
+                gsNetPlayerInfo[exitInfo.netPosition].name,
+                gsNetPlayerInfo[exitInfo.netPosition].name);
+        } else {
+            sprintf(
+                gText,
+                "%s is exiting the game.  The current game has been saved as 'PLYREXIT'.  Do you wish to continue playing with a computer player filling in for %s?",
+                gsNetPlayerInfo[exitInfo.netPosition].name,
+                gsNetPlayerInfo[exitInfo.netPosition].name);
+        }
+        NormalDialog(gText, PLAYER_EXIT_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0,
+                     -1, 0);
+        if (gpWindowManager->m_dialogResult == PLAYER_EXIT_CONFIRM_OK)
+            exitInfo.continueGame = 1;
+        else
+            exitInfo.continueGame = 0;
+    }
+
+    if (giNumHumanPlayers == 2) {
+        if (exitInfo.eliminated && !exitInfo.hostReported) {
+            sendReturn = TransmitRemoteData(
+                reinterpret_cast<char *>(&exitInfo), 1 - giThisNetPos,
+                PLAYER_EXIT_PACKET_TYPE, PLAYER_EXIT_PACKET_COMMAND, 1, 1, -1);
+        }
+        if (localPlayerLost) {
+        } else {
+            giNumHumanPlayers--;
+            gbHumanPlayer[exitInfo.gamePosition] = 0;
+            RemoteCleanup();
+            ComputeAdvNetControl();
+        }
+    } else {
+        for (recipient = 0; recipient < PLAYER_EXIT_NETWORK_SLOTS; recipient++) {
+            if ((exitInfo.netPosition == recipient && exitInfo.eliminated &&
+                 !exitInfo.hostReported) ||
+                (exitInfo.netPosition != recipient &&
+                 giNumHumanPlayers > recipient && recipient != giThisNetPos)) {
+                sendReturn = TransmitRemoteData(
+                    reinterpret_cast<char *>(&exitInfo), recipient,
+                    PLAYER_EXIT_PACKET_TYPE, PLAYER_EXIT_PACKET_COMMAND, 1, 1, -1);
+            }
+        }
+        if (localPlayerLost) {
+        } else {
+            ReceiveHostReportsPlayerExit(0, exitInfo, 1);
+        }
+    }
+
+    if (localPlayerLost) {
+        sprintf(gText, "You have been eliminated from the game!!!");
+        RemoteCleanup();
+        NormalDialog(gText, PLAYER_EXIT_DIALOG_INFO, -1, -1, -1, 0, -1, 0,
+                     -1, 0);
+        gbGameOver = 1;
+        giEndSequence = 0;
+    } else if (!exitInfo.continueGame) {
+        ShutDown(0);
+    }
+}
 
 VA(0x004a0b44, 0x29)
 int CheckMem(void)
@@ -2684,7 +2858,546 @@ void CheckShingleUpdate(void)
 }
 
 VA(0x004a0d9f, 0x17c6)
-void NormalDialog(char *, int, int, int, int, int, int, int, int, int) {}
+void NormalDialog(char *text, int dialogType, int windowX, int windowY,
+                  int firstResourceType, int firstResourceValue,
+                  int secondResourceType, int secondResourceValue,
+                  int showOrText, int timeout)
+{
+    short panelY;
+    short panelHeight;
+    short labelY;
+    widget *borderWidget;
+    char iconFile[NORMAL_DIALOG_FILENAME_LENGTH];
+    char *resourceText[NORMAL_DIALOG_RESOURCE_COUNT];
+    int iconHeight;
+    int showPrimaryBonus;
+    int resourceType[NORMAL_DIALOG_RESOURCE_COUNT];
+    int lineCount;
+    widget *iconPanel;
+    heroWindow *savedNormalDialogWindow;
+    int windowWidth;
+    int savedFirstResourceType;
+    int resourceImageHeight;
+    short showMessage;
+    int windowHeight;
+    int resourceSlot;
+    int savedPointerType;
+    int dialogContentHeight;
+    int textWidgetId;
+    tag_message message;
+    int savedSecondResourceType;
+    int windowRows;
+    int maxIconHeight;
+    int savedFirstResourceValue;
+    int resourceY;
+    int resourceFrame;
+    widget *textPanel;
+    int resourceCenterX;
+    int resourceValue[NORMAL_DIALOG_RESOURCE_COUNT];
+    int savedSecondResourceValue;
+    char *orText;
+    int savedPointerFrame;
+
+    if (!gbRemoteOn)
+        timeout = 0;
+    if (timeout > NORMAL_DIALOG_TIMEOUT_MIN &&
+        timeout < NORMAL_DIALOG_TIMEOUT_MAX) {
+        giDialogTimeout = KBTickCount() + timeout;
+    } else {
+        giDialogTimeout = timeout;
+    }
+
+    resourceCenterX = 0;
+    resourceY = 0;
+    resourceFrame = 0;
+    textWidgetId = NORMAL_DIALOG_TEXT_WIDGET_FIRST_ID;
+    resourceImageHeight = 0;
+    iconHeight = 0;
+    showPrimaryBonus = 0;
+    showMessage = 1;
+
+    if (firstResourceType == NORMAL_DIALOG_PRIMARY_SKILL &&
+        firstResourceValue >= NORMAL_DIALOG_PRIMARY_BONUS_OFFSET) {
+        firstResourceValue -= NORMAL_DIALOG_PRIMARY_BONUS_OFFSET;
+        showPrimaryBonus = 1;
+    }
+    if (firstResourceType >= NORMAL_DIALOG_MONSTER + 1 &&
+        firstResourceType <= NORMAL_DIALOG_PRIMARY_SKILL - 1) {
+        firstResourceType = NORMAL_DIALOG_NO_RESOURCE;
+    }
+
+    savedNormalDialogWindow = pNormalDialogWindow;
+    savedFirstResourceType = giResType1;
+    savedFirstResourceValue = giResExtra1;
+    savedSecondResourceType = giResType2;
+    savedSecondResourceValue = giResExtra2;
+    giResType1 = firstResourceType;
+    giResExtra1 = firstResourceValue;
+    giResType2 = secondResourceType;
+    giResExtra2 = secondResourceValue;
+
+    resourceType[0] = firstResourceType;
+    resourceValue[0] = firstResourceValue;
+    resourceType[1] = secondResourceType;
+    resourceValue[1] = secondResourceValue;
+
+    lineCount = bigFont->LineLength(text, NORMAL_DIALOG_TEXT_LINE_WIDTH);
+    dialogContentHeight = lineCount * NORMAL_DIALOG_TEXT_LINE_HEIGHT;
+    maxIconHeight = 0;
+    if (dialogType != NORMAL_DIALOG_QUICK_VIEW)
+        dialogContentHeight += 39;
+
+    for (resourceSlot = 0; resourceSlot < NORMAL_DIALOG_RESOURCE_COUNT;
+         resourceSlot++) {
+        switch (resourceType[resourceSlot]) {
+        case RES_WOOD:
+        case RES_MERCURY:
+        case RES_ORE:
+        case RES_SULFUR:
+        case RES_CRYSTAL:
+        case RES_GEMS:
+            iconHeight = 44;
+            break;
+        case RES_GOLD:
+            iconHeight = 26;
+            break;
+        case NORMAL_DIALOG_ARTIFACT:
+            iconHeight = 76;
+            break;
+        case NORMAL_DIALOG_SPELL:
+            iconHeight = 79;
+            break;
+        case NORMAL_DIALOG_CREST:
+            iconHeight = 55;
+            break;
+        case NORMAL_DIALOG_EXPMRL_FIRST:
+            iconHeight = 28;
+            break;
+        case NORMAL_DIALOG_EXPMRL_FIRST + 1:
+            iconHeight = 57;
+            break;
+        case NORMAL_DIALOG_EXPMRL_FIRST + 2:
+            iconHeight = 62;
+            break;
+        case NORMAL_DIALOG_EXPMRL_FIRST + 3:
+            iconHeight = 59;
+            break;
+        case NORMAL_DIALOG_EXPMRL_LAST:
+            iconHeight =
+                ((resourceValue[resourceSlot] == NORMAL_DIALOG_NO_VALUE) - 1 &
+                 12) + 64;
+            break;
+        case NORMAL_DIALOG_HERO:
+            iconHeight = 111;
+            break;
+        default:
+            iconHeight = 0;
+            break;
+        case NORMAL_DIALOG_SECONDARY_SKILL:
+            iconHeight = 81;
+            break;
+        case NORMAL_DIALOG_MONSTER:
+        case NORMAL_DIALOG_PRIMARY_SKILL:
+            iconHeight = 105;
+            break;
+        }
+        if (maxIconHeight < iconHeight)
+            maxIconHeight = iconHeight;
+    }
+
+    if (maxIconHeight)
+        dialogContentHeight += maxIconHeight + 14;
+    windowRows = (dialogContentHeight - 25) / NORMAL_DIALOG_WINDOW_ROW_HEIGHT;
+    if (windowRows > NORMAL_DIALOG_MAX_ROWS)
+        windowRows = NORMAL_DIALOG_MAX_ROWS;
+    windowWidth = NORMAL_DIALOG_WINDOW_WIDTH;
+    windowHeight = windowRows * NORMAL_DIALOG_WINDOW_ROW_HEIGHT +
+                   NORMAL_DIALOG_WINDOW_BASE_HEIGHT;
+
+    if (windowX == -1 || windowX + windowWidth > 638)
+        windowX = 159;
+    if (windowY == -1 || windowY + windowHeight > 478) {
+        windowY = (480 - windowHeight) / 2;
+        if (windowY > 28)
+            windowY = 28;
+    }
+
+    sprintf(iconFile, "evntwin%d.bin", windowRows);
+    pNormalDialogWindow = new heroWindow(windowX, windowY, iconFile);
+    if (!pNormalDialogWindow)
+        MemError();
+
+    message.type = NORMAL_DIALOG_DISABLE_MESSAGE;
+    message.field4 = NORMAL_DIALOG_DISABLE_COMMAND;
+    message.text = reinterpret_cast<char *>(NORMAL_DIALOG_DISABLE_COMMAND);
+    if (dialogType != NORMAL_DIALOG_DISABLE_SEVENTH &&
+        dialogType != NORMAL_DIALOG_DISABLE_EIGHTH) {
+        message.field8 = NORMAL_DIALOG_BUTTON_SEVEN;
+        pNormalDialogWindow->BroadcastMessage(message);
+    }
+    if (dialogType != NORMAL_DIALOG_DISABLE_SEVENTH) {
+        message.field8 = NORMAL_DIALOG_BUTTON_EIGHT;
+        pNormalDialogWindow->BroadcastMessage(message);
+    }
+    if (dialogType != NORMAL_DIALOG_WAIT_LAST &&
+        dialogType != NORMAL_DIALOG_BUTTON_PAIR) {
+        message.field8 = NORMAL_DIALOG_BUTTON_ONE;
+        pNormalDialogWindow->BroadcastMessage(message);
+    }
+    if (dialogType != NORMAL_DIALOG_WAIT_FIRST &&
+        dialogType != NORMAL_DIALOG_INFO &&
+        dialogType != NORMAL_DIALOG_BUTTON_PAIR) {
+        message.field8 = NORMAL_DIALOG_BUTTON_TWO;
+        pNormalDialogWindow->BroadcastMessage(message);
+    }
+    if (dialogType != NORMAL_DIALOG_CONFIRM) {
+        message.field8 = NORMAL_DIALOG_BUTTON_FIVE;
+        pNormalDialogWindow->BroadcastMessage(message);
+        message.field8 = NORMAL_DIALOG_BUTTON_SIX;
+        pNormalDialogWindow->BroadcastMessage(message);
+    }
+
+    for (resourceSlot = 0; resourceSlot < NORMAL_DIALOG_RESOURCE_COUNT;
+         resourceSlot++) {
+        iconPanel = 0;
+        textPanel = 0;
+        if (resourceType[resourceSlot] == NORMAL_DIALOG_NO_RESOURCE)
+            break;
+
+        resourceText[resourceSlot] = static_cast<char *>(BaseAlloc(
+            NORMAL_DIALOG_TEXT_LENGTH, KBFILE, NORMAL_DIALOG_FIRST_TEXT_LINE));
+        if (resourceType[resourceSlot] >= NORMAL_DIALOG_RESOURCE_FIRST &&
+            resourceType[resourceSlot] <= NORMAL_DIALOG_RESOURCE_LAST) {
+            if (resourceValue[resourceSlot] < 1) {
+                if (resourceValue[resourceSlot] == 0) {
+                    strcpy(resourceText[resourceSlot], "");
+                } else if (resourceValue[resourceSlot] <
+                           -NORMAL_DIALOG_DAILY_RESOURCE_OFFSET) {
+                    sprintf(resourceText[resourceSlot], "%d",
+                            resourceValue[resourceSlot] +
+                                NORMAL_DIALOG_DAILY_RESOURCE_OFFSET);
+                } else {
+                    sprintf(resourceText[resourceSlot], "%d/day",
+                            -resourceValue[resourceSlot]);
+                }
+            } else {
+                sprintf(resourceText[resourceSlot], "%d",
+                        resourceValue[resourceSlot]);
+            }
+            strcpy(iconFile, "resource.icn");
+            resourceFrame = resourceType[resourceSlot];
+        } else if (resourceType[resourceSlot] == NORMAL_DIALOG_SPELL) {
+            sprintf(resourceText[resourceSlot], "%s",
+                    gSpellNames[resourceValue[resourceSlot]]);
+            strcpy(iconFile, "spells.icn");
+            resourceFrame = gsSpellInfo[resourceValue[resourceSlot]].iconIndex;
+        } else if (resourceType[resourceSlot] == NORMAL_DIALOG_CREST) {
+            sprintf(resourceText[resourceSlot], "%s", "");
+            strcpy(iconFile, "brcrest.icn");
+            resourceFrame = resourceValue[resourceSlot];
+        } else if (resourceType[resourceSlot] == NORMAL_DIALOG_PRIMARY_SKILL) {
+            sprintf(resourceText[resourceSlot], "%s", "");
+            strcpy(iconFile, "primskil.icn");
+            resourceFrame = 4;
+        } else if (resourceType[resourceSlot] == NORMAL_DIALOG_MONSTER) {
+            sprintf(resourceText[resourceSlot], "%s", "");
+            strcpy(iconFile, "strip.icn");
+            resourceFrame = 12;
+        } else if (resourceType[resourceSlot] == NORMAL_DIALOG_SECONDARY_SKILL) {
+            sprintf(resourceText[resourceSlot], "%s",
+                    gSecondarySkills[resourceValue[resourceSlot] /
+                                     HERO_SECONDARY_SKILL_VALUE_LEVELS]);
+            strcpy(iconFile, "secskill.icn");
+            resourceFrame = resourceValue[resourceSlot] /
+                                HERO_SECONDARY_SKILL_VALUE_LEVELS +
+                            1;
+        } else if (resourceType[resourceSlot] == NORMAL_DIALOG_HERO) {
+            sprintf(resourceText[resourceSlot], "%s", "");
+            sprintf(iconFile, "surrendr.icn");
+            resourceFrame = 4;
+        } else if (resourceType[resourceSlot] >= NORMAL_DIALOG_EXPMRL_FIRST &&
+                   resourceType[resourceSlot] <= NORMAL_DIALOG_EXPMRL_LAST) {
+            strcpy(resourceText[resourceSlot], "");
+            strcpy(iconFile, "expmrl.icn");
+            resourceFrame = resourceType[resourceSlot] - NORMAL_DIALOG_EXPMRL_FIRST;
+            if (resourceType[resourceSlot] == NORMAL_DIALOG_EXPMRL_LAST &&
+                resourceValue[resourceSlot] != NORMAL_DIALOG_NO_VALUE) {
+                sprintf(resourceText[resourceSlot], "%d",
+                        resourceValue[resourceSlot]);
+            }
+        } else {
+            strcpy(resourceText[resourceSlot], "");
+            strcpy(iconFile, "resource.icn");
+            resourceFrame = resourceType[resourceSlot];
+        }
+
+        switch (resourceType[resourceSlot]) {
+        case RES_WOOD:
+        case RES_MERCURY:
+        case RES_ORE:
+        case RES_SULFUR:
+        case RES_CRYSTAL:
+        case RES_GEMS:
+            resourceImageHeight = 38;
+            iconHeight = 32;
+            break;
+        case RES_GOLD:
+            resourceImageHeight = 76;
+            iconHeight = 26;
+            break;
+        case NORMAL_DIALOG_ARTIFACT:
+            resourceImageHeight = 76;
+            iconHeight = 76;
+            break;
+        case NORMAL_DIALOG_SPELL:
+            resourceImageHeight = 70;
+            iconHeight = 55;
+            break;
+        case NORMAL_DIALOG_CREST:
+            resourceImageHeight = 50;
+            iconHeight = 55;
+            break;
+        case NORMAL_DIALOG_EXPMRL_FIRST:
+            resourceImageHeight = 64;
+            iconHeight = 28;
+            break;
+        case NORMAL_DIALOG_EXPMRL_FIRST + 1:
+            resourceImageHeight = 64;
+            iconHeight = 57;
+            break;
+        case NORMAL_DIALOG_EXPMRL_FIRST + 2:
+            resourceImageHeight = 64;
+            iconHeight = 62;
+            break;
+        case NORMAL_DIALOG_EXPMRL_FIRST + 3:
+            resourceImageHeight = 64;
+            iconHeight = 59;
+            break;
+        case NORMAL_DIALOG_EXPMRL_LAST:
+            resourceImageHeight = 64;
+            iconHeight = 64;
+            break;
+        case NORMAL_DIALOG_HERO:
+            resourceImageHeight = 111;
+            iconHeight = 105;
+            break;
+        case NORMAL_DIALOG_SECONDARY_SKILL:
+            resourceImageHeight = 75;
+            iconHeight = 65;
+            break;
+        case NORMAL_DIALOG_MONSTER:
+        case NORMAL_DIALOG_PRIMARY_SKILL:
+            resourceImageHeight = 94;
+            iconHeight = 105;
+            break;
+        }
+
+        int imageHeight = iconHeight;
+        if (strlen(resourceText[resourceSlot]))
+            iconHeight += 12;
+
+        if (resourceSlot == 0) {
+            if (secondResourceType == NORMAL_DIALOG_NO_RESOURCE)
+                resourceCenterX = (windowWidth - 17) / 2 + 17;
+            else
+                resourceCenterX = 104;
+        } else {
+            resourceCenterX = windowWidth - 87;
+        }
+        resourceY = windowHeight - iconHeight - 48;
+        if (dialogType != NORMAL_DIALOG_QUICK_VIEW)
+            resourceY = windowHeight - iconHeight - 87;
+        if (resourceType[0] == NORMAL_DIALOG_SECONDARY_SKILL &&
+            secondResourceType == NORMAL_DIALOG_SECONDARY_SKILL) {
+            if (resourceSlot == 0)
+                resourceCenterX -= 4;
+            else
+                resourceCenterX += 4;
+        }
+
+        iconPanel = new iconWidget(
+            resourceCenterX - resourceImageHeight / 2 +
+                (resourceType[resourceSlot] == NORMAL_DIALOG_SPELL) * 2,
+            resourceY, resourceImageHeight, imageHeight, iconFile, resourceFrame,
+            0, -1, NORMAL_DIALOG_WIDGET_COLOR +
+                        (resourceType[resourceSlot] == NORMAL_DIALOG_SPELL),
+            1);
+        if (!iconPanel)
+            MemError();
+        pNormalDialogWindow->AddWidget(iconPanel, -1);
+
+        if (resourceType[resourceSlot] == NORMAL_DIALOG_ARTIFACT) {
+            iconPanel = new iconWidget(
+                resourceCenterX - resourceImageHeight / 2 + 6,
+                resourceY + 6, 76, 76, "artifact.icn",
+                resourceValue[resourceSlot] + 1, 0, -1,
+                NORMAL_DIALOG_WIDGET_COLOR, 1);
+            if (!iconPanel)
+                MemError();
+            pNormalDialogWindow->AddWidget(iconPanel, -1);
+        }
+        if (resourceType[resourceSlot] == NORMAL_DIALOG_PRIMARY_SKILL) {
+            iconPanel = new iconWidget(
+                resourceCenterX - resourceImageHeight / 2 + 6,
+                resourceY + 6, 82, 93, "primskil.icn",
+                resourceValue[resourceSlot], 0, -1,
+                NORMAL_DIALOG_WIDGET_COLOR, 1);
+            if (!iconPanel)
+                MemError();
+            pNormalDialogWindow->AddWidget(iconPanel, -1);
+            strcpy(resourceText[resourceSlot],
+                   gStatNames[resourceValue[resourceSlot]]);
+        }
+        if (resourceType[resourceSlot] == NORMAL_DIALOG_MONSTER) {
+            iconPanel = new iconWidget(
+                resourceCenterX - resourceImageHeight / 2 + 6,
+                resourceY + 6, 82, 93, "strip.icn",
+                gMonsterDatabase[resourceValue[resourceSlot]].race + 4,
+                0, -1, NORMAL_DIALOG_WIDGET_COLOR, 1);
+            if (!iconPanel)
+                MemError();
+            pNormalDialogWindow->AddWidget(iconPanel, -1);
+
+            sprintf(gText, "monh%04d.icn", resourceValue[resourceSlot]);
+            iconPanel = new iconWidget(
+                resourceCenterX - resourceImageHeight / 2 + 6,
+                resourceY + 6, 82, 93, gText, 0, 0, -1,
+                NORMAL_DIALOG_WIDGET_COLOR, 1);
+            if (!iconPanel)
+                MemError();
+            pNormalDialogWindow->AddWidget(iconPanel, -1);
+        }
+        if (resourceType[resourceSlot] == NORMAL_DIALOG_CREST) {
+            iconPanel = new iconWidget(
+                resourceCenterX - resourceImageHeight / 2 - 4,
+                resourceY - 4, 58, 55, "brcrest.icn", 6, 0, -1,
+                NORMAL_DIALOG_WIDGET_COLOR, 1);
+            if (!iconPanel)
+                MemError();
+            pNormalDialogWindow->AddWidget(iconPanel, -1);
+        }
+        if (resourceType[resourceSlot] == NORMAL_DIALOG_SECONDARY_SKILL) {
+            iconPanel = new iconWidget(
+                resourceCenterX - resourceImageHeight / 2 - 3,
+                resourceY - 3, 71, 81, "secskill.icn", 15, 0, -1,
+                NORMAL_DIALOG_WIDGET_COLOR, 1);
+            if (!iconPanel)
+                MemError();
+            pNormalDialogWindow->AddWidget(iconPanel, -1);
+        }
+        if (resourceType[resourceSlot] == NORMAL_DIALOG_HERO) {
+            sprintf(iconFile, "port%04d.icn", resourceValue[resourceSlot]);
+            iconPanel = new iconWidget(
+                resourceCenterX - resourceImageHeight / 2 + 5,
+                resourceY + 5, 101, 95, iconFile, 0, 0, -1,
+                NORMAL_DIALOG_WIDGET_COLOR, 1);
+            if (!iconPanel)
+                MemError();
+            pNormalDialogWindow->AddWidget(iconPanel, -1);
+        }
+
+        panelHeight = iconHeight;
+        panelY = resourceY;
+        if (resourceType[resourceSlot] == NORMAL_DIALOG_SECONDARY_SKILL) {
+            textPanel = new textWidget(
+                resourceCenterX - 50, panelHeight + panelY - 72, 100,
+                (resourceType[resourceSlot] == NORMAL_DIALOG_SPELL) * 12 + 12,
+                resourceText[resourceSlot], "smalfont.fnt", 1,
+                textWidgetId++, NORMAL_DIALOG_WIDGET_FLAGS, 1);
+            if (!textPanel)
+                MemError();
+            pNormalDialogWindow->AddWidget(textPanel, -1);
+
+            resourceText[resourceSlot] = static_cast<char *>(BaseAlloc(
+                NORMAL_DIALOG_TEXT_LENGTH, KBFILE,
+                NORMAL_DIALOG_SECONDARY_TEXT_LINE));
+            labelY = static_cast<short>(iconHeight) +
+                     static_cast<short>(resourceY) - 24;
+            sprintf(resourceText[resourceSlot], "%s",
+                    gSecondarySkillLevels[
+                        resourceValue[resourceSlot] %
+                        HERO_SECONDARY_SKILL_VALUE_LEVELS]);
+        } else if (resourceType[resourceSlot] == NORMAL_DIALOG_PRIMARY_SKILL) {
+            labelY = panelHeight + panelY - 93;
+        } else {
+            labelY = panelHeight + panelY - 10;
+        }
+
+        textPanel = new textWidget(
+            resourceCenterX - 50, labelY, 100,
+            (resourceType[resourceSlot] == NORMAL_DIALOG_SPELL) * 12 + 12,
+            resourceText[resourceSlot], "smalfont.fnt", 1,
+            textWidgetId++, NORMAL_DIALOG_WIDGET_FLAGS, 1);
+        if (!textPanel)
+            MemError();
+        pNormalDialogWindow->AddWidget(textPanel, -1);
+
+        if (resourceType[resourceSlot] == NORMAL_DIALOG_PRIMARY_SKILL &&
+            showPrimaryBonus) {
+            char *bonusText = static_cast<char *>(BaseAlloc(
+                5, KBFILE, NORMAL_DIALOG_PRIMARY_BONUS_LINE));
+            strcpy(bonusText, "+1 ");
+            textPanel = new textWidget(
+                resourceCenterX - 50, iconHeight + resourceY - 22, 100, 16,
+                bonusText, "bigfont.fnt", 1, textWidgetId++,
+                NORMAL_DIALOG_WIDGET_FLAGS, 1);
+            if (!textPanel)
+                MemError();
+            pNormalDialogWindow->AddWidget(textPanel, -1);
+        }
+
+        borderWidget = new border(
+            resourceCenterX - resourceImageHeight / 2, resourceY,
+            resourceImageHeight, iconHeight,
+            resourceSlot + NORMAL_DIALOG_RESOURCE_BORDER_FIRST_ID,
+            1, 0, 0);
+        pNormalDialogWindow->AddWidget(borderWidget, -1);
+    }
+
+    message.type = NORMAL_DIALOG_DISABLE_MESSAGE;
+    message.field4 = NORMAL_DIALOG_SET_TEXT_COMMAND;
+    message.field8 = NORMAL_DIALOG_TEXT_WIDGET_ID;
+    message.text = text;
+    pNormalDialogWindow->BroadcastMessage(message);
+
+    if (showOrText == NORMAL_DIALOG_SHOW_OR_TEXT) {
+        orText = static_cast<char *>(BaseAlloc(
+            3, KBFILE, NORMAL_DIALOG_OR_TEXT_LINE));
+        strcpy(orText, "or");
+        textPanel = new textWidget(
+            windowWidth / 2 - 10, resourceY + 43, 40, 12,
+            orText, "smalfont.fnt", 1, textWidgetId++,
+            NORMAL_DIALOG_WIDGET_FLAGS, 1);
+        if (!textPanel)
+            MemError();
+        pNormalDialogWindow->AddWidget(textPanel, -1);
+    }
+
+    savedPointerType = gpMouseManager->m_cursorType;
+    savedPointerFrame = gpMouseManager->m_cursorFrame;
+    while (gpMouseManager->m_hideCount)
+        gpMouseManager->ShowColorPointer();
+    gpMouseManager->SetPointer("advmice.mse", 0, NORMAL_DIALOG_POINTER_ID);
+
+    if (dialogType == NORMAL_DIALOG_WAIT_LAST ||
+        dialogType == NORMAL_DIALOG_WAIT_FIRST) {
+        gpWindowManager->DoDialog(pNormalDialogWindow, WaitHandler, 0);
+    } else if (dialogType == NORMAL_DIALOG_QUICK_VIEW) {
+        gpWindowManager->AddWindow(pNormalDialogWindow, -1, 1);
+        QuickViewWait();
+        gpWindowManager->RemoveWindow(pNormalDialogWindow);
+    } else {
+        gpWindowManager->DoDialog(pNormalDialogWindow, EventWindowHandler, 0);
+    }
+
+    delete pNormalDialogWindow;
+    gpMouseManager->SetPointer("", savedPointerFrame, savedPointerType);
+    giResType1 = savedFirstResourceType;
+    giResExtra1 = savedFirstResourceValue;
+    giResType2 = savedSecondResourceType;
+    giResExtra2 = savedSecondResourceValue;
+    pNormalDialogWindow = savedNormalDialogWindow;
+}
 
 VA(0x004a2565, 0x71)
 void UpdateNormalDialog(char *text)

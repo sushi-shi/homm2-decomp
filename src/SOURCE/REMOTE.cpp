@@ -68,7 +68,7 @@ DATA(0x0052a500) char gbUseRegularCompression;
 DATA(0x0052a508) int *iInOrder;
 DATA(0x0052a730) char *sndBuf;
 DATA(0x0052a840) char *gcThisNetName;
-DATA(0x0052a860) long *lLastHeartbeatReceive;
+DATA(0x0052a860) long lLastHeartbeatReceive[6];
 DATA(0x0052a878) char *packet;
 DATA(0x0052a988) SNetPlayerInfo gsNetPlayerInfo[6];
 DATA(0x0052aa58) char *rcvBufIn;
