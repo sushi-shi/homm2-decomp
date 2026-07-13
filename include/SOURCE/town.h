@@ -8,10 +8,17 @@
 class hero;
 
 typedef enum TownType {
-    TOWN_TYPE_SORCERESS = 2
+    TOWN_TYPE_KNIGHT = 0,
+    TOWN_TYPE_BARBARIAN = 1,
+    TOWN_TYPE_SORCERESS = 2,
+    TOWN_TYPE_WARLOCK = 3,
+    TOWN_TYPE_WIZARD = 4,
+    TOWN_TYPE_NECROMANCER = 5
 } TownType;
 
 typedef enum TownBuilding {
+    TOWN_BUILDING_CASTLE = 0x40,
+    TOWN_BUILDING_CAPTAIN = 0x80,
     TOWN_BUILDING_RAINBOW = 0x2000
 } TownBuilding;
 
@@ -33,8 +40,21 @@ public:
     signed char m_buildState;  // +0x1c
     char m_unknown1d;  // +0x1d
     short m_garrison[12];  // +0x1e
-    char m_pad_0x36[0x2e];
-    // size >= 0x36 (accessed lower bound; no ctor/stride oracle)
+    unsigned char m_onMap;  // +0x36
+    signed char m_unknown37;  // +0x37
+    signed char m_unknown38;  // +0x38
+    signed char m_originalOwner;  // +0x39
+    unsigned short m_extraIndex;  // +0x3a
+    union {
+        signed char m_spells[5][4];  // +0x3c
+        struct {
+            char m_spellPad[19];
+            signed char m_spellCounts[6];
+        };
+    };
+    short m_unknown55;  // +0x55
+    char m_name[13];  // +0x57
+    // Packed retail stride is 0x64 bytes.
     // --- constructors ---
     town(void);
     // --- methods ---
