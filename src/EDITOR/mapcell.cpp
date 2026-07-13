@@ -42,7 +42,7 @@ void fullMap::Init(int w, int h)
     width = w;
     height = h;
     Close();
-    cells = (mapCell *)operator new(width * height * sizeof(mapCell));
+    cells = static_cast<mapCell *>(operator new(width * height * sizeof(mapCell)));
 }
 
 VA(0x0040b198, 0xce)
@@ -77,7 +77,7 @@ int fullMap::GetNewCellExtraIndex(void)
             return nb;
         }
     }
-    i = (mapCellExtra *)operator new((extraCount + 100) * sizeof(mapCellExtra));
+    i = static_cast<mapCellExtra *>(operator new((extraCount + 100) * sizeof(mapCellExtra)));
     memcpy(i, extras, extraCount * sizeof(mapCellExtra));
     delete extras;
     extras = i;
@@ -98,8 +98,9 @@ void fullMap::Write(int handle)
     _write(handle, extras, extraCount * sizeof(mapCellExtra));
 }
 
-// ~98%: all slots + logic match; one convert-path memcpy dst (cells+width*y+x)
-// schedules the cells-base add differently (regalloc artifact, see report).
+// The legacy cell stride is 20 bytes, while the current record is 12 bytes. Keeping
+// the destination byte offset factored by each current-record index reproduces the
+// retail conversion loop's separate scaled y and x address terms.
 VA(0x0040b7da, 0x295)
 void fullMap::Read(int handle, int convert)
 {
@@ -114,11 +115,13 @@ void fullMap::Read(int handle, int convert)
     _read(handle, &height, sizeof(height));
     Init(width, height);
     if (convert) {
-        tmp = (oldMapCell *)operator new(width * height * sizeof(oldMapCell));
+        tmp = static_cast<oldMapCell *>(operator new(width * height * sizeof(oldMapCell)));
         _read(handle, tmp, width * height * sizeof(oldMapCell));
         for (x = 0; x < width; x++)
             for (y = 0; y < height; y++)
-                memcpy(cells + width * y + x, tmp + width * y + x, sizeof(mapCell));
+                memcpy(reinterpret_cast<unsigned char *>(cells) +
+                           (width * y * sizeof(mapCell) + x * sizeof(mapCell)),
+                       tmp + width * y + x, sizeof(mapCell));
         delete tmp;
     } else {
         _read(handle, cells, width * height * sizeof(mapCell));
@@ -126,9 +129,9 @@ void fullMap::Read(int handle, int convert)
     _read(handle, &extraCount, sizeof(extraCount));
     if (extras)
         delete extras;
-    extras = (mapCellExtra *)operator new(extraCount * sizeof(mapCellExtra));
+    extras = static_cast<mapCellExtra *>(operator new(extraCount * sizeof(mapCellExtra)));
     if (convert) {
-        tmp2 = (oldMapCellExtra *)operator new(extraCount * sizeof(oldMapCellExtra));
+        tmp2 = static_cast<oldMapCellExtra *>(operator new(extraCount * sizeof(oldMapCellExtra)));
         _read(handle, tmp2, extraCount * sizeof(oldMapCellExtra));
         for (nb = 0; nb < extraCount; nb++)
             memcpy(extras + nb, tmp2 + nb, sizeof(mapCellExtra));
@@ -138,14 +141,8 @@ void fullMap::Read(int handle, int convert)
     }
 }
 
-// @early-stop ~97%: cell/extra access goes through inline Row()/Extra() so /Ob1
-// splices them in - matching retail's deferred Row(y)[x] addressing AND its jmp$+0
-// count (10/10; raw expressions capped this at ~91%). Locals node/ix/ni/cell are
-// named so the /Od hash drops them on retail's exact frame slots (-0x4/-0x8/-0xc/
-// -0x10) via od_slots. Residual: ~2 inline-bracket jmp$+0 the compiler emits leading
-// (after the `if`) vs retail's trailing (after the `cell` store) - an opaque MSVC /Od
-// inline-bracketing choice that resisted accessor + statement-shape variants.
-// See docs/patterns/inline-accessors.md, docs/patterns/od-hash-slots.md.
+// Cell's output-reference form places its /Ob1 continuation after the caller's
+// cell-pointer assignment, matching the retail inline boundary.
 VA(0x0040b396, 0x1d3)
 mapCellExtra *fullMap::GetNewCellExtraOverlay(int x, int y)
 {
@@ -155,28 +152,28 @@ mapCellExtra *fullMap::GetNewCellExtraOverlay(int x, int y)
     mapCell *cell;       // -0x10
 
     if (Row(y)[x].extra == 0) {
-        cell = &Row(y)[x];
+        Cell(cell, x, y);
         cell->extra = GetNewCellExtraIndex();
         return Extra(Row(y)[x].extra);
-    }
-    ix = Row(y)[x].extra;
-    node = Extra(Row(y)[x].extra);
-    for (;;) {
-        if (node->ovlIndex == 0xFF)
-            return node;
-        if (node->index == 0) {
-            ni = GetNewCellExtraIndex();
-            node = Extra(ix);
-            node->index = ni;
-            return Extra(node->index);
+    } else {
+        ix = Row(y)[x].extra;
+        node = Extra(Row(y)[x].extra);
+        for (;;) {
+            if (node->ovlIndex == 0xFF)
+                return node;
+            if (node->index == 0) {
+                ni = GetNewCellExtraIndex();
+                node = Extra(ix);
+                node->index = ni;
+                return Extra(node->index);
+            } else {
+                ix = node->index;
+                node = Extra(node->index);
+            }
         }
-        ix = node->index;
-        node = Extra(node->index);
     }
 }
 
-// @early-stop ~97%: twin of GetNewCellExtraOverlay (objIndex vs ovlIndex); same
-// inline-accessor + /Ob1 reconstruction, same jmp-placement residual.
 VA(0x0040b569, 0x1d3)
 mapCellExtra *fullMap::GetNewCellExtraObject(int x, int y)
 {
@@ -186,23 +183,25 @@ mapCellExtra *fullMap::GetNewCellExtraObject(int x, int y)
     mapCell *cell;       // -0x10
 
     if (Row(y)[x].extra == 0) {
-        cell = &Row(y)[x];
+        Cell(cell, x, y);
         cell->extra = GetNewCellExtraIndex();
         return Extra(Row(y)[x].extra);
-    }
-    ix = Row(y)[x].extra;
-    node = Extra(Row(y)[x].extra);
-    for (;;) {
-        if (node->objIndex == 0xFF)
-            return node;
-        if (node->index == 0) {
-            ni = GetNewCellExtraIndex();
-            node = Extra(ix);
-            node->index = ni;
-            return Extra(node->index);
+    } else {
+        ix = Row(y)[x].extra;
+        node = Extra(Row(y)[x].extra);
+        for (;;) {
+            if (node->objIndex == 0xFF)
+                return node;
+            if (node->index == 0) {
+                ni = GetNewCellExtraIndex();
+                node = Extra(ix);
+                node->index = ni;
+                return Extra(node->index);
+            } else {
+                ix = node->index;
+                node = Extra(node->index);
+            }
         }
-        ix = node->index;
-        node = Extra(node->index);
     }
 }
 
@@ -213,16 +212,9 @@ mapCellExtra *fullMap::GetNewCellExtraObject(int x, int y)
 // one reserved unused local @-10 (this spills to -0x14). Names chosen so their
 // buckets (0,1,4,6) sort into that order. The 7th param is unused in retail.
 //
-// NEEDS /G5: the four objTileset/ovlTileset bitfield READS lower in retail to
-// `movb; shrb; andw $mask; andl $0xffff` — the unsigned-bitfield->int zero-extend
-// idiom that MSVC 4.2 emits only under /G5 (Pentium). Under the build's /Gr-only
-// flags they instead become `andb; xor; movb` (4 sites mismatch). Compiling this
-// TU with /G5 makes them byte-exact AND leaves the 7 already-exact functions
-// byte-identical (verified). Two residuals survive even with /G5: the /Od leading
-// `jmp`-to-next at each chain-loop head (documented block-jmp wall,
-// docs/patterns/od-cell-access-and-block-jmps.md) and the cell-reset objTileset
-// write operand-order (t-first vs field-first; an /Od schedule driven by t's
-// liveness across both branches).
+// The explicit u8 conversion on the direct-cell object assignment preserves the
+// field-first read/modify/write schedule used by retail after the earlier legacy
+// allocation casts are expressed with C++ casts.
 VA(0x0040ba6f, 0x2ea)
 void fullMap::ChangeTilesetIndex(mapCell *cell, int x, int y, int tileset, int index, int overlay, int)
 {
@@ -241,7 +233,7 @@ void fullMap::ChangeTilesetIndex(mapCell *cell, int x, int y, int tileset, int i
         if (cell->objIndex != 0xFF && cell->objTileset != tileset) {
             idx = cell->extra;
             while (idx != 0) {
-                ptr = &extras[idx];
+                ptr = Extra(idx);
                 if (ptr->objIndex != 0xFF && ptr->objTileset != tileset) {
                     idx = ptr->index;
                 } else {
@@ -264,14 +256,14 @@ void fullMap::ChangeTilesetIndex(mapCell *cell, int x, int y, int tileset, int i
             cell->w4a = 0;
             cell->w4b = 0;
             cell->w4c = 0;
-            cell->objTileset = t;
+            cell->objTileset = static_cast<u8>(t);
             cell->objIndex = index;
         }
     } else {
         if (cell->ovlIndex != 0xFF && cell->ovlTileset != tileset) {
             idx = cell->extra;
             while (idx != 0) {
-                ptr = &extras[idx];
+                ptr = Extra(idx);
                 if (ptr->ovlIndex != 0xFF && ptr->ovlTileset != tileset) {
                     idx = ptr->index;
                 } else {
