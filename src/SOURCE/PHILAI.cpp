@@ -800,9 +800,9 @@ void philAI::DoAI(int player) {
                 ResetHeroRVs(0, 0, 0);
                 stepLimit36 = (gpCurAIHero->m_eventFlags & 0x80) ? 15 : 5;
                 minimumValue9 = gpCurAIHero->m_mobility + 800;
-                stepLimit36 = static_cast<int>(stepLimit36 * (1.7 - gpGame->m_aiSpeed * 0.1));
+                stepLimit36 = static_cast<int>(stepLimit36 * (1.7 - gpGame->m_difficulty * 0.1));
                 minimumValue9 =
-                    static_cast<int>(minimumValue9 * ((gpGame->m_aiSpeed - 1) * 0.06 + 0.8));
+                    static_cast<int>(minimumValue9 * ((gpGame->m_difficulty - 1) * 0.06 + 0.8));
 
                 while (!heroDone5 && gpCurAIHero->m_remainingMobility >= 75) {
                     if (!(gbGameOver == 0)) {
@@ -1222,15 +1222,15 @@ firstWeekDone:
 
     for (generalIndex4 = 0; generalIndex4 < AI_HERO_COUNT; generalIndex4++)
         gfHeroInteractionBonus[generalIndex4] = 1.0f;
-    if (gpGame->m_aiSpeed == 0) {
+    if (gpGame->m_difficulty == 0) {
         gfAttackHumanBonus = 0.6f;
         gfAttackComputerBonus = 1.3f;
-    } else if (gpGame->m_aiSpeed == 1) {
+    } else if (gpGame->m_difficulty == 1) {
         gfAttackHumanBonus = 1.0f;
         gfAttackComputerBonus = 1.0f;
     } else {
-        gfAttackHumanBonus = static_cast<float>(gpGame->m_aiSpeed * 0.07 + 1.0);
-        gfAttackComputerBonus = static_cast<float>(1.1 - gpGame->m_aiSpeed * 0.12);
+        gfAttackHumanBonus = static_cast<float>(gpGame->m_difficulty * 0.07 + 1.0);
+        gfAttackComputerBonus = static_cast<float>(1.1 - gpGame->m_difficulty * 0.12);
     }
     if (gbIAmGreatest)
         gfAttackComputerBonus = 0.1f;
@@ -1254,9 +1254,9 @@ firstWeekDone:
         giMaxHeroesForThisPlayer++;
     if (ownedTownCount19 >= 9)
         giMaxHeroesForThisPlayer++;
-    if (static_cast<unsigned char>(gpGame->field_0x2af) == AI_OBJECT_MONSTER)
+    if (gpGame->m_mapWidth == AI_MAP_SIZE_SMALL)
         giMaxHeroesForThisPlayer--;
-    if (static_cast<unsigned char>(gpGame->field_0x2af) >= AI_EXPANSION_OBJECT_THRESHOLD)
+    if (gpGame->m_mapWidth >= AI_MAP_SIZE_LARGE)
         giMaxHeroesForThisPlayer++;
 
     earlyTurn21 = 16;

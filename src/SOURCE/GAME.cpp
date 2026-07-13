@@ -25,6 +25,10 @@
 #include <SOURCE/searchArray.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/armyGroup.h>
+#include <SOURCE/army.h>
+#include <SOURCE/combatManager.h>
+#include <SOURCE/townManager.h>
+#include <SOURCE/TOWNMGR.h>
 #include <SOURCE/ExpCampaign.h>
 #include <SOURCE/EVENTS.h>
 #include <EDITOR/mapcell.h>
@@ -32,7 +36,11 @@
 #include <BASE/soundManager.h>
 #include <BASE/resourceManager.h>
 #include <BASE/heroWindowManager.h>
+#include <BASE/heroWindow.h>
+#include <BASE/iconWidget.h>
 #include <BASE/BITS.h>
+#include <SOURCE/ARMY.h>
+#include <SOURCE/kbwin.h>
 
 
 // configStruct/SCreatureInfo shared in _types.h; EventExtra/SThievesData in SOURCE/GAME.h.
@@ -44,6 +52,16 @@
 #define GSAVELINE (*reinterpret_cast<const short *>("\x94\x02"))
 #define GLOADLINE (*reinterpret_cast<const short *>("\x4f\x04"))
 #define GMAPLINE (*reinterpret_cast<const short *>("\n"))
+#define VIEW_ARMY_FRAMES \
+    "\x37\x3a\x37\x62\x37\x8a\x37\xb9\x37\xc0\x37\xc6\x37\x0d\x38\x11\x38\x15\x38\x19" \
+    "\x38\x1d\x38\x21\x38\x25\x38\x29\x38\x2d\x38\x31\x38\x35\x38\x39\x38\x3d\x38\x41" \
+    "\x38\x45\x38\x49\x38\x4d\x38\x51\x38\x48\x39\xa1\x39\xad\x39\xb9\x39\x0d\x3a\x5d\x3a" \
+    "\x8d\x3a\xb1\x3a\x8d\x3b\xf7\x3b\x80\x3c\x93\x3c\x0a\x3d\x75\x3d\x7a\x3d\xc1\x3d\xc7" \
+    "\x3d\x1f\x3e\x25\x3e\x36\x3e\x82\x3e\xef\x3e\x22\x3f\xdd\x3f\xe2\x3f"
+#define VIEW_ARMY_FRAME_OFFSETS \
+    "\x3b\x8a\x3b\x9c\x3b\xae\x3b\xd2\x3b\xe7\x3b\xf9\x3b\x1d\x3c\x32\x3c\x44\x3c\x5b\x3c" \
+    "\x7d\x3c\x8f\x3c\xa6\x3c\xd5\x3c\xe7\x3c\x0b\x3d\x20\x3d\x35\x3d\x4a\x3d\x5e\x3d\x70" \
+    "\x3d\x94\x3d\xb8\x3d\xcd\x3d\xe7\x3d\x18\x3e\x2d\x3e\x1a\x3f"
 
 // fullMap is embedded in `game` at this+0xb3e; the retail folds the +0xb3e into the
 // member offsets and inlines Row/Extra (/Ob1), so access it inline via the cast.
@@ -695,8 +713,8 @@ void game::SetupOrigData(void)
         memset(&m_heroRecs[i], 0, sizeof(m_heroRecs[i]));
         memset(reinterpret_cast<unsigned char *>(&m_heroRecs[i]) + 0x94, 0, 0x41);
         memset(m_heroRecs[i].m_artifacts, -1, 14);
-        m_heroRecs[i].m_unknown2a = -1;
-        m_heroRecs[i].m_boatId = m_heroRecs[i].m_unknown2a;
+        m_heroRecs[i].m_patrolY = -1;
+        m_heroRecs[i].m_patrolX = m_heroRecs[i].m_patrolY;
         m_heroRecs[i].m_id = static_cast<signed char>(i);
         m_heroRecs[i].m_unknown18 = static_cast<unsigned char>(i);
         m_heroRecs[i].m_owner = -1;
@@ -2059,8 +2077,245 @@ int ViewSpellsHandler(struct tag_message &) { return 0; }
 VA(0x0047a4cd, 0x17c)
 int ViewSpecialHandler(struct tag_message &) { return 0; }
 
+// @early-stop
+// reloc-masked: identical 0xc86-byte code/frame; the dwelling-table relocation resolves to
+// retail's folded 0x4fca35 symbol (gDwellingType at 0x4fca48 plus the -0x13 addend).
 VA(0x0047a649, 0xc86)
-void game::ViewArmy(int, int, int, int, class town *, int, int, int, class hero *, class army *, class armyGroup *, int) {}
+void game::ViewArmy(int x, int y, int monsterType, int numTroops, town *castle,
+                    int disableUpgrade, int facing, int quickView, hero *theHero,
+                    army *theArmy, armyGroup *theGroup, int groupIndex)
+{
+    short baseX7 = 86;
+    short quickBaseY3 = 164;
+    short blankWidget3 = 1;
+    short numWidget15 = 2;
+    short titleMessage15 = 3;
+    short detailMessage2 = 4;
+    short frame18 = 5;
+    int loopIndex0;
+    tag_message message6;
+    message6.type = 0x200;
+
+    iViewArmyFrame = 0;
+    iViewArmyType = monsterType;
+    iViewArmyNumTroops = numTroops;
+    gbAllowUpgrade = 0;
+
+    if (castle && (gpAdvManager->m_active == 1 || gpTownManager->m_active == 1)) {
+        for (loopIndex0 = 20; loopIndex0 <= 24; loopIndex0++) {
+            if (gDwellingType[static_cast<signed char>(castle->field_0x3)][loopIndex0 - 19] == monsterType &&
+                (castle->field_0x18 & (1 << (loopIndex0 + 5)))) {
+                gbAllowUpgrade = 1;
+                iViewArmyUpgradeToType = monsterType + 1;
+            }
+        }
+        if ((monsterType == 35 || monsterType == 36) &&
+            (castle->field_0x18 & 0x40000000)) {
+            gbAllowUpgrade = 1;
+            iViewArmyUpgradeToType = 37;
+        }
+    }
+
+    tag_monsterInfo *monster8 = &gMonsterDatabase[monsterType];
+    char *armyMonster11;
+    if (theArmy)
+        armyMonster11 = reinterpret_cast<char *>(theArmy) + 0xba;
+    else
+        armyMonster11 = reinterpret_cast<char *>(&gMonsterDatabase[monsterType]);
+
+    x = 19;
+    y = 75;
+    m_viewArmyWindow = new heroWindow(x, y, const_cast<char *>("armywin.bin"));
+    if (!m_viewArmyWindow)
+        MemError();
+
+    viewArmyFacingWIPXMod = facing == 1 ? -1 : 1;
+    gpResourceManager->PointToFile(
+        gpResourceManager->MakeId(cArmyFrameFileNames[monsterType], 1));
+    gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(&sViewArmyMonFrameInfo), 0x335);
+    ModifyFrameInfo(&sViewArmyMonFrameInfo, monsterType);
+    BuildTempWalkSeq(&sViewArmyMonFrameInfo, 0, 1);
+
+    viewArmyBaseX = 167;
+    char filename4[16];
+    if (gbLowMemory)
+        sprintf(filename4, "monh%04d.icn", monsterType);
+    else
+        strcpy(filename4, cMonFilename[monsterType]);
+
+    icon *monsterIcon5 = gpResourceManager->GetIcon(filename4);
+    int iconFrame15 = static_cast<signed char>(VIEW_ARMY_FRAMES[0]);
+    viewArmyBaseX += (GetIconEntry(monsterIcon5, iconFrame15)->w / 2) * viewArmyFacingWIPXMod;
+    viewArmyBaseX += GetIconEntry(monsterIcon5, iconFrame15)->x * viewArmyFacingWIPXMod +
+                     static_cast<signed char>(VIEW_ARMY_FRAME_OFFSETS[0]) * viewArmyFacingWIPXMod;
+    viewArmyBaseY = 138;
+    viewArmyBaseY += GetIconEntry(monsterIcon5, iconFrame15)->h / 2;
+    if (gbLowMemory) {
+        viewArmyBaseX = 126;
+        viewArmyBaseY = 93;
+    }
+
+    iconWidget *monsterWidget7 = new iconWidget(
+        static_cast<short>(viewArmyBaseX), static_cast<short>(viewArmyBaseY), 86, 149,
+        filename4, gbLowMemory ? 0 : static_cast<signed char>(VIEW_ARMY_FRAMES[0]),
+        facing == 0, 5, 16, 1);
+    if (!monsterWidget7)
+        MemError();
+    m_viewArmyWindow->AddWidget(monsterWidget7, -1);
+    gpResourceManager->Dispose(monsterIcon5);
+
+    char armyName8[32];
+    strcpy(armyName8, gArmyNames[monsterType]);
+    armyName8[0] -= 32;
+    message6.field4 = 3;
+    message6.field8 = 3;
+    message6.text = armyName8;
+    m_viewArmyWindow->BroadcastMessage(message6);
+
+    char *details9 = static_cast<char *>(BaseAlloc(0x226, GFILE, GSAVELINE + 0x93));
+    int morale2 = theGroup ? theGroup->GetMorale(theHero, castle, 0) : 0;
+    if (monster8->flags.all & MONSTER_FLAGS_NO_MORALE)
+        morale2 = 0;
+
+    sprintf(details9, "");
+    int modifier15 = 0;
+    sprintf(gText, "%s%d", cArmyDetail[0], static_cast<int>(monster8->attack));
+    strcat(details9, gText);
+    if (theHero)
+        modifier15 += theHero->Stats(0);
+    if (theArmy)
+        modifier15 = theArmy->m_monsterAttack - monster8->attack;
+    if (modifier15) {
+        sprintf(gText, " (%d)", monster8->attack + modifier15);
+        strcat(details9, gText);
+    }
+
+    modifier15 = 0;
+    sprintf(gText, "\n%s%d", cArmyDetail[1], static_cast<int>(monster8->defense));
+    strcat(details9, gText);
+    if (theHero)
+        modifier15 += theHero->Stats(1);
+    if (theArmy)
+        modifier15 = theArmy->m_monsterDefense - monster8->defense;
+    if (modifier15) {
+        sprintf(gText, " (%d)", monster8->defense + modifier15);
+        strcat(details9, gText);
+    }
+
+    if (monster8->flags.all & MONSTER_FLAGS_SHOOTER) {
+        int shots8 = static_cast<signed char>(armyMonster11[0x10]);
+        if (shots8 > 0) {
+            if (gpCombatManager->m_active == 1)
+                sprintf(gText, "\n%s%d", cArmyDetail[2], shots8);
+            else
+                sprintf(gText, "\n%s%d", cArmyDetail[8], shots8);
+            strcat(details9, gText);
+        }
+    }
+
+    sprintf(gText, "\n%s%d", cArmyDetail[3], static_cast<int>(monster8->damageMin));
+    strcat(details9, gText);
+    if (monster8->damageMin != monster8->damageMax) {
+        sprintf(gText, "-%d", static_cast<int>(monster8->damageMax));
+        strcat(details9, gText);
+    }
+    sprintf(gText, "\n%s%d", cArmyDetail[4], static_cast<unsigned int>(monster8->hitPoints));
+    strcat(details9, gText);
+    if (gpCombatManager->m_active == 1) {
+        sprintf(gText, "\n%s%d", "Hit Points Left: ",
+                static_cast<unsigned int>(monster8->hitPoints) - theArmy->m_hitPointsLost);
+        strcat(details9, gText);
+    }
+    sprintf(gText, "\n%s%s", cArmyDetail[5], speedText[static_cast<signed char>(armyMonster11[0xb])]);
+    strcat(details9, gText);
+    sprintf(gText, "\n%s%s", cArmyDetail[6], gMoraleText[morale2 + 3]);
+    strcat(details9, gText);
+    int luck1 = GetLuck(theHero, theArmy, castle);
+    sprintf(gText, "\n%s%s", cArmyDetail[7], gLuckText[luck1 + 3]);
+    strcat(details9, gText);
+
+    message6.field8 = 4;
+    message6.text = details9;
+    m_viewArmyWindow->BroadcastMessage(message6);
+    if (!gbAllowUpgrade) {
+        message6.field4 = 6;
+        message6.text = reinterpret_cast<char *>(6);
+        message6.field8 = 500;
+        m_viewArmyWindow->BroadcastMessage(message6);
+    }
+    if (disableUpgrade) {
+        message6.field4 = 6;
+        message6.text = reinterpret_cast<char *>(6);
+        message6.field8 = 0x7803;
+        m_viewArmyWindow->BroadcastMessage(message6);
+    }
+    if (quickView) {
+        message6.field4 = 6;
+        message6.text = reinterpret_cast<char *>(6);
+        message6.field8 = 0x7800;
+        m_viewArmyWindow->BroadcastMessage(message6);
+    }
+    if (numTroops < 1) {
+        message6.field4 = 6;
+        message6.text = reinterpret_cast<char *>(6);
+        message6.field8 = 1;
+        m_viewArmyWindow->BroadcastMessage(message6);
+        message6.field8 = 2;
+        m_viewArmyWindow->BroadcastMessage(message6);
+    } else {
+        char countText[12];
+        sprintf(countText, "%d", numTroops);
+        message6.field4 = 3;
+        message6.field8 = 2;
+        message6.text = countText;
+        m_viewArmyWindow->BroadcastMessage(message6);
+    }
+
+    if (theArmy) {
+        int spellY3 = 169;
+        int spellCenterX8 = 420;
+        if (quickView)
+            spellY3 += 12;
+        int spacing0 = 44 - theArmy->m_spellCount;
+        int spellX3 = 10 - theArmy->m_spellCount + spellCenterX8 -
+                      (theArmy->m_spellCount * spacing0) / 2;
+        int spellIndex9 = -1;
+        for (loopIndex0 = 0;
+             loopIndex0 < (theArmy->m_spellCount < 6 ? theArmy->m_spellCount : 6);
+             loopIndex0++) {
+            spellIndex9++;
+            for (; spellIndex9 < 15; spellIndex9++) {
+                if (theArmy->m_spellInfluence[spellIndex9])
+                    break;
+            }
+            iconWidget *spellWidget = new iconWidget(
+                static_cast<short>(loopIndex0 * spacing0 + spellX3),
+                static_cast<short>(spellY3 + 14), 0, 0, const_cast<char *>("spellinl.icn"),
+                static_cast<short>(spellIndex9), 0, static_cast<short>(loopIndex0 + 200), 16, 1);
+            if (!spellWidget)
+                MemError();
+            m_viewArmyWindow->AddWidget(spellWidget, -1);
+        }
+    }
+
+    glTimers[0] = KBTickCount() + 90;
+    m_viewArmyResult = 0;
+    if (quickView) {
+        gpWindowManager->AddWindow(m_viewArmyWindow, -1, 1);
+        QuickViewWait();
+        gpWindowManager->RemoveWindow(m_viewArmyWindow);
+    } else {
+        gpWindowManager->DoDialog(m_viewArmyWindow, ViewArmyHandler, 0);
+        if (gbDismissArmy && theGroup) {
+            theGroup->m_troopTypes[groupIndex] = -1;
+            theGroup->m_troopCounts[groupIndex] = 0;
+        }
+        if (gbUpgradeArmy && theGroup)
+            theGroup->m_troopTypes[groupIndex] = static_cast<signed char>(iViewArmyUpgradeToType);
+    }
+    BaseFree(details9, GFILE, GSAVELINE + 0x164);
+    delete m_viewArmyWindow;
+}
 
 VA(0x0047b2cf, 0x3f5)
 int ViewArmyHandler(struct tag_message &) { return 0; }
@@ -2088,11 +2343,403 @@ void game::NextPlayer(void) {}
 VA(0x0047c32f, 0x432)
 int game::ComputeDailyGold(int) { return 0; }
 
+// @early-stop
+// Frame/slots and 30 relocations are exact. The only residual is target 0x47ce94..0x47cec2:
+// the commutative handicap sum loads gpGame secondary income before this->primary income;
+// this partial /Od TU loads the same two operands in the opposite order, then realigns at fild.
 VA(0x0047c761, 0x9aa)
-void game::PerDay(void) {}
+void game::PerDay(void)
+{
+    int maxSpellPoints9;
+    int player;
+    int resource8;
+    int income13;
+    int dailyIncome0;
+    int resourceType1;
+    hero *currentHero6;
+    int restoredSpellPoints13;
+    hero *townHero12;
+    town *currentTown4;
+    double penaltyRate9;
 
+    for (player = 0; player < gpGame->m_playerCount; player++) {
+        for (resource8 = 0; resource8 < 7; resource8++) {
+            gpGame->m_players[player].secondaryResources[resource8] =
+                -m_players[player].resources[resource8];
+        }
+    }
+
+    memset(m_dailyEventFlags, 0, sizeof(m_dailyEventFlags));
+
+    for (player = 0; player < GAME_MINE_COUNT; player++) {
+        if (m_mines[player].owner != -1) {
+            resourceType1 = m_mines[player].resourceType;
+            dailyIncome0 = 0;
+            if (resourceType1 == RES_ORE)
+                dailyIncome0 = 2;
+            else if (resourceType1 == RES_WOOD)
+                dailyIncome0 = 2;
+            else if (resourceType1 != RES_GOLD)
+                dailyIncome0 = 1;
+
+            if (resourceType1 != RES_GOLD && resourceType1 <= RES_GOLD)
+                m_players[m_mines[player].owner].resources[resourceType1] += dailyIncome0;
+        }
+    }
+
+    for (player = 0; player < GAME_TOWN_COUNT; player++)
+        m_castleRecs[player].unknown55++;
+
+    for (player = 0; player < m_playerCount; player++) {
+        m_players[player].resources[RES_SULFUR] +=
+            reinterpret_cast<playerData *>(&m_players[player])->NumOfGivenArtifact(
+                ARTIFACT_ENDLESS_POUCH_SULFUR);
+        m_players[player].resources[RES_MERCURY] +=
+            reinterpret_cast<playerData *>(&m_players[player])->NumOfGivenArtifact(
+                ARTIFACT_ENDLESS_VIAL_MERCURY);
+        m_players[player].resources[RES_GEMS] +=
+            reinterpret_cast<playerData *>(&m_players[player])->NumOfGivenArtifact(
+                ARTIFACT_ENDLESS_POUCH_GEMS);
+        m_players[player].resources[RES_WOOD] +=
+            reinterpret_cast<playerData *>(&m_players[player])->NumOfGivenArtifact(
+                ARTIFACT_ENDLESS_CORD_WOOD);
+        m_players[player].resources[RES_ORE] +=
+            reinterpret_cast<playerData *>(&m_players[player])->NumOfGivenArtifact(
+                ARTIFACT_ENDLESS_CART_ORE);
+        m_players[player].resources[RES_CRYSTAL] +=
+            reinterpret_cast<playerData *>(&m_players[player])->NumOfGivenArtifact(
+                ARTIFACT_ENDLESS_POUCH_CRYSTAL);
+        m_players[player].resources[RES_GOLD] += ComputeDailyGold(player);
+    }
+
+    if (xIsPlayingExpansionCampaign && xCampaign.HasAward(2))
+        m_players[0].resources[RES_WOOD] += 2;
+
+    for (player = 0; player < m_playerCount; player++) {
+        if (!gbHumanPlayer[player]) {
+            if (gpGame->m_difficulty >= GAME_DIFFICULTY_HARD) {
+                m_players[player].resources[RES_WOOD]++;
+                m_players[player].resources[RES_ORE]++;
+            }
+            if (gpGame->m_difficulty >= GAME_DIFFICULTY_EXPERT && m_day >= 1 && m_day <= 6)
+                m_players[player].resources[m_day - 1]++;
+            if (gpGame->m_difficulty >= GAME_DIFFICULTY_IMPOSSIBLE && m_day >= 1 && m_day <= 6)
+                m_players[player].resources[m_day - 1]++;
+            if (gpGame->m_players[player].unknown0f == 1 && m_day >= 1 && m_day <= 6)
+                m_players[player].resources[m_day - 1]++;
+        }
+    }
+
+    m_day++;
+    giCurTurn = (m_week - 1) * 7 + (m_month - 1) * 28 + m_day;
+    if (!gbGameOver) {
+        if (m_day > 7) {
+            m_day = 1;
+            PerWeek();
+        }
+        if (m_week > 4) {
+            m_week = 1;
+            PerMonth();
+        }
+    }
+
+    for (player = 0; player < GAME_HERO_COUNT; player++)
+        m_heroRecs[player].m_eventFlags = m_heroRecs[player].m_eventFlags & 0xfffeffff;
+
+    for (player = 0; player < gpGame->m_playerCount; player++) {
+        for (resource8 = 0; resource8 < 6; resource8++) {
+            if (m_playerHandicap[player]) {
+                if (m_playerHandicap[player] == 1)
+                    penaltyRate9 = 0.15;
+                else
+                    penaltyRate9 = 0.30;
+                m_players[player].resources[resource8] -= static_cast<int>(
+                    (gpGame->m_players[player].secondaryResources[resource8] +
+                     m_players[player].resources[resource8]) * penaltyRate9);
+            }
+        }
+    }
+
+    for (player = 0; player < gpGame->m_playerCount; player++) {
+        for (resource8 = 0; resource8 < 7; resource8++) {
+            gpGame->m_players[player].secondaryResources[resource8] +=
+                m_players[player].resources[resource8];
+        }
+    }
+
+    for (player = 0; player < GAME_HERO_COUNT; player++) {
+        currentHero6 = &m_heroRecs[player];
+        restoredSpellPoints13 = currentHero6->m_spellPoints;
+        maxSpellPoints9 = currentHero6->Stats(3) * 10;
+        restoredSpellPoints13 += currentHero6->m_secondarySkills[8] + 1;
+        if (currentHero6->HasArtifact(ARTIFACT_POWER_RING))
+            restoredSpellPoints13 += 2;
+        if (restoredSpellPoints13 > maxSpellPoints9)
+            restoredSpellPoints13 = maxSpellPoints9;
+        if (currentHero6->m_spellPoints < restoredSpellPoints13)
+            currentHero6->m_spellPoints = static_cast<short>(restoredSpellPoints13);
+        if (currentHero6->m_eventFlags & 0x1000)
+            currentHero6->m_eventFlags = currentHero6->m_eventFlags - 0x1000U;
+    }
+
+    for (player = 0; player < GAME_TOWN_COUNT; player++) {
+        currentTown4 = GetTown(player);
+        if (!(currentTown4->field_0x18 & 1))
+            continue;
+        if (currentTown4->m_occupyingHeroId != -1) {
+            townHero12 = GetHero(currentTown4->m_occupyingHeroId);
+            maxSpellPoints9 = townHero12->Stats(3) * 10;
+            if (townHero12->m_spellPoints < maxSpellPoints9)
+                townHero12->m_spellPoints = static_cast<short>(maxSpellPoints9);
+        }
+    }
+}
+
+// @early-stop
+// 99.09%: frame and control flow are byte-exact. The six hero-slot index residuals
+// differ only in when a commutative subtraction is issued, and the map-height loop
+// differs only in compare operand order; both are the documented TU-cumulative /Od
+// operand-order pattern. The other residuals are delinked switch labels/constants;
+// the full function has the retail 95 relocations and matching external targets.
 VA(0x0047d10b, 0x199d)
-void game::PerWeek(void) {}
+void game::PerWeek(void)
+{
+    int heroClass18 = 0;
+    int outerIndex5;
+    int innerIndex3;
+    int mapY5;
+    int mapX8;
+    townSlot *castle37;
+    int growth13;
+    int desiredClass1;
+    int monsterIncrease16;
+    int monsterCount36;
+    hero *weeklyHero4;
+
+    giWeekType = 0;
+    giWeekTypeExtra = Random(0, 14);
+    if (m_week != 4) {
+        outerIndex5 = Random(1, 4);
+        if (outerIndex5 == 1) {
+            giWeekType = 1;
+            giWeekTypeExtra = Random(0, 56);
+        }
+    }
+
+    for (outerIndex5 = 0; outerIndex5 < GAME_TOWN_COUNT; outerIndex5++) {
+        castle37 = reinterpret_cast<townSlot *>(GetTown(outerIndex5));
+        for (innerIndex3 = WEEKLY_FIRST_DWELLING; innerIndex3 <= WEEKLY_LAST_DWELLING;
+             innerIndex3++) {
+            if (castle37->buildings & (1 << innerIndex3)) {
+                growth13 = gMonsterDatabase[
+                    gDwellingType[castle37->race][innerIndex3 - WEEKLY_FIRST_DWELLING]].growth;
+                if (castle37->buildings & 0x10)
+                    growth13 += 2;
+                if (innerIndex3 == WEEKLY_FIRST_DWELLING && (castle37->buildings & 0x800))
+                    growth13 += 8;
+                if (castle37->owner == -1)
+                    growth13 /= 2;
+                if (castle37->owner >= 0 &&
+                    castle37->dwellingGrowth[innerIndex3 - WEEKLY_FIRST_DWELLING] == 0 &&
+                    !gbHumanPlayer[castle37->owner]) {
+                    if (gpGame->m_difficulty == GAME_DIFFICULTY_HARD)
+                        growth13 = static_cast<int>(growth13 * 1.20);
+                    if (gpGame->m_difficulty == GAME_DIFFICULTY_EXPERT)
+                        growth13 = static_cast<int>(growth13 * 1.32);
+                    if (gpGame->m_difficulty == GAME_DIFFICULTY_IMPOSSIBLE)
+                        growth13 = static_cast<int>(growth13 * 1.44);
+                }
+                if (giWeekType == 1 &&
+                    gDwellingType[castle37->race][innerIndex3 - WEEKLY_FIRST_DWELLING] ==
+                        giWeekTypeExtra)
+                    growth13 += 5;
+                castle37->dwellingGrowth[innerIndex3 - WEEKLY_FIRST_DWELLING] += growth13;
+            }
+        }
+    }
+
+    for (outerIndex5 = 0; outerIndex5 < GAME_PLAYER_COUNT; outerIndex5++) {
+        for (innerIndex3 = 0; innerIndex3 < 2; innerIndex3++) {
+            if (innerIndex3 == 1) {
+                heroClass18 =
+                    m_heroRecs[gpGame->m_players[outerIndex5].unknown0c[0]].m_cursorType;
+            }
+            heroClass18 = (Random(1, 5) + heroClass18) % 6;
+            desiredClass1 = heroClass18;
+            if (innerIndex3 == 0 &&
+                m_setupPlayerRace[gcColorToSetupPos[m_players[outerIndex5].color]] <
+                    GAME_PLAYER_COUNT) {
+                desiredClass1 = m_setupPlayerRace[gcColorToSetupPos[m_players[outerIndex5].color]];
+            }
+
+            if (gpGame->m_availableHeroes[
+                    (innerIndex3 - outerIndex5 +
+                     outerIndex5 * (sizeof(playerData) + 1))[
+                        gpGame->m_players[0].unknown0c]] ==
+                WEEKLY_AVAILABLE_HERO) {
+                if (gpGame->m_heroRecs[
+                        (innerIndex3 - outerIndex5 +
+                         outerIndex5 * (sizeof(playerData) + 1))[
+                            gpGame->m_players[0].unknown0c]]
+                        .m_eventFlags & WEEKLY_HERO_RESERVED_FLAG)
+                    continue;
+            }
+            {
+                if (gpGame->m_availableHeroes[
+                        (innerIndex3 - outerIndex5 +
+                         outerIndex5 * (sizeof(playerData) + 1))[
+                            gpGame->m_players[0].unknown0c]] ==
+                    WEEKLY_AVAILABLE_HERO)
+                    gpGame->m_availableHeroes[
+                        (innerIndex3 - outerIndex5 +
+                         outerIndex5 * (sizeof(playerData) + 1))[
+                            gpGame->m_players[0].unknown0c]] =
+                        -1;
+                if (innerIndex3 == 1 && !gbHumanPlayer[outerIndex5])
+                    desiredClass1 = -1;
+                int useDifficultyBonus3 =
+                    !gbHumanPlayer[outerIndex5] && gpGame->m_difficulty > 0;
+                (innerIndex3 - outerIndex5 +
+                 outerIndex5 * (sizeof(playerData) + 1))[
+                    gpGame->m_players[0].unknown0c] =
+                    static_cast<signed char>(gpGame->GetNewHeroId(
+                        outerIndex5, desiredClass1, useDifficultyBonus3));
+                m_availableHeroes[(innerIndex3 - outerIndex5 +
+                                   outerIndex5 * (sizeof(playerData) + 1))[
+                    gpGame->m_players[0].unknown0c]] =
+                    WEEKLY_AVAILABLE_HERO;
+            }
+        }
+    }
+
+    for (mapY5 = 0; MAP_HEIGHT > mapY5; mapY5++) {
+        for (mapX8 = 0; mapX8 < MAP_WIDTH; mapX8++) {
+            switch (WORLDMAP->Row(mapY5)[mapX8].triggerType) {
+            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_MONSTER: {
+                monsterCount36 = WORLDMAP->GetCell(mapX8, mapY5)->w4hi & 0xfff;
+                monsterIncrease16 = monsterCount36 / 7;
+                if (Random(1, 7) <= static_cast<int>(monsterCount36 % 7))
+                    monsterIncrease16++;
+                monsterCount36 += monsterIncrease16;
+                if (monsterCount36 > WEEKLY_MONSTER_LIMIT)
+                    monsterCount36 = WEEKLY_MONSTER_LIMIT;
+                WORLDMAP->GetCell(mapX8, mapY5)->w4hi =
+                    (WORLDMAP->GetCell(mapX8, mapY5)->w4hi & 0x1000) | monsterCount36;
+                break;
+            }
+            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_ARTESIAN_SPRING:
+                WORLDMAP->GetCell(mapX8, mapY5)->w4hi = 1;
+                break;
+            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_WATER_WHEEL:
+                if (WORLDMAP->GetCell(mapX8, mapY5)->w4hi != 0xff)
+                    WORLDMAP->GetCell(mapX8, mapY5)->w4hi = 2;
+                break;
+            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_MAGIC_GARDEN:
+                WORLDMAP->GetCell(mapX8, mapY5)->w4hi =
+                    Random(0, 1) ? 7 : 6;
+                break;
+            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_WINDMILL:
+                WORLDMAP->GetCell(mapX8, mapY5)->w4hi = Random(1, 5);
+                break;
+            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_ARCHER_HOUSE:
+                if (WORLDMAP->GetCell(mapX8, mapY5)->w4hi < WEEKLY_GROWTH_LIMIT)
+                    WORLDMAP->GetCell(mapX8, mapY5)->w4hi += Random(2, 4);
+                break;
+            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_GOBLIN_HUT:
+                if (WORLDMAP->GetCell(mapX8, mapY5)->w4hi < WEEKLY_GROWTH_LIMIT)
+                    WORLDMAP->GetCell(mapX8, mapY5)->w4hi += Random(3, 6);
+                break;
+            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_DWARF_COTTAGE:
+                if (WORLDMAP->GetCell(mapX8, mapY5)->w4hi < WEEKLY_GROWTH_LIMIT)
+                    WORLDMAP->GetCell(mapX8, mapY5)->w4hi += Random(2, 4);
+                break;
+            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_PEASANT_HUT:
+                if (WORLDMAP->GetCell(mapX8, mapY5)->w4hi < WEEKLY_GROWTH_LIMIT)
+                    WORLDMAP->GetCell(mapX8, mapY5)->w4hi += Random(5, 10);
+                break;
+            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_LOG_CABIN:
+                if (WORLDMAP->GetCell(mapX8, mapY5)->w4hi < WEEKLY_GROWTH_LIMIT)
+                    WORLDMAP->GetCell(mapX8, mapY5)->w4hi += Random(5, 10);
+                break;
+            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_DESERT_TENT:
+                if (WORLDMAP->GetCell(mapX8, mapY5)->w4hi < WEEKLY_GROWTH_LIMIT)
+                    WORLDMAP->GetCell(mapX8, mapY5)->w4hi += Random(1, 3);
+                break;
+            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_WAGON_CAMP:
+                if (WORLDMAP->GetCell(mapX8, mapY5)->w4hi < WEEKLY_GROWTH_LIMIT)
+                    WORLDMAP->GetCell(mapX8, mapY5)->w4hi += Random(3, 6);
+                break;
+            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_TREE_HOUSE:
+                if (WORLDMAP->GetCell(mapX8, mapY5)->w4hi < WEEKLY_GROWTH_LIMIT)
+                    WORLDMAP->GetCell(mapX8, mapY5)->w4hi += Random(4, 8);
+                break;
+            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_SIRENS:
+                if (WORLDMAP->GetCell(mapX8, mapY5)->w4hi < WEEKLY_GROWTH_LIMIT)
+                    WORLDMAP->GetCell(mapX8, mapY5)->w4hi += Random(3, 6);
+                break;
+            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_WATCH_TOWER:
+                if (WORLDMAP->GetCell(mapX8, mapY5)->w4hi < WEEKLY_GROWTH_LIMIT)
+                    WORLDMAP->GetCell(mapX8, mapY5)->w4hi += Random(1, 4);
+                break;
+            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_RUINS:
+                if (WORLDMAP->GetCell(mapX8, mapY5)->w4hi < WEEKLY_GROWTH_LIMIT)
+                    WORLDMAP->GetCell(mapX8, mapY5)->w4hi += Random(1, 3);
+                break;
+            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_TREE_CITY:
+                if (WORLDMAP->GetCell(mapX8, mapY5)->w4hi < 0x1fe1)
+                    WORLDMAP->GetCell(mapX8, mapY5)->w4hi += Random(10, 20);
+                break;
+            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_CAVE:
+                if (WORLDMAP->GetCell(mapX8, mapY5)->w4hi < WEEKLY_GROWTH_LIMIT)
+                    WORLDMAP->GetCell(mapX8, mapY5)->w4hi += Random(3, 6);
+                break;
+            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_EXCAVATION:
+                if (WORLDMAP->GetCell(mapX8, mapY5)->w4hi < WEEKLY_GROWTH_LIMIT)
+                    WORLDMAP->GetCell(mapX8, mapY5)->w4hi += Random(4, 8);
+                break;
+            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_HALFLING_HOLE:
+                if (WORLDMAP->GetCell(mapX8, mapY5)->w4hi < WEEKLY_GROWTH_LIMIT)
+                    WORLDMAP->GetCell(mapX8, mapY5)->w4hi += Random(5, 10);
+                break;
+            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_TROLL_BRIDGE:
+                if (!(WORLDMAP->GetCell(mapX8, mapY5)->w4hi & 0x80) &&
+                    WORLDMAP->GetCell(mapX8, mapY5)->w4hi < WEEKLY_DRAGON_CITY_LIMIT)
+                    WORLDMAP->GetCell(mapX8, mapY5)->w4hi += Random(1, 3);
+                break;
+            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_CITY_OF_DEAD:
+                if (!(WORLDMAP->GetCell(mapX8, mapY5)->w4hi & 0x80) &&
+                    WORLDMAP->GetCell(mapX8, mapY5)->w4hi < WEEKLY_DRAGON_CITY_LIMIT)
+                    WORLDMAP->GetCell(mapX8, mapY5)->w4hi += Random(1, 3);
+                break;
+            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_DRAGON_CITY:
+                if (!(WORLDMAP->GetCell(mapX8, mapY5)->w4hi & 0x80) &&
+                    WORLDMAP->GetCell(mapX8, mapY5)->w4hi < WEEKLY_DRAGON_CITY_LIMIT)
+                    WORLDMAP->GetCell(mapX8, mapY5)->w4hi += 1;
+                break;
+            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_EXPANSION_DWELLING:
+                WeeklyRecruitSite(WORLDMAP->GetCell(mapX8, mapY5));
+                break;
+            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_EXPANSION_OBJECT:
+                WeeklyGenericSite(WORLDMAP->GetCell(mapX8, mapY5));
+                break;
+            default:
+                break;
+            }
+        }
+    }
+
+    for (outerIndex5 = 0; outerIndex5 < GAME_HERO_COUNT; outerIndex5++) {
+        weeklyHero4 = &m_heroRecs[outerIndex5];
+        if (weeklyHero4->m_eventFlags & WEEKLY_HERO_VISIT_FLAG)
+            weeklyHero4->m_eventFlags =
+                static_cast<unsigned int>(weeklyHero4->m_eventFlags) -
+                WEEKLY_HERO_VISIT_FLAG;
+    }
+
+    m_week++;
+    SetupNewRumour();
+    GiveTroopsToNeutralTowns();
+}
 
 VA(0x0047eaa8, 0x12d)
 void game::WeeklyRecruitSite(class mapCell *) {}
@@ -2355,11 +3002,380 @@ void game::ConvertAllToLateOverlay(int col, int row)
 VA(0x004819b2, 0x295)
 void game::ProcessMapExtra(void) {}
 
+// @early-stop
+// reloc-masked: identical frame/instruction stream and all 39 relocation sites align.
+// Retail folds gDwellingType, gMonsterDatabase, gSpellLimits, and gsSpellInfo to
+// field/addend aliases; their effective addresses are identical.
 VA(0x00481c47, 0x900)
-void game::SetupTowns(void) {}
+void game::SetupTowns(void)
+{
+    char defaultDwellingRoll[12];
+    signed char usedSpells[65];
+    int spellsPerLevel[5];
+    int townIndex;
+    int slot;
+    int owner;
+    int building;
+    int spellLevel;
+    int spellSlot;
+    int spell;
+    int roll;
+    int attempts;
+    int spellValue;
+    int combatSpells;
+    int dwellingCount;
+    unsigned int extraIndex;
+    townSlot *castle;
+    mapTownExtra *extra;
 
+    for (townIndex = 0; townIndex < GAME_TOWN_COUNT; townIndex++) {
+        if (!m_castleRecs[townIndex].m_onMap)
+            continue;
+        castle = reinterpret_cast<townSlot *>(GetTown(townIndex));
+
+        extraIndex = castle->m_extraIndex;
+        extra = reinterpret_cast<mapTownExtra *>(ppMapExtra[extraIndex]);
+        if (extra->color == -1)
+            owner = -1;
+        else
+            owner = gcColorToPlayerPos[extra->color];
+        ClaimTown(townIndex, owner, 0);
+        castle->m_originalOwner = static_cast<signed char>(owner);
+
+        if (extra->hasCustomArmy) {
+            for (slot = 0; slot < 5; slot++) {
+                castle->m_army.m_troopCounts[slot] = extra->troopCounts[slot];
+                if (static_cast<short>(castle->m_army.m_troopCounts[slot]) > 0)
+                    castle->m_army.m_troopTypes[slot] = extra->troopTypes[slot];
+                else
+                    castle->m_army.m_troopTypes[slot] = -1;
+            }
+        } else {
+            for (slot = 0; slot < 5; slot++) {
+                castle->m_army.m_troopCounts[slot] = 0;
+                castle->m_army.m_troopTypes[slot] = -1;
+            }
+            GiveTroopsToNeutralTown(townIndex);
+            GiveTroopsToNeutralTown(townIndex);
+            GiveTroopsToNeutralTown(townIndex);
+            GiveTroopsToNeutralTown(townIndex);
+        }
+
+        if (extra->hasCustomBuildings) {
+            castle->buildings =
+                (gTownEligibleBuildMask[castle->race] & extra->buildings) |
+                (castle->buildings & 0x60);
+            castle->unknown1c = extra->mageGuildLevel;
+        } else {
+            defaultDwellingRoll[0] = 1;
+            defaultDwellingRoll[1] = 1;
+            defaultDwellingRoll[2] = 1;
+            defaultDwellingRoll[3] = 2;
+            defaultDwellingRoll[4] = 1;
+            defaultDwellingRoll[5] = 1;
+            defaultDwellingRoll[6] = 1;
+            defaultDwellingRoll[7] = 2;
+            defaultDwellingRoll[8] = 1;
+            defaultDwellingRoll[9] = 2;
+            dwellingCount = defaultDwellingRoll[Random(0, 99) / 10];
+            castle->buildings |= 0x80000;
+            if (!gbHumanPlayer[castle->owner] && dwellingCount == 1 && Random(1, 10) < 4)
+                dwellingCount++;
+            if (--dwellingCount != 0)
+                castle->buildings |= 0x100000;
+            dwellingCount--;
+            castle->unknown1c = 0;
+        }
+
+        for (building = 25; building <= 30; building++) {
+            if (castle->buildings & (1 << building)) {
+                if (building == 30)
+                    castle->buildings &= -553648129;
+                else
+                    castle->buildings &= -1 - (1 << (building - 5));
+            }
+        }
+        for (building = 19; building <= 30; building++) {
+            if (castle->buildings & (1 << building)) {
+                castle->dwellingGrowth[building - 19] =
+                    gMonsterDatabase[gDwellingType[castle->race][building - 19]].growth;
+            }
+        }
+        if (castle->buildings & 1) {
+            for (slot = 1; slot <= castle->unknown1c; slot++) {
+                castle->m_spellCounts[slot] = gSpellLimits[slot - 1];
+                if (castle->race == 4 && (castle->buildings & 0x2000))
+                    castle->m_spellCounts[slot]++;
+            }
+        }
+        if (extra->hasShrine)
+            castle->buildings |= 0x8000;
+        castle->m_unknown37 = extra->unknown28;
+        strcpy(castle->m_name, extra->name);
+
+        memset(usedSpells, 0, 65);
+        for (spellLevel = 0; spellLevel < 5; spellLevel++) {
+            spellsPerLevel[spellLevel] = 0;
+            for (spellSlot = 0; spellSlot < 4; spellSlot++)
+                reinterpret_cast<signed char *>(castle->m_spells)
+                    [spellLevel * 4 + spellSlot] = -1;
+        }
+
+        if (castle->race == 5 && castle->owner != -1 && !gbHumanPlayer[castle->owner]) {
+            if (Random(0, 100) < 50)
+                spell = 35;
+            else
+                spell = 36;
+            spellLevel = gsSpellInfo[spell].level - 1;
+            castle->m_spells[spellLevel][spellsPerLevel[spellLevel]] =
+                static_cast<signed char>(spell);
+            spellsPerLevel[spellLevel]++;
+        }
+
+        roll = Random(0, 100);
+        if (roll < 25)
+            spell = 23;
+        else if (roll < 50)
+            spell = 24;
+        else if (roll < 75)
+            spell = 22;
+        else
+            spell = 5;
+        spellLevel = gsSpellInfo[spell].level - 1;
+        castle->m_spells[spellLevel][spellsPerLevel[spellLevel]] =
+            static_cast<signed char>(spell);
+        spellsPerLevel[spellLevel]++;
+
+        roll = Random(0, 100);
+        if (roll < 20)
+            spell = 25;
+        else if (roll < 40)
+            spell = 2;
+        else if (roll < 60)
+            spell = 0;
+        else if (roll < 80)
+            spell = 32;
+        else
+            spell = 33;
+        spellLevel = gsSpellInfo[spell].level - 1;
+        castle->m_spells[spellLevel][spellsPerLevel[spellLevel]] =
+            static_cast<signed char>(spell);
+        spellsPerLevel[spellLevel]++;
+
+        for (spellLevel = 0; spellLevel < 5; spellLevel++) {
+            combatSpells = 0;
+            for (spellSlot = 0; spellSlot < 4; spellSlot++) {
+                if (reinterpret_cast<signed char *>(castle->m_spells)
+                        [spellLevel * 4 + spellSlot] != -1) {
+                    usedSpells[reinterpret_cast<signed char *>(castle->m_spells)
+                                   [spellLevel * 4 + spellSlot]] = 1;
+                } else {
+                    attempts = 0;
+                    do {
+                        spell = Random(0, 64);
+                        while (gsSpellInfo[spell].level - 1 != spellLevel)
+                            spell = Random(0, 64);
+                        if (castle->owner != -1 && !gbHumanPlayer[castle->owner])
+                            spellValue =
+                                (gsSpellInfo[spell].attributes & 1 ? 4 : 1) *
+                                    gsSpellInfo[spell].value +
+                                50;
+                        else
+                            spellValue = 1500;
+                        if (spell == 56)
+                            spellValue = 1500;
+                    } while ((combatSpells == 1 &&
+                              (gsSpellInfo[spell].attributes & 4)) ||
+                             gsSpellInfo[spell].raceChance[castle->race] < Random(0, 10) ||
+                             attempts++ > 500 || usedSpells[spell] ||
+                             spellValue < Random(1, 1500));
+                    if (gsSpellInfo[spell].attributes & 4)
+                        combatSpells++;
+                    reinterpret_cast<signed char *>(castle->m_spells)
+                        [spellLevel * 4 + spellSlot] =
+                        static_cast<signed char>(spell);
+                    usedSpells[spell] = 1;
+                }
+            }
+        }
+        BaseFree(ppMapExtra[extraIndex], GFILE,
+                 *reinterpret_cast<const short *>("\xef\x18") + 0xee);
+        ppMapExtra[extraIndex] = 0;
+    }
+}
+
+// @early-stop
+// reloc-masked: identical frame/instruction stream and all 23 relocation sites align;
+// only the folded identities of the line-number and source-file string literals differ.
 VA(0x00482547, 0x774)
-void game::ProcessOnMapHeroes(void) {}
+void game::ProcessOnMapHeroes(void)
+{
+    signed char usedHeroes[GAME_HERO_COUNT];
+    int pass;
+    int mapY;
+    int mapX;
+    int armySlot;
+    int artifactSlot;
+    int skillSlot;
+    int heroClass;
+    int heroId;
+    unsigned int extraIndex;
+    signed char isJail;
+    hero *mapHero;
+    mapHeroExtra *extra;
+    mapCell *cell;
+    mapCell *townCell;
+    townSlot *occupiedTown;
+
+    memset(usedHeroes, 0, GAME_HERO_COUNT);
+    for (pass = 0; pass < 3; pass++) {
+        for (mapY = 0; mapY < MAP_HEIGHT; mapY++) {
+            for (mapX = 0; mapX < MAP_WIDTH; mapX++) {
+                cell = &WORLDMAP->Row(mapY)[mapX];
+                if ((cell->triggerType & MAP_EVENT_TYPE_MASK) == MAP_EVENT_HERO ||
+                    cell->triggerType == (MAP_EVENT_ACTION_FLAG | MAP_EVENT_JAIL)) {
+
+                if ((cell->triggerType & MAP_EVENT_TYPE_MASK) == MAP_EVENT_JAIL)
+                    isJail = 1;
+                else
+                    isJail = 0;
+                extraIndex = cell->w4hi;
+                extra = reinterpret_cast<mapHeroExtra *>(ppMapExtra[extraIndex]);
+
+                if (pass == 0) {
+                    if (extra->hasCustomHero && extra->heroId < GAME_HERO_COUNT &&
+                        !usedHeroes[extra->heroId]) {
+                        usedHeroes[extra->heroId] = 1;
+                        extra->hasAssignedHero = 1;
+                    } else {
+                        extra->hasAssignedHero = 0;
+                    }
+                    if (isJail) {
+                        extra->owner = -1;
+                    } else {
+                        extra->owner = static_cast<signed char>(cell->objIndex / 7);
+                        heroClass = gcColorToPlayerPos[extra->owner];
+                        extra->owner = static_cast<signed char>(heroClass);
+                    }
+                }
+
+                if (pass == 1) {
+                    if (isJail) {
+                        heroClass = extra->heroClass;
+                    } else {
+                        heroClass = cell->objIndex % 7;
+                        if (heroClass == 6) {
+                            heroClass = m_setupPlayerRace[
+                                gcColorToSetupPos[gpGame->m_players[extra->owner].color]];
+                        }
+                    }
+
+                    if (extra->hasAssignedHero) {
+                        mapHero = GetHero(extra->heroId);
+                        mapHero->m_cursorType = static_cast<unsigned char>(heroClass);
+                    } else {
+                        heroId = RandomScan(usedHeroes, heroClass * 9, 9, 1000, 0);
+                        if (heroId == -1) {
+                            heroId = RandomScan(usedHeroes, 0, GAME_HERO_COUNT, 10000, 0);
+                            heroClass = heroId / 9;
+                        }
+                        usedHeroes[heroId] = 1;
+                        mapHero = GetHero(heroId);
+                        mapHero->m_cursorType = static_cast<unsigned char>(heroClass);
+                        if (extra->hasCustomHero && extra->heroId >= GAME_HERO_COUNT)
+                            mapHero->m_unknown18 = extra->heroId;
+                        extra->heroId = static_cast<signed char>(heroId);
+                    }
+                }
+
+                if (pass == 2) {
+                    mapHero = GetHero(extra->heroId);
+                    if (!isJail && extra->hasPatrol) {
+                        mapHero->m_patrolX = static_cast<signed char>(mapX);
+                        mapHero->m_patrolY = static_cast<signed char>(mapY);
+                        mapHero->m_patrolRadius = extra->patrolRadius;
+                    }
+                    if (extra->hasCustomArmy) {
+                        for (armySlot = 0; armySlot < 5; armySlot++) {
+                            mapHero->m_army.m_troopCounts[armySlot] =
+                                extra->troopCounts[armySlot];
+                            if (static_cast<short>(mapHero->m_army.m_troopCounts[armySlot]) > 0)
+                                mapHero->m_army.m_troopTypes[armySlot] =
+                                    extra->troopTypes[armySlot];
+                            else
+                                mapHero->m_army.m_troopTypes[armySlot] = -1;
+                        }
+                    }
+                    for (artifactSlot = 0; artifactSlot < 3; artifactSlot++) {
+                        if (extra->artifacts[artifactSlot] >= 0)
+                            GiveArtifact(mapHero, extra->artifacts[artifactSlot], 1, -1);
+                    }
+                    if (extra->hasCustomName)
+                        strcpy(mapHero->m_name, extra->name);
+                    mapHero->m_experience = 0;
+                    gpAdvManager->GiveExperience(mapHero, extra->experience, 1);
+                    mapHero->CheckLevel();
+                    mapHero->m_x = mapX;
+                    mapHero->m_y = mapY;
+
+                    if (isJail) {
+                        mapHero->m_owner = -1;
+                        m_availableHeroes[extra->heroId] = 0x41;
+                    } else {
+                        mapHero->m_owner = extra->owner;
+                        m_availableHeroes[extra->heroId] = mapHero->m_owner;
+                        m_players[mapHero->m_owner]
+                            .heroes[m_players[mapHero->m_owner].heroCount] = mapHero->m_id;
+                        m_players[mapHero->m_owner].heroCount++;
+                    }
+
+                    if (!isJail && mapY > 0) {
+                        townCell = &WORLDMAP->Row(mapY - 1)[mapX];
+                        if (townCell->triggerType ==
+                            (MAP_EVENT_ACTION_FLAG | MAP_EVENT_CASTLE)) {
+                            mapHero->m_patrolY--;
+                            mapHero->m_y--;
+                            occupiedTown = reinterpret_cast<townSlot *>(
+                                GetTown(GetTownId(mapX, mapY - 1)));
+                            occupiedTown->occupyingHeroId = mapHero->m_id;
+                        }
+                    }
+
+                    if (isJail) {
+                        cell->w4hi = extra->heroId;
+                    } else {
+                        cell->objTileset = 0;
+                        cell->objIndex = 0xff;
+                        cell->w4hi = 0;
+                        cell->triggerType = 0;
+                    }
+
+                    if (extra->hasCustomSkills) {
+                        mapHero->m_secondarySkillCount = 0;
+                        for (skillSlot = 0; skillSlot < 14; skillSlot++) {
+                            mapHero->m_secondarySkills[skillSlot] = 0;
+                            mapHero->m_secondarySkillOrder[skillSlot] = 0;
+                        }
+                        for (skillSlot = 0; skillSlot < 8; skillSlot++) {
+                            if (extra->skillTypes[skillSlot] != -1) {
+                                mapHero->GiveSS(extra->skillTypes[skillSlot],
+                                                extra->skillLevels[skillSlot]);
+                            }
+                        }
+                    }
+                    if (!isJail) {
+                        SetVisibility(mapHero->m_x, mapHero->m_y, mapHero->m_owner,
+                                      giVisRange[mapHero->m_secondarySkills[3]]);
+                    }
+                    BaseFree(ppMapExtra[extraIndex], GFILE,
+                             *reinterpret_cast<const short *>("\xef\x18") + 0xdd);
+                    ppMapExtra[extraIndex] = 0;
+                }
+                }
+            }
+        }
+    }
+}
 
 VA(0x00482cbb, 0x55e)
 void game::CheckHeroConsistency(void) {}
@@ -2553,7 +3569,105 @@ int game::TownIDToTownPos(playerData *pd, int townId)
 }
 
 VA(0x0048558f, 0x79f)
-void game::SetupNewRumour(void) {}
+void game::SetupNewRumour(void)
+{
+    char rumourBuffer6[100];
+    long categoryStats7[6];
+    signed char categoryOrder2[8];
+    rumourEventExtra *event4;
+    int eventIndex11;
+    int attempts13;
+    int category10;
+    int roll2;
+    int direction9;
+    if (m_rumourEventCount != 0 &&
+        Random(0, 9) < static_cast<int>(m_rumourEventCount)) {
+        attempts13 = 0;
+        while (attempts13++ < 200) {
+            if (m_rumourEventCount > 1)
+                eventIndex11 = Random(0, m_rumourEventCount - 1);
+            else
+                eventIndex11 = 0;
+            event4 = reinterpret_cast<rumourEventExtra *>(
+                ppMapExtra[m_rumourEventIndices[eventIndex11]]);
+            if (strlen(event4->text) > 2 && event4->text[0] != '@') {
+                strcpy(m_rumour, event4->text);
+                event4->text[0] = '@';
+                return;
+            }
+        }
+    }
+
+    if (Random(0, 100) < 30) {
+        strcpy(m_rumour, cRandomTavernText[(giCurTurn / 7) % 8]);
+    } else {
+        roll2 = Random(0, 100);
+        if (roll2 < 80 && giCurTurn > 1) {
+            attempts13 = 0;
+            while (attempts13++ < 200) {
+                category10 = Random(6, 9);
+                GetCategoryStats(category10, categoryStats7, categoryOrder2);
+                SortStats(categoryStats7, categoryOrder2);
+                if (categoryStats7[1] != categoryStats7[0]) {
+                    if (category10 == 6)
+                        sprintf(m_rumour, "%s has found the most obelisks.",
+                                cPlayerNames[categoryOrder2[0]]);
+                    else if (category10 == 7)
+                        sprintf(m_rumour, "%s has found the most artifacts.",
+                                cPlayerNames[categoryOrder2[0]]);
+                    else if (category10 == 8)
+                        sprintf(m_rumour, "%s has the most powerful forces.",
+                                cPlayerNames[categoryOrder2[0]]);
+                    else
+                        sprintf(m_rumour, "%s earns the most gold.",
+                                cPlayerNames[categoryOrder2[0]]);
+                    return;
+                }
+            }
+            goto ultimateRumour;
+        } else {
+ultimateRumour:
+            category10 = Random(0, 100);
+            if (category10 < 33) {
+                // Retail uses the X coordinate for both threshold axes.
+                if (!(m_mapWidth * 0.33 <= m_ultimateArtifactX ||
+                      m_mapHeight * 0.33 <= m_ultimateArtifactX)) {
+                    direction9 = 7;
+                } else if (!(m_mapWidth * 0.33 <= m_ultimateArtifactX ||
+                             m_ultimateArtifactX <= m_mapHeight * 0.66)) {
+                    direction9 = 5;
+                } else if (!(m_mapWidth * 0.33 <= m_ultimateArtifactX)) {
+                    direction9 = 6;
+                } else if (!(m_ultimateArtifactX <= m_mapWidth * 0.66 ||
+                             m_mapHeight * 0.33 <= m_ultimateArtifactX)) {
+                    direction9 = 1;
+                } else if (!(m_ultimateArtifactX <= m_mapWidth * 0.66 ||
+                             m_ultimateArtifactX <= m_mapHeight * 0.66)) {
+                    direction9 = 3;
+                } else if (!(m_ultimateArtifactX <= m_mapWidth * 0.66)) {
+                    direction9 = 2;
+                } else if (!(m_mapHeight * 0.33 <= m_ultimateArtifactX)) {
+                    direction9 = 0;
+                } else if (!(m_ultimateArtifactX <= m_mapHeight * 0.66)) {
+                    direction9 = 4;
+                } else {
+                    direction9 = 8;
+                }
+                sprintf(m_rumour, "The ultimate artifact may be found %s.",
+                        cDirections[direction9]);
+            } else if (category10 < 66) {
+                sprintf(m_rumour,
+                        "The ultimate artifact may be found in the %s regions of the world.",
+                        cRumourTerrainDescriptions[giGroundToTerrain[
+                            gpAdvManager->GetCell(m_ultimateArtifactX,
+                                                  m_ultimateArtifactY)->tile]]);
+            } else {
+                sprintf(m_rumour, "The ultimate artifact is really the %s.",
+                        gArtifactNames[m_ultimateArtifactId]);
+            }
+        }
+    }
+}
 
 VA(0x00485d2e, 0xd9)
 EventExtra *GetMapEvent(int x, int y)
@@ -2647,6 +3761,7 @@ DATA(0x004f7550) signed char *giMonType;
 DATA(0x004f7a08) char bMapInitialized;
 DATA(0x005280e8) int iViewArmyNumTroops;
 DATA(0x005280ec) signed char *gbNGHeroType;
+DATA(0x005280f8) SMonFrameInfo sViewArmyMonFrameInfo;
 DATA(0x00528430) short giUABaseX;
 DATA(0x00528434) short giUABaseY;
 DATA(0x00528438) int giEndSequence;
