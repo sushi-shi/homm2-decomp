@@ -73,8 +73,8 @@ authoritative. This file is the short, restart-ready Codex workflow.
 - Do not repeatedly poll worker worktrees, reports, or percentages while a batch is active. Rely on
   matcher milestone/completion messages and let workers tune uninterrupted. Inspect a lane only for
   serial integration, a reported blocker/coordination need, or after a genuinely long silent period
-  that suggests the worker or build has failed. Use waits on the order of 20-30 minutes between
-  unsolicited checks, not short multi-minute polling cycles.
+  that suggests the worker or build has failed. Use waits on the order of 5-6 minutes between
+  unsolicited checks, not frequent sub-minute polling cycles.
 
 ## Compiler Constraints
 
