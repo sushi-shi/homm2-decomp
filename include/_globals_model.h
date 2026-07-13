@@ -27,6 +27,7 @@ DATA(0x00528d24) extern int const_00128d24;
 #define gCursorSampleSet const_00128d24
 DATA(0x00528e46) extern int gSoundTransition;
 DATA(0x004f59a8) extern short const_000f59a8;
+DATA(0x004fa684) extern int gMapTypeFlags; // map format flags (game::NewMap)
 
 
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
