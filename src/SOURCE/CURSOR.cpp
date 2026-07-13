@@ -26,10 +26,15 @@
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/PHILAI.h>
 #include <SOURCE/playerData.h>
+#include <SOURCE/REMOTE.h>
 #include <SOURCE/town.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <_carcass_types.h>
 #include <stdio.h>
+#include <string.h>
+
+#define CURSOR_SOURCE_FILE \
+    const_cast<char *>("I:\\Projects\\Heroes\\Prog\\SOURCE\\CURSOR.CPP")
 VA(0x0040d5e0, 0x138)
 void advManager::StartCursor(int direction)
 {
@@ -1126,19 +1131,172 @@ void advManager::ProcessMapChange(SMapChange change)
 }
 
 VA(0x004108a1, 0x1ba)
-void advManager::ProcessIncomingSingleMapChange(struct SMapChange *) {}
+void advManager::ProcessIncomingSingleMapChange(SMapChange *incoming)
+{
+    int slot;
+
+    if (incoming->sequence < giMapChangeCtr)
+        goto done;
+
+    if (incoming->sequence == giMapChangeCtr) {
+        ProcessMapChange(*incoming);
+        goto unwindQueue;
+    } else {
+retryInsert:
+        for (slot = 0; slot < CURSOR_MAP_CHANGE_QUEUE_COUNT; ++slot) {
+            if (sMapChangeQueue[slot].type != 0 &&
+                sMapChangeQueue[slot].sequence == incoming->sequence) {
+                LogInt("OQ", incoming->sequence, giMapChangeCtr,
+                       CURSOR_LOG_UNUSED, CURSOR_LOG_UNUSED,
+                       CURSOR_LOG_UNUSED, CURSOR_LOG_UNUSED,
+                       CURSOR_LOG_UNUSED);
+                goto duplicateChange;
+            }
+        }
+
+        for (slot = 0; slot < CURSOR_MAP_CHANGE_QUEUE_COUNT; ++slot) {
+            if (sMapChangeQueue[slot].type == 0) {
+                LogInt("SQ", incoming->sequence, giMapChangeCtr,
+                       CURSOR_LOG_UNUSED, CURSOR_LOG_UNUSED,
+                       CURSOR_LOG_UNUSED, CURSOR_LOG_UNUSED,
+                       CURSOR_LOG_UNUSED);
+                sMapChangeQueue[slot] = *incoming;
+                goto done;
+            }
+        }
+
+        UnwindMapChangeQueue(1, 1);
+        goto retryInsert;
+    }
+
+duplicateChange:
+    ++slot;
+unwindQueue:
+    UnwindMapChangeQueue(0, 1);
+done:
+    return;
+}
 
 VA(0x00410a5b, 0xce)
-void advManager::ProcessIncomingGroupMapChange(char *) {}
+void advManager::ProcessIncomingGroupMapChange(char *incomingData)
+{
+    SMapChange *ptr;
+    int size;
+    SMapChange *buf;
+    int i;
+    int processed;
+
+    size = sizeof(sMapChangeLastFew);
+    buf = static_cast<SMapChange *>(
+        BaseAlloc(size, CURSOR_SOURCE_FILE,
+                  CURSOR_GROUP_ALLOC_LINE));
+    memcpy(buf, incomingData, size);
+    for (i = CURSOR_MAP_CHANGE_RECENT_COUNT - 1; i >= 0; --i) {
+        ptr = &buf[i];
+        if (ptr->type != 0 && ptr->sequence >= giMapChangeCtr) {
+            ProcessIncomingSingleMapChange(ptr);
+        } else {
+            processed = 0;
+        }
+    }
+    BaseFree(buf, CURSOR_SOURCE_FILE, CURSOR_GROUP_FREE_LINE);
+}
 
 VA(0x00410b29, 0x75)
-void advManager::PurgeMapChangeQueue(void) {}
+void advManager::PurgeMapChangeQueue(void)
+{
+    int slot;
+
+    for (slot = 0; slot < CURSOR_MAP_CHANGE_QUEUE_COUNT; ++slot)
+        sMapChangeQueue[slot].type = 0;
+    for (slot = 0; slot < CURSOR_MAP_CHANGE_RECENT_COUNT; ++slot)
+        sMapChangeLastFew[slot].type = 0;
+}
 
 VA(0x00410b9e, 0x1d4)
-void advManager::UnwindMapChangeQueue(int, int) {}
+void advManager::UnwindMapChangeQueue(int maximumToUnwind, int processChanges)
+{
+    int queuedChanges;
+    int unwoundChanges;
+    int lowestSlot;
+    int lowestSequence;
+    int continueUnwinding;
+    int slot;
+
+    queuedChanges = CURSOR_MAP_CHANGE_PENDING_SENTINEL;
+    unwoundChanges = 0;
+    while (queuedChanges > 0 && unwoundChanges < maximumToUnwind) {
+        lowestSlot = -1;
+        lowestSequence = CURSOR_MAP_CHANGE_SEQUENCE_SENTINEL;
+        queuedChanges = 0;
+        for (slot = 0; slot < CURSOR_MAP_CHANGE_QUEUE_COUNT; ++slot) {
+            if (sMapChangeQueue[slot].type != 0) {
+                ++queuedChanges;
+                if (sMapChangeQueue[slot].sequence < lowestSequence) {
+                    lowestSequence = sMapChangeQueue[slot].sequence;
+                    lowestSlot = slot;
+                }
+            }
+        }
+        if (lowestSlot != -1) {
+            --queuedChanges;
+            if (processChanges)
+                ProcessMapChange(sMapChangeQueue[lowestSlot]);
+            sMapChangeQueue[lowestSlot].type = 0;
+            ++unwoundChanges;
+        }
+    }
+
+    continueUnwinding = 1;
+    while (continueUnwinding) {
+        continueUnwinding = 0;
+        for (slot = 0; slot < CURSOR_MAP_CHANGE_QUEUE_COUNT; ++slot) {
+            if (sMapChangeQueue[slot].type != 0 &&
+                sMapChangeQueue[slot].sequence == giMapChangeCtr) {
+                if (processChanges)
+                    ProcessMapChange(sMapChangeQueue[slot]);
+                sMapChangeQueue[slot].type = 0;
+                continueUnwinding = 1;
+            }
+        }
+    }
+}
 
 VA(0x00410d72, 0x11a)
-void SendMapChange(int, signed char, unsigned char, unsigned char, int, unsigned char, unsigned char) {}
+void SendMapChange(int type, signed char id, unsigned char x, unsigned char y,
+                   int player, unsigned char stopAfterMove,
+                   unsigned char direction)
+{
+    SMapChange change;
+
+    if (gbThisNetGotAdventureControl) {
+        if (gbRemoteOn) {
+            if (player == CURSOR_LOG_UNUSED)
+                player = giCurPlayer;
+            LogInt("Send Map Change", type, id, x, y,
+                   CURSOR_LOG_UNUSED, CURSOR_LOG_UNUSED, CURSOR_LOG_UNUSED);
+            memset(&change, 0, sizeof(change));
+            change.type = static_cast<unsigned char>(type);
+            change.id = id;
+            change.x = x;
+            change.y = y;
+            change.player = static_cast<signed char>(player);
+            change.stopAfterMove = static_cast<signed char>(stopAfterMove);
+            change.direction = static_cast<signed char>(direction);
+            change.sequence = giMapChangeCtr;
+            ++giMapChangeCtr;
+            memmove(&sMapChangeLastFew[1], &sMapChangeLastFew[0],
+                    sizeof(SMapChange) *
+                        (CURSOR_MAP_CHANGE_RECENT_COUNT - 1));
+            sMapChangeLastFew[0] = change;
+            TransmitRemoteData(
+                reinterpret_cast<char *>(sMapChangeLastFew),
+                CURSOR_REMOTE_PLAYER_ALL, sizeof(sMapChangeLastFew),
+                CURSOR_REMOTE_PACKET_TYPE, 0, CURSOR_REMOTE_RELIABLE,
+                CURSOR_REMOTE_NO_TIMEOUT);
+        }
+    }
+}
 
 // ---- globals (definitions, RVA order) ----
 DATA(0x004ee020) int bMoveSoundMade;
