@@ -132,7 +132,13 @@ struct SSpellInfo {
     unsigned char attributes;
     unsigned char m_e;
 };  // gsSpellInfo[] (sizeof 22)
-struct SNetPlayerInfo { char m_pad[0xcc]; };                                // gsNetPlayerInfo[]
+#pragma pack(push, 1)
+struct SNetPlayerInfo {
+    int networkId;
+    char name[30];
+};
+#pragma pack(pop)
+SIZE(SNetPlayerInfo, 34);
 struct SAMPLE2 { class sample *pSample; struct _SAMPLE *pMem; };            // NULL_SAMPLE2
 
 typedef enum MonsterAttribute {
