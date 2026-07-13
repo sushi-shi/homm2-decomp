@@ -1313,7 +1313,7 @@ DATA(0x004fce20) int gDwellingBaseResourceValues[6][12];
 DATA(0x004fcf40) int gDwellingCosts[6][12][7];
 DATA(0x004fd720) unsigned long gHierarchyMask[6][12];
 DATA(0x004fd840) int giDebugBuildingToBuild;
-DATA(0x004fd848) unsigned char *giTerrainToMusicTrack;
+DATA(0x004fd848) unsigned char giTerrainToMusicTrack[16];
 DATA(0x004fd858) char *cHeroTypeShortName[6];
 DATA(0x004fd870) char *cHeroTypeInitial;
 DATA(0x004fd878) int giDeferObjDrawX;

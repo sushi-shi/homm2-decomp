@@ -12,11 +12,11 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     char   m_id;  // +0x00
-    char   field_0x1;  // +0x01
+    char   m_owner;  // +0x01
     char _pad_0x2[0x1];
     char   field_0x3;  // +0x03
-    char   field_0x4;  // +0x04
-    char   field_0x5;  // +0x05
+    unsigned char m_x;  // +0x04
+    unsigned char m_y;  // +0x05
     char   field_0x6;  // +0x06
     char _pad_0x7[0x10];
     char   m_occupyingHeroId;  // +0x17

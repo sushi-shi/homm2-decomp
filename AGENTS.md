@@ -46,6 +46,14 @@ authoritative. This file is the short, restart-ready Codex workflow.
    labels may be delinked as the containing function; external globals and callees must agree.
 9. Run the full `homm2 build` and `git diff --check` before committing. A one-unit full build is
    about 4-5 seconds; do not optimize the build unless it exceeds 10 seconds in real shell time.
+10. For large switch functions, recover case-body order independently from case values. MSVC often
+    emits bodies in source order, so use retail call/relocation order to reorder blocks, coalesce
+    empty case labels, and place shared bodies before changing expressions inside them.
+11. When a delinked local symbol truncates `llvm-objdump --disassemble-symbols`, disassemble the
+    explicit object-address range instead. Read jump-table offsets and sizes from
+    `build/gen/jump_tables.csv`, exclude those data ranges, and compare the remaining instruction
+    streams. Normalize only branch destinations and relocation identities, never operands or stack
+    displacements.
 
 ## Orchestration Campaign
 
@@ -91,6 +99,13 @@ authoritative. This file is the short, restart-ready Codex workflow.
   semantic suffixes to place locals in increasing bucket order. Do not brute-force random names.
 - Arrays/aggregates can explain unused four-byte words. Example: `EraseObj` needed two `int[2]`
   coordinate temporaries; scalar or struct-member spellings changed later inline code generation.
+- Source condition polarity controls `/Od` block layout. Match the retail positive arm and `else`
+  order directly; logically equivalent negation often reverses compare operands and introduces a
+  different trampoline pattern.
+- Local names only order allocations within their lexical scope. If a target slot appears missing,
+  inspect the retail decompile/local-use sites for a real initialization or a local declared in a
+  wider scope before adding padding. Moving the real local to its original scope can shift all
+  later slots while preserving the frame size.
 - TU-cumulative compiler state can move fuzzy scores after an unrelated type/source addition. The
   source-hash max model intentionally preserves prior maxima. Always use raw bytes for final proof.
 - When a later change lowers the live fuzzy score of an already matched function, keep its retained
@@ -98,6 +113,10 @@ authoritative. This file is the short, restart-ready Codex workflow.
   raw-byte or relocation evidence proves that the function itself actually regressed.
 - Mark `@early-stop` only for 100% matches or a byte-proven residual such as delinked local-label or
   constant-pool naming. Document the exact byte span and reason.
+- A jump-only early stop must be proved after excluding known jump-table data: every non-jump
+  opcode and operand must match, the remaining size delta must equal the counted five-byte
+  continuation/trampoline jumps, and external relocation targets must be audited manually when
+  `homm2 relocs` stops at a delinked local boundary.
 
 ## Source Conventions
 

@@ -58,24 +58,24 @@ void playerData::Write(int file)
     _write(file, &m_color, 1);
     _write(file, &m_heroCount, 1);
     _write(file, &m_currentHero, 1);
-    _write(file, &m_heroWindowTop, 1);
-    _write(file, m_heroes, 8);
+    _write(file, &m_heroLocatorPage, 1);
+    _write(file, m_heroIds, 8);
     _write(file, m_unknown0c, 2);
     memset(unused, 0, 48);
     _write(file, unused, 42);
-    _write(file, &gpGame->m_unknown639d, 1);
-    _write(file, &m_unknown13, 1);
+    _write(file, &gpGame->m_cheated, 1);
+    _write(file, &m_cheatValue, 1);
     _write(file, &m_unknown0f, 4);
     _write(file, &m_unknown0e, 1);
     _write(file, &m_unknownab, 1);
-    _write(file, &m_unknown40, 1);
+    _write(file, &m_canDig, 1);
     _write(file, &m_unknown41, 1);
     _write(file, &m_unknown42, 1);
     _write(file, &m_unknown43, 1);
     _write(file, &m_townCount, 1);
     _write(file, &m_currentTown, 1);
-    _write(file, &m_townWindowTop, 1);
-    _write(file, m_towns, 72);
+    _write(file, &m_townLocatorPage, 1);
+    _write(file, m_townIds, 72);
     _write(file, m_resources, 28);
     _write(file, m_secondaryResources, 28);
     _write(file, &m_unknownac, 1);
@@ -91,23 +91,23 @@ void playerData::Read(int file)
     _read(file, &m_color, 1);
     _read(file, &m_heroCount, 1);
     _read(file, &m_currentHero, 1);
-    _read(file, &m_heroWindowTop, 1);
-    _read(file, m_heroes, 8);
+    _read(file, &m_heroLocatorPage, 1);
+    _read(file, m_heroIds, 8);
     _read(file, m_unknown0c, 2);
     _read(file, unused, 42);
-    _read(file, &gpGame->m_unknown639d, 1);
-    _read(file, &m_unknown13, 1);
+    _read(file, &gpGame->m_cheated, 1);
+    _read(file, &m_cheatValue, 1);
     _read(file, &m_unknown0f, 4);
     _read(file, &m_unknown0e, 1);
     _read(file, &m_unknownab, 1);
-    _read(file, &m_unknown40, 1);
+    _read(file, &m_canDig, 1);
     _read(file, &m_unknown41, 1);
     _read(file, &m_unknown42, 1);
     _read(file, &m_unknown43, 1);
     _read(file, &m_townCount, 1);
     _read(file, &m_currentTown, 1);
-    _read(file, &m_townWindowTop, 1);
-    _read(file, m_towns, 72);
+    _read(file, &m_townLocatorPage, 1);
+    _read(file, m_townIds, 72);
     _read(file, m_resources, 28);
     _read(file, m_secondaryResources, 28);
     _read(file, &m_unknownac, 1);
@@ -123,18 +123,18 @@ int playerData::NextHero(int)
 
     if (gpCurPlayer->m_currentHero != -1) {
         for (i = 0; i < gpCurPlayer->m_heroCount; i++) {
-            if (gpCurPlayer->m_heroes[i] == gpCurPlayer->m_currentHero)
+            if (gpCurPlayer->m_heroIds[i] == gpCurPlayer->m_currentHero)
                 current = i;
         }
     }
 
     for (i = current + 1; i < gpCurPlayer->m_heroCount; i++) {
-        if (gpGame->IsMobile(gpCurPlayer->m_heroes[i]))
-            return m_heroes[i];
+        if (gpGame->IsMobile(gpCurPlayer->m_heroIds[i]))
+            return m_heroIds[i];
     }
     for (i = 0; i < current + 1; i++) {
-        if (gpGame->IsMobile(gpCurPlayer->m_heroes[i]))
-            return m_heroes[i];
+        if (gpGame->IsMobile(gpCurPlayer->m_heroIds[i]))
+            return m_heroIds[i];
     }
     return -1;
 }
@@ -287,7 +287,7 @@ int game::SetupPuzzlePieces(int player, int justCount)
         return pieceCountTotal;
 
     memset(puzzlePiecesRemoved, 0, 6);
-    SRand(m_players[player].color + m_players[player].padab[0] * 3);
+    SRand(m_players[player].color + m_players[player].evilInterface * 3);
     int tries;
     int fallbackNum;
     int pieceValue;
@@ -647,7 +647,7 @@ void game::SetupOrigData(void)
     giMonthTypeExtra = 0;
     giWeekType = 0;
     giWeekTypeExtra = 0;
-    m_unknown639d = 0;
+    m_cheated = 0;
     gpAdvManager->PurgeMapChangeQueue();
     giMapChangeCtr = 1;
     strcpy(m_saveName, "NEWGAME");
@@ -685,7 +685,7 @@ void game::SetupOrigData(void)
     }
 
     m_obeliskCount = 0;
-    gpAdvManager->heroContextLocked = 0;
+    gpAdvManager->m_heroContextLocked = 0;
     memset(m_availableHeroes, -1, GAME_HERO_COUNT);
     for (i = 0; i < GAME_HERO_COUNT; i++) {
         memset(&m_heroRecs[i], 0, sizeof(m_heroRecs[i]));
@@ -704,8 +704,8 @@ void game::SetupOrigData(void)
                 gStartingHeroStats[m_heroRecs[i].m_cursorType][j];
         for (j = 0; j < 5; j++)
             reinterpret_cast<signed char *>(&m_heroRecs[i].m_army)[j] = -1;
-        m_heroRecs[i].field_0x25 = -1;
-        m_heroRecs[i].field_0x21 = m_heroRecs[i].field_0x25;
+        m_heroRecs[i].m_destinationY = -1;
+        m_heroRecs[i].m_destinationX = m_heroRecs[i].m_destinationY;
         m_heroRecs[i].m_level = 1;
         m_heroRecs[i].m_spellPoints = m_heroRecs[i].Stats(3) * 10;
         m_heroRecs[i].m_secondarySkillCount = 0;
@@ -931,7 +931,7 @@ void game::LoadGame(char *filename, int loadFromFile, int)
         _read(file, marker, 4);
         _close(file);
 
-        gpAdvManager->heroContextLocked = 0;
+        gpAdvManager->m_heroContextLocked = 0;
         gpCurPlayer = reinterpret_cast<playerData *>(&gpGame->m_players[giCurPlayer]);
         giCurPlayerBit = static_cast<unsigned char>(1 << giCurPlayer);
         giCurWatchPlayer = giCurPlayer;
