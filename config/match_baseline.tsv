@@ -1048,7 +1048,7 @@ SOURCE/Overview	?DoKnob@game@@QAEXXZ	6.5888	6ddabb1c999c
 SOURCE/Overview	?Overview@game@@QAEXXZ	4.4913	a75d22ee2c4b
 SOURCE/Overview	?OverviewHandler@@YIHAAUtag_message@@@Z	1.5298	802444b8eb73
 SOURCE/Overview	?ProcessIconSelect@game@@QAEHHH@Z	4.1731	562f9b2042b5
-SOURCE/Overview	?SetupDynamicStuff@game@@QAEXHHH@Z	0.1879	dc38e85e0415
+SOURCE/Overview	?SetupDynamicStuff@game@@QAEXHHH@Z	92.6376	6edc7428c674
 SOURCE/Overview	?SetupNewOverviewType@game@@QAEXHH@Z	6.5226	01b24975aeef
 SOURCE/Overview	?SetupResources@game@@QAEXXZ	35.0811	4ba81d80fcea
 SOURCE/PATH	?FindPath@army@@QAEHHHHHH@Z	14.7158	9f934e672410
