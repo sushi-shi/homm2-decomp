@@ -182,14 +182,14 @@ public:
     char   field_0x44b;  // +0x44b
     char   field_0x44c;  // +0x44c
     char _pad_0x44d[0x18];
-    char   field_0x465;  // +0x465
+    signed char m_aiSpeed;  // +0x465
     char _pad_0x466[0x13];
     char   field_0x479;  // +0x479
     char   field_0x47a;  // +0x47a
     char   field_0x47b;  // +0x47b
     char _pad_0x47c[0x12];
     signed char m_playerCount;  // +0x48e
-    signed char m_unknown48f;  // +0x48f
+    signed char m_humanPlayerCount;  // +0x48f
     signed char m_playerDead[6];  // +0x490
     unsigned short m_day;  // +0x496
     unsigned short m_week;  // +0x498

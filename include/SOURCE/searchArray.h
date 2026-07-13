@@ -19,11 +19,27 @@ SIZE(searchCell, 9);
 
 union searchStorage {
     struct searchCell *cells;
+    struct searchNode *nodes;
     struct {
         char pad[3];
         unsigned char directions[0x101];
     } path;
+    struct {
+        char pad[4];
+        signed char directions[0x100];
+    } aiPath;
 };
+
+#pragma pack(push, 1)
+struct searchNode {
+    char pad0[2];
+    unsigned short distance;
+    unsigned char visited : 1;
+    unsigned char flags : 7;
+    char pad1[4];
+};
+#pragma pack(pop)
+SIZE(searchNode, 9);
 
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class searchArray {
@@ -38,6 +54,7 @@ public:
     int    field_0x14;  // +0x14
     char _pad_0x18[0x23fc];
     searchStorage m_storage;  // +0x2414, path directions overlap the search-cell pointer
+    searchNode *GetRow(int y, int width) { return m_storage.nodes + y * (width | 0); }
     // --- constructors ---
     searchArray(void);
     ~searchArray();
