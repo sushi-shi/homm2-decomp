@@ -18,6 +18,7 @@
 #include <SOURCE/CURSOR.h>
 #include <SOURCE/EVENTS.h>
 #include <SOURCE/ExpCampaign.h>
+#include <SOURCE/GAME.h>
 #include <SOURCE/game.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/KB.h>
@@ -2230,7 +2231,939 @@ VA(0x004b1d01, 0x142)
 void advManager::FizzleCenter(int) {}
 
 VA(0x004b1e43, 0x2a40)
-void advManager::DoAIEvent(class mapCell *, class hero *, int, int) {}
+void advManager::DoAIEvent(mapCell *cell, hero *eventHero, int x, int y)
+{
+    float battleStatValue_o;
+    float spellValueFactor_i;
+    unsigned int resourceAmount_o;
+    int unusedEventResult_e;
+    int unusedEventValue_o;
+    mapCell *exitCell_d;
+    int teleportDistance_o;
+    int spell_g;
+    unsigned int guardianCount_i;
+    float attackerLoss_c;
+    float defenderLoss_k;
+    int levelExperience_g;
+    int heroLevel_e;
+    int creatureCosts_a[AI_EVENT_RESOURCE_COUNT];
+    int spellPower_j;
+    int adjacentMonster_j;
+    int artifactResource_p;
+    hero *otherHero_e;
+    int artifactGuardResult_e;
+    int heroCombatResult_h;
+    int exitY_d;
+    int artifact_g;
+    int heroInteractionResult;
+    int resourceType_a;
+    int exitX;
+    int exitCount;
+    mapEventExtra *eventExtra_o;
+    unsigned int artifactGuardCount_b;
+    unsigned int survivingCount_a;
+    boatRecord *boat_k;
+    int savedShowIt_e;
+    int mineId_j;
+    int rewardWork_e[AI_EVENT_ARMY_STACK_COUNT];
+    int resourceWork_p[AI_EVENT_RESOURCE_COUNT];
+    int eventResults[3];
+    int abandonedMineValue_f;
+    int index_h;
+    town *occupiedTown_b;
+    int combatResult_d;
+    int eventWork_o[AI_EVENT_RESOURCE_COUNT];
+    int battleWon_j;
+    int pyramidBattleValue_l;
+    int oldPlayer_o;
+    int eventType_g;
+    playerData *oldPlayerData_h;
+    int battleResult_l;
+    int purchaseCost_i;
+    int purchaseValue_a;
+    int creatureType_i;
+    int creatureFlag_l;
+
+    occupiedTown_b = 0;
+    eventType_g = cell->triggerType & MAP_EVENT_TYPE_MASK;
+    eventResults[0] = 0;
+    eventResults[1] = 0;
+    oldPlayer_o = giCurPlayer;
+    oldPlayerData_h = gpCurPlayer;
+
+    if (eventHero->m_destinationX == x && eventHero->m_destinationY == y) {
+        eventHero->m_destinationY = -1;
+        eventHero->m_destinationX = eventHero->m_destinationY;
+    }
+    --eventHero->m_remainingMobility;
+    switch (eventType_g) {
+    case MAP_EVENT_COAST:
+        if (eventHero->m_eventFlags & HERO_EVENT_EMBARKED) {
+            eventHero->m_eventFlags &= ~HERO_EVENT_EMBARKED;
+            eventHero->m_remainingMobility = 0;
+            eventHero->m_direction = static_cast<unsigned char>(m_cursorDirection);
+            m_cursorType = eventHero->m_cursorType;
+            m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
+            m_cursorActive = 1;
+            CheckAdjacentMon(&adjacentMonster_j);
+        }
+        break;
+
+    case MAP_EVENT_BOAT:
+        boat_k = &gpGame->m_boats[cell->w4hi];
+        gpGame->RestoreCell(-1, -1, boat_k->savedTriggerType,
+                            boat_k->savedEventData, cell,
+                            AI_EVENT_BOAT_RESTORE_MODE);
+        eventHero->m_eventFlags |= HERO_EVENT_EMBARKED;
+        eventHero->m_remainingMobility = 0;
+        boat_k->heroId = eventHero->m_id;
+        boat_k->owner = eventHero->m_owner;
+        m_cursorType = AI_EVENT_BOAT_CURSOR;
+        m_cursorDirection = boat_k->direction;
+        m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
+        m_cursorActive = 1;
+        break;
+
+    case MAP_EVENT_ALCHEMIST_LAB:
+    case MAP_EVENT_MINE:
+    case MAP_EVENT_SAWMILL:
+        if (gpGame->m_mineOwners[cell->w4hi] != giCurPlayer) {
+            if (gpGame->m_mines[cell->w4hi].guardianType != AI_EVENT_NO_CREATURE) {
+                index_h = gpGame->m_mines[cell->w4hi].guardianCount;
+                combatResult_d = gpPhilAI->CombatMonsterEvent(
+                    eventHero, gpGame->m_mines[cell->w4hi].guardianType,
+                    reinterpret_cast<int *>(&index_h), 0);
+                if (combatResult_d == 0)
+                    break;
+                gpGame->m_mines[cell->w4hi].guardianType = AI_EVENT_NO_CREATURE;
+                gpGame->m_mines[cell->w4hi].guardianCount = 0;
+                eventHero->CheckLevel();
+            }
+            gpGame->ClaimMine(cell->w4hi, giCurPlayer);
+            if (eventType_g == MAP_EVENT_MINE) {
+                for (index_h = AI_EVENT_MINE_SPELL_FIRST;
+                     index_h < AI_EVENT_MINE_SPELL_LAST; ++index_h) {
+                    if (eventHero->HasSpell(index_h) &&
+                        GetManaCost(index_h, eventHero) < eventHero->m_spellPoints) {
+                        eventHero->m_spellPoints = static_cast<short>(
+                            eventHero->m_spellPoints -
+                            GetManaCost(index_h, eventHero));
+                        gpGame->m_mines[cell->w4hi].guardianType =
+                            static_cast<signed char>(index_h + 1);
+                        spellPower_j = eventHero->Stats(HERO_PRIMARY_SPELL_POWER);
+                        if (spellPower_j > AI_EVENT_MINE_SPELL_POWER_MAX)
+                            spellPower_j = AI_EVENT_MINE_SPELL_POWER_MAX;
+                        gpGame->m_mines[cell->w4hi].guardianCount =
+                            static_cast<unsigned char>(
+                                spellPower_j * AI_EVENT_MINE_SPELL_COUNT_SCALE);
+                        index_h = 999;
+                    }
+                }
+            }
+        }
+        break;
+
+    case MAP_EVENT_LIGHTHOUSE:
+        if (gpGame->m_mineOwners[cell->w4hi] != giCurPlayer)
+            gpGame->ClaimMine(cell->w4hi, giCurPlayer);
+        break;
+
+    case MAP_EVENT_TREASURE_CHEST:
+        if ((cell->w4hi & CHEST_ARTIFACT_FLAG) == 0) {
+chestGoldOrExperience:
+            if (gpPhilAI->ChooseGoldOrExperience(
+                    cell->w4hi * CHEST_GOLD_MULTIPLIER,
+                    (cell->w4hi * 4 - 4) * CHEST_EXPERIENCE_MULTIPLIER) == 0) {
+                GiveExperience(eventHero,
+                               (cell->w4hi * 4 - 4) *
+                                   CHEST_EXPERIENCE_MULTIPLIER,
+                               1);
+                eventHero->CheckLevel();
+            } else {
+                GiveResource(eventHero, RES_GOLD,
+                             cell->w4hi * CHEST_GOLD_MULTIPLIER);
+            }
+        } else {
+            if (eventHero->NumArtifacts() >= AI_EVENT_ARTIFACT_LIMIT) {
+                cell->m_objectData =
+                    (cell->m_objectData & 7) | 0x10;
+                goto chestGoldOrExperience;
+            }
+            GiveArtifact(eventHero, cell->w4hi & CHEST_ARTIFACT_MASK, 1, -1);
+        }
+        eventResults[0] = 1;
+        break;
+
+    case MAP_EVENT_WATERING_HOLE:
+        if ((eventHero->m_eventFlags & HERO_EVENT_WATERING_HOLE) == 0) {
+            eventHero->m_mobility += WATERING_HOLE_MOBILITY_BONUS;
+            eventHero->m_remainingMobility += WATERING_HOLE_MOBILITY_BONUS;
+            eventHero->m_eventFlags |= HERO_EVENT_WATERING_HOLE;
+            ++eventHero->m_morale;
+        }
+        break;
+
+    case MAP_EVENT_BUOY:
+        if ((eventHero->m_eventFlags & HERO_EVENT_BUOY) == 0) {
+            eventHero->m_eventFlags |= HERO_EVENT_BUOY;
+            ++eventHero->m_morale;
+        }
+        break;
+
+    case MAP_EVENT_FAERIE_RING:
+        if ((eventHero->m_eventFlags & HERO_EVENT_FAERIE_RING) == 0) {
+            eventHero->m_eventFlags |= HERO_EVENT_FAERIE_RING;
+            ++eventHero->m_luck;
+        }
+        break;
+
+    case MAP_EVENT_IDOL:
+        if ((eventHero->m_eventFlags & HERO_EVENT_IDOL) == 0) {
+            eventHero->m_eventFlags |= HERO_EVENT_IDOL;
+            ++eventHero->m_luck;
+        }
+        break;
+
+    case MAP_EVENT_FOUNTAIN:
+        if ((eventHero->m_eventFlags & HERO_EVENT_FOUNTAIN) == 0) {
+            eventHero->m_eventFlags |= HERO_EVENT_FOUNTAIN;
+            ++eventHero->m_luck;
+        }
+        break;
+
+    case MAP_EVENT_OASIS:
+        if ((eventHero->m_eventFlags & HERO_EVENT_OASIS) == 0) {
+            eventHero->m_eventFlags |= HERO_EVENT_OASIS;
+            ++eventHero->m_morale;
+            eventHero->m_mobility += OASIS_MOBILITY_BONUS;
+            eventHero->m_remainingMobility += OASIS_MOBILITY_BONUS;
+        }
+        break;
+
+    case MAP_EVENT_TEMPLE:
+        if ((eventHero->m_eventFlags & HERO_EVENT_TEMPLE) == 0) {
+            eventHero->m_eventFlags |= HERO_EVENT_TEMPLE;
+            eventHero->m_morale += 2;
+        }
+        break;
+
+    case MAP_EVENT_SKELETON:
+        if (cell->w4hi != SKELETON_EMPTY) {
+            GiveArtifact(eventHero, cell->w4hi - SKELETON_ARTIFACT_OFFSET,
+                         1, -1);
+            cell->m_objectData = (cell->m_objectData & 7) | 8;
+        }
+        break;
+
+    case MAP_EVENT_MAGIC_GARDEN:
+        if (cell->w4hi != MAP_EVENT_DATA_EMPTY) {
+            resourceType_a = cell->w4hi - MAP_EVENT_RESOURCE_OFFSET;
+            GiveResource(eventHero, resourceType_a,
+                         resourceType_a == RES_GOLD ? MAP_EVENT_GOLD_AMOUNT
+                                                  : MAP_EVENT_RESOURCE_AMOUNT);
+            cell->m_objectData &= 7;
+        }
+        break;
+
+    case MAP_EVENT_LEAN_TO:
+        if (cell->w4hi != MAP_EVENT_DATA_EMPTY) {
+            GiveResource(eventHero,
+                         (cell->w4hi & ARTIFACT_MODE_MASK) - 1,
+                         (cell->w4hi & ARTIFACT_RESOURCE_MASK) >>
+                             ARTIFACT_RESOURCE_SHIFT);
+            cell->m_objectData &= 7;
+        }
+        break;
+
+    case MAP_EVENT_WAGON:
+        if (cell->w4hi != MAP_EVENT_DATA_EMPTY) {
+            if ((cell->w4hi & WAGON_ARTIFACT_FLAG) == 0) {
+                GiveResource(eventHero,
+                             (cell->w4hi & ARTIFACT_MODE_MASK) - 1,
+                             (cell->w4hi & ARTIFACT_RESOURCE_MASK) >>
+                                 ARTIFACT_RESOURCE_SHIFT);
+                cell->m_objectData &= 7;
+            } else {
+                if (eventHero->NumArtifacts() != AI_EVENT_ARTIFACT_LIMIT)
+                    GiveArtifact(eventHero,
+                                 cell->w4hi & WAGON_ARTIFACT_MASK, 1, -1);
+                cell->m_objectData &= 7;
+            }
+        }
+        break;
+
+    case MAP_EVENT_SEA_CHEST:
+        if ((cell->w4hi & CHEST_ARTIFACT_FLAG) == 0 ||
+            eventHero->NumArtifacts() >= AI_EVENT_ARTIFACT_LIMIT) {
+            if (cell->w4hi != 0)
+                GiveResource(eventHero, RES_GOLD, AI_EVENT_SEA_CHEST_GOLD);
+        } else {
+            GiveArtifact(eventHero, cell->w4hi & CHEST_ARTIFACT_MASK, 1, -1);
+            GiveResource(eventHero, RES_GOLD,
+                         AI_EVENT_SEA_CHEST_ARTIFACT_GOLD);
+        }
+        eventResults[0] = 1;
+        break;
+
+    case MAP_EVENT_FLOTSAM:
+        switch (cell->w4hi) {
+        case 1:
+            GiveResource(eventHero, RES_WOOD, 5);
+            break;
+        case 2:
+            GiveResource(eventHero, RES_WOOD, 5);
+            GiveResource(eventHero, RES_GOLD, 200);
+            break;
+        case 3:
+            GiveResource(eventHero, RES_WOOD, 10);
+            GiveResource(eventHero, RES_GOLD, 500);
+            break;
+        default:
+            break;
+        }
+        eventResults[0] = 1;
+        break;
+
+    case MAP_EVENT_CAMPFIRE:
+        resourceType_a = cell->objIndex >> 1;
+        resourceAmount_o = resourceType_a == RES_GOLD
+            ? cell->w4hi * CAMPFIRE_GOLD_MULTIPLIER
+            : cell->w4hi;
+        GiveResource(eventHero, resourceType_a, resourceAmount_o);
+        eventResults[0] = 1;
+        break;
+
+    case MAP_EVENT_FORT:
+        if ((eventHero->m_fortVisits & (1U << (cell->w4hi & 31))) == 0) {
+            ++eventHero->m_defense;
+            eventHero->m_fortVisits |= 1U << (cell->w4hi & 31);
+        }
+        break;
+
+    case MAP_EVENT_XANADU:
+        if ((eventHero->m_xanaduVisits & (1U << (cell->w4hi & 31))) == 0 &&
+            eventHero->m_level +
+                    eventHero->m_secondarySkills[HERO_SKILL_DIPLOMACY] * 2 >
+                9) {
+            ++eventHero->m_attack;
+            ++eventHero->m_defense;
+            ++eventHero->m_knowledge;
+            ++eventHero->m_spellPower;
+            eventHero->m_xanaduVisits |= 1U << (cell->w4hi & 31);
+        }
+        break;
+
+    case MAP_EVENT_STANDING_STONES:
+        if ((eventHero->m_standingStoneVisits &
+             (1U << (cell->w4hi & 31))) == 0) {
+            ++eventHero->m_spellPower;
+            eventHero->m_standingStoneVisits |= 1U << (cell->w4hi & 31);
+        }
+        break;
+
+    case MAP_EVENT_WITCH_DOCTOR_HUT:
+        if ((eventHero->m_witchDoctorVisits &
+             (1U << (cell->w4hi & 31))) == 0) {
+            ++eventHero->m_knowledge;
+            eventHero->m_witchDoctorVisits |= 1U << (cell->w4hi & 31);
+        }
+        break;
+
+    case MAP_EVENT_MERCENARY_CAMP:
+        if ((eventHero->m_mercenaryCampVisits &
+             (1U << (cell->w4hi & 31))) == 0) {
+            ++eventHero->m_attack;
+            eventHero->m_mercenaryCampVisits |= 1U << (cell->w4hi & 31);
+        }
+        break;
+
+    case MAP_EVENT_GAZEBO:
+        if ((eventHero->m_gazeboVisits & (1U << (cell->w4hi & 31))) == 0) {
+            GiveExperience(eventHero, GAZEBO_EXPERIENCE, 1);
+            eventHero->m_gazeboVisits |= 1U << (cell->w4hi & 31);
+            eventHero->CheckLevel();
+        }
+        break;
+
+    case MAP_EVENT_WATER_WHEEL:
+        if (cell->w4hi != 0) {
+            GiveResource(eventHero, RES_GOLD,
+                         cell->w4hi * CHEST_GOLD_MULTIPLIER);
+            cell->m_objectData &= 7;
+        }
+        break;
+
+    case MAP_EVENT_RESOURCE:
+        resourceType_a = cell->objIndex >> 1;
+        resourceAmount_o = resourceType_a == RES_GOLD
+            ? cell->w4hi * CAMPFIRE_GOLD_MULTIPLIER
+            : cell->w4hi;
+        GiveResource(eventHero, resourceType_a, resourceAmount_o);
+        eventResults[0] = 1;
+        break;
+
+    case MAP_EVENT_WINDMILL:
+        if (cell->w4hi != AI_EVENT_WINDMILL_EMPTY) {
+            GiveResource(eventHero, cell->w4hi, WINDMILL_RESOURCE_AMOUNT);
+            cell->m_objectData = (cell->m_objectData & 7) | 0x318;
+        }
+        break;
+
+    case MAP_EVENT_HILL_FORT:
+        eventHero->UpgradeCreatures(HILL_FORT_OGRE, HILL_FORT_OGRE_LORD);
+        eventHero->UpgradeCreatures(HILL_FORT_ORC, HILL_FORT_ORC_CHIEF);
+        eventHero->UpgradeCreatures(HILL_FORT_DWARF,
+                                    HILL_FORT_BATTLE_DWARF);
+        break;
+
+    case MAP_EVENT_FREEMANS_FOUNDRY:
+        eventHero->UpgradeCreatures(FOUNDRY_IRON_GOLEM,
+                                    FOUNDRY_STEEL_GOLEM);
+        eventHero->UpgradeCreatures(FOUNDRY_PIKEMAN,
+                                    FOUNDRY_VETERAN_PIKEMAN);
+        eventHero->UpgradeCreatures(FOUNDRY_SWORDSMAN,
+                                    FOUNDRY_MASTER_SWORDSMAN);
+        break;
+
+    case MAP_EVENT_TREE_CITY:
+        creatureType_i = EVENT_RECRUIT_SPRITE;
+        creatureFlag_l = 0;
+        goto creaturePurchase;
+    case MAP_EVENT_RUINS:
+        creatureType_i = EVENT_RECRUIT_MEDUSA;
+        creatureFlag_l = 0;
+        goto creaturePurchase;
+    case MAP_EVENT_TROLL_BRIDGE:
+        if (cell->w4hi & DWELLING_GUARDED_FLAG)
+            break;
+        creatureType_i = TROLL_BRIDGE_TROLL;
+        creatureFlag_l = 0;
+        goto creaturePurchase;
+    case MAP_EVENT_CITY_OF_DEAD:
+        if (cell->w4hi & DWELLING_GUARDED_FLAG)
+            break;
+        creatureType_i = CITY_DEAD_RECRUIT;
+        creatureFlag_l = 0;
+        goto creaturePurchase;
+    case MAP_EVENT_DRAGON_CITY:
+        if (cell->w4hi & DWELLING_GUARDED_FLAG)
+            break;
+        creatureType_i = DRAGON_CITY_RECRUIT;
+        creatureFlag_l = 0;
+        goto creaturePurchase;
+    case MAP_EVENT_HALFLING_HOLE:
+        creatureType_i = AI_CREATURE_HALFLING;
+        creatureFlag_l = 1;
+        goto creaturePurchase;
+    case MAP_EVENT_ANCIENT_LAMP:
+        creatureType_i = EVENT_RECRUIT_GENIE;
+        creatureFlag_l = 0;
+        goto creaturePurchase;
+    case MAP_EVENT_WAGON_CAMP:
+        creatureType_i = EVENT_RECRUIT_ROGUE;
+        creatureFlag_l = 0;
+        goto creaturePurchase;
+    case MAP_EVENT_DESERT_TENT:
+        creatureType_i = EVENT_RECRUIT_NOMAD;
+        creatureFlag_l = 0;
+        goto creaturePurchase;
+    case MAP_EVENT_WATCH_TOWER:
+        creatureType_i = AI_CREATURE_ORC;
+        creatureFlag_l = 1;
+        goto creaturePurchase;
+    case MAP_EVENT_TREE_HOUSE:
+        creatureType_i = EVENT_RECRUIT_SPRITE;
+        creatureFlag_l = 1;
+        goto creaturePurchase;
+    case MAP_EVENT_ARCHER_HOUSE:
+        creatureType_i = AI_CREATURE_ARCHER;
+        creatureFlag_l = 1;
+        goto creaturePurchase;
+    case MAP_EVENT_GOBLIN_HUT:
+        creatureType_i = AI_CREATURE_GOBLIN;
+        creatureFlag_l = 1;
+        goto creaturePurchase;
+    case MAP_EVENT_PEASANT_HUT:
+        creatureType_i = AI_CREATURE_PEASANT;
+        creatureFlag_l = 1;
+        goto creaturePurchase;
+    case MAP_EVENT_DWARF_COTTAGE:
+    case MAP_EVENT_SIRENS:
+        creatureType_i = AI_CREATURE_DWARF;
+        creatureFlag_l = 1;
+        goto creaturePurchase;
+    case MAP_EVENT_CAVE:
+        creatureType_i = AI_CREATURE_CENTAUR;
+        creatureFlag_l = 1;
+        goto creaturePurchase;
+    case MAP_EVENT_EXCAVATION:
+        creatureType_i = AI_CREATURE_SKELETON;
+        creatureFlag_l = 1;
+creaturePurchase:
+        if (cell->w4hi != 0) {
+            gpPhilAI->EvaluateOneTimeCreaturePurchase(
+                creatureType_i, cell->w4hi, creatureFlag_l, eventResults[2],
+                purchaseCost_i, purchaseValue_a);
+            if (eventResults[2] > 0) {
+                gpGame->GiveArmy(&eventHero->m_army, creatureType_i,
+                                 eventResults[2], purchaseValue_a);
+                cell->m_objectData = static_cast<unsigned short>(
+                    (cell->w4hi - eventResults[2]) * 8 |
+                    (cell->m_objectData & 7));
+                if (creatureFlag_l == 0) {
+                    GetMonsterCost(creatureType_i, creatureCosts_a);
+                    for (index_h = 0; index_h < AI_EVENT_RESOURCE_COUNT; ++index_h)
+                        gpCurPlayer->m_resources[index_h] -=
+                            creatureCosts_a[index_h] * eventResults[2];
+                }
+            }
+        }
+        if (cell->w4hi == 0 && eventType_g == MAP_EVENT_ANCIENT_LAMP)
+            eventResults[0] = 1;
+        break;
+
+    case MAP_EVENT_MONSTER:
+        ComputerMonsterInteract(cell, eventHero, eventResults);
+        break;
+
+    case MAP_EVENT_TREE_OF_KNOWLEDGE:
+        if ((eventHero->m_treeKnowledgeVisits &
+             (1U << (cell->w4hi & 31))) == 0) {
+            heroLevel_e = eventHero->GetLevel(eventHero->m_experience);
+            levelExperience_g = eventHero->GetExperience(heroLevel_e + 1) -
+                              eventHero->GetExperience(heroLevel_e);
+            switch (cell->w4hi >> TREE_KNOWLEDGE_MODE_SHIFT) {
+            case TREE_KNOWLEDGE_FREE:
+                GiveExperience(eventHero, levelExperience_g, 1);
+                eventHero->m_treeKnowledgeVisits |=
+                    1U << (cell->w4hi & 31);
+                eventHero->CheckLevel();
+                break;
+            case TREE_KNOWLEDGE_GOLD:
+                if (gpCurPlayer->m_resources[RES_GOLD] >
+                    AI_EVENT_TREE_GOLD) {
+                    gpCurPlayer->m_resources[RES_GOLD] -= AI_EVENT_TREE_GOLD;
+                    GiveExperience(eventHero, levelExperience_g, 1);
+                    eventHero->m_treeKnowledgeVisits |=
+                        1U << (cell->w4hi & 31);
+                    eventHero->CheckLevel();
+                }
+                break;
+            case TREE_KNOWLEDGE_GEMS:
+                if (gpCurPlayer->m_resources[RES_GEMS] >
+                    AI_EVENT_TREE_GEMS) {
+                    gpCurPlayer->m_resources[RES_GEMS] -= AI_EVENT_TREE_GEMS;
+                    GiveExperience(eventHero, levelExperience_g, 1);
+                    eventHero->m_treeKnowledgeVisits |=
+                        1U << (cell->w4hi & 31);
+                    eventHero->CheckLevel();
+                }
+                break;
+            }
+        }
+        break;
+
+    case MAP_EVENT_OBELISK:
+        if ((giCurPlayerBit & gpGame->m_obeliskVisitors[cell->w4hi]) == 0) {
+            gpGame->m_obeliskVisitors[cell->w4hi] |= giCurPlayerBit;
+            ComputeUALoc(giCurPlayer);
+        }
+        break;
+
+    case MAP_EVENT_ORACLE:
+        break;
+
+    case MAP_EVENT_SHRINE_FIRST_CIRCLE:
+    case MAP_EVENT_SHRINE_SECOND_CIRCLE:
+    case MAP_EVENT_SHRINE_THIRD_CIRCLE:
+        index_h = cell->w4hi - 1;
+        if (eventHero->HasArtifact(AI_EVENT_MAGIC_BOOK) &&
+            gsSpellInfo[index_h].level <=
+                eventHero->m_secondarySkills[HERO_SKILL_WISDOM] + 2) {
+            eventHero->AddSpell(index_h,
+                                eventHero->Stats(HERO_PRIMARY_KNOWLEDGE));
+        }
+        break;
+
+    case MAP_EVENT_CASTLE:
+        gpPhilAI->TownEvent(cell, eventHero, x, y);
+        break;
+
+    case MAP_EVENT_WHIRLPOOL:
+        DoWhirlpool(eventHero);
+        goto teleportEvent;
+    case MAP_EVENT_STONE_LITHS:
+teleportEvent:
+        exitCount = 0;
+        teleportDistance_o = eventType_g == MAP_EVENT_STONE_LITHS
+            ? AI_EVENT_TELEPORT_STONE_DISTANCE
+            : AI_EVENT_TELEPORT_WHIRLPOOL_DISTANCE;
+        for (exitY_d = 0; exitY_d < MAP_HEIGHT; ++exitY_d) {
+            for (exitX = 0; exitX < MAP_WIDTH; ++exitX) {
+                exitCell_d = gpGame->m_worldMap.Row(exitY_d) + exitX;
+                if (exitCell_d->triggerType ==
+                        (eventType_g | MAP_EVENT_ACTION_FLAG) &&
+                    exitCell_d->objIndex == cell->objIndex &&
+                    abs(exitY_d - y) + abs(exitX - x) > teleportDistance_o) {
+                    ++exitCount;
+                }
+            }
+        }
+        if (exitCount > 0) {
+            if (exitCount > 1)
+                exitCount = Random(1, exitCount);
+            for (exitY_d = 0; exitY_d < MAP_HEIGHT; ++exitY_d) {
+                for (exitX = 0; exitX < MAP_WIDTH; ++exitX) {
+                    exitCell_d = gpGame->m_worldMap.Row(exitY_d) + exitX;
+                    if (exitCell_d->triggerType ==
+                            (eventType_g | MAP_EVENT_ACTION_FLAG) &&
+                        exitCell_d->objIndex == cell->objIndex &&
+                        abs(exitY_d - y) + abs(exitX - x) > teleportDistance_o &&
+                        --exitCount < 1) {
+                        goto teleportDestination;
+                    }
+                }
+            }
+teleportDestination:
+            StopCursor(1);
+            gpAdvManager->TeleportTo(eventHero, exitX, exitY_d, 0, 0);
+        }
+        break;
+
+    case MAP_EVENT_ARTIFACT:
+        artifactResource_p = (cell->w4hi & ARTIFACT_RESOURCE_MASK) >>
+                           ARTIFACT_RESOURCE_SHIFT;
+        artifact_g = cell->objIndex >> 1;
+        artifactGuardCount_b = cell->w4hi & ARTIFACT_MONSTER_MASK;
+        if (eventHero->NumArtifacts() == AI_EVENT_ARTIFACT_LIMIT)
+            break;
+        if (artifact_g == AI_EVENT_SPELL_SCROLL) {
+            GiveArtifact(eventHero, AI_EVENT_SPELL_SCROLL, 1,
+                         static_cast<signed char>(cell->w4hi));
+            eventResults[0] = 1;
+            break;
+        }
+        if (cell->w4hi & ARTIFACT_GUARDED_FLAG) {
+            if (artifactGuardCount_b == AI_EVENT_ROGUE_GUARD) {
+                artifactGuardResult_e = AI_EVENT_ROGUE_COUNT;
+            } else {
+                artifactGuardResult_e = 1;
+                if (gpPhilAI->ChooseToFightForArtifact(
+                        artifact_g, artifactGuardCount_b, 0) == 0)
+                    break;
+            }
+            if (gpPhilAI->CombatMonsterEvent(
+                    eventHero, artifactGuardCount_b, &artifactGuardResult_e, 0) == 0)
+                break;
+            goto artifactPickup;
+        }
+        switch (cell->w4hi & ARTIFACT_MODE_MASK) {
+        case ARTIFACT_MODE_PICKUP:
+artifactPickup:
+            for (index_h = 0; index_h < AI_EVENT_RESOURCE_COUNT; ++index_h) {
+                if (gpCurPlayer->m_resources[index_h] < 0)
+                    gpCurPlayer->m_resources[index_h] = 0;
+            }
+            GiveArtifact(eventHero, artifact_g, 1, -1);
+            eventResults[0] = 1;
+            break;
+        case ARTIFACT_MODE_GOLD:
+            if (gpPhilAI->NetValueOfArtifact(
+                    artifact_g, AI_EVENT_ARTIFACT_GOLD, 0, 0)) {
+                gpCurPlayer->m_resources[RES_GOLD] -=
+                    AI_EVENT_ARTIFACT_GOLD;
+                goto artifactPickup;
+            }
+            break;
+        case ARTIFACT_MODE_WISDOM:
+            if (eventHero->m_secondarySkills[HERO_SKILL_WISDOM] != 0)
+                goto artifactPickup;
+            break;
+        case ARTIFACT_MODE_LEADERSHIP:
+            if (eventHero->m_secondarySkills[HERO_SKILL_LEADERSHIP] != 0)
+                goto artifactPickup;
+            break;
+        case ARTIFACT_MODE_RESOURCE_3:
+            if (gpPhilAI->NetValueOfArtifact(
+                    artifact_g, AI_EVENT_ARTIFACT_RESOURCE_3_GOLD,
+                    artifactResource_p, AI_EVENT_ARTIFACT_RESOURCE_3)) {
+                gpCurPlayer->m_resources[RES_GOLD] -=
+                    AI_EVENT_ARTIFACT_RESOURCE_3_GOLD;
+                gpCurPlayer->m_resources[artifactResource_p] -=
+                    AI_EVENT_ARTIFACT_RESOURCE_3;
+                goto artifactPickup;
+            }
+            break;
+        case ARTIFACT_MODE_RESOURCE_5:
+            if (gpPhilAI->NetValueOfArtifact(
+                    artifact_g, AI_EVENT_ARTIFACT_RESOURCE_5_GOLD,
+                    artifactResource_p, AI_EVENT_ARTIFACT_RESOURCE_5)) {
+                gpCurPlayer->m_resources[RES_GOLD] -=
+                    AI_EVENT_ARTIFACT_RESOURCE_5_GOLD;
+                gpCurPlayer->m_resources[artifactResource_p] -=
+                    AI_EVENT_ARTIFACT_RESOURCE_5;
+                goto artifactPickup;
+            }
+            break;
+        }
+        break;
+
+    case MAP_EVENT_HERO_INTERACTION:
+        otherHero_e = &gpGame->m_heroRecs[cell->w4hi];
+        savedShowIt_e = bShowIt;
+        if (otherHero_e->m_owner == giCurPlayer) {
+            gpPhilAI->HeroInteractionAtHero(eventHero, otherHero_e, 0,
+                                            &heroInteractionResult);
+            return;
+        }
+        if (otherHero_e->m_locationType == AI_EVENT_HERO_TOWN_LOCATION)
+            occupiedTown_b = reinterpret_cast<town *>(
+                &gpGame->m_castleRecs[otherHero_e->m_occupiedTown]);
+
+        if (gbHumanPlayer[otherHero_e->m_owner] == 0) {
+            combatResult_d = gpPhilAI->QuickCombat(
+                &eventHero->m_army, eventHero, &otherHero_e->m_army, otherHero_e,
+                0, 0, attackerLoss_c, defenderLoss_k);
+            if (combatResult_d != 0 && occupiedTown_b != 0) {
+                combatResult_d = gpPhilAI->QuickCombat(
+                    &eventHero->m_army, eventHero, &occupiedTown_b->m_army, 0,
+                    1, occupiedTown_b->m_owner, attackerLoss_c, defenderLoss_k);
+            }
+        } else {
+            if (occupiedTown_b != 0)
+                occupiedTown_b->m_occupyingHeroId = otherHero_e->m_owner;
+            heroCombatResult_h = DoCombat(
+                x, y, eventHero, &eventHero->m_army, occupiedTown_b, otherHero_e,
+                &gpGame->m_heroRecs[cell->w4hi].m_army, x, y, -1, 1);
+            if (heroCombatResult_h == 0 && occupiedTown_b != 0)
+                gpGame->ClaimTown(occupiedTown_b->m_id, giCurPlayer, 0);
+        }
+        CompleteDraw(0);
+        break;
+
+    case MAP_EVENT_SIGN:
+    case MAP_EVENT_BOTTLE:
+        break;
+
+    case MAP_EVENT_DAEMON_CAVE:
+        switch (cell->w4hi) {
+        case DAEMON_CAVE_EMPTY:
+            break;
+        case DAEMON_REWARD_EXPERIENCE:
+            GiveExperience(eventHero, DAEMON_EXPERIENCE, 1);
+            break;
+        case DAEMON_REWARD_ARTIFACT:
+            GiveExperience(eventHero, DAEMON_EXPERIENCE, 1);
+            GiveRandomArtifact(eventHero);
+            break;
+        case DAEMON_REWARD_EXPERIENCE_GOLD:
+            GiveExperience(eventHero, DAEMON_EXPERIENCE, 1);
+            GiveResource(eventHero, RES_GOLD, AI_EVENT_DAEMON_GOLD);
+            break;
+        case DAEMON_REWARD_RANSOM:
+            if (gpCurPlayer->m_resources[RES_GOLD] < AI_EVENT_DAEMON_GOLD) {
+                HeroLoses(eventHero);
+            } else {
+                if (gpPhilAI->ChooseToPayRansomOnHero(
+                        AI_EVENT_DAEMON_GOLD) == 0) {
+                    HeroLoses(eventHero);
+                } else {
+                    gpCurPlayer->m_resources[RES_GOLD] -=
+                        AI_EVENT_DAEMON_GOLD;
+                }
+            }
+            break;
+        }
+        cell->m_objectData = (cell->m_objectData & 7) | 8;
+        break;
+
+    case MAP_EVENT_PYRAMID:
+        if (cell->w4hi != 0 && eventHero->HasSpell(cell->w4hi - 1) == 0) {
+            for (index_h = 0; index_h < AI_EVENT_ARMY_STACK_COUNT; ++index_h) {
+                gpMonGroup->m_creatureTypes[index_h] = AI_CREATURE_POWER_LICH;
+                gpMonGroup->m_creatureCounts[index_h] = 10;
+            }
+            index_h = cell->w4hi - 1;
+            if (gsSpellInfo[index_h].m_e & 1) {
+                battleStatValue_o =
+                    eventHero->Stats(HERO_PRIMARY_SPELL_POWER) > 40
+                        ? gfBattleStat[40]
+                        : gfBattleStat[eventHero->Stats(
+                              HERO_PRIMARY_SPELL_POWER)];
+                spellValueFactor_i = battleStatValue_o;
+            } else {
+                spellValueFactor_i = 1.0f;
+            }
+            pyramidBattleValue_l = static_cast<int>(
+                gsSpellInfo[index_h].aiValue *
+                gpCurPlayer->m_aiSpellValueMultiplier * spellValueFactor_i);
+            gpPhilAI->ChooseEvaluateBattle(
+                &eventHero->m_army, eventHero, gpMonGroup, 0, 0, 0,
+                pyramidBattleValue_l, battleWon_j, battleResult_l);
+            if (battleWon_j != 0) {
+                survivingCount_a = 50;
+                combatResult_d = gpPhilAI->CombatMonsterEvent(
+                    eventHero, AI_CREATURE_POWER_LICH,
+                    reinterpret_cast<int *>(&survivingCount_a), 0);
+                if (combatResult_d != 0) {
+                    eventHero->AddSpell(
+                        index_h, eventHero->Stats(HERO_PRIMARY_KNOWLEDGE));
+                    cell->m_objectData &= 7;
+                }
+            }
+        }
+        break;
+
+    case MAP_EVENT_GRAVEYARD:
+    case MAP_EVENT_SHIPWRECK:
+    case MAP_EVENT_DERELICT_SHIP:
+        gpPhilAI->FightEvent(eventHero, cell, 0);
+        break;
+
+    case MAP_EVENT_ABANDONED_MINE:
+        for (index_h = 0; index_h < AI_EVENT_ARMY_STACK_COUNT; ++index_h) {
+            gpMonGroup->m_creatureTypes[index_h] =
+                gpGame->m_mines[cell->w4hi].guardianType;
+            gpMonGroup->m_creatureCounts[index_h] = static_cast<short>(
+                gpGame->m_mines[cell->w4hi].guardianCount /
+                AI_EVENT_ABANDONED_MINE_ARMY_DIVISOR);
+        }
+        abandonedMineValue_f = static_cast<int>(
+            static_cast<float>(gaiTurnValueOfMine[y * MAP_WIDTH + x]) *
+            gMineCharacteristics[RES_GOLD] *
+            gafAITurnCostResource[RES_GOLD]);
+        gpPhilAI->ChooseEvaluateBattle(
+            &eventHero->m_army, eventHero, gpMonGroup, 0, 0, 0,
+            abandonedMineValue_f, battleWon_j, battleResult_l);
+        if (battleWon_j != 0) {
+            survivingCount_a = gpGame->m_mines[cell->w4hi].guardianCount;
+            combatResult_d = gpPhilAI->CombatMonsterEvent(
+                eventHero, gpGame->m_mines[cell->w4hi].guardianType,
+                reinterpret_cast<int *>(&survivingCount_a), 0);
+            if (survivingCount_a > AI_EVENT_GUARD_COUNT_MAX)
+                survivingCount_a = AI_EVENT_GUARD_COUNT_MAX;
+            gpGame->m_mines[cell->w4hi].guardianCount =
+                static_cast<unsigned char>(survivingCount_a);
+            if (combatResult_d != 0) {
+                eventHero->CheckLevel();
+                gpGame->ConvertObject(x - 2, y - 1, x + 1, y - 1,
+                                      56, 0, 4, 26, 104, 64, 23);
+                gpGame->ConvertObject(x - 2, y, x + 1, y,
+                                      56, 5, 9, 26, 109, 64, 23);
+                gpGame->ConvertObject(x - 2, y - 1, x + 1, y - 1,
+                                      51, 0, 3, 32, 75, 64, 23);
+                gpGame->ConvertObject(x - 2, y, x + 1, y,
+                                      51, 4, 7, 32, 80, 64, 23);
+                gpGame->ConvertObject(x, y, x, y,
+                                      29, 5, 5, 29, 4, 64, 23);
+                gpGame->m_mines[cell->w4hi].resourceType = RES_GOLD;
+                gpGame->m_mines[cell->w4hi].guardianType = AI_EVENT_NO_CREATURE;
+                gpGame->m_mines[cell->w4hi].guardianCount = 0;
+                gpGame->ClaimMine(cell->w4hi, giCurPlayer);
+            }
+        }
+        break;
+
+    case MAP_EVENT_TAR_PIT:
+        break;
+
+    case MAP_EVENT_OBSERVATION_TOWER:
+        gpGame->SetVisibility(x, y, giCurPlayer,
+                              AI_EVENT_OBSERVATION_RADIUS);
+        break;
+
+    case MAP_EVENT_SHIPWRECK_SURVIVOR:
+        if (eventHero->NumArtifacts() < AI_EVENT_ARTIFACT_LIMIT)
+            GiveArtifact(eventHero, cell->w4hi, 1, -1);
+        eventResults[0] = 1;
+        break;
+
+    case MAP_EVENT_ARTESIAN_SPRING:
+        if (cell->w4hi != 0) {
+            cell->m_objectData &= 7;
+            spellPower_j = eventHero->Stats(HERO_PRIMARY_KNOWLEDGE);
+            if (eventHero->m_spellPoints < spellPower_j * 20)
+                eventHero->m_spellPoints = static_cast<short>(spellPower_j * 20);
+        }
+        break;
+
+    case MAP_EVENT_MAGIC_WELL:
+        if ((eventHero->m_eventFlags & HERO_EVENT_MAGIC_WELL) == 0) {
+            cell->m_objectData &= 7;
+            spellPower_j = eventHero->Stats(HERO_PRIMARY_KNOWLEDGE);
+            if (eventHero->m_spellPoints < spellPower_j * 10) {
+                eventHero->m_eventFlags |= HERO_EVENT_MAGIC_WELL;
+                eventHero->m_spellPoints = static_cast<short>(spellPower_j * 10);
+            }
+        }
+        break;
+
+    case MAP_EVENT_WITCH_HUT:
+        if (eventHero->m_secondarySkills[cell->w4hi] == 0)
+            eventHero->GiveSS(cell->w4hi, HERO_SKILL_LEVEL_BASIC);
+        break;
+
+    case MAP_EVENT_MAGELLAN_MAPS:
+        if (cell->w4hi != 0) {
+            GiveResource(eventHero, cell->w4hi - 1,
+                         cell->w4hi == 7 ? 500 : 5);
+            cell->m_objectData &= 7;
+        }
+        break;
+
+    case MAP_EVENT_SPHINX:
+        eventExtra_o = reinterpret_cast<mapEventExtra *>(ppMapExtra[cell->w4hi]);
+        if (eventExtra_o->active != 0) {
+            if (Random(0, AI_EVENT_RANDOM_PERCENT_MAX) <
+                AI_EVENT_RANDOM_EVENT_SUCCESS) {
+                for (index_h = 0; index_h < AI_EVENT_RESOURCE_COUNT; ++index_h) {
+                    gpCurPlayer->m_resources[index_h] +=
+                        eventExtra_o->resources[index_h];
+                    if (gpCurPlayer->m_resources[index_h] < 0)
+                        gpCurPlayer->m_resources[index_h] = 0;
+                }
+                if (eventExtra_o->artifact != -1 &&
+                    eventHero->NumArtifacts() < AI_EVENT_ARTIFACT_LIMIT) {
+                    GiveArtifact(eventHero, eventExtra_o->artifact, 1, -1);
+                }
+                eventExtra_o->active = 0;
+            } else {
+                HeroLoses(eventHero);
+            }
+        }
+        break;
+
+    case MAP_EVENT_TRADING_POST:
+        break;
+
+    case MAP_EVENT_BARRIER:
+        eventResults[0] = BarrierAIEvent(cell, eventHero);
+        break;
+    case MAP_EVENT_TRAVELER_TENT:
+        PasswordAIEvent(cell, eventHero);
+        break;
+    case MAP_EVENT_EXPANSION_OBJECT:
+        GenericSiteAIEvent(cell, eventHero);
+        break;
+    case MAP_EVENT_EXPANSION_DWELLING:
+        RecruitSiteAIEvent(cell, eventHero);
+        break;
+    case MAP_EVENT_JAIL:
+        JailAIEvent(cell, eventHero, x, y);
+        break;
+
+    default:
+        break;
+    }
+
+    if (eventResults[0] != 0)
+        EraseObj(cell, x, y);
+    giCurPlayer = oldPlayer_o;
+    gpCurPlayer = oldPlayerData_h;
+    if (eventHero->m_owner != AI_EVENT_NO_OWNER)
+        eventHero->CheckLevel();
+    CheckEndGame(0, 0);
+}
 
 VA(0x004b4883, 0x65)
 int advManager::BarrierAIEvent(class mapCell *, class hero *) { return 0; }
