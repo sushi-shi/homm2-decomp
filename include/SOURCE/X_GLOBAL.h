@@ -48,7 +48,7 @@ extern char *gcMapPath;
 extern int gbDontTryRedbook;
 extern int gbDontTryMIDI;
 extern int gbDontTryDigital;
-extern float *gfCombatSpeedMod;
+extern float gfCombatSpeedMod[3];
 extern int giDialogTimeout;
 extern int giNewMonsterCycleFrame;
 extern int gbLeaveNetBoxAlone;
