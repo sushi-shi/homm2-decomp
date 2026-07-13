@@ -5008,9 +5008,9 @@ int OnMySide(int player) {
               AI_SIDE_CAMPAIGN_SCENARIO_ELEVEN &&
           player != AI_SIDE_PRIMARY_PLAYER) ||
          (gpGame->m_victoryConditionType == AI_SIDE_VICTORY_CONDITION &&
-          ((gpGame->m_victoryArtifact == AI_SIDE_VICTORY_SPECIAL_VALUE &&
+          ((gpGame->m_victoryConditionValue == AI_SIDE_VICTORY_SPECIAL_VALUE &&
             player != AI_SIDE_PRIMARY_PLAYER) ||
-           (gpGame->m_victoryArtifact != AI_SIDE_VICTORY_SPECIAL_VALUE &&
+           (gpGame->m_victoryConditionValue != AI_SIDE_VICTORY_SPECIAL_VALUE &&
             ((gpGame->m_players[giCurPlayer].color <
                   gpGame->m_victorySideThreshold &&
               gpGame->m_players[player].color <

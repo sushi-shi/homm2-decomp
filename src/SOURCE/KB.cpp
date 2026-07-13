@@ -14,6 +14,7 @@
 #include <BASE/WINMGR.h>
 #include <SOURCE/ADVMGR.h>
 #include <SOURCE/CURSOR.h>
+#include <SOURCE/ExpCampaign.h>
 #include <SOURCE/HERO.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/Modem.h>
@@ -570,7 +571,490 @@ void PlayerDead(int player)
 }
 
 VA(0x0049a6c1, 0x19bb)
-void CheckEndGame(int, int) {}
+void CheckEndGame(int forcedResult, int dragonCityCaptured)
+{
+    char saveName[20];
+    unsigned int carryoverHeroId;
+    int carryoverHeroIndex;
+    int sideBelow;
+    int sideAbove;
+    int townId;
+    char artifactName[100];
+    hero *conditionHero;
+    int bestGold;
+    int winner;
+    int hasDwarfTown;
+    int hasRoland;
+    int enemyRemains;
+    int artifactWinner;
+    int currentDay;
+    int savedRemoteOn;
+    int dialogShown;
+    int aliveCount;
+    int lastAlive;
+    int aliveHumanCount;
+    int lastHuman;
+    int aliveThisNetHumanCount;
+    int victory;
+    int defeat;
+    int normalVictoryAllowed;
+    int player;
+    int heroIndex;
+    int armySlot;
+    playerRec *rec;
+    townSlot *victoryTown;
+    townSlot *lossTown;
+
+    if (gbThisNetGotAdventureControl && !gbInNewGameSetup && !gbGameOver && !bInCheckEndGame) {
+        bInCheckEndGame = 1;
+        savedRemoteOn = gbRemoteOn;
+        dialogShown = 0;
+
+        for (player = 0; player < gpGame->m_playerCount; player++) {
+            if (!gpGame->m_playerDead[player]) {
+                rec = &gpGame->m_players[player];
+                if ((rec->heroCount == 0 && rec->townCount == 0) ||
+                    (xIsPlayingExpansionCampaign && xCampaign.IsSpecialLossCondition(player))) {
+                    PlayerDead(player);
+                    if (giThisGamePos == player) {
+                        dialogShown = 1;
+                        sprintf(gText, "You have been eliminated from the game!!!");
+                        NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                    } else {
+                        sprintf(gText, "%s has been vanquished!", cPlayerNames[player]);
+                        NormalDialog(gText, 1, -1, -1, CHECK_END_GAME_PLAYER_DIALOG_ICON,
+                                     gpGame->m_players[player].color, -1, -1, -1, CHECK_END_GAME_REMOTE_DIALOG_TIME);
+                    }
+                } else if (rec->townCount == 0) {
+                    if (rec->daysLeft == -1) {
+                        if (gbThisNetHumanPlayer[player] && giCurPlayer == player) {
+                            sprintf(gText,
+                                    "%s, you have lost your last town.  If you do not conquer another "
+                                    "town in the next week, you will be eliminated.",
+                                    cPlayerNames[player]);
+                            NormalDialog(gText, 1, -1, -1, CHECK_END_GAME_PLAYER_DIALOG_ICON,
+                                         gpGame->m_players[player].color, -1, 0, -1, 0);
+                        }
+                        rec->daysLeft = CHECK_END_GAME_GRACE_DAYS;
+                    } else if (rec->daysLeft == 0) {
+                        PlayerDead(player);
+                        if (gbThisNetHumanPlayer[player] && giCurPlayer == player) {
+                            if (!dialogShown) {
+                                dialogShown = 1;
+                                sprintf(gText,
+                                        "%s, your heroes abandon you, and you are banished from this "
+                                        "land.",
+                                        cPlayerNames[player]);
+                            }
+                        } else {
+                            sprintf(gText,
+                                    "%s's heroes have abandoned him, and he is banished from this "
+                                    "land.",
+                                    cPlayerNames[player]);
+                        }
+                        NormalDialog(gText, 1, -1, -1, CHECK_END_GAME_PLAYER_DIALOG_ICON,
+                                     gpGame->m_players[player].color, -1, 0, -1, 0);
+                    }
+                } else {
+                    rec->daysLeft = -1;
+                }
+            }
+        }
+
+        aliveCount = 0;
+        lastAlive = 0;
+        aliveHumanCount = 0;
+        lastHuman = 0;
+        aliveThisNetHumanCount = 0;
+        for (player = 0; player < gpGame->m_playerCount; player++) {
+            if (!gpGame->m_playerDead[player]) {
+                aliveCount++;
+                lastAlive = player;
+                if (gbThisNetHumanPlayer[player]) {
+                    aliveThisNetHumanCount++;
+                }
+                if (gbHumanPlayer[player]) {
+                    aliveHumanCount++;
+                    lastHuman = player;
+                }
+            }
+        }
+
+        victory = 0;
+        defeat = 0;
+        normalVictoryAllowed = 1;
+        if ((gpGame->m_victoryConditionType != CHECK_END_GAME_VICTORY_STANDARD && !gpGame->m_allowNormalVictory) ||
+            (gbInCampaign && gpGame->m_campaignType == CHECK_END_GAME_ARCHIBALD_CAMPAIGN &&
+             gpGame->m_campaignScenario + CHECK_END_GAME_SCENARIO_OFFSET == CHECK_END_GAME_SIDE_SCENARIO)) {
+            normalVictoryAllowed = 0;
+        }
+
+        if (gpGame->m_victoryConditionType == CHECK_END_GAME_VICTORY_SIDE &&
+            gpGame->m_victoryConditionValue != CHECK_END_GAME_SIDE_SPECIAL_VALUE &&
+            (!gbInCampaign || gpGame->m_campaignType != CHECK_END_GAME_ARCHIBALD_CAMPAIGN ||
+             gpGame->m_campaignScenario + CHECK_END_GAME_SCENARIO_OFFSET != CHECK_END_GAME_SIDE_SCENARIO)) {
+            sideBelow = 0;
+            sideAbove = 0;
+            for (player = 0; player < gpGame->m_playerCount; player++) {
+                if (!gpGame->m_playerDead[player]) {
+                    if (gpGame->m_players[player].color < gpGame->m_victorySideThreshold) {
+                        sideBelow++;
+                    } else {
+                        sideAbove++;
+                    }
+                }
+            }
+            if (sideBelow == 0) {
+                for (player = 0; player < gpGame->m_playerCount; player++) {
+                    if (gbThisNetHumanPlayer[player] && !gpGame->m_playerDead[player] &&
+                        gpGame->m_players[player].color >= gpGame->m_victorySideThreshold) {
+                        victory = 1;
+                    }
+                }
+            } else if (sideAbove == 0) {
+                for (player = 0; player < gpGame->m_playerCount; player++) {
+                    if (gbThisNetHumanPlayer[player] && !gpGame->m_playerDead[player] &&
+                        gpGame->m_players[player].color < gpGame->m_victorySideThreshold) {
+                        victory = 1;
+                    }
+                }
+            }
+            if ((sideBelow == 0 || sideAbove == 0) && (defeat = victory == 0, !dialogShown && victory)) {
+                dialogShown = 1;
+                sprintf(gText, "The enemy is beaten.  Your side has triumphed!");
+                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+            }
+        }
+
+        if (gpGame->m_victoryConditionType == CHECK_END_GAME_VICTORY_CAPTURE_TOWN) {
+            townId = gpGame->GetTownId(gpGame->m_victoryConditionValue, gpGame->m_victoryTownY);
+            victoryTown = GetCastleRec(townId);
+            if (victoryTown->owner != CHECK_END_GAME_NO_PLAYER &&
+                (gbHumanPlayer[victoryTown->owner] || gpGame->m_computerAlsoWins)) {
+                if (gbThisNetHumanPlayer[victoryTown->owner]) {
+                    victory = 1;
+                } else {
+                    defeat = 1;
+                }
+                if (!dialogShown) {
+                    dialogShown = 1;
+                    if (victory) {
+                        sprintf(gText, "You captured %s!  You are victorious.", victoryTown->m_name);
+                    } else {
+                        sprintf(gText, "The enemy has captured %s!  They are triumphant.", victoryTown->m_name);
+                    }
+                    NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                }
+            }
+        }
+
+        if (gpGame->m_lossConditionType == CHECK_END_GAME_LOSS_TOWN) {
+            townId = gpGame->GetTownId(gpGame->m_lossConditionValue, gpGame->m_lossTownY);
+            lossTown = GetCastleRec(townId);
+            if (lossTown->owner == CHECK_END_GAME_NO_PLAYER || !gbHumanPlayer[lossTown->owner]) {
+                defeat = 1;
+                if (!dialogShown) {
+                    dialogShown = 1;
+                    sprintf(gText, "%s has fallen!  All is lost.", lossTown->m_name);
+                    NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                }
+            }
+        }
+
+        if (gpGame->m_victoryConditionType == CHECK_END_GAME_VICTORY_GOLD) {
+            bestGold = 0;
+            winner = CHECK_END_GAME_NO_PLAYER;
+            for (player = 0; player < gpGame->m_playerCount; player++) {
+                if ((gbHumanPlayer[player] || gpGame->m_computerAlsoWins) &&
+                    gpGame->m_players[player].resources[CHECK_END_GAME_GOLD_RESOURCE] >=
+                        gpGame->m_victoryConditionValue * CHECK_END_GAME_GOLD_SCALE &&
+                    gpGame->m_players[player].resources[CHECK_END_GAME_GOLD_RESOURCE] >= bestGold) {
+                    bestGold = gpGame->m_players[player].resources[CHECK_END_GAME_GOLD_RESOURCE];
+                    winner = player;
+                }
+                if (winner != CHECK_END_GAME_NO_PLAYER) {
+                    if (gbThisNetHumanPlayer[winner]) {
+                        victory = 1;
+                    } else {
+                        defeat = 1;
+                    }
+                    if (!dialogShown) {
+                        dialogShown = 1;
+                        if (victory) {
+                            sprintf(gText,
+                                    "You have built up over %d gold in your treasury.  All enemies bow "
+                                    "before your wealth and power.",
+                                    bestGold);
+                        } else {
+                            sprintf(gText,
+                                    "The enemy has built up over %d gold in his treasury.  You must "
+                                    "bow done in defeat before his wealth and power.",
+                                    bestGold);
+                        }
+                        NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                    }
+                }
+            }
+        }
+
+        if (gpGame->m_victoryConditionType == CHECK_END_GAME_VICTORY_DEFEAT_HERO) {
+            conditionHero = GetHeroSlot(gpGame->m_victoryConditionValue);
+            if (conditionHero->m_owner < 0 || conditionHero->m_owner >= CHECK_END_GAME_PLAYER_COUNT ||
+                gbHumanPlayer[conditionHero->m_owner]) {
+                victory = 1;
+                if (!dialogShown) {
+                    dialogShown = 1;
+                    sprintf(gText, "You have captured the enemy hero %s!  Your quest is complete.",
+                            conditionHero->m_name);
+                    NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                }
+            }
+        }
+
+        if (gpGame->m_lossConditionType == CHECK_END_GAME_LOSS_HERO) {
+            conditionHero = GetHeroSlot(gpGame->m_lossConditionValue);
+            if (conditionHero->m_owner < 0 || conditionHero->m_owner >= CHECK_END_GAME_PLAYER_COUNT ||
+                !gbHumanPlayer[conditionHero->m_owner]) {
+                defeat = 1;
+                if (!dialogShown) {
+                    dialogShown = 1;
+                    sprintf(gText, "You have lost the hero %s.  Your quest is over.", conditionHero->m_name);
+                    NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                }
+            }
+        }
+
+        if (gpGame->m_lossConditionType == CHECK_END_GAME_LOSS_TIME) {
+            if (gpGame->m_lossConditionValue < (gpGame->m_week - 1) * CHECK_END_GAME_DAYS_PER_WEEK +
+                                                   (gpGame->m_month - 1) * CHECK_END_GAME_DAYS_PER_MONTH +
+                                                   gpGame->m_day) {
+                defeat = 1;
+                if (!dialogShown) {
+                    dialogShown = 1;
+                    sprintf(gText, "You have failed to complete your quest in time.  All is lost.");
+                    NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                }
+            }
+        }
+
+        if (gpGame->m_victoryConditionType == CHECK_END_GAME_VICTORY_ARTIFACT) {
+            artifactWinner = CHECK_END_GAME_NO_PLAYER;
+            for (player = 0; player < gpGame->m_playerCount; player++) {
+                if (!gpGame->m_playerDead[player]) {
+                    for (heroIndex = 0; heroIndex < gpGame->m_players[player].heroCount; heroIndex++) {
+                        conditionHero = &gpGame->m_heroRecs[gpGame->m_players[player].heroes[heroIndex]];
+                        if (gpGame->m_victoryConditionValue > CHECK_END_GAME_ULTIMATE_ARTIFACT) {
+                            if (conditionHero->HasArtifact(gpGame->m_victoryConditionValue - 1)) {
+                                artifactWinner = player;
+                            }
+                        } else {
+                            if (conditionHero->HasArtifact(0) || conditionHero->HasArtifact(1) ||
+                                conditionHero->HasArtifact(2) || conditionHero->HasArtifact(3) ||
+                                conditionHero->HasArtifact(4) || conditionHero->HasArtifact(5) ||
+                                conditionHero->HasArtifact(6) || conditionHero->HasArtifact(7)) {
+                                artifactWinner = player;
+                            }
+                        }
+                    }
+                }
+            }
+            if (artifactWinner != CHECK_END_GAME_NO_PLAYER) {
+                if (gbThisNetHumanPlayer[artifactWinner]) {
+                    victory = 1;
+                } else {
+                    defeat = 1;
+                }
+                if (!dialogShown) {
+                    dialogShown = 1;
+                    if (gpGame->m_victoryConditionValue == CHECK_END_GAME_ULTIMATE_ARTIFACT) {
+                        sprintf(artifactName, "Ultimate Artifact");
+                    } else {
+                        sprintf(artifactName, gArtifactNames[gpGame->m_victoryConditionValue - 1]);
+                    }
+                    if (victory) {
+                        sprintf(gText, "You have found the %s.  Your quest is complete.", artifactName);
+                    } else {
+                        sprintf(gText, "The enemy has found the %s.  Your quest is a failure.", artifactName);
+                    }
+                    NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                }
+            }
+        }
+
+        if (gbInCampaign && gpGame->m_campaignType == CHECK_END_GAME_ROLAND_CAMPAIGN &&
+            gpGame->m_campaignScenario + CHECK_END_GAME_SCENARIO_OFFSET == CHECK_END_GAME_DWARF_SCENARIO) {
+            hasDwarfTown = 0;
+            for (player = 0; player < gpGame->m_players[0].townCount; player++) {
+                if (GetCastleRec(gpGame->m_players[0].towns[player])->race == CHECK_END_GAME_DWARF_TOWN) {
+                    hasDwarfTown = 1;
+                }
+            }
+            if (!hasDwarfTown) {
+                defeat = 1;
+                if (!dialogShown) {
+                    dialogShown = 1;
+                    sprintf(gText, "All the dwarf towns have fallen.  This is a disastrous defeat!  You have "
+                                   "lost.");
+                    NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                }
+            }
+        }
+
+        if (gbInCampaign && gpGame->m_campaignType == CHECK_END_GAME_ARCHIBALD_CAMPAIGN &&
+            gpGame->m_campaignScenario + CHECK_END_GAME_SCENARIO_OFFSET == CHECK_END_GAME_SIDE_SCENARIO &&
+            dragonCityCaptured) {
+            victory = 1;
+            if (!dialogShown) {
+                dialogShown = 1;
+                sprintf(gText, "Dragon city has fallen!  You are now the Master of the Dragons.");
+                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+            }
+        }
+
+        if (gbInCampaign && gpGame->m_campaignType == CHECK_END_GAME_ROLAND_CAMPAIGN &&
+            gpGame->m_campaignScenario + CHECK_END_GAME_SCENARIO_OFFSET == CHECK_END_GAME_ROLAND_CAPTURE_SCENARIO) {
+            hasRoland = 0;
+            for (heroIndex = 0; heroIndex < CHECK_END_GAME_HERO_COUNT; heroIndex++) {
+                if (gpGame->m_heroRecs[heroIndex].m_portrait == CHECK_END_GAME_ROLAND_HERO &&
+                    gpGame->m_heroRecs[heroIndex].m_owner >= 0 &&
+                    gpGame->m_heroRecs[heroIndex].m_owner <= CHECK_END_GAME_PLAYER_COUNT - 1) {
+                    hasRoland = 1;
+                }
+            }
+            if (!hasRoland) {
+                defeat = 1;
+                if (!dialogShown) {
+                    dialogShown = 1;
+                    sprintf(gText, "Roland has been captured!  All is lost.");
+                    NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                }
+            }
+        }
+
+        if (gbInCampaign && gpGame->m_campaignType == CHECK_END_GAME_ROLAND_CAMPAIGN &&
+            gpGame->m_campaignScenario + CHECK_END_GAME_SCENARIO_OFFSET == CHECK_END_GAME_ROLAND_CAPTURE_SCENARIO) {
+            enemyRemains = 0;
+            for (player = 0; player < gpGame->m_playerCount; player++) {
+                if (!gpGame->m_playerDead[player] && gpGame->m_players[player].color != CHECK_END_GAME_ROLAND_COLOR &&
+                    gpGame->m_players[player].color != CHECK_END_GAME_ALLY_COLOR) {
+                    enemyRemains = 1;
+                }
+            }
+            if (!enemyRemains) {
+                victory = 1;
+                if (!dialogShown && victory) {
+                    dialogShown = 1;
+                    sprintf(gText, "The enemy is beaten.  Your side has triumphed!");
+                    NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                }
+            }
+        }
+
+        if (defeat) {
+            gbGameOver = 1;
+            giEndSequence = 0;
+        }
+        if (victory) {
+            gbGameOver = 1;
+            giEndSequence = 1;
+        }
+
+        if (aliveCount == 1 || aliveHumanCount == 0 || (aliveHumanCount == 1 && !gbThisNetHumanPlayer[lastHuman])) {
+            if (aliveHumanCount == 1 && gbThisNetHumanPlayer[lastHuman]) {
+                if (normalVictoryAllowed) {
+                    gbGameOver = 1;
+                    giEndSequence = 1;
+                }
+            } else {
+                gbGameOver = 1;
+                giEndSequence = 0;
+            }
+        }
+
+        if (savedRemoteOn && aliveThisNetHumanCount == 0) {
+            gbGameOver = 1;
+            giEndSequence = 0;
+        }
+        if (forcedResult == CHECK_END_GAME_FORCE_VICTORY) {
+            victory = 1;
+            gbGameOver = 1;
+            giEndSequence = 1;
+        }
+        if (forcedResult == CHECK_END_GAME_FORCE_DEFEAT) {
+            defeat = 1;
+            gbGameOver = 1;
+            giEndSequence = 0;
+        }
+
+        if (giEndSequence == 1 && gbGameOver) {
+            victory = 1;
+        }
+        if (giEndSequence == 0 && gbGameOver) {
+            defeat = 1;
+        }
+
+        if (gbInCampaign && victory) {
+            currentDay = (gpGame->m_week - 1) * CHECK_END_GAME_DAYS_PER_WEEK +
+                         (gpGame->m_month - 1) * CHECK_END_GAME_DAYS_PER_MONTH + gpGame->m_day;
+            gpGame->m_campaignScenarioWon = 1;
+            gpGame->m_campaignScenarioCompleted[gpGame->m_campaignType][gpGame->m_campaignScenario] = 1;
+            gpGame->m_campaignScenarioDays[gpGame->m_campaignType][gpGame->m_campaignScenario] = currentDay;
+            gpGame->m_campaignScore =
+                gpGame->m_campaignScenarioDays[gpGame->m_campaignType][gpGame->m_campaignScenario] +
+                gpGame->m_campaignScenarioBonus[gpGame->m_campaignType][gpGame->m_campaignScenario];
+
+            carryoverHeroId = CHECK_END_GAME_NO_PLAYER;
+            if (gpGame->m_campaignType == CHECK_END_GAME_ROLAND_CAMPAIGN &&
+                gpGame->m_campaignScenario + CHECK_END_GAME_SCENARIO_OFFSET == CHECK_END_GAME_SIDE_SCENARIO) {
+                carryoverHeroId = CHECK_END_GAME_SIDE_SPECIAL_VALUE;
+            }
+            if (gpGame->m_campaignType == CHECK_END_GAME_ARCHIBALD_CAMPAIGN &&
+                gpGame->m_campaignScenario + CHECK_END_GAME_SCENARIO_OFFSET == CHECK_END_GAME_FIRST_NO_SAVE_SCENARIO) {
+                carryoverHeroId = CHECK_END_GAME_SIDE_SPECIAL_VALUE;
+            }
+
+            if (carryoverHeroId != CHECK_END_GAME_NO_PLAYER) {
+                for (armySlot = 0; armySlot < CHECK_END_GAME_ARMY_SLOTS; armySlot++) {
+                    gpGame->m_campaignCarryoverCreatureTypes[armySlot] = CHECK_END_GAME_EMPTY_ARMY;
+                    gpGame->m_campaignCarryoverCreatureCounts[armySlot] = 0;
+                }
+                carryoverHeroIndex = 0;
+                while (carryoverHeroIndex < gpGame->m_players[0].heroCount &&
+                       carryoverHeroId != CHECK_END_GAME_SIDE_SPECIAL_VALUE &&
+                       gpGame->m_heroRecs[gpGame->m_players[0].heroes[carryoverHeroIndex]].m_portrait !=
+                           carryoverHeroId) {
+                    carryoverHeroIndex++;
+                }
+                if (gpGame->m_players[0].heroCount == carryoverHeroIndex) {
+                    gpGame->m_campaignCarryoverCreatureTypes[0] = 0;
+                    gpGame->m_campaignCarryoverCreatureCounts[0] = 1;
+                } else {
+                    for (armySlot = 0; armySlot < CHECK_END_GAME_ARMY_SLOTS; armySlot++) {
+                        gpGame->m_campaignCarryoverCreatureTypes[armySlot] =
+                            gpGame->m_heroRecs[gpGame->m_players[0].heroes[carryoverHeroIndex]]
+                                .m_army.m_creatureTypes[armySlot];
+                        gpGame->m_campaignCarryoverCreatureCounts[armySlot] =
+                            gpGame->m_heroRecs[gpGame->m_players[0].heroes[carryoverHeroIndex]]
+                                .m_army.m_creatureCounts[armySlot];
+                    }
+                }
+            }
+
+            if (gpGame->m_campaignScenario + CHECK_END_GAME_SCENARIO_OFFSET != CHECK_END_GAME_LAST_SCENARIO &&
+                (gpGame->m_campaignScenario + CHECK_END_GAME_SCENARIO_OFFSET != CHECK_END_GAME_FIRST_NO_SAVE_SCENARIO ||
+                 gpGame->m_campaignType != CHECK_END_GAME_ROLAND_CAMPAIGN)) {
+                sprintf(saveName, "%s%c_%02d", "WIN_",
+                        gpGame->m_campaignType == CHECK_END_GAME_ROLAND_CAMPAIGN ? 'G' : 'E',
+                        gpGame->m_campaignScenario + 1);
+                gpGame->SaveGame(saveName, 1, 0);
+            }
+        } else if (xIsPlayingExpansionCampaign && victory) {
+            xCampaign.Autosave();
+        }
+
+        bInCheckEndGame = 0;
+    }
+}
 
 VA(0x0049c07c, 0x95)
 void QuickViewWait(void)

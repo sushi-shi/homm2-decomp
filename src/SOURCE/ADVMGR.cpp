@@ -3609,7 +3609,7 @@ void advManager::HeroQuickView(int heroId, int locatorSlot, int windowX, int win
 
     quickViewMessageState.field4 = 4;
     quickViewMessageState.field8 = 2;
-    quickViewMessageState.field18 = targetHero->m_unknown18;
+    quickViewMessageState.field18 = targetHero->m_portrait;
     quickWindowSlot->BroadcastMessage(quickViewMessageState);
     quickViewMessageState.field4 = 4;
     quickViewMessageState.field8 = 8;
