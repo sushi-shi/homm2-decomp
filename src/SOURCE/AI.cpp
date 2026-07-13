@@ -4,15 +4,19 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <string.h>
 #include <SOURCE/CMBTMGR.h>
 #include <SOURCE/KB.h>
+#include <SOURCE/PATH.h>
 #include <SOURCE/PHILAI.h>
+#include <SOURCE/SPELLS.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/game.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/philAI.h>
+#include <SOURCE/searchArray.h>
 #include <SOURCE/town.h>
 
 VA(0x004c0790, 0x8d7)
@@ -72,7 +76,7 @@ int combatManager::AICheckRetreat(void)
                 armyGroupPtr1->m_creatureTypes[groupCount8] =
                     static_cast<signed char>(m_armies[side9][armyIndex36].m_monsterType);
                 if ((m_armies[side9][armyIndex36].m_monster.flags.all &
-                     COMBAT_ARMY_FLAG_FULL_AI_QUANTITY) != 0) {
+                     MONSTER_FLAGS_FULL_AI_QUANTITY) != 0) {
                     armyGroupPtr1->m_creatureCounts[groupCount8] =
                         static_cast<short>(m_armies[side9][armyIndex36].m_quantity);
                 } else {
@@ -296,12 +300,13 @@ void combatManager::DoCompAI(int)
         static_cast<int>(currentShooterStrength5))
         enemyStronger3 = 1;
 
-    if ((currentArmy9->m_monster.flags.all & COMBAT_ARMY_FLAG_SHOOTER) != 0) {
+    if ((currentArmy9->m_monster.flags.all & MONSTER_FLAGS_SHOOTER) != 0) {
         if (currentArmy9->m_monster.shots < 1)
             attackType3 = COMBAT_AI_ATTACK_WALK;
         else
             attackType3 = COMBAT_AI_ATTACK_SHOOT;
-    } else if ((currentArmy9->m_monster.flags.all & COMBAT_ARMY_FLAG_FLYER) != 0) {
+    } else if ((currentArmy9->m_monster.flags.all &
+                MONSTER_FLAGS_FLYING) != 0) {
         attackType3 = COMBAT_AI_ATTACK_FLY;
     } else {
         attackType3 = COMBAT_AI_ATTACK_WALK;
@@ -443,52 +448,566 @@ finish:
 }
 
 VA(0x004c2303, 0xc9)
-float combatManager::GetModLichDamage(class army *, float) { return 0; }
+float combatManager::GetModLichDamage(class army *target, float damage)
+{
+    float modifiedDamage = damage;
+    float remainingHitPoints = static_cast<float>(
+        target->m_monster.hitPoints * target->m_quantity -
+        target->m_hitPointsLost);
+
+    if (remainingHitPoints < modifiedDamage)
+        modifiedDamage = remainingHitPoints;
+    if ((target->m_monster.flags.all & MONSTER_FLAGS_SHOOTER) != 0)
+        modifiedDamage = static_cast<float>(
+            modifiedDamage * COMBAT_AI_LICH_PRIORITY_MULTIPLIER);
+    if ((target->m_monster.flags.all & MONSTER_FLAGS_FLYING) != 0)
+        modifiedDamage = static_cast<float>(
+            modifiedDamage * COMBAT_AI_LICH_PRIORITY_MULTIPLIER);
+    modifiedDamage = static_cast<float>(
+        (target->m_monster.hitPoints + COMBAT_AI_LICH_HIT_POINT_BONUS) *
+        modifiedDamage /
+        COMBAT_AI_LICH_HIT_POINT_SCALE);
+    return modifiedDamage;
+}
 
 VA(0x004c23cc, 0x32e)
-void combatManager::DoLichShot(class army *) {}
+void combatManager::DoLichShot(class army *lich)
+{
+    int bestArmy12 = COMBAT_AI_NO_ARMY;
+    float bestDamage15 = COMBAT_AI_MIN_LICH_DAMAGE_SCORE;
+    float lichDamage5 = static_cast<float>(
+        lich->m_quantity * COMBAT_AI_LICH_DAMAGE_PER_CREATURE);
+    int armyIndex37;
+    unsigned char damaged19[COMBAT_AI_SIDE_COUNT][COMBAT_AI_ARMY_SLOT_COUNT];
+    float damageValue10;
+    float adjacentDamage6;
+    int direction37;
+    int adjacentHex13;
+    int targetHex36;
+    army *target17;
+
+    for (armyIndex37 = 0;
+         armyIndex37 < m_armyCount[COMBAT_DEFENDER_SIDE - m_currentSide];
+         armyIndex37++) {
+        memset(damaged19, 0, sizeof(damaged19));
+        target17 = 0;
+        target17 = &m_armies[COMBAT_DEFENDER_SIDE - m_currentSide][armyIndex37];
+        if (target17 != 0 &&
+            (target17->m_monster.flags.all & MONSTER_FLAGS_AI_EXCLUDED) == 0) {
+            if (target17->m_quantity <= 0) {
+            } else {
+                damageValue10 = GetModLichDamage(target17, lichDamage5);
+                damaged19[target17->m_side][target17->m_index] = 1;
+                targetHex36 = target17->m_hex;
+                for (direction37 = 0;
+                     direction37 < COMBAT_AI_ADJACENT_DIRECTION_COUNT;
+                     direction37++) {
+                    adjacentHex13 = GetAdjacentCellIndexNoArmy(targetHex36, direction37);
+                    if (adjacentHex13 >= 0 && adjacentHex13 < COMBAT_HEX_COUNT &&
+                        m_hexCells[adjacentHex13].m_occupantSide != -1 &&
+                        m_hexCells[adjacentHex13].m_occupantIndex != -1 &&
+                        damaged19[m_hexCells[adjacentHex13].m_occupantSide]
+                               [m_hexCells[adjacentHex13].m_occupantIndex] == 0) {
+                        adjacentDamage6 = GetModLichDamage(
+                            &m_armies[m_hexCells[adjacentHex13].m_occupantSide]
+                                     [m_hexCells[adjacentHex13].m_occupantIndex],
+                            lichDamage5);
+                        damaged19[m_hexCells[adjacentHex13].m_occupantSide]
+                               [m_hexCells[adjacentHex13].m_occupantIndex] = 1;
+                        if (m_hexCells[adjacentHex13].m_occupantSide == m_currentSide)
+                            damageValue10 -= adjacentDamage6;
+                        else
+                            damageValue10 += adjacentDamage6;
+                    }
+                }
+                if (bestArmy12 == COMBAT_AI_NO_ARMY || bestDamage15 < damageValue10) {
+                    bestDamage15 = damageValue10;
+                    bestArmy12 = armyIndex37;
+                    giNextAction = COMBAT_AI_ACTION_MOVE;
+                    giNextActionGridIndex = targetHex36;
+                }
+            }
+        }
+    }
+}
 
 VA(0x004c26fa, 0x131)
-int combatManager::GetShooterMask(int) { return 0; }
+int combatManager::GetShooterMask(int side)
+{
+    int armyIndex2 = 0;
+    unsigned int bit1 = COMBAT_AI_MASK_FIRST_BIT;
+    unsigned int mask5 = 0;
+    army *currentArmy10;
+
+    for (armyIndex2 = 0; armyIndex2 < m_armyCount[side]; armyIndex2++) {
+        currentArmy10 = m_armies[side] + armyIndex2;
+        if (currentArmy10 != 0 &&
+            (currentArmy10->m_monster.flags.all &
+             MONSTER_FLAGS_AI_EXCLUDED) == 0 &&
+            (currentArmy10->m_monster.flags.all & MONSTER_FLAGS_SHOOTER) != 0 &&
+            currentArmy10->m_monster.shots > 0 &&
+            currentArmy10->m_spellInfluence[SPELL_INFLUENCE_BLIND] == 0 &&
+            currentArmy10->m_spellInfluence[SPELL_INFLUENCE_PARALYZE] == 0 &&
+            currentArmy10->m_spellInfluence[SPELL_INFLUENCE_MIRROR_IMAGE] == 0 &&
+            currentArmy10->m_spellInfluence[SPELL_INFLUENCE_BERSERKER] == 0 &&
+            currentArmy10->m_spellInfluence[SPELL_INFLUENCE_HYPNOTIZE] == 0)
+            mask5 |= bit1;
+        bit1 <<= 1;
+    }
+    return mask5;
+}
 
 VA(0x004c282b, 0xc0)
-int combatManager::GetMirrorImageMask(int) { return 0; }
+int combatManager::GetMirrorImageMask(int side)
+{
+    int armyIndex2 = 0;
+    unsigned int bit1 = COMBAT_AI_MASK_FIRST_BIT;
+    unsigned int mask5 = 0;
+    army *currentArmy10;
+
+    for (armyIndex2 = 0; armyIndex2 < m_armyCount[side]; armyIndex2++) {
+        currentArmy10 = m_armies[side] + armyIndex2;
+        if (currentArmy10 != 0 &&
+            (currentArmy10->m_monster.flags.all &
+             MONSTER_FLAGS_AI_EXCLUDED) == 0 &&
+            (currentArmy10->m_monster.flags.all &
+             MONSTER_FLAGS_MIRROR_IMAGE) != 0)
+            mask5 |= bit1;
+        bit1 <<= 1;
+    }
+    return mask5;
+}
 
 VA(0x004c28eb, 0x11f)
-int combatManager::GetFlyerMask(int) { return 0; }
+int combatManager::GetFlyerMask(int side)
+{
+    int armyIndex2 = 0;
+    unsigned int bit1 = COMBAT_AI_MASK_FIRST_BIT;
+    unsigned int mask5 = 0;
+    army *currentArmy10;
+
+    for (armyIndex2 = 0; armyIndex2 < m_armyCount[side]; armyIndex2++) {
+        currentArmy10 = m_armies[side] + armyIndex2;
+        if (currentArmy10 != 0 &&
+            (currentArmy10->m_monster.flags.all &
+             MONSTER_FLAGS_AI_EXCLUDED) == 0 &&
+            (currentArmy10->m_monster.flags.all & MONSTER_FLAGS_FLYING) != 0 &&
+            currentArmy10->m_spellInfluence[SPELL_INFLUENCE_BLIND] == 0 &&
+            currentArmy10->m_spellInfluence[SPELL_INFLUENCE_PARALYZE] == 0 &&
+            currentArmy10->m_spellInfluence[SPELL_INFLUENCE_MIRROR_IMAGE] == 0 &&
+            currentArmy10->m_spellInfluence[SPELL_INFLUENCE_BERSERKER] == 0 &&
+            currentArmy10->m_spellInfluence[SPELL_INFLUENCE_HYPNOTIZE] == 0)
+            mask5 |= bit1;
+        bit1 <<= 1;
+    }
+    return mask5;
+}
 
 VA(0x004c2a0a, 0xc0)
-int combatManager::GetAllMask(int) { return 0; }
+int combatManager::GetAllMask(int side)
+{
+    int armyIndex2 = 0;
+    unsigned int bit1 = COMBAT_AI_MASK_FIRST_BIT;
+    unsigned int mask5 = 0;
+    army *currentArmy10;
+
+    for (armyIndex2 = 0; armyIndex2 < m_armyCount[side]; armyIndex2++) {
+        currentArmy10 = m_armies[side] + armyIndex2;
+        if (currentArmy10 != 0 &&
+            (currentArmy10->m_monster.flags.all &
+             MONSTER_FLAGS_AI_EXCLUDED) == 0 &&
+            currentArmy10->m_quantity > 0)
+            mask5 |= bit1;
+        bit1 <<= 1;
+    }
+    return mask5;
+}
 
 VA(0x004c2aca, 0x141)
-int combatManager::GetWalkerMask(int) { return 0; }
+int combatManager::GetWalkerMask(int side)
+{
+    int armyIndex2 = 0;
+    unsigned int bit1 = COMBAT_AI_MASK_FIRST_BIT;
+    unsigned int mask5 = 0;
+    army *currentArmy10;
+
+    for (armyIndex2 = 0; armyIndex2 < m_armyCount[side]; armyIndex2++) {
+        currentArmy10 = m_armies[side] + armyIndex2;
+        if (currentArmy10 != 0 &&
+            (currentArmy10->m_monster.flags.all &
+             MONSTER_FLAGS_AI_EXCLUDED) == 0 &&
+            (currentArmy10->m_monster.flags.all & MONSTER_FLAGS_FLYING) == 0 &&
+            ((currentArmy10->m_monster.flags.all & MONSTER_FLAGS_SHOOTER) == 0 ||
+             currentArmy10->m_monster.shots < 1) &&
+            currentArmy10->m_spellInfluence[SPELL_INFLUENCE_BLIND] == 0 &&
+            currentArmy10->m_spellInfluence[SPELL_INFLUENCE_PARALYZE] == 0 &&
+            currentArmy10->m_spellInfluence[SPELL_INFLUENCE_MIRROR_IMAGE] == 0 &&
+            currentArmy10->m_spellInfluence[SPELL_INFLUENCE_BERSERKER] == 0 &&
+            currentArmy10->m_spellInfluence[SPELL_INFLUENCE_HYPNOTIZE] == 0)
+            mask5 |= bit1;
+        bit1 <<= 1;
+    }
+    return mask5;
+}
 
 VA(0x004c2c0b, 0xe9)
-int combatManager::GetOutOfItMask(int) { return 0; }
+int combatManager::GetOutOfItMask(int side)
+{
+    int armyIndex2 = 0;
+    unsigned int bit1 = COMBAT_AI_MASK_FIRST_BIT;
+    unsigned int mask5 = 0;
+    army *currentArmy10;
+
+    for (armyIndex2 = 0; armyIndex2 < m_armyCount[side]; armyIndex2++) {
+        currentArmy10 = m_armies[side] + armyIndex2;
+        if (currentArmy10 != 0 &&
+            (currentArmy10->m_monster.flags.all &
+             MONSTER_FLAGS_AI_EXCLUDED) == 0 &&
+            (currentArmy10->m_spellInfluence[SPELL_INFLUENCE_BLIND] != 0 ||
+             currentArmy10->m_spellInfluence[SPELL_INFLUENCE_PARALYZE] != 0 ||
+             currentArmy10->m_spellInfluence[SPELL_INFLUENCE_MIRROR_IMAGE] != 0))
+            mask5 |= bit1;
+        bit1 <<= 1;
+    }
+    return mask5;
+}
 
 VA(0x004c2cf4, 0xd6)
-int combatManager::GetTraitorMask(int) { return 0; }
+int combatManager::GetTraitorMask(int side)
+{
+    int armyIndex2 = 0;
+    unsigned int bit1 = COMBAT_AI_MASK_FIRST_BIT;
+    unsigned int mask5 = 0;
+    army *currentArmy10;
+
+    for (armyIndex2 = 0; armyIndex2 < m_armyCount[side]; armyIndex2++) {
+        currentArmy10 = m_armies[side] + armyIndex2;
+        if (currentArmy10 != 0 &&
+            (currentArmy10->m_monster.flags.all &
+             MONSTER_FLAGS_AI_EXCLUDED) == 0 &&
+            (currentArmy10->m_spellInfluence[SPELL_INFLUENCE_BERSERKER] != 0 ||
+             currentArmy10->m_spellInfluence[SPELL_INFLUENCE_HYPNOTIZE] != 0))
+            mask5 |= bit1;
+        bit1 <<= 1;
+    }
+    return mask5;
+}
 
 VA(0x004c2dca, 0x1f1)
-int combatManager::GetBestArmy(int, int) { return 0; }
+int combatManager::GetBestArmy(int side, int mask)
+{
+    int armyIndex2 = 0;
+    unsigned int bit1 = COMBAT_AI_MASK_FIRST_BIT;
+    unsigned long bestStrength8 = 0;
+    int bestArmy1 = COMBAT_AI_NO_ARMY;
+    unsigned long strength8;
+
+    for (armyIndex2 = 0; armyIndex2 < m_armyCount[side]; armyIndex2++) {
+        if ((mask & bit1) != 0) {
+            strength8 = (m_armies[side] + armyIndex2)->Strength();
+            if ((m_armies[side] + armyIndex2)
+                        ->m_spellInfluence[SPELL_INFLUENCE_BLIND] != 0 ||
+                (m_armies[side] + armyIndex2)
+                        ->m_spellInfluence[SPELL_INFLUENCE_PARALYZE] != 0 ||
+                (m_armies[side] + armyIndex2)
+                        ->m_spellInfluence[SPELL_INFLUENCE_MIRROR_IMAGE] != 0 ||
+                (m_armies[side] + armyIndex2)
+                        ->m_spellInfluence[SPELL_INFLUENCE_BERSERKER] != 0 ||
+                (m_armies[side] + armyIndex2)
+                        ->m_spellInfluence[SPELL_INFLUENCE_HYPNOTIZE] != 0)
+                strength8 >>= 1;
+            if (bestStrength8 < strength8) {
+                bestArmy1 = armyIndex2;
+                bestStrength8 = strength8;
+            }
+        }
+        bit1 <<= 1;
+    }
+    return bestArmy1;
+}
 
 VA(0x004c2fbb, 0xc2)
-int combatManager::GetWorstArmy(int, int) { return 0; }
+int combatManager::GetWorstArmy(int side, int mask)
+{
+    int armyIndex2 = 0;
+    unsigned int bit1 = COMBAT_AI_MASK_FIRST_BIT;
+    unsigned long worstStrength2 = COMBAT_AI_WORST_STRENGTH_LIMIT;
+    int worstArmy6 = COMBAT_AI_NO_ARMY;
+    unsigned long strength8;
+
+    for (armyIndex2 = 0; armyIndex2 < m_armyCount[side]; armyIndex2++) {
+        if ((mask & bit1) != 0) {
+            strength8 = m_armies[side][armyIndex2].Strength();
+            if (strength8 < worstStrength2) {
+                worstArmy6 = armyIndex2;
+                worstStrength2 = strength8;
+            }
+        }
+        bit1 <<= 1;
+    }
+    return worstArmy6;
+}
 
 VA(0x004c307d, 0x16f)
-int combatManager::GetClosestArmy(class army *, int, int) { return 0; }
+int combatManager::GetClosestArmy(class army *currentArmy, int side, int mask)
+{
+    unsigned int bit = COMBAT_AI_MASK_FIRST_BIT;
+    int closestValue = COMBAT_AI_CLOSEST_ARMY_LIMIT;
+    int closestArmy = COMBAT_AI_NO_ARMY;
+    int armyIndex = 0;
+    int distance;
+    int value;
+    army *target;
+
+    for (armyIndex = 0; armyIndex < m_armyCount[side]; armyIndex++) {
+        if ((mask & bit) != 0) {
+            target = &m_armies[side][armyIndex];
+            distance = gpSearchArray->QuickDistance(
+                m_hexCells[currentArmy->m_hex].m_x,
+                m_hexCells[currentArmy->m_hex].m_y,
+                m_hexCells[target->m_hex].m_x,
+                m_hexCells[target->m_hex].m_y);
+            value = distance * COMBAT_AI_DISTANCE_WEIGHT -
+                target->m_monster.hitPoints * target->m_quantity;
+            if (closestValue > value) {
+                closestArmy = armyIndex;
+                closestValue = value;
+            }
+        }
+        bit <<= 1;
+    }
+    return closestArmy;
+}
 
 VA(0x004c31ec, 0xc1)
-unsigned long int combatManager::GetStrength(int, int) { return 0; }
+unsigned long int combatManager::GetStrength(int side, int mask)
+{
+    int armyIndex4 = 0;
+    unsigned int bit36 = COMBAT_AI_MASK_FIRST_BIT;
+    unsigned long strength7 = 0;
+    army *currentArmy8;
+
+    for (armyIndex4 = 0; armyIndex4 < m_armyCount[side]; armyIndex4++) {
+        if ((bit36 & mask) != 0) {
+            currentArmy8 = &m_armies[side][armyIndex4];
+            if (currentArmy8 != 0 &&
+                (currentArmy8->m_monster.flags.all &
+                 MONSTER_FLAGS_AI_EXCLUDED) == 0)
+                strength7 += currentArmy8->Strength();
+        }
+        bit36 <<= 1;
+    }
+    return strength7;
+}
 
 VA(0x004c32ad, 0x1bb)
-int combatManager::AttemptAttack(class army *, int, int) { return 0; }
+int combatManager::AttemptAttack(class army *currentArmy, int side, int mask)
+{
+    int targetArmy;
+    int targetHex;
+
+    while (mask != 0) {
+        if (currentArmy->m_monsterType == ARMY_CREATURE_GHOST)
+            targetArmy = GetWorstArmy(side, mask);
+        else
+            targetArmy = GetBestArmy(side, mask);
+        if (targetArmy == COMBAT_AI_NO_ARMY)
+            return 0;
+
+        currentArmy->m_targetSide = side;
+        currentArmy->m_targetIndex = targetArmy;
+        targetHex = m_armies[side][targetArmy].m_hex;
+        currentArmy->m_moveTargetHex = targetHex;
+        if (currentArmy->ValidPath(targetHex, 0)) {
+            giNextAction = COMBAT_AI_ACTION_MOVE;
+            giNextActionGridIndex = targetHex;
+            return 1;
+        }
+        if ((m_armies[side][targetArmy].m_monster.flags.all &
+             MONSTER_FLAGS_WIDE) != 0) {
+            if (m_armies[side][targetArmy].m_facing == 0)
+                targetHex--;
+            else
+                targetHex++;
+            currentArmy->m_moveTargetHex = targetHex;
+            if (currentArmy->ValidPath(targetHex, 0)) {
+                giNextAction = COMBAT_AI_ACTION_MOVE;
+                giNextActionGridIndex = targetHex;
+                return 1;
+            }
+        }
+        mask &= ~(1 << targetArmy);
+    }
+    return 0;
+}
 
 VA(0x004c3468, 0x182)
-int combatManager::AttemptAdjacentAttack(class army *) { return 0; }
+int combatManager::AttemptAdjacentAttack(class army *currentArmy)
+{
+    unsigned int availableMask = ~currentArmy->GetAttackMask(
+        currentArmy->m_hex, 1, -1);
+    unsigned int bit;
+    unsigned int targetMask;
+    int direction;
+    int attackHexes[2];
+    int targetArmy;
+
+    if (availableMask == 0)
+        return 0;
+
+    bit = COMBAT_AI_MASK_FIRST_BIT;
+    targetMask = 0;
+    for (direction = 0;
+         direction < COMBAT_AI_ATTACK_DIRECTION_COUNT;
+         direction++) {
+        if ((availableMask & bit) != 0 &&
+            currentArmy->ValidAttack(currentArmy->m_hex, direction,
+                                     1, -1, attackHexes) &&
+            attackHexes[0] >= 0)
+            targetMask |= 1 << m_hexCells[attackHexes[0]].m_occupantIndex;
+        bit <<= 1;
+    }
+    if (currentArmy->m_monsterType == ARMY_CREATURE_GHOST)
+        targetArmy = GetWorstArmy(
+            COMBAT_DEFENDER_SIDE - m_currentSide, targetMask);
+    else
+        targetArmy = GetBestArmy(
+            COMBAT_DEFENDER_SIDE - m_currentSide, targetMask);
+    if (targetArmy != COMBAT_AI_NO_ARMY) {
+        giNextAction = COMBAT_AI_ACTION_MOVE;
+        giNextActionGridIndex =
+            m_armies[COMBAT_DEFENDER_SIDE - m_currentSide][targetArmy].m_hex;
+        return 1;
+    }
+    return 0;
+}
 
 VA(0x004c35ea, 0x240)
-int combatManager::WalkTowardArmyFront(class army *, int, int) { return 0; }
+int combatManager::WalkTowardArmyFront(class army *currentArmy,
+                                      int side, int mask)
+{
+    int targetArmy6;
+    int frontOffset13;
+    int targetHex7;
+    int savedSpeed11;
+    int pathFound6;
+    int movement3;
+    int pathIndex12;
+
+    currentArmy->m_targetSide = COMBAT_AI_NO_ARMY;
+    currentArmy->m_targetIndex = COMBAT_AI_NO_ARMY;
+    targetArmy6 = GetClosestArmy(currentArmy, side, mask);
+    if (targetArmy6 == COMBAT_AI_NO_ARMY)
+        return 0;
+
+    targetHex7 = m_armies[side][targetArmy6].m_hex;
+    frontOffset13 = 1;
+    if ((m_armies[side][targetArmy6].m_monster.flags.all &
+         MONSTER_FLAGS_WIDE) != 0)
+        frontOffset13 = 2;
+    if (currentArmy->m_facing == 1)
+        targetHex7 += frontOffset13;
+    else
+        targetHex7 += -frontOffset13;
+    if (targetHex7 % ARMY_HEX_COLUMNS == ARMY_HEX_COLUMNS - 1 ||
+        targetHex7 % ARMY_HEX_COLUMNS == 0)
+        return WalkTowardArmy(currentArmy, side, mask);
+
+    savedSpeed11 = currentArmy->m_monster.speed;
+    currentArmy->m_monster.speed = COMBAT_AI_UNLIMITED_PATH_SPEED;
+    pathFound6 = gpSearchArray->FindCombatPath(
+        currentArmy->m_hex, targetHex7, currentArmy,
+        COMBAT_AI_PATH_TO_FRONT, 0);
+    currentArmy->m_monster.speed = static_cast<signed char>(savedSpeed11);
+    if (gpSearchArray->m_pathLength > 0) {
+        giNextAction = COMBAT_AI_ACTION_MOVE;
+        movement3 = currentArmy->m_monster.speed;
+        pathIndex12 = gpSearchArray->m_pathLength - 1;
+        giNextActionGridIndex = currentArmy->m_hex;
+        while (pathIndex12 >= 0 && movement3 != 0) {
+            giNextActionGridIndex = currentArmy->GetAdjacentCellIndex(
+                giNextActionGridIndex,
+                static_cast<unsigned char>(
+                    gpSearchArray->m_storage.aiPath.directions[pathIndex12]));
+            pathIndex12--;
+            movement3--;
+            if (giNextActionGridIndex > 0 &&
+                reinterpret_cast<unsigned char *>(&bIsMoatSlowed)
+                    [giNextActionGridIndex] != 0)
+                movement3 = 0;
+        }
+        return 1;
+    }
+    return WalkTowardArmy(currentArmy, side, mask);
+}
 
 VA(0x004c382a, 0x244)
-int combatManager::WalkTowardArmy(class army *, int, int) { return 0; }
+int combatManager::WalkTowardArmy(class army *currentArmy, int side, int mask)
+{
+    int targetArmy6;
+    army *targetPtr9;
+    int targetHex7;
+    int attackMask36;
+    int savedSpeed12;
+    int pathFound5;
+    int unusedPath8;
+    int movement27;
+    int pathIndex14;
+
+    targetArmy6 = GetClosestArmy(currentArmy, side, mask);
+
+    if (targetArmy6 == COMBAT_AI_NO_ARMY)
+        return 0;
+
+    targetPtr9 = &m_armies[side][targetArmy6];
+    targetHex7 = targetPtr9->m_hex;
+    currentArmy->m_targetSide = side;
+    currentArmy->m_targetIndex = targetArmy6;
+    attackMask36 = currentArmy->GetAttackMask(currentArmy->m_hex, 0, -1);
+    if (attackMask36 != COMBAT_AI_ALL_ATTACK_DIRECTIONS) {
+        giNextAction = COMBAT_AI_ACTION_WAIT;
+        return 1;
+    }
+
+    savedSpeed12 = currentArmy->m_monster.speed;
+    currentArmy->m_monster.speed = COMBAT_AI_UNLIMITED_PATH_SPEED;
+    pathFound5 = gpSearchArray->FindCombatPath(
+        currentArmy->m_hex, targetHex7, currentArmy,
+        COMBAT_AI_PATH_TO_TARGET, 0);
+    if (pathFound5 == 0 &&
+        (targetPtr9->m_monster.flags.all & MONSTER_FLAGS_WIDE) != 0) {
+        switch (targetPtr9->m_facing) {
+        case 0:
+            targetHex7--;
+            break;
+        case 1:
+            targetHex7++;
+            break;
+        }
+        if (targetHex7 != COMBAT_AI_NO_ARMY)
+            pathFound5 = gpSearchArray->FindCombatPath(
+                currentArmy->m_hex, targetHex7, currentArmy,
+                COMBAT_AI_PATH_TO_TARGET, 0);
+    }
+    currentArmy->m_monster.speed = static_cast<signed char>(savedSpeed12);
+    if (gpSearchArray->m_pathLength > 1) {
+        giNextAction = COMBAT_AI_ACTION_MOVE;
+        movement27 = currentArmy->m_monster.speed;
+        pathIndex14 = gpSearchArray->m_pathLength - 1;
+        giNextActionGridIndex = currentArmy->m_hex;
+        while (pathIndex14 >= 1 && movement27 != 0) {
+            giNextActionGridIndex = currentArmy->GetAdjacentCellIndex(
+                giNextActionGridIndex,
+                static_cast<unsigned char>(
+                    gpSearchArray->m_storage.aiPath.directions[pathIndex14]));
+            pathIndex14--;
+            movement27--;
+            if (giNextActionGridIndex > 0 &&
+                reinterpret_cast<unsigned char *>(&bIsMoatSlowed)
+                    [giNextActionGridIndex] != 0)
+                movement27 = 0;
+        }
+        return 1;
+    }
+    return 0;
+}

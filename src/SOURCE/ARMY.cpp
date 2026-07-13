@@ -1767,7 +1767,7 @@ void army::DamageEnemy(army *target, int *damageResult, int *killedResult,
     if (damageDone <= 0) {
         damageDone = 1;
     }
-    if (target->m_monster.flags.all & MONSTER_FLAGS_LIGHT_PALETTE) {
+    if (target->m_monster.flags.all & MONSTER_FLAGS_MIRROR_IMAGE) {
         damageDone = -1;
     }
     *damageResult = damageDone;
