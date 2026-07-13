@@ -316,11 +316,15 @@ VA(0x004dcb10, 0x81f)
 void dropListWidget::ProcessSelectDialog(void)
 {
     IconEntry *iconEntry;
-    short scrollWidth;
-    short scrollTopHeight;
-    short scrollBottomWidth;
+    // Retail reserves a four-byte stack object for each 16-bit dimension temporary.
+    short scrollWidth[2];
+    short scrollTopHeight[2];
+    short scrollBottomWidth[2];
     short scrollBottomHeight;
+    tag_message message;
     int firstRelease = 1;
+    int ownerX;
+    int ownerY;
     field_0xac = 0;
     field_0xad = 0;
     field_0xaf = 0;
@@ -354,28 +358,28 @@ void dropListWidget::ProcessSelectDialog(void)
     field_0x86 = reinterpret_cast<IconEntry *>(m_icon->m_data)[field_0x4e].w;
     field_0x88 = (field_0x32 - 2) * field_0x76 + field_0x74 + field_0x78;
     iconEntry = reinterpret_cast<IconEntry *>(m_icon->m_data) + field_0x54;
-    scrollWidth = iconEntry->w;
-    field_0x8e = scrollWidth;
-    scrollTopHeight = iconEntry->h;
-    field_0x90 = scrollTopHeight;
+    scrollWidth[0] = iconEntry->w;
+    field_0x8e = scrollWidth[0];
+    scrollTopHeight[0] = iconEntry->h;
+    field_0x90 = scrollTopHeight[0];
     iconEntry = reinterpret_cast<IconEntry *>(m_icon->m_data) + field_0x58;
-    scrollBottomWidth = iconEntry->w;
-    field_0x9e = scrollBottomWidth;
+    scrollBottomWidth[0] = iconEntry->w;
+    field_0x9e = scrollBottomWidth[0];
     scrollBottomHeight = iconEntry->h;
     field_0xa0 = scrollBottomHeight;
     field_0x7a = m_iconX;
     field_0x7c = field_0x84;
-    field_0x7e = field_0x46 > 0 ? scrollWidth + field_0x86 : field_0x86;
+    field_0x7e = field_0x46 > 0 ? scrollWidth[0] + field_0x86 : field_0x86;
     field_0x80 = field_0x88;
 
     if (field_0x46 > 0) {
-        field_0x8a = m_x + m_width - scrollWidth;
+        field_0x8a = m_x + m_width - scrollWidth[0];
         field_0x8c = field_0x84;
         field_0x9a = field_0x8a;
         field_0x9c = field_0x84 - scrollBottomHeight + field_0x88;
         field_0x92 = field_0x8a;
-        field_0x94 = field_0x84 + scrollTopHeight;
-        field_0x96 = scrollBottomWidth;
+        field_0x94 = field_0x84 + scrollTopHeight[0];
+        field_0x96 = scrollBottomWidth[0];
         field_0x98 = field_0x9c - field_0x94;
         field_0xaa = field_0x98 - field_0xa8 - 7;
     }
@@ -387,16 +391,14 @@ void dropListWidget::ProcessSelectDialog(void)
     m_savedBackground = new bitmap(0, field_0x7e, field_0x80);
     m_savedBackground->GrabScreen(field_0x7a, field_0x7c);
 
-redraw:
     DrawDropStuff();
     for (;;) {
         PollSound();
         Process1WindowsMessage();
-        tag_message message;
         message = gpInputManager->GetEvent();
         gpMouseManager->Main(message);
-        int ownerX = m_owner->m_posX;
-        int ownerY = m_owner->m_posY;
+        ownerX = m_owner->m_posX;
+        ownerY = m_owner->m_posY;
         int mouseX = message.field10 - ownerX;
         int mouseY = message.field14 - ownerY;
 
@@ -406,14 +408,16 @@ redraw:
             case 0x47:
                 m_topIndex = 0;
                 m_selectedIndex = 0;
-                goto redraw;
+                DrawDropStuff();
+                continue;
             case 0x48:
                 if (m_selectedIndex > 0) {
                     m_selectedIndex--;
                     if (m_selectedIndex > 0 && m_selectedIndex < m_topIndex)
                         m_topIndex = m_selectedIndex;
                 }
-                goto redraw;
+                DrawDropStuff();
+                continue;
             case 0x49:
                 m_topIndex = m_topIndex - field_0x30 + 1;
                 if (m_topIndex < 0)
@@ -421,17 +425,20 @@ redraw:
                 m_selectedIndex = m_selectedIndex - field_0x30 + 1;
                 if (m_selectedIndex < 0)
                     m_selectedIndex = 0;
-                goto redraw;
+                DrawDropStuff();
+                continue;
             case 0x4f:
                 m_topIndex = field_0x46;
                 m_selectedIndex = m_itemCount - 1;
-                goto redraw;
+                DrawDropStuff();
+                continue;
             case 0x50:
                 if (m_selectedIndex < m_itemCount - 1)
                     m_selectedIndex++;
                 if (m_topIndex + field_0x30 - 1 < m_selectedIndex)
                     m_topIndex = m_selectedIndex - field_0x30 + 1;
-                goto redraw;
+                DrawDropStuff();
+                continue;
             case 0x51:
                 m_topIndex = m_topIndex - 1 + field_0x30;
                 if (field_0x46 < m_topIndex)
@@ -439,26 +446,13 @@ redraw:
                 m_selectedIndex = m_selectedIndex - 1 + field_0x30;
                 if (m_itemCount - 1 < m_selectedIndex)
                     m_selectedIndex = m_itemCount - 1;
-                goto redraw;
+                DrawDropStuff();
+                continue;
             }
             break;
 
         case 4:
-            if (field_0xaf == 0) {
-                if (field_0xae != 0) {
-                    int scrollRange = field_0x46;
-                    int top = ((mouseY - field_0xa8 / 2 - field_0x94 - 4) *
-                        (scrollRange + 1)) / field_0xaa;
-                    if (top < 0)
-                        top = 0;
-                    if (scrollRange < top)
-                        top = scrollRange;
-                    if (m_topIndex != top) {
-                        m_topIndex = static_cast<short>(top);
-                        goto redraw;
-                    }
-                }
-            } else {
+            if (field_0xaf != 0) {
                 int item;
                 if (field_0x74 < mouseY - field_0x84)
                     item = (mouseY - field_0x84 - field_0x74) / field_0x76 + 1;
@@ -471,7 +465,21 @@ redraw:
                 int selected = m_topIndex + item;
                 if (selected < m_itemCount && m_selectedIndex != selected) {
                     m_selectedIndex = static_cast<short>(item) + m_topIndex;
-                    goto redraw;
+                    DrawDropStuff();
+                    continue;
+                }
+            } else if (field_0xae != 0) {
+                int scrollRange = field_0x46;
+                int top = ((mouseY - field_0xa8 / 2 - field_0x94 - 4) *
+                    (scrollRange + 1)) / field_0xaa;
+                if (top < 0)
+                    top = 0;
+                if (scrollRange < top)
+                    top = scrollRange;
+                if (m_topIndex != top) {
+                    m_topIndex = static_cast<short>(top);
+                    DrawDropStuff();
+                    continue;
                 }
             }
             break;
@@ -480,8 +488,20 @@ redraw:
             if (mouseX < field_0x7a || mouseY < field_0x7c ||
                 mouseX >= field_0x7a + field_0x7e || mouseY >= field_0x7c + field_0x80)
                 goto done;
-            if (mouseX < field_0x82 || mouseY < field_0x84 ||
-                mouseX >= field_0x82 + field_0x86 || mouseY >= field_0x84 + field_0x88) {
+            if (mouseX >= field_0x82 && mouseY >= field_0x84 &&
+                mouseX < field_0x82 + field_0x86 && mouseY < field_0x84 + field_0x88) {
+                int item;
+                if (field_0x74 < mouseY - field_0x84)
+                    item = m_topIndex + 1 + (mouseY - field_0x84 - field_0x74) / field_0x76;
+                else
+                    item = m_topIndex;
+                field_0xaf = 1;
+                if (item < m_itemCount && m_selectedIndex != item) {
+                    m_selectedIndex = static_cast<short>(item);
+                    DrawDropStuff();
+                    continue;
+                }
+            } else {
                 if (mouseY < field_0x8c + field_0x90) {
                     if (m_topIndex > 0)
                         m_topIndex--;
@@ -501,26 +521,16 @@ redraw:
                         m_topIndex++;
                     field_0xad = 1;
                 }
-                goto redraw;
-            }
-            {
-                int item;
-                if (field_0x74 < mouseY - field_0x84)
-                    item = m_topIndex + 1 + (mouseY - field_0x84 - field_0x74) / field_0x76;
-                else
-                    item = m_topIndex;
-                field_0xaf = 1;
-                if (item < m_itemCount && m_selectedIndex != item) {
-                    m_selectedIndex = static_cast<short>(item);
-                    goto redraw;
-                }
+                DrawDropStuff();
+                continue;
             }
             break;
 
         case 0x10:
             if (firstRelease) {
                 firstRelease = 0;
-                m_icon->DrawToBuffer(field_0x64 + ownerX, field_0x66 + ownerY, field_0x4a, 0);
+                m_icon->DrawToBuffer(field_0x64 + ownerX, field_0x66 + ownerY,
+                    field_0x4a, 0);
                 gpWindowManager->UpdateScreenRegion(m_owner->m_posX + field_0x64,
                     m_owner->m_posY + field_0x66, field_0x68, field_0x6a);
             } else {
@@ -530,7 +540,8 @@ redraw:
                     field_0xae = 0;
                     field_0xad = 0;
                     field_0xac = 0;
-                    goto redraw;
+                    DrawDropStuff();
+                    continue;
                 }
             }
             break;
