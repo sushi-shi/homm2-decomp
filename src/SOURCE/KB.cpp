@@ -10,6 +10,7 @@
 #include <BASE/executive.h>
 #include <BASE/mouseManager.h>
 #include <SOURCE/game.h>
+#include <SOURCE/GAME.h>
 #include <BASE/Misc.h>
 #include <BASE/WINMGR.h>
 #include <SOURCE/ADVMGR.h>
@@ -34,6 +35,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <fcntl.h>
+#include <io.h>
 
 #include <SOURCE/advManager.h>
 #include <SOURCE/hero.h>
@@ -43,6 +46,7 @@
 #include <BASE/resourceManager.h>
 #include <BASE/soundManager.h>
 #include <BASE/icon.h>
+#include <BASE/font.h>
 
 // Types now from headers: game/mouseManager/townManager/town/executive + combatManager/
 // palette/font -> _all.h; tag_message -> _carcass_types.h; SAMPLE2/tag_monsterInfo/SSpellInfo/
@@ -1116,10 +1120,193 @@ void InitVars(void)
 }
 
 VA(0x0049c312, 0x61b)
-void game::ShowMoraleInfo(class hero *, int) {}
+void game::ShowMoraleInfo(hero *h, int dialogType)
+{
+    int hasMixedUndead;
+    int alignment;
+    int homogeneous;
+    int modifierStart;
+    char description[200];
+    int morale;
+    int slot;
+
+    hasMixedUndead = 0;
+    morale = h->m_army.GetMorale(h, h->GetOccupiedTown(), 0);
+    if (morale > 0)
+        sprintf(description, cMoraleInfo[MORALE_INFO_GOOD]);
+    else {
+        morale = h->m_army.GetMorale(h, h->GetOccupiedTown(), 0);
+        if (morale == 0)
+            sprintf(description, cMoraleInfo[MORALE_INFO_NEUTRAL]);
+        else
+            sprintf(description, cMoraleInfo[MORALE_INFO_BAD]);
+    }
+
+    sprintf(gText, cMoraleInfo[MORALE_INFO_HEADER], description);
+    modifierStart = strlen(gText);
+    if (h->m_army.HasAllUndead()) {
+        strcat(gText, cMoraleInfo[MORALE_INFO_ALL_UNDEAD]);
+    } else {
+        if (h->m_army.HasSomeUndead() || h->HasArtifact(ARTIFACT_UNDEAD_MORALE)) {
+            strcat(gText, cMoraleInfo[MORALE_INFO_SOME_UNDEAD]);
+            hasMixedUndead = 1;
+        }
+
+        homogeneous = h->m_army.IsHomogeneous(-1);
+        if (hasMixedUndead && homogeneous > 0) {
+            homogeneous = 0;
+        }
+        if (homogeneous > 0) {
+            alignment = 0;
+            for (slot = 0; slot < 5; slot++) {
+                if (h->m_army.m_creatureTypes[slot] != -1) {
+                    alignment = gMonsterDatabase[h->m_army.m_creatureTypes[slot]].race;
+                }
+            }
+            sprintf(
+                description,
+                cMoraleInfo[MORALE_INFO_SAME_ALIGNMENT],
+                gAlignmentNames[alignment]
+            );
+            strcat(gText, description);
+        }
+        if (homogeneous == -1) {
+            sprintf(description, cMoraleInfo[MORALE_INFO_THREE_ALIGNMENTS]);
+            strcat(gText, description);
+        }
+        if (homogeneous == -2) {
+            sprintf(description, cMoraleInfo[MORALE_INFO_FOUR_ALIGNMENTS]);
+            strcat(gText, description);
+        }
+        if (homogeneous == -3) {
+            sprintf(description, cMoraleInfo[MORALE_INFO_FIVE_ALIGNMENTS]);
+            strcat(gText, description);
+        }
+
+        if (h->GetOccupiedTown() != 0 && h->GetOccupiedTown()->m_type == TOWN_TYPE_BARBARIAN
+            && (h->GetOccupiedTown()->m_buildings & TOWN_BUILDING_COLISEUM)) {
+            strcat(gText, cMoraleInfo[MORALE_INFO_COLISEUM]);
+        }
+        if (h->GetOccupiedTown() != 0
+            && (h->GetOccupiedTown()->m_buildings & TOWN_BUILDING_TAVERN)) {
+            strcat(gText, cMoraleInfo[MORALE_INFO_TAVERN]);
+        }
+
+        if (h->HasArtifact(ARTIFACT_MEDAL_OF_VALOR)) {
+            strcat(gText, cMoraleInfo[MORALE_INFO_MEDAL_OF_VALOR]);
+        }
+        if (h->HasArtifact(ARTIFACT_MEDAL_OF_COURAGE)) {
+            strcat(gText, cMoraleInfo[MORALE_INFO_MEDAL_OF_COURAGE]);
+        }
+        if (h->HasArtifact(ARTIFACT_MEDAL_OF_HONOR)) {
+            strcat(gText, cMoraleInfo[MORALE_INFO_MEDAL_OF_HONOR]);
+        }
+        if (h->HasArtifact(ARTIFACT_MEDAL_OF_DISTINCTION)) {
+            strcat(gText, cMoraleInfo[MORALE_INFO_MEDAL_OF_DISTINCTION]);
+        }
+        if (h->HasArtifact(ARTIFACT_FIZBIN_OF_MISFORTUNE)) {
+            strcat(gText, cMoraleInfo[MORALE_INFO_FIZBIN]);
+        }
+        if (h->m_eventFlags & HERO_EVENT_BUOY) {
+            strcat(gText, cMoraleInfo[MORALE_INFO_BUOY]);
+        }
+        if (h->m_eventFlags & HERO_EVENT_OASIS) {
+            strcat(gText, cMoraleInfo[MORALE_INFO_OASIS]);
+        }
+        if (h->m_eventFlags & HERO_EVENT_TEMPLE) {
+            strcat(gText, cMoraleInfo[MORALE_INFO_TEMPLE]);
+        }
+        if (h->m_eventFlags & HERO_EVENT_GRAVEYARD) {
+            strcat(gText, cMoraleInfo[MORALE_INFO_GRAVEYARD]);
+        }
+        if (h->m_eventFlags & HERO_EVENT_SHIPWRECK) {
+            strcat(gText, cMoraleInfo[MORALE_INFO_SHIPWRECK]);
+        }
+        if (h->m_eventFlags & HERO_EVENT_WATERING_HOLE) {
+            strcat(gText, cMoraleInfo[MORALE_INFO_WATERING_HOLE]);
+        }
+        if (h->m_eventFlags & HERO_EVENT_DERELICT_SHIP) {
+            strcat(gText, cMoraleInfo[MORALE_INFO_DERELICT_SHIP]);
+        }
+        if (h->m_secondarySkills[HERO_SKILL_LEADERSHIP] == HERO_SKILL_LEVEL_BASIC) {
+            strcat(gText, cMoraleInfo[MORALE_INFO_BASIC_LEADERSHIP]);
+        }
+        if (h->m_secondarySkills[HERO_SKILL_LEADERSHIP] == HERO_SKILL_LEVEL_ADVANCED) {
+            strcat(gText, cMoraleInfo[MORALE_INFO_ADVANCED_LEADERSHIP]);
+        }
+        if (h->m_secondarySkills[HERO_SKILL_LEADERSHIP] == HERO_SKILL_LEVEL_EXPERT) {
+            strcat(gText, cMoraleInfo[MORALE_INFO_EXPERT_LEADERSHIP]);
+        }
+        if (h->HasArtifact(ARTIFACT_MASTHEAD) && (h->m_eventFlags & HERO_EVENT_EMBARKED)) {
+            strcat(gText, cMoraleInfo[MORALE_INFO_MASTHEAD]);
+        }
+        if (h->HasArtifact(ARTIFACT_BATTLE_GARB)) {
+            strcat(gText, cMoraleInfo[MORALE_INFO_BATTLE_GARB]);
+        }
+        if (static_cast<int>(strlen(gText)) == modifierStart) {
+            strcat(gText, cMoraleInfo[MORALE_INFO_NONE]);
+        }
+    }
+
+    NormalDialog(gText, dialogType, -1, -1, -1, 0, -1, 0, -1, 0);
+}
 
 VA(0x0049c92d, 0x371)
-void game::ShowLuckInfo(class hero *, int) {}
+void game::ShowLuckInfo(hero *h, int dialogType)
+{
+    char description[200];
+    int luck;
+    int modifierStart;
+
+    luck = gpGame->GetLuck(h, 0, h->GetOccupiedTown());
+    if (luck > 0)
+        sprintf(description, cLuckInfo[LUCK_INFO_GOOD]);
+    else {
+        luck = gpGame->GetLuck(h, 0, h->GetOccupiedTown());
+        if (luck == 0)
+            sprintf(description, cLuckInfo[LUCK_INFO_NEUTRAL]);
+        else
+            sprintf(description, cLuckInfo[LUCK_INFO_BAD]);
+    }
+
+    sprintf(gText, cLuckInfo[LUCK_INFO_HEADER], description);
+    modifierStart = strlen(gText);
+    if (h->GetOccupiedTown() != 0 && h->GetOccupiedTown()->m_type == TOWN_TYPE_SORCERESS &&
+        (h->GetOccupiedTown()->m_buildings & TOWN_BUILDING_RAINBOW))
+        strcat(gText, cLuckInfo[LUCK_INFO_RAINBOW]);
+    if (h->HasArtifact(ARTIFACT_RABBIT_FOOT))
+        strcat(gText, cLuckInfo[LUCK_INFO_RABBIT_FOOT]);
+    if (h->HasArtifact(ARTIFACT_GOLDEN_HORSESHOE))
+        strcat(gText, cLuckInfo[LUCK_INFO_HORSESHOE]);
+    if (h->HasArtifact(ARTIFACT_GAMBLERS_LUCKY_COIN))
+        strcat(gText, cLuckInfo[LUCK_INFO_LUCKY_COIN]);
+    if (h->HasArtifact(ARTIFACT_FOUR_LEAF_CLOVER))
+        strcat(gText, cLuckInfo[LUCK_INFO_CLOVER]);
+    if (h->m_eventFlags & HERO_EVENT_FAERIE_RING)
+        strcat(gText, cLuckInfo[LUCK_INFO_FAERIE_RING]);
+    if (h->m_eventFlags & HERO_EVENT_IDOL)
+        strcat(gText, cLuckInfo[LUCK_INFO_IDOL]);
+    if (h->m_eventFlags & HERO_EVENT_FOUNTAIN)
+        strcat(gText, cLuckInfo[LUCK_INFO_FOUNTAIN]);
+    if (h->m_eventFlags & HERO_EVENT_PYRAMID)
+        strcat(gText, cLuckInfo[LUCK_INFO_PYRAMID]);
+    if (h->m_secondarySkills[HERO_SKILL_LUCK] == HERO_SKILL_LEVEL_BASIC)
+        strcat(gText, cLuckInfo[LUCK_INFO_BASIC_SKILL]);
+    if (h->m_secondarySkills[HERO_SKILL_LUCK] == HERO_SKILL_LEVEL_ADVANCED)
+        strcat(gText, cLuckInfo[LUCK_INFO_ADVANCED_SKILL]);
+    if (h->m_secondarySkills[HERO_SKILL_LUCK] == HERO_SKILL_LEVEL_EXPERT)
+        strcat(gText, cLuckInfo[LUCK_INFO_EXPERT_SKILL]);
+    if (h->HasArtifact(ARTIFACT_MASTHEAD) && (h->m_eventFlags & HERO_EVENT_EMBARKED))
+        strcat(gText, cLuckInfo[LUCK_INFO_MASTHEAD]);
+    if (h->m_eventFlags & HERO_EVENT_MERMAID)
+        strcat(gText, cLuckInfo[LUCK_INFO_MERMAID]);
+    if (h->HasArtifact(ARTIFACT_BATTLE_GARB))
+        strcat(gText, cLuckInfo[LUCK_INFO_BATTLE_GARB]);
+    if (static_cast<int>(strlen(gText)) == modifierStart)
+        strcat(gText, cLuckInfo[LUCK_INFO_NONE]);
+
+    NormalDialog(gText, dialogType, -1, -1, -1, 0, -1, 0, -1, 0);
+}
 
 VA(0x0049cc9e, 0xd7)
 void ClearMapExtra(void)
@@ -1155,7 +1342,77 @@ int GetMonType(int score, int campaign)
 }
 
 VA(0x0049ce14, 0x4ac)
-int AddScoreToHighScore(int, int, int, int, char *) { return 0; }
+int AddScoreToHighScore(int score, int days, int scenario, int highScoreType, char *scenarioName)
+{
+    int destination;
+    HighScoreEntry entries[HIGH_SCORE_ENTRY_COUNT];
+    int file;
+    int entry;
+    char filename[352];
+    char playerName[20];
+    int missingFile;
+
+    missingFile = 0;
+    if (highScoreType == HIGH_SCORE_STANDARD)
+        sprintf(filename, "%sSTANDARD.HS", ".\\DATA\\");
+    else
+        sprintf(filename, "%sCAMPAIGN.HS", ".\\DATA\\");
+
+    file = _open(filename, HIGH_SCORE_FILE_READ_FLAGS);
+    if (file == -1)
+        missingFile = 1;
+    if (missingFile) {
+        for (entry = 0; entry < HIGH_SCORE_ENTRY_COUNT; entry++) {
+            memset(&entries[entry], 0, sizeof(HighScoreEntry));
+            entries[entry].score = HIGH_SCORE_EMPTY;
+        }
+    } else {
+        for (entry = 0; entry < HIGH_SCORE_ENTRY_COUNT; entry++)
+            _read(file, &entries[entry], sizeof(entries[entry]));
+        _close(file);
+    }
+
+    gbShowHighScore = 1;
+    giHighScoreType = highScoreType;
+    giHighScoreRank = HIGH_SCORE_EMPTY;
+    giScore = score;
+    for (entry = 0; entry < HIGH_SCORE_ENTRY_COUNT; entry++) {
+        if ((entries[entry].score <= score && highScoreType == HIGH_SCORE_STANDARD) ||
+            (score <= entries[entry].score && highScoreType == HIGH_SCORE_CAMPAIGN) ||
+            (score <= entries[entry].score && highScoreType == HIGH_SCORE_EXPANSION_CAMPAIGN) ||
+            entries[entry].score == HIGH_SCORE_EMPTY) {
+            giHighScoreRank = entry;
+            break;
+        }
+    }
+
+    if (entry < HIGH_SCORE_ENTRY_COUNT) {
+        for (destination = HIGH_SCORE_ENTRY_COUNT - 2; destination >= entry; destination--)
+            entries[destination + 1] = entries[destination];
+
+        GetDataEntry("Please enter your name for the high score list.", playerName,
+                     HIGH_SCORE_NAME_LENGTH, 0, 0, 1);
+        memset(&entries[entry], 0, sizeof(HighScoreEntry));
+        strcpy(entries[entry].playerName, playerName);
+        strcpy(entries[entry].scenarioName, scenarioName);
+        entries[entry].score = score;
+        entries[entry].days = days;
+        entries[entry].scenario = scenario;
+        entries[entry].cheated = gpGame->m_cheated;
+        if (highScoreType == HIGH_SCORE_CAMPAIGN && gpGame->m_campaignCheated)
+            entries[entry].cheated = 1;
+
+        file = _open(filename, HIGH_SCORE_FILE_WRITE_FLAGS, HIGH_SCORE_FILE_PERMISSIONS);
+        if (file == -1)
+            FileError(filename);
+        for (entry = 0; entry < HIGH_SCORE_ENTRY_COUNT; entry++)
+            _write(file, &entries[entry], sizeof(HighScoreEntry));
+        _close(file);
+    } else {
+        gbShowHighScore = 0;
+    }
+    return 0;
+}
 
 VA(0x0049d2c0, 0x66)
 void BVResMsg(char *s, int res, int qty)
@@ -1210,7 +1467,275 @@ int WaitForOtherPlayer(void)
 }
 
 VA(0x0049d4a6, 0xb85)
-void PopNetBox(char *, int) {}
+void PopNetBox(char *text, int netPlayer)
+{
+    int exitForIncomingData;
+    int done;
+    int sendText;
+    int redrawLines;
+    int redrawAdventure;
+    int result;
+    heroWindow *netWindow;
+    char *remoteData;
+    long messageTime;
+    int delay;
+    tag_message updateMessage;
+    int inputLength;
+    char inputText[NET_BOX_TEXT_LENGTH];
+    int savedShowIt;
+    int updateInput;
+    int cursorState;
+    int textWidth;
+    int line;
+    tag_message event;
+    int textX;
+    int textY;
+    int redrawSavedShowIt;
+    int lineTextLimit;
+    int firstLineId;
+
+    if (!gbRemoteOn)
+        return;
+
+    lineTextLimit = NET_BOX_LINE_TEXT_LIMIT;
+    firstLineId = NET_BOX_FIRST_LINE_ID;
+    textX = 20;
+    textY = 54;
+    messageTime = 0;
+    if (text != 0) {
+        if (netPlayer >= 0) {
+            sprintf(gText, "%s:  %s", gsNetPlayerInfo[netPlayer].name, text);
+            gText[NET_BOX_LINE_TEXT_LIMIT] = 0;
+            AddNetBoxLine(gText, gpGame->m_players[NetPosToGamePos(netPlayer)].color);
+        } else {
+            sprintf(gText, text);
+            gText[NET_BOX_LINE_TEXT_LIMIT] = 0;
+            AddNetBoxLine(gText, NET_BOX_DEFAULT_COLOR);
+        }
+        messageTime = KBTickCount();
+    }
+
+    inputLength = 0;
+    savedShowIt = bShowIt;
+    bShowIt = 1;
+    gbMoveShown = 0;
+    netWindow = new heroWindow(0, NET_BOX_WINDOW_Y, "netbox.bin");
+    if (netWindow == 0)
+        MemError();
+
+    updateMessage.type = NET_BOX_UPDATE_MESSAGE;
+    updateMessage.field4 = NET_BOX_TEXT_COMMAND;
+    updateMessage.field8 = 1;
+    updateMessage.text = cNetBoxLine[0];
+    netWindow->BroadcastMessage(updateMessage);
+    updateMessage.field8 = 2;
+    updateMessage.text = cNetBoxLine[1];
+    netWindow->BroadcastMessage(updateMessage);
+    updateMessage.field8 = 3;
+    updateMessage.text = cNetBoxLine[2];
+    netWindow->BroadcastMessage(updateMessage);
+    updateMessage.field8 = 4;
+    updateMessage.text = cNetBoxLine[3];
+    netWindow->BroadcastMessage(updateMessage);
+    updateMessage.field4 = NET_BOX_COLOR_COMMAND;
+    updateMessage.field8 = 0x14;
+    updateMessage.field18 = cNetBoxColor[0] + 1;
+    netWindow->BroadcastMessage(updateMessage);
+    updateMessage.field8 = 0x15;
+    updateMessage.field18 = cNetBoxColor[1] + 1;
+    netWindow->BroadcastMessage(updateMessage);
+    updateMessage.field8 = 0x16;
+    updateMessage.field18 = cNetBoxColor[2] + 1;
+    netWindow->BroadcastMessage(updateMessage);
+    updateMessage.field8 = 0x17;
+    updateMessage.field18 = cNetBoxColor[3] + 1;
+    netWindow->BroadcastMessage(updateMessage);
+    updateMessage.field8 = NET_BOX_THIS_PLAYER_COLOR_ID;
+    updateMessage.field18 = gpGame->m_players[NetPosToGamePos(giThisNetPos)].color + 1;
+    netWindow->BroadcastMessage(updateMessage);
+
+    gpWindowManager->AddWindow(netWindow, -1, 1);
+    exitForIncomingData = 0;
+    done = 0;
+    updateInput = 1;
+    cursorState = 0;
+    sendText = 0;
+    redrawLines = 1;
+    redrawAdventure = 0;
+    strcpy(inputText, "");
+    gpInputManager->SetKeyCodeType(0);
+
+    while (!done) {
+        PollSound();
+        remoteData = GetRemoteData(0);
+        if (remoteData != 0) {
+            if (remoteData[5] == NET_BOX_REMOTE_GROUP) {
+                remoteData = GetRemoteData(1);
+                switch (remoteData[6]) {
+                case NET_BOX_REMOTE_MAP_CHANGE:
+                    gbLeaveNetBoxAlone = 1;
+                    if (gpAdvManager->m_active == 1) {
+                        bShowIt = savedShowIt;
+                        gpAdvManager->ProcessIncomingGroupMapChange(remoteData + 9);
+                        bShowIt = 1;
+                        redrawAdventure = 1;
+                    }
+                    gbLeaveNetBoxAlone = 0;
+                    updateInput = 1;
+                    break;
+                }
+            } else if (remoteData[5] == NET_BOX_REMOTE_CONTROL) {
+                switch (remoteData[6]) {
+                case NET_BOX_REMOTE_CHAT:
+                    remoteData = GetRemoteData(1);
+                    sprintf(gText, "%s:  %s", gsNetPlayerInfo[remoteData[0]].name, remoteData + 9);
+                    AddNetBoxLine(gText, gpGame->m_players[NetPosToGamePos(remoteData[0])].color);
+                    redrawLines = 1;
+                    if (messageTime != 0)
+                        messageTime = KBTickCount();
+                    break;
+                default:
+                    AddNetBoxLine("[ Incoming data, must exit... ]", NET_BOX_DEFAULT_COLOR);
+                    redrawLines = 1;
+                    exitForIncomingData = 1;
+                    break;
+                }
+            } else {
+                GetRemoteData(1);
+            }
+        }
+
+        Process1WindowsMessage();
+        event = gpInputManager->GetEvent();
+        switch (event.type) {
+        case NET_BOX_KEY_MESSAGE:
+            messageTime = 0;
+            switch (event.field4) {
+            case NET_BOX_KEY_ESCAPE:
+            case NET_BOX_KEY_F1:
+                done = 1;
+                break;
+            case NET_BOX_KEY_BACKSPACE:
+                if (inputLength > 0)
+                    inputLength--;
+                updateInput = 1;
+                cursorState = 1;
+                break;
+            case NET_BOX_KEY_ENTER:
+                sendText = 1;
+                break;
+            default:
+                if (static_cast<unsigned char>(event.field4) >= NET_BOX_FIRST_PRINTABLE &&
+                    static_cast<unsigned char>(event.field4) <= NET_BOX_LAST_PRINTABLE &&
+                    inputLength < NET_BOX_MAX_INPUT && event.field4 != 0) {
+                    inputText[inputLength] = 0;
+                    textWidth = smallFont->LineWidth(inputText);
+                    if (textWidth + NET_BOX_CURSOR_WIDTH_PADDING < NET_BOX_CURSOR_WIDTH_LIMIT) {
+                        inputText[inputLength] = static_cast<char>(event.field4);
+                        inputLength++;
+                        updateInput = 1;
+                        cursorState = 0;
+                    }
+                }
+                break;
+            }
+            break;
+        }
+
+        if (!updateInput && glTimers[0] < KBTickCount()) {
+            cursorState = 1 - cursorState;
+            updateInput = 1;
+        }
+        if (sendText) {
+            sendText = 0;
+            inputText[inputLength] = 0;
+            AddNetBoxLine(inputText, gpGame->m_players[NetPosToGamePos(giThisNetPos)].color);
+            result = TransmitRemoteData(inputText, NET_BOX_PACKET_BUFFER_SIZE,
+                                        strlen(inputText) + 1,
+                                        NET_BOX_REMOTE_CHAT, 1, 1, -1);
+            if (!result)
+                ShutDown(0);
+            inputLength = 0;
+            strcpy(inputText, "");
+            updateInput = 1;
+            redrawLines = 1;
+        }
+
+        if (redrawLines) {
+            redrawLines = 0;
+            updateMessage.type = NET_BOX_UPDATE_MESSAGE;
+            updateMessage.field4 = NET_BOX_TEXT_COMMAND;
+            updateMessage.field8 = 1;
+            updateMessage.text = cNetBoxLine[0];
+            netWindow->BroadcastMessage(updateMessage);
+            updateMessage.field8 = 2;
+            updateMessage.text = cNetBoxLine[1];
+            netWindow->BroadcastMessage(updateMessage);
+            updateMessage.field8 = 3;
+            updateMessage.text = cNetBoxLine[2];
+            netWindow->BroadcastMessage(updateMessage);
+            updateMessage.field8 = 4;
+            updateMessage.text = cNetBoxLine[3];
+            netWindow->BroadcastMessage(updateMessage);
+            updateMessage.field4 = NET_BOX_COLOR_COMMAND;
+            updateMessage.field8 = 0x14;
+            updateMessage.field18 = cNetBoxColor[0] + 1;
+            netWindow->BroadcastMessage(updateMessage);
+            updateMessage.field8 = 0x15;
+            updateMessage.field18 = cNetBoxColor[1] + 1;
+            netWindow->BroadcastMessage(updateMessage);
+            updateMessage.field8 = 0x16;
+            updateMessage.field18 = cNetBoxColor[2] + 1;
+            netWindow->BroadcastMessage(updateMessage);
+            updateMessage.field8 = 0x17;
+            updateMessage.field18 = cNetBoxColor[3] + 1;
+            netWindow->BroadcastMessage(updateMessage);
+            netWindow->DrawWindow();
+            gpWindowManager->UpdateScreenRegion(0, NET_BOX_WINDOW_Y, NET_BOX_WIDTH, NET_BOX_HEIGHT);
+        }
+
+        if (updateInput) {
+            updateInput = 0;
+            glTimers[0] = KBTickCount() + NET_BOX_CURSOR_DELAY;
+            if (cursorState)
+                inputText[inputLength] = '_';
+            else
+                inputText[inputLength] = 0x1f;
+            inputText[inputLength + 1] = 0;
+            updateMessage.type = NET_BOX_UPDATE_MESSAGE;
+            updateMessage.field4 = NET_BOX_TEXT_COMMAND;
+            updateMessage.field8 = NET_BOX_INPUT_ID;
+            updateMessage.text = inputText;
+            netWindow->BroadcastMessage(updateMessage);
+            netWindow->DrawWindow();
+            gpWindowManager->UpdateScreenRegion(0, NET_BOX_INPUT_Y, NET_BOX_WIDTH, NET_BOX_INPUT_HEIGHT);
+        }
+
+        if (messageTime != 0 && messageTime + NET_BOX_MESSAGE_TIMEOUT < KBTickCount())
+            done = 1;
+        if (exitForIncomingData) {
+            for (delay = 0; delay < NET_BOX_EXIT_DELAY_STEPS; delay++) {
+                PollSound();
+                DelayMilli(NET_BOX_EXIT_DELAY);
+            }
+            done = 1;
+        }
+    }
+
+    gpInputManager->SetKeyCodeType(1);
+    if (redrawAdventure && gbMoveShown) {
+        gbDrawWindowBackground = 0;
+        gpWindowManager->RemoveWindow(netWindow);
+        gbDrawWindowBackground = 1;
+        redrawSavedShowIt = bShowIt;
+        bShowIt = 1;
+        gpAdvManager->RedrawAdvScreen(1, 0);
+        bShowIt = redrawSavedShowIt;
+    } else {
+        gpWindowManager->RemoveWindow(netWindow);
+    }
+    bShowIt = savedShowIt;
+}
 
 VA(0x0049e02b, 0xc7)
 void AddNetBoxLine(char *str, char color)
