@@ -216,7 +216,7 @@ int RecruitHeroHandler(tag_message &msg)
         case 0xc:
             switch (msg.field8) {
             case 2:
-                HeroView(static_cast<unsigned char>(gpTownManager->m_recruitHeroRec[2]), 1, 0);
+                HeroView(static_cast<unsigned char>(gpTownManager->m_recruitHero->m_id), 1, 0);
                 gpTownManager->RedrawTownScreen();
                 gpTownManager->m_heroWindow0->DrawWindow();
                 gpTownManager->m_heroWindow1->DrawWindow();

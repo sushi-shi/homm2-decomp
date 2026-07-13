@@ -6,6 +6,13 @@
 #include "../BASE/baseManager.h"
 // forward declarations:
 class heroWindow;
+class icon;
+class town;
+class townObject;
+class strip;
+class armyGroup;
+class bankBox;
+class hero;
 struct tag_message;
 
 #pragma pack(push, 1)  // recovered layout is byte-packed
@@ -14,37 +21,37 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
-    int    field_0x36;  // +0x36
-    int    field_0x3a;  // +0x3a
-    char _pad_0x3e[0x80];
-    int    field_0xbe;  // +0xbe
-    int    field_0xc2;  // +0xc2
+    town *m_town;  // +0x36
+    icon *m_backgroundIcon;  // +0x3a
+    townObject *m_townObjects[32];  // +0x3e
+    int m_townObjectCount;  // +0xbe
+    int m_lastTownType;  // +0xc2
     int    field_0xc6;  // +0xc6
-    int    field_0xca;  // +0xca
-    int    field_0xce;  // +0xce
-    int    field_0xd2;  // +0xd2
-    int    field_0xd6;  // +0xd6
-    int    field_0xda;  // +0xda
-    int    field_0xde;  // +0xde
-    int    field_0xe2;  // +0xe2
-    int    field_0xe6;  // +0xe6
-    int    field_0xea;  // +0xea
-    int    field_0xee;  // +0xee
-    char _pad_0xf2[0x50];
-    int    field_0x142;  // +0x142
-    int    field_0x146;  // +0x146
-    int    field_0x14a;  // +0x14a
-    int    field_0x14e;  // +0x14e
+    heroWindow *m_townWindow;  // +0xca
+    strip *m_garrisonStrip;  // +0xce
+    strip *m_heroStrip;  // +0xd2
+    strip *m_selectedStrip;  // +0xd6
+    int m_selectedArmySlot;  // +0xda
+    strip *m_swapStrip;  // +0xde
+    int m_swapArmySlot;  // +0xe2
+    strip *m_pendingStrip;  // +0xe6
+    int m_pendingArmySlot;  // +0xea
+    bankBox *m_bankBox;  // +0xee
+    char m_statusText[0x50];  // +0xf2
+    int m_lastHoverId;  // +0x142
+    int m_lastHoverSubId;  // +0x146
+    int m_command;  // +0x14a
+    int m_recruitResult;  // +0x14e
     int    field_0x152;  // +0x152
     int    field_0x156;  // +0x156
-    int    field_0x15a;  // +0x15a
-    int    field_0x15e;  // +0x15e
+    int m_castleDialogActive;  // +0x15a
+    int m_selectedBuilding;  // +0x15e
     heroWindow *m_heroWindow0;  // +0x162  hero portrait window (redrawn on recruit)
     heroWindow *m_heroWindow1;  // +0x166  hero portrait window (redrawn on recruit)
     int    field_0x16a;  // +0x16a
     int    field_0x16e;  // +0x16e
     int    m_recruitState;  // +0x172  recruit slot / selection state
-    char  *m_recruitHeroRec;  // +0x176  selected hero record (byte [2] = hero id)
+    hero *m_recruitHero;  // +0x176
     // --- constructors ---
     townManager(void);
     // --- virtual methods (vtable order) ---
