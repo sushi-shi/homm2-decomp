@@ -781,10 +781,357 @@ char toupper(char c)
 }
 
 VA(0x0049859c, 0x791)
-int InterpretCommandLine(void) { return 0; }
+int InterpretCommandLine(void)
+{
+    int len;
+    int i;
+    int helpRequested;
+    gbTCPFirstTime = 1;
+    giTCPType = -1;
+    giTCPHostStatus = -1;
+    giTCPNumPlayers = -1;
+    strcpy(gcTCPAddress, "");
+    strcpy(gcTCPName, "");
+    gbUseWaveout = 0;
+    giDebugLevel = 0;
+    giShowIntro = 1;
+    gbNoSound = 0;
+    gbCheatMenus = 0;
+    giScreenScroll = 1;
+    giLimitPlayer = 0;
+    gbBlackoutPlayer = 1;
+    helpRequested = 0;
+    strcpy(gMapName, "Chaos.mp2");
+    strcpy(gFullMapName, "Chaos");
+
+    len = strlen(gcCommandLine);
+    for (i = 0; len > i; i++) {
+        if (gcCommandLine[i] == ' ' &&
+            i + 1 < len &&
+            (gcCommandLine[i + 1] == '?' ||
+             gcCommandLine[i + 1] == 'h' ||
+             gcCommandLine[i + 1] == 'H')) {
+            helpRequested = 1;
+        }
+        if (gcCommandLine[i] == '/' && i + 1 < len) {
+            switch (toupper(gcCommandLine[i + 1])) {
+        case 'Z':
+            gbDoMemCheck = 0;
+            break;
+        case 'W':
+            gbUseWaveout = 1;
+            if (i + 2 < len)
+                gbUseWaveout =
+                    gcCommandLine[i + 2] - '0';
+            break;
+        case 'V':
+            gConfig.slowVideo = 1;
+            WritePrefs();
+            break;
+        case 'N':
+            if (i + 3 < len &&
+                toupper(gcCommandLine[i + 2]) == 'W' &&
+                toupper(gcCommandLine[i + 3]) == 'C') {
+                gbCheatMenus = 1;
+            }
+            break;
+        case 'M':
+            if (i + 2 < len)
+                gbDontTryMIDI = 1 -
+                    (gcCommandLine[i + 2] - '0');
+            break;
+        case 'R':
+            if (i + 2 < len)
+                gbDontTryRedbook = 1 -
+                    (gcCommandLine[i + 2] - '0');
+            break;
+        case 'D':
+            if (i + 2 < len)
+                gbDontTryDigital = 1 -
+                    (gcCommandLine[i + 2] - '0');
+            break;
+        case 'S':
+            if (i + 2 < len)
+                gbNoSound = 1 -
+                    (gcCommandLine[i + 2] - '0');
+            break;
+        case 'I':
+            if (i + 2 < len)
+                giShowIntro =
+                    gcCommandLine[i + 2] - '0';
+            break;
+        case 'P':
+            if (i + 2 < len)
+                giDebugLevel =
+                    gcCommandLine[i + 2] - '0';
+            break;
+        case 'X':
+            xSmackFromNetwork = 1;
+            break;
+        case 'T':
+            if (i + 2 < len) {
+                switch (toupper(gcCommandLine[i + 2])) {
+            case 'T':
+                if (i + 3 < len &&
+                    toupper(gcCommandLine[i + 3]) == 'L') {
+                    giTCPType = COMMAND_LINE_TCP_TYPE_L;
+                } else {
+                    giTCPType = COMMAND_LINE_TCP_TYPE_DEFAULT;
+                }
+                break;
+            case 'S':
+                if (i + 3 < len &&
+                    toupper(gcCommandLine[i + 3]) == 'H') {
+                    giTCPHostStatus = COMMAND_LINE_TCP_HOST;
+                } else {
+                    giTCPHostStatus = COMMAND_LINE_TCP_CLIENT;
+                }
+                break;
+            case 'P':
+            {
+                int count = 0;
+                if (i + 3 < len)
+                    count = gcCommandLine[i + 3] - '0';
+                if (count >= COMMAND_LINE_TCP_MIN_PLAYERS &&
+                    count <= COMMAND_LINE_TCP_MAX_PLAYERS) {
+                    giTCPNumPlayers = count;
+                }
+                break;
+            }
+            case 'A':
+            {
+                if (i + 3 < len) {
+                    int dst = 0;
+                    int src = i + 3;
+                    while (dst < COMMAND_LINE_TCP_TEXT_LENGTH &&
+                           gcCommandLine[src] && gcCommandLine[src] != ' ') {
+                        gcTCPAddress[dst] = gcCommandLine[src];
+                        src++;
+                        dst++;
+                    }
+                    gcTCPAddress[dst] = 0;
+                }
+                break;
+            }
+            case 'N':
+            {
+                if (i + 3 < len) {
+                    int dst = 0;
+                    int src = i + 3;
+                    while (dst < COMMAND_LINE_TCP_TEXT_LENGTH &&
+                           gcCommandLine[src] && gcCommandLine[src] != ' ') {
+                        gcTCPName[dst] = gcCommandLine[src];
+                        src++;
+                        dst++;
+                    }
+                    gcTCPName[dst] = 0;
+                }
+                break;
+            }
+                }
+            }
+            break;
+            }
+        }
+    }
+
+    if (helpRequested) {
+        sprintf(gText, "");
+        for (i = 0; i < COMMAND_LINE_HELP_LINE_COUNT; i++)
+            strcat(gText, gcCommandLineHelp[i]);
+        ShutDown(gText);
+    }
+
+    sprintf(cAggPathName, "%s%s", ".\\DATA\\", "heroes2.agg");
+    DEFAULT_AGGREGATE_NAME = cAggPathName;
+    sprintf(cExpAggPathName, "%s%s", ".\\DATA\\", "heroes2x.agg");
+    EXPANSION_AGGREGATE_NAME = cExpAggPathName;
+    giFrameStep = COMMAND_LINE_FRAME_STEP;
+
+    for (i = 0; i < COMMAND_LINE_HUMAN_PLAYER_SLOTS; i++) {
+        if (giNumHumanPlayers > i)
+            gbHumanPlayer[i] = 1;
+        else
+            gbHumanPlayer[i] = 0;
+    }
+    if (giNumHumanPlayers == COMMAND_LINE_SINGLE_PLAYER)
+        gbBlackoutPlayer = 0;
+
+    if (giTCPHostStatus != -1) {
+        if (giTCPType == -1 || giTCPNumPlayers == -1 ||
+            (giTCPHostStatus == COMMAND_LINE_TCP_CLIENT &&
+             strlen(gcTCPAddress) < 1)) {
+            ShutDown("Incomplete TCP/IP command line information");
+        }
+        giShowIntro = 0;
+    }
+    return 1;
+}
 
 VA(0x00498d2d, 0x698)
-int InitMenuHandler(struct tag_message &) { return 0; }
+int InitMenuHandler(struct tag_message &msg)
+{
+    int handled = 0;
+    int idx;
+    int menu;
+    int helpIndex;
+    int hoverIndex;
+
+    PollSound();
+    if (msg.fieldC & INIT_MENU_DISABLE_MASK) {
+        if (msg.field4 == INIT_MENU_HOVER_COMMAND ||
+            msg.field4 == INIT_MENU_HELP_COMMAND) {
+            helpIndex = -1;
+            switch (msg.field8) {
+            case INIT_MENU_NEW_GAME:
+                helpIndex = 0;
+                break;
+            case INIT_MENU_LOAD_GAME:
+                helpIndex = 1;
+                break;
+            case INIT_MENU_HIGH_SCORES:
+                helpIndex = 2;
+                break;
+            case INIT_MENU_CREDITS:
+                helpIndex = 3;
+                break;
+            case INIT_MENU_EXIT:
+                helpIndex = 4;
+                break;
+            }
+            if (helpIndex >= 0) {
+                NormalDialog(gInitMenuHelp[helpIndex], INIT_MENU_HELP_DIALOG,
+                             -1, -1, -1, 0, -1, 0, -1, 0);
+            }
+        }
+    } else {
+        if (msg.type == INIT_MENU_KEY_PRESS) {
+            switch (msg.field4) {
+            case INIT_MENU_KEY_NEW:
+                gpWindowManager->m_dialogResult = INIT_MENU_NEW_GAME;
+                handled = 1;
+                break;
+            case INIT_MENU_KEY_LOAD:
+                gpWindowManager->m_dialogResult = INIT_MENU_LOAD_GAME;
+                handled = 1;
+                break;
+            case INIT_MENU_KEY_CREDITS:
+                gpWindowManager->m_dialogResult = INIT_MENU_CREDITS;
+                handled = 1;
+                break;
+            case INIT_MENU_KEY_HIGH_SCORES:
+                gpWindowManager->m_dialogResult = INIT_MENU_HIGH_SCORES;
+                handled = 1;
+                break;
+            case INIT_MENU_KEY_EXIT:
+                gpWindowManager->m_dialogResult = INIT_MENU_EXIT;
+                handled = 1;
+                break;
+            }
+        } else if (msg.type == INIT_MENU_MESSAGE) {
+            if (msg.field8 < INIT_MENU_FIRST_COMMAND ||
+                msg.field8 > INIT_MENU_LAST_ACTION) {
+                return INIT_MENU_HANDLER_IGNORE;
+            }
+            switch (msg.field4) {
+            case INIT_MENU_HOVER_COMMAND:
+                if (msg.field8 == INIT_MENU_MOVIE)
+                    break;
+                menu = msg.field8 - INIT_MENU_FIRST_COMMAND;
+                idx = menu + INIT_MENU_WIDGET_OFFSET;
+                msg.type = INIT_MENU_MESSAGE;
+                msg.field8 = idx;
+                msg.field4 = INIT_MENU_SET_WIDGET_COMMAND;
+                msg.field18 =
+                    menu * INIT_MENU_FRAME_STRIDE + INIT_MENU_HOVER_FRAME;
+                gpInitWin->BroadcastMessage(msg);
+                gpInitWin->DrawWindow(0, idx, idx);
+                gpWindowManager->UpdateScreenRegion(
+                    IMHotSpots[menu][0], IMHotSpots[menu][1],
+                    IMHotSpots[menu][2], IMHotSpots[menu][3]);
+                break;
+            case INIT_MENU_CLICK_COMMAND:
+                if (msg.field8 == INIT_MENU_MOVIE) {
+                    PlaySmacker(INIT_MENU_MOVIE_SMACKER);
+                    gpResourceManager->GetBackdrop(
+                        "heroes.icn", gpWindowManager->m_screen, 1);
+                    gpInitWin->DrawWindow(0);
+                    gpWindowManager->UpdateScreenRegion(
+                        0, 0, INIT_MENU_SCREEN_WIDTH, INIT_MENU_SCREEN_HEIGHT);
+                    gpSoundManager->PlayAmbientMusic(
+                        INIT_MENU_MAIN_MUSIC, 0, -1);
+                    break;
+                } else {
+                    gpWindowManager->m_dialogResult = msg.field8;
+                    for (idx = INIT_MENU_FIRST_WIDGET;
+                         idx <= INIT_MENU_LAST_WIDGET; idx++) {
+                        msg.type = INIT_MENU_MESSAGE;
+                        msg.field8 = idx;
+                        msg.field4 = INIT_MENU_SET_WIDGET_COMMAND;
+                        msg.field18 = idx * INIT_MENU_FRAME_STRIDE -
+                                      INIT_MENU_WIDGET_FRAME_BASE;
+                        gpInitWin->BroadcastMessage(msg);
+                    }
+                    gpInitWin->DrawWindow(
+                        0, INIT_MENU_FIRST_WIDGET, INIT_MENU_LAST_WIDGET);
+                    gpWindowManager->UpdateScreenRegion(
+                        INIT_MENU_REDRAW_LEFT, INIT_MENU_REDRAW_TOP,
+                        INIT_MENU_REDRAW_WIDTH, INIT_MENU_REDRAW_HEIGHT);
+                    handled = 1;
+                }
+                break;
+            }
+        } else if (msg.type == INIT_MENU_MOUSE_MOVE) {
+            hoverIndex = -1;
+            for (idx = 0; idx < INIT_MENU_HOTSPOT_COUNT; idx++) {
+                if (IMHotSpots[idx][0] <= msg.field10 &&
+                    IMHotSpots[idx][1] <= msg.field14 &&
+                    msg.field10 < IMHotSpots[idx][0] + IMHotSpots[idx][2] &&
+                    msg.field14 < IMHotSpots[idx][1] + IMHotSpots[idx][3]) {
+                    hoverIndex = idx;
+                }
+            }
+            if (lastIMHoverID != hoverIndex) {
+                if (lastIMHoverID != -1) {
+                    msg.type = INIT_MENU_MESSAGE;
+                    msg.field8 = lastIMHoverID + INIT_MENU_WIDGET_OFFSET;
+                    msg.field4 = INIT_MENU_SET_WIDGET_COMMAND;
+                    msg.field18 = lastIMHoverID * INIT_MENU_FRAME_STRIDE +
+                                  INIT_MENU_IDLE_FRAME;
+                    gpInitWin->BroadcastMessage(msg);
+                    gpInitWin->DrawWindow(0, lastIMHoverID + INIT_MENU_WIDGET_OFFSET,
+                                          lastIMHoverID + INIT_MENU_WIDGET_OFFSET);
+                    gpWindowManager->UpdateScreenRegion(
+                        IMHotSpots[lastIMHoverID][0], IMHotSpots[lastIMHoverID][1],
+                        IMHotSpots[lastIMHoverID][2], IMHotSpots[lastIMHoverID][3]);
+                }
+                if (hoverIndex != -1) {
+                    msg.type = INIT_MENU_MESSAGE;
+                    msg.field8 = hoverIndex + INIT_MENU_WIDGET_OFFSET;
+                    msg.field4 = INIT_MENU_SET_WIDGET_COMMAND;
+                    msg.field18 = hoverIndex * INIT_MENU_FRAME_STRIDE +
+                                  INIT_MENU_ACTIVE_FRAME;
+                    gpInitWin->BroadcastMessage(msg);
+                    gpInitWin->DrawWindow(0, hoverIndex + INIT_MENU_WIDGET_OFFSET,
+                                          hoverIndex + INIT_MENU_WIDGET_OFFSET);
+                    gpWindowManager->UpdateScreenRegion(
+                        IMHotSpots[hoverIndex][0], IMHotSpots[hoverIndex][1],
+                        IMHotSpots[hoverIndex][2], IMHotSpots[hoverIndex][3]);
+                }
+                lastIMHoverID = hoverIndex;
+            }
+        }
+    }
+
+    if (handled || giMenuCommand != -1) {
+        msg.type = INIT_MENU_MESSAGE;
+        msg.field8 = INIT_MENU_CLOSE_COMMAND;
+        msg.field4 = msg.field8;
+        return INIT_MENU_HANDLER_CLOSE;
+    }
+    CheckShingleUpdate();
+    return INIT_MENU_HANDLER_CONTINUE;
+}
 
 VA(0x004993c5, 0x1b)
 int NullHandler(struct tag_message &msg)
@@ -4354,8 +4701,8 @@ DATA(0x00528ca4) char cNetBoxColor[4];
 DATA(0x00528ca8) int giMonthTypeExtra;
 DATA(0x00528cac) int iMPExtendedType;
 DATA(0x00528cb0) signed char gcColorToSetupPos[8];
-DATA(0x00528cb8) char *gFullMapName;
-DATA(0x00528cd0) char *gcTCPName;
+DATA(0x00528cb8) char gFullMapName[GLOBAL_MAP_NAME_SIZE];
+DATA(0x00528cd0) char gcTCPName[GLOBAL_TCP_TEXT_SIZE];
 DATA(0x00528ce8) int giShowIntro;
 DATA(0x00528cf0) int glTimers[10];
 DATA(0x00528d18) int giScore;
@@ -4371,14 +4718,14 @@ DATA(0x005290b0) int giWaitType;
 DATA(0x005290b4) class icon *gCurLoadedSpellIcon;
 DATA(0x005290b8) unsigned char bSaveMusicPosition[0x3c];
 DATA(0x005290f4) int giBottomViewOverride;
-DATA(0x005290f8) char *gcTCPAddress;
+DATA(0x005290f8) char gcTCPAddress[GLOBAL_TCP_TEXT_SIZE];
 DATA(0x00529110) unsigned char giSetupGameType;
 DATA(0x00529118) char *gLastFilename;
 DATA(0x00529278) int giFullySeeded;
 DATA(0x0052927c) icon *gBuyBuildIcons;
 DATA(0x00529280) int gbNoSound;
 DATA(0x00529288) int *iCombatControlNetPos;
-DATA(0x00529290) char *cExpAggPathName;
+DATA(0x00529290) char cExpAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
 DATA(0x005293f0) int gbMoveShown;
 DATA(0x005293f4) void **ppMapExtra;
 DATA(0x005293f8) char gcBottomViewText[92];
@@ -4402,7 +4749,7 @@ DATA(0x005295f4) int giMonthType;
 DATA(0x005295f8) char *DEFAULT_AGGREGATE_NAME;
 DATA(0x005295fc) int gCurSpellEffectFrame;
 DATA(0x00529600) signed char gbThisNetHumanPlayer[8];
-DATA(0x00529608) char *cAggPathName;
+DATA(0x00529608) char cAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
 DATA(0x00529768) class highScoreManager *gpHighScoreManager;
 DATA(0x0052976c) int gbFunctionComplete;
 DATA(0x00529770) int gbIAmGreatest;
@@ -4416,7 +4763,7 @@ DATA(0x005298b8) int bShowIt;
 DATA(0x005298bc) int gLowPageScreenSelector;
 DATA(0x005298c0) class heroWindowManager *gpWindowManager;
 DATA(0x005298c4) int giCurWatchPlayer;
-DATA(0x005298c8) char *gcCommandLine;
+DATA(0x005298c8) char gcCommandLine[GLOBAL_COMMAND_LINE_SIZE];
 DATA(0x00529908) int giBottomViewResourceQty;
 DATA(0x0052990c) soundManager *gpSoundManager;
 DATA(0x00529910) int gbThisNetGotAdventureControl;
