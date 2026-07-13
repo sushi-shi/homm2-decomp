@@ -178,6 +178,36 @@ typedef enum GameRandomHeroConstant {
     RANDOM_HERO_NECROMANCER_STARTING_SPELL = 9
 } GameRandomHeroConstant;
 
+typedef enum GameVisibilityConstant {
+    VISIBILITY_EARLY_TURN_LAST = 20,
+    VISIBILITY_MIDDLE_TURN_LAST = 40,
+    VISIBILITY_EARLY_AI_BONUS = 1,
+    VISIBILITY_MIDDLE_AI_BONUS = 2,
+    VISIBILITY_LATE_AI_BONUS = 3,
+    VISIBILITY_SMALL_RADIUS_LIMIT = 5,
+    VISIBILITY_SMALL_RADIUS_THRESHOLD = 2,
+    VISIBILITY_LARGE_RADIUS_THRESHOLD = 3,
+    VISIBILITY_RADIAL_RADIUS_LIMIT = 10
+} GameVisibilityConstant;
+
+typedef enum GameLuckConstant {
+    ARTIFACT_RABBIT_FOOT = 0x23,
+    ARTIFACT_GOLDEN_HORSESHOE = 0x24,
+    ARTIFACT_GAMBLERS_LUCKY_COIN = 0x25,
+    ARTIFACT_FOUR_LEAF_CLOVER = 0x26,
+    ARTIFACT_MASTHEAD = 0x61,
+    LUCK_NEUTRAL = 0,
+    LUCK_MINIMUM = -3,
+    LUCK_MAXIMUM = 3,
+    LUCK_RAINBOW_BONUS = 2
+} GameLuckConstant;
+
+typedef enum GameWaitConstant {
+    WAIT_BOTTOM_VIEW_TIMEOUT = 9999999,
+    WAIT_AMBIENT_MUSIC = 21,
+    WAIT_DIALOG_TYPE = 9
+} GameWaitConstant;
+
 int GetNumObelisks(int color);
 void ComputeUALoc(int);
 void GenerateStandardFileName(char *, char *);

@@ -11,6 +11,10 @@
 #include <va.h>
 #include <Ints.h>
 
+typedef enum MapTilesetConstant {
+    MAP_TILESET_FLAG = 14
+} MapTilesetConstant;
+
 #pragma pack(push, 1)
 struct mapCellExtra {       // 7 bytes (packed)
     u16 index;              // +0  next-in-chain / free-pool marker (0xFFFF == free)
