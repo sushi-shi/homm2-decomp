@@ -3444,8 +3444,142 @@ void philAI::HeroInteractionAtTown(hero *heroPtr, town *townPtr, int doInteracti
     }
 }
 
+// @early-stop
+// Exact 0x4ba span and 0x48 frame; all 19 relocation sites and targets agree.
+// The only masked residual is TU-cumulative comparison load order at +0x3b9,
+// +0x3bc, and +0x3be (transfer count vs total creature count).
 VA(0x004420bd, 0x4ba)
-void philAI::RedistributeTroops(class armyGroup *, class armyGroup *, int, int, int, int, int) {}
+void philAI::RedistributeTroops(armyGroup *sourceArmy, armyGroup *destinationArmy,
+                                int preserveOne, int preferFast, int sourceStrength,
+                                int destinationStrength, int transferBudget) {
+    int totalCreatures0;
+    int keepGoing5;
+    int sourceIndex15;
+    int destinationIndex6;
+    int selectedIndex5;
+    int bestValue37;
+    int stackValue7;
+    int selectedSpeed19;
+    int transferCount16;
+
+    keepGoing5 = 1;
+    gbTroopReload = 0;
+    while (keepGoing5) {
+        if (preserveOne != 0) {
+            totalCreatures0 = 0;
+            for (sourceIndex15 = 0; sourceIndex15 < AI_TOWN_ARMY_SLOTS;
+                 sourceIndex15++) {
+                if (sourceArmy->m_creatureTypes[sourceIndex15] != AI_TROOP_EMPTY_SLOT)
+                    totalCreatures0 += sourceArmy->m_quantities[sourceIndex15];
+            }
+            if (totalCreatures0 <= 1)
+                return;
+        }
+
+        selectedIndex5 = AI_TROOP_EMPTY_SLOT;
+        for (sourceIndex15 = 0; sourceIndex15 < AI_TOWN_ARMY_SLOTS;
+             sourceIndex15++) {
+            if (selectedIndex5 == AI_TROOP_EMPTY_SLOT) {
+                for (destinationIndex6 = 0;
+                     destinationIndex6 < AI_TOWN_ARMY_SLOTS;
+                     destinationIndex6++) {
+                    if (sourceArmy->m_creatureTypes[sourceIndex15] != AI_TROOP_EMPTY_SLOT &&
+                        destinationArmy->m_creatureTypes[destinationIndex6] ==
+                            sourceArmy->m_creatureTypes[sourceIndex15]) {
+                        selectedIndex5 = sourceIndex15;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (selectedIndex5 == AI_TROOP_EMPTY_SLOT) {
+            bestValue37 = AI_TROOP_REDISTRIBUTION_WORST_VALUE;
+            if (preferFast != 0)
+                selectedSpeed19 = AI_TROOP_REDISTRIBUTION_MIN_SPEED;
+            else
+                selectedSpeed19 = AI_TROOP_REDISTRIBUTION_MAX_SPEED;
+
+            for (sourceIndex15 = 0; sourceIndex15 < AI_TOWN_ARMY_SLOTS;
+                 sourceIndex15++) {
+                if (sourceArmy->m_creatureTypes[sourceIndex15] != AI_TROOP_EMPTY_SLOT) {
+                    stackValue7 =
+                        gMonsterDatabase[sourceArmy->m_creatureTypes[sourceIndex15]].fightValue *
+                        sourceArmy->m_quantities[sourceIndex15];
+                    if ((preferFast != 0 &&
+                         gMonsterDatabase[sourceArmy->m_creatureTypes[sourceIndex15]].speed >
+                             selectedSpeed19) ||
+                        (preferFast == 0 &&
+                         gMonsterDatabase[sourceArmy->m_creatureTypes[sourceIndex15]].speed <
+                             selectedSpeed19)) {
+                        selectedSpeed19 =
+                            gMonsterDatabase[sourceArmy->m_creatureTypes[sourceIndex15]].speed;
+                        bestValue37 = stackValue7;
+                        selectedIndex5 = sourceIndex15;
+                    } else if (
+                        gMonsterDatabase[sourceArmy->m_creatureTypes[sourceIndex15]].speed ==
+                            selectedSpeed19 &&
+                        stackValue7 > bestValue37) {
+                        bestValue37 = stackValue7;
+                        selectedIndex5 = sourceIndex15;
+                    }
+                }
+            }
+        }
+
+        if (selectedIndex5 == AI_TROOP_EMPTY_SLOT) {
+            keepGoing5 = 0;
+        } else if (destinationArmy->CanJoin(
+                       sourceArmy->m_creatureTypes[selectedIndex5])) {
+            transferCount16 = static_cast<int>(
+                static_cast<double>(transferBudget) /
+                    gMonsterDatabase[sourceArmy->m_creatureTypes[selectedIndex5]].fightValue +
+                AI_TROOP_REDISTRIBUTION_ROUNDING);
+            if (transferCount16 > 0) {
+                if (sourceArmy->m_quantities[selectedIndex5] < transferCount16) {
+                    transferCount16 = sourceArmy->m_quantities[selectedIndex5];
+                } else {
+                    keepGoing5 = 0;
+                    if ((sourceArmy->m_quantities[selectedIndex5] *
+                                 AI_TROOP_REDISTRIBUTION_STACK_SHARE <=
+                             transferCount16 ||
+                         sourceArmy->m_quantities[selectedIndex5] - 1 <= transferCount16) &&
+                        gMonsterDatabase[sourceArmy->m_creatureTypes[selectedIndex5]].fightValue *
+                                (sourceArmy->m_quantities[selectedIndex5] - transferCount16) <
+                            (sourceStrength - transferBudget) *
+                                AI_TROOP_REDISTRIBUTION_REMAINDER_FACTOR) {
+                        transferCount16 = sourceArmy->m_quantities[selectedIndex5];
+                    }
+                }
+
+                if (preserveOne != 0 && totalCreatures0 <= transferCount16) {
+                    transferCount16 = totalCreatures0 - 1;
+                    keepGoing5 = 0;
+                }
+
+                if (gMonsterDatabase[sourceArmy->m_creatureTypes[selectedIndex5]].fightValue *
+                            transferCount16 * AI_TROOP_REDISTRIBUTION_BUDGET_FACTOR >
+                        transferBudget) {
+                    keepGoing5 = 0;
+                } else {
+                    transferBudget -=
+                        gMonsterDatabase[sourceArmy->m_creatureTypes[selectedIndex5]].fightValue *
+                        transferCount16;
+                }
+
+                destinationArmy->Add(sourceArmy->m_creatureTypes[selectedIndex5],
+                                     transferCount16, AI_TROOP_EMPTY_SLOT);
+                sourceArmy->m_quantities[selectedIndex5] -= transferCount16;
+                if (sourceArmy->m_quantities[selectedIndex5] == 0)
+                    sourceArmy->m_creatureTypes[selectedIndex5] = AI_TROOP_EMPTY_SLOT;
+            } else {
+                keepGoing5 = 0;
+            }
+        } else {
+            keepGoing5 = 0;
+        }
+    }
+}
 
 VA(0x00442577, 0x39)
 int philAI::ChooseGoldOrExperience(int, int) {
