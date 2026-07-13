@@ -314,14 +314,14 @@ BASE/TILE	_TileToBitmap	100.0000	39bb7d0c396d
 BASE/TILESET	??0tileset@@QAE@K@Z	99.9767	64da762805c6
 BASE/TILESET	??1tileset@@UAE@XZ	99.9091	aa6a6ba26ca4
 BASE/TILESET	??_Etileset@@UAEPAXI@Z	0.0000	
-BASE/Textntry	??0textEntryWidget@@QAE@FFFFFPAD0F0FFFFHH@Z	90.5326	45599d4d6d26
-BASE/Textntry	??0textEntryWidget@@QAE@XZ	100.0000	285990d0b786
-BASE/Textntry	??1textEntryWidget@@UAE@XZ	100.0000	8413e64c089a
+BASE/Textntry	??0textEntryWidget@@QAE@FFFFFPAD0F0FFFFHH@Z	96.0000	b4b5495b9b44
+BASE/Textntry	??0textEntryWidget@@QAE@XZ	100.0000	89971044ecfe
+BASE/Textntry	??1textEntryWidget@@UAE@XZ	100.0000	f654f60cf276
 BASE/Textntry	??_EtextEntryWidget@@UAEPAXI@Z	0.0000	
-BASE/Textntry	?Draw@textEntryWidget@@UAEXXZ	0.7576	a26de91d8570
-BASE/Textntry	?Main@textEntryWidget@@UAEHAAUtag_message@@@Z	0.2801	eb5343bbc796
-BASE/Textntry	?Read@textEntryWidget@@QAEXH@Z	0.0000	9048dbfd5d6e
-BASE/Textntry	?SetupDisplayString@textEntryWidget@@QAEXPADG@Z	0.6757	e61a552d1719
+BASE/Textntry	?Draw@textEntryWidget@@UAEXXZ	99.9924	9ff4f3d8d8c4
+BASE/Textntry	?Main@textEntryWidget@@UAEHAAUtag_message@@@Z	51.3333	91e79cdcc99a
+BASE/Textntry	?Read@textEntryWidget@@QAEXH@Z	96.5232	8698c63fe763
+BASE/Textntry	?SetupDisplayString@textEntryWidget@@QAEXPADG@Z	97.3581	4190acfe45cc
 BASE/WIDGET	??0widget@@QAE@FFFFFF@Z	96.8261	ce8c24384ff9
 BASE/WIDGET	??0widget@@QAE@XZ	100.0000	c4c5959c7db6
 BASE/WIDGET	??1widget@@UAE@XZ	100.0000	7e399133b272
