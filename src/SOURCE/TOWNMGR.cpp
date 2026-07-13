@@ -1777,7 +1777,7 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
             maxCategories = TOWN_THIEVES_BASIC_CATEGORY_COUNT;
     }
 
-    for (position = gpGame->m_playerCount - gpGame->m_humanPlayerCount;
+    for (position = gpGame->m_playerCount - gpGame->m_deadPlayerCount;
          position < TOWN_THIEVES_PLAYER_COUNT; ++position) {
         message.type = TOWN_MESSAGE_SELECT;
         message.field4 = 6;
@@ -1787,7 +1787,7 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
         message.field8 = position + TOWN_THIEVES_FIRST_PLAYER_CONTROL;
         window->BroadcastMessage(message);
     }
-    for (position = gpGame->m_playerCount - gpGame->m_humanPlayerCount;
+    for (position = gpGame->m_playerCount - gpGame->m_deadPlayerCount;
          position < TOWN_THIEVES_PLAYER_COUNT; ++position) {
         message.type = TOWN_MESSAGE_SELECT;
         message.field4 = 6;
@@ -1802,7 +1802,7 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
         firstAtRank = 0;
         for (rank = 0;
              rank < TOWN_THIEVES_PLAYER_COUNT &&
-             gpGame->m_playerCount - gpGame->m_humanPlayerCount !=
+             gpGame->m_playerCount - gpGame->m_deadPlayerCount !=
                  firstAtRank;
              ++rank) {
             tiedCount = 1;
@@ -1833,7 +1833,7 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
     playerIndex = 0;
     for (displayPlayer = 0;
          displayPlayer <
-             gpGame->m_playerCount - gpGame->m_humanPlayerCount;
+             gpGame->m_playerCount - gpGame->m_deadPlayerCount;
          ++displayPlayer) {
         while (gpGame->m_playerDead[playerIndex] != 0)
             ++playerIndex;

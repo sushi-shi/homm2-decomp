@@ -136,6 +136,11 @@ typedef enum EventWindowConstant {
     EVENT_WINDOW_EXPERIENCE = 14
 } EventWindowConstant;
 
+typedef enum PlayerDeadConstant {
+    PLAYER_DEAD_MAP_CHANGE = 0xa,
+    PLAYER_DEAD_MAP_CHANGE_UNUSED = -999
+} PlayerDeadConstant;
+
 typedef enum KbBuildingType {
     KB_BUILDING_MAGE_GUILD = 0,
     KB_BUILDING_NECROMANCER_SHRINE = 2,
@@ -279,6 +284,7 @@ typedef enum CheckEndGameConstants {
     CHECK_END_GAME_GRACE_DAYS = 7,
     CHECK_END_GAME_DAYS_PER_WEEK = 7,
     CHECK_END_GAME_DAYS_PER_MONTH = 28,
+    CHECK_END_GAME_TEXT_BUFFER_SIZE = 100,
     CHECK_END_GAME_GOLD_SCALE = 1000,
     CHECK_END_GAME_ULTIMATE_ARTIFACT = 0,
     CHECK_END_GAME_LAST_ULTIMATE_PART = 7,

@@ -1140,7 +1140,7 @@ firstWeekDone:
         artifactTotal8 += gArtifactBaseRV[generalIndex4];
     for (generalIndex4 = 0; generalIndex4 < gpGame->m_playerCount; generalIndex4++) {
         reinterpret_cast<pdView *>(&gpGame->m_players[generalIndex4])->artifactPoolShare =
-            1.0 / (gpGame->m_playerCount + gpGame->m_humanPlayerCount);
+            1.0 / (gpGame->m_playerCount + gpGame->m_deadPlayerCount);
     }
     reinterpret_cast<pdView *>(gpCurPlayer)->artifactValue =
         static_cast<float>(artifactTotal8 / AI_ARTIFACT_POOL_DIVISOR);
@@ -1250,9 +1250,9 @@ firstWeekDone:
     }
     ownedTownCount19 = static_cast<int>(townCountValue5);
     giMaxHeroesForThisPlayer = 3;
-    if (gpGame->m_playerCount - gpGame->m_humanPlayerCount == 2)
+    if (gpGame->m_playerCount - gpGame->m_deadPlayerCount == 2)
         giMaxHeroesForThisPlayer++;
-    if (gpGame->m_playerCount - gpGame->m_humanPlayerCount == 3)
+    if (gpGame->m_playerCount - gpGame->m_deadPlayerCount == 3)
         giMaxHeroesForThisPlayer++;
     if (ownedTownCount19 >= 4)
         giMaxHeroesForThisPlayer++;
