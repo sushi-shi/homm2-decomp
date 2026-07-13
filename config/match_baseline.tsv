@@ -130,15 +130,15 @@ BASE/DIMMER	?Draw@dimmerWidget@@UAEXXZ	100.0000	a1b9b89be0a2
 BASE/DIMMER	?Main@dimmerWidget@@UAEHAAUtag_message@@@Z	100.0000	01068e5417a9
 BASE/DIMMER	?Read@dimmerWidget@@QAEXXZ	100.0000	0459d1442580
 BASE/EXEC	??0executive@@QAE@XZ	100.0000	5bb717bb0a5b
-BASE/EXEC	?AddManager@executive@@QAEHPAVbaseManager@@H@Z	65.2500	68b7cbebebdb
-BASE/EXEC	?CallManager@executive@@QAEXPAVbaseManager@@@Z	100.0000	49a69bfb6076
-BASE/EXEC	?DoDialog@executive@@QAEHPAVbaseManager@@@Z	0.0000	4afc1868d1e0
+BASE/EXEC	?AddManager@executive@@QAEHPAVbaseManager@@H@Z	100.0000	6b9f85f4f0a6
+BASE/EXEC	?CallManager@executive@@QAEXPAVbaseManager@@@Z	100.0000	619fef1ba18d
+BASE/EXEC	?DoDialog@executive@@QAEHPAVbaseManager@@@Z	99.0000	3fae843d2a1d
 BASE/EXEC	?InitSystem@executive@@QAEHXZ	100.0000	c5081f20d60e
-BASE/EXEC	?MainLoop@executive@@QAEXXZ	0.0000	caa33c66d4aa
+BASE/EXEC	?MainLoop@executive@@QAEXXZ	99.8851	9e906a24d349
 BASE/EXEC	?PrintManagerList@executive@@QAEXXZ	100.0000	2b59959ae41d
 BASE/EXEC	?RemoveManager@executive@@QAEXPAVbaseManager@@@Z	100.0000	f747d69c18bc
-BASE/EXEC	?ShutDownSystem@executive@@QAEXXZ	100.0000	8787bbebb46d
-BASE/EXEC	?Terminate@executive@@QAEXXZ	100.0000	d33a5cc384b3
+BASE/EXEC	?ShutDownSystem@executive@@QAEXXZ	100.0000	de8dbe738b06
+BASE/EXEC	?Terminate@executive@@QAEXXZ	100.0000	687bac529063
 BASE/FONT	??0font@@QAE@K@Z	100.0000	67411d2f90da
 BASE/FONT	??1font@@UAE@XZ	100.0000	088279c525b8
 BASE/FONT	??_Efont@@UAEPAXI@Z	0.0000	
