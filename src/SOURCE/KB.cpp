@@ -2541,6 +2541,11 @@ int WaitForOtherPlayer(void)
     return result;
 }
 
+// @early-stop
+// Retail frame 0x158, CFG, and every stack slot align; relocations are 131/131
+// with only delinked literal/addend aliases. The sole code residual is the
+// printable-key guard: equivalent byte-vs-zero-extend comparisons, with the
+// retail direct-byte sequence eight bytes shorter.
 VA(0x0049d4a6, 0xb85)
 void PopNetBox(char *text, int netPlayer)
 {
@@ -3108,6 +3113,13 @@ int GameUnsaved(void)
         return 0;
 }
 
+// @early-stop
+// Excluding the two switch data tables at function offsets [0x84d, 0x905) and
+// [0x905, 0x98a), explicit-range comparison finds all 477 instructions aligned;
+// only the delinked table-address operands retain different symbol identities.
+// The 0x20 frame and stack slots match. All 163 target relocations agree by
+// offset/type; the base-only PostMessageA and WritePrefs entries are resolved by
+// delinking, and the remaining aliases are literals or local switch labels.
 VA(0x0049ec05, 0xa18)
 int HandleAppSpecificMenuCommands(int command)
 {
@@ -3120,8 +3132,8 @@ int HandleAppSpecificMenuCommands(int command)
 
     menuChanged = 0;
     currentHeroRec = 0;
-    if (gpCurPlayer != 0 && gpCurPlayer->m_currentHero != -1)
-        currentHeroRec = &gpGame->m_heroRecs[gpCurPlayer->m_currentHero];
+    if (gpCurPlayer != 0 && gpCurPlayer->CurrentHero() != -1)
+        currentHeroRec = &gpGame->m_heroRecs[gpCurPlayer->CurrentHero()];
 
     switch (command) {
     case APP_MENU_RESTART_0:
@@ -3154,10 +3166,12 @@ int HandleAppSpecificMenuCommands(int command)
     case APP_MENU_LOAD_10:
         strcpy(gText, "Are you sure you want to load a new game?  (Your current game will be lost)");
 confirmMenuCommand:
-        if (gpAdvManager->m_active != 1 ||
-            (NormalDialog(gText, APP_MENU_CONFIRM_DIALOG, -1, -1, -1, 0, -1, 0, -1, 0),
-             gpWindowManager->m_dialogResult == APP_MENU_CONFIRM_OK))
-            giMenuCommand = command;
+        if (gpAdvManager->m_active == 1) {
+            NormalDialog(gText, APP_MENU_CONFIRM_DIALOG, -1, -1, -1, 0, -1, 0, -1, 0);
+            if (gpWindowManager->m_dialogResult != APP_MENU_CONFIRM_OK)
+                break;
+        }
+        giMenuCommand = command;
         break;
 
     case APP_MENU_SAVE:
@@ -3199,6 +3213,7 @@ confirmMenuCommand:
         goto adjustMusic;
     case APP_MENU_MUSIC_LAST:
         gMusicVolume = 10;
+        goto adjustMusic;
 adjustMusic:
         gpSoundManager->AdjustMusicVolumes();
         menuChanged = 1;
@@ -3236,6 +3251,7 @@ adjustMusic:
         goto adjustSound;
     case APP_MENU_SOUND_LAST:
         gSoundVolume = 10;
+        goto adjustSound;
 adjustSound:
         gpSoundManager->AdjustSoundVolumes();
         menuChanged = 1;
@@ -3320,8 +3336,8 @@ adjustSound:
             gpGame->m_cheated = 1;
             if (gbInCampaign)
                 gpGame->m_campaignCheated = 1;
-            if (gpCurPlayer->m_currentHero != -1) {
-                gpGame->GiveArmy(&gpGame->m_heroRecs[gpCurPlayer->m_currentHero].m_army,
+            if (gpCurPlayer->CurrentHero() != -1) {
+                gpGame->GiveArmy(&gpGame->m_heroRecs[gpCurPlayer->CurrentHero()].m_army,
                                  command - APP_MENU_ARMY_FIRST, 5, -1);
                 gpAdvManager->UpdBottomView(1, 1, 1);
             }
