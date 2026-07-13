@@ -122,3 +122,6 @@ predecessor steering have all been attempted and documented.
 
 Related: [tu-cumulative-eval-order.md](tu-cumulative-eval-order.md),
 [inline-accessors.md](inline-accessors.md).
+
+Target-specific negative search history and exact retest triggers are kept in
+[the soft-deferred matching search ledger](../matching-soft-defer-ledger.md). Check it before
