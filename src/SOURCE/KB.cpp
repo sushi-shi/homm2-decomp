@@ -2499,7 +2499,7 @@ void BVResMsg(char *s, int res, int qty)
 VA(0x0049d326, 0x2d)
 void GOut(char *str)
 {
-    if (*(int *)((char *)gpAdvManager + 0x32) == 1)
+    if (gpAdvManager->m_active == 1)
         AiPrint(str);
 }
 
@@ -2516,21 +2516,25 @@ VA(0x0049d3a7, 0xff)
 int WaitForOtherPlayer(void)
 {
     int result = 0;
-    char *data;
+    KbRemotePacket *data;
     PollSound();
-    data = GetRemoteData(1);
-    if (data && data[5] == 2) {
-        switch (data[6]) {
-        case 0x20:
-            memcpy(gbGamePosToNetPos, data + 9, 6);
-            gbUseRegularCompression = data[0xf];
-            gbUseDiffCompression = data[0x10];
-            memcpy(gsNetPlayerInfo, data + 0x11, 0xcc);
+    data = reinterpret_cast<KbRemotePacket *>(GetRemoteData(1));
+    if (data && data->group == NET_BOX_REMOTE_CONTROL) {
+        switch (data->command) {
+        case NET_BOX_REMOTE_SETUP:
+            memcpy(gbGamePosToNetPos, data->payload.setup.gamePosToNetPos,
+                   OLD_MAIN_PLAYER_COUNT);
+            gbUseRegularCompression = data->payload.setup.useRegularCompression;
+            gbUseDiffCompression = data->payload.setup.useDiffCompression;
+            memcpy(gsNetPlayerInfo, data->payload.setup.players,
+                   sizeof(data->payload.setup.players));
             giThisGamePos = NetPosToGamePos(giThisNetPos);
             break;
-        case 1:
-            result = gpGame->ReceiveSaveGame(*(int *)(data + 9), *(int *)(data + 0xd),
-                                             *(int *)(data + 0x11), data[0]);
+        case NET_BOX_REMOTE_SAVE:
+            result = gpGame->ReceiveSaveGame(data->payload.save.saveId,
+                                             data->payload.save.saveOffset,
+                                             data->payload.save.saveSize,
+                                             data->sender);
             break;
         }
     }
@@ -2540,39 +2544,38 @@ int WaitForOtherPlayer(void)
 VA(0x0049d4a6, 0xb85)
 void PopNetBox(char *text, int netPlayer)
 {
-    int exitForIncomingData;
-    int done;
-    int sendText;
-    int redrawLines;
+    int textY_d;
+    long messageTime_b;
+    heroWindow *netWindow_j;
+    int result_a;
+    int textWidth_b;
+    int textX_d;
+    int savedShowIt_a;
+    int updateInput_a;
+    int inputLength_a;
+    char inputText_c[NET_BOX_TEXT_LENGTH];
+    int exitForIncomingData_i;
+    int redrawLines_a;
+    tag_message event_a;
+    tag_message updateMessage_f;
+    int firstLineId_a;
+    int delay_h;
+    int lineTextLimit_p;
+    int done_i;
     int redrawAdventure;
-    int result;
-    heroWindow *netWindow;
-    char *remoteData;
-    long messageTime;
-    int delay;
-    tag_message updateMessage;
-    int inputLength;
-    char inputText[NET_BOX_TEXT_LENGTH];
-    int savedShowIt;
-    int updateInput;
+    int redrawSavedShowIt_a;
+    KbRemotePacket *remoteData_g;
+    int sendText_h;
     int cursorState;
-    int textWidth;
-    int line;
-    tag_message event;
-    int textX;
-    int textY;
-    int redrawSavedShowIt;
-    int lineTextLimit;
-    int firstLineId;
 
     if (!gbRemoteOn)
         return;
 
-    lineTextLimit = NET_BOX_LINE_TEXT_LIMIT;
-    firstLineId = NET_BOX_FIRST_LINE_ID;
-    textX = 20;
-    textY = 54;
-    messageTime = 0;
+    lineTextLimit_p = NET_BOX_LINE_TEXT_LIMIT;
+    firstLineId_a = NET_BOX_FIRST_LINE_ID;
+    textX_d = NET_BOX_TEXT_X;
+    textY_d = NET_BOX_TEXT_Y;
+    messageTime_b = 0;
     if (text != 0) {
         if (netPlayer >= 0) {
             sprintf(gText, "%s:  %s", gsNetPlayerInfo[netPlayer].name, text);
@@ -2583,229 +2586,232 @@ void PopNetBox(char *text, int netPlayer)
             gText[NET_BOX_LINE_TEXT_LIMIT] = 0;
             AddNetBoxLine(gText, NET_BOX_DEFAULT_COLOR);
         }
-        messageTime = KBTickCount();
+        messageTime_b = KBTickCount();
     }
 
-    inputLength = 0;
-    savedShowIt = bShowIt;
+    inputLength_a = 0;
+    savedShowIt_a = bShowIt;
     bShowIt = 1;
     gbMoveShown = 0;
-    netWindow = new heroWindow(0, NET_BOX_WINDOW_Y, "netbox.bin");
-    if (netWindow == 0)
+    netWindow_j = new heroWindow(0, NET_BOX_WINDOW_Y, "netbox.bin");
+    if (netWindow_j == 0)
         MemError();
 
-    updateMessage.type = NET_BOX_UPDATE_MESSAGE;
-    updateMessage.field4 = NET_BOX_TEXT_COMMAND;
-    updateMessage.field8 = 1;
-    updateMessage.text = cNetBoxLine[0];
-    netWindow->BroadcastMessage(updateMessage);
-    updateMessage.field8 = 2;
-    updateMessage.text = cNetBoxLine[1];
-    netWindow->BroadcastMessage(updateMessage);
-    updateMessage.field8 = 3;
-    updateMessage.text = cNetBoxLine[2];
-    netWindow->BroadcastMessage(updateMessage);
-    updateMessage.field8 = 4;
-    updateMessage.text = cNetBoxLine[3];
-    netWindow->BroadcastMessage(updateMessage);
-    updateMessage.field4 = NET_BOX_COLOR_COMMAND;
-    updateMessage.field8 = 0x14;
-    updateMessage.field18 = cNetBoxColor[0] + 1;
-    netWindow->BroadcastMessage(updateMessage);
-    updateMessage.field8 = 0x15;
-    updateMessage.field18 = cNetBoxColor[1] + 1;
-    netWindow->BroadcastMessage(updateMessage);
-    updateMessage.field8 = 0x16;
-    updateMessage.field18 = cNetBoxColor[2] + 1;
-    netWindow->BroadcastMessage(updateMessage);
-    updateMessage.field8 = 0x17;
-    updateMessage.field18 = cNetBoxColor[3] + 1;
-    netWindow->BroadcastMessage(updateMessage);
-    updateMessage.field8 = NET_BOX_THIS_PLAYER_COLOR_ID;
-    updateMessage.field18 = gpGame->m_players[NetPosToGamePos(giThisNetPos)].color + 1;
-    netWindow->BroadcastMessage(updateMessage);
+    updateMessage_f.type = NET_BOX_UPDATE_MESSAGE;
+    updateMessage_f.field4 = NET_BOX_TEXT_COMMAND;
+    updateMessage_f.field8 = 1;
+    updateMessage_f.text = cNetBoxLine[0];
+    netWindow_j->BroadcastMessage(updateMessage_f);
+    updateMessage_f.field8 = 2;
+    updateMessage_f.text = cNetBoxLine[1];
+    netWindow_j->BroadcastMessage(updateMessage_f);
+    updateMessage_f.field8 = 3;
+    updateMessage_f.text = cNetBoxLine[2];
+    netWindow_j->BroadcastMessage(updateMessage_f);
+    updateMessage_f.field8 = 4;
+    updateMessage_f.text = cNetBoxLine[3];
+    netWindow_j->BroadcastMessage(updateMessage_f);
+    updateMessage_f.field4 = NET_BOX_COLOR_COMMAND;
+    updateMessage_f.field8 = NET_BOX_FIRST_COLOR_ID;
+    updateMessage_f.field18 = cNetBoxColor[0] + 1;
+    netWindow_j->BroadcastMessage(updateMessage_f);
+    updateMessage_f.field8 = NET_BOX_SECOND_COLOR_ID;
+    updateMessage_f.field18 = cNetBoxColor[1] + 1;
+    netWindow_j->BroadcastMessage(updateMessage_f);
+    updateMessage_f.field8 = NET_BOX_THIRD_COLOR_ID;
+    updateMessage_f.field18 = cNetBoxColor[2] + 1;
+    netWindow_j->BroadcastMessage(updateMessage_f);
+    updateMessage_f.field8 = NET_BOX_FOURTH_COLOR_ID;
+    updateMessage_f.field18 = cNetBoxColor[3] + 1;
+    netWindow_j->BroadcastMessage(updateMessage_f);
+    updateMessage_f.field8 = NET_BOX_THIS_PLAYER_COLOR_ID;
+    updateMessage_f.field18 = gpGame->m_players[NetPosToGamePos(giThisNetPos)].color + 1;
+    netWindow_j->BroadcastMessage(updateMessage_f);
 
-    gpWindowManager->AddWindow(netWindow, -1, 1);
-    exitForIncomingData = 0;
-    done = 0;
-    updateInput = 1;
+    gpWindowManager->AddWindow(netWindow_j, -1, 1);
+    exitForIncomingData_i = 0;
+    done_i = 0;
+    updateInput_a = 1;
     cursorState = 0;
-    sendText = 0;
-    redrawLines = 1;
+    sendText_h = 0;
+    redrawLines_a = 1;
     redrawAdventure = 0;
-    strcpy(inputText, "");
+    strcpy(inputText_c, "");
     gpInputManager->SetKeyCodeType(0);
 
-    while (!done) {
+    while (!done_i) {
         PollSound();
-        remoteData = GetRemoteData(0);
-        if (remoteData != 0) {
-            if (remoteData[5] == NET_BOX_REMOTE_GROUP) {
-                remoteData = GetRemoteData(1);
-                switch (remoteData[6]) {
+        remoteData_g = reinterpret_cast<KbRemotePacket *>(GetRemoteData(0));
+        if (remoteData_g != 0) {
+            if (remoteData_g->group == NET_BOX_REMOTE_GROUP) {
+                remoteData_g = reinterpret_cast<KbRemotePacket *>(GetRemoteData(1));
+                switch (remoteData_g->command) {
                 case NET_BOX_REMOTE_MAP_CHANGE:
                     gbLeaveNetBoxAlone = 1;
                     if (gpAdvManager->m_active == 1) {
-                        bShowIt = savedShowIt;
-                        gpAdvManager->ProcessIncomingGroupMapChange(remoteData + 9);
+                        bShowIt = savedShowIt_a;
+                        gpAdvManager->ProcessIncomingGroupMapChange(remoteData_g->payload.data);
                         bShowIt = 1;
                         redrawAdventure = 1;
                     }
                     gbLeaveNetBoxAlone = 0;
-                    updateInput = 1;
+                    updateInput_a = 1;
                     break;
                 }
-            } else if (remoteData[5] == NET_BOX_REMOTE_CONTROL) {
-                switch (remoteData[6]) {
+            } else if (remoteData_g->group != NET_BOX_REMOTE_CONTROL) {
+                remoteData_g = reinterpret_cast<KbRemotePacket *>(GetRemoteData(1));
+            } else {
+                switch (remoteData_g->command) {
                 case NET_BOX_REMOTE_CHAT:
-                    remoteData = GetRemoteData(1);
-                    sprintf(gText, "%s:  %s", gsNetPlayerInfo[remoteData[0]].name, remoteData + 9);
-                    AddNetBoxLine(gText, gpGame->m_players[NetPosToGamePos(remoteData[0])].color);
-                    redrawLines = 1;
-                    if (messageTime != 0)
-                        messageTime = KBTickCount();
+                    remoteData_g = reinterpret_cast<KbRemotePacket *>(GetRemoteData(1));
+                    sprintf(gText, "%s:  %s", gsNetPlayerInfo[remoteData_g->sender].name,
+                            remoteData_g->payload.data);
+                    AddNetBoxLine(gText,
+                                  gpGame->m_players[NetPosToGamePos(remoteData_g->sender)].color);
+                    redrawLines_a = 1;
+                    if (messageTime_b != 0)
+                        messageTime_b = KBTickCount();
                     break;
                 default:
                     AddNetBoxLine("[ Incoming data, must exit... ]", NET_BOX_DEFAULT_COLOR);
-                    redrawLines = 1;
-                    exitForIncomingData = 1;
+                    redrawLines_a = 1;
+                    exitForIncomingData_i = 1;
                     break;
                 }
-            } else {
-                GetRemoteData(1);
             }
         }
 
         Process1WindowsMessage();
-        event = gpInputManager->GetEvent();
-        switch (event.type) {
+        event_a = gpInputManager->GetEvent();
+        switch (event_a.type) {
         case NET_BOX_KEY_MESSAGE:
-            messageTime = 0;
-            switch (event.field4) {
+            messageTime_b = 0;
+            switch (event_a.field4) {
             case NET_BOX_KEY_ESCAPE:
             case NET_BOX_KEY_F1:
-                done = 1;
+                done_i = 1;
                 break;
             case NET_BOX_KEY_BACKSPACE:
-                if (inputLength > 0)
-                    inputLength--;
-                updateInput = 1;
+                if (inputLength_a > 0)
+                    inputLength_a--;
+                updateInput_a = 1;
                 cursorState = 1;
                 break;
             case NET_BOX_KEY_ENTER:
-                sendText = 1;
+                sendText_h = 1;
                 break;
             default:
-                if (static_cast<unsigned char>(event.field4) >= NET_BOX_FIRST_PRINTABLE &&
-                    static_cast<unsigned char>(event.field4) <= NET_BOX_LAST_PRINTABLE &&
-                    inputLength < NET_BOX_MAX_INPUT && event.field4 != 0) {
-                    inputText[inputLength] = 0;
-                    textWidth = smallFont->LineWidth(inputText);
-                    if (textWidth + NET_BOX_CURSOR_WIDTH_PADDING < NET_BOX_CURSOR_WIDTH_LIMIT) {
-                        inputText[inputLength] = static_cast<char>(event.field4);
-                        inputLength++;
-                        updateInput = 1;
+                if (reinterpret_cast<unsigned char *>(&event_a.field4)[0] <
+                        NET_BOX_FIRST_PRINTABLE ||
+                    reinterpret_cast<unsigned char *>(&event_a.field4)[0] >
+                        NET_BOX_LAST_PRINTABLE)
+                    break;
+                if (inputLength_a < NET_BOX_MAX_INPUT && event_a.field4 != 0) {
+                    inputText_c[inputLength_a] = 0;
+                    textWidth_b = smallFont->LineWidth(inputText_c);
+                    if (textWidth_b + NET_BOX_CURSOR_WIDTH_PADDING < NET_BOX_CURSOR_WIDTH_LIMIT) {
+                        inputText_c[inputLength_a] = static_cast<char>(event_a.field4);
+                        inputLength_a++;
+                        updateInput_a = 1;
                         cursorState = 0;
                     }
                 }
-                break;
             }
-            break;
         }
 
-        if (!updateInput && glTimers[0] < KBTickCount()) {
+        if (!updateInput_a && glTimers[0] < KBTickCount()) {
             cursorState = 1 - cursorState;
-            updateInput = 1;
+            updateInput_a = 1;
         }
-        if (sendText) {
-            sendText = 0;
-            inputText[inputLength] = 0;
-            AddNetBoxLine(inputText, gpGame->m_players[NetPosToGamePos(giThisNetPos)].color);
-            result = TransmitRemoteData(inputText, NET_BOX_PACKET_BUFFER_SIZE,
-                                        strlen(inputText) + 1,
+        if (sendText_h) {
+            sendText_h = 0;
+            inputText_c[inputLength_a] = 0;
+            AddNetBoxLine(inputText_c, gpGame->m_players[NetPosToGamePos(giThisNetPos)].color);
+            result_a = TransmitRemoteData(inputText_c, NET_BOX_PACKET_BUFFER_SIZE,
+                                        strlen(inputText_c) + 1,
                                         NET_BOX_REMOTE_CHAT, 1, 1, -1);
-            if (!result)
+            if (!result_a)
                 ShutDown(0);
-            inputLength = 0;
-            strcpy(inputText, "");
-            updateInput = 1;
-            redrawLines = 1;
+            inputLength_a = 0;
+            strcpy(inputText_c, "");
+            updateInput_a = 1;
+            redrawLines_a = 1;
         }
 
-        if (redrawLines) {
-            redrawLines = 0;
-            updateMessage.type = NET_BOX_UPDATE_MESSAGE;
-            updateMessage.field4 = NET_BOX_TEXT_COMMAND;
-            updateMessage.field8 = 1;
-            updateMessage.text = cNetBoxLine[0];
-            netWindow->BroadcastMessage(updateMessage);
-            updateMessage.field8 = 2;
-            updateMessage.text = cNetBoxLine[1];
-            netWindow->BroadcastMessage(updateMessage);
-            updateMessage.field8 = 3;
-            updateMessage.text = cNetBoxLine[2];
-            netWindow->BroadcastMessage(updateMessage);
-            updateMessage.field8 = 4;
-            updateMessage.text = cNetBoxLine[3];
-            netWindow->BroadcastMessage(updateMessage);
-            updateMessage.field4 = NET_BOX_COLOR_COMMAND;
-            updateMessage.field8 = 0x14;
-            updateMessage.field18 = cNetBoxColor[0] + 1;
-            netWindow->BroadcastMessage(updateMessage);
-            updateMessage.field8 = 0x15;
-            updateMessage.field18 = cNetBoxColor[1] + 1;
-            netWindow->BroadcastMessage(updateMessage);
-            updateMessage.field8 = 0x16;
-            updateMessage.field18 = cNetBoxColor[2] + 1;
-            netWindow->BroadcastMessage(updateMessage);
-            updateMessage.field8 = 0x17;
-            updateMessage.field18 = cNetBoxColor[3] + 1;
-            netWindow->BroadcastMessage(updateMessage);
-            netWindow->DrawWindow();
+        if (redrawLines_a) {
+            redrawLines_a = 0;
+            updateMessage_f.type = NET_BOX_UPDATE_MESSAGE;
+            updateMessage_f.field4 = NET_BOX_TEXT_COMMAND;
+            updateMessage_f.field8 = 1;
+            updateMessage_f.text = cNetBoxLine[0];
+            netWindow_j->BroadcastMessage(updateMessage_f);
+            updateMessage_f.field8 = 2;
+            updateMessage_f.text = cNetBoxLine[1];
+            netWindow_j->BroadcastMessage(updateMessage_f);
+            updateMessage_f.field8 = 3;
+            updateMessage_f.text = cNetBoxLine[2];
+            netWindow_j->BroadcastMessage(updateMessage_f);
+            updateMessage_f.field8 = 4;
+            updateMessage_f.text = cNetBoxLine[3];
+            netWindow_j->BroadcastMessage(updateMessage_f);
+            updateMessage_f.field4 = NET_BOX_COLOR_COMMAND;
+            updateMessage_f.field8 = NET_BOX_FIRST_COLOR_ID;
+            updateMessage_f.field18 = cNetBoxColor[0] + 1;
+            netWindow_j->BroadcastMessage(updateMessage_f);
+            updateMessage_f.field8 = NET_BOX_SECOND_COLOR_ID;
+            updateMessage_f.field18 = cNetBoxColor[1] + 1;
+            netWindow_j->BroadcastMessage(updateMessage_f);
+            updateMessage_f.field8 = NET_BOX_THIRD_COLOR_ID;
+            updateMessage_f.field18 = cNetBoxColor[2] + 1;
+            netWindow_j->BroadcastMessage(updateMessage_f);
+            updateMessage_f.field8 = NET_BOX_FOURTH_COLOR_ID;
+            updateMessage_f.field18 = cNetBoxColor[3] + 1;
+            netWindow_j->BroadcastMessage(updateMessage_f);
+            netWindow_j->DrawWindow();
             gpWindowManager->UpdateScreenRegion(0, NET_BOX_WINDOW_Y, NET_BOX_WIDTH, NET_BOX_HEIGHT);
         }
 
-        if (updateInput) {
-            updateInput = 0;
+        if (updateInput_a) {
+            updateInput_a = 0;
             glTimers[0] = KBTickCount() + NET_BOX_CURSOR_DELAY;
             if (cursorState)
-                inputText[inputLength] = '_';
+                inputText_c[inputLength_a] = '_';
             else
-                inputText[inputLength] = 0x1f;
-            inputText[inputLength + 1] = 0;
-            updateMessage.type = NET_BOX_UPDATE_MESSAGE;
-            updateMessage.field4 = NET_BOX_TEXT_COMMAND;
-            updateMessage.field8 = NET_BOX_INPUT_ID;
-            updateMessage.text = inputText;
-            netWindow->BroadcastMessage(updateMessage);
-            netWindow->DrawWindow();
+                inputText_c[inputLength_a] = NET_BOX_CURSOR_GLYPH;
+            inputText_c[inputLength_a + 1] = 0;
+            updateMessage_f.type = NET_BOX_UPDATE_MESSAGE;
+            updateMessage_f.field4 = NET_BOX_TEXT_COMMAND;
+            updateMessage_f.field8 = NET_BOX_INPUT_ID;
+            updateMessage_f.text = inputText_c;
+            netWindow_j->BroadcastMessage(updateMessage_f);
+            netWindow_j->DrawWindow();
             gpWindowManager->UpdateScreenRegion(0, NET_BOX_INPUT_Y, NET_BOX_WIDTH, NET_BOX_INPUT_HEIGHT);
         }
 
-        if (messageTime != 0 && messageTime + NET_BOX_MESSAGE_TIMEOUT < KBTickCount())
-            done = 1;
-        if (exitForIncomingData) {
-            for (delay = 0; delay < NET_BOX_EXIT_DELAY_STEPS; delay++) {
+        if (messageTime_b != 0 && messageTime_b + NET_BOX_MESSAGE_TIMEOUT < KBTickCount())
+            done_i = 1;
+        if (exitForIncomingData_i) {
+            for (delay_h = 0; delay_h < NET_BOX_EXIT_DELAY_STEPS; delay_h++) {
                 PollSound();
                 DelayMilli(NET_BOX_EXIT_DELAY);
             }
-            done = 1;
+            done_i = 1;
         }
     }
 
     gpInputManager->SetKeyCodeType(1);
     if (redrawAdventure && gbMoveShown) {
         gbDrawWindowBackground = 0;
-        gpWindowManager->RemoveWindow(netWindow);
+        gpWindowManager->RemoveWindow(netWindow_j);
         gbDrawWindowBackground = 1;
-        redrawSavedShowIt = bShowIt;
+        redrawSavedShowIt_a = bShowIt;
         bShowIt = 1;
         gpAdvManager->RedrawAdvScreen(1, 0);
-        bShowIt = redrawSavedShowIt;
+        bShowIt = redrawSavedShowIt_a;
     } else {
-        gpWindowManager->RemoveWindow(netWindow);
+        gpWindowManager->RemoveWindow(netWindow_j);
     }
-    bShowIt = savedShowIt;
+    bShowIt = savedShowIt_a;
 }
 
 VA(0x0049e02b, 0xc7)
