@@ -5359,7 +5359,36 @@ void advManager::ShowRoute(int redraw, int, int updateButton)
 }
 
 VA(0x00468720, 0x107)
-void advManager::HideRoute(int, int, int) {}
+void advManager::HideRoute(int redraw, int clearDestination, int updateButton)
+{
+    hero *currentHero;
+
+    if (!gbThisNetHumanPlayer[giCurPlayer] &&
+        (!giDebugLevel || !giShowComputerRoute))
+        return;
+
+    if (updateButton) {
+        gpWindowManager->BroadcastMessage(
+            ADVMGR_BUTTON_MESSAGE, ADVMGR_BUTTON_ENABLE,
+            ADVMGR_BUTTON_TARGET, ADVMGR_BUTTON_BROADCAST_FLAGS);
+    }
+
+    if (clearDestination &&
+        gpCurPlayer->m_currentHero != ADVMGR_INVALID_HERO) {
+        currentHero = &gpGame->m_heroRecs[gpCurPlayer->CurrentHero()];
+        currentHero->m_destinationX = ADVMGR_INVALID_CELL;
+        currentHero->m_destinationY = ADVMGR_INVALID_CELL;
+    }
+
+    if (!m_visibilityMapValid)
+        return;
+
+    m_visibilityMapValid = 0;
+    if (redraw) {
+        CompleteDraw(0);
+        UpdateScreen(0, 0);
+    }
+}
 
 // @early-stop
 // all 52 instructions, both inline-continuation jumps, and ten relocation targets match
@@ -5390,7 +5419,34 @@ void advManager::CheckDimNextHeroBut(void) {
 }
 
 VA(0x0046891f, 0x138)
-void advManager::SeedTo(int, int) {}
+void advManager::SeedTo(int targetX, int targetY)
+{
+    hero *currentHero;
+
+    if (!gbThisNetHumanPlayer[giCurPlayer])
+        return;
+    if (gpCurPlayer->m_currentHero == ADVMGR_INVALID_HERO)
+        return;
+
+    currentHero = &gpGame->m_heroRecs[gpCurPlayer->CurrentHero()];
+    if (!giSeedingValid) {
+        gpSearchArray->SeedPosition(
+            currentHero->m_x, currentHero->m_y, m_cursorDirection,
+            ADVMGR_ROUTE_PATH_COST_LIMIT,
+            m_cursorType == ADVMGR_POINTER_SAIL, 0,
+            currentHero->m_remainingMobility,
+            currentHero->m_secondarySkills[HERO_SKILL_PATHFINDING],
+            targetX, targetY, 0, 1);
+    } else if (!giFullySeeded) {
+        gpSearchArray->SeedPosition(
+            currentHero->m_x, currentHero->m_y, m_cursorDirection,
+            ADVMGR_ROUTE_PATH_COST_LIMIT,
+            m_cursorType == ADVMGR_POINTER_SAIL, 0,
+            currentHero->m_remainingMobility,
+            currentHero->m_secondarySkills[HERO_SKILL_PATHFINDING],
+            targetX, targetY, 1, 1);
+    }
+}
 
 VA(0x00468a57, 0x5f)
 void advManager::ForceNewHover(void)
@@ -5405,11 +5461,122 @@ void advManager::ForceNewHover(void)
     ProcessHover(x, y);
 }
 
+// @early-stop
+// All non-table bytes match. The 32-byte jump table has the same eight case
+// offsets; retail delinks its entries as ScreenScroll while base retains local labels.
 VA(0x00468ab6, 0x1a6)
-void advManager::ScreenScroll(int, int) {}
+void advManager::ScreenScroll(int direction, int updatePointer)
+{
+    int originX;
+    int originY;
+
+    originX = m_mapOriginX;
+    originY = m_mapOriginY;
+    iLastScrollTime = KBTickCount();
+
+    switch (direction) {
+    case ADVMGR_SCROLL_NORTH:
+        --originY;
+        break;
+    case ADVMGR_SCROLL_NORTH_EAST:
+        ++originX;
+        --originY;
+        break;
+    case ADVMGR_SCROLL_EAST:
+        ++originX;
+        break;
+    case ADVMGR_SCROLL_SOUTH_EAST:
+        ++originX;
+        ++originY;
+        break;
+    case ADVMGR_SCROLL_SOUTH:
+        ++originY;
+        break;
+    case ADVMGR_SCROLL_SOUTH_WEST:
+        --originX;
+        ++originY;
+        break;
+    case ADVMGR_SCROLL_WEST:
+        --originX;
+        break;
+    case ADVMGR_SCROLL_NORTH_WEST:
+        --originX;
+        --originY;
+        break;
+    }
+
+    if (updatePointer)
+        gpMouseManager->SetPointer(
+            direction + ADVMGR_HOVER_SCROLL_FRAME_FIRST);
+
+    if (originX < ADVMGR_SCROLL_MIN_ORIGIN)
+        originX = ADVMGR_SCROLL_MIN_ORIGIN;
+    if (MAP_WIDTH - ADVMGR_VIEW_EDGE_MARGIN < originX)
+        originX = MAP_WIDTH - ADVMGR_VIEW_EDGE_MARGIN;
+    if (originY < ADVMGR_SCROLL_MIN_ORIGIN)
+        originY = ADVMGR_SCROLL_MIN_ORIGIN;
+    if (MAP_HEIGHT - ADVMGR_VIEW_EDGE_MARGIN < originY)
+        originY = MAP_HEIGHT - ADVMGR_VIEW_EDGE_MARGIN;
+
+    if (m_mapOriginX != originX || m_mapOriginY != originY) {
+        DemobilizeCurrHero();
+        m_mapOriginX = originX;
+        m_mapOriginY = originY;
+        UpdateRadar(1, 0);
+        CompleteDraw(0);
+        UpdateScreen(0, 0);
+    }
+}
 
 VA(0x00468c5c, 0x1bb)
-void advManager::CheckScreenScroll(void) {}
+void advManager::CheckScreenScroll(void)
+{
+    int mouseX6;
+    int mouseY1;
+    int oldOriginX9;
+    int oldOriginY3;
+
+    if (KBTickCount() - iLastScrollTime > ADVMGR_SCROLL_TICK_INTERVAL) {
+        iLastScrollTime = KBTickCount();
+        oldOriginX9 = m_mapOriginX;
+        oldOriginY3 = m_mapOriginY;
+        gpMouseManager->MouseCoords(mouseX6, mouseY1);
+
+        if (mouseX6 >= 0 && mouseX6 < ADVMGR_SCREEN_WIDTH &&
+            mouseY1 >= 0 && mouseY1 < ADVMGR_SCREEN_HEIGHT) {
+            if (mouseX6 < ADVMGR_SCROLL_BORDER) {
+                if (mouseY1 < ADVMGR_SCROLL_BORDER)
+                    ScreenScroll(ADVMGR_SCROLL_NORTH_WEST, 1);
+                else if (mouseY1 >
+                         ADVMGR_SCREEN_HEIGHT - ADVMGR_SCROLL_BORDER)
+                    ScreenScroll(ADVMGR_SCROLL_SOUTH_WEST, 1);
+                else
+                    ScreenScroll(ADVMGR_SCROLL_WEST, 1);
+            } else if (mouseX6 >
+                       ADVMGR_SCREEN_WIDTH - ADVMGR_SCROLL_BORDER - 1) {
+                if (mouseY1 < ADVMGR_SCROLL_BORDER)
+                    ScreenScroll(ADVMGR_SCROLL_NORTH_EAST, 1);
+                else if (mouseY1 >
+                         ADVMGR_SCREEN_HEIGHT - ADVMGR_SCROLL_BORDER)
+                    ScreenScroll(ADVMGR_SCROLL_SOUTH_EAST, 1);
+                else
+                    ScreenScroll(ADVMGR_SCROLL_EAST, 1);
+            } else if (mouseY1 < ADVMGR_SCROLL_BORDER) {
+                ScreenScroll(ADVMGR_SCROLL_NORTH, 1);
+            } else if (mouseY1 >
+                       ADVMGR_SCREEN_HEIGHT - ADVMGR_SCROLL_BORDER) {
+                ScreenScroll(ADVMGR_SCROLL_SOUTH, 1);
+            }
+        }
+
+        if (gpMouseManager->m_cursorFrame >=
+                ADVMGR_HOVER_SCROLL_FRAME_FIRST &&
+            gpMouseManager->m_cursorFrame < ADVMGR_HOVER_SCROLL_FRAME_END &&
+            m_mapOriginX == oldOriginX9 && m_mapOriginY == oldOriginY3) {
+            gpMouseManager->SetPointer(ADVMGR_POINTER_DEFAULT);
+        }
+    }
+}
 
 VA(0x00468e17, 0x91)
 int advManager::MouseInScrollZone(void)
@@ -5427,7 +5594,65 @@ int advManager::MouseInScrollZone(void)
 }
 
 VA(0x00468ea8, 0x2b8)
-void advManager::SetInitialMapOrigin(void) {}
+void advManager::SetInitialMapOrigin(void)
+{
+    game *gameState;  // outer-scope retail slot retained in the frame
+    town *currentTown9;
+    playerData *initialPlayer8;
+    hero *initialHero5;
+    town *initialTown9;
+
+    gpWindowManager->BroadcastMessage(
+        ADVMGR_BUTTON_MESSAGE, ADVMGR_BUTTON_ENABLE,
+        ADVMGR_BUTTON_TARGET, ADVMGR_BUTTON_BROADCAST_FLAGS);
+    m_hoverCellY = 0;
+    m_lastHoverCell = m_hoverCellY;
+    m_cursorActive = 0;
+    gbHeroMoving = 0;
+
+    if (gbThisNetHumanPlayer[giCurPlayer] &&
+        gpCurPlayer->CurrentTown() != ADVMGR_INVALID_CELL) {
+        currentTown9 = reinterpret_cast<town *>(
+            &gpGame->m_castleRecs[gpCurPlayer->CurrentTown()]);
+        m_mapOriginX = currentTown9->m_x - ADVMGR_VIEW_CENTER_OFFSET;
+        m_mapOriginY = currentTown9->m_y - ADVMGR_VIEW_CENTER_OFFSET;
+    } else if (gbThisNetHumanPlayer[giCurPlayer] &&
+               gpCurPlayer->CurrentHero() != ADVMGR_INVALID_HERO) {
+        MobilizeCurrHero(0);
+    } else {
+        if (gbThisNetHumanPlayer[giCurPlayer])
+            initialPlayer8 = gpCurPlayer;
+        else
+            initialPlayer8 = reinterpret_cast<playerData *>(
+                &gpGame->m_players[giThisGamePos]);
+
+        if (initialPlayer8->m_heroCount > 0) {
+            initialHero5 =
+                &gpGame->m_heroRecs[initialPlayer8->m_heroIds[0]];
+            m_mapOriginX = initialHero5->m_x - ADVMGR_VIEW_CENTER_OFFSET;
+            m_mapOriginY = initialHero5->m_y - ADVMGR_VIEW_CENTER_OFFSET;
+        } else if (initialPlayer8->m_townCount > 0) {
+            initialTown9 = reinterpret_cast<town *>(
+                &gpGame->m_castleRecs[initialPlayer8->m_townIds[0]]);
+            m_mapOriginX = initialTown9->m_x - ADVMGR_VIEW_CENTER_OFFSET;
+            m_mapOriginY = initialTown9->m_y - ADVMGR_VIEW_CENTER_OFFSET;
+        } else {
+            m_mapOriginX = 0;
+            m_mapOriginY = 0;
+        }
+    }
+
+    m_currentTerrain = giGroundToTerrain[
+        GetCell(m_mapOriginX + ADVMGR_VIEW_CENTER_OFFSET,
+                m_mapOriginY + ADVMGR_VIEW_CENTER_OFFSET)->tile];
+    gpSoundManager->SwitchAmbientMusic(
+        giTerrainToMusicTrack[m_currentTerrain]);
+    SetEnvironmentOrigin(
+        m_mapOriginX + ADVMGR_VIEW_CENTER_OFFSET,
+        m_mapOriginY + ADVMGR_VIEW_CENTER_OFFSET, 1);
+    Reseed(0, 0);
+    CheckDimNextHeroBut();
+}
 
 VA(0x00469160, 0x1be)
 void advManager::LoadRemote(void) {}
