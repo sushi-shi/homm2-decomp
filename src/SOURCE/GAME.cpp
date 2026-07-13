@@ -5532,8 +5532,46 @@ int game::CalcDifficultyRating(void)
     return rating;
 }
 
+// @early-stop
+// The frame and every non-jump instruction/operand match. Retail is exactly 45 bytes
+// longer: nine five-byte local continuation/trampoline jumps; no jump table is present.
 VA(0x00484620, 0x1ea)
-int CalcBaseScore(int) { return 0; }
+int CalcBaseScore(int days)
+{
+    int score = GAME_SCORE_BASE;
+
+    if (gpGame->m_mapWidth == GAME_SCORE_MAP_EXTRA_LARGE)
+        days = static_cast<int>(days * 1.2);
+    else if (gpGame->m_mapWidth == GAME_SCORE_MAP_LARGE)
+        days = static_cast<int>(days * 1.1);
+    else if (gpGame->m_mapWidth == GAME_SCORE_MAP_MEDIUM) {
+    } else if (gpGame->m_mapWidth == GAME_SCORE_MAP_SMALL)
+        days = static_cast<int>(days * 0.95);
+
+    if (days <= GAME_SCORE_FIRST_TIER) {
+        score -= -(-days);
+    } else {
+        score -= GAME_SCORE_FIRST_TIER;
+        if (days <= GAME_SCORE_SECOND_TIER) {
+            score = static_cast<int>(
+                score - (days - GAME_SCORE_FIRST_TIER) * 0.5);
+        } else {
+            score = static_cast<int>(score - 30.0);
+            if (days <= GAME_SCORE_THIRD_TIER) {
+                score = static_cast<int>(
+                    score - (days - GAME_SCORE_SECOND_TIER) * 0.25);
+            } else {
+                score = static_cast<int>(score - 60.0);
+                score = static_cast<int>(
+                    score - (days - GAME_SCORE_THIRD_TIER) * 0.125);
+            }
+        }
+    }
+
+    if (score < GAME_SCORE_MINIMUM)
+        score = GAME_SCORE_MINIMUM;
+    return score;
+}
 
 // @early-stop
 // ~99.9%: logic byte-exact (matched 100% standalone); tiny residual is the same
@@ -5787,8 +5825,94 @@ void CreateDiffFile(char *oldName, char *joinName, char *diffName,
     return;
 }
 
+// @early-stop
+// Logic and all 0x34-frame slots match. At +0x1e8..+0x1f4 only, /Od emits the
+// equivalent TU-cumulative loop test with the two operand loads reversed.
 VA(0x00485107, 0x3ce)
-void CreateJoinFile(char *, char *, char *) {}
+void CreateJoinFile(char *oldName, char *diffName, char *joinName)
+{
+    unsigned char *oldData13 = 0;
+    unsigned char *diffData5 = 0;
+    unsigned char *joinData9 = 0;
+    int joinSize37 = 0;
+    int diffSize1;
+    int copyLength9;
+    int diffFile2;
+    int oldSize10;
+    unsigned char copyFlag16;
+    int position1;
+    int joinFile0;
+
+    sprintf(gText, "%s%s", ".\\DATA\\", diffName);
+    diffSize1 = FileSize(gText);
+    diffData5 = static_cast<unsigned char *>(
+        BaseAlloc(diffSize1, GFILE, GDIFFLINE + 0xd));
+    sprintf(gText, "%s%s", ".\\DATA\\", diffName);
+    diffFile2 = _open(gText, 0x8000);
+    if (diffFile2 == -1)
+        FileError(gText);
+    _read(diffFile2, diffData5, diffSize1);
+    _close(diffFile2);
+
+    joinData9 = static_cast<unsigned char *>(
+        BaseAlloc(GAME_JOIN_BUFFER_SIZE, GFILE, GDIFFLINE + 0x16));
+    if (diffData5[0] == 0) {
+        memcpy(joinData9, diffData5 + GAME_JOIN_HEADER_SIZE,
+               diffSize1 - GAME_JOIN_HEADER_SIZE);
+        joinSize37 = diffSize1 - GAME_JOIN_HEADER_SIZE;
+    } else {
+        sprintf(gText, "%s%s", ".\\DATA\\", oldName);
+        oldSize10 = FileSize(gText);
+        oldData13 = static_cast<unsigned char *>(
+            BaseAlloc(oldSize10, GFILE, GDIFFLINE + 0x21));
+        sprintf(gText, "%s%s", ".\\DATA\\", oldName);
+        diffFile2 = _open(gText, 0x8000);
+        if (diffFile2 == -1)
+            FileError(gText);
+        _read(diffFile2, oldData13, oldSize10);
+        _close(diffFile2);
+        memcpy(joinData9, oldData13, oldSize10);
+
+        position1 = GAME_JOIN_HEADER_SIZE;
+        while (diffSize1 > position1) {
+            copyFlag16 = diffData5[position1] >> 7;
+            copyLength9 = GetSkipCopyLen(diffData5, &position1);
+            if (copyFlag16) {
+                memcpy(joinData9 + joinSize37,
+                       diffData5 + position1, copyLength9);
+                joinSize37 += copyLength9;
+                position1 += copyLength9;
+            } else {
+                joinSize37 += copyLength9;
+            }
+        }
+    }
+
+    sprintf(gText, "%s%s", ".\\DATA\\", joinName);
+    joinFile0 = _open(gText, 0x8301, 0x80);
+    if (joinFile0 == -1)
+        FileError(gText);
+    _write(joinFile0, joinData9, joinSize37);
+    _close(joinFile0);
+    LogInt(const_cast<char *>("New Join CRC"),
+           calc_crc_long(joinData9, joinSize37), joinSize37,
+           GAME_JOIN_LOG_UNUSED, GAME_JOIN_LOG_UNUSED, GAME_JOIN_LOG_UNUSED,
+           GAME_JOIN_LOG_UNUSED, GAME_JOIN_LOG_UNUSED);
+
+    sprintf(gText, "%s%s", ".\\DATA\\", oldName);
+    joinFile0 = _open(gText, 0x8301, 0x80);
+    if (joinFile0 == -1)
+        FileError(gText);
+    _write(joinFile0, joinData9, joinSize37);
+    _close(joinFile0);
+
+    if (oldData13)
+        BaseFree(oldData13, GFILE, GDIFFLINE + 0x53);
+    if (diffData5)
+        BaseFree(diffData5, GFILE, GDIFFLINE + 0x55);
+    if (joinData9)
+        BaseFree(joinData9, GFILE, GDIFFLINE + 0x57);
+}
 
 VA(0x004854d5, 0x5d)
 int game::HeroIDToHeroPos(playerData *pd, int heroId)
