@@ -33,6 +33,7 @@
 #include <SOURCE/HERO.h>
 #include <SOURCE/EVENTS.h>
 #include <SOURCE/ExpCampaign.h>
+#include <SOURCE/FINDPATH.h>
 #include <SOURCE/GAME.h>
 #include <SOURCE/PHILAI.h>
 #include <SOURCE/NOOPT.h>
@@ -5051,12 +5052,14 @@ void advManager::TownGate(int spellId)
         giTerrainToMusicTrack[m_currentTerrain]);
 }
 
+// @early-stop
+// Exact 0x5ac size and 41 relocation sites. Retail places the CurrentHero
+// /Ob1 continuation at +0x180; ours places the same five-byte jump at +0x174.
+// The screen-bound sums at +0x3e8..+0x40d only reverse commutative stack loads,
+// and the unreachable +0x5a3 jump has a different local target. The two
+// y-coordinate relocations are delinked as a string but resolve to
+// normalDirTable+2 at original VA 0x004faa7a; all other operands agree.
 VA(0x00467c9b, 0x5ac)
-// @early-stop exact size and 41 relocation sites. Residuals are the
-// CurrentHero /Ob1 continuation at +0x174..+0x184, equivalent w4hi bitfield
-// read-modify-write evaluation order at +0x4de..+0x4ed, and the unreachable
-// post-return local jump at +0x5a3..+0x5a6. Retail's +0xc2 and +0x4a2
-// relocations are delinked as a string but address normalDirTable in context.
 void advManager::SummonBoat(void) {
     int boatIndex9;
     mapCell* destinationCell;
@@ -5220,7 +5223,140 @@ void advManager::SummonBoat(void) {
 }
 
 VA(0x00468247, 0x4d9)
-void advManager::ShowRoute(int, int, int) {}
+void advManager::ShowRoute(int redraw, int, int updateButton)
+{
+    int routeReachable8;
+    int pathFound5;
+    int routeX1;
+    mapCell *nextCell7;
+    int previousDirection0;
+    hero *currentHero0;
+    int routeY1;
+    int direction;
+    int terrainCost;
+    int remainingMobility2;
+    int pathIndex;
+    int currentTerrain0;
+    mapCell *currentCell2;
+    int routeFrame;
+    int buttonFrame;
+
+    routeReachable8 = 0;
+    if (!gbThisNetHumanPlayer[giCurPlayer])
+        return;
+
+    if (gpCurPlayer->m_currentHero == ADVMGR_INVALID_HERO) {
+        HideRoute(redraw, 0, 1);
+        return;
+    }
+
+    currentHero0 = gpGame->GetHero(gpCurPlayer->m_currentHero);
+    if (currentHero0->m_destinationX == ADVMGR_INVALID_CELL) {
+        HideRoute(redraw, 1, 1);
+        return;
+    }
+
+    pathFound5 = gpSearchArray->BuildPath(
+        currentHero0->m_x, currentHero0->m_y,
+        currentHero0->m_destinationX, currentHero0->m_destinationY,
+        ADVMGR_ROUTE_PATH_COST_LIMIT);
+    if (gpSearchArray->m_pathLength > 0 && pathFound5 > 0) {
+        memset(m_visibilityMap, 0, MAP_WIDTH * MAP_HEIGHT * 2);
+        m_visibilityMapValid = 1;
+        remainingMobility2 = currentHero0->m_remainingMobility;
+        routeX1 = currentHero0->m_x;
+        routeY1 = currentHero0->m_y;
+
+        for (pathIndex = gpSearchArray->m_pathLength - 1;
+             pathIndex >= 0; --pathIndex) {
+            direction =
+                gpSearchArray->m_storage.path.directions[pathIndex + 1];
+            currentCell2 = GetCell(routeX1, routeY1);
+            routeX1 += normalDirTable[direction].x;
+            routeY1 += normalDirTable[direction].y;
+            nextCell7 = GetCell(routeX1, routeY1);
+            currentTerrain0 = giGroundToTerrain[currentCell2->tile];
+            terrainCost = CalcTerrainCost(
+                giGroundToTerrain[nextCell7->tile], direction & 1,
+                ADVMGR_ROUTE_TERRAIN_COST_INFINITY,
+                currentHero0->m_secondarySkills[HERO_SKILL_PATHFINDING],
+                currentCell2->objFlag1, nextCell7->objFlag1);
+            remainingMobility2 -= CalcTerrainCost(
+                currentTerrain0, direction & 1, remainingMobility2,
+                currentHero0->m_secondarySkills[HERO_SKILL_PATHFINDING],
+                currentCell2->objFlag1, nextCell7->objFlag1);
+
+            if (direction & 1) {
+                if (terrainCost == ADVMGR_ROUTE_DIAGONAL_COST_0)
+                    routeFrame = 0;
+                else if (terrainCost == ADVMGR_ROUTE_DIAGONAL_COST_1)
+                    routeFrame = 1;
+                else if (terrainCost == ADVMGR_ROUTE_DIAGONAL_COST_2)
+                    routeFrame = 2;
+                else if (terrainCost == ADVMGR_ROUTE_DIAGONAL_COST_3)
+                    routeFrame = 3;
+                else if (terrainCost == ADVMGR_ROUTE_DIAGONAL_COST_4)
+                    routeFrame = 4;
+                else if (terrainCost == ADVMGR_ROUTE_DIAGONAL_COST_5)
+                    routeFrame = 5;
+                else
+                    routeFrame = 1;
+            } else {
+                if (terrainCost == ADVMGR_ROUTE_STRAIGHT_COST_0)
+                    routeFrame = 0;
+                else if (terrainCost == ADVMGR_ROUTE_STRAIGHT_COST_1)
+                    routeFrame = 1;
+                else if (terrainCost == ADVMGR_ROUTE_STRAIGHT_COST_2)
+                    routeFrame = 2;
+                else if (terrainCost == ADVMGR_ROUTE_STRAIGHT_COST_3)
+                    routeFrame = 3;
+                else if (terrainCost == ADVMGR_ROUTE_STRAIGHT_COST_4)
+                    routeFrame = 4;
+                else if (terrainCost == ADVMGR_ROUTE_STRAIGHT_COST_5)
+                    routeFrame = 5;
+                else
+                    routeFrame = 1;
+            }
+
+            if (pathIndex == 0) {
+                reinterpret_cast<unsigned short *>(m_visibilityMap)
+                    [routeY1 * (MAP_WIDTH | 0) + routeX1] = 1;
+            } else {
+                previousDirection0 =
+                    gpSearchArray->m_storage.path.directions[pathIndex];
+                reinterpret_cast<unsigned short *>(m_visibilityMap)
+                    [routeY1 * (MAP_WIDTH | 0) + routeX1] =
+                    static_cast<unsigned short>(
+                        gbArrow[previousDirection0][direction | 0] +
+                        routeFrame * ADVMGR_ROUTE_ARROW_FRAME_STRIDE +
+                        ADVMGR_ROUTE_ARROW_FRAME_OFFSET);
+            }
+
+            if (remainingMobility2 < 0) {
+                reinterpret_cast<unsigned short *>(m_visibilityMap)
+                    [routeY1 * (MAP_WIDTH | 0) + routeX1] +=
+                    ADVMGR_ROUTE_DAY_MASK;
+            } else {
+                routeReachable8 = 1;
+            }
+        }
+
+        if (updateButton) {
+            buttonFrame = routeReachable8 ? ADVMGR_BUTTON_DISABLE
+                                          : ADVMGR_BUTTON_ENABLE;
+            gpWindowManager->BroadcastMessage(
+                ADVMGR_BUTTON_MESSAGE, buttonFrame, ADVMGR_BUTTON_TARGET,
+                ADVMGR_BUTTON_BROADCAST_FLAGS);
+        }
+    } else {
+        HideRoute(redraw, 1, 1);
+    }
+
+    if (redraw) {
+        CompleteDraw(0);
+        UpdateScreen(0, 0);
+    }
+}
 
 VA(0x00468720, 0x107)
 void advManager::HideRoute(int, int, int) {}
