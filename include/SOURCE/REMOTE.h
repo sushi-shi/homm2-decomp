@@ -47,7 +47,7 @@ extern char *PacketSend;
 extern int *iInOrder;
 extern char *sndBuf;
 extern char *gcThisNetName;
-extern long *lLastHeartbeatReceive;
+extern long lLastHeartbeatReceive[6];
 extern char *packet;
 extern char *rcvBufIn;
 extern char *rcvBuf[138];

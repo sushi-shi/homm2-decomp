@@ -5719,13 +5719,13 @@ char * advManager::CheckHandleNet(void)
                 ShutDown(0);
             }
             if (playerExited5) {
-                exitInfo4.m_0 = packet9->sender;
-                exitInfo4.m_1 = static_cast<signed char>(
+                exitInfo4.netPosition = packet9->sender;
+                exitInfo4.gamePosition = static_cast<signed char>(
                     NetPosToGamePos(packet9->sender));
-                exitInfo4.m_2 = 0;
-                exitInfo4.m_4 = 1;
-                exitInfo4.m_5 = 1;
-                exitInfo4.m_3 = 1;
+                exitInfo4.updateNetworkControl = 0;
+                exitInfo4.eliminated = 1;
+                exitInfo4.hostReported = 1;
+                exitInfo4.timedOut = 1;
                 ReceiveRemotePlayerExit(exitInfo4);
             }
             LoadRemote();

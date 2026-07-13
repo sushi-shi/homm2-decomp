@@ -76,6 +76,6 @@ DATA(0x004ef810) int iLastMsgNumHumanPlayers;
 DATA(0x00525060) int iMaxSession;
 DATA(0x00525064) int giHostAcceptStatus;
 DATA(0x00525068) struct _GUID *g_lpGuid;
-DATA(0x00525070) int *giNetPosToDCOPos;
+DATA(0x00525070) int giNetPosToDCOPos[6];
 DATA(0x00525088) int iSessionToTry;
 DATA(0x00525090) long *lSessions;
