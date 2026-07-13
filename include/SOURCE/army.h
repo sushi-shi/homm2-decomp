@@ -43,12 +43,14 @@ public:
     int    field_0xb2;  // +0xb2
     int    field_0xb6;  // +0xb6
     short  m_monsterHitPoints;  // +0xba
-    char _pad_0xbc[0x9];
+    char _pad_0xbc[0x6];
+    unsigned short m_currentHitPoints;  // +0xc2
+    char m_unknownC4;  // +0xc4
     signed char m_monsterSpeed;  // +0xc5
     signed char m_monsterAttack;  // +0xc6
     signed char m_monsterDefense;  // +0xc7
-    char   field_0xc8;  // +0xc8
-    char   field_0xc9;  // +0xc9
+    signed char m_monsterDamageMin;  // +0xc8
+    signed char m_monsterDamageMax;  // +0xc9
     signed char m_shots;  // +0xca
     char _pad_0xcb[0x5];
     int    m_flags;  // +0xd0
@@ -60,8 +62,8 @@ public:
     int    m_effectX;  // +0xe6
     int    m_effectY;  // +0xea
     int    field_0xee;  // +0xee
-    int    field_0xf2;  // +0xf2
-    int    field_0xf6;  // +0xf6
+    int    m_morale;  // +0xf2
+    int    m_luck;  // +0xf6
     int    field_0xfa;  // +0xfa
     int    field_0xfe;  // +0xfe
     int    field_0x102;  // +0x102
