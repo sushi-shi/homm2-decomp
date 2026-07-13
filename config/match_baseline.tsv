@@ -202,12 +202,12 @@ BASE/MOUSEMGR	?SetColorMice@mouseManager@@QAEXH@Z	96.8381	f1c8cf2a2c9e
 BASE/MOUSEMGR	?SetPointer@mouseManager@@QAEXH@Z	94.3421	4a16b6afeee5
 BASE/MOUSEMGR	?SetPointer@mouseManager@@QAEXPADHH@Z	100.0000	ca1869e445bb
 BASE/MOUSEMGR	?ShowColorPointer@mouseManager@@QAEXXZ	100.0000	f56b43291986
-BASE/Midi	?MIDIIsPlaying@soundManager@@QAEHXZ	100.0000	83c30248b74e
-BASE/Midi	?MIDIPlay@soundManager@@QAEXH@Z	81.0494	e22d370b5300
-BASE/Midi	?MIDISetVolume@soundManager@@QAEXXZ	90.8684	7f1fa6f17e96
-BASE/Midi	?MIDIShutdown@soundManager@@QAEXXZ	87.6699	36fe41a039c0
-BASE/Midi	?MIDIStartup@soundManager@@QAEXXZ	100.0000	e0c99d7d5b62
-BASE/Midi	?MIDIStop@soundManager@@QAEXXZ	87.9688	9b08e9e778fe
+BASE/Midi	?MIDIIsPlaying@soundManager@@QAEHXZ	100.0000	2211c291016d
+BASE/Midi	?MIDIPlay@soundManager@@QAEXH@Z	99.9588	6625f3b982ab
+BASE/Midi	?MIDISetVolume@soundManager@@QAEXXZ	100.0000	15a39005816d
+BASE/Midi	?MIDIShutdown@soundManager@@QAEXXZ	100.0000	e2ecdc5b4f51
+BASE/Midi	?MIDIStartup@soundManager@@QAEXXZ	100.0000	bebbda206114
+BASE/Midi	?MIDIStop@soundManager@@QAEXXZ	100.0000	08f46b747c6e
 BASE/Midi	empty_stub	0.0000	
 BASE/Misc	?AbsAiPrint@@YIXPAD@Z	100.0000	7400f45663bb
 BASE/Misc	?AiPrint@@YIXPAD@Z	100.0000	f80a0304e1ce
