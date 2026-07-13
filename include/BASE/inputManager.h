@@ -21,12 +21,11 @@ public:
     int    field_0x742;  // +0x742
     int    field_0x746;  // +0x746
     int    field_0x74a;  // +0x74a
-    short  m_keyState[89];  // +0x74e  89-entry short array (key/scancode state; unreferenced in reconstructed code)
-    char _pad_0x800[0x4e];
+    short  m_keyState[128];  // +0x74e  scan-code to ASCII/extended-key table
     int    field_0x84e;  // +0x84e
     int    field_0x852;  // +0x852
     int    field_0x856;  // +0x856
-    char _pad_0x85a[0x4];
+    int    m_field_0x85a;  // +0x85a
     int    field_0x85e;  // +0x85e
     int    field_0x862;  // +0x862
     int    field_0x866;  // +0x866
