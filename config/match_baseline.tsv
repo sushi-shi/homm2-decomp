@@ -374,7 +374,7 @@ BASE/droplist	?DeleteItem@dropListWidget@@QAEXH@Z	100.0000	9c6f4628e789
 BASE/droplist	?Draw@dropListWidget@@UAEXXZ	100.0000	a9f68c5f29e3
 BASE/droplist	?DrawDropStuff@dropListWidget@@QAEXXZ	100.0000	02e6e36033be
 BASE/droplist	?Main@dropListWidget@@UAEHAAUtag_message@@@Z	99.8745	5d9d3d64c2fe
-BASE/droplist	?ProcessSelectDialog@dropListWidget@@QAEXXZ	99.1997	570c274d5f1b
+BASE/droplist	?ProcessSelectDialog@dropListWidget@@QAEXXZ	99.3675	40e2a77ca175
 BASE/droplist	?Read@dropListWidget@@QAEXXZ	100.0000	3e0df002aca4
 BASE/droplist	?RestoreDropBackground@dropListWidget@@QAEXXZ	100.0000	fdd690daaab3
 BASE/droplist	?SaveDropBackground@dropListWidget@@QAEXXZ	100.0000	b3d5c9e1b5dd

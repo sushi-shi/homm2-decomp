@@ -413,9 +413,9 @@ void dropListWidget::ProcessSelectDialog(void)
             case 0x48:
                 if (m_selectedIndex > 0) {
                     m_selectedIndex--;
-                    if (m_selectedIndex > 0 && m_selectedIndex < m_topIndex)
-                        m_topIndex = m_selectedIndex;
                 }
+                if (m_selectedIndex > 0 && m_selectedIndex < m_topIndex)
+                    m_topIndex = m_selectedIndex;
                 DrawDropStuff();
                 continue;
             case 0x49:
