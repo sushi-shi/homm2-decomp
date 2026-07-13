@@ -401,9 +401,11 @@ typedef enum NetBoxConstant {
     NET_BOX_WIDTH = 0x27f,
     NET_BOX_INPUT_Y = 0x1d1,
     NET_BOX_INPUT_HEIGHT = 0xc,
-    NET_BOX_TEXT_LENGTH = 100,
+    NET_BOX_TEXT_LENGTH = 150,
     NET_BOX_LINE_COUNT = 4,
     NET_BOX_LINE_TEXT_LIMIT = 120,
+    NET_BOX_TEXT_X = 20,
+    NET_BOX_TEXT_Y = 54,
     NET_BOX_MAX_INPUT = 0x5d,
     NET_BOX_DEFAULT_COLOR = 6,
     NET_BOX_CURSOR_DELAY = 0x168,
@@ -417,6 +419,9 @@ typedef enum NetBoxConstant {
     NET_BOX_COLOR_COMMAND = 4,
     NET_BOX_FIRST_LINE_ID = 1,
     NET_BOX_FIRST_COLOR_ID = 0x14,
+    NET_BOX_SECOND_COLOR_ID = 0x15,
+    NET_BOX_THIRD_COLOR_ID = 0x16,
+    NET_BOX_FOURTH_COLOR_ID = 0x17,
     NET_BOX_INPUT_ID = 5,
     NET_BOX_THIS_PLAYER_COLOR_ID = 0x18,
     NET_BOX_KEY_MESSAGE = 1,
@@ -424,10 +429,13 @@ typedef enum NetBoxConstant {
     NET_BOX_KEY_ENTER = 10,
     NET_BOX_KEY_BACKSPACE = 0x7f,
     NET_BOX_KEY_F1 = 0x3b00,
+    NET_BOX_CURSOR_GLYPH = 0x1f,
     NET_BOX_PACKET_BUFFER_SIZE = 0x7f,
     NET_BOX_FIRST_PRINTABLE = 0x20,
     NET_BOX_LAST_PRINTABLE = 0x7f,
     NET_BOX_REMOTE_MAP_CHANGE = 0x29,
+    NET_BOX_REMOTE_SETUP = 0x20,
+    NET_BOX_REMOTE_SAVE = 1,
     NET_BOX_REMOTE_CHAT = 0xb,
     NET_BOX_REMOTE_GROUP = 3,
     NET_BOX_REMOTE_CONTROL = 2
@@ -601,6 +609,26 @@ struct OldMainNetSetup {
 };
 #pragma pack(pop)
 SIZE(OldMainNetSetup, 0xd4);
+
+#pragma pack(push, 1)
+struct KbRemotePacket {
+    signed char sender;
+    char reserved1[4];
+    signed char group;
+    signed char command;
+    char reserved2[2];
+    union {
+        OldMainNetSetup setup;
+        struct {
+            int saveId;
+            int saveOffset;
+            int saveSize;
+        } save;
+        char data[1];
+    } payload;
+};
+#pragma pack(pop)
+SIZE(KbRemotePacket, 0xdd);
 
 typedef enum AppMenuConstant {
     APP_MENU_CHECKED = 8,
