@@ -249,3 +249,54 @@ The known missing sites are setup `gIcX0`/`gIcY` CSE reloads and the fifth dim
 the remaining concrete setup/dim sites only after a shared header/compiler state changes or an
 adjacent decoder reveals a new retail-proven lifetime. Do not repeat the axes above while the
 canonical hash agrees. This is a scheduling defer, not proof that the residual is impossible.
+
+## BASE/Iconf2b: FlipIconToBitmap
+
+Status: active. This section records superseded axes while the same lane continues; it is not a
+wall or soft defer.
+
+Canonical source state:
+
+- checkpoint: `188544b`
+- target: RVA `0xd1ba0`, retail size `0x4f1`
+- `src/BASE/Iconf2b.cpp`: `8e4f2a38efb2ff4ec5bfae630ff56e08f1ea33c465828373b09908c25d3506cb`
+- live checkpoint: 83.53%, 84 candidate vs 81 retail relocations, no base-only external target
+
+### Corrections retained at the canonical checkpoint
+
+- removed the invalid generic `@early-stop`;
+- recovered early source cursor, width spill, and entry Y/X lifetimes;
+- reordered clipped fill, dim, literal quadrants, and newline updates;
+- corrected dim advancement to the original `gFlipCnt2` publication;
+- used `gFlipDimLen` for the retail selected dim/literal publication;
+- reconstructed the local dim cursor with a per-iteration global palette load;
+- corrected the flipped right-edge boundary and shared literal loop;
+- retained the assignment-expression decrement that removes one unwanted destination relocation.
+
+### Searches already exhausted
+
+The removed pre-reconstruction wall had already tried local/global X bounds, early/late source
+formation, volatile width/run, split/common clipped fills, local/global dim loops, offset
+temporaries, and 180 historical AST permutations. Those AST passes predate the current structural
+gate and must not be repeated below 96-97%.
+
+A local dim-pointer form reached retail size `0x4f1` and 83 relocations but changed the frame to
+four bytes and reduced instruction agreement; it was rejected.
+
+New measured axes:
+
+- combined extra boundary/count locals: 69.29%, reverted;
+- isolated clipped destination local: 69.20%, reverted;
+- separate width assignment: byte-identical;
+- setup X/Y reuse: byte-identical;
+- Y polarity/constant spellings: byte-identical;
+- dim-count placement: byte-identical;
+- address grouping: byte-identical;
+- entry-publication placement: byte-identical;
+- palette local outside the loop: 75.64% with 82 relocations, reverted because retail reloads the
+  global palette per iteration;
+- postfix `gFlipDst--`: byte-identical; the retained assignment expression removes one relocation.
+
+Continue from the first remaining structural/relocation divergence. Do not repeat these axes while
+the canonical hash agrees. If a real shared icon/header change is retained, retest the deferred
+Icon2b and icon2bc functions before final handoff.
