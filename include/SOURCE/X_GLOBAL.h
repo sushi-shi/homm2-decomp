@@ -123,7 +123,7 @@ extern int giDeferObjDrawX;
 extern int giDeferObjDrawY;
 extern class heroWindow *gpInitWin;
 DATA(0x004fd888) extern unsigned char (*iGetSSByAlignment)[6];
-extern struct SCmbtHero *sCmbtHero;
+extern struct SCmbtHero sCmbtHero[12];
 extern unsigned char *iWallToHexCell;
 extern unsigned char *iTowerToHexCell;
 extern unsigned short wallPos[4][2];

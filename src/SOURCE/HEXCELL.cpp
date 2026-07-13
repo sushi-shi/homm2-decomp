@@ -13,12 +13,12 @@
 VA(0x0044a3c0, 0x46)
 hexcell::hexcell(void)
 {
-    obstacleIndex = -1;
-    field_0xe = 0;
-    occupantSide = -1;
-    occupantIndex = 0;
-    occupantFrame = -1;
-    deadOccupantCount = 0;
+    m_obstacleIndex = -1;
+    m_blocked = 0;
+    m_occupantSide = -1;
+    m_occupantIndex = 0;
+    m_occupantFrame = -1;
+    m_deadOccupantCount = 0;
 }
 
 VA(0x0044a406, 0x16)
@@ -31,12 +31,12 @@ void hexcell::DrawLowerDeadOccupants(void)
     int i;
     army *occupant;
 
-    if (deadOccupantCount > 0) {
-        for (i = 0; i < deadOccupantCount - 1; ++i) {
-            occupant = &gpCombatManager->armies[deadOccupantSides[i]][deadOccupantIndices[i]];
-            currentFrame = occupant->field_0x86;
-            if (deadOccupantFrames[i] != currentFrame)
-                occupant->DrawToBuffer(field_0x0, field_0x2, 0);
+    if (m_deadOccupantCount > 0) {
+        for (i = 0; i < m_deadOccupantCount - 1; ++i) {
+            occupant = &gpCombatManager->m_armies[m_deadOccupantSides[i]][m_deadOccupantIndices[i]];
+            currentFrame = occupant->m_facing;
+            if (m_deadOccupantFrames[i] != currentFrame)
+                occupant->DrawToBuffer(m_x, m_y, 0);
         }
     }
 }
@@ -50,12 +50,12 @@ void hexcell::DrawUpperDeadOccupant(void)
     int i;
     army *occupant;
 
-    if (deadOccupantCount > 0) {
-        for (i = deadOccupantCount - 1; i < deadOccupantCount; ++i) {
-            occupant = &gpCombatManager->armies[deadOccupantSides[i]][deadOccupantIndices[i]];
-            currentFrame = occupant->field_0x86;
-            if (deadOccupantFrames[i] != currentFrame)
-                occupant->DrawToBuffer(field_0x0, field_0x2, 0);
+    if (m_deadOccupantCount > 0) {
+        for (i = m_deadOccupantCount - 1; i < m_deadOccupantCount; ++i) {
+            occupant = &gpCombatManager->m_armies[m_deadOccupantSides[i]][m_deadOccupantIndices[i]];
+            currentFrame = occupant->m_facing;
+            if (m_deadOccupantFrames[i] != currentFrame)
+                occupant->DrawToBuffer(m_x, m_y, 0);
         }
     }
 }
@@ -63,17 +63,17 @@ void hexcell::DrawUpperDeadOccupant(void)
 VA(0x0044a5aa, 0x165)
 void hexcell::DrawOccupant(int creature, int frame)
 {
-    if (occupantSide != -1) {
+    if (m_occupantSide != -1) {
         if (creature != 100) {
-            if (gpCombatManager->armies[occupantSide][occupantIndex].field_0x6 != creature)
+            if (gpCombatManager->m_armies[m_occupantSide][m_occupantIndex].m_drawState != creature)
                 return;
         }
-        if (gbLimitToExtent && occupantSide == gpCombatManager->currentArmySide
-            && occupantIndex == gpCombatManager->currentArmyIndex)
+        if (gbLimitToExtent && m_occupantSide == gpCombatManager->m_currentArmySide
+            && m_occupantIndex == gpCombatManager->m_currentArmyIndex)
             gbCurrArmyDrawn = 1;
-        if (gpCombatManager->armies[occupantSide][occupantIndex].field_0x86 != occupantFrame)
-            gpCombatManager->armies[occupantSide][occupantIndex].DrawToBuffer(
-                field_0x0, field_0x2, frame);
+        if (gpCombatManager->m_armies[m_occupantSide][m_occupantIndex].m_facing != m_occupantFrame)
+            gpCombatManager->m_armies[m_occupantSide][m_occupantIndex].DrawToBuffer(
+                m_x, m_y, frame);
     }
 }
 
@@ -87,26 +87,26 @@ void hexcell::DrawTower(int frame)
     int temp;
 
     if (level)
-        drawX = field_0x0;
+        drawX = m_x;
     else
-        drawX = field_0x0 + 28;
-    gpCombatManager->towerIcon->CombatClipDrawToBuffer(drawX, field_0x2, frame, &limits, 1, 0, 0, 0);
+        drawX = m_x + 28;
+    gpCombatManager->m_towerIcon->CombatClipDrawToBuffer(drawX, m_y, frame, &m_limits, 1, 0, 0, 0);
 
-    row = (field_0x2 - 139) / 42;
+    row = (m_y - 139) / 42;
     if (row == 4)
         return;
     if (row & 1) {
         if (level)
-            rightX = field_0x0;
+            rightX = m_x;
         else
-            rightX = field_0x0 + 28;
-        gpCombatManager->towerIcon->CombatClipDrawToBuffer(rightX, field_0x2, 9, &limits, 1, 0, 0, 0);
+            rightX = m_x + 28;
+        gpCombatManager->m_towerIcon->CombatClipDrawToBuffer(rightX, m_y, 9, &m_limits, 1, 0, 0, 0);
     } else {
         if (level)
-            temp = field_0x0 - 28;
+            temp = m_x - 28;
         else
-            temp = field_0x0;
-        gpCombatManager->towerIcon->CombatClipDrawToBuffer(temp, field_0x2, 9, &limits, 0, 0, 0, 0);
+            temp = m_x;
+        gpCombatManager->m_towerIcon->CombatClipDrawToBuffer(temp, m_y, 9, &m_limits, 0, 0, 0, 0);
     }
 }
 
@@ -116,6 +116,6 @@ void hexcell::DrawClouds(void) {}
 VA(0x0044a86e, 0x4f)
 void hexcell::DrawObstacle(void)
 {
-    gpCombatManager->obstacleIcons[obstacleIndex]->CombatClipDrawToBuffer(
-        field_0x0, field_0x2, 0, &limits, 0, 0, 0, 0);
+    gpCombatManager->m_obstacleIcons[m_obstacleIndex]->CombatClipDrawToBuffer(
+        m_x, m_y, 0, &m_limits, 0, 0, 0, 0);
 }

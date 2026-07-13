@@ -10,20 +10,20 @@ class hexcell {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
-    short  field_0x0;  // +0x00
-    short  field_0x2;  // +0x02
+    short  m_x;  // +0x00
+    short  m_y;  // +0x02
     char _pad_0x4[0xa];
-    char   field_0xe;  // +0x0e
-    signed char obstacleIndex;  // +0x0f
-    signed char occupantSide;  // +0x10
-    signed char occupantIndex;  // +0x11
-    signed char occupantFrame;  // +0x12
-    int deadOccupantCount;  // +0x13
-    signed char deadOccupantSides[14];  // +0x17
-    signed char deadOccupantIndices[14];  // +0x25
-    signed char deadOccupantFrames[14];  // +0x33
-    char field_0x41;
-    struct SLimitData limits;  // +0x42
+    char   m_blocked;  // +0x0e
+    signed char m_obstacleIndex;  // +0x0f
+    signed char m_occupantSide;  // +0x10
+    signed char m_occupantIndex;  // +0x11
+    signed char m_occupantFrame;  // +0x12
+    int m_deadOccupantCount;  // +0x13
+    signed char m_deadOccupantSides[14];  // +0x17
+    signed char m_deadOccupantIndices[14];  // +0x25
+    signed char m_deadOccupantFrames[14];  // +0x33
+    char m_unknown41;
+    struct SLimitData m_limits;  // +0x42
     // --- constructors ---
     hexcell(void);
     // --- methods ---
