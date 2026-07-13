@@ -31,24 +31,29 @@ static int gFCClipR;
 static unsigned char *gFCDst;
 
 // @early-stop
-// Flip + colour-table variant: horizontal-flip decoder (X decreases, backward copy) where literal
-// pixels are remapped through colorTable[] and solid runs fill colorTable[*src]. row is global
-// gFCRow; X and src are register-locals; fill-before-dim layout. Residual is the /O2 reg wall.
+// /O2 regalloc/intrinsic wall: base 0x532 vs retail 0x54d; all 83 reloc occurrences and targets
+// agree. Residual spans are setup +0x18..+0xec, fill/dim +0x181..+0x394, and clipped copy
+// +0x395..+0x542. Tried local/global/mutable setup, signed/unsigned counts, merged/split memset,
+// pointer-update orders, global palette/destination loads, and 136 AST variants over five rounds.
 VA(0x004d9790, 0x54d)
 void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                                 int clip, int clipX, int clipY, int clipW, int clipH, int color,
                                 unsigned char *colorTable)
 {
-    unsigned char *data = reinterpret_cast<unsigned char *>(srcIcon->m_data);
-    IconEntry *entries = reinterpret_cast<IconEntry *>(data);
-    int w = entries[frame].w;
-    gFCEntry = &entries[frame];
-    gFCX0 = ((x - entries[frame].x) - w) + 1;
-    gFCXEnd = w + gFCX0 - 1;
-    gFCY = y + entries[frame].y;
+    unsigned char *src = reinterpret_cast<unsigned char *>(srcIcon->m_data);
+    IconEntry *entry = reinterpret_cast<IconEntry *>(src) + frame;
+    int width = entry->w;
+    int x0 = x - entry->x - width + 1;
+    gFCEntry = entry;
+    src += entry->srcOffset;
+    gFCX0 = x0;
+    int X = x0 + width - 1;
+    gFCXEnd = X;
+    int Y = y + entry->y;
+    gFCY = Y;
     if (clip != 0) {
-        if (gFCX0 < clipX || clipW + clipX < gFCX0 + w || gFCY < clipY ||
-            clipY + clipH < entries[frame].h + gFCY) {
+        if (x0 < clipX || clipW + clipX <= x0 + width - 1 || Y < clipY ||
+            clipY + clipH < entry->h + Y) {
             clip = 1;
             gFCClipR = clipX + clipW - 1;
             gFCClipB = clipY + clipH - 1;
@@ -56,15 +61,13 @@ void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, 
             clip = 0;
         }
     }
-    short pitch = dest->m_width;
+    int pitch = dest->m_width;
     gFCRow = gFCY * pitch + reinterpret_cast<int>(dest->m_pixels);
-    int X = gFCXEnd;
-    unsigned char *src = data + entries[frame].srcOffset;
     for (;;) {
         int cmd = *src++;
         if (static_cast<signed char>(cmd) < 0) {
-            gFCRun = cmd;
             if ((cmd & 0x40) == 0) {
+                gFCRun = cmd;
                 int n = cmd & 0x3f;
                 gFCX = X;
                 gFCSrc = src;
@@ -73,6 +76,7 @@ void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, 
                 X = X - n;
                 continue;
             }
+            gFCRun = cmd;
             unsigned int count = cmd & 0x3f;
             int flags = 0;
             if (count != 0) {
@@ -86,10 +90,11 @@ void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, 
             count = flags & 3;
             if (count == 0)
                 count = *src++;
-            gFCCnt2 = count;
             gFCDimLen = count;
             if (color != 0) {
+                gFCRun = flags;
                 if (flags & 0x80) {
+                    gFCCnt2 = count;
                     gFCColor = static_cast<unsigned char>(color);
                     goto do_fill;
                 }
@@ -101,23 +106,22 @@ void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, 
             } else {
                 int left;
                 if (clipY <= gFCY && gFCY <= gFCClipB &&
-                    (left = (X - count) + 1, left <= gFCClipR) && clipX <= X) {
-                    unsigned int cn = count;
-                    unsigned char *dst;
+                    (left = (X - count) + 1, clipX <= left) && X <= gFCClipR) {
                     if (left < clipX) {
-                        cn = (X - clipX) + 1;
-                        dst = reinterpret_cast<unsigned char *>(gFCRow + clipX);
+                        memset(reinterpret_cast<unsigned char *>(gFCRow + clipX), gFCColor,
+                               (X - clipX) + 1);
                     } else {
-                        dst = reinterpret_cast<unsigned char *>((gFCRow - count) + 1 + X);
+                        memset(reinterpret_cast<unsigned char *>((gFCRow - count) + 1 + X),
+                               gFCColor, count);
                     }
-                    memset(dst, gFCColor, cn);
                 }
             }
-            gFCSrc = src;
             X = X - count;
+            gFCRun = count;
             continue;
         do_dim:
             gFCRun = flags;
+            gFCCnt2 = count;
             if (flags & 0x40) {
                 unsigned char *palette =
                     reinterpret_cast<unsigned char *>(uDimPal) + (flags & 0x3c) * 0x40;
@@ -126,36 +130,40 @@ void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, 
                     gFCCnt = 0;
                     unsigned char *dp = reinterpret_cast<unsigned char *>((gFCRow - count) + 1 + X);
                     gFCDimDst = dp;
-                    gFCCnt = count;
-                    for (unsigned int k = count; k != 0; k--) {
-                        gFCDimDst = dp + 1;
-                        *dp = palette[*dp];
-                        dp = dp + 1;
-                    }
-                } else if (clipY <= gFCY && gFCY <= gFCClipB &&
-                           (int)((X - count) + 1) >= clipX && X <= gFCClipR) {
-                    int left = (X - count) + 1;
-                    unsigned char *dp;
-                    if (left < clipX) {
-                        dp = reinterpret_cast<unsigned char *>(gFCRow + clipX);
-                        count = (X - clipX) + 1;
-                    } else {
-                        dp = reinterpret_cast<unsigned char *>((gFCRow - count) + 1 + X);
-                    }
-                    gFCCnt = 0;
-                    gFCCnt = count;
-                    gFCCnt2 = count;
-                    gFCDimDst = dp;
                     if (static_cast<int>(count) > 0) {
+                        gFCCnt = count;
                         for (unsigned int k = count; k != 0; k--) {
-                            gFCDimDst = dp + 1;
-                            *dp = palette[*dp];
+                            *dp = gFCDimPal[*dp];
                             dp = dp + 1;
+                            gFCDimDst = dp;
+                        }
+                    }
+                } else {
+                    gFCCnt2 = count;
+                    if (clipY <= gFCY && gFCY <= gFCClipB &&
+                        (int)((X - count) + 1) >= clipX && X <= gFCClipR) {
+                        int left = (X - count) + 1;
+                        unsigned char *dp;
+                        if (left < clipX) {
+                            count = (X - clipX) + 1;
+                            dp = reinterpret_cast<unsigned char *>(gFCRow + clipX);
+                        } else {
+                            dp = reinterpret_cast<unsigned char *>((gFCRow - count) + 1 + X);
+                        }
+                        gFCCnt2 = count;
+                        gFCCnt = 0;
+                        gFCDimDst = dp;
+                        if (static_cast<int>(count) > 0) {
+                            gFCCnt = count;
+                            for (unsigned int k = count; k != 0; k--) {
+                                *dp = gFCDimPal[*dp];
+                                dp = dp + 1;
+                                gFCDimDst = dp;
+                            }
                         }
                     }
                 }
             }
-            gFCSrc = src;
             X = X - gFCDimLen;
             continue;
         }
@@ -167,41 +175,53 @@ void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, 
                 gFCCnt = 0;
                 unsigned char *dst = reinterpret_cast<unsigned char *>(gFCRow + X);
                 gFCDst = dst;
-                gFCCnt = cmd;
-                for (int k = cmd; k != 0; k--) {
-                    unsigned char c = colorTable[*src++];
-                    *dst-- = c;
-                    gFCDst = dst;
+                if (cmd > 0) {
+                    gFCCnt = cmd;
+                    for (int k = cmd; k != 0; k--) {
+                        unsigned char c = colorTable[*src++];
+                        *dst-- = c;
+                        gFCDst = dst;
+                    }
                 }
             } else if (clipY <= gFCY && gFCY <= gFCClipB) {
-                int left = (X - cmd) + 1;
-                if (left <= gFCClipR && clipX <= X) {
+                int left = 1 + (X - cmd);
+                if (left <= gFCClipR && clipX <= X + 1 - 1) {
                     unsigned int cn;
                     unsigned char *dst;
-                    if (gFCClipR < X) {
+                    int skip;
+                    if (gFCClipR < X - 1 + 1) {
                         dst = reinterpret_cast<unsigned char *>(gFCRow + gFCClipR);
                         src = src + (X - gFCClipR);
+                        gFCDst = dst;
                         if ((X - cmd) < clipX) {
-                            gFCSkip = gFCClipR + ((cmd - X) - clipW);
+                            skip = gFCClipR + ((cmd - X) - clipW);
                             cn = clipW;
+                            goto set_skip;
                         } else {
                             gFCSkip = 0;
                             cn = (cmd - X) + gFCClipR;
                         }
                     } else {
                         dst = reinterpret_cast<unsigned char *>(gFCRow + X);
+                        gFCDst = dst;
                         if (left < clipX) {
                             cn = (X - clipX) + 1;
-                            gFCSkip = cmd - cn;
+                            skip = cmd - cn;
+                            goto set_skip;
                         } else {
                             gFCSkip = 0;
                             cn = cmd;
                         }
                     }
-                    gFCCnt = 0;
+                    goto skip_set;
+                set_skip:
+                    gFCSkip = skip;
+                skip_set:
                     gFCCnt2 = cn;
-                    if (static_cast<int>(cn) > 0) {
+                    gFCCnt = 0;
+                    if (static_cast<int>(cn) >= 0 + 1) {
                         gFCCnt = cn;
+                        dst = gFCDst;
                         for (unsigned int k = cn; k != 0; k--) {
                             unsigned char c = colorTable[*src++];
                             *dst-- = c;
@@ -211,13 +231,13 @@ void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, 
                     src = src + gFCSkip;
                 }
             }
-            gFCSrc = src;
             X = X - cmd;
+            gFCRun = cmd;
             continue;
         }
         // newline
-        gFCRow = gFCRow + pitch;
         X = gFCXEnd;
         gFCY = gFCY + 1;
+        gFCRow = gFCRow + pitch;
     }
 }
