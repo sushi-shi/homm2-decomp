@@ -31,7 +31,9 @@ public:
     char m_unknownad[6];  // +0xad
     char m_pad_0xb3[0x34];
     int m_secondaryResources[7];  // +0xe7
-    char m_pad_0x103[0x18];
+    char m_pad_0x103[0xc];
+    float m_aiSpellValueMultiplier;  // +0x10f
+    char m_pad_0x113[0x8];
     // --- methods ---
     void Write(int);
     void Read(int);
