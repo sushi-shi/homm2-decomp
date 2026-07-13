@@ -219,7 +219,7 @@ extern char *gSpellDesc[66];
 extern char *gSpellNames[66];
 extern char *gSecondarySkillLevels[4];
 extern char *gSecondarySkills[14];
-DATA(0x004ffa78) extern char *(*cSecSkillDesc)[3];
+extern char *cSecSkillDesc[14][3];
 extern char *cDirections[10];
 extern char *cRumourTerrainDescriptions[10];
 extern char *cRandomTavernText[8];
