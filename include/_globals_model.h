@@ -19,14 +19,17 @@ DATA(0x004faeb2) extern monsterRV gMonsterInfo[100];     // monster-DB view, 26B
 // level index, so an expert value aliases the next row's leading entry.
 #define HERO_SECONDARY_SKILL_VALUE_LEVELS 3
 DATA(0x004fabf4) extern int gSecondarySkillRV[][HERO_SECONDARY_SKILL_VALUE_LEVELS];
+DATA(0x004fdf52) extern signed char gCombatFormations[][17];
 // (gRVWeightOre/Merc/Crystal removed — they were just gafAITurnCostResource[2|1|4]; the code
 //  now indexes the array directly via the RES_* enum, which matches the retail byte-for-byte.)
 DATA(0x0051ef24) extern char gDefaultCursorName[]; // default cursor resource name (mouseManager::SetColorMice)
 DATA(0x00528dca) extern int gCdMusic; // CD-vs-MIDI music mode (dword-accessed) (soundManager::MusicPlaying)
 DATA(0x00528d28) extern int const_00128d28; // MIDI music volume 0-10 (0=off)
 #define gMidiEnabled const_00128d28
+#define gMusicVolume const_00128d28
 DATA(0x00528d2c) extern int const_00128d2c; // sample/CD music volume 0-10
 #define gSampleVolume const_00128d2c
+#define gSoundVolume const_00128d2c
 DATA(0x00528d24) extern int const_00128d24;
 #define gCursorSampleSet const_00128d24
 DATA(0x00528e46) extern int gSoundTransition;
@@ -35,7 +38,10 @@ DATA(0x004fa684) extern int gMapTypeFlags; // map format flags (game::NewMap)
 
 
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
-DATA(0x00528d38) extern int const_00128d38;            // 13-byte BSS flag buffer (??_C@_0N@PMOM@...)
+DATA(0x00528d34) extern int gShowRoute;
+DATA(0x00528d38) extern int const_00128d38;
+#define gBlackoutComputer const_00128d38
+DATA(0x00528d3c) extern exeGfxConfig gExecutableGraphics[];
 
 // TILE.cpp inline-asm scratch (no CodeView symbol): the blitter parks the mode word and a
 // mirror-path row counter in static storage between its __asm sections.

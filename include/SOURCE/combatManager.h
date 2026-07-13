@@ -138,7 +138,9 @@ public:
     int    m_unknown36;  // +0x36
     char _pad_0x3a[0x4da];
     hexcell m_hexCells[117];  // +0x514
-    char _pad_0x31de[0x24];
+    char _pad_0x31de[0x14];
+    int m_debugFormation;  // +0x31f2
+    char _pad_0x31f6[0xc];
     class icon *m_catapultIcon;  // +0x3202
     char _pad_0x3206[0x4];
     class icon *m_towerIcon;  // +0x320a

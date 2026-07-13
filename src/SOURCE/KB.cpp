@@ -4,6 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <_globals_model.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/town.h>
 #include <SOURCE/townManager.h>
@@ -39,10 +40,14 @@
 #include <io.h>
 
 #include <SOURCE/advManager.h>
+#include <SOURCE/combatManager.h>
 #include <SOURCE/hero.h>
+#include <SOURCE/playerData.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
+#include <BASE/iconWidget.h>
 #include <BASE/inputManager.h>
+#include <BASE/palette.h>
 #include <BASE/resourceManager.h>
 #include <BASE/soundManager.h>
 #include <BASE/icon.h>
@@ -1880,7 +1885,63 @@ void SmackFade(unsigned char *src, unsigned char *dst)
 }
 
 VA(0x0049e5fd, 0x303)
-void ShowCongrats(int) {}
+void ShowCongrats(int highScoreType)
+{
+    unsigned char savedPalette[CONGRATS_PALETTE_SIZE];
+    int baseScore;
+    int score;
+    char rating[CONGRATS_RATING_LENGTH];
+
+    gpMouseManager->HideColorPointer();
+    memcpy(savedPalette, gpBufferPalette->m_data, CONGRATS_PALETTE_SIZE);
+    gpWindowManager->m_updateFlags = 0;
+    congratsText = static_cast<char *>(BaseAlloc(
+        CONGRATS_TEXT_SIZE, KBFILE,
+        *reinterpret_cast<const short *>("\x97\x0f") + 9));
+    baseScore = CalcBaseScore(giCurTurn);
+    score = gpGame->m_difficultyRating * baseScore / CONGRATS_DIFFICULTY_SCALE;
+    gpSoundManager->PlayAmbientMusic(CONGRATS_MUSIC_SILENT, 0, CONGRATS_MUSIC_SILENT);
+
+    if (highScoreType == CONGRATS_STANDARD) {
+        sprintf(rating, gArmyNames[GetMonType(score, highScoreType)]);
+    } else if (highScoreType == CONGRATS_EXPANSION_CAMPAIGN) {
+        sprintf(rating,
+                gArmyNames[GetMonType(xCampaign.Days(), highScoreType)]);
+    } else {
+        sprintf(rating, gArmyNames[GetMonType(gpGame->m_campaignScore, highScoreType)]);
+    }
+    rating[0] -= 0x20;
+    if (static_cast<signed char>(gpGame->m_cheated))
+        sprintf(rating, "Cheater!!!");
+
+    if (highScoreType == CONGRATS_STANDARD) {
+        sprintf(congratsText,
+                "Congratulations!\n\nDays: %d\nBase Score: %d\nDifficulty: %d\n\nScore: %d\n\nRating:\n%s\n",
+                giCurTurn, baseScore, gpGame->m_difficultyRating, score, rating);
+    } else if (highScoreType == CONGRATS_EXPANSION_CAMPAIGN) {
+        sprintf(congratsText,
+                "Congratulations!\n\nDays: %d\n\nRating:\n%s\n",
+                xCampaign.Days(), rating);
+    } else {
+        sprintf(congratsText,
+                "Congratulations!\n\nDays: %d\n\nRating:\n%s\n",
+                gpGame->m_campaignScore, rating);
+    }
+
+    PlaySmacker(CONGRATS_SMACKER);
+    memcpy(gpBufferPalette->m_data, gPalette->m_data, CONGRATS_PALETTE_SIZE);
+    SmackFade(reinterpret_cast<unsigned char *>(gpBufferPalette->m_data), savedPalette);
+    memcpy(gPalette->m_data, savedPalette, CONGRATS_PALETTE_SIZE);
+    memcpy(gpBufferPalette->m_data, gPalette->m_data, CONGRATS_PALETTE_SIZE);
+    gpMouseManager->ShowColorPointer();
+    AddScoreToHighScore(score, giCurTurn, gpGame->m_difficultyRating,
+                        CONGRATS_STANDARD, gpGame->m_scenarioName);
+    BaseFree(congratsText, KBFILE,
+             *reinterpret_cast<const short *>("\x97\x0f") + 0x4e);
+    congratsText = 0;
+    gpWindowManager->m_updateFlags = 1;
+    memcpy(gpBufferPalette->m_data, gPalette->m_data, CONGRATS_PALETTE_SIZE);
+}
 
 VA(0x0049e900, 0x99)
 void CongratsWait(void)
@@ -1976,10 +2037,315 @@ int GameUnsaved(void)
 }
 
 VA(0x0049ec05, 0xa18)
-int HandleAppSpecificMenuCommands(int) { return 0; }
+int HandleAppSpecificMenuCommands(int command)
+{
+    int menuChanged;
+    hero *currentHeroRec;
+    int loopIndex;
+    int secondarySkillIndex;
+    int secondaryLevel;
+    int formationHexIndex;
+
+    menuChanged = 0;
+    currentHeroRec = 0;
+    if (gpCurPlayer != 0 && gpCurPlayer->m_currentHero != -1)
+        currentHeroRec = &gpGame->m_heroRecs[gpCurPlayer->m_currentHero];
+
+    switch (command) {
+    case APP_MENU_RESTART_0:
+    case APP_MENU_RESTART_1:
+    case APP_MENU_RESTART_2:
+    case APP_MENU_RESTART_3:
+    case APP_MENU_RESTART_4:
+    case APP_MENU_RESTART_5:
+    case APP_MENU_RESTART_6:
+    case APP_MENU_RESTART_7:
+    case APP_MENU_RESTART_8:
+    case APP_MENU_RESTART_9:
+    case APP_MENU_RESTART_10:
+    case APP_MENU_RESTART_11:
+    case APP_MENU_RESTART_12:
+    case APP_MENU_RESTART_13:
+        strcpy(gText, "Are you sure you want to restart?  (Your current game will be lost)");
+        goto confirmMenuCommand;
+
+    case APP_MENU_LOAD_0:
+    case APP_MENU_LOAD_1:
+    case APP_MENU_LOAD_2:
+    case APP_MENU_LOAD_3:
+    case APP_MENU_LOAD_4:
+    case APP_MENU_LOAD_5:
+    case APP_MENU_LOAD_6:
+    case APP_MENU_LOAD_7:
+    case APP_MENU_LOAD_8:
+    case APP_MENU_LOAD_9:
+    case APP_MENU_LOAD_10:
+        strcpy(gText, "Are you sure you want to load a new game?  (Your current game will be lost)");
+confirmMenuCommand:
+        if (gpAdvManager->m_active != 1 ||
+            (NormalDialog(gText, APP_MENU_CONFIRM_DIALOG, -1, -1, -1, 0, -1, 0, -1, 0),
+             gpWindowManager->m_dialogResult == APP_MENU_CONFIRM_OK))
+            giMenuCommand = command;
+        break;
+
+    case APP_MENU_SAVE:
+        SaveGame();
+        break;
+    case APP_MENU_EXIT:
+        PostMessageA(hwndApp, APP_MENU_CLOSE_MESSAGE, 0, 0);
+        break;
+
+    case APP_MENU_MUSIC_FIRST:
+        gMusicVolume = 0;
+        goto adjustMusic;
+    case APP_MENU_MUSIC_FIRST + 1:
+        gMusicVolume = 1;
+        goto adjustMusic;
+    case APP_MENU_MUSIC_FIRST + 2:
+        gMusicVolume = 2;
+        goto adjustMusic;
+    case APP_MENU_MUSIC_FIRST + 3:
+        gMusicVolume = 3;
+        goto adjustMusic;
+    case APP_MENU_MUSIC_FIRST + 4:
+        gMusicVolume = 4;
+        goto adjustMusic;
+    case APP_MENU_MUSIC_FIRST + 5:
+        gMusicVolume = 5;
+        goto adjustMusic;
+    case APP_MENU_MUSIC_FIRST + 6:
+        gMusicVolume = 6;
+        goto adjustMusic;
+    case APP_MENU_MUSIC_FIRST + 7:
+        gMusicVolume = 7;
+        goto adjustMusic;
+    case APP_MENU_MUSIC_FIRST + 8:
+        gMusicVolume = 8;
+        goto adjustMusic;
+    case APP_MENU_MUSIC_FIRST + 9:
+        gMusicVolume = 9;
+        goto adjustMusic;
+    case APP_MENU_MUSIC_LAST:
+        gMusicVolume = 10;
+adjustMusic:
+        gpSoundManager->AdjustMusicVolumes();
+        menuChanged = 1;
+        break;
+
+    case APP_MENU_SOUND_FIRST:
+        gSoundVolume = 0;
+        goto adjustSound;
+    case APP_MENU_SOUND_FIRST + 1:
+        gSoundVolume = 1;
+        goto adjustSound;
+    case APP_MENU_SOUND_FIRST + 2:
+        gSoundVolume = 2;
+        goto adjustSound;
+    case APP_MENU_SOUND_FIRST + 3:
+        gSoundVolume = 3;
+        goto adjustSound;
+    case APP_MENU_SOUND_FIRST + 4:
+        gSoundVolume = 4;
+        goto adjustSound;
+    case APP_MENU_SOUND_FIRST + 5:
+        gSoundVolume = 5;
+        goto adjustSound;
+    case APP_MENU_SOUND_FIRST + 6:
+        gSoundVolume = 6;
+        goto adjustSound;
+    case APP_MENU_SOUND_FIRST + 7:
+        gSoundVolume = 7;
+        goto adjustSound;
+    case APP_MENU_SOUND_FIRST + 8:
+        gSoundVolume = 8;
+        goto adjustSound;
+    case APP_MENU_SOUND_FIRST + 9:
+        gSoundVolume = 9;
+        goto adjustSound;
+    case APP_MENU_SOUND_LAST:
+        gSoundVolume = 10;
+adjustSound:
+        gpSoundManager->AdjustSoundVolumes();
+        menuChanged = 1;
+        break;
+
+    case APP_MENU_TOGGLE_ROUTE:
+        gShowRoute = 1 - gShowRoute;
+        menuChanged = 1;
+        break;
+    case APP_MENU_TOGGLE_BLACKOUT:
+        gBlackoutComputer = 1 - gBlackoutComputer;
+        menuChanged = 1;
+        break;
+
+    case APP_MENU_VIEW_WORLD:
+        gpAdvManager->ViewWorld(0x35, 0, 0);
+        break;
+    case APP_MENU_VIEW_PUZZLE:
+        gpAdvManager->ViewPuzzle();
+        break;
+    case APP_MENU_CAST_SPELL:
+        gpAdvManager->CheckCastSpell();
+        break;
+    case APP_MENU_SEARCH:
+        gpAdvManager->ProcessSearch(-1, -1);
+        break;
+
+    case APP_MENU_CHEAT_REVEAL:
+        gpGame->m_cheated = 1;
+        if (gbInCampaign)
+            gpGame->m_campaignCheated = 1;
+        gpGame->SetVisibility(APP_MENU_REVEAL_SIZE, APP_MENU_REVEAL_SIZE,
+                              giCurPlayer, APP_MENU_REVEAL_RADIUS);
+        if (currentHeroRec != 0)
+            gpAdvManager->Reseed(0, 0);
+        gpAdvManager->UpdateRadar(1, 0);
+        gpAdvManager->CompleteDraw(0);
+        gpAdvManager->UpdateScreen(0, 0);
+        break;
+
+    case APP_MENU_CHEAT_MOVEMENT:
+        gpGame->m_cheated = 1;
+        if (gbInCampaign)
+            gpGame->m_campaignCheated = 1;
+        if (currentHeroRec != 0)
+            currentHeroRec->m_remainingMobility = APP_MENU_MOVEMENT_BONUS;
+        break;
+
+    case APP_MENU_CHEAT_SPELLS:
+        gpGame->m_cheated = 1;
+        if (gbInCampaign)
+            gpGame->m_campaignCheated = 1;
+        if (currentHeroRec != 0) {
+            for (loopIndex = 0; loopIndex < APP_MENU_MAX_SPELLS; loopIndex++)
+                currentHeroRec->AddSpell(loopIndex, APP_MENU_SPELL_COUNT);
+            currentHeroRec->m_spellPoints = 999;
+        }
+        break;
+
+    case APP_MENU_CHEAT_RESOURCES:
+        gpGame->m_cheated = 1;
+        if (gbInCampaign)
+            gpGame->m_campaignCheated = 1;
+        for (loopIndex = 0; loopIndex < APP_MENU_RESOURCE_COUNT; loopIndex++) {
+            if (loopIndex == RES_GOLD)
+                gpCurPlayer->m_resources[loopIndex] += APP_MENU_GOLD_BONUS;
+            else
+                gpCurPlayer->m_resources[loopIndex] += APP_MENU_RESOURCE_BONUS;
+        }
+        gpAdvManager->UpdBottomView(1, 1, 1);
+        break;
+
+    default:
+        if (command >= APP_MENU_BUILDING_FIRST && command < APP_MENU_BUILDING_LAST) {
+            gpGame->m_cheated = 1;
+            if (gbInCampaign)
+                gpGame->m_campaignCheated = 1;
+            giDebugBuildingToBuild = command - APP_MENU_BUILDING_FIRST;
+            break;
+        }
+        if (command >= APP_MENU_ARMY_FIRST && command < APP_MENU_ARMY_LAST) {
+            gpGame->m_cheated = 1;
+            if (gbInCampaign)
+                gpGame->m_campaignCheated = 1;
+            if (gpCurPlayer->m_currentHero != -1) {
+                gpGame->GiveArmy(&gpGame->m_heroRecs[gpCurPlayer->m_currentHero].m_army,
+                                 command - APP_MENU_ARMY_FIRST, 5, -1);
+                gpAdvManager->UpdBottomView(1, 1, 1);
+            }
+            break;
+        }
+        if (command >= APP_MENU_SECONDARY_FIRST && command < APP_MENU_SECONDARY_LAST) {
+            gpGame->m_cheated = 1;
+            if (gbInCampaign)
+                gpGame->m_campaignCheated = 1;
+            secondarySkillIndex = (command - APP_MENU_SECONDARY_FIRST) / APP_MENU_SECONDARY_LEVELS;
+            secondaryLevel = (command - APP_MENU_SECONDARY_FIRST) % APP_MENU_SECONDARY_LEVELS;
+            if (currentHeroRec != 0)
+                currentHeroRec->SetSS(secondarySkillIndex, secondaryLevel);
+        }
+        if (command >= APP_MENU_COMBAT_FIRST && command < APP_MENU_COMBAT_LAST) {
+            gpCombatManager->m_debugFormation = command - APP_MENU_COMBAT_FIRST;
+            gpCombatManager->m_backgroundDrawn = 0;
+            for (loopIndex = 0; loopIndex < APP_MENU_COMBAT_HEX_COUNT; loopIndex++) {
+                gpCombatManager->m_hexCells[loopIndex].m_blocked = 0;
+                gpCombatManager->m_hexCells[loopIndex].m_obstacleIndex = -1;
+            }
+            for (loopIndex = 0; loopIndex < APP_MENU_FORMATION_HEX_COUNT; loopIndex++) {
+                formationHexIndex = gCombatFormations[gpCombatManager->m_debugFormation][loopIndex];
+                if (formationHexIndex != -1)
+                    gpCombatManager->m_hexCells[formationHexIndex].m_blocked = 1;
+            }
+            gpCombatManager->SetupGridForArmy(
+                &gpCombatManager->m_armies[gpCombatManager->m_currentArmySide]
+                                            [gpCombatManager->m_currentArmyIndex]);
+            gpCombatManager->DrawFrame(1, 0, 0, 0, 0, 1, 1);
+        }
+        return 1;
+    }
+
+    if (menuChanged)
+        WritePrefs();
+    return 0;
+}
 
 VA(0x0049f61d, 0x310)
-void UpdateSystemOptionsMenu(void) {}
+void UpdateSystemOptionsMenu(void)
+{
+    int menuCommand;
+    int checkedCommand;
+
+    if (gExecutableGraphics[giCurExe].showMenu == 0)
+        return;
+    if (hmnuApp == 0)
+        return;
+    if (hmnuApp != hmnuAdv)
+        return;
+
+    for (menuCommand = APP_MENU_MUSIC_FIRST; menuCommand <= APP_MENU_MUSIC_LAST;
+         menuCommand++)
+        CheckMenuItem(hmnuApp, menuCommand, APP_MENU_UNCHECKED);
+    switch (gMusicVolume) {
+    case 1: checkedCommand = APP_MENU_MUSIC_FIRST + 1; break;
+    case 2: checkedCommand = APP_MENU_MUSIC_FIRST + 2; break;
+    case 3: checkedCommand = APP_MENU_MUSIC_FIRST + 3; break;
+    case 4: checkedCommand = APP_MENU_MUSIC_FIRST + 4; break;
+    case 5: checkedCommand = APP_MENU_MUSIC_FIRST + 5; break;
+    case 6: checkedCommand = APP_MENU_MUSIC_FIRST + 6; break;
+    case 7: checkedCommand = APP_MENU_MUSIC_FIRST + 7; break;
+    case 8: checkedCommand = APP_MENU_MUSIC_FIRST + 8; break;
+    case 9: checkedCommand = APP_MENU_MUSIC_FIRST + 9; break;
+    case 10: checkedCommand = APP_MENU_MUSIC_LAST; break;
+    default: checkedCommand = APP_MENU_MUSIC_FIRST; break;
+    }
+    CheckMenuItem(hmnuApp, checkedCommand, APP_MENU_CHECKED);
+
+    for (menuCommand = APP_MENU_SOUND_FIRST; menuCommand <= APP_MENU_SOUND_LAST;
+         menuCommand++)
+        CheckMenuItem(hmnuApp, menuCommand, APP_MENU_UNCHECKED);
+    switch (gSoundVolume) {
+    case 1: checkedCommand = APP_MENU_SOUND_FIRST + 1; break;
+    case 2: checkedCommand = APP_MENU_SOUND_FIRST + 2; break;
+    case 3: checkedCommand = APP_MENU_SOUND_FIRST + 3; break;
+    case 4: checkedCommand = APP_MENU_SOUND_FIRST + 4; break;
+    case 5: checkedCommand = APP_MENU_SOUND_FIRST + 5; break;
+    case 6: checkedCommand = APP_MENU_SOUND_FIRST + 6; break;
+    case 7: checkedCommand = APP_MENU_SOUND_FIRST + 7; break;
+    case 8: checkedCommand = APP_MENU_SOUND_FIRST + 8; break;
+    case 9: checkedCommand = APP_MENU_SOUND_FIRST + 9; break;
+    case 10: checkedCommand = APP_MENU_SOUND_LAST; break;
+    default: checkedCommand = APP_MENU_SOUND_FIRST; break;
+    }
+    CheckMenuItem(hmnuApp, checkedCommand, APP_MENU_CHECKED);
+
+    for (menuCommand = APP_MENU_SPEED_FIRST; menuCommand <= APP_MENU_SPEED_LAST;
+         menuCommand++)
+        CheckMenuItem(hmnuApp, menuCommand, APP_MENU_UNCHECKED);
+    CheckMenuItem(hmnuApp, APP_MENU_TOGGLE_ROUTE,
+                  gShowRoute ? APP_MENU_CHECKED : APP_MENU_UNCHECKED);
+    CheckMenuItem(hmnuApp, APP_MENU_TOGGLE_BLACKOUT,
+                  1 - gBlackoutComputer ? APP_MENU_CHECKED : APP_MENU_UNCHECKED);
+}
 
 VA(0x0049f92d, 0x99)
 void CleanUpMenus(void)
@@ -2019,7 +2385,164 @@ int InMapArea(int x, int y)
 }
 
 VA(0x0049fa70, 0x6bc)
-void SetupDynamicWindow(int, int, int, int, int, int, int, int *, int *, int *, int *, int *, int *, class heroWindow * *, int) {}
+void SetupDynamicWindow(int x, int y, int centered, int boundsWidth, int boundsHeight,
+                        int contentWidth, int contentHeight, int *windowWidth,
+                        int *windowHeight, int *contentLeft, int *contentTop,
+                        int *contentRight, int *contentBottom, heroWindow **window,
+                        int windowType)
+{
+    int columns;
+    int rows;
+    int centeredWidth;
+    int centeredHeight;
+    int leftOffset;
+    int topOffset;
+    int rightOffset;
+    int bottomOffset;
+    int row;
+    int column;
+    int edge;
+    widget *newWidget;
+    int tileWidth;
+    int tileHeight;
+    int topEdgeOffset;
+    int bottomEdgeOffset;
+    int contentXPadding;
+    int contentYPadding;
+    int topCornerPadding;
+    int bottomCornerPadding;
+    int leftCornerPadding;
+    int rightCornerPadding;
+    int centeredPadding;
+    int stoneWidgetColor;
+    int dynamicWindowType;
+
+    tileWidth = DYNAMIC_TILE_SIZE;
+    tileHeight = DYNAMIC_TILE_SIZE;
+    topEdgeOffset = -DYNAMIC_EDGE_OFFSET;
+    bottomEdgeOffset = -DYNAMIC_EDGE_OFFSET;
+    contentXPadding = DYNAMIC_CONTENT_LEFT;
+    contentYPadding = DYNAMIC_CONTENT_TOP;
+    topCornerPadding = DYNAMIC_CONTENT_TOP;
+    bottomCornerPadding = DYNAMIC_CONTENT_TOP;
+    leftCornerPadding = DYNAMIC_CONTENT_TOP;
+    rightCornerPadding = DYNAMIC_CONTENT_TOP;
+    centeredPadding = DYNAMIC_CONTENT_LEFT;
+    stoneWidgetColor = DYNAMIC_WIDGET_COLOR;
+    dynamicWindowType = 0;
+    columns = (contentWidth - 1) / DYNAMIC_TILE_SIZE + 1;
+    rows = (contentHeight - 1) / DYNAMIC_TILE_SIZE + 1;
+    *windowWidth = columns * DYNAMIC_TILE_SIZE + DYNAMIC_WINDOW_PADDING;
+    *windowHeight = rows * DYNAMIC_TILE_SIZE + DYNAMIC_WINDOW_PADDING;
+    centeredWidth = columns * DYNAMIC_TILE_SIZE + DYNAMIC_CONTENT_LEFT;
+    centeredHeight = rows * DYNAMIC_TILE_SIZE + DYNAMIC_CONTENT_LEFT;
+    if (centered) {
+        x += ((boundsWidth - centeredWidth) >> 1) - DYNAMIC_CONTENT_TOP;
+        y += (boundsHeight - centeredHeight) >> 1;
+    }
+    *contentLeft = x + DYNAMIC_CONTENT_LEFT;
+    *contentTop = y + DYNAMIC_CONTENT_TOP;
+    *contentRight = columns * DYNAMIC_TILE_SIZE + *contentLeft - 1;
+    *contentBottom = rows * DYNAMIC_TILE_SIZE + *contentTop - 1;
+
+    if (windowType != 0)
+        return;
+    *window = new heroWindow(x, y, *windowWidth, *windowHeight,
+                             DYNAMIC_WINDOW_FLAGS);
+    leftOffset = *contentLeft - x;
+    topOffset = *contentTop - y;
+    rightOffset = *contentRight - x;
+    bottomOffset = *contentBottom - y;
+
+    for (row = 0; row < rows; row++) {
+        for (column = 0; column < columns; column++) {
+            newWidget = new iconWidget(
+                column * DYNAMIC_TILE_SIZE + leftOffset,
+                row * DYNAMIC_TILE_SIZE + topOffset,
+                DYNAMIC_TILE_SIZE, DYNAMIC_TILE_SIZE, "stonebk2.icn",
+                DYNAMIC_BACKGROUND_FRAME, 0, -1, DYNAMIC_WIDGET_COLOR, 1);
+            if (newWidget == 0)
+                MemError();
+            (*window)->AddWidget(newWidget, -1);
+        }
+    }
+
+    newWidget = new iconWidget(leftOffset - DYNAMIC_CORNER_LEFT,
+                               topOffset - DYNAMIC_CORNER_LEFT,
+                               DYNAMIC_CORNER_SIZE, DYNAMIC_CORNER_SIZE,
+                               "stonebk2.icn", 0, 0, -1, DYNAMIC_WIDGET_COLOR, 1);
+    if (newWidget == 0)
+        MemError();
+    (*window)->AddWidget(newWidget, -1);
+
+    newWidget = new iconWidget(rightOffset - DYNAMIC_CORNER_RIGHT,
+                               topOffset - DYNAMIC_CORNER_LEFT,
+                               DYNAMIC_CORNER_SIZE, DYNAMIC_CORNER_SIZE,
+                               "stonebk2.icn", 1, 0, -1, DYNAMIC_WIDGET_COLOR, 1);
+    if (newWidget == 0)
+        MemError();
+    (*window)->AddWidget(newWidget, -1);
+
+    newWidget = new iconWidget(rightOffset - DYNAMIC_CORNER_RIGHT,
+                               bottomOffset - DYNAMIC_CORNER_RIGHT,
+                               DYNAMIC_CORNER_SIZE, DYNAMIC_CORNER_SIZE,
+                               "stonebk2.icn", 2, 0, -1, DYNAMIC_WIDGET_COLOR, 1);
+    if (newWidget == 0)
+        MemError();
+    (*window)->AddWidget(newWidget, -1);
+
+    newWidget = new iconWidget(leftOffset - DYNAMIC_CORNER_LEFT,
+                               bottomOffset - DYNAMIC_CORNER_RIGHT,
+                               DYNAMIC_CORNER_SIZE, DYNAMIC_CORNER_SIZE,
+                               "stonebk2.icn", 3, 0, -1, DYNAMIC_WIDGET_COLOR, 1);
+    if (newWidget == 0)
+        MemError();
+    (*window)->AddWidget(newWidget, -1);
+
+    for (edge = 0; edge < columns; edge++) {
+        newWidget = new iconWidget(
+            edge * DYNAMIC_TILE_SIZE + leftOffset - DYNAMIC_EDGE_OFFSET,
+            topOffset - DYNAMIC_CORNER_LEFT,
+            DYNAMIC_CORNER_SIZE, DYNAMIC_CORNER_SIZE, "stonebk2.icn",
+            Random(DYNAMIC_TOP_FRAME_FIRST, DYNAMIC_TOP_FRAME_LAST), 0, -1,
+            DYNAMIC_WIDGET_COLOR, 1);
+        if (newWidget == 0)
+            MemError();
+        (*window)->AddWidget(newWidget, -1);
+
+        newWidget = new iconWidget(
+            edge * DYNAMIC_TILE_SIZE + leftOffset - DYNAMIC_EDGE_OFFSET,
+            bottomOffset - DYNAMIC_CORNER_RIGHT,
+            DYNAMIC_CORNER_SIZE, DYNAMIC_CORNER_SIZE, "stonebk2.icn",
+            Random(DYNAMIC_BOTTOM_FRAME_FIRST, DYNAMIC_BOTTOM_FRAME_LAST), 0, -1,
+            DYNAMIC_WIDGET_COLOR, 1);
+        if (newWidget == 0)
+            MemError();
+        (*window)->AddWidget(newWidget, -1);
+    }
+
+    for (edge = 0; edge < rows; edge++) {
+        newWidget = new iconWidget(
+            leftOffset - DYNAMIC_CORNER_LEFT,
+            edge * DYNAMIC_TILE_SIZE + topOffset - DYNAMIC_EDGE_OFFSET,
+            DYNAMIC_CORNER_SIZE, DYNAMIC_CORNER_SIZE, "stonebk2.icn",
+            Random(DYNAMIC_LEFT_FRAME_FIRST, DYNAMIC_LEFT_FRAME_LAST), 0, -1,
+            DYNAMIC_WIDGET_COLOR, 1);
+        if (newWidget == 0)
+            MemError();
+        (*window)->AddWidget(newWidget, -1);
+
+        newWidget = new iconWidget(
+            rightOffset - DYNAMIC_CORNER_RIGHT,
+            edge * DYNAMIC_TILE_SIZE + topOffset - DYNAMIC_EDGE_OFFSET,
+            DYNAMIC_CORNER_SIZE, DYNAMIC_CORNER_SIZE, "stonebk2.icn",
+            Random(DYNAMIC_RIGHT_FRAME_FIRST, DYNAMIC_RIGHT_FRAME_LAST), 0, -1,
+            DYNAMIC_WIDGET_COLOR, 1);
+        if (newWidget == 0)
+            MemError();
+        (*window)->AddWidget(newWidget, -1);
+    }
+}
 
 VA(0x004a012c, 0x108)
 void TestDynamicWindow(int p1, int p2)

@@ -129,7 +129,7 @@ class game {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
-    short  field_0x0;  // +0x00
+    short m_difficultyRating;  // +0x00
     unsigned char m_campaignType;  // +0x02
     char   field_0x3;  // +0x03
     signed char m_campaignScenario;  // +0x04
@@ -203,7 +203,8 @@ public:
     unsigned short m_victoryTownY;  // +0x2d5
     unsigned short m_lossTownY;  // +0x2d7
     unsigned short m_victorySideThreshold;  // +0x2d9
-    char _pad_0x2db[0x170];
+    char _pad_0x2db[0x8];
+    char m_scenarioName[0x168];  // +0x2e3
     char   field_0x44b;  // +0x44b
     char   field_0x44c;  // +0x44c
     char _pad_0x44d[0x6];
