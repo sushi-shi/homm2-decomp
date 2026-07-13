@@ -16,6 +16,7 @@ typedef enum HeroSecondarySkill {
     HERO_SKILL_LEADERSHIP = 6,
     HERO_SKILL_WISDOM = 7,
     HERO_SKILL_BALLISTICS = 10,
+    HERO_SKILL_EAGLE_EYE = 11,
     HERO_SKILL_NECROMANCY = 12,
     HERO_SKILL_ESTATES = 13
 } HeroSecondarySkill;
@@ -102,7 +103,7 @@ public:
     signed char m_secondarySkills[14];  // +0x74
     signed char m_secondarySkillOrder[14];  // +0x82
     int m_secondarySkillCount;  // +0x90
-    char _pad_0x94[0x41];
+    signed char m_spells[65];  // +0x94
     signed char m_artifacts[14];  // +0xd5
     union {
         unsigned int m_eventFlags;  // +0xe3
