@@ -140,6 +140,13 @@ the EXE + our known symbols. Needs the dev shell's Ghidra env (in the flake).
 
 ## Matching campaign (parallel by default)
 
+- **Two global phases:** until total SOURCE fuzzy reaches **95%**, prioritize complete body,
+  type/layout, frame/slot, CFG, inline-accessor, and relocation recovery. At a compiler-shape
+  wall, try only a few obvious semantics-preserving spellings, document the byte residual, and
+  move on; do not run extended permutation or compile-search loops because later shared-header
+  recovery can invalidate that tuning. At 95% total SOURCE fuzzy, start the systematic last-mile
+  wall-breaking and audited AST-permutation pass.
+
 - **`/match [n]`** drives the campaign (default n=4). It builds the queue, fans out
   `n` **matcher** agents across a reused `matcher-1..n` worktree pool, and integrates
   results **serially into linear `master`**. See `.claude/agents/orchestrator.md`.
