@@ -220,8 +220,14 @@ public:
     class fullMap m_worldMap;  // +0xb3e
     signed char m_obeliskCount;  // +0xb52
     townSlot m_castleRecs[72];  // 0xb53
-    signed char m_castleOwners[72];  // +0x2773
-    char m_dailyEventFlags[9];  // +0x27bb
+    union {
+        signed char m_castleOwners[72];  // +0x2773
+        signed char m_townOwners[72];
+    };
+    union {
+        char m_dailyEventFlags[9];  // +0x27bb
+        unsigned char m_knownTowns[9];
+    };
     hero m_heroRecs[54];         // 0x27c4  hero record slots (GetHeroSlot)
     signed char m_availableHeroes[54];  // +0x5c80
     mineRecord m_mines[144];      // 0x5cb6
@@ -229,7 +235,7 @@ public:
     char m_randomArtifacts[0x67];  // 0x6136
     boatRecord m_boats[48];        // 0x619d
     char m_pad_0x631d[0x30];
-    unsigned char m_obeliskVisitors[48];  // 0x634d
+    signed char m_obeliskVisitors[48];  // 0x634d
     char m_defaultPlayerNames[24];  // +0x637d
     signed char m_ultimateArtifactX;  // +0x6395
     signed char m_ultimateArtifactY;  // +0x6396
@@ -277,6 +283,7 @@ public:
     int GetTownId(int, int);
     hero *GetHero(int id) { return &m_heroRecs[id]; }
     town *GetTown(int id) { return reinterpret_cast<town *>(&m_castleRecs[id]); }
+    signed char GetPlayerColor(int player) { return m_players[player].color; }
     int GetMineId(int, int);
     int SaveGame(char *, int, signed char);
     void SetupOrigData(void);

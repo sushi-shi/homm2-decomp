@@ -7,8 +7,13 @@
 #include <_carcass_types.h>
 #include <_globals_model.h>
 #include <BASE/icon.h>
+#include <BASE/bitmap.h>
+#include <BASE/BITS.h>
 #include <BASE/iconWidget.h>
+#include <BASE/textWidget.h>
 #include <BASE/Icon2b.h>
+#include <BASE/icon2bc.h>
+#include <BASE/Iconf2b.h>
 #include <BASE/Misc.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
@@ -18,7 +23,9 @@
 #include <BASE/sample.h>
 #include <BASE/soundManager.h>
 #include <BASE/tileset.h>
+#include <BASE/TILE.h>
 #include <BASE/WINMGR.h>
+#include <EDITOR/fullMap.h>
 #include <EDITOR/mapcell.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/HERO.h>
@@ -35,8 +42,34 @@
 #include <SOURCE/playerData.h>
 #include <SOURCE/searchArray.h>
 #include <SOURCE/town.h>
+#include <ctype.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+
+#define ADVMGR_SOURCE_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\ADVMGR.CPP"
+#define ADVMGR_QUICK_VIEW_LINE (*reinterpret_cast<const short *>("\x76\x21"))
+#define ADVMGR_TOWN_VIEW_LINE (*reinterpret_cast<const short *>("\x5f\x5e"))
+
+DATA(0x00527eb8) static unsigned short s_drawGroundTile;
+DATA(0x00527ec0) static int s_drawPixelY;
+DATA(0x00527ec4) static mapCellExtra *s_drawExtra;
+DATA(0x00527ee4) static int s_drawMonsterFrame;
+DATA(0x00527f0c) static int s_drawCloudFrame;
+DATA(0x00527f10) static int s_drawStoneTile;
+DATA(0x00527f18) static mapCell *s_drawCell;
+DATA(0x00527f1c) static mineRecord *s_drawMine;
+DATA(0x00527f20) static hero *s_drawHero;
+DATA(0x00527f3c) static int s_drawHeroType;
+DATA(0x00527f44) static int s_drawCovered;
+DATA(0x00527f48) static mapCell *s_drawAdjacentCell;
+DATA(0x00528094) static int s_drawHasHero;
+DATA(0x0052809c) static int s_drawFlipCloud;
+DATA(0x005280a0) static int s_drawHeroFrame;
+DATA(0x005280a4) static int s_drawPixelX;
+DATA(0x005280a8) static int s_drawPlayerColor;
+DATA(0x005280d0) static int s_drawAnimationLength;
+DATA(0x005280d8) static int s_drawHeroYOffset;
 VA(0x00456350, 0x30f)
 advManager::advManager(void)
 {
@@ -83,10 +116,10 @@ advManager::advManager(void)
     bShowIt = 1;
     m_lastQuickViewX = ADVMGR_QUICK_VIEW_NONE;
     m_lastQuickViewY = ADVMGR_QUICK_VIEW_NONE;
-    m_viewLeft = 0;
-    m_viewTop = 4;
-    m_viewRight = 11;
-    m_viewBottom = 13;
+    m_viewBounds[0] = 0;
+    m_viewBounds[1] = 4;
+    m_viewBounds[2] = 11;
+    m_viewBounds[3] = 13;
     m_mapData = gpGame->GetWorldMapData();
     gMapX = 0;
     gMapY = 0;
@@ -137,7 +170,7 @@ int advManager::Open(int id)
         gpMouseManager->SetPointer("advmice.mse", 1, ADVMGR_DEFAULT_POINTER_FRAME);
 
     if (m_visibilityMap == 0) {
-        m_visibilityMap = new unsigned short[MAP_WIDTH * MAP_HEIGHT];
+        m_visibilityMap = new unsigned char[MAP_WIDTH * MAP_HEIGHT * 2];
         if (m_visibilityMap == 0)
             MemError();
     }
@@ -1398,19 +1431,1393 @@ void advManager::CompleteDraw(int update)
 }
 
 VA(0x0045b7d3, 0x3a9)
-int advManager::GetCloudLookup(int, int) { return 0; }
+int advManager::GetCloudLookup(int x, int y)
+{
+    unsigned int cloudMask = 0;
 
+    if (x < 1)
+        cloudMask |= ADVMGR_CLOUD_LEFT_EDGE;
+    else if (x >= MAP_WIDTH - 1)
+        cloudMask |= ADVMGR_CLOUD_RIGHT_EDGE;
+
+    if (y < 1)
+        cloudMask |= ADVMGR_CLOUD_TOP_EDGE;
+    else if (y >= MAP_HEIGHT - 1)
+        cloudMask |= ADVMGR_CLOUD_BOTTOM_EDGE;
+
+    if (cloudMask == 0) {
+        if ((giCurWatchPlayerBit & mapExtra[(y - 1) * MAP_WIDTH + x]) == 0)
+            cloudMask |= ADVMGR_CLOUD_NORTH;
+        if ((giCurWatchPlayerBit & mapExtra[y * MAP_WIDTH + x + 1]) == 0)
+            cloudMask |= ADVMGR_CLOUD_EAST;
+        if ((giCurWatchPlayerBit & mapExtra[(y + 1) * MAP_WIDTH + x]) == 0)
+            cloudMask |= ADVMGR_CLOUD_SOUTH;
+        if ((giCurWatchPlayerBit & *(x + mapExtra + y * MAP_WIDTH - 1)) == 0)
+            cloudMask |= ADVMGR_CLOUD_WEST;
+        if ((giCurWatchPlayerBit & mapExtra[(y - 1) * MAP_WIDTH + x + 1]) == 0)
+            cloudMask |= ADVMGR_CLOUD_NORTH_EAST;
+        if ((giCurWatchPlayerBit & mapExtra[(y + 1) * MAP_WIDTH + x + 1]) == 0)
+            cloudMask |= ADVMGR_CLOUD_SOUTH_EAST;
+        if ((giCurWatchPlayerBit & *(x + mapExtra + (y + 1) * MAP_WIDTH - 1)) == 0)
+            cloudMask |= ADVMGR_CLOUD_SOUTH_WEST;
+        if ((giCurWatchPlayerBit & *(x + mapExtra + (y - 1) * MAP_WIDTH - 1)) == 0)
+            cloudMask |= ADVMGR_CLOUD_NORTH_WEST;
+    } else {
+        if ((cloudMask & ADVMGR_CLOUD_NORTH) == 0 &&
+            (giCurWatchPlayerBit & mapExtra[(y - 1) * MAP_WIDTH + x]) == 0)
+            cloudMask |= ADVMGR_CLOUD_NORTH;
+        if ((cloudMask & ADVMGR_CLOUD_EAST) == 0 &&
+            (giCurWatchPlayerBit & mapExtra[y * MAP_WIDTH + x + 1]) == 0)
+            cloudMask |= ADVMGR_CLOUD_EAST;
+        if ((cloudMask & ADVMGR_CLOUD_SOUTH) == 0 &&
+            (giCurWatchPlayerBit & mapExtra[(y + 1) * MAP_WIDTH + x]) == 0)
+            cloudMask |= ADVMGR_CLOUD_SOUTH;
+        if ((cloudMask & ADVMGR_CLOUD_WEST) == 0 &&
+            (giCurWatchPlayerBit & *(x + mapExtra + y * MAP_WIDTH - 1)) == 0)
+            cloudMask |= ADVMGR_CLOUD_WEST;
+        if ((cloudMask & ADVMGR_CLOUD_NORTH_EAST) == 0 &&
+            (giCurWatchPlayerBit & mapExtra[(y - 1) * MAP_WIDTH + x + 1]) == 0)
+            cloudMask |= ADVMGR_CLOUD_NORTH_EAST;
+        if ((cloudMask & ADVMGR_CLOUD_SOUTH_EAST) == 0 &&
+            (giCurWatchPlayerBit & mapExtra[(y + 1) * MAP_WIDTH + x + 1]) == 0)
+            cloudMask |= ADVMGR_CLOUD_SOUTH_EAST;
+        if ((cloudMask & ADVMGR_CLOUD_SOUTH_WEST) == 0 &&
+            (giCurWatchPlayerBit & *(x + mapExtra + (y + 1) * MAP_WIDTH - 1)) == 0)
+            cloudMask |= ADVMGR_CLOUD_SOUTH_WEST;
+        if ((cloudMask & ADVMGR_CLOUD_NORTH_WEST) == 0 &&
+            (giCurWatchPlayerBit & *(x + mapExtra + (y - 1) * MAP_WIDTH - 1)) == 0)
+            cloudMask |= ADVMGR_CLOUD_NORTH_WEST;
+    }
+    return giCloudType[cloudMask];
+}
+
+// @early-stop
+// raw-masked: all 2373 retail instructions and 551 relocations accounted; residuals
+// are four boundary compares, one continuation jump, equivalent frame-boolean lowering,
+// eight +31 associations and consequent displacements; this function has no data island
 VA(0x0045bb7c, 0x24cb)
-void advManager::DrawCell(int, int, int, int, int, int) {}
+void advManager::DrawCell(int mapX, int mapY, int screenX, int screenY,
+                          int drawMask, int forceDraw)
+{
+    int animFrame;
+    int heroShadowOffset;
+    int cursorFrame;
+    int boatFrameIndex;
+    int boatShadowFrameOffset;
+    int cursorSuppressed;
+
+    if (forceDraw == 0 && bShowIt == 0)
+        return;
+
+    s_drawPixelX = screenX * ADVMGR_CELL_PIXELS;
+    s_drawPixelY = screenY * ADVMGR_CELL_PIXELS;
+    s_drawCell = GetCell(mapX, mapY);
+
+    if (gbAllBlack == 0 &&
+        (mapX < 0 || mapY < 0 || mapX >= MAP_WIDTH || mapY >= MAP_HEIGHT)) {
+        s_drawStoneTile = -1;
+        if (mapX == -1) {
+            if (mapY == -1)
+                s_drawStoneTile = 16;
+            else if (mapY == MAP_HEIGHT)
+                s_drawStoneTile = 19;
+            else if (mapY >= 0 && mapY < MAP_HEIGHT)
+                s_drawStoneTile = (mapY & 3) + 32;
+        } else if (mapX == MAP_WIDTH) {
+            if (mapY == -1)
+                s_drawStoneTile = 17;
+            else if (mapY == MAP_HEIGHT)
+                s_drawStoneTile = 18;
+            else if (mapY >= 0 && mapY < MAP_HEIGHT)
+                s_drawStoneTile = (mapY & 3) + 24;
+        } else if (mapY == -1) {
+            if (mapX >= 0 && mapX < MAP_WIDTH)
+                s_drawStoneTile = (mapX & 3) + 20;
+        } else if (mapY == MAP_HEIGHT && mapX >= 0 && mapX < MAP_WIDTH) {
+            s_drawStoneTile = (mapX & 3) + 28;
+        }
+        if (s_drawStoneTile == -1)
+            s_drawStoneTile = ((mapY + 16) % ADVMGR_CLOUD_VARIANTS) * 4 +
+                              (mapX + 16) % ADVMGR_CLOUD_VARIANTS;
+        TileToBitmap(m_stoneTiles, s_drawStoneTile, gpWindowManager->m_screen,
+                     s_drawPixelX, s_drawPixelY);
+    } else {
+
+    if (!(((gbAllBlack == 0 &&
+            (giCurWatchPlayerBit & mapExtra[mapY * MAP_WIDTH + mapX]) != 0) ||
+           gbDrawingPuzzle != 0))) {
+        s_drawCovered = 1;
+        if (gbAllBlack != 0)
+            s_drawCloudFrame = 0;
+        else
+            s_drawCloudFrame = GetCloudLookup(mapX, mapY);
+        if (s_drawCloudFrame == 0) {
+            if (drawMask & ADVMGR_DRAW_CLOUD) {
+                TileToBitmap(m_cloudTiles, (mapY + mapX) & 3,
+                             gpWindowManager->m_screen, s_drawPixelX, s_drawPixelY);
+            }
+            return;
+        }
+        if (s_drawCloudFrame >= 100) {
+            s_drawFlipCloud = 1;
+            s_drawCloudFrame -= 100;
+        } else {
+            s_drawFlipCloud = 0;
+        }
+        if ((s_drawCloudFrame == 1 || s_drawCloudFrame == 5) && (mapX & 1))
+            ++s_drawCloudFrame;
+        if (s_drawCloudFrame == 3 && (mapY & 1))
+            ++s_drawCloudFrame;
+    } else {
+        s_drawCovered = 0;
+    }
+
+    if ((drawMask & ADVMGR_DRAW_CLOUD) != 0 && gbDrawingPuzzle == 0) {
+        if (s_drawCovered != 0) {
+            if (s_drawFlipCloud != 0) {
+                FlipIconToBitmap(m_cloudOverlayIcon, gpWindowManager->m_screen,
+                                 s_drawPixelX + 31, s_drawPixelY, s_drawCloudFrame - 1,
+                                 0, 0, 0, 0, 0, 0);
+            } else {
+                IconToBitmap(m_cloudOverlayIcon, gpWindowManager->m_screen,
+                             s_drawPixelX, s_drawPixelY, s_drawCloudFrame - 1,
+                             0, 0, 0, 0, 0, 0);
+            }
+        } else if (m_visibilityMapValid &&
+                   *reinterpret_cast<unsigned short *>(
+                       m_visibilityMap + mapX * 2 + mapY * MAP_WIDTH * 2) != 0) {
+            if ((*reinterpret_cast<unsigned short *>(
+                     m_visibilityMap + mapX * 2 + mapY * MAP_WIDTH * 2) & 0x100) != 0) {
+                IconToBitmapColorTable(
+                    m_objectIcons[17], gpWindowManager->m_screen,
+                    s_drawPixelX - 12, s_drawPixelY + 2,
+                    (*reinterpret_cast<unsigned short *>(
+                         m_visibilityMap + mapX * 2 + mapY * MAP_WIDTH * 2) - 1) & 0xff,
+                    1, 0, 0, ADVMGR_DRAW_CLIP_WIDTH, ADVMGR_DRAW_CLIP_HEIGHT,
+                    0, gColorTableRed, 1);
+            } else {
+                IconToBitmap(m_objectIcons[17], gpWindowManager->m_screen,
+                             s_drawPixelX - 12, s_drawPixelY + 2,
+                             (*reinterpret_cast<unsigned short *>(
+                                  m_visibilityMap + mapX * 2 + mapY * MAP_WIDTH * 2) - 1) & 0xff,
+                             1, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
+                             ADVMGR_DRAW_CLIP_HEIGHT, 0);
+            }
+        }
+    } else {
+        if (drawMask & ADVMGR_DRAW_GROUND) {
+            s_drawGroundTile = s_drawCell->field8;
+            s_drawGroundTile <<= 14;
+            s_drawGroundTile |= s_drawCell->tile;
+            TileToBitmap(m_groundTiles, s_drawGroundTile, gpWindowManager->m_screen,
+                         s_drawPixelX, s_drawPixelY);
+
+            if (s_drawCell->w4a &&
+                (gbDrawingPuzzle == 0 || s_drawCell->objTileset != 56 ||
+                 s_drawCell->objIndex != 140) &&
+                (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawCell->objTileset])) {
+                IconToBitmap(m_objectIcons[s_drawCell->objTileset], gpWindowManager->m_screen,
+                             s_drawPixelX, s_drawPixelY, s_drawCell->objIndex,
+                             0, 0, 0, ADVMGR_DRAW_CLIP_WIDTH, ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                if (s_drawCell->objFlag0) {
+                    s_drawAnimationLength =
+                        GetIconEntry(m_objectIcons[s_drawCell->objTileset],
+                                     s_drawCell->objIndex)->flags;
+                    IconToBitmap(m_objectIcons[s_drawCell->objTileset], gpWindowManager->m_screen,
+                                 s_drawPixelX, s_drawPixelY,
+                                 m_updateMaxY % s_drawAnimationLength + s_drawCell->objIndex + 1,
+                                 0, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
+                                 ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                }
+            }
+
+            if (s_drawCell->extra != 0 &&
+                m_mapData->Extra(s_drawCell->extra)->objIndex != 0xff)
+                s_drawExtra = m_mapData->Extra(s_drawCell->extra);
+            else
+                s_drawExtra = 0;
+            while (s_drawExtra != 0) {
+                if (s_drawExtra->f4a &&
+                    (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawExtra->objTileset])) {
+                    IconToBitmap(m_objectIcons[s_drawExtra->objTileset],
+                                 gpWindowManager->m_screen, s_drawPixelX, s_drawPixelY,
+                                 s_drawExtra->objIndex, 0, 0, 0,
+                                 ADVMGR_DRAW_CLIP_WIDTH, ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                    if (s_drawExtra->objFlag) {
+                        s_drawAnimationLength =
+                            GetIconEntry(m_objectIcons[s_drawExtra->objTileset],
+                                         s_drawExtra->objIndex)->flags;
+                        IconToBitmap(m_objectIcons[s_drawExtra->objTileset],
+                                     gpWindowManager->m_screen, s_drawPixelX, s_drawPixelY,
+                                     m_updateMaxY % s_drawAnimationLength +
+                                         s_drawExtra->objIndex + 1,
+                                     0, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
+                                     ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                    }
+                }
+                if (s_drawExtra->index != 0 &&
+                    m_mapData->Extra(s_drawExtra->index)->objIndex != 0xff)
+                    s_drawExtra = m_mapData->Extra(s_drawExtra->index);
+                else
+                    s_drawExtra = 0;
+            }
+
+            if (s_drawCell->w4b && !s_drawCell->w4a &&
+                (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawCell->objTileset])) {
+                IconToBitmap(m_objectIcons[s_drawCell->objTileset], gpWindowManager->m_screen,
+                             s_drawPixelX, s_drawPixelY, s_drawCell->objIndex,
+                             0, 0, 0, ADVMGR_DRAW_CLIP_WIDTH, ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                if (s_drawCell->objFlag0) {
+                    s_drawAnimationLength =
+                        GetIconEntry(m_objectIcons[s_drawCell->objTileset],
+                                     s_drawCell->objIndex)->flags;
+                    IconToBitmap(m_objectIcons[s_drawCell->objTileset], gpWindowManager->m_screen,
+                                 s_drawPixelX, s_drawPixelY,
+                                 m_updateMaxY % s_drawAnimationLength + s_drawCell->objIndex + 1,
+                                 0, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
+                                 ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                }
+            }
+
+            if (s_drawCell->extra != 0 &&
+                m_mapData->Extra(s_drawCell->extra)->objIndex != 0xff)
+                s_drawExtra = m_mapData->Extra(s_drawCell->extra);
+            else
+                s_drawExtra = 0;
+            while (s_drawExtra != 0) {
+                if (s_drawExtra->f4b && !s_drawExtra->f4a &&
+                    (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawExtra->objTileset])) {
+                    IconToBitmap(m_objectIcons[s_drawExtra->objTileset],
+                                 gpWindowManager->m_screen, s_drawPixelX, s_drawPixelY,
+                                 s_drawExtra->objIndex, 0, 0, 0,
+                                 ADVMGR_DRAW_CLIP_WIDTH, ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                    if (s_drawExtra->objFlag) {
+                        s_drawAnimationLength =
+                            GetIconEntry(m_objectIcons[s_drawExtra->objTileset],
+                                         s_drawExtra->objIndex)->flags;
+                        IconToBitmap(m_objectIcons[s_drawExtra->objTileset],
+                                     gpWindowManager->m_screen, s_drawPixelX, s_drawPixelY,
+                                     m_updateMaxY % s_drawAnimationLength +
+                                         s_drawExtra->objIndex + 1,
+                                     0, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
+                                     ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                    }
+                }
+                if (s_drawExtra->index != 0 &&
+                    m_mapData->Extra(s_drawExtra->index)->objIndex != 0xff)
+                    s_drawExtra = m_mapData->Extra(s_drawExtra->index);
+                else
+                    s_drawExtra = 0;
+            }
+        }
+
+        if (drawMask & ADVMGR_DRAW_OBJECT) {
+            if (s_drawCell->objIndex != 0xff && !s_drawCell->w4a &&
+                !s_drawCell->w4b && !s_drawCell->w4c &&
+                s_drawCell->objTileset != ADVMGR_TILESET_MINE &&
+                (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawCell->objTileset])) {
+                IconToBitmap(m_objectIcons[s_drawCell->objTileset], gpWindowManager->m_screen,
+                             s_drawPixelX, s_drawPixelY, s_drawCell->objIndex,
+                             0, 0, 0, ADVMGR_DRAW_CLIP_WIDTH, ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                if (s_drawCell->objFlag0) {
+                    s_drawAnimationLength =
+                        GetIconEntry(m_objectIcons[s_drawCell->objTileset],
+                                     s_drawCell->objIndex)->flags;
+                    animFrame = m_updateMaxY % s_drawAnimationLength;
+                    if (s_drawCell->triggerType == 0xdf) {
+                        if (s_drawCell->w4hi != 0)
+                            animFrame = m_updateMaxY % (s_drawAnimationLength - 1);
+                        else
+                            animFrame = s_drawAnimationLength - 1;
+                    }
+                    IconToBitmap(m_objectIcons[s_drawCell->objTileset], gpWindowManager->m_screen,
+                                 s_drawPixelX, s_drawPixelY,
+                                 animFrame + s_drawCell->objIndex + 1,
+                                 0, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
+                                 ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                }
+            }
+
+            if (s_drawCell->extra != 0 &&
+                m_mapData->Extra(s_drawCell->extra)->objIndex != 0xff)
+                s_drawExtra = m_mapData->Extra(s_drawCell->extra);
+            else
+                s_drawExtra = 0;
+            while (s_drawExtra != 0) {
+                if (!s_drawExtra->f4a && !s_drawExtra->f4b && !s_drawExtra->f4c &&
+                    s_drawExtra->objTileset != ADVMGR_TILESET_MINE &&
+                    (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawExtra->objTileset])) {
+                    IconToBitmap(m_objectIcons[s_drawExtra->objTileset],
+                                 gpWindowManager->m_screen, s_drawPixelX, s_drawPixelY,
+                                 s_drawExtra->objIndex, 0, 0, 0,
+                                 ADVMGR_DRAW_CLIP_WIDTH, ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                    if (s_drawExtra->objFlag) {
+                        s_drawAnimationLength =
+                            GetIconEntry(m_objectIcons[s_drawExtra->objTileset],
+                                         s_drawExtra->objIndex)->flags;
+                        IconToBitmap(m_objectIcons[s_drawExtra->objTileset],
+                                     gpWindowManager->m_screen, s_drawPixelX, s_drawPixelY,
+                                     m_updateMaxY % s_drawAnimationLength +
+                                         s_drawExtra->objIndex + 1,
+                                     0, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
+                                     ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                    }
+                }
+                if (s_drawExtra->index != 0 &&
+                    m_mapData->Extra(s_drawExtra->index)->objIndex != 0xff)
+                    s_drawExtra = m_mapData->Extra(s_drawExtra->index);
+                else
+                    s_drawExtra = 0;
+            }
+        }
+
+        if (((drawMask & ADVMGR_DRAW_HERO) ||
+             (drawMask & ADVMGR_DRAW_HERO_SHADOW)) &&
+            gbDrawingPuzzle == 0) {
+            s_drawHasHero = 0;
+            s_drawHero = 0;
+            if (drawMask & ADVMGR_DRAW_HERO) {
+                if (mapX > 0) {
+                    s_drawAdjacentCell = GetCell(mapX - 1, mapY);
+                    if (s_drawAdjacentCell->triggerType == ADVMGR_MONSTER_TRIGGER) {
+                        s_drawMine = &gpGame->m_mines[s_drawAdjacentCell->w4hi];
+                        if (s_drawMine->guardianType == 59) {
+                            IconToBitmap(m_objectIcons[ADVMGR_MINE_GUARDIAN_ICON_SLOT],
+                                         gpWindowManager->m_screen,
+                                         s_drawPixelX - 16, s_drawPixelY,
+                                         (m_updateMaxY + mapY + mapX) % 15,
+                                         1, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
+                                         ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                        } else if (s_drawMine->guardianType != -1) {
+                            IconToBitmap(m_objectIcons[ADVMGR_TILESET_BOAT],
+                                         gpWindowManager->m_screen,
+                                         s_drawPixelX - 32, s_drawPixelY,
+                                         s_drawMine->guardianType - 62,
+                                         1, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
+                                         ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                        }
+                    }
+                }
+
+                if (s_drawCell->objTileset == ADVMGR_TILESET_MINE) {
+                    if (m_lastQuickViewX == mapX && m_lastQuickViewY == mapY) {
+                        IconToBitmap(m_objectIcons[ADVMGR_TILESET_MONSTER],
+                                     gpWindowManager->m_screen,
+                                     s_drawPixelX + 16, s_drawPixelY + 30,
+                                     (8 - (m_field_0x2ba == 0)) +
+                                         s_drawCell->objIndex * 9,
+                                     1, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
+                                     ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                    } else {
+                        IconToBitmap(m_objectIcons[ADVMGR_TILESET_MONSTER],
+                                     gpWindowManager->m_screen,
+                                     s_drawPixelX + 16, s_drawPixelY + 30,
+                                     s_drawCell->objIndex * 9,
+                                     1, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
+                                     ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                        if (s_drawCell->objIndex == 59 || s_drawCell->objIndex == 60)
+                            s_drawMonsterFrame = m_viewBounds[mapX & 3] % 6;
+                        else
+                            s_drawMonsterFrame = monAnimDrawFrame[m_viewBounds[mapX & 3]];
+                        IconToBitmap(m_objectIcons[ADVMGR_TILESET_MONSTER],
+                                     gpWindowManager->m_screen,
+                                     s_drawPixelX + 16, s_drawPixelY + 30,
+                                     s_drawCell->objIndex * 9 + s_drawMonsterFrame + 1,
+                                     1, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
+                                     ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                    }
+                }
+            }
+
+            if (s_drawCell->triggerType == ADVMGR_BOAT_TRIGGER) {
+                s_drawPlayerColor = -1;
+                s_drawHeroType = ADVMGR_HERO_TYPE_BOAT;
+                s_drawHeroFrame = GetCursorBaseFrame(
+                    gpGame->m_boats[s_drawCell->w4hi].direction);
+                s_drawHasHero = 1;
+                s_drawHeroYOffset = -10;
+            } else {
+                s_drawHeroYOffset = 0;
+                if (s_drawCell->triggerType == ADVMGR_HERO_TRIGGER) {
+                    s_drawHero = gpGame->GetHero(s_drawCell->w4hi);
+                    s_drawPlayerColor =
+                        gpGame->m_players[s_drawHero->m_owner].color;
+                    if (s_drawHero->m_eventFlags & 0x80)
+                        s_drawHeroType = ADVMGR_HERO_TYPE_BOAT;
+                    else
+                        s_drawHeroType = s_drawHero->m_cursorType;
+                    s_drawHeroFrame = GetCursorBaseFrame(s_drawHero->m_direction);
+                    s_drawHasHero = 1;
+                    if (s_drawHero->m_eventFlags & 0x80)
+                        s_drawHeroYOffset = -10;
+                }
+            }
+
+            if (s_drawHasHero) {
+                if (s_drawHeroFrame & 0x80) {
+                    if (drawMask & ADVMGR_DRAW_HERO_SHADOW) {
+                        if (m_field_0x276 != 0 &&
+                            s_drawHeroType != ADVMGR_HERO_TYPE_BOAT) {
+                            cursorFrame = s_drawHeroFrame & 0x7f;
+                            if (cursorFrame == 51)
+                                cursorFrame = 56;
+                            if (cursorFrame == 50)
+                                cursorFrame = 57;
+                            if (cursorFrame == 49)
+                                cursorFrame = 58;
+                            if (cursorFrame == 47)
+                                cursorFrame = 55;
+                            if (cursorFrame == 46)
+                                cursorFrame = 55;
+                            if (cursorFrame >= 9 &&
+                                cursorFrame < ADVMGR_HERO_SHADOW_FRAME_END)
+                                heroShadowOffset = 50;
+                            else
+                                heroShadowOffset = 0;
+                            IconToBitmap(m_shadowIcon, gpWindowManager->m_screen,
+                                         s_drawPixelX, s_drawPixelY + 31,
+                                         cursorFrame + heroShadowOffset,
+                                         1, 0, 0,
+                                         ADVMGR_DRAW_CLIP_WIDTH,
+                                         ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                        }
+                        if (m_field_0x276 != 0 &&
+                            s_drawHeroType == ADVMGR_HERO_TYPE_BOAT) {
+                            boatFrameIndex = s_drawHeroFrame & 0x7f;
+                            if (boatFrameIndex >= 9 &&
+                                boatFrameIndex < ADVMGR_HERO_SHADOW_FRAME_END)
+                                boatShadowFrameOffset = 36;
+                            else
+                                boatShadowFrameOffset = 0;
+                            IconToBitmap(m_boatShadowIcon, gpWindowManager->m_screen,
+                                         s_drawPixelX,
+                                         s_drawPixelY + 31 + s_drawHeroYOffset,
+                                         boatFrameIndex + boatShadowFrameOffset,
+                                         1, 0, 0,
+                                         ADVMGR_DRAW_CLIP_WIDTH,
+                                         ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                        }
+                    } else {
+                        if (s_drawHeroType == ADVMGR_HERO_TYPE_BOAT &&
+                            (s_drawCell->field8 & 4) == 0) {
+                            FlipIconToBitmap(m_heroIcons[7], gpWindowManager->m_screen,
+                                             s_drawPixelX + 32,
+                                             s_drawPixelY + 31 + s_drawHeroYOffset,
+                                             s_drawHeroFrame & 0x7f, 1, 0, 0,
+                                             ADVMGR_DRAW_CLIP_WIDTH,
+                                             ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                        }
+                        FlipIconToBitmap(m_heroIcons[s_drawHeroType],
+                                         gpWindowManager->m_screen,
+                                         s_drawPixelX + 32,
+                                         s_drawPixelY + 31 + s_drawHeroYOffset,
+                                         s_drawHeroFrame & 0x7f, 1, 0, 0,
+                                         ADVMGR_DRAW_CLIP_WIDTH,
+                                         ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                        if (s_drawPlayerColor != -1) {
+                            if (s_drawHeroType == ADVMGR_HERO_TYPE_BOAT) {
+                                FlipIconToBitmap(m_boatFlagIcons[s_drawPlayerColor],
+                                                 gpWindowManager->m_screen,
+                                                 s_drawPixelX + 32,
+                                                 s_drawPixelY + 31 + s_drawHeroYOffset,
+                                                 s_drawHeroFrame & 0x7f,
+                                                 1, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
+                                                 ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                            } else {
+                                FlipIconToBitmap(m_flagIcons[s_drawPlayerColor],
+                                                 gpWindowManager->m_screen,
+                                                 s_drawPixelX + 32, s_drawPixelY + 31,
+                                                 m_updateMaxY % 8 +
+                                                     (s_drawHeroFrame & 0x7f) + 56,
+                                                 1, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
+                                                 ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                            }
+                        }
+                    }
+                } else {
+                    if (drawMask & ADVMGR_DRAW_HERO_SHADOW) {
+                        if (m_field_0x276 != 0 &&
+                            s_drawHeroType != ADVMGR_HERO_TYPE_BOAT &&
+                            (drawMask & ADVMGR_DRAW_HERO_SHADOW)) {
+                            IconToBitmap(m_shadowIcon, gpWindowManager->m_screen,
+                                         s_drawPixelX, s_drawPixelY + 31,
+                                         s_drawHeroFrame, 1, 0, 0,
+                                         ADVMGR_DRAW_CLIP_WIDTH,
+                                         ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                        }
+                        if (m_field_0x276 != 0 &&
+                            s_drawHeroType == ADVMGR_HERO_TYPE_BOAT) {
+                            IconToBitmap(m_boatShadowIcon, gpWindowManager->m_screen,
+                                         s_drawPixelX,
+                                         s_drawPixelY + 31 + s_drawHeroYOffset,
+                                         s_drawHeroFrame, 1, 0, 0,
+                                         ADVMGR_DRAW_CLIP_WIDTH,
+                                         ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                        }
+                    } else {
+                        if (s_drawHeroType == ADVMGR_HERO_TYPE_BOAT &&
+                            (s_drawCell->field8 & 4) == 0) {
+                            IconToBitmap(m_heroIcons[7], gpWindowManager->m_screen,
+                                         s_drawPixelX,
+                                         s_drawPixelY + 31 + s_drawHeroYOffset,
+                                         s_drawHeroFrame, 1, 0, 0,
+                                         ADVMGR_DRAW_CLIP_WIDTH,
+                                         ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                        }
+                        IconToBitmap(m_heroIcons[s_drawHeroType], gpWindowManager->m_screen,
+                                     s_drawPixelX,
+                                     s_drawPixelY + 31 + s_drawHeroYOffset,
+                                     s_drawHeroFrame, 1, 0, 0,
+                                     ADVMGR_DRAW_CLIP_WIDTH,
+                                     ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                        if (s_drawPlayerColor != -1) {
+                            if (s_drawHeroType == ADVMGR_HERO_TYPE_BOAT) {
+                                IconToBitmap(m_boatFlagIcons[s_drawPlayerColor],
+                                             gpWindowManager->m_screen,
+                                             s_drawPixelX,
+                                             s_drawPixelY + 31 + s_drawHeroYOffset,
+                                             s_drawHeroFrame & 0x7f,
+                                             1, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
+                                             ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                            } else {
+                                IconToBitmap(m_flagIcons[s_drawPlayerColor],
+                                             gpWindowManager->m_screen,
+                                             s_drawPixelX, s_drawPixelY + 31,
+                                             m_updateMaxY % 8 +
+                                                 (s_drawHeroFrame & 0x7f) + 56,
+                                             1, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
+                                             ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (m_cursorActive != 0 && (s_drawCell->field8 & 0x40) != 0 &&
+                (m_comboHeroDrawn == 0 || (drawMask & ADVMGR_DRAW_HERO_SHADOW)) &&
+                m_mapOriginX + 7 == mapX && m_mapOriginY + 7 == mapY) {
+                if (drawMask & ADVMGR_DRAW_HERO_SHADOW) {
+                    cursorSuppressed = 1;
+                } else {
+                    DrawCursorShadow();
+                    DrawCursor();
+                    m_comboHeroDrawn = 1;
+                }
+            }
+        }
+
+        if ((drawMask & ADVMGR_DRAW_OVERLAY) ||
+            (drawMask & ADVMGR_DRAW_OVERLAY_TOP)) {
+            if ((drawMask & ADVMGR_DRAW_OVERLAY) && s_drawCell->objIndex != 0xff &&
+                s_drawCell->w4c &&
+                (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawCell->objTileset])) {
+                IconToBitmap(m_objectIcons[s_drawCell->objTileset], gpWindowManager->m_screen,
+                             s_drawPixelX, s_drawPixelY, s_drawCell->objIndex,
+                             0, 0, 0, ADVMGR_DRAW_CLIP_WIDTH, ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                if (s_drawCell->objFlag0) {
+                    s_drawAnimationLength =
+                        GetIconEntry(m_objectIcons[s_drawCell->objTileset],
+                                     s_drawCell->objIndex)->flags;
+                    IconToBitmap(m_objectIcons[s_drawCell->objTileset], gpWindowManager->m_screen,
+                                 s_drawPixelX, s_drawPixelY,
+                                 s_drawCell->objIndex + m_updateMaxY % s_drawAnimationLength + 1,
+                                 0, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
+                                 ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                }
+            }
+
+            if (s_drawCell->extra != 0 &&
+                m_mapData->Extra(s_drawCell->extra)->objIndex != 0xff)
+                s_drawExtra = m_mapData->Extra(s_drawCell->extra);
+            else
+                s_drawExtra = 0;
+            while (s_drawExtra != 0) {
+                if (s_drawExtra->f4c &&
+                    (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawExtra->objTileset])) {
+                    IconToBitmap(m_objectIcons[s_drawExtra->objTileset],
+                                 gpWindowManager->m_screen, s_drawPixelX, s_drawPixelY,
+                                 s_drawExtra->objIndex, 0, 0, 0,
+                                 ADVMGR_DRAW_CLIP_WIDTH, ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                    if (s_drawExtra->objFlag) {
+                        s_drawAnimationLength =
+                            GetIconEntry(m_objectIcons[s_drawExtra->objTileset],
+                                         s_drawExtra->objIndex)->flags;
+                        IconToBitmap(m_objectIcons[s_drawExtra->objTileset],
+                                     gpWindowManager->m_screen, s_drawPixelX, s_drawPixelY,
+                                     s_drawExtra->objIndex +
+                                         m_updateMaxY % s_drawAnimationLength + 1,
+                                     0, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
+                                     ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                    }
+                }
+                if (s_drawExtra->index != 0 &&
+                    m_mapData->Extra(s_drawExtra->index)->objIndex != 0xff)
+                    s_drawExtra = m_mapData->Extra(s_drawExtra->index);
+                else
+                    s_drawExtra = 0;
+            }
+
+            if (s_drawCell->ovlIndex != 0xff &&
+                (((drawMask & ADVMGR_DRAW_OVERLAY) && !s_drawCell->ovlFlag1) ||
+                 ((drawMask & ADVMGR_DRAW_OVERLAY_TOP) && s_drawCell->ovlFlag1)) &&
+                (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawCell->ovlTileset])) {
+                IconToBitmap(m_objectIcons[s_drawCell->ovlTileset], gpWindowManager->m_screen,
+                             s_drawPixelX, s_drawPixelY, s_drawCell->ovlIndex,
+                             s_drawCell->ovlTileset == 14, 0, 0,
+                             ADVMGR_DRAW_CLIP_WIDTH, ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                if (s_drawCell->ovlFlag0) {
+                    s_drawAnimationLength =
+                        GetIconEntry(m_objectIcons[s_drawCell->ovlTileset],
+                                     s_drawCell->ovlIndex)->flags;
+                    IconToBitmap(m_objectIcons[s_drawCell->ovlTileset],
+                                 gpWindowManager->m_screen, s_drawPixelX, s_drawPixelY,
+                                 m_updateMaxY % s_drawAnimationLength + s_drawCell->ovlIndex + 1,
+                                 0, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
+                                 ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                }
+            }
+
+            if (s_drawCell->extra != 0 &&
+                m_mapData->Extra(s_drawCell->extra)->ovlIndex != 0xff)
+                s_drawExtra = m_mapData->Extra(s_drawCell->extra);
+            else
+                s_drawExtra = 0;
+            while (s_drawExtra != 0) {
+                if (((drawMask & ADVMGR_DRAW_OVERLAY) && !s_drawExtra->ovlFlag1) ||
+                    ((drawMask & ADVMGR_DRAW_OVERLAY_TOP) && s_drawExtra->ovlFlag1)) {
+                    if (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawExtra->ovlTileset]) {
+                        IconToBitmap(m_objectIcons[s_drawExtra->ovlTileset],
+                                     gpWindowManager->m_screen, s_drawPixelX, s_drawPixelY,
+                                     s_drawExtra->ovlIndex,
+                                     s_drawExtra->ovlTileset == 14, 0, 0,
+                                     ADVMGR_DRAW_CLIP_WIDTH,
+                                     ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                        if (s_drawExtra->ovlFlag0) {
+                            s_drawAnimationLength =
+                                GetIconEntry(m_objectIcons[s_drawExtra->ovlTileset],
+                                             s_drawExtra->ovlIndex)->flags;
+                            IconToBitmap(m_objectIcons[s_drawExtra->ovlTileset],
+                                         gpWindowManager->m_screen,
+                                         s_drawPixelX, s_drawPixelY,
+                                         m_updateMaxY % s_drawAnimationLength +
+                                             s_drawExtra->ovlIndex + 1,
+                                         0, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
+                                         ADVMGR_DRAW_CLIP_HEIGHT, 0);
+                        }
+                    }
+                }
+                if (s_drawExtra->index != 0 &&
+                    m_mapData->Extra(s_drawExtra->index)->ovlIndex != 0xff)
+                    s_drawExtra = m_mapData->Extra(s_drawExtra->index);
+                else
+                    s_drawExtra = 0;
+            }
+        }
+    }
+    }
+}
 
 VA(0x0045e047, 0x93)
-class mapCell * advManager::GetCell(int, int) { return 0; }
+class mapCell * advManager::GetCell(int x, int y)
+{
+    if (x < 0 || y < 0 || x >= MAP_WIDTH || y >= MAP_HEIGHT)
+        return m_mapData->cells;
+    else
+        return &m_mapData->Row(y)[x];
+}
 
+// @early-stop
+// raw-masked: exact logic/frame and 122-reloc external-target audit; operand order at
+// +0x141..0x15a, +0x1d3..0x1eb, +0x234..0x23d, and +0x47d..0x488, plus retail NOPs
 VA(0x0045e0da, 0x104d)
-void advManager::UpdateRadar(int, int) {}
+void advManager::UpdateRadar(int updateScreen, int partial)
+{
+    int maxXLocal;
+    int unusedRadarRowLocal;
+    int radarFrameLocal;
+    unsigned char radarColorValue = ADVMGR_RADAR_UNSEEN_COLOR;
+    float radarScaleState;
+    int townXValue;
+    int maxYLocal;
+    int unusedRadarCoordinateLocal;
+    int townYValue;
+    int rowRemainderState;
+    int unusedRadarDimensionValue;
+    int unusedRadarColumnState;
+    int mapRow;
+    int mapColumnLimit;
+    int ownerIndexValue;
+    unsigned char *radarPixel;
+    mapCell *cellValue;
+    int screenColumnIndex;
+    unsigned char *screenRowOffset;
+    int columnRemainderValue;
+    int minYOffset;
+    int minXSlot;
+    int skipFrameIndex;
+    unsigned int objectTilesetLocal;
 
+    // Retail reserves these four unreferenced named-local words above `this`.
+
+    if (partial == 0) {
+        minXSlot = 0;
+        minYOffset = 0;
+        maxXLocal = MAP_WIDTH - 1;
+        maxYLocal = MAP_HEIGHT - 1;
+    } else {
+        minXSlot = m_mapOriginX - ADVMGR_RADAR_PARTIAL_MARGIN;
+        minYOffset = m_mapOriginY - ADVMGR_RADAR_PARTIAL_MARGIN;
+        maxXLocal = m_mapOriginX + ADVMGR_RADAR_PARTIAL_SPAN;
+        maxYLocal = m_mapOriginY + ADVMGR_RADAR_PARTIAL_SPAN;
+        if (minXSlot < 0)
+            minXSlot = 0;
+        if (minYOffset < 0)
+            minYOffset = 0;
+        if (maxXLocal > MAP_WIDTH - 1)
+            maxXLocal = MAP_WIDTH - 1;
+        if (maxYLocal > MAP_HEIGHT - 1)
+            maxYLocal = MAP_HEIGHT - 1;
+    }
+
+    if (gbThisNetHumanPlayer[giCurPlayer] == 0)
+        return;
+
+    gpAdvManager->m_openState = 0;
+    columnRemainderValue = rowRemainderState = 0;
+    switch (MAP_HEIGHT) {
+    case ADVMGR_RADAR_MAP_SMALL:
+        screenRowOffset = gpWindowManager->m_screen->m_pixels +
+            (minYOffset * 4 + ADVMGR_RADAR_TOP) * ADVMGR_RADAR_ROW_GROUPS *
+                ADVMGR_RADAR_GROUP_BYTES + ADVMGR_RADAR_LEFT;
+        screenColumnIndex = minXSlot * 4;
+        break;
+    case ADVMGR_RADAR_MAP_MEDIUM:
+        screenRowOffset =
+            &gpWindowManager->m_screen->m_pixels[
+                (minYOffset * 2 + ADVMGR_RADAR_TOP) *
+                ADVMGR_RADAR_ROW_GROUPS * ADVMGR_RADAR_GROUP_BYTES] +
+            ADVMGR_RADAR_LEFT;
+        screenColumnIndex = minXSlot * 2;
+        break;
+    case ADVMGR_RADAR_MAP_LARGE:
+        screenRowOffset = gpWindowManager->m_screen->m_pixels +
+            (minYOffset + (minYOffset + 2) / 3 + ADVMGR_RADAR_TOP) *
+                ADVMGR_RADAR_ROW_GROUPS * ADVMGR_RADAR_GROUP_BYTES +
+                ADVMGR_RADAR_LEFT;
+        screenColumnIndex = minXSlot + (minXSlot + 2) / 3;
+        columnRemainderValue = minXSlot % 3;
+        rowRemainderState = minYOffset % 3;
+        break;
+    default:
+        screenRowOffset =
+            &gpWindowManager->m_screen->m_pixels[
+                (minYOffset + ADVMGR_RADAR_TOP) * ADVMGR_RADAR_ROW_GROUPS *
+                ADVMGR_RADAR_GROUP_BYTES] + ADVMGR_RADAR_LEFT;
+        screenColumnIndex = minXSlot;
+        break;
+    }
+
+    for (mapRow = minYOffset; !(maxYLocal < mapRow); ++mapRow) {
+        radarPixel = screenRowOffset + screenColumnIndex;
+        switch (MAP_HEIGHT) {
+        case ADVMGR_RADAR_MAP_SMALL:
+            screenRowOffset += ADVMGR_RADAR_SCREEN_PITCH * 4;
+            break;
+        case ADVMGR_RADAR_MAP_MEDIUM:
+            screenRowOffset += ADVMGR_RADAR_SCREEN_PITCH * 2;
+            break;
+        case ADVMGR_RADAR_MAP_LARGE:
+            ++rowRemainderState;
+            if (rowRemainderState > 2)
+                rowRemainderState = 0;
+            if (rowRemainderState != 0)
+                screenRowOffset += ADVMGR_RADAR_SCREEN_PITCH;
+            else
+                screenRowOffset += ADVMGR_RADAR_SCREEN_PITCH * 2;
+            break;
+        case ADVMGR_RADAR_MAP_XLARGE:
+            screenRowOffset += ADVMGR_RADAR_SCREEN_PITCH;
+            break;
+        }
+
+        for (mapColumnLimit = minXSlot; mapColumnLimit <= maxXLocal; ++mapColumnLimit) {
+            if (gbAllBlack != 0 ||
+                (giCurPlayerBit & mapExtra[mapRow * MAP_WIDTH + mapColumnLimit]) == 0) {
+                radarColorValue = ADVMGR_RADAR_UNSEEN_COLOR;
+            } else {
+                cellValue = &m_mapData->Row(mapRow)[mapColumnLimit];
+                if ((cellValue->field8 & 0x40) != 0 &&
+                    m_mapOriginX + ADVMGR_RADAR_CURRENT_CELL == mapColumnLimit &&
+                    m_mapOriginY + ADVMGR_RADAR_CURRENT_CELL == mapRow) {
+                    radarColorValue = gOwnerColors[gpGame->m_players[giCurPlayer].color];
+                } else {
+                    if ((cellValue->triggerType & ADVMGR_TRIGGER_TYPE_MASK) ==
+                        ADVMGR_RADAR_TOWN_TRIGGER) {
+                        ownerIndexValue = gpGame->m_availableHeroes[cellValue->w4hi];
+                        if (!(giCurPlayer != ownerIndexValue)) {
+                            int ownerColorIndex;
+                            if (ownerIndexValue >= 0)
+                                ownerColorIndex = gpGame->m_players[ownerIndexValue].color;
+                            else
+                                ownerColorIndex = ADVMGR_RADAR_NEUTRAL_OWNER;
+                            radarColorValue = gOwnerColors[ownerColorIndex];
+                        }
+                    } else {
+                        objectTilesetLocal = static_cast<unsigned int>(-1);
+                        if (cellValue->objIndex != 0xff) {
+                            objectTilesetLocal = cellValue->objTileset;
+                        } else if (cellValue->ovlIndex != 0xff) {
+                            objectTilesetLocal = cellValue->ovlTileset;
+                        }
+
+                        if (cellValue->triggerType == ADVMGR_RADAR_TOWN_TILESET_1 ||
+                            (objectTilesetLocal == 14 && mapColumnLimit > 0 &&
+                             mapColumnLimit < MAP_WIDTH - 1 &&
+                             m_mapData->Row(mapRow)[mapColumnLimit - 1].triggerType ==
+                                 ADVMGR_RADAR_NEIGHBOR_TRIGGER) ||
+                            m_mapData->Row(mapRow)[mapColumnLimit + 1].triggerType ==
+                                ADVMGR_RADAR_NEIGHBOR_TRIGGER) {
+                            objectTilesetLocal = ADVMGR_RADAR_TOWN_TILESET_1;
+                        }
+
+                        if (objectTilesetLocal == ADVMGR_RADAR_SPECIAL_TILESET &&
+                            cellValue->triggerType == ADVMGR_RADAR_REEFS_TRIGGER) {
+                            radarColorValue = gMapColors[giGroundToTerrain[cellValue->tile]] +
+                                ADVMGR_RADAR_TERRAIN_SHADE;
+                        } else {
+                            switch (objectTilesetLocal) {
+                            case ADVMGR_RADAR_TOWN_TILESET_1:
+                            case ADVMGR_RADAR_TOWN_TILESET_2: {
+                                int ownerColorIndex;
+                                ownerIndexValue = gpGame->m_townOwners[cellValue->w4hi];
+                                townXValue = gpGame->GetTown(cellValue->w4hi)->m_x;
+                                townYValue = gpGame->GetTown(cellValue->w4hi)->m_y;
+                                if (ownerIndexValue >= 0)
+                                    ownerColorIndex = gpGame->m_players[ownerIndexValue].color;
+                                else
+                                    ownerColorIndex = ADVMGR_RADAR_NEUTRAL_OWNER;
+                                radarColorValue = gOwnerColors[ownerColorIndex];
+                                if (mapRow < townYValue - ADVMGR_RADAR_TOWN_RADIUS ||
+                                    townYValue < mapRow ||
+                                    mapColumnLimit < townXValue - ADVMGR_RADAR_TOWN_RADIUS ||
+                                    mapColumnLimit > townXValue + ADVMGR_RADAR_TOWN_RADIUS)
+                                    goto radar_default_object;
+                                break;
+                            }
+                            case 0x16: case 0x17: case 0x18: case 0x19:
+                            case 0x1a: case 0x1b: case 0x1f: case 0x20:
+                            case 0x21: case 0x22: case 0x2a: case 0x2b:
+                            case 0x2c: case 0x31:
+                                switch (cellValue->triggerType) {
+                                case 1: case 0x17: case 0x1d:
+                                case 0x81: case 0x97: case 0x9d: {
+                                    int ownerColorIndex;
+                                    ownerIndexValue = gpGame->m_mineOwners[cellValue->w4hi];
+                                    if (ownerIndexValue >= 0)
+                                        ownerColorIndex = gpGame->m_players[ownerIndexValue].color;
+                                    else
+                                        ownerColorIndex = ADVMGR_RADAR_NEUTRAL_OWNER;
+                                    radarColorValue = gOwnerColors[ownerColorIndex];
+                                    break;
+                                }
+                                default:
+                                    radarColorValue = gMapColors[giGroundToTerrain[cellValue->tile]] +
+                                        ADVMGR_RADAR_TERRAIN_SHADE;
+                                    break;
+                                }
+                                break;
+                            default:
+radar_default_object:
+                                switch (cellValue->triggerType) {
+                                case 1: case 0x17: case 0x1d:
+                                case 0x81: case 0x97: case 0x9d: {
+                                    int ownerColorIndex;
+                                    ownerIndexValue = gpGame->m_mineOwners[cellValue->w4hi];
+                                    if (ownerIndexValue >= 0)
+                                        ownerColorIndex = gpGame->m_players[ownerIndexValue].color;
+                                    else
+                                        ownerColorIndex = ADVMGR_RADAR_NEUTRAL_OWNER;
+                                    radarColorValue = gOwnerColors[ownerColorIndex];
+                                    break;
+                                }
+                                default:
+                                    radarColorValue = gMapColors[giGroundToTerrain[cellValue->tile]];
+                                    break;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            switch (MAP_HEIGHT) {
+            case ADVMGR_RADAR_MAP_SMALL:
+                memset(radarPixel, radarColorValue, 4);
+                memset(radarPixel + ADVMGR_RADAR_SCREEN_PITCH, radarColorValue, 4);
+                memset(radarPixel + ADVMGR_RADAR_SCREEN_PITCH * 2, radarColorValue, 4);
+                memset(radarPixel + ADVMGR_RADAR_SCREEN_PITCH * 3, radarColorValue, 4);
+                radarPixel += 4;
+                break;
+            case ADVMGR_RADAR_MAP_MEDIUM:
+                memset(radarPixel, radarColorValue, 2);
+                memset(radarPixel + ADVMGR_RADAR_SCREEN_PITCH, radarColorValue, 2);
+                radarPixel += 2;
+                break;
+            case ADVMGR_RADAR_MAP_LARGE:
+                if (columnRemainderValue != 0) {
+                    if (rowRemainderState != 0) {
+                        radarPixel[0] = radarColorValue;
+                        ++radarPixel;
+                    } else {
+                        radarPixel[0] = radarColorValue;
+                        radarPixel[ADVMGR_RADAR_SCREEN_PITCH] = radarColorValue;
+                        ++radarPixel;
+                    }
+                } else if (rowRemainderState != 0) {
+                    radarPixel[0] = radarColorValue;
+                    radarPixel[1] = radarColorValue;
+                    radarPixel += 2;
+                } else {
+                    radarPixel[0] = radarColorValue;
+                    radarPixel[1] = radarColorValue;
+                    radarPixel[ADVMGR_RADAR_SCREEN_PITCH] = radarColorValue;
+                    radarPixel[ADVMGR_RADAR_SCREEN_PITCH + 1] = radarColorValue;
+                    radarPixel += 2;
+                }
+                ++columnRemainderValue;
+                if (columnRemainderValue > 2)
+                    columnRemainderValue = 0;
+                break;
+            case ADVMGR_RADAR_MAP_XLARGE:
+                *radarPixel++ = radarColorValue;
+                break;
+            }
+        }
+    }
+
+    radarFrameLocal = -1;
+    skipFrameIndex = 0;
+    if (gbInViewWorld != 0) {
+        switch (MAP_HEIGHT) {
+        case ADVMGR_RADAR_MAP_SMALL:
+            radarScaleState = 4.0f;
+            skipFrameIndex = 1;
+            break;
+        case ADVMGR_RADAR_MAP_MEDIUM:
+            radarScaleState = 2.0f;
+            if (giViewWorldScale <= 6)
+                skipFrameIndex = 1;
+            else
+                radarFrameLocal = 6;
+            break;
+        case ADVMGR_RADAR_MAP_LARGE:
+            radarScaleState = 1.33f;
+            if (giViewWorldScale <= 4)
+                skipFrameIndex = 1;
+            else if (giViewWorldScale == 6)
+                radarFrameLocal = 9;
+            else
+                radarFrameLocal = 8;
+            break;
+        default:
+            radarScaleState = 1.0f;
+            if (giViewWorldScale == 4)
+                radarFrameLocal = 7;
+            else if (giViewWorldScale == 6)
+                radarFrameLocal = 6;
+            else
+                radarFrameLocal = 4;
+            break;
+        }
+    } else {
+        switch (MAP_HEIGHT) {
+        case ADVMGR_RADAR_MAP_SMALL:
+            radarFrameLocal = 5;
+            radarScaleState = 4.0f;
+            break;
+        case ADVMGR_RADAR_MAP_MEDIUM:
+            radarFrameLocal = 3;
+            radarScaleState = 2.0f;
+            break;
+        case ADVMGR_RADAR_MAP_LARGE:
+            radarFrameLocal = 2;
+            radarScaleState = 1.33f;
+            break;
+        default:
+            radarFrameLocal = 1;
+            radarScaleState = 1.0f;
+            break;
+        }
+    }
+
+    if (skipFrameIndex == 0) {
+        if (gbInViewWorld != 0) {
+            m_puzzleIcon->ClipFillToBuffer(
+                static_cast<int>(iVWMapOriginX * radarScaleState + 480.0f),
+                static_cast<int>(iVWMapOriginY * radarScaleState + 16.0f),
+                radarFrameLocal, 181, 0, ADVMGR_RADAR_LEFT, ADVMGR_RADAR_TOP,
+                ADVMGR_RADAR_SIZE, ADVMGR_RADAR_SIZE);
+        } else {
+            m_puzzleIcon->ClipFillToBuffer(
+                static_cast<int>(m_mapOriginX * radarScaleState + 480.0f),
+                static_cast<int>(m_mapOriginY * radarScaleState + 16.0f),
+                radarFrameLocal, 181, 0, ADVMGR_RADAR_LEFT, ADVMGR_RADAR_TOP,
+                ADVMGR_RADAR_SIZE, ADVMGR_RADAR_SIZE);
+        }
+    }
+
+    if (updateScreen != 0) {
+        if (partial != 0) {
+            gpWindowManager->UpdateScreenRegion(
+                static_cast<int>(minXSlot * radarScaleState + 480.0f),
+                static_cast<int>(minYOffset * radarScaleState + 16.0f),
+                static_cast<int>((maxXLocal - minXSlot + 1) * radarScaleState),
+                static_cast<int>((maxYLocal - minYOffset + 1) * radarScaleState));
+        } else {
+            gpWindowManager->UpdateScreenRegion(ADVMGR_RADAR_LEFT, ADVMGR_RADAR_TOP,
+                                                ADVMGR_RADAR_SIZE, ADVMGR_RADAR_SIZE);
+        }
+    }
+}
+
+// @early-stop
+// instruction-exact bodies/frame and 205-reloc audit; only map-index operand grouping,
+// switch break-stub/dispatcher placement, and retail trailing NOPs differ cumulatively
 VA(0x0045f127, 0x133e)
-void advManager::QuickInfo(int, int) {}
+void advManager::QuickInfo(int cellX, int cellY)
+{
+    int quickInfoShowFlag = 1;
+    mapCell *currentCell = 0;
+    hero *heroLocal = 0;
+    int quickInfoScreenX;
+    int dialogTopPosition;
+    heroWindow *windowLocal;
+    unsigned int visitedMaskValue;
+    char savedTextLocal[200];
+    char guardCaption[200];
+    int siteIndexName;
+    int siteFrameLocal[2];
+    int objectTilesetLocal;
+    char uppercaseResult;
+    char mapObjectKindValue;
+    tag_message message;
+
+    if (gpCurPlayer->CurrentHero() != -1)
+        heroLocal = &gpGame->m_heroRecs[gpCurPlayer->CurrentHero()];
+    else
+        heroLocal = 0;
+
+    quickInfoScreenX = cellX * ADVMGR_CELL_PIXELS - 57;
+    if (quickInfoScreenX < 30)
+        quickInfoScreenX = 30;
+    if (quickInfoScreenX + 160 > 464)
+        quickInfoScreenX = 304;
+
+    dialogTopPosition = cellY * ADVMGR_CELL_PIXELS - 25;
+    if (dialogTopPosition < 16)
+        dialogTopPosition = 16;
+    if (dialogTopPosition + 96 > 448)
+        dialogTopPosition = 352;
+
+    windowLocal = new heroWindow(quickInfoScreenX, dialogTopPosition, "qwikinfo.bin");
+    if (windowLocal == 0)
+        MemError();
+    visitedMaskValue = 0;
+
+    if (m_mapOriginX + cellX < 0 || m_mapOriginX + cellX >= MAP_WIDTH ||
+        m_mapOriginY + cellY < 0 || m_mapOriginY + cellY >= MAP_HEIGHT) {
+        sprintf(gText, "%s", "Border");
+    } else {
+        currentCell = GetCell(m_mapOriginX + cellX, m_mapOriginY + cellY);
+        if ((giCurPlayerBit &
+             mapExtra[(m_mapOriginX + cellX) +
+                      (m_mapOriginY + cellY) * MAP_WIDTH]) == 0) {
+            sprintf(gText, "%s", "Uncharted Territory");
+        } else {
+
+    switch (currentCell->triggerType & 0x7f) {
+    case ADVMGR_OBJECT_ARTIFACT:
+        sprintf(gText, "%s", "Artifact");
+        goto quick_info_ready;
+    case ADVMGR_OBJECT_OBELISK:
+        if (currentCell->triggerType & 0x80) {
+            sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->triggerType & 0x7f],
+                    (gpGame->m_obeliskVisitors[
+                         currentCell->w4hi - ADVMGR_OBELISK_INDEX_BASE] &
+                     (1u << giCurPlayer))
+                        ? "(already visited)" : "(not visited)");
+            goto quick_info_ready;
+        }
+        break;
+    case ADVMGR_OBJECT_GAZEBO_VISIT:
+        if (heroLocal != 0 && (currentCell->triggerType & 0x80)) {
+            sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->triggerType & 0x7f],
+                    (heroLocal->m_gazeboVisits & (1u << (currentCell->w4hi & 0x1f)))
+                        ? "(already visited)" : "(not visited)");
+            goto quick_info_ready;
+        }
+        break;
+    case ADVMGR_OBJECT_FORT_VISIT:
+        if (heroLocal != 0 && (currentCell->triggerType & 0x80)) {
+            sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->triggerType & 0x7f],
+                    (heroLocal->m_fortVisits & (1u << (currentCell->w4hi & 0x1f)))
+                        ? "(already visited)" : "(not visited)");
+            goto quick_info_ready;
+        }
+        break;
+    case ADVMGR_OBJECT_WITCH_DOCTOR_VISIT:
+        if (heroLocal != 0 && (currentCell->triggerType & 0x80)) {
+            sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->triggerType & 0x7f],
+                    (heroLocal->m_witchDoctorVisits &
+                     (1u << (currentCell->w4hi & 0x1f)))
+                        ? "(already visited)" : "(not visited)");
+            goto quick_info_ready;
+        }
+        break;
+    case ADVMGR_OBJECT_MERCENARY_VISIT:
+        if (heroLocal != 0 && (currentCell->triggerType & 0x80)) {
+            sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->triggerType & 0x7f],
+                    (heroLocal->m_mercenaryCampVisits &
+                     (1u << (currentCell->w4hi & 0x1f)))
+                        ? "(already visited)" : "(not visited)");
+            goto quick_info_ready;
+        }
+        break;
+    case ADVMGR_OBJECT_STANDING_STONE_ALT:
+        if (heroLocal != 0 && (currentCell->triggerType & 0x80)) {
+            sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->triggerType & 0x7f],
+                    (heroLocal->m_standingStoneVisits &
+                     (1u << (currentCell->w4hi & 0x1f)))
+                        ? "(already visited)" : "(not visited)");
+            goto quick_info_ready;
+        }
+        break;
+    case ADVMGR_OBJECT_TREE_ALT:
+        if (heroLocal != 0 && (currentCell->triggerType & 0x80)) {
+            sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->triggerType & 0x7f],
+                    (heroLocal->m_treeKnowledgeVisits &
+                     (1u << (currentCell->w4hi & 0x1f)))
+                        ? "(already visited)" : "(not visited)");
+            goto quick_info_ready;
+        }
+        break;
+    case ADVMGR_OBJECT_XANADU_ALT:
+        if (heroLocal != 0 && (currentCell->triggerType & 0x80)) {
+            sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->triggerType & 0x7f],
+                    (heroLocal->m_xanaduVisits & (1u << (currentCell->w4hi & 0x1f)))
+                        ? "(already visited)" : "(not visited)");
+            goto quick_info_ready;
+        }
+        break;
+    case ADVMGR_OBJECT_FORT:
+        visitedMaskValue = ADVMGR_VISIT_FORT;
+        break;
+    case ADVMGR_OBJECT_GAZEBO:
+        visitedMaskValue = ADVMGR_VISIT_GAZEBO;
+        break;
+    case ADVMGR_OBJECT_MERCENARY_CAMP:
+        visitedMaskValue = ADVMGR_VISIT_MERCENARY_CAMP;
+        break;
+    case ADVMGR_OBJECT_STANDING_STONES:
+        visitedMaskValue = ADVMGR_VISIT_STANDING_STONES;
+        break;
+    case ADVMGR_OBJECT_WITCH_DOCTOR_ALT:
+        visitedMaskValue = ADVMGR_VISIT_WITCH_DOCTOR;
+        break;
+    case ADVMGR_OBJECT_EVENT_SITE:
+        visitedMaskValue = ADVMGR_VISIT_EVENT_SITE;
+        break;
+    case ADVMGR_OBJECT_EVENT_SITE_ALT:
+        visitedMaskValue = ADVMGR_VISIT_XANADU;
+        break;
+    case ADVMGR_OBJECT_XANADU:
+        visitedMaskValue = ADVMGR_VISIT_TREE_OF_KNOWLEDGE;
+        break;
+    case ADVMGR_OBJECT_NONE:
+    case 0x13:
+    case 0x1c:
+    case 0x2c:
+    case 0x39:
+        sprintf(gText, "%s", gTerrainNames[giGroundToTerrain[currentCell->tile]]);
+        goto quick_info_ready;
+    case ADVMGR_OBJECT_GUARDED: {
+        sprintf(gText, "%s", gQuickViewText[currentCell->triggerType & 0x7f]);
+        goto quick_info_guarded;
+    }
+    case ADVMGR_OBJECT_MINE: {
+        if (gpGame->m_mines[currentCell->w4hi].guardianType != -1) {
+            sprintf(gText, "%s %s",
+                    gResourceNames[gpGame->m_mines[currentCell->w4hi].resourceType],
+                    "Mine");
+            goto quick_info_guarded;
+        }
+        goto quick_info_unguarded_mine;
+    }
+quick_info_guarded:
+        sprintf(guardCaption, "\n\nguarded by %s %s",
+                GetArmySizeName(gpGame->m_mines[currentCell->w4hi].guardianCount, 2),
+                gArmyNamesPlural[gpGame->m_mines[currentCell->w4hi].guardianType]);
+        strcat(gText, guardCaption);
+        goto quick_info_ready;
+quick_info_unguarded_mine:
+        sprintf(gText, "%s %s",
+                gResourceNames[gpGame->m_mines[currentCell->w4hi].resourceType],
+                "Mine");
+        goto quick_info_ready;
+    case ADVMGR_OBJECT_RESOURCE:
+        sprintf(gText, "%s", gResourceNames[
+            (currentCell->objIndex & ADVMGR_RESOURCE_FRAME_PAIR_MASK) / 2]);
+        goto quick_info_ready;
+    case ADVMGR_OBJECT_MONSTER:
+        if (IsCrystalBallInEffect(m_mapOriginX + cellX, m_mapOriginY + cellY, 8)) {
+            sprintf(gText, "%d %s", currentCell->w4hi & 0xfff,
+                    gArmyNamesPlural[currentCell->objIndex]);
+        } else {
+            sprintf(gText, "%s %s", GetArmySizeName(currentCell->w4hi & 0xfff, 1),
+                    gArmyNamesPlural[currentCell->objIndex]);
+        }
+        goto quick_info_ready;
+    case ADVMGR_OBJECT_BARRIER:
+    case ADVMGR_OBJECT_TENT:
+        sprintf(gText, gQuickViewText[currentCell->triggerType & 0x7f],
+                xBarrierColor[currentCell->w4hi & 7]);
+        uppercaseResult = static_cast<char>(
+            toupper(static_cast<int>(static_cast<signed char>(gText[0]))));
+        gText[0] = uppercaseResult;
+        goto quick_info_ready;
+    case ADVMGR_OBJECT_GENERIC_SITE: {
+        mapObjectKindValue = -1;
+        if (currentCell->objIndex != 0xff) {
+            siteFrameLocal[0] = currentCell->objIndex;
+            objectTilesetLocal = currentCell->objTileset;
+        } else {
+            siteFrameLocal[0] = currentCell->ovlIndex;
+            objectTilesetLocal = currentCell->ovlTileset;
+        }
+        siteIndexName = -1;
+        switch (objectTilesetLocal) {
+        case ADVMGR_SITE_TILESET_1:
+            if (siteFrameLocal[0] < 0) {
+                break;
+            } else {
+                if (siteFrameLocal[0] < ADVMGR_GENERIC_SITE_1_END)
+                    siteIndexName = 0;
+                else if (siteFrameLocal[0] < ADVMGR_GENERIC_SITE_2_END) {
+                    siteIndexName = 1;
+                    visitedMaskValue = ADVMGR_VISIT_GENERIC_HUT;
+                }
+            }
+            break;
+        case ADVMGR_SITE_TILESET_2:
+            if (siteFrameLocal[0] < 0) {
+                break;
+            } else {
+                if (siteFrameLocal[0] < ADVMGR_GENERIC_ALTAR_END) {
+                    siteIndexName = 4;
+                    visitedMaskValue = ADVMGR_VISIT_GENERIC_ALTAR;
+                } else if (siteFrameLocal[0] < ADVMGR_GENERIC_UNUSED_END) {
+                    siteIndexName = -1;
+                } else if (siteFrameLocal[0] < ADVMGR_GENERIC_TOWER_END) {
+                    siteIndexName = 5;
+                    visitedMaskValue = ADVMGR_VISIT_GENERIC_TOWER;
+                } else if (siteFrameLocal[0] < ADVMGR_GENERIC_SPRING_END) {
+                    siteIndexName = 6;
+                    visitedMaskValue = ADVMGR_VISIT_GENERIC_SPRING;
+                }
+            }
+            break;
+        case ADVMGR_SITE_TILESET_3:
+            if (siteFrameLocal[0] < 0) {
+                break;
+            } else {
+                if (siteFrameLocal[0] < ADVMGR_GENERIC_SITE_3_SPLIT)
+                    siteIndexName = 2;
+                else if (siteFrameLocal[0] < ADVMGR_GENERIC_SITE_3_END)
+                    siteIndexName = 3;
+            }
+            break;
+        }
+        if (siteIndexName == -1)
+            sprintf(gText, "Unknown");
+        else
+            sprintf(gText, xGenericSiteNames[siteIndexName]);
+        if (heroLocal != 0 && visitedMaskValue != 0) {
+            strcat(gText, "\n\n");
+            strcat(gText, (heroLocal->m_eventFlags & visitedMaskValue)
+                              ? "(already visited)" : "(not visited)");
+        }
+        goto quick_info_ready;
+    }
+    case ADVMGR_OBJECT_RECRUITMENT_SITE: {
+        if (currentCell->ovlIndex == 0xff) {
+            siteFrameLocal[0] = currentCell->objIndex;
+            objectTilesetLocal = currentCell->objTileset;
+        } else {
+            siteFrameLocal[0] = currentCell->ovlIndex;
+            objectTilesetLocal = currentCell->ovlTileset;
+        }
+        siteIndexName = -1;
+        switch (objectTilesetLocal) {
+        case ADVMGR_SITE_TILESET_1:
+            if (siteFrameLocal[0] < ADVMGR_RECRUITMENT_START) {
+                break;
+            } else {
+                if (siteFrameLocal[0] < ADVMGR_RECRUITMENT_1_END)
+                    siteIndexName = 0;
+                else if (siteFrameLocal[0] < ADVMGR_RECRUITMENT_2_END)
+                    siteIndexName = 1;
+                else if (siteFrameLocal[0] < ADVMGR_RECRUITMENT_3_END)
+                    siteIndexName = 2;
+                else if (siteFrameLocal[0] < ADVMGR_RECRUITMENT_4_END)
+                    siteIndexName = 3;
+                else if (siteFrameLocal[0] < ADVMGR_RECRUITMENT_5_END)
+                    siteIndexName = 4;
+            }
+            break;
+        }
+        if (siteIndexName == -1)
+            sprintf(gText, "Unknown");
+        else
+            sprintf(gText, xRecruitmentSiteNames[siteIndexName]);
+        goto quick_info_ready;
+    }
+    case ADVMGR_OBJECT_REEFS:
+        if (currentCell->objTileset == ADVMGR_SITE_TILESET_2) {
+            sprintf(gText, "Reefs");
+            goto quick_info_ready;
+        }
+        break;
+    }
+
+    if (visitedMaskValue != 0 && heroLocal != 0) {
+        sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->triggerType & 0x7f],
+                (heroLocal->m_eventFlags & visitedMaskValue)
+                    ? "(already visited)" : "(not visited)");
+    } else {
+        sprintf(gText, "%s", gQuickViewText[currentCell->triggerType & 0x7f]);
+    }
+        }
+    }
+
+quick_info_ready:
+    strcpy(savedTextLocal, gText);
+    if (giDebugLevel > 0 && currentCell != 0) {
+        sprintf(gText, "gi%d obtile%d obi%d ot%d ei%d bl%d %s X%d Y%d",
+                currentCell->tile, currentCell->objTileset, currentCell->objIndex, currentCell->triggerType,
+                currentCell->w4hi, currentCell->field8 & 8, savedTextLocal,
+                m_mapOriginX + cellX, m_mapOriginY + cellY);
+    }
+    message.type = 0x200;
+    message.field4 = 3;
+    message.field8 = 1;
+    message.text = gText;
+    windowLocal->BroadcastMessage(message);
+    gpWindowManager->AddWindow(windowLocal, -1, 1);
+    QuickViewWait();
+    gpWindowManager->RemoveWindow(windowLocal);
+    delete windowLocal;
+}
 
 VA(0x00460465, 0x348)
 void advManager::UpdateHeroLocator(int, int, int) {}
@@ -1442,14 +2849,526 @@ int advManager::UpdBottomViewKingdom(void) { return 0; }
 VA(0x00461dd8, 0x583)
 int advManager::UpdBottomViewHero(void) { return 0; }
 
+// @early-stop
+// raw-masked: exact frame/body and 109 relocations; only loop-compare/multiply operand
+// order, folding of literal 30 + 6, consequent jump displacements, and two retail NOPs
 VA(0x0046235b, 0xd32)
-void advManager::HeroQuickView(int, int, int, int) {}
+void advManager::HeroQuickView(int heroId, int locatorSlot, int windowX, int windowY)
+{
+    short armyAreaWidthLocal = 160;
+    short armyAreaLeftLocal = 22;
+    short detailedCreatureY = 124;
+    short stackIconWidthData = 32;
+    short creatureIconHeight = 32;
+    short widgetEnableFlagLocal = 1;
+    short portraitWidgetLocal = 2;
+    short primaryStatsWidgetValue = 3;
+    short playerColorWidgetId = 8;
+    iconWidget *stackIconsWidgets[5];
+    textWidget *creatureTextWidgetsLocal[5];
+    char *armyLabelsStrings[5];
+    tag_message quickViewMessageState;
+    icon *monsterIconRef;
+    hero *targetHero;
+    heroWindow *quickWindowSlot;
+    int visibleArmyCountState;
+    int armyIndex;
+    int previousOriginXState;
+    int savedOriginY;
+
+    quickViewMessageState.type = 0x200;
+    if (heroId == ADVMGR_INVALID_HERO)
+        return;
+
+    monsterIconRef = gpResourceManager->GetIcon("mons32.icn");
+    targetHero = gpGame->GetHero(heroId);
+    if (targetHero->m_owner == giCurPlayer || m_currentSampleSet == 1 ||
+        IsCrystalBallInEffect(targetHero->m_x, targetHero->m_y, 8)) {
+        if (windowX == -1) {
+            windowX = 288;
+            windowY = locatorSlot * 30 + 97;
+        }
+        quickWindowSlot = new heroWindow(windowX, windowY, "qhero0.bin");
+        if (quickWindowSlot == 0)
+            MemError();
+        SetWinText(quickWindowSlot, 18);
+    } else {
+        quickWindowSlot = new heroWindow(windowX, windowY, "qhero1.bin");
+        if (quickWindowSlot == 0)
+            MemError();
+    }
+
+    quickViewMessageState.field4 = 4;
+    quickViewMessageState.field8 = 2;
+    quickViewMessageState.field18 = targetHero->m_unknown18;
+    quickWindowSlot->BroadcastMessage(quickViewMessageState);
+    quickViewMessageState.field4 = 4;
+    quickViewMessageState.field8 = 8;
+    quickViewMessageState.field18 = gpGame->GetPlayerColor(targetHero->m_owner) * 2;
+    quickWindowSlot->BroadcastMessage(quickViewMessageState);
+    ++quickViewMessageState.field8;
+    ++quickViewMessageState.field18;
+    quickWindowSlot->BroadcastMessage(quickViewMessageState);
+    sprintf(gText, "%s", targetHero->m_name);
+    quickViewMessageState.field4 = 3;
+    quickViewMessageState.field8 = 1;
+    quickViewMessageState.text = gText;
+    quickWindowSlot->BroadcastMessage(quickViewMessageState);
+
+    visibleArmyCountState = 0;
+    for (armyIndex = 0; armyIndex < 5; ++armyIndex)
+        if (targetHero->m_army.m_creatureTypes[armyIndex] != -1)
+            ++visibleArmyCountState;
+
+    if (targetHero->m_owner == giCurPlayer || m_currentSampleSet == 1 ||
+        IsCrystalBallInEffect(targetHero->m_x, targetHero->m_y, 8)) {
+        for (armyIndex = 0; armyIndex < 4; ++armyIndex) {
+            sprintf(gText, "%d", targetHero->Stats(armyIndex));
+            quickViewMessageState.field8 = armyIndex + 3;
+            quickViewMessageState.text = gText;
+            quickWindowSlot->BroadcastMessage(quickViewMessageState);
+        }
+        sprintf(gText, "%d/%d", targetHero->m_spellPoints,
+                targetHero->Stats(3) * 10);
+        quickViewMessageState.field8 = 7;
+        quickViewMessageState.text = gText;
+        quickWindowSlot->BroadcastMessage(quickViewMessageState);
+
+        if (visibleArmyCountState != 0) {
+            int armyStartPosition = (160 - visibleArmyCountState * 32) / 2 + 22;
+            int displayIndexStateOffset = 0;
+            int creature;
+            for (armyIndex = 0; armyIndex < visibleArmyCountState; ++armyIndex) {
+                while (targetHero->m_army.m_creatureTypes[displayIndexStateOffset] == -1)
+                    ++displayIndexStateOffset;
+                creature = targetHero->m_army.m_creatureTypes[displayIndexStateOffset];
+                if (creature != -1) {
+                stackIconsWidgets[armyIndex] = new iconWidget(
+                    static_cast<short>(armyIndex * 32 + armyStartPosition -
+                        GetIconEntry(monsterIconRef, creature)->x +
+                        (32 - GetIconEntry(monsterIconRef, creature)->w) / 2 + 1),
+                    static_cast<short>(124 -
+                        GetIconEntry(monsterIconRef, creature)->y -
+                        GetIconEntry(monsterIconRef, creature)->h + 30),
+                    32, 32, "mons32.icn",
+                    static_cast<short>(creature), 0, -1, 16, 1);
+                if (stackIconsWidgets[armyIndex] == 0)
+                    MemError();
+                armyLabelsStrings[armyIndex] = static_cast<char *>(BaseAlloc(
+                    5, ADVMGR_SOURCE_FILE, ADVMGR_QUICK_VIEW_LINE + 0x9b));
+                sprintf(armyLabelsStrings[armyIndex], "%d",
+                        targetHero->m_army.m_creatureCounts[displayIndexStateOffset]);
+                creatureTextWidgetsLocal[armyIndex] = new textWidget(
+                    static_cast<short>(armyIndex * 32 + armyStartPosition),
+                    static_cast<short>(124 + 32), 32, 12,
+                    armyLabelsStrings[armyIndex], "smalfont.fnt", 1, -1,
+                    0x200, 1);
+                if (creatureTextWidgetsLocal[armyIndex] == 0)
+                    MemError();
+                quickWindowSlot->AddWidget(stackIconsWidgets[armyIndex], -1);
+                quickWindowSlot->AddWidget(creatureTextWidgetsLocal[armyIndex], -1);
+                }
+                ++displayIndexStateOffset;
+            }
+        }
+    } else if (visibleArmyCountState != 0) {
+        int rowYCurrent = 73;
+        int topRowCount;
+        int secondRowCountTotal;
+        int creatureTypeId;
+        switch (visibleArmyCountState) {
+        case 1:
+        case 2:
+        case 3:
+            rowYCurrent += 22;
+            topRowCount = visibleArmyCountState;
+            secondRowCountTotal = 0;
+            break;
+        case 4:
+            topRowCount = 2;
+            secondRowCountTotal = 2;
+            break;
+        default:
+            topRowCount = 2;
+            secondRowCountTotal = 3;
+            break;
+        }
+
+        int displayIndexValue = 0;
+        int armySpacing = 160 / topRowCount;
+        int slotStartPosition = (armySpacing - 32) / 2 + 22;
+        for (armyIndex = 0; armyIndex < topRowCount; ++armyIndex) {
+            while (targetHero->m_army.m_creatureTypes[displayIndexValue] == -1)
+                ++displayIndexValue;
+            creatureTypeId = targetHero->m_army.m_creatureTypes[displayIndexValue];
+            stackIconsWidgets[armyIndex] = new iconWidget(
+                static_cast<short>(armyIndex * armySpacing +
+                    slotStartPosition - GetIconEntry(monsterIconRef, creatureTypeId)->x +
+                    (32 - GetIconEntry(monsterIconRef, creatureTypeId)->w) / 2 + 1),
+                static_cast<short>(rowYCurrent -
+                    GetIconEntry(monsterIconRef, creatureTypeId)->y -
+                    GetIconEntry(monsterIconRef, creatureTypeId)->h + 30),
+                32, 32, "mons32.icn",
+                static_cast<short>(creatureTypeId), 0, -1, 16, 1);
+            if (stackIconsWidgets[armyIndex] == 0)
+                MemError();
+            armyLabelsStrings[armyIndex] = static_cast<char *>(BaseAlloc(
+                15, ADVMGR_SOURCE_FILE, ADVMGR_QUICK_VIEW_LINE + 0xe3));
+            strcpy(armyLabelsStrings[armyIndex],
+                   GetArmySizeName(targetHero->m_army.m_creatureCounts[displayIndexValue], 0));
+            creatureTextWidgetsLocal[armyIndex] = new textWidget(
+                static_cast<short>(armyIndex * armySpacing + 22),
+                static_cast<short>(rowYCurrent + 32), armySpacing, 12,
+                armyLabelsStrings[armyIndex], "smalfont.fnt", 1, -1,
+                0x200, 1);
+            if (creatureTextWidgetsLocal[armyIndex] == 0)
+                MemError();
+            quickWindowSlot->AddWidget(stackIconsWidgets[armyIndex], -1);
+            quickWindowSlot->AddWidget(creatureTextWidgetsLocal[armyIndex], -1);
+            ++displayIndexValue;
+        }
+
+        if (secondRowCountTotal != 0) {
+            armySpacing = 160 / secondRowCountTotal;
+            slotStartPosition = (armySpacing - 32) / 2 + 22;
+            rowYCurrent += 44;
+            for (armyIndex = topRowCount;
+                 armyIndex < topRowCount + secondRowCountTotal; ++armyIndex) {
+                while (targetHero->m_army.m_creatureTypes[displayIndexValue] == -1)
+                    ++displayIndexValue;
+                creatureTypeId = targetHero->m_army.m_creatureTypes[displayIndexValue];
+                stackIconsWidgets[armyIndex] = new iconWidget(
+                    static_cast<short>((armyIndex - 2) * armySpacing +
+                        slotStartPosition -
+                        GetIconEntry(monsterIconRef, creatureTypeId)->x +
+                        (32 - GetIconEntry(monsterIconRef, creatureTypeId)->w) / 2 + 1),
+                    static_cast<short>(rowYCurrent -
+                        GetIconEntry(monsterIconRef, creatureTypeId)->y -
+                        GetIconEntry(monsterIconRef, creatureTypeId)->h + 30 + 6),
+                    32, 32, "mons32.icn",
+                    static_cast<short>(creatureTypeId), 0, -1, 16, 1);
+                if (stackIconsWidgets[armyIndex] == 0)
+                    MemError();
+                armyLabelsStrings[armyIndex] = static_cast<char *>(BaseAlloc(
+                    15, ADVMGR_SOURCE_FILE, ADVMGR_QUICK_VIEW_LINE + 0x10e));
+                strcpy(armyLabelsStrings[armyIndex],
+                       GetArmySizeName(targetHero->m_army.m_creatureCounts[displayIndexValue], 0));
+                creatureTextWidgetsLocal[armyIndex] = new textWidget(
+                    static_cast<short>((armyIndex - 2) * armySpacing + 22),
+                    static_cast<short>(rowYCurrent + 38), armySpacing, 12,
+                    armyLabelsStrings[armyIndex], "smalfont.fnt", 1, -1,
+                    0x200, 1);
+                if (creatureTextWidgetsLocal[armyIndex] == 0)
+                    MemError();
+                quickWindowSlot->AddWidget(stackIconsWidgets[armyIndex], -1);
+                quickWindowSlot->AddWidget(creatureTextWidgetsLocal[armyIndex], -1);
+                ++displayIndexValue;
+            }
+        }
+    }
+
+    previousOriginXState = m_mapOriginX;
+    savedOriginY = m_mapOriginY;
+    m_mapOriginX = targetHero->m_x - 7;
+    m_mapOriginY = targetHero->m_y - 7;
+    UpdateRadar(1, 0);
+    gpWindowManager->AddWindow(quickWindowSlot, -1, 1);
+    QuickViewWait();
+    gpWindowManager->RemoveWindow(quickWindowSlot);
+    delete quickWindowSlot;
+    m_mapOriginX = previousOriginXState;
+    m_mapOriginY = savedOriginY;
+    UpdateRadar(1, 0);
+    CompleteDraw(0);
+    UpdateScreen(0, 0);
+    if (quickViewMessageState.type == 8 && targetHero->m_owner == giCurPlayer)
+        SetHeroContext(static_cast<unsigned char>(targetHero->m_id), 0);
+    gpResourceManager->Dispose(monsterIconRef);
+}
 
 VA(0x0046308d, 0x120)
-char * advManager::GetArmySizeName(int, int) { return 0; }
+char * advManager::GetArmySizeName(int armySize, int grammar)
+{
+    if (giDebugLevel > 0) {
+        sprintf(cArmySizeName, "%d", armySize);
+        return cArmySizeName;
+    }
+    if (armySize < ADVMGR_ARMY_FEW_LIMIT)
+        return gArmySizeNames[0][grammar];
+    if (armySize < ADVMGR_ARMY_SEVERAL_LIMIT)
+        return gArmySizeNames[1][grammar];
+    if (armySize < ADVMGR_ARMY_PACK_LIMIT)
+        return gArmySizeNames[2][grammar];
+    if (armySize < ADVMGR_ARMY_LOTS_LIMIT)
+        return gArmySizeNames[3][grammar];
+    if (armySize < ADVMGR_ARMY_HORDE_LIMIT)
+        return gArmySizeNames[4][grammar];
+    if (armySize < ADVMGR_ARMY_THRONG_LIMIT)
+        return gArmySizeNames[5][grammar];
+    if (armySize < ADVMGR_ARMY_SWARM_LIMIT)
+        return gArmySizeNames[6][grammar];
+    if (armySize < ADVMGR_ARMY_ZOUNDS_LIMIT)
+        return gArmySizeNames[7][grammar];
+    return gArmySizeNames[8][grammar];
+}
 
+// @early-stop
+// raw-masked: exact frame/body and 102 relocations; only commutative operand-order
+// bytes at twelve measured sites and three retail alignment NOPs remain
 VA(0x004631ad, 0xc29)
-void advManager::TownQuickView(int, int, int, int) {}
+void advManager::TownQuickView(int townId, int locatorSlot, int windowX, int windowY)
+{
+    icon *monsterIconLocal;
+    short portraitWidgetLocal;
+    short armyIconHeightState;
+    tag_message messageLocal;
+    int armyCountLocal;
+    int armyIndex;
+    short armyIconWidthState;
+    short widgetEnabledData;
+    short colorWidgetValue;
+    int previousOriginXValue;
+    heroWindow *townQuickWindow;
+    town *quickTownLocal;
+    int previousOriginYSlot;
+    int informationLevel;
+    char *emptyArmyLabel;
+    short armyAreaWidth;
+    short armyAreaLeftValue;
+    widget *emptyArmyTextState;
+
+    armyAreaWidth = 192;
+    armyAreaLeftValue = 22;
+    armyIconWidthState = 32;
+    armyIconHeightState = 32;
+    widgetEnabledData = 1;
+    portraitWidgetLocal = 2;
+    colorWidgetValue = 8;
+
+    if (townId == ADVMGR_INVALID_HERO)
+        return;
+
+    monsterIconLocal = gpResourceManager->GetIcon("mons32.icn");
+    quickTownLocal = gpGame->GetTown(townId);
+    if (windowX == -1) {
+        windowX = 328;
+        windowY = 176;
+    }
+    townQuickWindow = new heroWindow(windowX, windowY, "qtown1.bin");
+    if (townQuickWindow == 0)
+        MemError();
+
+    if (quickTownLocal->m_owner == giCurPlayer || giDebugLevel >= 2) {
+        informationLevel = 3;
+    } else {
+        informationLevel = gpGame->GetNumThievesGuilds(giCurPlayer);
+        if (informationLevel > 2)
+            informationLevel = 2;
+    }
+    if (IsCrystalBallInEffect(quickTownLocal->m_x, quickTownLocal->m_y, 8))
+        informationLevel = 3;
+
+    SetWinText(townQuickWindow, 19);
+    armyCountLocal = 0;
+    messageLocal.type = 0x200;
+    messageLocal.field4 = 4;
+    messageLocal.field8 = 2;
+    messageLocal.field18 = quickTownLocal->m_type + 9;
+    if ((gpGame->GetTown(townId)->m_buildings & 0x40) == 0)
+        messageLocal.field18 += 6;
+    townQuickWindow->BroadcastMessage(messageLocal);
+
+    if (informationLevel != 3 ||
+        BitTest(gpGame->m_knownTowns, static_cast<signed char>(quickTownLocal->m_id)) == 0) {
+        messageLocal.field4 = 6;
+        messageLocal.field8 = 300;
+        messageLocal.field18 = 4;
+        townQuickWindow->BroadcastMessage(messageLocal);
+    }
+
+    if (quickTownLocal->m_owner == -1) {
+        messageLocal.field4 = 6;
+        messageLocal.field8 = 8;
+        messageLocal.field18 = 4;
+        townQuickWindow->BroadcastMessage(messageLocal);
+        ++messageLocal.field8;
+        townQuickWindow->BroadcastMessage(messageLocal);
+    } else {
+        messageLocal.field4 = 4;
+        messageLocal.field8 = 8;
+        messageLocal.field18 = gpGame->GetPlayerColor(quickTownLocal->m_owner) * 2;
+        townQuickWindow->BroadcastMessage(messageLocal);
+        ++messageLocal.field8;
+        ++messageLocal.field18;
+        townQuickWindow->BroadcastMessage(messageLocal);
+    }
+
+    sprintf(gText, GetTownName(static_cast<signed char>(quickTownLocal->m_id)));
+    messageLocal.field4 = 3;
+    messageLocal.field8 = 1;
+    messageLocal.text = gText;
+    townQuickWindow->BroadcastMessage(messageLocal);
+
+    armyCountLocal = 0;
+    for (armyIndex = 0; armyIndex < 5; ++armyIndex)
+        if (quickTownLocal->m_army.m_creatureTypes[armyIndex] != -1)
+            ++armyCountLocal;
+
+    if (informationLevel == 0 || armyCountLocal == 0) {
+        emptyArmyLabel = static_cast<char *>(BaseAlloc(
+            20, ADVMGR_SOURCE_FILE, ADVMGR_TOWN_VIEW_LINE + 0x83));
+        if (informationLevel == 0)
+            sprintf(emptyArmyLabel, "Unknown");
+        else
+            sprintf(emptyArmyLabel, "None");
+        emptyArmyTextState = new textWidget(13, 117, 211, 12, emptyArmyLabel,
+                                       "smalfont.fnt", 1, -1, 0x200, 1);
+        if (emptyArmyTextState == 0)
+            MemError();
+        townQuickWindow->AddWidget(emptyArmyTextState, -1);
+    } else {
+        int secondRowCountState;
+        int creatureSlotLocal;
+        char *armyLabelsResult[5];
+        int creatureLocal;
+        iconWidget *armyIcons[5];
+        textWidget *armyTexts[5];
+        int displayIndexLocal;
+        int widgetIndexWidget;
+        int slotWidthSlot;
+        int fiveArmyShiftValue;
+        int slotStartState;
+        int rowY;
+        int firstRowCountState;
+
+        rowY = 76;
+        switch (armyCountLocal) {
+        case 1:
+        case 2:
+        case 3:
+            rowY += 22;
+            firstRowCountState = armyCountLocal;
+            secondRowCountState = 0;
+            break;
+        case 4:
+            firstRowCountState = 2;
+            secondRowCountState = 2;
+            break;
+        default:
+            firstRowCountState = 2;
+            secondRowCountState = 3;
+            break;
+        }
+
+        displayIndexLocal = 0;
+        widgetIndexWidget = 0;
+        creatureSlotLocal = 0;
+        slotWidthSlot = 192 / firstRowCountState;
+        slotStartState = (slotWidthSlot - 32) / 2 + 22;
+        fiveArmyShiftValue = 0;
+        for (armyIndex = 0; armyIndex < firstRowCountState; ++armyIndex) {
+            if (armyCountLocal == 5)
+                fiveArmyShiftValue = armyIndex == 0 ? 12 : -12;
+            while (quickTownLocal->m_army.m_creatureTypes[creatureSlotLocal] == -1)
+                ++creatureSlotLocal;
+            creatureLocal = quickTownLocal->m_army.m_creatureTypes[creatureSlotLocal];
+            armyIcons[widgetIndexWidget] = new iconWidget(
+                static_cast<short>(slotWidthSlot * widgetIndexWidget + slotStartState +
+                    fiveArmyShiftValue - GetIconEntry(monsterIconLocal, creatureLocal)->x +
+                    (32 - GetIconEntry(monsterIconLocal, creatureLocal)->w) / 2 + 1),
+                static_cast<short>(rowY - GetIconEntry(monsterIconLocal, creatureLocal)->y -
+                    GetIconEntry(monsterIconLocal, creatureLocal)->h + 30),
+                32, 32, "mons32.icn",
+                static_cast<short>(creatureLocal), 0, -1, 16, 1);
+            if (armyIcons[widgetIndexWidget] == 0)
+                MemError();
+            armyLabelsResult[widgetIndexWidget] = static_cast<char *>(BaseAlloc(
+                15, ADVMGR_SOURCE_FILE, ADVMGR_TOWN_VIEW_LINE + 0xd6));
+            if (informationLevel == 3)
+                sprintf(armyLabelsResult[widgetIndexWidget], "%d",
+                        quickTownLocal->m_army.m_creatureCounts[creatureSlotLocal]);
+            else if (informationLevel == 2)
+                strcpy(armyLabelsResult[widgetIndexWidget], GetArmySizeName(
+                    quickTownLocal->m_army.m_creatureCounts[creatureSlotLocal], 0));
+            else
+                strcpy(armyLabelsResult[widgetIndexWidget], "???");
+            armyTexts[widgetIndexWidget] = new textWidget(
+                static_cast<short>(slotWidthSlot * widgetIndexWidget + slotStartState +
+                    fiveArmyShiftValue - 14), static_cast<short>(rowY + 32), 60, 12,
+                armyLabelsResult[widgetIndexWidget], "smalfont.fnt", 1, -1,
+                0x200, 1);
+            if (armyTexts[widgetIndexWidget] == 0)
+                MemError();
+            townQuickWindow->AddWidget(armyIcons[widgetIndexWidget], -1);
+            townQuickWindow->AddWidget(armyTexts[widgetIndexWidget], -1);
+            ++widgetIndexWidget;
+            ++creatureSlotLocal;
+        }
+
+        if (secondRowCountState != 0) {
+            slotWidthSlot = 192 / secondRowCountState;
+            slotStartState = (slotWidthSlot - 32) / 2 + 22;
+            rowY += 44;
+            for (armyIndex = firstRowCountState;
+                 armyIndex < secondRowCountState + firstRowCountState; ++armyIndex) {
+                while (quickTownLocal->m_army.m_creatureTypes[creatureSlotLocal] == -1)
+                    ++creatureSlotLocal;
+                creatureLocal = quickTownLocal->m_army.m_creatureTypes[creatureSlotLocal];
+                armyIcons[widgetIndexWidget] = new iconWidget(
+                    static_cast<short>((widgetIndexWidget - firstRowCountState) *
+                        slotWidthSlot + slotStartState -
+                        GetIconEntry(monsterIconLocal, creatureLocal)->x +
+                        (32 - GetIconEntry(monsterIconLocal, creatureLocal)->w) / 2 + 1),
+                    static_cast<short>(rowY - GetIconEntry(monsterIconLocal, creatureLocal)->y -
+                        GetIconEntry(monsterIconLocal, creatureLocal)->h + 30),
+                    32, 32, "mons32.icn",
+                    static_cast<short>(creatureLocal), 0, -1, 16, 1);
+                if (armyIcons[widgetIndexWidget] == 0)
+                    MemError();
+                armyLabelsResult[widgetIndexWidget] = static_cast<char *>(BaseAlloc(
+                    15, ADVMGR_SOURCE_FILE, ADVMGR_TOWN_VIEW_LINE + 0x108));
+                if (informationLevel == 3)
+                    sprintf(armyLabelsResult[widgetIndexWidget], "%d",
+                            quickTownLocal->m_army.m_creatureCounts[creatureSlotLocal]);
+                else if (informationLevel == 2)
+                    strcpy(armyLabelsResult[widgetIndexWidget], GetArmySizeName(
+                        quickTownLocal->m_army.m_creatureCounts[creatureSlotLocal], 0));
+                else
+                    strcpy(armyLabelsResult[widgetIndexWidget], "???");
+                armyTexts[widgetIndexWidget] = new textWidget(
+                    static_cast<short>((widgetIndexWidget - firstRowCountState) *
+                        slotWidthSlot + slotStartState - 14),
+                    static_cast<short>(rowY + 32), 60, 12,
+                    armyLabelsResult[widgetIndexWidget], "smalfont.fnt", 1, -1,
+                    0x200, 1);
+                if (armyTexts[widgetIndexWidget] == 0)
+                    MemError();
+                townQuickWindow->AddWidget(armyIcons[widgetIndexWidget], -1);
+                townQuickWindow->AddWidget(armyTexts[widgetIndexWidget], -1);
+                ++widgetIndexWidget;
+                ++creatureSlotLocal;
+            }
+        }
+    }
+
+    gpWindowManager->AddWindow(townQuickWindow, -1, 1);
+    previousOriginXValue = m_mapOriginX;
+    previousOriginYSlot = m_mapOriginY;
+    m_mapOriginX = quickTownLocal->m_x - 7;
+    m_mapOriginY = quickTownLocal->m_y - 7;
+    UpdateRadar(1, 0);
+    QuickViewWait();
+    gpWindowManager->RemoveWindow(townQuickWindow);
+    delete townQuickWindow;
+    m_mapOriginX = previousOriginXValue;
+    m_mapOriginY = previousOriginYSlot;
+    UpdateRadar(1, 0);
+    CompleteDraw(0);
+    UpdateScreen(0, 0);
+    if (messageLocal.type == 8 && quickTownLocal->m_owner == giCurPlayer)
+        SetTownContext(static_cast<signed char>(quickTownLocal->m_id));
+    gpResourceManager->Dispose(monsterIconLocal);
+}
 
 VA(0x00463dd6, 0x11f)
 void advManager::RedrawAdvScreen(int, int) {}
@@ -1504,8 +3423,310 @@ void advManager::CheckCastSpell(void) {}
 VA(0x00465191, 0x31c)
 int DimensionDoorHandler(struct tag_message &) { return 0; }
 
+// @early-stop
+// instruction-exact frame/body and 161 relocations; residuals are delinked biased
+// bComboDraw aliases, commutative flat-index/min-max evaluation, and three retail NOPs
 VA(0x004654ad, 0x11a9)
-int advManager::ComboDraw(int, int, int) { return 0; }
+int advManager::ComboDraw(int originX, int originY, int animate)
+{
+    int updateCount;
+    int mapCellX;
+    int column;
+    int mapRow;
+    mapCell *cell;
+    int mapYValue;
+
+    PollSound();
+    if (bShowIt == 0)
+        return 0;
+
+    if (m_forceCompleteDraw != 0) {
+        CompleteDraw(originX, originY, 0, 1);
+        return 1;
+    }
+
+    if (animate != 0) {
+        giFrameCount += giFrameStep;
+        if (giFrameCount < ADVMGR_COMBO_FRAME_LIMIT) {
+            Process1WindowsMessage();
+            if (glTimers[0] < KBTickCount())
+                glTimers[0] = KBTickCount() + ADVMGR_TIMER_DELAY;
+            PollSound();
+            return 0;
+        } else {
+            giFrameCount = 0;
+        }
+    }
+
+    m_previousOriginX = m_mapOriginX;
+    m_previousOriginY = m_mapOriginY;
+    memset(bComboDraw, 0, ADVMGR_COMBO_CLEAR_BYTES);
+    m_comboHeroDrawn = 0;
+
+    for (mapRow = 0; mapRow < ADVMGR_COMBO_VIEW_CELLS; ++mapRow) {
+        for (column = 0; column < ADVMGR_COMBO_VIEW_CELLS; ++column) {
+            if (column + originX >= 0 && column + originX < MAP_WIDTH &&
+                mapRow + originY >= 0 && mapRow + originY < MAP_HEIGHT) {
+                cell = GetCell(column + originX, mapRow + originY);
+
+                if (cell->objFlag0 || cell->ovlFlag0)
+                    ++bComboDraw[column][mapRow];
+                if ((cell->triggerType & ADVMGR_TRIGGER_TYPE_MASK) == 0x28)
+                    ++bComboDraw[column][mapRow];
+                if ((cell->triggerType & ADVMGR_TRIGGER_TYPE_MASK) == 1)
+                    ++bComboDraw[column][mapRow];
+
+                if (cell->triggerType == 0x98) {
+                    ++bComboDraw[column][mapRow];
+                    ++bComboDraw[column - 1][mapRow];
+                    if (GetCloudLookup(column + originX, mapRow + originY) != 0) {
+                        bComboDraw[column + 1][mapRow] += ADVMGR_COMBO_CLOUD_MARK;
+                        if (mapRow >= 1) {
+                            bComboDraw[column][mapRow - 1] += ADVMGR_COMBO_CLOUD_MARK;
+                            bComboDraw[column + 1][mapRow - 1] += ADVMGR_COMBO_CLOUD_MARK;
+                        }
+                    } else {
+                        ++bComboDraw[column + 1][mapRow];
+                        if (mapRow >= 1) {
+                            ++bComboDraw[column][mapRow - 1];
+                            ++bComboDraw[column + 1][mapRow - 1];
+                        }
+                    }
+                }
+
+                if (cell->triggerType == ADVMGR_HERO_TRIGGER ||
+                    cell->triggerType == ADVMGR_BOAT_TRIGGER) {
+                    ++bComboDraw[column][mapRow];
+                    if (GetCloudLookup(column + originX, mapRow + originY) != 0) {
+                        bComboDraw[column + 1][mapRow] += ADVMGR_COMBO_CLOUD_MARK;
+                        bComboDraw[column][mapRow + 1] += ADVMGR_COMBO_CLOUD_MARK;
+                        bComboDraw[column + 1][mapRow + 1] += ADVMGR_COMBO_CLOUD_MARK;
+                        bComboDraw[column + 2][mapRow] += ADVMGR_COMBO_CLOUD_MARK;
+                        if (mapRow >= 1)
+                            bComboDraw[column][mapRow - 1] += ADVMGR_COMBO_CLOUD_MARK;
+                        if (column >= 1) {
+                            bComboDraw[column - 1][mapRow] += ADVMGR_COMBO_CLOUD_MARK;
+                            *(bComboDraw[column - 1] + mapRow + 1) +=
+                                ADVMGR_COMBO_CLOUD_MARK;
+                            if (column >= 2)
+                                bComboDraw[column - 2][mapRow] += ADVMGR_COMBO_CLOUD_MARK;
+                            if (mapRow >= 1)
+                                ++bComboDraw[column - 2][mapRow - 1];
+                        }
+                    } else {
+                        ++bComboDraw[column + 1][mapRow];
+                        ++bComboDraw[column][mapRow + 1];
+                        ++bComboDraw[column + 1][mapRow + 1];
+                        ++bComboDraw[column + 2][mapRow];
+                        if (mapRow >= 1)
+                            ++bComboDraw[column][mapRow - 1];
+                        if (column >= 1) {
+                            ++bComboDraw[column - 1][mapRow];
+                            ++bComboDraw[column - 1][mapRow + 1];
+                            if (column >= 2)
+                                ++bComboDraw[column - 2][mapRow];
+                            if (mapRow >= 1)
+                                ++bComboDraw[column - 2][mapRow - 1];
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    for (column = 0; column < ADVMGR_COMBO_VIEW_CELLS; ++column) {
+        for (mapRow = 0; mapRow < ADVMGR_COMBO_VIEW_CELLS; ++mapRow) {
+            if (bComboDraw[0][mapRow + column * ADVMGR_COMBO_GRID_CELLS] != 0) {
+                if (column + originX < 0 || column + originX >= MAP_WIDTH ||
+                    mapRow + originY < 0 || mapRow + originY >= MAP_HEIGHT) {
+                    *(bComboDraw[column] + mapRow) = 0;
+                } else if (*(bComboDraw[column] + mapRow) < ADVMGR_COMBO_CLOUD_MARK &&
+                           GetCloudLookup(column + originX, mapRow + originY) == 0) {
+                    *(bComboDraw[column] + mapRow) = 0;
+                }
+            }
+        }
+    }
+
+    if (m_heroContextLocked != 0) {
+        for (mapRow = ADVMGR_COMBO_HERO_PANEL_TOP;
+             mapRow <= ADVMGR_COMBO_HERO_PANEL_BOTTOM - 1; ++mapRow) {
+            for (column = ADVMGR_COMBO_HERO_PANEL_LEFT;
+                 column <= ADVMGR_COMBO_HERO_PANEL_RIGHT - 1; ++column) {
+                ++bComboDraw[column][mapRow];
+            }
+        }
+    }
+
+    if (m_cursorType == ADVMGR_CURSOR_ROUTE) {
+        ++bComboDraw[6][5];
+        ++bComboDraw[7][5];
+        ++bComboDraw[8][5];
+    }
+
+    for (column = 0; column < ADVMGR_COMBO_VIEW_CELLS; ++column) {
+        for (mapRow = 0; mapRow < ADVMGR_COMBO_VIEW_CELLS; ++mapRow) {
+            cell = GetCell(column + originX, mapRow + originY);
+            if (cell->triggerType == ADVMGR_MONSTER_TRIGGER) {
+                if (gpGame->m_mines[cell->w4hi].guardianType == ADVMGR_MONSTER_GHOST) {
+                    ++bComboDraw[column][mapRow];
+                    ++bComboDraw[column + 1][mapRow];
+                    if (column < ADVMGR_COMBO_VIEW_CELLS)
+                        ++bComboDraw[column + 2][mapRow];
+                    if (column > 0)
+                        ++bComboDraw[column - 1][mapRow];
+                    if (mapRow > 0) {
+                        ++bComboDraw[column][mapRow - 1];
+                        ++bComboDraw[column + 1][mapRow - 1];
+                        if (column < ADVMGR_COMBO_VIEW_CELLS)
+                            ++bComboDraw[column + 2][mapRow - 1];
+                        if (column > 0)
+                            ++bComboDraw[column - 1][mapRow - 1];
+                    }
+                    if (mapRow > 1) {
+                        ++bComboDraw[column][mapRow - 2];
+                        ++bComboDraw[column + 1][mapRow - 2];
+                        if (column < ADVMGR_COMBO_VIEW_CELLS)
+                            ++bComboDraw[column + 2][mapRow - 2];
+                        if (column > 0)
+                            ++bComboDraw[column - 1][mapRow - 2];
+                    }
+                } else if (mapRow > 0 && bComboDraw[column][mapRow - 1] != 0) {
+                    ++bComboDraw[column][mapRow];
+                }
+            }
+        }
+    }
+
+    if (m_visibilityMapValid != 0 && m_visibilityMap != 0) {
+        for (mapRow = 1; mapRow < ADVMGR_COMBO_VIEW_CELLS - 1; ++mapRow) {
+            for (column = 0; column < ADVMGR_COMBO_VIEW_CELLS; ++column) {
+                if (bComboDraw[column][mapRow] == 0)
+                    continue;
+                mapCellX = column + originX;
+                mapYValue = mapRow + originY;
+                if (mapCellX < 0 || mapCellX > MAP_WIDTH - 1 || mapYValue < 1 ||
+                    mapYValue > MAP_HEIGHT - 2)
+                    continue;
+                if (*reinterpret_cast<unsigned short *>(
+                        m_visibilityMap + mapCellX * 2 +
+                        mapYValue * MAP_WIDTH * 2) != 0)
+                    ++bComboDraw[column][mapRow + 1];
+                if (*reinterpret_cast<unsigned short *>(
+                        m_visibilityMap + mapCellX * 2 +
+                        (mapYValue - 1) * MAP_WIDTH * 2) != 0)
+                    ++bComboDraw[column][mapRow - 1];
+            }
+        }
+    }
+
+    gpMouseManager->m_cursorReady = 0;
+    for (mapRow = 0; mapRow < ADVMGR_COMBO_VIEW_CELLS; ++mapRow)
+        for (column = 0; column < ADVMGR_COMBO_VIEW_CELLS; ++column)
+            if (bComboDraw[column][mapRow] != 0)
+                DrawCell(column + originX, mapRow + originY, column, mapRow,
+                         ADVMGR_DRAW_GROUND, 0);
+
+    for (mapRow = 0; mapRow < ADVMGR_COMBO_VIEW_CELLS; ++mapRow)
+        for (column = 0; column < ADVMGR_COMBO_VIEW_CELLS; ++column)
+            if (bComboDraw[column][mapRow] != 0)
+                DrawCell(column + originX, mapRow + originY, column, mapRow,
+                         ADVMGR_DRAW_HERO_SHADOW, 0);
+
+    for (column = 0; column < ADVMGR_COMBO_VIEW_CELLS; ++column)
+        if (bComboDraw[column][0] != 0)
+            DrawCell(column + originX, originY, column, 0, ADVMGR_DRAW_OBJECT, 0);
+
+    for (mapRow = 1; mapRow < ADVMGR_COMBO_VIEW_CELLS; ++mapRow) {
+        PollSound();
+        for (column = 0; column < ADVMGR_COMBO_VIEW_CELLS; ++column)
+            if (bComboDraw[column][mapRow - 1] != 0)
+                DrawCell(column + originX, mapRow + originY - 1, column, mapRow - 1,
+                         ADVMGR_DRAW_HERO, 0);
+        for (column = 0; column < ADVMGR_COMBO_VIEW_CELLS; ++column)
+            if (bComboDraw[column][mapRow - 1] != 0)
+                DrawCell(column + originX, mapRow + originY - 1, column, mapRow - 1,
+                         ADVMGR_DRAW_OVERLAY, 0);
+        for (column = 0; column < ADVMGR_COMBO_VIEW_CELLS; ++column) {
+            if (column + originX == giDeferObjDrawX && mapRow + originY == giDeferObjDrawY)
+                continue;
+            if (column + originX == giDeferObjDrawX &&
+                mapRow + originY == giDeferObjDrawY + 1) {
+                DrawCell(column + originX, mapRow + originY - 1, column, mapRow - 1,
+                         ADVMGR_DRAW_OBJECT, 0);
+            }
+            if (bComboDraw[column][mapRow] != 0)
+                DrawCell(column + originX, mapRow + originY, column, mapRow,
+                         ADVMGR_DRAW_OBJECT, 0);
+        }
+    }
+
+    for (column = 0; column < ADVMGR_COMBO_VIEW_CELLS; ++column)
+        if (bComboDraw[column][ADVMGR_COMBO_VIEW_CELLS - 1] != 0)
+            DrawCell(column + originX, originY + ADVMGR_COMBO_VIEW_CELLS - 1,
+                     column, ADVMGR_COMBO_VIEW_CELLS - 1, ADVMGR_DRAW_HERO, 0);
+    for (column = 0; column < ADVMGR_COMBO_VIEW_CELLS; ++column)
+        if (bComboDraw[column][ADVMGR_COMBO_VIEW_CELLS - 1] != 0)
+            DrawCell(column + originX, originY + ADVMGR_COMBO_VIEW_CELLS - 1,
+                     column, ADVMGR_COMBO_VIEW_CELLS - 1, ADVMGR_DRAW_OVERLAY, 0);
+
+    for (mapRow = 0; mapRow < ADVMGR_COMBO_VIEW_CELLS; ++mapRow)
+        for (column = 0; column < ADVMGR_COMBO_VIEW_CELLS; ++column)
+            if (bComboDraw[column][mapRow] != 0)
+                DrawCell(column + originX, mapRow + originY, column, mapRow,
+                         ADVMGR_DRAW_OVERLAY_TOP, 0);
+    for (mapRow = 0; mapRow < ADVMGR_COMBO_VIEW_CELLS; ++mapRow)
+        for (column = 0; column < ADVMGR_COMBO_VIEW_CELLS; ++column)
+            if (bComboDraw[column][mapRow] != 0)
+                DrawCell(column + originX, mapRow + originY, column, mapRow,
+                         ADVMGR_DRAW_CLOUD, 0);
+
+    DrawAdventureBorder();
+    gpMouseManager->m_cursorReady = 1;
+    PollSound();
+    UpdBottomView(0, 1, 1);
+
+    giLimitUpdMinX = ADVMGR_COMBO_VIEW_CELLS;
+    giLimitUpdMinY = ADVMGR_COMBO_VIEW_CELLS;
+    giLimitUpdMaxX = 0;
+    giLimitUpdMaxY = 0;
+    updateCount = 0;
+    for (mapRow = 0; mapRow < ADVMGR_COMBO_VIEW_CELLS; ++mapRow) {
+        for (column = 0; column < ADVMGR_COMBO_VIEW_CELLS; ++column) {
+            if (bComboDraw[column][mapRow] != 0) {
+                ++updateCount;
+                if (column < giLimitUpdMinX)
+                    giLimitUpdMinX = column;
+                if (giLimitUpdMaxX < column)
+                    giLimitUpdMaxX = column;
+                if (giLimitUpdMinY > mapRow)
+                    giLimitUpdMinY = mapRow;
+                if (giLimitUpdMaxY < mapRow)
+                    giLimitUpdMaxY = mapRow;
+            }
+        }
+    }
+
+    giLimitUpdMinX *= ADVMGR_CELL_PIXELS;
+    giLimitUpdMinY *= ADVMGR_CELL_PIXELS;
+    giLimitUpdMaxX = (giLimitUpdMaxX + 1) * ADVMGR_CELL_PIXELS - 1;
+    giLimitUpdMaxY = (giLimitUpdMaxY + 1) * ADVMGR_CELL_PIXELS - 1;
+    if (giLimitUpdMinX < ADVMGR_COMBO_UPDATE_MIN)
+        giLimitUpdMinX = ADVMGR_COMBO_UPDATE_MIN;
+    if (giLimitUpdMaxX > ADVMGR_COMBO_UPDATE_MAX)
+        giLimitUpdMaxX = ADVMGR_COMBO_UPDATE_MAX;
+    if (giLimitUpdMinY < ADVMGR_COMBO_UPDATE_MIN)
+        giLimitUpdMinY = ADVMGR_COMBO_UPDATE_MIN;
+    if (giLimitUpdMaxY > ADVMGR_COMBO_UPDATE_MAX)
+        giLimitUpdMaxY = ADVMGR_COMBO_UPDATE_MAX;
+
+    if (giLimitUpdMaxX < giLimitUpdMinX || giLimitUpdMaxY < giLimitUpdMinY) {
+        giLimitUpdMinX = giLimitUpdMaxX - 1;
+        giLimitUpdMinY = giLimitUpdMaxY - 1;
+        return 0;
+    }
+    return 1;
+}
 
 VA(0x00466656, 0x38)
 int advManager::ComboDraw(int update)
@@ -1814,7 +4035,7 @@ DATA(0x004f57d4) int iLastHourGlassPhase;
 DATA(0x004f57d8) int gbForceUpdate;
 DATA(0x004f59e8) int giCheatSeq;
 DATA(0x004f59ec) int iQWE;
-DATA(0x004f5e38) unsigned char *monAnimDrawFrame;
+DATA(0x004f5e38) unsigned char monAnimDrawFrame[15];
 DATA(0x004f60e0) int iLastSandAnimTime;
 DATA(0x004f60e4) int iLastNewSandAnimTime;
 DATA(0x004f6720) int giFrameCount;
@@ -1824,9 +4045,10 @@ DATA(0x00527edc) int giTownPortalChoice;
 DATA(0x00527ee0) int iThisMinY;
 DATA(0x00527ee8) class heroWindow *townPortalWin;
 DATA(0x00527f14) int giFrameStep;
-DATA(0x00527f28) char *cArmySizeName;
+DATA(0x00527f28) char cArmySizeName[12];
 DATA(0x00527f34) int giLimitUpdMaxX;
 DATA(0x00527f38) int giLimitUpdMaxY;
 DATA(0x00527f40) int bPrefsChanged;
 DATA(0x00527f4c) int giLimitUpdMinY;
+DATA(0x00527f50) signed char bComboDraw[18][18];
 DATA(0x005280d4) int iLastAnimFrame;

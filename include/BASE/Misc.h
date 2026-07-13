@@ -29,7 +29,7 @@ struct IconEntry {          // one sprite frame header in the icon entry table (
     short y;                // +2  y offset
     short w;                // +4  width
     short h;                // +6  height
-    unsigned char flags;    // +8
+    unsigned char flags : 5; // +8
     int srcOffset;          // +9  offset of this frame's RLE data within the icon blob
 };
 #pragma pack(pop)
