@@ -391,7 +391,7 @@ BASE/listbox	?Draw@listBoxWidget@@UAEXXZ	100.0000	230100bbcc4e
 BASE/listbox	?DrawLBStuff@listBoxWidget@@QAEXH@Z	100.0000	bd3903067b29
 BASE/listbox	?Main@listBoxWidget@@UAEHAAUtag_message@@@Z	99.8781	3acda66be35c
 BASE/listbox	?ProcessMouseMessage@listBoxWidget@@QAEHAAUtag_message@@@Z	99.1322	6cfc4fc273b9
-BASE/listbox	?Read@listBoxWidget@@QAEXXZ	88.4422	c084f7c2357c
+BASE/listbox	?Read@listBoxWidget@@QAEXXZ	89.2517	2a94105916a2
 BASE/miscwin	?AutoInitSVGA@@YIFXZ	100.0000	ba21e7c98ba3
 BASE/miscwin	@BlitBitmapToScreenVesa@28	100.0000	d63e894c78f3
 BASE/soundmgr	??0soundManager@@QAE@XZ	97.6471	2cb5eafa76dd
