@@ -17,6 +17,7 @@
 // forward declarations:
 class sample;
 struct _SAMPLE;
+struct _DIG_DRIVER;
 struct tag_message;
 
 #pragma pack(push, 1)  // recovered layout is byte-packed
@@ -31,7 +32,7 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
-    int    m_digitalDriver;  // +0x36
+    struct _DIG_DRIVER *m_digitalDriver;  // +0x36
     int    field_0x3a;  // +0x3a
     int    m_ready;  // +0x3e
     char _pad_0x42[0xe];
