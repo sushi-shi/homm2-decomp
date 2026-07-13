@@ -35,6 +35,24 @@ typedef enum GameDifficultyConstant {
     GAME_DIFFICULTY_IMPOSSIBLE = 4
 } GameDifficultyConstant;
 
+typedef enum GameScoreConstant {
+    GAME_SCORE_MAP_SMALL = 36,
+    GAME_SCORE_MAP_MEDIUM = 72,
+    GAME_SCORE_MAP_LARGE = 108,
+    GAME_SCORE_MAP_EXTRA_LARGE = 144,
+    GAME_SCORE_BASE = 200,
+    GAME_SCORE_FIRST_TIER = 60,
+    GAME_SCORE_SECOND_TIER = 120,
+    GAME_SCORE_THIRD_TIER = 360,
+    GAME_SCORE_MINIMUM = 20
+} GameScoreConstant;
+
+typedef enum GameJoinConstant {
+    GAME_JOIN_HEADER_SIZE = 2,
+    GAME_JOIN_BUFFER_SIZE = 700000,
+    GAME_JOIN_LOG_UNUSED = -999
+} GameJoinConstant;
+
 typedef enum GameDailyArtifactConstant {
     ARTIFACT_POWER_RING = 0x43,
     ARTIFACT_ENDLESS_POUCH_SULFUR = 0x47,
