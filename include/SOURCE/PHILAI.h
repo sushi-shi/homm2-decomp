@@ -465,7 +465,7 @@ extern searchArray SVSearchArray;
 
 // ---- globals (declarations, RVA order) ----
 extern int gbGameOver;
-extern signed char *giMonType;
+extern signed char giMonType[];
 extern int iViewArmyNumTroops;
 extern signed char *gbNGHeroType;
 extern short giUABaseX;
