@@ -640,7 +640,22 @@ Combined setup, type, and header-state axes after integrated root `4d381e1`:
   standard adjusted-pointer signature expected here, so objdiff cannot claim the CodeView symbol;
   reverted.
 
-The full no-repeat set now contains 131 source-hash-distinct states. This combined-state batch
+Fresh shear-pointer type/lifetime audit after integrated root `76a78cc`:
+
+- top-level `volatile` on the shear pointer changes the VC4.2 symbol from retail `PAC` to `RAC`;
+  this is not an ABI-neutral qualifier and was reverted before scoring;
+- top-level `const` on the shear pointer likewise changes the symbol from retail `PAC` to `QAC`;
+  CodeView therefore proves the formal is a mutable, unqualified signed-char pointer;
+- a function-scope `signed char *const &` alias for every shear access falls to 88.77%, size
+  `0x563`, no frame, and 140/144 relocations; reverted;
+- confining that reference alias to the initial shear calculation falls to 88.93% with the same
+  size/frame and relocation regression; reverted.
+
+The retail reload pattern is therefore not evidence for pointer cv-qualification or a reference
+alias. Those shapes remove the retail four-byte allocator residue and four required scratch
+relocations instead of transferring the pointer from EBP to ESI.
+
+The full no-repeat set now contains 135 source-hash-distinct states. This combined-state batch
 confirms that the retained declaration surface and scratch order are stable: the isolated
 lifetime/type spellings are either byte-neutral, while retail-order edge publication still leaves
 the same EBP shear allocation, or they regress code size/relocations. Do not combine these axes

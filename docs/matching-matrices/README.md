@@ -80,10 +80,10 @@ hashes while the source and header state agree. The regex permuter was never use
 
 ## BASE/iconf2by manual reconstruction
 
-`iconf2by-manual.tsv` contains 131 full-SHA manual source states spanning the 84.29% through
+`iconf2by-manual.tsv` contains 135 full-SHA manual source states spanning the 84.29% through
 93.72654% reconstruction. Each row records the source hash, source-shape label, match, candidate
 size/frame, relocation counts, and disposition. Its SHA-256 is
-`d546bd7d633fa3dde7c268ae163961575b38251bd0f870079183fd1af4be0e92`.
+`857cfa8abba9d0ffbb2965593109c22627737282f3b2e8fbb0170ab0a6aa05cb`.
 
 The current source is restored to
 `f33ab84fe5e3b9205e40ae09de314bced82063fe587bddee30646c73d44bfea0`. The first normalized
@@ -101,6 +101,11 @@ publication remained 92.544235% and did not free EBP; restoring the owner/Misc d
 fell to 84.28954% with 141/144 relocations; and an unsigned global run fell to 89.83914% with no
 frame and 141/144 relocations. Keep the current narrow headers and declaration order pinned, and do
 not recombine these axes before a newly retained predecessor/shared-header state exists.
+
+The integrated-root `76a78cc` pointer audit added four states. Top-level `volatile` or `const`
+changes the CodeView-proven pointer symbol, while function-wide and setup-only reference aliases
+remove the frame residue and four required relocations. These reject the hypothesis that retail's
+formal reload pattern comes from cv qualification or reference storage.
 
 ## BASE/Textntry fresh lifetime and semantic-name pass
 
