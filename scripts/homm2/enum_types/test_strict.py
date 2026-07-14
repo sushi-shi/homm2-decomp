@@ -27,6 +27,17 @@ class StrictDiagnosticsTest(unittest.TestCase):
         self.assertEqual(diagnostic["column"], 7)
         self.assertTrue(diagnostic["promoted"])
 
+    def test_unnamed_enum_location_is_grouped(self):
+        results = [{
+            "source": "src/SOURCE/example.cpp",
+            "returncode": 1,
+            "output": "src/SOURCE/example.cpp(4,2) : error: bad (unnamed enum at include/x.h:8:1)\n",
+        }]
+        diagnostic = _diagnostics(
+            results, {}, {("include/x.h", 8): "AnonymousEnum@VALUE"}
+        )[0]
+        self.assertEqual(diagnostic["domain"], "AnonymousEnum@VALUE")
+
 
 if __name__ == "__main__":
     unittest.main()
