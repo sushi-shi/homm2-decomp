@@ -340,7 +340,7 @@ the prologue register-lifetime divergence.
 
 Canonical source state:
 
-- lane base: `1e1646a`, plus the retained branch-local fill-count recovery below
+- checkpoint: `3fb2d50`
 - target: RVA `0xd9ce0`, retail size `0x58d`
 - `src/BASE/iconf2by.cpp`:
   `d20712c2e1e836a2161ff93a7ed7db51bc04e2257aeb3ec2a1d03e0880ab4578`
