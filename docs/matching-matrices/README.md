@@ -24,3 +24,20 @@ siblings to remain pinned:
 
 The initial constructor pass found the retained 98.695656% source state. The `Read` pass and deep
 constructor continuation found no further improvement.
+
+## BASE/Textntry include-surface audit
+
+`textntry-include-surface-8aaf3.tsv` (SHA-256
+`d58c40bf716815c90a362b6f0f5fbd6a733105499dd25ea089ee57ad11e13f0a`) records the canonical state
+plus eight previously untested declaration/include surfaces. The matrix includes every objdiff
+function row and retail size; the two deleting-destructor aliases remain unscored because the
+canonical standalone-destructor tradeoff emits one 0x1f base wrapper for the two retail 0x36
+aliases. All scored siblings and sizes remained pinned. Canonical and the redundant-`va.h` removal
+also produced the same aggregate emitted `.text` dump SHA-256,
+`d68541c49e4bf533e079cc8410cc8d24d82b6ad72d3d3010be1fd16c74238d4f`.
+
+The audit established that `BASE/Misc.h` is still required as the owner of `BaseAlloc`/`BaseFree`,
+`SOURCE/KB.h` is still required as the owner of the manager globals, `glTimers`, and
+`gbTextEntryEscaped`, and `SOURCE/X_GLOBAL.h` and `SOURCE/kbwin.h` own the remaining globals and
+functions. Only the direct `va.h` include is redundant, and removing it is byte-neutral, so the
+canonical include block is retained rather than creating a no-gain source hash.
