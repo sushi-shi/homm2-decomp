@@ -14,6 +14,50 @@ Before replaying a source state, compare its hash here and confirm the canonical
 sibling hashes have not changed. A listed hash should not be rebuilt under the same compiler/header
 state.
 
+## BASE/soundmgr whole-TU raw audit
+
+`soundmgr-raw-audit-72ca327.tsv` records the complete 34-function audit from checkpoint
+`72ca327`. No source-shape experiment and neither permutation tool was run in this wind-down pass.
+The canonical pre-comment source SHA-256 was
+`6ea419d2e3b079228fdc16d57e27eddcee84d82d3d73ddaa0e8897fadc50b761`; the unchanged
+`include/BASE/soundmgr.h` SHA-256 was
+`e6bf228b4dc73f028aca22ba12986c67993108878c146fdcdac96f7471a9b48b`.
+
+The audit extracts each complete function from the compiled and retail `.text` sections, masks
+the union of four-byte relocation payloads reported by both objects, and compares every remaining
+byte. All 27 objdiff-exact functions are raw-exact. `ModifySample` is also raw-exact over its full
+0x202 bytes after masking 23 relocation offsets, including its address table at +0x16e..+0x182,
+byte-index table at +0x182..+0x1e7, and final code at +0x1e7..+0x202. Its sub-100 objdiff score is
+therefore a permanent fixed-IAT/delinked-self-relocation identity wall.
+
+The other six residuals are not relocation-only walls. The TSV records every unmasked byte:
+`CDStartup`, `CDPoll`, and `PlayAmbientMusic` retain one local-branch displacement each;
+`CDSetVolume` swaps adjacent 0x0b/0x0c immediates; `StopAllSamples` retains ten stack-slot
+displacements; and `SwitchAmbientMusic` retains two branch displacements and one immediate. Their
+old `@early-stop` claims were removed. Do not treat `homm2 sema disasm --diff --lite` showing only
+relocation-name differences as raw proof: lite normalization also hides branch destinations,
+stack displacements, and immediates. Re-run the full relocation-union raw comparator after any
+future predecessor, header, or combined-TU state change.
+
+`soundmgr-structural-fixes-72ca327.tsv` records the subsequent authorized six-function repair.
+No permutation tool was used. `CDSetVolume` needed the retail arithmetic
+`0xc - (0xb - volume / 0xc)`, correcting both emitted constants and the decomp's semantics.
+`CDPoll` needed one combined `CDPlaying == 0 || m_currentTrack < 0` guard.
+`StopAllSamples` used `od_slots.py` to select the semantic names `sampleIdx`, `waitCounter`, and
+`sampleStatus`, whose buckets 1/2/3 reproduce retail's -0x4/-0x8/-0xc slots.
+
+The first explicit-return state retained the surrounding `else` chains. It made the arithmetic,
+combined guard, and slots exact but added continuation jumps to `CDStartup`, `PlayAmbientMusic`,
+and `SwitchAmbientMusic`; hash `4b618e87...` must not be retried. Removing those trailing `else`
+chains recovered retail's actual guard-clause CFG. `SwitchAmbientMusic` additionally required the
+retail-proven `m_fadeSteps <= 0xa` threshold, rather than the decomp's incorrect `<= 0xb`.
+
+The retained source SHA-256 is
+`9f170036461a1a79ab2a7894f0402ad271573cf647bee0577c4a56f4fd34e487`. It produces 33/34 objdiff
+exact functions; the remaining `ModifySample` row is full-function raw-exact after relocation-union
+masking. Thus all 34 functions are raw-exact, with only `ModifySample`'s permitted delinker identity
+wall below 100% objdiff. All 27 pre-existing exact siblings remained pinned throughout.
+
 ## BASE/Textntry AST searches
 
 All three searches used only `scripts/permute_ast.py`, never the regex permuter, and required all 11
