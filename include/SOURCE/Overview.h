@@ -4,6 +4,8 @@
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
 struct tag_message;
+class iconWidget;
+class textWidget;
 
 typedef enum OverviewType {
     OVERVIEW_HEROES = 0,
@@ -22,6 +24,9 @@ typedef enum OverviewLayoutConstant {
     OVERVIEW_SECONDARY_SKILL_COLUMNS = 4,
     OVERVIEW_ARTIFACT_COLUMNS = 7
 } OverviewLayoutConstant;
+
+typedef iconWidget *OverviewIconWidgetRow[OVERVIEW_DYNAMIC_WIDGETS_PER_ROW];
+typedef textWidget *OverviewTextWidgetRow[OVERVIEW_DYNAMIC_WIDGETS_PER_ROW];
 
 typedef enum OverviewUiConstant {
     OVERVIEW_SETUP_SOURCE_LINE = 0x2ba,
