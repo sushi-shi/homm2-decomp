@@ -4672,6 +4672,22 @@ DATA(0x004fd870) char cHeroTypeInitial[HERO_TYPE_INITIAL_COUNT];
 DATA(0x004fd878) int giDeferObjDrawX;
 DATA(0x004fd87c) int giDeferObjDrawY;
 DATA(0x004fd880) class heroWindow *gpInitWin;
+DATA(0x004fd888) unsigned char iGetSSByAlignment[HERO_SKILL_COUNT][6] = {
+    {3, 4, 2, 2, 2, 3},
+    {2, 3, 3, 1, 1, 1},
+    {3, 3, 2, 2, 2, 2},
+    {2, 4, 1, 4, 2, 1},
+    {3, 2, 2, 2, 2, 2},
+    {2, 3, 4, 2, 2, 2},
+    {5, 3, 1, 1, 2, 0},
+    {2, 1, 4, 5, 5, 4},
+    {1, 1, 3, 3, 4, 3},
+    {1, 2, 3, 1, 2, 1},
+    {4, 3, 3, 3, 3, 3},
+    {1, 1, 2, 3, 3, 3},
+    {0, 0, 0, 1, 0, 7},
+    {3, 2, 2, 2, 2, 2}
+};
 DATA(0x004fd8e0) struct SCmbtHero sCmbtHero[12];
 DATA(0x004fdeec) unsigned char iWallToHexCell[4];
 DATA(0x004fdef0) unsigned char iTowerToHexCell[4];
