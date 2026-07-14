@@ -141,12 +141,15 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
                         }
                     } else {
                         gFYSrc = gFYSrc + (gFYX - gFYClipR);
-                        gFYDst = reinterpret_cast<unsigned char *>(gFYClipR + gFYRow);
+                        unsigned char *rightDst =
+                            reinterpret_cast<unsigned char *>(gFYClipR + gFYRow);
                         if (clipX <= (gFYX - gFYRun)) {
+                            gFYDst = rightDst;
                             gFYSkip = 0;
                             gFYDimLen = (gFYRun - gFYX) + gFYClipR;
                             goto copy_literal;
                         } else {
+                            gFYDst = rightDst;
                             pendingSkip = ((gFYRun - gFYX) - clipWidth) + gFYClipR;
                             gFYDimLen = clipWidth;
                             goto publish_literal_skip;
