@@ -88,6 +88,14 @@ DATA(0x00534c60) static int gFlipSkip;
 // sibling-setup, field-pointer, and split entry-X lifetime combinations all regressed; see the
 // appended fresh7 typed-view family. The unresolved first divergence remains the +0x1d Y load
 // versus retail's +0x1d entry LEA, and the sole excess occurrence remains gFlipY. This is not a wall.
+// The fd9229b follow-up tested only new retail-backed boundaries. The real 0xc-byte GetIconEntry
+// helper has out-of-line retail callers, but forcing its exact body inline here regressed to 83.33%
+// and moved the decoder cursor back to EBX. Assigning or dereferencing through the real gFlipEntry
+// owner either added three owner reloads (85/81 relocations, 84.58%) or reproduced the rejected
+// early-publication 86.13% shape. A named 13-byte entry-offset lifetime regressed to 84.55%; early
+// pitch declaration regressed to 86.05%, while split X/Y declarations and source-before-X order
+// were byte-identical. The typed-cursor source is restored unchanged; see the appended fd9229b
+// family. The +0x1d/Y occurrence residual remains unresolved and is still not a wall.
 VA(0x004d1ba0, 0x4f1)
 void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                       int clip, int clipX, int clipY, int clipW, int clipH, int color)
