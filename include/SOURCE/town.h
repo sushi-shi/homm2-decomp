@@ -27,6 +27,9 @@ typedef enum TownBuilding {
     TOWN_BUILDING_RAINBOW = 0x2000
 } TownBuilding;
 
+#define TOWN_FORMATION_SPREAD 0
+#define TOWN_FORMATION_GROUPED 1
+
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class town {
 public:
@@ -48,7 +51,7 @@ public:
     short m_garrison[12];  // +0x1e
     unsigned char m_onMap;  // +0x36
     signed char m_unknown37;  // +0x37
-    signed char m_unknown38;  // +0x38
+    signed char m_formation;  // +0x38
     signed char m_originalOwner;  // +0x39
     unsigned short m_extraIndex;  // +0x3a
     union {
