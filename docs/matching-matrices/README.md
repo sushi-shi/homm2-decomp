@@ -14,6 +14,19 @@ Before replaying a source state, compare its hash here and confirm the canonical
 sibling hashes have not changed. A listed hash should not be rebuilt under the same compiler/header
 state.
 
+## BASE/Icon2b adjacent-decoder setup transfer
+
+`icon2b-adjacent-setup-dd7973b.tsv` records the bounded setup-lifetime retest from checkpoint
+`dd7973b`. The Icon2b source and its complete include surface were unchanged from the documented
+`4498053` state, so this was not a new compiler/header TU state. The only retest trigger was the
+later reconstruction of the adjacent `Iconf2b` decoder, which supplied retail-evidenced early
+source-cursor and entry-Y lifetimes.
+
+Three entry/source-publication variants regressed the score and shortened the candidate from
+0x4c7 to 0x4c5-0x4c6. A separate `entryY` field snapshot produced the exact same emitted `.text`
+SHA-256 as canonical. The canonical source was restored. No dim/literal axis from the soft-defer
+ledger was repeated, and neither permutation tool was used.
+
 ## BASE allocation/assert metadata wrapper sweep
 
 `base-misc-callsite-audit-8ed859f.tsv` records all 86 direct `BaseAlloc`, `BaseFree`, and

@@ -831,6 +831,23 @@ Final axes measured after `4498053`:
 - retained final-assignment result plus a separate signed-test local: byte-identical;
 - signed decoded `count`: 73.04%, reverted.
 
+Fresh adjacent-decoder setup transfer after `dd7973b`:
+
+- the canonical source SHA remained `b42c0b8e...`, and `git diff 4498053..dd7973b` was empty for
+  `Icon2b.cpp` and every included header, so no new combined compiler/header TU state existed;
+- publishing `gIcEntry` then `gIcSrc` before X/Y formation reached 73.304950%, size `0x4c6`,
+  79/83 relocations; reverted;
+- publishing them in that order after X/Y formation reached 73.934070%, size `0x4c6`, 79/83;
+  reverted;
+- the adjacent `Iconf2b`-style local source snapshot before those publications reached
+  72.824170%, size `0x4c5`, 79/83; reverted;
+- a separate `entryY` field snapshot was byte-identical to canonical: 74.453300%, size `0x4c7`,
+  79/83, emitted `.text` SHA-256
+  `d5e105683f769459d8f3399fdac4f4a15faa54516b74070090d98ed7c34bb4cb`; reverted;
+- all states had no frame and no base-only external relocation target; neither permutation tool
+  was used. Full hashes and outcomes are in
+  [`icon2b-adjacent-setup-dd7973b.tsv`](matching-matrices/icon2b-adjacent-setup-dd7973b.tsv).
+
 ### Remaining concrete evidence
 
 The known missing sites are setup `gIcX0`/`gIcY` CSE reloads and the fifth dim
