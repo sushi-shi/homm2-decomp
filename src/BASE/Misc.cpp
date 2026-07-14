@@ -610,7 +610,9 @@ void ReadPrefsFromRegistry(void)
     RegQueryValueExA(hKey, "Modem Init String", 0, &dwType, reinterpret_cast<unsigned char *>(gConfig.modemInitString), &dwSize);
     dwSize = 4;
     RegQueryValueExA(hKey, "Unique System ID", 0, &dwType, reinterpret_cast<unsigned char *>(gConfig.uniqueSystemID), &dwSize);
-    gConfig.modemInitString[98] = 0;
+    // Retail relocation at function +0x2f6 resolves to gConfig +0x125, the terminator byte after
+    // this four-byte ID, rather than the unrelated modem string at gConfig +0x110.
+    gConfig.uniqueSystemID[3] = 0;
     dwSize = 0x1f;
     RegQueryValueExA(hKey, "Network Default Name", 0, &dwType, reinterpret_cast<unsigned char *>(gConfig.networkDefaultName), &dwSize);
     dwSize = 4;
