@@ -1,10 +1,14 @@
 # Matcher experiment matrices
 
-These TSV files are durable no-repeat sets for large exact-preserving searches. Each row is:
+These TSV files are durable no-repeat sets for large exact-preserving searches. The original
+matrices contain:
 
 ```text
 whole-source-file SHA-256<TAB>focused function match percentage
 ```
+
+Newer matrices add a third `outcome` column. Always follow the file's header; the outcome records
+whether all pins held or names the raw pin/review that rejected the state.
 
 Before replaying a source state, compare its hash here and confirm the canonical source and pinned
 sibling hashes have not changed. A listed hash should not be rebuilt under the same compiler/header
@@ -107,3 +111,29 @@ that exact-preserving predecessor/TU state must be audited after every earlier s
 
 The retained source/header SHA-256 values are `ac8dd08884961ba6d73e8a312391cdeecac71ba132f5badef5f79201a63b34d8`
 and `8207f088751e59f5a467c7a7e582c4870d82c3fb4e060262d02d5e3a07a17517`.
+
+## BASE/Textntry post-exact-Setup constructor and Read AST passes
+
+The exact Setup lifetime changed the combined TU state, authorizing one fresh pass over each of the
+two remaining Textntry residuals from checkpoint `2aeff38`. Both used only
+`scripts/permute_ast.py`; the regex permuter was never used, unsafe inequality rewrites were
+disabled, and all previously listed Textntry hashes were skipped before compilation.
+
+`textntry-ctor-ast-ac8dd.tsv` contains 286 new unique whole-file hashes from seed `28482744` and 20
+first-order variants. It has SHA-256
+`aae422221e02fcdce50fbf103aa918624b0e01b5c97f62287e6061772a9bf873`. Thirty-eight hashes reached
+98.695656%, but the final score-max representative `4363f3b...` failed the required raw target
+review: it moved `m_color` (`+0x28`) ahead of the other constant stores. That made the score rise
+while regressing an already-correct span, so it is explicitly marked `REJECT_RAW_STORE_ORDER` and
+the canonical `ac8dd088...` source was restored.
+
+`textntry-read-ast-ac8dd.tsv` contains 303 new unique hashes from seed `2848920` and 23 first-order
+variants. It has SHA-256
+`6399eacb8b875aefe21feb91aee2033692dca88a71f02f78ca76047b69613bdc`. Of these, 240 kept every
+pin and 63 are marked `PIN_BYTES_MOVED` for the `Main` disassembly fingerprint/placement. No
+pin-clean state exceeded 98.675500%.
+
+The byte pins covered default constructor/destructor, `Main`, `Draw`, and the now-exact Setup; the
+`Read` walk also pinned the long constructor. The accepted canonical source/header hashes remain
+`ac8dd08884961ba6d73e8a312391cdeecac71ba132f5badef5f79201a63b34d8` and
+`8207f088751e59f5a467c7a7e582c4870d82c3fb4e060262d02d5e3a07a17517`.
