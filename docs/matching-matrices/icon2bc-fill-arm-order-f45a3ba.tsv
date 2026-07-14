@@ -1,0 +1,15 @@
+# BASE/icon2bc retail fill-arm/control-dataflow pass, checkpoint f45a3ba
+# Target: IconToBitmapColorTable, RVA 0xd32a0, retail size 0x5af, target relocations 91.
+# Scope: inspect the retail decoder CFG from scratch and test only source ownership/arm order not closed by the setup/header/record/fetch/enum/command-loop matrices. No regex or AST permuter was used.
+# Retained raw audit: candidate 0x558, retail 0x5af; 747 differing non-relocation bytes in the 0x558 common span, first +0x12, last +0x557, plus a 0x57 retail tail. Candidate .text SHA-256 7857fbb3cf9e1100f0e0aca60f119b485029e499b7936f9635093b8e1733cb0b.
+state	match_percent	candidate_size	relocations	result	evidence
+canonical_command_lifetime	73.19249	0x566	88/91	baseline	Both clipped-fill inner conditions put the clipped body first; candidate has ClipR 9/10, Cnt 5/6, Dst 5/6, X0 2/3, and Y 9/8.
+loop_scoped_saved_destination	73.19249	0x566	88/91	byte-identical-rejected	Declare and initialize savedDst inside the command loop. MSVC emits the canonical object unchanged.
+direct_unclipped_dim_count	73.19249	0x566	88/91	byte-identical-rejected	Decrement count directly in the unclipped dim loop instead of a loop-local copy. Optimizer live-range splitting emits the canonical object unchanged.
+direct_clipped_dim_count	72.79578	not-retained	not-retained	rejected	Mutate count directly through clipped dim selection/loop; it regresses without repairing the shared allocator state.
+stepwise_fill_length	73.19249	0x566	88/91	byte-identical-rejected	Spell ClipR-X+1 and X-clipX+count as statement sequences. MSVC folds them back to canonical.
+stepwise_fill_plus_one_time_destination	71.94601	not-retained	not-retained	rejected	Combine the byte-identical fill spelling with the already-rejected pre-loop destination lifetime; it remains the same wrong cursor/count coloring.
+volatile_fill_length	69.92723	not-retained	not-retained	rejected	Force the sole fill-length local to memory. This broad stack/register perturbation is not retail and regresses.
+retail_fill_arm_order	74.558685	0x558	89/91	retained	Use >= as the positive inner arm in both X>=clipX and X<clipX fill subtrees, so fully visible bodies precede right-clipped bodies as retail does. This recovers ClipR 10/10 and improves 1.366195 points.
+# Remaining occurrence delta: Cnt 5/6, Dst 5/6, X0 2/3, Y 9/8; all other target occurrences agree and homm2 relocs reports only-base=0.
+# This is unresolved, not a wall. The retained decoder CFG is now closer, but the first divergence remains +0x12: retail needs setup data=ESI/offset=EBX/entry=EDI and decoder source=ECX/command=EAX/count=EDX/destination=EBX. Do not replay the rejected variants above.
