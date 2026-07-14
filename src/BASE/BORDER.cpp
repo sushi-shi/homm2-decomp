@@ -5,6 +5,7 @@
 
 #include <va.h>
 #include <BASE/border.h>
+#include <BASE/widgetKind.h>
 #include <BASE/resourceManager.h>
 #include <BASE/bmap2.h>
 #include <BASE/bitmap.h>
@@ -60,16 +61,16 @@ void border::Read(void)
     short kind = gpResourceManager->ReadWord();
     m_backgroundBitmap = 0;
     m_backgroundIcon = 0;
-    field_0x14 = kind;
+    m_kind = kind;
     char name[16];
-    if (kind == 0x800) {
+    if (kind == WIDGET_KIND_BITMAP) {
         gpResourceManager->Read13(reinterpret_cast<signed char *>(name));
         gpResourceManager->SavePosition();
         m_backgroundBitmap = gpResourceManager->GetBitmap(name);
         gpResourceManager->RestorePosition();
         return;
     }
-    if (kind == 0x801) {
+    if (kind == WIDGET_KIND_ICON) {
         gpResourceManager->Read13(reinterpret_cast<signed char *>(name));
         gpResourceManager->SavePosition();
         m_backgroundIcon = gpResourceManager->GetIcon(name);
@@ -79,11 +80,12 @@ void border::Read(void)
     m_fillColor = gpResourceManager->ReadWord() & 0xff;
 }
 
-// @early-stop
-// Proven delinker artifact in the current combined TU: explicit-range comparison
-// over all 0x181 bytes, including the +0x134 jump table and trailing index bytes,
-// is raw-exact after masking 9/9 relocation payloads. Both external widget::Main
-// calls agree; objdiff differs only on local dispatch/table owner identities.
+// @match-note
+// The shared WidgetKind header invalidates the former raw-exact TU state. Both
+// sections remain 0x181 bytes with 9/9 relocations and matching external calls;
+// explicit-range comparison differs only at +0x78 and +0x7b, where the equivalent
+// signed comparison uses the opposite CMP/branch orientation. Enum tag, include
+// position, and semantic enumerator-name variants did not change these bytes.
 VA(0x004d22f0, 0x181)
 int border::Main(struct tag_message &msg)
 {
@@ -144,17 +146,17 @@ void border::Draw(void)
 {
     short y = m_y + static_cast<short>(m_owner->m_posY);
     short x = m_x + static_cast<short>(m_owner->m_posX);
-    int kind = field_0x14;
+    int kind = m_kind;
     switch (kind) {
-    case 0x400:
+    case WIDGET_KIND_SOLID:
         FillBitmapArea(gpWindowManager->m_screen, x, y, m_width, m_height, m_fillColor);
         return;
-    case 0x800:
+    case WIDGET_KIND_BITMAP:
         PollSound();
         BlitBitmap(m_backgroundBitmap, 0, 0, m_width, m_height, gpWindowManager->m_screen, x, y);
         PollSound();
         return;
-    case 0x801:
+    case WIDGET_KIND_ICON:
         m_backgroundIcon->DrawToBuffer(x, y, 0, 0);
         return;
     default:

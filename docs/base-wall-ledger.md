@@ -1,7 +1,7 @@
 # BASE `@early-stop` proof ledger
 
 This ledger audits every current `@early-stop` marker under `src/BASE` from integration base
-checkpoint `942c94a`, with the accepted dirty source identities pinned below.
+checkpoint `a0b17fb`, with the accepted dirty source identities pinned below.
 It is deliberately stricter than the prose beside the functions: a score or a claim that
 instructions are "the same" is not proof.  The audit joined the current
 `build/objdiff/report.json` (refreshed with `homm2 status`) to
@@ -28,19 +28,27 @@ No BASE marker presently meets the soft-TU-cumulative checklist.
 
 The counts and rows below are pinned to the following fully rebuilt state:
 
-- Integration base Git checkpoint: `942c94a402573d7448a6a9343de7296815798e23`
+- Integration base Git checkpoint: `a0b17fb69de65ba589df69e16402900f7012447d`
 - Accepted `src/BASE/BORDER.cpp` SHA-256:
-  `ad400f790c7bc196189a5393eca758a0fa213ccd7693d6310057bd92e0eda4d0`
+  `c8e627807ba10e7d1f494e3891114b4f746c68ad5262d69d8997fb481a1c35dd`
 - Accepted `src/BASE/WINMGR.cpp` SHA-256:
   `b27afc6f3ee676396f9802c41e9fee3fe63557992418cad9833866005b1e3b69`
 - Accepted `src/BASE/BUTTON.cpp` SHA-256:
-  `37c1d4dd67d5599388b14c175c525879836d458b3e54e2bee4a482e8458b2a22`
+  `9e254a6733d5343a62de0865d9c5624e3c7890a5a7238182822b6c5a6ed09793`
+- Accepted `src/BASE/WIDGET.cpp` SHA-256:
+  `a01726c7fba2e267ba07ca78a46dc2cb155026f383f1de35c9f508fbe6c4d86e`
+- Accepted `src/BASE/TEXTWDGT.cpp` SHA-256:
+  `1cfc5fd48b2f6941400f143c89f66718612a623b662a2f8d2185fed8dc93ff4b`
+- Accepted `src/BASE/Textntry.cpp` SHA-256:
+  `6b0667f09d962f51a04d29c0e0a3be0edf2c0c5b66c979f766b7c306095643ba`
 - Accepted `include/BASE/heroWindowManager.h` SHA-256:
   `68a628f236fb7603240d0b766df838fcd845e3318391c632473521675ee0ea61`
 - Accepted `include/BASE/button.h` SHA-256:
-  `0fc288b1e73b4e691a2acbd08e5e656ab3d805082f2b87b8c64691973e5df64d`
+  `2fae68c1cd4ca807a255546dd73b1219f80a3f81585e227fb738ea8f1edab026`
 - Accepted `include/BASE/widget.h` SHA-256:
-  `fef7bbcfbedd94b1e94e96b9fa0b121522a5a08c746c3e44015f375f370ff43c`
+  `4efb3f3b249740f0e5631bf988cc2e8e108e49985e35203427e47f14eabb5f4d`
+- Accepted `include/BASE/widgetKind.h` SHA-256:
+  `ff661f928541eefacac1429f0e25d3e065b4743ce8f5ac5670a7046bb8abf31f`
 - Accepted `include/_carcass_types.h` SHA-256:
   `457c1114c0ee7e2f185a88124b015d56da97b2292c2ab09e8e67abb3b2d51995`
 - Accepted `src/SOURCE/GAME.cpp` SHA-256:
@@ -48,11 +56,11 @@ The counts and rows below are pinned to the following fully rebuilt state:
 - Accepted `src/SOURCE/SPELLS.cpp` SHA-256:
   `bb101342c4fea059a2fd1864212df6a48f5fc67c04ed59508ca4fa5c96c1842d`
 - `build/objdiff/report.json` SHA-256:
-  `c1d94570ff641b00bba0efdaafd74c996e02092897e4b7bb15413465aa430bab`
+  `160960e36ef529c2f3f0b7bc8849ce18ca10e1cfd8ab067ddee03b0aed1b3f3a`
 - `config/match_baseline.tsv` SHA-256:
-  `cc742c5111179bb5dfce9f82afe062413375a2d015b4d8f78d1ae44c4fc67763`
+  `20eb8b26d244086972d174fc8ffd1be510e50c81b82046e6999b61401ae959ae`
 - Sorted `rg -n '@early-stop' src/BASE` inventory SHA-256:
-  `bec091269258fa4034f177254f1dcad31ad20b7f7e02821dd7a5f290ee0a57d8`
+  `e3f46a4f232ec5a98f1c1a7a002499e8dc0ffb9ba36e25dd912b4cf45c05f473`
 
 Recompute all listed identities before reusing classifications after a root/header/source change.
 
@@ -60,10 +68,10 @@ Recompute all listed identities before reusing classifications after a root/head
 
 | Category | Marker count | Notes |
 | :--- | ---: | :--- |
-| `proven-artifact` | 11 | Eight ordinary function markers and three generated destructor aliases. |
+| `proven-artifact` | 10 | Seven ordinary function markers and three generated destructor aliases. |
 | `proven-soft-TU-cumulative` | 0 | No marker has the required frame/slot, standalone, combined-root, and exact-predecessor proof bundle. |
-| `unresolved/not-a-wall` | 54 | Includes three unproved deleting-destructor tradeoffs and two stale markers on exact functions. |
-| **Total** | **65** | Exactly 59 ordinary rows plus six generated-alias rows: one row per current source marker. |
+| `unresolved/not-a-wall` | 51 | Includes three unproved deleting-destructor tradeoffs and two stale markers on exact functions. |
+| **Total** | **61** | Exactly 55 ordinary rows plus six generated-alias rows: one row per current source marker. |
 
 Syntax/state defects found by the audit:
 
@@ -112,7 +120,6 @@ and live scores are shown as `retained/live`.
 | TU | RVA / function | Score | Classification | Current byte/reloc evidence | Tried record | Retry |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | `BITS` | `0x004d1594` `BitTest` | 47.6316/47.6316 | unresolved/not-a-wall | Δ=44; rel 0/0 | [source note](../src/BASE/BITS.cpp#L11) | R1 |
-| `BORDER` | `0x004d22f0` `border::Main` | 99.7989/99.7989 | proven-artifact | Δ=0 over all 0x181 bytes after 9/9 relocation-union masking; two external widget::Main calls agree, seven dispatch/table sites are local-owner aliases | [source note](../src/BASE/BORDER.cpp#L87) | A1 |
 | `Blur` | `0x004d28e0` `DoBlur` | 93.9030/93.9030 | unresolved/not-a-wall | Δ=1046; rel 43/43 | [source note](../src/BASE/Blur.cpp#L26) | R1 |
 | `Bzip` | `0x004d4470` `minUInt32` | 100.0000/99.8095 | unresolved/not-a-wall | Δ=4; rel 0/0 | [source note](../src/BASE/Bzip.cpp#L238) | R3 |
 | `Bzip` | `0x004d47a0` `arithDecodeSymbol` | 99.9730/99.9730 | unresolved/not-a-wall | Δ=2; rel 11/11 | [source note](../src/BASE/Bzip.cpp#L338) | R3 |
@@ -160,11 +167,8 @@ and live scores are shown as `retained/live`.
 | `TEXTWDGT` | `0x004d1060` `textWidget::textWidget()` | 97.3684/97.3684 | unresolved/not-a-wall | Δ=10; rel 2/2 | [source note](../src/BASE/TEXTWDGT.cpp#L14) | R2 |
 | `TEXTWDGT` | `0x004d10f0` `textWidget::textWidget(...)` | 99.2727/99.2727 | unresolved/not-a-wall | Δ=8; rel 4/4 | [source note](../src/BASE/TEXTWDGT.cpp#L38) | R2 |
 | `TEXTWDGT` | `0x004d1280` `textWidget::Main` | 99.6316/99.6316 | unresolved/not-a-wall | Δ=2; rel 6/6 | [source note](../src/BASE/TEXTWDGT.cpp#L88) | R2 |
-| `Textntry` | `0x004d8b90` `textEntryWidget::Main` | 99.8529/99.8529 | unresolved/not-a-wall | Δ=1 at `+0x21`; rel 55/55; claimed 0x9a8 frame is not raw-exact | [Textntry matrices](matching-matrices/README.md#basetextntry-manual-tu-state-and-lifetime-pass) | R2 |
-| `Textntry` | `0x004d9410` `textEntryWidget::Draw` | 99.9924/99.9924 | unresolved/not-a-wall | Δ=1 at `+0x6d`, stack displacement `0x0e` vs `0x0f`; rel 6/6 | [Textntry matrices](matching-matrices/README.md#basetextntry-manual-tu-state-and-lifetime-pass) | R2 |
 | `WIDGET` | `0x004dde00` `widget::widget` | 96.8261/96.8261 | unresolved/not-a-wall | Δ=18; rel 1/1 | [source note](../src/BASE/WIDGET.cpp#L30) | R2 |
 | `WIDGET` | `0x004dded0` `widget::Close` | unscored | proven-artifact | candidate named body and retail `empty_stub` are the same single `c3`, rel 0/0 | [empty-stub proof pattern](patterns/retail-empty-stubs.md) | A1 |
-| `WIDGET` | `0x004ddee0` `widget::Main` | 99.5667/99.5667 | unresolved/not-a-wall | Δ=14; rel 17/17 | [source note](../src/BASE/WIDGET.cpp#L86) | R2 |
 | `WINDOW` | `0x004cecd0` `heroWindow::heroWindow(resource)` | 99.9167/99.9167 | proven-artifact | Δ=0 over 0x521 bytes after 57 relocation payloads; 0x68 frame and EBP displacements exact; only folded dispatch/table identities remain | [WINDOW matrix](matching-matrices/README.md#basewindow-whole-tu-jump-table-revalidation) | A1 |
 | `droplist` | `0x004dc2e0` `dropListWidget::Main` | 99.8745/99.8745 | proven-artifact | Δ=0 over 0x350 bytes; rel 22/22; external sites agree and seven dispatch/table sites are owner-label aliases | [source note](../src/BASE/droplist.cpp#L126) | A1 |
 | `icon2bs` | `0x004d2f90` `IconToBitmapScale` | 76.3262/76.3262 | unresolved/not-a-wall | Δ=317; rel 4/4 | [source note](../src/BASE/icon2bs.cpp#L12) | R1 |
