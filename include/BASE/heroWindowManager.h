@@ -10,6 +10,10 @@ class palette;
 class bitmap;
 struct tag_message;
 
+typedef enum HeroWindowManagerConstant {
+    HERO_WINDOW_NO_HOVER_WIDGET = -1
+} HeroWindowManagerConstant;
+
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class heroWindowManager : public baseManager {
 public:
