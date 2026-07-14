@@ -7,6 +7,22 @@
 
 class ExpCampaign;
 
+#pragma pack(push, 1)
+struct SCmbtObstacle {
+    unsigned int terrainMask;
+    unsigned char minimumColumn;
+    unsigned char cellCount;
+    signed char cellOffsets[8];
+};
+
+struct SElevationOverlay {
+    unsigned short terrainMask;
+    signed char cellOffsets[15];
+};
+#pragma pack(pop)
+SIZE(SCmbtObstacle, 0xe);
+SIZE(SElevationOverlay, 0x11);
+
 enum {
     HERO_TYPE_INITIAL_COUNT = 8,
     EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT = 4,
@@ -123,7 +139,7 @@ extern unsigned char *giNumPowFrames;
 extern int giSpellEffectShowType;
 extern signed char gcColorToPlayerPos[8];
 extern char *cCombatBkgNames[20];
-extern struct SCmbtObstacle *sCmbtObstacles;
+extern struct SCmbtObstacle sCmbtObstacles[32];
 extern int gEstatesGoldLevel[4];
 extern float *gfSSLogisticsMod;
 extern float *gfSSNavigationMod;
@@ -149,7 +165,7 @@ extern unsigned short wallPos[4][2];
 extern unsigned short towerPos[4][2];
 extern unsigned short doorPos[2][2];
 extern float *fTradingPostEfficency;
-extern struct SElevationOverlay *sElevationOverlay;
+extern struct SElevationOverlay sElevationOverlay[25];
 extern int gbDrawingPuzzle;
 extern int giWalkingFrom;
 extern int giWalkingFrom2;

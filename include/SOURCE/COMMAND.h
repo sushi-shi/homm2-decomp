@@ -87,7 +87,6 @@ typedef enum CombatCommandConstant {
     COMBAT_INVALID_HEX = -1,
     COMBAT_IGNORED_HEX = -2,
     COMBAT_INVALID_COMMAND = -99,
-    COMBAT_CASTLE_GATE_APPROACH_HEX = 58,
     COMBAT_CASTLE_GATE_HEX = 59
 } CombatCommandConstant;
 
