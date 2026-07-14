@@ -38,9 +38,9 @@ font::~font()
 {
     gpResourceManager->Dispose(m_glyphIcon);
 }
-// The generated 0x39-byte deleting-destructor COMDAT is byte-identical to retail. The
-// delinked object contains two ??_E instances; MSVC emits one ??_G COMDAT with ??_E as its
-// weak alias, and the vtable relocation resolves through that alias.
+// The generated 0x39-byte ??_G COMDAT is raw-identical to both delinked retail ??_E copies;
+// its two relocations target ~font and operator delete. MSVC emits ??_E as a weak ??_G alias,
+// and the vtable relocation resolves through that alias, so the duplicate report rows are unscored.
 
 VA(0x004c7120, 0x24a)
 void font::DrawStringExecute(char *str, int x, int y, int mode,
@@ -110,10 +110,6 @@ int font::GetCharacterWidth(unsigned char c)
     }
 }
 
-// @early-stop
-// Raw masked compare: only +0x178..+0x17d and +0x1e8..+0x1ed differ (six bytes), from
-// TU-cumulative /Od load order in two equivalent index/start comparisons; frame slots,
-// logic, and all five relocations are exact (docs/patterns/tu-cumulative-eval-order.md).
 VA(0x004c7470, 0x313)
 void font::DrawBoundedString(char *str, int x, int y, int w, int h, int mode, int align)
 {
@@ -151,7 +147,8 @@ void font::DrawBoundedString(char *str, int x, int y, int w, int h, int mode, in
         if (w < lineWidth3) {
             idx--;
             wordBreak0 = 0;
-            while (text2[idx] != ' ' && idx >= lineStartD) {
+            // The SIB-equivalent lvalue makes VC4.2 load the other comparison operand first.
+            while (text2[idx] != ' ' && 0[&idx] >= lineStartD) {
                 lineWidth3 -= GetCharacterWidth(text2[idx]);
                 if (m_height * 2 + yOffC > h && lineWidth3 < w)
                     break;
@@ -159,7 +156,7 @@ void font::DrawBoundedString(char *str, int x, int y, int w, int h, int mode, in
                     wordBreak0 = idx;
                 idx--;
             }
-            if (idx <= lineStartD) {
+            if (0[&idx] <= lineStartD) {
                 idx = wordBreak0;
                 lineWidth3 = savedWidth;
             }
@@ -190,10 +187,6 @@ void font::DrawBoundedString(char *str, int x, int y, int w, int h, int mode, in
     }
 }
 
-// @early-stop
-// Raw masked compare: only +0xa7..+0xac, +0xd0..+0xd5, and +0x12a..+0x12f differ
-// (nine bytes), from TU-cumulative /Od load order in width/maxW comparisons; frame slots,
-// logic, and all three relocations are exact (docs/patterns/tu-cumulative-eval-order.md).
 VA(0x004c7790, 0x1b3)
 int font::LineLength(char *str, int maxW)
 {
@@ -208,16 +201,16 @@ int font::LineLength(char *str, int maxW)
     char *w = str;                       // ptr   @ -0x20
     int q, v;                            // unused @ -0x8, -0x1c
     while (p < s && w[p] != 0) {
-        while (w[p] != 0 && w[p] != '\n' && x <= maxW) {
+        while (w[p] != 0 && w[p] != '\n' && 0[&x] <= maxW) {
             x += GetCharacterWidth(w[p]);
             p++;
         }
-        if (x > maxW) {
+        if (0[&x] > maxW) {
             p--;
             gap = 0;
             while (w[p] != ' ' && p >= r) {
                 x -= GetCharacterWidth(w[p]);
-                if (gap == 0 && x < maxW)
+                if (gap == 0 && 0[&x] < maxW)
                     gap = p;
                 p--;
             }
@@ -244,7 +237,7 @@ int font::LineWidth(char *str)
     int q, u;                                   // unused @ -0x8, -0x18
     int y = 0, t = 0, r = 0, x = 0, p = 0, w = 0;  // zeroed in this order: -0x28,-0x14,-0xc,-0x24,-0x4(i),-0x20(width)
     char *v = str;                              // @ -0x1c
-    while (p < s && v[p] != 0) {
+    while (0[&p] < s && v[p] != 0) {
         while (v[p] != 0 && v[p] != '\n') {
             w += GetCharacterWidth(v[p]);
             p++;
