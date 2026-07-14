@@ -233,8 +233,8 @@ int inputManager::Open(int param_1)
     field_0x852 = param_1;
     field_0x85e = 0;
     MakeScanCodeTable();
-    field_0xc = 4;
-    field_0x10 = -1;
+    m_messageMask = 4;
+    m_priority = -1;
     m_active = 1;
     strcpy(name, "inputManager");
     return 0;

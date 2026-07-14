@@ -139,7 +139,7 @@ int executive::AddManager(class baseManager *mgr, int param_2)
     if (mgr == 0)
         return 3;
     if (param_2 == -1) {
-        param_2 = m_managerListTail == 0 ? 0 : m_managerListTail->field_0x10 + 1;
+        param_2 = m_managerListTail == 0 ? 0 : m_managerListTail->m_priority + 1;
     }
     if (mgr->m_active == 0 && mgr->Open(param_2) != 0)
         return 3;
@@ -147,7 +147,7 @@ int executive::AddManager(class baseManager *mgr, int param_2)
     baseManager *cur = m_managerListTail;
     if (cur != 0) {
         do {
-            if (cur->field_0x10 <= param_2)
+            if (cur->m_priority <= param_2)
                 break;
             cur = cur->m_prev;
         } while (cur != 0);

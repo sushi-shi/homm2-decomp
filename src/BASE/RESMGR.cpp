@@ -260,8 +260,8 @@ int resourceManager::Open(int param_1)
         return 3;
     if (LoadAggregateHeader(DEFAULT_AGGREGATE_NAME) != 0)
         return 3;
-    field_0xc = 0x80;
-    field_0x10 = param_1;
+    m_messageMask = 0x80;
+    m_priority = param_1;
     m_active = 1;
     strcpy(name, "resourceManager");
     m_resourceListHead = 0;

@@ -302,8 +302,8 @@ int advManager::Open(int id)
     giBottomViewOverride = 0;
     gConfig.soundVolume = oldSampleVolume;
     gpSoundManager->AdjustSoundVolumes();
-    field_0xc = ADVMGR_MANAGER_MESSAGE;
-    field_0x10 = id;
+    m_messageMask = ADVMGR_MANAGER_MESSAGE;
+    m_priority = id;
     m_active = 1;
     strcpy(name, "advManager");
     return 0;

@@ -46,8 +46,8 @@ int highScoreManager::Open(int id)
         MemError();
     Update();
     gpWindowManager->AddWindow(m_window, -1, 1);
-    field_0xc = HIGH_SCORE_MESSAGE_EXECUTIVE;
-    field_0x10 = id;
+    m_messageMask = HIGH_SCORE_MESSAGE_EXECUTIVE;
+    m_priority = id;
     m_active = 1;
     strcpy(name, "highScoreManager");
     KBChangeMenu(hmnuDflt);

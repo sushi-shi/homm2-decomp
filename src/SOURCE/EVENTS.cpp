@@ -5164,7 +5164,8 @@ int advManager::DoCombat(int x, int y, hero *firstHero, armyGroup *firstArmy,
     } else if (giHighMemBuffer > 900)
         gAdvDisposeLevel = 1;
     gpExec->CallManager(gpCombatManager);
-    gpMouseManager->SetPointer(const_cast<char *>("advmice.mse"), 0, -999);
+    gpMouseManager->SetPointer(const_cast<char *>("advmice.mse"), 0,
+                               MOUSE_AUTO_CURSOR_TYPE);
     gAdvDisposeLevel = 0;
 
 combatFinished:

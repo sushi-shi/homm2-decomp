@@ -11,8 +11,8 @@ baseManager::baseManager(void)
 {
     m_next = 0;
     m_prev = 0;
-    field_0x10 = -1;
-    field_0xc = -1;
+    m_priority = -1;
+    m_messageMask = -1;
     m_active = 0;
     strcpy(name, "Unknown");
 }
