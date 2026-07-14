@@ -883,33 +883,33 @@ void BlitBitmapToScreenNoMouseCheck(class bitmap *bmp, int sourceX, int sourceY,
 }
 
 // @match-note
-// Structurally complete /O2 checkpoint: base is 0x18c versus retail 0x18b; both use an
-// eight-byte frame and the same 13-branch/four-blit CFG.  Relocation targets agree, but
-// base has 23 occurrences versus retail 24. In this function retail gpMouseManager is
-// +0x89/+0xae/+0xcc/+0x108/+0x135/+0x158; base is
-// +0x8d/+0xb1/+0x109/+0x136/+0x159. Retail loads the horizontal owner at +0xae and reloads
-// it at +0xcc for the vertical test; base loads once at +0xb1 and carries EAX across both axes.
-// The first raw divergence is +0x18, where base reloads the spilled bitmap before the first VESA
-// call. The decomp's wrong AND was corrected to OR. A flat condition, nested two-stage test,
-// explicit horizontal/vertical subtrees, reversed positive comparisons, direct parameters,
-// saved-coordinate locals, and `(&gpMouseManager)[0]` were tried. Semantic parameter names on the
-// exact preceding no-mouse wrapper and renaming the real volatile spill to sourceBitmap are
-// byte-identical and do not perturb the downstream allocation. The missing owner occurrence is
-// unresolved, not a delinker artifact or proven wall.
+// Structurally complete /O2 checkpoint: base is 0x188 versus retail 0x18b; both use the
+// eight-byte frame and same 13-branch/four-blit CFG. External relocation identity/order is exact,
+// but base has 23 occurrences versus retail 24. The instruction stream agrees through the IsVis
+// test; the first opcode divergence is +0xac, where base loads gpMouseManager into EAX and carries
+// it through both axes. Retail loads it into ECX at +0xac (reloc +0xad), then reloads it into EAX
+// at +0xcb (reloc +0xcc) for the vertical test. Union-masking relocation fields leaves 270 common
+// comparable bytes, 121 different (+0xa8..+0x187; +0xa8 is the shifted local branch), and a
+// three-byte retail tail. Using bmp directly on the early call, placing the real width assignment
+// between sourceX/sourceY, and declaring savedY before savedX recovered the call, scroll and saved
+// coordinate schedules. Flat and fully nested predicates, relational operand reversal, sourceX
+// splitting and width-first order were retested; the latter two changed broad register allocation.
+// The libclang AST pass found 22 value-preserving variants and retained none after a 30-walk pass.
+// Revisit through exact-preserving predecessor/TU state; this CSE residual is not a proven wall.
 VA(0x004c5ee0, 0x18b)
 void BlitBitmapToScreen(class bitmap *bmp, int sourceX, int sourceY, int width, int height,
                         int destinationX, int destinationY)
 {
     bitmap *volatile sourceBitmap = bmp;
     if (gbColorMice == 0) {
-        BlitBitmapToScreenVesa(reinterpret_cast<int>(sourceBitmap), sourceX, sourceY, width, height,
+        BlitBitmapToScreenVesa(reinterpret_cast<int>(bmp), sourceX, sourceY, width, height,
                                destinationX, destinationY);
         return;
     }
     if (giScrollX != 0 || giScrollY != 0) {
         sourceX = giScrollX + 0x10;
-        sourceY = giScrollY + 0x10;
         width = 0x1c0;
+        sourceY = giScrollY + 0x10;
         height = 0x1c0;
     }
     gBlitRight = width + destinationX - 1;
@@ -925,8 +925,8 @@ void BlitBitmapToScreen(class bitmap *bmp, int sourceX, int sourceY, int width, 
                 gpMouseManager->m_savedLeft < destinationX ||
                 gpMouseManager->m_cursorBottom > gBlitBottom ||
                 gpMouseManager->m_savedTop < destinationY) {
-                int savedX = gpMouseManager->m_savedLeft;
                 int savedY = gpMouseManager->m_savedTop;
+                int savedX = gpMouseManager->m_savedLeft;
                 BlitBitmapToScreenVesa(reinterpret_cast<int>(sourceBitmap), savedX, savedY,
                                        gpMouseManager->m_cursorRight - savedX + 1,
                                        gpMouseManager->m_cursorBottom - savedY + 1, savedX, savedY);
