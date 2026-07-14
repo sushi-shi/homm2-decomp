@@ -39,6 +39,12 @@ enum {
     X_GLOBAL_RECRUIT_BUY_COUNT = 5,
     X_GLOBAL_PASSWORD_STRING_COUNT = 211,
     X_GLOBAL_STABLE_TEXT_COUNT = 4,
+    X_GLOBAL_SETUP_HELP_COUNT = 4,
+    X_GLOBAL_EXPANSION_CAMPAIGN_COUNT = 4,
+    X_GLOBAL_EXPANSION_CAMPAIGN_MAP_COUNT = 8,
+    X_GLOBAL_EXPANSION_CAMPAIGN_AWARD_COUNT = 12,
+    X_GLOBAL_EXPANSION_HERO_NAME_COUNT = 6,
+    X_GLOBAL_SHORT_SKILL_LEVEL_COUNT = 4,
     GLOBAL_MAP_NAME_SIZE = 0x18,
     GLOBAL_TCP_TEXT_SIZE = 0x18,
     GLOBAL_AGGREGATE_PATH_SIZE = 0x160,
@@ -50,11 +56,22 @@ extern signed char xIsExpansionMap;
 extern int xLastChoice;
 extern unsigned char xIsPlayingExpansionCampaign;
 extern class ExpCampaign xCampaign;
+extern char *xSetupCampaignGameHelp[X_GLOBAL_SETUP_HELP_COUNT];
+extern char *xSetupStandardGameHelp[X_GLOBAL_SETUP_HELP_COUNT];
+extern char *xCampaignAwards[X_GLOBAL_EXPANSION_CAMPAIGN_AWARD_COUNT];
+extern char *xScenarioName[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT]
+                          [X_GLOBAL_EXPANSION_CAMPAIGN_MAP_COUNT];
+extern char *xScenarioDescription[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT]
+                                 [X_GLOBAL_EXPANSION_CAMPAIGN_MAP_COUNT];
+extern char *xShortCampaignNames[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT];
 extern char *xHSCampaignNames[EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT];
 extern int xTheSpell;
 extern char *xNecromancerShrine;
 extern char *xNecromancerShrineDesc;
 extern char *xStableText[X_GLOBAL_STABLE_TEXT_COUNT];
+extern char *xJosephName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT];
+extern char *xUncleIvanName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT];
+extern char *xShortSSLevelNames[X_GLOBAL_SHORT_SKILL_LEVEL_COUNT];
 extern char *xPasswordStrings[X_GLOBAL_PASSWORD_STRING_COUNT];
 extern int xPasswordStringsIndex[];
 extern int xShrineBuildingCost[];
