@@ -36,16 +36,16 @@ void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, 
 {
     unsigned char *src = reinterpret_cast<unsigned char *>(srcIcon->m_data);
     int x0 = x;
+    int w;
     IconEntry *entry = reinterpret_cast<IconEntry *>(src) + frame;
-    int w = entry->w;
+    w = entry->w;
     x0 = x0 - entry->x;
     x0 = x0 - w;
     gFCEntry = entry;
     src += entry->srcOffset;
     x0++;
     gFCX0 = x0;
-    int X = w + x0 - 1;
-    gFCXEnd = X;
+    int X = (gFCXEnd = w + x0 - 1);
     int Y = y + entry->y;
     gFCY = Y;
     if (clip != 0) {
