@@ -17,7 +17,7 @@ public:
     short m_gridRight;  // +0x08
     short m_gridBodyBottom;  // +0x0a
     short m_gridBottom;  // +0x0c
-    char   m_blocked;  // +0x0e
+    unsigned char m_blocked;  // +0x0e
     signed char m_obstacleIndex;  // +0x0f
     signed char m_occupantSide;  // +0x10
     signed char m_occupantIndex;  // +0x11
