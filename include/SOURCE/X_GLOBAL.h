@@ -112,7 +112,7 @@ extern int iMPNetProtocol;
 extern int iLastDiffSendTo;
 extern char *cArmyFrameFileNames[66];
 extern unsigned char *gcSpellInfluenceIcons;
-extern unsigned char *giSpellInfluenceToSpell;
+extern unsigned char giSpellInfluenceToSpell[16];
 extern unsigned char *giNumPowFrames;
 extern int giSpellEffectShowType;
 extern signed char gcColorToPlayerPos[8];
