@@ -10,15 +10,18 @@
 #include <BASE/resourceManager.h>
 #include <SOURCE/KB.h>
 #include <string.h>
-// @early-stop
-// base/retail .text are both 0x181. Relocation-masked raw comparison differs in
-// exactly 27 bytes at +0x24..+0x25, +0x29..+0x39, +0x43..+0x48, and +0x4b..+0x4c:
-// base hoists EBP=2 across the resource constructor and schedules strcpy's EAX zero
-// after the volume store; retail schedules both after the argument reloads. Bytes
-// +0x4d..+0x180 are identical, including the switch table and load tail. Relocations
-// resolve base 7/retail 23, only-base=0; the extra retail entries are local jump-table
-// aliases. Moving/splitting formatFlags initialization and all member-store orders
-// were exhausted; later placement regresses the otherwise exact loop/tail.
+// @match-note
+// First divergence: base +0x24 hoists `mov ebp,2` across resource::resource;
+// retail +0x24 calls the constructor and assigns EBP after the three argument reloads.
+// Relocation-masked raw bytes differ only at +0x24..+0x25, +0x29..+0x39,
+// +0x43..+0x48, and +0x4b..+0x4c (27 bytes); +0x4d..+0x180 are identical.
+// Both are FPO with the exact 0x20 filename area, callee-save set, stack accesses,
+// CFG, switch tables, and load tail. Manual COFF review gives 23/23 relocations;
+// `homm2 relocs` undercounts base as 7 because its local $L jump-table symbols do
+// not survive delinking. Joined/split pre-store formatFlags initialization is
+// byte-identical; placing the assignment after m_channelType reaches 96.47% and
+// perturbs strcpy lowering. Revisit only after a real TU/header-state change or in
+// the >=95% last-mile phase; do not repeat the recorded shapes.
 VA(0x004dad60, 0x181)
 sample::sample(char *name, long channelType, long volume, long loopCount)
     : resource(6, gpResourceManager->MakeId(name, 1), 1, 0)

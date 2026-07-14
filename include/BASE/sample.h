@@ -5,17 +5,17 @@
 #include <va.h>
 #include <BASE/resource.h>
 
-enum sampleAudioFormat {
+typedef enum sampleAudioFormat {
     SAMPLE_FORMAT_8_BIT = 0,
     SAMPLE_FORMAT_16_BIT = 1,
     SAMPLE_FORMAT_STEREO = 2
-};
+} sampleAudioFormat;
 
-enum samplePlaybackRate {
+typedef enum samplePlaybackRate {
     SAMPLE_RATE_11025 = 11025,
     SAMPLE_RATE_22050 = 22050,
     SAMPLE_RATE_44100 = 44100
-};
+} samplePlaybackRate;
 
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class sample : public resource {
