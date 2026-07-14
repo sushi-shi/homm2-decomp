@@ -6,31 +6,25 @@
 #include <va.h>
 #include <BASE/WINMGR.h>
 #include <BASE/heroWindowManager.h>
-#include <BASE/bitmap.h>
-#include <BASE/Misc.h>
-#include <BASE/bmap2.h>
-#include <BASE/mouseManager.h>
-#include <BASE/heroWindow.h>
 #include <BASE/palette.h>
-#include <BASE/inputManager.h>
-#include <BASE/resourceManager.h>
-#include <stdio.h>
 #include <string.h>
-#include <SOURCE/kbwin.h>
 #include <SOURCE/wingraph.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <_globals_model.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/NOOPT.h>
 // @match-note
 // Structurally complete /O2 checkpoint: base is 0x391 bytes/255 instructions
 // versus retail's 0x3a3/261, with the same 0xc frame, 33 blocks and 23 branches.
 // Retail's three reflection tests are `frame >= 5`, `frame >= 5`, and `frame >= 4`;
 // those spellings and the distinct cycle/palette constant domains are now explicit.
-// Moving the unrelated fade-only static below this function changed the legitimate
-// predecessor state and raised this function's observed peak to 95.33%, but VC42
-// still tail-merges the default path's final three-byte copy into the non-default
-// copy. Retail instead writes the saved color through a separate gCyclePal+66 base
+// CycleColors is the TU's first CodeView/source-order function, so there is no
+// predecessor body to repair. Moving the unrelated fade-only static and headers
+// used only by later methods below this body gives it the minimal real declaration
+// state and raises live matching from 94.59% to 95.33%. The actual instruction gain
+// is in the alternate-combat reflection: VC42 now selects the result in EAX like
+// retail instead of ESI, removing one byte before the still-different address chain.
+// Moving bitmap.h or Misc.h alone emitted the old code; moving both later is
+// the exact state trigger. VC42 still tail-merges the default path's final three-byte
+// copy into the non-default copy. Retail writes through a separate gCyclePal+66 base
 // and jumps directly to the palette update, so one CFG edge and one relocation
 // occurrence remain different: 70/71, no wrong or excess target. An explicit
 // word/byte store recovered the edge but emitted 72/71 by separately relocating
@@ -38,8 +32,11 @@
 // Under the new enum/predecessor state the retail-evidenced pointer-terminated loop
 // scored 94.00% and still emitted 70/71, so it was rejected. Signed palette-byte
 // storage was byte-neutral. Direct-global frame and forced `| 0` forms were also
-// ineffective. Revisit only after another real header/TU-state change; do not
-// repeat local copy/predicate synonyms or synthesize the missing relocation.
+// ineffective. Splitting the cycle enums into a narrow predecessor header emitted
+// 0x390 bytes at 94.52%, remained 70/71, and regressed a later exact method; required
+// header reorderings were byte-neutral. Revisit only after another real reachable
+// header reconstruction; do not repeat local copy/predicate synonyms or synthesize
+// the missing relocation.
 VA(0x004ca6d0, 0x3a3)
 void CycleColors(int forceUpdate)
 {
@@ -156,6 +153,18 @@ updatePalette:
         UpdatePalette(gpBufferPalette->m_data);
     }
 }
+
+#include <BASE/bitmap.h>
+#include <BASE/Misc.h>
+#include <BASE/bmap2.h>
+#include <BASE/mouseManager.h>
+#include <BASE/heroWindow.h>
+#include <BASE/inputManager.h>
+#include <BASE/resourceManager.h>
+#include <stdio.h>
+#include <SOURCE/kbwin.h>
+#include <_globals_model.h>
+#include <SOURCE/NOOPT.h>
 
 // ---- module-private synthetic globals (retail xref: single-module) ----
 DATA(0x0053496c) static unsigned int gFadeSavedUpdate; // saved update flag across a fade (heroWindowManager::FadeScreen)
