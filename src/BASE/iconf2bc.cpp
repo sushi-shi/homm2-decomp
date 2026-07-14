@@ -4,11 +4,10 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
-#include <BASE/iconf2bc.h>
+#include <BASE/IconEntry.h>
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <BASE/Misc.h>
 #include <string.h>
 // Per-call decoder scratch — its own file-static block (0x5380c0+).
 static int gFCSkip;

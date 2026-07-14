@@ -1,11 +1,11 @@
 # BASE/iconf2bc experiment matrix
 
-Current integrated state: checkpoint `eda2a36`, source SHA-256
-`98ba8916cb186d89ddcded1d270e23cdf72430d2f063a25670a9b8b66021084d`.
-Retail RVA/size `0xd9790` / `0x54d`; canonical candidate 83.458435%, function end `0x54f`,
-frame `sub esp,8`, 86 candidate vs 83 retail relocations. Decoder entry is exact at `+0xec`.
-All relocation occurrence counts agree except candidate has three excess `gFCY` loads (setup,
-clipped fill, clipped dim; one each). No base-only relocation target.
+Current retained working state: source SHA-256
+`bcf4f468adf3b75d8226120b3eb00a72ba98833d8aea434625f13dba3e9b5cad`.
+Retail RVA/size `0xd9790` / `0x54d`; canonical candidate 85.166245%, function end `0x540`,
+frame `sub esp,8`, 84 candidate vs 83 retail relocations. Decoder entry is at `+0xe9` versus
+retail `+0xec`. Relocation occurrence counts agree except for one excess setup `gFCY` load;
+the previous clipped-fill and clipped-dim excess loads are gone. No base-only relocation target.
 
 The new-experiment table began at checkpoint `838105c` / source checkpoint `7386907`, SHA-256
 `648ecb4b963c5b97aea5908738d26509ad680853a3041817321b61aa955070f9`, score 83.4333%,
@@ -92,3 +92,13 @@ retained/reverted/byte-identical disposition.
 | `98ba8916cb186d89ddcded1d270e23cdf72430d2f063a25670a9b8b66021084d` | initialized Y snapshots on improved state | 83.458435% | `0x54f`, `sub esp,8` | 86/83 | byte-identical to improved state; retained cleaner form |
 | `b502d033aef2e99e590c272a5cb46602ace6c7c582b7464df01b4f13a4171d4c` | staged right-skip arithmetic plus common publication | 83.458435% | `0x54f`, `sub esp,8` | 86/83 | byte-identical; reverted |
 | `a125d93a04d126d03a3634cc2672e10287ce933cdb2bb4af38bad52b6534f4a4` | split clipped source fetch after destination snapshot | 83.458435% | `0x54f`, `sub esp,8` | 86/83 | byte-identical; reverted |
+| `bcf4f468adf3b75d8226120b3eb00a72ba98833d8aea434625f13dba3e9b5cad` | narrow `IconEntry.h` plus remove redundant owner header | 85.166245% | `0x540`, `sub esp,8`; decoder `+0xe9` | 84/83 | removes fill/dim excess `gFCY` loads; retained active checkpoint, not a wall |
+| `697ed6e1b172cdf99421c052ca2d90172e67bbafcbe6e988e75259fea8bb3ffe` | narrow `IconEntry.h` while retaining owner header | 77.77078% | `0x545`, `sub esp,8`; decoder `+0xea` | 84/83; 9 `gFCY` | broad allocation regression; reverted |
+| `35e4408a6b2d1a69459451e7cdc9096460c4d3b89233c1f0fdc816da6da48c58` | remove redundant owner header while retaining broad `Misc.h` | 78.22418% | `0x54a`, `sub esp,8`; decoder `+0xea` | 84/83; 9 `gFCY` | broad allocation regression; reverted |
+| `5c2ba8f663e24756bfdff86b78a483288050594204c637595fff2bade54eccf4` | setup Y snapshot assigned in the vertical predicate on narrow-header state | 85.166245% | `0x540`, `sub esp,8`; decoder `+0xe9` | 84/83; 9 `gFCY` | byte-identical to narrow-header state; reverted |
+| `59e4f5ad980e774cd2cb807314b0ceb876a4d6b654bd7e427cfb5d3b5ce13dcc` | commute first setup vertical failure comparison | 85.166245% | `0x540`, `sub esp,8`; decoder `+0xe9` | 84/83; 9 `gFCY` | byte-identical to narrow-header state; reverted |
+| `79363de918b72c755599d6d6243e68490ab582b90aa00ec1f2bebf2c10376b2c` | suppress direct `IconEntry` `SIZE` assertion | 80.13% | `0x54a`, `sub esp,8`; decoder `+0xea` | 84/83; 9 `gFCY` | cumulative allocation regression; reverted |
+| `8e19b127a25bb474d8d83700801adabc6055e75b4e59f237a3c28276600b2f50` | setup width local renamed semantically | 85.166245% | `0x540`, `sub esp,8`; decoder `+0xe9` | 84/83; 9 `gFCY` | byte-identical to narrow-header state; reverted |
+| `d18bb112c68e68d111024756da512d516fdd1d5139f9ddef36e05847c639914d` | spell frame-source advance as indexed address | 85.166245% | `0x540`, `sub esp,8`; decoder `+0xe9` | 84/83; 9 `gFCY` | byte-identical to narrow-header state; reverted |
+| `60f84d3ce650a829ac27589809c565bdd6b41f78843ce5a19fadda070ef85ed6` | volatile setup width to force retail-like spill | 84.74307% | `0x553`, `sub esp,12`; decoder `+0xfe` | 84/83; 9 `gFCY` | extra lifetime/frame and broad allocation regression; reverted |
+| `0074b3450ba5602ea6871aaeb2913847843fa49b369ae1cb4902cf2e4a99fb6e` | bound setup width/Y snapshots to a lexical block | 85.166245% | `0x540`, `sub esp,8`; decoder `+0xe9` | 84/83; 9 `gFCY` | byte-identical to narrow-header state; reverted |
