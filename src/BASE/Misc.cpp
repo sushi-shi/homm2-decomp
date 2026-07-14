@@ -3,6 +3,7 @@
 // functions: 46   data: 11
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
+#define HOMM2_MISC_INLINE_ICONENTRY
 #include <va.h>
 #include <SOURCE/kbwin.h>
 #include <BASE/heroWindow.h>
@@ -14,6 +15,7 @@
 #include <BASE/font.h>
 #include <BASE/textEntryWidget.h>
 #include <BASE/Misc.h>
+#undef HOMM2_MISC_INLINE_ICONENTRY
 #include <BASE/miscwin.h>        // this TU's own free functions + indexArray/IconEntry
 #include <SOURCE/KB.h>        // EventWindowHandler, FileError, ShutDown
 #include <SOURCE/wingraph.h>
@@ -1176,7 +1178,7 @@ void CreatePCXFile(char *filename, unsigned char *pixels, int width, int height,
         return;
     _write(file, &header, sizeof(header));
     unsigned char *encoded = static_cast<unsigned char *>(
-        BaseAlloc(width * 2, "I:\\Projects\\Heroes\\Prog\\BASE\\Misc.cpp", 0x5c8));
+        H2_ALLOC(width * 2, "I:\\Projects\\Heroes\\Prog\\BASE\\Misc.cpp", 0x5c8));
     for (int row = 0; row < height; ++row) {
         int sourceIndex = 0;
         unsigned int encodedSize = 0;
@@ -1198,15 +1200,15 @@ void CreatePCXFile(char *filename, unsigned char *pixels, int width, int height,
         _write(file, encoded, encodedSize);
         pixels += width;
     }
-    BaseFree(encoded, "I:\\Projects\\Heroes\\Prog\\BASE\\Misc.cpp", 0x5f0);
+    H2_FREE(encoded, "I:\\Projects\\Heroes\\Prog\\BASE\\Misc.cpp", 0x5f0);
     unsigned char paletteMarker = 0x0c;
     _write(file, &paletteMarker, 1);
     unsigned char *outputPalette = static_cast<unsigned char *>(
-        BaseAlloc(0x300, "I:\\Projects\\Heroes\\Prog\\BASE\\Misc.cpp", 0x5f6));
+        H2_ALLOC(0x300, "I:\\Projects\\Heroes\\Prog\\BASE\\Misc.cpp", 0x5f6));
     for (int i = 0; i < 0x300; ++i)
         outputPalette[i] = paletteData[i] << 2;
     _write(file, outputPalette, 0x300);
-    BaseFree(outputPalette, "I:\\Projects\\Heroes\\Prog\\BASE\\Misc.cpp", 0x5fb);
+    H2_FREE(outputPalette, "I:\\Projects\\Heroes\\Prog\\BASE\\Misc.cpp", 0x5fb);
     _close(file);
 }
 

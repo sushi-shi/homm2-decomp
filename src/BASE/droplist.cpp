@@ -34,8 +34,8 @@ dropListWidget::~dropListWidget()
     if (m_savedBackground != 0)
         delete m_savedBackground;
     for (int itemIndex = 0; itemIndex < m_itemCount; itemIndex++)
-        BaseFree(m_items[itemIndex], __FILE__, 25);
-    BaseFree(m_items, __FILE__, 27);
+        H2_FREE(m_items[itemIndex], "I:\\Projects\\Heroes\\Prog\\BASE\\droplist.cpp", 25);
+    H2_FREE(m_items, "I:\\Projects\\Heroes\\Prog\\BASE\\droplist.cpp", 27);
 }
 
 VA(0x004dbfe0, 0x21d)
@@ -107,16 +107,16 @@ void dropListWidget::DeleteItem(int index)
         if (m_selectedIndex == index)
             m_selectedIndex = -1;
         if (m_itemCount == 1) {
-            BaseFree(m_items[0], __FILE__, 111);
-            BaseFree(m_items, __FILE__, 112);
+            H2_FREE(m_items[0], "I:\\Projects\\Heroes\\Prog\\BASE\\droplist.cpp", 111);
+            H2_FREE(m_items, "I:\\Projects\\Heroes\\Prog\\BASE\\droplist.cpp", 112);
             m_items = 0;
         } else {
-            char **newItems = static_cast<char **>(BaseAlloc(m_itemCount * 4 - 4, __FILE__, 117));
+            char **newItems = static_cast<char **>(H2_ALLOC(m_itemCount * 4 - 4, "I:\\Projects\\Heroes\\Prog\\BASE\\droplist.cpp", 117));
             memcpy(newItems, m_items, m_itemCount * 4 - 4);
             if (m_itemCount - index - 1 > 0)
                 memcpy(newItems + index, m_items + index + 1, (m_itemCount - index - 1) * 4);
             if (m_items != 0)
-                BaseFree(m_items, __FILE__, 123);
+                H2_FREE(m_items, "I:\\Projects\\Heroes\\Prog\\BASE\\droplist.cpp", 123);
             m_items = newItems;
         }
         m_itemCount--;
@@ -179,14 +179,14 @@ int dropListWidget::Main(tag_message &message)
         case 0x38:
             if (m_id == message.field8) {
                 char *text = message.text;
-                char **newItems = static_cast<char **>(BaseAlloc(m_itemCount * 4 + 4, __FILE__, 184));
+                char **newItems = static_cast<char **>(H2_ALLOC(m_itemCount * 4 + 4, "I:\\Projects\\Heroes\\Prog\\BASE\\droplist.cpp", 184));
                 if (m_itemCount != 0)
                     memcpy(newItems, m_items, m_itemCount * 4);
-                newItems[m_itemCount] = static_cast<char *>(BaseAlloc(strlen(text) + 1, __FILE__, 187));
+                newItems[m_itemCount] = static_cast<char *>(H2_ALLOC(strlen(text) + 1, "I:\\Projects\\Heroes\\Prog\\BASE\\droplist.cpp", 187));
                 strcpy(newItems[m_itemCount], text);
                 m_itemCount++;
                 if (m_items != 0)
-                    BaseFree(m_items, __FILE__, 191);
+                    H2_FREE(m_items, "I:\\Projects\\Heroes\\Prog\\BASE\\droplist.cpp", 191);
                 m_items = newItems;
             }
             break;
@@ -194,8 +194,8 @@ int dropListWidget::Main(tag_message &message)
             if (m_id == message.field8) {
                 char *text = message.text;
                 if (message.fieldC < m_itemCount) {
-                    BaseFree(m_items[message.fieldC], __FILE__, 173);
-                    m_items[message.fieldC] = static_cast<char *>(BaseAlloc(strlen(text) + 1, __FILE__, 174));
+                    H2_FREE(m_items[message.fieldC], "I:\\Projects\\Heroes\\Prog\\BASE\\droplist.cpp", 173);
+                    m_items[message.fieldC] = static_cast<char *>(H2_ALLOC(strlen(text) + 1, "I:\\Projects\\Heroes\\Prog\\BASE\\droplist.cpp", 174));
                     strcpy(m_items[message.fieldC], text);
                 }
             }

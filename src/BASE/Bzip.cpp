@@ -612,9 +612,9 @@ void sendMTFVal(BitStream *bs, Int32 n)
 VA(0x004d5270, 0x94)
 void FreeCompressStructures(void)
 {
-    if (words != NULL) BaseFree(words, BZFILE, 0x461);
-    if (ftab  != NULL) BaseFree(ftab,  BZFILE, 0x462);
-    if (zptr  != NULL) BaseFree(zptr,  BZFILE, 0x463);
+    if (words != NULL) H2_FREE(words, BZFILE, 0x461);
+    if (ftab  != NULL) H2_FREE(ftab,  BZFILE, 0x462);
+    if (zptr  != NULL) H2_FREE(zptr,  BZFILE, 0x463);
     words = NULL;
     ftab  = NULL;
     zptr  = NULL;
@@ -625,9 +625,9 @@ void allocateCompressStructures(void)
 {
     Int32 n = 100000 * blockSize100k;
     FreeCompressStructures();
-    words = (UInt32 *)BaseAlloc((n + MAX_DENORM_OFFSET) * sizeof(Int32) + 1, BZFILE, 0x475);
-    zptr  = (Int32 *)BaseAlloc(n                        * sizeof(Int32) + 1, BZFILE, 0x476);
-    ftab  = (Int32 *)BaseAlloc(65537                    * sizeof(Int32) + 1, BZFILE, 0x477);
+    words = (UInt32 *)H2_ALLOC((n + MAX_DENORM_OFFSET) * sizeof(Int32) + 1, BZFILE, 0x475);
+    zptr  = (Int32 *)H2_ALLOC(n                        * sizeof(Int32) + 1, BZFILE, 0x476);
+    ftab  = (Int32 *)H2_ALLOC(65537                    * sizeof(Int32) + 1, BZFILE, 0x477);
 
     if (words == NULL || zptr == NULL || ftab == NULL) {
         Int32 totalDraw = (n + MAX_DENORM_OFFSET) * sizeof(Int32) +
@@ -641,9 +641,9 @@ void allocateCompressStructures(void)
 VA(0x004d53e0, 0x94)
 void FreeDecompressStructures(void)
 {
-    if (block != NULL) BaseFree(block, BZFILE, 0x489);
-    if (ll    != NULL) BaseFree(ll,    BZFILE, 0x48a);
-    if (zptr  != NULL) BaseFree(zptr,  BZFILE, 0x48b);
+    if (block != NULL) H2_FREE(block, BZFILE, 0x489);
+    if (ll    != NULL) H2_FREE(ll,    BZFILE, 0x48a);
+    if (zptr  != NULL) H2_FREE(zptr,  BZFILE, 0x48b);
     block = NULL;
     ll    = NULL;
     zptr  = NULL;
@@ -660,9 +660,9 @@ void setDecompressStructureSizes(Int32 newSize100k)
 
     if (newSize100k != 0) {
         Int32 n = 100000 * newSize100k;
-        block = (UChar *)BaseAlloc(n * sizeof(UChar) + 1, BZFILE, 0x4a1);
-        ll    = (UChar *)BaseAlloc(n * sizeof(UChar) + 1, BZFILE, 0x4a2);
-        zptr  = (Int32 *)BaseAlloc(n * sizeof(Int32) + 1, BZFILE, 0x4a3);
+        block = (UChar *)H2_ALLOC(n * sizeof(UChar) + 1, BZFILE, 0x4a1);
+        ll    = (UChar *)H2_ALLOC(n * sizeof(UChar) + 1, BZFILE, 0x4a2);
+        zptr  = (Int32 *)H2_ALLOC(n * sizeof(Int32) + 1, BZFILE, 0x4a3);
 
         if (block == NULL || ll == NULL || zptr == NULL) {
             Int32 totalDraw = 6 * n * sizeof(UChar);

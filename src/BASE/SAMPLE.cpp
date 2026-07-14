@@ -60,7 +60,7 @@ sample::sample(char *name, long channelType, long volume, long loopCount)
 
     unsigned long size = gpResourceManager->GetFileSize(m_id);
 #line 57
-    m_data = static_cast<char *>(BaseAlloc(size, __FILE__, __LINE__));
+    m_data = static_cast<char *>(H2_ALLOC(size, "I:\\Projects\\Heroes\\Prog\\BASE\\SAMPLE.CPP", 0x39));
     m_size = size;
     gpResourceManager->PointToFile(m_id);
     gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(m_data), size);
@@ -76,7 +76,7 @@ VA(0x004daf40, 0x2c)
 inline sample::~sample()
 {
 #line 97
-    BaseFree(m_data, __FILE__, __LINE__);
+    H2_FREE(m_data, "I:\\Projects\\Heroes\\Prog\\BASE\\SAMPLE.CPP", 0x61);
     m_data = 0;
     m_size = 0;
     m_volume = 0;
@@ -87,7 +87,7 @@ MIDIWrap::MIDIWrap(char *name) : resource(6, gpResourceManager->MakeId(name, 1),
 {
     unsigned long size = gpResourceManager->GetFileSize(m_id);
 #line 110
-    m_data = static_cast<char *>(BaseAlloc(size, __FILE__, __LINE__));
+    m_data = static_cast<char *>(H2_ALLOC(size, "I:\\Projects\\Heroes\\Prog\\BASE\\SAMPLE.CPP", 0x6e));
     gpResourceManager->PointToFile(m_id);
     gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(m_data), size);
 }
@@ -102,7 +102,7 @@ VA(0x004db030, 0x28)
 inline MIDIWrap::~MIDIWrap()
 {
 #line 118
-    BaseFree(m_data, __FILE__, __LINE__);
+    H2_FREE(m_data, "I:\\Projects\\Heroes\\Prog\\BASE\\SAMPLE.CPP", 0x76);
     m_data = 0;
 }
 

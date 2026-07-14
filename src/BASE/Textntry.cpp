@@ -64,7 +64,7 @@ textEntryWidget::textEntryWidget(short p1, short p2, short p3, short p4, short p
     m_rectH = m_height;
 #line 61 "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp"
     m_text = static_cast<char *>(
-        BaseAlloc(static_cast<unsigned short>(p5) + 5, __FILE__, __LINE__));
+        H2_ALLOC(static_cast<unsigned short>(p5) + 5, "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp", 0x3e));
     strcpy(m_text, p6);
     if (p13 == 4) {
         m_innerX = p14 + m_x;
@@ -94,7 +94,7 @@ void textEntryWidget::Read(int type)
     m_height = gpResourceManager->ReadWord();
     m_maxLength = gpResourceManager->ReadWord();
 #line 99
-    m_text = static_cast<char *>(BaseAlloc(m_maxLength + 5, __FILE__, __LINE__));
+    m_text = static_cast<char *>(H2_ALLOC(m_maxLength + 5, "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp", 0x63));
     gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(m_text), m_maxLength);
     gpResourceManager->Read13(reinterpret_cast<signed char *>(name));
     gpResourceManager->SavePosition();
@@ -278,9 +278,9 @@ int textEntryWidget::Main(struct tag_message &message)
                                 if (typed != 0) {
                                     strcpy(scratch, m_text);
 #line 388
-                                    BaseFree(m_text, __FILE__, __LINE__);
+                                    H2_FREE(m_text, "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp", 0x184);
 #line 389
-                                    m_text = static_cast<char *>(BaseAlloc(strlen(edit) + 6, __FILE__, __LINE__));
+                                    m_text = static_cast<char *>(H2_ALLOC(strlen(edit) + 6, "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp", 0x185));
                                     strcpy(scratch, edit);
                                     scratch[m_cursorPosition] = typed;
                                     scratch[m_cursorPosition + 1] = 0;

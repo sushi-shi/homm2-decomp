@@ -28,7 +28,7 @@ icon::icon(unsigned long int id) : resource(1, id, 1, 0)
     field_0x10 = gpResourceManager->ReadWord();
     unsigned int len = gpResourceManager->ReadLong();
     m_data = static_cast<char *>(
-        BaseAlloc(len, "I:\\Projects\\Heroes\\Prog\\BASE\\ICON.CPP", 0x12));
+        H2_ALLOC(len, "I:\\Projects\\Heroes\\Prog\\BASE\\ICON.CPP", 0x12));
     gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(m_data), len);
 }
 
@@ -44,7 +44,7 @@ icon::icon(unsigned long int id) : resource(1, id, 1, 0)
 VA(0x004c7ad0, 0x21)
 icon::~icon()
 {
-    BaseFree(m_data, "I:\\Projects\\Heroes\\Prog\\BASE\\ICON.CPP", 0x1a);
+    H2_FREE(m_data, "I:\\Projects\\Heroes\\Prog\\BASE\\ICON.CPP", 0x1a);
 }
 
 VA(0x004c7b00, 0x44)

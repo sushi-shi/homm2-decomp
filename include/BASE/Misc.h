@@ -23,10 +23,22 @@ struct MemEntry {
     int line;           // +0x46  caller __LINE__
 };
 #pragma pack(pop)
-// Preserve IconEntry's original declaration position in this compiler-sensitive header.
+#ifdef HOMM2_MISC_INLINE_ICONENTRY
+#pragma pack(push, 1)
+struct IconEntry {
+    short x;
+    short y;
+    short w;
+    short h;
+    unsigned char flags;
+    int srcOffset;
+};
+#pragma pack(pop)
+#else
 #define HOMM2_BASE_ICONENTRY_NO_SIZE
 #include <BASE/IconEntry.h>
 #undef HOMM2_BASE_ICONENTRY_NO_SIZE
+#endif
 #pragma pack(push, 1)
 struct PCXHeader {
     unsigned char manufacturer, version, encoding, bitsPerPixel;
@@ -51,6 +63,9 @@ void FadeIn(int);
 void FadeOut(int);
 int Random(int low, int high);
 void ProcessAssert(int condition, char *file, int line);
+#define H2_ALLOC(size, originalFile, originalLine) BaseAlloc(size, originalFile, originalLine)
+#define H2_FREE(ptr, originalFile, originalLine) BaseFree(ptr, originalFile, originalLine)
+#define H2_ASSERT(condition, originalFile, originalLine) ProcessAssert(condition, originalFile, originalLine)
 char * FindStringInString(char *text, char *pattern);
 char * FindToken(char *text, char token);
 char * FindLastToken(char *text, char token);

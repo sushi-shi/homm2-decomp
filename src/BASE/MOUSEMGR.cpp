@@ -109,10 +109,10 @@ void mouseManager::Close(void)
             hMouseCursor[i] = 0;
             if (cAndBits[i] != 0)
 #line 330
-                BaseFree(cAndBits[i], __FILE__, __LINE__);
+                H2_FREE(cAndBits[i], "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x14a);
             cAndBits[i] = 0;
             if (cColorBits[i] != 0)
-                BaseFree(cColorBits[i], __FILE__, __LINE__);
+                H2_FREE(cColorBits[i], "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x14e);
             cColorBits[i] = 0;
             if (hbmpAndMask[i] != 0)
                 DeleteObject(hbmpAndMask[i]);
@@ -155,7 +155,7 @@ void mouseManager::SetPointer(char *name, int param_2, int param_3)
                 sprintf(local_10, "CMSECO.ICN");
             m_cursorIcon = gpResourceManager->GetIcon(local_10);
 #line 410
-            ProcessAssert(param_2 != 1000, __FILE__, __LINE__);
+            H2_ASSERT(param_2 != 1000, "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x19a);
             m_cursorFrame = -1;
             m_cursorReady = saved82;
         }
@@ -193,15 +193,15 @@ void mouseManager::SetPointer(int frame)
         m_cursorFrame = frame;
     m_cursorSizeIndex = iMouseOffset[m_cursorType] + frame;
 #line 458
-    ProcessAssert(m_cursorSizeIndex >= 0 && m_cursorSizeIndex < 96, __FILE__, __LINE__);
+    H2_ASSERT(m_cursorSizeIndex >= 0 && m_cursorSizeIndex < 96, "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x1ca);
 
     if (gbColorMice != 0) {
         NewUpdate(1);
     } else {
         if (hMouseCursor[m_cursorSizeIndex] == 0) {
 #line 480
-            cColorBits[m_cursorSizeIndex] = BaseAlloc(0x400, __FILE__, __LINE__);
-            cAndBits[m_cursorSizeIndex] = BaseAlloc(0x100, __FILE__, __LINE__);
+            cColorBits[m_cursorSizeIndex] = H2_ALLOC(0x400, "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x1e0);
+            cAndBits[m_cursorSizeIndex] = H2_ALLOC(0x100, "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x1e1);
 
             char filename[16];
             if (m_cursorType == 0)
@@ -236,7 +236,7 @@ void mouseManager::SetPointer(int frame)
             bmpAndMask[m_cursorSizeIndex].bmBits = cAndBits[m_cursorSizeIndex];
             hbmpAndMask[m_cursorSizeIndex] = CreateBitmapIndirect(&bmpAndMask[m_cursorSizeIndex]);
 #line 514
-            ProcessAssert(reinterpret_cast<int>(hbmpAndMask[m_cursorSizeIndex]), __FILE__, __LINE__);
+            H2_ASSERT(reinterpret_cast<int>(hbmpAndMask[m_cursorSizeIndex]), "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x202);
 
             IconInfo[m_cursorSizeIndex].fIcon = 0;
             if (m_cursorType == 2) {
@@ -250,7 +250,7 @@ void mouseManager::SetPointer(int frame)
             IconInfo[m_cursorSizeIndex].hbmColor = 0;
             hMouseCursor[m_cursorSizeIndex] = CreateIconIndirect(&IconInfo[m_cursorSizeIndex]);
 #line 533
-            ProcessAssert(reinterpret_cast<int>(hMouseCursor[m_cursorSizeIndex]), __FILE__, __LINE__);
+            H2_ASSERT(reinterpret_cast<int>(hMouseCursor[m_cursorSizeIndex]), "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x215);
         }
         SetCursor(hMouseCursor[m_cursorSizeIndex]);
     }
