@@ -725,7 +725,7 @@ SOURCE/DRAWING	?UpdateGrid@combatManager@@QAEHHH@Z	99.9897	04db98816b7f
 SOURCE/DRAWING	?UpdateMouseGrid@combatManager@@QAEXHH@Z	99.9482	0b278ae413f4
 SOURCE/EVENTS	?AutoResolveCombat@advManager@@QAEHHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHH@Z	98.5000	f4b7af3b9681
 SOURCE/EVENTS	?BarrierAIEvent@advManager@@QAEHPAVmapCell@@PAVhero@@@Z	100.0000	ebf8c5d7e0df
-SOURCE/EVENTS	?BarrierEvent@advManager@@QAEHPAVmapCell@@PAVhero@@@Z	14.8723	57deddb694a2
+SOURCE/EVENTS	?BarrierEvent@advManager@@QAEHPAVmapCell@@PAVhero@@@Z	100.0000	f49490a66a50
 SOURCE/EVENTS	?CombatMonsterEvent@advManager@@QAEHPAVhero@@HHPAVmapCell@@HHHHHHHHHHH@Z	99.9924	6128293320da
 SOURCE/EVENTS	?ComputerMonsterInteract@advManager@@QAEXPAVmapCell@@PAVhero@@PAH@Z	98.1614	a7b3fb2aaedd
 SOURCE/EVENTS	?DoAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	96.9532	c0ed974fc45d
@@ -739,7 +739,7 @@ SOURCE/EVENTS	?EventWindow@advManager@@QAEXHHPADHHHHH@Z	22.0000	e7de72f6946e
 SOURCE/EVENTS	?ExpansionRecruitEvent@advManager@@QAEXPAVhero@@HPAF@Z	28.2174	0893eb34fc78
 SOURCE/EVENTS	?FizzleCenter@advManager@@QAEXH@Z	99.8415	0c3725c3f906
 SOURCE/EVENTS	?GenericSiteAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	99.8547	fd17fa8a7326
-SOURCE/EVENTS	?GenericSiteEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	1.9509	a5b2ee9230f5
+SOURCE/EVENTS	?GenericSiteEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	99.5678	9c5ece7222a3
 SOURCE/EVENTS	?GhostEvent@advManager@@QAEHPAVhero@@PAVmapCell@@PADHH@Z	5.4824	99981ca49796
 SOURCE/EVENTS	?GiveArtifact@@YIHPAVhero@@HHC@Z	29.1569	816202b6ba8f
 SOURCE/EVENTS	?GiveExperience@advManager@@QAEHPAVhero@@HH@Z	36.1622	41e94c796269
@@ -747,12 +747,12 @@ SOURCE/EVENTS	?GiveRandomArtifact@advManager@@QAEHPAVhero@@@Z	40.5455	2ef27df7d5
 SOURCE/EVENTS	?GiveResource@advManager@@QAEXPAVhero@@HH@Z	33.3333	3c34ae5bf004
 SOURCE/EVENTS	?GiveTakeArtifactStat@@YIXPAVhero@@HH@Z	98.7850	645420362176
 SOURCE/EVENTS	?HeroLoses@advManager@@QAEXPAVhero@@@Z	99.8864	6c10de460bfb
-SOURCE/EVENTS	?HeroSwap@advManager@@QAEXPAVhero@@0@Z	27.6170	670b7fcafe5d
+SOURCE/EVENTS	?HeroSwap@advManager@@QAEXPAVhero@@0@Z	100.0000	5def5c5f2aea
 SOURCE/EVENTS	?HouseEvent@advManager@@QAEXPAVhero@@PAVmapCell@@@Z	2.4102	29f23723f2ca
 SOURCE/EVENTS	?JailAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	99.9180	e7178bc9bdbf
 SOURCE/EVENTS	?JailEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	7.6805	1e7d053c1729
 SOURCE/EVENTS	?PasswordAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	100.0000	591df76c6aa2
-SOURCE/EVENTS	?PasswordEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	18.8116	5f657c2c442c
+SOURCE/EVENTS	?PasswordEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	100.0000	e52f67c09b5c
 SOURCE/EVENTS	?PlayerMonsterInteract@advManager@@QAEXPAVmapCell@@0PAVhero@@PAHHHHHH@Z	100.0000	633df0f44e3b
 SOURCE/EVENTS	?ReceiveHeroTownData@advManager@@QAEXPADPAH11PAPAVhero@@PAPAVarmyGroup@@PAPAVtown@@23111PAC55@Z	100.0000	3a8756283d73
 SOURCE/EVENTS	?RecruitEvent@advManager@@QAEXPAVhero@@HPAVmapCell@@@Z	22.0000	5261e784e3a3
@@ -761,7 +761,7 @@ SOURCE/EVENTS	?RecruitSiteEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	4.2436	1
 SOURCE/EVENTS	?RiddleStringsEqual@@YIHPAD0@Z	100.0000	518d8b1f3cd0
 SOURCE/EVENTS	?SendHeroTownData@advManager@@QAEXHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHHHHH@Z	100.0000	32c41d3a7f62
 SOURCE/EVENTS	?SkeletonEvent@advManager@@QAEHPAVhero@@PAVmapCell@@PADHH@Z	6.4722	f2f75ddd1dbf
-SOURCE/EVENTS	?StrEqNoCase@@YICPAD0@Z	29.9400	455d4bb38f2a
+SOURCE/EVENTS	?StrEqNoCase@@YICPAD0@Z	99.9600	14003574d41e
 SOURCE/EVENTS	?TownEvent@advManager@@QAEXPAVmapCell@@HH@Z	9.2057	24d782520586
 SOURCE/EVENTS	?TransferArtifacts@advManager@@QAEXPAVhero@@0@Z	99.9153	2f3c94cb0a00
 SOURCE/EVENTS	?ZombieEvent@advManager@@QAEHPAVhero@@PAVmapCell@@PADHH@Z	5.9237	56d708800b79
@@ -1181,7 +1181,7 @@ SOURCE/REQUEST	?SetOK@fileRequester@@QAEXH@Z	100.0000	bfe3a1ef4ad6
 SOURCE/REQUEST	?SetupFiles@fileRequester@@QAEXXZ	100.0000	c31396fe5e33
 SOURCE/REQUEST	?ShowThisMap@@YIHPAD@Z	100.0000	2231e1d2d3b1
 SOURCE/REQUEST	?ShowThisMapGame@@YIHPAD@Z	99.7917	77864e414baa
-SOURCE/REQUEST	?Update@fileRequester@@QAEXH@Z	99.3775	2168fa6b5c1f
+SOURCE/REQUEST	?Update@fileRequester@@QAEXH@Z	99.6533	2168fa6b5c1f
 SOURCE/SEARCH	?BuildPath@searchArray@@QAEHHHHHH@Z	3.0303	9c8365989983
 SOURCE/SEARCH	?SeedPosition@searchArray@@QAEXHHHHHHHHHHHH@Z	0.1441	0c95df9305e1
 SOURCE/SETUP	?BaseSetupHandler@@YIHAAUtag_message@@@Z	23.0690	3452869dd747
@@ -1216,11 +1216,11 @@ SOURCE/SMACKMGR	?PrintSummaryInfo@@YIXPAUSmackSumTag@@@Z	100.0000	20005049ebc4
 SOURCE/SMACKMGR	?ShutDownSmacker@@YIXXZ	100.0000	39c63172cd05
 SOURCE/SMACKMGR	?SmackManagerMain@@YIXXZ	94.4764	a5f11644b06e
 SOURCE/SPELLAI	?ClearEffects@combatManager@@QAEXXZ	99.7333	37e6c0ce962a
-SOURCE/SPELLAI	?DetermineEffectOfSpell@combatManager@@QAEXHPAH0@Z	98.6101	53be9a732bd4
+SOURCE/SPELLAI	?DetermineEffectOfSpell@combatManager@@QAEXHPAH0@Z	98.6109	53be9a732bd4
 SOURCE/SPELLAI	?DoSpellAI@combatManager@@QAEHHH@Z	99.2581	c1f178b99783
 SOURCE/SPELLAI	?EffectSpellCreateCreature@combatManager@@QAEHHH@Z	99.0845	2a44cd82f352
-SOURCE/SPELLAI	?EffectSpellCure@combatManager@@QAEXPAHHHH@Z	84.4677	08cc8684aec3
-SOURCE/SPELLAI	?EffectSpellDamage@combatManager@@QAEXPAHHH@Z	96.9613	1ce6c4bf1fd8
+SOURCE/SPELLAI	?EffectSpellCure@combatManager@@QAEXPAHHHH@Z	89.4751	08cc8684aec3
+SOURCE/SPELLAI	?EffectSpellDamage@combatManager@@QAEXPAHHH@Z	97.0299	1ce6c4bf1fd8
 SOURCE/SPELLAI	?EffectSpellResurrect@combatManager@@QAEXPAHHH@Z	99.7080	cc93ca7b3f0c
 SOURCE/SPELLAI	?FirstArmy@combatManager@@QAEHHHPAH@Z	100.0000	2702525f7d96
 SOURCE/SPELLAI	?FirstResurrectable@combatManager@@QAEHHPAHH@Z	100.0000	2fe2117adfb3
