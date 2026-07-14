@@ -4,19 +4,28 @@
 // 3 methods, 0 own-virtual, 0 static data.
 #include <va.h>
 // forward declarations:
+class heroWindow;
 class playerData;
+
+typedef enum BankBoxConstant {
+    BANK_BOX_TEXT_SIZE = 12,
+    BANK_BOX_NON_GOLD_RESOURCE_COUNT = 6,
+    BANK_BOX_FIRST_RESOURCE_WIDGET = 0x7ee,
+    BANK_BOX_GOLD_WIDGET = 0x7f4,
+    BANK_BOX_SET_TEXT_COMMAND = 3,
+    BANK_BOX_WINDOW_Z_ORDER = -1,
+    BANK_BOX_WINDOW_ACTIVE = 1
+} BankBoxConstant;
 
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class bankBox {
 public:
-    // --- members (offsets from Ghidra this+off access-analysis; widths are
-    // access-widths, NOT confirmed types; refine during byte-matching) ---
-    int    field_0x0;  // +0x00
-    short  field_0x4;  // +0x04
-    short  field_0x6;  // +0x06
-    int    field_0x8;  // +0x08
+    playerData *m_player;  // +0x00
+    short m_x;  // +0x04
+    short m_y;  // +0x06
+    heroWindow *m_window;  // +0x08
     // --- constructors ---
-    bankBox(int, int, class playerData *);
+    bankBox(int x, int y, class playerData *player);
     ~bankBox();
     // --- methods ---
     void Update(int);
