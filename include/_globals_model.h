@@ -11,19 +11,6 @@
 #include <windows.h>
 #include <SOURCE/comwin.h>
 
-// VAs pinned from the retail disassembly of the referencing fns (no CodeView symbol of their own):
-// (gRVWeightOre/Merc/Crystal removed — they were just gafAITurnCostResource[2|1|4]; the code
-//  now indexes the array directly via the RES_* enum, which matches the retail byte-for-byte.)
-DATA(0x0051ef24) extern char gDefaultCursorName[]; // default cursor resource name (mouseManager::SetColorMice)
-DATA(0x0052928c) extern int iCombatControlGamePos;
-DATA(0x00522f7c) extern signed char bExpansionSmackNum;
-DATA(0x004f59a8) extern short const_000f59a8;
-DATA(0x004fa684) extern int gMapTypeFlags; // map format flags (game::NewMap)
-
-
-// --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
-DATA(0x00528d10) extern long gCombatCycleTimer;
-
 // TILE.cpp inline-asm scratch (no CodeView symbol): the blitter parks the mode word and a
 // mirror-path row counter in static storage between its __asm sections.
 

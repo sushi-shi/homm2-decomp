@@ -56,6 +56,7 @@
 #define ADVMGR_QUICK_VIEW_LINE (*reinterpret_cast<const short *>("\x76\x21"))
 #define ADVMGR_TOWN_VIEW_LINE (*reinterpret_cast<const short *>("\x5f\x5e"))
 #define ADVMGR_BOTTOM_HERO_LINE (*reinterpret_cast<const short *>("\x5f\x21"))
+#define ADVMGR_BORDER_FREE_LINE (*reinterpret_cast<const short *>("\x24\x01"))
 #define ADVMGR_ENVIRONMENT_VOLUME(distance)                                \
     (reinterpret_cast<const int *>("\x40\0\0\0\x39\0\0\0\x28\0\0\0" \
                                    "\x15\0\0\0\x07\0\0\0\x05\0\0\0") \
@@ -315,8 +316,8 @@ void advManager::Close(void)
         gpSoundManager->StopAllSamples(0);
     }
     if (m_adventureBorder != 0) {
-        BaseFree(m_adventureBorder, "I:\\Projects\\Heroes\\Prog\\SOURCE\\ADVMGR.CPP",
-                 const_000f59a8 + 22);
+        BaseFree(m_adventureBorder, ADVMGR_SOURCE_FILE,
+                 ADVMGR_BORDER_FREE_LINE + ADVMGR_BORDER_FREE_LINE_OFFSET);
         m_adventureBorder = 0;
     }
 

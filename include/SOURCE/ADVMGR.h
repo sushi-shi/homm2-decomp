@@ -7,6 +7,10 @@
 class mapCell;
 struct tag_message;
 
+typedef enum AdventureSourceLineConstant {
+    ADVMGR_BORDER_FREE_LINE_OFFSET = 22
+} AdventureSourceLineConstant;
+
 typedef enum AdventureScreenConstant {
     ADVMGR_SCREEN_WIDTH = 640,
     ADVMGR_SCREEN_HEIGHT = 480,
