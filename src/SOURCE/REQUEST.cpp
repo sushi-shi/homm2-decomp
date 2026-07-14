@@ -40,6 +40,11 @@ int CheckSumIsDemoOK(char *)
     return 1;
 }
 
+// @match-note 99.79%: semantics, CFG, the 0x134 frame, and all 4/4 external
+// relocations agree. Retail's declared 0xbb-byte range differs only at the
+// pooled "BROKENA" string identity after normalization; this build retains an
+// additional dead-code exit sequence beyond that comparison range. Revisit the
+// unreachable return shape after SOURCE reaches 95% globally.
 VA(0x0048c9bb, 0xbb)
 int ShowThisMapGame(char *filename)
 {
@@ -65,14 +70,31 @@ int ShowThisMap(char *)
     return 1;
 }
 
+// @match-note retained/live 95.14%: both enumeration passes,
+// allocation, ordered insertion, extensions, and map-header population are
+// reconstructed. All 53/53 relocation sites agree. This build uses a 0x658
+// frame versus retail's 0x65c; retail places fullName/header/findData at
+// -0x65c/-0x530/-0x37c and the 200/350-byte extension/name arrays at
+// -0x238/-0x164. The first structural residual is the positive all-map-sizes
+// branch and its two retail continuation jumps; spelling that positive arm
+// directly lowered the live score to 92.18%. Moving the insertion shift loop
+// into the negative comparison retained the current improvement. Revisit CFG
+// polarity and identifier slots after SOURCE reaches 95% globally.
 VA(0x0048ca91, 0x7c1)
 int fileRequester::InitializeFiles(char *directory, char *pattern, int countOnly)
 {
     char fullName[FILE_REQUESTER_PATH_SIZE];
     SMapHeader header;
     WIN32_FIND_DATA findData;
+    char extension[FILE_REQUESTER_LOCAL_EXTENSION_SIZE];
+    char name[FILE_REQUESTER_LOCAL_NAME_SIZE];
     HANDLE findHandle;
     int moreFiles;
+    int insertedCount;
+    char *dot;
+    int insertAt;
+    int move;
+    int i;
 
     sprintf(gText, "%s%s", directory, pattern);
     m_fileCount = 0;
@@ -80,20 +102,24 @@ int fileRequester::InitializeFiles(char *directory, char *pattern, int countOnly
     findHandle = FindFirstFile(gText, &findData);
     if (findHandle != INVALID_HANDLE_VALUE) {
         while (moreFiles) {
-            if ((m_mode != FILE_REQUESTER_MAP_GAME ||
-                 (GetMapHeader(findData.cFileName, &header),
-                  header.minHumanPlayers <= giNumHumanPlayers &&
-                  giNumHumanPlayers <= header.maxHumanPlayers &&
-                  (giMapSizeFilter == FILE_REQUESTER_MAP_SIZE_ALL ||
-                   giMapSizes[giMapSizeFilter] == header.width) &&
-                  ShowThisMapGame(findData.cFileName))) &&
-                (m_mode != FILE_REQUESTER_MAP ||
-                 (GetMapHeader(findData.cFileName, &header),
-                  (giMapSizeFilter == FILE_REQUESTER_MAP_SIZE_ALL ||
-                   giMapSizes[giMapSizeFilter] == header.width) &&
-                  ShowThisMap(findData.cFileName)))) {
-                ++m_fileCount;
+            if (m_mode == FILE_REQUESTER_MAP_GAME) {
+                GetMapHeader(findData.cFileName, &header);
+                if (header.minHumanPlayers > giNumHumanPlayers ||
+                    giNumHumanPlayers > header.maxHumanPlayers ||
+                    (giMapSizeFilter != FILE_REQUESTER_MAP_SIZE_ALL &&
+                     giMapSizes[giMapSizeFilter] != header.width) ||
+                    ShowThisMapGame(findData.cFileName) == 0)
+                    goto CountNextFile;
             }
+            if (m_mode == FILE_REQUESTER_MAP) {
+                GetMapHeader(findData.cFileName, &header);
+                if ((giMapSizeFilter != FILE_REQUESTER_MAP_SIZE_ALL &&
+                     giMapSizes[giMapSizeFilter] != header.width) ||
+                    ShowThisMap(findData.cFileName) == 0)
+                    goto CountNextFile;
+            }
+            ++m_fileCount;
+CountNextFile:
             moreFiles = FindNextFile(findHandle, &findData);
         }
         FindClose(findHandle);
@@ -118,56 +144,65 @@ int fileRequester::InitializeFiles(char *directory, char *pattern, int countOnly
         }
     }
 
-    for (int i = 0; i < m_fileCount; ++i) {
+    for (i = 0; i < m_fileCount; ++i) {
         strcpy(m_fileNames[i].text, "");
         strcpy(m_extensions[i].text, "");
     }
 
-    int insertedCount = 0;
+    insertedCount = 0;
     sprintf(gText, "%s%s", directory, pattern);
     findHandle = FindFirstFile(gText, &findData);
     if (findHandle != INVALID_HANDLE_VALUE) {
         moreFiles = 1;
         while (moreFiles) {
-            if ((m_mode != FILE_REQUESTER_MAP_GAME ||
-                 (GetMapHeader(findData.cFileName, &header),
-                  header.minHumanPlayers <= giNumHumanPlayers &&
-                  giNumHumanPlayers <= header.maxHumanPlayers &&
-                  (giMapSizeFilter == 4 || giMapSizes[giMapSizeFilter] == header.width) &&
-                  ShowThisMapGame(findData.cFileName))) &&
-                (m_mode != FILE_REQUESTER_MAP ||
-                 (GetMapHeader(findData.cFileName, &header),
-                  (giMapSizeFilter == 4 || giMapSizes[giMapSizeFilter] == header.width) &&
-                  ShowThisMap(findData.cFileName)))) {
-                char name[FILE_REQUESTER_NAME_SIZE];
-                char extension[FILE_REQUESTER_EXTENSION_SIZE];
-                strcpy(name, findData.cFileName);
-                char *dot = FindLastToken(name, '.');
-                if (dot != 0) {
-                    strcpy(extension, dot);
-                    *dot = 0;
-                }
-
-                int insertAt = 0;
-                while (insertAt < insertedCount &&
-                       _strcmpi(name, m_fileNames[insertAt].text) >= 0) {
-                    ++insertAt;
-                }
-                for (int move = insertedCount; move > insertAt; --move) {
-                    strcpy(m_fileNames[move].text, m_fileNames[move - 1].text);
-                    strcpy(m_extensions[move].text, m_extensions[move - 1].text);
-                }
-                strcpy(m_fileNames[insertAt].text, name);
-                strcpy(m_extensions[insertAt].text, extension);
-                ++insertedCount;
+            if (m_mode == FILE_REQUESTER_MAP_GAME) {
+                GetMapHeader(findData.cFileName, &header);
+                if (header.minHumanPlayers > giNumHumanPlayers ||
+                    giNumHumanPlayers > header.maxHumanPlayers ||
+                    (giMapSizeFilter != FILE_REQUESTER_MAP_SIZE_ALL &&
+                     giMapSizes[giMapSizeFilter] != header.width) ||
+                    ShowThisMapGame(findData.cFileName) == 0)
+                    goto InsertNextFile;
             }
+            if (m_mode == FILE_REQUESTER_MAP) {
+                GetMapHeader(findData.cFileName, &header);
+                if ((giMapSizeFilter != FILE_REQUESTER_MAP_SIZE_ALL &&
+                     giMapSizes[giMapSizeFilter] != header.width) ||
+                    ShowThisMap(findData.cFileName) == 0)
+                    goto InsertNextFile;
+            }
+
+            strcpy(name, findData.cFileName);
+            dot = FindLastToken(name, '.');
+            if (dot != 0) {
+                strcpy(extension, dot);
+                *dot = 0;
+            }
+
+            insertAt = 0;
+            while (insertAt < insertedCount) {
+                if (_strcmpi(name, m_fileNames[insertAt].text) < 0) {
+                    for (move = insertedCount; move > insertAt; --move) {
+                        strcpy(m_fileNames[move].text,
+                               m_fileNames[move - 1].text);
+                        strcpy(m_extensions[move].text,
+                               m_extensions[move - 1].text);
+                    }
+                    break;
+                }
+                ++insertAt;
+            }
+            strcpy(m_fileNames[insertAt].text, name);
+            strcpy(m_extensions[insertAt].text, extension);
+            ++insertedCount;
+InsertNextFile:
             moreFiles = FindNextFile(findHandle, &findData);
         }
         FindClose(findHandle);
     }
 
     if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP) {
-        for (int i = 0; i < insertedCount; ++i) {
+        for (i = 0; i < insertedCount; ++i) {
             sprintf(fullName, "%s%s", m_fileNames[i].text, m_extensions[i].text);
             GetMapHeader(fullName, &m_mapHeaders[i]);
         }
@@ -181,7 +216,7 @@ fileRequester::fileRequester(int x, int y, int mode, char *pattern, char *direct
 {
     strcpy(m_filePattern, pattern);
     strcpy(m_directory, directory);
-    m_selectedIndex = -1;
+    m_selectedIndex = FILE_REQUESTER_SELECTION_NONE;
     m_fileCount = 0;
     m_topIndex = 0;
     m_fileNames = 0;
@@ -224,7 +259,7 @@ void fileRequester::SetupFiles(void)
     m_fileCount = 0;
     m_topIndex = 0;
     m_result = -2;
-    m_selectedIndex = -1;
+    m_selectedIndex = FILE_REQUESTER_SELECTION_NONE;
     InitializeFiles(m_directory, m_filePattern, 0);
 }
 
@@ -259,6 +294,11 @@ void fileRequester::Close(void)
     m_active = 0;
 }
 
+// @match-note 99.67%: the complete dialog/widget construction and all 47/47
+// external relocations agree. Remaining differences are pooled string-symbol
+// identities plus a 0x48 frame in this build versus retail's 0x44 frame. Do not
+// perturb this predecessor before global SOURCE 95%; revisit local slot naming
+// once earlier REQUEST TU state settles.
 VA(0x0048d5e1, 0x466)
 int fileRequester::Open(int id)
 {
@@ -332,7 +372,7 @@ int fileRequester::Open(int id)
     message.payload.widget.data.value = 201;
     m_window->BroadcastMessage(message);
     Update(0);
-    if (m_selectedIndex != -1) {
+    if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
         okEnabled = 1;
     }
     gpWindowManager->AddWindow(m_window, -1, 1);
@@ -340,7 +380,7 @@ int fileRequester::Open(int id)
         okEnabled = 0;
     }
     if (m_mode == FILE_REQUESTER_SAVE_GAME && _strcmpi(m_filename, "NEWGAME") == 0 &&
-        m_selectedIndex == -1) {
+        m_selectedIndex == FILE_REQUESTER_SELECTION_NONE) {
         okEnabled = 1;
     }
     SetOK(okEnabled);
@@ -377,21 +417,35 @@ void fileRequester::SetOK(int enabled)
     m_window->BroadcastMessage(message);
 }
 
+// @match-note retained 92.76%, combined live 92.70%: complete key, click,
+// hover/help, map-filter, filename,
+// scroll-knob, list-selection, saved-game validation, and executive-exit
+// behavior is reconstructed with typed tag_message views. Retail uses a 0x420
+// frame and 0x11ae bytes; this build uses 0x430 and 0x10de. Retail's stable
+// slots include this/accept/item at -0x3fc/-0x16c/-0x170, the two 300-byte
+// oldName arrays at -0x2a0/-0x3f4, helpIndex at -0x2a4, and switch temporaries
+// at -0x400 through -0x414. The first normalized structural residual is the
+// key-up selected/top comparison polarity near instruction 100. The helper's
+// relocation view stops at a delinked jump-table label. An explicit
+// 0x1190..0x2270 / 0x11dc..0x238c object-range audit finds all 76/76 external
+// relocation identities and counts agree; only local jump-table and pooled
+// string identities differ. Moving click behind hover/help lowered the score to
+// 88.20%; retail relocation order for the active widget bodies retained this
+// result. Revisit switch body placement and local slots after global SOURCE 95%.
 VA(0x0048daec, 0x11ae)
 int fileRequester::Main(struct tag_message &message)
 {
     int accept = 0;
 
     switch (message.type) {
-    case 1:
+    case FILE_REQUESTER_EVENT_KEY:
         switch (message.payload.keyboard.keyCode) {
-        case 0x40: {
-            char oldName[300];
-            if (m_selectedIndex == -1) {
-                strcpy(oldName, "");
-            }
-            else {
+        case FILE_REQUESTER_KEY_CYCLE_FILTER: {
+            char oldName[FILE_REQUESTER_PATH_SIZE];
+            if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
                 strcpy(oldName, m_fileNames[m_selectedIndex].text);
+            } else {
+                strcpy(oldName, "");
             }
             giMapSizeFilter = (giMapSizeFilter + 1) % FILE_REQUESTER_MAP_SIZE_COUNT;
             SetupFiles();
@@ -405,7 +459,7 @@ int fileRequester::Main(struct tag_message &message)
             Update(1);
             break;
         }
-        case 0x48:
+        case FILE_REQUESTER_KEY_UP:
             if (m_selectedIndex > 0) {
                 --m_selectedIndex;
                 if (m_selectedIndex < m_topIndex) {
@@ -414,8 +468,8 @@ int fileRequester::Main(struct tag_message &message)
                 Update(1);
             }
             break;
-        case 0x50:
-            if (m_selectedIndex < m_fileCount - 1) {
+        case FILE_REQUESTER_KEY_DOWN:
+            if (m_fileCount - 1 > m_selectedIndex) {
                 ++m_selectedIndex;
                 if (m_selectedIndex >= m_topIndex + iMaxListSize) {
                     ++m_topIndex;
@@ -425,19 +479,22 @@ int fileRequester::Main(struct tag_message &message)
             break;
         }
         break;
-    case 0x200:
+    case FILE_REQUESTER_EVENT_WIDGET:
         switch (message.payload.widget.command) {
-        case 13:
+        case FILE_REQUESTER_WIDGET_CLICK:
                 if (message.payload.widget.id < FILE_REQUESTER_OK) {
                     if (message.payload.widget.id == FILE_REQUESTER_CANCEL) {
-                        message.payload.widget.data.value = message.payload.widget.id;
+                        message.payload.widget.data.value =
+                            message.payload.widget.id;
                         accept = 1;
-                    } else if (message.payload.widget.id == 1) {
+                    } else if (message.payload.widget.id ==
+                               FILE_REQUESTER_SCROLL_UP) {
                         if (m_topIndex > 0) {
                             --m_topIndex;
                             Update(1);
                         }
-                    } else if (message.payload.widget.id == 2 &&
+                    } else if (message.payload.widget.id ==
+                                   FILE_REQUESTER_SCROLL_DOWN &&
                                m_topIndex + iMaxListSize < m_fileCount) {
                         ++m_topIndex;
                         if (m_topIndex + iMaxListSize - 1 >= m_fileCount) {
@@ -446,82 +503,111 @@ int fileRequester::Main(struct tag_message &message)
                         Update(1);
                     }
                 } else if (message.payload.widget.id == FILE_REQUESTER_OK) {
-                    if (m_selectedIndex == -1 && m_filename[0] == 0) {
-                        NormalDialog("Please make a selection from the list, or press cancel.",
-                                     1, -1, -1, -1, 0, -1, 0, -1, 0);
+                    if (m_selectedIndex == FILE_REQUESTER_SELECTION_NONE && m_filename[0] == 0) {
+                        NormalDialog(
+                            "Please make a selection from the list, or press cancel.",
+                            NORMAL_DIALOG_INFO, NORMAL_DIALOG_NO_RESOURCE,
+                            NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_NO_RESOURCE,
+                            0, NORMAL_DIALOG_NO_RESOURCE, 0,
+                            NORMAL_DIALOG_NO_RESOURCE, 0);
                     } else {
-                        message.payload.widget.data.value = message.payload.widget.id;
+                        message.payload.widget.data.value =
+                            message.payload.widget.id;
                         accept = 1;
                     }
                 }
                 break;
-        case 12:
-        case 14:
-                if ((message.payload.widget.parameter & 2) == 0) {
+        case FILE_REQUESTER_WIDGET_HOVER:
+        case FILE_REQUESTER_WIDGET_HELP:
+                if ((message.payload.widget.parameter &
+                     FILE_REQUESTER_HELP_MODIFIER) != 0) {
+                    int helpIndex = FILE_REQUESTER_HELP_NONE;
                     switch (message.payload.widget.id) {
-                    case FILE_REQUESTER_SCROLL_KNOB: {
-                        int positions = m_fileCount - (iMaxListSize - 1);
-                        if (positions < 1) {
-                            positions = 1;
+                    case FILE_REQUESTER_FILENAME_ENTRY:
+                        helpIndex = FILE_REQUESTER_HELP_FILENAME;
+                        break;
+                    case FILE_REQUESTER_MAP_NAME:
+                        helpIndex = FILE_REQUESTER_HELP_MAP_NAME;
+                        break;
+                    case FILE_REQUESTER_MAP_PLAYER_COUNT:
+                        helpIndex = FILE_REQUESTER_HELP_PLAYER_COUNT;
+                        break;
+                    case FILE_REQUESTER_MAP_SIZE:
+                        helpIndex = FILE_REQUESTER_HELP_MAP_SIZE;
+                        break;
+                    case FILE_REQUESTER_MAP_DIFFICULTY_ICON:
+                    case FILE_REQUESTER_MAP_DIFFICULTY_TEXT:
+                        helpIndex = FILE_REQUESTER_HELP_DIFFICULTY;
+                        break;
+                    case FILE_REQUESTER_MAP_DESCRIPTION:
+                        helpIndex = FILE_REQUESTER_HELP_DESCRIPTION;
+                        break;
+                    case FILE_REQUESTER_MAP_VICTORY:
+                        helpIndex = FILE_REQUESTER_HELP_VICTORY;
+                        break;
+                    case FILE_REQUESTER_MAP_LOSS:
+                        helpIndex = FILE_REQUESTER_HELP_LOSS;
+                        break;
+                    case FILE_REQUESTER_FILTER_SMALL:
+                        helpIndex = FILE_REQUESTER_HELP_FILTER_SMALL;
+                        break;
+                    case FILE_REQUESTER_FILTER_MEDIUM:
+                        helpIndex = FILE_REQUESTER_HELP_FILTER_MEDIUM;
+                        break;
+                    case FILE_REQUESTER_FILTER_LARGE:
+                        helpIndex = FILE_REQUESTER_HELP_FILTER_LARGE;
+                        break;
+                    case FILE_REQUESTER_FILTER_XLARGE:
+                        helpIndex = FILE_REQUESTER_HELP_FILTER_XLARGE;
+                        break;
+                    case FILE_REQUESTER_FILTER_ALL:
+                        helpIndex = FILE_REQUESTER_HELP_FILTER_ALL;
+                        break;
+                    case FILE_REQUESTER_CANCEL:
+                        helpIndex = FILE_REQUESTER_HELP_CANCEL;
+                        break;
+                    case FILE_REQUESTER_OK:
+                        helpIndex = FILE_REQUESTER_HELP_OK;
+                        break;
+                    default:
+                        if (message.payload.widget.id >=
+                                FILE_REQUESTER_MAP_SIZE_ICON_FIRST &&
+                            message.payload.widget.id <
+                                FILE_REQUESTER_MAP_SIZE_ICON_FIRST +
+                                    FILE_REQUESTER_LIST_RANGE_SIZE) {
+                            helpIndex = FILE_REQUESTER_HELP_MAP_SIZE;
+                        } else if (message.payload.widget.id >=
+                                       FILE_REQUESTER_MAP_PLAYER_ICON_FIRST &&
+                                   message.payload.widget.id <
+                                       FILE_REQUESTER_MAP_PLAYER_ICON_FIRST +
+                                           FILE_REQUESTER_LIST_RANGE_SIZE) {
+                            helpIndex = FILE_REQUESTER_HELP_PLAYER_COUNT;
+                        } else if (message.payload.widget.id >=
+                                       FILE_REQUESTER_MAP_VICTORY_ICON_FIRST &&
+                                   message.payload.widget.id <
+                                       FILE_REQUESTER_MAP_VICTORY_ICON_FIRST +
+                                           FILE_REQUESTER_LIST_RANGE_SIZE) {
+                            helpIndex = FILE_REQUESTER_HELP_VICTORY;
+                        } else if (message.payload.widget.id >=
+                                       FILE_REQUESTER_MAP_LOSS_ICON_FIRST &&
+                                   message.payload.widget.id <
+                                       FILE_REQUESTER_MAP_LOSS_ICON_FIRST +
+                                           FILE_REQUESTER_LIST_RANGE_SIZE) {
+                            helpIndex = FILE_REQUESTER_HELP_LOSS;
                         }
-                        int gutterStep = static_cast<int>((fGutterTravelLength * 100.0f) /
-                                                          positions);
-                        int mouseX = message.payload.mouse.screenX;
-                        int mouseY = message.payload.mouse.screenY;
-                        mouseY = static_cast<int>(mouseY - (m_y + fGutterMinY)) - 9;
-                        m_topIndex = (mouseY * 100) / gutterStep;
-                        if (m_topIndex + iMaxListSize - 1 >= m_fileCount) {
-                            m_topIndex = m_fileCount - iMaxListSize;
-                        }
-                        if (m_topIndex < 0) {
-                            m_topIndex = 0;
-                        }
-                        Update(1);
                         break;
                     }
-                    case 14:
-                        DoKnob();
-                        break;
-                    case FILE_REQUESTER_FILENAME_ENTRY: {
-                        tag_message textMessage;
-                        textMessage.type = 0x200;
-                        textMessage.payload.widget.command = 7;
-                        textMessage.payload.widget.id = FILE_REQUESTER_FILENAME_ENTRY;
-                        m_window->BroadcastMessage(textMessage);
-
-                        char newName[352];
-                        memset(newName, 0, 9);
-                        strcpy(newName, textMessage.payload.widget.data.text);
-                        int length = strlen(newName);
-                        int i;
-                        for (i = 0; i < length; ++i) {
-                            char ch = newName[i];
-                            if (!((ch >= 'A' && ch <= 'Z') ||
-                                  (ch >= 'a' && ch <= 'z') ||
-                                  (ch >= '0' && ch <= '9') || ch == '_' || ch == ' ' ||
-                                  FindToken("$%'-_@~`!(){}^#&+,;=[].", ch) != 0)) {
-                                newName[i] = 0;
-                            }
-                        }
-                        for (i = strlen(newName) - 1; i >= 0; --i) {
-                            if (newName[i] == ' ') {
-                                newName[i] = 0;
-                            } else {
-                                i = -1;
-                            }
-                        }
-                        if (strlen(newName) != 0 && newName[0] > ' ') {
-                            m_selectedIndex = -1;
-                            strcpy(m_filename, newName);
-                            SetOK(1);
-                        }
-                        textMessage.payload.widget.command = 3;
-                        textMessage.payload.widget.id = FILE_REQUESTER_FILENAME_ENTRY;
-                        textMessage.payload.widget.data.text = m_filename;
-                        m_window->BroadcastMessage(textMessage);
-                        Update(1);
-                        break;
+                    if (helpIndex >= 0) {
+                        NormalDialog(
+                            gFileRequestHelp[helpIndex],
+                            NORMAL_DIALOG_QUICK_VIEW,
+                            NORMAL_DIALOG_NO_RESOURCE, NORMAL_DIALOG_NO_VALUE,
+                            NORMAL_DIALOG_NO_RESOURCE, 0,
+                            NORMAL_DIALOG_NO_RESOURCE, 0,
+                            NORMAL_DIALOG_NO_RESOURCE, 0);
                     }
+                } else {
+                    switch (message.payload.widget.id) {
                     case FILE_REQUESTER_FILTER_SMALL:
                     case FILE_REQUESTER_FILTER_MEDIUM:
                     case FILE_REQUESTER_FILTER_LARGE:
@@ -538,14 +624,20 @@ int fileRequester::Main(struct tag_message &message)
                                         "No maps exist for %d human players at that size.",
                                         giNumHumanPlayers);
                             }
-                            NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                            NormalDialog(
+                                gText, NORMAL_DIALOG_INFO,
+                                NORMAL_DIALOG_NO_RESOURCE,
+                                NORMAL_DIALOG_NO_VALUE,
+                                NORMAL_DIALOG_NO_RESOURCE, 0,
+                                NORMAL_DIALOG_NO_RESOURCE, 0,
+                                NORMAL_DIALOG_NO_RESOURCE, 0);
                         } else {
                             giMapSizeFilter = filter;
-                            char oldName[300];
-                            if (m_selectedIndex == -1) {
-                                strcpy(oldName, "");
-                            } else {
+                            char oldName[FILE_REQUESTER_PATH_SIZE];
+                            if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
                                 strcpy(oldName, m_fileNames[m_selectedIndex].text);
+                            } else {
+                                strcpy(oldName, "");
                             }
                             SetupFiles();
                             if (strlen(oldName) != 0) {
@@ -559,23 +651,121 @@ int fileRequester::Main(struct tag_message &message)
                         }
                         break;
                     }
+                    case FILE_REQUESTER_FILENAME_ENTRY: {
+                        tag_message textMessage;
+                        textMessage.type = FILE_REQUESTER_EVENT_WIDGET;
+                        textMessage.payload.widget.command =
+                            FILE_REQUESTER_WIDGET_GET_TEXT;
+                        textMessage.payload.widget.id =
+                            FILE_REQUESTER_FILENAME_ENTRY;
+                        m_window->BroadcastMessage(textMessage);
+
+                        char newName[FILE_REQUESTER_LOCAL_NAME_SIZE];
+                        memset(newName, 0,
+                               FILE_REQUESTER_FILENAME_INITIAL_CLEAR_SIZE);
+                        strcpy(newName, textMessage.payload.widget.data.text);
+                        int length = strlen(newName);
+                        int i;
+                        for (i = 0; i < length; ++i) {
+                            char ch = newName[i];
+                            if (!((ch >= 'A' && ch <= 'Z') ||
+                                  (ch >= 'a' && ch <= 'z') ||
+                                  (ch >= '0' && ch <= '9') || ch == '_' ||
+                                  ch == ' ' ||
+                                  FindToken("$%'-_@~`!(){}^#&+,;=[].", ch) !=
+                                      0)) {
+                                newName[i] = 0;
+                            }
+                        }
+                        for (i = strlen(newName) - 1; i >= 0; --i) {
+                            if (newName[i] == ' ')
+                                newName[i] = 0;
+                            else
+                                i = -1;
+                        }
+                        if (strlen(newName) != 0 && newName[0] > ' ') {
+                            m_selectedIndex = FILE_REQUESTER_SELECTION_NONE;
+                            strcpy(m_filename, newName);
+                            SetOK(1);
+                        }
+                        textMessage.payload.widget.command =
+                            FILE_REQUESTER_WIDGET_SET_TEXT;
+                        textMessage.payload.widget.id =
+                            FILE_REQUESTER_FILENAME_ENTRY;
+                        textMessage.payload.widget.data.text = m_filename;
+                        m_window->BroadcastMessage(textMessage);
+                        Update(1);
+                        break;
+                    }
+                    case FILE_REQUESTER_SCROLL_KNOB: {
+                        int positions = m_fileCount - (iMaxListSize - 1);
+                        if (positions < 1)
+                            positions = 1;
+                        int gutterStep = static_cast<int>(
+                            (fGutterTravelLength *
+                             FILE_REQUESTER_GUTTER_SCALE) /
+                            positions);
+                        int mouseX = message.payload.widget.screenX;
+                        int mouseY = message.payload.widget.screenY;
+                        mouseY = static_cast<int>(
+                                     mouseY - (m_y + fGutterMinY)) -
+                                 FILE_REQUESTER_SCROLL_KNOB_HALF_HEIGHT;
+                        m_topIndex =
+                            (mouseY * FILE_REQUESTER_GUTTER_SCALE) /
+                            gutterStep;
+                        if (m_topIndex + iMaxListSize - 1 >= m_fileCount)
+                            m_topIndex = m_fileCount - iMaxListSize;
+                        if (m_topIndex < 0)
+                            m_topIndex = 0;
+                        Update(1);
+                        break;
+                    }
+                    case FILE_REQUESTER_SCROLL_GUTTER:
+                        DoKnob();
+                        break;
                     default: {
                         int item;
-                        if (message.payload.widget.id >= 200 && message.payload.widget.id <= 219) {
-                            item = message.payload.widget.id - 200;
-                        } else if (message.payload.widget.id >= 220 && message.payload.widget.id <= 239) {
-                            item = message.payload.widget.id - 220;
-                        } else if (message.payload.widget.id >= 240 && message.payload.widget.id <= 259) {
-                            item = message.payload.widget.id - 240;
-                        } else if (message.payload.widget.id >= 260 && message.payload.widget.id <= 279) {
-                            item = message.payload.widget.id - 260;
-                        } else if (message.payload.widget.id >= 20 && message.payload.widget.id <= 39) {
-                            item = message.payload.widget.id - 20;
+                        if (message.payload.widget.id >=
+                                FILE_REQUESTER_MAP_SIZE_ICON_FIRST &&
+                            message.payload.widget.id <
+                                FILE_REQUESTER_MAP_SIZE_ICON_FIRST +
+                                    FILE_REQUESTER_LIST_RANGE_SIZE) {
+                            item = message.payload.widget.id -
+                                   FILE_REQUESTER_MAP_SIZE_ICON_FIRST;
+                        } else if (message.payload.widget.id >=
+                                       FILE_REQUESTER_MAP_PLAYER_ICON_FIRST &&
+                                   message.payload.widget.id <
+                                       FILE_REQUESTER_MAP_PLAYER_ICON_FIRST +
+                                           FILE_REQUESTER_LIST_RANGE_SIZE) {
+                            item = message.payload.widget.id -
+                                   FILE_REQUESTER_MAP_PLAYER_ICON_FIRST;
+                        } else if (message.payload.widget.id >=
+                                       FILE_REQUESTER_MAP_VICTORY_ICON_FIRST &&
+                                   message.payload.widget.id <
+                                       FILE_REQUESTER_MAP_VICTORY_ICON_FIRST +
+                                           FILE_REQUESTER_LIST_RANGE_SIZE) {
+                            item = message.payload.widget.id -
+                                   FILE_REQUESTER_MAP_VICTORY_ICON_FIRST;
+                        } else if (message.payload.widget.id >=
+                                       FILE_REQUESTER_MAP_LOSS_ICON_FIRST &&
+                                   message.payload.widget.id <
+                                       FILE_REQUESTER_MAP_LOSS_ICON_FIRST +
+                                           FILE_REQUESTER_LIST_RANGE_SIZE) {
+                            item = message.payload.widget.id -
+                                   FILE_REQUESTER_MAP_LOSS_ICON_FIRST;
+                        } else if (message.payload.widget.id >=
+                                       FILE_REQUESTER_LIST_TEXT_FIRST &&
+                                   message.payload.widget.id <
+                                       FILE_REQUESTER_LIST_TEXT_FIRST +
+                                           FILE_REQUESTER_LIST_RANGE_SIZE) {
+                            item = message.payload.widget.id -
+                                   FILE_REQUESTER_LIST_TEXT_FIRST;
                         } else {
                             break;
                         }
                         if (item + m_topIndex == m_selectedIndex) {
-                            message.payload.widget.data.value = FILE_REQUESTER_OK;
+                            message.payload.widget.data.value =
+                                FILE_REQUESTER_OK;
                             message.payload.widget.id = FILE_REQUESTER_OK;
                             accept = 1;
                         } else if (item + m_topIndex < m_fileCount) {
@@ -585,41 +775,6 @@ int fileRequester::Main(struct tag_message &message)
                         }
                         break;
                     }
-                    }
-                } else {
-                    int helpIndex = -1;
-                    switch (message.payload.widget.id) {
-                    case FILE_REQUESTER_FILENAME_ENTRY: helpIndex = 5; break;
-                    case 0x50: helpIndex = 12; break;
-                    case 0x51: helpIndex = 9; break;
-                    case 0x52: helpIndex = 8; break;
-                    case 0x53:
-                    case 0x54: helpIndex = 14; break;
-                    case 0x55: helpIndex = 13; break;
-                    case 0x56: helpIndex = 10; break;
-                    case 0x57: helpIndex = 11; break;
-                    case FILE_REQUESTER_FILTER_SMALL: helpIndex = 0; break;
-                    case FILE_REQUESTER_FILTER_MEDIUM: helpIndex = 1; break;
-                    case FILE_REQUESTER_FILTER_LARGE: helpIndex = 2; break;
-                    case FILE_REQUESTER_FILTER_XLARGE: helpIndex = 3; break;
-                    case FILE_REQUESTER_FILTER_ALL: helpIndex = 4; break;
-                    case FILE_REQUESTER_CANCEL: helpIndex = 7; break;
-                    case FILE_REQUESTER_OK: helpIndex = 6; break;
-                    default:
-                        if (message.payload.widget.id >= 200 && message.payload.widget.id <= 219) {
-                            helpIndex = 8;
-                        } else if (message.payload.widget.id >= 220 && message.payload.widget.id <= 239) {
-                            helpIndex = 9;
-                        } else if (message.payload.widget.id >= 240 && message.payload.widget.id <= 259) {
-                            helpIndex = 10;
-                        } else if (message.payload.widget.id >= 260 && message.payload.widget.id <= 279) {
-                            helpIndex = 11;
-                        }
-                        break;
-                    }
-                    if (helpIndex >= 0) {
-                        NormalDialog(gFileRequestHelp[helpIndex], 4, -1, -1, -1,
-                                     0, -1, 0, -1, 0);
                     }
                 }
                 break;
@@ -632,31 +787,47 @@ int fileRequester::Main(struct tag_message &message)
             message.payload.widget.data.value != FILE_REQUESTER_CANCEL &&
             _strcmpi(m_extensions[m_selectedIndex].text, ".GMC") != 0 &&
             _strcmpi(m_extensions[m_selectedIndex].text, ".GXC") != 0) {
-            int humans = m_extensions[m_selectedIndex].text[3] - '0';
-            if (humans < giNumHumanPlayers && giDebugLevel < 2) {
+            int humans =
+                m_extensions[m_selectedIndex]
+                    .text[FILE_REQUESTER_EXTENSION_PLAYER_DIGIT] -
+                '0';
+            if (humans < giNumHumanPlayers &&
+                giDebugLevel < FILE_REQUESTER_DEBUG_ALLOW_PLAYER_MISMATCH) {
                 sprintf(gText,
                         "The game you have chosen only has slots for %d human(s).  You need one with room for at least %d humans.",
                         humans, giNumHumanPlayers);
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, NORMAL_DIALOG_INFO,
+                             NORMAL_DIALOG_NO_RESOURCE,
+                             NORMAL_DIALOG_NO_VALUE,
+                             NORMAL_DIALOG_NO_RESOURCE, 0,
+                             NORMAL_DIALOG_NO_RESOURCE, 0,
+                             NORMAL_DIALOG_NO_RESOURCE, 0);
                 accept = 0;
             }
             if (humans > giNumHumanPlayers) {
                 sprintf(gText,
                         "The game you have chosen was being played with %d humans. Is it OK if the computer takes the place of the last %d human(s)?",
                         humans, humans - giNumHumanPlayers);
-                NormalDialog(gText, 2, -1, -1, -1, 0, -1, 0, -1, 0);
-                if (gpWindowManager->m_dialogResult != 0x7805) {
+                NormalDialog(gText, NORMAL_DIALOG_CONFIRM,
+                             NORMAL_DIALOG_NO_RESOURCE,
+                             NORMAL_DIALOG_NO_VALUE,
+                             NORMAL_DIALOG_NO_RESOURCE, 0,
+                             NORMAL_DIALOG_NO_RESOURCE, 0,
+                             NORMAL_DIALOG_NO_RESOURCE, 0);
+                if (gpWindowManager->m_dialogResult !=
+                    NORMAL_DIALOG_BUTTON_FIVE) {
                     accept = 0;
                 }
             }
         }
         if (accept != 0) {
-            message.type = 0x4000;
-            message.payload.executive.command = 4;
-            return 2;
+            message.type = FILE_REQUESTER_EVENT_EXIT;
+            message.payload.executive.command =
+                FILE_REQUESTER_EXECUTIVE_CLOSE;
+            return FILE_REQUESTER_MAIN_CLOSE;
         }
     }
-    return 1;
+    return FILE_REQUESTER_MAIN_CONTINUE;
 }
 
 VA(0x0048ec9a, 0x2e8)
@@ -727,7 +898,7 @@ void fileRequester::Update(int drawWindow)
             message.payload.widget.data.value = (giMapSizeFilter == i) + i * 2 + 9;
             m_window->BroadcastMessage(message);
         }
-        if (m_selectedIndex == -1 && m_fileCount > 0) {
+        if (m_selectedIndex == FILE_REQUESTER_SELECTION_NONE && m_fileCount > 0) {
             m_selectedIndex = 0;
         }
         SetOK(1);
@@ -855,7 +1026,7 @@ void fileRequester::Update(int drawWindow)
     message.payload.widget.command = 5;
     message.payload.widget.data.value = 2;
     m_window->BroadcastMessage(message);
-    if (m_selectedIndex != -1) {
+    if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
         message.payload.widget.command = 3;
         if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP) {
             sprintf(gText, "%s", m_mapHeaders[m_selectedIndex].name);
@@ -891,7 +1062,7 @@ char * fileRequester::GetFilename(void)
         return cFRDummy;
     }
 
-    if (m_selectedIndex == -1) {
+    if (m_selectedIndex == FILE_REQUESTER_SELECTION_NONE) {
         sprintf(gText, "%s%s", m_filename, m_defaultExtension);
     } else if (m_mode == FILE_REQUESTER_LOAD_GAME || m_mode == FILE_REQUESTER_MAP ||
                m_mode == FILE_REQUESTER_MAP_GAME) {
