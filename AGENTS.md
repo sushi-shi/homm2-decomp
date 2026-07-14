@@ -200,6 +200,23 @@ authoritative. This file is the short, restart-ready Codex workflow.
 - Keep unresolved-symbol cleanup separate from data-byte matching. Its proof is: no unresolved
   reconstruction-object reference, correct owner/address/layout, correct call-site semantics, and
   a passing full build/relocation audit. It does not require improving objdiff's data percentage.
+- `DATA(<VA>)` is audit metadata and does not pin a linker address. Model the retail storage class
+  in the definition: a value present in initialized storage needs the corresponding initializer
+  (including an explicit zero when retail emitted it), while true loader-zeroed storage remains an
+  uninitialized definition. Verify what MSVC 4.2 actually emits rather than assuming modern
+  compiler behavior.
+- One TU contributes independently to initialized `.data` and zero-fill `.bss`; the linker combines
+  each contribution with the corresponding contributions from every other object. Two globals
+  owned by the same TU can therefore be hundreds of kilobytes apart in the final image. Never add
+  a giant padding object inside a TU to reproduce that final-image gap.
+- Exact final RVAs require the retail object/library order, per-object section sizes and alignment,
+  storage-class membership, and linker options. Validate the eventual link with a map/symbol-RVA
+  comparison. If natural MSVC 4.2 contributions cannot reproduce the order, use generated ordered
+  COFF section contributions as a final-link mechanism rather than contaminating reconstructed
+  source layouts with address-sized padding arrays.
+- Delinked target objects synthesize data sections and may duplicate a symbol once per reference;
+  their section membership is not evidence for original `.data` versus `.bss`. Use the retail PE's
+  raw/virtual section extents, stored bytes, CodeView addresses, and neighboring symbols instead.
 
 ## Git Discipline
 
