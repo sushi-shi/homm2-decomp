@@ -12,10 +12,12 @@
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/inputManager.h>
+#include <BASE/Icon2b.h>
 #include <BASE/Misc.h>
 #include <BASE/mouseManager.h>
 #include <BASE/palette.h>
 #include <BASE/resourceManager.h>
+#include <BASE/sample.h>
 #include <BASE/soundManager.h>
 #include <BASE/WINMGR.h>
 #include <EDITOR/mapcell.h>
@@ -26,6 +28,8 @@
 #include <SOURCE/game.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/kbwin.h>
+#include <SOURCE/NOOPT.h>
+#include <SOURCE/PATH.h>
 #include <SOURCE/town.h>
 #include <SOURCE/X_GLOBAL.h>
 
@@ -42,8 +46,9 @@ combatManager::combatManager(void)
     m_unknownF35B = 0;
     m_unknownF353 = -1;
     m_unknownF34F = m_unknownF353;
-    m_catapultFrame = m_unknownF34F;
-    m_unknownF317 = m_catapultFrame;
+    m_catapultFrame[COMBAT_ATTACKER_SIDE] = m_unknownF34F;
+    m_catapultFrame[COMBAT_DEFENDER_SIDE] =
+        m_catapultFrame[COMBAT_ATTACKER_SIDE];
     m_unknownF337[COMBAT_ATTACKER_SIDE] = 0;
     m_unknownF337[COMBAT_DEFENDER_SIDE] =
         m_unknownF337[COMBAT_ATTACKER_SIDE];
@@ -530,9 +535,9 @@ void combatManager::GenerateMap(void)
     int coordinateY;
 
     if (m_inCastleCombat == 1)
-        m_catapultFrame = 0;
+        m_catapultFrame[COMBAT_ATTACKER_SIDE] = 0;
     else
-        m_catapultFrame = -1;
+        m_catapultFrame[COMBAT_ATTACKER_SIDE] = -1;
 
     for (y = 0; static_cast<int>(y) < COMBAT_GRID_ROW_COUNT; y++) {
         for (x = 0; x < COMBAT_GRID_ROW_LENGTH; x++) {
@@ -1175,19 +1180,572 @@ int combatManager::IsWinner(int side)
 }
 
 VA(0x0049311f, 0x100e)
-void combatManager::CatAttack(int) {}
+void combatManager::CatAttack(int side)
+{
+    if (!m_inCastleCombat)
+        return;
+
+    LogStr("CA1");
+    if (m_smallViewSide[COMBAT_ATTACKER_SIDE] != -1 ||
+        m_smallViewSide[COMBAT_DEFENDER_SIDE] != -1) {
+        m_smallViewSide[COMBAT_ATTACKER_SIDE] =
+            m_smallViewSide[COMBAT_DEFENDER_SIDE] = -1;
+        DrawSmallView(COMBAT_ATTACKER_SIDE, 1);
+        DrawSmallView(COMBAT_DEFENDER_SIDE, 1);
+    }
+
+    int random8 = SRandom(COMBAT_CATAPULT_TARGET_ROLL_MIN,
+                          COMBAT_CATAPULT_TARGET_ROLL_MAX);
+    int wallCount7 = 0;
+    int towerCount1 = 0;
+    int wallIndex17 = -1;
+    int towerIndex27 = -1;
+    int gateIndex2 = -1;
+    int keepIndex6 = -1;
+    int targetHex4 = -1;
+    int missShot19 = 0;
+    int damageLevel13 = COMBAT_CATAPULT_DAMAGE_NORMAL;
+    int firstRoll7;
+    int advancedRoll5;
+    int index28;
+
+    if (m_wallStates[COMBAT_WALL_SLOT_SECTION_FIRST] !=
+            COMBAT_WALL_STATE_DESTROYED &&
+        m_wallStates[COMBAT_WALL_SLOT_SECTION_FIRST] !=
+            COMBAT_WALL_STATE_SECTION_DESTROYED)
+        wallCount7++;
+    if (m_wallStates[COMBAT_WALL_SLOT_SECTION_SECOND] !=
+            COMBAT_WALL_STATE_DESTROYED &&
+        m_wallStates[COMBAT_WALL_SLOT_SECTION_SECOND] !=
+            COMBAT_WALL_STATE_SECTION_DESTROYED)
+        wallCount7++;
+    if (m_wallStates[COMBAT_WALL_SLOT_SECTION_THIRD] !=
+            COMBAT_WALL_STATE_DESTROYED &&
+        m_wallStates[COMBAT_WALL_SLOT_SECTION_THIRD] !=
+            COMBAT_WALL_STATE_SECTION_DESTROYED)
+        wallCount7++;
+    if (m_wallStates[COMBAT_WALL_SLOT_SECTION_FOURTH] !=
+            COMBAT_WALL_STATE_DESTROYED &&
+        m_wallStates[COMBAT_WALL_SLOT_SECTION_FOURTH] !=
+            COMBAT_WALL_STATE_SECTION_DESTROYED)
+        wallCount7++;
+    if (m_wallStates[COMBAT_WALL_SLOT_TOP_TOWER] ==
+        COMBAT_WALL_STATE_TOWER_STANDING)
+        towerCount1++;
+    if (m_wallStates[COMBAT_WALL_SLOT_BOTTOM_TOWER] ==
+        COMBAT_WALL_STATE_TOWER_STANDING)
+        towerCount1++;
+
+    if (wallCount7 != 0) {
+        random8 = random8 % wallCount7 + 1;
+        wallIndex17 = -1;
+        while (random8 != 0) {
+            wallIndex17++;
+            if (m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST] !=
+                    COMBAT_WALL_STATE_DESTROYED &&
+                m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST] !=
+                    COMBAT_WALL_STATE_SECTION_DESTROYED)
+                random8--;
+        }
+    } else if (towerCount1 != 0) {
+        random8 %= towerCount1;
+        if (random8 == 1 ||
+            m_wallStates[COMBAT_WALL_SLOT_TOP_TOWER] ==
+                COMBAT_WALL_STATE_DESTROYED)
+            towerIndex27 = COMBAT_WALL_SLOT_BOTTOM_TOWER;
+        else
+            towerIndex27 = COMBAT_WALL_SLOT_TOP_TOWER;
+    } else if (m_drawbridgeState != COMBAT_CASTLE_GATE_HIDDEN) {
+        gateIndex2 = 1;
+    } else {
+        if (m_wallStates[COMBAT_WALL_SLOT_KEEP] ==
+            COMBAT_WALL_STATE_KEEP_STANDING)
+            keepIndex6 = 0;
+    }
+
+    if (towerIndex27 == -1 && wallIndex17 == -1 && gateIndex2 == -1 &&
+        keepIndex6 == -1)
+        return;
+
+    sprintf(gText, "catsnd%02d.82M", COMBAT_CATAPULT_IMPACT_SOUND);
+    sample *loadedSample26 = gpResourceManager->GetSample(gText);
+    int unknown15;
+    SAMPLE2 catapultSound37 = NULL_SAMPLE2;
+    SAMPLE2 impactSound1 = NULL_SAMPLE2;
+    icon *boulder37 = gpResourceManager->GetIcon("boulder37.icn");
+    sprintf(gText, "catsnd%02d.82M", COMBAT_CATAPULT_LAUNCH_SOUND);
+    catapultSound37 = LoadPlaySample(gText);
+
+    int impactX5 = -1;
+    int impactY0 = -1;
+    if (wallIndex17 != -1) {
+        impactX5 = wallPos[wallIndex17][COMBAT_COORDINATE_X];
+        impactY0 = wallPos[wallIndex17][COMBAT_COORDINATE_Y];
+        targetHex4 = iWallToHexCell[wallIndex17];
+    }
+    if (towerIndex27 != -1) {
+        impactX5 = towerPos[towerIndex27][COMBAT_COORDINATE_X];
+        impactY0 = towerPos[towerIndex27][COMBAT_COORDINATE_Y];
+        targetHex4 = iTowerToHexCell[towerIndex27];
+    }
+    if (gateIndex2 != -1) {
+        impactX5 = doorPos[0][COMBAT_COORDINATE_X];
+        impactY0 = doorPos[0][COMBAT_COORDINATE_Y];
+        targetHex4 = COMBAT_CASTLE_HEX_GATE;
+    }
+    if (keepIndex6 != -1) {
+        impactX5 = COMBAT_CATAPULT_KEEP_IMPACT_X;
+        impactY0 = COMBAT_CATAPULT_KEEP_IMPACT_Y;
+        targetHex4 = COMBAT_CASTLE_HEX_KEEP;
+    }
+
+    int startX7;
+    float bounceY0;
+    int frame18;
+
+    if (m_heroes[COMBAT_ATTACKER_SIDE]
+            ->m_secondarySkills[HERO_SKILL_BALLISTICS] ==
+        HERO_SKILL_LEVEL_NONE) {
+        firstRoll7 = SRandom(COMBAT_CATAPULT_BALLISTICS_ROLL_MIN,
+                             COMBAT_CATAPULT_BALLISTICS_ROLL_MAX);
+        if (!gbHumanPlayer[m_heroes[COMBAT_ATTACKER_SIDE]->m_owner])
+            firstRoll7 -= COMBAT_CATAPULT_AI_ROLL_PENALTY;
+        if (firstRoll7 < COMBAT_CATAPULT_NO_SKILL_DOUBLE_THRESHOLD)
+            damageLevel13 = COMBAT_CATAPULT_DAMAGE_DOUBLE;
+        else if (firstRoll7 > COMBAT_CATAPULT_NO_SKILL_MISS_THRESHOLD) {
+            missShot19 = 1;
+            damageLevel13 = COMBAT_CATAPULT_DAMAGE_NONE;
+        }
+    } else if (m_heroes[COMBAT_ATTACKER_SIDE]
+                   ->m_secondarySkills[HERO_SKILL_BALLISTICS] <=
+               HERO_SKILL_LEVEL_ADVANCED) {
+        advancedRoll5 = SRandom(COMBAT_CATAPULT_BALLISTICS_ROLL_MIN,
+                                COMBAT_CATAPULT_BALLISTICS_ROLL_MAX);
+        if (!gbHumanPlayer[m_heroes[COMBAT_ATTACKER_SIDE]->m_owner])
+            advancedRoll5 -= COMBAT_CATAPULT_AI_ROLL_PENALTY;
+        if (advancedRoll5 < COMBAT_CATAPULT_ADVANCED_DOUBLE_THRESHOLD)
+            damageLevel13 = COMBAT_CATAPULT_DAMAGE_DOUBLE;
+    } else if (m_heroes[COMBAT_ATTACKER_SIDE]
+                   ->m_secondarySkills[HERO_SKILL_BALLISTICS] ==
+               HERO_SKILL_LEVEL_EXPERT) {
+        damageLevel13 = COMBAT_CATAPULT_DAMAGE_DOUBLE;
+    }
+
+    if (missShot19) {
+        unsigned char validMissHexes[COMBAT_CATAPULT_MISS_HEX_COUNT] = {
+            32, 46, 10, 23, 35, 48, 60, 74, 87, 101, 114
+        };
+        int startDirection = SRandom(COMBAT_CATAPULT_DIRECTION_ROLL_MIN,
+                                     COMBAT_CATAPULT_DIRECTION_ROLL_MAX);
+        for (frame18 = 0; frame18 < COMBAT_CATAPULT_DIRECTION_COUNT;
+             frame18++) {
+            int adjacentHex = GetAdjacentCellIndexNoArmy(
+                targetHex4,
+                (frame18 + startDirection) % COMBAT_CATAPULT_DIRECTION_COUNT);
+            if (adjacentHex != -1 &&
+                m_hexCells[adjacentHex].m_occupantSide == -1) {
+                for (index28 = 0; index28 < COMBAT_CATAPULT_MISS_HEX_COUNT;
+                     index28++) {
+                    if (validMissHexes[index28] == adjacentHex) {
+                        impactX5 = m_hexCells[adjacentHex].m_x;
+                        impactY0 = m_hexCells[adjacentHex].m_y -
+                                   COMBAT_CATAPULT_MISS_Y_OFFSET;
+                        goto foundMissHex;
+                    }
+                }
+            }
+        }
+        missShot19 = 0;
+        damageLevel13 = COMBAT_CATAPULT_DAMAGE_NORMAL;
+foundMissHex:
+        frame18++;
+    }
+
+    giMinExtentX = 0;
+    giMaxExtentX = COMBAT_CATAPULT_INITIAL_MAX_X;
+    giMinExtentY = COMBAT_CATAPULT_INITIAL_MIN_Y;
+    giMaxExtentY = COMBAT_CATAPULT_INITIAL_MAX_Y;
+    m_catapultFrame[side] = 0;
+    while (m_catapultFrame[side] < COMBAT_CATAPULT_LOAD_FRAME_COUNT) {
+        DrawFrame(1, 0, 1, 0, COMBAT_CATAPULT_ANIMATION_DELAY, 1, 1);
+        m_catapultFrame[side]++;
+    }
+
+    startX7 = COMBAT_CATAPULT_START_X;
+    int startY9 = COMBAT_CATAPULT_START_Y;
+    int spriteFrame27 = 0;
+    float projectileX11 = static_cast<float>(startX7);
+    float projectileY4 = static_cast<float>(startY9);
+    float midpointX19 = static_cast<float>(
+        (impactX5 + startX7) / COMBAT_CATAPULT_MIDPOINT_DIVISOR);
+    bounceY0 = static_cast<float>(
+        (impactY0 - (impactX5 - startX7) *
+                         COMBAT_CATAPULT_DISTANCE_ARC_SCALE) -
+        impactY0 * COMBAT_CATAPULT_TARGET_ARC_SCALE);
+    float xStep0 = static_cast<float>(
+        (midpointX19 - startX7) / COMBAT_CATAPULT_HORIZONTAL_STEP_DIVISOR);
+    float yStep15 = (bounceY0 - startY9) /
+                    COMBAT_CATAPULT_VERTICAL_STEP_DIVISOR;
+    int previousX5 = -1;
+    int previousY2 = -1;
+    SLimitData limits1;
+    for (frame18 = 0; frame18 < COMBAT_CATAPULT_PROJECTILE_FRAME_COUNT;
+         frame18++) {
+        if (frame18 == COMBAT_CATAPULT_DESCENT_FRAME)
+            yStep15 = (bounceY0 - impactY0) /
+                      COMBAT_CATAPULT_VERTICAL_STEP_DIVISOR;
+        if (frame18 != 0) {
+            giMinExtentX = previousX5 -
+                           COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS;
+            giMaxExtentX = static_cast<long>(
+                projectileX11 + COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS);
+            giMinExtentY = static_cast<long>(
+                projectileY4 - COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS);
+            giMaxExtentY = static_cast<long>(
+                projectileY4 + COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS);
+            if (previousY2 < projectileY4)
+                giMinExtentY = previousY2 -
+                               COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS;
+            else
+                giMaxExtentY = previousY2 +
+                               COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS;
+            if (frame18 <= COMBAT_CATAPULT_EARLY_EXTENT_LAST_FRAME) {
+                giMinExtentX = 0;
+                giMaxExtentY = COMBAT_CATAPULT_INITIAL_MAX_Y;
+            }
+            if (giMinExtentX < 0)
+                giMinExtentX = 0;
+            if (giMinExtentY < 0)
+                giMinExtentY = 0;
+            if (giMaxExtentX > COMBAT_MAX_EXTENT_X)
+                giMaxExtentX = COMBAT_MAX_EXTENT_X;
+            if (giMaxExtentY > COMBAT_MAX_EXTENT_Y)
+                giMaxExtentY = COMBAT_MAX_EXTENT_Y;
+            if (giMaxExtentY < COMBAT_CATAPULT_MIN_VISIBLE_EXTENT_Y)
+                giMaxExtentY = COMBAT_CATAPULT_MIN_VISIBLE_EXTENT_Y;
+        }
+        DrawFrame(0, 0, 1, 0, COMBAT_CATAPULT_PROJECTILE_DELAY, 1, 1);
+        boulder37->CombatClipDrawToBuffer(
+            static_cast<long>(projectileX11), static_cast<long>(projectileY4),
+            spriteFrame27, &limits1, 0, 0, 0, 0);
+        gpWindowManager->UpdateScreenRegion(
+            giMinExtentX, giMinExtentY,
+            giMaxExtentX - giMinExtentX + 1,
+            giMaxExtentY - giMinExtentY + 1);
+        previousX5 = static_cast<long>(projectileX11);
+        previousY2 = static_cast<long>(projectileY4);
+        projectileX11 = projectileX11 + xStep0;
+        projectileY4 = (COMBAT_CATAPULT_DESCENT_FRAME - frame18) * yStep15 +
+                       projectileY4;
+        spriteFrame27++;
+        spriteFrame27 %= COMBAT_CATAPULT_BOULDER_FRAME_COUNT;
+        if (frame18 < COMBAT_CATAPULT_ADVANCE_FRAME_COUNT)
+            m_catapultFrame[side]++;
+    }
+
+    sprintf(gText, "catsnd%02d.82M", COMBAT_CATAPULT_IMPACT_SOUND);
+    impactSound1 = LoadPlaySample(gText);
+    m_unknownF34B = 0;
+    m_unknownF34F = 0;
+
+    giMinExtentX = impactX5 - COMBAT_CATAPULT_IMPACT_EXTENT_X;
+    giMaxExtentX = impactX5 + COMBAT_CATAPULT_IMPACT_EXTENT_X;
+    giMinExtentY = impactY0 - COMBAT_CATAPULT_IMPACT_EXTENT_TOP;
+    giMaxExtentY = impactY0 + COMBAT_CATAPULT_IMPACT_EXTENT_BOTTOM;
+    if (gateIndex2 != -1)
+        giMinExtentX -= COMBAT_CATAPULT_IMPACT_EXTENT_X;
+    if (giMinExtentX < 0)
+        giMinExtentX = 0;
+    if (giMaxExtentX > COMBAT_MAX_EXTENT_X)
+        giMaxExtentX = COMBAT_MAX_EXTENT_X;
+    if (giMinExtentY < 0)
+        giMinExtentY = 0;
+    if (giMaxExtentY > COMBAT_MAX_EXTENT_Y)
+        giMaxExtentY = COMBAT_MAX_EXTENT_Y;
+
+    icon *cloud29 = gpResourceManager->GetIcon(
+        missShot19 ? "lichclod.icn" : "smalclod.icn");
+
+    for (frame18 = 0; frame18 < COMBAT_CATAPULT_CLOUD_FRAME_COUNT;
+         frame18++) {
+        if (frame18 >= COMBAT_CATAPULT_CLOUD_VISIBLE_FRAME_COUNT &&
+            (gateIndex2 != -1 || missShot19 != 0))
+            continue;
+        glTimers[COMBAT_CATAPULT_TIMER_SLOT] = static_cast<long>(
+            KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] *
+                                COMBAT_CATAPULT_ANIMATION_DELAY);
+        DrawFrame(0, 0, 1, 0, 0, 1, 0);
+        if (gateIndex2 != -1 &&
+            frame18 >= COMBAT_CATAPULT_GATE_CLOUD_FIRST_FRAME &&
+            !missShot19) {
+            IconToBitmap(
+                cloud29, gpWindowManager->m_screen,
+                impactX5 - COMBAT_CATAPULT_GATE_CLOUD_X_OFFSET,
+                impactY0 + COMBAT_CATAPULT_GATE_CLOUD_Y_OFFSET,
+                frame18 - COMBAT_CATAPULT_GATE_CLOUD_FIRST_FRAME, 1, 0, 0,
+                COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT, 0);
+        }
+        if (frame18 < COMBAT_CATAPULT_CLOUD_VISIBLE_FRAME_COUNT) {
+            IconToBitmap(cloud29, gpWindowManager->m_screen, impactX5,
+                         impactY0 + (!missShot19
+                                         ? COMBAT_CATAPULT_CLOUD_Y_OFFSET
+                                         : 0),
+                         frame18, 1, 0, 0, COMBAT_SCREEN_WIDTH,
+                         COMBAT_AREA_HEIGHT, 0);
+        }
+        gpWindowManager->UpdateScreenRegion(
+            giMinExtentX, giMinExtentY,
+            giMaxExtentX - giMinExtentX + 1,
+            giMaxExtentY - giMinExtentY + 1);
+        DelayTil(&glTimers[COMBAT_CATAPULT_TIMER_SLOT]);
+
+        if (((frame18 == COMBAT_CATAPULT_WALL_IMPACT_FRAME &&
+              gateIndex2 == -1) ||
+             (frame18 == COMBAT_CATAPULT_GATE_IMPACT_FRAME &&
+              gateIndex2 != -1)) &&
+            !missShot19) {
+            if (wallIndex17 != -1) {
+                if (m_wallStates[wallIndex17 +
+                                 COMBAT_WALL_SLOT_SECTION_FIRST] >=
+                        COMBAT_WALL_STATE_SECTION_DAMAGE_FIRST &&
+                    m_wallStates[wallIndex17 +
+                                 COMBAT_WALL_SLOT_SECTION_FIRST] <=
+                        COMBAT_WALL_STATE_SECTION_DAMAGE_LAST) {
+                    m_wallStates[wallIndex17 +
+                                 COMBAT_WALL_SLOT_SECTION_FIRST] +=
+                        damageLevel13;
+                    if (m_wallStates[wallIndex17 +
+                                     COMBAT_WALL_SLOT_SECTION_FIRST] >
+                        COMBAT_WALL_STATE_SECTION_DAMAGE_LAST)
+                        m_wallStates[wallIndex17 +
+                                     COMBAT_WALL_SLOT_SECTION_FIRST] =
+                            COMBAT_WALL_STATE_SECTION_DESTROYED;
+                } else {
+                    if (damageLevel13 > COMBAT_CATAPULT_DAMAGE_NORMAL)
+                        m_wallStates[wallIndex17 +
+                                     COMBAT_WALL_SLOT_SECTION_FIRST] =
+                            COMBAT_WALL_STATE_DESTROYED;
+                    else
+                        m_wallStates[wallIndex17 +
+                                     COMBAT_WALL_SLOT_SECTION_FIRST]++;
+                }
+                if (m_wallStates[wallIndex17 +
+                                 COMBAT_WALL_SLOT_SECTION_FIRST] ==
+                        COMBAT_WALL_STATE_DESTROYED ||
+                    m_wallStates[wallIndex17 +
+                                 COMBAT_WALL_SLOT_SECTION_FIRST] ==
+                        COMBAT_WALL_STATE_SECTION_DESTROYED)
+                    m_hexCells[iWallToHexCell[wallIndex17]].m_blocked = 0;
+            } else if (towerIndex27 != -1) {
+                m_wallStates[towerIndex27] = COMBAT_WALL_STATE_DESTROYED;
+            } else if (gateIndex2 != -1) {
+                m_drawbridgeState = COMBAT_CASTLE_GATE_HIDDEN;
+            } else if (keepIndex6 != -1) {
+                m_wallStates[COMBAT_WALL_SLOT_KEEP] =
+                    COMBAT_WALL_STATE_KEEP_DESTROYED;
+            }
+        }
+    }
+
+    gpResourceManager->Dispose(cloud29);
+    m_catapultFrame[side] = 0;
+    DrawFrame(1, 0, 0, 0, COMBAT_CATAPULT_ANIMATION_DELAY, 1, 1);
+    gpResourceManager->Dispose(boulder37);
+    WaitEndSample(impactSound1, -1);
+    WaitEndSample(catapultSound37, -1);
+    if (loadedSample26)
+        gpResourceManager->Dispose(loadedSample26);
+    LogStr("CA2");
+}
 
 VA(0x0049412d, 0x74f)
-void combatManager::KeepAttack(int) {}
+void combatManager::KeepAttack(int tower)
+{
+    if (!m_inCastleCombat)
+        return;
+    if ((tower == COMBAT_TOWER_SELECTOR_GARRISON &&
+         m_wallStates[COMBAT_WALL_SLOT_KEEP] !=
+             COMBAT_WALL_STATE_KEEP_STANDING) ||
+        (tower == COMBAT_TOWER_SELECTOR_TOP &&
+         m_wallStates[COMBAT_WALL_SLOT_TOP_TOWER] !=
+             COMBAT_WALL_STATE_TOWER_STANDING) ||
+        (tower == COMBAT_TOWER_SELECTOR_BOTTOM &&
+         m_wallStates[COMBAT_WALL_SLOT_BOTTOM_TOWER] !=
+             COMBAT_WALL_STATE_TOWER_STANDING))
+        return;
+
+    LogStr("KA1");
+
+    int bestPriority0 = -1;
+    int bestValue10 = 0;
+    int bestArmyIndex5 = -1;
+    int armyIndex3;
+    army *target0;
+    int value26;
+    for (armyIndex3 = 0; armyIndex3 < COMBAT_ARMY_CAPACITY; armyIndex3++) {
+        if (m_armies[COMBAT_ATTACKER_SIDE][armyIndex3].IsAlive()) {
+            target0 = &m_armies[COMBAT_ATTACKER_SIDE][armyIndex3];
+            int priority;
+            if (target0->m_spellInfluence[ARMY_SPELL_INFLUENCE_BLIND] ||
+                target0->m_spellInfluence[ARMY_SPELL_INFLUENCE_PARALYZE] ||
+                target0->m_spellInfluence[ARMY_SPELL_INFLUENCE_PETRIFIED] ||
+                target0->m_spellInfluence[ARMY_SPELL_INFLUENCE_BERSERK] ||
+                target0->m_spellInfluence[ARMY_SPELL_INFLUENCE_HYPNOTIZE]) {
+                priority = COMBAT_KEEP_PRIORITY_DISABLED;
+            } else if (target0->m_monster.flags.all &
+                       MONSTER_FLAGS_SHOOTER) {
+                priority = COMBAT_KEEP_PRIORITY_SHOOTER;
+            } else if (target0->m_monster.flags.all &
+                       MONSTER_FLAGS_FLYING) {
+                priority = COMBAT_KEEP_PRIORITY_FLYER;
+            } else {
+                priority = COMBAT_KEEP_PRIORITY_WALKER;
+            }
+
+            value26 = gMonsterDatabase[target0->m_monsterType].fightValue *
+                      target0->m_quantity;
+            // Retail +0x25b loads bestValue10, compares value26, then uses jle.
+            // Reversing both operands produces equivalent jge and differs at
+            // function offsets +0x25d, +0x260, and +0x262.
+            if (bestPriority0 < priority ||
+                (bestPriority0 == priority && bestValue10 < value26)) {
+                bestValue10 = value26;
+                bestPriority0 = priority;
+                bestArmyIndex5 = armyIndex3;
+            }
+        }
+    }
+
+    if (bestArmyIndex5 == -1)
+        return;
+
+    target0 = &gpCombatManager->m_armies[COMBAT_ATTACKER_SIDE][bestArmyIndex5];
+    sprintf(gText, "keepshot.82M");
+    SAMPLE2 keepSample19 = NULL_SAMPLE2;
+    keepSample19 = LoadPlaySample(gText);
+
+    CombatTowerOrigin
+        towerOrigins4[COMBAT_KEEP_TOWN_TYPE_COUNT][COMBAT_KEEP_TOWER_COUNT] = {
+        {{586, 177}, {428, 60}, {428, 314}},
+        {{586, 177}, {428, 60}, {428, 314}},
+        {{586, 177}, {428, 60}, {428, 314}},
+        {{586, 177}, {428, 60}, {428, 314}},
+        {{586, 177}, {428, 60}, {428, 314}},
+        {{586, 177}, {428, 60}, {428, 314}}
+    };
+    int unknownTowerData6[4];
+    int sourceX9 = towerOrigins4[m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type]
+                              [tower]
+                                  .x;
+    int sourceY6 = towerOrigins4[m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type]
+                              [tower]
+                                  .y;
+    int targetX9 = target0->MidX();
+    int targetY8 = target0->MidY();
+    float missileAngles0[COMBAT_KEEP_MISSILE_ANGLE_COUNT] = {
+        90.0f, 68.5f, 45.0f, 20.8f, 0.0f,
+        -20.8f, -45.0f, -68.5f, -90.0f
+    };
+    ShootMissile(sourceX9, sourceY6, targetX9, targetY8, missileAngles0,
+                 m_combatIcons[COMBAT_ICON_KEEP]);
+
+    int shotCount28;
+    int attackBonus4;
+    m_combatTowns[COMBAT_DEFENDER_SIDE]->CalcNumLevelArchers(&shotCount28,
+                                                              &attackBonus4);
+    attackBonus4 += COMBAT_KEEP_TOWER_DAMAGE_BONUS;
+    if (m_heroes[COMBAT_DEFENDER_SIDE])
+        attackBonus4 +=
+            m_heroes[COMBAT_DEFENDER_SIDE]->Stats(HERO_PRIMARY_ATTACK);
+    attackBonus4 -= target0->m_monster.attack;
+    if (attackBonus4 > COMBAT_KEEP_ATTACK_STAT_LIMIT)
+        attackBonus4 = COMBAT_KEEP_ATTACK_STAT_LIMIT;
+    if (attackBonus4 < -COMBAT_KEEP_ATTACK_STAT_LIMIT)
+        attackBonus4 = -COMBAT_KEEP_ATTACK_STAT_LIMIT;
+    if (tower != COMBAT_TOWER_SELECTOR_GARRISON)
+        shotCount28 /= COMBAT_KEEP_SIDE_TOWER_SHOT_DIVISOR;
+
+    int damage8 = 0;
+    for (armyIndex3 = 0; shotCount28 > armyIndex3; armyIndex3++)
+        damage8 += SRandom(COMBAT_KEEP_RANDOM_DAMAGE_MIN,
+                           COMBAT_KEEP_RANDOM_DAMAGE_MAX);
+    damage8 = static_cast<long>(
+        damage8 * gfBattleStat[attackBonus4 +
+                              COMBAT_KEEP_ATTACK_STAT_INDEX_OFFSET]);
+    if (damage8 <= 0)
+        damage8 = COMBAT_KEEP_MIN_DAMAGE;
+
+    int killed29 = target0->Damage(damage8, -1);
+    if (killed29 > 0) {
+        char *armyName;
+        if (killed29 > 1)
+            armyName = gArmyNamesPlural[target0->m_monsterType];
+        else
+            armyName = gArmyNames[target0->m_monsterType];
+        sprintf(gText, "%s %d %s.\n%d %s %s.",
+                tower == COMBAT_TOWER_SELECTOR_GARRISON ? "Garrison does"
+                                                        : "Tower does",
+                damage8,
+                "damage", killed29, armyName,
+                killed29 > 1 ? "perish" : "perishes");
+    } else {
+        sprintf(gText, "%s %d %s.",
+                tower == COMBAT_TOWER_SELECTOR_GARRISON ? "Garrison does"
+                                                        : "Tower does",
+                damage8,
+                "damage");
+    }
+    gpCombatManager->CombatMessage(gText, 1, 1, 0);
+    target0->CancelSpellType(ARMY_CANCEL_SPELLS_AFTER_DAMAGE);
+    target0->PowEffect(-1, 1, -1, -1);
+    WaitEndSample(keepSample19, -1);
+    LogStr("KA2");
+}
 
 VA(0x0049487c, 0x17b)
-int combatManager::ExperienceValueOfStack(int) { return 0; }
+int combatManager::ExperienceValueOfStack(int side)
+{
+    int experienceValue6 = 0;
+    int index;
+
+    for (index = 0; index < COMBAT_ARMY_CAPACITY; index++) {
+        if (m_armies[side][index].m_monsterType != -1 &&
+            !(m_armies[side][index].m_monster.flags.all &
+              MONSTER_FLAGS_SUMMONED)) {
+            experienceValue6 +=
+                (m_armies[side][index].m_initialQuantity -
+                 m_armies[side][index].m_quantity) *
+                gMonsterDatabase[m_armies[side][index].m_monsterType]
+                    .hitPoints;
+        }
+    }
+    if (m_heroes[side])
+        experienceValue6 += COMBAT_HERO_EXPERIENCE_VALUE;
+    return experienceValue6;
+}
 
 VA(0x004949f7, 0x88)
-void combatManager::ResetHitByCreature(void) {}
+void combatManager::ResetHitByCreature(void)
+{
+    int side;
+    int index;
+
+    for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; side++) {
+        for (index = 0; index < COMBAT_ARMY_CAPACITY; index++)
+            m_armies[side][index].m_hitByCreature = 0;
+    }
+}
 
 VA(0x00494a7f, 0x36)
-int ValidHex(int) { return 0; }
+// @early-stop: all 0x36 instruction bytes match except +0x26, where the
+// success jump selects an equivalent delinked local label (0x07 versus 0x02).
+// The function has no relocations.
+int ValidHex(int hex)
+{
+    if (hex >= 0 && hex <= COMBAT_VALID_HEX_MAX)
+        return 1;
+    return 0;
+}
 
 VA(0x00494ab5, 0x16)
 void combatManager::SaveCombatBorder(void) {}
