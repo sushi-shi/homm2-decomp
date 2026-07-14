@@ -105,7 +105,7 @@ void SmackManagerMain(void) {
     bMainDone = 1;
     memcpy(savedPalette, gPalette->m_data, SMACK_PALETTE_SIZE);
 
-    if (!gbNoSound && gpSoundManager->m_digitalDriver && gSoundVolume) {
+    if (!gbNoSound && gpSoundManager->m_digitalDriver && gConfig.soundVolume) {
         if (bSmackNum == SMACK_CREDITS) {
             bSmackSound = 0;
         } else {

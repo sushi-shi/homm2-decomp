@@ -277,7 +277,7 @@ void combatManager::SetupGridForArmy(army *armyPtr)
 
     if (gbNoShowCombat != 0)
         return;
-    if (giCombatShadeLevel < 1)
+    if (gConfig.combatShadeLevel < 1)
         return;
 
     attackMask = armyPtr->GetAttackMask(armyPtr->m_hex, 2, -1);
@@ -338,7 +338,7 @@ int combatManager::UpdateGrid(int resetGridDisplay, int rebuildGrid)
     }
     if (resetGridDisplay != 0)
         bGridWasShowing = 0;
-    if (giCombatShadeLevel < 1 && gbShowCombatGrid == 0)
+    if (gConfig.combatShadeLevel < 1 && gConfig.showCombatGrid == 0)
         return 0;
 
     retval = 0;
@@ -350,7 +350,7 @@ int combatManager::UpdateGrid(int resetGridDisplay, int rebuildGrid)
     hadOldShade = 0;
     gridChanged = 0;
 
-    if (giCombatShadeLevel < 1)
+    if (gConfig.combatShadeLevel < 1)
         goto DrawCombatGrid;
 
     for (cellIndex = 0; cellIndex < COMBAT_HEX_COUNT; cellIndex++) {
@@ -412,7 +412,7 @@ int combatManager::UpdateGrid(int resetGridDisplay, int rebuildGrid)
     }
 
 DrawCombatGrid:
-    if (gbShowCombatGrid != 0) {
+    if (gConfig.showCombatGrid != 0) {
         if (bGridWasShowing != 0 && retval == 0)
             goto CopyGridState;
         for (cellIndex = 0; cellIndex < COMBAT_HEX_COUNT; cellIndex++) {
@@ -521,7 +521,7 @@ void combatManager::UpdateMouseGrid(int hexIndex, int forceUpdate)
         return;
     if (gbNoShowCombat != 0)
         return;
-    if (gbShowCombatMouseHex == 0)
+    if (gConfig.showCombatMouseHex == 0)
         return;
     if (gbProcessingCombatAction != 0 && forceUpdate == 0)
         return;

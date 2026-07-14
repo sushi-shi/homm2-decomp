@@ -464,10 +464,10 @@ char * FindLastToken(char *text, char token)
 VA(0x004c4930, 0x6c)
 void SetInstallDefaults(void)
 {
-    memset(&gConfig, 0, 0x19d);
+    memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
     strcpy(gConfig.autoLoadName, "AUTO");
     strcpy(gConfig.autoSaveName, "AUTO");
-    gConfig.soundQuality = 1;
+    gConfig.musicSource = CONFIG_MUSIC_SOURCE_CD;
 }
 
 // @match-note
@@ -513,7 +513,7 @@ void SetGameDefaults(void)
     gConfig.combatShadeLevel = 0;
     gConfig.combatArmyInfoLevel = 0;
     gConfig.evilInterfaceUsage = 0;
-    gConfig.useOpera = 1;
+    gConfig.useOpera = CONFIG_OPERA_ENABLED;
     gConfig.quickCombatLevel = 0;
     gConfig.combatSpeed = 0;
     gConfig.autoCombatUseSpells = 0;
@@ -525,7 +525,7 @@ void SetGameDefaults(void)
     gConfig.editorPaletteCycling = 0;
     gbFirstTimeThrough = 1;
     gConfig.slowVideo = 3;
-    gConfig.soundQuality = 3;
+    gConfig.musicSource = CONFIG_MUSIC_SOURCE_DEFAULT;
     gConfig.computerWalkSpeed = 3;
     gConfig.walkSpeed = 2;
     strcpy(gConfig.networkDefaultName, "The Unknown Hero");
@@ -549,15 +549,15 @@ void ReadPrefsFromFile(void)
 {
     sprintf(gText, "%s", "HEROES2.CFG");
     if (_access(gText, 0) == -1) {
-        memset(&gConfig, 0, 0x19d);
+        memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
         strcpy(gConfig.autoLoadName, "AUTO");
         strcpy(gConfig.autoSaveName, "AUTO");
-        gConfig.soundQuality = 1;
+        gConfig.musicSource = CONFIG_MUSIC_SOURCE_CD;
     } else {
         FILE *f = fopen(gText, "rb");
         if (f == 0)
             FileError(gText);
-        fread(&gConfig, 0x19d, 1, f);
+        fread(&gConfig, CONFIG_PERSISTED_SIZE, 1, f);
         fclose(f);
         if (gConfig.autoSaveName[0xe] == 0)
             goto skipDefaults;
@@ -593,11 +593,11 @@ void ReadPrefsFromRegistry(void)
     dwSize = 4;
     if (RegQueryValueExA(hKey, "Music Volume", 0, &dwType,
                          reinterpret_cast<unsigned char *>(&gConfig.musicVolume), &dwSize) != 0) {
-        memset(&gConfig, 0, 0x19d);
-        memset(&gConfig, 0, 0x19d);
+        memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
+        memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
         strcpy(gConfig.autoLoadName, "AUTO");
         strcpy(gConfig.autoSaveName, "AUTO");
-        gConfig.soundQuality = 1;
+        gConfig.musicSource = CONFIG_MUSIC_SOURCE_CD;
         SetGameDefaults();
         RegCloseKey(hKey);
         UpdateSystemOptionsMenu();
@@ -610,7 +610,7 @@ void ReadPrefsFromRegistry(void)
     RegQueryValueExA(hKey, "Computer Walk Speed", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.computerWalkSpeed), &dwSize);
     RegQueryValueExA(hKey, "Show Route", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.showRoute), &dwSize);
     RegQueryValueExA(hKey, "Blackout Computer", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.blackoutComputer), &dwSize);
-    RegQueryValueExA(hKey, "Sound Quality", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.soundQuality), &dwSize);
+    RegQueryValueExA(hKey, "Sound Quality", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.musicSource), &dwSize);
     RegQueryValueExA(hKey, "Use Opera", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.useOpera), &dwSize);
     RegQueryValueExA(hKey, "Direct Connect Com Port", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.directConnectComPort), &dwSize);
     RegQueryValueExA(hKey, "Direct Connect Baud Rate", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.directConnectBaudRate), &dwSize);
@@ -677,7 +677,7 @@ void ReadPrefsFromRegistry(void)
 VA(0x004c5450, 0xa1)
 void ReadPrefs(void)
 {
-    memset(&gConfig, 0, 0x19d);
+    memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
     ReadPrefsFromRegistry();
     sprintf(gConfig.rmtRLName, "RMT%sRL.BIN", gConfig.uniqueSystemID);
     sprintf(gConfig.rmtRCName, "RMT%sRC.BIN", gConfig.uniqueSystemID);
@@ -700,7 +700,7 @@ void WritePrefsToFile(void)
     sprintf(gText, "%s", "HEROES2.CFG");
     int fd = _open(gText, 0x8301, 0x80);
     if (fd != -1) {
-        _write(fd, &gConfig, 0x19d);
+        _write(fd, &gConfig, CONFIG_PERSISTED_SIZE);
         _close(fd);
     }
 }
@@ -723,7 +723,7 @@ void WritePrefsToRegistry(void)
     RegSetValueExA(hKey, "Computer Walk Speed", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.computerWalkSpeed), 4);
     RegSetValueExA(hKey, "Show Route", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.showRoute), 4);
     RegSetValueExA(hKey, "Blackout Computer", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.blackoutComputer), 4);
-    RegSetValueExA(hKey, "Sound Quality", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.soundQuality), 4);
+    RegSetValueExA(hKey, "Sound Quality", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.musicSource), 4);
     RegSetValueExA(hKey, "Use Opera", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.useOpera), 4);
     RegSetValueExA(hKey, "Direct Connect Com Port", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.directConnectComPort), 4);
     RegSetValueExA(hKey, "Direct Connect Baud Rate", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.directConnectBaudRate), 4);

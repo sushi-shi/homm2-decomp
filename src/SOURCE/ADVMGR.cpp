@@ -264,7 +264,7 @@ int advManager::Open(int id)
         m_activeSoundMask = 0;
     }
 
-    GetCursorSampleSet(gCursorSampleSet);
+    GetCursorSampleSet(gConfig.walkSpeed);
     if (!gbThisNetHumanPlayer[giCurPlayer]) {
         gpGame->TurnOnAIMusic();
         SetNoDialogMenus(0);
@@ -273,9 +273,9 @@ int advManager::Open(int id)
     }
 
     glTimers[0] = KBTickCount() + ADVMGR_TIMER_DELAY;
-    int oldSampleVolume = gSampleVolume;
-    if (gSampleVolume != 0)
-        gSampleVolume = 10;
+    int oldSampleVolume = gConfig.soundVolume;
+    if (gConfig.soundVolume != 0)
+        gConfig.soundVolume = 10;
     SetInitialMapOrigin();
 
     bShowIt = gbThisNetHumanPlayer[giCurPlayer];
@@ -294,7 +294,7 @@ int advManager::Open(int id)
     ForceNewHover();
     gpWindowManager->FadeScreen(0, 8, gPalette);
     giBottomViewOverride = 0;
-    gSampleVolume = oldSampleVolume;
+    gConfig.soundVolume = oldSampleVolume;
     gpSoundManager->AdjustSoundVolumes();
     field_0xc = ADVMGR_MANAGER_MESSAGE;
     field_0x10 = id;
@@ -308,7 +308,7 @@ void advManager::Close(void)
 {
     ClearBottomView();
     gpMouseManager->SetPointer(-1);
-    if (!bEnteringTown || gSoundTransition || !gCdMusic) {
+    if (!bEnteringTown || gConfig.useOpera || gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
         gpSoundManager->SwitchAmbientMusic(-1);
         gpSoundManager->StopAllSamples(1);
     } else {
@@ -603,7 +603,7 @@ int advManager::Main(struct tag_message &message)
     }
     if (giScreenScroll && gbForegroundApp)
         CheckScreenScroll();
-    if (!gbNoSound && gMidiEnabled && giForceSwitchMusic > 0 &&
+    if (!gbNoSound && gConfig.musicVolume && giForceSwitchMusic > 0 &&
         KBTickCount() - giForceSwitchMusic > 6000) {
         giForceSwitchMusic = -1;
         if (gpSoundManager->m_currentTrack == 21)
@@ -4480,7 +4480,7 @@ void advManager::SetEnvironmentOrigin(int originX, int originY, int stopSounds)
     if (originX == ADVMGR_ENVIRONMENT_SOUND_NONE)
         return;
 
-    if (gSampleVolume != 0) {
+    if (gConfig.soundVolume != 0) {
         m_activeSoundMask = 0;
         for (soundLayer = ADVMGR_ENVIRONMENT_SOUND_FIRST_LAYER;
              soundLayer <= ADVMGR_ENVIRONMENT_SOUND_LAYER_COUNT; ++soundLayer) {
@@ -4761,7 +4761,7 @@ void advManager::TeleportTo(hero *mapHero, int destinationX, int destinationY,
 
     CompleteDraw(0);
     if (gbThisNetHumanPlayer[giCurPlayer] == 0) {
-        if ((const_00128d38 == 0 &&
+        if ((gConfig.blackoutComputer == 0 &&
              MapExtraPosAndAdjacentsSet(mapHero->m_x, mapHero->m_y,
                                         giCurWatchPlayerBit)) ||
             MapExtraPosAndAdjacentsSet(destinationX, destinationY,
@@ -6085,7 +6085,7 @@ int SystemOptionsHandler(struct tag_message& message) {
                             break;
 
                         case ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE:
-                            if (gConfig.soundQuality == ADVMGR_OPTION_MUSIC_MIDI) {
+                            if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
                                 if (gpSoundManager->m_cdStarted == 0) {
                                     gpSoundManager->CDStartup();
                                 }
@@ -6106,18 +6106,18 @@ int SystemOptionsHandler(struct tag_message& message) {
                                     );
                                     break;
                                 }
-                                gpSoundManager->SetMusicQuality(ADVMGR_OPTION_MUSIC_CD);
-                                gConfig.useOpera = 0;
-                            } else if (gConfig.useOpera == 0) {
-                                gConfig.useOpera = 1;
+                                gpSoundManager->SetMusicQuality(CONFIG_MUSIC_SOURCE_CD);
+                                gConfig.useOpera = CONFIG_OPERA_DISABLED;
+                            } else if (gConfig.useOpera == CONFIG_OPERA_DISABLED) {
+                                gConfig.useOpera = CONFIG_OPERA_ENABLED;
                             } else {
                                 if (gpSoundManager->m_midiStarted == 0) {
                                     gpSoundManager->MIDIStartup();
                                 }
                                 if (gpSoundManager->m_midiReady == 0) {
-                                    gConfig.useOpera = 1 - gConfig.useOpera;
+                                    gConfig.useOpera = CONFIG_OPERA_ENABLED - gConfig.useOpera;
                                 } else {
-                                    gpSoundManager->SetMusicQuality(ADVMGR_OPTION_MUSIC_MIDI);
+                                    gpSoundManager->SetMusicQuality(CONFIG_MUSIC_SOURCE_MIDI);
                                 }
                             }
                             preferencesChanged = 1;
