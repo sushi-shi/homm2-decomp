@@ -5,6 +5,7 @@
 
 #include <va.h>
 #include <_globals_model.h>
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,10 +34,12 @@
 #include <SOURCE/combatManager.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/playerData.h>
+#include <SOURCE/swapManager.h>
 #include <SOURCE/tradpost.h>
 #include <SOURCE/town.h>
 #include <SOURCE/townManager.h>
 #include <SOURCE/X_GLOBAL.h>
+#include <SOURCE/x_arena.h>
 
 #define EVENTS_FILE const_cast<char *>("I:\\Projects\\Heroes\\Prog\\SOURCE\\EVENTS.CPP")
 #define EVENTS_NET_LINE (*reinterpret_cast<const short *>("U\x12"))
@@ -1984,19 +1987,330 @@ cellDone:
 }
 
 VA(0x004aea02, 0x90)
-void advManager::HeroSwap(class hero *, class hero *) {}
+void advManager::HeroSwap(hero *firstHero, hero *secondHero)
+{
+    swapManager *swapWindow = new swapManager(firstHero, secondHero);
+    if (swapWindow == 0)
+        MemError();
+    gpExec->DoDialog(swapWindow);
+    delete swapWindow;
+    RedrawAdvScreen(1, 0);
+}
 
 VA(0x004aea92, 0x12f)
-int advManager::BarrierEvent(class mapCell *, class hero *) { return 0; }
+int advManager::BarrierEvent(mapCell *cell, hero *)
+{
+    SAMPLE2 eventSample = NULL_SAMPLE2;
+    int color = cell->w4hi;
+    color &= BARRIER_COLOR_MASK;
+    int passwordIndex = cell->w4hi;
+    passwordIndex >>= BARRIER_PASSWORD_SHIFT;
+    char response[BARRIER_INPUT_BUFFER_SIZE];
+
+    sprintf(gText,
+            "A magical %s barrier stands tall before you, blocking your way.  "
+            "Runes on the arch read, \"Speak the key and you may pass.\"",
+            xBarrierColor[color]);
+    GetDataEntry(gText, response, BARRIER_INPUT_LENGTH, 0, 0, 1);
+    if (StrEqNoCase(response, xPasswordStrings[passwordIndex]) &&
+        (gpCurPlayer->m_barrierTents & (1 << color))) {
+        EventSound(cell->triggerType & MAP_EVENT_TYPE_MASK, color,
+                   &eventSample);
+        NormalDialog(
+            "As you speak the magic word, the glowing barrier dissolves into "
+            "nothingness.",
+            1, -1, -1, -1, 0, -1, 0, -1, 0);
+        return 1;
+    } else {
+        NormalDialog("You speak, and nothing happens.", 1, -1, -1, -1, 0,
+                     -1, 0, -1, 0);
+        return 0;
+    }
+}
 
 VA(0x004aebc1, 0x99)
-signed char StrEqNoCase(char *, char *) { return 0; }
+// @early-stop: all instructions and both external relocations match. The only
+// raw residual is offsets 0x5d and 0x61, where MSVC reverses the two symmetric
+// equality loads from the exact -0x10/-0x14 character slots.
+signed char StrEqNoCase(char *firstString, char *secondString)
+{
+    char *firstPosition = firstString;
+    char *secondPos = secondString;
+    int characterCount = 0;
+    char firstUpper;
+    char secondUpper;
+
+    while (1) {
+        characterCount++;
+        if (characterCount == GENERIC_SITE_STRING_LIMIT)
+            return 1;
+        firstUpper = static_cast<char>(
+            toupper(static_cast<int>(*firstPosition)));
+        secondUpper = static_cast<char>(
+            toupper(static_cast<int>(*secondPos)));
+        if (firstUpper == secondUpper) {
+            if (firstUpper == 0)
+                return 1;
+            firstPosition++;
+            secondPos++;
+        } else {
+            return 0;
+        }
+    }
+}
 
 VA(0x004aec5a, 0xde)
-void advManager::PasswordEvent(class mapCell *, class hero *) {}
+void advManager::PasswordEvent(mapCell *cell, hero *)
+{
+    SAMPLE2 eventSample = NULL_SAMPLE2;
+    int color = cell->w4hi;
+    color &= BARRIER_COLOR_MASK;
+    int passwordIndex = cell->w4hi;
+    passwordIndex >>= BARRIER_PASSWORD_SHIFT;
+
+    EventSound(cell->triggerType & MAP_EVENT_TYPE_MASK, color,
+               &eventSample);
+    sprintf(
+        gText,
+        "You enter the tent and see an old woman gazing into a magic gem.  She "
+        "looks up and says, \"In my travels, I have learned much in the way of "
+        "arcane magic.  A great oracle taught me his skill.  I have the answer "
+        "you seek.  The %s keyword is '%s'.\"",
+        xBarrierColor[color], xPasswordStrings[passwordIndex]);
+    NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+    gpCurPlayer->m_barrierTents |= 1 << color;
+}
 
 VA(0x004aed38, 0x6fe)
-void advManager::GenericSiteEvent(class mapCell *, class hero *) {}
+// @early-stop: complete semantics/CFG, 0x54-byte frame, and every source stack
+// slot are recovered. Both sides have 496 non-table instructions; retail is one
+// byte longer solely from the equivalent outer map-width comparison sequence.
+// The monster hit-point relocation is gMonsterDatabase+8 in base and the same
+// effective address const_000faeb8 in retail; other residuals are branch and
+// delinked seven-entry switch-table identities.
+void advManager::GenericSiteEvent(mapCell *cell, hero *eventHero)
+{
+    int currentSiteType;
+    mapCell *currentCell5;
+    int index3;
+    int siteLevel6;
+    int primaryStat15;
+    int siteType2;
+    int mapY9;
+    int mapX37;
+    int unusedSite;
+    SAMPLE2 eventSample5;
+    int cursedArtifactCount9;
+    int unusedOne18;
+    signed char stableResult26;
+    int unusedTwo6;
+    int creatureType;
+    int experience11;
+    int oldQuantity4;
+
+    cursedArtifactCount9 = 0;
+    eventSample5 = NULL_SAMPLE2;
+    siteType2 = cell->w4hi;
+    siteType2 &= GENERIC_SITE_TYPE_MASK;
+    siteLevel6 = cell->w4hi;
+    siteLevel6 >>= GENERIC_SITE_LEVEL_SHIFT;
+
+    switch (siteType2) {
+    case GENERIC_SITE_ALCHEMIST_TOWER:
+        for (index3 = 0; index3 < GENERIC_SITE_ARTIFACT_SLOT_COUNT; index3++) {
+            if (IsCursedItem(eventHero->m_artifacts[index3]))
+                cursedArtifactCount9++;
+        }
+        if (cursedArtifactCount9 != 0) {
+            EventSound(cell->triggerType & MAP_EVENT_TYPE_MASK, siteType2,
+                       &eventSample5);
+            if (cursedArtifactCount9 == 1) {
+                sprintf(
+                    gText,
+                    "As you enter the Alchemist's Tower, a hobbled, graying man "
+                    "in a brown cloak makes his way towards you.  He checks your "
+                    "pack, and sees that you have 1 cursed item.  For 750 gold, "
+                    "the alchemist will remove it for you.  Do you pay?");
+            } else {
+                sprintf(
+                    gText,
+                    "As you enter the Alchemist's Tower, a hobbled, graying man "
+                    "in a brown cloak makes his way towards you.  He checks your "
+                    "pack, and sees that you have %d cursed items.  For 750 gold, "
+                    " the alchemist will remove them for you.  Do you pay?",
+                    cursedArtifactCount9);
+            }
+            NormalDialog(gText, 2, -1, -1, -1, 0, -1, 0, -1, 0);
+            if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+                if (gpCurPlayer->m_resources[RES_GOLD] >=
+                    GENERIC_SITE_ALCHEMIST_COST) {
+                    for (index3 = 0;
+                         index3 < GENERIC_SITE_ARTIFACT_SLOT_COUNT; index3++) {
+                        if (IsCursedItem(eventHero->m_artifacts[index3]))
+                            eventHero->m_artifacts[index3] = -1;
+                    }
+                    gpCurPlayer->m_resources[RES_GOLD] -=
+                        GENERIC_SITE_ALCHEMIST_COST;
+                } else {
+                    NormalDialog(
+                        "You hear a voice from behind the locked door, \"You "
+                        "don't have enough gold to pay for my services.\"",
+                        1, -1, -1, -1, 0, -1, 0, -1, 0);
+                }
+            }
+        } else {
+            NormalDialog(
+                "You hear a voice from high above in the tower, \"Go away! I "
+                "can't help you!\"",
+                1, -1, -1, -1, 0, -1, 0, -1, 0);
+        }
+        break;
+
+    case GENERIC_SITE_ARENA:
+        if (eventHero->m_eventFlags & HERO_EVENT_ARENA) {
+            NormalDialog("The Arena guards turn you away.", 1, -1, -1, -1, 0,
+                         -1, 0, -1, 0);
+        } else {
+            EventSound(cell->triggerType & MAP_EVENT_TYPE_MASK, siteType2,
+                       &eventSample5);
+            eventHero->m_eventFlags =
+                static_cast<int>(eventHero->m_eventFlags) | HERO_EVENT_ARENA;
+            primaryStat15 = DoArenaDialog();
+            eventHero->m_primaryStats[primaryStat15]++;
+        }
+        break;
+
+    case GENERIC_SITE_MERMAIDS:
+        if (eventHero->m_eventFlags & HERO_EVENT_MERMAID) {
+            NormalDialog(
+                "The mermaids silently entice you to return later and be "
+                "blessed again.",
+                1, -1, -1, -1, 0, -1, 0, -1, 0);
+        } else {
+            EventSound(cell->triggerType & MAP_EVENT_TYPE_MASK, siteType2,
+                       &eventSample5);
+            eventHero->m_eventFlags = static_cast<int>(eventHero->m_eventFlags) |
+                                      HERO_EVENT_MERMAID;
+            eventHero->m_luck = eventHero->m_luck + 1;
+            EventWindow(
+                -1, 1,
+                "The magical, soothing beauty of the Mermaids reaches you and "
+                "your crew.  Just for a moment, you forget your worries and "
+                "bask in the beauty of the moment.  The mermaids charms bless "
+                "you with increased luck for your next combat.",
+                GENERIC_SITE_MERMAID_WINDOW_ICON, 0, -1, 0, -1);
+        }
+        break;
+
+    case GENERIC_SITE_HUT_OF_MAGI:
+        EventSound(cell->triggerType & MAP_EVENT_TYPE_MASK, siteType2,
+                   &eventSample5);
+        NormalDialog(
+            "You enter a rickety hut and talk to the magician who lives there.  "
+            "He tells you of places near and far which may aid you in your "
+            "journeys.",
+            1, -1, -1, -1, 0, -1, 0, -1, 0);
+        for (mapX37 = 0; mapX37 < MAP_WIDTH; mapX37++) {
+            for (mapY9 = 0; mapY9 < MAP_HEIGHT; mapY9++) {
+                currentCell5 = gpGame->m_worldMap.Row(mapY9) + mapX37;
+                currentSiteType = currentCell5->w4hi;
+                currentSiteType &= BARRIER_COLOR_MASK;
+                if ((currentCell5->triggerType & MAP_EVENT_TYPE_MASK) ==
+                        MAP_EVENT_EXPANSION_OBJECT &&
+                    currentSiteType == GENERIC_SITE_HUT_COLOR) {
+                    gpGame->SetVisibility(mapX37, mapY9, giCurPlayer,
+                                          GENERIC_SITE_VISIBILITY_RADIUS);
+                    CompleteDraw(0);
+                    UpdateScreen(0, 0);
+                }
+            }
+        }
+        break;
+
+    case GENERIC_SITE_EYE_OF_MAGI:
+        NormalDialog("This eye seems to be intently studying its surroundings.",
+                     1, -1, -1, -1, 0, -1, 0, -1, 0);
+        break;
+
+    case GENERIC_SITE_SIRENS:
+        if (eventHero->m_eventFlags & HERO_EVENT_SIRENS) {
+            NormalDialog(
+                "You have your crew stop up their ears with wax before the "
+                "sirens' eerie song has any chance of luring them to a watery "
+                "grave.",
+                1, -1, -1, -1, 0, -1, 0, -1, 0);
+        } else {
+            experience11 = 0;
+            for (index3 = 0; index3 < GENERIC_SITE_ARMY_SLOT_COUNT; index3++) {
+                creatureType = eventHero->m_army.m_creatureTypes[index3];
+                if (creatureType != -1) {
+                    oldQuantity4 = eventHero->m_army.m_quantities[index3];
+                    if (oldQuantity4 > 1) {
+                        eventHero->m_army.m_quantities[index3] =
+                            static_cast<short>(
+                                oldQuantity4 *
+                                GENERIC_SITE_SIREN_ARMY_REMAINDER);
+                        experience11 +=
+                            (oldQuantity4 -
+                             eventHero->m_army.m_quantities[index3]) *
+                            gMonsterDatabase[creatureType].hitPoints;
+                    }
+                }
+            }
+            if (experience11 != 0) {
+                EventSound(cell->triggerType & MAP_EVENT_TYPE_MASK, siteType2,
+                           &eventSample5);
+                sprintf(
+                    gText,
+                    "An eerie wailing song emanates from the sirens perched "
+                    "upon the rocks.  Many of your crew fall under its spell, "
+                    "and dive into the water where they drown.  You are now "
+                    "wiser for the visit, and gain %d experience.",
+                    experience11);
+                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                GiveExperience(eventHero, experience11, 1);
+            } else {
+                NormalDialog(
+                    "As the sirens sing their eerie song, your small, "
+                    "determined army manages to overcome the urge to dive "
+                    "headlong into the sea.",
+                    1, -1, -1, -1, 0, -1, 0, -1, 0);
+            }
+            eventHero->m_eventFlags = static_cast<int>(eventHero->m_eventFlags) |
+                                      HERO_EVENT_SIRENS;
+        }
+        break;
+
+    case GENERIC_SITE_STABLES:
+        unusedOne18 = 1;
+        unusedTwo6 = 2;
+        stableResult26 = 0;
+        if ((eventHero->m_eventFlags & HERO_EVENT_STABLES) == 0) {
+            eventHero->m_eventFlags =
+                static_cast<int>(eventHero->m_eventFlags) | HERO_EVENT_STABLES;
+            eventHero->m_mobility += GENERIC_SITE_STABLE_MOBILITY;
+            eventHero->m_remainingMobility += GENERIC_SITE_STABLE_MOBILITY;
+            stableResult26 |= 1;
+        }
+        if (eventHero->CreatureTypeCount(GENERIC_SITE_STABLE_CREATURE)) {
+            eventHero->UpgradeCreatures(GENERIC_SITE_STABLE_CREATURE,
+                                        GENERIC_SITE_STABLE_UPGRADE);
+            stableResult26 |= 2;
+        }
+        if (stableResult26 != 0) {
+            EventSound(cell->triggerType & MAP_EVENT_TYPE_MASK, siteType2,
+                       &eventSample5);
+        }
+        sprintf(gText, xStableText[stableResult26]);
+        if (stableResult26 & 2) {
+            EventWindow(-1, 1, gText, GENERIC_SITE_STABLE_REWARD_TYPE,
+                        GENERIC_SITE_STABLE_REWARD_VALUE, -1, 0, -1);
+        } else {
+            EventWindow(-1, 1, gText, -1, 0, -1, 0, -1);
+        }
+        break;
+    }
+}
 
 VA(0x004af436, 0x191)
 void advManager::RecruitSiteEvent(class mapCell *, class hero *) {}
