@@ -55,6 +55,10 @@ DATA(0x00534ce8) static unsigned int gCTRun;
 // A contiguous state-record ownership pass did recover source=ECX/command=EAX/count=EDX, but only
 // by reversing X/cursor to EBX/ESI and regressing below this checkpoint; see
 // icon2bc-state-ownership-06409a9.tsv. Do not replay whole/tail/cursor/nested record surfaces.
+// A bounded follow-up split only retail-evidenced adjacent roles (clip bounds, source-command
+// tail without destination, and X/Y/entry/row context) and tried the sibling-shared frame-entry
+// accessor. None kept the recovered command coloring with X=ESI/destination=EBX; canonical is
+// restored. Resume only from a newly proved owner/type surface, not another record boundary.
 VA(0x004d32a0, 0x5af)
 void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                             int clip, int clipX, int clipY, int clipW, int clipH, int color,
