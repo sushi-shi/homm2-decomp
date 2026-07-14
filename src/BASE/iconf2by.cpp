@@ -20,7 +20,7 @@ static int gFYXEnd;
 static int gFYY;
 static int gFYX;
 static int gFYClipB;
-static int gFYRow;
+static unsigned char *gFYRow;
 static int gFYRun;
 static unsigned char gFYColor;
 static int gFYDimLen;
@@ -33,15 +33,18 @@ static int gFYSkip;
 static int gFYClipR;
 
 // @match-note
-// /O2 structural checkpoint on master 71bdca9 with consumer-only enum ownership. Keeping the
-// required named IconShear typedef gives 89.77%, candidate 0x57f versus retail 0x58d, one four-byte
-// frame word, and 142/144 relocations with no wrong or excess target. Omitting that consumer header
-// restores the former 93.72654%/0x58c/144:144 allocation, but leaves three raw 0x7f sentinels and is
-// rejected: correctness wins over a temporary TU-state score. First raw divergence is +0x5c:
-// candidate keeps shear in EBP, while retail loads shear into ESI and then clipW into EBP. Missing
-// occurrences remain retail gFYX in the full dim destination and gFYClipR in the right-clipped
-// literal count. Revisit only after new retail-evidenced lifetime/type structure; no regex or AST
-// permuter was used, and dummy reloads, aliases, volatile state, and count-only locals are forbidden.
+// /O2 structural checkpoint in the corrected 1470-row delinker universe with consumer-only enum
+// ownership. Reconstructing gFYRow as the byte pointer owned by every sibling decoder removes the
+// integer-address casts and raises live match from 89.77212% to 90.20107%; candidate remains 0x57f
+// versus retail 0x58d with one four-byte frame word. The required named IconShear typedef is kept;
+// omitting that consumer header can recover a higher temporary TU-state score but leaves raw 0x7f
+// sentinels and is rejected. First raw divergence remains +0x5c: candidate keeps shear in EBP,
+// while retail loads shear into ESI and then clipW into EBP. Relocations remain 142/144 with no
+// wrong or excess target; missing occurrences are retail gFYX in the full dim destination and
+// gFYClipR in the right-clipped literal count. Direct shear indexing and the typed byte-row model
+// agree with the non-flipped/color-table siblings and related H2X lineage. Revisit only after new
+// retail-evidenced lifetime/type structure; no regex or AST permuter was used, and dummy reloads,
+// aliases, volatile state, and count-only locals are forbidden.
 VA(0x004d9ce0, 0x58d)
 void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                              int clip, int clipX, int clipY, int clipW, int clipH, int color,
@@ -54,13 +57,10 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
     gFYX0 = ((x - gFYEntry->w) - gFYEntry->x) + 1;
     gFYXEnd = gFYEntry->w + gFYX0 - 1;
     gFYY = gFYEntry->y + y;
-    {
-        int initialShearOffset = shear[gFYY];
-        gFYX = gFYXEnd - initialShearOffset;
-    }
+    gFYX = gFYXEnd - shear[gFYY];
     gFYClipB = clipY + clipH - 1;
     gFYClipR = clipX + clipWidth - 1;
-    gFYRow = dest->m_width * gFYY + reinterpret_cast<int>(dest->m_pixels);
+    gFYRow = dest->m_pixels + dest->m_width * gFYY;
     for (;;) {
         gFYRun = *gFYSrc;
         gFYSrc = gFYSrc + 1;
@@ -104,10 +104,10 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
                     if (clipX <= (gFYX - gFYDimLen) + 1 && gFYX <= gFYClipR) {
                         unsigned char *dimDst;
                         if (clipX <= (gFYX - gFYDimLen) + 1) {
-                            dimDst = reinterpret_cast<unsigned char *>((gFYRow - gFYDimLen) + gFYX + 1);
+                            dimDst = (gFYRow - gFYDimLen) + gFYX + 1;
                         } else {
                             gFYDimLen = (gFYX - clipX) + 1;
-                            dimDst = reinterpret_cast<unsigned char *>(gFYRow + clipX);
+                            dimDst = gFYRow + clipX;
                         }
                         gFYDimIdx = 0;
                         gFYDimDst = dimDst;
@@ -128,11 +128,9 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
                 unsigned int fillCount = gFYRun;
                 if (clipX <= static_cast<int>((gFYX - fillCount) + 1) && gFYX <= gFYClipR) {
                     if (clipX <= static_cast<int>((gFYX - fillCount) + 1)) {
-                        memset(reinterpret_cast<unsigned char *>((gFYRow - fillCount) + 1 + gFYX),
-                               gFYColor, fillCount);
+                        memset((gFYRow - fillCount) + 1 + gFYX, gFYColor, fillCount);
                     } else {
-                        memset(reinterpret_cast<unsigned char *>(gFYRow + clipX), gFYColor,
-                               (gFYX - clipX) + 1);
+                        memset(gFYRow + clipX, gFYColor, (gFYX - clipX) + 1);
                     }
                 }
             }
@@ -146,7 +144,7 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
                 int pendingSkip;
                 if (left <= gFYClipR && clipX <= gFYX) {
                     if (gFYX <= gFYClipR) {
-                        gFYDst = reinterpret_cast<unsigned char *>(gFYRow + gFYX);
+                        gFYDst = gFYRow + gFYX;
                         if (clipX <= left) {
                             gFYSkip = 0;
                             gFYDimLen = gFYRun;
@@ -158,8 +156,7 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
                         }
                     } else {
                         gFYSrc = gFYSrc + (gFYX - gFYClipR);
-                        unsigned char *rightDst =
-                            reinterpret_cast<unsigned char *>(gFYClipR + gFYRow);
+                        unsigned char *rightDst = gFYRow + gFYClipR;
                         if (clipX <= (gFYX - gFYRun)) {
                             gFYDst = rightDst;
                             gFYSkip = 0;
