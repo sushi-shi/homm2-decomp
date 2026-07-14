@@ -1,9 +1,10 @@
 # schema_version	1
 # base_checkpoint	8116876be8a54b191e027144012cf7726418b595
+# corrected_owner_checkpoint	6a86651f544e766fdd9ffc2adad0f3bde1d718ce
 # target_rva	0x004d1ba0 (normalized tool RVA 0x000d1ba0)
 # target_size	0x4f1
-# retained_source_sha256	7958f8af7f35ae9a8259cb816900a9163bea1ab3cd8b8fafb4b22b7b75f8321f
-# retained_object_sha256	ac410e52b0d3f2292229ae22edca185b6ed9368458acdfe3bed74c0d8981e68e
+# retained_source_sha256	6d75b7b03c1c1295c9ee896618abc9756d8df654f4b9f151dda5c3083aa4e730
+# retained_object_sha256	002371f2a0896235494ec4a8a7b5bfac6fb146290d274b940aef666390badb96
 # retained_text_sha256	0596f651ae42685c1cee0282b780756855c2d358883d82c85525618338006f3a
 # target_object_sha256	1620109acfec9c11aca38897696b8ab056e7b87091fb9f4bda8f1be60e77f1ae
 # target_text_sha256	dc51ac4ccfd5869d35741916dc42d83a184ddaf4238987fc68a233c57073b9a9
@@ -24,3 +25,11 @@ literal_early_reject_gate	86.5756	0x4e5	82	81	rejected_byte_identical	Spell the 
 shared_literal_copy_count	86.5756	0x4e5	82	81	retained_byte_identical	Snapshot cn into copyCount before publication/test as iconf2bc retail/source does; this TU coalesces the lifetimes but the source ownership is sibling-evidenced.
 shared_selected_destination	85.78	NA	82	81	rejected	Carry one selectedDst plus right local across both literal arms as iconf2bc source does; allocation regressed and the variant was discarded.
 corrected_static_owner_vas	86.5756	0x4e5	82	81	retained_semantic	Correct all 18 DATA annotations from ordered retail relocations; annotations are compiler-neutral and retained text is unchanged.
+corrected_owner_physical_order	85.87	NA	82	81	rejected	Declare file statics in ascending corrected retail address order: skip/run/x0/cnt/dimLen/y/entry/x/src/dimPal/dimDst/clipB/row/cnt2/color/clipR/dst/xEnd.
+corrected_owner_reverse_physical	84.59	NA	82	81	rejected	Use the bounded reverse order in case VC4.2 common allocation reversed declaration publication; allocation regressed further.
+sibling_object_symbol_order	84.58	NA	82	81	rejected	Map iconf2bc object symbol-table roles onto the corrected Iconf2b owners: row/y/xEnd/run/skip/dst/cnt/cnt2/clipR/clipB/x/dimLen/dimDst/dimPal/color/src/x0/entry.
+function_local_physical_order	84.33	NA	82	81	rejected	Move the corrected physical-order scratch block into function-local static ownership; both the declaration scope and allocation diverged.
+function_local_retained_order	86.40	NA	82	81	rejected	Isolate scope from order by moving the retained declaration sequence into function-local static ownership; close but below the executable baseline.
+sibling_object_bss_offset_order	84.35	NA	82	81	rejected	Map iconf2bc candidate BSS-offset order onto corrected roles: row/src/run/entry/dimDst/clipR/dimLen/x/y/clipB/dimPal/xEnd/x0/color/cnt2/skip/cnt/dst.
+packed_scratch_record	84.59	NA	82	81	rejected	Model the contiguous 0x48-byte owner as one packed semantic record in a narrow header; register allocation regressed, so the header/type was removed.
+canonical_corrected_owner_restored	86.5756	0x4e5	82	81	retained	Restore the integrated file-static declaration sequence and semantic currentY/copyCount lifetimes exactly.

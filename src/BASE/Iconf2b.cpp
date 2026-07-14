@@ -58,6 +58,12 @@ DATA(0x00534c60) static int gFlipSkip;
 // Nested/early-reject gates were also byte-identical; a shared selected-destination lifetime
 // regressed to 85.78% and was discarded. See iconf2b-template-8116876.tsv. The remaining setup
 // and [esp+0x10] spill residual is still unresolved and is not a wall.
+// The 6a86651 corrected-owner follow-up tested the newly derivable declaration surfaces. Retail
+// physical order, reverse physical order, sibling symbol-table order, sibling BSS-offset order,
+// function-local ownership, and one packed scratch record all regressed (84.33-85.87%). The exact
+// first-use and sibling source orders were already covered by the earlier matrices and were not
+// replayed. The retained file-static order is still 86.5756%; see the appended corrected-owner
+// family in iconf2b-template-8116876.tsv.
 VA(0x004d1ba0, 0x4f1)
 void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                       int clip, int clipX, int clipY, int clipW, int clipH, int color)
