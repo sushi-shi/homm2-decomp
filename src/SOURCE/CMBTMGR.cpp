@@ -1559,8 +1559,8 @@ foundMissHex:
     LogStr("CA2");
 }
 
-// @match-note: retained/combined-live 99.83%; frame, slots, CFG, and all 44/44
-// relocation targets align. The residual at +0x25d/+0x260/+0x262 is the same
+// @match-note: retained 99.83%, combined live 99.67%; frame, slots, CFG, and
+// all 44/44 relocation targets align. The residual at +0x25d/+0x260/+0x262 is the same
 // equivalent operand-load/reversed-branch class. Relational swaps, De
 // Morgan forms, explicit control flow, volatile intermediates, and the attempted
 // AST mutation did not change it; do not resume local source-shape grinding.
@@ -1759,7 +1759,7 @@ void combatManager::SaveCombatBorder(void) {}
 VA(0x00494acb, 0x16)
 void combatManager::DrawCombatBorder(void) {}
 
-// @match-note: retained 96.70%, combined live 94.89%; first residual is the
+// @match-note: retained/combined-live 96.70%; first residual is the
 // 0x60 base frame versus retail 0x58, with shifted slots. CFG first diverges at normalized
 // instruction 161 in the obstacle-loop exits/continues. All 22/22 relocation
 // sites align; member fields use different delinked aliases to the same DATA.
@@ -1896,8 +1896,8 @@ void combatManager::SetupAndLoadObstacles(void)
     }
 }
 
-// @match-note: retained/combined-live 97.18%; frame, slots, CFG, and all 20/20
-// relocation sites align. The first code residual is normalized instruction 134
+// @match-note: retained 97.18%, combined live 96.02%; frame, slots, CFG, and
+// all 20/20 relocation sites align. The first code residual is normalized instruction 134
 // (again at 150), where retail uses sbb and this TU uses equivalent mov/adc/neg.
 // Equality and alternate unsigned spellings regressed to 94.90%; unsigned
 // (facing - 1) < 1 is the high water. Remaining names are delinked gConfig and
@@ -2108,7 +2108,7 @@ int combatManager::ShotIsThroughWall(int side, int sourceHex, int targetHex)
     return 0;
 }
 
-// @match-note: retained 98.43%, combined live 97.48%; the 0x80 frame, slot reuse,
+// @match-note: retained/combined-live 98.60%; the 0x80 frame, slot reuse,
 // animation CFG, calls, and all 52/52 relocation sites align. First DATA-name residual is +0xb9;
 // first code residual is +0x283 (normalized instruction 197), then two extent
 // compares. frame < missileSteps versus missileSteps > frame and both orientations
