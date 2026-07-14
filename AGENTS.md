@@ -159,6 +159,9 @@ authoritative. This file is the short, restart-ready Codex workflow.
 
 - Every class data member introduced or refined here must start with `m_`. Struct fields do not need
   the prefix.
+- Do not preserve offset placeholders such as `field4` once their role is understood. Recover
+  semantic member names, and use genuine tagged views when one physical record has distinct event
+  layouts; do not retain anonymous compatibility aliases merely to avoid updating callers.
 - Do not use C-style casts. Use a real reconstructed layout first. Where a cast is genuinely what
   the source requires, use `static_cast`, `reinterpret_cast`, or `const_cast` as appropriate.
 - Prefer this repository's naming conventions over names from other projects.
