@@ -17,19 +17,27 @@ border::border(void) : widget(0, 0, 0, 0, 0, 0)
 {
     m_backgroundBitmap = 0;
     m_backgroundIcon = 0;
-    field_0x28 = 0;
+    m_fillColor = 0;
 }
 
+// @early-stop
+// Compiler COMDAT-folding artifact: retail has two strong, byte-identical 0x4d
+// ??_E deleting-destructor sections with 7 relocations each. Keeping the standalone
+// 0x38 ??1 destructor below exact makes VC4.2 emit a 0x1f ??_G wrapper and only a weak
+// ??_E alias. Marking the destructor inline produces the exact folded 0x4d body but
+// removes the separately mapped retail ??1, so the exact standalone symbol is retained.
+// VA(0x004d20e0, 0x4d) ??_E/??_G border deleting-destructor aliases
+
 VA(0x004d2130, 0x64)
-border::border(short int x, short int y, short int w, short int h, short int e, short int f, short int p7, char *name)
+border::border(short int x, short int y, short int w, short int h, short int e, short int f, short int fillColor, char *name)
     : widget(x, y, w, h, e, f)
 {
-    if (name == 0)
-        m_backgroundBitmap = 0;
-    else
+    if (name != 0)
         m_backgroundBitmap = gpResourceManager->GetBitmap(name);
+    else
+        m_backgroundBitmap = 0;
     m_backgroundIcon = 0;
-    field_0x28 = p7;
+    m_fillColor = fillColor;
 }
 
 VA(0x004d21a0, 0x38)
@@ -68,40 +76,46 @@ void border::Read(void)
         gpResourceManager->RestorePosition();
         return;
     }
-    field_0x28 = gpResourceManager->ReadWord() & 0xff;
+    m_fillColor = gpResourceManager->ReadWord() & 0xff;
 }
 
+// @early-stop
+// /O2 signed-comparison orientation wall: both sides are 0x181 bytes with 9
+// relocations at identical offsets and destinations. Relocation-masked raw bytes
+// differ only at +0x7e (base 39, retail 3b) and +0x81 (base 7f, retail 7c), where
+// `m_y <= my` is encoded as the equivalent reversed CMP/JG instead of CMP/JL.
+// Positive/negative and split predicates, staged/direct coordinates, declaration
+// order, shared failure labels, and the indexed/value-or-zero escape hatches agree.
 VA(0x004d22f0, 0x181)
 int border::Main(struct tag_message &msg)
 {
-    unsigned short flags = m_flags;
-    int type = msg.type;
+    short flags = m_flags;
     if ((flags & 2) == 0) {
-        if (type == 0x200)
+        if (msg.type == 0x200)
             return widget::Main(msg);
         return 0;
     }
+    int type = msg.type;
     switch (type) {
+    default:
+        goto normalEvent;
     case 8:
     case 0x20:
-        break;
-    default:
-        return widget::Main(msg);
+        goto hoverEvent;
     case 0x10:
     case 0x40:
-        if ((flags & 1) != 0) {
-            m_flags = flags & 0xfffe;
-            msg.type = 0x200;
-            msg.field4 = 0xd;
-            msg.field8 = m_id;
-            return 2;
-        }
-        return 0;
+        goto leaveEvent;
     }
-    short mx = static_cast<short>(msg.field4) - m_owner->m_posX;
-    short my = static_cast<short>(msg.field8) - m_owner->m_posY;
-    if (m_x <= mx && m_y <= my &&
-        mx < m_width + m_x && my < m_height + m_y) {
+
+normalEvent:
+    return widget::Main(msg);
+
+hoverEvent: {
+    short mx = static_cast<short>(msg.field4);
+    heroWindow *window = m_owner;
+    mx -= static_cast<short>(window->m_posX);
+    short my = static_cast<short>(msg.field8) - window->m_posY;
+    if (m_x <= mx && m_y <= my && mx < m_width + m_x && my < m_height + m_y) {
         if (type == 0x20) {
             msg.fieldC = 0x200;
             msg.field4 = 0xe;
@@ -116,25 +130,38 @@ int border::Main(struct tag_message &msg)
     return 0;
 }
 
+leaveEvent:
+    if ((flags & 1) != 0) {
+        m_flags = flags & 0xfffe;
+        msg.type = 0x200;
+        msg.field4 = 0xd;
+        msg.field8 = m_id;
+        return 2;
+    }
+    return 0;
+}
+
 VA(0x004d2480, 0xab)
 void border::Draw(void)
 {
-    short y = m_y + m_owner->m_posY;
-    short x = m_x + m_owner->m_posX;
-    short kind = field_0x14;
-    if (kind == 0x400) {
-        FillBitmapArea(gpWindowManager->m_screen, x, y, m_width, m_height, field_0x28);
+    short y = m_y + static_cast<short>(m_owner->m_posY);
+    short x = m_x + static_cast<short>(m_owner->m_posX);
+    int kind = field_0x14;
+    switch (kind) {
+    case 0x400:
+        FillBitmapArea(gpWindowManager->m_screen, x, y, m_width, m_height, m_fillColor);
         return;
-    }
-    if (kind != 0x800) {
-        if (kind != 0x801)
-            return;
+    case 0x800:
+        PollSound();
+        BlitBitmap(m_backgroundBitmap, 0, 0, m_width, m_height, gpWindowManager->m_screen, x, y);
+        PollSound();
+        return;
+    case 0x801:
         m_backgroundIcon->DrawToBuffer(x, y, 0, 0);
         return;
+    default:
+        return;
     }
-    PollSound();
-    BlitBitmap(m_backgroundBitmap, 0, 0, m_width, m_height, gpWindowManager->m_screen, x, y);
-    PollSound();
 }
 
 

@@ -1,10 +1,10 @@
-# tu-cumulative-eval-order — a residual that OTHER functions fix (early-stop signal)
+# TU-cumulative evaluation order — diagnose, steer, then defer only if proved
 
-> **This is a "reverse pattern."** The rest of `docs/patterns/*` are *fix-it* patterns
-> (symptom → the source spelling that matches). This one is the inverse: a symptom that
-> is **NOT steerable from this function's source**, so the move is to **`@early-stop` it**
-> and let it resolve as *sibling* functions in the same TU get reconstructed.
-> Documenting it tells us **when to stop grinding a diff.**
+> A cumulative-state fingerprint is a diagnosis, not immediate permission to park a
+> function. First reproduce the combined root/header state, process predecessors in
+> source order, simplify the affected source, and try audited exact-preserving predecessor
+> variants. See [o2-tu-cumulative-register-steering.md](o2-tu-cumulative-register-steering.md)
+> for the byte-exact BITMAP case and the required rejection criteria.
 
 ## Fingerprint
 
@@ -46,7 +46,7 @@ choice for a commutative operand depends on cumulative compiler state that shift
 inside a *partial* TU compiles byte-exact **standalone** and byte-exact once the TU is
 **fuller**.
 
-## What made it match in the end
+## What made historical cases match
 
 **Non-local (this pattern's core) — a sibling function landing.** Measured this session,
 source of the parked function UNCHANGED, flipped only by reconstructing other functions in
@@ -58,7 +58,8 @@ the TU:
 | `philAI::SetupRelativeHeroStrengths` | 98.9% (PHILAI b2) | **100%** | PHILAI b3 siblings bodied |
 | `game::ExperienceValueOfStack` | 96% | 99% | partial parity shift (still climbing) |
 
-So the "fix" is **not in this function** — park it and re-check after the TU fills.
+These cases prove cumulative state exists; they do not prove a new residual is locally
+unsteerable. Rebuild after the TU fills, then perform the steering sequence below.
 
 **Local escape hatch — ONE variant IS fixable: the SIB array index.** When the diff is an
 array subscript's base-vs-index load order, the **commuted subscript** `i[(T*)p]` (instead
@@ -70,29 +71,62 @@ target in `ExperienceValueOfStack`:
 ```
 
 `((signed char*)group)[i]` emitted the base first (mismatch); `i[(signed char*)group]`
-matched. Try this before parking a SIB-index diff. (The `field = val | 0` trick can
-similarly force a value-first bitfield write — see GAME `RandomizeBarrier`.) Everything
-else in the class — loop-test operand, flag-OR, FPU schedule — is **not** source-steerable.
+matched. Try this during local steering. (The `field = val | 0` trick can similarly force
+a value-first bitfield write — see GAME `RandomizeBarrier`.) Loop tests, flag ORs, and FPU
+schedules may also move when exact predecessors or header state changes; do not classify
+them as walls before a combined-root source-order audit.
 
-## Confirm-then-park checklist
+**Scalar-lvalue SIB escape — use `0[&local]`.** Array subscripting is symmetric by the
+language definition, so `0[&idx]` is the same lvalue as `idx`. In VC4.2 `/Od`, however, this
+source shape can make a comparison load its other operand first. It resolved every remaining
+FONT comparison without changing the frame, CFG, or relocations. For example,
+`DrawBoundedString`'s ordinary `idx >= lineStart` emitted:
 
-1. `(%ebp)`-visible diff → every local on the retail slot (rule out a slot-hash miss).
-2. The only diff is a commutative operand's order, and it survives every
-   `<`/`>`/`<=`/`else`/`continue`/extra-temp/reversed-compare/`k*i` spelling.
-3. (If cheap) the function compiles byte-exact **standalone** — proves the source is right.
+```text
+ordinary source (`idx >= lineStart`)       retail / `0[&idx] >= lineStart`
+8b 45 f8  mov eax,[ebp-08]                 8b 45 f0  mov eax,[ebp-10]
+39 45 f0  cmp [ebp-10],eax                 39 45 f8  cmp [ebp-08],eax
+0f 8f 64 00 00 00  jg exit                 0f 8c 64 00 00 00  jl exit
+```
 
-All three ⇒ tu-cumulative. Mark it a **soft / revisit** early-stop (distinct from a
-permanent delinker/reloc artifact — expect 100% for free later, then drop the marker):
+The analogous `LineLength` width test changed from local-first:
+
+```text
+ordinary source (`x <= maxW`)              retail / `0[&x] <= maxW`
+8b 45 dc  mov eax,[ebp-24]                 8b 45 0c  mov eax,[ebp+0c]
+39 45 0c  cmp [ebp+0c],eax                 39 45 dc  cmp [ebp-24],eax
+0f 8c 1d 00 00 00  jl exit                 0f 8f 1d 00 00 00  jg exit
+```
+
+Using `0[&idx]` in both index/start comparisons made `DrawBoundedString` exact; using
+`0[&x]` in its three width comparisons made `LineLength` exact; and `0[&p] < size`
+restored exact `LineWidth`. Directly commuting the relations, `maxW | 0`, and
+`0[&maxW]` were byte-neutral and did not solve the load order. This is a local steering
+step to try before any TU-state permutation or soft defer.
+
+## Confirm, steer, then optionally soft-defer
+
+1. Reproduce the integrated root/header state; a stale worker score is not evidence.
+2. Process all predecessors in source order and prove their raw bytes and relocations.
+3. For `/Od`, expose every `(%ebp)` displacement and rule out a slot-hash miss.
+4. Try audited local expression, alias, temporary, condition, and CFG spellings.
+5. At 96-97% or better, use only the libclang AST permuter and audit every retained
+   mutation; never use the regex permuter.
+6. Try exact-preserving AST variants in predecessors. Reject any variant that changes a
+   predecessor byte or relocation, and retest every candidate on the combined root.
+7. If the residual still consists solely of operand/register order, document all of the
+   above and use a **soft revisit**, not a permanent compiler-wall claim:
 
     // @early-stop
-    // ~9x%: logic + frame slots byte-exact; residual is tu-cumulative /Od operand-load
-    // order (docs/patterns/tu-cumulative-eval-order.md) — not source-steerable, resolves
-    // as the rest of <TU> is reconstructed. Matched 100% standalone.
+    // ~9x%: logic + frame slots byte-exact; residual is TU-cumulative operand order.
+    // Combined-root local and exact-predecessor steering were exhausted; revisit after
+    // later <TU> source/header changes. Matched 100% standalone.
     VA(0x........, 0x..)
 
-## Still parked awaiting a fuller TU (re-check these)
+## Soft-deferred cases to re-check after each material TU change
 
 `game::{MakeAllWaterVisible, SetupAdjacentMons, CountShrines, WriteDiffHeaderInfo, RestoreCell}`,
 `philAI::{DetermineHeroToMove, ValueOfTown, DoDimensionDoor}`.
 
-Related: `od-hash-slots.md` (prove slots first), `od-debug-build.md`, `inline-accessors.md`.
+Related: [o2-tu-cumulative-register-steering.md](o2-tu-cumulative-register-steering.md),
+`od-hash-slots.md` (prove slots first), `od-debug-build.md`, `inline-accessors.md`.

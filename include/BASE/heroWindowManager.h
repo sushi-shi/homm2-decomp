@@ -22,7 +22,7 @@ public:
     heroWindow *m_activeWindow;  // +0x42  active window
     bitmap *m_screen;  // +0x46  (target screen bitmap)
     bitmap *m_fizzleSource;  // +0x4a  fizzle-source saved bitmap
-    int    field_0x4e;  // +0x4e
+    bitmap *m_fizzleWork;  // +0x4e  temporary destination used while composing a fizzle
     int    m_screenshotIndex;  // +0x52
     int    m_updateFlags;  // +0x56
     int    m_dialogResult;  // +0x5a

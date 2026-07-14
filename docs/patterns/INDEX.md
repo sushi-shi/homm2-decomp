@@ -22,7 +22,9 @@
 | packed-records-and-bitfields | topic:layout cpp:bitfield cpp:pack | recover pack(1) structs + u8/u16 bitfields from stride & andb/andw forms |
 | inline-accessors | topic:codegen cpp:inline flag:Ob1 | `jmp $+0` clusters = inlined in-class accessors (/Ob1); reconstruct getters, don't hand-inline |
 | od-cell-access-and-block-jmps | topic:od cpp:array cpp:inline | 2D access needs an inline `Row(y)[x]` accessor (raw reassociates); block jmps SOLVED (see inline-accessors) |
-| tu-cumulative-eval-order | topic:od topic:early-stop reverse-pattern | **REVERSE pattern (early-stop signal):** commutative operand load-order that's NOT source-steerable — resolves as sibling TU functions land. Confirm slots+logic, park soft. SIB-index variant IS fixable via `i[(T*)p]` |
+| tu-cumulative-eval-order | topic:od topic:regalloc topic:tu-state | Diagnose cumulative operand order, then rebuild the combined TU and exhaust local/predecessor steering before a documented soft defer |
+| o2-tu-cumulative-register-steering | topic:o2 topic:regalloc topic:tu-state | BITMAP `CopyTo`: combined state turned redundant aliases into 89.59%; direct object access restored all 203 bytes; use audited exact-preserving predecessor variants and consult the target no-repeat ledger |
+| retail-empty-stubs | topic:stubs topic:proof topic:delinker | Empty/`return 0` source can be exact retail: prove raw bytes, calling-convention return, and zero relocations before expanding |
 | short-local-coord-truncation | topic:o2 cpp:short topic:widget | /O2 widget parent-relative coord `(short)(win->off + this->pos)` stuck 30–90% -> use a `short` LOCAL, not inline `static_cast<short>` (local reproduces the (short)operand+operand truncation) |
 | codeview-array-decayed-to-pointer | topic:globals topic:o2 topic:od | a global `T*` whose CodeView symbol SIZE>4 is really `T[]`; change decl+def to array -> indexed `g[i]` becomes direct `[g+i]`, byte-exact |
 | struct-typed-member-modeling | topic:structs topic:o2 topic:layout | model a member as its real struct/array type (`T member[N]`) not a raw pad; struct-copy + by-value return + indexing then match byte-exact (event ring, aggEntry directory) |

@@ -36,8 +36,7 @@ public:
     int    m_aggregateEntryCount[2];  // +0x52
     int    m_expunging;  // +0x5a
     char _pad_0x5e[0x4];
-    char   m_aggregateName;  // +0x62
-    char _pad_0x63[0x3b];
+    char   m_lastFileName[0x3c];  // +0x62
     int    m_lastFileId;  // +0x9e
     // --- constructors ---
     resourceManager(void);

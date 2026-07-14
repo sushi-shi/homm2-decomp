@@ -14,7 +14,9 @@ public:
     char   *m_data;  // +0x10  MIDI data buffer
     // --- constructors ---
     MIDIWrap(char *);
-    virtual ~MIDIWrap();
+    // Inline lets the compiler fold the body into ??_G; dllexport also retains the
+    // standalone ??1 body required by retail.
+    __declspec(dllexport) virtual inline ~MIDIWrap() OVERRIDE;
 };
 #pragma pack(pop)
 SIZE(MIDIWrap, 0x14);

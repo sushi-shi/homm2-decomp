@@ -8,10 +8,9 @@
 struct tag_message;
 
 #pragma pack(push, 1)  // recovered layout is byte-packed
-class resource;
-class widget;
 class font;
 class icon;
+class bitmap;
 class listBoxWidget : public widget {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
@@ -26,9 +25,9 @@ public:
     short  field_0x30;  // +0x30
     short  m_itemCount;  // +0x32
     short  m_selectedIndex;  // +0x34
-    short  field_0x36;  // +0x36
-    int    field_0x38;  // +0x38
-    void   **m_items;  // +0x3c  item-string array
+    short  m_lastSelectedIndex;  // +0x36  item selected by the previous click
+    int    m_lastClickTime;  // +0x38  tick count of the previous click
+    char   **m_items;  // +0x3c  item-string array
     short  m_topIndex;  // +0x40
     short  field_0x42;  // +0x42
     short  field_0x44;  // +0x44
@@ -42,9 +41,9 @@ public:
     short  field_0x54;  // +0x54
     short  field_0x56;  // +0x56
     short  field_0x58;  // +0x58
-    short  field_0x5a;  // +0x5a
-    short  field_0x5c;  // +0x5c
-    short  field_0x5e;  // +0x5e
+    short  m_firstRowHeight;  // +0x5a  height of the list's first row frame
+    short  m_rowHeight;  // +0x5c  height of each middle list row
+    short  m_lastRowHeight;  // +0x5e  height of the list's last row frame
     short  m_listX;  // +0x60
     short  m_listY;  // +0x62
     short  field_0x64;  // +0x64
@@ -70,7 +69,7 @@ public:
     char   field_0x8b;  // +0x8b
     char   field_0x8c;  // +0x8c
     char   field_0x8d;  // +0x8d
-    widget *m_scrollbar;  // +0x8e  child widget (scrollbar)
+    bitmap *m_scrollbar;  // +0x8e  separately-owned bitmap resource
     // --- constructors ---
     listBoxWidget(void);
     virtual ~listBoxWidget() OVERRIDE;
