@@ -24,23 +24,26 @@ Status: active. These functions have narrow measured residuals, but the delayed 
 and register-allocation differences do not meet either permitted `@early-stop` flavor. They must
 remain unmarked and in the same lane.
 
-Canonical source state:
+Current source state:
 
-- checkpoint: `949be58`
+- base checkpoint: `2e351c8`
 - `src/BASE/Textntry.cpp`:
-  `8aaf3cc7edfb882ad036d2e666e5af371fb613283f22c9f10894ba77137bf198`
+  `fd22c7692d4e9293c47a13eb83b422b678371fe4ee19755d78b515c9b94fd5cb`
+- `include/BASE/textEntryWidget.h`:
+  `f5d08f5a98e96310182cf720733ccb4670b41bfcb24c44ec8ce36fcce86072a3`
 - long constructor, RVA `0xd87b0`: 98.695656%, normalized hash `cc616330bf7f`,
   base/retail size `0x134`, 6/6 relocations;
 - `Read`, RVA `0xd8920`: 98.6755%, base/retail size `0x26c`, 52/52 relocations;
-- `SetupDisplayString`, RVA `0xd9570`: live 95.0% with retained maximum 97.3581%, base
-  `0x1bd` vs retail `0x1be`, frame `0x130`, 8/8 relocations.
+- `SetupDisplayString`, RVA `0xd9570`: live 97.12838% with retained maximum 97.3581%,
+  base/retail size `0x1be`, frame `0x130`, 8/8 relocations.
 
 The constructor streams differ only by retail storing parameter 10 before three independent
 constant flag stores while the candidate delays that store. `Read` differs only by retail comparing
 `type` before loading `m_height`, while the candidate emits those independent instructions in the
-opposite order. `SetupDisplayString` has the same calls, loop CFG, frame, and relocation targets;
-the candidate assigns this/cursor to EBX/EBP instead of retail EBP/EBX and omits one redundant
-retail `xor` in the dead second-loop tail.
+opposite order. `SetupDisplayString` has the same calls, loop CFG, size, frame, and relocation
+targets. The candidate assigns this/cursor to EBX/EBP instead of retail EBP/EBX; the remaining
+instruction stream agrees under that register mapping, including the redundant retail `xor` in
+the dead second-loop tail.
 
 ### Searches already exhausted
 
@@ -74,10 +77,25 @@ New manual `SetupDisplayString` and predecessor states:
 - `a3fe00` left Setup unchanged and regressed Main to 99.542015%;
 - `da8df8` over-optimized Setup to 89.62838%, size `0x1ac`, frame `0x130`, 8/8 relocations.
 
+Fresh retail-structure pass after `2e351c8`:
+
+- moved the `field_0x4b > 0` guard outside the second `do` loop and restored the explicit
+  zero-offset flag clear proved by retail; this raised Setup from 95.000000% to 97.128380% and
+  matched retail size `0x1be`;
+- plain and `register` cursor snapshots were byte-identical;
+- separate early loop-flag declarations and both combined declaration orders were byte-identical;
+- all siblings remained at the pinned baseline for every state;
+- exact whole-file hashes and outcomes are in
+  [`docs/matching-matrices/textntry-setup-fresh-2e351c8.tsv`](matching-matrices/textntry-setup-fresh-2e351c8.tsv);
+- neither permutation tool was used in the structural pass. Setup now meets the per-function
+  96-97% AST gate with exact size, frame, CFG, and relocations, so a new libclang AST search is
+  authorized from this genuinely changed canonical state; the regex permuter remains forbidden.
+
 Do not repeat those TU-state searches while the canonical source hash and sibling hashes agree.
-Continue with a retail-evidenced lifetime or a genuinely different exact-preserving predecessor/TU
-state. Any later accepted wall must satisfy the two narrow rules in `.claude/agents/matcher.md`;
-the current scheduling and register-allocation residuals do not.
+Continue with the newly authorized Setup AST search, a retail-evidenced lifetime, or a genuinely
+different exact-preserving predecessor/TU state. Any later accepted wall must satisfy the two
+narrow rules in `.claude/agents/matcher.md`; the current scheduling and register-allocation
+residuals do not.
 
 ## BASE/listbox: listBoxWidget::Main
 
