@@ -34,6 +34,13 @@ typedef enum MonsterFlags {
     MONSTER_FLAGS_NO_MORALE = 0x04000000
 } MonsterFlags;
 
+typedef enum MonsterAbilityFlags {
+    MONSTER_ABILITY_FLAG_AI_EXCLUDED = 0x10,
+    MONSTER_ABILITY_FLAG_HIGH_MORALE = 0x20,
+    MONSTER_ABILITY_FLAG_BAD_MORALE = 0x80,
+    MONSTER_ABILITY_FLAG_DEFERRED_TURN = 0x1000
+} MonsterAbilityFlags;
+
 typedef unsigned int UInt32;   // crc32Table[]
 struct MemEntry;               // gpMemEntry — full def not yet reconstructed; used via pointer
 struct _SAMPLE;                // SAMPLE2::pMem — opaque
@@ -120,11 +127,16 @@ struct tag_monsterInfo {
             char unknown14[2];
             signed char abilities;
             signed char attributes;
+            char trailing[2];
         } bytes;
+        struct {
+            char abilityFlagsPadding[2];
+            int abilityFlags;
+        };
     } flags;
-    char unknown18[2];
 };
 #pragma pack(pop)
+SIZE(tag_monsterInfo, 0x1a);
 #pragma pack(push, 1)
 struct SCmbtHero {
     short x[2];

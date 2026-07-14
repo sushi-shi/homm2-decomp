@@ -392,10 +392,10 @@ void army::DrawToBuffer(int x, int y, int effectsOnly)
             }
         }
         if (giSpellEffectShowType == 0 || !standing || m_spellCount < 1) {
-            drawn = gpCombatManager->m_combatStatusIcon->CombatClipDrawToBuffer(
+            drawn = gpCombatManager->m_combatIcons[COMBAT_ICON_STATUS]->CombatClipDrawToBuffer(
                 quantityX, quantityY, 10, &m_creatureLimits, 0, 0, 0, 0);
         } else if (giSpellEffectShowType == 1) {
-            drawn = gpCombatManager->m_combatStatusIcon->CombatClipDrawToBuffer(
+            drawn = gpCombatManager->m_combatIcons[COMBAT_ICON_STATUS]->CombatClipDrawToBuffer(
                 quantityX, quantityY, 11, &m_creatureLimits, 0, 0xed, 0, 0);
         } else {
             statusFrame = 2;
@@ -406,7 +406,7 @@ void army::DrawToBuffer(int x, int y, int effectsOnly)
             } else {
                 statusFrame = 3;
             }
-            drawn = gpCombatManager->m_combatStatusIcon->CombatClipDrawToBuffer(
+            drawn = gpCombatManager->m_combatIcons[COMBAT_ICON_STATUS]->CombatClipDrawToBuffer(
                 quantityX, quantityY, statusFrame + 10, &m_creatureLimits, 0, 0, 0, 0);
         }
         if (drawn) {
