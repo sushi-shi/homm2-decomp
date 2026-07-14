@@ -43,6 +43,7 @@ public:
     int NumOfGivenArtifact(int);
     signed char CurrentHero(void) { return m_currentHero; }
     signed char CurrentTown(void) { return m_currentTown; }
+    signed char Color(void) { return m_color; }
     signed char TownId(int index) { return m_townIds[index]; }
     signed char AvailableHeroId(int index) { return m_availableHeroIds[index]; }
 };
