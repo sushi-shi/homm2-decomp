@@ -7,8 +7,8 @@
 // (reversed from its disassembly), so the anchor is two node pointers (head/tail). The node's
 // link pointers occupy +0/+4; nb_rcv reads a payload length at +8 and the payload bytes at +0xb.
 struct tag_Node {
-    struct tag_Node *next;      // +0x00
-    struct tag_Node *prev;      // +0x04
+    struct tag_Node *prev;      // +0x00
+    struct tag_Node *next;      // +0x04
     unsigned short   len;       // +0x08  payload length
     unsigned char    field_0xa; // +0x0a
     unsigned char    data[1];   // +0x0b  payload (variable length)

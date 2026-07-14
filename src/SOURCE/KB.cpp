@@ -4526,7 +4526,7 @@ void UpdateNormalDialog(char *text)
 // ---- globals (definitions, RVA order) ----
 DATA(0x004f8c58) unsigned char giGroundToTerrain[432];
 DATA(0x004f8e08) unsigned char giGroundShape[432];
-DATA(0x004f8fb8) unsigned char *gColorTableTan;
+DATA(0x004f8fb8) unsigned char gColorTableTan[256];
 DATA(0x004f90b8) unsigned char gColorTableGray[256];
 DATA(0x004f91b8) unsigned char gColorTableYellow[256];
 DATA(0x004f92b8) unsigned char gColorTableScenWin[256];
@@ -5301,4 +5301,4 @@ DATA(0x0052a184) int gbWaitForRemoteReceive;
 DATA(0x0052a188) unsigned char bMusicIsLooping[0x3c];
 DATA(0x0052a1c4) townManager *gpTownManager;
 DATA(0x0052a1c8) advManager *gpAdvManager;
-DATA(0x0052a1d0) signed char gbGamePosToNetPos[152];
+DATA(0x0052a1d0) signed char gbGamePosToNetPos[OLD_MAIN_MATCH_BUFFER_SIZE];

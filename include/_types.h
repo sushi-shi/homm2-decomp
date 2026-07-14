@@ -88,6 +88,12 @@ typedef enum ConfigStorageConstant {
     CONFIG_STRUCT_SIZE = 0x1a0
 } ConfigStorageConstant;
 
+typedef enum ConfigConnectionType {
+    CONFIG_CONNECTION_MODEM = 0,
+    CONFIG_CONNECTION_DIRECT = 1,
+    CONFIG_CONNECTION_COUNT = 2
+} ConfigConnectionType;
+
 struct configStruct {                    // gConfig, 0x1a0 bytes
     int computerWalkSpeed;               // 0x00  "Computer Walk Speed"
     int walkSpeed;                       // 0x04  "Walk Speed"
@@ -111,10 +117,8 @@ struct configStruct {                    // gConfig, 0x1a0 bytes
     char autoSaveName[0x21];             // 0x89  default "AUTO"
     int musicSource;                     // 0xaa  persisted as "Sound Quality"
     char modemInitString[0x64];          // 0xae  "Modem Init String"
-    int modemComPort;                    // 0x112 "Modem Com Port"
-    int directConnectComPort;            // 0x116 "Direct Connect Com Port"
-    int modemBaudRate;                   // 0x11a "Modem Baud Rate"
-    int directConnectBaudRate;           // 0x11e "Direct Connect Baud Rate"
+    int comPort[CONFIG_CONNECTION_COUNT]; // 0x112 modem, 0x116 direct connect
+    int baudRate[CONFIG_CONNECTION_COUNT]; // 0x11a modem, 0x11e direct connect
     char uniqueSystemID[4];              // 0x122 "Unique System ID" (map-file name prefix)
     int useOpera;                        // 0x126 "Use Opera"; controls CD ambient transitions
     int quickCombatLevel;                // 0x12a "Quick Combat Level"

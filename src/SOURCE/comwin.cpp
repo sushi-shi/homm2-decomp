@@ -6,7 +6,19 @@
 #include <va.h>
 #include <SOURCE/comwin.h>
 VA(0x0048a640, 0x74)
-void add_node(struct tag_Anchor *, struct tag_Node *) {}
+void add_node(struct tag_Anchor *anchor, struct tag_Node *node)
+{
+    node->next = 0;
+    node->prev = node->next;
+    if (anchor->tail != 0) {
+        anchor->tail->next = node;
+        node->prev = anchor->tail;
+        anchor->tail = node;
+    } else {
+        anchor->tail = node;
+        anchor->head = anchor->tail;
+    }
+}
 
 VA(0x0048a6b4, 0x4c)
 struct tag_Node * pop_node(struct tag_Anchor *) { return 0; }
@@ -37,4 +49,3 @@ unsigned char com_stat(short int, unsigned short int) { return 0; }
 
 VA(0x0048b21d, 0xe8)
 void comm_wrt_task(void) {}
-
