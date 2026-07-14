@@ -172,6 +172,55 @@ reveals a retail-proven lifetime/type/source ordering not represented above. A r
 the setup divergence, preserve the retained cursor/literal corrections, and audit all 91 relocation
 sites. The current residual is a soft defer, not a permitted wall.
 
+## BASE/iconf2bc: FlipIconToBitmapColorTable
+
+Status: active. This is an integrated progress checkpoint, not a wall or soft defer. The same lane
+must continue from the three remaining `gFCY` loads before taking unrelated work.
+
+Canonical source state:
+
+- checkpoint: `7386907`
+- target: RVA `0xd9790`, retail size `0x54d`
+- `src/BASE/iconf2bc.cpp`:
+  `648ecb4b963c5b97aea5908738d26509ad680853a3041817321b61aa955070f9`
+- live checkpoint: 83.4333%, candidate size `0x550`, 86 candidate vs 83 retail relocations,
+  no base-only target
+- the command decoder now begins at the exact retail offset `+0xec`
+
+### Corrections retained at the canonical checkpoint
+
+- removed the invalid generic `@early-stop` and its unproved `/O2` wall claim;
+- recovered the split X/width/entry setup lifetimes and retail clipping extent tests;
+- rebuilt solid and dim runs with their retail body order, counters, cursor publications, and
+  per-iteration palette reloads;
+- rebuilt unclipped and four-quadrant clipped color-table literal loops;
+- restored source advancement for fully clipped literal runs;
+- corrected the `gFCClipR` lifetime/count to agree with retail;
+- matched every external relocation target and every scratch-global occurrence count except
+  `gFCY`.
+
+The remaining measured relocation delta is exactly three redundant retail `gFCY` loads. Every
+other scratch-global occurrence count agrees. Candidate code ends three bytes after retail. These
+facts are the next concrete steering target; they are not evidence that the residual is impossible.
+
+### Searches already exhausted
+
+The superseded pre-reconstruction wall had tried local/global/mutable setup, signed and unsigned
+counts, merged and split `memset` shapes, pointer-update orders, global palette/destination loads,
+and 136 historical AST variants over five rounds. Those permutations were run far below the
+current 96-97% structural gate and must not be repeated.
+
+The clean reconstruction pass measured setup-local forms, compare operand polarities,
+function-wide and nested vertical-coordinate locals (including `register` spellings), width and
+entry aliases, source-pointer spellings, dim-loop statement order, palette aliases, and literal
+cursor forms. Losing variants were reverted; the retained forms are the canonical checkpoint
+above. No permutation tool was used, and the regex permuter was never used.
+
+Continue specifically from the three missing `gFCY` loads and the first structural divergence.
+Record each new source-hash-distinct shape with its match, size, frame, and relocation result. Do
+not retry the families above while the canonical source hash agrees. If a shared icon/header edit
+is retained, retest the deferred icon2bc, Icon2b, and Iconf2b functions as well.
+
 ## BASE/Icon2b: IconToBitmap
 
 Status: clean soft defer pending a shared icon/header or compiler-state change. It is not an
