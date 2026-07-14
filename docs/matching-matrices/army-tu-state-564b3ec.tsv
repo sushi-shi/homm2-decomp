@@ -1,0 +1,2 @@
+commit	source_sha256	target	rva	seed	trials	families	baseline	best	result	manifest
+564b3ec9d25faecc300e30c80f2bec108eb8434b	6f5fd1f46500cef942eb2b3eba143026f6037f188be4605478f0860377493d20	?DoHydraAttack@army@@QAEXH@Z	0x4dcba	0x41524d59	40	macro,conditional,warning,comment,mixed	96.525314	96.525314	EXHAUSTED_NO_CHANGE	build/tu-state-noise/20260714-224243-SOURCE-ARMY-0x4dcba/manifest.json

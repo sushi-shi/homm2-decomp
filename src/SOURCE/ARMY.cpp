@@ -1082,54 +1082,59 @@ void army::DirDoAttack(int direction)
 VA(0x0044dcba, 0x4e7)
 void army::DoHydraAttack(int)
 {
-    char combatText[200];
-    short attackMask;
-    army *target;
-    int totalDamage;
-    int totalKilled;
-    int damage;
-    int killed;
-    int targetSide;
-    int targetIndex;
-    int targetHex;
+    int damage_8;
+    int killed_4;
+    int targetIndex_9;
     int direction;
+    int targetSide_8;
+    int targetHex_2;
+    int totalKilled_7;
+    army *target_2;
+    short attackMask_7;
+    char combatText_8[200];
+    int totalDamage_1;
 
-    totalKilled = 0;
-    totalDamage = totalKilled;
+    totalKilled_7 = 0;
+    totalDamage_1 = totalKilled_7;
     gpCombatManager->ResetHitByCreature();
     if (m_spellInfluence[ARMY_SPELL_INFLUENCE_BERSERK]) {
-        attackMask = static_cast<short>(GetAttackMask(m_hex, 2, -1));
+        attackMask_7 = static_cast<short>(GetAttackMask(m_hex, 2, -1));
     } else {
-        attackMask = static_cast<short>(GetAttackMask(m_hex, 1, -1));
+        attackMask_7 = static_cast<short>(GetAttackMask(m_hex, 1, -1));
     }
     CheckLuck();
     gpCombatManager->ResetLimitCreature();
     gpCombatManager->m_limitCreatureCount[m_side][m_index]++;
     for (direction = 0; direction < ARMY_COMBAT_DIRECTION_COUNT; direction++) {
-        if (!(attackMask & (1 << direction))) {
-            targetHex = m_hex;
+        if (!(attackMask_7 & (1 << direction))) {
+            targetHex_2 = m_hex;
             if ((m_monster.flags.all & MONSTER_FLAGS_WIDE) &&
                 ((m_facing == 0 && direction > 2) ||
                  (m_facing == 1 && (direction < 3 || direction > 5)))) {
                 if (m_facing == 0) {
-                    targetHex = m_hex - 1;
+                    targetHex_2 = m_hex - 1;
                 } else {
-                    targetHex = m_hex + 1;
+                    targetHex_2 = m_hex + 1;
                 }
             }
-            targetHex = GetAdjacentCellIndex(targetHex, direction);
-            if (ValidHex(targetHex)) {
-                targetSide = gpCombatManager->m_hexCells[targetHex].m_occupantSide;
-                targetIndex = gpCombatManager->m_hexCells[targetHex].m_occupantIndex;
-                if (targetSide >= 0 && targetIndex >= 0) {
-                    gpCombatManager->m_limitCreatureCount[targetSide][targetIndex]++;
-                    target = &gpCombatManager->m_armies[targetSide][targetIndex];
-                    if (!target->m_hitByCreature) {
-                        target->m_hitByCreature = 1;
-                        DamageEnemy(target, &damage, &killed, 0, 0);
-                        totalDamage += damage;
-                        totalKilled += killed;
-                        gpCombatManager->m_limitCreatureCount[targetSide][targetIndex]++;
+            targetHex_2 = GetAdjacentCellIndex(targetHex_2, direction);
+            if (ValidHex(targetHex_2)) {
+                targetSide_8 =
+                    gpCombatManager->m_hexCells[targetHex_2].m_occupantSide;
+                targetIndex_9 =
+                    gpCombatManager->m_hexCells[targetHex_2].m_occupantIndex;
+                if (targetSide_8 >= 0 && targetIndex_9 >= 0) {
+                    gpCombatManager
+                        ->m_limitCreatureCount[targetSide_8][targetIndex_9]++;
+                    target_2 =
+                        &gpCombatManager->m_armies[targetSide_8][targetIndex_9];
+                    if (!target_2->m_hitByCreature) {
+                        target_2->m_hitByCreature = 1;
+                        DamageEnemy(target_2, &damage_8, &killed_4, 0, 0);
+                        totalDamage_1 += damage_8;
+                        totalKilled_7 += killed_4;
+                        gpCombatManager->m_limitCreatureCount
+                            [targetSide_8][targetIndex_9]++;
                     }
                 }
             }
@@ -1139,26 +1144,26 @@ void army::DoHydraAttack(int)
     m_animationState = 1;
     m_pendingAnimationSequence = ARMY_ATTACK_DELAY_NORMAL;
     gpSoundManager->MemorySample(m_samples[ARMY_SAMPLE_ATTACK]);
-    if (totalKilled > 0) {
+    if (totalKilled_7 > 0) {
         sprintf(gText, "%s %s %d %s, %d %s %s.",
             m_quantity > 1 ? gArmyNamesPlural[m_monsterType] : gArmyNames[m_monsterType],
             m_quantity > 1 ? "do" : "does",
-            totalDamage,
+            totalDamage_1,
             "damage",
-            totalKilled,
-            totalKilled > 1 ? "creatures" : "creature",
-            totalKilled > 1 ? "perish" : "perishes");
+            totalKilled_7,
+            totalKilled_7 > 1 ? "creatures" : "creature",
+            totalKilled_7 > 1 ? "perish" : "perishes");
     } else {
         sprintf(gText, "%s %s %d %s.",
             m_quantity > 1 ? gArmyNamesPlural[m_monsterType] : gArmyNames[m_monsterType],
             m_quantity > 1 ? "do" : "does",
-            totalDamage,
+            totalDamage_1,
             "damage");
     }
     gText[0] -= ARMY_ASCII_CASE_OFFSET;
-    strcpy(combatText, gText);
+    strcpy(combatText_8, gText);
     PowEffect(-1, 0, -1, -1);
-    gpCombatManager->CombatMessage(combatText, 1, 1, 0);
+    gpCombatManager->CombatMessage(combatText_8, 1, 1, 0);
     gpCombatManager->m_limitCreatureCount[m_side][m_index] = 1;
 }
 
@@ -1414,7 +1419,7 @@ void army::DoAttack(int retaliation)
                 }
             }
             target->DoAttack(1);
-            target->m_monster.flags.all |= MONSTER_FLAGS_RETALIATED;
+            target->m_monster.attributes |= MONSTER_ATTRIBUTE_RETALIATED;
             if (gbRemoteOn && gpCombatManager->m_networkArmyPresent[0] &&
                 gpCombatManager->m_networkArmyPresent[1] &&
                 target->m_monsterType == ARMY_CREATURE_GHOST) {
@@ -1485,50 +1490,54 @@ int army::WalkTo(void)
     return WalkTo(m_moveTargetHex);
 }
 
+// @early-stop
+// Exact 0x2ee-byte match, including all 19 relocation sites.
 VA(0x0044f443, 0x2ee)
 int army::WalkTo(int destination)
 {
-    int moatDestination;
-    int canEnterMoat;
-    int moatIndex;
-    int direction;
+    int direction_3;
     int steps;
+    int moatDestination;
+    int moatIndex_1;
+    int canEnterMoat_1;
 
     m_targetIndex = -1;
     m_targetSide = m_targetIndex;
     if (gpCombatManager->m_drawbridgeBackgroundVisible &&
         (m_monster.flags.all & MONSTER_FLAGS_WIDE)) {
         moatDestination = 0;
-        moatIndex = 0;
-        for (direction = 0; direction < ARMY_MOAT_CELL_COUNT; direction++) {
-            if (moatCell[direction] == destination) {
+        moatIndex_1 = 0;
+        for (direction_3 = 0; direction_3 < ARMY_MOAT_CELL_COUNT; direction_3++) {
+            if (moatCell[direction_3] == destination) {
                 moatDestination = 1;
-                moatIndex = direction;
+                moatIndex_1 = direction_3;
             }
         }
         if (moatDestination) {
-            canEnterMoat = 0;
-            if (moatIndex == ARMY_MOAT_GATE_INDEX &&
+            canEnterMoat_1 = 0;
+            if (moatIndex_1 == ARMY_MOAT_GATE_INDEX &&
                 gpCombatManager->m_drawbridgeState != COMBAT_CASTLE_GATE_OPEN) {
-                canEnterMoat = 1;
+                canEnterMoat_1 = 1;
             }
-            if ((moatIndex > 0 && moatCell[moatIndex - 1] == m_hex) ||
-                (moatIndex < ARMY_MOAT_CELL_COUNT - 1 &&
-                 moatCell[moatIndex + 1] == m_hex)) {
-                canEnterMoat = 1;
+            if ((moatIndex_1 > 0 && moatCell[moatIndex_1 - 1] == m_hex) ||
+                (moatIndex_1 < ARMY_MOAT_CELL_COUNT - 1 &&
+                 moatCell[moatIndex_1 + 1] == m_hex)) {
+                canEnterMoat_1 = 1;
             }
-            for (direction = 0; direction < ARMY_ADJACENT_DIRECTION_COUNT; direction++) {
-                if (GetAdjacentCellIndex(m_hex, direction) == moatCell[moatIndex]) {
-                    canEnterMoat = 1;
+            for (direction_3 = 0; direction_3 < ARMY_ADJACENT_DIRECTION_COUNT;
+                 direction_3++) {
+                if (moatCell[moatIndex_1] ==
+                    GetAdjacentCellIndex(m_hex, direction_3)) {
+                    canEnterMoat_1 = 1;
                 }
             }
             if (m_side == 0 && moatCell[m_hex / ARMY_HEX_COLUMNS] < m_hex) {
-                canEnterMoat = 1;
+                canEnterMoat_1 = 1;
             }
             if (m_side == 1 && m_hex < moatCell[m_hex / ARMY_HEX_COLUMNS]) {
-                canEnterMoat = 1;
+                canEnterMoat_1 = 1;
             }
-            if (!canEnterMoat) {
+            if (!canEnterMoat_1) {
                 if (m_facing == 1) {
                     destination--;
                 } else {
@@ -1542,13 +1551,16 @@ int army::WalkTo(int destination)
     }
 
     steps = 0;
-    for (direction = gpSearchArray->m_pathLength - 1; direction >= 0; direction--) {
-        Walk(gpSearchArray->m_storage.path.directions[direction],
+    for (direction_3 = gpSearchArray->m_pathLength - 1;
+         direction_3 >= 0;
+         direction_3--) {
+        Walk(static_cast<unsigned char>(
+                 gpSearchArray->m_storage.path.directions[direction_3 + 1]),
              0,
-             gpSearchArray->m_pathLength - 1 != direction);
+             gpSearchArray->m_pathLength - 1 != direction_3);
         steps++;
         if (steps >= m_monster.speed) {
-            direction = -1;
+            direction_3 = -1;
         }
     }
     CancelSpellType(0);
@@ -1697,7 +1709,7 @@ void army::DamageEnemy(army *target, int *damageResult, int *killedResult,
     for (index16 = 0; index16 < m_quantity; index16++) {
         if (m_spellInfluence[ARMY_SPELL_INFLUENCE_BLESS]) {
             damage1 += m_monster.damageMax;
-        } else if (m_spellInfluence[ARMY_SPELL_INFLUENCE_BLESS]) {
+        } else if (m_spellInfluence[ARMY_SPELL_INFLUENCE_CURSE]) {
             damage1 += m_monster.damageMin;
         } else {
             damage1 += SRandom(m_monster.damageMin, m_monster.damageMax);
@@ -1706,7 +1718,7 @@ void army::DamageEnemy(army *target, int *damageResult, int *killedResult,
     attackBonus6 = 0;
     defenseBonus9 = 0;
     attackDifference7 = m_monster.attack + attackBonus6 -
-        (target->m_monster.defense + defenseBonus9 + defenseModifier);
+        (target->m_monster.defense + (defenseBonus9 + defenseModifier));
     if (m_spellInfluence[ARMY_SPELL_INFLUENCE_DRAGON_SLAYER] &&
         (target->m_monsterType == ARMY_CREATURE_GREEN_DRAGON ||
          target->m_monsterType == ARMY_CREATURE_RED_DRAGON ||
@@ -1784,7 +1796,7 @@ void army::DamageEnemy(army *target, int *damageResult, int *killedResult,
         SRandom(1, ARMY_GENIE_HALF_ROLL_MAX) == ARMY_GENIE_HALF_ROLL) {
         genieDamage26 =
             ((target->m_quantity + 1) / 2) * target->m_monster.hitPoints;
-        if (!(damageDone2 >= genieDamage26)) {
+        if (damageDone2 < genieDamage26) {
             gbGenieHalf = 1;
             damageDone2 = genieDamage26;
         }
@@ -2249,16 +2261,16 @@ int army::LeaveNoBody(void)
 }
 
 // @early-stop
-// Every instruction byte aligns. Retail binds the recursive ProcessDeath call
-// as a TU-local target, so its 19 relocations omit our one external identity.
+// All executable bytes align after masking the recursive call operand at
+// +0x3e5..+0x3e8; retail binds that call directly to this TU-local function.
 VA(0x00451766, 0x3f5)
 void army::ProcessDeath(int immediate)
 {
-    hexcell *frontCell;
-    hexcell *rearCell;
-    army *mirrorSource;
-    army *mirrorImage;
     int rearHex;
+    army *mirrorImage_4;
+    army *mirrorSource;
+    hexcell *frontCell_1;
+    hexcell *rearCell;
 
     if (m_monster.flags.all & MONSTER_FLAGS_DEAD) {
         return;
@@ -2268,9 +2280,9 @@ void army::ProcessDeath(int immediate)
     } else if (Random(0, ARMY_DEATH_RANDOM_MAX) < ARMY_DEATH_SECONDARY_CHANCE) {
         gpCombatManager->m_heroAlternateDeathPending[1 - m_side] = 1;
     }
-    m_monster.flags.all |= MONSTER_FLAGS_DEAD;
+    m_monster.attributes |= MONSTER_ATTRIBUTE_DEAD;
     m_deathPending = 0;
-    frontCell = &gpCombatManager->m_hexCells[m_hex];
+    frontCell_1 = &gpCombatManager->m_hexCells[m_hex];
     rearHex = 0;
     if (m_monster.flags.all & MONSTER_FLAGS_WIDE) {
         rearHex = (static_cast<unsigned int>(m_facing - 1) < 1 ? 1 : -1) +
@@ -2281,26 +2293,26 @@ void army::ProcessDeath(int immediate)
     }
     if (LeaveNoBody()) {
         if (immediate ||
-            (m_monsterType != ARMY_CREATURE_EARTH_ELEMENTAL &&
-             m_monsterType != ARMY_CREATURE_AIR_ELEMENTAL &&
+            (m_monsterType != ARMY_CREATURE_AIR_ELEMENTAL &&
              m_monsterType != ARMY_CREATURE_FIRE_ELEMENTAL &&
-             m_monsterType != ARMY_CREATURE_WATER_ELEMENTAL)) {
+             m_monsterType != ARMY_CREATURE_WATER_ELEMENTAL &&
+             m_monsterType != ARMY_CREATURE_EARTH_ELEMENTAL)) {
             gpCombatManager->m_removedArmies[m_side][m_index] = 1;
             gpCombatManager->m_removedArmyPresent = 1;
         } else {
-            frontCell->m_occupantSide = -1;
-            frontCell->m_occupantIndex = -1;
+            frontCell_1->m_occupantSide = -1;
+            frontCell_1->m_occupantIndex = -1;
         }
     }
-    if (frontCell->m_deadOccupantCount < ARMY_CORPSE_LIMIT && !LeaveNoBody() &&
+    if (frontCell_1->m_deadOccupantCount < ARMY_CORPSE_LIMIT && !LeaveNoBody() &&
         (!rearCell || rearCell->m_deadOccupantCount < ARMY_CORPSE_LIMIT)) {
-        frontCell->m_deadOccupantSides[frontCell->m_deadOccupantCount] =
+        frontCell_1->m_deadOccupantSides[frontCell_1->m_deadOccupantCount] =
             gpCombatManager->m_hexCells[m_hex].m_occupantSide;
-        frontCell->m_deadOccupantIndices[frontCell->m_deadOccupantCount] =
+        frontCell_1->m_deadOccupantIndices[frontCell_1->m_deadOccupantCount] =
             gpCombatManager->m_hexCells[m_hex].m_occupantIndex;
-        frontCell->m_deadOccupantFrames[frontCell->m_deadOccupantCount] =
+        frontCell_1->m_deadOccupantFrames[frontCell_1->m_deadOccupantCount] =
             gpCombatManager->m_hexCells[m_hex].m_occupantFrame;
-        frontCell->m_deadOccupantCount++;
+        frontCell_1->m_deadOccupantCount++;
         if (rearCell) {
             rearCell->m_deadOccupantSides[rearCell->m_deadOccupantCount] =
                 gpCombatManager->m_hexCells[rearHex].m_occupantSide;
@@ -2312,8 +2324,8 @@ void army::ProcessDeath(int immediate)
         }
     }
     if (!LeaveNoBody()) {
-        frontCell->m_occupantSide = -1;
-        frontCell->m_occupantIndex = -1;
+        frontCell_1->m_occupantSide = -1;
+        frontCell_1->m_occupantIndex = -1;
         if (rearCell) {
             rearCell->m_occupantSide = -1;
             rearCell->m_occupantIndex = -1;
@@ -2324,9 +2336,9 @@ void army::ProcessDeath(int immediate)
         mirrorSource->m_mirrorImageIndex = -1;
     }
     if (m_mirrorImageIndex != -1) {
-        mirrorImage = &gpCombatManager->m_armies[m_side][m_mirrorImageIndex];
-        mirrorImage->m_quantity = 0;
-        mirrorImage->ProcessDeath(0);
+        mirrorImage_4 = &gpCombatManager->m_armies[m_side][m_mirrorImageIndex];
+        mirrorImage_4->m_quantity = 0;
+        mirrorImage_4->ProcessDeath(0);
     }
 }
 
@@ -2429,6 +2441,9 @@ void army::SpellEffect(int effect, int effectFrameDelay, int animateCreature)
     }
 }
 
+// @early-stop
+// All non-table bytes match. The table at +0xf3..+0x102 contains four
+// function-local label relocations; its dispatch and all five calls also align.
 VA(0x00451ef8, 0x10f)
 void army::CancelSpellType(int cancelType)
 {
@@ -2443,13 +2458,13 @@ void army::CancelSpellType(int cancelType)
         if (m_spellInfluence[ARMY_SPELL_INFLUENCE_BLIND]) {
             CancelIndividualSpell(ARMY_SPELL_INFLUENCE_BLIND);
             m_damagePenalty = ARMY_DAMAGE_PENALTY_HALF;
-            m_monster.flags.all |= MONSTER_FLAGS_WOKE_FROM_DAMAGE;
+            m_monster.attributes |= MONSTER_ATTRIBUTE_WOKE_FROM_DAMAGE;
         }
         if (m_spellInfluence[ARMY_SPELL_INFLUENCE_PARALYZE] ||
             m_spellInfluence[ARMY_SPELL_INFLUENCE_HYPNOTIZE] ||
             m_spellInfluence[ARMY_SPELL_INFLUENCE_PETRIFIED]) {
-            m_monster.flags.all |= MONSTER_FLAGS_WOKE_FROM_DAMAGE;
-            m_monster.flags.all |= MONSTER_FLAGS_RETALIATED;
+            m_monster.attributes |= MONSTER_ATTRIBUTE_WOKE_FROM_DAMAGE;
+            m_monster.attributes |= MONSTER_ATTRIBUTE_RETALIATED;
             CancelIndividualSpell(ARMY_SPELL_INFLUENCE_PARALYZE);
             CancelIndividualSpell(ARMY_SPELL_INFLUENCE_PETRIFIED);
         }
@@ -2459,6 +2474,9 @@ void army::CancelSpellType(int cancelType)
     }
 }
 
+// @early-stop
+// All non-table bytes match. The table at +0x130..+0x16b contains only 15
+// function-local label relocations; its dispatch and database field also align.
 VA(0x00452007, 0x178)
 void army::CancelIndividualSpell(int influence)
 {
@@ -2472,22 +2490,30 @@ void army::CancelIndividualSpell(int influence)
     case ARMY_SPELL_INFLUENCE_SLOW:
         m_monster.speed = static_cast<signed char>(m_speed);
         m_frameInfo.walkDuration = m_walkDuration;
-        m_monster.flags.all |=
-            gMonsterDatabase[m_monsterType].flags.all & MONSTER_FLAGS_FLYING;
+        m_monster.attributes |=
+            gMonsterDatabase[m_monsterType].attributes & MONSTER_ATTRIBUTE_FLYING;
         break;
     case ARMY_SPELL_INFLUENCE_BLIND:
+        break;
     case ARMY_SPELL_INFLUENCE_BLESS:
+        break;
     case ARMY_SPELL_INFLUENCE_CURSE:
+        break;
     case ARMY_SPELL_INFLUENCE_BERSERK:
+        break;
     case ARMY_SPELL_INFLUENCE_PARALYZE:
+        break;
     case ARMY_SPELL_INFLUENCE_HYPNOTIZE:
+        break;
     case ARMY_SPELL_INFLUENCE_DRAGON_SLAYER:
         break;
     case ARMY_SPELL_INFLUENCE_BLOODLUST:
         m_monster.attack -= ARMY_BLOODLUST_ATTACK_BONUS;
         break;
     case ARMY_SPELL_INFLUENCE_SHIELD:
+        break;
     case ARMY_SPELL_INFLUENCE_PETRIFIED:
+        break;
     case ARMY_SPELL_INFLUENCE_ANTI_MAGIC:
         break;
     case ARMY_SPELL_INFLUENCE_STONESKIN:
@@ -2499,6 +2525,9 @@ void army::CancelIndividualSpell(int influence)
     }
 }
 
+// @early-stop
+// All non-table bytes match. The table at +0x21c..+0x257 contains only 15
+// function-local label relocations; its dispatch and all 12 externals also align.
 VA(0x0045217f, 0x282)
 int army::SetSpellInfluence(int influence, int rounds)
 {
@@ -2520,11 +2549,13 @@ int army::SetSpellInfluence(int influence, int rounds)
     case ARMY_SPELL_INFLUENCE_SLOW:
         CancelIndividualSpell(ARMY_SPELL_INFLUENCE_HASTE);
         m_monster.speed = static_cast<signed char>((m_monster.speed + 1) / 2);
-        if (m_monster.flags.all & MONSTER_FLAGS_FLYING) {
-            m_monster.flags.all -= MONSTER_FLAGS_FLYING;
+        if (m_monster.attributes & MONSTER_ATTRIBUTE_FLYING) {
+            m_monster.attributes -= MONSTER_ATTRIBUTE_FLYING;
         }
         m_frameInfo.walkDuration = static_cast<int>(
             m_frameInfo.walkDuration * ARMY_SLOW_WALK_DURATION_SCALE);
+        break;
+    case ARMY_SPELL_INFLUENCE_BLIND:
         break;
     case ARMY_SPELL_INFLUENCE_BLESS:
         CancelIndividualSpell(ARMY_SPELL_INFLUENCE_CURSE);
@@ -2535,11 +2566,19 @@ int army::SetSpellInfluence(int influence, int rounds)
     case ARMY_SPELL_INFLUENCE_BERSERK:
         CancelIndividualSpell(ARMY_SPELL_INFLUENCE_HYPNOTIZE);
         break;
+    case ARMY_SPELL_INFLUENCE_PARALYZE:
+        break;
     case ARMY_SPELL_INFLUENCE_HYPNOTIZE:
         CancelIndividualSpell(ARMY_SPELL_INFLUENCE_BERSERK);
         break;
+    case ARMY_SPELL_INFLUENCE_DRAGON_SLAYER:
+        break;
     case ARMY_SPELL_INFLUENCE_BLOODLUST:
         m_monster.attack += ARMY_BLOODLUST_ATTACK_BONUS;
+        break;
+    case ARMY_SPELL_INFLUENCE_SHIELD:
+        break;
+    case ARMY_SPELL_INFLUENCE_PETRIFIED:
         break;
     case ARMY_SPELL_INFLUENCE_ANTI_MAGIC:
         for (i = 0; i < ARMY_SPELL_INFLUENCE_COUNT; i++) {
