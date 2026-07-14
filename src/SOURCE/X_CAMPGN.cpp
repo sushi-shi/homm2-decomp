@@ -23,6 +23,7 @@
 #include <SOURCE/ExpCampaign.h>
 #include <SOURCE/game.h>
 #include <SOURCE/hero.h>
+#include <SOURCE/kbwin.h>
 
 static const int expansionCampaignTrackXY[EXPANSION_CAMPAIGN_COUNT]
                                          [EXPANSION_CAMPAIGN_MAX_MAP_COUNT][2] = {
@@ -992,37 +993,208 @@ void ExpCampaign::ReplaySmacker4(void)
 }
 
 VA(0x004bd5aa, 0x59)
-unsigned char ExpCampaign::IsCompleted(void) { return 0; }
+unsigned char ExpCampaign::IsCompleted(void)
+{
+    if (m_mapsPlayed[m_mapCount - 1])
+        return 1;
+    if (m_campaignId == EXPANSION_CAMPAIGN_VOYAGE_HOME &&
+        m_mapsPlayed[EXPANSION_MAP_VOY_KING_AND_COUNTRY])
+        return 1;
+    return 0;
+}
 
 VA(0x004bd603, 0x36)
-signed char ExpCampaign::IsThisMapCompleted(void) { return 0; }
+signed char ExpCampaign::IsThisMapCompleted(void)
+{
+    if (m_mapsPlayed[m_currentMap])
+        return 1;
+    return 0;
+}
 
+// @early-stop
+// Equal-sized raw code is identical after masking local switch DIR32 fields at
+// +0x199..+0x19c and +0x1a0..+0x1af, plus four-byte xCampaign member fields at
+// +0xfa,+0x10d,+0x11d,+0x134,+0x140,+0x148,+0x161,+0x167,+0x203,+0x213,
+// +0x21f,+0x227,+0x234,+0x239. Retail names interior addresses; base uses
+// xCampaign plus the same addends. All external globals and callees resolve identically.
 VA(0x004bd639, 0x32e)
-int ExpCampaign::MessageHandler(struct tag_message &) { return 0; }
+int ExpCampaign::MessageHandler(struct tag_message &message)
+{
+    int map;
+
+    if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active == 1)
+        gpSoundManager->SwitchAmbientMusic(
+            giTerrainToMusicTrack[gpAdvManager->m_currentTerrain]);
+    if (giDialogTimeout != 0 && giDialogTimeout < KBTickCount()) {
+        message.type = CAMPAIGN_MESSAGE_WIDGET;
+        gpWindowManager->m_dialogResult = message.payload.widget.id;
+        message.payload.widget.id = CAMPAIGN_CLOSE_COMMAND;
+        message.payload.widget.command = message.payload.widget.id;
+        giDialogTimeout = 0;
+        return CAMPAIGN_HANDLER_CLOSE;
+    }
+    if (message.type == CAMPAIGN_MESSAGE_WIDGET) {
+        switch (message.payload.widget.command) {
+        case CAMPAIGN_MESSAGE_HOVER:
+        case CAMPAIGN_MESSAGE_HELP:
+            switch (message.payload.widget.id) {
+            case CAMPAIGN_TRACK_WIDGET_FIRST:
+            case CAMPAIGN_TRACK_WIDGET_FIRST + 1:
+            case CAMPAIGN_TRACK_WIDGET_FIRST + 2:
+            case CAMPAIGN_TRACK_WIDGET_FIRST + 3:
+            case CAMPAIGN_TRACK_WIDGET_FIRST + 4:
+            case CAMPAIGN_TRACK_WIDGET_FIRST + 5:
+            case CAMPAIGN_TRACK_WIDGET_FIRST + 6:
+            case CAMPAIGN_TRACK_WIDGET_FIRST + 7:
+            case CAMPAIGN_TRACK_WIDGET_FIRST + 8:
+            case CAMPAIGN_TRACK_WIDGET_FIRST + 9:
+            case CAMPAIGN_TRACK_WIDGET_FIRST + 10:
+            case CAMPAIGN_TRACK_WIDGET_LAST:
+                map = message.payload.widget.id -
+                      CAMPAIGN_TRACK_WIDGET_FIRST;
+                if (giDebugLevel >= 1 || xCampaign.m_mapChoices[map] ||
+                    xCampaign.m_mapsPlayed[map]) {
+                    xCampaign.m_viewMap = map;
+                    xCampaign.UpdateInfo(1);
+                }
+                break;
+            case CAMPAIGN_BONUS_WIDGET_FIRST:
+            case CAMPAIGN_BONUS_WIDGET_FIRST + 1:
+            case CAMPAIGN_BONUS_WIDGET_LAST:
+                if (xCampaign.m_viewOnly == 0 &&
+                    xCampaign.m_mapChoices[xCampaign.m_viewMap]) {
+                    xCampaign.m_bonusChoices[xCampaign.m_viewMap] =
+                        message.payload.widget.id -
+                        CAMPAIGN_BONUS_WIDGET_FIRST;
+                    xCampaign.UpdateInfo(1);
+                }
+                break;
+            }
+            break;
+
+        case CAMPAIGN_MESSAGE_ACTIVATE:
+            switch (message.payload.widget.id) {
+            case CAMPAIGN_DIALOG_REPLAY:
+                xCampaign.ReplaySmacker();
+                xCampaign.m_window->DrawWindow();
+                break;
+            case CAMPAIGN_DIALOG_ACCEPT:
+                if (xCampaign.m_viewOnly == 0) {
+                    if (xCampaign.m_mapChoices[xCampaign.m_viewMap]) {
+                        xCampaign.m_currentMap = xCampaign.m_viewMap;
+                    } else {
+                        NormalDialog(
+                            "The currently selected map is not a valid choice for your next scenario.",
+                            NORMAL_DIALOG_INFO, NORMAL_DIALOG_NO_RESOURCE,
+                            NORMAL_DIALOG_NO_RESOURCE,
+                            NORMAL_DIALOG_NO_RESOURCE, 0,
+                            NORMAL_DIALOG_NO_RESOURCE, 0,
+                            NORMAL_DIALOG_NO_RESOURCE, 0);
+                        break;
+                    }
+                }
+            case CAMPAIGN_DIALOG_CANCEL:
+            case CAMPAIGN_DIALOG_RESTART:
+                gpWindowManager->m_dialogResult =
+                    message.payload.widget.id;
+                message.payload.widget.id = CAMPAIGN_CLOSE_COMMAND;
+                message.payload.widget.command = message.payload.widget.id;
+                giDialogTimeout = 0;
+                return CAMPAIGN_HANDLER_CLOSE;
+            default:
+                break;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+    return CAMPAIGN_HANDLER_CONTINUE;
+}
 
 VA(0x004bd967, 0x6c)
-void ExpCampaign::Autosave(void) {}
+void ExpCampaign::Autosave(void)
+{
+    if (m_currentMap != EXPANSION_MAP_NONE) {
+        m_mapsPlayed[m_currentMap] = 1;
+        sprintf(gText, "%s_%d", xShortCampaignNames[m_campaignId],
+                m_currentMap + 1);
+        gpGame->SaveGame(gText, 1, 0);
+    }
+}
 
 VA(0x004bd9d3, 0x25)
-int ExpCampaign::Choose(void) { return 0; }
+int ExpCampaign::Choose(void)
+{
+    PlaySmacker(EXPANSION_SMACKER_CAMPAIGN_CHOICE);
+    return xLastChoice;
+}
 
+// @match-note
+// Complete arithmetic semantics, 0x4 frame, CFG, and three gpGame relocations.
+// First divergence is +0x2a: retail accumulates the seven-day week term before
+// the 28-day month term, while MSVC emits the month term first here. Both source
+// term orders and explicit grouping were tried. Revisit at 95% for last-mile AST tuning.
 VA(0x004bd9f8, 0x64)
-short int ExpCampaign::Days(void) { return 0; }
+short int ExpCampaign::Days(void)
+{
+    return (m_mapDays[m_currentMap] +
+            (gpGame->m_week - 1) * EXPANSION_CAMPAIGN_DAYS_PER_WEEK) +
+           (gpGame->m_month - 1) * EXPANSION_CAMPAIGN_DAYS_PER_MONTH +
+           gpGame->m_day;
+}
 
 VA(0x004bda5c, 0x1b)
-int ExpCampaign::CampaignID(void) { return 0; }
+int ExpCampaign::CampaignID(void)
+{
+    return m_campaignId;
+}
 
 VA(0x004bda77, 0x3a)
-char * ExpCampaign::JosephName(void) { return 0; }
+char *ExpCampaign::JosephName(void)
+{
+    if (m_currentMap < EXPANSION_CAMPAIGN_FIRST_ALTERNATE_NAME_MAP)
+        return xJosephName[0];
+    return xStableText[m_currentMap];
+}
 
 VA(0x004bdab1, 0x3a)
-char * ExpCampaign::IvanName(void) { return 0; }
+char *ExpCampaign::IvanName(void)
+{
+    if (m_currentMap < EXPANSION_CAMPAIGN_FIRST_ALTERNATE_NAME_MAP)
+        return xUncleIvanName[0];
+    return xStableText[m_currentMap + EXPANSION_CAMPAIGN_IVAN_NAME_OFFSET];
+}
 
 VA(0x004bdaeb, 0x4e)
-signed char ExpCampaign::IsSpecialGoldenBow(int, int) { return 0; }
+signed char ExpCampaign::IsSpecialGoldenBow(int x, int y)
+{
+    if (m_campaignId == EXPANSION_CAMPAIGN_DESCENDANTS &&
+        m_currentMap == EXPANSION_MAP_DES_ELVEN_LANDS &&
+        x == EXPANSION_CAMPAIGN_GOLDEN_BOW_EVENT_X &&
+        y == EXPANSION_CAMPAIGN_GOLDEN_BOW_EVENT_Y)
+        return 1;
+    return 0;
+}
 
 VA(0x004bdb39, 0x38)
-signed char ExpCampaign::IsSpecialUA(void) { return 0; }
+signed char ExpCampaign::IsSpecialUA(void)
+{
+    if (m_campaignId == EXPANSION_CAMPAIGN_WIZARDS_ISLE &&
+        m_currentMap == EXPANSION_MAP_WIZ_POWERS_END)
+        return 1;
+    return 0;
+}
 
 VA(0x004bdb71, 0x73)
-signed char ExpCampaign::IsSpecialLossCondition(int) { return 0; }
+signed char ExpCampaign::IsSpecialLossCondition(int playerIndex)
+{
+    playerRec *player = &gpGame->m_players[playerIndex];
+
+    if (playerIndex == EXPANSION_CAMPAIGN_MAIN_PLAYER &&
+        m_campaignId == EXPANSION_CAMPAIGN_PRICE_OF_LOYALTY &&
+        m_currentMap == EXPANSION_MAP_POL_ABYSS &&
+        player->heroCount == 0)
+        return 1;
+    return 0;
+}
