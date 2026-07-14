@@ -42,7 +42,8 @@ void soundManager::ValidatePreviousPosition(int param_1)
 {
     char buf[20];
     char *cur;
-    ProcessAssert(param_1 >= 0 && param_1 < 0x3c, __FILE__, 66);
+    H2_ASSERT(param_1 >= 0 && param_1 < 0x3c,
+              "I:\\Projects\\Heroes\\Prog\\BASE\\soundmgr.cpp", 66);
     if (CDPreviousPosition[param_1][0] == 0)
         return;
     strcpy(buf, CDPreviousPosition[param_1]);
@@ -621,7 +622,7 @@ void soundManager::ModifySample(struct _SAMPLE *sampleHandle, short operation, l
             iLastVolume[foundChannel] = static_cast<short>(value);
         break;
     case 101:
-        ProcessAssert(gCdMusic == 0, __FILE__, 0x52f);
+        H2_ASSERT(gCdMusic == 0, "I:\\Projects\\Heroes\\Prog\\BASE\\soundmgr.cpp", 0x52f);
         _AIL_set_sample_volume_8(sampleHandle, ConvertVolume(value, 101));
         if (foundChannel >= 0)
             iLastVolume[foundChannel] = static_cast<short>(value);
@@ -794,7 +795,8 @@ void soundManager::PollSound(void)
         if (m_fadeSteps <= 0xa && m_currentTrack != m_fadeTargetTrack) {
             if (m_midiFile != 0 && bSaveMusicPosition[m_currentTrack] != 0) {
                 if (gCdMusic == 0) {
-                    ProcessAssert(m_midiFile, __FILE__, 0x61a);
+                    H2_ASSERT(m_midiFile, "I:\\Projects\\Heroes\\Prog\\BASE\\soundmgr.cpp",
+                              0x61a);
                     m_savedTrackPositions[m_currentTrack] =
                         ftell(reinterpret_cast<FILE *>(m_midiFile));
                 }

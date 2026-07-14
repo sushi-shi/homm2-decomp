@@ -14,6 +14,30 @@ Before replaying a source state, compare its hash here and confirm the canonical
 sibling hashes have not changed. A listed hash should not be rebuilt under the same compiler/header
 state.
 
+## BASE/Misc early-batch structural and TU-state retest
+
+`misc-early-tu-state-04f798c.tsv` records the bounded clean retest of `InitMemEntry` through
+`FindToken` from checkpoint `04f798c`. Its hashes identify the normalized descriptor printed in
+the `variant` column (SHA-256 of `scope:variant`), rather than unavailable temporary whole-file
+states; this makes every rejected spelling independently searchable and reproducible.
+The retained `Misc.cpp` SHA-256 is
+`08b3d2dfb8a14899ad3cac10418aa1ad82124cfcc0195eeea45e310efcf09194`; the matrix SHA-256 is
+`94bb4371ef12e7dfcb76becd2ba17b09d06ad24d43d07f512c24cdb2d105e605`.
+
+The important structural recovery is `FadeIn`: naming the repeated `0x3f - level` value as an
+explicit `int threshold` changes MSVC 4.2's allocation and reassociation to retail, raising the
+function from 92.96% to 97.41%. Candidate and retail are both 0xea bytes, all 11 relocation targets
+agree, and all bytes after +0x1f align. The remaining raw difference is only the six-byte new-
+expression null-check ordering at +0x1a..+0x1f; three local allocation spellings leave it unchanged,
+so it remains an `@match-note`, not a proven wall.
+
+The BaseAlloc append spellings also demonstrate why a local `/O2` search cannot certify a wall:
+changing only the append and a value-neutral size alias moves later functions substantially, making
+`FindLastToken` exact in several rejected states while regressing BaseAlloc and other pins. The
+canonical high-scoring append was restored. Future work should start with exact-preserving
+predecessor/TU-state variants and the recorded pins, not replay these local synonyms. No regex
+permuter was used; the listed relational and SIB forms were manually audited as value-preserving.
+
 ## BASE/Icon2b adjacent-decoder setup transfer
 
 `icon2b-adjacent-setup-dd7973b.tsv` records the bounded setup-lifetime retest from checkpoint
@@ -110,6 +134,21 @@ The retained source SHA-256 is
 exact functions; the remaining `ModifySample` row is full-function raw-exact after relocation-union
 masking. Thus all 34 functions are raw-exact, with only `ModifySample`'s permitted delinker identity
 wall below 100% objdiff. All 27 pre-existing exact siblings remained pinned throughout.
+
+The subsequent assertion-wrapper recovery at source-decomp checkpoint `226828f` replaced the three
+remaining direct `ProcessAssert` calls in `ValidatePreviousPosition`, `ModifySample`, and `PollSound`
+with `H2_ASSERT`. `homm2 sema strings` at retail RVAs `0x0cb6a0`, `0x0ccc80`, and `0x0cd320`
+independently recovered the same original filename, `I:\Projects\Heroes\Prog\BASE\soundmgr.cpp`;
+the existing retail line arguments `66`, `0x52f`, and `0x61a` and each assertion expression's token
+shape were preserved. No source-shape experiment or permutation tool was used. The source hash moved
+from `9f170036461a1a79ab2a7894f0402ad271573cf647bee0577c4a56f4fd34e487` to
+`cc03a7df2e5b3aae3e11ba5c78cd538148a0baf27802e8494d987e843559244a`, and the candidate object hash
+from `d3821307056a0da061096dc9efd6e8e457be27e99704ed2076fb962f5c034a52` to
+`48768cc90911be6b39ee041731bddd0542fdb610773d4c0faab4e755b6606e78`. A fresh complete-function
+COFF audit again found all 34 functions raw-exact after masking the union of four-byte relocation
+payloads. Objdiff remained 33/34 exact, with only `ModifySample` at `99.837960%`; its full `0x202`
+span remained raw-exact with 23 candidate and 20 retail relocations. Do not retry filename casing,
+`__FILE__`, expression synonyms, or either permuter for these wrappers.
 
 ## BASE/Textntry AST searches
 
