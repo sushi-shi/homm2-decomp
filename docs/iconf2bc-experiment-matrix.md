@@ -1,13 +1,6 @@
 # BASE/iconf2bc experiment matrix
 
-Current integrated state: checkpoint `3bbfe46`, source SHA-256
-`e620be13ef21922c1ce5eb3260079f3e71b8fc4054684ac9d99e25f72ba80dcd`, 85.465996%,
-function end `0x542`, frame `sub esp,8`, decoder entry `+0xeb`, and 84/83 relocations.
-The global-assignment X initializer restores retail's `eax`/`ebx` publication sequence and two
-of the three missing setup bytes. The first width/x register-order divergence and one excess setup
-`gFCY` load remain active work; this is not classified as a compiler wall.
-
-Current retained working state: source SHA-256
+Current integrated state: checkpoint `ea3b363`, source SHA-256
 `55a3efd26cc0bc327cc0bc09a7b832c0bc6632ea53257dd49950e1a7b9af090c`, 85.84131%,
 function end `0x545`, frame `sub esp,8`, decoder entry `+0xee`, and 84/83 relocations.
 Declaring the later row pitch immediately after the entry cursor preserves the retained width/X
