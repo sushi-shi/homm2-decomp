@@ -340,14 +340,15 @@ the prologue register-lifetime divergence.
 
 Canonical source state:
 
-- checkpoint: `c131c56`
+- lane base: `1e1646a`, plus the retained branch-local fill-count recovery below
 - target: RVA `0xd9ce0`, retail size `0x58d`
 - `src/BASE/iconf2by.cpp`:
-  `5bcb21613117b98e1131fee547745a0d299eaf604683ae3775c8bdfabc636c98`
-- live checkpoint: 89.47721%, candidate size `0x57a`, 143 candidate vs 144 retail relocations,
+  `d20712c2e1e836a2161ff93a7ed7db51bc04e2257aeb3ec2a1d03e0880ab4578`
+- live checkpoint: 90.402145%, candidate size `0x57a`, 143 candidate vs 144 retail relocations,
   no candidate-only target
 - the decoder aligns instruction-for-instruction through extended-run setup;
-- candidate and retail now both reserve the otherwise-unused four-byte frame slot
+- candidate and retail both reserve a four-byte frame slot; the candidate still spills the fill
+  count there while retail never accesses it
 
 ### Corrections retained at the canonical checkpoint
 
@@ -361,7 +362,9 @@ Canonical source state:
 - replaced the long-lived advance local with branch-selected source advancement and a common join;
 - restored the right literal quadrant's zero-skip-first polarity and common computed-skip
   publication;
-- recovered the unsigned fill-count snapshot that produces the retail frame.
+- recovered the unsigned fill-count snapshot that produces the retail-sized frame;
+- narrowed that snapshot to the vertical-visible fill block, moving the `gFYRun` load from before
+  the shear/vertical checks to the retail position after them;
 - formed the right-quadrant destination once and published it in both arms, moving the global
   destination store between the compare and branch as retail does.
 - recovered a setup-only promoted shear-value lifetime; it emits no setup-local instructions but
@@ -480,7 +483,7 @@ Shear-lifetime axes after `11424f1`:
   right destination (`66ca2813`), `register` setup value (`f51119a9`), and split setup-value
   declaration/assignment (`33b353d4`): byte-identical to 89.47721%.
 
-The authoritative full-SHA no-repeat set for all 90 recovered manual states is
+The authoritative full-SHA no-repeat set for all 97 recovered manual states is
 [`docs/matching-matrices/iconf2by-manual.tsv`](matching-matrices/iconf2by-manual.tsv). Later
 right-block pointer/reference/local spellings were byte-identical or regressed; do not repeat them.
 The earliest normalized divergence is the prologue register choice: candidate loads `shear` into
@@ -503,6 +506,29 @@ Final setup lifetime axes after `c131c56`:
   reverted;
 - moving the clip-width declaration immediately after current-Y formation: byte-identical to
   89.47721%; reverted.
+
+Fill-lifetime and setup-order axes after lane base `1e1646a`:
+
+- publish `gFYClipR` before the initial shear expression: 87.7319%, size `0x57b`, 143/144;
+  reverted;
+- move the unsigned fill-count snapshot inside the vertical-visible block: 90.402145%, canonical
+  candidate size/frame, 143/144; retained because its `gFYRun` load now occurs after the vertical
+  checks as retail does;
+- keep that branch-local snapshot for clipping arithmetic but use `gFYRun` as the full-fill
+  `memset` count: 88.793564%, size `0x563`, no frame, 143/144; reverted;
+- signed branch-local fill count: 89.08847%, size `0x567`, no frame, 144/144; reverted;
+- direct formal `clipW` after the branch-local recovery: 90.02681%, canonical candidate size/frame,
+  143/144; reverted;
+- publish the right-clipped dim length before computing the pending literal skip: 88.75335%, size
+  `0x57d`, 143/144; reverted;
+- named `fillLeft` after the branch-local count: 90.02681%, canonical candidate size/frame, 143/144;
+  reverted.
+
+The branch-local recovery also clarifies the four-byte-frame evidence: retail reserves but never
+accesses the slot, while the retained candidate spills the fill count to it in the full-fill
+intrinsic path. Fixing the ESI-shear/EBP-width allocation may remove that spill. The original NB09
+stream has no symbol subsection at all for this compiland, so there are neither BPREL stack locals
+nor optimized-register records to recover.
 
 These close the obvious setup-lifetime spellings but do not prove a wall. Continue from the
 prologue register divergence with genuinely new retail-evidenced structure, and do not run an AST
