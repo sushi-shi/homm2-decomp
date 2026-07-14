@@ -54,7 +54,10 @@ army::army(void)
 }
 
 VA(0x0044a98f, 0x18)
-void army::WaitSample(int) {}
+void army::WaitSample(int sampleIndex)
+{
+    return;
+}
 
 VA(0x0044a9a7, 0xde)
 void army::InitClean(void)
@@ -1462,7 +1465,10 @@ void army::DoAttack(int retaliation)
 }
 
 VA(0x0044f408, 0x16)
-void army::ResetPath(void) {}
+void army::ResetPath(void)
+{
+    return;
+}
 
 VA(0x0044f41e, 0x25)
 int army::WalkTo(void)
