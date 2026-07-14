@@ -394,21 +394,23 @@ def collect_uses(declarations: list[EnumDeclaration], files: list[Path], texts: 
     for path in files:
         rel = str(path.relative_to(ROOT))
         for line_number, line in enumerate(texts[path].splitlines(), 1):
-            identifiers = set(re.findall(r"\b[A-Za-z_]\w*\b", line))
+            code_line = line.split("//", 1)[0]
+            identifiers = set(re.findall(r"\b[A-Za-z_]\w*\b", code_line))
             for name in identifiers & type_names:
                 declaration = type_by_name[name]
                 if line_number in declaration_ranges.get((rel, name), ()):
                     continue
-                context = _line_context(line, name)
-                declaration.type_uses.setdefault(context, []).append(f"{rel}:{line_number}")
+                context = _line_context(code_line, name)
+                if context != "other":
+                    declaration.type_uses.setdefault(context, []).append(f"{rel}:{line_number}")
             for name in identifiers & enum_names:
                 declaration, enumerator = enum_by_name[name]
                 if declaration.owner == rel and enumerator.line == line_number:
                     continue
-                operations = _usage_operations(line, name)
+                operations = _usage_operations(code_line, name)
                 enumerator.uses.append({"location": f"{rel}:{line_number}", "operations": operations})
                 enumerator.operations = sorted(set(enumerator.operations) | set(operations))
-                target = _assignment_target(line, name)
+                target = _assignment_target(code_line, name)
                 if target:
                     enumerator.storage_locations.append(f"{rel}:{line_number}:{target}")
 
@@ -463,13 +465,16 @@ def build_census() -> tuple[list[EnumDeclaration], dict]:
 
 def _json_report(declarations: list[EnumDeclaration]) -> dict:
     constant_only = [item.name for item in declarations if not item.type_uses]
+    constant_only_typedefs = [item.name for item in declarations
+                              if item.form == "typedef-enum" and not item.type_uses]
     return {
         "schema_version": 1,
         "declaration_count": len(declarations),
         "enumerator_count": sum(len(item.enumerators) for item in declarations),
         "unclassified": [item.name for item in declarations if item.manifest_status == "unclassified"],
         "audits": {
-            "constant_only_typedef_enums": constant_only,
+            "constant_only_declarations": constant_only,
+            "constant_only_typedef_enums": constant_only_typedefs,
             "mixed_constant_groups": [item.name for item in declarations if _mixed_constant_group(item)],
         },
         "declarations": [asdict(item) for item in declarations],
@@ -483,6 +488,7 @@ def _markdown_report(report: dict) -> str:
         f"- Declarations: {report['declaration_count']}",
         f"- Enumerators: {report['enumerator_count']}",
         f"- Unclassified: {len(report['unclassified'])}",
+        f"- Constant-only declarations: {len(report['audits']['constant_only_declarations'])}",
         f"- Constant-only typedef enums: {len(report['audits']['constant_only_typedef_enums'])}",
         f"- Mixed `*Constant` candidates: {len(report['audits']['mixed_constant_groups'])}",
         "",
