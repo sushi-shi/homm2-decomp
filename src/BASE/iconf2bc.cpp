@@ -69,6 +69,19 @@ DATA(0x005380c0) static unsigned char *gFCDst;
 // without the surrounding instructions is not structural recovery. Earlier width/pitch, snapshot,
 // staged-skip, C89 declaration, static-order, and enum-grouping attempts remain closed. The
 // residual is unresolved, not a byte-proven wall; no regex or AST permuter was used.
+// A fresh command-body/row-ownership audit on d8502da retained one source correction: the selected
+// IconEntry now owns the horizontal clip width directly instead of preserving that value through
+// the later destination-pitch local. This raises live match from 85.9925% to 86.31738%, grows the
+// candidate from 0x53c to 0x53e, and aligns row setup and decoder entry at retail +0xcc/+0xec.
+// Excluding retail's three trailing padding NOPs, candidate/retail are 392/397 instructions; both
+// retain the eight-byte frame and 59 branches with the previously proved 76-block topology.
+// The first divergence remains +0x11. Candidate reloads entry->w at +0x61 for the second horizontal
+// clause, whereas retail spills the original width at +0x32 and consumes [esp+0x14] at +0x6b.
+// A clip-local width snapshot regresses to 85.93%, moves decoder entry back to +0xea, and does not
+// create that spill, so it was reverted. Relocations remain 84/83 with only gFCY 9/8: candidate
+// stores at relocation +0x51 and loads at +0x78/+0x86; retail stores at +0x55 and loads once at
+// +0x77 while retaining ECX. Revisit only after real type/declaration/TU-state evidence changes
+// this allocation; do not introduce an alias, dummy reload, volatile state, or count-only local.
 VA(0x004d9790, 0x54d)
 void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                                 int clip, int clipX, int clipY, int clipW, int clipH, int color,
@@ -86,7 +99,6 @@ void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, 
     gFCEntry = entry;
     src += entry->srcOffset;
     x0++;
-    pitch = w;
     gFCX0 = x0;
     w = w + x0;
     int X = (gFCXEnd = w - 1);
@@ -94,7 +106,7 @@ void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, 
     gFCY = Y;
     if (clip != 0) {
         int currentY = gFCY;
-        if (x0 < clipX || clipW + clipX < x0 + pitch ||
+        if (x0 < clipX || clipW + clipX < x0 + entry->w ||
             currentY < clipY || clipY + clipH < entry->h + currentY) {
             clip = 1;
             gFCClipR = clipX + clipW - 1;
