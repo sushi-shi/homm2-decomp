@@ -3361,7 +3361,9 @@ adjustSound:
                 gpCombatManager->m_hexCells[loopIndex].m_obstacleIndex = -1;
             }
             for (loopIndex = 0; loopIndex < APP_MENU_FORMATION_HEX_COUNT; loopIndex++) {
-                formationHexIndex = gCombatFormations[gpCombatManager->m_debugFormation][loopIndex];
+                formationHexIndex =
+                    sElevationOverlay[gpCombatManager->m_debugFormation]
+                        .cellOffsets[loopIndex];
                 if (formationHexIndex != -1)
                     gpCombatManager->m_hexCells[formationHexIndex].m_blocked = 1;
             }
@@ -4213,10 +4215,10 @@ void NormalDialog(char *text, int dialogType, int windowX, int windowY,
         } else if (resourceType[resourceSlot] == NORMAL_DIALOG_SECONDARY_SKILL) {
             sprintf(resourceText[resourceSlot], "%s",
                     gSecondarySkills[resourceValue[resourceSlot] /
-                                     HERO_SECONDARY_SKILL_VALUE_LEVELS]);
+                                     SECONDARY_SKILL_VALUE_LEVEL_COUNT]);
             strcpy(iconFile, "secskill.icn");
             resourceFrame = resourceValue[resourceSlot] /
-                                HERO_SECONDARY_SKILL_VALUE_LEVELS +
+                                SECONDARY_SKILL_VALUE_LEVEL_COUNT +
                             1;
         } else if (resourceType[resourceSlot] == NORMAL_DIALOG_HERO) {
             sprintf(resourceText[resourceSlot], "%s", "");
@@ -4423,7 +4425,7 @@ void NormalDialog(char *text, int dialogType, int windowX, int windowY,
             sprintf(resourceText[resourceSlot], "%s",
                     gSecondarySkillLevels[
                         resourceValue[resourceSlot] %
-                        HERO_SECONDARY_SKILL_VALUE_LEVELS]);
+                        SECONDARY_SKILL_VALUE_LEVEL_COUNT]);
         } else if (resourceType[resourceSlot] == NORMAL_DIALOG_PRIMARY_SKILL) {
             labelY = panelHeight + panelY - 93;
         } else {
@@ -4590,13 +4592,14 @@ DATA(0x004faa98) int gResourceBaseValue[8];
 DATA(0x004faab8) int gInitResourcesHuman[5][7];
 DATA(0x004fab48) int gInitResourcesComputer[5][7];
 DATA(0x004fabd8) int gMineCharacteristics[8];
-DATA(0x004fabf8) int gSSValues[14][3];
+DATA(0x004fabf8) int gSSValues[HERO_SKILL_COUNT]
+                                 [SECONDARY_SKILL_VALUE_LEVEL_COUNT];
 DATA(0x004faca0) unsigned char gArtifactLevel[104];
 DATA(0x004fad08) int gArtifactBaseRV[100];
 DATA(0x004faea4) int gUltArtifactAvgValue;
 DATA(0x004faea8) int giDebugLevel;
 DATA(0x004faeac) signed char giVisRangeTown;
-DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[66];
+DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[MONSTER_DATABASE_COUNT];
 DATA(0x004fb568) float gfStatPower[42];
 DATA(0x004fb610) float gfBattleStat[42];
 DATA(0x004fb6b8) signed char gSpellLimits[5];
@@ -4736,7 +4739,8 @@ DATA(0x004fdef8) unsigned short wallPos[4][2];
 DATA(0x004fdf08) unsigned short towerPos[4][2];
 DATA(0x004fdf18) unsigned short doorPos[2][2];
 DATA(0x004fdf20) float *fTradingPostEfficency;
-DATA(0x004fdf50) struct SElevationOverlay sElevationOverlay[25];
+DATA(0x004fdf50) struct SElevationOverlay
+    sElevationOverlay[ELEVATION_OVERLAY_COUNT];
 DATA(0x004fe100) signed char captainStats[6][4];
 DATA(0x004fe118) int gbDrawingPuzzle;
 DATA(0x004fe11c) int giWalkingFrom;
