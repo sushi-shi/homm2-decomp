@@ -5,6 +5,7 @@
 
 #include <va.h>
 #include <BASE/widget.h>
+#include <BASE/widgetKind.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/bitmap.h>
@@ -23,8 +24,6 @@
 #define WIDGET_COMMAND_SET_X 0x34
 #define WIDGET_COMMAND_SET_Y 0x35
 #define WIDGET_COMMAND_SET_WIDTH 0x3d
-#define WIDGET_KIND_UNDIMMED 0x8
-#define WIDGET_KIND_TEXT 0x200
 #define WIDGET_COMMAND_DIMMED 0x1000
 
 // @early-stop
@@ -47,7 +46,7 @@ widget::widget(short int x, short int y, short int w, short int h, short int p5,
     m_width = w;
     m_height = h;
     m_id = p5;
-    field_0x14 = kind;
+    m_kind = kind;
 }
 
 VA(0x004dde60, 0x3f)
@@ -59,7 +58,7 @@ widget::widget(void)
     m_prev = 0;
     m_flags = 6;
     m_zOrder = -1;
-    field_0x14 = 2;
+    m_kind = WIDGET_KIND_DEFAULT;
     m_y = 0;
     m_x = 0;
     m_width = 0x10;
@@ -83,15 +82,13 @@ int widget::Open(int id, class heroWindow *win)
 VA(0x004dded0, 0x1)
 void widget::Close(void) {}
 
-// @early-stop
-// /O2 register-coloring wall plus delinker-local identities: both sections are
-// 0x2f4 bytes with 17 relocations at identical offsets. All eight external targets
-// agree; retail names the two switch-dispatch and seven table-entry relocations as
-// Main-relative while base uses $L locals. After masking those relocations, 742/756
-// bytes are identical. Every non-relocation residual is confined to +0x26..+0x61,
-// where AX and DX are exchanged while computing the mouse hit test; the complete
-// command dispatcher from +0x77 onward is otherwise byte-identical. Direct versus
-// staged coordinates, x/y declaration order, and a cached owner were tried.
+// @match-note
+// In the shared WidgetKind state both sections are 0x2f4 with 17/17 relocations
+// and matching external targets. Explicit-range comparison has 16 non-relocation
+// byte differences, all at +0x26..+0x61 in the equivalent mouse-hit-test register
+// coloring; the command dispatcher from +0x77 onward is otherwise byte-identical.
+// Owner-header-adjacent and late enum includes emit the same bytes. Direct/staged
+// coordinates, X/Y declaration order, and a cached owner were tried previously.
 VA(0x004ddee0, 0x2f4)
 int widget::Main(tag_message &message)
 {
@@ -112,8 +109,8 @@ int widget::Main(tag_message &message)
         case WIDGET_COMMAND_DRAW:
             if ((m_flags & WIDGET_FLAG_DRAW) != 0)
                 Draw();
-            if ((m_flags & WIDGET_FLAG_DIMMED) != 0 && field_0x14 != WIDGET_KIND_UNDIMMED &&
-                field_0x14 != WIDGET_KIND_TEXT) {
+            if ((m_flags & WIDGET_FLAG_DIMMED) != 0 && m_kind != WIDGET_KIND_UNDIMMED &&
+                m_kind != WIDGET_KIND_TEXT) {
                 short x = m_x + static_cast<short>(m_owner->m_posX);
                 short y = m_y + static_cast<short>(m_owner->m_posY);
                 DimBitmapArea(gpWindowManager->m_screen, x, y, m_width, m_height, 0);
@@ -131,7 +128,7 @@ int widget::Main(tag_message &message)
                 m_flags = flags;
                 if ((flags & WIDGET_FLAG_DIMMED) != 0) {
                     Draw();
-                    if (field_0x14 != WIDGET_KIND_UNDIMMED && field_0x14 != WIDGET_KIND_TEXT) {
+                    if (m_kind != WIDGET_KIND_UNDIMMED && m_kind != WIDGET_KIND_TEXT) {
                         short x = m_x + static_cast<short>(m_owner->m_posX);
                         short y = m_y + static_cast<short>(m_owner->m_posY);
                         DimBitmapArea(gpWindowManager->m_screen, x, y, m_width, m_height, 0);
@@ -194,7 +191,7 @@ int widget::Main(tag_message &message)
 VA(0x004de1e0, 0x47)
 void widget::Dim(void)
 {
-    if (field_0x14 != 8 && field_0x14 != 0x200) {
+    if (m_kind != WIDGET_KIND_UNDIMMED && m_kind != WIDGET_KIND_TEXT) {
         short x = m_owner->m_posX + m_x;
         short y = m_y + m_owner->m_posY;
         DimBitmapArea(gpWindowManager->m_screen, x, y, m_width, m_height, 0);

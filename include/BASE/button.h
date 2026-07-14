@@ -17,8 +17,7 @@ typedef enum ButtonHotkeyConstant {
 
 typedef enum ButtonConstant {
     BUTTON_REPEAT_DELAY_TICKS = 60,
-    BUTTON_COMMAND_REPLACE_ICON = 0x3c,
-    BUTTON_KIND_AUTO_REPEAT = 0x1000
+    BUTTON_COMMAND_REPLACE_ICON = 0x3c
 } ButtonConstant;
 
 #pragma pack(push, 1)  // recovered layout is byte-packed

@@ -5,6 +5,7 @@
 
 #include <va.h>
 #include <BASE/button.h>
+#include <BASE/widgetKind.h>
 #include <BASE/resourceManager.h>
 #include <BASE/icon.h>
 #include <BASE/heroWindow.h>
@@ -74,7 +75,7 @@ void button::Read(void)
     m_selectMode = gpResourceManager->ReadWord();
     m_hotkey = gpResourceManager->ReadWord();
     m_id = gpResourceManager->ReadWord();
-    field_0x14 = gpResourceManager->ReadWord();
+    m_kind = gpResourceManager->ReadWord();
 }
 
 VA(0x004dd6a0, 0x21)
@@ -103,7 +104,7 @@ inline button::~button()
 VA(0x004dd6d0, 0x595)
 int button::Main(tag_message &msg)
 {
-    if (field_0x14 == BUTTON_KIND_AUTO_REPEAT &&
+    if (m_kind == WIDGET_KIND_AUTO_REPEAT &&
         (m_flags & WIDGET_FLAG_SELECTED) != 0 && KBTickCount() > gButtonRepeatTime) {
         if ((m_flags & WIDGET_FLAG_SELECTED) == 0)
             return 0;
