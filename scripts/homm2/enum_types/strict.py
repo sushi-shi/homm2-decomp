@@ -102,7 +102,11 @@ def _run_entry(entry: dict, compiler: str) -> dict:
     }
 
 
-def _diagnostics(results: list[dict], domain_names: set[str]) -> list[dict]:
+def _diagnostics(results: list[dict], domain_names, location_domains: dict | None = None) -> list[dict]:
+    name_to_domain = ({name: name for name in domain_names}
+                      if isinstance(domain_names, set) else domain_names)
+    known_names = set(name_to_domain)
+    location_domains = location_domains or {}
     diagnostics = []
     for result in results:
         for raw in result["output"].splitlines():
@@ -125,7 +129,18 @@ def _diagnostics(results: list[dict], domain_names: set[str]) -> list[dict]:
             warning_flags = [flag.strip() for flag in (data["flags"] or "").split(",")
                              if flag.strip().startswith("-W") and flag.strip() != "-Werror"]
             message_identifiers = set(re.findall(r"\b[A-Za-z_]\w*\b", data["message"]))
-            mentioned = sorted(message_identifiers & domain_names)
+            mentioned = sorted({name_to_domain[name]
+                                for name in message_identifiers & known_names})
+            if not mentioned:
+                location = re.search(r"unnamed enum at (.*?):(\d+):\d+", data["message"])
+                if location:
+                    enum_path = Path(location.group(1))
+                    try:
+                        enum_file = str(enum_path.resolve().relative_to(ROOT))
+                    except ValueError:
+                        enum_file = str(enum_path)
+                    domain = location_domains.get((enum_file, int(location.group(2))))
+                    mentioned = [domain] if domain else []
             diagnostics.append({
                 "source": result["source"], "file": filename,
                 "line": int(data["line"]), "column": int(data["column"]),
@@ -158,9 +173,11 @@ def run(jobs: int = 0, filters: list[str] | None = None) -> int:
     results.sort(key=lambda item: item["source"])
 
     declarations, _ = census.build_census()
-    names = {item.name for item in declarations}
-    names.update(enumerator.name for item in declarations for enumerator in item.enumerators)
-    diagnostics = _diagnostics(results, names)
+    names = {item.name: item.name for item in declarations}
+    names.update({enumerator.name: item.name
+                  for item in declarations for enumerator in item.enumerators})
+    locations = {(item.owner, item.line): item.name for item in declarations}
+    diagnostics = _diagnostics(results, names, locations)
     report = {
         "schema_version": 1,
         "compiler": compiler,
