@@ -45,13 +45,15 @@ void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, 
     gFCEntry = entry;
     src += entry->srcOffset;
     x0++;
+    pitch = w;
     gFCX0 = x0;
-    int X = (gFCXEnd = w + x0 - 1);
+    w = w + x0;
+    int X = (gFCXEnd = w - 1);
     int Y = y + entry->y;
     gFCY = Y;
     if (clip != 0) {
         int currentY = gFCY;
-        if (x0 < clipX || clipW + clipX < x0 + w ||
+        if (x0 < clipX || clipW + clipX < x0 + pitch ||
             currentY < clipY || clipY + clipH < entry->h + currentY) {
             clip = 1;
             gFCClipR = clipX + clipW - 1;
