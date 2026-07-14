@@ -14,4 +14,8 @@ typedef enum IconRleCommandConstant {
     ICON_RLE_DIM_PALETTE_LEVEL_STRIDE = 0x40
 } IconRleCommandConstant;
 
+typedef enum IconShearConstant {
+    ICON_SHEAR_SKIP_ROW = 0x7f
+} IconShearConstant;
+
 #endif // HOMM2_BASE_ICONRLE_H
