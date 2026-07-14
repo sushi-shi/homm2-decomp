@@ -112,6 +112,43 @@ Apply one audited variant at a time, prove the predecessor is still exact, and k
 only when the listbox residual improves without introducing a new byte or relocation
 mismatch elsewhere.
 
+## What an exhausted search actually means
+
+Never record an unqualified "all `/O2` variants exhausted" conclusion. `BASE/BITMAP`
+demonstrated that a target which appeared exhausted in one worker state could become raw-exact
+after an earlier source shape changed under the combined translation-unit state. Exhaustion is
+therefore a statement about one reproducible state tuple, not about the function forever:
+
+- combined-root commit and compiler flags/toolchain;
+- target source hash and include order;
+- every included shared-header hash that can alter declarations or compiler state;
+- source and object hashes of all preceding functions in the same translation unit;
+- target candidate/retail sizes, relocation counts and targets, and first unmasked divergence.
+
+Keep one target-specific TSV for each materially new state tuple. Give every attempted variant a
+single row containing the exact source-shape axis, fuzzy score, candidate size, relocation counts,
+raw/object hashes when retained, and a disposition such as `retained`, `rejected`, or
+`rejected_byte_identical`. Use `NA` rather than inventing a hash for a transient artifact that was
+not retained. The accompanying source note should summarize only the current checkpoint and link
+to the TSV; historical measurements belong in the matrix or no-repeat ledger.
+
+When revisiting a target, compare the tuple before compiling old ideas. If it agrees, do not replay
+the matrix. If it differs, start again at the first raw divergence and retest only axes plausibly
+affected by that change. A shared-header or predecessor change is a valid trigger; a stale fuzzy
+score or a desire to try more predicate synonyms is not.
+
+For a target with no function predecessor, the same method is limited to real exact-preserving TU
+inputs: existing include order, declaration order justified by owned retail data, and shared-header
+shape. Do not invent dummy declarations, fake globals, or labels to steer the compiler. For a
+target with predecessors, mutate one predecessor axis at a time and retain it only if its complete
+code bytes and relocation identities remain exact. In either case, rebuild through the target on
+the combined root before measuring it.
+
+This bookkeeping is what makes a negative result reusable: it prevents identical searches at an
+unchanged checkpoint while leaving an explicit, evidence-based trigger for a later combined-TU
+retest. It must not be converted into `@early-stop` unless the residual independently satisfies the
+project's byte-proven artifact rules.
+
 ## Rejection criteria
 
 Reject a candidate when any of the following is true:
