@@ -15,6 +15,10 @@ python3 scripts/tu_state_noise.py \
   --source src/BASE/WINMGR.cpp --rva 0xca6d0 --trials 40 --seed 0x484f4d32
 ```
 
+The default is evidence-only. To retain an eligible improvement as the maximum for the
+target's unchanged normalized source hash, add `--record-max`. Generated probe text is never
+retained in reconstructed source, even when it produces 100%.
+
 The RVA may be image-relative (`0xca6d0`) or an image VA (`0x4ca6d0`), but it must identify
 exactly one CodeView function in the configured source TU. The tool recompiles with that TU's
 real profile from `config/units.toml` and scores the exact mangled symbol from
@@ -60,15 +64,21 @@ best-candidate selection when:
 - target relocation-count distance from retail worsens.
 
 `manifest.json` records the commit, source hash, compiler flags, exact snippets, every score,
-target text/relocation metrics, and rejection reasons. `trials.tsv` is the compact search log.
-When an eligible improvement exists, `best.cpp` and `best.patch` are emitted, but the working
-source remains original. A 100% objdiff score is still relocation-masked and is not acceptance
-proof.
+target text/relocation metrics, rejection reasons, and the eligible best trial. `trials.tsv` is
+the compact search log. No generated `.cpp` or patch is emitted. A 100% objdiff score is still
+relocation-masked and requires raw-byte and relocation review, but the probe itself remains only
+evidence.
 
-To retain a candidate, audit `best.patch`, apply it explicitly, then run the full build, raw-byte
-comparison, `homm2 relocs <rva>`, and `git diff --check`. Record the manifest path and state tuple
-in the target's durable matrix. If the noise has no credible recovered-source explanation, keep it
-as experimental evidence rather than committing it merely for percentage.
+`--record-max` is the only optional repository mutation. It runs after byte-for-byte source
+restoration and uses the project's normalized `source_hashes()` API. The mode requires exactly
+one target row in `config/match_baseline.tsv`, requires its stored hash to equal the current hash,
+and never lowers a maximum. Only when the eligible best exceeds the stored maximum does it replace
+that row's max field; every other byte and field in the ledger is preserved. Missing/duplicate
+rows and hash mismatches are refused, and a neutral search leaves the baseline unchanged. The
+manifest records the old maximum, new maximum, and hash.
+
+Never apply or commit generated TU-state noise. Preserve the manifest as the reproducible evidence
+for the retained maximum and record its state tuple in the target's durable matrix.
 
 Related: [msvc42-tu-declaration-state.md](msvc42-tu-declaration-state.md),
 [o2-tu-cumulative-register-steering.md](o2-tu-cumulative-register-steering.md), and
