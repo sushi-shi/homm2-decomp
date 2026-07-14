@@ -73,3 +73,17 @@ The pass compiled 286 new unique whole-file hashes. Every candidate remained at 
 kept all 11 objdiff symbols pinned, so the integrated source was restored unchanged. The matrix
 SHA-256 is `ec3473c9c38668f263892a0a5868cd8280ec34c01d28c9359b95064be7ec8344`. Do not replay these
 hashes while the source and header state agree. The regex permuter was never used.
+
+## BASE/iconf2by manual reconstruction
+
+`iconf2by-manual.tsv` contains 85 full-SHA manual source states spanning the 85.72% through
+89.47721% reconstruction. Each row records the source hash, source-shape label, match, candidate
+size/frame, relocation counts, and disposition. Its SHA-256 is
+`e48e22822ab2aaaaf5a622b694945a2f3f1147afb387c001f6e8db081ac299f9`.
+
+The current source is restored to
+`5bcb21613117b98e1131fee547745a0d299eaf604683ae3775c8bdfabc636c98`. The first normalized
+register divergence is in the prologue: candidate `+0x5c` loads `shear` into EBP, while retail
+loads it into ESI and then loads `clipW` into EBP at `+0x60`. The later missing `gFYClipR` reload is
+downstream of that lifetime choice. CodeView has no local `S_BPREL` records for this TU, so the
+matrix—not guessed local names—is the no-repeat oracle. No permutation tool was used.

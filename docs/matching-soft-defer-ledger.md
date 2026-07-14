@@ -468,6 +468,14 @@ Shear-lifetime axes after `11424f1`:
   right destination (`66ca2813`), `register` setup value (`f51119a9`), and split setup-value
   declaration/assignment (`33b353d4`): byte-identical to 89.47721%.
 
+The authoritative full-SHA no-repeat set for all 85 recovered manual states is
+[`docs/matching-matrices/iconf2by-manual.tsv`](matching-matrices/iconf2by-manual.tsv). Later
+right-block pointer/reference/local spellings were byte-identical or regressed; do not repeat them.
+The earliest normalized divergence is the prologue register choice: candidate loads `shear` into
+EBP at `+0x5c`, while retail loads `shear` into ESI and `clipW` into EBP at `+0x60`. The sole later
+`gFYClipR` relocation deficit is downstream of that lifetime. CodeView contains no local BPREL
+records for this TU, so no local-name/type oracle exists beyond the retail instruction stream.
+
 Retail's four-byte frame slot is never accessed: every ESP-relative retail access is an argument,
 and after `sub esp,4` plus four pushes the smallest displacement is `0x18`. The slot is allocator
 residue, not evidence for a missing local or padding variable. Neither permutation tool was used.
