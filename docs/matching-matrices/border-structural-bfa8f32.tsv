@@ -1,0 +1,7 @@
+descriptor_sha256	scope	variant	focused_scores	raw_result	disposition
+d6a196ae420a6b410b1fd2a428502cad032bc4fdf784ed64b0a6441c969ea939	border::Draw	y before x combined coordinate expressions	73.80	0xab retail; candidate preserves EBP and swaps coordinate register roles	REJECT decompiler-shaped lifetime order
+ff1998892216298e7b57b675dbbc6545083af8634f5b961b6b10312cb12ce4bf	border::Draw	x before y combined coordinate expressions	88.03	0xaa base / 0xab retail; rel 7/7	RETAIN removes spurious EBP save
+6bdeef122b0fb78f62d56a238e0d31bdeb33599556573fb6a99f726dfbc59299	border::Draw	x before y two-step coordinate expressions	88.03	byte-identical focused result to retained x-before-y state	REJECT no gain
+bc8ced138f78ccf9e9f446db4df9f11c0ed5dd8457c00b4c7db86838ed88399d	border::Draw	x before y with explicit owner lifetime	88.03	byte-identical focused result to retained x-before-y state	REJECT no gain
+0f783bd84cb15c4bf3603687d6db4e775a2b37ca9974506c1eef3ef6a95c01a1	border::Draw	y before x two-step with explicit owner lifetime	73.80	restores EBP-preserving regalloc regression	REJECT
+2fc0c3a7669ec593df9e1ecb0c019e02f0b407e261ee881ea85958aff54fa865	border::~border	inline destructor for deleting-alias emission	standalone ??1 lost; deleting alias body exact	retail ??_E 0x4d/7 relocs recovered but mapped 0x38 standalone destructor removed	REJECT preserve exact standalone ??1

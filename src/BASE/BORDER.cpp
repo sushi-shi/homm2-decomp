@@ -20,12 +20,12 @@ border::border(void) : widget(0, 0, 0, 0, 0, 0)
     m_fillColor = 0;
 }
 
-// @early-stop
-// Compiler COMDAT-folding artifact: retail has two strong, byte-identical 0x4d
-// ??_E deleting-destructor sections with 7 relocations each. Keeping the standalone
-// 0x38 ??1 destructor below exact makes VC4.2 emit a 0x1f ??_G wrapper and only a weak
-// ??_E alias. Marking the destructor inline produces the exact folded 0x4d body but
-// removes the separately mapped retail ??1, so the exact standalone symbol is retained.
+// @match-note
+// Generated-alias checkpoint: candidate emits a 0x1f ??_G with 2 relocations that
+// calls the exact standalone destructor; each retail ??_E is 0x4d with 7 relocations
+// and inlines both resource disposals plus widget::~widget. Inlining border::~border
+// recovers that alias body but removes the mapped standalone ??1. This is a real
+// emission tradeoff, not a relocation artifact; preserve the exact standalone body.
 // VA(0x004d20e0, 0x4d) ??_E/??_G border deleting-destructor aliases
 
 VA(0x004d2130, 0x64)
@@ -80,12 +80,10 @@ void border::Read(void)
 }
 
 // @early-stop
-// /O2 signed-comparison orientation wall: both sides are 0x181 bytes with 9
-// relocations at identical offsets and destinations. Relocation-masked raw bytes
-// differ only at +0x7e (base 39, retail 3b) and +0x81 (base 7f, retail 7c), where
-// `m_y <= my` is encoded as the equivalent reversed CMP/JG instead of CMP/JL.
-// Positive/negative and split predicates, staged/direct coordinates, declaration
-// order, shared failure labels, and the indexed/value-or-zero escape hatches agree.
+// Proven delinker artifact in the current combined TU: explicit-range comparison
+// over all 0x181 bytes, including the +0x134 jump table and trailing index bytes,
+// is raw-exact after masking 9/9 relocation payloads. Both external widget::Main
+// calls agree; objdiff differs only on local dispatch/table owner identities.
 VA(0x004d22f0, 0x181)
 int border::Main(struct tag_message &msg)
 {
@@ -141,11 +139,17 @@ leaveEvent:
     return 0;
 }
 
+// @match-note
+// Structurally complete /O2 checkpoint: declaring X before Y removes the spurious
+// EBP save and raises this from 73.80% to 88.03%. The switch, three draw paths,
+// calls and 7 relocations agree. Base is 0xaa bytes versus retail 0xab; remaining
+// bytes are the equivalent owner/member load order for X/Y. Y-first and explicit
+// owner/two-step forms regress or emit no gain; revisit after a new TU state.
 VA(0x004d2480, 0xab)
 void border::Draw(void)
 {
-    short y = m_y + static_cast<short>(m_owner->m_posY);
     short x = m_x + static_cast<short>(m_owner->m_posX);
+    short y = m_y + static_cast<short>(m_owner->m_posY);
     int kind = field_0x14;
     switch (kind) {
     case 0x400:

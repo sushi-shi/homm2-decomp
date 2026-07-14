@@ -1,7 +1,7 @@
 # BASE `@early-stop` proof ledger
 
 This ledger audits every current `@early-stop` marker under `src/BASE` from base checkpoint
-`775f0d3`, plus the accepted WINMGR/shared-member state identified in the audit snapshot.
+`1f10d4a`, plus the accepted BORDER source identified in the audit snapshot.
 It is deliberately stricter than the prose beside the functions: a score or a claim that
 instructions are "the same" is not proof.  The audit joined the current
 `build/objdiff/report.json` (refreshed with `homm2 status`) to
@@ -28,7 +28,9 @@ No BASE marker presently meets the soft-TU-cumulative checklist.
 
 The counts and rows below are pinned to the following fully rebuilt state:
 
-- Base Git checkpoint: `775f0d3`
+- Base Git checkpoint: `1f10d4a71ac02824e39b6178f94eacd2817cb449`
+- Accepted `src/BASE/BORDER.cpp` SHA-256:
+  `f3028b809e1ed1fd78392078c5be6c1df26c39fb18dfd73bd5f64469458d0bca`
 - Accepted `src/BASE/WINMGR.cpp` SHA-256:
   `255975bbfae92f01fe9eb603abdeaa48996f937759f7bfb7678efee46ae25df5`
 - Accepted `include/BASE/heroWindowManager.h` SHA-256:
@@ -38,11 +40,11 @@ The counts and rows below are pinned to the following fully rebuilt state:
 - Accepted `src/SOURCE/SPELLS.cpp` SHA-256:
   `5c611ade00f62636c124da6741638e0286278dc8a388f477f5d219e11c3f0563`
 - `build/objdiff/report.json` SHA-256:
-  `6a346956e9f8535010d2249d21dc16eac958bb97f0c6640177894934d387524b`
+  `f8f916c9b793385956d17ef1c64b4179977942ec53c2fa3dc8dea62f111d7c4f`
 - `config/match_baseline.tsv` SHA-256:
-  `2c4db5795133477413bd2c7c50c6bf4985b0ba8b8de67ecbfddffe54613a7abb`
+  `149ba03ec0a35081f1effba9a35490423d98c4dcfccfd14effcaa5ea99253caa`
 - Sorted `rg -n '@early-stop' src/BASE` inventory SHA-256:
-  `2d27f20638aadd1a9f9d313c18ad8ecf8578bd686adfdddb079058d770064b5e`
+  `fe5cb2b67b9cf70ff765a230cbaddf04dedda61d4dd76f5bfd4960180049f951`
 
 Recompute all listed identities before reusing classifications after a root/header/source change.
 
@@ -50,10 +52,10 @@ Recompute all listed identities before reusing classifications after a root/head
 
 | Category | Marker count | Notes |
 | :--- | ---: | :--- |
-| `proven-artifact` | 9 | Seven ordinary function markers and two generated destructor aliases. |
+| `proven-artifact` | 10 | Eight ordinary function markers and two generated destructor aliases. |
 | `proven-soft-TU-cumulative` | 0 | No marker has the required frame/slot, standalone, combined-root, and exact-predecessor proof bundle. |
-| `unresolved/not-a-wall` | 60 | Includes five unproved deleting-destructor tradeoffs and two stale markers on exact functions. |
-| **Total** | **69** | Exactly 62 ordinary rows plus seven generated-alias rows: one row per current source marker. |
+| `unresolved/not-a-wall` | 58 | Includes four unproved deleting-destructor tradeoffs and two stale markers on exact functions. |
+| **Total** | **68** | Exactly 62 ordinary rows plus six generated-alias rows: one row per current source marker. |
 
 Syntax/state defects found by the audit:
 
@@ -102,7 +104,7 @@ and live scores are shown as `retained/live`.
 | TU | RVA / function | Score | Classification | Current byte/reloc evidence | Tried record | Retry |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | `BITS` | `0x004d1594` `BitTest` | 47.6316/47.6316 | unresolved/not-a-wall | Δ=44; rel 0/0 | [source note](../src/BASE/BITS.cpp#L11) | R1 |
-| `BORDER` | `0x004d22f0` `border::Main` | 99.3621/99.3621 | unresolved/not-a-wall | Δ=2 at `+0x7e,+0x81`; rel 9/9 | [source note](../src/BASE/BORDER.cpp#L82) | R2 |
+| `BORDER` | `0x004d22f0` `border::Main` | 99.7989/99.7989 | proven-artifact | Δ=0 over all 0x181 bytes after 9/9 relocation-union masking; two external widget::Main calls agree, seven dispatch/table sites are local-owner aliases | [source note](../src/BASE/BORDER.cpp#L87) | A1 |
 | `BUTTON` | `0x004dd6d0` `button::Main` | 94.3705/94.3705 | unresolved/not-a-wall | Δ=823; rel 36/36 | [source note](../src/BASE/BUTTON.cpp#L95) | R1 |
 | `BUTTON` | `0x004ddc70` `button::Select` | 89.0652/89.0652 | unresolved/not-a-wall | Δ=105; rel 6/6 | [source note](../src/BASE/BUTTON.cpp#L258) | R1 |
 | `BUTTON` | `0x004ddd10` `button::Deselect` | 99.7778/99.7778 | unresolved/not-a-wall | Δ=2; rel 4/4 | [source note](../src/BASE/BUTTON.cpp#L286) | R2 |
@@ -166,14 +168,13 @@ and live scores are shown as `retained/live`.
 
 ## Generated deleting-destructor aliases and unscored symbols
 
-These seven rows are kept separate because the marker applies to compiler-generated
+These six rows are kept separate because the marker applies to compiler-generated
 `??_E`/`??_G` output, not to the next ordinary source function.  Retail has two same-address or
 duplicate `??_E` rows for each affected CodeView alias, while VC4.2 may emit a strong `??_G` plus
 a weak `??_E`.  A report score of zero or an absent row says nothing about the bytes.
 
 | TU / marker | Generated RVA / symbol | Score state | Classification | Current proof or missing proof | Retry |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| [`BORDER:23`](../src/BASE/BORDER.cpp#L23) | `0x004d20e0` `border ??_E/??_G` | `??_E` retained 0, live unscored; `??_G` absent | unresolved/not-a-wall | Current emitted `??_G` is 0x1f with 2 relocs; each retail `??_E` is 0x4d with 7.  Masked comparison still has Δ=42.  The exact standalone `??1` and a hypothetical inline tradeoff do not satisfy permanent-artifact proof. | R4 |
 | [`BUTTON:86`](../src/BASE/BUTTON.cpp#L86) | `0x004dd480` `button ??_E/??_G` | `??_E` retained 0, live unscored; `??_G` absent | unresolved/not-a-wall | Current `??_G` has 2 relocs versus 5 in each retail copy and Δ=28.  No emitted raw-exact deleting body is present. | R4 |
 | [`ICON:35`](../src/BASE/ICON.cpp#L35) | `0x004c7a90` `icon ??_E/??_G` | `??_E` retained 0, live unscored; `??_G` absent | unresolved/not-a-wall | Current `??_G` has 2 relocs versus 5 in each retail copy and Δ=28. | R4 |
 | [`ICONWDGT:23`](../src/BASE/ICONWDGT.cpp#L23) | `0x004d0a90` `iconWidget ??_E/??_G` | `??_E` retained 0, live unscored; `??_G` absent | unresolved/not-a-wall | Current `??_G` has 2 relocs versus 5 in each retail copy and Δ=28. | R4 |
