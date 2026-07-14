@@ -16,9 +16,9 @@
 //                      VA `va`". Vtables are compiler-emitted (not hand-written), so this is a
 //                      pure source-level claim the vtable gate cross-checks against CodeView +
 //                      the emitted objects. Expands to NOTHING under clang AND MSVC.
-//   SIZE(type,bytes) - file-scope sizeof assert; a REAL compile-time check under
-//                      BOTH clang and MSVC 4.2 (whose sizeof is matching ground
-//                      truth). Emits no code -> matching-neutral.
+//   SIZE(type,bytes) - file-scope sizeof assert for Clang/editor tooling. It is
+//                      deliberately empty under MSVC 4.2: even a typedef-only
+//                      assertion can perturb that compiler's cumulative state.
 //   OVERRIDE         - compile-time-only check that a method overrides a base
 //                      virtual (clang enforces; MSVC 4.2 has no `override`).
 //
@@ -26,8 +26,8 @@
 // 4.2 under wine (the base objs). MSVC 4.2 predates __attribute__, [[...]], and
 // C99 variadic macros, so each macro is FIXED-arity and compiles to nothing
 // under any non-clang compiler. Under MSVC the attributes vanish -> never
-// perturbing matched bytes. (SIZE is the one deliberate exception: a real sizeof
-// assert active under MSVC too, still emitting no code.)
+// perturbing matched bytes. SIZE also expands to nothing under MSVC so it cannot
+// affect cumulative matching state.
 #ifndef HOMM2_VA_H
 #define HOMM2_VA_H
 
@@ -52,12 +52,7 @@
 #define VTBL(cls, va)
 #define OVERRIDE
 
-// MSVC 4.2 has no static_assert: classic negative-size typedef, name uniquified
-// by __LINE__ so aggregating many SIZE()s into one TU cannot clash.
-#define HOMM2_SIZE_CAT_(a, b) a##b
-#define HOMM2_SIZE_CAT(a, b) HOMM2_SIZE_CAT_(a, b)
-#define SIZE(type, bytes)                                                                          \
-    typedef char HOMM2_SIZE_CAT(homm2_size_check_, __LINE__)[(sizeof(type) == (bytes)) ? 1 : -1]
+#define SIZE(type, bytes)
 
 #endif
 
