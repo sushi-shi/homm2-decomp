@@ -11,6 +11,7 @@
 #include <_carcass_types.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
+#include <BASE/inputManager.h>
 #include <BASE/Misc.h>
 #include <SOURCE/ADVMGR.h>
 #include <SOURCE/advManager.h>
@@ -22,7 +23,9 @@
 #include <SOURCE/HERO.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/PHILAI.h>
+#include <SOURCE/playerData.h>
 #include <SOURCE/SPELLS.h>
+#include <SOURCE/townManager.h>
 #include <SOURCE/X_GLOBAL.h>
 
 VA(0x0046c3a0, 0x6f)
@@ -35,7 +38,7 @@ hero::hero(void) {
     m_portrait = 0;
     m_name[0] = 0;
     heroWin = 0;
-    giHeroScreenSrcIndex = -1;
+    giHeroScreenSrcIndex = HERO_UI_ARMY_SELECTION_NONE;
 }
 
 VA(0x0046c40f, 0x53)
@@ -763,11 +766,501 @@ int hero::NumArtifacts(void) {
     return cnt;
 }
 
+// @match-note 98.86%: semantics, the 0x10 frame, army/secondary-skill slots at
+// -0x04/-0x08, message at -0x0c, switch CFG, and all 150 relocation positions
+// agree. The relocation helper's two only-base reports are signed array-addend
+// identities: gStatNames-0x144 and gSecondarySkillLevels-4 resolve to retail's
+// delinked interior labels. The first non-relocation residual is in the third
+// secondary-skill range near +0x59e: retail uses one jge plus tail trampolines,
+// while the value-equivalent invalid-range spelling uses jl and continuation
+// jumps. Direct range bounds and both positive/negative third-range forms were
+// tried. Revisit when total SOURCE fuzzy reaches 95%.
 VA(0x0046e0be, 0x758)
-void UpdateHeroScreenStatusBar(struct tag_message &) {}
+void UpdateHeroScreenStatusBar(struct tag_message &message) {
+    int armySlot;
+    int secondarySkillSlot;
 
+    switch (message.payload.widget.id) {
+    case HERO_UI_PRIMARY_STAT_FIRST:
+    case HERO_UI_PRIMARY_STAT_FIRST + 1:
+    case HERO_UI_PRIMARY_STAT_FIRST + 2:
+    case HERO_UI_PRIMARY_STAT_LAST:
+        sprintf(gText, cHeroScreen[HERO_TEXT_PRIMARY_STAT],
+            gStatNames[message.payload.widget.id - HERO_UI_PRIMARY_STAT_FIRST]);
+        break;
+
+    case HERO_UI_ADDITIONAL_STATS:
+        sprintf(gText, cHeroScreen[HERO_TEXT_ADDITIONAL_STATS]);
+        break;
+
+    case HERO_UI_MORALE_FIRST:
+    case HERO_UI_MORALE_FIRST + 1:
+    case HERO_UI_MORALE_LAST:
+        if (gpHVHero->m_army.GetMorale(gpHVHero, gpHVHero->GetOccupiedTown(), 0) > 0)
+            sprintf(gText, cHeroScreen[HERO_TEXT_GOOD_MORALE]);
+        else if (gpHVHero->m_army.GetMorale(
+                     gpHVHero, gpHVHero->GetOccupiedTown(), 0) == 0)
+            sprintf(gText, cHeroScreen[HERO_TEXT_NEUTRAL_MORALE]);
+        else
+            sprintf(gText, cHeroScreen[HERO_TEXT_BAD_MORALE]);
+        break;
+
+    case HERO_UI_LUCK_FIRST:
+    case HERO_UI_LUCK_FIRST + 1:
+    case HERO_UI_LUCK_LAST:
+        if (gpGame->GetLuck(gpHVHero, 0, gpHVHero->GetOccupiedTown()) > 0)
+            sprintf(gText, cHeroScreen[HERO_TEXT_GOOD_LUCK]);
+        else if (gpGame->GetLuck(gpHVHero, 0, gpHVHero->GetOccupiedTown()) == 0)
+            sprintf(gText, cHeroScreen[HERO_TEXT_NEUTRAL_LUCK]);
+        else
+            sprintf(gText, cHeroScreen[HERO_TEXT_BAD_LUCK]);
+        break;
+
+    case HERO_UI_EXPERIENCE_FIRST:
+    case HERO_UI_EXPERIENCE_LAST:
+        sprintf(gText, cHeroScreen[HERO_TEXT_EXPERIENCE]);
+        break;
+
+    case HERO_UI_SPELL_POINTS_FIRST:
+    case HERO_UI_SPELL_POINTS_LAST:
+        sprintf(gText, cHeroScreen[HERO_TEXT_SPELL_POINTS]);
+        break;
+
+    case HERO_UI_FORMATION_SPREAD:
+        sprintf(gText, cHeroScreen[HERO_TEXT_SPREAD_FORMATION]);
+        break;
+
+    case HERO_UI_FORMATION_GROUPED:
+        sprintf(gText, cHeroScreen[HERO_TEXT_GROUPED_FORMATION]);
+        break;
+
+    case HERO_UI_ARMY_SELECTOR_FIRST:
+    case HERO_UI_ARMY_SELECTOR_FIRST + 1:
+    case HERO_UI_ARMY_SELECTOR_FIRST + 2:
+    case HERO_UI_ARMY_SELECTOR_FIRST + 3:
+    case HERO_UI_ARMY_SELECTOR_LAST:
+        armySlot = message.payload.widget.id - HERO_UI_ARMY_SELECTOR_FIRST;
+        if (giHeroScreenSrcIndex == HERO_UI_ARMY_SELECTION_NONE) {
+            if (gpHVHero->m_army.m_creatureTypes[armySlot] != ARMY_GROUP_EMPTY_SLOT)
+                sprintf(gText, cHeroScreen[HERO_TEXT_SELECT_ARMY],
+                    gArmyNames[gpHVHero->m_army.m_creatureTypes[armySlot]]);
+            else
+                strcpy(gText, cHeroScreen[HERO_TEXT_EMPTY]);
+        } else if (giHeroScreenSrcIndex == armySlot) {
+            sprintf(gText, cHeroScreen[HERO_TEXT_SELECT_ARMY],
+                gArmyNames[gpHVHero->m_army.m_creatureTypes[armySlot]]);
+        } else if (gpTownManager->m_castleDialogActive != 0) {
+            if (gpHVHero->m_army.m_creatureTypes[armySlot] != ARMY_GROUP_EMPTY_SLOT)
+                sprintf(gText, cHeroScreen[HERO_TEXT_SELECT_ARMY],
+                    gArmyNames[gpHVHero->m_army.m_creatureTypes[armySlot]]);
+            else
+                strcpy(gText, cHeroScreen[HERO_TEXT_EMPTY]);
+        } else if (gpHVHero->m_army.m_creatureTypes[armySlot] == ARMY_GROUP_EMPTY_SLOT) {
+            if (message.payload.widget.parameter & HERO_UI_SPLIT_MODIFIER_MASK)
+                sprintf(gText, cHeroScreen[HERO_TEXT_SPLIT_ARMY],
+                    gArmyNamesPlural[
+                        gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex]]);
+            else
+                sprintf(gText, cHeroScreen[HERO_TEXT_MOVE_ARMY],
+                    gArmyNames[gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex]]);
+        } else if (gpHVHero->m_army.m_creatureTypes[armySlot] ==
+                   gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex]) {
+            sprintf(gText, cHeroScreen[HERO_TEXT_COMBINE_ARMIES],
+                gArmyNamesPlural[gpHVHero->m_army.m_creatureTypes[armySlot]]);
+        } else {
+            sprintf(gText, cHeroScreen[HERO_TEXT_EXCHANGE_ARMIES],
+                gArmyNames[gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex]],
+                gArmyNames[gpHVHero->m_army.m_creatureTypes[armySlot]]);
+        }
+        break;
+
+    case HERO_UI_ARTIFACT_FIRST:
+    case HERO_UI_ARTIFACT_FIRST + 1:
+    case HERO_UI_ARTIFACT_FIRST + 2:
+    case HERO_UI_ARTIFACT_FIRST + 3:
+    case HERO_UI_ARTIFACT_FIRST + 4:
+    case HERO_UI_ARTIFACT_FIRST + 5:
+    case HERO_UI_ARTIFACT_FIRST + 6:
+    case HERO_UI_ARTIFACT_FIRST + 7:
+    case HERO_UI_ARTIFACT_FIRST + 8:
+    case HERO_UI_ARTIFACT_FIRST + 9:
+    case HERO_UI_ARTIFACT_FIRST + 10:
+    case HERO_UI_ARTIFACT_FIRST + 11:
+    case HERO_UI_ARTIFACT_FIRST + 12:
+    case HERO_UI_ARTIFACT_LAST:
+        if (gpHVHero->m_artifacts[message.payload.widget.id - HERO_UI_ARTIFACT_FIRST] ==
+            HERO_ARTIFACT_NONE)
+            sprintf(gText, cHeroScreen[HERO_TEXT_EMPTY]);
+        else if (gpHVHero->m_artifacts[message.payload.widget.id - HERO_UI_ARTIFACT_FIRST] ==
+                 HERO_ARTIFACT_MAGIC_BOOK)
+            strcpy(gText, cHeroScreen[HERO_TEXT_VIEW_SPELLS]);
+        else
+            sprintf(gText, cHeroScreen[HERO_TEXT_ARTIFACT],
+                gArtifactNames[
+                    gpHVHero->m_artifacts[message.payload.widget.id - HERO_UI_ARTIFACT_FIRST]]);
+        break;
+
+    case HERO_UI_DISMISS:
+        sprintf(gText, cHeroScreen[HERO_TEXT_DISMISS], gpHVHero->m_name,
+            gAlignmentNames[gpHVHero->m_cursorType]);
+        break;
+
+    case HERO_UI_CLOSE:
+        strcpy(gText, cHeroScreen[HERO_TEXT_EXIT]);
+        break;
+
+    default:
+        if (message.payload.widget.id >= HERO_UI_SECONDARY_SKILL_ROW1_FIRST &&
+            message.payload.widget.id < HERO_UI_SECONDARY_SKILL_ROW2_FIRST) {
+            secondarySkillSlot = message.payload.widget.id - HERO_UI_SECONDARY_SKILL_ROW1_FIRST;
+            goto secondary_skill_text;
+        }
+        if (message.payload.widget.id >= HERO_UI_SECONDARY_SKILL_ROW2_FIRST &&
+            message.payload.widget.id < HERO_UI_SECONDARY_SKILL_ROW3_FIRST) {
+            secondarySkillSlot = message.payload.widget.id - HERO_UI_SECONDARY_SKILL_ROW2_FIRST;
+            goto secondary_skill_text;
+        }
+        if (message.payload.widget.id < HERO_UI_SECONDARY_SKILL_ROW3_FIRST ||
+            message.payload.widget.id >= HERO_UI_SECONDARY_SKILL_ROW3_LAST + 1)
+            goto default_hero_text;
+        secondarySkillSlot = message.payload.widget.id - HERO_UI_SECONDARY_SKILL_ROW3_FIRST;
+
+secondary_skill_text:
+        if (secondarySkillSlot < gpHVHero->m_secondarySkillCount) {
+            sprintf(gText, cHeroScreen[HERO_TEXT_SECONDARY_SKILL],
+                gSecondarySkillLevels[
+                    gpHVHero->m_secondarySkills[gpHVHero->GetNthSS(secondarySkillSlot)] - 1],
+                gSecondarySkills[gpHVHero->GetNthSS(secondarySkillSlot)]);
+            break;
+        }
+default_hero_text:
+        strcpy(gText, cHeroScreen[HERO_TEXT_SCREEN]);
+        break;
+    }
+    HeroMessageUpdate(gText);
+}
+
+// @match-note 83.55%: complete message, hero-cycle, stat, army, artifact, skill,
+// formation, and exit behavior; all 23 callee identities/counts agree. The full
+// external relocation multiset agrees except for two additional retail gpHVHero
+// loads. Retail reserves a 0x60 frame with an unused eight-dword span at
+// -0x28..-0x44 and places the used locals at -0x08..-0x24/-0x48, while this
+// reconstruction's real locals and case scopes produce 0x3c. The first structural
+// residuals are the hover comparison load order and positive-arm trampolines in
+// hero cycling; the main control jump table and case-body order are recovered.
+// Both hover-equality operand orders and positive/negative hero-cycle arms were
+// tried. Revisit when total SOURCE fuzzy reaches 95%.
 VA(0x0046e816, 0xaef)
-int HeroHandler(struct tag_message &) { return 0; }
+int HeroHandler(struct tag_message &message) {
+    int exitHero = 0;
+    int quickView;
+
+    if (message.payload.widget.parameter & HERO_UI_QUICK_VIEW_MODIFIER)
+        quickView = 1;
+    else
+        quickView = 0;
+
+    if (message.type == HERO_UI_HOVER) {
+        gpWindowManager->ConvertToHover(message);
+        if (message.payload.hover.id == gpWindowManager->m_hoverWidgetId)
+            return HERO_UI_HANDLER_CONTINUE;
+        gpWindowManager->m_hoverWidgetId = message.payload.hover.id;
+        UpdateHeroScreenStatusBar(message);
+        return HERO_UI_HANDLER_CONTINUE;
+    }
+
+    if (message.type == HERO_UI_KEY_UP) {
+        switch (message.payload.keyboard.keyCode) {
+        case HERO_UI_SHIFT_LEFT:
+        case HERO_UI_SHIFT_RIGHT:
+            gpWindowManager->m_hoverWidgetId = HERO_WINDOW_NO_HOVER_WIDGET;
+            gpInputManager->ForceMouseMove();
+            break;
+        }
+    }
+
+    if (message.type == HERO_UI_KEY_DOWN) {
+        switch (message.payload.keyboard.keyCode) {
+        case HERO_UI_SHIFT_LEFT:
+        case HERO_UI_SHIFT_RIGHT:
+            gpWindowManager->m_hoverWidgetId = HERO_WINDOW_NO_HOVER_WIDGET;
+            gpInputManager->ForceMouseMove();
+            break;
+        }
+    }
+
+    if (message.type == HERO_UI_MESSAGE) {
+        switch (message.payload.widget.command) {
+        case HERO_UI_INPUT_DESELECT:
+            if (quickView == 0) {
+                switch (message.payload.widget.id) {
+                case HERO_UI_DISMISS:
+                    if (gpHVHero->Dismiss())
+                        exitHero = 1;
+                    break;
+                case HERO_UI_CLOSE:
+                    exitHero = 1;
+                    break;
+                case HERO_UI_PREVIOUS_HERO:
+                case HERO_UI_NEXT_HERO: {
+                    int heroPosition;
+
+                    if (gpHVHero->m_owner == giCurPlayer) {
+                        if (gpCurPlayer->m_heroCount >= HERO_UI_HERO_CYCLE_MIN_COUNT) {
+                            heroPosition =
+                                gpGame->HeroIDToHeroPos(gpCurPlayer, gpHVHero->m_id);
+                            heroPosition =
+                                (((static_cast<unsigned int>(message.payload.widget.id -
+                                        HERO_UI_PREVIOUS_HERO) >= 1) - 1 &
+                                    HERO_UI_PREVIOUS_HERO_MASK) +
+                                    1 + gpCurPlayer->m_heroCount + heroPosition) %
+                                gpCurPlayer->m_heroCount;
+                            gpHVHero = &gpGame->m_heroRecs[
+                                gpCurPlayer->m_heroIds[heroPosition]];
+                            SetupHeroView();
+                            RedrawHeroScreen();
+                        }
+                    }
+                    break;
+                }
+                }
+            }
+            break;
+
+        case HERO_UI_INPUT_SELECT:
+        case HERO_UI_INPUT_ALTERNATE_SELECT:
+            switch (message.payload.widget.id) {
+            case HERO_UI_PRIMARY_STAT_FIRST:
+            case HERO_UI_PRIMARY_STAT_FIRST + 1:
+            case HERO_UI_PRIMARY_STAT_FIRST + 2:
+            case HERO_UI_PRIMARY_STAT_LAST:
+                gpHVHero->ViewStat(message.payload.widget.id - HERO_UI_PRIMARY_STAT_FIRST, quickView);
+                break;
+
+            case HERO_UI_MORALE_FIRST:
+            case HERO_UI_MORALE_FIRST + 1:
+            case HERO_UI_MORALE_LAST:
+                gpGame->ShowMoraleInfo(gpHVHero,
+                    quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW);
+                break;
+
+            case HERO_UI_LUCK_FIRST:
+            case HERO_UI_LUCK_FIRST + 1:
+            case HERO_UI_LUCK_LAST:
+                gpGame->ShowLuckInfo(gpHVHero,
+                    quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW);
+                break;
+
+            case HERO_UI_FORMATION_SPREAD:
+                if (quickView) {
+                    NormalDialog(
+                        "{Spread Formation}\n\n'Spread' combat formation spreads your armies from the top to the bottom of the battlefield, with at least one empty space between each army.",
+                        NORMAL_DIALOG_QUICK_VIEW, NORMAL_DIALOG_NO_RESOURCE,
+                        NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_NO_RESOURCE,
+                        0, NORMAL_DIALOG_NO_RESOURCE, 0,
+                        NORMAL_DIALOG_NO_RESOURCE, 0);
+                } else {
+                    gpHVHero->m_eventFlags &= ~HERO_EVENT_GROUPED_FORMATION;
+                    SetupHeroView();
+                    RedrawHeroScreen();
+                }
+                break;
+
+            case HERO_UI_FORMATION_GROUPED:
+                if (quickView) {
+                    NormalDialog(
+                        "{Grouped Formation}\n\n'Grouped' combat formation bunches your army together in the center of your side of the battlefield.",
+                        NORMAL_DIALOG_QUICK_VIEW, NORMAL_DIALOG_NO_RESOURCE,
+                        NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_NO_RESOURCE,
+                        0, NORMAL_DIALOG_NO_RESOURCE, 0,
+                        NORMAL_DIALOG_NO_RESOURCE, 0);
+                } else {
+                    gpHVHero->m_eventFlags |= HERO_EVENT_GROUPED_FORMATION;
+                    SetupHeroView();
+                    RedrawHeroScreen();
+                }
+                break;
+
+            case HERO_UI_SPELL_POINTS_FIRST:
+            case HERO_UI_SPELL_POINTS_LAST:
+                sprintf(gText,
+                    "{Spell Points}\n%s currently has %d spell points out of a maximum of %d.  The maximum number of spell points is 10 times your knowledge.  It is occasionally possible to have more than your maximum spell points via special events.",
+                    gpHVHero->m_name, gpHVHero->m_spellPoints,
+                    gpHVHero->Stats(HERO_PRIMARY_KNOWLEDGE) *
+                        HERO_SPELL_POINTS_PER_KNOWLEDGE);
+                NormalDialog(gText,
+                    quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
+                    NORMAL_DIALOG_NO_RESOURCE, NORMAL_DIALOG_NO_VALUE,
+                    NORMAL_DIALOG_NO_RESOURCE, 0,
+                    NORMAL_DIALOG_NO_RESOURCE, 0,
+                    NORMAL_DIALOG_NO_RESOURCE, 0);
+                break;
+
+            case HERO_UI_EXPERIENCE_FIRST:
+            case HERO_UI_EXPERIENCE_LAST: {
+                int nextExperience;
+                int level;
+
+                level = gpHVHero->GetLevel(gpHVHero->m_experience);
+                nextExperience = gpHVHero->GetExperience(level + 1);
+                sprintf(gText, "{Level %d}\nCurrent experience %d\nNext level %d",
+                    level, gpHVHero->m_experience, nextExperience);
+                NormalDialog(gText,
+                    quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
+                    NORMAL_DIALOG_NO_RESOURCE, NORMAL_DIALOG_NO_VALUE,
+                    NORMAL_DIALOG_NO_RESOURCE, 0,
+                    NORMAL_DIALOG_NO_RESOURCE, 0,
+                    NORMAL_DIALOG_NO_RESOURCE, 0);
+                break;
+            }
+
+            case HERO_UI_ARMY_SELECTOR_FIRST:
+            case HERO_UI_ARMY_SELECTOR_FIRST + 1:
+            case HERO_UI_ARMY_SELECTOR_FIRST + 2:
+            case HERO_UI_ARMY_SELECTOR_FIRST + 3:
+            case HERO_UI_ARMY_SELECTOR_LAST: {
+                int temp;
+                int armySlot;
+
+                armySlot = message.payload.widget.id - HERO_UI_ARMY_SELECTOR_FIRST;
+                if (quickView == 0 && giHeroScreenSrcIndex == HERO_UI_ARMY_SELECTION_NONE) {
+                    if (gpHVHero->m_army.m_creatureTypes[armySlot] != ARMY_GROUP_EMPTY_SLOT) {
+                        giHeroScreenSrcIndex = armySlot;
+                        gpHVHero->HeroScreenUpdate();
+                    }
+                } else if ((quickView == 0 ||
+                            gpHVHero->m_army.m_creatureTypes[armySlot] ==
+                                ARMY_GROUP_EMPTY_SLOT) &&
+                           (quickView != 0 || armySlot != giHeroScreenSrcIndex)) {
+                    if (quickView == 0 && gpTownManager->m_castleDialogActive != 0) {
+                        if (gpHVHero->m_army.m_creatureTypes[armySlot] !=
+                            ARMY_GROUP_EMPTY_SLOT) {
+                            giHeroScreenSrcIndex = armySlot;
+                            gpHVHero->HeroScreenUpdate();
+                        }
+                    } else if (quickView == 0) {
+                        temp = gpHVHero->m_army.m_creatureTypes[armySlot];
+                        if ((message.payload.widget.parameter & HERO_UI_SPLIT_MODIFIER_MASK) == 0 ||
+                            (gpHVHero->m_army.m_creatureTypes[armySlot] !=
+                                 ARMY_GROUP_EMPTY_SLOT &&
+                             gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex] !=
+                                 gpHVHero->m_army.m_creatureTypes[armySlot])) {
+                            if (gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex] ==
+                                gpHVHero->m_army.m_creatureTypes[armySlot]) {
+                                gpHVHero->m_army.m_creatureCounts[armySlot] +=
+                                    gpHVHero->m_army.m_creatureCounts[giHeroScreenSrcIndex];
+                                gpHVHero->m_army.m_creatureCounts[giHeroScreenSrcIndex] = 0;
+                                gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex] =
+                                    ARMY_GROUP_EMPTY_SLOT;
+                            } else {
+                                gpHVHero->m_army.m_creatureTypes[armySlot] =
+                                    gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex];
+                                gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex] =
+                                    static_cast<signed char>(temp);
+                                temp = gpHVHero->m_army.m_creatureCounts[armySlot];
+                                gpHVHero->m_army.m_creatureCounts[armySlot] =
+                                    gpHVHero->m_army.m_creatureCounts[giHeroScreenSrcIndex];
+                                gpHVHero->m_army.m_creatureCounts[giHeroScreenSrcIndex] =
+                                    static_cast<short>(temp);
+                            }
+                        } else {
+                            DoHeroSplit(armySlot, giHeroScreenSrcIndex);
+                        }
+                        giHeroScreenSrcIndex = HERO_UI_ARMY_SELECTION_NONE;
+                        gpHVHero->HeroScreenUpdate();
+                    }
+                } else {
+                    int canDismiss;
+
+                    if (quickView == 0 && gpTownManager->m_castleDialogActive !=
+                            HERO_UI_CASTLE_DIALOG_ACTIVE &&
+                        gpHVHero->m_army.GetNumArmies() != 1)
+                        canDismiss = 0;
+                    else
+                        canDismiss = 1;
+                    gpGame->ViewArmy(HERO_UI_VIEW_ARMY_X, HERO_UI_VIEW_ARMY_Y,
+                        gpHVHero->m_army.m_creatureTypes[armySlot],
+                        gpHVHero->m_army.m_creatureCounts[armySlot], 0, canDismiss, 1,
+                        quickView, gpHVHero, 0, &gpHVHero->m_army, armySlot);
+                    if (quickView == 0)
+                        giHeroScreenSrcIndex = HERO_UI_ARMY_SELECTION_NONE;
+                    SetupHeroView();
+                    RedrawHeroScreen();
+                }
+                if (quickView == 0) {
+                    gpWindowManager->m_hoverWidgetId = HERO_WINDOW_NO_HOVER_WIDGET;
+                    UpdateHeroScreenStatusBar(message);
+                }
+                break;
+            }
+
+            case HERO_UI_ARTIFACT_FIRST:
+            case HERO_UI_ARTIFACT_FIRST + 1:
+            case HERO_UI_ARTIFACT_FIRST + 2:
+            case HERO_UI_ARTIFACT_FIRST + 3:
+            case HERO_UI_ARTIFACT_FIRST + 4:
+            case HERO_UI_ARTIFACT_FIRST + 5:
+            case HERO_UI_ARTIFACT_FIRST + 6:
+            case HERO_UI_ARTIFACT_FIRST + 7:
+            case HERO_UI_ARTIFACT_FIRST + 8:
+            case HERO_UI_ARTIFACT_FIRST + 9:
+            case HERO_UI_ARTIFACT_FIRST + 10:
+            case HERO_UI_ARTIFACT_FIRST + 11:
+            case HERO_UI_ARTIFACT_FIRST + 12:
+            case HERO_UI_ARTIFACT_LAST:
+                if (gpHVHero->m_artifacts[message.payload.widget.id - HERO_UI_ARTIFACT_FIRST] !=
+                    HERO_ARTIFACT_NONE) {
+                    if (quickView == 0 &&
+                        gpHVHero->m_artifacts[message.payload.widget.id - HERO_UI_ARTIFACT_FIRST] ==
+                            HERO_ARTIFACT_MAGIC_BOOK) {
+                        gpGame->ViewSpells(gpHVHero, HERO_UI_VIEW_SPELLS_ALL,
+                            ViewSpecialHandler, HERO_UI_VIEW_SPELLS_SPECIAL);
+                    } else {
+                        gpHVHero->ViewArtifact(
+                            gpHVHero->m_artifacts[message.payload.widget.id - HERO_UI_ARTIFACT_FIRST],
+                            quickView,
+                            gpHVHero->m_artifactExtra[
+                                message.payload.widget.id - HERO_UI_ARTIFACT_FIRST]);
+                    }
+                }
+                break;
+
+            default: {
+                int secondarySkillSlot;
+
+                if (message.payload.widget.id >= HERO_UI_SECONDARY_SKILL_ROW1_FIRST &&
+                    message.payload.widget.id <= HERO_UI_SECONDARY_SKILL_ROW1_LAST)
+                    secondarySkillSlot =
+                        message.payload.widget.id - HERO_UI_SECONDARY_SKILL_ROW1_FIRST;
+                else if (message.payload.widget.id >= HERO_UI_SECONDARY_SKILL_ROW2_FIRST &&
+                         message.payload.widget.id <= HERO_UI_SECONDARY_SKILL_ROW2_LAST)
+                    secondarySkillSlot =
+                        message.payload.widget.id - HERO_UI_SECONDARY_SKILL_ROW2_FIRST;
+                else if (message.payload.widget.id >= HERO_UI_SECONDARY_SKILL_ROW3_FIRST &&
+                         message.payload.widget.id <= HERO_UI_SECONDARY_SKILL_ROW3_LAST)
+                    secondarySkillSlot =
+                        message.payload.widget.id - HERO_UI_SECONDARY_SKILL_ROW3_FIRST;
+                else
+                    break;
+
+                if (secondarySkillSlot < gpHVHero->m_secondarySkillCount)
+                    gpHVHero->DoSSLevelDialog(
+                        gpHVHero->GetNthSS(secondarySkillSlot), quickView);
+                break;
+            }
+            }
+            break;
+        }
+    }
+
+    if (exitHero) {
+        gpWindowManager->m_dialogResult = message.payload.widget.id;
+        message.payload.widget.id = HERO_UI_DIALOG_CLOSE_COMMAND;
+        message.payload.widget.command = message.payload.widget.id;
+        return HERO_UI_HANDLER_CLOSE;
+    }
+    return HERO_UI_HANDLER_CONTINUE;
+}
 
 VA(0x0046f305, 0x4f)
 void RedrawHeroScreen(void) {}
