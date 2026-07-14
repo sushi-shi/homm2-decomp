@@ -50,9 +50,9 @@ DATA(0x00534ce8) static unsigned int gCTRun;
 // surface, a minimal direct IconEntry surface, and the proven pre-loop cursor were combined with
 // the new header state but did not exceed this checkpoint or preserve 91 occurrences. Resume only
 // with a new model that makes the command fetch use source=ECX/command=EAX, which in turn can color
-// count=EDX/cursor=EBX, while also fixing the EBX/EDI setup split. Function-scope/shared count,
-// source-cursor, fetch-order, snapshot, and all six command/count/cursor declaration-order shapes
-// have now been exhausted; do not replay those or the earlier setup/count matrices.
+// count=EDX/cursor=EBX, while also fixing the EBX/EDI setup split. Function-scope shared count,
+// source-cursor, fetch-order, snapshot, and all six combined command/count/cursor declaration-order
+// shapes have now been exhausted; do not replay those or the earlier setup/count matrices.
 // A contiguous state-record ownership pass did recover source=ECX/command=EAX/count=EDX, but only
 // by reversing X/cursor to EBX/ESI and regressing below this checkpoint; see
 // icon2bc-state-ownership-06409a9.tsv. Do not replay whole/tail/cursor/nested record surfaces.
@@ -69,7 +69,13 @@ DATA(0x00534ce8) static unsigned int gCTRun;
 // surfaces and existing blitter declaration headers. Direct IconEntry plus broad X_GLOBAL without
 // Misc is byte-identical to this checkpoint; _globals_model, Misc, one/two sibling declarations,
 // and declarations placed after the scratch block all regress. See icon2bc-header-context-a0a8646.
-// No source body or predicate was changed; this is still unresolved and not a wall.
+// A 9c5c24d retail-backedge pass isolated the command lifetime from the previously combined
+// command/count/cursor states. Declaring cmd once immediately before the loop improves 73.1690 to
+// 73.19249 without changing the 0x566 size or 88/91 relocation signature; it changes only three
+// operand bytes in the clipped-literal path. Explicit read/tail labels are byte-identical, while
+// a one-time destination load, direct header gotos, and structured solid/dim fallthrough regress.
+// See icon2bc-command-loop-9c5c24d.tsv. The setup and decoder allocation remain unresolved.
+// No predicate or semantic state model changed; this is still unresolved and not a wall.
 VA(0x004d32a0, 0x5af)
 void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                             int clip, int clipX, int clipY, int clipW, int clipH, int color,
@@ -96,10 +102,11 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
     }
     unsigned char *row =
         reinterpret_cast<unsigned char *>(gCTPitch * gCTY + reinterpret_cast<int>(dest->m_pixels));
+    int cmd;
     for (;;) {
         savedDst = gCTDst;
         gCTSrc++;
-        int cmd = gCTSrc[-1];
+        cmd = gCTSrc[-1];
         if (static_cast<signed char>(cmd) < 0) {
             if ((cmd & 0x40) == 0) {
                 // skip run / end-of-sprite
