@@ -105,7 +105,7 @@ struct tag_tilePoint { signed char x; signed char _1; signed char y; signed char
 struct tag_monsterInfo {
     union {
         struct {
-            short cost;
+            unsigned short cost;
             int fightValue;
         };
         int randomValue;

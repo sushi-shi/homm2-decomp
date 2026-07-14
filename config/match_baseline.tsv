@@ -608,9 +608,9 @@ SOURCE/ARMYGRP	?IsHomogeneous@armyGroup@@QAEHH@Z	16.2558	22f9c1519ce3
 SOURCE/ARMYGRP	?IsMember@armyGroup@@QAEHH@Z	51.7778	5023544b6410
 SOURCE/ARMYGRP	?Swap@armyGroup@@QAEXHPAV1@H@Z	31.6585	7c7b2a086054
 SOURCE/ARMYGRP	?View@armyGroup@@QAEXH@Z	100.0000	10ef94b0363f
-SOURCE/CMBTMGR	??0combatManager@@QAE@XZ	100.0000	b8aae05e5955
+SOURCE/CMBTMGR	??0combatManager@@QAE@XZ	100.0000	d5f030343ad9
 SOURCE/CMBTMGR	??_H@YGXPAXIHP6EX0@Z@Z	100.0000	
-SOURCE/CMBTMGR	?CatAttack@combatManager@@QAEXH@Z	1.4743	9b7a4f9c1171
+SOURCE/CMBTMGR	?CatAttack@combatManager@@QAEXH@Z	99.9954	9231f6478f69
 SOURCE/CMBTMGR	?CheckApplyBadMorale@combatManager@@QAEHHH@Z	100.0000	6c3d4c250f53
 SOURCE/CMBTMGR	?CheckApplyGoodMorale@combatManager@@QAEXHH@Z	100.0000	0d3e83dc7a84
 SOURCE/CMBTMGR	?Close@combatManager@@UAEXXZ	100.0000	a82c682b9527
@@ -618,17 +618,17 @@ SOURCE/CMBTMGR	?CombatSystemOptions@combatManager@@QAEXXZ	20.2812	cf9de8768ee7
 SOURCE/CMBTMGR	?CombatSystemOptionsHandler@@YIHAAUtag_message@@@Z	1.7068	0cbd21d1f226
 SOURCE/CMBTMGR	?CombineGroups@combatManager@@QAEXPAVarmyGroup@@0@Z	100.0000	06a32266b979
 SOURCE/CMBTMGR	?DrawCombatBorder@combatManager@@QAEXXZ	100.0000	8e845432585c
-SOURCE/CMBTMGR	?ExperienceValueOfStack@combatManager@@QAEHH@Z	11.5667	f5ab9f920749
+SOURCE/CMBTMGR	?ExperienceValueOfStack@combatManager@@QAEHH@Z	100.0000	f53df3a552e3
 SOURCE/CMBTMGR	?FreeArmies@combatManager@@QAEXXZ	100.0000	23c22774851c
 SOURCE/CMBTMGR	?FreeIcons@combatManager@@QAEXXZ	100.0000	682a2a659b22
-SOURCE/CMBTMGR	?GenerateMap@combatManager@@QAEXXZ	100.0000	8c6094ca5265
+SOURCE/CMBTMGR	?GenerateMap@combatManager@@QAEXXZ	100.0000	8bc39e6f4d73
 SOURCE/CMBTMGR	?GetBackgroundName@combatManager@@QAEPADXZ	99.5690	01f6a185d3f3
 SOURCE/CMBTMGR	?GetGridIndex@combatManager@@QAEHHH@Z	100.0000	42f2d46193e7
 SOURCE/CMBTMGR	?GetNextArmy@combatManager@@QAEHH@Z	100.0000	caf97be53cc6
 SOURCE/CMBTMGR	?InCastle@combatManager@@QAEHH@Z	26.9231	d251523c6f89
 SOURCE/CMBTMGR	?InitNonVisualVars@combatManager@@QAEXXZ	100.0000	bbe6458fe222
 SOURCE/CMBTMGR	?IsWinner@combatManager@@QAEHH@Z	100.0000	d8a51664aba6
-SOURCE/CMBTMGR	?KeepAttack@combatManager@@QAEXH@Z	3.2049	3e90327b1181
+SOURCE/CMBTMGR	?KeepAttack@combatManager@@QAEXH@Z	99.8272	cde5e4f66ed4
 SOURCE/CMBTMGR	?LoadArmies@combatManager@@QAEXXZ	100.0000	dad8fbade916
 SOURCE/CMBTMGR	?LoadIcons@combatManager@@QAEXXZ	99.0950	9d37dcce1102
 SOURCE/CMBTMGR	?LowerDoor@combatManager@@QAEXXZ	24.4906	4a6d08f84fc9
@@ -636,7 +636,7 @@ SOURCE/CMBTMGR	?MakeCreaturesVanish@combatManager@@QAEXXZ	6.5556	c736a5ef2e6c
 SOURCE/CMBTMGR	?MoreTreesNear@combatManager@@QAEHXZ	99.8607	a402d9897997
 SOURCE/CMBTMGR	?Open@combatManager@@UAEHH@Z	100.0000	57d789afcb44
 SOURCE/CMBTMGR	?RaiseDoor@combatManager@@QAEXXZ	19.0882	9d5cf33bf056
-SOURCE/CMBTMGR	?ResetHitByCreature@combatManager@@QAEXXZ	30.9048	39dfa5f2e5bf
+SOURCE/CMBTMGR	?ResetHitByCreature@combatManager@@QAEXXZ	100.0000	9c52e2ebb50d
 SOURCE/CMBTMGR	?SaveCombatBorder@combatManager@@QAEXXZ	100.0000	979ae436e300
 SOURCE/CMBTMGR	?SetupAdjacencyArray@combatManager@@QAEXXZ	99.8504	9352838f095e
 SOURCE/CMBTMGR	?SetupAndLoadObstacles@combatManager@@QAEXXZ	4.1338	57c957f5de2e
@@ -646,7 +646,7 @@ SOURCE/CMBTMGR	?ShotIsThroughWall@combatManager@@QAEHHHH@Z	5.7061	d6c625bde879
 SOURCE/CMBTMGR	?TestRaiseDoor@combatManager@@QAEXXZ	37.1429	5cd9e725701f
 SOURCE/CMBTMGR	?UpdateArmyGroup@combatManager@@QAEXH@Z	100.0000	1a722a93d70c
 SOURCE/CMBTMGR	?UpdateCombatSystemOptions@@YIXH@Z	11.0000	360f70e351a0
-SOURCE/CMBTMGR	?ValidHex@@YIHH@Z	70.0000	ba9c60d83e6a
+SOURCE/CMBTMGR	?ValidHex@@YIHH@Z	99.7500	78c8c9661c63
 SOURCE/COMMAND	?AddArmy@combatManager@@QAEXHHHHHH@Z	4.4605	5dc155b9cede
 SOURCE/COMMAND	?CheckCastleAttack@combatManager@@QAEXXZ	22.0339	f5b9bccd6b97
 SOURCE/COMMAND	?CheckChangeSelector@combatManager@@QAEXXZ	19.6667	c948c4884014
@@ -715,7 +715,7 @@ SOURCE/DRAWING	?ClearCombatMessages@combatManager@@QAEXH@Z	100.0000	a13385b2bc8b
 SOURCE/DRAWING	?CombatMessage@combatManager@@QAEXH@Z	99.8103	b431be4bdee0
 SOURCE/DRAWING	?CombatMessage@combatManager@@QAEXPADHHH@Z	100.0000	76951881d016
 SOURCE/DRAWING	?DrawBackground@combatManager@@QAEXXZ	99.8655	ec9943534f35
-SOURCE/DRAWING	?DrawFrame@combatManager@@QAEXHHHHHHH@Z	91.2536	4e278d8811cd
+SOURCE/DRAWING	?DrawFrame@combatManager@@QAEXHHHHHHH@Z	91.2536	68e3712bf7ba
 SOURCE/DRAWING	?DrawSmallView@combatManager@@QAEXHH@Z	99.9244	81dabbeff233
 SOURCE/DRAWING	?NoShowCombatLog@combatManager@@QAEXPAD@Z	100.0000	3de47f29d606
 SOURCE/DRAWING	?ResetLimitCreature@combatManager@@QAEXXZ	100.0000	1f50e7bb3f02

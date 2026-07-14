@@ -783,7 +783,8 @@ void combatManager::DrawFrame(int updateScreen, int computeExtent, int redrawExt
 
         if (m_inCastleCombat != 0 && row == COMBAT_DRAW_CATAPULT_LAYER) {
             m_combatIcons[COMBAT_ICON_CATAPULT]->CombatClipDrawToBuffer(
-                COMBAT_CATAPULT_X, COMBAT_CATAPULT_Y, m_catapultFrame,
+                COMBAT_CATAPULT_X, COMBAT_CATAPULT_Y,
+                m_catapultFrame[COMBAT_ATTACKER_SIDE],
                 &m_catapultLimits, 0, 0, 0, 0);
         }
         if (m_inCastleCombat != 0 && row == COMBAT_DRAW_WALL_TOP_LAYER &&
