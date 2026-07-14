@@ -4,10 +4,12 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <BASE/iconf2by.h>
+#include <BASE/IconEntry.h>
+#include <BASE/IconRle.h>
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
-#include <SOURCE/X_GLOBAL.h>
-#include <BASE/IconEntry.h>
+#include <SOURCE/dimPalette.h>
 #include <string.h>
 // Per-call decoder scratch — its own file-static block.
 static IconEntry *gFYEntry;
@@ -29,6 +31,20 @@ static unsigned char *gFYDst;
 static int gFYSkip;
 static int gFYClipR;
 
+// @match-note
+// /O2 structural checkpoint on master 8f1edf6: the complete backward
+// skip/solid/dim/literal/newline decoder uses the canonical IconEntry, IconRle command constants,
+// and KB-owned dim-palette declaration. Candidate is 0x57f versus retail 0x58d; both reserve one
+// four-byte stack word and have 49 branch/return sites. Relocations are 142/144 with no wrong or
+// excess target. First unmasked divergence is +0x5c: candidate keeps shear in EBP, while retail
+// loads shear into ESI and then clipW into EBP. The only occurrence deficits are retail gFYX
+// +0x30b in the full dim-destination expression and gFYClipR +0x48d in the right-clipped literal
+// count; candidate carries the already
+// loaded values in registers at both sites. The broad X_GLOBAL surface had 141/144; the direct
+// palette owner restored gFYDimLen, while an explicit dim-left lifetime and bounded/scoped right-
+// edge lifetimes were byte-identical in this state. No permutation tool was used. Revisit only
+// after a real included declaration/type change or a decoder model that changes those lifetimes;
+// do not add volatile/dummy reloads, padding references, aliases, or count-only locals.
 VA(0x004d9ce0, 0x58d)
 void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                              int clip, int clipX, int clipY, int clipW, int clipH, int color,
@@ -52,18 +68,18 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
         gFYRun = *gFYSrc;
         gFYSrc = gFYSrc + 1;
         if (static_cast<signed char>(gFYRun) < 0) {
-            if ((gFYRun & 0x40) == 0) {
-                if ((gFYRun & 0x3f) == 0)
+            if ((gFYRun & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
+                if ((gFYRun & ICON_RLE_COMMAND_RUN_MASK) == 0)
                     return;
-                gFYX = gFYX - (gFYRun & 0x3f);
+                gFYX = gFYX - (gFYRun & ICON_RLE_COMMAND_RUN_MASK);
                 continue;
             }
-            if ((gFYRun & 0x3f) != 0) {
-                if (gFYRun == 0xc1) {
+            if ((gFYRun & ICON_RLE_COMMAND_RUN_MASK) != 0) {
+                if (gFYRun == ICON_RLE_LONG_SOLID_COMMAND) {
                     gFYRun = *gFYSrc;
                     gFYSrc = gFYSrc + 1;
                 } else {
-                    gFYRun = gFYRun & 0x3f;
+                    gFYRun = gFYRun & ICON_RLE_COMMAND_RUN_MASK;
                 }
                 gFYColor = *gFYSrc;
                 gFYSrc = gFYSrc + 1;
@@ -71,21 +87,22 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
             }
             gFYRun = *gFYSrc;
             gFYSrc = gFYSrc + 1;
-            if ((gFYRun & 3) != 0) {
-                gFYDimLen = gFYRun & 3;
+            if ((gFYRun & ICON_RLE_DIM_SHORT_COUNT_MASK) != 0) {
+                gFYDimLen = gFYRun & ICON_RLE_DIM_SHORT_COUNT_MASK;
             } else {
                 gFYDimLen = *gFYSrc;
                 gFYSrc = gFYSrc + 1;
             }
             gFYDimLen2 = gFYDimLen;
-            if (color != 0 && (gFYRun & 0x80) != 0) {
+            if (color != 0 && (gFYRun & ICON_RLE_DIM_RECOLOR_FLAG) != 0) {
                 gFYRun = gFYDimLen;
                 gFYColor = static_cast<unsigned char>(color);
                 goto do_fill;
             }
-            if ((gFYRun & 0x40) != 0) {
+            if ((gFYRun & ICON_RLE_DIM_APPLY_FLAG) != 0) {
                 gFYDimPal =
-                    reinterpret_cast<unsigned char *>(uDimPal) + (gFYRun & 0x3c) * 0x40;
+                    reinterpret_cast<unsigned char *>(uDimPal) +
+                    (gFYRun & ICON_RLE_DIM_LEVEL_MASK) * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
                 if (shear[gFYY] != 0x7f && clipY <= gFYY && gFYY <= gFYClipB) {
                     if (clipX <= (gFYX - gFYDimLen) + 1 && gFYX <= gFYClipR) {
                         unsigned char *dimDst;
