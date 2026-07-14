@@ -7,47 +7,48 @@
 #include <BASE/Iconm2b.h>
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
-#include <_globals_model.h>
-#include <BASE/Misc.h>
+#include <BASE/IconEntry.h>
+#include <BASE/IconRle.h>
 #include <string.h>
-// Per-call decoder scratch — its own file-static block.
-static IconEntry *gMonoEntry;
-static unsigned char *gMonoSrc;
-static int gMonoX0;
-static int gMonoX;
-static int gMonoY;
-static int gMonoRow;
-static unsigned int gMonoRun;
-static int gMonoClipR;
-static int gMonoClipB;
+// Per-call decoder scratch — its own 0x534bcc+ file-static block.
+DATA(0x00534bcc) static int gMonoClipR;
+DATA(0x00534bd0) static unsigned char *gMonoRow;
+DATA(0x00534bd4) static IconEntry *gMonoEntry;
+DATA(0x00534bd8) static unsigned char *gMonoSrc;
+DATA(0x00534bdc) static int gMonoX0;
+DATA(0x00534be0) static unsigned int gMonoRun;
+DATA(0x00534be4) static int gMonoY;
+DATA(0x00534be8) static int gMonoClipB;
+DATA(0x00534bec) static int gMonoX;
 
-// @early-stop
-// Mono silhouette variant of IconToBitmap: every literal run is a solid single-colour fill (the
-// `color` param), no per-pixel source and no dim/colour sub-commands (negative = skip, mask 0x7f).
-// /O2 byte-proven register-allocation wall: base 0x257 versus retail 0x266. Setup is base
-// +0x000..+0x0de versus retail +0x000..+0x0f0. After the cursor load/xor scheduling pair, base
-// +0x0e5..+0x146 and retail +0x0f7..+0x158 are raw-byte identical with relocation and branch-
-// displacement bytes masked; the same is true of suffix +0x214..+0x257/+0x223..+0x266. The
-// clipped four-quadrant fill is base +0x146..+0x214 versus retail +0x158..+0x223.
-// Base has 36/38 retail relocations with no base-only target. The missing occurrences are retail's
-// second gMonoX0 and gMonoY setup reloads at +0x061 and +0x086; every decoder/fill relocation
-// occurrence agrees. Tried merged and four-way memset forms, global/local/static entry forms,
-// source-cursor postincrement forms, comparison reversals and inclusive-bound equivalents,
-// combined positive-AND, explicit else-if clipping, and the full 180-attempt AST permutation.
+// @match-note
+// Structurally complete mono-RLE decoder. Both sides use one four-byte pitch slot (`sub esp,4`),
+// save EBX/ESI/EDI/EBP, and return with `ret 0x24`; skip/end, solid fill, four clipping quadrants,
+// and newline CFGs agree. First divergence is +0x11: ours assigns the 13-byte frame offset to EBX
+// and reads x/srcOffset before publishing the entry, while retail retains it in ECX and publishes
+// the entry first. Ours ends at +0x25e versus retail +0x266. Relocations are 36/38 with no
+// base-only target: only one X0 and one Y setup reload are missing; all other seven scratch owners
+// at 0x534bcc..0x534bec agree occurrence-for-occurrence. Indexed entry selection, direct positive
+// clip tests, narrow owner headers, typed row storage, and retail fill-arm order were tried. Revisit
+// only after a reachable icon/header TU-state change or in the post-coverage last-mile phase; no
+// permutation tool was used.
 VA(0x004cfae0, 0x266)
 void MonoIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                       int color, int clip, int clipX, int clipY, int clipW, int clipH)
 {
     unsigned char *data = reinterpret_cast<unsigned char *>(srcIcon->m_data);
-    IconEntry *entries = reinterpret_cast<IconEntry *>(data);
-    gMonoEntry = &entries[frame];
-    gMonoSrc = data + entries[frame].srcOffset;
-    gMonoX0 = entries[frame].x + x;
+    int entryOffset = frame * sizeof(IconEntry);
+    int entryX = reinterpret_cast<IconEntry *>(data + entryOffset)->x;
+    int srcOffset = reinterpret_cast<IconEntry *>(data + entryOffset)->srcOffset;
+    IconEntry *entry = reinterpret_cast<IconEntry *>(data + entryOffset);
+    gMonoEntry = entry;
+    gMonoSrc = data + srcOffset;
+    gMonoX0 = entryX + x;
     gMonoX = gMonoX0;
-    gMonoY = entries[frame].y + y;
+    gMonoY = entry->y + y;
     if (clip != 0) {
-        if (clipX > gMonoX0 || gMonoX0 + entries[frame].w > clipX + clipW ||
-            clipY > gMonoY || gMonoY + entries[frame].h > clipY + clipH) {
+        if (gMonoX0 < clipX || clipX + clipW < entry->w + gMonoX0 ||
+            gMonoY < clipY || clipY + clipH < entry->h + gMonoY) {
             clip = 1;
             gMonoClipR = clipX + clipW - 1;
             gMonoClipB = clipY + clipH - 1;
@@ -56,16 +57,15 @@ void MonoIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int
         }
     }
     short pitch = dest->m_width;
-    unsigned char *row =
-        reinterpret_cast<unsigned char *>(gMonoY * pitch + reinterpret_cast<int>(dest->m_pixels));
+    unsigned char *row = dest->m_pixels + gMonoY * pitch;
     for (;;) {
         gMonoSrc++;
         int cmd = gMonoSrc[-1];
         if (static_cast<signed char>(cmd) < 0) {
             // skip run / end-of-sprite (negative command masks 7 bits)
-            gMonoRow = reinterpret_cast<int>(row);
+            gMonoRow = row;
             gMonoRun = cmd;
-            int n = cmd & 0x7f;
+            int n = cmd & ICON_RLE_MONO_RUN_MASK;
             if (n == 0)
                 return;
             gMonoX = gMonoX + n;

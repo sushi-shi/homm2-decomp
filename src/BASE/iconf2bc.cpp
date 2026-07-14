@@ -34,7 +34,8 @@ static unsigned char *gFCDst;
 // @match-note
 // Macro-aware structural checkpoint from a18cc69: this body is a clean typed reconstruction, with
 // the shared IconRle enum constants, canonical dim-palette owner, and byte-pointer row storage.
-// Live match is 85.32% (retained maximum 86.2544%), candidate 0x53f versus retail 0x54d, with
+// In the combined IconRle state, live match is 85.27% (retained maximum 86.2544%), candidate
+// 0x53f versus retail 0x54d, with
 // 84/83 relocations and no candidate-only target. Every scratch occurrence agrees except gFCY,
 // candidate 9 versus retail 8: source snapshots gFCY once for both initial vertical clip clauses,
 // but MSVC reloads it for the second clause while retail holds the first load in ECX.
