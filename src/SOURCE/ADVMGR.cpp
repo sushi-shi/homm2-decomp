@@ -932,8 +932,14 @@ void advManager::Reseed(int, int)
     giSeedingValid = 0;
 }
 
-// @early-stop
-// Retail is 0xeb1 and reconstruction is 0xeb0 with 999 aligned instructions and an exact 0xb8 frame; residuals are commutative load order at +0x73b..+0x762 and +0xa94..+0xd21, one /Ob1 continuation move, and one block-boundary jump at +0xd71.
+// @match-note
+// The retained source-hash object has the complete 0xb8 frame/slots, switch and radar
+// CFG, 999 aligned instructions, and all 118 relocation targets. The first code
+// residual is commutative load order at +0x73b; later residuals at +0xa94..+0xd21
+// have the same cause, followed by one moved /Ob1 continuation and one adjacent-
+// block jump at +0xd71. Reversing the commutative expressions, using direct
+// members versus CurrentHero(), and both boundary-test polarities were checked.
+// Revisit after a material predecessor/TU-state change or in the last-mile phase.
 VA(0x00458d68, 0xeb1)
 int advManager::ProcessSelect(struct tag_message *message, class mapCell **eventCell)
 {
@@ -1326,7 +1332,10 @@ int advManager::ProcessDeSelect(struct tag_message *message, int *result,
 }
 
 // @early-stop
-// Both sides are 0x5c8 bytes / 390 instructions; only the GetNullSample /Ob1 jmp $+0 moves from leading to trailing, plus relocation symbol naming differences.
+// Both sides are 0x5c8 bytes / 390 instructions with the same 0x44 frame, CFG,
+// and 84 relocation targets. The only code difference is GetNullSample's five-
+// byte /Ob1 continuation: ours is at +0x0c and retail's is at +0x1d. Declaration
+// initialization and post-declaration assignment compile to the same placement.
 VA(0x0045a07c, 0x5c8)
 int advManager::ProcessSearch(int x, int y)
 {
@@ -1451,7 +1460,8 @@ search_end:
 
 // @early-stop
 // Reloc-masked bytes differ only at +0xc5, +0x2d8, +0x9df, and +0x9fb: four
-// equivalent local-return displacements; all 106 relocation targets agree.
+// equivalent local-return displacements. The 0x2c frame/slots and CFG agree,
+// and all 106 relocation targets resolve to the same addresses.
 VA(0x0045a644, 0xa50)
 int advManager::ProcessHover(int mouseX, int mouseY) {
     int heroXHero;
@@ -1698,8 +1708,9 @@ int advManager::ProcessHover(int mouseX, int mouseY) {
 }
 
 // @early-stop
-// Assembly and all 31 relocation targets match; only +0x42 branches to the
-// adjacent jmp-to-epilogue instead of directly to the same epilogue.
+// The 0x4 frame/slots, CFG, instructions, and all 31 relocation targets match;
+// only +0x42 branches to the adjacent jmp-to-epilogue instead of directly to
+// that same epilogue.
 VA(0x0045b094, 0x21a)
 void advManager::UpdateScreen(int, int forceUpdate)
 {
@@ -1980,10 +1991,15 @@ int advManager::GetCloudLookup(int x, int y)
     return giCloudType[cloudMask];
 }
 
-// @early-stop
-// raw-masked: all 2373 retail instructions and 551 relocations accounted; residuals
-// are four boundary compares, one continuation jump, equivalent frame-boolean lowering,
-// eight +31 associations and consequent displacements; this function has no data island
+// @match-note
+// The retained source-hash object accounts for all 2373 retail instructions, the
+// complete 0x1c frame/slots and draw CFG, and all 551 relocation targets; there
+// is no data island. The first real code divergence is the MAP_WIDTH boundary
+// compare at +0x74. The residual set is four reversed boundary compares, one
+// moved continuation, equivalent frame-boolean lowering, and eight commutative
+// +31 associations with consequent branch displacements. Both comparison
+// polarities, direct versus temporary booleans, both +31 associations, and the
+// accessor/direct forms were checked. Revisit after a material TU-state change.
 VA(0x0045bb7c, 0x24cb)
 void advManager::DrawCell(int mapX, int mapY, int screenX, int screenY,
                           int drawMask, int forceDraw)
@@ -2602,22 +2618,22 @@ void advManager::DrawCell(int mapX, int mapY, int screenX, int screenY,
     }
 }
 
-// @early-stop
-// Exact 0x4 frame, both relocation targets, and every non-jump opcode/operand.
-// Retail has one additional five-byte jmp $+0 at +0x3e before the fallback
-// return; all four relational spellings and the AST permutation pass were tried.
 VA(0x0045e047, 0x93)
 class mapCell * advManager::GetCell(int x, int y)
 {
     if (x < 0 || y < 0 || x >= MAP_WIDTH || MAP_HEIGHT <= y)
-        return m_mapData->cells;
+        return m_mapData->Cells();
     else
         return &m_mapData->Row(y)[x];
 }
 
-// @early-stop
-// raw-masked: exact logic/frame and 122-reloc external-target audit; operand order at
-// +0x141..0x15a, +0x1d3..0x1eb, +0x234..0x23d, and +0x47d..0x488, plus retail NOPs
+// @match-note
+// Complete semantics, 0xb4 frame/slots, radar CFG, and all 122 relocation targets
+// agree. The first divergence is commutative operand order at +0x141; the other
+// spans are +0x1d3..+0x1eb, +0x234..+0x23d, and +0x47d..+0x488, plus retail
+// alignment NOPs. Reversed operands, explicit temporaries, symmetric subscript,
+// and pointer-add forms compile to the same order. Revisit after a material
+// predecessor/TU-state change.
 VA(0x0045e0da, 0x104d)
 void advManager::UpdateRadar(int updateScreen, int partial)
 {
@@ -2681,11 +2697,10 @@ void advManager::UpdateRadar(int updateScreen, int partial)
         screenColumnIndex = minXSlot * 4;
         break;
     case ADVMGR_RADAR_MAP_MEDIUM:
-        screenRowOffset =
-            &gpWindowManager->m_screen->m_pixels[
-                (minYOffset * 2 + ADVMGR_RADAR_TOP) *
-                ADVMGR_RADAR_ROW_GROUPS * ADVMGR_RADAR_GROUP_BYTES] +
-            ADVMGR_RADAR_LEFT;
+        screenRowOffset = gpWindowManager->m_screen->m_pixels +
+            (minYOffset * 2 + ADVMGR_RADAR_TOP) *
+                ADVMGR_RADAR_ROW_GROUPS * ADVMGR_RADAR_GROUP_BYTES +
+                ADVMGR_RADAR_LEFT;
         screenColumnIndex = minXSlot * 2;
         break;
     case ADVMGR_RADAR_MAP_LARGE:
@@ -3638,10 +3653,13 @@ void advManager::ClearBottomView(void)
     iLastAnimFrame = ADVMGR_BOTTOM_VIEW_NO_ANIMATION;
 }
 
-// @early-stop
-// Exact size and 73 relocations; residuals are the moved GetPlayerColor /Ob1
-// continuation at +0x2f5..+0x320 and commutative global comparisons at
-// +0x29e..+0x2c6 and +0x3ef..+0x418, with equivalent opcodes at +0x3fa/+0x418.
+// @match-note
+// The 0x38 frame/slots, complete CFG, exact size, and all 73 relocation targets
+// agree. The first divergence is commutative global comparison order at
+// +0x29e..+0x2c6; later residuals are the moved GetPlayerColor /Ob1 continuation
+// at +0x2f5..+0x320 and comparison order at +0x3ef..+0x418. Both comparison
+// orders compile identically, while direct member access only moves the inline
+// continuation. Revisit after a material TU-state change or in the last-mile phase.
 VA(0x00460e95, 0x51b)
 int advManager::UpdBottomViewEnemyTurn(void)
 {
@@ -4142,9 +4160,13 @@ int advManager::UpdBottomViewHero(void)
     return 1;
 }
 
-// @early-stop
-// raw-masked: exact frame/body and 109 relocations; only loop-compare/multiply operand
-// order, folding of literal 30 + 6, consequent jump displacements, and two retail NOPs
+// @match-note
+// Complete semantics, 0xf0 frame/slots, CFG, and all 109 relocation targets
+// agree. The first code divergence is the commutative loop comparison at +0x409;
+// later residuals are multiply/load order, folding of literal 30 + 6, consequent
+// jump displacements, and two retail NOPs. Reversing the loop comparison and
+// multiplication operands and splitting the literal sum were checked. Revisit
+// after a material TU-state change or in the last-mile phase.
 VA(0x0046235b, 0xd32)
 void advManager::HeroQuickView(int heroId, int locatorSlot, int windowX, int windowY)
 {
@@ -4406,8 +4428,9 @@ char * advManager::GetArmySizeName(int armySize, int grammar)
 }
 
 // @early-stop
-// raw-masked: exact frame/body and 102 relocations; only commutative operand-order
-// bytes at twelve measured sites and three retail alignment NOPs remain
+// The relocation-masked lite diff has no opcode or operand differences: the
+// complete 0xec frame/slots and CFG agree, and all 102 external relocation
+// targets resolve identically. The residual is delinked relocation-symbol identity.
 VA(0x004631ad, 0xc29)
 void advManager::TownQuickView(int townId, int locatorSlot, int windowX, int windowY)
 {
@@ -5231,9 +5254,12 @@ int DimensionDoorHandler(tag_message &message)
     return ADVMGR_DIMENSION_DOOR_UNHANDLED;
 }
 
-// @early-stop
-// instruction-exact frame/body and 161 relocations; residuals are delinked biased
-// bComboDraw aliases, commutative flat-index/min-max evaluation, and three retail NOPs
+// @match-note
+// The retained source-hash object has the complete 0x1c frame/slots, draw CFG, and all
+// 161 relocation targets. Its residuals are delinked biased bComboDraw aliases,
+// commutative flat-index/min-max evaluation, and three retail alignment NOPs.
+// Direct and reversed index/min-max spellings and explicit temporaries compile to
+// the same evaluation order. Revisit after a material TU-state change.
 VA(0x004654ad, 0x11a9)
 int advManager::ComboDraw(int originX, int originY, int animate)
 {
@@ -5820,11 +5846,13 @@ void advManager::InsertSound(int x, int mapY, int distance, int soundLayer)
     }
 }
 
-// @early-stop
-// Exact 0x24 frame and instruction stream outside +0x343..+0x359. Retail emits
-// a 23-byte load/OR/store for m_eventFlags; MSVC folds every value-preserving
-// direct spelling tested to the equivalent 13-byte memory OR. The size delta is
-// exactly 10 bytes and all 44 external relocation addresses agree.
+// @match-note
+// The exact 0x24 frame/slots, CFG, instruction stream outside +0x343..+0x359,
+// and all 44 relocation targets agree. Retail emits a 23-byte load/OR/store for
+// m_eventFlags; ours folds to the equivalent 13-byte memory OR, accounting for
+// the entire ten-byte size delta. Direct `|=`, explicit load/OR/store, enum/int
+// temporaries, and both operand orders all fold to the memory OR. Revisit only
+// after a material TU-state change or in the last-mile phase.
 VA(0x0046712a, 0x40f)
 void advManager::TeleportTo(hero *mapHero, int destinationX, int destinationY,
                             int, int skipMapChange)
@@ -6148,13 +6176,15 @@ void advManager::TownGate(int spellId)
         giTerrainToMusicTrack[m_currentTerrain]);
 }
 
-// @early-stop
-// Exact 0x5ac size and 41 relocation sites. Retail places the CurrentHero
-// /Ob1 continuation at +0x180; ours places the same five-byte jump at +0x174.
-// The screen-bound sums at +0x3e8..+0x40d only reverse commutative stack loads,
-// and the unreachable +0x5a3 jump has a different local target. The two
-// y-coordinate relocations are delinked as a string but resolve to
-// normalDirTable+2 at original VA 0x004faa7a; all other operands agree.
+// @match-note
+// The exact 0x40 frame/slots, complete CFG, 0x5ac size, and 41 relocation sites
+// agree after manual interior-alias resolution. The first code residual is the
+// CurrentHero /Ob1 continuation at +0x174 versus retail +0x180; the screen-bound
+// sums at +0x3e8..+0x40d reverse commutative stack loads, and the unreachable
+// +0x5a3 jump has a different local target. Direct/accessor hero spellings and
+// both coordinate operand orders were checked. The two apparent relocation
+// extras resolve to normalDirTable+2 at retail RVA 0xfaa7a; one is delinked as
+// the interior string symbol at RVA 0xfaa79. Revisit after material TU-state change.
 VA(0x00467c9b, 0x5ac)
 void advManager::SummonBoat(void) {
     int boatIndex9;
@@ -6891,7 +6921,8 @@ int advManager::CheckHandleNetPlayerWait(
 
 // @early-stop
 // Retail adds continuation jumps at +0x14e and +0x1c9. Excluding those two
-// five-byte jumps, every opcode/operand and all six relocation targets match.
+// five-byte jumps, every opcode/operand, the 0x28 frame/slots and CFG, and all
+// six relocation targets match.
 VA(0x004695f7, 0x1d5)
 void advManager::TrimLoopingSounds(int maxSamples)
 {

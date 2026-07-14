@@ -35,6 +35,7 @@ public:
     // expansion ON), so these splice into each call site - reproducing the per-call
     // `jmp $+0` and the deferred `Row(y)[x]` indexing seen in the retail .text. Fully
     // inlined -> they emit no out-of-line symbol, which is why CodeView lists none.
+    mapCell      *Cells(void)  { return cells; }
     mapCell      *Row(int y)   { return &cells[width * y]; }   // row base ptr; caller does [x]
     // Retail closes this inline region after assigning the caller's pointer. The
     // output reference is therefore part of the recovered source shape.
