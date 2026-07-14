@@ -872,5 +872,6 @@ extern heroWindow *pNormalDialogWindow;
 extern void **ppMapExtra;
 extern short *pwSizeOfMapExtra;
 extern font *smallFont;
+extern unsigned char iGetSSByAlignment[HERO_SKILL_COUNT][6];
 
 #endif // HOMM2_KB_H
