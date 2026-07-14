@@ -1,0 +1,18 @@
+# BASE/icon2bc scratch-occurrence closure pass, checkpoint 7283868
+# Target: IconToBitmapColorTable, RVA 0xd32a0, retail size 0x5af, target .text SHA-256 15096a6b70e855d536084307e3f0f9caff5f35f7da2c157ef2fe1a80feeb647c, target relocations 91.
+# Scope: close the five raw scratch-occurrence residuals left by the forward-sibling decoder skeleton. No AST, regex, or permutation tool was used.
+state	match_percent	candidate_size	relocations	result	site_evidence
+macro_aware_skeleton	76.94	0x596	90/91	superseded	Cnt/Dst/X0 each missing once; ClipR/Y each excess once.
+single_y_snapshot	76.18	0x596	90/91	rejected	A currentY snapshot before the whole condition leaves the occurrence multiset unchanged and regresses allocation.
+positioned_y_snapshot	76.18	0x596	90/91	retained-structure	Assign currentY at the first vertical clause and share it with the second. MSVC still reloads gCTY twice; the source lifetime is faithful but the occurrence residual remains.
+literal_dst_publication	76.40	0x596	91/91	retained	Publish savedDst at the retail literal rejection test. This restores Dst from five to six occurrences; ClipR remains excess before the clipped-dim correction.
+global_dim_count_mutation	77.62	0x590	93/91	rejected	Mutating gCTCnt in both selection arms emits eight Cnt occurrences versus retail six.
+local_dim_count_mutation	78.17	0x590	90/91	retained-structure	Mutating local count before the final publication closes ClipR when combined with the explicit snapshot, but MSVC deletes the overwritten original-count publication.
+published_count_readback	78.20	0x590	92/91	rejected	Reading gCTCnt as the arithmetic source preserves the initial store but adds a load, yielding seven Cnt occurrences versus retail six.
+explicit_clipr_snapshot	78.07	0x590	90/91	retained	Retail order is explicit: snapshot ClipR, publish original Cnt, select into local count, then publish the selected count. Dst and ClipR are exact; MSVC DSE removes only the original Cnt store.
+# Final candidate occurrence distribution: Pitch3 Cnt5 X2 Y9 Entry1 Row1 DimPal4 ClipB4 ClipR10 SrcCopy5 DimLen6 Dst6 Src15 Cnt2=2 X0=2 Color7 Run7 uDimPal1.
+# Retail differs only at Cnt6, Y8, and X0=3. There are no candidate-only targets; raw totals are candidate 90 versus retail 91.
+# Exact residual sites: X0 retail reload +0x61 is forwarded from local X; Y retail holds the +0x7b reload across both vertical tests while candidate reloads at +0x78 and +0x85; Cnt retail publishes the original count at +0x406 before the selected count at +0x42a while candidate DSEs the first store and retains the selected store at +0x407.
+# Relocation-union raw audit: candidate 0x590 versus retail 0x5af; 808 common unmasked bytes, 763 differing, first +0x11, last +0x58d, plus a 0x1f retail tail. Candidate .text SHA-256 4d320e9e3968ca9791e05d28a76625026672af4726871b125521798ffc9c096b; source SHA-256 4a59664234b341d79027ec04605ab3bb4afee7171ce435312baa563c446be912.
+# The initial clip source has the same four short-circuit tests and outside/join ownership as retail, but broad setup/register allocation remains unresolved. This is not a delinked-label, relocation, or compiler-state wall.
+# Revisit from the +0x11 setup lifetime split; do not replay direct-global Cnt mutation, published-Cnt readback, independent Y predicate spellings, or literal destination/ClipR publication variants.
