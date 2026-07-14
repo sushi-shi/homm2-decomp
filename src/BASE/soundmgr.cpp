@@ -93,8 +93,6 @@ int soundManager::CDIsPlaying(void)
     return stricmp(lpszReturnString, "playing") == 0;
 }
 
-// @early-stop
-// All instructions agree; 14/14 external relocations resolve with only-base=0, and the residual is delinked fixed-address identity.
 VA(0x004cb970, 0xf3)
 void soundManager::CDStartup(void)
 {
@@ -117,9 +115,9 @@ void soundManager::CDStartup(void)
         gMciErrorFlag = 1;
         gCdMusic = 0;
         WritePrefs();
-    } else {
-        m_cdReady = 1;
+        return;
     }
+    m_cdReady = 1;
 }
 
 VA(0x004cba70, 0xd5)
@@ -141,8 +139,6 @@ void soundManager::CDShutdown(void)
         HandleMCIError(nMCIError, CommandString);
 }
 
-// @early-stop
-// All instructions agree; 2/2 external relocations resolve with only-base=0, and the residual is delinked fixed-address identity.
 VA(0x004cbb50, 0xe5)
 void soundManager::CDSetVolume(int param_1, int param_2)
 {
@@ -161,7 +157,7 @@ void soundManager::CDSetVolume(int param_1, int param_2)
     if (local_c != 0) {
         int local_10;
         if (param_2 != 0)
-            local_10 = 0xb - (0xc - local_c / 0xc);
+            local_10 = 0xc - (0xb - local_c / 0xc);
         else
             local_10 = 0xc - local_c;
         local_10 <<= 0xc;
@@ -263,8 +259,6 @@ void soundManager::CDPlay(int param_1, int param_2, int param_3, int param_4)
     m_currentTrack = static_cast<char>(param_1);
 }
 
-// @early-stop
-// All instructions agree; 8/8 external relocations resolve with only-base=0, and the residual is delinked fixed-address identity.
 VA(0x004cc0c0, 0xf1)
 void soundManager::CDPoll(void)
 {
@@ -274,9 +268,9 @@ void soundManager::CDPoll(void)
         return;
     if (m_cdReady == 0)
         return;
-    if (CDPlaying != 0) {
-        if (m_currentTrack < 0)
-            return;
+    if (CDPlaying == 0 || m_currentTrack < 0)
+        return;
+    {
         if (bMusicIsLooping[m_currentTrack] == 0)
             return;
         if ((KBTickCount() | 0) < m_pollTimer + 3000)
@@ -537,13 +531,11 @@ int soundManager::Main(struct tag_message &) { return 0; }
 VA(0x004cca70, 0x1a)
 struct _SAMPLE * soundManager::StartSample(char *, char * *, short int, short int, int, int, long int) { return 0; }
 
-// @early-stop
-// All instructions agree; 10/10 external relocations resolve with only-base=0, and the residual is delinked fixed-address identity.
 VA(0x004cca90, 0x126)
 void soundManager::StopAllSamples(int param_1)
 {
-    short local_8;
-    int local_c;
+    short sampleIdx;
+    int waitCounter;
     int sampleStatus;
     if (gbNoSound != 0)
         return;
@@ -552,10 +544,10 @@ void soundManager::StopAllSamples(int param_1)
     if (m_samplesReady == 0)
         return;
     LogStr("SAS 1");
-    for (local_8 = 0; local_8 < m_numSampleHandles; local_8++) {
-        sampleStatus = _AIL_sample_status_4(m_sampleHandles[local_8]);
+    for (sampleIdx = 0; sampleIdx < m_numSampleHandles; sampleIdx++) {
+        sampleStatus = _AIL_sample_status_4(m_sampleHandles[sampleIdx]);
         if (sampleStatus == 4)
-            _AIL_end_sample_4(m_sampleHandles[local_8]);
+            _AIL_end_sample_4(m_sampleHandles[sampleIdx]);
     }
     m_fadeSteps = 0;
     if (param_1 != 0) {
@@ -564,7 +556,7 @@ void soundManager::StopAllSamples(int param_1)
         else
             MIDIStop();
     }
-    for (local_c = 0; local_c < 5; local_c++) {
+    for (waitCounter = 0; waitCounter < 5; waitCounter++) {
         ServiceSound();
         DelayMilli(1);
     }
@@ -595,7 +587,9 @@ void soundManager::StopSample(struct _SAMPLE *param_1)
 }
 
 // @early-stop
-// Non-table spans +0x0..+0x16e and +0x1e7..+0x202 are byte-identical after masking five IAT/local-table relocation payloads.
+// The complete +0x0..+0x202 range is raw-exact after masking the union of 23 relocation
+// payload offsets. This includes the address table at +0x16e..+0x182, byte-index table at
+// +0x182..+0x1e7, and resumed code at +0x1e7; only fixed-IAT/self-relocation identity differs.
 VA(0x004ccc80, 0x202)
 void soundManager::ModifySample(struct _SAMPLE *sampleHandle, short operation, long value)
 {
@@ -748,8 +742,6 @@ void soundManager::SetMusicQuality(int param_1)
         PlayAmbientMusic(local_8, 0, -1);
 }
 
-// @early-stop
-// All instructions agree; 5/5 external relocations resolve with only-base=0, and the residual is delinked fixed-address identity.
 VA(0x004cd250, 0xc5)
 void soundManager::PlayAmbientMusic(int param_1, long param_2, int param_3)
 {
@@ -763,13 +755,13 @@ void soundManager::PlayAmbientMusic(int param_1, long param_2, int param_3)
         return;
     if (gMidiEnabled == 0) {
         m_currentTrack = static_cast<char>(param_1);
-    } else {
-        if (gCdMusic != 0)
-            CDPlay(param_1, param_2, -1, 0);
-        else
-            MIDIPlay(param_1);
-        m_currentTrack = static_cast<char>(param_1);
+        return;
     }
+    if (gCdMusic != 0)
+        CDPlay(param_1, param_2, -1, 0);
+    else
+        MIDIPlay(param_1);
+    m_currentTrack = static_cast<char>(param_1);
 }
 
 VA(0x004cd320, 0x38f)
@@ -848,8 +840,6 @@ void soundManager::PollSound(void)
     m_pollRequested = 0;
 }
 
-// @early-stop
-// All instructions agree; 12/12 external relocations resolve with only-base=0, and the residual is delinked fixed-address identity.
 VA(0x004cd6b0, 0x138)
 void soundManager::SwitchAmbientMusic(int param_1)
 {
@@ -859,24 +849,26 @@ void soundManager::SwitchAmbientMusic(int param_1)
         return;
     if (gMidiEnabled == 0) {
         m_currentTrack = static_cast<char>(param_1);
-    } else if (MusicPlaying() == 0) {
-        PlayAmbientMusic(param_1, 0, -1);
-    } else {
-        if (m_currentTrack == param_1)
-            return;
-        LogStr("Switch Ambient Music 1");
-        Process1WindowsMessage();
-        if ((m_fadeSteps != 0 && m_fadeTargetTrack != param_1) ||
-            (m_fadeSteps == 0 && m_currentTrack != param_1)) {
-            if (m_fadeSteps <= 0xb) {
-                m_fadeSteps = 0xb;
-                gMusicFadeTimer = KBTickCount() + 900;
-            }
-            m_fadeTargetTrack = param_1;
-            PollSound();
-        }
-        LogStr("Switch Ambient Music 2");
+        return;
     }
+    if (MusicPlaying() == 0) {
+        PlayAmbientMusic(param_1, 0, -1);
+        return;
+    }
+    if (m_currentTrack == param_1)
+        return;
+    LogStr("Switch Ambient Music 1");
+    Process1WindowsMessage();
+    if ((m_fadeSteps != 0 && m_fadeTargetTrack != param_1) ||
+        (m_fadeSteps == 0 && m_currentTrack != param_1)) {
+        if (m_fadeSteps <= 0xa) {
+            m_fadeSteps = 0xb;
+            gMusicFadeTimer = KBTickCount() + 900;
+        }
+        m_fadeTargetTrack = param_1;
+        PollSound();
+    }
+    LogStr("Switch Ambient Music 2");
 }
 
 VA(0x004cd7f0, 0x28f)
