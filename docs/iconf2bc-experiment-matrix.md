@@ -5,8 +5,9 @@ Current integrated state: checkpoint `48dbe3e`, source SHA-256
 end `0x541`, frame `sub esp,8`, decoder entry `+0xea`, and 84/83 relocations. It reuses the
 later pitch lifetime to preserve the original icon width while `w` becomes the exclusive horizontal
 bound. This improves the score but does not remove the first width/X load-order divergence or the
-single excess setup `gFCY` relocation. The row result also remains in `ecx` rather than retail's
-`eax`. This is an integrated progress checkpoint, not a wall classification.
+single excess setup `gFCY` relocation. The row sum and publication now use retail's `eax`; the two
+row inputs still load into the opposite registers. This is an integrated progress checkpoint, not a
+wall classification.
 
 The new-experiment table began at checkpoint `838105c` / source checkpoint `7386907`, SHA-256
 `648ecb4b963c5b97aea5908738d26509ad680853a3041817321b61aa955070f9`, score 83.4333%,
@@ -171,3 +172,7 @@ retained/reverted/byte-identical disposition.
 | `dd868c0ffcdabf134c98631a7a731d7b8d90845b7df496ce5a3c6dd05b305fd9` | assign original width to pitch immediately before `gFCX0` | 85.99% | `0x541`, `sub esp,8`; decoder `+0xea` | 84/83; 9 `gFCY` | byte-identical to assignment immediately after `gFCX0`; optimizer does not materialize the intended width spill; retained fresh-pass checkpoint |
 | `175f256da9364142eba543b69d8237abd54797783ca0125236e4d9dfe9695533` | pitch-backed original-width alias without transforming `w` into the bound | 85.84131% | `0x545`, `sub esp,8`; decoder `+0xee` | 84/83; 9 `gFCY` | optimizer eliminates the alias and returns to canonical checkpoint bytes; reverted |
 | `6c7620bcd04e6b66c2aa327d02fd8be45fe8150f199e95751d1b6e48e23d5093` | widen pitch-backed original-width lifetime before X subtracts | 85.16% | `0x540`, `sub esp,8`; decoder `+0xe9` | 84/83; 9 `gFCY` | broadens the early register lifetime and regresses entry/X setup without materializing the retail spill; reverted |
+| `18d1fbbfeacf948ddf7232c42726ef2491691b23ee11de9af052222ea87923c1` | reuse pitch as the exclusive horizontal bound while preserving `w` as width | 85.84131% | `0x545`, `sub esp,8`; decoder `+0xee` | 84/83; 9 `gFCY` | optimizer returns to the pre-width-lifetime canonical bytes, including ECX row publication; reverted |
+| `34a0f036a3836bd9b3197f3ee145e2167ac9b5b98baa68a749ea51cf31da70e3` | use computed `Y` for the first setup vertical comparison and `gFCY` snapshot for the second | 85.95% | `0x537`, `sub esp,8`; decoder `+0xe0` | 81/83; 6 `gFCY` | optimizer propagates computed Y through both comparisons and row setup, removing three required relocations rather than the single excess load; reverted |
+| `e64964a907bab8325276bad6e0fc50da33cd788ad0b4a891efba9a91bade28be` | copy transformed exclusive bound into pitch and use pitch directly in the clip test | 85.61% | `0x542`, `sub esp,8`; decoder `+0xeb` | 84/83; 9 `gFCY` | alias optimizes away and emits bytes identical to exclusive-bound-only state; width/X order is recovered but row and source-offset setup regress; reverted |
+| `1ce64a9488af55e4cbc6f39659a8f97e045b16e2c1146e29e0fd73dd7d19b746` | advance source through the just-published `gFCEntry` pointer | 85.9925% | `0x541`, `sub esp,8`; decoder `+0xea` | 84/83; 9 `gFCY` | compiler forwards the local entry value and emits bytes identical to the integrated checkpoint; reverted |
