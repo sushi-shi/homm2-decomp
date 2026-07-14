@@ -100,12 +100,18 @@ DATA(0x00534ce8) static unsigned int gCTRun;
 // while the unsigned count remains the loop-decrement owner adds a smaller further gain. The
 // isolated literal skeleton, the old Icon2b setup combined with this skeleton, and the old
 // per-command cursor all regress. See icon2bc-forward-sibling-99d936f.tsv.
-// Relocations are now 88/91 with no base-only target: ClipB/ClipR/Src/Y are exact and Cnt, Dst,
-// and X0 are each short once. The first divergence remains the setup LEA ModRM at +0x12, so this
-// is a stronger structural checkpoint, not a wall. On the later a237782 SIZE-neutral state this
-// same skeleton builds at 76.94% and 90/91 total occurrences: Cnt/Dst/X0 remain short once each,
-// while ClipR and Y are excess once each. Thus the normalized CFG gain is retained, but its current
-// relocation multiset is still open and must not be described as structurally complete.
+// On the macro-aware 7283868 state, retail-ordered destination publication and a clipped-dim
+// ClipR snapshot/local-count selection make Dst and ClipR exact. The source also explicitly owns
+// the remaining three retail sites: local X followed by global X0 in the initial horizontal test,
+// one currentY snapshot shared by both vertical tests, and ClipR -> original Cnt publication ->
+// local count selection in the clipped-dim X<clip arm. MSVC nevertheless forwards X instead of
+// reloading X0, reloads Y twice instead of holding one snapshot, and deletes the overwritten Cnt
+// publication. Direct global count mutation produces three excess Cnt sites; reading the published
+// global produces one excess site, so neither is retained. The final occurrence multiset is 90/91
+// with no candidate-only target and differs only by Cnt-1, X0-1, and Y+1. Candidate size is 0x590
+// versus retail 0x5af and the first divergence is still broad setup allocation at +0x11. This is
+// an evidenced structural checkpoint, not a compiler-state wall; see
+// icon2bc-occurrence-7283868.tsv and resume from the setup register/lifetime split.
 VA(0x004d32a0, 0x5af)
 void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                             int clip, int clipX, int clipY, int clipW, int clipH, int color,
@@ -121,8 +127,10 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
     gCTPitch = dest->m_width;
     gCTY = entries[frame].y + y;
     if (clip != 0) {
-        if (gCTX0 < clipX || clipW + clipX < entries[frame].w + gCTX0 || gCTY < clipY ||
-            clipY + clipH < entries[frame].h + gCTY) {
+        int currentY;
+        if (X < clipX || clipW + clipX < entries[frame].w + gCTX0 ||
+            (currentY = gCTY, currentY < clipY) ||
+            clipY + clipH < entries[frame].h + currentY) {
             clip = 1;
             gCTClipR = clipX + clipW - 1;
             gCTClipB = clipY + clipH - 1;
@@ -246,10 +254,13 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
                                 cn = (gCTClipR - X) + 1;
                             savedDst = row + X;
                         } else {
+                            int clipRight = gCTClipR;
                             gCTCnt = count;
-                            cn = clipW;
-                            if (right <= gCTClipR)
-                                cn = (count - clipX) + X;
+                            if (right <= clipRight)
+                                count = (count - clipX) + X;
+                            else
+                                count = clipW;
+                            cn = count;
                             savedDst = row + clipX;
                         }
                         gCTDimPal = palette;
@@ -289,18 +300,19 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
                         break;
                     }
                     int right = X + cmd;
-                    if (right <= clipX || gCTClipR < X) {
+                    if (right <= clipX || (gCTDst = savedDst, gCTClipR < X)) {
                         cnt = 0;
                         break;
                     }
+                    int clipRight = gCTClipR;
                     if (clipX <= X) {
                         savedDst = row + X;
-                        if (gCTClipR >= right)
+                        if (clipRight >= right)
                             cnt = cmd;
                         else
                             cnt = (gCTClipR - X) + 1;
                     } else {
-                        if (gCTClipR >= right)
+                        if (clipRight >= right)
                             cnt = (cmd - clipX) + X;
                         else
                             cnt = clipW;
