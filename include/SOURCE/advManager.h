@@ -15,6 +15,7 @@ class heroWindow;
 class icon;
 class iconWidget;
 class textWidget;
+class widget;
 class tileset;
 struct SAMPLE2;
 struct SMapChange;
@@ -34,6 +35,7 @@ public:
     int    m_selectedCell;  // +0x36
     union {
         int m_heroLocatorState[12];  // +0x3a
+        class widget *m_bottomViewPrimaryWidgets[12];
         struct {
             class iconWidget *m_bottomViewBackground;  // +0x3a
             class iconWidget *m_bottomViewHourglassBackground;  // +0x3e
@@ -43,6 +45,8 @@ public:
     };
     union {
         int m_townLocatorState[12];  // +0x6a
+        class widget *m_bottomViewSecondaryWidgets[12];
+        class textWidget *m_bottomViewAllTexts[12];
         struct {
             int m_bottomViewTextReserved;  // +0x6a
             class textWidget *m_bottomViewTexts[5];  // +0x6e
