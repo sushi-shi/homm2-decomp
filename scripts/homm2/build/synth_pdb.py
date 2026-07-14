@@ -9,7 +9,7 @@ set is COMPLETE and authoritative from CodeView, so this is a ONE-TIME step run 
 per-unit line info (no Ghidra functions.csv, no address-bucketed remainder).
 
 Pipeline:
-  build/gen/symbol_names.csv (rva,name,unit,size,kind)
+  build/gen/symbol_names.csv (rva,name,unit,size,kind,provenance)
       -> PDB-YAML (one DBI module; per-function C13 line info -> c:\\proj\\<unit>.c;
          S_GPROC32 for funcs, S_LDATA32 for data)
       -> `llvm-pdbutil yaml2pdb`  -> build/pdb/HEROES2W.pdb
