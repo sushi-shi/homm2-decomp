@@ -62,6 +62,70 @@ class TuStateNoiseTests(unittest.TestCase):
                     raise RuntimeError("stop")
             self.assertEqual(path.read_bytes(), original)
 
+    def test_record_target_max_updates_only_target_max_field(self):
+        with tempfile.TemporaryDirectory() as directory:
+            baseline = Path(directory) / "match_baseline.tsv"
+            original = (
+                b"# header\n"
+                b"BASE/other\t?Other@@\t100.0000\totherhash\n"
+                b"BASE/unit\t?Target@@YIXXZ\t90.0000\tabc123\textra-field\r\n"
+                b"BASE/tail\t?Tail@@\t88.0000\ttailhash"
+            )
+            baseline.write_bytes(original)
+            result = noise.record_target_max(
+                baseline, "BASE/unit", "?Target@@YIXXZ", "abc123", 95.4321
+            )
+            self.assertTrue(result["updated"])
+            self.assertEqual(result["old_max"], 90.0)
+            self.assertEqual(result["new_max"], 95.4321)
+            self.assertEqual(
+                baseline.read_bytes(),
+                original.replace(b"\t90.0000\tabc123\t", b"\t95.4321\tabc123\t"),
+            )
+
+    def test_record_target_max_noop_never_lowers_or_rewrites(self):
+        with tempfile.TemporaryDirectory() as directory:
+            baseline = Path(directory) / "match_baseline.tsv"
+            original = b"BASE/unit\t?Target@@YIXXZ\t97.2000\tabc123\n"
+            baseline.write_bytes(original)
+            for score, reason in ((96.0, "not_above_stored_max"), (None, "no_eligible_improvement")):
+                result = noise.record_target_max(
+                    baseline, "BASE/unit", "?Target@@YIXXZ", "abc123", score
+                )
+                self.assertFalse(result["updated"])
+                self.assertEqual(result["reason"], reason)
+                self.assertEqual(baseline.read_bytes(), original)
+
+    def test_record_target_max_refuses_hash_mismatch_without_write(self):
+        with tempfile.TemporaryDirectory() as directory:
+            baseline = Path(directory) / "match_baseline.tsv"
+            original = b"BASE/unit\t?Target@@YIXXZ\t90.0000\toldhash\n"
+            baseline.write_bytes(original)
+            with self.assertRaisesRegex(noise.BaselineUpdateError, "source hash mismatch"):
+                noise.record_target_max(
+                    baseline, "BASE/unit", "?Target@@YIXXZ", "newhash", 95.0
+                )
+            self.assertEqual(baseline.read_bytes(), original)
+
+    def test_record_target_max_refuses_missing_and_duplicate_rows(self):
+        with tempfile.TemporaryDirectory() as directory:
+            baseline = Path(directory) / "match_baseline.tsv"
+            cases = (
+                (b"BASE/other\t?Other@@\t90.0000\tabc123\n", "missing baseline row"),
+                (
+                    b"BASE/unit\t?Target@@YIXXZ\t90.0000\tabc123\n"
+                    b"BASE/unit\t?Target@@YIXXZ\t91.0000\tabc123\n",
+                    "duplicate baseline rows",
+                ),
+            )
+            for original, message in cases:
+                baseline.write_bytes(original)
+                with self.assertRaisesRegex(noise.BaselineUpdateError, message):
+                    noise.record_target_max(
+                        baseline, "BASE/unit", "?Target@@YIXXZ", "abc123", 95.0
+                    )
+                self.assertEqual(baseline.read_bytes(), original)
+
 
 if __name__ == "__main__":
     unittest.main()

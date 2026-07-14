@@ -8,8 +8,8 @@ compiles the real translation unit with VC 4.2, scores the requested symbol with
 objdiff, and restores the source immediately.
 
 The source is unchanged on normal exit, compiler failure, or Ctrl-C.  Results, exact
-snippets, COFF metrics, and a patch for the best eligible improvement are written to
-``build/tu-state-noise``.  The patch is never applied automatically.
+snippets, and COFF metrics are written to ``build/tu-state-noise``.  Generated noise
+is evidence only and is never written back to reconstructed source.
 
 Run inside ``nix develop .#build`` after entering the worktree first::
 
@@ -25,15 +25,16 @@ from __future__ import annotations
 
 import argparse
 import csv
-import difflib
 import hashlib
 import json
+import math
 import os
 import random
 import re
 import signal
 import subprocess
 import sys
+import tempfile
 import time
 import tomllib
 from contextlib import contextmanager
@@ -48,6 +49,10 @@ IMAGE_BASE = 0x400000
 DEFAULT_FAMILIES = ("macro", "conditional", "warning", "comment", "mixed")
 SAFE_MACRO_VALUES = ("0", "1", "(-1)", "(0x13579bdfUL)", "probe_token", "(1 + 2)")
 SAFE_WARNING_CODES = (4100, 4189, 4505)
+
+
+class BaselineUpdateError(ValueError):
+    pass
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -85,7 +90,7 @@ class Variant:
         # Restore the pre-existing logical line before any authored source token.
         # No filename is supplied, so an earlier #line filename remains unchanged.
         return (
-            f"// h2-tu-state-probe {self.tag} ({self.family}); generated, do not commit blindly\n"
+            f"// h2-tu-state-probe {self.tag} ({self.family}); generated evidence only\n"
             f"{self.body}"
             f"#line {logical_line}\n"
         )
@@ -329,14 +334,97 @@ def _predecessor_regressions(
     ]
 
 
-def write_patch(path: Path, source_rel: Path, original: str, candidate: str) -> None:
-    patch = difflib.unified_diff(
-        original.splitlines(keepends=True),
-        candidate.splitlines(keepends=True),
-        fromfile=str(source_rel),
-        tofile=str(source_rel),
-    )
-    path.write_text("".join(patch))
+def record_target_max(
+    baseline_path: Path,
+    unit: str,
+    symbol: str,
+    current_hash: str | None,
+    new_score: float | None,
+) -> dict:
+    """Validate one retained-max row and, if higher, replace only its max field.
+
+    All non-target bytes and all other target-row fields are preserved exactly.  Validation
+    happens even when *new_score* is None or not higher, so ``--record-max`` never silently
+    accepts a missing, duplicate, or stale-hash ledger.
+    """
+    original = baseline_path.read_bytes()
+    lines = original.splitlines(keepends=True)
+    matches = []
+    for index, line in enumerate(lines):
+        body = line.rstrip(b"\r\n")
+        if not body or body.startswith(b"#"):
+            continue
+        fields = body.split(b"\t")
+        if len(fields) >= 2 and fields[0].decode("utf-8") == unit and fields[1].decode("utf-8") == symbol:
+            matches.append((index, line, fields))
+    if not matches:
+        raise BaselineUpdateError(f"missing baseline row for {unit}::{symbol}")
+    if len(matches) != 1:
+        raise BaselineUpdateError(f"duplicate baseline rows for {unit}::{symbol}")
+    index, line, fields = matches[0]
+    if len(fields) < 4 or not fields[3]:
+        raise BaselineUpdateError(f"baseline row has no source hash for {unit}::{symbol}")
+    stored_hash = fields[3].decode("utf-8")
+    if current_hash is None:
+        raise BaselineUpdateError(f"current normalized source hash is missing for {unit}::{symbol}")
+    if current_hash != stored_hash:
+        raise BaselineUpdateError(
+            f"source hash mismatch for {unit}::{symbol}: baseline {stored_hash}, current {current_hash}"
+        )
+    try:
+        old_max = float(fields[2])
+    except (IndexError, ValueError) as exc:
+        raise BaselineUpdateError(f"invalid baseline max for {unit}::{symbol}") from exc
+    if not math.isfinite(old_max) or not 0.0 <= old_max <= 100.0:
+        raise BaselineUpdateError(f"invalid baseline max for {unit}::{symbol}: {old_max}")
+    result = {
+        "requested": True,
+        "updated": False,
+        "unit": unit,
+        "symbol": symbol,
+        "source_hash": current_hash,
+        "old_max": old_max,
+        "new_max": old_max,
+    }
+    if new_score is None:
+        result["reason"] = "no_eligible_improvement"
+        return result
+    if not math.isfinite(new_score) or not 0.0 <= new_score <= 100.0:
+        raise BaselineUpdateError(f"invalid eligible best for {unit}::{symbol}: {new_score}")
+    result["eligible_best"] = new_score
+    if new_score <= old_max:
+        result["reason"] = "not_above_stored_max"
+        return result
+
+    formatted_score = f"{new_score:.4f}"
+    written_max = float(formatted_score)
+    if written_max <= old_max:
+        result["reason"] = "not_above_stored_precision"
+        return result
+    ending = line[len(line.rstrip(b"\r\n")) :]
+    replacement_fields = list(fields)
+    replacement_fields[2] = formatted_score.encode("ascii")
+    lines[index] = b"\t".join(replacement_fields) + ending
+    updated = b"".join(lines)
+    if updated == original:
+        result["reason"] = "not_above_stored_precision"
+        return result
+
+    mode = baseline_path.stat().st_mode & 0o777
+    temporary_name = None
+    try:
+        with tempfile.NamedTemporaryFile(dir=baseline_path.parent, delete=False) as handle:
+            temporary_name = Path(handle.name)
+            handle.write(updated)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.chmod(temporary_name, mode)
+        os.replace(temporary_name, baseline_path)
+    finally:
+        if temporary_name is not None and temporary_name.exists():
+            temporary_name.unlink()
+    result.update({"updated": True, "new_max": written_max, "reason": "raised"})
+    return result
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -353,9 +441,15 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--output", type=Path, help="artifact directory (default: build/tu-state-noise/...)")
     parser.add_argument("--dry-run", action="store_true", help="resolve target and emit snippets without compiling")
+    parser.add_argument(
+        "--record-max", action="store_true",
+        help="after source restoration, raise only this target's retained max when an eligible best exceeds it",
+    )
     args = parser.parse_args(argv)
     if args.trials < 1:
         parser.error("--trials must be positive")
+    if args.dry_run and args.record_max:
+        parser.error("--record-max requires compiled trials, not --dry-run")
 
     root = Path(os.environ.get("HOMM2_DIR", Path.cwd())).resolve()
     try:
@@ -396,7 +490,8 @@ def main(argv: list[str] | None = None) -> int:
             "parser_visible_declarations": False,
             "runtime_or_linkage_effects": False,
             "source_restored_after_every_trial": True,
-            "automatic_application": False,
+            "generated_noise_retained_in_source": False,
+            "default_repository_mutation": False,
             "sibling_score_regressions_allowed": False,
             "exact_sibling_raw_or_reloc_changes_allowed": False,
             "target_size_or_reloc_count_distance_may_not_worsen": True,
@@ -404,14 +499,14 @@ def main(argv: list[str] | None = None) -> int:
         "baseline": None,
         "trials": [],
         "best": None,
+        "record_max": {"requested": args.record_max, "updated": False},
     }
 
     if args.dry_run:
         for variant in variants:
-            candidate = insert_variant(original, target, variant)
-            trial_path = output / f"trial-{variant.trial:04d}-{variant.family}.patch"
-            write_patch(trial_path, source_rel, original, candidate)
-            manifest["trials"].append({**asdict(variant), "patch": trial_path.name})
+            snippet_path = output / f"trial-{variant.trial:04d}-{variant.family}.snippet"
+            snippet_path.write_text(variant.block(target.logical_line))
+            manifest["trials"].append({**asdict(variant), "snippet": snippet_path.name})
         manifest["source_restored"] = target.source.read_bytes() == original_bytes
         (output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
         print(f"dry-run: {len(variants)} auditable variants in {output}")
@@ -452,7 +547,6 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     best = None
-    best_candidate = None
     rows = []
     interrupted = False
     old_term = signal.getsignal(signal.SIGTERM)
@@ -519,7 +613,6 @@ def main(argv: list[str] | None = None) -> int:
                     if trial["eligible"] and score > baseline_score + 1e-6:
                         if best is None or score > best["score"] + 1e-6:
                             best = trial
-                            best_candidate = candidate
                 trial_obj.unlink(missing_ok=True)
                 Path(str(trial_obj) + ".d").unlink(missing_ok=True)
             manifest["trials"].append(trial)
@@ -545,24 +638,52 @@ def main(argv: list[str] | None = None) -> int:
     (output / "trials.tsv").write_text(
         "trial\tfamily\tscore\tdelta\teligible\trejections\n" + "".join(rows)
     )
-    if best is not None and best_candidate is not None:
-        (output / "best.cpp").write_text(best_candidate)
-        write_patch(output / "best.patch", source_rel, original, best_candidate)
+    if best is not None:
         manifest["best"] = {
             "trial": best["trial"],
             "family": best["family"],
             "score": best["score"],
             "score_delta": best["score_delta"],
             "candidate": best["candidate"],
-            "patch": "best.patch",
-            "source": "best.cpp",
-            "requires_manual_semantic_raw_byte_and_relocation_audit": True,
+            "source_hash_unchanged": True,
+            "generated_noise_retained": False,
         }
     manifest["source_restored"] = target.source.read_bytes() == original_bytes
-    (output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     if not manifest["source_restored"]:
+        (output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
         print("FATAL: source restoration check failed", file=sys.stderr)
         return 3
+    record_error = False
+    if args.record_max and interrupted:
+        manifest["record_max"] = {
+            "requested": True,
+            "updated": False,
+            "reason": "search_interrupted",
+        }
+    elif args.record_max:
+        from homm2.match.status import source_hashes as project_source_hashes
+
+        current_hash = project_source_hashes().get((target.unit, target.symbol))
+        try:
+            manifest["record_max"] = record_target_max(
+                root / "config/match_baseline.tsv",
+                target.unit,
+                target.symbol,
+                current_hash,
+                best["score"] if best is not None else None,
+            )
+        except (OSError, BaselineUpdateError) as exc:
+            record_error = True
+            manifest["record_max"] = {
+                "requested": True,
+                "updated": False,
+                "refused": True,
+                "error": str(exc),
+            }
+    (output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
+    if record_error:
+        print(f"record-max refused: {manifest['record_max']['error']}", file=sys.stderr)
+        return 4
     if interrupted:
         return 130
     if best is None:
@@ -570,10 +691,19 @@ def main(argv: list[str] | None = None) -> int:
     else:
         print(
             f"best {baseline_score:.6f}% -> {best['score']:.6f}% (trial {best['trial']}); "
-            f"source restored; inspect {output / 'best.patch'}",
+            f"source restored; generated noise retained only in {output / 'manifest.json'}",
         )
         if best["score"] >= 100.0 - 1e-9:
-            print("100% is relocation-masked: explicitly apply, rebuild, and run homm2 relocs before retaining.")
+            print("100% is relocation-masked; the evidence still requires raw-byte and relocation review.")
+    if args.record_max:
+        state = manifest["record_max"]
+        if state["updated"]:
+            print(
+                f"retained max raised {state['old_max']:.4f}% -> {state['new_max']:.4f}% "
+                f"for unchanged source hash {state['source_hash']}"
+            )
+        else:
+            print(f"retained max unchanged: {state['reason']}")
     return 0
 
 
