@@ -55,8 +55,35 @@ class BaselineTest(unittest.TestCase):
             }]
         }
         block = status.readme_block(data, {})
+        self.assertIn("Functions exact-max", block)
+        self.assertEqual(block.count("1 / 1 (100.0%)"), 2)
+
+    def test_retained_exact_is_counted_separately_from_live_exact(self):
+        key = ("SOURCE/PHILAI", "?EvaluateTownEvent@@")
+        data = {
+            "units": [{
+                "name": key[0],
+                "measures": {"matched_functions": 0, "total_functions": 1},
+                "functions": [{"name": key[1], "size": 100,
+                               "fuzzy_match_percent": 95.0}],
+            }]
+        }
+        block = status.readme_block(data, {key: (100.0, "abc123")})
+        self.assertIn("0 / 1 (0.0%)", block)
         self.assertIn("1 / 1 (100.0%)", block)
-        self.assertIn("100.0%", block)
+
+    def test_near_exact_retained_score_is_not_counted_as_exact(self):
+        key = ("SOURCE/CMBTMGR", "?CatAttack@@")
+        data = {
+            "units": [{
+                "name": key[0],
+                "measures": {"matched_functions": 0, "total_functions": 1},
+                "functions": [{"name": key[1], "size": 100,
+                               "fuzzy_match_percent": 99.9977}],
+            }]
+        }
+        block = status.readme_block(data, {key: (99.9977, "abc123")})
+        self.assertEqual(block.count("0 / 1 (0.0%)"), 2)
 
 
 if __name__ == "__main__":
