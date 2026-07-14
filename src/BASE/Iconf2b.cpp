@@ -11,23 +11,23 @@
 #include <BASE/IconEntry.h>
 #include <string.h>
 // Per-call decoder scratch — its own file-static block (0x534c60+).
-DATA(0x00534c7c) static IconEntry *gFlipEntry;
+DATA(0x00534c78) static IconEntry *gFlipEntry;
 DATA(0x00534c68) static int gFlipX0;
-DATA(0x00534c6c) static int gFlipXEnd;
-DATA(0x00534c78) static int gFlipY;
-DATA(0x00534c80) static int gFlipX;
-DATA(0x00534c84) static unsigned char *gFlipSrc;
-DATA(0x00534ca0) static int gFlipClipR;
-DATA(0x00534c90) static int gFlipClipB;
-DATA(0x00534c94) static int gFlipRow;
+DATA(0x00534ca4) static int gFlipXEnd;
+DATA(0x00534c74) static int gFlipY;
+DATA(0x00534c7c) static int gFlipX;
+DATA(0x00534c80) static unsigned char *gFlipSrc;
+DATA(0x00534c9c) static int gFlipClipR;
+DATA(0x00534c8c) static int gFlipClipB;
+DATA(0x00534c90) static int gFlipRow;
 DATA(0x00534c64) static unsigned int gFlipRun;
-DATA(0x00534c9c) static unsigned char gFlipColor;
-DATA(0x00534c74) static unsigned int gFlipCnt2;
-DATA(0x00534c98) static unsigned int gFlipDimLen;
-DATA(0x00534c88) static unsigned char *gFlipDimPal;
-DATA(0x00534c70) static unsigned int gFlipCnt;
-DATA(0x00534c8c) static unsigned char *gFlipDimDst;
-DATA(0x00534ca4) static unsigned char *gFlipDst;
+DATA(0x00534c98) static unsigned char gFlipColor;
+DATA(0x00534c94) static unsigned int gFlipCnt2;
+DATA(0x00534c70) static unsigned int gFlipDimLen;
+DATA(0x00534c84) static unsigned char *gFlipDimPal;
+DATA(0x00534c6c) static unsigned int gFlipCnt;
+DATA(0x00534c88) static unsigned char *gFlipDimDst;
+DATA(0x00534ca0) static unsigned char *gFlipDst;
 DATA(0x00534c60) static int gFlipSkip;
 
 // @match-note
@@ -51,6 +51,13 @@ DATA(0x00534c60) static int gFlipSkip;
 // diagnostics did force memory ownership but regressed to 81.44%/80.44%, so they are not source
 // evidence and were discarded. See iconf2b-fresh-032a2b3.tsv; revisit only with a new real
 // aliasing/declaration surface that explains the retail spill without volatile semantics.
+// The 8116876 sibling-template differential aligned the retail decoder with iconf2bc/iconf2by
+// and recovered the exact scratch owner VAs: the earlier DATA annotations had assigned most
+// semantic roles to adjacent four-byte cells. The shared clipped-fill current-Y lifetime and
+// clipped-literal copy-count snapshot are retained, although VC4.2 emits the same 0x4e5 bytes.
+// Nested/early-reject gates were also byte-identical; a shared selected-destination lifetime
+// regressed to 85.78% and was discarded. See iconf2b-template-8116876.tsv. The remaining setup
+// and [esp+0x10] spill residual is still unresolved and is not a wall.
 VA(0x004d1ba0, 0x4f1)
 void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                       int clip, int clipX, int clipY, int clipW, int clipH, int color)
@@ -127,8 +134,9 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int
                 memset(reinterpret_cast<unsigned char *>((gFlipRow - count) + 1 + X), gFlipColor,
                        count);
             } else {
+                int currentY = gFlipY;
                 int left;
-                if (clipY <= (left = gFlipY) && left <= gFlipClipB &&
+                if (currentY >= clipY && currentY <= gFlipClipB &&
                     (left = (X - count) + 1, clipX <= left) && X <= gFlipClipR) {
                     if (clipX <= left) {
                         memset(reinterpret_cast<unsigned char *>((gFlipRow - count) + 1 + X),
@@ -218,7 +226,7 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int
                 }
             } else {
                 int currentY = gFlipY;
-                if (clipY <= currentY && currentY <= gFlipClipB) {
+                if (currentY >= clipY && currentY <= gFlipClipB) {
                     int left = (X - cmd) + 1;
                     if (left <= gFlipClipR && clipX <= X) {
                         unsigned int cn;
@@ -254,10 +262,11 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int
                     set_skip:
                         gFlipSkip = skip;
                     skip_set:
-                        gFlipCnt = 0;
+                        int copyCount = cn;
                         gFlipDimLen = cn;
-                        if (static_cast<int>(cn) > 0) {
-                            gFlipCnt = cn;
+                        gFlipCnt = 0;
+                        if (copyCount > 0) {
+                            gFlipCnt = copyCount;
                             do {
                                 unsigned char c = *src++;
                                 (gFlipDst = gFlipDst - 1)[1] = c;
