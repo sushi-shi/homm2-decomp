@@ -31,7 +31,7 @@
 #include <EDITOR/mapcell.h>
 #include <BASE/mouseManager.h>
 
-// Globals -> _globals.h; tag_tilePoint/monsterRV -> _types.h; called free functions
+// Globals -> _globals.h; tag_tilePoint/tag_monsterInfo -> _types.h; called free functions
 // from owner headers (Misc.h/KB.h/kbwin.h/NOOPT.h); PHILAI's own -> SOURCE/PHILAI.h.
 
 // __FILE__ for the NWC BaseAlloc/BaseFree memory tracking (reloc-masked path string).
@@ -2079,9 +2079,9 @@ void philAI::ValueOfBuyingBuilding(town *townPtr, int building, int &resourceVal
                  (1 << (buildingLevel + AI_BUILDING_FIRST_DWELLING))) &&
                 *reinterpret_cast<short *>(reinterpret_cast<char *>(townPtr) +
                                            0x1e + buildingLevel * 2) > 0 &&
-                gMonsterInfo[gDwellingType[reinterpret_cast<townView *>(townPtr)->race]
-                                          [building - AI_BUILDING_FIRST_DWELLING]].level <
-                    gMonsterInfo[currentCreatureType].level * 1.2) {
+                gMonsterDatabase[gDwellingType[reinterpret_cast<townView *>(townPtr)->race]
+                                              [building - AI_BUILDING_FIRST_DWELLING]].iconIndex <
+                    gMonsterDatabase[currentCreatureType].iconIndex * 1.2) {
                 adjustedValue = 0.0f;
                 break;
             }
@@ -2553,7 +2553,7 @@ float philAI::FutureDeflator(int *const p) {
 
 // @early-stop
 // Exact 0xbf8 code span with zero relocation-masked byte differences. All 72
-// relocation sites align; gMonsterInfo interior-field names are delinker aliases.
+// relocation sites align; retail delinks canonical monster-record field addends as local symbols.
 VA(0x0043fed2, 0xbf8)
 int philAI::FightValueOfStack(armyGroup *group, hero *heroPtr, int useHero,
                               int useTown, int townId, int useEnemyMods) {
@@ -2649,7 +2649,7 @@ int philAI::FightValueOfStack(armyGroup *group, hero *heroPtr, int useHero,
                 else
                     quantityModifierTarget = -0.58f;
 
-                if ((gMonsterInfo[group->m_creatureTypes[armySlotRecord]].attributes &
+                if ((gMonsterDatabase[group->m_creatureTypes[armySlotRecord]].attributes &
                      MONSTER_ATTRIBUTE_RANGED) ||
                     group->m_creatureTypes[armySlotRecord] == 0x34 ||
                     group->m_creatureTypes[armySlotRecord] == 0x35 ||
@@ -2667,24 +2667,24 @@ int philAI::FightValueOfStack(armyGroup *group, hero *heroPtr, int useHero,
                 stackValueMap = static_cast<int>((quantityModifierTarget + 1.0f) * stackValueMap);
 
                 if (useTown) {
-                    if (gMonsterInfo[group->m_creatureTypes[armySlotRecord]].attributes &
+                    if (gMonsterDatabase[group->m_creatureTypes[armySlotRecord]].attributes &
                         MONSTER_ATTRIBUTE_RANGED)
                         stackValueMap = static_cast<int>(stackValueMap * 1.18);
-                    if (gMonsterInfo[group->m_creatureTypes[armySlotRecord]].attributes &
+                    if (gMonsterDatabase[group->m_creatureTypes[armySlotRecord]].attributes &
                         MONSTER_ATTRIBUTE_FLYING)
                         stackValueMap = static_cast<int>(stackValueMap * 0.95);
                 }
-                if ((gMonsterInfo[group->m_creatureTypes[armySlotRecord]].attributes &
+                if ((gMonsterDatabase[group->m_creatureTypes[armySlotRecord]].attributes &
                      MONSTER_ATTRIBUTE_RANGED) && heroPtr &&
                     heroPtr->m_secondarySkills[1]) {
                     stackValueMap = static_cast<int>(stackValueMap *
                         gfSSAIArcheryMod[heroPtr->m_secondarySkills[1]]);
                 }
                 if (useEnemyMods) {
-                    if (gMonsterInfo[group->m_creatureTypes[armySlotRecord]].attributes &
+                    if (gMonsterDatabase[group->m_creatureTypes[armySlotRecord]].attributes &
                         MONSTER_ATTRIBUTE_RANGED)
                         stackValueMap = static_cast<int>(stackValueMap * enemyRangedModifier27);
-                    if (gMonsterInfo[group->m_creatureTypes[armySlotRecord]].attributes &
+                    if (gMonsterDatabase[group->m_creatureTypes[armySlotRecord]].attributes &
                         MONSTER_ATTRIBUTE_FLYING)
                         stackValueMap = static_cast<int>(stackValueMap * enemyMeleeModifierIndex);
                     else
@@ -2782,7 +2782,7 @@ int philAI::FightValueOfStack(armyGroup *group, hero *heroPtr, int useHero,
         townArcherValueValue = static_cast<int>(armyValue * 1.5);
     else if (townArcherValueValue > armyValue * 1.5) {
         townArcherValueValue = static_cast<int>(armyValue * 0.9);
-    } else if (armyValue < townArcherValueValue)
+    } else if ((armyValue | 0) < townArcherValueValue)
         townArcherValueValue = static_cast<int>(armyValue * 1.25);
     if (giDebugLevel == 9)
         LogInt("Fight Value", armyValue, spellValueMap, townArcherValueValue,
@@ -3130,8 +3130,9 @@ void philAI::HeroInteractionAtHero(hero *firstHero, hero *secondHero,
                 if (currentHero9->m_secondarySkills[statIndex8] !=
                     HERO_SKILL_LEVEL_NONE) {
                     heroValues27[heroIndex9] +=
-                        gSecondarySkillRV[statIndex8]
-                            [currentHero9->m_secondarySkills[statIndex8]];
+                        gSSValues[statIndex8]
+                            [currentHero9->m_secondarySkills[statIndex8] -
+                             AI_SECONDARY_SKILL_LEVEL_OFFSET];
                 }
             }
         }
@@ -4134,10 +4135,12 @@ int philAI::ComputeUpgradeValue(int a1, int a2) {
     int cnt = gpCurAIHero->CreatureTypeCount(a1);
     if (cnt == 0)
         return 0;
-    int result = (int)((float)((gMonsterInfo[a2].rv - gMonsterInfo[a1].rv) * cnt)
-                       * ((pdView *)gpCurPlayer)->upgradeFactor);
+    int result = static_cast<int>(
+        static_cast<float>((gMonsterDatabase[a2].fightValue -
+                            gMonsterDatabase[a1].fightValue) * cnt) *
+        reinterpret_cast<pdView *>(gpCurPlayer)->upgradeFactor);
     if (gpCurAIHero->CreatureTypeCount(a2) != 0)
-        result = (int)(result * 0.6);
+        result = static_cast<int>(result * 0.6);
     return result;
 }
 

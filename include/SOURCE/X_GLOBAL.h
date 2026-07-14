@@ -7,6 +7,15 @@
 
 class ExpCampaign;
 
+typedef enum SecondarySkillValueTableConstant {
+    SECONDARY_SKILL_VALUE_LEVEL_COUNT = HERO_SKILL_LEVEL_COUNT - 1
+} SecondarySkillValueTableConstant;
+
+typedef enum ElevationOverlayConstant {
+    ELEVATION_OVERLAY_COUNT = 25,
+    ELEVATION_OVERLAY_CELL_COUNT = 15
+} ElevationOverlayConstant;
+
 #pragma pack(push, 1)
 struct SCmbtObstacle {
     unsigned int terrainMask;
@@ -17,7 +26,7 @@ struct SCmbtObstacle {
 
 struct SElevationOverlay {
     unsigned short terrainMask;
-    signed char cellOffsets[15];
+    signed char cellOffsets[ELEVATION_OVERLAY_CELL_COUNT];
 };
 #pragma pack(pop)
 SIZE(SCmbtObstacle, 0xe);
@@ -98,7 +107,7 @@ extern short *gVesaMode;
 extern int gInitResourcesHuman[5][7];
 extern int gInitResourcesComputer[5][7];
 extern int gMineCharacteristics[8];
-extern int gSSValues[14][3];
+extern int gSSValues[HERO_SKILL_COUNT][SECONDARY_SKILL_VALUE_LEVEL_COUNT];
 extern unsigned char gArtifactLevel[104];
 extern int gUltArtifactAvgValue;
 extern signed char giVisRangeTown;
@@ -175,7 +184,7 @@ extern unsigned short wallPos[4][2];
 extern unsigned short towerPos[4][2];
 extern unsigned short doorPos[2][2];
 extern float *fTradingPostEfficency;
-extern struct SElevationOverlay sElevationOverlay[25];
+extern struct SElevationOverlay sElevationOverlay[ELEVATION_OVERLAY_COUNT];
 extern int gbDrawingPuzzle;
 extern int giWalkingFrom;
 extern int giWalkingFrom2;

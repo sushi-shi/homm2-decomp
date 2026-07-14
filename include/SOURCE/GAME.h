@@ -7,7 +7,7 @@
 // forward declarations (was <_all.h>):
 struct tag_message;
 
-// GAME-private types (configStruct / SCreatureInfo are shared, in _types.h).
+// GAME-private types (configStruct / tag_monsterInfo are shared, in _types.h).
 #pragma pack(push, 1)
 struct EventExtra {
     unsigned char unknown00;

@@ -1,9 +1,9 @@
 #ifndef HOMM2_GLOBALS_MODEL_H
 #define HOMM2_GLOBALS_MODEL_H
 #include <va.h>
-// Synthetic / MODELLING globals — readable aliases the matcher introduced for data that has
-// NO CodeView symbol of its own: overlay views of the monster-database region, and .rdata
-// float literals (MSVC-hashed ??_C@ names) referenced as named consts for reloc control.
+// Synthetic / MODELLING globals — readable names the matcher introduced for data that has
+// NO CodeView symbol of its own: .rdata float literals (MSVC-hashed ??_C@ names) referenced
+// as named consts for relocation control, plus anonymous data slots still being reconstructed.
 // They DO have retail addresses; those marked DATA-PENDING are pinned from the reloc when
 // their user function is byte-matched (they alias object-local literals / computed bases).
 // Kept OUT of _globals.h (which is CodeView-backed) — assert_globals_data exempts these.
@@ -12,13 +12,6 @@
 #include <SOURCE/comwin.h>
 
 // VAs pinned from the retail disassembly of the referencing fns (no CodeView symbol of their own):
-DATA(0x004faeb8) extern SCreatureInfo gCreatureInfo[];   // monster-DB view (game::ExperienceValueOfStack)
-DATA(0x004faeb2) extern monsterRV gMonsterInfo[100];     // monster-DB view, 26B recs (philAI::ComputeUpgradeValue)
-// The retail base includes the zero-level entry used by the one-based skill
-// level index, so an expert value aliases the next row's leading entry.
-#define HERO_SECONDARY_SKILL_VALUE_LEVELS 3
-DATA(0x004fabf4) extern int gSecondarySkillRV[][HERO_SECONDARY_SKILL_VALUE_LEVELS];
-DATA(0x004fdf52) extern signed char gCombatFormations[][17];
 // (gRVWeightOre/Merc/Crystal removed — they were just gafAITurnCostResource[2|1|4]; the code
 //  now indexes the array directly via the RES_* enum, which matches the retail byte-for-byte.)
 DATA(0x0051ef24) extern char gDefaultCursorName[]; // default cursor resource name (mouseManager::SetColorMice)

@@ -167,28 +167,28 @@ void army::LoadResources(void)
     ModifyFrameInfo(&m_frameInfo, m_monsterType);
     m_walkDuration = m_frameInfo.walkDuration;
 
-    sprintf(gText, "%smove.82M", m_monster.unknown11);
+    sprintf(gText, "%smove.82M", m_monster.spriteName);
     m_samples[ARMY_SAMPLE_MOVE] = gpResourceManager->GetSample(gText);
-    sprintf(gText, "%sattk.82M", m_monster.unknown11);
+    sprintf(gText, "%sattk.82M", m_monster.spriteName);
     m_samples[ARMY_SAMPLE_ATTACK] = gpResourceManager->GetSample(gText);
-    sprintf(gText, "%swnce.82M", m_monster.unknown11);
+    sprintf(gText, "%swnce.82M", m_monster.spriteName);
     m_samples[ARMY_SAMPLE_WINCE] = gpResourceManager->GetSample(gText);
-    sprintf(gText, "%skill.82M", m_monster.unknown11);
+    sprintf(gText, "%skill.82M", m_monster.spriteName);
     m_samples[ARMY_SAMPLE_KILL] = gpResourceManager->GetSample(gText);
 
     if (m_monster.flags.all & MONSTER_FLAGS_SHOOTER) {
-        sprintf(gText, "%sshot.82M", m_monster.unknown11);
+        sprintf(gText, "%sshot.82M", m_monster.spriteName);
         m_samples[ARMY_SAMPLE_SHOT] = gpResourceManager->GetSample(gText);
     }
     if (m_monsterType == ARMY_CREATURE_VAMPIRE ||
         m_monsterType == ARMY_CREATURE_VAMPIRE_LORD) {
-        sprintf(gText, "%sext1.82M", m_monster.unknown11);
+        sprintf(gText, "%sext1.82M", m_monster.spriteName);
         m_samples[ARMY_SAMPLE_EXTRA_ONE] = gpResourceManager->GetSample(gText);
-        sprintf(gText, "%sext2.82M", m_monster.unknown11);
+        sprintf(gText, "%sext2.82M", m_monster.spriteName);
         m_samples[ARMY_SAMPLE_EXTRA_TWO] = gpResourceManager->GetSample(gText);
     } else if (m_monsterType == ARMY_CREATURE_LICH ||
                m_monsterType == ARMY_CREATURE_POWER_LICH) {
-        sprintf(gText, "%sexpl.82M", m_monster.unknown11);
+        sprintf(gText, "%sexpl.82M", m_monster.spriteName);
         m_samples[ARMY_SAMPLE_EXTRA_ONE] = gpResourceManager->GetSample(gText);
     }
 

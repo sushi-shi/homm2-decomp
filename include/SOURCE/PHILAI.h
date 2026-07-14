@@ -2,7 +2,7 @@
 #define HOMM2_PHILAI_TU_H
 #include <va.h>
 // AI view/record structs + free functions DEFINED in PHILAI.cpp — single home.
-// (tag_tilePoint / monsterRV are shared, in _types.h.)
+// (tag_tilePoint and tag_monsterInfo are shared, in _types.h.)
 // forward declarations (was <_all.h>):
 class army;
 class hero;
