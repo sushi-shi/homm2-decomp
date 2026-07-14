@@ -24,7 +24,7 @@ Review relocation-count deficits among incomplete functions:
     homm2 relocs --counts BASE
 Run from repo root; exits 1 on any wrong/fabricated reloc target.
 """
-import sys, os, re, csv, json, glob, subprocess
+import sys, os, re, csv, json, glob, struct, subprocess
 from collections import Counter
 
 IMAGE_BASE = 0x400000
@@ -95,33 +95,104 @@ def _addend(insn):
     imms = re.findall(r'\$(-?0x[0-9a-f]+)', insn)
     return int(imms[-1], 16) & 0xffffffff if imms else 0     # -0x4c disp -> 0xffffffb4 addend
 
-def parse_obj(obj):
-    """llvm-objdump -dr -> {func_name: [(type, symbol, addend), ...]} in order; __imp__ skipped."""
+def parse_obj(obj, with_sites=False):
+    """llvm-objdump -dr -> ordered relocations per function; __imp__ skipped.
+
+    ``with_sites`` prefixes each relocation with its function-relative COFF offset.  Those offsets
+    let the empty-COMDAT audit recover the original retail REL32 destination from the PE without
+    weakening ordinary target checking.
+    """
     out = subprocess.run(["llvm-objdump", "-dr", obj], capture_output=True, text=True).stdout
-    funcs, cur, prev = {}, None, ""
+    funcs, cur, cur_start, prev = {}, None, 0, ""
     for ln in out.splitlines():
-        m = re.match(r'^[0-9a-f]+ <(.+?)>:', ln)
+        m = re.match(r'^([0-9a-f]+) <(.+?)>:', ln)
         if m:
-            name = m.group(1)
+            name = m.group(2)
             if name.startswith('$') and cur is not None:
                 # MSVC emits block labels as COFF symbols inside a function COMDAT. llvm-objdump
                 # prints each as a new title, but its following relocations still belong to the
                 # containing function; do not truncate the function at the first local label.
                 prev = ""
                 continue
-            cur = name; funcs.setdefault(cur, []); prev = ""; continue
+            cur = name
+            cur_start = int(m.group(1), 16)
+            funcs.setdefault(cur, [])
+            prev = ""
+            continue
         if cur is None:
             continue
         mr = re.search(r'IMAGE_REL_I386_(\w+)\s+(\S+)', ln)
         if mr:
             s = mr.group(2)
             if not s.startswith('__imp__'):
-                funcs[cur].append((mr.group(1), s, _addend(prev)))
+                reloc = (mr.group(1), s, _addend(prev))
+                if with_sites:
+                    mo = re.match(r'^\s*([0-9a-f]+):', ln)
+                    funcs[cur].append((int(mo.group(1), 16) - cur_start,) + reloc)
+                else:
+                    funcs[cur].append(reloc)
             continue
         mi = re.match(r'^\s*[0-9a-f]+:\s+(?:[0-9a-f]{2}\s+)+(.+)$', ln)
         if mi:
             prev = mi.group(1).replace('\t', ' ').strip()
     return funcs
+
+_PE_SECTIONS = None
+
+def _pe_sections():
+    """Return (image bytes, [(rva, span, raw offset), ...]) for the authoritative retail PE."""
+    global _PE_SECTIONS
+    if _PE_SECTIONS is not None:
+        return _PE_SECTIONS
+    data = open("build/orig/HEROES2W.EXE", "rb").read()
+    pe = struct.unpack_from("<L", data, 0x3c)[0]
+    nsec = struct.unpack_from("<H", data, pe + 6)[0]
+    optsz = struct.unpack_from("<H", data, pe + 20)[0]
+    sections = []
+    off = pe + 24 + optsz
+    for i in range(nsec):
+        sh = off + i * 40
+        vsize, rva, raw_size, raw = struct.unpack_from("<LLLL", data, sh + 8)
+        sections.append((rva, max(vsize, raw_size), raw))
+    _PE_SECTIONS = data, sections
+    return _PE_SECTIONS
+
+def _pe_read(rva, size):
+    data, sections = _pe_sections()
+    for start, span, raw in sections:
+        if start <= rva and rva + size <= start + span:
+            off = raw + rva - start
+            return data[off:off + size]
+    return None
+
+def _normalize_empty_stub_relocs(function_rva, target_relocs, base_sites, target_sites, sym, data):
+    """Recover delinked ``empty_stub`` identities from the original retail REL32 bytes.
+
+    Acceptance is site-specific: the base and target relocations must occupy the same relative
+    field, and the retail PE displacement at that field must resolve to the base CodeView callee.
+    A wrong named empty function therefore remains a wrong target instead of being generically
+    allowlisted merely because its body also returns.
+    """
+    base_by_site = {r[0]: r[1:] for r in base_sites}
+    normalized = []
+    for reloc, site_reloc in zip(target_relocs, target_sites):
+        site, typ, target_name, _add = site_reloc
+        if typ != 'REL32' or target_name != 'empty_stub':
+            normalized.append(reloc)
+            continue
+        base = base_by_site.get(site)
+        if base is None or base[0] != 'REL32':
+            normalized.append(reloc)
+            continue
+        base_rva = resolve(sym, data, *base)
+        disp_bytes = _pe_read(function_rva + site, 4)
+        if base_rva is None or disp_bytes is None:
+            normalized.append(reloc)
+            continue
+        disp = struct.unpack("<l", disp_bytes)[0]
+        retail_rva = (function_rva + site + 4 + disp) & 0xffffffff
+        normalized.append(base if retail_rva == base_rva else reloc)
+    return normalized
 
 # Pre-existing reloc-target discrepancies surfaced when this gate was introduced (objdiff masked
 # them, so they scored ~100%). Two kinds: (A) SUSPECTED wrong VA — a base symbol that disagrees with
@@ -194,17 +265,20 @@ def _function_for_arg(arg):
             except (KeyError, ValueError):
                 continue
             if row["name"] == arg or (wanted_rva is not None and row_rva == wanted_rva):
-                return row["unit"], row["name"]
+                return row["unit"], row["name"], row_rva
     raise SystemExit("function not found in build/gen/symbol_names.csv: %s" % arg)
 
 def review(rva):
     """Single-function multiset review (order-independent; usable on <100% walls)."""
     sym, data, dups = load_symbols()
-    unit, name = _function_for_arg(rva)
+    unit, name, function_rva = _function_for_arg(rva)
     base_obj = "build/objdiff/base/%s.obj" % unit
     target_obj = "build/delink/%s.c.obj" % unit
     B = parse_obj(base_obj).get(name, [])
     T = parse_obj(target_obj).get(name, [])
+    BS = parse_obj(base_obj, with_sites=True).get(name, [])
+    TS = parse_obj(target_obj, with_sites=True).get(name, [])
+    T = _normalize_empty_stub_relocs(function_rva, T, BS, TS, sym, data)
     for s in sorted({r[1] for r in B if is_fake(sym, data, r[1])}):
         print("  !! FAKE base references '%s'" % s)
     def bvas(rs):
@@ -287,6 +361,11 @@ def main():
     if len(sys.argv) > 1:                        # single-function review mode
         review(sys.argv[1]); return 0
     sym, data, dups = load_symbols()
+    function_rvas = {}
+    with open("build/gen/symbol_names.csv", encoding="latin-1") as f:
+        for row in csv.DictReader(f):
+            if row.get("kind") == "func":
+                function_rvas[(row["unit"], row["name"])] = int(row["rva"], 0)
     report = json.load(open("build/objdiff/report.json"))
     bad = []
     # A WRONG reloc doesn't drop objdiff to a low %, it costs a TINY fraction (~0.005%/reloc) that
@@ -303,10 +382,14 @@ def main():
         if not (os.path.exists(base_obj) and os.path.exists(tgt_obj)):
             continue
         bf, tf = parse_obj(base_obj), parse_obj(tgt_obj)
+        bfs = parse_obj(base_obj, with_sites=True)
+        tfs = parse_obj(tgt_obj, with_sites=True)
         for name in sorted(exact):
             if name not in bf or name not in tf:
                 continue
-            for p in check_fn(sym, data, dups, unit, name, bf[name], tf[name]):
+            target_relocs = _normalize_empty_stub_relocs(
+                function_rvas[(unit, name)], tf[name], bfs[name], tfs[name], sym, data)
+            for p in check_fn(sym, data, dups, unit, name, bf[name], target_relocs):
                 bad.append((unit, name, p))
     for unit, name, p in bad:
         print("  %s  %s: %s" % (unit, name, p))

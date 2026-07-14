@@ -242,7 +242,7 @@ BASE/Misc	?ProcessAssert@@YIXHPADH@Z	100.0000	55af4092448f
 BASE/Misc	?Random@@YIHHH@Z	100.0000	1a18aa51eec7
 BASE/Misc	?ReadPrefs@@YIXXZ	100.0000	fae13d490334
 BASE/Misc	?ReadPrefsFromFile@@YIXXZ	100.0000	28ea51fe4825
-BASE/Misc	?ReadPrefsFromRegistry@@YIXXZ	100.0000	4779d987ef23
+BASE/Misc	?ReadPrefsFromRegistry@@YIXXZ	100.0000	bb99b4666009
 BASE/Misc	?SGenRand@@YIHXZ	90.6364	6596b97003fb
 BASE/Misc	?SIncRandomize@@YIXHH@Z	54.8125	2b5bf7e2efed
 BASE/Misc	?SRand@@YIXH@Z	100.0000	48faf7bbdee5
@@ -341,7 +341,7 @@ BASE/WINDOW	?DrawWindow@heroWindow@@QAEXXZ	100.0000	05354f94dd26
 BASE/WINDOW	?MoveWindow@heroWindow@@QAEXHH@Z	100.0000	d30f8d9539a4
 BASE/WINDOW	?Open@heroWindow@@QAEHHH@Z	100.0000	127d04be21ab
 BASE/WINDOW	?RemoveAndDeleteWidget@heroWindow@@QAEXH@Z	100.0000	729dcdcf9c3b
-BASE/WINDOW	?RemoveWidget@heroWindow@@QAEXPAVwidget@@@Z	100.0000	2a2e6f78208b
+BASE/WINDOW	?RemoveWidget@heroWindow@@QAEXPAVwidget@@@Z	100.0000	04796a289906
 BASE/WINDOW	?RestoreBackground@heroWindow@@QAEXXZ	100.0000	1ad6adddfb67
 BASE/WINDOW	?SaveBackground@heroWindow@@QAEHXZ	100.0000	b4aefb12dfaa
 BASE/WINMGR	??0heroWindowManager@@QAE@XZ	100.0000	4113cba8c1df
