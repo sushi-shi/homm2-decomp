@@ -220,11 +220,11 @@ must continue from the three remaining `gFCY` loads before taking unrelated work
 
 Canonical source state:
 
-- checkpoint: `7386907`
+- checkpoint: `eda2a36`
 - target: RVA `0xd9790`, retail size `0x54d`
 - `src/BASE/iconf2bc.cpp`:
-  `648ecb4b963c5b97aea5908738d26509ad680853a3041817321b61aa955070f9`
-- live checkpoint: 83.4333%, candidate size `0x550`, 86 candidate vs 83 retail relocations,
+  `98ba8916cb186d89ddcded1d270e23cdf72430d2f063a25670a9b8b66021084d`
+- live checkpoint: 83.458435%, candidate size `0x54f`, 86 candidate vs 83 retail relocations,
   no base-only target
 - the command decoder now begins at the exact retail offset `+0xec`
 
@@ -236,12 +236,14 @@ Canonical source state:
   per-iteration palette reloads;
 - rebuilt unclipped and four-quadrant clipped color-table literal loops;
 - restored source advancement for fully clipped literal runs;
+- restored the retail-evidenced branch-selected literal destination cursor, common skip
+  publication, and literal-count snapshot lifetime;
 - corrected the `gFCClipR` lifetime/count to agree with retail;
 - matched every external relocation target and every scratch-global occurrence count except
   `gFCY`.
 
 The remaining measured relocation delta is exactly three redundant retail `gFCY` loads. Every
-other scratch-global occurrence count agrees. Candidate code ends three bytes after retail. These
+other scratch-global occurrence count agrees. Candidate code ends two bytes after retail. These
 facts are the next concrete steering target; they are not evidence that the residual is impossible.
 
 ### Searches already exhausted
@@ -256,6 +258,11 @@ function-wide and nested vertical-coordinate locals (including `register` spelli
 entry aliases, source-pointer spellings, dim-loop statement order, palette aliases, and literal
 cursor forms. Losing variants were reverted; the retained forms are the canonical checkpoint
 above. No permutation tool was used, and the regex permuter was never used.
+
+The complete source-hash matrix, including every measured score, size/frame, relocation count, and
+retained/reverted/byte-identical disposition, is in
+[`docs/iconf2bc-experiment-matrix.md`](iconf2bc-experiment-matrix.md). Treat that file as the
+authoritative no-repeat list for this source/header state.
 
 Continue specifically from the three missing `gFCY` loads and the first structural divergence.
 Record each new source-hash-distinct shape with its match, size, frame, and relocation result. Do
