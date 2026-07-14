@@ -80,10 +80,10 @@ hashes while the source and header state agree. The regex permuter was never use
 
 ## BASE/iconf2by manual reconstruction
 
-`iconf2by-manual.tsv` contains 113 full-SHA manual source states spanning the 85.72% through
+`iconf2by-manual.tsv` contains 131 full-SHA manual source states spanning the 84.29% through
 93.72654% reconstruction. Each row records the source hash, source-shape label, match, candidate
 size/frame, relocation counts, and disposition. Its SHA-256 is
-`6eff06a7967f2b24097ed69d8638dfedda7562cb9366498f607496dcb80466b7`.
+`d546bd7d633fa3dde7c268ae163961575b38251bd0f870079183fd1af4be0e92`.
 
 The current source is restored to
 `f33ab84fe5e3b9205e40ae09de314bced82063fe587bddee30646c73d44bfea0`. The first normalized
@@ -94,6 +94,13 @@ raises the match to 93.72654%; the branch-local fill snapshot keeps the fill `gF
 the vertical checks, matching retail's source lifetime. CodeView has no symbol
 subsection for this TU, so neither stack-local nor optimized-register names exist; the matrix—not
 guessed local names—is the no-repeat oracle. No permutation tool was used.
+
+The integrated-root `4d381e1` continuation added 18 combined-TU states. Direct, commuted,
+`register`, and top-level-`const` width/shear/fill spellings were byte-neutral; retail-order edge
+publication remained 92.544235% and did not free EBP; restoring the owner/Misc declaration surface
+fell to 84.28954% with 141/144 relocations; and an unsigned global run fell to 89.83914% with no
+frame and 141/144 relocations. Keep the current narrow headers and declaration order pinned, and do
+not recombine these axes before a newly retained predecessor/shared-header state exists.
 
 ## BASE/Textntry fresh lifetime and semantic-name pass
 
