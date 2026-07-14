@@ -36,6 +36,11 @@ class townManager;
 #include <_types.h>
 #include <_carcass_types.h>
 
+typedef enum GlobalTimerConstant {
+    GLOBAL_TIMER_COUNT = 10,
+    GLOBAL_COMBAT_CYCLE_TIMER_SLOT = 8
+} GlobalTimerConstant;
+
 typedef enum CampaignSide {
     CAMPAIGN_ROLAND = 0,
     CAMPAIGN_ARCHIBALD = 1,
@@ -929,7 +934,7 @@ extern int giThisGamePos;
 extern int giThisNetPos;
 extern int giTotalHighMem;
 extern int giWaitType;
-extern int glTimers[];
+extern int glTimers[GLOBAL_TIMER_COUNT];
 extern int gMageBaseResourceValues[];
 extern int gMageBuildingCosts[][7];
 extern tag_monsterInfo gMonsterDatabase[MONSTER_DATABASE_COUNT];

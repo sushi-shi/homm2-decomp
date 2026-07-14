@@ -21,6 +21,7 @@
 #include <_globals_model.h>
 
 
+DATA(0x0051ef24) static char gDefaultCursorName[] = "";
 
 // ---- module-private synthetic globals (retail xref: single-module) ----
 DATA(0x00533238) static int gOldMouseRight;

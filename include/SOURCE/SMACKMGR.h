@@ -74,6 +74,7 @@ struct SmackMilesDigitalDriver {
 SIZE(tag_rect, 8);
 SIZE(SSmackOptions, 45);
 SIZE(SmackMilesDigitalDriver, 0x50);
+SIZE(SmackSum, 0x4c);
 
 extern "C" __declspec(dllimport) int __stdcall AIL_get_preference(unsigned int);
 

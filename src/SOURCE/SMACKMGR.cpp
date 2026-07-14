@@ -24,6 +24,8 @@
 #include <stdio.h>
 #include <string.h>
 
+DATA(0x00522f7c) static signed char bExpansionSmackNum;
+
 VA(0x00401000, 0x4e)
 void ConvertSmackerPalette(unsigned char *paletteData) {
     int i;

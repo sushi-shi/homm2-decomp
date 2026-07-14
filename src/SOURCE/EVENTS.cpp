@@ -5094,8 +5094,9 @@ int advManager::DoCombat(int x, int y, hero *firstHero, armyGroup *firstArmy,
     if (firstPlayer >= 0 && secondPlayer >= 0 &&
         gbHumanPlayer[secondPlayer]) {
         if (!gbThisNetHumanPlayer[secondPlayer]) {
-            iCombatControlNetPos = reinterpret_cast<int *>(giThisNetPos);
-            iCombatControlGamePos = gbGamePosToNetPos[secondPlayer];
+            iCombatControlNetPos[COMBAT_ATTACKER_SIDE] = giThisNetPos;
+            iCombatControlNetPos[COMBAT_DEFENDER_SIDE] =
+                gbGamePosToNetPos[secondPlayer];
             SendHeroTownData(x, y, firstHero, firstArmy, combatTown, secondHero,
                              secondArmy, firstSide, secondSide, randomSeed,
                              gbGamePosToNetPos[secondPlayer], 0, 0, 0);
@@ -5378,8 +5379,8 @@ void advManager::ReceiveHeroTownData(
         memcpy(*combatTown, packet + 64, sizeof(town));
     }
 
-    iCombatControlNetPos = reinterpret_cast<int *>(*remotePlayer);
-    iCombatControlGamePos = giThisNetPos;
+    iCombatControlNetPos[COMBAT_ATTACKER_SIDE] = *remotePlayer;
+    iCombatControlNetPos[COMBAT_DEFENDER_SIDE] = giThisNetPos;
     result7 = TransmitRemoteData(0, *remotePlayer, 0,
                                  COMBAT_REMOTE_CONFIRM_COMMAND,
                                  COMBAT_REMOTE_FRAGMENT_TYPE,

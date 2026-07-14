@@ -1102,9 +1102,9 @@ void game::NewMap(char *filename)
     if (extension0 != 0 && StrEqNoCase(extension0 + 1, "MX2"))
         xIsExpansionMap = 1;
     if (xIsExpansionMap)
-        gMapTypeFlags |= 4;
+        gTownEligibleBuildMask[TOWN_TYPE_NECROMANCER] |= 4;
     else
-        gMapTypeFlags &= ~4;
+        gTownEligibleBuildMask[TOWN_TYPE_NECROMANCER] &= ~4;
 
     gbInNewGameSetup = 1;
     giCurPlayer = 0;

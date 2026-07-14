@@ -4558,7 +4558,15 @@ DATA(0x004fa65c) int giScreenScroll;
 DATA(0x004fa660) int giMenuCommand;
 DATA(0x004fa664) int gbSendMouseMoveMessages;
 DATA(0x004fa668) int gbColorMice;
-DATA(0x004fa670) unsigned long gTownEligibleBuildMask[6];
+DATA(0x004fa670) unsigned long
+    gTownEligibleBuildMask[TOWN_ELIGIBLE_BUILD_MASK_COUNT] = {
+        TOWN_ELIGIBLE_BUILD_KNIGHT_MASK,
+        TOWN_ELIGIBLE_BUILD_BARBARIAN_MASK,
+        TOWN_ELIGIBLE_BUILD_SORCERESS_MASK,
+        TOWN_ELIGIBLE_BUILD_WARLOCK_MASK,
+        TOWN_ELIGIBLE_BUILD_WIZARD_MASK,
+        TOWN_ELIGIBLE_BUILD_NECROMANCER_MASK
+    };
 DATA(0x004fa688) unsigned char giMapSizes[4];
 DATA(0x004fa68c) int gbUseEvilInterface;
 DATA(0x004fa690) char *cEvilTranslate[37][2];
@@ -5223,7 +5231,7 @@ DATA(0x00528cb0) signed char gcColorToSetupPos[8];
 DATA(0x00528cb8) char gFullMapName[GLOBAL_MAP_NAME_SIZE];
 DATA(0x00528cd0) char gcTCPName[GLOBAL_TCP_TEXT_SIZE];
 DATA(0x00528ce8) int giShowIntro;
-DATA(0x00528cf0) int glTimers[10];
+DATA(0x00528cf0) int glTimers[GLOBAL_TIMER_COUNT];
 DATA(0x00528d18) int giScore;
 DATA(0x00528d1c) armyGroup *gpMonGroup;
 DATA(0x00528d20) configStruct gConfig;
@@ -5243,7 +5251,7 @@ DATA(0x00529118) char gLastFilename[GLOBAL_AGGREGATE_PATH_SIZE];
 DATA(0x00529278) int giFullySeeded;
 DATA(0x0052927c) icon *gBuyBuildIcons;
 DATA(0x00529280) int gbNoSound;
-DATA(0x00529288) int *iCombatControlNetPos;
+DATA(0x00529288) int iCombatControlNetPos[COMBAT_CONTROL_SIDE_COUNT];
 DATA(0x00529290) char cExpAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
 DATA(0x005293f0) int gbMoveShown;
 DATA(0x005293f4) void **ppMapExtra;
