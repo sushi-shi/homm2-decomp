@@ -15,6 +15,8 @@ def main(argv=None):
         return sh("python3", "configure.py")
     if cmd == "clangd":
         from homm2.init.clangd import main as m; return m()
+    if cmd == "enum-types":
+        from homm2.enum_types import main as m; return m(rest)
     if cmd == "build":
         if sh("python3", "configure.py"): return 1
         if sh("ninja", *rest): return 1
@@ -44,5 +46,6 @@ def main(argv=None):
         from homm2.analysis.sema import main as m; return m(rest)
     if cmd == "ghidra":
         from homm2.ghidra.driver import cli_main as m; return m(rest)
-    print("usage: homm2 {init|configure|build|clangd|status|relocs|sema|ghidra}", file=sys.stderr)
+    print("usage: homm2 {init|configure|build|clangd|enum-types|status|relocs|sema|ghidra}",
+          file=sys.stderr)
     return 0 if cmd in ("help", "-h", "--help") else 1
