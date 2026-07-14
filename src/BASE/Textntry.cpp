@@ -44,22 +44,23 @@ textEntryWidget::textEntryWidget(short p1, short p2, short p3, short p4, short p
                                  short p13, int p14, int p15)
     : textWidget(p1, p2, p3, p4, p6, p7, p8, p11, p12, 1)
 {
-    m_maxLength = p5;
     field_0x31 = 0;
+    m_maxLength = p5;
     icon *loadedIcon;
     loadedIcon = gpResourceManager->GetIcon(p9);
-    short rectX = m_x;
-    m_icon = loadedIcon;
+    short rectX;
+    rectX = m_x;
     field_0x4b = 0;
+    m_icon = loadedIcon;
     field_0x2f = p10;
-    m_rectW = m_width;
     m_rectX = rectX;
     field_0x14 = 0x4000;
     m_rectY = m_y;
+    m_rectW = m_width;
     m_maxLength = p5;
+    m_color = 1;
     field_0x45 = 1;
     m_hasInset = 0;
-    m_color = 1;
     m_rectH = m_height;
 #line 61 "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp"
     m_text = static_cast<char *>(
@@ -67,8 +68,8 @@ textEntryWidget::textEntryWidget(short p1, short p2, short p3, short p4, short p
     strcpy(m_text, p6);
     if (p13 == 4) {
         m_innerX = p14 + m_x;
-        m_innerY = p15 + m_y;
         m_hasInset = 1;
+        m_innerY = p15 + m_y;
         m_innerW = m_width + -2 * p14;
         m_innerH = m_height;
     }
