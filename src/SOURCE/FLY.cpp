@@ -17,6 +17,10 @@
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/PATH.h>
 #include <SOURCE/X_GLOBAL.h>
+// @match-note: Semantic CFG and the 0x0c frame are complete; all 14 relocations
+// agree. First residual is +0x0f..+0x11: retail stores candidateHex at [ebp-0x8],
+// ours at [ebp-0x4], with cell in the opposite slot. od_slots suffixes, declaration/
+// initialization order, cached/direct cell access, and wide-branch polarity were tried.
 VA(0x004a5900, 0x295)
 int army::CanFit(int hex, int tryOtherSide, int *fittingHex)
 {
@@ -79,6 +83,10 @@ int army::CanFit(int hex, int tryOtherSide, int *fittingHex)
     return 1;
 }
 
+// @match-note: Semantic CFG is complete and all 18 relocations agree. First
+// residual is +0x03..+0x05: retail frame 0x38, ours 0x30 (8 bytes short); NB09
+// has no local records for slot recovery. Local names/order/scope, attackHex forms,
+// cached/direct target access, if/ternary forms, and direction-loop polarity were tried.
 VA(0x004a5b95, 0x405)
 int army::ValidFlight(int destination, int fromTargetHex)
 {
@@ -193,6 +201,12 @@ int army::FlyTo(void)
     return FlyTo(m_moveTargetHex);
 }
 
+// @match-note: Semantic CFG is complete and all 119 relocations agree. First
+// residual is +0x03..+0x08: retail frame 0xc0, ours 0xb4 (12 bytes short); NB09
+// has no local records. Local names/order/scope, scalar/aggregate temporary forms,
+// initialization grouping, condition polarity, and for/while spellings were tried.
+// The dead retail segment-count==0 fallback and the BEGIN_STANDING frame count
+// overwritten by the MIDDLE assignment were audited and intentionally retained.
 VA(0x004a5fbf, 0xc1f)
 int army::FlyTo(int destination)
 {
