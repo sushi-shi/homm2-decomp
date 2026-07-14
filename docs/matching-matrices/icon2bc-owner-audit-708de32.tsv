@@ -1,0 +1,30 @@
+# BASE/icon2bc ordered retail scratch-owner audit, checkpoint 708de32
+# Target: IconToBitmapColorTable, RVA 0xd32a0, retail size 0x5af, target object SHA-256 a37407754627bc06241364dbb769148a02223a8e05bee63d57bebfa3b43d4f82, target .text SHA-256 15096a6b70e855d536084307e3f0f9caff5f35f7da2c157ef2fe1a80feeb647c.
+# Input source SHA-256 e6afb8acfa36eeac2046a70fc90d14a71f37f2df99d82727395a01c8bdf82f45; dimPalette.h cf3d92124cbb77c3e18b26afc12932d01a6b86087d7209af987ea8907ac625ee; Misc.h 5f54db2d7e6dd85cb245c8cab8aa0b24d79aec998ab3bbf558dc24c594433233.
+# This audit resolves each retail relocation in instruction order, then infers its role from the surrounding loads/stores and subsequent uses. It does not infer owners from candidate names or unordered address membership.
+address	retail_occurrences	owner	instruction_role_evidence
+0x00534ca8	3	gCTPitch	Store sign-extended dest width at +0x41; multiply Y at +0xdc; add pitch to row on newline at +0x593.
+0x00534cac	6	gCTCnt	Publish override-fill and clipped dim/literal counts at +0x1be,+0x331,+0x3aa,+0x406,+0x42a,+0x527.
+0x00534cb0	2	gCTX	Publish current X on skip at +0x109 and positive-command dispatch at +0x46a.
+0x00534cb4	8	gCTY	Publish initial Y at +0x51; use it for clipping/row tests; increment and republish on newline at +0x58d/+0x59b.
+0x00534cb8	1	gCTEntry	Publish the frame-entry pointer formed in EDI at +0x21.
+0x00534cbc	1	gCTRow	Publish the current row pointer on the skip edge at +0x10f.
+0x00534cc0	4	gCTDimPal	Publish selected dim palette at +0x35c and republish it once per pixel at +0x392,+0x424,+0x455.
+0x00534cc4	4	gCTClipB	Publish inclusive bottom clip bound at +0xcd and use it in fill/dim/literal Y tests.
+0x00534cc8	10	gCTClipR	Publish inclusive right clip bound at +0xc3 and use it throughout fill/dim/literal right-edge tests.
+0x00534ccc	5	gCTSrcCopy	Publish the mapped-literal source cursor at +0x48d/+0x51d and load/advance/republish it in the literal loop.
+0x00534cd0	6	gCTDimLen	Publish zero then the positive inner-loop length for both dim and mapped-literal loops.
+0x00534cd4	6	gCTDst	Load the saved destination cursor before the loop at +0xe5 and publish/restore it at skip, dim, and literal branch boundaries.
+0x00534cd8	15	gCTSrc	Publish initial RLE source at +0x27, advance it for command payloads, and advance it by literal command length.
+0x00534cdc	2	gCTCnt2	Publish decoded shadow/dim run length at +0x1a3 and load it to advance X at +0x45e.
+0x00534ce0	3	gCTX0	Publish initial X at +0x34, reload for the initial clip test, and reload to reset X on newline.
+0x00534ce4	7	gCTColor	Publish mapped/override fill byte and reload it for each inlined memset body.
+0x00534ce8	7	gCTRun	Publish the current command, shadow flags, or completed run length at decoder branch boundaries.
+# Result: all 17 current DATA owners are semantically correct; no owner swap or address correction is justified. Retail totals 90 scratch DIR32 occurrences plus one uDimPal relocation.
+source_sha256_or_state	match_percent	base_size	base_target_relocs	text_sha256	result	new_state_and_byte_evidence
+e6afb8acfa36eeac2046a70fc90d14a71f37f2df99d82727395a01c8bdf82f45	73.1690	0x566	88/91	6e7102ac86ce318118835de5be00b34e5cd1d008c8da3040e47464c998381e2e	canonical-input	Ascending-address declarations; missing ClipR1,Cnt1,Dst1,X0 one occurrence and excess Y1, with no base-only target.
+4100a6481a6b77b2e8f52da1e3da4e2c6027cad0e500b422232bcb8b20d47fd7	73.1690	0x566	88/91	6e7102ac86ce318118835de5be00b34e5cd1d008c8da3040e47464c998381e2e	byte-identical-rejected	Declare the verified owners in retail first-relocation order: Entry,Src,X0,Pitch,Y,ClipR,ClipB,Dst,X,Row,Run,Color,Cnt2,Cnt,DimPal,DimLen,SrcCopy. Emitted .text is byte-identical, so declaration order cannot steer the residual.
+842dac41433796388d641e272c21dca85d52ba1288ae6726d77341d3b79d44ae	73.1690	0x566	88/91	6e7102ac86ce318118835de5be00b34e5cd1d008c8da3040e47464c998381e2e	byte-identical-rejected	Remove the owner-header parse under the new narrow dim-palette surface. Emitted .text is byte-identical; the owner include is restored.
+22332cea48aeffe660c3f685631b13744bd2899fead7ddf977ca836544fac8fe	72.06	0x56c	88/91	d7b4390524db0384a47d3272786baeadae7966a76f6e44e103e7e59701a8661e	rejected	Reuse the formal x parameter as the long-lived decoder cursor under the narrow palette surface. This current-header retest regresses by 1.11 points, grows .text six bytes, and does not repair any relocation deficit; the local X lifetime is restored.
+# No permutation tool was used. The regex permuter is prohibited and the AST permuter is inapplicable at this broad structural score.
+# Revisit remains the shared setup/cursor template: retail needs EBX=13*frame and EDI=entry during setup, then EBX=destination cursor and EDX=count in the decoder. The owner audit closes only the address-assignment question; it does not prove a compiler wall.
