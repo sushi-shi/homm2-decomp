@@ -81,9 +81,14 @@ void widget::Close(void) {}
 // checkpoint 2158e9b regressed to 95.8533% with 408 raw-byte differences despite
 // retaining 17/17 relocations. The six-argument constructor and every other
 // ordinary predecessor are now exact; Main remains at the same eight-byte
-// mouse-hit-test residual and exact Dim remains pinned. The standalone-exact
-// requirement still fails, so this remains unresolved, not a soft TU-cumulative
-// wall.
+// mouse-hit-test residual and exact Dim remains pinned. A subsequent
+// exact-constructor-state sweep covered parameter/link aliases, snapshots,
+// register-lifetime reuse, neutral scopes/order boundaries, and a register
+// qualifier. Every state either left this tuple unchanged or perturbed Dim; each
+// fully pinned state combined with the retail-timed top snapshot reached the same
+// six-byte Main residual while changing 25 raw bytes in Dim. See the matrix for
+// the bounded results. The standalone-exact requirement still fails, so this
+// remains unresolved, not a soft TU-cumulative wall.
 VA(0x004ddee0, 0x2f4)
 int widget::Main(tag_message &message)
 {
