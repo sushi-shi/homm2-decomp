@@ -72,6 +72,11 @@ DATA(0x00534ce8) static unsigned int gCTRun;
 // alias scores 78.28%, all with 90:91. Chaining the X0 publication reaches 78.62% but emits X0
 // 4/3 and 92:91 by reloading it in both horizontal clauses; a scoped current-X snapshot is byte-
 // identical. These are real lifetime/type alternatives, not count fixes, and all are rejected.
+// Fresh 5a48d4c accessor/type audit: forcing the exact CodeView-backed GetIconEntry body through an
+// inline selection boundary scores 78.28%/90:91 and emits the same rejected entry/data-alias shape;
+// it does not recover retail's EBX offset plus EDI selected-entry lifetime. Changing the serialized
+// srcOffset field from signed to unsigned int is instruction-byte-identical at 78.95071%/90:91.
+// The observed data proves its four-byte width but not signedness, so the existing field is retained.
 VA(0x004d32a0, 0x5af)
 void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                             int clip, int clipX, int clipY, int clipW, int clipH, int color,
