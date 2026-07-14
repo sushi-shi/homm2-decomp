@@ -15,6 +15,7 @@ class heroWindow;
 class icon;
 class palette;
 class town;
+class widget;
 struct SBolt;
 struct tag_message;
 
@@ -737,7 +738,8 @@ public:
     int m_drawHero[2];  // +0xf41f
     int m_drawHeroOverlay[2];  // +0xf427
     int m_combatWindowOpen;  // +0xf42f
-    char _pad_0xf433[0xc8];
+    class widget *m_winLoseBottomWidgets[25];  // +0xf433
+    class widget *m_winLoseBottomTextWidgets[25];  // +0xf497
     int m_combatX;  // +0xf4fb
     int m_combatY;  // +0xf4ff
     signed char m_directionMap[24];  // +0xf503
@@ -756,7 +758,8 @@ public:
     unsigned char m_removedArmyPresent;  // +0xf59f
     char m_battlefieldBackgroundName[13];  // +0xf5a0
     signed char m_adjacency[COMBAT_HEX_COUNT][COMBAT_AI_ADJACENT_DIRECTION_COUNT];  // +0xf5ad
-    char _pad_0xf86b[0x8];
+    class heroWindow *m_winLoseWindow;  // +0xf86b
+    char _pad_0xf86f[0x4];
     int m_combatResult;  // +0xf873
     // --- constructors ---
     combatManager(void);
@@ -941,7 +944,7 @@ extern int giWinCmbtFrame;
 extern int giNextActionGridIndex;
 extern int giSurrenderCost;
 extern int giSkeletonsCreated;
-extern signed char *iTransferArtifacts;
+extern signed char iTransferArtifacts[16];
 extern int giNextAction;
 extern int giNextActionGridIndex2;
 extern int giCurrSpellGroup;
