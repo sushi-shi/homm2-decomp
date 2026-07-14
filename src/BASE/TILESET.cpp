@@ -16,14 +16,14 @@ tileset::tileset(unsigned long id) : resource(3, id, 1, 0)
     m_tileHeight = gpResourceManager->ReadWord();
     m_tileCount = gpResourceManager->ReadWord();
     unsigned int size = m_tileCount * m_tileWidth * m_tileHeight;
-    m_data = static_cast<char *>(BaseAlloc(size, __FILE__, __LINE__));
+    m_data = static_cast<char *>(H2_ALLOC(size, "I:\\Projects\\Heroes\\Prog\\BASE\\TILESET.CPP", 0x12));
     gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(m_data), size);
 }
 
 VA(0x004dad30, 0x21)
 tileset::~tileset()
 {
-    BaseFree(m_data, __FILE__, __LINE__);
+    H2_FREE(m_data, "I:\\Projects\\Heroes\\Prog\\BASE\\TILESET.CPP", 0x1c);
 }
 
 

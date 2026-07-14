@@ -83,20 +83,199 @@ button::~button()
     gpResourceManager->Dispose(m_icon);
 }
 
-VA(0x004dd6d0, 0x595)
-// int button::Main(tag_message &);
+// @early-stop
+// Compiler COMDAT-folding artifact: retail carries two strong, byte-identical 0x36
+// ??_E/??_G deleting-destructor sections (10 relocations apiece), while retaining the
+// exact standalone 0x21 ??1 destructor above makes VC4.2 emit a 0x1f ??_G wrapper and
+// a weak ??_E alias with no section. Making the destructor inline produces the folded
+// deleting body but removes the separately mapped exact ??1 symbol, so the ABI-correct
+// standalone destructor is retained rather than traded for weak aliases.
+// VA(0x004dd480, 0x36) ??_E/??_G button deleting-destructor aliases
 
+// @early-stop
+// /O2 register-allocation/scheduling wall: base is 0x58d bytes, retail 0x595, and
+// all 36 relocation targets agree. Residual spans are the vptr-load/store ordering
+// at +0x46..+0x50, flag allocation across keyboard dispatch +0xb7..+0x22a (DX in
+// base versus CX in retail), signed hit-test orientation and repeated deselection
+// blocks +0x236..+0x4ba, and the release block +0x4c6..+0x54b. The event tree,
+// modal input loop, all calls, message writes, and icon replacement agree. Direct
+// versus cached flags, signed/unsigned flags, direct versus local event type,
+// positive/rejection hit tests, helper calls versus expanded deselection, and
+// duplicated/shared widget fallbacks were tried; the shared expanded form is best.
+VA(0x004dd6d0, 0x595)
+int button::Main(tag_message &msg)
+{
+    if (field_0x14 == 0x1000 && (m_flags & 1) != 0 && KBTickCount() > gButtonRepeatTime) {
+        if ((m_flags & 1) == 0)
+            return 0;
+        m_flags &= 0xfffe;
+        Draw();
+        gpWindowManager->UpdateScreenRegion(m_x + m_owner->m_posX,
+                                            m_y + m_owner->m_posY, m_width, m_height);
+        msg.field4 = 0xd;
+        msg.type = 0x200;
+        msg.field8 = m_id;
+        msg.fieldC = iLeftRightSave;
+        iLeftRightSave = 0;
+        return 2;
+    }
+
+    if ((m_flags & 2) == 0) {
+        if (msg.type == 0x200)
+            return widget::Main(msg);
+        return 0;
+    }
+
+    int eventType = msg.type;
+    switch (eventType) {
+    case 1:
+        if ((m_flags & 2) != 0 && (m_flags & 4) != 0 && (m_flags & 8) == 0 && m_hotkey != -1 &&
+            m_hotkey == msg.field4)
+            return Select(msg);
+        return 0;
+
+    case 2:
+        if ((m_flags & 2) != 0 && (m_flags & 4) != 0 && (m_flags & 8) == 0 && m_hotkey != -1 &&
+            m_hotkey == msg.field4) {
+            if ((m_flags & 1) == 0)
+                return 0;
+            m_flags &= 0xfffe;
+            Draw();
+            gpWindowManager->UpdateScreenRegion(m_x + m_owner->m_posX,
+                                                m_y + m_owner->m_posY, m_width, m_height);
+            msg.field4 = 0xd;
+            msg.type = 0x200;
+            msg.field8 = m_id;
+            msg.fieldC = iLeftRightSave;
+            iLeftRightSave = 0;
+            return 2;
+        }
+        return 0;
+
+    case 8:
+    case 0x20: {
+        if ((m_flags & 4) == 0)
+            goto normalEvent;
+
+        short relativeX = static_cast<short>(msg.field4) -
+                          static_cast<short>(m_owner->m_posX);
+        short relativeY = static_cast<short>(msg.field8) -
+                          static_cast<short>(m_owner->m_posY);
+        if (eventType == 0x20) {
+            if (m_x <= relativeX && m_y <= relativeY &&
+                relativeX < m_x + m_width && relativeY < m_y + m_height) {
+                msg.field4 = 0xe;
+                msg.type = 0x200;
+                msg.field8 = m_id;
+                msg.fieldC = 0x200;
+                return 2;
+            }
+            return 0;
+        }
+
+        if ((m_flags & 8) != 0 || m_x > relativeX || m_y > relativeY ||
+            relativeX >= m_x + m_width || relativeY >= m_y + m_height)
+            return 0;
+
+        Select(msg);
+        while (msg.type != 0x10 && msg.type != 0x40) {
+            PollSound();
+            gpMouseManager->Main(msg);
+            if (msg.type == 4) {
+                relativeX = static_cast<short>(msg.field4) -
+                            static_cast<short>(m_owner->m_posX);
+                relativeY = static_cast<short>(msg.field8) -
+                            static_cast<short>(m_owner->m_posY);
+                if (m_x > relativeX || m_y > relativeY ||
+                    relativeX >= m_x + m_width || relativeY >= m_y + m_height) {
+                    if ((m_flags & 1) != 0) {
+                        m_flags &= 0xfffe;
+                        Draw();
+                        gpWindowManager->UpdateScreenRegion(
+                            m_x + m_owner->m_posX, m_y + m_owner->m_posY, m_width, m_height);
+                        msg.field4 = 0xd;
+                        msg.type = 0x200;
+                        msg.field8 = m_id;
+                        msg.fieldC = iLeftRightSave;
+                        iLeftRightSave = 0;
+                    }
+                } else if ((m_flags & 1) == 0) {
+                    Select(msg);
+                }
+            }
+            Process1WindowsMessage();
+            msg = gpInputManager->GetEvent();
+        }
+        if ((m_flags & 1) != 0) {
+            m_flags &= 0xfffe;
+            Draw();
+            gpWindowManager->UpdateScreenRegion(m_x + m_owner->m_posX,
+                                                m_y + m_owner->m_posY, m_width, m_height);
+            msg.field4 = 0xd;
+            msg.type = 0x200;
+            msg.field8 = m_id;
+            msg.fieldC = iLeftRightSave;
+            iLeftRightSave = 0;
+            return 2;
+        }
+        return 1;
+    }
+
+    case 0x10:
+        if ((m_flags & 4) != 0 && (m_flags & 1) != 0) {
+            m_flags &= 0xfffe;
+            Draw();
+            gpWindowManager->UpdateScreenRegion(m_x + m_owner->m_posX,
+                                                m_y + m_owner->m_posY, m_width, m_height);
+            msg.field4 = 0xd;
+            msg.type = 0x200;
+            msg.field8 = m_id;
+            msg.fieldC = iLeftRightSave;
+            iLeftRightSave = 0;
+            return 2;
+        }
+        goto normalEvent;
+
+    case 0x200:
+        if (msg.field4 == 0x3c) {
+            if (msg.field8 == m_iconId) {
+                m_iconId = msg.field18;
+                gpResourceManager->Dispose(m_icon);
+                m_icon = gpResourceManager->GetIcon(msg.field18);
+            }
+            return 0;
+        }
+        goto normalEvent;
+
+    default:
+        goto normalEvent;
+    }
+
+normalEvent:
+    return widget::Main(msg);
+}
+
+// @early-stop
+// /O2 scheduling wall: base is 0x95 bytes, retail 0x96, with all 6 relocation
+// targets agreeing. Only coordinate preparation +0x08..+0x2d and message-store
+// scheduling +0x50..+0x6f differ; retail retains the owner pointer while base CSEs
+// both owner coordinates into AX/CX. The final global-name difference is the same
+// single-module gButtonRepeatTime address. Cached/direct owner access, x/y declaration
+// order, split compound additions, and both field4/field8 assignment orders were tried.
 VA(0x004ddc70, 0x96)
 short button::Select(struct tag_message &msg)
 {
-    short x = m_owner->m_posX + m_x;
-    short y = m_y + m_owner->m_posY;
+    heroWindow *window = m_owner;
+    short y = m_y;
+    short x = static_cast<short>(window->m_posX);
+    x += m_x;
+    y += static_cast<short>(window->m_posY);
     m_icon->DrawToBuffer(x, y, m_normalFrame, 0);
     gpWindowManager->UpdateScreenRegion(x, y, m_width, m_height);
     m_flags |= 1;
     msg.type = 0x200;
-    msg.field8 = m_id;
     msg.field4 = 10;
+    msg.field8 = m_id;
     if (field_0x28 != 1)
         msg.field4 = 0xc;
     gButtonRepeatTime = KBTickCount() + 0x3c;
@@ -104,12 +283,20 @@ short button::Select(struct tag_message &msg)
     return 2;
 }
 
+// @early-stop
+// /O2 three-instruction scheduling wall: base and retail are both 0x83 bytes and
+// all 4 relocation targets agree. Every instruction matches except base +0x18..+0x20
+// (`mov ecx,this; store flags; load vptr`) versus retail +0x18..+0x20 (`load vptr;
+// store flags; mov ecx,this`). Direct `&=` and an explicit short flag temporary both
+// select the base order; subsequent virtual call and all message bytes are identical.
 VA(0x004ddd10, 0x83)
 short button::Deselect(struct tag_message &msg)
 {
-    if ((m_flags & 1) == 0)
+    short flags = m_flags;
+    if ((flags & 1) == 0)
         return 0;
-    m_flags &= 0xfffe;
+    flags &= 0xfffe;
+    m_flags = flags;
     Draw();
     gpWindowManager->UpdateScreenRegion(m_x + m_owner->m_posX,
                                         m_y + m_owner->m_posY, m_width, m_height);

@@ -14,16 +14,28 @@ VA(0x004d0a60, 0x2d)
 iconWidget::iconWidget(void) : widget(0, 0, 0, 0, 0, 0)
 {
     m_frame = 0;
-    field_0x27 = 0;
+    m_fillColor = 0;
     m_icon = 0;
     m_flip = 0;
     m_iconId = 0;
 }
 
-// @early-stop ~16% — prologue through GetIcon is byte-identical; only the final 5 field
-// stores differ, purely /O2 register allocation (retail loads param_6→cx first for an
-// ascending-offset store order; ours loads param_10→cx first, descending). Not
-// source-controllable — reordering the assignments produces byte-identical output.
+// @early-stop
+// Compiler COMDAT-folding artifact: retail carries two strong, byte-identical 0x36
+// ??_E/??_G deleting-destructor sections (10 relocations apiece), while retaining the
+// exact standalone 0x21 ??1 destructor below makes VC4.2 emit a 0x1f ??_G wrapper and
+// a weak ??_E alias with no section. Making the destructor inline produces the folded
+// deleting body but removes the separately mapped exact ??1 symbol, so the ABI-correct
+// standalone destructor is retained rather than traded for weak aliases.
+// VA(0x004d0a90, 0x36) ??_E/??_G iconWidget deleting-destructor aliases
+
+// @early-stop
+// /O2 register-allocation wall: base and retail are both 0x6a bytes and all 4
+// relocation targets agree. Bytes +0x00..+0x46 and +0x5e..+0x69 are identical;
+// only +0x47..+0x5d schedules the icon store and colors frame/fill/flip as
+// CX/AX/DL instead of retail CX/DX/AL. Direct assignments, reordered assignments,
+// and placing the icon store before or after the parameter stores select the same
+// base schedule.
 VA(0x004d0ad0, 0x6a)
 iconWidget::iconWidget(short int param_1, short int param_2, short int param_3, short int param_4,
                        unsigned long int param_5, short int param_6, signed char param_7,
@@ -34,24 +46,28 @@ iconWidget::iconWidget(short int param_1, short int param_2, short int param_3, 
     m_icon = gpResourceManager->GetIcon(param_5);
     m_frame = param_6;
     m_flip = param_7;
-    field_0x27 = param_10;
+    m_fillColor = param_10;
     field_0x14 = param_9;
 }
 
-// @early-stop ~13% — same /O2 register-scheduling wall as the sibling ctor above; body
-// is semantically exact (MakeId+GetIcon then the same field stores).
+// @early-stop
+// /O2 register-allocation wall: base and retail are both 0x78 bytes and all 6
+// relocation targets agree. The clean-slate MakeId/GetIcon path is identical through
+// +0x54 and the epilogue +0x6c..+0x77 is identical; only +0x55..+0x6b has the same
+// icon/frame/fill/flip store schedule described for the unsigned-id constructor.
+// The same direct assignment-order variants retain this schedule after the exact
+// MakeId/GetIcon sequence.
 VA(0x004d0b40, 0x78)
 iconWidget::iconWidget(short int param_1, short int param_2, short int param_3, short int param_4,
-                       char *param_5, short int param_6, signed char param_7, short int param_8,
-                       short int param_9, short int param_10)
+                       char *param_5, short int param_6, signed char param_7,
+                       short int param_8, short int param_9, short int param_10)
     : widget(param_1, param_2, param_3, param_4, param_8, param_9)
 {
-    unsigned long int uVar1 = gpResourceManager->MakeId(param_5, 1);
-    m_iconId = uVar1;
-    m_icon = gpResourceManager->GetIcon(uVar1);
+    m_iconId = gpResourceManager->MakeId(param_5, 1);
+    m_icon = gpResourceManager->GetIcon(m_iconId);
     m_frame = param_6;
     m_flip = param_7;
-    field_0x27 = param_10;
+    m_fillColor = param_10;
     field_0x14 = param_9;
 }
 
@@ -65,14 +81,14 @@ void iconWidget::Read(void)
     m_height = gpResourceManager->ReadWord();
     gpResourceManager->Read13(reinterpret_cast<signed char *>(local_10));
     gpResourceManager->SavePosition();
-    unsigned long id = gpResourceManager->MakeId(local_10, 1);
-    m_icon = gpResourceManager->GetIcon(id);
+    m_iconId = gpResourceManager->MakeId(local_10, 1);
+    m_icon = gpResourceManager->GetIcon(m_iconId);
     gpResourceManager->RestorePosition();
     m_frame = gpResourceManager->ReadWord();
     m_flip = static_cast<char>(gpResourceManager->ReadWord());
     m_id = gpResourceManager->ReadWord();
     field_0x14 = gpResourceManager->ReadWord();
-    field_0x27 = gpResourceManager->ReadWord() & 0xff;
+    m_fillColor = gpResourceManager->ReadWord() & 0xff;
 }
 
 VA(0x004d0ca0, 0x21)
@@ -81,11 +97,143 @@ iconWidget::~iconWidget()
     gpResourceManager->Dispose(m_icon);
 }
 
+// @early-stop
+// Relocation-masked raw bytes are identical across the full 0x291-byte function.
+// Retail delinks the two switch-dispatch references and five jump-table entries as
+// containing-function relocations with addends, while VC4.2 emits $L local-label
+// relocations; manual llvm-objdump review confirms all 17 sites and destinations.
 VA(0x004d0cd0, 0x291)
-// int iconWidget::Main(tag_message &);
+int iconWidget::Main(tag_message &msg)
+{
+    unsigned short flags = m_flags;
+    if ((flags & 2) == 0 && (msg.type != 0x200 || msg.field4 != 0x3c)) {
+        if (msg.type == 0x200)
+            return widget::Main(msg);
+        return 0;
+    }
 
+    int eventType = msg.type;
+    switch (eventType) {
+    case 8:
+    case 0x20: {
+        short relativeX = static_cast<short>(msg.field4);
+        heroWindow *window = m_owner;
+        relativeX -= static_cast<short>(window->m_posX);
+        short relativeY = static_cast<short>(msg.field8);
+        relativeY -= static_cast<short>(window->m_posY);
+        if (m_x <= relativeX && m_y <= relativeY &&
+            relativeX < m_x + m_width && relativeY < m_y + m_height) {
+            if (eventType == 0x20) {
+                msg.fieldC = 0x200;
+                msg.field4 = 0xe;
+            } else {
+                m_flags = flags | 1;
+                msg.field4 = 0xc;
+            }
+            msg.type = 0x200;
+            msg.field8 = m_id;
+            return 2;
+        }
+        return 0;
+    }
+
+    case 0x10:
+    case 0x40:
+        if ((flags & 1) != 0) {
+            m_flags = flags & 0xfffe;
+            msg.field4 = 0xd;
+            msg.type = 0x200;
+            msg.field8 = m_id;
+            return 2;
+        }
+        return 0;
+
+    case 0x200:
+        switch (msg.field4) {
+        case 4:
+            if (m_id != msg.field8)
+                goto normalEvent;
+            m_frame = msg.field18;
+            return 1;
+
+        case 8:
+            if (m_id != msg.field8)
+                goto normalEvent;
+            m_fillColor = msg.field18 & 0xff;
+            return 1;
+
+        case 9:
+            if (m_id != msg.field8)
+                goto normalEvent;
+            if (m_icon != 0) {
+                gpResourceManager->Dispose(m_icon);
+                m_icon = gpResourceManager->GetIcon(msg.text);
+            }
+            return 1;
+
+        case 0x3c:
+            if (m_iconId == msg.field8) {
+                m_iconId = msg.field18;
+                gpResourceManager->Dispose(m_icon);
+                m_icon = gpResourceManager->GetIcon(static_cast<unsigned long>(msg.field18));
+            }
+            return 0;
+
+        default:
+            goto normalEvent;
+        }
+
+    default:
+        goto normalEvent;
+    }
+
+normalEvent:
+    return widget::Main(msg);
+}
+
+// @early-stop
+// /O2 two-instruction scheduling wall: base and retail are both 0xe5 bytes and all
+// 4 relocation targets agree. All instructions are identical except +0x64..+0x6b:
+// base loads m_width before subtracting entry->y, while retail performs those two
+// independent instructions in the opposite order. Direct member expressions,
+// cached width/icon-width locals, declaration/statement reordering, comma sequencing,
+// and both x/y subtraction orders were tried.
 VA(0x004d0f70, 0xe5)
-// void iconWidget::Draw(void);
+void iconWidget::Draw(void)
+{
+    heroWindow *window = m_owner;
+    short y = static_cast<short>(window->m_posY);
+    short x = static_cast<short>(window->m_posX);
+    short kind = field_0x14;
+    x += m_x;
+    y += m_y;
+
+    switch (kind) {
+    case 0x10:
+        m_icon->DrawToBuffer(x, y, m_frame, m_flip);
+        return;
+
+    case 0x11: {
+        IconEntry *entry = GetIconEntry(m_icon, m_frame);
+        short widgetWidth;
+        short iconWidth;
+        iconWidth = entry->w;
+        y -= entry->y;
+        widgetWidth = m_width;
+        x -= entry->x;
+        if (iconWidth < widgetWidth)
+            x += (widgetWidth - iconWidth) >> 1;
+        if (entry->h + 2 < m_height)
+            y += m_height - entry->h - 2;
+        m_icon->DrawToBuffer(x, y, m_frame, m_flip);
+        return;
+    }
+
+    case 0x80:
+        m_icon->FillToBuffer(x, y, m_frame, m_fillColor, m_flip, 0);
+        return;
+    }
+}
 
 
 // ===== vtable iconWidget : public widget  (3 slots) =====

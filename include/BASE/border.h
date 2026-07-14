@@ -17,7 +17,7 @@ public:
     // (derived: base widget = 0x20 bytes at 0x00 via ': public widget'; own fields below)
     bitmap *m_backgroundBitmap;  // +0x20  background bitmap
     icon  *m_backgroundIcon;  // +0x24  background icon
-    short  field_0x28;  // +0x28
+    short m_fillColor;  // +0x28  palette index for a solid-color border
     // --- constructors ---
     border(void);
     border(short int, short int, short int, short int, short int, short int, short int, char *);

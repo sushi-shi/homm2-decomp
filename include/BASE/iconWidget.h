@@ -17,8 +17,8 @@ public:
     icon   *m_icon;  // +0x20  the icon resource
     short  m_frame;  // +0x24
     char   m_flip;  // +0x26
-    short  field_0x27;  // +0x27
-    int    m_iconId;  // +0x29
+    short  m_fillColor;  // +0x27  color index used by filled-icon draw mode
+    unsigned long m_iconId;  // +0x29  aggregate resource id
     // --- constructors ---
     iconWidget(void);
     iconWidget(short int, short int, short int, short int, unsigned long int, short int, signed char, short int, short int, short int);
