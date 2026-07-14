@@ -11,6 +11,7 @@
 #include <_globals_model.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/bitmap.h>
+#include <BASE/icon.h>
 #include <BASE/bmap2.h>
 #include <BASE/font.h>
 #include <BASE/textEntryWidget.h>
@@ -31,7 +32,7 @@
 #include <BASE/palette.h>
 #include <SOURCE/X_GLOBAL.h>
 
-static int giFindMid;
+DATA(0x005331c0) static int giFindMid;
 
 
 
@@ -50,18 +51,16 @@ void InitMemEntry(void)
 }
 
 // @match-note
-// Structurally complete /O2 checkpoint: base .text is 0x202 bytes versus retail 0x20f.
-// The complete allocation/tracking flow and calls match (LogInt, malloc x2, MemError,
-// sprintf, fopen/fputs/fclose, OutputDebugStringA). The remaining source divergence is
-// the newline append at base +0x1ab..+0x1cb versus retail +0x1b2..+0x1d5: base loads
-// "\n" before `repne scasb` and addresses the end through `not ecx`; retail scans first,
-// loads the same relocated word afterward, and stores it at `[edi-1]`. `strcat`,
-// `strcpy(buf+strlen)`, `memcpy(...,2)`, direct/named word stores, volatile loads, and a
-// manual end scan were compiled; none selected retail's hybrid intrinsic sequence in
-// the measured TU states. Revisit through exact-preserving predecessor/TU-state variants;
-// this residual is not a byte-proven wall. See misc-early-tu-state-04f798c.tsv.
+// Structurally complete /O2 checkpoint: allocation/tracking semantics, the 12-branch CFG,
+// and all 29 relocations agree.  With the required real icon definition in this TU, base
+// currently reserves 0x2c4 bytes and ends at 0x204; retail reserves 0x2bc and is 0x20f.
+// The first divergence is the frame immediate at +0x2, followed at +0xc by base keeping
+// size in EBP while retail uses EBX.  The two arrays account for the retail 700-byte frame;
+// there is no missing local.  Earlier exact-frame TU states left only the newline intrinsic.
+// `strcat`, strcpy/memcpy-at-strlen, direct word stores, volatile loads, and a manual scan
+// were already tried.  Revisit only after required shared-header/TU state changes.
 VA(0x004c3d70, 0x20f)
-void *BaseAlloc(unsigned int size, char *file, int line)
+void *BaseAlloc(unsigned int size, char *originalFile, int originalLine)
 {
     char text[200];
     char logText[500];
@@ -86,13 +85,14 @@ void *BaseAlloc(unsigned int size, char *file, int line)
             gpMemEntry[i].used = 1;
             gpMemEntry[i].ptr = ptr;
             gpMemEntry[i].size = size;
-            strcpy(gpMemEntry[i].file, file);
-            gpMemEntry[i].line = line;
+            strcpy(gpMemEntry[i].file, originalFile);
+            gpMemEntry[i].line = originalLine;
             i = 99999;
         }
     }
     if (giDebugLevel == 4) {
-        sprintf(text, "KBAlloc    Size %d   Ptr %d   File %s  Line %d", size, ptr, file, line);
+        sprintf(text, "KBAlloc    Size %d   Ptr %d   File %s  Line %d", size, ptr,
+                originalFile, originalLine);
         if (giDebugLevel >= 2) {
             FILE *f = fopen("KB.LOG", "at+");
             if (f != 0) {
@@ -110,16 +110,14 @@ void *BaseAlloc(unsigned int size, char *file, int line)
 }
 
 // @match-note
-// Structurally complete /O2 checkpoint: base .text is 0x38f bytes versus retail 0x386.
-// The three equivalent newline-append clusters load the same `"\n"` relocation at
-// base +0x105/+0x23a/+0x330 (reloc operands +0x108/+0x23d/+0x333) versus retail
-// +0x113/+0x244/+0x338 (operands +0x116/+0x247/+0x33b); retail keeps the post-scan
-// pointer in EDI while base materializes the strlen result. All LogInt/malloc/free,
-// sprintf, fopen/fputs/fclose and OutputDebugStringA sites and tracked MemEntry fields
-// agree. The same six append spellings documented on BaseAlloc were tried. Revisit through
-// exact-preserving predecessor/TU-state variants; this is not a byte-proven wall.
+// Structurally complete /O2 checkpoint: both spans are 0x386 with the same 0x2c4 frame,
+// 20-branch CFG, and all 52 relocations.  The first residual is the first newline append:
+// base preloads the word then derives `buf+strlen`; retail scans first and writes `[edi-1]`.
+// The other two append sites have the same scheduling difference.  All allocation/free,
+// MemEntry, logging, and bad-delete paths agree.  The BaseAlloc append spellings were also
+// tested here; revisit only after exact-preserving predecessor/TU-state changes.
 VA(0x004c3f80, 0x386)
-void BaseFree(void *ptr, char *file, int line)
+void BaseFree(void *ptr, char *originalFile, int originalLine)
 {
     char logText[500];
     char text[200];
@@ -174,7 +172,8 @@ void BaseFree(void *ptr, char *file, int line)
         }
     }
     if (i < 99999) {
-        sprintf(gText, "Bad Delete,  File '%13s'  Line % 4d, ptr %12d", file, line, ptr);
+        sprintf(gText, "Bad Delete,  File '%13s'  Line % 4d, ptr %12d", originalFile,
+                originalLine, ptr);
         if (giDebugLevel >= 2) {
             FILE *f = fopen("KB.LOG", "at+");
             if (f != 0) {
@@ -203,7 +202,7 @@ void BaseFree(void *ptr, char *file, int line)
 VA(0x004c4310, 0x134)
 void PrintMemoryLeaks(void)
 {
-    char local_1f4[500];
+    char logText[500];
     if (giDebugLevel >= 1 && gpMemEntry != 0) {
         LogInt("Total Memory Leaks", iMemEntries, -999, -999, -999, -999, -999, -999);
         int i = 0;
@@ -213,15 +212,15 @@ void PrintMemoryLeaks(void)
                         gpMemEntry[i].file, gpMemEntry[i].line, reinterpret_cast<int>(gpMemEntry[i].ptr),
                         gpMemEntry[i].size);
                 if (giDebugLevel >= 2) {
-                    FILE *_File = fopen("KB.LOG", "at+");
-                    if (_File != 0) {
-                        strcpy(local_1f4, gText);
-                        *reinterpret_cast<unsigned short *>(local_1f4 + strlen(local_1f4)) =
+                    FILE *logFile = fopen("KB.LOG", "at+");
+                    if (logFile != 0) {
+                        strcpy(logText, gText);
+                        *reinterpret_cast<unsigned short *>(logText + strlen(logText)) =
                             *reinterpret_cast<const unsigned short *>("\n");
-                        fputs(local_1f4, _File);
-                        fclose(_File);
+                        fputs(logText, logFile);
+                        fclose(logFile);
                         if (giDebugLevel == 4)
-                            OutputDebugStringA(local_1f4);
+                            OutputDebugStringA(logText);
                     }
                 }
             }
@@ -259,47 +258,44 @@ unsigned long int MAKEFILEID(char *text)
 }
 
 // @match-note
-// Structurally complete /O2 checkpoint: base .text is 0x97 bytes versus retail 0x95.
-// Base alone emits `3b c7` (`cmp eax,edi`) at +0x38..+0x39 before the equality
-// `jge`; retail reuses flags from the identical +0x2a comparison. Everything after
-// that differs only by the resulting two-byte jump displacements. There are no calls;
-// all four giFindMid relocations resolve to the same 0x5331c0 storage (retail delinks
-// it as const_001331c0). Direct field tests, saved int/ushort values, nested ==/>=,
-// reversed relational operands, negated predicates, comma/combined conditions, and
-// three-way forms tried. Revisit through exact-preserving predecessor/TU-state variants;
-// the redundant compare is not a byte-proven artifact.
+// Structurally complete /O2 checkpoint: base is 0x97 bytes, retail 0x95, with the same
+// eight-branch CFG and four giFindMid relocations to 0x5331c0.  The first current
+// divergence is +0x2a: base emits `cmp edi,eax; jge`, retail `cmp eax,edi; jle` and then
+// reuses those flags for equality where base emits another compare at +0x38.  The key/value
+// fields are typed and named.  Direct tests, saved values, reversed/negated predicates,
+// combined conditions, and three-way forms were tried; this is not a proven artifact.
 VA(0x004c4540, 0x95)
 int FindIndex(struct indexArray *entries, int low, int high, int key)
 {
     giFindMid = (low + high) >> 1;
     while (high - low > 1) {
-        int value = entries[giFindMid].field0;
+        int value = entries[giFindMid].key;
         if (value > key) {
             high = giFindMid;
         } else {
             low = giFindMid;
             if (value >= key)
-                return entries[low].field2;
+                return entries[low].value;
         }
         giFindMid = (low + high) >> 1;
     }
-    if (entries[low].field0 == key) {
-        return entries[low].field2;
+    if (entries[low].key == key) {
+        return entries[low].value;
     }
-    if (entries[high].field0 == key) {
-        return entries[high].field2;
+    if (entries[high].key == key) {
+        return entries[high].value;
     }
     return 0xFFFF;
 }
 
 // @match-note
-// Structurally complete /O2 checkpoint: explicit `threshold = 0x3f - level` recovered
-// retail's EBX/EBP/ESI allocation and raised this from 92.96% to 97.41%. Both sections
-// are now 0xea bytes with the same FPO frame, CFG, and 11/11 relocation targets. The sole
-// raw-code residual is +0x1a..+0x1f: base `8b c8 85 c9 74 07` moves the allocation to
-// ECX before testing it; retail `85 c0 74 09 8b c8` tests EAX first. `new palette`,
-// `new palette()`, and split declaration/assignment retain the base order. Revisit with
-// exact-preserving predecessor/TU-state variants; this is not a permitted early-stop.
+// Structurally complete /O2 checkpoint: both sections are 0xea with the same CFG and
+// exact 11/11 relocations.  Explicit `threshold = 0x3f - level` preserves the recovered
+// loop semantics.  In the current required-header TU state the first divergence is the
+// allocation at +0x7: base carries fadePalette in ESI and tests ECX after construction;
+// retail initially uses EBX and tests EAX before construction.  `new palette`, value-init,
+// and split declaration/assignment were tried.  This register allocation moved after the
+// icon type include; revisit after further exact-preserving shared-header/TU changes.
 VA(0x004c45e0, 0xea)
 void FadeIn(int increment)
 {
@@ -403,12 +399,12 @@ void ProcessAssert(int condition, char *file, int line)
 }
 
 // @match-note
-// Structurally complete /O2 checkpoint with equal 0x66-byte sections and the same frame,
-// CFG, sole strncmp relocation, and arguments. Only three encodings remain: base LEAs
-// `[ebp+esi]` at +0x3c/+0x5b versus retail `[esi+ebp]`, and base `cmp esi,ebx; jl`
-// at +0x4d versus retail `cmp ebx,esi; jg`. Pointer-operand swaps, `&i[text]`, lvalue
-// count loads, for/while/do forms, count|0, >=1+i, and audited AST swaps did not steer
-// them. Revisit through exact-preserving predecessor/TU-state variants; not byte-proven.
+// Structurally complete /O2 checkpoint with equal 0x66-byte sections, the same frame/CFG,
+// and the sole strncmp relocation.  In the current required-header state the first
+// divergence is +0xa: base carries text/count/index in EBX/EBP/EDI while retail uses
+// EBP/EBX/ESI; all calls, bounds, and return values remain equivalent.  Pointer operand
+// swaps, `&i[text]`, lvalue count loads, for/while/do forms, count|0, and reversed bounds
+// were tried.  This is a TU-state register allocation residual, not a proven artifact.
 VA(0x004c4850, 0x66)
 char * FindStringInString(char *text, char *pattern)
 {
@@ -428,13 +424,11 @@ char * FindStringInString(char *text, char *pattern)
 
 // @match-note
 // Structurally complete /O2 checkpoint with equal 0x31-byte sections and no relocs/calls.
-// The only bytes that differ are +0x21..+0x24: base `3b c1 7c f4`
-// (`cmp eax,ecx; jl`) versus retail `3b c8 7f f4` (`cmp ecx,eax; jg`). They are the
-// same signed `index < length` condition. for/while/do loops, explicit backedges,
-// `length|0`, `>= 1+index`, reversed operands/returns, SIB spelling, and the AST
-// relational permuter, lvalue len load, and index-side `| 0` all retained this canonical
-// base encoding. Revisit through exact-preserving predecessor/TU-state variants; the
-// four-byte residual is not a byte-proven artifact.
+// The current differences are the equivalent SIB at +0x17 (`[eax+esi]` versus
+// `[esi+eax]`) and loop test at +0x21 (`cmp eax,ecx; jl` versus `cmp ecx,eax; jg`).
+// for/while/do loops, explicit backedges, length/index `|0`, reversed bounds/returns,
+// `i[text]`, and lvalue length loads did not steer them.  Revisit after TU-state changes;
+// these operand-order encodings are not byte-proven artifacts.
 VA(0x004c48c0, 0x31)
 char * FindToken(char *text, char token)
 {
@@ -471,29 +465,26 @@ void SetInstallDefaults(void)
 }
 
 // @match-note
-// Structurally complete /O2 checkpoint: base has no stack frame and preserves EBX/ESI/EDI,
-// matching retail. Its 0x1b9-byte COMDAT differs from retail's 0x1b5-byte code symbol.
-// The first real divergence is +0x03: base anchors EAX at gConfig.gfx[0] (+0x1c), then
-// stores at +0x00..+0x10; retail anchors EAX at fullScreen (+0x30), preloads video width
-// into EBX, and uses -0x14..+0x04. The two-iteration loop CFG, every field value, four
-// rand calls, three KBTickCount calls, and external relocation targets are accounted for.
-// `homm2 relocs` reports 43/42 and three candidate-only interior anchors at gConfig+0x1c,
-// +0x54, and +0xaa. They arise from this unfinished induction/store layout; source already uses
-// the proper typed gConfig fields, so no interior-label alias should be introduced.
-// Exhausted: pointer and indexed loops, gfx-index plus alias, fullScreen-first stores,
-// an int reference to fullScreen, direct indexed fields, dual gfx/fullScreen induction,
-// field-order variants, all three 640 comparisons, and split/combined random-tick sums.
-// Revisit only after a new exact-preserving predecessor/shared-header TU state exists;
-// this 90.21% register/induction residual is not eligible for AST permutation yet.
+// Structurally complete /O2 checkpoint: base is 0x1b9, retail 0x1b5, with the same
+// three-branch CFG and exact 42/42 ordered relocations.  Retail's induction is now
+// recovered: &gfx[0].fullScreen (+0x30), seven-word stride, endpoint showCombatGrid
+// (+0x68), with semantic exeGfxConfig field access and no interior aliases.  The earlier
+// gConfig.musicSource store was not present in retail and was removed.  The first residual
+// is +0x1: after the common `push ebx`, base loads the induction address before saving the
+// other registers and later preserves EBP, while retail saves ESI/EDI first and preserves
+// only EBX/ESI/EDI.  Prior pointer/index/field-order variants are exhausted; revisit only
+// after exact-preserving predecessor/shared-header TU state.
 VA(0x004c49a0, 0x1b5)
 void SetGameDefaults(void)
 {
+    int *fullScreen = &gConfig.gfx[0].fullScreen;
     gConfig.musicVolume = 1;
     gConfig.soundVolume = 1;
     gConfig.autosave = 1;
     gConfig.showRoute = 1;
-    exeGfxConfig *gfx = gConfig.gfx;
     do {
+        exeGfxConfig *gfx = reinterpret_cast<exeGfxConfig *>(
+            fullScreen - (CONFIG_GRAPHICS_SIZE / sizeof(int) - 2));
         gfx->showMenu = 1;
         gfx->x = 10;
         gfx->y = 10;
@@ -506,8 +497,8 @@ void SetGameDefaults(void)
             gfx->width = 0x280;
             gfx->height = 0x1e0;
         }
-        ++gfx;
-    } while (gfx < gConfig.gfx + 2);
+        fullScreen += CONFIG_GRAPHICS_SIZE / sizeof(int);
+    } while (fullScreen < &gConfig.showCombatGrid);
     gConfig.showCombatGrid = 0;
     gConfig.showCombatMouseHex = 0;
     gConfig.combatShadeLevel = 0;
@@ -525,7 +516,6 @@ void SetGameDefaults(void)
     gConfig.editorPaletteCycling = 0;
     gbFirstTimeThrough = 1;
     gConfig.slowVideo = 3;
-    gConfig.musicSource = CONFIG_MUSIC_SOURCE_DEFAULT;
     gConfig.computerWalkSpeed = 3;
     gConfig.walkSpeed = 2;
     strcpy(gConfig.networkDefaultName, "The Unknown Hero");
@@ -690,9 +680,9 @@ void ReadPrefs(void)
 VA(0x004c5500, 0x6a)
 void WritePrefsToFile(void)
 {
-    int local_64[25];
+    int zeroBuffer[25];
     int i;
-    int *p = local_64;
+    int *p = zeroBuffer;
     for (i = 0x19; i != 0; i--) {
         *p = 0;
         p++;
@@ -772,10 +762,10 @@ void WritePrefs(void)
 }
 
 VA(0x004c5a20, 0x3c)
-int IsCDDrive(int param_1)
+int IsCDDrive(int driveIndex)
 {
     sprintf(gText, "A:\\");
-    gText[0] = gText[0] + param_1;
+    gText[0] = gText[0] + driveIndex;
     return GetDriveTypeA(gText) == DRIVE_CDROM;
 }
 
@@ -874,11 +864,11 @@ void BitmapToScreen(class bitmap *bmp)
 }
 
 VA(0x004c5e70, 0x3d)
-void SetPalette(signed char *param_1, int param_2)
+void SetPalette(signed char *paletteData, int updateDisplay)
 {
-    memcpy(gpBufferPalette->m_data, param_1, 0x300);
-    memcpy(gCyclePal, param_1 + 0x282, 0x60);
-    if (param_2 != 0)
+    memcpy(gpBufferPalette->m_data, paletteData, 0x300);
+    memcpy(gCyclePal, paletteData + 0x282, 0x60);
+    if (updateDisplay != 0)
         UpdatePalette(gpBufferPalette->m_data);
 }
 
@@ -889,13 +879,14 @@ void BlitBitmapToScreenNoMouseCheck(class bitmap *bmp, int p2, int p3, int p4, i
 }
 
 // @match-note
-// Structurally complete /O2 checkpoint: base and retail object extents are 0x18c,
-// both frames are 8 bytes, and all external call/relocation targets agree (the
-// 23/24 helper count is one delinked retail local owner). The first raw difference
-// is +0x18; the remaining 195 bytes are register/schedule and local-owner changes.
-// Correcting the second overlap test from the decomp's AND to retail's OR and
-// retaining the retail bitmap spill recovered the complete four-call CFG. Direct
-// parameters, saved-coordinate locals and overlap-expression order were also tried.
+// Structurally complete /O2 checkpoint: base is 0x18c versus retail 0x18b; both use an
+// eight-byte frame and the same 13-branch/four-blit CFG.  Relocation targets agree, but
+// base has 23 occurrences versus retail 24: retail reloads the real gpMouseManager owner
+// between horizontal and vertical overlap tests while base CSEs it.  The first raw
+// divergence is +0x18, where base reloads the spilled bitmap before the first VESA call.
+// The decomp's wrong AND was corrected to OR; a two-stage rectangle test, reversed positive
+// comparisons, direct parameters, saved-coordinate locals, and `(&gpMouseManager)[0]`
+// were tried.  The missing owner occurrence is unresolved, not a delinker artifact.
 VA(0x004c5ee0, 0x18b)
 void BlitBitmapToScreen(class bitmap *bmp, int sourceX, int sourceY, int width, int height,
                         int destinationX, int destinationY)
@@ -914,24 +905,26 @@ void BlitBitmapToScreen(class bitmap *bmp, int sourceX, int sourceY, int width, 
     }
     gBlitRight = width + destinationX - 1;
     gBlitBottom = height + destinationY - 1;
-    if (gpMouseManager->IsVis() != 0 && gpMouseManager->m_savedW <= gBlitRight &&
-        gpMouseManager->field_0x6e >= destinationX && gpMouseManager->m_savedH <= gBlitBottom &&
-        gpMouseManager->field_0x72 >= destinationY) {
-        gpMouseManager->SaveAndDraw();
-        BlitBitmapToScreenVesa(reinterpret_cast<int>(targetBitmap), sourceX, sourceY, width, height,
-                               destinationX, destinationY);
-        if (gpMouseManager->field_0x6e > gBlitRight ||
-            gpMouseManager->m_savedW < destinationX ||
-            gpMouseManager->field_0x72 > gBlitBottom ||
-            gpMouseManager->m_savedH < destinationY) {
-            int savedX = gpMouseManager->m_savedW;
-            int savedY = gpMouseManager->m_savedH;
-            BlitBitmapToScreenVesa(reinterpret_cast<int>(targetBitmap), savedX, savedY,
-                                   gpMouseManager->field_0x6e - savedX + 1,
-                                   gpMouseManager->field_0x72 - savedY + 1, savedX, savedY);
+    if (gpMouseManager->IsVis() != 0 && gBlitRight >= gpMouseManager->m_savedLeft &&
+        gpMouseManager->m_cursorRight >= destinationX) {
+        if (gBlitBottom >= gpMouseManager->m_savedTop &&
+            gpMouseManager->m_cursorBottom >= destinationY) {
+            gpMouseManager->SaveAndDraw();
+            BlitBitmapToScreenVesa(reinterpret_cast<int>(targetBitmap), sourceX, sourceY, width, height,
+                                   destinationX, destinationY);
+            if (gpMouseManager->m_cursorRight > gBlitRight ||
+                gpMouseManager->m_savedLeft < destinationX ||
+                gpMouseManager->m_cursorBottom > gBlitBottom ||
+                gpMouseManager->m_savedTop < destinationY) {
+                int savedX = gpMouseManager->m_savedLeft;
+                int savedY = gpMouseManager->m_savedTop;
+                BlitBitmapToScreenVesa(reinterpret_cast<int>(targetBitmap), savedX, savedY,
+                                       gpMouseManager->m_cursorRight - savedX + 1,
+                                       gpMouseManager->m_cursorBottom - savedY + 1, savedX, savedY);
+            }
+            gpMouseManager->RestoreUnderlying();
+            return;
         }
-        gpMouseManager->RestoreUnderlying();
-        return;
     }
     BlitBitmapToScreenVesa(reinterpret_cast<int>(targetBitmap), sourceX, sourceY, width, height,
                            destinationX, destinationY);
@@ -946,15 +939,15 @@ void BlitBitmapToScreen(class bitmap *bmp, int sourceX, int sourceY, int width, 
 VA(0x004c6070, 0xa6)
 void LogTruncate(void)
 {
-    char local_1f4[500];
+    char logText[500];
     if (giDebugLevel >= 2) {
-        int _FileHandle = _open("KB.LOG", 0x4301, 0x80);
-        if (_FileHandle != -1) {
-            strcpy(local_1f4, "===========New Log==========");
-            *reinterpret_cast<unsigned short *>(local_1f4 + strlen(local_1f4)) =
+        int fileHandle = _open("KB.LOG", 0x4301, 0x80);
+        if (fileHandle != -1) {
+            strcpy(logText, "===========New Log==========");
+            *reinterpret_cast<unsigned short *>(logText + strlen(logText)) =
                 *reinterpret_cast<const unsigned short *>("\n");
-            _write(_FileHandle, local_1f4, strlen(local_1f4));
-            _close(_FileHandle);
+            _write(fileHandle, logText, strlen(logText));
+            _close(fileHandle);
         }
     }
 }
@@ -966,20 +959,20 @@ void LogTruncate(void)
 // OutputDebugString IAT operand at +0x8e is not named by delink. The same direct,
 // strcpy-at-strlen, memcpy and manual-scan forms were tried; strcat regressed.
 VA(0x004c6120, 0x9e)
-void LogStr(char *param_1)
+void LogStr(char *text)
 {
-    char local_1f4[500];
+    char logText[500];
     if (giDebugLevel >= 2) {
         FILE *f = fopen("KB.LOG", "at+");
         if (f != 0) {
-            strcpy(local_1f4, param_1);
-            *reinterpret_cast<unsigned short *>(local_1f4 + strlen(local_1f4)) =
+            strcpy(logText, text);
+            *reinterpret_cast<unsigned short *>(logText + strlen(logText)) =
                 *reinterpret_cast<const unsigned short *>("\n");
-            fputs(local_1f4, f);
+            fputs(logText, f);
             fclose(f);
         }
         if (giDebugLevel == 4)
-            OutputDebugStringA(local_1f4);
+            OutputDebugStringA(logText);
     }
 }
 
@@ -1027,22 +1020,22 @@ void LogInt(char *label, int value1, int value2, int value3, int value4, int val
 }
 
 VA(0x004c63f0, 0x6c)
-void AiPrint(char *param_1)
+void AiPrint(char *text)
 {
     if (giDebugLevel >= 2) {
         FillBitmapArea(gpWindowManager->m_screen, 0, 0x1cc, 0x280, 0x14, 0);
-        smallFont->DrawBoundedString(param_1, 0, 0x1d0, 0x280, 0x10, 1, 0);
+        smallFont->DrawBoundedString(text, 0, 0x1d0, 0x280, 0x10, 1, 0);
         BlitBitmapToScreen(gpWindowManager->m_screen, 0, 0x1cc, 0x280, 0x14, 0, 0x1cc);
     }
 }
 
 VA(0x004c6460, 0x7a)
-void AbsAiPrint(char *param_1)
+void AbsAiPrint(char *text)
 {
     int saved = giDebugLevel;
     giDebugLevel = 9;
     FillBitmapArea(gpWindowManager->m_screen, 0, 0x1cc, 0x280, 0x14, 0);
-    smallFont->DrawBoundedString(param_1, 0, 0x1d0, 0x280, 0x10, 1, 0);
+    smallFont->DrawBoundedString(text, 0, 0x1d0, 0x280, 0x10, 1, 0);
     BlitBitmapToScreen(gpWindowManager->m_screen, 0, 0x1cc, 0x280, 0x14, 0, 0x1cc);
     giDebugLevel = saved;
 }
@@ -1222,17 +1215,18 @@ long int FileSize(char *filename)
 VA(0x004c6920, 0xc)
 struct IconEntry * GetIconEntry(class icon *iconPtr, int index)
 {
-    IconEntry *entries = *(IconEntry **)((char *)iconPtr + 0x12);
+    IconEntry *entries = reinterpret_cast<IconEntry *>(iconPtr->m_data);
     return &entries[index];
 }
 
 // @match-note
-// Structurally complete /O2 checkpoint: base is 0xb7 bytes, retail 0xb8 and all 3
-// relocations agree. The semantic body is identical; base +0x1d..+0xb4 versus
-// retail +0x1d..+0xb5 assigns seed/mix/result to EDI/EBX/EAX instead of
-// ECX/EDI/EAX and schedules the final seed store before division. Direct term
-// locals, folded arithmetic and explicit bit-loop forms were checked. A volatile
-// seed store regressed this and neighboring random functions under combined TU state.
+// Structurally complete /O2 checkpoint: all three relocations and the complete seeded
+// random CFG agree.  The current prefix matches through +0x43; base then uses EAX for
+// the feedback term and stores iLastSeed before range division, while retail uses ECX,
+// folds the range LEA first, and publishes the seed after division.  Direct term locals,
+// folded arithmetic, explicit bit-loop forms, and a volatile seed store were checked.
+// The broad score movement followed a required header-state change; do not retune it
+// until the shared/TU declaration state is stable.
 VA(0x004c6930, 0xb8)
 int SRandom(int low, int high)
 {
