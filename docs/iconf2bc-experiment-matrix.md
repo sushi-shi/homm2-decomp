@@ -1,13 +1,12 @@
 # BASE/iconf2bc experiment matrix
 
-Current integrated state: checkpoint `48dbe3e`, source SHA-256
-`dd868c0ffcdabf134c98631a7a731d7b8d90845b7df496ce5a3c6dd05b305fd9`, 85.99%, function
-end `0x541`, frame `sub esp,8`, decoder entry `+0xea`, and 84/83 relocations. It reuses the
-later pitch lifetime to preserve the original icon width while `w` becomes the exclusive horizontal
-bound. This improves the score but does not remove the first width/X load-order divergence or the
-single excess setup `gFCY` relocation. The row sum and publication now use retail's `eax`; the two
-row inputs still load into the opposite registers. This is an integrated progress checkpoint, not a
-wall classification.
+Current structural state is based on integrated tip `a18cc69`, source SHA-256
+`1dff1e69857039210c855dda122d6340c5ebda3edcc9a6cff804f7925e84427d`, live 85.32%
+(retained maximum 86.2544%), function end `0x53f`, frame `sub esp,8`, and 84/83 relocations.
+It adopts the newly integrated shared IconRle enum domain, the canonical dim-palette owner header,
+the function owner header, and byte-pointer row storage. The complete normalized CFG and every
+relocation target are closed; gFCY 9/8 is the only occurrence excess. This is a structural
+checkpoint and compiler-state residual, not a byte-proven wall classification.
 
 The new-experiment table began at checkpoint `838105c` / source checkpoint `7386907`, SHA-256
 `648ecb4b963c5b97aea5908738d26509ad680853a3041817321b61aa955070f9`, score 83.4333%,
@@ -187,3 +186,34 @@ retained/reverted/byte-identical disposition.
 | `a59a175632a59a617591b7e7b97e7889e045f250697000691c97396aaa250794` | rename the reused icon-width/destination-pitch lifetime to semantic `width` | 85.99245% | `0x541`, `sub esp,8`; decoder `+0xea` | 84/83; 9 `gFCY` | byte-identical; the optimized register/spill choice is name-independent; reverted |
 | `fa4d6d949d4a6903b5a62c5707335d084ec1a784e649eec35f3b708f373563d3` | chain `pitch = w = entry->w` at the packed-width load and remove the later pitch copy | 85.16121% | `0x540`, `sub esp,8`; decoder `+0xe9` | 84/83; 9 `gFCY` | does not materialize the retail `[esp+0x14]` width spill: width stays in `eax`, X moves through `ebx`, and x0 moves through `ecx`; source-offset and row setup remain non-retail while the retained width/X and decoder alignment regress; reverted |
 | `30f1335677be4de2cbbcae38f912ef0a8206e20f01fccb91486b81bdfff203c4` | reverse the width chain to `w = pitch = entry->w` | 85.84131% | `0x544`, `sub esp,8`; decoder `+0xed` | 84/83; 9 `gFCY` | still does not materialize the retail early width spill; it reproduces the documented direct-pitch structural state (`13dee37...`): canonical width/X load order remains wrong, row inputs switch to retail order, but `gFCRow` is accumulated/published in `ecx` and decoder alignment regresses; reverted |
+
+## Structural audit at a18cc69
+
+This pass was triggered by the real shared `IconRle.h` type added at the integrated tip, not by a
+fuzzy search. No regex or AST permutation tool was used.
+
+| State | Live match | End/frame | Relocs | Result |
+|---|---:|---|---:|---|
+| rebuilt a18cc69 input | 84.39% | prior body, `sub esp,8` | 84/83 | baseline after refreshing the stale lane object/report |
+| shared IconRle enum with broad X_GLOBAL owner surface | 82.37% | not retained | 86/83 | rejected header ownership; enum declaration is real but the broad umbrella perturbs allocation and adds two occurrences |
+| shared IconRle enum plus canonical dimPalette/function owners | 85.53% | `0x53f`, `sub esp,8` | 84/83 | structurally retained; candidate text SHA-256 `c12480c014b478e6a41c68f91ead90a140b7fc8a116c04ca1c2c049376e4263e` |
+| preceding owner state plus byte-pointer gFCRow | 85.32% | `0x53f`, `sub esp,8` | 84/83 | final semantic state; removes integer-address casts, candidate text SHA-256 `a896f8fdb728691c8719bf0ec35c3dc8128d686b0c0c207981cee05c465fd9c9` |
+
+Final occurrence distribution is Entry1, X0=1, XEnd2, Y9, ClipR8, ClipB4, Row12, Run6, X2,
+Src1, Color5, DimLen2, Cnt2=5, DimPal3, Cnt8, DimDst4, Dst6, Skip4, and uDimPal1. Retail is
+identical except Y8. Candidate setup stores Y at +0x52 and reloads it at +0x77/+0x85; retail stores
+at +0x55 and loads once at +0x77, retaining ECX across both vertical clauses.
+
+CFG/frame proof: excluding retail padding, candidate/retail have 394/397 instructions, 76/76
+ordered blocks, 59/59 branches, and identical ordered successor vectors. Both reserve eight bytes.
+Candidate uses [esp+0x10] 7 times and [esp+0x14] 3 times versus retail 11 and 5: retail spills the
+icon width for its upper horizontal test and stages the far-right literal skip expression. Source
+already contains distinct width/pitch and skip lifetimes; the earlier staged forms optimized away,
+while volatile width created an incorrect 12-byte frame. These are allocation/home differences,
+not absent locals.
+
+Relocation-union raw audit: candidate `0x53f` versus retail `0x54d`; 889 common unmasked bytes,
+811 differ, first +0x0b, last +0x53e, plus a `0x0e` retail tail. At +0x0b candidate assigns icon
+data to EBX while retail uses ESI, and allocation differs broadly thereafter. Revisit only after a
+real shared-header/type-state change; do not replay the setup, width/pitch, snapshot, skip-staging,
+row-expression, or declaration-order families above.
