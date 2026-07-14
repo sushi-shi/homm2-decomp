@@ -14,6 +14,37 @@ Before replaying a source state, compare its hash here and confirm the canonical
 sibling hashes have not changed. A listed hash should not be rebuilt under the same compiler/header
 state.
 
+## BASE/icon2bc clean reconstruction
+
+`icon2bc-clean-reconstruction-04f798c.tsv` preserves the complete stale-header clean-room search,
+whose best state was 62.85%. `icon2bc-clean-reconstruction-a45e64f.tsv` records the fresh search
+after rebasing to checkpoint `a45e64f` and the current `icon::m_data` type. The canonical body was
+not inspected or copied. Its locally measured score was 72.22% (retained campaign maximum 72.479%);
+the best independent decoder reached 69.46%, 90/91 relocations, and was rejected. Canonical source
+was therefore restored. Its full-range raw audit confirms a structural residual: after masking the
+union of relocation payloads, 745 of 792 common bytes differ and retail has a further 0x49-byte
+tail.
+
+The new search recovered reusable structure: the destination is a long-lived register cursor with
+selective scratch publications; the dim path republishes clipped counts and palette state; and the
+literal path has a common zero-count publication join, including the fully clipped case. Parsing
+`Misc.h` reproduces the retail private-symbol sequence `S1629` through `S1645`, which is strong
+evidence for the historical include/TU state. A direct-global decoder was again rejected because it
+overpublishes scratch state and loses the retail register lifetimes.
+
+The best clean state still has a global register-role swap (candidate X in EBX and destination in
+ESI versus retail X in ESI and later destination in EBX). Its relocation residual is missing two
+`gCTClipR`, one `gCTCnt`, and one `gCTSrc` reference while adding one `gCTX0` and two `gCTY`
+references. Do not repeat local predicate/count synonyms. The next credible lever is an
+exact-preserving predecessor/include/TU-state and lifetime search under the combined translation
+unit, retaining canonical unless the 72.479 maximum is exceeded.
+
+No permutation tool was used in either search. The regex permuter remains prohibited; AST
+permutation is inappropriate until the body is structurally aligned at the 96-97% last-mile
+threshold. The old/new matrix SHA-256 values are respectively
+`2634ba3204bd39929fd97602e87484522a145105f93e353179264461c6b603eb` and
+`7cb7a33ae738a510c08cbc6a23c4a2c3b8201f469df34c95aab0cf601b60fa8f`.
+
 ## BASE/Misc early-batch structural and TU-state retest
 
 `misc-early-tu-state-04f798c.tsv` records the bounded clean retest of `InitMemEntry` through
