@@ -52,6 +52,42 @@ typedef enum HeroPrimaryStat {
 
 #define HERO_PRIMARY_STAT_COUNT 4
 #define HERO_ARTIFACT_SLOT_COUNT 14
+#define HERO_SPELL_COUNT 65
+
+typedef enum HeroArtifact {
+    HERO_ARTIFACT_NOMAD_BOOTS = 0x21,
+    HERO_ARTIFACT_TRAVELER_BOOTS = 0x22,
+    HERO_ARTIFACT_TRUE_COMPASS = 0x27,
+    HERO_ARTIFACT_SAILORS_ASTROLABE = 0x28,
+    HERO_ARTIFACT_MAGIC_BOOK = 0x51,
+    HERO_ARTIFACT_SPELL_SCROLL = 0x56,
+    HERO_ARTIFACT_BATTLE_GARB = 0x5a
+} HeroArtifact;
+
+typedef enum HeroSpell {
+    HERO_SPELL_NONE = -1,
+    HERO_SPELL_TOWN_PORTAL = 0x3a
+} HeroSpell;
+
+typedef enum HeroSpellType {
+    HERO_SPELL_TYPE_COMBAT = 0,
+    HERO_SPELL_TYPE_ADVENTURE = 1,
+    HERO_SPELL_TYPE_ALL = 2
+} HeroSpellType;
+
+typedef enum HeroMobilityConstant {
+    HERO_BASE_RECORD_SIZE = 0xec,
+    HERO_SEA_BASE_MOBILITY = 1500,
+    HERO_LIGHTHOUSE_MOBILITY_BONUS = 500,
+    HERO_ASTROLABE_MOBILITY_BONUS = 1000,
+    HERO_COMPASS_MOBILITY_BONUS = 500,
+    HERO_NOMAD_BOOTS_MOBILITY_BONUS = 600,
+    HERO_TRAVELER_BOOTS_MOBILITY_BONUS = 300,
+    HERO_STABLES_MOBILITY_BONUS = 400,
+    HERO_AI_DIFFICULTY_MOBILITY_BONUS = 75,
+    HERO_AI_STATE_MOBILITY_BONUS = 50,
+    HERO_LIGHTHOUSE_MINE_TYPE = 100
+} HeroMobilityConstant;
 
 typedef enum HeroEventFlag {
     HERO_EVENT_BUOY = 0x2,
@@ -130,7 +166,7 @@ public:
     signed char m_secondarySkills[14];  // +0x74
     signed char m_secondarySkillOrder[14];  // +0x82
     int m_secondarySkillCount;  // +0x90
-    signed char m_spells[65];  // +0x94
+    signed char m_spells[HERO_SPELL_COUNT];  // +0x94
     signed char m_artifacts[HERO_ARTIFACT_SLOT_COUNT];  // +0xd5
     union {
         unsigned int m_eventFlags;  // +0xe3
