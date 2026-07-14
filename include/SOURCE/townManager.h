@@ -26,7 +26,7 @@ public:
     townObject *m_townObjects[32];  // +0x3e
     int m_townObjectCount;  // +0xbe
     int m_lastTownType;  // +0xc2
-    int    field_0xc6;  // +0xc6
+    int m_unknownC6;  // +0xc6
     heroWindow *m_townWindow;  // +0xca
     strip *m_garrisonStrip;  // +0xce
     strip *m_heroStrip;  // +0xd2

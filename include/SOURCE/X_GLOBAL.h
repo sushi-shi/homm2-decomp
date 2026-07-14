@@ -112,7 +112,18 @@ extern float gfPhilAIDurationMod[12];
 extern float gfSpellTypeNumMod[7];
 extern signed char gbArrow[8][8];
 extern unsigned char giCloudType[256];
-extern signed char *townTheme;
+typedef enum TownMusicTrack {
+    TOWN_MUSIC_NONE = 0,
+    TOWN_MUSIC_WARLOCK = 5,
+    TOWN_MUSIC_WIZARD = 6,
+    TOWN_MUSIC_NECROMANCER = 7,
+    TOWN_MUSIC_KNIGHT = 8,
+    TOWN_MUSIC_BARBARIAN = 9,
+    TOWN_MUSIC_SORCERESS = 10,
+    TOWN_MUSIC_TABLE_SIZE = 8
+} TownMusicTrack;
+
+extern signed char townTheme[TOWN_MUSIC_TABLE_SIZE];
 extern signed char gHeroSkillBonus[6][2][4];
 extern int giMonoIconSkip;
 extern int giScrollX;

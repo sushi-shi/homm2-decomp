@@ -13,11 +13,14 @@ typedef enum TownType {
     TOWN_TYPE_SORCERESS = 2,
     TOWN_TYPE_WARLOCK = 3,
     TOWN_TYPE_WIZARD = 4,
-    TOWN_TYPE_NECROMANCER = 5
+    TOWN_TYPE_NECROMANCER = 5,
+    TOWN_TYPE_COUNT = 6
 } TownType;
 
 typedef enum TownBuilding {
+    TOWN_BUILDING_MAGE_GUILD = 0x1,
     TOWN_BUILDING_TAVERN = 0x4,
+    TOWN_BUILDING_DOCK = 0x8,
     TOWN_BUILDING_TENT = 0x20,
     TOWN_BUILDING_CASTLE = 0x40,
     TOWN_BUILDING_CAPTAIN = 0x80,
@@ -49,7 +52,7 @@ public:
     unsigned char m_boatY;  // +0x07
     armyGroup m_army;  // +0x08
     char   m_occupyingHeroId;  // +0x17
-    int    m_buildings;  // +0x18
+    unsigned long m_buildings;  // +0x18
     signed char m_buildState;  // +0x1c
     char m_unknown1d;  // +0x1d
     short m_garrison[12];  // +0x1e
