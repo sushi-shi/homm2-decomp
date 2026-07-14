@@ -23,16 +23,34 @@ struct MemEntry {
     int line;           // +0x46  caller __LINE__
 };
 #pragma pack(pop)
+#ifdef HOMM2_MISC_INLINE_ICONENTRY
 #pragma pack(push, 1)
-struct IconEntry {          // one sprite frame header in the icon entry table (13B, indexed by frame)
-    short x;                // +0  x offset
-    short y;                // +2  y offset
-    short w;                // +4  width
-    short h;                // +6  height
-    unsigned char flags : 5; // +8
-    int srcOffset;          // +9  offset of this frame's RLE data within the icon blob
+struct IconEntry {
+    short x;
+    short y;
+    short w;
+    short h;
+    unsigned char flags;
+    int srcOffset;
 };
 #pragma pack(pop)
+#else
+#define HOMM2_BASE_ICONENTRY_NO_SIZE
+#include <BASE/IconEntry.h>
+#undef HOMM2_BASE_ICONENTRY_NO_SIZE
+#endif
+#pragma pack(push, 1)
+struct PCXHeader {
+    unsigned char manufacturer, version, encoding, bitsPerPixel;
+    unsigned short xMin, yMin, xMax, yMax;
+    unsigned short horizontalDpi, verticalDpi;
+    unsigned char palette16[48];
+    unsigned char reserved, planes;
+    unsigned short bytesPerLine, paletteType, horizontalScreenSize, verticalScreenSize;
+    unsigned char filler[54];
+};
+#pragma pack(pop)
+SIZE(PCXHeader, 0x80);
 
 void InitMemEntry(void);
 void * BaseAlloc(unsigned int, char *, int);
@@ -45,6 +63,9 @@ void FadeIn(int);
 void FadeOut(int);
 int Random(int low, int high);
 void ProcessAssert(int condition, char *file, int line);
+#define H2_ALLOC(size, originalFile, originalLine) BaseAlloc(size, originalFile, originalLine)
+#define H2_FREE(ptr, originalFile, originalLine) BaseFree(ptr, originalFile, originalLine)
+#define H2_ASSERT(condition, originalFile, originalLine) ProcessAssert(condition, originalFile, originalLine)
 char * FindStringInString(char *text, char *pattern);
 char * FindToken(char *text, char token);
 char * FindLastToken(char *text, char token);

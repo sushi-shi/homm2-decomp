@@ -60,16 +60,16 @@ public:
 #pragma pack(pop)
 SIZE(mouseManager, 0x8a);
 // ---- globals (declarations, RVA order) ----
-extern int *iMouseOffset;
+extern int iMouseOffset[4];
 extern signed char iMouseSize[96][2];
 extern signed char iHotSpot[96][2];
 extern int gbInSetPointer;
 extern int bInNewMouseUpdate;
-extern struct tagBITMAP *bmpAndMask;
+extern struct tagBITMAP bmpAndMask[97];
 extern void *hMouseCursor[96];
 extern void *cAndBits[96];
 extern void *cColorBits[98];
-extern struct _ICONINFO *IconInfo;
+extern struct _ICONINFO IconInfo[96];
 extern void *hbmpAndMask[106];
 
 #endif // HOMM2_BASE_MOUSEMANAGER_H

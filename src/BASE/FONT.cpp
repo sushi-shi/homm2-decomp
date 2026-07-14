@@ -8,6 +8,7 @@
 #include <BASE/font.h>
 #include <BASE/resourceManager.h>
 #include <BASE/icon.h>
+#include <BASE/IconEntry.h>
 #include <BASE/Icon2b.h>
 #include <BASE/icon2bc.h>
 #include <BASE/heroWindowManager.h>
@@ -37,6 +38,9 @@ font::~font()
 {
     gpResourceManager->Dispose(m_glyphIcon);
 }
+// The generated 0x39-byte ??_G COMDAT is raw-identical to both delinked retail ??_E copies;
+// its two relocations target ~font and operator delete. MSVC emits ??_E as a weak ??_G alias,
+// and the vtable relocation resolves through that alias, so the duplicate report rows are unscored.
 
 VA(0x004c7120, 0x24a)
 void font::DrawStringExecute(char *str, int x, int y, int mode,
@@ -48,34 +52,35 @@ void font::DrawStringExecute(char *str, int x, int y, int mode,
     while (str[i] != 0) {
         c = str[i];
         if (c == 0x1f) {
-            pos += GetCharacterWidth(str[i]);
+            pos += GetCharacterWidth(reinterpret_cast<unsigned char *>(str)[i]);
             goto next;
-        } else if (c == '{') {
+        }
+        if (c == '{') {
             m_suppressDraw = 1;
             goto next;
-        } else if (c == '}') {
+        }
+        if (c == '}') {
             m_suppressDraw = 0;
             goto next;
-        } else {
-            c -= 0x20;
-            if (c < 0 || c > 0x5f)
-                c = 0x5f;
-            if (c != 0) {
-                if (mode == 1 && m_suppressDraw == 0)
-                    IconToBitmap(m_glyphIcon, gpWindowManager->m_screen, pos, y, c, 1,
-                                 clipL, clipT, clipR, clipB, 0);
-                else if (mode == 2 || (mode == 1 && m_suppressDraw != 0))
-                    IconToBitmapColorTable(m_glyphIcon, gpWindowManager->m_screen, pos, y, c, 1,
-                                           clipL, clipT, clipR, clipB, 0, gColorTableYellow, 1);
-                else if (mode == 4)
-                    IconToBitmapColorTable(m_glyphIcon, gpWindowManager->m_screen, pos, y, c, 1,
-                                           clipL, clipT, clipR, clipB, 0, gColorTableScenWin, 0);
-                else
-                    IconToBitmapColorTable(m_glyphIcon, gpWindowManager->m_screen, pos, y, c, 1,
-                                           clipL, clipT, clipR, clipB, 0, gColorTableDarkGray, 1);
-            }
-            pos += GetCharacterWidth(str[i]);
         }
+        c -= 0x20;
+        if (c < 0 || c > 0x5f)
+            c = 0x5f;
+        if (c != 0) {
+            if (mode == 1 && m_suppressDraw == 0)
+                IconToBitmap(m_glyphIcon, gpWindowManager->m_screen, pos, y, c, 1,
+                             clipL, clipT, clipR, clipB, 0);
+            else if (mode == 2 || (mode == 1 && m_suppressDraw != 0))
+                IconToBitmapColorTable(m_glyphIcon, gpWindowManager->m_screen, pos, y, c, 1,
+                                       clipL, clipT, clipR, clipB, 0, gColorTableYellow, 1);
+            else if (mode == 4)
+                IconToBitmapColorTable(m_glyphIcon, gpWindowManager->m_screen, pos, y, c, 1,
+                                       clipL, clipT, clipR, clipB, 0, gColorTableScenWin, 0);
+            else
+                IconToBitmapColorTable(m_glyphIcon, gpWindowManager->m_screen, pos, y, c, 1,
+                                       clipL, clipT, clipR, clipB, 0, gColorTableDarkGray, 1);
+        }
+        pos += GetCharacterWidth(reinterpret_cast<unsigned char *>(str)[i]);
     next:
         i++;
     }
@@ -101,77 +106,84 @@ int font::GetCharacterWidth(unsigned char c)
         c -= ' ';
         if (c < 0 || c > 0x5f)
             c = 0x5f;
-        // stride-13 char-metrics table in the glyph icon; width is the short at +4.
-        return *(short *)(m_glyphIcon->m_data + c * 13 + 4) + m_isLarge;
+        return reinterpret_cast<IconEntry *>(m_glyphIcon->m_data)[c].w + m_isLarge;
     }
 }
 
 VA(0x004c7470, 0x313)
 void font::DrawBoundedString(char *str, int x, int y, int w, int h, int mode, int align)
 {
-    // Locals declared at function scope (period C89 style): the retail's /Od frame (0x4c) spills
-    // all of them up-front, incl. two write-once vestigials (glyph pointer, a ' ') and local copies
-    // of str/align — the same reserved-local pattern as LineWidth/LineLength.
-    int len = strlen(str);
-    char *glyph = m_glyphIcon->m_data;
-    char sp = ' ';
-    int xOff = 0;
-    int yOff = 0;
-    int lineStart = 0;
-    int v1 = 0;
-    int i = 0;
-    int lineWidth = 0;
-    int v2 = 0;
-    char *s = str;
-    int m = mode;
-    int breakPt;
+    // Semantic suffixes preserve the retail /Od slot buckets. glyphPos, space9, and v1 are
+    // vestigial locals present in the retail frame.
+    int size = strlen(str);
+    char *glyphPos = m_glyphIcon->m_data;
+    char space9 = ' ';
+    int xPosition = 0;
+    int yOffC = 0;
+    char savedChar;
+    int lineStartD = 0;
+    int lineEnd1 = 0;
+    int v1;
+    int idx = 0;
+    int lineWidth3 = 0;
+    int wordBreak0 = 0;
+    char *text2 = str;
+    int drawMode2 = mode;
     if (align & 4) {
         align -= 4;
-        int totalH = m_height * LineLength(s, w);
+        int lineCount = LineLength(str, w);
+        int totalH = m_height * lineCount;
         if (totalH < h)
-            yOff = (h - totalH) / 2;
+            yOffC = (h - totalH) / 2;
     }
     m_suppressDraw = 0;
-    while (1) {
-        if (len <= i || s[i] == 0 || (h < m_height + yOff && yOff != 0))
-            return;
-        while (s[i] != 0 && s[i] != '\n' && lineWidth <= w) {
-            lineWidth += GetCharacterWidth(s[i]);
-            i++;
+    while (size > idx && text2[idx] != 0 &&
+           (m_height + yOffC <= h || yOffC == 0)) {
+        while (text2[idx] != 0 && text2[idx] != '\n' && lineWidth3 <= w) {
+            lineWidth3 += GetCharacterWidth(text2[idx]);
+            idx++;
         }
-        if (w < lineWidth) {
-            breakPt = 0;
-            while (i--, s[i] != ' ' && lineStart <= i) {
-                lineWidth -= GetCharacterWidth(s[i]);
-                if (h < m_height * 2 + yOff && lineWidth < w)
-                    return;
-                if (breakPt == 0 && lineWidth < w)
-                    breakPt = i;
+        int savedWidth = lineWidth3;
+        if (w < lineWidth3) {
+            idx--;
+            wordBreak0 = 0;
+            // The SIB-equivalent lvalue makes VC4.2 load the other comparison operand first.
+            while (text2[idx] != ' ' && 0[&idx] >= lineStartD) {
+                lineWidth3 -= GetCharacterWidth(text2[idx]);
+                if (m_height * 2 + yOffC > h && lineWidth3 < w)
+                    break;
+                if (wordBreak0 == 0 && lineWidth3 < w)
+                    wordBreak0 = idx;
+                idx--;
             }
-            if (i <= lineStart)
-                i = breakPt;
-            if (s[i] == ' ')
-                lineWidth -= GetCharacterWidth(s[i]);
+            if (0[&idx] <= lineStartD) {
+                idx = wordBreak0;
+                lineWidth3 = savedWidth;
+            }
+            if (text2[idx] == ' ')
+                lineWidth3 -= GetCharacterWidth(text2[idx]);
         }
-        char saved = s[i];
-        s[i] = 0;
+        lineEnd1 = idx;
+        savedChar = text2[lineEnd1];
+        text2[lineEnd1] = 0;
         switch (align) {
         case 0:
-            xOff = 0;
+            xPosition = 0;
             break;
         case 1:
-            xOff = (w - lineWidth) / 2;
+            xPosition = (w - lineWidth3) / 2;
             break;
         case 2:
-            xOff = w - lineWidth;
+            xPosition = w - lineWidth3;
             break;
         }
-        DrawStringExecute(s + lineStart, xOff + x, yOff + y, m, x, y, w, h);
-        s[i] = saved;
-        yOff += m_height;
-        i++;
-        lineStart = i;
-        lineWidth = 0;
+        DrawStringExecute(text2 + lineStartD, x + xPosition, y + yOffC, drawMode2,
+                          x, y, w, h);
+        text2[lineEnd1] = savedChar;
+        yOffC += m_height;
+        lineStartD = lineEnd1 + 1;
+        idx = lineStartD;
+        lineWidth3 = 0;
     }
 }
 
@@ -189,16 +201,16 @@ int font::LineLength(char *str, int maxW)
     char *w = str;                       // ptr   @ -0x20
     int q, v;                            // unused @ -0x8, -0x1c
     while (p < s && w[p] != 0) {
-        while (w[p] != 0 && w[p] != '\n' && x <= maxW) {
+        while (w[p] != 0 && w[p] != '\n' && 0[&x] <= maxW) {
             x += GetCharacterWidth(w[p]);
             p++;
         }
-        if (x > maxW) {
+        if (0[&x] > maxW) {
             p--;
             gap = 0;
             while (w[p] != ' ' && p >= r) {
                 x -= GetCharacterWidth(w[p]);
-                if (gap == 0 && x < maxW)
+                if (gap == 0 && 0[&x] < maxW)
                     gap = p;
                 p--;
             }
@@ -225,7 +237,7 @@ int font::LineWidth(char *str)
     int q, u;                                   // unused @ -0x8, -0x18
     int y = 0, t = 0, r = 0, x = 0, p = 0, w = 0;  // zeroed in this order: -0x28,-0x14,-0xc,-0x24,-0x4(i),-0x20(width)
     char *v = str;                              // @ -0x1c
-    while (p < s && v[p] != 0) {
+    while (0[&p] < s && v[p] != 0) {
         while (v[p] != 0 && v[p] != '\n') {
             w += GetCharacterWidth(v[p]);
             p++;

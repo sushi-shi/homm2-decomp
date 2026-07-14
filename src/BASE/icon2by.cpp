@@ -29,9 +29,14 @@ static unsigned int gYMDimLen2;
 static int gYMClipR;
 
 // @early-stop
-// Y-shear variant of IconToBitmap: each scanline's X origin is offset by shear[Y] (0x7f = skip this
-// line). Always clips (no fast path); X and row live in globals gYMX/gYMRow. Literal copy = memcpy,
-// solid run = memset, dim = per-pixel uDimPal remap. Residual is the /O2 register-fusion wall.
+// /O2 byte-proven register-allocation wall: base 0x57c versus retail 0x588. Setup and command
+// parsing are instruction-identical through +0x191 (apart from relocations/forward displacements).
+// Residual blocks are fill base +0x191..+0x2da vs retail +0x191..+0x2e2, dim
+// +0x2da..+0x409 vs +0x2e2..+0x413, and literal +0x409..+0x575 vs +0x413..+0x581.
+// Base has 129/130 retail relocations with no wrong target; the sole missing occurrence is retail's
+// gYMX reload at +0x214 in the full-fill quadrant. Tried merged and four-way memcpy/memset forms,
+// combined/nested/goto clipping, both comparison directions, per-branch dim destinations, semantic
+// locals, inclusive-bound equivalents, and the full 129-variant AST permutation search.
 VA(0x004da270, 0x588)
 void IconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int y, int frame, int clip,
                          int clipX, int clipY, int clipW, int clipH, int color, signed char *shear)
@@ -47,59 +52,57 @@ void IconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int y, 
     gYMClipB = clipY + clipH - 1;
     gYMRow = gYMPitch * gYMY + reinterpret_cast<int>(dest->m_pixels);
     for (;;) {
-        int cmd = *gYMSrc++;
-        if (static_cast<signed char>(cmd) < 0) {
-            gYMRun = cmd;
-            if ((cmd & 0x40) == 0) {
-                if ((cmd & 0x3f) == 0)
+        gYMRun = *gYMSrc;
+        gYMSrc = gYMSrc + 1;
+        if (static_cast<signed char>(gYMRun) < 0) {
+            if ((gYMRun & 0x40) == 0) {
+                if ((gYMRun & 0x3f) == 0)
                     return;
-                gYMX = gYMX + (cmd & 0x3f);
+                gYMX = gYMX + (gYMRun & 0x3f);
                 continue;
             }
             // 0xc0 - 0xff
-            unsigned int count = cmd & 0x3f;
-            gYMRun = count;
-            int flags = 0;
-            if (count != 0) {
-                if (cmd == 0xc1) {
+            if ((gYMRun & 0x3f) != 0) {
+                if (gYMRun == 0xc1) {
                     gYMRun = *gYMSrc;
                     gYMSrc = gYMSrc + 1;
+                } else {
+                    gYMRun = gYMRun & 0x3f;
                 }
                 gYMColor = *gYMSrc;
                 gYMSrc = gYMSrc + 1;
                 goto do_fill;
             }
-            flags = *gYMSrc;
-            gYMDimLen = flags & 3;
+            gYMRun = *gYMSrc;
             gYMSrc = gYMSrc + 1;
-            if ((flags & 3) == 0) {
+            if ((gYMRun & 3) != 0) {
+                gYMDimLen = gYMRun & 3;
+            } else {
                 gYMDimLen = *gYMSrc;
                 gYMSrc = gYMSrc + 1;
             }
             gYMDimLen2 = gYMDimLen;
-            if (color != 0 && (flags & 0x80) != 0) {
-                gYMColor = static_cast<unsigned char>(color);
+            if (color != 0 && (gYMRun & 0x80) != 0) {
                 gYMRun = gYMDimLen;
+                gYMColor = static_cast<unsigned char>(color);
                 goto do_fill;
             }
-            if ((flags & 0x40) != 0) {
-                gYMDimPal = reinterpret_cast<unsigned char *>(uDimPal) + (flags & 0x3c) * 0x40;
-                if (shear[gYMY] != 0x7f && clipY <= gYMY && gYMY <= gYMClipB &&
-                    (int)(gYMDimLen + gYMX) > clipX && gYMX <= gYMClipR) {
-                    int right = gYMDimLen + gYMX;
-                    int at;
-                    if (gYMX < clipX) {
-                        at = clipX;
-                        if (gYMClipR < right)
-                            gYMDimLen = clipW;
-                        else
-                            gYMDimLen = gYMDimLen + (gYMX - clipX);
-                    } else {
-                        at = gYMX;
-                        if (gYMClipR < right)
+            if ((gYMRun & 0x40) != 0) {
+                gYMDimPal = reinterpret_cast<unsigned char *>(uDimPal) + (gYMRun & 0x3c) * 0x40;
+                if (shear[gYMY] != 0x7f && clipY <= gYMY && gYMClipB >= gYMY &&
+                    (int)(gYMDimLen + gYMX) > clipX && gYMClipR >= gYMX) {
+                    int dimRight = gYMDimLen + gYMX;
+                    if (clipX <= gYMX) {
+                        if (gYMClipR < dimRight)
                             gYMDimLen = (gYMClipR - gYMX) + 1;
+                        gYMDimDst = reinterpret_cast<unsigned char *>(gYMRow + gYMX);
+                    } else {
+                        if (gYMClipR >= dimRight)
+                            gYMDimLen = gYMDimLen + (gYMX - clipX);
+                        else
+                            gYMDimLen = clipW;
+                        gYMDimDst = reinterpret_cast<unsigned char *>(gYMRow + clipX);
                     }
-                    gYMDimDst = reinterpret_cast<unsigned char *>(gYMRow + at);
                     gYMDimIdx = 0;
                     if (0 < static_cast<int>(gYMDimLen)) {
                         do {
@@ -113,57 +116,55 @@ void IconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int y, 
             gYMX = gYMX + gYMDimLen2;
             continue;
         do_fill:
-            if (shear[gYMY] != 0x7f && clipY <= gYMY && gYMY <= gYMClipB &&
-                (int)(gYMX + gYMRun) > clipX && gYMX <= gYMClipR) {
-                int right = gYMX + gYMRun;
-                unsigned int cn;
-                unsigned char *dst;
-                if (gYMX < clipX) {
-                    if (gYMClipR < right)
-                        cn = clipW;
-                    else
-                        cn = (gYMRun - clipX) + gYMX;
-                    dst = reinterpret_cast<unsigned char *>(gYMRow + clipX);
+            if (shear[gYMY] != 0x7f && clipY <= gYMY && gYMClipB >= gYMY &&
+                (int)(gYMX + gYMRun) > clipX && gYMClipR >= gYMX) {
+                int fillRight = gYMX + gYMRun;
+                if (clipX <= gYMX) {
+                    if (gYMClipR >= fillRight) {
+                        memset(reinterpret_cast<unsigned char *>(gYMRow + gYMX), gYMColor,
+                               gYMRun);
+                    } else {
+                        memset(reinterpret_cast<unsigned char *>(gYMRow + gYMX), gYMColor,
+                               (gYMClipR - gYMX) + 1);
+                    }
                 } else {
-                    if (gYMClipR < right)
-                        cn = (gYMClipR - gYMX) + 1;
-                    else
-                        cn = gYMRun;
-                    dst = reinterpret_cast<unsigned char *>(gYMRow + gYMX);
+                    if (gYMClipR >= fillRight) {
+                        memset(reinterpret_cast<unsigned char *>(gYMRow + clipX), gYMColor,
+                               (gYMRun - clipX) + gYMX);
+                    } else {
+                        memset(reinterpret_cast<unsigned char *>(gYMRow + clipX), gYMColor,
+                               clipW);
+                    }
                 }
-                memset(dst, gYMColor, cn);
             }
             gYMX = gYMX + gYMRun;
             continue;
         }
         // ---- positive command : literal copy / newline ----
-        gYMRun = cmd;
-        if (cmd != 0) {
-            if (shear[gYMY] != 0x7f && clipY <= gYMY && gYMY <= gYMClipB &&
-                (int)(gYMX + cmd) > clipX && gYMX <= gYMClipR) {
-                int right = gYMX + cmd;
-                unsigned int cn;
-                unsigned char *src2;
-                unsigned char *dst;
-                if (gYMX < clipX) {
-                    if (gYMClipR < right)
-                        cn = clipW;
-                    else
-                        cn = (cmd - clipX) + gYMX;
-                    src2 = gYMSrc + (clipX - gYMX);
-                    dst = reinterpret_cast<unsigned char *>(gYMRow + clipX);
+        if (gYMRun != 0) {
+            if (shear[gYMY] != 0x7f && clipY <= gYMY && gYMClipB >= gYMY &&
+                (int)(gYMX + gYMRun) > clipX && gYMClipR >= gYMX) {
+                int copyRight = gYMX + gYMRun;
+                if (clipX <= gYMX) {
+                    if (gYMClipR >= copyRight) {
+                        memcpy(reinterpret_cast<unsigned char *>(gYMRow + gYMX), gYMSrc,
+                               gYMRun);
+                    } else {
+                        memcpy(reinterpret_cast<unsigned char *>(gYMRow + gYMX), gYMSrc,
+                               (gYMClipR - gYMX) + 1);
+                    }
                 } else {
-                    src2 = gYMSrc;
-                    if (gYMClipR < right)
-                        cn = (gYMClipR - gYMX) + 1;
-                    else
-                        cn = cmd;
-                    dst = reinterpret_cast<unsigned char *>(gYMRow + gYMX);
+                    if (gYMClipR >= copyRight) {
+                        memcpy(reinterpret_cast<unsigned char *>(gYMRow + clipX),
+                               gYMSrc + (clipX - gYMX), (gYMRun - clipX) + gYMX);
+                    } else {
+                        memcpy(reinterpret_cast<unsigned char *>(gYMRow + clipX),
+                               gYMSrc + (clipX - gYMX), clipW);
+                    }
                 }
-                memcpy(dst, src2, cn);
             }
-            gYMX = gYMX + cmd;
-            gYMSrc = gYMSrc + cmd;
+            gYMX = gYMX + gYMRun;
+            gYMSrc = gYMSrc + gYMRun;
             continue;
         }
         // newline

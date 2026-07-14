@@ -4,9 +4,20 @@
 // 37 methods, 3 own-virtual, 0 static data.
 #include <va.h>
 #include "baseManager.h"
+
+#define MIDI_TRACK_COUNT 60
+#define MIDI_NO_TRACK (-1)
+#define MIDI_SEQUENCE_PLAYING 4
+#define MIDI_MAX_VOLUME 127
+#define MIDI_VOLUME_FADE_SPLIT 10
+#define MIDI_VOLUME_LOW_RANGE 11
+#define MIDI_VOLUME_HIGH_RANGE 6
+#define MIDI_VOLUME_CONVERSION_MODE 101
+#define MIDI_DEFAULT_DEVICE_ID 0xffffffffUL
 // forward declarations:
 class sample;
 struct _SAMPLE;
+struct _DIG_DRIVER;
 struct tag_message;
 
 #pragma pack(push, 1)  // recovered layout is byte-packed
@@ -21,7 +32,7 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
-    int    m_digitalDriver;  // +0x36
+    struct _DIG_DRIVER *m_digitalDriver;  // +0x36
     int    field_0x3a;  // +0x3a
     int    m_ready;  // +0x3e
     char _pad_0x42[0xe];
@@ -45,7 +56,7 @@ public:
     char   m_pollDue;  // +0x57a
     char   m_pollToggle;  // +0x57b
     char _pad_0x57c[0x14];
-    long   m_savedTrackPositions[0x3c];  // +0x590  saved music file positions per track
+    long   m_savedTrackPositions[MIDI_TRACK_COUNT];  // +0x590  saved music file positions per track
     int    m_fading;  // +0x680
     int    m_samplesReady;  // +0x684
     int    m_fadeSteps;  // +0x688
@@ -94,9 +105,9 @@ public:
     void MIDIStartup(void);
     void MIDIShutdown(void);
     void MIDIPlay(int);
-    void MIDIStop(void);
-    int MIDIIsPlaying(void);
-    void MIDISetVolume(void);
+    __declspec(dllexport) inline void MIDIStop(void);
+    __declspec(dllexport) inline int MIDIIsPlaying(void);
+    __declspec(dllexport) inline void MIDISetVolume(void);
     void MIDIPoll(void);
 };
 #pragma pack(pop)
@@ -110,13 +121,13 @@ extern int CDPlaying;
 extern int iCalibrateLoop;
 extern struct _MDI_DRIVER *hMDI;
 extern int CurrentMidiFile;
-extern unsigned char *bGotMidi;
+extern unsigned char bGotMidi[MIDI_TRACK_COUNT];
 extern long lLastMIDIPollTickCount;
 extern char lpszReturnString[0x100];
 extern unsigned long nMCIError;
 extern short iLastVolume[0x20];
 extern char CommandString[0x100];
-extern class MIDIWrap *pMIDIWrap[60];
-extern struct _SEQUENCE *hSequence[60];
+extern class MIDIWrap *pMIDIWrap[MIDI_TRACK_COUNT];
+extern struct _SEQUENCE *hSequence[MIDI_TRACK_COUNT];
 
 #endif // HOMM2_BASE_SOUNDMANAGER_H
