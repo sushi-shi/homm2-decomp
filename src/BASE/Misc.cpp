@@ -887,20 +887,21 @@ void BlitBitmapToScreenNoMouseCheck(class bitmap *bmp, int p2, int p3, int p4, i
     BlitBitmapToScreenVesa(reinterpret_cast<int>(bmp), p2, p3, p4, p5, p6, p7);
 }
 
-// @early-stop
-// /O2 register-allocation wall: base is 0x17b bytes, retail 0x18b, with all 24
-// relocation targets agreeing. The divergent instruction spans are base
-// +0x06..+0x178 / retail +0x06..+0x188: retail spills the bitmap at entry and
-// assigns EBX/ESI/EDI to the two destination coordinates differently. All four
-// VESA sites and IsVis/SaveAndDraw/RestoreUnderlying calls, overlap branches,
-// and rectangle fields agree. Parameter copies, direct parameters, saved-coordinate
-// locals and reordered overlap expressions were tried; they only permute registers.
+// @match-note
+// Structurally complete /O2 checkpoint: base and retail object extents are 0x18c,
+// both frames are 8 bytes, and all external call/relocation targets agree (the
+// 23/24 helper count is one delinked retail local owner). The first raw difference
+// is +0x18; the remaining 195 bytes are register/schedule and local-owner changes.
+// Correcting the second overlap test from the decomp's AND to retail's OR and
+// retaining the retail bitmap spill recovered the complete four-call CFG. Direct
+// parameters, saved-coordinate locals and overlap-expression order were also tried.
 VA(0x004c5ee0, 0x18b)
 void BlitBitmapToScreen(class bitmap *bmp, int sourceX, int sourceY, int width, int height,
                         int destinationX, int destinationY)
 {
+    bitmap *volatile targetBitmap = bmp;
     if (gbColorMice == 0) {
-        BlitBitmapToScreenVesa(reinterpret_cast<int>(bmp), sourceX, sourceY, width, height,
+        BlitBitmapToScreenVesa(reinterpret_cast<int>(targetBitmap), sourceX, sourceY, width, height,
                                destinationX, destinationY);
         return;
     }
@@ -916,31 +917,31 @@ void BlitBitmapToScreen(class bitmap *bmp, int sourceX, int sourceY, int width, 
         gpMouseManager->field_0x6e >= destinationX && gpMouseManager->m_savedH <= gBlitBottom &&
         gpMouseManager->field_0x72 >= destinationY) {
         gpMouseManager->SaveAndDraw();
-        BlitBitmapToScreenVesa(reinterpret_cast<int>(bmp), sourceX, sourceY, width, height,
+        BlitBitmapToScreenVesa(reinterpret_cast<int>(targetBitmap), sourceX, sourceY, width, height,
                                destinationX, destinationY);
-        if (gpMouseManager->field_0x6e <= gBlitRight &&
-            gpMouseManager->m_savedW >= destinationX &&
-            gpMouseManager->field_0x72 <= gBlitBottom &&
+        if (gpMouseManager->field_0x6e > gBlitRight ||
+            gpMouseManager->m_savedW < destinationX ||
+            gpMouseManager->field_0x72 > gBlitBottom ||
             gpMouseManager->m_savedH < destinationY) {
             int savedX = gpMouseManager->m_savedW;
             int savedY = gpMouseManager->m_savedH;
-            BlitBitmapToScreenVesa(reinterpret_cast<int>(bmp), savedX, savedY,
+            BlitBitmapToScreenVesa(reinterpret_cast<int>(targetBitmap), savedX, savedY,
                                    gpMouseManager->field_0x6e - savedX + 1,
                                    gpMouseManager->field_0x72 - savedY + 1, savedX, savedY);
         }
         gpMouseManager->RestoreUnderlying();
         return;
     }
-    BlitBitmapToScreenVesa(reinterpret_cast<int>(bmp), sourceX, sourceY, width, height,
+    BlitBitmapToScreenVesa(reinterpret_cast<int>(targetBitmap), sourceX, sourceY, width, height,
                            destinationX, destinationY);
 }
 
-// @early-stop
-// /O2 intrinsic wall: base is 0xa9 bytes, retail 0xa6; all 7 relocations agree.
+// @match-note
+// Structurally complete /O2 checkpoint: the 0x1f4 frame, CFG and 7/7 relocations agree.
 // Only base +0x5c..+0x7c differs from retail +0x5c..+0x75: base loads the newline
 // word before strlen and addresses via `not ecx`, while retail scans first and
 // writes through `[edi-1]`. Direct word stores, strcat, strcpy-at-strlen, memcpy
-// and a manual end scan were tried; none select retail's hybrid intrinsic.
+// and a manual end scan were tried; the combined-TU strcat retest regressed badly.
 VA(0x004c6070, 0xa6)
 void LogTruncate(void)
 {
@@ -957,12 +958,12 @@ void LogTruncate(void)
     }
 }
 
-// @early-stop
-// /O2 intrinsic/delink wall: base is 0xa4 bytes, retail 0x9e; all 8 relocation
-// targets agree. The newline append is base +0x53..+0x73 versus retail
+// @match-note
+// Structurally complete /O2 checkpoint: the 0x1f4 frame, CFG and external targets
+// agree. The newline append is base +0x53..+0x73 versus retail
 // +0x4f..+0x6c (preloaded word/not-ECX versus post-scan `[edi-1]`); retail's raw
 // OutputDebugString IAT operand at +0x8e is not named by delink. The same direct,
-// strcat, strcpy-at-strlen, memcpy and manual-scan append shapes were exhausted.
+// strcpy-at-strlen, memcpy and manual-scan forms were tried; strcat regressed.
 VA(0x004c6120, 0x9e)
 void LogStr(char *param_1)
 {
@@ -981,9 +982,9 @@ void LogStr(char *param_1)
     }
 }
 
-// @early-stop
-// /O2 intrinsic/delink wall: base is 0x22a bytes, retail 0x224; all 22 relocation
-// targets and all seven sprintf call/format branches agree. Only the newline
+// @match-note
+// Structurally complete /O2 checkpoint: the 0x2bc frame, all external targets and
+// all seven sprintf call/format branches agree. Only the newline
 // append differs (base +0x1c9..+0x1f2, retail +0x1c9..+0x1ec), followed by the
 // unnamed retail OutputDebugString IAT operand at +0x211. Direct word, strcat,
 // strcpy-at-strlen, memcpy and manual end-scan spellings were tried.
@@ -1045,13 +1046,13 @@ void AbsAiPrint(char *param_1)
     giDebugLevel = saved;
 }
 
-// @early-stop
-// /O2 register-allocation wall: base is 0xfa bytes, retail 0xf8 and all 6
-// relocations agree. The sole divergent instruction span is the inner color
-// adjustment at base +0x49..+0x85 / retail +0x47..+0x81: threshold/value use
-// EAX/ECX/EBX in a different permutation and the equivalent comparison is
-// reversed. Signed difference, unsigned value, abs/ternary, and both comparison
-// orientations were tried; the current form retains the 95.12% maximum.
+// @match-note
+// Structurally complete /O2 checkpoint: the calls, 768-byte loop, CFG and 6/6
+// relocations agree. The current combined-TU state reserves 0x314 bytes versus
+// retail's 0x310 and moves the palette base by four bytes; the retained source-hash
+// maximum had the retail frame. The remaining inner adjustment differs by register
+// allocation and threshold scheduling. Signed/unsigned difference, abs/ternary,
+// comparison polarity and volatile level forms were tried; volatile regressed.
 VA(0x004c64e0, 0xf8)
 void FadeTo(unsigned char *source, unsigned char *destination, int increment)
 {
@@ -1093,13 +1094,13 @@ void FadeTo(unsigned char *source, unsigned char *destination, int increment)
     UpdatePalette(reinterpret_cast<signed char *>(destination));
 }
 
-// @early-stop
-// /O2 register-allocation wall: base and retail are both 0xb8 bytes and all 8
-// relocations agree. Differences are limited to palette translation
+// @match-note
+// Structurally complete /O2 checkpoint: the 0x304 frame, complete two-loop CFG and
+// all 8 relocations agree. Differences are limited to palette translation
 // +0x22..+0x51 and screen remapping +0x65..+0x87: retail holds the row count in
 // EDI and advances EDX, while base uses EDX and advances EAX. Indexed output,
 // pre/post-increment output, explicit row pointers and a single linear pointer
-// loop were tried; the linear form gives the retained 87.18% maximum.
+// loop were tried; revisit only after a new predecessor/header TU state.
 VA(0x004c65e0, 0xb8)
 void FadeToColorTable(unsigned char *colorTable, int increment)
 {
@@ -1142,13 +1143,13 @@ int IsCycleColor(int color)
     return 0;
 }
 
-// @early-stop
-// /O2 register-allocation wall: base is 0x1ec bytes, retail 0x1ee; all 14
+// @match-note
+// Structurally complete /O2 checkpoint: the 0x8c frame and all 14
 // relocations and every open/write/alloc/free/close target agree. Divergences are
 // confined to the RLE loop (base +0x67..+0xe0 / retail +0x67..+0xdf), where EBX
 // and EDI swap encoded-size/run-end roles, and palette scaling +0x19a..+0x1ae,
 // where equivalent indexed operands are commuted. `<2`, `==1`, and `<=1` run
-// tests plus reordered loop locals were tried; `<=1` retains 98.04%.
+// tests, reordered locals, predicate polarity and commuted SIB forms were tried.
 VA(0x004c66d0, 0x1ee)
 void CreatePCXFile(char *filename, unsigned char *pixels, int width, int height,
                    unsigned char *paletteData)
@@ -1224,13 +1225,13 @@ struct IconEntry * GetIconEntry(class icon *iconPtr, int index)
     return &entries[index];
 }
 
-// @early-stop
-// /O2 register-allocation wall: base is 0xb7 bytes, retail 0xb8 and all 3
+// @match-note
+// Structurally complete /O2 checkpoint: base is 0xb7 bytes, retail 0xb8 and all 3
 // relocations agree. The semantic body is identical; base +0x1d..+0xb4 versus
 // retail +0x1d..+0xb5 assigns seed/mix/result to EDI/EBX/EAX instead of
 // ECX/EDI/EAX and schedules the final seed store before division. Direct term
-// locals, folded arithmetic and explicit bit-loop forms were checked; they only
-// rotate registers or move the invariant store.
+// locals, folded arithmetic and explicit bit-loop forms were checked. A volatile
+// seed store regressed this and neighboring random functions under combined TU state.
 VA(0x004c6930, 0xb8)
 int SRandom(int low, int high)
 {
@@ -1261,8 +1262,8 @@ int SRandom(int low, int high)
     return low + result % (high - low + 1);
 }
 
-// @early-stop
-// /O2 register-allocation wall: base is 0x58 bytes, retail 0x5c and both
+// @match-note
+// Structurally complete /O2 checkpoint: base is 0x57 bytes, retail 0x5c and both
 // relocations agree. The complete +0x00..return span differs only in allocation:
 // base preserves EDI and uses EDX/ESI for terms; retail preserves EBP and uses
 // ESI/EDX. Split term locals and folded multiply/add expressions were checked;
@@ -1285,13 +1286,13 @@ void SRand(int seed)
     srand(seed);
 }
 
-// @early-stop
-// /O2 invariant-store scheduling wall: base and retail are both 0x48 bytes and
+// @match-note
+// Structurally complete /O2 checkpoint: base and retail are both 0x48 bytes and
 // all 3 relocations agree. Every byte matches except the six-byte iLastSeed store:
 // base +0x30..+0x35 places it before the bit loop; retail +0x3e..+0x43 places it
 // after `dec ecx` in the loop. for/do-while placement and a volatile store were
-// tried; volatile spills the mix and drops the match to 53%, while nonvolatile
-// forms are hoisted and retain 90.64%.
+// tried; volatile spills the mix and caused broad TU regressions, while nonvolatile
+// forms are hoisted. Revisit only after a new predecessor/header TU state.
 VA(0x004c6a60, 0x48)
 int SGenRand(void)
 {
@@ -1316,14 +1317,13 @@ int MemSize(int)
     return 0x3ea2;
 }
 
-// @early-stop
-// /O2 local-allocation/delink wall: base is 0x381 bytes, retail 0x386; all 59
-// relocation targets agree. Differences are the three empty-string local labels,
-// row/entry-Y arithmetic at retail +0xbc..+0x102, and swapped LEA roles for the
-// entry buffer/message near +0x185..+0x1c6. All broadcasts, constructors,
-// MemError calls, widget arguments, dialog/delete and cursor restoration agree.
-// Branched and boolean-mask Y adjustment, direct/local empty strings, and local
-// declaration reorderings were tried; the current form retains 95.90%.
+// @match-note
+// Structurally aligned /O2 checkpoint: both code spans are 0x386, the 0x9c frame,
+// CFG and all 59 relocations agree. The recovered conditional Y adjustment leaves
+// only 12 unmasked bytes: one `mov ecx,0x2d` schedule at +0xbc and swapped LEAs for
+// entryText/message near +0x141, plus three delinked empty-string owner names.
+// Boolean-mask/branched Y forms, direct/local empty strings and declaration order
+// were tried. Resume with exact-preserving predecessor/TU state, then AST last mile.
 VA(0x004c6ac0, 0x386)
 void GetDataEntry(char *prompt, char *destination, int maximumLength, char *initialText,
                   int showCancel, int useImmediateHandler)
@@ -1344,7 +1344,7 @@ void GetDataEntry(char *prompt, char *destination, int maximumLength, char *init
     rows = (rows + 0xf) / 0x2d;
     if (rows > 6)
         rows = 6;
-    int entryY = rows * 0x2d - (((showCancel == 0) - 1) & 0x1e) + 0x5f;
+    int entryY = rows * 0x2d - (showCancel != 0 ? 0x1e : 0) + 0x5f;
 
     char windowName[16];
     sprintf(windowName, "evntwin%d.bin", rows);
@@ -1406,13 +1406,13 @@ void GetDataEntry(char *prompt, char *destination, int maximumLength, char *init
     gbAllowTextEntryEscape = 1;
 }
 
-// @early-stop
-// /O2 block-layout wall: base is 0x17b bytes, retail 0x173; all 23 relocations
-// agree. The only differing instruction blocks are the command==13/cancel dispatch
-// (retail +0x4d..+0x70) and its equivalent tail block (+0x15a..+0x172); the entire
-// broadcast/copy/draw/dialog-result path between them matches. Early returns,
-// shared fallback labels, combined predicates and a late possible-cancel label
-// were tried; MSVC continues to invert and reorder these equivalent blocks.
+// @match-note
+// Structurally complete /O2 checkpoint: all 23 relocations and the complete
+// broadcast/copy/draw/dialog-result path agree. Moving the possible-cancel tail
+// before the normal fallback recovered retail body order and shortened base to
+// 0x16f versus retail's 0x173. The remaining difference is widget id 0x7802 being
+// hoisted into the initial command dispatch instead of emitted in the tail. Direct
+// returns regressed badly; a volatile tail read emitted no change and was removed.
 VA(0x004c6e50, 0x173)
 int DataEntryWindowHandler(struct tag_message &message)
 {
@@ -1460,15 +1460,15 @@ int DataEntryWindowHandler(struct tag_message &message)
         }
     }
 
-normalEvent:
-    return EventWindowHandler(message);
-
 possibleCancelEvent:
     if (message.payload.widget.id != 0x7802)
         goto normalEvent;
     message.payload.widget.id = 10;
     message.payload.widget.command = 10;
     return 2;
+
+normalEvent:
+    return EventWindowHandler(message);
 }
 
 // ---- globals (definitions, RVA order) ----
