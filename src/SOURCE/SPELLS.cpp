@@ -19,6 +19,7 @@
 #include <BASE/heroWindowManager.h>
 #include <BASE/mouseManager.h>
 #include <BASE/resourceManager.h>
+#include <BASE/soundManager.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/CMBTMGR.h>
 #include <SOURCE/combatManager.h>
@@ -2140,53 +2141,1353 @@ skipBranch:
     gpWindowManager->m_updateFlags = 1;
 }
 
+// @match-note retained 99.68%, combined live 94.16%: semantics, CFG, frame,
+// and all 12 relocation targets agree. Later TU/header state changed the two
+// side/index multiply sequences; the remaining relocation-only residual is the
+// zero-float label ($T8947 versus retail const_000eb150). Revisit after shared
+// layout stabilization; do not repeat the already exact source spelling.
 VA(0x004266ce, 0x18c)
-int combatManager::GetNextChainLightningTarget(class army *, int) { return 0; }
+int combatManager::GetNextChainLightningTarget(army *source, int requireWorks)
+{
+    int closestDistance = 999999;
+    int closestHex = COMBAT_HEX_EMPTY;
+    int sourceX = source->MidX();
+    int sourceY = source->MidY();
 
+    int side;
+    for (side = 0; side < COMBAT_SIDE_COUNT; ++side) {
+        int armyIndex;
+        for (armyIndex = 0; armyIndex < m_armyCount[side]; ++armyIndex) {
+            army *candidate = &m_armies[side][armyIndex];
+            if (gArmyEffected[side][armyIndex] == 0) {
+                if ((requireWorks != 0 &&
+                     candidate->SpellCastWorks(SPELL_CHAIN_LIGHTNING)) ||
+                    (requireWorks == 0 &&
+                     candidate->SpellCastWorkChance(SPELL_CHAIN_LIGHTNING) !=
+                         0.0f)) {
+                    int deltaX = abs(candidate->MidX() - sourceX);
+                    int deltaY = abs(candidate->MidY() - sourceY);
+                    int distance = static_cast<int>(sqrt(static_cast<double>(
+                        deltaX * deltaX + deltaY * deltaY)));
+                    if (distance < closestDistance) {
+                        closestDistance = distance;
+                        closestHex = candidate->m_hex;
+                    }
+                }
+            }
+        }
+    }
+    return closestHex;
+}
+
+// @match-note 99.41%: complete four-target damage/selection/bolt CFG; all 37
+// relocation targets agree. Retail has a 0x5c frame versus ours 0x50. The first
+// code divergence is the branch-distance clamp (`jg`/`jl` versus retail
+// `jge`/`jle`). Tried both assignment orders, a nextTarget local, `<`, and
+// `<= MIN-1`; revisit at 95% for slot/layout steering, not those spellings.
 VA(0x0042685a, 0x361)
-void combatManager::ChainLightning(int, int) {}
+void combatManager::ChainLightning(int targetHex, int spellPower)
+{
+    int firstBolt = 1;
+    int damage = spellPower * CHAIN_LIGHTNING_INITIAL_DAMAGE_PER_POWER;
+    int deadline = KBTickCount();
+    int startX = castX;
+    int startY = castY;
 
+    ClearEffects();
+    gpMouseManager->HideColorPointer();
+    int strike;
+    for (strike = 0; strike < CHAIN_LIGHTNING_MAX_TARGETS; ++strike) {
+        army *target = &m_armies[m_hexCells[targetHex].m_occupantSide]
+                                 [m_hexCells[targetHex].m_occupantIndex];
+        if (strike <= CHAIN_LIGHTNING_MAX_TARGETS - 2 &&
+            m_hexCells[targetHex].m_occupantSide == m_currentSide)
+            gpCombatManager->m_heroDeathPending[m_currentSide] = 1;
+
+        int targetDamage = damage;
+        if (target->m_monsterType == SPELL_MONSTER_AIR_ELEMENTAL)
+            targetDamage *= CHAIN_LIGHTNING_AIR_ELEMENTAL_MULTIPLIER;
+        if (target->m_monsterType == SPELL_MONSTER_IRON_GOLEM ||
+            target->m_monsterType == SPELL_MONSTER_STEEL_GOLEM)
+            targetDamage = static_cast<int>(targetDamage *
+                                            SPELL_GOLEM_DAMAGE_MULTIPLIER);
+        target->Damage(targetDamage, COMBAT_HEX_EMPTY);
+        damage >>= 1;
+        gArmyEffected[target->m_side][target->m_index] = 1;
+
+        int targetX = target->MidX();
+        int targetY = target->MidY();
+        int deltaX = abs(targetX - startX);
+        int deltaY = abs(targetY - startY);
+        int distance = static_cast<int>(
+            sqrt(static_cast<double>(deltaX * deltaX + deltaY * deltaY)));
+        int branchDistance = distance / CHAIN_LIGHTNING_DISTANCE_DIVISOR;
+        if (branchDistance > CHAIN_LIGHTNING_MAX_BRANCH_DISTANCE)
+            branchDistance = CHAIN_LIGHTNING_MAX_BRANCH_DISTANCE;
+        if (branchDistance < CHAIN_LIGHTNING_MIN_BRANCH_DISTANCE)
+            branchDistance = CHAIN_LIGHTNING_MIN_BRANCH_DISTANCE;
+        int forceAngle = branchDistance < CHAIN_LIGHTNING_SHORT_BRANCH_THRESHOLD
+                             ? 2
+                             : 3;
+        DoBolt(0, startX, startY, targetX, targetY, 0,
+               CHAIN_LIGHTNING_BOLT_LENGTH, CHAIN_LIGHTNING_START_WIDTH,
+               CHAIN_LIGHTNING_END_WIDTH, CHAIN_LIGHTNING_COLOR_MODE,
+               CHAIN_LIGHTNING_MIN_ANGLE, CHAIN_LIGHTNING_MAX_ANGLE,
+               branchDistance, forceAngle, 0, 0, strike == 0);
+        firstBolt = 0;
+        startX = targetX;
+        startY = targetY;
+        DelayMilli(static_cast<long>(gfCombatSpeedMod[gConfig.combatSpeed] *
+                                     SPELL_FIZZLE_FRAME_DELAY));
+        int nextTarget = GetNextChainLightningTarget(target, 1);
+        if (nextTarget == COMBAT_HEX_EMPTY)
+            break;
+        targetHex = nextTarget;
+        DrawFrame(1, 0, 0, 0, 0, 1, 1);
+        DelayTil(&deadline);
+        deadline = static_cast<int>(
+            KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] *
+                                SPELL_FIZZLE_FRAME_DELAY);
+    }
+    ShowMassSpell(gArmyEffected, gsSpellInfo[SPELL_CHAIN_LIGHTNING].combatEffect,
+                  1);
+    DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
+    gpMouseManager->ShowColorPointer();
+}
+
+// @match-note 94.56%: complete three-phase vapor mask and cleanup CFG. Retail
+// has a 0x30 frame and 31 relocations versus ours 0x28 and 29; the first
+// divergence is BaseAlloc's retail source-line expression, followed by the
+// bottom-stripe address evaluation order. Tried extent calculation before and
+// after palette assignment and explicit first/last stripe locals. Revisit at
+// 95% after source-line metadata/od_slots work; do not repeat those orderings.
 VA(0x00426bbb, 0x292)
-void combatManager::VaporizeCreature(int, int) {}
+void combatManager::VaporizeCreature(int side, int armyIndex)
+{
+    army *target = &m_armies[side][armyIndex];
+    ResetLimitCreature();
+    ++m_limitCreatureCount[side][armyIndex];
+    gpCombatManager->DrawFrame(1, 1, 1, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
+    gyModify = static_cast<signed char *>(
+        BaseAlloc(SPELL_MODIFIER_ROW_COUNT, SPELLS_SOURCE_FILE, 0));
+    memset(gyModify, 0, SPELL_MODIFIER_ROW_COUNT);
+    int rowCount = giMaxExtentY - giMinExtentY + 1;
+    target->m_palette = gyModify;
+    target->m_drawEnabled = 0;
 
+    int firstY = (giMinExtentY / VAPORIZE_STRIPE_WIDTH) *
+                 VAPORIZE_STRIPE_WIDTH;
+    int lastY = (giMaxExtentY / VAPORIZE_STRIPE_WIDTH) *
+                VAPORIZE_STRIPE_WIDTH;
+    rowCount = (lastY - firstY) / VAPORIZE_STRIPE_WIDTH + 1;
+    int phase;
+    for (phase = 0; phase < VAPORIZE_PHASE_COUNT; ++phase) {
+        int topOffset;
+        int bottomOffset;
+        switch (phase) {
+        case 0:
+            topOffset = 0;
+            bottomOffset = 1;
+            break;
+        case 1:
+            topOffset = 1;
+            bottomOffset = 3;
+            break;
+        default:
+            topOffset = 3;
+            bottomOffset = 2;
+            break;
+        }
+        if (phase == VAPORIZE_PHASE_COUNT - 1)
+            rowCount = (rowCount - 1) / 2 + 1;
+        int row;
+        for (row = 0; row < rowCount; ++row) {
+            gyModify[row * VAPORIZE_STRIPE_WIDTH +
+                     firstY + topOffset] =
+                VAPORIZE_MASKED;
+            gyModify[lastY +
+                     (row * -VAPORIZE_STRIPE_WIDTH - bottomOffset)] =
+                VAPORIZE_MASKED;
+            gbLimitToExtent = 1;
+            gpCombatManager->DrawFrame(1, 0, 1, 0, 30, 1, 1);
+        }
+    }
+    DelayMilli(static_cast<long>(gfCombatSpeedMod[gConfig.combatSpeed] *
+                                 SPELL_FIZZLE_FRAME_DELAY));
+    target->m_palette = 0;
+    target->m_drawEnabled = 1;
+    BaseFree(gyModify, SPELLS_SOURCE_FILE, 0);
+    gyModify = 0;
+    gpCombatManager->DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
+}
+
+// @match-note 92.18%: complete mode parameters, sine table, phase filtering,
+// amplitude scaling, both fade masks, draw, and cleanup CFG. Retail has a 0x54
+// frame/68 relocs versus ours 0x58/62; the first code divergence after the
+// switch is side/index multiplication order, then BaseAlloc source-line
+// metadata. The old unscaled-wave/union-filter formulation was wrong and is
+// exhausted. Revisit at 95% for slot placement and allocation metadata only.
 VA(0x00426e4d, 0x592)
-void combatManager::RippleCreature(int, int, int) {}
+void combatManager::RippleCreature(int side, int armyIndex, int mode)
+{
+    army *target = &m_armies[side][armyIndex];
+    int phaseStep;
+    int frameDelay;
+    float amplitudeBase;
+    float amplitudeStep;
+    switch (mode) {
+    case SPELL_RIPPLE_MODE_WAVE:
+        phaseStep = 2;
+        frameDelay = 20;
+        amplitudeBase = RIPPLE_MODE_ZERO_AMPLITUDE_BASE;
+        amplitudeStep = RIPPLE_MODE_ZERO_AMPLITUDE_STEP;
+        break;
+    case SPELL_RIPPLE_MODE_DEATH_RIPPLE:
+        phaseStep = 1;
+        frameDelay = 30;
+        amplitudeBase = RIPPLE_OTHER_AMPLITUDE_BASE;
+        amplitudeStep = RIPPLE_OTHER_AMPLITUDE_STEP;
+        break;
+    default:
+        phaseStep = 1;
+        frameDelay = 30;
+        amplitudeBase = RIPPLE_OTHER_AMPLITUDE_BASE;
+        amplitudeStep = RIPPLE_OTHER_AMPLITUDE_STEP;
+        break;
+    }
 
+    ResetLimitCreature();
+    ++m_limitCreatureCount[side][armyIndex];
+    if (mode == SPELL_RIPPLE_MODE_DEATH_WAVE)
+        gpCombatManager->DrawFrame(0, 1, 1, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
+    else
+        gpCombatManager->DrawFrame(1, 1, 1, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
+
+    int extentHeight;
+    gyModify = static_cast<signed char *>(
+        BaseAlloc(SPELL_MODIFIER_ROW_COUNT, SPELLS_SOURCE_FILE, 0));
+    float *wave = static_cast<float *>(
+        BaseAlloc(sizeof(float) * SPELL_MODIFIER_ROW_COUNT,
+                  SPELLS_SOURCE_FILE, 0));
+    memset(gyModify, 0, SPELL_MODIFIER_ROW_COUNT);
+    int row;
+    for (row = 0; row < SPELL_MODIFIER_ROW_COUNT; ++row) {
+        wave[row] = static_cast<float>(
+            (sin(static_cast<float>(row % RIPPLE_WAVE_PERIOD) /
+                 static_cast<float>(RIPPLE_WAVE_DIVISOR)) - 0.5) * 2.0);
+    }
+    target->m_palette = gyModify;
+    target->m_drawEnabled = 0;
+    giMinExtentX -= RIPPLE_MARGIN;
+    giMaxExtentX += RIPPLE_MARGIN;
+    if (giMinExtentX < 0)
+        giMinExtentX = 0;
+    if (giMaxExtentX >= COMBAT_SCREEN_WIDTH)
+        giMaxExtentX = COMBAT_SCREEN_WIDTH - 1;
+    extentHeight = giMaxExtentY - giMinExtentY + 1;
+
+    int phase;
+    for (phase = RIPPLE_PHASE_START; phase < RIPPLE_PHASE_END;
+         phase += phaseStep) {
+        int skipDistance = abs(RIPPLE_PHASE_CENTER -
+                               phase % RIPPLE_PHASE_PERIOD) -
+                           RIPPLE_SKIP_CENTER_OFFSET;
+        int amplitudeIndex =
+            (phase - RIPPLE_PHASE_START) / RIPPLE_AMPLITUDE_INDEX_DIVISOR + 1;
+        if (mode == SPELL_RIPPLE_MODE_DEATH_WAVE)
+            amplitudeIndex = RIPPLE_MODE_TWO_AMPLITUDE_START - amplitudeIndex;
+        else if (mode == SPELL_RIPPLE_MODE_WAVE) {
+            if (amplitudeIndex == 0)
+                amplitudeIndex = RIPPLE_MODE_ZERO_CENTER_AMPLITUDE;
+            else
+                amplitudeIndex = RIPPLE_MODE_ZERO_AMPLITUDE_START -
+                                 amplitudeIndex;
+        }
+        if (phase > RIPPLE_PHASE_CENTER &&
+            phase < RIPPLE_PHASE_END - RIPPLE_SKIP_CENTER_OFFSET &&
+            (skipDistance != RIPPLE_SKIP_DISTANCE_0 &&
+             skipDistance != RIPPLE_SKIP_DISTANCE_1 &&
+             skipDistance != RIPPLE_SKIP_DISTANCE_2 &&
+             skipDistance != RIPPLE_SKIP_DISTANCE_3 &&
+             skipDistance != RIPPLE_SKIP_DISTANCE_4)) {
+            float amplitude =
+                (amplitudeIndex * amplitudeStep + amplitudeBase) *
+                skipDistance;
+            memset(gyModify + giMinExtentY, 0, extentHeight);
+            for (row = giMinExtentY; row < giMaxExtentY; ++row) {
+                int waveIndex;
+                if (mode == SPELL_RIPPLE_MODE_DEATH_WAVE)
+                    waveIndex = -RIPPLE_PHASE_CENTER - giMaxExtentY +
+                                phase * 2 + row;
+                else
+                    waveIndex = phase * 2 - RIPPLE_PHASE_CENTER - row +
+                                giMinExtentY;
+                waveIndex += RIPPLE_WAVE_INDEX_OFFSET;
+                if (waveIndex >= 0 && waveIndex < SPELL_MODIFIER_ROW_COUNT)
+                    gyModify[row] = static_cast<signed char>(
+                        wave[waveIndex] * amplitude);
+            }
+            if (mode == SPELL_RIPPLE_MODE_DEATH_RIPPLE &&
+                phase >= RIPPLE_DEATH_RIPPLE_FADE_START) {
+                int start = giMinExtentY - 1;
+                int end = giMinExtentY +
+                          (RIPPLE_DEATH_RIPPLE_FADE_BASE -
+                           (RIPPLE_PHASE_END - phase)) *
+                              extentHeight / RIPPLE_FADE_DIVISOR +
+                          1;
+                memset(gyModify + start, VAPORIZE_MASKED, end - start + 1);
+            }
+            if (mode == SPELL_RIPPLE_MODE_DEATH_WAVE &&
+                phase < RIPPLE_DEATH_WAVE_FADE_END) {
+                int start = giMinExtentY - 1;
+                int end = giMaxExtentY - 1 -
+                          (phase - RIPPLE_DEATH_WAVE_FADE_BASE) *
+                              extentHeight / RIPPLE_FADE_DIVISOR;
+                memset(gyModify + start, VAPORIZE_MASKED, end - start + 1);
+            }
+            gbLimitToExtent = 1;
+            gpCombatManager->DrawFrame(1, 0, 1, 0, frameDelay, 1, 1);
+        }
+    }
+    DelayMilli(static_cast<long>(gfCombatSpeedMod[gConfig.combatSpeed] *
+                                 SPELL_FIZZLE_FRAME_DELAY));
+    target->m_palette = 0;
+    target->m_drawEnabled = 1;
+    BaseFree(gyModify, SPELLS_SOURCE_FILE, 0);
+    BaseFree(wave, SPELLS_SOURCE_FILE, 0);
+    gyModify = 0;
+    if (mode != SPELL_RIPPLE_MODE_DEATH_RIPPLE)
+        gpCombatManager->DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
+}
+
+// @match-note retained 94.20%, live 88.08% after shared-header changes:
+// complete effect loading, creature animation, death processing, and vanish
+// CFG; all 23 relocation targets agree. Retail has a 0x28 frame versus ours
+// 0x40. The first normalized divergence is affected[side][armyIndex] address
+// multiplication order, followed by wince/death arm layout. Tried target
+// pointer locals, direct indexing, and both frame-loop spellings. Revisit at
+// 95% for od_slots/header stabilization; do not restore the transient live max.
 VA(0x004273df, 0x6b2)
-void combatManager::ShowMassSpell(signed char (* const)[20], int, int) {}
+void combatManager::ShowMassSpell(signed char (* const affected)[20],
+                                  int effect, int animateCreatures)
+{
+    unsigned long effectFile = MAKEFILEID(gCombatFxNames[effect]);
+    int effectFrames = giNumPowFrames[effect] - 1;
+    int returnFrames = 0;
+    if (gCurLoadedSpellEffect != effect) {
+        gpResourceManager->Dispose(gCurLoadedSpellIcon);
+        gCurLoadedSpellIcon = gpResourceManager->GetIcon(effectFile);
+        gCurLoadedSpellEffect = effect;
+    }
 
+    int side;
+    for (side = 0; side < COMBAT_SIDE_COUNT; ++side) {
+        int armyIndex;
+        for (armyIndex = 0; armyIndex < m_armyCount[side]; ++armyIndex) {
+            army *target = &m_armies[side][armyIndex];
+            if (affected[side][armyIndex] != 0)
+                target->m_drawSpellEffect = 1;
+            if (animateCreatures != 0 && affected[side][armyIndex] != 0 &&
+                target->m_animationSequence != ARMY_ANIMATION_WINCE &&
+                target->m_animationSequence != ARMY_ANIMATION_WINCE_RETURN) {
+                if (target->m_quantity == 0) {
+                    if (effectFrames < target->m_frameInfo.animationFrameCount[
+                                           ARMY_ANIMATION_DEATH])
+                        effectFrames = target->m_frameInfo.animationFrameCount[
+                            ARMY_ANIMATION_DEATH];
+                    gpSoundManager->MemorySample(target->m_samples[ARMY_SAMPLE_KILL]);
+                } else {
+                    if (effectFrames < target->m_frameInfo.animationFrameCount[
+                                           ARMY_ANIMATION_WINCE])
+                        effectFrames = target->m_frameInfo.animationFrameCount[
+                            ARMY_ANIMATION_WINCE];
+                    if (returnFrames < target->m_frameInfo.animationFrameCount[
+                                           ARMY_ANIMATION_WINCE_RETURN])
+                        returnFrames = target->m_frameInfo.animationFrameCount[
+                            ARMY_ANIMATION_WINCE_RETURN];
+                    gpSoundManager->MemorySample(target->m_samples[ARMY_SAMPLE_WINCE]);
+                }
+            }
+        }
+    }
+
+    int frame;
+    for (frame = 0; frame < effectFrames; ++frame) {
+        for (side = 0; side < COMBAT_SIDE_COUNT; ++side) {
+            int armyIndex;
+            for (armyIndex = 0; armyIndex < m_armyCount[side]; ++armyIndex) {
+                army *target = &m_armies[side][armyIndex];
+                target->m_spellEffectYOffset = 0;
+                if (animateCreatures != 0 && affected[side][armyIndex] != 0) {
+                    if (target->m_quantity == 0) {
+                        if (target->m_animationSequence == ARMY_ANIMATION_DEATH) {
+                            if (target->m_animationFrame + 1 <
+                                target->m_frameInfo.animationFrameCount[
+                                    target->m_animationSequence])
+                                ++target->m_animationFrame;
+                        } else {
+                            target->m_animationSequence = ARMY_ANIMATION_DEATH;
+                            target->m_animationFrame = 0;
+                        }
+                    } else if (target->m_animationSequence ==
+                               ARMY_ANIMATION_WINCE) {
+                        if (target->m_animationFrame + 1 <
+                            target->m_frameInfo.animationFrameCount[
+                                target->m_animationSequence])
+                            ++target->m_animationFrame;
+                    } else {
+                        target->m_animationSequence = ARMY_ANIMATION_WINCE;
+                        target->m_animationFrame = 0;
+                    }
+                }
+                if (frame + 1 < giNumPowFrames[effect])
+                    gCurSpellEffectFrame = frame;
+            }
+        }
+        DrawFrame(1, 0, 0, 0, 110, 1, 1);
+    }
+
+    for (side = 0; side < COMBAT_SIDE_COUNT; ++side) {
+        int armyIndex;
+        for (armyIndex = 0; armyIndex < m_armyCount[side]; ++armyIndex)
+            m_armies[side][armyIndex].m_drawSpellEffect = 0;
+    }
+    for (frame = 0; frame < returnFrames + 1; ++frame) {
+        for (side = 0; side < COMBAT_SIDE_COUNT; ++side) {
+            int armyIndex;
+            for (armyIndex = 0; armyIndex < m_armyCount[side]; ++armyIndex) {
+                army *target = &m_armies[side][armyIndex];
+                if (animateCreatures != 0 && affected[side][armyIndex] != 0 &&
+                    target->m_animationSequence != ARMY_ANIMATION_STAND) {
+                    if (target->m_animationSequence ==
+                        ARMY_ANIMATION_WINCE) {
+                        target->m_animationSequence = ARMY_ANIMATION_WINCE_RETURN;
+                        target->m_animationFrame = 0;
+                    } else if (target->m_animationFrame + 1 <
+                               target->m_frameInfo.animationFrameCount[
+                                   target->m_animationSequence]) {
+                        ++target->m_animationFrame;
+                    } else if (target->m_animationSequence !=
+                               ARMY_ANIMATION_DEATH) {
+                        target->m_animationSequence = ARMY_ANIMATION_STAND;
+                        target->m_animationFrame = 0;
+                    }
+                }
+            }
+        }
+        DrawFrame(1, 0, 0, 0, 110, 1, 1);
+    }
+
+    int creatureDied = 0;
+    memset(m_removedArmies, 0, sizeof(m_removedArmies));
+    m_removedArmyPresent = 0;
+    for (side = 0; side < COMBAT_SIDE_COUNT; ++side) {
+        int armyIndex;
+        for (armyIndex = 0; armyIndex < m_armyCount[side]; ++armyIndex) {
+            army *target = &m_armies[side][armyIndex];
+            if (affected[side][armyIndex] != 0 && target->m_quantity == 0) {
+                target->ProcessDeath(0);
+                creatureDied = 1;
+            }
+        }
+    }
+    if (creatureDied)
+        DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
+    if (m_removedArmyPresent != 0)
+        MakeCreaturesVanish();
+}
+
+// @match-note 84.73%: complete mass-target selection, damage, presentation,
+// influence application, and final draw CFG. Retail has a 0x54 frame versus
+// ours 0x58. The delink helper stops at a local label (4/59); explicit
+// llvm-objdump range review shows all external callees/globals agree and one
+// extra local-label relocation remains. Tried retail enemy-body-before-friendly
+// switch order. Revisit structural block order at 95%, not expression grinding.
 VA(0x00427a91, 0x8f8)
-void combatManager::CastMassSpell(int, int) {}
+void combatManager::CastMassSpell(int spell, int spellPower)
+{
+    army *target = 0;
+    unsigned int effect = gsSpellInfo[spell].combatEffect;
+    int animateCreatures = 0;
+    gpWindowManager->m_updateFlags = 0;
+    ShowSpellMessage(0, spell, 0);
+    signed char affected[COMBAT_SIDE_COUNT][20];
+    memset(affected, 0, sizeof(affected));
 
+    int side;
+    int armyIndex;
+    switch (spell) {
+    case SPELL_MASS_SLOW:
+    case SPELL_MASS_CURSE:
+        side = 1 - m_currentSide;
+        for (armyIndex = 0; armyIndex < m_armyCount[side]; ++armyIndex) {
+            if (m_armies[side][armyIndex].SpellCastWorks(spell))
+                affected[side][armyIndex] = 1;
+        }
+        break;
+
+    case SPELL_MASS_CURE:
+    case SPELL_MASS_HASTE:
+    case SPELL_MASS_BLESS:
+    case SPELL_MASS_SHIELD:
+        side = m_currentSide;
+        for (armyIndex = 0; armyIndex < m_armyCount[side]; ++armyIndex) {
+            if (m_armies[side][armyIndex].SpellCastWorks(spell))
+                affected[side][armyIndex] = 1;
+        }
+        break;
+
+    case SPELL_HOLY_WORD:
+    case SPELL_HOLY_SHOUT: {
+        animateCreatures = 1;
+        int damage = (spell == SPELL_HOLY_WORD ? 10 : 20) * spellPower;
+        for (side = 0; side < COMBAT_SIDE_COUNT; ++side) {
+            for (armyIndex = 0; armyIndex < m_armyCount[side]; ++armyIndex) {
+                target = &m_armies[side][armyIndex];
+                if ((target->m_monster.flags.bytes.attributes & 4) != 0 &&
+                    target->SpellCastWorks(spell))
+                    affected[side][armyIndex] = 1;
+            }
+        }
+        if (spell == SPELL_HOLY_WORD)
+            Blur(0, -2, -2);
+        else
+            Blur(0, -4, -4);
+        for (side = 0; side < COMBAT_SIDE_COUNT; ++side) {
+            for (armyIndex = 0; armyIndex < m_armyCount[side]; ++armyIndex) {
+                if (affected[side][armyIndex] != 0)
+                    m_armies[side][armyIndex].Damage(damage, COMBAT_HEX_EMPTY);
+            }
+        }
+        sprintf(gText, "The %s spell does %d damage", gSpellNames[spell], damage);
+        CombatMessage(gText, 1, 1, 0);
+        break;
+    }
+
+    case SPELL_MASS_DISPEL:
+        for (side = 0; side < COMBAT_SIDE_COUNT; ++side) {
+            for (armyIndex = 0; armyIndex < m_armyCount[side]; ++armyIndex) {
+                if (m_armies[side][armyIndex].SpellCastWorks(spell))
+                    affected[side][armyIndex] = 1;
+            }
+        }
+        break;
+
+    case SPELL_DEATH_RIPPLE:
+    case SPELL_DEATH_WAVE: {
+        animateCreatures = 1;
+        for (side = 0; side < COMBAT_SIDE_COUNT; ++side) {
+            for (armyIndex = 0; armyIndex < m_armyCount[side]; ++armyIndex) {
+                target = &m_armies[side][armyIndex];
+                if ((target->m_monster.flags.bytes.attributes & 4) == 0 &&
+                    target->SpellCastWorks(spell))
+                    affected[side][armyIndex] = 1;
+            }
+        }
+        Ripple(spell == SPELL_DEATH_RIPPLE ? 1 : 2);
+        int damage = (spell == SPELL_DEATH_RIPPLE ? 5 : 10) * spellPower;
+        for (side = 0; side < COMBAT_SIDE_COUNT; ++side) {
+            for (armyIndex = 0; armyIndex < m_armyCount[side]; ++armyIndex) {
+                if (affected[side][armyIndex] != 0)
+                    m_armies[side][armyIndex].Damage(damage, COMBAT_HEX_EMPTY);
+            }
+        }
+        sprintf(gText, "The Death spell does %d damage", damage);
+        CombatMessage(gText, 1, 1, 0);
+        break;
+    }
+    }
+
+    if (!gbNoShowCombat) {
+        int anyAffected = 0;
+        for (side = 0; side < COMBAT_SIDE_COUNT; ++side) {
+            for (armyIndex = 0; armyIndex < m_armyCount[side]; ++armyIndex) {
+                if (affected[side][armyIndex] != 0)
+                    anyAffected = 1;
+            }
+        }
+        if (anyAffected)
+            ShowMassSpell(affected, effect, animateCreatures);
+    }
+
+    for (side = 0; side < COMBAT_SIDE_COUNT; ++side) {
+        for (armyIndex = 0; armyIndex < m_armyCount[side]; ++armyIndex) {
+            if (affected[side][armyIndex] == 0)
+                continue;
+            target = &m_armies[side][armyIndex];
+            switch (spell) {
+            case SPELL_MASS_CURE:
+                target->Cure(spellPower);
+                break;
+            case SPELL_MASS_HASTE:
+                target->SetSpellInfluence(SPELL_INFLUENCE_HASTE, spellPower);
+                break;
+            case SPELL_MASS_SLOW:
+                target->SetSpellInfluence(SPELL_INFLUENCE_SLOW, spellPower);
+                break;
+            case SPELL_MASS_BLESS:
+                target->SetSpellInfluence(SPELL_INFLUENCE_BLESS, spellPower);
+                break;
+            case SPELL_MASS_CURSE:
+                target->SetSpellInfluence(SPELL_INFLUENCE_CURSE, spellPower);
+                break;
+            case SPELL_MASS_DISPEL: {
+                int influence;
+                for (influence = 0; influence < SPELL_INFLUENCE_COUNT; ++influence)
+                    target->CancelIndividualSpell(influence);
+                break;
+            }
+            case SPELL_HOLY_WORD:
+            case SPELL_HOLY_SHOUT:
+            case SPELL_DEATH_RIPPLE:
+            case SPELL_DEATH_WAVE:
+                break;
+            case SPELL_MASS_SHIELD:
+                target->SetSpellInfluence(SPELL_INFLUENCE_SHIELD, spellPower);
+                break;
+            }
+        }
+    }
+    DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
+    gpWindowManager->m_updateFlags = 1;
+}
+
+// @match-note retained 91.94%, live 89.43%: complete search, failure dialog,
+// army creation, duration artifacts, links, and slide animation; the 0x44
+// frame matches. Retail has 38 relocs versus ours 34, with no wrong external
+// target. The first divergence is search-loop initialization/trampoline order.
+// Tried success inline and retail failure-before-success via goto. Revisit at
+// 95% for loop CFG/slots; do not repeat either body placement.
 VA(0x00428389, 0x5c8)
-void combatManager::MirrorImage(int) {}
+void combatManager::MirrorImage(int targetHex)
+{
+    army *source = &m_armies[m_hexCells[targetHex].m_occupantSide]
+                             [m_hexCells[targetHex].m_occupantIndex];
+    int mirrorHex = COMBAT_HEX_EMPTY;
+    int distance;
+    for (distance = 1; distance <= MIRROR_SEARCH_MAX_DISTANCE; ++distance) {
+        int sourcePart;
+        for (sourcePart = 0; sourcePart < 2; ++sourcePart) {
+            int searchHex;
+            if (sourcePart == 0) {
+                searchHex = source->m_hex;
+            } else {
+                if ((source->m_monster.flags.all & ARMY_FLAG_WIDE) == 0)
+                    continue;
+                if (source->m_facing == ARMY_FACING_RIGHT)
+                    searchHex = source->m_hex + 1;
+                else
+                    searchHex = source->m_hex - 1;
+            }
 
+            int direction;
+            for (direction = 0; direction < SPELL_ADJACENT_DIRECTION_COUNT;
+                 ++direction) {
+                int searchDirection = source->m_facing == ARMY_FACING_RIGHT
+                                          ? direction
+                                          : SPELL_ADJACENT_DIRECTION_COUNT - 1 - direction;
+                int candidateHex = searchHex;
+                int step;
+                for (step = 0; step < distance; ++step) {
+                    candidateHex = GetAdjacentCellIndexNoArmy(candidateHex,
+                                                               searchDirection);
+                    if (candidateHex >= 0 && candidateHex < COMBAT_HEX_COUNT &&
+                        candidateHex % SPELL_HEX_COLUMN_COUNT != 0 &&
+                        candidateHex % SPELL_HEX_COLUMN_COUNT !=
+                            SPELL_HEX_RIGHT_BORDER &&
+                        source->CanFit(candidateHex, 0, 0)) {
+                        mirrorHex = candidateHex;
+                        goto mirror_found;
+                    }
+                }
+            }
+        }
+    }
+    sprintf(gText, "Mirror Image spell failed!");
+    NormalDialog(gText, NORMAL_DIALOG_INFO, NORMAL_DIALOG_NO_VALUE,
+                 NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_NO_RESOURCE, 0,
+                 NORMAL_DIALOG_NO_RESOURCE, 0, NORMAL_DIALOG_NO_VALUE, 0);
+    return;
+
+mirror_found:
+    AddArmy(m_currentSide, source->m_monsterType, source->m_quantity,
+            mirrorHex, MIRROR_ARMY_FLAG, 0);
+    army *image = &m_armies[m_hexCells[mirrorHex].m_occupantSide]
+                            [m_hexCells[mirrorHex].m_occupantIndex];
+    image->m_monster.flags.abilityFlags |= MIRROR_MONSTER_ABILITY;
+    int duration = m_spellPower[m_currentSide];
+    if (m_heroes[m_currentSide]->HasArtifact(
+            SPELL_ARTIFACT_ENCHANTED_HOURGLASS))
+        duration += SPELL_HOURGLASS_POWER_BONUS;
+    if (m_heroes[m_currentSide]->HasArtifact(SPELL_ARTIFACT_WIZARD_HAT))
+        duration += SPELL_WIZARD_HAT_POWER_BONUS;
+    image->m_roundCounter = duration;
+    source->m_mirrorImageIndex = image->m_index;
+    image->m_mirrorSourceIndex = source->m_index;
+
+    int xOffset = m_hexCells[source->m_hex].m_x -
+                  m_hexCells[image->m_hex].m_x;
+    int yOffset = m_hexCells[source->m_hex].m_y -
+                  m_hexCells[image->m_hex].m_y;
+    ResetLimitCreature();
+    ++m_limitCreatureCount[image->m_side][image->m_index];
+    ++m_limitCreatureCount[m_hexCells[targetHex].m_occupantSide]
+                          [m_hexCells[targetHex].m_occupantIndex];
+    gpCombatManager->DrawFrame(0, 1, 0, 1, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
+    int deadline = static_cast<int>(KBTickCount());
+    int frame;
+    for (frame = 0; frame < MIRROR_SLIDE_FRAME_COUNT; ++frame) {
+        image->m_xOffset = (MIRROR_SLIDE_FRAME_COUNT - frame) * xOffset /
+                           MIRROR_SLIDE_FRAME_COUNT;
+        image->m_yOffset = (MIRROR_SLIDE_FRAME_COUNT - frame) * yOffset /
+                           MIRROR_SLIDE_FRAME_COUNT;
+        gbLimitToExtent = 1;
+        gpCombatManager->DrawFrame(0, 0, 0, 0, 0, 1, 0);
+        gpWindowManager->UpdateScreenRegion(
+            giMinExtentX, giMinExtentY, giMaxExtentX - giMinExtentX + 1,
+            giMaxExtentY - giMinExtentY + 1);
+        gbLimitToExtent = 0;
+        DelayTil(&deadline);
+        deadline = static_cast<int>(
+            KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] *
+                                SPELL_FIZZLE_FRAME_DELAY);
+    }
+    image->m_xOffset = 0;
+    image->m_yOffset = 0;
+    UpdateGrid(0, 1);
+    DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
+}
+
+// @match-note retained 99.88%, live 90.97% after later named-header constants:
+// complete hex selection, quantity artifact, AddArmy, ability flag, and duration
+// artifact semantics; the 0x1c frame and all 5 relocation targets agree. Before
+// the later header additions all 157 masked instructions were identical. The
+// current first divergence is modulo/index evaluation order. Do not tune this
+// affected function before 95%; accept the retained maximum with the new hash.
 VA(0x00428951, 0x218)
-void combatManager::SummonElemental(int, int) {}
+void combatManager::SummonElemental(int monsterType, int spellPower)
+{
+    unsigned char summonHexes[8];
+    summonHexes[0] = 14;
+    summonHexes[1] = 27;
+    summonHexes[2] = 40;
+    summonHexes[3] = 11;
+    summonHexes[4] = 24;
+    summonHexes[5] = 37;
+    int randomOffset = SRandom(0, 2);
+    unsigned int summonHex = static_cast<unsigned int>(COMBAT_HEX_EMPTY);
+    if (m_heroes[m_currentSide] != 0 &&
+        m_heroes[m_currentSide]->HasArtifact(SPELL_ARTIFACT_BOOK_ELEMENTS))
+        spellPower <<= 1;
+    int offset;
+    for (offset = 0; offset < 3; ++offset) {
+        if (m_hexCells[summonHexes[m_currentSide * 3 +
+                                   (randomOffset + offset) % 3]]
+                .m_occupantSide == COMBAT_HEX_EMPTY)
+            summonHex = summonHexes[m_currentSide * 3 +
+                                    (randomOffset + offset) % 3];
+    }
+    m_unknown351D[m_currentSide] = static_cast<unsigned char>(monsterType);
+    AddArmy(m_currentSide, monsterType,
+            spellPower * ELEMENTAL_SUMMON_QUANTITY_PER_POWER, summonHex, 0, 1);
+    army *elementals = &m_armies[m_hexCells[summonHex].m_occupantSide]
+                                  [m_hexCells[summonHex].m_occupantIndex];
+    elementals->m_monster.flags.abilityFlags |= MIRROR_MONSTER_ABILITY;
+    spellPower = m_spellPower[m_currentSide];
+    if (m_heroes[m_currentSide]->HasArtifact(
+            SPELL_ARTIFACT_ENCHANTED_HOURGLASS))
+        spellPower += SPELL_HOURGLASS_POWER_BONUS;
+    if (m_heroes[m_currentSide]->HasArtifact(SPELL_ARTIFACT_WIZARD_HAT))
+        spellPower += SPELL_WIZARD_HAT_POWER_BONUS;
+}
 
+// @match-note live 87.70% after named-header state changes: complete fixed
+// frame-info lookup, edge selection, clamping, and
+// rainbow-bolt call; the 0x18 frame and all 3 relocation targets agree. The
+// current first divergence is side/index multiplication; the first local CFG
+// divergence is facing/targetX arm order after the exact army+0x2ae signed-byte
+// frame load. Tried m_animationFrame, a dynamic
+// standing-frame lookup, and the fixed reconstructed table entry. Revisit at
+// 95% for condition polarity; do not retry the two incorrect frame sources.
 VA(0x00428b69, 0x1e6)
-void combatManager::DoLuck(int, int) {}
+void combatManager::DoLuck(int side, int armyIndex)
+{
+    army *target = &m_armies[side][armyIndex];
+    int targetX = target->MidX();
+    int targetY = m_hexCells[target->m_hex].m_y;
+    targetY -= GetIconEntry(
+                   target->m_creatureIcon,
+                   target->m_frameInfo.animationFrames
+                       [ARMY_ANIMATION_STANDING_END - 1]
+                       [LUCK_TARGET_FRAME_INDEX])->h +
+               LUCK_ICON_Y_PADDING;
+    if (targetY < LUCK_MIN_TARGET_Y)
+        targetY = LUCK_MIN_TARGET_Y;
+    int startY = LUCK_EDGE_START_Y;
+    int startX;
+    if (target->m_facing == ARMY_FACING_RIGHT) {
+        if (targetX < 480)
+            startX = targetX + targetY / 2 + LUCK_EDGE_INSET;
+        else
+            startX = targetX - LUCK_EDGE_INSET - targetY / 2;
+    } else if (targetX < 201) {
+        startX = targetX + targetY / 2 + LUCK_EDGE_INSET;
+    } else {
+        startX = targetX - LUCK_EDGE_INSET - targetY / 2;
+    }
+    if (targetY < LUCK_SHORT_BOLT_HEIGHT) {
+        startX = side == 0 ? 0 : COMBAT_SCREEN_WIDTH - 1;
+        startY = targetY + LUCK_MIN_TARGET_Y;
+    }
+    if (startX < 0)
+        startX = 0;
+    if (COMBAT_SCREEN_WIDTH - 1 < startX)
+        startX = COMBAT_SCREEN_WIDTH - 1;
+    DoBolt(0, startX, startY, targetX, targetY, 0, 0, LUCK_BOLT_WIDTH,
+           LUCK_BOLT_WIDTH,
+           startX <= targetX ? BOLT_COLOR_RAINBOW_FORWARD
+                             : BOLT_COLOR_RAINBOW_REVERSE,
+           LUCK_BOLT_ANGLE, LUCK_BOLT_ANGLE,
+           LUCK_BOLT_DISTANCE, LUCK_BOLT_FORCE_ANGLE, 1,
+           LUCK_BOLT_FRAME_DELAY, 0);
+}
 
+// @match-note retained 99.75%, live 99.49% after shared-header changes:
+// complete blast interpolation/draw/update CFG; the 0x7c frame and all 50
+// relocation targets agree. A prior stabilized build differed only in local
+// string/constant identities; current TU state first differs at the segment
+// loop branch (`jle` versus retail `jge`). Tried `count > segment`, `<`, and an
+// explicit break (worse). Revisit at 95% after headers settle, not before.
 VA(0x00428d4f, 0x33a)
-void combatManager::DoBlast(int, int) {}
+void combatManager::DoBlast(int targetHex, int spell)
+{
+    icon *blastIcon;
+    int frameSpacing;
+    if (spell == SPELL_COLD_RAY) {
+        blastIcon = gpResourceManager->GetIcon("coldray.icn");
+        frameSpacing = BLAST_COLD_RAY_FRAME_SPACING;
+    } else {
+        blastIcon = gpResourceManager->GetIcon("disrray.icn");
+        frameSpacing = BLAST_DISRUPTING_RAY_FRAME_SPACING;
+    }
+    army *target = &m_armies[m_hexCells[targetHex].m_occupantSide]
+                             [m_hexCells[targetHex].m_occupantIndex];
+    int targetX = target->MidX();
+    int targetY = target->MidY();
+    int startX = castX;
+    int startY = castY;
+    int deltaX = targetX - startX;
+    int deltaY = targetY - startY;
+    int distance = static_cast<int>(
+        sqrt(static_cast<double>(deltaX * deltaX + deltaY * deltaY)));
+    int segmentCount = distance / frameSpacing;
+    float currentX = static_cast<float>(startX);
+    float currentY = static_cast<float>(startY);
+    float stepX = static_cast<float>(deltaX) / segmentCount;
+    float stepY = static_cast<float>(deltaY) / segmentCount;
+    int deadline = 0;
+    int segment;
+    for (segment = 0; segmentCount > segment; ++segment) {
+        ResetLimitCreature();
+        gbComputeExtent = 1;
+        gbSaveBiggestExtent = 1;
+        currentX += stepX;
+        currentY += stepY;
+        int frame = (segment * BLAST_FRAME_COUNT - 1) / segmentCount;
+        SLimitData limits;
+        blastIcon->CombatClipDrawToBuffer(
+            static_cast<int>(currentX), static_cast<int>(currentY), frame,
+            &limits, stepX < 0.0f, 0, 0, 0);
+        if (giMinExtentX < 0)
+            giMinExtentX = 0;
+        if (giMinExtentY < 0)
+            giMinExtentY = 0;
+        if (COMBAT_SCREEN_WIDTH - 1 < giMaxExtentX)
+            giMaxExtentX = COMBAT_SCREEN_WIDTH - 1;
+        if (COMBAT_AREA_HEIGHT - 1 < giMaxExtentY)
+            giMaxExtentY = COMBAT_AREA_HEIGHT - 1;
+        DelayTil(&deadline);
+        deadline = static_cast<int>(
+            KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] *
+                                SPELL_FIZZLE_FRAME_DELAY);
+        gpWindowManager->UpdateScreenRegion(
+            giMinExtentX, giMinExtentY, giMaxExtentX - giMinExtentX + 1,
+            giMaxExtentY - giMinExtentY + 1);
+    }
+    gbComputeExtent = 0;
+    gbSaveBiggestExtent = 0;
+    DrawFrame(1, 0, 0, 0, 0, 1, 0);
+    gpResourceManager->Dispose(blastIcon);
+}
 
+// @match-note 85.51%: complete quantity/artifact handling, both dead-hex record
+// removals, message, reverse-death animation, and cleanup; the 0x44 frame and
+// all 33 relocation targets agree. The first code divergence is quantity-clamp
+// polarity, then processedOtherHex initialization and the dead-occupant loop
+// CFG. Tried moving that initialization across the oldQuantity arm and explicit
+// break/keepSearching forms. Revisit structural loop order at 95%.
 VA(0x00429089, 0x655)
-void combatManager::Resurrect(int, int, int) {}
+void combatManager::Resurrect(int spell, int targetHex, int spellPower)
+{
+    if (m_heroes[m_currentSide] != 0 &&
+        m_heroes[m_currentSide]->HasArtifact(SPELL_ARTIFACT_ANKH))
+        spellPower <<= 1;
+    int armyIndex = FindResurrectArmyIndex(m_currentSide, spell, targetHex);
+    army *target = &m_armies[m_currentSide][armyIndex];
+    int processedOtherHex = 0;
+    int oldQuantity = target->m_quantity;
+    target->m_quantity +=
+        spellPower * RESURRECT_HIT_POINTS_PER_POWER /
+        static_cast<unsigned short>(target->m_monster.hitPoints);
+    if (target->m_quantity > target->m_initialQuantity)
+        target->m_quantity = target->m_initialQuantity;
+    if (spell == SPELL_RESURRECT)
+        target->m_temporaryResurrectionQuantity +=
+            target->m_quantity - oldQuantity;
 
+    if (oldQuantity <= 0) {
+        int otherHex = COMBAT_HEX_EMPTY;
+        int keepSearching = 1;
+        int deadHex = targetHex;
+        while (keepSearching) {
+            int deadIndex = COMBAT_HEX_EMPTY;
+            int index;
+            for (index = 0; index < m_hexCells[deadHex].m_deadOccupantCount;
+                 ++index) {
+                if (m_hexCells[deadHex].m_deadOccupantSides[index] ==
+                        m_currentSide &&
+                    m_hexCells[deadHex].m_deadOccupantIndices[index] ==
+                        armyIndex) {
+                    deadIndex = index;
+                    if (!processedOtherHex) {
+                        if (m_hexCells[deadHex].m_deadOccupantFrames[index] == 1)
+                            otherHex = deadHex - 1;
+                        else if (m_hexCells[deadHex].m_deadOccupantFrames[index] == 0)
+                            otherHex = deadHex + 1;
+                    }
+                    m_hexCells[deadHex].m_occupantSide =
+                        m_hexCells[deadHex].m_deadOccupantSides[index];
+                    m_hexCells[deadHex].m_occupantIndex =
+                        m_hexCells[deadHex].m_deadOccupantIndices[index];
+                    m_hexCells[deadHex].m_occupantFrame =
+                        m_hexCells[deadHex].m_deadOccupantFrames[index];
+                    if (m_hexCells[deadHex].m_deadOccupantCount == index + 1) {
+                        m_hexCells[deadHex].m_deadOccupantSides[index] =
+                            COMBAT_HEX_EMPTY;
+                        m_hexCells[deadHex].m_deadOccupantIndices[index] =
+                            COMBAT_HEX_EMPTY;
+                    } else {
+                        m_hexCells[deadHex].m_deadOccupantSides[index] =
+                            m_hexCells[deadHex].m_deadOccupantSides[index + 1];
+                        m_hexCells[deadHex].m_deadOccupantIndices[index] =
+                            m_hexCells[deadHex].m_deadOccupantIndices[index + 1];
+                    }
+                    break;
+                }
+            }
+            --m_hexCells[deadHex].m_deadOccupantCount;
+            if (processedOtherHex || otherHex == COMBAT_HEX_EMPTY) {
+                keepSearching = 0;
+            } else {
+                deadHex = otherHex;
+                processedOtherHex = 1;
+                deadIndex = COMBAT_HEX_EMPTY;
+            }
+        }
+    }
+
+    int effectX = target->MidX();
+    int effectY = target->MidY();
+    int resurrected = target->m_quantity - oldQuantity;
+    if (resurrected < 2)
+        sprintf(gText, "%d %s rises from the dead!", resurrected,
+                gArmyNames[target->m_monsterType]);
+    else
+        sprintf(gText, "%d %s rise from the dead!", resurrected,
+                gArmyNamesPlural[target->m_monsterType]);
+    CombatMessage(gText, 1, 1, 0);
+
+    if (!gbNoShowCombat) {
+        icon *resurrectIcon = gpResourceManager->GetIcon("yinyang.icn");
+        int frame;
+        for (frame = 0; frame < RESURRECT_ANIMATION_FRAME_COUNT; ++frame) {
+            glTimers[0] = static_cast<int>(
+                KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] *
+                                    SPELL_FIZZLE_FRAME_DELAY);
+            IconToBitmap(resurrectIcon, gpWindowManager->m_screen, effectX,
+                         effectY, frame, 1, 0, 0, COMBAT_SCREEN_WIDTH,
+                         COMBAT_AREA_HEIGHT, 0);
+            UpdateCombatArea();
+            target->m_facing = 1 - target->m_side;
+            if (target->m_animationSequence == ARMY_ANIMATION_DEATH) {
+                if (frame < RESURRECT_DEATH_REVERSE_FRAME) {
+                    int reverseFrame =
+                        target->m_frameInfo.animationFrameCount[
+                            ARMY_ANIMATION_DEATH] - 1;
+                    if (RESURRECT_DEATH_REVERSE_FRAME - 1 - frame <=
+                        reverseFrame)
+                        reverseFrame = RESURRECT_DEATH_REVERSE_FRAME - 1 - frame;
+                    target->m_animationFrame = reverseFrame;
+                } else {
+                    target->m_animationSequence = ARMY_ANIMATION_STAND;
+                    target->m_animationFrame = 0;
+                }
+            }
+            DrawFrame(0, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
+            DelayTil(glTimers);
+        }
+        gpResourceManager->Dispose(resurrectIcon);
+    }
+    DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
+    target->m_monster.flags.abilityFlags &= ~RESURRECT_MONSTER_ABILITY;
+}
+
+// @match-note 97.87%: complete side-specific three-cell test; the 0x04 frame
+// matches and neither side has relocations. The only normalized residual is one
+// retail continuation `jmp` before the true return. Tried nested side arms and
+// the combined early-return condition. Revisit at 95% for inline continuation
+// shaping; do not repeat those equivalent condition forms.
 VA(0x004296de, 0xb9)
-int combatManager::SpaceForElementalExists(void) { return 0; }
+int combatManager::SpaceForElementalExists(void)
+{
+    if ((m_currentSide == 0 &&
+         m_hexCells[14].m_occupantSide != COMBAT_HEX_EMPTY &&
+         m_hexCells[27].m_occupantSide != COMBAT_HEX_EMPTY &&
+         m_hexCells[40].m_occupantSide != COMBAT_HEX_EMPTY) ||
+        (m_currentSide == 1 &&
+         m_hexCells[11].m_occupantSide != COMBAT_HEX_EMPTY &&
+         m_hexCells[24].m_occupantSide != COMBAT_HEX_EMPTY &&
+         m_hexCells[37].m_occupantSide != COMBAT_HEX_EMPTY))
+        return 0;
+    return 1;
+}
 
+// @early-stop
+// All instructions are identical after relocation masking and all 15 targets
+// agree. The 99.89% residual is only delinked identities for NULL_SAMPLE2's
+// second word and four strings; the 0x18 frame and all code bytes agree.
 VA(0x00429797, 0xd9)
-void combatManager::ShowSpellCastFailure(class army *, int) {}
+void combatManager::ShowSpellCastFailure(army *target, int)
+{
+    SAMPLE2 sample = NULL_SAMPLE2;
+    sample = LoadPlaySample("rsbryfzl.82m");
+    char *armyName;
+    if (target->m_quantity == 1)
+        armyName = gArmyNames[target->m_monsterType];
+    else
+        armyName = gArmyNamesPlural[target->m_monsterType];
+    sprintf(gText, "The %s %s the spell!", armyName,
+            target->m_quantity == 1 ? "resists" : "resist");
+    gpCombatManager->CombatMessage(gText, 1, 1, 0);
+    WaitEndSample(sample, -1);
+}
 
 VA(0x00429870, 0x270)
-void combatManager::ModifyDamageForArtifacts(long int *, int, class hero *, class hero *) {}
+void combatManager::ModifyDamageForArtifacts(long *damage, int spell,
+                                              hero *attacker, hero *defender)
+{
+    if (attacker != 0) {
+        if (attacker->HasArtifact(SPELL_ARTIFACT_EVERCOLD_ICICLE) &&
+            (spell == SPELL_COLD_RAY || spell == SPELL_COLD_RING))
+            *damage = static_cast<long>(*damage * SPELL_ARTIFACT_DAMAGE_BONUS);
+        if (attacker->HasArtifact(SPELL_ARTIFACT_EVERHOT_LAVA_ROCK) &&
+            (spell == SPELL_FIREBALL || spell == SPELL_FIREBLAST))
+            *damage = static_cast<long>(*damage * SPELL_ARTIFACT_DAMAGE_BONUS);
+        if (attacker->HasArtifact(SPELL_ARTIFACT_LIGHTNING_ROD) &&
+            (spell == SPELL_LIGHTNING_BOLT || spell == SPELL_CHAIN_LIGHTNING))
+            *damage = static_cast<long>(*damage * SPELL_ARTIFACT_DAMAGE_BONUS);
+    }
+    if (defender != 0) {
+        if (defender->HasArtifact(SPELL_ARTIFACT_ICE_CLOAK) &&
+            (spell == SPELL_COLD_RAY || spell == SPELL_COLD_RING))
+            *damage = static_cast<long>(*damage * SPELL_ARTIFACT_DAMAGE_REDUCTION);
+        if (defender->HasArtifact(SPELL_ARTIFACT_FIRE_CLOAK) &&
+            (spell == SPELL_FIREBALL || spell == SPELL_FIREBLAST))
+            *damage = static_cast<long>(*damage * SPELL_ARTIFACT_DAMAGE_REDUCTION);
+        if (defender->HasArtifact(SPELL_ARTIFACT_LIGHTNING_HELM) &&
+            (spell == SPELL_LIGHTNING_BOLT || spell == SPELL_CHAIN_LIGHTNING))
+            *damage = static_cast<long>(*damage * SPELL_ARTIFACT_DAMAGE_REDUCTION);
+        if (defender->HasArtifact(SPELL_ARTIFACT_HEART_FIRE)) {
+            if (spell == SPELL_COLD_RAY || spell == SPELL_COLD_RING)
+                *damage <<= 1;
+            else if (spell == SPELL_FIREBALL || spell == SPELL_FIREBLAST)
+                *damage = static_cast<long>(
+                    *damage * SPELL_ARTIFACT_DAMAGE_REDUCTION);
+        }
+        if (defender->HasArtifact(SPELL_ARTIFACT_HEART_ICE)) {
+            if (spell == SPELL_COLD_RAY || spell == SPELL_COLD_RING)
+                *damage = static_cast<long>(
+                    *damage * SPELL_ARTIFACT_DAMAGE_REDUCTION);
+            else if (spell == SPELL_FIREBALL || spell == SPELL_FIREBLAST)
+                *damage <<= 1;
+        }
+    }
+}
 
+// @match-note 97.20%: complete shake, randomized wall/tower/keep damage, cloud
+// animation, state application, and input restore; the 0x160 frame and all 62
+// relocation targets agree. After constant identity, the first code divergence
+// is the screen-copy row loop branch (`jge` versus retail `jle`); later residuals
+// are packed wallPos/towerPos local-label identities and keep impact ordering.
+// Tried cached/direct offsets, both height association orders, <= zero tests,
+// and both loop polarities. Revisit at 95% after layout/header stabilization.
 VA(0x00429ae0, 0x931)
-void combatManager::Earthquake(void) {}
+void combatManager::Earthquake(void)
+{
+    int shakeOffsets[30];
+    shakeOffsets[0] = 2;
+    shakeOffsets[1] = 2;
+    shakeOffsets[2] = 4;
+    shakeOffsets[3] = 1;
+    shakeOffsets[4] = 3;
+    shakeOffsets[5] = -2;
+    shakeOffsets[6] = 0;
+    shakeOffsets[7] = -6;
+    shakeOffsets[8] = 2;
+    shakeOffsets[9] = -2;
+    shakeOffsets[10] = -1;
+    shakeOffsets[11] = 3;
+    shakeOffsets[12] = -5;
+    shakeOffsets[13] = 4;
+    shakeOffsets[14] = -8;
+    shakeOffsets[15] = 6;
+    shakeOffsets[16] = -4;
+    shakeOffsets[17] = 2;
+    shakeOffsets[18] = -1;
+    shakeOffsets[19] = 1;
+    shakeOffsets[20] = -3;
+    shakeOffsets[21] = -3;
+    shakeOffsets[22] = -7;
+    shakeOffsets[23] = -5;
+    shakeOffsets[24] = -5;
+    shakeOffsets[25] = -7;
+    shakeOffsets[26] = -2;
+    shakeOffsets[27] = -3;
+    shakeOffsets[28] = 0;
+    shakeOffsets[29] = 0;
 
+    gpMouseManager->HideColorPointer();
+    memcpy(m_backgroundBuffer->m_pixels, gpWindowManager->m_screen->m_pixels,
+           COMBAT_SCREEN_WIDTH * COMBAT_AREA_HEIGHT);
+    int pass;
+    for (pass = 0; pass < EARTHQUAKE_SHAKE_PASS_COUNT; ++pass) {
+        int frame;
+        for (frame = 0; frame < EARTHQUAKE_SHAKE_FRAME_COUNT; ++frame) {
+            int deadline = static_cast<int>(
+                KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] *
+                                    SPELL_ARMAGEDDON_SHAKE_DELAY);
+            PollSound();
+            int width = COMBAT_SCREEN_WIDTH -
+                        abs(shakeOffsets[frame *
+                                         EARTHQUAKE_SHAKE_COORDINATE_COUNT +
+                                         COMBAT_COORDINATE_X]);
+            int height = COMBAT_AREA_HEIGHT -
+                         abs(shakeOffsets[frame *
+                                          EARTHQUAKE_SHAKE_COORDINATE_COUNT +
+                                          COMBAT_COORDINATE_Y]) -
+                         1;
+            unsigned char *source =
+                m_backgroundBuffer->m_pixels +
+                (shakeOffsets[frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT +
+                              COMBAT_COORDINATE_Y] > 0
+                     ? shakeOffsets[frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT +
+                                    COMBAT_COORDINATE_Y]
+                     : 0) *
+                    COMBAT_SCREEN_WIDTH +
+                (shakeOffsets[frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT +
+                              COMBAT_COORDINATE_X] > 0
+                     ? shakeOffsets[frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT +
+                                    COMBAT_COORDINATE_X]
+                     : 0);
+            int destinationX =
+                shakeOffsets[frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT +
+                             COMBAT_COORDINATE_X] <= 0
+                    ? -shakeOffsets[frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT +
+                                    COMBAT_COORDINATE_X]
+                    : 0;
+            int destinationY =
+                shakeOffsets[frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT +
+                             COMBAT_COORDINATE_Y] <= 0
+                    ? -shakeOffsets[frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT +
+                                    COMBAT_COORDINATE_Y]
+                    : 0;
+            unsigned char *destination =
+                gpWindowManager->m_screen->m_pixels +
+                destinationY * COMBAT_SCREEN_WIDTH + destinationX;
+            int row;
+            for (row = 0; height > row; ++row) {
+                memcpy(destination, source, width);
+                source += COMBAT_SCREEN_WIDTH;
+                destination += COMBAT_SCREEN_WIDTH;
+            }
+            BlitBitmapToScreen(gpWindowManager->m_screen, 0, 0,
+                               COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT, 0, 0);
+            DelayTil(&deadline);
+        }
+    }
+    m_backgroundDrawn = 0;
+    DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
+
+    int newWallStates[EARTHQUAKE_STRUCTURE_COUNT];
+    int newTowerStates[EARTHQUAKE_STRUCTURE_COUNT];
+    int impactPositions[EARTHQUAKE_MAX_IMPACTS][2];
+    int impactCount = 0;
+    int structure;
+    for (structure = 0; structure < EARTHQUAKE_STRUCTURE_COUNT; ++structure) {
+        newWallStates[structure] =
+            m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST];
+        if (m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST] !=
+                COMBAT_WALL_STATE_DESTROYED &&
+            m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST] !=
+                COMBAT_WALL_STATE_SECTION_DESTROYED &&
+            SRandom(0, 100) < EARTHQUAKE_WALL_HIT_CHANCE) {
+            ++newWallStates[structure];
+            if (m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST] !=
+                    COMBAT_WALL_STATE_DESTROYED &&
+                m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST] !=
+                    COMBAT_WALL_STATE_TOWER_STANDING &&
+                m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST] !=
+                    COMBAT_WALL_STATE_SECTION_DESTROYED &&
+                m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST] !=
+                    COMBAT_WALL_STATE_SECTION_DAMAGE_LAST &&
+                SRandom(0, 100) < EARTHQUAKE_WALL_SECOND_HIT_CHANCE)
+                ++newWallStates[structure];
+            impactPositions[impactCount][COMBAT_COORDINATE_X] =
+                wallPos[structure][COMBAT_COORDINATE_X];
+            impactPositions[impactCount][COMBAT_COORDINATE_Y] =
+                wallPos[structure][COMBAT_COORDINATE_Y] +
+                EARTHQUAKE_CLOUD_Y_OFFSET;
+            ++impactCount;
+            if (newWallStates[structure] == COMBAT_WALL_STATE_DESTROYED ||
+                newWallStates[structure] == COMBAT_WALL_STATE_SECTION_DESTROYED)
+                m_hexCells[iWallToHexCell[structure]].m_blocked = 0;
+        }
+
+        newTowerStates[structure] = m_wallStates[structure];
+        if (m_wallStates[structure] != COMBAT_WALL_STATE_DESTROYED &&
+            SRandom(0, 100) < EARTHQUAKE_TOWER_HIT_CHANCE) {
+            newTowerStates[structure] = COMBAT_WALL_STATE_DESTROYED;
+            impactPositions[impactCount][COMBAT_COORDINATE_X] =
+                towerPos[structure][COMBAT_COORDINATE_X];
+            impactPositions[impactCount][COMBAT_COORDINATE_Y] =
+                towerPos[structure][COMBAT_COORDINATE_Y] +
+                EARTHQUAKE_CLOUD_Y_OFFSET;
+            ++impactCount;
+        }
+    }
+
+    int newKeepState = m_drawbridgeState;
+    if (m_drawbridgeState != 3 &&
+        SRandom(0, 100) < EARTHQUAKE_KEEP_HIT_CHANCE) {
+        newKeepState = 3;
+        impactPositions[impactCount][COMBAT_COORDINATE_X] =
+            towerPos[0][COMBAT_COORDINATE_X];
+        impactPositions[impactCount][COMBAT_COORDINATE_Y] =
+            towerPos[0][COMBAT_COORDINATE_Y] + EARTHQUAKE_CLOUD_Y_OFFSET;
+        impactPositions[impactCount + 1][COMBAT_COORDINATE_X] =
+            towerPos[1][COMBAT_COORDINATE_X];
+        impactPositions[impactCount + 1][COMBAT_COORDINATE_Y] =
+            towerPos[1][COMBAT_COORDINATE_Y] + EARTHQUAKE_CLOUD_Y_OFFSET;
+        impactCount += 2;
+    }
+
+    int impactDelay[EARTHQUAKE_MAX_IMPACTS];
+    for (structure = 0; structure < EARTHQUAKE_MAX_IMPACTS; ++structure)
+        impactDelay[structure] = Random(0, 2);
+    giMinExtentX = EARTHQUAKE_EXTENT_MIN_X;
+    giMinExtentY = 0;
+    giMaxExtentX = EARTHQUAKE_EXTENT_MAX_X;
+    giMaxExtentY = COMBAT_AREA_HEIGHT - 1;
+    if (impactCount != 0) {
+        icon *cloudIcon = gpResourceManager->GetIcon("lichclod.icn");
+        int frame;
+        for (frame = 0; frame < EARTHQUAKE_CLOUD_FRAME_COUNT; ++frame) {
+            glTimers[1] = static_cast<int>(
+                KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] *
+                                    SPELL_FIZZLE_FRAME_DELAY);
+            DrawFrame(0, 0, 1, 0, 0, 1, 0);
+            int impact;
+            for (impact = 0; impact < impactCount; ++impact) {
+                int cloudFrame = frame - impactDelay[impact];
+                if (impactDelay[impact] <= frame &&
+                    cloudFrame < EARTHQUAKE_CLOUD_VISIBLE_FRAME_COUNT) {
+                    IconToBitmap(cloudIcon, gpWindowManager->m_screen,
+                                 impactPositions[impact][COMBAT_COORDINATE_X],
+                                 impactPositions[impact][COMBAT_COORDINATE_Y],
+                                 cloudFrame, 1, 0, 0, COMBAT_SCREEN_WIDTH,
+                                 COMBAT_AREA_HEIGHT, 0);
+                }
+            }
+            gpWindowManager->UpdateScreenRegion(
+                giMinExtentX, giMinExtentY, giMaxExtentX - giMinExtentX + 1,
+                giMaxExtentY - giMinExtentY + 1);
+            DelayTil(&glTimers[1]);
+            if (frame == EARTHQUAKE_APPLY_DAMAGE_FRAME) {
+                for (structure = 0; structure < EARTHQUAKE_STRUCTURE_COUNT;
+                     ++structure) {
+                    m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST] =
+                        static_cast<unsigned char>(newWallStates[structure]);
+                    m_wallStates[structure] =
+                        static_cast<unsigned char>(newTowerStates[structure]);
+                }
+                m_drawbridgeState = newKeepState;
+            }
+        }
+        gpResourceManager->Dispose(cloudIcon);
+    }
+    gpMouseManager->ShowColorPointer();
+}
+
+// @match-note 97.79%: complete creature-first and hero-second message selection;
+// all 26 relocation targets agree. Retail has a 0x1d8 frame versus ours 0x1d4.
+// The first code residual after Archmages sprintf is a retail `jmp`, dead-local
+// clear/increment, then another `jmp`; later differences are string identities.
+// Tried hero-first order, plural polarity, direct hero access, and the extra
+// unused targetName variadic argument. Revisit dead-local scope at 95%.
 VA(0x0042a411, 0x2b1)
-void combatManager::ShowSpellMessage(int, int, class army *) {}
+void combatManager::ShowSpellMessage(int castByCreature, int spell,
+                                     army *target)
+{
+    char targetName[60];
+    char message[400];
+    if (target != 0) {
+        char *name;
+        if (target->m_quantity > 1)
+            name = gArmyNamesPlural[target->m_monsterType];
+        else
+            name = gArmyNames[target->m_monsterType];
+        sprintf(targetName, name);
+    }
+    if (castByCreature != 0) {
+        if (spell == SPELL_PARALYZE)
+            sprintf(message, "The %s are paralyzed by the Cyclopes!", targetName);
+        else if (spell == SPELL_BLIND)
+            sprintf(message, "The Unicorns' attack blinds the %s!", targetName);
+        else if (spell == SPELL_PETRIFY)
+            sprintf(message, "The Medusas' gaze turns the %s to stone!", targetName);
+        else if (spell == SPELL_CURSE)
+            sprintf(message, "The Mummies' curse falls upon the %s!", targetName);
+        else if (spell == SPELL_CREATURE_DISPEL)
+            sprintf(message, "The Archmages dispel all good spells", targetName);
+    } else {
+        if (target != 0) {
+            if (m_heroes[m_currentSide]->m_isCaptain != 0)
+                sprintf(message, "The captain casts '%s' on the %s.",
+                        gSpellNames[spell], targetName);
+            else
+                sprintf(message, "%s casts '%s' on the %s.",
+                        m_heroes[m_currentSide]->m_name, gSpellNames[spell],
+                        targetName);
+        } else {
+            if (m_heroes[m_currentSide]->m_isCaptain != 0)
+                sprintf(message, "The captain casts '%s'.", gSpellNames[spell]);
+            else
+                sprintf(message, "%s casts '%s'.",
+                        m_heroes[m_currentSide]->m_name, gSpellNames[spell]);
+        }
+    }
+    CombatMessage(message, 1, 1, 0);
+}
 
 // ---- globals (definitions, RVA order) ----
 DATA(0x004f00b0) int castX;
