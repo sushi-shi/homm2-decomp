@@ -897,8 +897,10 @@ void BlitBitmapToScreenNoMouseCheck(class bitmap *bmp, int sourceX, int sourceY,
 // The libclang AST pass found 22 value-preserving variants and retained none after a 30-walk pass.
 // At integrated head 5a48d4c, all 65 single AST variants across the 19 exact predecessors and 149
 // deterministic two-to-five-variant predecessor combinations were downstream-byte-neutral while
-// all 144 Misc symbols were pinned. Revisit only after a real header/predecessor state change; this
-// CSE residual is not a proven wall.
+// all 144 Misc symbols were pinned. Moving the two private bound definitions to this function's
+// source boundary, or making them function-static, also emitted identical code; the latter only
+// changed their COFF identities into unauditable local-static names. Revisit only after a real
+// semantic header/type or predecessor change; this CSE residual is not a proven wall.
 VA(0x004c5ee0, 0x18b)
 void BlitBitmapToScreen(class bitmap *bmp, int sourceX, int sourceY, int width, int height,
                         int destinationX, int destinationY)
