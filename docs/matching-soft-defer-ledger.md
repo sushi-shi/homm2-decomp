@@ -18,6 +18,47 @@ General rules:
   96-97%. Never use the regex permuter for these targets.
 - A clean soft defer is a scheduling decision, not proof that the remaining bytes are impossible.
 
+## BASE/Textntry: remaining constructor, Read, and display-string residuals
+
+Status: active. These functions have narrow measured residuals, but the delayed independent store
+and register-allocation differences do not meet either permitted `@early-stop` flavor. They must
+remain unmarked and in the same lane.
+
+Canonical source state:
+
+- checkpoint: `9e6037c`
+- `src/BASE/Textntry.cpp`:
+  `adc0b76f9c9fc4c43129d8790dc889144dacf7371bcc5e3ca7ad6cd94d7df000`
+- long constructor, RVA `0xd87b0`: 98.58696%, base/retail size `0x134`, 6/6 relocations;
+- `Read`, RVA `0xd8920`: 98.6755%, base/retail size `0x26c`, 52/52 relocations;
+- `SetupDisplayString`, RVA `0xd9570`: live 95.0% with retained maximum 97.3581%, base
+  `0x1bd` vs retail `0x1be`, frame `0x130`, 8/8 relocations.
+
+The constructor streams differ only by retail storing parameter 10 before three independent
+constant flag stores while the candidate delays that store. `Read` differs only by retail comparing
+`type` before loading `m_height`, while the candidate emits those independent instructions in the
+opposite order. `SetupDisplayString` has the same calls, loop CFG, frame, and relocation targets;
+the candidate assigns this/cursor to EBX/EBP instead of retail EBP/EBX and omits one redundant
+retail `xor` in the dead second-loop tail.
+
+### Searches already exhausted
+
+- constructor member-store and constant-flag order was steered until only the one delayed parameter
+  store remained;
+- `Read` default-rectangle and shared-enabled-value shapes were steered until only the adjacent
+  compare/load reversal remained;
+- two independent 220-iteration exact-preserving TU-state searches were run from the newly improved
+  constructor and `Read` source hashes;
+- every search candidate pinned all 11 sibling functions, and neither search improved
+  `SetupDisplayString`;
+- destructor aliases were tested only with ABI-valid source forms; none improved them;
+- no diagnostic scripts or generated status changes were retained from the searches.
+
+Do not repeat those TU-state searches while the canonical source hash and sibling hashes agree.
+Continue with a retail-evidenced lifetime or a genuinely different exact-preserving predecessor/TU
+state. Any later accepted wall must satisfy the two narrow rules in `.claude/agents/matcher.md`;
+the current scheduling and register-allocation residuals do not.
+
 ## BASE/listbox: listBoxWidget::Main
 
 Canonical source state:
@@ -266,6 +307,24 @@ branch-scope pointer locals, clip-edge publication order, signed/unsigned width 
 combined clip predicates, explicit literal-failure joins, shared skip publication, loop comparison
 polarity, setup-alias removal, and declaration/lifetime variations. Losing forms were reverted; the
 retained forms are the canonical checkpoint above. Neither permutation tool was used.
+
+Final measured axes after `8bd4149`:
+
+- fill-only `currentY` scalar: byte-identical, 85.7239%, size `0x559`, no frame, 142/144
+  relocations;
+- `currentY` scalars across dim/fill/literal: 85.20%, size `0x559`, no frame, 142/144; reverted;
+- right-edge scalar confined to the clipped-right arm: byte-identical;
+- right-edge scalar retained across outer overlap and quadrant dispatch: byte-identical;
+- `const` right-edge scalar: byte-identical;
+- fill `currentY` plus widened right-edge lifetime: byte-identical;
+- normalize the dead `clip` parameter to enabled and gate every path through it: 84.50%, size
+  `0x55d`, no frame, 143/144; reverted;
+- reuse the dead `clip` parameter as the clip-width scalar: 85.21%, size `0x559`, no frame,
+  142/144; reverted.
+
+Retail's four-byte frame slot is never accessed: every ESP-relative retail access is an argument,
+and after `sub esp,4` plus four pushes the smallest displacement is `0x18`. The slot is allocator
+residue, not evidence for a missing local or padding variable. Neither permutation tool was used.
 
 Continue from the first post-dispatch structural divergence and the four named scratch-count
 differences. Record each new source-hash-distinct shape with its match, size, frame, and relocation
