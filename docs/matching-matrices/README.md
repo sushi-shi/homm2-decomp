@@ -173,3 +173,26 @@ leaves real extra branches and must not be repeated.
 
 The canonical source/header hashes remain `ac8dd08884961ba6d73e8a312391cdeecac71ba132f5badef5f79201a63b34d8`
 and `8207f088751e59f5a467c7a7e582c4870d82c3fb4e060262d02d5e3a07a17517`.
+
+## BASE/Textntry exact-preserving TU-state continuation
+
+`textntry-tu-state-ab91486.tsv` records seven new manual states from checkpoint `ab91486`. Its
+SHA-256 is `9531574071c6fa3434afa2f2ca38e429718983d114541c66f462f712b34ec6c1`.
+No permutation tool was used. The matrix carries both full source and header hashes because two
+states change only the ABI-neutral declaration order in `textEntryWidget.h`.
+
+The source-lifetime probes move `Read`'s 32-bit `enabled` declaration to function and outer-branch
+scope, hoist the constructor's existing `loadedIcon` and `rectX` declarations without moving their
+initializations, spell the exact destructor call through an explicit resource-manager dereference,
+and combine all three byte-neutral forms. The header probes swap the two non-virtual method
+declarations and move both non-virtual declarations before the virtual-method block without
+changing virtual order or class layout.
+
+Every state preserves the complete nine-row Textntry objdiff vector, including exact default
+constructor, destructor, and `SetupDisplayString`, as well as the existing `Main` and `Draw` scores.
+The two header states also leave the rebuilt `BASE/WINDOW` and `BASE/Misc` units unchanged in the
+status report. Raw review still shows only the constructor's delayed `m_iconFrame` store and
+`Read`'s adjacent compare/height-load reversal. Do not repeat these lifetime, dereference,
+declaration-order, or combined forms while the canonical source/header hashes remain
+`ac8dd08884961ba6d73e8a312391cdeecac71ba132f5badef5f79201a63b34d8` and
+`8207f088751e59f5a467c7a7e582c4870d82c3fb4e060262d02d5e3a07a17517`.

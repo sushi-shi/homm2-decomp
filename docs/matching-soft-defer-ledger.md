@@ -155,6 +155,28 @@ The 16-bit `enabled` result is a diagnostic boundary, not an accepted improvemen
 right only by changing the proved 32-bit constant materialization. Neither residual is a permitted
 wall and neither receives `@early-stop`.
 
+Exact-preserving TU-state continuation after checkpoint `ab91486`:
+
+- seven additional states were rebuilt with full source/header SHA-256 values and the complete
+  nine-row Textntry objdiff vector recorded in
+  [`textntry-tu-state-ab91486.tsv`](matching-matrices/textntry-tu-state-ab91486.tsv);
+- moving the existing 32-bit `Read::enabled` declaration to function scope or immediately before
+  the outer `type == 2` branch is byte-neutral and leaves the compare/load reversal unchanged;
+- hoisting the constructor's existing `loadedIcon` and `rectX` declarations without moving their
+  initialization sites is byte-neutral and leaves the delayed `m_iconFrame` store unchanged;
+- spelling the exact destructor call through `(*gpResourceManager).Dispose(...)` is byte-neutral,
+  and combining that spelling with both lifetime changes still leaves both target residuals
+  unchanged. This closes that combined predecessor/TU-state bundle, not just its individual forms;
+- swapping the two non-virtual member declarations, and separately moving both non-virtual method
+  declarations ahead of the virtual-method block while preserving virtual order, are ABI-neutral
+  header-state probes. Both preserve all Textntry rows and the rebuilt `BASE/WINDOW` and
+  `BASE/Misc` unit scores, but neither changes either residual;
+- no permutation tool was used. In particular, this continuation does not reopen the exhausted
+  libclang AST matrices and never uses the regex permuter.
+
+The canonical source/header hashes remain `ac8dd08884961ba6d73e8a312391cdeecac71ba132f5badef5f79201a63b34d8`
+and `8207f088751e59f5a467c7a7e582c4870d82c3fb4e060262d02d5e3a07a17517`.
+
 Fresh semantic-lifetime pass from lane checkpoint `97c1152`:
 
 - reusing the same 32-bit `shifted` local across both loops makes `SetupDisplayString` raw-exact;
