@@ -20,6 +20,7 @@
 #include <SOURCE/advManager.h>
 #include <SOURCE/Campaign.h>
 #include <SOURCE/CURSOR.h>
+#include <SOURCE/EVENTS.h>
 #include <SOURCE/game.h>
 #include <SOURCE/GAME.h>
 #include <SOURCE/hero.h>
@@ -1658,37 +1659,204 @@ void DoHeroSplit(int destinationSlot, int sourceSlot) {
 }
 
 VA(0x004701e1, 0x6a)
-void hero::SetSS(int, int) {}
+void hero::SetSS(int skill, int level) {
+    if (level == HERO_SKILL_LEVEL_NONE)
+        TakeSS(skill, HERO_SKILL_LEVEL_EXPERT);
+    else if (m_secondarySkills[skill] != HERO_SKILL_LEVEL_NONE)
+        m_secondarySkills[skill] = static_cast<signed char>(level);
+    else
+        GiveSS(skill, level);
+}
 
 VA(0x0047024b, 0xfa)
-int hero::TakeSS(int, int) { return 0; }
+int hero::TakeSS(int skill, int levels) {
+    int oldLevel;
+    int otherSkill;
+
+    oldLevel = m_secondarySkills[skill];
+    if (m_secondarySkills[skill] != HERO_SKILL_LEVEL_NONE) {
+        m_secondarySkills[skill] -= levels;
+        if (m_secondarySkills[skill] < HERO_SKILL_LEVEL_NONE)
+            m_secondarySkills[skill] = HERO_SKILL_LEVEL_NONE;
+        if (m_secondarySkills[skill] == HERO_SKILL_LEVEL_NONE) {
+            for (otherSkill = 0; otherSkill < HERO_SKILL_COUNT; otherSkill++) {
+                if (m_secondarySkillOrder[otherSkill] >
+                    m_secondarySkillOrder[skill]) {
+                    m_secondarySkillOrder[otherSkill]--;
+                }
+            }
+            m_secondarySkillOrder[skill] = 0;
+            m_secondarySkillCount--;
+        }
+    }
+    return oldLevel - m_secondarySkills[skill];
+}
 
 VA(0x00470345, 0xbf)
-int hero::GiveSS(int, int) { return 0; }
+int hero::GiveSS(int skill, int levels) {
+    int oldLevel;
+
+    oldLevel = m_secondarySkills[skill];
+    if (m_secondarySkills[skill] != HERO_SKILL_LEVEL_NONE) {
+        m_secondarySkills[skill] += levels;
+    } else {
+        if (m_secondarySkillCount < HERO_SECONDARY_SKILL_CAPACITY) {
+            m_secondarySkills[skill] = static_cast<signed char>(levels);
+            m_secondarySkillCount++;
+            m_secondarySkillOrder[skill] =
+                static_cast<unsigned char>(m_secondarySkillCount);
+        }
+    }
+    if (m_secondarySkills[skill] > HERO_SKILL_LEVEL_EXPERT)
+        m_secondarySkills[skill] = HERO_SKILL_LEVEL_EXPERT;
+    return m_secondarySkills[skill] - oldLevel;
+}
 
 VA(0x00470404, 0x6a)
-int hero::CreatureTypeCount(int) { return 0; }
+int hero::CreatureTypeCount(int creatureType) {
+    int creatureCount;
+    int armySlot;
+
+    creatureCount = 0;
+    for (armySlot = 0; armySlot < ARMY_GROUP_SLOT_COUNT; armySlot++) {
+        if (m_army.m_creatureTypes[armySlot] == creatureType &&
+            m_army.m_creatureCounts[armySlot] > 0) {
+            creatureCount++;
+        }
+    }
+    return creatureCount;
+}
 
 VA(0x0047046e, 0x5e)
-void hero::UpgradeCreatures(int, int) {}
+void hero::UpgradeCreatures(int oldCreatureType, int newCreatureType) {
+    int numberUpgraded = 0;
+    int armySlot;
+
+    for (armySlot = 0; armySlot < ARMY_GROUP_SLOT_COUNT; armySlot++) {
+        if (m_army.m_creatureTypes[armySlot] == oldCreatureType)
+            m_army.m_creatureTypes[armySlot] =
+                static_cast<signed char>(newCreatureType);
+    }
+}
 
 VA(0x004704cc, 0x5e)
-int hero::GetNthSS(int) { return 0; }
+int hero::GetNthSS(int ordinal) {
+    int skill;
+
+    for (skill = 0; skill < HERO_SKILL_COUNT; skill++) {
+        if (m_secondarySkillOrder[skill] ==
+            ordinal + HERO_SECONDARY_SKILL_ORDER_BASE)
+            return skill;
+    }
+    return HERO_SECONDARY_SKILL_NONE;
+}
 
 VA(0x0047052a, 0x51)
-class town * hero::GetOccupiedTown(void) { return 0; }
+class town * hero::GetOccupiedTown(void) {
+    if (m_locationType == HERO_LOCATION_TOWN)
+        return gpGame->GetTown(m_occupiedTown);
+    return 0;
+}
 
 VA(0x0047057b, 0x47)
-signed char hero::Stats(int) { return 0; }
+signed char hero::Stats(int stat) {
+    if (stat == HERO_PRIMARY_SPELL_POWER &&
+        m_primaryStats[stat] < HERO_MINIMUM_SPELL_POWER) {
+        return HERO_MINIMUM_SPELL_POWER;
+    }
+    return m_primaryStats[stat];
+}
 
+// @match-note 99.97%: semantics, the 0x0c frame, CFG, and all 3/3 relocation
+// targets agree. The first differing instruction is +0x96 (first differing byte
+// +0x99): retail loads shrineAndArtifactBonus from -0x08 before level from -0x04;
+// base loads level first. Both += and reversed binary operand spelling compile
+// to the base sequence; the addition is value-equivalent.
 VA(0x004705c2, 0xc3)
-signed char hero::GetSSLevel(int) { return 0; }
+signed char hero::GetSSLevel(int skill) {
+    signed char shrineAndArtifactBonus = 0;
+    signed char level;
 
+    level = m_secondarySkills[skill];
+    if (skill != HERO_SKILL_NECROMANCY)
+        return level;
+    if (level == HERO_SKILL_LEVEL_NONE)
+        return level;
+    if (HasArtifact(HERO_ARTIFACT_SPADE_NECROMANCY))
+        shrineAndArtifactBonus++;
+    if (m_cursorType == HERO_CLASS_NECROMANCER)
+        shrineAndArtifactBonus += gpGame->CountShrines(m_owner);
+    if (shrineAndArtifactBonus > HERO_NECROMANCY_BONUS_MAX)
+        shrineAndArtifactBonus = HERO_NECROMANCY_BONUS_MAX;
+    level += shrineAndArtifactBonus;
+    if (level > HERO_NECROMANCY_EFFECTIVE_LEVEL_MAX)
+        level = HERO_NECROMANCY_EFFECTIVE_LEVEL_MAX;
+    return level;
+}
+
+// @early-stop
+// All 0xf4 code bytes and all 11 relocation sites match after masking the three
+// delinked identities. Retail names the long format literal directly and uses
+// interior labels for gSecondarySkillLevels and cSecSkillDesc; typed source uses
+// the owning symbols and their corresponding addends.
 VA(0x00470685, 0xf4)
-void hero::DoSSLevelDialog(int, int) {}
+void hero::DoSSLevelDialog(int skill, int quickView) {
+    int skillBonus;
+    char *skillLevelName;
+
+    skillBonus = GetSSLevel(skill) - m_secondarySkills[skill];
+    if (skillBonus > 0) {
+        skillLevelName = gSecondarySkillLevels[m_secondarySkills[skill]];
+        sprintf(gText,
+            "{%s Necromancy (+%d)}\n\n%s Necromancy (+%d) allows %d percent of the creatures killed in combat to be brought back from the dead as Skeletons.",
+            skillLevelName, skillBonus, skillLevelName, skillBonus,
+            GetSSLevel(skill) * HERO_NECROMANCY_PERCENT_PER_LEVEL);
+    } else {
+        sprintf(gText,
+            cSecSkillDesc[skill][m_secondarySkills[skill] - 1]);
+    }
+    NormalDialog(gText,
+        quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
+        NORMAL_DIALOG_NO_RESOURCE, NORMAL_DIALOG_NO_VALUE,
+        NORMAL_DIALOG_SECONDARY_SKILL,
+        m_secondarySkills[skill] +
+            skill * HERO_SECONDARY_SKILL_ICON_STRIDE -
+            HERO_SECONDARY_SKILL_ICON_FRAME_BASE,
+        NORMAL_DIALOG_NO_RESOURCE, 0,
+        NORMAL_DIALOG_NO_RESOURCE, 0);
+}
 
 VA(0x00470779, 0x12f)
-void hero::CheckAnduranPieces(int) {}
+void hero::CheckAnduranPieces(int showDialog) {
+    int artifactSlot;
+
+    if (HasArtifact(HERO_ARTIFACT_BREASTPLATE_ANDURAN) &&
+        HasArtifact(HERO_ARTIFACT_HELMET_ANDURAN) &&
+        HasArtifact(HERO_ARTIFACT_SWORD_ANDURAN)) {
+        for (artifactSlot = 0; artifactSlot < HERO_ARTIFACT_SLOT_COUNT;
+             artifactSlot++) {
+            if (m_artifacts[artifactSlot] ==
+                    HERO_ARTIFACT_BREASTPLATE_ANDURAN ||
+                m_artifacts[artifactSlot] == HERO_ARTIFACT_HELMET_ANDURAN ||
+                m_artifacts[artifactSlot] == HERO_ARTIFACT_SWORD_ANDURAN) {
+                GiveTakeArtifactStat(
+                    this, m_artifacts[artifactSlot], EVENT_ARTIFACT_TAKE);
+                m_artifacts[artifactSlot] = HERO_ARTIFACT_NONE;
+            }
+        }
+        GiveArtifact(this, HERO_ARTIFACT_BATTLE_GARB, showDialog,
+            HERO_ARTIFACT_NONE);
+        if (gbThisNetHumanPlayer[m_owner]) {
+            LoadPlaySample("treasure.82m");
+            NormalDialog(
+                "The three Anduran artifacts magically combine into one.",
+                NORMAL_DIALOG_INFO, NORMAL_DIALOG_NO_RESOURCE,
+                NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_ARTIFACT,
+                HERO_ARTIFACT_BATTLE_GARB, NORMAL_DIALOG_NO_RESOURCE, 0,
+                NORMAL_DIALOG_NO_RESOURCE, 0);
+        }
+    }
+}
 
 // ---- globals (definitions, RVA order) ----
 DATA(0x004f6c88) class hero *gpHVHero;
