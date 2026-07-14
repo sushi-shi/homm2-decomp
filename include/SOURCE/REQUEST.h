@@ -27,6 +27,22 @@ typedef enum MapDimension {
     MAP_DIMENSION_XLARGE = 144
 } MapDimension;
 
+typedef enum MapVictoryCondition {
+    MAP_VICTORY_DEFEAT_ALL = 0,
+    MAP_VICTORY_CAPTURE_TOWN = 1,
+    MAP_VICTORY_DEFEAT_HERO = 2,
+    MAP_VICTORY_FIND_ARTIFACT = 3,
+    MAP_VICTORY_DEFEAT_SIDE = 4,
+    MAP_VICTORY_ACCUMULATE_GOLD = 5
+} MapVictoryCondition;
+
+typedef enum MapLossCondition {
+    MAP_LOSS_STANDARD = 0,
+    MAP_LOSS_TOWN = 1,
+    MAP_LOSS_HERO = 2,
+    MAP_LOSS_TIME = 3
+} MapLossCondition;
+
 #pragma pack(push, 1)
 struct SMapHeader {
     unsigned int magic;

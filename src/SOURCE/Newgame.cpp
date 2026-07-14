@@ -9,10 +9,13 @@
 #include <_carcass_types.h>
 #include <BASE/Misc.h>
 #include <BASE/executive.h>
+#include <BASE/font.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/icon.h>
 #include <BASE/iconWidget.h>
+#include <BASE/inputManager.h>
+#include <BASE/mouseManager.h>
 #include <BASE/resourceManager.h>
 #include <BASE/textWidget.h>
 #include <SOURCE/EVENTS.h>
@@ -29,6 +32,8 @@
 DATA(0x0051cdd0) static short newGameSourceLineBase = NEW_GAME_SOURCE_LINE_BASE;
 DATA(0x0051cfa0) static short newGameWindowSourceLineBase =
     NEW_GAME_WINDOW_SOURCE_LINE_BASE;
+DATA(0x0051d0fc) static short scenarioInfoSourceLineBase =
+    NEW_GAME_SCENARIO_SOURCE_LINE_BASE;
 
 VA(0x004b6f40, 0x1d5)
 void game::GetMap(void)
@@ -1200,26 +1205,644 @@ finish:
     return 1;
 }
 
+// @early-stop
+// Excluding jump-table data at retail +0x259..+0x289 and +0x399..+0x400,
+// every instruction byte agrees. Both objects have 84 relocation sites and every
+// external target agrees; residuals are delinked gText+1/local-table identities.
 VA(0x004b9db8, 0x418)
-int game::ProcessNGKeyPress(struct tag_message &) { return 0; }
+int game::ProcessNGKeyPress(struct tag_message &message)
+{
+    char workText[NEW_GAME_KEY_BUFFER_SIZE];
+    char keyChar;
+    int scanCode;
+    int widthResult;
+
+    if (giNumHumanPlayers == 1 ||
+        iMPBaseType == NEW_GAME_MULTIPLAYER_HOTSEAT)
+        return 0;
+
+    switch (message.field4) {
+    case NEW_GAME_KEY_ESCAPE:
+        if (!gbAllowTextEntryEscape)
+            break;
+        strcpy(cNGKPCore, "");
+        break;
+
+    case NEW_GAME_KEY_DELETE:
+        if (strlen(cNGKPCore) > NGKPcursorIndex) {
+            strcpy(gText, cNGKPCore + (NGKPcursorIndex + 1));
+            strcpy(cNGKPCore + NGKPcursorIndex, gText);
+        }
+        break;
+
+    case NEW_GAME_KEY_LEFT:
+        if (NGKPcursorIndex > 0)
+            --NGKPcursorIndex;
+        break;
+
+    case NEW_GAME_KEY_RIGHT:
+        if (strlen(cNGKPCore) > NGKPcursorIndex)
+            ++NGKPcursorIndex;
+        break;
+
+    default:
+        gpInputManager->AsciiConvert(message);
+        if (message.field4 == NEW_GAME_KEY_ENTER)
+            return 1;
+
+        if (message.field4 == NEW_GAME_KEY_BACKSPACE) {
+            if (NGKPcursorIndex > 0) {
+                strcpy(gText, cNGKPCore + NGKPcursorIndex);
+                strcpy(cNGKPCore + (NGKPcursorIndex - 1), gText);
+                --NGKPcursorIndex;
+            }
+        } else if (strlen(cNGKPCore) + 1 < NEW_GAME_CHAT_TEXT_LIMIT &&
+                   message.field4 != 0) {
+            strcpy(workText, cNGKPCore);
+            keyChar = 0;
+            if (message.field4 >= NEW_GAME_KEY_FIRST_EXTENDED) {
+                scanCode = message.keyView.scanCode;
+                switch (scanCode) {
+                case NEW_GAME_KEYPAD_INSERT:
+                    keyChar = '0';
+                    break;
+                case NEW_GAME_KEYPAD_END:
+                    keyChar = '1';
+                    break;
+                case NEW_GAME_KEYPAD_DOWN:
+                    keyChar = '2';
+                    break;
+                case NEW_GAME_KEYPAD_PAGE_DOWN:
+                    keyChar = '3';
+                    break;
+                case NEW_GAME_KEYPAD_LEFT:
+                    keyChar = '4';
+                    break;
+                case NEW_GAME_KEYPAD_CENTER:
+                    keyChar = '5';
+                    break;
+                case NEW_GAME_KEYPAD_RIGHT:
+                    keyChar = '6';
+                    break;
+                case NEW_GAME_KEYPAD_HOME:
+                    keyChar = '7';
+                    break;
+                case NEW_GAME_KEYPAD_UP:
+                    keyChar = '8';
+                    break;
+                case NEW_GAME_KEYPAD_PAGE_UP:
+                    keyChar = '9';
+                    break;
+                }
+            } else {
+                keyChar = static_cast<char>(message.field4);
+            }
+
+            if (keyChar == '{' || keyChar == '}')
+                keyChar = 0;
+
+            if (keyChar != 0) {
+                strcpy(gText, cNGKPCore);
+                gText[NGKPcursorIndex] = keyChar;
+                gText[NGKPcursorIndex + 1] = 0;
+                strcat(gText, cNGKPCore + NGKPcursorIndex);
+                strcpy(cNGKPCore, gText);
+                ++NGKPcursorIndex;
+                NGKPSetupDisplayString(cNGKPCore,
+                                       static_cast<unsigned short>(NGKPcursorIndex));
+                widthResult = smallFont->LineLength(
+                    cNGKPDisplay, NEW_GAME_CHAT_DRAW_WIDTH);
+                if (widthResult > NEW_GAME_CHAT_MAX_LINES) {
+                    strcpy(cNGKPCore, workText);
+                    --NGKPcursorIndex;
+                }
+            }
+        }
+        break;
+    }
+
+    DrawNGKPDisplayString(1);
+    return 0;
+}
 
 VA(0x004ba1d0, 0x11e)
-void game::NGKPSetupDisplayString(char *, unsigned short int) {}
+void game::NGKPSetupDisplayString(char *text, unsigned short cursor)
+{
+    if (giNumHumanPlayers == 1 ||
+        iMPBaseType == NEW_GAME_MULTIPLAYER_HOTSEAT)
+        return;
 
+    if (glTimers[0] < static_cast<int>(KBTickCount())) {
+        NGKPcursorFlashOn = 1 - NGKPcursorFlashOn;
+        glTimers[0] = KBTickCount() + NEW_GAME_CURSOR_FLASH_TICKS;
+    }
+
+    if (cursor > 0)
+        strncpy(cNGKPDisplay, text, cursor);
+
+    if (NGKPcursorFlashOn)
+        cNGKPDisplay[cursor] = 0x1f;
+    else
+        cNGKPDisplay[cursor] = '_';
+
+    if (cursor < strlen(text))
+        strcpy(cNGKPDisplay + (cursor + 1), text + cursor);
+    else
+        cNGKPDisplay[cursor + 1] = 0;
+}
+
+// @early-stop
+// The complete 55-instruction stream is identical with relocations masked and
+// all 10 relocation sites and targets agree; the residual is delinker identity.
 VA(0x004ba2ee, 0xae)
-void game::DrawNGKPDisplayString(int) {}
+void game::DrawNGKPDisplayString(int updateScreen)
+{
+    if (gbNewGameDialogOver != 0) {
+    } else if (giNumHumanPlayers != 1) {
+        if (iMPBaseType == NEW_GAME_MULTIPLAYER_HOTSEAT) {
+        } else {
+            NGKPBkg->DrawToBuffer(NEW_GAME_CHAT_DRAW_X, NEW_GAME_CHAT_DRAW_Y,
+                                  NEW_GAME_CHAT_BACKGROUND_WIDTH, 0);
+            smallFont->DrawBoundedString(
+                cNGKPDisplay, NEW_GAME_CHAT_DRAW_X, NEW_GAME_CHAT_DRAW_Y,
+                NEW_GAME_CHAT_DRAW_WIDTH, NEW_GAME_CHAT_DRAW_HEIGHT, 2, 0);
+            if (updateScreen)
+                gpWindowManager->UpdateScreenRegion(
+                    NEW_GAME_CHAT_DRAW_X, NEW_GAME_CHAT_DRAW_Y,
+                    NEW_GAME_CHAT_DRAW_WIDTH, NEW_GAME_CHAT_DRAW_HEIGHT);
+        }
+    }
+}
 
+// @early-stop
+// Instruction bytes, frame slots, and all 118 relocation sites and targets
+// agree. Residual rows are string and local static-constant symbol identities.
 VA(0x004ba39c, 0xb71)
-void game::ShowScenInfo(void) {}
+void game::ShowScenInfo(void)
+{
+    int availableWidthResult;
+    int mapSizeIndex;
+    widget *textControlLocal;
+    int firstPlayerXLocal;
+    int multiplayerYOffsetValue;
+    int playerCounter;
+    int playerLockedLocal;
+    int playerSpacingTemp;
+    tag_message scenarioMessageTemp;
+    widget *iconControlLocal;
+    heroWindow *scenarioWindowValue;
+    int playerGapValue;
+    char *label;
+    int raceTextWidth;
+    int singlePlayerYOffsetValue;
 
+    gpMouseManager->SetPointer("advmice.mse", 0,
+                               NEW_GAME_POINTER_DEFAULT_FRAME);
+    scenarioWindowValue = new heroWindow(90, 4, "sceninfo.bin");
+    if (scenarioWindowValue == 0)
+        MemError();
+    SetWinText(scenarioWindowValue, NEW_GAME_SCENARIO_WINDOW_TEXT_ID);
+
+    scenarioMessageTemp.type = NEW_GAME_MESSAGE_WIDGET;
+    scenarioMessageTemp.field4 = NEW_GAME_WIDGET_SET_TEXT;
+    scenarioMessageTemp.field8 = NEW_GAME_SCENARIO_NAME;
+    scenarioMessageTemp.text = m_mapHeader.name;
+    scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
+
+    scenarioMessageTemp.field8 = NEW_GAME_SCENARIO_DIFFICULTY;
+    scenarioMessageTemp.text = cDifficulty[m_mapHeader.difficulty];
+    scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
+    scenarioMessageTemp.field8 = NEW_GAME_SCENARIO_SELECTED_DIFFICULTY;
+    scenarioMessageTemp.text = cDifficulty[m_difficulty];
+    scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
+
+    sprintf(gText, "%d", CalcDifficultyRating());
+    strcat(gText, "%");
+    scenarioMessageTemp.field8 = NEW_GAME_SCENARIO_RATING;
+    scenarioMessageTemp.text = gText;
+    scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
+
+    mapSizeIndex = 0;
+    if (m_mapHeader.width == MAP_DIMENSION_MEDIUM)
+        mapSizeIndex = 1;
+    else if (m_mapHeader.width == MAP_DIMENSION_LARGE)
+        mapSizeIndex = 2;
+    else if (m_mapHeader.width == MAP_DIMENSION_XLARGE)
+        mapSizeIndex = 3;
+    scenarioMessageTemp.field8 = NEW_GAME_SCENARIO_MAP_SIZE;
+    scenarioMessageTemp.text = cMapSize[mapSizeIndex];
+    scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
+
+    scenarioMessageTemp.field8 = NEW_GAME_SCENARIO_DESCRIPTION;
+    scenarioMessageTemp.text = m_mapHeader.description;
+    scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
+    GetVictoryConditionText(gText);
+    scenarioMessageTemp.field8 = NEW_GAME_SCENARIO_VICTORY;
+    scenarioMessageTemp.text = gText;
+    scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
+    GetLossConditionText(gText);
+    scenarioMessageTemp.field8 = NEW_GAME_SCENARIO_LOSS;
+    scenarioMessageTemp.text = gText;
+    scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
+
+    iconControlLocal = 0;
+    textControlLocal = 0;
+    availableWidthResult = 372 - m_mapHeader.playerCount * 62;
+    playerGapValue = availableWidthResult / (m_mapHeader.playerCount + 1);
+    firstPlayerXLocal = playerGapValue + 24;
+    playerSpacingTemp = playerGapValue + 62;
+    multiplayerYOffsetValue = 0;
+
+    for (playerCounter = 0; playerCounter < m_mapHeader.playerCount; ++playerCounter) {
+        if (giNumHumanPlayers > 1) {
+            iconControlLocal = new iconWidget(
+                static_cast<short>(playerSpacingTemp * playerCounter +
+                                   firstPlayerXLocal + 13),
+                static_cast<short>(multiplayerYOffsetValue + 309), 64, 28,
+                "ngextra.icn", 59, 0,
+                static_cast<short>(playerCounter + NEW_GAME_PLAYER_HUMAN_FIRST), 16,
+                1);
+            if (iconControlLocal == 0)
+                MemError();
+            scenarioWindowValue->AddWidget(iconControlLocal, -1);
+
+            iconControlLocal = new iconWidget(
+                static_cast<short>(playerSpacingTemp * playerCounter +
+                                   firstPlayerXLocal + 16),
+                static_cast<short>(multiplayerYOffsetValue + 306), 62, 26,
+                "ngextra.icn", 0, 0,
+                static_cast<short>(playerCounter + NEW_GAME_HANDICAP_FIRST), 16, 1);
+            if (iconControlLocal == 0)
+                MemError();
+            scenarioWindowValue->AddWidget(iconControlLocal, -1);
+        }
+
+        iconControlLocal = new iconWidget(
+            static_cast<short>(playerSpacingTemp * playerCounter + firstPlayerXLocal +
+                               11),
+            163, 68,
+            static_cast<short>(((giNumHumanPlayers <= 1) - 1 & 0x11) + 0x2f),
+            "ngextra.icn",
+            static_cast<short>(((giNumHumanPlayers <= 1) - 1 & -0x13) + 0x4f),
+            0, static_cast<short>(playerCounter + NEW_GAME_RACE_FIRST), 16, 1);
+        if (iconControlLocal == 0)
+            MemError();
+        scenarioWindowValue->AddWidget(iconControlLocal, -1);
+
+        iconControlLocal = new iconWidget(
+            static_cast<short>(playerSpacingTemp * playerCounter + firstPlayerXLocal +
+                               16),
+            160, 62, 58, "ngextra.icn",
+            static_cast<short>(((giNumHumanPlayers <= 1) - 1 & 0x18) + 3), 0,
+            static_cast<short>(playerCounter + NEW_GAME_COLOR_FIRST), 16, 1);
+        if (iconControlLocal == 0)
+            MemError();
+        scenarioWindowValue->AddWidget(iconControlLocal, -1);
+
+        if (giNumHumanPlayers > 1) {
+            label = static_cast<char *>(BaseAlloc(
+                2, "I:\\Projects\\Heroes\\Prog\\SOURCE\\Newgame.cpp",
+                scenarioInfoSourceLineBase + 0x72));
+            sprintf(label, " ");
+            textControlLocal = new textWidget(
+                static_cast<short>(playerSpacingTemp * playerCounter +
+                                   firstPlayerXLocal + 19),
+                206, 56, 9, label, "smalfont.fnt", 1,
+                static_cast<short>(playerCounter + NEW_GAME_PLAYER_NAME_FIRST),
+                NEW_GAME_MESSAGE_WIDGET, 1);
+            if (textControlLocal == 0)
+                MemError();
+            scenarioWindowValue->AddWidget(textControlLocal, -1);
+        }
+
+        singlePlayerYOffsetValue = 0;
+        iconControlLocal = new iconWidget(
+            static_cast<short>(playerSpacingTemp * playerCounter + firstPlayerXLocal +
+                               11),
+            static_cast<short>(multiplayerYOffsetValue +
+                               singlePlayerYOffsetValue + 243),
+            64, 47,
+            "ngextra.icn", 61, 0,
+            static_cast<short>(playerCounter + NEW_GAME_RACE_ICON_FIRST), 16, 1);
+        if (iconControlLocal == 0)
+            MemError();
+        scenarioWindowValue->AddWidget(iconControlLocal, -1);
+
+        label = static_cast<char *>(BaseAlloc(
+            2, "I:\\Projects\\Heroes\\Prog\\SOURCE\\Newgame.cpp",
+            scenarioInfoSourceLineBase + 0x92));
+        sprintf(label, "A");
+        if (m_mapHeader.playerCount >= 5) {
+            if (m_mapHeader.playerCount >= MAP_HEADER_PLAYER_COUNT)
+                raceTextWidth = 0;
+            else
+                raceTextWidth = 16;
+        } else {
+            raceTextWidth = 26;
+        }
+        textControlLocal = new textWidget(
+            static_cast<short>(playerSpacingTemp * playerCounter + firstPlayerXLocal +
+                               15 - raceTextWidth / 2),
+            static_cast<short>(multiplayerYOffsetValue +
+                               singlePlayerYOffsetValue + 288),
+            static_cast<short>(raceTextWidth + 64), 12, label,
+            "smalfont.fnt", 1,
+            static_cast<short>(playerCounter + NEW_GAME_RACE_NAME_FIRST),
+            NEW_GAME_MESSAGE_WIDGET, 1);
+        if (textControlLocal == 0)
+            MemError();
+        scenarioWindowValue->AddWidget(textControlLocal, -1);
+
+        iconControlLocal = new iconWidget(
+            static_cast<short>(playerSpacingTemp * playerCounter + firstPlayerXLocal +
+                               16),
+            static_cast<short>(multiplayerYOffsetValue +
+                               singlePlayerYOffsetValue + 240),
+            62, 45,
+            "ngextra.icn", 51, 0,
+            static_cast<short>(playerCounter + NEW_GAME_RACE_CYCLE_FIRST), 16, 1);
+        if (iconControlLocal == 0)
+            MemError();
+        scenarioWindowValue->AddWidget(iconControlLocal, -1);
+    }
+
+    for (playerCounter = 0; playerCounter < m_mapHeader.playerCount; ++playerCounter) {
+        if (m_setupPlayerNetworkId[playerCounter] == NEW_GAME_COMPUTER_PLAYER) {
+            sprintf(gText, "");
+        } else if (strlen(cPlayerNames[m_setupPlayerNetworkId[playerCounter]]) != 0) {
+            sprintf(gText, cPlayerNames[m_setupPlayerNetworkId[playerCounter]]);
+        } else {
+            sprintf(gText, "Player %d",
+                    m_setupPlayerNetworkId[playerCounter] + 1);
+        }
+        scenarioMessageTemp.field4 = NEW_GAME_WIDGET_SET_TEXT;
+        scenarioMessageTemp.field8 = playerCounter + NEW_GAME_PLAYER_NAME_FIRST;
+        scenarioMessageTemp.text = gText;
+        scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
+
+        if (m_selectedSetupPlayer == playerCounter)
+            scenarioMessageTemp.field4 = NEW_GAME_WIDGET_ENABLE;
+        else
+            scenarioMessageTemp.field4 = NEW_GAME_WIDGET_DISABLE;
+        scenarioMessageTemp.field8 = playerCounter + NEW_GAME_PLAYER_SELECT_FIRST;
+        scenarioMessageTemp.field18 = NEW_GAME_WIDGET_REFRESH_FRAME;
+        scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
+
+        if (m_setupPlayerType[playerCounter] != NEW_GAME_PLAYER_DEFAULT ||
+            (giNumHumanPlayers > 1 &&
+             m_setupPlayerNetworkId[playerCounter] != NEW_GAME_COMPUTER_PLAYER))
+            playerLockedLocal = 0;
+        else
+            playerLockedLocal = 1;
+        scenarioMessageTemp.field4 = NEW_GAME_WIDGET_SET_FRAME;
+        scenarioMessageTemp.field8 = playerCounter + NEW_GAME_COLOR_FIRST;
+        if (m_setupPlayerNetworkId[playerCounter] == NEW_GAME_COMPUTER_PLAYER)
+            scenarioMessageTemp.field18 = m_setupPlayerColor[playerCounter] +
+                (playerLockedLocal ? NEW_GAME_COMPUTER_COLOR_LOCKED_FRAME
+                                   : NEW_GAME_COMPUTER_COLOR_UNLOCKED_FRAME);
+        else
+            scenarioMessageTemp.field18 = m_setupPlayerColor[playerCounter] +
+                (playerLockedLocal ? NEW_GAME_HUMAN_COLOR_LOCKED_FRAME
+                                   : NEW_GAME_HUMAN_COLOR_UNLOCKED_FRAME);
+        if (giNumHumanPlayers > 1)
+            scenarioMessageTemp.field18 += NEW_GAME_MULTIPLAYER_COLOR_FRAME_OFFSET;
+        scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
+
+        if (playerLockedLocal)
+            scenarioMessageTemp.field4 = NEW_GAME_WIDGET_DISABLE;
+        else
+            scenarioMessageTemp.field4 = NEW_GAME_WIDGET_ENABLE;
+        scenarioMessageTemp.field18 = NEW_GAME_WIDGET_INACTIVE_FRAME;
+        scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
+
+        scenarioMessageTemp.field4 = NEW_GAME_WIDGET_SET_FRAME;
+        scenarioMessageTemp.field8 = playerCounter + NEW_GAME_HANDICAP_FIRST;
+        if (m_setupPlayerNetworkId[playerCounter] == NEW_GAME_COMPUTER_PLAYER)
+            scenarioMessageTemp.field18 = NEW_GAME_RACE_NAME_FIRST;
+        else
+            scenarioMessageTemp.field18 = m_playerHandicap[playerCounter];
+        scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
+        if (m_setupPlayerNetworkId[playerCounter] == NEW_GAME_COMPUTER_PLAYER)
+            scenarioMessageTemp.field4 = NEW_GAME_WIDGET_DISABLE;
+        else
+            scenarioMessageTemp.field4 = NEW_GAME_WIDGET_ENABLE;
+        scenarioMessageTemp.field18 = NEW_GAME_WIDGET_INACTIVE_FRAME;
+        scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
+
+        scenarioMessageTemp.field4 = NEW_GAME_WIDGET_SET_FRAME;
+        scenarioMessageTemp.field8 = playerCounter + NEW_GAME_RACE_CYCLE_FIRST;
+        scenarioMessageTemp.field18 = m_setupPlayerRace[playerCounter] +
+            (playerLockedLocal ? NEW_GAME_FIXED_RACE_FRAME_BASE
+                               : NEW_GAME_RANDOM_RACE_FRAME_BASE);
+        scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
+
+        sprintf(gText, gAlignmentNames[m_setupPlayerRace[playerCounter]]);
+        scenarioMessageTemp.field4 = NEW_GAME_WIDGET_SET_TEXT;
+        scenarioMessageTemp.field8 = playerCounter + NEW_GAME_RACE_NAME_FIRST;
+        scenarioMessageTemp.text = gText;
+        scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
+    }
+
+    gpWindowManager->DoDialog(scenarioWindowValue, EventWindowHandler, 0);
+    delete scenarioWindowValue;
+}
+
+// @early-stop
+// The instruction stream is identical with relocations masked and all 14
+// relocation sites and targets agree; only string symbol identities differ.
 VA(0x004baf0d, 0x1c7)
-void game::GetLossConditionText(char *) {}
+void game::GetLossConditionText(char *text)
+{
+    int week;
+    hero *lossHero;
+    int day;
+    int month;
+    town *lossTown;
+    int townId;
 
+    if (m_mapHeader.lossCondition != MAP_LOSS_STANDARD) {
+        switch (m_mapHeader.lossCondition) {
+        case MAP_LOSS_TOWN:
+            townId = GetTownId(m_mapHeader.lossConditionValue,
+                               m_mapHeader.lossTownY);
+            lossTown = GetTown(townId);
+            sprintf(text, "Lose the %s '%s'.",
+                    (lossTown->m_buildings & TOWN_BUILDING_CASTLE)
+                        ? "castle"
+                        : "town",
+                    lossTown->m_name);
+            break;
+
+        case MAP_LOSS_HERO:
+            lossHero = GetHero(m_mapHeader.lossConditionValue);
+            sprintf(text, "Lose the hero '%s'.", lossHero->m_name);
+            break;
+
+        case MAP_LOSS_TIME:
+            month = (gpGame->m_mapHeader.lossConditionValue - 1) /
+                        NEW_GAME_DAYS_PER_MONTH +
+                    1;
+            week = (gpGame->m_mapHeader.lossConditionValue -
+                    (month - 1) * NEW_GAME_DAYS_PER_MONTH - 1) /
+                       NEW_GAME_DAYS_PER_WEEK +
+                   1;
+            day = (gpGame->m_mapHeader.lossConditionValue - 1) %
+                      NEW_GAME_DAYS_PER_WEEK +
+                  1;
+            sprintf(text,
+                    "Fail to win by the end of month %d, week %d, day %d.",
+                    month, week, day);
+            break;
+        }
+    } else {
+        sprintf(text, "Lose all your heroes, towns and castles.");
+    }
+}
+
+// @early-stop
+// Excluding the 0x14-byte jump table, opcodes and CFG agree after normalizing a
+// uniform four-byte stack displacement. Retail reserves one unreferenced frame
+// word and one trailing alignment NOP; its const_000fe2ac relocation is the
+// linked equivalent of gArtifactNames-1. Both objects have 32 relocations and
+// every external target agrees.
 VA(0x004bb0d4, 0x2fb)
-void game::GetVictoryConditionText(char *) {}
+void game::GetVictoryConditionText(char *text)
+{
+    hero *victoryHeroData;
+    int firstSideIsLocalResult;
+    char firstSide[NEW_GAME_SIDE_TEXT_SIZE];
+    char secondSideValue[NEW_GAME_SIDE_TEXT_SIZE];
+    town *victoryTown;
+    int townId;
 
+    if (m_mapHeader.victoryCondition != MAP_VICTORY_DEFEAT_ALL) {
+        switch (m_mapHeader.victoryCondition) {
+        case MAP_VICTORY_CAPTURE_TOWN:
+            townId = GetTownId(m_mapHeader.victoryConditionValue,
+                               m_mapHeader.victoryTownY);
+            victoryTown = GetTown(townId);
+            sprintf(text, "Capture the %s '%s'",
+                    (victoryTown->m_buildings & TOWN_BUILDING_CASTLE)
+                        ? "castle"
+                        : "town",
+                    victoryTown->m_name);
+            break;
+
+        case MAP_VICTORY_DEFEAT_HERO:
+            victoryHeroData = GetHero(m_mapHeader.victoryConditionValue);
+            sprintf(text, "Defeat the hero '%s'", victoryHeroData->m_name);
+            break;
+
+        case MAP_VICTORY_FIND_ARTIFACT:
+            if (m_mapHeader.victoryConditionValue == 0)
+                sprintf(text, "Find the ultimate artifact");
+            else
+                sprintf(text, "Find the %s",
+                        gArtifactNames[m_mapHeader.victoryConditionValue - 1]);
+            break;
+
+        case MAP_VICTORY_ACCUMULATE_GOLD:
+            sprintf(text, "Accumulate %d gold",
+                    m_mapHeader.victoryConditionValue *
+                        NEW_GAME_GOLD_CONDITION_MULTIPLIER);
+            break;
+
+        case MAP_VICTORY_DEFEAT_SIDE:
+            firstSideIsLocalResult = GetSideDesc(
+                firstSide, 0, m_mapHeader.victoryConditionValue - 1);
+            GetSideDesc(secondSideValue, m_mapHeader.victoryConditionValue,
+                        m_mapHeader.playerCount - 1);
+            if (firstSideIsLocalResult)
+                sprintf(text, "%s must defeat %s", firstSide, secondSideValue);
+            else
+                sprintf(text, "%s must defeat %s", secondSideValue, firstSide);
+        }
+
+        if (m_mapHeader.victoryCondition != MAP_VICTORY_DEFEAT_SIDE &&
+            m_mapHeader.allowNormalVictory != 0)
+            strcat(text,
+                   ", or you may win by defeating all enemy heroes and capturing all enemy towns and castles.");
+        else
+            strcat(text, ".");
+    } else {
+        strcpy(text,
+               "Defeat all enemy heroes and capture all enemy towns and castles.");
+    }
+}
+
+// @early-stop
+// At this source hash's retained max, the instruction stream differs only in
+// string-symbol identities. The current TU-cumulative output also reverses the
+// operands of equivalent signed bounds checks; frame roles and 25 relocations agree.
 VA(0x004bb3cf, 0x2a7)
-int game::GetSideDesc(char *, int, int) { return 0; }
+int game::GetSideDesc(char *text, int firstPlayer, int lastPlayer)
+{
+    char colorName[NEW_GAME_SIDE_TEXT_SIZE];
+    int sideSize;
+    int localPlayerOnSide;
+    int localPlayerIndex;
+    int player;
+    int listedPlayerCount;
+    int otherPlayerCount;
+
+    localPlayerIndex = -1;
+    for (player = 0; player < m_mapHeader.playerCount; ++player) {
+        if (m_setupPlayerNetworkId[player] == giThisGamePos)
+            localPlayerIndex = player;
+    }
+
+    if (localPlayerIndex >= firstPlayer && localPlayerIndex <= lastPlayer)
+        localPlayerOnSide = 1;
+    else
+        localPlayerOnSide = 0;
+
+    sideSize = lastPlayer - firstPlayer + 1;
+    otherPlayerCount = sideSize - (localPlayerOnSide != 0);
+
+    if (localPlayerOnSide) {
+        if (otherPlayerCount != 0) {
+            if (otherPlayerCount > 1)
+                sprintf(text, "You and your allies ");
+            else
+                sprintf(text, "You and your ally ");
+
+            listedPlayerCount = 0;
+            for (player = firstPlayer; player <= lastPlayer; ++player) {
+                if (player != localPlayerIndex) {
+                    ++listedPlayerCount;
+                    sprintf(colorName, gColors[m_setupPlayerColor[player]]);
+                    colorName[0] -= 'a' - 'A';
+                    strcat(text, colorName);
+                    if (listedPlayerCount < otherPlayerCount - 1)
+                        strcat(text, ", ");
+                    else if (listedPlayerCount < otherPlayerCount)
+                        strcat(text, " and ");
+                }
+            }
+        } else {
+            sprintf(text, "You");
+        }
+    } else {
+        if (sideSize > 1)
+            strcpy(text, "the enemy alliance of ");
+        else
+            strcpy(text, "the enemy - ");
+
+        listedPlayerCount = 0;
+        for (player = firstPlayer; player <= lastPlayer; ++player) {
+            ++listedPlayerCount;
+            sprintf(colorName, gColors[m_setupPlayerColor[player]]);
+            colorName[0] -= 'a' - 'A';
+            strcat(text, colorName);
+            if (listedPlayerCount < otherPlayerCount - 1)
+                strcat(text, ", ");
+            else if (listedPlayerCount < otherPlayerCount)
+                strcat(text, " and ");
+        }
+    }
+
+    return localPlayerOnSide;
+}
 
 // ---- globals (definitions, RVA order) ----
 DATA(0x0051cd20) int gbNewGameDialogOver;
