@@ -1,0 +1,15 @@
+# BASE/icon2bc clean reconstruction, compiler/header checkpoint 04f798c
+# Target: IconToBitmapColorTable, RVA 0xd32a0, retail end/size 0x5af, target relocations 91
+# No AST or regex permutation tool was used. Scores are refreshed homm2 sema match results.
+source_sha256	match_percent	base_end	base_target_relocs	result	change_and_byte_evidence
+54f13ecdae43d9bac6804b71f99046f0b7d814fb3333df26482cf1ee03ba66d4	54.14	0x4ff	81/91	baseline	First complete clean semantic decoder: real IconEntry fields, all RLE command classes, clipping, dim palette, mapped literal copy, newline, and file-static scratch addresses reconstructed from retail.
+not-captured-setup-entry-order	53.80	not-retained	not-retained	reverted	Reordered entry/X/source setup locals; broadened the setup divergence and reduced the focused score.
+not-captured-global-entry-only	54.72	not-retained	not-retained	reverted	Removed the local entry lifetime and used only the published entry global; did not recover retail setup allocation.
+not-captured-unsigned-char-command	52.56	not-retained	not-retained	reverted	Narrowed the command local to unsigned char; changed compare/register shape broadly.
+not-captured-clip-global-predicates	55.36	not-retained	not-retained	superseded	Used the published start-X/Y values in the setup clip predicates; retained into later states.
+008b5f744b5e3cd09d0479b1c90ff6299eae9f9ef516f17b5e606298d1f1006f	59.89	0x557	not-retained	superseded	Expanded the left-clipped fill arm into separate both-clipped and left-only memset calls. This recovered retail's five distinct inlined memset bodies and was retained.
+685d04c4a003dcc1ec5fa5b6b154ef97ad4f78c10e2e5fd95c86476829d50e71	61.62	0x55d	not-retained	superseded	Matched shadow command publication order: dim length first; flags before the override test; count/value only on the override fill edge; count/flags at dim entry.
+9bb082e94d409bf1632113ac225fe2a51ec4c8cd763415e593f6a59d2b87bd72	62.79	not-retained	not-retained	superseded	Kept dim destination local in both loops, removed per-iteration destination-global stores, and republished the dim palette per iteration as retail does at +0x392/+0x455.
+a85e86cd9700713b19c05cb706acf6ef1ee38703f5ddca1a0aaae7d07650212a	62.85	0x543	82/91	retained-checkpoint	Removed destination-global publication from the literal inner loop while retaining the source cursor publication. Retail keeps destination in EBX and advances the global copy source at +0x549..+0x567.
+009806be20eb77f31378e1da67af67b4052c320fe92711ea943b963dc7365f4b	50.24	not-retained	135/91	reverted	Modeled X, row, source, and destination as direct globals throughout. This over-published state (44 excess relocations) and proved retail instead uses register-held locals with selective file-static publications.
+
