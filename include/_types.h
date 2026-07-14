@@ -45,6 +45,18 @@ typedef unsigned int UInt32;   // crc32Table[]
 struct MemEntry;               // gpMemEntry — full def not yet reconstructed; used via pointer
 struct _SAMPLE;                // SAMPLE2::pMem — opaque
 
+enum { MENU_ENABLE_STATUS_COUNT = 70 };
+#pragma pack(push, 1)
+struct SMenuEnableStatus {
+    unsigned int command;
+    unsigned char normalEnabled;
+    unsigned char setupEnabled;
+    // All 70 retail values are zero, and the executable has no xref to this byte.
+    unsigned char reserved;
+};
+#pragma pack(pop)
+SIZE(SMenuEnableStatus, 7);
+
 // gConfig — game/editor preferences (persisted to the registry; field names are the
 // retail registry value names, recovered from ReadPrefsFromRegistry/WritePrefsToRegistry).
 #pragma pack(push, 1)

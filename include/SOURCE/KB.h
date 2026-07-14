@@ -558,6 +558,7 @@ typedef enum CongratsConstant {
 } CongratsConstant;
 
 typedef enum AppMenuCommand {
+    APP_MENU_NONE = 0,
     APP_MENU_VIEW_WORLD = 0x9c4c,
     APP_MENU_VIEW_PUZZLE = 0x9c4d,
     APP_MENU_CAST_SPELL = 0x9c4e,
@@ -568,6 +569,7 @@ typedef enum AppMenuCommand {
     APP_MENU_SOUND_LAST = 0x9c66,
     APP_MENU_SPEED_FIRST = 0x9c68,
     APP_MENU_SPEED_LAST = 0x9c6c,
+    APP_MENU_UNKNOWN_9C6D = 0x9c6d,
     APP_MENU_TOGGLE_ROUTE = 0x9c6e,
     APP_MENU_TOGGLE_BLACKOUT = 0x9c6f,
     APP_MENU_RESTART_0 = 0x9ca6,
@@ -575,6 +577,7 @@ typedef enum AppMenuCommand {
     APP_MENU_RESTART_2 = 0x9ca9,
     APP_MENU_RESTART_3 = 0x9caa,
     APP_MENU_RESTART_4 = 0x9cab,
+    APP_MENU_UNKNOWN_9CAD = 0x9cad,
     APP_MENU_RESTART_5 = 0x9cae,
     APP_MENU_RESTART_6 = 0x9caf,
     APP_MENU_RESTART_7 = 0x9cb0,

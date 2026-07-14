@@ -1,6 +1,7 @@
 #ifndef HOMM2_X_GLOBAL_H
 #define HOMM2_X_GLOBAL_H
 // Globals owned by this data-only TU (from CodeView).
+#include <_types.h>
 #include <va.h>
 #include <SOURCE/CURSOR.h>
 #include <SOURCE/hero.h>
@@ -158,7 +159,7 @@ extern int gbNoBorder;
 extern int gbEnlargeScreenBlit;
 extern int giCurExe;
 extern int gbInDialog;
-extern struct SMenuEnableStatus *gsMenuEnableStatus;
+extern struct SMenuEnableStatus gsMenuEnableStatus[MENU_ENABLE_STATUS_COUNT];
 extern int gbInSetupDialog;
 extern int gbMinimized;
 extern int gbInSmackMgr;
