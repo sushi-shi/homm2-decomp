@@ -20,6 +20,8 @@ source bug, so it must not break every build.
 
 Review one function (order-independent; usable on <100% walls):
     homm2 relocs 0x<rva>
+Review relocation-count deficits among incomplete functions:
+    homm2 relocs --counts BASE
 Run from repo root; exits 1 on any wrong/fabricated reloc target.
 """
 import sys, os, re, csv, json, glob, subprocess
@@ -75,10 +77,22 @@ def is_fake(sym, data, s):
 
 def _addend(insn):
     insn = insn.split('#')[0]                    # drop llvm-objdump's "# imm = 0xNN" annotation
-    m = re.search(r'\[(0x[0-9a-f]+)\]', insn)    # absolute-memory operand [0xN] -> addend N
+    m = re.search(r'\[([^\]]+)\]', insn)         # Intel memory operand: use its displacement,
+    if m:                                        # never a following store immediate
+        disps = re.findall(r'(?<![\w\]])(-?0x[0-9a-f]+)', m.group(1))
+        if disps:
+            return int(disps[-1], 16) & 0xffffffff
+        return 0
+    # llvm-objdump -dr defaults to AT&T syntax. An indexed memory displacement precedes `(`;
+    # it is the relocation addend even when the instruction also stores an immediate afterward.
+    m = re.search(r'(?:(?<![\w$])(-?0x[0-9a-f]+))?\([^)]*\)', insn)
     if m:
-        return int(m.group(1), 16)
-    imms = re.findall(r'(?<![\w\]])(-?0x[0-9a-f]+)', insn)   # last standalone (SIGNED) immediate/disp
+        return int(m.group(1), 16) & 0xffffffff if m.group(1) else 0
+    # Absolute AT&T memory operands have no parentheses and no `$`. Prefer one over an immediate.
+    disps = re.findall(r'(?<![\w$])(-?0x[0-9a-f]+)', insn)
+    if disps:
+        return int(disps[-1], 16) & 0xffffffff
+    imms = re.findall(r'\$(-?0x[0-9a-f]+)', insn)
     return int(imms[-1], 16) & 0xffffffff if imms else 0     # -0x4c disp -> 0xffffffb4 addend
 
 def parse_obj(obj):
@@ -88,7 +102,14 @@ def parse_obj(obj):
     for ln in out.splitlines():
         m = re.match(r'^[0-9a-f]+ <(.+?)>:', ln)
         if m:
-            cur = m.group(1); funcs.setdefault(cur, []); prev = ""; continue
+            name = m.group(1)
+            if name.startswith('$') and cur is not None:
+                # MSVC emits block labels as COFF symbols inside a function COMDAT. llvm-objdump
+                # prints each as a new title, but its following relocations still belong to the
+                # containing function; do not truncate the function at the first local label.
+                prev = ""
+                continue
+            cur = name; funcs.setdefault(cur, []); prev = ""; continue
         if cur is None:
             continue
         mr = re.search(r'IMAGE_REL_I386_(\w+)\s+(\S+)', ln)
@@ -158,24 +179,32 @@ def check_fn(sym, data, dups, unit, name, base_relocs, tgt_relocs):
         probs.append("WRONG: base references 0x%x (%s) x%d — retail never references it (or fewer)" % (v, bs, n))
     return probs
 
+def _function_for_arg(arg):
+    """Resolve an RVA or decorated name to the generated (unit, function) identity."""
+    try:
+        wanted_rva = int(arg, 0)
+    except ValueError:
+        wanted_rva = None
+    with open("build/gen/symbol_names.csv", encoding="latin-1") as f:
+        for row in csv.DictReader(f):
+            if row.get("kind") != "func":
+                continue
+            try:
+                row_rva = int(row["rva"], 0)
+            except (KeyError, ValueError):
+                continue
+            if row["name"] == arg or (wanted_rva is not None and row_rva == wanted_rva):
+                return row["unit"], row["name"]
+    raise SystemExit("function not found in build/gen/symbol_names.csv: %s" % arg)
+
 def review(rva):
     """Single-function multiset review (order-independent; usable on <100% walls)."""
     sym, data, dups = load_symbols()
-    def disasm(side):
-        out = subprocess.run(["homm2", "sema", "disasm", rva, side], capture_output=True, text=True).stdout
-        rel, prev = [], ""
-        for ln in out.splitlines():
-            mr = re.search(r'IMAGE_REL_I386_(\w+)\s+(\S+)', ln)
-            if mr:
-                s = mr.group(2)
-                if not s.startswith('__imp__'):
-                    rel.append((mr.group(1), s, _addend(prev)))
-                continue
-            mi = re.match(r'^\s*[0-9a-f]+:\s+(?:[0-9a-f]{2}\s+)+(.+)$', ln)
-            if mi:
-                prev = mi.group(1).replace('\t', ' ').strip()
-        return rel
-    B, T = disasm("--base"), disasm("--target")
+    unit, name = _function_for_arg(rva)
+    base_obj = "build/objdiff/base/%s.obj" % unit
+    target_obj = "build/delink/%s.c.obj" % unit
+    B = parse_obj(base_obj).get(name, [])
+    T = parse_obj(target_obj).get(name, [])
     for s in sorted({r[1] for r in B if is_fake(sym, data, r[1])}):
         print("  !! FAKE base references '%s'" % s)
     def bvas(rs):
@@ -195,7 +224,66 @@ def review(rva):
               % (v, va_sym[v], n))
     print("base relocs=%d target relocs=%d  only-base=%d" % (len(B), len(T), sum(diff.values())))
 
+def review_counts(scope="BASE"):
+    """List incomplete functions whose relocation occurrence counts still differ.
+
+    This is a structural-work queue, not a wrong-target report: missing/excess counts usually mean
+    the source has not yet recovered retail's control flow or publication lifetimes. Retained fuzzy
+    maxima select incomplete functions so transient TU-state dips do not reopen finished work.
+    """
+    prefix = scope.rstrip("/") + "/"
+    maxima = {}
+    with open("config/match_baseline.tsv", encoding="utf-8") as f:
+        for row in csv.reader(f, delimiter="\t"):
+            if len(row) < 3 or row[0].startswith("#"):
+                continue
+            try:
+                maxima[(row[0], row[1])] = float(row[2])
+            except ValueError:
+                continue
+
+    report = json.load(open("build/objdiff/report.json"))
+    rows = []
+    for unit in report["units"]:
+        unit_name = unit["name"]
+        if not unit_name.startswith(prefix):
+            continue
+        base_obj = "build/objdiff/base/%s.obj" % unit_name
+        target_obj = "build/delink/%s.c.obj" % unit_name
+        if not (os.path.exists(base_obj) and os.path.exists(target_obj)):
+            continue
+        base_functions, target_functions = parse_obj(base_obj), parse_obj(target_obj)
+        for fn in unit.get("functions", []):
+            name = fn["name"]
+            retained = maxima.get((unit_name, name), fn.get("fuzzy_match_percent", 0.0))
+            if retained >= 100.0 or name not in base_functions or name not in target_functions:
+                continue
+            base_count = len(base_functions[name])
+            target_count = len(target_functions[name])
+            if base_count == target_count:
+                continue
+            missing = max(target_count - base_count, 0)
+            excess = max(base_count - target_count, 0)
+            size = int(fn.get("size", 0))
+            unmatched = size * (100.0 - retained) / 100.0
+            demangled = fn.get("metadata", {}).get("demangled_name", name)
+            rows.append((missing + excess, unmatched, unit_name, retained, size,
+                         base_count, target_count, missing, excess, demangled))
+
+    # This is an input to the normal hardest-first campaign, so rank recovered byte potential
+    # before raw relocation-count delta.
+    rows.sort(key=lambda row: (-row[1], -row[0], row[2], row[9]))
+    print("unit\tretained_pct\tsize\tunmatched_bytes\tbase_relocs\tretail_relocs\tmissing\texcess\tfunction")
+    for _, unmatched, unit, retained, size, base_count, target_count, missing, excess, name in rows:
+        print("%s\t%.4f\t%d\t%.2f\t%d\t%d\t%d\t%d\t%s" %
+              (unit, retained, size, unmatched, base_count, target_count, missing, excess, name))
+    print("summary\tfunctions=%d\tmissing=%d\texcess=%d" %
+          (len(rows), sum(row[7] for row in rows), sum(row[8] for row in rows)))
+    return 0
+
 def main():
+    if len(sys.argv) > 1 and sys.argv[1] == "--counts":
+        return review_counts(sys.argv[2] if len(sys.argv) > 2 else "BASE")
     if len(sys.argv) > 1:                        # single-function review mode
         review(sys.argv[1]); return 0
     sym, data, dups = load_symbols()
