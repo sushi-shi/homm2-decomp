@@ -124,8 +124,21 @@ typedef enum AISpellType {
 } AISpellType;
 
 typedef enum AIArtifactType {
-    AI_ARTIFACT_MAGIC_BOOK = 0x51
+    AI_ARTIFACT_MAGIC_BOOK = 0x51,
+    AI_ARTIFACT_HIDEOUT_MASK = 0x46,
+    AI_ARTIFACT_SPELL_SCROLL = 0x56,
+    AI_ARTIFACT_GUARD_FLAG = 0x100
 } AIArtifactType;
+
+typedef enum AIArtifactEventMode {
+    AI_ARTIFACT_EVENT_VALUE = 1,
+    AI_ARTIFACT_EVENT_NO_VALUE = 2,
+    AI_ARTIFACT_EVENT_PAY_GOLD = 3,
+    AI_ARTIFACT_EVENT_REQUIRES_WISDOM = 4,
+    AI_ARTIFACT_EVENT_REQUIRES_LEADERSHIP = 5,
+    AI_ARTIFACT_EVENT_PAY_RESOURCE_THREE = 6,
+    AI_ARTIFACT_EVENT_PAY_RESOURCE_FIVE = 7
+} AIArtifactEventMode;
 
 typedef enum AICreatureType {
     AI_CREATURE_PEASANT = 0x00,
@@ -155,7 +168,11 @@ typedef enum AICreatureType {
     AI_CREATURE_NOMAD = 0x3a,
     AI_CREATURE_GHOST = 0x3b,
     AI_CREATURE_GENIE = 0x3c,
-    AI_CREATURE_MEDUSA = 0x3d
+    AI_CREATURE_MEDUSA = 0x3d,
+    AI_CREATURE_EARTH_ELEMENTAL = 0x3e,
+    AI_CREATURE_AIR_ELEMENTAL = 0x3f,
+    AI_CREATURE_FIRE_ELEMENTAL = 0x40,
+    AI_CREATURE_WATER_ELEMENTAL = 0x41
 } AICreatureType;
 
 typedef enum AIFightEventConstant {
@@ -200,7 +217,8 @@ typedef enum AIPurchaseConstant {
     AI_HERO_BUILD_DIRECTION = 2,
     AI_HERO_BUILD_MAP_CHANGE = 3,
     AI_HERO_BUILD_MAP_CHANGE_VALUE = -999,
-    AI_HERO_AVAILABLE_FLAG = 0x40
+    AI_HERO_AVAILABLE_FLAG = 0x40,
+    AI_PURCHASE_VALUE_DEBUG_LEVEL = 5
 } AIPurchaseConstant;
 
 typedef enum AIBattleConstant {
@@ -286,8 +304,21 @@ typedef enum AISideConstant {
 typedef enum AICreaturePurchaseConstant {
     AI_CREATURE_PURCHASE_NO_SLOT = -1,
     AI_CREATURE_PURCHASE_ARMY_SLOT_COUNT = 5,
-    AI_CREATURE_PURCHASE_VALUE_LIMIT = 999999
+    AI_CREATURE_PURCHASE_VALUE_LIMIT = 999999,
+    AI_CREATURE_PURCHASE_DWELLING_COUNT = 12,
+    AI_CREATURE_PURCHASE_EXPENSIVE_VALUE = 1000,
+    AI_CREATURE_PURCHASE_RANGED_ATTRIBUTE = 0x04
 } AICreaturePurchaseConstant;
+
+typedef enum AIPositionValueConstant {
+    AI_POSITION_FULL_CHANCE = 100,
+    AI_POSITION_MINIMUM_LIVE_CHANCE = 30,
+    AI_POSITION_FAILED_VALUE = -100,
+    AI_POSITION_EMBARKED_BOAT_BONUS = 40,
+    AI_POSITION_DEBUG_LEVEL = 5,
+    AI_POSITION_DEBUG_UNUSED = -999,
+    AI_POSITION_OBJECT_NAME_COUNT = 119
+} AIPositionValueConstant;
 
 typedef enum AIQuickCombatConstant {
     AI_QUICK_COMBAT_TOWN_EXPERIENCE = 500,
@@ -365,8 +396,20 @@ typedef enum AIBuildingType {
 #define AI_HERO_INTERACTION_VALUE_FACTOR 0.1
 #define AI_PURCHASE_RANDOM_DIVISOR 100.0
 #define AI_CREATURE_BALANCE_BASE 0.66
+#define AI_CREATURE_VISITING_HERO_FACTOR 1.1
+#define AI_CREATURE_SAME_RACE_FACTOR 1.1f
+#define AI_CREATURE_RANGED_BASE_FACTOR 1.18
+#define AI_CREATURE_RANGED_STACK_FACTOR 0.06
+#define AI_CREATURE_DANGER_BASE 0.96
+#define AI_CREATURE_EASY_COST_FACTOR 1.3
+#define AI_CREATURE_RANDOM_BASE 90
 #define AI_HERO_PURCHASE_BONUS 500.0f
 #define AI_HERO_PURCHASE_FACTOR 1.3
+#define AI_HERO_PURCHASE_GOLD_COST 2500
+#define AI_HERO_PURCHASE_EXPERIENCE_BASE 2000
+#define AI_HERO_PURCHASE_CELL_PENALTY 200.0f
+#define AI_HERO_PURCHASE_RANDOM_BASE 90.0
+#define AI_PURCHASE_INITIAL_VALUE -99.0f
 #define AI_MINIMUM_PURCHASE_VALUE 0.02
 #define AI_PLAYER_HERO_IDS_BASE 0x4a0
 #define AI_DIMENSION_DOOR_SPELL_POINTS 30
@@ -422,6 +465,74 @@ typedef enum AIBuildingType {
 #define AI_TRAVEL_GATE_EXIT_DEPTH 700
 #define AI_TRAVEL_GATE_CURRENT_DEPTH 500
 #define AI_TRAVEL_GATE_PENALTY 200
+#define AI_POSITION_NEARBY_DELTA 1
+#define AI_POSITION_DISTANCE_BASE 1.0
+#define AI_POSITION_STRATEGIC_DISTANCE_BASE 2.0f
+#define AI_POSITION_EMBARKED_DISTANCE_FACTOR 0.5
+#define AI_POSITION_LAND_DISTANCE_1 1.0f
+#define AI_POSITION_LAND_DISTANCE_2 1.5
+#define AI_POSITION_LAND_DISTANCE_3 2.0f
+#define AI_POSITION_LAND_DISTANCE_4 3.0f
+#define AI_POSITION_LAND_DISTANCE_5 4.0f
+#define AI_POSITION_LAND_DISTANCE_6 5.0f
+#define AI_POSITION_LAND_FACTOR_2 1.4
+#define AI_POSITION_LAND_FACTOR_3 1.5
+#define AI_POSITION_LAND_FACTOR_4 2.0
+#define AI_POSITION_LAND_FACTOR_5 2.5
+#define AI_POSITION_LAND_FACTOR_6 4.0f
+#define AI_POSITION_LAND_FACTOR_FAR 3.0f
+#define AI_ATTENTION_RANDOM_DIVISOR 500.0
+#define AI_ATTENTION_RANDOM_BASE 0.23
+#define AI_ATTENTION_WEIGHT_A_PLAYER_FACTOR 0.07
+#define AI_ATTENTION_WEIGHT_B_PLAYER_FACTOR 0.15
+
+static const float AI_HERO_PURCHASE_SAME_RACE_FACTOR = 0.16f;
+static const float AI_HERO_PURCHASE_CLASS_DIVISOR = 2.0f;
+static const float AI_ATTENTION_IDENTITY_FLOAT = 1.0f;
+static const double AI_ATTENTION_IDENTITY = 1.0;
+static const double AI_ATTENTION_PLAYER_CENTER = 3.0;
+static const double AI_ATTENTION_NORMALIZER = 4.0;
+static const double AI_ATTENTION_UPPER_BOUND = 5.0;
+static const float AI_MONSTER_JOIN_RATIO = 2.0f;
+static const float AI_MONSTER_OVERWHELMING_RATIO = 5.0f;
+static const float AI_MONSTER_JOIN_CHANCE_SCALE = 60.0f;
+static const float AI_MONSTER_JOIN_CHANCE_BASE = 40.0f;
+static const float AI_MONSTER_FIGHT_CHANCE_SCALE = 100.0f;
+static const double AI_MONSTER_JOIN_PURCHASE_WEIGHT = 0.6;
+static const double AI_MONSTER_JOIN_OUTCOME_WEIGHT = 0.4;
+static const double AI_EVENT_TOWN_PLAYER_FACTOR = 0.25;
+static const double AI_EVENT_VALUE_BASE_FACTOR = 1.0;
+static const double AI_EVENT_HUMAN_VALUE_FACTOR = 1.5;
+static const double AI_TOWN_PRIMARY_HUMAN_VALUE_FACTOR = 1.6;
+static const double AI_TOWN_OTHER_HUMAN_VALUE_FACTOR = 1.3;
+static const double AI_EVENT_CERTAIN_ODDS = 0.75;
+static const double AI_EVENT_HIGH_ODDS = 0.5;
+static const double AI_EVENT_GOOD_ODDS = 0.4;
+static const double AI_EVENT_POOR_ODDS = 0.3;
+static const double AI_EVENT_BAD_ODDS = 0.2;
+static const float AI_EVENT_CERTAIN_CHANCE = 100.0f;
+static const float AI_EVENT_HIGH_CHANCE_SCALE = 136.0f;
+static const float AI_EVENT_GOOD_CHANCE_SCALE = 130.0f;
+static const float AI_EVENT_POOR_CHANCE_SCALE = 125.0f;
+static const float AI_EVENT_BAD_CHANCE_SCALE = 113.0f;
+
+typedef enum AIEventEvaluationConstant {
+    AI_EVENT_MODE_IGNORE = 0,
+    AI_EVENT_MODE_AVOID = 1,
+    AI_EVENT_SEVERE_PENALTY = -20000,
+    AI_EVENT_FRIENDLY_PENALTY = -500,
+    AI_EVENT_ALLIED_PENALTY = -1500,
+    AI_EVENT_INTERACTION_AGE = 4,
+    AI_EVENT_HUMAN_VALUE_THRESHOLD = 200,
+    AI_EVENT_EARLY_TURN_BASE = 70,
+    AI_EVENT_EARLY_TURN_DIFFICULTY_STEP = 5
+} AIEventEvaluationConstant;
+
+typedef enum AITownEvaluationConstant {
+    AI_TOWN_EARLY_DIFFICULTY_LIMIT = 3,
+    AI_TOWN_EARLY_TURN_BASE = 40,
+    AI_TOWN_EARLY_TURN_DIFFICULTY_STEP = 8
+} AITownEvaluationConstant;
 #define AI_MAX_BATTLE_STAT 40
 #define AI_DAEMON_FIGHT_VALUE_FACTOR 300.0
 #define AI_DAEMON_SECONDARY_FIGHT_VALUE_FACTOR 100.0
@@ -445,7 +556,7 @@ struct pdView {                  // playerData
     signed char numHeroes;       // 0x01
     char _2[2];
     signed char heroIds[8];      // 0x04
-    char _c[2];
+    signed char availableHeroIds[2]; // 0x0c
     unsigned char minimumHeroes; // 0x0e
     int difficulty;              // 0x0f
     char _13[0x40 - 0x13];
@@ -463,7 +574,8 @@ struct pdView {                  // playerData
     char _ad[0xbf - 0xad];
     float buildingFactor;        // 0xbf
     float baseUpgradeFactor;     // 0xc3
-    char _c7[0xe7 - 0xc7];
+    float heroFactor;            // 0xc7
+    char _cb[0xe7 - 0xcb];
     int income[7];               // 0xe7
     int obeliskValue;            // 0x103
     int totalObeliskValue;       // 0x107
@@ -481,10 +593,16 @@ struct gameObeliskView {         // game
 struct heroView {                // hero
     signed short curMana;        // 0x00
     unsigned char heroId;        // 0x02
-    char _3[0x65 - 0x03];
+    char _3[0x17 - 0x03];
+    unsigned char heroClass;     // 0x17
+    char _18[0x39 - 0x18];
+    int experience;              // 0x39
+    char _3d[0x65 - 0x3d];
     signed char army[0x74 - 0x65]; // 0x65 (embedded armyGroup creature types)
     signed char skills[0x90 - 0x74]; // 0x74
     int level;                   // 0x90
+    char _94[0xd5 - 0x94];
+    signed char artifacts[AI_BATTLE_ARTIFACT_SLOT_COUNT]; // 0xd5
 };
 struct aiHeroPositionRecord {
     char _0[0x19];
@@ -522,7 +640,12 @@ struct townView {                // town
     signed char getVisitingHero() { return visitingHero; }
 };
 struct taView {                  // per-player AI "turn attention" record (gpGame+0x49e + player*283)
-    float f0, f4, f8, fc, f10, f14; // 0x00..0x14
+    float gameWeightA;          // 0x00
+    float gameWeightRemainder;  // 0x04
+    float gameWeightB;          // 0x08
+    float turnWeightA;          // 0x0c
+    float turnWeightRemainder;  // 0x10
+    float turnWeightB;          // 0x14
     char _18[0x34 - 0x18];
     int field34[7];              // 0x34..0x4f
     int field50;                 // 0x50
