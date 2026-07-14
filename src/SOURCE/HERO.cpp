@@ -10,9 +10,13 @@
 #include <_carcass_types.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
+#include <BASE/Misc.h>
 #include <SOURCE/ADVMGR.h>
 #include <SOURCE/advManager.h>
+#include <SOURCE/Campaign.h>
+#include <SOURCE/CURSOR.h>
 #include <SOURCE/game.h>
+#include <SOURCE/GAME.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/HERO.h>
 #include <SOURCE/KB.h>
@@ -338,20 +342,240 @@ int hero::Dismiss(void) {
     return 0;
 }
 
+// @match-note 96.65% live, 98.19% retained maximum: semantics, the 0x20 frame,
+// player/playerHeroIndex/heroOwner/index/occupiedTown/availableHeroSlot/mapCell
+// slots at -0x04/-0x08/-0x0c/-0x10/-0x14/
+// -0x18/-0x1c, CFG, and all 44/44 relocation targets agree. First divergence is
+// +0x122: retail has a five-byte inline continuation before the occupied-town lookup.
+// Removing the alias-only event bitfields also changes the existing GetCell inline expression's
+// instruction order while preserving its value and stack slot. Two later continuations still
+// differ around cursor clearing/map-cell materialization. Retail expands both final flag masks
+// to load/OR-or-AND/store, while whole-word compound and explicit assignments select memory
+// operations. The removed 32-bit/split bitfield aliases were also tried. Revisit at SOURCE 95%
+// after shared HERO type/TU state settles for accessor-bracket and mask-operation steering.
 VA(0x0046cee8, 0x587)
-void hero::Deallocate(int) {}
+void hero::Deallocate(int updateMap) {
+    int availableHeroSlotCurrent;
+    playerRec *player;
+    int playerHeroIndex;
+    int heroOwner;
+    int index;
+    town *occupiedTownValue;
+    mapCell *mapCellRecord;
+
+    if (updateMap)
+        SendMapChange(MAP_CHANGE_DEAD_HERO, m_id, static_cast<unsigned char>(m_x),
+            static_cast<unsigned char>(m_y), HERO_MAP_CHANGE_UNUSED, 0, 0);
+
+    heroOwner = m_owner;
+    player = &gpGame->m_players[m_owner];
+
+    if (updateMap)
+        gpAdvManager->MobilizeCurrHero(0);
+    if (updateMap)
+        gpAdvManager->HideRoute(0, 0, 0);
+
+    if (m_eventFlags & HERO_EVENT_EMBARKED) {
+        for (index = 0; index < GAME_BOAT_COUNT; index++) {
+            if (gpGame->m_boats[index].heroId == m_id) {
+                gpGame->m_boats[index].heroId = -1;
+                gpGame->m_boatSlots[index] = -1;
+            }
+        }
+    }
+
+    if (m_locationType == HERO_LOCATION_TOWN) {
+        occupiedTownValue = &gpGame->m_castleRecs[m_occupiedTown];
+        occupiedTownValue->m_occupyingHeroId = -1;
+    }
+
+    if (m_owner != giCurPlayer || gpGame->m_players[m_owner].currentHero != m_id ||
+        gpAdvManager->m_heroContextLocked == 0) {
+        gpGame->RestoreCell(m_x, m_y, m_locationType, m_occupiedTown, 0, 1);
+    }
+
+    if (!gbCombatSurrender) {
+        for (index = 0; index < ARMY_GROUP_SLOT_COUNT; index++)
+            m_army.Dismiss(index);
+    }
+
+    playerHeroIndex = -1;
+    for (index = 0; index < player->heroCount; index++) {
+        if (player->heroes[index] == m_id)
+            playerHeroIndex = index;
+    }
+    for (index = playerHeroIndex; index < player->heroCount - 1; index++)
+        player->heroes[index] = player->heroes[index + 1];
+    player->heroes[player->heroCount - 1] = -1;
+
+    if (player->currentHero == m_id) {
+        player->currentHero = -1;
+        if (m_owner == giCurPlayer) {
+            gpAdvManager->m_cursorActive = 0;
+            mapCellRecord = gpGame->m_worldMap.GetCell(m_x, m_y);
+            mapCellRecord->field8 &= ~HERO_MAP_CELL_PRESENT;
+        }
+        if (giCurPlayer == heroOwner)
+            gpAdvManager->m_heroContextLocked = 0;
+    }
+
+    player->heroCount--;
+    player->heroWindowTop = 0;
+    gpGame->m_availableHeroes[m_id] = HERO_AVAILABILITY_UNAVAILABLE;
+
+    if (gbRetreatWin) {
+        availableHeroSlotCurrent = Random(0, HERO_AVAILABLE_SLOT_COUNT - 1);
+        if (gpGame->m_heroRecs[gpGame->m_players[m_owner]
+                                   .availableHeroes[availableHeroSlotCurrent]]
+                .m_eventFlags & HERO_EVENT_WEEKLY_VISIT) {
+            availableHeroSlotCurrent = 1 - availableHeroSlotCurrent;
+        }
+        if (gpGame->m_availableHeroes[gpGame->m_players[m_owner]
+                                          .availableHeroes[availableHeroSlotCurrent]] ==
+            HERO_AVAILABILITY_RETREATED) {
+            gpGame->m_availableHeroes[gpGame->m_players[m_owner]
+                                          .availableHeroes[availableHeroSlotCurrent]] =
+                HERO_AVAILABILITY_UNAVAILABLE;
+        }
+        gpGame->m_players[m_owner].availableHeroes[availableHeroSlotCurrent] = m_id;
+        gpGame->m_availableHeroes[m_id] = HERO_AVAILABILITY_RETREATED;
+        m_eventFlags = m_eventFlags | HERO_EVENT_WEEKLY_VISIT;
+    }
+
+    m_eventFlags = m_eventFlags & ~HERO_EVENT_GROUPED_FORMATION;
+    m_owner = HERO_OWNER_NONE;
+    m_destinationY = HERO_DESTINATION_NONE;
+    m_destinationX = m_destinationY;
+
+    if (!gbCombatSurrender)
+        gpGame->SetRandomHeroArmies(m_id, RANDOM_HERO_NORMAL_ARMY);
+
+    if (gbInCampaign && m_portrait == CAMPAIGN_HERO_CORLAGON &&
+        gpGame->m_campaignType == CAMPAIGN_ROLAND &&
+        gpGame->m_campaignScenario + 1 == CAMPAIGN_ROLAND_FINAL_SCENARIO &&
+        !gbRetreatWin && !gbCombatSurrender) {
+        gpGame->m_campaignAwards[CAMPAIGN_AWARD_DEFEAT_CORLAGON] = 1;
+    }
+
+    if (updateMap)
+        CheckEndGame(0, 0);
+}
 
 VA(0x0046d46f, 0x9e)
-int hero::GetExperience(int) { return 0; }
+int hero::GetExperience(int level) {
+    int experience;
+    int levelCounter;
+    int increment;
+
+    if (level <= HERO_EXPERIENCE_LEVEL_TABLE_COUNT)
+        return gMinExpForLevel[level - 1];
+
+    levelCounter = HERO_EXPERIENCE_EXTRAPOLATION_FIRST_LEVEL;
+    increment = static_cast<int>(
+        (gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1] -
+         gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 2]) *
+        HERO_EXPERIENCE_GROWTH_FACTOR);
+    experience = gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1] + increment;
+    while (levelCounter < level) {
+        increment = static_cast<int>(increment * HERO_EXPERIENCE_GROWTH_FACTOR);
+        experience += increment;
+        levelCounter++;
+    }
+    return experience;
+}
 
 VA(0x0046d50d, 0xc0)
-int hero::GetLevel(int) { return 0; }
+int hero::GetLevel(int experienceValue) {
+    int experience;
+    int levelCounter;
+    int increment;
 
+    for (levelCounter = 1; levelCounter <= HERO_EXPERIENCE_LEVEL_TABLE_COUNT; levelCounter++) {
+        if (experienceValue < gMinExpForLevel[levelCounter - 1])
+            return levelCounter - 1;
+    }
+
+    increment = static_cast<int>(
+        (gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1] -
+         gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 2]) *
+        HERO_EXPERIENCE_GROWTH_FACTOR);
+    experience = gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1] + increment;
+    levelCounter = HERO_EXPERIENCE_EXTRAPOLATION_FIRST_LEVEL;
+    while (experience < experienceValue) {
+        increment = static_cast<int>(increment * HERO_EXPERIENCE_GROWTH_FACTOR);
+        experience += increment;
+        levelCounter++;
+    }
+    return levelCounter - 1;
+}
+
+// @match-note 69.40%: semantics, the 0x04 frame with this at -0x04, CFG, and the
+// zero-relocation set agree. First divergence is +0x37: retail reads m_eventFlags,
+// subtracts 0x20 in EAX, and writes it back (18 bytes after the common this load),
+// while base emits a seven-byte memory SUB. The same 11-byte shortening repeats for
+// all twelve cleared temporary flags; morale/luck updates, order, tests, and branches
+// otherwise agree. Tried `-=`, explicit `field = field - flag`, addition of a negative
+// flag, and a 32-bit bitfield declaration; all select memory SUB. Revisit at SOURCE 95%
+// after shared HERO type/TU state settles, then source-steer the repeated assignment form.
 VA(0x0046d5cd, 0x254)
-void hero::ApplyBattleWinTemps(void) {}
+void hero::ApplyBattleWinTemps(void) {
+    m_lastTownInteractionTurn = HERO_INTERACTION_TURN_NONE;
+    m_lastHeroInteractionTurn = HERO_INTERACTION_TURN_NONE;
+
+    if (m_eventFlags & HERO_EVENT_GRAVEYARD) {
+        m_morale++;
+        m_eventFlags = m_eventFlags - HERO_EVENT_GRAVEYARD;
+    }
+    if (m_eventFlags & HERO_EVENT_SHIPWRECK) {
+        m_morale++;
+        m_eventFlags = m_eventFlags - HERO_EVENT_SHIPWRECK;
+    }
+    if (m_eventFlags & HERO_EVENT_BUOY) {
+        m_morale--;
+        m_eventFlags = m_eventFlags - HERO_EVENT_BUOY;
+    }
+    if (m_eventFlags & HERO_EVENT_OASIS) {
+        m_morale--;
+        m_eventFlags = m_eventFlags - HERO_EVENT_OASIS;
+    }
+    if (m_eventFlags & HERO_EVENT_TEMPLE) {
+        m_morale -= 2;
+        m_eventFlags = m_eventFlags - HERO_EVENT_TEMPLE;
+    }
+    if (m_eventFlags & HERO_EVENT_FAERIE_RING) {
+        m_luck--;
+        m_eventFlags = m_eventFlags - HERO_EVENT_FAERIE_RING;
+    }
+    if (m_eventFlags & HERO_EVENT_IDOL) {
+        m_luck--;
+        m_eventFlags = m_eventFlags - HERO_EVENT_IDOL;
+    }
+    if (m_eventFlags & HERO_EVENT_FOUNTAIN) {
+        m_luck--;
+        m_eventFlags = m_eventFlags - HERO_EVENT_FOUNTAIN;
+    }
+    if (m_eventFlags & HERO_EVENT_WATERING_HOLE) {
+        m_morale--;
+        m_eventFlags = m_eventFlags - HERO_EVENT_WATERING_HOLE;
+    }
+    if (m_eventFlags & HERO_EVENT_DERELICT_SHIP) {
+        m_morale++;
+        m_eventFlags = m_eventFlags - HERO_EVENT_DERELICT_SHIP;
+    }
+    if (m_eventFlags & HERO_EVENT_PYRAMID) {
+        m_luck += 2;
+        m_eventFlags = m_eventFlags - HERO_EVENT_PYRAMID;
+    }
+    if (m_eventFlags & HERO_EVENT_MERMAID) {
+        m_luck = m_luck - 1;
+        m_eventFlags = m_eventFlags - HERO_EVENT_MERMAID;
+    }
+}
 
 VA(0x0046d821, 0x1e)
-void hero::ApplyBattleLossTemps(void) {}
+void hero::ApplyBattleLossTemps(void) {
+    ApplyBattleWinTemps();
+}
 
 VA(0x0046d83f, 0x828)
 void hero::CheckLevel(void) {}
@@ -413,6 +637,8 @@ void hero::CheckAnduranPieces(int) {}
 // ---- globals (definitions, RVA order) ----
 DATA(0x004f6c88) class hero *gpHVHero;
 DATA(0x004f6c8c) class heroWindow *gheroWin;
-DATA(0x004f6cd0) short *gMinExpForLevel;
+DATA(0x004f6cd0) short gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT] = {
+    0, 1000, 2000, 3200, 4500, 6000, 7700, 9000, 11000, 13200, 15500, 18500
+};
 DATA(0x005280dc) int iOrigHeroViewID;
 DATA(0x005280e0) int gbNoDismiss;
