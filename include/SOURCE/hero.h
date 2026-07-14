@@ -78,8 +78,14 @@ typedef enum HeroConstant {
     HERO_SECONDARY_SKILL_SEARCH_LIMIT = 5000,
     HERO_SECONDARY_SKILL_OFFER_GAP = 3,
     HERO_SECONDARY_SKILL_ICON_STRIDE = 3,
+    HERO_SECONDARY_SKILL_ORDER_BASE = 1,
+    HERO_SECONDARY_SKILL_ICON_FRAME_BASE = 1,
     HERO_SECONDARY_SKILL_NONE = -1,
-    HERO_SPELL_POINTS_PER_KNOWLEDGE = 10
+    HERO_MINIMUM_SPELL_POWER = 1,
+    HERO_SPELL_POINTS_PER_KNOWLEDGE = 10,
+    HERO_NECROMANCY_BONUS_MAX = 6,
+    HERO_NECROMANCY_EFFECTIVE_LEVEL_MAX = 9,
+    HERO_NECROMANCY_PERCENT_PER_LEVEL = 10
 } HeroConstant;
 
 typedef enum HeroArtifact {
@@ -92,7 +98,11 @@ typedef enum HeroArtifact {
     HERO_ARTIFACT_STATESMANS_QUILL = 0x41,
     HERO_ARTIFACT_MAGIC_BOOK = 0x51,
     HERO_ARTIFACT_SPELL_SCROLL = 0x56,
-    HERO_ARTIFACT_BATTLE_GARB = 0x5a
+    HERO_ARTIFACT_BREASTPLATE_ANDURAN = 0x58,
+    HERO_ARTIFACT_BATTLE_GARB = 0x5a,
+    HERO_ARTIFACT_HELMET_ANDURAN = 0x5e,
+    HERO_ARTIFACT_SWORD_ANDURAN = 0x65,
+    HERO_ARTIFACT_SPADE_NECROMANCY = 0x66
 } HeroArtifact;
 
 typedef enum HeroSpell {
@@ -196,7 +206,7 @@ public:
     unsigned char m_enabled;  // +0x64
     class armyGroup m_army;  // +0x65
     signed char m_secondarySkills[14];  // +0x74
-    signed char m_secondarySkillOrder[14];  // +0x82
+    unsigned char m_secondarySkillOrder[14];  // +0x82
     int m_secondarySkillCount;  // +0x90
     signed char m_spells[HERO_SPELL_COUNT];  // +0x94
     signed char m_artifacts[HERO_ARTIFACT_SLOT_COUNT];  // +0xd5
