@@ -34,7 +34,7 @@ DATA(0x00534ce8) static unsigned int gCTRun;
 // Earlier setup, owner, command, lifetime, and CFG families are hash-pinned under
 // docs/matching-matrices/icon2bc-*.tsv; do not replay them without a real header/type trigger.
 // @match-note
-// /O2 typed checkpoint on master 71bdca9 with the canonical header-level IconRle and IconShear
+// /O2 typed checkpoint on master e34ed0d with the canonical header-level IconRle and IconShear
 // typedef enums: 78.95071%, candidate 0x58c versus retail 0x5af. Relocation-union masking leaves
 // 767 differing bytes among 822 common unmasked bytes, first +0x12 and last +0x588, plus a 0x23
 // retail tail. Candidate/retail have 423/426 instructions, the same 86 blocks, 133 directed edges,
@@ -58,6 +58,13 @@ DATA(0x00534ce8) static unsigned int gCTRun;
 // published-X0 derivation 78.74/92, and byte-identical wider-Y/per-arm-ClipR locals. Revisit only
 // after another real declaration/type/layout change, not with predicate synonyms, count balancing,
 // arbitrary record boundaries, or permutation tools.
+// Fresh e34ed0d trigger audit: this compiland contains only this function, so there is no same-TU
+// predecessor to steer. Replaying the current Icon2b byte-offset setup regresses to 78.50%/87:91;
+// retaining entry.x across the entry/source stores then adding formal x regresses to 78.83%/90:91.
+// Delaying typed entry formation through a real IconEntry table is byte-identical. Parsing the real
+// owner prototype after icon/bitmap are complete is byte-identical; moving it after the scratch
+// declarations regresses to 78.85%/90:91. No setup or declaration variant is retained. Reopen only
+// when a reachable type/header declaration changes, not for another local spelling search.
 VA(0x004d32a0, 0x5af)
 void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                             int clip, int clipX, int clipY, int clipW, int clipH, int color,
