@@ -95,6 +95,29 @@ def _addend(insn):
     imms = re.findall(r'\$(-?0x[0-9a-f]+)', insn)
     return int(imms[-1], 16) & 0xffffffff if imms else 0     # -0x4c disp -> 0xffffffb4 addend
 
+def _text_bytes(obj):
+    """Read the COFF .text payload so each relocation uses its own encoded addend.
+
+    An x86 instruction may contain multiple relocation fields (for example a
+    memory displacement and an immediate function pointer). Deriving both from
+    the rendered instruction text assigns the first operand's displacement to
+    every relocation. The four bytes at the relocation site are the actual COFF
+    addend and are unambiguous.
+    """
+    blob = open(obj, "rb").read()
+    if len(blob) < 20:
+        return b""
+    section_count = struct.unpack_from("<H", blob, 2)[0]
+    optional_size = struct.unpack_from("<H", blob, 16)[0]
+    first = 20 + optional_size
+    for index in range(section_count):
+        off = first + index * 40
+        if blob[off:off + 8].rstrip(b"\0") != b".text":
+            continue
+        size, raw = struct.unpack_from("<II", blob, off + 16)
+        return blob[raw:raw + size]
+    return b""
+
 def parse_obj(obj, with_sites=False):
     """llvm-objdump -dr -> ordered relocations per function; __imp__ skipped.
 
@@ -103,6 +126,7 @@ def parse_obj(obj, with_sites=False):
     weakening ordinary target checking.
     """
     out = subprocess.run(["llvm-objdump", "-dr", obj], capture_output=True, text=True).stdout
+    text_bytes = _text_bytes(obj)
     funcs, cur, cur_start, prev = {}, None, 0, ""
     for ln in out.splitlines():
         m = re.match(r'^([0-9a-f]+) <(.+?)>:', ln)
@@ -125,10 +149,15 @@ def parse_obj(obj, with_sites=False):
         if mr:
             s = mr.group(2)
             if not s.startswith('__imp__'):
-                reloc = (mr.group(1), s, _addend(prev))
+                mo = re.match(r'^\s*([0-9a-f]+):', ln)
+                site = int(mo.group(1), 16) if mo else -1
+                if 0 <= site <= len(text_bytes) - 4:
+                    addend = struct.unpack_from("<I", text_bytes, site)[0]
+                else:
+                    addend = _addend(prev)
+                reloc = (mr.group(1), s, addend)
                 if with_sites:
-                    mo = re.match(r'^\s*([0-9a-f]+):', ln)
-                    funcs[cur].append((int(mo.group(1), 16) - cur_start,) + reloc)
+                    funcs[cur].append((site - cur_start,) + reloc)
                 else:
                     funcs[cur].append(reloc)
             continue

@@ -5,7 +5,6 @@ BASE/BITMAP	??0bitmap@@QAE@FFF@Z	100.0000	b39db1089cec
 BASE/BITMAP	??0bitmap@@QAE@K@Z	100.0000	4ddca413101e
 BASE/BITMAP	??0bitmap@@QAE@XZ	100.0000	1792028f12ce
 BASE/BITMAP	??1bitmap@@UAE@XZ	100.0000	d3e8dabd2345
-BASE/BITMAP	??_Ebitmap@@UAEPAXI@Z	0.0000	
 BASE/BITMAP	?CopyTo@bitmap@@QAEXPAV1@HHHHHH@Z	100.0000	bf20ab10c78e
 BASE/BITMAP	?CopyToCareful@bitmap@@QAEXPAV1@HHHHHH@Z	100.0000	e4f5184f80e8
 BASE/BITMAP	?DrawToBuffer@bitmap@@QAEXFF@Z	100.0000	7df6da2595ea
@@ -20,7 +19,6 @@ BASE/BITS	_BitTest	47.6316	ab432782b513
 BASE/BORDER	??0border@@QAE@FFFFFFFPAD@Z	100.0000	701bc8cb3a14
 BASE/BORDER	??0border@@QAE@XZ	100.0000	587f23af98dc
 BASE/BORDER	??1border@@UAE@XZ	100.0000	136e4cd08a33
-BASE/BORDER	??_Eborder@@UAEPAXI@Z	0.0000	
 BASE/BORDER	?Draw@border@@UAEXXZ	100.0000	20cb9ff33649
 BASE/BORDER	?Main@border@@UAEHAAUtag_message@@@Z	99.7989	e967a43e7f03
 BASE/BORDER	?Read@border@@QAEXXZ	100.0000	1550ce358653
@@ -28,7 +26,6 @@ BASE/BUTTON	??0button@@QAE@FFFFKFFFFFF@Z	100.0000	83f17308dd9f
 BASE/BUTTON	??0button@@QAE@FFFFPADFFFFFF@Z	100.0000	edbf318db47b
 BASE/BUTTON	??0button@@QAE@XZ	100.0000	7d651520f9c2
 BASE/BUTTON	??1button@@UAE@XZ	100.0000	0040a120978a
-BASE/BUTTON	??_Ebutton@@UAEPAXI@Z	0.0000	
 BASE/BUTTON	?Deselect@button@@QAEFAAUtag_message@@@Z	99.7778	be16510063ee
 BASE/BUTTON	?Draw@button@@UAEXXZ	100.0000	0ef7c9f6df3f
 BASE/BUTTON	?Main@button@@UAEHAAUtag_message@@@Z	95.2270	10e0f90891e1
@@ -125,7 +122,6 @@ BASE/Bzip	?undoReversibleTransformation@@YIXXZ	99.5823	0482d6e07bc7
 BASE/Bzip	?updateModel@@YIXPAUModel@@H@Z	100.0000	0c7adcf987e8
 BASE/DIMMER	??0dimmerWidget@@QAE@FFFFFF@Z	100.0000	d40ae30749ab
 BASE/DIMMER	??0dimmerWidget@@QAE@XZ	100.0000	ecc550c0d114
-BASE/DIMMER	??_EdimmerWidget@@UAEPAXI@Z	0.0000	
 BASE/DIMMER	?Draw@dimmerWidget@@UAEXXZ	100.0000	a1b9b89be0a2
 BASE/DIMMER	?Main@dimmerWidget@@UAEHAAUtag_message@@@Z	100.0000	01068e5417a9
 BASE/DIMMER	?Read@dimmerWidget@@QAEXXZ	100.0000	0459d1442580
@@ -141,7 +137,6 @@ BASE/EXEC	?ShutDownSystem@executive@@QAEXXZ	100.0000	de8dbe738b06
 BASE/EXEC	?Terminate@executive@@QAEXXZ	100.0000	687bac529063
 BASE/FONT	??0font@@QAE@K@Z	100.0000	67411d2f90da
 BASE/FONT	??1font@@UAE@XZ	100.0000	0ca85318614e
-BASE/FONT	??_Efont@@UAEPAXI@Z	0.0000	
 BASE/FONT	?DrawBoundedString@font@@QAEXPADHHHHHH@Z	100.0000	e0d21d3d84cc
 BASE/FONT	?DrawString@font@@QAEXPADHHH@Z	100.0000	9c9349c5622f
 BASE/FONT	?DrawStringExecute@font@@IAEXPADHHHHHHH@Z	100.0000	bb27b6a3fdcd
@@ -150,7 +145,6 @@ BASE/FONT	?LineLength@font@@QAEHPADH@Z	100.0000	899d56b8089e
 BASE/FONT	?LineWidth@font@@QAEHPAD@Z	100.0000	af9d30875267
 BASE/ICON	??0icon@@QAE@K@Z	100.0000	83e4e5332be3
 BASE/ICON	??1icon@@UAE@XZ	100.0000	3f183990be8a
-BASE/ICON	??_Eicon@@UAEPAXI@Z	0.0000	
 BASE/ICON	?ClipFillToBuffer@icon@@QAEXHHHHHHHHH@Z	100.0000	d84cbd3c048d
 BASE/ICON	?CombatClipDrawToBuffer@icon@@QAEHHHHPAUSLimitData@@HHPAEPAC@Z	97.2049	2d302e0e186e
 BASE/ICON	?DimToBuffer@icon@@QAEXHHHH@Z	100.0000	f82980cf1492
@@ -160,7 +154,6 @@ BASE/ICONWDGT	??0iconWidget@@QAE@FFFFKFCFFF@Z	97.9444	3249b80e3989
 BASE/ICONWDGT	??0iconWidget@@QAE@FFFFPADFCFFF@Z	98.1500	8faa6c9026f4
 BASE/ICONWDGT	??0iconWidget@@QAE@XZ	100.0000	24b9c14ef8c1
 BASE/ICONWDGT	??1iconWidget@@UAE@XZ	100.0000	81a13b56becb
-BASE/ICONWDGT	??_EiconWidget@@UAEPAXI@Z	0.0000	
 BASE/ICONWDGT	?Draw@iconWidget@@UAEXXZ	97.8723	1071941040e8
 BASE/ICONWDGT	?Main@iconWidget@@UAEHAAUtag_message@@@Z	98.7453	a3a29d320f35
 BASE/ICONWDGT	?Read@iconWidget@@QAEXXZ	100.0000	a000fe9b278a
@@ -208,7 +201,6 @@ BASE/Midi	?MIDISetVolume@soundManager@@QAEXXZ	100.0000	15a39005816d
 BASE/Midi	?MIDIShutdown@soundManager@@QAEXXZ	100.0000	e2ecdc5b4f51
 BASE/Midi	?MIDIStartup@soundManager@@QAEXXZ	100.0000	bebbda206114
 BASE/Midi	?MIDIStop@soundManager@@QAEXXZ	100.0000	08f46b747c6e
-BASE/Midi	empty_stub	0.0000	
 BASE/Misc	?AbsAiPrint@@YIXPAD@Z	100.0000	1eb79786fdf1
 BASE/Misc	?AiPrint@@YIXPAD@Z	100.0000	5ed5d2f199a7
 BASE/Misc	?BaseAlloc@@YIPAXIPADH@Z	95.7297	997dad815967
@@ -258,7 +250,6 @@ BASE/Misc	?WritePrefsToRegistry@@YIXXZ	100.0000	c87235fd25e2
 BASE/PALETTE	??0palette@@QAE@K@Z	100.0000	f0d6149bb5b6
 BASE/PALETTE	??0palette@@QAE@XZ	100.0000	d0c9a7c66b13
 BASE/PALETTE	??1palette@@UAE@XZ	100.0000	66d4267d6fbc
-BASE/PALETTE	??_Epalette@@UAEPAXI@Z	0.0000	
 BASE/PALETTE	?Data@palette@@QAEPACXZ	100.0000	3bb1f3ed4160
 BASE/RESMGR	??0resourceManager@@QAE@XZ	99.9836	aa1e67128689
 BASE/RESMGR	?AddResource@resourceManager@@QAEXPAVresource@@@Z	100.0000	0a30f09b41ba
@@ -299,12 +290,9 @@ BASE/SAMPLE	??0MIDIWrap@@QAE@PAD@Z	100.0000	d20f0a3a6a12
 BASE/SAMPLE	??0sample@@QAE@PADJJJ@Z	96.7515	8cba2d5aee83
 BASE/SAMPLE	??1MIDIWrap@@UAE@XZ	100.0000	2ca2c0c036ff
 BASE/SAMPLE	??1sample@@UAE@XZ	100.0000	c76c2906339b
-BASE/SAMPLE	??_EMIDIWrap@@UAEPAXI@Z	0.0000	
-BASE/SAMPLE	??_Esample@@UAEPAXI@Z	0.0000	
 BASE/TEXTWDGT	??0textWidget@@QAE@FFFFPAD0FFFF@Z	99.2727	2332eee52e7c
 BASE/TEXTWDGT	??0textWidget@@QAE@XZ	97.3684	bab12c9ea01c
 BASE/TEXTWDGT	??1textWidget@@UAE@XZ	100.0000	6c07c28b1e66
-BASE/TEXTWDGT	??_EtextWidget@@UAEPAXI@Z	0.0000	
 BASE/TEXTWDGT	?Draw@textWidget@@UAEXXZ	100.0000	4ad2d442b850
 BASE/TEXTWDGT	?Main@textWidget@@UAEHAAUtag_message@@@Z	100.0000	8964f2935113
 BASE/TEXTWDGT	?Read@textWidget@@QAEXXZ	100.0000	bff9ec0eddb6
@@ -313,11 +301,9 @@ BASE/TEXTWDGT	?SetText@textWidget@@QAEXPAD@Z	100.0000	f043add31a12
 BASE/TILE	_TileToBitmap	100.0000	497157df3e64
 BASE/TILESET	??0tileset@@QAE@K@Z	100.0000	086792342f99
 BASE/TILESET	??1tileset@@UAE@XZ	100.0000	c63e97859bb3
-BASE/TILESET	??_Etileset@@UAEPAXI@Z	0.0000	
 BASE/Textntry	??0textEntryWidget@@QAE@FFFFFPAD0F0FFFFHH@Z	98.6522	5ae4aca1f9d2
 BASE/Textntry	??0textEntryWidget@@QAE@XZ	100.0000	3a2eb6938924
 BASE/Textntry	??1textEntryWidget@@UAE@XZ	100.0000	dbc13d305757
-BASE/Textntry	??_EtextEntryWidget@@UAEPAXI@Z	0.0000	
 BASE/Textntry	?Draw@textEntryWidget@@UAEXXZ	99.9924	2ccea491cca0
 BASE/Textntry	?Main@textEntryWidget@@UAEHAAUtag_message@@@Z	99.8529	0c27fddb3313
 BASE/Textntry	?Read@textEntryWidget@@QAEXH@Z	98.6755	f37d25fd661b
@@ -328,7 +314,6 @@ BASE/WIDGET	??1widget@@UAE@XZ	100.0000	7e399133b272
 BASE/WIDGET	?Dim@widget@@QAEXXZ	100.0000	211e0b051b88
 BASE/WIDGET	?Main@widget@@UAEHAAUtag_message@@@Z	99.8500	4268fa7f7b57
 BASE/WIDGET	?Open@widget@@QAEHHPAVheroWindow@@@Z	100.0000	8a20fb239b00
-BASE/WIDGET	empty_stub	0.0000	
 BASE/WINDOW	??0heroWindow@@QAE@HHHHH@Z	100.0000	0261e2bcc000
 BASE/WINDOW	??0heroWindow@@QAE@HHPAD@Z	99.9167	a289f28315cb
 BASE/WINDOW	??0heroWindow@@QAE@XZ	100.0000	926d19bc2059
@@ -362,14 +347,12 @@ BASE/WINMGR	?SaveFizzleSource@heroWindowManager@@QAEXHHHH@Z	100.0000	f1d436323ca
 BASE/WINMGR	?ScreenShot@heroWindowManager@@QAEXXZ	100.0000	44ad654f69c2
 BASE/WINMGR	?UpdateScreen@heroWindowManager@@QAEXXZ	100.0000	4077d1619d5f
 BASE/WINMGR	?UpdateScreenRegion@heroWindowManager@@QAEXHHHH@Z	100.0000	67a73e466f64
-BASE/WINMGR	empty_stub	0.0000	
 BASE/bmap2	?BlitBitmap@@YIXPAVbitmap@@HHHH0HH@Z	88.0000	85943241bc9f
 BASE/bmap2	?DimBitmapArea@@YIXPAVbitmap@@HHHHH@Z	84.2000	16228a92fc65
 BASE/bmap2	?FillBitmapArea@@YIXPAVbitmap@@HHHHH@Z	95.4545	abf87a174727
 BASE/bmap2	?FillBitmapAreaClip@@YIXPAVbitmap@@HHHHHHHHH@Z	94.4444	5a8565510c2c
 BASE/droplist	??0dropListWidget@@QAE@XZ	100.0000	36ab848d613b
 BASE/droplist	??1dropListWidget@@UAE@XZ	100.0000	29c47fbb75ad
-BASE/droplist	??_EdropListWidget@@UAEPAXI@Z	0.0000	
 BASE/droplist	?DeleteItem@dropListWidget@@QAEXH@Z	100.0000	39312fef206c
 BASE/droplist	?Draw@dropListWidget@@UAEXXZ	100.0000	a9f68c5f29e3
 BASE/droplist	?DrawDropStuff@dropListWidget@@QAEXXZ	100.0000	02e6e36033be
@@ -385,7 +368,6 @@ BASE/iconf2bc	?FlipIconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAE@Z
 BASE/iconf2by	?FlipIconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	93.7399	a4a3d8019c41
 BASE/listbox	??0listBoxWidget@@QAE@XZ	100.0000	1ce71b4c4e2c
 BASE/listbox	??1listBoxWidget@@UAE@XZ	100.0000	f64671b5cf40
-BASE/listbox	??_ElistBoxWidget@@UAEPAXI@Z	0.0000	
 BASE/listbox	?DeleteItem@listBoxWidget@@QAEXH@Z	100.0000	9571a31a4d92
 BASE/listbox	?Draw@listBoxWidget@@UAEXXZ	100.0000	230100bbcc4e
 BASE/listbox	?DrawLBStuff@listBoxWidget@@QAEXH@Z	100.0000	bd3903067b29
@@ -609,7 +591,6 @@ SOURCE/ARMYGRP	?IsMember@armyGroup@@QAEHH@Z	100.0000	8e5113106f1a
 SOURCE/ARMYGRP	?Swap@armyGroup@@QAEXHPAV1@H@Z	100.0000	aea4cf3cf784
 SOURCE/ARMYGRP	?View@armyGroup@@QAEXH@Z	100.0000	10ef94b0363f
 SOURCE/CMBTMGR	??0combatManager@@QAE@XZ	100.0000	d5f030343ad9
-SOURCE/CMBTMGR	??_H@YGXPAXIHP6EX0@Z@Z	100.0000	
 SOURCE/CMBTMGR	?CatAttack@combatManager@@QAEXH@Z	99.9977	5f103caae0ce
 SOURCE/CMBTMGR	?CheckApplyBadMorale@combatManager@@QAEHHH@Z	100.0000	6c3d4c250f53
 SOURCE/CMBTMGR	?CheckApplyGoodMorale@combatManager@@QAEXHH@Z	100.0000	0d3e83dc7a84
@@ -1102,7 +1083,7 @@ SOURCE/PHILAI	?EvaluateMonsterEvent@philAI@@QAEHHHPAH@Z	98.9283	4397d84342f6
 SOURCE/PHILAI	?EvaluateOneTimeCreaturePurchase@philAI@@QAEXHHHAAH00@Z	100.0000	6470d7a4e0d0
 SOURCE/PHILAI	?EvaluatePassword@philAI@@QAEHPAVmapCell@@@Z	100.0000	51f246f43d7c
 SOURCE/PHILAI	?EvaluateRecruitSite@philAI@@QAEHPAVmapCell@@@Z	99.6809	5fe7a76ca076
-SOURCE/PHILAI	?EvaluateTownEvent@philAI@@QAEHHHHHPAH@Z	80.9366	f64dd94f791c
+SOURCE/PHILAI	?EvaluateTownEvent@philAI@@QAEHHHHHPAH@Z	98.5906	f64dd94f791c
 SOURCE/PHILAI	?FightEvent@philAI@@QAEHPAVhero@@PAVmapCell@@H@Z	99.8605	a621edbc54ff
 SOURCE/PHILAI	?FightValueOfStack@philAI@@QAEHPAVarmyGroup@@PAVhero@@HHHH@Z	100.0000	ed924b026dfb
 SOURCE/PHILAI	?FutureDeflator@philAI@@QAEMQAH@Z	100.0000	c2abe59c4640
@@ -1424,13 +1405,24 @@ SOURCE/kbwin	?SetNoDialogMenus@@YIXH@Z	74.5312	f9123551057d
 SOURCE/kbwin	?UpdateDfltMenu@@YIXPAX@Z	99.8727	658e4f4cf2eb
 SOURCE/kbwin	_WinMain@16	100.0000	271323c77e36
 SOURCE/netwin	?is_netbios_avail@@YIHXZ	100.0000	12837e1c8866
-SOURCE/netwin	?nb_thr_ctl@@YIXXZ	6.7261	c5a0ea09b032
+SOURCE/netwin	?nb_add_name@@YIXXZ	100.0000	84628ca55470
+SOURCE/netwin	?nb_add_name_done@@YGXPAUNetbiosControlBlock@@@Z	99.7041	aec170ba76c3
+SOURCE/netwin	?nb_arm_recv@@YIXH@Z	100.0000	1eac58cc2458
+SOURCE/netwin	?nb_call@@YIGHPAX@Z	100.0000	c3c84f3b7dee
+SOURCE/netwin	?nb_call_done@@YGXPAUNetbiosControlBlock@@@Z	100.0000	3f84a3a801b5
+SOURCE/netwin	?nb_close_session@@YIXH@Z	100.0000	f552c38ce190
+SOURCE/netwin	?nb_format_name@@YIXPADPAE@Z	100.0000	d3059e76460b
+SOURCE/netwin	?nb_listen@@YIGHPAX@Z	100.0000	cff4f5514834
+SOURCE/netwin	?nb_recv_any@@YIGH@Z	100.0000	c42a639c7d59
+SOURCE/netwin	?nb_recv_any_done@@YGXPAUNetbiosControlBlock@@@Z	100.0000	5090f0597247
+SOURCE/netwin	?nb_recv_complete@@YIXH@Z	99.7518	282ecf938ee7
+SOURCE/netwin	?nb_thr_ctl@@YIXXZ	100.0000	c5a0ea09b032
 SOURCE/netwin	@nb_init@8	100.0000	bf320fd4610f
 SOURCE/netwin	@nb_rcv@8	100.0000	a51def834a49
 SOURCE/netwin	@nb_snd@12	100.0000	a4544c609ead
 SOURCE/netwin	@nb_stat@4	100.0000	89939d3bcf86
 SOURCE/netwin	@nb_term@0	100.0000	d564da2e1d0b
-SOURCE/netwin	_nb_sess	99.8418	1868a668e05b
+SOURCE/netwin	_nb_sess	99.8446	1868a668e05b
 SOURCE/tradpost	?ComputeTradeRatios@@YIXHHPAH00@Z	99.9444	b9a53cd4881c
 SOURCE/tradpost	?DoTradeKnob@@YIXUtag_message@@@Z	100.0000	58a78fccfc3a
 SOURCE/tradpost	?DoTradingPost@@YIXHM@Z	98.0920	ae8fb9ffc908
@@ -1459,7 +1451,7 @@ SOURCE/wingraph	?InitializePalette@@YIXXZ	100.0000	67f31ba0a0a8
 SOURCE/wingraph	?QueryNewPalette@@YIHXZ	100.0000	c28b1aee960a
 SOURCE/wingraph	?RestoreDisplayMode@@YIXXZ	100.0000	ed4fb428f9ee
 SOURCE/wingraph	?SetFullScreenStatus@@YIXH@Z	99.8214	0f1513e945cd
-SOURCE/wingraph	?SetGraphicsType@@YIHH@Z	71.3990	87806acf9b5e
+SOURCE/wingraph	?SetGraphicsType@@YIHH@Z	99.1367	87806acf9b5e
 SOURCE/wingraph	?SetPalette@@YIHXZ	100.0000	d91f52f47967
 SOURCE/wingraph	?SetupClipper@@YIXXZ	100.0000	89b1290b9829
 SOURCE/wingraph	?UpdatePalette@@YIXPAC@Z	100.0000	744becc5acc5
