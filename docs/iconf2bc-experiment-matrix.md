@@ -7,6 +7,14 @@ The global-assignment X initializer restores retail's `eax`/`ebx` publication se
 of the three missing setup bytes. The first width/x register-order divergence and one excess setup
 `gFCY` load remain active work; this is not classified as a compiler wall.
 
+Current retained working state: source SHA-256
+`55a3efd26cc0bc327cc0bc09a7b832c0bc6632ea53257dd49950e1a7b9af090c`, 85.84131%,
+function end `0x545`, frame `sub esp,8`, decoder entry `+0xee`, and 84/83 relocations.
+Declaring the later row pitch immediately after the entry cursor preserves the retained width/X
+setup and makes the row initialization use retail's load order and separate `gFCY` load. The row
+result remains in `ecx` rather than retail's `eax`; the first width/x divergence and excess setup
+`gFCY` load also remain active work. This is a progress checkpoint, not a wall classification.
+
 The new-experiment table began at checkpoint `838105c` / source checkpoint `7386907`, SHA-256
 `648ecb4b963c5b97aea5908738d26509ad680853a3041817321b61aa955070f9`, score 83.4333%,
 function end `0x550`. Every row records whether that state was retained, reverted, or
@@ -130,3 +138,19 @@ retained/reverted/byte-identical disposition.
 | `30451534ae7d47dfd11b1101a840d17892180fee41ff30d2a060e7b58dd35729` | direct setup `gFCY` operands under retained X shape | 84.14358% | `0x53f`, `sub esp,8`; decoder `+0xeb` | 84/83; 9 `gFCY` | setup loads remain duplicated and downstream local-symbol state regresses; reverted |
 | `571c71e3fa00c7673098dabb82537cb896e86a4b288d7ca58a0fb7c3c16cf379` | materialize horizontal/vertical outside booleans in stages | 81.39799% | `0x568`, `sub esp,8`; decoder `+0x113` | 84/83; 9 `gFCY` | materialized booleans and CFG expansion; reverted |
 | `8ce0c1f414d8fa05d05694aaf033cc4eb8f23fde1260f2766ab9cbb60dd8e302` | assign setup Y snapshot in first vertical clause under retained X shape | 85.465996% | `0x542`, `sub esp,8`; decoder `+0xeb` | 84/83; 9 `gFCY` | byte-identical to retained X-publication state; reverted |
+| `3a5581f7e735cca3234c46c15f85fbfd8bce35f3455e8791767f34a08f6af193` | sibling-style data/entries/source setup on retained width/X state | 84.52645% | `0x53d`, `sub esp,8`; decoder `+0xe7` | 84/83; 9 `gFCY` | gains retail direct source-offset add but broadly changes setup and decoder register allocation; reverted |
+| `815b1f5cc596962a835da1e950047623c9b618f9e0d26f12cfacea09d814eac8` | declare the later row pitch beside width before entry setup | 85.50378% | `0x541`, `sub esp,8`; decoder `+0xea` | 84/83; 9 `gFCY` | setup byte-identical; row result moves into retail's `eax` but starts two bytes early; retained while testing shared width/pitch lifetime |
+| `661afef1895ed8706fbb776ea30549bbfd538d93426cbc19b36d87046041439b` | order early pitch declaration before width | 85.50378% | `0x541`, `sub esp,8`; decoder `+0xea` | 84/83; 9 `gFCY` | byte-identical to width-before-pitch state; reverted to keep width first |
+| `08a256726618d1c637cae7e869eabdff4fb59d69e54c74c5988db308dc6e0e44` | move narrow `IconEntry` include to the former `Misc` position | 85.50378% | `0x541`, `sub esp,8`; decoder `+0xea` | 84/83; 9 `gFCY` | byte-identical to retained narrow-header order; reverted |
+| `5f1e64c3c6896374fdb56f3617dacb3b530532f09528af2c7d7852e0218b6a14` | form the two retail setup subtracts as one left-associated tree | 85.50378% | `0x541`, `sub esp,8`; decoder `+0xea` | 84/83; 9 `gFCY` | byte-identical to separate subtract statements; reverted |
+| `f6cfe8027bf4a0844eaff7c62d7a0245ca56dbaf1a5ed3a35407b48c3ca535ed` | reverse the two subtrahends in the combined setup tree | 85.50378% | `0x541`, `sub esp,8`; decoder `+0xea` | 84/83; 9 `gFCY` | optimizer canonicalizes to the same entry-X then width subtract sequence; reverted |
+| `1bb8a251e8e4f7dfb21b704d5e5179cfe446f07420a46282cfd3f8e44f615cd0` | C89-style early X/Y declarations beside width and pitch | 85.50378% | `0x541`, `sub esp,8`; decoder `+0xea` | 84/83; 9 `gFCY` | byte-identical to near-use X/Y declarations; reverted |
+| `838fa3a5a1f590e5fc3448ae421cf3769fed18fd16b1cf4365f13ced7d1c3026` | use computed Y for the second setup vertical extent while loading `gFCY` for the first | 82.16121% | `0x540`, `sub esp,8`; decoder `+0xec` | 81/83; 6 `gFCY` | compiler propagates Y through both comparisons and the row calculation, removing three required relocations and broadly changing allocation; reverted |
+| `55a3efd26cc0bc327cc0bc09a7b832c0bc6632ea53257dd49950e1a7b9af090c` | declare later row pitch immediately after the entry cursor | 85.84131% | `0x545`, `sub esp,8`; decoder `+0xee` | 84/83; 9 `gFCY` | row loads adopt retail order and separate `gFCY` load; final row add/store remains in `ecx`; retained while testing adjacent declaration boundary |
+| `df547a23bf280e1916c4bd134bdde3d3d08b2271b4faf4ed697b1b44569b2d8e` | move pitch declaration across the packed width load | 85.84131% | `0x545`, `sub esp,8`; decoder `+0xee` | 84/83; 9 `gFCY` | byte-identical to declaration immediately after entry; reverted to declare before assignment |
+| `88a5bbb26877c7083ae6a83442d7405296a5023763a3195c8c59e7fc9ee914c3` | commute pixels and Y-times-pitch in row publication | 85.84131% | `0x545`, `sub esp,8`; decoder `+0xee` | 84/83; 9 `gFCY` | byte-identical; optimizer still accumulates and publishes the row in `ecx`; reverted |
+| `849634283fd305dcce4787b25cbc7fd682071ca7476b43765c2e8438dab07285` | split row multiplication through a near-use local | 85.79093% | `0x545`, `sub esp,8`; decoder `+0xee` | 84/83; 9 `gFCY` | row instructions remain byte-identical while the local-symbol state slightly regresses later allocation; reverted |
+| `296e8b338809c28a78bca1942b35593c92823587afc46a665cc0be150e37e029` | stage row addition through `row += pixels` | 85.79093% | `0x545`, `sub esp,8`; decoder `+0xee` | 84/83; 9 `gFCY` | byte-identical to the split row expression; reverted |
+| `3041e5049b50107ca03cdbb1123161516af09756cfb9b8717edc4637236196fc` | snapshot destination pixels in a near-use local | 85.79093% | `0x545`, `sub esp,8`; decoder `+0xee` | 84/83; 9 `gFCY` | row instructions remain unchanged and local-symbol state regresses later allocation; reverted |
+| `af84f57d10e913f8de06896c76475eb047124469db62043a6575e9ba0940c2b1` | widen setup `currentY` declaration to function scope after entry/pitch | 85.84131% | `0x545`, `sub esp,8`; decoder `+0xee` | 84/83; 9 `gFCY` | byte-identical to the nested clip snapshot; reverted |
+| `d58dd3151724ff2c20d4cf510c63cba9524c6590bc87639e790365f9c6587c77` | hint setup width as a register local | 85.84131% | `0x545`, `sub esp,8`; decoder `+0xee` | 84/83; 9 `gFCY` | VC4.2 ignores the hint; byte-identical to the retained pitch-after-entry state; reverted |
