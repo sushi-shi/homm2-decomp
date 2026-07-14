@@ -19,6 +19,28 @@ evidence = [
 status = "reviewed"
 
 [[domain]]
+name = "WidgetKind"
+declaration = "WidgetKind"
+owner = "include/BASE/widgetKind.h"
+category = "serialized"
+production_carrier = "short storage boundary"
+strict = true
+sentinels = []
+interfaces = ["DecodeWidgetKind", "EncodeWidgetKind", "widget constructor raw short boundary"]
+members = ["widget::m_kind"]
+storage = ["packed short at widget +0x14", "resourceManager ReadWord streams"]
+conversions = [
+  "short to WidgetKind via DecodeWidgetKind",
+  "WidgetKind to short via EncodeWidgetKind",
+]
+evidence = [
+  "packed widget layout and repeated 16-bit accesses prove short storage",
+  "widget readers load the value with resourceManager::ReadWord",
+  "known retail values are open-ended rendering and behavior codes",
+]
+status = "reviewed"
+
+[[domain]]
 name = "FileRequesterMapSizeFilter"
 declaration = "FileRequesterMapSizeFilter"
 owner = "include/SOURCE/fileRequester.h"

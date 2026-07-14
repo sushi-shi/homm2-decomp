@@ -1,9 +1,11 @@
 #ifndef HOMM2_BASE_WIDGET_KIND_H
 #define HOMM2_BASE_WIDGET_KIND_H
 
+#include <EnumTypes.h>
+
 // Known serialized values only. The domain remains open-ended, and widget stores
 // the value in its proven packed short field rather than as this enum type.
-typedef enum WidgetKind {
+HOMM2_ENUM_BEGIN(WidgetKind)
     WIDGET_KIND_DEFAULT = 2,
     WIDGET_KIND_UNDIMMED = 8,
     WIDGET_KIND_TEXT = 0x200,
@@ -12,6 +14,21 @@ typedef enum WidgetKind {
     WIDGET_KIND_ICON = 0x801,
     WIDGET_KIND_AUTO_REPEAT = 0x1000,
     WIDGET_KIND_TEXT_ENTRY = 0x4000
-} WidgetKind;
+HOMM2_ENUM_END(WidgetKind)
+
+#ifdef HOMM2_STRICT_ENUM_TYPES
+inline WidgetKind DecodeWidgetKind(short value)
+{
+    return static_cast<WidgetKind>(value);
+}
+
+inline short EncodeWidgetKind(WidgetKind value)
+{
+    return static_cast<short>(value);
+}
+#else
+#define DecodeWidgetKind(value) (value)
+#define EncodeWidgetKind(value) (value)
+#endif
 
 #endif // HOMM2_BASE_WIDGET_KIND_H

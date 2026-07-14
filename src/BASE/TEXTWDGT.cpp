@@ -25,7 +25,7 @@ textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, 0)
     field_0x2a = 1;
     m_font = 0;
     m_text = 0;
-    m_kind = WIDGET_KIND_TEXT;
+    m_kind = EncodeWidgetKind(WIDGET_KIND_TEXT);
 }
 
 // @early-stop
@@ -52,7 +52,7 @@ textWidget::textWidget(short p1, short p2, short p3, short p4, char *p5, char *p
     m_color = p7;
     m_font = newFont;
     field_0x2a = static_cast<char>(p10);
-    m_kind = WIDGET_KIND_TEXT;
+    m_kind = EncodeWidgetKind(WIDGET_KIND_TEXT);
     m_text = p5;
 }
 
@@ -76,7 +76,7 @@ void textWidget::Read(void)
     field_0x2a = static_cast<char>(gpResourceManager->ReadWord());
     m_id = gpResourceManager->ReadWord();
     gpResourceManager->ReadWord();
-    m_kind = WIDGET_KIND_TEXT;
+    m_kind = EncodeWidgetKind(WIDGET_KIND_TEXT);
 }
 
 VA(0x004d1250, 0x30)
@@ -140,7 +140,8 @@ int textWidget::Main(tag_message &msg)
             if (m_id != msg.payload.widget.id)
                 goto normalEvent;
             char *newText = msg.payload.widget.data.text;
-            if (m_kind != WIDGET_KIND_TEXT && m_kind != WIDGET_KIND_TEXT_ENTRY) {
+            if (DecodeWidgetKind(m_kind) != WIDGET_KIND_TEXT &&
+                DecodeWidgetKind(m_kind) != WIDGET_KIND_TEXT_ENTRY) {
                 m_text = newText;
                 return 1;
             }
@@ -192,7 +193,8 @@ void textWidget::SetColorIndex(short int param_1)
 VA(0x004d14f0, 0xa2)
 void textWidget::SetText(char *param_1)
 {
-    if (m_kind != WIDGET_KIND_TEXT && m_kind != WIDGET_KIND_TEXT_ENTRY) {
+    if (DecodeWidgetKind(m_kind) != WIDGET_KIND_TEXT &&
+        DecodeWidgetKind(m_kind) != WIDGET_KIND_TEXT_ENTRY) {
         m_text = param_1;
         return;
     }

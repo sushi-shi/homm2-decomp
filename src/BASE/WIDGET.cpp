@@ -37,7 +37,7 @@ widget::widget(void)
     m_prev = 0;
     m_flags = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW;
     m_zOrder = -1;
-    m_kind = WIDGET_KIND_DEFAULT;
+    m_kind = EncodeWidgetKind(WIDGET_KIND_DEFAULT);
     m_y = 0;
     m_x = 0;
     m_width = 0x10;
@@ -123,8 +123,9 @@ int widget::Main(tag_message &message)
         case WIDGET_COMMAND_DRAW:
             if ((m_flags & WIDGET_FLAG_DRAW) != 0)
                 Draw();
-            if ((m_flags & WIDGET_FLAG_DIMMED) != 0 && m_kind != WIDGET_KIND_UNDIMMED &&
-                m_kind != WIDGET_KIND_TEXT) {
+            if ((m_flags & WIDGET_FLAG_DIMMED) != 0 &&
+                DecodeWidgetKind(m_kind) != WIDGET_KIND_UNDIMMED &&
+                DecodeWidgetKind(m_kind) != WIDGET_KIND_TEXT) {
                 short x = m_x + static_cast<short>(m_owner->m_posX);
                 short y = m_y + static_cast<short>(m_owner->m_posY);
                 DimBitmapArea(gpWindowManager->m_screen, x, y, m_width, m_height, 0);
@@ -142,7 +143,8 @@ int widget::Main(tag_message &message)
                 m_flags = flags;
                 if ((flags & WIDGET_FLAG_DIMMED) != 0) {
                     Draw();
-                    if (m_kind != WIDGET_KIND_UNDIMMED && m_kind != WIDGET_KIND_TEXT) {
+                    if (DecodeWidgetKind(m_kind) != WIDGET_KIND_UNDIMMED &&
+                        DecodeWidgetKind(m_kind) != WIDGET_KIND_TEXT) {
                         short x = m_x + static_cast<short>(m_owner->m_posX);
                         short y = m_y + static_cast<short>(m_owner->m_posY);
                         DimBitmapArea(gpWindowManager->m_screen, x, y, m_width, m_height, 0);
@@ -205,7 +207,8 @@ int widget::Main(tag_message &message)
 VA(0x004de1e0, 0x47)
 void widget::Dim(void)
 {
-    if (m_kind != WIDGET_KIND_UNDIMMED && m_kind != WIDGET_KIND_TEXT) {
+    if (DecodeWidgetKind(m_kind) != WIDGET_KIND_UNDIMMED &&
+        DecodeWidgetKind(m_kind) != WIDGET_KIND_TEXT) {
         short x = m_owner->m_posX + m_x;
         short y = m_y + m_owner->m_posY;
         DimBitmapArea(gpWindowManager->m_screen, x, y, m_width, m_height, 0);
