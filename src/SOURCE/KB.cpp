@@ -4649,7 +4649,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[65];
 DATA(0x004fc410) char *cArmyFrameFileNames[66];
 DATA(0x004fc518) unsigned char *gcSpellInfluenceIcons;
 DATA(0x004fc528) unsigned char giSpellInfluenceToSpell[16];
-DATA(0x004fc538) unsigned char *giNumPowFrames;
+DATA(0x004fc538) unsigned char giNumPowFrames[32];
 DATA(0x004fc558) int giSpellEffectShowType;
 DATA(0x004fc560) signed char gcColorToPlayerPos[8];
 DATA(0x004fc568) char *cCombatBkgNames[20];

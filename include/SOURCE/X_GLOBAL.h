@@ -146,7 +146,7 @@ extern int iLastDiffSendTo;
 extern char *cArmyFrameFileNames[66];
 extern unsigned char *gcSpellInfluenceIcons;
 extern unsigned char giSpellInfluenceToSpell[16];
-extern unsigned char *giNumPowFrames;
+extern unsigned char giNumPowFrames[32];
 extern int giSpellEffectShowType;
 extern signed char gcColorToPlayerPos[8];
 extern char *cCombatBkgNames[20];
