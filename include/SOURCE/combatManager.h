@@ -759,7 +759,7 @@ public:
     char m_battlefieldBackgroundName[13];  // +0xf5a0
     signed char m_adjacency[COMBAT_HEX_COUNT][COMBAT_AI_ADJACENT_DIRECTION_COUNT];  // +0xf5ad
     class heroWindow *m_winLoseWindow;  // +0xf86b
-    char _pad_0xf86f[0x4];
+    int m_selectedSpell;  // +0xf86f
     int m_combatResult;  // +0xf873
     // --- constructors ---
     combatManager(void);
