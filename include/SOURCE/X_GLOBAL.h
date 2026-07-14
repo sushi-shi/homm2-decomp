@@ -83,7 +83,7 @@ extern signed char giVisRangeTown;
 extern float gfStatPower[42];
 extern float gfBattleStat[42];
 extern signed char gSpellLimits[5];
-extern float *gfSpellCastableCombatMod;
+extern float gfSpellCastableCombatMod[12];
 extern float gfSpellCastNumMod[12];
 extern float gfPhilAISpellPowerMod[12];
 extern float gfPhilAIDurationMod[12];

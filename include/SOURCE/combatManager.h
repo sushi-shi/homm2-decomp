@@ -232,9 +232,37 @@ typedef enum CombatAIConstant {
     COMBAT_AI_EXPERIENCE_DIVISOR = 200000
 } CombatAIConstant;
 
+typedef enum CombatSpellAITargetMode {
+    COMBAT_SPELL_AI_GLOBAL = 0,
+    COMBAT_SPELL_AI_SUM_FRIENDLY = 1,
+    COMBAT_SPELL_AI_SUM_ENEMY = 2,
+    COMBAT_SPELL_AI_AREA = 3,
+    COMBAT_SPELL_AI_FRIENDLY = 4,
+    COMBAT_SPELL_AI_ENEMY = 5,
+    COMBAT_SPELL_AI_RESURRECT = 6,
+    COMBAT_SPELL_AI_ANY_ARMY = 7
+} CombatSpellAITargetMode;
+
+enum {
+    COMBAT_SPELL_AI_FIRST_HEX = 1,
+    COMBAT_SPELL_AI_LAST_HEX = 43,
+    COMBAT_SPELL_AI_ANY_SIDE = 2,
+    COMBAT_SPELL_AI_MAX_DURATION = 10,
+    COMBAT_SPELL_AI_MAX_MANA_RATIO = 10,
+    COMBAT_SPELL_AI_EARTHQUAKE_WALL_FIRST = 4,
+    COMBAT_SPELL_AI_EARTHQUAKE_WALL_COUNT = 4,
+    COMBAT_SPELL_AI_WALL_DAMAGED = 2,
+    COMBAT_SPELL_AI_WALL_DESTROYED = 6,
+    COMBAT_SPELL_AI_EARTHQUAKE_NO_DAMAGE_SCORE = 29999,
+    COMBAT_SPELL_AI_EARTHQUAKE_WALL_SCORE = 100,
+    COMBAT_SPELL_AI_CAST_ACTION = 1
+};
+
 #define COMBAT_AI_QUANTITY_ESTIMATE 1.2
 #define COMBAT_AI_TOWN_STRENGTH_MODIFIER 1.1
 #define COMBAT_AI_BASE_RETREAT_CHANCE 0.16f
+#define COMBAT_SPELL_AI_REDUCED_EFFECT_MODIFIER 0.5
+#define COMBAT_SPELL_AI_SIEGE_SHOOTER_MODIFIER 1.5
 #define COMBAT_AI_MAX_RETREAT_CHANCE_COMPARE 0.16
 #define COMBAT_AI_MAX_RETREAT_CHANCE 0.16f
 #define COMBAT_AI_HIGH_ARTIFACT_RETREAT_BONUS 0.06
@@ -555,8 +583,8 @@ extern int indexToCastOn;
 extern unsigned char *uRedBeam;
 extern unsigned char *uRainbow;
 extern signed char *gyModify;
-extern float *gfDurationMods;
-extern float *gfCancelDurationMods;
+extern float gfDurationMods[12];
+extern float gfCancelDurationMods[11];
 extern int bInHighMoraleBonus;
 extern int giSeed;
 extern unsigned char *wallHex;
