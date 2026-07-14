@@ -25,18 +25,24 @@ DATA(0x005381e4) static IconEntry *gFDEntry;
 DATA(0x005381e8) static unsigned int gFDRun;
 
 // @match-note
-// Structurally recovered /O2 decoder; live 69.89%, retained max 73.4337%. Ours is 0x237 bytes and
-// retail is 0x23b. Both have the same 0x4-byte frame, saved registers, command-loop CFG, and exact
-// 37-relocation identity/multiplicity sequence (all 13 scratch globals plus uDimPal). The first raw
-// divergence is +0x1d: ours loads x into ECX while retail loads it into EBX, after identical entry
-// address/source setup; later residuals are register allocation and instruction scheduling.
-// Retail deliberately tests clipX <= left before entering a clipped run, then tests clipX > left
-// again inside. This makes the partial-left arm unreachable, but retail +0x18c and +0x19a prove the
-// shipped CFG. Tried the typed IconEntry form, local X clip bounds, scoped volatile gFDY reads,
-// direct <=/> spellings, and the retail pre-loop gFDDst publication. Narrowing X_GLOBAL.h to the
-// canonical dimPalette.h changed only compiler/TU state and moved live fuzzy 70.55% -> 69.89%; do
-// not restore the broad header to chase that temporary score. No permutation tool was used.
-// Revisit after the SOURCE placeholder census reaches zero or after a real shared-header change.
+// Structurally recovered /O2 decoder. Candidate is 0x236 bytes versus retail 0x23b. Both have 166
+// instructions, 31 basic blocks, 25 branches, the same 0x4-byte
+// frame/saved registers, and an exact 37/37 relocation target/multiplicity sequence (all 13 scratch
+// globals plus uDimPal; only-base=0). The first relocation-masked raw divergence is +0x1d: retail
+// loads formal x into EBX before publishing gFDEntry, while candidate publishes gFDEntry first and
+// later carries x0 in EDI. The remaining residual is broad register allocation and scheduling.
+// The decoder now has the real geometry lifetimes seen in the retail instructions and sibling flip
+// blitters: x0 remains the left edge through clipping, while X starts at the right edge and moves
+// left through command runs. Delaying the gFDY snapshot to its short-circuit operand removes the
+// non-retail spill and restores the 0x4 frame. Retail deliberately tests clipX <= left both before
+// entering a clipped run and before selecting the full/partial arm; the redundant predicate makes
+// the partial arm unreachable, but retail emits the full arm first and that shipped CFG is retained.
+// Rejected fresh variants: an eager Y snapshot and explicit left/right homes widen the frame to 0x8;
+// a typed pixel-base owner, explicit entry-X owner, and post-setup right recomputation regress or
+// retain the wrong schedule. Earlier typed-entry, local/global bounds, destination-pointer, count,
+// loop-schedule, header-state, predicate-spelling, and AST-search families remain closed. No regex
+// or AST permutation was used here. This is an unresolved checkpoint, not a byte-proven wall;
+// revisit after a real shared-header/TU-state change or in the post-placeholder last-mile phase.
 VA(0x004daa20, 0x23b)
 void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                          int color, int clip, int clipX, int clipY, int clipW, int clipH)
@@ -44,20 +50,21 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, 
     char *data = srcIcon->m_data;
     IconEntry *entry = reinterpret_cast<IconEntry *>(data + frame * sizeof(IconEntry));
     unsigned char *srcData = reinterpret_cast<unsigned char *>(data + entry->srcOffset);
-    int X = x;
+    int x0 = x;
     gFDEntry = entry;
     gFDSrc = srcData;
     int w = entry->w;
-    X = X - entry->x;
     int entryY = entry->y;
-    X = X - w;
-    X++;
-    gFDX0 = X;
+    x0 = x0 - entry->x;
+    x0 = x0 - w;
+    x0++;
+    gFDX0 = x0;
     gFDY = y + entryY;
-    gFDXEnd = w + X - 1;
+    int X = w + x0 - 1;
+    gFDXEnd = X;
     if (clip != 0) {
-        int currentY = gFDY;
-        if (X < clipX || clipW + clipX < w + X || currentY < clipY ||
+        int currentY;
+        if (x0 < clipX || clipW + clipX < w + x0 || (currentY = gFDY) < clipY ||
             entry->h + currentY > clipY + clipH) {
             clip = 1;
             gFDClipR = clipX + clipW - 1;
@@ -106,12 +113,12 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, 
                     (left = (X - cmd) + 1, clipX <= left) && X <= gFDClipR) {
                     int cn;
                     unsigned char *dst;
-                    if (clipX > left) {
-                        dst = reinterpret_cast<unsigned char *>(gFDRow + clipX);
-                        cn = (X - clipX) + 1;
-                    } else {
+                    if (clipX <= left) {
                         cn = cmd;
                         dst = reinterpret_cast<unsigned char *>((gFDRow - cmd) + X + 1);
+                    } else {
+                        dst = reinterpret_cast<unsigned char *>(gFDRow + clipX);
+                        cn = (X - clipX) + 1;
                     }
                     gFDCnt2 = cn;
                     gFDDst = dst;
