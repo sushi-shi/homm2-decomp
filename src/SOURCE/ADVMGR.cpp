@@ -50,6 +50,7 @@
 #include <SOURCE/searchArray.h>
 #include <SOURCE/town.h>
 #include <ctype.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -68,8 +69,12 @@
          [distance])
 
 DATA(0x00527eb8) static unsigned short s_drawGroundTile;
+DATA(0x00527ebc) static int s_adjacentMonsterX;
 DATA(0x00527ec0) static int s_drawPixelY;
 DATA(0x00527ec4) static mapCellExtra *s_drawExtra;
+DATA(0x00527ecc) static int s_adjacentMonsterY;
+DATA(0x00527ed4) static int s_adjacentMonsterMinX;
+DATA(0x00527ed8) static int s_adjacentMonsterMinY;
 DATA(0x00527ee4) static int s_drawMonsterFrame;
 DATA(0x00527f0c) static int s_drawCloudFrame;
 DATA(0x00527f10) static int s_drawStoneTile;
@@ -80,10 +85,12 @@ DATA(0x00527f3c) static int s_drawHeroType;
 DATA(0x00527f44) static int s_drawCovered;
 DATA(0x00527f48) static mapCell *s_drawAdjacentCell;
 DATA(0x00528094) static int s_drawHasHero;
+DATA(0x00528098) static int s_adjacentMonsterEndY;
 DATA(0x0052809c) static int s_drawFlipCloud;
 DATA(0x005280a0) static int s_drawHeroFrame;
 DATA(0x005280a4) static int s_drawPixelX;
 DATA(0x005280a8) static int s_drawPlayerColor;
+DATA(0x005280cc) static int s_adjacentMonsterEndX;
 DATA(0x005280d0) static int s_drawAnimationLength;
 DATA(0x005280d8) static int s_drawHeroYOffset;
 VA(0x00456350, 0x30f)
@@ -5084,10 +5091,112 @@ int SaveGame(void)
 }
 
 VA(0x004650eb, 0xa6)
-void advManager::CheckCastSpell(void) {}
+void advManager::CheckCastSpell(void)
+{
+    if (gpCurPlayer->CurrentHero() != ADVMGR_INVALID_HERO) {
+        MobilizeCurrHero(0);
+        CompleteDraw(0);
+        UpdateScreen(0, 0);
+        gpMouseManager->SetPointer("advmice.mse", ADVMGR_POINTER_DEFAULT,
+                                   ADVMGR_DEFAULT_POINTER_FRAME);
+        CastSpell(gpGame->ViewSpells(
+            gpGame->GetHero(gpCurPlayer->m_currentHero), 1, NullHandler, 0));
+    }
+}
 
+// @match-note
+// Complete 0x24 frame/slots and message/mouse CFG; all 28 relocation targets
+// agree. Residuals are three continuation-jump placements: one extra retail
+// jump after the accepted widget path, one after the valid-cell SetPointer,
+// and one base-only jump after the invalid-map SetPointer return. Tried both
+// shift-condition polarities, nested/flat dialog-result checks, both map/cell
+// branch polarities, and both SetPointer arm orders. Revisit only with new TU
+// compiler-state evidence or after the SOURCE placeholder census is zero.
 VA(0x00465191, 0x31c)
-int DimensionDoorHandler(struct tag_message &) { return 0; }
+int DimensionDoorHandler(tag_message &message)
+{
+    if (glTimers[0] < KBTickCount()) {
+        gpAdvManager->CompleteDraw(gpAdvManager->m_mapOriginX,
+                                   gpAdvManager->m_mapOriginY, 0, 1);
+        gpAdvManager->UpdateScreen(0, 0);
+    }
+
+    int mouseX = message.payload.mouse.x;
+    int mouseY = message.payload.mouse.y;
+    int handled = 0;
+
+    switch (message.type) {
+    case MESSAGE_WIDGET:
+        switch (message.payload.widget.command) {
+        case WIDGET_COMMAND_SELECT:
+            switch (message.payload.widget.id) {
+            case ADVMGR_DIMENSION_DOOR_FIRST_BUTTON:
+            case ADVMGR_DIMENSION_DOOR_LAST_BUTTON:
+                if (message.payload.widget.parameter &
+                    MESSAGE_MODIFIER_LEFT_SHIFT) {
+                } else {
+                    if (gpWindowManager->m_dialogResult ==
+                        ADVMGR_TRAVEL_DIALOG_ACCEPT)
+                        handled = 1;
+                }
+                break;
+            }
+            break;
+        case WIDGET_COMMAND_DESELECT:
+            switch (message.payload.widget.id) {
+            case ADVMGR_DIMENSION_DOOR_CLOSE_BUTTON:
+                gpWindowManager->m_dialogResult = 0;
+                handled = 1;
+                break;
+            }
+            break;
+        }
+        break;
+
+    case MESSAGE_MOUSE_MOVE:
+        if (InMapArea(message.payload.mouse.x, message.payload.mouse.y)) {
+            mouseX /= ADVMGR_CELL_PIXELS;
+            mouseY /= ADVMGR_CELL_PIXELS;
+            if (mouseX < 0)
+                mouseX = 0;
+            if (mouseY < 0)
+                mouseY = 0;
+            if (mouseX > ADVMGR_DRAW_LAST_CELL)
+                mouseX = ADVMGR_DRAW_LAST_CELL;
+            if (mouseY > ADVMGR_DRAW_LAST_CELL)
+                mouseY = ADVMGR_DRAW_LAST_CELL;
+
+            if (gpAdvManager->m_lastHoverCell != mouseX ||
+                gpAdvManager->m_hoverCellY != mouseY) {
+                gpAdvManager->m_lastHoverCell = mouseX;
+                gpAdvManager->m_hoverCellY = mouseY;
+                mapCell *cell = gpAdvManager->GetCell(
+                    gpAdvManager->m_mapOriginX + mouseX,
+                    gpAdvManager->m_mapOriginY + mouseY);
+                if ((cell->triggerType & ADVMGR_TRIGGER_ACTION_FLAG) ||
+                    (cell->field8 & ADVMGR_HOVER_OBJECT_BLOCKED)) {
+                    gpWindowManager->m_dialogResult = 0;
+                    gpMouseManager->SetPointer(ADVMGR_POINTER_DEFAULT);
+                } else {
+                    gpWindowManager->m_dialogResult = ADVMGR_TRAVEL_DIALOG_ACCEPT;
+                    gpMouseManager->SetPointer(ADVMGR_POINTER_MOVE);
+                }
+            }
+        } else {
+            gpWindowManager->m_dialogResult = 0;
+            gpMouseManager->SetPointer(ADVMGR_POINTER_DEFAULT);
+            return ADVMGR_DIMENSION_DOOR_UNHANDLED;
+        }
+        break;
+    }
+
+    if (handled) {
+        message.payload.widget.id = ADVMGR_DIMENSION_DOOR_FIRST_BUTTON;
+        message.payload.widget.command = message.payload.widget.id;
+        return ADVMGR_DIMENSION_DOOR_HANDLED;
+    }
+    return ADVMGR_DIMENSION_DOOR_UNHANDLED;
+}
 
 // @early-stop
 // instruction-exact frame/body and 161 relocations; residuals are delinked biased
@@ -6835,17 +6944,202 @@ void advManager::EnableButtons(void)
     msg.payload.widget.id = ADVMGR_BUTTON_SLOT_6; m_adventureWindow->BroadcastMessage(msg);
 }
 
+// @early-stop
+// Relocation-masked instructions are byte-identical. All eight relocation
+// sites and target addresses agree; objdiff retains only retail/base names for
+// the "% " and source-path string-pool entries.
 VA(0x00469976, 0x145)
-void advManager::SaveAdventureBorder(void) {}
+void advManager::SaveAdventureBorder(void)
+{
+    if (m_adventureBorder != 0)
+        return;
 
+    m_adventureBorder = static_cast<unsigned char *>(
+        BaseAlloc(ADVMGR_BORDER_BUFFER_SIZE, ADVMGR_SOURCE_FILE,
+                  ADVMGR_BORDER_FREE_LINE + 4));
+    unsigned char *savedPixel = m_adventureBorder;
+    unsigned char *screenPixel = gpWindowManager->m_screen->m_pixels;
+    int row;
+    for (row = 0; row < ADVMGR_BORDER_EDGE_SIZE; ++row) {
+        memcpy(savedPixel, screenPixel, ADVMGR_BORDER_ROW_BYTES);
+        screenPixel += ADVMGR_BORDER_SCREEN_PITCH;
+        savedPixel += ADVMGR_BORDER_ROW_BYTES;
+    }
+    for (row = ADVMGR_BORDER_EDGE_SIZE; row < ADVMGR_BORDER_MIDDLE_END;
+         ++row) {
+        memcpy(savedPixel, screenPixel, ADVMGR_BORDER_SIDE_BYTES);
+        memcpy(savedPixel + ADVMGR_BORDER_SIDE_BYTES,
+               screenPixel + ADVMGR_BORDER_MIDDLE_END,
+               ADVMGR_BORDER_SIDE_BYTES);
+        screenPixel += ADVMGR_BORDER_SCREEN_PITCH;
+        savedPixel += ADVMGR_BORDER_SAVED_SIDE_BYTES;
+    }
+    for (row = ADVMGR_BORDER_MIDDLE_END; row < ADVMGR_SCREEN_HEIGHT; ++row) {
+        memcpy(savedPixel, screenPixel, ADVMGR_BORDER_ROW_BYTES);
+        screenPixel += ADVMGR_BORDER_SCREEN_PITCH;
+        savedPixel += ADVMGR_BORDER_ROW_BYTES;
+    }
+}
+
+// @early-stop
+// All 87 instructions match after masking relocation bytes, and all six
+// relocation sites and target addresses agree. The remaining objdiff score is
+// delinked symbol identity only.
 VA(0x00469abb, 0x134)
-void advManager::DrawAdventureBorder(void) {}
+void advManager::DrawAdventureBorder(void)
+{
+    if (m_adventureBorder == 0)
+        return;
+    if (gbNoBorder != 0)
+        return;
 
+    unsigned char *screenPixel = gpWindowManager->m_screen->m_pixels;
+    unsigned char *savedPixel = m_adventureBorder;
+    int row;
+    for (row = 0; row < ADVMGR_BORDER_EDGE_SIZE; ++row) {
+        memcpy(screenPixel, savedPixel, ADVMGR_BORDER_ROW_BYTES);
+        screenPixel += ADVMGR_BORDER_SCREEN_PITCH;
+        savedPixel += ADVMGR_BORDER_ROW_BYTES;
+    }
+    for (row = ADVMGR_BORDER_EDGE_SIZE; row < ADVMGR_BORDER_MIDDLE_END;
+         ++row) {
+        memcpy(screenPixel, savedPixel, ADVMGR_BORDER_SIDE_BYTES);
+        memcpy(screenPixel + ADVMGR_BORDER_MIDDLE_END,
+               savedPixel + ADVMGR_BORDER_SIDE_BYTES,
+               ADVMGR_BORDER_SIDE_BYTES);
+        screenPixel += ADVMGR_BORDER_SCREEN_PITCH;
+        savedPixel += ADVMGR_BORDER_SAVED_SIDE_BYTES;
+    }
+    for (row = ADVMGR_BORDER_MIDDLE_END; row < ADVMGR_SCREEN_HEIGHT; ++row) {
+        memcpy(screenPixel, savedPixel, ADVMGR_BORDER_ROW_BYTES);
+        screenPixel += ADVMGR_BORDER_SCREEN_PITCH;
+        savedPixel += ADVMGR_BORDER_ROW_BYTES;
+    }
+}
+
+// @match-note
+// Complete 0x4 frame, edge/interior loops, duplicated eligibility/exclusion CFG,
+// success writes, and all 52 relocation targets. The instruction streams align;
+// residuals are the six delinked static identities and four excluded-Y comparison
+// operand orientations. Tried cursor/end loop reversals, a shared body (wrong CFG),
+// compound duplicated predicates, and both excluded-Y inequality orientations.
+// Revisit only with new static-symbol/TU evidence or in the last-mile phase.
 VA(0x00469bef, 0x3d3)
-int advManager::FindAdjacentMonster(int, int, int *, int *, int, int) { return 0; }
+int advManager::FindAdjacentMonster(int originX, int originY, int *monsterX,
+                                    int *monsterY, int excludedX, int excludedY)
+{
+    s_adjacentMonsterEndX = originX + ADVMGR_ADJACENT_MONSTER_END_OFFSET;
+    s_adjacentMonsterEndY = originY + ADVMGR_ADJACENT_MONSTER_END_OFFSET;
 
+    if (originX > 0 && originY > 0 && originX < MAP_WIDTH - 1 &&
+        originY < MAP_HEIGHT - 1) {
+        for (s_adjacentMonsterX = originX - ADVMGR_ADJACENT_MONSTER_RADIUS;
+             s_adjacentMonsterX < s_adjacentMonsterEndX;
+             ++s_adjacentMonsterX) {
+            for (s_adjacentMonsterY = originY - ADVMGR_ADJACENT_MONSTER_RADIUS;
+                 s_adjacentMonsterY < s_adjacentMonsterEndY;
+                 ++s_adjacentMonsterY) {
+                if (m_mapData->Row(s_adjacentMonsterY)[s_adjacentMonsterX]
+                        .triggerType == ADVMGR_ADJACENT_MONSTER_TRIGGER) {
+                    if (originY > s_adjacentMonsterY) {
+                        if ((GetCell(originX, originY)->objIndex ==
+                                 ADVMGR_ADJACENT_OBJECT_INDEX_NONE ||
+                             GetCell(originX, originY)->objTileset ==
+                                 ADVMGR_CLEAR_GROUND_TILESET ||
+                             (GetCell(originX, originY)->field8 &
+                              ADVMGR_HOVER_UNREACHABLE)) &&
+                            (s_adjacentMonsterX != excludedX ||
+                             excludedY != s_adjacentMonsterY))
+                            goto foundAdjacentMonster;
+                    } else if (s_adjacentMonsterX != excludedX ||
+                               excludedY != s_adjacentMonsterY) {
+                        goto foundAdjacentMonster;
+                    }
+                }
+            }
+        }
+    } else {
+        if (originX == MAP_WIDTH - 1)
+            s_adjacentMonsterEndX = originX + 1;
+        if (originY == MAP_HEIGHT - 1)
+            s_adjacentMonsterEndY = originY + 1;
+        if (originX == 0)
+            s_adjacentMonsterMinX = 0;
+        else
+            s_adjacentMonsterMinX = originX - ADVMGR_ADJACENT_MONSTER_RADIUS;
+        if (originY == 0)
+            s_adjacentMonsterMinY = 0;
+        else
+            s_adjacentMonsterMinY = originY - ADVMGR_ADJACENT_MONSTER_RADIUS;
+
+        for (s_adjacentMonsterX = s_adjacentMonsterMinX;
+             s_adjacentMonsterX < s_adjacentMonsterEndX;
+             ++s_adjacentMonsterX) {
+            for (s_adjacentMonsterY = s_adjacentMonsterMinY;
+                 s_adjacentMonsterY < s_adjacentMonsterEndY;
+                 ++s_adjacentMonsterY) {
+                if (m_mapData->Row(s_adjacentMonsterY)[s_adjacentMonsterX]
+                        .triggerType == ADVMGR_ADJACENT_MONSTER_TRIGGER) {
+                    if (originY > s_adjacentMonsterY) {
+                        if ((GetCell(originX, originY)->objIndex ==
+                                 ADVMGR_ADJACENT_OBJECT_INDEX_NONE ||
+                             GetCell(originX, originY)->objTileset ==
+                                 ADVMGR_CLEAR_GROUND_TILESET ||
+                             (GetCell(originX, originY)->field8 &
+                              ADVMGR_HOVER_UNREACHABLE)) &&
+                            (s_adjacentMonsterX != excludedX ||
+                             excludedY != s_adjacentMonsterY))
+                            goto foundAdjacentMonster;
+                    } else if (s_adjacentMonsterX != excludedX ||
+                               excludedY != s_adjacentMonsterY) {
+                        goto foundAdjacentMonster;
+                    }
+                }
+            }
+        }
+    }
+    return 0;
+
+foundAdjacentMonster:
+    *monsterX = s_adjacentMonsterX;
+    *monsterY = s_adjacentMonsterY;
+    return 1;
+}
+
+// @match-note
+// Complete 0xc frame/slots, including the retail non-advancing dead-player
+// loop, and all 16 relocation targets agree. The only two divergences load the
+// local player before giCurPlayer instead of giCurPlayer before the local at
+// the two loop guards. Both operand spellings of player!=giCurPlayer were
+// tried. Revisit only with new TU compiler-state evidence or after the SOURCE
+// placeholder census is zero.
 VA(0x00469fc2, 0x125)
-void ComputeAdvNetControl(void) {}
+void ComputeAdvNetControl(void)
+{
+    if (!gbRemoteOn) {
+        gbThisNetGotAdventureControl = 1;
+    } else {
+        int selectedPlayer = -1;
+        int player;
+        if (gpGame->m_playerDead[giCurPlayer]) {
+            player = (giCurPlayer + 1) % GAME_PLAYER_COUNT;
+            while (giCurPlayer != player) {
+                if (!gpGame->m_playerDead[player] && gbHumanPlayer[player]) {
+                    gbThisNetGotAdventureControl = gbThisNetHumanPlayer[player];
+                    return;
+                }
+            }
+        }
+
+        player = (giCurPlayer + 1) % GAME_PLAYER_COUNT;
+        while (giCurPlayer != player) {
+            player = (player + 1) % GAME_PLAYER_COUNT;
+            if (!gpGame->m_playerDead[player] && gbHumanPlayer[player])
+                selectedPlayer = player;
+        }
+        gbThisNetGotAdventureControl = gbThisNetHumanPlayer[selectedPlayer];
+    }
+}
 
 // @early-stop
 // target loads MAP_WIDTH/MAP_HEIGHT before the local operand; base loads the local first
@@ -6867,8 +7161,120 @@ int MapExtraPosAndAdjacentsSet(int x, int y, unsigned char mask)
     return 0;
 }
 
+// @match-note
+// Complete 0x6c frame and retail slots (Y/window/icon/X adjustment/count/Y
+// adjustment/row/piece/end/pixel/order[48]/X); all 54 relocation targets
+// agree. Residuals are three string-pool names, the commuted Y*5+X*2 lowering,
+// and pixel<rowEnd lowering as jbe instead of jae. Tried both term orders,
+// constant-left multiplication, and an explicit >= break (which regressed).
+// Revisit only with new expression/TU evidence or after the SOURCE placeholder
+// census is zero.
 VA(0x0046a1dd, 0x4c6)
-void advManager::ViewPuzzle(void) {}
+void advManager::ViewPuzzle(void)
+{
+    gpGame->SetupPuzzlePieces(giCurPlayer, 0);
+    unsigned char puzzleOrderLocal[ADVMGR_PUZZLE_PIECE_COUNT] = {
+        23, 7, 44, 5, 24, 47, 1, 39, 16, 36, 11, 45,
+        31, 2, 30, 38, 43, 4, 3, 14, 40, 37, 34, 0,
+        12, 17, 35, 42, 15, 8, 26, 41, 28, 46, 10, 22,
+        21, 6, 32, 18, 19, 29, 13, 27, 9, 20, 33, 25
+    };
+    int puzzlePiecesVisible = 0;
+
+    gpSoundManager->SwitchAmbientMusic(ADVMGR_PUZZLE_MUSIC);
+    gpMouseManager->SetPointer("advmice.mse", ADVMGR_POINTER_DEFAULT,
+                               ADVMGR_DEFAULT_POINTER_FRAME);
+    icon *puzzleIconObjectPointer = gpResourceManager->GetIcon("puzzle.icn");
+    int pieceIndexPosition;
+    for (pieceIndexPosition = 0;
+         pieceIndexPosition < ADVMGR_PUZZLE_PIECE_COUNT;
+         ++pieceIndexPosition)
+        puzzleIconObjectPointer->DrawToBuffer(0, 0, pieceIndexPosition, 0);
+
+    gpWindowManager->UpdateScreenRegion(
+        ADVMGR_PUZZLE_VIEW_ORIGIN, ADVMGR_PUZZLE_VIEW_ORIGIN,
+        ADVMGR_PUZZLE_VIEW_SIZE, ADVMGR_PUZZLE_VIEW_SIZE);
+    gpWindowManager->SaveFizzleSource(
+        ADVMGR_PUZZLE_VIEW_ORIGIN, ADVMGR_PUZZLE_VIEW_ORIGIN,
+        ADVMGR_PUZZLE_VIEW_SIZE, ADVMGR_PUZZLE_VIEW_SIZE);
+    heroWindow *puzzleWindowObject = new heroWindow(
+        ADVMGR_PUZZLE_WINDOW_X, ADVMGR_PUZZLE_WINDOW_Y, "viewpuzl.bin");
+    if (puzzleWindowObject == 0)
+        MemError();
+    gpWindowManager->AddWindow(puzzleWindowObject, -1, 1);
+
+    int puzzleXViewCurrent = gpGame->m_ultimateArtifactX -
+                             ADVMGR_PUZZLE_COORDINATE_OFFSET;
+    int puzzleYTop = gpGame->m_ultimateArtifactY -
+                     ADVMGR_PUZZLE_COORDINATE_OFFSET;
+    int xAdjustmentOffset = 0;
+    int yAdjustmentOffsetLocal = 0;
+    xAdjustmentOffset = (gpGame->m_ultimateArtifactX +
+                         gpGame->m_ultimateArtifactY) %
+                            ADVMGR_PUZZLE_ALIGNMENT_DIVISOR -
+                        1;
+    yAdjustmentOffsetLocal = (gpGame->m_ultimateArtifactX * 2 +
+                              gpGame->m_ultimateArtifactY * 5) %
+                                 ADVMGR_PUZZLE_ALIGNMENT_DIVISOR -
+                             1;
+    if ((gpGame->m_ultimateArtifactX + gpGame->m_ultimateArtifactY) %
+            ADVMGR_PUZZLE_ALIGNMENT_DIVISOR ==
+        1) {
+        if (xAdjustmentOffset > 0)
+            ++xAdjustmentOffset;
+        else if (xAdjustmentOffset < 0)
+            --xAdjustmentOffset;
+    } else if ((gpGame->m_ultimateArtifactX +
+                gpGame->m_ultimateArtifactY) % 2 == 1) {
+        if (yAdjustmentOffsetLocal > 0)
+            ++yAdjustmentOffsetLocal;
+        else if (yAdjustmentOffsetLocal < 0)
+            --yAdjustmentOffsetLocal;
+    }
+
+    puzzleXViewCurrent += xAdjustmentOffset;
+    puzzleYTop += yAdjustmentOffsetLocal;
+    PuzzleDraw(puzzleXViewCurrent, puzzleYTop, gpGame->m_ultimateArtifactX,
+               gpGame->m_ultimateArtifactY);
+
+    int rowCounterNumber;
+    unsigned char *pixelIterator;
+    unsigned char *rowLimitAddress;
+    for (rowCounterNumber = ADVMGR_PUZZLE_VIEW_ORIGIN;
+         rowCounterNumber < ADVMGR_PUZZLE_VIEW_END;
+         ++rowCounterNumber) {
+        pixelIterator = gpWindowManager->m_screen->m_pixels +
+                        rowCounterNumber * ADVMGR_SCREEN_WIDTH +
+                        ADVMGR_PUZZLE_VIEW_ORIGIN;
+        rowLimitAddress = pixelIterator + ADVMGR_PUZZLE_VIEW_SIZE;
+        for (; pixelIterator < rowLimitAddress; ++pixelIterator)
+            *pixelIterator = gColorTableTan[*pixelIterator];
+    }
+
+    for (pieceIndexPosition = 0;
+         pieceIndexPosition < ADVMGR_PUZZLE_PIECE_COUNT;
+         ++pieceIndexPosition) {
+        if (!BitTest(puzzlePiecesRemoved, pieceIndexPosition)) {
+            puzzleIconObjectPointer->DrawToBuffer(
+                0, 0, puzzleOrderLocal[pieceIndexPosition], 0);
+            ++puzzlePiecesVisible;
+        }
+    }
+    if (puzzlePiecesVisible != ADVMGR_PUZZLE_PIECE_COUNT)
+        gpWindowManager->FizzleForward(
+            ADVMGR_PUZZLE_VIEW_ORIGIN, ADVMGR_PUZZLE_VIEW_ORIGIN,
+            ADVMGR_PUZZLE_VIEW_SIZE, ADVMGR_PUZZLE_VIEW_SIZE,
+            ADVMGR_PUZZLE_FIZZLE_TIME, 0, 0);
+    else
+        gpWindowManager->ReleaseFizzleSource();
+
+    gpWindowManager->DoDialog(puzzleWindowObject, EventWindowHandler, 0);
+    delete puzzleWindowObject;
+    CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
+    UpdateScreen(0, 0);
+    UpdateRadar(1, 0);
+    gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
+}
 
 // @early-stop
 // all 49 instructions and five relocation targets match; residual is the TU object span
@@ -6884,23 +7290,439 @@ void advManager::PuzzleDraw(int left, int top, int right, int bottom)
                  ADVMGR_SCREEN_HEIGHT, ADVMGR_SCREEN_HEIGHT, 0);
 }
 
+// @early-stop
+// Excluding the 0x10-byte jump table at RVA 0x6a9a2, every instruction and
+// operand matches after normalizing branch destinations. All 46 relocation
+// sites and target addresses agree; the residual is the delinked local table
+// base/labels and string-pool symbol identities.
 VA(0x0046a724, 0x2ac)
-void advManager::AdvPanel(void) {}
+void advManager::AdvPanel(void)
+{
+    heroWindow *adventurePanel;
+    {
+        TrimLoopingSounds(ADVMGR_LOOPING_SOUND_LIMIT);
+        gpMouseManager->SetPointer("advmice.mse", ADVMGR_POINTER_DEFAULT,
+                                   ADVMGR_DEFAULT_POINTER_FRAME);
+        int heroWasMobilized = m_heroContextLocked;
+        tag_message message;
+        DemobilizeCurrHero();
 
+        adventurePanel = new heroWindow(
+            ADVMGR_PANEL_WINDOW_X, ADVMGR_PANEL_WINDOW_Y, "apanel.bin");
+        if (adventurePanel == 0)
+            MemError();
+        if (gpCurPlayer->CurrentHero() == ADVMGR_INVALID_HERO) {
+            message.type = MESSAGE_WIDGET;
+            message.payload.widget.id = ADVMGR_PANEL_DISABLED_WIDGET;
+            message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
+            message.payload.widget.data.value = ADVMGR_BUTTON_TARGET;
+            adventurePanel->BroadcastMessage(message);
+            message.payload.widget.id = ADVMGR_PANEL_DISABLED_WIDGET;
+            message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
+            message.payload.widget.data.value = WIDGET_COMMAND_DIMMED;
+            adventurePanel->BroadcastMessage(message);
+        }
+
+        gpWindowManager->DoDialog(adventurePanel, APanelHandler, 0);
+        delete adventurePanel;
+        switch (gpWindowManager->m_dialogResult) {
+            case ADVMGR_PANEL_SCENARIO_INFO:
+                if (gbInCampaign) {
+                    SetEnvironmentOrigin(-1, -1, 1);
+                    gpGame->ShowCampaignInfo(1, 0);
+                    SetEnvironmentOrigin(
+                        m_mapOriginX + ADVMGR_VIEW_CENTER_OFFSET,
+                        m_mapOriginY + ADVMGR_VIEW_CENTER_OFFSET, 1);
+                    RedrawAdvScreen(1, 0);
+                    gpSoundManager->SwitchAmbientMusic(
+                        giTerrainToMusicTrack[m_currentTerrain]);
+                } else if (xIsPlayingExpansionCampaign) {
+                    SetEnvironmentOrigin(-1, -1, 1);
+                    xCampaign.ShowInfo(1, 0);
+                    SetEnvironmentOrigin(
+                        m_mapOriginX + ADVMGR_VIEW_CENTER_OFFSET,
+                        m_mapOriginY + ADVMGR_VIEW_CENTER_OFFSET, 1);
+                    RedrawAdvScreen(1, 0);
+                    gpSoundManager->SwitchAmbientMusic(
+                        giTerrainToMusicTrack[m_currentTerrain]);
+                } else {
+                    gpGame->ShowScenInfo();
+                }
+                break;
+            case ADVMGR_PANEL_SEARCH:
+                ProcessSearch(ADVMGR_INVALID_CELL, ADVMGR_INVALID_CELL);
+                break;
+            case ADVMGR_PANEL_VIEW_WORLD:
+                ViewWorld(ADVENTURE_SPELL_VIEW_ALL, 0, 0);
+                break;
+            case ADVMGR_PANEL_VIEW_PUZZLE:
+                ViewPuzzle();
+                break;
+        }
+
+        if (heroWasMobilized)
+            MobilizeCurrHero(0);
+    }
+}
+
+// @match-note
+// Complete 0x18 frame, shift-help/selection CFG, and all 8 external relocations agree.
+// The diff first diverges at the delinked 0x10-byte switch table at RVA 0x6aa99;
+// the 23 preceding instructions match. Tried compound command tests in both arms and
+// switch-based command dispatch in both arms; the retained mixed form is closest.
+// Revisit only after shared message/layout evidence changes or in the last-mile phase.
 VA(0x0046a9d0, 0x1ca)
-int APanelHandler(struct tag_message &) { return 0; }
+int APanelHandler(tag_message &message)
+{
+    int handled = 0;
+    if (message.type == MESSAGE_WIDGET) {
+        if (message.payload.widget.parameter & MESSAGE_MODIFIER_LEFT_SHIFT) {
+            if (message.payload.widget.command == WIDGET_COMMAND_SELECT ||
+                message.payload.widget.command ==
+                    WIDGET_COMMAND_ALTERNATE_SELECT) {
+                int helpIndex = ADVMGR_PANEL_NO_HELP;
+                switch (message.payload.widget.id) {
+                case ADVMGR_PANEL_VIEW_WORLD:
+                    helpIndex = 0;
+                    break;
+                case ADVMGR_PANEL_VIEW_PUZZLE:
+                    helpIndex = 1;
+                    break;
+                case ADVMGR_PANEL_SCENARIO_INFO:
+                    helpIndex = 2;
+                    break;
+                case ADVMGR_PANEL_SEARCH:
+                    helpIndex = 3;
+                    break;
+                case ADVMGR_PANEL_CLOSE_WIDGET:
+                    helpIndex = ADVMGR_PANEL_CLOSE_HELP;
+                    break;
+                }
+                if (helpIndex >= 0)
+                    NormalDialog(gAPanelHelp[helpIndex], 4, -1, -1, -1,
+                                 0, -1, 0, -1, 0);
+            }
+        } else {
+            switch (message.payload.widget.command) {
+            case WIDGET_COMMAND_DESELECT:
+                switch (message.payload.widget.id) {
+                case ADVMGR_PANEL_VIEW_WORLD:
+                case ADVMGR_PANEL_VIEW_PUZZLE:
+                case ADVMGR_PANEL_SCENARIO_INFO:
+                case ADVMGR_PANEL_SEARCH:
+                case ADVMGR_PANEL_CLOSE_WIDGET:
+                    handled = 1;
+                    break;
+                }
+                break;
+            }
+        }
+    }
 
+    if (handled) {
+        gpWindowManager->m_dialogResult = message.payload.widget.id;
+        message.payload.widget.id = WIDGET_COMMAND_DIALOG_SELECT;
+        message.payload.widget.command = message.payload.widget.id;
+        return ADVMGR_DIMENSION_DOOR_HANDLED;
+    }
+    return ADVMGR_DIMENSION_DOOR_UNHANDLED;
+}
+
+// @match-note
+// Complete modal/control-disable CFG and all 30 external relocations agree. The first
+// 102 diff lines align apart from string identities, then the helper stops at the
+// delinked result switch table. Retained direct remote-disable broadcasts and result
+// switch after testing equivalent compound and nested spellings.
+// Revisit only after shared dialog/message evidence changes or in the last-mile phase.
 VA(0x0046ab9a, 0x1e4)
-int advManager::ControlPanel(void) { return 0; }
+int advManager::ControlPanel(void)
+{
+    TrimLoopingSounds(ADVMGR_LOOPING_SOUND_LIMIT);
+    int selectedCommand = ADVMGR_PANEL_NO_HELP;
+    gpMouseManager->SetPointer("advmice.mse", ADVMGR_POINTER_DEFAULT,
+                               ADVMGR_DEFAULT_POINTER_FRAME);
+    int heroWasMobilized = m_heroContextLocked;
+    DemobilizeCurrHero();
 
+    heroWindow *controlPanel = new heroWindow(
+        ADVMGR_PANEL_WINDOW_X, ADVMGR_PANEL_WINDOW_Y, "cpanel.bin");
+    if (controlPanel == 0)
+        MemError();
+    if (gbRemoteOn) {
+        tag_message message;
+        message.type = MESSAGE_WIDGET;
+        message.payload.widget.id = ADVMGR_CONTROL_RESTART;
+        message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
+        message.payload.widget.data.value = WIDGET_COMMAND_DIMMED;
+        controlPanel->BroadcastMessage(message);
+        message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
+        message.payload.widget.data.value = ADVMGR_BUTTON_TARGET;
+        controlPanel->BroadcastMessage(message);
+        message.payload.widget.id = ADVMGR_CONTROL_NEW_GAME;
+        message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
+        message.payload.widget.data.value = WIDGET_COMMAND_DIMMED;
+        controlPanel->BroadcastMessage(message);
+        message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
+        message.payload.widget.data.value = ADVMGR_BUTTON_TARGET;
+        controlPanel->BroadcastMessage(message);
+    }
+
+    gpWindowManager->DoDialog(controlPanel, CPanelHandler, 0);
+    delete controlPanel;
+    switch (gpWindowManager->m_dialogResult) {
+    case ADVMGR_CONTROL_RESTART:
+    case ADVMGR_CONTROL_NEW_GAME:
+    case ADVMGR_CONTROL_MAIN_MENU:
+        selectedCommand = gpWindowManager->m_dialogResult;
+        break;
+    case ADVMGR_CONTROL_SAVE_GAME:
+        SaveGame();
+        break;
+    }
+    if (heroWasMobilized)
+        MobilizeCurrHero(0);
+    if (selectedCommand != ADVMGR_PANEL_NO_HELP)
+        gGameCommand = selectedCommand;
+    return selectedCommand != ADVMGR_PANEL_NO_HELP;
+}
+
+// @match-note
+// Complete 200-byte confirmation buffer, shift-help and confirmation CFG, and all 26
+// external relocations agree. The remaining bytes are compiler lowering around the
+// widget switches and bFreshSave confirmation arm. Tried compound command tests and
+// alternate nesting; the retained source preserves retail body order and relocations.
+// Revisit only after shared dialog/message evidence changes or in the last-mile phase.
 VA(0x0046ad7e, 0x304)
-int CPanelHandler(struct tag_message &) { return 0; }
+int CPanelHandler(tag_message &message)
+{
+    int handled = 0;
+    if (message.type == MESSAGE_WIDGET) {
+        if (message.payload.widget.parameter & MESSAGE_MODIFIER_LEFT_SHIFT) {
+            if (message.payload.widget.command == WIDGET_COMMAND_SELECT ||
+                message.payload.widget.command ==
+                    WIDGET_COMMAND_ALTERNATE_SELECT) {
+                int helpIndex = ADVMGR_PANEL_NO_HELP;
+                switch (message.payload.widget.id) {
+                case ADVMGR_CONTROL_RESTART:
+                    helpIndex = ADVMGR_CONTROL_RESTART_HELP;
+                    break;
+                case ADVMGR_CONTROL_NEW_GAME:
+                    helpIndex = ADVMGR_CONTROL_NEW_GAME_HELP;
+                    break;
+                case ADVMGR_CONTROL_MAIN_MENU:
+                    helpIndex = ADVMGR_CONTROL_MAIN_MENU_HELP;
+                    break;
+                case ADVMGR_CONTROL_SAVE_GAME:
+                    helpIndex = ADVMGR_CONTROL_SAVE_GAME_HELP;
+                    break;
+                case ADVMGR_PANEL_CLOSE_WIDGET:
+                    helpIndex = ADVMGR_CONTROL_CLOSE_HELP;
+                    break;
+                }
+                if (helpIndex >= 0)
+                    NormalDialog(gCPanelHelp[helpIndex], 4, -1, -1, -1,
+                                 0, -1, 0, -1, 0);
+            }
+        } else {
+            switch (message.payload.widget.command) {
+            case WIDGET_COMMAND_DESELECT: {
+                char confirmation[ADVMGR_CONTROL_CONFIRMATION_SIZE];
+                switch (message.payload.widget.id) {
+                case ADVMGR_CONTROL_RESTART:
+                    strcpy(confirmation,
+                           "Are you sure you want to restart?  (Your current game will be lost)");
+                    break;
+                case ADVMGR_CONTROL_NEW_GAME:
+                    strcpy(confirmation,
+                           "Are you sure you want to load a new game?  (Your current game will be lost)");
+                    break;
+                case ADVMGR_CONTROL_MAIN_MENU:
+                    strcpy(confirmation, "Are you sure you want to quit?");
+                    break;
+                case ADVMGR_CONTROL_SAVE_GAME:
+                case ADVMGR_PANEL_CLOSE_WIDGET:
+                    handled = 1;
+                    break;
+                default:
+                    break;
+                }
+                if (message.payload.widget.id == ADVMGR_CONTROL_RESTART ||
+                    message.payload.widget.id == ADVMGR_CONTROL_NEW_GAME ||
+                    message.payload.widget.id == ADVMGR_CONTROL_MAIN_MENU) {
+                    handled = 1;
+                    if (!bFreshSave) {
+                        NormalDialog(confirmation, 2, -1, -1, -1,
+                                     0, -1, 0, -1, 0);
+                        if (gpWindowManager->m_dialogResult == ADVMGR_DIALOG_OK)
+                            handled = 0;
+                    }
+                }
+                break;
+            }
+            }
+        }
+    }
 
+    if (handled) {
+        gpWindowManager->m_dialogResult = message.payload.widget.id;
+        message.payload.widget.id = WIDGET_COMMAND_DIALOG_SELECT;
+        message.payload.widget.command = message.payload.widget.id;
+        return ADVMGR_DIMENSION_DOOR_HANDLED;
+    }
+    return ADVMGR_DIMENSION_DOOR_UNHANDLED;
+}
+
+// @early-stop
+// Exact size and instruction stream; all 34 external relocations agree. The remaining
+// objdiff residuals are gConfig field-overlay and pooled-string symbol identities.
 VA(0x0046b082, 0x197)
-void advManager::SystemOptions(void) {}
+void advManager::SystemOptions(void)
+{
+    TrimLoopingSounds(ADVMGR_LOOPING_SOUND_LIMIT);
+    gpMouseManager->SetPointer("advmice.mse", ADVMGR_POINTER_DEFAULT,
+                               ADVMGR_DEFAULT_POINTER_FRAME);
+    int oldInterfaceMode = gConfig.evilInterfaceUsage;
+    int oldWalkSpeed = gConfig.walkSpeed;
+    int heroWasMobilized = m_heroContextLocked;
+    bPrefsChanged = 0;
+    DemobilizeCurrHero();
 
+    cPanel = new heroWindow(
+        ADVMGR_SYSTEM_OPTIONS_WINDOW_X, ADVMGR_SYSTEM_OPTIONS_WINDOW_Y,
+        "spanel.bin");
+    if (cPanel == 0)
+        MemError();
+    SetWinText(cPanel, ADVMGR_SYSTEM_OPTIONS_TITLE);
+    UpdateSystemOptions(1);
+    gpWindowManager->DoDialog(cPanel, SystemOptionsHandler, 0);
+    delete cPanel;
+
+    if (gConfig.walkSpeed != oldWalkSpeed) {
+        int sampleIndex;
+        for (sampleIndex = 0; sampleIndex < ADVMGR_CURSOR_SAMPLE_COUNT;
+             ++sampleIndex)
+            gpResourceManager->Dispose(m_cursorSamples[sampleIndex]);
+        GetCursorSampleSet(gConfig.walkSpeed);
+    }
+    if (bPrefsChanged)
+        WritePrefs();
+    if (gConfig.evilInterfaceUsage != oldInterfaceMode)
+        CheckSetEvilInterface(1, -1);
+    if (heroWasMobilized)
+        MobilizeCurrHero(0);
+}
+
+// @match-note
+// Complete 0x24 frame, all 18 frame/text broadcasts, draw CFG, and all 68 external
+// relocations agree. Residual lowering is around music-source, blackout-computer, and
+// slow-video expressions plus gConfig/string overlay identities. Tried direct ternary
+// and explicit branch forms; retained forms follow retail broadcast order.
+// Revisit only after shared config layout evidence changes or in the last-mile phase.
 VA(0x0046b219, 0x35f)
-void UpdateSystemOptions(int) {}
+void UpdateSystemOptions(int initialDraw)
+{
+    tag_message message;
+    int musicQuality;
+    message.type = MESSAGE_WIDGET;
+    message.payload.widget.command = ADVMGR_SYSTEM_OPTIONS_SET_FRAME;
+
+    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME;
+    message.payload.widget.data.value = gConfig.musicVolume != 0;
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_SOUND_VOLUME;
+    if (gConfig.soundVolume == 0)
+        message.payload.widget.data.value = ADVMGR_SYSTEM_OPTIONS_SOUND_FRAME_BASE;
+    else
+        message.payload.widget.data.value =
+            ADVMGR_SYSTEM_OPTIONS_SOUND_FRAME_BASE + 1;
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_HERO_SPEED;
+    message.payload.widget.data.value =
+        gConfig.walkSpeed + ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE;
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE;
+    if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI)
+        musicQuality = 0;
+    else if (gConfig.useOpera == CONFIG_OPERA_DISABLED)
+        musicQuality = 1;
+    else
+        musicQuality = 2;
+    message.payload.widget.data.value =
+        musicQuality + ADVMGR_SYSTEM_OPTIONS_MUSIC_SOURCE_FRAME_BASE;
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_SHOW_ROUTE;
+    message.payload.widget.data.value =
+        (gConfig.showRoute == 0) + ADVMGR_SYSTEM_OPTIONS_ROUTE_FRAME_BASE;
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_COMPUTER_SPEED;
+    if (gConfig.blackoutComputer == 0)
+        message.payload.widget.data.value =
+            gConfig.computerWalkSpeed + ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE;
+    else
+        message.payload.widget.data.value =
+            ADVMGR_SYSTEM_OPTIONS_COMPUTER_HIDDEN_FRAME;
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_INTERFACE;
+    message.payload.widget.data.value =
+        gConfig.evilInterfaceUsage + ADVMGR_SYSTEM_OPTIONS_INTERFACE_FRAME_BASE;
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_VIDEO;
+    message.payload.widget.data.value =
+        ADVMGR_SYSTEM_OPTIONS_VIDEO_FRAME_BASE + (gConfig.slowVideo != 0);
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_COLOR_CURSOR;
+    message.payload.widget.data.value =
+        gConfig.gfx[0].colorMouseCursor + ADVMGR_SYSTEM_OPTIONS_CURSOR_FRAME_BASE;
+    cPanel->BroadcastMessage(message);
+
+    message.payload.widget.command = ADVMGR_SYSTEM_OPTIONS_SET_TEXT;
+    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME +
+                                ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    message.payload.widget.data.text = onOffText[gConfig.musicVolume];
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_SOUND_VOLUME +
+                                ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    message.payload.widget.data.text = onOffText[gConfig.soundVolume];
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_HERO_SPEED +
+                                ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    message.payload.widget.data.text = walkSpeedText[gConfig.walkSpeed];
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE +
+                                ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    message.payload.widget.data.text = musicQualityText[musicQuality];
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_SHOW_ROUTE +
+                                ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    message.payload.widget.data.text = onOffText[gConfig.showRoute];
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_COMPUTER_SPEED +
+                                ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    if (gConfig.blackoutComputer == 0)
+        message.payload.widget.data.text =
+            walkSpeedText[gConfig.computerWalkSpeed];
+    else
+        message.payload.widget.data.text = "Don't Show";
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_INTERFACE +
+                                ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    message.payload.widget.data.text =
+        gInterfaceTypeText[gConfig.evilInterfaceUsage];
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_VIDEO +
+                                ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    message.payload.widget.data.text =
+        cSlowVideoLevelText[gConfig.slowVideo != 0];
+    cPanel->BroadcastMessage(message);
+    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_COLOR_CURSOR +
+                                ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    message.payload.widget.data.text =
+        cBWMouseText[gConfig.gfx[0].colorMouseCursor];
+    cPanel->BroadcastMessage(message);
+
+    if (initialDraw == 0)
+        cPanel->DrawWindow(1, 0, ADVMGR_SYSTEM_OPTIONS_DRAW_MASK);
+}
 
 // @early-stop
 // Exact size, all non-relocation bytes, and all 94 relocation sites match. Residuals are
@@ -7300,8 +8122,30 @@ showVision:
     return 1;
 }
 
+// @match-note
+// Complete hero loop, artifact/radius semantics, frame slots, and all 6 external
+// relocations agree. The first byte-level divergence is one extra retail continuation
+// jump after the loop guard; the remaining instruction stream aligns. Tried repeated
+// inline hero expressions and retained named locals, which is the closest source shape.
+// Revisit after inline GetHero evidence changes or in the last-mile phase.
 VA(0x0046c241, 0xd7)
-int advManager::IsCrystalBallInEffect(int, int, int) { return 0; }
+int advManager::IsCrystalBallInEffect(int x, int y, int radius)
+{
+    int heroIndex;
+    hero *crystalHero;
+    int distance;
+    for (heroIndex = 0; heroIndex < gpCurPlayer->m_heroCount; ++heroIndex) {
+        crystalHero = gpGame->GetHero(gpCurPlayer->m_heroIds[heroIndex]);
+        if (crystalHero->HasArtifact(ADVMGR_CRYSTAL_BALL_ARTIFACT)) {
+            distance = static_cast<int>(sqrt(static_cast<double>(
+                (crystalHero->m_y - y) * (crystalHero->m_y - y) +
+                (crystalHero->m_x - x) * (crystalHero->m_x - x))));
+            if (distance <= radius)
+                return 1;
+        }
+    }
+    return 0;
+}
 
 VA(0x0046c318, 0x85)
 unsigned char StopOnTrigger(class mapCell *cell)

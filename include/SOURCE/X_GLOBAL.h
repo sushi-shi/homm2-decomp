@@ -93,7 +93,7 @@ extern int xShrineBuildingCost[];
 
 // ---- globals (declarations, RVA order) ----
 extern unsigned char giGroundShape[432];
-extern unsigned char *gColorTableTan;
+extern unsigned char gColorTableTan[256];
 extern unsigned char gColorTableGray[256];
 extern unsigned char gColorTableRed[256];
 extern unsigned char gColorTableDarkBrown[256];

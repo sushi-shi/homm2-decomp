@@ -887,7 +887,7 @@ extern int gbDrawSavedCursor;
 extern int gbForegroundApp;
 extern int gbFunctionComplete;
 extern int gbGameInitialized;
-extern signed char gbGamePosToNetPos[];
+extern signed char gbGamePosToNetPos[OLD_MAIN_MATCH_BUFFER_SIZE];
 extern int gbHeroMoving;
 extern int gbHumanPlayer[];
 extern int gbLoadingMonoIcon;
