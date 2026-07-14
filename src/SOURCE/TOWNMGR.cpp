@@ -5,17 +5,20 @@
 
 #include <va.h>
 #include <_carcass_types.h>
+#include <_globals_model.h>
 #include <_types.h>
 #include <BASE/Misc.h>
 #include <BASE/border.h>
 #include <BASE/executive.h>
 #include <BASE/font.h>
 #include <BASE/inputManager.h>
+#include <BASE/mouseManager.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/icon.h>
 #include <BASE/iconWidget.h>
 #include <BASE/resourceManager.h>
+#include <BASE/soundManager.h>
 #include <BASE/textWidget.h>
 #include <EDITOR/mapcell.h>
 #include <SOURCE/ADVMGR.h>
@@ -45,29 +48,855 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+DATA(0x004eb080) static const signed char
+    gTownObjectOrder[TOWN_TYPE_COUNT][TOWN_BUILDING_COUNT] = {
+        {
+            TOWN_OBJECT_SECOND_WELL,
+            TOWN_OBJECT_CASTLE_UPGRADE,
+            TOWN_OBJECT_CASTLE,
+            TOWN_OBJECT_SPECIAL_BUILDING,
+            TOWN_OBJECT_LEFT_TURRET,
+            TOWN_OBJECT_RIGHT_TURRET,
+            TOWN_OBJECT_CAPTAIN_QUARTERS,
+            TOWN_OBJECT_MOAT,
+            TOWN_OBJECT_MARKETPLACE,
+            TOWN_OBJECT_THIEVES_GUILD,
+            TOWN_OBJECT_DWELLING_2,
+            TOWN_OBJECT_UPGRADED_DWELLING_2,
+            TOWN_OBJECT_DWELLING_5,
+            TOWN_OBJECT_UPGRADED_DWELLING_5,
+            TOWN_OBJECT_TAVERN,
+            TOWN_OBJECT_MAGE_GUILD,
+            TOWN_OBJECT_DWELLING_6,
+            TOWN_OBJECT_UPGRADED_DWELLING_6,
+            TOWN_OBJECT_KNIGHT_LEFT_OVERLAY,
+            TOWN_OBJECT_KNIGHT_RIGHT_OVERLAY,
+            TOWN_OBJECT_RACE_OVERLAY,
+            TOWN_OBJECT_DOCK,
+            TOWN_OBJECT_BOAT,
+            TOWN_OBJECT_DWELLING_1,
+            TOWN_OBJECT_DWELLING_3,
+            TOWN_OBJECT_UPGRADED_DWELLING_3,
+            TOWN_OBJECT_DWELLING_4,
+            TOWN_OBJECT_UPGRADED_DWELLING_4,
+            TOWN_OBJECT_STATUE,
+            TOWN_OBJECT_WELL,
+            TOWN_OBJECT_NONE,
+            TOWN_OBJECT_NONE
+        },
+        {
+            TOWN_OBJECT_RACE_OVERLAY,
+            TOWN_OBJECT_KNIGHT_LEFT_OVERLAY,
+            TOWN_OBJECT_SPECIAL_BUILDING,
+            TOWN_OBJECT_SECOND_WELL,
+            TOWN_OBJECT_DWELLING_6,
+            TOWN_OBJECT_THIEVES_GUILD,
+            TOWN_OBJECT_CAPTAIN_QUARTERS,
+            TOWN_OBJECT_DWELLING_5,
+            TOWN_OBJECT_UPGRADED_DWELLING_5,
+            TOWN_OBJECT_CASTLE_UPGRADE,
+            TOWN_OBJECT_CASTLE,
+            TOWN_OBJECT_MOAT,
+            TOWN_OBJECT_MARKETPLACE,
+            TOWN_OBJECT_DWELLING_2,
+            TOWN_OBJECT_UPGRADED_DWELLING_2,
+            TOWN_OBJECT_DWELLING_3,
+            TOWN_OBJECT_BARBARIAN_OVERLAY,
+            TOWN_OBJECT_DWELLING_1,
+            TOWN_OBJECT_DWELLING_4,
+            TOWN_OBJECT_UPGRADED_DWELLING_4,
+            TOWN_OBJECT_MAGE_GUILD,
+            TOWN_OBJECT_KNIGHT_RIGHT_OVERLAY,
+            TOWN_OBJECT_TAVERN,
+            TOWN_OBJECT_DOCK,
+            TOWN_OBJECT_BOAT,
+            TOWN_OBJECT_WELL,
+            TOWN_OBJECT_LEFT_TURRET,
+            TOWN_OBJECT_RIGHT_TURRET,
+            TOWN_OBJECT_STATUE,
+            TOWN_OBJECT_NONE,
+            TOWN_OBJECT_NONE,
+            TOWN_OBJECT_NONE
+        },
+        {
+            TOWN_OBJECT_SPECIAL_BUILDING,
+            TOWN_OBJECT_DWELLING_6,
+            TOWN_OBJECT_DWELLING_5,
+            TOWN_OBJECT_CASTLE_UPGRADE,
+            TOWN_OBJECT_CASTLE,
+            TOWN_OBJECT_LEFT_TURRET,
+            TOWN_OBJECT_RIGHT_TURRET,
+            TOWN_OBJECT_MOAT,
+            TOWN_OBJECT_CAPTAIN_QUARTERS,
+            TOWN_OBJECT_DWELLING_3,
+            TOWN_OBJECT_UPGRADED_DWELLING_3,
+            TOWN_OBJECT_DWELLING_1,
+            TOWN_OBJECT_MAGE_GUILD,
+            TOWN_OBJECT_DOCK,
+            TOWN_OBJECT_BOAT,
+            TOWN_OBJECT_DWELLING_4,
+            TOWN_OBJECT_UPGRADED_DWELLING_4,
+            TOWN_OBJECT_WELL,
+            TOWN_OBJECT_MARKETPLACE,
+            TOWN_OBJECT_DWELLING_2,
+            TOWN_OBJECT_UPGRADED_DWELLING_2,
+            TOWN_OBJECT_THIEVES_GUILD,
+            TOWN_OBJECT_TAVERN,
+            TOWN_OBJECT_KNIGHT_LEFT_OVERLAY,
+            TOWN_OBJECT_SECOND_WELL,
+            TOWN_OBJECT_STATUE,
+            TOWN_OBJECT_RACE_OVERLAY,
+            TOWN_OBJECT_NONE,
+            TOWN_OBJECT_NONE,
+            TOWN_OBJECT_NONE,
+            TOWN_OBJECT_NONE,
+            TOWN_OBJECT_NONE
+        },
+        {
+            TOWN_OBJECT_DWELLING_5,
+            TOWN_OBJECT_DWELLING_3,
+            TOWN_OBJECT_CASTLE_UPGRADE,
+            TOWN_OBJECT_CASTLE,
+            TOWN_OBJECT_LEFT_TURRET,
+            TOWN_OBJECT_RIGHT_TURRET,
+            TOWN_OBJECT_CAPTAIN_QUARTERS,
+            TOWN_OBJECT_RACE_OVERLAY,
+            TOWN_OBJECT_MOAT,
+            TOWN_OBJECT_TAVERN,
+            TOWN_OBJECT_THIEVES_GUILD,
+            TOWN_OBJECT_MAGE_GUILD,
+            TOWN_OBJECT_MARKETPLACE,
+            TOWN_OBJECT_STATUE,
+            TOWN_OBJECT_DOCK,
+            TOWN_OBJECT_BOAT,
+            TOWN_OBJECT_SECOND_WELL,
+            TOWN_OBJECT_DWELLING_1,
+            TOWN_OBJECT_SPECIAL_BUILDING,
+            TOWN_OBJECT_DWELLING_4,
+            TOWN_OBJECT_UPGRADED_DWELLING_4,
+            TOWN_OBJECT_DWELLING_2,
+            TOWN_OBJECT_UPGRADED_DWELLING_6,
+            TOWN_OBJECT_ALTERNATE_UPGRADED_DWELLING_6,
+            TOWN_OBJECT_DWELLING_6,
+            TOWN_OBJECT_WELL,
+            TOWN_OBJECT_NONE,
+            TOWN_OBJECT_NONE,
+            TOWN_OBJECT_NONE,
+            TOWN_OBJECT_NONE,
+            TOWN_OBJECT_NONE,
+            TOWN_OBJECT_NONE
+        },
+        {
+            TOWN_OBJECT_UPGRADED_DWELLING_6,
+            TOWN_OBJECT_DWELLING_6,
+            TOWN_OBJECT_THIEVES_GUILD,
+            TOWN_OBJECT_CAPTAIN_QUARTERS,
+            TOWN_OBJECT_RACE_OVERLAY,
+            TOWN_OBJECT_DWELLING_5,
+            TOWN_OBJECT_UPGRADED_DWELLING_5,
+            TOWN_OBJECT_CASTLE_UPGRADE,
+            TOWN_OBJECT_CASTLE,
+            TOWN_OBJECT_MOAT,
+            TOWN_OBJECT_DWELLING_3,
+            TOWN_OBJECT_UPGRADED_DWELLING_3,
+            TOWN_OBJECT_DWELLING_1,
+            TOWN_OBJECT_DWELLING_4,
+            TOWN_OBJECT_MAGE_GUILD,
+            TOWN_OBJECT_TAVERN,
+            TOWN_OBJECT_DOCK,
+            TOWN_OBJECT_BOAT,
+            TOWN_OBJECT_WELL,
+            TOWN_OBJECT_DWELLING_2,
+            TOWN_OBJECT_SPECIAL_BUILDING,
+            TOWN_OBJECT_MARKETPLACE,
+            TOWN_OBJECT_LEFT_TURRET,
+            TOWN_OBJECT_RIGHT_TURRET,
+            TOWN_OBJECT_STATUE,
+            TOWN_OBJECT_SECOND_WELL,
+            TOWN_OBJECT_NONE,
+            TOWN_OBJECT_NONE,
+            TOWN_OBJECT_NONE,
+            TOWN_OBJECT_NONE,
+            TOWN_OBJECT_NONE,
+            TOWN_OBJECT_NONE
+        },
+        {
+            TOWN_OBJECT_SPECIAL_BUILDING,
+            TOWN_OBJECT_TAVERN,
+            TOWN_OBJECT_CASTLE,
+            TOWN_OBJECT_LEFT_TURRET,
+            TOWN_OBJECT_RIGHT_TURRET,
+            TOWN_OBJECT_MOAT,
+            TOWN_OBJECT_CAPTAIN_QUARTERS,
+            TOWN_OBJECT_THIEVES_GUILD,
+            TOWN_OBJECT_DWELLING_6,
+            TOWN_OBJECT_DWELLING_1,
+            TOWN_OBJECT_DWELLING_3,
+            TOWN_OBJECT_UPGRADED_DWELLING_3,
+            TOWN_OBJECT_MAGE_GUILD,
+            TOWN_OBJECT_RACE_OVERLAY,
+            TOWN_OBJECT_DOCK,
+            TOWN_OBJECT_BOAT,
+            TOWN_OBJECT_DWELLING_5,
+            TOWN_OBJECT_UPGRADED_DWELLING_5,
+            TOWN_OBJECT_DWELLING_2,
+            TOWN_OBJECT_UPGRADED_DWELLING_2,
+            TOWN_OBJECT_DWELLING_4,
+            TOWN_OBJECT_UPGRADED_DWELLING_4,
+            TOWN_OBJECT_SECOND_WELL,
+            TOWN_OBJECT_CASTLE_UPGRADE,
+            TOWN_OBJECT_WELL,
+            TOWN_OBJECT_MARKETPLACE,
+            TOWN_OBJECT_STATUE,
+            TOWN_OBJECT_NONE,
+            TOWN_OBJECT_NONE,
+            TOWN_OBJECT_NONE,
+            TOWN_OBJECT_NONE,
+            TOWN_OBJECT_NONE
+        }
+    };
+
+DATA(0x004ee750) SBuildingInfo
+    sBuildingInfo[TOWN_TYPE_COUNT][TOWN_BUILDING_COUNT] = {
+        { // Knight
+            { 0, 397, 46, 84, 138 },
+            { 5, 0, 130, 53, 63 },
+            { 5, 345, 114, 83, 62 },
+            { 5, 531, 214, 113, 42 },
+            { 0, 188, 214, 39, 42 },
+            { 0, 69, 108, 67, 55 },
+            { 5, 0, 49, 286, 116 },
+            { 0, 478, 193, 46, 63 },
+            { 5, 7, 33, 0, 0 },
+            { 5, 134, 37, 0, 0 },
+            { 0, 219, 138, 120, 30 },
+            { 0, 286, 102, 88, 22 },
+            { 0, 0, 146, 311, 30 },
+            { 0, 0, 78, 251, 22 },
+            { 9, 531, 211, 113, 45 },
+            { 0, 293, 107, 59, 35 },
+            { 5, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0 },
+            { 5, 192, 163, 69, 52 },
+            { 0, 135, 149, 73, 32 },
+            { 5, 240, 166, 91, 66 },
+            { 0, 323, 174, 102, 69 },
+            { 7, 48, 176, 104, 80 },
+            { 0, 445, 50, 195, 157 },
+            { 0, 135, 149, 73, 32 },
+            { 5, 240, 166, 91, 66 },
+            { 0, 323, 174, 102, 69 },
+            { 7, 48, 176, 104, 80 },
+            { 0, 445, 50, 195, 157 },
+            { 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0 }
+        },
+        { // Barbarian
+            { 8, 346, 22, 54, 120 },
+            { 0, 466, 94, 87, 47 },
+            { 0, 0, 161, 136, 85 },
+            { 5, 505, 199, 138, 56 },
+            { 0, 268, 189, 50, 66 },
+            { 0, 44, 109, 87, 52 },
+            { 6, 0, 0, 214, 175 },
+            { 0, 463, 154, 38, 81 },
+            { 0, 10, 58, 0, 0 },
+            { 0, 118, 45, 0, 0 },
+            { 0, 217, 166, 67, 43 },
+            { 0, 240, 106, 73, 34 },
+            { 5, 115, 138, 182, 42 },
+            { 0, 210, 80, 197, 61 },
+            { 9, 505, 199, 138, 56 },
+            { 5, 206, 99, 46, 42 },
+            { 5, 0, 0, 0, 0 },
+            { 5, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0 },
+            { 0, 290, 138, 58, 45 },
+            { 0, 145, 195, 76, 52 },
+            { 0, 557, 48, 83, 83 },
+            { 5, 496, 136, 138, 64 },
+            { 5, 318, 174, 131, 54 },
+            { 5, 407, 0, 113, 106 },
+            { 0, 145, 195, 76, 52 },
+            { 0, 0, 0, 0, 0 },
+            { 5, 496, 136, 138, 64 },
+            { 5, 318, 174, 131, 54 },
+            { 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0 }
+        },
+        { // Sorceress
+            { 0, 279, 0, 63, 168 },
+            { 5, 423, 167, 87, 50 },
+            { 5, 490, 141, 148, 91 },
+            { 5, 0, 208, 178, 48 },
+            { 0, 335, 205, 45, 29 },
+            { 0, 104, 130, 59, 42 },
+            { 5, 0, 0, 201, 179 },
+            { 0, 152, 163, 28, 65 },
+            { 0, 98, 99, 0, 0 },
+            { 0, 151, 98, 0, 0 },
+            { 0, 404, 122, 69, 45 },
+            { 5, 131, 185, 71, 53 },
+            { 0, 0, 171, 272, 23 },
+            { 0, 152, 0, 236, 84 },
+            { 9, 0, 208, 178, 48 },
+            { 5, 223, 122, 37, 52 },
+            { 5, 0, 0, 0, 0 },
+            { 5, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0 },
+            { 5, 472, 59, 111, 92 },
+            { 5, 338, 146, 93, 61 },
+            { 0, 51, 164, 106, 40 },
+            { 0, 198, 178, 143, 71 },
+            { 0, 263, 226, 296, 30 },
+            { 0, 179, 0, 84, 119 },
+            { 5, 338, 146, 93, 61 },
+            { 0, 51, 164, 106, 40 },
+            { 0, 198, 178, 143, 71 },
+            { 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0 }
+        },
+        { // Warlock
+            { 0, 586, 18, 54, 150 },
+            { 0, 520, 103, 64, 54 },
+            { 0, 476, 96, 82, 55 },
+            { 5, 517, 200, 123, 56 },
+            { 0, 342, 205, 67, 51 },
+            { 0, 298, 135, 72, 31 },
+            { 5, 241, 18, 181, 150 },
+            { 0, 478, 161, 37, 63 },
+            { 0, 311, 84, 0, 0 },
+            { 0, 359, 83, 0, 0 },
+            { 0, 386, 171, 71, 40 },
+            { 6, 60, 32, 63, 186 },
+            { 5, 211, 166, 301, 21 },
+            { 0, 0, 160, 59, 96 },
+            { 9, 517, 200, 123, 56 },
+            { 5, 418, 83, 53, 84 },
+            { 5, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0 },
+            { 6, 0, 64, 48, 50 },
+            { 0, 237, 168, 78, 87 },
+            { 0, 492, 50, 53, 39 },
+            { 0, 139, 163, 190, 83 },
+            { 0, 82, 92, 178, 68 },
+            { 0, 92, 0, 64, 257 },
+            { 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0 },
+            { 0, 139, 163, 190, 83 },
+            { 0, 0, 0, 0, 0 },
+            { 0, 92, 0, 64, 257 },
+            { 0, 92, 0, 64, 257 },
+            { 0, 0, 0, 0, 0 }
+        },
+        { // Wizard
+            { 0, 570, 0, 70, 126 },
+            { 5, 505, 50, 51, 49 },
+            { 6, 0, 149, 118, 76 },
+            { 5, 0, 206, 206, 50 },
+            { 0, 249, 139, 28, 33 },
+            { 0, 58, 60, 49, 42 },
+            { 5, 0, 0, 200, 99 },
+            { 0, 464, 45, 24, 72 },
+            { 0, 30, 17, 0, 0 },
+            { 0, 128, 17, 0, 0 },
+            { 0, 255, 163, 108, 53 },
+            { 0, 237, 208, 137, 49 },
+            { 0, 0, 90, 223, 14 },
+            { 0, 297, 95, 109, 78 },
+            { 9, 0, 206, 206, 50 },
+            { 0, 210, 52, 28, 35 },
+            { 5, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0 },
+            { 5, 467, 181, 38, 30 },
+            { 0, 231, 68, 192, 36 },
+            { 5, 152, 130, 96, 60 },
+            { 0, 593, 184, 51, 31 },
+            { 0, 411, 0, 49, 167 },
+            { 0, 160, 0, 178, 67 },
+            { 0, 0, 0, 0, 0 },
+            { 5, 152, 130, 96, 60 },
+            { 0, 0, 0, 0, 0 },
+            { 0, 411, 0, 49, 167 },
+            { 0, 160, 0, 178, 67 },
+            { 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0 }
+        },
+        { // Necromancer
+            { 5, 557, 17, 85, 191 },
+            { 0, 275, 124, 62, 77 },
+            { 0, 455, 39, 51, 103 },
+            { 5, 500, 220, 141, 36 },
+            { 0, 215, 213, 29, 41 },
+            { 0, 333, 115, 47, 70 },
+            { 5, 289, 10, 134, 164 },
+            { 0, 365, 154, 41, 93 },
+            { 0, 330, 47, 0, 0 },
+            { 0, 360, 46, 0, 0 },
+            { 0, 412, 193, 98, 61 },
+            { 6, 263, 181, 90, 65 },
+            { 0, 258, 171, 193, 19 },
+            { 0, 0, 0, 640, 63 },
+            { 9, 500, 220, 141, 36 },
+            { 0, 441, 77, 22, 99 },
+            { 5, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0 },
+            { 0, 396, 177, 71, 35 },
+            { 0, 110, 174, 141, 45 },
+            { 5, 0, 28, 241, 142 },
+            { 0, 20, 107, 124, 129 },
+            { 0, 221, 127, 66, 84 },
+            { 6, 464, 72, 105, 124 },
+            { 0, 110, 174, 141, 45 },
+            { 5, 0, 28, 241, 142 },
+            { 0, 0, 107, 144, 129 },
+            { 0, 223, 45, 65, 166 },
+            { 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0 }
+        }
+    };
+
+// @match-note 90.65%: construction semantics, exact 0x30 frame, and all 12/12
+// relocations agree. fileName/w/h/x/buildingId_h/tempY/y occupy retail
+// -0x10/-0x14/-0x18/-0x1c/-0x20/-0x24/-0x28, followed by the compiler new
+// temporary and this at -0x2c/-0x30. The first relocation-masked raw byte
+// differs at +0x36: retail 08 versus ours 0c, the displacement operand of the
+// mov eax,[ebp+...] at +0x34. Retail forms
+// each SBuildingInfo address with townType*0x120 in eax and buildingId*9 in
+// ecx; this compiler state selects the commutative reverse register order for
+// all five field reads. Direct indexing, inverted subscript, and explicit
+// typed pointer-add spellings select the same order. Revisit at SOURCE 95%.
 VA(0x00413900, 0x16a)
-townObject::townObject(int, int, char *) {}
+townObject::townObject(int townType, int buildingId, char *iconBaseName)
+{
+    char fileName[TOWN_OBJECT_FILENAME_SIZE];
+    int x;
+    int y;
+    int tempY;
+    int w;
+    int h;
+    int buildingId_h;
+
+    m_animationFrame = 0;
+    m_icon = 0;
+    m_border = 0;
+    m_visible = 1;
+    m_animationFrameCount =
+        sBuildingInfo[townType][buildingId].animationFrameCount;
+    x = sBuildingInfo[townType][buildingId].x;
+    y = sBuildingInfo[townType][buildingId].y;
+    w = sBuildingInfo[townType][buildingId].width;
+    h = sBuildingInfo[townType][buildingId].height;
+    buildingId_h = buildingId;
+    m_buildingId = buildingId_h;
+    sprintf(fileName, "%s.icn", iconBaseName);
+    m_icon = gpResourceManager->GetIcon(fileName);
+    if (buildingId_h != TOWN_OBJECT_NONE) {
+        m_border = new border(x, y, w, h, static_cast<short>(buildingId_h),
+                              TOWN_OBJECT_BORDER_Z_ORDER, 0, 0);
+        if (m_border == 0)
+            MemError();
+    }
+}
 
 VA(0x00413a6a, 0x60)
-townObject::~townObject() {}
+townObject::~townObject()
+{
+    if (m_border != 0)
+        delete m_border;
+    gpResourceManager->Dispose(m_icon);
+}
 
+// @match-note 98.93%: complete render gates and animation behavior, the exact
+// 0x08 frame (baseFrame at -0x04, this at -0x08), and all 37/37 relocations
+// agree. The first relocation-masked raw byte differs at +0x1a: retail 12
+// versus ours 15, the rel32 operand of the early jmp at +0x16. The first
+// opcode divergence is at +0x2b2: retail 84 versus ours 85, the second opcode
+// byte of the je/jne at +0x2b1 in the race-overlay gate. A nested negative
+// gate combined with the indicated 2*(3*state-3) spelling lowered the result
+// to 98.13%. The later
+// residual is the equivalent Necromancer frame arithmetic instruction shape.
+// Revisit condition polarity and arithmetic separately at SOURCE 95%.
 VA(0x00413aca, 0x437)
-void townObject::Draw(int) {}
+void townObject::Draw(int advanceAnimation)
+{
+    int baseFrame;
+
+    if (m_visible == 0)
+        return;
+    if (m_buildingId == TOWN_OBJECT_CASTLE_UPGRADE)
+        return;
+    if (m_buildingId == TOWN_OBJECT_KNIGHT_LEFT_OVERLAY &&
+        gpTownManager->m_town->m_type == TOWN_TYPE_KNIGHT &&
+        (!(gpTownManager->m_town->m_buildings & TOWN_RENDER_KNIGHT_LEFT_GATE) ||
+         (!(gpTownManager->m_town->m_buildings &
+            TOWN_RENDER_KNIGHT_LEFT_FIRST_OPTION) &&
+          !(gpTownManager->m_town->m_buildings &
+            TOWN_RENDER_KNIGHT_LEFT_SECOND_OPTION) &&
+          !(gpTownManager->m_town->m_buildings &
+            TOWN_RENDER_KNIGHT_LEFT_THIRD_OPTION))))
+        return;
+    if (m_buildingId == TOWN_OBJECT_KNIGHT_RIGHT_OVERLAY &&
+        gpTownManager->m_town->m_type == TOWN_TYPE_KNIGHT &&
+        (!(gpTownManager->m_town->m_buildings & TOWN_RENDER_KNIGHT_RIGHT_GATE) ||
+         (!(gpTownManager->m_town->m_buildings &
+            TOWN_RENDER_KNIGHT_RIGHT_FIRST_OPTION) &&
+          !(gpTownManager->m_town->m_buildings &
+            TOWN_RENDER_KNIGHT_RIGHT_SECOND_OPTION))))
+        return;
+    if (m_buildingId == TOWN_OBJECT_KNIGHT_RIGHT_OVERLAY &&
+        gpTownManager->m_town->m_type == TOWN_TYPE_BARBARIAN &&
+        (!(gpTownManager->m_town->m_buildings &
+           TOWN_RENDER_BARBARIAN_RIGHT_GATE) ||
+         !(gpTownManager->m_town->m_buildings &
+           TOWN_RENDER_BARBARIAN_RIGHT_OPTION)))
+        return;
+    if (m_buildingId == TOWN_OBJECT_BARBARIAN_OVERLAY &&
+        gpTownManager->m_town->m_type == TOWN_TYPE_BARBARIAN &&
+        (!(gpTownManager->m_town->m_buildings &
+           TOWN_RENDER_BARBARIAN_OVERLAY_GATE) ||
+         !(gpTownManager->m_town->m_buildings &
+           TOWN_RENDER_BARBARIAN_OVERLAY_OPTION)))
+        return;
+    if (gpTownManager->m_town->m_type == TOWN_TYPE_SORCERESS &&
+        m_buildingId == TOWN_OBJECT_KNIGHT_LEFT_OVERLAY &&
+        (!(gpTownManager->m_town->m_buildings &
+           TOWN_RENDER_SORCERESS_LEFT_GATE) ||
+         !(gpTownManager->m_town->m_buildings &
+           TOWN_RENDER_SORCERESS_LEFT_OPTION)))
+        return;
+    if (gpTownManager->m_town->m_type == TOWN_TYPE_SORCERESS &&
+        (m_buildingId == TOWN_OBJECT_SORCERESS_LEFT_OVERLAY ||
+         m_buildingId == TOWN_OBJECT_SORCERESS_RIGHT_OVERLAY) &&
+        (gpTownManager->m_town->m_buildings &
+         TOWN_RENDER_SORCERESS_LEFT_GATE) &&
+        (gpTownManager->m_town->m_buildings &
+         TOWN_RENDER_SORCERESS_LEFT_OPTION))
+        return;
+    if (m_buildingId == TOWN_OBJECT_RACE_OVERLAY &&
+        (gpTownManager->m_town->m_type == TOWN_TYPE_NECROMANCER ||
+         gpTownManager->m_town->m_type == TOWN_TYPE_WARLOCK ||
+         gpTownManager->m_town->m_type == TOWN_TYPE_SORCERESS ||
+         gpTownManager->m_town->m_type == TOWN_TYPE_KNIGHT) &&
+        !(gpTownManager->m_town->m_buildings &
+          TOWN_RENDER_RACE_OVERLAY_FIRST_OPTION) &&
+        !(gpTownManager->m_town->m_buildings &
+          TOWN_RENDER_RACE_OVERLAY_SECOND_OPTION))
+        return;
+    if (m_buildingId == TOWN_OBJECT_DOCK &&
+        (gpTownManager->m_town->m_buildings &
+         TOWN_RENDER_SORCERESS_LEFT_OPTION))
+        return;
+
+    if (m_buildingId == TOWN_OBJECT_PRIMARY_ANIMATION) {
+        if (gpTownManager->m_town->m_type == TOWN_TYPE_NECROMANCER) {
+            baseFrame = gpTownManager->m_town->m_buildState * 3 - 3;
+            baseFrame *= 2;
+        } else {
+            baseFrame = gpTownManager->m_town->m_buildState - 1;
+        }
+        m_icon->DrawToBuffer(0, 0, baseFrame, 0);
+        if (m_animationFrameCount != 0) {
+            if (gpTownManager->m_town->m_type == TOWN_TYPE_BARBARIAN &&
+                gpTownManager->m_town->m_buildState <
+                    TOWN_BARBARIAN_ANIMATION_BUILD_STATE)
+                return;
+            m_icon->DrawToBuffer(0, 0,
+                                 m_animationFrame + baseFrame + 1, 0);
+            if (advanceAnimation == 1) {
+                ++m_animationFrame;
+                if (m_animationFrame == m_animationFrameCount)
+                    m_animationFrame = 0;
+            }
+        }
+    } else {
+        m_icon->DrawToBuffer(0, 0, 0, 0);
+        if (m_animationFrameCount != 0) {
+            m_icon->DrawToBuffer(0, 0, m_animationFrame + 1, 0);
+            if (advanceAnimation == 1) {
+                ++m_animationFrame;
+                if (m_animationFrame == m_animationFrameCount)
+                    m_animationFrame = 0;
+            }
+        }
+    }
+}
 
 VA(0x00413f01, 0x68)
-townManager::townManager(void) {}
+townManager::townManager(void)
+{
+    m_town = 0;
+    m_heroWindow0 = 0;
+    m_unknownC6 = 0;
+    m_selectedBuilding = TOWN_SELECTED_BUILDING_NONE;
+    m_castleDialogActive = 0;
+}
 
 VA(0x00413f69, 0x1a0)
-void townManager::SetupExtraStuff(void) {}
+void townManager::SetupExtraStuff(void)
+{
+    m_town->m_buildings &= TOWN_EXTRA_DYNAMIC_CLEAR_MASK;
+    if (m_town->m_type == TOWN_TYPE_WIZARD)
+        m_town->m_buildings |= TOWN_EXTRA_RACE_FIRST_MASK;
+    if (m_town->m_type == TOWN_TYPE_SORCERESS) {
+        m_town->m_buildings |= TOWN_EXTRA_RACE_FIRST_MASK;
+        m_town->m_buildings |= TOWN_EXTRA_RACE_SECOND_MASK;
+    }
+    if (m_town->m_type == TOWN_TYPE_KNIGHT) {
+        m_town->m_buildings |= TOWN_EXTRA_RACE_SECOND_MASK;
+        m_town->m_buildings |= TOWN_EXTRA_RACE_THIRD_MASK;
+    }
+    if (m_town->m_type == TOWN_TYPE_BARBARIAN) {
+        m_town->m_buildings |= TOWN_EXTRA_RACE_SECOND_MASK;
+        m_town->m_buildings |= TOWN_EXTRA_RACE_THIRD_MASK;
+        m_town->m_buildings |= TOWN_EXTRA_RACE_LAST_MASK;
+    }
+    if ((m_town->m_type == TOWN_TYPE_WARLOCK ||
+         m_town->m_type == TOWN_TYPE_KNIGHT ||
+         m_town->m_type == TOWN_TYPE_BARBARIAN ||
+         m_town->m_type == TOWN_TYPE_NECROMANCER) &&
+        m_town->CanBuildDock())
+        m_town->m_buildings |= TOWN_EXTRA_RACE_FIRST_MASK;
+    if ((m_town->m_buildings & TOWN_BUILDING_DOCK) &&
+        gpAdvManager->GetCell(m_town->m_boatX,
+                              m_town->m_boatY)->triggerType != 0)
+        m_town->m_buildings |= TOWN_EXTRA_DOCK_GRAPHIC_MASK;
+    else
+        m_town->m_buildings &= ~TOWN_EXTRA_DOCK_GRAPHIC_MASK;
+}
 
 VA(0x00414109, 0x1ef)
-int townManager::Open(int) { return 0; }
+int townManager::Open(int id)
+{
+    gpGame->CheckHeroConsistency();
+    if (gSoundTransition != 0 || gCdMusic == 0)
+        gpSoundManager->SwitchAmbientMusic(townTheme[m_town->m_type]);
+    PollSound();
+    m_townWindow = new heroWindow(0, 0, "townwind.bin");
+    if (m_townWindow == 0)
+        MemError();
+    glTimers[0] = KBTickCount() + TOWN_REDRAW_INTERVAL;
+    m_lastTownType = TOWN_LAST_TYPE_UNINITIALIZED;
+    m_castleDialogActive = 0;
+    m_recruitResult = 0;
+    m_lastHoverId = TOWN_HOVER_NONE;
+    m_lastHoverSubId = 0;
+    m_townObjectCount = 0;
+    m_unknownC6 = 0;
+    m_garrisonStrip = 0;
+    m_heroStrip = 0;
+    m_selectedStrip = 0;
+    m_swapStrip = 0;
+    m_pendingStrip = 0;
+    m_bankBox = 0;
+    m_backgroundIcon = 0;
+    SetupExtraStuff();
+    SetupTown();
+    KBChangeMenu(hmnuTown);
+    gpMouseManager->SetPointer("advmice.mse", 0, TOWN_MAP_CHANGE_UNUSED);
+    field_0xc = TOWN_MANAGER_EVENT_MASK;
+    field_0x10 = id;
+    m_active = 1;
+    strcpy(name, "townManager");
+    gpWindowManager->FadeScreen(0, TOWN_FADE_STEPS, 0);
+    return 0;
+}
 
 VA(0x004142f8, 0x77)
-void townManager::ChangeTown(void) {}
+void townManager::ChangeTown(void)
+{
+    tag_message message;
 
+    if (gSoundTransition != 0 || gCdMusic == 0)
+        gpSoundManager->SwitchAmbientMusic(townTheme[m_town->m_type]);
+    SetupExtraStuff();
+    SetupTown();
+    message.type = TOWN_MESSAGE_SELECT;
+    message.payload.widget.id = TOWN_WIDGET_ID_NONE;
+    SetCommandAndText(message);
+}
+
+// @match-note 99.60%: the complete window, object/widget ownership, same-race
+// refresh, garrison/hero strips, spell grant, selection reset, exact 0x58
+// frame/slots, and all 85/85 relocations agree. The 0x950-byte build is exactly
+// ten bytes shorter than retail's 0x95a-byte instruction stream: retail has
+// jump-to-next continuations at +0x58e after crestFrame and +0x692 before the
+// occupying-hero GetHero expansion. All non-jump opcodes/operands match after
+// masking aligned relocations; string-pool and the DATA-backed object-order
+// label identities are the only relocation-name differences. A Color() inline
+// accessor lowered the score to 99.43%, so the continuation context is not that
+// accessor alone. Revisit the two source block boundaries at SOURCE 95%.
 VA(0x0041436f, 0x95a)
-void townManager::SetupTown(void) {}
+void townManager::SetupTown(void)
+{
+    tag_message message;
+    int objectOrder;
+    int objectId;
+    int crestFrame;
+
+    sprintf(gText, GetTownName(m_town->m_id));
+    message.type = TOWN_MESSAGE_SELECT;
+    message.payload.widget.command = TOWN_WIDGET_SET_TEXT;
+    message.payload.widget.id = TOWN_WINDOW_TEXT_CONTROL;
+    message.payload.widget.data.text = gText;
+    m_townWindow->BroadcastMessage(message);
+    strcpy(gText, "Town Screen");
+    message.payload.widget.id = TOWN_CONTROL_STATUS_TEXT;
+    message.payload.widget.data.text = gText;
+    m_townWindow->BroadcastMessage(message);
+    m_townWindow->DrawWindow(0, TOWN_WINDOW_DRAW_WIDTH,
+                             TOWN_WINDOW_DRAW_RIGHT);
+
+    if (gpCurPlayer->m_townCount == 1) {
+        message.payload.widget.command = TOWN_WIDGET_DISABLE;
+        message.payload.widget.data.value = TOWN_WIDGET_DISABLED_VALUE;
+        message.payload.widget.id = TOWN_CONTROL_PREVIOUS_TOWN;
+        m_townWindow->BroadcastMessage(message);
+        message.payload.widget.id = TOWN_CONTROL_NEXT_TOWN;
+        m_townWindow->BroadcastMessage(message);
+        message.payload.widget.command = TOWN_WIDGET_ENABLE;
+        message.payload.widget.data.value = TOWN_WIDGET_ENABLED_VALUE;
+        message.payload.widget.id = TOWN_CONTROL_PREVIOUS_TOWN;
+        m_townWindow->BroadcastMessage(message);
+        message.payload.widget.id = TOWN_CONTROL_NEXT_TOWN;
+        m_townWindow->BroadcastMessage(message);
+    }
+
+    if (m_town->m_type != m_lastTownType) {
+        if (m_lastTownType != TOWN_LAST_TYPE_NONE)
+            UnloadTown();
+        m_bankBox =
+            new bankBox(TOWN_BANK_BOX_X, TOWN_GARRISON_STRIP_Y, gpCurPlayer);
+        if (m_bankBox == 0)
+            MemError();
+        sprintf(gText, "townbkg%d.icn", m_town->m_type);
+        m_backgroundIcon = gpResourceManager->GetIcon(gText);
+        m_townObjectCount = 0;
+        for (objectOrder = 0; objectOrder < TOWN_BUILDING_COUNT;
+             ++objectOrder) {
+            objectId = gTownObjectOrder[m_town->m_type][objectOrder];
+            if (objectId != TOWN_OBJECT_NONE) {
+                sprintf(gText, "%s%s",
+                        gTownPrefixNames[m_town->m_type],
+                        gTownObjNames[objectId]);
+                m_townObjects[m_townObjectCount] =
+                    new townObject(m_town->m_type, objectId, gText);
+                if (m_townObjects[m_townObjectCount] == 0)
+                    MemError();
+                if (m_townObjects[m_townObjectCount]->m_border != 0) {
+                    if (!(m_town->m_buildings & (1L << objectId))) {
+                        m_townObjects[m_townObjectCount]->m_border->m_flags &=
+                            ~TOWN_OBJECT_BORDER_ENABLED;
+                        m_townObjects[m_townObjectCount]->m_visible = 0;
+                    }
+                    m_townWindow->AddWidget(
+                        m_townObjects[m_townObjectCount]->m_border,
+                        TOWN_WIDGET_INSERT_DEFAULT);
+                }
+                ++m_townObjectCount;
+            }
+        }
+        gpWindowManager->AddWindow(m_townWindow, 0, 1);
+    } else {
+        m_townObjectCount = 0;
+        for (objectOrder = 0; objectOrder < TOWN_BUILDING_COUNT;
+             ++objectOrder) {
+            int existingObjectId =
+                gTownObjectOrder[m_town->m_type][objectOrder];
+            if (existingObjectId != TOWN_OBJECT_NONE) {
+                if (m_townObjects[m_townObjectCount]->m_border != 0) {
+                    if (!(m_town->m_buildings &
+                          (1L << existingObjectId))) {
+                        m_townObjects[m_townObjectCount]->m_border->m_flags &=
+                            ~TOWN_OBJECT_BORDER_ENABLED;
+                        m_townObjects[m_townObjectCount]->m_visible = 0;
+                    } else {
+                        m_townObjects[m_townObjectCount]->m_border->m_flags |=
+                            TOWN_OBJECT_BORDER_ENABLED;
+                        m_townObjects[m_townObjectCount]->m_visible = 1;
+                    }
+                }
+                ++m_townObjectCount;
+            }
+        }
+        if (m_heroStrip != 0)
+            delete m_heroStrip;
+        m_heroStrip = 0;
+        if (m_garrisonStrip != 0)
+            delete m_garrisonStrip;
+        m_garrisonStrip = 0;
+    }
+
+    crestFrame = gpCurPlayer->m_color;
+    if (m_town->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE) {
+        crestFrame *= 4;
+        crestFrame += gpGame->GetHero(m_town->m_occupyingHeroId)->m_portrait;
+    } else {
+        crestFrame += TOWN_EMPTY_HERO_PORTRAIT_OFFSET;
+    }
+    m_garrisonStrip = new strip(
+        0, TOWN_GARRISON_STRIP_Y,
+        static_cast<signed char>(
+            m_town->m_occupyingHeroId == TOWN_OCCUPYING_HERO_NONE
+                ? TOWN_CREST_FRAME_WITHOUT_HERO
+                : TOWN_CREST_FRAME_WITH_HERO),
+        gpResourceManager->MakeId("crest.icn", TOWN_ICON_RESOURCE_TYPE),
+        gpCurPlayer->m_color,
+        &m_town->m_army, TOWN_GARRISON_FIRST_CONTROL, 0, -1);
+    if (m_garrisonStrip == 0)
+        MemError();
+
+    if (m_town->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE) {
+        sprintf(gText, "port%04d.icn",
+                gpGame->GetHero(m_town->m_occupyingHeroId)->m_portrait);
+        m_heroStrip = new strip(
+            0, TOWN_HERO_STRIP_Y, TOWN_HERO_STRIP_FRAME_COUNT,
+            gpResourceManager->MakeId(gText, TOWN_ICON_RESOURCE_TYPE), 0,
+            &gpGame->GetHero(m_town->m_occupyingHeroId)->m_army,
+            TOWN_HERO_FIRST_CONTROL, 0, -1);
+        if (m_heroStrip == 0)
+            MemError();
+        if (m_town->m_buildings & TOWN_BUILDING_MAGE_GUILD)
+            m_town->GiveSpells(0);
+    } else if (m_town->m_buildings & TOWN_BUILDING_CAPTAIN_QUARTERS) {
+        sprintf(gText, "port%04d.icn",
+                m_town->m_type + TOWN_PORTRAIT_FRAME_BASE);
+        m_heroStrip = new strip(
+            0, TOWN_HERO_STRIP_Y, TOWN_HERO_STRIP_FRAME_COUNT,
+            gpResourceManager->MakeId(gText, TOWN_ICON_RESOURCE_TYPE),
+            0, 0, -1, 0,
+            gpCurPlayer->m_color);
+        if (m_heroStrip == 0)
+            MemError();
+    } else {
+        m_heroStrip = new strip(
+            0, TOWN_HERO_STRIP_Y, TOWN_HERO_STRIP_FRAME_COUNT,
+            gpResourceManager->MakeId("strip.icn", TOWN_ICON_RESOURCE_TYPE),
+            TOWN_HERO_STRIP_FRAME_COUNT, 0, -1, 0, -1);
+        if (m_heroStrip == 0)
+            MemError();
+    }
+
+    m_lastTownType = m_town->m_type;
+    m_pendingStrip = 0;
+    m_swapStrip = m_pendingStrip;
+    m_selectedStrip = m_swapStrip;
+    m_pendingArmySlot = TOWN_ARMY_SLOT_NONE;
+    m_swapArmySlot = m_pendingArmySlot;
+    m_selectedArmySlot = m_swapArmySlot;
+    DrawTown(0, 0);
+    gpWindowManager->UpdateScreenRegion(0, 0, TOWN_SCREEN_WIDTH,
+                                         TOWN_SCREEN_HEIGHT);
+}
 
 VA(0x00414cc9, 0x1cf)
 void townManager::UnloadTown(void) {}

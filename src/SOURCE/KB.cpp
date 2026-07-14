@@ -4609,7 +4609,16 @@ DATA(0x004fb7a0) signed char gbArrow[8][8];
 DATA(0x004fb7e0) unsigned char giCloudType[256];
 DATA(0x004fb8e0) short giScoreMon[66][2];
 DATA(0x004fb9e8) short giScoreCampaignMon[66][2];
-DATA(0x004fbaf0) signed char *townTheme;
+DATA(0x004fbaf0) signed char townTheme[TOWN_MUSIC_TABLE_SIZE] = {
+    TOWN_MUSIC_KNIGHT,
+    TOWN_MUSIC_BARBARIAN,
+    TOWN_MUSIC_WARLOCK,
+    TOWN_MUSIC_WIZARD,
+    TOWN_MUSIC_SORCERESS,
+    TOWN_MUSIC_NECROMANCER,
+    TOWN_MUSIC_NONE,
+    TOWN_MUSIC_NONE
+};
 DATA(0x004fbaf8) signed char gHeroSkillBonus[6][2][4];
 DATA(0x004fbb28) int gbLoadingMonoIcon;
 DATA(0x004fbb2c) int giMonoIconSkip;
