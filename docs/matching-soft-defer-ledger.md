@@ -391,6 +391,31 @@ retained/reverted/byte-identical disposition, is in
 [`docs/iconf2bc-experiment-matrix.md`](iconf2bc-experiment-matrix.md). Treat that file as the
 authoritative no-repeat list for this source/header state.
 
+Fresh cross-lane setup/lifetime batch after integrated root `76a78cc`:
+
+- load the packed icon width directly into the later pitch local while keeping `w` bound-only:
+  85.84131%, end `0x544`, frame eight, decoder `+0xed`, 84/83 relocations. This restores the
+  retail row-input load order but publishes the row in `ecx`, loses the retained width/X order,
+  and never materializes the early width spill; reverted;
+- make the reused icon-width/destination-pitch local volatile: 85.561714%, end `0x54a`, frame
+  twelve, decoder `+0xf3`, 84/83. The width materializes, but in a third frame word with broad
+  setup/decoder allocation changes; reverted;
+- order the file-static decoder scratches by first semantic use: 84.95214%, end `0x545`, frame
+  eight, decoder `+0xe6`, 85/83; reverted. This single evidence-based order regresses, so broad
+  scratch declaration permutations remain out of scope;
+- commute the row sum: byte-identical to 85.99245%. A near-use pixel snapshot scores 85.94206%,
+  and staged pixel/Y snapshots in retail source load order score 85.60201%; all still compile to
+  candidate `gFCY -> ecx`, pixels -> `eax`, followed by the already-correct `eax` publication;
+  reverted;
+- commute the first setup vertical comparison, assign its Y snapshot in that clause, or rename
+  the reused pitch lifetime to semantic `width`: each byte-identical to 85.99245%, end `0x541`,
+  frame eight, decoder `+0xea`, 84/83 with nine `gFCY` occurrences; reverted.
+
+The canonical source hash remains `dd868c0ffcdabf134c98631a7a731d7b8d90845b7df496ce5a3c6dd05b305fd9`.
+The matrix now includes these nine additional full hashes and has SHA-256
+`fecb726383a20922cb59ee51acdeab7abd3ab9adda4a7ee07c65da24f590aa8f`. Do not recombine these
+setup and row-load axes until a newly retained header/predecessor state changes the canonical TU.
+
 Continue specifically from the first width/X load-order divergence, the swapped row-input register
 loads before the now-correct `eax` publication, and the extra setup `gFCY` load.
 Record each new source-hash-distinct shape with its match, size, frame, and relocation result. Do
