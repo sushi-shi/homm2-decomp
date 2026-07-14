@@ -7,8 +7,9 @@
 #include <BASE/icon2bc.h>
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
+#include <BASE/IconEntry.h>
+#include <BASE/IconRle.h>
 #include <SOURCE/dimPalette.h>
-#include <BASE/Misc.h>
 #include <string.h>
 // Per-call decoder scratch — its own file-static block (0x534ca8+).
 DATA(0x00534ca8) static int gCTPitch;
@@ -30,119 +31,51 @@ DATA(0x00534ce4) static unsigned char gCTColor;
 DATA(0x00534ce8) static unsigned int gCTRun;
 
 // Colour-table variant: literals and solid runs use colorTable[], and dimming is gated by dimGate.
-// Header/template replay guard: docs/matching-matrices/icon2bc-template-surface-c4c0562.tsv.
-// Shared-lifetime replay guard: docs/matching-matrices/icon2bc-shared-lifetimes-5645ed8.tsv.
-// Scratch-owner audit: docs/matching-matrices/icon2bc-owner-audit-708de32.tsv. Every address in
-// 0x534ca8..0x534ce8 was re-derived from its ordered retail DIR32 instruction role; none is swapped.
-// Typed command/loop-state replay guard: docs/matching-matrices/icon2bc-command-state-08966f9.tsv.
+// Earlier setup, owner, command, lifetime, and CFG families are hash-pinned under
+// docs/matching-matrices/icon2bc-*.tsv; do not replay them without a real header/type trigger.
 // @match-note
-// /O2 template checkpoint: the complete skip/solid/shadow/fill/dim/literal/newline CFG and every
-// relocation target are accounted for. A canonical KB-owned dim-palette declaration now avoids
-// parsing the unrelated game-global surface in this BASE TU, and the retail X/Y/row newline order
-// raises the live match from 69.95% (retained 72.4789%) to 73.17%. Candidate .text is 0x566 versus
-// retail 0x5af; relocation-union masking leaves 745 differing common bytes, first +0x12, and a
-// 0x49-byte retail tail. Relocations are 88/91 with no base-only target: the allocation state is
-// short one ClipR, Cnt, Dst, and X0 occurrence and has one excess Y occurrence.
-// The first divergence is still setup allocation: ours folds 13*frame and entry into ECX, while
-// retail keeps data=ESI, offset=EBX, entry=EDI, entry.x=ECX, and srcOffset=EAX. Retail also loads
-// gCTDst into EBX once before the command loop and carries it; this source still reloads the cursor
-// at the loop header. Direct sibling-template field snapshots, the historical inline-IconEntry
-// surface, a minimal direct IconEntry surface, and the proven pre-loop cursor were combined with
-// the new header state but did not exceed this checkpoint or preserve 91 occurrences. Resume only
-// with a new model that makes the command fetch use source=ECX/command=EAX, which in turn can color
-// count=EDX/cursor=EBX, while also fixing the EBX/EDI setup split. Function-scope shared count,
-// source-cursor, fetch-order, snapshot, and all six combined command/count/cursor declaration-order
-// shapes have now been exhausted; do not replay those or the earlier setup/count matrices.
-// A contiguous state-record ownership pass did recover source=ECX/command=EAX/count=EDX, but only
-// by reversing X/cursor to EBX/ESI and regressing below this checkpoint; see
-// icon2bc-state-ownership-06409a9.tsv. Do not replay whole/tail/cursor/nested record surfaces.
-// A bounded follow-up split only retail-evidenced adjacent roles (clip bounds, source-command
-// tail without destination, and X/Y/entry/row context) and tried the sibling-shared frame-entry
-// accessor. None kept the recovered command coloring with X=ESI/destination=EBX; canonical is
-// restored. Resume only from a newly proved owner/type surface, not another record boundary.
-// A fresh retail/sibling pass then tested a shared inline frame view, a cursor-backed decoder for
-// every command and payload read, command/flag typedef-enum domains, and a typed loop-carried
-// destination state. The frame view alone recovers EBX=13*frame, and the enum states can recover
-// all 91 occurrences, but none produces retail's ECX/EAX/EDX/EBX decoder allocation; the inline
-// command object also reverses the command-body layout. Do not wrap only the byte reader again.
-// A fresh owner-header context pass at a0a8646 transferred only the real Icon2b/iconf2bc include
-// surfaces and existing blitter declaration headers. Direct IconEntry plus broad X_GLOBAL without
-// Misc is byte-identical to this checkpoint; _globals_model, Misc, one/two sibling declarations,
-// and declarations placed after the scratch block all regress. See icon2bc-header-context-a0a8646.
-// A 9c5c24d retail-backedge pass isolated the command lifetime from the previously combined
-// command/count/cursor states. Declaring cmd once immediately before the loop improves 73.1690 to
-// 73.19249 without changing the 0x566 size or 88/91 relocation signature; it changes only three
-// operand bytes in the clipped-literal path. Explicit read/tail labels are byte-identical, while
-// a one-time destination load, direct header gotos, and structured solid/dim fallthrough regress.
-// See icon2bc-command-loop-9c5c24d.tsv. The setup and decoder allocation remain unresolved.
-// A fresh retail-CFG audit found that both clipped-fill subtrees had their inner arms reversed:
-// retail emits the fully visible >= arm before the right-clipped arm. Restoring that source order
-// improves 73.19249 to 74.558685, shrinks the candidate from 0x566 to 0x558, and recovers the tenth
-// ClipR relocation (89/91 total). Cnt, Dst, and X0 remain short once each and Y remains excess once.
-// Branch-scoping savedDst and direct dim-count mutation are byte-identical; a volatile fill length
-// and the same fill spelling under the rejected one-time destination lifetime regress. See
-// icon2bc-fill-arm-order-f45a3ba.tsv. The first divergence remains setup allocation at +0x12.
-// On combined head f24566c the enlarged _types.h declaration surface reached through Misc.h
-// changes only allocator state and lowers this same source to 73.211266; candidate size remains
-// 0x558 and relocations remain 89/91. Removing the otherwise-unused Misc.h in favor of the direct
-// IconEntry owner is a valid header cleanup but regresses to 68.59 and 88/91, so the combined state
-// is retained. A clipped-dim Cnt audit also found the missing source publication already present at
-// the retail branch: reordering its selection arms regresses, while a ClipR snapshot, publication
-// reorder, and explicit join are byte-identical because MSVC deletes the overwritten store. See
-// icon2bc-combined-residual-f24566c.tsv. Do not force these scratch writes with volatile qualifiers.
-// A fresh cross-sibling audit then found that retail IconToBitmap is uniquely close to this
-// decoder: its normalized mnemonic stream is 0.829 similar, versus 0.52-0.58 for the flip,
-// colour-flip, and Y-modified siblings. Transferring its outer `do { select } while (0)` literal
-// ownership only becomes useful together with retail's one-time destination-cursor lifetime.
-// That combined skeleton improves the current head from 73.211266 to 76.27699 and grows the
-// candidate from 0x558 to 0x596 versus retail 0x5af. Giving the two rejected literal exits one
-// shared zero-count join accounts for the strongest gain; using a distinct signed dim-test owner
-// while the unsigned count remains the loop-decrement owner adds a smaller further gain. The
-// isolated literal skeleton, the old Icon2b setup combined with this skeleton, and the old
-// per-command cursor all regress. See icon2bc-forward-sibling-99d936f.tsv.
-// On the macro-aware 7283868 state, retail-ordered destination publication and a clipped-dim
-// ClipR snapshot/local-count selection make Dst and ClipR exact. The source also explicitly owns
-// the remaining three retail sites: local X followed by global X0 in the initial horizontal test,
-// one currentY snapshot shared by both vertical tests, and ClipR -> original Cnt publication ->
-// local count selection in the clipped-dim X<clip arm. MSVC nevertheless forwards X instead of
-// reloading X0, reloads Y twice instead of holding one snapshot, and deletes the overwritten Cnt
-// publication. Direct global count mutation produces three excess Cnt sites; reading the published
-// global produces one excess site, so neither is retained. The final occurrence multiset is 90/91
-// with no candidate-only target and differs only by Cnt-1, X0-1, and Y+1. Candidate size is 0x590
-// versus retail 0x5af and the first divergence is still broad setup allocation at +0x11. This is
-// an evidenced structural checkpoint, not a compiler-state wall; see
-// icon2bc-occurrence-7283868.tsv and resume from the setup register/lifetime split.
-// The e813385 setup audit closes that structural question without forcing another source shape.
-// Excluding retail's trailing pad, candidate and retail have the same 86 ordered basic blocks,
-// the same 67-branch mnemonic sequence, and identical ordered successor vectors. Both reserve one
-// stack word; their 15 accesses to its [esp+0x10] home have the same load/store sequence. Formal
-// home counts also agree except clipX at 5/6, paired exactly with candidate forwarding local X
-// where retail reloads X0. All m_data, bitmap, and IconEntry field accesses and all other scratch
-// owners agree. Retail IconToBitmap uses the same ESI-data/EBX-offset/EDI-entry construction, and
-// its current typed entry/data source reproduces that register chain through the entry formation
-// under this compiler, so no missing layout or accessor is indicated here. icon2bc's downstream
-// lifetime state instead hoists x into EBP at +0x11 and coalesces offset/entry in ECX. Treat the
-// Cnt/X0/Y residual as explained allocation state, but not as a byte-proven permitted wall: the
-// instruction stream still differs broadly. Revisit only after a real type/header/TU-state change.
+// /O2 structural checkpoint on master 58ac64e: direct IconEntry ownership plus the real Icon2b
+// icon/bitmap/IconEntry/IconRle declaration order raises this TU from 72.73% with 93/91 relocs to
+// 78.94% with 90/91.  The function is 0x58c versus retail 0x5af.  Relocation-union masking leaves
+// 767 differing bytes among 822 common unmasked bytes, first +0x12 and last +0x588, plus a 0x23
+// retail tail.  Both reserve one stack word and have the same 15 accesses to its [esp+0x10] home;
+// the complete skip/solid/shadow/fill/dim/literal/newline topology remains 86 logical blocks and
+// 67 branch sites, with three equivalent compare-operand reversals in clipped literal selection.
+// Every target identity is correct and no base-only target exists.  The multiset differs only by
+// Cnt 5/6, X0 2/3, and Y 9/8.  Ordered evidence: retail reloads X0 at +0x61 and holds one Y load at
+// +0x7b across both initial vertical clauses; candidate forwards X and reloads Y twice.  Retail's
+// clipped-dim X<clip arm stores the original Cnt at +0x406 before selected Cnt at +0x42a and gives
+// each selection arm its own ClipR load.  MSVC deletes the source's first Cnt store and merges the
+// branch-local ClipR snapshots, then later reloads ClipR in the literal arm despite its local view.
+// The source explicitly owns all of those lifetimes; volatile/dummy reads would only falsify it.
+// The first broad divergence remains +0x12: candidate coalesces frame offset/entry in ECX while
+// retail retains offset=EBX and entry=EDI, then uses source=ECX, command=EAX, count=EDX, cursor=EBX.
+// Current-trigger attempts: full sibling byte-offset setup was 77.07/87; formal-X update was
+// 78.40/90; deriving X from published X0 was 78.74/92 (X0 4/3); wider currentY scope and explicit
+// per-arm ClipR locals were byte-identical.  Canonical IconRle constants are byte-neutral in the
+// retained sibling include order.  Revisit only after another real declaration/type/layout change,
+// not with predicate synonyms, dummy state, arbitrary record boundaries, or permutation tools.
 VA(0x004d32a0, 0x5af)
 void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                             int clip, int clipX, int clipY, int clipW, int clipH, int color,
                             unsigned char *colorTable, int dimGate)
 {
     unsigned char *data = reinterpret_cast<unsigned char *>(srcIcon->m_data);
-    IconEntry *entries = reinterpret_cast<IconEntry *>(data);
+    IconEntry *entry = reinterpret_cast<IconEntry *>(data) + frame;
+    int entryX = entry->x;
+    int sourceOffset = entry->srcOffset;
     unsigned char *savedDst;
-    gCTSrc = data + entries[frame].srcOffset;
-    int X = x + entries[frame].x;
-    gCTEntry = &entries[frame];
+    gCTEntry = entry;
+    gCTSrc = data + sourceOffset;
+    int X = x + entryX;
     gCTX0 = X;
     gCTPitch = dest->m_width;
-    gCTY = entries[frame].y + y;
+    gCTY = entry->y + y;
     if (clip != 0) {
-        int currentY;
-        if (X < clipX || clipW + clipX < entries[frame].w + gCTX0 ||
-            (currentY = gCTY, currentY < clipY) ||
-            clipY + clipH < entries[frame].h + currentY) {
+        int currentY = gCTY;
+        if (X < clipX || clipW + clipX < entry->w + gCTX0 ||
+            currentY < clipY ||
+            clipY + clipH < entry->h + currentY) {
             clip = 1;
             gCTClipR = clipX + clipW - 1;
             gCTClipB = clipY + clipH - 1;
@@ -158,24 +91,24 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
         gCTSrc++;
         cmd = gCTSrc[-1];
         if (static_cast<signed char>(cmd) < 0) {
-            if ((cmd & 0x40) == 0) {
+            if ((cmd & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
                 // skip run / end-of-sprite
                 gCTX = X;
                 gCTRow = reinterpret_cast<int>(row);
                 gCTDst = savedDst;
                 gCTRun = cmd;
-                if ((cmd & 0x3f) == 0)
+                if ((cmd & ICON_RLE_COMMAND_RUN_MASK) == 0)
                     return;
-                X = X + (cmd & 0x3f);
+                X = X + (cmd & ICON_RLE_COMMAND_RUN_MASK);
                 continue;
             }
             // 0xc0 - 0xff
             gCTRun = cmd;
-            unsigned int count = cmd & 0x3f;
+            unsigned int count = cmd & ICON_RLE_COMMAND_RUN_MASK;
             int flags = 0;
             if (count != 0) {
                 // 0xc1 - 0xff : solid colour run
-                if (cmd == 0xc1) {
+                if (cmd == ICON_RLE_LONG_SOLID_COMMAND) {
                     gCTSrc++;
                     count = gCTSrc[-1];
                 }
@@ -186,7 +119,7 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
             // 0xc0 : shadow / dim run
             gCTSrc++;
             flags = gCTSrc[-1];
-            count = flags & 3;
+            count = flags & ICON_RLE_DIM_SHORT_COUNT_MASK;
             if (count == 0) {
                 gCTSrc++;
                 count = gCTSrc[-1];
@@ -194,7 +127,7 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
             gCTCnt2 = count;
             if (color != 0) {
                 gCTRun = flags;
-                if (flags & 0x80) {
+                if (flags & ICON_RLE_DIM_RECOLOR_FLAG) {
                     gCTCnt = count;
                     gCTColor = static_cast<unsigned char>(color);
                     goto do_fill;
@@ -234,9 +167,10 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
         do_dim:
             gCTCnt = count;
             gCTRun = flags;
-            if (flags & 0x40) {
+            if (flags & ICON_RLE_DIM_APPLY_FLAG) {
                 unsigned char *palette =
-                    reinterpret_cast<unsigned char *>(uDimPal) + (flags & 0x3c) * 0x40;
+                    reinterpret_cast<unsigned char *>(uDimPal) +
+                    (flags & ICON_RLE_DIM_LEVEL_MASK) * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
                 gCTDst = savedDst;
                 gCTDimPal = palette;
                 if (clip == 0) {
@@ -261,9 +195,10 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
                         int right = X + count;
                         unsigned int cn;
                         if (X >= clipX) {
+                            int clipRight = gCTClipR;
                             cn = count;
-                            if (gCTClipR < right)
-                                cn = (gCTClipR - X) + 1;
+                            if (clipRight < right)
+                                cn = (clipRight - X) + 1;
                             savedDst = row + X;
                         } else {
                             int clipRight = gCTClipR;
@@ -322,7 +257,7 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
                         if (clipRight >= right)
                             cnt = cmd;
                         else
-                            cnt = (gCTClipR - X) + 1;
+                            cnt = (clipRight - X) + 1;
                     } else {
                         if (clipRight >= right)
                             cnt = (cmd - clipX) + X;
