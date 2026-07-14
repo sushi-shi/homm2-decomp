@@ -30,25 +30,12 @@ static int gFYRun;
 static int gFYY;
 static unsigned char *gFYDimDst;
 
-// @early-stop
-// /O2 register-allocation/intrinsic wall after complete decoder recovery: base is 0x546 bytes and
-// retail is 0x58d. The relocation/branch-masked command decoder is byte-identical at base
-// +0xae..+0x138 versus retail +0xb2..+0x13c. Residual spans are setup base +0x00..+0xad versus
-// retail +0x00..+0xb1, fill/dim base +0x139..+0x359 versus retail +0x13d..+0x395, and clipped
-// literal/newline base +0x35a..+0x545 versus retail +0x396..+0x58c: retail reserves an unused
-// four-byte frame slot, pins clipW in EBP, reloads shear, and schedules the three inlined loops
-// differently. Relocations are base 140 versus retail 144 with no base-only target; the uDimPal
-// target and all 18 file-static scratch addresses agree. Tried signed/unsigned scratch lengths,
-// local/global flags, pitch, clip-width and advance forms, split/repeated clipping expressions,
-// 124 AST variants over eight improving rounds plus 80 walks, and 60 text-shape variants.
-// Retail's fill/dim outer gates require the entire run inside the horizontal clip, so their later
-// left-clipping arms are dead. Replacing those gates with ordinary overlap semantics was tested
-// and rejected: it changes both compare sequences and lowers the function match to 73.58%.
 VA(0x004d9ce0, 0x58d)
 void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                              int clip, int clipX, int clipY, int clipW, int clipH, int color,
                              signed char *shear)
 {
+    int clipWidth = clipW;
     IconEntry *entries = reinterpret_cast<IconEntry *>(srcIcon->m_data);
     gFYEntry = &entries[frame];
     gFYSrc = reinterpret_cast<unsigned char *>(srcIcon->m_data) + gFYEntry->srcOffset;
@@ -57,7 +44,7 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
     gFYY = gFYEntry->y + y;
     gFYX = gFYXEnd - shear[gFYY];
     gFYClipB = clipY + clipH - 1;
-    gFYClipR = clipX + clipW - 1;
+    gFYClipR = clipX + clipWidth - 1;
     gFYRow = dest->m_width * gFYY + reinterpret_cast<int>(dest->m_pixels);
     for (;;) {
         gFYRun = *gFYSrc;
@@ -81,16 +68,17 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
                 goto do_fill;
             }
             gFYRun = *gFYSrc;
-            gFYDimLen = gFYRun & 3;
             gFYSrc = gFYSrc + 1;
-            if (gFYDimLen == 0) {
+            if ((gFYRun & 3) != 0) {
+                gFYDimLen = gFYRun & 3;
+            } else {
                 gFYDimLen = *gFYSrc;
                 gFYSrc = gFYSrc + 1;
             }
             gFYDimLen2 = gFYDimLen;
             if (color != 0 && (gFYRun & 0x80) != 0) {
-                gFYColor = static_cast<unsigned char>(color);
                 gFYRun = gFYDimLen;
+                gFYColor = static_cast<unsigned char>(color);
                 goto do_fill;
             }
             if ((gFYRun & 0x40) != 0) {
@@ -98,14 +86,16 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
                     reinterpret_cast<unsigned char *>(uDimPal) + (gFYRun & 0x3c) * 0x40;
                 if (shear[gFYY] != 0x7f && clipY <= gFYY && gFYY <= gFYClipB) {
                     if (clipX <= (gFYX - gFYDimLen) + 1 && gFYX <= gFYClipR) {
-                        if ((gFYX - gFYDimLen) + 1 < clipX) {
-                            gFYDimDst = reinterpret_cast<unsigned char *>(gFYRow + clipX);
-                            gFYDimLen = (gFYX - clipX) + 1;
+                        unsigned char *dimDst;
+                        if (clipX <= (gFYX - gFYDimLen) + 1) {
+                            dimDst = reinterpret_cast<unsigned char *>((gFYRow - gFYDimLen) + gFYX + 1);
                         } else {
-                            gFYDimDst = reinterpret_cast<unsigned char *>((gFYRow - gFYDimLen) + gFYX + 1);
+                            gFYDimLen = (gFYX - clipX) + 1;
+                            dimDst = reinterpret_cast<unsigned char *>(gFYRow + clipX);
                         }
                         gFYDimIdx = 0;
-                        if (0 <= static_cast<int>(gFYDimLen) - 1) {
+                        gFYDimDst = dimDst;
+                        if (0 < static_cast<int>(gFYDimLen)) {
                             do {
                                 *gFYDimDst = gFYDimPal[*gFYDimDst];
                                 gFYDimDst = gFYDimDst + 1;
@@ -120,12 +110,12 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
         do_fill:
             if (shear[gFYY] != 0x7f && clipY <= gFYY && gFYY <= gFYClipB) {
                 if (clipX <= (gFYX - gFYRun) + 1 && gFYX <= gFYClipR) {
-                    if ((gFYX - gFYRun) + 1 < clipX) {
-                        memset(reinterpret_cast<unsigned char *>(gFYRow + clipX), gFYColor,
-                               (gFYX - clipX) + 1);
-                    } else {
+                    if (clipX <= (gFYX - gFYRun) + 1) {
                         memset(reinterpret_cast<unsigned char *>((gFYRow - gFYRun) + 1 + gFYX),
                                gFYColor, gFYRun);
+                    } else {
+                        memset(reinterpret_cast<unsigned char *>(gFYRow + clipX), gFYColor,
+                               (gFYX - clipX) + 1);
                     }
                 }
             }
@@ -138,28 +128,27 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
             if (shear[gFYY] != 0x7f && clipY <= gFYY && gFYY <= gFYClipB) {
                 int left = (gFYX - gFYRun) + 1;
                 if (left <= gFYClipR && clipX <= gFYX) {
-                    if (gFYClipR < gFYX) {
-                        gFYDst = reinterpret_cast<unsigned char *>(gFYClipR + gFYRow);
+                    if (gFYX <= gFYClipR) {
+                        gFYDst = reinterpret_cast<unsigned char *>(gFYRow + gFYX);
+                        if (clipX <= left) {
+                            gFYSkip = 0;
+                            gFYDimLen = gFYRun;
+                        } else {
+                            gFYDimLen = (gFYX - clipX) + 1;
+                            gFYSkip = gFYRun - gFYDimLen;
+                        }
+                    } else {
                         gFYSrc = gFYSrc + (gFYX - gFYClipR);
+                        gFYDst = reinterpret_cast<unsigned char *>(gFYClipR + gFYRow);
                         if ((gFYX - gFYRun) < clipX) {
-                            gFYSkip = ((gFYRun - gFYX) - clipW) + gFYClipR;
-                            gFYDimLen = clipW;
+                            gFYSkip = ((gFYRun - gFYX) - clipWidth) + gFYClipR;
+                            gFYDimLen = clipWidth;
                         } else {
                             gFYSkip = 0;
                             gFYDimLen = (gFYRun - gFYX) + gFYClipR;
                         }
-                    } else {
-                        gFYDst = reinterpret_cast<unsigned char *>(gFYRow + gFYX);
-                        if (left < clipX) {
-                            gFYDimLen = (gFYX - clipX) + 1;
-                            gFYSkip = gFYRun - gFYDimLen;
-                        } else {
-                            gFYSkip = 0;
-                            gFYDimLen = gFYRun;
-                        }
                     }
                     gFYDimIdx = 0;
-                    advance = gFYSkip;
                     if (0 < static_cast<int>(gFYDimLen)) {
                         do {
                             *gFYDst = *gFYSrc;
@@ -168,10 +157,11 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
                             gFYDimIdx = gFYDimIdx + 1;
                         } while (gFYDimIdx < static_cast<int>(gFYDimLen));
                     }
+                    advance = gFYSkip;
                 }
             }
-            gFYX = gFYX - gFYRun;
             gFYSrc = gFYSrc + advance;
+            gFYX = gFYX - gFYRun;
             continue;
         }
         // newline
