@@ -218,14 +218,14 @@ BASE/Misc	?BlitBitmapToScreen@@YIXPAVbitmap@@HHHHHH@Z	87.1259	eb817732384a
 BASE/Misc	?BlitBitmapToScreenNoMouseCheck@@YIXPAVbitmap@@HHHHHH@Z	100.0000	a77d17bb0be8
 BASE/Misc	?CreatePCXFile@@YIXPADPAEHH1@Z	98.3108	ad9fafdf0921
 BASE/Misc	?DataEntryWindowHandler@@YIHAAUtag_message@@@Z	86.7593	ed321183ca8e
-BASE/Misc	?FadeIn@@YIXH@Z	93.6420	fae519681dbf
+BASE/Misc	?FadeIn@@YIXH@Z	95.5556	f79b9f04de07
 BASE/Misc	?FadeOut@@YIXH@Z	100.0000	501727236f25
 BASE/Misc	?FadeTo@@YIXPAE0H@Z	95.1169	427327c52fa4
 BASE/Misc	?FadeToColorTable@@YIXPAEH@Z	87.1774	09bfbd8fb686
 BASE/Misc	?FileSize@@YIJPAD@Z	100.0000	e9d9ef6eb16e
 BASE/Misc	?FindIndex@@YIHPAUindexArray@@HHH@Z	98.3333	1fb34b65a8ed
 BASE/Misc	?FindLastToken@@YIPADPADD@Z	100.0000	b6990f2c3e5a
-BASE/Misc	?FindStringInString@@YIPADPAD0@Z	100.0000	b76134dcfb09
+BASE/Misc	?FindStringInString@@YIPADPAD0@Z	100.0000	62412afddb55
 BASE/Misc	?FindToken@@YIPADPADD@Z	99.6552	76e38f6285ed
 BASE/Misc	?GetDataEntry@@YIXPAD0H0HH@Z	95.8980	a99dca136bad
 BASE/Misc	?GetIconEntry@@YIPAUIconEntry@@PAVicon@@H@Z	100.0000	abeff9ff6328
