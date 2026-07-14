@@ -1469,9 +1469,9 @@ SOURCE/wingraph	?WGInitGraphics@@YIXXZ	100.0000	a16633650228
 SOURCE/wingraph	?WGInitializePalette@@YIXXZ	100.0000	d9ba4cce2661
 SOURCE/wingraph	?WGQueryNewPalette@@YIHXZ	100.0000	2190ed2a8b52
 SOURCE/wingraph	?WGUpdatePalette@@YIXPAC@Z	100.0000	d809d51ac1ed
-SOURCE/x_arena	?ArenaWindowHandler@@YIHAAUtag_message@@@Z	9.7746	04c63cb14292
-SOURCE/x_arena	?DoArenaDialog@@YIHXZ	5.2396	3de182c3bd91
-SOURCE/x_arena	?UpdateArenaIcons@@YIXXZ	11.7527	ad506427bed7
+SOURCE/x_arena	?ArenaWindowHandler@@YIHAAUtag_message@@@Z	100.0000	055cbb690ae3
+SOURCE/x_arena	?DoArenaDialog@@YIHXZ	100.0000	96cf25ad21bd
+SOURCE/x_arena	?UpdateArenaIcons@@YIXXZ	100.0000	978353a6ab19
 SOURCE/x_cdtest	?CDTest_Cleanup@@YIXXZ	100.0000	039192159cc0
 SOURCE/x_cdtest	?CDTest_GenerateTable@@YIHPAD@Z	100.0000	56ac090e88f1
 SOURCE/x_cdtest	?CDTest_Init@@YIHXZ	100.0000	f423c0afb724
