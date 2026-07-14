@@ -8,28 +8,36 @@
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <BASE/Misc.h>
+#include <BASE/IconEntry.h>
 #include <string.h>
 // Per-call decoder scratch — its own file-static block (0x534c60+).
-static int gFlipSkip;
-static unsigned int gFlipRun;
-static int gFlipX0;
-static int gFlipXEnd;
-static unsigned int gFlipCnt;
-static unsigned int gFlipCnt2;
-static int gFlipY;
-static IconEntry *gFlipEntry;
-static int gFlipX;
-static unsigned char *gFlipSrc;
-static unsigned char *gFlipDimPal;
-static unsigned char *gFlipDimDst;
-static int gFlipClipB;
-static int gFlipRow;
-static unsigned int gFlipDimLen;
-static unsigned char gFlipColor;
-static int gFlipClipR;
-static unsigned char *gFlipDst;
+DATA(0x00534c60) static int gFlipSkip;
+DATA(0x00534c64) static unsigned int gFlipRun;
+DATA(0x00534c68) static int gFlipX0;
+DATA(0x00534c6c) static int gFlipXEnd;
+DATA(0x00534c70) static unsigned int gFlipCnt;
+DATA(0x00534c74) static unsigned int gFlipCnt2;
+DATA(0x00534c78) static int gFlipY;
+DATA(0x00534c7c) static IconEntry *gFlipEntry;
+DATA(0x00534c80) static int gFlipX;
+DATA(0x00534c84) static unsigned char *gFlipSrc;
+DATA(0x00534c88) static unsigned char *gFlipDimPal;
+DATA(0x00534c8c) static unsigned char *gFlipDimDst;
+DATA(0x00534c90) static int gFlipClipB;
+DATA(0x00534c94) static int gFlipRow;
+DATA(0x00534c98) static unsigned int gFlipDimLen;
+DATA(0x00534c9c) static unsigned char gFlipColor;
+DATA(0x00534ca0) static int gFlipClipR;
+DATA(0x00534ca4) static unsigned char *gFlipDst;
 
+// @match-note
+// e590ae9 narrow IconEntry TU state: complete CFG, sub esp,8 frame, 0x4fa vs retail 0x4f1;
+// decoder +0xe9 vs +0xe3. First divergence +0x1d: candidate loads entry Y into EBP before
+// forming the entry pointer; retail forms EDI, loads entry X into EBX, subtracts it, then loads Y.
+// Relocations 84/81, no target-only external target; every scratch count agrees except gFlipY
+// (11 candidate/8 retail). Relocation-union raw mask leaves 554 differing bytes, first +0x21.
+// Direct entry/entryX and delayed entryY spellings were byte-neutral. Retry only after a retained
+// predecessor/shared-header/include-state change; see iconf2b-tu-state-e590ae9.tsv.
 VA(0x004d1ba0, 0x4f1)
 void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                       int clip, int clipX, int clipY, int clipW, int clipH, int color)

@@ -1,0 +1,23 @@
+# schema_version	1
+# base_checkpoint	e590ae971e418db279bb2d0792419f5644fc488c
+# target_rva	0x004d1ba0
+# target_size	0x4f1
+# target_object_sha256	1620109acfec9c11aca38897696b8ab056e7b87091fb9f4bda8f1be60e77f1ae
+# target_text_sha256	dc51ac4ccfd5869d35741916dc42d83a184ddaf4238987fc68a233c57073b9a9
+# owner_header_sha256	b6420dbd16cb2143e4f18cca9baa6c2bf8a54a56a0e037778dc884e4c1d86913
+# iconentry_header_sha256	4c213fcda960752692e6f1e202231b26d523bc2fa259c0b8a2d573380d2fb805
+# icon_header_sha256	809577ac8c7a091878b5ff40de5d96d37fe2074f480d45207ba6d7ccd3ef4e22
+# bitmap_header_sha256	2bdd293d52be21a46247a9257c15ebe2503cf38e50cbc7b3488c82a72127727f
+# x_global_header_sha256	ec3276c53bc952d78b348ebfb107c45cc0030b6e75bf891b3a1b84bfd2c3e818
+# retest_trigger	Retained predecessor/shared-header/include-state change; resume at setup +0x1d.
+state	source_sha256	object_sha256	text_sha256	include_state	score_pct	candidate_size	base_relocs	target_relocs	target_only	disposition	axis
+canonical_e590ae9	4db51d6a2e2bffb95cba2c36cb16fa7b0a690b6bd80e5ec60caed41fb50fa666	NA	NA	owner+icon+bitmap+x_global+Misc	79.57	NA	82	81	0	superseded	Root compiler state before local work.
+delayed_entry_y_broad	NA	NA	NA	owner+icon+bitmap+x_global+Misc	79.57	NA	82	81	0	rejected_byte_identical	Move entryY initialization between X and width subtraction.
+narrow_iconentry_owner	8ad2dfbd52ef62fa265349af646af50ba2662f76c8cea29ecef012ea2277e93a	eadd2d5e99cf36c1fcb5d6c27fdd1f69463867561d59d71c98132514de734829	2193247205acc3ae16f2c176b3f8fe89f255573cf2b5a7c64b1cb915298aa3bc	owner+icon+bitmap+x_global+IconEntry	83.50	0x4fa	84	81	0	retained	Replace broad Misc dependency with direct packed IconEntry header; add proven DATA ownership and match note.
+narrow_no_owner	NA	NA	NA	icon+bitmap+x_global+IconEntry	78.49	NA	84	81	0	rejected	Remove redundant owner header.
+misc_inline_iconentry	NA	NA	NA	owner+icon+bitmap+x_global+Misc-inline-IconEntry	77.77	NA	84	81	0	rejected	Use HOMM2_MISC_INLINE_ICONENTRY historical header surface.
+direct_entry_pointer	NA	NA	NA	owner+icon+bitmap+x_global+IconEntry	83.50	0x4fa	84	81	0	rejected_byte_identical	Remove entries base local and form typed entry directly.
+direct_entry_y	NA	NA	NA	owner+icon+bitmap+x_global+IconEntry	81.90	NA	84	81	0	rejected	Remove entryY local and use entry field at publication.
+explicit_entry_x	NA	NA	NA	owner+icon+bitmap+x_global+IconEntry	83.50	0x4fa	84	81	0	rejected_byte_identical	Snapshot packed entry X before subtraction.
+delayed_entry_y_narrow	NA	NA	NA	owner+icon+bitmap+x_global+IconEntry	83.50	0x4fa	84	81	0	rejected_byte_identical	Move entryY initialization between X and width subtraction under retained header state.
+iconentry_after_xglobal	8ad2dfbd52ef62fa265349af646af50ba2662f76c8cea29ecef012ea2277e93a	eadd2d5e99cf36c1fcb5d6c27fdd1f69463867561d59d71c98132514de734829	2193247205acc3ae16f2c176b3f8fe89f255573cf2b5a7c64b1cb915298aa3bc	owner+icon+bitmap+x_global+IconEntry	83.50	0x4fa	84	81	0	retained	Move direct IconEntry include to former Misc position; byte-identical retained readable order.
