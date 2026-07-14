@@ -968,9 +968,9 @@ int HeroHandler(struct tag_message &message) {
 
     if (message.type == HERO_UI_HOVER) {
         gpWindowManager->ConvertToHover(message);
-        if (message.payload.hover.id == gpWindowManager->m_hoverWidgetId)
+        if (message.payload.hover.id == gpWindowManager->m_lastHoverId)
             return HERO_UI_HANDLER_CONTINUE;
-        gpWindowManager->m_hoverWidgetId = message.payload.hover.id;
+        gpWindowManager->m_lastHoverId = message.payload.hover.id;
         UpdateHeroScreenStatusBar(message);
         return HERO_UI_HANDLER_CONTINUE;
     }
@@ -979,7 +979,7 @@ int HeroHandler(struct tag_message &message) {
         switch (message.payload.keyboard.keyCode) {
         case HERO_UI_SHIFT_LEFT:
         case HERO_UI_SHIFT_RIGHT:
-            gpWindowManager->m_hoverWidgetId = HERO_WINDOW_NO_HOVER_WIDGET;
+            gpWindowManager->m_lastHoverId = HERO_WINDOW_NO_HOVER_WIDGET;
             gpInputManager->ForceMouseMove();
             break;
         }
@@ -989,7 +989,7 @@ int HeroHandler(struct tag_message &message) {
         switch (message.payload.keyboard.keyCode) {
         case HERO_UI_SHIFT_LEFT:
         case HERO_UI_SHIFT_RIGHT:
-            gpWindowManager->m_hoverWidgetId = HERO_WINDOW_NO_HOVER_WIDGET;
+            gpWindowManager->m_lastHoverId = HERO_WINDOW_NO_HOVER_WIDGET;
             gpInputManager->ForceMouseMove();
             break;
         }
@@ -1194,7 +1194,7 @@ int HeroHandler(struct tag_message &message) {
                     RedrawHeroScreen();
                 }
                 if (quickView == 0) {
-                    gpWindowManager->m_hoverWidgetId = HERO_WINDOW_NO_HOVER_WIDGET;
+                    gpWindowManager->m_lastHoverId = HERO_WINDOW_NO_HOVER_WIDGET;
                     UpdateHeroScreenStatusBar(message);
                 }
                 break;
