@@ -181,6 +181,26 @@ authoritative. This file is the short, restart-ready Codex workflow.
   secondary naming references for enums, object IDs, and serialization formats. Retail disassembly,
   CodeView, data bytes, and relocations are authoritative. Adapt useful names to this repo's style;
   do not copy its implementation structure.
+
+## Static Data And Link Resolution
+
+- Do not use objdiff's aggregate `matched_data` or `matched_data_percent` as a static-data coverage
+  metric. The delinker fragments, duplicates, synthesizes, and zero-fills per-TU data sections, so
+  its target objects are not faithful byte-for-byte images of retail `.data`/`.rdata`. Matching
+  those synthetic sections globally is neither meaningful nor a campaign objective.
+- Unresolved data symbols are still actionable link and layout work. CodeView-backed globals must
+  be declared in their canonical owner header and defined in the owning TU with the proven type.
+  Recover retail initializers and pointer relocations when runtime semantics require them; compare
+  those bytes against the original PE at the authoritative VA, not against a synthetic delinked
+  data section.
+- Never resolve an interior alias by emitting overlapping independent storage. Replace aliases into
+  `gConfig`, monster tables, formation/elevation records, or other known objects with real member or
+  table access. Refine the owning packed layout when necessary and then remove the synthetic model
+  declaration.
+- Keep unresolved-symbol cleanup separate from data-byte matching. Its proof is: no unresolved
+  reconstruction-object reference, correct owner/address/layout, correct call-site semantics, and
+  a passing full build/relocation audit. It does not require improving objdiff's data percentage.
+
 ## Git Discipline
 
 - Never revert user changes or stage `.claude/worktrees/`.
