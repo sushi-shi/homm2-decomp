@@ -1,0 +1,19 @@
+# BASE/icon2bc contiguous decoder-state ownership pass, checkpoint 06409a9
+# Target: IconToBitmapColorTable, RVA 0xd32a0, retail size 0x5af, target relocations 91.
+# New evidence: the 17 verified scratch owners occupy one gapless 0x44-byte block at 0x534ca8..0x534ceb. This pass tested real record ownership, not overlapping aliases, and combined it only with the already-proved pre-loop destination lifetime where stated.
+# Retail allocation target: setup data=ESI, 13*frame=EBX, entry=EDI, entry.x=ECX, srcOffset=EAX; decoder X=ESI, destination=EBX, source=ECX, command=EAX, count=EDX.
+# No regex or AST permutation tool was used. All rejected source/header states were removed.
+state	match_percent	base_target_relocs	result	new_ownership_and_byte_evidence
+canonical-input	73.1690	88/91	retained	Separate verified statics; setup folds offset+entry into ECX and loop reloads destination. This remains the retained checkpoint.
+inline_byte_reader_main_fetch	71.84	88/91	rejected	An inline reader returning the command still emitted source=EAX/command=ECX; an inline return boundary alone is not the missing abstraction.
+whole_flat_state_reload_cursor	66.69	91/91	rejected	One flat 0x44-byte record preserves every retail relocation address/addend, but broad alias and declaration-state changes regress setup/decoder allocation.
+whole_flat_state_preloop_cursor	65.24	92/91	structurally-informative-rejected	The flat record plus the retail destination lifetime uniquely recovers source=ECX, command=EAX, and count=EDX. It keeps X=EBX and destination=ESI, exactly the reverse of retail, and adds one relocation occurrence.
+cursor_pair_state_preloop_cursor	68.42	87/91	rejected	A two-pointer record at 0x534cd4 groups only destination/source. It is too narrow to trigger command ownership and emits source=EAX/command=ECX/count=EBX/destination=EDX.
+command_tail_state_preloop_cursor	71.52	87/91	rejected	A contiguous record for destination/source/shadow-count/X0/color/run at 0x534cd4..0x534ceb remains source=EAX/command=ECX/count=EBX/destination=EDX.
+whole_flat_state_explicit_offset_setup	71.51	87/91	rejected	Byte-offset setup recovers 13*frame=EBX and X=ESI, but colors entry.x=EDI/entry=ECX and flips the decoder back to source=EAX/command=ECX/count=EBX/destination=EDX.
+whole_flat_state_entry_first_setup	71.09	87/91	rejected	Declaring the typed entry before its x/srcOffset snapshots folds offset+data into ECX and retains the wrong decoder coloring.
+whole_flat_state_formal_x	64.18	92/91	rejected	Mutating formal x preserves source=ECX/command=EAX/count=EDX but still leaves X=EBX/destination=ESI and broadly regresses setup.
+nested_command_record_preloop_cursor	71.37	87/91	rejected	Nesting the tail command record inside the full state changes compiler state enough to recover X=ESI, but loses command/count ownership and leaves destination=EDX.
+private_state_header_preloop_cursor	61.98	88/91	rejected	Moving the same flat record to a TU-private header after Misc perturbs the prologue/row lifetime broadly and does not recover the retail register chain.
+# Result: record ownership proves the desired command/count coloring is reachable without unsafe semantics, but not simultaneously with retail X/destination or the 91-occurrence shape. The trigger is the full flat declaration surface plus pre-loop cursor, not a fetch synonym.
+# Revisit only with independent evidence for a real state subrecord/header surface that simultaneously keeps X=ESI and destination=EBX, or with a setup abstraction that preserves the whole-flat command coloring while producing the retail EBX/EDI split. Do not enumerate arbitrary record boundaries or declaration surfaces.
