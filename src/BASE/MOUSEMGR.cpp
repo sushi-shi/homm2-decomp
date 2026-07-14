@@ -37,20 +37,20 @@ mouseManager::mouseManager(void) : baseManager()
     int i;
     m_savedUnderlying = 0;
     m_active = 0;
-    m_cursorType = -1;
+    m_cursorType = MOUSE_INVALID_CURSOR_TYPE;
     strcpy(name, "mouseManager");
     m_cursorFrame = 0;
     m_cursorReady = 1;
     m_cursorIcon = 0;
-    for (i = 0; i < 0x60; i++)
+    for (i = 0; i < MOUSE_CURSOR_COUNT; i++)
         hbmpAndMask[i] = 0;
-    for (i = 0; i < 0x60; i++)
+    for (i = 0; i < MOUSE_CURSOR_COUNT; i++)
         hMouseCursor[i] = 0;
-    for (i = 0; i < 0x60; i++)
+    for (i = 0; i < MOUSE_CURSOR_COUNT; i++)
         cColorBits[i] = 0;
-    for (i = 0; i < 0x60; i++)
+    for (i = 0; i < MOUSE_CURSOR_COUNT; i++)
         cAndBits[i] = 0;
-    for (i = 0; i < 0x60; i++) {
+    for (i = 0; i < MOUSE_CURSOR_COUNT; i++) {
         if (iHotSpot[i][0] == -1)
             iHotSpot[i][0] = iMouseSize[i][1] / 2;
         if (iHotSpot[i][1] == -1)
@@ -59,41 +59,44 @@ mouseManager::mouseManager(void) : baseManager()
     m_hideCount = 1;
 }
 
-// @early-stop
-// base .text 0x91, retail 0x94; non-reloc differences are base +0x52..+0x56
-// (the shared 0xf0 load) and base +0x60..+0x65 versus retail +0x5b..+0x68
-// (two immediate stores). The suffix is identical after the resulting 3-byte shift.
-// Relocations resolve 3/3 with only-base=0. Direct 0xf0 stores and a distinct
-// 0xef+1 spelling for the second store both select the same cumulative constant CSE.
+// @match-note coverage checkpoint: semantics, member layout, no-frame CFG, and
+// relocations are complete (3/3, no base-only target). Base .text is 0x91 versus
+// retail 0x94. The first code divergence is base +0x52: MSVC keeps 0xf0 in ECX and
+// shares it across the two stores, while retail emits two immediate stores at
+// +0x5b..+0x68; the suffix is identical after the three-byte shift. Direct stores
+// and spelling the second value as 0xef+1 still select the shared-load form.
+// Revisit after a predecessor/shared-header TU-state change, not with predicates.
 VA(0x004c9350, 0x94)
 int mouseManager::Open(int id)
 {
     m_forcePointerUpdate = 0;
-    m_savedUnderlying = new bitmap(0x21, 0x42, 0x40);
-    m_savedLeft = 0x13f;
-    m_savedTop = 0xef;
-    m_cursorRight = 0x140;
-    m_cursorLeft = 0x13f;
-    m_cursorTop = 0xef;
-    m_mouseX = 0x140;
+    m_savedUnderlying = new bitmap(MOUSE_SAVED_BITMAP_TYPE, MOUSE_SAVED_BITMAP_WIDTH,
+                                   MOUSE_SAVED_BITMAP_HEIGHT);
+    m_savedLeft = MOUSE_SCREEN_CENTER_X - 1;
+    m_savedTop = MOUSE_SCREEN_CENTER_Y - 1;
+    m_cursorRight = MOUSE_SCREEN_CENTER_X;
+    m_cursorLeft = MOUSE_SCREEN_CENTER_X - 1;
+    m_cursorTop = MOUSE_SCREEN_CENTER_Y - 1;
+    m_mouseX = MOUSE_SCREEN_CENTER_X;
     m_cursorSizeIndex = 0;
-    m_previousCursorSizeIndex = 0;
-    m_cursorBottom = 0xf0;
-    m_mouseY = 0xf0;
+    m_drawnCursorSizeIndex = 0;
+    m_cursorBottom = MOUSE_SCREEN_CENTER_Y;
+    m_mouseY = MOUSE_SCREEN_CENTER_Y;
     if (gbColorMice != 0)
         ShowCursor(0);
-    field_0xc = 0x40;
+    m_messageMask = MOUSE_MANAGER_MESSAGE_MASK;
     m_active = 1;
-    field_0x10 = id;
+    m_priority = id;
     return 0;
 }
 
-// @early-stop
-// base .text 0xed, retail 0xed after restoring retail __LINE__ values. Register-only
-// spans are +0x2b..+0x2c, +0x43..+0x54, +0x5a..+0x6b, +0x7f..+0x8e,
-// +0xa2..+0xb1, and +0xb9..+0xcb: base uses EDI as the byte offset and EBP for
-// DestroyIcon; retail exchanges EDI/EBP. Relocations resolve 14/14, only-base=0.
-// for-scope, hoisted int, and register-qualified counters all choose the base allocation.
+// @match-note coverage checkpoint: semantics, zero-frame loop CFG, and relocations
+// are complete (14/14, no base-only target); both bodies are 0xed bytes. The first
+// divergence is the loop setup at +0x2b: base uses EBX as the byte offset and EBP
+// for DeleteObject, while retail uses EBP as the offset and EBX for DeleteObject.
+// The later differences are only that register exchange. for-scope, hoisted, and
+// register-qualified counters retain the base allocation. Revisit after TU-state
+// changes or during the AST last-mile phase.
 VA(0x004c93f0, 0xed)
 void mouseManager::Close(void)
 {
@@ -104,12 +107,11 @@ void mouseManager::Close(void)
             delete m_savedUnderlying;
         m_savedUnderlying = 0;
         SetCursor(LoadCursorA(0, IDC_ARROW));
-        for (i = 0; i < 0x60; i++) {
+        for (i = 0; i < MOUSE_CURSOR_COUNT; i++) {
             if (hMouseCursor[i] != 0)
                 DestroyIcon(hMouseCursor[i]);
             hMouseCursor[i] = 0;
             if (cAndBits[i] != 0)
-#line 330
                 H2_FREE(cAndBits[i], "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x14a);
             cAndBits[i] = 0;
             if (cColorBits[i] != 0)
@@ -134,13 +136,13 @@ void mouseManager::SetPointer(char *name, int param_2, int param_3)
     if (m_forcePointerUpdate == 0) {
         gbPutzingWithMouseCtr++;
         gpResourceManager->SavePosition();
-        if (param_3 == -999) {
+        if (param_3 == MOUSE_AUTO_CURSOR_TYPE) {
             if (giCurExe == 1 || *name == 'a' || *name == 'A')
-                param_3 = 0;
+                param_3 = MOUSE_CURSOR_ADVENTURE;
             else if (*name == 's' || *name == 'S')
-                param_3 = 2;
+                param_3 = MOUSE_CURSOR_SPELL;
             else
-                param_3 = 1;
+                param_3 = MOUSE_CURSOR_COMBAT;
         }
         if (m_cursorType != param_3 && (m_cursorType = param_3, gbColorMice != 0)) {
             int saved82 = m_cursorReady;
@@ -148,16 +150,15 @@ void mouseManager::SetPointer(char *name, int param_2, int param_3)
             if (m_cursorIcon != 0)
                 gpResourceManager->Dispose(m_cursorIcon);
             char local_10[16];
-            if (m_cursorType == 0)
+            if (m_cursorType == MOUSE_CURSOR_ADVENTURE)
                 sprintf(local_10, "ADVMCO.ICN");
-            else if (m_cursorType == 2)
+            else if (m_cursorType == MOUSE_CURSOR_SPELL)
                 sprintf(local_10, "SPELCO.ICN");
             else
                 sprintf(local_10, "CMSECO.ICN");
             m_cursorIcon = gpResourceManager->GetIcon(local_10);
-#line 410
-            H2_ASSERT(param_2 != 1000, "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x19a);
-            m_cursorFrame = -1;
+            H2_ASSERT(param_2 != MOUSE_KEEP_CURRENT_FRAME, "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x19a);
+            m_cursorFrame = MOUSE_INVALID_CURSOR_FRAME;
             m_cursorReady = saved82;
         }
         SetPointer(param_2);
@@ -166,16 +167,17 @@ void mouseManager::SetPointer(char *name, int param_2, int param_3)
     }
 }
 
-// @early-stop
-// base .text 0x40f, retail 0x405. The mask loop differs at base +0x1c6..+0x24f
-// versus retail +0x1d1..+0x243: row*32/row*4 strength reduction uses EBX/EDI in
-// base versus independent EAX/EDI offsets in retail. Paired-offset for/while forms
-// (with direct subscripts or pointer temps) regress to 75.10%; the row/column form is 94.32%.
-// Aggregate-reloc spelling spans are base +0x26b..+0x2da and +0x337..+0x399
-// versus retail +0x25f..+0x2ce and +0x32b..+0x38d. Audit: base 69, retail 70.
-// The relocation checker now resolves indexed member displacements correctly and reports
-// only-base=0. Source uses the proper typed bmpAndMask and IconInfo members; retail's interior
-// labels are delinker identities, not globals or aliases that should be reproduced in source.
+// @match-note coverage checkpoint: semantics, 0x14-byte local area, CFG, cursor
+// table types, and external relocations are reconstructed (70/70, no base-only
+// target). This is still not an early stop. Base code is 0x3d9 versus retail
+// 0x405. The first divergence is the
+// prologue: retail spills this at [esp] before saving EBX/ESI/EDI/EBP; base keeps
+// this in EBP and later spills the color-row offset. The retail mask loop uses
+// independent color and mask byte offsets, which this source now models directly.
+// A row/column multiplication form scores ~94% but is structurally false; direct
+// offset forms score ~75%. A nested lifetime block and the hash-informed semantic
+// name sourceOffset do not change allocation. Register-qualified counters also
+// retain the base allocation. Revisit after TU-state changes or in last-mile AST work.
 VA(0x004c9630, 0x405)
 void mouseManager::SetPointer(int frame)
 {
@@ -186,62 +188,63 @@ void mouseManager::SetPointer(int frame)
     gbPutzingWithMouseCtr++;
     gpResourceManager->SavePosition();
     if (giCurExe == 1)
-        m_cursorType = 0;
-    if (frame == 1000)
+        m_cursorType = MOUSE_CURSOR_ADVENTURE;
+    if (frame == MOUSE_KEEP_CURRENT_FRAME)
         frame = m_cursorFrame;
     else
         m_cursorFrame = frame;
     m_cursorSizeIndex = iMouseOffset[m_cursorType] + frame;
-#line 458
-    H2_ASSERT(m_cursorSizeIndex >= 0 && m_cursorSizeIndex < 96, "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x1ca);
+    H2_ASSERT(m_cursorSizeIndex >= 0 && m_cursorSizeIndex < MOUSE_CURSOR_COUNT, "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x1ca);
 
     if (gbColorMice != 0) {
         NewUpdate(1);
     } else {
         if (hMouseCursor[m_cursorSizeIndex] == 0) {
-#line 480
-            cColorBits[m_cursorSizeIndex] = H2_ALLOC(0x400, "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x1e0);
-            cAndBits[m_cursorSizeIndex] = H2_ALLOC(0x100, "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x1e1);
+            cColorBits[m_cursorSizeIndex] = H2_ALLOC(MOUSE_CURSOR_COLOR_BYTES, "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x1e0);
+            cAndBits[m_cursorSizeIndex] = H2_ALLOC(MOUSE_CURSOR_AND_BYTES, "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x1e1);
 
             char filename[16];
-            if (m_cursorType == 0)
+            if (m_cursorType == MOUSE_CURSOR_ADVENTURE)
                 sprintf(filename, "ADVMBW%02d.BMP", frame + 1);
-            else if (m_cursorType == 2)
+            else if (m_cursorType == MOUSE_CURSOR_SPELL)
                 sprintf(filename, "SPELBW%02d.BMP", frame);
             else
                 sprintf(filename, "CMSEBW%02d.BMP", frame + 1);
 
             gpResourceManager->PointToFile(gpResourceManager->MakeId(filename, 1));
-            gpResourceManager->ReadBlock(static_cast<signed char *>(cColorBits[m_cursorSizeIndex]), 6);
-            gpResourceManager->ReadBlock(static_cast<signed char *>(cColorBits[m_cursorSizeIndex]), 0x400);
-            memset(cAndBits[m_cursorSizeIndex], 0, 0x100);
-            for (int row = 0; row < 32; row++) {
-                for (int column = 0; column < 32; column++) {
-                    signed char *colorBits = static_cast<signed char *>(cColorBits[m_cursorSizeIndex]);
-                    signed char *andBits = static_cast<signed char *>(cAndBits[m_cursorSizeIndex]);
-                    if (colorBits[row * 32 + column] == 0)
-                        andBits[row * 4 + column / 8] |= 1 << (7 - (column & 7));
-                    else if (colorBits[row * 32 + column] == 1)
-                        andBits[0x80 + row * 4 + column / 8] |= 1 << (7 - (column & 7));
+            gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(cColorBits[m_cursorSizeIndex]), MOUSE_CURSOR_BITMAP_HEADER_BYTES);
+            gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(cColorBits[m_cursorSizeIndex]), MOUSE_CURSOR_COLOR_BYTES);
+            memset(cAndBits[m_cursorSizeIndex], 0, MOUSE_CURSOR_AND_BYTES);
+            {
+                int sourceOffset = 0;
+                int maskOffset = 0;
+                while (sourceOffset < MOUSE_CURSOR_COLOR_BYTES) {
+                    for (int column = 0; column < MOUSE_CURSOR_BITMAP_WIDTH; column++) {
+                        if (static_cast<unsigned char *>(cColorBits[m_cursorSizeIndex])[sourceOffset + column] == 0)
+                            static_cast<unsigned char *>(cAndBits[m_cursorSizeIndex])[maskOffset + column / 8] |= 1 << (MOUSE_CURSOR_MASK_HIGH_BIT - (column & MOUSE_CURSOR_MASK_HIGH_BIT));
+                        else if (static_cast<unsigned char *>(cColorBits[m_cursorSizeIndex])[sourceOffset + column] == 1)
+                            static_cast<unsigned char *>(cAndBits[m_cursorSizeIndex])[MOUSE_CURSOR_MASK_PLANE_BYTES + maskOffset + column / 8] |= 1 << (MOUSE_CURSOR_MASK_HIGH_BIT - (column & MOUSE_CURSOR_MASK_HIGH_BIT));
+                    }
+                    sourceOffset += MOUSE_CURSOR_BITMAP_WIDTH;
+                    maskOffset += MOUSE_CURSOR_MASK_ROW_BYTES;
                 }
             }
 
             bmpAndMask[m_cursorSizeIndex].bmType = 0;
-            bmpAndMask[m_cursorSizeIndex].bmWidth = 32;
-            bmpAndMask[m_cursorSizeIndex].bmHeight = 64;
-            bmpAndMask[m_cursorSizeIndex].bmWidthBytes = 4;
-            bmpAndMask[m_cursorSizeIndex].bmPlanes = 1;
-            bmpAndMask[m_cursorSizeIndex].bmBitsPixel = 1;
-            bmpAndMask[m_cursorSizeIndex].bmWidthBytes = 4;
+            bmpAndMask[m_cursorSizeIndex].bmWidth = MOUSE_CURSOR_BITMAP_WIDTH;
+            bmpAndMask[m_cursorSizeIndex].bmHeight = MOUSE_CURSOR_MASK_HEIGHT;
+            bmpAndMask[m_cursorSizeIndex].bmWidthBytes = MOUSE_CURSOR_MASK_ROW_BYTES;
+            bmpAndMask[m_cursorSizeIndex].bmPlanes = MOUSE_CURSOR_BITMAP_PLANES;
+            bmpAndMask[m_cursorSizeIndex].bmBitsPixel = MOUSE_CURSOR_BITMAP_BITS_PER_PIXEL;
+            bmpAndMask[m_cursorSizeIndex].bmWidthBytes = MOUSE_CURSOR_MASK_ROW_BYTES;
             bmpAndMask[m_cursorSizeIndex].bmBits = cAndBits[m_cursorSizeIndex];
             hbmpAndMask[m_cursorSizeIndex] = CreateBitmapIndirect(&bmpAndMask[m_cursorSizeIndex]);
-#line 514
             H2_ASSERT(reinterpret_cast<int>(hbmpAndMask[m_cursorSizeIndex]), "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x202);
 
             IconInfo[m_cursorSizeIndex].fIcon = 0;
-            if (m_cursorType == 2) {
-                IconInfo[m_cursorSizeIndex].xHotspot = 15;
-                IconInfo[m_cursorSizeIndex].yHotspot = 15;
+            if (m_cursorType == MOUSE_CURSOR_SPELL) {
+                IconInfo[m_cursorSizeIndex].xHotspot = MOUSE_SPELL_CURSOR_HOTSPOT;
+                IconInfo[m_cursorSizeIndex].yHotspot = MOUSE_SPELL_CURSOR_HOTSPOT;
             } else {
                 IconInfo[m_cursorSizeIndex].xHotspot = iHotSpot[m_cursorSizeIndex][0];
                 IconInfo[m_cursorSizeIndex].yHotspot = iHotSpot[m_cursorSizeIndex][1];
@@ -249,7 +252,6 @@ void mouseManager::SetPointer(int frame)
             IconInfo[m_cursorSizeIndex].hbmMask = hbmpAndMask[m_cursorSizeIndex];
             IconInfo[m_cursorSizeIndex].hbmColor = 0;
             hMouseCursor[m_cursorSizeIndex] = CreateIconIndirect(&IconInfo[m_cursorSizeIndex]);
-#line 533
             H2_ASSERT(reinterpret_cast<int>(hMouseCursor[m_cursorSizeIndex]), "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x215);
         }
         SetCursor(hMouseCursor[m_cursorSizeIndex]);
@@ -259,15 +261,17 @@ void mouseManager::SetPointer(int frame)
     gbPutzingWithMouseCtr--;
 }
 
-// @early-stop
-// base .text 0x469, retail 0x47a. Private-DATA/second-column alias-only spans are
-// +0xdc..+0xe2, +0x12c..+0x132, and +0x14c..+0x152. The remaining equivalent
-// compare/load-order spans are base/retail +0x200..+0x203, +0x213..+0x216,
-// +0x243..+0x24a; base +0x255..+0x25d vs retail +0x255..+0x25c;
-// base +0x2eb..+0x307 vs retail +0x2ed..+0x309; and base +0x361..+0x388
-// vs retail +0x373..+0x399. Relocations resolve base 84/retail 83, only-base=0.
-// Reversed < and > spellings are byte-neutral; ternary and direct-field width/height
-// forms regress, while explicit branch assignments give the retained 97.38% shape.
+// @match-note coverage checkpoint: semantics, member layout, zero-frame CFG, local
+// lifetimes, and relocations are complete (83/83, no base-only target). The overlap
+// path must jump past the current-rectangle rebuild; without this join it discarded
+// the expanded update bounds and emitted an extra gOldMouseBottom occurrence. Base
+// .text is now 0x46a versus retail 0x47a, live 98.39%. After private-data and array-
+// column relocation identities, the first code divergence is equivalent condition
+// lowering near +0x1cf: base emits CMP savedLeft,oldRight/JG while retail emits CMP
+// oldRight,savedLeft/JL. Later residuals are the same operand/polarity allocation in
+// the overlap expansion and clipping comparisons. Direct/reversed comparison
+// spellings were previously byte-neutral; ternary/direct-field width forms regress.
+// No permutation was run. Revisit after a predecessor/shared-layout TU-state change.
 VA(0x004c9a40, 0x47a)
 void mouseManager::NewUpdate(int force)
 {
@@ -285,8 +289,8 @@ void mouseManager::NewUpdate(int force)
             goto updateDone;
         GetCursorPos(&gMouseCheckPt);
         ScreenToClient(hwndApp, &gMouseCheckPt);
-        m_mouseX = (gMouseCheckPt.x * 640) / iMainWinScreenWidth;
-        m_mouseY = (gMouseCheckPt.y * 480) / iMainWinScreenHeight;
+        m_mouseX = (gMouseCheckPt.x * MOUSE_SCREEN_WIDTH) / iMainWinScreenWidth;
+        m_mouseY = (gMouseCheckPt.y * MOUSE_SCREEN_HEIGHT) / iMainWinScreenHeight;
         CheckChangeCursor(m_mouseX, m_mouseY, 0);
     }
     if (gbColorMice == 0)
@@ -306,10 +310,10 @@ void mouseManager::NewUpdate(int force)
     m_cursorTop = m_mouseY - iHotSpot[m_cursorSizeIndex][1];
     m_cursorRight = m_cursorLeft + iMouseSize[m_cursorSizeIndex][0] - 1;
     m_cursorBottom = m_cursorTop + iMouseSize[m_cursorSizeIndex][1] - 1;
-    if (m_cursorRight > 639)
-        m_cursorRight = 639;
-    if (m_cursorBottom > 479)
-        m_cursorBottom = 479;
+    if (m_cursorRight > MOUSE_SCREEN_WIDTH - 1)
+        m_cursorRight = MOUSE_SCREEN_WIDTH - 1;
+    if (m_cursorBottom > MOUSE_SCREEN_HEIGHT - 1)
+        m_cursorBottom = MOUSE_SCREEN_HEIGHT - 1;
     m_savedLeft = 0;
     if (m_cursorLeft >= 0)
         m_savedLeft = m_cursorLeft;
@@ -317,14 +321,14 @@ void mouseManager::NewUpdate(int force)
     if (m_cursorTop >= 0)
         m_savedTop = m_cursorTop;
 
-    if (gOldMouseLeft <= 639 && gOldMouseTop <= 479 &&
+    if (gOldMouseLeft <= MOUSE_SCREEN_WIDTH - 1 && gOldMouseTop <= MOUSE_SCREEN_HEIGHT - 1 &&
         gOldMouseRight >= 0 && gOldMouseBottom >= 0) {
         if (gOldMouseRight < m_savedLeft || gOldMouseLeft > m_cursorRight ||
             gOldMouseBottom < m_savedTop || gOldMouseTop > m_cursorBottom) {
-            if (gOldMouseRight > 639)
-                gOldMouseRight = 639;
-            if (gOldMouseBottom > 479)
-                gOldMouseBottom = 479;
+            if (gOldMouseRight > MOUSE_SCREEN_WIDTH - 1)
+                gOldMouseRight = MOUSE_SCREEN_WIDTH - 1;
+            if (gOldMouseBottom > MOUSE_SCREEN_HEIGHT - 1)
+                gOldMouseBottom = MOUSE_SCREEN_HEIGHT - 1;
             BlitBitmapToScreenNoMouseCheck(gpWindowManager->m_screen,
                 gOldMouseLeft, gOldMouseTop,
                 gOldMouseRight - gOldMouseLeft + 1,
@@ -341,29 +345,31 @@ void mouseManager::NewUpdate(int force)
             int bottom = m_savedTop + iMouseSize[m_cursorSizeIndex][1] - 1;
             if (gOldMouseBottom < bottom)
                 gOldMouseBottom = bottom;
+            goto updateBoundsReady;
         }
     }
 
     gOldMouseLeft = m_savedLeft;
     gOldMouseTop = m_savedTop;
-    gOldMouseRight = m_savedLeft + iMouseSize[m_previousCursorSizeIndex][0] - 1;
-    gOldMouseBottom = m_savedTop + iMouseSize[m_previousCursorSizeIndex][1] - 1;
-    if (gOldMouseLeft <= 639 && gOldMouseTop <= 479 &&
+    gOldMouseRight = m_savedLeft + iMouseSize[m_drawnCursorSizeIndex][0] - 1;
+    gOldMouseBottom = m_savedTop + iMouseSize[m_drawnCursorSizeIndex][1] - 1;
+updateBoundsReady:
+    if (gOldMouseLeft <= MOUSE_SCREEN_WIDTH - 1 && gOldMouseTop <= MOUSE_SCREEN_HEIGHT - 1 &&
         gOldMouseRight >= 0 && gOldMouseBottom >= 0) {
-        if (gOldMouseRight > 639)
-            gOldMouseRight = 639;
-        if (gOldMouseBottom > 479)
-            gOldMouseBottom = 479;
+        if (gOldMouseRight > MOUSE_SCREEN_WIDTH - 1)
+            gOldMouseRight = MOUSE_SCREEN_WIDTH - 1;
+        if (gOldMouseBottom > MOUSE_SCREEN_HEIGHT - 1)
+            gOldMouseBottom = MOUSE_SCREEN_HEIGHT - 1;
     }
 
     width = iMouseSize[m_cursorSizeIndex][0];
-    if (m_savedLeft + width > 640)
-        m_savedWidth = 640 - m_savedLeft;
+    if (m_savedLeft + width > MOUSE_SCREEN_WIDTH)
+        m_savedWidth = MOUSE_SCREEN_WIDTH - m_savedLeft;
     else
         m_savedWidth = width;
     height = iMouseSize[m_cursorSizeIndex][1];
-    if (m_savedTop + height > 480)
-        m_savedHeight = 480 - m_savedTop;
+    if (m_savedTop + height > MOUSE_SCREEN_HEIGHT)
+        m_savedHeight = MOUSE_SCREEN_HEIGHT - m_savedTop;
     else
         m_savedHeight = height;
 
@@ -371,7 +377,7 @@ void mouseManager::NewUpdate(int force)
         m_savedLeft, m_savedTop, m_savedWidth, m_savedHeight);
     if (m_hideCount == 0)
         IconToBitmap(m_cursorIcon, gpWindowManager->m_screen, m_cursorLeft, m_cursorTop,
-            m_cursorFrame, 1, 0, 0, 640, 480, 0);
+            m_cursorFrame, 1, 0, 0, MOUSE_SCREEN_WIDTH, MOUSE_SCREEN_HEIGHT, 0);
     BlitBitmapToScreenNoMouseCheck(gpWindowManager->m_screen,
         gOldMouseLeft, gOldMouseTop,
         gOldMouseRight - gOldMouseLeft + 1,
@@ -379,7 +385,7 @@ void mouseManager::NewUpdate(int force)
         gOldMouseLeft, gOldMouseTop);
     m_savedUnderlying->CopyToCareful(gpWindowManager->m_screen, m_savedLeft, m_savedTop,
         0, 0, m_savedWidth, m_savedHeight);
-    m_previousCursorSizeIndex = m_cursorSizeIndex;
+    m_drawnCursorSizeIndex = m_cursorSizeIndex;
 
 updateDone:
     bInNewMouseUpdate = 0;
@@ -391,21 +397,21 @@ void mouseManager::MouseCoords(int &x, int &y)
 {
     GetCursorPos(&gMouseScreenPt);
     ScreenToClient(hwndApp, &gMouseScreenPt);
-    x = (gMouseScreenPt.x * 640) / iMainWinScreenWidth;
-    y = (gMouseScreenPt.y * 480) / iMainWinScreenHeight;
+    x = (gMouseScreenPt.x * MOUSE_SCREEN_WIDTH) / iMainWinScreenWidth;
+    y = (gMouseScreenPt.y * MOUSE_SCREEN_HEIGHT) / iMainWinScreenHeight;
 }
 
 VA(0x004c9f20, 0xa2)
 void mouseManager::SaveAndDraw(void)
 {
-    m_savedWidth = m_cursorLeft + iMouseSize[m_cursorSizeIndex][0] > 640
-        ? 640 - m_cursorLeft : iMouseSize[m_cursorSizeIndex][0];
-    m_savedHeight = m_cursorTop + iMouseSize[m_cursorSizeIndex][1] > 480
-        ? 480 - m_cursorTop : iMouseSize[m_cursorSizeIndex][1];
+    m_savedWidth = m_cursorLeft + iMouseSize[m_cursorSizeIndex][0] > MOUSE_SCREEN_WIDTH
+        ? MOUSE_SCREEN_WIDTH - m_cursorLeft : iMouseSize[m_cursorSizeIndex][0];
+    m_savedHeight = m_cursorTop + iMouseSize[m_cursorSizeIndex][1] > MOUSE_SCREEN_HEIGHT
+        ? MOUSE_SCREEN_HEIGHT - m_cursorTop : iMouseSize[m_cursorSizeIndex][1];
     gpWindowManager->m_screen->CopyToCareful(m_savedUnderlying, 0, 0, m_savedLeft, m_savedTop,
                                                m_savedWidth, m_savedHeight);
     IconToBitmap(m_cursorIcon, gpWindowManager->m_screen, m_cursorLeft, m_cursorTop, m_cursorFrame,
-                 1, 0, 0, 640, 480, 0);
+                 1, 0, 0, MOUSE_SCREEN_WIDTH, MOUSE_SCREEN_HEIGHT, 0);
 }
 
 VA(0x004c9fd0, 0x29)
@@ -436,9 +442,9 @@ void mouseManager::ReallyShowPointer(void)
             if (gbColorMice != 0) {
                 GetCursorPos(&gMouseCheckPt);
                 ScreenToClient(hwndApp, &gMouseCheckPt);
-                int x = (gMouseCheckPt.x * 640) / iMainWinScreenWidth;
+                int x = (gMouseCheckPt.x * MOUSE_SCREEN_WIDTH) / iMainWinScreenWidth;
                 m_mouseX = x;
-                int y = (gMouseCheckPt.y * 480) / iMainWinScreenHeight;
+                int y = (gMouseCheckPt.y * MOUSE_SCREEN_HEIGHT) / iMainWinScreenHeight;
                 m_mouseY = y;
                 CheckChangeCursor(x, y, 0);
             }
@@ -466,9 +472,9 @@ void mouseManager::ShowColorPointer(void)
         if (gbColorMice != 0) {
             GetCursorPos(&gMouseCheckPt);
             ScreenToClient(hwndApp, &gMouseCheckPt);
-            int x = (gMouseCheckPt.x * 640) / iMainWinScreenWidth;
+            int x = (gMouseCheckPt.x * MOUSE_SCREEN_WIDTH) / iMainWinScreenWidth;
             m_mouseX = x;
-            int y = (gMouseCheckPt.y * 480) / iMainWinScreenHeight;
+            int y = (gMouseCheckPt.y * MOUSE_SCREEN_HEIGHT) / iMainWinScreenHeight;
             m_mouseY = y;
             CheckChangeCursor(x, y, 0);
         }
@@ -486,22 +492,22 @@ void mouseManager::CheckUpdateMousePos(void)
     if (gbColorMice != 0) {
         GetCursorPos(&gMouseCheckPt);
         ScreenToClient(hwndApp, &gMouseCheckPt);
-        int x = (gMouseCheckPt.x * 640) / iMainWinScreenWidth;
+        int x = (gMouseCheckPt.x * MOUSE_SCREEN_WIDTH) / iMainWinScreenWidth;
         m_mouseX = x;
-        int y = (gMouseCheckPt.y * 480) / iMainWinScreenHeight;
+        int y = (gMouseCheckPt.y * MOUSE_SCREEN_HEIGHT) / iMainWinScreenHeight;
         m_mouseY = y;
         CheckChangeCursor(x, y, 0);
     }
 }
 
-// @early-stop
-// base .text 0x18f, retail 0x191. Divergence is confined to the prefix: base +0x0..+0xf
-// vs retail +0x0..+0xd, base +0x77..+0x80 vs retail +0x75..+0x81, and base
-// +0x8c..+0x91 vs retail +0x8d..+0x93. From base +0xb3 / retail +0xb5 onward,
-// instructions are identical; private-DATA names are delinker aliases. Relocations
-// resolve 29/29, only-base=0. Reversing savedY/savedX declarations improved 86.82%
-// to 96.84% and is retained. Direct/reversed comparisons, old-color temp, volatile
-// reference, and gbColorMice|0 all still fold the global into base's memory CMP.
+// @match-note coverage checkpoint: semantics, zero-frame CFG, member lifetimes, and
+// relocations are complete (29/29, no base-only target). Base .text is 0x18f versus
+// retail 0x191. The first divergence is the prologue: base compares the argument
+// directly with memory, while retail first loads gbColorMice and compares two
+// registers. Additional register/load-order spans end at base +0xb3 / retail +0xb5;
+// the suffix is identical. saved type-before-frame declaration order retains 96.84%.
+// Direct/reversed comparisons, an old-color temp, volatile reference, and `| 0`
+// still fold the global into the memory CMP. Revisit after TU-state changes.
 VA(0x004ca230, 0x191)
 void mouseManager::SetColorMice(int param_1)
 {
@@ -523,8 +529,8 @@ void mouseManager::SetColorMice(int param_1)
         int saved7e = m_forcePointerUpdate;
         m_cursorReady = 0;
         gbColorMice = param_1;
-        m_cursorFrame = -99;
-        m_cursorType = -1;
+        m_cursorFrame = MOUSE_RELOAD_CURSOR_FRAME;
+        m_cursorType = MOUSE_INVALID_CURSOR_TYPE;
         m_forcePointerUpdate = 0;
         SetPointer(gDefaultCursorName, savedX, savedY);
         m_cursorReady = 1;
@@ -535,9 +541,9 @@ void mouseManager::SetColorMice(int param_1)
                 if (gbColorMice != 0) {
                     GetCursorPos(&gMouseCheckPt);
                     ScreenToClient(hwndApp, &gMouseCheckPt);
-                    int x = (gMouseCheckPt.x * 640) / iMainWinScreenWidth;
+                    int x = (gMouseCheckPt.x * MOUSE_SCREEN_WIDTH) / iMainWinScreenWidth;
                     m_mouseX = x;
-                    int y = (gMouseCheckPt.y * 480) / iMainWinScreenHeight;
+                    int y = (gMouseCheckPt.y * MOUSE_SCREEN_HEIGHT) / iMainWinScreenHeight;
                     m_mouseY = y;
                     CheckChangeCursor(x, y, 0);
                 }
@@ -564,13 +570,13 @@ VTBL(mouseManager, 0x004eba00);
 
 // ---- globals (definitions, RVA order) ----
 DATA(0x0051ebc8) int iMouseOffset[4];
-DATA(0x0051ebd8) signed char iMouseSize[96][2];
-DATA(0x0051ec98) signed char iHotSpot[96][2];
+DATA(0x0051ebd8) signed char iMouseSize[MOUSE_CURSOR_COUNT][2];
+DATA(0x0051ec98) signed char iHotSpot[MOUSE_CURSOR_COUNT][2];
 DATA(0x0051ed58) int gbInSetPointer;
 DATA(0x0051ed5c) int bInNewMouseUpdate;
-DATA(0x00533240) struct tagBITMAP bmpAndMask[97];
-DATA(0x00533b58) void *hMouseCursor[96];
-DATA(0x00533cd8) void *cAndBits[96];
-DATA(0x00533e58) void *cColorBits[98];
-DATA(0x00533fe0) struct _ICONINFO IconInfo[96];
-DATA(0x00534760) void *hbmpAndMask[106];
+DATA(0x00533240) BITMAP bmpAndMask[MOUSE_CURSOR_COUNT];
+DATA(0x00533b58) HICON hMouseCursor[MOUSE_CURSOR_COUNT];
+DATA(0x00533cd8) void *cAndBits[MOUSE_CURSOR_COUNT];
+DATA(0x00533e58) void *cColorBits[MOUSE_CURSOR_COUNT];
+DATA(0x00533fe0) ICONINFO IconInfo[MOUSE_CURSOR_COUNT];
+DATA(0x00534760) HBITMAP hbmpAndMask[MOUSE_CURSOR_COUNT];

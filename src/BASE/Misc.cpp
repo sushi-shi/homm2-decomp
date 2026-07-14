@@ -1327,7 +1327,7 @@ void GetDataEntry(char *prompt, char *destination, int maximumLength, char *init
     int savedCursorFrame = gpMouseManager->m_cursorFrame;
     while (gpMouseManager->m_hideCount != 0)
         gpMouseManager->ShowColorPointer();
-    gpMouseManager->SetPointer("advmice.mse", 0, -999);
+    gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
 
     cDEDest = destination;
     iDEMaxLen = maximumLength;

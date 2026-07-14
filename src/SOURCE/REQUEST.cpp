@@ -384,8 +384,8 @@ int fileRequester::Open(int id)
         okEnabled = 1;
     }
     SetOK(okEnabled);
-    field_0xc = 0x4000;
-    field_0x10 = id;
+    m_messageMask = 0x4000;
+    m_priority = id;
     m_active = 1;
     strcpy(name, "fileRequester");
     return 0;

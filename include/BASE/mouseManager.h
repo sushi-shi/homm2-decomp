@@ -3,6 +3,7 @@
 // Reconstructed class (BASE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // 17 methods, 3 own-virtual, 0 static data.
 #include <va.h>
+#include <windows.h>
 #include "baseManager.h"
 // forward declarations:
 struct tag_message;
@@ -21,18 +22,18 @@ public:
     icon  *m_cursorIcon;  // +0x3e  the loaded cursor icon
     int    m_cursorType;  // +0x42
     int    m_cursorSizeIndex;  // +0x46
-    int    m_previousCursorSizeIndex;  // +0x4a
+    int    m_drawnCursorSizeIndex;  // +0x4a  size-table entry currently drawn/saved
     char _pad_0x4e[0x8];
     int    m_mouseX;  // +0x56
     int    m_mouseY;  // +0x5a
-    int    m_savedLeft;  // +0x5e  clipped left edge of saved cursor background
-    int    m_savedTop;  // +0x62  clipped top edge of saved cursor background
-    int    m_cursorLeft;  // +0x66  unclipped cursor left edge
-    int    m_cursorTop;  // +0x6a  unclipped cursor top edge
-    int    m_cursorRight;  // +0x6e  inclusive clipped cursor right edge
-    int    m_cursorBottom;  // +0x72  inclusive clipped cursor bottom edge
-    int    m_savedWidth;  // +0x76  clipped saved-background width
-    int    m_savedHeight;  // +0x7a  clipped saved-background height
+    int    m_savedLeft;  // +0x5e  clipped left edge of saved underlying pixels
+    int    m_savedTop;  // +0x62  clipped top edge of saved underlying pixels
+    int    m_cursorLeft;  // +0x66  unclipped cursor draw origin
+    int    m_cursorTop;  // +0x6a  unclipped cursor draw origin
+    int    m_cursorRight;  // +0x6e  clipped inclusive right edge
+    int    m_cursorBottom;  // +0x72  clipped inclusive bottom edge
+    int    m_savedWidth;  // +0x76  clipped saved-underlying width
+    int    m_savedHeight;  // +0x7a  clipped saved-underlying height
     int    m_forcePointerUpdate;  // +0x7e
     int    m_cursorReady;  // +0x82
     int    m_hideCount;  // +0x86
@@ -59,17 +60,49 @@ public:
 };
 #pragma pack(pop)
 SIZE(mouseManager, 0x8a);
+typedef enum MouseManagerConstant {
+    MOUSE_CURSOR_COUNT = 96,
+    MOUSE_SCREEN_WIDTH = 640,
+    MOUSE_SCREEN_HEIGHT = 480,
+    MOUSE_SCREEN_CENTER_X = 320,
+    MOUSE_SCREEN_CENTER_Y = 240,
+    MOUSE_SAVED_BITMAP_TYPE = 0x21,
+    MOUSE_SAVED_BITMAP_WIDTH = 0x42,
+    MOUSE_SAVED_BITMAP_HEIGHT = 0x40,
+    MOUSE_CURSOR_BITMAP_WIDTH = 32,
+    MOUSE_CURSOR_MASK_HEIGHT = 64,
+    MOUSE_CURSOR_MASK_ROW_BYTES = 4,
+    MOUSE_CURSOR_COLOR_BYTES = 0x400,
+    MOUSE_CURSOR_AND_BYTES = 0x100,
+    MOUSE_CURSOR_MASK_PLANE_BYTES = 0x80,
+    MOUSE_CURSOR_BITMAP_HEADER_BYTES = 6,
+    MOUSE_CURSOR_BITMAP_PLANES = 1,
+    MOUSE_CURSOR_BITMAP_BITS_PER_PIXEL = 1,
+    MOUSE_CURSOR_MASK_HIGH_BIT = 7,
+    MOUSE_SPELL_CURSOR_HOTSPOT = 15,
+    MOUSE_MANAGER_MESSAGE_MASK = 0x40,
+    MOUSE_INVALID_CURSOR_TYPE = -1,
+    MOUSE_INVALID_CURSOR_FRAME = -1,
+    MOUSE_RELOAD_CURSOR_FRAME = -99,
+    MOUSE_KEEP_CURRENT_FRAME = 1000,
+    MOUSE_AUTO_CURSOR_TYPE = -999
+} MouseManagerConstant;
+typedef enum MouseCursorType {
+    MOUSE_CURSOR_ADVENTURE = 0,
+    MOUSE_CURSOR_COMBAT = 1,
+    MOUSE_CURSOR_SPELL = 2
+} MouseCursorType;
 // ---- globals (declarations, RVA order) ----
 extern int iMouseOffset[4];
-extern signed char iMouseSize[96][2];
-extern signed char iHotSpot[96][2];
+extern signed char iMouseSize[MOUSE_CURSOR_COUNT][2];
+extern signed char iHotSpot[MOUSE_CURSOR_COUNT][2];
 extern int gbInSetPointer;
 extern int bInNewMouseUpdate;
-extern struct tagBITMAP bmpAndMask[97];
-extern void *hMouseCursor[96];
-extern void *cAndBits[96];
-extern void *cColorBits[98];
-extern struct _ICONINFO IconInfo[96];
-extern void *hbmpAndMask[106];
+extern BITMAP bmpAndMask[MOUSE_CURSOR_COUNT];
+extern HICON hMouseCursor[MOUSE_CURSOR_COUNT];
+extern void *cAndBits[MOUSE_CURSOR_COUNT];
+extern void *cColorBits[MOUSE_CURSOR_COUNT];
+extern ICONINFO IconInfo[MOUSE_CURSOR_COUNT];
+extern HBITMAP hbmpAndMask[MOUSE_CURSOR_COUNT];
 
 #endif // HOMM2_BASE_MOUSEMANAGER_H
