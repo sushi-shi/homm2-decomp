@@ -5,7 +5,11 @@
 
 #include <va.h>
 #include <io.h>
+#include <stdio.h>
 #include <_types.h>
+#include <_carcass_types.h>
+#include <BASE/heroWindow.h>
+#include <BASE/heroWindowManager.h>
 #include <SOURCE/ADVMGR.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/game.h>
@@ -206,25 +210,133 @@ void hero::UseSpell(int spell) {
 }
 
 VA(0x0046ca8b, 0x26)
-void hero::AddSpell(int, int) {}
+void hero::AddSpell(int spell, int) {
+    m_spells[spell] = 1;
+}
 
 VA(0x0046cab1, 0x82)
-void HeroMessageUpdate(char *) {}
+void HeroMessageUpdate(char *text) {
+    tag_message message;
 
+    if (gheroWin == 0)
+        return;
+
+    message.type = HERO_UI_MESSAGE;
+    message.field4 = HERO_UI_WIDGET_TEXT;
+    message.field8 = HERO_UI_STATUS_TEXT_WIDGET;
+    message.text = text;
+    gheroWin->BroadcastMessage(message);
+    gheroWin->DrawWindow(0, 300, 303);
+    gpWindowManager->UpdateScreenRegion(0, 459, 640, 20);
+}
+
+// @match-note 97.27%: semantics, the 0x24 frame, message/index/this slots at
+// -0x1c/-0x20/-0x24, CFG, and all 8/8 relocations agree. First divergence is +0x34:
+// retail bytes `8b 45 e0; 39 05 <giHeroScreenSrcIndex>` load index then compare the
+// global (9-byte span through +0x3c); base bytes `a1 <giHeroScreenSrcIndex>; 39 45 e0`
+// load the global then compare index (8-byte span through +0x3b). The remaining
+// instructions and operands agree, with branch displacements shifted by that byte.
+// Tried `global == index`, `index == global`, and `0[&index] == global`; all retained
+// the global-first form. Revisit after later HERO bodies change TU-cumulative state.
 VA(0x0046cb33, 0xa8)
-void hero::HeroScreenUpdate(void) {}
+void hero::HeroScreenUpdate(void) {
+    tag_message message;
+    int index;
+
+    message.type = HERO_UI_MESSAGE;
+    UpdateArmies();
+    for (index = 0; index < HERO_UI_ARMY_SLOT_COUNT; index++) {
+        if (index == giHeroScreenSrcIndex)
+            message.field4 = HERO_UI_WIDGET_ENABLE;
+        else
+            message.field4 = HERO_UI_WIDGET_DISABLE;
+        message.field18 = HERO_UI_WIDGET_FRAME_ACTIVE;
+        message.field8 = index + HERO_UI_ARMY_SELECTOR_FIRST;
+        heroWin->BroadcastMessage(message);
+    }
+    heroWin->DrawWindow();
+    gpWindowManager->UpdateScreenRegion(0, 0, 640, 480);
+}
 
 VA(0x0046cbdb, 0x1d2)
-void hero::UpdateArmies(void) {}
+void hero::UpdateArmies(void) {
+    tag_message message;
+    int index;
+
+    message.type = HERO_UI_MESSAGE;
+    for (index = 0; index < HERO_UI_ARMY_SLOT_COUNT; index++) {
+        if (m_army.m_creatureTypes[index] == ARMY_GROUP_EMPTY_SLOT) {
+            message.field4 = HERO_UI_WIDGET_FRAME;
+            message.field8 = index + HERO_UI_ARMY_ICON_FIRST;
+            message.field18 = HERO_UI_ARMY_EMPTY_FRAME;
+            heroWin->BroadcastMessage(message);
+
+            message.field4 = HERO_UI_WIDGET_DISABLE;
+            message.field8 = index + HERO_UI_ARMY_PORTRAIT_FIRST;
+            message.field18 = HERO_UI_WIDGET_FRAME_ACTIVE;
+            heroWin->BroadcastMessage(message);
+            message.field8 = index + HERO_UI_ARMY_COUNT_FIRST;
+            heroWin->BroadcastMessage(message);
+            message.field8 = index + HERO_UI_ARMY_SELECTOR_FIRST;
+            heroWin->BroadcastMessage(message);
+        } else {
+            message.field4 = HERO_UI_WIDGET_FRAME;
+            message.field8 = index + HERO_UI_ARMY_ICON_FIRST;
+            message.field18 = gMonsterDatabase[m_army.m_creatureTypes[index]].race + 4;
+            heroWin->BroadcastMessage(message);
+
+            message.field4 = HERO_UI_WIDGET_ICON_FILE;
+            sprintf(gText, "monh%04d.icn", m_army.m_creatureTypes[index]);
+            message.field8 = index + HERO_UI_ARMY_PORTRAIT_FIRST;
+            message.text = gText;
+            heroWin->BroadcastMessage(message);
+
+            message.field4 = HERO_UI_WIDGET_ENABLE;
+            message.field18 = HERO_UI_WIDGET_FRAME_ACTIVE;
+            heroWin->BroadcastMessage(message);
+
+            sprintf(gText, "%d", m_army.m_creatureCounts[index]);
+            message.field4 = HERO_UI_WIDGET_TEXT;
+            message.field8 = index + HERO_UI_ARMY_COUNT_FIRST;
+            message.text = gText;
+            heroWin->BroadcastMessage(message);
+
+            message.field4 = HERO_UI_WIDGET_ENABLE;
+            message.field18 = HERO_UI_WIDGET_FRAME_ACTIVE;
+            heroWin->BroadcastMessage(message);
+        }
+    }
+}
 
 VA(0x0046cdad, 0x43)
-void hero::ViewStat(int, int) {}
+void hero::ViewStat(int stat, int quickView) {
+    NormalDialog(gStatDesc[stat], quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
+        -1, -1, -1, 0, -1, 0, -1, 0);
+}
 
 VA(0x0046cdf0, 0x9b)
-void hero::ViewArtifact(int, int, int) {}
+void hero::ViewArtifact(int artifact, int quickView, int extra) {
+    if (artifact == HERO_ARTIFACT_SPELL_SCROLL) {
+        sprintf(gText, gArtifactDesc[artifact], gSpellNames[extra]);
+        NormalDialog(gText, quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
+            -1, HERO_UI_ARTIFACT_DIALOG_ICON, -1, 0, -1, 0, -1, 0);
+    } else {
+        NormalDialog(gArtifactDesc[artifact],
+            quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
+            -1, HERO_UI_ARTIFACT_DIALOG_ICON, -1, 0, -1, 0, -1, 0);
+    }
+}
 
 VA(0x0046ce8b, 0x5d)
-int hero::Dismiss(void) { return 0; }
+int hero::Dismiss(void) {
+    NormalDialog("Are you sure you want to dismiss this Hero?", NORMAL_DIALOG_CONFIRM,
+        -1, -1, -1, 0, -1, 0, -1, 0);
+    if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
+        Deallocate(1);
+        return 1;
+    }
+    return 0;
+}
 
 VA(0x0046cee8, 0x587)
 void hero::Deallocate(int) {}
