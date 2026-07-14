@@ -374,11 +374,11 @@ the prologue register-lifetime divergence.
 
 Canonical source state:
 
-- checkpoint: `3fb2d50`
+- lane base: `f220572`, plus the retained scratch declaration-order recovery below
 - target: RVA `0xd9ce0`, retail size `0x58d`
 - `src/BASE/iconf2by.cpp`:
-  `d20712c2e1e836a2161ff93a7ed7db51bc04e2257aeb3ec2a1d03e0880ab4578`
-- live checkpoint: 90.402145%, candidate size `0x57a`, 143 candidate vs 144 retail relocations,
+  `f33ab84fe5e3b9205e40ae09de314bced82063fe587bddee30646c73d44bfea0`
+- live checkpoint: 93.72654%, candidate size `0x58c`, 144 candidate vs 144 retail relocations,
   no candidate-only target
 - the decoder aligns instruction-for-instruction through extended-run setup;
 - candidate and retail both reserve a four-byte frame slot; the candidate still spills the fill
@@ -404,10 +404,9 @@ Canonical source state:
 - recovered a setup-only promoted shear-value lifetime; it emits no setup-local instructions but
   changes the later literal-overlap compare to retail operand order and polarity.
 
-The only remaining scratch relocation-count difference is `gFYClipR` 6/7; every other scratch and
-global count agrees. The candidate keeps `shear` in EBP, while retail pins `clipW`, overwrites the
-right-edge register while forming the literal destination, and reloads both `shear` and the one
-missing `gFYClipR`. These are concrete steering facts, not an accepted wall.
+Every scratch/global relocation count now agrees. The candidate still keeps `shear` in EBP while
+retail pins `clipW`, and it still spills the fill count to the four-byte frame slot that retail
+reserves but never accesses. These are concrete steering facts, not an accepted wall.
 
 ### Searches already exhausted
 
@@ -517,13 +516,13 @@ Shear-lifetime axes after `11424f1`:
   right destination (`66ca2813`), `register` setup value (`f51119a9`), and split setup-value
   declaration/assignment (`33b353d4`): byte-identical to 89.47721%.
 
-The authoritative full-SHA no-repeat set for all 97 recovered manual states is
+The authoritative full-SHA no-repeat set for all 113 recovered manual states is
 [`docs/matching-matrices/iconf2by-manual.tsv`](matching-matrices/iconf2by-manual.tsv). Later
 right-block pointer/reference/local spellings were byte-identical or regressed; do not repeat them.
 The earliest normalized divergence is the prologue register choice: candidate loads `shear` into
-EBP at `+0x5c`, while retail loads `shear` into ESI and `clipW` into EBP at `+0x60`. The sole later
-`gFYClipR` relocation deficit is downstream of that lifetime. CodeView contains no local BPREL
-records for this TU, so no local-name/type oracle exists beyond the retail instruction stream.
+EBP at `+0x5c`, while retail loads `shear` into ESI and `clipW` into EBP at `+0x60`. The retained
+scratch order closes the former downstream `gFYClipR` deficit. CodeView contains no symbol
+subsection for this TU, so no local-name/type oracle exists beyond the retail instruction stream.
 
 Retail's four-byte frame slot is never accessed: every ESP-relative retail access is an argument,
 and after `sub esp,4` plus four pushes the smallest displacement is `0x18`. The slot is allocator
@@ -563,6 +562,38 @@ accesses the slot, while the retained candidate spills the fill count to it in t
 intrinsic path. Fixing the ESI-shear/EBP-width allocation may remove that spill. The original NB09
 stream has no symbol subsection at all for this compiland, so there are neither BPREL stack locals
 nor optimized-register records to recover.
+
+Count-storage and scratch declaration-order axes after lane base `f220572`:
+
+- `register` branch-local fill count: byte-identical to 90.402145%; reverted;
+- snapshot the count only in the full-fill arm: 89.08847%, size `0x567`, no frame, 144/144;
+  reverted;
+- make the global run scratch unsigned: 87.07775%, size `0x561`, no frame, 141/144; reverted;
+- order file-static scratches by first semantic use: 91.89008%, size `0x583`, 143/144;
+  superseded;
+- transfer the adjacent `icon2by` scratch order: 91.675606%, size `0x583`, 144/144; reverted;
+- move all first-use-ordered scratches to function-local static storage: 90.99196%, size `0x583`,
+  143/144; reverted;
+- move the clip-width declaration down to its first emitted setup use under the first-use scratch
+  order: byte-identical to 91.89008%; reverted;
+- retain first-use scratch order but declare `gFYClipR` last: 93.72654%, size `0x58c`, exact
+  144/144 relocations; retained;
+- also move `gFYY` last: 91.675606%, size `0x583`, 144/144; reverted;
+- also move `gFYRun` last, or move `gFYXEnd` first: each byte-identical to 93.72654%; reverted;
+- make only `gFYClipR` function-local static: 92.828415%, size `0x58c`, 144/144; reverted;
+- use `gFYRun` as the full-fill `memset` count under the retained scratch order: 92.18499%, size
+  `0x576`, no frame, 144/144; reverted.
+- move `gFYClipB` beside the final `gFYClipR` declaration: byte-identical to 93.72654%; reverted;
+- use formal `clipW` directly under the retained scratch order: byte-identical to 93.72654%;
+  reverted, but this confirms why predecessor/TU-state retests must use whole-source hashes;
+- use a `const int &` clip-width lifetime under the retained order: 92.68096%, size `0x58c`,
+  144/144; reverted.
+
+The retained order is not a random permutation: it declares the decoder scratches in first-use
+order, with `gFYClipR` last as in the adjacent sibling's declaration surface. It closes the sole
+relocation deficit and brings the candidate to one byte below retail size, but does not alter the
+earliest EBP/ESI divergence or the fill-count spill. Do not replay broad declaration permutations;
+continue with a newly evidenced lifetime or a retained predecessor/header-state change.
 
 These close the obvious setup-lifetime spellings but do not prove a wall. Continue from the
 prologue register divergence with genuinely new retail-evidenced structure, and do not run an AST
