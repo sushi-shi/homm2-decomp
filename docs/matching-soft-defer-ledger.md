@@ -26,7 +26,7 @@ remain unmarked and in the same lane.
 
 Canonical source state:
 
-- lane checkpoint: `97c1152`
+- checkpoint: `5ff32d9`
 - `src/BASE/Textntry.cpp`:
   `ac8dd08884961ba6d73e8a312391cdeecac71ba132f5badef5f79201a63b34d8`
 - `include/BASE/textEntryWidget.h`:
