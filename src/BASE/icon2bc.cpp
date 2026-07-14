@@ -82,6 +82,14 @@ DATA(0x00534ce8) static unsigned int gCTRun;
 // Branch-scoping savedDst and direct dim-count mutation are byte-identical; a volatile fill length
 // and the same fill spelling under the rejected one-time destination lifetime regress. See
 // icon2bc-fill-arm-order-f45a3ba.tsv. The first divergence remains setup allocation at +0x12.
+// On combined head f24566c the enlarged _types.h declaration surface reached through Misc.h
+// changes only allocator state and lowers this same source to 73.211266; candidate size remains
+// 0x558 and relocations remain 89/91. Removing the otherwise-unused Misc.h in favor of the direct
+// IconEntry owner is a valid header cleanup but regresses to 68.59 and 88/91, so the combined state
+// is retained. A clipped-dim Cnt audit also found the missing source publication already present at
+// the retail branch: reordering its selection arms regresses, while a ClipR snapshot, publication
+// reorder, and explicit join are byte-identical because MSVC deletes the overwritten store. See
+// icon2bc-combined-residual-f24566c.tsv. Do not force these scratch writes with volatile qualifiers.
 // No semantic state model changed; this is still unresolved and not a wall.
 VA(0x004d32a0, 0x5af)
 void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,

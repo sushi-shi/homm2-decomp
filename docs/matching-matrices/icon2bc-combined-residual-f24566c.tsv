@@ -1,0 +1,16 @@
+# BASE/icon2bc combined-head residual/publication pass, checkpoint f24566c
+# Target: IconToBitmapColorTable, RVA 0xd32a0, retail size 0x5af and 91 relocations.
+# Scope: preserve the corrected fill CFG and consider the remaining Cnt/Dst/X0/Y occurrence residuals independently. No regex or AST permuter was used; closed setup/record/fetch/enum/command/fill families were not reopened.
+# Combined raw baseline: candidate 0x558, retail 0x5af; 747 differing non-relocation bytes in the common 0x558 span, first +0x12 and last +0x557, plus a 0x57 retail tail. Candidate .text SHA-256 8a8cb73c21667e8cfdc91b601b3c02f8b37540c9f68a87dcbe285755623184b2.
+state	match_percent	candidate_size	relocations	result	evidence
+combined_corrected_fill	73.211266	0x558	89/91	retained	Corrected fill arms and combined _types.h surface. ClipR is exact 10/10; Cnt,Dst,X0 each miss once and Y is excess once; only-base=0.
+dim_xlt_positive_arm	72.81	not-retained	88/91	rejected	Spell the X<clipX dim selection as positive ClipR>=right then else clipW. It regresses and loses another occurrence.
+dim_count_after_default	73.211266	0x558	89/91	byte-identical-rejected	Move gCTCnt=count after the default cn=clipW assignment. MSVC emits the retained object unchanged.
+dim_clipright_snapshot	73.211266	0x558	89/91	byte-identical-rejected	Snapshot ClipR before publishing original count, matching retail load/store order. MSVC still deletes the overwritten Cnt publication.
+dim_explicit_join	73.211266	0x558	89/91	byte-identical-rejected	Use an explicit goto from the X>=clipX arm to the shared selected-count join. Emitted code is unchanged.
+volatile_count_owner	61.50	not-retained	89/91	rejected	Qualifying the whole scratch owner volatile broadly destroys scheduling and still does not repair the occurrence total; retail does not support this ownership.
+direct_iconentry_without_misc	68.59	not-retained	88/91	rejected	Authorized one-time invalidation retest after _types.h gained menu/config/monster declarations. Replace unused Misc.h with direct IconEntry.h; the new combined surface regresses, unlike the prior byte-identical old-header result.
+# Site proof: the missing Cnt is retail +0x406 in the clipped-dim X<clipX arm. Source already publishes gCTCnt=count there, but combined MSVC deletes it before the unconditional selected-count publication corresponding to retail +0x42a.
+# Site proof: the missing Dst is the skip-edge publication at retail +0x115. Source already assigns gCTDst=savedDst there, but its per-command reload makes the store redundant; the separately documented one-time cursor lifetime recovers it with wrong register coloring and lower score.
+# Site proof: missing X0 and excess Y are confined to initial clipping. Retail reloads X0 once for the horizontal upper edge and holds one Y reload across both vertical edges; combined candidate CSEs X0 and reloads Y twice. Those setup/snapshot families are closed and were not replayed here.
+# Result: no decoder-local variant beats the retained combined source. This remains unresolved, not a wall: the four occurrence deltas are consequences of the same broad setup/decoder allocator state, and the first raw divergence remains setup +0x12.
