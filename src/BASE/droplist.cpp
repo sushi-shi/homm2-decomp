@@ -138,14 +138,14 @@ int dropListWidget::Main(tag_message &message)
     case 8:
     case 0x20:
         if (m_flags & 4) {
-            short x = static_cast<short>(message.field4) - static_cast<short>(m_owner->m_posX);
-            short y = static_cast<short>(message.field8) - static_cast<short>(m_owner->m_posY);
+            short x = static_cast<short>(message.payload.mouse.x) - static_cast<short>(m_owner->m_posX);
+            short y = static_cast<short>(message.payload.mouse.y) - static_cast<short>(m_owner->m_posY);
             if (message.type == 0x20) {
                 if (x >= m_x && y >= m_y && x < m_x + m_width && y < m_y + m_height) {
-                    message.field4 = 14;
+                    message.payload.widget.command = 14;
                     message.type = 0x200;
-                    message.field8 = m_id;
-                    message.fieldC = 0x200;
+                    message.payload.widget.id = m_id;
+                    message.payload.widget.parameter = 0x200;
                     return 2;
                 }
                 return 0;
@@ -153,9 +153,9 @@ int dropListWidget::Main(tag_message &message)
                 if (x >= field_0x64 && y >= field_0x66 &&
                     x < field_0x64 + field_0x68 && y < field_0x66 + field_0x6a) {
                     ProcessSelectDialog();
-                    message.field4 = 12;
+                    message.payload.widget.command = 12;
                     message.type = 0x200;
-                    message.field8 = m_id;
+                    message.payload.widget.id = m_id;
                     return 2;
                 }
                 return 0;
@@ -163,22 +163,22 @@ int dropListWidget::Main(tag_message &message)
         }
         break;
     case 0x200:
-        switch (message.field4) {
+        switch (message.payload.widget.command) {
         case 0x36:
-            if (m_id == message.field8) {
-                m_selectedIndex = static_cast<short>(message.field18);
+            if (m_id == message.payload.widget.id) {
+                m_selectedIndex = static_cast<short>(message.payload.widget.data.value);
                 return 1;
             }
             break;
         case 0x37:
-            if (m_id == message.field8) {
-                message.field18 = m_selectedIndex;
+            if (m_id == message.payload.widget.id) {
+                message.payload.widget.data.value = m_selectedIndex;
                 return 1;
             }
             break;
         case 0x38:
-            if (m_id == message.field8) {
-                char *text = message.text;
+            if (m_id == message.payload.widget.id) {
+                char *text = message.payload.widget.data.text;
                 char **newItems = static_cast<char **>(H2_ALLOC(m_itemCount * 4 + 4, "I:\\Projects\\Heroes\\Prog\\BASE\\droplist.cpp", 184));
                 if (m_itemCount != 0)
                     memcpy(newItems, m_items, m_itemCount * 4);
@@ -191,21 +191,21 @@ int dropListWidget::Main(tag_message &message)
             }
             break;
         case 0x39:
-            if (m_id == message.field8) {
-                char *text = message.text;
-                if (message.fieldC < m_itemCount) {
-                    H2_FREE(m_items[message.fieldC], "I:\\Projects\\Heroes\\Prog\\BASE\\droplist.cpp", 173);
-                    m_items[message.fieldC] = static_cast<char *>(H2_ALLOC(strlen(text) + 1, "I:\\Projects\\Heroes\\Prog\\BASE\\droplist.cpp", 174));
-                    strcpy(m_items[message.fieldC], text);
+            if (m_id == message.payload.widget.id) {
+                char *text = message.payload.widget.data.text;
+                if (message.payload.widget.parameter < m_itemCount) {
+                    H2_FREE(m_items[message.payload.widget.parameter], "I:\\Projects\\Heroes\\Prog\\BASE\\droplist.cpp", 173);
+                    m_items[message.payload.widget.parameter] = static_cast<char *>(H2_ALLOC(strlen(text) + 1, "I:\\Projects\\Heroes\\Prog\\BASE\\droplist.cpp", 174));
+                    strcpy(m_items[message.payload.widget.parameter], text);
                 }
             }
             break;
         case 0x3a:
-            if (m_id == message.field8)
-                DeleteItem(message.field18);
+            if (m_id == message.payload.widget.id)
+                DeleteItem(message.payload.widget.data.value);
             break;
         case 0x3b:
-            if (m_id == message.field8) {
+            if (m_id == message.payload.widget.id) {
                 while (m_itemCount != 0)
                     DeleteItem(0);
             }
@@ -399,12 +399,12 @@ void dropListWidget::ProcessSelectDialog(void)
         gpMouseManager->Main(message);
         ownerX = m_owner->m_posX;
         ownerY = m_owner->m_posY;
-        int mouseX = message.field10 - ownerX;
-        int mouseY = message.field14 - ownerY;
+        int mouseX = message.payload.mouse.screenX - ownerX;
+        int mouseY = message.payload.mouse.screenY - ownerY;
 
         switch (message.type) {
         case 1:
-            switch (message.field4) {
+            switch (message.payload.keyboard.keyCode) {
             case 0x47:
                 m_topIndex = 0;
                 m_selectedIndex = 0;

@@ -254,7 +254,7 @@ void executive::MainLoop(void)
                     case 2:
                         if ((message.type & 0x4000) == 0)
                             break;
-                        switch (message.field4) {
+                        switch (message.payload.executive.command) {
                         case 1:
                             done++;
                             break;
@@ -263,7 +263,7 @@ void executive::MainLoop(void)
                             m_activeManager = 0;
                             break;
                         case 4:
-                            field_0xc = message.field18;
+                            field_0xc = message.payload.executive.result;
                             done++;
                             break;
                         }

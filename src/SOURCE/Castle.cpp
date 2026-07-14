@@ -81,32 +81,32 @@ void townManager::SetupCastle(heroWindow *window, int updateOnly)
     }
 
     message.type = CASTLE_MESSAGE_WIDGET;
-    message.field4 = CASTLE_WIDGET_FRAME;
+    message.payload.widget.command = CASTLE_WIDGET_FRAME;
     for (slot = 0; slot < CASTLE_SLOT_COUNT; ++slot) {
-        message.field8 = CASTLE_CONTROL_BUILDING_ICON_FIRST + slot;
-        message.field18 = castleSlotsUse[slot];
+        message.payload.widget.id = CASTLE_CONTROL_BUILDING_ICON_FIRST + slot;
+        message.payload.widget.data.value = castleSlotsUse[slot];
         casWin->BroadcastMessage(message);
     }
 
-    message.field4 = CASTLE_WIDGET_ICON_FILE;
+    message.payload.widget.command = CASTLE_WIDGET_ICON_FILE;
     sprintf(iconName, "cstl%s.icn", cHeroTypeShortName[m_town->m_type]);
-    message.text = iconName;
+    message.payload.widget.data.text = iconName;
     for (slot = 0; slot < CASTLE_SLOT_COUNT; ++slot) {
-        message.field8 = CASTLE_CONTROL_BUILDING_ICON_FIRST + slot;
+        message.payload.widget.id = CASTLE_CONTROL_BUILDING_ICON_FIRST + slot;
         casWin->BroadcastMessage(message);
     }
 
-    message.field4 = CASTLE_WIDGET_TEXT;
+    message.payload.widget.command = CASTLE_WIDGET_TEXT;
     for (slot = 0; slot < CASTLE_SLOT_COUNT; ++slot) {
-        message.field8 = CASTLE_CONTROL_BUILDING_NAME_FIRST + slot;
+        message.payload.widget.id = CASTLE_CONTROL_BUILDING_NAME_FIRST + slot;
         if (castleSlotsUse[slot] == CASTLE_MAGE_GUILD) {
             sprintf(gText, "Mage Guild, Level %d",
                     m_town->m_buildState + 1 < CASTLE_MAGE_GUILD_MAX_LEVEL
                         ? m_town->m_buildState + 1
                         : CASTLE_MAGE_GUILD_MAX_LEVEL);
-            message.text = gText;
+            message.payload.widget.data.text = gText;
         } else {
-            message.text = GetBuildingName(m_town->m_type, castleSlotsUse[slot]);
+            message.payload.widget.data.text = GetBuildingName(m_town->m_type, castleSlotsUse[slot]);
         }
         casWin->BroadcastMessage(message);
     }
@@ -125,91 +125,91 @@ void townManager::SetupCastle(heroWindow *window, int updateOnly)
         }
 
         if (widgetFrame != -1) {
-            message.field4 = CASTLE_WIDGET_ENABLE;
-            message.field8 = CASTLE_CONTROL_BUILDING_BUTTON_FIRST + slot;
-            message.field18 = 4;
+            message.payload.widget.command = CASTLE_WIDGET_ENABLE;
+            message.payload.widget.id = CASTLE_CONTROL_BUILDING_BUTTON_FIRST + slot;
+            message.payload.widget.data.value = 4;
             casWin->BroadcastMessage(message);
-            message.field4 = CASTLE_WIDGET_FRAME;
-            message.field18 = widgetFrame;
+            message.payload.widget.command = CASTLE_WIDGET_FRAME;
+            message.payload.widget.data.value = widgetFrame;
             casWin->BroadcastMessage(message);
         } else {
-            message.field4 = CASTLE_WIDGET_DISABLE;
-            message.field18 = 4;
-            message.field8 = CASTLE_CONTROL_BUILDING_BUTTON_FIRST + slot;
+            message.payload.widget.command = CASTLE_WIDGET_DISABLE;
+            message.payload.widget.data.value = 4;
+            message.payload.widget.id = CASTLE_CONTROL_BUILDING_BUTTON_FIRST + slot;
             casWin->BroadcastMessage(message);
         }
 
         if (widgetFrame == CASTLE_FRAME_BUILT) {
-            message.field4 = CASTLE_WIDGET_DISABLE;
-            message.field18 = 4;
-            message.field8 = CASTLE_CONTROL_BUILDING_OVERLAY_FIRST + slot;
+            message.payload.widget.command = CASTLE_WIDGET_DISABLE;
+            message.payload.widget.data.value = 4;
+            message.payload.widget.id = CASTLE_CONTROL_BUILDING_OVERLAY_FIRST + slot;
             casWin->BroadcastMessage(message);
         } else {
-            message.field4 = CASTLE_WIDGET_ENABLE;
-            message.field18 = 4;
-            message.field8 = CASTLE_CONTROL_BUILDING_OVERLAY_FIRST + slot;
+            message.payload.widget.command = CASTLE_WIDGET_ENABLE;
+            message.payload.widget.data.value = 4;
+            message.payload.widget.id = CASTLE_CONTROL_BUILDING_OVERLAY_FIRST + slot;
             casWin->BroadcastMessage(message);
-            message.field4 = CASTLE_WIDGET_FRAME;
-            message.field18 =
+            message.payload.widget.command = CASTLE_WIDGET_FRAME;
+            message.payload.widget.data.value =
                 widgetFrame == -1 ? CASTLE_FRAME_AVAILABLE : CASTLE_FRAME_UNAVAILABLE;
             casWin->BroadcastMessage(message);
         }
     }
 
     captainBuilt = m_town->m_buildings & CASTLE_CAPTAIN_BUILDING_MASK;
-    message.field4 = captainBuilt != 0 ? CASTLE_WIDGET_DISABLE : CASTLE_WIDGET_ENABLE;
-    message.field8 = CASTLE_CONTROL_CAPTAIN_OVERLAY;
-    message.field18 = 6;
+    message.payload.widget.command = captainBuilt != 0 ? CASTLE_WIDGET_DISABLE : CASTLE_WIDGET_ENABLE;
+    message.payload.widget.id = CASTLE_CONTROL_CAPTAIN_OVERLAY;
+    message.payload.widget.data.value = 6;
     casWin->BroadcastMessage(message);
-    message.field4 = CASTLE_WIDGET_FRAME;
-    message.field8 = CASTLE_CONTROL_CAPTAIN_ICON;
-    message.field18 = captainBuilt != 0;
+    message.payload.widget.command = CASTLE_WIDGET_FRAME;
+    message.payload.widget.id = CASTLE_CONTROL_CAPTAIN_ICON;
+    message.payload.widget.data.value = captainBuilt != 0;
     casWin->BroadcastMessage(message);
     sprintf(gText, "CSTLCAP%c.ICN", cHeroTypeInitial[m_town->m_type]);
-    message.field4 = CASTLE_WIDGET_ICON_FILE;
-    message.field8 = CASTLE_CONTROL_CAPTAIN_ICON;
-    message.text = gText;
+    message.payload.widget.command = CASTLE_WIDGET_ICON_FILE;
+    message.payload.widget.id = CASTLE_CONTROL_CAPTAIN_ICON;
+    message.payload.widget.data.text = gText;
     casWin->BroadcastMessage(message);
-    message.field4 = captainBuilt != 0 ? CASTLE_WIDGET_ENABLE : CASTLE_WIDGET_DISABLE;
-    message.field8 = CASTLE_CONTROL_CAPTAIN_FLAG;
-    message.field18 = 4;
+    message.payload.widget.command = captainBuilt != 0 ? CASTLE_WIDGET_ENABLE : CASTLE_WIDGET_DISABLE;
+    message.payload.widget.id = CASTLE_CONTROL_CAPTAIN_FLAG;
+    message.payload.widget.data.value = 4;
     casWin->BroadcastMessage(message);
     if (captainBuilt != 0) {
-        message.field4 = CASTLE_WIDGET_FRAME;
-        message.field8 = CASTLE_CONTROL_CAPTAIN_FLAG;
-        message.field18 = gpCurPlayer->m_color;
+        message.payload.widget.command = CASTLE_WIDGET_FRAME;
+        message.payload.widget.id = CASTLE_CONTROL_CAPTAIN_FLAG;
+        message.payload.widget.data.value = gpCurPlayer->m_color;
         casWin->BroadcastMessage(message);
     }
 
     widgetFrame = -1;
     if (captainBuilt != 0) {
-        message.field4 = CASTLE_WIDGET_TEXT;
-        message.text = gText;
+        message.payload.widget.command = CASTLE_WIDGET_TEXT;
+        message.payload.widget.data.text = gText;
         sprintf(gText, "");
         for (slot = 0; slot < CASTLE_PRIMARY_STAT_COUNT; ++slot) {
             sprintf(statLine, "%s\n", gStatNames[slot]);
             strcat(gText, statLine);
         }
-        message.field8 = CASTLE_CONTROL_CAPTAIN_STATS;
+        message.payload.widget.id = CASTLE_CONTROL_CAPTAIN_STATS;
         casWin->BroadcastMessage(message);
         sprintf(gText, "");
         for (slot = 0; slot < CASTLE_PRIMARY_STAT_COUNT; ++slot) {
             sprintf(statLine, "%d\n", captainStats[m_town->m_type][slot]);
             strcat(gText, statLine);
         }
-        message.field8 = CASTLE_CONTROL_CAPTAIN_VALUES;
+        message.payload.widget.id = CASTLE_CONTROL_CAPTAIN_VALUES;
         casWin->BroadcastMessage(message);
-        message.field4 = m_town->m_formation != TOWN_FORMATION_SPREAD
+        message.payload.widget.command = m_town->m_formation != TOWN_FORMATION_SPREAD
                              ? CASTLE_WIDGET_DISABLE
                              : CASTLE_WIDGET_ENABLE;
-        message.field8 = CASTLE_CONTROL_CAPTAIN_FORMATION_SPREAD_INACTIVE;
-        message.field18 = 4;
+        message.payload.widget.id = CASTLE_CONTROL_CAPTAIN_FORMATION_SPREAD_INACTIVE;
+        message.payload.widget.data.value = 4;
         casWin->BroadcastMessage(message);
-        message.field4 = m_town->m_formation != TOWN_FORMATION_SPREAD
+        message.payload.widget.command = m_town->m_formation != TOWN_FORMATION_SPREAD
                              ? CASTLE_WIDGET_ENABLE
                              : CASTLE_WIDGET_DISABLE;
-        message.field8 = CASTLE_CONTROL_CAPTAIN_FORMATION_GROUPED_INACTIVE;
-        message.field18 = 4;
+        message.payload.widget.id = CASTLE_CONTROL_CAPTAIN_FORMATION_GROUPED_INACTIVE;
+        message.payload.widget.data.value = 4;
         casWin->BroadcastMessage(message);
     } else {
         if (!CanBuild(m_town, CASTLE_CAPTAIN))
@@ -222,13 +222,13 @@ void townManager::SetupCastle(heroWindow *window, int updateOnly)
             m_affordableBuildings |= CASTLE_CAPTAIN_BUILDING_MASK;
     }
 
-    message.field4 = widgetFrame != -1 ? CASTLE_WIDGET_ENABLE : CASTLE_WIDGET_DISABLE;
-    message.field8 = CASTLE_CONTROL_CAPTAIN_BUTTON;
-    message.field18 = 4;
+    message.payload.widget.command = widgetFrame != -1 ? CASTLE_WIDGET_ENABLE : CASTLE_WIDGET_DISABLE;
+    message.payload.widget.id = CASTLE_CONTROL_CAPTAIN_BUTTON;
+    message.payload.widget.data.value = 4;
     casWin->BroadcastMessage(message);
     if (widgetFrame != -1) {
-        message.field4 = CASTLE_WIDGET_FRAME;
-        message.field18 = widgetFrame;
+        message.payload.widget.command = CASTLE_WIDGET_FRAME;
+        message.payload.widget.data.value = widgetFrame;
         casWin->BroadcastMessage(message);
     }
 
@@ -243,23 +243,23 @@ void townManager::SetupCastle(heroWindow *window, int updateOnly)
         widgetFrame = CASTLE_FRAME_BUILT;
 
     for (slot = 0; slot < 2; ++slot) {
-        message.field18 = 4;
-        message.field8 = CASTLE_CONTROL_RECRUIT_FIRST + slot;
+        message.payload.widget.data.value = 4;
+        message.payload.widget.id = CASTLE_CONTROL_RECRUIT_FIRST + slot;
         if (widgetFrame != -1) {
-            message.field4 = CASTLE_WIDGET_ENABLE;
+            message.payload.widget.command = CASTLE_WIDGET_ENABLE;
             casWin->BroadcastMessage(message);
-            message.field4 = CASTLE_WIDGET_FRAME;
-            message.field18 = widgetFrame;
+            message.payload.widget.command = CASTLE_WIDGET_FRAME;
+            message.payload.widget.data.value = widgetFrame;
             casWin->BroadcastMessage(message);
         } else {
-            message.field4 = CASTLE_WIDGET_DISABLE;
+            message.payload.widget.command = CASTLE_WIDGET_DISABLE;
             casWin->BroadcastMessage(message);
         }
-        message.field4 = CASTLE_WIDGET_ICON_FILE;
+        message.payload.widget.command = CASTLE_WIDGET_ICON_FILE;
         sprintf(iconName, "port%04d.icn",
                 gpGame->GetHero(gpCurPlayer->AvailableHeroId(slot))->m_portrait);
-        message.text = iconName;
-        message.field8 = CASTLE_CONTROL_HERO_FIRST + slot;
+        message.payload.widget.data.text = iconName;
+        message.payload.widget.id = CASTLE_CONTROL_HERO_FIRST + slot;
         casWin->BroadcastMessage(message);
     }
 
@@ -339,34 +339,34 @@ int CastleHandler(tag_message &message)
             gpWindowManager->ConvertToHover(message);
             hoverMessage = 1;
         }
-        if (message.field8 == CASTLE_CONTROL_CAPTAIN_ICON)
+        if (message.payload.widget.id == CASTLE_CONTROL_CAPTAIN_ICON)
             buildingIndex = CASTLE_CAPTAIN;
-        else if (message.field8 == CASTLE_CONTROL_CAPTAIN_FORMATION_GROUPED)
+        else if (message.payload.widget.id == CASTLE_CONTROL_CAPTAIN_FORMATION_GROUPED)
             buildingIndex = CASTLE_CONTROL_CAPTAIN_FORMATION_GROUPED;
-        else if (message.field8 == CASTLE_CONTROL_CAPTAIN_FORMATION_SPREAD)
+        else if (message.payload.widget.id == CASTLE_CONTROL_CAPTAIN_FORMATION_SPREAD)
             buildingIndex = CASTLE_CONTROL_CAPTAIN_FORMATION_SPREAD;
         else {
-            if (message.field8 >= CASTLE_CONTROL_BUILDING_NAME_FIRST &&
-                message.field8 < CASTLE_CONTROL_BUILDING_NAME_FIRST +
+            if (message.payload.widget.id >= CASTLE_CONTROL_BUILDING_NAME_FIRST &&
+                message.payload.widget.id < CASTLE_CONTROL_BUILDING_NAME_FIRST +
                                      CASTLE_SLOT_COUNT)
-                buildingIndex = message.field8 - CASTLE_CONTROL_BUILDING_NAME_FIRST;
-            else if (message.field8 >= CASTLE_CONTROL_BUILDING_ICON_FIRST &&
-                     message.field8 < CASTLE_CONTROL_BUILDING_ICON_FIRST +
+                buildingIndex = message.payload.widget.id - CASTLE_CONTROL_BUILDING_NAME_FIRST;
+            else if (message.payload.widget.id >= CASTLE_CONTROL_BUILDING_ICON_FIRST &&
+                     message.payload.widget.id < CASTLE_CONTROL_BUILDING_ICON_FIRST +
                                           CASTLE_SLOT_COUNT)
-                buildingIndex = message.field8 - CASTLE_CONTROL_BUILDING_ICON_FIRST;
-            else if (message.field8 >= CASTLE_CONTROL_BUILDING_BUTTON_FIRST &&
-                     message.field8 < CASTLE_CONTROL_BUILDING_BUTTON_FIRST +
+                buildingIndex = message.payload.widget.id - CASTLE_CONTROL_BUILDING_ICON_FIRST;
+            else if (message.payload.widget.id >= CASTLE_CONTROL_BUILDING_BUTTON_FIRST &&
+                     message.payload.widget.id < CASTLE_CONTROL_BUILDING_BUTTON_FIRST +
                                           CASTLE_SLOT_COUNT)
-                buildingIndex = message.field8 - CASTLE_CONTROL_BUILDING_BUTTON_FIRST;
+                buildingIndex = message.payload.widget.id - CASTLE_CONTROL_BUILDING_BUTTON_FIRST;
             if (buildingIndex != -1)
                 buildingIndex = castleSlotsUse[buildingIndex];
         }
     }
 
     if (hoverMessage) {
-        if (gpTownManager->m_lastHoverId == message.field8)
+        if (gpTownManager->m_lastHoverId == message.payload.widget.id)
             return 1;
-        gpTownManager->m_lastHoverId = message.field8;
+        gpTownManager->m_lastHoverId = message.payload.widget.id;
         switch (buildingIndex) {
         case CASTLE_CONTROL_CAPTAIN_FORMATION_SPREAD:
             sprintf(gText, cCastleInfo[CASTLE_INFO_SPREAD_FORMATION]);
@@ -446,17 +446,17 @@ int CastleHandler(tag_message &message)
             break;
 
         case -1:
-            switch (message.field8) {
+            switch (message.payload.widget.id) {
             case CASTLE_CONTROL_HERO_FIRST:
             case CASTLE_CONTROL_HERO_FIRST + 1:
-                heroChoiceIndex = message.field8 - CASTLE_CONTROL_HERO_FIRST;
+                heroChoiceIndex = message.payload.widget.id - CASTLE_CONTROL_HERO_FIRST;
                 break;
             case CASTLE_CONTROL_RECRUIT_FIRST:
             case CASTLE_CONTROL_RECRUIT_FIRST + 1:
-                heroChoiceIndex = message.field8 - CASTLE_CONTROL_RECRUIT_FIRST;
+                heroChoiceIndex = message.payload.widget.id - CASTLE_CONTROL_RECRUIT_FIRST;
                 break;
             default:
-                if (message.field8 == CASTLE_CONTROL_CLOSE)
+                if (message.payload.widget.id == CASTLE_CONTROL_CLOSE)
                     strcpy(gText, cCastleInfo[CASTLE_INFO_EXIT]);
                 else
                     strcpy(gText, cCastleInfo[CASTLE_INFO_OPTIONS]);
@@ -483,9 +483,9 @@ int CastleHandler(tag_message &message)
 
 hover_text_ready:
         message.type = CASTLE_MESSAGE_WIDGET;
-        message.field4 = CASTLE_WIDGET_TEXT;
-        message.field8 = CASTLE_CONTROL_STATUS_TEXT;
-        message.text = gText;
+        message.payload.widget.command = CASTLE_WIDGET_TEXT;
+        message.payload.widget.id = CASTLE_CONTROL_STATUS_TEXT;
+        message.payload.widget.data.text = gText;
         gpTownManager->m_heroWindow0->BroadcastMessage(message);
         gpTownManager->m_heroWindow0->DrawWindow(
             0, CASTLE_CONTROL_STATUS_FIRST, CASTLE_CONTROL_STATUS_TEXT);
@@ -496,11 +496,11 @@ hover_text_ready:
     }
 
     if (message.type == CASTLE_MESSAGE_WIDGET) {
-        if (message.field4 == CASTLE_INPUT_DESELECT) {
-            result = message.field8 == CASTLE_CONTROL_CLOSE;
-        } else if (message.field4 == CASTLE_INPUT_SELECT ||
-                   message.field4 == CASTLE_INPUT_ALTERNATE_SELECT) {
-            quickFlag = (message.fieldC & CASTLE_QUICK_VIEW_MODIFIER) != 0;
+        if (message.payload.widget.command == CASTLE_INPUT_DESELECT) {
+            result = message.payload.widget.id == CASTLE_CONTROL_CLOSE;
+        } else if (message.payload.widget.command == CASTLE_INPUT_SELECT ||
+                   message.payload.widget.command == CASTLE_INPUT_ALTERNATE_SELECT) {
+            quickFlag = (message.payload.widget.parameter & CASTLE_QUICK_VIEW_MODIFIER) != 0;
             switch (buildingIndex) {
             case CASTLE_CONTROL_CAPTAIN_FORMATION_SPREAD:
                 if (quickFlag) {
@@ -577,14 +577,14 @@ buy_building:
                 break;
 
             case -1:
-                switch (message.field8) {
+                switch (message.payload.widget.id) {
                 case CASTLE_CONTROL_HERO_FIRST:
                 case CASTLE_CONTROL_HERO_FIRST + 1:
-                    heroChoiceIndex = message.field8 - CASTLE_CONTROL_HERO_FIRST;
+                    heroChoiceIndex = message.payload.widget.id - CASTLE_CONTROL_HERO_FIRST;
                     break;
                 case CASTLE_CONTROL_RECRUIT_FIRST:
                 case CASTLE_CONTROL_RECRUIT_FIRST + 1:
-                    heroChoiceIndex = message.field8 - CASTLE_CONTROL_RECRUIT_FIRST;
+                    heroChoiceIndex = message.payload.widget.id - CASTLE_CONTROL_RECRUIT_FIRST;
                     break;
                 default:
                     goto selection_done;
@@ -611,8 +611,8 @@ buy_building:
 selection_done:
     if (result == 0)
         return 1;
-    message.field8 = CASTLE_EXIT_COMMAND;
-    message.field4 = message.field8;
+    message.payload.widget.id = CASTLE_EXIT_COMMAND;
+    message.payload.widget.command = message.payload.widget.id;
     return 2;
 }
 

@@ -2107,12 +2107,12 @@ int game::ViewSpells(hero *spellHero, int spellType,
             MemError();
         if (spellType != 2) {
             message.type = 0x200;
-            message.field4 = 6;
+            message.payload.widget.command = 6;
             if (spellType == 0)
-                message.field8 = 4;
+                message.payload.widget.id = 4;
             else
-                message.field8 = 5;
-            message.field18 = 6;
+                message.payload.widget.id = 5;
+            message.payload.widget.data.value = 6;
             m_viewSpellsWindow->BroadcastMessage(message);
         }
         UpdateSpellWidgets();
@@ -2138,69 +2138,69 @@ void game::UpdateSpellWidgets(void)
     spellPoints0 = m_viewSpellsHero->m_spellPoints;
     if (spellPoints0 > 999)
         spellPoints0 = 999;
-    message9.field18 = 6;
+    message9.payload.widget.data.value = 6;
     if (spellPoints0 > 99)
-        message9.field4 = 5;
+        message9.payload.widget.command = 5;
     else
-        message9.field4 = 6;
-    message9.field8 = 7;
+        message9.payload.widget.command = 6;
+    message9.payload.widget.id = 7;
     m_viewSpellsWindow->BroadcastMessage(message9);
     if (spellPoints0 > 9)
-        message9.field4 = 5;
+        message9.payload.widget.command = 5;
     else
-        message9.field4 = 6;
-    message9.field8 = 8;
+        message9.payload.widget.command = 6;
+    message9.payload.widget.id = 8;
     m_viewSpellsWindow->BroadcastMessage(message9);
 
     sprintf(gText, "%d", (spellPoints0 / 100) % 10);
-    message9.text = gText;
-    message9.field4 = 3;
-    message9.field8 = 7;
+    message9.payload.widget.data.text = gText;
+    message9.payload.widget.command = 3;
+    message9.payload.widget.id = 7;
     m_viewSpellsWindow->BroadcastMessage(message9);
     sprintf(gText, "%d", (spellPoints0 / 10) % 10);
-    message9.text = gText;
-    message9.field4 = 3;
-    message9.field8 = 8;
+    message9.payload.widget.data.text = gText;
+    message9.payload.widget.command = 3;
+    message9.payload.widget.id = 8;
     m_viewSpellsWindow->BroadcastMessage(message9);
     sprintf(gText, "%d", spellPoints0 % 10);
-    message9.text = gText;
-    message9.field4 = 3;
-    message9.field8 = 9;
+    message9.payload.widget.data.text = gText;
+    message9.payload.widget.command = 3;
+    message9.payload.widget.id = 9;
     m_viewSpellsWindow->BroadcastMessage(message9);
 
     for (spellSlot6 = 0; spellSlot6 < 12; spellSlot6++) {
         if (m_viewSpellsTop[m_viewSpellsType] + spellSlot6 >=
             m_viewSpellsCount[m_viewSpellsType]) {
-            message9.field4 = 6;
-            message9.field8 = spellSlot6 + 100;
-            message9.field18 = 6;
+            message9.payload.widget.command = 6;
+            message9.payload.widget.id = spellSlot6 + 100;
+            message9.payload.widget.data.value = 6;
             m_viewSpellsWindow->BroadcastMessage(message9);
-            message9.field8 = spellSlot6 + 30;
+            message9.payload.widget.id = spellSlot6 + 30;
             m_viewSpellsWindow->BroadcastMessage(message9);
         } else {
             spell2 = m_viewSpellsHero->GetNthSpell(
                 m_viewSpellsType,
                 m_viewSpellsTop[m_viewSpellsType] + spellSlot6 + 1);
-            message9.field4 = 8;
-            message9.field8 = spellSlot6 + 30;
+            message9.payload.widget.command = 8;
+            message9.payload.widget.id = spellSlot6 + 30;
             if (GetManaCost(spell2, m_viewSpellsHero) >
                 m_viewSpellsHero->m_spellPoints)
-                message9.field18 = 3;
+                message9.payload.widget.data.value = 3;
             else
-                message9.field4 = 1;
+                message9.payload.widget.command = 1;
             m_viewSpellsWindow->BroadcastMessage(message9);
-            message9.field4 = 5;
-            message9.field18 = 6;
+            message9.payload.widget.command = 5;
+            message9.payload.widget.data.value = 6;
             m_viewSpellsWindow->BroadcastMessage(message9);
-            message9.field8 = spellSlot6 + 100;
+            message9.payload.widget.id = spellSlot6 + 100;
             m_viewSpellsWindow->BroadcastMessage(message9);
             if (m_viewSpellsReadOnly) {
-                message9.field4 = 5;
-                message9.field18 = 2;
+                message9.payload.widget.command = 5;
+                message9.payload.widget.data.value = 2;
                 m_viewSpellsWindow->BroadcastMessage(message9);
             }
-            message9.field4 = 4;
-            message9.field18 = gsSpellInfo[spell2].iconIndex;
+            message9.payload.widget.command = 4;
+            message9.payload.widget.data.value = gsSpellInfo[spell2].iconIndex;
             m_viewSpellsWindow->BroadcastMessage(message9);
             lineLength0 = smallFont->LineLength(gSpellNames[spell2], 78);
             if (lineLength0 == 1) {
@@ -2210,9 +2210,9 @@ void game::UpdateSpellWidgets(void)
                 sprintf(gText, "%s [%d]", gSpellNames[spell2],
                         GetManaCost(spell2, m_viewSpellsHero));
             }
-            message9.field4 = 3;
-            message9.field8 = spellSlot6 + 30;
-            message9.text = gText;
+            message9.payload.widget.command = 3;
+            message9.payload.widget.id = spellSlot6 + 30;
+            message9.payload.widget.data.text = gText;
             m_viewSpellsWindow->BroadcastMessage(message9);
         }
     }
@@ -2221,7 +2221,7 @@ void game::UpdateSpellWidgets(void)
 // @early-stop
 // Exact 0x692-byte span and 101 relocation sites. The live residual is the
 // commutative equality at +0x14: retail loads the window-manager field before
-// msg.field8, while this TU loads msg.field8 first. Both source operand orders
+// the hover id, while this TU loads the hover id first. Both source operand orders
 // emit the same sequence; this is an /Od TU-cumulative evaluation-order choice.
 VA(0x00479e3b, 0x692)
 int ViewSpellsHandler(tag_message &msg)
@@ -2230,19 +2230,19 @@ int ViewSpellsHandler(tag_message &msg)
 
     if (msg.type == 4) {
         gpWindowManager->ConvertToHover(msg);
-        if (msg.field8 == gpWindowManager->field_0x5e) {
+        if (msg.payload.hover.id == gpWindowManager->field_0x5e) {
             return 1;
         } else {
             return gpGame->m_viewSpellsCallback(msg);
         }
     }
     if (msg.type == 0x200) {
-      switch (msg.field4) {
+      switch (msg.payload.widget.command) {
     case 13:
-        if (msg.field4 == 14 || (msg.fieldC & 0x200) != 0)
+        if (msg.payload.widget.command == 14 || (msg.payload.widget.parameter & 0x200) != 0)
             break;
         {
-            switch (msg.field8) {
+            switch (msg.payload.widget.id) {
             case 6:
             case 7:
             case 8:
@@ -2277,15 +2277,15 @@ int ViewSpellsHandler(tag_message &msg)
                 gpGame->m_viewSpellsWindow->MoveWindow(0, 0);
                 break;
             case 0x7800:
-                msg.field8 = 10;
+                msg.payload.widget.id = 10;
                 break;
             }
         }
         break;
     case 12:
     case 14:
-        if (msg.field4 == 14 || (msg.fieldC & 0x200) != 0) {
-            switch (msg.field8) {
+        if (msg.payload.widget.command == 14 || (msg.payload.widget.parameter & 0x200) != 0) {
+            switch (msg.payload.widget.id) {
             case 100:
             case 101:
             case 102:
@@ -2301,7 +2301,7 @@ int ViewSpellsHandler(tag_message &msg)
                 spell = gpGame->m_viewSpellsHero->GetNthSpell(
                     gpGame->m_viewSpellsType,
                     gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType] +
-                        (msg.field8 - 100) + 1);
+                        (msg.payload.widget.id - 100) + 1);
                 NormalDialog(gSpellDesc[spell], 4, -1, -1, 8, spell, -1, 0, -1, 0);
                 break;
             case 2:
@@ -2325,7 +2325,7 @@ int ViewSpellsHandler(tag_message &msg)
                 break;
             }
         } else {
-          switch (msg.field8) {
+          switch (msg.payload.widget.id) {
           case 100:
           case 101:
           case 102:
@@ -2341,7 +2341,7 @@ int ViewSpellsHandler(tag_message &msg)
             spell = gpGame->m_viewSpellsHero->GetNthSpell(
                 gpGame->m_viewSpellsType,
                 gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType] +
-                    (msg.field8 - 100) + 1);
+                    (msg.payload.widget.id - 100) + 1);
             if (gpGame->m_viewSpellsReadOnly) {
                 NormalDialog(gSpellDesc[spell], 1, -1, -1, 8, spell, -1, 0, -1, 0);
                 return 1;
@@ -2354,7 +2354,7 @@ int ViewSpellsHandler(tag_message &msg)
                 return 0;
             }
             gpGame->m_viewSpell = spell;
-            msg.field4 = 10;
+            msg.payload.widget.command = 10;
             return 2;
           }
         }
@@ -2363,8 +2363,8 @@ int ViewSpellsHandler(tag_message &msg)
         break;
       }
 
-      if (msg.field8 == 10) {
-          msg.field4 = msg.field8;
+      if (msg.payload.widget.id == 10) {
+          msg.payload.widget.command = msg.payload.widget.id;
           return 2;
       }
     }
@@ -2380,10 +2380,10 @@ VA(0x0047a4cd, 0x17c)
 int ViewSpecialHandler(tag_message &msg)
 {
     if (msg.type == 4) {
-        if (gpWindowManager->field_0x5e == msg.field8)
+        if (gpWindowManager->field_0x5e == msg.payload.hover.id)
             return 1;
-        gpWindowManager->field_0x5e = msg.field8;
-        switch (msg.field8) {
+        gpWindowManager->field_0x5e = msg.payload.hover.id;
+        switch (msg.payload.hover.id) {
         case 2:
             strcpy(gText, cSpellHelp[0]);
             break;
@@ -2505,9 +2505,9 @@ void game::ViewArmy(int x, int y, int monsterType, int numTroops, town *castle,
     char armyName8[32];
     strcpy(armyName8, gArmyNames[monsterType]);
     armyName8[0] -= 32;
-    message6.field4 = 3;
-    message6.field8 = 3;
-    message6.text = armyName8;
+    message6.payload.widget.command = 3;
+    message6.payload.widget.id = 3;
+    message6.payload.widget.data.text = armyName8;
     m_viewArmyWindow->BroadcastMessage(message6);
 
     char *details9 = static_cast<char *>(BaseAlloc(0x226, GFILE, GSAVELINE + 0x93));
@@ -2572,40 +2572,40 @@ void game::ViewArmy(int x, int y, int monsterType, int numTroops, town *castle,
     sprintf(gText, "\n%s%s", cArmyDetail[7], gLuckText[luck1 + 3]);
     strcat(details9, gText);
 
-    message6.field8 = 4;
-    message6.text = details9;
+    message6.payload.widget.id = 4;
+    message6.payload.widget.data.text = details9;
     m_viewArmyWindow->BroadcastMessage(message6);
     if (!gbAllowUpgrade) {
-        message6.field4 = 6;
-        message6.text = reinterpret_cast<char *>(6);
-        message6.field8 = 500;
+        message6.payload.widget.command = 6;
+        message6.payload.widget.data.text = reinterpret_cast<char *>(6);
+        message6.payload.widget.id = 500;
         m_viewArmyWindow->BroadcastMessage(message6);
     }
     if (disableUpgrade) {
-        message6.field4 = 6;
-        message6.text = reinterpret_cast<char *>(6);
-        message6.field8 = 0x7803;
+        message6.payload.widget.command = 6;
+        message6.payload.widget.data.text = reinterpret_cast<char *>(6);
+        message6.payload.widget.id = 0x7803;
         m_viewArmyWindow->BroadcastMessage(message6);
     }
     if (quickView) {
-        message6.field4 = 6;
-        message6.text = reinterpret_cast<char *>(6);
-        message6.field8 = 0x7800;
+        message6.payload.widget.command = 6;
+        message6.payload.widget.data.text = reinterpret_cast<char *>(6);
+        message6.payload.widget.id = 0x7800;
         m_viewArmyWindow->BroadcastMessage(message6);
     }
     if (numTroops < 1) {
-        message6.field4 = 6;
-        message6.text = reinterpret_cast<char *>(6);
-        message6.field8 = 1;
+        message6.payload.widget.command = 6;
+        message6.payload.widget.data.text = reinterpret_cast<char *>(6);
+        message6.payload.widget.id = 1;
         m_viewArmyWindow->BroadcastMessage(message6);
-        message6.field8 = 2;
+        message6.payload.widget.id = 2;
         m_viewArmyWindow->BroadcastMessage(message6);
     } else {
         char countText[12];
         sprintf(countText, "%d", numTroops);
-        message6.field4 = 3;
-        message6.field8 = 2;
-        message6.text = countText;
+        message6.payload.widget.command = 3;
+        message6.payload.widget.id = 2;
+        message6.payload.widget.data.text = countText;
         m_viewArmyWindow->BroadcastMessage(message6);
     }
 
@@ -2672,14 +2672,14 @@ int ViewArmyHandler(tag_message &msg)
     short frameOffset1;
 
     if (msg.type == 0x200) {
-        switch (msg.field4) {
+        switch (msg.payload.widget.command) {
         case 13:
-            switch (msg.field8) {
+            switch (msg.payload.widget.id) {
             case 0x7800:
             case 0x7801:
-                gpWindowManager->m_dialogResult = msg.field8;
-                msg.field8 = 10;
-                msg.field4 = msg.field8;
+                gpWindowManager->m_dialogResult = msg.payload.widget.id;
+                msg.payload.widget.id = 10;
+                msg.payload.widget.command = msg.payload.widget.id;
                 return 2;
             case 0x7803:
                 NormalDialog(
@@ -2687,8 +2687,8 @@ int ViewArmyHandler(tag_message &msg)
                     2, -1, -1, -1, 0, -1, 0, -1, 0);
                 if (gpWindowManager->m_dialogResult == 0x7805) {
                     gbDismissArmy = 1;
-                    msg.field8 = 10;
-                    msg.field4 = msg.field8;
+                    msg.payload.widget.id = 10;
+                    msg.payload.widget.command = msg.payload.widget.id;
                     return 2;
                 }
                 break;
@@ -2721,8 +2721,8 @@ int ViewArmyHandler(tag_message &msg)
                         if (resourceType0 != -1)
                             gpCurPlayer->m_resources[resourceType0] -= resourceCost5;
                         gbUpgradeArmy = 1;
-                        msg.field8 = 10;
-                        msg.field4 = msg.field8;
+                        msg.payload.widget.id = 10;
+                        msg.payload.widget.command = msg.payload.widget.id;
                         return 2;
                     }
                 } else {
@@ -2743,17 +2743,17 @@ int ViewArmyHandler(tag_message &msg)
 
     if (!gbLowMemory && KBTickCount() > glTimers[0]) {
         msg.type = 0x200;
-        msg.field4 = 4;
-        msg.field8 = 5;
+        msg.payload.widget.command = 4;
+        msg.payload.widget.id = 5;
         iViewArmyFrame =
             (iViewArmyFrame + 1) %
             sViewArmyMonFrameInfo.animationFrameCount[ARMY_ANIMATION_WALK];
-        msg.field18 =
+        msg.payload.widget.data.value =
             sViewArmyMonFrameInfo.animationFrames[ARMY_ANIMATION_WALK]
                                                  [iViewArmyFrame];
         gpGame->m_viewArmyWindow->BroadcastMessage(msg);
-        msg.field4 = 52;
-        msg.field18 =
+        msg.payload.widget.command = 52;
+        msg.payload.widget.data.value =
             sViewArmyMonFrameInfo.walkXOffsets[iViewArmyFrame] *
                 viewArmyFacingWIPXMod +
             viewArmyBaseX;

@@ -112,10 +112,10 @@ int button::Main(tag_message &msg)
         Draw();
         gpWindowManager->UpdateScreenRegion(m_x + m_owner->m_posX,
                                             m_y + m_owner->m_posY, m_width, m_height);
-        msg.field4 = 0xd;
+        msg.payload.widget.command = 0xd;
         msg.type = 0x200;
-        msg.field8 = m_id;
-        msg.fieldC = iLeftRightSave;
+        msg.payload.widget.id = m_id;
+        msg.payload.widget.parameter = iLeftRightSave;
         iLeftRightSave = 0;
         return 2;
     }
@@ -130,23 +130,23 @@ int button::Main(tag_message &msg)
     switch (eventType) {
     case 1:
         if ((m_flags & 2) != 0 && (m_flags & 4) != 0 && (m_flags & 8) == 0 && m_hotkey != -1 &&
-            m_hotkey == msg.field4)
+            m_hotkey == msg.payload.keyboard.keyCode)
             return Select(msg);
         return 0;
 
     case 2:
         if ((m_flags & 2) != 0 && (m_flags & 4) != 0 && (m_flags & 8) == 0 && m_hotkey != -1 &&
-            m_hotkey == msg.field4) {
+            m_hotkey == msg.payload.keyboard.keyCode) {
             if ((m_flags & 1) == 0)
                 return 0;
             m_flags &= 0xfffe;
             Draw();
             gpWindowManager->UpdateScreenRegion(m_x + m_owner->m_posX,
                                                 m_y + m_owner->m_posY, m_width, m_height);
-            msg.field4 = 0xd;
+            msg.payload.widget.command = 0xd;
             msg.type = 0x200;
-            msg.field8 = m_id;
-            msg.fieldC = iLeftRightSave;
+            msg.payload.widget.id = m_id;
+            msg.payload.widget.parameter = iLeftRightSave;
             iLeftRightSave = 0;
             return 2;
         }
@@ -157,17 +157,17 @@ int button::Main(tag_message &msg)
         if ((m_flags & 4) == 0)
             goto normalEvent;
 
-        short relativeX = static_cast<short>(msg.field4) -
+        short relativeX = static_cast<short>(msg.payload.mouse.x) -
                           static_cast<short>(m_owner->m_posX);
-        short relativeY = static_cast<short>(msg.field8) -
+        short relativeY = static_cast<short>(msg.payload.mouse.y) -
                           static_cast<short>(m_owner->m_posY);
         if (eventType == 0x20) {
             if (m_x <= relativeX && m_y <= relativeY &&
                 relativeX < m_x + m_width && relativeY < m_y + m_height) {
-                msg.field4 = 0xe;
+                msg.payload.widget.command = 0xe;
                 msg.type = 0x200;
-                msg.field8 = m_id;
-                msg.fieldC = 0x200;
+                msg.payload.widget.id = m_id;
+                msg.payload.widget.parameter = 0x200;
                 return 2;
             }
             return 0;
@@ -182,9 +182,9 @@ int button::Main(tag_message &msg)
             PollSound();
             gpMouseManager->Main(msg);
             if (msg.type == 4) {
-                relativeX = static_cast<short>(msg.field4) -
+                relativeX = static_cast<short>(msg.payload.mouse.x) -
                             static_cast<short>(m_owner->m_posX);
-                relativeY = static_cast<short>(msg.field8) -
+                relativeY = static_cast<short>(msg.payload.mouse.y) -
                             static_cast<short>(m_owner->m_posY);
                 if (m_x > relativeX || m_y > relativeY ||
                     relativeX >= m_x + m_width || relativeY >= m_y + m_height) {
@@ -193,10 +193,10 @@ int button::Main(tag_message &msg)
                         Draw();
                         gpWindowManager->UpdateScreenRegion(
                             m_x + m_owner->m_posX, m_y + m_owner->m_posY, m_width, m_height);
-                        msg.field4 = 0xd;
+                        msg.payload.widget.command = 0xd;
                         msg.type = 0x200;
-                        msg.field8 = m_id;
-                        msg.fieldC = iLeftRightSave;
+                        msg.payload.widget.id = m_id;
+                        msg.payload.widget.parameter = iLeftRightSave;
                         iLeftRightSave = 0;
                     }
                 } else if ((m_flags & 1) == 0) {
@@ -211,10 +211,10 @@ int button::Main(tag_message &msg)
             Draw();
             gpWindowManager->UpdateScreenRegion(m_x + m_owner->m_posX,
                                                 m_y + m_owner->m_posY, m_width, m_height);
-            msg.field4 = 0xd;
+            msg.payload.widget.command = 0xd;
             msg.type = 0x200;
-            msg.field8 = m_id;
-            msg.fieldC = iLeftRightSave;
+            msg.payload.widget.id = m_id;
+            msg.payload.widget.parameter = iLeftRightSave;
             iLeftRightSave = 0;
             return 2;
         }
@@ -227,21 +227,21 @@ int button::Main(tag_message &msg)
             Draw();
             gpWindowManager->UpdateScreenRegion(m_x + m_owner->m_posX,
                                                 m_y + m_owner->m_posY, m_width, m_height);
-            msg.field4 = 0xd;
+            msg.payload.widget.command = 0xd;
             msg.type = 0x200;
-            msg.field8 = m_id;
-            msg.fieldC = iLeftRightSave;
+            msg.payload.widget.id = m_id;
+            msg.payload.widget.parameter = iLeftRightSave;
             iLeftRightSave = 0;
             return 2;
         }
         goto normalEvent;
 
     case 0x200:
-        if (msg.field4 == 0x3c) {
-            if (msg.field8 == m_iconId) {
-                m_iconId = msg.field18;
+        if (msg.payload.widget.command == 0x3c) {
+            if (msg.payload.widget.id == m_iconId) {
+                m_iconId = msg.payload.widget.data.value;
                 gpResourceManager->Dispose(m_icon);
-                m_icon = gpResourceManager->GetIcon(msg.field18);
+                m_icon = gpResourceManager->GetIcon(msg.payload.widget.data.value);
             }
             return 0;
         }
@@ -261,7 +261,7 @@ normalEvent:
 // scheduling +0x50..+0x6f differ; retail retains the owner pointer while base CSEs
 // both owner coordinates into AX/CX. The final global-name difference is the same
 // single-module gButtonRepeatTime address. Cached/direct owner access, x/y declaration
-// order, split compound additions, and both field4/field8 assignment orders were tried.
+// order, split compound additions, and both command/id assignment orders were tried.
 VA(0x004ddc70, 0x96)
 short button::Select(struct tag_message &msg)
 {
@@ -274,12 +274,12 @@ short button::Select(struct tag_message &msg)
     gpWindowManager->UpdateScreenRegion(x, y, m_width, m_height);
     m_flags |= 1;
     msg.type = 0x200;
-    msg.field4 = 10;
-    msg.field8 = m_id;
+    msg.payload.widget.command = 10;
+    msg.payload.widget.id = m_id;
     if (field_0x28 != 1)
-        msg.field4 = 0xc;
+        msg.payload.widget.command = 0xc;
     gButtonRepeatTime = KBTickCount() + 0x3c;
-    iLeftRightSave = msg.fieldC & 0x300;
+    iLeftRightSave = msg.payload.widget.parameter & 0x300;
     return 2;
 }
 
@@ -300,10 +300,10 @@ short button::Deselect(struct tag_message &msg)
     Draw();
     gpWindowManager->UpdateScreenRegion(m_x + m_owner->m_posX,
                                         m_y + m_owner->m_posY, m_width, m_height);
-    msg.field4 = 0xd;
+    msg.payload.widget.command = 0xd;
     msg.type = 0x200;
-    msg.field8 = m_id;
-    msg.fieldC = iLeftRightSave;
+    msg.payload.widget.id = m_id;
+    msg.payload.widget.parameter = iLeftRightSave;
     iLeftRightSave = 0;
     return 2;
 }

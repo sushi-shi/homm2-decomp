@@ -193,48 +193,48 @@ int listBoxWidget::Main(tag_message &message)
     case 0x20: {
         if (!(m_flags & 4))
             break;
-        short mx = message.field4 - m_owner->m_posX;
-        short my = message.field8 - m_owner->m_posY;
+        short mx = message.payload.mouse.x - m_owner->m_posX;
+        short my = message.payload.mouse.y - m_owner->m_posY;
         short left = m_x;
         if (left > mx || m_y > my || left + m_width <= mx || m_y + m_height <= my)
             return 0;
         if (message.type == 0x20) {
-            message.field4 = 0xe;
+            message.payload.widget.command = 0xe;
             message.type = 0x200;
-            message.field8 = m_id;
-            message.fieldC = 0x200;
+            message.payload.widget.id = m_id;
+            message.payload.widget.parameter = 0x200;
             return 2;
         }
         return ProcessMouseMessage(message);
     }
     case 0x200:
-        switch (message.field4) {
+        switch (message.payload.widget.command) {
         case 0x36:
-            if (m_id == message.field8) {
-                m_selectedIndex = reinterpret_cast<int>(message.text);
+            if (m_id == message.payload.widget.id) {
+                m_selectedIndex = reinterpret_cast<int>(message.payload.widget.data.text);
                 return 1;
             }
             break;
         case 0x37:
-            if (m_id == message.field8) {
-                message.text = reinterpret_cast<char *>(static_cast<int>(m_selectedIndex));
+            if (m_id == message.payload.widget.id) {
+                message.payload.widget.data.text = reinterpret_cast<char *>(static_cast<int>(m_selectedIndex));
                 return 1;
             }
             break;
         case 0x39:
-            if (m_id == message.field8) {
-                char *text = message.text;
-                if (m_itemCount <= message.fieldC)
+            if (m_id == message.payload.widget.id) {
+                char *text = message.payload.widget.data.text;
+                if (m_itemCount <= message.payload.widget.parameter)
                     break;
 #line 222
-                H2_FREE(m_items[message.fieldC], "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp", 0xde);
-                m_items[message.fieldC] = static_cast<char *>(H2_ALLOC(strlen(text) + 1, "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp", 0xdf));
-                strcpy(m_items[message.fieldC], text);
+                H2_FREE(m_items[message.payload.widget.parameter], "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp", 0xde);
+                m_items[message.payload.widget.parameter] = static_cast<char *>(H2_ALLOC(strlen(text) + 1, "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp", 0xdf));
+                strcpy(m_items[message.payload.widget.parameter], text);
             }
             break;
         case 0x38:
-            if (m_id == message.field8) {
-                char *text = message.text;
+            if (m_id == message.payload.widget.id) {
+                char *text = message.payload.widget.data.text;
 #line 233
                 char **newItems = static_cast<char **>(H2_ALLOC((m_itemCount + 1) * 4,
                                                                  "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp", 0xe9));
@@ -264,11 +264,11 @@ int listBoxWidget::Main(tag_message &message)
             }
             break;
         case 0x3a:
-            if (m_id == message.field8)
-                DeleteItem(reinterpret_cast<int>(message.text));
+            if (m_id == message.payload.widget.id)
+                DeleteItem(reinterpret_cast<int>(message.payload.widget.data.text));
             break;
         case 0x3b:
-            if (m_id == message.field8)
+            if (m_id == message.payload.widget.id)
                 while (m_itemCount != 0)
                     DeleteItem(0);
             break;
@@ -351,8 +351,8 @@ void listBoxWidget::DrawLBStuff(int doUpdate)
 VA(0x004dbbe0, 0x312)
 int listBoxWidget::ProcessMouseMessage(tag_message &message)
 {
-    int mouseX = message.field10 - m_owner->m_posX;
-    int mouseY = message.field14 - m_owner->m_posY;
+    int mouseX = message.payload.mouse.screenX - m_owner->m_posX;
+    int mouseY = message.payload.mouse.screenY - m_owner->m_posY;
     int adjY = mouseY - m_listY;
     switch (message.type) {
     case 4:
@@ -430,17 +430,17 @@ int listBoxWidget::ProcessMouseMessage(tag_message &message)
         }
         if (field_0x8d) {
             field_0x8d = 0;
-            message.field4 = 0xc;
+            message.payload.widget.command = 0xc;
             message.type = 0x200;
-            message.field8 = m_id;
+            message.payload.widget.id = m_id;
             int selectedIndex = m_selectedIndex;
-            message.fieldC = 1;
-            message.text = reinterpret_cast<char *>(selectedIndex);
+            message.payload.widget.parameter = 1;
+            message.payload.widget.data.text = reinterpret_cast<char *>(selectedIndex);
             if (m_lastSelectedIndex == m_selectedIndex) {
                 int lastTick = m_lastClickTime;
                 int currentTick = KBTickCount();
                 if (lastTick + 0x190 > currentTick)
-                    message.fieldC = 2;
+                    message.payload.widget.parameter = 2;
             }
             m_lastSelectedIndex = m_selectedIndex;
             m_lastClickTime = KBTickCount();

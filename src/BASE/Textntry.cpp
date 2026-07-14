@@ -171,17 +171,17 @@ int textEntryWidget::Main(struct tag_message &message)
         case 0x20: {
             m_cursorBlink = 1;
             short windowX = static_cast<short>(m_owner->m_posX);
-            short mouseX = static_cast<short>(message.field4 - windowX);
+            short mouseX = static_cast<short>(message.payload.mouse.x - windowX);
             short windowY = static_cast<short>(m_owner->m_posY);
-            short mouseY = static_cast<short>(message.field8 - windowY);
+            short mouseY = static_cast<short>(message.payload.mouse.y - windowY);
             if (message.type == 0x20) {
                 if (mouseX < m_x || mouseY < m_y || mouseX >= m_x + m_width ||
                     mouseY >= m_y + m_height)
                     return 0;
-                message.field4 = 0xe;
+                message.payload.widget.command = 0xe;
                 message.type = 0x200;
-                message.field8 = m_id;
-                message.fieldC = 0x200;
+                message.payload.widget.id = m_id;
+                message.payload.widget.parameter = 0x200;
                 return 2;
             }
             if (mouseX >= m_x && mouseY >= m_y && mouseX < m_x + m_width &&
@@ -216,7 +216,7 @@ int textEntryWidget::Main(struct tag_message &message)
                     Process1WindowsMessage();
                     event = gpInputManager->GetEvent();
                     if (event.type == 1) {
-                        switch (event.field4) {
+                        switch (event.payload.keyboard.keyCode) {
                         case 1:
                             if (gbAllowTextEntryEscape != 0) {
                                 strcpy(edit, original);
@@ -243,10 +243,10 @@ int textEntryWidget::Main(struct tag_message &message)
                             break;
                         default:
                             gpInputManager->AsciiConvert(event);
-                            if (event.field4 == 10) {
+                            if (event.payload.keyboard.keyCode == 10) {
                                 gbTextEntryEscaped = 0;
                                 done++;
-                            } else if (event.field4 == 0x7f) {
+                            } else if (event.payload.keyboard.keyCode == 0x7f) {
                                 if (m_cursorPosition != 0) {
                                     strcpy(scratch, edit + m_cursorPosition);
                                     strcpy(edit + m_cursorPosition - 1, scratch);
@@ -254,11 +254,11 @@ int textEntryWidget::Main(struct tag_message &message)
                                     if (m_cursorPosition < m_displayOffset)
                                         m_displayOffset = m_cursorPosition;
                                 }
-                            } else if (strlen(edit) + 1 < m_maxLength && event.field4 != 0) {
+                            } else if (strlen(edit) + 1 < m_maxLength && event.payload.keyboard.keyCode != 0) {
                                 strcpy(backup, edit);
                                 char typed = 0;
-                                if (event.field4 >= 0x100) {
-                                    switch ((event.field4 >> 8) & 0xff) {
+                                if (event.payload.keyboard.keyCode >= 0x100) {
+                                    switch ((event.payload.keyboard.keyCode >> 8) & 0xff) {
                                     case 0x47: typed = '7'; break;
                                     case 0x48: typed = '8'; break;
                                     case 0x49: typed = '9'; break;
@@ -271,7 +271,7 @@ int textEntryWidget::Main(struct tag_message &message)
                                     case 0x52: typed = '0'; break;
                                     }
                                 } else {
-                                    typed = static_cast<char>(event.field4);
+                                    typed = static_cast<char>(event.payload.keyboard.keyCode);
                                     if (typed == '{' || typed == '}')
                                         typed = 0;
                                 }
@@ -310,30 +310,30 @@ int textEntryWidget::Main(struct tag_message &message)
                 m_displayOffset = 0;
                 Draw();
                 gpWindowManager->UpdateScreenRegion(mouseX, mouseY, m_width, m_height);
-                message.field4 = 0xc;
+                message.payload.widget.command = 0xc;
                 message.type = 0x200;
-                message.field8 = m_id;
+                message.payload.widget.id = m_id;
                 return 2;
             }
             return 0;
         }
         case 0x200:
-            switch (message.field4) {
+            switch (message.payload.widget.command) {
             case 3:
-                if (message.field8 == m_id) {
-                    SetText(message.text);
+                if (message.payload.widget.id == m_id) {
+                    SetText(message.payload.widget.data.text);
                     return 1;
                 }
                 break;
             case 7:
-                if (message.field8 == m_id) {
-                    message.text = m_text;
+                if (message.payload.widget.id == m_id) {
+                    message.payload.widget.data.text = m_text;
                     return 1;
                 }
                 break;
             case 0x33:
-                if (message.field8 == m_id) {
-                    m_maxLength = static_cast<unsigned short>(message.field18);
+                if (message.payload.widget.id == m_id) {
+                    m_maxLength = static_cast<unsigned short>(message.payload.widget.data.value);
                     return 1;
                 }
                 break;

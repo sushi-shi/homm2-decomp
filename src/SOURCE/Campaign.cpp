@@ -328,15 +328,15 @@ void game::ShowCampaignInfo(int viewOnly, int)
 
     message.type = CAMPAIGN_MESSAGE_WIDGET;
     if (!viewOnly) {
-        message.field4 = CAMPAIGN_MESSAGE_DESELECT;
-        message.field8 = CAMPAIGN_DIALOG_RESTART;
-        message.field18 = CAMPAIGN_MESSAGE_DESELECT;
+        message.payload.widget.command = CAMPAIGN_MESSAGE_DESELECT;
+        message.payload.widget.id = CAMPAIGN_DIALOG_RESTART;
+        message.payload.widget.data.value = CAMPAIGN_MESSAGE_DESELECT;
         campWin->BroadcastMessage(message);
     }
     if (gbLowMemory) {
-        message.field4 = CAMPAIGN_MESSAGE_DESELECT;
-        message.field8 = CAMPAIGN_DIALOG_REPLAY;
-        message.field18 = CAMPAIGN_MESSAGE_DESELECT;
+        message.payload.widget.command = CAMPAIGN_MESSAGE_DESELECT;
+        message.payload.widget.id = CAMPAIGN_DIALOG_REPLAY;
+        message.payload.widget.data.value = CAMPAIGN_MESSAGE_DESELECT;
         campWin->BroadcastMessage(message);
     }
     gpSoundManager->SwitchAmbientMusic(
@@ -381,57 +381,57 @@ void game::CampaignInfoUpdate(int redraw)
     message.type = CAMPAIGN_MESSAGE_WIDGET;
     for (map = 0; map < CAMPAIGN_TRACK_POINT_COUNT; ++map) {
         if (m_campaignMapEnabled[iCurViewSide][map]) {
-            message.field18 = CAMPAIGN_TRACK_FRAME_COMPLETE;
+            message.payload.widget.data.value = CAMPAIGN_TRACK_FRAME_COMPLETE;
         } else if (map < CAMPAIGN_REGULAR_MAP_COUNT &&
                    m_campaignScenarioCompleted[
                        map < 4 ? m_campaignStartingSide
                                : m_campaignType][map]) {
-            message.field18 = CAMPAIGN_TRACK_FRAME_AVAILABLE;
+            message.payload.widget.data.value = CAMPAIGN_TRACK_FRAME_AVAILABLE;
         } else {
-            message.field18 = CAMPAIGN_TRACK_FRAME_LOCKED;
+            message.payload.widget.data.value = CAMPAIGN_TRACK_FRAME_LOCKED;
         }
         if (iCurViewMap == static_cast<int>(map)) {
             if (map + 1 == 5 && iCampaignTrackType == 1)
-                message.field18 += 12;
+                message.payload.widget.data.value += 12;
             else if (map + 1 == 5 && iCampaignTrackType == 2)
-                message.field18 += 9;
+                message.payload.widget.data.value += 9;
             else if (map + 1 > CAMPAIGN_REGULAR_MAP_COUNT) {
                 if (m_campaignStartingSide == CAMPAIGN_ROLAND)
-                    message.field18 += 6;
+                    message.payload.widget.data.value += 6;
                 else
-                    message.field18 += 3;
+                    message.payload.widget.data.value += 3;
             } else if (map + 1 < 5) {
                 if (m_campaignStartingSide == CAMPAIGN_ROLAND)
-                    message.field18 += 3;
+                    message.payload.widget.data.value += 3;
                 else
-                    message.field18 += 6;
+                    message.payload.widget.data.value += 6;
             } else if (m_campaignType == CAMPAIGN_ROLAND) {
-                message.field18 += 3;
+                message.payload.widget.data.value += 3;
             } else {
-                message.field18 += 6;
+                message.payload.widget.data.value += 6;
             }
         }
-        message.field4 = CAMPAIGN_MESSAGE_SET_FRAME;
-        message.field8 = map + CAMPAIGN_TRACK_WIDGET_FIRST;
+        message.payload.widget.command = CAMPAIGN_MESSAGE_SET_FRAME;
+        message.payload.widget.id = map + CAMPAIGN_TRACK_WIDGET_FIRST;
         campWin->BroadcastMessage(message);
     }
 
-    message.field4 = CAMPAIGN_MESSAGE_SET_ICON;
-    message.field8 = CAMPAIGN_TRACK_ICON_WIDGET;
-    message.text = gText;
+    message.payload.widget.command = CAMPAIGN_MESSAGE_SET_ICON;
+    message.payload.widget.id = CAMPAIGN_TRACK_ICON_WIDGET;
+    message.payload.widget.data.text = gText;
     sprintf(gText, "ctrack%02d.icn", iCampaignTrackType);
     campWin->BroadcastMessage(message);
 
-    message.field4 = CAMPAIGN_MESSAGE_SET_TEXT;
-    message.text = gText;
-    message.field8 = CAMPAIGN_SCENARIO_NUMBER_WIDGET;
+    message.payload.widget.command = CAMPAIGN_MESSAGE_SET_TEXT;
+    message.payload.widget.data.text = gText;
+    message.payload.widget.id = CAMPAIGN_SCENARIO_NUMBER_WIDGET;
     if (iCurViewMap == CAMPAIGN_SWITCHING_MAP)
         sprintf(gText, "5");
     else
         sprintf(gText, "%d", iCurViewMap + 1);
     campWin->BroadcastMessage(message);
 
-    message.field8 = CAMPAIGN_SCENARIO_NAME_WIDGET;
+    message.payload.widget.id = CAMPAIGN_SCENARIO_NAME_WIDGET;
     if (iCurViewMap == CAMPAIGN_SWITCHING_MAP) {
         sprintf(gText, "%s", cCampaignName[1 - iCurViewSide]
                                             [CAMPAIGN_SWITCHING_MAP]);
@@ -444,7 +444,7 @@ void game::CampaignInfoUpdate(int redraw)
     }
     campWin->BroadcastMessage(message);
 
-    message.field8 = CAMPAIGN_SCENARIO_DESCRIPTION_WIDGET;
+    message.payload.widget.id = CAMPAIGN_SCENARIO_DESCRIPTION_WIDGET;
     if (iCurViewMap == CAMPAIGN_SWITCHING_MAP) {
         sprintf(gText, "%s", cCampaignDescription[1 - iCurViewSide]
                                                    [CAMPAIGN_SWITCHING_MAP]);
@@ -457,7 +457,7 @@ void game::CampaignInfoUpdate(int redraw)
     }
     campWin->BroadcastMessage(message);
 
-    message.field8 = CAMPAIGN_SCENARIO_BONUS_WIDGET;
+    message.payload.widget.id = CAMPAIGN_SCENARIO_BONUS_WIDGET;
     sprintf(gText, "%d", m_campaignScenarioBonus[iCurViewSide][iCurViewMap]);
     campWin->BroadcastMessage(message);
 
@@ -468,7 +468,7 @@ void game::CampaignInfoUpdate(int redraw)
             strcat(gText, "\n");
         }
     }
-    message.field8 = CAMPAIGN_AWARDS_WIDGET;
+    message.payload.widget.id = CAMPAIGN_AWARDS_WIDGET;
     campWin->BroadcastMessage(message);
 
     for (map = 0; map < CAMPAIGN_BONUS_CHOICE_COUNT; ++map) {
@@ -532,25 +532,25 @@ void game::CampaignInfoUpdate(int redraw)
             sprintf(gText, gAlignmentNames[choice->value]);
             break;
         }
-        message.field8 = map + CAMPAIGN_BONUS_TEXT_WIDGET_FIRST;
+        message.payload.widget.id = map + CAMPAIGN_BONUS_TEXT_WIDGET_FIRST;
         campWin->BroadcastMessage(message);
     }
 
     for (map = 0; map < CAMPAIGN_BONUS_CHOICE_COUNT; ++map) {
-        message.field8 = map + CAMPAIGN_BONUS_WIDGET_FIRST;
-        message.field4 = CAMPAIGN_MESSAGE_SET_FRAME;
+        message.payload.widget.id = map + CAMPAIGN_BONUS_WIDGET_FIRST;
+        message.payload.widget.command = CAMPAIGN_MESSAGE_SET_FRAME;
         if (!bCampaignViewOnly &&
             gpGame->m_campaignMapEnabled[iCurViewSide][iCurViewMap])
-            message.field18 = CAMPAIGN_WIDGET_ENABLE_FRAME;
+            message.payload.widget.data.value = CAMPAIGN_WIDGET_ENABLE_FRAME;
         else
-            message.field18 = CAMPAIGN_WIDGET_DISABLE_FRAME;
+            message.payload.widget.data.value = CAMPAIGN_WIDGET_DISABLE_FRAME;
         campWin->BroadcastMessage(message);
 
         if (m_campaignChoice[iCurViewSide][iCurViewMap] == map)
-            message.field4 = CAMPAIGN_MESSAGE_SELECT;
+            message.payload.widget.command = CAMPAIGN_MESSAGE_SELECT;
         else
-            message.field4 = CAMPAIGN_MESSAGE_DESELECT;
-        message.field18 = CAMPAIGN_WIDGET_REFRESH_FRAME;
+            message.payload.widget.command = CAMPAIGN_MESSAGE_DESELECT;
+        message.payload.widget.data.value = CAMPAIGN_WIDGET_REFRESH_FRAME;
         campWin->BroadcastMessage(message);
     }
     if (redraw)
@@ -570,17 +570,17 @@ int CampaignHandler(struct tag_message &message)
             giTerrainToMusicTrack[gpAdvManager->m_currentTerrain]);
     if (giDialogTimeout != 0 && giDialogTimeout < KBTickCount()) {
         message.type = CAMPAIGN_MESSAGE_WIDGET;
-        gpWindowManager->m_dialogResult = message.field8;
-        message.field8 = CAMPAIGN_CLOSE_COMMAND;
-        message.field4 = message.field8;
+        gpWindowManager->m_dialogResult = message.payload.widget.id;
+        message.payload.widget.id = CAMPAIGN_CLOSE_COMMAND;
+        message.payload.widget.command = message.payload.widget.id;
         giDialogTimeout = 0;
         return CAMPAIGN_HANDLER_CLOSE;
     }
     if (message.type == CAMPAIGN_MESSAGE_WIDGET) {
-      switch (message.field4) {
+      switch (message.payload.widget.command) {
     case CAMPAIGN_MESSAGE_HOVER:
     case CAMPAIGN_MESSAGE_HELP:
-        switch (message.field8) {
+        switch (message.payload.widget.id) {
         case CAMPAIGN_TRACK_WIDGET_FIRST:
         case CAMPAIGN_TRACK_WIDGET_FIRST + 1:
         case CAMPAIGN_TRACK_WIDGET_FIRST + 2:
@@ -593,7 +593,7 @@ int CampaignHandler(struct tag_message &message)
         case CAMPAIGN_TRACK_WIDGET_FIRST + 9:
         case CAMPAIGN_TRACK_WIDGET_FIRST + 10:
         case CAMPAIGN_TRACK_WIDGET_LAST:
-            map = message.field8 - CAMPAIGN_TRACK_WIDGET_FIRST;
+            map = message.payload.widget.id - CAMPAIGN_TRACK_WIDGET_FIRST;
             if (giDebugLevel < 1 &&
                 !gpGame->m_campaignMapEnabled[iCurViewSide][map]) {
                 if (map < CAMPAIGN_REGULAR_MAP_COUNT) {
@@ -616,7 +616,7 @@ int CampaignHandler(struct tag_message &message)
             if (!bCampaignViewOnly &&
                 gpGame->m_campaignMapEnabled[iCurViewSide][iCurViewMap]) {
                 gpGame->m_campaignChoice[iCurViewSide][iCurViewMap] =
-                    static_cast<unsigned char>(message.field8 -
+                    static_cast<unsigned char>(message.payload.widget.id -
                                                CAMPAIGN_BONUS_WIDGET_FIRST);
                 gpGame->CampaignInfoUpdate(1);
             }
@@ -625,7 +625,7 @@ int CampaignHandler(struct tag_message &message)
         break;
 
     case CAMPAIGN_MESSAGE_ACTIVATE:
-        switch (message.field8) {
+        switch (message.payload.widget.id) {
         case CAMPAIGN_DIALOG_REPLAY:
             gpGame->PlayPreScenarioSmacker(iCurViewSide, iCurViewMap);
             campWin->DrawWindow();
@@ -666,9 +666,9 @@ int CampaignHandler(struct tag_message &message)
             }
         case CAMPAIGN_DIALOG_CANCEL:
         case CAMPAIGN_DIALOG_RESTART:
-            gpWindowManager->m_dialogResult = message.field8;
-            message.field8 = CAMPAIGN_CLOSE_COMMAND;
-            message.field4 = message.field8;
+            gpWindowManager->m_dialogResult = message.payload.widget.id;
+            message.payload.widget.id = CAMPAIGN_CLOSE_COMMAND;
+            message.payload.widget.command = message.payload.widget.id;
             giDialogTimeout = 0;
             return CAMPAIGN_HANDLER_CLOSE;
         }

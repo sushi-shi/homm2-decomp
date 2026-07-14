@@ -1366,35 +1366,35 @@ void GetDataEntry(char *prompt, char *destination, int maximumLength, char *init
 
     tag_message message;
     message.type = 0x200;
-    message.field4 = 3;
-    message.field8 = 1;
-    message.text = prompt;
+    message.payload.widget.command = 3;
+    message.payload.widget.id = 1;
+    message.payload.widget.data.text = prompt;
     DataEntryWin->BroadcastMessage(message);
 
     char entryText[100];
     if (initialText == 0)
         initialText = "";
     strcpy(entryText, initialText);
-    message.field8 = 10;
-    message.text = entryText;
+    message.payload.widget.id = 10;
+    message.payload.widget.data.text = entryText;
     DataEntryWin->BroadcastMessage(message);
     strcpy(destination, entryText);
 
     message.type = 0x200;
-    message.field4 = 6;
-    message.field8 = 0x7801;
-    message.text = reinterpret_cast<char *>(6);
+    message.payload.widget.command = 6;
+    message.payload.widget.id = 0x7801;
+    message.payload.widget.data.text = reinterpret_cast<char *>(6);
     DataEntryWin->BroadcastMessage(message);
-    message.field8 = 0x7807;
+    message.payload.widget.id = 0x7807;
     DataEntryWin->BroadcastMessage(message);
-    message.field8 = 0x7808;
+    message.payload.widget.id = 0x7808;
     DataEntryWin->BroadcastMessage(message);
-    message.field8 = 0x7805;
+    message.payload.widget.id = 0x7805;
     DataEntryWin->BroadcastMessage(message);
-    message.field8 = 0x7806;
+    message.payload.widget.id = 0x7806;
     DataEntryWin->BroadcastMessage(message);
     if (showCancel == 0) {
-        message.field8 = 0x7802;
+        message.payload.widget.id = 0x7802;
         DataEntryWin->BroadcastMessage(message);
     }
 
@@ -1420,7 +1420,7 @@ void GetDataEntry(char *prompt, char *destination, int maximumLength, char *init
 
 // @early-stop
 // /O2 block-layout wall: base is 0x17b bytes, retail 0x173; all 23 relocations
-// agree. The only differing instruction blocks are the field4==13/cancel dispatch
+// agree. The only differing instruction blocks are the command==13/cancel dispatch
 // (retail +0x4d..+0x70) and its equivalent tail block (+0x15a..+0x172); the entire
 // broadcast/copy/draw/dialog-result path between them matches. Early returns,
 // shared fallback labels, combined predicates and a late possible-cancel label
@@ -1431,8 +1431,8 @@ int DataEntryWindowHandler(struct tag_message &message)
     if (bDataEntryTime == 0) {
         ++bDataEntryTime;
         message.type = 8;
-        message.field4 = inBoxX;
-        message.field8 = inBoxY;
+        message.payload.mouse.x = inBoxX;
+        message.payload.mouse.y = inBoxY;
         DataEntryWin->BroadcastMessage(message);
         return 1;
     }
@@ -1442,32 +1442,32 @@ int DataEntryWindowHandler(struct tag_message &message)
     else {
         if (message.type != 0x200)
             goto normalEvent;
-        if (message.field4 != 0xc) {
-            if (message.field4 == 0xd)
+        if (message.payload.widget.command != 0xc) {
+            if (message.payload.widget.command == 0xd)
                 goto possibleCancelEvent;
             goto normalEvent;
         }
-        if (message.field8 != 10)
+        if (message.payload.widget.id != 10)
             goto normalEvent;
     }
 
     message.type = 0x200;
-    message.field8 = 0xA;
-    message.field4 = 7;
+    message.payload.widget.id = 0xA;
+    message.payload.widget.command = 7;
     DataEntryWin->BroadcastMessage(message);
-    if (strlen(message.text) != 0) {
+    if (strlen(message.payload.widget.data.text) != 0) {
         memset(cDEDest, 0, iDEMaxLen);
-        strncpy(cDEDest, message.text, iDEMaxLen - 1);
+        strncpy(cDEDest, message.payload.widget.data.text, iDEMaxLen - 1);
         message.type = 0x200;
-        message.field4 = 3;
-        message.field8 = 10;
-        message.text = cDEDest;
+        message.payload.widget.command = 3;
+        message.payload.widget.id = 10;
+        message.payload.widget.data.text = cDEDest;
         DataEntryWin->BroadcastMessage(message);
         DataEntryWin->DrawWindow(1, 10, 10);
         if (gbTextEntryEscaped == 0) {
-            gpWindowManager->m_dialogResult = message.field8;
-            message.field8 = 10;
-            message.field4 = 10;
+            gpWindowManager->m_dialogResult = message.payload.widget.id;
+            message.payload.widget.id = 10;
+            message.payload.widget.command = 10;
             return 2;
         }
     }
@@ -1476,10 +1476,10 @@ normalEvent:
     return EventWindowHandler(message);
 
 possibleCancelEvent:
-    if (message.field8 != 0x7802)
+    if (message.payload.widget.id != 0x7802)
         goto normalEvent;
-    message.field8 = 10;
-    message.field4 = 10;
+    message.payload.widget.id = 10;
+    message.payload.widget.command = 10;
     return 2;
 }
 

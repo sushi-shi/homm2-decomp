@@ -72,9 +72,9 @@ void advManager::ViewWorld(int whatToDraw, int drawAllObjects, int drawAllTerrai
         viewIndex = whatToDraw - VIEW_WORLD_MINES;
     sprintf(gText, "view%s.icn", viewNames[viewIndex]);
     message.type = VIEW_WORLD_MESSAGE;
-    message.field4 = VIEW_WORLD_ICON_MESSAGE;
-    message.field8 = VIEW_WORLD_ICON_WIDGET;
-    message.text = gText;
+    message.payload.widget.command = VIEW_WORLD_ICON_MESSAGE;
+    message.payload.widget.id = VIEW_WORLD_ICON_WIDGET;
+    message.payload.widget.data.text = gText;
     viewWindow->BroadcastMessage(message);
     gpWindowManager->DoDialog(viewWindow, ViewWorldDialogHandler, 0);
     delete viewWindow;
@@ -517,9 +517,9 @@ int ViewWorldDialogHandler(struct tag_message &message)
             giTerrainToMusicTrack[gpAdvManager->m_currentTerrain]);
 
     if (message.type == VIEW_WORLD_MESSAGE) {
-        switch (message.field4) {
+        switch (message.payload.widget.command) {
         case VIEW_WORLD_SELECT:
-            if (message.field8 == VIEW_WORLD_RADAR_WIDGET &&
+            if (message.payload.widget.id == VIEW_WORLD_RADAR_WIDGET &&
                 (giViewWorldScale != VIEW_WORLD_SCALE_NEAR ||
                  MAP_WIDTH > VIEW_WORLD_NEAR_MAX_MAP_SIZE) &&
                 (giViewWorldScale != VIEW_WORLD_SCALE_MIDDLE ||
@@ -541,8 +541,8 @@ int ViewWorldDialogHandler(struct tag_message &message)
                     radarScale = 1.0f;
                 }
 
-                radarX = message.field10;
-                radarY = message.field14;
+                radarX = message.payload.mouse.screenX;
+                radarY = message.payload.mouse.screenY;
                 radarX = static_cast<int>((radarX - VIEW_WORLD_RADAR_LEFT) / radarScale);
                 radarY = static_cast<int>((radarY - VIEW_WORLD_RADAR_TOP) / radarScale);
                 iVWMapOriginX = radarX - iVWCenterOffset;
@@ -571,19 +571,19 @@ int ViewWorldDialogHandler(struct tag_message &message)
                         currentMessage = gpInputManager->GetEvent();
                     }
                     if (savedMessage.type == VIEW_WORLD_MOUSE_MOVE) {
-                        if (savedMessage.field4 < VIEW_WORLD_RADAR_LEFT)
-                            savedMessage.field4 = VIEW_WORLD_RADAR_LEFT;
-                        if (savedMessage.field4 >= VIEW_WORLD_RADAR_RIGHT)
-                            savedMessage.field4 = MAP_WIDTH * 2 + VIEW_WORLD_RADAR_LEFT - 1;
-                        if (savedMessage.field8 < VIEW_WORLD_RADAR_TOP)
-                            savedMessage.field8 = VIEW_WORLD_RADAR_TOP;
-                        if (savedMessage.field8 >= VIEW_WORLD_RADAR_BOTTOM)
-                            savedMessage.field8 = MAP_HEIGHT * 2 + VIEW_WORLD_RADAR_TOP - 1;
+                        if (savedMessage.payload.mouse.x < VIEW_WORLD_RADAR_LEFT)
+                            savedMessage.payload.mouse.x = VIEW_WORLD_RADAR_LEFT;
+                        if (savedMessage.payload.mouse.x >= VIEW_WORLD_RADAR_RIGHT)
+                            savedMessage.payload.mouse.x = MAP_WIDTH * 2 + VIEW_WORLD_RADAR_LEFT - 1;
+                        if (savedMessage.payload.mouse.y < VIEW_WORLD_RADAR_TOP)
+                            savedMessage.payload.mouse.y = VIEW_WORLD_RADAR_TOP;
+                        if (savedMessage.payload.mouse.y >= VIEW_WORLD_RADAR_BOTTOM)
+                            savedMessage.payload.mouse.y = MAP_HEIGHT * 2 + VIEW_WORLD_RADAR_TOP - 1;
                         gpMouseManager->Main(savedMessage);
                         radarX = static_cast<int>(
-                            (savedMessage.field4 - VIEW_WORLD_RADAR_LEFT) / radarScale);
+                            (savedMessage.payload.mouse.x - VIEW_WORLD_RADAR_LEFT) / radarScale);
                         radarY = static_cast<int>(
-                            (savedMessage.field8 - VIEW_WORLD_RADAR_TOP) / radarScale);
+                            (savedMessage.payload.mouse.y - VIEW_WORLD_RADAR_TOP) / radarScale);
                         iVWMapOriginX = radarX - iVWCenterOffset;
                         iVWMapOriginY = radarY - iVWCenterOffset;
                         if (iVWMapOriginX < 0)
@@ -602,7 +602,7 @@ int ViewWorldDialogHandler(struct tag_message &message)
             }
             break;
         case VIEW_WORLD_RELEASE:
-            switch (message.field8) {
+            switch (message.payload.widget.id) {
             case VIEW_WORLD_SCALE_CONTROL:
                 gpAdvManager->VWCleanup();
                 if (giViewWorldScale == VIEW_WORLD_SCALE_NEAR)
@@ -615,15 +615,15 @@ int ViewWorldDialogHandler(struct tag_message &message)
                                      iVWCenterOffset + iVWMapOriginY);
                 gpAdvManager->VWCompleteDraw();
                 break;
-            case 0x7800:
-            case 0x7801:
-            case 0x7802:
-            case 0x7803:
-            case 0x7805:
-            case 0x7806:
-                gpWindowManager->m_dialogResult = message.field8;
-                message.field8 = VIEW_WORLD_DIALOG_CLOSE;
-                message.field4 = message.field8;
+            case EVENT_WINDOW_FIRST_BUTTON:
+            case EVENT_WINDOW_SECOND_BUTTON:
+            case EVENT_WINDOW_THIRD_BUTTON:
+            case EVENT_WINDOW_FOURTH_BUTTON:
+            case EVENT_WINDOW_FIFTH_BUTTON:
+            case EVENT_WINDOW_SIXTH_BUTTON:
+                gpWindowManager->m_dialogResult = message.payload.widget.id;
+                message.payload.widget.id = VIEW_WORLD_DIALOG_CLOSE;
+                message.payload.widget.command = message.payload.widget.id;
                 return 2;
             }
             break;
