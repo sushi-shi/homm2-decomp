@@ -110,8 +110,8 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
             gFYX = gFYX - gFYDimLen2;
             continue;
         do_fill:
-            unsigned int fillCount = gFYRun;
             if (shear[gFYY] != 0x7f && clipY <= gFYY && gFYY <= gFYClipB) {
+                unsigned int fillCount = gFYRun;
                 if (clipX <= static_cast<int>((gFYX - fillCount) + 1) && gFYX <= gFYClipR) {
                     if (clipX <= static_cast<int>((gFYX - fillCount) + 1)) {
                         memset(reinterpret_cast<unsigned char *>((gFYRow - fillCount) + 1 + gFYX),
