@@ -85,7 +85,9 @@ void widget::Close(void) {}
 // coordinate assignments, positive/rejection CFGs, explicit right/bottom bounds,
 // owner pointer/reference spellings, and audited commutative/relational AST forms
 // did not close the residual without losing an exact sibling. Retry after an
-// exact-preserving predecessor/TU-state change or new lifetime evidence.
+// exact-preserving predecessor/TU-state change or new lifetime evidence. The
+// bounded declaration-context retest for this combined checkpoint is recorded in
+// docs/matching-matrices/widget-whole-tu-214bd52.tsv.
 VA(0x004ddee0, 0x2f4)
 int widget::Main(tag_message &message)
 {
