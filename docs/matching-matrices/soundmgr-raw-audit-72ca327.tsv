@@ -1,0 +1,35 @@
+rva	function	retail_size	objdiff	masked_relocation_offsets	raw_result	unmasked_residual
+0xcb630	HandleMCIError	0x68	EXACT	14	RAW_EXACT	-
+0xcb6a0	soundManager::ValidatePreviousPosition	0xc7	EXACT	8	RAW_EXACT	-
+0xcb770	soundManager::CDStop	0x13c	EXACT	29	RAW_EXACT	-
+0xcb8b0	soundManager::CDIsPlaying	0xb3	EXACT	15	RAW_EXACT	-
+0xcb970	soundManager::CDStartup	0xf3	99.903850	16	UNRESOLVED	+0xd8: 0x0d/0x12 local-branch displacement
+0xcba70	soundManager::CDShutdown	0xd5	EXACT	23	RAW_EXACT	-
+0xcbb50	soundManager::CDSetVolume	0xe5	99.967740	3	UNRESOLVED	+0x7d/+0x82: 0x0b,0x0c / 0x0c,0x0b immediates
+0xcbc40	soundManager::CDPlay	0x473	EXACT	98	RAW_EXACT	-
+0xcc0c0	soundManager::CDPoll	0xf1	99.918030	8	UNRESOLVED	+0x4e: 0x95/0x12 local-branch displacement
+0xcc1c0	soundManager::ConvertVolume	0xdd	EXACT	6	RAW_EXACT	-
+0xcc2a0	SetReady2Poll	0x5e	EXACT	5	RAW_EXACT	-
+0xcc300	UpdateTimers	0x26	EXACT	3	RAW_EXACT	-
+0xcc330	soundManager::soundManager	0xd7	EXACT	4	RAW_EXACT	-
+0xcc410	WAVE_init_driver	0x14a	EXACT	20	RAW_EXACT	-
+0xcc560	soundManager::Open	0x3a8	EXACT	64	RAW_EXACT	-
+0xcc910	soundManager::AllocateSampleHandles	0x91	EXACT	2	RAW_EXACT	-
+0xcc9b0	soundManager::Close	0x96	EXACT	13	RAW_EXACT	-
+0xcca50	soundManager::Main	0x1a	EXACT	0	RAW_EXACT	-
+0xcca70	soundManager::StartSample	0x1a	EXACT	0	RAW_EXACT	-
+0xcca90	soundManager::StopAllSamples	0x126	99.857140	12	UNRESOLVED	stack-slot bytes +0x52,+0x5d,+0x64,+0x74,+0x85,+0x88,+0x93,+0xe2,+0xee,+0xf1
+0xccbc0	soundManager::StopSample	0xb1	EXACT	8	RAW_EXACT	-
+0xccc80	soundManager::ModifySample	0x202	99.838000	23	RAW_EXACT_DELINK_WALL	full range exact; fixed-IAT/self-relocation identities only
+0xcce90	soundManager::DigitalReport	0xa3	EXACT	3	RAW_EXACT	-
+0xccf40	soundManager::AdjustSoundVolumes	0xe8	EXACT	10	RAW_EXACT	-
+0xcd030	soundManager::AdjustMusicVolumes	0xee	EXACT	13	RAW_EXACT	-
+0xcd120	soundManager::ForcePollSound	0x3a	EXACT	2	RAW_EXACT	-
+0xcd160	soundManager::SetMusicQuality	0xe3	EXACT	8	RAW_EXACT	-
+0xcd250	soundManager::PlayAmbientMusic	0xc5	99.905660	5	UNRESOLVED	+0x77: 0x3e/0x43 local-branch displacement
+0xcd320	soundManager::PollSound	0x38f	EXACT	37	RAW_EXACT	-
+0xcd6b0	soundManager::SwitchAmbientMusic	0x138	99.851300	12	UNRESOLVED	+0x4d: 0xdb/0xe0; +0x72: 0xb6/0xbb; +0xeb: 0x0b/0x0a
+0xcd7f0	soundManager::MemorySample	0x28f	EXACT	22	RAW_EXACT	-
+0xcda80	soundManager::GetNumberCDDrives	0x16	EXACT	0	RAW_EXACT	-
+0xcdaa0	soundManager::ServiceSound	0x2e	EXACT	2	RAW_EXACT	-
+0xcdad0	soundManager::MusicPlaying	0x7f	EXACT	4	RAW_EXACT	-
