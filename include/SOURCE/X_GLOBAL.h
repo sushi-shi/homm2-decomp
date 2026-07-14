@@ -18,6 +18,7 @@ enum {
 
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
 extern signed char xIsExpansionMap;
+extern int xLastChoice;
 extern unsigned char xIsPlayingExpansionCampaign;
 extern class ExpCampaign xCampaign;
 extern char *xHSCampaignNames[EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT];
