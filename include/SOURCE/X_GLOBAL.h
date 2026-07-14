@@ -10,6 +10,8 @@ class ExpCampaign;
 enum {
     HERO_TYPE_INITIAL_COUNT = 8,
     EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT = 4,
+    X_GLOBAL_PASSWORD_STRING_COUNT = 211,
+    X_GLOBAL_STABLE_TEXT_COUNT = 4,
     GLOBAL_MAP_NAME_SIZE = 0x18,
     GLOBAL_TCP_TEXT_SIZE = 0x18,
     GLOBAL_AGGREGATE_PATH_SIZE = 0x160,
@@ -25,6 +27,8 @@ extern char *xHSCampaignNames[EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT];
 extern int xTheSpell;
 extern char *xNecromancerShrine;
 extern char *xNecromancerShrineDesc;
+extern char *xStableText[X_GLOBAL_STABLE_TEXT_COUNT];
+extern char *xPasswordStrings[X_GLOBAL_PASSWORD_STRING_COUNT];
 extern int xPasswordStringsIndex[];
 extern int xShrineBuildingCost[];
 
