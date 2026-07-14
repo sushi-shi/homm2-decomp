@@ -668,20 +668,20 @@ int combatManager::ProcessCombatMsg(tag_message &message)
             break;
         case COMBAT_KEY_CYCLE_ARMY_VIEW:
             SetCombatViewArmySmallLevel(
-                (giCombatViewArmySmallLevel + 1) %
+                (gConfig.combatArmyInfoLevel + 1) %
                 COMBAT_ARMY_VIEW_LEVEL_COUNT);
             break;
         case COMBAT_KEY_TOGGLE_GRID:
-            SetCombatGrid(1 - gbShowCombatGrid, gbShowCombatMouseHex,
-                          giCombatShadeLevel);
+            SetCombatGrid(1 - gConfig.showCombatGrid, gConfig.showCombatMouseHex,
+                          gConfig.combatShadeLevel);
             break;
         case COMBAT_KEY_TOGGLE_MOUSE_HEX:
-            SetCombatGrid(gbShowCombatGrid, 1 - gbShowCombatMouseHex,
-                          giCombatShadeLevel);
+            SetCombatGrid(gConfig.showCombatGrid, 1 - gConfig.showCombatMouseHex,
+                          gConfig.combatShadeLevel);
             break;
         case COMBAT_KEY_CYCLE_SHADE:
-            SetCombatGrid(gbShowCombatGrid, gbShowCombatMouseHex,
-                          1 - giCombatShadeLevel);
+            SetCombatGrid(gConfig.showCombatGrid, gConfig.showCombatMouseHex,
+                          1 - gConfig.combatShadeLevel);
             break;
         case COMBAT_KEY_CYCLE_SPELL_EFFECT:
             giSpellEffectShowType =
@@ -2748,7 +2748,7 @@ void combatManager::CycleCombatScreen(void)
 VA(0x004318ed, 0x3b)
 void combatManager::SetCombatViewArmySmallLevel(int level)
 {
-    giCombatViewArmySmallLevel = level;
+    gConfig.combatArmyInfoLevel = level;
     DrawFrame(1, 0, 0, 0, COMBAT_COMMAND_FRAME_DELAY, 1, 1);
     WritePrefs();
 }
@@ -2761,15 +2761,15 @@ VA(0x00431928, 0xe3)
 void combatManager::SetCombatGrid(int showGrid, int showMouseHex,
                                   int shadeLevel)
 {
-    if (gbShowCombatGrid == showGrid &&
-        gbShowCombatMouseHex == showMouseHex &&
-        giCombatShadeLevel == shadeLevel)
+    if (gConfig.showCombatGrid == showGrid &&
+        gConfig.showCombatMouseHex == showMouseHex &&
+        gConfig.combatShadeLevel == shadeLevel)
         return;
 
     UpdateMouseGrid(COMBAT_INVALID_HEX, 0);
-    gbShowCombatGrid = showGrid;
-    gbShowCombatMouseHex = showMouseHex;
-    giCombatShadeLevel = shadeLevel;
+    gConfig.showCombatGrid = showGrid;
+    gConfig.showCombatMouseHex = showMouseHex;
+    gConfig.combatShadeLevel = shadeLevel;
     m_backgroundDrawn = 0;
     SetupGridForArmy(&m_armies[m_currentArmySide][m_currentArmyIndex]);
     DrawFrame(1, 0, 0, 0, COMBAT_COMMAND_FRAME_DELAY, 1, 1);

@@ -3183,37 +3183,37 @@ confirmMenuCommand:
         break;
 
     case APP_MENU_MUSIC_FIRST:
-        gMusicVolume = 0;
+        gConfig.musicVolume = 0;
         goto adjustMusic;
     case APP_MENU_MUSIC_FIRST + 1:
-        gMusicVolume = 1;
+        gConfig.musicVolume = 1;
         goto adjustMusic;
     case APP_MENU_MUSIC_FIRST + 2:
-        gMusicVolume = 2;
+        gConfig.musicVolume = 2;
         goto adjustMusic;
     case APP_MENU_MUSIC_FIRST + 3:
-        gMusicVolume = 3;
+        gConfig.musicVolume = 3;
         goto adjustMusic;
     case APP_MENU_MUSIC_FIRST + 4:
-        gMusicVolume = 4;
+        gConfig.musicVolume = 4;
         goto adjustMusic;
     case APP_MENU_MUSIC_FIRST + 5:
-        gMusicVolume = 5;
+        gConfig.musicVolume = 5;
         goto adjustMusic;
     case APP_MENU_MUSIC_FIRST + 6:
-        gMusicVolume = 6;
+        gConfig.musicVolume = 6;
         goto adjustMusic;
     case APP_MENU_MUSIC_FIRST + 7:
-        gMusicVolume = 7;
+        gConfig.musicVolume = 7;
         goto adjustMusic;
     case APP_MENU_MUSIC_FIRST + 8:
-        gMusicVolume = 8;
+        gConfig.musicVolume = 8;
         goto adjustMusic;
     case APP_MENU_MUSIC_FIRST + 9:
-        gMusicVolume = 9;
+        gConfig.musicVolume = 9;
         goto adjustMusic;
     case APP_MENU_MUSIC_LAST:
-        gMusicVolume = 10;
+        gConfig.musicVolume = 10;
         goto adjustMusic;
 adjustMusic:
         gpSoundManager->AdjustMusicVolumes();
@@ -3221,37 +3221,37 @@ adjustMusic:
         break;
 
     case APP_MENU_SOUND_FIRST:
-        gSoundVolume = 0;
+        gConfig.soundVolume = 0;
         goto adjustSound;
     case APP_MENU_SOUND_FIRST + 1:
-        gSoundVolume = 1;
+        gConfig.soundVolume = 1;
         goto adjustSound;
     case APP_MENU_SOUND_FIRST + 2:
-        gSoundVolume = 2;
+        gConfig.soundVolume = 2;
         goto adjustSound;
     case APP_MENU_SOUND_FIRST + 3:
-        gSoundVolume = 3;
+        gConfig.soundVolume = 3;
         goto adjustSound;
     case APP_MENU_SOUND_FIRST + 4:
-        gSoundVolume = 4;
+        gConfig.soundVolume = 4;
         goto adjustSound;
     case APP_MENU_SOUND_FIRST + 5:
-        gSoundVolume = 5;
+        gConfig.soundVolume = 5;
         goto adjustSound;
     case APP_MENU_SOUND_FIRST + 6:
-        gSoundVolume = 6;
+        gConfig.soundVolume = 6;
         goto adjustSound;
     case APP_MENU_SOUND_FIRST + 7:
-        gSoundVolume = 7;
+        gConfig.soundVolume = 7;
         goto adjustSound;
     case APP_MENU_SOUND_FIRST + 8:
-        gSoundVolume = 8;
+        gConfig.soundVolume = 8;
         goto adjustSound;
     case APP_MENU_SOUND_FIRST + 9:
-        gSoundVolume = 9;
+        gConfig.soundVolume = 9;
         goto adjustSound;
     case APP_MENU_SOUND_LAST:
-        gSoundVolume = 10;
+        gConfig.soundVolume = 10;
         goto adjustSound;
 adjustSound:
         gpSoundManager->AdjustSoundVolumes();
@@ -3259,11 +3259,11 @@ adjustSound:
         break;
 
     case APP_MENU_TOGGLE_ROUTE:
-        gShowRoute = 1 - gShowRoute;
+        gConfig.showRoute = 1 - gConfig.showRoute;
         menuChanged = 1;
         break;
     case APP_MENU_TOGGLE_BLACKOUT:
-        gBlackoutComputer = 1 - gBlackoutComputer;
+        gConfig.blackoutComputer = 1 - gConfig.blackoutComputer;
         menuChanged = 1;
         break;
 
@@ -3384,7 +3384,7 @@ void UpdateSystemOptionsMenu(void)
     int menuCommand;
     int checkedCommand;
 
-    if (gExecutableGraphics[giCurExe].showMenu == 0)
+    if (gConfig.gfx[giCurExe].showMenu == 0)
         return;
     if (hmnuApp == 0)
         return;
@@ -3394,7 +3394,7 @@ void UpdateSystemOptionsMenu(void)
     for (menuCommand = APP_MENU_MUSIC_FIRST; menuCommand <= APP_MENU_MUSIC_LAST;
          menuCommand++)
         CheckMenuItem(hmnuApp, menuCommand, APP_MENU_UNCHECKED);
-    switch (gMusicVolume) {
+    switch (gConfig.musicVolume) {
     case 1: checkedCommand = APP_MENU_MUSIC_FIRST + 1; break;
     case 2: checkedCommand = APP_MENU_MUSIC_FIRST + 2; break;
     case 3: checkedCommand = APP_MENU_MUSIC_FIRST + 3; break;
@@ -3412,7 +3412,7 @@ void UpdateSystemOptionsMenu(void)
     for (menuCommand = APP_MENU_SOUND_FIRST; menuCommand <= APP_MENU_SOUND_LAST;
          menuCommand++)
         CheckMenuItem(hmnuApp, menuCommand, APP_MENU_UNCHECKED);
-    switch (gSoundVolume) {
+    switch (gConfig.soundVolume) {
     case 1: checkedCommand = APP_MENU_SOUND_FIRST + 1; break;
     case 2: checkedCommand = APP_MENU_SOUND_FIRST + 2; break;
     case 3: checkedCommand = APP_MENU_SOUND_FIRST + 3; break;
@@ -3431,9 +3431,9 @@ void UpdateSystemOptionsMenu(void)
          menuCommand++)
         CheckMenuItem(hmnuApp, menuCommand, APP_MENU_UNCHECKED);
     CheckMenuItem(hmnuApp, APP_MENU_TOGGLE_ROUTE,
-                  gShowRoute ? APP_MENU_CHECKED : APP_MENU_UNCHECKED);
+                  gConfig.showRoute ? APP_MENU_CHECKED : APP_MENU_UNCHECKED);
     CheckMenuItem(hmnuApp, APP_MENU_TOGGLE_BLACKOUT,
-                  1 - gBlackoutComputer ? APP_MENU_CHECKED : APP_MENU_UNCHECKED);
+                  1 - gConfig.blackoutComputer ? APP_MENU_CHECKED : APP_MENU_UNCHECKED);
 }
 
 VA(0x0049f92d, 0x99)

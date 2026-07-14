@@ -352,8 +352,8 @@ int combatManager::Open(int openFlags)
     LogStr("Op1");
     memcpy(m_savedPalette, gPalette->m_data, COMBAT_PALETTE_DATA_SIZE);
     gpMouseManager->m_forcePointerUpdate = 1;
-    int savedShowMouseHex = gbShowCombatMouseHex;
-    gbShowCombatMouseHex = 0;
+    int savedShowMouseHex = gConfig.showCombatMouseHex;
+    gConfig.showCombatMouseHex = 0;
     m_previousCombatMessageExpiration = 0;
     m_combatMessageExpiration = 0;
     m_combatMessagePending = 0;
@@ -397,7 +397,7 @@ int combatManager::Open(int openFlags)
     m_combatPalette = gpResourceManager->GetPalette("kb.pal");
     KBChangeMenu(hmnuCmbt);
     CombatMessage("", 1, 1, 0);
-    gbShowCombatMouseHex = savedShowMouseHex;
+    gConfig.showCombatMouseHex = savedShowMouseHex;
     if (m_combatPalette->m_data != gpBufferPalette->m_data)
         memmove(m_combatPalette->m_data, gpBufferPalette->m_data,
                 COMBAT_PALETTE_DATA_SIZE);

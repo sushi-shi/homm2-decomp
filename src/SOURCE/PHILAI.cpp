@@ -86,7 +86,7 @@ void CheckDoMain(int a1, int doMain) {
                 int savedX = *(int *)((char *)gpAdvManager + 0x1de);
                 int savedY = *(int *)((char *)gpAdvManager + 0x1e2);
                 gbDrawSavedCursor = 1;
-                if (const_00128d38 == 0 && gbRemoteOn == 0)
+                if (gConfig.blackoutComputer == 0 && gbRemoteOn == 0)
                     bShowIt = 1;
                 else
                     bShowIt = 0;
@@ -785,7 +785,7 @@ void philAI::DoAI(int player) {
                 CheckReload();
                 CheckBerserk();
                 giShowComputerRoute = 0;
-                if (const_00128d38 == 0 && gbRemoteOn == 0
+                if (gConfig.blackoutComputer == 0 && gbRemoteOn == 0
                     && MapExtraPosAndAdjacentsSet(
                         gpCurAIHero->m_x,
                         gpCurAIHero->m_y,

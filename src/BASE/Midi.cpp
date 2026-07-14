@@ -65,7 +65,7 @@ void soundManager::MIDIShutdown(void)
 VA(0x004d3ac0, 0x3ab)
 void soundManager::MIDIPlay(int midiTrack)
 {
-    if (gbNoSound == 0 && m_midiReady != 0 && gMidiEnabled != 0) {
+    if (gbNoSound == 0 && m_midiReady != 0 && gConfig.musicVolume != 0) {
         LogStr("MP1a");
         if (bGotMidi[midiTrack] == 0)
             midiTrack = MIDI_NO_TRACK;
@@ -122,7 +122,7 @@ inline void soundManager::MIDIStop(void)
 VA(0x004d3f80, 0x46)
 inline int soundManager::MIDIIsPlaying(void)
 {
-    if (gbNoSound == 0 && gMidiEnabled != 0 && m_midiReady != 0 &&
+    if (gbNoSound == 0 && gConfig.musicVolume != 0 && m_midiReady != 0 &&
         CurrentMidiFile != MIDI_NO_TRACK && hSequence[CurrentMidiFile] != 0) {
         return _AIL_sequence_status_4(hSequence[CurrentMidiFile]) == MIDI_SEQUENCE_PLAYING;
     }

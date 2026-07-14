@@ -57,6 +57,25 @@ struct exeGfxConfig {          // per-exe window config (Main Game = [0], Editor
     int fullScreen;            // +0x14  "<exe> Full Screen"
     int colorMouseCursor;      // +0x18  "<exe> Color Mouse Cursor"
 };
+
+typedef enum ConfigMusicSource {
+    CONFIG_MUSIC_SOURCE_MIDI = 0,
+    CONFIG_MUSIC_SOURCE_CD = 1,
+    CONFIG_MUSIC_SOURCE_DEFAULT = 3
+} ConfigMusicSource;
+
+typedef enum ConfigOperaMode {
+    CONFIG_OPERA_DISABLED = 0,
+    CONFIG_OPERA_ENABLED = 1
+} ConfigOperaMode;
+
+typedef enum ConfigStorageConstant {
+    CONFIG_EXECUTABLE_COUNT = 2,
+    CONFIG_GRAPHICS_SIZE = 0x1c,
+    CONFIG_PERSISTED_SIZE = 0x19d,
+    CONFIG_STRUCT_SIZE = 0x1a0
+} ConfigStorageConstant;
+
 struct configStruct {                    // gConfig, 0x1a0 bytes
     int computerWalkSpeed;               // 0x00  "Computer Walk Speed"
     int walkSpeed;                       // 0x04  "Walk Speed"
@@ -65,7 +84,7 @@ struct configStruct {                    // gConfig, 0x1a0 bytes
     int autosave;                        // 0x10  "Autosave"
     int showRoute;                       // 0x14  "Show Route"
     int blackoutComputer;                // 0x18  "Blackout Computer"
-    exeGfxConfig gfx[2];                 // 0x1c "Main Game *", 0x38 "Editor *"
+    exeGfxConfig gfx[CONFIG_EXECUTABLE_COUNT]; // 0x1c "Main Game *", 0x38 "Editor *"
     int firstMapOffset;                  // 0x54  "First Map Offset"
     int currentMapOffset;                // 0x58  "Current Map Offset"
     int showObjectBoxes;                 // 0x5c  "Show Object Boxes"
@@ -78,14 +97,14 @@ struct configStruct {                    // gConfig, 0x1a0 bytes
     int evilInterfaceUsage;              // 0x78  "Evil Interface Usage"
     char autoLoadName[0xd];              // 0x7c  default "AUTO"
     char autoSaveName[0x21];             // 0x89  default "AUTO"
-    int soundQuality;                    // 0xaa  "Sound Quality"
+    int musicSource;                     // 0xaa  persisted as "Sound Quality"
     char modemInitString[0x64];          // 0xae  "Modem Init String"
     int modemComPort;                    // 0x112 "Modem Com Port"
     int directConnectComPort;            // 0x116 "Direct Connect Com Port"
     int modemBaudRate;                   // 0x11a "Modem Baud Rate"
     int directConnectBaudRate;           // 0x11e "Direct Connect Baud Rate"
     char uniqueSystemID[4];              // 0x122 "Unique System ID" (map-file name prefix)
-    int useOpera;                        // 0x126 "Use Opera"
+    int useOpera;                        // 0x126 "Use Opera"; controls CD ambient transitions
     int quickCombatLevel;                // 0x12a "Quick Combat Level"
     int combatSpeed;                     // 0x12e "Combat Speed"
     int autoCombatUseSpells;             // 0x132 "Auto Combat Use Spells"
@@ -99,6 +118,8 @@ struct configStruct {                    // gConfig, 0x1a0 bytes
     char networkDefaultName[0x18];       // 0x188 "Network Default Name"
 };
 #pragma pack(pop)
+SIZE(exeGfxConfig, CONFIG_GRAPHICS_SIZE);
+SIZE(configStruct, CONFIG_STRUCT_SIZE);
 struct SCreatureInfo { unsigned short value; char pad[24]; };               // gCreatureInfo[]
 struct tag_tilePoint { signed char x; signed char _1; signed char y; signed char _3; };  // normalDirTable[]
 #pragma pack(push, 1)
