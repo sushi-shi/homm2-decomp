@@ -34,13 +34,17 @@ DATA(0x0053496c) static unsigned int gFadeSavedUpdate; // saved update flag acro
 // 23 branches. The default-only color rotation and both reflected combat frame
 // paths are now explicit. One CFG edge still differs because VC42 tail-merges the
 // default path's final three-byte copy into the non-default copy; retail exits the
-// default path directly. Relocations are 70/71 with no wrong/extra target (the
-// missing occurrence is an iCombatCycleFrame reload). Of 580 comparable unmasked
-// bytes, 125 differ from +0x1e. Direct word/byte copies added a wrong gCyclePal
-// relocation; a direct-global frame form added a wrong iCombatCycleFrame
-// occurrence; a forced `| 0` reload was byte-identical. Do not repeat the source
-// variants in docs/matching-matrices/winmgr-structural-6148770.tsv. Revisit only
-// after a real predecessor/header TU-state change; this is not a proven wall.
+// default path directly. Relocations are 70/71 with no wrong/extra target: the
+// sole missing occurrence is retail's separate store base at gCyclePal+66. Of 580
+// comparable unmasked bytes, 125 differ from +0x1e. An explicit word/byte store
+// recovered the CFG edge but emitted 72/71 by independently relocating the final
+// byte at gCyclePal+68, so it is structurally wrong. A real three-byte RGB type
+// assignment canonicalized to the same 70/71 tail merge. The retail-evidenced
+// pointer-terminated world-view loop was retried under this combined TU state; it
+// still left 70/71 and regressed later TU allocation. Direct-global frame and
+// forced `| 0` forms also failed as recorded above and in
+// docs/matching-matrices/winmgr-structural-6148770.tsv. Revisit only after a real
+// predecessor/header TU-state change; do not synthesize the missing relocation.
 VA(0x004ca6d0, 0x3a3)
 void CycleColors(int forceUpdate)
 {
@@ -504,6 +508,9 @@ void heroWindowManager::SaveFizzleSource(int x, int y, int width, int height)
     }
 }
 
+// @early-stop: retail is the one byte `ret` at delinked object +0xaa8, followed
+// only by alignment NOPs and carrying no relocations; the delinker names the
+// COMDAT-folded symbol empty_stub. This empty body emits the same `c3` byte.
 VA(0x004cb1d0, 0x1)
 void CreateFizzleTables(void) {}
 
@@ -616,9 +623,15 @@ void heroWindowManager::ReleaseFizzleSource(void)
     m_fizzleSource = 0;
 }
 
+// @early-stop: retail is the one byte `ret` at delinked object +0xecc, followed
+// only by alignment NOPs and carrying no relocations; the delinker names the
+// COMDAT-folded symbol empty_stub. This empty body emits the same `c3` byte.
 VA(0x004cb610, 0x1)
 void CreateColorTables(void) {}
 
+// @early-stop: retail is the one byte `ret` at delinked object +0xed0, followed
+// only by alignment NOPs and carrying no relocations; the delinker names the
+// COMDAT-folded symbol empty_stub. This empty body emits the same `c3` byte.
 VA(0x004cb620, 0x1)
 void CreateColorLookupTables(void) {}
 
