@@ -115,6 +115,16 @@ DATA(0x00534c60) static int gFlipSkip;
 // the nested CFG hashes to the canonical text. Direct field-to-global accumulation regresses to
 // 84.98% and 83/81. Canonical 86.5756%, 0x4e5, 82/81 source is restored; see the appended fresh9
 // family in iconf2b-template-8116876.tsv. This is still an unresolved residual, not a wall.
+// The fresh10 consumer-ownership pass retained that proved formal-y accumulator and reconstructed
+// the two later retail global reads at their actual short-circuit consumers. A plain value,
+// reference, pointer, or assignment snapshot is value-numbered back to the y home (79/81). A
+// four-byte semantic snapshot into the incoming clip home only after both horizontal tests defeats
+// that substitution; the following bottom test reuses the snapshot, and the row-base expression
+// again reads gFlipY. This raises the live score to 86.92%, keeps the 0x8 frame, ESI/[edi+9], and
+// reaches 81/81 relocations with no wrong owner; candidate .text is 0x4e7 versus retail 0x4f1.
+// Reusing entryY/w/x0/y instead, copying at publication, or snapshotting before the horizontal
+// short-circuit regresses. The first divergence is still the premature entry-Y load before retail's
+// +0x1d entry LEA. See the appended fresh10 family; this remains unresolved and is not a wall.
 VA(0x004d1ba0, 0x4f1)
 void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                       int clip, int clipX, int clipY, int clipW, int clipH, int color)
@@ -134,10 +144,12 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int
     gFlipX0 = x0;
     int X = w + x0 - 1;
     gFlipXEnd = X;
-    gFlipY = y + entryY;
+    y += entryY;
+    gFlipY = y;
     if (clip != 0) {
-        if (gFlipX0 < clipX || clipW + clipX < gFlipX0 + w || gFlipY < clipY ||
-            clipY + clipH < entry->h + gFlipY) {
+        if (gFlipX0 < clipX || clipW + clipX < gFlipX0 + w ||
+            (memcpy(&clip, &gFlipY, sizeof(clip)), clip < clipY) ||
+            clipY + clipH < entry->h + clip) {
             clip = 1;
             gFlipClipR = clipX + clipW - 1;
             gFlipClipB = clipY + clipH - 1;
