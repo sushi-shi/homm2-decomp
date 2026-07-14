@@ -1,0 +1,19 @@
+# BASE/icon2bc outer command-loop structure pass, checkpoint 9c5c24d
+# Target: IconToBitmapColorTable, RVA 0xd32a0, retail size 0x5af, target .text SHA-256 15096a6b70e855d536084307e3f0f9caff5f35f7da2c157ef2fe1a80feeb647c, target relocations 91.
+# Scope: retail command-header/backedge order, one-time versus per-command destination publication, command lifetime, and shared tail/source labels. Existing setup, header, record, enum, accessor, predicate, count, fetch, and scratch-owner families were not replayed.
+# No regex or AST permutation tool was used. The function remains far below the AST last-mile threshold.
+state	match_percent	base_size	base_target_relocs	result	outer_loop_and_byte_evidence
+canonical-input	73.1690	0x566	88/91	superseded	Block-local cmd in for(;;), per-command gCTDst reload, and direct continue backedges. Candidate .text SHA-256 6e7102ac86ce318118835de5be00b34e5cd1d008c8da3040e47464c998381e2e.
+preloop_destination_do_loop	71.92	0x58f	87/91	rejected	Load gCTDst once before a do/while(1) loop. This reproduces retail's one-time load lifetime but retains the wrong destination/count coloring and loses one relocation occurrence.
+preloop_destination_loop_wide_command	71.95	0x58f	87/91	rejected	Widen cmd across the same one-time-destination do loop; the command lifetime does not repair its allocator state.
+preloop_destination_shared_tail	71.93	0x58f	87/91	rejected	Route skip/fill/dim/literal backedges through one tail label under the one-time destination lifetime; still below canonical.
+reload_destination_shared_tail	73.19249	0x566	88/91	improved-byte-identical-to-retained	Keep the canonical per-command destination reload, widen cmd once before the loop, and use explicit read/tail labels. Relative to canonical only bytes +0x476, +0x4bc, and +0x4c5 change, all operand-selection bytes in the clipped-literal path.
+structured_solid_override_fallthrough	34.70	not-retained	86/91	rejected	Make solid and override-shadow fall through a structured common fill body and branch only non-override shadow to dim. MSVC reverses the large fill/dim body layout, unlike retail.
+explicit_label_preloop_destination	71.95	not-retained	87/91	rejected	Use a naked read-command label with the destination initialized before it; still produces the rejected one-time-destination allocation.
+direct_read_header_backedges	72.56	0x566	88/91	rejected	Send every branch directly to the read header rather than through the shared tail label. This loses the three-byte operand improvement.
+isolated_loop_wide_command	73.19249	0x566	88/91	retained	Declare cmd immediately before the canonical for loop and assign it at the fetch. This is raw-byte identical to the explicit read/tail-label improvement, so the simpler structured source is retained; candidate .text SHA-256 bad1f41a276ac2a17933d570098af4abc4c57d30e9d02b92fa3bdf233f1df2cf.
+function_scope_command	72.54	0x566	88/91	rejected	Move the isolated cmd declaration to the function setup scope. Its widened setup lifetime regresses the allocator.
+command_before_row	73.19249	0x566	88/91	byte-identical	Place cmd immediately before row rather than immediately after it; emitted .text is identical to the retained state.
+for_initializer_command	73.19249	0x566	88/91	byte-identical	Own cmd in the for initializer. Emitted .text is identical; the ordinary declaration immediately before the loop is clearer and retained.
+# Final relocation audit: base=88, target=91, only-base=0. The occurrence residual remains ClipR 9/10, Cnt 5/6, Dst 5/6, X0 2/3, and Y 9/8.
+# Final structural audit: first divergence remains +0x12; candidate size is 0x566 versus retail 0x5af. The simultaneous retail setup allocation (ESI data, EBX offset, EDI entry) and decoder allocation (ECX source, EAX command, EDX count, EBX destination) remain unresolved. This is not a wall.
