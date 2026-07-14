@@ -32,7 +32,7 @@ void HandleMCIError(int param_1, char *param_2)
     mciGetErrorStringA(param_1, lpszReturnString, 0xff);
     sprintf(gText, "CD MUSIC ERROR\nDescription: %s\nCall: %s", lpszReturnString, param_2);
     gMciErrorFlag = 1;
-    gCdMusic = 0;
+    gConfig.musicSource = CONFIG_MUSIC_SOURCE_MIDI;
     WritePrefs();
     ShutDown(gText);
 }
@@ -114,7 +114,7 @@ void soundManager::CDStartup(void)
     if (nMCIError != 0) {
         m_cdReady = 0;
         gMciErrorFlag = 1;
-        gCdMusic = 0;
+        gConfig.musicSource = CONFIG_MUSIC_SOURCE_MIDI;
         WritePrefs();
         return;
     }
@@ -152,7 +152,7 @@ void soundManager::CDSetVolume(int param_1, int param_2)
     if (m_auxDevice == -1)
         return;
     if (param_1 == -1)
-        local_c = gMidiEnabled;
+        local_c = gConfig.musicVolume;
     else
         local_c = param_1;
     if (local_c != 0) {
@@ -183,7 +183,7 @@ void soundManager::CDPlay(int param_1, int param_2, int param_3, int param_4)
         return;
     if (m_cdReady == 0)
         return;
-    if (gMidiEnabled == 0)
+    if (gConfig.musicVolume == 0)
         return;
     if (param_1 == -1) {
         CDStop();
@@ -265,7 +265,7 @@ void soundManager::CDPoll(void)
 {
     if (gbNoSound != 0)
         return;
-    if (gMidiEnabled == 0)
+    if (gConfig.musicVolume == 0)
         return;
     if (m_cdReady == 0)
         return;
@@ -287,13 +287,13 @@ int soundManager::ConvertVolume(int param_1, int param_2)
 {
     int local_8 = 0;
     if (param_2 == 0x65) {
-        if (gMidiEnabled >= 1 && gMidiEnabled <= 0xa) {
-            local_8 = ((0xb - gMidiEnabled) * param_1) / 10;
+        if (gConfig.musicVolume >= 1 && gConfig.musicVolume <= 0xa) {
+            local_8 = ((0xb - gConfig.musicVolume) * param_1) / 10;
             if (local_8 < 1)
                 local_8 = 1;
         }
-    } else if (gSampleVolume >= 1 && gSampleVolume <= 0xa) {
-        local_8 = ((0xb - gSampleVolume) * param_1) / 10;
+    } else if (gConfig.soundVolume >= 1 && gConfig.soundVolume <= 0xa) {
+        local_8 = ((0xb - gConfig.soundVolume) * param_1) / 10;
         if (local_8 < 1)
             local_8 = 1;
     }
@@ -427,12 +427,12 @@ int soundManager::Open(int)
 
     keyState = GetAsyncKeyState(VK_F6);
     if (HIBYTE(keyState)) {
-        gCdMusic = 0;
+        gConfig.musicSource = CONFIG_MUSIC_SOURCE_MIDI;
         WritePrefs();
     }
     keyState = GetAsyncKeyState(VK_F7);
     if (HIBYTE(keyState)) {
-        gCdMusic = 1;
+        gConfig.musicSource = CONFIG_MUSIC_SOURCE_CD;
         WritePrefs();
     }
 
@@ -443,15 +443,15 @@ int soundManager::Open(int)
     m_pollToggle = m_pollDue = m_pollRequested = 0;
     _AIL_startup_0();
 
-    if (gCdMusic != 0) {
+    if (gConfig.musicSource != CONFIG_MUSIC_SOURCE_MIDI) {
         CDStartup();
         if (m_cdReady == 0) {
             MIDIStartup();
             if (m_midiReady != 0) {
-                gCdMusic = 0;
+                gConfig.musicSource = CONFIG_MUSIC_SOURCE_MIDI;
                 WritePrefs();
             } else {
-                gMidiEnabled = 0;
+                gConfig.musicVolume = 0;
                 WritePrefs();
             }
         }
@@ -460,10 +460,10 @@ int soundManager::Open(int)
         if (m_midiReady == 0) {
             CDStartup();
             if (m_cdReady != 0) {
-                gCdMusic = 1;
+                gConfig.musicSource = CONFIG_MUSIC_SOURCE_CD;
                 WritePrefs();
             } else {
-                gMidiEnabled = 0;
+                gConfig.musicVolume = 0;
                 WritePrefs();
             }
         }
@@ -474,7 +474,7 @@ int soundManager::Open(int)
     if (gbDontTryDigital == 0 && m_digitalDriver == 0)
         m_digitalDriver = WAVE_init_driver(22050, 8, 1, 0);
     if (m_digitalDriver == 0) {
-        gSampleVolume = 0;
+        gConfig.soundVolume = 0;
         WritePrefs();
     }
     AllocateSampleHandles();
@@ -552,7 +552,7 @@ void soundManager::StopAllSamples(int param_1)
     }
     m_fadeSteps = 0;
     if (param_1 != 0) {
-        if (gCdMusic != 0)
+        if (gConfig.musicSource != CONFIG_MUSIC_SOURCE_MIDI)
             CDStop();
         else
             MIDIStop();
@@ -622,7 +622,7 @@ void soundManager::ModifySample(struct _SAMPLE *sampleHandle, short operation, l
             iLastVolume[foundChannel] = static_cast<short>(value);
         break;
     case 101:
-        H2_ASSERT(gCdMusic == 0, "I:\\Projects\\Heroes\\Prog\\BASE\\soundmgr.cpp", 0x52f);
+        H2_ASSERT(gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI, "I:\\Projects\\Heroes\\Prog\\BASE\\soundmgr.cpp", 0x52f);
         _AIL_set_sample_volume_8(sampleHandle, ConvertVolume(value, 101));
         if (foundChannel >= 0)
             iLastVolume[foundChannel] = static_cast<short>(value);
@@ -671,7 +671,7 @@ void soundManager::AdjustSoundVolumes(void)
     LogStr("Adjust Sound Volumes 1");
     for (sampleIndex = 1; sampleIndex < m_numSampleHandles; sampleIndex++) {
         sampleHandle = m_sampleHandles[sampleIndex];
-        if (gSampleVolume != 0) {
+        if (gConfig.soundVolume != 0) {
             if (DigitalReport(sampleHandle, 4) != 0)
                 ModifySample(sampleHandle, 100, iLastVolume[sampleIndex]);
         } else {
@@ -694,13 +694,13 @@ void soundManager::AdjustMusicVolumes(void)
     int local_4 = 0;
     if (bSaveMusicPosition[m_currentTrack] != 0)
         local_4 = 1;
-    if (gMidiEnabled != 0) {
-        if (gCdMusic != 0)
+    if (gConfig.musicVolume != 0) {
+        if (gConfig.musicSource != CONFIG_MUSIC_SOURCE_MIDI)
             CDSetVolume(-1, 0);
         else
             MIDISetVolume();
     } else {
-        if (gCdMusic != 0)
+        if (gConfig.musicSource != CONFIG_MUSIC_SOURCE_MIDI)
             CDSetVolume(-1, 0);
         else
             MIDISetVolume();
@@ -725,11 +725,11 @@ void soundManager::SetMusicQuality(int param_1)
         return;
     if (m_ready == 0)
         return;
-    if (gMidiEnabled == 0)
+    if (gConfig.musicVolume == 0)
         return;
     if (m_cdReady == 0)
         return;
-    if (gCdMusic != 0) {
+    if (gConfig.musicSource != CONFIG_MUSIC_SOURCE_MIDI) {
         local_8 = m_currentTrack;
         CDStop();
         m_currentTrack = static_cast<char>(0xff);
@@ -738,7 +738,7 @@ void soundManager::SetMusicQuality(int param_1)
         MIDIStop();
     }
     memset(m_savedTrackPositions, 0, 0xf0);
-    gCdMusic = param_1;
+    gConfig.musicSource = param_1;
     if (local_8 >= 0)
         PlayAmbientMusic(local_8, 0, -1);
 }
@@ -754,11 +754,11 @@ void soundManager::PlayAmbientMusic(int param_1, long param_2, int param_3)
         return;
     if (m_currentTrack == param_1)
         return;
-    if (gMidiEnabled == 0) {
+    if (gConfig.musicVolume == 0) {
         m_currentTrack = static_cast<char>(param_1);
         return;
     }
-    if (gCdMusic != 0)
+    if (gConfig.musicSource != CONFIG_MUSIC_SOURCE_MIDI)
         CDPlay(param_1, param_2, -1, 0);
     else
         MIDIPlay(param_1);
@@ -775,11 +775,11 @@ void soundManager::PollSound(void)
     long now;
     if (gbNoSound != 0)
         return;
-    if (gCdMusic != 0)
+    if (gConfig.musicSource != CONFIG_MUSIC_SOURCE_MIDI)
         CDPoll();
     if (m_pollRequested == 0 && m_fadeSteps == 0)
         return;
-    if (gMidiEnabled == 0)
+    if (gConfig.musicVolume == 0)
         return;
     LogStr("Poll Sound 1");
     if (m_fadeSteps > 0) {
@@ -794,7 +794,7 @@ void soundManager::PollSound(void)
         LogStr("Poll Sound 1b");
         if (m_fadeSteps <= 0xa && m_currentTrack != m_fadeTargetTrack) {
             if (m_midiFile != 0 && bSaveMusicPosition[m_currentTrack] != 0) {
-                if (gCdMusic == 0) {
+                if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
                     H2_ASSERT(m_midiFile, "I:\\Projects\\Heroes\\Prog\\BASE\\soundmgr.cpp",
                               0x61a);
                     m_savedTrackPositions[m_currentTrack] =
@@ -826,8 +826,8 @@ void soundManager::PollSound(void)
             volume = 0;
         LogStr("Poll Sound 1c");
         smp = m_sampleHandles[0];
-        if (gCdMusic != 0) {
-            volume = (0xb - gMidiEnabled) * volume * 0x7f / 0x280;
+        if (gConfig.musicSource != CONFIG_MUSIC_SOURCE_MIDI) {
+            volume = (0xb - gConfig.musicVolume) * volume * 0x7f / 0x280;
             if (volume > 0x7f)
                 volume = 0x7f;
             if (volume < 0)
@@ -849,7 +849,7 @@ void soundManager::SwitchAmbientMusic(int param_1)
         return;
     if (m_samplesReady == 0)
         return;
-    if (gMidiEnabled == 0) {
+    if (gConfig.musicVolume == 0) {
         m_currentTrack = static_cast<char>(param_1);
         return;
     }
@@ -886,7 +886,7 @@ struct _SAMPLE *soundManager::MemorySample(class sample *param_1)
         return 0;
     if (m_samplesReady == 0)
         return 0;
-    if (gSampleVolume == 0)
+    if (gConfig.soundVolume == 0)
         return 0;
     params = reinterpret_cast<int *>(param_1) + 4;
     if (m_ready == 0 || params[6] == 0)
@@ -918,7 +918,7 @@ struct _SAMPLE *soundManager::MemorySample(class sample *param_1)
     _AIL_set_sample_playback_rate_8(smp, params[4]);
     _AIL_set_sample_loop_count_8(smp, params[7]);
     _AIL_set_sample_address_12(smp, params[1], params[2]);
-    if (gSampleVolume != 0)
+    if (gConfig.soundVolume != 0)
         _AIL_set_sample_volume_8(smp, ConvertVolume(params[6], 0x64));
     else
         _AIL_set_sample_volume_8(smp, 0);
@@ -947,7 +947,7 @@ int soundManager::MusicPlaying(void)
 {
     if (gbNoSound != 0)
         return 0;
-    if (gCdMusic != 0) {
+    if (gConfig.musicSource != CONFIG_MUSIC_SOURCE_MIDI) {
         if (m_cdReady == 0)
             return 0;
         return CDIsPlaying();

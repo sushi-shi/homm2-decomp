@@ -371,7 +371,7 @@ int advManager::GetMoveShowIt(hero *movingHero, int direction)
 {
     int directionX = normalDirTable[direction].x;
     int directionY = normalDirTable[direction].y;
-    if (gbThisNetHumanPlayer[giCurPlayer] || !gBlackoutComputer) {
+    if (gbThisNetHumanPlayer[giCurPlayer] || !gConfig.blackoutComputer) {
         if (MapExtraPosAndAdjacentsSet(movingHero->m_x, movingHero->m_y,
                                       giCurWatchPlayerBit) ||
             MapExtraPosAndAdjacentsSet(movingHero->m_x + directionX,
@@ -654,7 +654,7 @@ stoppingEvent:
                               m_mapOriginY + CURSOR_MAP_DRAW_OFFSET);
         if (giGroundToTerrain[currentCell->tile] != m_currentTerrain &&
             (m_currentTerrain = giGroundToTerrain[currentCell->tile],
-             !gCdMusic))
+             gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI))
             gpSoundManager->SwitchAmbientMusic(
                 giTerrainToMusicTrack[m_currentTerrain]);
         m_updateMinY = 0;
