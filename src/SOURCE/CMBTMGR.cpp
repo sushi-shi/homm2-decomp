@@ -721,10 +721,10 @@ int combatManager::MoreTreesNear(void)
     return mountainCounter < treeCount;
 }
 
+// @early-stop
+// Exact 0x3e7-byte span and 58 relocations; every non-jump operand matches,
+// with only the GetPlayerColor /Ob1 continuation at +0x372 versus retail +0x3a0.
 VA(0x00491dda, 0x3e7)
-// @early-stop exact 0x3e7-byte span and 58 relocation targets. Every
-// non-jump opcode and operand matches; the sole residual is the five-byte
-// GetPlayerColor /Ob1 continuation at +0x372 here versus retail +0x3a0.
 void combatManager::LoadIcons(void)
 {
     int index;

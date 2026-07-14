@@ -1425,10 +1425,10 @@ search_end:
     return 1;
 }
 
+// @early-stop
+// Reloc-masked bytes differ only at +0xc5, +0x2d8, +0x9df, and +0x9fb: four
+// equivalent local-return displacements; all 106 relocation targets agree.
 VA(0x0045a644, 0xa50)
-// @early-stop reloc-masked bytes differ only at +0xc5, +0x2d8, +0x9df, and
-// +0x9fb: four displacement bytes selecting equivalent local return
-// trampolines. All 106 relocation sites and external targets agree.
 int advManager::ProcessHover(int mouseX, int mouseY) {
     int heroXHero;
     int heroYCoordinate;
@@ -1673,10 +1673,10 @@ int advManager::ProcessHover(int mouseX, int mouseY) {
     }
 }
 
+// @early-stop
+// Assembly and all 31 relocation targets match; only +0x42 branches to the
+// adjacent jmp-to-epilogue instead of directly to the same epilogue.
 VA(0x0045b094, 0x21a)
-// @early-stop identical assembly and all 31 relocation targets. The sole
-// reloc-masked byte difference is the branch displacement at +0x42: retail
-// jumps to the epilogue while this build targets the adjacent jmp-to-epilogue.
 void advManager::UpdateScreen(int, int forceUpdate)
 {
     if (forceUpdate == 0 && bShowIt == 0) {
@@ -1728,13 +1728,13 @@ void advManager::UpdateScreen(int, int forceUpdate)
     }
 }
 
+// @early-stop
+// Exact size and all 23 relocation targets; only twelve commutative X adds
+// exchange [ebp-4] drawX and [ebp+8] originX at +0xf9/+0xfc, +0x15c/+0x15f,
+// +0x19e/+0x1a1, +0x210/+0x213, +0x254/+0x257, +0x29d/+0x2a0,
+// +0x2e1/+0x2e4, +0x323/+0x326, +0x368/+0x36b, +0x3a8/+0x3ab,
+// +0x403/+0x406, and +0x463/+0x466.
 VA(0x0045b2ae, 0x4eb)
-// @early-stop exact size and all 23 relocation targets. Reloc-masked bytes
-// differ only in twelve commutative X-coordinate additions: operand bytes
-// +0xf9/+0xfc, +0x15c/+0x15f, +0x19e/+0x1a1, +0x210/+0x213,
-// +0x254/+0x257, +0x29d/+0x2a0, +0x2e1/+0x2e4, +0x323/+0x326,
-// +0x368/+0x36b, +0x3a8/+0x3ab, +0x403/+0x406, and +0x463/+0x466
-// exchange the equivalent [ebp-4] drawX and [ebp+8] originX operands.
 void advManager::CompleteDraw(int originX, int originY, int forceDraw, int updateBottomView) {
     int drawY;
     int drawX;
@@ -3288,12 +3288,11 @@ void advManager::UpdBottomView(int, int, int) {}
 VA(0x00460d63, 0x132)
 void advManager::ClearBottomView(void) {}
 
+// @early-stop
+// Exact size and 73 relocations; residuals are the moved GetPlayerColor /Ob1
+// continuation at +0x2f5..+0x320 and commutative global comparisons at
+// +0x29e..+0x2c6 and +0x3ef..+0x418, with equivalent opcodes at +0x3fa/+0x418.
 VA(0x00460e95, 0x51b)
-// @early-stop exact size and 73 relocation sites. Residuals are the
-// GetPlayerColor /Ob1 continuation at +0x2f5..+0x320 (leading versus trailing)
-// and equivalent commutative global comparisons at +0x29e..+0x2c6 and
-// +0x3ef..+0x418; the only unmasked bytes outside the moved continuation are
-// the equivalent relational opcodes at +0x3fa and +0x418.
 int advManager::UpdBottomViewEnemyTurn(void)
 {
     int updated;
@@ -3424,8 +3423,9 @@ int advManager::UpdBottomViewResMsg(void) { return 0; }
 VA(0x00461a75, 0x363)
 int advManager::UpdBottomViewKingdom(void) { return 0; }
 
+// @early-stop
+// Exact bytes and all 36 relocation targets.
 VA(0x00461dd8, 0x583)
-// @early-stop exact bytes and all 36 relocation targets
 int advManager::UpdBottomViewHero(void)
 {
     char *armyCountLabelsResult[ADVMGR_BOTTOM_HERO_ARMY_SLOTS];
@@ -6218,8 +6218,9 @@ int GetManaFrame(int mana) {
     return frame;
 }
 
+// @early-stop
+// Exact bytes and all 42 relocation targets.
 VA(0x0046bce8, 0x559)
-// @early-stop exact bytes and all 42 relocation targets
 int advManager::DoVisions(hero *visionHero)
 {
     char visionMessageResult[ADVMGR_VISIONS_MESSAGE_BUFFER_SIZE];
