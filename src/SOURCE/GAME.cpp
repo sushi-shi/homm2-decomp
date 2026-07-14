@@ -2887,7 +2887,7 @@ void game::NextPlayer(void)
         SaveGame(const_cast<char *>("AUTOSAVE"), 1, 0);
     }
 
-    gpAdvManager->m_currentSampleSet = 0;
+    gpAdvManager->m_identifyHeroActive = 0;
     if (gpGame->m_players[giCurPlayer].daysLeft > 0)
         gpGame->m_players[giCurPlayer].daysLeft--;
     CheckEndGame(0, 0);
