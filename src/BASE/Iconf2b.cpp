@@ -79,18 +79,28 @@ DATA(0x00534c60) static int gFlipSkip;
 // gates improve the narrow state to 85.36% but regress broad canonical, and dependency-after-
 // scratch, Misc-only, const/register lifetime, and include-order hybrids do not beat 86.05% live.
 // The integrated broad source remains; see the appended 5645ed8 hybrid family. This is unresolved.
+// The fresh7 typed-view pass recovered a stronger source ownership without changing the broad
+// dependency surface: retain an IconEntry array root and a separate byte cursor derived from it.
+// That restores the retail ESI source cursor and the [edi+9] srcOffset add, rebuilding at the
+// retained 86.5756%, 0x4e5 bytes, and 82/81 relocations. Pointer and reference entry views are
+// byte-identical. CodeView contains only a synthetic line-1 record for this optimized compiland,
+// so it provides no local/accessor boundary to transfer. Delayed-Y, early entry-publication,
+// sibling-setup, field-pointer, and split entry-X lifetime combinations all regressed; see the
+// appended fresh7 typed-view family. The unresolved first divergence remains the +0x1d Y load
+// versus retail's +0x1d entry LEA, and the sole excess occurrence remains gFlipY. This is not a wall.
 VA(0x004d1ba0, 0x4f1)
 void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                       int clip, int clipX, int clipY, int clipW, int clipH, int color)
 {
-    unsigned char *data = reinterpret_cast<unsigned char *>(srcIcon->m_data);
-    IconEntry *entries = reinterpret_cast<IconEntry *>(data);
-    IconEntry *entry = &entries[frame];
+    IconEntry *entries = reinterpret_cast<IconEntry *>(srcIcon->m_data);
+    unsigned char *src = reinterpret_cast<unsigned char *>(entries);
     int x0 = x;
-    int w = entry->w;
-    unsigned char *src = data + entry->srcOffset;
-    int entryY = entry->y;
+    int w;
+    IconEntry *entry = &entries[frame];
+    w = entry->w;
     x0 = x0 - entry->x;
+    src += entry->srcOffset;
+    int entryY = entry->y;
     x0 = x0 - w;
     gFlipEntry = entry;
     x0++;
