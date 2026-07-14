@@ -458,7 +458,8 @@ void inputManager::MakeScanCodeTable(void)
 }
 
 // @early-stop
-// /O2 wall: 0x004cea12..0x004cea22 and 0x004cea49..0x004cea5c exchange eax/ecx for identical color-state loads; local/reversed/combined assignment spellings exhausted
+// Exact: the former EAX/ECX color-state residual closed under later combined-TU state. Current
+// candidate and retail match 100% over 0xe4 bytes with 18/18 relocation occurrences.
 VA(0x004ce990, 0xe4)
 void CheckChangeCursor(int x, int y, int force)
 {
