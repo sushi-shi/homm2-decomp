@@ -83,8 +83,11 @@ The two registry functions were not relocation-only walls. Raw prologues exposed
 `szScratch[88]` locals: base reserved `0xc8`/`0xc0` bytes while retail reserved `0xd4`/`0xcc`.
 Recovering the real 100-byte buffers makes `ReadPrefsFromRegistry` and
 `WritePrefsToRegistry` exact. Their relocation counts are respectively 126/126 and 90/90; the
-read helper still displays five `gConfig` member addresses under different delinked retail owners,
-but no external target or code byte differs.
+read helper displays most `gConfig` member addresses under different delinked retail owners. A
+later addend audit found one genuine exception at function `+0x2f6`: retail stores to
+`gConfig.uniqueSystemID[3]` (`gConfig+0x125`), while the former source incorrectly stored to
+`gConfig.modemInitString[98]` (`gConfig+0x110`). Correcting the field preserves all code bytes and
+makes all 126 relocation targets agree.
 
 `SetupCDDrive` similarly disproved its old raw-identical claim. Widening the real local lifetimes
 first recovered the `0x2f0` frame and raised the live score from 99.47% to 99.94%. Declaration
