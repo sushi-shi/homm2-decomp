@@ -268,13 +268,13 @@ must continue from the remaining setup `gFCY` load before taking unrelated work.
 
 Canonical source state:
 
-- checkpoint: `3bbfe46`
+- checkpoint: `ea3b363`
 - target: RVA `0xd9790`, retail size `0x54d`
 - `src/BASE/iconf2bc.cpp`:
-  `e620be13ef21922c1ce5eb3260079f3e71b8fc4054684ac9d99e25f72ba80dcd`
-- live checkpoint: 85.465996%, candidate size `0x542`, 84 candidate vs 83 retail relocations,
+  `55a3efd26cc0bc327cc0bc09a7b832c0bc6632ea53257dd49950e1a7b9af090c`
+- live checkpoint: 85.84131%, candidate size `0x545`, 84 candidate vs 83 retail relocations,
   no base-only target
-- the command decoder begins at `+0xeb` versus retail `+0xec`
+- the command decoder begins at `+0xee` versus retail `+0xec`
 
 ### Corrections retained at the canonical checkpoint
 
@@ -290,13 +290,15 @@ Canonical source state:
   surface, removing the clipped fill/dim excess `gFCY` loads;
 - declared width before the entry load and initialized X through `gFCXEnd`, restoring retail's
   EAX/EBX publication sequence and two of the three missing setup bytes;
+- declared the later row pitch beside the entry cursor, restoring retail row-load order and a
+  separate `gFCY` load while preserving the retained width/X setup;
 - corrected the `gFCClipR` lifetime/count to agree with retail;
 - matched every external relocation target and every scratch-global occurrence count except
   `gFCY`.
 
 The remaining measured relocation delta is exactly one redundant setup `gFCY` load. Every other
-scratch-global occurrence count agrees. Candidate code ends 11 bytes before retail. These facts are
-the next concrete steering target; they are not evidence that the residual is impossible.
+scratch-global occurrence count agrees. Candidate code ends eight bytes before retail. These facts
+are the next concrete steering target; they are not evidence that the residual is impossible.
 
 ### Searches already exhausted
 
