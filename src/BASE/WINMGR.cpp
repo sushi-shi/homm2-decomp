@@ -12,41 +12,22 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/KB.h>
 // @match-note
-// Structurally complete /O2 checkpoint: base is 0x391 bytes/255 instructions
-// versus retail's 0x3a3/261, with the same 0xc frame, 33 blocks and 23 branches.
-// Retail's three reflection tests are `frame >= 5`, `frame >= 5`, and `frame >= 4`;
-// those spellings and the distinct cycle/palette constant domains are now explicit.
-// CycleColors is the TU's first CodeView/source-order function, so there is no
-// predecessor body to repair. Moving the unrelated fade-only static and headers
-// used only by later methods below this body gives it the minimal real declaration
-// state and raises live matching from 94.59% to 95.33%. The actual instruction gain
-// is in the alternate-combat reflection: VC42 now selects the result in EAX like
-// retail instead of ESI, removing one byte before the still-different address chain.
-// Moving bitmap.h or Misc.h alone emitted the old code; moving both later is
-// the exact state trigger. VC42 still tail-merges the default path's final three-byte
-// copy into the non-default copy. Retail writes through a separate gCyclePal+66 base
-// and jumps directly to the palette update, so one CFG edge and one relocation
-// occurrence remain different: 70/71, no wrong or excess target. An explicit
-// word/byte store recovered the edge but emitted 72/71 by separately relocating
-// gCyclePal+68; a three-byte RGB assignment canonicalized to the same 70/71 merge.
-// Under the new enum/predecessor state the retail-evidenced pointer-terminated loop
-// scored 94.00% and still emitted 70/71, so it was rejected. Signed palette-byte
-// storage was byte-neutral. Direct-global frame and forced `| 0` forms were also
-// ineffective. A function-wide source-pointer lifetime and the standard `register`
-// qualifier were byte-neutral; nesting the default and non-default paths in one
-// lexical `if`/`else` returned to the older 94.59% allocation while remaining
-// 70/71. Splitting the cycle enums into a narrow predecessor header emitted
-// 0x390 bytes at 94.52%, remained 70/71, and regressed a later exact method; required
-// header reorderings were byte-neutral. Giving the default copy either a distinct
-// three-byte local or a same-named local in a disjoint scope emitted 0x392 bytes at
-// 93.41% and remained 70/71; a switch emitted 0x38a at 89.94% and fell to 68/71.
-// No packed three-byte RGB record exists in the palette code, and `palette::Data`
-// is a separately emitted exact function, so inventing a record or forcing it inline
-// lacks evidence. A relocation-union raw audit leaves 580 comparable unmasked bytes:
-// 124 differ from +0x1e through +0x38e, followed by a 0x12-byte retail tail. This is
-// still a broad /O2 allocation/shape residual, not a permitted byte-proven wall.
-// Revisit only after another real reachable header reconstruction; do not repeat
-// local copy/predicate/control synonyms or synthesize the missing relocation.
+// Complete /O2 checkpoint: both code streams end at the ret at +0x3a2 and contain
+// 261 instructions (retail's +0x3a3 nop is alignment outside the CodeView span).
+// Relocations are exact at 71/71 with no wrong target. Keeping the combat and
+// alternate copies in their source branches is the retail-evidenced structure:
+// VC42 merges those two copies at +0x346, but preserves the saved-color restore at
+// +0x29d and its direct jump, recovering the former missing gCyclePal+66 occurrence.
+// The only remaining code residual is +0xda..+0x11c in the world-view loop: candidate
+// assigns ECX to colorIndex and ESI to the destination induction pointer, while
+// retail assigns ESI to colorIndex and ECX to the pointer. Renaming those two
+// registers makes every instruction in the range agree; all code outside that range
+// agrees after relocation masking. Earlier word/byte/RGB, signed-byte, pointer-loop,
+// predicate, scope, switch, accessor, header, enum, and source-pointer/register
+// variants did not recover the separate restore and need not be repeated. A semantic
+// local rename and preincrement were byte-neutral, and a 60-iteration libclang AST
+// pass retained no mutation. This is not a permitted artifact wall; revisit on a real
+// declaration/TU-state change.
 VA(0x004ca6d0, 0x3a3)
 void CycleColors(int forceUpdate)
 {
@@ -72,9 +53,10 @@ void CycleColors(int forceUpdate)
                 frame = iCombatCycleFrame;
             unsigned char cycleIndices[WINDOW_WORLD_CYCLE_COLOR_COUNT] =
                 { 0x98, 0x43, 0x59, 0xb5, 0x70, 0xdb, 0x87, 0x10 };
-            for (int i = 0; i < WINDOW_WORLD_CYCLE_COLOR_COUNT; i++) {
-                signed char *src = gpBufferPalette->m_data + (cycleIndices[i] + frame * 3) * 3;
-                memcpy(gCyclePal + i * WINDOW_PALETTE_COLOR_BYTES, src,
+            for (int colorIndex = 0; colorIndex < WINDOW_WORLD_CYCLE_COLOR_COUNT; ++colorIndex) {
+                signed char *src = gpBufferPalette->m_data +
+                    (cycleIndices[colorIndex] + frame * 3) * 3;
+                memcpy(gCyclePal + colorIndex * WINDOW_PALETTE_COLOR_BYTES, src,
                        WINDOW_PALETTE_COLOR_BYTES);
             }
             goto updatePalette;
@@ -130,7 +112,6 @@ void CycleColors(int forceUpdate)
         goto updatePalette;
     }
 
-    signed char *src;
     if (giCycleType == WINDOW_COLOR_CYCLE_COMBAT) {
         iCombatCycleFrame = (iCombatCycleFrame + 1) % WINDOW_CYCLE_FRAME_COUNT;
         int frame = iCombatCycleFrame;
@@ -138,7 +119,9 @@ void CycleColors(int forceUpdate)
             frame = WINDOW_CYCLE_FRAME_COUNT - frame;
         else
             frame = iCombatCycleFrame;
-        src = gpBufferPalette->m_data + WINDOW_COMBAT_CYCLE_SOURCE_OFFSET + frame * 12;
+        memcpy(gCyclePal + WINDOW_DEFAULT_CYCLE_SOURCE_OFFSET,
+               gpBufferPalette->m_data + WINDOW_COMBAT_CYCLE_SOURCE_OFFSET + frame * 12,
+               WINDOW_PALETTE_COLOR_BYTES);
     } else {
         if (giCycleType != WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE)
             goto updatePalette;
@@ -149,10 +132,10 @@ void CycleColors(int forceUpdate)
             frame = WINDOW_ALTERNATE_CYCLE_FRAME_COUNT - frame;
         else
             frame = iCombatCycleFrame;
-        src = gpBufferPalette->m_data + WINDOW_ALTERNATE_CYCLE_SOURCE_OFFSET + frame * 21;
+        memcpy(gCyclePal + WINDOW_DEFAULT_CYCLE_SOURCE_OFFSET,
+               gpBufferPalette->m_data + WINDOW_ALTERNATE_CYCLE_SOURCE_OFFSET + frame * 21,
+               WINDOW_PALETTE_COLOR_BYTES);
     }
-    memcpy(gCyclePal + WINDOW_DEFAULT_CYCLE_SOURCE_OFFSET, src,
-           WINDOW_PALETTE_COLOR_BYTES);
 
 updatePalette:
     memcpy(gpBufferPalette->m_data + WINDOW_CYCLE_PALETTE_OFFSET, gCyclePal,
