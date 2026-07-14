@@ -35,9 +35,9 @@ textEntryWidget::textEntryWidget(void) : textWidget()
 // so the ABI-correct non-inline declaration is retained.
 // VA(0x004d8770, 0x36) ??_E/??_G textEntryWidget deleting destructor aliases
 
-// Unresolved /O2 scheduling residual: base/retail sections are both 0x134 and all 6/6
-// relocation targets agree. Only four instructions differ: retail stores p10 before the
-// three constant flag stores, while VC4.2 delays that store in the current source shape.
+// Active /O2 scheduling residual: base/retail sections are both 0x134 and all 6/6
+// relocation targets agree. The instruction streams differ only by retail storing p10
+// before the three constant flag stores, while VC4.2 delays that one store here.
 VA(0x004d87b0, 0x134)
 textEntryWidget::textEntryWidget(short p1, short p2, short p3, short p4, short p5, char *p6,
                                  char *p7, short p8, char *p9, short p10, short p11, short p12,
@@ -51,15 +51,15 @@ textEntryWidget::textEntryWidget(short p1, short p2, short p3, short p4, short p
     short rectX = m_x;
     m_icon = loadedIcon;
     field_0x4b = 0;
+    field_0x2f = p10;
     m_rectW = m_width;
     m_rectX = rectX;
     field_0x14 = 0x4000;
     m_rectY = m_y;
-    field_0x2f = p10;
     m_maxLength = p5;
-    m_color = 1;
     field_0x45 = 1;
     m_hasInset = 0;
+    m_color = 1;
     m_rectH = m_height;
 #line 61 "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp"
     m_text = static_cast<char *>(
@@ -80,9 +80,9 @@ textEntryWidget::~textEntryWidget()
     gpResourceManager->Dispose(m_icon);
 }
 
-// Unresolved /O2 scheduling residual: all calls and 52/52 relocation targets agree.
-// Base is 0x26b versus retail 0x26c; only the default rectangle/flag block differs, where
-// retail completes four rectangle copies before materializing one shared integer 1.
+// Active /O2 scheduling residual: all calls and 52/52 relocation targets agree.
+// Base/retail are both 0x26c; the streams differ only by retail comparing type before
+// loading m_height, while VC4.2 emits those two independent instructions in reverse order.
 VA(0x004d8920, 0x26c)
 void textEntryWidget::Read(int type)
 {
@@ -117,8 +117,12 @@ void textEntryWidget::Read(int type)
         m_rectX = m_x;
         m_rectY = m_y;
         m_rectW = m_width;
+        int enabled;
         m_rectH = m_height;
-        int enabled = 1;
+        if (type == 3)
+            enabled = 1;
+        else
+            enabled = 1;
         field_0x45 = enabled;
         m_hasInset = enabled;
         if (type != 3)
@@ -372,7 +376,7 @@ void textEntryWidget::Draw(void)
     }
 }
 
-// Unresolved /O2 TU-cumulative register-allocation residual: all 8/8 relocation targets,
+// Active /O2 TU-cumulative register-allocation residual: all 8/8 relocation targets,
 // the 0x130 frame, calls, and loop CFG agree. Base is 0x1bd versus retail 0x1be; VC4.2
 // assigns this/cursor to ebx/ebp rather than retail ebp/ebx, and omits one redundant xor
 // in the dead second-loop tail.
