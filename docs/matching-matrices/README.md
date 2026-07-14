@@ -206,6 +206,45 @@ setup register-allocation or fifth dim-publication residual, not replay any matr
 AST nor regex permuter was used; AST permutation remains inappropriate until the function is truly
 structurally aligned at 96-97%, and the regex permuter is prohibited for this campaign.
 
+## BASE/SAMPLE whole-TU audit and constructor shapes
+
+`sample-tu-audit-66dafcc.tsv` is the retail-order audit of all eight CodeView functions at
+checkpoint `66dafcc`; its SHA-256 is
+`00cfc7633163c4e0d766280db792baffb61319ca48c4083d984d1d571d5ea6c7`. The audit reads COFF
+section bytes and relocation tables directly because `homm2 relocs` stops at the constructor's
+delinked local jump-table identities and cannot associate a candidate `??_G` deleting destructor
+with the duplicate retail `??_E` symbols.
+
+The standalone `sample` destructor, `MIDIWrap` constructor, and `MIDIWrap` destructor remain 100%
+raw exact at 4/4, 12/12, and 4/4 relocations. Each generated deleting-destructor candidate is also
+raw exact against both of its independently delinked retail copies: `sample` is `0x41`, 5/5
+relocations, and `MIDIWrap` is `0x3d`, 5/5. These four unscored CodeView aliases are strict
+delinker/symbol-identity artifacts, not incomplete functions.
+
+`sample::sample` is semantically and structurally complete but remains an unresolved compiler-shape
+residual, so its source marker is `@match-note`, not `@early-stop`. Candidate and retail are both
+FPO, size `0x181`, with the exact `0x20` filename area, callee-save set, stack accesses, CFG, switch
+tables, load tail, and 23/23 relocations. Relocation-masked raw comparison differs in 27 scheduling
+bytes at `+0x24..+0x25`, `+0x29..+0x39`, `+0x43..+0x48`, and `+0x4b..+0x4c`; every byte from
+`+0x4d` through `+0x180` is exact. The base hoists `EBP=2` across `resource::resource` and places
+the inline-`strcpy` EAX zero after the volume store, while retail schedules them after the argument
+reloads and before that store.
+
+`sample-ctor-shapes-66dafcc.tsv` records the bounded no-repeat source-shape pass; its SHA-256 is
+`fe1b3861b7a012915e9e9b274b6c498fbe0af3e4f308c46660f6252021d44f15`. Joining the declaration
+and initialization before the member stores is byte-identical to the retained split form. Moving
+the initialization after `m_channelType`, with either joined or split declaration, emits the same
+regressed `96.47%` body and perturbs argument reload plus inline-`strcpy` register selection. All
+three exact authored pins remain exact in every state. Do not repeat these shapes under the same
+source/header/TU state; revisit only after a real state change or in the >=95% last-mile phase.
+Neither permutation tool was used.
+
+The two recovered numeric domains in `include/BASE/sample.h` were also normalized from plain enums
+to header-level `typedef enum` declarations without changing any value or storage. The header moved
+from SHA-256 `a556d90f3c4a268140249b2b72eceb6643fdf826628d0c4abdf87c3a9a150298` to
+`15ec2254596e7d8f9773b842193f5c2ba83b6ad6072fa948ef231b00122d3648`. Rebuilding SAMPLE and all
+five dependent TUs left every SAMPLE `.text` hash in the audit unchanged.
+
 ## BASE allocation/assert metadata wrapper sweep
 
 `base-misc-callsite-audit-8ed859f.tsv` records all 86 direct `BaseAlloc`, `BaseFree`, and

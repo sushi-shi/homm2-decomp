@@ -1,7 +1,7 @@
 # BASE `@early-stop` proof ledger
 
 This ledger audits every current `@early-stop` marker under `src/BASE` from base checkpoint
-`7cc5434`, plus the accepted terminal `Misc.cpp` source identified in the audit snapshot.
+`625e799`, plus the accepted SAMPLE source/header state identified in the audit snapshot.
 It is deliberately stricter than the prose beside the functions: a score or a claim that
 instructions are "the same" is not proof.  The audit joined the current
 `build/objdiff/report.json` (refreshed with `homm2 status`) to
@@ -28,15 +28,17 @@ No BASE marker presently meets the soft-TU-cumulative checklist.
 
 The counts and rows below are pinned to the following fully rebuilt state:
 
-- Base Git checkpoint: `7cc543469660f0d925c53214b8df8f5185ce9210`
-- Accepted `src/BASE/Misc.cpp` SHA-256:
-  `d920abfe77a12b518442adcf0d4a802a91231c535ff9342864fcca214ab6e9e6`
+- Base Git checkpoint: `625e799`
+- Accepted `src/BASE/SAMPLE.cpp` SHA-256:
+  `4f2669954a4e724dc7480d63c1976b2c196a362458de3e57d0e9a68aef2120e3`
+- Accepted `include/BASE/sample.h` SHA-256:
+  `15ec2254596e7d8f9773b842193f5c2ba83b6ad6072fa948ef231b00122d3648`
 - `build/objdiff/report.json` SHA-256:
   `0cc524f93a240e04eb0bd78d11fb98ade3f5721353a6cafe2982b0589e799c40`
 - `config/match_baseline.tsv` SHA-256:
   `11627ae9d91a47efe09be197ca0bd5b575e5f2890ba403ce91d2457f543dd415`
 - Sorted `rg -n '@early-stop' src/BASE` inventory SHA-256:
-  `93397eee32421608cc51917ae89a3883a533f23537fed4e24c9fcbc302f66d4f`
+  `ad6a85e330207425e3fd8dcdb96dd1005d32bb8b4302ca6448740fa5849783e0`
 
 Recompute all listed identities before reusing classifications after a root/header/source change.
 
@@ -46,8 +48,8 @@ Recompute all listed identities before reusing classifications after a root/head
 | :--- | ---: | :--- |
 | `proven-artifact` | 9 | Seven ordinary function markers and two generated destructor aliases. |
 | `proven-soft-TU-cumulative` | 0 | No marker has the required frame/slot, standalone, combined-root, and exact-predecessor proof bundle. |
-| `unresolved/not-a-wall` | 69 | Includes five unproved deleting-destructor tradeoffs and two stale markers on exact functions. |
-| **Total** | **78** | Exactly 71 ordinary rows plus seven generated-alias rows: one row per current source marker. |
+| `unresolved/not-a-wall` | 68 | Includes five unproved deleting-destructor tradeoffs and two stale markers on exact functions. |
+| **Total** | **77** | Exactly 70 ordinary rows plus seven generated-alias rows: one row per current source marker. |
 
 Syntax/state defects found by the audit:
 
@@ -144,7 +146,6 @@ and live scores are shown as `retained/live`.
 | `RESMGR` | `0x004c89e0` `resourceManager::Close` | 100.0000/100.0000 | unresolved/not-a-wall (stale exact) | Δ=0; rel 4/4 | [source note](../src/BASE/RESMGR.cpp#L292) | R0 |
 | `RESMGR` | `0x004c8ab0` `resourceManager::LoadAggregateHeader` | 99.9495/99.9495 | unresolved/not-a-wall | Δ=5; rel 15/15 | [source note](../src/BASE/RESMGR.cpp#L314) | R2 |
 | `Ripple` | `0x004d26a0` `DoRipple` | 99.9355/99.9355 | unresolved/not-a-wall | Δ=1 at SIB byte `+0x156`; rel 13/13 | [source note](../src/BASE/Ripple.cpp#L17) | R2 |
-| `SAMPLE` | `0x004dad60` `sample::sample` | 96.7515/96.7515 | unresolved/not-a-wall | Δ=22; rel 23/23 | [source note](../src/BASE/SAMPLE.cpp#L13) | R2 |
 | `TEXTWDGT` | `0x004d1060` `textWidget::textWidget()` | 97.3684/97.3684 | unresolved/not-a-wall | Δ=10; rel 2/2 | [source note](../src/BASE/TEXTWDGT.cpp#L14) | R2 |
 | `TEXTWDGT` | `0x004d10f0` `textWidget::textWidget(...)` | 99.2727/99.2727 | unresolved/not-a-wall | Δ=8; rel 4/4 | [source note](../src/BASE/TEXTWDGT.cpp#L38) | R2 |
 | `TEXTWDGT` | `0x004d1280` `textWidget::Main` | 99.6316/99.6316 | unresolved/not-a-wall | Δ=2; rel 6/6 | [source note](../src/BASE/TEXTWDGT.cpp#L88) | R2 |
@@ -180,8 +181,8 @@ a weak `??_E`.  A report score of zero or an absent row says nothing about the b
 | [`BUTTON:86`](../src/BASE/BUTTON.cpp#L86) | `0x004dd480` `button ??_E/??_G` | `??_E` retained 0, live unscored; `??_G` absent | unresolved/not-a-wall | Current `??_G` has 2 relocs versus 5 in each retail copy and Δ=28.  No emitted raw-exact deleting body is present. | R4 |
 | [`ICON:35`](../src/BASE/ICON.cpp#L35) | `0x004c7a90` `icon ??_E/??_G` | `??_E` retained 0, live unscored; `??_G` absent | unresolved/not-a-wall | Current `??_G` has 2 relocs versus 5 in each retail copy and Δ=28. | R4 |
 | [`ICONWDGT:23`](../src/BASE/ICONWDGT.cpp#L23) | `0x004d0a90` `iconWidget ??_E/??_G` | `??_E` retained 0, live unscored; `??_G` absent | unresolved/not-a-wall | Current `??_G` has 2 relocs versus 5 in each retail copy and Δ=28. | R4 |
-| [`SAMPLE:69`](../src/BASE/SAMPLE.cpp#L69) | `0x004daef0` `sample ??_E/??_G` | generated alias unscored; standalone `sample::~sample` is 100/100 | proven-artifact | Candidate `??_G` and each retail `??_E` are 0x41 bytes, Δ=0, rel 5/5 with the same destructor/delete/vtable targets. | A1 |
-| [`SAMPLE:95`](../src/BASE/SAMPLE.cpp#L95) | `0x004daff0` `MIDIWrap ??_E/??_G` | generated alias unscored; standalone `MIDIWrap::~MIDIWrap` is 100/100 | proven-artifact | Candidate `??_G` and each retail `??_E` are 0x3d bytes, Δ=0, rel 5/5 with the same destructor/delete/vtable targets. | A1 |
+| [`SAMPLE:72`](../src/BASE/SAMPLE.cpp#L72) | `0x004daef0` `sample ??_E/??_G` | generated alias unscored; standalone `sample::~sample` is 100/100 | proven-artifact | Candidate `??_G` and each retail `??_E` are 0x41 bytes, Δ=0, rel 5/5 with the same destructor/delete/vtable targets; see the [SAMPLE audit](matching-matrices/README.md#basesample-whole-tu-audit-and-constructor-shapes). | A1 |
+| [`SAMPLE:98`](../src/BASE/SAMPLE.cpp#L98) | `0x004daff0` `MIDIWrap ??_E/??_G` | generated alias unscored; standalone `MIDIWrap::~MIDIWrap` is 100/100 | proven-artifact | Candidate `??_G` and each retail `??_E` are 0x3d bytes, Δ=0, rel 5/5 with the same destructor/delete/vtable targets; see the [SAMPLE audit](matching-matrices/README.md#basesample-whole-tu-audit-and-constructor-shapes). | A1 |
 | [`TEXTWDGT:30`](../src/BASE/TEXTWDGT.cpp#L30) | `0x004d10a0` `textWidget ??_E/??_G` | `??_E` retained 0, live unscored; `??_G` absent | unresolved/not-a-wall | Current `??_G` has 2 relocs versus 7 in each retail copy and Δ=35. | R4 |
 
 ## Semantic-layout debt census
