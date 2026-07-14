@@ -257,9 +257,9 @@ wall or soft defer.
 
 Canonical source state:
 
-- checkpoint: `188544b`
+- checkpoint: `ea86fa8`
 - target: RVA `0xd1ba0`, retail size `0x4f1`
-- `src/BASE/Iconf2b.cpp`: `8e4f2a38efb2ff4ec5bfae630ff56e08f1ea33c465828373b09908c25d3506cb`
+- `src/BASE/Iconf2b.cpp`: `4db51d6a2e2bffb95cba2c36cb16fa7b0a690b6bd80e5ec60caed41fb50fa666`
 - live checkpoint: 83.53%, 84 candidate vs 81 retail relocations, no base-only external target
 
 ### Corrections retained at the canonical checkpoint
@@ -272,6 +272,7 @@ Canonical source state:
 - reconstructed the local dim cursor with a per-iteration global palette load;
 - corrected the flipped right-edge boundary and shared literal loop;
 - retained the assignment-expression decrement that removes one unwanted destination relocation.
+- publish `gFlipClipR` before `gFlipClipB`, matching retail relocation order.
 
 ### Searches already exhausted
 
@@ -300,3 +301,109 @@ New measured axes:
 Continue from the first remaining structural/relocation divergence. Do not repeat these axes while
 the canonical hash agrees. If a real shared icon/header change is retained, retest the deferred
 Icon2b and icon2bc functions before final handoff.
+
+## BASE/droplist: dropListWidget::ProcessSelectDialog
+
+Status: clean soft defer pending a predecessor/shared-header compiler-state change. It is not an
+accepted wall and has no `@early-stop`.
+
+Canonical source state:
+
+- checkpoint: `0cb12b3`
+- target: RVA `0xdcb10`
+- normalized function source hash: `40e2a77ca175`
+- `src/BASE/droplist.cpp` SHA-256:
+  `65610405f395c0f78bf14d329a5830f870bb32b4e8734e4d4862a7083a967514`
+- live checkpoint: 99.36745%, raw COMDAT size 2079 bytes, 36 relocations
+- `Read`, `DrawDropStuff`, `SaveDropBackground`, and `RestoreDropBackground` are exact;
+  `Main` has its separate strict zero-unmasked-byte local-label proof
+
+All external relocation offsets and targets agree. The local tables align at `+0x7d4/+0x7f8`;
+their remaining identities are delinked local labels.
+
+### Remaining true code residuals
+
+- `+0x1b5`: candidate loads `[ebx+0x1c]` then adds `[ebx+0x18]`; retail loads
+  `[ebx+0x18]` then adds `[ebx+0x1c]`;
+- `+0x493`: candidate `cmp ecx,eax; jg` versus retail `cmp eax,ecx; jl`;
+- `+0x792..+0x7a0`: candidate stores null before loading the Draw receiver/vtable; retail
+  preloads vtable and `this`, stores null, then calls.
+
+The formerly missing `mov ax,[ebx+0x3e]` reload at `+0x368` is solved and integrated: the
+decrement and second guarded top-index update must be separate statements.
+
+### Searches already exhausted
+
+Commutative geometry/load forms, all byte-identical to the checkpoint:
+
+- `m_x + m_width - scrollWidth[0]`;
+- `m_width + m_x - scrollWidth[0]`;
+- `static_cast<short>(m_x + m_width) - scrollWidth[0]`;
+- `m_x - scrollWidth[0] + m_width`;
+- `m_width - scrollWidth[0] + m_x`.
+
+Compare forms at `+0x493`, all byte-identical:
+
+- `if (item >= field_0x32)`;
+- `if (field_0x32 <= item)`;
+- ternary clamp `item < field_0x32 ? item : field_0x32 - 1`;
+- positive empty-arm plus `else`.
+
+Cleanup/Draw scheduling forms, all byte-identical unless noted:
+
+- baseline null assignment then Draw;
+- truthy cleanup guard; explicit `this->Draw()`; comma statement;
+- assignment folded into true `if`, false/`else`, or conditional operator;
+- `(m_savedBackground = 0, this)->Draw()`: 95.97%, rejected;
+- inlining real Restore: same Process bytes but suppresses the exact Restore symbol, rejected;
+- paired inline Save/Restore: 95.99% and suppresses exact helpers, rejected;
+- stale bare-delete retest, file SHA
+  `60a0c22ddad13261eefc56f19234b6020a5498545fd61f8ea80c0bcc4341d2cc`:
+  98.06208%, raw 2075, rejected.
+
+Libclang search on the current reload CFG pinned Process and all 13 siblings:
+
+- ctor 3 variants; dtor 2; Read 27; DeleteItem 11; strict Main 37;
+- Restore 1; DrawDropStuff 51; Save had no legal mutation;
+- Process itself had 116 legal variants plus a bounded 100-step walk.
+
+No variant improved Process. Unsafe inequality +/-1 was disabled, the temporary tool state was
+restored, and the regex permuter was never used.
+
+Exact non-AST predecessor states, all rejected/restored:
+
+- Draw top-only ternary, SHA
+  `1b12bfab6008436a81ab202b36ad45aa9c77f7c1c50f4993509460424dfeea07`:
+  Draw exact, Process 93.419464/raw 2083;
+- Draw bottom-only, SHA
+  `d8d5fc262170ed466d09ba72f70f965e9090aadf0d669d25c178848dbc367da4`:
+  same result;
+- paired Draw ternaries, SHA
+  `d28fafcdbf35b0774e11d686e2a2e3fd326224ebb051566fc55a3bb7e578eb77`:
+  Draw exact, Process 96.38423/raw 2087;
+- Restore bare delete, SHA
+  `8a50df5d8fbd04b813ae95871a399b6e1a50d7787529253ab5009d68cfabca4a`:
+  Restore exact, Process 95.156044/raw 2075;
+- Save combined assignment/call, SHA
+  `86ec5679c5afbe16d17a8a2d378ef48ae22a24e36630eb69abbb19737c22fb73`:
+  Save exact, Process unchanged;
+- Draw split frame locals, SHA
+  `e5b974ed113ba24e83afe00f94ea0689c90f2f932ffa1265b55a3bb7e578eb77`:
+  Draw exact, Process 96.40269/raw 2087.
+
+Older closed axes: selected getter value/reference; scalar, pointer, and wider-scope selected
+snapshots; prefix/compound decrement; nested block, do/while, and short-circuit forms; helper
+inline calls; nonvirtual declaration order; local renames; the obsolete `maxItems` local; and
+already-integrated body order/polarity. Do not repeat them without a material compiler-state
+change.
+
+### Retest trigger
+
+Retest only when the normalized Process source hash changes from `40e2a77ca175`, a predecessor
+source hash changes, or an intentional shared declaration/layout edit changes droplist raw bytes.
+Relevant headers include `dropListWidget.h`, `widget.h`, `bitmap.h`, `icon.h`, `font.h`,
+`inputManager.h`, `mouseManager.h`, and `windowManager.h`.
+
+On a trigger, rebuild and raw-compare the three exact residual offsets first. Re-run only the
+legal AST/predecessor matrix associated with an offset that changed. The current state is a
+scheduling defer, not proof that the residual is impossible.
