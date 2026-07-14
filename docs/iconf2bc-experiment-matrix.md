@@ -1,19 +1,12 @@
 # BASE/iconf2bc experiment matrix
 
-Current integrated state: checkpoint `ea3b363`, source SHA-256
-`55a3efd26cc0bc327cc0bc09a7b832c0bc6632ea53257dd49950e1a7b9af090c`, 85.84131%,
-function end `0x545`, frame `sub esp,8`, decoder entry `+0xee`, and 84/83 relocations.
-Declaring the later row pitch immediately after the entry cursor preserves the retained width/X
-setup and makes the row initialization use retail's load order and separate `gFCY` load. The row
-result remains in `ecx` rather than retail's `eax`; the first width/x divergence and excess setup
-`gFCY` load also remain active work. This is a progress checkpoint, not a wall classification.
-
-Fresh-pass candidate pending integration: source SHA-256
+Current integrated state: checkpoint `48dbe3e`, source SHA-256
 `dd868c0ffcdabf134c98631a7a731d7b8d90845b7df496ce5a3c6dd05b305fd9`, 85.99%, function
 end `0x541`, frame `sub esp,8`, decoder entry `+0xea`, and 84/83 relocations. It reuses the
 later pitch lifetime to preserve the original icon width while `w` becomes the exclusive horizontal
 bound. This improves the score but does not remove the first width/X load-order divergence or the
-single excess setup `gFCY` relocation, so it remains a progress checkpoint rather than a wall.
+single excess setup `gFCY` relocation. The row result also remains in `ecx` rather than retail's
+`eax`. This is an integrated progress checkpoint, not a wall classification.
 
 The new-experiment table began at checkpoint `838105c` / source checkpoint `7386907`, SHA-256
 `648ecb4b963c5b97aea5908738d26509ad680853a3041817321b61aa955070f9`, score 83.4333%,
