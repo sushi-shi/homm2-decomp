@@ -167,9 +167,13 @@ accessor `jmp $+0` fingerprint — most plateaus are one of these two, both fixa
    stack slots, CFG, inline-accessor structure, and external relocations must be accounted for.
 2. **At a wall, try a few obvious cases and move on.** Re-check `od_slots`, try the source
    polarity/operand/accessor spelling directly indicated by the diff, and consult the pattern
-   catalog. If the residual is then byte-proven, document it and hand off. Do not run extended
-   permutation or brute-force searches before total SOURCE fuzzy reaches 95%.
-3. **At 95% total fuzzy, start the last-mile pass.** Return to the proven wall set, use the
+   catalog. If the residual is byte-proven, document it as `@early-stop`. Otherwise, after the body
+   and all structural proof are complete, add a provisional `@match-note` immediately above `VA()`
+   with the first retail/ours instruction divergence or byte span, frame/slot/CFG and relocation
+   status, and the exact obvious spellings already tried. Do not run extended permutation or
+   brute-force searches before total SOURCE fuzzy reaches 95%.
+3. **At 95% total fuzzy, start the last-mile pass.** Return to the `@match-note` and soft
+   `@early-stop` wall set, resume after the attempts recorded there, use the
    audited AST permuter where appropriate, and push each residual to its highest reproducible match.
 4. **Size is not a reason to defer.** Reconstruct large bodies leaf-first, in full.
 5. **Acceptable non-100% comes in exactly two `@early-stop` flavors — never a partial
@@ -189,11 +193,20 @@ accessor `jmp $+0` fingerprint — most plateaus are one of these two, both fixa
        VA(0x0040b396, 0x1d3)
        mapCellExtra *fullMap::GetNewCellExtraOverlay(int x, int y) { /* complete body */ }
 
-Invariant: a reconstructed method is **either 100% (unmarked) or carries a
-byte-PROVEN `@early-stop`** — `rg '@early-stop' src` is the proven-artifact set, NOT a
-"gave up" set. **Finish every function in your assigned batch** — never leave one
-un-attempted and never leave an attempted one half-pushed. Batch size is the
-orchestrator's decision; your job is to complete whatever you were handed.
+Before 95%, every integrated non-100 method carries exactly one durable marker:
+
+- `@early-stop` means the permitted residual is byte-proven. `rg '@early-stop' src` is the
+  proven-artifact set, never a "gave up" set.
+- `@match-note` means the method is semantically and structurally complete but the residual is not
+  yet a valid early-stop proof. It must name the first assembly/byte divergence, confirmed
+  frame/slot/CFG and relocation state, obvious attempts already exhausted, and the revisit trigger.
+  It prevents restarts from repeating pre-95 work; it does not remove the method from the 95%
+  last-mile queue. Remove it when the method reaches 100% or replace it with a proved early-stop.
+
+**Finish every function in your assigned batch** — never leave one un-attempted and never use a
+marker to excuse incomplete semantics, types/layout, frame/slots, CFG, inline-accessor recovery, or
+relocation review. Batch size is the orchestrator's decision; your job is to complete whatever you
+were handed.
 
 ## Report back to the orchestrator
 
