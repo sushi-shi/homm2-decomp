@@ -13,6 +13,8 @@
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/iconWidget.h>
+#include <BASE/inputManager.h>
+#include <BASE/mouseManager.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/fileRequester.h>
@@ -658,13 +660,250 @@ int fileRequester::Main(struct tag_message &message)
 }
 
 VA(0x0048ec9a, 0x2e8)
-void fileRequester::DoKnob(void) {}
+void fileRequester::DoKnob(void)
+{
+    int oldTopIndex = m_topIndex;
+    double gutterStep = fGutterTravelLength / (m_fileCount - (iMaxListSize - 1));
+    int mouseX;
+    int mouseY;
+    gpMouseManager->MouseCoords(mouseX, mouseY);
+    int mouseOffset = mouseY - m_scrollKnob->m_y;
+
+    gpInputManager->Flush();
+    tag_message message = gpInputManager->GetEvent();
+    while (message.type != 0x10 && message.type != 0x40) {
+        if (message.type == 4) {
+            if (static_cast<float>(message.field8) < mouseOffset + fGutterMinY) {
+                message.field8 = static_cast<int>(mouseOffset + fGutterMinY);
+            }
+            if (mouseOffset + fGutterTravelLength + fGutterMinY <
+                static_cast<float>(message.field8)) {
+                message.field8 = static_cast<int>(mouseOffset + fGutterTravelLength +
+                                                  fGutterMinY);
+            }
+            gpMouseManager->Main(message);
+            m_scrollKnob->m_y = message.field8 - mouseOffset;
+            if (m_fileCount > iMaxListSize) {
+                int newTopIndex = static_cast<int>((m_scrollKnob->m_y - fGutterMinY) /
+                                                   gutterStep);
+                if (newTopIndex != oldTopIndex) {
+                    if (newTopIndex > m_fileCount - iMaxListSize) {
+                        newTopIndex = m_fileCount - iMaxListSize;
+                    }
+                    if (newTopIndex < 0) {
+                        newTopIndex = 0;
+                    }
+                    m_topIndex = newTopIndex;
+                    Update(0);
+                    m_scrollKnob->m_y = message.field8 - mouseOffset;
+                    m_window->DrawWindow(1, 0, 0x7fff);
+                    oldTopIndex = newTopIndex;
+                } else {
+                    m_window->DrawWindow(1, 0, 0x7fff);
+                }
+            } else {
+                m_window->DrawWindow(1, 0, 0x7fff);
+            }
+        }
+        Process1WindowsMessage();
+        message = gpInputManager->GetEvent();
+    }
+    m_scrollKnob->m_flags &= ~1;
+    Update(1);
+}
 
 VA(0x0048ef82, 0xc42)
-void fileRequester::Update(int) {}
+void fileRequester::Update(int drawWindow)
+{
+    tag_message message;
+    message.type = 0x200;
+    message.field18 = 0;
+
+    int i;
+    if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP) {
+        for (i = 0; i < FILE_REQUESTER_MAP_SIZE_COUNT; ++i) {
+            message.field4 = 4;
+            message.field8 = FILE_REQUESTER_FILTER_SMALL + i;
+            message.field18 = (giMapSizeFilter == i) + i * 2 + 9;
+            m_window->BroadcastMessage(message);
+        }
+        if (m_selectedIndex == -1 && m_fileCount > 0) {
+            m_selectedIndex = 0;
+        }
+        SetOK(1);
+
+        message.field4 = 4;
+        message.field8 = 0x52;
+        if (m_mapHeaders[m_selectedIndex].mapSize == MAP_DIMENSION_SMALL) {
+            message.field18 = 0x1a;
+        } else if (m_mapHeaders[m_selectedIndex].mapSize == MAP_DIMENSION_MEDIUM) {
+            message.field18 = 0x1b;
+        } else if (m_mapHeaders[m_selectedIndex].mapSize == MAP_DIMENSION_LARGE) {
+            message.field18 = 0x1c;
+        } else {
+            message.field18 = 0x1d;
+        }
+        m_window->BroadcastMessage(message);
+
+        message.field8 = 0x51;
+        message.field18 = m_mapHeaders[m_selectedIndex].playerCount + 0x13;
+        m_window->BroadcastMessage(message);
+
+        message.field8 = 0x56;
+        message.field18 = m_mapHeaders[m_selectedIndex].victoryCondition + 0x1e;
+        m_window->BroadcastMessage(message);
+
+        message.field8 = 0x57;
+        message.field18 = m_mapHeaders[m_selectedIndex].lossCondition + 0x24;
+        m_window->BroadcastMessage(message);
+
+        message.field4 = 3;
+        message.text = gText;
+        sprintf(gText, "%s", m_mapHeaders[m_selectedIndex].name);
+        message.field8 = 0x50;
+        m_window->BroadcastMessage(message);
+
+        sprintf(gText, "%s", cDifficulty[m_mapHeaders[m_selectedIndex].difficulty]);
+        message.field8 = 0x54;
+        m_window->BroadcastMessage(message);
+
+        sprintf(gText, "%s", m_mapHeaders[m_selectedIndex].description);
+        message.field8 = 0x55;
+        m_window->BroadcastMessage(message);
+    }
+
+    for (i = 0; iMaxListSize > i; ++i) {
+        if (m_topIndex + i >= m_fileCount) {
+            message.field4 = 6;
+            message.field18 = 4;
+            message.field8 = i + 0x14;
+            m_window->BroadcastMessage(message);
+            if (m_mode == FILE_REQUESTER_MAP || m_mode == FILE_REQUESTER_MAP_GAME) {
+                message.field8 = i + 200;
+                m_window->BroadcastMessage(message);
+                message.field8 = i + 220;
+                m_window->BroadcastMessage(message);
+                message.field8 = i + 240;
+                m_window->BroadcastMessage(message);
+                message.field8 = i + 260;
+                m_window->BroadcastMessage(message);
+            }
+        } else {
+            message.field8 = i + 0x14;
+            message.field4 = 5;
+            message.field18 = 4;
+            m_window->BroadcastMessage(message);
+
+            if (m_mode == FILE_REQUESTER_MAP || m_mode == FILE_REQUESTER_MAP_GAME) {
+                message.field8 = i + 200;
+                m_window->BroadcastMessage(message);
+                message.field8 = i + 220;
+                m_window->BroadcastMessage(message);
+                message.field8 = i + 240;
+                m_window->BroadcastMessage(message);
+                message.field8 = i + 260;
+                m_window->BroadcastMessage(message);
+
+                message.field4 = 4;
+                message.field8 = i + 200;
+                if (m_mapHeaders[m_topIndex + i].mapSize == MAP_DIMENSION_SMALL) {
+                    message.field18 = 0x1a;
+                } else if (m_mapHeaders[m_topIndex + i].mapSize == MAP_DIMENSION_MEDIUM) {
+                    message.field18 = 0x1b;
+                } else if (m_mapHeaders[m_topIndex + i].mapSize == MAP_DIMENSION_LARGE) {
+                    message.field18 = 0x1c;
+                } else {
+                    message.field18 = 0x1d;
+                }
+                m_window->BroadcastMessage(message);
+
+                message.field8 = i + 220;
+                message.field18 = m_mapHeaders[m_topIndex + i].playerCount + 0x13;
+                m_window->BroadcastMessage(message);
+
+                message.field8 = i + 240;
+                message.field18 = m_mapHeaders[m_topIndex + i].victoryCondition + 0x1e;
+                m_window->BroadcastMessage(message);
+
+                message.field8 = i + 260;
+                message.field18 = m_mapHeaders[m_topIndex + i].lossCondition + 0x24;
+                m_window->BroadcastMessage(message);
+            }
+
+            message.field4 = 3;
+            if (m_mode == FILE_REQUESTER_MAP || m_mode == FILE_REQUESTER_MAP_GAME) {
+                sprintf(gText, "%s", m_mapHeaders[m_topIndex + i].name);
+            } else {
+                sprintf(gText, "%s", m_fileNames[m_topIndex + i].text);
+            }
+            message.text = gText;
+            message.field8 = i + 0x14;
+            m_window->BroadcastMessage(message);
+        }
+
+        message.field8 = i + 0x14;
+        message.field4 = 8;
+        if (m_topIndex + i == m_selectedIndex) {
+            message.field18 = 2;
+        } else {
+            message.field18 = 1;
+        }
+        m_window->BroadcastMessage(message);
+    }
+
+    message.field8 = FILE_REQUESTER_FILENAME_ENTRY;
+    message.field4 = 5;
+    message.field18 = 2;
+    m_window->BroadcastMessage(message);
+    if (m_selectedIndex != -1) {
+        message.field4 = 3;
+        if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP) {
+            sprintf(gText, "%s", m_mapHeaders[m_selectedIndex].name);
+        } else {
+            sprintf(gText, "%s", m_fileNames[m_selectedIndex].text);
+        }
+        message.text = gText;
+        m_window->BroadcastMessage(message);
+    }
+    if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_LOAD_GAME ||
+        m_mode == FILE_REQUESTER_MAP) {
+        message.field4 = 6;
+        message.field18 = 2;
+        m_window->BroadcastMessage(message);
+    }
+
+    if (m_fileCount <= iMaxListSize) {
+        m_scrollKnob->m_y = static_cast<short>(fGutterTravelLength / 2.0f + fGutterMinY);
+    } else {
+        double gutterStep = fGutterTravelLength / (m_fileCount - iMaxListSize);
+        m_scrollKnob->m_y = static_cast<short>(m_topIndex * gutterStep + fGutterMinY);
+    }
+    if (drawWindow) {
+        m_window->DrawWindow(1, 0, 0x7fff);
+    }
+}
 
 VA(0x0048fbc4, 0x15b)
-char * fileRequester::GetFilename(void) { return 0; }
+char * fileRequester::GetFilename(void)
+{
+    if (m_mode != FILE_REQUESTER_SAVE_GAME &&
+        (m_selectedIndex < 0 || m_fileCount <= m_selectedIndex)) {
+        return cFRDummy;
+    }
+
+    if (m_selectedIndex == -1) {
+        sprintf(gText, "%s%s", m_filename, m_defaultExtension);
+    } else if (m_mode == FILE_REQUESTER_LOAD_GAME || m_mode == FILE_REQUESTER_MAP ||
+               m_mode == FILE_REQUESTER_MAP_GAME) {
+        sprintf(gText, "%s%s", m_fileNames[m_selectedIndex].text,
+                m_extensions[m_selectedIndex].text);
+    } else {
+        sprintf(gText, "%s%s", m_fileNames[m_selectedIndex].text,
+                m_defaultExtension);
+    }
+    strcpy(m_filename, gText);
+    return m_filename;
+}
 
 
 // ===== vtable fileRequester : public baseManager  (3 slots) =====
@@ -677,7 +916,7 @@ VTBL(fileRequester, 0x004eb888);
 
 // ---- globals (definitions, RVA order) ----
 DATA(0x004f8674) int giMapSizeFilter;
-DATA(0x004f88c4) char *cFRDummy;
+DATA(0x004f88c4) char *cFRDummy = "";
 DATA(0x0052857c) float fGutterMinY;
 DATA(0x00528580) float fGutterTravelLength;
 DATA(0x00528584) int iMaxListSize;
