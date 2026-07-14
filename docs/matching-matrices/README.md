@@ -203,3 +203,28 @@ status report. Raw review still shows only the constructor's delayed `m_iconFram
 declaration-order, or combined forms while the canonical source/header hashes remain
 `ac8dd08884961ba6d73e8a312391cdeecac71ba132f5badef5f79201a63b34d8` and
 `8207f088751e59f5a467c7a7e582c4870d82c3fb4e060262d02d5e3a07a17517`.
+
+## BASE/Textntry exact-preserving include and lifetime combinations
+
+`textntry-tu-state-d9694ae.tsv` records the fresh cross-lane pass from checkpoint `d9694ae`. Its
+SHA-256 is `586dccc8df84b2b89692b0ffc1a882229f2c15c1ce9262e6fc81fbd581bc25da`.
+Neither permutation tool was used. The matrix records full source and header hashes, the complete
+nine-row Textntry score vector, and the raw or sibling rejection for every compiled state.
+
+Four previously untested include-order states were byte-neutral. Direct constructor icon and
+rectangle spellings were also individually neutral, but combining both regressed `Main` to
+98.689080% without moving the constructor store. Semantic constructor parameter names were neutral
+in the definition; adding those names to the header declaration changed only the later cumulative
+TU state and regressed exact `SetupDisplayString` to 99.932434%. A header-level `typedef enum` used
+for `Read`'s 32-bit flag produced the same Setup regression while leaving the `Read` schedule
+unchanged, so it is not a valid reason to change the proved short field storage or introduce an
+enum here.
+
+The natural direct-literal and single-initialized-`int` Read forms both entered the known early-flag-
+store family at 96.523180%; the latter also regressed `Main`. Opposite polarity for the duplicated
+32-bit condition was byte-neutral. Combining that polarity with a neutral include order, direct
+icon store, and the prior neutral header-method swap still preserved every sibling but did not move
+either residual. This confirms that combined predecessor/TU-state variants must be measured, while
+also closing these specific combinations. The canonical source/header hashes were restored to
+`ac8dd08884961ba6d73e8a312391cdeecac71ba132f5badef5f79201a63b34d8` and
+`8207f088751e59f5a467c7a7e582c4870d82c3fb4e060262d02d5e3a07a17517`.

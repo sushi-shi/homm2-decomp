@@ -174,6 +174,28 @@ Exact-preserving TU-state continuation after checkpoint `ab91486`:
 - no permutation tool was used. In particular, this continuation does not reopen the exhausted
   libclang AST matrices and never uses the regex permuter.
 
+Fresh include/lifetime combination pass after checkpoint `d9694ae`:
+
+- seventeen canonical, compiled, or explicitly skipped full source/header states are recorded in
+  [`textntry-tu-state-d9694ae.tsv`](matching-matrices/textntry-tu-state-d9694ae.tsv); no permutation
+  tool was used;
+- moving `icon.h`, `Misc.h`, and `string.h` across four declaration-order surfaces preserved the
+  complete Textntry vector but left both raw residuals unchanged;
+- eliminating the constructor's `loadedIcon` or `rectX` snapshots individually was byte-neutral.
+  Eliminating both still left the constructor residual unchanged and regressed `Main` to
+  98.689080%, proving these lifetime simplifications are not safely additive;
+- semantic constructor parameter names in the definition were neutral, but adding them to the
+  class declaration changed cumulative TU state and regressed exact Setup to 99.932434%. A
+  header-level 32-bit enabled enum used by `Read` caused the same Setup regression without changing
+  the compare/load reversal. Do not introduce either declaration-only shape while this canonical
+  header state remains;
+- direct literal flag stores and a single initialized 32-bit flag both hoisted the flag stores
+  ahead of retail's rectangle sequence and fell to 96.523180%; the initialized form additionally
+  regressed `Main`. These are members of the closed early-store family, not improvements;
+- reversing the duplicated condition polarity was byte-neutral. Combining it with a neutral icon
+  include order, direct icon store, and the previously neutral header method swap preserved every
+  sibling but still left both target residuals unchanged.
+
 The canonical source/header hashes remain `ac8dd08884961ba6d73e8a312391cdeecac71ba132f5badef5f79201a63b34d8`
 and `8207f088751e59f5a467c7a7e582c4870d82c3fb4e060262d02d5e3a07a17517`.
 
