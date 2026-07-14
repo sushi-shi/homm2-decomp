@@ -48,7 +48,7 @@ public:
     int    m_lastTargetHex;  // +0x9a
     int    field_0x9e;  // +0x9e
     int    m_hitPointsLost;  // +0xa2
-    int    field_0xa6;  // +0xa6
+    int    m_armyGroupSlot;  // +0xa6
     int    m_damagePenalty;  // +0xaa
     int    m_speed;  // +0xae
     int    m_walkDuration;  // +0xb2

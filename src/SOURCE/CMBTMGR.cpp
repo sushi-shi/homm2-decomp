@@ -6,14 +6,27 @@
 #include <va.h>
 #include <stdio.h>
 #include <string.h>
+#include <_globals_model.h>
+#include <BASE/bitmap.h>
+#include <BASE/heroWindow.h>
+#include <BASE/heroWindowManager.h>
+#include <BASE/inputManager.h>
 #include <BASE/Misc.h>
+#include <BASE/mouseManager.h>
+#include <BASE/palette.h>
+#include <BASE/resourceManager.h>
+#include <BASE/soundManager.h>
+#include <BASE/WINMGR.h>
 #include <EDITOR/mapcell.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/CMBTMGR.h>
+#include <SOURCE/game.h>
 #include <SOURCE/KB.h>
+#include <SOURCE/kbwin.h>
 #include <SOURCE/town.h>
+#include <SOURCE/X_GLOBAL.h>
 
 VA(0x0048fd50, 0x1ba)
 combatManager::combatManager(void)
@@ -326,22 +339,379 @@ void combatManager::SetupAdjacencyArray(void)
 }
 
 VA(0x00490aa0, 0x43f)
-int combatManager::Open(int) { return 0; }
+int combatManager::Open(int openFlags)
+{
+    LogStr("Op1");
+    memcpy(m_savedPalette, gPalette->m_data, COMBAT_PALETTE_DATA_SIZE);
+    gpMouseManager->m_forcePointerUpdate = 1;
+    int savedShowMouseHex = gbShowCombatMouseHex;
+    gbShowCombatMouseHex = 0;
+    m_previousCombatMessageExpiration = 0;
+    m_combatMessageExpiration = 0;
+    m_combatMessagePending = 0;
+    m_combatWindowOpen = 0;
+    gpSoundManager->PlayAmbientMusic(-1, 0, -1);
+    m_combatBuffer = new bitmap(0, COMBAT_BACKGROUND_COPY_WIDTH,
+                                COMBAT_BACKGROUND_COPY_HEIGHT);
+    m_backgroundBuffer =
+        new bitmap(0, COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT);
+    m_mouseGridBuffer = 0;
+    m_smallViewLastX[COMBAT_ATTACKER_SIDE] = -1;
+    m_smallViewLastX[COMBAT_DEFENDER_SIDE] = -1;
+    memset(m_gridState, 0, sizeof(m_gridState));
+    LoadIcons();
+    InitNonVisualVars();
+    SetupAndLoadObstacles();
+    memset(m_previousGridState, 0, sizeof(m_previousGridState));
+    GetNextArmy(COMBAT_ATTACKER_SIDE);
+    m_backgroundDrawn = 0;
+
+    LogStr("Op2");
+    SAMPLE2 preBattleSample = NULL_SAMPLE2;
+    preBattleSample = LoadPlaySample("PREBATTL.82M");
+    gpWindowManager->FadeScreen(1, 8, 0);
+    giCycleType = m_colorCycleType;
+    CycleColors(1);
+    CycleColors(1);
+    gCurLoadedSpellIcon = 0;
+    gCurLoadedSpellEffect = -1;
+    gpMouseManager->m_forcePointerUpdate = 0;
+    gpMouseManager->SetPointer("cmbtmous.mse", 6, -999);
+    bMouseWasVis = gpMouseManager->IsVis();
+    gpMouseManager->ShowColorPointer();
+    m_combatWindow = new heroWindow(0, 0, "cmbtwin.bin");
+    if (m_combatWindow == 0)
+        MemError();
+    gpWindowManager->AddWindow(m_combatWindow, -1, 1);
+    m_combatWindowOpen = 1;
+    DrawFrame(1, 0, 0, 0, 0x4b, 1, 1);
+    glTimers[0] = KBTickCount();
+    m_combatPalette = gpResourceManager->GetPalette("kb.pal");
+    KBChangeMenu(hmnuCmbt);
+    CombatMessage("", 1, 1, 0);
+    gbShowCombatMouseHex = savedShowMouseHex;
+    if (m_combatPalette->m_data != gpBufferPalette->m_data)
+        memmove(m_combatPalette->m_data, gpBufferPalette->m_data,
+                COMBAT_PALETTE_DATA_SIZE);
+    gpWindowManager->FadeScreen(0, 8, m_combatPalette);
+    gbLimitedCombatUpdatePalette = 1;
+    WaitEndSample(preBattleSample, -1);
+
+    LogStr("Op3");
+    gpSoundManager->SwitchAmbientMusic(SRandom(2, 4));
+    gCombatCycleTimer = KBTickCount();
+    ResetCycleTimers();
+    LogStr("Op4");
+    gpInputManager->Flush();
+    ResetMouse();
+    field_0xc = 0x200;
+    field_0x10 = openFlags;
+    m_active = 1;
+    strcpy(name, "combatManager");
+    LogStr("Op5");
+    return 0;
+}
 
 VA(0x00490edf, 0x3d6)
-void combatManager::Close(void) {}
+void combatManager::Close(void)
+{
+    gpSoundManager->SwitchAmbientMusic(-1);
+    gbLimitedCombatUpdatePalette = 0;
+    if (!gbClosingApp) {
+        memcpy(gPalette->m_data, m_savedPalette, COMBAT_PALETTE_DATA_SIZE);
+        memcpy(gpBufferPalette->m_data, m_savedPalette,
+               COMBAT_PALETTE_DATA_SIZE);
+    }
+    gpWindowManager->FadeScreen(1, 8, 0);
+    giCycleType = 0;
+    CycleColors(0);
+    delete m_combatBuffer;
+    delete m_backgroundBuffer;
+    if (m_mouseGridBuffer != 0)
+        delete m_mouseGridBuffer;
+
+    int total;
+    int groupSide;
+    int index;
+    for (index = 0; index < 2; index++)
+        UpdateArmyGroup(index);
+
+    total = 0;
+    if (m_playerId[COMBAT_DEFENDER_SIDE] == -1)
+        groupSide = COMBAT_DEFENDER_SIDE;
+    else
+        groupSide = COMBAT_ATTACKER_SIDE;
+
+    for (index = 0; index < ARMY_GROUP_SLOT_COUNT; index++) {
+        if (m_armyGroups[groupSide]->m_creatureTypes[index] !=
+            ARMY_GROUP_EMPTY_SLOT)
+            total += m_armyGroups[groupSide]->m_creatureCounts[index];
+    }
+
+    if (m_battlefieldCell->triggerType == COMBAT_TRIGGER_MONSTER) {
+        if (total > 4000)
+            total = 4000;
+        m_battlefieldCell->w4hi = total & 0xfff;
+    }
+
+    if (m_battlefieldCell->triggerType == COMBAT_TRIGGER_MINE &&
+        gpGame->m_mines[m_battlefieldCell->w4hi].guardianType != -1)
+        gpGame->m_mines[m_battlefieldCell->w4hi].guardianCount =
+            static_cast<unsigned char>(total);
+
+    if (m_battlefieldCell->triggerType == COMBAT_TRIGGER_HERO) {
+        hero *combatHero = gpGame->GetHero(m_battlefieldCell->w4hi);
+        if (combatHero->m_locationType == COMBAT_TRIGGER_MINE &&
+            gpGame->m_mines[combatHero->m_occupiedTown].guardianType != -1)
+            gpGame->m_mines[combatHero->m_occupiedTown].guardianCount =
+                static_cast<unsigned char>(total);
+    }
+
+    gpWindowManager->RemoveWindow(m_combatWindow);
+    FreeArmies();
+    FreeIcons();
+    gpResourceManager->Dispose(m_combatPalette);
+    delete m_combatWindow;
+    if (!bMouseWasVis)
+        gpMouseManager->HideColorPointer();
+    m_active = 0;
+    m_combatWindowOpen = 0;
+}
 
 VA(0x004912b5, 0x38c)
-void combatManager::UpdateArmyGroup(int) {}
+void combatManager::UpdateArmyGroup(int side)
+{
+    int index;
+    int pos;
+    for (index = 0; index < ARMY_GROUP_SLOT_COUNT; index++) {
+        m_armyGroups[side]->m_creatureTypes[index] = ARMY_GROUP_EMPTY_SLOT;
+        m_armyGroups[side]->m_creatureCounts[index] = 0;
+    }
+
+    for (index = 0; index < m_armyCount[side]; index++) {
+        if (!(m_armies[side][index].m_monster.flags.all &
+              MONSTER_FLAGS_AI_EXCLUDED) &&
+            m_armies[side][index].m_quantity > 0 &&
+            (m_playerId[side] == -1 ||
+             ((m_armies[side][index].m_monsterType !=
+                   ARMY_CREATURE_EARTH_ELEMENTAL &&
+               m_armies[side][index].m_monsterType !=
+                   ARMY_CREATURE_AIR_ELEMENTAL &&
+               m_armies[side][index].m_monsterType !=
+                   ARMY_CREATURE_FIRE_ELEMENTAL &&
+               m_armies[side][index].m_monsterType !=
+                   ARMY_CREATURE_WATER_ELEMENTAL) ||
+              !(m_armies[side][index].m_monster.flags.all &
+                MONSTER_FLAGS_SUMMONED))) &&
+            !(m_armies[side][index].m_monster.flags.all &
+              MONSTER_FLAGS_MIRROR_IMAGE)) {
+            m_armyGroups[side]
+                ->m_creatureTypes[m_armies[side][index].m_armyGroupSlot] =
+                static_cast<signed char>(m_armies[side][index].m_monsterType);
+            m_armyGroups[side]
+                ->m_creatureCounts[m_armies[side][index].m_armyGroupSlot] =
+                static_cast<short>(m_armies[side][index].m_quantity);
+        }
+    }
+
+    if (giSkeletonsCreated && m_combatResult == side)
+        m_armyGroups[side]->Add(ARMY_CREATURE_SKELETON, giSkeletonsCreated,
+                                ARMY_GROUP_EMPTY_SLOT);
+}
 
 VA(0x00491641, 0x365)
-void combatManager::GenerateMap(void) {}
+void combatManager::GenerateMap(void)
+{
+    int gridX;
+    int randomOffset;
+    int x;
+    unsigned int y;
+    int coordinateY;
 
+    if (m_inCastleCombat == 1)
+        m_catapultFrame = 0;
+    else
+        m_catapultFrame = -1;
+
+    for (y = 0; static_cast<int>(y) < COMBAT_GRID_ROW_COUNT; y++) {
+        for (x = 0; x < COMBAT_GRID_ROW_LENGTH; x++) {
+            m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_y =
+                static_cast<short>((y + 1) * COMBAT_HEX_VERTICAL_STEP +
+                                   COMBAT_HEX_CENTER_Y_ORIGIN);
+            m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_x =
+                static_cast<short>(
+                ((y & 1) ? COMBAT_HEX_ROW_STAGGER :
+                           COMBAT_HEX_HORIZONTAL_STEP) +
+                (x - 1) * COMBAT_HEX_HORIZONTAL_STEP +
+                COMBAT_HEX_GRID_LEFT_ORIGIN);
+            m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_gridLeft =
+                static_cast<short>(
+                ((y & 1) ? 0 : COMBAT_HEX_ROW_STAGGER) +
+                (x - 1) * COMBAT_HEX_HORIZONTAL_STEP +
+                COMBAT_HEX_GRID_LEFT_ORIGIN);
+            m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_gridTop =
+                static_cast<short>(
+                y * COMBAT_HEX_VERTICAL_STEP + COMBAT_HEX_GRID_TOP_ORIGIN);
+            m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_gridRight =
+                m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_gridLeft +
+                COMBAT_HEX_HORIZONTAL_STEP;
+            m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_gridBodyBottom =
+                m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_gridTop +
+                COMBAT_HEX_VERTICAL_STEP;
+            m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_gridBottom =
+                m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_gridTop +
+                COMBAT_MOUSE_HEX_HEIGHT;
+            m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_occupantSide =
+                -1;
+            m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_occupantIndex = -1;
+            m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_occupantFrame = -1;
+            m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_obstacleIndex = -1;
+            m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_blocked = 0;
+            m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x]
+                .m_deadOccupantCount = 0;
+        }
+    }
+    randomOffset = SRandom(8, 15);
+}
+
+// @early-stop
+// Instruction bytes and external relocations match; target offsets
+// +0x1e8..+0x20c are the delinked local jump table.
 VA(0x004919a6, 0x224)
-char * combatManager::GetBackgroundName(void) { return 0; }
+char * combatManager::GetBackgroundName(void)
+{
+    int backgroundIndex;
+    m_colorCycleType = 1;
+    m_battlefieldFringe = -1;
+    switch (m_terrainType) {
+    case COMBAT_TERRAIN_WATER:
+        backgroundIndex = 0;
+        m_battlefieldFringe = 13;
+        break;
+    case COMBAT_TERRAIN_GRASS:
+        if (MoreTreesNear()) {
+            backgroundIndex = 2;
+            m_battlefieldFringe = 12;
+        } else {
+            backgroundIndex = 3;
+            m_battlefieldFringe = 11;
+        }
+        break;
+    case COMBAT_TERRAIN_SNOW:
+        m_colorCycleType = 3;
+        if (MoreTreesNear()) {
+            backgroundIndex = 4;
+            m_battlefieldFringe = 6;
+        } else {
+            backgroundIndex = 5;
+            m_battlefieldFringe = 7;
+        }
+        break;
+    case COMBAT_TERRAIN_SWAMP:
+        backgroundIndex = 6;
+        m_battlefieldFringe = 8;
+        break;
+    case COMBAT_TERRAIN_LAVA:
+        backgroundIndex = 8;
+        m_battlefieldFringe = 5;
+        break;
+    case COMBAT_TERRAIN_DESERT:
+        m_colorCycleType = 3;
+        backgroundIndex = 10;
+        m_battlefieldFringe = 4;
+        break;
+    case COMBAT_TERRAIN_DIRT:
+        if (MoreTreesNear()) {
+            backgroundIndex = 12;
+            m_battlefieldFringe = 10;
+        } else {
+            backgroundIndex = 13;
+            m_battlefieldFringe = 9;
+        }
+        break;
+    case COMBAT_TERRAIN_WASTELAND:
+        m_colorCycleType = 3;
+        backgroundIndex = 14;
+        m_battlefieldFringe = 3;
+        break;
+    case COMBAT_TERRAIN_BEACH:
+        m_colorCycleType = 3;
+        backgroundIndex = 16;
+        m_battlefieldFringe = 2;
+        break;
+    default:
+        backgroundIndex = 0;
+        break;
+    }
+    return cCombatBkgNames[backgroundIndex];
+}
 
+// @early-stop
+// Logic and frame slots are byte-exact. The +0xb2 bound test is the
+// TU-cumulative /Od MAP_HEIGHT operand-load order; the target delinker names
+// normalDirTable+1 as a string, and moves the 0x14-byte local jump table from
+// target +0x13c to base +0x13d after the one-byte bound-test delta.
 VA(0x00491bca, 0x210)
-int combatManager::MoreTreesNear(void) { return 0; }
+int combatManager::MoreTreesNear(void)
+{
+    int treeCount;
+    int x;
+    int y;
+    int mountainCounter;
+    mapCell *combatCell;
+    int radius;
+    int combatOriginX;
+    signed char nearbyTypeTable[3][8];
+    unsigned char nearbyTileset;
+    int nearbyDirection;
+    int centerY;
+
+    memset(nearbyTypeTable, -1, sizeof(nearbyTypeTable));
+    combatOriginX = m_combatX;
+    centerY = m_combatY;
+
+    for (radius = 0; radius < 3; radius++) {
+        for (nearbyDirection = 0; nearbyDirection < 8; nearbyDirection++) {
+            x = normalDirTable[nearbyDirection].x * radius + combatOriginX;
+            y = normalDirTable[nearbyDirection]._1 * radius + centerY;
+            if (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT) {
+                combatCell = gpAdvManager->GetCell(x, y);
+                nearbyTileset = combatCell->objTileset;
+                switch (nearbyTileset) {
+                case COMBAT_TILESET_SNOW_MOUNTAINS:
+                case COMBAT_TILESET_SWAMP_MOUNTAINS:
+                case COMBAT_TILESET_LAVA_MOUNTAINS:
+                case COMBAT_TILESET_DESERT_MOUNTAINS:
+                case COMBAT_TILESET_DIRT_MOUNTAINS:
+                case COMBAT_TILESET_MIXED_MOUNTAINS:
+                case COMBAT_TILESET_CRACKED_MOUNTAINS:
+                case COMBAT_TILESET_GRASS_MOUNTAINS:
+                    nearbyTypeTable[radius][nearbyDirection] = 0;
+                    break;
+                case COMBAT_TILESET_JUNGLE_TREES:
+                case COMBAT_TILESET_EVIL_TREES:
+                case COMBAT_TILESET_SNOW_TREES:
+                case COMBAT_TILESET_SUMMER_TREES:
+                case COMBAT_TILESET_AUTUMN_TREES:
+                    nearbyTypeTable[radius][nearbyDirection] = 1;
+                    break;
+                }
+            }
+        }
+    }
+
+    treeCount = 0;
+    mountainCounter = 0;
+    for (radius = 0; radius < 3; radius++) {
+        for (nearbyDirection = 0; nearbyDirection < 8; nearbyDirection++) {
+            if (nearbyTypeTable[radius][nearbyDirection] == 0)
+                mountainCounter++;
+            if (nearbyTypeTable[radius][nearbyDirection] == 1)
+                treeCount++;
+        }
+    }
+    return mountainCounter < treeCount;
+}
 
 VA(0x00491dda, 0x3e7)
 void combatManager::LoadIcons(void) {}

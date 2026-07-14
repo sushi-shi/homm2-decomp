@@ -47,6 +47,7 @@ DATA(0x00528d3c) extern exeGfxConfig gExecutableGraphics[];
 DATA(0x00528d88) extern int gbShowCombatGrid;
 DATA(0x00528d8c) extern int gbShowCombatMouseHex;
 DATA(0x00528d90) extern int giCombatShadeLevel;
+DATA(0x00528d10) extern long gCombatCycleTimer;
 
 // TILE.cpp inline-asm scratch (no CodeView symbol): the blitter parks the mode word and a
 // mirror-path row counter in static storage between its __asm sections.
