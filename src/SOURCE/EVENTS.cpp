@@ -784,10 +784,10 @@ chestGold:
                 EventSound(eventType, cell->w4hi, &eventSample);
                 NormalDialog("{Xanadu}\n\nThe butler admits you to see the master of the house.  He trains you in the four skills a hero should know.",
                              1, -1, -1, -1, 0, -1, 0, -1, 0);
-                eventHero->m_attack++;
-                eventHero->m_defense++;
-                eventHero->m_knowledge++;
-                eventHero->m_spellPower++;
+                eventHero->m_primaryStats[HERO_PRIMARY_ATTACK]++;
+                eventHero->m_primaryStats[HERO_PRIMARY_DEFENSE]++;
+                eventHero->m_primaryStats[HERO_PRIMARY_KNOWLEDGE]++;
+                eventHero->m_primaryStats[HERO_PRIMARY_SPELL_POWER]++;
                 eventHero->m_xanaduVisits |= 1 << cell->w4hi;
             }
         }
@@ -802,7 +802,7 @@ chestGold:
             EventSound(eventType, cell->w4hi, &eventSample);
             NormalDialog("{Fort}\n\n The soldiers living in the fort teach you a few new defensive tricks.",
                          1, -1, -1, 25, 101, -1, 0, -1, 0);
-            eventHero->m_defense++;
+            eventHero->m_primaryStats[HERO_PRIMARY_DEFENSE]++;
             eventHero->m_fortVisits |= 1 << cell->w4hi;
         }
         else {
@@ -816,7 +816,7 @@ chestGold:
             EventSound(eventType, cell->w4hi, &eventSample);
             NormalDialog("{Standing Stones}\n\nYou've found a group of Druids worshipping at one of their strange stone edifices.  Silently, they teach you new ways to cast spells.",
                          1, -1, -1, 25, 102, -1, 0, -1, 0);
-            eventHero->m_spellPower++;
+            eventHero->m_primaryStats[HERO_PRIMARY_SPELL_POWER]++;
             eventHero->m_standingStoneVisits |= 1 << cell->w4hi;
         }
         else {
@@ -830,7 +830,7 @@ chestGold:
             EventSound(eventType, cell->w4hi, &eventSample);
             NormalDialog("{Witch Doctor's Hut}\n\nAn Orcish witch doctor living in the hut deepens your knowledge of magic by showing you how to cast stones, read portents, and decipher the intricacies of chicken entrails.",
                          1, -1, -1, 25, 103, -1, 0, -1, 0);
-            eventHero->m_knowledge++;
+            eventHero->m_primaryStats[HERO_PRIMARY_KNOWLEDGE]++;
             eventHero->m_witchDoctorVisits |= 1 << cell->w4hi;
         }
         else {
@@ -844,7 +844,7 @@ chestGold:
             EventSound(eventType, cell->w4hi, &eventSample);
             NormalDialog("{Mercenary Camp}\n\nYou've come upon a mercenary camp practicing their tactics.  The mercenaries welcome you and your troops and invite you to train with them.",
                          1, -1, -1, 25, 100, -1, 0, -1, 0);
-            eventHero->m_attack++;
+            eventHero->m_primaryStats[HERO_PRIMARY_ATTACK]++;
             eventHero->m_mercenaryCampVisits |= 1 << cell->w4hi;
         }
         else {
@@ -2534,7 +2534,8 @@ void GiveTakeArtifactStat(hero *targetHero, int artifact, int take)
     for (statChanges[EVENT_ARTIFACT_PRIMARY_STAT_COUNT] = 0;
          statChanges[EVENT_ARTIFACT_PRIMARY_STAT_COUNT] < EVENT_ARTIFACT_PRIMARY_STAT_COUNT;
          statChanges[EVENT_ARTIFACT_PRIMARY_STAT_COUNT]++) {
-        *(&targetHero->m_attack + statChanges[EVENT_ARTIFACT_PRIMARY_STAT_COUNT]) +=
+        targetHero->m_primaryStats[
+            statChanges[EVENT_ARTIFACT_PRIMARY_STAT_COUNT]] +=
             statChanges[statChanges[EVENT_ARTIFACT_PRIMARY_STAT_COUNT]] *
             (take == EVENT_ARTIFACT_TAKE ? -1 : 1);
         if (statChanges[EVENT_ARTIFACT_PRIMARY_STAT_COUNT] == HERO_PRIMARY_KNOWLEDGE &&
@@ -3006,7 +3007,7 @@ chestGoldOrExperience:
 
     case MAP_EVENT_FORT:
         if ((eventHero->m_fortVisits & (1U << cell->w4hi)) == 0) {
-            ++eventHero->m_defense;
+            ++eventHero->m_primaryStats[HERO_PRIMARY_DEFENSE];
             eventHero->m_fortVisits |= 1U << cell->w4hi;
         }
         break;
@@ -3016,31 +3017,31 @@ chestGoldOrExperience:
             eventHero->m_level +
                     eventHero->m_secondarySkills[HERO_SKILL_DIPLOMACY] * 2 >=
                 XANADU_ADMISSION_LEVEL) {
-            ++eventHero->m_attack;
-            ++eventHero->m_defense;
-            ++eventHero->m_knowledge;
-            ++eventHero->m_spellPower;
+            ++eventHero->m_primaryStats[HERO_PRIMARY_ATTACK];
+            ++eventHero->m_primaryStats[HERO_PRIMARY_DEFENSE];
+            ++eventHero->m_primaryStats[HERO_PRIMARY_KNOWLEDGE];
+            ++eventHero->m_primaryStats[HERO_PRIMARY_SPELL_POWER];
             eventHero->m_xanaduVisits |= 1U << cell->w4hi;
         }
         break;
 
     case MAP_EVENT_STANDING_STONES:
         if ((eventHero->m_standingStoneVisits & (1U << cell->w4hi)) == 0) {
-            ++eventHero->m_spellPower;
+            ++eventHero->m_primaryStats[HERO_PRIMARY_SPELL_POWER];
             eventHero->m_standingStoneVisits |= 1U << cell->w4hi;
         }
         break;
 
     case MAP_EVENT_WITCH_DOCTOR_HUT:
         if ((eventHero->m_witchDoctorVisits & (1U << cell->w4hi)) == 0) {
-            ++eventHero->m_knowledge;
+            ++eventHero->m_primaryStats[HERO_PRIMARY_KNOWLEDGE];
             eventHero->m_witchDoctorVisits |= 1U << cell->w4hi;
         }
         break;
 
     case MAP_EVENT_MERCENARY_CAMP:
         if ((eventHero->m_mercenaryCampVisits & (1U << cell->w4hi)) == 0) {
-            ++eventHero->m_attack;
+            ++eventHero->m_primaryStats[HERO_PRIMARY_ATTACK];
             eventHero->m_mercenaryCampVisits |= 1U << cell->w4hi;
         }
         break;
@@ -3642,19 +3643,247 @@ artifactPickup:
 }
 
 VA(0x004b4883, 0x65)
-int advManager::BarrierAIEvent(class mapCell *, class hero *) { return 0; }
+int advManager::BarrierAIEvent(mapCell *cell, hero *)
+{
+    int unusedBarrier15[5];
+    int color = cell->w4hi;
+    color &= AI_EVENT_BARRIER_COLOR_MASK;
+    if (gpCurPlayer->m_barrierTents & (1 << color))
+        return 1;
+    else
+        return 0;
+    return 0;
+}
 
 VA(0x004b48e8, 0x53)
-void advManager::PasswordAIEvent(class mapCell *, class hero *) {}
+void advManager::PasswordAIEvent(mapCell *cell, hero *)
+{
+    int unusedPassword6[1];
+    int color = cell->w4hi;
+    color &= AI_EVENT_BARRIER_COLOR_MASK;
+    gpCurPlayer->m_barrierTents |= (1 << color);
+}
 
 VA(0x004b493b, 0x369)
-void advManager::GenericSiteAIEvent(class mapCell *, class hero *) {}
+// @early-stop: all 0x369 code bytes match after masking 25 relocations. The
+// residual is the two switch tables' delinked local-label identities plus the
+// graveyard multiplier/monster-table folded symbol identities.
+void advManager::GenericSiteAIEvent(mapCell *cell, hero *eventHero)
+{
+    int unusedPair27[2];
+    int artifactIndex1;
+    int siteLevel5;
+    int primaryStat16;
+    int siteType3;
+    int unusedTriple26[3];
+    int cursedArtifactCount5;
+    int creatureType3;
+    int quantity6;
+    int armyValue7;
+
+    cursedArtifactCount5 = 0;
+    siteType3 = cell->w4hi;
+    siteType3 &= AI_EVENT_SITE_TYPE_MASK;
+    siteLevel5 = cell->w4hi;
+    siteLevel5 >>= AI_EVENT_SITE_LEVEL_SHIFT;
+
+    switch (siteType3) {
+    case AI_GENERIC_SITE_CURSED_ARTIFACTS:
+        for (artifactIndex1 = 0; artifactIndex1 < AI_EVENT_ARTIFACT_LIMIT;
+             artifactIndex1++) {
+            if (IsCursedItem(eventHero->m_artifacts[artifactIndex1]))
+                cursedArtifactCount5++;
+        }
+        if (cursedArtifactCount5 != 0 &&
+            gpCurPlayer->m_resources[RES_GOLD] >=
+                AI_EVENT_CURSED_ARTIFACT_GOLD_THRESHOLD) {
+            for (artifactIndex1 = 0; artifactIndex1 < AI_EVENT_ARTIFACT_LIMIT;
+                 artifactIndex1++) {
+                if (IsCursedItem(eventHero->m_artifacts[artifactIndex1]))
+                    eventHero->m_artifacts[artifactIndex1] = -1;
+            }
+            gpCurPlayer->m_resources[RES_GOLD] -= AI_EVENT_CURSED_ARTIFACT_COST;
+        }
+        break;
+    case AI_GENERIC_SITE_SHIPWRECK:
+        if (!(eventHero->m_eventFlags & AI_GENERIC_SITE_SHIPWRECK_FLAG)) {
+            eventHero->m_eventFlags =
+                static_cast<int>(eventHero->m_eventFlags) |
+                AI_GENERIC_SITE_SHIPWRECK_FLAG;
+            switch (eventHero->m_cursorType) {
+            case HERO_CLASS_SORCERESS:
+            case HERO_CLASS_WARLOCK:
+            case HERO_CLASS_WIZARD:
+            case HERO_CLASS_NECROMANCER:
+                primaryStat16 = HERO_PRIMARY_SPELL_POWER;
+                break;
+            case HERO_CLASS_BARBARIAN:
+                primaryStat16 = HERO_PRIMARY_ATTACK;
+                break;
+            case HERO_CLASS_KNIGHT:
+                primaryStat16 = HERO_PRIMARY_DEFENSE;
+                break;
+            default:
+                primaryStat16 = HERO_PRIMARY_ATTACK;
+            }
+            eventHero->m_primaryStats[primaryStat16]++;
+        }
+        break;
+    case AI_GENERIC_SITE_FAERIE_RING:
+        if (!(eventHero->m_eventFlags & AI_GENERIC_SITE_FAERIE_RING_FLAG)) {
+            eventHero->m_eventFlags =
+                static_cast<int>(eventHero->m_eventFlags) |
+                AI_GENERIC_SITE_FAERIE_RING_FLAG;
+            eventHero->m_luck = eventHero->m_luck + 1;
+        }
+        break;
+    case AI_GENERIC_SITE_UNUSED_2:
+    case AI_GENERIC_SITE_UNUSED_3:
+        break;
+    case AI_GENERIC_SITE_GRAVEYARD:
+        if (!(eventHero->m_eventFlags & AI_GENERIC_SITE_GRAVEYARD_FLAG)) {
+            armyValue7 = 0;
+            for (artifactIndex1 = 0;
+                 artifactIndex1 < AI_EVENT_ARMY_STACK_COUNT;
+                 artifactIndex1++) {
+                creatureType3 =
+                    eventHero->m_army.m_creatureTypes[artifactIndex1];
+                if (creatureType3 != AI_EVENT_NO_CREATURE) {
+                    quantity6 = eventHero->m_army.m_quantities[artifactIndex1];
+                    if (quantity6 > AI_EVENT_GRAVEYARD_ARMY_REMAINDER) {
+                        eventHero->m_army.m_quantities[artifactIndex1] =
+                            static_cast<short>(
+                                quantity6 * AI_GENERIC_SITE_GRAVEYARD_REMAINING);
+                        armyValue7 +=
+                            (quantity6 -
+                             eventHero->m_army.m_quantities[artifactIndex1]) *
+                            gMonsterDatabase[creatureType3].hitPoints;
+                    }
+                }
+            }
+            if (armyValue7 != 0)
+                GiveExperience(eventHero, armyValue7, 1);
+            eventHero->m_eventFlags =
+                static_cast<int>(eventHero->m_eventFlags) |
+                AI_GENERIC_SITE_GRAVEYARD_FLAG;
+        }
+        break;
+    case AI_GENERIC_SITE_CREATURE_UPGRADE:
+        if (!(eventHero->m_eventFlags & AI_GENERIC_SITE_CREATURE_UPGRADE_FLAG)) {
+            eventHero->m_eventFlags =
+                static_cast<int>(eventHero->m_eventFlags) |
+                AI_GENERIC_SITE_CREATURE_UPGRADE_FLAG;
+            eventHero->m_mobility += AI_EVENT_CREATURE_UPGRADE_MOBILITY;
+            eventHero->m_remainingMobility += AI_EVENT_CREATURE_UPGRADE_MOBILITY;
+        }
+        if (eventHero->CreatureTypeCount(AI_EVENT_CREATURE_UPGRADE_FROM))
+            eventHero->UpgradeCreatures(AI_EVENT_CREATURE_UPGRADE_FROM,
+                                        AI_EVENT_CREATURE_UPGRADE_TO);
+        break;
+    }
+}
 
 VA(0x004b4ca4, 0x18f)
-void advManager::RecruitSiteAIEvent(class mapCell *, class hero *) {}
+// @early-stop: complete semantics, frame, slots, CFG, and relocation targets.
+// The switch table differs only by delinked local-label identity; the only
+// opcode residual is the packed w4hi assignment's equivalent operand order.
+void advManager::RecruitSiteAIEvent(mapCell *cell, hero *eventHero)
+{
+    int cost16[AI_EVENT_RESOURCE_COUNT];
+    int purchaseCount17;
+    unsigned int packedSite17;
+    short availableCount1;
+    unsigned int siteType3;
+    int creatureType13;
+    int resourceIndex27;
+    int purchaseValue5;
+    int replacementSlot26;
+
+    siteType3 = cell->w4hi;
+    siteType3 &= AI_EVENT_RECRUIT_TYPE_MASK;
+    availableCount1 = static_cast<short>(cell->w4hi);
+    availableCount1 >>= AI_EVENT_RECRUIT_COUNT_SHIFT;
+
+    switch (siteType3) {
+    case 0:
+        creatureType13 = MONSTER_GENIE;
+        break;
+    case 1:
+        creatureType13 = MONSTER_EARTH_ELEMENTAL;
+        break;
+    case 2:
+        creatureType13 = MONSTER_AIR_ELEMENTAL;
+        break;
+    case 3:
+        creatureType13 = MONSTER_FIRE_ELEMENTAL;
+        break;
+    case 4:
+        creatureType13 = MONSTER_WATER_ELEMENTAL;
+        break;
+    }
+
+    if (availableCount1 != 0) {
+        gpPhilAI->EvaluateOneTimeCreaturePurchase(
+            creatureType13, availableCount1, 0, purchaseCount17, purchaseValue5,
+            replacementSlot26);
+        if (purchaseCount17 > 0) {
+            gpGame->GiveArmy(&eventHero->m_army, creatureType13, purchaseCount17,
+                             replacementSlot26);
+            availableCount1 =
+                static_cast<short>(availableCount1 - purchaseCount17);
+            packedSite17 =
+                (availableCount1 << AI_EVENT_RECRUIT_COUNT_SHIFT) | siteType3;
+            cell->w4hi = packedSite17 | 0;
+            GetMonsterCost(creatureType13, cost16);
+            for (resourceIndex27 = 0;
+                 resourceIndex27 < AI_EVENT_RESOURCE_COUNT;
+                 resourceIndex27++) {
+                gpCurPlayer->m_resources[resourceIndex27] -=
+                    cost16[resourceIndex27] * purchaseCount17;
+            }
+        }
+    }
+}
 
 VA(0x004b4e33, 0x1a2)
-void advManager::JailAIEvent(class mapCell *, class hero *, int, int) {}
+// @early-stop: complete semantics, frame, slots, CFG, and relocation targets.
+// The only opcode residual is the final w4hi assignment's equivalent operand
+// evaluation order; two earlier exits also target the identical final five-byte
+// continuation rather than its epilogue destination.
+void advManager::JailAIEvent(mapCell *cell, hero *eventHero, int x, int y)
+{
+    int heroId9;
+    hero *releasedHero13;
+
+    heroId9 = cell->w4hi;
+    if (gpGame->m_availableHeroes[heroId9] != AI_EVENT_JAILED_HERO) {
+        EraseObj(cell, x, y);
+    } else {
+        if (gpCurPlayer->m_heroCount >= AI_EVENT_HERO_LIMIT) {
+        } else {
+            gpGame->m_heroRecs[heroId9].m_owner = eventHero->m_owner;
+            gpGame->m_availableHeroes[heroId9] = eventHero->m_owner;
+            releasedHero13 = &gpGame->m_heroRecs[heroId9];
+            EraseObj(cell, x, y);
+            gpCurPlayer->m_heroIds[gpCurPlayer->m_heroCount] =
+                static_cast<signed char>(heroId9);
+            gpCurPlayer->m_heroCount++;
+            releasedHero13->m_x = x;
+            releasedHero13->m_y = y;
+            releasedHero13->m_eventFlags = 0;
+            releasedHero13->m_direction = AI_EVENT_HERO_DIRECTION;
+            releasedHero13->m_remainingMobility = releasedHero13->CalcMobility();
+            releasedHero13->m_mobility = releasedHero13->m_remainingMobility;
+            releasedHero13->m_locationType = cell->triggerType;
+            releasedHero13->m_occupiedTown = cell->w4hi;
+            cell->triggerType = MAP_EVENT_ACTION_FLAG | MAP_EVENT_HERO_INTERACTION;
+            cell->w4hi = heroId9;
+            SendMapChange(AI_EVENT_HERO_MAP_CHANGE,
+                          static_cast<signed char>(heroId9), x, y,
+                          AI_EVENT_HERO_MAP_CHANGE_VALUE, 0, 0);
+        }
+    }
+}
 
 VA(0x004b4fd5, 0x82b)
 void advManager::PlayerMonsterInteract(mapCell *cell, mapCell *combatCell, hero *eventHero,

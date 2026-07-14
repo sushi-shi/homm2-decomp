@@ -50,6 +50,8 @@ typedef enum HeroPrimaryStat {
     HERO_PRIMARY_KNOWLEDGE = 3
 } HeroPrimaryStat;
 
+#define HERO_PRIMARY_STAT_COUNT 4
+
 typedef enum HeroEventFlag {
     HERO_EVENT_BUOY = 0x2,
     HERO_EVENT_FOUNTAIN = 0x4,
@@ -105,11 +107,8 @@ public:
     int m_remainingMobility;  // +0x35
     int m_experience;  // +0x39
     short m_level;  // +0x3d
-    signed char m_attack;  // +0x3f
-    signed char m_defense;  // +0x40
-    signed char m_spellPower;  // +0x41
-    signed char m_knowledge;  // +0x42
-    char _pad_0x43[0x1];
+    signed char m_primaryStats[4];  // +0x3f
+    signed char m_unknown43;  // +0x43
     signed char m_morale;  // +0x44
     signed char m_luck;  // +0x45
     char _pad_0x46[0x1];
