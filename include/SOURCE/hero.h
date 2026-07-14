@@ -51,6 +51,7 @@ typedef enum HeroPrimaryStat {
 } HeroPrimaryStat;
 
 #define HERO_PRIMARY_STAT_COUNT 4
+#define HERO_ARTIFACT_SLOT_COUNT 14
 
 typedef enum HeroEventFlag {
     HERO_EVENT_BUOY = 0x2,
@@ -126,7 +127,7 @@ public:
     signed char m_secondarySkillOrder[14];  // +0x82
     int m_secondarySkillCount;  // +0x90
     signed char m_spells[65];  // +0x94
-    signed char m_artifacts[14];  // +0xd5
+    signed char m_artifacts[HERO_ARTIFACT_SLOT_COUNT];  // +0xd5
     union {
         unsigned int m_eventFlags;  // +0xe3
         struct {
