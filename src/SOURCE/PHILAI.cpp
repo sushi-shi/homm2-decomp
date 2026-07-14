@@ -366,7 +366,7 @@ int philAI::GoodAdjacent(int *direction) {
                 if (gpAdvManager->GetCell(kn, nb)->triggerType == AI_OBJECT_TOWN) {
                     ra = gpAdvManager->GetCell(kn, nb)->w4hi;
                     if (reinterpret_cast<townView *>(GetCastleSlot(ra))->owner == giCurPlayer)
-                        if (gpCurAIHero->field_0x7 == giCurTurn)
+                        if (gpCurAIHero->m_lastTownInteractionTurn == giCurTurn)
                             continue;
                 }
                 if (gpAdvManager->GetCell(kn, nb)->triggerType == AI_OBJECT_HERO) {
@@ -743,7 +743,7 @@ void philAI::DoAI(int player) {
                      pathIndex3[0]++) {
                     currentHero15 = GetHeroSlot(
                         reinterpret_cast<pdView*>(gpCurPlayer)->heroIds[pathIndex3[0]]);
-                    currentHero15->field_0x7 = -99;
+                    currentHero15->m_lastTownInteractionTurn = -99;
                 }
             }
             ShowStatus();
@@ -3284,7 +3284,7 @@ void philAI::HeroInteractionAtTown(hero *heroPtr, town *townPtr, int doInteracti
             gbPossibleShipyardFound = 1;
         }
     } else {
-        heroPtr->field_0x7 = static_cast<short>(giCurTurn);
+        heroPtr->m_lastTownInteractionTurn = static_cast<short>(giCurTurn);
         heroPtr->m_visitedTownId = static_cast<unsigned char>(
             reinterpret_cast<townView *>(townPtr)->id);
         if (!heroPtr->HasArtifact(AI_ARTIFACT_MAGIC_BOOK) &&
@@ -3691,7 +3691,7 @@ void philAI::BuildHero(town *townPtr, int availableHeroIndex) {
         gpCurPlayer->AvailableHeroId(availableHeroIndex)];
     gpGame->SetRandomHeroArmies(static_cast<unsigned char>(newHero6->m_id), 1);
     newHero6->m_lastHeroInteractionTurn = AI_HERO_BUILD_COORDINATE_UNSET;
-    newHero6->field_0x7 = AI_HERO_BUILD_COORDINATE_UNSET;
+    newHero6->m_lastTownInteractionTurn = AI_HERO_BUILD_COORDINATE_UNSET;
     newHero6->m_owner = static_cast<char>(giCurPlayer);
     newHero6->m_x = townX37;
     newHero6->m_y = townY9;

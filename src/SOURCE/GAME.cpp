@@ -2869,8 +2869,12 @@ void game::NextPlayer(void)
     int humanCount;
     int index;
 
-    m_heroRecs[gpCurPlayer->m_availableHeroIds[0]].m_weeklyVisit = 0;
-    m_heroRecs[gpCurPlayer->m_availableHeroIds[1]].m_weeklyVisit = 0;
+    m_heroRecs[gpCurPlayer->m_availableHeroIds[0]].m_eventFlags =
+        m_heroRecs[gpCurPlayer->m_availableHeroIds[0]].m_eventFlags &
+        ~HERO_EVENT_WEEKLY_VISIT;
+    m_heroRecs[gpCurPlayer->m_availableHeroIds[1]].m_eventFlags =
+        m_heroRecs[gpCurPlayer->m_availableHeroIds[1]].m_eventFlags &
+        ~HERO_EVENT_WEEKLY_VISIT;
     iCurHourGlassPhase = 0;
 
     if (gbThisNetHumanPlayer[giCurPlayer] && gConfig.autosave) {
