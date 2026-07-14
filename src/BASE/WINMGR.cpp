@@ -28,8 +28,15 @@
 // ---- module-private synthetic globals (retail xref: single-module) ----
 DATA(0x0053496c) static unsigned int gFadeSavedUpdate; // saved update flag across a fade (heroWindowManager::FadeScreen)
 
-// @early-stop
-// /O2 regalloc wall: retail 0x3a3 vs base 0x398; first residual is the 8-color loop's ecx/esi induction-register exchange, followed by relocation-name-only gCyclePal subobject aliases. All six memmove spans, three frame modulo/reflection paths, final 84-byte copy, counters, and UpdatePalette call match.
+// @match-note
+// Structurally complete /O2 checkpoint: the 0xc frame, all six memmove spans,
+// three modulo/reflection paths, final 84-byte copy, counters and palette update
+// agree. Base is 0x390 bytes versus retail's 0x3a3 code span; the first raw
+// difference is +0x1e and 160 unmasked bytes remain. The first real residual is
+// the eight-color loop's ECX/ESI induction exchange; later gCyclePal subobjects
+// also have delinked literal owners. Explicit indexed and pointer-terminated
+// destination loops regressed to 90.66% and 89.96%; revisit after a new TU state.
+// Tried-state hashes: docs/matching-matrices/winmgr-structural-6148770.tsv.
 VA(0x004ca6d0, 0x3a3)
 void CycleColors(int forceUpdate)
 {
@@ -130,12 +137,16 @@ heroWindowManager::heroWindowManager(void) : baseManager()
     m_fizzleSource = 0;
     m_screenshotIndex = 1;
     m_fizzleWork = 0;
-    field_0x5e = -1;
+    m_lastHoverId = -1;
     m_dialogResult = -1;
 }
 
-// @early-stop
-// /O2 scheduling wall: both spans are 0xd6 and bytes through the framebuffer rep stosd match; only the final 14-instruction manager-field/string-copy block schedules the Open argument in ecx vs eax around the same three stores.
+// @match-note
+// Structurally complete /O2 checkpoint: both code spans are 0xd6, there is no
+// local frame, and all 9 relocations agree. Bytes through the framebuffer rep
+// stosd match; the final manager-field/string-copy block leaves 24 unmasked bytes
+// from +0x95 because retail schedules the Open argument in ECX rather than EAX
+// around the same three stores. An explicit open-mode lifetime emitted no change.
 VA(0x004caad0, 0xd6)
 int heroWindowManager::Open(int param_1)
 {
@@ -183,6 +194,12 @@ void heroWindowManager::Close(void)
     }
 }
 
+// @match-note
+// Structurally complete /O2 checkpoint: both code spans are 0x2d with no frame and
+// 1/1 relocation. Seven unmasked bytes differ from +0x05 because retail assigns
+// EDI to the window-list cursor and ESI to the message while base swaps them; the
+// call, result-range test, previous-link walk and CFG agree. Reversing declaration
+// order emitted the same code. Revisit only after a predecessor/header TU change.
 VA(0x004cac00, 0x2d)
 int heroWindowManager::Main(struct tag_message &msg)
 {
@@ -203,8 +220,13 @@ int heroWindowManager::ConvertToHover(struct tag_message &msg)
     return Main(msg);
 }
 
-// @early-stop
-// /O2 scheduling wall: both spans are 0x35; the sole residual moves the vtable load across the message.payload.widget.data.value store (retail load/store, base store/load), with identical stack fields and slot-2 virtual call.
+// @match-note
+// Structurally complete /O2 checkpoint: both code spans are 0x35, the 0x1c message
+// frame and every initialized message field agree, and there are no relocations.
+// Seven unmasked bytes differ from +0x24 solely because retail loads the vtable
+// before storing message.payload.widget.data.value while base performs those two
+// operations in reverse;
+// both make the same slot-2 virtual call. Revisit after a new combined TU state.
 VA(0x004cac40, 0x35)
 int heroWindowManager::BroadcastMessage(int type, int p2, int p3, int p4)
 {
@@ -216,8 +238,14 @@ int heroWindowManager::BroadcastMessage(int type, int p2, int p3, int p4)
     return Main(msg);
 }
 
-// @early-stop
-// /O2 regalloc wall: retail 0xbc vs base 0xb3; the nine bytes are two mov ebp,0 encodings vs xor ebp,ebp plus head-insertion load/store scheduling. Open call, list search, and all head/tail/middle links match.
+// @match-note
+// Structurally complete /O2 checkpoint: retail link-assignment order and an
+// explicit second head snapshot raised this from 92.16% to 97.35%. The Open call,
+// ordered search and all head/tail/middle links now agree; 1/1 relocation agrees.
+// Base is 0xb6 bytes versus retail 0xbc. The remaining semantic diff is two
+// `xor ebp,ebp` encodings versus `mov ebp,0`, plus EAX/ECX selection for the head
+// snapshot; raw branch displacements make 155 bytes differ from +0x0d. Cached-head,
+// cached-tail and alternate assignment-order variants are recorded in the matrix.
 VA(0x004cac80, 0xbc)
 void heroWindowManager::AddWindow(class heroWindow *w, int param_2, int param_3)
 {
@@ -239,15 +267,15 @@ void heroWindowManager::AddWindow(class heroWindow *w, int param_2, int param_3)
         } while (cur != 0);
     }
     if (cur == 0) {
-        heroWindow *head = m_windowListHead;
+        w->m_nextWindow = m_windowListHead;
         w->m_prevWindow = 0;
-        w->m_nextWindow = head;
+        heroWindow *head = m_windowListHead;
         m_windowListHead = w;
         if (head == 0)
             m_windowListTail = w;
     } else if (cur->m_nextWindow == 0) {
-        w->m_nextWindow = 0;
         w->m_prevWindow = m_windowListTail;
+        w->m_nextWindow = 0;
         m_windowListTail->m_nextWindow = w;
         m_windowListTail = w;
     } else {
@@ -260,8 +288,12 @@ void heroWindowManager::AddWindow(class heroWindow *w, int param_2, int param_3)
     m_focusWindow = w;
 }
 
-// @early-stop
-// /O2 scheduling wall: retail 0x87 vs base 0x89; only cmp [this+tail],window vs mov ecx,[this+tail];cmp ecx,window differs (+2 bytes). Close call and every link/focus store match.
+// @match-note
+// Structurally complete /O2 checkpoint: the Close call, every head/tail link and
+// focus transition agree, with 1/1 relocation and no local frame. Retail's 0x87
+// code uses `cmp [this+tail],window`; base's 0x89 form loads the tail into ECX first,
+// causing 81 raw branch/displacement bytes to differ from +0x0b. Moving the previous
+// pointer into branch-local scopes regressed to 90.10%; retain the shared lifetime.
 VA(0x004cad40, 0x87)
 void heroWindowManager::RemoveWindow(class heroWindow *w)
 {
@@ -296,8 +328,12 @@ void heroWindowManager::RemoveWindow(class heroWindow *w)
     }
 }
 
-// @early-stop
-// /O2 scheduling + synthetic-reloc wall: both spans are 0x1cf; residual code is one message.payload.widget.id load moved across mov ebp,1. The two gFadeSavedUpdate relocs name the same DATA(0x0053496c) address; all dialog calls/control flow match.
+// @match-note
+// Structurally complete /O2 checkpoint: both code spans are 0x1cf with the exact
+// 0x38 frame, full dialog CFG and 31/31 relocations. Nine unmasked bytes differ at
+// +0x152 because one message.payload.widget.id load crosses `mov ebp,1`. The two displayed
+// gFadeSavedUpdate names resolve to the same DATA(0x0053496c), but the scheduling
+// bytes are real, so this is not an artifact wall. Revisit after a new TU state.
 VA(0x004cadd0, 0x1cf)
 int heroWindowManager::DoDialog(class heroWindow *window, int (*handler)(struct tag_message &),
                                 int fade)
@@ -310,7 +346,7 @@ int heroWindowManager::DoDialog(class heroWindow *window, int (*handler)(struct 
     if (iDialogNestCount == 0)
         SetNoDialogMenus(0);
     iDialogNestCount++;
-    field_0x5e = -1;
+    m_lastHoverId = -1;
     if (window != 0)
         AddWindow(window, -1, 1);
     if (fade != 0) {
@@ -433,16 +469,19 @@ void heroWindowManager::ScreenShot(void)
     gpInputManager->Flush();
 }
 
-// @early-stop
-// /O2 regalloc wall: retail 0xc0 vs base 0xc6; clipping and allocation/call sequence match, while this/height color as ebp/ebx in retail vs ebx/ebp in base, perturbing six bytes of encodings and push scheduling.
+// @match-note
+// Structurally complete /O2 checkpoint: removing the decompiler-only originalX
+// snapshot recovered direct `width += x` clipping, exact 0xc0 code size and raised
+// the match from 78.49% to 95.35%. All clipping branches, bitmap lifetime, calls and
+// 5/5 relocations agree. Twenty-one unmasked bytes remain from +0x18 because width,
+// height and Y use ESI/EDI/EBX instead of retail's EDI/EBX/ESI, changing push order.
 VA(0x004cb110, 0xc0)
 void heroWindowManager::SaveFizzleSource(int x, int y, int width, int height)
 {
     if (bShowIt != 0) {
-        int originalX = x;
         if (x < 0) {
+            width += x;
             x = 0;
-            width += originalX;
         }
         if (y < 0) {
             height += y;
@@ -464,24 +503,27 @@ void heroWindowManager::SaveFizzleSource(int x, int y, int width, int height)
 VA(0x004cb1d0, 0x1)
 void CreateFizzleTables(void) {}
 
-// @early-stop
-// /O2 regalloc wall: retail 0x402 vs base 0x41e; complete clipping, 8-frame resource/read/pixel/palette loops, delays, blits, deletes, and frees match. Residuals are stack/register coloring plus equivalent SIB/order in the 16-bit color-table index loop; no calls or stores are missing.
+// @match-note
+// Structurally complete /O2 checkpoint: direct `width += x` / `height += y`
+// clipping removed the decompiler-only original-coordinate snapshots and raised
+// this from 90.14% to 91.61%. The 0x2c frame, clipping CFG, eight resource/read/
+// pixel/palette iterations, delays, blits, deletes, frees and all 33 relocations
+// agree. Base is 0x418 bytes versus retail's 0x402 code; 564 raw bytes differ from
+// +0x18 through stack/register coloring and equivalent 16-bit lookup SIB order.
 VA(0x004cb1e0, 0x402)
 void heroWindowManager::FizzleForward(int x, int y, int width, int height, int delay,
                                       signed char *startPalette, signed char *endPalette)
 {
     if (bShowIt != 0) {
-        int originalX = x;
-        int originalY = y;
         gbEnlargeScreenBlit = 0;
         int tick = 0;
         if (x < 0) {
+            width += x;
             x = 0;
-            width += originalX;
         }
         if (y < 0) {
+            height += y;
             y = 0;
-            height += originalY;
         }
         if (x + width > 640)
             width = 640 - x;

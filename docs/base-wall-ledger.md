@@ -1,7 +1,7 @@
 # BASE `@early-stop` proof ledger
 
 This ledger audits every current `@early-stop` marker under `src/BASE` from base checkpoint
-`625e799`, plus the accepted SAMPLE source/header state identified in the audit snapshot.
+`775f0d3`, plus the accepted WINMGR/shared-member state identified in the audit snapshot.
 It is deliberately stricter than the prose beside the functions: a score or a claim that
 instructions are "the same" is not proof.  The audit joined the current
 `build/objdiff/report.json` (refreshed with `homm2 status`) to
@@ -28,17 +28,21 @@ No BASE marker presently meets the soft-TU-cumulative checklist.
 
 The counts and rows below are pinned to the following fully rebuilt state:
 
-- Base Git checkpoint: `625e799`
-- Accepted `src/BASE/SAMPLE.cpp` SHA-256:
-  `4f2669954a4e724dc7480d63c1976b2c196a362458de3e57d0e9a68aef2120e3`
-- Accepted `include/BASE/sample.h` SHA-256:
-  `15ec2254596e7d8f9773b842193f5c2ba83b6ad6072fa948ef231b00122d3648`
+- Base Git checkpoint: `775f0d3`
+- Accepted `src/BASE/WINMGR.cpp` SHA-256:
+  `255975bbfae92f01fe9eb603abdeaa48996f937759f7bfb7678efee46ae25df5`
+- Accepted `include/BASE/heroWindowManager.h` SHA-256:
+  `68a628f236fb7603240d0b766df838fcd845e3318391c632473521675ee0ea61`
+- Accepted `src/SOURCE/GAME.cpp` SHA-256:
+  `35db1e6f05dae168c7315b4e6639429fa9fdc79fad963cfa2e6ddbbae7ed95f7`
+- Accepted `src/SOURCE/SPELLS.cpp` SHA-256:
+  `5c611ade00f62636c124da6741638e0286278dc8a388f477f5d219e11c3f0563`
 - `build/objdiff/report.json` SHA-256:
-  `0cc524f93a240e04eb0bd78d11fb98ade3f5721353a6cafe2982b0589e799c40`
+  `6a346956e9f8535010d2249d21dc16eac958bb97f0c6640177894934d387524b`
 - `config/match_baseline.tsv` SHA-256:
-  `11627ae9d91a47efe09be197ca0bd5b575e5f2890ba403ce91d2457f543dd415`
+  `2c4db5795133477413bd2c7c50c6bf4985b0ba8b8de67ecbfddffe54613a7abb`
 - Sorted `rg -n '@early-stop' src/BASE` inventory SHA-256:
-  `ad6a85e330207425e3fd8dcdb96dd1005d32bb8b4302ca6448740fa5849783e0`
+  `2d27f20638aadd1a9f9d313c18ad8ecf8578bd686adfdddb079058d770064b5e`
 
 Recompute all listed identities before reusing classifications after a root/header/source change.
 
@@ -48,8 +52,8 @@ Recompute all listed identities before reusing classifications after a root/head
 | :--- | ---: | :--- |
 | `proven-artifact` | 9 | Seven ordinary function markers and two generated destructor aliases. |
 | `proven-soft-TU-cumulative` | 0 | No marker has the required frame/slot, standalone, combined-root, and exact-predecessor proof bundle. |
-| `unresolved/not-a-wall` | 68 | Includes five unproved deleting-destructor tradeoffs and two stale markers on exact functions. |
-| **Total** | **77** | Exactly 70 ordinary rows plus seven generated-alias rows: one row per current source marker. |
+| `unresolved/not-a-wall` | 60 | Includes five unproved deleting-destructor tradeoffs and two stale markers on exact functions. |
+| **Total** | **69** | Exactly 62 ordinary rows plus seven generated-alias rows: one row per current source marker. |
 
 Syntax/state defects found by the audit:
 
@@ -155,14 +159,6 @@ and live scores are shown as `retained/live`.
 | `WIDGET` | `0x004dded0` `widget::Close` | unscored | proven-artifact | candidate named body and retail `empty_stub` are the same single `c3`, rel 0/0 | [empty-stub proof pattern](patterns/retail-empty-stubs.md) | A1 |
 | `WIDGET` | `0x004ddee0` `widget::Main` | 99.5667/99.5667 | unresolved/not-a-wall | Δ=14; rel 17/17 | [source note](../src/BASE/WIDGET.cpp#L86) | R2 |
 | `WINDOW` | `0x004cecd0` `heroWindow::heroWindow(resource)` | 99.9167/99.9167 | proven-artifact | Δ=0 over 0x521 bytes after 57 relocation payloads; 0x68 frame and EBP displacements exact; only folded dispatch/table identities remain | [WINDOW matrix](matching-matrices/README.md#basewindow-whole-tu-jump-table-revalidation) | A1 |
-| `WINMGR` | `0x004ca6d0` `CycleColors` | 91.5172/90.6743 | unresolved/not-a-wall | Δ=149; rel 69/71 | [source note](../src/BASE/WINMGR.cpp#L31) | R1 |
-| `WINMGR` | `0x004caad0` `heroWindowManager::Open` | 94.1364/94.1364 | unresolved/not-a-wall | Δ=24; rel 9/9 | [source note](../src/BASE/WINMGR.cpp#L137) | R1 |
-| `WINMGR` | `0x004cac40` `heroWindowManager::BroadcastMessage` | 81.1765/81.1765 | unresolved/not-a-wall | Δ=7; rel 0/0 | [source note](../src/BASE/WINMGR.cpp#L206) | R1 |
-| `WINMGR` | `0x004cac80` `heroWindowManager::AddWindow` | 92.1622/92.1622 | unresolved/not-a-wall | Δ=157; rel 1/1 | [source note](../src/BASE/WINMGR.cpp#L219) | R1 |
-| `WINMGR` | `0x004cad40` `heroWindowManager::RemoveWindow` | 93.7755/93.7755 | unresolved/not-a-wall | Δ=81; rel 1/1 | [source note](../src/BASE/WINMGR.cpp#L263) | R1 |
-| `WINMGR` | `0x004cadd0` `heroWindowManager::DoDialog` | 99.1111/99.1111 | unresolved/not-a-wall | Δ=9; rel 31/31 | [source note](../src/BASE/WINMGR.cpp#L299) | R2 |
-| `WINMGR` | `0x004cb110` `heroWindowManager::SaveFizzleSource` | 79.0563/79.0563 | unresolved/not-a-wall | Δ=140; rel 5/5 | [source note](../src/BASE/WINMGR.cpp#L436) | R1 |
-| `WINMGR` | `0x004cb1e0` `heroWindowManager::FizzleForward` | 88.6743/88.6743 | unresolved/not-a-wall | Δ=737; rel 30/33 | [source note](../src/BASE/WINMGR.cpp#L467) | R1 |
 | `droplist` | `0x004dc2e0` `dropListWidget::Main` | 99.8745/99.8745 | proven-artifact | Δ=0 over 0x350 bytes; rel 22/22; external sites agree and seven dispatch/table sites are owner-label aliases | [source note](../src/BASE/droplist.cpp#L126) | A1 |
 | `icon2bs` | `0x004d2f90` `IconToBitmapScale` | 76.3262/76.3262 | unresolved/not-a-wall | Δ=317; rel 4/4 | [source note](../src/BASE/icon2bs.cpp#L12) | R1 |
 | `icon2by` | `0x004da270` `IconToBitmapYModify` | 91.5102/91.5102 | unresolved/not-a-wall | Δ=405; rel 129/130 | [manual matrix](matching-matrices/iconf2by-manual.tsv) | R1 |
@@ -187,30 +183,17 @@ a weak `??_E`.  A report score of zero or an absent row says nothing about the b
 
 ## Semantic-layout debt census
 
-The current BASE headers contain **133** `field_0xNN` declarations across **15** headers.  This is
-structural debt, not padding evidence: each field should be replaced only when retail use sites,
-CodeView, serialized data, or size/offset evidence identifies the real member.  An enum name does
-not justify changing the proved storage width; known serialized domains should use a header-level
-`typedef enum` with explicit values while preserving layout.
+Do not cache a field count here; it becomes stale as soon as another TU recovers a member. Derive
+the live inventory directly from the tree:
 
-| Header | `field_0xNN` declarations |
-| :--- | ---: |
-| `baseManager.h` | 2 |
-| `bitmap.h` | 1 |
-| `button.h` | 1 |
-| `dropListWidget.h` | 58 |
-| `executive.h` | 1 |
-| `heroWindowManager.h` | 1 |
-| `icon.h` | 1 |
-| `inputManager.h` | 11 |
-| `listBoxWidget.h` | 40 |
-| `mouseManager.h` | 8 |
-| `resource.h` | 1 |
-| `soundManager.h` | 5 |
-| `textEntryWidget.h` | 1 |
-| `textWidget.h` | 1 |
-| `widget.h` | 1 |
-| **Total** | **133** |
+```sh
+rg -n 'field_0x[0-9A-Fa-f]+' include/BASE
+```
+
+These declarations are structural debt, not padding evidence. Replace a field only when retail use
+sites, CodeView, serialized data, or size/offset evidence identifies the real member. An enum name
+does not justify changing proved storage width; known serialized domains should use a header-level
+`typedef enum` with explicit values while preserving layout.
 
 There are currently **zero** Ghidra-style `iVarN`/`uVarN` identifiers in `src/BASE` or
 `include/BASE`.  That does not certify clean structure: the real-offset discrepancy in the
