@@ -355,8 +355,12 @@ extern "C" char __fastcall nb_stat(short session) { return gNetStatus[session]; 
 // nb_thr_ctl — the receiver-thread pump: drain completed per-session receives into the rcv queue,
 // then drain the send/free queues, issuing a synchronous NCBSEND for each queued packet.
 // @early-stop
-// reloc-masked: all 0xdd2 CodeView-span bytes match, including 11 folded
-// static helpers; 6.73% is boundary/local identity only; external targets agree.
+// Byte-proven delinker wall: the explicit 0xdd2-byte CodeView span, including
+// 11 folded static helpers, has 124 raw differences and all are inside the
+// union of 242 base and 226 retail relocation fields; zero bytes remain.
+// The 49 shared external relocations have identical targets. The 16 base-only
+// sites are 11 IAT calls and five calls to folded helpers whose retail rel32
+// bytes resolve to the same entries. The 6.73% score is local identity only.
 VA(0x004a7758, 0xdd2)
 void nb_thr_ctl(void)
 {
