@@ -278,11 +278,11 @@ must continue this function before taking unrelated work.
 
 Canonical source state:
 
-- checkpoint: `215f379`
+- checkpoint: `90cd47a`
 - target: RVA `0xd9ce0`, retail size `0x58d`
 - `src/BASE/iconf2by.cpp`:
-  `8789a527e8c2b254326fef8607c51e97db04ef9776fe8cefce75dc416be0cd45`
-- live checkpoint: 89.0885%, candidate size `0x57a`, 143 candidate vs 144 retail relocations,
+  `3b0c5bfd8568bbd84de68760903ab6f2bcb82f6723f04e5fd6a0bd9207ba948e`
+- live checkpoint: 89.101875%, candidate size `0x57a`, 143 candidate vs 144 retail relocations,
   no candidate-only target
 - the decoder aligns instruction-for-instruction through extended-run setup;
 - candidate and retail now both reserve the otherwise-unused four-byte frame slot
@@ -300,6 +300,8 @@ Canonical source state:
 - restored the right literal quadrant's zero-skip-first polarity and common computed-skip
   publication;
 - recovered the unsigned fill-count snapshot that produces the retail frame.
+- formed the right-quadrant destination once and published it in both arms, moving the global
+  destination store between the compare and branch as retail does.
 
 The only remaining scratch relocation-count difference is `gFYClipR` 6/7; every other scratch and
 global count agrees. The candidate keeps `shear` in EBP, while retail pins `clipW`, overwrites the
@@ -388,6 +390,14 @@ Source-advancement and frame axes after `b60f188`:
 - unsigned clip width: 88.02% with an eight-byte frame; reverted;
 - scoped shear aliases: 88.89%; reverted;
 - `register` and `const` width forms: byte-identical.
+
+Destination-placement axes after `215f379`:
+
+- one right-destination value formed before the quadrant test and published in both arms:
+  89.101875%, retained;
+- direct pointer-base, commuted subscript, commuted branch-common local, split edge-first local,
+  right-count local, right-row/`register` local, and integer right-destination forms:
+  byte-identical and reverted.
 
 Retail's four-byte frame slot is never accessed: every ESP-relative retail access is an argument,
 and after `sub esp,4` plus four pushes the smallest displacement is `0x18`. The slot is allocator
