@@ -1,7 +1,7 @@
 # BASE `@early-stop` proof ledger
 
-This ledger audits every current `@early-stop` marker under `src/BASE` from base checkpoint
-`1f10d4a`, plus the accepted BORDER source identified in the audit snapshot.
+This ledger audits every current `@early-stop` marker under `src/BASE` from integration base
+checkpoint `942c94a`, with the accepted dirty source identities pinned below.
 It is deliberately stricter than the prose beside the functions: a score or a claim that
 instructions are "the same" is not proof.  The audit joined the current
 `build/objdiff/report.json` (refreshed with `homm2 status`) to
@@ -28,23 +28,31 @@ No BASE marker presently meets the soft-TU-cumulative checklist.
 
 The counts and rows below are pinned to the following fully rebuilt state:
 
-- Base Git checkpoint: `1f10d4a71ac02824e39b6178f94eacd2817cb449`
+- Integration base Git checkpoint: `942c94a402573d7448a6a9343de7296815798e23`
 - Accepted `src/BASE/BORDER.cpp` SHA-256:
-  `f3028b809e1ed1fd78392078c5be6c1df26c39fb18dfd73bd5f64469458d0bca`
+  `ad400f790c7bc196189a5393eca758a0fa213ccd7693d6310057bd92e0eda4d0`
 - Accepted `src/BASE/WINMGR.cpp` SHA-256:
-  `255975bbfae92f01fe9eb603abdeaa48996f937759f7bfb7678efee46ae25df5`
+  `b27afc6f3ee676396f9802c41e9fee3fe63557992418cad9833866005b1e3b69`
+- Accepted `src/BASE/BUTTON.cpp` SHA-256:
+  `37c1d4dd67d5599388b14c175c525879836d458b3e54e2bee4a482e8458b2a22`
 - Accepted `include/BASE/heroWindowManager.h` SHA-256:
   `68a628f236fb7603240d0b766df838fcd845e3318391c632473521675ee0ea61`
+- Accepted `include/BASE/button.h` SHA-256:
+  `0fc288b1e73b4e691a2acbd08e5e656ab3d805082f2b87b8c64691973e5df64d`
+- Accepted `include/BASE/widget.h` SHA-256:
+  `fef7bbcfbedd94b1e94e96b9fa0b121522a5a08c746c3e44015f375f370ff43c`
+- Accepted `include/_carcass_types.h` SHA-256:
+  `457c1114c0ee7e2f185a88124b015d56da97b2292c2ab09e8e67abb3b2d51995`
 - Accepted `src/SOURCE/GAME.cpp` SHA-256:
-  `35db1e6f05dae168c7315b4e6639429fa9fdc79fad963cfa2e6ddbbae7ed95f7`
+  `0ab36df97e9567ece70b52b505b105edf28e08748a6020e6c3d270886d4b64b2`
 - Accepted `src/SOURCE/SPELLS.cpp` SHA-256:
-  `5c611ade00f62636c124da6741638e0286278dc8a388f477f5d219e11c3f0563`
+  `bb101342c4fea059a2fd1864212df6a48f5fc67c04ed59508ca4fa5c96c1842d`
 - `build/objdiff/report.json` SHA-256:
-  `f8f916c9b793385956d17ef1c64b4179977942ec53c2fa3dc8dea62f111d7c4f`
+  `c1d94570ff641b00bba0efdaafd74c996e02092897e4b7bb15413465aa430bab`
 - `config/match_baseline.tsv` SHA-256:
-  `149ba03ec0a35081f1effba9a35490423d98c4dcfccfd14effcaa5ea99253caa`
+  `cc742c5111179bb5dfce9f82afe062413375a2d015b4d8f78d1ae44c4fc67763`
 - Sorted `rg -n '@early-stop' src/BASE` inventory SHA-256:
-  `fe5cb2b67b9cf70ff765a230cbaddf04dedda61d4dd76f5bfd4960180049f951`
+  `bec091269258fa4034f177254f1dcad31ad20b7f7e02821dd7a5f290ee0a57d8`
 
 Recompute all listed identities before reusing classifications after a root/header/source change.
 
@@ -52,10 +60,10 @@ Recompute all listed identities before reusing classifications after a root/head
 
 | Category | Marker count | Notes |
 | :--- | ---: | :--- |
-| `proven-artifact` | 10 | Eight ordinary function markers and two generated destructor aliases. |
+| `proven-artifact` | 11 | Eight ordinary function markers and three generated destructor aliases. |
 | `proven-soft-TU-cumulative` | 0 | No marker has the required frame/slot, standalone, combined-root, and exact-predecessor proof bundle. |
-| `unresolved/not-a-wall` | 58 | Includes four unproved deleting-destructor tradeoffs and two stale markers on exact functions. |
-| **Total** | **68** | Exactly 62 ordinary rows plus six generated-alias rows: one row per current source marker. |
+| `unresolved/not-a-wall` | 54 | Includes three unproved deleting-destructor tradeoffs and two stale markers on exact functions. |
+| **Total** | **65** | Exactly 59 ordinary rows plus six generated-alias rows: one row per current source marker. |
 
 Syntax/state defects found by the audit:
 
@@ -105,9 +113,6 @@ and live scores are shown as `retained/live`.
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | `BITS` | `0x004d1594` `BitTest` | 47.6316/47.6316 | unresolved/not-a-wall | Δ=44; rel 0/0 | [source note](../src/BASE/BITS.cpp#L11) | R1 |
 | `BORDER` | `0x004d22f0` `border::Main` | 99.7989/99.7989 | proven-artifact | Δ=0 over all 0x181 bytes after 9/9 relocation-union masking; two external widget::Main calls agree, seven dispatch/table sites are local-owner aliases | [source note](../src/BASE/BORDER.cpp#L87) | A1 |
-| `BUTTON` | `0x004dd6d0` `button::Main` | 94.3705/94.3705 | unresolved/not-a-wall | Δ=823; rel 36/36 | [source note](../src/BASE/BUTTON.cpp#L95) | R1 |
-| `BUTTON` | `0x004ddc70` `button::Select` | 89.0652/89.0652 | unresolved/not-a-wall | Δ=105; rel 6/6 | [source note](../src/BASE/BUTTON.cpp#L258) | R1 |
-| `BUTTON` | `0x004ddd10` `button::Deselect` | 99.7778/99.7778 | unresolved/not-a-wall | Δ=2; rel 4/4 | [source note](../src/BASE/BUTTON.cpp#L286) | R2 |
 | `Blur` | `0x004d28e0` `DoBlur` | 93.9030/93.9030 | unresolved/not-a-wall | Δ=1046; rel 43/43 | [source note](../src/BASE/Blur.cpp#L26) | R1 |
 | `Bzip` | `0x004d4470` `minUInt32` | 100.0000/99.8095 | unresolved/not-a-wall | Δ=4; rel 0/0 | [source note](../src/BASE/Bzip.cpp#L238) | R3 |
 | `Bzip` | `0x004d47a0` `arithDecodeSymbol` | 99.9730/99.9730 | unresolved/not-a-wall | Δ=2; rel 11/11 | [source note](../src/BASE/Bzip.cpp#L338) | R3 |
@@ -175,7 +180,7 @@ a weak `??_E`.  A report score of zero or an absent row says nothing about the b
 
 | TU / marker | Generated RVA / symbol | Score state | Classification | Current proof or missing proof | Retry |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| [`BUTTON:86`](../src/BASE/BUTTON.cpp#L86) | `0x004dd480` `button ??_E/??_G` | `??_E` retained 0, live unscored; `??_G` absent | unresolved/not-a-wall | Current `??_G` has 2 relocs versus 5 in each retail copy and Δ=28.  No emitted raw-exact deleting body is present. | R4 |
+| [`BUTTON:86`](../src/BASE/BUTTON.cpp#L86) | `0x004dd480` `button ??_E/??_G` | generated alias unscored; standalone `button::~button` is 100/100 | proven-artifact | Candidate strong `??_G` and both retail `??_E` copies are the same 0x36 raw bytes (SHA-256 `545c98e5…e959`) with 5/5 relocations; the weak `??_E` is sectionless. See the [BUTTON audit](matching-matrices/button-tu-audit-fe8cfa9.tsv). | A1 |
 | [`ICON:35`](../src/BASE/ICON.cpp#L35) | `0x004c7a90` `icon ??_E/??_G` | `??_E` retained 0, live unscored; `??_G` absent | unresolved/not-a-wall | Current `??_G` has 2 relocs versus 5 in each retail copy and Δ=28. | R4 |
 | [`ICONWDGT:23`](../src/BASE/ICONWDGT.cpp#L23) | `0x004d0a90` `iconWidget ??_E/??_G` | `??_E` retained 0, live unscored; `??_G` absent | unresolved/not-a-wall | Current `??_G` has 2 relocs versus 5 in each retail copy and Δ=28. | R4 |
 | [`SAMPLE:72`](../src/BASE/SAMPLE.cpp#L72) | `0x004daef0` `sample ??_E/??_G` | generated alias unscored; standalone `sample::~sample` is 100/100 | proven-artifact | Candidate `??_G` and each retail `??_E` are 0x41 bytes, Δ=0, rel 5/5 with the same destructor/delete/vtable targets; see the [SAMPLE audit](matching-matrices/README.md#basesample-whole-tu-audit-and-constructor-shapes). | A1 |
