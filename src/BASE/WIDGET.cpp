@@ -12,35 +12,18 @@
 #include <BASE/bmap2.h>
 #include <SOURCE/KB.h>
 
-// @match-note
-// Both sections are 0x5a with the vtable relocation matching at +0x13. The
-// relocation-masked residual is 10 bytes at +0x02,+0x0c,+0x0f,+0x19,+0x1b,
-// +0x1d,+0x24,+0x2c,+0x3c,+0x3e; the first divergence is our `mov ax,[esp+4]`
-// versus retail `mov dx,[esp+4]`. Member values, frame, store CFG, and return are
-// complete. Moving the width store before `m_prev` reduced the prior 18-byte
-// residual and raised 96.8261% to 97.9565%. Separate/chained null stores, cached
-// height, full and coordinate-only initializer lists, and a 200-iteration audited
-// libclang AST search found no exact form. A later retail-lifetime pass also ruled
-// out ABI-neutral dimension typedef/qualifier, width-conversion/accessor, explicit
-// X/height snapshot, and adjacent width/height initialization models; the bounded
-// results are in docs/matching-matrices/widget-whole-tu-214bd52.tsv. Retry after a
-// predecessor/include/header TU-state change or new evidence for the original
-// initialization lifetime graph. A constructor-only compile at checkpoint 2158e9b
-// emitted the identical 0x5a candidate, including the same 10 raw-byte residual and
-// 1/1 relocation, so this is not standalone-exact and cannot be certified as a
-// soft TU-cumulative wall.
 VA(0x004dde00, 0x5a)
 widget::widget(short int x, short int y, short int width, short int height, short int id, short int kind)
 {
-    m_x = x;
     m_owner = 0;
-    m_y = y;
     m_next = 0;
-    m_width = width;
     m_prev = 0;
+    m_x = x;
+    m_y = y;
+    m_width = width;
+    m_height = height;
     m_flags = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW;
     m_zOrder = -1;
-    m_height = height;
     m_id = id;
     m_kind = kind;
 }
@@ -96,9 +79,11 @@ void widget::Close(void) {}
 // bounded declaration-context retest for this combined checkpoint is recorded in
 // docs/matching-matrices/widget-whole-tu-214bd52.tsv. A Main-only compile at
 // checkpoint 2158e9b regressed to 95.8533% with 408 raw-byte differences despite
-// retaining 17/17 relocations. The six-argument constructor preceding Main is also
-// still 10 raw bytes from retail, so the standalone and all-predecessors-exact
-// requirements both fail; this remains unresolved, not a soft TU-cumulative wall.
+// retaining 17/17 relocations. The six-argument constructor and every other
+// ordinary predecessor are now exact; Main remains at the same eight-byte
+// mouse-hit-test residual and exact Dim remains pinned. The standalone-exact
+// requirement still fails, so this remains unresolved, not a soft TU-cumulative
+// wall.
 VA(0x004ddee0, 0x2f4)
 int widget::Main(tag_message &message)
 {
