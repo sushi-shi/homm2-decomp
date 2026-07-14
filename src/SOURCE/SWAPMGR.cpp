@@ -13,15 +13,18 @@
 #include <BASE/mouseManager.h>
 #include <BASE/resourceManager.h>
 #include <SOURCE/ADVMGR.h>
+#include <SOURCE/EVENTS.h>
 #include <SOURCE/GAME.h>
 #include <SOURCE/HERO.h>
 #include <SOURCE/KB.h>
+#include <SOURCE/TOWNMGR.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/game.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/swapManager.h>
+#include <SOURCE/townManager.h>
 VA(0x004543c0, 0x84)
 swapManager::swapManager(void)
 {
@@ -591,19 +594,297 @@ int swapManager::Main(tag_message &message)
 }
 
 VA(0x004556d3, 0xa3)
-void swapManager::ViewMon(void) {}
+void swapManager::ViewMon(void)
+{
+    gpGame->ViewArmy(
+        SWAP_ARMY_VIEW_X, SWAP_ARMY_VIEW_Y,
+        m_heroes[m_selectedSide]->m_army.m_creatureTypes[m_targetSlot],
+        m_heroes[m_selectedSide]->m_army.m_creatureCounts[m_targetSlot], 0,
+        m_heroes[m_selectedSide]->m_army.GetNumArmies() == 1, 1, 0,
+        m_heroes[m_selectedSide], 0, &m_heroes[m_selectedSide]->m_army,
+        m_targetSlot);
+}
 
 VA(0x00455776, 0x255)
-void swapManager::SwapArtifacts(void) {}
+void swapManager::SwapArtifacts(void)
+{
+    int selectedArtifact =
+        m_heroes[m_selectedSide]->m_artifacts[m_selectedSlot];
+    int targetArtifact_2 = m_heroes[m_targetSide]->m_artifacts[m_targetSlot];
 
+    GiveTakeArtifactStat(m_heroes[m_selectedSide], selectedArtifact, 1);
+    GiveTakeArtifactStat(m_heroes[m_targetSide], targetArtifact_2, 1);
+    m_heroes[m_selectedSide]->m_artifacts[m_selectedSlot] = targetArtifact_2;
+    m_heroes[m_targetSide]->m_artifacts[m_targetSlot] = selectedArtifact;
+
+    signed char extra =
+        m_heroes[m_selectedSide]->m_artifactExtra[m_selectedSlot];
+    m_heroes[m_selectedSide]->m_artifactExtra[m_selectedSlot] =
+        m_heroes[m_targetSide]->m_artifactExtra[m_targetSlot];
+    m_heroes[m_targetSide]->m_artifactExtra[m_targetSlot] = extra;
+
+    GiveTakeArtifactStat(m_heroes[m_selectedSide], targetArtifact_2, 0);
+    GiveTakeArtifactStat(m_heroes[m_targetSide], selectedArtifact, 0);
+    m_heroes[m_selectedSide]->CheckAnduranPieces(1);
+    m_heroes[m_targetSide]->CheckAnduranPieces(1);
+
+    if (selectedArtifact == SWAP_ARTIFACT_SKILL_BONUS ||
+        targetArtifact_2 == SWAP_ARTIFACT_SKILL_BONUS) {
+        tag_message message_1;
+        message_1.type = SWAP_MESSAGE_WIDGET;
+        for (int side = SWAP_SIDE_LEFT; side < SWAP_SIDE_COUNT; ++side) {
+            for (int skillSlot = 0;
+                 skillSlot < SWAP_SECONDARY_SKILL_WIDGET_COUNT; ++skillSlot) {
+                if (skillSlot < m_heroes[side]->m_secondarySkillCount) {
+                    message_1.field4 = SWAP_MESSAGE_SET_TEXT;
+                    message_1.field8 =
+                        side * SWAP_SECONDARY_SKILL_WIDGET_COUNT + skillSlot +
+                        SWAP_CONTROL_LEFT_SKILL_LEVEL_FIRST;
+                    message_1.text = gText;
+                    sprintf(gText, "%d", m_heroes[side]->GetSSLevel(
+                                                m_heroes[side]->GetNthSS(skillSlot)));
+                    m_window->BroadcastMessage(message_1);
+                }
+            }
+        }
+    }
+}
+
+// @match-note 99.98%
+// Only raw residual: candidate +0x11b loads selectedArmy from -0x4 and compares
+// targetArmy at -0x10; retail loads targetArmy from -0x10 and compares
+// selectedArmy at -0x4 (displacement bytes +0x11d/+0x120). Frame 0x14 and slots
+// match: selectedArmy -0x4, selectedArmyCount -0x8, slot_1 -0xc,
+// targetArmy -0x10, this -0x14. All 113 normalized instructions, CFG semantics,
+// and 3/3 relocation sites/targets agree. Tried both != operand orders (same
+// bytes); retail-positive ==/GetNumArmies()!=1/target-occupied form regressed to
+// 98.53% and perturbed SplitMons, so it was rejected. Revisit at 95% total fuzzy.
 VA(0x004559cb, 0x177)
-void swapManager::SwapMons(void) {}
+void swapManager::SwapMons(void)
+{
+    int selectedArmyCount = 0;
+    for (int slot_1 = 0; slot_1 < ARMY_GROUP_SLOT_COUNT; ++slot_1) {
+        if (m_heroes[m_selectedSide]->m_army.m_creatureTypes[slot_1] !=
+                SWAP_CREATURE_NONE &&
+            m_heroes[m_selectedSide]->m_army.m_creatureCounts[slot_1] > 0)
+            ++selectedArmyCount;
+    }
+
+    armyGroup *selectedArmy = &m_heroes[m_selectedSide]->m_army;
+    armyGroup *targetArmy = &m_heroes[m_targetSide]->m_army;
+    if (selectedArmy->m_creatureTypes[m_selectedSlot] ==
+        targetArmy->m_creatureTypes[m_targetSlot]) {
+        if (selectedArmy->GetNumArmies() == 1)
+            return;
+        targetArmy->m_creatureCounts[m_targetSlot] +=
+            selectedArmy->m_creatureCounts[m_selectedSlot];
+        selectedArmy->m_creatureTypes[m_selectedSlot] = SWAP_CREATURE_NONE;
+        selectedArmy->m_creatureCounts[m_selectedSlot] = 0;
+        return;
+    }
+    if (targetArmy != selectedArmy && selectedArmy->GetNumArmies() == 1 &&
+        targetArmy->m_creatureTypes[m_targetSlot] == SWAP_CREATURE_NONE)
+        return;
+    selectedArmy->Swap(m_selectedSlot, targetArmy, m_targetSlot);
+}
 
 VA(0x00455b42, 0x47b)
-void swapManager::Update(void) {}
+void swapManager::Update(void)
+{
+    int slot;
+    tag_message message_1;
+    message_1.type = SWAP_MESSAGE_WIDGET;
+    message_1.field4 = SWAP_MESSAGE_SET_TEXT;
+    message_1.text = gText;
+
+    for (slot = 0; slot < SWAP_PRIMARY_SKILL_COUNT; ++slot) {
+        message_1.field8 = slot + SWAP_LEFT_PRIMARY_SKILL_FIRST;
+        sprintf(gText, "%d", m_heroes[SWAP_SIDE_LEFT]->Stats(slot));
+        m_window->BroadcastMessage(message_1);
+        message_1.field8 = slot + SWAP_RIGHT_PRIMARY_SKILL_FIRST;
+        sprintf(gText, "%d", m_heroes[SWAP_SIDE_RIGHT]->Stats(slot));
+        m_window->BroadcastMessage(message_1);
+    }
+
+    for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
+        message_1.field8 = slot + SWAP_CONTROL_LEFT_ARMY_FIRST;
+        if (m_heroes[SWAP_SIDE_LEFT]->m_army.m_creatureTypes[slot] ==
+            SWAP_CREATURE_NONE) {
+            message_1.field4 = SWAP_MESSAGE_DISABLE;
+            message_1.field18 = SWAP_EMPTY_ITEM_VALUE;
+        } else {
+            message_1.field4 = SWAP_MESSAGE_ENABLE;
+            message_1.field18 = SWAP_EMPTY_ITEM_VALUE;
+            m_window->BroadcastMessage(message_1);
+            message_1.field4 = SWAP_MESSAGE_SET_ICON;
+            message_1.field18 =
+                m_heroes[SWAP_SIDE_LEFT]->m_army.m_creatureTypes[slot];
+        }
+        m_window->BroadcastMessage(message_1);
+    }
+
+    for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
+        message_1.field8 = slot + SWAP_LEFT_ARMY_COUNT_FIRST;
+        if (m_heroes[SWAP_SIDE_LEFT]->m_army.m_creatureTypes[slot] ==
+            SWAP_CREATURE_NONE) {
+            message_1.field4 = SWAP_MESSAGE_DISABLE;
+            message_1.field18 = SWAP_EMPTY_ITEM_VALUE;
+        } else {
+            message_1.field4 = SWAP_MESSAGE_ENABLE;
+            message_1.field18 = SWAP_EMPTY_ITEM_VALUE;
+            m_window->BroadcastMessage(message_1);
+            message_1.field4 = SWAP_MESSAGE_SET_TEXT;
+            sprintf(gText, "%d",
+                    m_heroes[SWAP_SIDE_LEFT]->m_army.m_creatureCounts[slot]);
+            message_1.text = gText;
+        }
+        m_window->BroadcastMessage(message_1);
+    }
+
+    for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
+        message_1.field8 = slot + SWAP_CONTROL_RIGHT_ARMY_FIRST;
+        if (m_heroes[SWAP_SIDE_RIGHT]->m_army.m_creatureTypes[slot] ==
+            SWAP_CREATURE_NONE) {
+            message_1.field4 = SWAP_MESSAGE_DISABLE;
+            message_1.field18 = SWAP_EMPTY_ITEM_VALUE;
+        } else {
+            message_1.field4 = SWAP_MESSAGE_ENABLE;
+            message_1.field18 = SWAP_EMPTY_ITEM_VALUE;
+            m_window->BroadcastMessage(message_1);
+            message_1.field4 = SWAP_MESSAGE_SET_ICON;
+            message_1.field18 =
+                m_heroes[SWAP_SIDE_RIGHT]->m_army.m_creatureTypes[slot];
+        }
+        m_window->BroadcastMessage(message_1);
+    }
+
+    for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
+        message_1.field8 = slot + SWAP_RIGHT_ARMY_COUNT_FIRST;
+        if (m_heroes[SWAP_SIDE_RIGHT]->m_army.m_creatureTypes[slot] ==
+            SWAP_CREATURE_NONE) {
+            message_1.field4 = SWAP_MESSAGE_DISABLE;
+            message_1.field18 = SWAP_EMPTY_ITEM_VALUE;
+        } else {
+            message_1.field4 = SWAP_MESSAGE_ENABLE;
+            message_1.field18 = SWAP_EMPTY_ITEM_VALUE;
+            m_window->BroadcastMessage(message_1);
+            message_1.field4 = SWAP_MESSAGE_SET_TEXT;
+            sprintf(gText, "%d",
+                    m_heroes[SWAP_SIDE_RIGHT]->m_army.m_creatureCounts[slot]);
+            message_1.text = gText;
+        }
+        m_window->BroadcastMessage(message_1);
+    }
+
+    for (slot = 0; slot < HERO_ARTIFACT_SLOT_COUNT; ++slot) {
+        message_1.field8 = slot + SWAP_CONTROL_LEFT_ARTIFACT_FIRST;
+        if (m_heroes[SWAP_SIDE_LEFT]->m_artifacts[slot] ==
+            SWAP_ARTIFACT_NONE) {
+            message_1.field4 = SWAP_MESSAGE_DISABLE;
+            message_1.field18 = SWAP_EMPTY_ITEM_VALUE;
+        } else {
+            message_1.field4 = SWAP_MESSAGE_ENABLE;
+            message_1.field18 = SWAP_EMPTY_ITEM_VALUE;
+            m_window->BroadcastMessage(message_1);
+            message_1.field4 = SWAP_MESSAGE_SET_ICON;
+            message_1.field18 = m_heroes[SWAP_SIDE_LEFT]->m_artifacts[slot];
+        }
+        m_window->BroadcastMessage(message_1);
+    }
+
+    for (slot = 0; slot < HERO_ARTIFACT_SLOT_COUNT; ++slot) {
+        message_1.field8 = slot + SWAP_CONTROL_RIGHT_ARTIFACT_FIRST;
+        if (m_heroes[SWAP_SIDE_RIGHT]->m_artifacts[slot] ==
+            SWAP_ARTIFACT_NONE) {
+            message_1.field4 = SWAP_MESSAGE_DISABLE;
+            message_1.field18 = SWAP_EMPTY_ITEM_VALUE;
+        } else {
+            message_1.field4 = SWAP_MESSAGE_ENABLE;
+            message_1.field18 = SWAP_EMPTY_ITEM_VALUE;
+            m_window->BroadcastMessage(message_1);
+            message_1.field4 = SWAP_MESSAGE_SET_ICON;
+            message_1.field18 = m_heroes[SWAP_SIDE_RIGHT]->m_artifacts[slot];
+        }
+        m_window->BroadcastMessage(message_1);
+    }
+}
 
 VA(0x00455fbd, 0x388)
-void swapManager::SplitMons(void) {}
+void swapManager::SplitMons(void)
+{
+    short unusedAmountControl_29 = SWAP_SPLIT_AMOUNT_CONTROL;
+    int unusedState = 0;
+    armyGroup *selectedArmy = &m_heroes[m_selectedSide]->m_army;
+    armyGroup *targetArmy = &m_heroes[m_targetSide]->m_army;
+    int emptySlot;
+    unusedState = 0;
+    short unusedTextControl_2 = SWAP_SPLIT_TEXT_CONTROL;
+
+    gpTownManager->m_heroWindow1 =
+        new heroWindow(SWAP_SPLIT_WINDOW_X, SWAP_SPLIT_WINDOW_Y,
+                       "splitwin.bin");
+    if (gpTownManager->m_heroWindow1 == 0)
+        MemError();
+    gpTownManager->m_splitAmount = 0;
+    gpTownManager->m_splitMaximum =
+        selectedArmy->m_creatureCounts[m_selectedSlot];
+
+    tag_message message;
+    message.type = SWAP_MESSAGE_WIDGET;
+    if (m_selectedSide == m_targetSide) {
+        sprintf(gText, "Move how many troops?");
+    } else {
+        sprintf(gText, "Move how many %s troops from %s to %s?",
+                gArmyNames[selectedArmy->m_creatureTypes[m_selectedSlot]],
+                m_heroes[m_selectedSide]->m_name,
+                m_heroes[m_targetSide]->m_name);
+    }
+    message.field4 = SWAP_MESSAGE_SET_TEXT;
+    message.field8 = SWAP_SPLIT_TEXT_CONTROL;
+    message.text = gText;
+    gpTownManager->m_heroWindow1->BroadcastMessage(message);
+    sprintf(gText, "%d", gpTownManager->m_splitAmount);
+    message.field8 = SWAP_SPLIT_AMOUNT_CONTROL;
+    message.text = gText;
+    gpTownManager->m_heroWindow1->BroadcastMessage(message);
+    gpWindowManager->DoDialog(gpTownManager->m_heroWindow1, SplitArmyHandler,
+                              0);
+    delete gpTownManager->m_heroWindow1;
+
+    if (gpWindowManager->m_dialogResult == SWAP_SPLIT_CONFIRM) {
+        if (selectedArmy->m_creatureTypes[m_selectedSlot] ==
+            targetArmy->m_creatureTypes[m_targetSlot]) {
+            selectedArmy->m_creatureCounts[m_selectedSlot] -=
+                gpTownManager->m_splitAmount;
+            targetArmy->m_creatureCounts[m_targetSlot] +=
+                gpTownManager->m_splitAmount;
+            if (selectedArmy->m_creatureCounts[m_selectedSlot] == 0)
+                selectedArmy->m_creatureTypes[m_selectedSlot] =
+                    SWAP_CREATURE_NONE;
+            return;
+        }
+        if (targetArmy->m_creatureTypes[m_targetSlot] !=
+            SWAP_CREATURE_NONE) {
+            for (emptySlot = 0; emptySlot < ARMY_GROUP_SLOT_COUNT;
+                 ++emptySlot) {
+                if (targetArmy->m_creatureTypes[emptySlot] ==
+                    SWAP_CREATURE_NONE)
+                    break;
+            }
+            if (emptySlot < ARMY_GROUP_SLOT_COUNT)
+                m_targetSlot = emptySlot;
+        }
+        targetArmy->m_creatureTypes[m_targetSlot] =
+            selectedArmy->m_creatureTypes[m_selectedSlot];
+        targetArmy->m_creatureCounts[m_targetSlot] =
+            gpTownManager->m_splitAmount;
+        selectedArmy->m_creatureCounts[m_selectedSlot] -=
+            gpTownManager->m_splitAmount;
+        if (selectedArmy->m_creatureCounts[m_selectedSlot] == 0)
+            selectedArmy->m_creatureTypes[m_selectedSlot] =
+                SWAP_CREATURE_NONE;
+    }
+}
 
 
 // ===== vtable swapManager : public baseManager  (3 slots) =====
