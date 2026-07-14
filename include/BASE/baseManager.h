@@ -28,6 +28,7 @@ public:
     int    m_active;  // +0x32
     // --- constructors ---
     baseManager(void);
+    void Activate(void) { m_active = 1; }
     // --- virtual methods (vtable order) ---
     virtual int Open(int) = 0;
     virtual void Close(void) = 0;
