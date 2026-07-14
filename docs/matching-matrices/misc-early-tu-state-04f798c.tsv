@@ -1,0 +1,21 @@
+descriptor_sha256	scope	variant	focused_scores	pin_result	disposition
+e3916d6de272c5b458b35a539e116e138539381dc7b71bf494ae73b5e5459738	BaseAlloc	canonical word store; no size alias	BaseAlloc=95.73; FindIndex=98.33; FadeIn=92.96; FindLastToken=99.13	canonical pins	RETAIN_BASELINE
+6d0535a8f286eeb00c273bf394508fa86b0b5a3c8b3b49e6f7d7d13c2281373a	BaseAlloc	strcat; no size alias	BaseAlloc=82.70; FindIndex=98.00; FadeIn=93.64; FindLastToken=100.00	BaseAlloc and CreatePCXFile regress	REJECT_LOCAL_AND_TU_REGRESSION
+5cf8fa9f4aa7e218d3858bd37b520e1a0d3f3237988b63b538febde3d1ecc594	BaseAlloc	strcpy(logText+strlen(logText),"\\n"); no alias	BaseAlloc=81.95; FindLastToken=100.00	BaseAlloc regresses	REJECT_LOCAL_REGRESSION
+f3bf3a0d36127ccb3a2ecfd20bdb1dbe4d7acb7186b2412eb26a2bf0d589be76	BaseAlloc	strcat with allocSize alias	BaseAlloc=87.05; FindIndex=98.33; FindLastToken=100.00	BaseAlloc regresses	REJECT_LOCAL_REGRESSION
+05fd02ebb08e39416c15a4cfa0af55e9eb4d633fe1109d051e201606005ed17b	BaseAlloc	split append pointer then word store with allocSize alias	BaseAlloc=95.73	retail post-scan store still not selected	REJECT_NO_GAIN
+6440f12801f2698d8b3f378977237c7acef49303800b9989e8eba54eb42f3d57	BaseAlloc	strchr destination end with allocSize alias	BaseAlloc=94.24	adds strchr call	REJECT_LOCAL_REGRESSION
+b5f26398cff7b5386a88ca2bf5eebec25d3acc1116996c7f307907298fa188c1	BaseAlloc	strcpy(&logText[strlen(logText)],"\\n") with allocSize alias	BaseAlloc=85.98	generic intrinsic copy remains	REJECT_LOCAL_REGRESSION
+e318dabaf0a6c2e9b45e214c5371506aafcab972b11269b5045e78d37e766153	InitMemEntry	rename exact loop local i to initIndex	InitMemEntry=100.00; BaseAlloc=87.05	no change from active strcat+alias state	REJECT_NO_DOWNSTREAM_GAIN
+548d9d1273ff2482403214b803dda1e6962f26d64ad4db6c1f851f00040d9fd9	MAKEFILEID	postdecrement i--	MAKEFILEID=100.00; FindIndex=98.33; FadeIn=93.64	exact predecessor; no downstream gain	REJECT_NO_DOWNSTREAM_GAIN
+989565adac615230234453717582f1cb04724ba4a7d9a48f71e73c2a2bbf252c	FindIndex	key <= value	FindIndex=98.33	same redundant cmp	REJECT_NO_GAIN
+c381f1b7629033552eb79c2fd77e464b35e580b9c05a69776aeb572e7f9746cd	FindIndex	!(value < key)	FindIndex=98.33	same redundant cmp	REJECT_NO_GAIN
+93e8f1ea24eddad58ce90ef3348f5c7ff2194b4079462b5e2c361fe758f5a3e0	FadeIn	explicit int threshold=0x3f-level	FadeIn=97.41	all 11 reloc targets and all bytes after +0x1f align	RETAIN
+9568f2bcade6bd577f0ba0535aa7106bae1a85add707f35120c5f0900463d8b0	FadeIn	new palette()	FadeIn=97.41	same +0x1a..+0x1f allocation-order residual	REJECT_NO_GAIN
+6f3d58dfba460ff7ef4d205117acc25b4164b024df9c162e2add768fa30ca03e	FadeIn	split palette declaration and new assignment	FadeIn=97.41	same +0x1a..+0x1f allocation-order residual	REJECT_NO_GAIN
+bd2e1d204e3025cbf0a1afd34c91446e6b123161df28184a88a0355f3d847818	ProcessAssert	!condition exact predecessor	ProcessAssert=100.00; FindString=98.20; FindToken=97.59; FindLast=99.13	exact predecessor; no downstream gain	REJECT_NO_DOWNSTREAM_GAIN
+630f66bbdef13eb6bb98903b882bf6d0bab278712c5cbbba29c082f398210505	FindStringInString	i+text pointer spelling	FindString=98.20	SIB and compare unchanged	REJECT_NO_GAIN
+f5d10098c714ffa2ada97f9c472fadc1a5d34c203ee6bc6bf89a3bec7aae46e3	FindStringInString	&i[text] SIB lvalue spelling	FindString=98.20	SIB and compare unchanged	REJECT_NO_GAIN
+46f50b6e5b221f437c08c2658797a6c025bc71f2b5e491842f5c91e20de1e9d2	FindStringInString	0[&count] comparison load	FindString=98.20	compare unchanged	REJECT_NO_GAIN
+f042d9460cdaf81b361d442d1748d1f4486d4ece31b5f8785f6aa6516decc567	FindToken	0[&len] comparison load	FindToken=97.59	compare unchanged	REJECT_NO_GAIN
+395725488e30f4310dff9db2474b438b995f0b59ba377aa523a3efda2bafac93	FindToken	len > (i|0)	FindToken=97.59	compare unchanged	REJECT_NO_GAIN

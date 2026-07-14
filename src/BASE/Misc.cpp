@@ -49,15 +49,17 @@ void InitMemEntry(void)
         gpMemEntry[i].used = 0;
 }
 
-// @early-stop
-// /O2 intrinsic-shape wall: base COMDAT .text is 0x202 bytes versus retail 0x20f.
+// @match-note
+// Structurally complete /O2 checkpoint: base .text is 0x202 bytes versus retail 0x20f.
 // The complete allocation/tracking flow and calls match (LogInt, malloc x2, MemError,
 // sprintf, fopen/fputs/fclose, OutputDebugStringA). The remaining source divergence is
 // the newline append at base +0x1ab..+0x1cb versus retail +0x1b2..+0x1d5: base loads
 // "\n" before `repne scasb` and addresses the end through `not ecx`; retail scans first,
 // loads the same relocated word afterward, and stores it at `[edi-1]`. `strcat`,
 // `strcpy(buf+strlen)`, `memcpy(...,2)`, direct/named word stores, volatile loads, and a
-// manual end scan were compiled; none selected retail's hybrid intrinsic sequence.
+// manual end scan were compiled; none selected retail's hybrid intrinsic sequence in
+// the measured TU states. Revisit through exact-preserving predecessor/TU-state variants;
+// this residual is not a byte-proven wall. See misc-early-tu-state-04f798c.tsv.
 VA(0x004c3d70, 0x20f)
 void *BaseAlloc(unsigned int size, char *file, int line)
 {
@@ -107,14 +109,15 @@ void *BaseAlloc(unsigned int size, char *file, int line)
     return ptr;
 }
 
-// @early-stop
-// /O2 intrinsic-shape wall: base COMDAT .text is 0x38f bytes versus retail 0x386.
+// @match-note
+// Structurally complete /O2 checkpoint: base .text is 0x38f bytes versus retail 0x386.
 // The three equivalent newline-append clusters load the same `"\n"` relocation at
 // base +0x105/+0x23a/+0x330 (reloc operands +0x108/+0x23d/+0x333) versus retail
 // +0x113/+0x244/+0x338 (operands +0x116/+0x247/+0x33b); retail keeps the post-scan
 // pointer in EDI while base materializes the strlen result. All LogInt/malloc/free,
 // sprintf, fopen/fputs/fclose and OutputDebugStringA sites and tracked MemEntry fields
-// agree. The same six append spellings documented on BaseAlloc were exhausted.
+// agree. The same six append spellings documented on BaseAlloc were tried. Revisit through
+// exact-preserving predecessor/TU-state variants; this is not a byte-proven wall.
 VA(0x004c3f80, 0x386)
 void BaseFree(void *ptr, char *file, int line)
 {
@@ -189,13 +192,14 @@ void BaseFree(void *ptr, char *file, int line)
     }
 }
 
-// @early-stop
-// /O2 intrinsic-shape wall: base COMDAT .text is 0x137 bytes versus retail 0x134.
+// @match-note
+// Structurally complete /O2 checkpoint: base .text is 0x137 bytes versus retail 0x134.
 // Only the completed log-line append differs: base loads `"\n"` at +0xd6 (reloc
 // +0xd9) before deriving `buf+strlen`, while retail loads it at +0xe3 (reloc +0xe6)
 // after `repne scasb` and stores through `[edi-1]`. LogInt, sprintf, fopen/fputs/
 // fclose and OutputDebugStringA targets are otherwise identical. `strcat`, strlen+
 // strcpy/memcpy, direct and named word stores, volatile load, and manual scan tried.
+// Revisit through exact-preserving predecessor/TU-state variants; not byte-proven.
 VA(0x004c4310, 0x134)
 void PrintMemoryLeaks(void)
 {
@@ -254,14 +258,16 @@ unsigned long int MAKEFILEID(char *text)
     return hash;
 }
 
-// @early-stop
-// /O2 flag-reuse wall: base COMDAT .text is 0x97 bytes versus retail 0x95.
+// @match-note
+// Structurally complete /O2 checkpoint: base .text is 0x97 bytes versus retail 0x95.
 // Base alone emits `3b c7` (`cmp eax,edi`) at +0x38..+0x39 before the equality
 // `jge`; retail reuses flags from the identical +0x2a comparison. Everything after
 // that differs only by the resulting two-byte jump displacements. There are no calls;
 // all four giFindMid relocations resolve to the same 0x5331c0 storage (retail delinks
 // it as const_001331c0). Direct field tests, saved int/ushort values, nested ==/>=,
-// reversed relational operands, comma/combined conditions, and three-way forms tried.
+// reversed relational operands, negated predicates, comma/combined conditions, and
+// three-way forms tried. Revisit through exact-preserving predecessor/TU-state variants;
+// the redundant compare is not a byte-proven artifact.
 VA(0x004c4540, 0x95)
 int FindIndex(struct indexArray *entries, int low, int high, int key)
 {
@@ -286,15 +292,14 @@ int FindIndex(struct indexArray *entries, int low, int high, int key)
     return 0xFFFF;
 }
 
-// @early-stop
-// /O2 register/instruction-selection wall: base COMDAT .text is 0xee bytes versus
-// retail 0xea. Register allocation differs throughout +0x0b..+0x68 (base palette/done/
-// level ESI/EBX/EDI; retail EBX/EBP/ESI). The value update at base +0x92..+0xc3 uses
-// `lea eax,[eax+edi]; sub al,0x3f`, while retail +0x92..+0xbf uses threshold EAX and
-// `sub cl,al`, accounting for the four-byte size delta; later call offsets shift by
-// four only. All seven callees and 11 relocations agree, including gConfig+0x30 (retail
-// delink name const_00128d50). Separate/repeated color loads, signed/unsigned locals,
-// threshold locals, branch inversion, update ordering, and explicit pointer init tried.
+// @match-note
+// Structurally complete /O2 checkpoint: explicit `threshold = 0x3f - level` recovered
+// retail's EBX/EBP/ESI allocation and raised this from 92.96% to 97.41%. Both sections
+// are now 0xea bytes with the same FPO frame, CFG, and 11/11 relocation targets. The sole
+// raw-code residual is +0x1a..+0x1f: base `8b c8 85 c9 74 07` moves the allocation to
+// ECX before testing it; retail `85 c0 74 09 8b c8` tests EAX first. `new palette`,
+// `new palette()`, and split declaration/assignment retain the base order. Revisit with
+// exact-preserving predecessor/TU-state variants; this is not a permitted early-stop.
 VA(0x004c45e0, 0xea)
 void FadeIn(int increment)
 {
@@ -321,10 +326,11 @@ void FadeIn(int increment)
             done = 1;
             colors = gpBufferPalette->m_data;
         } else {
+            int threshold = 0x3f - level;
             for (int i = 0; i < 0x300; ++i) {
                 signed char color = gpBufferPalette->m_data[i];
-                if (color > 0x3f - level)
-                    fadePalette->m_data[i] = color - (0x3f - level);
+                if (color > threshold)
+                    fadePalette->m_data[i] = color - threshold;
             }
             colors = fadePalette->m_data;
         }
@@ -383,10 +389,6 @@ int Random(int low, int high)
     return low + rand() % (high - low + 1);
 }
 
-// @early-stop
-// byte-exact except the MessageBoxA call: retail is a bare `ff 15 [0x53a650]` (the
-// delinker left the IAT import unnamed); ours is the same `ff 15` with an
-// __imp__MessageBoxA@16 reloc. Code bytes identical; only the masked IAT operand differs.
 VA(0x004c47f0, 0x5d)
 void ProcessAssert(int condition, char *file, int line)
 {
@@ -400,14 +402,13 @@ void ProcessAssert(int condition, char *file, int line)
     }
 }
 
-// @early-stop
-// /O2 register-allocation wall with equal 0x66-byte sections. Base +0x09..+0x34
-// retains text/count in EBX/EBP; retail uses EBP/EBX and schedules the two intrinsic
-// strlen scans differently. Equivalent SIB bytes consequently differ at +0x3c..+0x3e
-// and +0x5b..+0x5d; the loop backedge at +0x4d..+0x50 is `cmp esi,ebp; jl` versus
-// retail `cmp ebx,esi; jg`. The sole call is strncmp at +0x40 with the same relocation
-// and arguments. for/while/do forms, count|0, >=1+i, operand swaps and AST permutations
-// were exhausted without changing the allocation.
+// @match-note
+// Structurally complete /O2 checkpoint with equal 0x66-byte sections and the same frame,
+// CFG, sole strncmp relocation, and arguments. Only three encodings remain: base LEAs
+// `[ebp+esi]` at +0x3c/+0x5b versus retail `[esi+ebp]`, and base `cmp esi,ebx; jl`
+// at +0x4d versus retail `cmp ebx,esi; jg`. Pointer-operand swaps, `&i[text]`, lvalue
+// count loads, for/while/do forms, count|0, >=1+i, and audited AST swaps did not steer
+// them. Revisit through exact-preserving predecessor/TU-state variants; not byte-proven.
 VA(0x004c4850, 0x66)
 char * FindStringInString(char *text, char *pattern)
 {
@@ -425,13 +426,15 @@ char * FindStringInString(char *text, char *pattern)
     return 0;
 }
 
-// @early-stop
-// /O2 relational-encoding wall with equal 0x31-byte sections and no relocations/calls.
+// @match-note
+// Structurally complete /O2 checkpoint with equal 0x31-byte sections and no relocs/calls.
 // The only bytes that differ are +0x21..+0x24: base `3b c1 7c f4`
 // (`cmp eax,ecx; jl`) versus retail `3b c8 7f f4` (`cmp ecx,eax; jg`). They are the
 // same signed `index < length` condition. for/while/do loops, explicit backedges,
 // `length|0`, `>= 1+index`, reversed operands/returns, SIB spelling, and the AST
-// relational permuter all retained this canonical base encoding.
+// relational permuter, lvalue len load, and index-side `| 0` all retained this canonical
+// base encoding. Revisit through exact-preserving predecessor/TU-state variants; the
+// four-byte residual is not a byte-proven artifact.
 VA(0x004c48c0, 0x31)
 char * FindToken(char *text, char token)
 {
