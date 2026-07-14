@@ -4,12 +4,17 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <_globals_model.h>
+#include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
+#include <BASE/iconWidget.h>
 #include <BASE/inputManager.h>
+#include <BASE/Misc.h>
 #include <BASE/mouseManager.h>
+#include <BASE/textWidget.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/COMMAND.h>
@@ -1137,20 +1142,368 @@ void combatManager::DoCommand(int command)
     }
 }
 
+// @early-stop
 VA(0x0042d472, 0x57b)
-int WinCombatHandler(struct tag_message &) { return 0; }
+int WinCombatHandler(struct tag_message &message)
+{
+    char iconFile[40];
+    tag_message animationMessage;
+    int finalDelay = COMBAT_WIN_LOSE_INITIAL_DELAY;
+    int frame;
+    int iDelay;
 
+    if (giDialogTimeout != 0 && KBTickCount() > giDialogTimeout) {
+        message.type = COMBAT_EVENT_WINDOW;
+        gpWindowManager->m_dialogResult = message.field8;
+        message.field8 = COMBAT_WIN_LOSE_CLOSE_COMMAND;
+        message.field4 = message.field8;
+        giDialogTimeout = 0;
+        return COMBAT_MAIN_FINISHED;
+    }
+
+    if (message.type == COMBAT_EVENT_WINDOW) {
+        switch (message.field4) {
+        case COMBAT_WINDOW_CLICK:
+            switch (message.field8) {
+            case COMBAT_WIN_LOSE_NEXT_CONTROL:
+                if (gbShowingLoseWindow != 0)
+                    goto ExitDialog;
+                if (iCurTransferArtifact + 1 < iMaxTransferArtifacts) {
+                    gpCombatManager->ClearWinLoseBottom(
+                        gpCombatManager->m_winLoseWindow);
+                    ++iCurTransferArtifact;
+                    gpCombatManager->ShowWinLoseArtifact(
+                        gpCombatManager->m_winLoseWindow,
+                        iTransferArtifacts[iCurTransferArtifact]);
+                } else if (giSkeletonsCreated != 0 && bSkeletonsShown == 0) {
+                    bSkeletonsShown = 1;
+                    gpCombatManager->ClearWinLoseBottom(
+                        gpCombatManager->m_winLoseWindow);
+                    gpCombatManager->ShowSkeletons(
+                        gpCombatManager->m_winLoseWindow);
+                } else {
+                    if (gpCombatManager
+                            ->m_eagleEyeSpell[gpCombatManager->m_combatResult] !=
+                        -1) {
+                        gpCombatManager->ClearWinLoseBottom(
+                            gpCombatManager->m_winLoseWindow);
+                        gpCombatManager->ShowEagleEyeSpell(
+                            gpCombatManager->m_winLoseWindow);
+                        gpCombatManager
+                            ->m_eagleEyeSpell[gpCombatManager->m_combatResult] =
+                            -1;
+                    } else {
+                    ExitDialog:
+                        gpWindowManager->m_dialogResult = message.field8;
+                        message.field8 = COMBAT_WIN_LOSE_CLOSE_COMMAND;
+                        message.field4 = message.field8;
+                        return COMBAT_MAIN_FINISHED;
+                    }
+                }
+                break;
+            default:
+                break;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+    if (KBTickCount() > glTimers[0]) {
+        animationMessage.type = COMBAT_EVENT_WINDOW;
+        animationMessage.field4 = COMBAT_WIN_LOSE_RESOURCE_COMMAND;
+        animationMessage.text = iconFile;
+        ++giWinCmbtFrame;
+
+        switch (gbWhichAnimationPlaying) {
+        case COMBAT_WIN_LOSE_ANIMATION_CYCLE_FIRST:
+            frame = giWinCmbtFrame % COMBAT_WIN_LOSE_LOOP_FRAME_COUNT +
+                    COMBAT_WIN_LOSE_FIRST_ANIMATION_FRAME;
+            iDelay = COMBAT_WIN_LOSE_LOOP_DELAY;
+            break;
+        case COMBAT_WIN_LOSE_ANIMATION_CYCLE_SECOND:
+            frame = giWinCmbtFrame % COMBAT_WIN_LOSE_LOOP_FRAME_COUNT +
+                    COMBAT_WIN_LOSE_FIRST_ANIMATION_FRAME;
+            iDelay = COMBAT_WIN_LOSE_LOOP_DELAY;
+            break;
+        case COMBAT_WIN_LOSE_ANIMATION_FLEE:
+            if (giWinCmbtFrame ==
+                COMBAT_WIN_LOSE_FLEE_SECOND_RESOURCE_FRAME) {
+                sprintf(iconFile, "cmbtfle2.icn");
+                animationMessage.field8 =
+                    COMBAT_WIN_LOSE_RESOURCE_LOAD_ID;
+                gpCombatManager->m_winLoseWindow->BroadcastMessage(
+                    animationMessage);
+                animationMessage.field8 =
+                    COMBAT_WIN_LOSE_RESOURCE_DRAW_ID;
+                gpCombatManager->m_winLoseWindow->BroadcastMessage(
+                    animationMessage);
+            }
+            if (giWinCmbtFrame ==
+                COMBAT_WIN_LOSE_FLEE_THIRD_RESOURCE_FRAME) {
+                sprintf(iconFile, "cmbtfle3.icn");
+                animationMessage.field8 =
+                    COMBAT_WIN_LOSE_RESOURCE_LOAD_ID;
+                gpCombatManager->m_winLoseWindow->BroadcastMessage(
+                    animationMessage);
+                animationMessage.field8 =
+                    COMBAT_WIN_LOSE_RESOURCE_DRAW_ID;
+                gpCombatManager->m_winLoseWindow->BroadcastMessage(
+                    animationMessage);
+            }
+            if (giWinCmbtFrame <
+                COMBAT_WIN_LOSE_FLEE_SECOND_RESOURCE_FRAME) {
+                frame = giWinCmbtFrame + 1;
+            } else if (giWinCmbtFrame <
+                       COMBAT_WIN_LOSE_FLEE_THIRD_RESOURCE_FRAME) {
+                frame = giWinCmbtFrame -
+                        (COMBAT_WIN_LOSE_FLEE_SECOND_RESOURCE_FRAME - 1);
+            } else {
+                frame = giWinCmbtFrame -
+                        (COMBAT_WIN_LOSE_FLEE_THIRD_RESOURCE_FRAME - 1);
+                if (frame > COMBAT_WIN_LOSE_FLEE_LAST_FRAME)
+                    frame = COMBAT_WIN_LOSE_FLEE_LAST_FRAME;
+            }
+            iDelay = COMBAT_WIN_LOSE_FLEE_DELAY;
+            break;
+        default:
+            if (giWinCmbtFrame ==
+                COMBAT_WIN_LOSE_LOSS_SECOND_RESOURCE_FRAME) {
+                sprintf(iconFile, "cmbtlos2.icn");
+                animationMessage.field8 =
+                    COMBAT_WIN_LOSE_RESOURCE_LOAD_ID;
+                gpCombatManager->m_winLoseWindow->BroadcastMessage(
+                    animationMessage);
+                animationMessage.field8 =
+                    COMBAT_WIN_LOSE_RESOURCE_DRAW_ID;
+                gpCombatManager->m_winLoseWindow->BroadcastMessage(
+                    animationMessage);
+            }
+            if (giWinCmbtFrame ==
+                COMBAT_WIN_LOSE_LOSS_THIRD_RESOURCE_FRAME) {
+                sprintf(iconFile, "cmbtlos3.icn");
+                animationMessage.field8 =
+                    COMBAT_WIN_LOSE_RESOURCE_LOAD_ID;
+                gpCombatManager->m_winLoseWindow->BroadcastMessage(
+                    animationMessage);
+                animationMessage.field8 =
+                    COMBAT_WIN_LOSE_RESOURCE_DRAW_ID;
+                gpCombatManager->m_winLoseWindow->BroadcastMessage(
+                    animationMessage);
+            }
+            if (giWinCmbtFrame <
+                COMBAT_WIN_LOSE_LOSS_SECOND_RESOURCE_FRAME) {
+                frame = giWinCmbtFrame + 1;
+                iDelay = COMBAT_WIN_LOSE_LOSS_DELAY;
+            } else if (giWinCmbtFrame <
+                       COMBAT_WIN_LOSE_LOSS_THIRD_RESOURCE_FRAME) {
+                frame = giWinCmbtFrame -
+                        (COMBAT_WIN_LOSE_LOSS_SECOND_RESOURCE_FRAME - 1);
+                iDelay = COMBAT_WIN_LOSE_LOSS_DELAY;
+            } else {
+                if (giWinCmbtFrame == COMBAT_WIN_LOSE_LOSS_RESET_FRAME)
+                    giWinCmbtFrame =
+                        COMBAT_WIN_LOSE_LOSS_THIRD_RESOURCE_FRAME;
+                frame = giWinCmbtFrame -
+                        (COMBAT_WIN_LOSE_LOSS_THIRD_RESOURCE_FRAME - 1);
+                iDelay = COMBAT_WIN_LOSE_LOSS_FINAL_DELAY;
+            }
+            break;
+        }
+
+        message.type = COMBAT_EVENT_WINDOW;
+        message.field4 = COMBAT_WIN_LOSE_ANIMATION_COMMAND;
+        message.field8 = COMBAT_WIN_LOSE_RESOURCE_DRAW_ID;
+        message.field18 = frame;
+        gpCombatManager->m_winLoseWindow->BroadcastMessage(message);
+        gpCombatManager->m_winLoseWindow->DrawWindow(
+            1, 0, COMBAT_WIN_LOSE_DRAW_DEPTH);
+        glTimers[0] = KBTickCount() + iDelay;
+    }
+    return COMBAT_MAIN_CONTINUE;
+}
+
+// @early-stop
 VA(0x0042d9ed, 0x110)
-void combatManager::ClearWinLoseBottom(class heroWindow *) {}
+void combatManager::ClearWinLoseBottom(class heroWindow *window)
+{
+    int widgetIndex;
+    for (widgetIndex = 0; widgetIndex < COMBAT_WIN_LOSE_WIDGET_COUNT;
+         widgetIndex++) {
+        if (m_winLoseBottomWidgets[widgetIndex] != 0) {
+            window->RemoveWidget(m_winLoseBottomWidgets[widgetIndex]);
+            delete m_winLoseBottomWidgets[widgetIndex];
+        }
+        if (m_winLoseBottomTextWidgets[widgetIndex] != 0) {
+            window->RemoveWidget(m_winLoseBottomTextWidgets[widgetIndex]);
+            delete m_winLoseBottomTextWidgets[widgetIndex];
+        }
+        m_winLoseBottomWidgets[widgetIndex] = 0;
+        m_winLoseBottomTextWidgets[widgetIndex] = 0;
+    }
+}
 
+// @early-stop
 VA(0x0042dafd, 0x29a)
-void combatManager::ShowWinLoseArtifact(class heroWindow *, int) {}
+void combatManager::ShowWinLoseArtifact(class heroWindow *window, int artifact)
+{
+    short w = 320;
+    short winBottom = 458;
+    tag_message message;
+    char *capturedArtifactName;
 
+    sprintf(gText, "You have captured an enemy artifact!");
+    message.type = COMBAT_EVENT_WINDOW;
+    message.field4 = COMBAT_WIN_LOSE_TEXT_COMMAND;
+    message.field8 = COMBAT_WIN_LOSE_TEXT_ID;
+    message.text = gText;
+    m_winLoseWindow->BroadcastMessage(message);
+
+    m_winLoseBottomWidgets[0] =
+        new iconWidget(136, 310, 80, 80, "winloseb.icn", 0, 0,
+                       COMBAT_WIN_LOSE_ARTIFACT_ICON_ID,
+                       COMBAT_WIN_LOSE_ICON_FLAGS, 1);
+    if (m_winLoseBottomWidgets[0] == 0)
+        MemError();
+    window->AddWidget(m_winLoseBottomWidgets[0], -1);
+
+    m_winLoseBottomWidgets[1] =
+        new iconWidget(144, 318, 64, 64, "artifact.icn",
+                       artifact + 1, 0,
+                       COMBAT_WIN_LOSE_ARTIFACT_IMAGE_ID,
+                       COMBAT_WIN_LOSE_ICON_FLAGS, 1);
+    if (m_winLoseBottomWidgets[1] == 0)
+        MemError();
+    window->AddWidget(m_winLoseBottomWidgets[1], -1);
+
+    capturedArtifactName = static_cast<char *>(
+        BaseAlloc(60, COMMAND_SOURCE_FILE, COMMAND_ARTIFACT_ALLOC_LINE));
+    sprintf(capturedArtifactName, gArtifactNames[artifact]);
+    m_winLoseBottomTextWidgets[0] =
+        new textWidget(16, 397, 320, 12, capturedArtifactName,
+                       "smalfont.fnt", 1,
+                       COMBAT_WIN_LOSE_ARTIFACT_TEXT_ID,
+                       COMBAT_WIN_LOSE_TEXT_FLAGS, 1);
+    if (m_winLoseBottomTextWidgets[0] == 0)
+        MemError();
+    window->AddWidget(m_winLoseBottomTextWidgets[0], -1);
+
+    gpCombatManager->m_winLoseWindow->DrawWindow();
+    SAMPLE2 pickupSample = NULL_SAMPLE2;
+    sprintf(gText, "pickup%02d.82M", SRandom(1, 5));
+    pickupSample = LoadPlaySample(gText);
+    WaitEndSample(pickupSample, -1);
+}
+
+// @early-stop
 VA(0x0042dd97, 0x232)
-void combatManager::ShowSkeletons(class heroWindow *) {}
+void combatManager::ShowSkeletons(class heroWindow *window)
+{
+    tag_message message;
+    char *skeletonCount;
 
+    m_winLoseBottomWidgets[0] =
+        new iconWidget(173, 270, 32, 30, "mons32.icn", 47, 0,
+                       COMBAT_WIN_LOSE_SKELETON_ICON_ID,
+                       COMBAT_WIN_LOSE_ICON_FLAGS, 1);
+    if (m_winLoseBottomWidgets[0] == 0)
+        MemError();
+
+    skeletonCount = static_cast<char *>(
+        BaseAlloc(9, COMMAND_SOURCE_FILE, COMMAND_SKELETON_ALLOC_LINE));
+    sprintf(skeletonCount, "%d", giSkeletonsCreated);
+    m_winLoseBottomTextWidgets[0] =
+        new textWidget(165, 300, 32, 12, skeletonCount, "smalfont.fnt", 1,
+                       COMBAT_WIN_LOSE_SKELETON_TEXT_ID,
+                       COMBAT_WIN_LOSE_TEXT_FLAGS, 1);
+    if (m_winLoseBottomTextWidgets[0] == 0)
+        MemError();
+
+    window->AddWidget(m_winLoseBottomWidgets[0], -1);
+    window->AddWidget(m_winLoseBottomTextWidgets[0], -1);
+    if (giSkeletonsCreated > 1) {
+        sprintf(gText,
+                "Practicing the dark arts of necromancy, you are able to "
+                "raise %d of the enemy's dead to return under your service "
+                "as Skeletons.",
+                giSkeletonsCreated);
+    } else {
+        sprintf(gText,
+                "Practicing the dark arts of necromancy, you are able to "
+                "raise one of the enemy's dead to return under your service "
+                "as a Skeleton.");
+    }
+    message.type = COMBAT_EVENT_WINDOW;
+    message.field4 = COMBAT_WIN_LOSE_TEXT_COMMAND;
+    message.field8 = COMBAT_WIN_LOSE_TEXT_ID;
+    message.text = gText;
+    m_winLoseWindow->BroadcastMessage(message);
+    gpCombatManager->m_winLoseWindow->DrawWindow();
+
+    SAMPLE2 pickupSample = NULL_SAMPLE2;
+    sprintf(gText, "pickup%02d.82M", SRandom(1, 5));
+    pickupSample = LoadPlaySample(gText);
+    WaitEndSample(pickupSample, -1);
+}
+
+// @early-stop
 VA(0x0042dfc9, 0x2f6)
-void combatManager::ShowEagleEyeSpell(class heroWindow *) {}
+void combatManager::ShowEagleEyeSpell(class heroWindow *window)
+{
+    int displayedSpell = m_eagleEyeSpell[m_combatResult];
+    int x = 105;
+    int y = 275;
+    tag_message spellMessage;
+    char *spellName;
+
+    m_winLoseBottomWidgets[0] =
+        new iconWidget(x + 16, y, 0, 0, "townwind.icn", 0, 0,
+                       COMBAT_WIN_LOSE_EAGLE_BACKGROUND_ID,
+                       COMBAT_WIN_LOSE_ICON_FLAGS, 1);
+    if (m_winLoseBottomWidgets[0] == 0)
+        MemError();
+
+    m_winLoseBottomWidgets[1] =
+        new iconWidget(x + 36, y + 5, 72, 51, "spells.icn",
+                       static_cast<short>(
+                           gsSpellInfo[displayedSpell].iconIndex),
+                       0,
+                       COMBAT_WIN_LOSE_EAGLE_SPELL_ID,
+                       COMBAT_WIN_LOSE_SPELL_ICON_FLAGS, 1);
+    if (m_winLoseBottomWidgets[1] == 0)
+        MemError();
+
+    spellName = static_cast<char *>(
+        BaseAlloc(200, COMMAND_SOURCE_FILE, COMMAND_EAGLE_EYE_ALLOC_LINE));
+    sprintf(spellName, "%s", gSpellNames[displayedSpell]);
+    m_winLoseBottomTextWidgets[0] =
+        new textWidget(x + 34, y + 57, 80, 24, spellName, "smalfont.fnt", 1,
+                       COMBAT_WIN_LOSE_EAGLE_TEXT_ID,
+                       COMBAT_WIN_LOSE_TEXT_FLAGS, 1);
+    if (m_winLoseBottomTextWidgets[0] == 0)
+        MemError();
+
+    window->AddWidget(m_winLoseBottomWidgets[0], -1);
+    window->AddWidget(m_winLoseBottomWidgets[1], -1);
+    window->AddWidget(m_winLoseBottomTextWidgets[0], -1);
+    sprintf(gText,
+            "Through eagle-eyed observation, %s is able to learn the magic "
+            "spell '%s'.",
+            m_heroes[m_combatResult]->m_name,
+            gSpellNames[displayedSpell]);
+    spellMessage.type = COMBAT_EVENT_WINDOW;
+    spellMessage.field4 = COMBAT_WIN_LOSE_TEXT_COMMAND;
+    spellMessage.field8 = COMBAT_WIN_LOSE_TEXT_ID;
+    spellMessage.text = gText;
+    m_winLoseWindow->BroadcastMessage(spellMessage);
+    gpCombatManager->m_winLoseWindow->DrawWindow();
+
+    SAMPLE2 playedSample = NULL_SAMPLE2;
+    sprintf(gText, "pickup%02d.82M", SRandom(1, 5));
+    playedSample = LoadPlaySample(gText);
+    WaitEndSample(playedSample, -1);
+}
 
 VA(0x0042e2bf, 0x9cc)
 void combatManager::ShowDeadArmies(class heroWindow *) {}
@@ -1210,6 +1563,9 @@ VA(0x00431f1f, 0x304)
 void combatManager::ViewBallista(int) {}
 
 // ---- globals (definitions, RVA order) ----
+DATA(0x004f09e8) short const_000f09e8 = 0x680;
+DATA(0x004f0a80) short const_000f0a80 = 0x6c8;
+DATA(0x004f0be4) short const_000f0be4 = 0x702;
 DATA(0x005250b8) int gbThisNetHasControl;
 DATA(0x005250bc) int iCurTransferArtifact;
 DATA(0x005250c0) signed char *iTransferArtifactsInfo;
@@ -1222,6 +1578,6 @@ DATA(0x005250e4) int giWinCmbtFrame;
 DATA(0x005250e8) int giNextActionGridIndex;
 DATA(0x005250ec) int giSurrenderCost;
 DATA(0x005250f0) int giSkeletonsCreated;
-DATA(0x005250f8) signed char *iTransferArtifacts;
+DATA(0x005250f8) signed char iTransferArtifacts[16];
 DATA(0x00525108) int giNextAction;
 DATA(0x0052510c) int giNextActionGridIndex2;
