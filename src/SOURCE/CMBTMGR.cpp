@@ -43,7 +43,7 @@ combatManager::combatManager(void)
     m_limitCreatureHex = 0;
     m_limitCreature = 0;
     m_showArmyQuantities = 1;
-    m_unknownF2CF = 0;
+    m_currentCommand = 0;
     m_unknownF35B = 0;
     m_unknownF353 = -1;
     m_unknownF34F = m_unknownF353;
@@ -152,20 +152,20 @@ void combatManager::SetupCombat(int mapX, int mapY, hero *attackerHero,
         else
             m_armyGroups[side] = defenderGroup;
 
-        m_unknownF323[side] = 1;
-        m_unknownF31B[side] = m_unknownF323[side];
+        m_catapultAttacksRemaining[side] = 1;
+        m_catapultAttackCount[side] = m_catapultAttacksRemaining[side];
         if (m_heroes[side] != 0 &&
             m_heroes[side]->HasArtifact(COMBAT_ARTIFACT_BALLISTA)) {
-            m_unknownF323[side] = 2;
-            m_unknownF31B[side] = m_unknownF323[side];
+            m_catapultAttacksRemaining[side] = 2;
+            m_catapultAttackCount[side] = m_catapultAttacksRemaining[side];
         }
         if (m_heroes[side] != 0 &&
             m_heroes[side]->m_secondarySkills[HERO_SKILL_BALLISTICS] >=
                 HERO_SKILL_LEVEL_ADVANCED) {
-            m_unknownF31B[side]++;
-            m_unknownF323[side]++;
+            m_catapultAttackCount[side]++;
+            m_catapultAttacksRemaining[side]++;
         }
-        m_unknownF32B[side] = 1;
+        m_keepAttacksRemaining[side] = 1;
         m_visitingHeroPresent[side] = 0;
         m_heroCastSpell[side] = 0;
     }
@@ -252,10 +252,11 @@ void combatManager::InitNonVisualVars(void)
     m_sideRetreated[COMBAT_ATTACKER_SIDE] = 0;
     m_sideRetreated[COMBAT_DEFENDER_SIDE] = 0;
     m_combatResult = 3;
-    m_deathFlags[4] = m_deathFlags[5] = 0;
-    m_deathFlags[6] = m_deathFlags[7] = 0;
-    m_deathFlags[0] = m_deathFlags[1] = 0;
-    m_deathFlags[2] = m_deathFlags[3] = 0;
+    m_heroDeathAnimationPlayed[0] = m_heroDeathAnimationPlayed[1] = 0;
+    m_heroAlternateDeathAnimationPlayed[0] =
+        m_heroAlternateDeathAnimationPlayed[1] = 0;
+    m_heroDeathPending[0] = m_heroDeathPending[1] = 0;
+    m_heroAlternateDeathPending[0] = m_heroAlternateDeathPending[1] = 0;
     m_eagleEyeSpell[COMBAT_ATTACKER_SIDE] = -1;
     m_eagleEyeSpell[COMBAT_DEFENDER_SIDE] = -1;
     giNextAction = 0;
@@ -263,7 +264,7 @@ void combatManager::InitNonVisualVars(void)
     m_unknown351D[1] = 0;
     m_selectedHex = -1;
     m_limitCreatureHex = -1;
-    m_unknownF2CB = COMBAT_INVALID_HISTORY_INDEX;
+    m_previousCommand = COMBAT_INVALID_HISTORY_INDEX;
     m_currentSide = COMBAT_DEFENDER_SIDE;
     m_currentArmySide = COMBAT_DEFENDER_SIDE;
     m_currentSpeed = COMBAT_INITIAL_COMMAND;
