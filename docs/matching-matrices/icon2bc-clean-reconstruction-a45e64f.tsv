@@ -1,0 +1,54 @@
+# BASE/icon2bc clean reconstruction, compiler/header checkpoint a45e64f
+# Target: IconToBitmapColorTable, RVA 0xd32a0, retail end/size 0x5af, target relocations 91
+# Canonical source SHA-256 f060c410fd0e8bd0140d2ce4e83c70236ef3d936fe5b52366003b82e563a4ba0; current icon.h SHA-256 809577ac8c7a091878b5ff40de5d96d37fe2074f480d45207ba6d7ccd3ef4e22.
+# Canonical object SHA-256 6993dc10a359ffec1925db73a048c6463b0a4edf9f1d2c138ed6fd1e80b9da6a; locally measured 72.22%, end 0x566, 88/91 relocations.
+# The campaign retained maximum is 72.479%; it is the acceptance threshold even when the live score is lower.
+# The canonical body was not inspected or copied. The clean candidate was reconstructed from retail semantic/disassembly/relocation evidence and allowed headers.
+# Temporary states below retain the eight-character SHA-256 prefix logged at measurement time; the full best/canonical hashes are preserved. Descriptions plus score/size/relocations distinguish every state.
+# Prior checkpoint 04f798c best: a85e86cd9700713b19c05cb706acf6ef1ee38703f5ddca1a0aaae7d07650212a at 62.85%, documented in icon2bc-clean-reconstruction-04f798c.tsv.
+# No permutation tool was used. In particular, the regex permuter was not used; AST permutation is inappropriate below the 96-97% last-mile threshold.
+source_sha256_or_logged_prefix	match_percent	base_end	base_target_relocs	result	change_and_byte_evidence
+f060c410fd0e8bd0140d2ce4e83c70236ef3d936fe5b52366003b82e563a4ba0	72.22	0x566	88/91	canonical-restored	Untouched checkpoint-a45e64f source; retained campaign maximum 72.479. This remains the acceptance baseline.
+eab7f403...	60.68	0x4e6	78/91	rejected	First complete clean decoder rebuilt for current icon::m_data char-pointer header state.
+b1df2819...	60.68	0x4e6	78/91	byte-identical	Renamed file statics to retail-evidenced gCT names; naming alone was byte-neutral.
+13f24753...	66.65	0x581	86/91	improved	Recovered long-lived destination cursor with selective publication at decoder branch checkpoints.
+36a89463...	64.20	not-retained	not-retained	rejected	Direct setup without data local regressed allocation and setup shape.
+9fdb961d...	66.73	not-retained	not-retained	improved	Published gCTSrc before gCTEntry in the retail-evidenced setup order.
+74cd1c...	65.01	not-retained	not-retained	rejected	Declaring the X cursor earlier regressed setup and later allocation.
+027dcccd...	67.61	not-retained	88/91	improved	Added clipped-dim count publications and palette republish; corrected dim state boundaries.
+abe189bb...	68.15	not-retained	88/91	improved	Recovered literal common zero-count join; fully clipped literals publish zero rather than bypassing the join.
+0f65ed1c...	64.03	not-retained	96/91	rejected	Using gCTDst directly throughout overpublished scratch state and destroyed the register-held destination shape.
+8cf414da...	67.22	not-retained	not-retained	retained-TU-evidence	Including BASE/Misc.h reproduced the target private-symbol suffix sequence S1629..S1645 exactly.
+fbec7f...	67.22	not-retained	not-retained	byte-identical	Y snapshot spelling did not alter emitted code.
+7475c816...	67.22	not-retained	not-retained	byte-identical	Using the real current char-pointer source type did not alter emitted code.
+5f5a8e79...	67.98	not-retained	not-retained	improved	Mutating the x parameter as the decoder cursor improved register lifetime.
+b98ffd...	67.55	not-retained	not-retained	rejected	Direct owner-data setup regressed.
+b7cb04...	66.90	not-retained	not-retained	rejected	Reversing source publication order regressed.
+4e5297...	67.98	not-retained	not-retained	byte-identical	Chained X assignment was byte-neutral.
+8527787...	68.12	not-retained	not-retained	improved	Reverse X publication chain improved setup allocation.
+70252197...	68.12	not-retained	90/91	improved	Using the first local/global clip axis recovered two relocation publications without score loss.
+f1cc53...	68.11	not-retained	not-retained	rejected	Explicit entry-table base spelling regressed slightly.
+843e93...	67.07	not-retained	not-retained	rejected	Computing X earlier regressed setup allocation.
+c3c123...	67.70	not-retained	not-retained	rejected	Early X target-publication order regressed.
+9c01673...	68.72	not-retained	not-retained	improved	Explicit packed entryX snapshot recovered the target setup load order.
+e48af4...	68.73	not-retained	not-retained	improved	Direct gCTY publication removed an artificial dead Y local.
+c08abc...	68.72	not-retained	not-retained	rejected	Setup currentY local regressed slightly.
+a3bda...	68.72	not-retained	not-retained	rejected	Local-X chain regressed slightly.
+066a08...	68.73	not-retained	not-retained	byte-identical	Moving Misc.h to the conventional include position was byte-identical.
+a4ae155...	68.20	not-retained	not-retained	rejected	entryY snapshot regressed.
+374627...	68.72	not-retained	not-retained	rejected	Pitch local regressed.
+d735dd...	68.26	not-retained	not-retained	rejected	Initializing destination at function top regressed.
+d5ebe499...	68.98	not-retained	not-retained	improved	Initializing destination after gCTEntry made the first five retail setup instructions exact.
+9376447...	68.99	not-retained	not-retained	improved	Moving destination initialization after X improved slightly.
+999057...	68.23	not-retained	not-retained	rejected	Moving destination before row after clip regressed.
+e2c684...	69.12	not-retained	not-retained	improved	Moving destination initialization after pitch improved allocation.
+d01da412444b24724041acbc446e89983917ab823fb04000ea0a735aae0b0ea7	69.46	not-retained	90/91	best-clean-rejected	Destination initialization after gCTY is the best independent state. It remains below canonical 72.22 live and retained 72.479, so it must not replace canonical.
+eff716...	69.46	not-retained	not-retained	byte-identical	Explicit fill count did not change emitted code.
+0b20a2...	69.46	not-retained	not-retained	byte-identical	Audited SIB-form clip spelling did not change emitted code.
+not-captured-x-or-zero	69.46	not-retained	not-retained	byte-identical	Audited value-neutral x|0 spelling did not change emitted code.
+547ac6...	69.45	not-retained	not-retained	rejected	Local X with early destination regressed slightly.
+# Best clean relocation distribution: ClipB4 ClipR8 Cnt5 Cnt2=2 Color7 DimLen6 DimPal4 Dst6 Entry1 Pitch3 Row1 Run7 Src14 SrcCopy5 X2 X0=4 Y10.
+# Retail distribution: ClipB4 ClipR10 Cnt6 Cnt2=2 Color7 DimLen6 DimPal4 Dst6 Entry1 Pitch3 Row1 Run7 Src15 SrcCopy5 X2 X0=3 Y8.
+# Residual signature: missing ClipR2/Cnt1/Src1; excess X0 one/Y2; net one missing relocation. Initial setup is substantially aligned, but candidate keeps X in EBX and dst in ESI where retail uses X in ESI and later dst in EBX.
+# Restored-canonical raw audit: base function 0x566 versus retail 0x5af; relocation-union masking leaves 792 common bytes, 745 of them different, plus a 0x49-byte retail tail. This is structural residual, not a relocation/delink wall.
+# Do not replay local predicate/count synonyms. The next credible lever is exact-preserving predecessor/include/TU-state plus lifetime variants, retaining the canonical source unless a state exceeds the 72.479 maximum.
