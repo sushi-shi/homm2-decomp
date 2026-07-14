@@ -70,15 +70,15 @@ int mouseManager::Open(int id)
 {
     m_forcePointerUpdate = 0;
     m_savedUnderlying = new bitmap(0x21, 0x42, 0x40);
-    m_savedW = 0x13f;
-    m_savedH = 0xef;
-    field_0x6e = 0x140;
-    field_0x66 = 0x13f;
-    field_0x6a = 0xef;
+    m_savedLeft = 0x13f;
+    m_savedTop = 0xef;
+    m_cursorRight = 0x140;
+    m_cursorLeft = 0x13f;
+    m_cursorTop = 0xef;
     m_mouseX = 0x140;
     m_cursorSizeIndex = 0;
-    field_0x4a = 0;
-    field_0x72 = 0xf0;
+    m_previousCursorSizeIndex = 0;
+    m_cursorBottom = 0xf0;
     m_mouseY = 0xf0;
     if (gbColorMice != 0)
         ShowCursor(0);
@@ -293,34 +293,34 @@ void mouseManager::NewUpdate(int force)
         goto updateDone;
 
     if (force == 0 &&
-        m_mouseX - iHotSpot[m_cursorSizeIndex][0] == field_0x66 &&
-        m_mouseY - iHotSpot[m_cursorSizeIndex][1] == field_0x6a)
+        m_mouseX - iHotSpot[m_cursorSizeIndex][0] == m_cursorLeft &&
+        m_mouseY - iHotSpot[m_cursorSizeIndex][1] == m_cursorTop)
         goto updateDone;
 
-    gOldMouseLeft = m_savedW;
-    gOldMouseTop = m_savedH;
-    gOldMouseRight = field_0x6e;
-    gOldMouseBottom = field_0x72;
+    gOldMouseLeft = m_savedLeft;
+    gOldMouseTop = m_savedTop;
+    gOldMouseRight = m_cursorRight;
+    gOldMouseBottom = m_cursorBottom;
 
-    field_0x66 = m_mouseX - iHotSpot[m_cursorSizeIndex][0];
-    field_0x6a = m_mouseY - iHotSpot[m_cursorSizeIndex][1];
-    field_0x6e = field_0x66 + iMouseSize[m_cursorSizeIndex][0] - 1;
-    field_0x72 = field_0x6a + iMouseSize[m_cursorSizeIndex][1] - 1;
-    if (field_0x6e > 639)
-        field_0x6e = 639;
-    if (field_0x72 > 479)
-        field_0x72 = 479;
-    m_savedW = 0;
-    if (field_0x66 >= 0)
-        m_savedW = field_0x66;
-    m_savedH = 0;
-    if (field_0x6a >= 0)
-        m_savedH = field_0x6a;
+    m_cursorLeft = m_mouseX - iHotSpot[m_cursorSizeIndex][0];
+    m_cursorTop = m_mouseY - iHotSpot[m_cursorSizeIndex][1];
+    m_cursorRight = m_cursorLeft + iMouseSize[m_cursorSizeIndex][0] - 1;
+    m_cursorBottom = m_cursorTop + iMouseSize[m_cursorSizeIndex][1] - 1;
+    if (m_cursorRight > 639)
+        m_cursorRight = 639;
+    if (m_cursorBottom > 479)
+        m_cursorBottom = 479;
+    m_savedLeft = 0;
+    if (m_cursorLeft >= 0)
+        m_savedLeft = m_cursorLeft;
+    m_savedTop = 0;
+    if (m_cursorTop >= 0)
+        m_savedTop = m_cursorTop;
 
     if (gOldMouseLeft <= 639 && gOldMouseTop <= 479 &&
         gOldMouseRight >= 0 && gOldMouseBottom >= 0) {
-        if (gOldMouseRight < m_savedW || gOldMouseLeft > field_0x6e ||
-            gOldMouseBottom < m_savedH || gOldMouseTop > field_0x72) {
+        if (gOldMouseRight < m_savedLeft || gOldMouseLeft > m_cursorRight ||
+            gOldMouseBottom < m_savedTop || gOldMouseTop > m_cursorBottom) {
             if (gOldMouseRight > 639)
                 gOldMouseRight = 639;
             if (gOldMouseBottom > 479)
@@ -331,23 +331,23 @@ void mouseManager::NewUpdate(int force)
                 gOldMouseBottom - gOldMouseTop + 1,
                 gOldMouseLeft, gOldMouseTop);
         } else {
-            if (gOldMouseLeft > m_savedW)
-                gOldMouseLeft = m_savedW;
-            if (gOldMouseTop > m_savedH)
-                gOldMouseTop = m_savedH;
-            int right = m_savedW + iMouseSize[m_cursorSizeIndex][0] - 1;
+            if (gOldMouseLeft > m_savedLeft)
+                gOldMouseLeft = m_savedLeft;
+            if (gOldMouseTop > m_savedTop)
+                gOldMouseTop = m_savedTop;
+            int right = m_savedLeft + iMouseSize[m_cursorSizeIndex][0] - 1;
             if (gOldMouseRight < right)
                 gOldMouseRight = right;
-            int bottom = m_savedH + iMouseSize[m_cursorSizeIndex][1] - 1;
+            int bottom = m_savedTop + iMouseSize[m_cursorSizeIndex][1] - 1;
             if (gOldMouseBottom < bottom)
                 gOldMouseBottom = bottom;
         }
     }
 
-    gOldMouseLeft = m_savedW;
-    gOldMouseTop = m_savedH;
-    gOldMouseRight = m_savedW + iMouseSize[field_0x4a][0] - 1;
-    gOldMouseBottom = m_savedH + iMouseSize[field_0x4a][1] - 1;
+    gOldMouseLeft = m_savedLeft;
+    gOldMouseTop = m_savedTop;
+    gOldMouseRight = m_savedLeft + iMouseSize[m_previousCursorSizeIndex][0] - 1;
+    gOldMouseBottom = m_savedTop + iMouseSize[m_previousCursorSizeIndex][1] - 1;
     if (gOldMouseLeft <= 639 && gOldMouseTop <= 479 &&
         gOldMouseRight >= 0 && gOldMouseBottom >= 0) {
         if (gOldMouseRight > 639)
@@ -357,29 +357,29 @@ void mouseManager::NewUpdate(int force)
     }
 
     width = iMouseSize[m_cursorSizeIndex][0];
-    if (m_savedW + width > 640)
-        field_0x76 = 640 - m_savedW;
+    if (m_savedLeft + width > 640)
+        m_savedWidth = 640 - m_savedLeft;
     else
-        field_0x76 = width;
+        m_savedWidth = width;
     height = iMouseSize[m_cursorSizeIndex][1];
-    if (m_savedH + height > 480)
-        field_0x7a = 480 - m_savedH;
+    if (m_savedTop + height > 480)
+        m_savedHeight = 480 - m_savedTop;
     else
-        field_0x7a = height;
+        m_savedHeight = height;
 
     gpWindowManager->m_screen->CopyToCareful(m_savedUnderlying, 0, 0,
-        m_savedW, m_savedH, field_0x76, field_0x7a);
+        m_savedLeft, m_savedTop, m_savedWidth, m_savedHeight);
     if (m_hideCount == 0)
-        IconToBitmap(m_cursorIcon, gpWindowManager->m_screen, field_0x66, field_0x6a,
+        IconToBitmap(m_cursorIcon, gpWindowManager->m_screen, m_cursorLeft, m_cursorTop,
             m_cursorFrame, 1, 0, 0, 640, 480, 0);
     BlitBitmapToScreenNoMouseCheck(gpWindowManager->m_screen,
         gOldMouseLeft, gOldMouseTop,
         gOldMouseRight - gOldMouseLeft + 1,
         gOldMouseBottom - gOldMouseTop + 1,
         gOldMouseLeft, gOldMouseTop);
-    m_savedUnderlying->CopyToCareful(gpWindowManager->m_screen, m_savedW, m_savedH,
-        0, 0, field_0x76, field_0x7a);
-    field_0x4a = m_cursorSizeIndex;
+    m_savedUnderlying->CopyToCareful(gpWindowManager->m_screen, m_savedLeft, m_savedTop,
+        0, 0, m_savedWidth, m_savedHeight);
+    m_previousCursorSizeIndex = m_cursorSizeIndex;
 
 updateDone:
     bInNewMouseUpdate = 0;
@@ -398,21 +398,21 @@ void mouseManager::MouseCoords(int &x, int &y)
 VA(0x004c9f20, 0xa2)
 void mouseManager::SaveAndDraw(void)
 {
-    field_0x76 = field_0x66 + iMouseSize[m_cursorSizeIndex][0] > 640
-        ? 640 - field_0x66 : iMouseSize[m_cursorSizeIndex][0];
-    field_0x7a = field_0x6a + iMouseSize[m_cursorSizeIndex][1] > 480
-        ? 480 - field_0x6a : iMouseSize[m_cursorSizeIndex][1];
-    gpWindowManager->m_screen->CopyToCareful(m_savedUnderlying, 0, 0, m_savedW, m_savedH,
-                                               field_0x76, field_0x7a);
-    IconToBitmap(m_cursorIcon, gpWindowManager->m_screen, field_0x66, field_0x6a, m_cursorFrame,
+    m_savedWidth = m_cursorLeft + iMouseSize[m_cursorSizeIndex][0] > 640
+        ? 640 - m_cursorLeft : iMouseSize[m_cursorSizeIndex][0];
+    m_savedHeight = m_cursorTop + iMouseSize[m_cursorSizeIndex][1] > 480
+        ? 480 - m_cursorTop : iMouseSize[m_cursorSizeIndex][1];
+    gpWindowManager->m_screen->CopyToCareful(m_savedUnderlying, 0, 0, m_savedLeft, m_savedTop,
+                                               m_savedWidth, m_savedHeight);
+    IconToBitmap(m_cursorIcon, gpWindowManager->m_screen, m_cursorLeft, m_cursorTop, m_cursorFrame,
                  1, 0, 0, 640, 480, 0);
 }
 
 VA(0x004c9fd0, 0x29)
 void mouseManager::RestoreUnderlying(void)
 {
-    m_savedUnderlying->CopyToCareful(gpWindowManager->m_screen, m_savedW, m_savedH, 0, 0,
-                              field_0x76, field_0x7a);
+    m_savedUnderlying->CopyToCareful(gpWindowManager->m_screen, m_savedLeft, m_savedTop, 0, 0,
+                              m_savedWidth, m_savedHeight);
 }
 
 VA(0x004ca000, 0x2c)

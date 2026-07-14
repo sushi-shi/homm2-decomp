@@ -11,7 +11,10 @@ class icon;
 struct tag_message;
 
 // Misc-private record structs (params of the functions above).
-struct indexArray { unsigned short field0; unsigned short field2; };
+struct indexArray {
+    unsigned short key;
+    unsigned short value;
+};
 
 // Leak-tracking allocation record (BaseAlloc/BaseFree). Packed: ptr sits at +1 (unaligned).
 #pragma pack(push, 1)
@@ -19,8 +22,8 @@ struct MemEntry {
     char used;          // +0x00  in-use flag
     void *ptr;          // +0x01  allocated block
     unsigned int size;  // +0x05  block size
-    char file[0x3d];    // +0x09  caller __FILE__
-    int line;           // +0x46  caller __LINE__
+    char file[0x3d];    // +0x09  original source path supplied by the call site
+    int line;           // +0x46  original source line supplied by the call site
 };
 #pragma pack(pop)
 #ifdef HOMM2_MISC_INLINE_ICONENTRY
@@ -63,6 +66,7 @@ void FadeIn(int);
 void FadeOut(int);
 int Random(int low, int high);
 void ProcessAssert(int condition, char *file, int line);
+// Retail source locations are explicit operands. Never substitute this build's __FILE__/__LINE__.
 #define H2_ALLOC(size, originalFile, originalLine) BaseAlloc(size, originalFile, originalLine)
 #define H2_FREE(ptr, originalFile, originalLine) BaseFree(ptr, originalFile, originalLine)
 #define H2_ASSERT(condition, originalFile, originalLine) ProcessAssert(condition, originalFile, originalLine)
