@@ -172,10 +172,9 @@ void mouseManager::SetPointer(char *name, int param_2, int param_3)
 // (with direct subscripts or pointer temps) regress to 75.10%; the row/column form is 94.32%.
 // Aggregate-reloc spelling spans are base +0x26b..+0x2da and +0x337..+0x399
 // versus retail +0x25f..+0x2ce and +0x32b..+0x38d. Audit: base 69, retail 70.
-// The three helper warnings are false same-address aliases: bmpAndMask member stores
-// are base-symbol+0x4/+0x8 (retail member-local aliases; the helper mistakes stored
-// immediates 0x20/0x40 for addends, reporting 0x133260/0x133280), and IconInfo
-// base 0x133fe0 is the same retail aggregate/member address. llvm-objdump -dr confirms all.
+// The relocation checker now resolves indexed member displacements correctly and reports
+// only-base=0. Source uses the proper typed bmpAndMask and IconInfo members; retail's interior
+// labels are delinker identities, not globals or aliases that should be reproduced in source.
 VA(0x004c9630, 0x405)
 void mouseManager::SetPointer(int frame)
 {

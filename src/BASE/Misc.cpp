@@ -477,8 +477,9 @@ void SetInstallDefaults(void)
 // stores at +0x00..+0x10; retail anchors EAX at fullScreen (+0x30), preloads video width
 // into EBX, and uses -0x14..+0x04. The two-iteration loop CFG, every field value, four
 // rand calls, three KBTickCount calls, and external relocation targets are accounted for.
-// `homm2 relocs` reports 43/42 and only helper-side gConfig member aliases at 0x128d3c,
-// 0x128d74, and 0x128dca; retail delinks those addresses under const/string owners.
+// `homm2 relocs` reports 43/42 and three candidate-only interior anchors at gConfig+0x1c,
+// +0x54, and +0xaa. They arise from this unfinished induction/store layout; source already uses
+// the proper typed gConfig fields, so no interior-label alias should be introduced.
 // Exhausted: pointer and indexed loops, gfx-index plus alias, fullScreen-first stores,
 // an int reference to fullScreen, direct indexed fields, dual gfx/fullScreen induction,
 // field-order variants, all three 640 comparisons, and split/combined random-tick sums.
