@@ -203,7 +203,7 @@ BASE/MOUSEMGR	?SetPointer@mouseManager@@QAEXH@Z	94.3421	5e0d2151a2b4
 BASE/MOUSEMGR	?SetPointer@mouseManager@@QAEXPADHH@Z	100.0000	a6af1d8a1f92
 BASE/MOUSEMGR	?ShowColorPointer@mouseManager@@QAEXXZ	100.0000	f56b43291986
 BASE/Midi	?MIDIIsPlaying@soundManager@@QAEHXZ	100.0000	2211c291016d
-BASE/Midi	?MIDIPlay@soundManager@@QAEXH@Z	99.9588	6625f3b982ab
+BASE/Midi	?MIDIPlay@soundManager@@QAEXH@Z	100.0000	6625f3b982ab
 BASE/Midi	?MIDISetVolume@soundManager@@QAEXXZ	100.0000	15a39005816d
 BASE/Midi	?MIDIShutdown@soundManager@@QAEXXZ	100.0000	e2ecdc5b4f51
 BASE/Midi	?MIDIStartup@soundManager@@QAEXXZ	100.0000	bebbda206114
@@ -326,7 +326,7 @@ BASE/WIDGET	??0widget@@QAE@FFFFFF@Z	96.8261	e72e684243cd
 BASE/WIDGET	??0widget@@QAE@XZ	100.0000	c4c5959c7db6
 BASE/WIDGET	??1widget@@UAE@XZ	100.0000	7e399133b272
 BASE/WIDGET	?Dim@widget@@QAEXXZ	100.0000	48957ebef60e
-BASE/WIDGET	?Main@widget@@UAEHAAUtag_message@@@Z	99.5667	19187008f391
+BASE/WIDGET	?Main@widget@@UAEHAAUtag_message@@@Z	99.8500	19187008f391
 BASE/WIDGET	?Open@widget@@QAEHHPAVheroWindow@@@Z	100.0000	8a20fb239b00
 BASE/WIDGET	empty_stub	0.0000	
 BASE/WINDOW	??0heroWindow@@QAE@HHHHH@Z	100.0000	0261e2bcc000
@@ -639,9 +639,9 @@ SOURCE/CMBTMGR	?RaiseDoor@combatManager@@QAEXXZ	100.0000	9a674310a467
 SOURCE/CMBTMGR	?ResetHitByCreature@combatManager@@QAEXXZ	100.0000	9c52e2ebb50d
 SOURCE/CMBTMGR	?SaveCombatBorder@combatManager@@QAEXXZ	100.0000	979ae436e300
 SOURCE/CMBTMGR	?SetupAdjacencyArray@combatManager@@QAEXXZ	99.8504	9352838f095e
-SOURCE/CMBTMGR	?SetupAndLoadObstacles@combatManager@@QAEXXZ	94.8885	76dd8ef90786
+SOURCE/CMBTMGR	?SetupAndLoadObstacles@combatManager@@QAEXXZ	96.6975	76dd8ef90786
 SOURCE/CMBTMGR	?SetupCombat@combatManager@@QAEXHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHH@Z	100.0000	39a32955f562
-SOURCE/CMBTMGR	?ShootMissile@combatManager@@QAEXHHHHPAMPAVicon@@@Z	97.4787	8d6b1fc77ccf
+SOURCE/CMBTMGR	?ShootMissile@combatManager@@QAEXHHHHPAMPAVicon@@@Z	97.9548	8d6b1fc77ccf
 SOURCE/CMBTMGR	?ShotIsThroughWall@combatManager@@QAEHHHH@Z	99.5224	3f666cd078c3
 SOURCE/CMBTMGR	?TestRaiseDoor@combatManager@@QAEXXZ	100.0000	7504407c9f03
 SOURCE/CMBTMGR	?UpdateArmyGroup@combatManager@@QAEXH@Z	100.0000	1a722a93d70c
@@ -728,7 +728,7 @@ SOURCE/EVENTS	?BarrierAIEvent@advManager@@QAEHPAVmapCell@@PAVhero@@@Z	100.0000	e
 SOURCE/EVENTS	?BarrierEvent@advManager@@QAEHPAVmapCell@@PAVhero@@@Z	100.0000	f49490a66a50
 SOURCE/EVENTS	?CombatMonsterEvent@advManager@@QAEHPAVhero@@HHPAVmapCell@@HHHHHHHHHHH@Z	99.9924	6128293320da
 SOURCE/EVENTS	?ComputerMonsterInteract@advManager@@QAEXPAVmapCell@@PAVhero@@PAH@Z	98.1614	a7b3fb2aaedd
-SOURCE/EVENTS	?DoAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	96.9546	c0ed974fc45d
+SOURCE/EVENTS	?DoAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	96.9650	c0ed974fc45d
 SOURCE/EVENTS	?DoCombat@advManager@@QAEHHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHH@Z	97.4943	d5f1953a6ce3
 SOURCE/EVENTS	?DoEvent@advManager@@QAEXPAVmapCell@@HH@Z	97.9046	00a97e8a9453
 SOURCE/EVENTS	?DoNetCombat@advManager@@QAEHPAD@Z	100.0000	a179394b8b86
@@ -1048,7 +1048,7 @@ SOURCE/Overview	?DoKnob@game@@QAEXXZ	6.5888	6ddabb1c999c
 SOURCE/Overview	?Overview@game@@QAEXXZ	4.4913	a75d22ee2c4b
 SOURCE/Overview	?OverviewHandler@@YIHAAUtag_message@@@Z	1.5298	802444b8eb73
 SOURCE/Overview	?ProcessIconSelect@game@@QAEHHH@Z	4.1731	562f9b2042b5
-SOURCE/Overview	?SetupDynamicStuff@game@@QAEXHHH@Z	92.6376	6edc7428c674
+SOURCE/Overview	?SetupDynamicStuff@game@@QAEXHHH@Z	92.6841	6edc7428c674
 SOURCE/Overview	?SetupNewOverviewType@game@@QAEXHH@Z	6.5226	01b24975aeef
 SOURCE/Overview	?SetupResources@game@@QAEXXZ	35.0811	4ba81d80fcea
 SOURCE/PATH	?FindPath@army@@QAEHHHHHH@Z	14.7158	9f934e672410
@@ -1271,14 +1271,14 @@ SOURCE/STRIP	?Draw@strip@@QAEXXZ	50.0000	626f229cd313
 SOURCE/STRIP	?DrawFrame@strip@@QAEXXZ	54.1667	6598bc800ff2
 SOURCE/STRIP	?DrawIcons@strip@@QAEXH@Z	4.5069	6770c1b0f89e
 SOURCE/STRIP	?Update@bankBox@@QAEXH@Z	20.6032	9d490f0024d7
-SOURCE/SWAPMGR	??0swapManager@@QAE@PAVhero@@0@Z	75.0000	42d14766c140
-SOURCE/SWAPMGR	??0swapManager@@QAE@XZ	50.0000	836ea82e84e8
-SOURCE/SWAPMGR	?Close@swapManager@@UAEXXZ	16.6410	2da6cadae700
-SOURCE/SWAPMGR	?DrawSelector@swapManager@@QAEXXZ	9.4745	e90115fd169d
-SOURCE/SWAPMGR	?DrawSwapWin@swapManager@@QAEHXZ	70.0000	eb632266d1b6
-SOURCE/SWAPMGR	?Main@swapManager@@UAEHAAUtag_message@@@Z	1.0917	41fa6fdac603
-SOURCE/SWAPMGR	?Open@swapManager@@UAEHH@Z	5.7295	c14e0df60b41
-SOURCE/SWAPMGR	?Reset@swapManager@@QAEXXZ	41.9355	3b0e4c33ab65
+SOURCE/SWAPMGR	??0swapManager@@QAE@PAVhero@@0@Z	100.0000	2518a2b2ff23
+SOURCE/SWAPMGR	??0swapManager@@QAE@XZ	100.0000	66f46459a5a8
+SOURCE/SWAPMGR	?Close@swapManager@@UAEXXZ	100.0000	e522fa7e19e7
+SOURCE/SWAPMGR	?DrawSelector@swapManager@@QAEXXZ	100.0000	ba4e52dd1633
+SOURCE/SWAPMGR	?DrawSwapWin@swapManager@@QAEHXZ	100.0000	5e03a8abb696
+SOURCE/SWAPMGR	?Main@swapManager@@UAEHAAUtag_message@@@Z	91.3679	26bf54118e1e
+SOURCE/SWAPMGR	?Open@swapManager@@UAEHH@Z	100.0000	22be83afd3f6
+SOURCE/SWAPMGR	?Reset@swapManager@@QAEXXZ	100.0000	d5ea27ddec93
 SOURCE/SWAPMGR	?SplitMons@swapManager@@QAEXXZ	5.6681	58b31fa5fd2e
 SOURCE/SWAPMGR	?SwapArtifacts@swapManager@@QAEXXZ	7.7725	0e73874b4d46
 SOURCE/SWAPMGR	?SwapMons@swapManager@@QAEXXZ	11.8000	e9515de90386

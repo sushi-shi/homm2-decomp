@@ -80,7 +80,7 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     short  m_spellPoints;  // +0x00
-    char   m_id;  // +0x02
+    unsigned char m_id;  // +0x02
     char   m_owner;  // +0x03
     short m_lastHeroInteractionTurn;  // +0x04
     signed char m_lastInteractionHeroId;  // +0x06
