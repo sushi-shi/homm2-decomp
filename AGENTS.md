@@ -41,7 +41,9 @@ authoritative. This file is the short, restart-ready Codex workflow.
    The campaign has two global phases. Until total SOURCE fuzzy reaches **95%**, recover complete
    bodies, real types/layouts, frames, stack slots, CFG, inline accessors, and relocation targets.
    At a compiler-shape wall, try only a few obvious semantics-preserving spellings, record the
-   byte-level residual, and move on. Do not run extended compile searches or permutation passes:
+   byte-level residual and exhausted attempts in a durable source marker, and move on. Use
+   `@early-stop` only for a byte-proven permitted wall; otherwise use `@match-note` for a complete
+   pre-95 structural checkpoint. Do not run extended compile searches or permutation passes:
    later shared-header/layout recovery can invalidate carefully tuned matches. At 95% total fuzzy,
    start the last-mile phase and use `scripts/permute_ast.py` on structurally aligned 96-99% functions.
    Its ranges are syntax-aware, but audit every retained mutation. Inequality +/-1 rewrites are
@@ -87,6 +89,12 @@ authoritative. This file is the short, restart-ready Codex workflow.
   few obvious steering attempts, even if it is 96-99%. Systematic wall breaking and AST permutation
   begin only at 95% total fuzzy. This prevents later shared-header and class-layout discoveries from
   invalidating carefully crafted byte matches.
+- Every integrated non-100 function must carry a durable marker immediately above its `VA()`.
+  `@early-stop` is the byte-proven artifact set. `@match-note` is a provisional pre-95 checkpoint:
+  record the first retail/ours assembly divergence or byte span, frame/slot/CFG and relocation
+  status, the obvious spellings already tried, and the condition for revisiting it. Before 95%, do
+  not repeat attempts listed in `@match-note`; at 95%, build the last-mile queue from those notes.
+  Remove a stale `@match-note` when the function reaches 100% or gains a valid `@early-stop` proof.
 - Integrate exactly one worker at a time. Apply only its declared source/header files; never copy a
   worker's `README.md`, `config/match_baseline.tsv`, or transient queue. On `source-decomp`, run the
   full build, verify the reported functions, run `homm2 status update`, stage the worker files plus
@@ -96,8 +104,10 @@ authoritative. This file is the short, restart-ready Codex workflow.
   its handoff was comments-only, stub-only, or otherwise lacked real matching progress, reject that
   result and assign the lane to a fresh matcher agent instead.
 - A worker does not escape deferred targets. Return every unfinished or improperly parked function
-  to that same worker and lane before assigning new work; advance only after each target reaches
-  100% or a byte-proven permitted wall under `.claude/agents/matcher.md`.
+  to that same worker and lane before assigning new work. Before 95%, advance only after each target
+  is structurally complete and is either 100%, a byte-proven permitted `@early-stop`, or a fully
+  evidenced `@match-note` checkpoint under `.claude/agents/matcher.md`; a note cannot excuse missing
+  semantics, layout, frame/slot, CFG, or relocation work.
 - Do not repeatedly poll worker worktrees, reports, or percentages while a batch is active. Rely on
   matcher milestone/completion messages and let workers tune uninterrupted. Inspect a lane only for
   serial integration, a reported blocker/coordination need, or after a genuinely long silent period
@@ -130,6 +140,10 @@ authoritative. This file is the short, restart-ready Codex workflow.
   Use plain `homm2 status update` for direct function edits that should establish a new maximum.
 - Mark `@early-stop` only for 100% matches or a byte-proven residual such as delinked local-label or
   constant-pool naming. Document the exact byte span and reason.
+- Mark a structurally complete but not yet byte-proven pre-95 wall with `@match-note`, immediately
+  above `VA()`. Record the first differing instructions/offsets, confirmed frame/slot/CFG and
+  relocation state, and every obvious steering attempt already exhausted. This is a restart
+  checkpoint, not an early-stop proof and not permission to leave reconstruction work unfinished.
 - Before the 95% phase switch, a wall proof requires complete semantics/frame/slots/CFG and relocation
   review, but only a few obvious source-shape attempts. Do not exhaustively permute or brute-force it.
 - A jump-only early stop must be proved after excluding known jump-table data: every non-jump
