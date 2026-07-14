@@ -111,7 +111,7 @@ public:
     adventureSoundCell m_activeSounds[4];  // +0x2c2
     class sample *m_loopingSamples[28];  // +0x2e2
     class sample *m_cursorSamples[9];  // +0x352
-    int    m_currentSampleSet;  // +0x376
+    int m_identifyHeroActive;  // +0x376
     int    m_openState;  // +0x37a
     // --- constructors ---
     advManager(void);
