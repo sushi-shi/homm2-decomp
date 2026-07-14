@@ -18,32 +18,31 @@ General rules:
   96-97%. Never use the regex permuter for these targets.
 - A clean soft defer is a scheduling decision, not proof that the remaining bytes are impossible.
 
-## BASE/Textntry: remaining constructor, Read, and display-string residuals
+## BASE/Textntry: remaining constructor and Read residuals
 
-Status: active. These functions have narrow measured residuals, but the delayed independent store
-and register-allocation differences do not meet either permitted `@early-stop` flavor. They must
+Status: active. `SetupDisplayString` is now byte-exact. The delayed constructor store
+and the adjacent `Read` scheduling reversal do not meet either permitted `@early-stop` flavor. They
 remain unmarked and in the same lane.
 
 Canonical source state:
 
-- checkpoint: `a9d1370`
+- lane checkpoint: `97c1152`
 - `src/BASE/Textntry.cpp`:
-  `fd22c7692d4e9293c47a13eb83b422b678371fe4ee19755d78b515c9b94fd5cb`
+  `ac8dd08884961ba6d73e8a312391cdeecac71ba132f5badef5f79201a63b34d8`
 - `include/BASE/textEntryWidget.h`:
-  `f5d08f5a98e96310182cf720733ccb4670b41bfcb24c44ec8ce36fcce86072a3`
-- long constructor, RVA `0xd87b0`: 98.695656%, normalized hash `cc616330bf7f`,
+  `8207f088751e59f5a467c7a7e582c4870d82c3fb4e060262d02d5e3a07a17517`
+- long constructor, RVA `0xd87b0`: live 98.652176% with the prior 98.695656% retained maximum,
   base/retail size `0x134`, 6/6 relocations;
 - `Read`, RVA `0xd8920`: 98.6755%, base/retail size `0x26c`, 52/52 relocations;
-- `SetupDisplayString`, RVA `0xd9570`: live 97.12838% with retained maximum 97.3581%,
+- `SetupDisplayString`, RVA `0xd9570`: 100.000000% raw-exact,
   base/retail size `0x1be`, frame `0x130`, 8/8 relocations.
 
-The constructor streams differ only by retail storing parameter 10 before three independent
-constant flag stores while the candidate delays that store. `Read` differs only by retail comparing
-`type` before loading `m_height`, while the candidate emits those independent instructions in the
-opposite order. `SetupDisplayString` has the same calls, loop CFG, size, frame, and relocation
-targets. The candidate assigns this/cursor to EBX/EBP instead of retail EBP/EBX; the remaining
-instruction stream agrees under that register mapping, including the redundant retail `xor` in
-the dead second-loop tail.
+The three constructor constant member stores now occur in the unmasked retail offset order; the
+only remaining raw scheduling residual is retail storing `iconFrame` before them while the candidate
+delays that independent store. `Read` differs only by retail comparing `type` before loading
+`m_height`, while the candidate emits those instructions in the opposite order. The exact Setup source
+reuses one 32-bit `shifted` flag across both display-adjustment loops, which gives retail EBP=`this`,
+EBX=cursor/flag allocation and the proved 32-bit clears/tests in the dead second-loop tail.
 
 ### Searches already exhausted
 
@@ -101,11 +100,22 @@ Focused Setup AST pass after integration at `341e775`:
 - the complete no-repeat set is
   [`docs/matching-matrices/textntry-setup-ast-341e775.tsv`](matching-matrices/textntry-setup-ast-341e775.tsv).
 
+Fresh semantic-lifetime pass from lane checkpoint `97c1152`:
+
+- reusing the same 32-bit `shifted` local across both loops makes `SetupDisplayString` raw-exact;
+- reusing the unsigned-short cursor instead proves the right allocation but leaves four wrong-width
+  `xor/test bx` instructions, so that tempting 99.73% state is structurally wrong and was reverted;
+- narrowing a separate `int` flag and initializing it with zero or cursor are byte-identical to the
+  old 97.128380% state;
+- a constructor-local icon-frame snapshot regresses the later Setup allocation to 99.93%, proving
+  predecessor/TU-state sensitivity; all hashes and outcomes are in
+  [`textntry-fresh-lifetimes-97c1152.tsv`](matching-matrices/textntry-fresh-lifetimes-97c1152.tsv).
+
 Do not repeat those TU-state searches while the canonical source hash and sibling hashes agree.
 The newly authorized local Setup AST space is now exhausted. Continue only with a retail-evidenced
 lifetime or a genuinely different exact-preserving predecessor/TU state. Any later accepted wall
-must satisfy the two narrow rules in `.claude/agents/matcher.md`; the current scheduling and
-register-allocation residuals do not.
+must satisfy the two narrow rules in `.claude/agents/matcher.md`; the remaining constructor and
+`Read` scheduling residuals do not.
 
 ## BASE/listbox: listBoxWidget::Main
 
