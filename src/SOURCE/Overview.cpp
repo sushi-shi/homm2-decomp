@@ -39,18 +39,19 @@ static short overviewDialogSourceLine = OVERVIEW_DIALOG_SOURCE_LINE;
 
 #define OVERVIEW_SETUP_LINE overviewSetupSourceLine
 
-// @match-note: retained/live 98.23%. Recovered the row-major [row][item]
-// accesses, cached row widget-ID base, dword counters/town frame, captain flag
-// and 0x8000 building bit, sequential icon-count CFG, and shared text buffer.
-// External relocs are 340/340. The function is not parked: ours still has a
-// 0xe0 frame/this -0xd4 versus retail 0xe8/-0xdc. The primary slots row -0xc,
-// item -0x14, text count -0x10, icon count -0x18, row base -0x08 match; retail
-// has an unused -0x1c dword and knob scale/divisor at -0x20/-0x24. Before the
-// first jump table, the remaining opcode residuals are retail continuation
-// jumps near +0x406 and +0x780. Rejected: changing the globals to row pointers
-// (wrong ?@@3PAY0EG@ ABI), iconCounts[2] (96.44%, wrong slots), separate text
-// locals/function-wide hero (0xf0 frame), shared text/narrow heroes (0xe0),
-// and hoisting captainMana (retail uses it at -0x40, not the -0x1c hole).
+// @match-note: retained/live 98.90%. Recovered row-major [row][item] accesses,
+// the cached row widget-ID base, dword counters/town frame, captain CFG and
+// 0x8000 building bit, shared text buffer, and shared secondary-skill/artifact
+// row/column locals computed before allocation. Frame 0xe8, this -0xdc, primary
+// slots, CFG, semantics, and all 340 external relocations now match. The first
+// opcode residuals are retail continuation jumps near +0x406 and +0x780; knob
+// scale/divisor remain ours -0x1c/-0x20 versus retail -0x20/-0x24, and late
+// hero-detail locals retain different slot identities. Rejected: row-pointer
+// globals (wrong ?@@3PAY0EG@ ABI), iconCounts[2] (96.44%), separate text locals
+// plus function-wide hero (0xf0), hoisted captainMana (wrong -0x40 use), an
+// unaddressed top-level dword (0xe4), separate detail-coordinate pairs (0xf4),
+// and semantic bucket suffixes (no score gain). Revisit after total SOURCE 95%
+// for continuation/slot tuning; do not repeat these structural attempts.
 VA(0x00407870, 0x223e)
 void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
 {
@@ -486,6 +487,9 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
             }
         } else {
             hero *heroData0;
+            int detailRow;
+            int detailColumn;
+            int detailIndex;
             heroData0 = &m_heroRecs[gpCurPlayer->m_heroIds[giOverviewTop[giOverviewType] + row]];
 
             reinterpret_cast<OverviewIconWidgetRow *>(iconWidgetDynamic)[row][iconCount] = new iconWidget(
@@ -685,16 +689,18 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
             }
 
             for (item = 0; item < OVERVIEW_SECONDARY_SKILL_SLOTS; item++) {
-                int detailIndex = heroData0->GetNthSS(item);
+                detailIndex = heroData0->GetNthSS(item);
                 if (detailIndex != -1) {
+                    detailRow = item / OVERVIEW_SECONDARY_SKILL_COLUMNS;
+                    detailColumn = item % OVERVIEW_SECONDARY_SKILL_COLUMNS;
                     reinterpret_cast<OverviewIconWidgetRow *>(iconWidgetDynamic)[row][iconCount] =
                         new iconWidget(
                             static_cast<short>(
-                                (item % OVERVIEW_SECONDARY_SKILL_COLUMNS) * 35 + 233
+                                detailColumn * 35 + 233
                             ),
                             static_cast<short>(
                                 row * OVERVIEW_ROW_HEIGHT
-                                + (item / OVERVIEW_SECONDARY_SKILL_COLUMNS) * 42 + 20
+                                + detailRow * 42 + 20
                             ),
                             34,
                             34,
@@ -717,11 +723,11 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
                     reinterpret_cast<OverviewIconWidgetRow *>(iconWidgetDynamic)[row][iconCount + 1] =
                         new iconWidget(
                             static_cast<short>(
-                                (item % OVERVIEW_SECONDARY_SKILL_COLUMNS) * 35 + 234
+                                detailColumn * 35 + 234
                             ),
                             static_cast<short>(
                                 row * OVERVIEW_ROW_HEIGHT
-                                + (item / OVERVIEW_SECONDARY_SKILL_COLUMNS) * 42 + 21
+                                + detailRow * 42 + 21
                             ),
                             32,
                             32,
@@ -749,11 +755,11 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
                     reinterpret_cast<OverviewTextWidgetRow *>(textWidgetDynamic)[row][textItemCount] =
                         new textWidget(
                             static_cast<short>(
-                                (item % OVERVIEW_SECONDARY_SKILL_COLUMNS) * 35 + 255
+                                detailColumn * 35 + 255
                             ),
                             static_cast<short>(
                                 row * OVERVIEW_ROW_HEIGHT
-                                + (item / OVERVIEW_SECONDARY_SKILL_COLUMNS) * 42 + 45
+                                + detailRow * 42 + 45
                             ),
                             8,
                             8,
@@ -775,14 +781,16 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
             int displayedArtifacts = 0;
             for (item = 0; item < OVERVIEW_ARTIFACT_SLOTS; item++) {
                 if (heroData0->m_artifacts[item] != -1) {
+                    detailRow = displayedArtifacts / OVERVIEW_ARTIFACT_COLUMNS;
+                    detailColumn = displayedArtifacts % OVERVIEW_ARTIFACT_COLUMNS;
                     reinterpret_cast<OverviewIconWidgetRow *>(iconWidgetDynamic)[row][iconCount] =
                         new iconWidget(
                             static_cast<short>(
-                                (displayedArtifacts % OVERVIEW_ARTIFACT_COLUMNS) * 35 + 378
+                                detailColumn * 35 + 378
                             ),
                             static_cast<short>(
                                 row * OVERVIEW_ROW_HEIGHT
-                                + (displayedArtifacts / OVERVIEW_ARTIFACT_COLUMNS) * 42 + 20
+                                + detailRow * 42 + 20
                             ),
                             34,
                             34,
@@ -805,11 +813,11 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
                     reinterpret_cast<OverviewIconWidgetRow *>(iconWidgetDynamic)[row][iconCount + 1] =
                         new iconWidget(
                             static_cast<short>(
-                                (displayedArtifacts % OVERVIEW_ARTIFACT_COLUMNS) * 35 + 379
+                                detailColumn * 35 + 379
                             ),
                             static_cast<short>(
                                 row * OVERVIEW_ROW_HEIGHT
-                                + (displayedArtifacts / OVERVIEW_ARTIFACT_COLUMNS) * 42 + 21
+                                + detailRow * 42 + 21
                             ),
                             32,
                             32,

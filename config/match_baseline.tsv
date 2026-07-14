@@ -1029,7 +1029,7 @@ SOURCE/Overview	?DoKnob@game@@QAEXXZ	100.0000	bd646ea03ed8
 SOURCE/Overview	?Overview@game@@QAEXXZ	99.7855	e1411ffb3867
 SOURCE/Overview	?OverviewHandler@@YIHAAUtag_message@@@Z	99.8363	1766afff8094
 SOURCE/Overview	?ProcessIconSelect@game@@QAEHHH@Z	99.4030	49e7e4737fe0
-SOURCE/Overview	?SetupDynamicStuff@game@@QAEXHHH@Z	98.2269	4b75e32ab2ad
+SOURCE/Overview	?SetupDynamicStuff@game@@QAEXHHH@Z	98.8959	44b8680b5dc4
 SOURCE/Overview	?SetupNewOverviewType@game@@QAEXHH@Z	100.0000	fe0018b6de5f
 SOURCE/Overview	?SetupResources@game@@QAEXXZ	100.0000	4a64f57f145e
 SOURCE/PATH	?FindPath@army@@QAEHHHHHH@Z	100.0000	cab1782b72c7
