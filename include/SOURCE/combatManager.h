@@ -636,7 +636,7 @@ public:
     int m_limitCreatureHex;  // +0xf2bb
     int m_showArmyQuantities;  // +0xf2bf
     int m_selectedHex;  // +0xf2c3
-    char _pad_0xf2c7[0x4];
+    int m_directionTargetHex;  // +0xf2c7
     int m_unknownF2CB;  // +0xf2cb
     int m_unknownF2CF;  // +0xf2cf
     struct SLimitData m_catapultLimits;  // +0xf2d3
@@ -668,7 +668,9 @@ public:
     char _pad_0xf433[0xc8];
     int m_combatX;  // +0xf4fb
     int m_combatY;  // +0xf4ff
-    char _pad_0xf503[0x20];
+    signed char m_directionMap[24];  // +0xf503
+    int m_mouseDirection;  // +0xf51b
+    int m_validDirectionCount;  // +0xf51f
     struct SLimitData m_smallViewLimits;  // +0xf523
     char _pad_0xf533[0x10];
     int m_smallViewSide[2];  // +0xf543
