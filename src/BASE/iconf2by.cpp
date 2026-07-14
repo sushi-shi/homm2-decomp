@@ -107,11 +107,12 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
             gFYX = gFYX - gFYDimLen2;
             continue;
         do_fill:
+            unsigned int fillCount = gFYRun;
             if (shear[gFYY] != 0x7f && clipY <= gFYY && gFYY <= gFYClipB) {
-                if (clipX <= (gFYX - gFYRun) + 1 && gFYX <= gFYClipR) {
-                    if (clipX <= (gFYX - gFYRun) + 1) {
-                        memset(reinterpret_cast<unsigned char *>((gFYRow - gFYRun) + 1 + gFYX),
-                               gFYColor, gFYRun);
+                if (clipX <= static_cast<int>((gFYX - fillCount) + 1) && gFYX <= gFYClipR) {
+                    if (clipX <= static_cast<int>((gFYX - fillCount) + 1)) {
+                        memset(reinterpret_cast<unsigned char *>((gFYRow - fillCount) + 1 + gFYX),
+                               gFYColor, fillCount);
                     } else {
                         memset(reinterpret_cast<unsigned char *>(gFYRow + clipX), gFYColor,
                                (gFYX - clipX) + 1);
@@ -123,30 +124,37 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
         }
         // ---- positive command : backward literal copy / newline ----
         if (gFYRun != 0) {
-            unsigned int advance = gFYRun;
             if (shear[gFYY] != 0x7f && clipY <= gFYY && gFYY <= gFYClipB) {
                 int left = (gFYX - gFYRun) + 1;
+                int pendingSkip;
                 if (left <= gFYClipR && clipX <= gFYX) {
                     if (gFYX <= gFYClipR) {
                         gFYDst = reinterpret_cast<unsigned char *>(gFYRow + gFYX);
                         if (clipX <= left) {
                             gFYSkip = 0;
                             gFYDimLen = gFYRun;
+                            goto copy_literal;
                         } else {
                             gFYDimLen = (gFYX - clipX) + 1;
-                            gFYSkip = gFYRun - gFYDimLen;
+                            pendingSkip = gFYRun - gFYDimLen;
+                            goto publish_literal_skip;
                         }
                     } else {
                         gFYSrc = gFYSrc + (gFYX - gFYClipR);
                         gFYDst = reinterpret_cast<unsigned char *>(gFYClipR + gFYRow);
-                        if ((gFYX - gFYRun) < clipX) {
-                            gFYSkip = ((gFYRun - gFYX) - clipWidth) + gFYClipR;
-                            gFYDimLen = clipWidth;
-                        } else {
+                        if (clipX <= (gFYX - gFYRun)) {
                             gFYSkip = 0;
                             gFYDimLen = (gFYRun - gFYX) + gFYClipR;
+                            goto copy_literal;
+                        } else {
+                            pendingSkip = ((gFYRun - gFYX) - clipWidth) + gFYClipR;
+                            gFYDimLen = clipWidth;
+                            goto publish_literal_skip;
                         }
                     }
+                publish_literal_skip:
+                    gFYSkip = pendingSkip;
+                copy_literal:
                     gFYDimIdx = 0;
                     if (0 < static_cast<int>(gFYDimLen)) {
                         do {
@@ -156,10 +164,12 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
                             gFYDimIdx = gFYDimIdx + 1;
                         } while (gFYDimIdx < static_cast<int>(gFYDimLen));
                     }
-                    advance = gFYSkip;
+                    gFYSrc = gFYSrc + gFYSkip;
+                    goto literal_advance_done;
                 }
             }
-            gFYSrc = gFYSrc + advance;
+            gFYSrc = gFYSrc + gFYRun;
+        literal_advance_done:
             gFYX = gFYX - gFYRun;
             continue;
         }
