@@ -180,9 +180,9 @@ int CombatSpecialHandler(tag_message &message)
 {
     if (message.type == SPELL_MESSAGE_HOVER) {
         gpWindowManager->ConvertToHover(message);
-        if (gpWindowManager->field_0x5e == message.payload.hover.id)
+        if (gpWindowManager->m_lastHoverId == message.payload.hover.id)
             return SPELL_HANDLER_CONTINUE;
-        gpWindowManager->field_0x5e = message.payload.hover.id;
+        gpWindowManager->m_lastHoverId = message.payload.hover.id;
 
         switch (message.payload.hover.id) {
         case SPELL_CONTROL_PREVIOUS_PAGE:
