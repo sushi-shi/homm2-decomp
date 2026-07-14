@@ -9,6 +9,7 @@
 #include <BASE/icon.h>
 #include <BASE/font.h>
 #include <BASE/bitmap.h>
+#include <BASE/executive.h>
 #include <BASE/BITS.h>
 #include <BASE/iconWidget.h>
 #include <BASE/textWidget.h>
@@ -33,6 +34,7 @@
 #include <SOURCE/HERO.h>
 #include <SOURCE/EVENTS.h>
 #include <SOURCE/ExpCampaign.h>
+#include <SOURCE/fileRequester.h>
 #include <SOURCE/FINDPATH.h>
 #include <SOURCE/GAME.h>
 #include <SOURCE/PHILAI.h>
@@ -98,7 +100,7 @@ advManager::advManager(void)
     m_updatePending = 0;
     m_selectedCell = ADVMGR_INVALID_CELL;
     m_cursorActive = 0;
-    m_currentSampleSet = 0;
+    m_identifyHeroActive = 0;
     m_drawHeroShadows = 1;
     m_adventureBorder = 0;
 
@@ -4133,7 +4135,7 @@ void advManager::HeroQuickView(int heroId, int locatorSlot, int windowX, int win
 
     monsterIconRef = gpResourceManager->GetIcon("mons32.icn");
     targetHero = gpGame->GetHero(heroId);
-    if (targetHero->m_owner == giCurPlayer || m_currentSampleSet == 1 ||
+    if (targetHero->m_owner == giCurPlayer || m_identifyHeroActive == 1 ||
         IsCrystalBallInEffect(targetHero->m_x, targetHero->m_y, 8)) {
         if (windowX == -1) {
             windowX = 288;
@@ -4171,7 +4173,7 @@ void advManager::HeroQuickView(int heroId, int locatorSlot, int windowX, int win
         if (targetHero->m_army.m_creatureTypes[armyIndex] != -1)
             ++visibleArmyCountState;
 
-    if (targetHero->m_owner == giCurPlayer || m_currentSampleSet == 1 ||
+    if (targetHero->m_owner == giCurPlayer || m_identifyHeroActive == 1 ||
         IsCrystalBallInEffect(targetHero->m_x, targetHero->m_y, 8)) {
         for (armyIndex = 0; armyIndex < 4; ++armyIndex) {
             sprintf(gText, "%d", targetHero->Stats(armyIndex));
@@ -4622,7 +4624,29 @@ void advManager::TownQuickView(int townId, int locatorSlot, int windowX, int win
 }
 
 VA(0x00463dd6, 0x11f)
-void advManager::RedrawAdvScreen(int, int) {}
+void advManager::RedrawAdvScreen(int update, int freeBorder)
+{
+    if (!bShowIt)
+        return;
+    gpResourceManager->GetBackdrop("advbord.icn", gpWindowManager->m_screen, 1);
+    if (freeBorder) {
+        BaseFree(m_adventureBorder, ADVMGR_SOURCE_FILE,
+                 ADVMGR_BORDER_FREE_LINE + 9);
+        m_adventureBorder = 0;
+    }
+    SaveAdventureBorder();
+    UpdateHeroLocators(0, 0);
+    UpdateTownLocators(0, 0);
+    UpdBottomView(1, 0, 0);
+    m_adventureWindow->DrawWindow(0);
+    if (update)
+        gpWindowManager->UpdateScreenRegion(0, 0, ADVMGR_SCREEN_WIDTH,
+                                            ADVMGR_SCREEN_HEIGHT);
+    UpdateRadar(update, 0);
+    CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
+    if (update)
+        UpdateScreen(0, 0);
+}
 
 VA(0x00463ef5, 0x1f)
 void advManager::DeactivateCurrTown(void)
@@ -4647,26 +4671,417 @@ void advManager::MobilizeCurrHero(int update)
     SetHeroContext(gpCurPlayer->m_currentHero, update);
 }
 
+// @match-note
+// First residual at +0xd9: retail loads m_eventFlags, ORs EAX with 0x80, then
+// stores it; ours emits the equivalent OR dword ptr [hero+0xe3],0x80. The 0xc
+// frame and all three slots, CFG, remaining instructions, and all 7 relocation
+// targets agree. Both `|=` and explicit `= HERO_EVENT_EMBARKED | m_eventFlags`
+// collapse to the memory OR; w4hi bitfield assignment fixed the other residual.
+// Revisit with specific new evidence or after the SOURCE placeholder census is
+// zero.
 VA(0x00463f95, 0x16c)
-void advManager::DemobilizeCurrHero(void) {}
+void advManager::DemobilizeCurrHero(void)
+{
+    if (gpCurPlayer->m_currentHero == ADVMGR_INVALID_HERO)
+        return;
+    if (!m_heroContextLocked)
+        return;
+
+    m_heroContextLocked = 0;
+    hero *currentHero = gpGame->GetHero(gpCurPlayer->m_currentHero);
+    StopCursor(1);
+    mapCell *currentCell = GetCell(currentHero->m_x, currentHero->m_y);
+    currentHero->m_locationType = currentCell->triggerType;
+    currentHero->m_occupiedTown = currentCell->w4hi;
+    currentHero->m_direction = static_cast<unsigned char>(m_cursorDirection);
+    if (m_cursorType == CURSOR_HERO_TYPE_BOAT)
+        currentHero->m_eventFlags = HERO_EVENT_EMBARKED | currentHero->m_eventFlags;
+    currentCell->triggerType = MAP_EVENT_ACTION_FLAG | MAP_EVENT_HERO_INTERACTION;
+    currentCell->w4hi = currentHero->m_id;
+    currentCell->field8 &= ~CURSOR_MAP_VISIBLE_FLAG;
+    m_cursorActive = 0;
+    CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
+    UpdateScreen(0, 0);
+}
 
 VA(0x00464101, 0x217)
-void advManager::SetTownContext(int) {}
+void advManager::SetTownContext(int townId)
+{
+    DeactivateCurrHero();
+    gpCurPlayer->m_currentTown = static_cast<signed char>(townId);
+    town *currentTownValue = gpGame->GetTown(gpCurPlayer->m_currentTown);
+    m_mapOriginX = currentTownValue->m_x - ADVMGR_VIEW_CENTER_OFFSET;
+    m_mapOriginY = currentTownValue->m_y - ADVMGR_VIEW_CENTER_OFFSET;
+
+    int selectedIndex7 = 0;
+    int index;
+    for (index = 0; index < gpCurPlayer->m_townCount; ++index) {
+        if (gpCurPlayer->m_townIds[index] == townId)
+            selectedIndex7 = index;
+    }
+    if (selectedIndex7 < gpCurPlayer->m_townLocatorPage)
+        gpCurPlayer->m_townLocatorPage = static_cast<signed char>(selectedIndex7);
+    else if (gpCurPlayer->m_townLocatorPage + ADVMGR_LOCATOR_VISIBLE_COUNT - 1 <
+             selectedIndex7)
+        gpCurPlayer->m_townLocatorPage = static_cast<signed char>(
+            selectedIndex7 - (ADVMGR_LOCATOR_VISIBLE_COUNT - 1));
+
+    UpdateHeroLocators(1, 1);
+    UpdateTownLocators(1, 1);
+    HideRoute(0, 0, 1);
+    UpdBottomView(1, 1, 1);
+    UpdateRadar(1, 0);
+    CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
+    UpdateScreen(0, 0);
+    SetEnvironmentOrigin(m_mapOriginX + ADVMGR_VIEW_CENTER_OFFSET,
+                         m_mapOriginY + ADVMGR_VIEW_CENTER_OFFSET, 1);
+
+    selectedIndex7 = giGroundToTerrain[
+        GetCell(currentTownValue->m_x, currentTownValue->m_y)->tile];
+    if (m_currentTerrain != selectedIndex7) {
+        m_currentTerrain = selectedIndex7;
+        gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
+    }
+    gpInputManager->ForceMouseMove();
+    m_lastHoverCell = 0;
+}
 
 VA(0x00464318, 0x392)
-void advManager::SetHeroContext(int, int) {}
+void advManager::SetHeroContext(int heroId, int update)
+{
+    if (heroId == ADVMGR_INVALID_HERO)
+        return;
 
+    DeactivateCurrTown();
+    HideRoute(0, 0, 1);
+    DeactivateCurrHero();
+    m_heroContextLocked = 1;
+    gpCurPlayer->m_currentHero = static_cast<signed char>(heroId);
+    hero *currentHero = gpGame->GetHero(gpCurPlayer->m_currentHero);
+    m_mapOriginX = currentHero->m_x - ADVMGR_VIEW_CENTER_OFFSET;
+    m_mapOriginY = currentHero->m_y - ADVMGR_VIEW_CENTER_OFFSET;
+    m_cursorMapY = 7;
+    m_cursorMapX = m_cursorMapY;
+    m_previousCursorMapY = ADVMGR_INVALID_CELL;
+    m_previousCursorMapX = m_previousCursorMapY;
+    if (currentHero->m_eventFlags & HERO_EVENT_EMBARKED)
+        m_cursorType = CURSOR_HERO_TYPE_BOAT;
+    else
+        m_cursorType = currentHero->m_cursorType;
+    m_cursorDirection = currentHero->m_direction;
+    m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
+
+    mapCell *currentCell = GetCell(currentHero->m_x, currentHero->m_y);
+    currentCell->field8 |= CURSOR_MAP_VISIBLE_FLAG;
+    gpGame->RestoreCell(currentHero->m_x, currentHero->m_y,
+                        currentHero->m_locationType, currentHero->m_occupiedTown,
+                        0, 4);
+
+    int selectedIndex7 = 0;
+    int index;
+    for (index = 0; index < gpCurPlayer->m_heroCount; ++index) {
+        if (gpCurPlayer->m_heroIds[index] == heroId)
+            selectedIndex7 = index;
+    }
+    if (selectedIndex7 < gpCurPlayer->m_heroLocatorPage)
+        gpCurPlayer->m_heroLocatorPage = static_cast<signed char>(selectedIndex7);
+    else if (gpCurPlayer->m_heroLocatorPage + ADVMGR_LOCATOR_VISIBLE_COUNT - 1 <
+             selectedIndex7)
+        gpCurPlayer->m_heroLocatorPage = static_cast<signed char>(
+            selectedIndex7 - (ADVMGR_LOCATOR_VISIBLE_COUNT - 1));
+
+    UpdateHeroLocators(1, 1);
+    UpdateTownLocators(1, 1);
+    if (!update && (m_active == 1 || gbThisNetHumanPlayer[giCurPlayer])) {
+        Reseed(0, 0);
+        SeedTo(currentHero->m_destinationX, currentHero->m_destinationY);
+        ShowRoute(0, 0, !update);
+    }
+    UpdBottomView(1, 1, 1);
+    m_cursorActive = 1;
+    UpdateRadar(1, 0);
+    CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
+    UpdateScreen(0, 0);
+    SetEnvironmentOrigin(m_mapOriginX + ADVMGR_VIEW_CENTER_OFFSET,
+                         m_mapOriginY + ADVMGR_VIEW_CENTER_OFFSET, 1);
+
+    selectedIndex7 = giGroundToTerrain[currentCell->tile];
+    if (m_currentTerrain != selectedIndex7) {
+        m_currentTerrain = selectedIndex7;
+        gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
+    }
+    if (!gbHeroMoving) {
+        gpInputManager->ForceMouseMove();
+        m_lastHoverCell = 0;
+    }
+}
+
+// @match-note
+// First residual bytes are +0xcc/+0xd0: retail uses `cmp eax,[message.y]; jle`,
+// ours uses `cmp [message.y],eax; jge`; the mirrored upper clamp differs at
+// +0xe8/+0xec. The 0x80 frame, every named/compiler slot, CFG, all other code,
+// and all 26 relocation targets agree. `message.y < sum` and `sum > message.y`
+// lower identically; an empty positive arm plus else adds two 5-byte jumps and
+// regresses the match. Revisit with specific new evidence or after the SOURCE
+// placeholder census is zero.
 VA(0x004646aa, 0x22f)
-void advManager::DoHeroKnob(void) {}
+void advManager::DoHeroKnob(void)
+{
+    int previousPageSlot = gpCurPlayer->m_heroLocatorPage;
+    int locatorCount29 = gpCurPlayer->m_heroCount;
+    int newPageState;
+    double pageHeight7 = static_cast<double>(ADVMGR_LOCATOR_HERO_SCROLL_SPAN) /
+                         (locatorCount29 - ADVMGR_LOCATOR_VISIBLE_COUNT);
+    int mouseX4;
+    int mouseYState;
+    gpMouseManager->MouseCoords(mouseX4, mouseYState);
+    int dragOffset5 = mouseYState - m_scrollLeftButton->m_y;
+    gpInputManager->Flush();
+    tag_message message = gpInputManager->GetEvent();
 
+    while (message.type != MESSAGE_LEFT_BUTTON_UP &&
+           message.type != MESSAGE_RIGHT_BUTTON_UP) {
+        if (message.type == MESSAGE_MOUSE_MOVE) {
+            if (message.payload.mouse.y < dragOffset5 + ADVMGR_LOCATOR_SCROLL_BASE_Y)
+                message.payload.mouse.y = dragOffset5 + ADVMGR_LOCATOR_SCROLL_BASE_Y;
+            if (message.payload.mouse.y > dragOffset5 + ADVMGR_LOCATOR_KNOB_MAX_Y)
+                message.payload.mouse.y = dragOffset5 + ADVMGR_LOCATOR_KNOB_MAX_Y;
+            gpMouseManager->Main(message);
+            m_scrollLeftButton->m_y = message.payload.mouse.y - dragOffset5;
+            m_adventureWindow->DrawWindow();
+            if (locatorCount29 > ADVMGR_LOCATOR_VISIBLE_COUNT) {
+                newPageState = static_cast<int>(
+                    (m_scrollLeftButton->m_y - ADVMGR_LOCATOR_SCROLL_BASE_Y) /
+                    pageHeight7);
+                if (newPageState != previousPageSlot) {
+                    gpCurPlayer->m_heroLocatorPage = static_cast<signed char>(newPageState);
+                    if (newPageState >
+                        locatorCount29 - (ADVMGR_LOCATOR_VISIBLE_COUNT - 1))
+                        newPageState =
+                            locatorCount29 - (ADVMGR_LOCATOR_VISIBLE_COUNT - 1);
+                    UpdateHeroLocators(0, 1);
+                    m_scrollLeftButton->m_y = message.payload.mouse.y - dragOffset5;
+                    m_adventureWindow->DrawWindow();
+                    previousPageSlot = newPageState;
+                }
+            }
+        }
+        Process1WindowsMessage();
+        message = gpInputManager->GetEvent();
+    }
+    m_scrollLeftButton->m_flags &= ~WIDGET_FLAG_SELECTED;
+    UpdateHeroLocators(1, 1);
+}
+
+// @match-note
+// First residual bytes are +0xcc/+0xd0: retail uses `cmp eax,[message.y]; jle`,
+// ours uses `cmp [message.y],eax; jge`; the mirrored upper clamp differs at
+// +0xe8/+0xec. The 0x80 frame, every named/compiler slot, CFG, all other code,
+// and all 26 relocation targets agree. `message.y < sum` and `sum > message.y`
+// lower identically; an empty positive arm plus else adds two 5-byte jumps and
+// regresses the match. Revisit with specific new evidence or after the SOURCE
+// placeholder census is zero.
 VA(0x004648d9, 0x22f)
-void advManager::DoTownKnob(void) {}
+void advManager::DoTownKnob(void)
+{
+    int previousPageSlot = gpCurPlayer->m_townLocatorPage;
+    int locatorCount29 = gpCurPlayer->m_townCount;
+    int newPageState;
+    double pageHeight7 = static_cast<double>(ADVMGR_LOCATOR_HERO_SCROLL_SPAN) /
+                         (locatorCount29 - ADVMGR_LOCATOR_VISIBLE_COUNT);
+    int mouseX4;
+    int mouseYState;
+    gpMouseManager->MouseCoords(mouseX4, mouseYState);
+    int dragOffset5 = mouseYState - m_scrollRightButton->m_y;
+    gpInputManager->Flush();
+    tag_message message = gpInputManager->GetEvent();
 
+    while (message.type != MESSAGE_LEFT_BUTTON_UP &&
+           message.type != MESSAGE_RIGHT_BUTTON_UP) {
+        if (message.type == MESSAGE_MOUSE_MOVE) {
+            if (message.payload.mouse.y < dragOffset5 + ADVMGR_LOCATOR_SCROLL_BASE_Y)
+                message.payload.mouse.y = dragOffset5 + ADVMGR_LOCATOR_SCROLL_BASE_Y;
+            if (message.payload.mouse.y > dragOffset5 + ADVMGR_LOCATOR_KNOB_MAX_Y)
+                message.payload.mouse.y = dragOffset5 + ADVMGR_LOCATOR_KNOB_MAX_Y;
+            gpMouseManager->Main(message);
+            m_scrollRightButton->m_y = message.payload.mouse.y - dragOffset5;
+            m_adventureWindow->DrawWindow();
+            if (locatorCount29 > ADVMGR_LOCATOR_VISIBLE_COUNT) {
+                newPageState = static_cast<int>(
+                    (m_scrollRightButton->m_y - ADVMGR_LOCATOR_SCROLL_BASE_Y) /
+                    pageHeight7);
+                if (newPageState != previousPageSlot) {
+                    gpCurPlayer->m_townLocatorPage = static_cast<signed char>(newPageState);
+                    if (newPageState >
+                        locatorCount29 - (ADVMGR_LOCATOR_VISIBLE_COUNT - 1))
+                        newPageState =
+                            locatorCount29 - (ADVMGR_LOCATOR_VISIBLE_COUNT - 1);
+                    UpdateTownLocators(0, 1);
+                    m_scrollRightButton->m_y = message.payload.mouse.y - dragOffset5;
+                    m_adventureWindow->DrawWindow();
+                    previousPageSlot = newPageState;
+                }
+            }
+        }
+        Process1WindowsMessage();
+        message = gpInputManager->GetEvent();
+    }
+    m_scrollRightButton->m_flags &= ~WIDGET_FLAG_SELECTED;
+    UpdateTownLocators(1, 1);
+}
+
+// @early-stop
+// All 0x397 relocation-masked bytes are identical and all 38 relocation targets
+// agree; objdiff's residual is only delinked switch/jump-table local-label identity.
 VA(0x00464b08, 0x397)
-void advManager::CastSpell(int) {}
+void advManager::CastSpell(int spell)
+{
+    hero *currentHeroSlot;
+    if (gpCurPlayer->CurrentHero() != ADVMGR_INVALID_HERO)
+        currentHeroSlot = gpGame->GetHero(gpCurPlayer->m_currentHero);
+    else
+        currentHeroSlot = 0;
+
+    int guardianTypes1[ADVMGR_MINE_GUARDIAN_VALUE_COUNT];
+    mapCell *currentCell;
+    int spellPowerValue;
+    switch (spell) {
+    case ADVENTURE_SPELL_SET_EARTH_GUARDIAN:
+        guardianTypes1[ADVMGR_MINE_GUARDIAN_TYPE_INDEX] =
+            ADVMGR_MINE_GUARDIAN_EARTH_ELEMENTAL;
+        goto setMineGuardian;
+    case ADVENTURE_SPELL_SET_AIR_GUARDIAN:
+        guardianTypes1[ADVMGR_MINE_GUARDIAN_TYPE_INDEX] =
+            ADVMGR_MINE_GUARDIAN_AIR_ELEMENTAL;
+        goto setMineGuardian;
+    case ADVENTURE_SPELL_SET_FIRE_GUARDIAN:
+        guardianTypes1[ADVMGR_MINE_GUARDIAN_TYPE_INDEX] =
+            ADVMGR_MINE_GUARDIAN_FIRE_ELEMENTAL;
+        goto setMineGuardian;
+    case ADVENTURE_SPELL_SET_WATER_GUARDIAN:
+        guardianTypes1[ADVMGR_MINE_GUARDIAN_TYPE_INDEX] =
+            ADVMGR_MINE_GUARDIAN_WATER_ELEMENTAL;
+        goto setMineGuardian;
+    case ADVENTURE_SPELL_HAUNT:
+        guardianTypes1[ADVMGR_MINE_GUARDIAN_TYPE_INDEX] =
+            ADVMGR_MINE_GUARDIAN_GHOST;
+        goto setMineGuardian;
+setMineGuardian:
+        currentCell = gpAdvManager->GetCell(currentHeroSlot->m_x, currentHeroSlot->m_y);
+        if (currentCell->triggerType != (MAP_EVENT_ACTION_FLAG | MAP_EVENT_MINE)) {
+            NormalDialog("You must be standing on the entrance to a mine (sawmills and alchemists don't count) to cast this spell.",
+                         1, -1, -1, -1, 0, -1, 0, -1, 0);
+            return;
+        }
+        gpGame->m_mines[currentCell->w4hi].guardianType =
+            static_cast<signed char>(
+                guardianTypes1[ADVMGR_MINE_GUARDIAN_TYPE_INDEX]);
+        spellPowerValue = currentHeroSlot->Stats(HERO_PRIMARY_SPELL_POWER);
+        if (spellPowerValue > ADVMGR_MINE_GUARDIAN_MAX_POWER)
+            spellPowerValue = ADVMGR_MINE_GUARDIAN_MAX_POWER;
+        gpGame->m_mines[currentCell->w4hi].guardianCount =
+            static_cast<unsigned char>(
+                spellPowerValue * ADVMGR_MINE_GUARDIANS_PER_POWER);
+        if (spell == ADVENTURE_SPELL_HAUNT)
+            gpGame->ClaimMine(currentCell->w4hi, -1);
+        break;
+    case ADVENTURE_SPELL_VIEW_MINES:
+    case ADVENTURE_SPELL_VIEW_RESOURCES:
+    case ADVENTURE_SPELL_VIEW_ARTIFACTS:
+    case ADVENTURE_SPELL_VIEW_TOWNS:
+    case ADVENTURE_SPELL_VIEW_HEROES:
+    case ADVENTURE_SPELL_VIEW_ALL:
+        ViewWorld(spell, spell == ADVENTURE_SPELL_VIEW_ALL,
+                  spell == ADVENTURE_SPELL_VIEW_ALL);
+        break;
+    case ADVENTURE_SPELL_IDENTIFY_HERO:
+        m_identifyHeroActive = 1;
+        NormalDialog("Enemy heroes are now fully identifiable.",
+                     1, -1, -1, -1, 0, -1, 0, -1, 0);
+        break;
+    case ADVENTURE_SPELL_SUMMON_BOAT:
+        SummonBoat();
+        break;
+    case ADVENTURE_SPELL_DIMENSION_DOOR:
+    case ADVENTURE_SPELL_TOWN_GATE:
+    case ADVENTURE_SPELL_TOWN_PORTAL:
+        if (currentHeroSlot->m_remainingMobility == 0) {
+            NormalDialog("Your hero is too tired to cast this spell today.  Try again tomorrow.",
+                         1, -1, -1, -1, 0, -1, 0, -1, 0);
+            return;
+        }
+        if (currentHeroSlot->m_remainingMobility < ADVMGR_TRAVEL_SPELL_MOBILITY_COST)
+            currentHeroSlot->m_remainingMobility = 0;
+        else
+            currentHeroSlot->m_remainingMobility -= ADVMGR_TRAVEL_SPELL_MOBILITY_COST;
+        UpdateHeroLocator(-1, 1, 1);
+        if (spell == ADVENTURE_SPELL_DIMENSION_DOOR)
+            DimensionDoor();
+        else
+            TownGate(spell);
+        break;
+    case ADVENTURE_SPELL_VISIONS:
+        if (!DoVisions(currentHeroSlot))
+            return;
+        break;
+    default:
+        break;
+    }
+
+    if (spell != ADVENTURE_SPELL_DIMENSION_DOOR &&
+        spell != ADVENTURE_SPELL_TOWN_GATE &&
+        spell != ADVENTURE_SPELL_TOWN_PORTAL)
+        gpGame->GetHero(gpCurPlayer->m_currentHero)->UseSpell(spell);
+}
 
 VA(0x00464e9f, 0x24c)
-int SaveGame(void) { return 0; }
+int SaveGame(void)
+{
+    int result11 = 0;
+    int humanPlayerCount1 = 0;
+    gpAdvManager->DisableButtons();
+    gpMouseManager->SetPointer("advmice.mse", ADVMGR_SAVE_POINTER_FRAME,
+                               ADVMGR_SAVE_POINTER_DELAY);
+    int playerLocal;
+    for (playerLocal = 0; playerLocal < ADVMGR_SAVE_PLAYER_COUNT; ++playerLocal) {
+        if (!gpGame->m_playerDead[playerLocal] && gbHumanPlayer[playerLocal])
+            ++humanPlayerCount1;
+    }
+
+    char extension7[ADVMGR_SAVE_EXTENSION_SIZE];
+    char patternState[ADVMGR_SAVE_PATTERN_SIZE];
+    if (gbInCampaign) {
+        sprintf(extension7, ".GMC");
+        sprintf(patternState, "*.GMC");
+    } else if (xIsPlayingExpansionCampaign) {
+        sprintf(extension7, ".GXC");
+        sprintf(patternState, "*.GXC");
+    } else if (xIsExpansionMap) {
+        sprintf(extension7, ".GX%d", humanPlayerCount1);
+        sprintf(patternState, "*.GX%d", humanPlayerCount1);
+    } else {
+        sprintf(extension7, ".GM%d", humanPlayerCount1);
+        sprintf(patternState, "*.GM%d", humanPlayerCount1);
+    }
+
+    fileRequester *requester2 = new fileRequester(
+        ADVMGR_SAVE_REQUESTER_X, ADVMGR_SAVE_REQUESTER_Y,
+        FILE_REQUESTER_SAVE_GAME, patternState, gcGamePath, extension7);
+    if (requester2 == 0)
+        MemError();
+    int dialogResult7 = gpExec->DoDialog(requester2);
+    if (dialogResult7 == FILE_REQUESTER_OK) {
+        result11 = 1;
+        bFreshSave = 1;
+        result11 = gpGame->SaveGame(gLastFilename, 0, 0);
+        if (result11)
+            NormalDialog("Game saved successfully.",
+                         1, -1, -1, -1, 0, -1, 0, -1, 0);
+    }
+    delete requester2;
+    gpAdvManager->EnableButtons();
+    return result11;
+}
 
 VA(0x004650eb, 0xa6)
 void advManager::CheckCastSpell(void) {}
