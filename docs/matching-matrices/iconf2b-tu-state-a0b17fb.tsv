@@ -1,0 +1,35 @@
+# schema_version	1
+# base_checkpoint	a0b17fb69de65ba589df69e16402900f7012447d
+# target_rva	0x004d1ba0 (normalized tool RVA 0x000d1ba0)
+# target_size	0x4f1
+# canonical_pre_documentation_source_sha256	8ad2dfbd52ef62fa265349af646af50ba2662f76c8cea29ecef012ea2277e93a
+# canonical_documented_source_sha256	7388a30d32705858be3c1f59648c7ff637ce535d4c76d8e51b2fe7f46b2864e8
+# candidate_object_sha256	432327c63be4e5ae1002f0fd006601c99d8c990abd6c67f78139bd47cc19ff1c
+# candidate_text_sha256	d5026c339039175f0e81d637f85c73cbac32e6562393b454d9d8b39dee6c65de
+# target_object_sha256	1620109acfec9c11aca38897696b8ab056e7b87091fb9f4bda8f1be60e77f1ae
+# target_text_sha256	dc51ac4ccfd5869d35741916dc42d83a184ddaf4238987fc68a233c57073b9a9
+# owner_header_sha256	b6420dbd16cb2143e4f18cca9baa6c2bf8a54a56a0e037778dc884e4c1d86913
+# iconentry_header_sha256	4c213fcda960752692e6f1e202231b26d523bc2fa259c0b8a2d573380d2fb805
+# icon_header_sha256	809577ac8c7a091878b5ff40de5d96d37fe2074f480d45207ba6d7ccd3ef4e22
+# bitmap_header_sha256	2bdd293d52be21a46247a9257c15ebe2503cf38e50cbc7b3488c82a72127727f
+# x_global_header_sha256	3125d63d5f7996a55145652918a107e50e5b723c909071407996d8eacff86bc2
+# canonical_include_order	va, owner, icon, bitmap, X_GLOBAL, IconEntry, string
+# predecessor_state	No preceding function exists in this translation unit.
+# raw_audit	Candidate .text 0x4e5; retail function 0x4f1. Union of 82/81 .text relocation offsets masks 575 common bytes; 609 of 678 remaining common bytes differ, first +0x1d, with a 0xc-byte retail tail.
+# relocation_audit	No base-only external target. All scratch relocation counts agree except gFlipY, candidate 9 versus retail 8. The delinked target gives local-owner aliases garbage string-symbol names, so identities require the documented DATA addresses/manual object audit.
+# first_divergence	At +0x1d candidate loads entry Y into EBP before entry pointer formation; retail forms EDI, loads entry X into EBX, subtracts it, then loads entry Y. Decoder starts candidate +0xe9 versus retail +0xe3.
+# retest_trigger	A retained shared-header, declaration-order, compiler-state, or newly retail-proven lifetime change. Do not repeat rows while this checkpoint and hashes agree.
+# permutation_policy	No permutation tool used. AST is premature at 85.63%; regex permuter is forbidden.
+state	source_sha256	object_sha256	text_sha256	include_state	score_pct	candidate_size	base_relocs	target_relocs	target_only	disposition	axis
+canonical_a0b17fb	7388a30d32705858be3c1f59648c7ff637ce535d4c76d8e51b2fe7f46b2864e8	432327c63be4e5ae1002f0fd006601c99d8c990abd6c67f78139bd47cc19ff1c	d5026c339039175f0e81d637f85c73cbac32e6562393b454d9d8b39dee6c65de	owner+icon+bitmap+x_global+IconEntry	85.63395	0x4e5	82	81	0	retained	Combined-root baseline after X_GLOBAL/shared-state changes; structural residual, not a wall.
+delayed_entry_y_after_x	NA	NA	NA	canonical	85.63395	0x4e5	82	81	0	rejected_byte_identical	Move entryY initialization after entry-X subtraction.
+explicit_entry_x_with_delayed_y	NA	NA	NA	canonical	85.06	NA	82	81	0	rejected	Snapshot entry X and delay entry Y; worsened setup allocation.
+direct_entry_pointer_with_delayed_y	NA	NA	NA	canonical	85.55	NA	82	81	0	rejected	Remove entries base and form the typed entry pointer directly while delaying entry Y.
+entry_publication_before_width_sub	NA	NA	NA	canonical	85.63395	0x4e5	82	81	0	rejected_byte_identical	Move gFlipEntry publication before the second X subtraction.
+cached_initial_y_for_clip	NA	NA	NA	canonical	85.55	NA	82	81	0	rejected	Cache gFlipY once for both vertical clipping clauses; relocation count did not improve.
+commuted_y_sum	NA	NA	NA	canonical	85.63395	0x4e5	82	81	0	rejected_byte_identical	Spell gFlipY as entryY + y.
+entry_y_after_publication	NA	NA	NA	canonical	84.76	NA	82	81	0	rejected	Declare/load entryY after gFlipEntry publication.
+iconentry_before_x_global	NA	NA	NA	owner+icon+bitmap+IconEntry+x_global	85.63395	0x4e5	82	81	0	rejected_byte_identical	Move the narrow IconEntry include immediately before X_GLOBAL.
+iconentry_after_string	NA	NA	NA	owner+icon+bitmap+x_global+string+IconEntry	85.63395	0x4e5	82	81	0	rejected_byte_identical	Move the narrow IconEntry include after string.h.
+iconentry_first_after_va	NA	NA	NA	IconEntry+owner+icon+bitmap+x_global	85.63395	0x4e5	82	81	0	rejected_byte_identical	Move the narrow IconEntry include before the owner header.
+adjacent_iconf2bc_setup_shape	NA	NA	NA	canonical	83.85	NA	82	81	0	rejected	Adopt the sibling decoder's source/pointer/width/currentY setup shape; semantics preserved but allocation regressed.
