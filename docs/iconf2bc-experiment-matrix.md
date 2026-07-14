@@ -8,6 +8,13 @@ setup and makes the row initialization use retail's load order and separate `gFC
 result remains in `ecx` rather than retail's `eax`; the first width/x divergence and excess setup
 `gFCY` load also remain active work. This is a progress checkpoint, not a wall classification.
 
+Fresh-pass candidate pending integration: source SHA-256
+`dd868c0ffcdabf134c98631a7a731d7b8d90845b7df496ce5a3c6dd05b305fd9`, 85.99%, function
+end `0x541`, frame `sub esp,8`, decoder entry `+0xea`, and 84/83 relocations. It reuses the
+later pitch lifetime to preserve the original icon width while `w` becomes the exclusive horizontal
+bound. This improves the score but does not remove the first width/X load-order divergence or the
+single excess setup `gFCY` relocation, so it remains a progress checkpoint rather than a wall.
+
 The new-experiment table began at checkpoint `838105c` / source checkpoint `7386907`, SHA-256
 `648ecb4b963c5b97aea5908738d26509ad680853a3041817321b61aa955070f9`, score 83.4333%,
 function end `0x550`. Every row records whether that state was retained, reverted, or
@@ -160,3 +167,14 @@ retained/reverted/byte-identical disposition.
 | `aa364060e6860cceacbc85683e7cb4f2e3dea8d3fbf9fcd2e81a29a061695bc5` | reconstruct `gFCRow` scratch storage as a byte pointer | 84.58186% | `0x542`, `sub esp,8`; decoder `+0xee` | 84/83; 9 `gFCY` | setup and row initialization stay unchanged but pointer-domain downstream expressions regress broadly; reverted |
 | `361afb99b24b800bfe81344641f25af8eefe1deea6a695d3edb697e892260bd7` | declare the setup Y snapshot `const` | 85.84131% | `0x545`, `sub esp,8`; decoder `+0xee` | 84/83; 9 `gFCY` | qualifier is byte-neutral; the duplicate setup load remains; reverted |
 | `998f619b98a3682447fb208f924bc6fc6713b548e2b2fa6fe175263974d2a838` | regroup X as `(w - 1) + x0` to block horizontal CSE | 85.84131% | `0x545`, `sub esp,8`; decoder `+0xee` | 84/83; 9 `gFCY` | VC4.2 reassociates to the retained `w + x0 - 1` code and still precomputes the exclusive bound; reverted |
+| `f9c636fbff16ff2a4988ace172de3c8b3c7f6f9148804405ed6af164d197af20` | integer-domain source-offset addition | 85.06% | `0x541`, `sub esp,8`; decoder `+0xeb` | 84/83; 9 `gFCY` | changes long-lived source/X allocation and does not recover the retail memory-source add; reverted |
+| `af37873ca27ab3552c2cd2a75af2dc7819fa666c2f0cc94b28d37f558d9469ec` | subtract packed entry X and width as one additive RHS | 85.84131% | `0x545`, `sub esp,8`; decoder `+0xee` | 84/83; 9 `gFCY` | optimizer canonicalizes to the checkpoint's two subtracts and retained register order; reverted |
+| `3408c6dfbbcaac839c20e6907e74d513eb3a046a227a5dcee633fb6d61a80736` | reuse width local as the exclusive horizontal bound | 85.61% | `0x542`, `sub esp,8`; decoder `+0xeb` | 84/83; 9 `gFCY` | recovers retail width/X load and subtract register order, but retains the source-offset temporary and holds the bound in `ecx` instead of spilling width; retained only for combined setup tests |
+| `a88ccb5e08f5549e9ca7fcbac709c860309b2fc23018ba5ec9c441f4164b1469` | initialize Y before entry/source publication on exclusive-bound state | 82.91% | `0x52a`, `sub esp,8`; decoder `+0xd3` | 81/83; 6 `gFCY` | recovers the direct source-offset memory add but propagates Y across setup/row, removing three required `gFCY` relocations and broadly reorders the setup; reverted |
+| `586c3bd20589233823eec26804613566c146d5feda795c37b080d0a88c820268` | split Y initialization around entry/source publication | 85.61% | `0x542`, `sub esp,8`; decoder `+0xeb` | 84/83; 9 `gFCY` | optimizer folds the split and emits bytes identical to the exclusive-bound state; reverted |
+| `3a68fb58761178d28224e9b4ae2a0496dbd979120db6c7f8364481c069346667` | reuse transformed horizontal-bound local for later row pitch | 84.23% | `0x53b`, `sub esp,8`; decoder `+0xe7` | 84/83; 9 `gFCY` | setup remains the exclusive-bound shape while newline/row allocation regress and pitch multiplies directly from `gFCY`; reverted |
+| `695663eae62d200dc8f348fc9d194edf6497b17661f77b181ee8f6160940d9f5` | preserve original width in a distinct alias while reusing `w` as horizontal bound | 85.94% | `0x541`, `sub esp,8`; decoder `+0xea` | 84/83; 9 `gFCY` | slight score gain, but width/X load order returns to the canonical divergence and the alias remains register-only; superseded by pitch-backed alias |
+| `d5b95c6988bf997dfca488d56b7bad35be55431e4a503619dc48290b5fec8af5` | preserve original width in the later pitch local after `gFCX0` | 85.99% | `0x541`, `sub esp,8`; decoder `+0xea` | 84/83; 9 `gFCY` | best score in this pass, but optimizer keeps the alias in `ecx`; width/X load order and excess `gFCY` remain; retained for adjacent lifetime test |
+| `dd868c0ffcdabf134c98631a7a731d7b8d90845b7df496ce5a3c6dd05b305fd9` | assign original width to pitch immediately before `gFCX0` | 85.99% | `0x541`, `sub esp,8`; decoder `+0xea` | 84/83; 9 `gFCY` | byte-identical to assignment immediately after `gFCX0`; optimizer does not materialize the intended width spill; retained fresh-pass checkpoint |
+| `175f256da9364142eba543b69d8237abd54797783ca0125236e4d9dfe9695533` | pitch-backed original-width alias without transforming `w` into the bound | 85.84131% | `0x545`, `sub esp,8`; decoder `+0xee` | 84/83; 9 `gFCY` | optimizer eliminates the alias and returns to canonical checkpoint bytes; reverted |
+| `6c7620bcd04e6b66c2aa327d02fd8be45fe8150f199e95751d1b6e48e23d5093` | widen pitch-backed original-width lifetime before X subtracts | 85.16% | `0x540`, `sub esp,8`; decoder `+0xe9` | 84/83; 9 `gFCY` | broadens the early register lifetime and regresses entry/X setup without materializing the retail spill; reverted |
