@@ -322,6 +322,24 @@ Final measured axes after `8bd4149`:
 - reuse the dead `clip` parameter as the clip-width scalar: 85.21%, size `0x559`, no frame,
   142/144; reverted.
 
+Sibling-structure transfers measured after `e4e96c0`:
+
+- `fillLeft` lifetime matching sibling `fillRight`: byte-identical;
+- `dimLeft` lifetime matching sibling `dimRight`: byte-identical;
+- inner `copyLeft` lifetime matching sibling `copyRight`: byte-identical;
+- all three named edge lifetimes together: byte-identical;
+- direct `clipW` plus retail/sibling right-first edge publication: 83.64%, size `0x559`, no frame,
+  142/144 relocations; reverted;
+- precomputed `clipRight` spanning initial Y/shear setup with canonical publication order:
+  byte-identical;
+- the same precomputed `clipRight` with right-first publication: 84.14%, size `0x559`, no frame,
+  142/144 relocations; reverted.
+
+The exact `icon2by` prologue naturally releases `shear` from EBP after its initial use and then
+loads `clipW` into EBP. Transferring its named edge lifetimes does not change `iconf2by` allocation.
+Pitch, palette/destination, selected-count, and fill-color locals are contradicted by this target's
+already-correct relocation counts or duplicate earlier exhausted families.
+
 Retail's four-byte frame slot is never accessed: every ESP-relative retail access is an argument,
 and after `sub esp,4` plus four pushes the smallest displacement is `0x18`. The slot is allocator
 residue, not evidence for a missing local or padding variable. Neither permutation tool was used.
