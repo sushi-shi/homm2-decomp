@@ -270,8 +270,6 @@ extern char *gArmySizeNames[9][3];
 extern char *cRandomTavernText[8];
 extern char *cRandomSignText[4];
 extern char *cCampaignAwards[12];
-DATA(0x004ffdc0) extern char *(*cCampaignName)[12];
-DATA(0x004ffe20) extern char *(*cCampaignDescription)[12];
 extern char *cSlowVideoLevelText[2];
 extern char *gSPanelHelp[10];
 extern char *xBarrierColor[8];

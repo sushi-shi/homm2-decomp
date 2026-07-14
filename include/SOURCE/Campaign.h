@@ -1,55 +1,10 @@
 #ifndef HOMM2_CAMPAIGN_H
 #define HOMM2_CAMPAIGN_H
+#include <SOURCE/KB.h>
 // Declarations of the free functions DEFINED in Campaign.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
 struct tag_message;
-
-typedef enum CampaignSide {
-    CAMPAIGN_ROLAND = 0,
-    CAMPAIGN_ARCHIBALD = 1,
-    CAMPAIGN_SIDE_COUNT = 2
-} CampaignSide;
-
-typedef enum CampaignChoiceType {
-    CAMPAIGN_CHOICE_RESOURCE = 0,
-    CAMPAIGN_CHOICE_ARTIFACT = 1,
-    CAMPAIGN_CHOICE_SPELL = 2,
-    CAMPAIGN_CHOICE_SECONDARY_SKILL = 3,
-    CAMPAIGN_CHOICE_CREATURES = 4,
-    CAMPAIGN_CHOICE_PUZZLE_PIECES = 5,
-    CAMPAIGN_CHOICE_EXPERIENCE = 6,
-    CAMPAIGN_CHOICE_NONE = 7,
-    CAMPAIGN_CHOICE_ALIGNMENT = 8
-} CampaignChoiceType;
-
-typedef enum CampaignConstant {
-    CAMPAIGN_MAP_COUNT = 12,
-    CAMPAIGN_REGULAR_MAP_COUNT = 11,
-    CAMPAIGN_TRACK_POINT_COUNT = 13,
-    CAMPAIGN_BONUS_CHOICE_COUNT = 3,
-    CAMPAIGN_AWARD_COUNT = 12,
-    CAMPAIGN_SWITCHING_MAP = 11,
-    CAMPAIGN_SWITCHING_SCENARIO = 4,
-    CAMPAIGN_NO_SCENARIO = -1,
-    CAMPAIGN_ROLAND_FINAL_SCENARIO = 9,
-    CAMPAIGN_ARCHIBALD_FINAL_SCENARIO = 10,
-    CAMPAIGN_STATE_RESET_SIZE = 0x147,
-    CAMPAIGN_SETUP_RESET_SIZE = 0x41,
-    CAMPAIGN_ARMY_NAME_BUFFER_SIZE = 52,
-    CAMPAIGN_ARMY_SLOT_COUNT = 5,
-    CAMPAIGN_CARRYOVER_PLAYER = 3,
-    CAMPAIGN_TRIPLE_ARMY_MULTIPLIER = 3,
-    CAMPAIGN_EASY_SCENARIO_LIMIT = 2,
-    CAMPAIGN_NORMAL_SCENARIO_LIMIT = 5,
-    CAMPAIGN_HERO_COUNT = 54,
-    CAMPAIGN_HERO_PRIORITY_HIGH = 100,
-    CAMPAIGN_HERO_PRIORITY_NORMAL = 90,
-    CAMPAIGN_EXPERIENCE_BONUS = 5000,
-    CAMPAIGN_SUMMON_EARTH_SPELL = 43,
-    CAMPAIGN_SWITCH_VICTORY_VALUE = 99,
-    CAMPAIGN_ROLAND_TIME_LIMIT = 90
-} CampaignConstant;
 
 typedef enum CampaignAward {
     CAMPAIGN_AWARD_DWARF_ALLIANCE = 0,
@@ -170,19 +125,6 @@ typedef enum CampaignMapDifficulty {
     CAMPAIGN_DIFFICULTY_NORMAL = 1,
     CAMPAIGN_DIFFICULTY_HARD = 2
 } CampaignMapDifficulty;
-
-#pragma pack(push, 1)
-struct SCampaignChoice {
-    unsigned char type;
-    short value;
-    short amount;
-};
-#pragma pack(pop)
-SIZE(SCampaignChoice, 5);
-
-extern struct SCampaignChoice campaignChoices[CAMPAIGN_SIDE_COUNT]
-                                              [CAMPAIGN_MAP_COUNT]
-                                              [CAMPAIGN_BONUS_CHOICE_COUNT];
 
 int CampaignHandler(struct tag_message &);
 
