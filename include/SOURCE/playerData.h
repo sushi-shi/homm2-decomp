@@ -49,4 +49,5 @@ public:
 };
 #pragma pack(pop)
 SIZE(playerData, 0x11b);
+extern playerData *gpCurPlayer;
 #endif // HOMM2_SOURCE_PLAYERDATA_H
