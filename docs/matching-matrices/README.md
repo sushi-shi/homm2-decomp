@@ -14,6 +14,46 @@ Before replaying a source state, compare its hash here and confirm the canonical
 sibling hashes have not changed. A listed hash should not be rebuilt under the same compiler/header
 state.
 
+## BASE allocation/assert metadata wrapper sweep
+
+`base-misc-callsite-audit-8ed859f.tsv` records all 86 direct `BaseAlloc`, `BaseFree`, and
+`ProcessAssert` callsites converted in the non-sound-manager BASE scope at checkpoint `8ed859f`.
+Each function row preserves the call order, old metadata form, retail path/line recovered from its
+RVA, pre/post score, relocation result, and complete pre/post TU hashes. The three implementations
+in `Misc.cpp` were intentionally not wrapped. No permutation tool was used. The callsite matrix
+SHA-256 is `b8d87564501ab3c512e2fad74320dee80e8b3a96b29656936ada468e161b2c17`.
+
+The matrix abbreviates only the uniform retail directory prefix
+`I:\Projects\Heroes\Prog\BASE\`; every basename retains its retail case. The wrapper header moved
+from SHA-256 `2719f98ca758614124a7138e6ee870e1ef6f9d9ccf845bcb88e39ae5e427131a` to
+`5f54db2d7e6dd85cb245c8cab8aa0b24d79aec998ab3bbf558dc24c594433233`.
+
+`base-misc-wrapper-tu-state-8ed859f.tsv` is the no-repeat matrix for the wrapper and shared-header
+states. Parenthesized and token-preserving function-like wrappers emitted the same live code, but
+the new direct-function hashes exposed retained-max dips in `DoBlur` and `CreatePCXFile`. The actual
+lever was `IconEntry`'s declaration source location: parsing it at its historical position in
+`Misc.h` restores 93.9030% and 98.0405%. Doing that globally either duplicates the type or loses one
+net exact function by regressing the exact `fullGt` and `ProcessMouseMessage` pins while gaining an
+unrelated miscwin exact. The retained form opts only Blur and Misc into
+the inline declaration while every other TU keeps the existing `IconEntry.h` include state. Do not
+retry the four rejected full header/source hashes while the retained hashes agree. The TU-state
+matrix SHA-256 is `013d8d3c3e2e62712d95ff4a157e1b34342cfc733066c49b9f9aa5213df1a365`.
+
+The first build also rejected three listbox sites because their existing `#line` directives
+occurred between arguments; preprocessing directives cannot occur inside a macro invocation.
+Moving each directive immediately before its statement compiled and preserved the exact destructor
+and `DeleteItem` pins plus the 99.61% `Main` score. Do not put `#line` back inside an `H2_*`
+invocation.
+
+Retail metadata made all three PALETTE functions, both TILESET functions, and
+`resourceManager::Close` newly exact. `mouseManager::Close` and
+`resourceManager::LoadAggregateHeader` improved slightly. Every old exact pin stayed exact, and all
+other focused scores stayed unchanged or recovered their retained maximum. The baseline was updated
+with plain `homm2 status update`; `--accept-regressions` is not valid for these direct edits. The
+relocation helper's three MOUSEMGR aggregate/member
+alias warnings and the SAMPLE/Textntry/dropList/listBox delink-boundary undercounts predate this
+sweep; they are recorded rather than misclassified as wrapper regressions.
+
 ## BASE/soundmgr whole-TU raw audit
 
 `soundmgr-raw-audit-72ca327.tsv` records the complete 34-function audit from checkpoint

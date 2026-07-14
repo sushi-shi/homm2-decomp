@@ -492,9 +492,9 @@ void heroWindowManager::FizzleForward(int x, int y, int width, int height, int d
             m_updateFlags = 0;
             if (delay == -1)
                 delay = 150;
-            signed char *fadePalette = static_cast<signed char *>(BaseAlloc(0x300, __FILE__, 808));
+            signed char *fadePalette = static_cast<signed char *>(H2_ALLOC(0x300, "I:\\Projects\\Heroes\\Prog\\BASE\\WINMGR.CPP", 808));
             m_fizzleWork = new bitmap(0, static_cast<short>(width), static_cast<short>(height));
-            signed char *cycleTable = static_cast<signed char *>(BaseAlloc(0x10000, __FILE__, 810));
+            signed char *cycleTable = static_cast<signed char *>(H2_ALLOC(0x10000, "I:\\Projects\\Heroes\\Prog\\BASE\\WINMGR.CPP", 810));
             BlitBitmap(m_screen, x, y, width, height, m_fizzleWork, 0, 0);
 
             for (int frame = 0; frame < 8; frame++) {
@@ -550,8 +550,8 @@ void heroWindowManager::FizzleForward(int x, int y, int width, int height, int d
             if (m_fizzleWork != 0)
                 delete m_fizzleWork;
             m_fizzleWork = 0;
-            BaseFree(cycleTable, __FILE__, 897);
-            BaseFree(fadePalette, __FILE__, 898);
+            H2_FREE(cycleTable, "I:\\Projects\\Heroes\\Prog\\BASE\\WINMGR.CPP", 897);
+            H2_FREE(fadePalette, "I:\\Projects\\Heroes\\Prog\\BASE\\WINMGR.CPP", 898);
         }
     }
 }

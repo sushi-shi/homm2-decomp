@@ -11,13 +11,13 @@
 VA(0x004d2580, 0x2e)
 palette::palette(void) : resource(2, 0, 1, 0)
 {
-    m_data = static_cast<signed char *>(BaseAlloc(0x300, __FILE__, __LINE__));
+    m_data = static_cast<signed char *>(H2_ALLOC(0x300, "I:\\Projects\\Heroes\\Prog\\BASE\\PALETTE.CPP", 8));
 }
 
 VA(0x004d2600, 0x55)
 palette::palette(unsigned long int id) : resource(2, id, 1, 0)
 {
-    m_data = static_cast<signed char *>(BaseAlloc(0x300, __FILE__, __LINE__));
+    m_data = static_cast<signed char *>(H2_ALLOC(0x300, "I:\\Projects\\Heroes\\Prog\\BASE\\PALETTE.CPP", 13));
     gpResourceManager->PointToFile(id);
     gpResourceManager->ReadBlock(m_data, 0x300);
 }
@@ -26,7 +26,7 @@ VA(0x004d2660, 0x2c)
 palette::~palette()
 {
     if (m_data != 0)
-        BaseFree(m_data, __FILE__, __LINE__);
+        H2_FREE(m_data, "I:\\Projects\\Heroes\\Prog\\BASE\\PALETTE.CPP", 21);
     m_data = 0;
 }
 

@@ -3,6 +3,7 @@
 // functions: 1   data: 0
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
+#define HOMM2_MISC_INLINE_ICONENTRY
 #include <va.h>
 #include <BASE/Blur.h>
 #include <BASE/bitmap.h>
@@ -10,6 +11,7 @@
 #include <BASE/mouseManager.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/Misc.h>
+#undef HOMM2_MISC_INLINE_ICONENTRY
 #include <BASE/resourceManager.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/NOOPT.h>
@@ -58,7 +60,7 @@ void DoBlur(
     memcpy(saved->m_pixels, source->m_pixels, imageSize);
 
 #line 25
-    unsigned char* lookup = static_cast<unsigned char*>(BaseAlloc(lookupSize, __FILE__, __LINE__));
+    unsigned char* lookup = static_cast<unsigned char*>(H2_ALLOC(lookupSize, "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp", 0x19));
     int red[componentCount];
     int green[componentCount];
     int blue[componentCount];
@@ -170,9 +172,9 @@ void DoBlur(
 
     PollSound();
 #line 139
-    signed char* oldPalette = static_cast<signed char*>(BaseAlloc(paletteBytes, __FILE__, __LINE__));
+    signed char* oldPalette = static_cast<signed char*>(H2_ALLOC(paletteBytes, "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp", 0x8b));
 #line 140
-    signed char* newPalette = static_cast<signed char*>(BaseAlloc(paletteBytes, __FILE__, __LINE__));
+    signed char* newPalette = static_cast<signed char*>(H2_ALLOC(paletteBytes, "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp", 0x8c));
     memcpy(oldPalette, gPalette->m_data, paletteBytes);
     signed char* oldColor = oldPalette;
     int remainingColors = componentCount;
@@ -209,14 +211,14 @@ void DoBlur(
     memcpy(source->m_pixels, saved->m_pixels, imageSize);
     gpWindowManager->FizzleForward(0, 0, screenWidth, height, fizzleDelay, newPalette, oldPalette);
 #line 168
-    BaseFree(lookup, __FILE__, __LINE__);
+    H2_FREE(lookup, "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp", 0xa8);
     if (saved != 0) {
         delete saved;
     }
     gpMouseManager->ShowColorPointer();
 #line 173
-    BaseFree(oldPalette, __FILE__, __LINE__);
-    BaseFree(newPalette, __FILE__, __LINE__);
+    H2_FREE(oldPalette, "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp", 0xad);
+    H2_FREE(newPalette, "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp", 0xae);
 }
 
 #undef BLUR_COMPONENT

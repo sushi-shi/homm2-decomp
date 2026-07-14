@@ -65,7 +65,7 @@ void textWidget::Read(void)
     m_height = gpResourceManager->ReadWord();
     short len = gpResourceManager->ReadWord();
     m_text = static_cast<char *>(
-        BaseAlloc(len, "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP", 0x39));
+        H2_ALLOC(len, "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP", 0x39));
     gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(m_text), len);
     gpResourceManager->Read13(reinterpret_cast<signed char *>(local_10));
     gpResourceManager->SavePosition();
@@ -82,7 +82,7 @@ VA(0x004d1250, 0x30)
 textWidget::~textWidget()
 {
     gpResourceManager->Dispose(m_font);
-    BaseFree(m_text, "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP", 0x55);
+    H2_FREE(m_text, "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP", 0x55);
 }
 
 // @early-stop
@@ -145,8 +145,8 @@ int textWidget::Main(tag_message &msg)
             }
             unsigned short newLen = strlen(newText);
             if (strlen(m_text) < newLen) {
-                BaseFree(m_text, "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP", 0xd3);
-                m_text = static_cast<char *>(BaseAlloc(
+                H2_FREE(m_text, "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP", 0xd3);
+                m_text = static_cast<char *>(H2_ALLOC(
                     newLen + 5, "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP", 0xd4));
             }
             strcpy(m_text, newText);
@@ -197,8 +197,8 @@ void textWidget::SetText(char *param_1)
     }
     unsigned short newLen = strlen(param_1);
     if (strlen(m_text) < newLen) {
-        BaseFree(m_text, "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP", 0xd3);
-        m_text = static_cast<char *>(BaseAlloc(
+        H2_FREE(m_text, "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP", 0xd3);
+        m_text = static_cast<char *>(H2_ALLOC(
             newLen + 5, "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP", 0xd4));
     }
     strcpy(m_text, param_1);
