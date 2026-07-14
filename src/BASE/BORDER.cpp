@@ -139,17 +139,11 @@ leaveEvent:
     return 0;
 }
 
-// @match-note
-// Structurally complete /O2 checkpoint: declaring X before Y removes the spurious
-// EBP save and raises this from 73.80% to 88.03%. The switch, three draw paths,
-// calls and 7 relocations agree. Base is 0xaa bytes versus retail 0xab; remaining
-// bytes are the equivalent owner/member load order for X/Y. Y-first and explicit
-// owner/two-step forms regress or emit no gain; revisit after a new TU state.
 VA(0x004d2480, 0xab)
 void border::Draw(void)
 {
-    short x = m_x + static_cast<short>(m_owner->m_posX);
     short y = m_y + static_cast<short>(m_owner->m_posY);
+    short x = m_x + static_cast<short>(m_owner->m_posX);
     int kind = field_0x14;
     switch (kind) {
     case 0x400:
