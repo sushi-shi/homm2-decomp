@@ -88,6 +88,16 @@ DATA(0x00534ce8) static unsigned int gCTRun;
 // broad divergence is still setup +0x12. A combined source/destination post-increment scores 80.19,
 // a separate next-source local scores 67.72, and splitting the mapped value into its own assignment
 // scores 69.58; all were rejected. An explicit signed copy-count local is byte-identical and omitted.
+// Fresh d8502da clipped-literal ownership audit raises the live checkpoint to 82.333336% and grows
+// the candidate to 0x59e, only 0x11 short of retail. In retail's X<clipX subtree, both the fully
+// right-visible and right-clipped bodies independently form row+clipX before selecting their count
+// (+0x4f6..+0x511); only then does their join publish the adjusted gCTSrcCopy. The prior common
+// savedDst assignment let MSVC merge that formation. Keeping the destination assignment in each
+// real selection arm reproduces the duplicated ownership at candidate +0x4e2..+0x503 and improves
+// 1.748826 points without changing semantics or relocation targets. Candidate/retail now both have
+// 427 instructions, 67 branch sites, the exact 86-block topology and one-word frame; relocations
+// remain 90/91 with no wrong target, and the first broad divergence remains +0x12. Reversing the
+// three equivalent literal comparisons and spelling (clipX-X)+gCTSrc are byte-identical; omitted.
 VA(0x004d32a0, 0x5af)
 void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                             int clip, int clipX, int clipY, int clipW, int clipH, int color,
@@ -291,12 +301,14 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
                         else
                             cnt = (clipRight - X) + 1;
                     } else {
-                        if (clipRight >= right)
+                        if (clipRight >= right) {
+                            savedDst = row + clipX;
                             cnt = (cmd - clipX) + X;
-                        else
+                        } else {
+                            savedDst = row + clipX;
                             cnt = clipW;
+                        }
                         gCTSrcCopy = gCTSrc + (clipX - X);
-                        savedDst = row + clipX;
                     }
                 }
             } while (0);
