@@ -176,6 +176,19 @@ typedef enum ArmyAttackConstant {
     ARMY_PATH_BLOCKED = 3
 } ArmyAttackConstant;
 
+typedef enum ArmyCombatDirection {
+    ARMY_DIRECTION_LEFT = 1,
+    ARMY_DIRECTION_RIGHT = 4
+} ArmyCombatDirection;
+
+typedef enum ArmyFlightConstant {
+    ARMY_ALL_ADJACENT_DIRECTIONS = 0x3f,
+    ARMY_FLIGHT_SOUND_FRAME = 1,
+    ARMY_VAMPIRE_FLIGHT_SOUND_DELAY = 100
+} ArmyFlightConstant;
+
+#define ARMY_VAMPIRE_FLIGHT_DURATION_SCALE 1.3
+
 typedef enum ArmySpellStatConstant {
     ARMY_HASTE_SPEED_BONUS = 2,
     ARMY_BLOODLUST_ATTACK_BONUS = 3,
