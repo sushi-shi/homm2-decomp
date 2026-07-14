@@ -145,3 +145,26 @@ The byte pins covered default constructor/destructor, `Main`, `Draw`, and the no
 `Read` walk also pinned the long constructor. The accepted canonical source/header hashes remain
 `ac8dd08884961ba6d73e8a312391cdeecac71ba132f5badef5f79201a63b34d8` and
 `8207f088751e59f5a467c7a7e582c4870d82c3fb4e060262d02d5e3a07a17517`.
+
+## BASE/Textntry manual TU-state and lifetime pass
+
+`textntry-manual-tu-a4fa3a0.tsv` records 35 new unique manual states from integrated checkpoint
+`a4fa3a0`. Its SHA-256 is
+`eba42858cfad92679dfe1736d6ab31656064d1029f5f6bae88a177f6984cf2ec`. Neither permutation tool was
+used. Each row records the full source SHA, focused scores, raw target outcome, sibling outcome, and
+disposition; every state was checked against all older Textntry matrices before compilation.
+
+The pass covers exact-neutral default-constructor, long-constructor, and destructor spellings;
+constructor parameter/member lifetime aliases; width and storage-class variants of `Read`'s
+`enabled`; three progressively factored duplicated-arm CFGs; and two combined exact-predecessor
+bundles. No state was retained.
+
+The important new boundary is hash `9704ae26...`: `short enabled` emits retail's desired
+`cmp edi,3` before the `m_height` load, but changes the following constant from retail
+`mov eax,1` to candidate `mov ax,1`. Hash `9fe21062...` proves that `enabled | 0` is optimized back
+to the same wrong-width instruction. Short-to-int snapshots add `movsx`; using the short in the
+final predicate adds an extra sign-extend/subtract/compare sequence. The duplicated-arm family
+leaves real extra branches and must not be repeated.
+
+The canonical source/header hashes remain `ac8dd08884961ba6d73e8a312391cdeecac71ba132f5badef5f79201a63b34d8`
+and `8207f088751e59f5a467c7a7e582c4870d82c3fb4e060262d02d5e3a07a17517`.
