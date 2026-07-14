@@ -10,6 +10,8 @@ class ExpCampaign;
 enum {
     HERO_TYPE_INITIAL_COUNT = 8,
     EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT = 4,
+    X_GLOBAL_RECRUIT_EMPTY_COUNT = 6,
+    X_GLOBAL_RECRUIT_BUY_COUNT = 5,
     X_GLOBAL_PASSWORD_STRING_COUNT = 211,
     X_GLOBAL_STABLE_TEXT_COUNT = 4,
     GLOBAL_MAP_NAME_SIZE = 0x18,
@@ -248,6 +250,8 @@ extern char *cSlowVideoLevelText[2];
 extern char *gSPanelHelp[10];
 extern char *xBarrierColor[8];
 extern char *xGenericSiteNames[8];
+extern char *xRecruitEmpty[X_GLOBAL_RECRUIT_EMPTY_COUNT];
+extern char *xRecruitBuy[X_GLOBAL_RECRUIT_BUY_COUNT];
 extern char *xRecruitmentSiteNames[6];
 extern int gbHeroWindShowing;
 extern int gbFullCombatScreenDrawn;
