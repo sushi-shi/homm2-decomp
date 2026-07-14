@@ -216,17 +216,17 @@ sites. The current residual is a soft defer, not a permitted wall.
 ## BASE/iconf2bc: FlipIconToBitmapColorTable
 
 Status: active. This is an integrated progress checkpoint, not a wall or soft defer. The same lane
-must continue from the three remaining `gFCY` loads before taking unrelated work.
+must continue from the remaining setup `gFCY` load before taking unrelated work.
 
 Canonical source state:
 
-- checkpoint: `eda2a36`
+- checkpoint: `000768f`
 - target: RVA `0xd9790`, retail size `0x54d`
 - `src/BASE/iconf2bc.cpp`:
-  `98ba8916cb186d89ddcded1d270e23cdf72430d2f063a25670a9b8b66021084d`
-- live checkpoint: 83.458435%, candidate size `0x54f`, 86 candidate vs 83 retail relocations,
+  `bcf4f468adf3b75d8226120b3eb00a72ba98833d8aea434625f13dba3e9b5cad`
+- live checkpoint: 85.166245%, candidate size `0x540`, 84 candidate vs 83 retail relocations,
   no base-only target
-- the command decoder now begins at the exact retail offset `+0xec`
+- the command decoder begins at `+0xe9` versus retail `+0xec`
 
 ### Corrections retained at the canonical checkpoint
 
@@ -238,13 +238,15 @@ Canonical source state:
 - restored source advancement for fully clipped literal runs;
 - restored the retail-evidenced branch-selected literal destination cursor, common skip
   publication, and literal-count snapshot lifetime;
+- replaced broad/redundant owner and `Misc.h` includes with the narrow `IconEntry.h` declaration
+  surface, removing the clipped fill/dim excess `gFCY` loads;
 - corrected the `gFCClipR` lifetime/count to agree with retail;
 - matched every external relocation target and every scratch-global occurrence count except
   `gFCY`.
 
-The remaining measured relocation delta is exactly three redundant retail `gFCY` loads. Every
-other scratch-global occurrence count agrees. Candidate code ends two bytes after retail. These
-facts are the next concrete steering target; they are not evidence that the residual is impossible.
+The remaining measured relocation delta is exactly one redundant setup `gFCY` load. Every other
+scratch-global occurrence count agrees. Candidate code ends 13 bytes before retail. These facts are
+the next concrete steering target; they are not evidence that the residual is impossible.
 
 ### Searches already exhausted
 
@@ -264,7 +266,7 @@ retained/reverted/byte-identical disposition, is in
 [`docs/iconf2bc-experiment-matrix.md`](iconf2bc-experiment-matrix.md). Treat that file as the
 authoritative no-repeat list for this source/header state.
 
-Continue specifically from the three missing `gFCY` loads and the first structural divergence.
+Continue specifically from the extra setup `gFCY` load and the first structural divergence.
 Record each new source-hash-distinct shape with its match, size, frame, and relocation result. Do
 not retry the families above while the canonical source hash agrees. If a shared icon/header edit
 is retained, retest the deferred icon2bc, Icon2b, and Iconf2b functions as well.
