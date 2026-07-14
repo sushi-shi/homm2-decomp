@@ -34,6 +34,7 @@ DATA(0x00534ce8) static unsigned int gCTRun;
 // Shared-lifetime replay guard: docs/matching-matrices/icon2bc-shared-lifetimes-5645ed8.tsv.
 // Scratch-owner audit: docs/matching-matrices/icon2bc-owner-audit-708de32.tsv. Every address in
 // 0x534ca8..0x534ce8 was re-derived from its ordered retail DIR32 instruction role; none is swapped.
+// Typed command/loop-state replay guard: docs/matching-matrices/icon2bc-command-state-08966f9.tsv.
 // @match-note
 // /O2 template checkpoint: the complete skip/solid/shadow/fill/dim/literal/newline CFG and every
 // relocation target are accounted for. A canonical KB-owned dim-palette declaration now avoids
@@ -59,6 +60,11 @@ DATA(0x00534ce8) static unsigned int gCTRun;
 // tail without destination, and X/Y/entry/row context) and tried the sibling-shared frame-entry
 // accessor. None kept the recovered command coloring with X=ESI/destination=EBX; canonical is
 // restored. Resume only from a newly proved owner/type surface, not another record boundary.
+// A fresh retail/sibling pass then tested a shared inline frame view, a cursor-backed decoder for
+// every command and payload read, command/flag typedef-enum domains, and a typed loop-carried
+// destination state. The frame view alone recovers EBX=13*frame, and the enum states can recover
+// all 91 occurrences, but none produces retail's ECX/EAX/EDX/EBX decoder allocation; the inline
+// command object also reverses the command-body layout. Do not wrap only the byte reader again.
 VA(0x004d32a0, 0x5af)
 void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                             int clip, int clipX, int clipY, int clipW, int clipH, int color,
