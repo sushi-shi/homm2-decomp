@@ -362,7 +362,7 @@ BASE/droplist	?Read@dropListWidget@@QAEXXZ	100.0000	3e0df002aca4
 BASE/droplist	?RestoreDropBackground@dropListWidget@@QAEXXZ	100.0000	fdd690daaab3
 BASE/droplist	?SaveDropBackground@dropListWidget@@QAEXXZ	100.0000	b3d5c9e1b5dd
 BASE/icon2bc	?IconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAEH@Z	82.3333	c343242f78af
-BASE/icon2bs	?IconToBitmapScale@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	76.3262	4258b941508c
+BASE/icon2bs	?IconToBitmapScale@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	72.8865	8444208704e7
 BASE/icon2by	?IconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	95.7995	a997dc7283d5
 BASE/iconf2bc	?FlipIconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAE@Z	86.3174	32e4c5b86f58
 BASE/iconf2by	?FlipIconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	90.2011	00fd4884178b
