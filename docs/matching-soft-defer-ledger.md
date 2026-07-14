@@ -26,10 +26,11 @@ remain unmarked and in the same lane.
 
 Canonical source state:
 
-- checkpoint: `9e6037c`
+- checkpoint: `949be58`
 - `src/BASE/Textntry.cpp`:
-  `adc0b76f9c9fc4c43129d8790dc889144dacf7371bcc5e3ca7ad6cd94d7df000`
-- long constructor, RVA `0xd87b0`: 98.58696%, base/retail size `0x134`, 6/6 relocations;
+  `8aaf3cc7edfb882ad036d2e666e5af371fb613283f22c9f10894ba77137bf198`
+- long constructor, RVA `0xd87b0`: 98.695656%, normalized hash `cc616330bf7f`,
+  base/retail size `0x134`, 6/6 relocations;
 - `Read`, RVA `0xd8920`: 98.6755%, base/retail size `0x26c`, 52/52 relocations;
 - `SetupDisplayString`, RVA `0xd9570`: live 95.0% with retained maximum 97.3581%, base
   `0x1bd` vs retail `0x1be`, frame `0x130`, 8/8 relocations.
@@ -53,6 +54,25 @@ retail `xor` in the dead second-loop tail.
   `SetupDisplayString`;
 - destructor aliases were tested only with ABI-valid source forms; none improved them;
 - no diagnostic scripts or generated status changes were retained from the searches.
+
+AST-gated searches after `e4e96c0`:
+
+- initial constructor pass: 562 unique source hashes; found and retained the 98.695656% state;
+- `Read` pass from the improved constructor: 356 unique source hashes; no improvement;
+- deep constructor continuation: 819 unique source hashes; no further improvement;
+- every mutation was produced by `scripts/permute_ast.py`, all 11 siblings were pinned, and the
+  regex permuter was never used;
+- the exact hash/score rows are persisted under
+  [`docs/matching-matrices/`](matching-matrices/README.md) and must be checked before another AST
+  walk at the same source/header state.
+
+New manual `SetupDisplayString` and predecessor states:
+
+- Setup-equivalent 95.0% hashes: `3d218f`, `d6275b`, `0ac643`, `7ba293`, `e5e564`;
+- exact default-constructor/Main predecessor hashes leaving Setup unchanged: `534ee6`, `56260e`,
+  `3ff8a1`, `750047`, `601ce9`, `66fac8`, `629715`, `2dbe13`, `c7f37d`;
+- `a3fe00` left Setup unchanged and regressed Main to 99.542015%;
+- `da8df8` over-optimized Setup to 89.62838%, size `0x1ac`, frame `0x130`, 8/8 relocations.
 
 Do not repeat those TU-state searches while the canonical source hash and sibling hashes agree.
 Continue with a retail-evidenced lifetime or a genuinely different exact-preserving predecessor/TU
