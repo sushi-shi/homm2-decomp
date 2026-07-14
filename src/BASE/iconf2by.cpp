@@ -41,7 +41,10 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
     gFYX0 = ((x - gFYEntry->w) - gFYEntry->x) + 1;
     gFYXEnd = gFYEntry->w + gFYX0 - 1;
     gFYY = gFYEntry->y + y;
-    gFYX = gFYXEnd - shear[gFYY];
+    {
+        int initialShearOffset = shear[gFYY];
+        gFYX = gFYXEnd - initialShearOffset;
+    }
     gFYClipB = clipY + clipH - 1;
     gFYClipR = clipX + clipWidth - 1;
     gFYRow = dest->m_width * gFYY + reinterpret_cast<int>(dest->m_pixels);
