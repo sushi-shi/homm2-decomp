@@ -243,9 +243,9 @@ fileRequester::fileRequester(int x, int y, int mode, char *pattern, char *direct
 }
 
 VA(0x0048d3c0, 0x63)
-int fileRequester::MapExistsForFilter(int filter)
+int fileRequester::MapExistsForFilter(FileRequesterMapSizeFilter filter)
 {
-    int oldFilter = giMapSizeFilter;
+    FileRequesterMapSizeFilter oldFilter = giMapSizeFilter;
     giMapSizeFilter = filter;
     int result = InitializeFiles(m_directory, m_filePattern, 1);
     giMapSizeFilter = oldFilter;
@@ -447,7 +447,8 @@ int fileRequester::Main(struct tag_message &message)
             } else {
                 strcpy(oldName, "");
             }
-            giMapSizeFilter = (giMapSizeFilter + 1) % FILE_REQUESTER_MAP_SIZE_COUNT;
+            giMapSizeFilter = static_cast<FileRequesterMapSizeFilter>(
+                (giMapSizeFilter + 1) % FILE_REQUESTER_MAP_SIZE_COUNT);
             SetupFiles();
             if (strlen(oldName) != 0) {
                 for (int i = 0; i < m_fileCount; ++i) {
@@ -613,7 +614,9 @@ int fileRequester::Main(struct tag_message &message)
                     case FILE_REQUESTER_FILTER_LARGE:
                     case FILE_REQUESTER_FILTER_XLARGE:
                     case FILE_REQUESTER_FILTER_ALL: {
-                        int filter = message.payload.widget.id - FILE_REQUESTER_FILTER_SMALL;
+                        FileRequesterMapSizeFilter filter =
+                            static_cast<FileRequesterMapSizeFilter>(
+                                message.payload.widget.id - FILE_REQUESTER_FILTER_SMALL);
                         if (!MapExistsForFilter(filter)) {
                             if (giNumHumanPlayers == 1) {
                                 sprintf(gText,
@@ -1086,7 +1089,7 @@ char * fileRequester::GetFilename(void)
 VTBL(fileRequester, 0x004eb888);
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x004f8674) int giMapSizeFilter;
+DATA(0x004f8674) FileRequesterMapSizeFilter giMapSizeFilter;
 DATA(0x004f88c4) char *cFRDummy = "";
 DATA(0x0052857c) float fGutterMinY;
 DATA(0x00528580) float fGutterTravelLength;
