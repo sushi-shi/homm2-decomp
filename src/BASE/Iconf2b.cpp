@@ -31,13 +31,16 @@ DATA(0x00534ca0) static int gFlipClipR;
 DATA(0x00534ca4) static unsigned char *gFlipDst;
 
 // @match-note
-// e590ae9 narrow IconEntry TU state: complete CFG, sub esp,8 frame, 0x4fa vs retail 0x4f1;
-// decoder +0xe9 vs +0xe3. First divergence +0x1d: candidate loads entry Y into EBP before
-// forming the entry pointer; retail forms EDI, loads entry X into EBX, subtracts it, then loads Y.
-// Relocations 84/81, no target-only external target; every scratch count agrees except gFlipY
-// (11 candidate/8 retail). Relocation-union raw mask leaves 554 differing bytes, first +0x21.
-// Direct entry/entryX and delayed entryY spellings were byte-neutral. Retry only after a retained
-// predecessor/shared-header/include-state change; see iconf2b-tu-state-e590ae9.tsv.
+// a0b17fb combined-root state: complete CFG and sub esp,8 frame; candidate .text is 0x4e5
+// bytes versus the 0x4f1-byte retail function, and the decoder begins at +0xe9 versus +0xe3.
+// The first unmasked divergence is +0x1d: candidate loads entry Y into EBP before forming the
+// entry pointer; retail forms EDI, loads entry X into EBX, subtracts it, then loads Y. The
+// relocation-union audit masks 82/81 relocation payloads and leaves 609 differing bytes among
+// 678 common unmasked bytes plus a 0xc-byte retail tail. The sole count excess is gFlipY (9/8).
+// This TU has no function predecessor. Exact-preserving include placements, entry publication,
+// and Y-sum order were byte-identical; the measured local/sibling setup variants regressed. This
+// is not a wall or @early-stop. Retry after a retained shared-header/declaration/compiler-state
+// change; do not replay the a0b17fb matrix: iconf2b-tu-state-a0b17fb.tsv.
 VA(0x004d1ba0, 0x4f1)
 void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                       int clip, int clipX, int clipY, int clipW, int clipH, int color)
