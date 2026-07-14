@@ -31,12 +31,18 @@ DATA(0x00534c5c) static unsigned int gIcCnt2;
 
 // @match-note
 // Macro-neutral structural checkpoint: complete no-frame CFG and correct relocation targets.
-// First divergence is +0x11: ours loads x before the indexed entry fields; retail retains the
-// 13-byte frame offset in EBX, reads x/srcOffset, forms EDI, then publishes entry/source/X0.
-// Counts are 80/83: only X0 2/3, Y 7/8, and Cnt2 4/5 differ; every missing publication is present
-// in source and is removed by /O2 CSE/dead-store elimination. Narrow owner headers, indexed-entry
-// selection, split X/Y accumulation, typed scratch pointers, and retail fill-arm order were tried.
-// Revisit after a real icon/header TU-state change; no permutation tool was used.
+// First divergence is +0x11: ours hoists x before the indexed entry fields; retail retains the
+// 13-byte frame offset in EBX, reads entry.x/srcOffset, forms EDI, then publishes entry/source/X0.
+// Counts are 80/83: only X0 2/3, Y 7/8, and Cnt2 4/5 differ. Retail reloads X0 at +0x5a
+// (reloc +0x5c), Y for clipping at +0x78 (reloc +0x7a), and Y for the row at +0xcf
+// (reloc +0xd1); ours forwards the live X/Y values. Retail's fifth Cnt2 store is +0x387
+// (reloc +0x389), in the right-clipped dim arm after the ClipR load and before its comparison;
+// the corresponding source publication is removed as redundant. Scoped X/Y snapshots collapse
+// byte-identically, while direct scratch ownership overshoots (X0 5/3, Y 10/8). Making Cnt2 feed
+// the arm emits six occurrences with a non-retail global reload; reversed/separate assignments
+// collapse to four. A typed IconEntry array root also remains 80/83 and worsens the setup shape.
+// This is an unresolved compiler-state residual, not a proven wall. Revisit after a real reachable
+// type/header change; no permutation tool was used.
 VA(0x004d0570, 0x4ed)
 void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                   int clip, int clipX, int clipY, int clipW, int clipH, int color)
