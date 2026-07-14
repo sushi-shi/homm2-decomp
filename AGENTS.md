@@ -232,6 +232,19 @@ authoritative. This file is the short, restart-ready Codex workflow.
   their section membership is not evidence for original `.data` versus `.bss`. Use the retail PE's
   raw/virtual section extents, stored bytes, CodeView addresses, and neighboring symbols instead.
 
+## CodeView Function Boundaries
+
+- Treat the original NB09 per-module `sstAlignSym` procedure records as the authoritative function
+  inventory and length source. Parse both `S_GPROC32` and `S_LPROC32`, preserving their start,
+  `pLen`, name, and compiland ownership; also retain `S_THUNK32` records as distinct code ranges.
+- `S_PUB32` is a public alias or fallback only. It must never replace a matching procedure record's
+  start or length. Computing a function length as the distance to the next public symbol causes
+  public functions to absorb private helpers and creates artificial objdiff/delinker walls.
+- After all CodeView procedures and thunks are materialized, audit uncovered `.text` ranges. Carve
+  a truly CodeView-absent function only with executable entry evidence such as a direct-call target
+  or a validated thunk/disassembly boundary. Never carve alignment padding, jump tables, or embedded
+  data as functions; record deterministic synthetic names and provenance for every such range.
+
 ## Git Discipline
 
 - Never revert user changes or stage `.claude/worktrees/`.
