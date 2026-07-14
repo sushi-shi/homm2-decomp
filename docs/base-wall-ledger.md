@@ -1,7 +1,7 @@
 # BASE `@early-stop` proof ledger
 
 This ledger audits every current `@early-stop` marker under `src/BASE` from integration base
-checkpoint `a0b17fb`, with the accepted dirty source identities pinned below.
+checkpoint `9cae94e`, with the accepted dirty source identities pinned below.
 It is deliberately stricter than the prose beside the functions: a score or a claim that
 instructions are "the same" is not proof.  The audit joined the current
 `build/objdiff/report.json` (refreshed with `homm2 status`) to
@@ -28,7 +28,7 @@ No BASE marker presently meets the soft-TU-cumulative checklist.
 
 The counts and rows below are pinned to the following fully rebuilt state:
 
-- Integration base Git checkpoint: `a0b17fb69de65ba589df69e16402900f7012447d`
+- Integration base Git checkpoint: `9cae94e04aa26e4f178005377f6f833ea4f78623`
 - Accepted `src/BASE/BORDER.cpp` SHA-256:
   `c8e627807ba10e7d1f494e3891114b4f746c68ad5262d69d8997fb481a1c35dd`
 - Accepted `src/BASE/WINMGR.cpp` SHA-256:
@@ -36,7 +36,7 @@ The counts and rows below are pinned to the following fully rebuilt state:
 - Accepted `src/BASE/BUTTON.cpp` SHA-256:
   `9e254a6733d5343a62de0865d9c5624e3c7890a5a7238182822b6c5a6ed09793`
 - Accepted `src/BASE/WIDGET.cpp` SHA-256:
-  `a01726c7fba2e267ba07ca78a46dc2cb155026f383f1de35c9f508fbe6c4d86e`
+  `8337bc33368f5cb334ec9903643adef5328cdf0ec7e1edfb0b02db3bdeaac253`
 - Accepted `src/BASE/TEXTWDGT.cpp` SHA-256:
   `1cfc5fd48b2f6941400f143c89f66718612a623b662a2f8d2185fed8dc93ff4b`
 - Accepted `src/BASE/Textntry.cpp` SHA-256:
@@ -56,11 +56,11 @@ The counts and rows below are pinned to the following fully rebuilt state:
 - Accepted `src/SOURCE/SPELLS.cpp` SHA-256:
   `bb101342c4fea059a2fd1864212df6a48f5fc67c04ed59508ca4fa5c96c1842d`
 - `build/objdiff/report.json` SHA-256:
-  `160960e36ef529c2f3f0b7bc8849ce18ca10e1cfd8ab067ddee03b0aed1b3f3a`
+  `e8b859c9ca703aade7df99a66bfa646e462dfe821aeca33ff7a8d5c00e3c2bcf`
 - `config/match_baseline.tsv` SHA-256:
-  `20eb8b26d244086972d174fc8ffd1be510e50c81b82046e6999b61401ae959ae`
+  `41f838b15dc1b014b9324f891e1df551493a562d4f14447eb78f7822137002a6`
 - Sorted `rg -n '@early-stop' src/BASE` inventory SHA-256:
-  `e3f46a4f232ec5a98f1c1a7a002499e8dc0ffb9ba36e25dd912b4cf45c05f473`
+  `542a4b375f5b62df7415be062fa8a1747dfa38fb98dd4e88aa721ed19510d8ac`
 
 Recompute all listed identities before reusing classifications after a root/header/source change.
 
@@ -70,13 +70,11 @@ Recompute all listed identities before reusing classifications after a root/head
 | :--- | ---: | :--- |
 | `proven-artifact` | 10 | Seven ordinary function markers and three generated destructor aliases. |
 | `proven-soft-TU-cumulative` | 0 | No marker has the required frame/slot, standalone, combined-root, and exact-predecessor proof bundle. |
-| `unresolved/not-a-wall` | 51 | Includes three unproved deleting-destructor tradeoffs and two stale markers on exact functions. |
-| **Total** | **61** | Exactly 55 ordinary rows plus six generated-alias rows: one row per current source marker. |
+| `unresolved/not-a-wall` | 49 | Includes three unproved deleting-destructor tradeoffs and two stale markers on exact functions. |
+| **Total** | **59** | Exactly 53 ordinary rows plus six generated-alias rows: one row per current source marker. |
 
 Syntax/state defects found by the audit:
 
-- [`BITS.cpp:11`](../src/BASE/BITS.cpp#L11) uses invalid `// @early-stop ~44%:` syntax.  The
-  marker line must be exactly `// @early-stop`, with no percentage.
 - [`CheckChangeCursor`](../src/BASE/INPUTMGR.cpp#L452) and
   [`resourceManager::Close`](../src/BASE/RESMGR.cpp#L292) are live/retained 100% with `Δ=0`;
   their markers are stale and should be removed with the next source-owning change.
@@ -119,7 +117,6 @@ and live scores are shown as `retained/live`.
 
 | TU | RVA / function | Score | Classification | Current byte/reloc evidence | Tried record | Retry |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `BITS` | `0x004d1594` `BitTest` | 47.6316/47.6316 | unresolved/not-a-wall | Δ=44; rel 0/0 | [source note](../src/BASE/BITS.cpp#L11) | R1 |
 | `Blur` | `0x004d28e0` `DoBlur` | 93.9030/93.9030 | unresolved/not-a-wall | Δ=1046; rel 43/43 | [source note](../src/BASE/Blur.cpp#L26) | R1 |
 | `Bzip` | `0x004d4470` `minUInt32` | 100.0000/99.8095 | unresolved/not-a-wall | Δ=4; rel 0/0 | [source note](../src/BASE/Bzip.cpp#L238) | R3 |
 | `Bzip` | `0x004d47a0` `arithDecodeSymbol` | 99.9730/99.9730 | unresolved/not-a-wall | Δ=2; rel 11/11 | [source note](../src/BASE/Bzip.cpp#L338) | R3 |
@@ -167,7 +164,6 @@ and live scores are shown as `retained/live`.
 | `TEXTWDGT` | `0x004d1060` `textWidget::textWidget()` | 97.3684/97.3684 | unresolved/not-a-wall | Δ=10; rel 2/2 | [source note](../src/BASE/TEXTWDGT.cpp#L14) | R2 |
 | `TEXTWDGT` | `0x004d10f0` `textWidget::textWidget(...)` | 99.2727/99.2727 | unresolved/not-a-wall | Δ=8; rel 4/4 | [source note](../src/BASE/TEXTWDGT.cpp#L38) | R2 |
 | `TEXTWDGT` | `0x004d1280` `textWidget::Main` | 99.6316/99.6316 | unresolved/not-a-wall | Δ=2; rel 6/6 | [source note](../src/BASE/TEXTWDGT.cpp#L88) | R2 |
-| `WIDGET` | `0x004dde00` `widget::widget` | 96.8261/96.8261 | unresolved/not-a-wall | Δ=18; rel 1/1 | [source note](../src/BASE/WIDGET.cpp#L30) | R2 |
 | `WIDGET` | `0x004dded0` `widget::Close` | unscored | proven-artifact | candidate named body and retail `empty_stub` are the same single `c3`, rel 0/0 | [empty-stub proof pattern](patterns/retail-empty-stubs.md) | A1 |
 | `WINDOW` | `0x004cecd0` `heroWindow::heroWindow(resource)` | 99.9167/99.9167 | proven-artifact | Δ=0 over 0x521 bytes after 57 relocation payloads; 0x68 frame and EBP displacements exact; only folded dispatch/table identities remain | [WINDOW matrix](matching-matrices/README.md#basewindow-whole-tu-jump-table-revalidation) | A1 |
 | `droplist` | `0x004dc2e0` `dropListWidget::Main` | 99.8745/99.8745 | proven-artifact | Δ=0 over 0x350 bytes; rel 22/22; external sites agree and seven dispatch/table sites are owner-label aliases | [source note](../src/BASE/droplist.cpp#L126) | A1 |
