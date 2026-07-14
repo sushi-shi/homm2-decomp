@@ -11,36 +11,39 @@
 #include <BASE/IconEntry.h>
 #include <string.h>
 // Per-call decoder scratch — its own file-static block (0x534c60+).
-DATA(0x00534c60) static int gFlipSkip;
-DATA(0x00534c64) static unsigned int gFlipRun;
+DATA(0x00534c7c) static IconEntry *gFlipEntry;
 DATA(0x00534c68) static int gFlipX0;
 DATA(0x00534c6c) static int gFlipXEnd;
-DATA(0x00534c70) static unsigned int gFlipCnt;
-DATA(0x00534c74) static unsigned int gFlipCnt2;
 DATA(0x00534c78) static int gFlipY;
-DATA(0x00534c7c) static IconEntry *gFlipEntry;
 DATA(0x00534c80) static int gFlipX;
 DATA(0x00534c84) static unsigned char *gFlipSrc;
-DATA(0x00534c88) static unsigned char *gFlipDimPal;
-DATA(0x00534c8c) static unsigned char *gFlipDimDst;
+DATA(0x00534ca0) static int gFlipClipR;
 DATA(0x00534c90) static int gFlipClipB;
 DATA(0x00534c94) static int gFlipRow;
-DATA(0x00534c98) static unsigned int gFlipDimLen;
+DATA(0x00534c64) static unsigned int gFlipRun;
 DATA(0x00534c9c) static unsigned char gFlipColor;
-DATA(0x00534ca0) static int gFlipClipR;
+DATA(0x00534c74) static unsigned int gFlipCnt2;
+DATA(0x00534c98) static unsigned int gFlipDimLen;
+DATA(0x00534c88) static unsigned char *gFlipDimPal;
+DATA(0x00534c70) static unsigned int gFlipCnt;
+DATA(0x00534c8c) static unsigned char *gFlipDimDst;
 DATA(0x00534ca4) static unsigned char *gFlipDst;
+DATA(0x00534c60) static int gFlipSkip;
 
 // @match-note
-// a0b17fb combined-root state: complete CFG and sub esp,8 frame; candidate .text is 0x4e5
-// bytes versus the 0x4f1-byte retail function, and the decoder begins at +0xe9 versus +0xe3.
-// The first unmasked divergence is +0x1d: candidate loads entry Y into EBP before forming the
-// entry pointer; retail forms EDI, loads entry X into EBX, subtracts it, then loads Y. The
-// relocation-union audit masks 82/81 relocation payloads and leaves 609 differing bytes among
-// 678 common unmasked bytes plus a 0xc-byte retail tail. The sole count excess is gFlipY (9/8).
-// This TU has no function predecessor. Exact-preserving include placements, entry publication,
-// and Y-sum order were byte-identical; the measured local/sibling setup variants regressed. This
-// is not a wall or permitted stop. Retry after a retained shared-header/declaration/compiler-state
-// change; do not replay the a0b17fb matrix: iconf2b-tu-state-a0b17fb.tsv.
+// 214bd52 fresh structural pass: complete CFG, sub esp,8 frame, and all external relocation
+// targets; candidate .text remains 0x4e5 versus retail 0x4f1, with 82/81 relocations. The sole
+// count excess is the setup gFlipY reload (9/8): retail keeps the +0x73 load through the fourth
+// clip clause, while this build reloads it at +0x89. The first unmasked divergence remains +0x1d:
+// candidate loads entry Y before forming the entry pointer; retail forms EDI, loads/subtracts
+// entry X, then loads entry Y. The decoder begins at +0xe9 versus +0xe3.
+// A retail/adjacent-decoder-evidenced scratch declaration sequence raised 85.63395 to 86.5756;
+// the literal path now has the real shared nonzero-skip publication and split right-arm skip
+// lifetime, but VC4.2 still keeps that lifetime in ECX where retail spills three intermediates
+// through [esp+0x10]. Mutating parameter x regressed, while clause-local Y caching and split cursor
+// loads were byte-identical. This is not a wall or permitted stop. Continue from the setup Y/X
+// allocation and right-skip spill after a newly proved lifetime/header/compiler-state change;
+// do not replay either older matrix or iconf2b-fresh-214bd52.tsv.
 VA(0x004d1ba0, 0x4f1)
 void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                       int clip, int clipX, int clipY, int clipW, int clipH, int color)
@@ -212,6 +215,7 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int
                     int left = (X - cmd) + 1;
                     if (left <= gFlipClipR && clipX <= X) {
                         unsigned int cn;
+                        int skip;
                         if (X <= gFlipClipR) {
                             gFlipDst = reinterpret_cast<unsigned char *>(gFlipRow + X);
                             if (clipX <= left) {
@@ -219,7 +223,8 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int
                                 cn = cmd;
                             } else {
                                 cn = (X - clipX) + 1;
-                                gFlipSkip = cmd - cn;
+                                skip = cmd - cn;
+                                goto set_skip;
                             }
                         } else {
                             cn = gFlipClipR;
@@ -230,10 +235,18 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int
                                 gFlipSkip = 0;
                                 cn = (cmd - X) + cn;
                             } else {
-                                gFlipSkip = gFlipClipR + ((cmd - X) - clipW);
                                 cn = clipW;
+                                skip = cmd;
+                                skip = skip - X;
+                                skip = skip - clipW;
+                                skip = gFlipClipR + skip;
+                                goto set_skip;
                             }
                         }
+                        goto skip_set;
+                    set_skip:
+                        gFlipSkip = skip;
+                    skip_set:
                         gFlipCnt = 0;
                         gFlipDimLen = cn;
                         if (static_cast<int>(cn) > 0) {
