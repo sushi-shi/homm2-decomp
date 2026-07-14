@@ -301,7 +301,7 @@ sites. The current residual is a soft defer, not a permitted wall.
 ## BASE/iconf2bc: FlipIconToBitmapColorTable
 
 Status: active. This is an integrated progress checkpoint, not a wall or soft defer. The same lane
-must continue from the measured width/X, row-register, and setup-`gFCY` divergences before taking
+must continue from the measured width/X, row-input, and setup-`gFCY` divergences before taking
 unrelated work.
 
 Canonical source state:
@@ -328,10 +328,12 @@ Canonical source state:
   surface, removing the clipped fill/dim excess `gFCY` loads;
 - declared width before the entry load and initialized X through `gFCXEnd`, restoring retail's
   EAX/EBX publication sequence and two of the three missing setup bytes;
-- declared the later row pitch beside the entry cursor, restoring retail row-load order and a
-  separate `gFCY` load while preserving the retained width/X setup;
+- declared the later row pitch beside the entry cursor, restoring a separate `gFCY` load while
+  preserving the retained width/X setup;
 - reused the later pitch lifetime to preserve the original icon width while transforming `w` into
   the exclusive horizontal bound used by the clipping setup;
+- moved the final row sum and `gFCRow` publication into retail's `eax`; the `gFCY` and destination
+  pixel inputs still load into the opposite registers;
 - corrected the `gFCClipR` lifetime/count to agree with retail;
 - matched every external relocation target and every scratch-global occurrence count except
   `gFCY`.
@@ -361,8 +363,8 @@ retained/reverted/byte-identical disposition, is in
 [`docs/iconf2bc-experiment-matrix.md`](iconf2bc-experiment-matrix.md). Treat that file as the
 authoritative no-repeat list for this source/header state.
 
-Continue specifically from the first width/X load-order divergence, the row-result `ecx` versus
-retail `eax` allocation, and the extra setup `gFCY` load.
+Continue specifically from the first width/X load-order divergence, the swapped row-input register
+loads before the now-correct `eax` publication, and the extra setup `gFCY` load.
 Record each new source-hash-distinct shape with its match, size, frame, and relocation result. Do
 not retry the families above while the canonical source hash agrees. If a shared icon/header edit
 is retained, retest the deferred icon2bc, Icon2b, and Iconf2b functions as well.
