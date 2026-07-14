@@ -105,6 +105,16 @@ DATA(0x00534c60) static int gFlipSkip;
 // A two-stage final-Y lifetime instead grows the frame to 0x10 and regresses to 83.40%. Thus the
 // shared semantic selection phase is not the missing allocator trigger; the canonical typed-root
 // source is restored. See the appended fresh8 family. The residual is unresolved, not a wall.
+// The fresh9 ordered-relocation pass proved the sole excess occurrence precisely. Retail loads
+// gFlipY once at +0x73 (relocation +0x75) and keeps ECX live for both `clipY > y` and
+// `entry->h + y`; candidate loads at +0x78 (relocation +0x7d) and again at +0x89 (relocation
+// +0x8b). Mutating the caller's y lifetime reproduces retail's `add ebp,ecx` accumulator direction
+// and removes the extra reload, but it spills the result to the y parameter home and substitutes
+// that home for two required global reads, leaving only 79/81 relocations. Tight final-Y scopes,
+// split global publication, and a nested horizontal/vertical clip CFG do not retain that direction;
+// the nested CFG hashes to the canonical text. Direct field-to-global accumulation regresses to
+// 84.98% and 83/81. Canonical 86.5756%, 0x4e5, 82/81 source is restored; see the appended fresh9
+// family in iconf2b-template-8116876.tsv. This is still an unresolved residual, not a wall.
 VA(0x004d1ba0, 0x4f1)
 void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                       int clip, int clipX, int clipY, int clipW, int clipH, int color)
