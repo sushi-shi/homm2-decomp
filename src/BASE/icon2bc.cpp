@@ -65,6 +65,11 @@ DATA(0x00534ce8) static unsigned int gCTRun;
 // owner prototype after icon/bitmap are complete is byte-identical; moving it after the scratch
 // declarations regresses to 78.85%/90:91. No setup or declaration variant is retained. Reopen only
 // when a reachable type/header declaration changes, not for another local spelling search.
+// Fresh lifetime-scope audit on master 835c404: widening data/entry/entryX/sourceOffset/X/row/cmd
+// to C89-style declarations at function entry regresses to 66.72%/89:91. Keeping X outside while
+// enclosing data/entry/field snapshots and initial clipping in one lexical scope regresses to
+// 75.27%/90:91. Both retain correct targets but worsen the +0x12 allocation cascade, so neither is
+// retained; do not retry declaration widening or a setup-only scope without a real type trigger.
 VA(0x004d32a0, 0x5af)
 void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                             int clip, int clipX, int clipY, int clipW, int clipH, int color,
