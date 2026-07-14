@@ -51,7 +51,7 @@
 #include <SOURCE/kbwin.h>
 
 
-// configStruct/SCreatureInfo shared in _types.h; EventExtra/SThievesData in SOURCE/GAME.h.
+// configStruct/tag_monsterInfo shared in _types.h; EventExtra/SThievesData in SOURCE/GAME.h.
 
 // GAME's BaseAlloc/BaseFree pass __FILE__ + a source line number. The retail
 // encodes the base line as a 2-byte string read via movswl, then adds a per-call
@@ -4237,20 +4237,15 @@ void game::GiveArmy(armyGroup *group, int type, int count, int slot)
     i[(short *)((char *)group + 5)] += count;
 }
 
-// @early-stop
-// ~96%: only the operand-load order of one ((signed char*)group)[i] read differs
-// (retail loads i then group; we load group then i) — the movsbl(%eax,%ecx) bytes are
-// identical (commutative address), only the two preceding movs swap. Proven to compile
-// byte-exact in isolation; the flip is a TU-global eval-order effect of the partial GAME
-// TU. Re-check when GAME is fuller.
 VA(0x00480f68, 0x91)
 int game::ExperienceValueOfStack(armyGroup *group, hero *h)
 {
     int exp = 0;
     int i;
     for (i = 0; i < 5; i++) {
-        if (((short *)((char *)group + 5))[i] > 0) {
-            exp += gCreatureInfo[((signed char *)group)[i]].value * ((short *)((char *)group + 5))[i];
+        if (group->m_quantities[i] > 0) {
+            exp += gMonsterDatabase[group->m_creatureTypes[i]].hitPoints *
+                   group->m_quantities[i];
         }
     }
     if (h != 0)

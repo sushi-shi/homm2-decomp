@@ -926,7 +926,7 @@ extern int giWaitType;
 extern int glTimers[];
 extern int gMageBaseResourceValues[];
 extern int gMageBuildingCosts[][7];
-extern tag_monsterInfo gMonsterDatabase[];
+extern tag_monsterInfo gMonsterDatabase[MONSTER_DATABASE_COUNT];
 extern int gNeutralBaseResourceValues[];
 extern int gNeutralBuildingCosts[][7];
 extern char *gNeutralBuildingNames[];

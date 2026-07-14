@@ -120,8 +120,11 @@ struct configStruct {                    // gConfig, 0x1a0 bytes
 #pragma pack(pop)
 SIZE(exeGfxConfig, CONFIG_GRAPHICS_SIZE);
 SIZE(configStruct, CONFIG_STRUCT_SIZE);
-struct SCreatureInfo { unsigned short value; char pad[24]; };               // gCreatureInfo[]
 struct tag_tilePoint { signed char x; signed char _1; signed char y; signed char _3; };  // normalDirTable[]
+typedef enum MonsterDatabaseConstant {
+    MONSTER_DATABASE_COUNT = 66,
+    MONSTER_SPRITE_NAME_SIZE = 5
+} MonsterDatabaseConstant;
 #pragma pack(push, 1)
 struct tag_monsterInfo {
     union {
@@ -131,7 +134,7 @@ struct tag_monsterInfo {
         };
         int randomValue;
     };
-    signed char unknown06;
+    signed char iconIndex;
     signed char growth;
     unsigned short hitPoints;
     signed char race;
@@ -141,20 +144,28 @@ struct tag_monsterInfo {
     signed char damageMin;
     signed char damageMax;
     signed char shots;
-    char unknown11[3];
     union {
-        int all;
         struct {
-            char unknown14[2];
-            signed char abilities;
-            signed char attributes;
-            char trailing[2];
-        } bytes;
-        struct {
-            char abilityFlagsPadding[2];
-            int abilityFlags;
+            char spriteName[MONSTER_SPRITE_NAME_SIZE];
+            int attributes;
         };
-    } flags;
+        struct {
+            char spriteNamePrefix[3];
+            union {
+                int all;
+                struct {
+                    char spriteNameSuffix;
+                    char spriteNameTerminator;
+                    signed char abilities;
+                    signed char attributes;
+                } bytes;
+                struct {
+                    char abilityFlagsPadding[2];
+                    int abilityFlags;
+                };
+            } flags;
+        };
+    };
 };
 #pragma pack(pop)
 SIZE(tag_monsterInfo, 0x1a);
@@ -196,19 +207,11 @@ SIZE(SNetPlayerInfo, 34);
 struct SAMPLE2 { class sample *pSample; struct _SAMPLE *pMem; };            // NULL_SAMPLE2
 
 typedef enum MonsterAttribute {
-    MONSTER_ATTRIBUTE_UNKNOWN = 0x01,
+    MONSTER_ATTRIBUTE_WIDE = 0x01,
     MONSTER_ATTRIBUTE_FLYING = 0x02,
     MONSTER_ATTRIBUTE_RANGED = 0x04
 } MonsterAttribute;
-
 #pragma pack(push, 1)
-struct monsterRV {
-    int rv;
-    signed char level;
-    char pad5[15];
-    int attributes;
-    char pad24[2];
-};                                                                          // gMonsterInfo[] (26B, pack 1)
 struct SWinSetup { unsigned char m_0; unsigned short m_1; char *m_3; };     // gWinSetup[] (7B, pack 1)
 #pragma pack(pop)
 
