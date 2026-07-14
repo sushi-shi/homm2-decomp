@@ -410,10 +410,19 @@ Fresh cross-lane setup/lifetime batch after integrated root `76a78cc`:
 - commute the first setup vertical comparison, assign its Y snapshot in that clause, or rename
   the reused pitch lifetime to semantic `width`: each byte-identical to 85.99245%, end `0x541`,
   frame eight, decoder `+0xea`, 84/83 with nine `gFCY` occurrences; reverted.
+- chain the packed-width load as `pitch = w = entry->w`: source SHA-256
+  `fa4d6d949d4a6903b5a62c5707335d084ec1a784e649eec35f3b708f373563d3`, 85.16121%, end
+  `0x540`, frame eight, decoder `+0xe9`, 84/83 with nine `gFCY` occurrences. This does not emit
+  the retail `[esp+0x14]` width spill and broadly regresses the setup allocation; reverted;
+- reverse that chain to `w = pitch = entry->w`: source SHA-256
+  `30f1335677be4de2cbbcae38f912ef0a8206e20f01fccb91486b81bdfff203c4`, 85.84131%, end
+  `0x544`, frame eight, decoder `+0xed`, 84/83 with nine `gFCY` occurrences. This returns to the
+  already documented direct-pitch structural state: row inputs load in retail order, but the row
+  publishes in `ecx`, width/X remains wrong, and the early width still is not spilled; reverted.
 
 The canonical source hash remains `dd868c0ffcdabf134c98631a7a731d7b8d90845b7df496ce5a3c6dd05b305fd9`.
-The matrix now includes these nine additional full hashes and has SHA-256
-`fecb726383a20922cb59ee51acdeab7abd3ab9adda4a7ee07c65da24f590aa8f`. Do not recombine these
+The matrix now includes these eleven additional full hashes and has SHA-256
+`aa9de67a6acca3f1461749491bfe5411be1607fd9dbb246086d9f1342d8c8f8b`. Do not recombine these
 setup and row-load axes until a newly retained header/predecessor state changes the canonical TU.
 
 Continue specifically from the first width/X load-order divergence, the swapped row-input register
