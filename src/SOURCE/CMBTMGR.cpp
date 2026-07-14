@@ -1756,10 +1756,16 @@ int ValidHex(int hex)
 }
 
 VA(0x00494ab5, 0x16)
-void combatManager::SaveCombatBorder(void) {}
+void combatManager::SaveCombatBorder(void)
+{
+    return;
+}
 
 VA(0x00494acb, 0x16)
-void combatManager::DrawCombatBorder(void) {}
+void combatManager::DrawCombatBorder(void)
+{
+    return;
+}
 
 // @match-note: retained/combined-live 96.70%; first residual is the
 // 0x60 base frame versus retail 0x58, with shifted slots. CFG first diverges at normalized

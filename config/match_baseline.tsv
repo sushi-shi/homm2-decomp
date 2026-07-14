@@ -617,7 +617,7 @@ SOURCE/CMBTMGR	?Close@combatManager@@UAEXXZ	100.0000	a82c682b9527
 SOURCE/CMBTMGR	?CombatSystemOptions@combatManager@@QAEXXZ	100.0000	8449d8fed1e6
 SOURCE/CMBTMGR	?CombatSystemOptionsHandler@@YIHAAUtag_message@@@Z	99.8778	49c5885c4eca
 SOURCE/CMBTMGR	?CombineGroups@combatManager@@QAEXPAVarmyGroup@@0@Z	100.0000	06a32266b979
-SOURCE/CMBTMGR	?DrawCombatBorder@combatManager@@QAEXXZ	100.0000	12ff59f45fd6
+SOURCE/CMBTMGR	?DrawCombatBorder@combatManager@@QAEXXZ	100.0000	3bf9c5367d1f
 SOURCE/CMBTMGR	?ExperienceValueOfStack@combatManager@@QAEHH@Z	100.0000	f53df3a552e3
 SOURCE/CMBTMGR	?FreeArmies@combatManager@@QAEXXZ	100.0000	23c22774851c
 SOURCE/CMBTMGR	?FreeIcons@combatManager@@QAEXXZ	100.0000	682a2a659b22
@@ -637,7 +637,7 @@ SOURCE/CMBTMGR	?MoreTreesNear@combatManager@@QAEHXZ	99.8714	a402d9897997
 SOURCE/CMBTMGR	?Open@combatManager@@UAEHH@Z	100.0000	57d789afcb44
 SOURCE/CMBTMGR	?RaiseDoor@combatManager@@QAEXXZ	100.0000	9a674310a467
 SOURCE/CMBTMGR	?ResetHitByCreature@combatManager@@QAEXXZ	100.0000	9c52e2ebb50d
-SOURCE/CMBTMGR	?SaveCombatBorder@combatManager@@QAEXXZ	100.0000	979ae436e300
+SOURCE/CMBTMGR	?SaveCombatBorder@combatManager@@QAEXXZ	100.0000	c0c673290cf8
 SOURCE/CMBTMGR	?SetupAdjacencyArray@combatManager@@QAEXXZ	99.8504	9352838f095e
 SOURCE/CMBTMGR	?SetupAndLoadObstacles@combatManager@@QAEXXZ	96.6975	1fd853efcc68
 SOURCE/CMBTMGR	?SetupCombat@combatManager@@QAEXHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHH@Z	100.0000	39a32955f562
