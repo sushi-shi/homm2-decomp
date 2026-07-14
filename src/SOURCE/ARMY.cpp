@@ -74,7 +74,7 @@ void army::InitClean(void)
     m_spellEffect = -1;
     m_mirrorSourceIndex = -1;
     m_mirrorImageIndex = -1;
-    field_0xa6 = -1;
+    m_armyGroupSlot = -1;
     m_lastTargetHex = -1;
 }
 
@@ -145,7 +145,7 @@ void army::Init(int monsterType, int quantity, int side, int index, int hex, int
             gpCombatManager->m_hexCells[m_hex].m_occupantFrame = 1;
         }
     }
-    field_0xa6 = unknown;
+    m_armyGroupSlot = unknown;
 }
 
 VA(0x0044aec8, 0x4a6)

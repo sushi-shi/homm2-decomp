@@ -13,6 +13,7 @@ class armyGroup;
 class hero;
 class heroWindow;
 class icon;
+class palette;
 class town;
 struct SBolt;
 struct tag_message;
@@ -165,10 +166,52 @@ enum {
     COMBAT_MOUSE_REDRAW_DELAY = 75,
     COMBAT_BACKGROUND_COPY_WIDTH = 507,
     COMBAT_BACKGROUND_COPY_HEIGHT = 380,
+    COMBAT_PALETTE_DATA_SIZE = 0x300,
+    COMBAT_HEX_HORIZONTAL_STEP = 44,
+    COMBAT_HEX_VERTICAL_STEP = 42,
+    COMBAT_HEX_ROW_STAGGER = 22,
+    COMBAT_HEX_CENTER_X_ORIGIN = 89,
+    COMBAT_HEX_CENTER_Y_ORIGIN = 63,
+    COMBAT_HEX_GRID_LEFT_ORIGIN = 67,
+    COMBAT_HEX_GRID_TOP_ORIGIN = 63,
     COMBAT_CASTLE_BACKGROUND_BASE_FRAME = 1,
     COMBAT_CASTLE_BACKGROUND_BUILDING_FRAME = 4,
     COMBAT_CASTLE_BACKGROUND_DEFAULT_FRAME = 3
 };
+
+typedef enum CombatTerrainType {
+    COMBAT_TERRAIN_WATER = 0,
+    COMBAT_TERRAIN_GRASS = 1,
+    COMBAT_TERRAIN_SNOW = 2,
+    COMBAT_TERRAIN_SWAMP = 3,
+    COMBAT_TERRAIN_LAVA = 4,
+    COMBAT_TERRAIN_DESERT = 5,
+    COMBAT_TERRAIN_DIRT = 6,
+    COMBAT_TERRAIN_WASTELAND = 7,
+    COMBAT_TERRAIN_BEACH = 8
+} CombatTerrainType;
+
+typedef enum CombatMapTrigger {
+    COMBAT_TRIGGER_MINE = 0x97,
+    COMBAT_TRIGGER_MONSTER = 0x98,
+    COMBAT_TRIGGER_HERO = 0xaa
+} CombatMapTrigger;
+
+typedef enum CombatNearbyTileset {
+    COMBAT_TILESET_SNOW_MOUNTAINS = 0x16,
+    COMBAT_TILESET_SWAMP_MOUNTAINS = 0x17,
+    COMBAT_TILESET_LAVA_MOUNTAINS = 0x18,
+    COMBAT_TILESET_DESERT_MOUNTAINS = 0x19,
+    COMBAT_TILESET_DIRT_MOUNTAINS = 0x1a,
+    COMBAT_TILESET_MIXED_MOUNTAINS = 0x1b,
+    COMBAT_TILESET_CRACKED_MOUNTAINS = 0x1f,
+    COMBAT_TILESET_GRASS_MOUNTAINS = 0x20,
+    COMBAT_TILESET_JUNGLE_TREES = 0x21,
+    COMBAT_TILESET_EVIL_TREES = 0x22,
+    COMBAT_TILESET_SNOW_TREES = 0x2a,
+    COMBAT_TILESET_SUMMER_TREES = 0x2b,
+    COMBAT_TILESET_AUTUMN_TREES = 0x2c
+} CombatNearbyTileset;
 
 #define COMBAT_RANDOM_X_MULTIPLIER 100
 #define COMBAT_CAPTAIN_SPELL_POINT_MULTIPLIER 10
@@ -372,8 +415,8 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
-    int    m_unknown36;  // +0x36
-    char _pad_0x3a[0x300];
+    class palette *m_combatPalette;  // +0x36
+    signed char m_savedPalette[COMBAT_PALETTE_DATA_SIZE];  // +0x3a
     char m_previousCombatMessage[COMBAT_MESSAGE_LINE_SIZE];  // +0x33a
     char m_currentCombatMessage[COMBAT_MESSAGE_LINE_SIZE];  // +0x3b2
     unsigned char m_previousGridState[COMBAT_HEX_COUNT];  // +0x42a
@@ -382,7 +425,8 @@ public:
     int m_terrainType;  // +0x31de
     int m_battlefieldFringe;  // +0x31e2
     class town *m_originalCombatTown;  // +0x31e6
-    char _pad_0x31ea[0x8];
+    int m_colorCycleType;  // +0x31ea
+    char _pad_0x31ee[0x4];
     int m_debugFormation;  // +0x31f2
     char _pad_0x31f6[0x4];
     class icon *m_combatStatusIcon;  // +0x31fa
