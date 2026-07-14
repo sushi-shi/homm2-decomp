@@ -31,6 +31,7 @@ DATA(0x00534ce8) static unsigned int gCTRun;
 
 // Colour-table variant: literals and solid runs use colorTable[], and dimming is gated by dimGate.
 // Header/template replay guard: docs/matching-matrices/icon2bc-template-surface-c4c0562.tsv.
+// Shared-lifetime replay guard: docs/matching-matrices/icon2bc-shared-lifetimes-5645ed8.tsv.
 // Scratch-owner audit: docs/matching-matrices/icon2bc-owner-audit-708de32.tsv. Every address in
 // 0x534ca8..0x534ce8 was re-derived from its ordered retail DIR32 instruction role; none is swapped.
 // @match-note
@@ -47,8 +48,10 @@ DATA(0x00534ce8) static unsigned int gCTRun;
 // at the loop header. Direct sibling-template field snapshots, the historical inline-IconEntry
 // surface, a minimal direct IconEntry surface, and the proven pre-loop cursor were combined with
 // the new header state but did not exceed this checkpoint or preserve 91 occurrences. Resume only
-// with a new shared-template model that fixes both the EBX/EDI setup split and EBX/EDX cursor/count
-// colouring; do not replay the rows in the guard matrix or the earlier setup/count matrices.
+// with a new model that makes the command fetch use source=ECX/command=EAX, which in turn can color
+// count=EDX/cursor=EBX, while also fixing the EBX/EDI setup split. Function-scope/shared count,
+// source-cursor, fetch-order, snapshot, and all six command/count/cursor declaration-order shapes
+// have now been exhausted; do not replay those or the earlier setup/count matrices.
 VA(0x004d32a0, 0x5af)
 void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                             int clip, int clipX, int clipY, int clipW, int clipH, int color,
