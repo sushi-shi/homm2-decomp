@@ -5,7 +5,7 @@ description: Runs the HoMM2 matching campaign as a FAN-OUT pipeline — a fixed 
 
 # orchestrator — fan out the work, serialize the history
 
-> **Current SOURCE campaign override:** work on `source-decomp` with the persistent
+> **Current SOURCE campaign override:** work directly on `master` with the persistent
 > `source-matcher-N` pool and rank unreconstructed bodies hardest-first by retained-max
 > unmatched weighted bytes, as specified in root `AGENTS.md`. Until total SOURCE fuzzy
 > reaches **95%**, recover structure first: after a complete body reaches a byte-proven

@@ -5,7 +5,7 @@ authoritative. This file is the short, restart-ready Codex workflow.
 
 ## Objective
 
-- Work on branch `source-decomp`.
+- Work directly on the primary branch `master` (the repository has no `main` ref).
 - Reconstruct and byte-match functions in `SOURCE`, hardest/largest unresolved functions first.
 - Continue the matching campaign autonomously for as long as useful work remains. Finishing one
   function or batch is a checkpoint, not a reason to stop; rebuild the queue and continue.
@@ -73,7 +73,7 @@ authoritative. This file is the short, restart-ready Codex workflow.
   verifies master, blesses the baseline, commits, and immediately refills the freed lane.
 - Reuse four persistent worktrees with independent incremental `build/` and Wine state. The active
   SOURCE pool is `.claude/worktrees/source-matcher-1` through `source-matcher-4`; reset a lane to the
-  latest `source-decomp` only after its prior result has been integrated. Do not modify or reset the
+  latest `master` only after its prior result has been integrated. Do not modify or reset the
   older dirty `matcher-1` through `matcher-4` BASE worktrees.
 - Keep each translation unit in one lane and never run workers on the same source file. Assign
   bounded retail-order batches, including required predecessors, and keep the lane on that TU until
@@ -96,7 +96,7 @@ authoritative. This file is the short, restart-ready Codex workflow.
   not repeat attempts listed in `@match-note`; at 95%, build the last-mile queue from those notes.
   Remove a stale `@match-note` when the function reaches 100% or gains a valid `@early-stop` proof.
 - Integrate exactly one worker at a time. Apply only its declared source/header files; never copy a
-  worker's `README.md`, `config/match_baseline.tsv`, or transient queue. On `source-decomp`, run the
+  worker's `README.md`, `config/match_baseline.tsv`, or transient queue. On `master`, run the
   full build, verify the reported functions, run `homm2 status update`, stage the worker files plus
   the root-generated README/baseline, and create one linear `match:` commit.
 - Refill a lane immediately after serial integration. Reuse a worker with `followup_task` when its
