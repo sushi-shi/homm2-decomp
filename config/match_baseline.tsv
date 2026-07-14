@@ -173,7 +173,7 @@ BASE/INPUTMGR	?ForceMouseMove@inputManager@@QAEXXZ	97.4265	2ad3cb5d802f
 BASE/INPUTMGR	?GetEvent@inputManager@@QAE?AUtag_message@@XZ	100.0000	da168e6a8271
 BASE/INPUTMGR	?KeyboardMessageHandler@@YIHPAXIIJ@Z	99.7166	7cc4ec6a9960
 BASE/INPUTMGR	?Main@inputManager@@UAEHAAUtag_message@@@Z	100.0000	67af33cf7aae
-BASE/INPUTMGR	?MakeScanCodeTable@inputManager@@QAEXXZ	100.0000	9abc87fe4eff
+BASE/INPUTMGR	?MakeScanCodeTable@inputManager@@QAEXXZ	100.0000	2063994b2a97
 BASE/INPUTMGR	?MouseMessageHandler@@YIHPAXIIJ@Z	99.4068	41f91f37f5c3
 BASE/INPUTMGR	?Open@inputManager@@UAEHH@Z	100.0000	7e895b8bcf01
 BASE/INPUTMGR	?PeekEvent@inputManager@@QAE?AUtag_message@@XZ	100.0000	f8b237f5f83d
@@ -182,7 +182,7 @@ BASE/INPUTMGR	?SetMouseCoords@inputManager@@QAEXHH@Z	100.0000	d6158d77293b
 BASE/Icon2b	?IconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	75.3736	1b6c3fba56ce
 BASE/Icond2b	?DimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	87.4770	9e7fae366e26
 BASE/Icondf2b	?FlipDimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	73.3313	d1bb47d01157
-BASE/Iconf2b	?FlipIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	86.5756	824f97230396
+BASE/Iconf2b	?FlipIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	86.5756	25dac24435ba
 BASE/Iconm2b	?MonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	81.5635	2c3b0c682a1a
 BASE/Iconmf2b	?FlipMonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	69.4671	5f43e8f1edb3
 BASE/MOUSEMGR	??0mouseManager@@QAE@XZ	100.0000	124d6deb22fe
