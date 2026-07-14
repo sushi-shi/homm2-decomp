@@ -75,7 +75,14 @@ DATA(0x00534ce8) static unsigned int gCTRun;
 // operand bytes in the clipped-literal path. Explicit read/tail labels are byte-identical, while
 // a one-time destination load, direct header gotos, and structured solid/dim fallthrough regress.
 // See icon2bc-command-loop-9c5c24d.tsv. The setup and decoder allocation remain unresolved.
-// No predicate or semantic state model changed; this is still unresolved and not a wall.
+// A fresh retail-CFG audit found that both clipped-fill subtrees had their inner arms reversed:
+// retail emits the fully visible >= arm before the right-clipped arm. Restoring that source order
+// improves 73.19249 to 74.558685, shrinks the candidate from 0x566 to 0x558, and recovers the tenth
+// ClipR relocation (89/91 total). Cnt, Dst, and X0 remain short once each and Y remains excess once.
+// Branch-scoping savedDst and direct dim-count mutation are byte-identical; a volatile fill length
+// and the same fill spelling under the rejected one-time destination lifetime regress. See
+// icon2bc-fill-arm-order-f45a3ba.tsv. The first divergence remains setup allocation at +0x12.
+// No semantic state model changed; this is still unresolved and not a wall.
 VA(0x004d32a0, 0x5af)
 void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                             int clip, int clipX, int clipY, int clipW, int clipH, int color,
@@ -160,19 +167,19 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
                 if (clipY <= gCTY && gCTClipB >= gCTY &&
                     (right = X + count, clipX < right) && gCTClipR >= X) {
                     if (X >= clipX) {
-                        if (gCTClipR < right) {
-                            fillLen = (gCTClipR - X) + 1;
+                        if (gCTClipR >= right) {
+                            fillLen = count;
                             memset(row + X, gCTColor, fillLen);
                         } else {
-                            fillLen = count;
+                            fillLen = (gCTClipR - X) + 1;
                             memset(row + X, gCTColor, fillLen);
                         }
                     } else {
-                        if (gCTClipR < right) {
-                            fillLen = clipW;
+                        if (gCTClipR >= right) {
+                            fillLen = (count - clipX) + X;
                             memset(row + clipX, gCTColor, fillLen);
                         } else {
-                            fillLen = (count - clipX) + X;
+                            fillLen = clipW;
                             memset(row + clipX, gCTColor, fillLen);
                         }
                     }
