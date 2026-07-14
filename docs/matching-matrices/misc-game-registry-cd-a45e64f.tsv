@@ -1,0 +1,14 @@
+descriptor_sha256	scope	variant	focused_scores	raw_result	disposition
+f473a8ad20b0109357ef4e8bd7458b322258cb32c68a9386249f9c079e16d12f	SetGameDefaults	canonical gfx pointer induction	SetGameDefaults=90.21	base anchors gConfig+0x1c; retail anchors fullScreen at gConfig+0x30	RETAIN_MATCH_NOTE
+4153f57b34720ae826c4264f125be45eddaab4681053fea25e9daa81557f1060	SetGameDefaults	gfxIndex loop plus gfx alias	SetGameDefaults=90.21	emitted loop unchanged	REJECT_NO_GAIN
+be55a2b3ed583b0bca8e648f1a6cffc9db8493b83048462aa261b404dbb6b9e3	SetGameDefaults	fullScreen-first field stores	SetGameDefaults=89.34	register/store schedule regressed	REJECT_LOCAL_REGRESSION
+0631468b447317217d27232268cefd9a1cb97d4e58dfc06904eab15a0474ff8d	SetGameDefaults	int reference to fullScreen	SetGameDefaults=90.21	reference optimized away; emitted loop unchanged	REJECT_NO_GAIN
+b1e708c958858c622212e0067cbdc3141f290409182ab6f4912d513f3270b404	SetGameDefaults	direct indexed gConfig.gfx fields	SetGameDefaults=83.38	anchor changed but register allocation/structure regressed	REJECT_LOCAL_REGRESSION
+e1b4928d3f264cb2b8c9619e9c6de52de4c0ec5f673c9d6583f11bd23cdb1198	SetGameDefaults	dual gfx and fullScreen induction	SetGameDefaults=82.81	extra induction changes register allocation	REJECT_LOCAL_REGRESSION
+a31be51f4d15dcabd81069395cbfbec3d139b88381d335b4d56c369b016ade94	ReadPrefsFromRegistry	szScratch[100]	ReadPrefsFromRegistry=exact	frame sub esp changed 0xc8 to retail 0xd4; 0x7ab code bytes exact; relocs 126/126	RETAIN_STRUCTURAL_EXACT
+a9e3b3696a965ec1b3e1315c63c4ed1a73092b6b11cddb1ac878696458052f0f	WritePrefsToRegistry	szScratch[100]	WritePrefsToRegistry=exact	frame sub esp changed 0xc0 to retail 0xcc; 0x491 code bytes exact; relocs 90/90	RETAIN_STRUCTURAL_EXACT
+f227dd9c21b3daeaf4a3190a3b5f17545277e6dd439fa19b02ca3ad8178bc45d	SetupCDDrive	all relevant arrays and scalars at function scope	SetupCDDrive=99.94	frame recovered from 0x2e8 to retail 0x2f0; array offsets still differ	INTERMEDIATE_RETAINED_STRUCTURE
+bf201e7fa762dc09f460cf9dbf3cab03c621a19dec6b10f357318518fd458a16	SetupCDDrive	large array declaration reorder	SetupCDDrive=99.94	declaration order emits identical stack layout	REJECT_NO_GAIN
+5a1f70422ac67a64b1af1ba1e4a94773237dbc782ff26bdc69539180efaa4c67	SetupCDDrive	resultBuffer renamed mciResult	SetupCDDrive=99.94	identifier spelling emits identical stack layout	REJECT_NO_GAIN
+4648727eb6862484e434ee8bea87651f9992a0988baa8c76446c2ab2cf6faa98	SetupCDDrive	char resultBuffer[256]	SetupCDDrive=99.94	byte-neutral real buffer type; removes three casts	RETAIN_TYPE_RECOVERY
+7743790ca93ad91484643dd6098ce54f5863115395b45368e5d831959db6dfee	SetupCDDrive	retry-loop lexical scope around resultBuffer and command	SetupCDDrive=exact	retail 0x2f0 frame and all stack offsets recovered; 0x3ed code bytes and 51/51 relocations exact	RETAIN_STRUCTURAL_EXACT
