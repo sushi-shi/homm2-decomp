@@ -41,3 +41,22 @@ The audit established that `BASE/Misc.h` is still required as the owner of `Base
 `gbTextEntryEscaped`, and `SOURCE/X_GLOBAL.h` and `SOURCE/kbwin.h` own the remaining globals and
 functions. Only the direct `va.h` include is redundant, and removing it is byte-neutral, so the
 canonical include block is retained rather than creating a no-gain source hash.
+
+## BASE/Textntry fresh SetupDisplayString structure pass
+
+`textntry-setup-fresh-2e351c8.tsv` records the independent retail-structure pass from checkpoint
+`2e351c8`. The retained second-loop guard and explicit zero-offset clear raised
+`SetupDisplayString` from 95.000000% to 97.128380%, matched the retail `0x1be` size, and kept the
+`0x130` frame and 8/8 relocations. The remaining code difference is the whole-function EBX/EBP
+allocation swap between `this` and the cursor/second-loop flag lifetime.
+
+The final whole-file source SHA-256 is
+`fd22c7692d4e9293c47a13eb83b422b678371fe4ee19755d78b515c9b94fd5cb`; the unchanged
+`include/BASE/textEntryWidget.h` SHA-256 is
+`f5d08f5a98e96310182cf720733ccb4670b41bfcb24c44ec8ce36fcce86072a3`.
+
+Every row pins the same sibling baseline: default constructor 100%, long constructor 98.695656%,
+destructor 100%, `Read` 98.675500%, `Main` 99.852940%, and `Draw` 99.992424%; deleting-destructor
+aliases remain unscored. The cursor snapshot, `register` snapshot, and loop-flag declaration-order
+states are byte-identical at the new source structure and must not be repeated while the final
+source/header hashes agree. No permutation tool was used.
