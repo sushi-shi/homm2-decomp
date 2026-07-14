@@ -64,6 +64,13 @@ DATA(0x00534c60) static int gFlipSkip;
 // first-use and sibling source orders were already covered by the earlier matrices and were not
 // replayed. The retained file-static order is still 86.5756%; see the appended corrected-owner
 // family in iconf2b-template-8116876.tsv.
+// The 708de32 post-dimPalette pass tested the new real header/lifetime evidence. Isolating the
+// narrow dimPalette owner (as icon2bc now does) restored the desired ESI-source/EBX-X allocation
+// but regressed to 84.60%, grew relocation occurrences to 84/81, and left the +0x1d Y-load
+// divergence. A const-correct entry owner was byte-identical; chained transformed-X spellings,
+// the sibling final-Y lifetime, and an int pitch all regressed. The broad-header source was
+// restored; a clean live rebuild is 86.05%/0x4e5/82:81, while the retained source-hash maximum
+// remains 86.5756%. See the appended post-dimPalette family. This remains unresolved, not a wall.
 VA(0x004d1ba0, 0x4f1)
 void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                       int clip, int clipX, int clipY, int clipW, int clipH, int color)
