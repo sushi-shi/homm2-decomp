@@ -873,27 +873,34 @@ void SetPalette(signed char *paletteData, int updateDisplay)
 }
 
 VA(0x004c5eb0, 0x25)
-void BlitBitmapToScreenNoMouseCheck(class bitmap *bmp, int p2, int p3, int p4, int p5, int p6, int p7)
+void BlitBitmapToScreenNoMouseCheck(class bitmap *bmp, int sourceX, int sourceY, int width,
+                                    int height, int destinationX, int destinationY)
 {
-    BlitBitmapToScreenVesa(reinterpret_cast<int>(bmp), p2, p3, p4, p5, p6, p7);
+    BlitBitmapToScreenVesa(reinterpret_cast<int>(bmp), sourceX, sourceY, width, height,
+                           destinationX, destinationY);
 }
 
 // @match-note
 // Structurally complete /O2 checkpoint: base is 0x18c versus retail 0x18b; both use an
 // eight-byte frame and the same 13-branch/four-blit CFG.  Relocation targets agree, but
-// base has 23 occurrences versus retail 24: retail reloads the real gpMouseManager owner
-// between horizontal and vertical overlap tests while base CSEs it.  The first raw
-// divergence is +0x18, where base reloads the spilled bitmap before the first VESA call.
-// The decomp's wrong AND was corrected to OR; a two-stage rectangle test, reversed positive
-// comparisons, direct parameters, saved-coordinate locals, and `(&gpMouseManager)[0]`
-// were tried.  The missing owner occurrence is unresolved, not a delinker artifact.
+// base has 23 occurrences versus retail 24. In this function retail gpMouseManager is
+// +0x89/+0xae/+0xcc/+0x108/+0x135/+0x158; base is
+// +0x8d/+0xb1/+0x109/+0x136/+0x159. Retail loads the horizontal owner at +0xae and reloads
+// it at +0xcc for the vertical test; base loads once at +0xb1 and carries EAX across both axes.
+// The first raw divergence is +0x18, where base reloads the spilled bitmap before the first VESA
+// call. The decomp's wrong AND was corrected to OR. A flat condition, nested two-stage test,
+// explicit horizontal/vertical subtrees, reversed positive comparisons, direct parameters,
+// saved-coordinate locals, and `(&gpMouseManager)[0]` were tried. Semantic parameter names on the
+// exact preceding no-mouse wrapper and renaming the real volatile spill to sourceBitmap are
+// byte-identical and do not perturb the downstream allocation. The missing owner occurrence is
+// unresolved, not a delinker artifact or proven wall.
 VA(0x004c5ee0, 0x18b)
 void BlitBitmapToScreen(class bitmap *bmp, int sourceX, int sourceY, int width, int height,
                         int destinationX, int destinationY)
 {
-    bitmap *volatile targetBitmap = bmp;
+    bitmap *volatile sourceBitmap = bmp;
     if (gbColorMice == 0) {
-        BlitBitmapToScreenVesa(reinterpret_cast<int>(targetBitmap), sourceX, sourceY, width, height,
+        BlitBitmapToScreenVesa(reinterpret_cast<int>(sourceBitmap), sourceX, sourceY, width, height,
                                destinationX, destinationY);
         return;
     }
@@ -910,7 +917,7 @@ void BlitBitmapToScreen(class bitmap *bmp, int sourceX, int sourceY, int width, 
         if (gBlitBottom >= gpMouseManager->m_savedTop &&
             gpMouseManager->m_cursorBottom >= destinationY) {
             gpMouseManager->SaveAndDraw();
-            BlitBitmapToScreenVesa(reinterpret_cast<int>(targetBitmap), sourceX, sourceY, width, height,
+            BlitBitmapToScreenVesa(reinterpret_cast<int>(sourceBitmap), sourceX, sourceY, width, height,
                                    destinationX, destinationY);
             if (gpMouseManager->m_cursorRight > gBlitRight ||
                 gpMouseManager->m_savedLeft < destinationX ||
@@ -918,7 +925,7 @@ void BlitBitmapToScreen(class bitmap *bmp, int sourceX, int sourceY, int width, 
                 gpMouseManager->m_savedTop < destinationY) {
                 int savedX = gpMouseManager->m_savedLeft;
                 int savedY = gpMouseManager->m_savedTop;
-                BlitBitmapToScreenVesa(reinterpret_cast<int>(targetBitmap), savedX, savedY,
+                BlitBitmapToScreenVesa(reinterpret_cast<int>(sourceBitmap), savedX, savedY,
                                        gpMouseManager->m_cursorRight - savedX + 1,
                                        gpMouseManager->m_cursorBottom - savedY + 1, savedX, savedY);
             }
@@ -926,7 +933,7 @@ void BlitBitmapToScreen(class bitmap *bmp, int sourceX, int sourceY, int width, 
             return;
         }
     }
-    BlitBitmapToScreenVesa(reinterpret_cast<int>(targetBitmap), sourceX, sourceY, width, height,
+    BlitBitmapToScreenVesa(reinterpret_cast<int>(sourceBitmap), sourceX, sourceY, width, height,
                            destinationX, destinationY);
 }
 
