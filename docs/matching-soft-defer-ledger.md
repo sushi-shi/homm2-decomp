@@ -298,11 +298,11 @@ must continue this function before taking unrelated work.
 
 Canonical source state:
 
-- checkpoint: `90cd47a`
+- checkpoint: `336fa79`
 - target: RVA `0xd9ce0`, retail size `0x58d`
 - `src/BASE/iconf2by.cpp`:
-  `3b0c5bfd8568bbd84de68760903ab6f2bcb82f6723f04e5fd6a0bd9207ba948e`
-- live checkpoint: 89.101875%, candidate size `0x57a`, 143 candidate vs 144 retail relocations,
+  `5bcb21613117b98e1131fee547745a0d299eaf604683ae3775c8bdfabc636c98`
+- live checkpoint: 89.47721%, candidate size `0x57a`, 143 candidate vs 144 retail relocations,
   no candidate-only target
 - the decoder aligns instruction-for-instruction through extended-run setup;
 - candidate and retail now both reserve the otherwise-unused four-byte frame slot
@@ -322,6 +322,8 @@ Canonical source state:
 - recovered the unsigned fill-count snapshot that produces the retail frame.
 - formed the right-quadrant destination once and published it in both arms, moving the global
   destination store between the compare and branch as retail does.
+- recovered a setup-only promoted shear-value lifetime; it emits no setup-local instructions but
+  changes the later literal-overlap compare to retail operand order and polarity.
 
 The only remaining scratch relocation-count difference is `gFYClipR` 6/7; every other scratch and
 global count agrees. The candidate keeps `shear` in EBP, while retail pins `clipW`, overwrites the
@@ -418,6 +420,23 @@ Destination-placement axes after `215f379`:
 - direct pointer-base, commuted subscript, commuted branch-common local, split edge-first local,
   right-count local, right-row/`register` local, and integer right-destination forms:
   byte-identical and reverted.
+
+Shear-lifetime axes after `11424f1`:
+
+- narrow initial shear pointer alias (`ebe47a72`) and wider alias scope (`3e15131b`): 89.47721%;
+- smallest promoted-int initial shear snapshot (`5bcb2161`): 89.47721%, retained;
+- direct `clipW` (`43d5e09f`), initial commuted shear subscript (`1944701e`), all commuted shear
+  subscripts (`7ed76d08`), and `const` right destination (`36542cc2`): byte-identical to the prior
+  89.101875% checkpoint;
+- newline/literal/dim/fill pointer-alias extensions (`4b480715`, `2d490d76`, `f7e6d16f`,
+  `b578d5c5`), right `| 0` identity (`cbaf2feb`), and commuted integer destination sum
+  (`75be3b64`): byte-identical to 89.47721%;
+- `const` setup pointer (`80af0503`), one-pass source publication (`4137c524`), sequenced comma
+  statements (`0e668152`), comma initializer (`51edd169`), direct-init clip width (`b98385d1`),
+  and `shear + 0` alias (`081d58de`): byte-identical to 89.47721%;
+- signed-char value snapshot (`35688a84`), all-site value snapshots (`7fe672b0`), `register`
+  right destination (`66ca2813`), `register` setup value (`f51119a9`), and split setup-value
+  declaration/assignment (`33b353d4`): byte-identical to 89.47721%.
 
 Retail's four-byte frame slot is never accessed: every ESP-relative retail access is an argument,
 and after `sub esp,4` plus four pushes the smallest displacement is `0x18`. The slot is allocator
