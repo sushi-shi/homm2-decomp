@@ -90,6 +90,13 @@ typedef enum CombatCommandConstant {
     COMBAT_CASTLE_GATE_HEX = 59
 } CombatCommandConstant;
 
+typedef enum CombatRoundConstant {
+    COMBAT_ROUND_INITIAL_SPEED = 15,
+    COMBAT_ROUND_ABILITY_FLAGS = 0xff1f,
+    COMBAT_RESULT_DRAW = -1,
+    COMBAT_WIN_MESSAGE = 0x4000
+} CombatRoundConstant;
+
 typedef enum CombatCommandGeometry {
     COMBAT_CONTROL_RIGHT_MIN_X = 590,
     COMBAT_CONTROL_LEFT_MAX_X = 50,

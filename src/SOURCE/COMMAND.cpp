@@ -13,6 +13,8 @@
 #include <SOURCE/advManager.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/COMMAND.h>
+#include <SOURCE/GAME.h>
+#include <SOURCE/game.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/PATH.h>
@@ -111,8 +113,8 @@ ProcessAction:
     return result;
 }
 
-// @match-note retained max 94.35% (combined live 86.15%): current code span is
-// 0x17c versus retail 0x181; frame
+// @match-note retained/combined-live 94.35%: current code span is 0x17c versus
+// retail 0x181; frame
 // 0x4 and all 6/6 relocations agree. The first normalized residual is instruction
 // 93, where the final combined occupant predicate retains opposite CFG polarity.
 // Both comparison operand orders were tried before the current prefix aligned.
@@ -143,7 +145,8 @@ int combatManager::ValidHexToStandOn(int hexIndex)
     return 1;
 }
 
-// @match-note 86.77%: code size 0x8a1, frame 0x7c, and all 5/5 relocations
+// @match-note retained/combined-live 87.85%: code size 0x8a1, frame 0x7c, and
+// all 5/5 relocations
 // agree. The first residual is instruction 13 in current-army address strength
 // reduction, repeated for targetArmy at instruction 42; later residuals are
 // condition layout in the direction/rear loops. Emitting the wide special arm
@@ -741,22 +744,398 @@ int combatManager::ProcessCombatMsg(tag_message &message)
 }
 
 VA(0x0042c40a, 0x70)
-int combatManager::IsNegationSphereInEffect(void) { return 0; }
+int combatManager::IsNegationSphereInEffect(void)
+{
+    int side;
+    for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; side++) {
+        if (m_heroes[side] != 0 &&
+            m_heroes[side]->HasArtifact(ARTIFACT_SPHERE_NEGATION) != 0)
+            return 1;
+    }
+    return 0;
+}
 
+// @match-note 99.66%: code span is 0x205 versus retail 0x205 and all 8/8
+// relocation targets agree. The 132-instruction normalized streams are
+// identical; raw bytes first differ at +0x5 because retail reserves frame 0x14
+// versus 0x10 here. The missing retail stack word has no recovered use, so no
+// padding local was introduced.
 VA(0x0042c47a, 0x205)
-void combatManager::ResetRound(void) {}
+void combatManager::ResetRound(void)
+{
+    m_deathFlags[4] = m_deathFlags[5] = 0;
+    m_deathFlags[6] = m_deathFlags[7] = 0;
+    m_deathFlags[0] = m_deathFlags[1] = 0;
+    m_deathFlags[2] = m_deathFlags[3] = 0;
+    m_unknownF323[0] = m_unknownF31B[0];
+    m_unknownF323[1] = m_unknownF31B[1];
+    m_unknownF32B[0] = 1;
+    m_unknownF32B[1] = 1;
+    m_heroCastSpell[0] = m_heroCastSpell[1] = 0;
 
+    memset(gpCombatManager->m_removedArmies, 0,
+           sizeof(gpCombatManager->m_removedArmies));
+    gpCombatManager->m_removedArmyPresent = 0;
+
+    int side;
+    int armyIndex;
+    for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; side++) {
+        for (armyIndex = 0; armyIndex < COMBAT_ARMY_SLOT_COUNT; armyIndex++) {
+            army *currentArmy = m_armies[side] + armyIndex;
+            if (currentArmy->m_quantity > 0) {
+                currentArmy->m_monster.flags.abilityFlags &=
+                    COMBAT_ROUND_ABILITY_FLAGS;
+                if (currentArmy->m_monsterType == ARMY_CREATURE_TROLL ||
+                    currentArmy->m_monsterType == ARMY_CREATURE_WAR_TROLL)
+                    currentArmy->m_hitPointsLost = 0;
+                currentArmy->DecrementSpellRounds();
+                if (currentArmy->m_roundCounter == 0)
+                    currentArmy->ProcessDeath(1);
+            }
+        }
+    }
+
+    if (gpCombatManager->m_removedArmyPresent != 0)
+        gpCombatManager->MakeCreaturesVanish();
+    m_currentSpeed = COMBAT_ROUND_INITIAL_SPEED;
+}
+
+// @match-note 99.80%: code span is 0x280 versus retail 0x280 and all 6/6
+// relocation targets agree. The 163-instruction normalized streams are
+// identical; raw bytes first differ at +0x5 because retail reserves frame 0x14
+// versus 0x10 here. No semantic local accounts for the unused retail word.
 VA(0x0042c67f, 0x280)
-int combatManager::CheckWin(struct tag_message *) { return 0; }
+int combatManager::CheckWin(struct tag_message *message)
+{
+    int combatEnded = 0;
+    if (IsWinner(m_currentSide) != 0) {
+        combatEnded = 1;
+        if (IsWinner(1 - m_currentSide) != 0)
+            m_combatResult = COMBAT_RESULT_DRAW;
+        else
+            m_combatResult = m_currentSide;
+    } else if (IsWinner(1 - m_currentSide) != 0) {
+        combatEnded = 1;
+        m_combatResult = 1 - m_currentSide;
+    } else if (m_sideRetreated[0] != 0 || m_sideRetreated[1] != 0) {
+        combatEnded = 1;
+        gbRetreatWin = 1;
+        if (m_sideRetreated[0] != 0)
+            m_combatResult = 1;
+        else
+            m_combatResult = 0;
+    }
 
+    if (combatEnded != 0 && m_combatResult != COMBAT_RESULT_DRAW) {
+        int armyAlive = 0;
+        int armyIndex;
+        for (armyIndex = 0; armyIndex < COMBAT_ARMY_SLOT_COUNT; armyIndex++) {
+            if (m_armies[m_combatResult][armyIndex].m_monsterType != -1 &&
+                m_armies[m_combatResult][armyIndex].m_quantity > 0 &&
+                (m_armies[m_combatResult][armyIndex].m_monster.flags.all &
+                 MONSTER_FLAGS_SUMMONED) == 0) {
+                armyAlive = 1;
+            }
+        }
+        if (armyAlive == 0)
+            m_combatResult = COMBAT_RESULT_DRAW;
+    }
+
+    if (combatEnded != 0) {
+        DoVictory(m_combatResult);
+        if (gbNoShowCombat == 0) {
+            message->type = COMBAT_WIN_MESSAGE;
+            message->field4 = 1;
+        }
+    }
+    return combatEnded;
+}
+
+// @match-note 94.59%: code span is 0x4fe versus retail 0x51a, frame 0x28
+// agrees, and all 14/14 relocation targets agree. The first normalized residual
+// is instruction 21 in the source-ordered special-hex switch; both flattened
+// if/else and restored switch forms were tested. The remaining delta is branch
+// layout around the special cases and the late empty-cell arm.
 VA(0x0042c8ff, 0x51a)
-int combatManager::GetCommand(int) { return 0; }
+int combatManager::GetCommand(int hexIndex)
+{
+    int column = hexIndex % COMBAT_GRID_ROW_LENGTH;
+    int row = hexIndex / COMBAT_GRID_ROW_LENGTH;
+    int command = COMBAT_MESSAGE_COMMAND_DEFAULT;
+    int showSmallView = 0;
 
+    if (hexIndex == COMBAT_INVALID_HEX) {
+        command = COMBAT_MESSAGE_COMMAND_DEFAULT;
+    } else {
+        switch (hexIndex) {
+        case COMBAT_GRID_RIGHT_HERO_HEX:
+            if (m_heroes[1] != 0) {
+                if (m_currentSide == 1)
+                    command = COMBAT_MESSAGE_COMMAND_OPTIONS;
+                else
+                    command = COMBAT_MESSAGE_COMMAND_OPPOSING_OPTIONS;
+            } else {
+                command = COMBAT_MESSAGE_COMMAND_DEFAULT;
+            }
+            break;
+        case COMBAT_GRID_LEFT_SPECIAL_HEX:
+            if (m_heroes[0] != 0) {
+                if (m_currentSide == 0)
+                    command = COMBAT_MESSAGE_COMMAND_OPTIONS;
+                else
+                    command = COMBAT_MESSAGE_COMMAND_OPPOSING_OPTIONS;
+            } else {
+                command = COMBAT_MESSAGE_COMMAND_DEFAULT;
+            }
+            break;
+        case COMBAT_BALLISTA_HEX:
+            if (m_inCastleCombat == 0)
+                command = COMBAT_MESSAGE_COMMAND_DEFAULT;
+            else
+                command = COMBAT_MESSAGE_COMMAND_VIEW_INFO;
+            break;
+        default: {
+            if (hexIndex % COMBAT_GRID_ROW_LENGTH ==
+                COMBAT_GRID_ROW_LENGTH - 1) {
+                command = COMBAT_MESSAGE_COMMAND_DEFAULT;
+                break;
+            }
+
+            int targetSide = m_hexCells[hexIndex].m_occupantSide;
+            int targetIndex = m_hexCells[hexIndex].m_occupantIndex;
+            army *currentArmy =
+                &m_armies[m_currentArmySide][m_currentArmyIndex];
+            currentArmy->m_targetSide = -1;
+            currentArmy->m_targetIndex = -1;
+
+            if (m_hexCells[hexIndex].m_blocked != 0 &&
+                (gpCombatManager->m_inCastleCombat == 0 ||
+                 (hexIndex != COMBAT_CASTLE_GATE_APPROACH_HEX &&
+                  hexIndex != COMBAT_CASTLE_GATE_HEX) ||
+                 (gpCombatManager->m_drawbridgeState ==
+                      COMBAT_CASTLE_GATE_OPEN &&
+                  (gpCombatManager->m_currentSide != COMBAT_DEFENDER_SIDE ||
+                   gpCombatManager
+                           ->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
+                           .m_occupantSide != -1 ||
+                   gpCombatManager
+                           ->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
+                           .m_deadOccupantCount != 0)))) {
+                command = COMBAT_MESSAGE_COMMAND_DEFAULT;
+            } else if (targetSide != -1) {
+                if (m_currentArmySide != targetSide ||
+                    m_currentArmyIndex != targetIndex) {
+                    showSmallView = 1;
+                    if (gbProcessingCombatAction == 0 && giNextAction == 0) {
+                        m_smallViewSide[1] = targetSide;
+                        m_smallViewArmyIndex[1] = targetIndex;
+                        DrawSmallView(1, 1);
+                    }
+                }
+                switch (targetSide) {
+                case 0:
+                case 1:
+                    if (m_currentSide == targetSide ||
+                        (m_currentArmySide == targetSide &&
+                         m_currentArmyIndex == targetIndex)) {
+                        return COMBAT_MESSAGE_COMMAND_VIEW_INFO;
+                    }
+                    currentArmy->m_targetSide = targetSide;
+                    currentArmy->m_targetIndex = targetIndex;
+                    if (currentArmy->m_monster.shots > 0 &&
+                        currentArmy->GetAttackMask(currentArmy->m_hex, 1, -1) ==
+                            0xff) {
+                        if (ShotIsThroughWall(currentArmy->m_side,
+                                              currentArmy->m_hex,
+                                              hexIndex) != 0)
+                            return COMBAT_MESSAGE_COMMAND_SHOOT_THROUGH_WALL;
+                        return COMBAT_MESSAGE_COMMAND_SHOOT;
+                    }
+                    if (currentArmy->ValidPath(hexIndex, 0) == 1)
+                        return COMBAT_MESSAGE_COMMAND_ATTACK;
+                    currentArmy->m_targetSide = -1;
+                    currentArmy->m_targetIndex = -1;
+                }
+                command = COMBAT_MESSAGE_COMMAND_DEFAULT;
+            } else {
+                if (m_armies[m_currentArmySide][m_currentArmyIndex]
+                        .ValidPath(hexIndex, 0) == 1) {
+                    command = static_cast<char>(
+                        2 - ((m_armies[m_currentArmySide][m_currentArmyIndex]
+                                  .m_monster.flags.all &
+                              MONSTER_FLAGS_FLYING) == 0));
+                }
+            }
+            break;
+        }
+        }
+    }
+
+    if (showSmallView == 0 && gbProcessingCombatAction == 0) {
+        m_smallViewSide[1] = -1;
+        DrawSmallView(1, 1);
+    }
+    return command;
+}
+
+// @match-note 97.19%: code span is 0x290 versus retail 0x2a6, frame 0x1c
+// agrees, and all 14/14 relocation targets agree. The first normalized residual
+// is instruction 123, an extra jump at the transition from the blocked-cell
+// return into the inner side switch. Restoring both retail switches and their
+// case-body order removed the earlier structural divergence.
 VA(0x0042ce19, 0x2a6)
-int combatManager::RightClick(int) { return 0; }
+int combatManager::RightClick(int hexIndex)
+{
+    int column = hexIndex % COMBAT_GRID_ROW_LENGTH;
+    int row = hexIndex / COMBAT_GRID_ROW_LENGTH;
+    if (hexIndex == COMBAT_INVALID_HEX)
+        return 0;
 
+    switch (hexIndex) {
+    case COMBAT_BALLISTA_HEX:
+        if (m_inCastleCombat != 0)
+            ViewBallista(1);
+        return 0;
+    case COMBAT_GRID_RIGHT_HERO_HEX:
+        if (m_heroes[1] != 0) {
+            ViewGeneral(1, 0, 1);
+            ResetMouse();
+        }
+        return 0;
+    case COMBAT_GRID_LEFT_SPECIAL_HEX:
+        if (m_heroes[0] != 0) {
+            ViewGeneral(0, 0, 1);
+            ResetMouse();
+        }
+        return 0;
+    default:
+        if (hexIndex % COMBAT_GRID_ROW_LENGTH ==
+            COMBAT_GRID_ROW_LENGTH - 1)
+            return 0;
+
+        int side = m_hexCells[hexIndex].m_occupantSide;
+        int armyIndex = m_hexCells[hexIndex].m_occupantIndex;
+        if (m_hexCells[hexIndex].m_blocked != 0 &&
+            (gpCombatManager->m_inCastleCombat == 0 ||
+             (hexIndex != COMBAT_CASTLE_GATE_APPROACH_HEX &&
+              hexIndex != COMBAT_CASTLE_GATE_HEX) ||
+             (gpCombatManager->m_drawbridgeState == COMBAT_CASTLE_GATE_OPEN &&
+              (gpCombatManager->m_currentSide != COMBAT_DEFENDER_SIDE ||
+               gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
+                       .m_occupantSide != -1 ||
+               gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
+                       .m_deadOccupantCount != 0))))
+            return 0;
+
+        if (side != -1) {
+            switch (side) {
+            case 0:
+            case 1:
+                gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
+                ViewArmy(&m_armies[side]
+                                  [m_hexCells[m_selectedHex].m_occupantIndex],
+                         1);
+                ResetMouse();
+                return 0;
+            }
+        }
+    }
+    return 0;
+}
+
+// @match-note 99.58%: code span is 0x3b3
+// versus retail 0x3b3 with 54/54 relocation sites; all 38 external global/callee
+// targets agree, while 3 string-pool and 13 jump-table targets use compiler-local
+// identities. Raw bytes first differ at +0x5 because retail reserves frame 0x14
+// versus 0xc here. The target jump table is +0x36b..+0x397; the disasm helper
+// truncates at its delinked local label, while source-order case bodies agree.
 VA(0x0042d0bf, 0x3b3)
-void combatManager::DoCommand(int) {}
+void combatManager::DoCommand(int command)
+{
+    army *currentArmy = &m_armies[m_currentArmySide][m_currentArmyIndex];
+    switch (command) {
+    case COMBAT_MESSAGE_COMMAND_DEFAULT:
+        break;
+    case COMBAT_MESSAGE_COMMAND_MOVE:
+    case COMBAT_MESSAGE_COMMAND_FLY:
+    case COMBAT_MESSAGE_COMMAND_SHOOT:
+    case COMBAT_MESSAGE_COMMAND_SHOOT_THROUGH_WALL:
+        giNextAction = COMBAT_AI_ACTION_MOVE;
+        giNextActionGridIndex = m_selectedHex;
+        giNextActionExtra = -1;
+        break;
+    case COMBAT_MESSAGE_COMMAND_ATTACK:
+        giNextActionGridIndex = m_selectedHex;
+        if (m_playerId[m_currentSide] == -1 ||
+            gbHumanPlayer[m_playerId[m_currentSide]] == 0 ||
+            m_gridSelectionDisabled != 0) {
+            giNextAction = COMBAT_AI_ACTION_MOVE;
+            giNextActionExtra = -1;
+        } else {
+            giNextAction = COMBAT_AI_ACTION_ATTACK;
+            giNextActionExtra = m_directionTargetHex;
+        }
+        break;
+    case COMBAT_MESSAGE_COMMAND_OPTIONS:
+        gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
+        ViewGeneral(m_currentSide, 1, 0);
+        ResetMouse();
+        break;
+    case COMBAT_MESSAGE_COMMAND_OPPOSING_OPTIONS:
+        gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
+        ViewGeneral(1 - m_currentSide, 1, 0);
+        ResetMouse();
+        break;
+    case COMBAT_MESSAGE_COMMAND_VIEW_INFO:
+        gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
+        if (m_selectedHex == COMBAT_BALLISTA_HEX)
+            ViewBallista(0);
+        else
+            ViewArmy(&m_armies[m_hexCells[m_selectedHex].m_occupantSide]
+                              [m_hexCells[m_selectedHex].m_occupantIndex],
+                     0);
+        ResetMouse();
+        break;
+    case COMBAT_MESSAGE_COMMAND_CAST_SPELL:
+        if (IsNegationSphereInEffect() != 0) {
+            NormalDialog(
+                "The Sphere of Negation artifact is in effect for this battle, disabling all combat spells.",
+                NORMAL_DIALOG_INFO, NORMAL_DIALOG_NO_RESOURCE,
+                NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_NO_RESOURCE, 0,
+                NORMAL_DIALOG_NO_RESOURCE, 0, NORMAL_DIALOG_NO_RESOURCE, 0);
+        } else {
+            ViewSpells(0);
+            ResetMouse();
+        }
+        break;
+    case COMBAT_MESSAGE_COMMAND_RETREAT:
+        NormalDialog("Are you sure you want to retreat?",
+                     NORMAL_DIALOG_CONFIRM, NORMAL_DIALOG_NO_RESOURCE,
+                     NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_NO_RESOURCE, 0,
+                     NORMAL_DIALOG_NO_RESOURCE, 0, NORMAL_DIALOG_NO_RESOURCE,
+                     0);
+        if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE)
+            giNextAction = COMBAT_AI_ACTION_RETREAT;
+        ResetMouse();
+        break;
+    case COMBAT_MESSAGE_COMMAND_SURRENDER:
+        if (DoSurrender() == 1) {
+            if (gpGame->m_players[m_playerId[m_currentSide]].resources[RES_GOLD] <
+                giSurrenderCost) {
+                NormalDialog("You don't have enough gold!",
+                             NORMAL_DIALOG_INFO, NORMAL_DIALOG_NO_RESOURCE,
+                             NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_NO_RESOURCE,
+                             0, NORMAL_DIALOG_NO_RESOURCE, 0,
+                             NORMAL_DIALOG_NO_RESOURCE, 0);
+            } else {
+                giNextAction = COMBAT_AI_ACTION_SURRENDER;
+                giNextActionExtra = giSurrenderCost;
+            }
+        }
+        ResetMouse();
+        break;
+    }
+}
 
 VA(0x0042d472, 0x57b)
 int WinCombatHandler(struct tag_message &) { return 0; }
