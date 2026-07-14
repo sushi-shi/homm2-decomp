@@ -96,6 +96,15 @@ DATA(0x00534c60) static int gFlipSkip;
 // pitch declaration regressed to 86.05%, while split X/Y declarations and source-before-X order
 // were byte-identical. The typed-cursor source is restored unchanged; see the appended fd9229b
 // family. The +0x1d/Y occurrence residual remains unresolved and is still not a wall.
+// The fresh8 normalized-sibling pass compared retail Icon2b, Iconf2b, and iconf2bc setup roles.
+// All three read one or more indexed IconEntry fields before materializing the selected entry,
+// but the exact boundary differs: Icon2b reads x/srcOffset before its +0x19 LEA, Iconf2b reads
+// width before its +0x1d LEA, and iconf2bc reads width/x before its +0x21 LEA. Expressing the
+// Iconf2b width read before entry binding, or ending the indexed-root scope immediately after
+// producing entry/src, is byte-identical at 86.5756% and keeps ESI/[edi+9] plus 82/81 relocs.
+// A two-stage final-Y lifetime instead grows the frame to 0x10 and regresses to 83.40%. Thus the
+// shared semantic selection phase is not the missing allocator trigger; the canonical typed-root
+// source is restored. See the appended fresh8 family. The residual is unresolved, not a wall.
 VA(0x004d1ba0, 0x4f1)
 void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                       int clip, int clipX, int clipY, int clipW, int clipH, int color)
