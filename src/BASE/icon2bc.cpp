@@ -29,8 +29,8 @@ DATA(0x00534ce0) static int gCTX0;
 DATA(0x00534ce4) static unsigned char gCTColor;
 DATA(0x00534ce8) static unsigned int gCTRun;
 
-// Colour-table variant of IconToBitmap: literal pixels are remapped through colorTable[], solid
-// runs fill colorTable[*src], and the dim step is gated on dimGate.
+// Colour-table variant: literals and solid runs use colorTable[], and dimming is gated by dimGate.
+// Header-state replay guard: docs/matching-matrices/icon2bc-tu-state-a0b17fb.tsv.
 VA(0x004d32a0, 0x5af)
 void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                             int clip, int clipX, int clipY, int clipW, int clipH, int color,
