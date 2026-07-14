@@ -1258,9 +1258,9 @@ firstWeekDone:
         giMaxHeroesForThisPlayer++;
     if (ownedTownCount19 >= 9)
         giMaxHeroesForThisPlayer++;
-    if (gpGame->m_mapWidth == AI_MAP_SIZE_SMALL)
+    if (gpGame->m_mapHeader.width == AI_MAP_SIZE_SMALL)
         giMaxHeroesForThisPlayer--;
-    if (gpGame->m_mapWidth >= AI_MAP_SIZE_LARGE)
+    if (gpGame->m_mapHeader.width >= AI_MAP_SIZE_LARGE)
         giMaxHeroesForThisPlayer++;
 
     earlyTurn21 = 16;
@@ -1481,11 +1481,11 @@ int philAI::DetermineTargetPosition(int &targetX, int &targetY, int mobility,
             mobility = static_cast<int>(mobility * 1.35);
         if (mapTerrain == 7)
             mobility = static_cast<int>(mobility * 1.25);
-    } else if (gpGame->m_mapWidth == AI_MAP_SIZE_SMALL) {
+    } else if (gpGame->m_mapHeader.width == AI_MAP_SIZE_SMALL) {
         mobility = static_cast<int>(mobility * 0.9);
-    } else if (gpGame->m_mapWidth == AI_MAP_SIZE_LARGE) {
+    } else if (gpGame->m_mapHeader.width == AI_MAP_SIZE_LARGE) {
         mobility = static_cast<int>(mobility * 1.05);
-    } else if (gpGame->m_mapWidth == AI_MAP_SIZE_XLARGE) {
+    } else if (gpGame->m_mapHeader.width == AI_MAP_SIZE_XLARGE) {
         mobility = static_cast<int>(mobility * 1.1);
     }
     if (reinterpret_cast<pdView *>(gpCurPlayer)->difficulty == 2)
@@ -2528,7 +2528,7 @@ float philAI::TurnValueOfObelisk(int player) {
     taView *ta;         // ptr
     ta = (taView *)((char *)gpGame + player * 283 + 0x54f);
     jb = gArtifactBaseRV[*(signed char *)((char *)gpGame + 0x6397)];
-    if (*(unsigned char *)((char *)gpGame + 0x2c6) == 3)
+    if (gpGame->m_mapHeader.victoryCondition == 3)
         jb <<= 1;
     idx = jb / 0x6e;
     if (*(signed char *)((char *)gpGame + 0x6397) == -1)
@@ -5007,18 +5007,18 @@ int OnMySide(int player) {
           gpGame->m_campaignScenario + AI_SIDE_CAMPAIGN_SCENARIO_OFFSET ==
               AI_SIDE_CAMPAIGN_SCENARIO_ELEVEN &&
           player != AI_SIDE_PRIMARY_PLAYER) ||
-         (gpGame->m_victoryConditionType == AI_SIDE_VICTORY_CONDITION &&
-          ((gpGame->m_victoryConditionValue == AI_SIDE_VICTORY_SPECIAL_VALUE &&
+         (gpGame->m_mapHeader.victoryCondition == AI_SIDE_VICTORY_CONDITION &&
+          ((gpGame->m_mapHeader.victoryConditionValue == AI_SIDE_VICTORY_SPECIAL_VALUE &&
             player != AI_SIDE_PRIMARY_PLAYER) ||
-           (gpGame->m_victoryConditionValue != AI_SIDE_VICTORY_SPECIAL_VALUE &&
+           (gpGame->m_mapHeader.victoryConditionValue != AI_SIDE_VICTORY_SPECIAL_VALUE &&
             ((gpGame->m_players[giCurPlayer].color <
-                  gpGame->m_victorySideThreshold &&
+                  gpGame->m_mapHeader.victorySideThreshold &&
               gpGame->m_players[player].color <
-                  gpGame->m_victorySideThreshold) ||
+                  gpGame->m_mapHeader.victorySideThreshold) ||
              (gpGame->m_players[giCurPlayer].color >=
-                  gpGame->m_victorySideThreshold &&
+                  gpGame->m_mapHeader.victorySideThreshold &&
               gpGame->m_players[player].color >=
-                  gpGame->m_victorySideThreshold))))) ||
+                  gpGame->m_mapHeader.victorySideThreshold))))) ||
          (gbInCampaign &&
           gpGame->m_campaignType == AI_SIDE_CAMPAIGN_TYPE_ZERO &&
           gpGame->m_campaignScenario + AI_SIDE_CAMPAIGN_SCENARIO_OFFSET ==

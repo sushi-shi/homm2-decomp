@@ -4,6 +4,7 @@
 // 114 methods, 0 own-virtual, 0 static data.
 #include <va.h>
 #include <EDITOR/fullMap.h>
+#include <SOURCE/REQUEST.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/town.h>
 // forward declarations:
@@ -14,7 +15,6 @@ class hero;
 class mapCell;
 class playerData;
 class town;
-struct SMapHeader;
 struct tag_message;
 
 // game data records owned by the game struct (also declared in KB.h under the same guard)
@@ -182,39 +182,17 @@ public:
     unsigned char m_campaignCheated;  // +0xd1
     char _pad_0xd2[0x78];
     char m_saveName[0x15f];  // +0x14a
-    int    field_0x2a9;  // +0x2a9
-    char   field_0x2ad;  // +0x2ad
-    char _pad_0x2ae[0x1];
-    unsigned char m_mapWidth;  // +0x2af
-    unsigned char m_mapHeight;  // +0x2b0
-    char   field_0x2b1;  // +0x2b1
-    char   field_0x2b2;  // +0x2b2
-    char _pad_0x2b3[0x10];
-    char   field_0x2c3;  // +0x2c3
-    char   field_0x2c4;  // +0x2c4
-    char   field_0x2c5;  // +0x2c5
-    unsigned char m_victoryConditionType;  // +0x2c6
-    unsigned char m_computerAlsoWins;  // +0x2c7
-    unsigned char m_allowNormalVictory;  // +0x2c8
-    unsigned short m_victoryConditionValue;  // +0x2c9
-    unsigned char m_lossConditionType;  // +0x2cb
-    unsigned short m_lossConditionValue;  // +0x2cc
-    char   field_0x2ce;  // +0x2ce
-    char _pad_0x2cf[0x6];
-    unsigned short m_victoryTownY;  // +0x2d5
-    unsigned short m_lossTownY;  // +0x2d7
-    unsigned short m_victorySideThreshold;  // +0x2d9
-    char _pad_0x2db[0x8];
-    char m_scenarioName[0x168];  // +0x2e3
-    char   field_0x44b;  // +0x44b
-    char   field_0x44c;  // +0x44c
-    char _pad_0x44d[0x6];
-    signed char m_playerHandicap[6];  // +0x453
-    signed char m_setupPlayerRace[6];  // +0x459
-    char _pad_0x45f[6];
+    SMapHeader m_mapHeader;  // +0x2a9
+    signed char m_setupPlayerColor[MAP_HEADER_PLAYER_COUNT];  // +0x44d
+    signed char m_playerHandicap[MAP_HEADER_PLAYER_COUNT];  // +0x453
+    signed char m_setupPlayerRace[MAP_HEADER_PLAYER_COUNT];  // +0x459
+    signed char m_setupPlayerNetworkId[MAP_HEADER_PLAYER_COUNT];  // +0x45f
     signed char m_difficulty;  // +0x465
-    char m_mapFilename[21];  // +0x466
-    char   field_0x47b;  // +0x47b
+    char m_mapFilename[13];  // +0x466
+    signed char m_setupPlayerType[MAP_HEADER_PLAYER_COUNT];  // +0x473
+    signed char m_selectedSetupPlayer;  // +0x479
+    signed char m_newGameInitialized;  // +0x47a
+    signed char m_newGameHumanCount;  // +0x47b
     char _pad_0x47c[0x12];
     signed char m_playerCount;  // +0x48e
     signed char m_deadPlayerCount;  // +0x48f
@@ -246,7 +224,8 @@ public:
     signed char m_ultimateArtifactX;  // +0x6395
     signed char m_ultimateArtifactY;  // +0x6396
     signed char m_ultimateArtifactId;  // +0x6397
-    char m_pad_0x6398[5];
+    class heroWindow *m_newGameWindow;  // +0x6398
+    char m_pad_0x639c;
     unsigned char m_cheated;  // +0x639d
     char m_pad_0x639e[0xc];
     char m_rumour[0x12d];  // +0x63aa
@@ -392,6 +371,7 @@ public:
 #pragma pack(pop)
 // ---- globals (declarations, RVA order) ----
 extern class heroWindow *overWin;
+extern char gcCurMapName[16];
 extern class textWidget **textWidgetDynamic;
 extern class iconWidget **iconWidgetDynamic;
 extern int giOverviewType;
