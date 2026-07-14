@@ -8,6 +8,19 @@ class icon;
 // forward declarations:
 struct tag_message;
 
+// m_selectMode is open-ended; retail proves only this distinguished value.
+#define BUTTON_SELECT_DIALOG_RESULT 1
+
+typedef enum ButtonHotkeyConstant {
+    BUTTON_NO_HOTKEY = -1
+} ButtonHotkeyConstant;
+
+typedef enum ButtonConstant {
+    BUTTON_REPEAT_DELAY_TICKS = 60,
+    BUTTON_COMMAND_REPLACE_ICON = 0x3c,
+    BUTTON_KIND_AUTO_REPEAT = 0x1000
+} ButtonConstant;
+
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class button : public widget {
 public:
@@ -17,14 +30,14 @@ public:
     icon  *m_icon;  // +0x20  button icon
     short  m_pressedFrame;  // +0x24
     short  m_normalFrame;  // +0x26
-    short  field_0x28;  // +0x28
+    short  m_selectMode;  // +0x28  1 emits dialog-select command 10; other values emit command 12
     short  m_hotkey;  // +0x2a
     int    m_iconId;  // +0x2c
     // --- constructors ---
     button(void);
     button(short int, short int, short int, short int, unsigned long int, short int, short int, short int, short int, short int, short int);
     button(short int, short int, short int, short int, char *, short int, short int, short int, short int, short int, short int);
-    virtual ~button() OVERRIDE;
+    __declspec(dllexport) virtual inline ~button() OVERRIDE;
     // --- virtual methods (vtable order) ---
     virtual void Draw(void) OVERRIDE;
     virtual int Main(struct tag_message &) OVERRIDE;

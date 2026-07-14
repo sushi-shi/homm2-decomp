@@ -12,6 +12,27 @@
 class heroWindow;
 struct tag_message;
 
+typedef enum WidgetFlag {
+    WIDGET_FLAG_SELECTED = 1,
+    WIDGET_FLAG_ENABLED = 2,
+    WIDGET_FLAG_DRAW = 4,
+    WIDGET_FLAG_DIMMED = 8,
+    WIDGET_FLAG_UPDATE = 0x4000
+} WidgetFlag;
+
+typedef enum BaseWidgetCommand {
+    WIDGET_COMMAND_DRAW = 2,
+    WIDGET_COMMAND_SET_FLAGS = 5,
+    WIDGET_COMMAND_CLEAR_FLAGS = 6,
+    WIDGET_COMMAND_SET_X = 0x34,
+    WIDGET_COMMAND_SET_Y = 0x35,
+    WIDGET_COMMAND_SET_WIDTH = 0x3d
+} BaseWidgetCommand;
+
+typedef enum WidgetCommandArgument {
+    WIDGET_COMMAND_DIMMED = 0x1000
+} WidgetCommandArgument;
+
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class widget /* abstract */ {
 public:
