@@ -22,7 +22,10 @@ hexcell::hexcell(void)
 }
 
 VA(0x0044a406, 0x16)
-void hexcell::DrawGround(void) {}
+void hexcell::DrawGround(void)
+{
+    return;
+}
 
 VA(0x0044a41c, 0xc6)
 void hexcell::DrawLowerDeadOccupants(void)
@@ -111,7 +114,10 @@ void hexcell::DrawTower(int frame)
 }
 
 VA(0x0044a858, 0x16)
-void hexcell::DrawClouds(void) {}
+void hexcell::DrawClouds(void)
+{
+    return;
+}
 
 VA(0x0044a86e, 0x4f)
 void hexcell::DrawObstacle(void)
