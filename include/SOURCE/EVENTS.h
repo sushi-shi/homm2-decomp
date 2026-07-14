@@ -514,6 +514,7 @@ typedef enum HillFortCreatureType {
 
 typedef enum EventRecruitCreature {
     EVENT_RECRUIT_SPRITE = 20,
+    EVENT_RECRUIT_CENTAUR = 29,
     EVENT_RECRUIT_ROGUE = 57,
     EVENT_RECRUIT_NOMAD = 58,
     EVENT_RECRUIT_GENIE = 60,
@@ -527,6 +528,26 @@ typedef enum RecruitSiteType {
     RECRUIT_SITE_FIRE_ELEMENTAL = 3,
     RECRUIT_SITE_WATER_ELEMENTAL = 4
 } RecruitSiteType;
+
+typedef enum HouseRecruitmentSite {
+    HOUSE_RECRUIT_ARCHER = 0,
+    HOUSE_RECRUIT_GOBLIN = 1,
+    HOUSE_RECRUIT_PEASANT = 2,
+    HOUSE_RECRUIT_DWARF = 3,
+    HOUSE_RECRUIT_LOG_CABIN = 4,
+    HOUSE_RECRUIT_TREE_HOUSE = 5,
+    HOUSE_RECRUIT_HALFLING = 6,
+    HOUSE_RECRUIT_WATCH_TOWER = 7,
+    HOUSE_RECRUIT_CAVE = 8,
+    HOUSE_RECRUIT_EXCAVATION = 9,
+    HOUSE_RECRUIT_SITE_COUNT = 10
+} HouseRecruitmentSite;
+
+typedef enum HouseEventConstant {
+    HOUSE_EVENT_RECRUIT_DIALOG_BASE = 23,
+    HOUSE_EVENT_ARMY_FULL_DIALOG_BASE = 24,
+    HOUSE_EVENT_EMPTY_DIALOG_BASE = 25
+} HouseEventConstant;
 
 typedef enum EventSoundConstant {
     EVENT_SOUND_NONE = -1,

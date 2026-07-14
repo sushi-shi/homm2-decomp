@@ -2962,8 +2962,80 @@ int advManager::GhostEvent(hero *eventHero, mapCell *cell, char *text,
     return 0;
 }
 
+// @early-stop
+// Relocation-masked raw bytes are identical across all 0x274 bytes, including
+// the address table at +0xc3..+0xf2 and byte table at +0xf3..+0x13d. The only
+// residuals are delinked local-label and three equivalent empty-string symbols;
+// all six external relocation targets agree.
 VA(0x004b0add, 0x274)
-void advManager::HouseEvent(class hero *, class mapCell *) {}
+void advManager::HouseEvent(hero *eventHero, mapCell *cell)
+{
+    int siteIndex = HOUSE_RECRUIT_ARCHER;
+    int creatureTypes[HOUSE_RECRUIT_SITE_COUNT];
+
+    switch (cell->triggerType & MAP_EVENT_TYPE_MASK) {
+    case MAP_EVENT_ARCHER_HOUSE:
+        siteIndex = HOUSE_RECRUIT_ARCHER;
+        break;
+    case MAP_EVENT_GOBLIN_HUT:
+        siteIndex = HOUSE_RECRUIT_GOBLIN;
+        break;
+    case MAP_EVENT_PEASANT_HUT:
+        siteIndex = HOUSE_RECRUIT_PEASANT;
+        break;
+    case MAP_EVENT_DWARF_COTTAGE:
+    case MAP_EVENT_SIRENS:
+        siteIndex = HOUSE_RECRUIT_DWARF;
+        break;
+    case MAP_EVENT_LOG_CABIN:
+        siteIndex = HOUSE_RECRUIT_LOG_CABIN;
+        break;
+    case MAP_EVENT_TREE_HOUSE:
+        siteIndex = HOUSE_RECRUIT_TREE_HOUSE;
+        break;
+    case MAP_EVENT_HALFLING_HOLE:
+        siteIndex = HOUSE_RECRUIT_HALFLING;
+        break;
+    case MAP_EVENT_WATCH_TOWER:
+        siteIndex = HOUSE_RECRUIT_WATCH_TOWER;
+        break;
+    case MAP_EVENT_CAVE:
+        siteIndex = HOUSE_RECRUIT_CAVE;
+        break;
+    case MAP_EVENT_EXCAVATION:
+        siteIndex = HOUSE_RECRUIT_EXCAVATION;
+        break;
+    }
+
+    if (cell->w4hi == 0) {
+        EventWindow(siteIndex * 3 + HOUSE_EVENT_EMPTY_DIALOG_BASE, 1, "", -1,
+                    0, -1, 0, -1);
+    } else {
+        creatureTypes[HOUSE_RECRUIT_ARCHER] = ARMY_CREATURE_ARCHER;
+        creatureTypes[HOUSE_RECRUIT_GOBLIN] = ARMY_CREATURE_GOBLIN;
+        creatureTypes[HOUSE_RECRUIT_PEASANT] = ARMY_CREATURE_PEASANT;
+        creatureTypes[HOUSE_RECRUIT_DWARF] = ARMY_CREATURE_DWARF;
+        creatureTypes[HOUSE_RECRUIT_LOG_CABIN] = ARMY_CREATURE_DWARF;
+        creatureTypes[HOUSE_RECRUIT_TREE_HOUSE] = ARMY_CREATURE_SPRITE;
+        creatureTypes[HOUSE_RECRUIT_HALFLING] = ARMY_CREATURE_HALFLING;
+        creatureTypes[HOUSE_RECRUIT_WATCH_TOWER] = ARMY_CREATURE_ORC;
+        creatureTypes[HOUSE_RECRUIT_CAVE] = EVENT_RECRUIT_CENTAUR;
+        creatureTypes[HOUSE_RECRUIT_EXCAVATION] = ARMY_CREATURE_SKELETON;
+
+        EventWindow(siteIndex * 3 + HOUSE_EVENT_RECRUIT_DIALOG_BASE, 2, "", -1,
+                    0, -1, 0, -1);
+        if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+            if (eventHero->m_army.CanJoin(creatureTypes[siteIndex])) {
+                eventHero->m_army.Add(creatureTypes[siteIndex], cell->w4hi,
+                                      -1);
+                cell->w4hi = 0;
+            } else {
+                EventWindow(siteIndex * 3 + HOUSE_EVENT_ARMY_FULL_DIALOG_BASE,
+                            1, "", -1, 0, -1, 0, -1);
+            }
+        }
+    }
+}
 
 // @early-stop
 // raw instructions/slots identical; gMonsterDatabase+0x16 and const_000faec6 resolve to the same address
