@@ -31,6 +31,16 @@ DATA(0x00534ce8) static unsigned int gCTRun;
 
 // Colour-table variant: literals and solid runs use colorTable[], and dimming is gated by dimGate.
 // Header-state replay guard: docs/matching-matrices/icon2bc-tu-state-a0b17fb.tsv.
+// @match-note
+// /O2 structural checkpoint: both sides are FPO with one four-byte temporary and the complete
+// skip/solid/shadow/fill/dim/literal/newline CFG has been traced; all 91 relocation occurrences
+// and targets agree. The canonical first differs at +0x12: ours forms 13*frame in ECX and folds
+// the entry base there, while retail retains data=ESI and 13*frame=EBX, loads entry.x in ECX and
+// srcOffset in EAX, then forms entry=EDI and reuses ESI for X. A fresh byte-offset/SSA-lifetime
+// family (split raw entry X, delayed typed-entry formation, pointer/reference/global views, and
+// declaration splits) reached only 70.00% and either pushed EBP early or allocated entry=ECX;
+// see icon2bc-structural-214bd52.tsv. No decoder publication/order change was indicated. Revisit
+// only after a real declaration-surface change or with a model that directly yields that register split.
 VA(0x004d32a0, 0x5af)
 void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                             int clip, int clipX, int clipY, int clipW, int clipH, int color,
