@@ -15,6 +15,7 @@
 #include <SOURCE/EVENTS.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/REQUEST.h>
+#include <SOURCE/SMACKMGR.h>
 #include <SOURCE/SPELLS.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/advManager.h>
@@ -275,14 +276,14 @@ void ExpCampaign::InitMap(void)
         if (m_awards[award] == 0)
             continue;
         switch (award) {
-        case EXPANSION_AWARD_FIRST:
+        case EXPANSION_AWARD_ELVEN_ALLIANCE:
             break;
         case EXPANSION_AWARD_BREASTPLATE_ANDURAN:
             if (player->heroCount > 0)
                 GiveArtifact(gpGame->GetPlayerHero(0, 0),
                              EVENT_ARTIFACT_BREASTPLATE_ANDURAN, 0, -1);
             break;
-        case EXPANSION_AWARD_THIRD:
+        case EXPANSION_AWARD_WOOD_BONUS:
             break;
         case EXPANSION_AWARD_HELMET_ANDURAN:
             if (player->heroCount > 0)
@@ -302,8 +303,8 @@ void ExpCampaign::InitMap(void)
                 GiveArtifact(gpGame->GetPlayerHero(0, 0),
                              EVENT_ARTIFACT_BATTLE_GARB, 0, -1);
             break;
-        case EXPANSION_AWARD_SEVENTH:
-        case EXPANSION_AWARD_EIGHTH:
+        case EXPANSION_AWARD_WAYWARD_SON:
+        case EXPANSION_AWARD_UNCLE_IVAN:
             break;
         case EXPANSION_AWARD_LEGENDARY_SCEPTER:
             if (player->heroCount > 0)
@@ -628,35 +629,367 @@ void ExpCampaign::UpdateInfo(int redraw)
         m_window->DrawWindow();
 }
 
+// @early-stop
+// Equal-sized raw code is identical after masking the five
+// local jump-table DIR32 fields at +0xaa..+0xbd. Retail delinks them as this
+// function while our object uses $L labels; all external relocations match.
 VA(0x004bcc6e, 0x172)
-int ExpCampaign::HandleVictory(void) { return 0; }
+int ExpCampaign::HandleVictory(void)
+{
+    int days = 0;
+    int mapIndex;
 
+    if (m_currentMap > EXPANSION_MAP_NONE) {
+        days = Days();
+        m_mapsPlayed[m_currentMap] = 1;
+    }
+    memset(m_mapChoices, 0, m_mapCount);
+    switch (m_campaignId) {
+    case EXPANSION_CAMPAIGN_PRICE_OF_LOYALTY:
+        HandleVictory1();
+        break;
+    case EXPANSION_CAMPAIGN_DESCENDANTS:
+        HandleVictory2();
+        break;
+    case EXPANSION_CAMPAIGN_WIZARDS_ISLE:
+        HandleVictory3();
+        break;
+    case EXPANSION_CAMPAIGN_VOYAGE_HOME:
+        HandleVictory4();
+        break;
+    }
+    if (IsCompleted())
+        return 0;
+
+    m_currentMap = EXPANSION_MAP_NONE;
+    for (mapIndex = 0; mapIndex < m_mapCount; ++mapIndex) {
+        if (m_mapChoices[mapIndex]) {
+            m_mapDays[mapIndex] = days;
+            if (m_currentMap == EXPANSION_MAP_NONE)
+                m_currentMap = mapIndex;
+        }
+    }
+    ShowInfo(0, 0);
+    if (gpWindowManager->m_dialogResult == CAMPAIGN_DIALOG_ACCEPT)
+        return 1;
+    return 0;
+}
+
+// @early-stop
+// Equal-sized raw code is identical after masking the ten
+// local jump-table DIR32 fields at +0x135..+0x15c. Retail delinks them as this
+// function while our object uses $L labels; all PlaySmacker relocations match.
 VA(0x004bcde0, 0x167)
-void ExpCampaign::HandleVictory1(void) {}
+void ExpCampaign::HandleVictory1(void)
+{
+    switch (m_currentMap + 1) {
+    case EXPANSION_MAP_NONE + 1:
+        PlaySmacker(EXPANSION_SMACKER_POL_INTRO);
+        m_mapChoices[EXPANSION_MAP_POL_UPRISING] = 1;
+        break;
+    case EXPANSION_MAP_POL_UPRISING + 1:
+        PlaySmacker(EXPANSION_SMACKER_POL_UPRISING);
+        m_mapChoices[EXPANSION_MAP_POL_ISLAND_OF_CHAOS] = 1;
+        break;
+    case EXPANSION_MAP_POL_ISLAND_OF_CHAOS + 1:
+        PlaySmacker(EXPANSION_SMACKER_POL_ISLAND_OF_CHAOS);
+        m_mapChoices[EXPANSION_MAP_POL_ARROWS_FLIGHT] = 1;
+        m_mapChoices[EXPANSION_MAP_POL_ABYSS] = 1;
+        m_awards[EXPANSION_AWARD_BREASTPLATE_ANDURAN] = 1;
+        break;
+    case EXPANSION_MAP_POL_ARROWS_FLIGHT + 1:
+        PlaySmacker(EXPANSION_SMACKER_POL_ARROWS_FLIGHT);
+        m_mapChoices[EXPANSION_MAP_POL_GIANTS_PASS] = 1;
+        m_awards[EXPANSION_AWARD_ELVEN_ALLIANCE] = 1;
+        m_awards[EXPANSION_AWARD_WOOD_BONUS] = 1;
+        break;
+    case EXPANSION_MAP_POL_ABYSS + 1:
+        PlaySmacker(EXPANSION_SMACKER_POL_BRANCH_REUNITED);
+        m_mapChoices[EXPANSION_MAP_POL_AURORA_BOREALIS] = 1;
+        break;
+    case EXPANSION_MAP_POL_GIANTS_PASS + 1:
+        PlaySmacker(EXPANSION_SMACKER_POL_BRANCH_REUNITED);
+        m_mapChoices[EXPANSION_MAP_POL_AURORA_BOREALIS] = 1;
+        break;
+    case EXPANSION_MAP_POL_AURORA_BOREALIS + 1:
+        PlaySmacker(EXPANSION_SMACKER_POL_AURORA_BOREALIS);
+        m_mapChoices[EXPANSION_MAP_POL_BETRAYALS_END] = 1;
+        m_mapChoices[EXPANSION_MAP_POL_CORRUPTIONS_HEART] = 1;
+        m_awards[EXPANSION_AWARD_HELMET_ANDURAN] = 1;
+        break;
+    case EXPANSION_MAP_POL_BETRAYALS_END + 1:
+        PlaySmacker(EXPANSION_SMACKER_POL_BETRAYALS_END);
+        m_mapChoices[EXPANSION_MAP_POL_CORRUPTIONS_HEART] = 1;
+        m_awards[EXPANSION_AWARD_BATTLE_GARB] = 1;
+        m_awards[EXPANSION_AWARD_BREASTPLATE_ANDURAN] = 0;
+        m_awards[EXPANSION_AWARD_HELMET_ANDURAN] = 0;
+        m_awards[EXPANSION_AWARD_DEFEAT_KRAEGER] = 1;
+        break;
+    case EXPANSION_MAP_POL_CORRUPTIONS_HEART + 1:
+        PlaySmacker(EXPANSION_SMACKER_POL_CORRUPTIONS_HEART);
+        break;
+    }
+}
 
+// @early-stop
+// Equal-sized raw code is identical after masking the ten
+// local jump-table DIR32 fields at +0x119..+0x140. Retail delinks them as this
+// function while our object uses $L labels; all PlaySmacker relocations match.
 VA(0x004bcf47, 0x14b)
-void ExpCampaign::HandleVictory2(void) {}
+void ExpCampaign::HandleVictory2(void)
+{
+    switch (m_currentMap + 1) {
+    case EXPANSION_MAP_NONE + 1:
+        PlaySmacker(EXPANSION_SMACKER_DES_INTRO);
+        m_mapChoices[EXPANSION_MAP_DES_CONQUER_AND_UNIFY] = 1;
+        break;
+    case EXPANSION_MAP_DES_CONQUER_AND_UNIFY + 1:
+        PlaySmacker(EXPANSION_SMACKER_DES_CONQUER_AND_UNIFY);
+        m_mapChoices[EXPANSION_MAP_DES_BORDER_TOWNS] = 1;
+        break;
+    case EXPANSION_MAP_DES_BORDER_TOWNS + 1:
+        PlaySmacker(EXPANSION_SMACKER_DES_BORDER_TOWNS);
+        m_mapChoices[EXPANSION_MAP_DES_WAYWARD_SON] = 1;
+        m_mapChoices[EXPANSION_MAP_DES_UNCLE_IVAN] = 1;
+        break;
+    case EXPANSION_MAP_DES_WAYWARD_SON + 1:
+        PlaySmacker(EXPANSION_SMACKER_DES_FAMILY_REUNITED);
+        m_mapChoices[EXPANSION_MAP_DES_SOUTHERN_WAR] = 1;
+        m_awards[EXPANSION_AWARD_WAYWARD_SON] = 1;
+        break;
+    case EXPANSION_MAP_DES_UNCLE_IVAN + 1:
+        PlaySmacker(EXPANSION_SMACKER_DES_FAMILY_REUNITED);
+        m_mapChoices[EXPANSION_MAP_DES_SOUTHERN_WAR] = 1;
+        m_awards[EXPANSION_AWARD_UNCLE_IVAN] = 1;
+        break;
+    case EXPANSION_MAP_DES_SOUTHERN_WAR + 1:
+        PlaySmacker(EXPANSION_SMACKER_DES_SOUTHERN_WAR);
+        m_mapChoices[EXPANSION_MAP_DES_IVORY_GATES] = 1;
+        m_mapChoices[EXPANSION_MAP_DES_ELVEN_LANDS] = 1;
+        break;
+    case EXPANSION_MAP_DES_IVORY_GATES + 1:
+        PlaySmacker(EXPANSION_SMACKER_DES_BRANCH_REUNITED);
+        m_mapChoices[EXPANSION_MAP_DES_EPIC_BATTLE] = 1;
+        m_awards[EXPANSION_AWARD_LEGENDARY_SCEPTER] = 1;
+        break;
+    case EXPANSION_MAP_DES_ELVEN_LANDS + 1:
+        PlaySmacker(EXPANSION_SMACKER_DES_BRANCH_REUNITED);
+        m_mapChoices[EXPANSION_MAP_DES_EPIC_BATTLE] = 1;
+        m_awards[EXPANSION_AWARD_ELVEN_ALLIANCE] = 1;
+        break;
+    case EXPANSION_MAP_DES_EPIC_BATTLE + 1:
+        PlaySmacker(EXPANSION_SMACKER_DES_EPIC_BATTLE);
+        break;
+    }
+}
 
+// @early-stop
+// Equal-sized raw code is identical after masking the six
+// local jump-table DIR32 fields at +0xac..+0xc3. Retail delinks them as this
+// function while our object uses $L labels; all PlaySmacker relocations match.
 VA(0x004bd092, 0xce)
-void ExpCampaign::HandleVictory3(void) {}
+void ExpCampaign::HandleVictory3(void)
+{
+    switch (m_currentMap + 1) {
+    case EXPANSION_MAP_NONE + 1:
+        PlaySmacker(EXPANSION_SMACKER_WIZ_INTRO);
+        m_mapChoices[EXPANSION_MAP_WIZ_SHROUDED_ISLES] = 1;
+        break;
+    case EXPANSION_MAP_WIZ_SHROUDED_ISLES + 1:
+        PlaySmacker(EXPANSION_SMACKER_WIZ_SHROUDED_ISLES);
+        m_mapChoices[EXPANSION_MAP_WIZ_ETERNAL_SCROLLS] = 1;
+        break;
+    case EXPANSION_MAP_WIZ_ETERNAL_SCROLLS + 1:
+        PlaySmacker(EXPANSION_SMACKER_WIZ_ETERNAL_SCROLLS);
+        m_mapChoices[EXPANSION_MAP_WIZ_POWERS_END] = 1;
+        m_mapChoices[EXPANSION_MAP_WIZ_FOUNT_OF_WIZARDRY] = 1;
+        m_awards[EXPANSION_AWARD_SET_GUARDIAN] = 1;
+        break;
+    case EXPANSION_MAP_WIZ_POWERS_END + 1:
+        PlaySmacker(EXPANSION_SMACKER_WIZ_POWERS_END);
+        m_mapChoices[EXPANSION_MAP_WIZ_FOUNT_OF_WIZARDRY] = 1;
+        m_awards[EXPANSION_AWARD_SPHERE_NEGATION] = 1;
+        break;
+    case EXPANSION_MAP_WIZ_FOUNT_OF_WIZARDRY + 1:
+        PlaySmacker(EXPANSION_SMACKER_WIZ_FOUNT_OF_WIZARDRY);
+        break;
+    }
+}
 
+// @early-stop
+// Equal-sized raw code is identical after masking the six
+// local jump-table DIR32 fields at +0x97..+0xae. Retail delinks them as this
+// function while our object uses $L labels; all PlaySmacker relocations match.
 VA(0x004bd160, 0xb9)
-void ExpCampaign::HandleVictory4(void) {}
+void ExpCampaign::HandleVictory4(void)
+{
+    switch (m_currentMap + 1) {
+    case EXPANSION_MAP_NONE + 1:
+        PlaySmacker(EXPANSION_SMACKER_VOY_INTRO);
+        m_mapChoices[EXPANSION_MAP_VOY_STRANDED] = 1;
+        break;
+    case EXPANSION_MAP_VOY_STRANDED + 1:
+        PlaySmacker(EXPANSION_SMACKER_VOY_STRANDED);
+        m_mapChoices[EXPANSION_MAP_VOY_PIRATE_ISLES] = 1;
+        break;
+    case EXPANSION_MAP_VOY_PIRATE_ISLES + 1:
+        PlaySmacker(EXPANSION_SMACKER_VOY_PIRATE_ISLES);
+        m_mapChoices[EXPANSION_MAP_VOY_KING_AND_COUNTRY] = 1;
+        m_mapChoices[EXPANSION_MAP_VOY_BLOOD_IS_THICKER] = 1;
+        break;
+    case EXPANSION_MAP_VOY_KING_AND_COUNTRY + 1:
+        PlaySmacker(EXPANSION_SMACKER_VOY_KING_AND_COUNTRY);
+        break;
+    case EXPANSION_MAP_VOY_BLOOD_IS_THICKER + 1:
+        PlaySmacker(EXPANSION_SMACKER_VOY_BLOOD_IS_THICKER);
+        break;
+    }
+}
 
+// @early-stop
+// Equal-sized raw code is identical after masking the five
+// local jump-table DIR32 fields at +0x62..+0x75. Retail delinks them as this
+// function while our object uses $L labels; all callees and the global match.
 VA(0x004bd219, 0x8c)
-void ExpCampaign::ReplaySmacker(void) {}
+void ExpCampaign::ReplaySmacker(void)
+{
+    switch (m_campaignId) {
+    case EXPANSION_CAMPAIGN_PRICE_OF_LOYALTY:
+        ReplaySmacker1();
+        break;
+    case EXPANSION_CAMPAIGN_DESCENDANTS:
+        ReplaySmacker2();
+        break;
+    case EXPANSION_CAMPAIGN_WIZARDS_ISLE:
+        ReplaySmacker3();
+        break;
+    case EXPANSION_CAMPAIGN_VOYAGE_HOME:
+        ReplaySmacker4();
+        break;
+    }
+    gpWindowManager->m_updateFlags = 1;
+}
 
+// @early-stop
+// Equal-sized raw code is identical after masking the nine
+// local jump-table DIR32 fields at +0xca..+0xed. Retail delinks them as this
+// function while our object uses $L labels; all PlaySmacker relocations match.
 VA(0x004bd2a5, 0xf8)
-void ExpCampaign::ReplaySmacker1(void) {}
+void ExpCampaign::ReplaySmacker1(void)
+{
+    switch (m_viewMap + 1) {
+    case EXPANSION_MAP_POL_UPRISING + 1:
+        PlaySmacker(EXPANSION_SMACKER_POL_INTRO);
+        break;
+    case EXPANSION_MAP_POL_ISLAND_OF_CHAOS + 1:
+        PlaySmacker(EXPANSION_SMACKER_POL_UPRISING);
+        break;
+    case EXPANSION_MAP_POL_ARROWS_FLIGHT + 1:
+        PlaySmacker(EXPANSION_SMACKER_POL_ISLAND_OF_CHAOS);
+        break;
+    case EXPANSION_MAP_POL_ABYSS + 1:
+        PlaySmacker(EXPANSION_SMACKER_POL_ISLAND_OF_CHAOS);
+        break;
+    case EXPANSION_MAP_POL_GIANTS_PASS + 1:
+        PlaySmacker(EXPANSION_SMACKER_POL_ARROWS_FLIGHT);
+        break;
+    case EXPANSION_MAP_POL_AURORA_BOREALIS + 1:
+        PlaySmacker(EXPANSION_SMACKER_POL_BRANCH_REUNITED);
+        break;
+    case EXPANSION_MAP_POL_BETRAYALS_END + 1:
+        PlaySmacker(EXPANSION_SMACKER_POL_AURORA_BOREALIS);
+        break;
+    case EXPANSION_MAP_POL_CORRUPTIONS_HEART + 1:
+        if (m_mapsPlayed[EXPANSION_MAP_POL_BETRAYALS_END])
+            PlaySmacker(EXPANSION_SMACKER_POL_BETRAYALS_END);
+        else
+            PlaySmacker(EXPANSION_SMACKER_POL_AURORA_BOREALIS);
+        break;
+    }
+}
 
+// @early-stop
+// Equal-sized raw code is identical after masking the nine
+// local jump-table DIR32 fields at +0xab..+0xce. Retail delinks them as this
+// function while our object uses $L labels; all PlaySmacker relocations match.
 VA(0x004bd39d, 0xd9)
-void ExpCampaign::ReplaySmacker2(void) {}
+void ExpCampaign::ReplaySmacker2(void)
+{
+    switch (m_viewMap + 1) {
+    case EXPANSION_MAP_DES_CONQUER_AND_UNIFY + 1:
+        PlaySmacker(EXPANSION_SMACKER_DES_INTRO);
+        break;
+    case EXPANSION_MAP_DES_BORDER_TOWNS + 1:
+        PlaySmacker(EXPANSION_SMACKER_DES_CONQUER_AND_UNIFY);
+        break;
+    case EXPANSION_MAP_DES_WAYWARD_SON + 1:
+        PlaySmacker(EXPANSION_SMACKER_DES_BORDER_TOWNS);
+        break;
+    case EXPANSION_MAP_DES_UNCLE_IVAN + 1:
+        PlaySmacker(EXPANSION_SMACKER_DES_BORDER_TOWNS);
+        break;
+    case EXPANSION_MAP_DES_SOUTHERN_WAR + 1:
+        PlaySmacker(EXPANSION_SMACKER_DES_FAMILY_REUNITED);
+        break;
+    case EXPANSION_MAP_DES_IVORY_GATES + 1:
+        PlaySmacker(EXPANSION_SMACKER_DES_SOUTHERN_WAR);
+        break;
+    case EXPANSION_MAP_DES_ELVEN_LANDS + 1:
+        PlaySmacker(EXPANSION_SMACKER_DES_SOUTHERN_WAR);
+        break;
+    case EXPANSION_MAP_DES_EPIC_BATTLE + 1:
+        PlaySmacker(EXPANSION_SMACKER_DES_BRANCH_REUNITED);
+        break;
+    }
+}
 
+// @early-stop
+// Equal-sized raw code is identical after masking the five
+// local jump-table DIR32 fields at +0x8e..+0xa1. Retail delinks them as this
+// function while our object uses $L labels; all PlaySmacker relocations match.
 VA(0x004bd476, 0xac)
-void ExpCampaign::ReplaySmacker3(void) {}
+void ExpCampaign::ReplaySmacker3(void)
+{
+    switch (m_viewMap + 1) {
+    case EXPANSION_MAP_WIZ_SHROUDED_ISLES + 1:
+        PlaySmacker(EXPANSION_SMACKER_WIZ_INTRO);
+        break;
+    case EXPANSION_MAP_WIZ_ETERNAL_SCROLLS + 1:
+        PlaySmacker(EXPANSION_SMACKER_WIZ_SHROUDED_ISLES);
+        break;
+    case EXPANSION_MAP_WIZ_POWERS_END + 1:
+        PlaySmacker(EXPANSION_SMACKER_WIZ_ETERNAL_SCROLLS);
+        break;
+    case EXPANSION_MAP_WIZ_FOUNT_OF_WIZARDRY + 1:
+        if (m_mapsPlayed[EXPANSION_MAP_WIZ_POWERS_END])
+            PlaySmacker(EXPANSION_SMACKER_WIZ_POWERS_END);
+        else
+            PlaySmacker(EXPANSION_SMACKER_WIZ_ETERNAL_SCROLLS);
+        break;
+    }
+}
 
+// @early-stop
+// Equal-sized raw code is identical after masking the five
+// local jump-table DIR32 fields at +0x6f..+0x82. Retail delinks them as this
+// function while our object uses $L labels; all PlaySmacker relocations match.
 VA(0x004bd522, 0x88)
-void ExpCampaign::ReplaySmacker4(void) {}
+void ExpCampaign::ReplaySmacker4(void)
+{
+    switch (m_viewMap + 1) {
+    case EXPANSION_MAP_VOY_STRANDED + 1:
+        PlaySmacker(EXPANSION_SMACKER_VOY_INTRO);
+        break;
+    case EXPANSION_MAP_VOY_PIRATE_ISLES + 1:
+        PlaySmacker(EXPANSION_SMACKER_VOY_STRANDED);
+        break;
+    case EXPANSION_MAP_VOY_KING_AND_COUNTRY + 1:
+        PlaySmacker(EXPANSION_SMACKER_VOY_PIRATE_ISLES);
+        break;
+    case EXPANSION_MAP_VOY_BLOOD_IS_THICKER + 1:
+        PlaySmacker(EXPANSION_SMACKER_VOY_PIRATE_ISLES);
+    }
+}
 
 VA(0x004bd5aa, 0x59)
 unsigned char ExpCampaign::IsCompleted(void) { return 0; }
