@@ -5,6 +5,7 @@
 
 #include <va.h>
 #include <SOURCE/KB.h>
+#include <SOURCE/PATH.h>
 #include <SOURCE/SPELLS.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/combatManager.h>
@@ -629,31 +630,706 @@ void combatManager::DetermineEffectOfSpell(int spell, int *bestEffect, int *best
 }
 
 VA(0x00487b8e, 0x34c)
-int combatManager::EffectSpellCreateCreature(int, int) { return 0; }
+int combatManager::EffectSpellCreateCreature(int hex, int spell)
+{
+    float workChance = COMBAT_SPELL_AI_FULL_EFFECT_MODIFIER;
+    int spellPower = m_spellPower[m_currentSide];
+
+    if ((spell == SPELL_SUMMON_EARTH_ELEMENTAL ||
+         spell == SPELL_SUMMON_AIR_ELEMENTAL ||
+         spell == SPELL_SUMMON_FIRE_ELEMENTAL ||
+         spell == SPELL_SUMMON_WATER_ELEMENTAL) &&
+        m_heroes[m_currentSide] != 0 &&
+        m_heroes[m_currentSide]->HasArtifact(SPELL_ARTIFACT_BOOK_ELEMENTS))
+        spellPower <<= 1;
+
+    if ((spell == SPELL_SUMMON_EARTH_ELEMENTAL ||
+         spell == SPELL_SUMMON_AIR_ELEMENTAL ||
+         spell == SPELL_SUMMON_FIRE_ELEMENTAL ||
+         spell == SPELL_SUMMON_WATER_ELEMENTAL) &&
+        !SpaceForElementalExists())
+        return 0;
+
+    int monster;
+    switch (spell) {
+    case SPELL_SUMMON_EARTH_ELEMENTAL:
+        monster = SPELL_MONSTER_EARTH_ELEMENTAL;
+        break;
+    case SPELL_SUMMON_AIR_ELEMENTAL:
+        monster = SPELL_MONSTER_AIR_ELEMENTAL;
+        break;
+    case SPELL_SUMMON_FIRE_ELEMENTAL:
+        monster = SPELL_MONSTER_FIRE_ELEMENTAL;
+        break;
+    case SPELL_SUMMON_WATER_ELEMENTAL:
+        monster = SPELL_MONSTER_WATER_ELEMENTAL;
+        break;
+    default:
+        workChance =
+            m_armies[m_hexCells[hex].m_occupantSide]
+                    [m_hexCells[hex].m_occupantIndex]
+                        .SpellCastWorkChance(SPELL_MIRROR_IMAGE);
+        monster = m_armies[m_hexCells[hex].m_occupantSide]
+                            [m_hexCells[hex].m_occupantIndex]
+                                .m_monsterType;
+        spellPower = m_armies[m_hexCells[hex].m_occupantSide]
+                             [m_hexCells[hex].m_occupantIndex]
+                                 .m_quantity *
+                     SPELL_DEFAULT_CREATURE_POWER;
+        break;
+    }
+
+    int effect = gMonsterDatabase[monster].fightValue * spellPower;
+    if (spell == SPELL_MIRROR_IMAGE) {
+        float mirrorMod;
+        if (m_spellPower[m_currentSide] == COMBAT_SPELL_AI_MIRROR_POWER_ONE)
+            mirrorMod = COMBAT_SPELL_AI_MIRROR_POWER_ONE_MODIFIER;
+        else if (m_spellPower[m_currentSide] == COMBAT_SPELL_AI_MIRROR_POWER_TWO)
+            mirrorMod = COMBAT_SPELL_AI_MIRROR_POWER_TWO_MODIFIER;
+        else
+            mirrorMod = COMBAT_SPELL_AI_MIRROR_DEFAULT_MODIFIER;
+        effect = static_cast<int>(effect * mirrorMod);
+        if (gMonsterDatabase[monster].flags.bytes.abilities & 4)
+            effect = static_cast<int>(effect *
+                                      COMBAT_SPELL_AI_MIRROR_SHOOTER_MODIFIER);
+    }
+    return static_cast<int>(effect * workChance);
+}
 
 VA(0x00487eda, 0x72d)
-int combatManager::RawEffectSpellInfluence(class army *, int) { return 0; }
+int combatManager::RawEffectSpellInfluence(army *target, int influence)
+{
+    int effect = 0;
+    army *otherArmy = 0;
+    float workChance =
+        target->SpellCastWorkChance(giSpellInfluenceToSpell[influence]);
+    if (workChance <= 0.0)
+        return 0;
+
+    int armyValue = target->m_monster.fightValue * target->m_quantity;
+    switch (influence) {
+    case ARMY_SPELL_INFLUENCE_HASTE:
+    case ARMY_SPELL_INFLUENCE_SLOW: {
+        int newSpeed;
+        if (influence == ARMY_SPELL_INFLUENCE_HASTE) {
+            newSpeed = target->m_monster.speed +
+                       COMBAT_SPELL_AI_HASTE_SPEED_BONUS;
+            if (target->m_monster.flags.bytes.abilities & 2)
+                return 0;
+        } else {
+            newSpeed = (target->m_monster.speed + 1) >> 1;
+        }
+        if (m_inCastleCombat && target->m_side == 1)
+            return 0;
+        if (target->m_monster.flags.bytes.abilities & 4)
+            return 0;
+        int attackMask = target->GetAttackMask(target->m_hex, 1, -1);
+        if (attackMask != COMBAT_SPELL_AI_ALL_ATTACK_DIRECTIONS)
+            return 0;
+
+        int column = target->m_hex % ARMY_HEX_COLUMNS;
+        int distance;
+        if (m_currentSide == 0)
+            distance = column - COMBAT_SPELL_AI_MINIMUM_DISTANCE;
+        else
+            distance = COMBAT_SPELL_AI_RIGHT_DISTANCE_COLUMN - column;
+        if (distance < 0)
+            distance = 0;
+        distance += COMBAT_SPELL_AI_MINIMUM_DISTANCE;
+        if (m_inCastleCombat)
+            distance += COMBAT_SPELL_AI_CASTLE_DISTANCE_BONUS;
+
+        float oldTurns;
+        if (target->m_monster.flags.bytes.abilities & 2)
+            oldTurns = COMBAT_SPELL_AI_FULL_EFFECT_MODIFIER;
+        else
+            oldTurns = static_cast<float>(distance) / target->m_monster.speed;
+        float newTurns = static_cast<float>(distance) / newSpeed;
+        if (newTurns > COMBAT_SPELL_AI_TURN_CAP)
+            newTurns = COMBAT_SPELL_AI_TURN_CAP;
+        if (oldTurns > COMBAT_SPELL_AI_TURN_CAP)
+            oldTurns = COMBAT_SPELL_AI_TURN_CAP;
+        effect = static_cast<int>((oldTurns - newTurns) /
+                                  COMBAT_SPELL_AI_TURN_DIVISOR * armyValue);
+        break;
+    }
+    case ARMY_SPELL_INFLUENCE_BLIND:
+        effect = static_cast<int>(armyValue * COMBAT_SPELL_AI_BLIND_MODIFIER);
+        break;
+    case ARMY_SPELL_INFLUENCE_BLESS:
+    case ARMY_SPELL_INFLUENCE_CURSE: {
+        float averageDamage =
+            static_cast<float>((target->m_monster.damageMin +
+                                target->m_monster.damageMax) *
+                               COMBAT_SPELL_AI_AVERAGE_DAMAGE_MODIFIER);
+        float damageEffect =
+            static_cast<float>((target->m_monster.damageMax - averageDamage) /
+                               averageDamage * armyValue *
+                               COMBAT_SPELL_AI_BLESS_CURSE_MODIFIER);
+        if (influence == ARMY_SPELL_INFLUENCE_BLESS)
+            effect = static_cast<int>(damageEffect);
+        else
+            effect = static_cast<int>(-damageEffect);
+        break;
+    }
+    case ARMY_SPELL_INFLUENCE_BERSERK:
+        effect = static_cast<int>(armyValue * COMBAT_SPELL_AI_BERSERK_MODIFIER);
+        break;
+    case ARMY_SPELL_INFLUENCE_PARALYZE:
+        effect = static_cast<int>(armyValue * COMBAT_SPELL_AI_PARALYZE_MODIFIER);
+        break;
+    case ARMY_SPELL_INFLUENCE_HYPNOTIZE:
+        effect = static_cast<int>(armyValue *
+                                  COMBAT_SPELL_AI_HYPNOTIZE_MODIFIER);
+        break;
+    case ARMY_SPELL_INFLUENCE_DRAGON_SLAYER: {
+        int adjacent = 0;
+        int dragonCount = adjacent;
+        int i;
+        for (i = 0; i < m_armyCount[1 - target->m_side]; i++) {
+            otherArmy = &m_armies[target->m_side][i];
+            if (otherArmy->m_monsterType == ARMY_CREATURE_GREEN_DRAGON ||
+                otherArmy->m_monsterType == ARMY_CREATURE_RED_DRAGON ||
+                otherArmy->m_monsterType == ARMY_CREATURE_BLACK_DRAGON ||
+                otherArmy->m_monsterType == ARMY_CREATURE_BONE_DRAGON) {
+                dragonCount++;
+                if (target->OtherArmyAdjacent(otherArmy->m_side,
+                                               otherArmy->m_index))
+                    adjacent = 1;
+            }
+        }
+        float dragonMod;
+        if (adjacent)
+            dragonMod = COMBAT_SPELL_AI_FULL_EFFECT_MODIFIER;
+        else
+            dragonMod = static_cast<float>(
+                dragonCount / m_armyCount[1 - target->m_side]);
+        effect = static_cast<int>(COMBAT_SPELL_AI_DRAGON_SLAYER_MODIFIER *
+                                  dragonMod);
+        break;
+    }
+    case ARMY_SPELL_INFLUENCE_BLOODLUST:
+        effect = static_cast<int>(armyValue *
+                                  COMBAT_SPELL_AI_BLOODLUST_MODIFIER);
+        break;
+    case ARMY_SPELL_INFLUENCE_SHIELD: {
+        int shooterCount = 0;
+        int i;
+        for (i = 0; i < m_armyCount[1 - target->m_side]; i++) {
+            otherArmy = &m_armies[target->m_side][i];
+            if (otherArmy->m_monster.flags.bytes.abilities & 4)
+                shooterCount++;
+        }
+        float shooterMod = static_cast<float>(
+            shooterCount / m_armyCount[1 - target->m_side]);
+        if (target->m_side == 0 && m_inCastleCombat) {
+            shooterMod = static_cast<float>(
+                shooterMod + COMBAT_SPELL_AI_SIEGE_SHIELD_BONUS);
+            if (shooterMod > COMBAT_SPELL_AI_FULL_EFFECT_MODIFIER)
+                shooterMod = COMBAT_SPELL_AI_FULL_EFFECT_MODIFIER;
+        }
+        effect = static_cast<int>(COMBAT_SPELL_AI_SHIELD_MODIFIER *
+                                  shooterMod);
+        break;
+    }
+    case ARMY_SPELL_INFLUENCE_PETRIFIED:
+        effect = static_cast<int>(armyValue *
+                                  COMBAT_SPELL_AI_PETRIFIED_MODIFIER);
+        break;
+    case ARMY_SPELL_INFLUENCE_ANTI_MAGIC:
+        effect = static_cast<int>(armyValue *
+                                  COMBAT_SPELL_AI_ANTI_MAGIC_MODIFIER);
+        break;
+    case ARMY_SPELL_INFLUENCE_STONESKIN:
+        effect = static_cast<int>(armyValue *
+                                  COMBAT_SPELL_AI_STONE_SKIN_MODIFIER);
+        break;
+    case ARMY_SPELL_INFLUENCE_STEELSKIN:
+        effect = static_cast<int>(armyValue *
+                                  COMBAT_SPELL_AI_STEEL_SKIN_MODIFIER);
+        break;
+    default:
+        effect = 0;
+        break;
+    }
+
+    effect = static_cast<int>(effect * workChance);
+    if ((target->m_spellInfluence[ARMY_SPELL_INFLUENCE_BERSERK] ||
+         target->m_spellInfluence[ARMY_SPELL_INFLUENCE_HYPNOTIZE]) &&
+        influence != ARMY_SPELL_INFLUENCE_ANTI_MAGIC)
+        effect = 0;
+    return effect;
+}
 
 VA(0x00488607, 0x66)
-void combatManager::ClearEffects(void) {}
+void combatManager::ClearEffects(void)
+{
+    int side;
+    int index;
+    for (side = 0; side < COMBAT_SIDE_COUNT; side++) {
+        for (index = 0; index < COMBAT_ARMY_SLOT_COUNT; index++)
+            gArmyEffected[side][index] = 0;
+    }
+}
 
 VA(0x0048866d, 0x40)
-void combatManager::NextPos(int *) {}
+void combatManager::NextPos(int *hex)
+{
+    if ((*hex + 2) % 13 == 0)
+        *hex += 3;
+    else
+        (*hex)++;
+}
 
 VA(0x004886ad, 0xa1)
-int combatManager::FirstArmy(int, int, int *) { return 0; }
+int combatManager::FirstArmy(int startHex, int side, int *hex)
+{
+    while (startHex <= COMBAT_SPELL_AI_LAST_HEX) {
+        if (m_hexCells[startHex].m_occupantSide == side ||
+            (side == COMBAT_SPELL_AI_ANY_SIDE &&
+             m_hexCells[startHex].m_occupantSide >= 0)) {
+            *hex = startHex;
+            return 0;
+        }
+        NextPos(&startHex);
+    }
+    *hex = -1;
+    return 1;
+}
 
 VA(0x0048874e, 0x73)
-int combatManager::FirstResurrectable(int, int *, int) { return 0; }
+int combatManager::FirstResurrectable(int startHex, int *hex, int spell)
+{
+    while (startHex <= COMBAT_SPELL_AI_LAST_HEX) {
+        if (FindResurrectArmyIndex(m_currentSide, spell, startHex) != -1) {
+            *hex = startHex;
+            return 0;
+        }
+        NextPos(&startHex);
+    }
+    *hex = -1;
+    return 1;
+}
 
 VA(0x004887c1, 0x421)
-void combatManager::EffectSpellCure(int *, int, int, int) {}
+void combatManager::EffectSpellCure(int *effect, int targetSide,
+                                    int targetIndex, int cure)
+{
+    *effect = 0;
+    int done = 0;
+    int side;
+    if (targetSide == COMBAT_SPELL_AI_ANY_SIDE)
+        side = m_currentSide;
+    else
+        side = targetSide;
+
+    while (!done) {
+        int positiveEffect = 0;
+        int negativeEffect = 0;
+        int index;
+        for (index = 0; index < COMBAT_ARMY_SLOT_COUNT; index++) {
+            if ((targetIndex == -1 || index == targetIndex) &&
+                m_armies[side][index].m_monsterType >= 0 &&
+                m_armies[side][index].m_quantity > 0) {
+                army *target = &m_armies[side][index];
+                if (cure == 1) {
+                    int curePoints = m_spellPower[m_currentSide] *
+                                     COMBAT_SPELL_AI_CURE_POINTS_PER_POWER;
+                    if (curePoints > target->m_hitPointsLost)
+                        curePoints = target->m_hitPointsLost;
+                    positiveEffect = static_cast<int>(
+                        positiveEffect +
+                        gMonsterDatabase[target->m_monsterType].fightValue *
+                            curePoints * COMBAT_SPELL_AI_CURE_VALUE_MODIFIER /
+                            target->m_monster.hitPoints);
+                }
+
+                int fullQuantity =
+                    (target->m_monster.flags.bytes.abilities & 0x80) != 0;
+                int armyValue =
+                    gMonsterDatabase[target->m_monsterType].fightValue *
+                    target->m_quantity;
+                if (target->m_monster.flags.bytes.attributes & 1) {
+                    negativeEffect = armyValue;
+                    continue;
+                }
+
+                int influence;
+                for (influence = 0; influence < ARMY_SPELL_INFLUENCE_COUNT;
+                     influence++) {
+                    if (!target->m_spellInfluence[influence])
+                        continue;
+                    int duration = target->m_spellInfluence[influence] +
+                                   fullQuantity;
+                    if (duration >= COMBAT_SPELL_AI_MAX_DURATION)
+                        duration = COMBAT_SPELL_AI_MAX_DURATION;
+                    switch (influence) {
+                    case ARMY_SPELL_INFLUENCE_HASTE:
+                    case ARMY_SPELL_INFLUENCE_BLESS:
+                    case ARMY_SPELL_INFLUENCE_DRAGON_SLAYER:
+                    case ARMY_SPELL_INFLUENCE_BLOODLUST:
+                    case ARMY_SPELL_INFLUENCE_SHIELD:
+                    case ARMY_SPELL_INFLUENCE_STONESKIN:
+                    case ARMY_SPELL_INFLUENCE_STEELSKIN:
+                        positiveEffect = static_cast<int>(
+                            positiveEffect +
+                            RawEffectSpellInfluence(target, influence) *
+                                gfCancelDurationMods[duration]);
+                        break;
+                    case ARMY_SPELL_INFLUENCE_SLOW:
+                    case ARMY_SPELL_INFLUENCE_BLIND:
+                    case ARMY_SPELL_INFLUENCE_CURSE:
+                    case ARMY_SPELL_INFLUENCE_BERSERK:
+                    case ARMY_SPELL_INFLUENCE_PARALYZE:
+                    case ARMY_SPELL_INFLUENCE_HYPNOTIZE:
+                    case ARMY_SPELL_INFLUENCE_PETRIFIED:
+                        negativeEffect = static_cast<int>(
+                            negativeEffect +
+                            RawEffectSpellInfluence(target, influence) *
+                                gfCancelDurationMods[duration]);
+                        break;
+                    case ARMY_SPELL_INFLUENCE_ANTI_MAGIC:
+                        break;
+                    }
+                }
+            }
+        }
+        if (cure == 1)
+            positiveEffect = 0;
+        if (m_currentSide == side)
+            *effect += -negativeEffect - positiveEffect;
+        else
+            *effect += positiveEffect + negativeEffect;
+        if (targetSide == COMBAT_SPELL_AI_ANY_SIDE && m_currentSide == side)
+            side = 1 - m_currentSide;
+        else
+            done = 1;
+    }
+}
 
 VA(0x00488be2, 0x176)
-void combatManager::EffectSpellResurrect(int *, int, int) {}
+void combatManager::EffectSpellResurrect(int *effect, int hex, int spell)
+{
+    int resurrectPower = m_spellPower[m_currentSide] *
+                         COMBAT_SPELL_AI_RESURRECT_POINTS_PER_POWER;
+    if (m_heroes[m_currentSide] != 0 &&
+        m_heroes[m_currentSide]->HasArtifact(SPELL_ARTIFACT_ANKH))
+        resurrectPower <<= 1;
+
+    int armyIndex = FindResurrectArmyIndex(m_currentSide, spell, hex);
+    army *target = &m_armies[m_currentSide][armyIndex];
+    int quantity = resurrectPower / target->m_monster.hitPoints;
+    if (target->m_quantity + quantity > target->m_initialQuantity)
+        quantity = target->m_initialQuantity - target->m_quantity;
+    *effect = gMonsterDatabase[target->m_monsterType].fightValue * quantity;
+    *effect = static_cast<int>(*effect * target->SpellCastWorkChance(spell));
+    if (spell == SPELL_RESURRECT)
+        *effect = static_cast<int>(
+            *effect * COMBAT_SPELL_AI_RESURRECT_VALUE_MODIFIER);
+}
 
 VA(0x00488d58, 0xcc9)
-void combatManager::EffectSpellDamage(int *, int, int) {}
+void combatManager::EffectSpellDamage(int *effect, int spell, int targetHex)
+{
+    int damagePerPower;
+    switch (spell) {
+    case SPELL_FIREBALL:
+    case SPELL_FIREBLAST:
+        damagePerPower = COMBAT_SPELL_AI_FIRE_DAMAGE_PER_POWER;
+        break;
+    case SPELL_LIGHTNING_BOLT:
+        damagePerPower = COMBAT_SPELL_AI_LIGHTNING_DAMAGE_PER_POWER;
+        break;
+    case SPELL_CHAIN_LIGHTNING:
+        damagePerPower = COMBAT_SPELL_AI_CHAIN_LIGHTNING_DAMAGE_PER_POWER;
+        break;
+    default:
+        damagePerPower = 0;
+        break;
+    case SPELL_HOLY_WORD:
+        damagePerPower = COMBAT_SPELL_AI_HOLY_WORD_DAMAGE_PER_POWER;
+        break;
+    case SPELL_HOLY_SHOUT:
+        damagePerPower = COMBAT_SPELL_AI_HOLY_SHOUT_DAMAGE_PER_POWER;
+        break;
+    case SPELL_MAGIC_ARROW:
+        damagePerPower = COMBAT_SPELL_AI_MAGIC_ARROW_DAMAGE_PER_POWER;
+        break;
+    case SPELL_ARMAGEDDON:
+        damagePerPower = COMBAT_SPELL_AI_ARMAGEDDON_DAMAGE_PER_POWER;
+        break;
+    case SPELL_ELEMENTAL_STORM:
+    case SPELL_METEOR_SHOWER:
+        damagePerPower = COMBAT_SPELL_AI_ELEMENTAL_STORM_DAMAGE_PER_POWER;
+        break;
+    case SPELL_COLD_RAY:
+        damagePerPower = COMBAT_SPELL_AI_COLD_RAY_DAMAGE_PER_POWER;
+        break;
+    case SPELL_COLD_RING:
+        damagePerPower = COMBAT_SPELL_AI_COLD_RING_DAMAGE_PER_POWER;
+        break;
+    case SPELL_DEATH_RIPPLE:
+        damagePerPower = COMBAT_SPELL_AI_DEATH_RIPPLE_DAMAGE_PER_POWER;
+        break;
+    case SPELL_DEATH_WAVE:
+        damagePerPower = COMBAT_SPELL_AI_DEATH_WAVE_DAMAGE_PER_POWER;
+        break;
+    }
+
+    int damage = m_spellPower[m_currentSide] * damagePerPower;
+    int currentHex = 0;
+    int step = 0;
+    unsigned int done = 0;
+    int killedValue[2];
+    int damageValue[5];
+    int disruptingRayValue = 0;
+    army *target;
+    if (m_hexCells[targetHex].m_occupantIndex >= 0)
+        target = &m_armies[m_hexCells[targetHex].m_occupantSide]
+                            [m_hexCells[targetHex].m_occupantIndex];
+
+    damageValue[2] = 0;
+    int side;
+    for (side = 0; side < COMBAT_SIDE_COUNT; side++) {
+        damageValue[side] = 0;
+        damageValue[side + 3] = 0;
+        killedValue[side] = 0;
+    }
+    ClearEffects();
+
+    do {
+        if (done) {
+            if (damageValue[0] < m_armyCount[0] &&
+                damageValue[1] < m_armyCount[1]) {
+                *effect = damageValue[4 - m_currentSide] -
+                          damageValue[m_currentSide + 3] + disruptingRayValue;
+            } else if (killedValue[m_currentSide] < 1) {
+                *effect = COMBAT_SPELL_AI_DECISIVE_EFFECT -
+                          gsSpellInfo[spell].aiValue +
+                          disruptingRayValue;
+            } else {
+                *effect = killedValue[1 - m_currentSide] -
+                          killedValue[m_currentSide] + disruptingRayValue;
+            }
+            if (m_currentSide == 0 && m_inCastleCombat)
+                *effect = static_cast<int>(
+                    *effect * COMBAT_SPELL_AI_CASTLE_EFFECT_MODIFIER);
+            return;
+        }
+
+        switch (spell) {
+        case SPELL_LIGHTNING_BOLT:
+        case SPELL_MAGIC_ARROW:
+        case SPELL_COLD_RAY:
+        case SPELL_DISRUPTING_RAY:
+            if (currentHex == targetHex)
+                done = 1;
+            else
+                currentHex = targetHex;
+            break;
+        case SPELL_CHAIN_LIGHTNING:
+            if (currentHex == 0) {
+                currentHex = targetHex;
+            } else {
+                damage >>= 1;
+                currentHex = GetNextChainLightningTarget(target, 0);
+            }
+            step++;
+            if (step > 4 || currentHex == -1)
+                done = 1;
+            break;
+        case SPELL_TELEPORT:
+        case SPELL_CURE:
+        case SPELL_MASS_CURE:
+        case SPELL_RESURRECT:
+        case SPELL_TRUE_RESURRECT:
+        case SPELL_HASTE:
+        case SPELL_MASS_HASTE:
+        case SPELL_SLOW:
+        case SPELL_MASS_SLOW:
+        case SPELL_BLIND:
+        case SPELL_BLESS:
+        case SPELL_MASS_BLESS:
+        case SPELL_STONE_SKIN:
+        case SPELL_STEEL_SKIN:
+        case SPELL_CURSE:
+        case SPELL_MASS_CURSE:
+        case SPELL_ANTI_MAGIC:
+        case SPELL_DISPEL:
+        case SPELL_MASS_DISPEL:
+        case SPELL_BERSERKER:
+        case SPELL_PARALYZE:
+        case SPELL_HYPNOTIZE:
+            break;
+        case SPELL_HOLY_WORD:
+        case SPELL_HOLY_SHOUT:
+        case SPELL_ARMAGEDDON:
+        case SPELL_ELEMENTAL_STORM:
+        case SPELL_DEATH_RIPPLE:
+        case SPELL_DEATH_WAVE:
+            NextPos(&currentHex);
+            if (currentHex < COMBAT_SPELL_AI_LAST_HEX + 1)
+                done = 0;
+            else
+                done = 1;
+            done = currentHex >= COMBAT_SPELL_AI_LAST_HEX + 1;
+            break;
+        case SPELL_COLD_RING:
+            if (step == 0)
+                step++;
+        case SPELL_FIREBALL:
+        case SPELL_FIREBLAST:
+        case SPELL_METEOR_SHOWER:
+            if (((step < 7) || spell == SPELL_FIREBLAST) && step < 19) {
+                if (step == 0)
+                    currentHex = targetHex;
+                if (step > 0 && step < 7)
+                    currentHex = GetAdjacentCellIndexNoArmy(targetHex, step - 1);
+                if (step > 6 && step < 13) {
+                    currentHex = GetAdjacentCellIndexNoArmy(targetHex, step - 7);
+                    currentHex = GetAdjacentCellIndexNoArmy(currentHex, step - 7);
+                }
+                if (step == 13)
+                    currentHex = targetHex - 26;
+                if (step == 14)
+                    currentHex = targetHex + 26;
+                if (step == 15) {
+                    currentHex = GetAdjacentCellIndexNoArmy(targetHex, 1);
+                    currentHex = GetAdjacentCellIndexNoArmy(currentHex, 0);
+                }
+                if (step == 16) {
+                    currentHex = GetAdjacentCellIndexNoArmy(targetHex, 1);
+                    currentHex = GetAdjacentCellIndexNoArmy(currentHex, 2);
+                }
+                if (step == 17) {
+                    currentHex = GetAdjacentCellIndexNoArmy(targetHex, 4);
+                    currentHex = GetAdjacentCellIndexNoArmy(currentHex, 5);
+                }
+                if (step == 18) {
+                    currentHex = GetAdjacentCellIndexNoArmy(targetHex, 4);
+                    currentHex = GetAdjacentCellIndexNoArmy(currentHex, 3);
+                }
+                step++;
+            } else {
+                done = 1;
+            }
+        }
+
+        if (!done && currentHex >= 0 &&
+            currentHex < COMBAT_SPELL_AI_LAST_HEX + 1 &&
+            m_hexCells[currentHex].m_occupantIndex >= 0 &&
+            m_hexCells[currentHex].m_occupantSide >= 0) {
+            target = &m_armies[m_hexCells[currentHex].m_occupantSide]
+                                [m_hexCells[currentHex].m_occupantIndex];
+            if (!gArmyEffected[m_hexCells[currentHex].m_occupantSide]
+                               [m_hexCells[currentHex].m_occupantIndex]) {
+                gArmyEffected[m_hexCells[currentHex].m_occupantSide]
+                              [m_hexCells[currentHex].m_occupantIndex] = 1;
+                float workChance = target->SpellCastWorkChance(spell);
+                if (workChance > 0.0) {
+                    long spellDamage = static_cast<long>(damage * workChance);
+                    int monster = target->m_monsterType;
+                    switch (spell) {
+                    case SPELL_FIREBALL:
+                    case SPELL_FIREBLAST:
+                        if (monster == SPELL_MONSTER_IRON_GOLEM ||
+                            monster == SPELL_MONSTER_STEEL_GOLEM)
+                            spellDamage = static_cast<long>(
+                                spellDamage * SPELL_GOLEM_DAMAGE_MULTIPLIER);
+                        if (monster == SPELL_MONSTER_WATER_ELEMENTAL)
+                            spellDamage <<= 1;
+                        break;
+                    case SPELL_LIGHTNING_BOLT:
+                    case SPELL_CHAIN_LIGHTNING:
+                    case SPELL_ELEMENTAL_STORM:
+                        if (monster == SPELL_MONSTER_IRON_GOLEM ||
+                            monster == SPELL_MONSTER_STEEL_GOLEM)
+                            spellDamage = static_cast<long>(
+                                spellDamage * SPELL_GOLEM_DAMAGE_MULTIPLIER);
+                        if (monster == SPELL_MONSTER_AIR_ELEMENTAL)
+                            spellDamage <<= 1;
+                        break;
+                    case SPELL_ARMAGEDDON:
+                        if (monster == SPELL_MONSTER_IRON_GOLEM ||
+                            monster == SPELL_MONSTER_STEEL_GOLEM)
+                            spellDamage = static_cast<long>(
+                                spellDamage * SPELL_GOLEM_DAMAGE_MULTIPLIER);
+                        break;
+                    case SPELL_METEOR_SHOWER:
+                        if (monster == SPELL_MONSTER_IRON_GOLEM ||
+                            monster == SPELL_MONSTER_STEEL_GOLEM)
+                            spellDamage = static_cast<long>(
+                                spellDamage * SPELL_GOLEM_DAMAGE_MULTIPLIER);
+                        if (monster == SPELL_MONSTER_EARTH_ELEMENTAL)
+                            spellDamage <<= 1;
+                        break;
+                    case SPELL_COLD_RAY:
+                    case SPELL_COLD_RING:
+                        if (monster == SPELL_MONSTER_IRON_GOLEM ||
+                            monster == SPELL_MONSTER_STEEL_GOLEM)
+                            spellDamage = static_cast<long>(
+                                spellDamage * SPELL_GOLEM_DAMAGE_MULTIPLIER);
+                        if (monster == SPELL_MONSTER_FIRE_ELEMENTAL)
+                            spellDamage <<= 1;
+                        break;
+                    }
+
+                    ModifyDamageForArtifacts(
+                        &spellDamage, spell, m_heroes[m_currentSide],
+                        m_heroes[target->m_side]);
+                    if ((target->m_monster.flags.bytes.attributes & 1) &&
+                        spellDamage != 0)
+                        spellDamage = COMBAT_SPELL_AI_MIRROR_LETHAL_DAMAGE;
+
+                    damageValue[2] =
+                        spellDamage / target->m_monster.hitPoints;
+                    int remainder = spellDamage % target->m_monster.hitPoints;
+                    if (target->m_monster.hitPoints <=
+                        target->m_hitPointsLost + remainder) {
+                        damageValue[2] =
+                            spellDamage / target->m_monster.hitPoints + 1;
+                        remainder -= target->m_monster.hitPoints -
+                                     target->m_hitPointsLost;
+                    }
+                    if (target->m_quantity <= damageValue[2]) {
+                        damageValue[2] = target->m_quantity;
+                        remainder = 0;
+                        damageValue[m_hexCells[currentHex].m_occupantSide]++;
+                    }
+
+                    damageValue[m_hexCells[currentHex].m_occupantSide + 3] =
+                        static_cast<int>(
+                        damageValue[m_hexCells[currentHex].m_occupantSide + 3] +
+                        (remainder * COMBAT_SPELL_AI_PARTIAL_DAMAGE_MODIFIER +
+                         target->m_monster.hitPoints * damageValue[2]) *
+                            gMonsterDatabase[target->m_monsterType].fightValue /
+                            target->m_monster.hitPoints);
+                    killedValue[m_hexCells[currentHex].m_occupantSide] +=
+                        gMonsterDatabase[target->m_monsterType].fightValue *
+                        target->m_monster.hitPoints * damageValue[2] /
+                        target->m_monster.hitPoints;
+                    if (target->m_monster.flags.bytes.attributes & 1) {
+                        killedValue[m_hexCells[currentHex].m_occupantSide] /= 2;
+                        damageValue[m_hexCells[currentHex].m_occupantSide + 3] /= 2;
+                    }
+
+                    if (spell == SPELL_DISRUPTING_RAY) {
+                        int newDefense = target->m_monster.defense -
+                                         SPELL_DISRUPTING_RAY_DEFENSE_REDUCTION;
+                        if (newDefense < SPELL_MINIMUM_DEFENSE)
+                            newDefense = SPELL_MINIMUM_DEFENSE;
+                        disruptingRayValue = static_cast<int>(
+                            disruptingRayValue +
+                            gMonsterDatabase[target->m_monsterType].fightValue *
+                                (target->m_monster.defense - newDefense) *
+                                (target->m_quantity - damageValue[2]) *
+                                COMBAT_SPELL_AI_DISRUPTING_RAY_MODIFIER);
+                    }
+                }
+            }
+        }
+    } while (1);
+}
 
 // ---- globals (definitions, RVA order) ----
 DATA(0x004f80b8) float gfDurationMods[12];
