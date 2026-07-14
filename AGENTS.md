@@ -53,9 +53,9 @@ authoritative. This file is the short, restart-ready Codex workflow.
    For a remaining compiler/TU-state wall after those gates, use
    `scripts/tu_state_noise.py` as a bounded diagnostic. It inserts only reversible
    preprocessor/lexical probes, compiles outside the normal object path, and rejects sibling,
-   exact-function, predecessor, size, and relocation regressions. It never applies its best
-   patch automatically. Audit the generated manifest and raw bytes, and do not commit arbitrary
-   noise without a credible recovered-source explanation.
+   exact-function, predecessor, size, and relocation regressions. Generated noise is never
+   applied or committed. Audit the generated manifest and raw bytes; the optional guarded
+   `--record-max` mode may retain only the eligible score for the unchanged source hash.
    Sweep every SOURCE TU in that phase. The campaign is complete only when every function's
    retained fuzzy maximum is 100%, and therefore every TU's fuzzy-max is 100%. If a byte-proven
    delinker artifact prevents the raw metric from reaching 100%, normalize or explicitly bless
