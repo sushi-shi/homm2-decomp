@@ -4,8 +4,8 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
-#include <BASE/heroWindowManager.h>
 #include <BASE/WINMGR.h>
+#include <BASE/heroWindowManager.h>
 #include <BASE/bitmap.h>
 #include <BASE/Misc.h>
 #include <BASE/bmap2.h>
@@ -22,33 +22,28 @@
 #include <_globals_model.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/NOOPT.h>
-
-
-
-// ---- module-private synthetic globals (retail xref: single-module) ----
-DATA(0x0053496c) static unsigned int gFadeSavedUpdate; // saved update flag across a fade (heroWindowManager::FadeScreen)
-
 // @match-note
-// Structurally complete /O2 checkpoint (combined live and retained 94.85%): base is 0x391 bytes/255
-// instructions versus retail's 0x3a3/261, with the same 0xc frame, 33 blocks and
-// 23 branches. The default-only color rotation and both reflected combat frame
-// paths are now explicit. One CFG edge still differs because VC42 tail-merges the
-// default path's final three-byte copy into the non-default copy; retail exits the
-// default path directly. Relocations are 70/71 with no wrong/extra target: the
-// sole missing occurrence is retail's separate store base at gCyclePal+66. Of 580
-// comparable unmasked bytes, 125 differ from +0x1e. An explicit word/byte store
-// recovered the CFG edge but emitted 72/71 by independently relocating the final
-// byte at gCyclePal+68, so it is structurally wrong. A real three-byte RGB type
-// assignment canonicalized to the same 70/71 tail merge. The retail-evidenced
-// pointer-terminated world-view loop was retried under this combined TU state; it
-// still left 70/71 and regressed later TU allocation. Direct-global frame and
-// forced `| 0` forms also failed as recorded above and in
-// docs/matching-matrices/winmgr-structural-6148770.tsv. Revisit only after a real
-// predecessor/header TU-state change; do not synthesize the missing relocation.
+// Structurally complete /O2 checkpoint: base is 0x391 bytes/255 instructions
+// versus retail's 0x3a3/261, with the same 0xc frame, 33 blocks and 23 branches.
+// Retail's three reflection tests are `frame >= 5`, `frame >= 5`, and `frame >= 4`;
+// those spellings and the distinct cycle/palette constant domains are now explicit.
+// Moving the unrelated fade-only static below this function changed the legitimate
+// predecessor state and raised this function's observed peak to 95.33%, but VC42
+// still tail-merges the default path's final three-byte copy into the non-default
+// copy. Retail instead writes the saved color through a separate gCyclePal+66 base
+// and jumps directly to the palette update, so one CFG edge and one relocation
+// occurrence remain different: 70/71, no wrong or excess target. An explicit
+// word/byte store recovered the edge but emitted 72/71 by separately relocating
+// gCyclePal+68; a three-byte RGB assignment canonicalized to the same 70/71 merge.
+// Under the new enum/predecessor state the retail-evidenced pointer-terminated loop
+// scored 94.00% and still emitted 70/71, so it was rejected. Signed palette-byte
+// storage was byte-neutral. Direct-global frame and forced `| 0` forms were also
+// ineffective. Revisit only after another real header/TU-state change; do not
+// repeat local copy/predicate synonyms or synthesize the missing relocation.
 VA(0x004ca6d0, 0x3a3)
 void CycleColors(int forceUpdate)
 {
-    unsigned char savedColor[3];
+    signed char savedColor[WINDOW_PALETTE_COLOR_BYTES];
     iCycle1Count++;
     if (gpWindowManager == 0 || gpBufferPalette == 0 || gpWindowManager->m_active != 1)
         return;
@@ -64,43 +59,67 @@ void CycleColors(int forceUpdate)
         if (giCycleType == WINDOW_COLOR_CYCLE_WORLD_VIEW) {
             iCombatCycleFrame = (iCombatCycleFrame + 1) % WINDOW_CYCLE_FRAME_COUNT;
             int frame = iCombatCycleFrame;
-            if (frame >= 4)
+            if (frame >= WINDOW_CYCLE_REFLECTION_THRESHOLD)
                 frame = WINDOW_CYCLE_FRAME_COUNT - frame;
             else
                 frame = iCombatCycleFrame;
-            unsigned char cycleIndices[8] = { 0x98, 0x43, 0x59, 0xb5, 0x70, 0xdb, 0x87, 0x10 };
-            for (int i = 0; i < 8; i++) {
+            unsigned char cycleIndices[WINDOW_WORLD_CYCLE_COLOR_COUNT] =
+                { 0x98, 0x43, 0x59, 0xb5, 0x70, 0xdb, 0x87, 0x10 };
+            for (int i = 0; i < WINDOW_WORLD_CYCLE_COLOR_COUNT; i++) {
                 signed char *src = gpBufferPalette->m_data + (cycleIndices[i] + frame * 3) * 3;
-                memcpy(gCyclePal + i * 3, src, 3);
+                memcpy(gCyclePal + i * WINDOW_PALETTE_COLOR_BYTES, src,
+                       WINDOW_PALETTE_COLOR_BYTES);
             }
             goto updatePalette;
         }
 
-        memcpy(savedColor, gCyclePal + 9, 3);
-        memmove(gCyclePal + 3, gCyclePal, 9);
-        memcpy(gCyclePal, savedColor, 3);
+        memcpy(savedColor, gCyclePal + WINDOW_CYCLE_ROTATION_1_SAVE_OFFSET,
+               WINDOW_PALETTE_COLOR_BYTES);
+        memmove(gCyclePal + WINDOW_CYCLE_ROTATION_1_DESTINATION_OFFSET, gCyclePal,
+                WINDOW_CYCLE_ROTATION_1_BYTES);
+        memcpy(gCyclePal, savedColor, WINDOW_PALETTE_COLOR_BYTES);
 
-        memcpy(savedColor, gCyclePal + 21, 3);
-        memmove(gCyclePal + 15, gCyclePal + 12, 9);
-        memcpy(gCyclePal + 12, savedColor, 3);
+        memcpy(savedColor, gCyclePal + WINDOW_CYCLE_ROTATION_2_SAVE_OFFSET,
+               WINDOW_PALETTE_COLOR_BYTES);
+        memmove(gCyclePal + WINDOW_CYCLE_ROTATION_2_DESTINATION_OFFSET,
+                gCyclePal + WINDOW_CYCLE_ROTATION_2_SOURCE_OFFSET,
+                WINDOW_CYCLE_ROTATION_2_BYTES);
+        memcpy(gCyclePal + WINDOW_CYCLE_ROTATION_2_SOURCE_OFFSET, savedColor,
+               WINDOW_PALETTE_COLOR_BYTES);
 
-        memcpy(savedColor, gCyclePal + 51, 3);
-        memmove(gCyclePal + 51, gCyclePal + 54, 12);
-        memcpy(gCyclePal + 63, savedColor, 3);
+        memcpy(savedColor, gCyclePal + WINDOW_CYCLE_ROTATION_3_SAVE_OFFSET,
+               WINDOW_PALETTE_COLOR_BYTES);
+        memmove(gCyclePal + WINDOW_CYCLE_ROTATION_3_SAVE_OFFSET,
+                gCyclePal + WINDOW_CYCLE_ROTATION_3_SOURCE_OFFSET,
+                WINDOW_CYCLE_ROTATION_3_BYTES);
+        memcpy(gCyclePal + WINDOW_CYCLE_ROTATION_3_RESTORE_OFFSET, savedColor,
+               WINDOW_PALETTE_COLOR_BYTES);
 
-        memcpy(savedColor, gCyclePal + 81, 3);
-        memmove(gCyclePal + 75, gCyclePal + 72, 9);
-        memcpy(gCyclePal + 72, savedColor, 3);
+        memcpy(savedColor, gCyclePal + WINDOW_CYCLE_ROTATION_4_SAVE_OFFSET,
+               WINDOW_PALETTE_COLOR_BYTES);
+        memmove(gCyclePal + WINDOW_CYCLE_ROTATION_4_DESTINATION_OFFSET,
+                gCyclePal + WINDOW_CYCLE_ROTATION_4_SOURCE_OFFSET,
+                WINDOW_CYCLE_ROTATION_4_BYTES);
+        memcpy(gCyclePal + WINDOW_CYCLE_ROTATION_4_SOURCE_OFFSET, savedColor,
+               WINDOW_PALETTE_COLOR_BYTES);
 
-        memcpy(savedColor, gCyclePal + 93, 3);
-        memmove(gCyclePal + 87, gCyclePal + 84, 9);
-        memcpy(gCyclePal + 84, savedColor, 3);
+        memcpy(savedColor, gCyclePal + WINDOW_CYCLE_ROTATION_5_SAVE_OFFSET,
+               WINDOW_PALETTE_COLOR_BYTES);
+        memmove(gCyclePal + WINDOW_CYCLE_ROTATION_5_DESTINATION_OFFSET,
+                gCyclePal + WINDOW_CYCLE_ROTATION_5_SOURCE_OFFSET,
+                WINDOW_CYCLE_ROTATION_5_BYTES);
+        memcpy(gCyclePal + WINDOW_CYCLE_ROTATION_5_SOURCE_OFFSET, savedColor,
+               WINDOW_PALETTE_COLOR_BYTES);
     }
 
     if (giCycleType == WINDOW_COLOR_CYCLE_DEFAULT) {
-        memcpy(savedColor, gCyclePal + 69, WINDOW_PALETTE_COLOR_BYTES);
-        memmove(gCyclePal + 69, gCyclePal + 66, WINDOW_PALETTE_COLOR_BYTES);
-        memcpy(gCyclePal + 66, savedColor, WINDOW_PALETTE_COLOR_BYTES);
+        memcpy(savedColor, gCyclePal + WINDOW_DEFAULT_CYCLE_SAVE_OFFSET,
+               WINDOW_PALETTE_COLOR_BYTES);
+        memmove(gCyclePal + WINDOW_DEFAULT_CYCLE_SAVE_OFFSET,
+                gCyclePal + WINDOW_DEFAULT_CYCLE_SOURCE_OFFSET,
+                WINDOW_PALETTE_COLOR_BYTES);
+        memcpy(gCyclePal + WINDOW_DEFAULT_CYCLE_SOURCE_OFFSET, savedColor,
+               WINDOW_PALETTE_COLOR_BYTES);
         goto updatePalette;
     }
 
@@ -108,7 +127,7 @@ void CycleColors(int forceUpdate)
     if (giCycleType == WINDOW_COLOR_CYCLE_COMBAT) {
         iCombatCycleFrame = (iCombatCycleFrame + 1) % WINDOW_CYCLE_FRAME_COUNT;
         int frame = iCombatCycleFrame;
-        if (frame > 4)
+        if (frame >= WINDOW_CYCLE_REFLECTION_THRESHOLD)
             frame = WINDOW_CYCLE_FRAME_COUNT - frame;
         else
             frame = iCombatCycleFrame;
@@ -119,13 +138,14 @@ void CycleColors(int forceUpdate)
         int frame =
             (iCombatCycleFrame + 1) % WINDOW_ALTERNATE_CYCLE_FRAME_COUNT;
         iCombatCycleFrame = frame;
-        if (frame > 3)
+        if (frame >= WINDOW_ALTERNATE_CYCLE_REFLECTION_THRESHOLD)
             frame = WINDOW_ALTERNATE_CYCLE_FRAME_COUNT - frame;
         else
             frame = iCombatCycleFrame;
         src = gpBufferPalette->m_data + WINDOW_ALTERNATE_CYCLE_SOURCE_OFFSET + frame * 21;
     }
-    memcpy(gCyclePal + 66, src, WINDOW_PALETTE_COLOR_BYTES);
+    memcpy(gCyclePal + WINDOW_DEFAULT_CYCLE_SOURCE_OFFSET, src,
+           WINDOW_PALETTE_COLOR_BYTES);
 
 updatePalette:
     memcpy(gpBufferPalette->m_data + WINDOW_CYCLE_PALETTE_OFFSET, gCyclePal,
@@ -136,6 +156,9 @@ updatePalette:
         UpdatePalette(gpBufferPalette->m_data);
     }
 }
+
+// ---- module-private synthetic globals (retail xref: single-module) ----
+DATA(0x0053496c) static unsigned int gFadeSavedUpdate; // saved update flag across a fade (heroWindowManager::FadeScreen)
 
 VA(0x004caa80, 0x41)
 heroWindowManager::heroWindowManager(void) : baseManager()

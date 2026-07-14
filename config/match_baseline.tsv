@@ -349,7 +349,7 @@ BASE/WINMGR	?AddWindow@heroWindowManager@@QAEXPAVheroWindow@@HH@Z	97.3513	a33e6b
 BASE/WINMGR	?BroadcastMessage@heroWindowManager@@QAEHHHHH@Z	81.1765	afb90999266e
 BASE/WINMGR	?Close@heroWindowManager@@UAEXXZ	100.0000	87919b3de056
 BASE/WINMGR	?ConvertToHover@heroWindowManager@@QAEHAAUtag_message@@@Z	100.0000	d43eb36bf33c
-BASE/WINMGR	?CycleColors@@YIXH@Z	94.8544	41921c9c8817
+BASE/WINMGR	?CycleColors@@YIXH@Z	94.8544	6041b629206c
 BASE/WINMGR	?DoDialog@heroWindowManager@@QAEHPAVheroWindow@@P6IHAAUtag_message@@@ZH@Z	99.1111	6108b31b7e68
 BASE/WINMGR	?FadeScreen@heroWindowManager@@QAEXHHPAVpalette@@@Z	100.0000	76fa3ab96e6f
 BASE/WINMGR	?FizzleForward@heroWindowManager@@QAEXHHHHHPAC0@Z	93.5132	cac1f61ab946
@@ -473,7 +473,7 @@ SOURCE/ADVMGR	?DoVisions@advManager@@QAEHPAVhero@@@Z	100.0000	16a915ce0a4d
 SOURCE/ADVMGR	?DrawAdventureBorder@advManager@@QAEXXZ	99.7901	05da242e3153
 SOURCE/ADVMGR	?DrawCell@advManager@@QAEXHHHHHH@Z	99.5504	6cb53e8471a9
 SOURCE/ADVMGR	?EnableButtons@advManager@@QAEXXZ	100.0000	482a23117b3b
-SOURCE/ADVMGR	?FindAdjacentMonster@advManager@@QAEHHHPAH0HH@Z	98.0247	9fb4f5599df4
+SOURCE/ADVMGR	?FindAdjacentMonster@advManager@@QAEHHHPAH0HH@Z	99.0123	9fb4f5599df4
 SOURCE/ADVMGR	?ForceNewHover@advManager@@QAEXXZ	100.0000	22365eeaebb7
 SOURCE/ADVMGR	?GetArmySizeName@advManager@@QAEPADHH@Z	100.0000	e114146d972b
 SOURCE/ADVMGR	?GetCell@advManager@@QAEPAVmapCell@@HH@Z	97.6191	11ee731cc167
