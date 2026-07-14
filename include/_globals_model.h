@@ -24,6 +24,7 @@ DATA(0x004fdf52) extern signed char gCombatFormations[][17];
 //  now indexes the array directly via the RES_* enum, which matches the retail byte-for-byte.)
 DATA(0x0051ef24) extern char gDefaultCursorName[]; // default cursor resource name (mouseManager::SetColorMice)
 DATA(0x00528dca) extern int gCdMusic; // CD-vs-MIDI music mode (dword-accessed) (soundManager::MusicPlaying)
+DATA(0x0052928c) extern int iCombatControlGamePos;
 DATA(0x00528d28) extern int const_00128d28; // MIDI music volume 0-10 (0=off)
 #define gMidiEnabled const_00128d28
 #define gMusicVolume const_00128d28

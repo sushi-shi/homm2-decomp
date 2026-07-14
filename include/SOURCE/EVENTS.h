@@ -5,6 +5,28 @@
 // forward declarations (was <_all.h>):
 class hero;
 
+enum {
+    COMBAT_REMOTE_BUFFER_SIZE = 0xff,
+    COMBAT_REMOTE_HEADER_SIZE = 0x9b,
+    COMBAT_REMOTE_HERO_FIRST_SIZE = 200,
+    COMBAT_REMOTE_HERO_SECOND_SIZE = 50,
+    COMBAT_REMOTE_PACKET_HEADER_SIZE = 9,
+    COMBAT_REMOTE_FRAGMENT_TYPE = 1,
+    COMBAT_REMOTE_TIMEOUT = 90000
+};
+
+typedef enum CombatRemoteCommand {
+    COMBAT_REMOTE_COMMAND = 0x15,
+    COMBAT_REMOTE_CONFIRM_COMMAND = 0x16
+} CombatRemoteCommand;
+
+typedef enum CombatRemoteFragment {
+    COMBAT_REMOTE_FIRST_HERO_FIRST = 1,
+    COMBAT_REMOTE_FIRST_HERO_SECOND = 2,
+    COMBAT_REMOTE_SECOND_HERO_FIRST = 3,
+    COMBAT_REMOTE_SECOND_HERO_SECOND = 4
+} CombatRemoteFragment;
+
 #pragma pack(push, 1)
 struct mapEventExtra {
     unsigned char active;
@@ -68,7 +90,29 @@ struct mapTownExtra {
     char name[15];
     signed char unknown28;
 };
+struct combatRemoteData {
+    signed char fragment;
+    signed char x;
+    signed char y;
+    signed char hasFirstHero;
+    signed char hasTown;
+    signed char hasSecondHero;
+    signed char firstSide;
+    signed char secondSide;
+    int randomSeed;
+    signed char combatResult;
+    signed char retreatWin;
+    signed char combatSurrender;
+    signed char firstOwner;
+    int firstGold;
+    signed char secondOwner;
+    int secondGold;
+    char firstArmy[15];
+    char secondArmy[15];
+    char townData[100];
+};
 #pragma pack(pop)
+SIZE(combatRemoteData, COMBAT_REMOTE_HEADER_SIZE);
 
 typedef enum MapEventType {
     MAP_EVENT_ALCHEMIST_LAB = 1,
@@ -481,12 +525,16 @@ typedef enum MonsterInteractionType {
     MONSTER_RED_DRAGON = 0x24,
     MONSTER_BLACK_DRAGON = 0x25,
     MONSTER_TITAN = 0x2e,
+    MONSTER_SKELETON = 0x2f,
     MONSTER_GENIE = 0x3b,
     MONSTER_EARTH_ELEMENTAL = 0x3e,
     MONSTER_AIR_ELEMENTAL = 0x3f,
     MONSTER_FIRE_ELEMENTAL = 0x40,
     MONSTER_WATER_ELEMENTAL = 0x41
 } MonsterInteractionType;
+
+#define MONSTER_NECROMANCY_FRACTION 0.1
+#define MONSTER_AI_JOIN_COST_FRACTION 0.75
 
 typedef enum CombatMonsterEventConstant {
     COMBAT_MONSTER_ARMY_SLOTS = 5,
