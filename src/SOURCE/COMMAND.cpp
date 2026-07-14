@@ -69,7 +69,7 @@ int combatManager::Main(tag_message &message)
 
         if (gbThisNetHasControl == 0) {
             if (message.type == COMBAT_EVENT_KEY) {
-                switch (message.field4) {
+                switch (message.payload.keyboard.keyCode) {
                 case COMBAT_KEY_CLOSE_NETWORK_BOX:
                     PopNetBox(0, -1);
                     break;
@@ -532,17 +532,17 @@ int combatManager::GetPointer(int command, int hexIndex)
 VA(0x0042bb26, 0x8e4)
 int combatManager::ProcessCombatMsg(tag_message &message)
 {
-    int mouseX = message.field10;
-    int mouseY = message.field14;
+    int mouseX = message.payload.mouse.screenX;
+    int mouseY = message.payload.mouse.screenY;
     int unusedResult = 0;
 
     switch (message.type) {
     case COMBAT_EVENT_WINDOW:
-        if ((message.fieldC & COMBAT_WINDOW_HELP_FLAG) != 0) {
-            if (message.field4 == COMBAT_WINDOW_HOVER ||
-                message.field4 == COMBAT_WINDOW_HELP) {
+        if ((message.payload.widget.parameter & COMBAT_WINDOW_HELP_FLAG) != 0) {
+            if (message.payload.widget.command == COMBAT_WINDOW_HOVER ||
+                message.payload.widget.command == COMBAT_WINDOW_HELP) {
                 int helpIndex = -1;
-                switch (message.field8) {
+                switch (message.payload.widget.id) {
                 case COMBAT_CONTROL_ATTACK:
                     helpIndex = 0;
                     break;
@@ -575,11 +575,11 @@ int combatManager::ProcessCombatMsg(tag_message &message)
                                  NORMAL_DIALOG_NO_RESOURCE, 0);
                 }
             }
-        } else if (message.field4 == COMBAT_WINDOW_HOVER) {
-            if (message.field8 == COMBAT_WINDOW_MAIN_BUTTON)
+        } else if (message.payload.widget.command == COMBAT_WINDOW_HOVER) {
+            if (message.payload.widget.id == COMBAT_WINDOW_MAIN_BUTTON)
                 DoCommand(m_unknownF2CF);
-        } else if (message.field4 == COMBAT_WINDOW_CLICK) {
-            switch (message.field8) {
+        } else if (message.payload.widget.command == COMBAT_WINDOW_CLICK) {
+            switch (message.payload.widget.id) {
             case COMBAT_CONTROL_ATTACK:
                 giNextAction = COMBAT_MESSAGE_COMMAND_ATTACK;
                 break;
@@ -601,13 +601,13 @@ int combatManager::ProcessCombatMsg(tag_message &message)
             tag_message pendingMessage = gpInputManager->PeekEvent();
             if (pendingMessage.type != COMBAT_EVENT_MOUSE_MOVE) {
                 int selectedHex;
-                if (InCombatArea(message.field10, message.field14) != 0)
+                if (InCombatArea(message.payload.mouse.screenX, message.payload.mouse.screenY) != 0)
                     selectedHex = GetGridIndex(mouseX, mouseY);
                 else
                     selectedHex = COMBAT_INVALID_HEX;
 
                 UpdateMouseGrid(selectedHex, 0);
-                if (InCombatArea(message.field10, message.field14) != 0) {
+                if (InCombatArea(message.payload.mouse.screenX, message.payload.mouse.screenY) != 0) {
                     if (m_selectedHex != selectedHex ||
                         selectedHex == COMBAT_INVALID_HEX) {
                         m_selectedHex = selectedHex;
@@ -652,7 +652,7 @@ int combatManager::ProcessCombatMsg(tag_message &message)
         return COMBAT_MAIN_CONTINUE;
 
     case COMBAT_EVENT_KEY:
-        switch (message.field4) {
+        switch (message.payload.keyboard.keyCode) {
         case COMBAT_KEY_CLOSE_NETWORK_BOX:
             PopNetBox(0, -1);
             break;
@@ -683,9 +683,9 @@ int combatManager::ProcessCombatMsg(tag_message &message)
             DrawFrame(1, 0, 0, 0, COMBAT_COMMAND_FRAME_DELAY, 1, 1);
             break;
         case COMBAT_KEY_DEBUG_CREATURE_EFFECT:
-            if ((message.fieldC & COMBAT_DEBUG_VAPORIZE_MASK) != 0) {
+            if ((message.payload.keyboard.modifiers & COMBAT_DEBUG_VAPORIZE_MASK) != 0) {
                 VaporizeCreature(1, 1);
-            } else if ((message.fieldC & COMBAT_DEBUG_DOUBLE_RIPPLE_MASK) != 0) {
+            } else if ((message.payload.keyboard.modifiers & COMBAT_DEBUG_DOUBLE_RIPPLE_MASK) != 0) {
                 RippleCreature(1, 1, 1);
                 RippleCreature(1, 1, 2);
             } else {
@@ -850,7 +850,7 @@ int combatManager::CheckWin(struct tag_message *message)
         DoVictory(m_combatResult);
         if (gbNoShowCombat == 0) {
             message->type = COMBAT_WIN_MESSAGE;
-            message->field4 = 1;
+            message->payload.widget.command = 1;
         }
     }
     return combatEnded;
@@ -1154,17 +1154,17 @@ int WinCombatHandler(struct tag_message &message)
 
     if (giDialogTimeout != 0 && KBTickCount() > giDialogTimeout) {
         message.type = COMBAT_EVENT_WINDOW;
-        gpWindowManager->m_dialogResult = message.field8;
-        message.field8 = COMBAT_WIN_LOSE_CLOSE_COMMAND;
-        message.field4 = message.field8;
+        gpWindowManager->m_dialogResult = message.payload.widget.id;
+        message.payload.widget.id = COMBAT_WIN_LOSE_CLOSE_COMMAND;
+        message.payload.widget.command = message.payload.widget.id;
         giDialogTimeout = 0;
         return COMBAT_MAIN_FINISHED;
     }
 
     if (message.type == COMBAT_EVENT_WINDOW) {
-        switch (message.field4) {
+        switch (message.payload.widget.command) {
         case COMBAT_WINDOW_CLICK:
-            switch (message.field8) {
+            switch (message.payload.widget.id) {
             case COMBAT_WIN_LOSE_NEXT_CONTROL:
                 if (gbShowingLoseWindow != 0)
                     goto ExitDialog;
@@ -1194,9 +1194,9 @@ int WinCombatHandler(struct tag_message &message)
                             -1;
                     } else {
                     ExitDialog:
-                        gpWindowManager->m_dialogResult = message.field8;
-                        message.field8 = COMBAT_WIN_LOSE_CLOSE_COMMAND;
-                        message.field4 = message.field8;
+                        gpWindowManager->m_dialogResult = message.payload.widget.id;
+                        message.payload.widget.id = COMBAT_WIN_LOSE_CLOSE_COMMAND;
+                        message.payload.widget.command = message.payload.widget.id;
                         return COMBAT_MAIN_FINISHED;
                     }
                 }
@@ -1212,8 +1212,8 @@ int WinCombatHandler(struct tag_message &message)
 
     if (KBTickCount() > glTimers[0]) {
         animationMessage.type = COMBAT_EVENT_WINDOW;
-        animationMessage.field4 = COMBAT_WIN_LOSE_RESOURCE_COMMAND;
-        animationMessage.text = iconFile;
+        animationMessage.payload.widget.command = COMBAT_WIN_LOSE_RESOURCE_COMMAND;
+        animationMessage.payload.widget.data.text = iconFile;
         ++giWinCmbtFrame;
 
         switch (gbWhichAnimationPlaying) {
@@ -1231,11 +1231,11 @@ int WinCombatHandler(struct tag_message &message)
             if (giWinCmbtFrame ==
                 COMBAT_WIN_LOSE_FLEE_SECOND_RESOURCE_FRAME) {
                 sprintf(iconFile, "cmbtfle2.icn");
-                animationMessage.field8 =
+                animationMessage.payload.widget.id =
                     COMBAT_WIN_LOSE_RESOURCE_LOAD_ID;
                 gpCombatManager->m_winLoseWindow->BroadcastMessage(
                     animationMessage);
-                animationMessage.field8 =
+                animationMessage.payload.widget.id =
                     COMBAT_WIN_LOSE_RESOURCE_DRAW_ID;
                 gpCombatManager->m_winLoseWindow->BroadcastMessage(
                     animationMessage);
@@ -1243,11 +1243,11 @@ int WinCombatHandler(struct tag_message &message)
             if (giWinCmbtFrame ==
                 COMBAT_WIN_LOSE_FLEE_THIRD_RESOURCE_FRAME) {
                 sprintf(iconFile, "cmbtfle3.icn");
-                animationMessage.field8 =
+                animationMessage.payload.widget.id =
                     COMBAT_WIN_LOSE_RESOURCE_LOAD_ID;
                 gpCombatManager->m_winLoseWindow->BroadcastMessage(
                     animationMessage);
-                animationMessage.field8 =
+                animationMessage.payload.widget.id =
                     COMBAT_WIN_LOSE_RESOURCE_DRAW_ID;
                 gpCombatManager->m_winLoseWindow->BroadcastMessage(
                     animationMessage);
@@ -1271,11 +1271,11 @@ int WinCombatHandler(struct tag_message &message)
             if (giWinCmbtFrame ==
                 COMBAT_WIN_LOSE_LOSS_SECOND_RESOURCE_FRAME) {
                 sprintf(iconFile, "cmbtlos2.icn");
-                animationMessage.field8 =
+                animationMessage.payload.widget.id =
                     COMBAT_WIN_LOSE_RESOURCE_LOAD_ID;
                 gpCombatManager->m_winLoseWindow->BroadcastMessage(
                     animationMessage);
-                animationMessage.field8 =
+                animationMessage.payload.widget.id =
                     COMBAT_WIN_LOSE_RESOURCE_DRAW_ID;
                 gpCombatManager->m_winLoseWindow->BroadcastMessage(
                     animationMessage);
@@ -1283,11 +1283,11 @@ int WinCombatHandler(struct tag_message &message)
             if (giWinCmbtFrame ==
                 COMBAT_WIN_LOSE_LOSS_THIRD_RESOURCE_FRAME) {
                 sprintf(iconFile, "cmbtlos3.icn");
-                animationMessage.field8 =
+                animationMessage.payload.widget.id =
                     COMBAT_WIN_LOSE_RESOURCE_LOAD_ID;
                 gpCombatManager->m_winLoseWindow->BroadcastMessage(
                     animationMessage);
-                animationMessage.field8 =
+                animationMessage.payload.widget.id =
                     COMBAT_WIN_LOSE_RESOURCE_DRAW_ID;
                 gpCombatManager->m_winLoseWindow->BroadcastMessage(
                     animationMessage);
@@ -1313,9 +1313,9 @@ int WinCombatHandler(struct tag_message &message)
         }
 
         message.type = COMBAT_EVENT_WINDOW;
-        message.field4 = COMBAT_WIN_LOSE_ANIMATION_COMMAND;
-        message.field8 = COMBAT_WIN_LOSE_RESOURCE_DRAW_ID;
-        message.field18 = frame;
+        message.payload.widget.command = COMBAT_WIN_LOSE_ANIMATION_COMMAND;
+        message.payload.widget.id = COMBAT_WIN_LOSE_RESOURCE_DRAW_ID;
+        message.payload.widget.data.value = frame;
         gpCombatManager->m_winLoseWindow->BroadcastMessage(message);
         gpCombatManager->m_winLoseWindow->DrawWindow(
             1, 0, COMBAT_WIN_LOSE_DRAW_DEPTH);
@@ -1355,9 +1355,9 @@ void combatManager::ShowWinLoseArtifact(class heroWindow *window, int artifact)
 
     sprintf(gText, "You have captured an enemy artifact!");
     message.type = COMBAT_EVENT_WINDOW;
-    message.field4 = COMBAT_WIN_LOSE_TEXT_COMMAND;
-    message.field8 = COMBAT_WIN_LOSE_TEXT_ID;
-    message.text = gText;
+    message.payload.widget.command = COMBAT_WIN_LOSE_TEXT_COMMAND;
+    message.payload.widget.id = COMBAT_WIN_LOSE_TEXT_ID;
+    message.payload.widget.data.text = gText;
     m_winLoseWindow->BroadcastMessage(message);
 
     m_winLoseBottomWidgets[0] =
@@ -1435,9 +1435,9 @@ void combatManager::ShowSkeletons(class heroWindow *window)
                 "as a Skeleton.");
     }
     message.type = COMBAT_EVENT_WINDOW;
-    message.field4 = COMBAT_WIN_LOSE_TEXT_COMMAND;
-    message.field8 = COMBAT_WIN_LOSE_TEXT_ID;
-    message.text = gText;
+    message.payload.widget.command = COMBAT_WIN_LOSE_TEXT_COMMAND;
+    message.payload.widget.id = COMBAT_WIN_LOSE_TEXT_ID;
+    message.payload.widget.data.text = gText;
     m_winLoseWindow->BroadcastMessage(message);
     gpCombatManager->m_winLoseWindow->DrawWindow();
 
@@ -1493,9 +1493,9 @@ void combatManager::ShowEagleEyeSpell(class heroWindow *window)
             m_heroes[m_combatResult]->m_name,
             gSpellNames[displayedSpell]);
     spellMessage.type = COMBAT_EVENT_WINDOW;
-    spellMessage.field4 = COMBAT_WIN_LOSE_TEXT_COMMAND;
-    spellMessage.field8 = COMBAT_WIN_LOSE_TEXT_ID;
-    spellMessage.text = gText;
+    spellMessage.payload.widget.command = COMBAT_WIN_LOSE_TEXT_COMMAND;
+    spellMessage.payload.widget.id = COMBAT_WIN_LOSE_TEXT_ID;
+    spellMessage.payload.widget.data.text = gText;
     m_winLoseWindow->BroadcastMessage(spellMessage);
     gpCombatManager->m_winLoseWindow->DrawWindow();
 

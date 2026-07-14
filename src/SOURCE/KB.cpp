@@ -978,11 +978,11 @@ int InitMenuHandler(struct tag_message &msg)
     int hoverIndex;
 
     PollSound();
-    if (msg.fieldC & INIT_MENU_DISABLE_MASK) {
-        if (msg.field4 == INIT_MENU_HOVER_COMMAND ||
-            msg.field4 == INIT_MENU_HELP_COMMAND) {
+    if (msg.payload.widget.parameter & INIT_MENU_DISABLE_MASK) {
+        if (msg.payload.widget.command == INIT_MENU_HOVER_COMMAND ||
+            msg.payload.widget.command == INIT_MENU_HELP_COMMAND) {
             helpIndex = -1;
-            switch (msg.field8) {
+            switch (msg.payload.widget.id) {
             case INIT_MENU_NEW_GAME:
                 helpIndex = 0;
                 break;
@@ -1006,7 +1006,7 @@ int InitMenuHandler(struct tag_message &msg)
         }
     } else {
         if (msg.type == INIT_MENU_KEY_PRESS) {
-            switch (msg.field4) {
+            switch (msg.payload.keyboard.keyCode) {
             case INIT_MENU_KEY_NEW:
                 gpWindowManager->m_dialogResult = INIT_MENU_NEW_GAME;
                 handled = 1;
@@ -1029,20 +1029,20 @@ int InitMenuHandler(struct tag_message &msg)
                 break;
             }
         } else if (msg.type == INIT_MENU_MESSAGE) {
-            if (msg.field8 < INIT_MENU_FIRST_COMMAND ||
-                msg.field8 > INIT_MENU_LAST_ACTION) {
+            if (msg.payload.widget.id < INIT_MENU_FIRST_COMMAND ||
+                msg.payload.widget.id > INIT_MENU_LAST_ACTION) {
                 return INIT_MENU_HANDLER_IGNORE;
             }
-            switch (msg.field4) {
+            switch (msg.payload.widget.command) {
             case INIT_MENU_HOVER_COMMAND:
-                if (msg.field8 == INIT_MENU_MOVIE)
+                if (msg.payload.widget.id == INIT_MENU_MOVIE)
                     break;
-                menu = msg.field8 - INIT_MENU_FIRST_COMMAND;
+                menu = msg.payload.widget.id - INIT_MENU_FIRST_COMMAND;
                 idx = menu + INIT_MENU_WIDGET_OFFSET;
                 msg.type = INIT_MENU_MESSAGE;
-                msg.field8 = idx;
-                msg.field4 = INIT_MENU_SET_WIDGET_COMMAND;
-                msg.field18 =
+                msg.payload.widget.id = idx;
+                msg.payload.widget.command = INIT_MENU_SET_WIDGET_COMMAND;
+                msg.payload.widget.data.value =
                     menu * INIT_MENU_FRAME_STRIDE + INIT_MENU_HOVER_FRAME;
                 gpInitWin->BroadcastMessage(msg);
                 gpInitWin->DrawWindow(0, idx, idx);
@@ -1051,7 +1051,7 @@ int InitMenuHandler(struct tag_message &msg)
                     IMHotSpots[menu][2], IMHotSpots[menu][3]);
                 break;
             case INIT_MENU_CLICK_COMMAND:
-                if (msg.field8 == INIT_MENU_MOVIE) {
+                if (msg.payload.widget.id == INIT_MENU_MOVIE) {
                     PlaySmacker(INIT_MENU_MOVIE_SMACKER);
                     gpResourceManager->GetBackdrop(
                         "heroes.icn", gpWindowManager->m_screen, 1);
@@ -1062,13 +1062,13 @@ int InitMenuHandler(struct tag_message &msg)
                         INIT_MENU_MAIN_MUSIC, 0, -1);
                     break;
                 } else {
-                    gpWindowManager->m_dialogResult = msg.field8;
+                    gpWindowManager->m_dialogResult = msg.payload.widget.id;
                     for (idx = INIT_MENU_FIRST_WIDGET;
                          idx <= INIT_MENU_LAST_WIDGET; idx++) {
                         msg.type = INIT_MENU_MESSAGE;
-                        msg.field8 = idx;
-                        msg.field4 = INIT_MENU_SET_WIDGET_COMMAND;
-                        msg.field18 = idx * INIT_MENU_FRAME_STRIDE -
+                        msg.payload.widget.id = idx;
+                        msg.payload.widget.command = INIT_MENU_SET_WIDGET_COMMAND;
+                        msg.payload.widget.data.value = idx * INIT_MENU_FRAME_STRIDE -
                                       INIT_MENU_WIDGET_FRAME_BASE;
                         gpInitWin->BroadcastMessage(msg);
                     }
@@ -1084,19 +1084,19 @@ int InitMenuHandler(struct tag_message &msg)
         } else if (msg.type == INIT_MENU_MOUSE_MOVE) {
             hoverIndex = -1;
             for (idx = 0; idx < INIT_MENU_HOTSPOT_COUNT; idx++) {
-                if (IMHotSpots[idx][0] <= msg.field10 &&
-                    IMHotSpots[idx][1] <= msg.field14 &&
-                    msg.field10 < IMHotSpots[idx][0] + IMHotSpots[idx][2] &&
-                    msg.field14 < IMHotSpots[idx][1] + IMHotSpots[idx][3]) {
+                if (IMHotSpots[idx][0] <= msg.payload.mouse.screenX &&
+                    IMHotSpots[idx][1] <= msg.payload.mouse.screenY &&
+                    msg.payload.mouse.screenX < IMHotSpots[idx][0] + IMHotSpots[idx][2] &&
+                    msg.payload.mouse.screenY < IMHotSpots[idx][1] + IMHotSpots[idx][3]) {
                     hoverIndex = idx;
                 }
             }
             if (lastIMHoverID != hoverIndex) {
                 if (lastIMHoverID != -1) {
                     msg.type = INIT_MENU_MESSAGE;
-                    msg.field8 = lastIMHoverID + INIT_MENU_WIDGET_OFFSET;
-                    msg.field4 = INIT_MENU_SET_WIDGET_COMMAND;
-                    msg.field18 = lastIMHoverID * INIT_MENU_FRAME_STRIDE +
+                    msg.payload.widget.id = lastIMHoverID + INIT_MENU_WIDGET_OFFSET;
+                    msg.payload.widget.command = INIT_MENU_SET_WIDGET_COMMAND;
+                    msg.payload.widget.data.value = lastIMHoverID * INIT_MENU_FRAME_STRIDE +
                                   INIT_MENU_IDLE_FRAME;
                     gpInitWin->BroadcastMessage(msg);
                     gpInitWin->DrawWindow(0, lastIMHoverID + INIT_MENU_WIDGET_OFFSET,
@@ -1107,9 +1107,9 @@ int InitMenuHandler(struct tag_message &msg)
                 }
                 if (hoverIndex != -1) {
                     msg.type = INIT_MENU_MESSAGE;
-                    msg.field8 = hoverIndex + INIT_MENU_WIDGET_OFFSET;
-                    msg.field4 = INIT_MENU_SET_WIDGET_COMMAND;
-                    msg.field18 = hoverIndex * INIT_MENU_FRAME_STRIDE +
+                    msg.payload.widget.id = hoverIndex + INIT_MENU_WIDGET_OFFSET;
+                    msg.payload.widget.command = INIT_MENU_SET_WIDGET_COMMAND;
+                    msg.payload.widget.data.value = hoverIndex * INIT_MENU_FRAME_STRIDE +
                                   INIT_MENU_ACTIVE_FRAME;
                     gpInitWin->BroadcastMessage(msg);
                     gpInitWin->DrawWindow(0, hoverIndex + INIT_MENU_WIDGET_OFFSET,
@@ -1125,8 +1125,8 @@ int InitMenuHandler(struct tag_message &msg)
 
     if (handled || giMenuCommand != -1) {
         msg.type = INIT_MENU_MESSAGE;
-        msg.field8 = INIT_MENU_CLOSE_COMMAND;
-        msg.field4 = msg.field8;
+        msg.payload.widget.id = INIT_MENU_CLOSE_COMMAND;
+        msg.payload.widget.command = msg.payload.widget.id;
         return INIT_MENU_HANDLER_CLOSE;
     }
     CheckShingleUpdate();
@@ -1147,9 +1147,9 @@ int RecruitHeroHandler(tag_message &msg)
     int a = 0;
     int b;
     if (msg.type == 0x200) {
-        switch (msg.field4) {
+        switch (msg.payload.widget.command) {
         case 0xc:
-            switch (msg.field8) {
+            switch (msg.payload.widget.id) {
             case 2:
                 HeroView(static_cast<unsigned char>(gpTownManager->m_recruitHero->m_id), 1, 0);
                 gpTownManager->RedrawTownScreen();
@@ -1162,14 +1162,14 @@ int RecruitHeroHandler(tag_message &msg)
             }
             break;
         case 0xd:
-            switch (msg.field8) {
+            switch (msg.payload.widget.id) {
             case 0x7801:
                 gpTownManager->m_recruitState = -1;
                 a = 1;
                 break;
             case 0x7802:
                 gpTownManager->m_recruitState = 0;
-                *(int *)((char *)gpWindowManager + 0x5a) = msg.field8;
+                *(int *)((char *)gpWindowManager + 0x5a) = msg.payload.widget.id;
                 a = 1;
                 break;
             }
@@ -1179,8 +1179,8 @@ int RecruitHeroHandler(tag_message &msg)
         }
     }
     if (a == 1) {
-        msg.field8 = 0xa;
-        msg.field4 = msg.field8;
+        msg.payload.widget.id = 0xa;
+        msg.payload.widget.command = msg.payload.widget.id;
         return 2;
     }
     return 1;
@@ -1409,9 +1409,9 @@ int WaitHandler(tag_message &msg)
     gbFunctionComplete = 1;
     PollSound();
     if (msg.type == EVENT_WINDOW_MESSAGE) {
-        switch (msg.field4) {
+        switch (msg.payload.widget.command) {
         case EVENT_WINDOW_CLICK_COMMAND:
-            switch (msg.field8) {
+            switch (msg.payload.widget.id) {
             case EVENT_WINDOW_FIRST_BUTTON:
             case EVENT_WINDOW_SECOND_BUTTON:
             case EVENT_WINDOW_THIRD_BUTTON:
@@ -1471,8 +1471,8 @@ int WaitHandler(tag_message &msg)
     if (result != 0) {
         gpWindowManager->m_dialogResult = EVENT_WINDOW_SECOND_BUTTON;
         msg.type = EVENT_WINDOW_MESSAGE;
-        msg.field8 = EVENT_WINDOW_CLOSE_COMMAND;
-        msg.field4 = msg.field8;
+        msg.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
+        msg.payload.widget.command = msg.payload.widget.id;
         return 2;
     }
     return 1;
@@ -1495,20 +1495,20 @@ int EventWindowHandler(struct tag_message &msg)
             giTerrainToMusicTrack[gpAdvManager->m_currentTerrain]);
     if (giDialogTimeout != 0 && KBTickCount() > giDialogTimeout) {
         msg.type = EVENT_WINDOW_MESSAGE;
-        gpWindowManager->m_dialogResult = msg.field8;
-        msg.field8 = EVENT_WINDOW_CLOSE_COMMAND;
-        msg.field4 = msg.field8;
+        gpWindowManager->m_dialogResult = msg.payload.widget.id;
+        msg.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
+        msg.payload.widget.command = msg.payload.widget.id;
         giDialogTimeout = 0;
         return EVENT_WINDOW_CLOSE;
     }
     if (msg.type == EVENT_WINDOW_MESSAGE) {
-        switch (msg.field4) {
+        switch (msg.payload.widget.command) {
         case EVENT_WINDOW_HOVER_COMMAND:
         case EVENT_WINDOW_HELP_COMMAND:
             type = NORMAL_DIALOG_NO_RESOURCE;
             extra = NORMAL_DIALOG_NO_VALUE;
-            if (msg.fieldC & EVENT_WINDOW_RESOURCE_FLAG) {
-                switch (msg.field8) {
+            if (msg.payload.widget.parameter & EVENT_WINDOW_RESOURCE_FLAG) {
+                switch (msg.payload.widget.id) {
                 case EVENT_WINDOW_FIRST_RESOURCE_WIDGET:
                     type = giResType1;
                     extra = giResExtra1;
@@ -1575,7 +1575,7 @@ int EventWindowHandler(struct tag_message &msg)
             }
             break;
         case EVENT_WINDOW_CLICK_COMMAND:
-            switch (msg.field8) {
+            switch (msg.payload.widget.id) {
             case EVENT_WINDOW_FIRST_BUTTON:
             case EVENT_WINDOW_SECOND_BUTTON:
             case EVENT_WINDOW_THIRD_BUTTON:
@@ -1584,9 +1584,9 @@ int EventWindowHandler(struct tag_message &msg)
             case EVENT_WINDOW_SIXTH_BUTTON:
             case EVENT_WINDOW_SEVENTH_BUTTON:
             case EVENT_WINDOW_EIGHTH_BUTTON:
-                gpWindowManager->m_dialogResult = msg.field8;
-                msg.field8 = EVENT_WINDOW_CLOSE_COMMAND;
-                msg.field4 = msg.field8;
+                gpWindowManager->m_dialogResult = msg.payload.widget.id;
+                msg.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
+                msg.payload.widget.command = msg.payload.widget.id;
                 giDialogTimeout = 0;
                 return EVENT_WINDOW_CLOSE;
             case EVENT_WINDOW_IGNORED_BUTTON:
@@ -2603,34 +2603,34 @@ void PopNetBox(char *text, int netPlayer)
         MemError();
 
     updateMessage_f.type = NET_BOX_UPDATE_MESSAGE;
-    updateMessage_f.field4 = NET_BOX_TEXT_COMMAND;
-    updateMessage_f.field8 = 1;
-    updateMessage_f.text = cNetBoxLine[0];
+    updateMessage_f.payload.widget.command = NET_BOX_TEXT_COMMAND;
+    updateMessage_f.payload.widget.id = 1;
+    updateMessage_f.payload.widget.data.text = cNetBoxLine[0];
     netWindow_j->BroadcastMessage(updateMessage_f);
-    updateMessage_f.field8 = 2;
-    updateMessage_f.text = cNetBoxLine[1];
+    updateMessage_f.payload.widget.id = 2;
+    updateMessage_f.payload.widget.data.text = cNetBoxLine[1];
     netWindow_j->BroadcastMessage(updateMessage_f);
-    updateMessage_f.field8 = 3;
-    updateMessage_f.text = cNetBoxLine[2];
+    updateMessage_f.payload.widget.id = 3;
+    updateMessage_f.payload.widget.data.text = cNetBoxLine[2];
     netWindow_j->BroadcastMessage(updateMessage_f);
-    updateMessage_f.field8 = 4;
-    updateMessage_f.text = cNetBoxLine[3];
+    updateMessage_f.payload.widget.id = 4;
+    updateMessage_f.payload.widget.data.text = cNetBoxLine[3];
     netWindow_j->BroadcastMessage(updateMessage_f);
-    updateMessage_f.field4 = NET_BOX_COLOR_COMMAND;
-    updateMessage_f.field8 = NET_BOX_FIRST_COLOR_ID;
-    updateMessage_f.field18 = cNetBoxColor[0] + 1;
+    updateMessage_f.payload.widget.command = NET_BOX_COLOR_COMMAND;
+    updateMessage_f.payload.widget.id = NET_BOX_FIRST_COLOR_ID;
+    updateMessage_f.payload.widget.data.value = cNetBoxColor[0] + 1;
     netWindow_j->BroadcastMessage(updateMessage_f);
-    updateMessage_f.field8 = NET_BOX_SECOND_COLOR_ID;
-    updateMessage_f.field18 = cNetBoxColor[1] + 1;
+    updateMessage_f.payload.widget.id = NET_BOX_SECOND_COLOR_ID;
+    updateMessage_f.payload.widget.data.value = cNetBoxColor[1] + 1;
     netWindow_j->BroadcastMessage(updateMessage_f);
-    updateMessage_f.field8 = NET_BOX_THIRD_COLOR_ID;
-    updateMessage_f.field18 = cNetBoxColor[2] + 1;
+    updateMessage_f.payload.widget.id = NET_BOX_THIRD_COLOR_ID;
+    updateMessage_f.payload.widget.data.value = cNetBoxColor[2] + 1;
     netWindow_j->BroadcastMessage(updateMessage_f);
-    updateMessage_f.field8 = NET_BOX_FOURTH_COLOR_ID;
-    updateMessage_f.field18 = cNetBoxColor[3] + 1;
+    updateMessage_f.payload.widget.id = NET_BOX_FOURTH_COLOR_ID;
+    updateMessage_f.payload.widget.data.value = cNetBoxColor[3] + 1;
     netWindow_j->BroadcastMessage(updateMessage_f);
-    updateMessage_f.field8 = NET_BOX_THIS_PLAYER_COLOR_ID;
-    updateMessage_f.field18 = gpGame->m_players[NetPosToGamePos(giThisNetPos)].color + 1;
+    updateMessage_f.payload.widget.id = NET_BOX_THIS_PLAYER_COLOR_ID;
+    updateMessage_f.payload.widget.data.value = gpGame->m_players[NetPosToGamePos(giThisNetPos)].color + 1;
     netWindow_j->BroadcastMessage(updateMessage_f);
 
     gpWindowManager->AddWindow(netWindow_j, -1, 1);
@@ -2691,7 +2691,7 @@ void PopNetBox(char *text, int netPlayer)
         switch (event_a.type) {
         case NET_BOX_KEY_MESSAGE:
             messageTime_b = 0;
-            switch (event_a.field4) {
+            switch (event_a.payload.keyboard.keyCode) {
             case NET_BOX_KEY_ESCAPE:
             case NET_BOX_KEY_F1:
                 done_i = 1;
@@ -2706,16 +2706,16 @@ void PopNetBox(char *text, int netPlayer)
                 sendText_h = 1;
                 break;
             default:
-                if (reinterpret_cast<unsigned char *>(&event_a.field4)[0] <
+                if (static_cast<unsigned char>(event_a.payload.keyboard.keyCode) <
                         NET_BOX_FIRST_PRINTABLE ||
-                    reinterpret_cast<unsigned char *>(&event_a.field4)[0] >
+                    static_cast<unsigned char>(event_a.payload.keyboard.keyCode) >
                         NET_BOX_LAST_PRINTABLE)
                     break;
-                if (inputLength_a < NET_BOX_MAX_INPUT && event_a.field4 != 0) {
+                if (inputLength_a < NET_BOX_MAX_INPUT && event_a.payload.keyboard.keyCode != 0) {
                     inputText_c[inputLength_a] = 0;
                     textWidth_b = smallFont->LineWidth(inputText_c);
                     if (textWidth_b + NET_BOX_CURSOR_WIDTH_PADDING < NET_BOX_CURSOR_WIDTH_LIMIT) {
-                        inputText_c[inputLength_a] = static_cast<char>(event_a.field4);
+                        inputText_c[inputLength_a] = static_cast<char>(event_a.payload.keyboard.keyCode);
                         inputLength_a++;
                         updateInput_a = 1;
                         cursorState = 0;
@@ -2746,31 +2746,31 @@ void PopNetBox(char *text, int netPlayer)
         if (redrawLines_a) {
             redrawLines_a = 0;
             updateMessage_f.type = NET_BOX_UPDATE_MESSAGE;
-            updateMessage_f.field4 = NET_BOX_TEXT_COMMAND;
-            updateMessage_f.field8 = 1;
-            updateMessage_f.text = cNetBoxLine[0];
+            updateMessage_f.payload.widget.command = NET_BOX_TEXT_COMMAND;
+            updateMessage_f.payload.widget.id = 1;
+            updateMessage_f.payload.widget.data.text = cNetBoxLine[0];
             netWindow_j->BroadcastMessage(updateMessage_f);
-            updateMessage_f.field8 = 2;
-            updateMessage_f.text = cNetBoxLine[1];
+            updateMessage_f.payload.widget.id = 2;
+            updateMessage_f.payload.widget.data.text = cNetBoxLine[1];
             netWindow_j->BroadcastMessage(updateMessage_f);
-            updateMessage_f.field8 = 3;
-            updateMessage_f.text = cNetBoxLine[2];
+            updateMessage_f.payload.widget.id = 3;
+            updateMessage_f.payload.widget.data.text = cNetBoxLine[2];
             netWindow_j->BroadcastMessage(updateMessage_f);
-            updateMessage_f.field8 = 4;
-            updateMessage_f.text = cNetBoxLine[3];
+            updateMessage_f.payload.widget.id = 4;
+            updateMessage_f.payload.widget.data.text = cNetBoxLine[3];
             netWindow_j->BroadcastMessage(updateMessage_f);
-            updateMessage_f.field4 = NET_BOX_COLOR_COMMAND;
-            updateMessage_f.field8 = NET_BOX_FIRST_COLOR_ID;
-            updateMessage_f.field18 = cNetBoxColor[0] + 1;
+            updateMessage_f.payload.widget.command = NET_BOX_COLOR_COMMAND;
+            updateMessage_f.payload.widget.id = NET_BOX_FIRST_COLOR_ID;
+            updateMessage_f.payload.widget.data.value = cNetBoxColor[0] + 1;
             netWindow_j->BroadcastMessage(updateMessage_f);
-            updateMessage_f.field8 = NET_BOX_SECOND_COLOR_ID;
-            updateMessage_f.field18 = cNetBoxColor[1] + 1;
+            updateMessage_f.payload.widget.id = NET_BOX_SECOND_COLOR_ID;
+            updateMessage_f.payload.widget.data.value = cNetBoxColor[1] + 1;
             netWindow_j->BroadcastMessage(updateMessage_f);
-            updateMessage_f.field8 = NET_BOX_THIRD_COLOR_ID;
-            updateMessage_f.field18 = cNetBoxColor[2] + 1;
+            updateMessage_f.payload.widget.id = NET_BOX_THIRD_COLOR_ID;
+            updateMessage_f.payload.widget.data.value = cNetBoxColor[2] + 1;
             netWindow_j->BroadcastMessage(updateMessage_f);
-            updateMessage_f.field8 = NET_BOX_FOURTH_COLOR_ID;
-            updateMessage_f.field18 = cNetBoxColor[3] + 1;
+            updateMessage_f.payload.widget.id = NET_BOX_FOURTH_COLOR_ID;
+            updateMessage_f.payload.widget.data.value = cNetBoxColor[3] + 1;
             netWindow_j->BroadcastMessage(updateMessage_f);
             netWindow_j->DrawWindow();
             gpWindowManager->UpdateScreenRegion(0, NET_BOX_WINDOW_Y, NET_BOX_WIDTH, NET_BOX_HEIGHT);
@@ -2785,9 +2785,9 @@ void PopNetBox(char *text, int netPlayer)
                 inputText_c[inputLength_a] = NET_BOX_CURSOR_GLYPH;
             inputText_c[inputLength_a + 1] = 0;
             updateMessage_f.type = NET_BOX_UPDATE_MESSAGE;
-            updateMessage_f.field4 = NET_BOX_TEXT_COMMAND;
-            updateMessage_f.field8 = NET_BOX_INPUT_ID;
-            updateMessage_f.text = inputText_c;
+            updateMessage_f.payload.widget.command = NET_BOX_TEXT_COMMAND;
+            updateMessage_f.payload.widget.id = NET_BOX_INPUT_ID;
+            updateMessage_f.payload.widget.data.text = inputText_c;
             netWindow_j->BroadcastMessage(updateMessage_f);
             netWindow_j->DrawWindow();
             gpWindowManager->UpdateScreenRegion(0, NET_BOX_INPUT_Y, NET_BOX_WIDTH, NET_BOX_INPUT_HEIGHT);
@@ -3942,9 +3942,9 @@ void SetWinText(heroWindow *j, int id)
         if (gWinSetup[i].m_0 == id) {
             a++;
             c.type = 0x200;
-            c.field4 = 3;
-            c.field8 = gWinSetup[i].m_1;
-            c.text = gWinSetup[i].m_3;
+            c.payload.widget.command = 3;
+            c.payload.widget.id = gWinSetup[i].m_1;
+            c.payload.widget.data.text = gWinSetup[i].m_3;
             j->BroadcastMessage(c);
         }
     }
@@ -4134,32 +4134,32 @@ void NormalDialog(char *text, int dialogType, int windowX, int windowY,
         MemError();
 
     message.type = NORMAL_DIALOG_DISABLE_MESSAGE;
-    message.field4 = NORMAL_DIALOG_DISABLE_COMMAND;
-    message.text = reinterpret_cast<char *>(NORMAL_DIALOG_DISABLE_COMMAND);
+    message.payload.widget.command = NORMAL_DIALOG_DISABLE_COMMAND;
+    message.payload.widget.data.text = reinterpret_cast<char *>(NORMAL_DIALOG_DISABLE_COMMAND);
     if (dialogType != NORMAL_DIALOG_DISABLE_SEVENTH &&
         dialogType != NORMAL_DIALOG_DISABLE_EIGHTH) {
-        message.field8 = NORMAL_DIALOG_BUTTON_SEVEN;
+        message.payload.widget.id = NORMAL_DIALOG_BUTTON_SEVEN;
         pNormalDialogWindow->BroadcastMessage(message);
     }
     if (dialogType != NORMAL_DIALOG_DISABLE_SEVENTH) {
-        message.field8 = NORMAL_DIALOG_BUTTON_EIGHT;
+        message.payload.widget.id = NORMAL_DIALOG_BUTTON_EIGHT;
         pNormalDialogWindow->BroadcastMessage(message);
     }
     if (dialogType != NORMAL_DIALOG_WAIT_LAST &&
         dialogType != NORMAL_DIALOG_BUTTON_PAIR) {
-        message.field8 = NORMAL_DIALOG_BUTTON_ONE;
+        message.payload.widget.id = NORMAL_DIALOG_BUTTON_ONE;
         pNormalDialogWindow->BroadcastMessage(message);
     }
     if (dialogType != NORMAL_DIALOG_WAIT_FIRST &&
         dialogType != NORMAL_DIALOG_INFO &&
         dialogType != NORMAL_DIALOG_BUTTON_PAIR) {
-        message.field8 = NORMAL_DIALOG_BUTTON_TWO;
+        message.payload.widget.id = NORMAL_DIALOG_BUTTON_TWO;
         pNormalDialogWindow->BroadcastMessage(message);
     }
     if (dialogType != NORMAL_DIALOG_CONFIRM) {
-        message.field8 = NORMAL_DIALOG_BUTTON_FIVE;
+        message.payload.widget.id = NORMAL_DIALOG_BUTTON_FIVE;
         pNormalDialogWindow->BroadcastMessage(message);
-        message.field8 = NORMAL_DIALOG_BUTTON_SIX;
+        message.payload.widget.id = NORMAL_DIALOG_BUTTON_SIX;
         pNormalDialogWindow->BroadcastMessage(message);
     }
 
@@ -4461,9 +4461,9 @@ void NormalDialog(char *text, int dialogType, int windowX, int windowY,
     }
 
     message.type = NORMAL_DIALOG_DISABLE_MESSAGE;
-    message.field4 = NORMAL_DIALOG_SET_TEXT_COMMAND;
-    message.field8 = NORMAL_DIALOG_TEXT_WIDGET_ID;
-    message.text = text;
+    message.payload.widget.command = NORMAL_DIALOG_SET_TEXT_COMMAND;
+    message.payload.widget.id = NORMAL_DIALOG_TEXT_WIDGET_ID;
+    message.payload.widget.data.text = text;
     pNormalDialogWindow->BroadcastMessage(message);
 
     if (showOrText == NORMAL_DIALOG_SHOW_OR_TEXT) {
@@ -4511,9 +4511,9 @@ void UpdateNormalDialog(char *text)
     short show = 1;
     tag_message evt;
     evt.type = 0x200;
-    evt.field4 = 3;
-    evt.field8 = 1;
-    evt.text = text;
+    evt.payload.widget.command = 3;
+    evt.payload.widget.id = 1;
+    evt.payload.widget.data.text = text;
     pNormalDialogWindow->BroadcastMessage(evt);
     pNormalDialogWindow->DrawWindow(0, 0, 0x9000);
     pNormalDialogWindow->DrawWindow(1, -65535, -256);

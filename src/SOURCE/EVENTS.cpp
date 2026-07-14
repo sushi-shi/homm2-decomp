@@ -1206,9 +1206,9 @@ chestGold:
         gpTownManager->SetupThievesGuild(oracleWindow, ORACLE_THIEVES_GUILD_RANK);
         strcpy(gText, "Shrine - Player Rankings");
         oracleMessage.type = ORACLE_MESSAGE_TYPE;
-        oracleMessage.field4 = ORACLE_MESSAGE_COMMAND;
-        oracleMessage.field8 = 0;
-        oracleMessage.text = gText;
+        oracleMessage.payload.widget.command = ORACLE_MESSAGE_COMMAND;
+        oracleMessage.payload.widget.id = 0;
+        oracleMessage.payload.widget.data.text = gText;
         oracleWindow->BroadcastMessage(oracleMessage);
         gpWindowManager->DoDialog(oracleWindow, TrueFalseDialogHandler, 0);
         delete oracleWindow;

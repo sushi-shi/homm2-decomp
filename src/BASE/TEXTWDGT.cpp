@@ -104,19 +104,19 @@ int textWidget::Main(tag_message &msg)
     switch (msg.type) {
     case 8:
     case 0x20: {
-        short relativeX = static_cast<short>(msg.field4) -
+        short relativeX = static_cast<short>(msg.payload.mouse.x) -
                           static_cast<short>(m_owner->m_posX);
-        short relativeY = static_cast<short>(msg.field8) -
+        short relativeY = static_cast<short>(msg.payload.mouse.y) -
                           static_cast<short>(m_owner->m_posY);
         if (relativeX < m_x || relativeY < m_y ||
             relativeX >= m_x + m_width || relativeY >= m_y + m_height)
             return 0;
         m_flags = flags | 1;
         if (msg.type == 0x20)
-            msg.fieldC = 0x200;
+            msg.payload.widget.parameter = 0x200;
         msg.type = 0x200;
-        msg.field4 = 0xc;
-        msg.field8 = m_id;
+        msg.payload.widget.command = 0xc;
+        msg.payload.widget.id = m_id;
         return 2;
     }
 
@@ -125,20 +125,20 @@ int textWidget::Main(tag_message &msg)
         if ((flags & 1) != 0) {
             m_flags = flags & 0xfffe;
             if (msg.type == 0x40)
-                msg.fieldC = 0x200;
+                msg.payload.widget.parameter = 0x200;
             msg.type = 0x200;
-            msg.field4 = 0xd;
-            msg.field8 = m_id;
+            msg.payload.widget.command = 0xd;
+            msg.payload.widget.id = m_id;
             return 2;
         }
         return 0;
 
     case 0x200:
-        switch (msg.field4) {
+        switch (msg.payload.widget.command) {
         case 3: {
-            if (m_id != msg.field8)
+            if (m_id != msg.payload.widget.id)
                 goto normalEvent;
-            char *newText = msg.text;
+            char *newText = msg.payload.widget.data.text;
             if (field_0x14 != 0x200 && field_0x14 != 0x4000) {
                 m_text = newText;
                 return 1;
@@ -154,9 +154,9 @@ int textWidget::Main(tag_message &msg)
         }
 
         case 8:
-            if (m_id != msg.field8)
+            if (m_id != msg.payload.widget.id)
                 goto normalEvent;
-            m_color = msg.field18;
+            m_color = msg.payload.widget.data.value;
             return 1;
 
         default:

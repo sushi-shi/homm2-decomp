@@ -227,9 +227,9 @@ void HeroMessageUpdate(char *text) {
         return;
 
     message.type = HERO_UI_MESSAGE;
-    message.field4 = HERO_UI_WIDGET_TEXT;
-    message.field8 = HERO_UI_STATUS_TEXT_WIDGET;
-    message.text = text;
+    message.payload.widget.command = HERO_UI_WIDGET_TEXT;
+    message.payload.widget.id = HERO_UI_STATUS_TEXT_WIDGET;
+    message.payload.widget.data.text = text;
     gheroWin->BroadcastMessage(message);
     gheroWin->DrawWindow(0, 300, 303);
     gpWindowManager->UpdateScreenRegion(0, 459, 640, 20);
@@ -252,11 +252,11 @@ void hero::HeroScreenUpdate(void) {
     UpdateArmies();
     for (index = 0; index < HERO_UI_ARMY_SLOT_COUNT; index++) {
         if (index == giHeroScreenSrcIndex)
-            message.field4 = HERO_UI_WIDGET_ENABLE;
+            message.payload.widget.command = HERO_UI_WIDGET_ENABLE;
         else
-            message.field4 = HERO_UI_WIDGET_DISABLE;
-        message.field18 = HERO_UI_WIDGET_FRAME_ACTIVE;
-        message.field8 = index + HERO_UI_ARMY_SELECTOR_FIRST;
+            message.payload.widget.command = HERO_UI_WIDGET_DISABLE;
+        message.payload.widget.data.value = HERO_UI_WIDGET_FRAME_ACTIVE;
+        message.payload.widget.id = index + HERO_UI_ARMY_SELECTOR_FIRST;
         heroWin->BroadcastMessage(message);
     }
     heroWin->DrawWindow();
@@ -271,43 +271,43 @@ void hero::UpdateArmies(void) {
     message.type = HERO_UI_MESSAGE;
     for (index = 0; index < HERO_UI_ARMY_SLOT_COUNT; index++) {
         if (m_army.m_creatureTypes[index] == ARMY_GROUP_EMPTY_SLOT) {
-            message.field4 = HERO_UI_WIDGET_FRAME;
-            message.field8 = index + HERO_UI_ARMY_ICON_FIRST;
-            message.field18 = HERO_UI_ARMY_EMPTY_FRAME;
+            message.payload.widget.command = HERO_UI_WIDGET_FRAME;
+            message.payload.widget.id = index + HERO_UI_ARMY_ICON_FIRST;
+            message.payload.widget.data.value = HERO_UI_ARMY_EMPTY_FRAME;
             heroWin->BroadcastMessage(message);
 
-            message.field4 = HERO_UI_WIDGET_DISABLE;
-            message.field8 = index + HERO_UI_ARMY_PORTRAIT_FIRST;
-            message.field18 = HERO_UI_WIDGET_FRAME_ACTIVE;
+            message.payload.widget.command = HERO_UI_WIDGET_DISABLE;
+            message.payload.widget.id = index + HERO_UI_ARMY_PORTRAIT_FIRST;
+            message.payload.widget.data.value = HERO_UI_WIDGET_FRAME_ACTIVE;
             heroWin->BroadcastMessage(message);
-            message.field8 = index + HERO_UI_ARMY_COUNT_FIRST;
+            message.payload.widget.id = index + HERO_UI_ARMY_COUNT_FIRST;
             heroWin->BroadcastMessage(message);
-            message.field8 = index + HERO_UI_ARMY_SELECTOR_FIRST;
+            message.payload.widget.id = index + HERO_UI_ARMY_SELECTOR_FIRST;
             heroWin->BroadcastMessage(message);
         } else {
-            message.field4 = HERO_UI_WIDGET_FRAME;
-            message.field8 = index + HERO_UI_ARMY_ICON_FIRST;
-            message.field18 = gMonsterDatabase[m_army.m_creatureTypes[index]].race + 4;
+            message.payload.widget.command = HERO_UI_WIDGET_FRAME;
+            message.payload.widget.id = index + HERO_UI_ARMY_ICON_FIRST;
+            message.payload.widget.data.value = gMonsterDatabase[m_army.m_creatureTypes[index]].race + 4;
             heroWin->BroadcastMessage(message);
 
-            message.field4 = HERO_UI_WIDGET_ICON_FILE;
+            message.payload.widget.command = HERO_UI_WIDGET_ICON_FILE;
             sprintf(gText, "monh%04d.icn", m_army.m_creatureTypes[index]);
-            message.field8 = index + HERO_UI_ARMY_PORTRAIT_FIRST;
-            message.text = gText;
+            message.payload.widget.id = index + HERO_UI_ARMY_PORTRAIT_FIRST;
+            message.payload.widget.data.text = gText;
             heroWin->BroadcastMessage(message);
 
-            message.field4 = HERO_UI_WIDGET_ENABLE;
-            message.field18 = HERO_UI_WIDGET_FRAME_ACTIVE;
+            message.payload.widget.command = HERO_UI_WIDGET_ENABLE;
+            message.payload.widget.data.value = HERO_UI_WIDGET_FRAME_ACTIVE;
             heroWin->BroadcastMessage(message);
 
             sprintf(gText, "%d", m_army.m_creatureCounts[index]);
-            message.field4 = HERO_UI_WIDGET_TEXT;
-            message.field8 = index + HERO_UI_ARMY_COUNT_FIRST;
-            message.text = gText;
+            message.payload.widget.command = HERO_UI_WIDGET_TEXT;
+            message.payload.widget.id = index + HERO_UI_ARMY_COUNT_FIRST;
+            message.payload.widget.data.text = gText;
             heroWin->BroadcastMessage(message);
 
-            message.field4 = HERO_UI_WIDGET_ENABLE;
-            message.field18 = HERO_UI_WIDGET_FRAME_ACTIVE;
+            message.payload.widget.command = HERO_UI_WIDGET_ENABLE;
+            message.payload.widget.data.value = HERO_UI_WIDGET_FRAME_ACTIVE;
             heroWin->BroadcastMessage(message);
         }
     }

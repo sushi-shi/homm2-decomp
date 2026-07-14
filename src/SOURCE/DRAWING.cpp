@@ -124,12 +124,12 @@ void combatManager::CombatMessage(char *message, int updateScreen, int retainPre
     }
 
     windowMessage.type = COMBAT_MESSAGE_BROADCAST_EVENT;
-    windowMessage.field4 = COMBAT_MESSAGE_TEXT_ACTION;
-    windowMessage.field8 = COMBAT_MESSAGE_WIDGET_FIRST;
-    windowMessage.text = m_previousCombatMessage;
+    windowMessage.payload.widget.command = COMBAT_MESSAGE_TEXT_ACTION;
+    windowMessage.payload.widget.id = COMBAT_MESSAGE_WIDGET_FIRST;
+    windowMessage.payload.widget.data.text = m_previousCombatMessage;
     m_combatWindow->BroadcastMessage(windowMessage);
-    windowMessage.field8 = COMBAT_MESSAGE_WIDGET_SECOND;
-    windowMessage.text = m_currentCombatMessage;
+    windowMessage.payload.widget.id = COMBAT_MESSAGE_WIDGET_SECOND;
+    windowMessage.payload.widget.data.text = m_currentCombatMessage;
     m_combatWindow->BroadcastMessage(windowMessage);
 
     savedComputeExtent = gbComputeExtent;

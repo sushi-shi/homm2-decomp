@@ -204,15 +204,15 @@ int heroWindowManager::ConvertToHover(struct tag_message &msg)
 }
 
 // @early-stop
-// /O2 scheduling wall: both spans are 0x35; the sole residual moves the vtable load across the message.field18 store (retail load/store, base store/load), with identical stack fields and slot-2 virtual call.
+// /O2 scheduling wall: both spans are 0x35; the sole residual moves the vtable load across the message.payload.widget.data.value store (retail load/store, base store/load), with identical stack fields and slot-2 virtual call.
 VA(0x004cac40, 0x35)
 int heroWindowManager::BroadcastMessage(int type, int p2, int p3, int p4)
 {
     tag_message msg;
     msg.type = type;
-    msg.field4 = p2;
-    msg.field8 = p3;
-    msg.text = reinterpret_cast<char *>(p4);
+    msg.payload.widget.command = p2;
+    msg.payload.widget.id = p3;
+    msg.payload.widget.data.text = reinterpret_cast<char *>(p4);
     return Main(msg);
 }
 
@@ -297,7 +297,7 @@ void heroWindowManager::RemoveWindow(class heroWindow *w)
 }
 
 // @early-stop
-// /O2 scheduling + synthetic-reloc wall: both spans are 0x1cf; residual code is one message.field8 load moved across mov ebp,1. The two gFadeSavedUpdate relocs name the same DATA(0x0053496c) address; all dialog calls/control flow match.
+// /O2 scheduling + synthetic-reloc wall: both spans are 0x1cf; residual code is one message.payload.widget.id load moved across mov ebp,1. The two gFadeSavedUpdate relocs name the same DATA(0x0053496c) address; all dialog calls/control flow match.
 VA(0x004cadd0, 0x1cf)
 int heroWindowManager::DoDialog(class heroWindow *window, int (*handler)(struct tag_message &),
                                 int fade)
@@ -349,14 +349,14 @@ int heroWindowManager::DoDialog(class heroWindow *window, int (*handler)(struct 
         gpMouseManager->Main(message);
         if (window != 0 && (message.type != 4 || gbSendMouseMoveMessages != 0)) {
             result = window->BroadcastMessage(message);
-            if (result == 2 && message.type == 0x200 && message.field4 == 10) {
-                int dialogResult = message.field8;
+            if (result == 2 && message.type == 0x200 && message.payload.widget.command == 10) {
+                int dialogResult = message.payload.widget.id;
                 done = 1;
                 m_dialogResult = dialogResult;
             }
         }
         result = handler(message);
-        if (result == 2 && message.type == 0x200 && message.field4 == 10)
+        if (result == 2 && message.type == 0x200 && message.payload.widget.command == 10)
             done = 1;
     } while (done == 0);
     if (window != 0)

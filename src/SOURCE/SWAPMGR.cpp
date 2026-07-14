@@ -73,64 +73,64 @@ int swapManager::Open(int id)
 
     tag_message message;
     message.type = SWAP_MESSAGE_WIDGET;
-    message.field4 = SWAP_MESSAGE_SET_PORTRAIT;
+    message.payload.widget.command = SWAP_MESSAGE_SET_PORTRAIT;
     sprintf(gText, "port%04d.icn", m_heroes[SWAP_SIDE_LEFT]->m_portrait);
-    message.field8 = SWAP_LEFT_PORTRAIT_WIDGET;
-    message.text = gText;
+    message.payload.widget.id = SWAP_LEFT_PORTRAIT_WIDGET;
+    message.payload.widget.data.text = gText;
     m_window->BroadcastMessage(message);
 
     sprintf(gText, "port%04d.icn", m_heroes[SWAP_SIDE_RIGHT]->m_portrait);
-    message.field8 = SWAP_RIGHT_PORTRAIT_WIDGET;
+    message.payload.widget.id = SWAP_RIGHT_PORTRAIT_WIDGET;
     m_window->BroadcastMessage(message);
 
-    message.field4 = SWAP_MESSAGE_SET_TEXT;
+    message.payload.widget.command = SWAP_MESSAGE_SET_TEXT;
     sprintf(gText, "%s meets %s", m_heroes[SWAP_SIDE_LEFT]->m_name,
             m_heroes[SWAP_SIDE_RIGHT]->m_name);
-    message.text = gText;
-    message.field8 = SWAP_TITLE_WIDGET;
+    message.payload.widget.data.text = gText;
+    message.payload.widget.id = SWAP_TITLE_WIDGET;
     m_window->BroadcastMessage(message);
 
     for (int side_6 = SWAP_SIDE_LEFT; side_6 < SWAP_SIDE_COUNT; ++side_6) {
         for (int skillSlot = 0; skillSlot < SWAP_SECONDARY_SKILL_WIDGET_COUNT;
              ++skillSlot) {
             if (skillSlot < m_heroes[side_6]->m_secondarySkillCount) {
-                message.field4 = SWAP_MESSAGE_SET_ICON;
-                message.field8 = side_6 * SWAP_SECONDARY_SKILL_WIDGET_COUNT +
+                message.payload.widget.command = SWAP_MESSAGE_SET_ICON;
+                message.payload.widget.id = side_6 * SWAP_SECONDARY_SKILL_WIDGET_COUNT +
                                  skillSlot + SWAP_CONTROL_LEFT_SKILL_FIRST;
-                message.field18 = m_heroes[side_6]->GetNthSS(skillSlot);
+                message.payload.widget.data.value = m_heroes[side_6]->GetNthSS(skillSlot);
                 m_window->BroadcastMessage(message);
 
-                message.field4 = SWAP_MESSAGE_SET_TEXT;
-                message.field8 = side_6 * SWAP_SECONDARY_SKILL_WIDGET_COUNT +
+                message.payload.widget.command = SWAP_MESSAGE_SET_TEXT;
+                message.payload.widget.id = side_6 * SWAP_SECONDARY_SKILL_WIDGET_COUNT +
                                  skillSlot + SWAP_CONTROL_LEFT_SKILL_LEVEL_FIRST;
-                message.text = gText;
+                message.payload.widget.data.text = gText;
                 sprintf(gText, "%d", m_heroes[side_6]->GetSSLevel(
                                          m_heroes[side_6]->GetNthSS(skillSlot)));
                 m_window->BroadcastMessage(message);
             } else {
-                message.field4 = SWAP_MESSAGE_DISABLE;
-                message.field8 = side_6 * SWAP_SECONDARY_SKILL_WIDGET_COUNT +
+                message.payload.widget.command = SWAP_MESSAGE_DISABLE;
+                message.payload.widget.id = side_6 * SWAP_SECONDARY_SKILL_WIDGET_COUNT +
                                  skillSlot + SWAP_CONTROL_LEFT_SKILL_FIRST;
-                message.field18 = SWAP_EMPTY_SKILL_VALUE;
+                message.payload.widget.data.value = SWAP_EMPTY_SKILL_VALUE;
                 m_window->BroadcastMessage(message);
             }
         }
     }
 
     message.type = SWAP_MESSAGE_WIDGET;
-    message.field4 = SWAP_MESSAGE_DISABLE;
-    message.field18 = SWAP_ADVENTURE_DISABLE_VALUE;
-    message.field8 = SWAP_ADVENTURE_WIDGET_FIRST;
+    message.payload.widget.command = SWAP_MESSAGE_DISABLE;
+    message.payload.widget.data.value = SWAP_ADVENTURE_DISABLE_VALUE;
+    message.payload.widget.id = SWAP_ADVENTURE_WIDGET_FIRST;
     gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.field8 = SWAP_ADVENTURE_WIDGET_FIRST + 1;
+    message.payload.widget.id = SWAP_ADVENTURE_WIDGET_FIRST + 1;
     gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.field8 = SWAP_ADVENTURE_WIDGET_FIRST + 2;
+    message.payload.widget.id = SWAP_ADVENTURE_WIDGET_FIRST + 2;
     gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.field8 = SWAP_ADVENTURE_WIDGET_FIRST + 3;
+    message.payload.widget.id = SWAP_ADVENTURE_WIDGET_FIRST + 3;
     gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.field8 = SWAP_ADVENTURE_WIDGET_FIRST + 4;
+    message.payload.widget.id = SWAP_ADVENTURE_WIDGET_FIRST + 4;
     gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.field8 = SWAP_ADVENTURE_WIDGET_LAST;
+    message.payload.widget.id = SWAP_ADVENTURE_WIDGET_LAST;
     gpAdvManager->m_adventureWindow->BroadcastMessage(message);
 
     Update();
@@ -158,19 +158,19 @@ void swapManager::Close(void)
 
     tag_message message;
     message.type = SWAP_MESSAGE_WIDGET;
-    message.field4 = SWAP_MESSAGE_ENABLE;
-    message.field18 = SWAP_ADVENTURE_DISABLE_VALUE;
-    message.field8 = SWAP_ADVENTURE_WIDGET_FIRST;
+    message.payload.widget.command = SWAP_MESSAGE_ENABLE;
+    message.payload.widget.data.value = SWAP_ADVENTURE_DISABLE_VALUE;
+    message.payload.widget.id = SWAP_ADVENTURE_WIDGET_FIRST;
     gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.field8 = SWAP_ADVENTURE_WIDGET_FIRST + 1;
+    message.payload.widget.id = SWAP_ADVENTURE_WIDGET_FIRST + 1;
     gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.field8 = SWAP_ADVENTURE_WIDGET_FIRST + 2;
+    message.payload.widget.id = SWAP_ADVENTURE_WIDGET_FIRST + 2;
     gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.field8 = SWAP_ADVENTURE_WIDGET_FIRST + 3;
+    message.payload.widget.id = SWAP_ADVENTURE_WIDGET_FIRST + 3;
     gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.field8 = SWAP_ADVENTURE_WIDGET_FIRST + 4;
+    message.payload.widget.id = SWAP_ADVENTURE_WIDGET_FIRST + 4;
     gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.field8 = SWAP_ADVENTURE_WIDGET_LAST;
+    message.payload.widget.id = SWAP_ADVENTURE_WIDGET_LAST;
     gpAdvManager->m_adventureWindow->BroadcastMessage(message);
 }
 
@@ -253,7 +253,7 @@ VA(0x00454be3, 0xaf0)
 int swapManager::Main(tag_message &message)
 {
     int closeRequested_5 = 0;
-    int quickView = (message.fieldC & SWAP_QUICK_VIEW_MODIFIER) != 0;
+    int quickView = (message.payload.widget.parameter & SWAP_QUICK_VIEW_MODIFIER) != 0;
     int side;
     int slotIndex_8;
     int artifactSlot_2;
@@ -270,18 +270,18 @@ int swapManager::Main(tag_message &message)
         break;
 
     case SWAP_MESSAGE_WIDGET:
-        switch (message.field4) {
+        switch (message.payload.widget.command) {
         case SWAP_COMMAND_SELECT:
             if (quickView) {
             } else {
-                if (message.field8 == SWAP_CONTROL_CLOSE)
+                if (message.payload.widget.id == SWAP_CONTROL_CLOSE)
                     closeRequested_5 = 1;
             }
             break;
 
         case SWAP_COMMAND_HOVER:
         case SWAP_COMMAND_HELP:
-            switch (message.field8) {
+            switch (message.payload.widget.id) {
             case SWAP_CONTROL_LEFT_SKILL_FIRST:
             case SWAP_CONTROL_LEFT_SKILL_FIRST + 1:
             case SWAP_CONTROL_LEFT_SKILL_FIRST + 2:
@@ -291,7 +291,7 @@ int swapManager::Main(tag_message &message)
             case SWAP_CONTROL_LEFT_SKILL_FIRST + 6:
             case SWAP_CONTROL_LEFT_SKILL_LAST:
                 side = SWAP_SIDE_LEFT;
-                slotIndex_8 = message.field8 - SWAP_CONTROL_LEFT_SKILL_FIRST;
+                slotIndex_8 = message.payload.widget.id - SWAP_CONTROL_LEFT_SKILL_FIRST;
                 goto showSecondarySkill;
 
             case SWAP_CONTROL_LEFT_SKILL_LEVEL_FIRST:
@@ -303,7 +303,7 @@ int swapManager::Main(tag_message &message)
             case SWAP_CONTROL_LEFT_SKILL_LEVEL_FIRST + 6:
             case SWAP_CONTROL_LEFT_SKILL_LEVEL_LAST:
                 side = SWAP_SIDE_LEFT;
-                slotIndex_8 = message.field8 - SWAP_CONTROL_LEFT_SKILL_LEVEL_FIRST;
+                slotIndex_8 = message.payload.widget.id - SWAP_CONTROL_LEFT_SKILL_LEVEL_FIRST;
                 goto showSecondarySkill;
 
             case SWAP_CONTROL_RIGHT_SKILL_FIRST:
@@ -315,7 +315,7 @@ int swapManager::Main(tag_message &message)
             case SWAP_CONTROL_RIGHT_SKILL_FIRST + 6:
             case SWAP_CONTROL_RIGHT_SKILL_LAST:
                 side = SWAP_SIDE_RIGHT;
-                slotIndex_8 = message.field8 - SWAP_CONTROL_RIGHT_SKILL_FIRST;
+                slotIndex_8 = message.payload.widget.id - SWAP_CONTROL_RIGHT_SKILL_FIRST;
                 goto showSecondarySkill;
 
             case SWAP_CONTROL_RIGHT_SKILL_LEVEL_FIRST:
@@ -327,7 +327,7 @@ int swapManager::Main(tag_message &message)
             case SWAP_CONTROL_RIGHT_SKILL_LEVEL_FIRST + 6:
             case SWAP_CONTROL_RIGHT_SKILL_LEVEL_LAST:
                 side = SWAP_SIDE_RIGHT;
-                slotIndex_8 = message.field8 - SWAP_CONTROL_RIGHT_SKILL_LEVEL_FIRST;
+                slotIndex_8 = message.payload.widget.id - SWAP_CONTROL_RIGHT_SKILL_LEVEL_FIRST;
             showSecondarySkill:
                 if (slotIndex_8 >= m_heroes[side]->m_secondarySkillCount) {
                 } else {
@@ -374,7 +374,7 @@ int swapManager::Main(tag_message &message)
             case SWAP_CONTROL_LEFT_ARTIFACT_FIRST + 11:
             case SWAP_CONTROL_LEFT_ARTIFACT_FIRST + 12:
             case SWAP_CONTROL_LEFT_ARTIFACT_LAST:
-                artifactSlot_2 = message.field8 - SWAP_CONTROL_LEFT_ARTIFACT_FIRST;
+                artifactSlot_2 = message.payload.widget.id - SWAP_CONTROL_LEFT_ARTIFACT_FIRST;
                 if (!quickView && m_heroes[SWAP_SIDE_LEFT]->m_artifacts[artifactSlot_2] ==
                                       SWAP_ARTIFACT_MAGIC_BOOK) {
                     NormalDialog("This item can't be traded.", NORMAL_DIALOG_INFO,
@@ -431,7 +431,7 @@ int swapManager::Main(tag_message &message)
             case SWAP_CONTROL_RIGHT_ARTIFACT_FIRST + 11:
             case SWAP_CONTROL_RIGHT_ARTIFACT_FIRST + 12:
             case SWAP_CONTROL_RIGHT_ARTIFACT_LAST:
-                artifactSlot_2 = message.field8 - SWAP_CONTROL_RIGHT_ARTIFACT_FIRST;
+                artifactSlot_2 = message.payload.widget.id - SWAP_CONTROL_RIGHT_ARTIFACT_FIRST;
                 if (!quickView && m_heroes[SWAP_SIDE_RIGHT]->m_artifacts[artifactSlot_2] ==
                                       SWAP_ARTIFACT_MAGIC_BOOK) {
                     NormalDialog("This item can't be traded.", NORMAL_DIALOG_INFO,
@@ -479,7 +479,7 @@ int swapManager::Main(tag_message &message)
             case SWAP_CONTROL_LEFT_ARMY_FIRST + 2:
             case SWAP_CONTROL_LEFT_ARMY_FIRST + 3:
             case SWAP_CONTROL_LEFT_ARMY_LAST:
-                slotIndex_8 = message.field8 - SWAP_CONTROL_LEFT_ARMY_FIRST;
+                slotIndex_8 = message.payload.widget.id - SWAP_CONTROL_LEFT_ARMY_FIRST;
                 if (quickView) {
                     if (m_heroes[SWAP_SIDE_LEFT]->m_army.m_creatureTypes[slotIndex_8] !=
                         SWAP_CREATURE_NONE)
@@ -507,7 +507,7 @@ int swapManager::Main(tag_message &message)
                         m_selectedSlot == m_targetSlot) {
                         ViewMon();
                         Reset();
-                    } else if ((message.fieldC & SWAP_SPLIT_MODIFIER_MASK) == 0 ||
+                    } else if ((message.payload.widget.parameter & SWAP_SPLIT_MODIFIER_MASK) == 0 ||
                                (m_heroes[m_targetSide]
                                         ->m_army.m_creatureTypes[m_targetSlot] !=
                                     SWAP_CREATURE_NONE &&
@@ -529,7 +529,7 @@ int swapManager::Main(tag_message &message)
             case SWAP_CONTROL_RIGHT_ARMY_FIRST + 2:
             case SWAP_CONTROL_RIGHT_ARMY_FIRST + 3:
             case SWAP_CONTROL_RIGHT_ARMY_LAST:
-                slotIndex_8 = message.field8 - SWAP_CONTROL_RIGHT_ARMY_FIRST;
+                slotIndex_8 = message.payload.widget.id - SWAP_CONTROL_RIGHT_ARMY_FIRST;
                 if (quickView) {
                     if (m_heroes[SWAP_SIDE_RIGHT]->m_army.m_creatureTypes[slotIndex_8] !=
                         SWAP_CREATURE_NONE)
@@ -557,7 +557,7 @@ int swapManager::Main(tag_message &message)
                         m_selectedSlot == m_targetSlot) {
                         ViewMon();
                         Reset();
-                    } else if ((message.fieldC & SWAP_SPLIT_MODIFIER_MASK) == 0 ||
+                    } else if ((message.payload.widget.parameter & SWAP_SPLIT_MODIFIER_MASK) == 0 ||
                                (m_heroes[m_targetSide]
                                         ->m_army.m_creatureTypes[m_targetSlot] !=
                                     SWAP_CREATURE_NONE &&
@@ -587,7 +587,7 @@ int swapManager::Main(tag_message &message)
 
     if (closeRequested_5) {
         message.type = SWAP_MESSAGE_EXIT;
-        message.field4 = SWAP_COMMAND_EXIT;
+        message.payload.widget.command = SWAP_COMMAND_EXIT;
         return SWAP_RESULT_CLOSE;
     }
     return SWAP_RESULT_CONTINUE;
@@ -636,11 +636,11 @@ void swapManager::SwapArtifacts(void)
             for (int skillSlot = 0;
                  skillSlot < SWAP_SECONDARY_SKILL_WIDGET_COUNT; ++skillSlot) {
                 if (skillSlot < m_heroes[side]->m_secondarySkillCount) {
-                    message_1.field4 = SWAP_MESSAGE_SET_TEXT;
-                    message_1.field8 =
+                    message_1.payload.widget.command = SWAP_MESSAGE_SET_TEXT;
+                    message_1.payload.widget.id =
                         side * SWAP_SECONDARY_SKILL_WIDGET_COUNT + skillSlot +
                         SWAP_CONTROL_LEFT_SKILL_LEVEL_FIRST;
-                    message_1.text = gText;
+                    message_1.payload.widget.data.text = gText;
                     sprintf(gText, "%d", m_heroes[side]->GetSSLevel(
                                                 m_heroes[side]->GetNthSS(skillSlot)));
                     m_window->BroadcastMessage(message_1);
@@ -694,116 +694,116 @@ void swapManager::Update(void)
     int slot;
     tag_message message_1;
     message_1.type = SWAP_MESSAGE_WIDGET;
-    message_1.field4 = SWAP_MESSAGE_SET_TEXT;
-    message_1.text = gText;
+    message_1.payload.widget.command = SWAP_MESSAGE_SET_TEXT;
+    message_1.payload.widget.data.text = gText;
 
     for (slot = 0; slot < SWAP_PRIMARY_SKILL_COUNT; ++slot) {
-        message_1.field8 = slot + SWAP_LEFT_PRIMARY_SKILL_FIRST;
+        message_1.payload.widget.id = slot + SWAP_LEFT_PRIMARY_SKILL_FIRST;
         sprintf(gText, "%d", m_heroes[SWAP_SIDE_LEFT]->Stats(slot));
         m_window->BroadcastMessage(message_1);
-        message_1.field8 = slot + SWAP_RIGHT_PRIMARY_SKILL_FIRST;
+        message_1.payload.widget.id = slot + SWAP_RIGHT_PRIMARY_SKILL_FIRST;
         sprintf(gText, "%d", m_heroes[SWAP_SIDE_RIGHT]->Stats(slot));
         m_window->BroadcastMessage(message_1);
     }
 
     for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
-        message_1.field8 = slot + SWAP_CONTROL_LEFT_ARMY_FIRST;
+        message_1.payload.widget.id = slot + SWAP_CONTROL_LEFT_ARMY_FIRST;
         if (m_heroes[SWAP_SIDE_LEFT]->m_army.m_creatureTypes[slot] ==
             SWAP_CREATURE_NONE) {
-            message_1.field4 = SWAP_MESSAGE_DISABLE;
-            message_1.field18 = SWAP_EMPTY_ITEM_VALUE;
+            message_1.payload.widget.command = SWAP_MESSAGE_DISABLE;
+            message_1.payload.widget.data.value = SWAP_EMPTY_ITEM_VALUE;
         } else {
-            message_1.field4 = SWAP_MESSAGE_ENABLE;
-            message_1.field18 = SWAP_EMPTY_ITEM_VALUE;
+            message_1.payload.widget.command = SWAP_MESSAGE_ENABLE;
+            message_1.payload.widget.data.value = SWAP_EMPTY_ITEM_VALUE;
             m_window->BroadcastMessage(message_1);
-            message_1.field4 = SWAP_MESSAGE_SET_ICON;
-            message_1.field18 =
+            message_1.payload.widget.command = SWAP_MESSAGE_SET_ICON;
+            message_1.payload.widget.data.value =
                 m_heroes[SWAP_SIDE_LEFT]->m_army.m_creatureTypes[slot];
         }
         m_window->BroadcastMessage(message_1);
     }
 
     for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
-        message_1.field8 = slot + SWAP_LEFT_ARMY_COUNT_FIRST;
+        message_1.payload.widget.id = slot + SWAP_LEFT_ARMY_COUNT_FIRST;
         if (m_heroes[SWAP_SIDE_LEFT]->m_army.m_creatureTypes[slot] ==
             SWAP_CREATURE_NONE) {
-            message_1.field4 = SWAP_MESSAGE_DISABLE;
-            message_1.field18 = SWAP_EMPTY_ITEM_VALUE;
+            message_1.payload.widget.command = SWAP_MESSAGE_DISABLE;
+            message_1.payload.widget.data.value = SWAP_EMPTY_ITEM_VALUE;
         } else {
-            message_1.field4 = SWAP_MESSAGE_ENABLE;
-            message_1.field18 = SWAP_EMPTY_ITEM_VALUE;
+            message_1.payload.widget.command = SWAP_MESSAGE_ENABLE;
+            message_1.payload.widget.data.value = SWAP_EMPTY_ITEM_VALUE;
             m_window->BroadcastMessage(message_1);
-            message_1.field4 = SWAP_MESSAGE_SET_TEXT;
+            message_1.payload.widget.command = SWAP_MESSAGE_SET_TEXT;
             sprintf(gText, "%d",
                     m_heroes[SWAP_SIDE_LEFT]->m_army.m_creatureCounts[slot]);
-            message_1.text = gText;
+            message_1.payload.widget.data.text = gText;
         }
         m_window->BroadcastMessage(message_1);
     }
 
     for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
-        message_1.field8 = slot + SWAP_CONTROL_RIGHT_ARMY_FIRST;
+        message_1.payload.widget.id = slot + SWAP_CONTROL_RIGHT_ARMY_FIRST;
         if (m_heroes[SWAP_SIDE_RIGHT]->m_army.m_creatureTypes[slot] ==
             SWAP_CREATURE_NONE) {
-            message_1.field4 = SWAP_MESSAGE_DISABLE;
-            message_1.field18 = SWAP_EMPTY_ITEM_VALUE;
+            message_1.payload.widget.command = SWAP_MESSAGE_DISABLE;
+            message_1.payload.widget.data.value = SWAP_EMPTY_ITEM_VALUE;
         } else {
-            message_1.field4 = SWAP_MESSAGE_ENABLE;
-            message_1.field18 = SWAP_EMPTY_ITEM_VALUE;
+            message_1.payload.widget.command = SWAP_MESSAGE_ENABLE;
+            message_1.payload.widget.data.value = SWAP_EMPTY_ITEM_VALUE;
             m_window->BroadcastMessage(message_1);
-            message_1.field4 = SWAP_MESSAGE_SET_ICON;
-            message_1.field18 =
+            message_1.payload.widget.command = SWAP_MESSAGE_SET_ICON;
+            message_1.payload.widget.data.value =
                 m_heroes[SWAP_SIDE_RIGHT]->m_army.m_creatureTypes[slot];
         }
         m_window->BroadcastMessage(message_1);
     }
 
     for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
-        message_1.field8 = slot + SWAP_RIGHT_ARMY_COUNT_FIRST;
+        message_1.payload.widget.id = slot + SWAP_RIGHT_ARMY_COUNT_FIRST;
         if (m_heroes[SWAP_SIDE_RIGHT]->m_army.m_creatureTypes[slot] ==
             SWAP_CREATURE_NONE) {
-            message_1.field4 = SWAP_MESSAGE_DISABLE;
-            message_1.field18 = SWAP_EMPTY_ITEM_VALUE;
+            message_1.payload.widget.command = SWAP_MESSAGE_DISABLE;
+            message_1.payload.widget.data.value = SWAP_EMPTY_ITEM_VALUE;
         } else {
-            message_1.field4 = SWAP_MESSAGE_ENABLE;
-            message_1.field18 = SWAP_EMPTY_ITEM_VALUE;
+            message_1.payload.widget.command = SWAP_MESSAGE_ENABLE;
+            message_1.payload.widget.data.value = SWAP_EMPTY_ITEM_VALUE;
             m_window->BroadcastMessage(message_1);
-            message_1.field4 = SWAP_MESSAGE_SET_TEXT;
+            message_1.payload.widget.command = SWAP_MESSAGE_SET_TEXT;
             sprintf(gText, "%d",
                     m_heroes[SWAP_SIDE_RIGHT]->m_army.m_creatureCounts[slot]);
-            message_1.text = gText;
+            message_1.payload.widget.data.text = gText;
         }
         m_window->BroadcastMessage(message_1);
     }
 
     for (slot = 0; slot < HERO_ARTIFACT_SLOT_COUNT; ++slot) {
-        message_1.field8 = slot + SWAP_CONTROL_LEFT_ARTIFACT_FIRST;
+        message_1.payload.widget.id = slot + SWAP_CONTROL_LEFT_ARTIFACT_FIRST;
         if (m_heroes[SWAP_SIDE_LEFT]->m_artifacts[slot] ==
             SWAP_ARTIFACT_NONE) {
-            message_1.field4 = SWAP_MESSAGE_DISABLE;
-            message_1.field18 = SWAP_EMPTY_ITEM_VALUE;
+            message_1.payload.widget.command = SWAP_MESSAGE_DISABLE;
+            message_1.payload.widget.data.value = SWAP_EMPTY_ITEM_VALUE;
         } else {
-            message_1.field4 = SWAP_MESSAGE_ENABLE;
-            message_1.field18 = SWAP_EMPTY_ITEM_VALUE;
+            message_1.payload.widget.command = SWAP_MESSAGE_ENABLE;
+            message_1.payload.widget.data.value = SWAP_EMPTY_ITEM_VALUE;
             m_window->BroadcastMessage(message_1);
-            message_1.field4 = SWAP_MESSAGE_SET_ICON;
-            message_1.field18 = m_heroes[SWAP_SIDE_LEFT]->m_artifacts[slot];
+            message_1.payload.widget.command = SWAP_MESSAGE_SET_ICON;
+            message_1.payload.widget.data.value = m_heroes[SWAP_SIDE_LEFT]->m_artifacts[slot];
         }
         m_window->BroadcastMessage(message_1);
     }
 
     for (slot = 0; slot < HERO_ARTIFACT_SLOT_COUNT; ++slot) {
-        message_1.field8 = slot + SWAP_CONTROL_RIGHT_ARTIFACT_FIRST;
+        message_1.payload.widget.id = slot + SWAP_CONTROL_RIGHT_ARTIFACT_FIRST;
         if (m_heroes[SWAP_SIDE_RIGHT]->m_artifacts[slot] ==
             SWAP_ARTIFACT_NONE) {
-            message_1.field4 = SWAP_MESSAGE_DISABLE;
-            message_1.field18 = SWAP_EMPTY_ITEM_VALUE;
+            message_1.payload.widget.command = SWAP_MESSAGE_DISABLE;
+            message_1.payload.widget.data.value = SWAP_EMPTY_ITEM_VALUE;
         } else {
-            message_1.field4 = SWAP_MESSAGE_ENABLE;
-            message_1.field18 = SWAP_EMPTY_ITEM_VALUE;
+            message_1.payload.widget.command = SWAP_MESSAGE_ENABLE;
+            message_1.payload.widget.data.value = SWAP_EMPTY_ITEM_VALUE;
             m_window->BroadcastMessage(message_1);
-            message_1.field4 = SWAP_MESSAGE_SET_ICON;
-            message_1.field18 = m_heroes[SWAP_SIDE_RIGHT]->m_artifacts[slot];
+            message_1.payload.widget.command = SWAP_MESSAGE_SET_ICON;
+            message_1.payload.widget.data.value = m_heroes[SWAP_SIDE_RIGHT]->m_artifacts[slot];
         }
         m_window->BroadcastMessage(message_1);
     }
@@ -839,13 +839,13 @@ void swapManager::SplitMons(void)
                 m_heroes[m_selectedSide]->m_name,
                 m_heroes[m_targetSide]->m_name);
     }
-    message.field4 = SWAP_MESSAGE_SET_TEXT;
-    message.field8 = SWAP_SPLIT_TEXT_CONTROL;
-    message.text = gText;
+    message.payload.widget.command = SWAP_MESSAGE_SET_TEXT;
+    message.payload.widget.id = SWAP_SPLIT_TEXT_CONTROL;
+    message.payload.widget.data.text = gText;
     gpTownManager->m_heroWindow1->BroadcastMessage(message);
     sprintf(gText, "%d", gpTownManager->m_splitAmount);
-    message.field8 = SWAP_SPLIT_AMOUNT_CONTROL;
-    message.text = gText;
+    message.payload.widget.id = SWAP_SPLIT_AMOUNT_CONTROL;
+    message.payload.widget.data.text = gText;
     gpTownManager->m_heroWindow1->BroadcastMessage(message);
     gpWindowManager->DoDialog(gpTownManager->m_heroWindow1, SplitArmyHandler,
                               0);

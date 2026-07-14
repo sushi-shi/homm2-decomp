@@ -180,11 +180,11 @@ int CombatSpecialHandler(tag_message &message)
 {
     if (message.type == SPELL_MESSAGE_HOVER) {
         gpWindowManager->ConvertToHover(message);
-        if (gpWindowManager->field_0x5e == message.field8)
+        if (gpWindowManager->field_0x5e == message.payload.hover.id)
             return SPELL_HANDLER_CONTINUE;
-        gpWindowManager->field_0x5e = message.field8;
+        gpWindowManager->field_0x5e = message.payload.hover.id;
 
-        switch (message.field8) {
+        switch (message.payload.hover.id) {
         case SPELL_CONTROL_PREVIOUS_PAGE:
             gpCombatManager->CombatMessage(cSpellHelp[SPELL_HELP_PREVIOUS_PAGE],
                                            1, 0, 0);
@@ -228,7 +228,7 @@ int HandleCastSpell(tag_message &message)
 
     switch (message.type) {
     case SPELL_MESSAGE_HOVER:
-        hex = gpCombatManager->GetGridIndex(message.field4, message.field8);
+        hex = gpCombatManager->GetGridIndex(message.payload.mouse.x, message.payload.mouse.y);
         if (indexToCastOn != hex) {
             if (!gpCombatManager->ValidSpellTarget(
                     gpCombatManager->m_selectedSpell, hex)) {
@@ -260,8 +260,8 @@ int HandleCastSpell(tag_message &message)
                     bInTeleportGetDest = 1;
                     indexToCastOn = SPELL_NO_SELECTION;
                     message.type = SPELL_MESSAGE_HOVER;
-                    message.field4 = message.field10;
-                    message.field8 = message.field14;
+                    message.payload.mouse.x = message.payload.mouse.screenX;
+                    message.payload.mouse.y = message.payload.mouse.screenY;
                     HandleCastSpell(message);
                     gpCombatManager->CombatMessage(
                         "Select teleport destination.", 1, 0, 0);
@@ -272,13 +272,13 @@ int HandleCastSpell(tag_message &message)
             }
             bInTeleportGetDest = 0;
             message.type = SPELL_MESSAGE_DIALOG;
-            message.field4 = SPELL_COMMAND_CLOSE;
+            message.payload.widget.command = SPELL_COMMAND_CLOSE;
             return SPELL_HANDLER_CLOSE;
         }
         break;
 
     case SPELL_MESSAGE_MOUSE_DOWN:
-        if (message.field4 == SPELL_COMMAND_CANCEL)
+        if (message.payload.keyboard.keyCode == SPELL_COMMAND_CANCEL)
             goto cancel_spell;
         break;
 
@@ -287,7 +287,7 @@ cancel_spell:
         gpCombatManager->m_selectedSpell = SPELL_NO_SELECTION;
         giNextAction = 0;
         message.type = SPELL_MESSAGE_DIALOG;
-        message.field4 = SPELL_COMMAND_CLOSE;
+        message.payload.widget.command = SPELL_COMMAND_CLOSE;
         bInTeleportGetDest = 0;
         return SPELL_HANDLER_CLOSE;
     }
