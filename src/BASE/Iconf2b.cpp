@@ -157,6 +157,22 @@ DATA(0x00534c60) static int gFlipSkip;
 // SIZE declarations neutral changes the live result to 82.77% and 83/81 relocations, proving that
 // this closure is TU-state-local and triggering a new macro-head structural/relocation audit. The
 // setup allocation residual remains unresolved, not a wall.
+// The 71462a5 macro-neutral audit closes that trigger structurally. With SIZE erased under MSVC,
+// the unchanged body emits 0x4fe bytes at 82.76923% and 83/81 relocations. Both excess occurrences
+// are gFlipY: candidate clipped-fill +0x1b2/+0x1bf/+0x1c4 loads Y/clipB/Y versus retail
+// +0x1a2/+0x1b4 loads Y/clipB, and clipped-dim +0x2e7/+0x2f6/+0x2fb repeats the same allocation
+// versus retail +0x2ca/+0x2de. All other 17 scratch owners and uDimPal agree occurrence-for-
+// occurrence, and there is no base-only target. The explicit per-arm currentY snapshots are already
+// the retail semantic lifetime: retail keeps each Y value in ECX while loading clipB into EAX;
+// macro-neutral VC4.2 instead loads Y into EAX, overwrites it with clipB, and reloads Y into ECX.
+// Candidate and retail still have the same 0x8 frame, the same two local homes, 76 basic blocks,
+// 59 branches, and an identical ordered successor graph for every command arm and backedge.
+// `register` on both snapshots and retail-facing comparison operand spelling emit byte-identical
+// candidate text. Conversely, the same body under the former SIZE-typedef compiler state emitted
+// the proved 81/81 f24566c object. Thus the new two-occurrence residual is compiler-state/register
+// allocation, not missing CFG, ownership, type, or relocation structure. Do not restore fake SIZE
+// typedefs or tune fuzzy here; revisit after a real header/TU-state change. See the macro-head rows
+// in iconf2b-cfg-f24566c.tsv. This remains a coverage checkpoint, not a byte-proven wall.
 VA(0x004d1ba0, 0x4f1)
 void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                       int clip, int clipX, int clipY, int clipW, int clipH, int color)
