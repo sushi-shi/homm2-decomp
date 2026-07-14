@@ -80,10 +80,10 @@ hashes while the source and header state agree. The regex permuter was never use
 
 ## BASE/iconf2by manual reconstruction
 
-`iconf2by-manual.tsv` contains 135 full-SHA manual source states spanning the 84.29% through
+`iconf2by-manual.tsv` contains 136 full-SHA manual source states spanning the 84.29% through
 93.72654% reconstruction. Each row records the source hash, source-shape label, match, candidate
 size/frame, relocation counts, and disposition. Its SHA-256 is
-`857cfa8abba9d0ffbb2965593109c22627737282f3b2e8fbb0170ab0a6aa05cb`.
+`f787d7905c05b7a28435c8bd9e6296f2075c7c4579f4cd744874c57330fdac5d`.
 
 The current source is restored to
 `f33ab84fe5e3b9205e40ae09de314bced82063fe587bddee30646c73d44bfea0`. The first normalized
@@ -106,6 +106,13 @@ The integrated-root `76a78cc` pointer audit added four states. Top-level `volati
 changes the CodeView-proven pointer symbol, while function-wide and setup-only reference aliases
 remove the frame residue and four required relocations. These reject the hypothesis that retail's
 formal reload pattern comes from cv qualification or reference storage.
+
+The fresh `9c7eb18` lifetime audit added source SHA-256
+`2e6bb567c731745d39b20dba1c5c70bc013c6d21899e9a4ba0cc373c7d8b1162`. Initializing the
+long-lived clip width through the optimizer escape hatch `clipW | 0` is byte-identical to the
+canonical state: 93.72654%, candidate `0x58c`, four-byte frame, and exact 144/144 relocations. It
+does not transfer clip width into EBP, release shear into ESI, or remove the fill-count spill, so
+that identity spelling must not be retried while the canonical TU/header state agrees.
 
 ## BASE/Textntry fresh lifetime and semantic-name pass
 

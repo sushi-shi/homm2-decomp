@@ -711,12 +711,22 @@ The retail reload pattern is therefore not evidence for pointer cv-qualification
 alias. Those shapes remove the retail four-byte allocator residue and four required scratch
 relocations instead of transferring the pointer from EBP to ESI.
 
-The full no-repeat set now contains 135 source-hash-distinct states. This combined-state batch
+The full no-repeat set now contains 136 source-hash-distinct states. This combined-state batch
 confirms that the retained declaration surface and scratch order are stable: the isolated
 lifetime/type spellings are either byte-neutral, while retail-order edge publication still leaves
 the same EBP shear allocation, or they regress code size/relocations. Do not combine these axes
 again unless an independently retained predecessor or shared-header change produces a new
 canonical TU state.
+
+Fresh clip-width lifetime audit after integrated root `9c7eb18`:
+
+- initialize the long-lived clip-width alias as `clipW | 0`: source SHA-256
+  `2e6bb567c731745d39b20dba1c5c70bc013c6d21899e9a4ba0cc373c7d8b1162`, byte-identical at
+  93.72654%, size `0x58c`, frame four, and exact 144/144 relocations. The optimizer still keeps
+  shear in EBP, reloads the formal width later, and spills the branch-local fill count; reverted.
+
+The authoritative matrix now has SHA-256
+`f787d7905c05b7a28435c8bd9e6296f2075c7c4579f4cd744874c57330fdac5d`.
 
 The retained order is not a random permutation: it declares the decoder scratches in first-use
 order, with `gFYClipR` last as in the adjacent sibling's declaration surface. It closes the sole
