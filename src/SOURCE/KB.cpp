@@ -8,6 +8,7 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/town.h>
 #include <SOURCE/townManager.h>
+#include <SOURCE/ARMY.h>
 #include <BASE/executive.h>
 #include <BASE/mouseManager.h>
 #include <SOURCE/game.h>
@@ -4664,7 +4665,38 @@ DATA(0x004fc7f0) int giTerrainCost[10][4][2];
 DATA(0x004fc930) unsigned char bStopOnTrigger[128];
 DATA(0x004fc9b0) char *gTownPrefixNames[6];
 DATA(0x004fc9c8) char *gTownObjNames[32];
-DATA(0x004fca48) signed char gDwellingType[20][12];
+DATA(0x004fca48) signed char gDwellingType[TOWN_TYPE_COUNT][12] = {
+    { ARMY_CREATURE_PEASANT, ARMY_CREATURE_ARCHER, ARMY_CREATURE_PIKEMAN,
+      ARMY_CREATURE_SWORDSMAN, ARMY_CREATURE_CAVALRY,
+      ARMY_CREATURE_PALADIN, ARMY_CREATURE_RANGER,
+      ARMY_CREATURE_VETERAN_PIKEMAN, ARMY_CREATURE_MASTER_SWORDSMAN,
+      ARMY_CREATURE_CHAMPION, ARMY_CREATURE_CRUSADER, ARMY_GROUP_EMPTY_SLOT },
+    { ARMY_CREATURE_GOBLIN, ARMY_CREATURE_ORC, ARMY_CREATURE_WOLF,
+      ARMY_CREATURE_OGRE, ARMY_CREATURE_TROLL, ARMY_CREATURE_CYCLOPS,
+      ARMY_CREATURE_ORC_CHIEF, ARMY_GROUP_EMPTY_SLOT, ARMY_CREATURE_OGRE_LORD,
+      ARMY_CREATURE_WAR_TROLL, ARMY_GROUP_EMPTY_SLOT, ARMY_GROUP_EMPTY_SLOT },
+    { ARMY_CREATURE_SPRITE, ARMY_CREATURE_DWARF, ARMY_CREATURE_ELF,
+      ARMY_CREATURE_DRUID, ARMY_CREATURE_UNICORN, ARMY_CREATURE_PHOENIX,
+      ARMY_CREATURE_BATTLE_DWARF, ARMY_CREATURE_GRAND_ELF,
+      ARMY_CREATURE_GREATER_DRUID, ARMY_GROUP_EMPTY_SLOT,
+      ARMY_GROUP_EMPTY_SLOT, ARMY_GROUP_EMPTY_SLOT },
+    { ARMY_CREATURE_CENTAUR, ARMY_CREATURE_GARGOYLE, ARMY_CREATURE_GRIFFIN,
+      ARMY_CREATURE_MINOTAUR, ARMY_CREATURE_HYDRA,
+      ARMY_CREATURE_GREEN_DRAGON, ARMY_GROUP_EMPTY_SLOT,
+      ARMY_GROUP_EMPTY_SLOT, ARMY_CREATURE_MINOTAUR_KING,
+      ARMY_GROUP_EMPTY_SLOT, ARMY_CREATURE_RED_DRAGON,
+      ARMY_CREATURE_BLACK_DRAGON },
+    { ARMY_CREATURE_HALFLING, ARMY_CREATURE_BOAR, ARMY_CREATURE_IRON_GOLEM,
+      ARMY_CREATURE_ROC, ARMY_CREATURE_MAGE, ARMY_CREATURE_GIANT,
+      ARMY_GROUP_EMPTY_SLOT, ARMY_CREATURE_STEEL_GOLEM,
+      ARMY_GROUP_EMPTY_SLOT, ARMY_CREATURE_ARCHMAGE, ARMY_CREATURE_TITAN,
+      ARMY_GROUP_EMPTY_SLOT },
+    { ARMY_CREATURE_SKELETON, ARMY_CREATURE_ZOMBIE, ARMY_CREATURE_MUMMY,
+      ARMY_CREATURE_VAMPIRE, ARMY_CREATURE_LICH, ARMY_CREATURE_BONE_DRAGON,
+      ARMY_CREATURE_MUTANT_ZOMBIE, ARMY_CREATURE_ROYAL_MUMMY,
+      ARMY_CREATURE_VAMPIRE_LORD, ARMY_CREATURE_POWER_LICH,
+      ARMY_GROUP_EMPTY_SLOT, ARMY_GROUP_EMPTY_SLOT }
+};
 DATA(0x004fca90) int gMageBuildingCosts[6][7];
 DATA(0x004fcb38) int gSpecialBuildingCosts[6][7];
 DATA(0x004fcbe0) int gNeutralBuildingCosts[16][7];
@@ -4756,7 +4788,36 @@ DATA(0x004ff268) char *cCombatMessage[12];
 DATA(0x004ff298) char *cHeroLevel[4];
 DATA(0x004ff2a8) char *cCombatHelp[6];
 DATA(0x004ff2c0) char *cLongCombatHelp[6];
-DATA(0x004ff2d8) char *cTownCommand[28];
+DATA(0x004ff2d8) char *cTownCommand[28] = {
+    "Redistribute %s army",
+    "Cannot combine hero's last army",
+    "Combine %s armies",
+    "Redistribute %s army",
+    "View %s",
+    "Cannot move last army to garrison.",
+    "Move %s",
+    "Exchange %s with %s",
+    "Exit town",
+    "",
+    "Kingdom Overview",
+    "Empty",
+    "Select %s",
+    "View Hero",
+    "Mage Guild",
+    "Thieves' Guild",
+    "Tavern",
+    "Dock",
+    "Well",
+    "Tent",
+    "Castle",
+    "Recruit %s",
+    "Statue",
+    "Left Turret",
+    "Right Turret",
+    "Moat",
+    "Marketplace",
+    "Captain's Quarters"
+};
 DATA(0x004ff348) char *gHeroDefaultNames[54];
 DATA(0x004ff420) char *gNewGameHelp[8];
 DATA(0x004ff440) char *gSetupBaudHelp[6];

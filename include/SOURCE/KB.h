@@ -801,7 +801,7 @@ extern configStruct gConfig;
 extern int gDwellingBaseResourceValues[][12];
 extern int gDwellingCosts[][12][7];
 extern char *gDwellingNames[][12];
-extern signed char gDwellingType[20][12];
+extern signed char gDwellingType[][12];
 extern int gGameCommand;
 extern int gHeroGoldCost;
 extern unsigned long gHierarchyMask[][12];

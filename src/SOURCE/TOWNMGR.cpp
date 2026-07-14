@@ -899,19 +899,294 @@ void townManager::SetupTown(void)
 }
 
 VA(0x00414cc9, 0x1cf)
-void townManager::UnloadTown(void) {}
+void townManager::UnloadTown(void)
+{
+    int index_i;
+
+    if (m_bankBox != 0)
+        delete m_bankBox;
+    m_bankBox = 0;
+    if (m_heroStrip != 0)
+        delete m_heroStrip;
+    m_heroStrip = 0;
+    if (m_garrisonStrip != 0)
+        delete m_garrisonStrip;
+    m_garrisonStrip = 0;
+    for (index_i = 0; index_i < m_townObjectCount; ++index_i) {
+        m_townWindow->RemoveWidget(m_townObjects[index_i]->m_border);
+        delete m_townObjects[index_i];
+        m_townObjects[index_i] = 0;
+    }
+    if (m_backgroundIcon != 0) {
+        gpResourceManager->Dispose(m_backgroundIcon);
+        m_backgroundIcon = 0;
+    }
+}
 
 VA(0x00414e98, 0xca)
-void townManager::Close(void) {}
+void townManager::Close(void)
+{
+    UnloadTown();
+    if (m_townWindow != 0) {
+        gpWindowManager->RemoveWindow(m_townWindow);
+        delete m_townWindow;
+    }
+    m_townWindow = 0;
+    if (gSoundTransition != 0 || gCdMusic == 0)
+        gpSoundManager->SwitchAmbientMusic(TOWN_MUSIC_STOP);
+    gpWindowManager->FadeScreen(TOWN_FADE_OUT, TOWN_FADE_STEPS, 0);
+    gpMouseManager->SetPointer(TOWN_POINTER_DEFAULT);
+    m_active = 0;
+    m_town->m_buildings &= TOWN_CLOSE_DYNAMIC_CLEAR_MASK;
+}
 
+// @early-stop
+// Soft TU-cumulative operand-order wall: the 0x0c frame, slots, CFG, and 24/24
+// relocations agree. After relocation masking, only +0xfd/+0x10c/+0x119/+0x128
+// differ: retail loads swap strip/slot before pending strip/slot for the
+// commutative creature-type equality, while this TU state emits the reverse.
+// Reversing operands and the commutative-subscript spelling did not steer it.
 VA(0x00414f62, 0x3b9)
-void townManager::SetArmyCommand(int) {}
+void townManager::SetArmyCommand(int qualifier)
+{
+    int cantMoveLastArmy;
+    int sameType;
 
+    m_command = TOWN_WIDGET_ID_NONE;
+    cantMoveLastArmy = 0;
+    if (m_swapStrip->m_army->GetNumArmies() == 1 &&
+        &m_swapStrip[0] == m_heroStrip && m_pendingStrip != m_swapStrip)
+        cantMoveLastArmy = 1;
+
+    if (m_pendingStrip == m_swapStrip &&
+        m_swapArmySlot == m_pendingArmySlot) {
+        sprintf(m_statusText, cTownCommand[TOWN_TEXT_VIEW_ARMY],
+                gArmyNames[
+                    m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot]]);
+        m_command = TOWN_ARMY_COMMAND_VIEW;
+    } else {
+        sameType = 0;
+        if (m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot] ==
+            m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot])
+            sameType = 1;
+        if (sameType) {
+            if (qualifier != 0) {
+                sprintf(m_statusText,
+                        cTownCommand[TOWN_TEXT_REDISTRIBUTE_ARMY],
+                        gArmyNames[m_swapStrip->m_army
+                                       ->m_creatureTypes[m_swapArmySlot]]);
+                m_command = TOWN_ARMY_COMMAND_SPLIT;
+            } else if (cantMoveLastArmy) {
+                strcpy(m_statusText,
+                       cTownCommand[TOWN_TEXT_CANNOT_COMBINE_LAST_ARMY]);
+                return;
+            } else {
+                sprintf(m_statusText,
+                        cTownCommand[TOWN_TEXT_COMBINE_ARMIES],
+                        gArmyNames[m_swapStrip->m_army
+                                       ->m_creatureTypes[m_swapArmySlot]]);
+                m_command = TOWN_ARMY_COMMAND_MERGE;
+            }
+        } else if (qualifier != 0 &&
+                   m_pendingStrip->m_army
+                           ->m_creatureTypes[m_pendingArmySlot] ==
+                       ARMY_GROUP_EMPTY_SLOT) {
+            sprintf(m_statusText,
+                    cTownCommand[TOWN_TEXT_REDISTRIBUTE_TO_EMPTY_SLOT],
+                    gArmyNames[m_swapStrip->m_army
+                                   ->m_creatureTypes[m_swapArmySlot]]);
+            m_command = TOWN_ARMY_COMMAND_SPLIT;
+        }
+    }
+
+    if (m_command != TOWN_WIDGET_ID_NONE)
+        return;
+    if (m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot] ==
+        ARMY_GROUP_EMPTY_SLOT) {
+        if (cantMoveLastArmy) {
+            strcpy(m_statusText,
+                   cTownCommand[TOWN_TEXT_CANNOT_MOVE_LAST_ARMY]);
+            return;
+        } else {
+            sprintf(m_statusText, cTownCommand[TOWN_TEXT_MOVE_ARMY],
+                    gArmyNames[m_swapStrip->m_army
+                                   ->m_creatureTypes[m_swapArmySlot]]);
+            m_command = TOWN_ARMY_COMMAND_SWAP;
+        }
+    } else {
+        sprintf(
+            m_statusText, cTownCommand[TOWN_TEXT_EXCHANGE_ARMIES],
+            gArmyNames[m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot]],
+            gArmyNames[m_pendingStrip->m_army
+                           ->m_creatureTypes[m_pendingArmySlot]]);
+        m_command = TOWN_ARMY_COMMAND_SWAP;
+    }
+}
+
+// @early-stop
+// Permanent delinker-label artifact: all 0x5c5 relocation-masked bytes match.
+// Manual llvm-objdump audit finds 73/73 relocations: 55 external plus 18 local
+// jump-table entries. Retail absolute operands prove cTownCommand indices
+// 8, 9, and 11 through 27, plus gWellExtraNames, gSpecialBuildingNames, and
+// gDwellingType-19; the helper
+// truncates at the delinked local jump-table symbol and reports only 2 base.
 VA(0x0041531b, 0x5c5)
-void townManager::SetCommandAndText(struct tag_message &) {}
+void townManager::SetCommandAndText(struct tag_message &message)
+{
+    int objectId = message.payload.widget.id;
+
+    m_command = TOWN_WIDGET_ID_NONE;
+    switch (objectId) {
+    case TOWN_CONTROL_CLOSE:
+        strcpy(m_statusText, cTownCommand[TOWN_TEXT_EXIT]);
+        break;
+    case TOWN_WIDGET_ID_NONE:
+    case TOWN_EMPTY_STATUS_CONTROL_FIRST:
+    case TOWN_EMPTY_STATUS_CONTROL_LAST:
+        strcpy(m_statusText, cTownCommand[TOWN_TEXT_EMPTY_STATUS]);
+        break;
+    case TOWN_GARRISON_SLOT_FIRST:
+    case TOWN_GARRISON_SLOT_FIRST + 1:
+    case TOWN_GARRISON_SLOT_FIRST + 2:
+    case TOWN_GARRISON_SLOT_FIRST + 3:
+    case TOWN_GARRISON_SLOT_LAST:
+        if (m_swapArmySlot != TOWN_ARMY_SLOT_NONE) {
+            m_pendingStrip = m_garrisonStrip;
+            m_pendingArmySlot = objectId - TOWN_GARRISON_SLOT_FIRST;
+            SetArmyCommand(message.payload.widget.parameter &
+                           TOWN_ARMY_QUALIFIER_MASK);
+        } else {
+            m_selectedStrip = m_garrisonStrip;
+            m_selectedArmySlot = objectId - TOWN_GARRISON_SLOT_FIRST;
+            if (m_selectedStrip->m_army
+                    ->m_creatureTypes[m_selectedArmySlot] ==
+                ARMY_GROUP_EMPTY_SLOT) {
+                strcpy(m_statusText, cTownCommand[TOWN_TEXT_EMPTY_SLOT]);
+            } else {
+                sprintf(m_statusText, cTownCommand[TOWN_TEXT_SELECT_ARMY],
+                        gArmyNames[m_selectedStrip->m_army
+                                       ->m_creatureTypes[m_selectedArmySlot]]);
+                m_command = TOWN_ARMY_COMMAND_SELECT;
+            }
+        }
+        break;
+    case TOWN_HERO_FIRST_CONTROL:
+        strcpy(m_statusText, cTownCommand[TOWN_TEXT_VIEW_HERO]);
+        m_command = TOWN_ARMY_COMMAND_VIEW_HERO;
+        break;
+    case TOWN_HERO_SLOT_FIRST:
+    case TOWN_HERO_SLOT_FIRST + 1:
+    case TOWN_HERO_SLOT_FIRST + 2:
+    case TOWN_HERO_SLOT_FIRST + 3:
+    case TOWN_HERO_SLOT_LAST:
+        if (m_swapArmySlot != TOWN_ARMY_SLOT_NONE) {
+            m_pendingStrip = m_heroStrip;
+            m_pendingArmySlot = objectId - TOWN_HERO_SLOT_FIRST;
+            SetArmyCommand(message.payload.widget.parameter &
+                           TOWN_ARMY_QUALIFIER_MASK);
+        } else {
+            m_selectedStrip = m_heroStrip;
+            m_selectedArmySlot = objectId - TOWN_HERO_SLOT_FIRST;
+            if (m_selectedStrip->m_army == 0 ||
+                m_selectedStrip->m_army
+                        ->m_creatureTypes[m_selectedArmySlot] ==
+                    ARMY_GROUP_EMPTY_SLOT) {
+                strcpy(m_statusText, cTownCommand[TOWN_TEXT_EMPTY_SLOT]);
+                m_command = TOWN_WIDGET_ID_NONE;
+            } else {
+                sprintf(m_statusText, cTownCommand[TOWN_TEXT_SELECT_ARMY],
+                        gArmyNames[m_selectedStrip->m_army
+                                       ->m_creatureTypes[m_selectedArmySlot]]);
+                m_command = TOWN_ARMY_COMMAND_SELECT;
+            }
+        }
+        break;
+    case TOWN_OBJECT_MAGE_GUILD:
+        strcpy(m_statusText, cTownCommand[TOWN_TEXT_MAGE_GUILD]);
+        break;
+    case TOWN_OBJECT_THIEVES_GUILD:
+        strcpy(m_statusText, cTownCommand[TOWN_TEXT_THIEVES_GUILD]);
+        break;
+    case TOWN_OBJECT_TAVERN:
+        if (m_town->m_type == TOWN_TYPE_NECROMANCER)
+            strcpy(m_statusText, xNecromancerShrine);
+        else
+            strcpy(m_statusText, cTownCommand[TOWN_TEXT_TAVERN]);
+        break;
+    case TOWN_OBJECT_DOCK:
+    case TOWN_OBJECT_BOAT:
+        strcpy(m_statusText, cTownCommand[TOWN_TEXT_DOCK]);
+        break;
+    case TOWN_OBJECT_WELL:
+        strcpy(m_statusText, cTownCommand[TOWN_TEXT_WELL]);
+        break;
+    case TOWN_OBJECT_TENT:
+        strcpy(m_statusText, cTownCommand[TOWN_TEXT_TENT]);
+        break;
+    case TOWN_OBJECT_CASTLE:
+        strcpy(m_statusText, cTownCommand[TOWN_TEXT_CASTLE]);
+        break;
+    case TOWN_OBJECT_STATUE:
+        strcpy(m_statusText, cTownCommand[TOWN_TEXT_STATUE]);
+        break;
+    case TOWN_OBJECT_LEFT_TURRET:
+        strcpy(m_statusText, cTownCommand[TOWN_TEXT_LEFT_TURRET]);
+        break;
+    case TOWN_OBJECT_RIGHT_TURRET:
+        strcpy(m_statusText, cTownCommand[TOWN_TEXT_RIGHT_TURRET]);
+        break;
+    case TOWN_OBJECT_MOAT:
+        strcpy(m_statusText, cTownCommand[TOWN_TEXT_MOAT]);
+        break;
+    case TOWN_OBJECT_MARKETPLACE:
+        strcpy(m_statusText, cTownCommand[TOWN_TEXT_MARKETPLACE]);
+        break;
+    case TOWN_OBJECT_CAPTAIN_QUARTERS:
+        strcpy(m_statusText, cTownCommand[TOWN_TEXT_CAPTAIN_QUARTERS]);
+        break;
+    case TOWN_OBJECT_SPECIAL_BUILDING:
+        strcpy(m_statusText, gSpecialBuildingNames[m_town->m_type]);
+        break;
+    case TOWN_OBJECT_SECOND_WELL:
+        strcpy(m_statusText, gWellExtraNames[m_town->m_type]);
+        break;
+    case TOWN_OBJECT_DWELLING_1:
+    case TOWN_OBJECT_DWELLING_2:
+    case TOWN_OBJECT_DWELLING_3:
+    case TOWN_OBJECT_DWELLING_4:
+    case TOWN_OBJECT_DWELLING_5:
+    case TOWN_OBJECT_DWELLING_6:
+    case TOWN_OBJECT_UPGRADED_DWELLING_2:
+    case TOWN_OBJECT_UPGRADED_DWELLING_3:
+    case TOWN_OBJECT_UPGRADED_DWELLING_4:
+    case TOWN_OBJECT_UPGRADED_DWELLING_5:
+    case TOWN_OBJECT_UPGRADED_DWELLING_6:
+    case TOWN_OBJECT_ALTERNATE_UPGRADED_DWELLING_6:
+        sprintf(
+            m_statusText, cTownCommand[TOWN_TEXT_RECRUIT],
+            gArmyNames[gDwellingType[m_town->m_type]
+                                    [objectId - TOWN_OBJECT_DWELLING_1]]);
+        break;
+    }
+    ShowText(m_statusText);
+}
 
 VA(0x004158e0, 0x7d)
-void townManager::ShowText(char *) {}
+void townManager::ShowText(char *)
+{
+    tag_message message;
+
+    message.type = TOWN_MESSAGE_SELECT;
+    message.payload.widget.command = TOWN_WIDGET_SET_TEXT;
+    message.payload.widget.id = TOWN_CONTROL_STATUS_TEXT;
+    message.payload.widget.data.text = m_statusText;
+    m_townWindow->BroadcastMessage(message);
+    m_townWindow->DrawWindow(TOWN_STATUS_DRAW_LEFT, TOWN_STATUS_DRAW_WIDTH,
+                             TOWN_STATUS_DRAW_RIGHT);
+    gpWindowManager->UpdateScreenRegion(
+        TOWN_STATUS_REGION_X, TOWN_STATUS_REGION_Y, TOWN_STATUS_REGION_WIDTH,
+        TOWN_STATUS_REGION_HEIGHT);
+}
 
 VA(0x0041595d, 0x1830)
 int townManager::Main(tag_message &message)
