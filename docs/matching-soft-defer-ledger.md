@@ -221,6 +221,58 @@ Record each new source-hash-distinct shape with its match, size, frame, and relo
 not retry the families above while the canonical source hash agrees. If a shared icon/header edit
 is retained, retest the deferred icon2bc, Icon2b, and Iconf2b functions as well.
 
+## BASE/iconf2by: FlipIconToBitmapYModify
+
+Status: active. This is an integrated progress checkpoint, not a wall or soft defer. The same lane
+must continue this function before taking unrelated work.
+
+Canonical source state:
+
+- checkpoint: `8bd4149`
+- target: RVA `0xd9ce0`, retail size `0x58d`
+- `src/BASE/iconf2by.cpp`:
+  `2493675ecd4e4c3fbd4ea184fc98cefce9c66d84745bda53c701820a72907240`
+- live checkpoint: 85.7239%, candidate size `0x559`, 142 candidate vs 144 retail relocations,
+  no candidate-only target
+- the decoder aligns instruction-for-instruction through extended-run setup, apart from retail's
+  four-byte frame displacement
+
+### Corrections retained at the canonical checkpoint
+
+- removed the invalid generic `@early-stop` and its unproved `/O2` wall claim;
+- recovered the explicit short/extended run-length branches and override run/color order;
+- recovered the fill, dim, and literal quadrant polarity and body order;
+- restored the dim destination join and publication order;
+- restored literal source advancement/store order and right-clipped source publication before
+  destination publication;
+- introduced the real clip-width lifetime used by the clipped literal path.
+
+The remaining scratch relocation counts are `gFYX` 23/25, `gFYDimLen` 14/16, `gFYSkip` 5/4,
+and `gFYClipR` 8/7; every other scratch/global relocation count agrees. Retail also reserves four
+stack bytes, pins the clip-width lifetime in EBP, reloads `shear`, and emits longer split fill, dim,
+and literal schedules. These are concrete steering facts, not an accepted wall.
+
+### Searches already exhausted
+
+The superseded pre-reconstruction wall had tried signed/unsigned scratch lengths, local/global
+flags, pitch, clip-width and advance forms, split/repeated clipping expressions, 124 historical AST
+variants over eight rounds, 80 additional walks, and 60 text-shape variants. It also tested ordinary
+overlap semantics for the fill/dim outer gates; that changed both compare sequences and fell to
+73.58%. Those permutations were run far below the present 96-97% structural gate and must not be
+repeated.
+
+The clean reconstruction pass audited and rejected command and fill locals, function- and
+branch-scope pointer locals, clip-edge publication order, signed/unsigned width and advance types,
+combined clip predicates, explicit literal-failure joins, shared skip publication, loop comparison
+polarity, setup-alias removal, and declaration/lifetime variations. Losing forms were reverted; the
+retained forms are the canonical checkpoint above. Neither permutation tool was used.
+
+Continue from the first post-dispatch structural divergence and the four named scratch-count
+differences. Record each new source-hash-distinct shape with its match, size, frame, and relocation
+result. Do not retry the families above while the canonical source hash agrees. If a shared
+icon/header edit is retained, retest the deferred icon2bc, Icon2b, and Iconf2b functions and the
+active iconf2bc function.
+
 ## BASE/Icon2b: IconToBitmap
 
 Status: clean soft defer pending a shared icon/header or compiler-state change. It is not an
