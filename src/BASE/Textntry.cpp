@@ -20,12 +20,12 @@
 VA(0x004d8740, 0x2d)
 textEntryWidget::textEntryWidget(void) : textWidget()
 {
-    field_0x31 = 0;
+    m_cursorPosition = 0;
     m_icon = 0;
     field_0x14 = 0x4000;
     m_maxLength = 0;
-    field_0x2f = 0;
-    field_0x4b = 0;
+    m_iconFrame = 0;
+    m_displayOffset = 0;
 }
 
 // Unresolved compiler folding artifact: keeping the standalone destructor exact makes VC4.2 emit a
@@ -40,27 +40,27 @@ textEntryWidget::textEntryWidget(void) : textWidget()
 // before the three constant flag stores, while VC4.2 delays that one store here.
 VA(0x004d87b0, 0x134)
 textEntryWidget::textEntryWidget(short p1, short p2, short p3, short p4, short p5, char *p6,
-                                 char *p7, short p8, char *p9, short p10, short p11, short p12,
+                                 char *p7, short p8, char *p9, short iconFrame, short p11, short p12,
                                  short p13, int p14, int p15)
     : textWidget(p1, p2, p3, p4, p6, p7, p8, p11, p12, 1)
 {
-    field_0x31 = 0;
+    m_cursorPosition = 0;
     m_maxLength = p5;
     icon *loadedIcon;
     loadedIcon = gpResourceManager->GetIcon(p9);
     short rectX;
     rectX = m_x;
-    field_0x4b = 0;
+    m_displayOffset = 0;
     m_icon = loadedIcon;
-    field_0x2f = p10;
+    m_iconFrame = iconFrame;
     m_rectX = rectX;
     field_0x14 = 0x4000;
     m_rectY = m_y;
     m_rectW = m_width;
     m_maxLength = p5;
-    m_color = 1;
     field_0x45 = 1;
     m_hasInset = 0;
+    m_color = 1;
     m_rectH = m_height;
 #line 61 "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp"
     m_text = static_cast<char *>(
@@ -106,7 +106,7 @@ void textEntryWidget::Read(int type)
     gpResourceManager->SavePosition();
     m_icon = gpResourceManager->GetIcon(name);
     gpResourceManager->RestorePosition();
-    field_0x49 = static_cast<short>(type);
+    m_entryType = static_cast<short>(type);
     if (type == 2) {
         m_rectX = gpResourceManager->ReadWord();
         m_rectY = gpResourceManager->ReadWord();
@@ -145,7 +145,7 @@ void textEntryWidget::Read(int type)
         m_innerW = m_width;
         m_innerH = m_height;
     }
-    field_0x2f = gpResourceManager->ReadWord();
+    m_iconFrame = gpResourceManager->ReadWord();
     m_id = gpResourceManager->ReadWord();
     gpResourceManager->ReadWord();
     field_0x14 = 0x4000;
@@ -194,13 +194,13 @@ int textEntryWidget::Main(struct tag_message &message)
                 mouseY = m_y + windowY;
                 strcpy(original, m_text);
                 if ((m_hasInset & 1) != 0) {
-                    field_0x31 = static_cast<unsigned short>(strlen(m_text));
+                    m_cursorPosition = static_cast<unsigned short>(strlen(m_text));
                 } else {
-                    field_0x31 = 0;
+                    m_cursorPosition = 0;
                     m_text[0] = 0;
                 }
                 strcpy(edit, m_text);
-                SetupDisplayString(edit, field_0x31);
+                SetupDisplayString(edit, m_cursorPosition);
                 Draw();
                 gpWindowManager->UpdateScreenRegion(mouseX, mouseY, m_width, m_height);
                 short done = 0;
@@ -209,7 +209,7 @@ int textEntryWidget::Main(struct tag_message &message)
                 tag_message event;
                 do {
                     if (KBTickCount() > glTimers[0]) {
-                        SetupDisplayString(edit, field_0x31);
+                        SetupDisplayString(edit, m_cursorPosition);
                         Draw();
                         gpWindowManager->UpdateScreenRegion(mouseX, mouseY, m_width, m_height);
                     }
@@ -225,20 +225,20 @@ int textEntryWidget::Main(struct tag_message &message)
                             }
                             break;
                         case 0x4b:
-                            if (field_0x31 != 0) {
-                                field_0x31--;
-                                if (field_0x31 < field_0x4b)
-                                    field_0x4b = field_0x31;
+                            if (m_cursorPosition != 0) {
+                                m_cursorPosition--;
+                                if (m_cursorPosition < m_displayOffset)
+                                    m_displayOffset = m_cursorPosition;
                             }
                             break;
                         case 0x4d:
-                            if (field_0x31 < strlen(edit))
-                                field_0x31++;
+                            if (m_cursorPosition < strlen(edit))
+                                m_cursorPosition++;
                             break;
                         case 0x53:
-                            if (field_0x31 < strlen(edit)) {
-                                strcpy(scratch, edit + field_0x31 + 1);
-                                strcpy(edit + field_0x31, scratch);
+                            if (m_cursorPosition < strlen(edit)) {
+                                strcpy(scratch, edit + m_cursorPosition + 1);
+                                strcpy(edit + m_cursorPosition, scratch);
                             }
                             break;
                         default:
@@ -247,12 +247,12 @@ int textEntryWidget::Main(struct tag_message &message)
                                 gbTextEntryEscaped = 0;
                                 done++;
                             } else if (event.field4 == 0x7f) {
-                                if (field_0x31 != 0) {
-                                    strcpy(scratch, edit + field_0x31);
-                                    strcpy(edit + field_0x31 - 1, scratch);
-                                    field_0x31--;
-                                    if (field_0x31 < field_0x4b)
-                                        field_0x4b = field_0x31;
+                                if (m_cursorPosition != 0) {
+                                    strcpy(scratch, edit + m_cursorPosition);
+                                    strcpy(edit + m_cursorPosition - 1, scratch);
+                                    m_cursorPosition--;
+                                    if (m_cursorPosition < m_displayOffset)
+                                        m_displayOffset = m_cursorPosition;
                                 }
                             } else if (strlen(edit) + 1 < m_maxLength && event.field4 != 0) {
                                 strcpy(backup, edit);
@@ -282,32 +282,32 @@ int textEntryWidget::Main(struct tag_message &message)
 #line 389
                                     m_text = static_cast<char *>(BaseAlloc(strlen(edit) + 6, __FILE__, __LINE__));
                                     strcpy(scratch, edit);
-                                    scratch[field_0x31] = typed;
-                                    scratch[field_0x31 + 1] = 0;
-                                    strcat(scratch, edit + field_0x31);
+                                    scratch[m_cursorPosition] = typed;
+                                    scratch[m_cursorPosition + 1] = 0;
+                                    strcat(scratch, edit + m_cursorPosition);
                                     strcpy(edit, scratch);
-                                    field_0x31++;
-                                    SetupDisplayString(edit, field_0x31);
-                                    if (field_0x49 != 3) {
+                                    m_cursorPosition++;
+                                    SetupDisplayString(edit, m_cursorPosition);
+                                    if (m_entryType != 3) {
                                         int lineLength = m_font->LineLength(m_text, m_innerW);
                                         if (field_0x45 >= lineLength) {
                                         } else {
                                             strcpy(edit, backup);
-                                            field_0x31--;
+                                            m_cursorPosition--;
                                         }
                                     }
                                 }
                             }
                             break;
                         }
-                        SetupDisplayString(edit, field_0x31);
+                        SetupDisplayString(edit, m_cursorPosition);
                         Draw();
                         gpWindowManager->UpdateScreenRegion(mouseX, mouseY, m_width, m_height);
                     }
                 } while (done == 0);
                 gpMouseManager->ReallyShowPointer();
                 strcpy(m_text, edit);
-                field_0x4b = 0;
+                m_displayOffset = 0;
                 Draw();
                 gpWindowManager->UpdateScreenRegion(mouseX, mouseY, m_width, m_height);
                 message.field4 = 0xc;
@@ -350,9 +350,9 @@ int textEntryWidget::Main(struct tag_message &message)
 VA(0x004d9410, 0x160)
 void textEntryWidget::Draw(void)
 {
-    if (field_0x49 == 3) {
+    if (m_entryType == 3) {
         char display[600];
-        strcpy(display, m_text + field_0x4b);
+        strcpy(display, m_text + m_displayOffset);
         unsigned int length = strlen(display);
         if (m_font->LineWidth(display) > m_innerW) {
             do {
@@ -361,13 +361,13 @@ void textEntryWidget::Draw(void)
             } while (m_font->LineWidth(display) > m_innerW);
         }
         m_icon->DrawToBuffer(m_rectX + m_owner->m_posX, m_rectY + m_owner->m_posY,
-                             field_0x2f, 0);
+                             m_iconFrame, 0);
         m_font->DrawBoundedString(display, m_innerX + m_owner->m_posX,
                                   m_innerY + m_owner->m_posY, m_innerW, m_innerH,
                                   m_color, field_0x2a);
     } else {
         m_icon->DrawToBuffer(m_rectX + m_owner->m_posX, m_rectY + m_owner->m_posY,
-                             field_0x2f, 0);
+                             m_iconFrame, 0);
         int color = 3;
         if ((m_flags & 8) == 0)
             color = m_color;
@@ -377,10 +377,6 @@ void textEntryWidget::Draw(void)
     }
 }
 
-// Active /O2 TU-cumulative register-allocation residual: base/retail are both 0x1be with
-// the 0x130 frame, calls, loop CFG, and all 8/8 relocation targets aligned. VC4.2 assigns
-// this/cursor to ebx/ebp rather than retail ebp/ebx; the streams otherwise agree,
-// including the redundant clear in the dead second-loop tail.
 VA(0x004d9570, 0x1be)
 void textEntryWidget::SetupDisplayString(char *source, unsigned short cursor)
 {
@@ -399,31 +395,31 @@ void textEntryWidget::SetupDisplayString(char *source, unsigned short cursor)
     else
         m_text[cursor + 1] = 0;
 
-    if (field_0x49 == 3) {
-        int shifted, fits;
+    if (m_entryType == 3) {
+        int shifted;
         char display[300];
         do {
             shifted = 0;
-            strcpy(display, m_text + field_0x4b);
+            strcpy(display, m_text + m_displayOffset);
             if (m_font->LineWidth(display) > m_innerW) {
-                display[cursor - field_0x4b + 1] = 0;
+                display[cursor - m_displayOffset + 1] = 0;
                 if (m_font->LineWidth(display) > m_innerW) {
                     shifted = 1;
-                    field_0x4b++;
+                    m_displayOffset++;
                 }
             }
         } while (shifted);
-        if (field_0x4b > 0) {
+        if (m_displayOffset > 0) {
             do {
-                fits = 0;
-                strcpy(display, m_text + field_0x4b - 1);
+                shifted = 0;
+                strcpy(display, m_text + m_displayOffset - 1);
                 if (m_font->LineWidth(display) <= m_innerW)
-                    field_0x4b--;
+                    m_displayOffset--;
                 else
-                    fits = 0;
-                if (field_0x4b == 0)
-                    fits = 0;
-            } while (fits != 0);
+                    shifted = 0;
+                if (m_displayOffset == 0)
+                    shifted = 0;
+            } while (shifted != 0);
         }
     }
 }

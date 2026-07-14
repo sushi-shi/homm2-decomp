@@ -87,3 +87,21 @@ register divergence is in the prologue: candidate `+0x5c` loads `shear` into EBP
 loads it into ESI and then loads `clipW` into EBP at `+0x60`. The later missing `gFYClipR` reload is
 downstream of that lifetime choice. CodeView has no local `S_BPREL` records for this TU, so the
 matrix—not guessed local names—is the no-repeat oracle. No permutation tool was used.
+
+## BASE/Textntry fresh lifetime and semantic-name pass
+
+`textntry-fresh-lifetimes-97c1152.tsv` records the independent pass from checkpoint `97c1152`.
+It did not use either permutation tool. The decisive retail-evidenced lifetime was that the same
+32-bit `shifted` flag controls both display-adjustment loops. Reusing that flag makes VC4.2
+coalesce its non-overlapping lifetime with the unsigned-short cursor in EBX, assigns `this` to EBP,
+and produces a raw-exact `SetupDisplayString`: size `0x1be`, frame `0x130`, and 8/8 matching
+relocation targets.
+
+The matrix also records why reusing the cursor itself is structurally wrong: it reaches 99.73% but
+emits `xor/test bx` where retail proves a separate 32-bit flag with `xor/test ebx`. Narrowing the
+separate flag's lexical scope and adding dead initializers both reproduce the old 97.128380% state.
+One constructor-local snapshot perturbed the later exact Setup function to 99.93%, directly proving
+that exact-preserving predecessor/TU state must be audited after every earlier source change.
+
+The retained source/header SHA-256 values are `ac8dd08884961ba6d73e8a312391cdeecac71ba132f5badef5f79201a63b34d8`
+and `8207f088751e59f5a467c7a7e582c4870d82c3fb4e060262d02d5e3a07a17517`.
