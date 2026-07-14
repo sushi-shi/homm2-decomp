@@ -29,6 +29,7 @@
 #include <SOURCE/PATH.h>
 #include <SOURCE/PHILAI.h>
 #include <SOURCE/REMOTE.h>
+#include <SOURCE/town.h>
 #include <SOURCE/X_GLOBAL.h>
 VA(0x0042a6d0, 0x36d)
 int combatManager::Main(tag_message &message)
@@ -2740,20 +2741,240 @@ void combatManager::CycleCombatScreen(void)
         gfCombatSpeedMod[gConfig.combatSpeed] * COMBAT_CYCLE_TIMER_FACTOR);
 }
 
+// @early-stop
+// All 0x3b bytes and all 3 relocation targets match retail.
 VA(0x004318ed, 0x3b)
-void combatManager::SetCombatViewArmySmallLevel(int) {}
+void combatManager::SetCombatViewArmySmallLevel(int level)
+{
+    giCombatViewArmySmallLevel = level;
+    DrawFrame(1, 0, 0, 0, COMBAT_COMMAND_FRAME_DELAY, 1, 1);
+    WritePrefs();
+}
 
+// @early-stop
+// At the retained source hash, all 0xe3 bytes and all 11 relocation targets
+// match retail. Named header constants later moved MSVC's TU-cumulative state;
+// the byte-proven 100% maximum is retained per campaign policy.
 VA(0x00431928, 0xe3)
-void combatManager::SetCombatGrid(int, int, int) {}
+void combatManager::SetCombatGrid(int showGrid, int showMouseHex,
+                                  int shadeLevel)
+{
+    if (gbShowCombatGrid == showGrid &&
+        gbShowCombatMouseHex == showMouseHex &&
+        giCombatShadeLevel == shadeLevel)
+        return;
 
+    UpdateMouseGrid(COMBAT_INVALID_HEX, 0);
+    gbShowCombatGrid = showGrid;
+    gbShowCombatMouseHex = showMouseHex;
+    giCombatShadeLevel = shadeLevel;
+    m_backgroundDrawn = 0;
+    SetupGridForArmy(&m_armies[m_currentArmySide][m_currentArmyIndex]);
+    DrawFrame(1, 0, 0, 0, COMBAT_COMMAND_FRAME_DELAY, 1, 1);
+    ResetMouse();
+    WritePrefs();
+}
+
+// @match-note retained 99.89%, live 79.47% after named header constants moved
+// MSVC's TU-cumulative state. At the retained source hash, all 314 normalized
+// instructions, the full slot-search/reuse/init/fizzle CFG, exact 0x3ab span,
+// 0x14 frame, and 23/23 relocation targets agree. Retail slots are `this`
+// -0x14, armyIndex -0x04,
+// reusedArmy -0x10, index -0x08, and newArmy -0x0c; ours assigns the four
+// locals to -0x08/-0x04/-0x0c/-0x10. The first non-relocation raw residual is
+// +0x0e at armyIndex initialization. Compound versus nested destination checks,
+// animate if/else versus early return, and counter ++ versus += were compared.
+// Revisit when total SOURCE fuzzy reaches 95%.
 VA(0x00431a0b, 0x3ab)
-void combatManager::AddArmy(int, int, int, int, int, int) {}
+void combatManager::AddArmy(int side, int monsterType, int quantity, int hex,
+                            int flags, int animate)
+{
+    int armyIndex = COMBAT_INVALID_ARMY_INDEX;
+    int reusedArmy = 0;
+    int index;
+    for (index = 0; index < COMBAT_ARMY_CAPACITY; ++index) {
+        if (m_armies[side][index].m_monsterType == ARMY_GROUP_EMPTY_SLOT) {
+            armyIndex = index;
+            break;
+        }
+        if (m_armies[side][index].m_quantity == 0 &&
+            (m_armies[side][index].m_monster.flags.all &
+             MONSTER_FLAGS_AI_EXCLUDED) != 0 &&
+            ((m_armies[side][index].m_monster.flags.all &
+              MONSTER_FLAGS_MIRROR_IMAGE) != 0 ||
+             m_armies[side][index].m_monsterType ==
+                 ARMY_CREATURE_EARTH_ELEMENTAL ||
+             m_armies[side][index].m_monsterType ==
+                 ARMY_CREATURE_AIR_ELEMENTAL ||
+             m_armies[side][index].m_monsterType ==
+                 ARMY_CREATURE_FIRE_ELEMENTAL ||
+             m_armies[side][index].m_monsterType ==
+                 ARMY_CREATURE_WATER_ELEMENTAL)) {
+            armyIndex = index;
+            reusedArmy = 1;
+            break;
+        }
+    }
 
+    if (armyIndex != COMBAT_INVALID_ARMY_INDEX) {
+        if (m_hexCells[hex].m_occupantSide != COMBAT_INVALID_HEX)
+            return;
+
+        army *newArmy = &m_armies[side][armyIndex];
+        newArmy->Init(monsterType, quantity, side, armyIndex, hex,
+                      COMBAT_INVALID_HEX);
+        newArmy->LoadResources();
+        newArmy->m_monster.flags.all |= flags;
+        if (reusedArmy == 0)
+            ++m_armyCount[side];
+
+        if (animate == 0)
+            return;
+
+        ResetLimitCreature();
+        m_limitCreatureCount[side][armyIndex] += 1;
+        gpCombatManager->DrawFrame(0, 1, 0, 1,
+                                   COMBAT_COMMAND_FRAME_DELAY, 1, 1);
+        gpWindowManager->SaveFizzleSource(
+            giMinExtentX, giMinExtentY,
+            giMaxExtentX - giMinExtentX + 1,
+            giMaxExtentY - giMinExtentY + 1);
+        UpdateGrid(0, 1);
+        DrawFrame(0, 0, 0, 0, COMBAT_COMMAND_FRAME_DELAY, 1, 1);
+        gpWindowManager->FizzleForward(
+            giMinExtentX, giMinExtentY,
+            giMaxExtentX - giMinExtentX + 1,
+            giMaxExtentY - giMinExtentY + 1,
+            COMBAT_COMMAND_FRAME_DELAY, 0, 0);
+    }
+}
+
+// @match-note retained/live 99.68%: all 91 normalized instructions, the full
+// controlled-player/cleanup CFG, exact 0x169 span, and all 6/6 relocation
+// targets agree. Retail reserves a 0x0c frame and stores only `this` at -0x0c;
+// ours reserves 0x04 and stores it at -0x04. The first non-relocation raw
+// residual is the frame immediate at +0x05. Cleanup-first and controlled-first
+// condition forms were compared. Revisit when total SOURCE fuzzy reaches 95%.
 VA(0x00431db6, 0x169)
-void combatManager::SetupSmallView(void) {}
+void combatManager::SetupSmallView(void)
+{
+    if (m_smallViewSide[COMBAT_DEFENDER_SIDE] == COMBAT_SMALL_VIEW_SIDE_NONE &&
+        m_smallViewLastX[COMBAT_DEFENDER_SIDE] != COMBAT_SMALL_VIEW_POSITION_NONE) {
+        DrawSmallView(COMBAT_DEFENDER_SIDE, 1);
+    }
 
+    if (gbThisNetHasControl != 0 &&
+        m_playerId[m_currentSide] != COMBAT_PLAYER_NONE &&
+        gbHumanPlayer[m_playerId[m_currentSide]] != 0) {
+        if (m_smallViewSide[COMBAT_ATTACKER_SIDE] != m_currentSide ||
+            m_smallViewArmyIndex[COMBAT_ATTACKER_SIDE] !=
+                m_currentArmyIndex) {
+            if (m_smallViewSide[COMBAT_ATTACKER_SIDE] !=
+                    COMBAT_SMALL_VIEW_SIDE_NONE &&
+                m_smallViewSide[COMBAT_ATTACKER_SIDE] != m_currentSide &&
+                m_smallViewLastX[COMBAT_ATTACKER_SIDE] !=
+                    COMBAT_SMALL_VIEW_POSITION_NONE) {
+                m_smallViewSide[COMBAT_ATTACKER_SIDE] =
+                    COMBAT_SMALL_VIEW_SIDE_NONE;
+                DrawSmallView(COMBAT_ATTACKER_SIDE, 1);
+            }
+            m_smallViewSide[COMBAT_ATTACKER_SIDE] = m_currentSide;
+            m_smallViewArmyIndex[COMBAT_ATTACKER_SIDE] = m_currentArmyIndex;
+            DrawSmallView(COMBAT_ATTACKER_SIDE, 1);
+        }
+    } else {
+        m_smallViewSide[COMBAT_ATTACKER_SIDE] = COMBAT_SMALL_VIEW_SIDE_NONE;
+        if (m_smallViewLastX[COMBAT_ATTACKER_SIDE] !=
+            COMBAT_SMALL_VIEW_POSITION_NONE)
+            DrawSmallView(COMBAT_ATTACKER_SIDE, 1);
+    }
+}
+
+// @early-stop
+// All 0x304 bytes and all 45 relocation targets match retail.
 VA(0x00431f1f, 0x304)
-void combatManager::ViewBallista(int) {}
+void combatManager::ViewBallista(int quickView)
+{
+    int archerCount;
+    int attackBonus;
+    char description[300];
+
+    m_combatTowns[COMBAT_DEFENDER_SIDE]->CalcNumLevelArchers(&archerCount,
+                                                              &attackBonus);
+    sprintf(gText, "Ballista");
+    strcpy(description, "");
+    if (m_wallStates[COMBAT_WALL_SLOT_KEEP] !=
+        COMBAT_WALL_STATE_KEEP_STANDING) {
+        sprintf(description, "\n\nThe %s is destroyed.", "Ballista");
+    } else if (attackBonus > 0) {
+        sprintf(description,
+                "\n\nThe %s fires with the strength of %d Archers, each "
+                "with a +%d bonus to their attack skill.",
+                "Ballista", archerCount, attackBonus);
+    } else {
+        sprintf(description,
+                "\n\nThe %s fires with the strength of %d Archers.",
+                "Ballista", archerCount);
+    }
+    strcat(gText, description);
+
+    strcpy(description, "");
+    if ((m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings &
+         TOWN_BUILDING_LEFT_TURRET) != 0) {
+        if (m_wallStates[COMBAT_WALL_SLOT_TOP_TOWER] ==
+            COMBAT_WALL_STATE_DESTROYED) {
+            sprintf(description, "\n\nThe %s is destroyed.", "Left Turret");
+        } else if (m_wallStates[COMBAT_WALL_SLOT_TOP_TOWER] ==
+                   COMBAT_WALL_STATE_TOWER_STANDING) {
+            if (attackBonus > 0) {
+                sprintf(description,
+                        "\n\nThe %s fires with the strength of %d Archers, "
+                        "each with a +%d bonus to their attack skill.",
+                        "Left Turret",
+                        archerCount / COMBAT_KEEP_SIDE_TOWER_SHOT_DIVISOR,
+                        attackBonus);
+            } else {
+                sprintf(description,
+                        "\n\nThe %s fires with the strength of %d Archers.",
+                        "Left Turret",
+                        archerCount / COMBAT_KEEP_SIDE_TOWER_SHOT_DIVISOR);
+            }
+        }
+        strcat(gText, description);
+    }
+
+    if ((m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings &
+         TOWN_BUILDING_RIGHT_TURRET) != 0) {
+        strcpy(description, "");
+        if (m_wallStates[COMBAT_WALL_SLOT_BOTTOM_TOWER] ==
+            COMBAT_WALL_STATE_DESTROYED) {
+            sprintf(description, "\n\nThe %s is destroyed.", "Right Turret");
+        } else if (m_wallStates[COMBAT_WALL_SLOT_BOTTOM_TOWER] ==
+                   COMBAT_WALL_STATE_TOWER_STANDING) {
+            if (attackBonus > 0) {
+                sprintf(description,
+                        "\n\nThe %s fires with the strength of %d Archers, "
+                        "each with a +%d bonus to their attack skill.",
+                        "Right Turret",
+                        archerCount / COMBAT_KEEP_SIDE_TOWER_SHOT_DIVISOR,
+                        attackBonus);
+            } else {
+                sprintf(description,
+                        "\n\nThe %s fires with the strength of %d Archers.",
+                        "Right Turret",
+                        archerCount / COMBAT_KEEP_SIDE_TOWER_SHOT_DIVISOR);
+            }
+        }
+        strcat(gText, description);
+    }
+
+    NormalDialog(gText,
+                 quickView == 0 ? NORMAL_DIALOG_INFO
+                                : NORMAL_DIALOG_QUICK_VIEW,
+                 NORMAL_DIALOG_NO_RESOURCE, NORMAL_DIALOG_NO_VALUE,
+                 NORMAL_DIALOG_NO_RESOURCE, 0, NORMAL_DIALOG_NO_RESOURCE, 0,
+                 NORMAL_DIALOG_NO_RESOURCE, 0);
+}
 
 // ---- globals (definitions, RVA order) ----
 DATA(0x004f09e8) short const_000f09e8 = 0x680;
