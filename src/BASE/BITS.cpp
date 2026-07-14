@@ -8,7 +8,8 @@
 
 // Bit-array primitives (winextra C file): index a flag by (unsigned) bit number. The byte holding
 // bit n is at p + n/8; the retail reads/writes it a dword at a time (`*(unsigned int *)`), bit n&7.
-// @early-stop ~44%: the logic is correct (byte-indexed bit ops), but our MSVC 4.2 /O2 emits an
+// @match-note
+// The logic is correct (byte-indexed bit ops), but our MSVC 4.2 /O2 emits an
 // indexed [reg+reg] load/or/store with FPO, whereas the retail materializes the address into one
 // register and uses a direct `or [mem],reg` under an ebp frame. No flag combo (/O2, /O2 /Oy-, /O1,
 // /Ox, /Od, C, C++) reproduces it — same class as TILE's ebx-save. The winextra C-file primitives
