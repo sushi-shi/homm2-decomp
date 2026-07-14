@@ -708,8 +708,8 @@ SOURCE/Campaign	?InitCampaignMap@game@@QAEXXZ	0.6195	f1dc38c54f23
 SOURCE/Campaign	?InitEntireCampaign@game@@QAEXH@Z	46.4286	0020a0b9cb23
 SOURCE/Campaign	?PlayPreScenarioSmacker@game@@QAEXHH@Z	2.1239	fead5ff663bb
 SOURCE/Campaign	?ShowCampaignInfo@game@@QAEXHH@Z	4.5385	870ba26486d2
-SOURCE/Castle	?CastleHandler@@YIHAAUtag_message@@@Z	0.5791	8fdd668fe90c
-SOURCE/Castle	?SetupCastle@townManager@@QAEXPAVheroWindow@@H@Z	1.6044	153ae4077ade
+SOURCE/Castle	?CastleHandler@@YIHAAUtag_message@@@Z	86.6134	c72e79b7be3e
+SOURCE/Castle	?SetupCastle@townManager@@QAEXPAVheroWindow@@H@Z	98.7639	c7c10f36983d
 SOURCE/DRAWING	?CheckUpdateCombatMessages@combatManager@@QAEXXZ	100.0000	2c0eb8526f88
 SOURCE/DRAWING	?ClearCombatMessages@combatManager@@QAEXH@Z	100.0000	a13385b2bc8b
 SOURCE/DRAWING	?CombatMessage@combatManager@@QAEXH@Z	99.8103	b431be4bdee0
@@ -830,7 +830,7 @@ SOURCE/GAME	?InitializePasswords@game@@QAEXXZ	100.0000	1f89f2bdd296
 SOURCE/GAME	?IsCursedItem@@YIHH@Z	100.0000	17fd79c7d173
 SOURCE/GAME	?IsMobile@game@@QAEHH@Z	100.0000	6fffefb34392
 SOURCE/GAME	?LoadGame@game@@QAEXPADHH@Z	99.8299	e54fac7bbd3d
-SOURCE/GAME	?LoadMap@game@@QAEHPAD@Z	99.8834	7b866f1cddde
+SOURCE/GAME	?LoadMap@game@@QAEHPAD@Z	99.8834	f982491d2c4d
 SOURCE/GAME	?MakeAllWaterVisible@game@@QAEXH@Z	100.0000	d5e5f18372d2
 SOURCE/GAME	?MineTypesOwned@game@@QAEHHH@Z	100.0000	3756fe49b521
 SOURCE/GAME	?NewMap@game@@QAEXPAD@Z	99.8361	e8bfcd70ad56

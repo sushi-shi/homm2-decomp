@@ -42,8 +42,8 @@ public:
     int m_lastHoverSubId;  // +0x146
     int m_command;  // +0x14a
     int m_recruitResult;  // +0x14e
-    int    field_0x152;  // +0x152
-    int    field_0x156;  // +0x156
+    unsigned long m_affordableBuildings;  // +0x152
+    unsigned long m_buildableBuildings;  // +0x156
     int m_castleDialogActive;  // +0x15a
     int m_selectedBuilding;  // +0x15e
     heroWindow *m_heroWindow0;  // +0x162  hero portrait window (redrawn on recruit)
@@ -84,9 +84,4 @@ public:
 };
 #pragma pack(pop)
 SIZE(townManager, 0x17a);
-// ---- globals (declarations, RVA order) ----
-extern unsigned char *castleSlotsBase;
-extern class heroWindow *casWin;
-extern unsigned char *castleSlotsUse;
-
 #endif // HOMM2_SOURCE_TOWNMANAGER_H

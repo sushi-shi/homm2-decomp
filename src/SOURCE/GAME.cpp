@@ -1940,7 +1940,7 @@ int game::LoadMap(char *filename)
         _read(file, row, 1);
         _read(file, type, 1);
         if (static_cast<unsigned char>(column[0]) != 0xff) {
-            m_castleRecs[i].m_unknown38 = 1;
+            m_castleRecs[i].m_formation = TOWN_FORMATION_GROUPED;
             m_castleRecs[i].m_x = static_cast<unsigned char>(column[0]);
             m_castleRecs[i].m_y = static_cast<unsigned char>(row[0]);
             m_castleRecs[i].m_type = static_cast<signed char>(type[0] & 0x7f);
