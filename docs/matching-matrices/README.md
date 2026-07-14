@@ -60,3 +60,16 @@ destructor 100%, `Read` 98.675500%, `Main` 99.852940%, and `Draw` 99.992424%; de
 aliases remain unscored. The cursor snapshot, `register` snapshot, and loop-flag declaration-order
 states are byte-identical at the new source structure and must not be repeated while the final
 source/header hashes agree. No permutation tool was used.
+
+## BASE/Textntry SetupDisplayString AST pass
+
+`textntry-setup-ast-341e775.tsv` records a focused `scripts/permute_ast.py` pass from integrated
+checkpoint `341e775` and source SHA-256
+`fd22c7692d4e9293c47a13eb83b422b678371fe4ee19755d78b515c9b94fd5cb`. The pass exposed 18 legal
+first-order variants and ran a deterministic 300-attempt walk with seed `341775`. Existing matrix
+hashes were skipped before compilation, and unsafe inequality +/-1 rewrites were disabled.
+
+The pass compiled 286 new unique whole-file hashes. Every candidate remained at 97.128380% and
+kept all 11 objdiff symbols pinned, so the integrated source was restored unchanged. The matrix
+SHA-256 is `ec3473c9c38668f263892a0a5868cd8280ec34c01d28c9359b95064be7ec8344`. Do not replay these
+hashes while the source and header state agree. The regex permuter was never used.
