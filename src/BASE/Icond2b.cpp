@@ -7,6 +7,7 @@
 #include <BASE/Icond2b.h>
 #include <BASE/IconEntry.h>
 #include <BASE/IconRle.h>
+#include <BASE/IconMonoRle.h>
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
 #include <SOURCE/dimPalette.h>
@@ -29,8 +30,8 @@ DATA(0x00534c1c) static volatile int gDimX0;
 // quadrants and the negative-run/newline exits.  Both objects have a four-byte frame; [esp+0x10]
 // retains the signed destination pitch.  All 37 external relocations match in identity,
 // multiplicity, and order (the 12 scratch owners plus uDimPal).
-// Combined-state live fuzzy is 83.29% (retained maximum 87.4770%).  The first raw divergence is
-// +0x21: ours
+// Consumer-only mono/shear enum headers raise the unchanged body from 83.29% to 84.99% while
+// preserving the exact 37/37 relocation stream. The first raw divergence is +0x21: ours
 // adds the caller X to ECX before publishing gDimEntry/gDimSrc, while retail publishes those
 // pointers, loads entry->y, then loads/adds X and publishes gDimX0.  Ours ends at +0x269 versus
 // retail +0x26e; later differences are register/source-order choices with the same CFG successors.

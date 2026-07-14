@@ -7,6 +7,7 @@
 #include <BASE/iconf2by.h>
 #include <BASE/IconEntry.h>
 #include <BASE/IconRle.h>
+#include <BASE/IconShear.h>
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
 #include <SOURCE/dimPalette.h>
@@ -32,19 +33,15 @@ static int gFYSkip;
 static int gFYClipR;
 
 // @match-note
-// /O2 structural checkpoint on master 8f1edf6: the complete backward
-// skip/solid/dim/literal/newline decoder uses the canonical IconEntry, IconRle command constants,
-// and KB-owned dim-palette declaration. Candidate is 0x57f versus retail 0x58d; both reserve one
-// four-byte stack word and have 49 branch/return sites. Relocations are 142/144 with no wrong or
-// excess target. First unmasked divergence is +0x5c: candidate keeps shear in EBP, while retail
-// loads shear into ESI and then clipW into EBP. The only occurrence deficits are retail gFYX
-// +0x30b in the full dim-destination expression and gFYClipR +0x48d in the right-clipped literal
-// count; candidate carries the already
-// loaded values in registers at both sites. The broad X_GLOBAL surface had 141/144; the direct
-// palette owner restored gFYDimLen, while an explicit dim-left lifetime and bounded/scoped right-
-// edge lifetimes were byte-identical in this state. No permutation tool was used. Revisit only
-// after a real included declaration/type change or a decoder model that changes those lifetimes;
-// do not add volatile/dummy reloads, padding references, aliases, or count-only locals.
+// /O2 structural checkpoint on master 71bdca9 with consumer-only enum ownership. Keeping the
+// required named IconShear typedef gives 89.77%, candidate 0x57f versus retail 0x58d, one four-byte
+// frame word, and 142/144 relocations with no wrong or excess target. Omitting that consumer header
+// restores the former 93.72654%/0x58c/144:144 allocation, but leaves three raw 0x7f sentinels and is
+// rejected: correctness wins over a temporary TU-state score. First raw divergence is +0x5c:
+// candidate keeps shear in EBP, while retail loads shear into ESI and then clipW into EBP. Missing
+// occurrences remain retail gFYX in the full dim destination and gFYClipR in the right-clipped
+// literal count. Revisit only after new retail-evidenced lifetime/type structure; no regex or AST
+// permuter was used, and dummy reloads, aliases, volatile state, and count-only locals are forbidden.
 VA(0x004d9ce0, 0x58d)
 void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                              int clip, int clipX, int clipY, int clipW, int clipH, int color,
@@ -103,7 +100,7 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
                 gFYDimPal =
                     reinterpret_cast<unsigned char *>(uDimPal) +
                     (gFYRun & ICON_RLE_DIM_LEVEL_MASK) * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
-                if (shear[gFYY] != 0x7f && clipY <= gFYY && gFYY <= gFYClipB) {
+                if (shear[gFYY] != ICON_SHEAR_SKIP_ROW && clipY <= gFYY && gFYY <= gFYClipB) {
                     if (clipX <= (gFYX - gFYDimLen) + 1 && gFYX <= gFYClipR) {
                         unsigned char *dimDst;
                         if (clipX <= (gFYX - gFYDimLen) + 1) {
@@ -127,7 +124,7 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
             gFYX = gFYX - gFYDimLen2;
             continue;
         do_fill:
-            if (shear[gFYY] != 0x7f && clipY <= gFYY && gFYY <= gFYClipB) {
+            if (shear[gFYY] != ICON_SHEAR_SKIP_ROW && clipY <= gFYY && gFYY <= gFYClipB) {
                 unsigned int fillCount = gFYRun;
                 if (clipX <= static_cast<int>((gFYX - fillCount) + 1) && gFYX <= gFYClipR) {
                     if (clipX <= static_cast<int>((gFYX - fillCount) + 1)) {
@@ -144,7 +141,7 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
         }
         // ---- positive command : backward literal copy / newline ----
         if (gFYRun != 0) {
-            if (shear[gFYY] != 0x7f && clipY <= gFYY && gFYY <= gFYClipB) {
+            if (shear[gFYY] != ICON_SHEAR_SKIP_ROW && clipY <= gFYY && gFYY <= gFYClipB) {
                 int left = (gFYX - gFYRun) + 1;
                 int pendingSkip;
                 if (left <= gFYClipR && clipX <= gFYX) {

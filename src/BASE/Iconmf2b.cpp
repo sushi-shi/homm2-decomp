@@ -7,6 +7,7 @@
 #include <BASE/Iconmf2b.h>
 #include <BASE/IconEntry.h>
 #include <BASE/IconRle.h>
+#include <BASE/IconMonoRle.h>
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
 #include <string.h>
@@ -23,7 +24,8 @@ DATA(0x005381b0) static int gFMClipR;
 DATA(0x005381b4) static int gFMXEnd;
 
 // @match-note
-// Fresh structural reconstruction; live 69.51% (previous retained maximum 69.4671%). Candidate is
+// Consumer-only mono/shear enum headers raise the unchanged structural body from 69.51% to 76.52%.
+// Candidate is
 // 0x20e bytes versus retail 0x212. Both have 167 instructions, 26 basic blocks, 20 branches, and an
 // identical ordered successor graph. Both reserve one four-byte pitch home, save EBX/ESI/EDI/EBP,
 // and return with `ret 0x24`. All 27 ordered relocation occurrences agree, including each of the
