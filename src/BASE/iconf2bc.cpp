@@ -53,6 +53,15 @@ DATA(0x005380c0) static unsigned char *gFCDst;
 // between the two indexed reads is byte-identical. Moving the semantic `+1` into the initial X
 // expression regresses to 85.63%, so both were reverted. The source still owns distinct
 // width/destination-pitch lifetimes; the earlier width/pitch family remains closed.
+// Reusing by-value `frame` as the byte offset is the only tested real source shape that moves the
+// formal-X load before the final frame LEA: +0x0e..+0x15 then exactly matches retail scheduling.
+// It scores 84.58%, however, because width lands in EAX and entry X in ECX, the retail width spill
+// is still absent, and downstream allocation regresses. Swapping the field-read statements and a
+// left-associated combined subtraction are byte-identical at 84.58%. An explicit entry-X snapshot
+// and a named byte-offset local each score 83.46%; accumulating into by-value x scores 83.71%; a
+// direct byte root scores 84.87%; and advancing the typed root scores 83.09%. The latter forms also
+// lose the recovered ESI source/EBX X allocation. Do not repeat these frame/root spellings: revisit
+// only after a real type or declaration-state correction naturally changes the width/X allocation.
 // Under this scoped-header state, accumulating into formal y gives 81.83%/81:83 because MSVC
 // propagates y through the clip tests and row setup. A sibling-style clip-home memcpy reaches
 // 85.07%/83:83 only by adding a non-retail store/reload, and direct global predicates give
