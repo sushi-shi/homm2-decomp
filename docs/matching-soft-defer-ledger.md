@@ -26,7 +26,7 @@ remain unmarked and in the same lane.
 
 Canonical source state:
 
-- checkpoint: `5ff32d9`
+- checkpoint: `2aeff38`
 - `src/BASE/Textntry.cpp`:
   `ac8dd08884961ba6d73e8a312391cdeecac71ba132f5badef5f79201a63b34d8`
 - `include/BASE/textEntryWidget.h`:
@@ -99,6 +99,33 @@ Focused Setup AST pass after integration at `341e775`:
   regex permuter was never used;
 - the complete no-repeat set is
   [`docs/matching-matrices/textntry-setup-ast-341e775.tsv`](matching-matrices/textntry-setup-ast-341e775.tsv).
+
+Focused constructor and `Read` AST passes after exact Setup integration at `2aeff38`:
+
+- the exact Setup lifetime materially changed the canonical TU, so both residuals received one new
+  syntax-aware pass even though older Textntry matrices existed;
+- the constructor walk used seed `28482744`, exposed 20 first-order variants, skipped 1,949 old
+  Textntry hashes before compilation, and recorded 286 new unique hashes;
+- 38 constructor hashes reached the retained 98.695656% maximum, but the retained representative
+  `4363f3b877bae06621366e5e1b64eed03f687dd29af5446ce0c1f456b3984cb7` was rejected after raw
+  review: it emitted the `m_color` (`+0x28`) store before the `+0x45/+0x47` stores and therefore
+  regressed an already-correct store-order span while still delaying `m_iconFrame` (`+0x2f`);
+- the canonical `ac8dd088...` constructor was restored because it preserves the retail order of all
+  three constant stores and differs only by the already-documented delayed `m_iconFrame` store;
+- the `Read` walk used seed `2848920`, exposed 23 first-order variants, skipped 2,235 old hashes,
+  and recorded 303 new unique hashes; 240 passed every raw pin and 63 were rejected when the
+  `Main` disassembly fingerprint/placement moved;
+- none of the accepted `Read` candidates exceeded 98.675500%, so the sole raw residual remains the
+  adjacent retail `cmp edi,3` before `m_height` load versus the candidate's reversed schedule;
+- both passes used only `scripts/permute_ast.py`; unsafe inequality rewrites and the regex permuter
+  were disabled. Default constructor/destructor, `Main`, `Draw`, and exact Setup were byte-pinned;
+  the `Read` pass additionally byte-pinned the accepted long constructor.
+
+Every full hash, score, and pin/rejection outcome is in
+[`textntry-ctor-ast-ac8dd.tsv`](matching-matrices/textntry-ctor-ast-ac8dd.tsv) and
+[`textntry-read-ast-ac8dd.tsv`](matching-matrices/textntry-read-ast-ac8dd.tsv). Do not repeat these
+hashes while the canonical source/header hashes remain `ac8dd088...`/`8207f088...`. A higher fuzzy
+score alone is not a retest trigger and must never override an earlier raw-span regression.
 
 Fresh semantic-lifetime pass from lane checkpoint `97c1152`:
 

@@ -98,6 +98,13 @@ root, compare raw bytes, and audit relocations. In this case the final checks re
    relocations; then rebuild and measure the downstream function.
 7. Retest the retained variant on the combined root and run the full build.
 
+Pin the target's already-correct raw spans as well as its exact siblings. A target candidate can
+increase fuzzy percentage by fixing one later span while regressing an earlier instruction order.
+For example, a post-Setup Textntry constructor pass recovered its prior 98.695656% maximum only by
+moving the `m_color` store ahead of two stores that already matched retail. Raw review rejected it
+and restored the lower-scoring canonical source, whose only residual remained the intended delayed
+`m_iconFrame` store. Therefore a score maximum is a search hint, never an acceptance criterion.
+
 The predecessor technique is especially useful for a downstream listbox function: an
 equivalent operand or statement order in an already-exact predecessor can move the
 compiler's cumulative register state without changing that predecessor's emitted bytes.
@@ -112,6 +119,7 @@ Reject a candidate when any of the following is true:
 - it changes values, overflow behavior, evaluation side effects, or object lifetimes;
 - an exact predecessor changes even one raw byte or relocation;
 - it improves fuzzy percentage while worsening CFG, frame, calls, or relocation targets;
+- it improves fuzzy percentage while regressing any earlier raw-exact span in the target;
 - it matches only in the stale worker state and regresses on the combined root;
 - it depends on a regex mutation or an unaudited AST mutation;
 - it perturbs an already-exact sibling such as `CopyToCareful` to rescue the target.
