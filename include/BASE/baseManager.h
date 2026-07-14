@@ -22,8 +22,8 @@ public:
     // (vptr auto-emitted at 0x00; own data starts at 0x04)
     baseManager *m_next;  // +0x04  next in the executive manager list
     baseManager *m_prev;  // +0x08  prev in the executive manager list
-    int    field_0xc;  // +0x0c
-    int    field_0x10;  // +0x10
+    int    m_messageMask;  // +0x0c  event/message classes accepted by Main
+    int    m_priority;  // +0x10  executive manager-list ordering key
     char   name[0x1e];  // +0x14  manager name (strcpy'd, e.g. "Unknown")
     int    m_active;  // +0x32
     // --- constructors ---

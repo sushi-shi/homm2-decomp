@@ -384,7 +384,7 @@ int combatManager::Open(int openFlags)
     gCurLoadedSpellIcon = 0;
     gCurLoadedSpellEffect = -1;
     gpMouseManager->m_forcePointerUpdate = 0;
-    gpMouseManager->SetPointer("cmbtmous.mse", 6, -999);
+    gpMouseManager->SetPointer("cmbtmous.mse", 6, MOUSE_AUTO_CURSOR_TYPE);
     bMouseWasVis = gpMouseManager->IsVis();
     gpMouseManager->ShowColorPointer();
     m_combatWindow = new heroWindow(0, 0, "cmbtwin.bin");
@@ -412,8 +412,8 @@ int combatManager::Open(int openFlags)
     LogStr("Op4");
     gpInputManager->Flush();
     ResetMouse();
-    field_0xc = 0x200;
-    field_0x10 = openFlags;
+    m_messageMask = 0x200;
+    m_priority = openFlags;
     m_active = 1;
     strcpy(name, "combatManager");
     LogStr("Op5");

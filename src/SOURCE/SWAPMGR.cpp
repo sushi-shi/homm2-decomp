@@ -140,8 +140,8 @@ int swapManager::Open(int id)
     m_selectorIcon = gpResourceManager->GetIcon("swapbtn.icn");
     giMonoIconSkip = SWAP_MONO_ICON_DEFAULT;
     gpMouseManager->SetPointer(0);
-    field_0xc = SWAP_MANAGER_MESSAGE;
-    field_0x10 = id;
+    m_messageMask = SWAP_MANAGER_MESSAGE;
+    m_priority = id;
     m_active = 1;
     strcpy(name, "swapManager");
     return 0;

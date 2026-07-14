@@ -179,8 +179,8 @@ int heroWindowManager::Open(int managerOrder)
         *fb = 0x24242424;
         fb++;
     }
-    field_0x10 = managerOrder;
-    field_0xc = 0x20;
+    m_priority = managerOrder;
+    m_messageMask = 0x20;
     m_active = 1;
     strcpy(name, "heroWindowManager");
     return 0;

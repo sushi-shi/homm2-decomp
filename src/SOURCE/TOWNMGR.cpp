@@ -703,8 +703,8 @@ int townManager::Open(int id)
     SetupTown();
     KBChangeMenu(hmnuTown);
     gpMouseManager->SetPointer("advmice.mse", 0, TOWN_MAP_CHANGE_UNUSED);
-    field_0xc = TOWN_MANAGER_EVENT_MASK;
-    field_0x10 = id;
+    m_messageMask = TOWN_MANAGER_EVENT_MASK;
+    m_priority = id;
     m_active = 1;
     strcpy(name, "townManager");
     gpWindowManager->FadeScreen(0, TOWN_FADE_STEPS, 0);

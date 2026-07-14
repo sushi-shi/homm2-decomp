@@ -484,8 +484,8 @@ int soundManager::Open(int)
     m_fading = 1;
 
 managerReady:
-    field_0xc = 0x10;
-    field_0x10 = -1;
+    m_messageMask = 0x10;
+    m_priority = -1;
     m_active = 1;
     strcpy(name, "soundManager");
     return 0;
