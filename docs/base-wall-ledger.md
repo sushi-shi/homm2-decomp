@@ -1,7 +1,7 @@
 # BASE `@early-stop` proof ledger
 
 This ledger audits every current `@early-stop` marker under `src/BASE` from base checkpoint
-`a45e64f`, plus the accepted uncommitted `Misc.cpp` source identified in the audit snapshot.
+`7cc5434`, plus the accepted terminal `Misc.cpp` source identified in the audit snapshot.
 It is deliberately stricter than the prose beside the functions: a score or a claim that
 instructions are "the same" is not proof.  The audit joined the current
 `build/objdiff/report.json` (refreshed with `homm2 status`) to
@@ -28,15 +28,15 @@ No BASE marker presently meets the soft-TU-cumulative checklist.
 
 The counts and rows below are pinned to the following fully rebuilt state:
 
-- Base Git checkpoint: `a45e64fc731d462dd2efaa8512f565a4712e7905`
+- Base Git checkpoint: `7cc543469660f0d925c53214b8df8f5185ce9210`
 - Accepted `src/BASE/Misc.cpp` SHA-256:
-  `38f67aa8d1b6e870596d67d5a2cb1322c1100b1f17ee8933422d6cf9302b29b0`
+  `d920abfe77a12b518442adcf0d4a802a91231c535ff9342864fcca214ab6e9e6`
 - `build/objdiff/report.json` SHA-256:
-  `c5a4b8372e2463c86be2ecaa6b684e8b4086e813540e2e78c1228855b02877ed`
+  `0cc524f93a240e04eb0bd78d11fb98ade3f5721353a6cafe2982b0589e799c40`
 - `config/match_baseline.tsv` SHA-256:
-  `f380dea7bdfd4929319606e2019a4e7b3b5a9c9c4d87f75e9ff7349ee6fc41ae`
+  `11627ae9d91a47efe09be197ca0bd5b575e5f2890ba403ce91d2457f543dd415`
 - Sorted `rg -n '@early-stop' src/BASE` inventory SHA-256:
-  `3297f135ab0cfd2c9299b589591b52cb4c92d424187aac540f4c59df56206b5c`
+  `93397eee32421608cc51917ae89a3883a533f23537fed4e24c9fcbc302f66d4f`
 
 Recompute all listed identities before reusing classifications after a root/header/source change.
 
@@ -46,8 +46,8 @@ Recompute all listed identities before reusing classifications after a root/head
 | :--- | ---: | :--- |
 | `proven-artifact` | 9 | Seven ordinary function markers and two generated destructor aliases. |
 | `proven-soft-TU-cumulative` | 0 | No marker has the required frame/slot, standalone, combined-root, and exact-predecessor proof bundle. |
-| `unresolved/not-a-wall` | 81 | Includes five unproved deleting-destructor tradeoffs and two stale markers on exact functions. |
-| **Total** | **90** | Exactly 83 ordinary rows plus seven generated-alias rows: one row per current source marker. |
+| `unresolved/not-a-wall` | 69 | Includes five unproved deleting-destructor tradeoffs and two stale markers on exact functions. |
+| **Total** | **78** | Exactly 71 ordinary rows plus seven generated-alias rows: one row per current source marker. |
 
 Syntax/state defects found by the audit:
 
@@ -138,18 +138,6 @@ and live scores are shown as `retained/live`.
 | `MOUSEMGR` | `0x004c9a40` `mouseManager::NewUpdate` | 97.8916/97.8916 | unresolved/not-a-wall | Δ=278; rel 86/83 | [source note](../src/BASE/MOUSEMGR.cpp#L262) | R2 |
 | `MOUSEMGR` | `0x004ca230` `mouseManager::SetColorMice` | 96.8381/96.8381 | unresolved/not-a-wall | Δ=183; rel 33/29 | [source note](../src/BASE/MOUSEMGR.cpp#L497) | R2 |
 | `Midi` | `0x004d3ac0` `soundManager::MIDIPlay` | 99.9588/99.9588 | unresolved/not-a-wall | Δ=1 at `+0x167`; rel 79/66 | [source note](../src/BASE/Midi.cpp#L61) | R2 |
-| `Misc` | `0x004c5ee0` `BlitBitmapToScreen` | 82.5407/81.4296 | unresolved/not-a-wall | Δ=206; rel 24/24 | [source note](../src/BASE/Misc.cpp#L890) | R1 |
-| `Misc` | `0x004c6070` `LogTruncate` | 92.5000/92.5000 | unresolved/not-a-wall | Δ=53; rel 7/7 | [source note](../src/BASE/Misc.cpp#L938) | R1 |
-| `Misc` | `0x004c6120` `LogStr` | 88.2222/88.2222 | unresolved/not-a-wall | Δ=88; rel 9/8 | [source note](../src/BASE/Misc.cpp#L960) | R1 |
-| `Misc` | `0x004c61c0` `LogInt` | 96.6000/96.6000 | unresolved/not-a-wall | Δ=57; rel 23/22 | [source note](../src/BASE/Misc.cpp#L984) | R2 |
-| `Misc` | `0x004c64e0` `FadeTo` | 95.1169/95.1169 | unresolved/not-a-wall | Δ=110; rel 6/6 | [source note](../src/BASE/Misc.cpp#L1048) | R1 |
-| `Misc` | `0x004c65e0` `FadeToColorTable` | 87.1774/87.1774 | unresolved/not-a-wall | Δ=43; rel 8/8 | [source note](../src/BASE/Misc.cpp#L1096) | R1 |
-| `Misc` | `0x004c66d0` `CreatePCXFile` | 98.0405/98.0405 | unresolved/not-a-wall | Δ=176; rel 14/14 | [source note](../src/BASE/Misc.cpp#L1145) | R2 |
-| `Misc` | `0x004c6930` `SRandom` | 85.1333/66.8667 | unresolved/not-a-wall | Δ=68; rel 3/3 | [source note](../src/BASE/Misc.cpp#L1227) | R1 |
-| `Misc` | `0x004c69f0` `SIncRandomize` | 54.8125/54.8125 | unresolved/not-a-wall | Δ=72; rel 2/2 | [source note](../src/BASE/Misc.cpp#L1264) | R1 |
-| `Misc` | `0x004c6a60` `SGenRand` | 90.6364/90.6364 | unresolved/not-a-wall | Δ=13; rel 3/3 | [source note](../src/BASE/Misc.cpp#L1288) | R1 |
-| `Misc` | `0x004c6ac0` `GetDataEntry` | 95.8980/95.8980 | unresolved/not-a-wall | Δ=374; rel 59/59 | [source note](../src/BASE/Misc.cpp#L1319) | R1 |
-| `Misc` | `0x004c6e50` `DataEntryWindowHandler` | 86.7593/86.7593 | unresolved/not-a-wall | Δ=172; rel 22/23 | [source note](../src/BASE/Misc.cpp#L1409) | R1 |
 | `RESMGR` | `0x004c7fa0` `resourceManager::resourceManager` | 99.9836/99.9836 | unresolved/not-a-wall | Δ=1 at `+0x56` (`add edi,0x14` vs `0x62`); rel 3/3 | [source note](../src/BASE/RESMGR.cpp#L25) | R2 |
 | `RESMGR` | `0x004c84d0` `resourceManager::GetFont` | 99.7755/99.7755 | unresolved/not-a-wall | Δ=11; rel 5/5 | [source note](../src/BASE/RESMGR.cpp#L153) | R2 |
 | `RESMGR` | `0x004c8950` `resourceManager::RemoveResource` | 99.8837/99.8837 | unresolved/not-a-wall | Δ=1 at `+0x28`; rel 0/0 | [source note](../src/BASE/RESMGR.cpp#L271) | R2 |

@@ -70,6 +70,32 @@ Resume only from a new exact-preserving predecessor or shared-header TU state; d
 local variants. Neither permuter was used: the function is only 90.21% and is not structurally
 aligned enough for the audited AST last-mile tool, while the regex permuter remains prohibited.
 
+## BASE/Misc terminal structural pass
+
+`misc-terminal-345e643.tsv` records the bounded source-order pass from
+`BlitBitmapToScreen` through `DataEntryWindowHandler` at checkpoint `345e643`. Descriptor hashes
+are SHA-256 of the exact `scope:variant` strings. The retained `Misc.cpp` SHA-256 is
+`d920abfe77a12b518442adcf0d4a802a91231c535ff9342864fcca214ab6e9e6`; the matrix SHA-256 is
+`305297a9401ca13bf62d9def7f39e80295491b899a6bc0d480612e7a3cf170a5`.
+
+`BlitBitmapToScreen` was not an optimizer wall. The Ghidra-shaped second overlap predicate used
+four AND terms with inverted comparisons, while retail branches on the OR of four disjointness
+tests. Recovering that predicate and the entry bitmap spill restores the 8-byte frame, the full
+four-VESA-call CFG, and equal 0x18c object extents; the score rises from 80.04% to 95.53%.
+`GetDataEntry` likewise needed the real conditional Y adjustment rather than its boolean mask.
+That makes both code spans 0x386 with an exact 0x9c frame and leaves only 12 unmasked bytes at one
+constant-load schedule and two local LEAs. Moving `DataEntryWindowHandler`'s possible-cancel body
+before the normal fallback recovers retail body order and raises it from 86.76% to 93.80%.
+
+The matrix also pins the rejected combined-TU retests: `strcat` regresses all three logging
+functions, a volatile `FadeTo` level regresses its frame/schedule, the two PCX polarity/SIB forms
+emit no useful gain, and a volatile `SGenRand` store regresses the entire random cluster. Direct
+handler returns fall to 48.09%; a volatile tail field read emits no focused change. None of these
+families should be repeated while the retained source/header state agrees. No permutation tool was
+used in this pass. In particular, the regex permuter remains prohibited; if the 99.10%
+`GetDataEntry` residual is revisited after an exact-preserving predecessor/TU-state change, only
+the audited libclang AST permuter is eligible.
+
 ## BASE/Icon2b adjacent-decoder setup transfer
 
 `icon2b-adjacent-setup-dd7973b.tsv` records the bounded setup-lifetime retest from checkpoint
