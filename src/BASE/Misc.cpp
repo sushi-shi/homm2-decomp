@@ -895,7 +895,10 @@ void BlitBitmapToScreenNoMouseCheck(class bitmap *bmp, int sourceX, int sourceY,
 // coordinate schedules. Flat and fully nested predicates, relational operand reversal, sourceX
 // splitting and width-first order were retested; the latter two changed broad register allocation.
 // The libclang AST pass found 22 value-preserving variants and retained none after a 30-walk pass.
-// Revisit through exact-preserving predecessor/TU state; this CSE residual is not a proven wall.
+// At integrated head 5a48d4c, all 65 single AST variants across the 19 exact predecessors and 149
+// deterministic two-to-five-variant predecessor combinations were downstream-byte-neutral while
+// all 144 Misc symbols were pinned. Revisit only after a real header/predecessor state change; this
+// CSE residual is not a proven wall.
 VA(0x004c5ee0, 0x18b)
 void BlitBitmapToScreen(class bitmap *bmp, int sourceX, int sourceY, int width, int height,
                         int destinationX, int destinationY)
