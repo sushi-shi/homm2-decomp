@@ -430,7 +430,7 @@ struct HighScoreEntry {
     int score;
     int days;
     int scenario;
-    unsigned char cheated;
+    char cheated;
     char reserved[29];
 };
 #pragma pack(pop)
