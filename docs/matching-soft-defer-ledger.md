@@ -269,11 +269,11 @@ must continue this function before taking unrelated work.
 
 Canonical source state:
 
-- checkpoint: `8bd4149`
+- checkpoint: `b60f188`
 - target: RVA `0xd9ce0`, retail size `0x58d`
 - `src/BASE/iconf2by.cpp`:
-  `2493675ecd4e4c3fbd4ea184fc98cefce9c66d84745bda53c701820a72907240`
-- live checkpoint: 85.7239%, candidate size `0x559`, 142 candidate vs 144 retail relocations,
+  `f1a3b2fe728733ebf993ffaa5574e20e23c0a1b520446a4b802290f2a1aa991a`
+- live checkpoint: 87.091156%, candidate size `0x56d`, 145 candidate vs 144 retail relocations,
   no candidate-only target
 - the decoder aligns instruction-for-instruction through extended-run setup, apart from retail's
   four-byte frame displacement
@@ -288,10 +288,11 @@ Canonical source state:
   destination publication;
 - introduced the real clip-width lifetime used by the clipped literal path.
 
-The remaining scratch relocation counts are `gFYX` 23/25, `gFYDimLen` 14/16, `gFYSkip` 5/4,
-and `gFYClipR` 8/7; every other scratch/global relocation count agrees. Retail also reserves four
-stack bytes, pins the clip-width lifetime in EBP, reloads `shear`, and emits longer split fill, dim,
-and literal schedules. These are concrete steering facts, not an accepted wall.
+The remaining scratch relocation counts are `gFYDimLen` 15/16, `gFYSkip` 5/4, and `gFYClipR`
+8/7; `gFYX` is now exact at 25/25 and every other scratch/global relocation count agrees. Retail
+also reserves four stack bytes, pins the clip-width lifetime in EBP, reloads `shear`, and emits
+longer split fill, dim, and literal schedules. These are concrete steering facts, not an accepted
+wall.
 
 ### Searches already exhausted
 
@@ -339,6 +340,25 @@ The exact `icon2by` prologue naturally releases `shear` from EBP after its initi
 loads `clipW` into EBP. Transferring its named edge lifetimes does not change `iconf2by` allocation.
 Pitch, palette/destination, selected-count, and fill-color locals are contradicted by this target's
 already-correct relocation counts or duplicate earlier exhausted families.
+
+Declaration-surface audit after `e07b643`:
+
+- replacing broad `BASE/Misc.h` with narrow `BASE/IconEntry.h` while retaining the redundant own
+  header: 86.782845%, 145/144 relocations;
+- suppressing the `IconEntry` size assertion: 84.986595%, 142/144 relocations; reverted;
+- direct `IconEntry` declaration with `Misc.h`: 78.0563%, 142/144 relocations; reverted;
+- removing the redundant own-header include as well: 87.091156%, size `0x56d`, 145/144
+  relocations; retained;
+- narrow `X_GLOBAL`, `IconEntry`-first order, width rename, moved width declaration, direct
+  `clipW`, `register` hint, widened `advance`, and string-first include order: byte-identical to
+  87.091156%;
+- widening all existing locals: 86.42091%; reverted;
+- two retail-evidenced shared-skip joins: byte-identical and reverted to avoid source complexity.
+
+Retail mangling proves ten integer clip/color arguments and a mutable signed-char shear pointee.
+The packed `IconEntry` stride/field signedness and bitmap width type agree with retail access
+opcodes, so no shared type edit is justified. The useful lever was declaration visibility, not a
+layout change.
 
 Retail's four-byte frame slot is never accessed: every ESP-relative retail access is an argument,
 and after `sub esp,4` plus four pushes the smallest displacement is `0x18`. The slot is allocator
