@@ -16,6 +16,9 @@ typedef enum WingraphConstant {
     WINGRAPH_SYSTEM_PALETTE_SIZE = 10,
     WINGRAPH_SCROLL_MARGIN = 16,
     WINGRAPH_SCROLL_SIZE = WINGRAPH_WIDTH - WINGRAPH_SCROLL_MARGIN * 2,
+    WINGRAPH_LIMITED_COMBAT_HEIGHT = 458,
+    WINGRAPH_PAINT_ALIGN_MASK = 0xfffc,
+    WINGRAPH_LOAD_LIBRARY_SUCCESS = 32,
     WINGRAPH_PAINT_TIMEOUT = 10000,
     WINGRAPH_ERROR_TEXT_SIZE = 200
 } WingraphConstant;
@@ -28,6 +31,29 @@ struct _PALETTE {
 };
 #pragma pack(pop)
 SIZE(_PALETTE, 0x404);
+
+struct _IMAGE {
+    BITMAPINFOHEADER header;
+    RGBQUAD colors[WINGRAPH_PALETTE_SIZE];
+    void *bits;
+};
+SIZE(_IMAGE, 0x42c);
+
+typedef HRESULT (__stdcall *DirectDrawCreateProc)(
+    GUID *guid, IDirectDraw **directDraw, IUnknown *outerUnknown);
+
+extern "C" BOOL __stdcall WinGRecommendDIBFormat(BITMAPINFO *bitmapInfo);
+extern "C" HDC __stdcall WinGCreateDC(void);
+extern "C" HBITMAP __stdcall WinGCreateBitmap(
+    HDC hdc, BITMAPINFO *bitmapInfo, void **bits);
+extern "C" UINT __stdcall WinGSetDIBColorTable(
+    HDC hdc, UINT startIndex, UINT entryCount, RGBQUAD *colors);
+extern "C" BOOL __stdcall WinGBitBlt(HDC destination, int destinationX,
+    int destinationY, int width, int height, HDC source, int sourceX,
+    int sourceY);
+extern "C" BOOL __stdcall WinGStretchBlt(HDC destination, int destinationX,
+    int destinationY, int destinationWidth, int destinationHeight, HDC source,
+    int sourceX, int sourceY, int sourceWidth, int sourceHeight);
 
 void DDRestoreDisplayMode(void);
 int DDQueryNewPalette(void);
@@ -74,8 +100,9 @@ extern void *lpInitWin;
 extern int bPaletteInitialized;
 extern int giTtlBlts;
 extern int gbWinGraphBusy;
-extern long (__stdcall *lpDirectDrawCreate)(struct _GUID *, struct IDirectDraw **, struct IUnknown *);
+extern DirectDrawCreateProc lpDirectDrawCreate;
 extern struct _PALETTE LogicalPalette;
+extern struct _IMAGE screenImage;
 extern struct IDirectDraw *lpDD;
 extern struct IDirectDrawSurface *lpDDSPrimary;
 extern struct IDirectDrawSurface *lpDDSOne;
@@ -83,11 +110,11 @@ extern struct IDirectDrawClipper *lpClipper;
 extern struct IDirectDrawPalette *lpDDPal;
 extern int iBusyRetry;
 extern int bInDDSD;
-extern void *hdcImage;
-extern void *gbmOldMonoBitmap;
-extern void *hpalApp;
-extern void *hWinGLibrary;
-extern void *hDDrawLibrary;
+extern HDC hdcImage;
+extern HBITMAP gbmOldMonoBitmap;
+extern HPALETTE hpalApp;
+extern HINSTANCE hWinGLibrary;
+extern HINSTANCE hDDrawLibrary;
 extern long lDelayRefresh;
 extern long lPaintStart;
 
