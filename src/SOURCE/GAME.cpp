@@ -566,8 +566,8 @@ int game::SaveGame(char *filename, int generateName, signed char expansionFormat
         _write(fileInfo, &legacyMarkerTemp, 4);
     _write(fileInfo, &m_worldMap.width, 4);
     _write(fileInfo, &m_worldMap.height, 4);
-    _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x2a9, 0x1a4);
-    _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x44d, 0x41);
+    _write(fileInfo, &m_mapHeader, sizeof(m_mapHeader));
+    _write(fileInfo, m_setupPlayerColor, 0x41);
     _write(fileInfo, &gbIAmGreatest, 1);
     _write(fileInfo, this, 2);
     _write(fileInfo, &giMonthType, 1);
@@ -851,8 +851,8 @@ void game::LoadGame(char *filename, int loadFromFile, int)
         }
         _read(file, height, 4);
         SetMapSize(width, height[0]);
-        _read(file, reinterpret_cast<unsigned char *>(this) + 0x2a9, 0x1a4);
-        _read(file, reinterpret_cast<unsigned char *>(this) + 0x44d, 0x41);
+        _read(file, &m_mapHeader, sizeof(m_mapHeader));
+        _read(file, m_setupPlayerColor, 0x41);
         _read(file, &gbIAmGreatest, 1);
         _read(file, this, 2);
         _read(file, &giMonthType, 1);
@@ -1115,31 +1115,30 @@ void game::NewMap(char *filename)
     nextHuman6 = giNumHumanPlayers;
 
     for (player2 = 0; player2 < GAME_PLAYER_COUNT; player2++) {
-        if (player2 >= static_cast<unsigned char>(gpGame->field_0x2c3)) {
+        if (player2 >= static_cast<unsigned char>(gpGame->m_mapHeader.playerCount)) {
             gbSetupGamePosToRealGamePos[player2] = -1;
         } else {
-            if (reinterpret_cast<signed char *>(this)[player2 + 0x45f] == 10)
+            if (m_setupPlayerNetworkId[player2] == 10)
                 gbSetupGamePosToRealGamePos[player2] = static_cast<signed char>(nextHuman6++);
             else
                 gbSetupGamePosToRealGamePos[player2] =
-                    reinterpret_cast<signed char *>(this)[player2 + 0x45f];
+                    m_setupPlayerNetworkId[player2];
         }
     }
     for (player2 = 0; player2 < GAME_PLAYER_COUNT; player2++) {
         m_players[player2].color = -1;
         gcColorToPlayerPos[player2] = -1;
         gcColorToSetupPos[player2] = -1;
-        if (reinterpret_cast<signed char *>(gpGame)[player2 + 0x459] == 7)
-            reinterpret_cast<signed char *>(gpGame)[player2 + 0x459] =
-                static_cast<signed char>(randomColor2);
+        if (gpGame->m_setupPlayerRace[player2] == 7)
+            gpGame->m_setupPlayerRace[player2] = static_cast<signed char>(randomColor2);
         randomColor2 = (randomColor2 + 1) % GAME_PLAYER_COUNT;
     }
     for (player2 = 0; player2 < m_playerCount; player2++)
-        gcColorToSetupPos[reinterpret_cast<signed char *>(this)[player2 + 0x44d]] =
+        gcColorToSetupPos[m_setupPlayerColor[player2]] =
             static_cast<signed char>(player2);
     for (player2 = 0; player2 < m_playerCount; player2++)
         m_players[gbSetupGamePosToRealGamePos[player2]].color =
-            reinterpret_cast<signed char *>(this)[player2 + 0x44d];
+            m_setupPlayerColor[player2];
     for (player2 = 0; player2 < m_playerCount; player2++)
         gcColorToPlayerPos[m_players[player2].color] = static_cast<signed char>(player2);
     for (player2 = 0; player2 < m_playerCount; player2++) {
@@ -1167,25 +1166,24 @@ void game::NewMap(char *filename)
     for (player2 = m_playerCount; player2 < GAME_PLAYER_COUNT; player2++)
         m_playerDead[player2] = 1;
 
-    if (reinterpret_cast<unsigned char *>(this)[0x2c6] == 4 ||
-        reinterpret_cast<unsigned char *>(this)[0x2c6] == 2) {
-        reinterpret_cast<unsigned char *>(this)[0x2c7] = 1;
-        reinterpret_cast<unsigned char *>(this)[0x2c8] = 0;
+    if (m_mapHeader.victoryCondition == 4 ||
+        m_mapHeader.victoryCondition == 2) {
+        m_mapHeader.computerAlsoWins = 1;
+        m_mapHeader.allowNormalVictory = 0;
     }
-    if (reinterpret_cast<unsigned char *>(this)[0x2c6] == 4) {
+    if (m_mapHeader.victoryCondition == 4) {
         townIndex9 = 0;
         for (player2 = 0; player2 < GAME_PLAYER_COUNT; player2++) {
-            if (reinterpret_cast<unsigned char *>(this)[player2 + 0x2b1] != 0)
+            if (m_mapHeader.playerEnabled[player2] != 0)
                 townIndex9++;
-            if (*reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x2c9) + 1 == townIndex9) {
-                *reinterpret_cast<short *>(reinterpret_cast<unsigned char *>(this) + 0x2d9) =
-                    static_cast<short>(player2);
+            if (m_mapHeader.victoryConditionValue + 1 == townIndex9) {
+                m_mapHeader.victorySideThreshold = static_cast<unsigned short>(player2);
                 player2 = 99;
             }
         }
     }
-    if (reinterpret_cast<unsigned char *>(this)[0x2c6] == 3)
-        reinterpret_cast<unsigned char *>(this)[0x2c7] = 1;
+    if (m_mapHeader.victoryCondition == 3)
+        m_mapHeader.computerAlsoWins = 1;
 
     for (player2 = 0; player2 < m_playerCount; player2++) {
         m_players[player2].unknown40 = 0;
@@ -1193,7 +1191,7 @@ void game::NewMap(char *filename)
         m_players[player2].unknown42 = -1;
         heroIndex1 = 0;
         selectedTown14 = -1;
-        if (reinterpret_cast<unsigned char *>(this)[0x2ce] == 0 &&
+        if (m_mapHeader.unknown25 == 0 &&
             m_players[player2].townCount > 0) {
             for (pass27 = 0; pass27 < 2; pass27++) {
                 for (townIndex9 = 0; townIndex9 < m_players[player2].townCount; townIndex9++) {
@@ -1290,10 +1288,8 @@ void game::NewMap(char *filename)
                 }
             }
             heroClass5 = Random(0, 5);
-            if (reinterpret_cast<signed char *>(this)[
-                    gcColorToSetupPos[m_players[player2].color] + 0x459] < 6)
-                heroClass5 = reinterpret_cast<signed char *>(this)[
-                    gcColorToSetupPos[m_players[player2].color] + 0x459];
+            if (m_setupPlayerRace[gcColorToSetupPos[m_players[player2].color]] < 6)
+                heroClass5 = m_setupPlayerRace[gcColorToSetupPos[m_players[player2].color]];
             m_players[player2].availableHeroes[0] =
                 static_cast<char>(GetNewHeroId(player2, heroClass5, 0));
             m_availableHeroes[m_players[player2].availableHeroes[0]] = 64;
@@ -1359,12 +1355,12 @@ secondHero:
                     if (gbHumanPlayer[player2]) {
                         m_players[player2].unknown0f = 3;
                         memcpy(m_players[player2].resources,
-                               gInitResourcesHuman[reinterpret_cast<signed char *>(this)[0x465]],
+                               gInitResourcesHuman[m_difficulty],
                                28);
-                        if (reinterpret_cast<signed char *>(this)[player2 + 0x453] != 0) {
+                        if (m_playerHandicap[player2] != 0) {
                             for (townIndex9 = 0; townIndex9 < 7; townIndex9++) {
                                 double resourceScale;
-                                if (reinterpret_cast<signed char *>(this)[player2 + 0x453] == 1)
+                                if (m_playerHandicap[player2] == 1)
                                     resourceScale = 0.85;
                                 else
                                     resourceScale = 0.7;
@@ -1375,49 +1371,46 @@ secondHero:
                     } else {
                         m_players[player2].unknown0f = Random(0, 2);
                         memcpy(m_players[player2].resources,
-                               gInitResourcesComputer[reinterpret_cast<signed char *>(this)[0x465]],
+                               gInitResourcesComputer[m_difficulty],
                                28);
                     }
                 }
                 SetupAdjacentMons();
-                if (reinterpret_cast<unsigned char *>(this)[0x2cb] == 2) {
-                    ultimateDistance5 = *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x2cc);
-                    ultimateTries4 = *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x2d7);
-                    *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x2cc) = 0;
+                if (m_mapHeader.lossCondition == 2) {
+                    ultimateDistance5 = m_mapHeader.lossConditionValue;
+                    ultimateTries4 = m_mapHeader.lossTownY;
+                    m_mapHeader.lossConditionValue = 0;
                     if (m_worldMap.GetCell(ultimateDistance5, ultimateTries4)->triggerType == 0xaa)
-                        *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x2cc) =
+                        m_mapHeader.lossConditionValue =
                             m_worldMap.GetCell(ultimateDistance5, ultimateTries4)->w4hi;
                     else {
                         if (m_worldMap.GetCell(ultimateDistance5, ultimateTries4 - 1)->triggerType == 0xaa)
-                            *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x2cc) =
+                            m_mapHeader.lossConditionValue =
                                 m_worldMap.GetCell(ultimateDistance5, ultimateTries4 - 1)->w4hi;
                         else
-                            reinterpret_cast<unsigned char *>(this)[0x2cb] = 0;
+                            m_mapHeader.lossCondition = 0;
                     }
                 }
-                if (reinterpret_cast<unsigned char *>(this)[0x2c6] == 2) {
-                    ultimateDistance5 = *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x2c9);
-                    ultimateTries4 = *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x2d5);
-                    *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x2c9) = 0;
+                if (m_mapHeader.victoryCondition == 2) {
+                    ultimateDistance5 = m_mapHeader.victoryConditionValue;
+                    ultimateTries4 = m_mapHeader.victoryTownY;
+                    m_mapHeader.victoryConditionValue = 0;
                     if (m_worldMap.GetCell(ultimateDistance5, ultimateTries4)->triggerType == 0xaa)
-                        *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x2c9) =
+                        m_mapHeader.victoryConditionValue =
                             m_worldMap.GetCell(ultimateDistance5, ultimateTries4)->w4hi;
                     else {
                         if (m_worldMap.GetCell(ultimateDistance5, ultimateTries4 - 1)->triggerType == 0xaa)
-                            *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x2c9) =
+                            m_mapHeader.victoryConditionValue =
                                 m_worldMap.GetCell(ultimateDistance5, ultimateTries4 - 1)->w4hi;
                         else
-                            reinterpret_cast<unsigned char *>(this)[0x2c6] = 0;
+                            m_mapHeader.victoryCondition = 0;
                     }
                 }
                 for (player2 = 0; player2 < m_playerCount; player2++) {
                     heroClass5 = 0;
-                    if (reinterpret_cast<signed char *>(this)[
-                            gcColorToSetupPos[m_players[player2].color] + 0x459] >= 0 &&
-                        reinterpret_cast<signed char *>(this)[
-                            gcColorToSetupPos[m_players[player2].color] + 0x459] < 6) {
-                        heroClass5 = reinterpret_cast<signed char *>(this)[
-                            gcColorToSetupPos[m_players[player2].color] + 0x459];
+                    if (m_setupPlayerRace[gcColorToSetupPos[m_players[player2].color]] >= 0 &&
+                        m_setupPlayerRace[gcColorToSetupPos[m_players[player2].color]] < 6) {
+                        heroClass5 = m_setupPlayerRace[gcColorToSetupPos[m_players[player2].color]];
                     } else {
                         if (!!m_players[player2].townCount) {
                             heroClass5 = gpGame->m_castleRecs[m_players[player2].Town(0)].m_type;
@@ -1931,7 +1924,7 @@ int game::LoadMap(char *filename)
     file = _open(gText, 0x8000);
     if (file == -1)
         FileError(gText);
-    _read(file, reinterpret_cast<unsigned char *>(this) + 0x2a9, 0x1a4);
+    _read(file, &m_mapHeader, sizeof(m_mapHeader));
     m_worldMap.Read(file, 1);
     SetMapSize(m_worldMap.width, m_worldMap.height);
 
@@ -1952,7 +1945,7 @@ int game::LoadMap(char *filename)
     }
 
     for (i = 0; i < GAME_MINE_COUNT; i++) {
-        if (field_0x2a9 == 90 && i >= GAME_TOWN_COUNT) {
+        if (m_mapHeader.magic == MAP_HEADER_MAGIC_BASE_GAME && i >= GAME_TOWN_COUNT) {
             column[0] = -1;
             row[0] = -1;
             type[0] = -1;
@@ -1969,16 +1962,16 @@ int game::LoadMap(char *filename)
         }
     }
 
-    field_0x2a9 = 92;
+    m_mapHeader.magic = MAP_HEADER_MAGIC_EXPANSION_GAME;
     _read(file, &m_obeliskCount, 1);
     _read(file, reinterpret_cast<unsigned char *>(this) + 0x64d9,
-          static_cast<unsigned char>(field_0x44b) * 2);
+          m_mapHeader.rumourCount * 2);
     *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x64d7) =
-        static_cast<unsigned char>(field_0x44b);
+        m_mapHeader.rumourCount;
     _read(file, reinterpret_cast<unsigned char *>(this) + 0x6517,
-          static_cast<unsigned char>(field_0x44c) * 2);
+          m_mapHeader.timeEventCount * 2);
     *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x6515) =
-        static_cast<unsigned char>(field_0x44c);
+        m_mapHeader.timeEventCount;
     _read(file, &iMaxMapExtra, 4);
     ppMapExtra = reinterpret_cast<void **>(BaseAlloc(iMaxMapExtra * 4, GFILE, GMAPLINE + 0x59));
     pwSizeOfMapExtra = reinterpret_cast<short *>(BaseAlloc(iMaxMapExtra * 2, GFILE, GMAPLINE + 0x5a));
@@ -3872,8 +3865,8 @@ int game::GetRandomArtifactId(int levelMask, int allowCursed)
                 RANDOM_ARTIFACT_CURSED_REJECT_CHANCE)
                 continue;
         }
-        if (m_victoryConditionType != VICTORY_CONDITION_ARTIFACT ||
-            m_victoryConditionValue - VICTORY_ARTIFACT_ID_OFFSET != artifact)
+        if (m_mapHeader.victoryCondition != VICTORY_CONDITION_ARTIFACT ||
+            m_mapHeader.victoryConditionValue - VICTORY_ARTIFACT_ID_OFFSET != artifact)
             break;
     }
 
@@ -5520,23 +5513,23 @@ int game::CalcDifficultyRating(void)
 {
     int notused;
     int rating = 0;
-    if (((signed char *)this)[0x465] == 0)
+    if (m_difficulty == 0)
         rating += 0x32;
-    else if (((signed char *)this)[0x465] == 1)
+    else if (m_difficulty == 1)
         rating += 0x50;
-    else if (((signed char *)this)[0x465] == 2)
+    else if (m_difficulty == 2)
         rating += 0x64;
-    else if (((signed char *)this)[0x465] == 3)
+    else if (m_difficulty == 3)
         rating += 0x78;
-    else if (((signed char *)this)[0x465] == 4)
+    else if (m_difficulty == 4)
         rating += 0x8c;
-    if (((unsigned char *)this)[0x2ad] == 0)
+    if (m_mapHeader.difficulty == 0)
         ;
-    else if (((unsigned char *)this)[0x2ad] == 1)
+    else if (m_mapHeader.difficulty == 1)
         rating += 0x14;
-    else if (((unsigned char *)this)[0x2ad] == 2)
+    else if (m_mapHeader.difficulty == 2)
         rating += 0x28;
-    else if (((unsigned char *)this)[0x2ad] == 3)
+    else if (m_mapHeader.difficulty == 3)
         rating += 0x50;
     return rating;
 }
@@ -5549,12 +5542,12 @@ int CalcBaseScore(int days)
 {
     int score = GAME_SCORE_BASE;
 
-    if (gpGame->m_mapWidth == GAME_SCORE_MAP_EXTRA_LARGE)
+    if (gpGame->m_mapHeader.width == GAME_SCORE_MAP_EXTRA_LARGE)
         days = static_cast<int>(days * 1.2);
-    else if (gpGame->m_mapWidth == GAME_SCORE_MAP_LARGE)
+    else if (gpGame->m_mapHeader.width == GAME_SCORE_MAP_LARGE)
         days = static_cast<int>(days * 1.1);
-    else if (gpGame->m_mapWidth == GAME_SCORE_MAP_MEDIUM) {
-    } else if (gpGame->m_mapWidth == GAME_SCORE_MAP_SMALL)
+    else if (gpGame->m_mapHeader.width == GAME_SCORE_MAP_MEDIUM) {
+    } else if (gpGame->m_mapHeader.width == GAME_SCORE_MAP_SMALL)
         days = static_cast<int>(days * 0.95);
 
     if (days <= GAME_SCORE_FIRST_TIER) {
@@ -6007,25 +6000,25 @@ ultimateRumour:
             category10 = Random(0, 100);
             if (category10 < 33) {
                 // Retail uses the X coordinate for both threshold axes.
-                if (!(m_mapWidth * 0.33 <= m_ultimateArtifactX ||
-                      m_mapHeight * 0.33 <= m_ultimateArtifactX)) {
+                if (!(m_mapHeader.width * 0.33 <= m_ultimateArtifactX ||
+                      m_mapHeader.height * 0.33 <= m_ultimateArtifactX)) {
                     direction9 = 7;
-                } else if (!(m_mapWidth * 0.33 <= m_ultimateArtifactX ||
-                             m_ultimateArtifactX <= m_mapHeight * 0.66)) {
+                } else if (!(m_mapHeader.width * 0.33 <= m_ultimateArtifactX ||
+                             m_ultimateArtifactX <= m_mapHeader.height * 0.66)) {
                     direction9 = 5;
-                } else if (!(m_mapWidth * 0.33 <= m_ultimateArtifactX)) {
+                } else if (!(m_mapHeader.width * 0.33 <= m_ultimateArtifactX)) {
                     direction9 = 6;
-                } else if (!(m_ultimateArtifactX <= m_mapWidth * 0.66 ||
-                             m_mapHeight * 0.33 <= m_ultimateArtifactX)) {
+                } else if (!(m_ultimateArtifactX <= m_mapHeader.width * 0.66 ||
+                             m_mapHeader.height * 0.33 <= m_ultimateArtifactX)) {
                     direction9 = 1;
-                } else if (!(m_ultimateArtifactX <= m_mapWidth * 0.66 ||
-                             m_ultimateArtifactX <= m_mapHeight * 0.66)) {
+                } else if (!(m_ultimateArtifactX <= m_mapHeader.width * 0.66 ||
+                             m_ultimateArtifactX <= m_mapHeader.height * 0.66)) {
                     direction9 = 3;
-                } else if (!(m_ultimateArtifactX <= m_mapWidth * 0.66)) {
+                } else if (!(m_ultimateArtifactX <= m_mapHeader.width * 0.66)) {
                     direction9 = 2;
-                } else if (!(m_mapHeight * 0.33 <= m_ultimateArtifactX)) {
+                } else if (!(m_mapHeader.height * 0.33 <= m_ultimateArtifactX)) {
                     direction9 = 0;
-                } else if (!(m_ultimateArtifactX <= m_mapHeight * 0.66)) {
+                } else if (!(m_ultimateArtifactX <= m_mapHeader.height * 0.66)) {
                     direction9 = 4;
                 } else {
                     direction9 = 8;
@@ -6345,7 +6338,7 @@ DATA(0x00528450) int iViewArmyType;
 DATA(0x00528454) class hero *viewSpellsHero;
 DATA(0x00528458) int gbUpgradeArmy;
 DATA(0x00528460) short RandMineQty[8];
-DATA(0x00528470) char *gcCurMapName;
+DATA(0x00528470) char gcCurMapName[16];
 DATA(0x00528480) signed char *gbNGDifficulty;
 DATA(0x00528488) int iViewArmyUpgradeToType;
 DATA(0x0052848c) int viewArmyBaseX;

@@ -13,6 +13,7 @@ DATA(0x004f26f4) char *xNecromancerShrine;
 DATA(0x004f26f8) char *xNecromancerShrineDesc;
 DATA(0x004f2700) char *xStableText[X_GLOBAL_STABLE_TEXT_COUNT];
 DATA(0x004f2750) char *xPasswordStrings[X_GLOBAL_PASSWORD_STRING_COUNT];
+DATA(0x004f2a9c) signed char xNetHasOldPlayers;
 DATA(0x004f2ab0) int xShrineBuildingCost[2334];
 DATA(0x00527e78) int xPasswordStringsIndex[8];
 DATA(0x00527e98) signed char xIsExpansionMap;
