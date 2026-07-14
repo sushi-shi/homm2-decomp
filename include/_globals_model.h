@@ -9,7 +9,6 @@
 // Kept OUT of _globals.h (which is CodeView-backed) — assert_globals_data exempts these.
 #include <_types.h>
 #include <windows.h>
-#include <nb30.h>
 #include <SOURCE/comwin.h>
 
 // VAs pinned from the retail disassembly of the referencing fns (no CodeView symbol of their own):
@@ -57,9 +56,6 @@ DATA(0x00528d10) extern long gCombatCycleTimer;
 // Icon2b.cpp IconToBitmap RLE-decoder file-static state (no CodeView symbols) - the sprite blit
 // state machine shared by the Icon*2b* family. Base 0x534c20.
 // bmap2.cpp BlitBitmap file-static blit state (no CodeView symbol):
-
-// netwin.cpp netbios per-session status byte array (no CodeView symbol), indexed by session id.
-DATA(0x005173b4) extern char gNetStatus[];
 
 // netwin.cpp netbios probe state (no CodeView symbol): the LANA number netbios was found on,
 // and the "netbios present" flag, set by is_netbios_avail and read by nb_init.
