@@ -433,7 +433,7 @@ SOURCE/ADVMGR	?CheckHandleNet@advManager@@QAEPADXZ	99.7594	ec4892d03124
 SOURCE/ADVMGR	?CheckHandleNetPlayerWait@advManager@@QAEHAAUtag_message@@H@Z	100.0000	ca28260db67f
 SOURCE/ADVMGR	?CheckLoadSample@advManager@@QAEXH@Z	100.0000	dbcfb3de838c
 SOURCE/ADVMGR	?CheckScreenScroll@advManager@@QAEXXZ	100.0000	e15473559735
-SOURCE/ADVMGR	?CheckSetEvilInterface@advManager@@QAEXHH@Z	99.8370	73e5c8893751
+SOURCE/ADVMGR	?CheckSetEvilInterface@advManager@@QAEXHH@Z	99.8370	6ce944696f49
 SOURCE/ADVMGR	?ClearBottomView@advManager@@QAEXXZ	100.0000	9e98eb3b4f3f
 SOURCE/ADVMGR	?Close@advManager@@UAEXXZ	100.0000	2c5dbd8652cb
 SOURCE/ADVMGR	?ComboDraw@advManager@@QAEHH@Z	100.0000	e68d56a53525
@@ -448,7 +448,7 @@ SOURCE/ADVMGR	?DemobilizeCurrHero@advManager@@QAEXXZ	96.5049	f7b22cb194e0
 SOURCE/ADVMGR	?DimensionDoor@advManager@@QAEXXZ	100.0000	7bbda0018f84
 SOURCE/ADVMGR	?DimensionDoorHandler@@YIHAAUtag_message@@@Z	98.2857	079fe0cfb9c6
 SOURCE/ADVMGR	?DisableButtons@advManager@@QAEXXZ	100.0000	6321339f8a72
-SOURCE/ADVMGR	?DoAdvCommand@advManager@@QAEPAVmapCell@@XZ	97.2834	f146b5fd69a5
+SOURCE/ADVMGR	?DoAdvCommand@advManager@@QAEPAVmapCell@@XZ	99.8922	994f38370245
 SOURCE/ADVMGR	?DoHeroKnob@advManager@@QAEXXZ	99.0000	0693d9ad937d
 SOURCE/ADVMGR	?DoTownKnob@advManager@@QAEXXZ	99.0000	525546b72915
 SOURCE/ADVMGR	?DoVisions@advManager@@QAEHPAVhero@@@Z	100.0000	16a915ce0a4d
@@ -460,7 +460,7 @@ SOURCE/ADVMGR	?ForceNewHover@advManager@@QAEXXZ	100.0000	22365eeaebb7
 SOURCE/ADVMGR	?GetArmySizeName@advManager@@QAEPADHH@Z	100.0000	e114146d972b
 SOURCE/ADVMGR	?GetCell@advManager@@QAEPAVmapCell@@HH@Z	97.6191	bd3092087d31
 SOURCE/ADVMGR	?GetCloudLookup@advManager@@QAEHHH@Z	96.8642	5340ba436bb2
-SOURCE/ADVMGR	?GetCursorSampleSet@advManager@@QAEXH@Z	100.0000	c41fdf262977
+SOURCE/ADVMGR	?GetCursorSampleSet@advManager@@QAEXH@Z	100.0000	c568e8348efb
 SOURCE/ADVMGR	?GetManaFrame@@YIHH@Z	100.0000	6121105678c1
 SOURCE/ADVMGR	?GetMobilityFrame@@YIHH@Z	100.0000	0348fb7b62d9
 SOURCE/ADVMGR	?GetSoundId@advManager@@QAEHHH@Z	99.7267	9b04bd43ddbf
@@ -469,7 +469,7 @@ SOURCE/ADVMGR	?HideRoute@advManager@@QAEXHHH@Z	100.0000	e7d9ab08ecde
 SOURCE/ADVMGR	?InsertSound@advManager@@QAEXHHHH@Z	100.0000	5460087ac4fd
 SOURCE/ADVMGR	?IsCrystalBallInEffect@advManager@@QAEHHHH@Z	98.1539	9e585cf53920
 SOURCE/ADVMGR	?LoadRemote@advManager@@QAEXXZ	100.0000	9361457fc19f
-SOURCE/ADVMGR	?Main@advManager@@UAEHAAUtag_message@@@Z	96.2511	75eadd73cd5c
+SOURCE/ADVMGR	?Main@advManager@@UAEHAAUtag_message@@@Z	99.9183	ac6d9a64d567
 SOURCE/ADVMGR	?MapExtraPosAndAdjacentsSet@@YIHHHE@Z	97.5211	e9503d7d17e9
 SOURCE/ADVMGR	?MobilizeCurrHero@advManager@@QAEXH@Z	100.0000	dfd659646394
 SOURCE/ADVMGR	?MouseInScrollZone@advManager@@QAEHXZ	100.0000	504169b33aa3
@@ -479,7 +479,7 @@ SOURCE/ADVMGR	?ProcessHover@advManager@@QAEHHH@Z	99.9286	d9828f8744fd
 SOURCE/ADVMGR	?ProcessSearch@advManager@@QAEHHH@Z	99.4859	02a931a5db57
 SOURCE/ADVMGR	?ProcessSelect@advManager@@QAEHPAUtag_message@@PAPAVmapCell@@@Z	99.6147	ce2c4104626e
 SOURCE/ADVMGR	?PuzzleDraw@advManager@@QAEXHHHH@Z	99.9091	3123b470982f
-SOURCE/ADVMGR	?QuickInfo@advManager@@QAEXHH@Z	85.2004	657fc8380da2
+SOURCE/ADVMGR	?QuickInfo@advManager@@QAEXHH@Z	99.8875	4ff86bc5d894
 SOURCE/ADVMGR	?RedrawAdvScreen@advManager@@QAEXHH@Z	100.0000	f44e5cfbe480
 SOURCE/ADVMGR	?Reseed@advManager@@QAEXHH@Z	100.0000	ac1cb9a514a4
 SOURCE/ADVMGR	?SaveAdventureBorder@advManager@@QAEXXZ	99.8023	ff4589fcaf60
@@ -508,7 +508,7 @@ SOURCE/ADVMGR	?UpdBottomViewNewTurn@advManager@@QAEHXZ	99.8053	87a4dbbfc54f
 SOURCE/ADVMGR	?UpdBottomViewResMsg@advManager@@QAEHXZ	100.0000	47398bdc911b
 SOURCE/ADVMGR	?UpdateHeroLocator@advManager@@QAEXHHH@Z	99.0610	65ed239b077e
 SOURCE/ADVMGR	?UpdateHeroLocators@advManager@@QAEXHH@Z	100.0000	ff9cf9e945ca
-SOURCE/ADVMGR	?UpdateRadar@advManager@@QAEXHH@Z	99.5591	963bf7621ae9
+SOURCE/ADVMGR	?UpdateRadar@advManager@@QAEXHH@Z	99.5582	fcbfa9aae6fc
 SOURCE/ADVMGR	?UpdateScreen@advManager@@QAEXHH@Z	99.9603	980674020b54
 SOURCE/ADVMGR	?UpdateSystemOptions@@YIXH@Z	94.0829	ccf4d7103a25
 SOURCE/ADVMGR	?UpdateTownLocators@advManager@@QAEXHH@Z	100.0000	d2217b855df8
