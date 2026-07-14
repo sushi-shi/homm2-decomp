@@ -112,6 +112,18 @@ DATA(0x00534ce8) static unsigned int gCTRun;
 // versus retail 0x5af and the first divergence is still broad setup allocation at +0x11. This is
 // an evidenced structural checkpoint, not a compiler-state wall; see
 // icon2bc-occurrence-7283868.tsv and resume from the setup register/lifetime split.
+// The e813385 setup audit closes that structural question without forcing another source shape.
+// Excluding retail's trailing pad, candidate and retail have the same 86 ordered basic blocks,
+// the same 67-branch mnemonic sequence, and identical ordered successor vectors. Both reserve one
+// stack word; their 15 accesses to its [esp+0x10] home have the same load/store sequence. Formal
+// home counts also agree except clipX at 5/6, paired exactly with candidate forwarding local X
+// where retail reloads X0. All m_data, bitmap, and IconEntry field accesses and all other scratch
+// owners agree. Retail IconToBitmap uses the same ESI-data/EBX-offset/EDI-entry construction, and
+// its current typed entry/data source reproduces that register chain through the entry formation
+// under this compiler, so no missing layout or accessor is indicated here. icon2bc's downstream
+// lifetime state instead hoists x into EBP at +0x11 and coalesces offset/entry in ECX. Treat the
+// Cnt/X0/Y residual as explained allocation state, but not as a byte-proven permitted wall: the
+// instruction stream still differs broadly. Revisit only after a real type/header/TU-state change.
 VA(0x004d32a0, 0x5af)
 void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                             int clip, int clipX, int clipY, int clipW, int clipH, int color,
