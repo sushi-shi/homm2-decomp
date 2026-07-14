@@ -111,6 +111,21 @@ exact functions; the remaining `ModifySample` row is full-function raw-exact aft
 masking. Thus all 34 functions are raw-exact, with only `ModifySample`'s permitted delinker identity
 wall below 100% objdiff. All 27 pre-existing exact siblings remained pinned throughout.
 
+The subsequent assertion-wrapper recovery at source-decomp checkpoint `226828f` replaced the three
+remaining direct `ProcessAssert` calls in `ValidatePreviousPosition`, `ModifySample`, and `PollSound`
+with `H2_ASSERT`. `homm2 sema strings` at retail RVAs `0x0cb6a0`, `0x0ccc80`, and `0x0cd320`
+independently recovered the same original filename, `I:\Projects\Heroes\Prog\BASE\soundmgr.cpp`;
+the existing retail line arguments `66`, `0x52f`, and `0x61a` and each assertion expression's token
+shape were preserved. No source-shape experiment or permutation tool was used. The source hash moved
+from `9f170036461a1a79ab2a7894f0402ad271573cf647bee0577c4a56f4fd34e487` to
+`cc03a7df2e5b3aae3e11ba5c78cd538148a0baf27802e8494d987e843559244a`, and the candidate object hash
+from `d3821307056a0da061096dc9efd6e8e457be27e99704ed2076fb962f5c034a52` to
+`48768cc90911be6b39ee041731bddd0542fdb610773d4c0faab4e755b6606e78`. A fresh complete-function
+COFF audit again found all 34 functions raw-exact after masking the union of four-byte relocation
+payloads. Objdiff remained 33/34 exact, with only `ModifySample` at `99.837960%`; its full `0x202`
+span remained raw-exact with 23 candidate and 20 retail relocations. Do not retry filename casing,
+`__FILE__`, expression synonyms, or either permuter for these wrappers.
+
 ## BASE/Textntry AST searches
 
 All three searches used only `scripts/permute_ast.py`, never the regex permuter, and required all 11
