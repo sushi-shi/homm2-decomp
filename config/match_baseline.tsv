@@ -613,7 +613,7 @@ SOURCE/CMBTMGR	??_H@YGXPAXIHP6EX0@Z@Z	100.0000
 SOURCE/CMBTMGR	?CatAttack@combatManager@@QAEXH@Z	1.4743	9b7a4f9c1171
 SOURCE/CMBTMGR	?CheckApplyBadMorale@combatManager@@QAEHHH@Z	11.4590	2ed3d3426717
 SOURCE/CMBTMGR	?CheckApplyGoodMorale@combatManager@@QAEXHH@Z	10.8167	364e0daf9c92
-SOURCE/CMBTMGR	?Close@combatManager@@UAEXXZ	5.3859	f97ac43f3421
+SOURCE/CMBTMGR	?Close@combatManager@@UAEXXZ	100.0000	a82c682b9527
 SOURCE/CMBTMGR	?CombatSystemOptions@combatManager@@QAEXXZ	20.2812	cf9de8768ee7
 SOURCE/CMBTMGR	?CombatSystemOptionsHandler@@YIHAAUtag_message@@@Z	1.7068	0cbd21d1f226
 SOURCE/CMBTMGR	?CombineGroups@combatManager@@QAEXPAVarmyGroup@@0@Z	100.0000	06a32266b979
@@ -621,8 +621,8 @@ SOURCE/CMBTMGR	?DrawCombatBorder@combatManager@@QAEXXZ	100.0000	8e845432585c
 SOURCE/CMBTMGR	?ExperienceValueOfStack@combatManager@@QAEHH@Z	11.5667	f5ab9f920749
 SOURCE/CMBTMGR	?FreeArmies@combatManager@@QAEXXZ	23.1786	209513d86e6c
 SOURCE/CMBTMGR	?FreeIcons@combatManager@@QAEXXZ	18.2817	0189714bf1d3
-SOURCE/CMBTMGR	?GenerateMap@combatManager@@QAEXXZ	4.7721	00006ca9d0ad
-SOURCE/CMBTMGR	?GetBackgroundName@combatManager@@QAEPADXZ	8.9052	482099e8fb5a
+SOURCE/CMBTMGR	?GenerateMap@combatManager@@QAEXXZ	100.0000	8c6094ca5265
+SOURCE/CMBTMGR	?GetBackgroundName@combatManager@@QAEPADXZ	99.5690	01f6a185d3f3
 SOURCE/CMBTMGR	?GetGridIndex@combatManager@@QAEHHH@Z	11.2017	ea47226ebadf
 SOURCE/CMBTMGR	?GetNextArmy@combatManager@@QAEHH@Z	6.3836	28250db341ad
 SOURCE/CMBTMGR	?InCastle@combatManager@@QAEHH@Z	26.9231	d251523c6f89
@@ -633,8 +633,8 @@ SOURCE/CMBTMGR	?LoadArmies@combatManager@@QAEXXZ	5.4310	24aae01cedce
 SOURCE/CMBTMGR	?LoadIcons@combatManager@@QAEXXZ	5.8733	7c47994983bf
 SOURCE/CMBTMGR	?LowerDoor@combatManager@@QAEXXZ	24.4906	4a6d08f84fc9
 SOURCE/CMBTMGR	?MakeCreaturesVanish@combatManager@@QAEXXZ	6.5556	c736a5ef2e6c
-SOURCE/CMBTMGR	?MoreTreesNear@combatManager@@QAEHXZ	3.9036	78437219c511
-SOURCE/CMBTMGR	?Open@combatManager@@UAEHH@Z	5.2955	003e1cf844e4
+SOURCE/CMBTMGR	?MoreTreesNear@combatManager@@QAEHXZ	99.2107	a402d9897997
+SOURCE/CMBTMGR	?Open@combatManager@@UAEHH@Z	100.0000	57d789afcb44
 SOURCE/CMBTMGR	?RaiseDoor@combatManager@@QAEXXZ	19.0882	9d5cf33bf056
 SOURCE/CMBTMGR	?ResetHitByCreature@combatManager@@QAEXXZ	30.9048	39dfa5f2e5bf
 SOURCE/CMBTMGR	?SaveCombatBorder@combatManager@@QAEXXZ	100.0000	979ae436e300
@@ -644,7 +644,7 @@ SOURCE/CMBTMGR	?SetupCombat@combatManager@@QAEXHHPAVhero@@PAVarmyGroup@@PAVtown@
 SOURCE/CMBTMGR	?ShootMissile@combatManager@@QAEXHHHHPAMPAVicon@@@Z	3.4521	244997b48b2f
 SOURCE/CMBTMGR	?ShotIsThroughWall@combatManager@@QAEHHHH@Z	5.7061	d6c625bde879
 SOURCE/CMBTMGR	?TestRaiseDoor@combatManager@@QAEXXZ	37.1429	5cd9e725701f
-SOURCE/CMBTMGR	?UpdateArmyGroup@combatManager@@QAEXH@Z	4.7029	04ec64a5aa4b
+SOURCE/CMBTMGR	?UpdateArmyGroup@combatManager@@QAEXH@Z	100.0000	1a722a93d70c
 SOURCE/CMBTMGR	?UpdateCombatSystemOptions@@YIXH@Z	11.0000	360f70e351a0
 SOURCE/CMBTMGR	?ValidHex@@YIHH@Z	70.0000	ba9c60d83e6a
 SOURCE/COMMAND	?AddArmy@combatManager@@QAEXHHHHHH@Z	4.4605	5dc155b9cede
@@ -1143,7 +1143,7 @@ SOURCE/PHILAI	?ValidateHero@@YIXPAVhero@@@Z	100.0000	68fc09ee3994
 SOURCE/PHILAI	?ValueOfBuyingBuilding@philAI@@QAEXPAVtown@@HAAHAAM@Z	99.8659	68e20788570c
 SOURCE/PHILAI	?ValueOfBuyingCreature@philAI@@QAEXPAVtown@@HAAHHAAM@Z	5.9000	c318a2595952
 SOURCE/PHILAI	?ValueOfBuyingHero@philAI@@QAEXPAVtown@@PAVhero@@AAHAAM@Z	7.1713	405ed3dcd8e3
-SOURCE/PHILAI	?ValueOfEventAtPosition@philAI@@QAEHHHHPAH@Z	99.6744	c2df74e35ec1
+SOURCE/PHILAI	?ValueOfEventAtPosition@philAI@@QAEHHHHPAH@Z	99.7735	c2df74e35ec1
 SOURCE/PHILAI	?ValueOfTown@philAI@@QAEHPAVtown@@@Z	97.0337	c2002b956865
 SOURCE/RECRUIT	??0recruitUnit@@QAE@PAVarmyGroup@@HPAF@Z	28.4921	d6ac472badcf
 SOURCE/RECRUIT	??0recruitUnit@@QAE@PAVtown@@HH@Z	24.9306	d18178f070e2
@@ -1217,7 +1217,7 @@ SOURCE/SMACKMGR	?ShutDownSmacker@@YIXXZ	100.0000	39c63172cd05
 SOURCE/SMACKMGR	?SmackManagerMain@@YIXXZ	94.4764	a5f11644b06e
 SOURCE/SPELLAI	?ClearEffects@combatManager@@QAEXXZ	99.7333	37e6c0ce962a
 SOURCE/SPELLAI	?DetermineEffectOfSpell@combatManager@@QAEXHPAH0@Z	98.6109	53be9a732bd4
-SOURCE/SPELLAI	?DoSpellAI@combatManager@@QAEHHH@Z	99.2581	c1f178b99783
+SOURCE/SPELLAI	?DoSpellAI@combatManager@@QAEHHH@Z	99.6452	c1f178b99783
 SOURCE/SPELLAI	?EffectSpellCreateCreature@combatManager@@QAEHHH@Z	99.0845	2a44cd82f352
 SOURCE/SPELLAI	?EffectSpellCure@combatManager@@QAEXPAHHHH@Z	89.4751	08cc8684aec3
 SOURCE/SPELLAI	?EffectSpellDamage@combatManager@@QAEXPAHHH@Z	97.0299	1ce6c4bf1fd8
