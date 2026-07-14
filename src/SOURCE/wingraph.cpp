@@ -9,6 +9,8 @@
 #include <BASE/bitmap.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/Misc.h>
+#include <BASE/palette.h>
+#include <BASE/INPUTMGR.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/kbwin.h>
@@ -32,6 +34,7 @@ DATA(0x004f1a10) static short gDDCreateSurfaceLineBase = 393;
 DATA(0x004f1dbc) static short gDDUpdatePaletteLineBase = 500;
 DATA(0x004f1e18) static short gDDCleanUpLineBase = 526;
 DATA(0x004f1e74) static short gDDSetFullScreenLineBase = 572;
+DATA(0x004f2084) static short gSetGraphicsTypeLineBase = 1247;
 
 VA(0x00435290, 0x55)
 void DDRestoreDisplayMode(void)
@@ -843,40 +846,206 @@ void ConnectToDLLs(void)
 }
 
 VA(0x00437207, 0x29)
-void DisconnectDLLs(void) {}
+void DisconnectDLLs(void)
+{
+    if (reinterpret_cast<unsigned long>(hDDrawLibrary) >=
+        WINGRAPH_LOAD_LIBRARY_SUCCESS) {
+        FreeLibrary(hDDrawLibrary);
+    }
+}
 
 VA(0x00437230, 0x2c)
-void RestoreDisplayMode(void) {}
+void RestoreDisplayMode(void)
+{
+    if (giGraphicsType == WINGRAPH_GRAPHICS_WING) {
+        return;
+    } else {
+        DDRestoreDisplayMode();
+    }
+}
 
 VA(0x0043725c, 0x2e)
-int SetPalette(void) { return 0; }
+int SetPalette(void)
+{
+    if (giGraphicsType == WINGRAPH_GRAPHICS_WING)
+        return 0;
+    else
+        return DDSetPalette();
+}
 
 VA(0x0043728a, 0x7e)
-void GetGraphicsInfo(void) {}
+void GetGraphicsInfo(void)
+{
+    HDC screenDC;
+
+    screenDC = GetDC(0);
+    if (screenDC != 0) {
+        giMainVideoModeColorDepth = GetDeviceCaps(screenDC, BITSPIXEL);
+        giMainVideoModeWidth = GetDeviceCaps(screenDC, HORZRES);
+        giMainVideoModeHeight = GetDeviceCaps(screenDC, VERTRES);
+        ReleaseDC(0, screenDC);
+        if (giMainVideoModeColorDepth < WINGRAPH_COLOR_DEPTH)
+            ShutDown("Heroes II requires 256 color mode or higher.");
+    }
+}
 
 VA(0x00437308, 0xa0)
-void InitGraphics(void) {}
+void InitGraphics(void)
+{
+    LogStr("IG1");
+    ConnectToDLLs();
+    LogStr("IG2");
+    if (gConfig.gfx[giCurExe].fullScreen != 0)
+        giGraphicsType = WINGRAPH_GRAPHICS_DIRECT_DRAW;
+    else
+        giGraphicsType = WINGRAPH_GRAPHICS_WING;
+    if (giGraphicsType == WINGRAPH_GRAPHICS_WING) {
+        LogStr("IG3");
+        WGInitGraphics();
+        LogStr("IG4");
+    } else {
+        LogStr("IG5");
+        DDInitGraphics();
+        LogStr("IG6");
+    }
+}
 
 VA(0x004373a8, 0x46)
-int AppPaint(void *, void *) { return 0; }
+int AppPaint(void *window, void *message)
+{
+    if (giGraphicsType == WINGRAPH_GRAPHICS_WING)
+        return WGAppPaint(window, message);
+    else
+        return DDAppPaint(window, message);
+}
 
 VA(0x004373ee, 0x2c)
-void InitializePalette(void) {}
+void InitializePalette(void)
+{
+    if (giGraphicsType == WINGRAPH_GRAPHICS_WING)
+        WGInitializePalette();
+    else
+        DDInitializePalette();
+}
 
 VA(0x0043741a, 0x38)
-void UpdatePalette(signed char *) {}
+void UpdatePalette(signed char *paletteData)
+{
+    if (giGraphicsType == WINGRAPH_GRAPHICS_WING)
+        WGUpdatePalette(paletteData);
+    else
+        DDUpdatePalette(paletteData);
+}
 
 VA(0x00437452, 0x31)
-void CleanUpWinGraphics(void) {}
+void CleanUpWinGraphics(void)
+{
+    if (giGraphicsType == WINGRAPH_GRAPHICS_WING)
+        WGCleanUpWinGraphics();
+    else
+        DDCleanUpWinGraphics();
+    DisconnectDLLs();
+}
 
+// @early-stop
+// Relocation-masked code bytes and the 0x4 frame are identical. The only two
+// objdiff rows are gConfig+0x30 versus retail's delinked const_00128d50 label;
+// both indexed operands resolve to VA 0x00528d50 and all 13 relocations align.
 VA(0x00437483, 0xe1)
-void SetFullScreenStatus(int) {}
+void SetFullScreenStatus(int fullScreen)
+{
+    if (gbInSmackMgr != 0) {
+    } else {
+        if (gConfig.gfx[giCurExe].fullScreen == fullScreen) {
+        } else {
+            if (giGraphicsType == WINGRAPH_GRAPHICS_WING) {
+                if (gbDDrawAttached == 0)
+                    return;
+                gConfig.gfx[giCurExe].fullScreen = 1;
+                if (SetGraphicsType(WINGRAPH_GRAPHICS_DIRECT_DRAW) != 0)
+                    DDSetFullScreenStatus(fullScreen);
+            } else if (fullScreen == 0) {
+                if (gbWinGAttached != 0)
+                    SetGraphicsType(WINGRAPH_GRAPHICS_WING);
+            } else {
+                DDSetFullScreenStatus(fullScreen);
+            }
+            if (fullScreen != 0)
+                CheckChangeCursor(0, 0, 1);
+        }
+    }
+}
 
 VA(0x00437564, 0x31)
-int QueryNewPalette(void) { return 0; }
+int QueryNewPalette(void)
+{
+    if (giGraphicsType == WINGRAPH_GRAPHICS_WING)
+        return WGQueryNewPalette();
+    else
+        return DDQueryNewPalette();
+}
 
+// @match-note
+// The real body is target +0x000..+0x219; frame 0x1c, all six local slots, CFG,
+// calls, and external relocations align. First code divergence is target +0x0c
+// `mov eax,[ebp-0x1c]; cmp [giGraphicsType],eax` versus ours `mov eax,
+// [giGraphicsType]; cmp [ebp-0x1c],eax` (one byte shorter). Equality operands
+// were swapped and direct/addressed parameter spellings were tried. Target
+// +0x21a..+0x285 is a delinked SVSearchArray ctor/dtor/atexit tail, not this body.
+// Revisit after the SOURCE placeholder census reaches zero.
 VA(0x00437595, 0x286)
-int SetGraphicsType(int) { return 0; }
+int SetGraphicsType(int graphicsType)
+{
+    int fullScreen;
+    int x;
+    int y;
+    int width;
+    int height7;
+    void *screenBuffer;
+
+    if (graphicsType == giGraphicsType)
+        return 1;
+    if (graphicsType == WINGRAPH_GRAPHICS_WING && gbWinGAttached == 0)
+        return 0;
+    if (graphicsType == WINGRAPH_GRAPHICS_DIRECT_DRAW && gbDDrawAttached == 0)
+        return 0;
+
+    fullScreen = gConfig.gfx[giCurExe].fullScreen;
+    x = gConfig.gfx[giCurExe].x;
+    y = gConfig.gfx[giCurExe].y;
+    width = gConfig.gfx[giCurExe].width;
+    height7 = gConfig.gfx[giCurExe].height;
+    screenBuffer = BaseAlloc(WINGRAPH_WIDTH * WINGRAPH_HEIGHT,
+        WINGRAPH_SOURCE_FILE, gSetGraphicsTypeLineBase + 18);
+    memcpy(screenBuffer, gpWindowManager->m_screen->m_pixels,
+        WINGRAPH_WIDTH * WINGRAPH_HEIGHT);
+    if (graphicsType == WINGRAPH_GRAPHICS_WING) {
+        gConfig.gfx[giCurExe].fullScreen = 0;
+        DDCleanUpWinGraphics();
+        giGraphicsType = WINGRAPH_GRAPHICS_WING;
+        WGInitGraphics();
+        gpWindowManager->m_screen->m_pixels =
+            static_cast<unsigned char *>(lpInitWin);
+    } else {
+        WGCleanUpWinGraphics();
+        giGraphicsType = WINGRAPH_GRAPHICS_DIRECT_DRAW;
+        DDInitGraphics();
+        gpWindowManager->m_screen->m_pixels =
+            static_cast<unsigned char *>(lpInitWin);
+    }
+    memcpy(gpWindowManager->m_screen->m_pixels, screenBuffer,
+        WINGRAPH_WIDTH * WINGRAPH_HEIGHT);
+    BaseFree(screenBuffer, WINGRAPH_SOURCE_FILE,
+        gSetGraphicsTypeLineBase + 39);
+    if (fullScreen != 0 && graphicsType == WINGRAPH_GRAPHICS_WING) {
+        SetMenuStatus(1);
+        ResizeWindow(x, y, width, height7);
+    }
+    BlitBitmapToScreen(gpWindowManager->m_screen, 0, 0, WINGRAPH_WIDTH,
+        WINGRAPH_HEIGHT, 0, 0);
+    UpdatePalette(gpBufferPalette->m_data);
+    return 1;
+}
 
 // ---- globals (definitions, RVA order) ----
 DATA(0x004f1288) int gbWinGAttached;
