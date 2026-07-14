@@ -480,6 +480,14 @@ typedef enum EventRecruitCreature {
     EVENT_RECRUIT_MEDUSA = 61
 } EventRecruitCreature;
 
+typedef enum RecruitSiteType {
+    RECRUIT_SITE_GENIE = 0,
+    RECRUIT_SITE_EARTH_ELEMENTAL = 1,
+    RECRUIT_SITE_AIR_ELEMENTAL = 2,
+    RECRUIT_SITE_FIRE_ELEMENTAL = 3,
+    RECRUIT_SITE_WATER_ELEMENTAL = 4
+} RecruitSiteType;
+
 typedef enum EventSoundConstant {
     EVENT_SOUND_NONE = -1,
     EVENT_SOUND_TRACK_1 = 1,

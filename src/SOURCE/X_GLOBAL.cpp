@@ -9,6 +9,8 @@
 
 // ---- globals (definitions, RVA order) ----
 DATA(0x004f26b8) char *xHSCampaignNames[EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT];
+DATA(0x004f26c8) char *xRecruitEmpty[X_GLOBAL_RECRUIT_EMPTY_COUNT];
+DATA(0x004f26e0) char *xRecruitBuy[X_GLOBAL_RECRUIT_BUY_COUNT];
 DATA(0x004f26f4) char *xNecromancerShrine;
 DATA(0x004f26f8) char *xNecromancerShrineDesc;
 DATA(0x004f2700) char *xStableText[X_GLOBAL_STABLE_TEXT_COUNT];

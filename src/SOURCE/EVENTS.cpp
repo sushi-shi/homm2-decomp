@@ -34,6 +34,7 @@
 #include <SOURCE/combatManager.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/playerData.h>
+#include <SOURCE/recruitUnit.h>
 #include <SOURCE/swapManager.h>
 #include <SOURCE/tradpost.h>
 #include <SOURCE/town.h>
@@ -2312,20 +2313,164 @@ void advManager::GenericSiteEvent(mapCell *cell, hero *eventHero)
     }
 }
 
+// @early-stop
+// Relocation-masked: all 0x191 bytes match. Objdiff's residual is the delinked
+// switch-label identity and NULL_SAMPLE2's second-word symbol name.
 VA(0x004af436, 0x191)
-void advManager::RecruitSiteEvent(class mapCell *, class hero *) {}
+void advManager::RecruitSiteEvent(mapCell *cell, hero *eventHero)
+{
+    SAMPLE2 eventSample = NULL_SAMPLE2;
+    unsigned int siteType2;
+    short availableCount;
+    int creatureType1;
+    unsigned int siteIndex;
+    unsigned int packedSite1;
+
+    siteType2 = cell->w4hi;
+    siteType2 &= AI_EVENT_RECRUIT_TYPE_MASK;
+    availableCount = static_cast<short>(cell->w4hi);
+    availableCount >>= AI_EVENT_RECRUIT_COUNT_SHIFT;
+
+    switch (siteType2) {
+    case RECRUIT_SITE_GENIE:
+        creatureType1 = MONSTER_GENIE;
+        break;
+    case RECRUIT_SITE_EARTH_ELEMENTAL:
+        creatureType1 = MONSTER_EARTH_ELEMENTAL;
+        break;
+    case RECRUIT_SITE_AIR_ELEMENTAL:
+        creatureType1 = MONSTER_AIR_ELEMENTAL;
+        break;
+    case RECRUIT_SITE_FIRE_ELEMENTAL:
+        creatureType1 = MONSTER_FIRE_ELEMENTAL;
+        break;
+    case RECRUIT_SITE_WATER_ELEMENTAL:
+        creatureType1 = MONSTER_WATER_ELEMENTAL;
+        break;
+    }
+
+    siteIndex = siteType2;
+    if (availableCount == 0) {
+        EventWindow(-1, 1, xRecruitEmpty[siteIndex], -1, 0, -1, 0, -1);
+    } else {
+        EventSound(cell->triggerType & MAP_EVENT_TYPE_MASK, availableCount,
+                   &eventSample);
+        EventWindow(-1, 2, xRecruitBuy[siteIndex], -1, 0, -1, 0, -1);
+        if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+            ExpansionRecruitEvent(eventHero, creatureType1, &availableCount);
+            packedSite1 =
+                (availableCount << AI_EVENT_RECRUIT_COUNT_SHIFT) | siteType2;
+            cell->w4hi = packedSite1;
+        }
+    }
+}
 
 VA(0x004af5c7, 0x8b)
-void advManager::ExpansionRecruitEvent(class hero *, int, short int *) {}
-
-VA(0x004af652, 0x22a)
-void advManager::JailEvent(class mapCell *, class hero *, int, int) {}
-
-VA(0x004af87c, 0x1da)
-void advManager::TownEvent(class mapCell *, int, int) {}
+void advManager::ExpansionRecruitEvent(hero *eventHero, int creatureType,
+                                       short *availableCount)
+{
+    // These unused dialog locals account for the retail /Od frame layout.
+    tag_message dialogMessage2;
+    baseManager *dialogManager =
+        new recruitUnit(&eventHero->m_army, creatureType, availableCount);
+    int dialogResult;
+    if (dialogManager == 0)
+        MemError();
+    gpExec->DoDialog(dialogManager);
+    delete dialogManager;
+}
 
 // @early-stop
-// reloc-masked: all 0x516 code bytes identical; residual is delinked jump-table/local-label and empty-string symbol naming
+// Relocation-masked: only rel32 bytes +0x7e and +0xb4 differ. The two early
+// exits target the epilogue instead of the identical final continuation;
+// every non-branch byte and external relocation target matches.
+VA(0x004af652, 0x22a)
+void advManager::JailEvent(mapCell *cell, hero *eventHero, int x, int y)
+{
+    SAMPLE2 eventSample1 = NULL_SAMPLE2;
+    int heroId9;
+    hero *releasedHero1;
+
+    heroId9 = cell->w4hi;
+    if (gpGame->m_availableHeroes[heroId9] != AI_EVENT_JAILED_HERO) {
+        NormalDialog(
+            "The jailer tells you that the hero who was imprisoned here has been released by the king who imprisoned him.",
+            1, -1, -1, -1, 0, -1, 0, -1, 0);
+        EraseObj(cell, x, y);
+    } else if (gpCurPlayer->m_heroCount >= AI_EVENT_HERO_LIMIT) {
+        NormalDialog(
+            "You already have 8 heroes, and regretfully must leave the prisoner in this jail to languish in agony for untold days.",
+            1, -1, -1, -1, 0, -1, 0, -1, 0);
+    } else {
+        EventSound(cell->triggerType & MAP_EVENT_TYPE_MASK, 0, &eventSample1);
+        NormalDialog(
+            "In a dazzling display of daring, you break into the local jail and free the hero imprisoned there, who, in return, pledges loyalty to your cause.",
+            1, -1, -1, -1, 0, -1, 0, -1, 0);
+        gpGame->m_heroRecs[heroId9].m_owner = eventHero->m_owner;
+        gpGame->m_availableHeroes[heroId9] = eventHero->m_owner;
+        releasedHero1 = &gpGame->m_heroRecs[heroId9];
+        EraseObj(cell, x, y);
+        gpCurPlayer->m_heroIds[gpCurPlayer->m_heroCount] =
+            static_cast<signed char>(heroId9);
+        gpCurPlayer->m_heroCount++;
+        releasedHero1->m_x = x;
+        releasedHero1->m_y = y;
+        releasedHero1->m_eventFlags = 0;
+        releasedHero1->m_direction = AI_EVENT_HERO_DIRECTION;
+        releasedHero1->m_remainingMobility = releasedHero1->CalcMobility();
+        releasedHero1->m_mobility = releasedHero1->m_remainingMobility;
+        releasedHero1->m_locationType = cell->triggerType;
+        releasedHero1->m_occupiedTown = cell->w4hi;
+        cell->triggerType = MAP_EVENT_ACTION_FLAG | MAP_EVENT_HERO_INTERACTION;
+        cell->w4hi = heroId9;
+        SendMapChange(AI_EVENT_HERO_MAP_CHANGE,
+                      static_cast<signed char>(heroId9), x, y,
+                      AI_EVENT_HERO_MAP_CHANGE_VALUE, 0, 0);
+    }
+}
+
+VA(0x004af87c, 0x1da)
+void advManager::TownEvent(mapCell *cell, int x, int y)
+{
+    hero *eventHero1;
+    int combatResult1;
+    hero *defendingHero;
+    town *eventTown1;
+
+    eventTown1 = gpGame->GetTown(cell->w4hi);
+    eventHero1 = gpGame->GetHero(gpCurPlayer->m_currentHero);
+    DemobilizeCurrHero();
+    if (eventTown1->m_owner == giCurPlayer) {
+        eventTown1->m_occupyingHeroId = gpCurPlayer->CurrentHero();
+        eventTown1->View(0);
+    } else if (eventTown1->HasGarrison()) {
+        defendingHero = eventTown1->m_occupyingHeroId == -1
+                            ? 0
+                            : gpGame->GetHero(eventTown1->m_occupyingHeroId);
+        combatResult1 =
+            DoCombat(x, y, eventHero1, &eventHero1->m_army, eventTown1,
+                     defendingHero, &eventTown1->m_army, x, y, -1, 1);
+        if (combatResult1 == 0)
+            gpGame->ClaimTown(eventTown1->m_id, giCurPlayer, 0);
+    } else {
+        gpGame->ClaimTown(eventTown1->m_id, giCurPlayer, 0);
+        if (gbGameOver)
+            return;
+        UpdateRadar(1, 0);
+        UpdateHeroLocators(1, 1);
+        UpdateTownLocators(1, 1);
+        eventTown1->m_occupyingHeroId = gpCurPlayer->CurrentHero();
+        eventTown1->View(0);
+    }
+    eventTown1->GiveSpells(0);
+    eventHero1->CheckLevel();
+}
+
+// @early-stop
+// Excluding address tables +0x1cb..+0x1e7, +0x235..+0x31d, and
+// +0x468..+0x484 plus byte tables +0x31d..+0x396 and +0x484..+0x4d9,
+// all 176 normalized instructions match. Residuals are delinked local-table
+// relocations and string symbol names; external relocation targets match.
 VA(0x004afa56, 0x516)
 void advManager::EventSound(int eventType, int eventData, struct SAMPLE2 *outSample)
 {
