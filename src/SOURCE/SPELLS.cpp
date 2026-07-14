@@ -228,11 +228,13 @@ int CombatSpecialHandler(tag_message &message)
 // @match-note 92.25%: semantics and CFG agree, including the two-stage teleport,
 // recursive hover, close/cancel paths, and all message mutations. The message
 // reference arrives in ECX and is stored at -0x8; the 0x0c frame also has hex at
-// -0x4 and the implicit switch temporary at -0x0c, with no other locals. External
-// relocation targets agree. First residual is the switch dispatch after +0x09;
-// explicit ranges confirm retail body order is hover, select, then mouse-down/cancel.
-// That order and the opposite order were tried. Revisit only after total SOURCE
-// fuzzy reaches 95%, or earlier if later same-TU structural work changes this function.
+// -0x4 and the implicit switch temporary at -0x0c, with no other locals. The
+// helper reports one extra base self-call relocation; manual target decomp/range
+// review confirms retail recursively calls HandleCastSpell at that same site,
+// represented by the target delinker as an intra-function label. First residual
+// is the switch dispatch after +0x09. Explicit ranges confirm retail body order
+// is hover, select, then mouse-down/cancel; the opposite order was also tried.
+// Revisit for switch shaping after structural recovery.
 VA(0x00420aec, 0x2aa)
 int HandleCastSpell(tag_message &message)
 {
@@ -352,16 +354,17 @@ int combatManager::FindResurrectArmyIndex(int side, int spell, int hex)
     return SPELL_NO_SELECTION;
 }
 
-// @match-note 92.04%: semantics and CFG agree, including target filtering, every
-// case body, retail case-body order, and singleton teleport-origin access. The
-// 0x14 frame has target at -0x8, the implicit teleport hex temporary at -0x0c,
-// this at -0x10, the switch temporary at -0x14, and an unused word at -0x4;
-// arguments are spell +0x8 and hex +0x0c, with no other source locals. External
-// relocs agree. First residual is the equivalent 0.0 constant-pool identity at
-// +0x57, followed by the delinked switch boundary at +0x60. Tried a teleport
-// pointer local/direct expression, this/global origin access, and both case orders.
-// Revisit only after total SOURCE fuzzy reaches 95%, or earlier if later same-TU
-// structural work changes this function.
+// @match-note: Semantics and CFG agree, including every target filter and retail
+// case-body order. Retail reads the teleport origin side/index through the combat
+// singleton but resolves the destination army from this; using the singleton for
+// both produced one wrong gpCombatManager relocation. The relocation sets now
+// agree (37/37). Retail's 0x14 frame has target at -0x8, an implicit teleport
+// temporary at -0xc, this at -0x10, the switch temporary at -0x14, and an unused
+// word at -0x4; ours is 0x0c. The first normalized residual is the side/index
+// multiplication order, followed by the equivalent zero constant identity and
+// delinked switch boundary. Tried pointer/direct destination expressions, both
+// ownership spellings, and both case-body orders. Revisit for frame-slot shaping
+// after the pre-95 structural campaign.
 VA(0x0042107b, 0x521)
 int combatManager::ValidSpellTarget(int spell, int hex)
 {
@@ -455,13 +458,12 @@ int combatManager::ValidSpellTarget(int spell, int hex)
                 return 0;
         } else {
             if (hex == giNextActionGridIndex ||
-                !gpCombatManager
-                     ->m_armies[gpCombatManager
-                                    ->m_hexCells[giNextActionGridIndex]
-                                    .m_occupantSide]
-                               [gpCombatManager
-                                    ->m_hexCells[giNextActionGridIndex]
-                                    .m_occupantIndex]
+                !m_armies[gpCombatManager
+                               ->m_hexCells[giNextActionGridIndex]
+                               .m_occupantSide]
+                          [gpCombatManager
+                               ->m_hexCells[giNextActionGridIndex]
+                               .m_occupantIndex]
                      .CanFit(hex, 0, 0))
                 return 0;
         }
@@ -534,6 +536,17 @@ show_message:
     CombatMessage(gText, 1, 0, 0);
 }
 
+// @match-note: The complete dispatch, creature-cast handling, spell-specific
+// bodies, sound/hero animation, cleanup, and final selector CFG agree with retail.
+// All 270 external relocation targets agree. Retail uses a 0xb4 frame versus
+// ours 0xa8; the recovered named buffers and float[9] occupy the proven retail
+// ranges, while the remaining three words are compiler temporaries rather than
+// missing semantic locals. The first normalized residual is the typed
+// gsSpellInfo field relocation versus retail's interior label, followed by one
+// inline continuation jump and side/index multiplication order. Local scopes,
+// direct member expressions, and the recovered aggregate shapes were audited;
+// adding fake padding would not recover the retail stack layout. Revisit for
+// compiler slot shaping after the pre-95 structural campaign.
 VA(0x004217be, 0x1eca)
 void combatManager::CastSpell(int spell, int targetHex, int castByCreature, int teleportDestination)
 {
@@ -1610,10 +1623,12 @@ void combatManager::BloodLustEffect(army *target, int effect)
         giMaxExtentY - giMinExtentY + 1, SPELL_BLOOD_LUST_FIZZLE_STEPS, 0, 0);
 }
 
-// @early-stop
-// All 48 relocation-masked instructions are identical and all five relocation
-// targets agree. The reported 99.86% is solely delinked relocation identity;
-// there is no code-byte residual.
+// @match-note: The 48-instruction stream and all five relocation targets agree,
+// but this is not an exact raw-byte match: retail reserves a 0x0c frame and stores
+// this at -0x0c, while ours reserves 0x04 and stores it at -0x04. The other two
+// retail words are unused compiler slots; the body has no source locals. Tried
+// direct screen access and cached screen pointers without recovering the slots.
+// Revisit for predecessor/compiler-state frame shaping.
 VA(0x004250db, 0x80)
 void combatManager::Ripple(int strength)
 {
@@ -2255,12 +2270,14 @@ void combatManager::ChainLightning(int targetHex, int spellPower)
     gpMouseManager->ShowColorPointer();
 }
 
-// @match-note 94.56%: complete three-phase vapor mask and cleanup CFG. Retail
-// has a 0x30 frame and 31 relocations versus ours 0x28 and 29; the first
-// divergence is BaseAlloc's retail source-line expression, followed by the
-// bottom-stripe address evaluation order. Tried extent calculation before and
-// after palette assignment and explicit first/last stripe locals. Revisit at
-// 95% after source-line metadata/od_slots work; do not repeat those orderings.
+// @match-note: The complete three-phase vapor mask and cleanup CFG agree. Retail
+// stores the initial extent height, then replaces it with a stripe count based on
+// the unscaled giMinExtentY/5 quotient; both otherwise-unused operations are now
+// preserved. Retail has a 0x30 frame and 31 relocations versus ours 0x28 and 29,
+// with no wrong external target. The first normalized residual is BaseAlloc's
+// retail source-line expression, followed by stripe address evaluation order.
+// Tried extent initialization before/after palette assignment and scaled versus
+// unscaled first-stripe locals. Revisit for source-line identity and slot shaping.
 VA(0x00426bbb, 0x292)
 void combatManager::VaporizeCreature(int side, int armyIndex)
 {
@@ -2275,11 +2292,12 @@ void combatManager::VaporizeCreature(int side, int armyIndex)
     target->m_palette = gyModify;
     target->m_drawEnabled = 0;
 
-    int firstY = (giMinExtentY / VAPORIZE_STRIPE_WIDTH) *
-                 VAPORIZE_STRIPE_WIDTH;
+    int firstStripe = giMinExtentY / VAPORIZE_STRIPE_WIDTH;
     int lastY = (giMaxExtentY / VAPORIZE_STRIPE_WIDTH) *
                 VAPORIZE_STRIPE_WIDTH;
-    rowCount = (lastY - firstY) / VAPORIZE_STRIPE_WIDTH + 1;
+    rowCount = (lastY - firstStripe * VAPORIZE_STRIPE_WIDTH) /
+                   VAPORIZE_STRIPE_WIDTH +
+               1;
     int phase;
     for (phase = 0; phase < VAPORIZE_PHASE_COUNT; ++phase) {
         int topOffset;
@@ -2303,7 +2321,7 @@ void combatManager::VaporizeCreature(int side, int armyIndex)
         int row;
         for (row = 0; row < rowCount; ++row) {
             gyModify[row * VAPORIZE_STRIPE_WIDTH +
-                     firstY + topOffset] =
+                     firstStripe * VAPORIZE_STRIPE_WIDTH + topOffset] =
                 VAPORIZE_MASKED;
             gyModify[lastY +
                      (row * -VAPORIZE_STRIPE_WIDTH - bottomOffset)] =
@@ -2321,12 +2339,14 @@ void combatManager::VaporizeCreature(int side, int armyIndex)
     gpCombatManager->DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 }
 
-// @match-note 92.18%: complete mode parameters, sine table, phase filtering,
-// amplitude scaling, both fade masks, draw, and cleanup CFG. Retail has a 0x54
-// frame/68 relocs versus ours 0x58/62; the first code divergence after the
-// switch is side/index multiplication order, then BaseAlloc source-line
-// metadata. The old unscaled-wave/union-filter formulation was wrong and is
-// exhausted. Revisit at 95% for slot placement and allocation metadata only.
+// @match-note: Complete mode parameters, sine table, amplitude scaling, both fade
+// masks, draw, and cleanup CFG agree. The effect predicate now matches retail:
+// phases outside the center band always draw, while center-band phases skip only
+// five distances. Retail has a 0x54 frame/68 relocs versus ours 0x58/62, with no
+// wrong external target. The first normalized residual is side/index
+// multiplication order, followed by BaseAlloc source-line metadata. Tried the
+// prior conjunction/union predicate, both wave scalings, and direct/pointer army
+// access. Revisit for slot placement and allocation metadata.
 VA(0x00426e4d, 0x592)
 void combatManager::RippleCreature(int side, int armyIndex, int mode)
 {
@@ -2403,8 +2423,8 @@ void combatManager::RippleCreature(int side, int armyIndex, int mode)
                 amplitudeIndex = RIPPLE_MODE_ZERO_AMPLITUDE_START -
                                  amplitudeIndex;
         }
-        if (phase > RIPPLE_PHASE_CENTER &&
-            phase < RIPPLE_PHASE_END - RIPPLE_SKIP_CENTER_OFFSET &&
+        if (phase <= RIPPLE_PHASE_CENTER ||
+            phase >= RIPPLE_PHASE_END - RIPPLE_SKIP_CENTER_OFFSET ||
             (skipDistance != RIPPLE_SKIP_DISTANCE_0 &&
              skipDistance != RIPPLE_SKIP_DISTANCE_1 &&
              skipDistance != RIPPLE_SKIP_DISTANCE_2 &&
@@ -2597,12 +2617,13 @@ void combatManager::ShowMassSpell(signed char (* const affected)[20],
         MakeCreaturesVanish();
 }
 
-// @match-note 84.73%: complete mass-target selection, damage, presentation,
-// influence application, and final draw CFG. Retail has a 0x54 frame versus
-// ours 0x58. The delink helper stops at a local label (4/59); explicit
-// llvm-objdump range review shows all external callees/globals agree and one
-// extra local-label relocation remains. Tried retail enemy-body-before-friendly
-// switch order. Revisit structural block order at 95%, not expression grinding.
+// @match-note: Complete mass-target selection, damage, presentation, influence
+// application, and final draw CFG agree. Retail has a 0x54 frame versus ours
+// 0x58. The delink helper stops at a local label; explicit llvm-objdump range
+// review shows all external callees/globals agree and one extra local-label
+// relocation remains. Enemy-body-before-friendly switch order is measurably
+// closer; friendly-first regressed alignment and was rejected. Revisit for
+// switch/slot shaping after the pre-95 structural campaign.
 VA(0x00427a91, 0x8f8)
 void combatManager::CastMassSpell(int spell, int spellPower)
 {
@@ -3020,12 +3041,14 @@ void combatManager::DoBlast(int targetHex, int spell)
     gpResourceManager->Dispose(blastIcon);
 }
 
-// @match-note 85.51%: complete quantity/artifact handling, both dead-hex record
-// removals, message, reverse-death animation, and cleanup; the 0x44 frame and
-// all 33 relocation targets agree. The first code divergence is quantity-clamp
-// polarity, then processedOtherHex initialization and the dead-occupant loop
-// CFG. Tried moving that initialization across the oldQuantity arm and explicit
-// break/keepSearching forms. Revisit structural loop order at 95%.
+// @match-note: Complete quantity/artifact handling, both dead-hex record removals,
+// message, reverse-death animation, and cleanup agree; the 0x44 frame and all 33
+// relocation targets match. Retail performs a matched corpse's removal after the
+// match arm but inside the scan loop and does not break; the source now preserves
+// that unusual CFG. The first residual is quantity-clamp polarity, followed by
+// processedOtherHex initialization and local-slot order. Tried moving that
+// initialization across oldQuantity and the former nested-removal/break shape.
+// Revisit for condition polarity and slots after the pre-95 structural campaign.
 VA(0x00429089, 0x655)
 void combatManager::Resurrect(int spell, int targetHex, int spellPower)
 {
@@ -3065,6 +3088,8 @@ void combatManager::Resurrect(int spell, int targetHex, int spellPower)
                         else if (m_hexCells[deadHex].m_deadOccupantFrames[index] == 0)
                             otherHex = deadHex + 1;
                     }
+                }
+                if (deadIndex != COMBAT_HEX_EMPTY) {
                     m_hexCells[deadHex].m_occupantSide =
                         m_hexCells[deadHex].m_deadOccupantSides[index];
                     m_hexCells[deadHex].m_occupantIndex =
@@ -3082,7 +3107,6 @@ void combatManager::Resurrect(int spell, int targetHex, int spellPower)
                         m_hexCells[deadHex].m_deadOccupantIndices[index] =
                             m_hexCells[deadHex].m_deadOccupantIndices[index + 1];
                     }
-                    break;
                 }
             }
             --m_hexCells[deadHex].m_deadOccupantCount;
