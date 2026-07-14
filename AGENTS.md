@@ -50,6 +50,12 @@ authoritative. This file is the short, restart-ready Codex workflow.
    later shared-header/layout recovery can invalidate carefully tuned matches. Only after the
    syntactic-placeholder census reaches zero, start the last-mile phase and use
    `scripts/permute_ast.py` on structurally aligned 96-99% functions.
+   For a remaining compiler/TU-state wall after those gates, use
+   `scripts/tu_state_noise.py` as a bounded diagnostic. It inserts only reversible
+   preprocessor/lexical probes, compiles outside the normal object path, and rejects sibling,
+   exact-function, predecessor, size, and relocation regressions. It never applies its best
+   patch automatically. Audit the generated manifest and raw bytes, and do not commit arbitrary
+   noise without a credible recovered-source explanation.
    Sweep every SOURCE TU in that phase. The campaign is complete only when every function's
    retained fuzzy maximum is 100%, and therefore every TU's fuzzy-max is 100%. If a byte-proven
    delinker artifact prevents the raw metric from reaching 100%, normalize or explicitly bless
@@ -195,6 +201,14 @@ authoritative. This file is the short, restart-ready Codex workflow.
   secondary naming references for enums, object IDs, and serialization formats. Retail disassembly,
   CodeView, data bytes, and relocations are authoritative. Adapt useful names to this repo's style;
   do not copy its implementation structure.
+- Project Ironfist is available read-only at `/path/to/homm2/project-ironfist`. It is
+  not original NWC source: `src/raw_decompiled/` is Hex-Rays output,
+  `src/sergei_reversing_dump/` is a community manual-reversing corpus, and `src/cpp/shared/`
+  contains cleaned but potentially mod-altered code. Use it only as secondary evidence for
+  semantics, source-shaped loops, constants, enums, field names, and related-version behavior.
+  Check its commit and working-tree state when provenance matters; never copy decompiler
+  temporaries, raw pointer arithmetic, guessed signatures, or mod behavior. Retail evidence
+  remains authoritative, and this repository's naming conventions still take precedence.
 
 ## Static Data And Link Resolution
 
