@@ -31,27 +31,27 @@ DATA(0x005380c8) static int gFCClipR;
 DATA(0x005380c0) static unsigned char *gFCDst;
 
 // @match-note
-// Functionally complete typed reconstruction with canonical IconRle enum constants, dim-palette
-// owner, byte-pointer row storage, and retail-proven DATA owners for every file-static scratch.
-// Fresh ee1391f audit: live 85.27% (retained maximum 86.2544%), candidate 0x543 versus retail
-// 0x54d, 395/397 instructions, the same 76 ordered blocks/59 branches/successor vectors, and the
-// same eight-byte frame. Relocations are 84/83 with no wrong owner: every occurrence count agrees
-// except gFCY 9/8. Source has one snapshot shared by the initial vertical clauses, but candidate reloads
-// gFCY at +0x7b/+0x89 while retail loads it once at +0x77 and retains ECX for the bottom test.
-// Removing that excess from the ordered static-owner stream leaves one adjacent order difference
-// in the right-clipped literal arm: candidate ClipR/Skip versus retail Skip/ClipR. Source already
-// stores zero to Skip before the ClipR expression; the recorded staged/common-tail forms optimize
-// away or regress, so this is part of the same allocator residual rather than missing side effects.
-// First raw divergence remains +0x0b: candidate keeps icon data in EBX while retail uses ESI.
-// Retail then spills icon width at [esp+0x14] for the horizontal upper edge and retains the Y load;
-// the documented width/pitch/snapshot/staged-skip variants either optimize away or add a false
-// third frame word. The retail CodeView `.c` basename and exact `C:\proj\BASE` path in C++ mode are
-// text-identical. C89-style within-scope declaration ordering regresses to 82.56%/85:83; isolating
-// its downstream-only portion gives 83.60%/84:83. Splitting the general/dim/mono serialized
-// constants into separate typedef enums gives 84.33%/84:83, while
-// splitting only mono gives 84.10%/85:83; both were reverted. Declaring statics in ascending proven
-// retail address order gives 84.43%/85:83, so only the DATA annotations were retained.
-// This is an unresolved setup/source-shape residual, not a byte-proven wall. No permuter was used.
+// Complete typed decoder with the canonical IconEntry/layout, enum constants, dim-palette owner,
+// byte-pointer rows, retail DATA owners, eight-byte frame, and the same 76 ordered blocks and 59
+// branches as retail. On master 71bdca9 the unused IconShear typedef in IconRle.h lowered this TU
+// to 84.33%. Moving the shear and monochrome typedef enums to consumer-only headers is a real
+// declaration-ownership correction and raises it through 85.27% to 85.32%. From the shear-scoped
+// stage, mono scoping improves four siblings and leaves the other three unchanged; a fifth score
+// gain was rejected because it left shear sentinels as raw literals. Moving IconRle after bitmap.h,
+// dimPalette.h, or string.h is byte-identical, so declaration placement is closed here.
+// Candidate remains 0x53f versus retail 0x54d and 394 versus 397 instructions. Relocations are
+// 84/83 with every target and occurrence agreeing except gFCY 9/8. Candidate stores Y at relocation
+// +0x52, then loads it at +0x77 and +0x85; retail stores at +0x55 and loads once at +0x77, retaining
+// ECX through the bottom test. First raw divergence is still +0x0b: candidate keeps icon data in
+// EBX while retail uses ESI. Retail also spills icon width at [esp+0x14] for the horizontal upper
+// edge; the source already owns distinct width/pitch lifetimes.
+// Under this scoped-header state, accumulating into formal y gives 81.83%/81:83 because MSVC
+// propagates y through the clip tests and row setup. A sibling-style clip-home memcpy reaches
+// 85.07%/83:83 only by adding a non-retail store/reload, and direct global predicates give
+// 82.89%/81:83. Direct gFCY publication remains 85.04%/84:83. All were reverted: matching a count
+// without the surrounding instructions is not structural recovery. Earlier width/pitch, snapshot,
+// staged-skip, C89 declaration, static-order, and enum-grouping attempts remain closed. The
+// residual is unresolved, not a byte-proven wall; no regex or AST permuter was used.
 VA(0x004d9790, 0x54d)
 void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                                 int clip, int clipX, int clipY, int clipW, int clipH, int color,

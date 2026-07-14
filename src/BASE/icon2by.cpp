@@ -9,6 +9,7 @@
 #include <BASE/bitmap.h>
 #include <BASE/IconEntry.h>
 #include <BASE/IconRle.h>
+#include <BASE/IconShear.h>
 #include <SOURCE/dimPalette.h>
 #include <string.h>
 // Per-call decoder scratch.
