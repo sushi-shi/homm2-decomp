@@ -7,12 +7,12 @@
 #include <BASE/Icon2b.h>
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
-#include <SOURCE/X_GLOBAL.h>
-#include <_globals_model.h>
-#include <BASE/Misc.h>
+#include <BASE/IconEntry.h>
+#include <BASE/IconRle.h>
+#include <SOURCE/dimPalette.h>
 #include <string.h>
-// Per-call decoder scratch — its own 0x534c20+ global block (modeled in _globals_model.h).
-DATA(0x00534c20) static int gIcRow;
+// Per-call decoder scratch — its own 0x534c20+ file-static block.
+DATA(0x00534c20) static unsigned char *gIcRow;
 DATA(0x00534c24) static int gIcPitch;
 DATA(0x00534c28) static unsigned char gIcColor;
 DATA(0x00534c2c) static unsigned char *gIcDimPal;
@@ -26,24 +26,38 @@ DATA(0x00534c48) static int gIcX0;
 DATA(0x00534c4c) static unsigned int gIcDimLen;
 DATA(0x00534c50) static int gIcY;
 DATA(0x00534c54) static int gIcX;
-DATA(0x00534c58) static unsigned char *gIcEntry;
+DATA(0x00534c58) static IconEntry *gIcEntry;
 DATA(0x00534c5c) static unsigned int gIcCnt2;
 
+// @match-note
+// Macro-neutral structural checkpoint: complete no-frame CFG and correct relocation targets.
+// First divergence is +0x11: ours loads x before the indexed entry fields; retail retains the
+// 13-byte frame offset in EBX, reads x/srcOffset, forms EDI, then publishes entry/source/X0.
+// Counts are 80/83: only X0 2/3, Y 7/8, and Cnt2 4/5 differ; every missing publication is present
+// in source and is removed by /O2 CSE/dead-store elimination. Narrow owner headers, indexed-entry
+// selection, split X/Y accumulation, typed scratch pointers, and retail fill-arm order were tried.
+// Revisit after a real icon/header TU-state change; no permutation tool was used.
 VA(0x004d0570, 0x4ed)
 void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                   int clip, int clipX, int clipY, int clipW, int clipH, int color)
 {
-    IconEntry *entry = reinterpret_cast<IconEntry *>(srcIcon->m_data) + frame;
     unsigned char *data = reinterpret_cast<unsigned char *>(srcIcon->m_data);
-    int X = x + entry->x;
-    int Y = entry->y + y;
-    gIcSrc = data + entry->srcOffset;
-    gIcEntry = reinterpret_cast<unsigned char *>(entry);
+    int entryOffset = frame * sizeof(IconEntry);
+    int entryX = reinterpret_cast<IconEntry *>(data + entryOffset)->x;
+    int srcOffset = reinterpret_cast<IconEntry *>(data + entryOffset)->srcOffset;
+    IconEntry *entry = reinterpret_cast<IconEntry *>(data + entryOffset);
+    unsigned char *cursor = data + srcOffset;
+    gIcEntry = entry;
+    gIcSrc = cursor;
+    int X = x;
+    X += entryX;
+    int Y = entry->y;
+    Y += y;
     gIcX0 = X;
     gIcPitch = dest->m_width;
     gIcY = Y;
     if (clip != 0) {
-        if (gIcX0 < clipX || clipW + clipX < entry->w + X || gIcY < clipY ||
+        if (gIcX0 < clipX || clipW + clipX < entry->w + gIcX0 || gIcY < clipY ||
             clipY + clipH < entry->h + gIcY) {
             clip = 1;
             gIcClipR = clipX + clipW - 1;
@@ -52,30 +66,29 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int fra
             clip = 0;
         }
     }
-    unsigned char *row =
-        reinterpret_cast<unsigned char *>(gIcPitch * gIcY + reinterpret_cast<int>(dest->m_pixels));
+    unsigned char *row = dest->m_pixels + gIcPitch * gIcY;
     for (;;) {
         gIcSrc++;
         int cmd = gIcSrc[-1];
         if (static_cast<signed char>(cmd) < 0) {
             // ---- negative command ----
-            if ((cmd & 0x40) == 0) {
+            if ((cmd & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
                 // skip run / end-of-sprite
                 gIcX = X;
-                gIcRow = reinterpret_cast<int>(row);
+                gIcRow = row;
                 gIcRun = cmd;
-                if ((cmd & 0x3f) == 0)
+                if ((cmd & ICON_RLE_COMMAND_RUN_MASK) == 0)
                     return;
-                X = X + (cmd & 0x3f);
+                X = X + (cmd & ICON_RLE_COMMAND_RUN_MASK);
                 continue;
             }
             // 0xc0 - 0xff
             gIcRun = cmd;
-            unsigned int count = cmd & 0x3f;
+            unsigned int count = cmd & ICON_RLE_COMMAND_RUN_MASK;
             int flags = 0;
             if (count != 0) {
                 // 0xc1 - 0xff : solid colour run
-                if (cmd == 0xc1) {
+                if (cmd == ICON_RLE_LONG_SOLID_COMMAND) {
                     gIcSrc++;
                     count = gIcSrc[-1];
                 }
@@ -86,7 +99,7 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int fra
             // 0xc0 : shadow / dim run
             gIcSrc++;
             flags = gIcSrc[-1];
-            count = flags & 3;
+            count = flags & ICON_RLE_DIM_SHORT_COUNT_MASK;
             if (count == 0) {
                 gIcSrc++;
                 count = gIcSrc[-1];
@@ -94,7 +107,7 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int fra
             gIcDimLen = count;
             if (color != 0) {
                 gIcRun = flags;
-                if (flags & 0x80) {
+                if (flags & ICON_RLE_DIM_RECOLOR_FLAG) {
                     gIcCnt2 = count;
                     gIcColor = static_cast<unsigned char>(color);
                     goto do_fill;
@@ -109,10 +122,10 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int fra
                 if (clipY <= gIcY && gIcClipB >= gIcY &&
                     (right = X + count, clipX < right) && gIcClipR >= X) {
                     if (clipX <= X) {
-                        if (gIcClipR < right)
-                            memset(row + X, gIcColor, (gIcClipR - X) + 1);
-                        else
+                        if (gIcClipR >= right)
                             memset(row + X, gIcColor, count);
+                        else
+                            memset(row + X, gIcColor, (gIcClipR - X) + 1);
                     } else {
                         unsigned int cn = clipW;
                         if (right <= gIcClipR)
@@ -127,9 +140,10 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int fra
         do_dim:
             gIcCnt2 = count;
             gIcRun = flags;
-            if (flags & 0x40) {
-                unsigned int lvl = (flags & 0x3c) * 0x40;
-                unsigned char *palette = reinterpret_cast<unsigned char *>(uDimPal) + lvl;
+            if (flags & ICON_RLE_DIM_APPLY_FLAG) {
+                unsigned int lvl =
+                    (flags & ICON_RLE_DIM_LEVEL_MASK) * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
+                unsigned char *palette = &uDimPal[0][0][0] + lvl;
                 if (clip == 0) {
                     unsigned char *dp = row + X;
                     gIcDimPal = palette;
