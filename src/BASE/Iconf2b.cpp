@@ -71,6 +71,14 @@ DATA(0x00534c60) static int gFlipSkip;
 // the sibling final-Y lifetime, and an int pitch all regressed. The broad-header source was
 // restored; a clean live rebuild is 86.05%/0x4e5/82:81, while the retained source-hash maximum
 // remains 86.5756%. See the appended post-dimPalette family. This remains unresolved, not a wall.
+// The 5645ed8 hybrid follow-up localized the narrow owner's three excess occurrences: every
+// scratch owner except gFlipY exactly matches retail, while gFlipY is 11/8 because setup, clipped
+// fill, and clipped dim each reload it once. CURSOR.h or hero.h alone restore the broad 82/81
+// allocation, proving those unrelated X_GLOBAL dependencies dominate the palette declaration;
+// declaring dimPalette before X_GLOBAL is byte-identical to broad canonical. Nested vertical
+// gates improve the narrow state to 85.36% but regress broad canonical, and dependency-after-
+// scratch, Misc-only, const/register lifetime, and include-order hybrids do not beat 86.05% live.
+// The integrated broad source remains; see the appended 5645ed8 hybrid family. This is unresolved.
 VA(0x004d1ba0, 0x4f1)
 void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                       int clip, int clipX, int clipY, int clipW, int clipH, int color)
