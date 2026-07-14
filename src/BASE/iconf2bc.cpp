@@ -39,12 +39,20 @@ DATA(0x005380c0) static unsigned char *gFCDst;
 // stage, mono scoping improves four siblings and leaves the other three unchanged; a fifth score
 // gain was rejected because it left shear sentinels as raw literals. Moving IconRle after bitmap.h,
 // dimPalette.h, or string.h is byte-identical, so declaration placement is closed here.
-// Candidate remains 0x53f versus retail 0x54d and 394 versus 397 instructions. Relocations are
-// 84/83 with every target and occurrence agreeing except gFCY 9/8. Candidate stores Y at relocation
-// +0x52, then loads it at +0x77 and +0x85; retail stores at +0x55 and loads once at +0x77, retaining
-// ECX through the bottom test. First raw divergence is still +0x0b: candidate keeps icon data in
-// EBX while retail uses ESI. Retail also spills icon width at [esp+0x14] for the horizontal upper
-// edge; the source already owns distinct width/pitch lifetimes.
+// A fresh selected-frame audit under the consumer-scoped enum state recovered a real typed-root
+// boundary: retain the IconEntry array root, read the indexed width/X fields, then bind the selected
+// entry while advancing a separate byte cursor. This raises live match from 85.32% to 85.99% and
+// removes the old +0x0b divergence: candidate now keeps icon data/source in retail ESI and working
+// X in retail EBX through the decoder. Candidate is 0x53c versus retail 0x54d and 393 versus 397
+// instructions. Relocations remain 84/83 with every target and occurrence agreeing except gFCY
+// 9/8. Candidate stores Y at relocation +0x4f, then loads it at +0x76 and +0x84; retail stores at
+// +0x55 and loads once at +0x77, retaining ECX through the bottom test.
+// First raw divergence is now +0x11: candidate forms the final frame offset before loading formal
+// X, then loads entry X before width; retail loads formal X into EBP before that LEA, loads width
+// before entry X, and spills width at [esp+0x14] for the horizontal upper edge. Binding `entry`
+// between the two indexed reads is byte-identical. Moving the semantic `+1` into the initial X
+// expression regresses to 85.63%, so both were reverted. The source still owns distinct
+// width/destination-pitch lifetimes; the earlier width/pitch family remains closed.
 // Under this scoped-header state, accumulating into formal y gives 81.83%/81:83 because MSVC
 // propagates y through the clip tests and row setup. A sibling-style clip-home memcpy reaches
 // 85.07%/83:83 only by adding a non-retail store/reload, and direct global predicates give
@@ -57,13 +65,14 @@ void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, 
                                 int clip, int clipX, int clipY, int clipW, int clipH, int color,
                                 unsigned char *colorTable)
 {
-    unsigned char *src = reinterpret_cast<unsigned char *>(srcIcon->m_data);
+    IconEntry *entries = reinterpret_cast<IconEntry *>(srcIcon->m_data);
+    unsigned char *src = reinterpret_cast<unsigned char *>(entries);
     int x0 = x;
     int w;
-    IconEntry *entry = reinterpret_cast<IconEntry *>(src) + frame;
     int pitch;
-    w = entry->w;
-    x0 = x0 - entry->x;
+    w = entries[frame].w;
+    x0 = x0 - entries[frame].x;
+    IconEntry *entry = &entries[frame];
     x0 = x0 - w;
     gFCEntry = entry;
     src += entry->srcOffset;
