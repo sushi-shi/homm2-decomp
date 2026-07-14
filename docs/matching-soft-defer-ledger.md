@@ -26,7 +26,7 @@ remain unmarked and in the same lane.
 
 Canonical source state:
 
-- checkpoint: `2aeff38`
+- checkpoint: `a4fa3a0`
 - `src/BASE/Textntry.cpp`:
   `ac8dd08884961ba6d73e8a312391cdeecac71ba132f5badef5f79201a63b34d8`
 - `include/BASE/textEntryWidget.h`:
@@ -126,6 +126,34 @@ Every full hash, score, and pin/rejection outcome is in
 [`textntry-read-ast-ac8dd.tsv`](matching-matrices/textntry-read-ast-ac8dd.tsv). Do not repeat these
 hashes while the canonical source/header hashes remain `ac8dd088...`/`8207f088...`. A higher fuzzy
 score alone is not a retest trigger and must never override an earlier raw-span regression.
+
+Manual lifetime, CFG, and exact-predecessor pass after integration at `a4fa3a0`:
+
+- 35 new unique whole-source hashes were compiled or classified without either permutation tool;
+  the canonical source/header hashes were restored unchanged;
+- exact-neutral predecessor forms covered explicit `this`, nested scopes, chained/comma stores,
+  `const` constructor locals, `register` on `iconFrame`, `iconFrame | 0`, `0[&iconFrame]`, and two
+  combined exact-predecessor bundles. Eighteen states left both residuals unchanged;
+- constructor member/parameter reference aliases changed already-correct raw spans and regressed
+  exact Setup to 99.932434%; explicit storage casts, a constructor-base-argument cast, and a
+  destructor pointer snapshot also regressed Setup without helping either target;
+- changing only `Read`'s branch-local `enabled` from `int` to `short` moved `cmp edi,3` before the
+  `m_height` load exactly as retail, while preserving exact Setup and every pinned sibling. It is
+  still invalid: candidate emits `mov ax,1`, while retail requires `mov eax,1` before the two word
+  stores. Read scores 98.642390% in that state;
+- `enabled | 0` is folded back to the same wrong 16-bit materialization. A short-to-int snapshot
+  adds `movsx` and regresses Setup; reusing the short in the final compare adds sign extension,
+  subtraction, and another compare. `long`, `unsigned int`, and `register int` are byte-neutral and
+  retain the original load/compare reversal;
+- duplicating the common `type == 3` arm at progressively later rectangle-store boundaries does not
+  reproduce retail commoning. VC4.2 retains extra branch bodies/compares, scoring 94.390730% through
+  98.013245%, so do not revisit the duplicated-arm CFG family;
+- the complete rows are in
+  [`textntry-manual-tu-a4fa3a0.tsv`](matching-matrices/textntry-manual-tu-a4fa3a0.tsv).
+
+The 16-bit `enabled` result is a diagnostic boundary, not an accepted improvement: the schedule is
+right only by changing the proved 32-bit constant materialization. Neither residual is a permitted
+wall and neither receives `@early-stop`.
 
 Fresh semantic-lifetime pass from lane checkpoint `97c1152`:
 
