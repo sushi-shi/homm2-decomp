@@ -125,6 +125,15 @@ DATA(0x00534c60) static int gFlipSkip;
 // Reusing entryY/w/x0/y instead, copying at publication, or snapshotting before the horizontal
 // short-circuit regresses. The first divergence is still the premature entry-Y load before retail's
 // +0x1d entry LEA. See the appended fresh10 family; this remains unresolved and is not a wall.
+// The fresh11 ownership pass removed the promoted entryY local and accumulates the packed field
+// directly into the caller's y parameter at the source point after the X/source-offset reads. This
+// is semantically identical, preserves the fresh10 clip-home snapshot, 0x8 frame, ESI/[edi+9], and
+// 81/81 relocation stream, and raises the live score again to 87.01% at 0x4e9. Register/const
+// promoted locals and delayed source-cursor declaration return to 86.92%; a late pointer copy,
+// dead-parameter copies, and an address-taken packed-short snapshot regress. The latter reaches
+// 87.28% only by widening the frame to 0xc and is structurally rejected. The setup's first raw
+// divergence remains unchanged at +0x1d (early Y load versus retail entry LEA), so this is a better
+// executable checkpoint rather than a wall proof. See the appended fresh11 family.
 VA(0x004d1ba0, 0x4f1)
 void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                       int clip, int clipX, int clipY, int clipW, int clipH, int color)
@@ -137,14 +146,13 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int
     w = entry->w;
     x0 = x0 - entry->x;
     src += entry->srcOffset;
-    int entryY = entry->y;
+    y += entry->y;
     x0 = x0 - w;
     gFlipEntry = entry;
     x0++;
     gFlipX0 = x0;
     int X = w + x0 - 1;
     gFlipXEnd = X;
-    y += entryY;
     gFlipY = y;
     if (clip != 0) {
         if (gFlipX0 < clipX || clipW + clipX < gFlipX0 + w ||
