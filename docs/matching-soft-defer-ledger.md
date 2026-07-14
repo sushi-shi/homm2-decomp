@@ -252,8 +252,8 @@ canonical hash agrees. This is a scheduling defer, not proof that the residual i
 
 ## BASE/Iconf2b: FlipIconToBitmap
 
-Status: active. This section records superseded axes while the same lane continues; it is not a
-wall or soft defer.
+Status: clean soft defer pending a shared icon/header or compiler-state change. It is not an
+accepted wall and must not receive `@early-stop`.
 
 Canonical source state:
 
@@ -298,9 +298,19 @@ New measured axes:
   global palette per iteration;
 - postfix `gFlipDst--`: byte-identical; the retained assignment expression removes one relocation.
 
-Continue from the first remaining structural/relocation divergence. Do not repeat these axes while
-the canonical hash agrees. If a real shared icon/header change is retained, retest the deferred
-Icon2b and icon2bc functions before final handoff.
+Final measured axes after `ea86fa8`:
+
+- mapped-byte dim initializer: 74.89% with 86 relocations, reverted;
+- palette assignment through `px` after publication: 72.63% with 86 relocations, reverted;
+- unsigned-int dim pixel index: byte-identical;
+- volatile `gFlipClipB`: byte-identical;
+- move `entryY` initialization after X subtraction: byte-identical;
+- branch-local unsigned-char fill color: byte-identical.
+
+Retest from the first structural/relocation divergence only after a real shared icon/header or
+compiler-state change. Do not repeat these axes while the canonical hash agrees. A retained shared
+change must also trigger the deferred Icon2b and icon2bc retests. This is a scheduling defer, not
+proof that the remaining bytes are impossible.
 
 ## BASE/droplist: dropListWidget::ProcessSelectDialog
 
