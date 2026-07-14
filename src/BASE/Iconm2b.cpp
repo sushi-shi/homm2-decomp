@@ -23,37 +23,36 @@ DATA(0x00534be8) static int gMonoClipB;
 DATA(0x00534bec) static int gMonoX;
 
 // @match-note
-// Structurally complete mono-RLE decoder. Both sides use one four-byte pitch slot (`sub esp,4`),
-// save EBX/ESI/EDI/EBP, and return with `ret 0x24`; skip/end, solid fill, four clipping quadrants,
-// and newline CFGs agree. First divergence is +0x11: ours retains the 13-byte frame offset in EBX
-// and reads entry.x/srcOffset before publishing the entry, while retail materializes the entry in
-// ECX and publishes it first. Ours ends at +0x25e versus retail +0x266. Relocations are 36/38 with
-// no base-only target: retail X0 is +0x34/+0x59/+0x63/+0x23b versus ours
-// +0x3b/+0x5e/+0x233, and retail Y is +0x4a/+0x7a/+0x88/+0xd8/+0x159/+0x247/+0x253
-// versus ours +0x4e/+0x7a/+0xdc/+0x150/+0x23f/+0x24b. Thus the missing setup accesses are
-// retail's first X0 clip reload (+0x59; ours forwards EAX) and second Y clip reload (+0x88; ours
-// reuses EBX); all other seven scratch owners agree occurrence-for-occurrence. Publishing a local
-// entry before its field snapshots worsens X0 to 2/4 (Y remains 6/7) and shrinks to 0x253. Moving
-// the real working-X initialization after row setup yields the right X0 count but at the wrong
-// point (+0xde), moves
-// the X store from retail +0x38 to +0xe2, and grows to 0x263. Reversing or splitting the Y sum is
-// byte-identical; accumulating into the by-value y parameter collapses further to 0x252.
-// Indexed entry selection, direct scratch ownership, direct positive clip tests, narrow owner
-// headers, typed row storage, and retail fill-arm order were also tried. This remains unresolved,
-// not a proven wall. Revisit after a reachable icon/header TU-state change or post-coverage; no
-// permutation tool was used in this pass.
+// Complete mono-RLE decoder with the selected IconEntry kept as one typed lifetime: entry/source
+// publication, initial clipping, skip/end, solid fill, four clipped-fill quadrants, and newline
+// state agree semantically. Both sides reserve only the four-byte pitch home (`sub esp,4`), save
+// EBX/ESI/EDI/EBP, and return with `ret 0x24`. Excluding retail's two trailing padding NOPs, retail
+// is 181 instructions and ours is 182; both have 31 basic blocks, 46 edges, and the same ordered
+// successor graph. Ours ends at +0x25a versus retail +0x266.
+// First divergence is setup +0x14: retail adds the data base to ECX, publishes the entry, and only
+// then loads x; VC4.2 hoists ours' x into EBX before that add. Relocations remain 36/38 with no
+// base-only target. Retail X0 is +0x34/+0x59/+0x63/+0x23b versus ours
+// +0x39/+0x58/+0x22f, and retail Y is +0x4a/+0x7a/+0x88/+0xd8/+0x159/+0x247/+0x253
+// versus ours +0x4d/+0x76/+0xc9/+0x14c/+0x23b/+0x247. The missing occurrences are the second
+// setup X0 reload (+0x63; ours keeps the +0x58 value) and second setup Y reload (+0x88; ours keeps
+// the +0x76 value); every other scratch owner agrees occurrence-for-occurrence.
+// Replacing the former entry-offset/field snapshots with the single typed entry lifetime improves
+// the retained shape and is kept. A chained X publication is byte-identical; an explicit working-X
+// local changes entry/data registers broadly and regresses. Direct global-entry consumption adds
+// one or three non-retail entry relocations. Earlier closed attempts include delayed working-X,
+// reversed/split Y sums, by-value y accumulation, indexed entry selection, comparison reversals,
+// direct scratch ownership, narrow headers, and alternate fill-arm spellings. This is unresolved,
+// not a proven wall; revisit only after a real reachable header/TU-state change. No permutation
+// tool was used.
 VA(0x004cfae0, 0x266)
 void MonoIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                       int color, int clip, int clipX, int clipY, int clipW, int clipH)
 {
     unsigned char *data = reinterpret_cast<unsigned char *>(srcIcon->m_data);
-    int entryOffset = frame * sizeof(IconEntry);
-    int entryX = reinterpret_cast<IconEntry *>(data + entryOffset)->x;
-    int srcOffset = reinterpret_cast<IconEntry *>(data + entryOffset)->srcOffset;
-    IconEntry *entry = reinterpret_cast<IconEntry *>(data + entryOffset);
+    IconEntry *entry = reinterpret_cast<IconEntry *>(data + frame * sizeof(IconEntry));
     gMonoEntry = entry;
-    gMonoSrc = data + srcOffset;
-    gMonoX0 = entryX + x;
+    gMonoSrc = data + entry->srcOffset;
+    gMonoX0 = entry->x + x;
     gMonoX = gMonoX0;
     gMonoY = entry->y + y;
     if (clip != 0) {
