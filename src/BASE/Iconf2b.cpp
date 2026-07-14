@@ -134,6 +134,17 @@ DATA(0x00534c60) static int gFlipSkip;
 // 87.28% only by widening the frame to 0xc and is structurally rejected. The setup's first raw
 // divergence remains unchanged at +0x1d (early Y load versus retail entry LEA), so this is a better
 // executable checkpoint rather than a wall proof. See the appended fresh11 family.
+// The fresh12 selected-frame pass tested the remaining address-formation boundary without replaying
+// fresh1-11. Advancing the typed root materializes EDI before packed Y, but either reads width after
+// the LEA (84.89%) or preloads srcOffset into EBP before it (86.60%). Reading width through a separate
+// selection cursor is byte-identical to this checkpoint. A no-symbol inline typed selector regresses
+// to 83.71%/0x4f8 and moves the decoder cursor to EBX; immediate gFlipEntry publication aligns the
+// width/LEA/spill prefix but emits the observable store at +0x24 and regresses to 86.71%. Reusing the
+// dead frame parameter for entry X is erased, while an explicit base-data owner plus delayed cursor
+// returns to the fresh10 86.92%/0x4e7 allocation. Every variant preserves the 0x8 frame and 81/81
+// relocation targets. Retail has no helper call/continuation and this TU has no predecessor, so there
+// is no supported accessor or predecessor-state lever left in this family. This remains an unresolved
+// residual, not a byte-proven wall; see the appended fresh12 rows.
 VA(0x004d1ba0, 0x4f1)
 void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                       int clip, int clipX, int clipY, int clipW, int clipH, int color)
