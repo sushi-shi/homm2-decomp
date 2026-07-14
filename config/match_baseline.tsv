@@ -381,7 +381,7 @@ BASE/droplist	?SaveDropBackground@dropListWidget@@QAEXXZ	100.0000	b3d5c9e1b5dd
 BASE/icon2bc	?IconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAEH@Z	71.8803	d70464fd672d
 BASE/icon2bs	?IconToBitmapScale@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	76.3262	a49d5fdfa818
 BASE/icon2by	?IconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	91.5102	e2aeb74dde86
-BASE/iconf2bc	?FlipIconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAE@Z	85.4660	a5cdaf2e5698
+BASE/iconf2bc	?FlipIconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAE@Z	85.8413	cbd21fe39740
 BASE/iconf2by	?FlipIconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	89.4772	22928b097041
 BASE/listbox	??0listBoxWidget@@QAE@XZ	100.0000	1ce71b4c4e2c
 BASE/listbox	??1listBoxWidget@@UAE@XZ	100.0000	ddc8822b41ec

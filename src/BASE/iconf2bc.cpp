@@ -38,6 +38,7 @@ void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, 
     int x0 = x;
     int w;
     IconEntry *entry = reinterpret_cast<IconEntry *>(src) + frame;
+    int pitch;
     w = entry->w;
     x0 = x0 - entry->x;
     x0 = x0 - w;
@@ -59,7 +60,7 @@ void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, 
             clip = 0;
         }
     }
-    int pitch = dest->m_width;
+    pitch = dest->m_width;
     gFCRow = gFCY * pitch + reinterpret_cast<int>(dest->m_pixels);
     for (;;) {
         int cmd = *src++;
