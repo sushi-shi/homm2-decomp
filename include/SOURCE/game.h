@@ -132,49 +132,15 @@ public:
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     short m_difficultyRating;  // +0x00
     unsigned char m_campaignType;  // +0x02
-    char   field_0x3;  // +0x03
+    unsigned char m_campaignStartingSide;  // +0x03
     signed char m_campaignScenario;  // +0x04
     unsigned char m_campaignScenarioCompleted[2][12];  // +0x05
     short m_campaignScenarioBonus[2][12];  // +0x1d
     short m_campaignScenarioDays[2][12];  // +0x4d
     char m_unknown7d;  // +0x7d
-    unsigned char m_dwarfAlliance;  // +0x7e
-    char   field_0x7f;  // +0x7f
-    char   field_0x80;  // +0x80
-    char   field_0x81;  // +0x81
-    char   field_0x82;  // +0x82
-    char   field_0x83;  // +0x83
-    char   field_0x84;  // +0x84
-    unsigned char m_dwarfbane;  // +0x85
-    unsigned char m_ogreAlliance;  // +0x86
-    unsigned char m_dragonAlliance;  // +0x87
-    char   field_0x88;  // +0x88
-    char   field_0x89;  // +0x89
-    char _pad_0x8a[0x18];
-    char   field_0xa2;  // +0xa2
-    char   field_0xa3;  // +0xa3
-    char   field_0xa4;  // +0xa4
-    char   field_0xa5;  // +0xa5
-    char   field_0xa6;  // +0xa6
-    char   field_0xa7;  // +0xa7
-    char   field_0xa8;  // +0xa8
-    char   field_0xa9;  // +0xa9
-    char   field_0xaa;  // +0xaa
-    char   field_0xab;  // +0xab
-    char _pad_0xac[0x1];
-    char   field_0xad;  // +0xad
-    char   field_0xae;  // +0xae
-    char   field_0xaf;  // +0xaf
-    char   field_0xb0;  // +0xb0
-    char   field_0xb1;  // +0xb1
-    char   field_0xb2;  // +0xb2
-    char   field_0xb3;  // +0xb3
-    char   field_0xb4;  // +0xb4
-    char   field_0xb5;  // +0xb5
-    char   field_0xb6;  // +0xb6
-    char   field_0xb7;  // +0xb7
-    char   field_0xb8;  // +0xb8
-    char   field_0xb9;  // +0xb9
+    unsigned char m_campaignAwards[12];  // +0x7e
+    unsigned char m_campaignChoice[2][12];  // +0x8a
+    unsigned char m_campaignMapEnabled[2][12];  // +0xa2
     short m_campaignScore;  // +0xba
     short m_campaignCarryoverCreatureTypes[5];  // +0xbc
     short m_campaignCarryoverCreatureCounts[5];  // +0xc6
