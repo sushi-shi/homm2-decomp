@@ -5,6 +5,11 @@
 // forward declarations (was <_all.h>):
 struct tag_message;
 
+struct CombatTowerOrigin {
+    unsigned short x;
+    unsigned short y;
+};
+
 int ValidHex(int);
 void UpdateCombatSystemOptions(int);
 int CombatSystemOptionsHandler(struct tag_message &);
