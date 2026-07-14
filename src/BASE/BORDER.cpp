@@ -63,14 +63,14 @@ void border::Read(void)
     m_backgroundIcon = 0;
     m_kind = kind;
     char name[16];
-    if (kind == WIDGET_KIND_BITMAP) {
+    if (DecodeWidgetKind(kind) == WIDGET_KIND_BITMAP) {
         gpResourceManager->Read13(reinterpret_cast<signed char *>(name));
         gpResourceManager->SavePosition();
         m_backgroundBitmap = gpResourceManager->GetBitmap(name);
         gpResourceManager->RestorePosition();
         return;
     }
-    if (kind == WIDGET_KIND_ICON) {
+    if (DecodeWidgetKind(kind) == WIDGET_KIND_ICON) {
         gpResourceManager->Read13(reinterpret_cast<signed char *>(name));
         gpResourceManager->SavePosition();
         m_backgroundIcon = gpResourceManager->GetIcon(name);

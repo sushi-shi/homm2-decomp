@@ -23,7 +23,7 @@ textEntryWidget::textEntryWidget(void) : textWidget()
 {
     m_cursorPosition = 0;
     m_icon = 0;
-    m_kind = WIDGET_KIND_TEXT_ENTRY;
+    m_kind = EncodeWidgetKind(WIDGET_KIND_TEXT_ENTRY);
     m_maxLength = 0;
     m_iconFrame = 0;
     m_displayOffset = 0;
@@ -55,7 +55,7 @@ textEntryWidget::textEntryWidget(short p1, short p2, short p3, short p4, short p
     m_icon = loadedIcon;
     m_iconFrame = iconFrame;
     m_rectX = rectX;
-    m_kind = WIDGET_KIND_TEXT_ENTRY;
+    m_kind = EncodeWidgetKind(WIDGET_KIND_TEXT_ENTRY);
     m_rectY = m_y;
     m_rectW = m_width;
     m_maxLength = p5;
@@ -149,7 +149,7 @@ void textEntryWidget::Read(int type)
     m_iconFrame = gpResourceManager->ReadWord();
     m_id = gpResourceManager->ReadWord();
     gpResourceManager->ReadWord();
-    m_kind = WIDGET_KIND_TEXT_ENTRY;
+    m_kind = EncodeWidgetKind(WIDGET_KIND_TEXT_ENTRY);
 }
 
 // @match-note

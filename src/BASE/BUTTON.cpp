@@ -104,7 +104,7 @@ inline button::~button()
 VA(0x004dd6d0, 0x595)
 int button::Main(tag_message &msg)
 {
-    if (m_kind == WIDGET_KIND_AUTO_REPEAT &&
+    if (DecodeWidgetKind(m_kind) == WIDGET_KIND_AUTO_REPEAT &&
         (m_flags & WIDGET_FLAG_SELECTED) != 0 && KBTickCount() > gButtonRepeatTime) {
         if ((m_flags & WIDGET_FLAG_SELECTED) == 0)
             return 0;
