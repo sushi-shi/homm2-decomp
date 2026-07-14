@@ -52,6 +52,9 @@ DATA(0x00534ce8) static unsigned int gCTRun;
 // count=EDX/cursor=EBX, while also fixing the EBX/EDI setup split. Function-scope/shared count,
 // source-cursor, fetch-order, snapshot, and all six command/count/cursor declaration-order shapes
 // have now been exhausted; do not replay those or the earlier setup/count matrices.
+// A contiguous state-record ownership pass did recover source=ECX/command=EAX/count=EDX, but only
+// by reversing X/cursor to EBX/ESI and regressing below this checkpoint; see
+// icon2bc-state-ownership-06409a9.tsv. Do not replay whole/tail/cursor/nested record surfaces.
 VA(0x004d32a0, 0x5af)
 void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                             int clip, int clipX, int clipY, int clipW, int clipH, int color,
