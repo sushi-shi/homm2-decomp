@@ -16,8 +16,13 @@ typedef enum SearchConstant {
     SEARCH_MAX_COST = 999999,
     SEARCH_TARGET_COST_WINDOW = 75,
     SEARCH_MONSTER_RESEED_WINDOW = 300,
+    SEARCH_TERRAIN_WATER = 0,
+    SEARCH_TERRAIN_ROAD = 9,
+    SEARCH_DIAGONAL_COST_MASK = 1,
+    SEARCH_CELL_UNREACHABLE = 0x08,
     SEARCH_MAP_BLOCKED = 0x80,
     SEARCH_CELL_BLOCKED = 0x80,
+    SEARCH_TRIGGER_PRESENT = 0x80,
     SEARCH_TRIGGER_MASK = 0x7f,
     SEARCH_TRIGGER_MONSTER = 0x18,
     SEARCH_TRIGGER_BOAT = 0x1c,
@@ -31,6 +36,7 @@ typedef enum SearchConstant {
     SEARCH_CLEAR_GROUND_TILESET = 0x2f,
     SEARCH_INVALID_COORDINATE = -1,
     SEARCH_NO_OBJECT = 0xff,
+    SEARCH_DIRECTION_EDGE_OBJECT_MASK = 0x83,
     SEARCH_DIRECTION_OBJECT_MASK = 0x38,
     SEARCH_OBJECT_TYPE_MASK = 0xfc,
     SEARCH_BLOCKING_OBJECT_TYPE = 0xbc
@@ -69,10 +75,20 @@ struct searchNode {
     unsigned char rvFlag1 : 1;
     unsigned char rvFlag2 : 1;
     unsigned char direction : 4;
-    unsigned char adjacentMonsterX;
-    unsigned char adjacentMonsterY;
-    unsigned char previousFlags;
-    unsigned char terrain;
+    union {
+        struct {
+            unsigned char adjacentMonsterX;
+            unsigned char adjacentMonsterY;
+            unsigned char previousFlags;
+            unsigned char terrain;
+        };
+        struct {
+            signed char valueX;
+            signed char valueY;
+            signed char previousX;
+            signed char previousY;
+        };
+    };
 };
 #pragma pack(pop)
 SIZE(searchNode, 9);
@@ -80,11 +96,27 @@ SIZE(searchNode, 9);
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class searchArray {
 public:
-    int    m_queueSize;  // +0x00
-    int    m_queueCursor;  // +0x04
+    union {
+        struct {
+            int m_queueSize;       // +0x00, overland queue count
+            int m_queueCursor;     // +0x04, overland queue high-water mark
+        };
+        struct {
+            unsigned int m_queueCount;     // +0x00, combat queue count
+            unsigned int m_maxQueueCount;  // +0x04, combat queue high-water mark
+        };
+    };
     int    m_pathLength;  // +0x08
-    int    m_lastY;  // +0x0c
-    int    m_lastX;  // +0x10
+    union {
+        struct {
+            int m_lastY;  // +0x0c, overland destination
+            int m_lastX;  // +0x10
+        };
+        struct {
+            int m_specialTargetX;  // +0x0c, combat special target
+            int m_specialTargetY;  // +0x10
+        };
+    };
     searchNode m_queue[SEARCH_QUEUE_CAPACITY];  // +0x14
     searchStorage m_storage;  // +0x2414, path directions overlap the search-cell pointer
     searchNode *GetRow(int y, int width) { return m_storage.nodes + y * (width | 0); }
@@ -111,6 +143,6 @@ public:
 #pragma pack(pop)
 SIZE(searchArray, 0x2518);
 // ---- globals (declarations, RVA order) ----
-extern unsigned char *bIsMoatSlowed;
+extern unsigned char bIsMoatSlowed[117];
 
 #endif // HOMM2_SOURCE_SEARCHARRAY_H

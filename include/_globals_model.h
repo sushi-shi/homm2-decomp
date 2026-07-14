@@ -11,6 +11,24 @@
 #include <windows.h>
 #include <SOURCE/comwin.h>
 
+class mapCell;
+struct searchNode;
+
+// FINDPATH.cpp file-static priority-search scratch, recovered from the contiguous
+// 0x52adc0-0x52ae64 storage and its retail relocation sites.
+DATA(0x0052adc0) extern int gSearchLow;
+DATA(0x0052adc4) extern mapCell *gSearchNextCell;
+DATA(0x0052ae40) extern searchNode *gSearchCell;
+DATA(0x0052ae44) extern int gSearchNextY;
+DATA(0x0052ae48) extern mapCell *gSearchCurrentCell;
+DATA(0x0052ae4c) extern int gSearchDirection;
+DATA(0x0052ae50) extern int gSearchTriggerType;
+DATA(0x0052ae54) extern int gSearchNextX;
+DATA(0x0052ae58) extern int gSearchTerrain;
+DATA(0x0052ae5c) extern searchNode *gSearchQueueNode;
+DATA(0x0052ae60) extern int gSearchMiddle;
+DATA(0x0052ae64) extern int gSearchHigh;
+
 // TILE.cpp inline-asm scratch (no CodeView symbol): the blitter parks the mode word and a
 // mirror-path row counter in static storage between its __asm sections.
 
