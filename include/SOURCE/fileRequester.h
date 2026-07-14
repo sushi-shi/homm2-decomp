@@ -3,6 +3,7 @@
 // Reconstructed class (SOURCE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // 12 methods, 3 own-virtual, 0 static data.
 #include <va.h>
+#include <EnumTypes.h>
 #include "../BASE/baseManager.h"
 // forward declarations:
 struct tag_message;
@@ -10,12 +11,12 @@ class heroWindow;
 class iconWidget;
 struct SMapHeader;
 
-typedef enum FileRequesterMode {
+HOMM2_ENUM_BEGIN(FileRequesterMode)
     FILE_REQUESTER_MAP_GAME = 1,
     FILE_REQUESTER_LOAD_GAME = 2,
     FILE_REQUESTER_SAVE_GAME = 3,
     FILE_REQUESTER_MAP = 4
-} FileRequesterMode;
+HOMM2_ENUM_END(FileRequesterMode)
 
 typedef enum FileRequesterControlId {
     FILE_REQUESTER_SCROLL_UP = 1,
@@ -45,14 +46,14 @@ typedef enum FileRequesterControlId {
     FILE_REQUESTER_FILTER_ALL = 104
 } FileRequesterControlId;
 
-typedef enum FileRequesterMapSizeFilter {
+HOMM2_ENUM_BEGIN(FileRequesterMapSizeFilter)
     FILE_REQUESTER_MAP_SIZE_SMALL = 0,
     FILE_REQUESTER_MAP_SIZE_MEDIUM = 1,
     FILE_REQUESTER_MAP_SIZE_LARGE = 2,
     FILE_REQUESTER_MAP_SIZE_XLARGE = 3,
     FILE_REQUESTER_MAP_SIZE_ALL = 4,
     FILE_REQUESTER_MAP_SIZE_COUNT = 5
-} FileRequesterMapSizeFilter;
+HOMM2_ENUM_END(FileRequesterMapSizeFilter)
 
 typedef enum FileRequesterEventType {
     FILE_REQUESTER_EVENT_KEY = 1,
@@ -149,7 +150,7 @@ public:
     virtual int Main(struct tag_message &) OVERRIDE;
     // --- methods ---
     int InitializeFiles(char *, char *, int);
-    int MapExistsForFilter(int);
+    int MapExistsForFilter(FileRequesterMapSizeFilter);
     void SetupFiles(void);
     void CleanUpData(void);
     void SetOK(int);
@@ -160,7 +161,7 @@ public:
 #pragma pack(pop)
 SIZE(fileRequester, 0x42f);
 // ---- globals (declarations, RVA order) ----
-extern int giMapSizeFilter;
+extern FileRequesterMapSizeFilter giMapSizeFilter;
 extern char *cFRDummy;
 extern float fGutterMinY;
 extern float fGutterTravelLength;
