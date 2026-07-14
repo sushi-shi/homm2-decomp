@@ -44,7 +44,11 @@ DATA(0x00534ce8) static unsigned int gCTRun;
 // publishes X, Y, then row. That whole-function model reached only 71.88% with 88/91 relocations,
 // below the retained 72.479%, so this 91/91 canonical remains; see
 // icon2bc-decoder-lifetime-9cdac5a.tsv. Revisit with a model that preserves those lifetimes while
-// also yielding the +0x12 EBX/EDI split, or after a real declaration-surface change.
+// also yielding the +0x12 EBX/EDI split, or after a real declaration-surface change. A fresh
+// checkpoint-032a2b3 combination kept the cursor before the loop and used retail newline order,
+// but reached only 71.88% with 87/91 relocations; semantic local renames, a single do-loop, split
+// command declaration, and command/shadow-flags SSA reuse were byte-identical and did not change
+// the EDX-cursor/EBX-count allocation. See icon2bc-retail-lifetime-032a2b3.tsv.
 VA(0x004d32a0, 0x5af)
 void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                             int clip, int clipX, int clipY, int clipW, int clipH, int color,
