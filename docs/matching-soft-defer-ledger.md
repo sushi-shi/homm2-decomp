@@ -848,6 +848,26 @@ Fresh adjacent-decoder setup transfer after `dd7973b`:
   was used. Full hashes and outcomes are in
   [`icon2b-adjacent-setup-dd7973b.tsv`](matching-matrices/icon2b-adjacent-setup-dd7973b.tsv).
 
+Clean-room restart across `38b2438` and `a45e64f`:
+
+- the canonical body was mechanically hidden and was never inspected or copied; the declaration and
+  include surface was consulted only after the first independent candidate had been measured;
+- the first independent candidate exposed an invalid shifted parameter map and a `0x10` frame at
+  54.535713%, size `0x4a3`, 79/83 relocations; do not repeat that ABI interpretation;
+- 21 measured source states recovered the retail three-call fill, `gIcCnt2` roles, one-pass literal
+  tail, pitch/setup lifetimes, split entry/running X, dim publication lifetimes, and the exact scratch
+  declarations;
+- the independent best was 73.563190%, size `0x4e9`, 83/83 relocations; a byte-pointer entry local
+  regressed, and separating the `gIcClipR` declaration/assignment was emitted-code identical;
+- because the retained canonical maximum is still 74.453300%, the clean-room body was rejected and
+  the canonical source was restored mechanically. Full hashes, scores, sizes, relocation counts, and
+  per-state outcomes are in
+  [`icon2b-clean-room-a45e64f.tsv`](matching-matrices/icon2b-clean-room-a45e64f.tsv).
+
+Neither permuter was used. Do not replay these axes under the same header/predecessor state. A future
+pass needs new TU-state evidence and should start at the remaining setup register-allocation or fifth
+dim-publication site; syntax-aware AST permutation is reserved for a genuinely aligned 96-97% body.
+
 ### Remaining concrete evidence
 
 The known missing sites are setup `gIcX0`/`gIcY` CSE reloads and the fifth dim
