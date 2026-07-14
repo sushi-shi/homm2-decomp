@@ -1,0 +1,24 @@
+# BASE/icon2bc shared setup/cursor/count lifetime pass, checkpoint 5645ed8
+# Target: IconToBitmapColorTable, RVA 0xd32a0, retail size 0x5af, target relocations 91.
+# Trigger: the corrected owner audit proved all 17 gCT addresses and narrowed the retained residual to missing ClipR/Cnt/Dst/X0 once each plus excess Y once. This pass tested whether those five occurrences are one shared optimizer-lifetime mismatch.
+# Retail allocation target: setup data=ESI, 13*frame=EBX, entry=EDI, entry.x=ECX, srcOffset=EAX; decoder source=ECX, command=EAX, count=EDX, destination cursor=EBX.
+# No regex or AST permutation tool was used. The AST permuter is inapplicable at this broad structural score.
+state	match_percent	base_target_relocs	result	new_model_and_byte_evidence
+canonical-input	73.1690	88/91	retained	Narrow dim-palette header and retail newline order; .text 0x566 versus retail 0x5af. Missing ClipR/Cnt/Dst/X0 once each and excess Y once.
+icon2b_setup_plus_preloop_cursor	70.05	85/91	rejected	Use the sibling Icon2b typed entry/data/X/Y setup and carry gCTDst from before the loop. The extra setup lifetime moves the m_data load before saved-register pushes and broadly worsens allocation.
+x_y_snapshots_plus_preloop_cursor	71.91	87/91	rejected	Snapshot published X/Y for the initial clip predicates and carry destination from before the loop. This removes one net relocation mismatch but retains cursor=EDX/count=EBX and regresses 1.26 points.
+y_snapshot_only	73.15	88/91	rejected	Use one current-Y snapshot for both initial clip tests. It nearly ties but does not exceed canonical and the emitted semantic occurrence distribution remains X0 2/3, ClipR 9/10, Cnt 5/6, Dst 5/6, Y 9/8.
+x_before_source_setup	71.83	88/91	rejected	Read entry.x before publishing the source cursor while keeping the canonical typed table. It worsens the first-divergence setup allocation.
+function_scope_command_count_preloop_cursor	71.91	87/91	rejected	Widen command/count declarations and carry destination across loop backedges. MSVC still assigns cursor=EDX, command=ECX, count=EBX.
+shared_negative_literal_count	71.91	87/91	byte-identical-rejected	Reuse one count variable for negative runs and mapped literals. Optimizer live-range splitting emits the same cursor=EDX/count=EBX code.
+explicit_one_command_source_cursor	71.44	83/91	rejected	Form a local source cursor, publish it, then fetch cursor[-1]. This loses four additional scratch occurrences and does not recover command=EAX.
+direct_postincrement_fetch	71.62	87/91	rejected	Fetch command with *gCTSrc++ under the shared count/preloop-cursor state. Candidate still loads the pointer in EAX and the command in ECX.
+byte_load_then_source_publication	71.62	87/91	rejected	Fetch gCTSrc[0] before publishing gCTSrc+1. Candidate remains pointer=EAX/command=ECX.
+after_row_cmd_count_cursor	71.30	89/91	rejected	Declare command, shared count, then cursor immediately before the loop. Two relocation occurrences return, but allocation and byte score regress.
+after_row_count_cmd_cursor	71.30	89/91	byte-identical-rejected	Swap command/count declaration order in the preceding state; emitted score and relocation counts are unchanged.
+after_row_count_cursor_cmd	71.91	87/91	rejected	Place cursor between count and command; returns to cursor=EDX/count=EBX and remains below canonical.
+after_row_cmd_cursor_count	70.56	89/91	rejected	Place cursor between command and count; worst declaration-order score despite two additional occurrences.
+after_row_cursor_cmd_count	71.11	87/91	rejected	Declare cursor, command, count after row setup; remains below canonical.
+after_row_cursor_count_cmd	71.91	87/91	rejected	Declare cursor, count, command after row setup; returns to the common rejected allocation.
+# Result: the five count discrepancies do share the loop-carried state axis, but neither shared variable ownership nor declaration order produces retail's command=EAX/count=EDX/cursor=EBX allocation. Canonical source was restored byte-for-byte.
+# Revisit remains structural, not a wall: require a genuinely new source ownership model that reserves EAX for command before loading gCTSrc into ECX and simultaneously preserves all 91 relocation occurrences; do not replay these declaration/fetch/shared-count families.
