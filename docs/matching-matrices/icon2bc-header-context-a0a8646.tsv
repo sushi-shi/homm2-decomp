@@ -1,0 +1,20 @@
+# BASE/icon2bc real owner-header/declaration-context pass, checkpoint a0a8646
+# Target: IconToBitmapColorTable, RVA 0xd32a0, retail size 0x5af, target relocations 91.
+# Scope: preserve the canonical semantic body and transfer only existing declaration/include surfaces justified by the sibling Icon2b and iconf2bc compilands. No local expression, predicate, record, enum, command wrapper, regex permutation, or AST permutation was tested.
+# Canonical target: 73.1690%, .text 0x566, .text SHA-256 6e7102ac86ce318118835de5be00b34e5cd1d008c8da3040e47464c998381e2e, 88/91 relocations.
+state	match_percent	base_target_relocs	result	real_header_or_declaration_context_and_evidence
+canonical_narrow_palette_misc	73.1690	88/91	retained	Owner header, icon, bitmap, narrow dimPalette owner, Misc, and string; unchanged semantic body.
+iconf2bc_direct_iconentry_broad_globals	73.1690	88/91	byte-identical-rejected	Transfer iconf2bc's direct IconEntry/icon/bitmap/X_GLOBAL/string surface and omit unused Misc. Candidate .text SHA-256 remains 6e7102ac86ce318118835de5be00b34e5cd1d008c8da3040e47464c998381e2e, so the very different declaration suffix state does not steer code.
+icon2b_broad_globals_model_misc	72.76	88/91	rejected	Transfer Icon2b's icon/bitmap/X_GLOBAL/_globals_model/Misc/string surface. It changes allocation but regresses below canonical.
+direct_iconentry_broad_globals_misc	66.69	91/91	rejected	Combine iconf2bc's direct IconEntry with broad X_GLOBAL and Misc. All relocation occurrences return, but simultaneous setup/decoder allocation regresses sharply.
+direct_iconentry_narrow_palette_misc	73.1690	88/91	byte-identical-rejected	Parse the real standalone IconEntry before Misc under the narrow palette surface. Emitted code is unchanged.
+direct_narrow_plus_icon2b_declaration	72.28	88/91	rejected	Add the real sibling IconToBitmap owner declaration before the direct IconEntry surface. One declaration changes TU state but worsens allocation.
+direct_narrow_plus_iconf2bc_declaration	73.1690	88/91	byte-score-neutral-rejected	Add only the real FlipIconToBitmapColorTable owner declaration before the direct IconEntry surface. It does not improve canonical.
+direct_narrow_plus_two_sibling_declarations	67.21	87/91	rejected	Add IconToBitmap and FlipIconToBitmapColorTable declarations in either order. Both orders produce the same score/count regression.
+direct_narrow_globals_model_misc	72.54	88/91	rejected	Add Icon2b's existing _globals_model context while retaining narrow dimPalette and Misc. This does not recover the target register chain.
+narrow_misc_one_sibling_declaration	72.93	88/91	rejected	Add exactly one existing sibling blitter owner header without direct IconEntry. Iconf2b, icon2by, and icon2bs each produce the same measured score/count and remain below canonical.
+narrow_misc_two_sibling_declarations	66.84	87/91	rejected	Add two existing sibling blitter declarations without direct IconEntry. The second declaration broadly changes allocation and loses an occurrence.
+post_scratch_iconf2bc_declaration	72.49	88/91	rejected	Place the real iconf2bc owner declaration after the file-static scratch block and before the function. This declaration timing changes allocation but regresses.
+direct_broad_globals_model_no_misc	72.76	88/91	rejected	Transfer direct IconEntry plus X_GLOBAL and _globals_model while omitting unused Misc. The model header, not a missing semantic dependency, perturbs code below canonical.
+# Result: the broad iconf2bc include surface can be exactly code-equivalent to the narrow canonical despite moving private scratch suffixes from S928..S944 to S1339..S1355. Private-symbol numbering is therefore not a reliable register-allocation target by itself.
+# None of the bounded real owner-header contexts improves the simultaneous retail setup (ESI data, EBX frame offset, EDI entry) and decoder (ECX source, EAX command, EDX count, EBX destination) allocation. Canonical is restored. This closes only the transferred existing-header context family; icon2bc remains unresolved, not a wall.
