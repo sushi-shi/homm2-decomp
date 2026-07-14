@@ -104,7 +104,7 @@ void army::Init(int monsterType, int quantity, int side, int index, int hex, int
     m_speed = m_monster.speed;
     m_quantity = quantity;
     m_initialQuantity = m_quantity;
-    field_0x9e = 0;
+    m_temporaryResurrectionQuantity = 0;
     m_animationState = 0;
     m_hitPointsLost = 0;
     m_damagePenalty = 0;
@@ -2235,9 +2235,9 @@ void army::ProcessDeath(int immediate)
         return;
     }
     if (Random(0, ARMY_DEATH_RANDOM_MAX) < ARMY_DEATH_PRIMARY_CHANCE) {
-        gpCombatManager->m_deathFlags[m_side] = 1;
+        gpCombatManager->m_heroDeathPending[m_side] = 1;
     } else if (Random(0, ARMY_DEATH_RANDOM_MAX) < ARMY_DEATH_SECONDARY_CHANCE) {
-        gpCombatManager->m_deathFlags[3 - m_side] = 1;
+        gpCombatManager->m_heroAlternateDeathPending[1 - m_side] = 1;
     }
     m_monster.flags.all |= MONSTER_FLAGS_DEAD;
     m_deathPending = 0;
@@ -2654,7 +2654,7 @@ walkToward:
 berserkFinish:
     if (giNextAction == COMBAT_AI_ACTION_MOVE &&
         gpCombatManager->m_hexCells[giNextActionGridIndex].m_occupantSide == m_side) {
-        gpCombatManager->m_deathFlags[m_side] = 1;
+        gpCombatManager->m_heroDeathPending[m_side] = 1;
     }
 }
 
