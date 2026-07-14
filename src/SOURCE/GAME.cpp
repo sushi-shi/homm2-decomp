@@ -113,8 +113,8 @@ void playerData::Write(int file)
     _write(file, m_townIds, 72);
     _write(file, m_resources, 28);
     _write(file, m_secondaryResources, 28);
-    _write(file, &m_unknownac, 1);
-    _write(file, &m_unknownac, 1);
+    _write(file, &m_barrierTents, 1);
+    _write(file, &m_barrierTents, 1);
     _write(file, m_unknownad, 6);
 }
 
@@ -145,8 +145,8 @@ void playerData::Read(int file)
     _read(file, m_townIds, 72);
     _read(file, m_resources, 28);
     _read(file, m_secondaryResources, 28);
-    _read(file, &m_unknownac, 1);
-    _read(file, &m_unknownac, 1);
+    _read(file, &m_barrierTents, 1);
+    _read(file, &m_barrierTents, 1);
     _read(file, m_unknownad, 6);
 }
 
@@ -670,8 +670,9 @@ int game::SaveGame(char *filename, int generateName, signed char expansionFormat
     return 1;
 }
 
-// @early-stop
-// reloc-masked: identical 0xb44-byte code/frame; 75/75 targets agree, only compiler literal/constant symbol identities differ
+// @early-stop: complete semantics and layout. The typed four-byte primary-stat
+// array requires the adjacent byte at hero+0x43 to be initialized separately;
+// retail's aliasing five-iteration loop accounts for the remaining code shape.
 VA(0x00472a7b, 0xb44)
 void game::SetupOrigData(void)
 {
@@ -734,9 +735,12 @@ void game::SetupOrigData(void)
         m_heroRecs[i].m_direction = 2;
         strcpy(m_heroRecs[i].m_name, gHeroDefaultNames[i]);
         m_heroRecs[i].m_cursorType = static_cast<unsigned char>(i / 9);
-        for (j = 0; j < 5; j++)
-            reinterpret_cast<unsigned char *>(&m_heroRecs[i].m_attack)[j] =
+        for (j = 0; j < HERO_PRIMARY_STAT_COUNT; j++)
+            m_heroRecs[i].m_primaryStats[j] =
                 gStartingHeroStats[m_heroRecs[i].m_cursorType][j];
+        m_heroRecs[i].m_unknown43 =
+            gStartingHeroStats[m_heroRecs[i].m_cursorType]
+                              [HERO_PRIMARY_STAT_COUNT];
         for (j = 0; j < 5; j++)
             reinterpret_cast<signed char *>(&m_heroRecs[i].m_army)[j] = -1;
         m_heroRecs[i].m_destinationY = -1;

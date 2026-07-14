@@ -27,7 +27,7 @@ public:
     signed char m_townIds[72];  // +0x47
     int m_resources[7];  // +0x8f
     signed char m_unknownab;  // +0xab
-    signed char m_unknownac;  // +0xac
+    signed char m_barrierTents;  // +0xac
     char m_unknownad[6];  // +0xad
     char m_pad_0xb3[0x34];
     int m_secondaryResources[7];  // +0xe7
