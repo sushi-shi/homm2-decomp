@@ -53,6 +53,21 @@ typedef enum HeroPrimaryStat {
 #define HERO_PRIMARY_STAT_COUNT 4
 #define HERO_ARTIFACT_SLOT_COUNT 14
 #define HERO_SPELL_COUNT 65
+#define HERO_EXPERIENCE_GROWTH_FACTOR 1.2
+
+typedef enum HeroConstant {
+    HERO_OWNER_NONE = -1,
+    HERO_DESTINATION_NONE = -1,
+    HERO_INTERACTION_TURN_NONE = -99,
+    HERO_LOCATION_TOWN = 0xa3,
+    HERO_MAP_CHANGE_UNUSED = -999,
+    HERO_MAP_CELL_PRESENT = 0x40,
+    HERO_AVAILABLE_SLOT_COUNT = 2,
+    HERO_AVAILABILITY_UNAVAILABLE = -1,
+    HERO_AVAILABILITY_RETREATED = 0x40,
+    HERO_EXPERIENCE_LEVEL_TABLE_COUNT = 12,
+    HERO_EXPERIENCE_EXTRAPOLATION_FIRST_LEVEL = 13
+} HeroConstant;
 
 typedef enum HeroArtifact {
     HERO_ARTIFACT_NOMAD_BOOTS = 0x21,
@@ -103,6 +118,7 @@ typedef enum HeroEventFlag {
     HERO_EVENT_MAGIC_WELL = 0x1000,
     HERO_EVENT_IDOL = 0x2000,
     HERO_EVENT_PYRAMID = 0x4000,
+    HERO_EVENT_WEEKLY_VISIT = 0x10000,
     HERO_EVENT_MERMAID = 0x100000,
     HERO_EVENT_SIRENS = 0x200000,
     HERO_EVENT_ARENA = 0x400000,
@@ -120,7 +136,7 @@ public:
     char   m_owner;  // +0x03
     short m_lastHeroInteractionTurn;  // +0x04
     signed char m_lastInteractionHeroId;  // +0x06
-    short  field_0x7;  // +0x07
+    short m_lastTownInteractionTurn;  // +0x07
     unsigned char m_visitedTownId;  // +0x09
     char m_name[13];  // +0x0a
     unsigned char m_cursorType;  // +0x17
@@ -168,14 +184,7 @@ public:
     int m_secondarySkillCount;  // +0x90
     signed char m_spells[HERO_SPELL_COUNT];  // +0x94
     signed char m_artifacts[HERO_ARTIFACT_SLOT_COUNT];  // +0xd5
-    union {
-        unsigned int m_eventFlags;  // +0xe3
-        struct {
-            unsigned int m_eventFlagsLow : 16;
-            unsigned int m_weeklyVisit : 1;
-            unsigned int m_eventFlagsHigh : 15;
-        };
-    };
+    unsigned int m_eventFlags;  // +0xe3
     unsigned char m_isCaptain;  // +0xe7
     float m_aiFightValue;  // +0xe8
     signed char m_artifactExtra[14];  // +0xec
@@ -222,7 +231,7 @@ SIZE(hero, 250);
 // ---- globals (declarations, RVA order) ----
 extern class hero *gpHVHero;
 extern class heroWindow *gheroWin;
-extern short *gMinExpForLevel;
+extern short gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT];
 extern int iOrigHeroViewID;
 extern int gbNoDismiss;
 
