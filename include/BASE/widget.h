@@ -44,7 +44,7 @@ public:
     widget *m_prev;  // +0x0c  prev widget in the owner window's list
     short  m_id;  // +0x10
     short  m_zOrder;  // +0x12
-    short  field_0x14;  // +0x14
+    short  m_kind;  // +0x14  serialized widget rendering/behavior kind
     short  m_flags;  // +0x16
     short  m_x;  // +0x18
     short  m_y;  // +0x1a

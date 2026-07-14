@@ -26,7 +26,7 @@ void dimmerWidget::Read(void)
     m_width = gpResourceManager->ReadWord();
     m_height = gpResourceManager->ReadWord();
     m_id = gpResourceManager->ReadWord();
-    field_0x14 = gpResourceManager->ReadWord();
+    m_kind = gpResourceManager->ReadWord();
 }
 
 VA(0x004dd3f0, 0xd)

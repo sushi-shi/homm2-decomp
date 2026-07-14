@@ -5,6 +5,7 @@
 
 #include <va.h>
 #include <BASE/textEntryWidget.h>
+#include <BASE/widgetKind.h>
 #include <BASE/resourceManager.h>
 #include <BASE/font.h>
 #include <BASE/heroWindow.h>
@@ -22,7 +23,7 @@ textEntryWidget::textEntryWidget(void) : textWidget()
 {
     m_cursorPosition = 0;
     m_icon = 0;
-    field_0x14 = 0x4000;
+    m_kind = WIDGET_KIND_TEXT_ENTRY;
     m_maxLength = 0;
     m_iconFrame = 0;
     m_displayOffset = 0;
@@ -54,7 +55,7 @@ textEntryWidget::textEntryWidget(short p1, short p2, short p3, short p4, short p
     m_icon = loadedIcon;
     m_iconFrame = iconFrame;
     m_rectX = rectX;
-    field_0x14 = 0x4000;
+    m_kind = WIDGET_KIND_TEXT_ENTRY;
     m_rectY = m_y;
     m_rectW = m_width;
     m_maxLength = p5;
@@ -148,14 +149,14 @@ void textEntryWidget::Read(int type)
     m_iconFrame = gpResourceManager->ReadWord();
     m_id = gpResourceManager->ReadWord();
     gpResourceManager->ReadWord();
-    field_0x14 = 0x4000;
+    m_kind = WIDGET_KIND_TEXT_ENTRY;
 }
 
-// @early-stop
-// Delinked local-label identity only: base/retail sections are both 0x874 with the exact
-// 0x9a8 frame, CFG, instruction stream, and jump tables at +0x7dc/+0x844. Manual raw-byte
-// and relocation review finds the same ordered 35 external targets and 20 local table
-// relocations; only delinked local-label identities differ.
+// @match-note
+// Shared WidgetKind checkpoint: base/retail are both 0x874 with the exact 0x9a8
+// frame, CFG, and 55/55 relocation sites. Explicit-range comparison still differs
+// at +0x21, so the former local-label-only artifact claim is not valid. The ordered
+// external targets and jump-table structure agree; late enum inclusion emits no change.
 VA(0x004d8b90, 0x874)
 int textEntryWidget::Main(struct tag_message &message)
 {
@@ -344,9 +345,10 @@ int textEntryWidget::Main(struct tag_message &message)
     goto defaultMessage;
 }
 
-// @early-stop
-// Delinked local-label identity only: base/retail sections are 0x160, all 138 masked
-// instructions are identical, and all 6/6 relocation targets agree.
+// @match-note
+// Shared WidgetKind checkpoint: both sections are 0x160 with 6/6 matching
+// relocations, but explicit-range comparison has one real byte difference at +0x6d
+// in the equivalent stack displacement. This is not a delinked-label artifact.
 VA(0x004d9410, 0x160)
 void textEntryWidget::Draw(void)
 {

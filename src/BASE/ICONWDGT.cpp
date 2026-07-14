@@ -47,7 +47,7 @@ iconWidget::iconWidget(short int param_1, short int param_2, short int param_3, 
     m_frame = param_6;
     m_flip = param_7;
     m_fillColor = param_10;
-    field_0x14 = param_9;
+    m_kind = param_9;
 }
 
 // @early-stop
@@ -68,7 +68,7 @@ iconWidget::iconWidget(short int param_1, short int param_2, short int param_3, 
     m_frame = param_6;
     m_flip = param_7;
     m_fillColor = param_10;
-    field_0x14 = param_9;
+    m_kind = param_9;
 }
 
 VA(0x004d0bc0, 0xdf)
@@ -87,7 +87,7 @@ void iconWidget::Read(void)
     m_frame = gpResourceManager->ReadWord();
     m_flip = static_cast<char>(gpResourceManager->ReadWord());
     m_id = gpResourceManager->ReadWord();
-    field_0x14 = gpResourceManager->ReadWord();
+    m_kind = gpResourceManager->ReadWord();
     m_fillColor = gpResourceManager->ReadWord() & 0xff;
 }
 
@@ -204,7 +204,7 @@ void iconWidget::Draw(void)
     heroWindow *window = m_owner;
     short y = static_cast<short>(window->m_posY);
     short x = static_cast<short>(window->m_posX);
-    short kind = field_0x14;
+    short kind = m_kind;
     x += m_x;
     y += m_y;
 
