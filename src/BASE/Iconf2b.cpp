@@ -145,6 +145,18 @@ DATA(0x00534c60) static int gFlipSkip;
 // relocation targets. Retail has no helper call/continuation and this TU has no predecessor, so there
 // is no supported accessor or predecessor-state lever left in this family. This remains an unresolved
 // residual, not a byte-proven wall; see the appended fresh12 rows.
+// The fresh13 CFG-first pass normalized the decoder's ESI/EBX source/X register swap and checked
+// every command block independently. Dispatch order, condition polarity, clipped/unclipped arm
+// order, shared fill/dim/literal tails, newline, and all loop backedges agree with retail; unlike
+// icon2bc, no reversed subtree remains to repair. A typed byte-row owner regresses to 86.14%, a
+// signed literal count to 85.63%/82:81, and a combined source/destination copy expression to
+// 86.23%/82:81. Explicit retail instruction-order cursor ownership, unsigned skip ownership, and
+// removal of the dead flags initializer are byte-identical to the 86.39% live f24566c object
+// (0x4e9, 81:81; disassembly SHA-256 a2235f0d...). See iconf2b-cfg-f24566c.tsv. This closes only
+// the fresh decoder-CFG/type family at that hash. Rebuilding the identical body after a237782 made
+// SIZE declarations neutral changes the live result to 82.77% and 83/81 relocations, proving that
+// this closure is TU-state-local and triggering a new macro-head structural/relocation audit. The
+// setup allocation residual remains unresolved, not a wall.
 VA(0x004d1ba0, 0x4f1)
 void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                       int clip, int clipX, int clipY, int clipW, int clipH, int color)
