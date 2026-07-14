@@ -21,6 +21,7 @@
 #include <SOURCE/advManager.h>
 #include <SOURCE/ARMY.h>
 #include <SOURCE/armyGroup.h>
+#include <SOURCE/Campaign.h>
 #include <SOURCE/CURSOR.h>
 #include <SOURCE/EVENTS.h>
 #include <SOURCE/ExpCampaign.h>
@@ -3019,7 +3020,7 @@ void advManager::HouseEvent(hero *eventHero, mapCell *cell)
         creatureTypes[HOUSE_RECRUIT_TREE_HOUSE] = ARMY_CREATURE_SPRITE;
         creatureTypes[HOUSE_RECRUIT_HALFLING] = ARMY_CREATURE_HALFLING;
         creatureTypes[HOUSE_RECRUIT_WATCH_TOWER] = ARMY_CREATURE_ORC;
-        creatureTypes[HOUSE_RECRUIT_CAVE] = EVENT_RECRUIT_CENTAUR;
+        creatureTypes[HOUSE_RECRUIT_CAVE] = ARMY_CREATURE_CENTAUR;
         creatureTypes[HOUSE_RECRUIT_EXCAVATION] = ARMY_CREATURE_SKELETON;
 
         EventWindow(siteIndex * 3 + HOUSE_EVENT_RECRUIT_DIALOG_BASE, 2, "", -1,
@@ -4734,10 +4735,14 @@ void advManager::PlayerMonsterInteract(mapCell *cell, mapCell *combatCell, hero 
                       static_cast<float>(gMonsterDatabase[monster_n].fightValue * monsterCount_n);
 
     if (gbInCampaign &&
-        ((gpGame->m_dwarfAlliance && (monster_n == MONSTER_DWARF || monster_n == MONSTER_BATTLE_DWARF)) ||
-         (gpGame->m_ogreAlliance && (monster_n == MONSTER_OGRE || monster_n == MONSTER_OGRE_LORD)) ||
-         (gpGame->m_dragonAlliance && (monster_n == MONSTER_GREEN_DRAGON || monster_n == MONSTER_RED_DRAGON ||
-                                       monster_n == MONSTER_BLACK_DRAGON)))) {
+        ((gpGame->m_campaignAwards[CAMPAIGN_AWARD_DWARF_ALLIANCE] &&
+          (monster_n == MONSTER_DWARF || monster_n == MONSTER_BATTLE_DWARF)) ||
+         (gpGame->m_campaignAwards[CAMPAIGN_AWARD_OGRE_ALLIANCE] &&
+          (monster_n == MONSTER_OGRE || monster_n == MONSTER_OGRE_LORD)) ||
+         (gpGame->m_campaignAwards[CAMPAIGN_AWARD_DRAGON_ALLIANCE] &&
+          (monster_n == MONSTER_GREEN_DRAGON ||
+           monster_n == MONSTER_RED_DRAGON ||
+           monster_n == MONSTER_BLACK_DRAGON)))) {
         if (!eventHero->m_army.CanJoin(monster_n)) {
             if (monster_n == MONSTER_DWARF || monster_n == MONSTER_BATTLE_DWARF)
                 NormalDialog("The dwarves hail you, \"Any friend of Roland is a friend of ours.  You may pass.\"",
@@ -4766,7 +4771,7 @@ void advManager::PlayerMonsterInteract(mapCell *cell, mapCell *combatCell, hero 
         return;
     }
 
-    if (gbInCampaign && gpGame->m_dwarfbane &&
+    if (gbInCampaign && gpGame->m_campaignAwards[CAMPAIGN_AWARD_DWARFBANE] &&
         (monster_n == MONSTER_DWARF || monster_n == MONSTER_BATTLE_DWARF)) {
         NormalDialog("\"The Dwarfbane!!!!, run for your lives.\"", 1, -1, -1, -1, 0, -1, 0, -1, 0);
         *handled = 1;

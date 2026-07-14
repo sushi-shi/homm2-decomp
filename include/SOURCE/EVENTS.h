@@ -514,7 +514,6 @@ typedef enum HillFortCreatureType {
 
 typedef enum EventRecruitCreature {
     EVENT_RECRUIT_SPRITE = 20,
-    EVENT_RECRUIT_CENTAUR = 29,
     EVENT_RECRUIT_ROGUE = 57,
     EVENT_RECRUIT_NOMAD = 58,
     EVENT_RECRUIT_GENIE = 60,
