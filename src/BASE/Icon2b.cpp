@@ -41,6 +41,17 @@ DATA(0x00534c5c) static unsigned int gIcCnt2;
 // byte-identically, while direct scratch ownership overshoots (X0 5/3, Y 10/8). Making Cnt2 feed
 // the arm emits six occurrences with a non-retail global reload; reversed/separate assignments
 // collapse to four. A typed IconEntry array root also remains 80/83 and worsens the setup shape.
+// Declaration-state audit on 6c2fa39: omitting the unused self-header scored 73.60165; splitting
+// the serialized constants into command/dim/palette typedef-enum domains and moving the palette
+// scale to its storage-owner header each scored 73.53571 with the same 80/83 total. Retail
+// first-relocation scratch order scored 75.16758, but fell to 79/83 by deleting another Y access;
+// the ascending-address owner order is retained because it preserves the better relocation shape.
+// NB09 has no per-compiland language/source record beyond `.\Win32_RE\Icon2b.obj`, so filename,
+// `#line`, or C/C++ mode steering is not evidence-backed.
+// Final raw audit: candidate 0x4cb versus retail 0x4ed; 639 of 685 relocation-union-unmasked
+// common bytes differ from +0x11 through +0x4c9, plus a 34-byte retail tail. Both are FPO with
+// EBX/ESI/EDI/EBP saves and ret 0x24; excluding three retail padding NOPs they are 363/364
+// instructions and 60/61 branches, with the same complete decoder state-machine coverage.
 // This is an unresolved compiler-state residual, not a proven wall. Revisit after a real reachable
 // type/header change; no permutation tool was used.
 VA(0x004d0570, 0x4ed)
