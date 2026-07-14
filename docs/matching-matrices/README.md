@@ -76,10 +76,10 @@ hashes while the source and header state agree. The regex permuter was never use
 
 ## BASE/iconf2by manual reconstruction
 
-`iconf2by-manual.tsv` contains 85 full-SHA manual source states spanning the 85.72% through
+`iconf2by-manual.tsv` contains 90 full-SHA manual source states spanning the 85.72% through
 89.47721% reconstruction. Each row records the source hash, source-shape label, match, candidate
 size/frame, relocation counts, and disposition. Its SHA-256 is
-`e48e22822ab2aaaaf5a622b694945a2f3f1147afb387c001f6e8db081ac299f9`.
+`70f5757a6dcaf05121c16bfeaf1d249597239fa4aa15bdb877fc0614df0ea297`.
 
 The current source is restored to
 `5bcb21613117b98e1131fee547745a0d299eaf604683ae3775c8bdfabc636c98`. The first normalized

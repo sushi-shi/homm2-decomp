@@ -323,12 +323,12 @@ is retained, retest the deferred icon2bc, Icon2b, and Iconf2b functions as well.
 
 ## BASE/iconf2by: FlipIconToBitmapYModify
 
-Status: active. This is an integrated progress checkpoint, not a wall or soft defer. The same lane
-must continue this function before taking unrelated work.
+Status: active. This is not an accepted wall and must not receive `@early-stop`; the lane remains on
+the prologue register-lifetime divergence.
 
 Canonical source state:
 
-- checkpoint: `336fa79`
+- checkpoint: `c131c56`
 - target: RVA `0xd9ce0`, retail size `0x58d`
 - `src/BASE/iconf2by.cpp`:
   `5bcb21613117b98e1131fee547745a0d299eaf604683ae3775c8bdfabc636c98`
@@ -468,7 +468,7 @@ Shear-lifetime axes after `11424f1`:
   right destination (`66ca2813`), `register` setup value (`f51119a9`), and split setup-value
   declaration/assignment (`33b353d4`): byte-identical to 89.47721%.
 
-The authoritative full-SHA no-repeat set for all 85 recovered manual states is
+The authoritative full-SHA no-repeat set for all 90 recovered manual states is
 [`docs/matching-matrices/iconf2by-manual.tsv`](matching-matrices/iconf2by-manual.tsv). Later
 right-block pointer/reference/local spellings were byte-identical or regressed; do not repeat them.
 The earliest normalized divergence is the prologue register choice: candidate loads `shear` into
@@ -480,11 +480,22 @@ Retail's four-byte frame slot is never accessed: every ESP-relative retail acces
 and after `sub esp,4` plus four pushes the smallest displacement is `0x18`. The slot is allocator
 residue, not evidence for a missing local or padding variable. Neither permutation tool was used.
 
-Continue from the first post-dispatch structural divergence and the four named scratch-count
-differences. Record each new source-hash-distinct shape with its match, size, frame, and relocation
-result. Do not retry the families above while the canonical source hash agrees. If a shared
-icon/header edit is retained, retest the deferred icon2bc, Icon2b, and Iconf2b functions and the
-active iconf2bc function.
+Final setup lifetime axes after `c131c56`:
+
+- direct formal `clipW` with the canonical fill snapshot: 89.101875%, exact candidate size/frame,
+  143/144 relocations; reverted;
+- direct formal `clipW` with no fill snapshot: 89.11528%, size `0x567`, no frame, 145/144
+  relocations; reverted;
+- function-scope fill-count declaration: byte-identical to 89.47721%; reverted;
+- `const int &` clip-width lifetime: 88.43163%, exact candidate size/frame, 143/144 relocations;
+  reverted;
+- moving the clip-width declaration immediately after current-Y formation: byte-identical to
+  89.47721%; reverted.
+
+These close the obvious setup-lifetime spellings but do not prove a wall. Continue from the
+prologue register divergence with genuinely new retail-evidenced structure, and do not run an AST
+search while this function remains below its per-function 96-97% gate. A retained shared change
+must also trigger iconf2bc, Icon2b, and Iconf2b retests.
 
 ## BASE/Icon2b: IconToBitmap
 
