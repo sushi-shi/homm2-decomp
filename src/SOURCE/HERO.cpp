@@ -6,6 +6,7 @@
 #include <va.h>
 #include <io.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <_types.h>
 #include <_carcass_types.h>
@@ -13,6 +14,8 @@
 #include <BASE/heroWindowManager.h>
 #include <BASE/inputManager.h>
 #include <BASE/Misc.h>
+#include <BASE/resourceManager.h>
+#include <EDITOR/mapcell.h>
 #include <SOURCE/ADVMGR.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/Campaign.h>
@@ -26,6 +29,7 @@
 #include <SOURCE/playerData.h>
 #include <SOURCE/SPELLS.h>
 #include <SOURCE/townManager.h>
+#include <SOURCE/TOWNMGR.h>
 #include <SOURCE/X_GLOBAL.h>
 
 VA(0x0046c3a0, 0x6f)
@@ -1263,16 +1267,394 @@ int HeroHandler(struct tag_message &message) {
 }
 
 VA(0x0046f305, 0x4f)
-void RedrawHeroScreen(void) {}
+void RedrawHeroScreen(void) {
+    gpResourceManager->GetBackdrop("herobkg.icn", gpWindowManager->m_screen,
+        HERO_UI_BACKDROP_PALETTE);
+    heroWin->DrawWindow();
+    gpWindowManager->UpdateScreenRegion(0, 0, HERO_UI_SCREEN_WIDTH,
+        HERO_UI_SCREEN_HEIGHT);
+}
 
+// @early-stop
+// All 0x218 code bytes and all 47 relocation sites match after
+// masking the herowind.bin relocation. Objdiff gives this TU-local coalesced
+// literal a generated $SG identity while retail retains its string symbol.
 VA(0x0046f354, 0x218)
-int HeroView(int, int, int) { return 0; }
+int HeroView(int heroId, int noDismiss, int fadeAlreadyOut) {
+    mapCell *heroCell;
 
+    gbNoDismiss = noDismiss;
+    iOrigHeroViewID = heroId;
+    gpAdvManager->TrimLoopingSounds(HERO_UI_LOOPING_SOUND_KEEP_COUNT);
+    gpHVHero = gpGame->GetHero(heroId);
+    gbHeroWindShowing = 1;
+    if (fadeAlreadyOut == 0)
+        gpWindowManager->FadeScreen(HERO_UI_FADE_OUT, HERO_UI_FADE_STEPS, 0);
+
+    heroWin = new heroWindow(0, 0, "herowind.bin");
+    if (heroWin == 0)
+        MemError();
+    SetWinText(heroWin, HERO_UI_WINDOW_TEXT_ID);
+    gheroWin = heroWin;
+
+    if (gpCurPlayer->m_currentHero == gpHVHero->m_id) {
+        heroCell = gpAdvManager->GetCell(gpHVHero->m_x, gpHVHero->m_y);
+        if (heroCell->triggerType != ADVMGR_HERO_TRIGGER) {
+            gpHVHero->m_locationType = heroCell->triggerType;
+            gpHVHero->m_occupiedTown = heroCell->w4hi;
+        }
+    }
+
+    SetupHeroView();
+    RedrawHeroScreen();
+    gpWindowManager->FadeScreen(HERO_UI_FADE_IN, HERO_UI_FADE_STEPS, 0);
+    gpWindowManager->DoDialog(heroWin, HeroHandler, 0);
+    gpWindowManager->FadeScreen(HERO_UI_FADE_OUT, HERO_UI_FADE_STEPS, 0);
+    delete heroWin;
+    gheroWin = 0;
+
+    if (gpWindowManager->m_dialogResult == HERO_UI_DIALOG_DISMISS) {
+        return HERO_UI_VIEW_DISMISSED;
+    } else {
+        gpHVHero->m_mobility = gpHVHero->CalcMobility();
+        gbHeroWindShowing = 0;
+        gpHVHero = 0;
+        return HERO_UI_VIEW_CLOSED;
+    }
+}
+
+// @match-note 98.77%: complete title, hero-cycle, stat, dismissal, portrait,
+// luck, morale, experience, formation, spell-point, crest, army, secondary-
+// skill, artifact, and status-message behavior. The retail 0x58 frame is
+// restored with distinct luck, morale, and skill-bonus locals. All 143
+// relocation sites agree; the two gSecondarySkillLevels entries resolve to
+// retail's interior const_000ff87c label. The built body is five bytes larger
+// from one equivalent hero-cycle condition trampoline. The first normalized
+// instruction difference is at +0x1b4 after comparing m_heroCount with one:
+// ours emits je (0f 84), retail emits jne (0f 85), so the first differing raw
+// byte is +0x1b5; opposite arm order selects the same enable/disable values.
+// Later differences are dismissal and formation assignment load order and the
+// repeated modifier-icon comparisons. The player-color inline accessor
+// continuation is present, with its jump placed before rather than after the
+// field load. Structural recovery and direct source-polarity steering are
+// exhausted; no permutation pass was run. Revisit after preceding TU state
+// changes or when total SOURCE fuzzy reaches 95%.
 VA(0x0046f56c, 0x9c5)
-void SetupHeroView(void) {}
+void SetupHeroView(void) {
+    int cannotDismiss;
+    tag_message message;
+    int index;
+    int displayIndex;
+    int magnitude;
+    int luck;
+    int morale;
+    int secondarySkillBonus;
+    int secondarySkill;
+    tag_message statusMessage;
 
+    cannotDismiss = gbNoDismiss;
+    if (gpHVHero->m_locationType == HERO_LOCATION_TOWN)
+        cannotDismiss = 1;
+
+    message.type = HERO_UI_MESSAGE;
+    sprintf(gText, "%s the %s", gpHVHero->m_name,
+        gAlignmentNames[gpHVHero->m_cursorType]);
+    message.payload.widget.command = HERO_UI_WIDGET_TEXT;
+    message.payload.widget.id = HERO_UI_HERO_TITLE;
+    message.payload.widget.data.text = gText;
+    heroWin->BroadcastMessage(message);
+
+    if (gpHVHero->m_owner != giCurPlayer ||
+        gpCurPlayer->m_heroCount == HERO_UI_SINGLE_HERO_COUNT) {
+        message.payload.widget.command = HERO_UI_WIDGET_ENABLE;
+        message.payload.widget.data.value = HERO_UI_CYCLE_BUTTON_DISABLED_FRAME;
+        message.payload.widget.id = HERO_UI_PREVIOUS_HERO;
+        heroWin->BroadcastMessage(message);
+        message.payload.widget.id = HERO_UI_NEXT_HERO;
+        heroWin->BroadcastMessage(message);
+        message.payload.widget.command = HERO_UI_WIDGET_DISABLE;
+        message.payload.widget.data.value = HERO_UI_CYCLE_BUTTON_FRAME;
+        message.payload.widget.id = HERO_UI_PREVIOUS_HERO;
+        heroWin->BroadcastMessage(message);
+        message.payload.widget.id = HERO_UI_NEXT_HERO;
+        heroWin->BroadcastMessage(message);
+    }
+
+    message.payload.widget.command = HERO_UI_WIDGET_DISABLE;
+    message.payload.widget.data.value = HERO_UI_CONTROL_FRAME_DEFAULT;
+    for (index = 0; index < HERO_UI_ARMY_SLOT_COUNT; index++) {
+        message.payload.widget.id = HERO_UI_PRIMARY_STAT_FIRST + index;
+        heroWin->BroadcastMessage(message);
+        message.payload.widget.id = HERO_UI_ARMY_SELECTOR_FIRST + index;
+        heroWin->BroadcastMessage(message);
+    }
+
+    if (cannotDismiss == 0 &&
+        gpTownManager->m_castleDialogActive == 0 &&
+        (gpCurPlayer->m_townCount != 0 ||
+         gpCurPlayer->m_heroCount != HERO_UI_SINGLE_HERO_COUNT))
+        message.payload.widget.command = HERO_UI_WIDGET_ENABLE;
+    else
+        message.payload.widget.command = HERO_UI_WIDGET_DISABLE;
+    message.payload.widget.id = HERO_UI_DISMISS;
+    message.payload.widget.data.value = HERO_UI_CONTROL_VALUE_DEFAULT;
+    heroWin->BroadcastMessage(message);
+
+    sprintf(gText, "port%04d.icn", gpHVHero->m_portrait);
+    message.payload.widget.command = HERO_UI_WIDGET_ICON_FILE;
+    message.payload.widget.id = HERO_UI_HERO_PORTRAIT;
+    message.payload.widget.data.text = gText;
+    heroWin->BroadcastMessage(message);
+
+    message.payload.widget.command = HERO_UI_WIDGET_TEXT;
+    for (index = 0; index < HERO_PRIMARY_STAT_COUNT; index++) {
+        sprintf(gText, "%d", gpHVHero->Stats(index));
+        message.payload.widget.id = HERO_UI_PRIMARY_STAT_VALUE_FIRST + index;
+        message.payload.widget.data.text = gText;
+        heroWin->BroadcastMessage(message);
+    }
+
+    luck = gpGame->GetLuck(
+        gpHVHero, 0, gpHVHero->GetOccupiedTown());
+    magnitude = abs(luck);
+    if (magnitude <= HERO_UI_MIN_MODIFIER_ICONS)
+        magnitude = HERO_UI_MIN_MODIFIER_ICONS;
+    for (index = 0; index < HERO_UI_MODIFIER_ICON_COUNT; index++) {
+        if (index >= magnitude)
+            message.payload.widget.command = HERO_UI_WIDGET_DISABLE;
+        else
+            message.payload.widget.command = HERO_UI_WIDGET_ENABLE;
+        if (index == 1 && luck != 0)
+            displayIndex = 0;
+        else if (index == 0 && luck != 0)
+            displayIndex = 1;
+        else
+            displayIndex = index;
+        message.payload.widget.id = HERO_UI_LUCK_FIRST + displayIndex;
+        message.payload.widget.data.value = HERO_UI_CONTROL_VALUE_DEFAULT;
+        heroWin->BroadcastMessage(message);
+    }
+    for (index = 0; index < HERO_UI_MODIFIER_ICON_COUNT; index++) {
+        message.payload.widget.command = HERO_UI_WIDGET_FRAME;
+        message.payload.widget.id = HERO_UI_LUCK_FIRST + index;
+        if (luck < 0)
+            message.payload.widget.data.value = HERO_UI_LUCK_NEGATIVE_FRAME;
+        else if (luck == 0)
+            message.payload.widget.data.value = HERO_UI_LUCK_NEUTRAL_FRAME;
+        else
+            message.payload.widget.data.value = HERO_UI_LUCK_POSITIVE_FRAME;
+        heroWin->BroadcastMessage(message);
+    }
+
+    morale = gpHVHero->m_army.GetMorale(
+        gpHVHero, gpHVHero->GetOccupiedTown(), 0);
+    magnitude = abs(morale);
+    if (magnitude <= HERO_UI_MIN_MODIFIER_ICONS)
+        magnitude = HERO_UI_MIN_MODIFIER_ICONS;
+    for (index = 0; index < HERO_UI_MODIFIER_ICON_COUNT; index++) {
+        if (index >= magnitude)
+            message.payload.widget.command = HERO_UI_WIDGET_DISABLE;
+        else
+            message.payload.widget.command = HERO_UI_WIDGET_ENABLE;
+        if (index == 1 && morale != 0)
+            displayIndex = 0;
+        else if (index == 0 && morale != 0)
+            displayIndex = 1;
+        else
+            displayIndex = index;
+        message.payload.widget.id = HERO_UI_MORALE_FIRST + displayIndex;
+        message.payload.widget.data.value = HERO_UI_CONTROL_VALUE_DEFAULT;
+        heroWin->BroadcastMessage(message);
+    }
+    for (index = 0; index < HERO_UI_MODIFIER_ICON_COUNT; index++) {
+        message.payload.widget.command = HERO_UI_WIDGET_FRAME;
+        message.payload.widget.id = HERO_UI_MORALE_FIRST + index;
+        if (morale < 0)
+            message.payload.widget.data.value = HERO_UI_MORALE_NEGATIVE_FRAME;
+        else if (morale == 0)
+            message.payload.widget.data.value = HERO_UI_MORALE_NEUTRAL_FRAME;
+        else
+            message.payload.widget.data.value = HERO_UI_MORALE_POSITIVE_FRAME;
+        heroWin->BroadcastMessage(message);
+    }
+
+    sprintf(gText, "%d", gpHVHero->m_experience);
+    message.payload.widget.command = HERO_UI_WIDGET_TEXT;
+    message.payload.widget.id = HERO_UI_EXPERIENCE_LAST;
+    message.payload.widget.data.text = gText;
+    heroWin->BroadcastMessage(message);
+
+    if (gpHVHero->m_eventFlags & HERO_EVENT_GROUPED_FORMATION)
+        message.payload.widget.command = HERO_UI_WIDGET_DISABLE;
+    else
+        message.payload.widget.command = HERO_UI_WIDGET_ENABLE;
+    message.payload.widget.id = HERO_UI_FORMATION_SPREAD_ICON;
+    message.payload.widget.data.value = HERO_UI_CONTROL_FRAME_DEFAULT;
+    heroWin->BroadcastMessage(message);
+    if (gpHVHero->m_eventFlags & HERO_EVENT_GROUPED_FORMATION)
+        message.payload.widget.command = HERO_UI_WIDGET_ENABLE;
+    else
+        message.payload.widget.command = HERO_UI_WIDGET_DISABLE;
+    message.payload.widget.id = HERO_UI_FORMATION_GROUPED_ICON;
+    message.payload.widget.data.value = HERO_UI_CONTROL_FRAME_DEFAULT;
+    heroWin->BroadcastMessage(message);
+
+    sprintf(gText, "%d/%d", gpHVHero->m_spellPoints,
+        gpHVHero->Stats(HERO_PRIMARY_KNOWLEDGE) *
+            HERO_SPELL_POINTS_PER_KNOWLEDGE);
+    message.payload.widget.command = HERO_UI_WIDGET_TEXT;
+    message.payload.widget.id = HERO_UI_SPELL_POINTS_LAST;
+    message.payload.widget.data.text = gText;
+    heroWin->BroadcastMessage(message);
+
+    sprintf(gText, "crest.icn");
+    message.payload.widget.command = HERO_UI_WIDGET_ICON_FILE;
+    message.payload.widget.id = HERO_UI_PLAYER_CREST;
+    heroWin->BroadcastMessage(message);
+    message.payload.widget.command = HERO_UI_WIDGET_FRAME;
+    message.payload.widget.id = HERO_UI_PLAYER_CREST;
+    message.payload.widget.data.value = gpCurPlayer->Color();
+    heroWin->BroadcastMessage(message);
+
+    gpHVHero->UpdateArmies();
+    for (index = 0; index < HERO_SECONDARY_SKILL_CAPACITY; index++) {
+        if (index < gpHVHero->m_secondarySkillCount) {
+            secondarySkill = gpHVHero->GetNthSS(index);
+            message.payload.widget.id =
+                HERO_UI_SECONDARY_SKILL_ROW1_FIRST + index;
+            message.payload.widget.command = HERO_UI_WIDGET_FRAME;
+            message.payload.widget.data.value = secondarySkill + 1;
+            heroWin->BroadcastMessage(message);
+            message.payload.widget.command = HERO_UI_WIDGET_ENABLE;
+            message.payload.widget.id =
+                HERO_UI_SECONDARY_SKILL_ROW2_FIRST + index;
+            message.payload.widget.data.value = HERO_UI_CONTROL_VALUE_DEFAULT;
+            heroWin->BroadcastMessage(message);
+            message.payload.widget.command = HERO_UI_WIDGET_ENABLE;
+            message.payload.widget.id =
+                HERO_UI_SECONDARY_SKILL_ROW3_FIRST + index;
+            message.payload.widget.data.value = HERO_UI_CONTROL_VALUE_DEFAULT;
+            heroWin->BroadcastMessage(message);
+            message.payload.widget.command = HERO_UI_WIDGET_TEXT;
+            message.payload.widget.id =
+                HERO_UI_SECONDARY_SKILL_ROW2_FIRST + index;
+            message.payload.widget.data.text = gSecondarySkills[secondarySkill];
+            heroWin->BroadcastMessage(message);
+            message.payload.widget.command = HERO_UI_WIDGET_TEXT;
+            message.payload.widget.id =
+                HERO_UI_SECONDARY_SKILL_ROW3_FIRST + index;
+            secondarySkillBonus = gpHVHero->GetSSLevel(secondarySkill) -
+                gpHVHero->m_secondarySkills[secondarySkill];
+            if (secondarySkillBonus > 0) {
+                sprintf(gText, "%s+%d",
+                    gSecondarySkillLevels[
+                        gpHVHero->m_secondarySkills[secondarySkill]],
+                    secondarySkillBonus);
+            } else {
+                sprintf(gText, "%s",
+                    gSecondarySkillLevels[
+                        gpHVHero->m_secondarySkills[secondarySkill]]);
+            }
+            message.payload.widget.data.text = gText;
+            heroWin->BroadcastMessage(message);
+        } else {
+            message.payload.widget.id =
+                HERO_UI_SECONDARY_SKILL_ROW1_FIRST + index;
+            message.payload.widget.command = HERO_UI_WIDGET_FRAME;
+            message.payload.widget.data.value = HERO_UI_EMPTY_SKILL_FRAME;
+            heroWin->BroadcastMessage(message);
+            message.payload.widget.command = HERO_UI_WIDGET_DISABLE;
+            message.payload.widget.id =
+                HERO_UI_SECONDARY_SKILL_ROW2_FIRST + index;
+            message.payload.widget.data.value = HERO_UI_CONTROL_VALUE_DEFAULT;
+            heroWin->BroadcastMessage(message);
+            message.payload.widget.command = HERO_UI_WIDGET_DISABLE;
+            message.payload.widget.id =
+                HERO_UI_SECONDARY_SKILL_ROW3_FIRST + index;
+            message.payload.widget.data.value = HERO_UI_CONTROL_VALUE_DEFAULT;
+            heroWin->BroadcastMessage(message);
+        }
+    }
+
+    for (index = 0; index < HERO_ARTIFACT_SLOT_COUNT; index++) {
+        message.payload.widget.id = HERO_UI_ARTIFACT_FIRST + index;
+        if (gpHVHero->m_artifacts[index] != HERO_ARTIFACT_NONE) {
+            message.payload.widget.command = HERO_UI_WIDGET_ENABLE;
+            message.payload.widget.data.value = HERO_UI_ARTIFACT_CONTROL_VALUE;
+            heroWin->BroadcastMessage(message);
+            message.payload.widget.command = HERO_UI_WIDGET_FRAME;
+            message.payload.widget.data.value = gpHVHero->m_artifacts[index] + 1;
+            heroWin->BroadcastMessage(message);
+        } else {
+            message.payload.widget.command = HERO_UI_WIDGET_FRAME;
+            message.payload.widget.data.value = HERO_UI_EMPTY_ARTIFACT_FRAME;
+            heroWin->BroadcastMessage(message);
+            message.payload.widget.command = HERO_UI_WIDGET_DISABLE;
+            message.payload.widget.data.value = HERO_UI_ARTIFACT_CONTROL_VALUE;
+            heroWin->BroadcastMessage(message);
+        }
+    }
+
+    statusMessage.type = HERO_UI_MESSAGE;
+    statusMessage.payload.widget.id = HERO_UI_ARMY_SELECTION_NONE;
+    UpdateHeroScreenStatusBar(statusMessage);
+}
+
+// @early-stop
+// All 0x2b0 code bytes and all 50 relocation sites match after
+// masking the three string relocations. Objdiff names this TU's coalesced
+// split-window, prompt, and integer-format literals differently from retail.
 VA(0x0046ff31, 0x2b0)
-void DoHeroSplit(int, int) {}
+void DoHeroSplit(int destinationSlot, int sourceSlot) {
+    short unusedTextControl = HERO_UI_SPLIT_TEXT;
+    short unusedAmountControl = HERO_UI_SPLIT_AMOUNT;
+    tag_message message;
+
+    gpTownManager->m_heroWindow1 = new heroWindow(
+        HERO_UI_SPLIT_WINDOW_X, HERO_UI_SPLIT_WINDOW_Y, "splitwin.bin");
+    if (gpTownManager->m_heroWindow1 == 0)
+        MemError();
+    gpTownManager->m_splitAmount = 0;
+    gpTownManager->m_splitMaximum =
+        gpHVHero->m_army.m_creatureCounts[sourceSlot];
+
+    message.type = HERO_UI_MESSAGE;
+    sprintf(gText, "Move how many troops?");
+    message.payload.widget.command = HERO_UI_WIDGET_TEXT;
+    message.payload.widget.id = HERO_UI_SPLIT_TEXT;
+    message.payload.widget.data.text = gText;
+    gpTownManager->m_heroWindow1->BroadcastMessage(message);
+    sprintf(gText, "%d", gpTownManager->m_splitAmount);
+    message.payload.widget.id = HERO_UI_SPLIT_AMOUNT;
+    message.payload.widget.data.text = gText;
+    gpTownManager->m_heroWindow1->BroadcastMessage(message);
+    gpWindowManager->DoDialog(gpTownManager->m_heroWindow1, SplitArmyHandler, 0);
+    delete gpTownManager->m_heroWindow1;
+
+    if (gpWindowManager->m_dialogResult == HERO_UI_DIALOG_SPLIT &&
+        gpTownManager->m_splitAmount != 0) {
+        if (gpHVHero->m_army.m_creatureTypes[sourceSlot] ==
+            gpHVHero->m_army.m_creatureTypes[destinationSlot]) {
+            gpHVHero->m_army.m_creatureCounts[sourceSlot] -=
+                gpTownManager->m_splitAmount;
+            gpHVHero->m_army.m_creatureCounts[destinationSlot] +=
+                gpTownManager->m_splitAmount;
+            if (gpHVHero->m_army.m_creatureCounts[sourceSlot] == 0)
+                gpHVHero->m_army.m_creatureTypes[sourceSlot] =
+                    ARMY_GROUP_EMPTY_SLOT;
+        } else {
+            gpHVHero->m_army.m_creatureCounts[sourceSlot] -=
+                gpTownManager->m_splitAmount;
+            gpHVHero->m_army.m_creatureCounts[destinationSlot] =
+                static_cast<short>(gpTownManager->m_splitAmount);
+            gpHVHero->m_army.m_creatureTypes[destinationSlot] =
+                gpHVHero->m_army.m_creatureTypes[sourceSlot];
+            if (gpHVHero->m_army.m_creatureCounts[sourceSlot] == 0)
+                gpHVHero->m_army.m_creatureTypes[sourceSlot] =
+                    ARMY_GROUP_EMPTY_SLOT;
+        }
+    }
+}
 
 VA(0x004701e1, 0x6a)
 void hero::SetSS(int, int) {}
