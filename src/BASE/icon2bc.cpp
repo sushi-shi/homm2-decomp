@@ -31,6 +31,8 @@ DATA(0x00534ce8) static unsigned int gCTRun;
 
 // Colour-table variant: literals and solid runs use colorTable[], and dimming is gated by dimGate.
 // Header/template replay guard: docs/matching-matrices/icon2bc-template-surface-c4c0562.tsv.
+// Scratch-owner audit: docs/matching-matrices/icon2bc-owner-audit-708de32.tsv. Every address in
+// 0x534ca8..0x534ce8 was re-derived from its ordered retail DIR32 instruction role; none is swapped.
 // @match-note
 // /O2 template checkpoint: the complete skip/solid/shadow/fill/dim/literal/newline CFG and every
 // relocation target are accounted for. A canonical KB-owned dim-palette declaration now avoids
