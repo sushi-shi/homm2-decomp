@@ -17,7 +17,7 @@ DATA(0x00534cac) static unsigned int gCTCnt;
 DATA(0x00534cb0) static int gCTX;
 DATA(0x00534cb4) static int gCTY;
 DATA(0x00534cb8) static IconEntry *gCTEntry;
-DATA(0x00534cbc) static int gCTRow;
+DATA(0x00534cbc) static unsigned char *gCTRow;
 DATA(0x00534cc0) static unsigned char *gCTDimPal;
 DATA(0x00534cc4) static int gCTClipB;
 DATA(0x00534cc8) static int gCTClipR;
@@ -34,27 +34,30 @@ DATA(0x00534ce8) static unsigned int gCTRun;
 // Earlier setup, owner, command, lifetime, and CFG families are hash-pinned under
 // docs/matching-matrices/icon2bc-*.tsv; do not replay them without a real header/type trigger.
 // @match-note
-// /O2 structural checkpoint on master 58ac64e: direct IconEntry ownership plus the real Icon2b
-// icon/bitmap/IconEntry/IconRle declaration order raises this TU from 72.73% with 93/91 relocs to
-// 78.94% with 90/91.  The function is 0x58c versus retail 0x5af.  Relocation-union masking leaves
+// /O2 typed checkpoint on master 71bdca9 with the canonical header-level IconRle and IconShear
+// typedef enums: 78.95071%, candidate 0x58c versus retail 0x5af. Relocation-union masking leaves
 // 767 differing bytes among 822 common unmasked bytes, first +0x12 and last +0x588, plus a 0x23
-// retail tail.  Both reserve one stack word and have the same 15 accesses to its [esp+0x10] home;
-// the complete skip/solid/shadow/fill/dim/literal/newline topology remains 86 logical blocks and
-// 67 branch sites, with three equivalent compare-operand reversals in clipped literal selection.
-// Every target identity is correct and no base-only target exists.  The multiset differs only by
-// Cnt 5/6, X0 2/3, and Y 9/8.  Ordered evidence: retail reloads X0 at +0x61 and holds one Y load at
-// +0x7b across both initial vertical clauses; candidate forwards X and reloads Y twice.  Retail's
-// clipped-dim X<clip arm stores the original Cnt at +0x406 before selected Cnt at +0x42a and gives
-// each selection arm its own ClipR load.  MSVC deletes the source's first Cnt store and merges the
-// branch-local ClipR snapshots, then later reloads ClipR in the literal arm despite its local view.
-// The source explicitly owns all of those lifetimes; volatile/dummy reads would only falsify it.
+// retail tail. Candidate/retail have 423/426 instructions, the same 86 blocks, 133 directed edges,
+// 67 branch sites, and identical ordered successor topology. Both reserve one stack word and have
+// the same 15 accesses to its [esp+0x10] home.
+// Relocations are 90/91 with no wrong or base-only target; uDimPal and every scratch count agree
+// except Cnt 5/6, X0 2/3, and Y 9/8. Retail reloads X0 at +0x61, while candidate forwards local X.
+// Retail holds one Y load at +0x7b across both initial vertical clauses; candidate reloads Y at
+// +0x78 and +0x86. Retail publishes original Cnt at +0x406 and selected Cnt at +0x42a in clipped
+// dim; candidate source owns both stores, but MSVC deletes the first and retains selected Cnt at
+// +0x408. ClipR totals are both ten, but retail gives the two dim selection arms loads at +0x3ec
+// and +0x400; candidate merges them at +0x3e7 and compensates with a literal-arm reload at +0x4d4.
+// Do not manufacture these occurrences with volatile, dummy reads, aliases, or inert expressions.
 // The first broad divergence remains +0x12: candidate coalesces frame offset/entry in ECX while
 // retail retains offset=EBX and entry=EDI, then uses source=ECX, command=EAX, count=EDX, cursor=EBX.
-// Current-trigger attempts: full sibling byte-offset setup was 77.07/87; formal-X update was
-// 78.40/90; deriving X from published X0 was 78.74/92 (X0 4/3); wider currentY scope and explicit
-// per-arm ClipR locals were byte-identical.  Canonical IconRle constants are byte-neutral in the
-// retained sibling include order.  Revisit only after another real declaration/type/layout change,
-// not with predicate synonyms, dummy state, arbitrary record boundaries, or permutation tools.
+// This pass corrected the proven row owner to unsigned-char pointer storage and removed all three
+// pointer/int casts around row formation/publication. The gCTRow-only correction measured
+// 78.985916% with 766 raw differences; the fully typed row expression is retained at
+// 78.95071%/767 because source correctness wins.
+// Closed prior-header axes remain: sibling byte-offset setup 77.07/87, formal-X 78.40/90,
+// published-X0 derivation 78.74/92, and byte-identical wider-Y/per-arm-ClipR locals. Revisit only
+// after another real declaration/type/layout change, not with predicate synonyms, count balancing,
+// arbitrary record boundaries, or permutation tools.
 VA(0x004d32a0, 0x5af)
 void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                             int clip, int clipX, int clipY, int clipW, int clipH, int color,
@@ -83,8 +86,7 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
             clip = 0;
         }
     }
-    unsigned char *row =
-        reinterpret_cast<unsigned char *>(gCTPitch * gCTY + reinterpret_cast<int>(dest->m_pixels));
+    unsigned char *row = dest->m_pixels + gCTPitch * gCTY;
     savedDst = gCTDst;
     int cmd;
     for (;;) {
@@ -94,7 +96,7 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
             if ((cmd & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
                 // skip run / end-of-sprite
                 gCTX = X;
-                gCTRow = reinterpret_cast<int>(row);
+                gCTRow = row;
                 gCTDst = savedDst;
                 gCTRun = cmd;
                 if ((cmd & ICON_RLE_COMMAND_RUN_MASK) == 0)
@@ -190,7 +192,7 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
                 } else {
                     gCTCnt = count;
                     if (clipY <= gCTY && gCTClipB >= gCTY &&
-                        (int)(X + count) > clipX &&
+                        static_cast<int>(X + count) > clipX &&
                         (gCTDst = savedDst, gCTClipR >= X)) {
                         int right = X + count;
                         unsigned int cn;
