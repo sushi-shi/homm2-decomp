@@ -50,6 +50,10 @@ authoritative. This file is the short, restart-ready Codex workflow.
    later shared-header/layout recovery can invalidate carefully tuned matches. Only after the
    syntactic-placeholder census reaches zero, start the last-mile phase and use
    `scripts/permute_ast.py` on structurally aligned 96-99% functions.
+   Sweep every SOURCE TU in that phase. The campaign is complete only when every function's
+   retained fuzzy maximum is 100%, and therefore every TU's fuzzy-max is 100%. If a byte-proven
+   delinker artifact prevents the raw metric from reaching 100%, normalize or explicitly bless
+   that proven artifact in the comparison/baseline instead of distorting correct source.
    Its ranges are syntax-aware, but audit every retained mutation. Inequality +/-1 rewrites are
    disabled because they are invalid for floats and can cross integer overflow boundaries. Do not
    use the regex permuter unless every retained mutation receives the same audit.
