@@ -28,9 +28,9 @@ int combatManager::AICheckRetreat(void)
         return 0;
     if (m_heroes[m_currentSide]->m_isCaptain != 0)
         return 0;
-    if (gpGame->m_victoryConditionType == COMBAT_AI_DEFEAT_HERO_VICTORY &&
+    if (gpGame->m_mapHeader.victoryCondition == COMBAT_AI_DEFEAT_HERO_VICTORY &&
         static_cast<unsigned char>(m_heroes[m_currentSide]->m_id) ==
-            gpGame->m_victoryConditionValue)
+            gpGame->m_mapHeader.victoryConditionValue)
         return 0;
     if (gpGame->m_players[m_heroes[m_currentSide]->m_owner].townCount == 0 &&
         gpGame->m_players[m_heroes[m_currentSide]->m_owner].heroCount ==

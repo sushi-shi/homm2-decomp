@@ -319,6 +319,7 @@ extern int giScore;
 extern char gcRegAppPath[0x160];  // CodeView size 0x160; typed char* (array-decayed)
 extern unsigned long gTimeMark;
 extern char *EXPANSION_AGGREGATE_NAME;
+extern signed char xNetHasOldPlayers;
 extern char cPlayerNames[6][21];
 extern class icon *gCurLoadedSpellIcon;
 extern unsigned char bSaveMusicPosition[0x3c];

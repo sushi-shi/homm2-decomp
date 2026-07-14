@@ -1760,21 +1760,21 @@ void CheckEndGame(int forcedResult, int dragonCityCaptured)
         victory = 0;
         defeat = 0;
         normalVictoryAllowed = 1;
-        if ((gpGame->m_victoryConditionType != CHECK_END_GAME_VICTORY_STANDARD && !gpGame->m_allowNormalVictory) ||
+        if ((gpGame->m_mapHeader.victoryCondition != CHECK_END_GAME_VICTORY_STANDARD && !gpGame->m_mapHeader.allowNormalVictory) ||
             (gbInCampaign && gpGame->m_campaignType == CHECK_END_GAME_ARCHIBALD_CAMPAIGN &&
              gpGame->m_campaignScenario + CHECK_END_GAME_SCENARIO_OFFSET == CHECK_END_GAME_SIDE_SCENARIO)) {
             normalVictoryAllowed = 0;
         }
 
-        if (gpGame->m_victoryConditionType == CHECK_END_GAME_VICTORY_SIDE &&
-            gpGame->m_victoryConditionValue != CHECK_END_GAME_SIDE_SPECIAL_VALUE &&
+        if (gpGame->m_mapHeader.victoryCondition == CHECK_END_GAME_VICTORY_SIDE &&
+            gpGame->m_mapHeader.victoryConditionValue != CHECK_END_GAME_SIDE_SPECIAL_VALUE &&
             (!gbInCampaign || gpGame->m_campaignType != CHECK_END_GAME_ARCHIBALD_CAMPAIGN ||
              gpGame->m_campaignScenario + CHECK_END_GAME_SCENARIO_OFFSET != CHECK_END_GAME_SIDE_SCENARIO)) {
             sideBelow = 0;
             sideAbove = 0;
             for (player = 0; player < gpGame->m_playerCount; player++) {
                 if (!gpGame->m_playerDead[player]) {
-                    if (gpGame->m_players[player].color < gpGame->m_victorySideThreshold) {
+                    if (gpGame->m_players[player].color < gpGame->m_mapHeader.victorySideThreshold) {
                         sideBelow++;
                     } else {
                         sideAbove++;
@@ -1784,14 +1784,14 @@ void CheckEndGame(int forcedResult, int dragonCityCaptured)
             if (sideBelow == 0) {
                 for (player = 0; player < gpGame->m_playerCount; player++) {
                     if (gbThisNetHumanPlayer[player] && !gpGame->m_playerDead[player] &&
-                        gpGame->m_players[player].color >= gpGame->m_victorySideThreshold) {
+                        gpGame->m_players[player].color >= gpGame->m_mapHeader.victorySideThreshold) {
                         victory = 1;
                     }
                 }
             } else if (sideAbove == 0) {
                 for (player = 0; player < gpGame->m_playerCount; player++) {
                     if (gbThisNetHumanPlayer[player] && !gpGame->m_playerDead[player] &&
-                        gpGame->m_players[player].color < gpGame->m_victorySideThreshold) {
+                        gpGame->m_players[player].color < gpGame->m_mapHeader.victorySideThreshold) {
                         victory = 1;
                     }
                 }
@@ -1806,11 +1806,11 @@ void CheckEndGame(int forcedResult, int dragonCityCaptured)
             }
         }
 
-        if (gpGame->m_victoryConditionType == CHECK_END_GAME_VICTORY_CAPTURE_TOWN) {
+        if (gpGame->m_mapHeader.victoryCondition == CHECK_END_GAME_VICTORY_CAPTURE_TOWN) {
             victoryTown = gpGame->GetTown(
-                gpGame->GetTownId(gpGame->m_victoryConditionValue, gpGame->m_victoryTownY));
+                gpGame->GetTownId(gpGame->m_mapHeader.victoryConditionValue, gpGame->m_mapHeader.victoryTownY));
             if (victoryTown->m_owner != CHECK_END_GAME_NO_PLAYER &&
-                (gbHumanPlayer[victoryTown->m_owner] || gpGame->m_computerAlsoWins)) {
+                (gbHumanPlayer[victoryTown->m_owner] || gpGame->m_mapHeader.computerAlsoWins)) {
                 if (gbThisNetHumanPlayer[victoryTown->m_owner]) {
                     victory = 1;
                 } else {
@@ -1828,9 +1828,9 @@ void CheckEndGame(int forcedResult, int dragonCityCaptured)
             }
         }
 
-        if (gpGame->m_lossConditionType == CHECK_END_GAME_LOSS_TOWN) {
+        if (gpGame->m_mapHeader.lossCondition == CHECK_END_GAME_LOSS_TOWN) {
             lossTown =
-                gpGame->GetTown(gpGame->GetTownId(gpGame->m_lossConditionValue, gpGame->m_lossTownY));
+                gpGame->GetTown(gpGame->GetTownId(gpGame->m_mapHeader.lossConditionValue, gpGame->m_mapHeader.lossTownY));
             if (lossTown->m_owner == CHECK_END_GAME_NO_PLAYER || !gbHumanPlayer[lossTown->m_owner]) {
                 defeat = 1;
                 if (!dialogShown) {
@@ -1841,13 +1841,13 @@ void CheckEndGame(int forcedResult, int dragonCityCaptured)
             }
         }
 
-        if (gpGame->m_victoryConditionType == CHECK_END_GAME_VICTORY_GOLD) {
+        if (gpGame->m_mapHeader.victoryCondition == CHECK_END_GAME_VICTORY_GOLD) {
             bestGold = 0;
             winner = CHECK_END_GAME_NO_PLAYER;
             for (player = 0; player < gpGame->m_playerCount; player++) {
-                if ((gbHumanPlayer[player] || gpGame->m_computerAlsoWins) &&
+                if ((gbHumanPlayer[player] || gpGame->m_mapHeader.computerAlsoWins) &&
                     gpGame->m_players[player].resources[CHECK_END_GAME_GOLD_RESOURCE] >=
-                        gpGame->m_victoryConditionValue * CHECK_END_GAME_GOLD_SCALE &&
+                        gpGame->m_mapHeader.victoryConditionValue * CHECK_END_GAME_GOLD_SCALE &&
                     gpGame->m_players[player].resources[CHECK_END_GAME_GOLD_RESOURCE] >= bestGold) {
                     bestGold = gpGame->m_players[player].resources[CHECK_END_GAME_GOLD_RESOURCE];
                     winner = player;
@@ -1877,8 +1877,8 @@ void CheckEndGame(int forcedResult, int dragonCityCaptured)
             }
         }
 
-        if (gpGame->m_victoryConditionType == CHECK_END_GAME_VICTORY_DEFEAT_HERO) {
-            victoryHero = GetHeroSlot(gpGame->m_victoryConditionValue);
+        if (gpGame->m_mapHeader.victoryCondition == CHECK_END_GAME_VICTORY_DEFEAT_HERO) {
+            victoryHero = GetHeroSlot(gpGame->m_mapHeader.victoryConditionValue);
             if (victoryHero->m_owner < 0 || victoryHero->m_owner >= CHECK_END_GAME_PLAYER_COUNT ||
                 gbHumanPlayer[victoryHero->m_owner]) {
                 victory = 1;
@@ -1891,8 +1891,8 @@ void CheckEndGame(int forcedResult, int dragonCityCaptured)
             }
         }
 
-        if (gpGame->m_lossConditionType == CHECK_END_GAME_LOSS_HERO) {
-            lossHero = GetHeroSlot(gpGame->m_lossConditionValue);
+        if (gpGame->m_mapHeader.lossCondition == CHECK_END_GAME_LOSS_HERO) {
+            lossHero = GetHeroSlot(gpGame->m_mapHeader.lossConditionValue);
             if (lossHero->m_owner < 0 || lossHero->m_owner >= CHECK_END_GAME_PLAYER_COUNT ||
                 !gbHumanPlayer[lossHero->m_owner]) {
                 defeat = 1;
@@ -1904,8 +1904,8 @@ void CheckEndGame(int forcedResult, int dragonCityCaptured)
             }
         }
 
-        if (gpGame->m_lossConditionType == CHECK_END_GAME_LOSS_TIME) {
-            if (gpGame->m_lossConditionValue < (gpGame->m_week - 1) * CHECK_END_GAME_DAYS_PER_WEEK +
+        if (gpGame->m_mapHeader.lossCondition == CHECK_END_GAME_LOSS_TIME) {
+            if (gpGame->m_mapHeader.lossConditionValue < (gpGame->m_week - 1) * CHECK_END_GAME_DAYS_PER_WEEK +
                                                    (gpGame->m_month - 1) * CHECK_END_GAME_DAYS_PER_MONTH +
                                                    gpGame->m_day) {
                 defeat = 1;
@@ -1917,14 +1917,14 @@ void CheckEndGame(int forcedResult, int dragonCityCaptured)
             }
         }
 
-        if (gpGame->m_victoryConditionType == CHECK_END_GAME_VICTORY_ARTIFACT) {
+        if (gpGame->m_mapHeader.victoryCondition == CHECK_END_GAME_VICTORY_ARTIFACT) {
             artifactWinner = CHECK_END_GAME_NO_PLAYER;
             for (player = 0; player < gpGame->m_playerCount; player++) {
                 if (!gpGame->m_playerDead[player]) {
                     for (heroIndex = 0; heroIndex < gpGame->m_players[player].heroCount; heroIndex++) {
                         artifactHero = gpGame->GetPlayerHero(player, heroIndex);
-                        if (gpGame->m_victoryConditionValue > CHECK_END_GAME_ULTIMATE_ARTIFACT) {
-                            if (artifactHero->HasArtifact(gpGame->m_victoryConditionValue - 1)) {
+                        if (gpGame->m_mapHeader.victoryConditionValue > CHECK_END_GAME_ULTIMATE_ARTIFACT) {
+                            if (artifactHero->HasArtifact(gpGame->m_mapHeader.victoryConditionValue - 1)) {
                                 artifactWinner = player;
                             }
                         } else {
@@ -1946,10 +1946,10 @@ void CheckEndGame(int forcedResult, int dragonCityCaptured)
                 }
                 if (!dialogShown) {
                     dialogShown = 1;
-                    if (gpGame->m_victoryConditionValue == CHECK_END_GAME_ULTIMATE_ARTIFACT) {
+                    if (gpGame->m_mapHeader.victoryConditionValue == CHECK_END_GAME_ULTIMATE_ARTIFACT) {
                         sprintf(artifactName, "Ultimate Artifact");
                     } else {
-                        sprintf(artifactName, gArtifactNames[gpGame->m_victoryConditionValue - 1]);
+                        sprintf(artifactName, gArtifactNames[gpGame->m_mapHeader.victoryConditionValue - 1]);
                     }
                     if (victory) {
                         sprintf(gText, "You have found the %s.  Your quest is complete.", artifactName);
@@ -3012,7 +3012,7 @@ void ShowCongrats(int highScoreType)
     memcpy(gpBufferPalette->m_data, gPalette->m_data, CONGRATS_PALETTE_SIZE);
     gpMouseManager->ShowColorPointer();
     AddScoreToHighScore(score, giCurTurn, gpGame->m_difficultyRating,
-                        CONGRATS_STANDARD, gpGame->m_scenarioName);
+                        CONGRATS_STANDARD, gpGame->m_mapHeader.name);
     BaseFree(congratsText, KBFILE,
              *reinterpret_cast<const short *>("\x97\x0f") + 0x4e);
     congratsText = 0;

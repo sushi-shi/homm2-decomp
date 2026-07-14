@@ -85,12 +85,12 @@ int fileRequester::InitializeFiles(char *directory, char *pattern, int countOnly
                   header.minHumanPlayers <= giNumHumanPlayers &&
                   giNumHumanPlayers <= header.maxHumanPlayers &&
                   (giMapSizeFilter == FILE_REQUESTER_MAP_SIZE_ALL ||
-                   giMapSizes[giMapSizeFilter] == header.mapSize) &&
+                   giMapSizes[giMapSizeFilter] == header.width) &&
                   ShowThisMapGame(findData.cFileName))) &&
                 (m_mode != FILE_REQUESTER_MAP ||
                  (GetMapHeader(findData.cFileName, &header),
                   (giMapSizeFilter == FILE_REQUESTER_MAP_SIZE_ALL ||
-                   giMapSizes[giMapSizeFilter] == header.mapSize) &&
+                   giMapSizes[giMapSizeFilter] == header.width) &&
                   ShowThisMap(findData.cFileName)))) {
                 ++m_fileCount;
             }
@@ -133,11 +133,11 @@ int fileRequester::InitializeFiles(char *directory, char *pattern, int countOnly
                  (GetMapHeader(findData.cFileName, &header),
                   header.minHumanPlayers <= giNumHumanPlayers &&
                   giNumHumanPlayers <= header.maxHumanPlayers &&
-                  (giMapSizeFilter == 4 || giMapSizes[giMapSizeFilter] == header.mapSize) &&
+                  (giMapSizeFilter == 4 || giMapSizes[giMapSizeFilter] == header.width) &&
                   ShowThisMapGame(findData.cFileName))) &&
                 (m_mode != FILE_REQUESTER_MAP ||
                  (GetMapHeader(findData.cFileName, &header),
-                  (giMapSizeFilter == 4 || giMapSizes[giMapSizeFilter] == header.mapSize) &&
+                  (giMapSizeFilter == 4 || giMapSizes[giMapSizeFilter] == header.width) &&
                   ShowThisMap(findData.cFileName)))) {
                 char name[FILE_REQUESTER_NAME_SIZE];
                 char extension[FILE_REQUESTER_EXTENSION_SIZE];
@@ -734,11 +734,11 @@ void fileRequester::Update(int drawWindow)
 
         message.field4 = 4;
         message.field8 = 0x52;
-        if (m_mapHeaders[m_selectedIndex].mapSize == MAP_DIMENSION_SMALL) {
+        if (m_mapHeaders[m_selectedIndex].width == MAP_DIMENSION_SMALL) {
             message.field18 = 0x1a;
-        } else if (m_mapHeaders[m_selectedIndex].mapSize == MAP_DIMENSION_MEDIUM) {
+        } else if (m_mapHeaders[m_selectedIndex].width == MAP_DIMENSION_MEDIUM) {
             message.field18 = 0x1b;
-        } else if (m_mapHeaders[m_selectedIndex].mapSize == MAP_DIMENSION_LARGE) {
+        } else if (m_mapHeaders[m_selectedIndex].width == MAP_DIMENSION_LARGE) {
             message.field18 = 0x1c;
         } else {
             message.field18 = 0x1d;
@@ -806,11 +806,11 @@ void fileRequester::Update(int drawWindow)
 
                 message.field4 = 4;
                 message.field8 = i + 200;
-                if (m_mapHeaders[m_topIndex + i].mapSize == MAP_DIMENSION_SMALL) {
+                if (m_mapHeaders[m_topIndex + i].width == MAP_DIMENSION_SMALL) {
                     message.field18 = 0x1a;
-                } else if (m_mapHeaders[m_topIndex + i].mapSize == MAP_DIMENSION_MEDIUM) {
+                } else if (m_mapHeaders[m_topIndex + i].width == MAP_DIMENSION_MEDIUM) {
                     message.field18 = 0x1b;
-                } else if (m_mapHeaders[m_topIndex + i].mapSize == MAP_DIMENSION_LARGE) {
+                } else if (m_mapHeaders[m_topIndex + i].width == MAP_DIMENSION_LARGE) {
                     message.field18 = 0x1c;
                 } else {
                     message.field18 = 0x1d;

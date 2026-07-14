@@ -603,7 +603,6 @@ extern int iViewArmyType;
 extern class hero *viewSpellsHero;
 extern int gbUpgradeArmy;
 extern short RandMineQty[8];
-extern char *gcCurMapName;
 extern signed char *gbNGDifficulty;
 extern int iViewArmyUpgradeToType;
 extern int viewArmyBaseX;
