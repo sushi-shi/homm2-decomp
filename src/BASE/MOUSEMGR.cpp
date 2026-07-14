@@ -57,7 +57,7 @@ mouseManager::mouseManager(void) : baseManager()
 VA(0x004c9350, 0x94)
 int mouseManager::Open(int id)
 {
-    field_0x7e = 0;
+    m_forcePointerUpdate = 0;
     m_savedUnderlying = new bitmap(0x21, 0x42, 0x40);
     m_savedW = 0x13f;
     m_savedH = 0xef;
@@ -112,7 +112,7 @@ int mouseManager::Main(struct tag_message &) { return 0; }
 VA(0x004c94f0, 0x135)
 void mouseManager::SetPointer(char *name, int param_2, int param_3)
 {
-    if (field_0x7e == 0) {
+    if (m_forcePointerUpdate == 0) {
         gbPutzingWithMouseCtr++;
         gpResourceManager->SavePosition();
         if (param_3 == -999) {
@@ -285,15 +285,15 @@ void mouseManager::SetColorMice(int param_1)
         }
         int savedX = m_cursorFrame;
         int savedY = m_cursorType;
-        int saved7e = field_0x7e;
+        int saved7e = m_forcePointerUpdate;
         m_cursorReady = 0;
         gbColorMice = param_1;
         m_cursorFrame = -99;
         m_cursorType = -1;
-        field_0x7e = 0;
+        m_forcePointerUpdate = 0;
         SetPointer(gDefaultCursorName, savedX, savedY);
         m_cursorReady = 1;
-        field_0x7e = saved7e;
+        m_forcePointerUpdate = saved7e;
         if (gbColorMice == 0) {
             ShowCursor(1);
         } else if (m_hideCount > 0 && --m_hideCount == 0) {
