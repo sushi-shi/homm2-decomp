@@ -50,9 +50,9 @@ void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, 
     int Y = y + entry->y;
     gFCY = Y;
     if (clip != 0) {
-        int currentY;
+        int currentY = gFCY;
         if (x0 < clipX || clipW + clipX < x0 + w ||
-            clipY > (currentY = gFCY) || clipY + clipH < entry->h + currentY) {
+            currentY < clipY || clipY + clipH < entry->h + currentY) {
             clip = 1;
             gFCClipR = clipX + clipW - 1;
             gFCClipB = clipY + clipH - 1;
@@ -106,9 +106,9 @@ void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, 
             if (clip == 0) {
                 memset(reinterpret_cast<unsigned char *>((gFCRow - count) + 1 + X), gFCColor, count);
             } else {
-                int currentY;
+                int currentY = gFCY;
                 int left;
-                if ((currentY = gFCY) >= clipY && currentY <= gFCClipB &&
+                if (currentY >= clipY && currentY <= gFCClipB &&
                     (left = (X - count) + 1, clipX <= left) && X <= gFCClipR) {
                     if (clipX <= left) {
                         memset(reinterpret_cast<unsigned char *>((gFCRow - count) + 1 + X),
@@ -146,9 +146,9 @@ void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, 
                         } while (count != 0);
                     }
                 } else {
-                    int currentY;
+                    int currentY = gFCY;
                     gFCCnt2 = count;
-                    if ((currentY = gFCY) >= clipY && currentY <= gFCClipB &&
+                    if (currentY >= clipY && currentY <= gFCClipB &&
                         clipX <= static_cast<int>((X - count) + 1) && X <= gFCClipR) {
                         int left = (X - count) + 1;
                         unsigned char *dp;
@@ -204,31 +204,42 @@ void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, 
                     int left = (X - cmd) + 1;
                     if (left <= gFCClipR && clipX <= X) {
                         unsigned int cn;
+                        unsigned char *selectedDst;
+                        int skip;
                         if (X <= gFCClipR) {
-                            gFCDst = reinterpret_cast<unsigned char *>(gFCRow + X);
+                            selectedDst = reinterpret_cast<unsigned char *>(gFCRow + X);
+                            gFCDst = selectedDst;
                             if (clipX <= left) {
                                 gFCSkip = 0;
                                 cn = cmd;
                             } else {
                                 cn = (X - clipX) + 1;
-                                gFCSkip = cmd - cn;
+                                skip = cmd - cn;
+                                goto set_skip;
                             }
                         } else {
                             int right = gFCClipR;
                             src = src + (X - right);
-                            gFCDst = reinterpret_cast<unsigned char *>(gFCRow + right);
+                            selectedDst = reinterpret_cast<unsigned char *>(gFCRow + right);
+                            gFCDst = selectedDst;
                             if (clipX <= (X - cmd)) {
                                 gFCSkip = 0;
                                 cn = (cmd - X) + gFCClipR;
                             } else {
-                                gFCSkip = gFCClipR + ((cmd - X) - clipW);
+                                skip = gFCClipR + ((cmd - X) - clipW);
                                 cn = clipW;
+                                goto set_skip;
                             }
                         }
-                        gFCCnt = 0;
+                        goto skip_set;
+                    set_skip:
+                        gFCSkip = skip;
+                    skip_set:
+                        int copyCount = cn;
                         gFCCnt2 = cn;
-                        if (static_cast<int>(cn) > 0) {
-                            gFCCnt = cn;
+                        gFCCnt = 0;
+                        if (copyCount > 0) {
+                            gFCCnt = copyCount;
                             do {
                                 unsigned char *dst = gFCDst;
                                 int c = *src++;
