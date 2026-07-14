@@ -210,7 +210,10 @@ struct SAMPLE2 { class sample *pSample; struct _SAMPLE *pMem; };            // N
 typedef enum MonsterAttribute {
     MONSTER_ATTRIBUTE_WIDE = 0x01,
     MONSTER_ATTRIBUTE_FLYING = 0x02,
-    MONSTER_ATTRIBUTE_RANGED = 0x04
+    MONSTER_ATTRIBUTE_RANGED = 0x04,
+    MONSTER_ATTRIBUTE_DEAD = 0x10,
+    MONSTER_ATTRIBUTE_RETALIATED = 0x40,
+    MONSTER_ATTRIBUTE_WOKE_FROM_DAMAGE = 0x80
 } MonsterAttribute;
 #pragma pack(push, 1)
 struct SWinSetup { unsigned char m_0; unsigned short m_1; char *m_3; };     // gWinSetup[] (7B, pack 1)
