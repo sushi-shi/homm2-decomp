@@ -39,8 +39,12 @@ DATA(0x00534ce8) static unsigned int gCTRun;
 // srcOffset in EAX, then forms entry=EDI and reuses ESI for X. A fresh byte-offset/SSA-lifetime
 // family (split raw entry X, delayed typed-entry formation, pointer/reference/global views, and
 // declaration splits) reached only 70.00% and either pushed EBP early or allocated entry=ECX;
-// see icon2bc-structural-214bd52.tsv. No decoder publication/order change was indicated. Revisit
-// only after a real declaration-surface change or with a model that directly yields that register split.
+// see icon2bc-structural-214bd52.tsv. A later independent decoder audit proved retail loads
+// gCTDst once before the command loop and carries that cursor across iterations; its newline also
+// publishes X, Y, then row. That whole-function model reached only 71.88% with 88/91 relocations,
+// below the retained 72.479%, so this 91/91 canonical remains; see
+// icon2bc-decoder-lifetime-9cdac5a.tsv. Revisit with a model that preserves those lifetimes while
+// also yielding the +0x12 EBX/EDI split, or after a real declaration-surface change.
 VA(0x004d32a0, 0x5af)
 void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                             int clip, int clipX, int clipY, int clipW, int clipH, int color,
