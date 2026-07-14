@@ -2655,32 +2655,312 @@ void advManager::EventSound(int eventType, int eventData, struct SAMPLE2 *outSam
     }
 }
 
+// @early-stop
+// Relocation-masked raw bytes are identical; the only residual is the delinked
+// constant-pool identity for the identical "Event ID %d" literal.
 VA(0x004aff6c, 0xc7)
-void advManager::EventWindow(int, int, char *, int, int, int, int, int) {}
+void advManager::EventWindow(int eventId, int buttons, char *text, int type1,
+                             int value1, int type2, int value2, int type3)
+{
+    // Unused retail locals retain the original /Od frame around the text buffer.
+    int dialogState7;
+    int eventWindowUnused12;
+    int windowGap1;
+    int unusedStyle9;
+    int unusedResult;
+    int dialogState8;
+    int eventWindowUnused11;
+    int unusedStyle;
+    char eventText[EVENT_TEXT_BUFFER_SIZE];
 
+    unusedResult = 0;
+    unusedStyle9 = 1;
+
+    if (eventId >= 0 && eventId < EVENT_TEXT_COUNT)
+        sprintf(eventText, gEventText[eventId]);
+    else if (eventId == MAP_EVENT_REWARD_NONE)
+        sprintf(eventText, text);
+    else
+        sprintf(eventText, "Event ID %d", eventId);
+
+    NormalDialog(eventText, buttons, -1, -1, type1, value1, type2, value2,
+                 type3, 0);
+}
+
+// @early-stop
+// The base is five bytes larger solely because of the unreachable jump at
+// +0x44. With branch destinations normalized, every other opcode and operand
+// matches; all three external relocation targets also agree.
 VA(0x004b0033, 0xb6)
-int GiveArtifact(class hero *, int, int, signed char) { return 0; }
+int GiveArtifact(hero *eventHero, int artifact, int checkEndGame,
+                 signed char artifactExtra)
+{
+    int artifactSlot;
+
+    for (artifactSlot = 0; artifactSlot < EVENT_ARTIFACT_SLOT_COUNT;
+         artifactSlot++) {
+        if (eventHero->m_artifacts[artifactSlot] == EVENT_ARTIFACT_NONE) {
+            break;
+        } else {
+        }
+    }
+
+    if (artifactSlot == EVENT_ARTIFACT_SLOT_COUNT) {
+        return EVENT_ARTIFACT_NONE;
+    }
+
+    eventHero->m_artifacts[artifactSlot] = artifact;
+    eventHero->m_artifactExtra[artifactSlot] = artifactExtra;
+    GiveTakeArtifactStat(eventHero, artifact, 0);
+    eventHero->CheckAnduranPieces(0);
+    if (checkEndGame)
+        CheckEndGame(0, 0);
+    return artifactSlot;
+}
 
 VA(0x004b00e9, 0x5e)
-int advManager::GiveRandomArtifact(class hero *) { return 0; }
+int advManager::GiveRandomArtifact(hero *eventHero)
+{
+    int artifactId = gpGame->GetRandomArtifactId(EVENT_RANDOM_ARTIFACT_ANY, 1);
+
+    if (artifactId == EVENT_ARTIFACT_NONE)
+        GiveResource(eventHero, RES_GOLD, EVENT_RANDOM_ARTIFACT_GOLD);
+    else
+        GiveArtifact(eventHero, artifactId, 1, EVENT_ARTIFACT_NONE);
+    return artifactId;
+}
 
 VA(0x004b0147, 0x67)
-int advManager::GiveExperience(class hero *, int, int) { return 0; }
+int advManager::GiveExperience(hero *eventHero, int experience, int checkLevel)
+{
+    // These unused level locals account for the retail /Od stack slots.
+    int oldLevel;
+    int unusedLevel2;
+    int unusedLevel1;
+    int newLevel1;
+    int levelGap1;
+
+    oldLevel = eventHero->GetLevel(eventHero->m_experience);
+    eventHero->m_level = static_cast<short>(oldLevel);
+    eventHero->m_experience += experience;
+    newLevel1 = eventHero->GetLevel(eventHero->m_experience);
+    if (checkLevel)
+        eventHero->CheckLevel();
+    return newLevel1 - oldLevel;
+}
 
 VA(0x004b01ae, 0x80)
-void advManager::GiveResource(class hero *, int, int) {}
+void advManager::GiveResource(hero *eventHero, int resourceType, int amount)
+{
+    if (resourceType >= 0 && resourceType <= RES_GOLD)
+        gpGame->m_players[eventHero->m_owner].resources[resourceType] += amount;
+    if (resourceType == RES_GOLD && gbHumanPlayer[eventHero->m_owner])
+        CheckEndGame(0, 0);
+}
 
 VA(0x004b022e, 0xbb)
-void advManager::RecruitEvent(class hero *, int, class mapCell *) {}
+void advManager::RecruitEvent(hero *eventHero, int creatureType, mapCell *cell)
+{
+    tag_message dialogMessage2;
+    short availableCount15 = static_cast<short>(cell->w4hi);
+    baseManager *dialogManager =
+        new recruitUnit(&eventHero->m_army, creatureType, &availableCount15);
+    int dialogResult;
+
+    if (dialogManager == 0)
+        MemError();
+    gpExec->DoDialog(dialogManager);
+    delete dialogManager;
+    cell->w4hi = static_cast<unsigned short>(availableCount15 + 0);
+}
 
 VA(0x004b02e9, 0x261)
-int advManager::SkeletonEvent(class hero *, class mapCell *, char *, int, int) { return 0; }
+int advManager::SkeletonEvent(hero *eventHero, mapCell *cell, char *text,
+                              int x, int y)
+{
+    int artifactId;
+
+    switch (cell->w4hi) {
+    case UNDEAD_EVENT_LEVEL_SMALL:
+        if (CombatMonsterEvent(eventHero, ARMY_CREATURE_SKELETON,
+                               SKELETON_EVENT_SMALL_COUNT, cell, x, y, 0, x, y,
+                               -1, 0, 0, -1, 0, 0) == 0) {
+            EventWindow(-1, 1, text, RES_GOLD, SKELETON_EVENT_SMALL_GOLD,
+                        -1, 0, -1);
+            GiveResource(eventHero, RES_GOLD, SKELETON_EVENT_SMALL_GOLD);
+            eventHero->CheckLevel();
+            return 1;
+        }
+        break;
+    case UNDEAD_EVENT_LEVEL_MEDIUM:
+        if (CombatMonsterEvent(eventHero, ARMY_CREATURE_SKELETON,
+                               SKELETON_EVENT_MEDIUM_COUNT, cell, x, y, 0, x,
+                               y, -1, 0, 0, -1, 0, 0) == 0) {
+            EventWindow(-1, 1, text, RES_GOLD, SKELETON_EVENT_MEDIUM_GOLD,
+                        -1, 0, -1);
+            GiveResource(eventHero, RES_GOLD, SKELETON_EVENT_MEDIUM_GOLD);
+            eventHero->CheckLevel();
+            return 1;
+        }
+        break;
+    case UNDEAD_EVENT_LEVEL_LARGE:
+        if (CombatMonsterEvent(eventHero, ARMY_CREATURE_SKELETON,
+                               SKELETON_EVENT_LARGE_COUNT, cell, x, y, 0, x, y,
+                               -1, 0, 0, -1, 0, 0) == 0) {
+            EventWindow(-1, 1, text, RES_GOLD, SKELETON_EVENT_LARGE_GOLD,
+                        -1, 0, -1);
+            GiveResource(eventHero, RES_GOLD, SKELETON_EVENT_LARGE_GOLD);
+            eventHero->CheckLevel();
+            return 1;
+        }
+        break;
+    default:
+        if (CombatMonsterEvent(eventHero, ARMY_CREATURE_SKELETON,
+                               SKELETON_EVENT_HUGE_COUNT, cell, x, y, 0, x, y,
+                               -1, 0, 0, -1, 0, 0) == 0) {
+            EventWindow(-1, 1, text, RES_GOLD, SKELETON_EVENT_HUGE_GOLD,
+                        -1, 0, -1);
+            GiveResource(eventHero, RES_GOLD, SKELETON_EVENT_HUGE_GOLD);
+            eventHero->CheckLevel();
+            return 1;
+        }
+        break;
+    }
+    return 0;
+}
 
 VA(0x004b054a, 0x29b)
-int advManager::ZombieEvent(class hero *, class mapCell *, char *, int, int) { return 0; }
+int advManager::ZombieEvent(hero *eventHero, mapCell *cell, char *text,
+                            int x, int y)
+{
+    int artifactId;
+    switch (cell->w4hi) {
+    case UNDEAD_EVENT_LEVEL_SMALL:
+        if (CombatMonsterEvent(
+                eventHero, ARMY_CREATURE_ZOMBIE, ZOMBIE_EVENT_SMALL_COUNT,
+                cell, x, y, 0, x, y, ARMY_CREATURE_MUTANT_ZOMBIE,
+                ZOMBIE_EVENT_SMALL_SUPPORT_COUNT, ZOMBIE_EVENT_SUPPORT_STACKS,
+                -1, 0, 0) == 0) {
+            EventWindow(-1, 1, text, RES_GOLD, ZOMBIE_EVENT_SMALL_GOLD,
+                        -1, 0, -1);
+            GiveResource(eventHero, RES_GOLD, ZOMBIE_EVENT_SMALL_GOLD);
+            eventHero->CheckLevel();
+            return 1;
+        }
+        break;
+    case UNDEAD_EVENT_LEVEL_MEDIUM:
+        if (CombatMonsterEvent(
+                eventHero, ARMY_CREATURE_MUTANT_ZOMBIE,
+                ZOMBIE_EVENT_MEDIUM_COUNT, cell, x, y, 0, x, y,
+                ARMY_CREATURE_MUTANT_ZOMBIE,
+                ZOMBIE_EVENT_MEDIUM_SUPPORT_COUNT, ZOMBIE_EVENT_SUPPORT_STACKS,
+                -1, 0, 0) == 0) {
+            EventWindow(-1, 1, text, RES_GOLD, ZOMBIE_EVENT_MEDIUM_GOLD,
+                        -1, 0, -1);
+            GiveResource(eventHero, RES_GOLD, ZOMBIE_EVENT_MEDIUM_GOLD);
+            eventHero->CheckLevel();
+            return 1;
+        }
+        break;
+    case UNDEAD_EVENT_LEVEL_LARGE:
+        if (CombatMonsterEvent(
+                eventHero, ARMY_CREATURE_MUTANT_ZOMBIE,
+                ZOMBIE_EVENT_LARGE_COUNT, cell, x, y, 0, x, y,
+                ARMY_CREATURE_MUTANT_ZOMBIE,
+                ZOMBIE_EVENT_LARGE_SUPPORT_COUNT, ZOMBIE_EVENT_SUPPORT_STACKS,
+                -1, 0, 0) == 0) {
+            EventWindow(-1, 1, text, RES_GOLD, ZOMBIE_EVENT_LARGE_GOLD,
+                        -1, 0, -1);
+            GiveResource(eventHero, RES_GOLD, ZOMBIE_EVENT_LARGE_GOLD);
+            eventHero->CheckLevel();
+            return 1;
+        }
+        break;
+    default:
+        if (CombatMonsterEvent(
+                eventHero, ARMY_CREATURE_MUTANT_ZOMBIE,
+                ZOMBIE_EVENT_HUGE_COUNT, cell, x, y, 0, x, y,
+                ARMY_CREATURE_MUTANT_ZOMBIE,
+                ZOMBIE_EVENT_HUGE_SUPPORT_COUNT, ZOMBIE_EVENT_SUPPORT_STACKS,
+                -1, 0, 0) == 0) {
+            artifactId = GiveRandomArtifact(eventHero);
+            if (artifactId != EVENT_ARTIFACT_NONE)
+                EventWindow(-1, 1, text, RES_GOLD, ZOMBIE_EVENT_HUGE_GOLD,
+                            MAP_EVENT_REWARD_ARTIFACT, artifactId, -1);
+            else
+                EventWindow(-1, 1, text, RES_GOLD, ZOMBIE_EVENT_HUGE_GOLD,
+                            -1, 0, -1);
+            GiveResource(eventHero, RES_GOLD, ZOMBIE_EVENT_HUGE_GOLD);
+            eventHero->CheckLevel();
+            return 1;
+        }
+        break;
+    }
+    return 0;
+}
 
 VA(0x004b07e5, 0x2f8)
-int advManager::GhostEvent(class hero *, class mapCell *, char *, int, int) { return 0; }
+int advManager::GhostEvent(hero *eventHero, mapCell *cell, char *text,
+                           int x, int y)
+{
+    int artifactId;
+    switch (cell->w4hi) {
+    case UNDEAD_EVENT_LEVEL_SMALL:
+        if (CombatMonsterEvent(eventHero, ARMY_CREATURE_GHOST,
+                               GHOST_EVENT_SMALL_COUNT, cell, x, y, 0, x, y,
+                               -1, 0, 0, -1, 0, 0) == 0) {
+            sprintf(gText, "%s", text);
+            EventWindow(-1, 1, gText, RES_GOLD, GHOST_EVENT_SMALL_GOLD,
+                        -1, 0, -1);
+            GiveResource(eventHero, RES_GOLD, GHOST_EVENT_SMALL_GOLD);
+            eventHero->CheckLevel();
+            return 1;
+        }
+        break;
+    case UNDEAD_EVENT_LEVEL_MEDIUM:
+        if (CombatMonsterEvent(eventHero, ARMY_CREATURE_GHOST,
+                               GHOST_EVENT_MEDIUM_COUNT, cell, x, y, 0, x, y,
+                               -1, 0, 0, -1, 0, 0) == 0) {
+            sprintf(gText, "%s", text);
+            EventWindow(-1, 1, gText, RES_GOLD, GHOST_EVENT_MEDIUM_GOLD,
+                        -1, 0, -1);
+            GiveResource(eventHero, RES_GOLD, GHOST_EVENT_MEDIUM_GOLD);
+            eventHero->CheckLevel();
+            return 1;
+        }
+        break;
+    case UNDEAD_EVENT_LEVEL_LARGE:
+        if (CombatMonsterEvent(eventHero, ARMY_CREATURE_GHOST,
+                               GHOST_EVENT_LARGE_COUNT, cell, x, y, 0, x, y,
+                               -1, 0, 0, -1, 0, 0) == 0) {
+            sprintf(gText, "%s", text);
+            EventWindow(-1, 1, gText, RES_GOLD, GHOST_EVENT_LARGE_GOLD,
+                        -1, 0, -1);
+            GiveResource(eventHero, RES_GOLD, GHOST_EVENT_LARGE_GOLD);
+            eventHero->CheckLevel();
+            return 1;
+        }
+        break;
+    default:
+        if (CombatMonsterEvent(eventHero, ARMY_CREATURE_GHOST,
+                               GHOST_EVENT_HUGE_COUNT, cell, x, y, 0, x, y,
+                               -1, 0, 0, -1, 0, 0) == 0) {
+            artifactId = GiveRandomArtifact(eventHero);
+            sprintf(gText, "%s", text);
+            if (artifactId != EVENT_ARTIFACT_NONE)
+                EventWindow(-1, 1, gText, RES_GOLD, GHOST_EVENT_HUGE_GOLD,
+                            MAP_EVENT_REWARD_ARTIFACT, artifactId, -1);
+            else
+                EventWindow(-1, 1, gText, RES_GOLD, GHOST_EVENT_HUGE_GOLD,
+                            -1, 0, -1);
+            GiveResource(eventHero, RES_GOLD, GHOST_EVENT_HUGE_GOLD);
+            eventHero->CheckLevel();
+            return 1;
+        }
+        break;
+    }
+    return 0;
+}
 
 VA(0x004b0add, 0x274)
 void advManager::HouseEvent(class hero *, class mapCell *) {}
