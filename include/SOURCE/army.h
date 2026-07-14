@@ -25,7 +25,7 @@ public:
     struct SLimitData m_quantityLimits;  // +0x1a
     struct SLimitData m_spriteLimits;  // +0x2a
     struct SLimitData m_spellLimits;  // +0x3a
-    char m_padding4A[4];
+    int m_standingAnimation;  // +0x4a
     int    m_showQuantity;  // +0x4e
     int    m_targetSide;  // +0x52
     int    m_targetIndex;  // +0x56
@@ -46,7 +46,7 @@ public:
     int    m_initialQuantity;  // +0x92
     int    m_quantity;  // +0x96
     int    m_lastTargetHex;  // +0x9a
-    int    field_0x9e;  // +0x9e
+    int    m_temporaryResurrectionQuantity;  // +0x9e
     int    m_hitPointsLost;  // +0xa2
     int    m_armyGroupSlot;  // +0xa6
     int    m_damagePenalty;  // +0xaa

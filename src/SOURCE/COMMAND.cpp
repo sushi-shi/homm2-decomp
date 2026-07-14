@@ -8,12 +8,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <_globals_model.h>
+#include <BASE/bmap2.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/iconWidget.h>
 #include <BASE/inputManager.h>
 #include <BASE/Misc.h>
 #include <BASE/mouseManager.h>
+#include <BASE/resourceManager.h>
+#include <BASE/soundManager.h>
 #include <BASE/textWidget.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/combatManager.h>
@@ -22,7 +25,9 @@
 #include <SOURCE/game.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/kbwin.h>
+#include <SOURCE/NOOPT.h>
 #include <SOURCE/PATH.h>
+#include <SOURCE/PHILAI.h>
 #include <SOURCE/REMOTE.h>
 #include <SOURCE/X_GLOBAL.h>
 VA(0x0042a6d0, 0x36d)
@@ -577,7 +582,7 @@ int combatManager::ProcessCombatMsg(tag_message &message)
             }
         } else if (message.payload.widget.command == COMBAT_WINDOW_HOVER) {
             if (message.payload.widget.id == COMBAT_WINDOW_MAIN_BUTTON)
-                DoCommand(m_unknownF2CF);
+                DoCommand(m_currentCommand);
         } else if (message.payload.widget.command == COMBAT_WINDOW_CLICK) {
             switch (message.payload.widget.id) {
             case COMBAT_CONTROL_ATTACK:
@@ -611,22 +616,22 @@ int combatManager::ProcessCombatMsg(tag_message &message)
                     if (m_selectedHex != selectedHex ||
                         selectedHex == COMBAT_INVALID_HEX) {
                         m_selectedHex = selectedHex;
-                        m_unknownF2CB = COMBAT_INVALID_COMMAND;
-                        m_unknownF2CF = GetCommand(m_selectedHex);
+                        m_previousCommand = COMBAT_INVALID_COMMAND;
+                        m_currentCommand = GetCommand(m_selectedHex);
                         m_mouseDirection = COMBAT_INVALID_HEX;
-                        if (m_unknownF2CF == COMBAT_MESSAGE_COMMAND_ATTACK) {
+                        if (m_currentCommand == COMBAT_MESSAGE_COMMAND_ATTACK) {
                             SetCombatDirections(selectedHex);
                             CheckSetMouseDirection(mouseX, mouseY, selectedHex);
                         } else {
                             gpMouseManager->SetPointer(
-                                GetPointer(m_unknownF2CF, selectedHex));
+                                GetPointer(m_currentCommand, selectedHex));
                         }
-                    } else if (m_unknownF2CF == COMBAT_MESSAGE_COMMAND_ATTACK) {
+                    } else if (m_currentCommand == COMBAT_MESSAGE_COMMAND_ATTACK) {
                         CheckSetMouseDirection(mouseX, mouseY, selectedHex);
                     }
-                    if (m_unknownF2CB != m_unknownF2CF) {
-                        m_unknownF2CB = m_unknownF2CF;
-                        CombatMessage(m_unknownF2CF);
+                    if (m_previousCommand != m_currentCommand) {
+                        m_previousCommand = m_currentCommand;
+                        CombatMessage(m_currentCommand);
                     }
                 } else {
                     if (mouseX >= COMBAT_CONTROL_RIGHT_MIN_X) {
@@ -645,7 +650,7 @@ int combatManager::ProcessCombatMsg(tag_message &message)
                     }
                     gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
                     m_selectedHex = COMBAT_INVALID_HEX;
-                    m_unknownF2CB = COMBAT_INVALID_COMMAND;
+                    m_previousCommand = COMBAT_INVALID_COMMAND;
                 }
             }
         }
@@ -768,14 +773,15 @@ int combatManager::IsNegationSphereInEffect(void)
 VA(0x0042c47a, 0x205)
 void combatManager::ResetRound(void)
 {
-    m_deathFlags[4] = m_deathFlags[5] = 0;
-    m_deathFlags[6] = m_deathFlags[7] = 0;
-    m_deathFlags[0] = m_deathFlags[1] = 0;
-    m_deathFlags[2] = m_deathFlags[3] = 0;
-    m_unknownF323[0] = m_unknownF31B[0];
-    m_unknownF323[1] = m_unknownF31B[1];
-    m_unknownF32B[0] = 1;
-    m_unknownF32B[1] = 1;
+    m_heroDeathAnimationPlayed[0] = m_heroDeathAnimationPlayed[1] = 0;
+    m_heroAlternateDeathAnimationPlayed[0] =
+        m_heroAlternateDeathAnimationPlayed[1] = 0;
+    m_heroDeathPending[0] = m_heroDeathPending[1] = 0;
+    m_heroAlternateDeathPending[0] = m_heroAlternateDeathPending[1] = 0;
+    m_catapultAttacksRemaining[0] = m_catapultAttackCount[0];
+    m_catapultAttacksRemaining[1] = m_catapultAttackCount[1];
+    m_keepAttacksRemaining[0] = 1;
+    m_keepAttacksRemaining[1] = 1;
     m_heroCastSpell[0] = m_heroCastSpell[1] = 0;
 
     memset(gpCombatManager->m_removedArmies, 0,
@@ -1505,47 +1511,1234 @@ void combatManager::ShowEagleEyeSpell(class heroWindow *window)
     WaitEndSample(playedSample, -1);
 }
 
+// @match-note retained/live 91.57%: the complete casualty/widget CFG compiles to
+// 0xa22 bytes versus retail 0x9cc. Retail uses a 0x1a4 frame (`this` -0x1a4, quantity[42]
+// -0x184, type[2][20] -0xac, army/side/y -0xdc..-0xd4, width/bottom
+// -0xb4/-0xb0, spacing/text -0x0c/-0x08, window +0x08); ours is 0x188.
+// First normalized residual is instruction 34, the side/army strength reduction.
+// All 55 retail calls/relocations are reconstructed; offsets diverge after that
+// loop, while external targets and local strings are accounted for. Direct and
+// cached army access, cached versus four repeated GetIconEntry calls, and both
+// index operand orders were tried. Revisit when total SOURCE fuzzy reaches 95%.
 VA(0x0042e2bf, 0x9cc)
-void combatManager::ShowDeadArmies(class heroWindow *) {}
+void combatManager::ShowDeadArmies(class heroWindow *window)
+{
+    int casualtyQuantity[COMBAT_CASUALTY_QUANTITY_STORAGE_COUNT];
+    int casualtyType[COMBAT_MANAGER_SIDE_COUNT][COMBAT_ARMY_SLOT_COUNT];
+    int side;
+    int armyIndex;
+    int y;
+    short width = 320;
+    short bottom = 458;
+    int displayedCount;
+    short spacing;
+    short startX;
+    char *text;
+    icon *monsterIcons;
 
+    for (armyIndex = 0; armyIndex < COMBAT_WIN_LOSE_WIDGET_COUNT;
+         ++armyIndex) {
+        m_winLoseBottomWidgets[armyIndex] = 0;
+        m_winLoseBottomTextWidgets[armyIndex] = 0;
+    }
+    for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; ++side) {
+        casualtyQuantity[side] = 0;
+        for (armyIndex = 0; armyIndex < COMBAT_ARMY_SLOT_COUNT; ++armyIndex) {
+            if (m_armies[side][armyIndex].m_monsterType != -1 &&
+                m_armies[side][armyIndex].m_quantity <
+                    m_armies[side][armyIndex].m_initialQuantity) {
+                casualtyType[side][casualtyQuantity[side]] =
+                    m_armies[side][armyIndex].m_monsterType;
+                casualtyQuantity[COMBAT_MANAGER_SIDE_COUNT +
+                                 side * COMBAT_ARMY_SLOT_COUNT +
+                                 casualtyQuantity[side]] =
+                    m_armies[side][armyIndex].m_initialQuantity -
+                    m_armies[side][armyIndex].m_quantity;
+                ++casualtyQuantity[side];
+            }
+        }
+    }
+
+    text = static_cast<char *>(BaseAlloc(
+        30, COMMAND_SOURCE_FILE, COMMAND_CASUALTY_TITLE_ALLOC_LINE));
+    sprintf(text, "Battlefield Casualties");
+    m_winLoseBottomTextWidgets[17] =
+        new textWidget(16, 263, width, 20, text, "smalfont.fnt", 1, 2110,
+                       COMBAT_WIN_LOSE_TEXT_FLAGS, 1);
+    if (m_winLoseBottomTextWidgets[17] == 0)
+        MemError();
+    window->AddWidget(m_winLoseBottomTextWidgets[17], -1);
+
+    for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; ++side) {
+        if (side == COMBAT_ATTACKER_SIDE)
+            y = 279;
+        else
+            y = 346;
+        text = static_cast<char *>(BaseAlloc(
+            30, COMMAND_SOURCE_FILE, COMMAND_CASUALTY_HEADER_ALLOC_LINE));
+        sprintf(text,
+                side == COMBAT_ATTACKER_SIDE ? "Attacker" : "Defender");
+        m_winLoseBottomTextWidgets[15 + side] =
+            new textWidget(16, static_cast<short>(y) + 3, width, 20, text,
+                           "smalfont.fnt", 1, 2110,
+                           COMBAT_WIN_LOSE_TEXT_FLAGS, 1);
+        if (m_winLoseBottomTextWidgets[15 + side] == 0)
+            MemError();
+        window->AddWidget(m_winLoseBottomTextWidgets[15 + side], -1);
+
+        if (casualtyQuantity[side] < 1) {
+            text = static_cast<char *>(BaseAlloc(
+                10, COMMAND_SOURCE_FILE, COMMAND_CASUALTY_NONE_ALLOC_LINE));
+            sprintf(text, "None");
+            m_winLoseBottomTextWidgets[side * COMBAT_CASUALTY_WIDGETS_PER_SIDE] =
+                new textWidget(16, static_cast<short>(y) + 21, width, 20,
+                               text, "smalfont.fnt", 1, side * 5 + 2100,
+                               COMBAT_WIN_LOSE_TEXT_FLAGS, 1);
+            if (m_winLoseBottomTextWidgets
+                    [side * COMBAT_CASUALTY_WIDGETS_PER_SIDE] == 0)
+                MemError();
+            window->AddWidget(
+                m_winLoseBottomTextWidgets
+                    [side * COMBAT_CASUALTY_WIDGETS_PER_SIDE],
+                -1);
+        }
+
+        monsterIcons = gpResourceManager->GetIcon("mons32.icn");
+        displayedCount = casualtyQuantity[side];
+        if (displayedCount > COMBAT_CASUALTY_DISPLAY_LIMIT)
+            displayedCount = COMBAT_CASUALTY_DISPLAY_LIMIT;
+        spacing = 40;
+        startX = static_cast<short>((320 - displayedCount * 40) / 2) + 3;
+        for (armyIndex = 0; armyIndex < displayedCount; ++armyIndex) {
+            m_winLoseBottomWidgets
+                [side * COMBAT_CASUALTY_WIDGETS_PER_SIDE + armyIndex] =
+                new iconWidget(
+                    static_cast<short>(armyIndex) * spacing + startX -
+                        GetIconEntry(monsterIcons,
+                                     casualtyType[side][armyIndex])
+                            ->x +
+                        static_cast<short>(
+                            (32 - GetIconEntry(
+                                      monsterIcons,
+                                      casualtyType[side][armyIndex])
+                                      ->w) /
+                            2) +
+                        17,
+                    (static_cast<short>(y) -
+                     GetIconEntry(monsterIcons,
+                                  casualtyType[side][armyIndex])
+                         ->y -
+                     GetIconEntry(monsterIcons,
+                                  casualtyType[side][armyIndex])
+                         ->h) +
+                        51,
+                    32, 28, "mons32.icn",
+                    static_cast<short>(casualtyType[side][armyIndex]), 0,
+                    static_cast<short>(side) * 5 +
+                        static_cast<short>(armyIndex) + 2000,
+                    COMBAT_WIN_LOSE_ICON_FLAGS, 1);
+            if (m_winLoseBottomWidgets
+                    [side * COMBAT_CASUALTY_WIDGETS_PER_SIDE + armyIndex] == 0)
+                MemError();
+
+            text = static_cast<char *>(BaseAlloc(
+                9, COMMAND_SOURCE_FILE,
+                COMMAND_CASUALTY_QUANTITY_ALLOC_LINE));
+            sprintf(text, "%d",
+                    casualtyQuantity[COMBAT_MANAGER_SIDE_COUNT +
+                                     side * COMBAT_ARMY_SLOT_COUNT +
+                                     armyIndex]);
+            m_winLoseBottomTextWidgets
+                [side * COMBAT_CASUALTY_WIDGETS_PER_SIDE + armyIndex] =
+                new textWidget(static_cast<short>(armyIndex) * spacing +
+                                   startX + 16,
+                               static_cast<short>(y) + 53, 32, 12, text,
+                               "smalfont.fnt", 1,
+                               static_cast<short>(side) * 5 +
+                                   static_cast<short>(armyIndex) + 2100,
+                               COMBAT_WIN_LOSE_TEXT_FLAGS, 1);
+            if (m_winLoseBottomTextWidgets
+                    [side * COMBAT_CASUALTY_WIDGETS_PER_SIDE + armyIndex] == 0)
+                MemError();
+            window->AddWidget(
+                m_winLoseBottomWidgets
+                    [side * COMBAT_CASUALTY_WIDGETS_PER_SIDE + armyIndex],
+                -1);
+            window->AddWidget(
+                m_winLoseBottomTextWidgets
+                    [side * COMBAT_CASUALTY_WIDGETS_PER_SIDE + armyIndex],
+                -1);
+        }
+        gpResourceManager->Dispose(monsterIcons);
+    }
+}
+
+// @match-note retained/live 97.32%: the full winner/draw CFG compiles to 0xba8
+// bytes versus retail 0xba9. Retail frame is 0x104 (`this` -0xf8, experienceText[152]
+// -0xec, artifact/living/fade/army locals -0x54..-0x38, currentArmy -0x34,
+// message -0x30..-0x18, experience/side/dead/last -0x14..-0x08, winningSide
+// +0x08); ours is 0x100. First residual is instruction 52 (armyIndex/side
+// strength-reduction order), repeated at 131. All 112 relocation sites and
+// external targets were audited; later offset drift follows CFG/slot differences
+// and retail-delinked constants. Multidimensional/flattened pointer forms, both
+// fade predicates, and nested/combined artifact caps were tried. Revisit when
+// total SOURCE fuzzy reaches 95%.
 VA(0x0042ec8b, 0xba9)
-void combatManager::DoVictory(int) {}
+void combatManager::DoVictory(int winningSide)
+{
+    char experienceText[152];
+    int experienceLevels = 0;
+    int deadCreatureCount;
+    int eligibleWinnerStacks;
+    int side;
+    int armyIndex;
+    int lastLivingArmy;
+    int livingCreatureCount;
+    army *currentArmy;
+    int fadeCount;
+    int fadeTimer;
+    int fadeIndex;
+    int emptyArtifactSlots;
+    tag_message message;
 
+    if (m_heroes[COMBAT_DEFENDER_SIDE] != 0 &&
+        m_heroes[COMBAT_DEFENDER_SIDE]->m_isCaptain != 0)
+        m_heroes[COMBAT_DEFENDER_SIDE] = 0;
+    gbShowingLoseWindow = 0;
+    gbWhichAnimationPlaying = 1;
+    giWinCmbtFrame = 0;
+    giSkeletonsCreated = 0;
+    iMaxTransferArtifacts = 0;
+    iCurTransferArtifact = -1;
+    bSkeletonsShown = 0;
+    deadCreatureCount = 0;
+    eligibleWinnerStacks = 0;
+
+    for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; ++side) {
+        livingCreatureCount = 0;
+        lastLivingArmy = -1;
+        for (armyIndex = 0; armyIndex < gpCombatManager->m_armyCount[side];
+             ++armyIndex) {
+            currentArmy =
+                side * COMBAT_ARMY_STORAGE_SLOT_COUNT +
+                &m_armies[COMBAT_ATTACKER_SIDE][armyIndex];
+            if (currentArmy->m_quantity > 0) {
+                lastLivingArmy = armyIndex;
+                if (currentArmy->m_temporaryResurrectionQuantity > 0)
+                    currentArmy->m_quantity -=
+                        currentArmy->m_temporaryResurrectionQuantity;
+                if (currentArmy->m_quantity < 0)
+                    currentArmy->m_quantity = 0;
+                livingCreatureCount += currentArmy->m_quantity;
+            }
+            if (side == winningSide && currentArmy->m_quantity > 0 &&
+                (currentArmy->m_monster.flags.all &
+                 MONSTER_FLAGS_LIGHT_PALETTE) == 0 &&
+                currentArmy->m_monsterType != ARMY_CREATURE_EARTH_ELEMENTAL &&
+                currentArmy->m_monsterType != ARMY_CREATURE_AIR_ELEMENTAL &&
+                currentArmy->m_monsterType != ARMY_CREATURE_FIRE_ELEMENTAL &&
+                currentArmy->m_monsterType != ARMY_CREATURE_WATER_ELEMENTAL &&
+                currentArmy->m_monsterType != ARMY_CREATURE_GHOST) {
+                ++eligibleWinnerStacks;
+            }
+            if (winningSide == COMBAT_DEFENDER_SIDE - side) {
+                deadCreatureCount += currentArmy->m_initialQuantity -
+                                     currentArmy->m_quantity;
+            }
+        }
+        if (livingCreatureCount == 0 && lastLivingArmy != -1)
+            (side * COMBAT_ARMY_STORAGE_SLOT_COUNT +
+             &m_armies[COMBAT_ATTACKER_SIDE][lastLivingArmy])
+                ->m_quantity = 1;
+    }
+
+    if (winningSide != COMBAT_RESULT_DRAW &&
+        eligibleWinnerStacks < COMBAT_VICTORY_NECROMANCY_STACK_LIMIT &&
+        m_heroes[winningSide] != 0 &&
+        m_heroes[winningSide]->GetSSLevel(HERO_SKILL_NECROMANCY) != 0) {
+        giSkeletonsCreated = static_cast<int>(
+            deadCreatureCount *
+            (m_heroes[winningSide]->GetSSLevel(HERO_SKILL_NECROMANCY) *
+             COMBAT_NECROMANCY_LEVEL_FACTOR));
+        if (giSkeletonsCreated <= 0 && deadCreatureCount != 0)
+            giSkeletonsCreated = 1;
+    }
+
+    m_nonVisualCombat = 1;
+    FreeArmies();
+    CombatMessage("", 1, 1, 0);
+    gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
+    fadeCount = COMBAT_VICTORY_FADE_STEPS;
+    if (m_terrainType == COMBAT_VICTORY_WATER_TERRAIN)
+        fadeCount = COMBAT_VICTORY_WATER_FADE_STEPS;
+    fadeTimer = KBTickCount();
+    for (fadeIndex = 0; fadeCount > fadeIndex; ++fadeIndex) {
+        PollSound();
+        DelayTil(&fadeTimer);
+        fadeTimer = KBTickCount() + COMBAT_VICTORY_FADE_DELAY;
+        DimBitmapArea(gpWindowManager->m_screen, 0, 0,
+                      COMBAT_SCREEN_WIDTH, COMBAT_SCREEN_HEIGHT, 3);
+        PollSound();
+        gpWindowManager->UpdateScreenRegion(0, 0, COMBAT_SCREEN_MAX_X,
+                                            COMBAT_SCREEN_MAX_Y);
+        PollSound();
+    }
+
+    switch (winningSide) {
+    case COMBAT_RESULT_DRAW:
+        gpSoundManager->SwitchAmbientMusic(COMBAT_LOSS_MUSIC);
+        DoLoseWindow();
+        break;
+    case COMBAT_ATTACKER_SIDE:
+    case COMBAT_DEFENDER_SIDE:
+        if (m_heroes[winningSide] != 0) {
+            if (m_eagleEyeSpell[winningSide] != HERO_SPELL_NONE) {
+                m_heroes[winningSide]
+                    ->m_spells[m_eagleEyeSpell[winningSide]] = 1;
+            }
+            m_experienceValue[COMBAT_DEFENDER_SIDE - winningSide] =
+                ExperienceValueOfStack(COMBAT_DEFENDER_SIDE - winningSide);
+            if (gbRetreatWin != 0)
+                m_experienceValue[COMBAT_DEFENDER_SIDE - winningSide] -=
+                    COMBAT_HERO_EXPERIENCE_VALUE;
+            if (m_combatTowns[COMBAT_DEFENDER_SIDE] != 0 &&
+                winningSide == COMBAT_ATTACKER_SIDE)
+                m_experienceValue[COMBAT_DEFENDER_SIDE - winningSide] +=
+                    COMBAT_HERO_EXPERIENCE_VALUE;
+            experienceLevels = gpAdvManager->GiveExperience(
+                m_heroes[winningSide],
+                m_experienceValue[COMBAT_DEFENDER_SIDE - winningSide],
+                gbThisNetHumanPlayer[m_heroes[winningSide]->m_owner] == 0);
+
+            if (gbRetreatWin == 0) {
+                emptyArtifactSlots = 0;
+                if (m_heroes[COMBAT_ATTACKER_SIDE] != 0 &&
+                    m_heroes[COMBAT_DEFENDER_SIDE] != 0) {
+                    for (fadeIndex = 0; fadeIndex < HERO_ARTIFACT_SLOT_COUNT;
+                         ++fadeIndex) {
+                        if (m_heroes[winningSide]->m_artifacts[fadeIndex] ==
+                            HERO_ARTIFACT_NONE) {
+                            ++emptyArtifactSlots;
+                        }
+                    }
+                    for (fadeIndex = 0; fadeIndex < HERO_ARTIFACT_SLOT_COUNT;
+                         ++fadeIndex) {
+                        if (m_heroes[COMBAT_DEFENDER_SIDE - winningSide]
+                                    ->m_artifacts[fadeIndex] >=
+                                HERO_ARTIFACT_TRANSFERABLE_FIRST &&
+                            m_heroes[COMBAT_DEFENDER_SIDE - winningSide]
+                                    ->m_artifacts[fadeIndex] !=
+                                HERO_ARTIFACT_MAGIC_BOOK &&
+                            emptyArtifactSlots > iMaxTransferArtifacts) {
+                            iTransferArtifacts[iMaxTransferArtifacts] =
+                                m_heroes[COMBAT_DEFENDER_SIDE - winningSide]
+                                    ->m_artifacts[fadeIndex];
+                            iTransferArtifactsInfo[iMaxTransferArtifacts] =
+                                m_heroes[COMBAT_DEFENDER_SIDE - winningSide]
+                                    ->m_artifactExtra[fadeIndex];
+                            ++iMaxTransferArtifacts;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!(giCurPlayer == -1 ||
+              gbThisNetHumanPlayer[giCurPlayer] == 0 ||
+              m_playerId[winningSide] != giCurPlayer) ||
+            !(giCurPlayer == -1 || m_playerId[winningSide] == -1 ||
+              gbThisNetHumanPlayer[giCurPlayer] != 0 ||
+              gbThisNetHumanPlayer[m_playerId[winningSide]] == 0) ||
+            !(m_playerId[winningSide] == -1 ||
+              gbThisNetHumanPlayer[m_playerId[winningSide]] == 0)) {
+            gpSoundManager->SwitchAmbientMusic(COMBAT_VICTORY_MUSIC);
+            m_winLoseWindow = new heroWindow(143, 10, "wincmbt.bin");
+            if (m_winLoseWindow == 0)
+                MemError();
+
+            if (m_heroes[winningSide] != 0) {
+                if (gbCombatSurrender != 0) {
+                    sprintf(gText, cBattleResults[
+                                       COMBAT_RESULT_TEXT_ENEMY_SURRENDERED]);
+                } else if (gbRetreatWin != 0) {
+                    sprintf(gText,
+                            cBattleResults[COMBAT_RESULT_TEXT_ENEMY_FLED]);
+                } else {
+                    sprintf(gText,
+                            cBattleResults[COMBAT_RESULT_TEXT_VICTORY]);
+                }
+                if (experienceLevels > 0 &&
+                    winningSide == COMBAT_DEFENDER_SIDE &&
+                    giNumHumanPlayers > 1) {
+                    sprintf(experienceText,
+                            cBattleResults[
+                                COMBAT_RESULT_TEXT_NETWORK_EXPERIENCE],
+                            m_heroes[winningSide]->m_name,
+                            m_experienceValue
+                                [COMBAT_DEFENDER_SIDE - winningSide],
+                            experienceLevels);
+                } else {
+                    sprintf(experienceText,
+                            cBattleResults[COMBAT_RESULT_TEXT_EXPERIENCE],
+                            m_heroes[winningSide]->m_name,
+                            m_experienceValue
+                                [COMBAT_DEFENDER_SIDE - winningSide]);
+                }
+                strcat(gText, experienceText);
+                m_heroes[winningSide]->ApplyBattleWinTemps();
+            } else {
+                if (gbCombatSurrender != 0) {
+                    sprintf(gText, cBattleResults[
+                                       COMBAT_RESULT_TEXT_ENEMY_SURRENDERED]);
+                } else if (gbRetreatWin != 0) {
+                    sprintf(gText,
+                            cBattleResults[COMBAT_RESULT_TEXT_ENEMY_FLED]);
+                } else {
+                    sprintf(gText,
+                            cBattleResults[COMBAT_RESULT_TEXT_VICTORY]);
+                }
+            }
+            message.type = COMBAT_EVENT_WINDOW;
+            message.payload.widget.command = COMBAT_WIN_LOSE_TEXT_COMMAND;
+            message.payload.widget.id = COMBAT_WIN_LOSE_TEXT_ID;
+            message.payload.widget.data.text = gText;
+            m_winLoseWindow->BroadcastMessage(message);
+            ShowDeadArmies(m_winLoseWindow);
+            if (gbRemoteOn != 0 && gbThisNetGotAdventureControl == 0)
+                giDialogTimeout = KBTickCount() + 15000;
+            gpWindowManager->DoDialog(m_winLoseWindow, WinCombatHandler, 0);
+            giDialogTimeout = 0;
+            delete m_winLoseWindow;
+            if (m_heroes[COMBAT_DEFENDER_SIDE - winningSide] != 0)
+                m_heroes[COMBAT_DEFENDER_SIDE - winningSide]
+                    ->ApplyBattleLossTemps();
+        } else {
+            if (m_heroes[winningSide] != 0)
+                m_heroes[winningSide]->ApplyBattleWinTemps();
+            if (m_heroes[COMBAT_DEFENDER_SIDE - winningSide] != 0)
+                m_heroes[COMBAT_DEFENDER_SIDE - winningSide]
+                    ->ApplyBattleLossTemps();
+            gpSoundManager->SwitchAmbientMusic(COMBAT_LOSS_MUSIC);
+            DoLoseWindow();
+        }
+        break;
+    }
+    gMapX = gpAdvManager->m_mapOriginX;
+    gMapY = gpAdvManager->m_mapOriginY;
+}
+
+// @match-note retained/live 99.74%: retail/ours both span 0x3bc and the complete
+// dialog CFG agrees. Retail frame is 0x68 (`this` -0x68, losingSide -0x58,
+// message -0x54..-0x3c, animationFile[52] -0x38); ours is 0x64 with the same
+// named values in hash-shifted slots. Raw first residual is +0x05 (frame byte);
+// normalized instruction 51 first differs only in a string relocation identity.
+// All 57/57 relocation offsets align and external targets agree; ten identities
+// are retail-delinked strings/cBattleResults aliases. Hero-first/no-hero-first
+// arms and surrender/retreat polarity forms were tried. Revisit when total
+// SOURCE fuzzy reaches 95%.
 VA(0x0042f834, 0x3bc)
-void combatManager::DoLoseWindow(void) {}
+void combatManager::DoLoseWindow(void)
+{
+    int losingSide = COMBAT_ATTACKER_SIDE;
+    char animationFile[52];
+    tag_message message;
 
+    if (m_playerId[COMBAT_ATTACKER_SIDE] == giCurPlayer &&
+        gbThisNetHumanPlayer[m_playerId[COMBAT_ATTACKER_SIDE]] != 0) {
+        losingSide = COMBAT_ATTACKER_SIDE;
+    } else if (m_playerId[COMBAT_DEFENDER_SIDE] == giCurPlayer &&
+               gbThisNetHumanPlayer[m_playerId[COMBAT_DEFENDER_SIDE]] != 0) {
+        losingSide = COMBAT_DEFENDER_SIDE;
+    } else if (m_playerId[COMBAT_ATTACKER_SIDE] != -1 &&
+               gbThisNetHumanPlayer[m_playerId[COMBAT_ATTACKER_SIDE]] != 0) {
+        losingSide = COMBAT_ATTACKER_SIDE;
+    } else {
+        losingSide = COMBAT_DEFENDER_SIDE;
+    }
+
+    gbShowingLoseWindow = 1;
+    if (gbCombatSurrender != 0) {
+        sprintf(animationFile, "cmbtsurr.icn");
+        gbWhichAnimationPlaying = COMBAT_WIN_LOSE_ANIMATION_CYCLE_SECOND;
+    } else if (gbRetreatWin != 0) {
+        sprintf(animationFile, "cmbtfle1.icn");
+        gbWhichAnimationPlaying = COMBAT_WIN_LOSE_ANIMATION_FLEE;
+    } else {
+        sprintf(animationFile, "cmbtlos1.icn");
+        gbWhichAnimationPlaying = COMBAT_WIN_LOSE_ANIMATION_LOSS;
+    }
+
+    m_winLoseWindow = new heroWindow(143, 10, "wincmbt.bin");
+    if (m_winLoseWindow == 0)
+        MemError();
+
+    if (m_heroes[losingSide] != 0) {
+        if (gbCombatSurrender != 0) {
+            sprintf(gText, cBattleResults[COMBAT_RESULT_TEXT_HERO_SURRENDER],
+                    m_heroes[losingSide]->m_name);
+        } else if (gbRetreatWin != 0) {
+            sprintf(gText, cBattleResults[COMBAT_RESULT_TEXT_HERO_FLEE],
+                    m_heroes[losingSide]->m_name);
+        } else {
+            sprintf(gText, cBattleResults[COMBAT_RESULT_TEXT_HERO_DEFEAT],
+                    m_heroes[losingSide]->m_name);
+        }
+    } else {
+        if (gbCombatSurrender != 0) {
+            sprintf(gText,
+                    cBattleResults[COMBAT_RESULT_TEXT_FORCES_SURRENDER]);
+        } else if (gbRetreatWin != 0) {
+            sprintf(gText, cBattleResults[COMBAT_RESULT_TEXT_FORCES_FLEE]);
+        } else {
+            sprintf(gText, cBattleResults[COMBAT_RESULT_TEXT_FORCES_DEFEAT]);
+        }
+    }
+
+    message.type = COMBAT_EVENT_WINDOW;
+    message.payload.widget.command = COMBAT_WIN_LOSE_RESOURCE_COMMAND;
+    message.payload.widget.id = COMBAT_WIN_LOSE_RESOURCE_LOAD_ID;
+    message.payload.widget.data.text = animationFile;
+    m_winLoseWindow->BroadcastMessage(message);
+    message.payload.widget.id = COMBAT_WIN_LOSE_RESOURCE_DRAW_ID;
+    message.payload.widget.data.text = animationFile;
+    m_winLoseWindow->BroadcastMessage(message);
+    message.type = COMBAT_EVENT_WINDOW;
+    message.payload.widget.command = COMBAT_WIN_LOSE_TEXT_COMMAND;
+    message.payload.widget.id = COMBAT_WIN_LOSE_TEXT_ID;
+    message.payload.widget.data.text = gText;
+    m_winLoseWindow->BroadcastMessage(message);
+    ShowDeadArmies(m_winLoseWindow);
+    if (gbRemoteOn != 0 && gbThisNetGotAdventureControl == 0)
+        giDialogTimeout = KBTickCount() + 15000;
+    gpWindowManager->DoDialog(m_winLoseWindow, WinCombatHandler, 0);
+    giDialogTimeout = 0;
+    delete m_winLoseWindow;
+    m_winLoseWindow = 0;
+}
+
+// @match-note retained/live 99.87%: the 0x54 frame, 0x43d span, and complete
+// cost/dialog CFG agree. Retail slots are `this` -0x44, armyIndex -0x2c,
+// message -0x28..-0x10, window -0x0c, textWidth -0x08; ours places armyIndex
+// at -0x08. Raw first residual is +0x18 (that slot displacement); normalized
+// instruction 113 first names an equivalent local 0.1 constant. All 40/40
+// relocation offsets align and external targets agree; seven identities are
+// retail-delinked float/string constants. Artifact branch polarity and float/
+// double factor spellings were tried. Revisit when total SOURCE fuzzy reaches 95%.
 VA(0x0042fbf0, 0x43d)
-int combatManager::DoSurrender(void) { return 0; }
+int combatManager::DoSurrender(void)
+{
+    int armyIndex;
+    short dialogType;
+    short dialogResult;
+    short textWidth;
+    heroWindow *window;
+    tag_message message;
 
+    giSurrenderCost = 0;
+    for (armyIndex = 0; armyIndex < COMBAT_ARMY_SLOT_COUNT; ++armyIndex) {
+        if (m_armies[m_currentSide][armyIndex].IsAlive()) {
+            giSurrenderCost +=
+                static_cast<short>(gMonsterDatabase[
+                    m_armies[m_currentSide][armyIndex].m_monsterType].cost) *
+                m_armies[m_currentSide][armyIndex].m_quantity;
+        }
+    }
+    if (m_heroes[m_currentSide]->HasArtifact(
+            HERO_ARTIFACT_STATESMANS_QUILL) != 0)
+        giSurrenderCost =
+            static_cast<int>(giSurrenderCost * COMBAT_SURRENDER_QUILL_FACTOR);
+    else
+        giSurrenderCost =
+            static_cast<int>(giSurrenderCost * COMBAT_SURRENDER_BASE_FACTOR);
+    giSurrenderCost = static_cast<int>(
+        giSurrenderCost *
+        (1.0 - m_heroes[m_currentSide]
+                       ->m_secondarySkills[HERO_SKILL_DIPLOMACY] *
+                   COMBAT_SURRENDER_DIPLOMACY_FACTOR));
+
+    dialogType = COMBAT_SURRENDER_DIALOG_TYPE;
+    dialogResult = COMBAT_SURRENDER_DIALOG_ACCEPT_RESULT;
+    textWidth = COMBAT_SURRENDER_TEXT_WIDTH;
+    window = new heroWindow(74, 80, "surrendr.bin");
+    if (window == 0)
+        MemError();
+    message.type = COMBAT_EVENT_WINDOW;
+    message.payload.widget.command = COMBAT_WIN_LOSE_RESOURCE_COMMAND;
+    message.payload.widget.id = COMBAT_SURRENDER_PORTRAIT_RESOURCE_ID;
+    sprintf(gText, "port%04d.icn",
+            static_cast<unsigned int>(
+                m_heroes[COMBAT_DEFENDER_SIDE - m_currentSide]->m_portrait));
+    message.payload.widget.data.text = gText;
+    window->BroadcastMessage(message);
+    if (m_heroes[COMBAT_DEFENDER_SIDE - m_currentSide]->m_isCaptain != 0)
+        message.payload.widget.command = COMBAT_SURRENDER_CAPTAIN_PORTRAIT_COMMAND;
+    else
+        message.payload.widget.command = COMBAT_SURRENDER_HERO_PORTRAIT_COMMAND;
+    message.payload.widget.id = COMBAT_SURRENDER_PORTRAIT_WIDGET_ID;
+    message.payload.widget.data.value = COMBAT_SURRENDER_PORTRAIT_DEFAULT_COLOR;
+    window->BroadcastMessage(message);
+    if (m_heroes[COMBAT_DEFENDER_SIDE - m_currentSide]->m_isCaptain != 0) {
+        message.payload.widget.command = COMBAT_SURRENDER_CAPTAIN_OVERLAY_COMMAND;
+        if (m_playerId[COMBAT_DEFENDER_SIDE - m_currentSide] == -1)
+            message.payload.widget.data.value = COMBAT_SURRENDER_CAPTAIN_NEUTRAL_COLOR;
+        else
+            message.payload.widget.data.value =
+                gpGame->m_players
+                    [m_playerId[COMBAT_DEFENDER_SIDE - m_currentSide]]
+                        .color;
+        window->BroadcastMessage(message);
+    }
+    message.payload.widget.data.text = gText;
+    message.payload.widget.command = COMBAT_WIN_LOSE_TEXT_COMMAND;
+    message.payload.widget.id = COMBAT_SURRENDER_TEXT_ID;
+    sprintf(gText, "%s states:\n\n\"I will accept your surrender and grant you and your troops safe passage for the price of %d gold.\"",
+            m_heroes[COMBAT_DEFENDER_SIDE - m_currentSide]->m_name,
+            giSurrenderCost);
+    window->BroadcastMessage(message);
+    gpWindowManager->DoDialog(window, TrueFalseDialogHandler, 0);
+    delete window;
+    return gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_TWO;
+}
+
+// @early-stop: all 0xdc bytes match after masking five aligned COFF
+// relocations; relocation offsets and targets are identical.
 VA(0x0043002d, 0xdc)
-void combatManager::CheckChangeSelector(void) {}
+void combatManager::CheckChangeSelector(void)
+{
+    if (gbNoShowCombat != 0)
+        return;
+    army *currentArmy = &m_armies[m_currentArmySide][m_currentArmyIndex];
+    if (m_limitCreature == 0 || currentArmy->m_hex != m_limitCreatureHex) {
+        UpdateGrid(0, 1);
+        giNewMonsterCycleFrame = 7;
+        m_limitCreatureHex = currentArmy->m_hex;
+        m_limitCreature = 1;
+        DrawFrame(1, 0, 0, 0, COMBAT_COMMAND_FRAME_DELAY, 1, 1);
+    }
+    SetupSmallView();
+}
 
+// @early-stop: all 0xea bytes match after masking four aligned COFF
+// relocations; relocation offsets and targets are identical.
 VA(0x00430109, 0xea)
-void combatManager::CheckCastleAttack(void) {}
+void combatManager::CheckCastleAttack(void)
+{
+    if (m_inCastleCombat != 0 && m_currentSide == 0) {
+        while (m_catapultAttacksRemaining[m_currentSide] > 0) {
+            CatAttack(m_currentSide);
+            --m_catapultAttacksRemaining[m_currentSide];
+        }
+    }
+    if (m_inCastleCombat != 0 && m_currentSide == 1) {
+        while (m_keepAttacksRemaining[m_currentSide] > 0) {
+            KeepAttack(0);
+            KeepAttack(1);
+            KeepAttack(2);
+            --m_keepAttacksRemaining[m_currentSide];
+        }
+    }
+}
 
+// @match-note retained/live 99.91%: the exact 0x08 frame (`this` -0x08,
+// retreat -0x04), argument-free ABI, 0xdd span, and full AI/spell/retreat CFG
+// agree. Normalized instruction 28 first differs because retail delinks
+// gConfig.autoCombatUseSpells as an interior local alias; the first masked raw
+// residual is +0xbd, where the retreat arm lands on the equivalent trailing
+// local jump. All 7/7 relocation offsets and six external identities agree.
+// Direct field access and equivalent predicate/early-return polarities were
+// compared. Revisit when total SOURCE fuzzy reaches 95%.
 VA(0x004301f3, 0xdd)
-void combatManager::CheckGetAIMove(void) {}
+void combatManager::CheckGetAIMove(void)
+{
+    int retreat = AICheckRetreat();
+    if (m_heroCastSpell[m_currentSide] == 0 &&
+        (m_playerId[m_currentSide] == -1 ||
+         gbThisNetHumanPlayer[m_playerId[m_currentSide]] == 0 ||
+         gConfig.autoCombatUseSpells != 0)) {
+        if (DoSpellAI(m_currentSide, retreat) != 0)
+            return;
+    }
+    retreat = AICheckRetreat();
+    if (retreat != 0)
+        giNextAction = COMBAT_ACTION_RETREAT;
+    else
+        DoCompAI(m_currentSide);
+}
 
+// @match-note retained/live 96.52%: the complete network-control CFG compiles to
+// 0x185 bytes versus retail 0x18f, with the exact 0x04 frame (`this` -0x04; no explicit
+// arguments). Retail proves two consecutive stores to m_previousCommand at
+// +0xf2cb; +0xf2cf is the distinct current command and is not written here.
+// First normalized residual is instruction 53/raw +0xae, a retail continuation
+// jump before the remote-player arm; another occurs at exit. All 15/15 external
+// relocations are accounted for, with offsets drifting at those jumps. Nested,
+// compound, De Morgan, and opposite-polarity network predicates were tried.
+// Revisit when total SOURCE fuzzy reaches 95%.
 VA(0x004302d0, 0x18f)
-void combatManager::GetControl(void) {}
+void combatManager::GetControl(void)
+{
+    m_selectedHex = COMBAT_INVALID_HEX;
+    // Retail emits two stores to +0xf2cb here; +0xf2cf is not the second target.
+    m_previousCommand = COMBAT_INVALID_COMMAND;
+    m_previousCommand = COMBAT_INVALID_COMMAND;
+    if (gpCombatManager->m_active == 1)
+        gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
+    CheckChangeSelector();
+    if (gbRemoteOn == 0 || m_playerId[COMBAT_ATTACKER_SIDE] < 0 ||
+        m_playerId[COMBAT_DEFENDER_SIDE] < 0 ||
+        gbHumanPlayer[m_playerId[COMBAT_DEFENDER_SIDE]] == 0 ||
+        (gbHumanPlayer[m_playerId[COMBAT_ATTACKER_SIDE]] == 0 &&
+         (gbHumanPlayer[m_playerId[COMBAT_ATTACKER_SIDE]] != 0 ||
+          m_playerId[COMBAT_DEFENDER_SIDE] == 0))) {
+        gbThisNetHasControl = 1;
+    } else if (m_playerId[m_currentSide] == -1 ||
+               gbHumanPlayer[m_playerId[m_currentSide]] == 0 ||
+               gbThisNetHumanPlayer[m_playerId[m_currentSide]] != 0) {
+        gbThisNetHasControl = 1;
+    } else {
+        gbThisNetHasControl = 0;
+    }
+    m_smallViewSide[COMBAT_DEFENDER_SIDE] = -1;
+    SetupSmallView();
+    ResetMouse();
+}
 
+// @match-note retained/live 99.81%: normalized assembly, the 0x28 frame, full
+// control/AI CFG, and 0xd7 span agree. Retail reuses `this` -0x28 for mouseY
+// after the guard, with mouseX -0x24 and message -0x20..-0x0c; there are no
+// explicit arguments. First masked raw residual is +0x7f in the MouseCoords/
+// message slot displacements. All 9/9 relocation offsets and targets are exact.
+// Mouse X/Y declaration order, direct message assignments, and guard/else
+// polarity were compared. Revisit when total SOURCE fuzzy reaches 95%.
 VA(0x0043045f, 0xd7)
-void combatManager::ResetMouse(void) {}
+void combatManager::ResetMouse(void)
+{
+    int mouseY;
+    int mouseX;
+    tag_message message;
 
+    if (gbNoShowCombat != 0)
+        return;
+    if (gbThisNetHasControl != 0 && m_playerId[m_currentSide] >= 0 &&
+        gbHumanPlayer[m_playerId[m_currentSide]] != 0) {
+        m_selectedHex = COMBAT_INVALID_HEX;
+        ClearCombatMessages(0);
+        gpMouseManager->MouseCoords(mouseX, mouseY);
+        message.type = COMBAT_EVENT_MOUSE_MOVE;
+        message.payload.mouse.modifiers = mouseX;
+        message.payload.mouse.x = mouseX;
+        message.payload.mouse.screenY = mouseY;
+        message.payload.mouse.y = mouseY;
+        ProcessCombatMsg(message);
+    } else {
+        gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
+    }
+}
+
+// @match-note retained/live 95.79%: the complete eight-action
+// switch/finish CFG compiles to 0x642 bytes versus retail 0x65b and uses the
+// exact 0x2c frame. Retail slots
+// are `this` -0x28, actionData -0x24..-0x18, transmitResult -0x14,
+// currentArmy -0x10, redraw -0x0c, result -0x08, advanceArmy -0x04, message
+// +0x08; ours first places result at -0x04. Raw first residual is +0x18; first
+// normalized residual is instruction 33, current-side/current-army strength
+// reduction before LogInt. All 82 calls/relocations are reconstructed; offset
+// order diverges around that arithmetic and the switch table, with external
+// targets audited. Retail body order, pointer/direct army access, and switch arm
+// order were tried. Revisit when total SOURCE fuzzy reaches 95%.
 VA(0x00430536, 0x65b)
-int combatManager::ProcessNextAction(struct tag_message &) { return 0; }
+int combatManager::ProcessNextAction(struct tag_message &message)
+{
+    int actionData[COMBAT_ACTION_DATA_COUNT];
+    int transmitResult;
+    army *currentArmy;
+    int advanceArmy;
+    int redraw;
+    int result;
 
+    ClearCombatMessages(0);
+    result = COMBAT_MAIN_CONTINUE;
+    redraw = 0;
+    gbProcessingCombatAction = 1;
+    if (m_smallViewSide[COMBAT_ATTACKER_SIDE] != -1 ||
+        m_smallViewSide[COMBAT_DEFENDER_SIDE] != -1) {
+        m_smallViewSide[COMBAT_DEFENDER_SIDE] = -1;
+        m_smallViewSide[COMBAT_ATTACKER_SIDE] =
+            m_smallViewSide[COMBAT_DEFENDER_SIDE];
+        redraw = 1;
+    }
+    if (giNextAction != COMBAT_ACTION_NONE) {
+        LogInt("Process Act", giNextAction, giNextActionGridIndex,
+               giNextActionGridIndex2, giNextActionExtra, m_currentArmySide,
+               m_currentArmyIndex,
+               m_armies[m_currentArmySide][m_currentArmyIndex].m_hex);
+    }
+    gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
+    UpdateMouseGrid(-1, 1);
+    memset(m_gridState, 0, sizeof(m_gridState));
+    if (UpdateGrid(0, 0) != 0)
+        redraw = 1;
+    if (redraw != 0)
+        DrawFrame(1, 0, 0, 0, COMBAT_COMMAND_FRAME_DELAY, 1, 1);
+
+    if (gbThisNetHasControl != 0 && gbRemoteOn != 0 &&
+        m_playerId[COMBAT_ATTACKER_SIDE] >= 0 &&
+        m_playerId[COMBAT_DEFENDER_SIDE] >= 0 &&
+        gbHumanPlayer[m_playerId[COMBAT_DEFENDER_SIDE]] != 0 &&
+        gbHumanPlayer[m_playerId[COMBAT_ATTACKER_SIDE]] != 0) {
+        actionData[COMBAT_ACTION_DATA_ACTION] = giNextAction;
+        actionData[COMBAT_ACTION_DATA_EXTRA] = giNextActionExtra;
+        actionData[COMBAT_ACTION_DATA_GRID] = giNextActionGridIndex;
+        actionData[COMBAT_ACTION_DATA_SECOND_GRID] = giNextActionGridIndex2;
+        LogInt("About to T",
+               reinterpret_cast<int *>(&iCombatControlNetPos)
+                   [COMBAT_DEFENDER_SIDE - m_currentSide],
+               -999, -999, -999, -999, -999, -999);
+        transmitResult = TransmitRemoteData(
+            reinterpret_cast<char *>(actionData),
+            reinterpret_cast<int *>(&iCombatControlNetPos)
+                [COMBAT_DEFENDER_SIDE - m_currentSide],
+            sizeof(actionData), COMBAT_REMOTE_COMMAND_ACTION, 1, 1, -1);
+        LogStr("Post T");
+        if (transmitResult == 0)
+            ShutDown(0);
+    }
+
+    currentArmy = &m_armies[m_currentArmySide][m_currentArmyIndex];
+    advanceArmy = 0;
+    if (CheckWin(&message) == 0) {
+        switch (giNextAction) {
+        case COMBAT_ACTION_NONE:
+            break;
+        case COMBAT_ACTION_CAST_SPELL:
+            ResetCyclingCreatures();
+            CastSpell(giNextActionExtra, giNextActionGridIndex, 0,
+                      giNextActionGridIndex2);
+            if (m_armies[m_currentArmySide][m_currentArmyIndex].m_quantity < 1)
+                advanceArmy = 1;
+            ResetCycleTimers();
+            break;
+        case COMBAT_ACTION_MOVE:
+            ResetCyclingCreatures();
+            currentArmy->MoveAttack(giNextActionGridIndex, 0);
+            currentArmy->m_monster.flags.all |=
+                MONSTER_ABILITY_FLAG_BAD_MORALE;
+            if (CheckWin(&message) != 0) {
+                result = COMBAT_MAIN_FINISHED;
+                goto Finished;
+            }
+            CheckApplyGoodMorale(m_currentArmySide, m_currentArmyIndex);
+            advanceArmy = 1;
+            ResetCycleTimers();
+            break;
+        case COMBAT_ACTION_ATTACK:
+            ResetCyclingCreatures();
+            if (giNextActionExtra != -1 &&
+                currentArmy->m_hex != giNextActionExtra) {
+                currentArmy->MoveAttack(giNextActionExtra, 1);
+            }
+            currentArmy->MoveAttack(giNextActionGridIndex, 0);
+            currentArmy->m_monster.flags.all |=
+                MONSTER_ABILITY_FLAG_BAD_MORALE;
+            if (CheckWin(&message) != 0) {
+                result = COMBAT_MAIN_FINISHED;
+                goto Finished;
+            }
+            CheckApplyGoodMorale(m_currentArmySide, m_currentArmyIndex);
+            advanceArmy = 1;
+            ResetCycleTimers();
+            break;
+        case COMBAT_ACTION_RETREAT:
+            m_sideRetreated[m_currentSide] = 1;
+            gbRetreatWin = 1;
+            ResetCycleTimers();
+            break;
+        case COMBAT_ACTION_SURRENDER:
+            gbCombatSurrender = 1;
+            gbRetreatWin = 1;
+            m_sideDefeated[m_currentSide] = 1;
+            gpGame->m_players[m_playerId[m_currentSide]].resources[RES_GOLD] -=
+                giNextActionExtra;
+            gpGame->m_players
+                [m_playerId[COMBAT_DEFENDER_SIDE - m_currentSide]]
+                .resources[RES_GOLD] += giNextActionExtra;
+            ResetCycleTimers();
+            break;
+        case COMBAT_ACTION_WAIT:
+            currentArmy->m_monster.flags.all |=
+                MONSTER_ABILITY_FLAG_BAD_MORALE;
+            advanceArmy = 1;
+            break;
+        case COMBAT_ACTION_DEFEND:
+            currentArmy->m_monster.flags.all |=
+                MONSTER_ABILITY_FLAG_DEFERRED_TURN;
+            advanceArmy = 1;
+            break;
+        }
+        giNextAction = COMBAT_ACTION_NONE;
+        if (CheckWin(&message) == 0) {
+            TestRaiseDoor();
+            if (advanceArmy != 0 && GetNextArmy(1) == 0) {
+                ResetRound();
+                GetNextArmy(1);
+            }
+            CheckChangeSelector();
+        } else {
+            result = COMBAT_MAIN_FINISHED;
+        }
+    }
+
+Finished:
+    gbProcessingCombatAction = 0;
+    ResetMouse();
+    return result;
+}
+
+// @match-note retained/live 99.79%:
+// the full two-pass CFG and 0x237 span are reconstructed. Retail frame is 0x18
+// (`this` -0x18, armyIndex -0x14, side -0x0c, cyclingCount -0x08,
+// currentArmy -0x04); current live frame is 0x14. First normalized residual is
+// instruction 24/raw +0x05, side/army strength reduction after the frame byte.
+// All 13/13 external relocation targets are present. Direct versus cached army
+// access, byte/all flag tests, >7/<13 versus inclusive bounds, pointer
+// recomputation, and empty-if polarity reached the retained identical-assembly
+// maximum. Revisit when total SOURCE fuzzy reaches 95%.
 VA(0x00430b91, 0x237)
-void combatManager::ResetCyclingCreatures(void) {}
+void combatManager::ResetCyclingCreatures(void)
+{
+    army *currentArmy = 0;
+    int cyclingCount = 0;
+    int side;
+    int index;
 
+    for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; ++side) {
+        for (index = 0; index < gpCombatManager->m_armyCount[side]; ++index) {
+            currentArmy = gpCombatManager->m_armies[side] + index;
+            if ((currentArmy->m_monster.flags.all &
+                 MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0 &&
+                currentArmy->m_animationSequence >=
+                    COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST &&
+                currentArmy->m_animationSequence <=
+                    COMBAT_CREATURE_CYCLE_SEQUENCE_LAST) {
+                ++cyclingCount;
+                ++gpCombatManager->m_limitCreatureCount[side][index];
+            }
+        }
+    }
+    if (cyclingCount == 0) {
+    } else {
+        gpCombatManager->DrawFrame(0, 1, 1, 1,
+                                   COMBAT_COMMAND_FRAME_DELAY, 1, 1);
+        for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; ++side) {
+            for (index = 0; index < gpCombatManager->m_armyCount[side];
+                 ++index) {
+                currentArmy = gpCombatManager->m_armies[side] + index;
+                if ((currentArmy->m_monster.flags.all &
+                     MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0) {
+                    currentArmy = gpCombatManager->m_armies[side] + index;
+                    currentArmy->m_animationSequence =
+                        ARMY_ANIMATION_STAND;
+                    currentArmy->m_animationFrame = 0;
+                    currentArmy->m_lastAnimationTime = KBTickCount();
+                }
+            }
+        }
+        m_heroCycleTimer[COMBAT_ATTACKER_SIDE] = KBTickCount();
+        m_heroCycleTimer[COMBAT_DEFENDER_SIDE] = KBTickCount();
+        gpCombatManager->DrawFrame(1, 1, 0, 0,
+                                   COMBAT_COMMAND_FRAME_DELAY, 1, 1);
+    }
+}
+
+// @match-note retained/live 99.83%: normalized assembly, complete nested-loop
+// CFG, exact 0x14 frame, and 0xf9 span agree. Retail slots are `this` -0x14,
+// currentTime -0x10 with side/index reuse at -0x08/-0x10; ours keeps
+// currentTime at -0x04. First masked raw residual is +0x13 at that store.
+// All 6/6 relocation offsets and targets are exact. Cached/direct army access,
+// timer declaration placement, and threshold predicate spelling were compared.
+// Revisit when total SOURCE fuzzy reaches 95%.
 VA(0x00430dc8, 0xf9)
-void combatManager::ResetCycleTimers(void) {}
+void combatManager::ResetCycleTimers(void)
+{
+    long currentTime = KBTickCount();
+    int side;
+    int index;
 
+    m_heroCycleTimer[COMBAT_ATTACKER_SIDE] = KBTickCount();
+    m_heroCycleTimer[COMBAT_DEFENDER_SIDE] = KBTickCount();
+    for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; ++side) {
+        for (index = 0; index < gpCombatManager->m_armyCount[side]; ++index) {
+            army *currentArmy = &gpCombatManager->m_armies[side][index];
+            currentArmy->m_lastAnimationTime = currentTime;
+            if (currentArmy->m_frameInfo.standStillDelay >
+                COMBAT_STAND_DELAY_RANDOM_THRESHOLD) {
+                currentArmy->m_lastAnimationTime -=
+                    Random(COMBAT_STAND_DELAY_RANDOM_MIN,
+                           currentArmy->m_frameInfo.standStillDelay);
+            }
+        }
+    }
+}
+
+// @match-note retained/live 99.80%: exact 0x08 frame (`x`/ECX -0x04,
+// `y`/EDX -0x08), complete four-bound CFG, no relocations, and 0x53 retail span
+// agree. First/only masked raw residual is +0x43: the true-arm branch targets
+// retail's equivalent final `jmp $+0` continuation instead of our epilogue.
+// Positive/fallthrough comparisons and an explicit else were tried; the else
+// adds the jump on the wrong arm and falls to 95.80%. Revisit when total SOURCE
+// fuzzy reaches 95%.
 VA(0x00430ec1, 0x53)
-int InCombatArea(int, int) { return 0; }
+int InCombatArea(int x, int y)
+{
+    if (x >= 0 && x < COMBAT_SCREEN_WIDTH && y >= 0 &&
+        y < COMBAT_AREA_HEIGHT)
+        return 1;
+    return 0;
+}
 
+// @match-note retained/live 97.41%: the complete overlay, creature-idle, hero-
+// death/idle, animation-selection, redraw, and timer CFG compiles to 0x9ca bytes
+// versus retail 0x9d9 with the exact 0x64 frame. Retail slots are `this` -0x50,
+// cycleArmy[2][20] -0x48,
+// animationIndex -0x20, accumulatedChance -0x1c, currentArmy -0x18, side/index
+// -0x14/-0x1c, nextHeroAnimation[3] -0x10; ours first puts currentArmy at -0x4c.
+// Raw first residual is +0x16; normalized instruction 66 first reverses side/
+// army strength reduction. All 39 calls/relocations are reconstructed; offsets
+// diverge after that loop and retail uses interior SCmbtHero/constant aliases.
+// Pointer/direct indexing, inclusive bounds, signed/unsigned cycle bytes,
+// condition polarities, and float operand orders were tried. Revisit when total
+// SOURCE fuzzy reaches 95%.
 VA(0x00430f14, 0x9d9)
-void combatManager::CycleCombatScreen(void) {}
+void combatManager::CycleCombatScreen(void)
+{
+    army *currentArmy;
+    unsigned char cycleArmy[2][20];
+    int nextHeroAnimation[3];
+    int side;
+    int index;
+    int animationIndex;
+    float roll;
+    float accumulatedChance;
+
+    CheckUpdateCombatMessages();
+    currentArmy = 0;
+    nextHeroAnimation[COMBAT_MANAGER_SIDE_COUNT] = 0;
+    gpCombatManager->ResetLimitCreature();
+    for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; ++side) {
+        if (m_heroOverlayIcons[side] == 0) {
+        } else {
+            if (m_heroes[side] != 0)
+                m_heroOverlayFrame[side] = (m_heroOverlayFrame[side] + 1) % 5;
+            ++m_drawHeroOverlay[side];
+        }
+    }
+
+    memset(cycleArmy, 0, sizeof(cycleArmy));
+    for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; ++side) {
+        for (index = 0; index < gpCombatManager->m_armyCount[side]; ++index) {
+            currentArmy = gpCombatManager->m_armies[side] + index;
+            if ((currentArmy->m_monster.flags.all &
+                 MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0 &&
+                currentArmy->m_spellInfluence[ARMY_SPELL_INFLUENCE_PARALYZE] == 0 &&
+                currentArmy->m_spellInfluence[ARMY_SPELL_INFLUENCE_BLIND] == 0 &&
+                currentArmy->m_spellInfluence[ARMY_SPELL_INFLUENCE_PETRIFIED] == 0 &&
+                ((currentArmy->m_animationSequence >=
+                      COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST &&
+                  currentArmy->m_animationSequence <=
+                      COMBAT_CREATURE_CYCLE_SEQUENCE_LAST) ||
+                 (currentArmy->m_animationSequence == ARMY_ANIMATION_STAND &&
+                  currentArmy->m_frameInfo.standStillDelay +
+                          currentArmy->m_lastAnimationTime <
+                      KBTickCount()))) {
+                ++nextHeroAnimation[COMBAT_MANAGER_SIDE_COUNT];
+                ++cycleArmy[side][index];
+                ++m_limitCreatureCount[side][index];
+            }
+        }
+    }
+
+    for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; ++side) {
+        nextHeroAnimation[side] = -1;
+        if (m_heroIcons[side] == 0) {
+        } else {
+            if (m_heroAnimationState[side] ==
+                    COMBAT_HERO_ANIMATION_DEATH_FIRST ||
+                m_heroAnimationState[side] ==
+                    COMBAT_HERO_ANIMATION_DEATH_SECOND ||
+                m_heroAnimationState[side] ==
+                    COMBAT_HERO_ANIMATION_IDLE_FIRST ||
+                m_heroAnimationState[side] ==
+                    COMBAT_HERO_ANIMATION_IDLE_SECOND ||
+                m_heroAnimationState[side] ==
+                    COMBAT_HERO_ANIMATION_IDLE_LAST) {
+                m_drawHero[side] = 1;
+            } else if (m_heroAnimationState[side] ==
+                           COMBAT_HERO_ANIMATION_STAND &&
+                       m_heroDeathAnimationPlayed[side] == 0 &&
+                       m_heroDeathPending[side] != 0) {
+                if (m_playerId[m_currentSide] == -1 ||
+                    gbThisNetHumanPlayer[m_playerId[m_currentSide]] == 0) {
+                    m_heroAlternateDeathPending[side] = 0;
+                    m_heroDeathPending[side] =
+                        m_heroAlternateDeathPending[side];
+                } else {
+                    m_heroAlternateDeathPending[side] = 0;
+                    m_heroDeathPending[side] =
+                        m_heroAlternateDeathPending[side];
+                    m_heroDeathAnimationPlayed[side] = 1;
+                    if (sCmbtHero[m_heroSpriteIndex[side]]
+                            .animationFrameCount
+                                [COMBAT_HERO_ANIMATION_DEATH_FIRST] > 0) {
+                        nextHeroAnimation[side] =
+                            COMBAT_HERO_ANIMATION_DEATH_FIRST;
+                        m_drawHero[side] = 1;
+                    }
+                }
+            } else if (m_heroAnimationState[side] ==
+                           COMBAT_HERO_ANIMATION_STAND &&
+                       m_heroAlternateDeathAnimationPlayed[side] == 0 &&
+                       m_heroAlternateDeathPending[side] != 0) {
+                if (m_playerId[m_currentSide] == -1 ||
+                    gbThisNetHumanPlayer[m_playerId[m_currentSide]] == 0) {
+                    m_heroAlternateDeathPending[side] = 0;
+                    m_heroDeathPending[side] =
+                        m_heroAlternateDeathPending[side];
+                } else {
+                    m_heroAlternateDeathPending[side] = 0;
+                    m_heroDeathPending[side] =
+                        m_heroAlternateDeathPending[side];
+                    m_heroAlternateDeathAnimationPlayed[side] = 1;
+                    if (sCmbtHero[m_heroSpriteIndex[side]]
+                            .animationFrameCount
+                                [COMBAT_HERO_ANIMATION_DEATH_SECOND] > 0) {
+                        nextHeroAnimation[side] =
+                            COMBAT_HERO_ANIMATION_DEATH_SECOND;
+                        m_drawHero[side] = 1;
+                    }
+                }
+            } else if (m_heroAnimationState[side] ==
+                           COMBAT_HERO_ANIMATION_STAND &&
+                       m_heroCycleTimer[side] + COMBAT_HERO_IDLE_DELAY <
+                           KBTickCount()) {
+                if (static_cast<unsigned char>(
+                        sCmbtHero[m_heroSpriteIndex[side]].idleAnimationCount) >
+                    1) {
+                    nextHeroAnimation[side] =
+                        Random(0,
+                               static_cast<unsigned char>(
+                                   sCmbtHero[m_heroSpriteIndex[side]]
+                                       .idleAnimationCount) -
+                                   1) +
+                        COMBAT_HERO_ANIMATION_IDLE_FIRST;
+                } else {
+                    nextHeroAnimation[side] =
+                        COMBAT_HERO_ANIMATION_IDLE_FIRST;
+                }
+                m_drawHero[side] = 1;
+            }
+        }
+    }
+    if (m_heroIcons[COMBAT_ATTACKER_SIDE] != 0)
+        m_drawHero[COMBAT_ATTACKER_SIDE] = 1;
+    if (m_heroIcons[COMBAT_DEFENDER_SIDE] != 0)
+        m_drawHero[COMBAT_DEFENDER_SIDE] = 1;
+
+    if (nextHeroAnimation[COMBAT_MANAGER_SIDE_COUNT] != 0 ||
+        m_drawHero[COMBAT_ATTACKER_SIDE] != 0 ||
+        m_drawHero[COMBAT_DEFENDER_SIDE] != 0 ||
+        m_drawHeroOverlay[COMBAT_ATTACKER_SIDE] != 0 ||
+        m_drawHeroOverlay[COMBAT_DEFENDER_SIDE] != 0) {
+        gpCombatManager->DrawFrame(0, 1, 1, 1,
+                                   COMBAT_COMMAND_FRAME_DELAY, 1, 1);
+        for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; ++side) {
+            for (index = 0; index < gpCombatManager->m_armyCount[side];
+                 ++index) {
+                currentArmy = gpCombatManager->m_armies[side] + index;
+                if (cycleArmy[side][index] != 0) {
+                    if (currentArmy->m_animationSequence ==
+                        ARMY_ANIMATION_STAND) {
+                        roll = static_cast<float>(
+                                   Random(COMBAT_IDLE_ROLL_MIN,
+                                          COMBAT_IDLE_ROLL_MAX)) /
+                               COMBAT_IDLE_ROLL_DIVISOR;
+                        accumulatedChance = 0.0f;
+                        currentArmy->m_standingAnimation =
+                            currentArmy->m_frameInfo.standingAnimationCount - 1;
+                        for (animationIndex = 0;
+                             animationIndex <
+                                 currentArmy->m_frameInfo
+                                         .standingAnimationCount -
+                                     1;
+                             ++animationIndex) {
+                            accumulatedChance +=
+                                currentArmy->m_frameInfo
+                                    .standingAnimationChances[animationIndex];
+                            if (accumulatedChance > roll) {
+                                currentArmy->m_standingAnimation =
+                                    animationIndex;
+                                animationIndex = 99;
+                            }
+                        }
+                        currentArmy->m_animationSequence =
+                            currentArmy->m_standingAnimation +
+                            COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST;
+                        currentArmy->m_animationFrame = 0;
+                    } else {
+                        ++currentArmy->m_animationFrame;
+                        if (currentArmy->m_frameInfo.standStillDelay == 0 &&
+                            currentArmy->m_frameInfo.standingAnimationCount ==
+                                1 &&
+                            Random(0, COMBAT_IDLE_ROLL_MAX) <
+                                COMBAT_IDLE_REPEAT_CHANCE) {
+                            --currentArmy->m_animationFrame;
+                        }
+                        if (currentArmy->m_animationFrame >=
+                            currentArmy->m_frameInfo.animationFrameCount
+                                [currentArmy->m_standingAnimation +
+                                 COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST]) {
+                            currentArmy->m_animationSequence =
+                                ARMY_ANIMATION_STAND;
+                            currentArmy->m_animationFrame = 0;
+                            currentArmy->m_lastAnimationTime = KBTickCount();
+                            if (currentArmy->m_frameInfo.standStillDelay > 0) {
+                                currentArmy->m_lastAnimationTime = static_cast<int>(
+                                    (currentArmy->m_frameInfo.standStillDelay *
+                                         COMBAT_STAND_DELAY_BASE_FACTOR -
+                                     Random(0,
+                                            currentArmy->m_frameInfo
+                                                .standStillDelay) *
+                                         COMBAT_STAND_DELAY_RANDOM_FACTOR) +
+                                    currentArmy->m_lastAnimationTime);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; ++side) {
+            if (m_drawHero[side] != 0) {
+                if (nextHeroAnimation[side] != -1) {
+                    m_heroAnimationState[side] = nextHeroAnimation[side];
+                    m_heroAnimationFrame[side] = 0;
+                } else {
+                    ++m_heroAnimationFrame[side];
+                    if (m_heroAnimationFrame[side] >=
+                        sCmbtHero[m_heroSpriteIndex[side]]
+                            .animationFrameCount[m_heroAnimationState[side]]) {
+                        m_heroAnimationState[side] =
+                            COMBAT_HERO_ANIMATION_STAND;
+                        m_heroAnimationFrame[side] = 0;
+                        m_heroCycleTimer[side] = KBTickCount();
+                    }
+                }
+            }
+        }
+        DrawFrame(1, 1, 0, 0, COMBAT_COMMAND_FRAME_DELAY, 1, 1);
+    }
+    gCombatCycleTimer = static_cast<int>(
+        KBTickCount() +
+        gfCombatSpeedMod[gConfig.combatSpeed] * COMBAT_CYCLE_TIMER_FACTOR);
+}
 
 VA(0x004318ed, 0x3b)
 void combatManager::SetCombatViewArmySmallLevel(int) {}
@@ -1566,9 +2759,10 @@ void combatManager::ViewBallista(int) {}
 DATA(0x004f09e8) short const_000f09e8 = 0x680;
 DATA(0x004f0a80) short const_000f0a80 = 0x6c8;
 DATA(0x004f0be4) short const_000f0be4 = 0x702;
+DATA(0x004f0ca0) short const_000f0ca0 = 0x74b;
 DATA(0x005250b8) int gbThisNetHasControl;
 DATA(0x005250bc) int iCurTransferArtifact;
-DATA(0x005250c0) signed char *iTransferArtifactsInfo;
+DATA(0x005250c0) signed char iTransferArtifactsInfo[16];
 DATA(0x005250d0) int gbWhichAnimationPlaying;
 DATA(0x005250d4) int iMaxTransferArtifacts;
 DATA(0x005250d8) int giNextActionExtra;

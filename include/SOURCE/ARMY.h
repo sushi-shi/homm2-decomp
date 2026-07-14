@@ -261,7 +261,10 @@ struct SMonFrameInfo {
     short spellEffectY;              // +0x03
     signed char animationXOffsets[ARMY_WALK_SEGMENT_COUNT]
                                  [ARMY_ANIMATION_FRAME_COUNT]; // +0x05
-    signed char walkXOffsets[0x3d];   // +0x65
+    signed char walkXOffsets[ARMY_ANIMATION_FRAME_COUNT]; // +0x65
+    signed char standingAnimationCount; // +0x75
+    float standingAnimationChances[10]; // +0x76
+    int standStillDelay;              // +0x9e
     int walkDuration;                 // +0xa2
     char unknownA6[4];
     int attackDuration;               // +0xaa

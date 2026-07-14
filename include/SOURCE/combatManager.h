@@ -212,6 +212,7 @@ enum {
     COMBAT_GRID_REVERSE_COLUMN_END = 0,
     COMBAT_MANAGER_SIDE_COUNT = 2,
     COMBAT_ARMY_SLOT_COUNT = 20,
+    COMBAT_ARMY_STORAGE_SLOT_COUNT = 21,
     COMBAT_DRAW_PHASE_COUNT = 4,
     COMBAT_DRAW_ALL_OCCUPANTS = 100,
     COMBAT_CASTLE_REVERSE_ROW = 5,
@@ -677,11 +678,14 @@ public:
     int m_spellPower[2];  // +0x3389
     class armyGroup *m_armyGroups[2];  // +0x3391
     int m_mouseGridHex;  // +0x3399
-    unsigned char m_deathFlags[8];  // +0x339d
+    unsigned char m_heroDeathPending[2];  // +0x339d
+    unsigned char m_heroAlternateDeathPending[2];  // +0x339f
+    unsigned char m_heroDeathAnimationPlayed[2];  // +0x33a1
+    unsigned char m_heroAlternateDeathAnimationPlayed[2];  // +0x33a3
     int m_heroAnimationState[2];  // +0x33a5
     int m_heroAnimationFrame[2];  // +0x33ad
     int m_heroSpriteIndex[2];  // +0x33b5
-    char _pad_0x33bd[0x8];
+    long m_heroCycleTimer[2];  // +0x33bd
     class icon *m_heroIcons[2];  // +0x33c5
     class icon *m_heroOverlayIcons[2];  // +0x33cd
     int m_heroOverlayFrame[2];  // +0x33d5
@@ -696,7 +700,7 @@ public:
     int m_sideDefeated[2];  // +0x351f
     int m_networkArmyPresent[2];  // +0x3527
     int m_playerId[2];  // +0x352f
-    char _pad_0x3537[0x8];
+    int m_experienceValue[2];  // +0x3537
     int m_heroCastSpell[2];  // +0x353f
     int m_armyCount[2];  // +0x3547
     class army m_armies[2][21];  // +0x354f
@@ -710,16 +714,16 @@ public:
     int m_showArmyQuantities;  // +0xf2bf
     int m_selectedHex;  // +0xf2c3
     int m_directionTargetHex;  // +0xf2c7
-    int m_unknownF2CB;  // +0xf2cb
-    int m_unknownF2CF;  // +0xf2cf
+    int m_previousCommand;  // +0xf2cb
+    int m_currentCommand;  // +0xf2cf
     struct SLimitData m_catapultLimits;  // +0xf2d3
     struct SLimitData m_gateLimits;  // +0xf2e3
     struct SLimitData m_upperWallLimits;  // +0xf2f3
     struct SLimitData m_middleWallLimits;  // +0xf303
     int m_catapultFrame[2];  // +0xf313
-    int m_unknownF31B[2];  // +0xf31b
-    int m_unknownF323[2];  // +0xf323
-    int m_unknownF32B[2];  // +0xf32b
+    int m_catapultAttackCount[2];  // +0xf31b
+    int m_catapultAttacksRemaining[2];  // +0xf323
+    int m_keepAttacksRemaining[2];  // +0xf32b
     int m_inCastleCombat;  // +0xf333
     int m_unknownF337[2];  // +0xf337
     int m_visitingHeroPresent[2];  // +0xf33f
@@ -934,7 +938,7 @@ extern int giSeed;
 extern unsigned char *wallHex;
 extern int gbThisNetHasControl;
 extern int iCurTransferArtifact;
-extern signed char *iTransferArtifactsInfo;
+extern signed char iTransferArtifactsInfo[16];
 extern int gbWhichAnimationPlaying;
 extern int iMaxTransferArtifacts;
 extern int giNextActionExtra;

@@ -141,11 +141,9 @@ SIZE(tag_monsterInfo, 0x1a);
 struct SCmbtHero {
     short x[2];
     short y[2];
-    char unknown8;
-    signed char animationFrameCount[8];
-    char unknown11[4];
-    signed char animationFrames[8][9];
-    char unknown5d[0x24];
+    unsigned char idleAnimationCount;
+    signed char animationFrameCount[12];
+    signed char animationFrames[12][9];
 };
 SIZE(SCmbtHero, 0x81);
 #pragma pack(pop)
