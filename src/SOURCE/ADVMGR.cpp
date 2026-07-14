@@ -56,6 +56,9 @@
 #define ADVMGR_QUICK_VIEW_LINE (*reinterpret_cast<const short *>("\x76\x21"))
 #define ADVMGR_TOWN_VIEW_LINE (*reinterpret_cast<const short *>("\x5f\x5e"))
 #define ADVMGR_BOTTOM_HERO_LINE (*reinterpret_cast<const short *>("\x5f\x21"))
+#define ADVMGR_NEW_TURN_LINE (*reinterpret_cast<const short *>("\xd0\x11"))
+#define ADVMGR_RESOURCE_VIEW_LINE (*reinterpret_cast<const short *>("\x2f\x12"))
+#define ADVMGR_KINGDOM_VIEW_LINE (*reinterpret_cast<const short *>("\x96\x12"))
 #define ADVMGR_BORDER_FREE_LINE (*reinterpret_cast<const short *>("\x24\x01"))
 #define ADVMGR_ENVIRONMENT_VOLUME(distance)                                \
     (reinterpret_cast<const int *>("\x40\0\0\0\x39\0\0\0\x28\0\0\0" \
@@ -3273,20 +3276,325 @@ quick_info_ready:
     delete windowLocal;
 }
 
+// @match-note
+// Complete semantics and 0x3c frame/explicit slots match; CFG differs only by
+// missing five-byte /Ob1 continuations at retail +0x3b (after CurrentHero) and
+// +0x1c5 (before the populated locator body). All 25 relocation targets agree.
+// Direct m_currentHero access omits +0x3b; CurrentHero() moves it before the
+// load. Both loop-bound polarities were checked. Revisit only if the real
+// inline accessor/expression context is recovered, or after the SOURCE
+// placeholder census reaches zero; do not repeat these spellings beforehand.
 VA(0x00460465, 0x348)
-void advManager::UpdateHeroLocator(int, int, int) {}
+void advManager::UpdateHeroLocator(int locatorSlot, int drawWindow,
+                                   int updateScreen)
+{
+    hero *locatorHero8;
+    int mobilityFrame18;
+    int manaFrame36;
+    int selectedHero9;
+    int widgetBase7;
+    int index3;
+    tag_message locatorMessage15;
+    int heroId9;
+
+    if (!gbThisNetHumanPlayer[giCurPlayer])
+        return;
+
+    if (locatorSlot == -1) {
+        selectedHero9 = gpCurPlayer->m_currentHero;
+        if (selectedHero9 == ADVMGR_INVALID_HERO)
+            return;
+        for (index3 = 0; index3 < ADVMGR_LOCATOR_VISIBLE_COUNT; ++index3) {
+            if (gpCurPlayer->m_heroIds[gpCurPlayer->m_heroLocatorPage + index3] ==
+                selectedHero9)
+                locatorSlot = index3;
+        }
+        if (locatorSlot == -1)
+            return;
+    }
+
+    widgetBase7 = locatorSlot * ADVMGR_LOCATOR_HERO_WIDGET_STRIDE +
+                  ADVMGR_LOCATOR_HERO_WIDGET_BASE;
+    locatorMessage15.type = ADVMGR_LOCATOR_MESSAGE_TYPE;
+    heroId9 = gpCurPlayer->m_heroIds[
+        gpCurPlayer->m_heroLocatorPage + locatorSlot];
+    locatorMessage15.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_COLOR;
+    locatorMessage15.payload.widget.id =
+        widgetBase7 + ADVMGR_LOCATOR_HERO_BORDER_OFFSET;
+    if (gpCurPlayer->m_currentHero == heroId9 &&
+        gpCurPlayer->m_currentHero != ADVMGR_INVALID_HERO && !gbAllBlack)
+        locatorMessage15.payload.widget.data.value = ADVMGR_LOCATOR_SELECTED_COLOR;
+    else
+        locatorMessage15.payload.widget.data.value = ADVMGR_LOCATOR_NORMAL_COLOR;
+    m_adventureWindow->BroadcastMessage(locatorMessage15);
+
+    if (heroId9 == ADVMGR_INVALID_HERO || gbAllBlack) {
+        locatorMessage15.payload.widget.id =
+            widgetBase7 + ADVMGR_LOCATOR_HERO_IMAGE_OFFSET;
+        locatorMessage15.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FRAME;
+        locatorMessage15.payload.widget.data.value =
+            locatorSlot + ADVMGR_LOCATOR_HERO_EMPTY_FRAME_BASE;
+        m_adventureWindow->BroadcastMessage(locatorMessage15);
+
+        locatorMessage15.payload.widget.command = ADVMGR_LOCATOR_COMMAND_CLEAR_FLAGS;
+        locatorMessage15.payload.widget.data.value = ADVMGR_LOCATOR_HERO_DISABLE_FLAGS;
+        for (index3 = 0; index3 <= ADVMGR_LOCATOR_VISIBLE_COUNT - 1; ++index3) {
+            locatorMessage15.payload.widget.id = widgetBase7 + index3;
+            m_adventureWindow->BroadcastMessage(locatorMessage15);
+        }
+    } else {
+        locatorHero8 = &gpGame->m_heroRecs[heroId9];
+        locatorMessage15.payload.widget.id =
+            widgetBase7 + ADVMGR_LOCATOR_HERO_IMAGE_OFFSET;
+        locatorMessage15.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FRAME;
+        locatorMessage15.payload.widget.data.value = ADVMGR_LOCATOR_HERO_DEFAULT_FRAME;
+        m_adventureWindow->BroadcastMessage(locatorMessage15);
+
+        locatorMessage15.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FLAGS;
+        locatorMessage15.payload.widget.data.value = ADVMGR_LOCATOR_HERO_ENABLE_FLAGS;
+        for (index3 = 0; index3 <= ADVMGR_LOCATOR_HERO_WIDGET_STRIDE - 1;
+             ++index3) {
+            locatorMessage15.payload.widget.id = widgetBase7 + index3;
+            m_adventureWindow->BroadcastMessage(locatorMessage15);
+        }
+
+        mobilityFrame18 = GetMobilityFrame(locatorHero8->m_remainingMobility);
+        locatorMessage15.payload.widget.id =
+            widgetBase7 + ADVMGR_LOCATOR_HERO_MOBILITY_OFFSET;
+        locatorMessage15.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FRAME;
+        locatorMessage15.payload.widget.data.value = mobilityFrame18;
+        m_adventureWindow->BroadcastMessage(locatorMessage15);
+
+        manaFrame36 = GetManaFrame(locatorHero8->m_spellPoints);
+        locatorMessage15.payload.widget.id =
+            widgetBase7 + ADVMGR_LOCATOR_HERO_MANA_OFFSET;
+        locatorMessage15.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FRAME;
+        locatorMessage15.payload.widget.data.value = manaFrame36;
+        m_adventureWindow->BroadcastMessage(locatorMessage15);
+
+        locatorMessage15.payload.widget.id =
+            widgetBase7 + ADVMGR_LOCATOR_HERO_PORTRAIT_OFFSET;
+        locatorMessage15.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FRAME;
+        locatorMessage15.payload.widget.data.value = locatorHero8->m_portrait;
+        m_adventureWindow->BroadcastMessage(locatorMessage15);
+    }
+
+    if (drawWindow) {
+        m_adventureWindow->DrawWindow(
+            ADVMGR_LOCATOR_HERO_DRAW_LEFT, widgetBase7,
+            widgetBase7 + ADVMGR_LOCATOR_HERO_BORDER_OFFSET);
+        if (updateScreen) {
+            gpWindowManager->UpdateScreenRegion(
+                ADVMGR_LOCATOR_SCREEN_LEFT,
+                locatorSlot * ADVMGR_LOCATOR_SCREEN_ROW_HEIGHT +
+                    ADVMGR_LOCATOR_SCREEN_TOP,
+                ADVMGR_LOCATOR_SCREEN_WIDTH, ADVMGR_LOCATOR_SCREEN_HEIGHT);
+        }
+    }
+}
 
 VA(0x004607ad, 0x102)
-void advManager::UpdateHeroLocators(int, int) {}
+void advManager::UpdateHeroLocators(int drawWindow, int updateScreen)
+{
+    int locatorSlot;
+    double scrollStep;
+
+    if (!gbThisNetHumanPlayer[giCurPlayer])
+        return;
+
+    for (locatorSlot = 0; locatorSlot < ADVMGR_LOCATOR_VISIBLE_COUNT;
+         ++locatorSlot)
+        UpdateHeroLocator(locatorSlot, 0, 0);
+
+    if (gpCurPlayer->m_heroCount < ADVMGR_LOCATOR_PAGE_THRESHOLD) {
+        m_scrollLeftButton->m_y = ADVMGR_LOCATOR_SCROLL_NO_PAGES_Y;
+    } else {
+        scrollStep = static_cast<double>(ADVMGR_LOCATOR_HERO_SCROLL_SPAN) /
+                     (gpCurPlayer->m_heroCount -
+                      ADVMGR_LOCATOR_PAGE_DENOMINATOR_OFFSET);
+        m_scrollLeftButton->m_y = static_cast<short>(
+            gpCurPlayer->m_heroLocatorPage * scrollStep +
+            ADVMGR_LOCATOR_SCROLL_BASE_Y);
+    }
+    if (drawWindow)
+        m_adventureWindow->DrawWindow(updateScreen);
+}
 
 VA(0x004608af, 0x2e8)
-void advManager::UpdateTownLocators(int, int) {}
+void advManager::UpdateTownLocators(int drawWindow, int updateScreen)
+{
+    int locatorSlot;
+    tag_message locatorMessage14;
+    int townId37;
+    double scrollStep;
 
+    if (!gbThisNetHumanPlayer[giCurPlayer])
+        return;
+
+    locatorMessage14.type = ADVMGR_LOCATOR_MESSAGE_TYPE;
+    for (locatorSlot = 0; locatorSlot < ADVMGR_LOCATOR_VISIBLE_COUNT;
+         ++locatorSlot) {
+        townId37 = gpCurPlayer->m_townIds[
+            gpCurPlayer->m_townLocatorPage + locatorSlot];
+        locatorMessage14.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_COLOR;
+        locatorMessage14.payload.widget.id =
+            locatorSlot + ADVMGR_LOCATOR_TOWN_BORDER_BASE;
+        if (gpCurPlayer->m_currentTown != ADVMGR_INVALID_CELL &&
+            gpCurPlayer->m_currentTown == townId37 && !gbAllBlack)
+            locatorMessage14.payload.widget.data.value = ADVMGR_LOCATOR_SELECTED_COLOR;
+        else
+            locatorMessage14.payload.widget.data.value = ADVMGR_LOCATOR_NORMAL_COLOR;
+        m_adventureWindow->BroadcastMessage(locatorMessage14);
+
+        locatorMessage14.payload.widget.id =
+            locatorSlot + ADVMGR_LOCATOR_TOWN_IMAGE_BASE;
+        if (townId37 == ADVMGR_INVALID_CELL || gbAllBlack) {
+            locatorMessage14.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FRAME;
+            locatorMessage14.payload.widget.data.value =
+                locatorSlot + ADVMGR_LOCATOR_TOWN_EMPTY_FRAME_BASE;
+            m_adventureWindow->BroadcastMessage(locatorMessage14);
+            locatorMessage14.payload.widget.command =
+                ADVMGR_LOCATOR_COMMAND_CLEAR_FLAGS;
+            locatorMessage14.payload.widget.data.value =
+                ADVMGR_LOCATOR_TOWN_ENABLE_FLAGS;
+            m_adventureWindow->BroadcastMessage(locatorMessage14);
+            locatorMessage14.payload.widget.command =
+                ADVMGR_LOCATOR_COMMAND_CLEAR_FLAGS;
+            locatorMessage14.payload.widget.data.value =
+                ADVMGR_LOCATOR_TOWN_DISABLE_FLAGS;
+            locatorMessage14.payload.widget.id =
+                locatorSlot + ADVMGR_LOCATOR_TOWN_FLAG_BASE;
+            m_adventureWindow->BroadcastMessage(locatorMessage14);
+        } else {
+            locatorMessage14.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FLAGS;
+            locatorMessage14.payload.widget.data.value =
+                ADVMGR_LOCATOR_TOWN_ENABLE_FLAGS;
+            m_adventureWindow->BroadcastMessage(locatorMessage14);
+            locatorMessage14.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FRAME;
+            locatorMessage14.payload.widget.data.value =
+                gpGame->GetTown(townId37)->m_type +
+                ADVMGR_LOCATOR_TOWN_TYPE_FRAME_BASE;
+            if (!(gpGame->GetTown(townId37)->m_buildings &
+                  TOWN_BUILDING_CASTLE))
+                locatorMessage14.payload.widget.data.value +=
+                    ADVMGR_LOCATOR_TOWN_VILLAGE_FRAME_OFFSET;
+            m_adventureWindow->BroadcastMessage(locatorMessage14);
+
+            if (BitTest(gpGame->m_knownTowns, townId37))
+                locatorMessage14.payload.widget.command =
+                    ADVMGR_LOCATOR_COMMAND_SET_FLAGS;
+            else
+                locatorMessage14.payload.widget.command =
+                    ADVMGR_LOCATOR_COMMAND_CLEAR_FLAGS;
+            locatorMessage14.payload.widget.data.value =
+                ADVMGR_LOCATOR_TOWN_DISABLE_FLAGS;
+            locatorMessage14.payload.widget.id =
+                locatorSlot + ADVMGR_LOCATOR_TOWN_FLAG_BASE;
+            m_adventureWindow->BroadcastMessage(locatorMessage14);
+        }
+    }
+
+    if (gpCurPlayer->m_townCount < ADVMGR_LOCATOR_PAGE_THRESHOLD) {
+        m_scrollRightButton->m_y = ADVMGR_LOCATOR_SCROLL_NO_PAGES_Y;
+    } else {
+        scrollStep = static_cast<double>(ADVMGR_LOCATOR_TOWN_SCROLL_SPAN) /
+                     (gpCurPlayer->m_townCount -
+                      ADVMGR_LOCATOR_PAGE_DENOMINATOR_OFFSET);
+        m_scrollRightButton->m_y = static_cast<short>(
+            gpCurPlayer->m_townLocatorPage * scrollStep +
+            ADVMGR_LOCATOR_SCROLL_BASE_Y);
+    }
+    if (drawWindow)
+        m_adventureWindow->DrawWindow(updateScreen);
+}
+
+// @match-note
+// Complete semantics, 0x0c frame/slots, switch order, CFG, and all 24
+// relocation targets agree. The first and only instruction divergence is the
+// missing retail jmp $+0 at +0x12d after UpdBottomViewEnemyTurn. An explicit
+// enemy-path goto emits two extra continuations; both expiry-test polarities
+// were checked. Revisit only after the SOURCE placeholder census reaches zero.
 VA(0x00460b97, 0x1cc)
-void advManager::UpdBottomView(int, int, int) {}
+void advManager::UpdBottomView(int forceUpdate, int drawWindow,
+                               int updateScreen)
+{
+    int updated;
+
+    updated = 0;
+    gbForceUpdate = forceUpdate;
+    if (giBottomViewOverride == ADVMGR_BOTTOM_VIEW_OVERRIDE_DISABLED)
+        return;
+
+    if (giBottomViewOverride > 0) {
+        if (KBTickCount() > giBottomViewOverrideEndTime) {
+            giBottomViewOverride = ADVMGR_BOTTOM_VIEW_NONE;
+        } else {
+            switch (giBottomViewOverride) {
+            case ADVMGR_BOTTOM_VIEW_NEW_TURN:
+                updated = UpdBottomViewNewTurn();
+                break;
+            case ADVMGR_BOTTOM_VIEW_KINGDOM:
+                updated = UpdBottomViewKingdom();
+                break;
+            case ADVMGR_BOTTOM_VIEW_RESOURCE:
+                updated = UpdBottomViewResMsg();
+                break;
+            }
+            goto update_bottom_view;
+        }
+    }
+
+    if (!gbThisNetHumanPlayer[giCurPlayer] || gbAllBlack ||
+        gpGame->m_players[giCurPlayer].color != gpCurPlayer->m_color) {
+        updated = UpdBottomViewEnemyTurn();
+    } else if (gpCurPlayer->m_currentHero == ADVMGR_INVALID_HERO) {
+        updated = UpdBottomViewKingdom();
+    } else {
+        updated = UpdBottomViewHero();
+    }
+
+update_bottom_view:
+    if (updated && drawWindow) {
+        m_adventureWindow->DrawWindow(
+            ADVMGR_BOTTOM_VIEW_DRAW_LEFT, ADVMGR_BOTTOM_VIEW_DRAW_TOP,
+            ADVMGR_BOTTOM_VIEW_DRAW_BOTTOM);
+        if (updateScreen) {
+            gpWindowManager->UpdateScreenRegion(
+                ADVMGR_BOTTOM_VIEW_PANEL_X, ADVMGR_BOTTOM_VIEW_PANEL_Y,
+                ADVMGR_BOTTOM_VIEW_PANEL_WIDTH,
+                ADVMGR_BOTTOM_VIEW_PANEL_HEIGHT);
+        }
+    }
+    forceUpdate = gbForceUpdate;
+}
 
 VA(0x00460d63, 0x132)
-void advManager::ClearBottomView(void) {}
+void advManager::ClearBottomView(void)
+{
+    int widgetIndex;
+
+    if (iCurBottomView == ADVMGR_BOTTOM_VIEW_NONE)
+        return;
+
+    for (widgetIndex = 0; widgetIndex < ADVMGR_BOTTOM_VIEW_WIDGET_CAPACITY;
+         ++widgetIndex) {
+        if (m_bottomViewPrimaryWidgets[widgetIndex] != 0) {
+            m_adventureWindow->RemoveWidget(
+                m_bottomViewPrimaryWidgets[widgetIndex]);
+            delete m_bottomViewPrimaryWidgets[widgetIndex];
+        }
+        if (m_bottomViewSecondaryWidgets[widgetIndex] != 0) {
+            m_adventureWindow->RemoveWidget(
+                m_bottomViewSecondaryWidgets[widgetIndex]);
+            delete m_bottomViewSecondaryWidgets[widgetIndex];
+        }
+        m_bottomViewPrimaryWidgets[widgetIndex] = 0;
+        m_bottomViewSecondaryWidgets[widgetIndex] = 0;
+    }
+    iCurBottomViewEnemy = ADVMGR_BOTTOM_VIEW_NO_ENEMY;
+    iCurBottomView = ADVMGR_BOTTOM_VIEW_NONE;
+    iLastAnimFrame = ADVMGR_BOTTOM_VIEW_NO_ANIMATION;
+}
 
 // @early-stop
 // Exact size and 73 relocations; residuals are the moved GetPlayerColor /Ob1
@@ -3414,14 +3722,252 @@ int advManager::UpdBottomViewEnemyTurn(void)
     return updated;
 }
 
+// @match-note
+// Complete semantics/CFG and all 45 relocation targets agree. The first byte
+// divergence is the frame allocation at +0x03: retail uses 0x24, ours 0x20.
+// Retail slots are dateIconFrame=-0x4, unused=-0x8, dayText=-0xc,
+// weekText=-0x10; ours are weekText=-0x4, dayText=-0x8,
+// dateIconFrame=-0xc. The decompile/local-use audit found no real source local
+// for -0x8, and declaration ordering cannot create it without fake padding.
+// Revisit only if later type/predecessor recovery explains the word, or after
+// the SOURCE placeholder census reaches zero.
 VA(0x004613b0, 0x366)
-int advManager::UpdBottomViewNewTurn(void) { return 0; }
+int advManager::UpdBottomViewNewTurn(void)
+{
+    int dateIconFrame;
+    char *weekText;
+    char *dayText;
+
+    dateIconFrame = 0;
+    if (!gbForceUpdate && iCurBottomView == ADVMGR_BOTTOM_VIEW_NEW_TURN)
+        return 0;
+
+    ClearBottomView();
+    iCurBottomView = ADVMGR_BOTTOM_VIEW_NEW_TURN;
+    if (gpGame->m_day == ADVMGR_NEW_TURN_FIRST_DAY &&
+        (gpGame->m_month != ADVMGR_NEW_TURN_FIRST_DAY ||
+         gpGame->m_week != ADVMGR_NEW_TURN_FIRST_DAY ||
+         gpGame->m_day != ADVMGR_NEW_TURN_FIRST_DAY))
+        dateIconFrame = gpGame->m_week;
+
+    m_bottomViewBackground = new iconWidget(
+        ADVMGR_BOTTOM_VIEW_PANEL_X, ADVMGR_BOTTOM_VIEW_PANEL_Y,
+        ADVMGR_BOTTOM_VIEW_BACKGROUND_WIDTH, ADVMGR_BOTTOM_VIEW_PANEL_HEIGHT,
+        "stonback.icn", 0, 0, ADVMGR_BOTTOM_VIEW_BACKGROUND_ID,
+        ADVMGR_BOTTOM_VIEW_WIDGET_FLAGS, 1);
+    if (m_bottomViewBackground == 0)
+        MemError();
+    m_adventureWindow->AddWidget(m_bottomViewBackground, -1);
+
+    m_bottomViewHourglassBackground = new iconWidget(
+        ADVMGR_NEW_TURN_DATE_ICON_X, ADVMGR_NEW_TURN_DATE_ICON_Y,
+        ADVMGR_NEW_TURN_DATE_ICON_WIDTH, ADVMGR_NEW_TURN_DATE_ICON_HEIGHT,
+        "sunmoon.icn", dateIconFrame, 0, ADVMGR_BOTTOM_VIEW_FOREGROUND_ID,
+        ADVMGR_BOTTOM_VIEW_WIDGET_FLAGS, 1);
+    if (m_bottomViewHourglassBackground == 0)
+        MemError();
+    m_adventureWindow->AddWidget(m_bottomViewHourglassBackground, -1);
+
+    weekText = static_cast<char *>(BaseAlloc(
+        ADVMGR_BOTTOM_VIEW_TEXT_BUFFER_SIZE, ADVMGR_SOURCE_FILE,
+        ADVMGR_NEW_TURN_LINE + ADVMGR_NEW_TURN_WEEK_ALLOC_LINE_OFFSET));
+    sprintf(weekText, "%s: %d  %s: %d", "Month", gpGame->m_month,
+            "Week", gpGame->m_week);
+    m_bottomViewAllTexts[0] = new textWidget(
+        ADVMGR_NEW_TURN_DATE_TEXT_X, ADVMGR_NEW_TURN_WEEK_TEXT_Y,
+        ADVMGR_NEW_TURN_DATE_TEXT_WIDTH, ADVMGR_NEW_TURN_WEEK_TEXT_HEIGHT,
+        weekText, "smalfont.fnt", 1, ADVMGR_BOTTOM_VIEW_TEXT_ID,
+        ADVMGR_BOTTOM_VIEW_TEXT_FLAGS, 1);
+    if (m_bottomViewAllTexts[0] == 0)
+        MemError();
+    m_adventureWindow->AddWidget(m_bottomViewAllTexts[0], -1);
+
+    dayText = static_cast<char *>(BaseAlloc(
+        ADVMGR_BOTTOM_VIEW_TEXT_BUFFER_SIZE, ADVMGR_SOURCE_FILE,
+        ADVMGR_NEW_TURN_LINE + ADVMGR_NEW_TURN_DAY_ALLOC_LINE_OFFSET));
+    sprintf(dayText, "%s: %d", "Day", gpGame->m_day);
+    m_bottomViewAllTexts[0] = new textWidget(
+        ADVMGR_NEW_TURN_DATE_TEXT_X, ADVMGR_NEW_TURN_DAY_TEXT_Y,
+        ADVMGR_NEW_TURN_DATE_TEXT_WIDTH, ADVMGR_NEW_TURN_DAY_TEXT_HEIGHT,
+        dayText, "bigfont.fnt", 1, ADVMGR_BOTTOM_VIEW_TEXT_ID,
+        ADVMGR_BOTTOM_VIEW_TEXT_FLAGS, 1);
+    if (m_bottomViewAllTexts[0] == 0)
+        MemError();
+    m_adventureWindow->AddWidget(m_bottomViewAllTexts[0], -1);
+    return 1;
+}
 
 VA(0x00461716, 0x35f)
-int advManager::UpdBottomViewResMsg(void) { return 0; }
+int advManager::UpdBottomViewResMsg(void)
+{
+    int iconWidth6;
+    int iconHeight11;
+    int textY19;
+    int lineCount10;
+    char *messageText2;
+    char *resourceCountText6;
+
+    if (!gbForceUpdate && iCurBottomView == ADVMGR_BOTTOM_VIEW_RESOURCE)
+        return 0;
+
+    ClearBottomView();
+    iCurBottomView = ADVMGR_BOTTOM_VIEW_RESOURCE;
+    m_bottomViewBackground = new iconWidget(
+        ADVMGR_BOTTOM_VIEW_PANEL_X, ADVMGR_BOTTOM_VIEW_PANEL_Y,
+        ADVMGR_BOTTOM_VIEW_BACKGROUND_WIDTH, ADVMGR_BOTTOM_VIEW_PANEL_HEIGHT,
+        "stonback.icn", 0, 0, ADVMGR_BOTTOM_VIEW_BACKGROUND_ID,
+        ADVMGR_BOTTOM_VIEW_WIDGET_FLAGS, 1);
+    if (m_bottomViewBackground == 0)
+        MemError();
+    m_adventureWindow->AddWidget(m_bottomViewBackground, -1);
+
+    textY19 = 0;
+    if (giBottomViewResource < 0) {
+        textY19 = ADVMGR_RESOURCE_VIEW_MULTILINE_HEIGHT;
+        lineCount10 = smallFont->LineLength(
+            gcBottomViewText, ADVMGR_BOTTOM_VIEW_PANEL_WIDTH);
+        textY19 -= lineCount10 * ADVMGR_RESOURCE_VIEW_LINE_HEIGHT;
+    }
+    messageText2 = static_cast<char *>(BaseAlloc(
+        strlen(gcBottomViewText) + 1, ADVMGR_SOURCE_FILE,
+        ADVMGR_RESOURCE_VIEW_LINE +
+            ADVMGR_RESOURCE_VIEW_MESSAGE_ALLOC_LINE_OFFSET));
+    sprintf(messageText2, gcBottomViewText);
+    m_bottomViewAllTexts[0] = new textWidget(
+        ADVMGR_BOTTOM_VIEW_PANEL_X,
+        textY19 + ADVMGR_RESOURCE_VIEW_TEXT_BASE_Y,
+        ADVMGR_BOTTOM_VIEW_PANEL_WIDTH, ADVMGR_RESOURCE_VIEW_TEXT_HEIGHT,
+        messageText2, "smalfont.fnt", 1, ADVMGR_BOTTOM_VIEW_TEXT_ID,
+        ADVMGR_BOTTOM_VIEW_TEXT_FLAGS, 1);
+    if (m_bottomViewAllTexts[0] == 0)
+        MemError();
+    m_adventureWindow->AddWidget(m_bottomViewAllTexts[0], -1);
+
+    if (giBottomViewResource >= 0) {
+        if (giBottomViewResource == ADVMGR_RESOURCE_VIEW_GOLD) {
+            iconWidth6 = ADVMGR_RESOURCE_VIEW_GOLD_WIDTH;
+            iconHeight11 = ADVMGR_RESOURCE_VIEW_GOLD_HEIGHT;
+        } else {
+            iconWidth6 = ADVMGR_RESOURCE_VIEW_ICON_WIDTH;
+            iconHeight11 = ADVMGR_RESOURCE_VIEW_ICON_HEIGHT;
+        }
+        m_bottomViewHourglassBackground = new iconWidget(
+            (ADVMGR_BOTTOM_VIEW_PANEL_WIDTH - iconWidth6) / 2 +
+                ADVMGR_BOTTOM_VIEW_PANEL_X,
+            ADVMGR_RESOURCE_VIEW_ICON_BOTTOM - iconHeight11 -
+                ADVMGR_RESOURCE_VIEW_ICON_BOTTOM_PADDING,
+            iconWidth6, iconHeight11, "resource.icn", giBottomViewResource, 0,
+            ADVMGR_BOTTOM_VIEW_FOREGROUND_ID,
+            ADVMGR_BOTTOM_VIEW_WIDGET_FLAGS, 1);
+        if (m_bottomViewHourglassBackground == 0)
+            MemError();
+        m_adventureWindow->AddWidget(m_bottomViewHourglassBackground, -1);
+
+        resourceCountText6 = static_cast<char *>(BaseAlloc(
+            ADVMGR_BOTTOM_VIEW_COUNT_BUFFER_SIZE, ADVMGR_SOURCE_FILE,
+            ADVMGR_RESOURCE_VIEW_LINE +
+                ADVMGR_RESOURCE_VIEW_COUNT_ALLOC_LINE_OFFSET));
+        sprintf(resourceCountText6, "%d", giBottomViewResourceQty);
+        m_bottomViewAllTexts[1] = new textWidget(
+            ADVMGR_RESOURCE_VIEW_COUNT_X, ADVMGR_RESOURCE_VIEW_COUNT_Y,
+            ADVMGR_RESOURCE_VIEW_COUNT_WIDTH,
+            ADVMGR_RESOURCE_VIEW_COUNT_HEIGHT, resourceCountText6,
+            "smalfont.fnt", 1, ADVMGR_BOTTOM_VIEW_TEXT_ID_2,
+            ADVMGR_BOTTOM_VIEW_TEXT_FLAGS, 1);
+        if (m_bottomViewAllTexts[1] == 0)
+            MemError();
+        m_adventureWindow->AddWidget(m_bottomViewAllTexts[1], -1);
+    }
+    return 1;
+}
 
 VA(0x00461a75, 0x363)
-int advManager::UpdBottomViewKingdom(void) { return 0; }
+int advManager::UpdBottomViewKingdom(void)
+{
+    int villageCount37;
+    int index11;
+    int castleCount12;
+    signed char textY5[ADVMGR_KINGDOM_VIEW_ENTRY_COUNT];
+    unsigned char textX[ADVMGR_KINGDOM_VIEW_ENTRY_COUNT];
+    char *countText14[ADVMGR_KINGDOM_VIEW_ENTRY_COUNT];
+
+    if (!gbForceUpdate && iCurBottomView == ADVMGR_BOTTOM_VIEW_KINGDOM)
+        return 0;
+
+    ClearBottomView();
+    iCurBottomView = ADVMGR_BOTTOM_VIEW_KINGDOM;
+    textY5[0] = ADVMGR_KINGDOM_VIEW_RESOURCE_TEXT_Y;
+    textY5[1] = ADVMGR_KINGDOM_VIEW_RESOURCE_TEXT_Y;
+    textY5[2] = ADVMGR_KINGDOM_VIEW_RESOURCE_TEXT_Y;
+    textY5[3] = ADVMGR_KINGDOM_VIEW_RESOURCE_TEXT_Y;
+    textY5[4] = ADVMGR_KINGDOM_VIEW_RESOURCE_TEXT_Y;
+    textY5[5] = ADVMGR_KINGDOM_VIEW_RESOURCE_TEXT_Y;
+    textY5[6] = ADVMGR_KINGDOM_VIEW_TOWN_TEXT_Y;
+    textY5[7] = ADVMGR_KINGDOM_VIEW_TOWN_TEXT_Y;
+    textY5[8] = ADVMGR_KINGDOM_VIEW_TOWN_TEXT_Y;
+    textX[0] = ADVMGR_KINGDOM_VIEW_WOOD_TEXT_X;
+    textX[1] = ADVMGR_KINGDOM_VIEW_MERCURY_TEXT_X;
+    textX[2] = ADVMGR_KINGDOM_VIEW_ORE_TEXT_X;
+    textX[3] = ADVMGR_KINGDOM_VIEW_SULFUR_TEXT_X;
+    textX[4] = ADVMGR_KINGDOM_VIEW_CRYSTAL_TEXT_X;
+    textX[5] = ADVMGR_KINGDOM_VIEW_GEMS_TEXT_X;
+    textX[6] = ADVMGR_KINGDOM_VIEW_GOLD_TEXT_X;
+    textX[7] = ADVMGR_KINGDOM_VIEW_CASTLE_TEXT_X;
+    textX[8] = ADVMGR_KINGDOM_VIEW_VILLAGE_TEXT_X;
+    villageCount37 = 0;
+    castleCount12 = 0;
+
+    m_bottomViewBackground = new iconWidget(
+        ADVMGR_BOTTOM_VIEW_PANEL_X, ADVMGR_BOTTOM_VIEW_PANEL_Y,
+        ADVMGR_BOTTOM_VIEW_BACKGROUND_WIDTH, ADVMGR_BOTTOM_VIEW_PANEL_HEIGHT,
+        "stonback.icn", 0, 0, ADVMGR_BOTTOM_VIEW_BACKGROUND_ID,
+        ADVMGR_BOTTOM_VIEW_WIDGET_FLAGS, 1);
+    if (m_bottomViewBackground == 0)
+        MemError();
+    m_adventureWindow->AddWidget(m_bottomViewBackground, -1);
+
+    m_bottomViewHourglassBackground = new iconWidget(
+        ADVMGR_KINGDOM_VIEW_ICON_X, ADVMGR_KINGDOM_VIEW_ICON_Y,
+        ADVMGR_BOTTOM_VIEW_PANEL_WIDTH, ADVMGR_BOTTOM_VIEW_PANEL_HEIGHT,
+        "ressmall.icn", 0, 0, ADVMGR_BOTTOM_VIEW_FOREGROUND_ID,
+        ADVMGR_BOTTOM_VIEW_WIDGET_FLAGS, 1);
+    if (m_bottomViewHourglassBackground == 0)
+        MemError();
+    m_adventureWindow->AddWidget(m_bottomViewHourglassBackground, -1);
+
+    for (index11 = 0; index11 < gpCurPlayer->m_townCount; ++index11) {
+        if (gpGame->m_castleRecs[gpCurPlayer->m_townIds[index11]].m_buildings &
+            TOWN_BUILDING_CASTLE)
+            ++castleCount12;
+        else
+            ++villageCount37;
+    }
+
+    for (index11 = 0; index11 < ADVMGR_KINGDOM_VIEW_ENTRY_COUNT; ++index11) {
+        countText14[index11] = static_cast<char *>(BaseAlloc(
+            ADVMGR_BOTTOM_VIEW_COUNT_BUFFER_SIZE, ADVMGR_SOURCE_FILE,
+            ADVMGR_KINGDOM_VIEW_LINE +
+                ADVMGR_KINGDOM_VIEW_COUNT_ALLOC_LINE_OFFSET));
+        if (index11 < ADVMGR_KINGDOM_VIEW_RESOURCE_COUNT)
+            sprintf(countText14[index11], "%d", gpCurPlayer->m_resources[index11]);
+        else if (index11 == ADVMGR_KINGDOM_VIEW_CASTLE_ENTRY)
+            sprintf(countText14[index11], "%d", castleCount12);
+        else
+            sprintf(countText14[index11], "%d", villageCount37);
+
+        m_bottomViewAllTexts[index11] = new textWidget(
+            textX[index11] + ADVMGR_KINGDOM_VIEW_TEXT_X_BASE,
+            textY5[index11] + ADVMGR_KINGDOM_VIEW_TEXT_Y_BASE,
+            ADVMGR_KINGDOM_VIEW_TEXT_WIDTH,
+            ADVMGR_KINGDOM_VIEW_TEXT_HEIGHT, countText14[index11],
+            "smalfont.fnt", 1, index11 + ADVMGR_BOTTOM_VIEW_TEXT_ID,
+            ADVMGR_BOTTOM_VIEW_TEXT_FLAGS, 1);
+        if (m_bottomViewAllTexts[index11] == 0)
+            MemError();
+        m_adventureWindow->AddWidget(m_bottomViewAllTexts[index11], -1);
+    }
+    return 1;
+}
 
 // @early-stop
 // Exact bytes and all 36 relocation targets.
