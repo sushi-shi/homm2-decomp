@@ -20,9 +20,10 @@ state.
 `FindToken` from checkpoint `04f798c`. Its hashes identify the normalized descriptor printed in
 the `variant` column (SHA-256 of `scope:variant`), rather than unavailable temporary whole-file
 states; this makes every rejected spelling independently searchable and reproducible.
-The retained `Misc.cpp` SHA-256 is
+The checkpoint `Misc.cpp` SHA-256 was
 `08b3d2dfb8a14899ad3cac10418aa1ad82124cfcc0195eeea45e310efcf09194`; the matrix SHA-256 is
-`94bb4371ef12e7dfcb76becd2ba17b09d06ad24d43d07f512c24cdb2d105e605`.
+`c7ca8e27b1047bd4f7e5692a6aa906ec06be6df86f3857d6e48ad90700342617`. Later-function
+reconstruction changes the whole-file hash without changing these predecessor descriptors.
 
 The important structural recovery is `FadeIn`: naming the repeated `0x3f - level` value as an
 explicit `int threshold` changes MSVC 4.2's allocation and reassociation to retail, raising the
@@ -37,6 +38,37 @@ changing only the append and a value-neutral size alias moves later functions su
 canonical high-scoring append was restored. Future work should start with exact-preserving
 predecessor/TU-state variants and the recorded pins, not replay these local synonyms. No regex
 permuter was used; the listed relational and SIB forms were manually audited as value-preserving.
+
+## BASE/Misc game-default, registry, and CD structural pass
+
+`misc-game-registry-cd-a45e64f.tsv` records the source-order pass from `SetGameDefaults` through
+`SetupCDDrive` on checkpoint `a45e64f`. Descriptor hashes are SHA-256 of the exact
+`scope:variant` strings, so rejected temporary spellings remain searchable even though their
+whole-file states were not retained. The retained `Misc.cpp` SHA-256 is
+`38f67aa8d1b6e870596d67d5a2cb1322c1100b1f17ee8933422d6cf9302b29b0`; the matrix SHA-256 is
+`4ef70591756b09513cf0aae0109b0843c9b8f7bcdf28eb76d8622a8e81780d2c`.
+
+The two registry functions were not relocation-only walls. Raw prologues exposed undersized
+`szScratch[88]` locals: base reserved `0xc8`/`0xc0` bytes while retail reserved `0xd4`/`0xcc`.
+Recovering the real 100-byte buffers makes `ReadPrefsFromRegistry` and
+`WritePrefsToRegistry` exact. Their relocation counts are respectively 126/126 and 90/90; the
+read helper still displays five `gConfig` member addresses under different delinked retail owners,
+but no external target or code byte differs.
+
+`SetupCDDrive` similarly disproved its old raw-identical claim. Widening the real local lifetimes
+first recovered the `0x2f0` frame and raised the live score from 99.47% to 99.94%. Declaration
+order and local-name spelling did not affect optimized allocation. The decisive source shape was
+an explicit retry-loop scope around the 256-byte character result buffer and 256-byte command
+buffer. That permits VC4.2 to reuse the finished drive-count slot and places the buffers at retail
+offsets `+0x38`, `+0x138`, `+0x19c`, and `+0x29c`. All `0x3ed` code bytes and 51/51 relocation
+targets are exact; the three following retail NOPs are alignment outside the function symbol.
+
+`SetGameDefaults` remains a structural `@match-note`, not a certified wall. Its source writes the
+same two graphics records and has the same CFG/calls, but base induces from the record start while
+retail induces from `fullScreen`. The matrix lists every rejected local loop/anchor spelling.
+Resume only from a new exact-preserving predecessor or shared-header TU state; do not replay the
+local variants. Neither permuter was used: the function is only 90.21% and is not structurally
+aligned enough for the audited AST last-mile tool, while the regex permuter remains prohibited.
 
 ## BASE/Icon2b adjacent-decoder setup transfer
 

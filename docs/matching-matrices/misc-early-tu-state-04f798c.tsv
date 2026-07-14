@@ -19,3 +19,4 @@ f5d10098c714ffa2ada97f9c472fadc1a5d34c203ee6bc6bf89a3bec7aae46e3	FindStringInStr
 46f50b6e5b221f437c08c2658797a6c025bc71f2b5e491842f5c91e20de1e9d2	FindStringInString	0[&count] comparison load	FindString=98.20	compare unchanged	REJECT_NO_GAIN
 f042d9460cdaf81b361d442d1748d1f4486d4ece31b5f8785f6aa6516decc567	FindToken	0[&len] comparison load	FindToken=97.59	compare unchanged	REJECT_NO_GAIN
 395725488e30f4310dff9db2474b438b995f0b59ba377aa523a3efda2bafac93	FindToken	len > (i|0)	FindToken=97.59	compare unchanged	REJECT_NO_GAIN
+94848d4ff9713873c34142452c4be901bdcfbed33c1f334686401541370f0b36	FindLastToken	i[text] load and &i[text] return; whole-file SHA 13436d7f93cf0af276125533bdd6a966e9a870b2a41762f49d7596fb5a758d05	FindLastToken=99.13	two SIB base/index encodings unchanged; zero relocations	REJECT_NO_GAIN_AFTER_A45E64F_REBASE

@@ -470,17 +470,20 @@ void SetInstallDefaults(void)
     gConfig.soundQuality = 1;
 }
 
-// @early-stop
-// /O2 induction/register wall: base COMDAT .text is 0x1b9 bytes versus retail 0x1b5.
-// At +0x03..+0x68 base induces from exeGfxConfig start and uses positive offsets;
-// retail +0x03..+0x6c induces from `fullScreen` and uses -0x14..+4, while writing the
-// same two records/fields and constants. The later four-byte skew is scheduling only
-// (notably default-name setup at base +0xd2..+0x123 versus retail +0xd4..+0x147);
-// all four rand and three KBTickCount calls match. Relocations resolve to the same
-// gConfig field VAs despite delinked const/string labels (`homm2 relocs`: base 43,
-// retail 42; helper-only 0x128d3c/0x128d74/0x128dca are respectively the loop anchor
-// and direct fields visible under retail's const labels). Indexed/pointer loops, field
-// orders, <641/>640/<=640 branches, and split/combined random-tick expressions tried.
+// @match-note
+// Structurally complete /O2 checkpoint: base has no stack frame and preserves EBX/ESI/EDI,
+// matching retail. Its 0x1b9-byte COMDAT differs from retail's 0x1b5-byte code symbol.
+// The first real divergence is +0x03: base anchors EAX at gConfig.gfx[0] (+0x1c), then
+// stores at +0x00..+0x10; retail anchors EAX at fullScreen (+0x30), preloads video width
+// into EBX, and uses -0x14..+0x04. The two-iteration loop CFG, every field value, four
+// rand calls, three KBTickCount calls, and external relocation targets are accounted for.
+// `homm2 relocs` reports 43/42 and only helper-side gConfig member aliases at 0x128d3c,
+// 0x128d74, and 0x128dca; retail delinks those addresses under const/string owners.
+// Exhausted: pointer and indexed loops, gfx-index plus alias, fullScreen-first stores,
+// an int reference to fullScreen, direct indexed fields, dual gfx/fullScreen induction,
+// field-order variants, all three 640 comparisons, and split/combined random-tick sums.
+// Revisit only after a new exact-preserving predecessor/shared-header TU state exists;
+// this 90.21% register/induction residual is not eligible for AST permutation yet.
 VA(0x004c49a0, 0x1b5)
 void SetGameDefaults(void)
 {
@@ -572,14 +575,6 @@ skipDefaults:
 #define REG_UNIQUE_SYSTEM_ID_SIZE    4      // 4 bytes
 #define REG_NETWORK_DEFAULT_NAME_SIZE 0x1e  // 30 bytes
 
-// @early-stop
-// Relocation/delink identity only: base and retail are both 0x7ab bytes and the
-// relocation-masked instruction stream is identical. Both have 126 relocations;
-// the five `homm2 relocs` exceptions are gConfig members at retail RVA
-// 0x128d20 (two uses), 0x128e10, 0x128e30 and 0x128e60, delinked as anonymous
-// `const_`/string-owner labels. The other displayed spans are empty-string local
-// labels and raw IAT operands. Direct member, array-index and named-local shapes
-// were checked; changing them only changes delink ownership, not bytes.
 VA(0x004c4ca0, 0x7ab)
 void ReadPrefsFromRegistry(void)
 {
@@ -587,7 +582,7 @@ void ReadPrefsFromRegistry(void)
     unsigned long dwType;
     unsigned long dwSize;
     char szKey[100];
-    char szScratch[88];
+    char szScratch[100];
 
     strcpy(szScratch, "");
     strcpy(szKey, "SOFTWARE\\New World Computing\\Heroes of Might and Magic 2\\1.0");
@@ -709,18 +704,12 @@ void WritePrefsToFile(void)
     }
 }
 
-// @early-stop
-// Relocation/delink identity only: base and retail are both 0x491 bytes with an
-// identical relocation-masked instruction stream and 90/90 matching relocation
-// targets. The diff consists solely of gConfig member labels, three raw registry
-// IAT operands, and the empty-string local label. Direct field and indexed-field
-// spellings were checked; they preserve bytes and only rename delinked owners.
 VA(0x004c5570, 0x491)
 void WritePrefsToRegistry(void)
 {
     HKEY hKey;
     char szKey[100];
-    char szScratch[88];
+    char szScratch[100];
 
     strcpy(szScratch, "");
     strcpy(szKey, "SOFTWARE\\New World Computing\\Heroes of Might and Magic 2\\1.0");
@@ -789,16 +778,16 @@ int IsCDDrive(int param_1)
     return GetDriveTypeA(gText) == DRIVE_CDROM;
 }
 
-// @early-stop
-// reloc-masked: base COMDAT .text is 0x3fc including tail padding versus the retail
-// 0x3ed code symbol; every instruction within the retail span is identical. Only
-// +0x16a..+0x16d names the same
-// `gText + 2` operand as `const_0012899a` in the delinked retail object. Retail's raw
-// IAT operands also lack several import relocation names; the audit pairs all 51/51
-// relocations with only-base=0 and every call opcode/target slot is unchanged.
 VA(0x004c5a60, 0x3ed)
 int SetupCDDrive(void)
 {
+    unsigned char registryPath[100];
+    char registryKey[100];
+    char cdDrives[26];
+    char count;
+    int attempts;
+    HKEY key;
+
     sprintf(gText, ".\\DATA\\HEROES2.AGG");
     int file = _open(gText, 0x8000);
     if (file == -1) {
@@ -812,7 +801,6 @@ int SetupCDDrive(void)
 
     unsigned long logicalDrives = GetLogicalDrives();
     int cdDriveCount = 0;
-    char cdDrives[26];
     memset(cdDrives, 0, sizeof(cdDrives));
     for (int drive = 2; drive < 26; ++drive) {
         if (logicalDrives & (1 << drive)) {
@@ -824,7 +812,7 @@ int SetupCDDrive(void)
             }
         }
     }
-    char count = static_cast<char>(cdDriveCount);
+    count = static_cast<char>(cdDriveCount);
 
     if (strlen(gcRegCDRomPath) != 0) {
         sprintf(gText, "%s\\heroes2\\anim\\voy24.smk", gcRegCDRomPath);
@@ -837,44 +825,44 @@ int SetupCDDrive(void)
         }
     }
 
-    int attempts = 0;
-    int resultBuffer[64];
-    char command[256];
-    for (;;) {
-        for (int index = 0; index < count; ++index) {
-            wsprintfA(command, "open %c: type cdaudio alias CD", cdDrives[index] + 'A');
-            if (mciSendStringA(command, reinterpret_cast<char *>(resultBuffer), 0xff, 0) == 0) {
-                wsprintfA(command, "info CD UPC wait");
-                mciSendStringA(command, reinterpret_cast<char *>(resultBuffer), 0xff, 0);
-                wsprintfA(command, "close CD");
-                mciSendStringA(command, reinterpret_cast<char *>(resultBuffer), 0xff, 0);
-            }
-            sprintf(gText, "%c:\\heroes2\\anim\\voy24.smk", cdDrives[index] + 'A');
-            file = _open(gText, 0x8000);
-            if (file != -1) {
-                if (_lseek(file, 0, 2) != -1 && _lseek(file, -100, 1) != -1)
-                    _read(file, resultBuffer, 100);
-                _close(file);
-
-                char registryKey[100];
-                strcpy(registryKey, "SOFTWARE\\New World Computing\\Heroes of Might and Magic 2\\1.0");
-                HKEY key = 0;
-                if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, registryKey, 0, 0x20006, &key) == 0) {
-                    unsigned char registryPath[100];
-                    wsprintfA(reinterpret_cast<char *>(registryPath), "%c:", cdDrives[index] + 'A');
-                    RegSetValueExA(key, "CDDrive", 0, REG_SZ, registryPath,
-                                   lstrlenA(reinterpret_cast<char *>(registryPath)) + 1);
-                    RegCloseKey(key);
+    attempts = 0;
+    {
+        char resultBuffer[256];
+        char command[256];
+        for (;;) {
+            for (int index = 0; index < count; ++index) {
+                wsprintfA(command, "open %c: type cdaudio alias CD", cdDrives[index] + 'A');
+                if (mciSendStringA(command, resultBuffer, 0xff, 0) == 0) {
+                    wsprintfA(command, "info CD UPC wait");
+                    mciSendStringA(command, resultBuffer, 0xff, 0);
+                    wsprintfA(command, "close CD");
+                    mciSendStringA(command, resultBuffer, 0xff, 0);
                 }
-                sprintf(gText, "%c:%s", cdDrives[index] + 'A', gcAnimPath);
-                strcpy(gcAnimPath, gText);
-                return 0;
+                sprintf(gText, "%c:\\heroes2\\anim\\voy24.smk", cdDrives[index] + 'A');
+                file = _open(gText, 0x8000);
+                if (file != -1) {
+                    if (_lseek(file, 0, 2) != -1 && _lseek(file, -100, 1) != -1)
+                        _read(file, resultBuffer, 100);
+                    _close(file);
+
+                    strcpy(registryKey, "SOFTWARE\\New World Computing\\Heroes of Might and Magic 2\\1.0");
+                    key = 0;
+                    if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, registryKey, 0, 0x20006, &key) == 0) {
+                        wsprintfA(reinterpret_cast<char *>(registryPath), "%c:", cdDrives[index] + 'A');
+                        RegSetValueExA(key, "CDDrive", 0, REG_SZ, registryPath,
+                                       lstrlenA(reinterpret_cast<char *>(registryPath)) + 1);
+                        RegCloseKey(key);
+                    }
+                    sprintf(gText, "%c:%s", cdDrives[index] + 'A', gcAnimPath);
+                    strcpy(gcAnimPath, gText);
+                    return 0;
+                }
             }
+            Sleep(3000);
+            ++attempts;
+            if (attempts >= 2)
+                return 2;
         }
-        Sleep(3000);
-        ++attempts;
-        if (attempts >= 2)
-            return 2;
     }
 }
 
