@@ -215,7 +215,7 @@ BASE/Misc	?BaseAlloc@@YIPAXIPADH@Z	95.7297	997dad815967
 BASE/Misc	?BaseFree@@YIXPAXPADH@Z	94.0482	0c92a40993f0
 BASE/Misc	?BitmapToScreen@@YIXPAVbitmap@@@Z	100.0000	ddaa22cc3922
 BASE/Misc	?BlitBitmapToScreen@@YIXPAVbitmap@@HHHHHH@Z	98.3704	9272c84ef61d
-BASE/Misc	?BlitBitmapToScreenNoMouseCheck@@YIXPAVbitmap@@HHHHHH@Z	100.0000	cde3401808ca
+BASE/Misc	?BlitBitmapToScreenNoMouseCheck@@YIXPAVbitmap@@HHHHHH@Z	100.0000	fa3de515b4e5
 BASE/Misc	?CreatePCXFile@@YIXPADPAEHH1@Z	98.3108	ad9fafdf0921
 BASE/Misc	?DataEntryWindowHandler@@YIHAAUtag_message@@@Z	93.7963	58c0fcb07e6e
 BASE/Misc	?FadeIn@@YIXH@Z	97.4074	f79b9f04de07
@@ -378,7 +378,7 @@ BASE/droplist	?ProcessSelectDialog@dropListWidget@@QAEXXZ	99.3675	850bfb90269e
 BASE/droplist	?Read@dropListWidget@@QAEXXZ	100.0000	3e0df002aca4
 BASE/droplist	?RestoreDropBackground@dropListWidget@@QAEXXZ	100.0000	fdd690daaab3
 BASE/droplist	?SaveDropBackground@dropListWidget@@QAEXXZ	100.0000	b3d5c9e1b5dd
-BASE/icon2bc	?IconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAEH@Z	78.9507	4190d100d053
+BASE/icon2bc	?IconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAEH@Z	80.5845	8474381a8e68
 BASE/icon2bs	?IconToBitmapScale@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	76.3262	4258b941508c
 BASE/icon2by	?IconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	95.7995	a997dc7283d5
 BASE/iconf2bc	?FlipIconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAE@Z	85.9925	e317199baec9
