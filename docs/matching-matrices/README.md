@@ -80,17 +80,18 @@ hashes while the source and header state agree. The regex permuter was never use
 
 ## BASE/iconf2by manual reconstruction
 
-`iconf2by-manual.tsv` contains 97 full-SHA manual source states spanning the 85.72% through
-90.402145% reconstruction. Each row records the source hash, source-shape label, match, candidate
+`iconf2by-manual.tsv` contains 113 full-SHA manual source states spanning the 85.72% through
+93.72654% reconstruction. Each row records the source hash, source-shape label, match, candidate
 size/frame, relocation counts, and disposition. Its SHA-256 is
-`11f9a8fb338ed3bf64dac40457995d9a75cb53e9c9ab8b89784a5f7e284bcddb`.
+`6eff06a7967f2b24097ed69d8638dfedda7562cb9366498f607496dcb80466b7`.
 
 The current source is restored to
-`d20712c2e1e836a2161ff93a7ed7db51bc04e2257aeb3ec2a1d03e0880ab4578`. The first normalized
+`f33ab84fe5e3b9205e40ae09de314bced82063fe587bddee30646c73d44bfea0`. The first normalized
 register divergence is in the prologue: candidate `+0x5c` loads `shear` into EBP, while retail
 loads it into ESI and then loads `clipW` into EBP at `+0x60`. The later missing `gFYClipR` reload is
-downstream of that lifetime choice. The retained branch-local fill snapshot moves the fill
-`gFYRun` load after the vertical checks, matching retail's source lifetime. CodeView has no symbol
+now recovered by the retained first-use scratch declaration order with `gFYClipR` last. That order
+raises the match to 93.72654%; the branch-local fill snapshot keeps the fill `gFYRun` load after
+the vertical checks, matching retail's source lifetime. CodeView has no symbol
 subsection for this TU, so neither stack-local nor optimized-register names exist; the matrix—not
 guessed local names—is the no-repeat oracle. No permutation tool was used.
 

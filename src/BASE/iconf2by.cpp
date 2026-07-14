@@ -10,24 +10,24 @@
 #include <BASE/IconEntry.h>
 #include <string.h>
 // Per-call decoder scratch — its own file-static block.
-static int gFYXEnd;
-static unsigned char *gFYDimPal;
-static int gFYX0;
-static unsigned int gFYDimLen2;
 static IconEntry *gFYEntry;
-static unsigned char *gFYDst;
-static int gFYX;
-static int gFYSkip;
 static unsigned char *gFYSrc;
-static unsigned char gFYColor;
-static int gFYDimLen;
+static int gFYX0;
+static int gFYXEnd;
+static int gFYY;
+static int gFYX;
 static int gFYClipB;
-static int gFYDimIdx;
-static int gFYClipR;
 static int gFYRow;
 static int gFYRun;
-static int gFYY;
+static unsigned char gFYColor;
+static int gFYDimLen;
+static unsigned int gFYDimLen2;
+static unsigned char *gFYDimPal;
+static int gFYDimIdx;
 static unsigned char *gFYDimDst;
+static unsigned char *gFYDst;
+static int gFYSkip;
+static int gFYClipR;
 
 VA(0x004d9ce0, 0x58d)
 void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
