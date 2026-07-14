@@ -518,7 +518,7 @@ Shear-lifetime axes after `11424f1`:
   right destination (`66ca2813`), `register` setup value (`f51119a9`), and split setup-value
   declaration/assignment (`33b353d4`): byte-identical to 89.47721%.
 
-The authoritative full-SHA no-repeat set for all 113 recovered manual states is
+The authoritative full-SHA no-repeat set for the recovered manual states is
 [`docs/matching-matrices/iconf2by-manual.tsv`](matching-matrices/iconf2by-manual.tsv). Later
 right-block pointer/reference/local spellings were byte-identical or regressed; do not repeat them.
 The earliest normalized divergence is the prologue register choice: candidate loads `shear` into
@@ -590,6 +590,34 @@ Count-storage and scratch declaration-order axes after lane base `f220572`:
   reverted, but this confirms why predecessor/TU-state retests must use whole-source hashes;
 - use a `const int &` clip-width lifetime under the retained order: 92.68096%, size `0x58c`,
   144/144; reverted.
+
+Combined setup, type, and header-state axes after integrated root `4d381e1`:
+
+- publish clip-right before clip-bottom, either directly or through named edge temporaries, and
+  transfer the sibling's complete direct-shear/direct-width setup: 92.544235%, size `0x58c`,
+  frame four, 144/144; all reverted. These shapes recover retail's edge-store order but do not
+  move `shear` out of EBP, so their later allocation is worse overall;
+- direct initial shear, a `register` clip-width local, a precomputed clip-right spanning initial
+  shear, `IconEntry` before `X_GLOBAL`, `const`/`unsigned long` fill counts, `register` or
+  top-level-`const` clip-width formals, direct uses of a `register` formal, and commuted
+  `gFYY[shear]` subscripts: each byte-identical to 93.72654%, size `0x58c`, frame four, 144/144;
+  reverted;
+- restore the owner header, or replace the narrow `IconEntry` header with `Misc`: each 84.28954%,
+  size `0x56b`, frame four, 141/144; reverted. This proves the current narrow declaration surface
+  must remain pinned;
+- make the global run scratch unsigned under the retained order: 89.83914%, size `0x56d`, no
+  frame, 141/144; reverted;
+- use a non-const reference for clip width: 92.68096%, size `0x58c`, frame four, 144/144; reverted;
+- spell the shear formal as an array: VC4.2 changes the emitted symbol instead of applying the
+  standard adjusted-pointer signature expected here, so objdiff cannot claim the CodeView symbol;
+  reverted.
+
+The full no-repeat set now contains 131 source-hash-distinct states. This combined-state batch
+confirms that the retained declaration surface and scratch order are stable: the isolated
+lifetime/type spellings are either byte-neutral, while retail-order edge publication still leaves
+the same EBP shear allocation, or they regress code size/relocations. Do not combine these axes
+again unless an independently retained predecessor or shared-header change produces a new
+canonical TU state.
 
 The retained order is not a random permutation: it declares the decoder scratches in first-use
 order, with `gFYClipR` last as in the adjacent sibling's declaration surface. It closes the sole
