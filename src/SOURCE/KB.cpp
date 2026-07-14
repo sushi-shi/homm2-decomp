@@ -4599,7 +4599,7 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[66];
 DATA(0x004fb568) float gfStatPower[42];
 DATA(0x004fb610) float gfBattleStat[42];
 DATA(0x004fb6b8) signed char gSpellLimits[5];
-DATA(0x004fb6c0) float *gfSpellCastableCombatMod;
+DATA(0x004fb6c0) float gfSpellCastableCombatMod[12];
 DATA(0x004fb6f0) float gfSpellCastNumMod[12];
 DATA(0x004fb720) float gfPhilAISpellPowerMod[12];
 DATA(0x004fb750) float gfPhilAIDurationMod[12];
