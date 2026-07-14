@@ -65,6 +65,11 @@ DATA(0x00534ce8) static unsigned int gCTRun;
 // destination state. The frame view alone recovers EBX=13*frame, and the enum states can recover
 // all 91 occurrences, but none produces retail's ECX/EAX/EDX/EBX decoder allocation; the inline
 // command object also reverses the command-body layout. Do not wrap only the byte reader again.
+// A fresh owner-header context pass at a0a8646 transferred only the real Icon2b/iconf2bc include
+// surfaces and existing blitter declaration headers. Direct IconEntry plus broad X_GLOBAL without
+// Misc is byte-identical to this checkpoint; _globals_model, Misc, one/two sibling declarations,
+// and declarations placed after the scratch block all regress. See icon2bc-header-context-a0a8646.
+// No source body or predicate was changed; this is still unresolved and not a wall.
 VA(0x004d32a0, 0x5af)
 void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                             int clip, int clipX, int clipY, int clipW, int clipH, int color,
