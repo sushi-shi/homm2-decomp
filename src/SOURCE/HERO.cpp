@@ -6,6 +6,7 @@
 #include <va.h>
 #include <io.h>
 #include <stdio.h>
+#include <string.h>
 #include <_types.h>
 #include <_carcass_types.h>
 #include <BASE/heroWindow.h>
@@ -577,11 +578,190 @@ void hero::ApplyBattleLossTemps(void) {
     ApplyBattleWinTemps();
 }
 
+// @match-note 99.52%: semantics, CFG, the 0x118 frame, line/statBonuses/newLevel/
+// levelsGained/currentLevel/sample/index/highLevel/skillChoices/attempts/skillIndex/
+// skillWeight/randomValue slots at -0xc8/-0xd8/-0xdc/-0xe0/-0xe4/-0xec..-0xe8/
+// -0xf0/-0xf4/-0xfc..-0xf8/-0x100/-0x104/-0x108/-0x10c, and all 58/58
+// relocation targets agree. First code divergence is +0x4be: retail adds a five-byte
+// jump through its local trampoline at +0x81e, which adds the second five-byte jump
+// back to the search-loop cleanup; base jumps directly to cleanup. Function sizes differ
+// by exactly those 10 bytes and every non-jump opcode, operand, and visible stack offset
+// agrees. Empty-positive/else outer flow, branch polarity, regular `break`, indexed Wisdom
+// assignment, real table typing, and computed stack-name/declaration order were tried.
+// Revisit at SOURCE 95% for the residual local-label/trampoline source shape.
 VA(0x0046d83f, 0x828)
-void hero::CheckLevel(void) {}
+void hero::CheckLevel(void) {
+    int statBonuses[HERO_PRIMARY_STAT_COUNT];
+    char line[HERO_LEVEL_TEXT_BUFFER_SIZE];
+    int levelsGained;
+    int newLevel;
+    int attempts;
+    int skillChoicesResult[HERO_SECONDARY_SKILL_CHOICE_COUNT];
+    int highLevelIndex;
+    int indexValue;
+    SAMPLE2 sampleValue;
+    int currentLevelIndex;
+    int skillIndexValue;
+    int randomValue;
+    int skillWeightIndex;
+
+    newLevel = GetLevel(m_experience);
+    if (m_level == newLevel) {
+    } else {
+        sampleValue = NULL_SAMPLE2;
+        levelsGained = newLevel - m_level;
+        for (currentLevelIndex = m_level + 1; currentLevelIndex <= newLevel;
+             currentLevelIndex++) {
+            sprintf(gText, cHeroLevel[0], m_name);
+            sprintf(line, cHeroLevel[1]);
+            strcat(gText, line);
+
+            statBonuses[HERO_PRIMARY_ATTACK] = 0;
+            statBonuses[HERO_PRIMARY_DEFENSE] = 0;
+            statBonuses[HERO_PRIMARY_SPELL_POWER] = 0;
+            statBonuses[HERO_PRIMARY_KNOWLEDGE] = 0;
+            if (currentLevelIndex <= HERO_LEVEL_HIGH_THRESHOLD)
+                highLevelIndex = 0;
+            else
+                highLevelIndex = 1;
+
+            SRand(m_randomSeed + currentLevelIndex * HERO_LEVEL_RANDOM_SEED_FACTOR);
+            randomValue = SRandom(1, HERO_LEVEL_RANDOM_MAX);
+            if (randomValue <
+                gHeroSkillBonus[m_cursorType][highLevelIndex][HERO_PRIMARY_ATTACK]) {
+                statBonuses[HERO_PRIMARY_ATTACK]++;
+            } else {
+                randomValue -=
+                    gHeroSkillBonus[m_cursorType][highLevelIndex][HERO_PRIMARY_ATTACK];
+                if (randomValue <
+                    gHeroSkillBonus[m_cursorType][highLevelIndex][HERO_PRIMARY_DEFENSE]) {
+                    statBonuses[HERO_PRIMARY_DEFENSE]++;
+                } else {
+                    randomValue -=
+                        gHeroSkillBonus[m_cursorType][highLevelIndex][HERO_PRIMARY_DEFENSE];
+                    if (randomValue <
+                        gHeroSkillBonus[m_cursorType][highLevelIndex]
+                                       [HERO_PRIMARY_SPELL_POWER]) {
+                        statBonuses[HERO_PRIMARY_SPELL_POWER]++;
+                    } else {
+                        statBonuses[HERO_PRIMARY_KNOWLEDGE]++;
+                    }
+                }
+            }
+
+            for (indexValue = 0; indexValue < HERO_PRIMARY_STAT_COUNT; indexValue++) {
+                if (statBonuses[indexValue] > 0) {
+                    m_primaryStats[indexValue] =
+                        m_primaryStats[indexValue] + statBonuses[indexValue];
+                    sprintf(line, "\n%s +%d", gStatNames[indexValue], statBonuses[indexValue]);
+                    strcat(gText, line);
+                }
+            }
+
+            for (indexValue = 0; indexValue < HERO_SECONDARY_SKILL_CHOICE_COUNT;
+                 indexValue++) {
+                skillChoicesResult[indexValue] = HERO_SECONDARY_SKILL_NONE;
+                if (indexValue == 0 && m_cursorType != HERO_CLASS_BARBARIAN &&
+                    m_cursorType != HERO_CLASS_KNIGHT &&
+                    m_secondarySkills[HERO_SKILL_WISDOM] < HERO_SKILL_LEVEL_EXPERT &&
+                    currentLevelIndex - m_enabled >= HERO_SECONDARY_SKILL_OFFER_GAP) {
+                    skillChoicesResult[indexValue] = HERO_SKILL_WISDOM;
+                } else {
+                    attempts = 0;
+                    skillWeightIndex = Random(0, HERO_SECONDARY_SKILL_RANDOM_WEIGHT);
+                    skillIndexValue = 0;
+                    while (attempts < HERO_SECONDARY_SKILL_SEARCH_LIMIT) {
+                        attempts++;
+                        if ((indexValue == 0 || skillChoicesResult[0] != skillIndexValue) &&
+                            ((m_secondarySkills[skillIndexValue] != HERO_SKILL_LEVEL_NONE &&
+                                 m_secondarySkills[skillIndexValue] <
+                                     HERO_SKILL_LEVEL_EXPERT) ||
+                                (m_secondarySkills[skillIndexValue] == HERO_SKILL_LEVEL_NONE &&
+                                    m_secondarySkillCount < HERO_SECONDARY_SKILL_CAPACITY))) {
+                            skillWeightIndex -=
+                                iGetSSByAlignment[skillIndexValue][m_cursorType];
+                            if (skillWeightIndex <= 0) {
+                                skillChoicesResult[indexValue] = skillIndexValue;
+                                break;
+                            }
+                        }
+                        skillIndexValue = (skillIndexValue + 1) % HERO_SKILL_COUNT;
+                    }
+                    attempts--;
+                }
+            }
+
+            if (skillChoicesResult[0] == HERO_SKILL_WISDOM ||
+                skillChoicesResult[1] == HERO_SKILL_WISDOM) {
+                m_enabled = static_cast<unsigned char>(currentLevelIndex);
+            }
+
+            if (!gbInNewGameSetup && m_owner >= 0 && gbThisNetHumanPlayer[m_owner]) {
+                sampleValue = LoadPlaySample(const_cast<char *>("nwherolv.82m"));
+                if (skillChoicesResult[0] == HERO_SECONDARY_SKILL_NONE) {
+                    NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                } else if (skillChoicesResult[1] == HERO_SECONDARY_SKILL_NONE) {
+                    sprintf(line, "\n\nYou have learned %s %s.",
+                        gSecondarySkillLevels[m_secondarySkills[skillChoicesResult[0]]],
+                        gSecondarySkills[skillChoicesResult[0]]);
+                    strcat(gText, line);
+                    NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1,
+                        NORMAL_DIALOG_SECONDARY_SKILL,
+                        m_secondarySkills[skillChoicesResult[0]] +
+                            skillChoicesResult[0] * HERO_SECONDARY_SKILL_ICON_STRIDE,
+                        -1, 0, -1, 0);
+                    GiveSS(skillChoicesResult[0], 1);
+                } else {
+                    sprintf(line, "\n\nYou may learn either %s %s or %s %s.",
+                        gSecondarySkillLevels[m_secondarySkills[skillChoicesResult[0]]],
+                        gSecondarySkills[skillChoicesResult[0]],
+                        gSecondarySkillLevels[m_secondarySkills[skillChoicesResult[1]]],
+                        gSecondarySkills[skillChoicesResult[1]]);
+                    strcat(gText, line);
+                    NormalDialog(gText, NORMAL_DIALOG_DISABLE_SEVENTH, -1, -1,
+                        NORMAL_DIALOG_SECONDARY_SKILL,
+                        m_secondarySkills[skillChoicesResult[0]] +
+                            skillChoicesResult[0] * HERO_SECONDARY_SKILL_ICON_STRIDE,
+                        NORMAL_DIALOG_SECONDARY_SKILL,
+                        m_secondarySkills[skillChoicesResult[1]] +
+                            skillChoicesResult[1] * HERO_SECONDARY_SKILL_ICON_STRIDE,
+                        -1, 0);
+                    if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_SEVEN)
+                        GiveSS(skillChoicesResult[0], 1);
+                    else
+                        GiveSS(skillChoicesResult[1], 1);
+                }
+            } else {
+                if (skillChoicesResult[0] != HERO_SECONDARY_SKILL_NONE) {
+                    if (skillChoicesResult[1] != HERO_SECONDARY_SKILL_NONE) {
+                        if (gSSValues[skillChoicesResult[1]][0] <
+                            gSSValues[skillChoicesResult[0]][0]) {
+                            GiveSS(skillChoicesResult[0], 1);
+                        } else {
+                            GiveSS(skillChoicesResult[1], 1);
+                        }
+                    } else {
+                        GiveSS(skillChoicesResult[0], 1);
+                    }
+                }
+            }
+        }
+        m_level = static_cast<short>(newLevel);
+        WaitEndSample(sampleValue, -1);
+    }
+}
 
 VA(0x0046e067, 0x57)
-int hero::NumArtifacts(void) { return 0; }
+int hero::NumArtifacts(void) {
+    int cnt = 0;
+    int i;
+
+    for (i = 0; i < HERO_ARTIFACT_SLOT_COUNT; i++) {
+        if (m_artifacts[i] >= 0)
+            cnt++;
+    }
+    return cnt;
+}
 
 VA(0x0046e0be, 0x758)
 void UpdateHeroScreenStatusBar(struct tag_message &) {}
