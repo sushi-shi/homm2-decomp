@@ -601,7 +601,8 @@ void game::InitNewGameWindow(void)
     }
 }
 
-// @early-stop: the full instruction stream and all 50 relocation sites match.
+// @early-stop
+// The full instruction stream and all 50 relocation sites match.
 // Objdiff's residual is only string/local-constant relocation identity.
 VA(0x004b88d6, 0x59c)
 void game::UpdateNewGameWindow(void)
@@ -738,7 +739,8 @@ void game::UpdateNewGameWindow(void)
     DrawNGKPDisplayString(0);
 }
 
-// @early-stop: after excluding retail switch data [0x21fe,0x2242) and
+// @early-stop
+// After excluding retail switch data [0x21fe,0x2242) and
 // [0x2d11,0x2d8d), and base switch data [0x21c8,0x220c) and
 // [0x2cf3,0x2d73), the base has eight extra five-byte continuation jumps. Its
 // equivalent race increment load order saves one byte, and its second local

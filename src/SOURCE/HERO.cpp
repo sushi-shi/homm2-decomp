@@ -178,7 +178,8 @@ int hero::GetNthSpell(int type, int spellNumber) {
     return HERO_SPELL_NONE;
 }
 
-// @early-stop: all 0xd0 bytes match after masking the two aligned COFF relocations.
+// @early-stop
+// All 0xd0 bytes match after masking the two aligned COFF relocations.
 // Both relocation targets agree; retail delinks gsSpellInfo[0].m_e as the interior
 // label const_000fbe8d while the typed source uses gsSpellInfo with addend 0x15.
 VA(0x0046c931, 0xd0)

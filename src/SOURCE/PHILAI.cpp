@@ -4141,7 +4141,8 @@ int philAI::ComputeUpgradeValue(int a1, int a2) {
     return result;
 }
 
-// @early-stop: all 0x271 bytes match after masking 34 aligned COFF relocations.
+// @early-stop
+// All 0x271 bytes match after masking 34 aligned COFF relocations.
 // Objdiff's residual is symbol identity: table/field addends and compiler constant
 // pools resolve to the retail addresses, while jump-table labels delink as this function.
 VA(0x00443c54, 0x271)
@@ -4226,7 +4227,8 @@ int philAI::ManaRefreshValue(hero *h, int level) {
     return v;
 }
 
-// @early-stop: exact 0x1ac5 size and relocation layout. The only relocation-masked
+// @early-stop
+// Exact 0x1ac5 size and relocation layout. The only relocation-masked
 // byte difference is +0x34d: SIB 0x01 versus retail 0x08. Both encode the same
 // scale-1 address, EAX + ECX + 0x634c; field, pointer-first, integer-first, and
 // byte-neutral operand spellings all retain the assembler's equivalent encoding.
@@ -4822,7 +4824,8 @@ creature_purchase:
     return value_h;
 }
 
-// @early-stop: all 0x299 bytes match after masking 33 aligned COFF relocations.
+// @early-stop
+// All 0x299 bytes match after masking 33 aligned COFF relocations.
 // The residual is constant/field symbol identity plus jump-table labels delinked
 // as this function; all external calls and globals agree.
 VA(0x00445a89, 0x299)

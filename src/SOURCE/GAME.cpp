@@ -670,7 +670,8 @@ int game::SaveGame(char *filename, int generateName, signed char expansionFormat
     return 1;
 }
 
-// @early-stop: complete semantics and layout. The typed four-byte primary-stat
+// @early-stop
+// Complete semantics and layout. The typed four-byte primary-stat
 // array requires the adjacent byte at hero+0x43 to be initialized separately;
 // retail's aliasing five-iteration loop accounts for the remaining code shape.
 VA(0x00472a7b, 0xb44)
