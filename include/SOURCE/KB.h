@@ -3,6 +3,7 @@
 #include <va.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/hero.h>
+#include <SOURCE/REMOTE_TYPES.h>
 // Declarations of the free functions DEFINED in KB.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
@@ -144,8 +145,8 @@ extern SCampaignChoice campaignChoices[CAMPAIGN_SIDE_COUNT]
 extern char *cCampaignName[CAMPAIGN_SIDE_COUNT][CAMPAIGN_MAP_COUNT];
 extern char *cCampaignDescription[CAMPAIGN_SIDE_COUNT][CAMPAIGN_MAP_COUNT];
 
-// KB-private record structs (shared ones — tag_message/SAMPLE2/tag_monsterInfo/SSpellInfo/
-// SWinSetup/SNetPlayerInfo — live in _types.h / _carcass_types.h).
+// KB-private record structs (shared ones -- tag_message/SAMPLE2/tag_monsterInfo/SSpellInfo/
+// SWinSetup live in _types.h / _carcass_types.h; SNetPlayerInfo is REMOTE-owned).
 #ifndef HOMM2_GAME_RECORD_TYPES
 #define HOMM2_GAME_RECORD_TYPES
 #pragma pack(push, 1)

@@ -62,7 +62,8 @@
 
 // Types now from headers: game/mouseManager/townManager/town/executive + combatManager/
 // palette/font -> _all.h; tag_message -> _carcass_types.h; SAMPLE2/tag_monsterInfo/SSpellInfo/
-// SWinSetup/SNetPlayerInfo -> _types.h; townSlot/heroRec/SPlayerExit/playerRec -> KB.h.
+// SWinSetup -> _types.h; SNetPlayerInfo -> REMOTE_TYPES.h;
+// townSlot/heroRec/SPlayerExit/playerRec -> KB.h.
 
 #define KBFILE ((char *)"I:\\Projects\\Heroes\\Prog\\SOURCE\\KB.CPP")
 #define KBLINE (*(short *)"\xBE\x0C")
