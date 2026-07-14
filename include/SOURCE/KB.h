@@ -2,6 +2,7 @@
 #define HOMM2_KB_H
 #include <va.h>
 #include <SOURCE/armyGroup.h>
+#include <SOURCE/hero.h>
 // Declarations of the free functions DEFINED in KB.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
@@ -769,6 +770,7 @@ extern int gbAllBlack;
 extern int gbCheatMenus;
 extern int gbClosingApp;
 extern signed char gbCombatSurrender;
+extern signed char captainStats[6][HERO_PRIMARY_STAT_COUNT];
 extern int gbDrawSavedCursor;
 extern int gbForegroundApp;
 extern int gbFunctionComplete;

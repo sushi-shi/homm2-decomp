@@ -7,6 +7,9 @@
 class hero;
 class town;
 
+#define ARMY_GROUP_SLOT_COUNT 5
+#define ARMY_GROUP_EMPTY_SLOT (-1)
+
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class armyGroup {
 public:
@@ -14,13 +17,13 @@ public:
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // NOTE: sparse this-access recovery (few/no this-relative probes).
     union {
-        signed char m_creatureTypes[5];  // +0x00
-        signed char m_troopTypes[5];
+        signed char m_creatureTypes[ARMY_GROUP_SLOT_COUNT];  // +0x00
+        signed char m_troopTypes[ARMY_GROUP_SLOT_COUNT];
     };
     union {
-        short m_creatureCounts[5];       // +0x05
-        unsigned short m_troopCounts[5];
-        signed short m_quantities[5];
+        short m_creatureCounts[ARMY_GROUP_SLOT_COUNT];       // +0x05
+        unsigned short m_troopCounts[ARMY_GROUP_SLOT_COUNT];
+        signed short m_quantities[ARMY_GROUP_SLOT_COUNT];
     };
     // --- constructors ---
     armyGroup(void);

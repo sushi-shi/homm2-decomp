@@ -144,7 +144,6 @@ extern unsigned short towerPos[4][2];
 extern unsigned short doorPos[2][2];
 extern float *fTradingPostEfficency;
 extern struct SElevationOverlay *sElevationOverlay;
-extern signed char captainStats[6][4];
 extern int gbDrawingPuzzle;
 extern int giWalkingFrom;
 extern int giWalkingFrom2;
