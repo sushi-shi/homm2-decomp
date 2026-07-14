@@ -4,6 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -271,7 +272,7 @@ void combatManager::InitNonVisualVars(void)
     m_sideDefeated[COMBAT_ATTACKER_SIDE] = 0;
     m_sideDefeated[COMBAT_DEFENDER_SIDE] = 0;
     m_limitCreature = 1;
-    m_obstacleIcons[8] = 0;
+    m_obstacleCount = 0;
     SetupAdjacencyArray();
     GenerateMap();
     LoadArmies();
@@ -1558,6 +1559,11 @@ foundMissHex:
     LogStr("CA2");
 }
 
+// @match-note: retained/combined-live 99.83%; frame, slots, CFG, and all 44/44
+// relocation targets align. The residual at +0x25d/+0x260/+0x262 is the same
+// equivalent operand-load/reversed-branch class. Relational swaps, De
+// Morgan forms, explicit control flow, volatile intermediates, and the attempted
+// AST mutation did not change it; do not resume local source-shape grinding.
 VA(0x0049412d, 0x74f)
 void combatManager::KeepAttack(int tower)
 {
@@ -1753,38 +1759,684 @@ void combatManager::SaveCombatBorder(void) {}
 VA(0x00494acb, 0x16)
 void combatManager::DrawCombatBorder(void) {}
 
+// @match-note: retained 96.70%, combined live 94.89%; first residual is the
+// 0x60 base frame versus retail 0x58, with shifted slots. CFG first diverges at normalized
+// instruction 161 in the obstacle-loop exits/continues. All 22/22 relocation
+// sites align; member fields use different delinked aliases to the same DATA.
+// Combined while conditions and early continues worsened 96.69% to 89.96%.
+// The table is exactly 0x1c0 bytes (32 * 0xe) before gEstatesGoldLevel; retail
+// SRandom is inclusive and its literal high 32 can index past both 32-entry
+// arrays. Preserve that retail defect; never expand the table or change it to 31.
 VA(0x00494ae1, 0x4d8)
-void combatManager::SetupAndLoadObstacles(void) {}
+void combatManager::SetupAndLoadObstacles(void)
+{
+    m_debugFormation = 0;
+    if (m_inCastleCombat) {
+        m_wallStates[COMBAT_WALL_SLOT_KEEP] = COMBAT_WALL_STATE_KEEP_STANDING;
+        int structureIndex;
+        for (structureIndex = 0;
+             structureIndex < COMBAT_CASTLE_STRUCTURE_COUNT;
+             structureIndex++) {
+            m_wallStates[structureIndex + COMBAT_WALL_SLOT_SECTION_FIRST] =
+                COMBAT_WALL_STATE_KEEP_STANDING;
+            if (m_originalCombatTown->m_type == TOWN_TYPE_KNIGHT &&
+                (m_originalCombatTown->m_buildings & TOWN_BUILDING_TENT)) {
+                m_wallStates[structureIndex + COMBAT_WALL_SLOT_SECTION_FIRST] =
+                    COMBAT_WALL_STATE_SECTION_DAMAGE_FIRST;
+            }
+            m_wallStates[structureIndex] = COMBAT_WALL_STATE_KEEP_STANDING;
+        }
+        if (m_originalCombatTown->m_buildings & TOWN_BUILDING_LEFT_TURRET)
+            m_wallStates[COMBAT_WALL_SLOT_TOP_TOWER] =
+                COMBAT_WALL_STATE_TOWER_STANDING;
+        if (m_originalCombatTown->m_buildings & TOWN_BUILDING_RIGHT_TURRET)
+            m_wallStates[COMBAT_WALL_SLOT_BOTTOM_TOWER] =
+                COMBAT_WALL_STATE_TOWER_STANDING;
 
+        m_hexCells[COMBAT_CASTLE_HEX_TOP_TOWER].m_blocked = 1;
+        m_hexCells[COMBAT_CASTLE_HEX_TOP_WALL].m_blocked = 1;
+        m_hexCells[COMBAT_CASTLE_HEX_SECOND_TOWER].m_blocked = 1;
+        m_hexCells[COMBAT_CASTLE_HEX_SECOND_WALL].m_blocked = 1;
+        m_hexCells[COMBAT_CASTLE_HEX_GATE].m_blocked = 1;
+        m_hexCells[COMBAT_CASTLE_HEX_THIRD_WALL].m_blocked = 1;
+        m_hexCells[COMBAT_CASTLE_HEX_THIRD_TOWER].m_blocked = 1;
+        m_hexCells[COMBAT_CASTLE_HEX_BOTTOM_WALL].m_blocked = 1;
+        m_hexCells[COMBAT_CASTLE_HEX_BOTTOM_TOWER].m_blocked = 1;
+        m_hexCells[COMBAT_CASTLE_HEX_MOAT].m_blocked = 1;
+    } else {
+        int obstacleGoal = SRandom(COMBAT_RANDOM_OBSTACLE_MIN,
+                                   COMBAT_RANDOM_OBSTACLE_MAX);
+        int obstacleCells = 0;
+        unsigned int terrainMask = 1 << m_terrainType;
+        int tryCount = 0;
+        int elevationCells = 0;
+        if (SRandom(0, COMBAT_RANDOM_PERCENT_MAX) <
+            COMBAT_ELEVATION_OVERLAY_CHANCE) {
+            while (tryCount++ < COMBAT_ELEVATION_OVERLAY_TRY_LIMIT) {
+                int overlayIndex =
+                    SRandom(0, COMBAT_ELEVATION_OVERLAY_COUNT - 1);
+                if (terrainMask & sElevationOverlay[overlayIndex].terrainMask) {
+                    m_debugFormation = overlayIndex;
+                    int cellIndex;
+                    for (cellIndex = 0;
+                         cellIndex < COMBAT_ELEVATION_OVERLAY_CELL_COUNT;
+                         cellIndex++) {
+                        if (sElevationOverlay[m_debugFormation]
+                                .cellOffsets[cellIndex] != -1) {
+                            m_hexCells[sElevationOverlay[m_debugFormation]
+                                           .cellOffsets[cellIndex]]
+                                .m_blocked = 1;
+                            elevationCells++;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        obstacleGoal -= elevationCells / 2;
+        tryCount = 0;
+        unsigned char obstacleUsed[COMBAT_OBSTACLE_TYPE_COUNT];
+        memset(obstacleUsed, 0, sizeof(obstacleUsed));
+        while (1) {
+            if (obstacleCells >= obstacleGoal)
+                break;
+            if (tryCount >= COMBAT_OBSTACLE_TRY_LIMIT)
+                break;
+            tryCount++;
+            int anchorHex = SRandom(0, COMBAT_OBSTACLE_CELL_ROLL_MAX);
+            // Retail's inclusive high endpoint permits the out-of-range value 32.
+            int obstacleType =
+                SRandom(0, COMBAT_OBSTACLE_INCLUSIVE_ROLL_HIGH);
+            if ((terrainMask & sCmbtObstacles[obstacleType].terrainMask) &&
+                obstacleUsed[obstacleType] == 0) {
+                int anchorRow = anchorHex / COMBAT_GRID_ROW_LENGTH;
+                if (sCmbtObstacles[obstacleType].minimumColumn <=
+                    anchorRow + COMBAT_OBSTACLE_MIN_COLUMN_OFFSET) {
+                    int blocked = 0;
+                    int cellIndex;
+                    for (cellIndex = 0;
+                         cellIndex < sCmbtObstacles[obstacleType].cellCount;
+                         cellIndex++) {
+                        int obstacleHex =
+                            anchorHex +
+                            sCmbtObstacles[obstacleType].cellOffsets[cellIndex];
+                        if (obstacleHex % COMBAT_GRID_ROW_LENGTH <
+                                COMBAT_OBSTACLE_LEFT_COLUMN_LIMIT ||
+                            obstacleHex % COMBAT_GRID_ROW_LENGTH >
+                                COMBAT_OBSTACLE_RIGHT_COLUMN_FIRST - 1) {
+                            blocked = 1;
+                        }
+                        if (m_hexCells[obstacleHex].m_blocked != 0)
+                            blocked = 1;
+                    }
+                    if (blocked == 0) {
+                        tryCount = 0;
+                        obstacleCells +=
+                            sCmbtObstacles[obstacleType].cellCount;
+                        obstacleUsed[obstacleType] = 1;
+                        for (cellIndex = 0;
+                             cellIndex <
+                                 sCmbtObstacles[obstacleType].cellCount;
+                             cellIndex++) {
+                            m_hexCells[anchorHex +
+                                       sCmbtObstacles[obstacleType]
+                                           .cellOffsets[cellIndex]]
+                                .m_blocked = 1;
+                        }
+                        sprintf(gText, "cobj%04d.icn", obstacleType);
+                        m_obstacleIcons[m_obstacleCount] =
+                            gpResourceManager->GetIcon(gText);
+                        m_hexCells[anchorHex].m_obstacleIndex =
+                            static_cast<signed char>(m_obstacleCount);
+                        m_obstacleCount++;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// @match-note: retained/combined-live 97.18%; frame, slots, CFG, and all 20/20
+// relocation sites align. The first code residual is normalized instruction 134
+// (again at 150), where retail uses sbb and this TU uses equivalent mov/adc/neg.
+// Equality and alternate unsigned spellings regressed to 94.90%; unsigned
+// (facing - 1) < 1 is the high water. Remaining names are delinked gConfig and
+// 150.0f DATA identities; accept the shared-header live regression.
 VA(0x00494fb9, 0x2a1)
-void combatManager::MakeCreaturesVanish(void) {}
+void combatManager::MakeCreaturesVanish(void)
+{
+    ResetLimitCreature();
+    int side;
+    int armyIndex;
+    for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; side++) {
+        for (armyIndex = 0; armyIndex < gpCombatManager->m_armyCount[side];
+             armyIndex++) {
+            if (m_removedArmies[side][armyIndex])
+                m_limitCreatureCount[side][armyIndex] = 1;
+        }
+    }
+    DrawFrame(0, 1, 0, 1, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
+    int extentX = giMinExtentX;
+    int extentY = giMinExtentY;
+    int extentWidth = giMaxExtentX - giMinExtentX + 1;
+    int extentHeight = giMaxExtentY - giMinExtentY + 1;
+    for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; side++) {
+        for (armyIndex = 0; armyIndex < gpCombatManager->m_armyCount[side];
+             armyIndex++) {
+            if (m_removedArmies[side][armyIndex]) {
+                army *removedArmy = &m_armies[side][armyIndex];
+                m_hexCells[removedArmy->m_hex].m_occupantSide = -1;
+                m_hexCells[removedArmy->m_hex].m_occupantIndex = -1;
+                if (removedArmy->m_monster.flags.all & MONSTER_FLAGS_WIDE) {
+                    m_hexCells[((-(static_cast<unsigned int>(
+                                           removedArmy->m_facing - 1) < 1) &
+                                  2) -
+                                 1) +
+                               removedArmy->m_hex]
+                        .m_occupantSide = -1;
+                    m_hexCells[((-(static_cast<unsigned int>(
+                                           removedArmy->m_facing - 1) < 1) &
+                                  2) -
+                                 1) +
+                               removedArmy->m_hex]
+                        .m_occupantIndex = -1;
+                }
+            }
+        }
+    }
+    gpWindowManager->SaveFizzleSource(extentX, extentY, extentWidth,
+                                      extentHeight);
+    gpCombatManager->DrawFrame(0, 0, 1, 0, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
+    gpWindowManager->FizzleForward(
+        extentX, extentY, extentWidth, extentHeight,
+        static_cast<int>(gfCombatSpeedMod[gConfig.combatSpeed] *
+                         COMBAT_CREATURE_VANISH_DURATION),
+        0, 0);
+}
 
 VA(0x0049525a, 0xbd)
-void combatManager::LowerDoor(void) {}
+void combatManager::LowerDoor(void)
+{
+    SAMPLE2 drawbridgeSample = NULL_SAMPLE2;
+    drawbridgeSample = LoadPlaySample("drawbrg.82m");
+    giMinExtentX = COMBAT_DOOR_EXTENT_MIN_X;
+    giMinExtentY = COMBAT_DOOR_EXTENT_MIN_Y;
+    giMaxExtentX = COMBAT_DOOR_EXTENT_MAX_X;
+    giMaxExtentY = COMBAT_DOOR_EXTENT_MAX_Y;
+    int bridgeFrame;
+    for (bridgeFrame = COMBAT_DRAWBRIDGE_RAISE_FRAME_SECOND;
+         bridgeFrame >= COMBAT_DRAWBRIDGE_LOWERED; bridgeFrame--) {
+        m_drawbridgeState = bridgeFrame;
+        DrawFrame(1, 0, 1, 0, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
+    }
+    WaitEndSample(drawbridgeSample, -1);
+}
 
 VA(0x00495317, 0xe6)
-void combatManager::RaiseDoor(void) {}
+void combatManager::RaiseDoor(void)
+{
+    SAMPLE2 drawbridgeSample = NULL_SAMPLE2;
+    drawbridgeSample = LoadPlaySample("drawbrg.82m");
+    giMinExtentX = COMBAT_DOOR_EXTENT_MIN_X;
+    giMinExtentY = COMBAT_DOOR_EXTENT_MIN_Y;
+    giMaxExtentX = COMBAT_DOOR_EXTENT_MAX_X;
+    giMaxExtentY = COMBAT_DOOR_EXTENT_MAX_Y;
+    m_drawbridgeState = COMBAT_DRAWBRIDGE_RAISE_FRAME_FIRST;
+    DrawFrame(1, 0, 1, 0, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
+    m_drawbridgeState = COMBAT_DRAWBRIDGE_RAISE_FRAME_SECOND;
+    DrawFrame(1, 0, 1, 0, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
+    m_drawbridgeState = COMBAT_DRAWBRIDGE_RAISED;
+    DrawFrame(1, 0, 1, 0, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
+    WaitEndSample(drawbridgeSample, -1);
+}
 
 VA(0x004953fd, 0x84)
-void combatManager::TestRaiseDoor(void) {}
+void combatManager::TestRaiseDoor(void)
+{
+    if (m_inCastleCombat &&
+        m_drawbridgeState == COMBAT_DRAWBRIDGE_LOWERED &&
+        m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX].m_occupantSide == -1 &&
+        m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX].m_deadOccupantCount == 0 &&
+        m_hexCells[COMBAT_CASTLE_HEX_GATE].m_occupantSide == -1 &&
+        m_hexCells[COMBAT_CASTLE_HEX_GATE].m_deadOccupantCount == 0) {
+        RaiseDoor();
+    }
+}
 
+// @early-stop: retained/live 99.90%; frame and slots match, all 52 normalized
+// instructions/operands match, and there are 0/0 relocations. Raw bytes differ
+// only at +0xc6, where the first return arm jumps to the common continuation
+// instead of retail's equivalent local-label hop. Positive-arm/else polarity is
+// already aligned; no value-bearing expression mutation applies to this hop.
 VA(0x00495481, 0xd8)
-int combatManager::InCastle(int) { return 0; }
+int combatManager::InCastle(int hex)
+{
+    if ((hex < COMBAT_CASTLE_INTERIOR_ROW_0_FIRST ||
+         hex > COMBAT_CASTLE_INTERIOR_ROW_0_LAST) &&
+        (hex < COMBAT_CASTLE_INTERIOR_ROW_1_FIRST ||
+         hex > COMBAT_CASTLE_INTERIOR_ROW_1_LAST) &&
+        (hex < COMBAT_CASTLE_INTERIOR_ROW_2_FIRST ||
+         hex > COMBAT_CASTLE_INTERIOR_ROW_2_LAST) &&
+        (hex < COMBAT_CASTLE_INTERIOR_ROW_3_FIRST ||
+         hex > COMBAT_CASTLE_INTERIOR_ROW_3_LAST) &&
+        (hex < COMBAT_CASTLE_INTERIOR_ROW_4_FIRST ||
+         hex > COMBAT_CASTLE_INTERIOR_ROW_4_LAST) &&
+        (hex < COMBAT_CASTLE_INTERIOR_ROW_5_FIRST ||
+         hex > COMBAT_CASTLE_INTERIOR_ROW_5_LAST) &&
+        (hex < COMBAT_CASTLE_INTERIOR_ROW_6_FIRST ||
+         hex > COMBAT_CASTLE_INTERIOR_ROW_6_LAST) &&
+        (hex < COMBAT_CASTLE_INTERIOR_ROW_7_FIRST ||
+         hex > COMBAT_CASTLE_INTERIOR_ROW_7_LAST) &&
+        (hex < COMBAT_CASTLE_INTERIOR_ROW_8_FIRST ||
+         hex > COMBAT_CASTLE_INTERIOR_ROW_8_LAST)) {
+        return 1;
+    }
+    return 0;
+}
 
+// @match-note: retained/live 99.52%; frame, slots, loop CFG, calls, and all 25/25
+// relocation sites align. First code residual is +0x108, normalized instruction
+// 84: an equivalent abs-distance jge/jle from operand evaluation/register
+// assignment. Both abs(column) > abs(row) and abs(row) < abs(column) compiled to
+// the same score. Other differences are only the delinked 10.0f DATA identity.
 VA(0x00495559, 0x346)
-int combatManager::ShotIsThroughWall(int, int, int) { return 0; }
+int combatManager::ShotIsThroughWall(int side, int sourceHex, int targetHex)
+{
+    if (!m_inCastleCombat)
+        return 0;
+    if (m_heroes[side] &&
+        (m_heroes[side]->HasArtifact(COMBAT_ARTIFACT_GOLDEN_BOW) ||
+         m_heroes[side]->m_secondarySkills[HERO_SKILL_ARCHERY])) {
+        return 0;
+    }
+    if (InCastle(sourceHex) || !InCastle(targetHex))
+        return 0;
 
+    int sourceColumn = sourceHex % COMBAT_GRID_ROW_LENGTH;
+    int sourceRow = sourceHex / COMBAT_GRID_ROW_LENGTH;
+    int targetColumn = targetHex % COMBAT_GRID_ROW_LENGTH;
+    int targetRow = targetHex / COMBAT_GRID_ROW_LENGTH;
+    int columnDistance = targetColumn - sourceColumn;
+    int rowDistance = targetRow - sourceRow;
+    int traceLength;
+    float columnStep;
+    float rowStep;
+    if (abs(columnDistance) > abs(rowDistance)) {
+        traceLength = abs(columnDistance);
+        columnStep = columnDistance > 0 ? 1 : -1;
+        rowStep = static_cast<float>(rowDistance) /
+                  static_cast<float>(abs(columnDistance));
+    } else {
+        traceLength = abs(rowDistance);
+        rowStep = rowDistance > 0 ? 1 : -1;
+        columnStep = static_cast<float>(columnDistance) /
+                     static_cast<float>(abs(rowDistance));
+    }
+    columnStep /= static_cast<float>(COMBAT_WALL_TRACE_SUBDIVISIONS);
+    rowStep /= static_cast<float>(COMBAT_WALL_TRACE_SUBDIVISIONS);
+    float traceColumn = static_cast<float>(sourceColumn);
+    float traceRow = static_cast<float>(sourceRow);
+    int traceIndex;
+    for (traceIndex = 0;
+         traceIndex < traceLength * COMBAT_WALL_TRACE_SUBDIVISIONS;
+         traceIndex++) {
+        traceColumn += columnStep;
+        traceRow += rowStep;
+        int traceHex = static_cast<int>(traceRow) * COMBAT_GRID_ROW_LENGTH +
+                       static_cast<int>(traceColumn);
+        int structureIndex;
+        for (structureIndex = 0;
+             structureIndex < COMBAT_CASTLE_STRUCTURE_COUNT;
+             structureIndex++) {
+            if (iWallToHexCell[structureIndex] == traceHex &&
+                m_wallStates[structureIndex + COMBAT_WALL_SLOT_SECTION_FIRST] !=
+                    COMBAT_WALL_STATE_DESTROYED &&
+                m_wallStates[structureIndex + COMBAT_WALL_SLOT_SECTION_FIRST] !=
+                    COMBAT_WALL_STATE_SECTION_DESTROYED) {
+                return 1;
+            }
+            if (iTowerToHexCell[structureIndex] == traceHex &&
+                m_wallStates[structureIndex] != COMBAT_WALL_STATE_DESTROYED) {
+                return 1;
+            }
+            if (traceHex == COMBAT_CASTLE_HEX_GATE &&
+                m_drawbridgeState == COMBAT_DRAWBRIDGE_RAISED) {
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+// @match-note: retained 98.43%, combined live 97.48%; the 0x80 frame, slot reuse,
+// animation CFG, calls, and all 52/52 relocation sites align. First DATA-name residual is +0xb9;
+// first code residual is +0x283 (normalized instruction 197), then two extent
+// compares. frame < missileSteps versus missileSteps > frame and both orientations
+// of the extent operands compiled identically. Remaining names are delinked
+// floating constants and the gConfig DATA alias.
 VA(0x0049589f, 0x52e)
-void combatManager::ShootMissile(int, int, int, int, float *, class icon *) {}
+void combatManager::ShootMissile(int sourceX, int sourceY, int targetX,
+                                 int targetY, float *directionAngles,
+                                 icon *missileIcon)
+{
+    int xDistance = targetX - sourceX;
+    int yDistance = targetY - sourceY;
+    int absoluteXDistance = targetX - sourceX;
+    signed char reverseMissile = 0;
+    if (absoluteXDistance < 0) {
+        reverseMissile = 1;
+        absoluteXDistance = -absoluteXDistance;
+    }
+    int directionYDistance = targetY - sourceY;
+    int directionFrame;
+    if (absoluteXDistance == 0) {
+        if (directionYDistance > 0)
+            directionFrame = COMBAT_MISSILE_LAST_DIRECTION;
+        else
+            directionFrame = 0;
+    } else {
+        float directionSlope =
+            static_cast<float>(-directionYDistance) / absoluteXDistance;
+        float angle = static_cast<float>(
+            atan(static_cast<double>(directionSlope)) *
+            COMBAT_MISSILE_DEGREES_PER_RADIAN / COMBAT_MISSILE_PI);
+        int frame;
+        for (frame = 1; frame < COMBAT_MISSILE_DIRECTION_COUNT;
+             frame++) {
+            if ((directionAngles[frame - 1] +
+                 directionAngles[frame]) /
+                    COMBAT_MISSILE_DIRECTION_AVERAGE_DIVISOR <
+                angle) {
+                break;
+            }
+        }
+        if (frame < COMBAT_MISSILE_DIRECTION_COUNT)
+            directionFrame = frame - 1;
+        else
+            directionFrame = COMBAT_MISSILE_LAST_DIRECTION;
+    }
+
+    int distance = static_cast<int>(sqrt(static_cast<double>(
+        xDistance * xDistance + yDistance * yDistance)));
+    int missileSteps =
+        (distance + COMBAT_MISSILE_SPACING_ROUND) / COMBAT_MISSILE_SPACING;
+    int xStep;
+    int yStep;
+    if (missileSteps > 1) {
+        xStep = xDistance / (missileSteps - 1);
+        yStep = yDistance / (missileSteps - 1);
+    } else {
+        xStep = xDistance;
+        yStep = yDistance;
+    }
+    int missileX = sourceX;
+    int missileY = sourceY;
+    int missileHalfWidth = COMBAT_MISSILE_HALF_WIDTH;
+    int missileHalfHeight = COMBAT_MISSILE_HALF_HEIGHT;
+    bitmap *missileBackground =
+        new bitmap(COMBAT_MISSILE_BITMAP_TYPE, missileHalfWidth * 2,
+                   missileHalfHeight * 2);
+    missileBackground->GrabBitmapCareful(
+        gpWindowManager->m_screen,
+        static_cast<short>(missileX - missileHalfWidth),
+        static_cast<short>(missileY - missileHalfHeight));
+
+    int oldX = missileX;
+    int oldY = missileY;
+    int minX = COMBAT_MAX_EXTENT_X;
+    int maxX = 0;
+    int minY = 480;
+    int maxY = 0;
+    int frame;
+    for (frame = 0; missileSteps > frame; frame++) {
+        if (oldX - missileHalfWidth < minX)
+            minX = oldX - missileHalfWidth;
+        if (minX < 0)
+            minX = 0;
+        if (oldX + missileHalfWidth > maxX)
+            maxX = oldX + missileHalfWidth;
+        if (maxX > COMBAT_MAX_EXTENT_X)
+            maxX = COMBAT_MAX_EXTENT_X;
+        if (oldY - missileHalfHeight < minY)
+            minY = oldY - missileHalfHeight;
+        if (minY < 0)
+            minY = 0;
+        if (oldY + missileHalfHeight > maxY)
+            maxY = oldY + missileHalfHeight;
+        if (maxY > COMBAT_MAX_EXTENT_Y)
+            maxY = COMBAT_MAX_EXTENT_Y;
+
+        if (frame != 0) {
+            missileBackground->DrawToBufferCareful(
+                static_cast<short>(oldX - missileHalfWidth),
+                static_cast<short>(oldY - missileHalfHeight));
+            missileBackground->GrabBitmapCareful(
+                gpWindowManager->m_screen,
+                static_cast<short>(missileX - missileHalfWidth),
+                static_cast<short>(missileY - missileHalfHeight));
+        } else {
+            if (giMinExtentX > minX)
+                giMinExtentX = minX;
+            if (maxX > giMaxExtentX)
+                giMaxExtentX = maxX;
+            if (minY < giMinExtentY)
+                giMinExtentY = minY;
+            if (maxY > giMaxExtentY)
+                giMaxExtentY = maxY;
+        }
+        missileIcon->DrawToBuffer(missileX, missileY, directionFrame,
+                                  reverseMissile);
+        if (frame == 0) {
+            gpWindowManager->UpdateScreenRegion(
+                giMinExtentX, giMinExtentY,
+                giMaxExtentX - giMinExtentX + 1,
+                giMaxExtentY - giMinExtentY + 1);
+        } else {
+            DelayTil(glTimers);
+            gpWindowManager->UpdateScreenRegion(
+                minX, minY, maxX - minX + 1, maxY - minY + 1);
+        }
+        glTimers[0] = static_cast<int>(
+            KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] *
+                                COMBAT_MISSILE_TIMER_DELAY);
+        oldX = missileX;
+        oldY = missileY;
+        missileX += xStep;
+        missileY += yStep;
+        minX = missileX - missileHalfWidth;
+        maxX = missileX + missileHalfWidth;
+        minY = missileY - missileHalfHeight;
+        maxY = missileY + missileHalfHeight;
+    }
+    missileBackground->DrawToBuffer(
+        static_cast<short>(oldX - missileHalfWidth),
+        static_cast<short>(oldY - missileHalfHeight));
+    gpWindowManager->UpdateScreenRegion(
+        oldX - missileHalfWidth, oldY - missileHalfHeight,
+        missileHalfWidth * 2, missileHalfHeight * 2);
+    delete missileBackground;
+}
 
 VA(0x00495dcd, 0xf2)
-void combatManager::CombatSystemOptions(void) {}
+void combatManager::CombatSystemOptions(void)
+{
+    tag_message message;
+    bCPrefsChanged = 0;
+    CSPanel = new heroWindow(160, 33, "cspanel.bin");
+    if (!CSPanel)
+        MemError();
+    SetWinText(CSPanel, 1);
+    UpdateCombatSystemOptions(1);
+    gpWindowManager->DoDialog(CSPanel, CombatSystemOptionsHandler, 0);
+    delete CSPanel;
+    if (bCPrefsChanged)
+        WritePrefs();
+    m_backgroundDrawn = 0;
+    DrawFrame(1, 0, 0, 0, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
+}
 
 VA(0x00495ebf, 0x1ea)
-void UpdateCombatSystemOptions(int) {}
+void UpdateCombatSystemOptions(int initialDraw)
+{
+    tag_message message;
+    message.type = COMBAT_SYSTEM_OPTION_EVENT;
+    message.field4 = COMBAT_SYSTEM_OPTION_BUTTON_MESSAGE;
+    message.field8 = COMBAT_SYSTEM_OPTION_SPEED_BUTTON;
+    message.field18 = gConfig.combatSpeed +
+                      COMBAT_SYSTEM_OPTION_SPEED_STATE_OFFSET;
+    CSPanel->BroadcastMessage(message);
+    message.field8 = COMBAT_SYSTEM_OPTION_ARMY_INFO_BUTTON;
+    message.field18 = gConfig.combatArmyInfoLevel +
+                      COMBAT_SYSTEM_OPTION_ARMY_INFO_STATE_OFFSET;
+    CSPanel->BroadcastMessage(message);
+    message.field8 = COMBAT_SYSTEM_OPTION_AUTO_SPELL_BUTTON;
+    message.field18 = gConfig.autoCombatUseSpells +
+                      COMBAT_SYSTEM_OPTION_AUTO_SPELL_STATE_OFFSET;
+    CSPanel->BroadcastMessage(message);
+    message.field8 = COMBAT_SYSTEM_OPTION_GRID_BUTTON;
+    message.field18 = gConfig.showCombatGrid +
+                      COMBAT_SYSTEM_OPTION_GRID_STATE_OFFSET;
+    CSPanel->BroadcastMessage(message);
+    message.field8 = COMBAT_SYSTEM_OPTION_SHADE_BUTTON;
+    message.field18 = gConfig.combatShadeLevel +
+                      COMBAT_SYSTEM_OPTION_SHADE_STATE_OFFSET;
+    CSPanel->BroadcastMessage(message);
+    message.field8 = COMBAT_SYSTEM_OPTION_MOUSE_HEX_BUTTON;
+    message.field18 = gConfig.showCombatMouseHex +
+                      COMBAT_SYSTEM_OPTION_MOUSE_HEX_STATE_OFFSET;
+    CSPanel->BroadcastMessage(message);
 
+    message.field4 = COMBAT_SYSTEM_OPTION_TEXT_MESSAGE;
+    message.field8 = COMBAT_SYSTEM_OPTION_SPEED_TEXT;
+    message.text = combatSpeedText[gConfig.combatSpeed];
+    CSPanel->BroadcastMessage(message);
+    message.field8 = COMBAT_SYSTEM_OPTION_ARMY_INFO_TEXT;
+    message.text = combatMiniInfoText[gConfig.combatArmyInfoLevel];
+    CSPanel->BroadcastMessage(message);
+    message.field8 = COMBAT_SYSTEM_OPTION_AUTO_SPELL_TEXT;
+    message.text = onOffText[gConfig.autoCombatUseSpells];
+    CSPanel->BroadcastMessage(message);
+    message.field8 = COMBAT_SYSTEM_OPTION_GRID_TEXT;
+    message.text = onOffText[gConfig.showCombatGrid];
+    CSPanel->BroadcastMessage(message);
+    message.field8 = COMBAT_SYSTEM_OPTION_SHADE_TEXT;
+    message.text = onOffText[gConfig.combatShadeLevel];
+    CSPanel->BroadcastMessage(message);
+    message.field8 = COMBAT_SYSTEM_OPTION_MOUSE_HEX_TEXT;
+    message.text = onOffText[gConfig.showCombatMouseHex];
+    CSPanel->BroadcastMessage(message);
+    if (!initialDraw)
+        CSPanel->DrawWindow(1, 0, COMBAT_SYSTEM_OPTION_DRAW_MASK);
+}
+
+// @early-stop: retained/live 99.88%; relocation-masked raw bytes are identical
+// across all 0x39a bytes, including jump-table spans +0x121..+0x13c and
+// +0x2f0..+0x30b. Frame, slots, and CFG match; all 36/36 relocation sites align,
+// with retail delinking 12 gConfig sites as local DATA aliases. Flat equality
+// close handling was 95.17%; the nested switch supplies retail's hidden temp.
+// Redraw/done declaration order and right-button flag forms are exhausted.
 VA(0x004960a9, 0x39a)
-int CombatSystemOptionsHandler(struct tag_message &) { return 0; }
+int CombatSystemOptionsHandler(tag_message &message)
+{
+    int bRedraw = 0;
+    int bDone = 0;
+    char optionText[COMBAT_MESSAGE_LINE_SIZE];
+    if (message.type == COMBAT_SYSTEM_OPTION_EVENT) {
+        if (message.fieldC & COMBAT_SYSTEM_OPTION_RIGHT_BUTTON) {
+            if (message.field4 == COMBAT_SYSTEM_OPTION_BUTTON_EVENT ||
+                message.field4 == COMBAT_SYSTEM_OPTION_HOVER_EVENT) {
+                int helpIndex = -1;
+                switch (message.field8) {
+                case COMBAT_SYSTEM_OPTION_CLOSE_BUTTON:
+                    helpIndex = 0;
+                    break;
+                case COMBAT_SYSTEM_OPTION_SPEED_BUTTON:
+                    helpIndex = 1;
+                    break;
+                case COMBAT_SYSTEM_OPTION_ARMY_INFO_BUTTON:
+                    helpIndex = 2;
+                    break;
+                case COMBAT_SYSTEM_OPTION_AUTO_SPELL_BUTTON:
+                    helpIndex = 3;
+                    break;
+                case COMBAT_SYSTEM_OPTION_GRID_BUTTON:
+                    helpIndex = 4;
+                    break;
+                case COMBAT_SYSTEM_OPTION_SHADE_BUTTON:
+                    helpIndex = 5;
+                    break;
+                case COMBAT_SYSTEM_OPTION_MOUSE_HEX_BUTTON:
+                    helpIndex = 6;
+                    break;
+                }
+                if (helpIndex >= 0) {
+                    NormalDialog(gCSPanelHelp[helpIndex],
+                                 COMBAT_SYSTEM_OPTION_HELP_DIALOG, -1, -1,
+                                 -1, 0, -1, 0, -1, 0);
+                }
+            }
+        } else {
+            switch (message.field4) {
+            case COMBAT_SYSTEM_OPTION_CLOSE_EVENT:
+                switch (message.field8) {
+                case COMBAT_SYSTEM_OPTION_CLOSE_BUTTON:
+                    bDone = 1;
+                    break;
+                }
+                break;
+            case COMBAT_SYSTEM_OPTION_BUTTON_EVENT:
+                switch (message.field8) {
+                case COMBAT_SYSTEM_OPTION_SPEED_BUTTON:
+                    gConfig.combatSpeed =
+                        (gConfig.combatSpeed + 1) %
+                        COMBAT_SYSTEM_OPTION_CYCLE_COUNT;
+                    bRedraw = 1;
+                    bCPrefsChanged = 1;
+                    break;
+                case COMBAT_SYSTEM_OPTION_ARMY_INFO_BUTTON:
+                    gConfig.combatArmyInfoLevel =
+                        (gConfig.combatArmyInfoLevel + 1) %
+                        COMBAT_SYSTEM_OPTION_CYCLE_COUNT;
+                    bRedraw = 1;
+                    bCPrefsChanged = 1;
+                    break;
+                case COMBAT_SYSTEM_OPTION_AUTO_SPELL_BUTTON:
+                    gConfig.autoCombatUseSpells =
+                        1 - gConfig.autoCombatUseSpells;
+                    bRedraw = 1;
+                    bCPrefsChanged = 1;
+                    break;
+                case COMBAT_SYSTEM_OPTION_GRID_BUTTON:
+                    gConfig.showCombatGrid = 1 - gConfig.showCombatGrid;
+                    bRedraw = 1;
+                    bCPrefsChanged = 1;
+                    break;
+                case COMBAT_SYSTEM_OPTION_SHADE_BUTTON:
+                    gConfig.combatShadeLevel = 1 - gConfig.combatShadeLevel;
+                    bRedraw = 1;
+                    bCPrefsChanged = 1;
+                    break;
+                case COMBAT_SYSTEM_OPTION_MOUSE_HEX_BUTTON:
+                    gConfig.showCombatMouseHex =
+                        1 - gConfig.showCombatMouseHex;
+                    bRedraw = 1;
+                    bCPrefsChanged = 1;
+                    break;
+                }
+                break;
+            }
+        }
+    }
+    if (bRedraw)
+        UpdateCombatSystemOptions(0);
+    if (bDone) {
+        gpWindowManager->m_dialogResult = message.field8;
+        message.field8 = COMBAT_SYSTEM_OPTION_SPEED_BUTTON;
+        message.field4 = message.field8;
+        return COMBAT_SYSTEM_OPTION_HANDLER_CLOSE;
+    }
+    return COMBAT_SYSTEM_OPTION_HANDLER_CONTINUE;
+}
 
 
 // ===== vtable combatManager : public baseManager  (3 slots) =====
