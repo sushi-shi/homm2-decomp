@@ -84,6 +84,10 @@ authoritative. This file is the short, restart-ready Codex workflow.
 - For a hardest-first campaign, rank SOURCE work by unmatched weighted bytes using the retained
   source-hash maximum, not a transient live dip. Prefer `/Od` units until they are drained; start
   `/O2` units when only optimizer/register-allocation work remains.
+- While a substantial syntactic-stub backlog remains, dedicate one persistent lane to untouched
+  bodies. Start with the highest-weighted stub-heavy TU and drain it in source order, including
+  required predecessors, before moving that lane to the next stub-heavy TU. A stub lane changes
+  priority only: it must still recover complete semantics, types, layouts, frames, CFG, and relocs.
 - Before total SOURCE fuzzy reaches **95%**, prioritize structural recovery over wall grinding.
   A semantically complete function at a proven compiler wall leaves the active queue after only a
   few obvious steering attempts, even if it is 96-99%. Systematic wall breaking and AST permutation
