@@ -65,11 +65,13 @@ DATA(0x00534ce8) static unsigned int gCTRun;
 // owner prototype after icon/bitmap are complete is byte-identical; moving it after the scratch
 // declarations regresses to 78.85%/90:91. No setup or declaration variant is retained. Reopen only
 // when a reachable type/header declaration changes, not for another local spelling search.
-// Fresh lifetime-scope audit on master 835c404: widening data/entry/entryX/sourceOffset/X/row/cmd
-// to C89-style declarations at function entry regresses to 66.72%/89:91. Keeping X outside while
-// enclosing data/entry/field snapshots and initial clipping in one lexical scope regresses to
-// 75.27%/90:91. Both retain correct targets but worsen the +0x12 allocation cascade, so neither is
-// retained; do not retry declaration widening or a setup-only scope without a real type trigger.
+// Fresh cfec3b8 enum-state closure: widening setup/row/command declarations to C89 scope scores
+// 66.72%/89:91, while putting setup and clip temporaries in one lexical scope with X outside scores
+// 75.27%/90:91. An explicit 13-byte entry offset scores 78.60%/90:91; narrowing entry.x to short
+// scores 77.85%, mutating formal x scores 78.34%, and loading fields through an entry/entry-data
+// alias scores 78.28%, all with 90:91. Chaining the X0 publication reaches 78.62% but emits X0
+// 4/3 and 92:91 by reloading it in both horizontal clauses; a scoped current-X snapshot is byte-
+// identical. These are real lifetime/type alternatives, not count fixes, and all are rejected.
 VA(0x004d32a0, 0x5af)
 void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                             int clip, int clipX, int clipY, int clipW, int clipH, int color,
