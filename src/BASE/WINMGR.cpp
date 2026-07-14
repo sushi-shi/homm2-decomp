@@ -32,11 +32,21 @@
 // Under the new enum/predecessor state the retail-evidenced pointer-terminated loop
 // scored 94.00% and still emitted 70/71, so it was rejected. Signed palette-byte
 // storage was byte-neutral. Direct-global frame and forced `| 0` forms were also
-// ineffective. Splitting the cycle enums into a narrow predecessor header emitted
+// ineffective. A function-wide source-pointer lifetime and the standard `register`
+// qualifier were byte-neutral; nesting the default and non-default paths in one
+// lexical `if`/`else` returned to the older 94.59% allocation while remaining
+// 70/71. Splitting the cycle enums into a narrow predecessor header emitted
 // 0x390 bytes at 94.52%, remained 70/71, and regressed a later exact method; required
-// header reorderings were byte-neutral. Revisit only after another real reachable
-// header reconstruction; do not repeat local copy/predicate synonyms or synthesize
-// the missing relocation.
+// header reorderings were byte-neutral. Giving the default copy either a distinct
+// three-byte local or a same-named local in a disjoint scope emitted 0x392 bytes at
+// 93.41% and remained 70/71; a switch emitted 0x38a at 89.94% and fell to 68/71.
+// No packed three-byte RGB record exists in the palette code, and `palette::Data`
+// is a separately emitted exact function, so inventing a record or forcing it inline
+// lacks evidence. A relocation-union raw audit leaves 580 comparable unmasked bytes:
+// 124 differ from +0x1e through +0x38e, followed by a 0x12-byte retail tail. This is
+// still a broad /O2 allocation/shape residual, not a permitted byte-proven wall.
+// Revisit only after another real reachable header reconstruction; do not repeat
+// local copy/predicate/control synonyms or synthesize the missing relocation.
 VA(0x004ca6d0, 0x3a3)
 void CycleColors(int forceUpdate)
 {
