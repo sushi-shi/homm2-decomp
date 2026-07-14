@@ -44,6 +44,13 @@ DATA(0x00534c60) static int gFlipSkip;
 // loads were byte-identical. This is not a wall or permitted stop. Continue from the setup Y/X
 // allocation and right-skip spill after a newly proved lifetime/header/compiler-state change;
 // do not replay either older matrix or iconf2b-fresh-214bd52.tsv.
+// The 032a2b3 retry exhausted a new typed-alias/right-skip ownership family. Whole-entry
+// references, a separate right-arm temporary, semantic skip-name buckets, cn/skip declaration
+// order, setup-width slot reuse, compound updates, and the new icon2bc decoder-lifetime
+// declaration surface were byte-identical. A field-Y reference regressed to 85.52%; volatile
+// diagnostics did force memory ownership but regressed to 81.44%/80.44%, so they are not source
+// evidence and were discarded. See iconf2b-fresh-032a2b3.tsv; revisit only with a new real
+// aliasing/declaration surface that explains the retail spill without volatile semantics.
 VA(0x004d1ba0, 0x4f1)
 void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                       int clip, int clipX, int clipY, int clipW, int clipH, int color)

@@ -1,0 +1,30 @@
+# schema_version	1
+# base_checkpoint	032a2b3b1c0570f63397f3fda117030a1bbe2442
+# target_rva	0x004d1ba0 (normalized tool RVA 0x000d1ba0)
+# target_size	0x4f1
+# retained_source_sha256	12c64ab4ccab9b51fa9445c4baef3387b728c046bb0c11510bedf4ea444ccbc7
+# retained_object_sha256	d28bc528da0909f8f527a0d443a96d7823ff2b8dc82fceab9364ef8982e23ca3
+# retained_text_sha256	0596f651ae42685c1cee0282b780756855c2d358883d82c85525618338006f3a
+# target_object_sha256	1620109acfec9c11aca38897696b8ab056e7b87091fb9f4bda8f1be60e77f1ae
+# target_text_sha256	dc51ac4ccfd5869d35741916dc42d83a184ddaf4238987fc68a233c57073b9a9
+# predecessor_state	No preceding function exists in this translation unit.
+# new_trigger	032a2b3 recorded a retail-proven adjacent icon2bc decoder lifetime/declaration surface; this pass tested only new typed-alias and right-skip ownership structures against the retained 214bd52 body.
+# raw_audit	Retained candidate .text remains 0x4e5 versus retail 0x4f1; relocation-union audit remains 678 common unmasked bytes, 611 differing, first +0x1d, plus a 0xc-byte retail tail.
+# relocation_audit	Retained base/target counts remain 82/81 with no base-only external target; gFlipY remains the sole occurrence-count excess at 9/8.
+# right_skip_proof	Retail +0x44f loads cn=clipW into EDX, then writes cmd, cmd-X, and cmd-X-clipW through [esp+0x10] before loading gFlipClipR and adding that stack value. The retained source has the same semantic stages but VC4.2 folds them into ECX.
+# conclusion	The bounded family below did not improve the retained score. Volatile diagnostics prove that forced memory ownership is not sufficient and broadly regress; they are not source evidence and were discarded. This remains an unresolved residual, not a wall or permitted stop.
+# permutation_policy	No regex or AST permuter used; AST remains premature at 86.5756%.
+state	score_pct	candidate_size	base_relocs	target_relocs	disposition	new_axis_and_byte_evidence
+canonical_032a2b3	86.5756	0x4e5	82	81	retained	214bd52 split right-skip baseline before the new family.
+whole_entry_reference	86.5756	0x4e5	82	81	rejected_byte_identical	Use IconEntry reference ownership and publish its address; optimized instructions were unchanged.
+separate_right_arm_temporary	86.5756	0x4e5	82	81	rejected_byte_identical	Stage the right-edge arithmetic in a branch-local rightSkip before assigning the shared skip; compiler coalesced both lifetimes.
+semantic_skip_name_bucket7	86.5756	0x4e5	82	81	rejected_byte_identical	Rename the real local to sourceSkip (MSVC identifier bucket 7); no instruction or relocation change.
+semantic_skip_name_bucket0	86.5756	0x4e5	82	81	rejected_byte_identical	Rename the real local to srcSkip (bucket 0); no instruction or relocation change, so no further name search was justified.
+skip_before_count_declaration	86.5756	0x4e5	82	81	rejected_byte_identical	Declare skip before cn in the overlap scope to give the spill candidate earlier ownership; code was unchanged.
+volatile_skip_diagnostic	81.44	NA	82	81	diagnostic_rejected	Volatile local forces memory traffic but globally regresses; this disproves simple forced-stack ownership as the missing source model.
+reuse_setup_width_lifetime	86.5756	0x4e5	82	81	rejected_byte_identical	Reuse the real setup width local for the late skip stages because retail reuses its [esp+0x10] home; optimizer still folds into ECX.
+volatile_setup_width_diagnostic	80.44	NA	82	81	diagnostic_rejected	Making the reused setup width volatile forces excess accesses throughout setup and decoder and is not a plausible source model.
+compound_skip_updates	86.5756	0x4e5	82	81	rejected_byte_identical	Use skip-=X, skip-=clipW, skip+=gFlipClipR; optimizer emits the retained reassociated ECX sequence.
+icon2bc_decoder_declaration_surface	86.5756	0x4e5	82	81	rejected_byte_identical	Transfer the newly recorded icon2bc cursor/newline declaration ordering, placing Iconf2b extras by first semantic use; instructions were unchanged.
+entry_y_field_reference	85.52	NA	82	81	rejected	Bind a const short reference to entry.y so its typed load remains tied to EDI; allocation instead loads entry X first, loses the width spill shape, and regresses.
+canonical_restored	86.5756	0x4e5	82	81	retained	Exact 214bd52 executable bytes restored; only the durable match note and this hash-pinned matrix remain.
