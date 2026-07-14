@@ -87,8 +87,20 @@ void widget::Close(void) {}
 // qualifier. Every state either left this tuple unchanged or perturbed Dim; each
 // fully pinned state combined with the retail-timed top snapshot reached the same
 // six-byte Main residual while changing 25 raw bytes in Dim. See the matrix for
-// the bounded results. The standalone-exact requirement still fails, so this
-// remains unresolved, not a soft TU-cumulative wall.
+// the bounded results. A final dispatcher-only pass kept the improved mouse shape
+// fixed and exhausted 68 syntax-aware single mutations plus bounded combinations
+// of later declaration splits/qualifiers/semantic names and operand order. Manual
+// typed owner/screen/command/value lifetimes, merged declarations, explicit case
+// scopes, parameter naming, and equivalent early-rejection CFGs either preserved
+// the same Main/Dim tuple or moved Dim farther from retail; none exposed a frame,
+// CFG, or relocation defect. Canonical source is retained because it keeps exact
+// Dim at the pinned f45 state. After a237782 made SIZE declarations neutral, the
+// identical body rebuilds with Main at 93.89%, Dim at 74.31%, and Main relocations
+// still clean at 17/17. This confirms that the old exact-Dim pin and mouse residual
+// are compiler-state-local, not new source defects. Defer that unstable coloring
+// to whole-TU last-mile work.
+// The standalone-exact requirement still fails, so this remains unresolved, not
+// a soft TU-cumulative wall.
 VA(0x004ddee0, 0x2f4)
 int widget::Main(tag_message &message)
 {
