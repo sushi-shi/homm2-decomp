@@ -7,35 +7,520 @@
 #include <stdio.h>
 #include <string.h>
 #include <BASE/Misc.h>
+#include <BASE/heroWindowManager.h>
+#include <BASE/mouseManager.h>
 #include <BASE/resourceManager.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/CMBTMGR.h>
 #include <SOURCE/combatManager.h>
+#include <SOURCE/game.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/SPELLS.h>
 #include <SOURCE/X_GLOBAL.h>
 VA(0x004204c0, 0x86)
-int combatManager::HasValidSpellTarget(int) { return 0; }
+int combatManager::HasValidSpellTarget(int spell)
+{
+    int hex;
 
+    for (hex = 0; hex < COMBAT_HEX_COUNT; ++hex) {
+        if (hex % SPELL_HEX_COLUMN_COUNT == 0 ||
+            hex % SPELL_HEX_COLUMN_COUNT == SPELL_HEX_RIGHT_BORDER)
+            continue;
+        if (ValidSpellTarget(spell, hex))
+            return 1;
+    }
+    return 0;
+}
+
+// @match-note 93.37%: semantics and CFG agree, including the selected-spell
+// positive arm, cleanup path, and retail body order (earthquake, elementals,
+// mass spells, mirror/default). The 0x0c frame has elementalType at -0x4,
+// this at -0x8, the switch temporary at -0x0c, and the unused argument at +0x8;
+// there are no other locals. First residual is the delinked switch dispatch after
+// +0x27; manual range audit found no mismatched external call/global target. Tried
+// early return, cleanup goto, positive wrapper, and semantic/body ordering. Revisit
+// only after total SOURCE fuzzy reaches 95%, or earlier if later same-TU structural
+// work changes this function.
 VA(0x00420546, 0x44a)
-int combatManager::ViewSpells(int) { return 0; }
+int combatManager::ViewSpells(int)
+{
+    int elementalType;
 
+    m_selectedSpell =
+        gpGame->ViewSpells(m_heroes[giCurGeneral], 0, CombatSpecialHandler, 0);
+    if (m_selectedSpell != SPELL_NO_SELECTION) {
+        switch (m_selectedSpell) {
+    case SPELL_EARTHQUAKE:
+        if (m_combatTowns[COMBAT_DEFENDER_SIDE] == 0) {
+            NormalDialog("An earthquake will do you no good in this battle.",
+                         NORMAL_DIALOG_INFO, NORMAL_DIALOG_NO_VALUE,
+                         NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_NO_RESOURCE, 0,
+                         NORMAL_DIALOG_NO_RESOURCE, 0,
+                         NORMAL_DIALOG_NO_VALUE, 0);
+            goto restore_pointer;
+        }
+        break;
+
+    case SPELL_SUMMON_EARTH_ELEMENTAL:
+        elementalType = SPELL_MONSTER_EARTH_ELEMENTAL;
+        goto check_elemental;
+    case SPELL_SUMMON_AIR_ELEMENTAL:
+        elementalType = SPELL_MONSTER_AIR_ELEMENTAL;
+        goto check_elemental;
+    case SPELL_SUMMON_FIRE_ELEMENTAL:
+        elementalType = SPELL_MONSTER_FIRE_ELEMENTAL;
+        goto check_elemental;
+    case SPELL_SUMMON_WATER_ELEMENTAL:
+        elementalType = SPELL_MONSTER_WATER_ELEMENTAL;
+check_elemental:
+        if (m_unknown351D[m_currentSide] != 0 &&
+            m_unknown351D[m_currentSide] != elementalType) {
+            NormalDialog("You may only summon one type of elemental per combat.",
+                         NORMAL_DIALOG_INFO, NORMAL_DIALOG_NO_VALUE,
+                         NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_NO_RESOURCE, 0,
+                         NORMAL_DIALOG_NO_RESOURCE, 0,
+                         NORMAL_DIALOG_NO_VALUE, 0);
+            return 0;
+        }
+        if (m_armyCount[m_currentSide] >= SPELL_ELEMENTAL_ARMY_LIMIT) {
+            sprintf(gText,
+                    "You already have %d creatures in your army.  You cannot summon more.",
+                    m_armyCount[m_currentSide]);
+            NormalDialog(gText, NORMAL_DIALOG_INFO, NORMAL_DIALOG_NO_VALUE,
+                         NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_NO_RESOURCE, 0,
+                         NORMAL_DIALOG_NO_RESOURCE, 0,
+                         NORMAL_DIALOG_NO_VALUE, 0);
+            return 0;
+        }
+        if (!SpaceForElementalExists()) {
+            sprintf(gText,
+                    "There is no open space adjacent to your hero to summon an elemental to.");
+            NormalDialog(gText, NORMAL_DIALOG_INFO, NORMAL_DIALOG_NO_VALUE,
+                         NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_NO_RESOURCE, 0,
+                         NORMAL_DIALOG_NO_RESOURCE, 0,
+                         NORMAL_DIALOG_NO_VALUE, 0);
+            return 0;
+        }
+        break;
+
+    case SPELL_MASS_CURE:
+    case SPELL_MASS_HASTE:
+    case SPELL_MASS_SLOW:
+    case SPELL_MASS_BLESS:
+    case SPELL_MASS_CURSE:
+    case SPELL_HOLY_WORD:
+    case SPELL_HOLY_SHOUT:
+    case SPELL_MASS_DISPEL:
+    case SPELL_ARMAGEDDON:
+    case SPELL_ELEMENTAL_STORM:
+    case SPELL_DEATH_RIPPLE:
+    case SPELL_DEATH_WAVE:
+    case SPELL_MASS_SHIELD:
+        if (!HasValidSpellTarget(m_selectedSpell)) {
+            NormalDialog("That spell will affect no one!", NORMAL_DIALOG_INFO,
+                         NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_NO_VALUE,
+                         NORMAL_DIALOG_NO_RESOURCE, 0,
+                         NORMAL_DIALOG_NO_RESOURCE, 0,
+                         NORMAL_DIALOG_NO_VALUE, 0);
+            return 0;
+        }
+        break;
+
+    case SPELL_MIRROR_IMAGE:
+        if (m_armyCount[m_currentSide] >= SPELL_ELEMENTAL_ARMY_LIMIT) {
+            sprintf(gText,
+                    "You already have %d creatures in your army.  You cannot create a mirror image.",
+                    m_armyCount[m_currentSide]);
+            NormalDialog(gText, NORMAL_DIALOG_INFO, NORMAL_DIALOG_NO_VALUE,
+                         NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_NO_RESOURCE, 0,
+                         NORMAL_DIALOG_NO_RESOURCE, 0,
+                         NORMAL_DIALOG_NO_VALUE, 0);
+            return 0;
+        }
+        // fall through
+    default:
+        if (!HasValidSpellTarget(m_selectedSpell)) {
+            NormalDialog("That spell will affect no one!", NORMAL_DIALOG_INFO,
+                         NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_NO_VALUE,
+                         NORMAL_DIALOG_NO_RESOURCE, 0,
+                         NORMAL_DIALOG_NO_RESOURCE, 0,
+                         NORMAL_DIALOG_NO_VALUE, 0);
+            return 0;
+        }
+        giNextAction = SPELL_ACTION_CAST;
+        giNextActionExtra = m_selectedSpell;
+        gpMouseManager->SetPointer("spelmous.mse",
+                                   gsSpellInfo[m_selectedSpell].iconIndex,
+                                   SPELL_POINTER_DEFAULT_ID);
+        gpWindowManager->DoDialog(0, HandleCastSpell, 0);
+        goto restore_pointer;
+        }
+
+        giNextAction = SPELL_ACTION_CAST;
+        giNextActionExtra = m_selectedSpell;
+    }
+
+restore_pointer:
+    gpMouseManager->SetPointer("cmbtmous.mse", 0, SPELL_POINTER_DEFAULT_ID);
+    return m_selectedSpell != SPELL_NO_SELECTION;
+}
+
+// @match-note 91.43%: semantics and CFG agree, including hover conversion/cache,
+// common return, and retail case order. There are no source locals: the message
+// reference arrives in ECX and is stored at -0x4; the only other 0x08-frame slot
+// is the implicit switch temporary at -0x8. All external calls/globals are
+// recovered. First residual is after the switch dispatch at +0x31, where delinked
+// help-pointer/table identities truncate the normal diff. Tried early-return and
+// retail positive-arm forms. Revisit only after total SOURCE fuzzy reaches 95%,
+// or earlier if later same-TU structural work changes this function.
 VA(0x00420990, 0x15c)
-int CombatSpecialHandler(struct tag_message &) { return 0; }
+int CombatSpecialHandler(tag_message &message)
+{
+    if (message.type == SPELL_MESSAGE_HOVER) {
+        gpWindowManager->ConvertToHover(message);
+        if (gpWindowManager->field_0x5e == message.field8)
+            return SPELL_HANDLER_CONTINUE;
+        gpWindowManager->field_0x5e = message.field8;
 
+        switch (message.field8) {
+        case SPELL_CONTROL_PREVIOUS_PAGE:
+            gpCombatManager->CombatMessage(cSpellHelp[SPELL_HELP_PREVIOUS_PAGE],
+                                           1, 0, 0);
+            break;
+        case SPELL_CONTROL_NEXT_PAGE:
+            gpCombatManager->CombatMessage(cSpellHelp[SPELL_HELP_NEXT_PAGE], 1,
+                                           0, 0);
+            break;
+        case SPELL_CONTROL_CLOSE:
+            gpCombatManager->CombatMessage(cSpellHelp[SPELL_HELP_CLOSE], 1, 0,
+                                           0);
+            break;
+        case SPELL_CONTROL_FIRST_MANA:
+        case SPELL_CONTROL_FIRST_MANA + 1:
+        case SPELL_CONTROL_FIRST_MANA + 2:
+        case SPELL_CONTROL_LAST_MANA:
+            gpCombatManager->CombatMessage(cSpellHelp[SPELL_HELP_MANA], 1, 0,
+                                           0);
+            break;
+        default:
+            gpCombatManager->CombatMessage(cSpellHelp[SPELL_HELP_DEFAULT], 1, 0,
+                                           0);
+            break;
+        }
+    }
+    return SPELL_HANDLER_CONTINUE;
+}
+
+// @match-note 92.25%: semantics and CFG agree, including the two-stage teleport,
+// recursive hover, close/cancel paths, and all message mutations. The message
+// reference arrives in ECX and is stored at -0x8; the 0x0c frame also has hex at
+// -0x4 and the implicit switch temporary at -0x0c, with no other locals. External
+// relocation targets agree. First residual is the switch dispatch after +0x09;
+// explicit ranges confirm retail body order is hover, select, then mouse-down/cancel.
+// That order and the opposite order were tried. Revisit only after total SOURCE
+// fuzzy reaches 95%, or earlier if later same-TU structural work changes this function.
 VA(0x00420aec, 0x2aa)
-int HandleCastSpell(struct tag_message &) { return 0; }
+int HandleCastSpell(tag_message &message)
+{
+    int hex;
 
+    switch (message.type) {
+    case SPELL_MESSAGE_HOVER:
+        hex = gpCombatManager->GetGridIndex(message.field4, message.field8);
+        if (indexToCastOn != hex) {
+            if (!gpCombatManager->ValidSpellTarget(
+                    gpCombatManager->m_selectedSpell, hex)) {
+                indexToCastOn = SPELL_NO_SELECTION;
+                gpMouseManager->SetPointer(0);
+                if (gpCombatManager->m_selectedSpell == SPELL_TELEPORT &&
+                    bInTeleportGetDest) {
+                    gpCombatManager->CombatMessage(
+                        "Invalid Teleport Destination.", 1, 0, 0);
+                } else {
+                    gpCombatManager->CombatMessage("Select Spell Target.", 1, 0,
+                                                   0);
+                }
+            } else {
+                indexToCastOn = hex;
+                gpMouseManager->SetPointer(
+                    gsSpellInfo[gpCombatManager->m_selectedSpell].iconIndex);
+                gpCombatManager->SpellMessage(
+                    gpCombatManager->m_selectedSpell, hex);
+            }
+        }
+        break;
+
+    case SPELL_MESSAGE_SELECT:
+        if (indexToCastOn != SPELL_NO_SELECTION) {
+            if (!bInTeleportGetDest) {
+                giNextActionGridIndex = indexToCastOn;
+                if (gpCombatManager->m_selectedSpell == SPELL_TELEPORT) {
+                    bInTeleportGetDest = 1;
+                    indexToCastOn = SPELL_NO_SELECTION;
+                    message.type = SPELL_MESSAGE_HOVER;
+                    message.field4 = message.field10;
+                    message.field8 = message.field14;
+                    HandleCastSpell(message);
+                    gpCombatManager->CombatMessage(
+                        "Select teleport destination.", 1, 0, 0);
+                    return SPELL_HANDLER_CONTINUE;
+                }
+            } else {
+                giNextActionGridIndex2 = indexToCastOn;
+            }
+            bInTeleportGetDest = 0;
+            message.type = SPELL_MESSAGE_DIALOG;
+            message.field4 = SPELL_COMMAND_CLOSE;
+            return SPELL_HANDLER_CLOSE;
+        }
+        break;
+
+    case SPELL_MESSAGE_MOUSE_DOWN:
+        if (message.field4 == SPELL_COMMAND_CANCEL)
+            goto cancel_spell;
+        break;
+
+    case SPELL_MESSAGE_CANCEL:
+cancel_spell:
+        gpCombatManager->m_selectedSpell = SPELL_NO_SELECTION;
+        giNextAction = 0;
+        message.type = SPELL_MESSAGE_DIALOG;
+        message.field4 = SPELL_COMMAND_CLOSE;
+        bInTeleportGetDest = 0;
+        return SPELL_HANDLER_CLOSE;
+    }
+    return SPELL_HANDLER_CONTINUE;
+}
+
+// @match-note 91.40%: semantics and CFG agree, including the live-first arm and
+// descending corpse scan. The 0x0c frame has target_j at -0x4, corpse at -0x8,
+// and this at -0x0c; arguments are side +0x8, spell +0x0c, and hex +0x10, with no
+// other locals. Both SpellCastWorkChance relocations match. First code residual is
+// the corpse/hex index formation near +0x124: retail forms corpse + 0x61*hex,
+// ours forms 0x62*hex + corpse. Tried empty-first do/while, live-first for, direct
+// army expressions, an army pointer local, and slot suffixes. Revisit only after
+// total SOURCE fuzzy reaches 95%, or earlier if later same-TU structural work
+// changes this function.
 VA(0x00420d96, 0x2e5)
-int combatManager::FindResurrectArmyIndex(int, int, int) { return 0; }
+int combatManager::FindResurrectArmyIndex(int side, int spell, int hex)
+{
+    army *target_j;
+    int corpse;
 
+    if (m_hexCells[hex].m_occupantSide != COMBAT_HEX_EMPTY) {
+        if (m_hexCells[hex].m_occupantSide == side) {
+            target_j = &m_armies[m_hexCells[hex].m_occupantSide]
+                                  [m_hexCells[hex].m_occupantIndex];
+            if (target_j->SpellCastWorkChance(spell) > 0.0f)
+                return m_hexCells[hex].m_occupantIndex;
+        }
+        return SPELL_NO_SELECTION;
+    }
+
+    for (corpse = m_hexCells[hex].m_deadOccupantCount - 1; corpse >= 0;
+         --corpse) {
+        if (m_hexCells[hex].m_deadOccupantSides[corpse] !=
+                COMBAT_HEX_EMPTY &&
+            (m_hexCells[hex].m_deadOccupantFrames[corpse] !=
+                 ARMY_FACING_LEFT ||
+             m_hexCells[hex + 1].m_occupantSide == COMBAT_HEX_EMPTY) &&
+            (m_hexCells[hex].m_deadOccupantFrames[corpse] !=
+                 ARMY_FACING_RIGHT ||
+             m_hexCells[hex - 1].m_occupantSide == COMBAT_HEX_EMPTY) &&
+            m_hexCells[hex].m_deadOccupantSides[corpse] == side) {
+            target_j =
+                &m_armies[m_hexCells[hex].m_deadOccupantSides[corpse]]
+                           [m_hexCells[hex].m_deadOccupantIndices[corpse]];
+            if (target_j->SpellCastWorkChance(spell) > 0.0f)
+                return m_hexCells[hex].m_deadOccupantIndices[corpse];
+        }
+    }
+    return SPELL_NO_SELECTION;
+}
+
+// @match-note 92.04%: semantics and CFG agree, including target filtering, every
+// case body, retail case-body order, and singleton teleport-origin access. The
+// 0x14 frame has target at -0x8, the implicit teleport hex temporary at -0x0c,
+// this at -0x10, the switch temporary at -0x14, and an unused word at -0x4;
+// arguments are spell +0x8 and hex +0x0c, with no other source locals. External
+// relocs agree. First residual is the equivalent 0.0 constant-pool identity at
+// +0x57, followed by the delinked switch boundary at +0x60. Tried a teleport
+// pointer local/direct expression, this/global origin access, and both case orders.
+// Revisit only after total SOURCE fuzzy reaches 95%, or earlier if later same-TU
+// structural work changes this function.
 VA(0x0042107b, 0x521)
-int combatManager::ValidSpellTarget(int, int) { return 0; }
+int combatManager::ValidSpellTarget(int spell, int hex)
+{
+    army *target = 0;
+    if (!ValidHex(hex))
+        return 0;
 
+    if (spell != SPELL_FIREBALL && spell != SPELL_FIREBLAST &&
+        spell != SPELL_METEOR_SHOWER && spell != SPELL_COLD_RING &&
+        spell != SPELL_RESURRECT && spell != SPELL_TRUE_RESURRECT &&
+        spell != SPELL_ANIMATE_DEAD &&
+        m_hexCells[hex].m_occupantSide != COMBAT_HEX_EMPTY) {
+        target = &m_armies[m_hexCells[hex].m_occupantSide]
+                            [m_hexCells[hex].m_occupantIndex];
+        if (target->m_spellInfluence[SPELL_INFLUENCE_ANTI_MAGIC] != 0 ||
+            target->m_monsterType == SPELL_MONSTER_GREEN_DRAGON)
+            return 0;
+    }
+
+    if (target != 0 && target->SpellCastWorkChance(spell) <= 0.0f)
+        return 0;
+
+    switch (spell) {
+    case SPELL_HOLY_WORD:
+    case SPELL_HOLY_SHOUT:
+    case SPELL_DISPEL:
+    case SPELL_MASS_DISPEL:
+    case SPELL_ARMAGEDDON:
+    case SPELL_ELEMENTAL_STORM:
+    case SPELL_DEATH_RIPPLE:
+    case SPELL_DEATH_WAVE:
+        if (m_hexCells[hex].m_occupantSide == COMBAT_HEX_EMPTY)
+            return 0;
+        break;
+
+    case SPELL_RESURRECT:
+    case SPELL_TRUE_RESURRECT:
+    case SPELL_ANIMATE_DEAD:
+        return FindResurrectArmyIndex(m_currentSide, spell, hex) !=
+               SPELL_NO_SELECTION;
+
+    case SPELL_CURE:
+    case SPELL_MASS_CURE:
+    case SPELL_HASTE:
+    case SPELL_MASS_HASTE:
+    case SPELL_BLESS:
+    case SPELL_MASS_BLESS:
+    case SPELL_STONE_SKIN:
+    case SPELL_STEEL_SKIN:
+    case SPELL_ANTI_MAGIC:
+    case SPELL_DRAGON_SLAYER:
+    case SPELL_BLOOD_LUST:
+    case SPELL_SHIELD:
+    case SPELL_MASS_SHIELD:
+        if (m_hexCells[hex].m_occupantSide != m_currentSide)
+            return 0;
+        break;
+
+    case SPELL_MIRROR_IMAGE:
+        if (m_hexCells[hex].m_occupantSide != m_currentSide)
+            return 0;
+        if (m_armies[m_hexCells[hex].m_occupantSide]
+                     [m_hexCells[hex].m_occupantIndex]
+                         .m_mirrorImageIndex != SPELL_NO_SELECTION ||
+            m_armies[m_hexCells[hex].m_occupantSide]
+                     [m_hexCells[hex].m_occupantIndex]
+                         .m_mirrorSourceIndex != SPELL_NO_SELECTION)
+            return 0;
+        break;
+
+    case SPELL_LIGHTNING_BOLT:
+    case SPELL_CHAIN_LIGHTNING:
+    case SPELL_SLOW:
+    case SPELL_MASS_SLOW:
+    case SPELL_BLIND:
+    case SPELL_CURSE:
+    case SPELL_MASS_CURSE:
+    case SPELL_MAGIC_ARROW:
+    case SPELL_BERSERKER:
+    case SPELL_PARALYZE:
+    case SPELL_HYPNOTIZE:
+    case SPELL_COLD_RAY:
+    case SPELL_DISRUPTING_RAY:
+        if (m_hexCells[hex].m_occupantSide != 1 - m_currentSide)
+            return 0;
+        break;
+
+    case SPELL_TELEPORT:
+        if (!bInTeleportGetDest) {
+            if (m_hexCells[hex].m_occupantSide != m_currentSide)
+                return 0;
+        } else {
+            if (hex == giNextActionGridIndex ||
+                !gpCombatManager
+                     ->m_armies[gpCombatManager
+                                    ->m_hexCells[giNextActionGridIndex]
+                                    .m_occupantSide]
+                               [gpCombatManager
+                                    ->m_hexCells[giNextActionGridIndex]
+                                    .m_occupantIndex]
+                     .CanFit(hex, 0, 0))
+                return 0;
+        }
+        break;
+
+    case SPELL_FIREBALL:
+    case SPELL_FIREBLAST:
+    case SPELL_METEOR_SHOWER:
+    case SPELL_COLD_RING:
+        if (hex == COMBAT_HEX_EMPTY || hex % SPELL_HEX_COLUMN_COUNT == 0 ||
+            hex % SPELL_HEX_COLUMN_COUNT == SPELL_HEX_RIGHT_BORDER)
+            return 0;
+        break;
+    }
+    return 1;
+}
+
+// @match-note 50.99%: semantics and CFG agree, including area, teleport,
+// resurrection/default targeting, and shared formatting. The 0x10 frame has
+// target_i at -0x4, armyName at -0x8, this at -0x0c, and the implicit switch
+// temporary at -0x10; arguments are spell +0x8 and hex +0x0c, with no other
+// locals. All external relocations agree. First residual is an extra five-byte
+// switch thunk between the area and teleport bodies (+0x4b ours); retail places
+// the equivalent default-target thunk after its table. Tried both label orders,
+// explicit occupied goto, repeated expressions, pointer locals, and MSVC
+// slot-compatible suffixes. Revisit only after total SOURCE fuzzy reaches 95%,
+// or earlier if later same-TU structural work changes this function.
 VA(0x0042159c, 0x222)
-void combatManager::SpellMessage(int, int) {}
+void combatManager::SpellMessage(int spell, int hex)
+{
+    army *target_i;
+    char *armyName;
+
+    if (gbNoShowCombat)
+        return;
+
+    switch (spell) {
+    case SPELL_FIREBALL:
+    case SPELL_FIREBLAST:
+    case SPELL_METEOR_SHOWER:
+    case SPELL_COLD_RING:
+        sprintf(gText, "Cast %s", gSpellNames[spell]);
+        goto show_message;
+    case SPELL_TELEPORT:
+        if (bInTeleportGetDest) {
+            sprintf(gText, "Teleport Here");
+            goto show_message;
+        }
+        goto occupied_target;
+    case SPELL_RESURRECT:
+    case SPELL_TRUE_RESURRECT:
+    case SPELL_ANIMATE_DEAD:
+        target_i =
+            &m_armies[m_currentSide]
+                       [FindResurrectArmyIndex(m_currentSide, spell, hex)];
+        break;
+    default:
+occupied_target:
+        target_i = &m_armies[m_hexCells[hex].m_occupantSide]
+                              [m_hexCells[hex].m_occupantIndex];
+        break;
+    }
+    if (target_i->m_quantity == 1)
+        armyName = gArmyNames[target_i->m_monsterType];
+    else
+        armyName = gArmyNamesPlural[target_i->m_monsterType];
+    sprintf(gText, "Cast %s on %s", gSpellNames[spell], armyName);
+
+show_message:
+    CombatMessage(gText, 1, 0, 0);
+}
 
 VA(0x004217be, 0x1eca)
 void combatManager::CastSpell(int spell, int targetHex, int castByCreature, int teleportDestination)
