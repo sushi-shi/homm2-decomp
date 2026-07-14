@@ -83,6 +83,72 @@ Three entry/source-publication variants regressed the score and shortened the ca
 SHA-256 as canonical. The canonical source was restored. No dim/literal axis from the soft-defer
 ledger was repeated, and neither permutation tool was used.
 
+`icon2b-clean-room-a45e64f.tsv` records the later clean-room restart and is the authoritative
+no-repeat ledger for that pass. Its SHA-256 is
+`4f75bd1b9ff72f8b62b6551d12bf924101a3dd4917c46863cfa85aab1362c51d`. A `not-captured` text
+hash means the transient `.text` artifact was not retained; the full source hash plus score, size,
+relocation count, tested axis, and outcome still identify that state. The canonical implementation
+was mechanically hidden before any candidate work and its body was never inspected or copied.
+Reconstruction used only the public ABI,
+retail disassembly and relocation stream, CodeView layouts, cached decompiler semantics, adjacent
+decoder conventions, and the canonical file's declaration/include surface. The latter was consulted
+only after an independent candidate had been compiled and measured.
+
+The pass crossed two base identities. The first candidate was made at `38b2438`; after the lane was
+reset, all later retained measurements used `a45e64f`. The canonical `Icon2b.cpp` source hash was
+`b42c0b8e368561082811dbcc7b170ab975483447470c577173ad6a9132f26124` at both checkpoints. At
+`38b2438`, the relevant input hashes were `icon.h`
+`84030c0e0ea1296a34cfd9cb19f450af59326522c7d983d78485eec09d97aaf0`, `IconEntry.h`
+`4c213fcda960752692e6f1e202231b26d523bc2fa259c0b8a2d573380d2fb805`, `Icon2b.h`
+`64e20fdcad765b0cf4a2f3aa1c39c424061dc1e2c9211471da8ed6df5f947530`, `bitmap.h`
+`2bdd293d52be21a46247a9257c15ebe2503cf38e50cbc7b3488c82a72127727f`, `X_GLOBAL.h`
+`2a7fce66bcff3f06b7186bb8477d338bdaa42febc708ae104bb22d424ee015e0`, and the baseline
+`9944ebd7d571e578215c686faaead49b869af9fe7b1cb1f7f1588c3632b0cda6`. At `a45e64f`, the
+relevant inputs were:
+
+- `include/BASE/icon.h`:
+  `809577ac8c7a091878b5ff40de5d96d37fe2074f480d45207ba6d7ccd3ef4e22`;
+- `include/BASE/IconEntry.h`:
+  `4c213fcda960752692e6f1e202231b26d523bc2fa259c0b8a2d573380d2fb805`;
+- `include/BASE/Icon2b.h`:
+  `64e20fdcad765b0cf4a2f3aa1c39c424061dc1e2c9211471da8ed6df5f947530`;
+- `include/BASE/bitmap.h`:
+  `2bdd293d52be21a46247a9257c15ebe2503cf38e50cbc7b3488c82a72127727f`;
+- `include/SOURCE/X_GLOBAL.h`:
+  `bf73ee8242bf9ef85786075a62fea0a4501faea2d71fde8068d9b863aa6d8914`;
+- `config/match_baseline.tsv`:
+  `7dabd2551254fa709b797049e36eb20a5ea355430e5af159c72619a15b464aa8`.
+
+The first independent body accidentally shifted the integer roles instead of using the retail map
+`x, y, frame, clip, clipX, clipY, clipW, clipH, color`. It scored `54.535713%`, emitted `0x4a3`
+bytes with an unwanted `0x10` frame, and had 79 candidate versus 83 retail relocations. The matrix
+retains its source and `.text` hashes so this invalid ABI interpretation cannot be rediscovered and
+retried.
+
+The remaining 20 rows record every measured structural step, including regressions and emitted-code
+no-ops. The productive sequence was: correct the parameter roles; recover the retail three-call
+clipped fill; repair `gIcCnt2` publication; use one literal quadrant selector with one common
+`memcpy` tail; place the pitch lifetime before clip classification; split entry X from the running
+X; repair dim palette/destination/count lifetimes; and restore the exact include/scratch declaration
+surface with a typed `IconEntry` local. The independent best was
+`ec6beeb17c9db42ba48d6cbd3fea9ed4a0d8bc4c4500eeba3cdf7dd1670db9f5` at `73.563190%`, size
+`0x4e9`, with all 83 retail relocation records and `.text` SHA-256
+`b134d637dfe087a246840e3b5bdcf6763940b605694dbc059e678c08d9a8bdd9`. An unsigned-byte entry
+cursor regressed to `72.079670%`; splitting the `gIcClipR` snapshot declaration from its assignment
+was byte-identical to the independent best. These two axes must not be retried in the same TU/header
+state.
+
+The independent best did not clear the retained canonical maximum of `74.453300%`, size `0x4c7`,
+79/83 relocations, `.text` SHA-256
+`d5e105683f769459d8f3399fdac4f4a15faa54516b74070090d98ed7c34bb4cb`. Therefore no candidate
+was integrated: the canonical source was restored mechanically without viewing its body. Its live
+score after the `a45e64f` combined-TU/header changes is lower than that retained source-hash maximum;
+this is expected cumulative compiler state, not evidence that the clean-room candidate should replace
+it. Future work should begin from a genuinely changed shared-header/predecessor state and the concrete
+setup register-allocation or fifth dim-publication residual, not replay any matrix row. Neither the
+AST nor regex permuter was used; AST permutation remains inappropriate until the function is truly
+structurally aligned at 96-97%, and the regex permuter is prohibited for this campaign.
+
 ## BASE allocation/assert metadata wrapper sweep
 
 `base-misc-callsite-audit-8ed859f.tsv` records all 86 direct `BaseAlloc`, `BaseFree`, and
