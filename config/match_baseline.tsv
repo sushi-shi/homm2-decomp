@@ -534,7 +534,7 @@ SOURCE/ADVMGR	?ViewPuzzle@advManager@@QAEXXZ	4.0818	cefaa5f0f413
 SOURCE/AI	?AICheckRetreat@combatManager@@QAEHXZ	99.7452	f1845e42e5a8
 SOURCE/AI	?AttemptAdjacentAttack@combatManager@@QAEHPAVarmy@@@Z	98.9646	15153697ccf4
 SOURCE/AI	?AttemptAttack@combatManager@@QAEHPAVarmy@@HH@Z	100.0000	cbe72816bd9a
-SOURCE/AI	?DoCompAI@combatManager@@QAEXH@Z	92.0609	0b110c0203bb
+SOURCE/AI	?DoCompAI@combatManager@@QAEXH@Z	92.0618	0b110c0203bb
 SOURCE/AI	?DoLichShot@combatManager@@QAEXPAVarmy@@@Z	99.9307	d2cea3fb04c7
 SOURCE/AI	?GetAllMask@combatManager@@QAEHH@Z	100.0000	93be9b0e14b4
 SOURCE/AI	?GetBestArmy@combatManager@@QAEHHH@Z	100.0000	8098249c5433
@@ -608,7 +608,7 @@ SOURCE/ARMYGRP	?IsHomogeneous@armyGroup@@QAEHH@Z	16.2558	22f9c1519ce3
 SOURCE/ARMYGRP	?IsMember@armyGroup@@QAEHH@Z	51.7778	5023544b6410
 SOURCE/ARMYGRP	?Swap@armyGroup@@QAEXHPAV1@H@Z	31.6585	7c7b2a086054
 SOURCE/ARMYGRP	?View@armyGroup@@QAEXH@Z	100.0000	10ef94b0363f
-SOURCE/CMBTMGR	??0combatManager@@QAE@XZ	39.8351	c563bfde5083
+SOURCE/CMBTMGR	??0combatManager@@QAE@XZ	100.0000	b8aae05e5955
 SOURCE/CMBTMGR	??_H@YGXPAXIHP6EX0@Z@Z	100.0000	
 SOURCE/CMBTMGR	?CatAttack@combatManager@@QAEXH@Z	1.4743	9b7a4f9c1171
 SOURCE/CMBTMGR	?CheckApplyBadMorale@combatManager@@QAEHHH@Z	11.4590	2ed3d3426717
@@ -616,7 +616,7 @@ SOURCE/CMBTMGR	?CheckApplyGoodMorale@combatManager@@QAEXHH@Z	10.8167	364e0daf9c9
 SOURCE/CMBTMGR	?Close@combatManager@@UAEXXZ	5.3859	f97ac43f3421
 SOURCE/CMBTMGR	?CombatSystemOptions@combatManager@@QAEXXZ	20.2812	cf9de8768ee7
 SOURCE/CMBTMGR	?CombatSystemOptionsHandler@@YIHAAUtag_message@@@Z	1.7068	0cbd21d1f226
-SOURCE/CMBTMGR	?CombineGroups@combatManager@@QAEXPAVarmyGroup@@0@Z	15.2706	118bea840ed2
+SOURCE/CMBTMGR	?CombineGroups@combatManager@@QAEXPAVarmyGroup@@0@Z	100.0000	06a32266b979
 SOURCE/CMBTMGR	?DrawCombatBorder@combatManager@@QAEXXZ	100.0000	8e845432585c
 SOURCE/CMBTMGR	?ExperienceValueOfStack@combatManager@@QAEHH@Z	11.5667	f5ab9f920749
 SOURCE/CMBTMGR	?FreeArmies@combatManager@@QAEXXZ	23.1786	209513d86e6c
@@ -626,7 +626,7 @@ SOURCE/CMBTMGR	?GetBackgroundName@combatManager@@QAEPADXZ	8.9052	482099e8fb5a
 SOURCE/CMBTMGR	?GetGridIndex@combatManager@@QAEHHH@Z	11.2017	ea47226ebadf
 SOURCE/CMBTMGR	?GetNextArmy@combatManager@@QAEHH@Z	6.3836	28250db341ad
 SOURCE/CMBTMGR	?InCastle@combatManager@@QAEHH@Z	26.9231	d251523c6f89
-SOURCE/CMBTMGR	?InitNonVisualVars@combatManager@@QAEXXZ	10.1406	db202d59073f
+SOURCE/CMBTMGR	?InitNonVisualVars@combatManager@@QAEXXZ	100.0000	d3188d9c1d33
 SOURCE/CMBTMGR	?IsWinner@combatManager@@QAEHH@Z	23.0690	01716df03be5
 SOURCE/CMBTMGR	?KeepAttack@combatManager@@QAEXH@Z	3.2049	3e90327b1181
 SOURCE/CMBTMGR	?LoadArmies@combatManager@@QAEXXZ	5.4310	24aae01cedce
@@ -638,9 +638,9 @@ SOURCE/CMBTMGR	?Open@combatManager@@UAEHH@Z	5.2955	003e1cf844e4
 SOURCE/CMBTMGR	?RaiseDoor@combatManager@@QAEXXZ	19.0882	9d5cf33bf056
 SOURCE/CMBTMGR	?ResetHitByCreature@combatManager@@QAEXXZ	30.9048	39dfa5f2e5bf
 SOURCE/CMBTMGR	?SaveCombatBorder@combatManager@@QAEXXZ	100.0000	979ae436e300
-SOURCE/CMBTMGR	?SetupAdjacencyArray@combatManager@@QAEXXZ	4.0085	3ceb5463f117
+SOURCE/CMBTMGR	?SetupAdjacencyArray@combatManager@@QAEXXZ	99.8504	9352838f095e
 SOURCE/CMBTMGR	?SetupAndLoadObstacles@combatManager@@QAEXXZ	4.1338	57c957f5de2e
-SOURCE/CMBTMGR	?SetupCombat@combatManager@@QAEXHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHH@Z	3.7623	c2d280185804
+SOURCE/CMBTMGR	?SetupCombat@combatManager@@QAEXHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHH@Z	100.0000	39a32955f562
 SOURCE/CMBTMGR	?ShootMissile@combatManager@@QAEXHHHHPAMPAVicon@@@Z	3.4521	244997b48b2f
 SOURCE/CMBTMGR	?ShotIsThroughWall@combatManager@@QAEHHHH@Z	5.7061	d6c625bde879
 SOURCE/CMBTMGR	?TestRaiseDoor@combatManager@@QAEXXZ	37.1429	5cd9e725701f
@@ -1170,7 +1170,7 @@ SOURCE/REQUEST	??0fileRequester@@QAE@HHHPAD00@Z	100.0000	a77329906e9d
 SOURCE/REQUEST	?CheckSumIsDemoOK@@YIHPAD@Z	100.0000	df42a0263526
 SOURCE/REQUEST	?CleanUpData@fileRequester@@QAEXXZ	100.0000	3b2479741987
 SOURCE/REQUEST	?Close@fileRequester@@UAEXXZ	100.0000	47ec4c458011
-SOURCE/REQUEST	?DoKnob@fileRequester@@QAEXXZ	99.8177	a9d7c32fbf97
+SOURCE/REQUEST	?DoKnob@fileRequester@@QAEXXZ	99.8229	a9d7c32fbf97
 SOURCE/REQUEST	?GetFilename@fileRequester@@QAEPADXZ	99.3474	497888e37ff4
 SOURCE/REQUEST	?GetMapHeader@@YIHPADPAUSMapHeader@@@Z	100.0000	4d73be2ecfc4
 SOURCE/REQUEST	?InitializeFiles@fileRequester@@QAEHPAD0H@Z	88.1876	9e4dff08dcdc
@@ -1220,7 +1220,7 @@ SOURCE/SPELLAI	?DetermineEffectOfSpell@combatManager@@QAEXHPAH0@Z	98.6101	53be9a
 SOURCE/SPELLAI	?DoSpellAI@combatManager@@QAEHHH@Z	99.2581	c1f178b99783
 SOURCE/SPELLAI	?EffectSpellCreateCreature@combatManager@@QAEHHH@Z	99.0845	2a44cd82f352
 SOURCE/SPELLAI	?EffectSpellCure@combatManager@@QAEXPAHHHH@Z	84.4677	08cc8684aec3
-SOURCE/SPELLAI	?EffectSpellDamage@combatManager@@QAEXPAHHH@Z	96.9606	1ce6c4bf1fd8
+SOURCE/SPELLAI	?EffectSpellDamage@combatManager@@QAEXPAHHH@Z	96.9613	1ce6c4bf1fd8
 SOURCE/SPELLAI	?EffectSpellResurrect@combatManager@@QAEXPAHHH@Z	99.7080	cc93ca7b3f0c
 SOURCE/SPELLAI	?FirstArmy@combatManager@@QAEHHHPAH@Z	100.0000	2702525f7d96
 SOURCE/SPELLAI	?FirstResurrectable@combatManager@@QAEHHPAHH@Z	100.0000	2fe2117adfb3
