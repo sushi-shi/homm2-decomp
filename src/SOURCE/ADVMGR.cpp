@@ -1900,6 +1900,13 @@ void advManager::CompleteDraw(int update)
     CompleteDraw(m_mapOriginX, m_mapOriginY, update, 1);
 }
 
+// @match-note
+// Complete 0x8 frame, mask/edge CFG, and all 51 relocation targets agree.
+// The four residual index blocks are the east and west lookups in each path:
+// retail loads MAP_WIDTH before y for east and forms x+mapExtra before the row
+// term for west. Reassociating the west pointer terms recovered both diagonals;
+// both multiplication orders and all 99 legal single-step AST variants were
+// checked without steering the remaining /Od evaluation order.
 VA(0x0045b7d3, 0x3a9)
 int advManager::GetCloudLookup(int x, int y)
 {
@@ -1918,32 +1925,32 @@ int advManager::GetCloudLookup(int x, int y)
     if (cloudMask == 0) {
         if ((giCurWatchPlayerBit & mapExtra[(y - 1) * MAP_WIDTH + x]) == 0)
             cloudMask |= ADVMGR_CLOUD_NORTH;
-        if ((giCurWatchPlayerBit & mapExtra[y * MAP_WIDTH + x + 1]) == 0)
+        if ((giCurWatchPlayerBit & mapExtra[MAP_WIDTH * y + x + 1]) == 0)
             cloudMask |= ADVMGR_CLOUD_EAST;
         if ((giCurWatchPlayerBit & mapExtra[(y + 1) * MAP_WIDTH + x]) == 0)
             cloudMask |= ADVMGR_CLOUD_SOUTH;
-        if ((giCurWatchPlayerBit & *(x + mapExtra + y * MAP_WIDTH - 1)) == 0)
+        if ((giCurWatchPlayerBit & *(x + mapExtra + MAP_WIDTH * y - 1)) == 0)
             cloudMask |= ADVMGR_CLOUD_WEST;
         if ((giCurWatchPlayerBit & mapExtra[(y - 1) * MAP_WIDTH + x + 1]) == 0)
             cloudMask |= ADVMGR_CLOUD_NORTH_EAST;
         if ((giCurWatchPlayerBit & mapExtra[(y + 1) * MAP_WIDTH + x + 1]) == 0)
             cloudMask |= ADVMGR_CLOUD_SOUTH_EAST;
-        if ((giCurWatchPlayerBit & *(x + mapExtra + (y + 1) * MAP_WIDTH - 1)) == 0)
+        if ((giCurWatchPlayerBit & (x + mapExtra - 1)[(y + 1) * MAP_WIDTH]) == 0)
             cloudMask |= ADVMGR_CLOUD_SOUTH_WEST;
-        if ((giCurWatchPlayerBit & *(x + mapExtra + (y - 1) * MAP_WIDTH - 1)) == 0)
+        if ((giCurWatchPlayerBit & (x + mapExtra - 1)[(y - 1) * MAP_WIDTH]) == 0)
             cloudMask |= ADVMGR_CLOUD_NORTH_WEST;
     } else {
         if ((cloudMask & ADVMGR_CLOUD_NORTH) == 0 &&
             (giCurWatchPlayerBit & mapExtra[(y - 1) * MAP_WIDTH + x]) == 0)
             cloudMask |= ADVMGR_CLOUD_NORTH;
         if ((cloudMask & ADVMGR_CLOUD_EAST) == 0 &&
-            (giCurWatchPlayerBit & mapExtra[y * MAP_WIDTH + x + 1]) == 0)
+            (giCurWatchPlayerBit & mapExtra[MAP_WIDTH * y + x + 1]) == 0)
             cloudMask |= ADVMGR_CLOUD_EAST;
         if ((cloudMask & ADVMGR_CLOUD_SOUTH) == 0 &&
             (giCurWatchPlayerBit & mapExtra[(y + 1) * MAP_WIDTH + x]) == 0)
             cloudMask |= ADVMGR_CLOUD_SOUTH;
         if ((cloudMask & ADVMGR_CLOUD_WEST) == 0 &&
-            (giCurWatchPlayerBit & *(x + mapExtra + y * MAP_WIDTH - 1)) == 0)
+            (giCurWatchPlayerBit & *(x + mapExtra + MAP_WIDTH * y - 1)) == 0)
             cloudMask |= ADVMGR_CLOUD_WEST;
         if ((cloudMask & ADVMGR_CLOUD_NORTH_EAST) == 0 &&
             (giCurWatchPlayerBit & mapExtra[(y - 1) * MAP_WIDTH + x + 1]) == 0)
@@ -1952,10 +1959,10 @@ int advManager::GetCloudLookup(int x, int y)
             (giCurWatchPlayerBit & mapExtra[(y + 1) * MAP_WIDTH + x + 1]) == 0)
             cloudMask |= ADVMGR_CLOUD_SOUTH_EAST;
         if ((cloudMask & ADVMGR_CLOUD_SOUTH_WEST) == 0 &&
-            (giCurWatchPlayerBit & *(x + mapExtra + (y + 1) * MAP_WIDTH - 1)) == 0)
+            (giCurWatchPlayerBit & (x + mapExtra - 1)[(y + 1) * MAP_WIDTH]) == 0)
             cloudMask |= ADVMGR_CLOUD_SOUTH_WEST;
         if ((cloudMask & ADVMGR_CLOUD_NORTH_WEST) == 0 &&
-            (giCurWatchPlayerBit & *(x + mapExtra + (y - 1) * MAP_WIDTH - 1)) == 0)
+            (giCurWatchPlayerBit & (x + mapExtra - 1)[(y - 1) * MAP_WIDTH]) == 0)
             cloudMask |= ADVMGR_CLOUD_NORTH_WEST;
     }
     return giCloudType[cloudMask];
@@ -2583,10 +2590,14 @@ void advManager::DrawCell(int mapX, int mapY, int screenX, int screenY,
     }
 }
 
+// @early-stop
+// Exact 0x4 frame, both relocation targets, and every non-jump opcode/operand.
+// Retail has one additional five-byte jmp $+0 at +0x3e before the fallback
+// return; all four relational spellings and the AST permutation pass were tried.
 VA(0x0045e047, 0x93)
 class mapCell * advManager::GetCell(int x, int y)
 {
-    if (x < 0 || y < 0 || x >= MAP_WIDTH || y >= MAP_HEIGHT)
+    if (x < 0 || y < 0 || x >= MAP_WIDTH || MAP_HEIGHT <= y)
         return m_mapData->cells;
     else
         return &m_mapData->Row(y)[x];
