@@ -23,18 +23,18 @@
 // libclang AST search found no exact form. Retry after a predecessor/include/header
 // TU-state change or new evidence for the original initialization lifetime graph.
 VA(0x004dde00, 0x5a)
-widget::widget(short int x, short int y, short int w, short int h, short int p5, short int kind)
+widget::widget(short int x, short int y, short int width, short int height, short int id, short int kind)
 {
     m_x = x;
     m_owner = 0;
     m_y = y;
     m_next = 0;
-    m_width = w;
+    m_width = width;
     m_prev = 0;
     m_flags = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW;
     m_zOrder = -1;
-    m_height = h;
-    m_id = p5;
+    m_height = height;
+    m_id = id;
     m_kind = kind;
 }
 
@@ -74,25 +74,27 @@ void widget::Close(void) {}
 // @match-note
 // Both sections are 0x2f4 with 17/17 explicit-range relocations and matching
 // external targets. The helper truncates the candidate at a delinked local label,
-// so the explicit object range is authoritative. The remaining 12 non-relocation
-// bytes are +0x23,+0x29,+0x30,+0x38,+0x39,+0x41,+0x42,+0x46,+0x4a,+0x4d,
-// +0x4f,+0x51, all in the mouse-hit-test register coloring; first is our
-// `mov dx,[esi+18h]` versus retail `mov bp,[esi+18h]`. The dispatcher from +0x77
-// onward is byte-identical. Explicit left/owner lifetimes reduced the prior
-// 16-byte residual and raised 99.1333% to 99.2%. Direct/staged coordinates, X/Y
-// and left/owner declaration orders, cached-owner-only, and a 120-iteration
-// audited libclang AST search did not improve it. Splitting the bounds checks kept
-// Main identical but perturbed exact Dim by 25 raw bytes and was rejected. Retry
-// only after a predecessor/include/header TU-state change or new lifetime evidence.
+// so the explicit object range is authoritative. The remaining 8 non-relocation
+// bytes are +0x23,+0x38,+0x41,+0x42,+0x46,+0x4a,+0x4f,+0x51, all in the
+// mouse-hit-test register coloring; first is our `mov bx,[esi+18h]` versus retail
+// `mov bp,[esi+18h]`. The dispatcher from +0x77 onward is byte-identical. Declaring
+// mouse X/Y before the left snapshot reduced the prior 12-byte residual and raised
+// 99.2% to 99.4833% while preserving exact Dim. A retail-timed top snapshot reached
+// 99.7167% in Main but changed exact Dim by 25 raw bytes through TU state. Typed
+// payload references emitted an extra `lea`; width/top snapshots, direct/staged
+// coordinate assignments, positive/rejection CFGs, explicit right/bottom bounds,
+// owner pointer/reference spellings, and audited commutative/relational AST forms
+// did not close the residual without losing an exact sibling. Retry after an
+// exact-preserving predecessor/TU-state change or new lifetime evidence.
 VA(0x004ddee0, 0x2f4)
 int widget::Main(tag_message &message)
 {
     switch (message.type) {
     case MESSAGE_MOUSE_MOVE: {
-        short left = m_x;
-        heroWindow *window = m_owner;
         short x = static_cast<short>(message.payload.mouse.x);
         short y = static_cast<short>(message.payload.mouse.y);
+        short left = m_x;
+        heroWindow *window = m_owner;
         x -= static_cast<short>(window->m_posX);
         y -= static_cast<short>(window->m_posY);
         if (left > x || m_y > y || left + m_width <= x || m_y + m_height <= y)
