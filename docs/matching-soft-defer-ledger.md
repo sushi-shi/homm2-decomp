@@ -91,11 +91,21 @@ Fresh retail-structure pass after `2e351c8`:
   96-97% AST gate with exact size, frame, CFG, and relocations, so a new libclang AST search is
   authorized from this genuinely changed canonical state; the regex permuter remains forbidden.
 
+Focused Setup AST pass after integration at `341e775`:
+
+- `scripts/permute_ast.py` exposed 18 legal first-order variants and compiled 286 new unique hashes
+  in a deterministic 300-attempt walk;
+- every candidate remained at 97.128380% with all 11 objdiff symbols pinned;
+- existing matrix hashes were skipped, unsafe inequality +/-1 rewrites were disabled, and the
+  regex permuter was never used;
+- the complete no-repeat set is
+  [`docs/matching-matrices/textntry-setup-ast-341e775.tsv`](matching-matrices/textntry-setup-ast-341e775.tsv).
+
 Do not repeat those TU-state searches while the canonical source hash and sibling hashes agree.
-Continue with the newly authorized Setup AST search, a retail-evidenced lifetime, or a genuinely
-different exact-preserving predecessor/TU state. Any later accepted wall must satisfy the two
-narrow rules in `.claude/agents/matcher.md`; the current scheduling and register-allocation
-residuals do not.
+The newly authorized local Setup AST space is now exhausted. Continue only with a retail-evidenced
+lifetime or a genuinely different exact-preserving predecessor/TU state. Any later accepted wall
+must satisfy the two narrow rules in `.claude/agents/matcher.md`; the current scheduling and
+register-allocation residuals do not.
 
 ## BASE/listbox: listBoxWidget::Main
 
