@@ -60,6 +60,7 @@ public:
     virtual int Main(struct tag_message &) OVERRIDE;
     // --- methods ---
     void SetupExtraStuff(void);
+    void SetTown(class town *townData) { m_town = townData; }
     void ChangeTown(void);
     void SetupTown(void);
     void UnloadTown(void);
