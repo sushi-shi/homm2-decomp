@@ -352,7 +352,7 @@ BASE/WINMGR	?ConvertToHover@heroWindowManager@@QAEHAAUtag_message@@@Z	100.0000	d
 BASE/WINMGR	?CycleColors@@YIXH@Z	91.6897	f075327ebd61
 BASE/WINMGR	?DoDialog@heroWindowManager@@QAEHPAVheroWindow@@P6IHAAUtag_message@@@ZH@Z	99.1111	9b5686853444
 BASE/WINMGR	?FadeScreen@heroWindowManager@@QAEXHHPAVpalette@@@Z	100.0000	76fa3ab96e6f
-BASE/WINMGR	?FizzleForward@heroWindowManager@@QAEXHHHHHPAC0@Z	91.6118	274b237c084e
+BASE/WINMGR	?FizzleForward@heroWindowManager@@QAEXHHHHHPAC0@Z	93.5132	274b237c084e
 BASE/WINMGR	?Main@heroWindowManager@@UAEHAAUtag_message@@@Z	100.0000	5ef8d637ceb1
 BASE/WINMGR	?Open@heroWindowManager@@UAEHH@Z	94.1364	8b5189a68f7c
 BASE/WINMGR	?RedrawScreen@heroWindowManager@@QAEXXZ	100.0000	c64b79610770
@@ -378,7 +378,7 @@ BASE/droplist	?ProcessSelectDialog@dropListWidget@@QAEXXZ	99.3675	850bfb90269e
 BASE/droplist	?Read@dropListWidget@@QAEXXZ	100.0000	3e0df002aca4
 BASE/droplist	?RestoreDropBackground@dropListWidget@@QAEXXZ	100.0000	fdd690daaab3
 BASE/droplist	?SaveDropBackground@dropListWidget@@QAEXXZ	100.0000	b3d5c9e1b5dd
-BASE/icon2bc	?IconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAEH@Z	72.4789	d70464fd672d
+BASE/icon2bc	?IconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAEH@Z	73.1690	e215e7f415ef
 BASE/icon2bs	?IconToBitmapScale@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	76.3262	a49d5fdfa818
 BASE/icon2by	?IconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	95.7995	e2aeb74dde86
 BASE/iconf2bc	?FlipIconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAE@Z	86.2544	f01807f68ef1
@@ -633,7 +633,7 @@ SOURCE/CMBTMGR	?LoadArmies@combatManager@@QAEXXZ	100.0000	dad8fbade916
 SOURCE/CMBTMGR	?LoadIcons@combatManager@@QAEXXZ	99.0950	9d37dcce1102
 SOURCE/CMBTMGR	?LowerDoor@combatManager@@QAEXXZ	100.0000	918dcc68e92c
 SOURCE/CMBTMGR	?MakeCreaturesVanish@combatManager@@QAEXXZ	97.1768	7c9c366912f7
-SOURCE/CMBTMGR	?MoreTreesNear@combatManager@@QAEHXZ	99.8607	a402d9897997
+SOURCE/CMBTMGR	?MoreTreesNear@combatManager@@QAEHXZ	99.8714	a402d9897997
 SOURCE/CMBTMGR	?Open@combatManager@@UAEHH@Z	100.0000	57d789afcb44
 SOURCE/CMBTMGR	?RaiseDoor@combatManager@@QAEXXZ	100.0000	9a674310a467
 SOURCE/CMBTMGR	?ResetHitByCreature@combatManager@@QAEXXZ	100.0000	9c52e2ebb50d
@@ -642,7 +642,7 @@ SOURCE/CMBTMGR	?SetupAdjacencyArray@combatManager@@QAEXXZ	99.8504	9352838f095e
 SOURCE/CMBTMGR	?SetupAndLoadObstacles@combatManager@@QAEXXZ	96.6975	1fd853efcc68
 SOURCE/CMBTMGR	?SetupCombat@combatManager@@QAEXHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHH@Z	100.0000	39a32955f562
 SOURCE/CMBTMGR	?ShootMissile@combatManager@@QAEXHHHHPAMPAVicon@@@Z	98.9122	8d6b1fc77ccf
-SOURCE/CMBTMGR	?ShotIsThroughWall@combatManager@@QAEHHHH@Z	99.5224	f72148cef30c
+SOURCE/CMBTMGR	?ShotIsThroughWall@combatManager@@QAEHHHH@Z	99.7673	f72148cef30c
 SOURCE/CMBTMGR	?TestRaiseDoor@combatManager@@QAEXXZ	100.0000	7504407c9f03
 SOURCE/CMBTMGR	?UpdateArmyGroup@combatManager@@QAEXH@Z	100.0000	1a722a93d70c
 SOURCE/CMBTMGR	?UpdateCombatSystemOptions@@YIXH@Z	100.0000	18c1ecfac032
