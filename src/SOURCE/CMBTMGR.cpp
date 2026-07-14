@@ -5,6 +5,7 @@
 
 #include <va.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <_globals_model.h>
 #include <BASE/bitmap.h>
@@ -242,8 +243,8 @@ void combatManager::InitNonVisualVars(void)
 
     m_heroOverlayFrame[COMBAT_ATTACKER_SIDE] = 0;
     m_heroOverlayFrame[COMBAT_DEFENDER_SIDE] = 3;
-    m_unknownF377 = 0;
-    m_unknownF37B = 0;
+    m_sideRetreated[COMBAT_ATTACKER_SIDE] = 0;
+    m_sideRetreated[COMBAT_DEFENDER_SIDE] = 0;
     m_combatResult = 3;
     m_deathFlags[4] = m_deathFlags[5] = 0;
     m_deathFlags[6] = m_deathFlags[7] = 0;
@@ -259,11 +260,11 @@ void combatManager::InitNonVisualVars(void)
     m_unknownF2CB = COMBAT_INVALID_HISTORY_INDEX;
     m_currentSide = COMBAT_DEFENDER_SIDE;
     m_currentArmySide = COMBAT_DEFENDER_SIDE;
-    m_unknownF2AB = COMBAT_INITIAL_COMMAND;
+    m_currentSpeed = COMBAT_INITIAL_COMMAND;
     gbRetreatWin = 0;
     gbCombatSurrender = 0;
-    m_unknown351F = 0;
-    m_unknown3523 = 0;
+    m_sideDefeated[COMBAT_ATTACKER_SIDE] = 0;
+    m_sideDefeated[COMBAT_DEFENDER_SIDE] = 0;
     m_limitCreature = 1;
     m_obstacleIcons[8] = 0;
     SetupAdjacencyArray();
@@ -714,31 +715,464 @@ int combatManager::MoreTreesNear(void)
 }
 
 VA(0x00491dda, 0x3e7)
-void combatManager::LoadIcons(void) {}
+// @early-stop exact 0x3e7-byte span and 58 relocation targets. Every
+// non-jump opcode and operand matches; the sole residual is the five-byte
+// GetPlayerColor /Ob1 continuation at +0x372 here versus retail +0x3a0.
+void combatManager::LoadIcons(void)
+{
+    int index;
+    int heroColor;
+    for (index = 0; index < COMBAT_FIXED_ICON_COUNT; index++)
+        m_combatIcons[index] = 0;
+
+    for (index = 0; index < COMBAT_OBSTACLE_ICON_LOAD_COUNT; index++)
+        m_obstacleIcons[index] = 0;
+
+    m_combatIcons[COMBAT_ICON_SPELLS] = gpResourceManager->GetIcon("spells.icn");
+    m_combatIcons[COMBAT_ICON_STATUS] = gpResourceManager->GetIcon("textbar.icn");
+    m_combatIcons[COMBAT_ICON_GRID] = gpResourceManager->GetIcon("cmbtmisc.icn");
+    m_combatIcons[COMBAT_ICON_SMALL_VIEW_BACKGROUND] =
+        gpResourceManager->GetIcon("viewarsm.icn");
+    m_combatIcons[COMBAT_ICON_SMALL_VIEW_MODIFIER] =
+        gpResourceManager->GetIcon("minilkmr.icn");
+    m_combatIcons[COMBAT_ICON_SMALL_VIEW_SPELL] =
+        gpResourceManager->GetIcon("spellinf.icn");
+
+    if (m_inCastleCombat) {
+        if (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings &
+            TOWN_BUILDING_MOAT) {
+            m_combatIcons[COMBAT_ICON_MOAT] =
+                gpResourceManager->GetIcon("moatpart.icn");
+            m_combatIcons[COMBAT_ICON_DRAWBRIDGE] =
+                gpResourceManager->GetIcon("moatwhol.icn");
+        }
+        m_combatIcons[COMBAT_ICON_CATAPULT] =
+            gpResourceManager->GetIcon("catapult.icn");
+        sprintf(gText, "castle%c.icn",
+                cHeroTypeInitial[m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type]);
+        m_combatIcons[COMBAT_ICON_TOWER] = gpResourceManager->GetIcon(gText);
+        m_combatIcons[COMBAT_ICON_KEEP] = gpResourceManager->GetIcon("keep.icn");
+    }
+
+    for (index = 0; index < COMBAT_MANAGER_SIDE_COUNT; index++) {
+        m_heroIcons[index] = 0;
+        m_heroOverlayIcons[index] = 0;
+        m_heroAnimationState[index] = 0;
+        m_heroAnimationFrame[index] = 0;
+        m_heroSpriteIndex[index] = -1;
+
+        if (m_heroes[index]) {
+            if (m_heroes[index]->m_isCaptain) {
+                sprintf(gText, "cmbtcap%c.icn",
+                        cHeroTypeInitial[m_heroes[index]->m_cursorType]);
+                m_heroIcons[index] = gpResourceManager->GetIcon(gText);
+                m_heroSpriteIndex[index] = m_heroes[index]->m_cursorType + 6;
+            } else {
+                sprintf(gText, "cmbthro%c.icn",
+                        cHeroTypeInitial[m_heroes[index]->m_cursorType]);
+                m_heroIcons[index] = gpResourceManager->GetIcon(gText);
+                m_heroSpriteIndex[index] = m_heroes[index]->m_cursorType;
+            }
+        }
+
+        if (m_heroIcons[index]) {
+            if (m_playerId[index] == -1)
+                heroColor = 6;
+            else
+                heroColor = gpGame->GetPlayerColor(
+                    static_cast<signed char>(m_playerId[index]));
+            sprintf(gText, "herofl%02d.icn", heroColor);
+            m_heroOverlayIcons[index] = gpResourceManager->GetIcon(gText);
+        }
+    }
+}
 
 VA(0x004921c1, 0x124)
-void combatManager::FreeIcons(void) {}
+void combatManager::FreeIcons(void)
+{
+    int index;
+    for (index = 0; index < COMBAT_FIXED_ICON_COUNT; index++) {
+        if (m_combatIcons[index])
+            gpResourceManager->Dispose(m_combatIcons[index]);
+    }
+
+    for (index = 0; index < COMBAT_OBSTACLE_ICON_LOAD_COUNT; index++) {
+        if (m_obstacleIcons[index])
+            gpResourceManager->Dispose(m_obstacleIcons[index]);
+    }
+
+    for (index = 0; index < COMBAT_MANAGER_SIDE_COUNT; index++) {
+        if (m_heroIcons[index])
+            gpResourceManager->Dispose(m_heroIcons[index]);
+        if (m_heroOverlayIcons[index])
+            gpResourceManager->Dispose(m_heroOverlayIcons[index]);
+    }
+}
 
 VA(0x004922e5, 0x36d)
-void combatManager::LoadArmies(void) {}
+void combatManager::LoadArmies(void)
+{
+    int groupSlot;
+    int side;
+    int combatHex;
+
+    m_armyCount[COMBAT_ATTACKER_SIDE] =
+        m_armyCount[COMBAT_DEFENDER_SIDE] = 0;
+
+    for (groupSlot = 0; groupSlot < COMBAT_ARMY_CAPACITY; groupSlot++) {
+        for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; side++) {
+            m_armies[side][groupSlot].m_quantity = 0;
+            m_armies[side][groupSlot].m_monsterType = -1;
+        }
+    }
+
+    for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; side++) {
+        for (groupSlot = 0; groupSlot < COMBAT_ARMY_CAPACITY; groupSlot++)
+            m_armies[side][groupSlot].InitClean();
+    }
+
+    for (groupSlot = 0; groupSlot < ARMY_GROUP_SLOT_COUNT; groupSlot++) {
+        if (m_armyGroups[COMBAT_ATTACKER_SIDE]->m_creatureTypes[groupSlot] !=
+            ARMY_GROUP_EMPTY_SLOT) {
+            if (m_heroes[COMBAT_ATTACKER_SIDE] &&
+                (m_heroes[COMBAT_ATTACKER_SIDE]->m_eventFlags &
+                 HERO_EVENT_GROUPED_FORMATION))
+                combatHex = COMBAT_GROUPED_HEX_STEP * groupSlot +
+                            COMBAT_ATTACKER_GROUPED_HEX;
+            else
+                combatHex = COMBAT_SPREAD_HEX_STEP * groupSlot +
+                            COMBAT_ATTACKER_SPREAD_HEX;
+
+            m_armies[COMBAT_ATTACKER_SIDE]
+                    [m_armyCount[COMBAT_ATTACKER_SIDE]]
+                        .Init(m_armyGroups[COMBAT_ATTACKER_SIDE]
+                                  ->m_creatureTypes[groupSlot],
+                              m_armyGroups[COMBAT_ATTACKER_SIDE]
+                                  ->m_creatureCounts[groupSlot],
+                              COMBAT_ATTACKER_SIDE,
+                              m_armyCount[COMBAT_ATTACKER_SIDE], combatHex,
+                              groupSlot);
+            m_armies[COMBAT_ATTACKER_SIDE]
+                    [m_armyCount[COMBAT_ATTACKER_SIDE]]
+                        .LoadResources();
+            m_armyCount[COMBAT_ATTACKER_SIDE]++;
+        }
+
+        if (m_armyGroups[COMBAT_DEFENDER_SIDE]->m_creatureTypes[groupSlot] !=
+            ARMY_GROUP_EMPTY_SLOT) {
+            if ((m_heroes[COMBAT_DEFENDER_SIDE] &&
+                 (m_heroes[COMBAT_DEFENDER_SIDE]->m_eventFlags &
+                  HERO_EVENT_GROUPED_FORMATION)) ||
+                (m_combatTowns[COMBAT_DEFENDER_SIDE] &&
+                 m_combatTowns[COMBAT_DEFENDER_SIDE]->m_formation))
+                combatHex = COMBAT_GROUPED_HEX_STEP * groupSlot +
+                            COMBAT_DEFENDER_GROUPED_HEX;
+            else
+                combatHex = COMBAT_SPREAD_HEX_STEP * groupSlot +
+                            COMBAT_DEFENDER_SPREAD_HEX;
+
+            m_armies[COMBAT_DEFENDER_SIDE]
+                    [m_armyCount[COMBAT_DEFENDER_SIDE]]
+                        .Init(m_armyGroups[COMBAT_DEFENDER_SIDE]
+                                  ->m_creatureTypes[groupSlot],
+                              m_armyGroups[COMBAT_DEFENDER_SIDE]
+                                  ->m_creatureCounts[groupSlot],
+                              COMBAT_DEFENDER_SIDE,
+                              m_armyCount[COMBAT_DEFENDER_SIDE], combatHex,
+                              groupSlot);
+            m_armies[COMBAT_DEFENDER_SIDE]
+                    [m_armyCount[COMBAT_DEFENDER_SIDE]]
+                        .LoadResources();
+            m_armyCount[COMBAT_DEFENDER_SIDE]++;
+        }
+    }
+}
 
 VA(0x00492652, 0xdb)
-void combatManager::FreeArmies(void) {}
+void combatManager::FreeArmies(void)
+{
+    int index;
+    gpSoundManager->StopAllSamples(1);
+
+    for (index = 0; index < m_armyCount[COMBAT_ATTACKER_SIDE]; index++)
+        m_armies[COMBAT_ATTACKER_SIDE][index].FreeResources();
+    for (index = 0; index < m_armyCount[COMBAT_DEFENDER_SIDE]; index++)
+        m_armies[COMBAT_DEFENDER_SIDE][index].FreeResources();
+
+    if (gCurLoadedSpellIcon)
+        gpResourceManager->Dispose(gCurLoadedSpellIcon);
+    gCurLoadedSpellIcon = 0;
+    gCurLoadedSpellEffect = -1;
+}
 
 VA(0x0049272d, 0x1e2)
-int combatManager::GetGridIndex(int, int) { return 0; }
+int combatManager::GetGridIndex(int x, int y)
+{
+    int gridX;
+    int gridY;
+    int rowIndex;
+    int gridColumn;
+    int diagonalDistance;
+    int yOffset;
+    int xResidual;
+
+    gridX = x;
+    gridY = y;
+    gridY -= COMBAT_HEX_GRID_TOP_ORIGIN;
+    rowIndex = gridY / COMBAT_HEX_VERTICAL_STEP;
+    gridX -= COMBAT_GRID_INDEX_X_ORIGIN;
+    if (!(rowIndex & 1))
+        gridX -= COMBAT_HEX_ROW_STAGGER;
+    gridColumn = gridX / COMBAT_HEX_HORIZONTAL_STEP;
+
+    if (gridColumn < 0)
+        goto specialRegion;
+
+    yOffset = gridY % COMBAT_HEX_VERTICAL_STEP;
+    if (yOffset < COMBAT_GRID_DIAGONAL_HEIGHT) {
+        xResidual = gridX % COMBAT_HEX_HORIZONTAL_STEP;
+        diagonalDistance =
+            abs(xResidual - COMBAT_HEX_ROW_STAGGER) /
+            COMBAT_GRID_DIAGONAL_SLOPE_DIVISOR;
+        if (yOffset < diagonalDistance) {
+            rowIndex--;
+            if (xResidual < COMBAT_HEX_ROW_STAGGER) {
+                if (!(rowIndex & 1))
+                    gridColumn--;
+            } else if (rowIndex & 1) {
+                gridColumn++;
+            }
+        }
+    }
+
+    if (gridColumn <= COMBAT_GRID_REVERSE_COLUMN_END ||
+        gridColumn >= COMBAT_GRID_COLUMN_END ||
+        rowIndex >= COMBAT_GRID_ROW_COUNT ||
+        rowIndex < 0) {
+specialRegion:
+        if (x >= 0 && x <= COMBAT_GRID_LEFT_SPECIAL_X_MAX &&
+            y >= COMBAT_GRID_LEFT_SPECIAL_Y_MIN &&
+            y <= COMBAT_GRID_LEFT_SPECIAL_Y_MAX)
+            return COMBAT_GRID_LEFT_SPECIAL_HEX;
+        if (x >= COMBAT_GRID_RIGHT_SPECIAL_X_MIN &&
+            x <= COMBAT_MAX_EXTENT_X &&
+            y >= COMBAT_GRID_RIGHT_UPPER_Y_MIN &&
+            y <= COMBAT_GRID_RIGHT_UPPER_Y_MAX)
+            return COMBAT_GRID_RIGHT_UPPER_HEX;
+        if (x >= COMBAT_GRID_RIGHT_SPECIAL_X_MIN &&
+            x <= COMBAT_MAX_EXTENT_X &&
+            y >= COMBAT_GRID_RIGHT_LOWER_Y_MIN &&
+            y <= COMBAT_GRID_RIGHT_LOWER_Y_MAX &&
+            m_inCastleCombat)
+            return COMBAT_BALLISTA_HEX;
+        return -1;
+    }
+    return rowIndex * COMBAT_GRID_ROW_LENGTH + gridColumn;
+}
 
 VA(0x0049290f, 0x1eb)
-void combatManager::CheckApplyGoodMorale(int, int) {}
+void combatManager::CheckApplyGoodMorale(int side, int index)
+{
+    if (side < 0 || index < 0)
+        return;
+    if (bInHighMoraleBonus) {
+        bInHighMoraleBonus = 0;
+        return;
+    }
+    bInHighMoraleBonus = 0;
+
+    army *activeArmy = &m_armies[side][index];
+    if (activeArmy->m_monster.flags.all & MONSTER_FLAGS_NO_MORALE)
+        return;
+    if (activeArmy->m_quantity == 0)
+        return;
+    if (activeArmy->m_morale <= 0 ||
+        SRandom(COMBAT_MORALE_ROLL_MIN, COMBAT_GOOD_MORALE_ROLL_MAX) >
+            activeArmy->m_morale)
+        return;
+
+    bInHighMoraleBonus = 1;
+    SAMPLE2 moraleSample;
+    if (!gbNoShowCombat) {
+        sprintf(gText, "goodmrle.82M");
+        moraleSample = LoadPlaySample(gText);
+        if (activeArmy->m_quantity <= 1)
+            sprintf(gText, "High morale enables the \n%s to attack again.",
+                    gArmyNames[activeArmy->m_monsterType]);
+        else
+            sprintf(gText, "High morale enables the \n%s to attack again.",
+                    gArmyNamesPlural[activeArmy->m_monsterType]);
+        CombatMessage(gText, 1, 1, 0);
+    }
+
+    activeArmy->SpellEffect(COMBAT_GOOD_MORALE_EFFECT,
+                            COMBAT_MORALE_EFFECT_DURATION, 0);
+    if (activeArmy->m_monster.flags.abilityFlags &
+        MONSTER_ABILITY_FLAG_BAD_MORALE)
+        activeArmy->m_monster.flags.abilityFlags -=
+            MONSTER_ABILITY_FLAG_BAD_MORALE;
+    activeArmy->m_monster.flags.abilityFlags |=
+        MONSTER_ABILITY_FLAG_HIGH_MORALE;
+
+    if (!gbNoShowCombat)
+        WaitEndSample(moraleSample, -1);
+}
 
 VA(0x00492afa, 0x1cd)
-int combatManager::CheckApplyBadMorale(int, int) { return 0; }
+int combatManager::CheckApplyBadMorale(int side, int index)
+{
+    if (side < 0 || index < 0)
+        return 0;
+
+    army *activeArmy = &m_armies[side][index];
+    if (activeArmy->m_monster.flags.all & MONSTER_FLAGS_NO_MORALE)
+        return 0;
+    if (activeArmy->m_morale >= 0 ||
+        SRandom(COMBAT_MORALE_ROLL_MIN, COMBAT_BAD_MORALE_ROLL_MAX) >
+            -activeArmy->m_morale)
+        return 0;
+    if (!m_networkArmyPresent[side] &&
+        SRandom(COMBAT_MORALE_ROLL_MIN,
+                COMBAT_BAD_MORALE_NETWORK_ROLL_MAX) ==
+            COMBAT_BAD_MORALE_NETWORK_SKIP_ROLL)
+        return 0;
+
+    SAMPLE2 moraleSample;
+    if (!gbNoShowCombat) {
+        moraleSample = NULL_SAMPLE2;
+        moraleSample = LoadPlaySample("BADMRLE.82M");
+        if (activeArmy->m_quantity <= 1)
+            sprintf(gText, "Low morale causes the \n%s to freeze in panic.",
+                    gArmyNames[activeArmy->m_monsterType]);
+        else
+            sprintf(gText, "Low morale causes the \n%s to freeze in panic.",
+                    gArmyNamesPlural[activeArmy->m_monsterType]);
+        CombatMessage(gText, 1, 1, 0);
+    }
+
+    activeArmy->SpellEffect(COMBAT_BAD_MORALE_EFFECT,
+                            COMBAT_MORALE_EFFECT_DURATION, 1);
+    activeArmy->m_monster.flags.abilityFlags |=
+        MONSTER_ABILITY_FLAG_BAD_MORALE;
+    if (!gbNoShowCombat)
+        WaitEndSample(moraleSample, -1);
+    return 1;
+}
 
 VA(0x00492cc7, 0x382)
-int combatManager::GetNextArmy(int) { return 0; }
+int combatManager::GetNextArmy(int checkMorale)
+{
+    army *activeArmy;
+    int speedLoop;
+    int stackSide;
+    int armyCounter;
+    int sideLoop;
+    int hasDeferred;
+    int skipEntry;
+    int armyOffset;
+
+restart:
+    hasDeferred = 0;
+    stackSide = m_currentArmySide;
+    m_currentSpeed = COMBAT_MAX_SPEED;
+    for (speedLoop = 0; speedLoop < COMBAT_SPEED_LEVEL_COUNT; speedLoop++) {
+        for (sideLoop = 0; sideLoop < COMBAT_MANAGER_SIDE_COUNT; sideLoop++) {
+            stackSide ^= 1;
+            for (armyCounter = 0; armyCounter < m_armyCount[stackSide];
+                 armyCounter++) {
+                skipEntry = 0;
+                activeArmy = armyCounter + m_armies[stackSide];
+                if ((activeArmy->m_monster.flags.abilityFlags &
+                     (MONSTER_ABILITY_FLAG_AI_EXCLUDED |
+                      MONSTER_ABILITY_FLAG_BAD_MORALE)) ||
+                    activeArmy->m_spellInfluence
+                        [ARMY_SPELL_INFLUENCE_PARALYZE] ||
+                    activeArmy->m_spellInfluence
+                        [ARMY_SPELL_INFLUENCE_PETRIFIED] ||
+                    activeArmy->m_spellInfluence[ARMY_SPELL_INFLUENCE_BLIND] ||
+                    (activeArmy->m_monster.speed != m_currentSpeed &&
+                     !(activeArmy->m_monster.flags.abilityFlags &
+                       MONSTER_ABILITY_FLAG_HIGH_MORALE)))
+                    skipEntry = 1;
+
+                if (!skipEntry && speedLoop == 0 &&
+                    !(activeArmy->m_monster.flags.abilityFlags &
+                      MONSTER_ABILITY_FLAG_HIGH_MORALE))
+                    skipEntry = 1;
+
+                if (activeArmy->m_monster.flags.abilityFlags &
+                    MONSTER_ABILITY_FLAG_DEFERRED_TURN) {
+                    skipEntry = 1;
+                    hasDeferred = 1;
+                }
+
+                if (!skipEntry && checkMorale &&
+                    CheckApplyBadMorale(stackSide, armyCounter))
+                    skipEntry = 1;
+                if (!skipEntry)
+                    break;
+            }
+
+            if (armyCounter != m_armyCount[stackSide]) {
+                m_currentArmySide = stackSide;
+                m_currentArmyIndex = armyCounter;
+                if ((armyCounter + m_armies[stackSide])
+                        ->m_spellInfluence[ARMY_SPELL_INFLUENCE_HYPNOTIZE])
+                    m_currentSide = 1 - stackSide;
+                else
+                    m_currentSide = stackSide;
+                GetControl();
+                return 1;
+            }
+        }
+
+        if (speedLoop) {
+            m_currentSpeed--;
+            if (m_currentSpeed == 0)
+                m_currentSpeed = COMBAT_SPEED_LEVEL_COUNT;
+        }
+    }
+
+    if (hasDeferred) {
+        checkMorale = 0;
+        for (sideLoop = 0; sideLoop < COMBAT_MANAGER_SIDE_COUNT; sideLoop++) {
+            for (armyCounter = 0; armyCounter < m_armyCount[sideLoop];
+                 armyCounter++) {
+                (m_armies[sideLoop] + armyCounter)
+                    ->m_monster.flags.abilityFlags &=
+                    ~MONSTER_ABILITY_FLAG_DEFERRED_TURN;
+            }
+        }
+        goto restart;
+    }
+
+    CheckCastleAttack();
+    m_currentSide = 1 - m_currentSide;
+    CheckCastleAttack();
+    m_currentSide = 1 - m_currentSide;
+    return 0;
+}
 
 VA(0x00493049, 0xd6)
-int combatManager::IsWinner(int) { return 0; }
+int combatManager::IsWinner(int side)
+{
+    int winner;
+    int index;
+
+    if (m_sideDefeated[1 - side])
+        return 1;
+    if (m_sideRetreated[1 - side])
+        return 1;
+
+    side ^= 1;
+    winner = 1;
+    for (index = 0; index < m_armyCount[side]; index++) {
+        if (!(m_armies[side][index].m_monster.flags.abilityFlags &
+              MONSTER_ABILITY_FLAG_AI_EXCLUDED))
+            winner = 0;
+    }
+    return winner;
+}
 
 VA(0x0049311f, 0x100e)
 void combatManager::CatAttack(int) {}

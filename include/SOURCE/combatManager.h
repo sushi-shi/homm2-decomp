@@ -70,6 +70,7 @@ enum {
     COMBAT_GRID_COLUMN_END = 12,
     COMBAT_GRID_REVERSE_FIRST_COLUMN = 11,
     COMBAT_GRID_REVERSE_COLUMN_END = 0,
+    COMBAT_MANAGER_SIDE_COUNT = 2,
     COMBAT_DRAW_PHASE_COUNT = 4,
     COMBAT_DRAW_ALL_OCCUPANTS = 100,
     COMBAT_CASTLE_REVERSE_ROW = 5,
@@ -174,10 +175,45 @@ enum {
     COMBAT_HEX_CENTER_Y_ORIGIN = 63,
     COMBAT_HEX_GRID_LEFT_ORIGIN = 67,
     COMBAT_HEX_GRID_TOP_ORIGIN = 63,
+    COMBAT_GRID_INDEX_X_ORIGIN = 23,
+    COMBAT_GRID_DIAGONAL_HEIGHT = 10,
+    COMBAT_GRID_DIAGONAL_SLOPE_DIVISOR = 2,
+    COMBAT_GRID_LEFT_SPECIAL_X_MAX = 74,
+    COMBAT_GRID_LEFT_SPECIAL_Y_MIN = 80,
+    COMBAT_GRID_LEFT_SPECIAL_Y_MAX = 196,
+    COMBAT_GRID_LEFT_SPECIAL_HEX = 26,
+    COMBAT_GRID_RIGHT_SPECIAL_X_MIN = 566,
+    COMBAT_GRID_RIGHT_UPPER_Y_MIN = 37,
+    COMBAT_GRID_RIGHT_UPPER_Y_MAX = 153,
+    COMBAT_GRID_RIGHT_UPPER_HEX = 25,
+    COMBAT_GRID_RIGHT_LOWER_Y_MIN = 154,
+    COMBAT_GRID_RIGHT_LOWER_Y_MAX = 310,
+    COMBAT_FIXED_ICON_COUNT = 15,
+    COMBAT_OBSTACLE_ICON_LOAD_COUNT = 8,
+    COMBAT_ARMY_CAPACITY = 20,
+    COMBAT_SPEED_LEVEL_COUNT = 15,
+    COMBAT_MAX_SPEED = 14,
+    COMBAT_GROUPED_HEX_STEP = 13,
+    COMBAT_SPREAD_HEX_STEP = 26,
+    COMBAT_ATTACKER_GROUPED_HEX = 27,
+    COMBAT_ATTACKER_SPREAD_HEX = 1,
+    COMBAT_DEFENDER_GROUPED_HEX = 37,
+    COMBAT_DEFENDER_SPREAD_HEX = 11,
     COMBAT_CASTLE_BACKGROUND_BASE_FRAME = 1,
     COMBAT_CASTLE_BACKGROUND_BUILDING_FRAME = 4,
     COMBAT_CASTLE_BACKGROUND_DEFAULT_FRAME = 3
 };
+
+typedef enum CombatMoraleConstant {
+    COMBAT_MORALE_ROLL_MIN = 1,
+    COMBAT_GOOD_MORALE_ROLL_MAX = 24,
+    COMBAT_BAD_MORALE_ROLL_MAX = 12,
+    COMBAT_BAD_MORALE_NETWORK_ROLL_MAX = 4,
+    COMBAT_BAD_MORALE_NETWORK_SKIP_ROLL = 1,
+    COMBAT_GOOD_MORALE_EFFECT = 11,
+    COMBAT_BAD_MORALE_EFFECT = 12,
+    COMBAT_MORALE_EFFECT_DURATION = 180
+} CombatMoraleConstant;
 
 typedef enum CombatTerrainType {
     COMBAT_TERRAIN_WATER = 0,
@@ -212,6 +248,20 @@ typedef enum CombatNearbyTileset {
     COMBAT_TILESET_SUMMER_TREES = 0x2b,
     COMBAT_TILESET_AUTUMN_TREES = 0x2c
 } CombatNearbyTileset;
+
+typedef enum CombatIconIndex {
+    COMBAT_ICON_STATUS = 1,
+    COMBAT_ICON_CATAPULT = 3,
+    COMBAT_ICON_TOWER = 5,
+    COMBAT_ICON_KEEP = 7,
+    COMBAT_ICON_SPELLS = 8,
+    COMBAT_ICON_GRID = 9,
+    COMBAT_ICON_SMALL_VIEW_BACKGROUND = 10,
+    COMBAT_ICON_SMALL_VIEW_MODIFIER = 11,
+    COMBAT_ICON_SMALL_VIEW_SPELL = 12,
+    COMBAT_ICON_MOAT = 13,
+    COMBAT_ICON_DRAWBRIDGE = 14
+} CombatIconIndex;
 
 #define COMBAT_RANDOM_X_MULTIPLIER 100
 #define COMBAT_CAPTAIN_SPELL_POINT_MULTIPLIER 10
@@ -428,19 +478,7 @@ public:
     int m_colorCycleType;  // +0x31ea
     char _pad_0x31ee[0x4];
     int m_debugFormation;  // +0x31f2
-    char _pad_0x31f6[0x4];
-    class icon *m_combatStatusIcon;  // +0x31fa
-    char _pad_0x31fe[0x4];
-    class icon *m_catapultIcon;  // +0x3202
-    char _pad_0x3206[0x4];
-    class icon *m_towerIcon;  // +0x320a
-    char _pad_0x320e[0xc];
-    class icon *m_gridIcon;  // +0x321a
-    class icon *m_smallViewBackgroundIcon;  // +0x321e
-    class icon *m_smallViewModifierIcon;  // +0x3222
-    class icon *m_smallViewSpellIcon;  // +0x3226
-    class icon *m_moatIcon;  // +0x322a
-    class icon *m_drawbridgeIcon;  // +0x322e
+    class icon *m_combatIcons[COMBAT_FIXED_ICON_COUNT];  // +0x31f6
     class icon *m_obstacleIcons[9];  // +0x3232
     short m_eagleEyeSpell[2];  // +0x3256
     int m_drawbridgeState;  // +0x325a
@@ -473,8 +511,7 @@ public:
     int m_combatMessagePending;  // +0x34b5
     char _pad_0x34b9[0x64];
     unsigned char m_unknown351D[2];  // +0x351d
-    int m_unknown351F;  // +0x351f
-    int m_unknown3523;  // +0x3523
+    int m_sideDefeated[2];  // +0x351f
     int m_networkArmyPresent[2];  // +0x3527
     int m_playerId[2];  // +0x352f
     char _pad_0x3537[0x8];
@@ -483,7 +520,7 @@ public:
     class army m_armies[2][21];  // +0x354f
     int m_currentArmySide;  // +0xf2a3
     int m_currentArmyIndex;  // +0xf2a7
-    int m_unknownF2AB;  // +0xf2ab
+    int m_currentSpeed;  // +0xf2ab
     int m_currentSide;  // +0xf2af
     int m_gridSelectionDisabled;  // +0xf2b3
     int m_limitCreature;  // +0xf2b7
@@ -514,8 +551,7 @@ public:
     class heroWindow *m_combatWindow;  // +0xf367
     char _pad_0xf36b[0x8];
     int m_unknownF373;  // +0xf373
-    int m_unknownF377;  // +0xf377
-    int m_unknownF37B;  // +0xf37b
+    int m_sideRetreated[2];  // +0xf377
     int m_limitCreatureCount[2][20];  // +0xf37f
     int m_drawHero[2];  // +0xf41f
     int m_drawHeroOverlay[2];  // +0xf427

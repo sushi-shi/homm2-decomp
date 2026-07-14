@@ -90,7 +90,7 @@ void hexcell::DrawTower(int frame)
         drawX = m_x;
     else
         drawX = m_x + 28;
-    gpCombatManager->m_towerIcon->CombatClipDrawToBuffer(drawX, m_y, frame, m_limits, 1, 0, 0, 0);
+    gpCombatManager->m_combatIcons[COMBAT_ICON_TOWER]->CombatClipDrawToBuffer(drawX, m_y, frame, m_limits, 1, 0, 0, 0);
 
     row = (m_y - 139) / 42;
     if (row == 4)
@@ -100,13 +100,13 @@ void hexcell::DrawTower(int frame)
             rightX = m_x;
         else
             rightX = m_x + 28;
-        gpCombatManager->m_towerIcon->CombatClipDrawToBuffer(rightX, m_y, 9, m_limits, 1, 0, 0, 0);
+        gpCombatManager->m_combatIcons[COMBAT_ICON_TOWER]->CombatClipDrawToBuffer(rightX, m_y, 9, m_limits, 1, 0, 0, 0);
     } else {
         if (level)
             temp = m_x - 28;
         else
             temp = m_x;
-        gpCombatManager->m_towerIcon->CombatClipDrawToBuffer(temp, m_y, 9, m_limits, 0, 0, 0, 0);
+        gpCombatManager->m_combatIcons[COMBAT_ICON_TOWER]->CombatClipDrawToBuffer(temp, m_y, 9, m_limits, 0, 0, 0, 0);
     }
 }
 

@@ -70,7 +70,8 @@ typedef enum HeroEventFlag {
     HERO_EVENT_MERMAID = 0x100000,
     HERO_EVENT_SIRENS = 0x200000,
     HERO_EVENT_ARENA = 0x400000,
-    HERO_EVENT_STABLES = 0x800000
+    HERO_EVENT_STABLES = 0x800000,
+    HERO_EVENT_GROUPED_FORMATION = 0x00008000
 } HeroEventFlag;
 
 #pragma pack(push, 1)  // recovered layout is byte-packed
