@@ -323,7 +323,7 @@ void SmackManagerMain(void) {
             }
             break;
         case SMACK_EVENT_KEY:
-            if (message.field4 == SMACK_ALT_KEY)
+            if (message.payload.keyboard.keyCode == SMACK_ALT_KEY)
                 break;
         case SMACK_EVENT_QUIT:
             if (bSmackNum == SMACK_CHOOSE_CAMPAIGN ||

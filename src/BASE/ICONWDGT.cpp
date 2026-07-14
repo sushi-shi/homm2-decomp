@@ -106,7 +106,7 @@ VA(0x004d0cd0, 0x291)
 int iconWidget::Main(tag_message &msg)
 {
     unsigned short flags = m_flags;
-    if ((flags & 2) == 0 && (msg.type != 0x200 || msg.field4 != 0x3c)) {
+    if ((flags & 2) == 0 && (msg.type != 0x200 || msg.payload.widget.command != 0x3c)) {
         if (msg.type == 0x200)
             return widget::Main(msg);
         return 0;
@@ -116,22 +116,22 @@ int iconWidget::Main(tag_message &msg)
     switch (eventType) {
     case 8:
     case 0x20: {
-        short relativeX = static_cast<short>(msg.field4);
+        short relativeX = static_cast<short>(msg.payload.mouse.x);
         heroWindow *window = m_owner;
         relativeX -= static_cast<short>(window->m_posX);
-        short relativeY = static_cast<short>(msg.field8);
+        short relativeY = static_cast<short>(msg.payload.mouse.y);
         relativeY -= static_cast<short>(window->m_posY);
         if (m_x <= relativeX && m_y <= relativeY &&
             relativeX < m_x + m_width && relativeY < m_y + m_height) {
             if (eventType == 0x20) {
-                msg.fieldC = 0x200;
-                msg.field4 = 0xe;
+                msg.payload.widget.parameter = 0x200;
+                msg.payload.widget.command = 0xe;
             } else {
                 m_flags = flags | 1;
-                msg.field4 = 0xc;
+                msg.payload.widget.command = 0xc;
             }
             msg.type = 0x200;
-            msg.field8 = m_id;
+            msg.payload.widget.id = m_id;
             return 2;
         }
         return 0;
@@ -141,41 +141,41 @@ int iconWidget::Main(tag_message &msg)
     case 0x40:
         if ((flags & 1) != 0) {
             m_flags = flags & 0xfffe;
-            msg.field4 = 0xd;
+            msg.payload.widget.command = 0xd;
             msg.type = 0x200;
-            msg.field8 = m_id;
+            msg.payload.widget.id = m_id;
             return 2;
         }
         return 0;
 
     case 0x200:
-        switch (msg.field4) {
+        switch (msg.payload.widget.command) {
         case 4:
-            if (m_id != msg.field8)
+            if (m_id != msg.payload.widget.id)
                 goto normalEvent;
-            m_frame = msg.field18;
+            m_frame = msg.payload.widget.data.value;
             return 1;
 
         case 8:
-            if (m_id != msg.field8)
+            if (m_id != msg.payload.widget.id)
                 goto normalEvent;
-            m_fillColor = msg.field18 & 0xff;
+            m_fillColor = msg.payload.widget.data.value & 0xff;
             return 1;
 
         case 9:
-            if (m_id != msg.field8)
+            if (m_id != msg.payload.widget.id)
                 goto normalEvent;
             if (m_icon != 0) {
                 gpResourceManager->Dispose(m_icon);
-                m_icon = gpResourceManager->GetIcon(msg.text);
+                m_icon = gpResourceManager->GetIcon(msg.payload.widget.data.text);
             }
             return 1;
 
         case 0x3c:
-            if (m_iconId == msg.field8) {
-                m_iconId = msg.field18;
+            if (m_iconId == msg.payload.widget.id) {
+                m_iconId = msg.payload.widget.data.value;
                 gpResourceManager->Dispose(m_icon);
-                m_icon = gpResourceManager->GetIcon(static_cast<unsigned long>(msg.field18));
+                m_icon = gpResourceManager->GetIcon(static_cast<unsigned long>(msg.payload.widget.data.value));
             }
             return 0;
 

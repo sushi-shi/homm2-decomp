@@ -111,20 +111,20 @@ normalEvent:
     return widget::Main(msg);
 
 hoverEvent: {
-    short mx = static_cast<short>(msg.field4);
+    short mx = static_cast<short>(msg.payload.mouse.x);
     heroWindow *window = m_owner;
     mx -= static_cast<short>(window->m_posX);
-    short my = static_cast<short>(msg.field8) - window->m_posY;
+    short my = static_cast<short>(msg.payload.mouse.y) - window->m_posY;
     if (m_x <= mx && m_y <= my && mx < m_width + m_x && my < m_height + m_y) {
         if (type == 0x20) {
-            msg.fieldC = 0x200;
-            msg.field4 = 0xe;
+            msg.payload.widget.parameter = 0x200;
+            msg.payload.widget.command = 0xe;
         } else {
             m_flags = flags | 1;
-            msg.field4 = 0xc;
+            msg.payload.widget.command = 0xc;
         }
         msg.type = 0x200;
-        msg.field8 = m_id;
+        msg.payload.widget.id = m_id;
         return 2;
     }
     return 0;
@@ -134,8 +134,8 @@ leaveEvent:
     if ((flags & 1) != 0) {
         m_flags = flags & 0xfffe;
         msg.type = 0x200;
-        msg.field4 = 0xd;
-        msg.field8 = m_id;
+        msg.payload.widget.command = 0xd;
+        msg.payload.widget.id = m_id;
         return 2;
     }
     return 0;

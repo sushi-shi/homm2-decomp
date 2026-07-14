@@ -282,7 +282,7 @@ int fileRequester::Open(int id)
 
     tag_message message;
     message.type = 0x200;
-    message.field4 = 3;
+    message.payload.widget.command = 3;
     unsigned char okEnabled;
     if (m_mode == FILE_REQUESTER_SAVE_GAME) {
         okEnabled = 1;
@@ -291,12 +291,12 @@ int fileRequester::Open(int id)
         if (dot != 0) {
             *dot = 0;
         }
-        message.field8 = 15;
-        message.text = m_filename;
+        message.payload.widget.id = 15;
+        message.payload.widget.data.text = m_filename;
         m_window->BroadcastMessage(message);
-        message.field8 = 16;
+        message.payload.widget.id = 16;
         sprintf(gText, "File to Save:");
-        message.text = gText;
+        message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
         for (int i = 0; i < m_fileCount; ++i) {
             if (_strcmpi(m_fileNames[i].text, m_filename) == 0) {
@@ -320,16 +320,16 @@ int fileRequester::Open(int id)
                 }
             }
         }
-        message.field8 = 16;
+        message.payload.widget.id = 16;
         sprintf(gText, "File to Load:");
-        message.text = gText;
+        message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
     }
 
     message.type = 0x200;
-    message.field4 = 0x33;
-    message.field8 = 15;
-    message.field18 = 201;
+    message.payload.widget.command = 0x33;
+    message.payload.widget.id = 15;
+    message.payload.widget.data.value = 201;
     m_window->BroadcastMessage(message);
     Update(0);
     if (m_selectedIndex != -1) {
@@ -357,23 +357,23 @@ void fileRequester::SetOK(int enabled)
     tag_message message;
     message.type = 0x200;
     if (enabled) {
-        message.field4 = 6;
+        message.payload.widget.command = 6;
     } else {
-        message.field4 = 5;
+        message.payload.widget.command = 5;
     }
-    message.field8 = 0x7802;
+    message.payload.widget.id = 0x7802;
     if (m_active == 1) {
-        message.field18 = 8;
+        message.payload.widget.data.value = 8;
     } else {
-        message.field18 = 0x1000;
+        message.payload.widget.data.value = 0x1000;
     }
     m_window->BroadcastMessage(message);
     if (enabled) {
-        message.field4 = 5;
+        message.payload.widget.command = 5;
     } else {
-        message.field4 = 6;
+        message.payload.widget.command = 6;
     }
-    message.field18 = 2;
+    message.payload.widget.data.value = 2;
     m_window->BroadcastMessage(message);
 }
 
@@ -384,7 +384,7 @@ int fileRequester::Main(struct tag_message &message)
 
     switch (message.type) {
     case 1:
-        switch (message.field4) {
+        switch (message.payload.keyboard.keyCode) {
         case 0x40: {
             char oldName[300];
             if (m_selectedIndex == -1) {
@@ -426,18 +426,18 @@ int fileRequester::Main(struct tag_message &message)
         }
         break;
     case 0x200:
-        switch (message.field4) {
+        switch (message.payload.widget.command) {
         case 13:
-                if (message.field8 < FILE_REQUESTER_OK) {
-                    if (message.field8 == FILE_REQUESTER_CANCEL) {
-                        message.field18 = message.field8;
+                if (message.payload.widget.id < FILE_REQUESTER_OK) {
+                    if (message.payload.widget.id == FILE_REQUESTER_CANCEL) {
+                        message.payload.widget.data.value = message.payload.widget.id;
                         accept = 1;
-                    } else if (message.field8 == 1) {
+                    } else if (message.payload.widget.id == 1) {
                         if (m_topIndex > 0) {
                             --m_topIndex;
                             Update(1);
                         }
-                    } else if (message.field8 == 2 &&
+                    } else if (message.payload.widget.id == 2 &&
                                m_topIndex + iMaxListSize < m_fileCount) {
                         ++m_topIndex;
                         if (m_topIndex + iMaxListSize - 1 >= m_fileCount) {
@@ -445,20 +445,20 @@ int fileRequester::Main(struct tag_message &message)
                         }
                         Update(1);
                     }
-                } else if (message.field8 == FILE_REQUESTER_OK) {
+                } else if (message.payload.widget.id == FILE_REQUESTER_OK) {
                     if (m_selectedIndex == -1 && m_filename[0] == 0) {
                         NormalDialog("Please make a selection from the list, or press cancel.",
                                      1, -1, -1, -1, 0, -1, 0, -1, 0);
                     } else {
-                        message.field18 = message.field8;
+                        message.payload.widget.data.value = message.payload.widget.id;
                         accept = 1;
                     }
                 }
                 break;
         case 12:
         case 14:
-                if ((message.fieldC & 2) == 0) {
-                    switch (message.field8) {
+                if ((message.payload.widget.parameter & 2) == 0) {
+                    switch (message.payload.widget.id) {
                     case FILE_REQUESTER_SCROLL_KNOB: {
                         int positions = m_fileCount - (iMaxListSize - 1);
                         if (positions < 1) {
@@ -466,8 +466,8 @@ int fileRequester::Main(struct tag_message &message)
                         }
                         int gutterStep = static_cast<int>((fGutterTravelLength * 100.0f) /
                                                           positions);
-                        int mouseX = message.field10;
-                        int mouseY = message.field14;
+                        int mouseX = message.payload.mouse.screenX;
+                        int mouseY = message.payload.mouse.screenY;
                         mouseY = static_cast<int>(mouseY - (m_y + fGutterMinY)) - 9;
                         m_topIndex = (mouseY * 100) / gutterStep;
                         if (m_topIndex + iMaxListSize - 1 >= m_fileCount) {
@@ -485,13 +485,13 @@ int fileRequester::Main(struct tag_message &message)
                     case FILE_REQUESTER_FILENAME_ENTRY: {
                         tag_message textMessage;
                         textMessage.type = 0x200;
-                        textMessage.field4 = 7;
-                        textMessage.field8 = FILE_REQUESTER_FILENAME_ENTRY;
+                        textMessage.payload.widget.command = 7;
+                        textMessage.payload.widget.id = FILE_REQUESTER_FILENAME_ENTRY;
                         m_window->BroadcastMessage(textMessage);
 
                         char newName[352];
                         memset(newName, 0, 9);
-                        strcpy(newName, textMessage.text);
+                        strcpy(newName, textMessage.payload.widget.data.text);
                         int length = strlen(newName);
                         int i;
                         for (i = 0; i < length; ++i) {
@@ -515,9 +515,9 @@ int fileRequester::Main(struct tag_message &message)
                             strcpy(m_filename, newName);
                             SetOK(1);
                         }
-                        textMessage.field4 = 3;
-                        textMessage.field8 = FILE_REQUESTER_FILENAME_ENTRY;
-                        textMessage.text = m_filename;
+                        textMessage.payload.widget.command = 3;
+                        textMessage.payload.widget.id = FILE_REQUESTER_FILENAME_ENTRY;
+                        textMessage.payload.widget.data.text = m_filename;
                         m_window->BroadcastMessage(textMessage);
                         Update(1);
                         break;
@@ -527,7 +527,7 @@ int fileRequester::Main(struct tag_message &message)
                     case FILE_REQUESTER_FILTER_LARGE:
                     case FILE_REQUESTER_FILTER_XLARGE:
                     case FILE_REQUESTER_FILTER_ALL: {
-                        int filter = message.field8 - FILE_REQUESTER_FILTER_SMALL;
+                        int filter = message.payload.widget.id - FILE_REQUESTER_FILTER_SMALL;
                         if (!MapExistsForFilter(filter)) {
                             if (giNumHumanPlayers == 1) {
                                 sprintf(gText,
@@ -561,22 +561,22 @@ int fileRequester::Main(struct tag_message &message)
                     }
                     default: {
                         int item;
-                        if (message.field8 >= 200 && message.field8 <= 219) {
-                            item = message.field8 - 200;
-                        } else if (message.field8 >= 220 && message.field8 <= 239) {
-                            item = message.field8 - 220;
-                        } else if (message.field8 >= 240 && message.field8 <= 259) {
-                            item = message.field8 - 240;
-                        } else if (message.field8 >= 260 && message.field8 <= 279) {
-                            item = message.field8 - 260;
-                        } else if (message.field8 >= 20 && message.field8 <= 39) {
-                            item = message.field8 - 20;
+                        if (message.payload.widget.id >= 200 && message.payload.widget.id <= 219) {
+                            item = message.payload.widget.id - 200;
+                        } else if (message.payload.widget.id >= 220 && message.payload.widget.id <= 239) {
+                            item = message.payload.widget.id - 220;
+                        } else if (message.payload.widget.id >= 240 && message.payload.widget.id <= 259) {
+                            item = message.payload.widget.id - 240;
+                        } else if (message.payload.widget.id >= 260 && message.payload.widget.id <= 279) {
+                            item = message.payload.widget.id - 260;
+                        } else if (message.payload.widget.id >= 20 && message.payload.widget.id <= 39) {
+                            item = message.payload.widget.id - 20;
                         } else {
                             break;
                         }
                         if (item + m_topIndex == m_selectedIndex) {
-                            message.field18 = FILE_REQUESTER_OK;
-                            message.field8 = FILE_REQUESTER_OK;
+                            message.payload.widget.data.value = FILE_REQUESTER_OK;
+                            message.payload.widget.id = FILE_REQUESTER_OK;
                             accept = 1;
                         } else if (item + m_topIndex < m_fileCount) {
                             m_selectedIndex = item + m_topIndex;
@@ -588,7 +588,7 @@ int fileRequester::Main(struct tag_message &message)
                     }
                 } else {
                     int helpIndex = -1;
-                    switch (message.field8) {
+                    switch (message.payload.widget.id) {
                     case FILE_REQUESTER_FILENAME_ENTRY: helpIndex = 5; break;
                     case 0x50: helpIndex = 12; break;
                     case 0x51: helpIndex = 9; break;
@@ -606,13 +606,13 @@ int fileRequester::Main(struct tag_message &message)
                     case FILE_REQUESTER_CANCEL: helpIndex = 7; break;
                     case FILE_REQUESTER_OK: helpIndex = 6; break;
                     default:
-                        if (message.field8 >= 200 && message.field8 <= 219) {
+                        if (message.payload.widget.id >= 200 && message.payload.widget.id <= 219) {
                             helpIndex = 8;
-                        } else if (message.field8 >= 220 && message.field8 <= 239) {
+                        } else if (message.payload.widget.id >= 220 && message.payload.widget.id <= 239) {
                             helpIndex = 9;
-                        } else if (message.field8 >= 240 && message.field8 <= 259) {
+                        } else if (message.payload.widget.id >= 240 && message.payload.widget.id <= 259) {
                             helpIndex = 10;
-                        } else if (message.field8 >= 260 && message.field8 <= 279) {
+                        } else if (message.payload.widget.id >= 260 && message.payload.widget.id <= 279) {
                             helpIndex = 11;
                         }
                         break;
@@ -629,7 +629,7 @@ int fileRequester::Main(struct tag_message &message)
 
     if (accept == 1) {
         if (m_mode == FILE_REQUESTER_LOAD_GAME && m_selectedIndex >= 0 &&
-            message.field18 != FILE_REQUESTER_CANCEL &&
+            message.payload.widget.data.value != FILE_REQUESTER_CANCEL &&
             _strcmpi(m_extensions[m_selectedIndex].text, ".GMC") != 0 &&
             _strcmpi(m_extensions[m_selectedIndex].text, ".GXC") != 0) {
             int humans = m_extensions[m_selectedIndex].text[3] - '0';
@@ -652,7 +652,7 @@ int fileRequester::Main(struct tag_message &message)
         }
         if (accept != 0) {
             message.type = 0x4000;
-            message.field4 = 4;
+            message.payload.executive.command = 4;
             return 2;
         }
     }
@@ -673,16 +673,16 @@ void fileRequester::DoKnob(void)
     tag_message message = gpInputManager->GetEvent();
     while (message.type != 0x10 && message.type != 0x40) {
         if (message.type == 4) {
-            if (static_cast<float>(message.field8) < mouseOffset + fGutterMinY) {
-                message.field8 = static_cast<int>(mouseOffset + fGutterMinY);
+            if (static_cast<float>(message.payload.mouse.y) < mouseOffset + fGutterMinY) {
+                message.payload.mouse.y = static_cast<int>(mouseOffset + fGutterMinY);
             }
             if (mouseOffset + fGutterTravelLength + fGutterMinY <
-                static_cast<float>(message.field8)) {
-                message.field8 = static_cast<int>(mouseOffset + fGutterTravelLength +
+                static_cast<float>(message.payload.mouse.y)) {
+                message.payload.mouse.y = static_cast<int>(mouseOffset + fGutterTravelLength +
                                                   fGutterMinY);
             }
             gpMouseManager->Main(message);
-            m_scrollKnob->m_y = message.field8 - mouseOffset;
+            m_scrollKnob->m_y = message.payload.mouse.y - mouseOffset;
             if (m_fileCount > iMaxListSize) {
                 int newTopIndex = static_cast<int>((m_scrollKnob->m_y - fGutterMinY) /
                                                    gutterStep);
@@ -695,7 +695,7 @@ void fileRequester::DoKnob(void)
                     }
                     m_topIndex = newTopIndex;
                     Update(0);
-                    m_scrollKnob->m_y = message.field8 - mouseOffset;
+                    m_scrollKnob->m_y = message.payload.mouse.y - mouseOffset;
                     m_window->DrawWindow(1, 0, 0x7fff);
                     oldTopIndex = newTopIndex;
                 } else {
@@ -717,14 +717,14 @@ void fileRequester::Update(int drawWindow)
 {
     tag_message message;
     message.type = 0x200;
-    message.field18 = 0;
+    message.payload.widget.data.value = 0;
 
     int i;
     if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP) {
         for (i = 0; i < FILE_REQUESTER_MAP_SIZE_COUNT; ++i) {
-            message.field4 = 4;
-            message.field8 = FILE_REQUESTER_FILTER_SMALL + i;
-            message.field18 = (giMapSizeFilter == i) + i * 2 + 9;
+            message.payload.widget.command = 4;
+            message.payload.widget.id = FILE_REQUESTER_FILTER_SMALL + i;
+            message.payload.widget.data.value = (giMapSizeFilter == i) + i * 2 + 9;
             m_window->BroadcastMessage(message);
         }
         if (m_selectedIndex == -1 && m_fileCount > 0) {
@@ -732,143 +732,143 @@ void fileRequester::Update(int drawWindow)
         }
         SetOK(1);
 
-        message.field4 = 4;
-        message.field8 = 0x52;
+        message.payload.widget.command = 4;
+        message.payload.widget.id = 0x52;
         if (m_mapHeaders[m_selectedIndex].width == MAP_DIMENSION_SMALL) {
-            message.field18 = 0x1a;
+            message.payload.widget.data.value = 0x1a;
         } else if (m_mapHeaders[m_selectedIndex].width == MAP_DIMENSION_MEDIUM) {
-            message.field18 = 0x1b;
+            message.payload.widget.data.value = 0x1b;
         } else if (m_mapHeaders[m_selectedIndex].width == MAP_DIMENSION_LARGE) {
-            message.field18 = 0x1c;
+            message.payload.widget.data.value = 0x1c;
         } else {
-            message.field18 = 0x1d;
+            message.payload.widget.data.value = 0x1d;
         }
         m_window->BroadcastMessage(message);
 
-        message.field8 = 0x51;
-        message.field18 = m_mapHeaders[m_selectedIndex].playerCount + 0x13;
+        message.payload.widget.id = 0x51;
+        message.payload.widget.data.value = m_mapHeaders[m_selectedIndex].playerCount + 0x13;
         m_window->BroadcastMessage(message);
 
-        message.field8 = 0x56;
-        message.field18 = m_mapHeaders[m_selectedIndex].victoryCondition + 0x1e;
+        message.payload.widget.id = 0x56;
+        message.payload.widget.data.value = m_mapHeaders[m_selectedIndex].victoryCondition + 0x1e;
         m_window->BroadcastMessage(message);
 
-        message.field8 = 0x57;
-        message.field18 = m_mapHeaders[m_selectedIndex].lossCondition + 0x24;
+        message.payload.widget.id = 0x57;
+        message.payload.widget.data.value = m_mapHeaders[m_selectedIndex].lossCondition + 0x24;
         m_window->BroadcastMessage(message);
 
-        message.field4 = 3;
-        message.text = gText;
+        message.payload.widget.command = 3;
+        message.payload.widget.data.text = gText;
         sprintf(gText, "%s", m_mapHeaders[m_selectedIndex].name);
-        message.field8 = 0x50;
+        message.payload.widget.id = 0x50;
         m_window->BroadcastMessage(message);
 
         sprintf(gText, "%s", cDifficulty[m_mapHeaders[m_selectedIndex].difficulty]);
-        message.field8 = 0x54;
+        message.payload.widget.id = 0x54;
         m_window->BroadcastMessage(message);
 
         sprintf(gText, "%s", m_mapHeaders[m_selectedIndex].description);
-        message.field8 = 0x55;
+        message.payload.widget.id = 0x55;
         m_window->BroadcastMessage(message);
     }
 
     for (i = 0; iMaxListSize > i; ++i) {
         if (m_topIndex + i >= m_fileCount) {
-            message.field4 = 6;
-            message.field18 = 4;
-            message.field8 = i + 0x14;
+            message.payload.widget.command = 6;
+            message.payload.widget.data.value = 4;
+            message.payload.widget.id = i + 0x14;
             m_window->BroadcastMessage(message);
             if (m_mode == FILE_REQUESTER_MAP || m_mode == FILE_REQUESTER_MAP_GAME) {
-                message.field8 = i + 200;
+                message.payload.widget.id = i + 200;
                 m_window->BroadcastMessage(message);
-                message.field8 = i + 220;
+                message.payload.widget.id = i + 220;
                 m_window->BroadcastMessage(message);
-                message.field8 = i + 240;
+                message.payload.widget.id = i + 240;
                 m_window->BroadcastMessage(message);
-                message.field8 = i + 260;
+                message.payload.widget.id = i + 260;
                 m_window->BroadcastMessage(message);
             }
         } else {
-            message.field8 = i + 0x14;
-            message.field4 = 5;
-            message.field18 = 4;
+            message.payload.widget.id = i + 0x14;
+            message.payload.widget.command = 5;
+            message.payload.widget.data.value = 4;
             m_window->BroadcastMessage(message);
 
             if (m_mode == FILE_REQUESTER_MAP || m_mode == FILE_REQUESTER_MAP_GAME) {
-                message.field8 = i + 200;
+                message.payload.widget.id = i + 200;
                 m_window->BroadcastMessage(message);
-                message.field8 = i + 220;
+                message.payload.widget.id = i + 220;
                 m_window->BroadcastMessage(message);
-                message.field8 = i + 240;
+                message.payload.widget.id = i + 240;
                 m_window->BroadcastMessage(message);
-                message.field8 = i + 260;
+                message.payload.widget.id = i + 260;
                 m_window->BroadcastMessage(message);
 
-                message.field4 = 4;
-                message.field8 = i + 200;
+                message.payload.widget.command = 4;
+                message.payload.widget.id = i + 200;
                 if (m_mapHeaders[m_topIndex + i].width == MAP_DIMENSION_SMALL) {
-                    message.field18 = 0x1a;
+                    message.payload.widget.data.value = 0x1a;
                 } else if (m_mapHeaders[m_topIndex + i].width == MAP_DIMENSION_MEDIUM) {
-                    message.field18 = 0x1b;
+                    message.payload.widget.data.value = 0x1b;
                 } else if (m_mapHeaders[m_topIndex + i].width == MAP_DIMENSION_LARGE) {
-                    message.field18 = 0x1c;
+                    message.payload.widget.data.value = 0x1c;
                 } else {
-                    message.field18 = 0x1d;
+                    message.payload.widget.data.value = 0x1d;
                 }
                 m_window->BroadcastMessage(message);
 
-                message.field8 = i + 220;
-                message.field18 = m_mapHeaders[m_topIndex + i].playerCount + 0x13;
+                message.payload.widget.id = i + 220;
+                message.payload.widget.data.value = m_mapHeaders[m_topIndex + i].playerCount + 0x13;
                 m_window->BroadcastMessage(message);
 
-                message.field8 = i + 240;
-                message.field18 = m_mapHeaders[m_topIndex + i].victoryCondition + 0x1e;
+                message.payload.widget.id = i + 240;
+                message.payload.widget.data.value = m_mapHeaders[m_topIndex + i].victoryCondition + 0x1e;
                 m_window->BroadcastMessage(message);
 
-                message.field8 = i + 260;
-                message.field18 = m_mapHeaders[m_topIndex + i].lossCondition + 0x24;
+                message.payload.widget.id = i + 260;
+                message.payload.widget.data.value = m_mapHeaders[m_topIndex + i].lossCondition + 0x24;
                 m_window->BroadcastMessage(message);
             }
 
-            message.field4 = 3;
+            message.payload.widget.command = 3;
             if (m_mode == FILE_REQUESTER_MAP || m_mode == FILE_REQUESTER_MAP_GAME) {
                 sprintf(gText, "%s", m_mapHeaders[m_topIndex + i].name);
             } else {
                 sprintf(gText, "%s", m_fileNames[m_topIndex + i].text);
             }
-            message.text = gText;
-            message.field8 = i + 0x14;
+            message.payload.widget.data.text = gText;
+            message.payload.widget.id = i + 0x14;
             m_window->BroadcastMessage(message);
         }
 
-        message.field8 = i + 0x14;
-        message.field4 = 8;
+        message.payload.widget.id = i + 0x14;
+        message.payload.widget.command = 8;
         if (m_topIndex + i == m_selectedIndex) {
-            message.field18 = 2;
+            message.payload.widget.data.value = 2;
         } else {
-            message.field18 = 1;
+            message.payload.widget.data.value = 1;
         }
         m_window->BroadcastMessage(message);
     }
 
-    message.field8 = FILE_REQUESTER_FILENAME_ENTRY;
-    message.field4 = 5;
-    message.field18 = 2;
+    message.payload.widget.id = FILE_REQUESTER_FILENAME_ENTRY;
+    message.payload.widget.command = 5;
+    message.payload.widget.data.value = 2;
     m_window->BroadcastMessage(message);
     if (m_selectedIndex != -1) {
-        message.field4 = 3;
+        message.payload.widget.command = 3;
         if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP) {
             sprintf(gText, "%s", m_mapHeaders[m_selectedIndex].name);
         } else {
             sprintf(gText, "%s", m_fileNames[m_selectedIndex].text);
         }
-        message.text = gText;
+        message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
     }
     if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_LOAD_GAME ||
         m_mode == FILE_REQUESTER_MAP) {
-        message.field4 = 6;
-        message.field18 = 2;
+        message.payload.widget.command = 6;
+        message.payload.widget.data.value = 2;
         m_window->BroadcastMessage(message);
     }
 

@@ -97,18 +97,18 @@ int widget::Main(tag_message &message)
 {
     switch (message.type) {
     case WIDGET_MESSAGE_MOUSE_MOVE: {
-        short x = static_cast<short>(message.field4);
-        short y = static_cast<short>(message.field8);
+        short x = static_cast<short>(message.payload.mouse.x);
+        short y = static_cast<short>(message.payload.mouse.y);
         x -= static_cast<short>(m_owner->m_posX);
         y -= static_cast<short>(m_owner->m_posY);
         if (m_x > x || m_y > y || m_x + m_width <= x || m_y + m_height <= y)
             break;
-        message.field8 = m_id;
+        message.payload.hover.id = m_id;
         return 2;
     }
 
     case WIDGET_MESSAGE_COMMAND:
-        switch (message.field4) {
+        switch (message.payload.widget.command) {
         case WIDGET_COMMAND_DRAW:
             if ((m_flags & WIDGET_FLAG_DRAW) != 0)
                 Draw();
@@ -122,12 +122,12 @@ int widget::Main(tag_message &message)
             break;
 
         case WIDGET_COMMAND_SET_FLAGS:
-            if (m_id == message.field8) {
-                if (message.field18 == WIDGET_COMMAND_DIMMED) {
+            if (m_id == message.payload.widget.id) {
+                if (message.payload.widget.data.value == WIDGET_COMMAND_DIMMED) {
                     m_flags |= WIDGET_FLAG_DIMMED;
                     return 1;
                 }
-                unsigned short flags = m_flags | static_cast<unsigned short>(message.field18);
+                unsigned short flags = m_flags | static_cast<unsigned short>(message.payload.widget.data.value);
                 m_flags = flags;
                 if ((flags & WIDGET_FLAG_DIMMED) != 0) {
                     Draw();
@@ -148,8 +148,8 @@ int widget::Main(tag_message &message)
             break;
 
         case WIDGET_COMMAND_CLEAR_FLAGS:
-            if (m_id == message.field8) {
-                unsigned int flags = message.field18;
+            if (m_id == message.payload.widget.id) {
+                unsigned int flags = message.payload.widget.data.value;
                 if (flags == WIDGET_COMMAND_DIMMED) {
                     m_flags &= ~WIDGET_FLAG_DIMMED;
                     return 1;
@@ -166,22 +166,22 @@ int widget::Main(tag_message &message)
             break;
 
         case WIDGET_COMMAND_SET_X:
-            if (m_id == message.field8) {
-                m_x = static_cast<short>(message.field18);
+            if (m_id == message.payload.widget.id) {
+                m_x = static_cast<short>(message.payload.widget.data.value);
                 return 1;
             }
             break;
 
         case WIDGET_COMMAND_SET_Y:
-            if (m_id == message.field8) {
-                m_y = static_cast<short>(message.field18);
+            if (m_id == message.payload.widget.id) {
+                m_y = static_cast<short>(message.payload.widget.data.value);
                 return 1;
             }
             break;
 
         case WIDGET_COMMAND_SET_WIDTH:
-            if (m_id == message.field8) {
-                m_width = static_cast<short>(message.field18);
+            if (m_id == message.payload.widget.id) {
+                m_width = static_cast<short>(message.payload.widget.data.value);
                 return 1;
             }
             break;

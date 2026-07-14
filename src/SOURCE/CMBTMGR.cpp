@@ -2280,50 +2280,50 @@ void UpdateCombatSystemOptions(int initialDraw)
 {
     tag_message message;
     message.type = COMBAT_SYSTEM_OPTION_EVENT;
-    message.field4 = COMBAT_SYSTEM_OPTION_BUTTON_MESSAGE;
-    message.field8 = COMBAT_SYSTEM_OPTION_SPEED_BUTTON;
-    message.field18 = gConfig.combatSpeed +
+    message.payload.widget.command = COMBAT_SYSTEM_OPTION_BUTTON_MESSAGE;
+    message.payload.widget.id = COMBAT_SYSTEM_OPTION_SPEED_BUTTON;
+    message.payload.widget.data.value = gConfig.combatSpeed +
                       COMBAT_SYSTEM_OPTION_SPEED_STATE_OFFSET;
     CSPanel->BroadcastMessage(message);
-    message.field8 = COMBAT_SYSTEM_OPTION_ARMY_INFO_BUTTON;
-    message.field18 = gConfig.combatArmyInfoLevel +
+    message.payload.widget.id = COMBAT_SYSTEM_OPTION_ARMY_INFO_BUTTON;
+    message.payload.widget.data.value = gConfig.combatArmyInfoLevel +
                       COMBAT_SYSTEM_OPTION_ARMY_INFO_STATE_OFFSET;
     CSPanel->BroadcastMessage(message);
-    message.field8 = COMBAT_SYSTEM_OPTION_AUTO_SPELL_BUTTON;
-    message.field18 = gConfig.autoCombatUseSpells +
+    message.payload.widget.id = COMBAT_SYSTEM_OPTION_AUTO_SPELL_BUTTON;
+    message.payload.widget.data.value = gConfig.autoCombatUseSpells +
                       COMBAT_SYSTEM_OPTION_AUTO_SPELL_STATE_OFFSET;
     CSPanel->BroadcastMessage(message);
-    message.field8 = COMBAT_SYSTEM_OPTION_GRID_BUTTON;
-    message.field18 = gConfig.showCombatGrid +
+    message.payload.widget.id = COMBAT_SYSTEM_OPTION_GRID_BUTTON;
+    message.payload.widget.data.value = gConfig.showCombatGrid +
                       COMBAT_SYSTEM_OPTION_GRID_STATE_OFFSET;
     CSPanel->BroadcastMessage(message);
-    message.field8 = COMBAT_SYSTEM_OPTION_SHADE_BUTTON;
-    message.field18 = gConfig.combatShadeLevel +
+    message.payload.widget.id = COMBAT_SYSTEM_OPTION_SHADE_BUTTON;
+    message.payload.widget.data.value = gConfig.combatShadeLevel +
                       COMBAT_SYSTEM_OPTION_SHADE_STATE_OFFSET;
     CSPanel->BroadcastMessage(message);
-    message.field8 = COMBAT_SYSTEM_OPTION_MOUSE_HEX_BUTTON;
-    message.field18 = gConfig.showCombatMouseHex +
+    message.payload.widget.id = COMBAT_SYSTEM_OPTION_MOUSE_HEX_BUTTON;
+    message.payload.widget.data.value = gConfig.showCombatMouseHex +
                       COMBAT_SYSTEM_OPTION_MOUSE_HEX_STATE_OFFSET;
     CSPanel->BroadcastMessage(message);
 
-    message.field4 = COMBAT_SYSTEM_OPTION_TEXT_MESSAGE;
-    message.field8 = COMBAT_SYSTEM_OPTION_SPEED_TEXT;
-    message.text = combatSpeedText[gConfig.combatSpeed];
+    message.payload.widget.command = COMBAT_SYSTEM_OPTION_TEXT_MESSAGE;
+    message.payload.widget.id = COMBAT_SYSTEM_OPTION_SPEED_TEXT;
+    message.payload.widget.data.text = combatSpeedText[gConfig.combatSpeed];
     CSPanel->BroadcastMessage(message);
-    message.field8 = COMBAT_SYSTEM_OPTION_ARMY_INFO_TEXT;
-    message.text = combatMiniInfoText[gConfig.combatArmyInfoLevel];
+    message.payload.widget.id = COMBAT_SYSTEM_OPTION_ARMY_INFO_TEXT;
+    message.payload.widget.data.text = combatMiniInfoText[gConfig.combatArmyInfoLevel];
     CSPanel->BroadcastMessage(message);
-    message.field8 = COMBAT_SYSTEM_OPTION_AUTO_SPELL_TEXT;
-    message.text = onOffText[gConfig.autoCombatUseSpells];
+    message.payload.widget.id = COMBAT_SYSTEM_OPTION_AUTO_SPELL_TEXT;
+    message.payload.widget.data.text = onOffText[gConfig.autoCombatUseSpells];
     CSPanel->BroadcastMessage(message);
-    message.field8 = COMBAT_SYSTEM_OPTION_GRID_TEXT;
-    message.text = onOffText[gConfig.showCombatGrid];
+    message.payload.widget.id = COMBAT_SYSTEM_OPTION_GRID_TEXT;
+    message.payload.widget.data.text = onOffText[gConfig.showCombatGrid];
     CSPanel->BroadcastMessage(message);
-    message.field8 = COMBAT_SYSTEM_OPTION_SHADE_TEXT;
-    message.text = onOffText[gConfig.combatShadeLevel];
+    message.payload.widget.id = COMBAT_SYSTEM_OPTION_SHADE_TEXT;
+    message.payload.widget.data.text = onOffText[gConfig.combatShadeLevel];
     CSPanel->BroadcastMessage(message);
-    message.field8 = COMBAT_SYSTEM_OPTION_MOUSE_HEX_TEXT;
-    message.text = onOffText[gConfig.showCombatMouseHex];
+    message.payload.widget.id = COMBAT_SYSTEM_OPTION_MOUSE_HEX_TEXT;
+    message.payload.widget.data.text = onOffText[gConfig.showCombatMouseHex];
     CSPanel->BroadcastMessage(message);
     if (!initialDraw)
         CSPanel->DrawWindow(1, 0, COMBAT_SYSTEM_OPTION_DRAW_MASK);
@@ -2342,11 +2342,11 @@ int CombatSystemOptionsHandler(tag_message &message)
     int bDone = 0;
     char optionText[COMBAT_MESSAGE_LINE_SIZE];
     if (message.type == COMBAT_SYSTEM_OPTION_EVENT) {
-        if (message.fieldC & COMBAT_SYSTEM_OPTION_RIGHT_BUTTON) {
-            if (message.field4 == COMBAT_SYSTEM_OPTION_BUTTON_EVENT ||
-                message.field4 == COMBAT_SYSTEM_OPTION_HOVER_EVENT) {
+        if (message.payload.widget.parameter & COMBAT_SYSTEM_OPTION_RIGHT_BUTTON) {
+            if (message.payload.widget.command == COMBAT_SYSTEM_OPTION_BUTTON_EVENT ||
+                message.payload.widget.command == COMBAT_SYSTEM_OPTION_HOVER_EVENT) {
                 int helpIndex = -1;
-                switch (message.field8) {
+                switch (message.payload.widget.id) {
                 case COMBAT_SYSTEM_OPTION_CLOSE_BUTTON:
                     helpIndex = 0;
                     break;
@@ -2376,16 +2376,16 @@ int CombatSystemOptionsHandler(tag_message &message)
                 }
             }
         } else {
-            switch (message.field4) {
+            switch (message.payload.widget.command) {
             case COMBAT_SYSTEM_OPTION_CLOSE_EVENT:
-                switch (message.field8) {
+                switch (message.payload.widget.id) {
                 case COMBAT_SYSTEM_OPTION_CLOSE_BUTTON:
                     bDone = 1;
                     break;
                 }
                 break;
             case COMBAT_SYSTEM_OPTION_BUTTON_EVENT:
-                switch (message.field8) {
+                switch (message.payload.widget.id) {
                 case COMBAT_SYSTEM_OPTION_SPEED_BUTTON:
                     gConfig.combatSpeed =
                         (gConfig.combatSpeed + 1) %
@@ -2430,9 +2430,9 @@ int CombatSystemOptionsHandler(tag_message &message)
     if (bRedraw)
         UpdateCombatSystemOptions(0);
     if (bDone) {
-        gpWindowManager->m_dialogResult = message.field8;
-        message.field8 = COMBAT_SYSTEM_OPTION_SPEED_BUTTON;
-        message.field4 = message.field8;
+        gpWindowManager->m_dialogResult = message.payload.widget.id;
+        message.payload.widget.id = COMBAT_SYSTEM_OPTION_SPEED_BUTTON;
+        message.payload.widget.command = message.payload.widget.id;
         return COMBAT_SYSTEM_OPTION_HANDLER_CLOSE;
     }
     return COMBAT_SYSTEM_OPTION_HANDLER_CONTINUE;
