@@ -1,13 +1,6 @@
 # BASE/iconf2bc experiment matrix
 
-Current integrated state: checkpoint `000768f`, source SHA-256
-`bcf4f468adf3b75d8226120b3eb00a72ba98833d8aea434625f13dba3e9b5cad`.
-Retail RVA/size `0xd9790` / `0x54d`; canonical candidate 85.166245%, function end `0x540`,
-frame `sub esp,8`, 84 candidate vs 83 retail relocations. Decoder entry is at `+0xe9` versus
-retail `+0xec`. Relocation occurrence counts agree except for one excess setup `gFCY` load;
-the previous clipped-fill and clipped-dim excess loads are gone. No base-only relocation target.
-
-Current retained working state: source SHA-256
+Current integrated state: checkpoint `3bbfe46`, source SHA-256
 `e620be13ef21922c1ce5eb3260079f3e71b8fc4054684ac9d99e25f72ba80dcd`, 85.465996%,
 function end `0x542`, frame `sub esp,8`, decoder entry `+0xeb`, and 84/83 relocations.
 The global-assignment X initializer restores retail's `eax`/`ebx` publication sequence and two
