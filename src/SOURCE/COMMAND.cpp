@@ -2101,7 +2101,8 @@ int combatManager::DoSurrender(void)
     return gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_TWO;
 }
 
-// @early-stop: all 0xdc bytes match after masking five aligned COFF
+// @early-stop
+// All 0xdc bytes match after masking five aligned COFF
 // relocations; relocation offsets and targets are identical.
 VA(0x0043002d, 0xdc)
 void combatManager::CheckChangeSelector(void)
@@ -2119,7 +2120,8 @@ void combatManager::CheckChangeSelector(void)
     SetupSmallView();
 }
 
-// @early-stop: all 0xea bytes match after masking four aligned COFF
+// @early-stop
+// All 0xea bytes match after masking four aligned COFF
 // relocations; relocation offsets and targets are identical.
 VA(0x00430109, 0xea)
 void combatManager::CheckCastleAttack(void)

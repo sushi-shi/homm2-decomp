@@ -1744,7 +1744,8 @@ void combatManager::ResetHitByCreature(void)
 }
 
 VA(0x00494a7f, 0x36)
-// @early-stop: all 0x36 instruction bytes match except +0x26, where the
+// @early-stop
+// All 0x36 instruction bytes match except +0x26, where the
 // success jump selects an equivalent delinked local label (0x07 versus 0x02).
 // The function has no relocations.
 int ValidHex(int hex)
@@ -2004,7 +2005,8 @@ void combatManager::TestRaiseDoor(void)
     }
 }
 
-// @early-stop: retained/live 99.90%; frame and slots match, all 52 normalized
+// @early-stop
+// Retained/live 99.90%; frame and slots match, all 52 normalized
 // instructions/operands match, and there are 0/0 relocations. Raw bytes differ
 // only at +0xc6, where the first return arm jumps to the common continuation
 // instead of retail's equivalent local-label hop. Positive-arm/else polarity is
@@ -2330,7 +2332,8 @@ void UpdateCombatSystemOptions(int initialDraw)
         CSPanel->DrawWindow(1, 0, COMBAT_SYSTEM_OPTION_DRAW_MASK);
 }
 
-// @early-stop: retained/live 99.88%; relocation-masked raw bytes are identical
+// @early-stop
+// Retained/live 99.88%; relocation-masked raw bytes are identical
 // across all 0x39a bytes, including jump-table spans +0x121..+0x13c and
 // +0x2f0..+0x30b. Frame, slots, and CFG match; all 36/36 relocation sites align,
 // with retail delinking 12 gConfig sites as local DATA aliases. Flat equality
