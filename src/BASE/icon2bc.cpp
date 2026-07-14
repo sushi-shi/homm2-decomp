@@ -90,7 +90,22 @@ DATA(0x00534ce8) static unsigned int gCTRun;
 // the retail branch: reordering its selection arms regresses, while a ClipR snapshot, publication
 // reorder, and explicit join are byte-identical because MSVC deletes the overwritten store. See
 // icon2bc-combined-residual-f24566c.tsv. Do not force these scratch writes with volatile qualifiers.
-// No semantic state model changed; this is still unresolved and not a wall.
+// A fresh cross-sibling audit then found that retail IconToBitmap is uniquely close to this
+// decoder: its normalized mnemonic stream is 0.829 similar, versus 0.52-0.58 for the flip,
+// colour-flip, and Y-modified siblings. Transferring its outer `do { select } while (0)` literal
+// ownership only becomes useful together with retail's one-time destination-cursor lifetime.
+// That combined skeleton improves the current head from 73.211266 to 76.27699 and grows the
+// candidate from 0x558 to 0x596 versus retail 0x5af. Giving the two rejected literal exits one
+// shared zero-count join accounts for the strongest gain; using a distinct signed dim-test owner
+// while the unsigned count remains the loop-decrement owner adds a smaller further gain. The
+// isolated literal skeleton, the old Icon2b setup combined with this skeleton, and the old
+// per-command cursor all regress. See icon2bc-forward-sibling-99d936f.tsv.
+// Relocations are now 88/91 with no base-only target: ClipB/ClipR/Src/Y are exact and Cnt, Dst,
+// and X0 are each short once. The first divergence remains the setup LEA ModRM at +0x12, so this
+// is a stronger structural checkpoint, not a wall. On the later a237782 SIZE-neutral state this
+// same skeleton builds at 76.94% and 90/91 total occurrences: Cnt/Dst/X0 remain short once each,
+// while ClipR and Y are excess once each. Thus the normalized CFG gain is retained, but its current
+// relocation multiset is still open and must not be described as structurally complete.
 VA(0x004d32a0, 0x5af)
 void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                             int clip, int clipX, int clipY, int clipW, int clipH, int color,
@@ -117,9 +132,9 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
     }
     unsigned char *row =
         reinterpret_cast<unsigned char *>(gCTPitch * gCTY + reinterpret_cast<int>(dest->m_pixels));
+    savedDst = gCTDst;
     int cmd;
     for (;;) {
-        savedDst = gCTDst;
         gCTSrc++;
         cmd = gCTSrc[-1];
         if (static_cast<signed char>(cmd) < 0) {
@@ -207,14 +222,16 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
                 if (clip == 0) {
                     savedDst = row + X;
                     gCTDimLen = 0;
-                    if (static_cast<int>(count) > 0) {
-                        gCTDimLen = count;
-                        for (unsigned int k = count; k != 0; k--) {
+                    int dimCount = count;
+                    if (dimCount > 0) {
+                        gCTDimLen = dimCount;
+                        do {
                             if (dimGate != 0)
                                 *savedDst = palette[*savedDst];
                             savedDst = savedDst + 1;
                             gCTDimPal = palette;
-                        }
+                            count--;
+                        } while (count != 0);
                     }
                 } else {
                     gCTCnt = count;
@@ -238,14 +255,16 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
                         gCTDimPal = palette;
                         gCTCnt = cn;
                         gCTDimLen = 0;
-                        if (static_cast<int>(cn) > 0) {
-                            gCTDimLen = cn;
-                            for (unsigned int k = cn; k != 0; k--) {
+                        int dimCount = cn;
+                        if (dimCount > 0) {
+                            gCTDimLen = dimCount;
+                            do {
                                 if (dimGate != 0)
                                     *savedDst = palette[*savedDst];
                                 savedDst = savedDst + 1;
                                 gCTDimPal = palette;
-                            }
+                                cn--;
+                            } while (cn != 0);
                         }
                     }
                 }
@@ -257,28 +276,39 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
         gCTX = X;
         gCTRun = cmd;
         if (cmd != 0) {
-            gCTSrcCopy = gCTSrc;
-            gCTDst = savedDst;
             unsigned int cnt;
-            if (clip == 0) {
-                savedDst = row + X;
-                cnt = cmd;
-            } else if (gCTY < clipY || gCTClipB < gCTY ||
-                       (int)(X + cmd) <= clipX ||
-                       (gCTDst = savedDst, gCTClipR < X)) {
-                cnt = 0;
-            } else if (X >= clipX) {
-                savedDst = row + X;
-                cnt = cmd;
-                if (gCTClipR < X + cmd)
-                    cnt = (gCTClipR - X) + 1;
-            } else {
-                cnt = clipW;
-                if (X + cmd <= gCTClipR)
-                    cnt = (cmd - clipX) + X;
-                savedDst = row + clipX;
-                gCTSrcCopy = gCTSrc + (clipX - X);
-            }
+            do {
+                gCTDst = savedDst;
+                gCTSrcCopy = gCTSrc;
+                if (clip == 0) {
+                    savedDst = row + X;
+                    cnt = cmd;
+                } else {
+                    if (gCTY < clipY || gCTClipB < gCTY) {
+                        cnt = 0;
+                        break;
+                    }
+                    int right = X + cmd;
+                    if (right <= clipX || gCTClipR < X) {
+                        cnt = 0;
+                        break;
+                    }
+                    if (clipX <= X) {
+                        savedDst = row + X;
+                        if (gCTClipR >= right)
+                            cnt = cmd;
+                        else
+                            cnt = (gCTClipR - X) + 1;
+                    } else {
+                        if (gCTClipR >= right)
+                            cnt = (cmd - clipX) + X;
+                        else
+                            cnt = clipW;
+                        gCTSrcCopy = gCTSrc + (clipX - X);
+                        savedDst = row + clipX;
+                    }
+                }
+            } while (0);
             gCTCnt = cnt;
             if (cnt != 0) {
                 gCTDimLen = 0;
