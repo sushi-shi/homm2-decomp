@@ -39,7 +39,7 @@ DATA(0x00534ca4) static unsigned char *gFlipDst;
 // 678 common unmasked bytes plus a 0xc-byte retail tail. The sole count excess is gFlipY (9/8).
 // This TU has no function predecessor. Exact-preserving include placements, entry publication,
 // and Y-sum order were byte-identical; the measured local/sibling setup variants regressed. This
-// is not a wall or @early-stop. Retry after a retained shared-header/declaration/compiler-state
+// is not a wall or permitted stop. Retry after a retained shared-header/declaration/compiler-state
 // change; do not replay the a0b17fb matrix: iconf2b-tu-state-a0b17fb.tsv.
 VA(0x004d1ba0, 0x4f1)
 void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
