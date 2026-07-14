@@ -6,6 +6,7 @@
 #include <va.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include <string.h>
 #include <BASE/bitmap.h>
 #include <BASE/icon.h>
@@ -13,6 +14,8 @@
 #include <BASE/Iconf2b.h>
 #include <BASE/Misc.h>
 #include <BASE/palette.h>
+#include <BASE/Blur.h>
+#include <BASE/Ripple.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/mouseManager.h>
 #include <BASE/resourceManager.h>
@@ -1564,28 +1567,578 @@ void combatManager::Armageddon(void)
 }
 
 VA(0x00424e48, 0x101)
-void combatManager::TurnToStone(class army *) {}
+void combatManager::TurnToStone(army *target)
+{
+    ResetLimitCreature();
+    ++m_limitCreatureCount[target->m_side][target->m_index];
+    gpCombatManager->DrawFrame(0, 1, 0, 1, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
+    gpWindowManager->SaveFizzleSource(
+        giMinExtentX, giMinExtentY, giMaxExtentX - giMinExtentX + 1,
+        giMaxExtentY - giMinExtentY + 1);
+    DrawFrame(0, 1, 0, 1, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
+    target->SetSpellInfluence(ARMY_SPELL_INFLUENCE_PETRIFIED,
+                              SPELL_PETRIFY_DURATION);
+    gpCombatManager->DrawFrame(0, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
+    gpWindowManager->FizzleForward(
+        giMinExtentX, giMinExtentY, giMaxExtentX - giMinExtentX + 1,
+        giMaxExtentY - giMinExtentY + 1, SPELL_PETRIFY_FIZZLE_STEPS, 0, 0);
+}
 
 VA(0x00424f49, 0x192)
-void combatManager::BloodLustEffect(class army *, int) {}
+void combatManager::BloodLustEffect(army *target, int effect)
+{
+    ResetLimitCreature();
+    ++m_limitCreatureCount[target->m_side][target->m_index];
+    gpCombatManager->DrawFrame(0, 1, 0, 1, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
+    gpWindowManager->SaveFizzleSource(
+        giMinExtentX, giMinExtentY, giMaxExtentX - giMinExtentX + 1,
+        giMaxExtentY - giMinExtentY + 1);
+    DrawFrame(0, 1, 0, 1, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
+    target->m_monster.flags.abilityFlags |= effect;
+    gpCombatManager->DrawFrame(0, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
+    gpWindowManager->FizzleForward(
+        giMinExtentX, giMinExtentY, giMaxExtentX - giMinExtentX + 1,
+        giMaxExtentY - giMinExtentY + 1, SPELL_BLOOD_LUST_FIZZLE_STEPS, 0, 0);
+    gpWindowManager->SaveFizzleSource(
+        giMinExtentX, giMinExtentY, giMaxExtentX - giMinExtentX + 1,
+        giMaxExtentY - giMinExtentY + 1);
+    target->m_monster.flags.abilityFlags -= effect;
+    gpCombatManager->DrawFrame(0, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
+    gpWindowManager->FizzleForward(
+        giMinExtentX, giMinExtentY, giMaxExtentX - giMinExtentX + 1,
+        giMaxExtentY - giMinExtentY + 1, SPELL_BLOOD_LUST_FIZZLE_STEPS, 0, 0);
+}
 
+// @early-stop
+// All 48 relocation-masked instructions are identical and all five relocation
+// targets agree. The reported 99.86% is solely delinked relocation identity;
+// there is no code-byte residual.
 VA(0x004250db, 0x80)
-void combatManager::Ripple(int) {}
+void combatManager::Ripple(int strength)
+{
+    memcpy(m_backgroundBuffer->m_pixels, gpWindowManager->m_screen->m_pixels,
+           COMBAT_SCREEN_WIDTH * COMBAT_AREA_HEIGHT);
+    DoRipple(m_backgroundBuffer, gpWindowManager->m_screen,
+             COMBAT_AREA_HEIGHT, strength);
+    m_backgroundDrawn = 0;
+    DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
+}
 
 VA(0x0042515b, 0x72)
-void combatManager::Blur(int, int, int) {}
+void combatManager::Blur(int redAdjust, int greenAdjust, int blueAdjust)
+{
+    memcpy(m_backgroundBuffer->m_pixels, gpWindowManager->m_screen->m_pixels,
+           COMBAT_SCREEN_WIDTH * COMBAT_AREA_HEIGHT);
+    DoBlur(m_backgroundBuffer, gpWindowManager->m_screen, COMBAT_AREA_HEIGHT,
+           redAdjust, greenAdjust, blueAdjust);
+    m_backgroundDrawn = 0;
+}
 
+// @match-note 98.42%: complete distance/width interpolation and both angle
+// perturbation paths; all 30 relocation targets agree. The first raw differing
+// byte is +0x05, the sub esp immediate: retail 0x58, ours 0x54. The first
+// normalized-stream difference is retail +0x1c8 `fld qword ptr
+// [const_000eb1a8]` (DIR32 operand at +0x1ca) versus the same opcode/value using
+// ours $T8146 identity. The first opcode/CFG divergence is retail +0x21c
+// `jne +0x5` versus ours `je +0xf2` for the second zero-angle guard. Tried
+// direct/compound intermediate angle assignments and nested zero-angle guards.
+// Revisit at 95% for od_slots; do not repeat these spellings beforehand.
 VA(0x004251cd, 0x320)
-void combatManager::ResetBoltAngle(struct SBolt *) {}
+void combatManager::ResetBoltAngle(SBolt *bolt)
+{
+    if (bolt->nearTarget != 0)
+        return;
 
+    int deltaX = abs(bolt->endX - bolt->pixelX);
+    int deltaY = abs(bolt->endY - bolt->pixelY);
+    int distance = static_cast<int>(
+        sqrt(static_cast<double>(deltaX * deltaX + deltaY * deltaY)));
+    if (bolt->totalDistance < distance)
+        bolt->distanceRatio = 0;
+    else
+        bolt->distanceRatio = static_cast<float>(bolt->totalDistance - distance) /
+                              bolt->totalDistance;
+
+    if (bolt->startWidth != bolt->endWidth) {
+        int widthDelta = bolt->endWidth - bolt->startWidth;
+        if (widthDelta > 0)
+            ++widthDelta;
+        else
+            --widthDelta;
+        int width = bolt->startWidth +
+                    static_cast<int>(widthDelta * bolt->distanceRatio);
+        if (width < 1)
+            width = 1;
+        bolt->width = width;
+    }
+    bolt->widthFirst = -(bolt->width >> 1);
+    bolt->widthLast = bolt->width + bolt->widthFirst - 1;
+
+    int angleX = bolt->endX - bolt->pixelX;
+    int angleY = bolt->endY - bolt->pixelY;
+    bolt->baseAngle = static_cast<float>(
+        atan2(static_cast<double>(angleX), static_cast<double>(angleY)));
+    float averageAngle = static_cast<float>(
+        (bolt->minAngle + bolt->maxAngle) / BOLT_ANGLE_AVERAGE_DIVISOR);
+    averageAngle = static_cast<float>(
+        (BOLT_INITIAL_ANGLE_BIAS - bolt->distanceRatio) /
+        BOLT_INITIAL_ANGLE_DIVISOR) * averageAngle;
+    bolt->angle = averageAngle + bolt->baseAngle;
+
+    if (bolt->minAngle != 0 || bolt->maxAngle != 0) {
+        if (!(bolt->angleDistance * BOLT_ANGLE_DISTANCE_FACTOR < distance ||
+              bolt->forceAngle != 0))
+            return;
+        float randomAngle;
+        if (bolt->minAngle == bolt->maxAngle)
+            randomAngle = static_cast<float>(bolt->minAngle) /
+                          BOLT_ANGLE_PERCENT_SCALE;
+        else
+            randomAngle = static_cast<float>(
+                Random(bolt->minAngle, bolt->maxAngle)) /
+                BOLT_ANGLE_PERCENT_SCALE;
+        randomAngle = static_cast<float>(
+            (BOLT_RANDOM_ANGLE_BIAS - bolt->distanceRatio) /
+            BOLT_RANDOM_ANGLE_DIVISOR) * randomAngle;
+        bolt->baseAngle = randomAngle + bolt->baseAngle;
+    }
+}
+
+// @match-note 88.07%: complete stepping, clipping, width drawing, all six color
+// modes, target approach, and finish CFG with the exact 0x40 frame. Retail is
+// 0x4f0 bytes and ours 0x503. The first raw differing byte is +0x19, the local
+// displacement in `mov [ebp-local], eax` for oldX: retail 0xd4 (-0x2c), ours
+// 0xfc (-0x04). The first normalized instruction divergence is retail +0x6a
+// `fld dword ptr [eax+0x38]`; ours starts `mov eax,[eax+0x38]`, stores a local,
+// emits two `jmp $+0` continuations, then loads that local. The delinked switch
+// boundary truncates homm2 relocs: explicit object ranges contain 28 relocations
+// on both sides, with every external target agreeing and eight local entries
+// targeting their respective DrawBolt labels. Tried direct and compound sin/cos
+// assignment, both loop polarities, direct per-case pixel expressions, and
+// retail case-body order. Revisit at 95% or after predecessor slot changes; do
+// not grind the switch beforehand.
 VA(0x004254ed, 0x4f0)
-void combatManager::DrawBolt(struct SBolt *, int) {}
+void combatManager::DrawBolt(SBolt *bolt, int stepCount)
+{
+    int oldX = static_cast<int>(bolt->currentX);
+    int oldY = static_cast<int>(bolt->currentY);
+    int widthFirst = bolt->widthFirst;
+    int widthLast = bolt->widthLast;
+    int unusedRandom = Random(BOLT_RANDOM_WIDTH_LOW, BOLT_RANDOM_WIDTH_HIGH);
+    int step;
+    for (step = 0; stepCount > step; ++step) {
+        bolt->currentX =
+            static_cast<float>(sin(bolt->baseAngle)) + bolt->currentX;
+        bolt->currentY =
+            static_cast<float>(cos(bolt->baseAngle)) + bolt->currentY;
+        bolt->pixelX = static_cast<int>(bolt->currentX);
+        bolt->pixelY = static_cast<int>(bolt->currentY);
+        if (bolt->pixelX < 0) {
+            bolt->pixelX = 0;
+            bolt->currentX = 0;
+        }
+        if (COMBAT_SCREEN_WIDTH - 1 < bolt->pixelX) {
+            bolt->pixelX = COMBAT_SCREEN_WIDTH - 1;
+            bolt->currentX = static_cast<float>(COMBAT_SCREEN_WIDTH - 1);
+        }
+        if (bolt->pixelY < 0) {
+            bolt->pixelY = 0;
+            bolt->currentY = 0;
+        }
+        if (COMBAT_AREA_HEIGHT - 1 < bolt->pixelY) {
+            bolt->pixelY = COMBAT_AREA_HEIGHT - 1;
+            bolt->currentY = static_cast<float>(COMBAT_AREA_HEIGHT - 1);
+        }
 
+        int drawX = bolt->pixelX;
+        int drawY = bolt->pixelY;
+        if (bolt->pixelX == oldX) {
+            if (bolt->pixelY == oldY)
+                continue;
+        }
+        {
+            oldX = bolt->pixelX;
+            oldY = bolt->pixelY;
+            int widthIndex;
+            for (widthIndex = widthFirst;; ++widthIndex) {
+                if (widthLast < widthIndex)
+                    break;
+                if (bolt->drawVertically != 0)
+                    drawY = bolt->pixelY + widthIndex;
+                else
+                    drawX = bolt->pixelX + widthIndex;
+                if (drawX >= 0 && drawX < COMBAT_SCREEN_WIDTH && drawY >= 0 &&
+                    drawY < COMBAT_AREA_HEIGHT) {
+                    int edgeDistance;
+                    if (widthIndex < 0)
+                        edgeDistance = -(widthFirst - widthIndex);
+                    else
+                        edgeDistance = widthLast - widthIndex;
+                    switch (bolt->colorMode) {
+                    case BOLT_COLOR_RED_TABLE:
+                        gpWindowManager->m_screen->m_pixels
+                            [drawY * COMBAT_SCREEN_WIDTH + drawX] =
+                            gColorTableRed[static_cast<signed char>(
+                                gpWindowManager->m_screen->m_pixels
+                                    [drawY * COMBAT_SCREEN_WIDTH + drawX])];
+                        break;
+                    case BOLT_COLOR_RED_BEAM:
+                        gpWindowManager->m_screen->m_pixels
+                            [drawY * COMBAT_SCREEN_WIDTH + drawX] =
+                            uRedBeam[edgeDistance];
+                        break;
+                    case BOLT_COLOR_RAINBOW_FORWARD:
+                        gpWindowManager->m_screen->m_pixels
+                            [drawY * COMBAT_SCREEN_WIDTH + drawX] =
+                            uRainbow[widthIndex - widthFirst];
+                        break;
+                    case BOLT_COLOR_RAINBOW_REVERSE:
+                        gpWindowManager->m_screen->m_pixels
+                            [drawY * COMBAT_SCREEN_WIDTH + drawX] =
+                            uRainbow[BOLT_RAINBOW_LAST_INDEX -
+                                     (widthIndex - widthFirst)];
+                        break;
+                    case BOLT_COLOR_LIGHTNING: {
+                        unsigned char color;
+                        if (edgeDistance == 0)
+                            color = BOLT_LIGHTNING_SHADE_0;
+                        else if (edgeDistance == 1)
+                            color = BOLT_LIGHTNING_SHADE_1;
+                        else if (edgeDistance == 2)
+                            color = BOLT_LIGHTNING_SHADE_2;
+                        else if (edgeDistance == 3)
+                            color = BOLT_LIGHTNING_SHADE_3;
+                        else if (edgeDistance == 4)
+                            color = BOLT_LIGHTNING_SHADE_4;
+                        else
+                            color = BOLT_LIGHTNING_SHADE_5;
+                        gpWindowManager->m_screen->m_pixels
+                            [drawY * COMBAT_SCREEN_WIDTH + drawX] = color;
+                        break;
+                    }
+                    default:
+                        gpWindowManager->m_screen->m_pixels
+                            [drawY * COMBAT_SCREEN_WIDTH + drawX] =
+                            static_cast<unsigned char>(bolt->colorMode);
+                        break;
+                    }
+                }
+            }
+
+            int distance = abs(bolt->endY - bolt->pixelY) +
+                           abs(bolt->endX - bolt->pixelX);
+            if (bolt->nearTarget == 0) {
+                if (distance < BOLT_NEAR_TARGET_DISTANCE) {
+                    bolt->nearTarget = 1;
+                    bolt->nearestDistance = distance;
+                }
+            } else if (bolt->nearestDistance + 1 < distance ||
+                       distance < BOLT_FINISHED_DISTANCE) {
+                bolt->finished = 1;
+                return;
+            } else if (distance < bolt->nearestDistance) {
+                bolt->nearestDistance = distance;
+            }
+        }
+    }
+}
+
+// @match-note 99.59%: complete initialization/clamping/orientation/distance CFG;
+// the 0x18 frame, 0x26f byte size, and all seven relocation targets agree. The
+// first raw and normalized instruction difference starts at retail +0x1c3:
+// retail `mov eax,[ebp+0x14]`, ours `mov eax,[ebp+0x18]`; the first differing
+// byte is its +0x1c5 displacement, retail 0x14 versus ours 0x18. Retail evaluates
+// horizontal abs first and retains it in ebx; ours evaluates vertical abs first,
+// producing the later equivalent `jle`/`jge` polarity difference. Tried reversed
+// inequality, explicit distance locals, and direct abs expressions. Revisit at
+// 95% or after predecessor compiler-state changes.
 VA(0x004259dd, 0x26f)
-void combatManager::AddBolt(struct SBolt *, int, int, int, int, int, int, int, int, int, int, int, int) {}
+void combatManager::AddBolt(SBolt *bolt, int startX, int startY, int endX,
+                            int endY, int branchDistance, int startWidth,
+                            int endWidth, int colorMode, int minAngle,
+                            int maxAngle, int angleDistance, int forceAngle)
+{
+    if (startX < 0)
+        startX = 0;
+    if (COMBAT_SCREEN_WIDTH - 1 < startX)
+        startX = COMBAT_SCREEN_WIDTH - 1;
+    if (startY < 0)
+        startY = 0;
+    if (COMBAT_AREA_HEIGHT - 1 < startY)
+        startY = COMBAT_AREA_HEIGHT - 1;
+    if (endX < 0)
+        endX = 0;
+    if (COMBAT_SCREEN_WIDTH - 1 < endX)
+        endX = COMBAT_SCREEN_WIDTH - 1;
+    if (endY < 0)
+        endY = 0;
+    if (COMBAT_AREA_HEIGHT - 1 < endY)
+        endY = COMBAT_AREA_HEIGHT - 1;
 
+    bolt->startX = startX;
+    bolt->startY = startY;
+    bolt->endX = endX;
+    bolt->endY = endY;
+    bolt->branchDistance = branchDistance;
+    bolt->width = startWidth;
+    bolt->startWidth = startWidth;
+    bolt->endWidth = endWidth;
+    bolt->colorMode = colorMode;
+    bolt->minAngle = minAngle;
+    bolt->maxAngle = maxAngle;
+    bolt->angleDistance = angleDistance;
+    bolt->currentX = static_cast<float>(startX);
+    bolt->currentY = static_cast<float>(startY);
+    bolt->pixelX = startX;
+    bolt->pixelY = startY;
+    bolt->finished = 0;
+    bolt->nearTarget = 0;
+    bolt->lastBranchX = startX;
+    bolt->lastBranchY = startY;
+    bolt->distanceRatio = 0;
+    bolt->forceAngle = forceAngle;
+
+    if (colorMode == BOLT_COLOR_RAINBOW_FORWARD ||
+        colorMode == BOLT_COLOR_RAINBOW_REVERSE) {
+        if (startX <= 0 || startX >= COMBAT_SCREEN_WIDTH - 1)
+            bolt->drawVertically = 1;
+        else
+            bolt->drawVertically = 0;
+    } else if (abs(endX - startX) > abs(endY - startY))
+        bolt->drawVertically = 1;
+    else
+        bolt->drawVertically = 0;
+
+    int deltaX = abs(endX - startX);
+    int deltaY = abs(endY - startY);
+    bolt->totalDistance = static_cast<int>(
+        sqrt(static_cast<double>(deltaX * deltaX + deltaY * deltaY)));
+    ResetBoltAngle(bolt);
+}
+
+// @match-note 98.52%: complete palette, 25-record bolt pool, extent/timer/blit,
+// branching, angle reset, and cleanup CFG; all 60 relocation targets agree. The
+// first raw differing byte is +0x05, the sub esp immediate: retail 0xac, ours
+// 0xbc. After masking frame/local slots, the first relocation-identity difference
+// is the retail +0x7d DIR32 operand for "kb.pal" versus ours equivalent string
+// symbol. The first normalized instruction divergence is retail +0x1a1
+// `mov eax,[ebp+0x28]` versus ours +0x1a4 `mov eax,[ebp+0x24]`; the following
+// loads reverse the startWidth/endWidth operands of the equivalent maximum.
+// Retail's executable size is 0xa82 through the `ret`; its 0xa84 object span
+// additionally contains NOPs at +0xa82 and +0xa83. Ours uses a 0xac0 object span.
+// Later residuals are loop-slot allocation and constant-pool identities. Tried
+// inline/pointer record access, top/tail cleanup, positive/continue branch arms,
+// ternary width selection, and stored/inline child angles. Retail itself leaves
+// parameter 14 unused and uses scalar delete for the POD bolt allocation; both
+// are preserved. Revisit at 95% for od_slots and AST permutation, not before.
 VA(0x00425c4c, 0xa82)
-void combatManager::DoBolt(int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int) {}
+void combatManager::DoBolt(int managePointer, int startX, int startY, int endX,
+                           int endY, int branchDistance, int branchLength,
+                           int startWidth, int endWidth, int colorMode,
+                           int minAngle, int maxAngle, int angleDistance,
+                           int unusedParameter, int forceAngle, int frameDelay,
+                           int brightenPalette)
+{
+    if (managePointer != 0)
+        gpMouseManager->HideColorPointer();
+
+    int drawDistance = angleDistance;
+    int allFinished = 0;
+    int drawPassCount = (angleDistance - 1) / drawDistance + 1;
+    int branchChance = branchDistance * BOLT_ANGLE_PERCENT_SCALE /
+                       angleDistance;
+    int deadline = KBTickCount();
+    gpWindowManager->m_updateFlags = 0;
+
+    palette *originalPalette = 0;
+    palette *effectPalette = 0;
+    if (brightenPalette != 0) {
+        originalPalette = gpResourceManager->GetPalette("kb.pal");
+        effectPalette = new palette;
+        if (!effectPalette)
+            MemError();
+        memcpy(effectPalette->Data(), originalPalette->Data(),
+               SPELL_ARMAGEDDON_PALETTE_SIZE);
+        signed char *effectData = effectPalette->Data();
+        int component;
+        for (component = 0; component < SPELL_ARMAGEDDON_PALETTE_SIZE;
+             ++component) {
+            effectData[component] += BOLT_PALETTE_BRIGHTEN_STEP;
+            if (effectData[component] > BOLT_PALETTE_COMPONENT_MAX)
+                effectData[component] = BOLT_PALETTE_COMPONENT_MAX;
+        }
+        SetPalette(effectData, 1);
+    }
+
+    if (endX < startX) {
+        minAngle = -minAngle;
+        maxAngle = -maxAngle;
+    }
+    if (maxAngle < minAngle) {
+        int savedAngle = maxAngle;
+        maxAngle = minAngle;
+        minAngle = savedAngle;
+    }
+
+    SBolt *bolts = new SBolt[BOLT_MAX_COUNT];
+    int extentPadding =
+        (endWidth <= startWidth ? startWidth : endWidth) >> 1;
+    AddBolt(bolts, startX, startY, endX, endY, branchDistance, startWidth,
+            endWidth, colorMode, minAngle, maxAngle, angleDistance,
+            forceAngle);
+
+    int boltCount = 1;
+    while (allFinished == 0) {
+        int drawPass;
+        for (drawPass = 0; drawPass < drawPassCount; ++drawPass) {
+            allFinished = 1;
+            int minY = BOLT_EXTENT_SENTINEL;
+            int minX = minY;
+            int maxY = -1;
+            int maxX = maxY;
+            int boltIndex;
+            for (boltIndex = 0; boltIndex < boltCount; ++boltIndex) {
+                if (bolts[boltIndex].finished == 0) {
+                    if (maxX < bolts[boltIndex].pixelX)
+                        maxX = bolts[boltIndex].pixelX;
+                    if (bolts[boltIndex].pixelX < minX)
+                        minX = bolts[boltIndex].pixelX;
+                    if (maxY < bolts[boltIndex].pixelY)
+                        maxY = bolts[boltIndex].pixelY;
+                    if (bolts[boltIndex].pixelY < minY)
+                        minY = bolts[boltIndex].pixelY;
+                    DrawBolt(&bolts[boltIndex], drawDistance);
+                    if (maxX < bolts[boltIndex].pixelX)
+                        maxX = bolts[boltIndex].pixelX;
+                    if (bolts[boltIndex].pixelX < minX)
+                        minX = bolts[boltIndex].pixelX;
+                    if (maxY < bolts[boltIndex].pixelY)
+                        maxY = bolts[boltIndex].pixelY;
+                    if (bolts[boltIndex].pixelY < minY)
+                        minY = bolts[boltIndex].pixelY;
+                }
+            }
+
+            maxX += extentPadding;
+            minX -= extentPadding;
+            maxY += extentPadding;
+            minY -= extentPadding;
+            if (minX < 0)
+                minX = 0;
+            if (minY < 0)
+                minY = 0;
+            if (COMBAT_SCREEN_WIDTH - 1 < maxX)
+                maxX = COMBAT_SCREEN_WIDTH - 1;
+            if (COMBAT_AREA_HEIGHT - 1 < maxY)
+                maxY = COMBAT_AREA_HEIGHT - 1;
+
+            DelayTil(&deadline);
+            deadline = static_cast<int>(
+                KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] *
+                                    frameDelay);
+            BlitBitmapToScreen(gpWindowManager->m_screen, minX, minY,
+                               maxX - minX + 1, maxY - minY + 1, minX, minY);
+            PollSound();
+
+            for (boltIndex = 0; boltIndex < boltCount; ++boltIndex) {
+                if (bolts[boltIndex].finished == 0)
+                    allFinished = 0;
+            }
+            if (allFinished != 0)
+                break;
+
+            if (branchDistance != 0) {
+                int oldBoltCount = boltCount;
+                for (boltIndex = 0; boltIndex < oldBoltCount; ++boltIndex) {
+                    if (bolts[boltIndex].finished == 0) {
+                        int remainingDistance =
+                            abs(bolts[boltIndex].endX -
+                                bolts[boltIndex].pixelX) +
+                            abs(bolts[boltIndex].endY -
+                                bolts[boltIndex].pixelY);
+                        if (boltCount < BOLT_MAX_COUNT &&
+                            angleDistance * 2 < remainingDistance &&
+                            Random(0, branchChance) <
+                                BOLT_BRANCH_PERCENT_LIMIT) {
+                            if (bolts[boltIndex].lastBranchX != 0) {
+                                int branchSeparation =
+                                    abs(bolts[boltIndex].lastBranchX -
+                                        bolts[boltIndex].pixelX) +
+                                    abs(bolts[boltIndex].lastBranchY -
+                                        bolts[boltIndex].pixelY);
+                                if (branchSeparation <
+                                    branchDistance *
+                                        BOLT_BRANCH_COOLDOWN_FACTOR)
+                                    goto skipBranch;
+                            }
+                            bolts[boltIndex].lastBranchX =
+                                bolts[boltIndex].pixelX;
+                            bolts[boltIndex].lastBranchY =
+                                bolts[boltIndex].pixelY;
+                            float branchAngle = static_cast<float>(
+                                Random(BOLT_BRANCH_RANDOM_LOW,
+                                       BOLT_BRANCH_RANDOM_HIGH)) /
+                                                BOLT_ANGLE_PERCENT_SCALE;
+                            if (Random(0, 1) != 0)
+                                branchAngle = -branchAngle;
+                            float currentAngle = bolts[boltIndex].angle;
+                            float childAngle = branchAngle + currentAngle;
+                            int childDistance =
+                                Random(branchLength >> 1, branchLength);
+                            if ((remainingDistance >> 1) < childDistance)
+                                childDistance = remainingDistance >> 1;
+                            int childX = static_cast<int>(
+                                sin(childAngle) * childDistance +
+                                bolts[boltIndex].pixelX);
+                            int childY = static_cast<int>(
+                                cos(childAngle) * childDistance +
+                                bolts[boltIndex].pixelY);
+                            int childWidth;
+                            if (bolts[boltIndex].endWidth <
+                                bolts[boltIndex].startWidth)
+                                childWidth = bolts[boltIndex].width - 1;
+                            else
+                                childWidth = bolts[boltIndex].width;
+                            AddBolt(&bolts[boltCount],
+                                    bolts[boltIndex].pixelX,
+                                    bolts[boltIndex].pixelY, childX, childY,
+                                    branchDistance, childWidth, 1, colorMode,
+                                    static_cast<int>(
+                                        minAngle * BOLT_CHILD_ANGLE_SCALE +
+                                        BOLT_CHILD_MIN_ANGLE_OFFSET),
+                                    static_cast<int>(
+                                        maxAngle * BOLT_CHILD_ANGLE_SCALE +
+                                        BOLT_CHILD_ANGLE_OFFSET),
+                                    angleDistance,
+                                    bolts[boltIndex].forceAngle);
+                            ++boltCount;
+                        }
+                    }
+skipBranch:
+                    ;
+                }
+            }
+        }
+
+        int boltIndex;
+        for (boltIndex = 0; boltIndex < boltCount; ++boltIndex) {
+            if (bolts[boltIndex].finished == 0)
+                ResetBoltAngle(&bolts[boltIndex]);
+        }
+    }
+
+    delete bolts;
+    if (managePointer != 0) {
+        DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
+        gpMouseManager->ShowColorPointer();
+    }
+    if (brightenPalette != 0) {
+        SetPalette(originalPalette->Data(), 1);
+        gpResourceManager->Dispose(originalPalette);
+        delete effectPalette;
+    }
+    gpWindowManager->m_updateFlags = 1;
+}
 
 VA(0x004266ce, 0x18c)
 int combatManager::GetNextChainLightningTarget(class army *, int) { return 0; }
@@ -1640,6 +2193,11 @@ DATA(0x004f00b0) int castX;
 DATA(0x004f00b4) int castY;
 DATA(0x004f00b8) int bInTeleportGetDest;
 DATA(0x004f0278) int indexToCastOn;
-DATA(0x004f04c0) unsigned char *uRedBeam;
-DATA(0x004f04c8) unsigned char *uRainbow;
+DATA(0x004f04c0) unsigned char uRedBeam[] = {
+    0x77, 0xb5, 0xbc, 0xc0, 0xc3
+};
+DATA(0x004f04c8) unsigned char uRainbow[] = {
+    0xbc, 0xba, 0xce, 0xca, 0xc8, 0x6f, 0x71, 0x73,
+    0xde, 0x5a, 0x9f, 0x47, 0x4a, 0x8d, 0x8f
+};
 DATA(0x004f04e0) signed char *gyModify;
