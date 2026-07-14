@@ -64,7 +64,7 @@ extern unsigned char *gObjectColors;
 extern unsigned char gOwnerColors[];
 extern char *gTilesetFiles[64];
 extern unsigned char bPuzzleDraw[64];
-extern unsigned char uDimPal[3][4][256];
+#include <SOURCE/dimPalette.h>
 extern unsigned char gColorTableLighten[256];
 extern unsigned char *gColorTableNoCycle;
 extern int gbReturnAfterComputeExtent;

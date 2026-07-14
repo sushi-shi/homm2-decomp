@@ -7,7 +7,7 @@
 #include <BASE/icon2bc.h>
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
-#include <SOURCE/X_GLOBAL.h>
+#include <SOURCE/dimPalette.h>
 #include <BASE/Misc.h>
 #include <string.h>
 // Per-call decoder scratch — its own file-static block (0x534ca8+).
@@ -30,25 +30,23 @@ DATA(0x00534ce4) static unsigned char gCTColor;
 DATA(0x00534ce8) static unsigned int gCTRun;
 
 // Colour-table variant: literals and solid runs use colorTable[], and dimming is gated by dimGate.
-// Header-state replay guard: docs/matching-matrices/icon2bc-tu-state-a0b17fb.tsv.
+// Header/template replay guard: docs/matching-matrices/icon2bc-template-surface-c4c0562.tsv.
 // @match-note
-// /O2 structural checkpoint: both sides are FPO with one four-byte temporary and the complete
-// skip/solid/shadow/fill/dim/literal/newline CFG has been traced; all 91 relocation occurrences
-// and targets agree. The canonical first differs at +0x12: ours forms 13*frame in ECX and folds
-// the entry base there, while retail retains data=ESI and 13*frame=EBX, loads entry.x in ECX and
-// srcOffset in EAX, then forms entry=EDI and reuses ESI for X. A fresh byte-offset/SSA-lifetime
-// family (split raw entry X, delayed typed-entry formation, pointer/reference/global views, and
-// declaration splits) reached only 70.00% and either pushed EBP early or allocated entry=ECX;
-// see icon2bc-structural-214bd52.tsv. A later independent decoder audit proved retail loads
-// gCTDst once before the command loop and carries that cursor across iterations; its newline also
-// publishes X, Y, then row. That whole-function model reached only 71.88% with 88/91 relocations,
-// below the retained 72.479%, so this 91/91 canonical remains; see
-// icon2bc-decoder-lifetime-9cdac5a.tsv. Revisit with a model that preserves those lifetimes while
-// also yielding the +0x12 EBX/EDI split, or after a real declaration-surface change. A fresh
-// checkpoint-032a2b3 combination kept the cursor before the loop and used retail newline order,
-// but reached only 71.88% with 87/91 relocations; semantic local renames, a single do-loop, split
-// command declaration, and command/shadow-flags SSA reuse were byte-identical and did not change
-// the EDX-cursor/EBX-count allocation. See icon2bc-retail-lifetime-032a2b3.tsv.
+// /O2 template checkpoint: the complete skip/solid/shadow/fill/dim/literal/newline CFG and every
+// relocation target are accounted for. A canonical KB-owned dim-palette declaration now avoids
+// parsing the unrelated game-global surface in this BASE TU, and the retail X/Y/row newline order
+// raises the live match from 69.95% (retained 72.4789%) to 73.17%. Candidate .text is 0x566 versus
+// retail 0x5af; relocation-union masking leaves 745 differing common bytes, first +0x12, and a
+// 0x49-byte retail tail. Relocations are 88/91 with no base-only target: the allocation state is
+// short one ClipR, Cnt, Dst, and X0 occurrence and has one excess Y occurrence.
+// The first divergence is still setup allocation: ours folds 13*frame and entry into ECX, while
+// retail keeps data=ESI, offset=EBX, entry=EDI, entry.x=ECX, and srcOffset=EAX. Retail also loads
+// gCTDst into EBX once before the command loop and carries it; this source still reloads the cursor
+// at the loop header. Direct sibling-template field snapshots, the historical inline-IconEntry
+// surface, a minimal direct IconEntry surface, and the proven pre-loop cursor were combined with
+// the new header state but did not exceed this checkpoint or preserve 91 occurrences. Resume only
+// with a new shared-template model that fixes both the EBX/EDI setup split and EBX/EDX cursor/count
+// colouring; do not replay the rows in the guard matrix or the earlier setup/count matrices.
 VA(0x004d32a0, 0x5af)
 void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                             int clip, int clipX, int clipY, int clipW, int clipH, int color,
@@ -256,8 +254,8 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
             continue;
         }
         // newline
-        row = row + gCTPitch;
         X = gCTX0;
         gCTY = gCTY + 1;
+        row = row + gCTPitch;
     }
 }
