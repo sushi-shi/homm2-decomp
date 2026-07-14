@@ -17,6 +17,20 @@ typedef enum ElevationOverlayConstant {
     ELEVATION_OVERLAY_CELL_COUNT = 15
 } ElevationOverlayConstant;
 
+typedef enum TownEligibleBuildMaskConstant {
+    TOWN_ELIGIBLE_BUILD_MASK_COUNT = 6,
+    TOWN_ELIGIBLE_BUILD_KNIGHT_MASK = 0x3ff8bf9f,
+    TOWN_ELIGIBLE_BUILD_BARBARIAN_MASK = 0x1bf8bf9f,
+    TOWN_ELIGIBLE_BUILD_SORCERESS_MASK = 0x0ff8bf9f,
+    TOWN_ELIGIBLE_BUILD_WARLOCK_MASK = 0x69f8bf9f,
+    TOWN_ELIGIBLE_BUILD_WIZARD_MASK = 0x35f8bf9f,
+    TOWN_ELIGIBLE_BUILD_NECROMANCER_MASK = 0x1ff8bf9b
+} TownEligibleBuildMaskConstant;
+
+typedef enum CombatControlConstant {
+    COMBAT_CONTROL_SIDE_COUNT = 2
+} CombatControlConstant;
+
 #pragma pack(push, 1)
 struct SCmbtObstacle {
     unsigned int terrainMask;
@@ -100,7 +114,7 @@ extern int giScreenScroll;
 extern int giMenuCommand;
 extern int gbSendMouseMoveMessages;
 extern int gbColorMice;
-extern unsigned long gTownEligibleBuildMask[6];
+extern unsigned long gTownEligibleBuildMask[TOWN_ELIGIBLE_BUILD_MASK_COUNT];
 extern unsigned char giMapSizes[4];
 extern int gbUseEvilInterface;
 extern char *cEvilTranslate[37][2];  // CodeView size 0x128 = 37*2*4; array-decayed mangling
@@ -382,7 +396,7 @@ extern char gcTCPAddress[GLOBAL_TCP_TEXT_SIZE];
 extern unsigned char giSetupGameType;
 extern char gLastFilename[GLOBAL_AGGREGATE_PATH_SIZE];
 extern int giFullySeeded;
-extern int *iCombatControlNetPos;
+extern int iCombatControlNetPos[COMBAT_CONTROL_SIDE_COUNT];
 extern char cExpAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
 extern int gbMoveShown;
 extern signed char gbSetupGamePosToRealGamePos[8];

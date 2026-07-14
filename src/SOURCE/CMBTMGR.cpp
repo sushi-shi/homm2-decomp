@@ -407,7 +407,7 @@ int combatManager::Open(int openFlags)
 
     LogStr("Op3");
     gpSoundManager->SwitchAmbientMusic(SRandom(2, 4));
-    gCombatCycleTimer = KBTickCount();
+    glTimers[GLOBAL_COMBAT_CYCLE_TIMER_SLOT] = KBTickCount();
     ResetCycleTimers();
     LogStr("Op4");
     gpInputManager->Flush();

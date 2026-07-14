@@ -43,7 +43,7 @@ int combatManager::Main(tag_message &message)
                 KBTickCount() +
                 gfCombatSpeedMod[gConfig.combatSpeed] * COMBAT_SOUND_POLL_DELAY);
         }
-        if (KBTickCount() > gCombatCycleTimer &&
+        if (KBTickCount() > glTimers[GLOBAL_COMBAT_CYCLE_TIMER_SLOT] &&
             gbProcessingCombatAction == 0) {
             gbProcessingCombatAction = 1;
             CycleCombatScreen();
@@ -2294,13 +2294,11 @@ int combatManager::ProcessNextAction(struct tag_message &message)
         actionData[COMBAT_ACTION_DATA_GRID] = giNextActionGridIndex;
         actionData[COMBAT_ACTION_DATA_SECOND_GRID] = giNextActionGridIndex2;
         LogInt("About to T",
-               reinterpret_cast<int *>(&iCombatControlNetPos)
-                   [COMBAT_DEFENDER_SIDE - m_currentSide],
+               iCombatControlNetPos[COMBAT_DEFENDER_SIDE - m_currentSide],
                -999, -999, -999, -999, -999, -999);
         transmitResult = TransmitRemoteData(
             reinterpret_cast<char *>(actionData),
-            reinterpret_cast<int *>(&iCombatControlNetPos)
-                [COMBAT_DEFENDER_SIDE - m_currentSide],
+            iCombatControlNetPos[COMBAT_DEFENDER_SIDE - m_currentSide],
             sizeof(actionData), COMBAT_REMOTE_COMMAND_ACTION, 1, 1, -1);
         LogStr("Post T");
         if (transmitResult == 0)
@@ -2738,7 +2736,7 @@ void combatManager::CycleCombatScreen(void)
         }
         DrawFrame(1, 1, 0, 0, COMBAT_COMMAND_FRAME_DELAY, 1, 1);
     }
-    gCombatCycleTimer = static_cast<int>(
+    glTimers[GLOBAL_COMBAT_CYCLE_TIMER_SLOT] = static_cast<int>(
         KBTickCount() +
         gfCombatSpeedMod[gConfig.combatSpeed] * COMBAT_CYCLE_TIMER_FACTOR);
 }
