@@ -301,7 +301,7 @@ void resourceManager::Close(void)
     m_resourceListHead = 0;
     for (local_8 = 0; local_8 < 2; local_8++) {
         if (m_aggregateDir[local_8] != 0)
-            BaseFree(m_aggregateDir[local_8], __FILE__, __LINE__);
+            H2_FREE(m_aggregateDir[local_8], "I:\\Projects\\Heroes\\Prog\\BASE\\RESMGR.CPP", 0x1da);
         if (m_aggregateFd[local_8] != -1) {
             _close(m_aggregateFd[local_8]);
             m_aggregateFd[local_8] = -1;
@@ -336,7 +336,7 @@ int resourceManager::LoadAggregateHeader(char *param_1)
     _read(m_aggregateFd[m_curAggregate], local_10, 2);
     m_aggregateEntryCount[m_curAggregate] = local_10[0];
     local_8 = m_aggregateEntryCount[m_curAggregate] * 0xc;
-    m_aggregateDir[m_curAggregate] = static_cast<aggEntry *>(BaseAlloc(local_8, __FILE__, __LINE__));
+    m_aggregateDir[m_curAggregate] = static_cast<aggEntry *>(H2_ALLOC(local_8, "I:\\Projects\\Heroes\\Prog\\BASE\\RESMGR.CPP", 0x21e));
     _read(m_aggregateFd[m_curAggregate], m_aggregateDir[m_curAggregate], local_8);
     return 0;
 }
@@ -422,7 +422,7 @@ void resourceManager::RestorePosition(void)
 VA(0x004c8ee0, 0x81)
 signed char resourceManager::ReadByte(void)
 {
-    ProcessAssert(m_aggregateFd[m_curAggregate] != -1, __FILE__, 0x2bf);
+    H2_ASSERT(m_aggregateFd[m_curAggregate] != -1, "I:\\Projects\\Heroes\\Prog\\BASE\\RESMGR.CPP", 0x2bf);
     signed char value = 0;
     int bytesRead = _read(m_aggregateFd[m_curAggregate], &value, 1);
     if (bytesRead == 0) {
@@ -437,7 +437,7 @@ signed char resourceManager::ReadByte(void)
 VA(0x004c8f70, 0x84)
 short resourceManager::ReadWord(void)
 {
-    ProcessAssert(m_aggregateFd[m_curAggregate] != -1, __FILE__, 0x2dc);
+    H2_ASSERT(m_aggregateFd[m_curAggregate] != -1, "I:\\Projects\\Heroes\\Prog\\BASE\\RESMGR.CPP", 0x2dc);
     short value = 0;
     int bytesRead = _read(m_aggregateFd[m_curAggregate], &value, 2);
     if (bytesRead == 0) {
@@ -452,7 +452,7 @@ short resourceManager::ReadWord(void)
 VA(0x004c9000, 0x84)
 long resourceManager::ReadLong(void)
 {
-    ProcessAssert(m_aggregateFd[m_curAggregate] != -1, __FILE__, 0x2f8);
+    H2_ASSERT(m_aggregateFd[m_curAggregate] != -1, "I:\\Projects\\Heroes\\Prog\\BASE\\RESMGR.CPP", 0x2f8);
     long value = 0;
     int bytesRead = _read(m_aggregateFd[m_curAggregate], &value, 4);
     if (bytesRead == 0) {
@@ -488,7 +488,7 @@ void resourceManager::Read13(signed char *param_1)
 VA(0x004c91b0, 0xbd)
 void resourceManager::ReadBlock(signed char *destination, unsigned long size)
 {
-    ProcessAssert(m_aggregateFd[m_curAggregate] != -1, __FILE__, 0x330);
+    H2_ASSERT(m_aggregateFd[m_curAggregate] != -1, "I:\\Projects\\Heroes\\Prog\\BASE\\RESMGR.CPP", 0x330);
     PollSound();
     int bytesRead = _read(m_aggregateFd[m_curAggregate], destination, size);
     if (bytesRead != size) {

@@ -37,9 +37,9 @@ listBoxWidget::~listBoxWidget()
         delete m_scrollbar;
     for (i = 0; i < m_itemCount; i++)
 #line 25
-        BaseFree(m_items[i], __FILE__, __LINE__);
+        H2_FREE(m_items[i], "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp", 25);
 #line 27
-    BaseFree(m_items, __FILE__, __LINE__);
+    H2_FREE(m_items, "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp", 27);
     gbSendMouseMoveMessages = 0;
 }
 
@@ -146,19 +146,19 @@ void listBoxWidget::DeleteItem(int index)
         m_topIndex = field_0x42;
     if (m_itemCount == 1) {
 #line 156
-        BaseFree(m_items[0], __FILE__, __LINE__);
-        BaseFree(m_items, __FILE__, __LINE__);
+        H2_FREE(m_items[0], "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp", 0x9c);
+        H2_FREE(m_items, "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp", 0x9d);
         m_items = 0;
     } else {
-        char **newItems = static_cast<char **>(BaseAlloc((m_itemCount - 1) * 4,
 #line 162
-                                                         __FILE__, __LINE__));
+        char **newItems = static_cast<char **>(H2_ALLOC((m_itemCount - 1) * 4,
+                                                         "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp", 0xa2));
         memcpy(newItems, m_items, (m_itemCount - 1) * 4);
         if (m_itemCount - index - 1 > 0)
             memcpy(&newItems[index], &m_items[index + 1], (m_itemCount - index - 1) * 4);
         if (m_items != 0)
 #line 169
-            BaseFree(m_items, __FILE__, __LINE__);
+            H2_FREE(m_items, "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp", 0xa9);
         m_items = newItems;
     }
     m_itemCount--;
@@ -227,27 +227,27 @@ int listBoxWidget::Main(tag_message &message)
                 if (m_itemCount <= message.fieldC)
                     break;
 #line 222
-                BaseFree(m_items[message.fieldC], __FILE__, __LINE__);
-                m_items[message.fieldC] = static_cast<char *>(BaseAlloc(strlen(text) + 1, __FILE__, __LINE__));
+                H2_FREE(m_items[message.fieldC], "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp", 0xde);
+                m_items[message.fieldC] = static_cast<char *>(H2_ALLOC(strlen(text) + 1, "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp", 0xdf));
                 strcpy(m_items[message.fieldC], text);
             }
             break;
         case 0x38:
             if (m_id == message.field8) {
                 char *text = message.text;
-                char **newItems = static_cast<char **>(BaseAlloc((m_itemCount + 1) * 4,
 #line 233
-                                                                 __FILE__, __LINE__));
+                char **newItems = static_cast<char **>(H2_ALLOC((m_itemCount + 1) * 4,
+                                                                 "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp", 0xe9));
                 if (m_itemCount != 0)
                     memcpy(newItems, m_items, m_itemCount * 4);
-                newItems[m_itemCount] = static_cast<char *>(BaseAlloc(strlen(text) + 1,
 #line 236
-                                                                      __FILE__, __LINE__));
+                newItems[m_itemCount] = static_cast<char *>(H2_ALLOC(strlen(text) + 1,
+                                                                      "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp", 0xec));
                 strcpy(newItems[m_itemCount], text);
                 m_itemCount++;
                 if (m_items != 0)
 #line 240
-                    BaseFree(m_items, __FILE__, __LINE__);
+                    H2_FREE(m_items, "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp", 0xf0);
                 m_items = newItems;
                 if (field_0x28 < m_itemCount) {
                     field_0x42 = m_itemCount - field_0x28;
