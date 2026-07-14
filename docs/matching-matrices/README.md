@@ -158,6 +158,37 @@ The byte pins covered default constructor/destructor, `Main`, `Draw`, and the no
 `ac8dd08884961ba6d73e8a312391cdeecac71ba132f5badef5f79201a63b34d8` and
 `8207f088751e59f5a467c7a7e582c4870d82c3fb4e060262d02d5e3a07a17517`.
 
+## BASE/WINDOW whole-TU jump-table revalidation
+
+`window-manual-tu-72ca327.tsv` records the canonical 15-function TU and one fresh
+exact-predecessor state. Its SHA-256 is
+`7619528c745728ad6ad447c89e86fd8e7671437999744c9980ec0aed390e627d`. Neither permutation
+tool was used.
+
+The canonical source SHA-256 is
+`b286e1136d4692eb131fefc4c5d392b39ea8401338196a9ba0a79c8553194ac3`. Fourteen functions,
+including both constructors preceding the resource constructor, are exact. For
+`heroWindow::heroWindow(int,int,char*)`, candidate and retail are both `0x521` with a `0x68`
+frame. Excluding the five-entry table at relative `+0x4d7..+0x4ea` and masking all 57 matching
+relocation positions leaves 1,293/1,293 equal bytes. Explicit-range disassembly gives identical
+EBP displacements and one `e9 00000000` inline continuation on each side. The external relocation
+targets agree; the extra delinked target identities are folded local table/case labels.
+
+The sole non-table raw difference remains the dispatch relocation addend: MSVC emits
+`ff 24 85 00000000` against its internal `$L` table symbol, while the delinked retail object emits
+`ff 24 85 d7040000` against the containing constructor. The five table entries agree after masking
+their local-label relocations. This is the byte-proven mid-function jump-table artifact documented
+in `docs/jump-tables.md`, not a source/CFG/frame/slot/inline mismatch.
+
+Renaming all five parameters of the preceding exact constructor produced source SHA-256
+`7185388d9a86cfd2ebc976baafa621545d475ca6d2c0894eb561db308c6ca935` but left the complete TU
+`.text` byte-identical at SHA-256
+`b9c24bc77e7c2879084e1d697cd31ba6e8e557769dcd88a9364eabc21d43bde9`; all 14 siblings and the
+99.916664% target stayed pinned. It was reverted. Do not repeat this parameter-name predecessor
+state while the canonical source/header state agrees. An AST pass is not applicable to the
+remaining residual because every non-table code byte is already exact and source AST mutations
+cannot change the delinker's folded relocation addend.
+
 ## BASE/FONT scalar-lvalue SIB resolution
 
 `font-sib-lvalue-72ca327.tsv` records the complete FONT continuation from checkpoint
