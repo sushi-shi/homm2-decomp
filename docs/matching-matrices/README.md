@@ -158,6 +158,29 @@ The byte pins covered default constructor/destructor, `Main`, `Draw`, and the no
 `ac8dd08884961ba6d73e8a312391cdeecac71ba132f5badef5f79201a63b34d8` and
 `8207f088751e59f5a467c7a7e582c4870d82c3fb4e060262d02d5e3a07a17517`.
 
+## BASE/FONT scalar-lvalue SIB resolution
+
+`font-sib-lvalue-72ca327.tsv` records the complete FONT continuation from checkpoint
+`72ca327`; its SHA-256 is
+`1095e413c0316e9a84fc23119350bbf4d942ec9c354f1f008b83667c19b68aa8`.
+Neither permutation tool was used. Full source/header hashes and every ineffective or retained
+source shape are recorded so the direct relation, `maxW | 0`, and `0[&maxW]` forms are not
+repeated.
+
+The successful form is the scalar-lvalue SIB identity `0[&local]`. It makes VC4.2 `/Od` load the
+other comparison operand first without changing semantics, slots, instruction count, CFG, or
+relocations. Applying it to the two index/start comparisons in `DrawBoundedString`, the three
+width/argument comparisons in `LineLength`, and the length/index comparison in `LineWidth` makes
+all three functions raw-exact. The prior stale `@early-stop` markers on the first two are removed.
+The reusable byte-level before/after form is documented in
+[`tu-cumulative-eval-order.md`](../patterns/tu-cumulative-eval-order.md).
+
+The two deleting-destructor report rows remain unscored because delinking materializes two retail
+`??_E` aliases while VC4.2 correctly emits one `0x39` `??_G` COMDAT plus a weak `??_E -> ??_G`
+external. Manual raw review proves the COMDAT identical to each retail copy over all `0x39` bytes;
+both relocations target `font::~font` and `operator delete`, and the vtable relocates through the
+weak `??_E` alias. This is a report/delink alias artifact, not missing source.
+
 ## BASE/Textntry manual TU-state and lifetime pass
 
 `textntry-manual-tu-a4fa3a0.tsv` records 35 new unique manual states from integrated checkpoint
