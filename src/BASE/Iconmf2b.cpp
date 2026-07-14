@@ -24,44 +24,49 @@ DATA(0x005381b0) static int gFMClipR;
 DATA(0x005381b4) static int gFMXEnd;
 
 // @match-note
-// Consumer-only mono/shear enum headers raise the unchanged structural body from 69.51% to 76.52%.
-// Candidate is
-// 0x20e bytes versus retail 0x212. Both have 167 instructions, 26 basic blocks, 20 branches, and an
-// identical ordered successor graph. Both reserve one four-byte pitch home, save EBX/ESI/EDI/EBP,
-// and return with `ret 0x24`. All 27 ordered relocation occurrences agree, including each of the
-// ten real scratch owners at 0x538190..0x5381b4; there is no candidate-only target.
-// The former @early-stop was invalid: that candidate had 28 blocks versus retail's 26 and first
-// diverged during entry setup, so it did not prove a compiler wall. The typed frame selection,
-// byte-row owner, named mono-RLE mask, short-circuit clip order, solid-run arm order, newline, and
-// every loop backedge are now recovered. Retail deliberately tests clipX <= left both at clipped-
-// run entry and before selecting the full/partial fill arm; the redundant shipped CFG is preserved.
-// The remaining raw residual is broad register allocation/instruction scheduling: first difference
-// is +0x12, where candidate's frame-offset LEA targets EBX while retail targets ECX. Relocation-
-// masked comparison has 341 common unmasked bytes, 282 differing bytes, and a four-byte retail
-// tail. This is structurally closed but remains unresolved/not-a-wall, not an @early-stop proof.
-// Revisit only after a real shared-header/TU-state change; no regex or AST permuter was used.
+// Fresh geometry/type recovery. Candidate is 0x205 bytes versus retail 0x212, with 166 versus 167
+// instructions. Both have 26 basic blocks, 20 branch instructions, an identical ordered successor
+// graph, one four-byte pitch home, the same saved registers, and `ret 0x24`.
+// Retail materializes the selected IconEntry pointer before reading fields. It then retains three
+// distinct horizontal values through setup: x0 (left edge), right (exclusive right edge), and X
+// (inclusive running edge, decremented by each command). The old body overwrote the left-edge local
+// and reloaded gFMX0 during clipping. The typed pointer and real three-value lifetime are now
+// recovered. Moving entryY to its retail lifetime before right-edge formation further aligns setup.
+// Nonvolatile gFMY is canonical: neither PoL nor the related H2X build proves volatile storage. MSVC
+// coalesces the two retail setup-clip gFMY reads into one reload, leaving 26/27 relocations with
+// only-base=0; this is unresolved code generation and must not be forced with a qualifier or reads.
+// The H2X build independently corroborates the geometry lifetimes only, not source qualifiers.
+// First relocation-masked raw divergence is now +0x1c: retail publishes gFMEntry before adding the
+// data base to srcOffset; candidate schedules that add first and publishes at +0x1e. The remaining
+// residual is register allocation/instruction scheduling. Direct entry->srcOffset use regresses
+// sharply; splitting x0 initialization is byte-identical. Earlier cursor, memset-tail, pointer/count,
+// predicate, header-state, and AST-search families remain closed. Retail's redundant clipX <= left
+// test and full/partial arm order are retained. This remains unresolved/not-a-wall; no regex or AST
+// permutation was used. Revisit after a real TU-state change or in the post-placeholder last mile.
 VA(0x004da800, 0x212)
 void FlipMonoIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                           int color, int clip, int clipX, int clipY, int clipW, int clipH)
 {
     unsigned char *data = reinterpret_cast<unsigned char *>(srcIcon->m_data);
     int entryOffset = frame * sizeof(IconEntry);
-    int entryX = reinterpret_cast<IconEntry *>(data + entryOffset)->x;
-    int srcOffset = reinterpret_cast<IconEntry *>(data + entryOffset)->srcOffset;
     IconEntry *entry = reinterpret_cast<IconEntry *>(data + entryOffset);
+    int entryX = entry->x;
+    int srcOffset = entry->srcOffset;
     gFMEntry = entry;
+    int x0 = x;
+    x0 = x0 - entryX;
     gFMSrc = data + srcOffset;
-    int X = x - entryX;
     int w = entry->w;
-    X = X - w;
-    int right = w + X + 1;
-    X++;
-    gFMX0 = X;
-    X = right - 1;
+    x0 = x0 - w;
+    int entryY = entry->y;
+    int right = w + x0 + 1;
+    x0++;
+    gFMX0 = x0;
+    int X = right - 1;
     gFMXEnd = X;
-    gFMY = y + entry->y;
+    gFMY = y + entryY;
     if (clip != 0) {
-        if (gFMX0 < clipX || clipX + clipW < right || gFMY < clipY ||
+        if (x0 < clipX || clipX + clipW < right || gFMY < clipY ||
             entry->h + gFMY > clipY + clipH) {
             clip = 1;
             gFMClipR = clipX + clipW - 1;
