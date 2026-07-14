@@ -25,7 +25,10 @@
 // X/height snapshot, and adjacent width/height initialization models; the bounded
 // results are in docs/matching-matrices/widget-whole-tu-214bd52.tsv. Retry after a
 // predecessor/include/header TU-state change or new evidence for the original
-// initialization lifetime graph.
+// initialization lifetime graph. A constructor-only compile at checkpoint 2158e9b
+// emitted the identical 0x5a candidate, including the same 10 raw-byte residual and
+// 1/1 relocation, so this is not standalone-exact and cannot be certified as a
+// soft TU-cumulative wall.
 VA(0x004dde00, 0x5a)
 widget::widget(short int x, short int y, short int width, short int height, short int id, short int kind)
 {
@@ -91,7 +94,11 @@ void widget::Close(void) {}
 // did not close the residual without losing an exact sibling. Retry after an
 // exact-preserving predecessor/TU-state change or new lifetime evidence. The
 // bounded declaration-context retest for this combined checkpoint is recorded in
-// docs/matching-matrices/widget-whole-tu-214bd52.tsv.
+// docs/matching-matrices/widget-whole-tu-214bd52.tsv. A Main-only compile at
+// checkpoint 2158e9b regressed to 95.8533% with 408 raw-byte differences despite
+// retaining 17/17 relocations. The six-argument constructor preceding Main is also
+// still 10 raw bytes from retail, so the standalone and all-predecessors-exact
+// requirements both fail; this remains unresolved, not a soft TU-cumulative wall.
 VA(0x004ddee0, 0x2f4)
 int widget::Main(tag_message &message)
 {
