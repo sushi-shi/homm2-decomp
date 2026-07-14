@@ -11,42 +11,47 @@
 #include <BASE/bitmap.h>
 #include <SOURCE/dimPalette.h>
 #include <string.h>
-// Per-call decoder scratch — its own file-static block (0x5380c0+).
-static int gFCSkip;
-static unsigned int gFCRun;
-static int gFCX0;
-static int gFCXEnd;
-static unsigned int gFCCnt;
-static unsigned int gFCCnt2;
-static int gFCY;
-static IconEntry *gFCEntry;
-static int gFCX;
-static unsigned char *gFCSrc;
-static unsigned char *gFCDimPal;
-static unsigned char *gFCDimDst;
-static int gFCClipB;
-static unsigned char *gFCRow;
-static unsigned int gFCDimLen;
-static unsigned char gFCColor;
-static int gFCClipR;
-static unsigned char *gFCDst;
+DATA(0x005380d4) static int gFCSkip;
+DATA(0x00538104) static unsigned int gFCRun;
+DATA(0x005380f8) static int gFCX0;
+DATA(0x005380e4) static int gFCXEnd;
+DATA(0x005380e8) static unsigned int gFCCnt;
+DATA(0x005380e0) static unsigned int gFCCnt2;
+DATA(0x005380d8) static int gFCY;
+DATA(0x005380ec) static IconEntry *gFCEntry;
+DATA(0x005380d0) static int gFCX;
+DATA(0x005380f0) static unsigned char *gFCSrc;
+DATA(0x005380dc) static unsigned char *gFCDimPal;
+DATA(0x005380f4) static unsigned char *gFCDimDst;
+DATA(0x005380fc) static int gFCClipB;
+DATA(0x00538100) static unsigned char *gFCRow;
+DATA(0x005380c4) static unsigned int gFCDimLen;
+DATA(0x005380cc) static unsigned char gFCColor;
+DATA(0x005380c8) static int gFCClipR;
+DATA(0x005380c0) static unsigned char *gFCDst;
 
 // @match-note
-// Macro-aware structural checkpoint from a18cc69: this body is a clean typed reconstruction, with
-// the shared IconRle enum constants, canonical dim-palette owner, and byte-pointer row storage.
-// In the combined IconRle state, live match is 85.27% (retained maximum 86.2544%), candidate
-// 0x53f versus retail 0x54d, with
-// 84/83 relocations and no candidate-only target. Every scratch occurrence agrees except gFCY,
-// candidate 9 versus retail 8: source snapshots gFCY once for both initial vertical clip clauses,
-// but MSVC reloads it for the second clause while retail holds the first load in ECX.
-// Excluding retail padding, both sides have 76 ordered blocks, 59 branches, and identical ordered
-// successor vectors. Both reserve eight frame bytes. Retail additionally materializes the icon
-// width twice in [esp+0x14] and a right-clipped skip intermediate four times in [esp+0x10]; source
-// already has the real width/pitch and skip lifetimes, and the recorded staged/volatile spellings
-// either optimize away or add a false third frame word. First raw divergence is +0x0b: candidate
-// keeps icon data in EBX while retail uses ESI, causing broad register allocation thereafter.
-// Thus no semantics/type/layout/CFG/relocation structure remains missing, but the broad raw delta
-// is not a byte-proven wall. Revisit only after a real shared-header/type state change; no permuter.
+// Functionally complete typed reconstruction with canonical IconRle enum constants, dim-palette
+// owner, byte-pointer row storage, and retail-proven DATA owners for every file-static scratch.
+// Fresh ee1391f audit: live 85.27% (retained maximum 86.2544%), candidate 0x543 versus retail
+// 0x54d, 395/397 instructions, the same 76 ordered blocks/59 branches/successor vectors, and the
+// same eight-byte frame. Relocations are 84/83 with no wrong owner: every occurrence count agrees
+// except gFCY 9/8. Source has one snapshot shared by the initial vertical clauses, but candidate reloads
+// gFCY at +0x7b/+0x89 while retail loads it once at +0x77 and retains ECX for the bottom test.
+// Removing that excess from the ordered static-owner stream leaves one adjacent order difference
+// in the right-clipped literal arm: candidate ClipR/Skip versus retail Skip/ClipR. Source already
+// stores zero to Skip before the ClipR expression; the recorded staged/common-tail forms optimize
+// away or regress, so this is part of the same allocator residual rather than missing side effects.
+// First raw divergence remains +0x0b: candidate keeps icon data in EBX while retail uses ESI.
+// Retail then spills icon width at [esp+0x14] for the horizontal upper edge and retains the Y load;
+// the documented width/pitch/snapshot/staged-skip variants either optimize away or add a false
+// third frame word. The retail CodeView `.c` basename and exact `C:\proj\BASE` path in C++ mode are
+// text-identical. C89-style within-scope declaration ordering regresses to 82.56%/85:83; isolating
+// its downstream-only portion gives 83.60%/84:83. Splitting the general/dim/mono serialized
+// constants into separate typedef enums gives 84.33%/84:83, while
+// splitting only mono gives 84.10%/85:83; both were reverted. Declaring statics in ascending proven
+// retail address order gives 84.43%/85:83, so only the DATA annotations were retained.
+// This is an unresolved setup/source-shape residual, not a byte-proven wall. No permuter was used.
 VA(0x004d9790, 0x54d)
 void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                                 int clip, int clipX, int clipY, int clipW, int clipH, int color,
