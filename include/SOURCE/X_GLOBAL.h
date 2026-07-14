@@ -51,7 +51,7 @@ extern int giMenuCommand;
 extern int gbSendMouseMoveMessages;
 extern int gbColorMice;
 extern unsigned long gTownEligibleBuildMask[6];
-extern unsigned char *giMapSizes;
+extern unsigned char giMapSizes[4];
 extern int gbUseEvilInterface;
 extern char *cEvilTranslate[37][2];  // CodeView size 0x128 = 37*2*4; array-decayed mangling
 extern char gcAnimPath[0x160];
@@ -320,7 +320,7 @@ extern class icon *gCurLoadedSpellIcon;
 extern unsigned char bSaveMusicPosition[0x3c];
 extern char gcTCPAddress[GLOBAL_TCP_TEXT_SIZE];
 extern unsigned char giSetupGameType;
-extern char *gLastFilename;
+extern char gLastFilename[GLOBAL_AGGREGATE_PATH_SIZE];
 extern int giFullySeeded;
 extern int *iCombatControlNetPos;
 extern char cExpAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
