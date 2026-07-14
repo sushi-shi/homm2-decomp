@@ -33,6 +33,7 @@ DATA(0x00528d2c) extern int const_00128d2c; // sample/CD music volume 0-10
 DATA(0x00528d24) extern int const_00128d24;
 #define gCursorSampleSet const_00128d24
 DATA(0x00528e46) extern int gSoundTransition;
+DATA(0x00522f7c) extern signed char bExpansionSmackNum;
 DATA(0x004f59a8) extern short const_000f59a8;
 DATA(0x004fa684) extern int gMapTypeFlags; // map format flags (game::NewMap)
 
