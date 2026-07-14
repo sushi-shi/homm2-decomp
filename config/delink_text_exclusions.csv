@@ -1,0 +1,9 @@
+# Reviewed non-procedure .text ranges exposed after exact procedure carving.
+# These bytes must not be synthesized as functions. The audit requires every
+# nonpadding uncovered byte to be covered by one of these explicit ranges.
+rva,size,kind,unit,reason
+0xe23c0,0x10b,embedded-data,output,switch targets and format-class lookup tables owned by __output
+0xe3610,0x1c,body-chunk,87triga,alternate x87 entry stubs that join the public __fFATN2 body
+0xe3be5,0x32,body-chunk,87tran,unreferenced exception continuation chunk belonging to __ffexpm1
+0xe4a28,0x27,embedded-data,mbctype,switch targets and code-page lookup bytes owned by the 0xe49f0 helper
+0xe82a8,0x35,embedded-data,winsig,switch targets and signal lookup bytes owned by _raise

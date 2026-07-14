@@ -1,5 +1,5 @@
 # units.toml - per-TU build manifest (generated from CodeView by scripts/gen_manifest.py).
-# unit MUST match the unit column in config/symbol_names.csv.
+# unit MUST match the unit column in build/gen/symbol_names.csv.
 
 [build]
 compiler = "msvc4.2"

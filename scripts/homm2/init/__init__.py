@@ -1,7 +1,7 @@
 """homm2 init - the one-time setup that splits HEROES2W.EXE into target objects.
 
-This does the heavy one-time work. Since our CodeView symbols are
-complete + frozen, it runs ONCE: CodeView -> manifest -> ??_C@ string names -> synth
+This does the heavy one-time work. It runs ONCE: CodeView plus validated hidden
+procedures -> manifest/coverage audit -> ??_C@ string names -> synth
 PDB -> vostok-delinker -> per-unit target objs -> configure. Needs `nix develop .#build`
 (wine + MSVC for the ??_C@ string oracle). Idempotent: safe to re-run.
 """
@@ -16,6 +16,7 @@ def run(*cmd):
 def main(argv=None):
     # 1. manifest straight from CodeView (units.toml + symbol_names.csv) - cl-free
     if run("python3", "scripts/gen_manifest.py", "build/orig/HEROES2W.EXE", "."): return 1
+    if run("python3", "-m", "homm2.build.audit_text_coverage"): return 1
     # 2. give string-literal constants their real ??_C@ names (cl oracle)
     if run("python3", "scripts/name_strings.py"): return 1
     # 3. synthesize the PDB the delinker needs

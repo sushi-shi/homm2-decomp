@@ -2,7 +2,7 @@
 # gen_manifest.py  PE  REPO  [SRCPATHS]
 # Generate the matching build manifest straight from the CodeView NB09 debug
 # stream — no Ghidra. Emits:
-#   config/symbol_names.csv   rva,name,unit,size,kind   (RAW MSVC-mangled names,
+#   build/gen/symbol_names.csv rva,name,unit,size,kind,provenance (RAW MSVC names,
 #                             RVA relative to image base — what cl emits / what
 #                             synth_pdb + vostok-delinker + objdiff key on)
 #   config/units.toml         one [[unit]] per NWC compiland with src/<tier>/<stem>.cpp
@@ -79,6 +79,36 @@ for sst,iMod,lfo,cb in ents:
         p+=2+rl
 pubs.sort()
 
+# ---- per-module procedures -------------------------------------------------------
+# Public symbols do not carry lengths. Prefer the true pLen from a per-module
+# S_GPROC32/S_LPROC32/S_THUNK32 record whenever NB09 provides one. This retail
+# happens to contain only import S_THUNK32 records, but the parser is complete:
+# never use a next-public span when a procedure record exists at that RVA.
+proc_records=[]
+for sst,iMod,lfo,cb in ents:
+    if sst!=0x125: continue                       # sstAlignSym
+    blob=d[lfoBase+lfo:lfoBase+lfo+cb]; p=4      # four-byte alignment signature
+    while p+4<=len(blob):
+        rl,rt=struct.unpack_from("<HH",blob,p)
+        if rl==0: break
+        body=blob[p+4:p+2+rl]
+        try:
+            if rt in (0x0204,0x0205):            # S_LPROC32 / S_GPROC32 (CV4)
+                length=struct.unpack_from("<I",body,12)[0]
+                off,seg=struct.unpack_from("<IH",body,24)
+                nm,_=pstr(body,33); va=s2va(seg,off)
+                if va and length:
+                    proc_records.append((va,length,nm,iMod,
+                                         "cv-lproc32" if rt==0x0204 else "cv-gproc32"))
+            elif rt==0x0206:                     # S_THUNK32 (CV4)
+                off,seg,length=struct.unpack_from("<IHH",body,12)
+                nm,_=pstr(body,21); va=s2va(seg,off)
+                if va and length:
+                    proc_records.append((va,length,nm,iMod,"cv-thunk32"))
+        except (IndexError,struct.error):
+            pass
+        p+=2+rl
+
 # ---- harvest reloc-target constants (vostok-delinker: "all constants must be
 # named"). Every .reloc fixup stores an absolute VA; targets landing in a data
 # section that aren't already a named symbol get a synthetic name so the delinker
@@ -140,6 +170,43 @@ def unit_of(im):
     t=tier_of(im); st=stem_of(modname.get(im,""))
     return f"{t}/{st}" if t in ("BASE","SOURCE","EDITOR") else st
 
+# Procedures absent from CodeView are admitted only through this reviewed
+# manifest. Each row has an explicit executable span and evidence provenance;
+# no address is inferred from padding, jump-table bytes, or a source-only label.
+validated_procs=[]
+vp=os.path.join(REPO,"config","delink_procedures.csv")
+if os.path.exists(vp):
+    import csv
+    with open(vp,newline="") as vf:
+        rows=(ln for ln in vf if not ln.lstrip().startswith("#"))
+        for row in csv.DictReader(rows):
+            rva=int(row["rva"],16); va=imgbase+rva; size=int(row["size"],16)
+            name=row["name"].strip() or ("delink_proc_%08x"%rva)
+            unit=row["unit"].strip()
+            proof=row["provenance"].strip()
+            if size<=0 or not name or not unit or not proof:
+                raise SystemExit("invalid delink procedure row at 0x%x"%rva)
+            if sec_of(rva)!=".text":
+                raise SystemExit("delink procedure outside .text: 0x%x"%rva)
+            contribution_unit=unit_of(which(va))
+            if contribution_unit!=unit:
+                raise SystemExit("delink procedure 0x%x belongs to %s, not %s"%
+                                 (rva,contribution_unit,unit))
+            validated_procs.append((va,size,name,unit,"validated-"+proof))
+    seen=set()
+    for va,size,name,unit,proof in sorted(validated_procs):
+        key=(va,name)
+        if key in seen:
+            raise SystemExit("duplicate delink procedure: 0x%x %s"%(va-imgbase,name))
+        seen.add(key)
+        o=va2off(va); body=d[o:o+size] if o is not None else b""
+        if len(body)!=size or body[:1] in (b"\xcc",b"\x90"):
+            raise SystemExit("delink procedure is padding/truncated: 0x%x %s"%(va-imgbase,name))
+    spans=sorted((va,va+size,name) for va,size,name,_,_ in validated_procs)
+    for (_,end,name),(start2,_,name2) in zip(spans,spans[1:]):
+        if start2<end:
+            raise SystemExit("overlapping delink procedures: %s and %s"%(name,name2))
+
 # ---- per-TU optimization level (empirical, from the PE itself) -------------
 # Retail optimization is PER-COMPILAND, not uniform /Od: the basewin.lib UI
 # framework (most of BASE) + a couple SOURCE units shipped /O2 (FPO, register
@@ -156,6 +223,13 @@ for _va,_raw in pubs:
     if (sec_of(_va-imgbase) or "").startswith(".text"):
         unit_funcs[unit_of(which(_va))].append(_va)
 def profile_of(unit):
+    # A frame-pointer majority is not a complete optimization fingerprint. All
+    # public functions in these four units currently have 55 8b ec prologues,
+    # yet their established byte matches require the profiles below (BITS/TILE
+    # /O2; FONT/RESMGR /Od plus /Oi). Keep those proven settings across init.
+    established={"BASE/BITS":"o2", "BASE/FONT":"base_oi",
+                 "BASE/RESMGR":"base_oi", "BASE/TILE":"o2"}
+    if unit in established: return established[unit]
     fns=unit_funcs.get(unit,[])
     if not fns: return "base"            # data-only TU: harmless default
     od=sum(1 for va in fns if is_od_func(va))
@@ -173,19 +247,49 @@ for tier in ("BASE","SOURCE","EDITOR"):
 os.makedirs(os.path.join(REPO,"build","gen"),exist_ok=True); os.makedirs(os.path.join(REPO,"config"),exist_ok=True)
 n_func=n_data=0
 with open(os.path.join(REPO,"build","gen","symbol_names.csv"),"w") as f:
-    f.write("rva,name,unit,size,kind\n")
+    f.write("rva,name,unit,size,kind,provenance\n")
+    procs_by_va=defaultdict(list)
+    for rec in proc_records: procs_by_va[rec[0]].append(rec)
+    validated_by_key={(va,name):(size,unit,proof)
+                      for va,size,name,unit,proof in validated_procs}
+    emitted=set()
     for va,raw in pubs:
         im=which(va); unit=unit_of(im)
         rva=va-imgbase; s=sec_of(rva) or ""
         if raw.startswith("??_7") or raw.startswith("??_R") or not s.startswith(".text"):
-            kind="data"; size=dsize(va); n_data+=1
+            kind="data"; size=dsize(va); provenance="cv-public-data"; n_data+=1
         else:
-            kind="func"; size=fsize(va); n_func+=1
-        f.write(f"0x{rva:x},{raw},{unit},0x{size:x},{kind}\n")
+            kind="func"; n_func+=1
+            override=validated_by_key.get((va,raw))
+            records=procs_by_va.get(va,[])
+            if override:
+                size,unit,provenance=override
+                provenance="cv-public-"+provenance
+            elif records:
+                lengths={rec[1] for rec in records}
+                if len(lengths)!=1:
+                    raise SystemExit("conflicting CodeView pLen at 0x%x"%rva)
+                size=next(iter(lengths)); unit=unit_of(records[0][3]); provenance=records[0][4]
+            else:
+                size=fsize(va); provenance="cv-public-gap"
+        f.write(f"0x{rva:x},{raw},{unit},0x{size:x},{kind},{provenance}\n")
+        emitted.add((va,raw))
+    public_rvas={va for va,_ in pubs}
+    for va,size,name,im,provenance in sorted(proc_records):
+        if va in public_rvas: continue            # public decorated alias is the COFF name
+        raw=name or ("delink_%s_%08x"%(provenance[3:],va-imgbase))
+        if (va,raw) in emitted: continue
+        f.write(f"0x{va-imgbase:x},{raw},{unit_of(im)},0x{size:x},func,{provenance}\n")
+        emitted.add((va,raw)); n_func+=1
+    for va,size,raw,unit,provenance in sorted(validated_procs):
+        if (va,raw) in emitted: continue           # reviewed same-RVA size override
+        f.write(f"0x{va-imgbase:x},{raw},{unit},0x{size:x},func,{provenance}\n")
+        emitted.add((va,raw)); n_func+=1
     n_const = 0
     for tgt in sorted(consts):
         rva = tgt - imgbase
-        f.write(f"0x{rva:x},const_{rva:08x},_const,0x0,data\n"); n_const += 1; n_data += 1
+        f.write(f"0x{rva:x},const_{rva:08x},_const,0x0,data,pe-reloc-constant\n")
+        n_const += 1; n_data += 1
 
 # ---- emit units.toml (NWC reconstruction units only) ----
 units=[]
@@ -199,7 +303,7 @@ for im,name in modname.items():
 units.sort()
 with open(os.path.join(REPO,"config","units.toml"),"w") as f:
     f.write("# units.toml - per-TU build manifest (generated from CodeView by scripts/gen_manifest.py).\n")
-    f.write("# unit MUST match the unit column in config/symbol_names.csv.\n\n")
+    f.write("# unit MUST match the unit column in build/gen/symbol_names.csv.\n\n")
     f.write('[build]\ncompiler = "msvc4.2"\nplatform = "win32"\n\n')
     f.write("[flags]\n")
     # Retail is a DEBUG build: /Od (full ebp frames, every local spilled) + /Gr
@@ -236,7 +340,8 @@ with open(os.path.join(REPO,"config","units.toml"),"w") as f:
     # regressions across all 95 units (status check clean) - guards only appear around
     # float divides, so a function that already matches without one is unaffected.
     f.write('base = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/QIfdiv"]\n')
-    f.write('o2 = ["/nologo", "/c", "/O2", "/MT", "/Gr", "/G5", "/QIfdiv"]\n\n')
+    f.write('o2 = ["/nologo", "/c", "/O2", "/MT", "/Gr", "/G5", "/QIfdiv"]\n')
+    f.write('base_oi = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/QIfdiv", "/Oi"]\n\n')
     for st,src in units:
         f.write(f'[[unit]]\nunit = "{st}"\nsource = "{src}"\nflags = "{profile_of(st)}"\n\n')
 
