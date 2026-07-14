@@ -23,6 +23,11 @@ typedef enum WingraphConstant {
     WINGRAPH_ERROR_TEXT_SIZE = 200
 } WingraphConstant;
 
+typedef enum WingraphGraphicsType {
+    WINGRAPH_GRAPHICS_WING = 1,
+    WINGRAPH_GRAPHICS_DIRECT_DRAW = 2
+} WingraphGraphicsType;
+
 #pragma pack(push, 1)
 struct _PALETTE {
     WORD version;
