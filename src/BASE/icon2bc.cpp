@@ -77,6 +77,17 @@ DATA(0x00534ce8) static unsigned int gCTRun;
 // it does not recover retail's EBX offset plus EDI selected-entry lifetime. Changing the serialized
 // srcOffset field from signed to unsigned int is instruction-byte-identical at 78.95071%/90:91.
 // The observed data proves its four-byte width but not signedness, so the existing field is retained.
+// Fresh 8c85311 command-body audit raises the live checkpoint to 80.58451%, candidate 0x596 versus
+// retail 0x5af, while preserving 90/91 correct relocations and the exact one-word frame. Solid-fill
+// quadrant order, both dim bodies, and their shared X-advance tails already agree with retail. The
+// mapped-literal loop did not: retail loads the byte through gCTSrcCopy, advances the destination,
+// maps and stores it, then decrements the selected count before publishing gCTSrcCopy and taking
+// the backedge (+0x547..+0x56b). Delaying that source publication and making the decrement belong
+// to the loop condition recovers the same ownership/order at candidate +0x52f..+0x552. Both sides
+// remain 426 instructions and 67 branch sites with the previously proved 86-block topology; first
+// broad divergence is still setup +0x12. A combined source/destination post-increment scores 80.19,
+// a separate next-source local scores 67.72, and splitting the mapped value into its own assignment
+// scores 69.58; all were rejected. An explicit signed copy-count local is byte-identical and omitted.
 VA(0x004d32a0, 0x5af)
 void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                             int clip, int clipX, int clipY, int clipW, int clipH, int color,
@@ -295,12 +306,11 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
                 if (static_cast<int>(cnt) > 0) {
                     gCTDimLen = cnt;
                     do {
-                        unsigned char b = *gCTSrcCopy;
-                        gCTSrcCopy = gCTSrcCopy + 1;
-                        *savedDst = colorTable[b];
-                        cnt--;
+                        int b = *gCTSrcCopy;
                         savedDst = savedDst + 1;
-                    } while (cnt != 0);
+                        savedDst[-1] = colorTable[b];
+                        gCTSrcCopy = gCTSrcCopy + 1;
+                    } while (--cnt != 0);
                 }
             }
             X = X + cmd;
