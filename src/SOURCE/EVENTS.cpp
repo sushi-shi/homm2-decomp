@@ -2031,7 +2031,8 @@ int advManager::BarrierEvent(mapCell *cell, hero *)
 }
 
 VA(0x004aebc1, 0x99)
-// @early-stop: all instructions and both external relocations match. The only
+// @early-stop
+// All instructions and both external relocations match. The only
 // raw residual is offsets 0x5d and 0x61, where MSVC reverses the two symmetric
 // equality loads from the exact -0x10/-0x14 character slots.
 signed char StrEqNoCase(char *firstString, char *secondString)
@@ -2084,7 +2085,8 @@ void advManager::PasswordEvent(mapCell *cell, hero *)
 }
 
 VA(0x004aed38, 0x6fe)
-// @early-stop: complete semantics/CFG, 0x54-byte frame, and every source stack
+// @early-stop
+// Complete semantics/CFG, 0x54-byte frame, and every source stack
 // slot are recovered. Both sides have 496 non-table instructions; retail is one
 // byte longer solely from the equivalent outer map-width comparison sequence.
 // The monster hit-point relocation is gMonsterDatabase+8 in base and the same
@@ -4490,7 +4492,8 @@ void advManager::PasswordAIEvent(mapCell *cell, hero *)
 }
 
 VA(0x004b493b, 0x369)
-// @early-stop: all 0x369 code bytes match after masking 25 relocations. The
+// @early-stop
+// All 0x369 code bytes match after masking 25 relocations. The
 // residual is the two switch tables' delinked local-label identities plus the
 // graveyard multiplier/monster-table folded symbol identities.
 void advManager::GenericSiteAIEvent(mapCell *cell, hero *eventHero)
@@ -4609,7 +4612,8 @@ void advManager::GenericSiteAIEvent(mapCell *cell, hero *eventHero)
 }
 
 VA(0x004b4ca4, 0x18f)
-// @early-stop: complete semantics, frame, slots, CFG, and relocation targets.
+// @early-stop
+// Complete semantics, frame, slots, CFG, and relocation targets.
 // The switch table differs only by delinked local-label identity; the only
 // opcode residual is the packed w4hi assignment's equivalent operand order.
 void advManager::RecruitSiteAIEvent(mapCell *cell, hero *eventHero)
@@ -4671,7 +4675,8 @@ void advManager::RecruitSiteAIEvent(mapCell *cell, hero *eventHero)
 }
 
 VA(0x004b4e33, 0x1a2)
-// @early-stop: complete semantics, frame, slots, CFG, and relocation targets.
+// @early-stop
+// Complete semantics, frame, slots, CFG, and relocation targets.
 // The only opcode residual is the final w4hi assignment's equivalent operand
 // evaluation order; two earlier exits also target the identical final five-byte
 // continuation rather than its epilogue destination.
@@ -4884,7 +4889,8 @@ fightMonsters:
 }
 
 VA(0x004b5800, 0x440)
-// @early-stop: complete semantics, 0x40-byte frame, slots, CFG, and all 36
+// @early-stop
+// Complete semantics, 0x40-byte frame, slots, CFG, and all 36
 // relocation sites are recovered. Retail is 25 bytes larger solely because it
 // retains five five-byte continuation jumps; the remaining relocation names
 // are delinked aliases of the same monster fields and floating constants.
@@ -5444,7 +5450,8 @@ void advManager::ReceiveHeroTownData(
 }
 
 VA(0x004b6c2f, 0x254)
-// @early-stop: complete semantics, frame, slots, CFG, and external relocation
+// @early-stop
+// Complete semantics, frame, slots, CFG, and external relocation
 // targets. The retail body is exactly one five-byte continuation jump longer;
 // the apparent relocation excess is the delinked six-entry local switch table.
 int advManager::AutoResolveCombat(
