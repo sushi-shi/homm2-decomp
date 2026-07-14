@@ -276,14 +276,14 @@ must continue this function before taking unrelated work.
 
 Canonical source state:
 
-- checkpoint: `b60f188`
+- checkpoint: `215f379`
 - target: RVA `0xd9ce0`, retail size `0x58d`
 - `src/BASE/iconf2by.cpp`:
-  `f1a3b2fe728733ebf993ffaa5574e20e23c0a1b520446a4b802290f2a1aa991a`
-- live checkpoint: 87.091156%, candidate size `0x56d`, 145 candidate vs 144 retail relocations,
+  `8789a527e8c2b254326fef8607c51e97db04ef9776fe8cefce75dc416be0cd45`
+- live checkpoint: 89.0885%, candidate size `0x57a`, 143 candidate vs 144 retail relocations,
   no candidate-only target
-- the decoder aligns instruction-for-instruction through extended-run setup, apart from retail's
-  four-byte frame displacement
+- the decoder aligns instruction-for-instruction through extended-run setup;
+- candidate and retail now both reserve the otherwise-unused four-byte frame slot
 
 ### Corrections retained at the canonical checkpoint
 
@@ -293,13 +293,16 @@ Canonical source state:
 - restored the dim destination join and publication order;
 - restored literal source advancement/store order and right-clipped source publication before
   destination publication;
-- introduced the real clip-width lifetime used by the clipped literal path.
+- introduced the real clip-width lifetime used by the clipped literal path;
+- replaced the long-lived advance local with branch-selected source advancement and a common join;
+- restored the right literal quadrant's zero-skip-first polarity and common computed-skip
+  publication;
+- recovered the unsigned fill-count snapshot that produces the retail frame.
 
-The remaining scratch relocation counts are `gFYDimLen` 15/16, `gFYSkip` 5/4, and `gFYClipR`
-8/7; `gFYX` is now exact at 25/25 and every other scratch/global relocation count agrees. Retail
-also reserves four stack bytes, pins the clip-width lifetime in EBP, reloads `shear`, and emits
-longer split fill, dim, and literal schedules. These are concrete steering facts, not an accepted
-wall.
+The only remaining scratch relocation-count difference is `gFYClipR` 6/7; every other scratch and
+global count agrees. The candidate keeps `shear` in EBP, while retail pins `clipW`, overwrites the
+right-edge register while forming the literal destination, and reloads both `shear` and the one
+missing `gFYClipR`. These are concrete steering facts, not an accepted wall.
 
 ### Searches already exhausted
 
@@ -366,6 +369,23 @@ Retail mangling proves ten integer clip/color arguments and a mutable signed-cha
 The packed `IconEntry` stride/field signedness and bitmap width type agree with retail access
 opcodes, so no shared type edit is justified. The useful lever was declaration visibility, not a
 layout change.
+
+Source-advancement and frame axes after `b60f188`:
+
+- explicit branch-selected advancement: 88.51%; `gFYClipR` exact but `gFYRun` 20/19,
+  `gFYSkip` 5/4, and `gFYDimLen` 15/16;
+- shared skip with the old right-quadrant polarity: byte-identical;
+- common literal copy-count snapshot: 86.46%, 141/144 relocations; reverted;
+- right zero-skip-first polarity: 88.83%, `gFYDimLen` 16/16 and `gFYClipR` 6/7;
+- common skip publication in the corrected CFG: 88.91%, 144/144 relocations and `gFYSkip` 4/4;
+- setup-only right edge, right-destination local, and split-destination local: byte-identical;
+- signed fill snapshot plus right-lifetime form: byte-identical;
+- combined current-Y/fill-count/fill-left snapshot: 86.73%; reverted;
+- unsigned fill-count snapshot: 89.0885%, size `0x57a`, retail four-byte frame, 143/144
+  relocations; retained;
+- unsigned clip width: 88.02% with an eight-byte frame; reverted;
+- scoped shear aliases: 88.89%; reverted;
+- `register` and `const` width forms: byte-identical.
 
 Retail's four-byte frame slot is never accessed: every ESP-relative retail access is an argument,
 and after `sub esp,4` plus four pushes the smallest displacement is `0x18`. The slot is allocator
