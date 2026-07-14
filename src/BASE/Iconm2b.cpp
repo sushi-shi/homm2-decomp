@@ -9,6 +9,7 @@
 #include <BASE/bitmap.h>
 #include <BASE/IconEntry.h>
 #include <BASE/IconRle.h>
+#include <BASE/IconMonoRle.h>
 #include <string.h>
 // Per-call decoder scratch — its own 0x534bcc+ file-static block.
 DATA(0x00534bcc) static int gMonoClipR;
