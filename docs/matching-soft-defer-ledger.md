@@ -274,17 +274,18 @@ sites. The current residual is a soft defer, not a permitted wall.
 ## BASE/iconf2bc: FlipIconToBitmapColorTable
 
 Status: active. This is an integrated progress checkpoint, not a wall or soft defer. The same lane
-must continue from the remaining setup `gFCY` load before taking unrelated work.
+must continue from the measured width/X, row-register, and setup-`gFCY` divergences before taking
+unrelated work.
 
 Canonical source state:
 
-- checkpoint: `ea3b363`
+- checkpoint: `48dbe3e`
 - target: RVA `0xd9790`, retail size `0x54d`
 - `src/BASE/iconf2bc.cpp`:
-  `55a3efd26cc0bc327cc0bc09a7b832c0bc6632ea53257dd49950e1a7b9af090c`
-- live checkpoint: 85.84131%, candidate size `0x545`, 84 candidate vs 83 retail relocations,
+  `dd868c0ffcdabf134c98631a7a731d7b8d90845b7df496ce5a3c6dd05b305fd9`
+- live checkpoint: 85.9925%, candidate size `0x541`, 84 candidate vs 83 retail relocations,
   no base-only target
-- the command decoder begins at `+0xee` versus retail `+0xec`
+- the command decoder begins at `+0xea` versus retail `+0xec`
 
 ### Corrections retained at the canonical checkpoint
 
@@ -302,12 +303,14 @@ Canonical source state:
   EAX/EBX publication sequence and two of the three missing setup bytes;
 - declared the later row pitch beside the entry cursor, restoring retail row-load order and a
   separate `gFCY` load while preserving the retained width/X setup;
+- reused the later pitch lifetime to preserve the original icon width while transforming `w` into
+  the exclusive horizontal bound used by the clipping setup;
 - corrected the `gFCClipR` lifetime/count to agree with retail;
 - matched every external relocation target and every scratch-global occurrence count except
   `gFCY`.
 
 The remaining measured relocation delta is exactly one redundant setup `gFCY` load. Every other
-scratch-global occurrence count agrees. Candidate code ends eight bytes before retail. These facts
+scratch-global occurrence count agrees. Candidate code ends twelve bytes before retail. These facts
 are the next concrete steering target; they are not evidence that the residual is impossible.
 
 ### Searches already exhausted
@@ -317,18 +320,22 @@ counts, merged and split `memset` shapes, pointer-update orders, global palette/
 and 136 historical AST variants over five rounds. Those permutations were run far below the
 current 96-97% structural gate and must not be repeated.
 
-The clean reconstruction pass measured setup-local forms, compare operand polarities,
+The clean reconstruction passes measured setup-local forms, compare operand polarities,
 function-wide and nested vertical-coordinate locals (including `register` spellings), width and
 entry aliases, source-pointer spellings, dim-loop statement order, palette aliases, and literal
-cursor forms. Losing variants were reverted; the retained forms are the canonical checkpoint
-above. No permutation tool was used, and the regex permuter was never used.
+cursor forms. The latest pass additionally measured integer-domain source offsets, packed X/width
+subtraction, width-as-exclusive-bound lifetimes, early and split Y publication, transformed-bound
+pitch reuse, and several original-width alias scopes. Losing variants and useful partial wins that
+regressed in combination were reverted; the retained form is the canonical checkpoint above. No
+permutation tool was used, and the regex permuter was never used.
 
 The complete source-hash matrix, including every measured score, size/frame, relocation count, and
 retained/reverted/byte-identical disposition, is in
 [`docs/iconf2bc-experiment-matrix.md`](iconf2bc-experiment-matrix.md). Treat that file as the
 authoritative no-repeat list for this source/header state.
 
-Continue specifically from the extra setup `gFCY` load and the first structural divergence.
+Continue specifically from the first width/X load-order divergence, the row-result `ecx` versus
+retail `eax` allocation, and the extra setup `gFCY` load.
 Record each new source-hash-distinct shape with its match, size, frame, and relocation result. Do
 not retry the families above while the canonical source hash agrees. If a shared icon/header edit
 is retained, retest the deferred icon2bc, Icon2b, and Iconf2b functions as well.
