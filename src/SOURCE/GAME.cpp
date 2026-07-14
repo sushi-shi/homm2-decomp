@@ -2230,7 +2230,7 @@ int ViewSpellsHandler(tag_message &msg)
 
     if (msg.type == 4) {
         gpWindowManager->ConvertToHover(msg);
-        if (msg.payload.hover.id == gpWindowManager->field_0x5e) {
+        if (msg.payload.hover.id == gpWindowManager->m_lastHoverId) {
             return 1;
         } else {
             return gpGame->m_viewSpellsCallback(msg);
@@ -2380,9 +2380,9 @@ VA(0x0047a4cd, 0x17c)
 int ViewSpecialHandler(tag_message &msg)
 {
     if (msg.type == 4) {
-        if (gpWindowManager->field_0x5e == msg.payload.hover.id)
+        if (gpWindowManager->m_lastHoverId == msg.payload.hover.id)
             return 1;
-        gpWindowManager->field_0x5e = msg.payload.hover.id;
+        gpWindowManager->m_lastHoverId = msg.payload.hover.id;
         switch (msg.payload.hover.id) {
         case 2:
             strcpy(gText, cSpellHelp[0]);

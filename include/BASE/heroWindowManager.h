@@ -26,7 +26,7 @@ public:
     int    m_screenshotIndex;  // +0x52
     int    m_updateFlags;  // +0x56
     int    m_dialogResult;  // +0x5a
-    int    field_0x5e;  // +0x5e
+    int    m_lastHoverId;  // +0x5e  last hover widget/message id; -1 means none
     // --- constructors ---
     heroWindowManager(void);
     // --- virtual methods (vtable order) ---
