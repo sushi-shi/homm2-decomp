@@ -374,7 +374,7 @@ the prologue register-lifetime divergence.
 
 Canonical source state:
 
-- lane base: `f220572`, plus the retained scratch declaration-order recovery below
+- checkpoint: `813cf59`
 - target: RVA `0xd9ce0`, retail size `0x58d`
 - `src/BASE/iconf2by.cpp`:
   `f33ab84fe5e3b9205e40ae09de314bced82063fe587bddee30646c73d44bfea0`
