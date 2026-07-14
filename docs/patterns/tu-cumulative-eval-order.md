@@ -76,6 +76,34 @@ a value-first bitfield write — see GAME `RandomizeBarrier`.) Loop tests, flag 
 schedules may also move when exact predecessors or header state changes; do not classify
 them as walls before a combined-root source-order audit.
 
+**Scalar-lvalue SIB escape — use `0[&local]`.** Array subscripting is symmetric by the
+language definition, so `0[&idx]` is the same lvalue as `idx`. In VC4.2 `/Od`, however, this
+source shape can make a comparison load its other operand first. It resolved every remaining
+FONT comparison without changing the frame, CFG, or relocations. For example,
+`DrawBoundedString`'s ordinary `idx >= lineStart` emitted:
+
+```text
+ordinary source (`idx >= lineStart`)       retail / `0[&idx] >= lineStart`
+8b 45 f8  mov eax,[ebp-08]                 8b 45 f0  mov eax,[ebp-10]
+39 45 f0  cmp [ebp-10],eax                 39 45 f8  cmp [ebp-08],eax
+0f 8f 64 00 00 00  jg exit                 0f 8c 64 00 00 00  jl exit
+```
+
+The analogous `LineLength` width test changed from local-first:
+
+```text
+ordinary source (`x <= maxW`)              retail / `0[&x] <= maxW`
+8b 45 dc  mov eax,[ebp-24]                 8b 45 0c  mov eax,[ebp+0c]
+39 45 0c  cmp [ebp+0c],eax                 39 45 dc  cmp [ebp-24],eax
+0f 8c 1d 00 00 00  jl exit                 0f 8f 1d 00 00 00  jg exit
+```
+
+Using `0[&idx]` in both index/start comparisons made `DrawBoundedString` exact; using
+`0[&x]` in its three width comparisons made `LineLength` exact; and `0[&p] < size`
+restored exact `LineWidth`. Directly commuting the relations, `maxW | 0`, and
+`0[&maxW]` were byte-neutral and did not solve the load order. This is a local steering
+step to try before any TU-state permutation or soft defer.
+
 ## Confirm, steer, then optionally soft-defer
 
 1. Reproduce the integrated root/header state; a stale worker score is not evidence.
