@@ -4,37 +4,206 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <io.h>
+#include <_types.h>
+#include <SOURCE/ADVMGR.h>
+#include <SOURCE/advManager.h>
+#include <SOURCE/game.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/HERO.h>
+#include <SOURCE/KB.h>
+#include <SOURCE/PHILAI.h>
+#include <SOURCE/SPELLS.h>
+#include <SOURCE/X_GLOBAL.h>
+
 VA(0x0046c3a0, 0x6f)
-hero::hero(void) {}
+hero::hero(void) {
+    m_id = 0;
+    m_owner = 0;
+    m_x = 0;
+    m_y = 0;
+    m_cursorType = 0;
+    m_portrait = 0;
+    m_name[0] = 0;
+    heroWin = 0;
+    giHeroScreenSrcIndex = -1;
+}
 
 VA(0x0046c40f, 0x53)
-void hero::Read(int, signed char) {}
+void hero::Read(int file, signed char expansion) {
+    if (expansion)
+        read(file, this, sizeof(hero));
+    else
+        read(file, this, HERO_BASE_RECORD_SIZE);
+}
 
 VA(0x0046c462, 0x53)
-void hero::Write(int, signed char) {}
+void hero::Write(int file, signed char expansion) {
+    if (expansion)
+        write(file, this, sizeof(hero));
+    else
+        write(file, this, HERO_BASE_RECORD_SIZE);
+}
 
 VA(0x0046c4b5, 0x18)
 void hero::GetArmyStrengths(unsigned long int * const) {}
 
 VA(0x0046c4cd, 0x59)
-int hero::HasArtifact(int) { return 0; }
+int hero::HasArtifact(int artifact) {
+    int artifactIndex;
+
+    for (artifactIndex = 0; artifactIndex < HERO_ARTIFACT_SLOT_COUNT; artifactIndex++) {
+        if (m_artifacts[artifactIndex] == artifact)
+            return 1;
+    }
+    return 0;
+}
 
 VA(0x0046c526, 0x277)
-int hero::CalcMobility(void) { return 0; }
+int hero::CalcMobility(void) {
+    short landMobility[8] = {
+        1000, 1000, 1000, 1100, 1200, 1300, 1400, 1500
+    };
+    const short seaBaseMobilityCurrent = HERO_SEA_BASE_MOBILITY;
+    const short lighthouseBonusIncrement = HERO_LIGHTHOUSE_MOBILITY_BONUS;
+    const short astrolabeBonus = HERO_ASTROLABE_MOBILITY_BONUS;
+    const short compassMobility = HERO_COMPASS_MOBILITY_BONUS;
+    const short nomadBootsMobilityBonus = HERO_NOMAD_BOOTS_MOBILITY_BONUS;
+    const short travelerBonus = HERO_TRAVELER_BOOTS_MOBILITY_BONUS;
+    int mobilityResult;
+    int slowestSpeedValue;
+    int armySlotIndex;
+
+    if (m_eventFlags & HERO_EVENT_EMBARKED) {
+        mobilityResult = seaBaseMobilityCurrent;
+        mobilityResult = static_cast<int>(mobilityResult *
+            gfSSNavigationMod[m_secondarySkills[HERO_SKILL_NAVIGATION]]);
+        if (m_owner != -1)
+            mobilityResult += gpGame->MineTypesOwned(m_owner, HERO_LIGHTHOUSE_MINE_TYPE) *
+                lighthouseBonusIncrement;
+        if (HasArtifact(HERO_ARTIFACT_SAILORS_ASTROLABE))
+            mobilityResult += astrolabeBonus;
+    } else {
+        slowestSpeedValue = 7;
+        for (armySlotIndex = 0; armySlotIndex < ARMY_GROUP_SLOT_COUNT; armySlotIndex++) {
+            if (m_army.m_creatureTypes[armySlotIndex] != ARMY_GROUP_EMPTY_SLOT &&
+                gMonsterDatabase[m_army.m_creatureTypes[armySlotIndex]].speed < slowestSpeedValue) {
+                slowestSpeedValue = gMonsterDatabase[m_army.m_creatureTypes[armySlotIndex]].speed;
+            }
+        }
+        mobilityResult = landMobility[slowestSpeedValue];
+        mobilityResult = static_cast<int>(mobilityResult *
+            gfSSLogisticsMod[m_secondarySkills[HERO_SKILL_LOGISTICS]]);
+        if (HasArtifact(HERO_ARTIFACT_NOMAD_BOOTS))
+            mobilityResult += nomadBootsMobilityBonus;
+        if (HasArtifact(HERO_ARTIFACT_TRAVELER_BOOTS))
+            mobilityResult += travelerBonus;
+        if (m_eventFlags & HERO_EVENT_STABLES)
+            mobilityResult += HERO_STABLES_MOBILITY_BONUS;
+    }
+
+    if (HasArtifact(HERO_ARTIFACT_TRUE_COMPASS))
+        mobilityResult += compassMobility;
+
+    if (m_owner >= 0 && m_owner < 6 && !gbHumanPlayer[m_owner] &&
+        gpGame->m_difficulty >= 2) {
+        mobilityResult += HERO_AI_DIFFICULTY_MOBILITY_BONUS;
+        if (gpGame->m_players[m_owner].unknown0f == 2)
+            mobilityResult += HERO_AI_STATE_MOBILITY_BONUS;
+    }
+    return mobilityResult;
+}
 
 VA(0x0046c79d, 0xcf)
-int hero::HasSpell(int) { return 0; }
+int hero::HasSpell(int spell) {
+    int artifactIndex;
 
+    if (!HasArtifact(HERO_ARTIFACT_MAGIC_BOOK))
+        return 0;
+    if (m_spells[spell])
+        return 1;
+    for (artifactIndex = 0; artifactIndex < HERO_ARTIFACT_SLOT_COUNT; artifactIndex++) {
+        if (m_artifacts[artifactIndex] == HERO_ARTIFACT_SPELL_SCROLL &&
+            m_artifactExtra[artifactIndex] == spell) {
+            return 1;
+        }
+    }
+    if (HasArtifact(HERO_ARTIFACT_BATTLE_GARB) && spell == HERO_SPELL_TOWN_PORTAL)
+        return 1;
+    return 0;
+}
+
+// @match-note 99.78%: the 0x0c frame, count/spell/this slots at -0x04/-0x08/-0x0c,
+// CFG, and all 3/3 relocations agree. The first non-relocation residual is +0x9b:
+// retail loads the count and compares the second argument, while this build loads
+// the second argument and compares the count (two displacement bytes, same equality).
+// Operand swaps, the AST permuter, semantic identifier changes, unary-plus,
+// subtraction, and an explicit continue shape did not retain an improvement. The
+// two gsSpellInfo relocations resolve to the same m_e bytes through retail's
+// interior const_000fbe8d label. Revisit if preceding TU state changes code selection.
 VA(0x0046c86c, 0xc5)
-int hero::GetNthSpell(int, int) { return 0; }
+int hero::GetNthSpell(int type, int spellNumber) {
+    int spell;
+    int spellOrdinalCount = 0;
 
+    for (spell = 0; spell < HERO_SPELL_COUNT; spell++) {
+        if (HasSpell(spell)) {
+            if (type == HERO_SPELL_TYPE_ALL ||
+                (type == HERO_SPELL_TYPE_COMBAT &&
+                 (gsSpellInfo[spell].m_e & SPELL_ATTRIBUTE_COMBAT)) ||
+                (type == HERO_SPELL_TYPE_ADVENTURE &&
+                 !(gsSpellInfo[spell].m_e & SPELL_ATTRIBUTE_COMBAT))) {
+                spellOrdinalCount++;
+            }
+            if (spellOrdinalCount == spellNumber)
+                return spell;
+        }
+    }
+    return HERO_SPELL_NONE;
+}
+
+// @early-stop: all 0xd0 bytes match after masking the two aligned COFF relocations.
+// Both relocation targets agree; retail delinks gsSpellInfo[0].m_e as the interior
+// label const_000fbe8d while the typed source uses gsSpellInfo with addend 0x15.
 VA(0x0046c931, 0xd0)
-int hero::GetNumSpells(int) { return 0; }
+int hero::GetNumSpells(int type) {
+    int numAdventureSpells;
+    int numCombatSpells;
+    int spellIndexCurrent;
+
+    numCombatSpells = 0;
+    numAdventureSpells = 0;
+    for (spellIndexCurrent = 0; spellIndexCurrent < HERO_SPELL_COUNT; spellIndexCurrent++) {
+        if (HasSpell(spellIndexCurrent)) {
+            if (gsSpellInfo[spellIndexCurrent].m_e & SPELL_ATTRIBUTE_COMBAT)
+                numCombatSpells++;
+            else
+                numAdventureSpells++;
+        }
+    }
+
+    switch (type) {
+    case HERO_SPELL_TYPE_COMBAT:
+        return numCombatSpells;
+    case HERO_SPELL_TYPE_ADVENTURE:
+        return numAdventureSpells;
+    case HERO_SPELL_TYPE_ALL:
+        return numCombatSpells + numAdventureSpells;
+    }
+    return 0;
+}
 
 VA(0x0046ca01, 0x8a)
-void hero::UseSpell(int) {}
+void hero::UseSpell(int spell) {
+    if (spell == HERO_SPELL_NONE)
+        return;
+
+    m_spellPoints -= GetManaCost(spell, this);
+    if (m_spellPoints < 0)
+        m_spellPoints = 0;
+    if (gpAdvManager->m_active == 1 && gbThisNetHumanPlayer[giCurPlayer])
+        gpAdvManager->UpdateHeroLocator(-1, 1, 1);
+}
 
 VA(0x0046ca8b, 0x26)
 void hero::AddSpell(int, int) {}
