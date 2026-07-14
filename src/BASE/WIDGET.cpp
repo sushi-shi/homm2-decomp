@@ -12,27 +12,16 @@
 #include <BASE/bmap2.h>
 #include <SOURCE/KB.h>
 
-#define WIDGET_FLAG_ENABLED 0x2
-#define WIDGET_FLAG_DRAW 0x4
-#define WIDGET_FLAG_DIMMED 0x8
-#define WIDGET_FLAG_UPDATE 0x4000
-#define WIDGET_MESSAGE_MOUSE_MOVE 0x4
-#define WIDGET_MESSAGE_COMMAND 0x200
-#define WIDGET_COMMAND_DRAW 0x2
-#define WIDGET_COMMAND_SET_FLAGS 0x5
-#define WIDGET_COMMAND_CLEAR_FLAGS 0x6
-#define WIDGET_COMMAND_SET_X 0x34
-#define WIDGET_COMMAND_SET_Y 0x35
-#define WIDGET_COMMAND_SET_WIDTH 0x3d
-#define WIDGET_COMMAND_DIMMED 0x1000
-
-// @early-stop
-// /O2 scheduling wall: base and retail are both 0x5a bytes and the sole vtable
-// relocation at +0x13 agrees. The residual bytes at +0x02, +0x0c, +0x0f,
-// +0x18..+0x22, +0x24, +0x2c, +0x3c, and +0x3e are only AX/DX coloring and
-// parameter-load/null-store scheduling; all member values and the return sequence
-// agree. Separate and chained null stores, a cached height, full initializer-list,
-// and coordinate-only initializer-list forms were tried; this body is the best.
+// @match-note
+// Both sections are 0x5a with the vtable relocation matching at +0x13. The
+// relocation-masked residual is 10 bytes at +0x02,+0x0c,+0x0f,+0x19,+0x1b,
+// +0x1d,+0x24,+0x2c,+0x3c,+0x3e; the first divergence is our `mov ax,[esp+4]`
+// versus retail `mov dx,[esp+4]`. Member values, frame, store CFG, and return are
+// complete. Moving the width store before `m_prev` reduced the prior 18-byte
+// residual and raised 96.8261% to 97.9565%. Separate/chained null stores, cached
+// height, full and coordinate-only initializer lists, and a 200-iteration audited
+// libclang AST search found no exact form. Retry after a predecessor/include/header
+// TU-state change or new evidence for the original initialization lifetime graph.
 VA(0x004dde00, 0x5a)
 widget::widget(short int x, short int y, short int w, short int h, short int p5, short int kind)
 {
@@ -40,10 +29,10 @@ widget::widget(short int x, short int y, short int w, short int h, short int p5,
     m_owner = 0;
     m_y = y;
     m_next = 0;
+    m_width = w;
     m_prev = 0;
     m_flags = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW;
     m_zOrder = -1;
-    m_width = w;
     m_height = h;
     m_id = p5;
     m_kind = kind;
@@ -56,7 +45,7 @@ widget::widget(void)
     m_owner = 0;
     m_next = 0;
     m_prev = 0;
-    m_flags = 6;
+    m_flags = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW;
     m_zOrder = -1;
     m_kind = WIDGET_KIND_DEFAULT;
     m_y = 0;
@@ -83,28 +72,36 @@ VA(0x004dded0, 0x1)
 void widget::Close(void) {}
 
 // @match-note
-// In the shared WidgetKind state both sections are 0x2f4 with 17/17 relocations
-// and matching external targets. Explicit-range comparison has 16 non-relocation
-// byte differences, all at +0x26..+0x61 in the equivalent mouse-hit-test register
-// coloring; the command dispatcher from +0x77 onward is otherwise byte-identical.
-// Owner-header-adjacent and late enum includes emit the same bytes. Direct/staged
-// coordinates, X/Y declaration order, and a cached owner were tried previously.
+// Both sections are 0x2f4 with 17/17 explicit-range relocations and matching
+// external targets. The helper truncates the candidate at a delinked local label,
+// so the explicit object range is authoritative. The remaining 12 non-relocation
+// bytes are +0x23,+0x29,+0x30,+0x38,+0x39,+0x41,+0x42,+0x46,+0x4a,+0x4d,
+// +0x4f,+0x51, all in the mouse-hit-test register coloring; first is our
+// `mov dx,[esi+18h]` versus retail `mov bp,[esi+18h]`. The dispatcher from +0x77
+// onward is byte-identical. Explicit left/owner lifetimes reduced the prior
+// 16-byte residual and raised 99.1333% to 99.2%. Direct/staged coordinates, X/Y
+// and left/owner declaration orders, cached-owner-only, and a 120-iteration
+// audited libclang AST search did not improve it. Splitting the bounds checks kept
+// Main identical but perturbed exact Dim by 25 raw bytes and was rejected. Retry
+// only after a predecessor/include/header TU-state change or new lifetime evidence.
 VA(0x004ddee0, 0x2f4)
 int widget::Main(tag_message &message)
 {
     switch (message.type) {
-    case WIDGET_MESSAGE_MOUSE_MOVE: {
+    case MESSAGE_MOUSE_MOVE: {
+        short left = m_x;
+        heroWindow *window = m_owner;
         short x = static_cast<short>(message.payload.mouse.x);
         short y = static_cast<short>(message.payload.mouse.y);
-        x -= static_cast<short>(m_owner->m_posX);
-        y -= static_cast<short>(m_owner->m_posY);
-        if (m_x > x || m_y > y || m_x + m_width <= x || m_y + m_height <= y)
+        x -= static_cast<short>(window->m_posX);
+        y -= static_cast<short>(window->m_posY);
+        if (left > x || m_y > y || left + m_width <= x || m_y + m_height <= y)
             break;
         message.payload.hover.id = m_id;
         return 2;
     }
 
-    case WIDGET_MESSAGE_COMMAND:
+    case MESSAGE_WIDGET:
         switch (message.payload.widget.command) {
         case WIDGET_COMMAND_DRAW:
             if ((m_flags & WIDGET_FLAG_DRAW) != 0)

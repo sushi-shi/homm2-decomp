@@ -1,0 +1,10 @@
+variant	source_sha256	unit_fuzzy	ctor_fuzzy	main_fuzzy	exact_functions	masked_raw_pins	outcome
+integration baseline	a01726c7fba2e267ba07ca78a46dc2cb155026f383f1de35c9f508fbe6c4d86e	98.96740	96.82609	99.13333	4	ctor delta18 rel1/1; Main delta16 rel17/17; Dim delta0 rel2/2	REFERENCE
+width-before-prev plus explicit left/owner lifetimes	4eee8180ae5baba90ca17c897285d0dff6f432b3685e6e35772ea43fbb35e03a	99.11833	97.95652	99.20000	4	ctor delta10 rel1/1; Main delta12 rel17/17; Dim delta0 rel2/2	RETAIN improvements from audited AST/manual lifetime search
+left-x-owner-y declaration order	7ad00e0492093397421a2c6cc619e70a52328fa4acb77cc29fc94b218be9387e	99.11833	97.95652	99.20000	4	Main delta12 rel17/17; Dim delta0 rel2/2	REJECT no byte change
+left-x-y-owner declaration order	fea7df9c160200959790a9ee9971350742d975070e2365cc0bdaa6c7203db49f	99.11833	97.95652	99.20000	4	Main delta12 rel17/17; Dim delta0 rel2/2	REJECT no byte change
+four separate bounds checks	5b3f9619b48a1bac2000b6089e6ace7ee08de8080bbfb58b57f6200bd1aeb39a	97.79630	97.95652	99.20000	3	Main delta12 rel17/17; Dim delta25 rel2/2	REJECT perturbs exact successor through combined TU state
+header enums replace TU-local flag/command/message macros	50c477a687b8896a5a2af8dd895a0f06fd1e62f63cc430283d0186781443f142	99.11833	97.95652	99.20000	4	ctor delta10 rel1/1; Main delta12 rel17/17; Dim delta0 rel2/2	RETAIN byte-neutral semantic cleanup
+named default-constructor flags	e9271fd688bfc769abfd6db15b8430941655a5ad8f5ca74ecb6c77a7dd873215	99.11833	97.95652	99.20000	4	default ctor delta0 rel1/1; Main delta12 rel17/17; Dim delta0 rel2/2	RETAIN byte-neutral named constants
+replace KB include with carcass types only	f1c125452fb7829e5a7aad0729ca126b91a301a3aa7de8c24b4f6e54bf40af02	build failure	-	-	-	gpWindowManager declaration absent	REJECT owner global is declared by KB header
+final documented source	8337bc33368f5cb334ec9903643adef5328cdf0ec7e1edfb0b02db3bdeaac253	99.11833	97.95652	99.20000	4	ctor delta10 rel1/1; default ctor/dtor/Open/Dim exact; Main delta12 rel17/17	RETAIN canonical best
