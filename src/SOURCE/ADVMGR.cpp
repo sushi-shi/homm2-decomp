@@ -400,8 +400,14 @@ void advManager::GetCursorSampleSet(int sampleSet)
     }
 }
 
-// @early-stop
-// Retail is 0x6c0 and reconstruction is 0x6b1 with 502 aligned entries; ordinary opcodes/operands match, leaving only gConfig/jump-table symbol identity and two /Ob1 continuation placements.
+// @match-note
+// Excluding the 0x24 pointer table, all 429 executable instructions, the 0x80
+// frame/slots, CFG, and all 87 relocation targets agree. Retail's three
+// const_00128d34 references are gConfig + 0x14 (showRoute). The only code
+// residuals are the commutative X-coordinate load orders at retail +0x5a6
+// and +0x5ef: retail loads m_lastHoverCell before adding m_mapOriginX.
+// Both source operand orders and all 31 syntax-aware AST variants were tried.
+// Revisit after a material TU-state change or in the global last-mile phase.
 VA(0x0045751b, 0x6c0)
 class mapCell * advManager::DoAdvCommand(void)
 {
@@ -424,10 +430,11 @@ class mapCell * advManager::DoAdvCommand(void)
     case ADVMGR_COMMAND_MOVE_TO:
         if (currentHeroState == 0)
             break;
-        currentHeroState->m_destinationX = GetCommandTargetX(),
-        currentHeroState->m_destinationY = GetCommandTargetY();
-        // fall through
+        currentHeroState->m_destinationX = m_commandTargetX,
+        currentHeroState->m_destinationY = m_commandTargetY;
+        goto continue_route;
     case ADVMGR_COMMAND_CONTINUE_ROUTE:
+continue_route:
         if (currentHeroState == 0)
             break;
         if (currentHeroState->m_destinationX == ADVMGR_INVALID_CELL ||
@@ -450,7 +457,9 @@ class mapCell * advManager::DoAdvCommand(void)
 
             pathIndexLocal = gpSearchArray->m_pathLength - 1;
             for (; pathIndexLocal >= 0; --pathIndexLocal) {
-                eventCellState = MoveHero(gpSearchArray->m_storage.path.directions[pathIndexLocal + 1],
+                eventCellState = MoveHero(static_cast<unsigned char>(
+                                              gpSearchArray->m_storage.path.directions[
+                                                  pathIndexLocal + 1]),
                                           pathIndexLocal == 0,
                                           &TrigX, &TrigY, &movementChangedResult, 0,
                                           &movementEndedLocal, 0);
@@ -458,7 +467,7 @@ class mapCell * advManager::DoAdvCommand(void)
                 if (eventCellState != 0)
                     break;
                 if (movementChangedResult || movementEndedLocal || gbHitEvent)
-                    break;
+                    goto movement_done;
                 messageValue = gpInputManager->GetEvent();
                 while (messageValue.type != 0) {
                     if (messageValue.type == ADVMGR_INPUT_MOUSE_DOWN ||
@@ -530,12 +539,12 @@ movement_done:
         break;
 
     case ADVMGR_COMMAND_SELECT_HERO:
-        SetHeroContext(GetCell(m_lastHoverCell + m_mapOriginX,
+        SetHeroContext(GetCell(m_mapOriginX + m_lastHoverCell,
                                m_hoverCellY + m_mapOriginY)->w4hi, 0);
         break;
 
     case ADVMGR_COMMAND_SELECT_TOWN:
-        SetTownContext(GetCell(m_lastHoverCell + m_mapOriginX,
+        SetTownContext(GetCell(m_mapOriginX + m_lastHoverCell,
                                m_hoverCellY + m_mapOriginY)->w4hi);
         break;
 
@@ -593,8 +602,11 @@ void advManager::CheckSetEvilInterface(int redraw, int player)
 }
 
 // @early-stop
-// Retail is 0xfda and reconstruction is 0x1016 with an exact 0x48 frame; excluding the 0x20/0x94 jump tables, every non-jump opcode/operand matches and the 60-byte delta is twelve net five-byte /Ob1/block-boundary jumps.
-// All 232 relocation sites agree apart from delinked local/string identities and retail empty_stub versus the reconstructed CreateColorTables call.
+// Excluding the 0x20 and 0x94 pointer tables and the latter's adjacent 0x51
+// byte lookup, all 902 executable instructions, the 0x48 frame, and all 232
+// relocation targets match. Retail's const_00128d28 is gConfig + 0x08
+// (musicVolume); the other displayed addend is the delinked byte table.
+// Retail has two trailing alignment NOPs.
 VA(0x00457d6c, 0xfda)
 int advManager::Main(struct tag_message &message)
 {
@@ -658,35 +670,31 @@ int advManager::Main(struct tag_message &message)
                 if (helpIndexState >= 0) {
                     NormalDialog(gAdvMenuHelp[helpIndexState], 4, -1, -1, -1,
                                  0, -1, 0, -1, 0);
-                    goto finish_message;
+                    break;
                 }
             }
             processResult = ProcessSelect(&message, eventCellsResult);
-            goto finish_message;
+            break;
         }
         }
-        goto finish_message;
+        break;
     case 4:
         processResult = ProcessHover(message.payload.mouse.screenX, message.payload.mouse.screenY);
-        goto finish_message;
-    case 1:
-        break;
     default:
-        goto finish_message;
-    }
-
-    moveDirectionState = -1;
-    if (gpCurPlayer->CurrentHero() != ADVMGR_INVALID_HERO)
-        currentHero = gpGame->GetHero(gpCurPlayer->CurrentHero());
-    else
-        currentHero = 0;
-    if (giDebugLevel < 1 &&
-        (message.payload.keyboard.keyCode == 61 || message.payload.keyboard.keyCode == 62 ||
-         message.payload.keyboard.keyCode == 63 || message.payload.keyboard.keyCode == 64 ||
-         message.payload.keyboard.keyCode == 65 || message.payload.keyboard.keyCode == 66 ||
-         message.payload.keyboard.keyCode == 67 || message.payload.keyboard.keyCode == 68 ||
-         message.payload.keyboard.keyCode == 87 || message.payload.keyboard.keyCode == 88))
-        goto finish_message;
+        break;
+    case 1:
+        moveDirectionState = -1;
+        if (gpCurPlayer->CurrentHero() != ADVMGR_INVALID_HERO)
+            currentHero = gpGame->GetHero(gpCurPlayer->m_currentHero);
+        else
+            currentHero = 0;
+        if (giDebugLevel < 1 &&
+            (message.payload.keyboard.keyCode == 61 || message.payload.keyboard.keyCode == 62 ||
+             message.payload.keyboard.keyCode == 63 || message.payload.keyboard.keyCode == 64 ||
+             message.payload.keyboard.keyCode == 65 || message.payload.keyboard.keyCode == 66 ||
+             message.payload.keyboard.keyCode == 67 || message.payload.keyboard.keyCode == 68 ||
+             message.payload.keyboard.keyCode == 87 || message.payload.keyboard.keyCode == 88))
+            break;
 
     switch (message.payload.keyboard.keyCode) {
     case 60:
@@ -728,7 +736,7 @@ int advManager::Main(struct tag_message &message)
 process_cheat_digit: {
         hero *cheatHero = 0;
         if (gpCurPlayer->CurrentHero() != ADVMGR_INVALID_HERO)
-            cheatHero = gpGame->GetHero(gpCurPlayer->CurrentHero());
+            cheatHero = gpGame->GetHero(gpCurPlayer->m_currentHero);
         giCheatSeq = cheatDigitLocal + (giCheatSeq * 10) % 10000000;
         if (!gbRemoteOn) {
             if (giCheatSeq % 100000 == 0x7da7 && cheatHero != 0) {
@@ -768,6 +776,7 @@ process_cheat_digit: {
             sprintf(gText, "Coordinates at top left corner of view: %d, %d",
                     m_mapOriginX, m_mapOriginY);
             NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+            break;
         }
         break;
     }
@@ -818,6 +827,7 @@ process_cheat_digit: {
     case 16:
         cheatDigitLocal = 0x69;
         strcpy(gText, "Are you sure you want to quit?");
+        goto confirm_game_command;
 confirm_game_command:
         exitRequestedFlag = 1;
         NormalDialog(gText, 2, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -880,7 +890,7 @@ confirm_game_command:
         break;
     }
 
-    if (gpCurPlayer->CurrentHero() != ADVMGR_INVALID_HERO && moveDirectionState >= 0) {
+    if (gpCurPlayer->m_currentHero != ADVMGR_INVALID_HERO && moveDirectionState >= 0) {
         HideRoute(1, 1, 1);
         gpMouseManager->HideColorPointer();
         int movementChanged;
@@ -900,6 +910,8 @@ confirm_game_command:
         ForceNewHover();
         UpdBottomView(1, 1, 1);
         CheckDimHero();
+    }
+        break;
     }
     }
 
@@ -2959,8 +2971,10 @@ radar_default_object:
 }
 
 // @early-stop
-// instruction-exact bodies/frame and 205-reloc audit; only map-index operand grouping,
-// switch break-stub/dispatcher placement, and retail trailing NOPs differ cumulatively
+// Excluding the 0x7c pointer table and adjacent 0x7b byte lookup, all 1017
+// executable instructions, the 0x1fc frame, and all 205 relocation targets match.
+// The only displayed operand difference is the delinked byte-table reference
+// ([eax + 0x110b] versus [eax]); retail also has two trailing alignment NOPs.
 VA(0x0045f127, 0x133e)
 void advManager::QuickInfo(int cellX, int cellY)
 {
@@ -3008,15 +3022,15 @@ void advManager::QuickInfo(int cellX, int cellY)
     } else {
         currentCell = GetCell(m_mapOriginX + cellX, m_mapOriginY + cellY);
         if ((giCurPlayerBit &
-             mapExtra[(m_mapOriginX + cellX) +
-                      (m_mapOriginY + cellY) * MAP_WIDTH]) == 0) {
+             (mapExtra + (m_mapOriginY + cellY) * MAP_WIDTH)
+                 [m_mapOriginX + cellX]) == 0) {
             sprintf(gText, "%s", "Uncharted Territory");
         } else {
 
     switch (currentCell->triggerType & 0x7f) {
     case ADVMGR_OBJECT_ARTIFACT:
         sprintf(gText, "%s", "Artifact");
-        goto quick_info_ready;
+        break;
     case ADVMGR_OBJECT_OBELISK:
         if (currentCell->triggerType & 0x80) {
             sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->triggerType & 0x7f],
@@ -3024,7 +3038,8 @@ void advManager::QuickInfo(int cellX, int cellY)
                          currentCell->w4hi - ADVMGR_OBELISK_INDEX_BASE] &
                      (1u << giCurPlayer))
                         ? "(already visited)" : "(not visited)");
-            goto quick_info_ready;
+        } else {
+            goto quick_info_default;
         }
         break;
     case ADVMGR_OBJECT_GAZEBO_VISIT:
@@ -3032,7 +3047,8 @@ void advManager::QuickInfo(int cellX, int cellY)
             sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->triggerType & 0x7f],
                     (heroLocal->m_gazeboVisits & (1u << (currentCell->w4hi & 0x1f)))
                         ? "(already visited)" : "(not visited)");
-            goto quick_info_ready;
+        } else {
+            goto quick_info_default;
         }
         break;
     case ADVMGR_OBJECT_FORT_VISIT:
@@ -3040,7 +3056,8 @@ void advManager::QuickInfo(int cellX, int cellY)
             sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->triggerType & 0x7f],
                     (heroLocal->m_fortVisits & (1u << (currentCell->w4hi & 0x1f)))
                         ? "(already visited)" : "(not visited)");
-            goto quick_info_ready;
+        } else {
+            goto quick_info_default;
         }
         break;
     case ADVMGR_OBJECT_WITCH_DOCTOR_VISIT:
@@ -3049,7 +3066,8 @@ void advManager::QuickInfo(int cellX, int cellY)
                     (heroLocal->m_witchDoctorVisits &
                      (1u << (currentCell->w4hi & 0x1f)))
                         ? "(already visited)" : "(not visited)");
-            goto quick_info_ready;
+        } else {
+            goto quick_info_default;
         }
         break;
     case ADVMGR_OBJECT_MERCENARY_VISIT:
@@ -3058,7 +3076,8 @@ void advManager::QuickInfo(int cellX, int cellY)
                     (heroLocal->m_mercenaryCampVisits &
                      (1u << (currentCell->w4hi & 0x1f)))
                         ? "(already visited)" : "(not visited)");
-            goto quick_info_ready;
+        } else {
+            goto quick_info_default;
         }
         break;
     case ADVMGR_OBJECT_STANDING_STONE_ALT:
@@ -3067,7 +3086,8 @@ void advManager::QuickInfo(int cellX, int cellY)
                     (heroLocal->m_standingStoneVisits &
                      (1u << (currentCell->w4hi & 0x1f)))
                         ? "(already visited)" : "(not visited)");
-            goto quick_info_ready;
+        } else {
+            goto quick_info_default;
         }
         break;
     case ADVMGR_OBJECT_TREE_ALT:
@@ -3076,7 +3096,8 @@ void advManager::QuickInfo(int cellX, int cellY)
                     (heroLocal->m_treeKnowledgeVisits &
                      (1u << (currentCell->w4hi & 0x1f)))
                         ? "(already visited)" : "(not visited)");
-            goto quick_info_ready;
+        } else {
+            goto quick_info_default;
         }
         break;
     case ADVMGR_OBJECT_XANADU_ALT:
@@ -3084,68 +3105,66 @@ void advManager::QuickInfo(int cellX, int cellY)
             sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->triggerType & 0x7f],
                     (heroLocal->m_xanaduVisits & (1u << (currentCell->w4hi & 0x1f)))
                         ? "(already visited)" : "(not visited)");
-            goto quick_info_ready;
+        } else {
+            goto quick_info_default;
         }
         break;
     case ADVMGR_OBJECT_FORT:
         visitedMaskValue = ADVMGR_VISIT_FORT;
-        break;
+        goto quick_info_default;
     case ADVMGR_OBJECT_GAZEBO:
         visitedMaskValue = ADVMGR_VISIT_GAZEBO;
-        break;
+        goto quick_info_default;
     case ADVMGR_OBJECT_MERCENARY_CAMP:
         visitedMaskValue = ADVMGR_VISIT_MERCENARY_CAMP;
-        break;
+        goto quick_info_default;
     case ADVMGR_OBJECT_STANDING_STONES:
         visitedMaskValue = ADVMGR_VISIT_STANDING_STONES;
-        break;
+        goto quick_info_default;
     case ADVMGR_OBJECT_WITCH_DOCTOR_ALT:
         visitedMaskValue = ADVMGR_VISIT_WITCH_DOCTOR;
-        break;
+        goto quick_info_default;
     case ADVMGR_OBJECT_EVENT_SITE:
         visitedMaskValue = ADVMGR_VISIT_EVENT_SITE;
-        break;
+        goto quick_info_default;
     case ADVMGR_OBJECT_EVENT_SITE_ALT:
         visitedMaskValue = ADVMGR_VISIT_XANADU;
-        break;
+        goto quick_info_default;
     case ADVMGR_OBJECT_XANADU:
         visitedMaskValue = ADVMGR_VISIT_TREE_OF_KNOWLEDGE;
-        break;
+        goto quick_info_default;
     case ADVMGR_OBJECT_NONE:
     case 0x13:
     case 0x1c:
     case 0x2c:
     case 0x39:
         sprintf(gText, "%s", gTerrainNames[giGroundToTerrain[currentCell->tile]]);
-        goto quick_info_ready;
-    case ADVMGR_OBJECT_GUARDED: {
+        break;
+    case ADVMGR_OBJECT_GUARDED:
         sprintf(gText, "%s", gQuickViewText[currentCell->triggerType & 0x7f]);
         goto quick_info_guarded;
-    }
-    case ADVMGR_OBJECT_MINE: {
+    case ADVMGR_OBJECT_MINE:
         if (gpGame->m_mines[currentCell->w4hi].guardianType != -1) {
             sprintf(gText, "%s %s",
                     gResourceNames[gpGame->m_mines[currentCell->w4hi].resourceType],
                     "Mine");
-            goto quick_info_guarded;
-        }
-        goto quick_info_unguarded_mine;
-    }
 quick_info_guarded:
-        sprintf(guardCaption, "\n\nguarded by %s %s",
-                GetArmySizeName(gpGame->m_mines[currentCell->w4hi].guardianCount, 2),
-                gArmyNamesPlural[gpGame->m_mines[currentCell->w4hi].guardianType]);
-        strcat(gText, guardCaption);
-        goto quick_info_ready;
-quick_info_unguarded_mine:
-        sprintf(gText, "%s %s",
-                gResourceNames[gpGame->m_mines[currentCell->w4hi].resourceType],
-                "Mine");
-        goto quick_info_ready;
+            sprintf(guardCaption, "\n\nguarded by %s %s",
+                    GetArmySizeName(
+                        gpGame->m_mines[currentCell->w4hi].guardianCount, 2),
+                    gArmyNamesPlural[
+                        gpGame->m_mines[currentCell->w4hi].guardianType]);
+            strcat(gText, guardCaption);
+        } else {
+            sprintf(gText, "%s %s",
+                    gResourceNames[gpGame->m_mines[currentCell->w4hi].resourceType],
+                    "Mine");
+        }
+        break;
     case ADVMGR_OBJECT_RESOURCE:
         sprintf(gText, "%s", gResourceNames[
             (currentCell->objIndex & ADVMGR_RESOURCE_FRAME_PAIR_MASK) / 2]);
-        goto quick_info_ready;
+        break;
     case ADVMGR_OBJECT_MONSTER:
         if (IsCrystalBallInEffect(m_mapOriginX + cellX, m_mapOriginY + cellY, 8)) {
             sprintf(gText, "%d %s", currentCell->w4hi & 0xfff,
@@ -3154,7 +3173,7 @@ quick_info_unguarded_mine:
             sprintf(gText, "%s %s", GetArmySizeName(currentCell->w4hi & 0xfff, 1),
                     gArmyNamesPlural[currentCell->objIndex]);
         }
-        goto quick_info_ready;
+        break;
     case ADVMGR_OBJECT_BARRIER:
     case ADVMGR_OBJECT_TENT:
         sprintf(gText, gQuickViewText[currentCell->triggerType & 0x7f],
@@ -3162,7 +3181,7 @@ quick_info_unguarded_mine:
         uppercaseResult = static_cast<char>(
             toupper(static_cast<int>(static_cast<signed char>(gText[0]))));
         gText[0] = uppercaseResult;
-        goto quick_info_ready;
+        break;
     case ADVMGR_OBJECT_GENERIC_SITE: {
         mapObjectKindValue = -1;
         if (currentCell->objIndex != 0xff) {
@@ -3224,7 +3243,7 @@ quick_info_unguarded_mine:
             strcat(gText, (heroLocal->m_eventFlags & visitedMaskValue)
                               ? "(already visited)" : "(not visited)");
         }
-        goto quick_info_ready;
+        break;
     }
     case ADVMGR_OBJECT_RECRUITMENT_SITE: {
         if (currentCell->ovlIndex == 0xff) {
@@ -3257,22 +3276,25 @@ quick_info_unguarded_mine:
             sprintf(gText, "Unknown");
         else
             sprintf(gText, xRecruitmentSiteNames[siteIndexName]);
-        goto quick_info_ready;
+        break;
     }
     case ADVMGR_OBJECT_REEFS:
         if (currentCell->objTileset == ADVMGR_SITE_TILESET_2) {
             sprintf(gText, "Reefs");
-            goto quick_info_ready;
+        } else {
+            goto quick_info_default;
         }
         break;
-    }
-
+    default:
+quick_info_default:
     if (visitedMaskValue != 0 && heroLocal != 0) {
         sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->triggerType & 0x7f],
                 (heroLocal->m_eventFlags & visitedMaskValue)
                     ? "(already visited)" : "(not visited)");
     } else {
         sprintf(gText, "%s", gQuickViewText[currentCell->triggerType & 0x7f]);
+    }
+        break;
     }
         }
     }
