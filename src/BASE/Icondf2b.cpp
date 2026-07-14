@@ -5,56 +5,60 @@
 
 #include <va.h>
 #include <BASE/Icondf2b.h>
+#include <BASE/IconEntry.h>
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
-#include <SOURCE/X_GLOBAL.h>
-#include <BASE/Misc.h>
-// Per-call decoder scratch — its own file-static block.
-static int gFDX0;
-static int gFDXEnd;
-static unsigned int gFDCnt;
-static unsigned int gFDCnt2;
-static int gFDRow;
-static IconEntry *gFDEntry;
-static int gFDClipR;
-static int gFDX;
-static int gFDClipB;
-static unsigned char *gFDSrc;
-static unsigned char *gFDDst;
-static int gFDY;
-static unsigned int gFDRun;
+#include <SOURCE/dimPalette.h>
+// Per-call decoder scratch — its own contiguous file-static block (0x5381b8+).
+DATA(0x005381b8) static int gFDX0;
+DATA(0x005381bc) static int gFDXEnd;
+DATA(0x005381c0) static unsigned int gFDCnt;
+DATA(0x005381c4) static int gFDX;
+DATA(0x005381c8) static int gFDClipR;
+DATA(0x005381cc) static unsigned int gFDCnt2;
+DATA(0x005381d0) static int gFDRow;
+DATA(0x005381d4) static int gFDClipB;
+DATA(0x005381d8) static unsigned char *gFDSrc;
+DATA(0x005381dc) static unsigned char *gFDDst;
+DATA(0x005381e0) static volatile int gFDY;
+DATA(0x005381e4) static IconEntry *gFDEntry;
+DATA(0x005381e8) static unsigned int gFDRun;
 
-// @early-stop
-// /O2 register-allocation wall after complete decoder recovery: base and retail are both 0x23b.
-// The relocation/branch-masked command dispatch is byte-identical at base +0xf6..+0x11c versus
-// retail +0xf9..+0x11f (39 bytes). Residual spans are setup/fetch base +0x00..+0xf5 versus retail
-// +0x00..+0xf8, no-clip base +0x11d..+0x170 versus retail +0x120..+0x16f, clipped base
-// +0x171..+0x208 versus retail +0x170..+0x208, and newline/return +0x209..+0x23a in both: retail
-// assigns the setup fields, row/X operands, palette/count loads, and loop load/decrement among
-// EAX/EBX/ESI/EDI differently. Relocations are base 38 versus retail 37; the sole extra is a gFDY
-// reload at base +0x185, with no base-only target, and uDimPal plus all 13 scratch addresses agree.
-// Retail itself gates clipped runs with clipX <= left && X <= clipR, then repeats clipX > left for
-// a dead partial-left arm; exact compare/branch dataflow was verified and the normal overlap gate
-// was rejected. Tried direct/indexed entry forms, local/global X bounds and destination pointers,
-// field/store orders, split source fetches, signed/unsigned counts, palette/count/loop schedules,
-// repeated/local clipping expressions, three AST searches (580 walks), and 120 text variants.
+// @match-note
+// Structurally recovered /O2 decoder; live 69.89%, retained max 73.4337%. Ours is 0x237 bytes and
+// retail is 0x23b. Both have the same 0x4-byte frame, saved registers, command-loop CFG, and exact
+// 37-relocation identity/multiplicity sequence (all 13 scratch globals plus uDimPal). The first raw
+// divergence is +0x1d: ours loads x into ECX while retail loads it into EBX, after identical entry
+// address/source setup; later residuals are register allocation and instruction scheduling.
+// Retail deliberately tests clipX <= left before entering a clipped run, then tests clipX > left
+// again inside. This makes the partial-left arm unreachable, but retail +0x18c and +0x19a prove the
+// shipped CFG. Tried the typed IconEntry form, local X clip bounds, scoped volatile gFDY reads,
+// direct <=/> spellings, and the retail pre-loop gFDDst publication. Narrowing X_GLOBAL.h to the
+// canonical dimPalette.h changed only compiler/TU state and moved live fuzzy 70.55% -> 69.89%; do
+// not restore the broad header to chase that temporary score. No permutation tool was used.
+// Revisit after the SOURCE placeholder census reaches zero or after a real shared-header change.
 VA(0x004daa20, 0x23b)
 void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                          int color, int clip, int clipX, int clipY, int clipW, int clipH)
 {
-    unsigned char *data = reinterpret_cast<unsigned char *>(srcIcon->m_data);
-    int off = frame * 13;
-    gFDSrc = data + *reinterpret_cast<int *>(off + data + 9);
-    IconEntry *e = reinterpret_cast<IconEntry *>(off + data);
-    gFDEntry = e;
-    int w = e->w;
-    gFDX0 = ((x - e->x) - w) + 1;
-    int X = w + gFDX0 - 1;
-    gFDXEnd = X;
-    gFDY = y + e->y;
+    char *data = srcIcon->m_data;
+    IconEntry *entry = reinterpret_cast<IconEntry *>(data + frame * sizeof(IconEntry));
+    unsigned char *srcData = reinterpret_cast<unsigned char *>(data + entry->srcOffset);
+    int X = x;
+    gFDEntry = entry;
+    gFDSrc = srcData;
+    int w = entry->w;
+    X = X - entry->x;
+    int entryY = entry->y;
+    X = X - w;
+    X++;
+    gFDX0 = X;
+    gFDY = y + entryY;
+    gFDXEnd = w + X - 1;
     if (clip != 0) {
-        if (clipX > gFDX0 || clipW + clipX < w + gFDX0 || gFDY < clipY ||
-            e->h + gFDY > clipY + clipH) {
+        int currentY = gFDY;
+        if (X < clipX || clipW + clipX < w + X || currentY < clipY ||
+            entry->h + currentY > clipY + clipH) {
             clip = 1;
             gFDClipR = clipX + clipW - 1;
             gFDClipB = clipY + clipH - 1;
@@ -84,7 +88,7 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, 
                 gFDCnt = 0;
                 unsigned char *dst = reinterpret_cast<unsigned char *>((gFDRow - cmd) + X + 1);
                 gFDDst = dst;
-                if (static_cast<int>(cmd) >= 1) {
+                if (static_cast<int>(cmd) > 0) {
                     cnt = cmd;
                     gFDCnt = cmd;
                     do {
@@ -97,19 +101,21 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, 
                 }
             } else {
                 int left;
-                if (clipY <= gFDY && gFDY <= gFDClipB &&
-                    (left = (X - cmd) + 1, clipX < left + 1) && X <= gFDClipR) {
-                    unsigned int cn;
+                int currentY = gFDY;
+                if (clipY <= currentY && currentY <= gFDClipB &&
+                    (left = (X - cmd) + 1, clipX <= left) && X <= gFDClipR) {
+                    int cn;
                     unsigned char *dst;
-                    if (left < clipX) {
+                    if (clipX > left) {
                         dst = reinterpret_cast<unsigned char *>(gFDRow + clipX);
                         cn = (X - clipX) + 1;
                     } else {
                         cn = cmd;
                         dst = reinterpret_cast<unsigned char *>((gFDRow - cmd) + X + 1);
                     }
-                    gFDCnt = 0;
                     gFDCnt2 = cn;
+                    gFDDst = dst;
+                    gFDCnt = 0;
                     if (static_cast<int>(cn) > 0) {
                         gFDCnt = cn;
                         unsigned int cnt = cn;
