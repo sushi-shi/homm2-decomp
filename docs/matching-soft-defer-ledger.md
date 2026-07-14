@@ -24,9 +24,9 @@ Status: active. These functions have narrow measured residuals, but the delayed 
 and register-allocation differences do not meet either permitted `@early-stop` flavor. They must
 remain unmarked and in the same lane.
 
-Current source state:
+Canonical source state:
 
-- base checkpoint: `2e351c8`
+- checkpoint: `a9d1370`
 - `src/BASE/Textntry.cpp`:
   `fd22c7692d4e9293c47a13eb83b422b678371fe4ee19755d78b515c9b94fd5cb`
 - `include/BASE/textEntryWidget.h`:
