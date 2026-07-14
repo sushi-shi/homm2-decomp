@@ -465,7 +465,8 @@ public:
     unsigned char m_removedArmies[2][20];  // +0xf577
     unsigned char m_removedArmyPresent;  // +0xf59f
     char m_battlefieldBackgroundName[13];  // +0xf5a0
-    char _pad_0xf5ad[0x2ca];
+    char _pad_0xf5ad[0x2c6];
+    int m_combatResult;  // +0xf873
     // --- constructors ---
     combatManager(void);
     // --- virtual methods (vtable order) ---

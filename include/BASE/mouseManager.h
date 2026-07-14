@@ -33,7 +33,7 @@ public:
     int    field_0x72;  // +0x72
     int    field_0x76;  // +0x76
     int    field_0x7a;  // +0x7a
-    int    field_0x7e;  // +0x7e
+    int    m_forcePointerUpdate;  // +0x7e
     int    m_cursorReady;  // +0x82
     int    m_hideCount;  // +0x86
     // --- constructors ---
