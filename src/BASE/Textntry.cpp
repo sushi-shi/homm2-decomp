@@ -377,10 +377,10 @@ void textEntryWidget::Draw(void)
     }
 }
 
-// Active /O2 TU-cumulative register-allocation residual: all 8/8 relocation targets,
-// the 0x130 frame, calls, and loop CFG agree. Base is 0x1bd versus retail 0x1be; VC4.2
-// assigns this/cursor to ebx/ebp rather than retail ebp/ebx, and omits one redundant xor
-// in the dead second-loop tail.
+// Active /O2 TU-cumulative register-allocation residual: base/retail are both 0x1be with
+// the 0x130 frame, calls, loop CFG, and all 8/8 relocation targets aligned. VC4.2 assigns
+// this/cursor to ebx/ebp rather than retail ebp/ebx; the streams otherwise agree,
+// including the redundant clear in the dead second-loop tail.
 VA(0x004d9570, 0x1be)
 void textEntryWidget::SetupDisplayString(char *source, unsigned short cursor)
 {
@@ -400,7 +400,7 @@ void textEntryWidget::SetupDisplayString(char *source, unsigned short cursor)
         m_text[cursor + 1] = 0;
 
     if (field_0x49 == 3) {
-        int shifted;
+        int shifted, fits;
         char display[300];
         do {
             shifted = 0;
@@ -413,18 +413,18 @@ void textEntryWidget::SetupDisplayString(char *source, unsigned short cursor)
                 }
             }
         } while (shifted);
-        int fits;
-        do {
-            if (field_0x4b > 0) {
+        if (field_0x4b > 0) {
+            do {
                 fits = 0;
                 strcpy(display, m_text + field_0x4b - 1);
                 if (m_font->LineWidth(display) <= m_innerW)
                     field_0x4b--;
                 else
                     fits = 0;
-            } else
-                fits = 0;
-        } while (field_0x4b == 0 && fits != 0);
+                if (field_0x4b == 0)
+                    fits = 0;
+            } while (fits != 0);
+        }
     }
 }
 
