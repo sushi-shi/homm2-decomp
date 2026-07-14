@@ -20,8 +20,12 @@
 // complete. Moving the width store before `m_prev` reduced the prior 18-byte
 // residual and raised 96.8261% to 97.9565%. Separate/chained null stores, cached
 // height, full and coordinate-only initializer lists, and a 200-iteration audited
-// libclang AST search found no exact form. Retry after a predecessor/include/header
-// TU-state change or new evidence for the original initialization lifetime graph.
+// libclang AST search found no exact form. A later retail-lifetime pass also ruled
+// out ABI-neutral dimension typedef/qualifier, width-conversion/accessor, explicit
+// X/height snapshot, and adjacent width/height initialization models; the bounded
+// results are in docs/matching-matrices/widget-whole-tu-214bd52.tsv. Retry after a
+// predecessor/include/header TU-state change or new evidence for the original
+// initialization lifetime graph.
 VA(0x004dde00, 0x5a)
 widget::widget(short int x, short int y, short int width, short int height, short int id, short int kind)
 {
