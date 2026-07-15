@@ -986,7 +986,7 @@ SOURCE/KB	?WaitHandler@@YIHAAUtag_message@@@Z	99.5902	0118ffd4c1d7
 SOURCE/KB	?oldmain@@YIHXZ	97.7900	3a86a7091a12
 SOURCE/KB	?toupper@@YIDD@Z	100.0000	69509dfade2d
 SOURCE/KB	@PollSound@0	100.0000	cf9f81b8f839
-SOURCE/Modem	?Connect@@YIXXZ	100.0000	52efebc1dcad
+SOURCE/Modem	?Connect@@YIXXZ	100.0000	7d3d467118a3
 SOURCE/Modem	?Dial@@YIJXZ	99.8837	ca1b53eb871f
 SOURCE/Modem	?GUIModemCommand@@YIXPAD0@Z	100.0000	baeac1dfddc3
 SOURCE/Modem	?GUIModemCommandExec@@YICXZ	100.0000	dce9445c090b
@@ -996,7 +996,7 @@ SOURCE/Modem	?ModemCommand@@YIXPAD@Z	100.0000	99a8ac4bc567
 SOURCE/Modem	?ModemSetup@@YIXH@Z	100.0000	3b6cf45a4c00
 SOURCE/Modem	?ReadPacket@@YIDXZ	100.0000	f46c52e8b5a1
 SOURCE/Modem	?Wait@@YIJXZ	99.8077	7b3ebee564d6
-SOURCE/Modem	?WaitForDirectConnect@@YIHXZ	100.0000	b573d6e89edc
+SOURCE/Modem	?WaitForDirectConnect@@YIHXZ	100.0000	f8c0b823621b
 SOURCE/Modem	?WriteModemPacket@@YIXPADH@Z	99.9138	a8c8818bcb80
 SOURCE/Modem	?read_byte@@YIHXZ	100.0000	f5114e3edcef
 SOURCE/Modem	?write_buffer@@YIHPADH@Z	100.0000	98f64e0ae08c
