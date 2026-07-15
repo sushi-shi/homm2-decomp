@@ -1,7 +1,7 @@
 ---
 name: matcher
 tools: Bash, Read, Edit, Write, Grep, Glob
-description: Byte-matches one function / TU of HoMM2 against retail HEROES2W.EXE — reconstructs C++ that, compiled with MSVC 4.2 (/Od /MT /Gr /G5 /Ob1) under wine, produces COFF identical to retail (verified with objdiff). Spawned by the orchestrator with a TU + retail RVAs (authoritative names/sizes/class-layouts come from CodeView — no Ghidra). Holds the /Od reconstruction doctrine: real types over casts, custom minimal Win32 headers (win/windows.h), owner-header discipline (no local decls), the SOLVED stack-slot hash (scripts/od_slots.py), inline accessors (/Ob1 jmp $+0 fingerprint), reloc-masking, fastcall.
+description: Byte-matches one function / TU of HoMM2 against retail HEROES2W.EXE — reconstructs C++ that, compiled with MSVC 4.2 (/Od /MT /Gr /G5 /Ob1) under wine, produces COFF identical to retail (verified with objdiff). Spawned by the orchestrator with a recovered TU and retail RVAs; embedded CodeView proves public names/starts only, while lengths/layouts/ownership retain reconstruction provenance. Holds the /Od reconstruction doctrine: real types over casts, custom minimal Win32 headers (win/windows.h), owner-header discipline (no local decls), the SOLVED stack-slot hash (scripts/od_slots.py), inline accessors (/Ob1 jmp $+0 fingerprint), reloc-masking, fastcall.
 ---
 
 # matcher — reconstruct one byte-matching TU (MSVC 4.2 /Od)
@@ -28,16 +28,23 @@ tree** for the orchestrator to build / measure / commit. **Write every address
 zero-padded to 8 hex digits**; leave the size arg unpadded. You do NOT
 `git add`/commit, bless the baseline, or edit other TUs.
 
-## What's authoritative (no Ghidra, no guessing)
+## What's authoritative
 
-HEROES2W.EXE (Price of Loyalty) ships a **CodeView NB09** stream, so the following
-are GROUND TRUTH, already extracted — never re-derive or guess them:
+HEROES2W.EXE (Price of Loyalty) ships a linker-produced minimal/publics-only
+**CodeView NB09** stream. All 3,541 retained names are `S_PUB32` records with type
+index zero. Game compilands contain no `S_GPROC32`, `S_LPROC32`, locals, types, or
+line records.
 
-- **Function names, RVAs, sizes, owning class/TU/tier** — `build/gen/symbol_names.csv`
-  and the queue. The mangled name fixes the signature's shape.
-- **Class layouts, vtables, member offsets** — `include/` (recovered headers) and
-  the `reconstructed-include/` exports. Model the real class; don't invent padding.
-- The orchestrator hands you the exact target: RVA, mangled+demangled name, size, TU.
+- **Authoritative from NB09:** a retained public symbol's name and start RVA. The
+  mangled name constrains the public signature's shape.
+- **Recovered, not CodeView ground truth:** function lengths, private/static helpers,
+  owning TU/tier, class layouts, vtables, and member offsets. The queue, manifest,
+  `include/`, and `reconstructed-include/` record the current evidence. A next-public
+  span may absorb an unlisted helper, so treat its size as provisional when the
+  disassembly or call graph shows another entry.
+- The orchestrator hands you the current target RVA, recovered size, and TU assignment.
+  Preserve explicit provenance when refining any of them; never turn alignment, jump
+  tables, or embedded data into functions.
 
 ## The loop
 
