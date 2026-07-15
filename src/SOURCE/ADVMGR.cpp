@@ -540,12 +540,12 @@ movement_done:
 
     case ADVMGR_COMMAND_SELECT_HERO:
         SetHeroContext(GetCell(m_mapOriginX + m_lastHoverCell,
-                               m_hoverCellY + m_mapOriginY)->w4hi, 0);
+                               m_hoverCellY + m_mapOriginY)->m_objectMetadata, 0);
         break;
 
     case ADVMGR_COMMAND_SELECT_TOWN:
         SetTownContext(GetCell(m_mapOriginX + m_lastHoverCell,
-                               m_hoverCellY + m_mapOriginY)->w4hi);
+                               m_hoverCellY + m_mapOriginY)->m_objectMetadata);
         break;
 
     case ADVMGR_COMMAND_NONE:
@@ -1047,8 +1047,8 @@ int advManager::ProcessSelect(struct tag_message *message, class mapCell **event
                     objectTypeState = MAP_EVENT_HERO_INTERACTION;
                     objectIdIndex = gpCurPlayer->CurrentHero();
                 } else {
-                    objectTypeState = currentCell->triggerType & 0x7f;
-                    objectIdIndex = currentCell->w4hi;
+                    objectTypeState = currentCell->m_triggerType & 0x7f;
+                    objectIdIndex = currentCell->m_objectMetadata;
                 }
                 switch (objectTypeState) {
                 case MAP_EVENT_HERO_INTERACTION:
@@ -1112,8 +1112,8 @@ int advManager::ProcessSelect(struct tag_message *message, class mapCell **event
                     *eventCell = DoAdvCommand();
                 }
             } else {
-                objectTypeState = currentCell->triggerType & 0x7f;
-                objectIdIndex = currentCell->w4hi;
+                objectTypeState = currentCell->m_triggerType & 0x7f;
+                objectIdIndex = currentCell->m_objectMetadata;
                 if (objectTypeState == MAP_EVENT_HERO_INTERACTION) {
                     if (gpCurPlayer->CurrentHero() == objectIdIndex) {
                         m_selectedCell = ADVMGR_COMMAND_HERO_VIEW;
@@ -1373,16 +1373,16 @@ int advManager::ProcessSearch(int x, int y)
         y = m_mapOriginY + 7;
     }
     currentCell = GetCell(x, y);
-    if (!((currentCell->objIndex == 0xff ||
-           currentCell->objTileset == ADVMGR_CLEAR_GROUND_TILESET) &&
-          currentCell->ovlIndex == 0xff)) {
+    if (!((currentCell->m_objectIndex == 0xff ||
+           currentCell->m_objectTileset == ADVMGR_CLEAR_GROUND_TILESET) &&
+          currentCell->m_overlayIndex == 0xff)) {
         if (!gbHumanPlayer[giCurPlayer])
             goto search_end;
         NormalDialog("Try searching on clear ground.",
                      1, -1, -1, -1, 0, -1, 0, -1, 0);
         return 1;
     }
-    if (!giGroundToTerrain[currentCell->tile]) {
+    if (!giGroundToTerrain[currentCell->m_terrainImageIndex]) {
         if (!gbHumanPlayer[giCurPlayer])
             goto search_end;
         NormalDialog("Try looking on land!!!",
@@ -1392,13 +1392,13 @@ int advManager::ProcessSearch(int x, int y)
 
             if (gbHumanPlayer[giCurPlayer])
                 digSampleState = LoadPlaySample("DIGSOUND.82M");
-            if (currentCell->objIndex == 0xff ||
-                currentCell->objTileset == ADVMGR_CLEAR_GROUND_TILESET) {
-                currentCell->objTileset = ADVMGR_DIG_HOLE_TILESET;
-                currentCell->objIndex = ADVMGR_DIG_HOLE_FRAME;
-                currentCell->w4a = 1;
-                currentCell->w4b = 1;
-                currentCell->field8 |= 0x80;
+            if (currentCell->m_objectIndex == 0xff ||
+                currentCell->m_objectTileset == ADVMGR_CLEAR_GROUND_TILESET) {
+                currentCell->m_objectTileset = ADVMGR_DIG_HOLE_TILESET;
+                currentCell->m_objectIndex = ADVMGR_DIG_HOLE_FRAME;
+                currentCell->m_objectLayerBit0 = 1;
+                currentCell->m_objectLayerBit1 = 1;
+                currentCell->m_flags |= 0x80;
             }
             CompleteDraw(0);
             UpdateScreen(0, 0);
@@ -1512,15 +1512,15 @@ int advManager::ProcessHover(int mouseX, int mouseY) {
 
             hoverCellLocal = GetCell(m_commandTargetX, m_commandTargetY);
             if (gpCurPlayer->m_currentHero == ADVMGR_INVALID_HERO) {
-                if ((hoverCellLocal->triggerType & ADVMGR_TRIGGER_TYPE_MASK) == ADVMGR_HOVER_TOWN
-                    && gpGame->GetTown(hoverCellLocal->w4hi)->m_owner == giCurPlayer) {
+                if ((hoverCellLocal->m_triggerType & ADVMGR_TRIGGER_TYPE_MASK) == ADVMGR_HOVER_TOWN
+                    && gpGame->GetTown(hoverCellLocal->m_objectMetadata)->m_owner == giCurPlayer) {
                     gpMouseManager->SetPointer(ADVMGR_POINTER_TOWN);
                     m_selectedCell = ADVMGR_COMMAND_TOWN_VIEW;
                     return 1;
                 } else {
-                    if ((hoverCellLocal->triggerType & ADVMGR_TRIGGER_TYPE_MASK)
+                    if ((hoverCellLocal->m_triggerType & ADVMGR_TRIGGER_TYPE_MASK)
                             == ADVMGR_HOVER_HERO
-                        && gpGame->GetHero(hoverCellLocal->w4hi)->m_owner == giCurPlayer) {
+                        && gpGame->GetHero(hoverCellLocal->m_objectMetadata)->m_owner == giCurPlayer) {
                         gpMouseManager->SetPointer(ADVMGR_POINTER_HERO);
                         m_selectedCell = ADVMGR_COMMAND_HERO_VIEW;
                         return 1;
@@ -1539,10 +1539,10 @@ int advManager::ProcessHover(int mouseX, int mouseY) {
                     return 1;
                 }
 
-                if (hoverCellLocal->field8 & ADVMGR_HOVER_OBJECT_BLOCKED) {
-                    if ((hoverCellLocal->triggerType & ADVMGR_TRIGGER_TYPE_MASK)
+                if (hoverCellLocal->m_flags & ADVMGR_HOVER_OBJECT_BLOCKED) {
+                    if ((hoverCellLocal->m_triggerType & ADVMGR_TRIGGER_TYPE_MASK)
                         == ADVMGR_HOVER_TOWN) {
-                        hoverTownCell = gpGame->GetTown(hoverCellLocal->w4hi);
+                        hoverTownCell = gpGame->GetTown(hoverCellLocal->m_objectMetadata);
                         if (hoverTownCell->m_owner == giCurPlayer) {
                             gpMouseManager->SetPointer(ADVMGR_POINTER_TOWN);
                             m_selectedCell = ADVMGR_COMMAND_SELECT_TOWN;
@@ -1555,13 +1555,13 @@ int advManager::ProcessHover(int mouseX, int mouseY) {
                 }
 
                 if (!((m_cursorType == ADVMGR_CURSOR_ROUTE
-                       || giGroundToTerrain[hoverCellLocal->tile]
-                       || hoverCellLocal->triggerType == ADVMGR_HERO_TRIGGER
-                       || hoverCellLocal->triggerType == ADVMGR_BOAT_TRIGGER
-                       || hoverCellLocal->triggerType == ADVMGR_HOVER_SHIPWRECK_TRIGGER)
+                       || giGroundToTerrain[hoverCellLocal->m_terrainImageIndex]
+                       || hoverCellLocal->m_triggerType == ADVMGR_HERO_TRIGGER
+                       || hoverCellLocal->m_triggerType == ADVMGR_BOAT_TRIGGER
+                       || hoverCellLocal->m_triggerType == ADVMGR_HOVER_SHIPWRECK_TRIGGER)
                       && (m_cursorType != ADVMGR_CURSOR_ROUTE
-                          || !giGroundToTerrain[hoverCellLocal->tile]
-                          || hoverCellLocal->triggerType == ADVMGR_HOVER_COAST))) {
+                          || !giGroundToTerrain[hoverCellLocal->m_terrainImageIndex]
+                          || hoverCellLocal->m_triggerType == ADVMGR_HOVER_COAST))) {
                     gpSearchArray->m_pathLength = 0;
                     gpMouseManager->SetPointer(ADVMGR_POINTER_DEFAULT);
                     return 1;
@@ -1583,7 +1583,7 @@ int advManager::ProcessHover(int mouseX, int mouseY) {
                     }
                     pointerBaseCursor = routeDaysCount * ADVMGR_HOVER_ROUTE_FRAMES_PER_DAY;
 
-                    switch (hoverCellLocal->triggerType & ADVMGR_TRIGGER_TYPE_MASK) {
+                    switch (hoverCellLocal->m_triggerType & ADVMGR_TRIGGER_TYPE_MASK) {
                         case ADVMGR_HOVER_BOAT:
                             if (m_cursorType != ADVMGR_CURSOR_ROUTE) {
                                 gpMouseManager->SetPointer(pointerBaseCursor + ADVMGR_POINTER_SAIL);
@@ -1612,7 +1612,7 @@ int advManager::ProcessHover(int mouseX, int mouseY) {
                             m_selectedCell = ADVMGR_COMMAND_MOVE_TO;
                             break;
                         case ADVMGR_HOVER_HERO:
-                            if (gpGame->GetHero(hoverCellLocal->w4hi)->m_owner != giCurPlayer) {
+                            if (gpGame->GetHero(hoverCellLocal->m_objectMetadata)->m_owner != giCurPlayer) {
                                 gpMouseManager->SetPointer(
                                     pointerBaseCursor + ADVMGR_POINTER_ATTACK
                                 );
@@ -1625,8 +1625,8 @@ int advManager::ProcessHover(int mouseX, int mouseY) {
                             }
                             break;
                         case ADVMGR_HOVER_TOWN:
-                            hoverTownCell = gpGame->GetTown(hoverCellLocal->w4hi);
-                            if ((hoverCellLocal->triggerType & ADVMGR_TRIGGER_ACTION_FLAG)
+                            hoverTownCell = gpGame->GetTown(hoverCellLocal->m_objectMetadata);
+                            if ((hoverCellLocal->m_triggerType & ADVMGR_TRIGGER_ACTION_FLAG)
                                 && hoverTownCell->m_owner != giCurPlayer
                                 && hoverTownCell->HasGarrison()) {
                                 gpMouseManager->SetPointer(
@@ -1641,19 +1641,19 @@ int advManager::ProcessHover(int mouseX, int mouseY) {
                             if (!((mapExtra[m_commandTargetY * MAP_WIDTH + m_commandTargetX]
                                    & ADVMGR_HOVER_UNREACHABLE)
                                   && m_cursorType != ADVMGR_CURSOR_ROUTE
-                                  && (!(hoverCellLocal->triggerType & ADVMGR_TRIGGER_ACTION_FLAG)
+                                  && (!(hoverCellLocal->m_triggerType & ADVMGR_TRIGGER_ACTION_FLAG)
                                       || !StopOnTrigger(hoverCellLocal))
                                   && (gpMouseManager->SetPointer(
                                           pointerBaseCursor + ADVMGR_POINTER_ATTACK
                                       ),
                                       1))) {
-                                if (hoverCellLocal->triggerType & ADVMGR_TRIGGER_ACTION_FLAG) {
+                                if (hoverCellLocal->m_triggerType & ADVMGR_TRIGGER_ACTION_FLAG) {
                                     if (m_cursorType != ADVMGR_CURSOR_ROUTE) {
-                                        if (giGroundToTerrain[hoverCellLocal->tile]) {
+                                        if (giGroundToTerrain[hoverCellLocal->m_terrainImageIndex]) {
                                             gpMouseManager->SetPointer(
                                                 pointerBaseCursor + ADVMGR_POINTER_ACTION
                                             );
-                                        } else if (hoverCellLocal->triggerType
+                                        } else if (hoverCellLocal->m_triggerType
                                                    == ADVMGR_HOVER_SHIPWRECK_TRIGGER) {
                                             gpMouseManager->SetPointer(
                                                 pointerBaseCursor + ADVMGR_POINTER_ACTION
@@ -1665,7 +1665,7 @@ int advManager::ProcessHover(int mouseX, int mouseY) {
                                             break;
                                         }
                                     } else {
-                                        if (!giGroundToTerrain[hoverCellLocal->tile]) {
+                                        if (!giGroundToTerrain[hoverCellLocal->m_terrainImageIndex]) {
                                             gpMouseManager->SetPointer(
                                                 routeDaysCount + ADVMGR_POINTER_WATER_ACTION
                                             );
@@ -2107,166 +2107,166 @@ void advManager::DrawCell(int mapX, int mapY, int screenX, int screenY,
         }
     } else {
         if (drawMask & ADVMGR_DRAW_GROUND) {
-            s_drawGroundTile = s_drawCell->field8;
+            s_drawGroundTile = s_drawCell->m_flags;
             s_drawGroundTile <<= 14;
-            s_drawGroundTile |= s_drawCell->tile;
+            s_drawGroundTile |= s_drawCell->m_terrainImageIndex;
             TileToBitmap(m_groundTiles, s_drawGroundTile, gpWindowManager->m_screen,
                          s_drawPixelX, s_drawPixelY);
 
-            if (s_drawCell->w4a &&
-                (gbDrawingPuzzle == 0 || s_drawCell->objTileset != 56 ||
-                 s_drawCell->objIndex != 140) &&
-                (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawCell->objTileset])) {
-                IconToBitmap(m_objectIcons[s_drawCell->objTileset], gpWindowManager->m_screen,
-                             s_drawPixelX, s_drawPixelY, s_drawCell->objIndex,
+            if (s_drawCell->m_objectLayerBit0 &&
+                (gbDrawingPuzzle == 0 || s_drawCell->m_objectTileset != 56 ||
+                 s_drawCell->m_objectIndex != 140) &&
+                (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawCell->m_objectTileset])) {
+                IconToBitmap(m_objectIcons[s_drawCell->m_objectTileset], gpWindowManager->m_screen,
+                             s_drawPixelX, s_drawPixelY, s_drawCell->m_objectIndex,
                              0, 0, 0, ADVMGR_DRAW_CLIP_WIDTH, ADVMGR_DRAW_CLIP_HEIGHT, 0);
-                if (s_drawCell->objFlag0) {
+                if (s_drawCell->m_animatedObject) {
                     s_drawAnimationLength =
-                        GetIconEntry(m_objectIcons[s_drawCell->objTileset],
-                                     s_drawCell->objIndex)->flags;
-                    IconToBitmap(m_objectIcons[s_drawCell->objTileset], gpWindowManager->m_screen,
+                        GetIconEntry(m_objectIcons[s_drawCell->m_objectTileset],
+                                     s_drawCell->m_objectIndex)->flags;
+                    IconToBitmap(m_objectIcons[s_drawCell->m_objectTileset], gpWindowManager->m_screen,
                                  s_drawPixelX, s_drawPixelY,
-                                 m_updateMaxY % s_drawAnimationLength + s_drawCell->objIndex + 1,
+                                 m_updateMaxY % s_drawAnimationLength + s_drawCell->m_objectIndex + 1,
                                  0, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
                                  ADVMGR_DRAW_CLIP_HEIGHT, 0);
                 }
             }
 
-            if (s_drawCell->extra != 0 &&
-                m_mapData->Extra(s_drawCell->extra)->objIndex != 0xff)
-                s_drawExtra = m_mapData->Extra(s_drawCell->extra);
+            if (s_drawCell->m_extraIndex != 0 &&
+                m_mapData->Extra(s_drawCell->m_extraIndex)->objectIndex != 0xff)
+                s_drawExtra = m_mapData->Extra(s_drawCell->m_extraIndex);
             else
                 s_drawExtra = 0;
             while (s_drawExtra != 0) {
-                if (s_drawExtra->f4a &&
-                    (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawExtra->objTileset])) {
-                    IconToBitmap(m_objectIcons[s_drawExtra->objTileset],
+                if (s_drawExtra->objectLayerBit0 &&
+                    (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawExtra->objectTileset])) {
+                    IconToBitmap(m_objectIcons[s_drawExtra->objectTileset],
                                  gpWindowManager->m_screen, s_drawPixelX, s_drawPixelY,
-                                 s_drawExtra->objIndex, 0, 0, 0,
+                                 s_drawExtra->objectIndex, 0, 0, 0,
                                  ADVMGR_DRAW_CLIP_WIDTH, ADVMGR_DRAW_CLIP_HEIGHT, 0);
-                    if (s_drawExtra->objFlag) {
+                    if (s_drawExtra->animatedObject) {
                         s_drawAnimationLength =
-                            GetIconEntry(m_objectIcons[s_drawExtra->objTileset],
-                                         s_drawExtra->objIndex)->flags;
-                        IconToBitmap(m_objectIcons[s_drawExtra->objTileset],
+                            GetIconEntry(m_objectIcons[s_drawExtra->objectTileset],
+                                         s_drawExtra->objectIndex)->flags;
+                        IconToBitmap(m_objectIcons[s_drawExtra->objectTileset],
                                      gpWindowManager->m_screen, s_drawPixelX, s_drawPixelY,
                                      m_updateMaxY % s_drawAnimationLength +
-                                         s_drawExtra->objIndex + 1,
+                                         s_drawExtra->objectIndex + 1,
                                      0, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
                                      ADVMGR_DRAW_CLIP_HEIGHT, 0);
                     }
                 }
-                if (s_drawExtra->index != 0 &&
-                    m_mapData->Extra(s_drawExtra->index)->objIndex != 0xff)
-                    s_drawExtra = m_mapData->Extra(s_drawExtra->index);
+                if (s_drawExtra->nextIndex != 0 &&
+                    m_mapData->Extra(s_drawExtra->nextIndex)->objectIndex != 0xff)
+                    s_drawExtra = m_mapData->Extra(s_drawExtra->nextIndex);
                 else
                     s_drawExtra = 0;
             }
 
-            if (s_drawCell->w4b && !s_drawCell->w4a &&
-                (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawCell->objTileset])) {
-                IconToBitmap(m_objectIcons[s_drawCell->objTileset], gpWindowManager->m_screen,
-                             s_drawPixelX, s_drawPixelY, s_drawCell->objIndex,
+            if (s_drawCell->m_objectLayerBit1 && !s_drawCell->m_objectLayerBit0 &&
+                (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawCell->m_objectTileset])) {
+                IconToBitmap(m_objectIcons[s_drawCell->m_objectTileset], gpWindowManager->m_screen,
+                             s_drawPixelX, s_drawPixelY, s_drawCell->m_objectIndex,
                              0, 0, 0, ADVMGR_DRAW_CLIP_WIDTH, ADVMGR_DRAW_CLIP_HEIGHT, 0);
-                if (s_drawCell->objFlag0) {
+                if (s_drawCell->m_animatedObject) {
                     s_drawAnimationLength =
-                        GetIconEntry(m_objectIcons[s_drawCell->objTileset],
-                                     s_drawCell->objIndex)->flags;
-                    IconToBitmap(m_objectIcons[s_drawCell->objTileset], gpWindowManager->m_screen,
+                        GetIconEntry(m_objectIcons[s_drawCell->m_objectTileset],
+                                     s_drawCell->m_objectIndex)->flags;
+                    IconToBitmap(m_objectIcons[s_drawCell->m_objectTileset], gpWindowManager->m_screen,
                                  s_drawPixelX, s_drawPixelY,
-                                 m_updateMaxY % s_drawAnimationLength + s_drawCell->objIndex + 1,
+                                 m_updateMaxY % s_drawAnimationLength + s_drawCell->m_objectIndex + 1,
                                  0, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
                                  ADVMGR_DRAW_CLIP_HEIGHT, 0);
                 }
             }
 
-            if (s_drawCell->extra != 0 &&
-                m_mapData->Extra(s_drawCell->extra)->objIndex != 0xff)
-                s_drawExtra = m_mapData->Extra(s_drawCell->extra);
+            if (s_drawCell->m_extraIndex != 0 &&
+                m_mapData->Extra(s_drawCell->m_extraIndex)->objectIndex != 0xff)
+                s_drawExtra = m_mapData->Extra(s_drawCell->m_extraIndex);
             else
                 s_drawExtra = 0;
             while (s_drawExtra != 0) {
-                if (s_drawExtra->f4b && !s_drawExtra->f4a &&
-                    (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawExtra->objTileset])) {
-                    IconToBitmap(m_objectIcons[s_drawExtra->objTileset],
+                if (s_drawExtra->objectLayerBit1 && !s_drawExtra->objectLayerBit0 &&
+                    (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawExtra->objectTileset])) {
+                    IconToBitmap(m_objectIcons[s_drawExtra->objectTileset],
                                  gpWindowManager->m_screen, s_drawPixelX, s_drawPixelY,
-                                 s_drawExtra->objIndex, 0, 0, 0,
+                                 s_drawExtra->objectIndex, 0, 0, 0,
                                  ADVMGR_DRAW_CLIP_WIDTH, ADVMGR_DRAW_CLIP_HEIGHT, 0);
-                    if (s_drawExtra->objFlag) {
+                    if (s_drawExtra->animatedObject) {
                         s_drawAnimationLength =
-                            GetIconEntry(m_objectIcons[s_drawExtra->objTileset],
-                                         s_drawExtra->objIndex)->flags;
-                        IconToBitmap(m_objectIcons[s_drawExtra->objTileset],
+                            GetIconEntry(m_objectIcons[s_drawExtra->objectTileset],
+                                         s_drawExtra->objectIndex)->flags;
+                        IconToBitmap(m_objectIcons[s_drawExtra->objectTileset],
                                      gpWindowManager->m_screen, s_drawPixelX, s_drawPixelY,
                                      m_updateMaxY % s_drawAnimationLength +
-                                         s_drawExtra->objIndex + 1,
+                                         s_drawExtra->objectIndex + 1,
                                      0, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
                                      ADVMGR_DRAW_CLIP_HEIGHT, 0);
                     }
                 }
-                if (s_drawExtra->index != 0 &&
-                    m_mapData->Extra(s_drawExtra->index)->objIndex != 0xff)
-                    s_drawExtra = m_mapData->Extra(s_drawExtra->index);
+                if (s_drawExtra->nextIndex != 0 &&
+                    m_mapData->Extra(s_drawExtra->nextIndex)->objectIndex != 0xff)
+                    s_drawExtra = m_mapData->Extra(s_drawExtra->nextIndex);
                 else
                     s_drawExtra = 0;
             }
         }
 
         if (drawMask & ADVMGR_DRAW_OBJECT) {
-            if (s_drawCell->objIndex != 0xff && !s_drawCell->w4a &&
-                !s_drawCell->w4b && !s_drawCell->w4c &&
-                s_drawCell->objTileset != ADVMGR_TILESET_MINE &&
-                (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawCell->objTileset])) {
-                IconToBitmap(m_objectIcons[s_drawCell->objTileset], gpWindowManager->m_screen,
-                             s_drawPixelX, s_drawPixelY, s_drawCell->objIndex,
+            if (s_drawCell->m_objectIndex != 0xff && !s_drawCell->m_objectLayerBit0 &&
+                !s_drawCell->m_objectLayerBit1 && !s_drawCell->m_unknownObjectFlag &&
+                s_drawCell->m_objectTileset != ADVMGR_TILESET_MINE &&
+                (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawCell->m_objectTileset])) {
+                IconToBitmap(m_objectIcons[s_drawCell->m_objectTileset], gpWindowManager->m_screen,
+                             s_drawPixelX, s_drawPixelY, s_drawCell->m_objectIndex,
                              0, 0, 0, ADVMGR_DRAW_CLIP_WIDTH, ADVMGR_DRAW_CLIP_HEIGHT, 0);
-                if (s_drawCell->objFlag0) {
+                if (s_drawCell->m_animatedObject) {
                     s_drawAnimationLength =
-                        GetIconEntry(m_objectIcons[s_drawCell->objTileset],
-                                     s_drawCell->objIndex)->flags;
+                        GetIconEntry(m_objectIcons[s_drawCell->m_objectTileset],
+                                     s_drawCell->m_objectIndex)->flags;
                     animFrame = m_updateMaxY % s_drawAnimationLength;
-                    if (s_drawCell->triggerType == 0xdf) {
-                        if (s_drawCell->w4hi != 0)
+                    if (s_drawCell->m_triggerType == 0xdf) {
+                        if (s_drawCell->m_objectMetadata != 0)
                             animFrame = m_updateMaxY % (s_drawAnimationLength - 1);
                         else
                             animFrame = s_drawAnimationLength - 1;
                     }
-                    IconToBitmap(m_objectIcons[s_drawCell->objTileset], gpWindowManager->m_screen,
+                    IconToBitmap(m_objectIcons[s_drawCell->m_objectTileset], gpWindowManager->m_screen,
                                  s_drawPixelX, s_drawPixelY,
-                                 animFrame + s_drawCell->objIndex + 1,
+                                 animFrame + s_drawCell->m_objectIndex + 1,
                                  0, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
                                  ADVMGR_DRAW_CLIP_HEIGHT, 0);
                 }
             }
 
-            if (s_drawCell->extra != 0 &&
-                m_mapData->Extra(s_drawCell->extra)->objIndex != 0xff)
-                s_drawExtra = m_mapData->Extra(s_drawCell->extra);
+            if (s_drawCell->m_extraIndex != 0 &&
+                m_mapData->Extra(s_drawCell->m_extraIndex)->objectIndex != 0xff)
+                s_drawExtra = m_mapData->Extra(s_drawCell->m_extraIndex);
             else
                 s_drawExtra = 0;
             while (s_drawExtra != 0) {
-                if (!s_drawExtra->f4a && !s_drawExtra->f4b && !s_drawExtra->f4c &&
-                    s_drawExtra->objTileset != ADVMGR_TILESET_MINE &&
-                    (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawExtra->objTileset])) {
-                    IconToBitmap(m_objectIcons[s_drawExtra->objTileset],
+                if (!s_drawExtra->objectLayerBit0 && !s_drawExtra->objectLayerBit1 && !s_drawExtra->unknownObjectFlag &&
+                    s_drawExtra->objectTileset != ADVMGR_TILESET_MINE &&
+                    (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawExtra->objectTileset])) {
+                    IconToBitmap(m_objectIcons[s_drawExtra->objectTileset],
                                  gpWindowManager->m_screen, s_drawPixelX, s_drawPixelY,
-                                 s_drawExtra->objIndex, 0, 0, 0,
+                                 s_drawExtra->objectIndex, 0, 0, 0,
                                  ADVMGR_DRAW_CLIP_WIDTH, ADVMGR_DRAW_CLIP_HEIGHT, 0);
-                    if (s_drawExtra->objFlag) {
+                    if (s_drawExtra->animatedObject) {
                         s_drawAnimationLength =
-                            GetIconEntry(m_objectIcons[s_drawExtra->objTileset],
-                                         s_drawExtra->objIndex)->flags;
-                        IconToBitmap(m_objectIcons[s_drawExtra->objTileset],
+                            GetIconEntry(m_objectIcons[s_drawExtra->objectTileset],
+                                         s_drawExtra->objectIndex)->flags;
+                        IconToBitmap(m_objectIcons[s_drawExtra->objectTileset],
                                      gpWindowManager->m_screen, s_drawPixelX, s_drawPixelY,
                                      m_updateMaxY % s_drawAnimationLength +
-                                         s_drawExtra->objIndex + 1,
+                                         s_drawExtra->objectIndex + 1,
                                      0, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
                                      ADVMGR_DRAW_CLIP_HEIGHT, 0);
                     }
                 }
-                if (s_drawExtra->index != 0 &&
-                    m_mapData->Extra(s_drawExtra->index)->objIndex != 0xff)
-                    s_drawExtra = m_mapData->Extra(s_drawExtra->index);
+                if (s_drawExtra->nextIndex != 0 &&
+                    m_mapData->Extra(s_drawExtra->nextIndex)->objectIndex != 0xff)
+                    s_drawExtra = m_mapData->Extra(s_drawExtra->nextIndex);
                 else
                     s_drawExtra = 0;
             }
@@ -2280,8 +2280,8 @@ void advManager::DrawCell(int mapX, int mapY, int screenX, int screenY,
             if (drawMask & ADVMGR_DRAW_HERO) {
                 if (mapX > 0) {
                     s_drawAdjacentCell = GetCell(mapX - 1, mapY);
-                    if (s_drawAdjacentCell->triggerType == ADVMGR_MONSTER_TRIGGER) {
-                        s_drawMine = &gpGame->m_mines[s_drawAdjacentCell->w4hi];
+                    if (s_drawAdjacentCell->m_triggerType == ADVMGR_MONSTER_TRIGGER) {
+                        s_drawMine = &gpGame->m_mines[s_drawAdjacentCell->m_objectMetadata];
                         if (s_drawMine->guardianType == 59) {
                             IconToBitmap(m_objectIcons[ADVMGR_MINE_GUARDIAN_ICON_SLOT],
                                          gpWindowManager->m_screen,
@@ -2300,47 +2300,47 @@ void advManager::DrawCell(int mapX, int mapY, int screenX, int screenY,
                     }
                 }
 
-                if (s_drawCell->objTileset == ADVMGR_TILESET_MINE) {
+                if (s_drawCell->m_objectTileset == ADVMGR_TILESET_MINE) {
                     if (m_lastQuickViewX == mapX && m_lastQuickViewY == mapY) {
                         IconToBitmap(m_objectIcons[ADVMGR_TILESET_MONSTER],
                                      gpWindowManager->m_screen,
                                      s_drawPixelX + 16, s_drawPixelY + 30,
                                      (8 - (m_field_0x2ba == 0)) +
-                                         s_drawCell->objIndex * 9,
+                                         s_drawCell->m_objectIndex * 9,
                                      1, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
                                      ADVMGR_DRAW_CLIP_HEIGHT, 0);
                     } else {
                         IconToBitmap(m_objectIcons[ADVMGR_TILESET_MONSTER],
                                      gpWindowManager->m_screen,
                                      s_drawPixelX + 16, s_drawPixelY + 30,
-                                     s_drawCell->objIndex * 9,
+                                     s_drawCell->m_objectIndex * 9,
                                      1, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
                                      ADVMGR_DRAW_CLIP_HEIGHT, 0);
-                        if (s_drawCell->objIndex == 59 || s_drawCell->objIndex == 60)
+                        if (s_drawCell->m_objectIndex == 59 || s_drawCell->m_objectIndex == 60)
                             s_drawMonsterFrame = m_viewBounds[mapX & 3] % 6;
                         else
                             s_drawMonsterFrame = monAnimDrawFrame[m_viewBounds[mapX & 3]];
                         IconToBitmap(m_objectIcons[ADVMGR_TILESET_MONSTER],
                                      gpWindowManager->m_screen,
                                      s_drawPixelX + 16, s_drawPixelY + 30,
-                                     s_drawCell->objIndex * 9 + s_drawMonsterFrame + 1,
+                                     s_drawCell->m_objectIndex * 9 + s_drawMonsterFrame + 1,
                                      1, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
                                      ADVMGR_DRAW_CLIP_HEIGHT, 0);
                     }
                 }
             }
 
-            if (s_drawCell->triggerType == ADVMGR_BOAT_TRIGGER) {
+            if (s_drawCell->m_triggerType == ADVMGR_BOAT_TRIGGER) {
                 s_drawPlayerColor = -1;
                 s_drawHeroType = ADVMGR_HERO_TYPE_BOAT;
                 s_drawHeroFrame = GetCursorBaseFrame(
-                    gpGame->m_boats[s_drawCell->w4hi].direction);
+                    gpGame->m_boats[s_drawCell->m_objectMetadata].direction);
                 s_drawHasHero = 1;
                 s_drawHeroYOffset = -10;
             } else {
                 s_drawHeroYOffset = 0;
-                if (s_drawCell->triggerType == ADVMGR_HERO_TRIGGER) {
-                    s_drawHero = gpGame->GetHero(s_drawCell->w4hi);
+                if (s_drawCell->m_triggerType == ADVMGR_HERO_TRIGGER) {
+                    s_drawHero = gpGame->GetHero(s_drawCell->m_objectMetadata);
                     s_drawPlayerColor =
                         gpGame->m_players[s_drawHero->m_owner].m_color;
                     if (s_drawHero->m_eventFlags & 0x80)
@@ -2400,7 +2400,7 @@ void advManager::DrawCell(int mapX, int mapY, int screenX, int screenY,
                         }
                     } else {
                         if (s_drawHeroType == ADVMGR_HERO_TYPE_BOAT &&
-                            (s_drawCell->field8 & 4) == 0) {
+                            (s_drawCell->m_flags & 4) == 0) {
                             FlipIconToBitmap(m_heroIcons[7], gpWindowManager->m_screen,
                                              s_drawPixelX + 32,
                                              s_drawPixelY + 31 + s_drawHeroYOffset,
@@ -2457,7 +2457,7 @@ void advManager::DrawCell(int mapX, int mapY, int screenX, int screenY,
                         }
                     } else {
                         if (s_drawHeroType == ADVMGR_HERO_TYPE_BOAT &&
-                            (s_drawCell->field8 & 4) == 0) {
+                            (s_drawCell->m_flags & 4) == 0) {
                             IconToBitmap(m_heroIcons[7], gpWindowManager->m_screen,
                                          s_drawPixelX,
                                          s_drawPixelY + 31 + s_drawHeroYOffset,
@@ -2494,7 +2494,7 @@ void advManager::DrawCell(int mapX, int mapY, int screenX, int screenY,
                 }
             }
 
-            if (m_cursorActive != 0 && (s_drawCell->field8 & 0x40) != 0 &&
+            if (m_cursorActive != 0 && (s_drawCell->m_flags & 0x40) != 0 &&
                 (m_comboHeroDrawn == 0 || (drawMask & ADVMGR_DRAW_HERO_SHADOW)) &&
                 m_mapOriginX + 7 == mapX && m_mapOriginY + 7 == mapY) {
                 if (drawMask & ADVMGR_DRAW_HERO_SHADOW) {
@@ -2509,107 +2509,107 @@ void advManager::DrawCell(int mapX, int mapY, int screenX, int screenY,
 
         if ((drawMask & ADVMGR_DRAW_OVERLAY) ||
             (drawMask & ADVMGR_DRAW_OVERLAY_TOP)) {
-            if ((drawMask & ADVMGR_DRAW_OVERLAY) && s_drawCell->objIndex != 0xff &&
-                s_drawCell->w4c &&
-                (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawCell->objTileset])) {
-                IconToBitmap(m_objectIcons[s_drawCell->objTileset], gpWindowManager->m_screen,
-                             s_drawPixelX, s_drawPixelY, s_drawCell->objIndex,
+            if ((drawMask & ADVMGR_DRAW_OVERLAY) && s_drawCell->m_objectIndex != 0xff &&
+                s_drawCell->m_unknownObjectFlag &&
+                (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawCell->m_objectTileset])) {
+                IconToBitmap(m_objectIcons[s_drawCell->m_objectTileset], gpWindowManager->m_screen,
+                             s_drawPixelX, s_drawPixelY, s_drawCell->m_objectIndex,
                              0, 0, 0, ADVMGR_DRAW_CLIP_WIDTH, ADVMGR_DRAW_CLIP_HEIGHT, 0);
-                if (s_drawCell->objFlag0) {
+                if (s_drawCell->m_animatedObject) {
                     s_drawAnimationLength =
-                        GetIconEntry(m_objectIcons[s_drawCell->objTileset],
-                                     s_drawCell->objIndex)->flags;
-                    IconToBitmap(m_objectIcons[s_drawCell->objTileset], gpWindowManager->m_screen,
+                        GetIconEntry(m_objectIcons[s_drawCell->m_objectTileset],
+                                     s_drawCell->m_objectIndex)->flags;
+                    IconToBitmap(m_objectIcons[s_drawCell->m_objectTileset], gpWindowManager->m_screen,
                                  s_drawPixelX, s_drawPixelY,
-                                 s_drawCell->objIndex + m_updateMaxY % s_drawAnimationLength + 1,
+                                 s_drawCell->m_objectIndex + m_updateMaxY % s_drawAnimationLength + 1,
                                  0, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
                                  ADVMGR_DRAW_CLIP_HEIGHT, 0);
                 }
             }
 
-            if (s_drawCell->extra != 0 &&
-                m_mapData->Extra(s_drawCell->extra)->objIndex != 0xff)
-                s_drawExtra = m_mapData->Extra(s_drawCell->extra);
+            if (s_drawCell->m_extraIndex != 0 &&
+                m_mapData->Extra(s_drawCell->m_extraIndex)->objectIndex != 0xff)
+                s_drawExtra = m_mapData->Extra(s_drawCell->m_extraIndex);
             else
                 s_drawExtra = 0;
             while (s_drawExtra != 0) {
-                if (s_drawExtra->f4c &&
-                    (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawExtra->objTileset])) {
-                    IconToBitmap(m_objectIcons[s_drawExtra->objTileset],
+                if (s_drawExtra->unknownObjectFlag &&
+                    (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawExtra->objectTileset])) {
+                    IconToBitmap(m_objectIcons[s_drawExtra->objectTileset],
                                  gpWindowManager->m_screen, s_drawPixelX, s_drawPixelY,
-                                 s_drawExtra->objIndex, 0, 0, 0,
+                                 s_drawExtra->objectIndex, 0, 0, 0,
                                  ADVMGR_DRAW_CLIP_WIDTH, ADVMGR_DRAW_CLIP_HEIGHT, 0);
-                    if (s_drawExtra->objFlag) {
+                    if (s_drawExtra->animatedObject) {
                         s_drawAnimationLength =
-                            GetIconEntry(m_objectIcons[s_drawExtra->objTileset],
-                                         s_drawExtra->objIndex)->flags;
-                        IconToBitmap(m_objectIcons[s_drawExtra->objTileset],
+                            GetIconEntry(m_objectIcons[s_drawExtra->objectTileset],
+                                         s_drawExtra->objectIndex)->flags;
+                        IconToBitmap(m_objectIcons[s_drawExtra->objectTileset],
                                      gpWindowManager->m_screen, s_drawPixelX, s_drawPixelY,
-                                     s_drawExtra->objIndex +
+                                     s_drawExtra->objectIndex +
                                          m_updateMaxY % s_drawAnimationLength + 1,
                                      0, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
                                      ADVMGR_DRAW_CLIP_HEIGHT, 0);
                     }
                 }
-                if (s_drawExtra->index != 0 &&
-                    m_mapData->Extra(s_drawExtra->index)->objIndex != 0xff)
-                    s_drawExtra = m_mapData->Extra(s_drawExtra->index);
+                if (s_drawExtra->nextIndex != 0 &&
+                    m_mapData->Extra(s_drawExtra->nextIndex)->objectIndex != 0xff)
+                    s_drawExtra = m_mapData->Extra(s_drawExtra->nextIndex);
                 else
                     s_drawExtra = 0;
             }
 
-            if (s_drawCell->ovlIndex != 0xff &&
-                (((drawMask & ADVMGR_DRAW_OVERLAY) && !s_drawCell->ovlFlag1) ||
-                 ((drawMask & ADVMGR_DRAW_OVERLAY_TOP) && s_drawCell->ovlFlag1)) &&
-                (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawCell->ovlTileset])) {
-                IconToBitmap(m_objectIcons[s_drawCell->ovlTileset], gpWindowManager->m_screen,
-                             s_drawPixelX, s_drawPixelY, s_drawCell->ovlIndex,
-                             s_drawCell->ovlTileset == 14, 0, 0,
+            if (s_drawCell->m_overlayIndex != 0xff &&
+                (((drawMask & ADVMGR_DRAW_OVERLAY) && !s_drawCell->m_drawOverlayOnTop) ||
+                 ((drawMask & ADVMGR_DRAW_OVERLAY_TOP) && s_drawCell->m_drawOverlayOnTop)) &&
+                (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawCell->m_overlayTileset])) {
+                IconToBitmap(m_objectIcons[s_drawCell->m_overlayTileset], gpWindowManager->m_screen,
+                             s_drawPixelX, s_drawPixelY, s_drawCell->m_overlayIndex,
+                             s_drawCell->m_overlayTileset == 14, 0, 0,
                              ADVMGR_DRAW_CLIP_WIDTH, ADVMGR_DRAW_CLIP_HEIGHT, 0);
-                if (s_drawCell->ovlFlag0) {
+                if (s_drawCell->m_animatedOverlay) {
                     s_drawAnimationLength =
-                        GetIconEntry(m_objectIcons[s_drawCell->ovlTileset],
-                                     s_drawCell->ovlIndex)->flags;
-                    IconToBitmap(m_objectIcons[s_drawCell->ovlTileset],
+                        GetIconEntry(m_objectIcons[s_drawCell->m_overlayTileset],
+                                     s_drawCell->m_overlayIndex)->flags;
+                    IconToBitmap(m_objectIcons[s_drawCell->m_overlayTileset],
                                  gpWindowManager->m_screen, s_drawPixelX, s_drawPixelY,
-                                 m_updateMaxY % s_drawAnimationLength + s_drawCell->ovlIndex + 1,
+                                 m_updateMaxY % s_drawAnimationLength + s_drawCell->m_overlayIndex + 1,
                                  0, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
                                  ADVMGR_DRAW_CLIP_HEIGHT, 0);
                 }
             }
 
-            if (s_drawCell->extra != 0 &&
-                m_mapData->Extra(s_drawCell->extra)->ovlIndex != 0xff)
-                s_drawExtra = m_mapData->Extra(s_drawCell->extra);
+            if (s_drawCell->m_extraIndex != 0 &&
+                m_mapData->Extra(s_drawCell->m_extraIndex)->overlayIndex != 0xff)
+                s_drawExtra = m_mapData->Extra(s_drawCell->m_extraIndex);
             else
                 s_drawExtra = 0;
             while (s_drawExtra != 0) {
-                if (((drawMask & ADVMGR_DRAW_OVERLAY) && !s_drawExtra->ovlFlag1) ||
-                    ((drawMask & ADVMGR_DRAW_OVERLAY_TOP) && s_drawExtra->ovlFlag1)) {
-                    if (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawExtra->ovlTileset]) {
-                        IconToBitmap(m_objectIcons[s_drawExtra->ovlTileset],
+                if (((drawMask & ADVMGR_DRAW_OVERLAY) && !s_drawExtra->drawOverlayOnTop) ||
+                    ((drawMask & ADVMGR_DRAW_OVERLAY_TOP) && s_drawExtra->drawOverlayOnTop)) {
+                    if (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawExtra->overlayTileset]) {
+                        IconToBitmap(m_objectIcons[s_drawExtra->overlayTileset],
                                      gpWindowManager->m_screen, s_drawPixelX, s_drawPixelY,
-                                     s_drawExtra->ovlIndex,
-                                     s_drawExtra->ovlTileset == 14, 0, 0,
+                                     s_drawExtra->overlayIndex,
+                                     s_drawExtra->overlayTileset == 14, 0, 0,
                                      ADVMGR_DRAW_CLIP_WIDTH,
                                      ADVMGR_DRAW_CLIP_HEIGHT, 0);
-                        if (s_drawExtra->ovlFlag0) {
+                        if (s_drawExtra->animatedOverlay) {
                             s_drawAnimationLength =
-                                GetIconEntry(m_objectIcons[s_drawExtra->ovlTileset],
-                                             s_drawExtra->ovlIndex)->flags;
-                            IconToBitmap(m_objectIcons[s_drawExtra->ovlTileset],
+                                GetIconEntry(m_objectIcons[s_drawExtra->overlayTileset],
+                                             s_drawExtra->overlayIndex)->flags;
+                            IconToBitmap(m_objectIcons[s_drawExtra->overlayTileset],
                                          gpWindowManager->m_screen,
                                          s_drawPixelX, s_drawPixelY,
                                          m_updateMaxY % s_drawAnimationLength +
-                                             s_drawExtra->ovlIndex + 1,
+                                             s_drawExtra->overlayIndex + 1,
                                          0, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
                                          ADVMGR_DRAW_CLIP_HEIGHT, 0);
                         }
                     }
                 }
-                if (s_drawExtra->index != 0 &&
-                    m_mapData->Extra(s_drawExtra->index)->ovlIndex != 0xff)
-                    s_drawExtra = m_mapData->Extra(s_drawExtra->index);
+                if (s_drawExtra->nextIndex != 0 &&
+                    m_mapData->Extra(s_drawExtra->nextIndex)->overlayIndex != 0xff)
+                    s_drawExtra = m_mapData->Extra(s_drawExtra->nextIndex);
                 else
                     s_drawExtra = 0;
             }
@@ -2750,14 +2750,14 @@ void advManager::UpdateRadar(int updateScreen, int partial)
                 radarColorValue = ADVMGR_RADAR_UNSEEN_COLOR;
             } else {
                 cellValue = &m_mapData->Row(mapRow)[mapColumnLimit];
-                if ((cellValue->field8 & 0x40) != 0 &&
+                if ((cellValue->m_flags & 0x40) != 0 &&
                     m_mapOriginX + ADVMGR_RADAR_CURRENT_CELL == mapColumnLimit &&
                     m_mapOriginY + ADVMGR_RADAR_CURRENT_CELL == mapRow) {
                     radarColorValue = gOwnerColors[gpGame->m_players[giCurPlayer].m_color];
                 } else {
-                    if ((cellValue->triggerType & ADVMGR_TRIGGER_TYPE_MASK) ==
+                    if ((cellValue->m_triggerType & ADVMGR_TRIGGER_TYPE_MASK) ==
                         ADVMGR_RADAR_TOWN_TRIGGER) {
-                        ownerIndexValue = gpGame->m_availableHeroes[cellValue->w4hi];
+                        ownerIndexValue = gpGame->m_availableHeroes[cellValue->m_objectMetadata];
                         if (!(giCurPlayer != ownerIndexValue)) {
                             int ownerColorIndex;
                             if (ownerIndexValue >= 0)
@@ -2768,34 +2768,34 @@ void advManager::UpdateRadar(int updateScreen, int partial)
                         }
                     } else {
                         objectTilesetLocal = static_cast<unsigned int>(-1);
-                        if (cellValue->objIndex != 0xff) {
-                            objectTilesetLocal = cellValue->objTileset;
-                        } else if (cellValue->ovlIndex != 0xff) {
-                            objectTilesetLocal = cellValue->ovlTileset;
+                        if (cellValue->m_objectIndex != 0xff) {
+                            objectTilesetLocal = cellValue->m_objectTileset;
+                        } else if (cellValue->m_overlayIndex != 0xff) {
+                            objectTilesetLocal = cellValue->m_overlayTileset;
                         }
 
-                        if (cellValue->triggerType == ADVMGR_RADAR_TOWN_TILESET_1 ||
+                        if (cellValue->m_triggerType == ADVMGR_RADAR_TOWN_TILESET_1 ||
                             (objectTilesetLocal == 14 && mapColumnLimit > 0 &&
                              mapColumnLimit < MAP_WIDTH - 1 &&
-                             m_mapData->Row(mapRow)[mapColumnLimit - 1].triggerType ==
+                             m_mapData->Row(mapRow)[mapColumnLimit - 1].m_triggerType ==
                                  ADVMGR_RADAR_NEIGHBOR_TRIGGER) ||
-                            m_mapData->Row(mapRow)[mapColumnLimit + 1].triggerType ==
+                            m_mapData->Row(mapRow)[mapColumnLimit + 1].m_triggerType ==
                                 ADVMGR_RADAR_NEIGHBOR_TRIGGER) {
                             objectTilesetLocal = ADVMGR_RADAR_TOWN_TILESET_1;
                         }
 
                         if (objectTilesetLocal == ADVMGR_RADAR_SPECIAL_TILESET &&
-                            cellValue->triggerType == ADVMGR_RADAR_REEFS_TRIGGER) {
-                            radarColorValue = gMapColors[giGroundToTerrain[cellValue->tile]] +
+                            cellValue->m_triggerType == ADVMGR_RADAR_REEFS_TRIGGER) {
+                            radarColorValue = gMapColors[giGroundToTerrain[cellValue->m_terrainImageIndex]] +
                                 ADVMGR_RADAR_TERRAIN_SHADE;
                         } else {
                             switch (objectTilesetLocal) {
                             case ADVMGR_RADAR_TOWN_TILESET_1:
                             case ADVMGR_RADAR_TOWN_TILESET_2: {
                                 int ownerColorIndex;
-                                ownerIndexValue = gpGame->m_townOwners[cellValue->w4hi];
-                                townXValue = gpGame->GetTown(cellValue->w4hi)->m_x;
-                                townYValue = gpGame->GetTown(cellValue->w4hi)->m_y;
+                                ownerIndexValue = gpGame->m_townOwners[cellValue->m_objectMetadata];
+                                townXValue = gpGame->GetTown(cellValue->m_objectMetadata)->m_x;
+                                townYValue = gpGame->GetTown(cellValue->m_objectMetadata)->m_y;
                                 if (ownerIndexValue >= 0)
                                     ownerColorIndex = gpGame->m_players[ownerIndexValue].m_color;
                                 else
@@ -2812,11 +2812,11 @@ void advManager::UpdateRadar(int updateScreen, int partial)
                             case 0x1a: case 0x1b: case 0x1f: case 0x20:
                             case 0x21: case 0x22: case 0x2a: case 0x2b:
                             case 0x2c: case 0x31:
-                                switch (cellValue->triggerType) {
+                                switch (cellValue->m_triggerType) {
                                 case 1: case 0x17: case 0x1d:
                                 case 0x81: case 0x97: case 0x9d: {
                                     int ownerColorIndex;
-                                    ownerIndexValue = gpGame->m_mineOwners[cellValue->w4hi];
+                                    ownerIndexValue = gpGame->m_mineOwners[cellValue->m_objectMetadata];
                                     if (ownerIndexValue >= 0)
                                         ownerColorIndex = gpGame->m_players[ownerIndexValue].m_color;
                                     else
@@ -2825,18 +2825,18 @@ void advManager::UpdateRadar(int updateScreen, int partial)
                                     break;
                                 }
                                 default:
-                                    radarColorValue = gMapColors[giGroundToTerrain[cellValue->tile]] +
+                                    radarColorValue = gMapColors[giGroundToTerrain[cellValue->m_terrainImageIndex]] +
                                         ADVMGR_RADAR_TERRAIN_SHADE;
                                     break;
                                 }
                                 break;
                             default:
 radar_default_object:
-                                switch (cellValue->triggerType) {
+                                switch (cellValue->m_triggerType) {
                                 case 1: case 0x17: case 0x1d:
                                 case 0x81: case 0x97: case 0x9d: {
                                     int ownerColorIndex;
-                                    ownerIndexValue = gpGame->m_mineOwners[cellValue->w4hi];
+                                    ownerIndexValue = gpGame->m_mineOwners[cellValue->m_objectMetadata];
                                     if (ownerIndexValue >= 0)
                                         ownerColorIndex = gpGame->m_players[ownerIndexValue].m_color;
                                     else
@@ -2845,7 +2845,7 @@ radar_default_object:
                                     break;
                                 }
                                 default:
-                                    radarColorValue = gMapColors[giGroundToTerrain[cellValue->tile]];
+                                    radarColorValue = gMapColors[giGroundToTerrain[cellValue->m_terrainImageIndex]];
                                     break;
                                 }
                                 break;
@@ -3042,15 +3042,15 @@ void advManager::QuickInfo(int cellX, int cellY)
             sprintf(gText, "%s", "Uncharted Territory");
         } else {
 
-    switch (currentCell->triggerType & 0x7f) {
+    switch (currentCell->m_triggerType & 0x7f) {
     case ADVMGR_OBJECT_ARTIFACT:
         sprintf(gText, "%s", "Artifact");
         break;
     case ADVMGR_OBJECT_OBELISK:
-        if (currentCell->triggerType & 0x80) {
-            sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->triggerType & 0x7f],
+        if (currentCell->m_triggerType & 0x80) {
+            sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->m_triggerType & 0x7f],
                     (gpGame->m_obeliskVisitors[
-                         currentCell->w4hi - ADVMGR_OBELISK_INDEX_BASE] &
+                         currentCell->m_objectMetadata - ADVMGR_OBELISK_INDEX_BASE] &
                      (1u << giCurPlayer))
                         ? "(already visited)" : "(not visited)");
         } else {
@@ -3058,67 +3058,67 @@ void advManager::QuickInfo(int cellX, int cellY)
         }
         break;
     case ADVMGR_OBJECT_GAZEBO_VISIT:
-        if (heroLocal != 0 && (currentCell->triggerType & 0x80)) {
-            sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->triggerType & 0x7f],
-                    (heroLocal->m_gazeboVisits & (1u << (currentCell->w4hi & 0x1f)))
+        if (heroLocal != 0 && (currentCell->m_triggerType & 0x80)) {
+            sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->m_triggerType & 0x7f],
+                    (heroLocal->m_gazeboVisits & (1u << (currentCell->m_objectMetadata & 0x1f)))
                         ? "(already visited)" : "(not visited)");
         } else {
             goto quick_info_default;
         }
         break;
     case ADVMGR_OBJECT_FORT_VISIT:
-        if (heroLocal != 0 && (currentCell->triggerType & 0x80)) {
-            sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->triggerType & 0x7f],
-                    (heroLocal->m_fortVisits & (1u << (currentCell->w4hi & 0x1f)))
+        if (heroLocal != 0 && (currentCell->m_triggerType & 0x80)) {
+            sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->m_triggerType & 0x7f],
+                    (heroLocal->m_fortVisits & (1u << (currentCell->m_objectMetadata & 0x1f)))
                         ? "(already visited)" : "(not visited)");
         } else {
             goto quick_info_default;
         }
         break;
     case ADVMGR_OBJECT_WITCH_DOCTOR_VISIT:
-        if (heroLocal != 0 && (currentCell->triggerType & 0x80)) {
-            sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->triggerType & 0x7f],
+        if (heroLocal != 0 && (currentCell->m_triggerType & 0x80)) {
+            sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->m_triggerType & 0x7f],
                     (heroLocal->m_witchDoctorVisits &
-                     (1u << (currentCell->w4hi & 0x1f)))
+                     (1u << (currentCell->m_objectMetadata & 0x1f)))
                         ? "(already visited)" : "(not visited)");
         } else {
             goto quick_info_default;
         }
         break;
     case ADVMGR_OBJECT_MERCENARY_VISIT:
-        if (heroLocal != 0 && (currentCell->triggerType & 0x80)) {
-            sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->triggerType & 0x7f],
+        if (heroLocal != 0 && (currentCell->m_triggerType & 0x80)) {
+            sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->m_triggerType & 0x7f],
                     (heroLocal->m_mercenaryCampVisits &
-                     (1u << (currentCell->w4hi & 0x1f)))
+                     (1u << (currentCell->m_objectMetadata & 0x1f)))
                         ? "(already visited)" : "(not visited)");
         } else {
             goto quick_info_default;
         }
         break;
     case ADVMGR_OBJECT_STANDING_STONE_ALT:
-        if (heroLocal != 0 && (currentCell->triggerType & 0x80)) {
-            sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->triggerType & 0x7f],
+        if (heroLocal != 0 && (currentCell->m_triggerType & 0x80)) {
+            sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->m_triggerType & 0x7f],
                     (heroLocal->m_standingStoneVisits &
-                     (1u << (currentCell->w4hi & 0x1f)))
+                     (1u << (currentCell->m_objectMetadata & 0x1f)))
                         ? "(already visited)" : "(not visited)");
         } else {
             goto quick_info_default;
         }
         break;
     case ADVMGR_OBJECT_TREE_ALT:
-        if (heroLocal != 0 && (currentCell->triggerType & 0x80)) {
-            sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->triggerType & 0x7f],
+        if (heroLocal != 0 && (currentCell->m_triggerType & 0x80)) {
+            sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->m_triggerType & 0x7f],
                     (heroLocal->m_treeKnowledgeVisits &
-                     (1u << (currentCell->w4hi & 0x1f)))
+                     (1u << (currentCell->m_objectMetadata & 0x1f)))
                         ? "(already visited)" : "(not visited)");
         } else {
             goto quick_info_default;
         }
         break;
     case ADVMGR_OBJECT_XANADU_ALT:
-        if (heroLocal != 0 && (currentCell->triggerType & 0x80)) {
-            sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->triggerType & 0x7f],
-                    (heroLocal->m_xanaduVisits & (1u << (currentCell->w4hi & 0x1f)))
+        if (heroLocal != 0 && (currentCell->m_triggerType & 0x80)) {
+            sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->m_triggerType & 0x7f],
+                    (heroLocal->m_xanaduVisits & (1u << (currentCell->m_objectMetadata & 0x1f)))
                         ? "(already visited)" : "(not visited)");
         } else {
             goto quick_info_default;
@@ -3153,58 +3153,58 @@ void advManager::QuickInfo(int cellX, int cellY)
     case 0x1c:
     case 0x2c:
     case 0x39:
-        sprintf(gText, "%s", gTerrainNames[giGroundToTerrain[currentCell->tile]]);
+        sprintf(gText, "%s", gTerrainNames[giGroundToTerrain[currentCell->m_terrainImageIndex]]);
         break;
     case ADVMGR_OBJECT_GUARDED:
-        sprintf(gText, "%s", gQuickViewText[currentCell->triggerType & 0x7f]);
+        sprintf(gText, "%s", gQuickViewText[currentCell->m_triggerType & 0x7f]);
         goto quick_info_guarded;
     case ADVMGR_OBJECT_MINE:
-        if (gpGame->m_mines[currentCell->w4hi].guardianType != -1) {
+        if (gpGame->m_mines[currentCell->m_objectMetadata].guardianType != -1) {
             sprintf(gText, "%s %s",
-                    gResourceNames[gpGame->m_mines[currentCell->w4hi].resourceType],
+                    gResourceNames[gpGame->m_mines[currentCell->m_objectMetadata].resourceType],
                     "Mine");
 quick_info_guarded:
             sprintf(guardCaption, "\n\nguarded by %s %s",
                     GetArmySizeName(
-                        gpGame->m_mines[currentCell->w4hi].guardianCount, 2),
+                        gpGame->m_mines[currentCell->m_objectMetadata].guardianCount, 2),
                     gArmyNamesPlural[
-                        gpGame->m_mines[currentCell->w4hi].guardianType]);
+                        gpGame->m_mines[currentCell->m_objectMetadata].guardianType]);
             strcat(gText, guardCaption);
         } else {
             sprintf(gText, "%s %s",
-                    gResourceNames[gpGame->m_mines[currentCell->w4hi].resourceType],
+                    gResourceNames[gpGame->m_mines[currentCell->m_objectMetadata].resourceType],
                     "Mine");
         }
         break;
     case ADVMGR_OBJECT_RESOURCE:
         sprintf(gText, "%s", gResourceNames[
-            (currentCell->objIndex & ADVMGR_RESOURCE_FRAME_PAIR_MASK) / 2]);
+            (currentCell->m_objectIndex & ADVMGR_RESOURCE_FRAME_PAIR_MASK) / 2]);
         break;
     case ADVMGR_OBJECT_MONSTER:
         if (IsCrystalBallInEffect(m_mapOriginX + cellX, m_mapOriginY + cellY, 8)) {
-            sprintf(gText, "%d %s", currentCell->w4hi & 0xfff,
-                    gArmyNamesPlural[currentCell->objIndex]);
+            sprintf(gText, "%d %s", currentCell->m_objectMetadata & 0xfff,
+                    gArmyNamesPlural[currentCell->m_objectIndex]);
         } else {
-            sprintf(gText, "%s %s", GetArmySizeName(currentCell->w4hi & 0xfff, 1),
-                    gArmyNamesPlural[currentCell->objIndex]);
+            sprintf(gText, "%s %s", GetArmySizeName(currentCell->m_objectMetadata & 0xfff, 1),
+                    gArmyNamesPlural[currentCell->m_objectIndex]);
         }
         break;
     case ADVMGR_OBJECT_BARRIER:
     case ADVMGR_OBJECT_TENT:
-        sprintf(gText, gQuickViewText[currentCell->triggerType & 0x7f],
-                xBarrierColor[currentCell->w4hi & 7]);
+        sprintf(gText, gQuickViewText[currentCell->m_triggerType & 0x7f],
+                xBarrierColor[currentCell->m_objectMetadata & 7]);
         uppercaseResult = static_cast<char>(
             toupper(static_cast<int>(static_cast<signed char>(gText[0]))));
         gText[0] = uppercaseResult;
         break;
     case ADVMGR_OBJECT_GENERIC_SITE: {
         mapObjectKindValue = -1;
-        if (currentCell->objIndex != 0xff) {
-            siteFrameLocal[0] = currentCell->objIndex;
-            objectTilesetLocal = currentCell->objTileset;
+        if (currentCell->m_objectIndex != 0xff) {
+            siteFrameLocal[0] = currentCell->m_objectIndex;
+            objectTilesetLocal = currentCell->m_objectTileset;
         } else {
-            siteFrameLocal[0] = currentCell->ovlIndex;
-            objectTilesetLocal = currentCell->ovlTileset;
+            siteFrameLocal[0] = currentCell->m_overlayIndex;
+            objectTilesetLocal = currentCell->m_overlayTileset;
         }
         siteIndexName = -1;
         switch (objectTilesetLocal) {
@@ -3261,12 +3261,12 @@ quick_info_guarded:
         break;
     }
     case ADVMGR_OBJECT_RECRUITMENT_SITE: {
-        if (currentCell->ovlIndex == 0xff) {
-            siteFrameLocal[0] = currentCell->objIndex;
-            objectTilesetLocal = currentCell->objTileset;
+        if (currentCell->m_overlayIndex == 0xff) {
+            siteFrameLocal[0] = currentCell->m_objectIndex;
+            objectTilesetLocal = currentCell->m_objectTileset;
         } else {
-            siteFrameLocal[0] = currentCell->ovlIndex;
-            objectTilesetLocal = currentCell->ovlTileset;
+            siteFrameLocal[0] = currentCell->m_overlayIndex;
+            objectTilesetLocal = currentCell->m_overlayTileset;
         }
         siteIndexName = -1;
         switch (objectTilesetLocal) {
@@ -3294,7 +3294,7 @@ quick_info_guarded:
         break;
     }
     case ADVMGR_OBJECT_REEFS:
-        if (currentCell->objTileset == ADVMGR_SITE_TILESET_2) {
+        if (currentCell->m_objectTileset == ADVMGR_SITE_TILESET_2) {
             sprintf(gText, "Reefs");
         } else {
             goto quick_info_default;
@@ -3303,11 +3303,11 @@ quick_info_guarded:
     default:
 quick_info_default:
     if (visitedMaskValue != 0 && heroLocal != 0) {
-        sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->triggerType & 0x7f],
+        sprintf(gText, "%s\n\n%s", gQuickViewText[currentCell->m_triggerType & 0x7f],
                 (heroLocal->m_eventFlags & visitedMaskValue)
                     ? "(already visited)" : "(not visited)");
     } else {
-        sprintf(gText, "%s", gQuickViewText[currentCell->triggerType & 0x7f]);
+        sprintf(gText, "%s", gQuickViewText[currentCell->m_triggerType & 0x7f]);
     }
         break;
     }
@@ -3318,8 +3318,8 @@ quick_info_ready:
     strcpy(savedTextLocal, gText);
     if (giDebugLevel > 0 && currentCell != 0) {
         sprintf(gText, "gi%d obtile%d obi%d ot%d ei%d bl%d %s X%d Y%d",
-                currentCell->tile, currentCell->objTileset, currentCell->objIndex, currentCell->triggerType,
-                currentCell->w4hi, currentCell->field8 & 8, savedTextLocal,
+                currentCell->m_terrainImageIndex, currentCell->m_objectTileset, currentCell->m_objectIndex, currentCell->m_triggerType,
+                currentCell->m_objectMetadata, currentCell->m_flags & 8, savedTextLocal,
                 m_mapOriginX + cellX, m_mapOriginY + cellY);
     }
     message.type = 0x200;
@@ -4739,7 +4739,7 @@ void advManager::MobilizeCurrHero(int update)
 // stores it; ours emits the equivalent OR dword ptr [hero+0xe3],0x80. The 0xc
 // frame and all three slots, CFG, remaining instructions, and all 7 relocation
 // targets agree. Both `|=` and explicit `= HERO_EVENT_EMBARKED | m_eventFlags`
-// collapse to the memory OR; w4hi bitfield assignment fixed the other residual.
+// collapse to the memory OR; m_objectMetadata bitfield assignment fixed the other residual.
 // Revisit with specific new evidence or after the SOURCE placeholder census is
 // zero.
 VA(0x00463f95, 0x16c)
@@ -4754,14 +4754,14 @@ void advManager::DemobilizeCurrHero(void)
     hero *currentHero = gpGame->GetHero(gpCurPlayer->m_currentHero);
     StopCursor(1);
     mapCell *currentCell = GetCell(currentHero->m_x, currentHero->m_y);
-    currentHero->m_locationType = currentCell->triggerType;
-    currentHero->m_occupiedTown = currentCell->w4hi;
+    currentHero->m_locationType = currentCell->m_triggerType;
+    currentHero->m_occupiedTown = currentCell->m_objectMetadata;
     currentHero->m_direction = static_cast<unsigned char>(m_cursorDirection);
     if (m_cursorType == CURSOR_HERO_TYPE_BOAT)
         currentHero->m_eventFlags = HERO_EVENT_EMBARKED | currentHero->m_eventFlags;
-    currentCell->triggerType = MAP_EVENT_ACTION_FLAG | MAP_EVENT_HERO_INTERACTION;
-    currentCell->w4hi = currentHero->m_id;
-    currentCell->field8 &= ~CURSOR_MAP_VISIBLE_FLAG;
+    currentCell->m_triggerType = MAP_EVENT_ACTION_FLAG | MAP_EVENT_HERO_INTERACTION;
+    currentCell->m_objectMetadata = currentHero->m_id;
+    currentCell->m_flags &= ~CURSOR_MAP_VISIBLE_FLAG;
     m_cursorActive = 0;
     CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
     UpdateScreen(0, 0);
@@ -4800,7 +4800,7 @@ void advManager::SetTownContext(int townId)
                          m_mapOriginY + ADVMGR_VIEW_CENTER_OFFSET, 1);
 
     selectedIndex7 = giGroundToTerrain[
-        GetCell(currentTownValue->m_x, currentTownValue->m_y)->tile];
+        GetCell(currentTownValue->m_x, currentTownValue->m_y)->m_terrainImageIndex];
     if (m_currentTerrain != selectedIndex7) {
         m_currentTerrain = selectedIndex7;
         gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
@@ -4835,7 +4835,7 @@ void advManager::SetHeroContext(int heroId, int update)
     m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
 
     mapCell *currentCell = GetCell(currentHero->m_x, currentHero->m_y);
-    currentCell->field8 |= CURSOR_MAP_VISIBLE_FLAG;
+    currentCell->m_flags |= CURSOR_MAP_VISIBLE_FLAG;
     gpGame->RestoreCell(currentHero->m_x, currentHero->m_y,
                         currentHero->m_locationType, currentHero->m_occupiedTown,
                         0, 4);
@@ -4868,7 +4868,7 @@ void advManager::SetHeroContext(int heroId, int update)
     SetEnvironmentOrigin(m_mapOriginX + ADVMGR_VIEW_CENTER_OFFSET,
                          m_mapOriginY + ADVMGR_VIEW_CENTER_OFFSET, 1);
 
-    selectedIndex7 = giGroundToTerrain[currentCell->tile];
+    selectedIndex7 = giGroundToTerrain[currentCell->m_terrainImageIndex];
     if (m_currentTerrain != selectedIndex7) {
         m_currentTerrain = selectedIndex7;
         gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
@@ -5031,22 +5031,22 @@ void advManager::CastSpell(int spell)
         goto setMineGuardian;
 setMineGuardian:
         currentCell = gpAdvManager->GetCell(currentHeroSlot->m_x, currentHeroSlot->m_y);
-        if (currentCell->triggerType != (MAP_EVENT_ACTION_FLAG | MAP_EVENT_MINE)) {
+        if (currentCell->m_triggerType != (MAP_EVENT_ACTION_FLAG | MAP_EVENT_MINE)) {
             NormalDialog("You must be standing on the entrance to a mine (sawmills and alchemists don't count) to cast this spell.",
                          1, -1, -1, -1, 0, -1, 0, -1, 0);
             return;
         }
-        gpGame->m_mines[currentCell->w4hi].guardianType =
+        gpGame->m_mines[currentCell->m_objectMetadata].guardianType =
             static_cast<signed char>(
                 guardianTypes1[ADVMGR_MINE_GUARDIAN_TYPE_INDEX]);
         spellPowerValue = currentHeroSlot->Stats(HERO_PRIMARY_SPELL_POWER);
         if (spellPowerValue > ADVMGR_MINE_GUARDIAN_MAX_POWER)
             spellPowerValue = ADVMGR_MINE_GUARDIAN_MAX_POWER;
-        gpGame->m_mines[currentCell->w4hi].guardianCount =
+        gpGame->m_mines[currentCell->m_objectMetadata].guardianCount =
             static_cast<unsigned char>(
                 spellPowerValue * ADVMGR_MINE_GUARDIANS_PER_POWER);
         if (spell == ADVENTURE_SPELL_HAUNT)
-            gpGame->ClaimMine(currentCell->w4hi, -1);
+            gpGame->ClaimMine(currentCell->m_objectMetadata, -1);
         break;
     case ADVENTURE_SPELL_VIEW_MINES:
     case ADVENTURE_SPELL_VIEW_RESOURCES:
@@ -5229,8 +5229,8 @@ int DimensionDoorHandler(tag_message &message)
                 mapCell *cell = gpAdvManager->GetCell(
                     gpAdvManager->m_mapOriginX + mouseX,
                     gpAdvManager->m_mapOriginY + mouseY);
-                if ((cell->triggerType & ADVMGR_TRIGGER_ACTION_FLAG) ||
-                    (cell->field8 & ADVMGR_HOVER_OBJECT_BLOCKED)) {
+                if ((cell->m_triggerType & ADVMGR_TRIGGER_ACTION_FLAG) ||
+                    (cell->m_flags & ADVMGR_HOVER_OBJECT_BLOCKED)) {
                     gpWindowManager->m_dialogResult = 0;
                     gpMouseManager->SetPointer(ADVMGR_POINTER_DEFAULT);
                 } else {
@@ -5303,14 +5303,14 @@ int advManager::ComboDraw(int originX, int originY, int animate)
                 mapRow + originY >= 0 && mapRow + originY < MAP_HEIGHT) {
                 cell = GetCell(column + originX, mapRow + originY);
 
-                if (cell->objFlag0 || cell->ovlFlag0)
+                if (cell->m_animatedObject || cell->m_animatedOverlay)
                     ++bComboDraw[column][mapRow];
-                if ((cell->triggerType & ADVMGR_TRIGGER_TYPE_MASK) == 0x28)
+                if ((cell->m_triggerType & ADVMGR_TRIGGER_TYPE_MASK) == 0x28)
                     ++bComboDraw[column][mapRow];
-                if ((cell->triggerType & ADVMGR_TRIGGER_TYPE_MASK) == 1)
+                if ((cell->m_triggerType & ADVMGR_TRIGGER_TYPE_MASK) == 1)
                     ++bComboDraw[column][mapRow];
 
-                if (cell->triggerType == 0x98) {
+                if (cell->m_triggerType == 0x98) {
                     ++bComboDraw[column][mapRow];
                     ++bComboDraw[column - 1][mapRow];
                     if (GetCloudLookup(column + originX, mapRow + originY) != 0) {
@@ -5328,8 +5328,8 @@ int advManager::ComboDraw(int originX, int originY, int animate)
                     }
                 }
 
-                if (cell->triggerType == ADVMGR_HERO_TRIGGER ||
-                    cell->triggerType == ADVMGR_BOAT_TRIGGER) {
+                if (cell->m_triggerType == ADVMGR_HERO_TRIGGER ||
+                    cell->m_triggerType == ADVMGR_BOAT_TRIGGER) {
                     ++bComboDraw[column][mapRow];
                     if (GetCloudLookup(column + originX, mapRow + originY) != 0) {
                         bComboDraw[column + 1][mapRow] += ADVMGR_COMBO_CLOUD_MARK;
@@ -5401,8 +5401,8 @@ int advManager::ComboDraw(int originX, int originY, int animate)
     for (column = 0; column < ADVMGR_COMBO_VIEW_CELLS; ++column) {
         for (mapRow = 0; mapRow < ADVMGR_COMBO_VIEW_CELLS; ++mapRow) {
             cell = GetCell(column + originX, mapRow + originY);
-            if (cell->triggerType == ADVMGR_MONSTER_TRIGGER) {
-                if (gpGame->m_mines[cell->w4hi].guardianType == ADVMGR_MONSTER_GHOST) {
+            if (cell->m_triggerType == ADVMGR_MONSTER_TRIGGER) {
+                if (gpGame->m_mines[cell->m_objectMetadata].guardianType == ADVMGR_MONSTER_GHOST) {
                     ++bComboDraw[column][mapRow];
                     ++bComboDraw[column + 1][mapRow];
                     if (column < ADVMGR_COMBO_VIEW_CELLS)
@@ -5673,12 +5673,12 @@ int advManager::GetSoundId(int x, int y)
     mapCell *currentCell = &m_mapData->Row(y)[x];
     int soundId = ADVMGR_ENVIRONMENT_SOUND_NONE;
 
-    if (!giGroundToTerrain[currentCell->tile] &&
-        (giGroundShape[currentCell->tile] & ADVMGR_SOUND_GROUND_SHAPE_MASK))
+    if (!giGroundToTerrain[currentCell->m_terrainImageIndex] &&
+        (giGroundShape[currentCell->m_terrainImageIndex] & ADVMGR_SOUND_GROUND_SHAPE_MASK))
         return ADVMGR_SOUND_COASTLINE;
 
-    if (currentCell->triggerType & ADVMGR_TRIGGER_ACTION_FLAG) {
-        switch (currentCell->triggerType & ADVMGR_TRIGGER_TYPE_MASK) {
+    if (currentCell->m_triggerType & ADVMGR_TRIGGER_ACTION_FLAG) {
+        switch (currentCell->m_triggerType & ADVMGR_TRIGGER_TYPE_MASK) {
         case ADVMGR_SOUND_OBJECT_ARCHER_HOUSE:
             return ADVMGR_SOUND_DWELLING;
         case ADVMGR_SOUND_OBJECT_DWARF_COTTAGE:
@@ -5724,54 +5724,54 @@ int advManager::GetSoundId(int x, int y)
         case ADVMGR_SOUND_OBJECT_WATER_WHEEL:
             return ADVMGR_SOUND_WATER_WHEEL;
         case ADVMGR_SOUND_OBJECT_ALCHEMIST_LAB:
-            if (currentCell->triggerType & ADVMGR_TRIGGER_ACTION_FLAG)
+            if (currentCell->m_triggerType & ADVMGR_TRIGGER_ACTION_FLAG)
                 return ADVMGR_SOUND_ALCHEMIST_LAB_ACTION;
             break;
         case ADVMGR_SOUND_OBJECT_MINE:
-            if (currentCell->triggerType & ADVMGR_TRIGGER_ACTION_FLAG)
+            if (currentCell->m_triggerType & ADVMGR_TRIGGER_ACTION_FLAG)
                 return ADVMGR_SOUND_MINE;
             break;
         case ADVMGR_SOUND_OBJECT_ABANDONED_MINE:
-            if (currentCell->triggerType & ADVMGR_TRIGGER_ACTION_FLAG)
+            if (currentCell->m_triggerType & ADVMGR_TRIGGER_ACTION_FLAG)
                 return ADVMGR_SOUND_ABANDONED_MINE;
             break;
         case ADVMGR_SOUND_OBJECT_SAWMILL:
-            if (currentCell->triggerType & ADVMGR_TRIGGER_ACTION_FLAG)
+            if (currentCell->m_triggerType & ADVMGR_TRIGGER_ACTION_FLAG)
                 return ADVMGR_SOUND_SAWMILL;
             break;
         case ADVMGR_SOUND_OBJECT_DAEMON_CAVE:
-            if (currentCell->triggerType & ADVMGR_TRIGGER_ACTION_FLAG)
+            if (currentCell->m_triggerType & ADVMGR_TRIGGER_ACTION_FLAG)
                 return ADVMGR_SOUND_DAEMON_CAVE;
             break;
         }
     } else {
-        switch (currentCell->triggerType) {
+        switch (currentCell->m_triggerType) {
         case ADVMGR_SOUND_OBJECT_TAR_PIT:
             return ADVMGR_SOUND_TAR_PIT;
         case ADVMGR_SOUND_OBJECT_LAVA_POOL:
-            if (currentCell->objIndex >= ADVMGR_SOUND_ALCHEMIST_FRAME_FIRST &&
-                currentCell->objIndex <= ADVMGR_SOUND_ALCHEMIST_FRAME_LAST)
+            if (currentCell->m_objectIndex >= ADVMGR_SOUND_ALCHEMIST_FRAME_FIRST &&
+                currentCell->m_objectIndex <= ADVMGR_SOUND_ALCHEMIST_FRAME_LAST)
                 return ADVMGR_SOUND_ALCHEMIST_LAB;
             else
                 return ADVMGR_SOUND_LAVA_POOL;
         case ADVMGR_SOUND_OBJECT_VOLCANO:
-            if (currentCell->objTileset == ADVMGR_SOUND_TILESET_SMALL_VOLCANO ||
-                currentCell->objTileset == ADVMGR_SOUND_TILESET_LARGE_VOLCANO)
+            if (currentCell->m_objectTileset == ADVMGR_SOUND_TILESET_SMALL_VOLCANO ||
+                currentCell->m_objectTileset == ADVMGR_SOUND_TILESET_LARGE_VOLCANO)
                 return ADVMGR_SOUND_LARGE_VOLCANO;
             else
                 return ADVMGR_SOUND_SMALL_VOLCANO;
         case ADVMGR_SOUND_OBJECT_WATER_LAKE:
-            if (currentCell->objTileset == ADVMGR_SOUND_TILESET_WATER_LAKE_UNUSED)
+            if (currentCell->m_objectTileset == ADVMGR_SOUND_TILESET_WATER_LAKE_UNUSED)
                 break;
             return ADVMGR_SOUND_WATERING_HOLE;
         }
 
-        switch (currentCell->objTileset) {
+        switch (currentCell->m_objectTileset) {
         case ADVMGR_SOUND_TILESET_STREAM:
             return ADVMGR_SOUND_STREAM;
         case ADVMGR_SOUND_TILESET_WATER:
-            if (currentCell->objIndex == ADVMGR_SOUND_SEAGULL_FRAME_FIRST ||
-                currentCell->objIndex == ADVMGR_SOUND_SEAGULL_FRAME_LAST)
+            if (currentCell->m_objectIndex == ADVMGR_SOUND_SEAGULL_FRAME_FIRST ||
+                currentCell->m_objectIndex == ADVMGR_SOUND_SEAGULL_FRAME_LAST)
                 return ADVMGR_SOUND_SEAGULLS;
             break;
         }
@@ -5882,8 +5882,8 @@ void advManager::TeleportTo(hero *mapHero, int destinationX, int destinationY,
     }
 
     oldCellFlag26 = 0;
-    if (oldCell2->field8 & ADVMGR_TELEPORT_CELL_OBJECT_FLAG) {
-        oldCell2->field8 -= ADVMGR_TELEPORT_CELL_OBJECT_FLAG;
+    if (oldCell2->m_flags & ADVMGR_TELEPORT_CELL_OBJECT_FLAG) {
+        oldCell2->m_flags -= ADVMGR_TELEPORT_CELL_OBJECT_FLAG;
         oldCellFlag26 = 1;
     } else {
         gpGame->RestoreCell(mapHero->m_x, mapHero->m_y,
@@ -5923,7 +5923,7 @@ void advManager::TeleportTo(hero *mapHero, int destinationX, int destinationY,
                  ADVMGR_TELEPORT_TELESCOPE_ARTIFACT)) >= 1));
 
     if (bShowIt != 0) {
-        destinationCell29->field8 |= ADVMGR_TELEPORT_CELL_OBJECT_FLAG;
+        destinationCell29->m_flags |= ADVMGR_TELEPORT_CELL_OBJECT_FLAG;
         gpWindowManager->SaveFizzleSource(
             ADVMGR_UPDATE_VIEWPORT_ORIGIN, ADVMGR_UPDATE_VIEWPORT_ORIGIN,
             ADVMGR_UPDATE_VIEWPORT_SIZE, ADVMGR_UPDATE_VIEWPORT_SIZE);
@@ -5938,13 +5938,13 @@ void advManager::TeleportTo(hero *mapHero, int destinationX, int destinationY,
             ADVMGR_ENVIRONMENT_SOUND_NONE, 0, 0);
         PollSound();
     } else {
-        mapHero->m_locationType = destinationCell29->triggerType;
-        mapHero->m_occupiedTown = destinationCell29->w4hi;
+        mapHero->m_locationType = destinationCell29->m_triggerType;
+        mapHero->m_occupiedTown = destinationCell29->m_objectMetadata;
         if (oldCellFlag26 != 0) {
-            destinationCell29->field8 |= ADVMGR_TELEPORT_CELL_OBJECT_FLAG;
+            destinationCell29->m_flags |= ADVMGR_TELEPORT_CELL_OBJECT_FLAG;
         } else {
-            destinationCell29->triggerType = ADVMGR_HERO_TRIGGER;
-            destinationCell29->w4hi =
+            destinationCell29->m_triggerType = ADVMGR_HERO_TRIGGER;
+            destinationCell29->m_objectMetadata =
                 static_cast<unsigned char>(mapHero->m_id);
         }
         if (m_cursorType == BOAT_CURSOR_TYPE) {
@@ -5956,7 +5956,7 @@ void advManager::TeleportTo(hero *mapHero, int destinationX, int destinationY,
 
     SetEnvironmentOrigin(m_mapOriginX + ADVMGR_TELEPORT_VIEW_CENTER,
                          m_mapOriginY + ADVMGR_TELEPORT_VIEW_CENTER, 1);
-    terrain5 = giGroundToTerrain[destinationCell29->tile];
+    terrain5 = giGroundToTerrain[destinationCell29->m_terrainImageIndex];
     if (m_currentTerrain != terrain5) {
         m_currentTerrain = terrain5;
         gpSoundManager->SwitchAmbientMusic(
@@ -5989,9 +5989,9 @@ void advManager::DimensionDoor(void)
         y = m_hoverCellY + m_mapOriginY;
         targetCell = GetCell(x, y);
         if (((targetHero->m_eventFlags & HERO_EVENT_EMBARKED) &&
-             giGroundToTerrain[targetCell->tile]) ||
+             giGroundToTerrain[targetCell->m_terrainImageIndex]) ||
             (!(targetHero->m_eventFlags & HERO_EVENT_EMBARKED) &&
-             !giGroundToTerrain[targetCell->tile])) {
+             !giGroundToTerrain[targetCell->m_terrainImageIndex])) {
             NormalDialog("Dimension Door failed!!!",
                          ADVMGR_OPTION_DIALOG_MESSAGE,
                          ADVMGR_OPTION_DIALOG_NONE,
@@ -6210,7 +6210,7 @@ void advManager::SummonBoat(void) {
         m_mapOriginX + ADVMGR_SUMMON_CENTER_OFFSET,
         m_mapOriginY + ADVMGR_SUMMON_CENTER_OFFSET
     );
-    if (!giGroundToTerrain[destinationCell->tile]) {
+    if (!giGroundToTerrain[destinationCell->m_terrainImageIndex]) {
         return;
     } else {
 
@@ -6225,8 +6225,8 @@ void advManager::SummonBoat(void) {
             }
 
             destinationCell = GetCell(destinationX10, destinationY15);
-            if (destinationCell->objIndex == 0xff && destinationCell->triggerType == 0
-                && !giGroundToTerrain[destinationCell->tile]) {
+            if (destinationCell->m_objectIndex == 0xff && destinationCell->m_triggerType == 0
+                && !giGroundToTerrain[destinationCell->m_terrainImageIndex]) {
                 foundDestination9 = 1;
                 break;
             }
@@ -6304,10 +6304,10 @@ void advManager::SummonBoat(void) {
                 boat1->y = static_cast<signed char>(
                     normalDirTable[direction5].y + m_mapOriginY + ADVMGR_SUMMON_CENTER_OFFSET
                 );
-                boat1->savedTriggerType = destinationCell->triggerType;
-                boat1->savedEventData = static_cast<unsigned char>(destinationCell->w4hi);
-                destinationCell->triggerType = ADVMGR_SUMMON_BOAT_TRIGGER;
-                destinationCell->w4hi = boatIndex9;
+                boat1->savedTriggerType = destinationCell->m_triggerType;
+                boat1->savedEventData = static_cast<unsigned char>(destinationCell->m_objectMetadata);
+                destinationCell->m_triggerType = ADVMGR_SUMMON_BOAT_TRIGGER;
+                destinationCell->m_objectMetadata = boatIndex9;
 
                 gpWindowManager->SaveFizzleSource(
                     ADVMGR_SUMMON_TARGET_X,
@@ -6401,16 +6401,16 @@ void advManager::ShowRoute(int redraw, int, int updateButton)
             routeX1 += normalDirTable[direction].x;
             routeY1 += normalDirTable[direction].y;
             nextCell7 = GetCell(routeX1, routeY1);
-            currentTerrain0 = giGroundToTerrain[currentCell2->tile];
+            currentTerrain0 = giGroundToTerrain[currentCell2->m_terrainImageIndex];
             terrainCost = CalcTerrainCost(
-                giGroundToTerrain[nextCell7->tile], direction & 1,
+                giGroundToTerrain[nextCell7->m_terrainImageIndex], direction & 1,
                 ADVMGR_ROUTE_TERRAIN_COST_INFINITY,
                 currentHero0->m_secondarySkills[HERO_SKILL_PATHFINDING],
-                currentCell2->objFlag1, nextCell7->objFlag1);
+                currentCell2->m_isRoad, nextCell7->m_isRoad);
             remainingMobility2 -= CalcTerrainCost(
                 currentTerrain0, direction & 1, remainingMobility2,
                 currentHero0->m_secondarySkills[HERO_SKILL_PATHFINDING],
-                currentCell2->objFlag1, nextCell7->objFlag1);
+                currentCell2->m_isRoad, nextCell7->m_isRoad);
 
             if (direction & 1) {
                 if (terrainCost == ADVMGR_ROUTE_DIAGONAL_COST_0)
@@ -6767,7 +6767,7 @@ void advManager::SetInitialMapOrigin(void)
 
     m_currentTerrain = giGroundToTerrain[
         GetCell(m_mapOriginX + ADVMGR_VIEW_CENTER_OFFSET,
-                m_mapOriginY + ADVMGR_VIEW_CENTER_OFFSET)->tile];
+                m_mapOriginY + ADVMGR_VIEW_CENTER_OFFSET)->m_terrainImageIndex];
     gpSoundManager->SwitchAmbientMusic(
         giTerrainToMusicTrack[m_currentTerrain]);
     SetEnvironmentOrigin(
@@ -7104,13 +7104,13 @@ int advManager::FindAdjacentMonster(int originX, int originY, int *monsterX,
                  s_adjacentMonsterY < s_adjacentMonsterEndY;
                  ++s_adjacentMonsterY) {
                 if (m_mapData->Row(s_adjacentMonsterY)[s_adjacentMonsterX]
-                        .triggerType == ADVMGR_ADJACENT_MONSTER_TRIGGER) {
+                        .m_triggerType == ADVMGR_ADJACENT_MONSTER_TRIGGER) {
                     if (originY > s_adjacentMonsterY) {
-                        if ((GetCell(originX, originY)->objIndex ==
+                        if ((GetCell(originX, originY)->m_objectIndex ==
                                  ADVMGR_ADJACENT_OBJECT_INDEX_NONE ||
-                             GetCell(originX, originY)->objTileset ==
+                             GetCell(originX, originY)->m_objectTileset ==
                                  ADVMGR_CLEAR_GROUND_TILESET ||
-                             (GetCell(originX, originY)->field8 &
+                             (GetCell(originX, originY)->m_flags &
                               ADVMGR_HOVER_UNREACHABLE)) &&
                             (s_adjacentMonsterX != excludedX ||
                              excludedY != s_adjacentMonsterY))
@@ -7143,13 +7143,13 @@ int advManager::FindAdjacentMonster(int originX, int originY, int *monsterX,
                  s_adjacentMonsterY < s_adjacentMonsterEndY;
                  ++s_adjacentMonsterY) {
                 if (m_mapData->Row(s_adjacentMonsterY)[s_adjacentMonsterX]
-                        .triggerType == ADVMGR_ADJACENT_MONSTER_TRIGGER) {
+                        .m_triggerType == ADVMGR_ADJACENT_MONSTER_TRIGGER) {
                     if (originY > s_adjacentMonsterY) {
-                        if ((GetCell(originX, originY)->objIndex ==
+                        if ((GetCell(originX, originY)->m_objectIndex ==
                                  ADVMGR_ADJACENT_OBJECT_INDEX_NONE ||
-                             GetCell(originX, originY)->objTileset ==
+                             GetCell(originX, originY)->m_objectTileset ==
                                  ADVMGR_CLEAR_GROUND_TILESET ||
-                             (GetCell(originX, originY)->field8 &
+                             (GetCell(originX, originY)->m_flags &
                               ADVMGR_HOVER_UNREACHABLE)) &&
                             (s_adjacentMonsterX != excludedX ||
                              excludedY != s_adjacentMonsterY))
@@ -8093,7 +8093,7 @@ int advManager::DoVisions(hero *visionHero)
         for (scanYLocal = visionHero->m_y - ADVMGR_VISIONS_RADIUS;
              scanYLocal <= visionHero->m_y + ADVMGR_VISIONS_RADIUS; ++scanYLocal) {
             cellData = GetCell(scanXType, scanYLocal);
-            if (cellData->triggerType == ADVMGR_VISIONS_MONSTER_TRIGGER) {
+            if (cellData->m_triggerType == ADVMGR_VISIONS_MONSTER_TRIGGER) {
                 if (nearestDistanceState >
                     (currentDistanceId = abs(visionHero->m_x - scanXType) +
                                          abs(visionHero->m_y - scanYLocal))) {
@@ -8113,9 +8113,9 @@ int advManager::DoVisions(hero *visionHero)
     }
 
     cellData = GetCell(nearestXId, nearestYData);
-    creatureData = cellData->objIndex;
-    forcedJoinState = cellData->w4hi & MONSTER_JOIN_FORCED;
-    monsterCountIndex = cellData->w4hi & MONSTER_COUNT_MASK;
+    creatureData = cellData->m_objectIndex;
+    forcedJoinState = cellData->m_objectMetadata & MONSTER_JOIN_FORCED;
+    monsterCountIndex = cellData->m_objectMetadata & MONSTER_COUNT_MASK;
     sprintf(gText, "{%d %s}\n\n", monsterCountIndex, gArmyNamesPlural[creatureData]);
     strengthRatioCurrent = static_cast<float>(
         gpPhilAI->FightValueOfStack(&visionHero->m_army, visionHero, 0, 0, 0, 0)) /
@@ -8214,11 +8214,11 @@ int advManager::IsCrystalBallInEffect(int x, int y, int radius)
 VA(0x0046c318, 0x85)
 unsigned char StopOnTrigger(class mapCell *cell)
 {
-    int type = cell->triggerType & ADVMGR_TRIGGER_TYPE_MASK;
+    int type = cell->m_triggerType & ADVMGR_TRIGGER_TYPE_MASK;
     if (type != ADVMGR_SPECIAL_TRIGGER)
         return bStopOnTrigger[type];
 
-    int trigger = cell->w4hi;
+    int trigger = cell->m_objectMetadata;
     trigger &= ADVMGR_SPECIAL_TRIGGER_MASK;
     switch (trigger) {
     case ADVMGR_TRIGGER_EVENT_5:

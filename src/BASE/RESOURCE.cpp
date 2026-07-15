@@ -9,7 +9,7 @@
 VA(0x004d9730, 0x19)
 resource::resource(void)
 {
-  field_0x4 = 0;
+  m_resourceType = 0;
   m_id = 0;
   m_refCount = 0;
   m_next = 0;
@@ -18,7 +18,7 @@ resource::resource(void)
 VA(0x004d9750, 0x2d)
 resource::resource(short int a1, unsigned long int a2, short int a3, resource* a4)
 {
-  field_0x4 = a1;
+  m_resourceType = a1;
   m_id = a2;
   m_refCount = a3;
   m_next = a4;

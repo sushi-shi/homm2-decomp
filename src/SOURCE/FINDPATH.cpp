@@ -231,12 +231,12 @@ void searchArray::TestPossibleDirections(int x, int y,
             goto invalidDirection;
 
         gSearchNextCell = gpAdvManager->GetCell(gSearchNextX, gSearchNextY);
-        if ((gSearchNextCell->field8 & SEARCH_CELL_UNREACHABLE) != 0 ||
+        if ((gSearchNextCell->m_flags & SEARCH_CELL_UNREACHABLE) != 0 ||
             (gbHumanPlayer[giCurPlayer] != 0 &&
              (giCurPlayerBit & mapExtra[gSearchNextY * MAP_WIDTH + gSearchNextX]) == 0))
             goto invalidDirection;
 
-        if ((gSearchNextCell->triggerType & SEARCH_TRIGGER_PRESENT) != 0) {
+        if ((gSearchNextCell->m_triggerType & SEARCH_TRIGGER_PRESENT) != 0) {
             if (!allowOccupied) {
                 if (m_specialTargetX != gSearchNextX || m_specialTargetY != gSearchNextY)
                     goto invalidDirection;
@@ -245,62 +245,62 @@ void searchArray::TestPossibleDirections(int x, int y,
             }
         }
 
-        gSearchTerrain = giGroundToTerrain[gSearchNextCell->tile];
+        gSearchTerrain = giGroundToTerrain[gSearchNextCell->m_terrainImageIndex];
         if (gSearchTerrain == SEARCH_TERRAIN_WATER) {
             if (waterMode != 0) {
-                if (gSearchNextCell->triggerType == SEARCH_WATER_ENTRY_SECOND)
+                if (gSearchNextCell->m_triggerType == SEARCH_WATER_ENTRY_SECOND)
                     goto invalidDirection;
-                if (giGroundToTerrain[gSearchCurrentCell->tile] == SEARCH_TERRAIN_WATER &&
+                if (giGroundToTerrain[gSearchCurrentCell->m_terrainImageIndex] == SEARCH_TERRAIN_WATER &&
                     normalDirTable[gSearchDirection].x != 0 &&
                     normalDirTable[gSearchDirection].y != 0) {
                     if (giGroundToTerrain[
-                            gpAdvManager->GetCell(gSearchNextX, y)->tile] != SEARCH_TERRAIN_WATER ||
+                            gpAdvManager->GetCell(gSearchNextX, y)->m_terrainImageIndex] != SEARCH_TERRAIN_WATER ||
                         giGroundToTerrain[
-                            gpAdvManager->GetCell(x, gSearchNextY)->tile] != SEARCH_TERRAIN_WATER)
+                            gpAdvManager->GetCell(x, gSearchNextY)->m_terrainImageIndex] != SEARCH_TERRAIN_WATER)
                         goto invalidDirection;
                 }
             } else {
-                if (gSearchNextCell->triggerType != SEARCH_WATER_ENTRY_FIRST &&
-                    gSearchNextCell->triggerType != SEARCH_WATER_ENTRY_SECOND &&
-                    gSearchNextCell->triggerType != SEARCH_WATER_ENTRY_THIRD)
+                if (gSearchNextCell->m_triggerType != SEARCH_WATER_ENTRY_FIRST &&
+                    gSearchNextCell->m_triggerType != SEARCH_WATER_ENTRY_SECOND &&
+                    gSearchNextCell->m_triggerType != SEARCH_WATER_ENTRY_THIRD)
                     goto invalidDirection;
             }
         } else if (waterMode != 0 &&
-                   gSearchNextCell->triggerType != SEARCH_TRIGGER_BOAT) {
+                   gSearchNextCell->m_triggerType != SEARCH_TRIGGER_BOAT) {
             goto invalidDirection;
         }
 
     testObjects:
         if (((1U << gSearchDirection) & SEARCH_DIRECTION_EDGE_OBJECT_MASK) != 0) {
-            if ((gSearchCurrentCell->objIndex != SEARCH_NO_OBJECT &&
+            if ((gSearchCurrentCell->m_objectIndex != SEARCH_NO_OBJECT &&
                  (gSearchCurrentCell->m_objTypeBits & SEARCH_OBJECT_TYPE_MASK) !=
                      SEARCH_BLOCKING_OBJECT_TYPE &&
-                 (gSearchCurrentCell->field8 & SEARCH_CELL_BLOCKED) == 0))
+                 (gSearchCurrentCell->m_flags & SEARCH_CELL_BLOCKED) == 0))
                 goto invalidDirection;
-            if (gSearchNextCell->ovlIndex != SEARCH_NO_OBJECT) {
+            if (gSearchNextCell->m_overlayIndex != SEARCH_NO_OBJECT) {
                 mapCell *belowNext =
                     gpAdvManager->GetCell(gSearchNextX, gSearchNextY + 1);
-                if (belowNext->objIndex != SEARCH_NO_OBJECT &&
+                if (belowNext->m_objectIndex != SEARCH_NO_OBJECT &&
                     (belowNext->m_objTypeBits & SEARCH_OBJECT_TYPE_MASK) !=
                         SEARCH_BLOCKING_OBJECT_TYPE &&
-                    (belowNext->field8 & SEARCH_CELL_BLOCKED) == 0)
+                    (belowNext->m_flags & SEARCH_CELL_BLOCKED) == 0)
                     goto invalidDirection;
             }
         } else if (((1U << gSearchDirection) & SEARCH_DIRECTION_OBJECT_MASK) != 0) {
-            if (gSearchNextCell->objIndex == SEARCH_NO_OBJECT ||
+            if (gSearchNextCell->m_objectIndex == SEARCH_NO_OBJECT ||
                 (gSearchNextCell->m_objTypeBits & SEARCH_OBJECT_TYPE_MASK) ==
                     SEARCH_BLOCKING_OBJECT_TYPE ||
-                (gSearchNextCell->field8 & SEARCH_CELL_BLOCKED) != 0 ||
-                ((gSearchNextCell->triggerType & SEARCH_TRIGGER_PRESENT) != 0 &&
-                 (gSearchTriggerType = gSearchNextCell->triggerType & SEARCH_TRIGGER_MASK,
+                (gSearchNextCell->m_flags & SEARCH_CELL_BLOCKED) != 0 ||
+                ((gSearchNextCell->m_triggerType & SEARCH_TRIGGER_PRESENT) != 0 &&
+                 (gSearchTriggerType = gSearchNextCell->m_triggerType & SEARCH_TRIGGER_MASK,
                   StopOnTrigger(gSearchNextCell) != 0))) {
-                if (gSearchCurrentCell->ovlIndex == SEARCH_NO_OBJECT)
+                if (gSearchCurrentCell->m_overlayIndex == SEARCH_NO_OBJECT)
                     goto storeDirection;
                 mapCell *belowCurrent = gpAdvManager->GetCell(x, y + 1);
-                if (belowCurrent->objIndex == SEARCH_NO_OBJECT ||
+                if (belowCurrent->m_objectIndex == SEARCH_NO_OBJECT ||
                     (belowCurrent->m_objTypeBits & SEARCH_OBJECT_TYPE_MASK) ==
                         SEARCH_BLOCKING_OBJECT_TYPE ||
-                    (belowCurrent->field8 & SEARCH_CELL_BLOCKED) != 0)
+                    (belowCurrent->m_flags & SEARCH_CELL_BLOCKED) != 0)
                     goto storeDirection;
             }
             goto invalidDirection;

@@ -337,7 +337,7 @@ void heroWindow::DrawWindow(int param_1, int param_2, int param_3)
 VA(0x004cf830, 0x7f)
 int heroWindow::SaveBackground(void)
 {
-    m_savedBackground = new bitmap(0x21, m_winWidth, m_winHeight);
+    m_savedBackground = new bitmap(BITMAP_TYPE_MEMORY, m_winWidth, m_winHeight);
     PollSound();
     m_savedBackground->GrabScreen(m_posX, m_posY);
     PollSound();

@@ -112,7 +112,7 @@ void combatManager::SetupCombat(int mapX, int mapY, hero *attackerHero,
     else
         m_battlefieldCell = 0;
 
-    m_terrainType = giGroundToTerrain[m_battlefieldCell->tile];
+    m_terrainType = giGroundToTerrain[m_battlefieldCell->m_terrainImageIndex];
     sprintf(m_battlefieldBackgroundName, GetBackgroundName());
 
     if (attackerHero != 0) {
@@ -456,19 +456,19 @@ void combatManager::Close(void)
             total += m_armyGroups[groupSide]->m_creatureCounts[index];
     }
 
-    if (m_battlefieldCell->triggerType == COMBAT_TRIGGER_MONSTER) {
+    if (m_battlefieldCell->m_triggerType == COMBAT_TRIGGER_MONSTER) {
         if (total > 4000)
             total = 4000;
-        m_battlefieldCell->w4hi = total & 0xfff;
+        m_battlefieldCell->m_objectMetadata = total & 0xfff;
     }
 
-    if (m_battlefieldCell->triggerType == COMBAT_TRIGGER_MINE &&
-        gpGame->m_mines[m_battlefieldCell->w4hi].guardianType != -1)
-        gpGame->m_mines[m_battlefieldCell->w4hi].guardianCount =
+    if (m_battlefieldCell->m_triggerType == COMBAT_TRIGGER_MINE &&
+        gpGame->m_mines[m_battlefieldCell->m_objectMetadata].guardianType != -1)
+        gpGame->m_mines[m_battlefieldCell->m_objectMetadata].guardianCount =
             static_cast<unsigned char>(total);
 
-    if (m_battlefieldCell->triggerType == COMBAT_TRIGGER_HERO) {
-        hero *combatHero = gpGame->GetHero(m_battlefieldCell->w4hi);
+    if (m_battlefieldCell->m_triggerType == COMBAT_TRIGGER_HERO) {
+        hero *combatHero = gpGame->GetHero(m_battlefieldCell->m_objectMetadata);
         if (combatHero->m_locationType == COMBAT_TRIGGER_MINE &&
             gpGame->m_mines[combatHero->m_occupiedTown].guardianType != -1)
             gpGame->m_mines[combatHero->m_occupiedTown].guardianCount =
@@ -684,7 +684,7 @@ int combatManager::MoreTreesNear(void)
             y = normalDirTable[nearbyDirection]._1 * radius + centerY;
             if (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT) {
                 combatCell = gpAdvManager->GetCell(x, y);
-                nearbyTileset = combatCell->objTileset;
+                nearbyTileset = combatCell->m_objectTileset;
                 switch (nearbyTileset) {
                 case COMBAT_TILESET_SNOW_MOUNTAINS:
                 case COMBAT_TILESET_SWAMP_MOUNTAINS:

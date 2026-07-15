@@ -16,7 +16,7 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (vptr auto-emitted at 0x00; own data starts at 0x04)
-    short     field_0x4;  // +0x04
+    short     m_resourceType;  // +0x04  resource-manager category
     short     m_refCount;  // +0x06
     int       m_id;  // +0x08
     resource* m_next;  // +0x0c

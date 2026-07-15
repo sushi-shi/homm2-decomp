@@ -72,7 +72,7 @@ VA(0x004c9350, 0x94)
 int mouseManager::Open(int priority)
 {
     m_forcePointerUpdate = 0;
-    m_savedUnderlying = new bitmap(MOUSE_SAVED_BITMAP_TYPE, MOUSE_SAVED_BITMAP_WIDTH,
+    m_savedUnderlying = new bitmap(BITMAP_TYPE_MEMORY, MOUSE_SAVED_BITMAP_WIDTH,
                                    MOUSE_SAVED_BITMAP_HEIGHT);
     m_savedLeft = MOUSE_SCREEN_CENTER_X - 1;
     m_savedTop = MOUSE_SCREEN_CENTER_Y - 1;

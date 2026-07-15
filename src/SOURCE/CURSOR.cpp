@@ -60,7 +60,7 @@ void advManager::StartCursor(int direction)
     cellX = m_cursorMapX + m_mapOriginX;
     cellY = m_cursorMapY + m_mapOriginY;
     cell = m_mapData->GetCell(cellX, cellY);
-    cell->field8 |= CURSOR_MAP_VISIBLE_FLAG;
+    cell->m_flags |= CURSOR_MAP_VISIBLE_FLAG;
 }
 
 VA(0x0040d718, 0x11c)
@@ -77,7 +77,7 @@ void advManager::StopCursor(int stopSound)
     m_cursorCycle = 0;
     if (m_previousCursorMapX != -1) {
         m_mapData->GetCell(m_previousCursorMapX + m_mapOriginX,
-                           m_previousCursorMapY + m_mapOriginY)->field8 &=
+                           m_previousCursorMapY + m_mapOriginY)->m_flags &=
             ~CURSOR_MAP_VISIBLE_FLAG;
         m_previousCursorMapY = -1;
         m_previousCursorMapX = m_previousCursorMapY;
@@ -112,7 +112,7 @@ void advManager::DrawCursor(void)
                         m_cursorFrameCount;
             if (m_cursorType == CURSOR_HERO_TYPE_BOAT &&
                 !(GetCell(m_mapOriginX + CURSOR_MAP_DRAW_OFFSET,
-                          m_mapOriginY + CURSOR_MAP_DRAW_OFFSET)->field8 &
+                          m_mapOriginY + CURSOR_MAP_DRAW_OFFSET)->m_flags &
                   CURSOR_CELL_UNCOVERED_FLAG)) {
                 FlipIconToBitmap(m_heroIcons[CURSOR_BOAT_WAKE_TYPE],
                                  gpWindowManager->m_screen, drawX, drawY,
@@ -146,7 +146,7 @@ void advManager::DrawCursor(void)
             drawFrame = m_cursorFrame + m_cursorFrameCount;
             if (m_cursorType == CURSOR_HERO_TYPE_BOAT &&
                 !(GetCell(m_mapOriginX + CURSOR_MAP_DRAW_OFFSET,
-                          m_mapOriginY + CURSOR_MAP_DRAW_OFFSET)->field8 &
+                          m_mapOriginY + CURSOR_MAP_DRAW_OFFSET)->m_flags &
                   CURSOR_CELL_UNCOVERED_FLAG)) {
                 IconToBitmap(m_heroIcons[CURSOR_BOAT_WAKE_TYPE],
                              gpWindowManager->m_screen, drawX, drawY,
@@ -202,7 +202,7 @@ void advManager::DrawCursor(void)
                         m_cursorSamples[giGroundToTerrain[
                             GetCell(m_mapOriginX + CURSOR_MAP_DRAW_OFFSET,
                                     m_mapOriginY + CURSOR_MAP_DRAW_OFFSET)
-                                ->tile]]);
+                                ->m_terrainImageIndex]]);
                 }
             }
         }
@@ -437,19 +437,19 @@ mapCell *advManager::MoveHero(int direction, int stopAfterMove,
         gbMoveShown = 1;
 
     currentCell = GetCell(movingHero->m_x, movingHero->m_y);
-    int currentTerrain = giGroundToTerrain[currentCell->tile];
+    int currentTerrain = giGroundToTerrain[currentCell->m_terrainImageIndex];
     destinationCell = GetCell(movingHero->m_x + directionX,
                               movingHero->m_y + directionY);
     terrainCost = CalcTerrainCost(
         currentTerrain, direction & 1,
         movingHero->m_remainingMobility,
         movingHero->m_secondarySkills[HERO_SKILL_PATHFINDING],
-        currentCell->objFlag1, destinationCell->objFlag1);
+        currentCell->m_isRoad, destinationCell->m_isRoad);
     nextTerrainCost = CalcTerrainCost(
-        giGroundToTerrain[destinationCell->tile], 0,
+        giGroundToTerrain[destinationCell->m_terrainImageIndex], 0,
         movingHero->m_remainingMobility - terrainCost,
         movingHero->m_secondarySkills[HERO_SKILL_PATHFINDING],
-        destinationCell->objFlag1, 1);
+        destinationCell->m_isRoad, 1);
 
     if (!forceMove && movingHero->m_remainingMobility < terrainCost) {
         *outOfMobility = 1;
@@ -471,7 +471,7 @@ mapCell *advManager::MoveHero(int direction, int stopAfterMove,
     movingHero->m_direction = static_cast<unsigned char>(direction);
 
     if ((movingHero->m_eventFlags & HERO_EVENT_EMBARKED) &&
-        destinationCell->triggerType == MAP_EVENT_COAST) {
+        destinationCell->m_triggerType == MAP_EVENT_COAST) {
         for (step = 0; step < CURSOR_BOAT_COUNT; ++step) {
             if (gpGame->m_boats[step].heroId ==
                 static_cast<unsigned char>(movingHero->m_id))
@@ -479,13 +479,13 @@ mapCell *advManager::MoveHero(int direction, int stopAfterMove,
         }
         boatRecord *boat = &gpGame->m_boats[step];
         currentCell = GetCell(movingHero->m_x, movingHero->m_y);
-        boat->savedTriggerType = currentCell->triggerType;
+        boat->savedTriggerType = currentCell->m_triggerType;
         boat->savedEventData =
-            static_cast<unsigned char>(currentCell->w4hi);
+            static_cast<unsigned char>(currentCell->m_objectMetadata);
         boat->direction = static_cast<signed char>(m_cursorDirection);
         boat->heroId = static_cast<signed char>(
             boat->heroId | MAP_EVENT_ACTION_FLAG);
-        currentCell->triggerType = MAP_EVENT_ACTION_FLAG | MAP_EVENT_BOAT;
+        currentCell->m_triggerType = MAP_EVENT_ACTION_FLAG | MAP_EVENT_BOAT;
         currentCell->m_objectData = static_cast<unsigned short>(
             static_cast<unsigned short>(step) << MAP_EVENT_DATA_SHIFT |
             currentCell->m_objectData &
@@ -498,9 +498,9 @@ mapCell *advManager::MoveHero(int direction, int stopAfterMove,
         m_cursorActive = 0;
     }
 
-    if ((destinationCell->triggerType & MAP_EVENT_ACTION_FLAG) &&
+    if ((destinationCell->m_triggerType & MAP_EVENT_ACTION_FLAG) &&
         gpAdvManager->ValidMoveWithEvent(movingHero, direction)) {
-        int eventType = destinationCell->triggerType & MAP_EVENT_TYPE_MASK;
+        int eventType = destinationCell->m_triggerType & MAP_EVENT_TYPE_MASK;
         switch (eventType) {
         case MAP_EVENT_BOAT:
             if (movingHero->m_eventFlags & HERO_EVENT_EMBARKED)
@@ -524,15 +524,15 @@ mapCell *advManager::MoveHero(int direction, int stopAfterMove,
 
         case MAP_EVENT_HERO_INTERACTION:
             if ((movingHero->m_eventFlags & HERO_EVENT_EMBARKED) &&
-                !(gpGame->m_heroRecs[destinationCell->w4hi].m_eventFlags &
+                !(gpGame->m_heroRecs[destinationCell->m_objectMetadata].m_eventFlags &
                   HERO_EVENT_EMBARKED))
                 goto movementDone;
             goto stoppingEvent;
 
         case MAP_EVENT_CASTLE: {
-            if (gpGame->m_castleRecs[destinationCell->w4hi].m_owner !=
+            if (gpGame->m_castleRecs[destinationCell->m_objectMetadata].m_owner !=
                     giCurPlayer &&
-                gpGame->m_castleRecs[destinationCell->w4hi].HasGarrison())
+                gpGame->m_castleRecs[destinationCell->m_objectMetadata].HasGarrison())
                 goto stoppingEvent;
             break;
         }
@@ -665,8 +665,8 @@ stoppingEvent:
                              m_mapOriginY + CURSOR_MAP_DRAW_OFFSET, 0);
         currentCell = GetCell(m_mapOriginX + CURSOR_MAP_DRAW_OFFSET,
                               m_mapOriginY + CURSOR_MAP_DRAW_OFFSET);
-        if (giGroundToTerrain[currentCell->tile] != m_currentTerrain &&
-            (m_currentTerrain = giGroundToTerrain[currentCell->tile],
+        if (giGroundToTerrain[currentCell->m_terrainImageIndex] != m_currentTerrain &&
+            (m_currentTerrain = giGroundToTerrain[currentCell->m_terrainImageIndex],
              gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI))
             gpSoundManager->SwitchAmbientMusic(
                 giTerrainToMusicTrack[m_currentTerrain]);
@@ -677,11 +677,11 @@ stoppingEvent:
                              m_cursorMapY + m_mapOriginY);
         *eventX = m_cursorMapX + m_mapOriginX;
         *eventY = m_cursorMapY + m_mapOriginY;
-        if ((cursorCell->triggerType & MAP_EVENT_ACTION_FLAG) ||
+        if ((cursorCell->m_triggerType & MAP_EVENT_ACTION_FLAG) ||
             ((movingHero->m_eventFlags & HERO_EVENT_EMBARKED) &&
-             cursorCell->triggerType == MAP_EVENT_COAST)) {
+             cursorCell->m_triggerType == MAP_EVENT_COAST)) {
             eventCell = cursorCell;
-            switch (cursorCell->triggerType & MAP_EVENT_TYPE_MASK) {
+            switch (cursorCell->m_triggerType & MAP_EVENT_TYPE_MASK) {
             case MAP_EVENT_NOTHING_SPECIAL:
             case MAP_EVENT_MOSSY_ROCK:
             case MAP_EVENT_REEFS:
@@ -714,7 +714,7 @@ movementDone:
          MAP_EVENT_ACTION_FLAG) &&
         !(movingHero->m_eventFlags & HERO_EVENT_EMBARKED) &&
         (!eventCell ||
-         (eventCell->triggerType & MAP_EVENT_TYPE_MASK) != MAP_EVENT_BOAT)) {
+         (eventCell->m_triggerType & MAP_EVENT_TYPE_MASK) != MAP_EVENT_BOAT)) {
         CheckAdjacentMon(adjacentMonster);
         if (movingHero->m_owner != giCurPlayer)
             eventCell = 0;
@@ -838,11 +838,11 @@ int advManager::ValidMoveWithEvent(hero *movingHero, int direction)
         return 0;
 
     destinationCell0 = m_mapData->GetCell(destinationX0, destinationY0);
-    switch (destinationCell0->triggerType & MAP_EVENT_TYPE_MASK) {
+    switch (destinationCell0->m_triggerType & MAP_EVENT_TYPE_MASK) {
     case MAP_EVENT_HERO_INTERACTION:
         if (!(movingHero->m_eventFlags & HERO_EVENT_EMBARKED))
             return 1;
-        if (!(gpGame->m_heroRecs[destinationCell0->w4hi].m_eventFlags &
+        if (!(gpGame->m_heroRecs[destinationCell0->m_objectMetadata].m_eventFlags &
               HERO_EVENT_EMBARKED))
             return 0;
         return 1;
@@ -889,66 +889,66 @@ int advManager::ValidMove(int direction, int eventMode)
 
     destinationCell = m_mapData->GetCell(destinationX, destinationY);
     currentCell = m_mapData->GetCell(centerX, centerY);
-    if (destinationCell->field8 & CURSOR_CELL_BLOCKED_FLAG)
+    if (destinationCell->m_flags & CURSOR_CELL_BLOCKED_FLAG)
         return 0;
 
-    if (giGroundToTerrain[destinationCell->tile] == CURSOR_WATER_TERRAIN) {
+    if (giGroundToTerrain[destinationCell->m_terrainImageIndex] == CURSOR_WATER_TERRAIN) {
         if (m_cursorType != CURSOR_HERO_TYPE_BOAT &&
-            destinationCell->triggerType !=
+            destinationCell->m_triggerType !=
                 (MAP_EVENT_ACTION_FLAG | MAP_EVENT_BOAT) &&
-            destinationCell->triggerType !=
+            destinationCell->m_triggerType !=
                 (MAP_EVENT_ACTION_FLAG | MAP_EVENT_SHIPWRECK))
             return 0;
-        if (giGroundToTerrain[currentCell->tile] == CURSOR_WATER_TERRAIN &&
+        if (giGroundToTerrain[currentCell->m_terrainImageIndex] == CURSOR_WATER_TERRAIN &&
             directionX != 0 && directionY != 0) {
             if (giGroundToTerrain[
-                    m_mapData->GetCell(centerX + directionX, centerY)->tile] !=
+                    m_mapData->GetCell(centerX + directionX, centerY)->m_terrainImageIndex] !=
                 CURSOR_WATER_TERRAIN)
                 return 0;
             if (giGroundToTerrain[
-                    m_mapData->GetCell(centerX, centerY + directionY)->tile] !=
+                    m_mapData->GetCell(centerX, centerY + directionY)->m_terrainImageIndex] !=
                 CURSOR_WATER_TERRAIN)
                 return 0;
         }
     } else if (m_cursorType == CURSOR_HERO_TYPE_BOAT &&
-               destinationCell->triggerType != MAP_EVENT_COAST) {
+               destinationCell->m_triggerType != MAP_EVENT_COAST) {
         return 0;
     }
 
     northDirection = (1 << direction) & CURSOR_NORTH_DIRECTION_MASK;
     southDirection = (1 << direction) & CURSOR_SOUTH_DIRECTION_MASK;
     if (northDirection) {
-        if (currentCell->objIndex != CURSOR_EMPTY_OBJECT_INDEX &&
-            currentCell->objTileset != CURSOR_PASSABLE_OBJECT_TILESET &&
-            !(currentCell->field8 & CURSOR_OBJECT_PASSABLE_FLAG) &&
-            currentCell->triggerType !=
+        if (currentCell->m_objectIndex != CURSOR_EMPTY_OBJECT_INDEX &&
+            currentCell->m_objectTileset != CURSOR_PASSABLE_OBJECT_TILESET &&
+            !(currentCell->m_flags & CURSOR_OBJECT_PASSABLE_FLAG) &&
+            currentCell->m_triggerType !=
                 (MAP_EVENT_ACTION_FLAG | MAP_EVENT_WHIRLPOOL))
             return 0;
-        if (destinationCell->ovlIndex != CURSOR_EMPTY_OBJECT_INDEX) {
+        if (destinationCell->m_overlayIndex != CURSOR_EMPTY_OBJECT_INDEX) {
             northNeighborCell = m_mapData->GetCell(destinationX,
                                                    destinationY + 1);
-            if (northNeighborCell->objIndex != CURSOR_EMPTY_OBJECT_INDEX &&
-                northNeighborCell->objTileset != CURSOR_PASSABLE_OBJECT_TILESET &&
-                !(northNeighborCell->field8 & CURSOR_OBJECT_PASSABLE_FLAG))
+            if (northNeighborCell->m_objectIndex != CURSOR_EMPTY_OBJECT_INDEX &&
+                northNeighborCell->m_objectTileset != CURSOR_PASSABLE_OBJECT_TILESET &&
+                !(northNeighborCell->m_flags & CURSOR_OBJECT_PASSABLE_FLAG))
                 return 0;
         }
     } else if (southDirection) {
-        if (destinationCell->objIndex != CURSOR_EMPTY_OBJECT_INDEX &&
-            destinationCell->objTileset != CURSOR_PASSABLE_OBJECT_TILESET &&
-            !(destinationCell->field8 & CURSOR_OBJECT_PASSABLE_FLAG) &&
-            destinationCell->triggerType !=
+        if (destinationCell->m_objectIndex != CURSOR_EMPTY_OBJECT_INDEX &&
+            destinationCell->m_objectTileset != CURSOR_PASSABLE_OBJECT_TILESET &&
+            !(destinationCell->m_flags & CURSOR_OBJECT_PASSABLE_FLAG) &&
+            destinationCell->m_triggerType !=
                 (MAP_EVENT_ACTION_FLAG | MAP_EVENT_WHIRLPOOL) &&
-            (!eventMode || !(destinationCell->triggerType & MAP_EVENT_ACTION_FLAG) ||
+            (!eventMode || !(destinationCell->m_triggerType & MAP_EVENT_ACTION_FLAG) ||
              !StopOnTrigger(destinationCell)))
             return 0;
-        if (currentCell->ovlIndex != CURSOR_EMPTY_OBJECT_INDEX) {
+        if (currentCell->m_overlayIndex != CURSOR_EMPTY_OBJECT_INDEX) {
             southNeighborCell = m_mapData->GetCell(
                 m_cursorMapX + m_mapOriginX,
                 m_cursorMapY + m_mapOriginY + 1);
-            if (southNeighborCell->objIndex != CURSOR_EMPTY_OBJECT_INDEX &&
-                southNeighborCell->objTileset != CURSOR_PASSABLE_OBJECT_TILESET &&
-                !(southNeighborCell->field8 & CURSOR_OBJECT_PASSABLE_FLAG) &&
-                !(southNeighborCell->triggerType & MAP_EVENT_ACTION_FLAG))
+            if (southNeighborCell->m_objectIndex != CURSOR_EMPTY_OBJECT_INDEX &&
+                southNeighborCell->m_objectTileset != CURSOR_PASSABLE_OBJECT_TILESET &&
+                !(southNeighborCell->m_flags & CURSOR_OBJECT_PASSABLE_FLAG) &&
+                !(southNeighborCell->m_triggerType & MAP_EVENT_ACTION_FLAG))
                 return 0;
         }
     }
@@ -976,24 +976,24 @@ void advManager::MoveOrigin(int directionX, int directionY)
     if (directionX != 0 || directionY != 0) {
         oldCursorCell0 = m_mapData->GetCell(m_cursorMapX + oldOriginX0,
                                             m_cursorMapY + oldOriginY9);
-        oldCursorCell0->field8 &= ~CURSOR_MAP_VISIBLE_FLAG;
+        oldCursorCell0->m_flags &= ~CURSOR_MAP_VISIBLE_FLAG;
         m_cursorMapX += directionX;
         m_cursorMapY += directionY;
         cellX5 = m_cursorMapX + m_mapOriginX;
         cellY1 = m_cursorMapY + m_mapOriginY;
         newCursorCell5 = m_mapData->GetCell(cellX5, cellY1);
-        newCursorCell5->field8 |= CURSOR_MAP_VISIBLE_FLAG;
+        newCursorCell5->m_flags |= CURSOR_MAP_VISIBLE_FLAG;
         if (m_previousCursorMapX != CURSOR_INVALID_POSITION) {
             oldPreviousCell2 = m_mapData->GetCell(
                 m_previousCursorMapX + oldOriginX0,
                 m_previousCursorMapY + oldOriginY9);
-            oldPreviousCell2->field8 &= ~CURSOR_MAP_VISIBLE_FLAG;
+            oldPreviousCell2->m_flags &= ~CURSOR_MAP_VISIBLE_FLAG;
             m_previousCursorMapX += directionX;
             m_previousCursorMapY += directionY;
             cellX5 = m_previousCursorMapX + m_mapOriginX;
             cellY1 = m_previousCursorMapY + m_mapOriginY;
             newPreviousCell4 = m_mapData->GetCell(cellX5, cellY1);
-            newPreviousCell4->field8 |= CURSOR_MAP_VISIBLE_FLAG;
+            newPreviousCell4->m_flags |= CURSOR_MAP_VISIBLE_FLAG;
         }
     }
     m_forceCompleteDraw = 1;
@@ -1042,7 +1042,7 @@ void advManager::ProcessMapChange(SMapChange change)
                              &eventX, &eventY, &outOfMobility, 1,
                              &adjacentMonster, 1);
         if (eventCell != 0) {
-            switch (eventCell->triggerType & MAP_EVENT_TYPE_MASK) {
+            switch (eventCell->m_triggerType & MAP_EVENT_TYPE_MASK) {
             case MAP_EVENT_COAST:
             case MAP_EVENT_BOAT:
                 DoAIEvent(eventCell, mapHero, eventX, eventY);
@@ -1120,12 +1120,12 @@ void advManager::ProcessMapChange(SMapChange change)
         mapHero->m_eventFlags = 0;
         mapHero->m_direction = CURSOR_RECRUIT_HERO_DIRECTION;
         mapHero->m_locationType =
-            gpGame->m_worldMap.GetCell(change.x, change.y)->triggerType;
+            gpGame->m_worldMap.GetCell(change.x, change.y)->m_triggerType;
         mapHero->m_occupiedTown =
-            gpGame->m_worldMap.GetCell(change.x, change.y)->w4hi;
+            gpGame->m_worldMap.GetCell(change.x, change.y)->m_objectMetadata;
         mapHero->m_owner = change.player;
         recruitCell = gpGame->m_worldMap.GetCell(change.x, change.y);
-        recruitCell->triggerType =
+        recruitCell->m_triggerType =
             MAP_EVENT_ACTION_FLAG | MAP_EVENT_HERO_INTERACTION;
         heroCell = gpGame->m_worldMap.GetCell(change.x, change.y);
         heroCell->m_objectData = static_cast<unsigned short>(

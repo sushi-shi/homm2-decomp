@@ -125,15 +125,15 @@ void searchArray::SeedPosition(int seedX, int seedY, int seedDirection,
         }
 
         s_targetCell = gpAdvManager->GetCell(targetColumn, targetY);
-        if (s_targetCell->field8 & 8)
+        if (s_targetCell->m_flags & 8)
             return;
 
-        if (giGroundToTerrain[s_targetCell->tile] == 0) {
+        if (giGroundToTerrain[s_targetCell->m_terrainImageIndex] == 0) {
             if (waterMode) {
-                if (s_targetCell->triggerType == SEARCH_WATER_ENTRY_SECOND)
+                if (s_targetCell->m_triggerType == SEARCH_WATER_ENTRY_SECOND)
                     return;
             } else {
-                unsigned char targetTrigger = s_targetCell->triggerType;
+                unsigned char targetTrigger = s_targetCell->m_triggerType;
                 if (targetTrigger != SEARCH_WATER_ENTRY_FIRST &&
                     targetTrigger != SEARCH_WATER_ENTRY_SECOND &&
                     targetTrigger != SEARCH_WATER_ENTRY_THIRD)
@@ -197,7 +197,7 @@ seed_loop:
 
             currentCell = gpAdvManager->GetCell(
                 s_currentNode.x, s_currentNode.y);
-            s_triggerType = currentCell->triggerType & SEARCH_TRIGGER_MASK;
+            s_triggerType = currentCell->m_triggerType & SEARCH_TRIGGER_MASK;
             if (s_triggerType == SEARCH_TRIGGER_MONSTER ||
                 s_triggerType == SEARCH_TRIGGER_TOWN ||
                 s_triggerType == SEARCH_TRIGGER_TOWN_ALT) {
@@ -208,7 +208,7 @@ seed_loop:
                     if (s_triggerType != SEARCH_TRIGGER_TOWN ||
                         gpGame->m_availableHeroes[
                             gpAdvManager->GetCell(s_adjacentMonsterX,
-                                                  s_adjacentY)->w4hi] != giCurPlayer)
+                                                  s_adjacentY)->m_objectMetadata] != giCurPlayer)
                         goto expand_directions;
                 }
             } else if (s_triggerType != SEARCH_TRIGGER_IGNORE_FIRST &&
@@ -224,7 +224,7 @@ seed_loop:
 expand_directions:
             if (waterMode) {
                 s_triggerType = gpAdvManager->GetCell(
-                    s_currentNode.x, s_currentNode.y)->triggerType;
+                    s_currentNode.x, s_currentNode.y)->m_triggerType;
                 if (s_triggerType == SEARCH_TRIGGER_BOAT)
                     goto point_complete;
             } else {
@@ -247,7 +247,7 @@ expand_directions:
                                            s_possibleDirections, s_directionCosts,
                                            1, waterMode);
             s_terrain = giGroundToTerrain[gpAdvManager->GetCell(
-                s_currentNode.x, s_currentNode.y)->tile];
+                s_currentNode.x, s_currentNode.y)->m_terrainImageIndex];
             s_currentWater = (gpAdvManager->GetCell(
                 s_currentNode.x, s_currentNode.y)->m_objTypeBits & 2) >> 1;
             s_direction = 0;
@@ -319,7 +319,7 @@ point_complete:
                     do {
                         mapCell *mapPosition =
                             gpAdvManager->GetCell(s_mapX, s_mapY);
-                        if ((mapPosition->triggerType & SEARCH_TRIGGER_MASK) ==
+                        if ((mapPosition->m_triggerType & SEARCH_TRIGGER_MASK) ==
                             SEARCH_TRIGGER_MONSTER) {
                             s_targetCell = gpAdvManager->GetCell(s_mapX, s_mapY);
                             s_direction = 0;
@@ -336,11 +336,11 @@ point_complete:
                                     s_directionBlocked = 1;
                                     if (((1 << s_direction) &
                                          SEARCH_DIRECTION_OBJECT_MASK) != 0 &&
-                                        s_neighborCell->objIndex != SEARCH_NO_OBJECT &&
+                                        s_neighborCell->m_objectIndex != SEARCH_NO_OBJECT &&
                                         (s_neighborCell->m_objTypeBits &
                                          SEARCH_OBJECT_TYPE_MASK) !=
                                             SEARCH_BLOCKING_OBJECT_TYPE &&
-                                        !(s_neighborCell->field8 &
+                                        !(s_neighborCell->m_flags &
                                           SEARCH_CELL_BLOCKED)) {
                                         s_directionBlocked = 0;
                                     }
@@ -349,10 +349,10 @@ point_complete:
                                         MAP_WIDTH * s_candidateY + s_adjacentX;
                                     if (s_directionBlocked &&
                                         search->m_storage.nodes[adjacentIndex].visited &&
-                                        !(s_neighborCell->triggerType &
+                                        !(s_neighborCell->m_triggerType &
                                           SEARCH_CELL_BLOCKED)) {
                                         s_terrain = giGroundToTerrain[
-                                            s_neighborCell->tile];
+                                            s_neighborCell->m_terrainImageIndex];
                                         s_adjacentCost = search->m_storage
                                             .nodes[adjacentIndex].distance;
                                         search->PushPoint(

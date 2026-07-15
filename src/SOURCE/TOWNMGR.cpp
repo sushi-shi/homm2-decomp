@@ -668,7 +668,7 @@ void townManager::SetupExtraStuff(void)
         m_town->m_buildings |= TOWN_EXTRA_RACE_FIRST_MASK;
     if ((m_town->m_buildings & TOWN_BUILDING_DOCK) &&
         gpAdvManager->GetCell(m_town->m_boatX,
-                              m_town->m_boatY)->triggerType != 0)
+                              m_town->m_boatY)->m_triggerType != 0)
         m_town->m_buildings |= TOWN_EXTRA_DOCK_GRAPHIC_MASK;
     else
         m_town->m_buildings &= ~TOWN_EXTRA_DOCK_GRAPHIC_MASK;
@@ -1434,7 +1434,7 @@ int townManager::Main(tag_message &message)
                     TOWN_INTERFACE_BROADCAST_FLAGS);
                 if (gpGame->GetBoatsBuilt() < TOWN_MAX_BOATS &&
                     gpAdvManager->GetCell(m_town->m_boatX,
-                                          m_town->m_boatY)->triggerType == 0) {
+                                          m_town->m_boatY)->m_triggerType == 0) {
                     m_heroWindow0 =
                         new heroWindow(0xb1, 0x14, "shipwind.bin");
                     if (m_heroWindow0 == 0)
@@ -2542,12 +2542,12 @@ int townManager::RecruitHero(int availableHeroIndex, int cannotRecruit)
         m_recruitHero->m_remainingMobility = m_recruitHero->CalcMobility();
         m_recruitHero->m_mobility = m_recruitHero->m_remainingMobility;
         m_recruitHero->m_locationType =
-            gpGame->m_worldMap.GetCell(townX, townY)->triggerType;
+            gpGame->m_worldMap.GetCell(townX, townY)->m_triggerType;
         m_recruitHero->m_occupiedTown =
-            gpGame->m_worldMap.GetCell(townX, townY)->w4hi;
-        gpGame->m_worldMap.GetCell(townX, townY)->triggerType =
+            gpGame->m_worldMap.GetCell(townX, townY)->m_objectMetadata;
+        gpGame->m_worldMap.GetCell(townX, townY)->m_triggerType =
             AI_OBJECT_HERO;
-        gpGame->m_worldMap.GetCell(townX, townY)->w4hi =
+        gpGame->m_worldMap.GetCell(townX, townY)->m_objectMetadata =
             gpCurPlayer->m_availableHeroIds[m_recruitState];
         SendMapChange(3, m_recruitHero->m_id, townX, townY,
                       TOWN_MAP_CHANGE_UNUSED, 0, 0);
