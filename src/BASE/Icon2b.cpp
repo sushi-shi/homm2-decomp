@@ -62,6 +62,13 @@ DATA(0x00534c5c) static unsigned int gIcCnt2;
 // 0x4c9 candidate bytes versus 0x4ed retail and 80/83 relocations, from extracting the entry-offset
 // multiply into an inline helper. Nested and bundled helpers did not raise that maximum; no generated
 // source was retained because neither batch reached exact closure.
+// A later unified-runner audit used 229 valid disposable declaration states. State alone reached
+// 75.980770%; a 36-shape related-version-corroborated setup/payload batch reached 75.241760%; their
+// cross reached 76.530220%, candidate 0x4cc versus retail 0x4ed, with 79/83 relocations. The useful
+// source lever was splitting each payload read into cursor increment followed by `gIcSrc[-1]`; the
+// typed repeated-index setup did not improve the canonical setup. The winning predecessor was a
+// prototype/include-equivalent state. This remains broad unresolved allocation/code generation;
+// neither the split-read source nor any generated declaration was retained below exact closure.
 VA(0x004d0570, 0x4ed)
 void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                   int clip, int clipX, int clipY, int clipW, int clipH, int color)
