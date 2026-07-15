@@ -145,7 +145,7 @@ typedef enum MonsterDatabaseConstant {
 struct tag_monsterInfo {
     union {
         struct {
-            unsigned short cost;
+            short cost;
             int fightValue;
         };
         int randomValue;
