@@ -19,11 +19,19 @@ def main(argv=None):
         from homm2.enum_types import main as m; return m(rest)
     if cmd == "strict-allocations":
         from homm2.build.strict_allocations import main as m; return m(rest)
+    if cmd == "data-topology":
+        from homm2.build.reviewed_data import main as m
+        if len(rest) != 1 or rest[0] not in (
+                "propose", "promote", "finalize", "regenerate"):
+            print("usage: homm2 data-topology {propose|promote|finalize|regenerate}",
+                  file=sys.stderr)
+            return 1
+        return m(["--" + rest[0]])
     if cmd == "build":
         if sh("python3", "configure.py"): return 1
         if sh("ninja", *rest): return 1
         # HARD gates: every declaration comes from a header (no drift), and every emitted
-        # function symbol exists in CodeView (no invented/fake labels).
+        # function symbol exists in the retained-public/recovered-private inventory.
         if sh("python3", "-m", "homm2.build.assert_decls"): return 1
         if sh("python3", "-m", "homm2.build.assert_no_fake_labels"): return 1
         if sh("python3", "-m", "homm2.build.assert_globals_data"): return 1
@@ -52,6 +60,6 @@ def main(argv=None):
         from homm2.analysis.sema import main as m; return m(rest)
     if cmd == "ghidra":
         from homm2.ghidra.driver import cli_main as m; return m(rest)
-    print("usage: homm2 {init|configure|build|link|clangd|enum-types|strict-allocations|status|relocs|sema|ghidra}",
+    print("usage: homm2 {init|configure|build|link|clangd|enum-types|strict-allocations|data-topology|status|relocs|sema|ghidra}",
           file=sys.stderr)
     return 0 if cmd in ("help", "-h", "--help") else 1

@@ -7,13 +7,14 @@ public symbol RVAs and `sstModule` contribution ranges remain authoritative for 
 contents. The shipping NB09 stream has no game procedure, local, type, or line records; this
 process does not infer any of those from CodeView.
 
-For a function, candidate `DIR32` relocations are paired in order with retail HIGHLOW sites only
-when their counts agree. Known public-data relocations anchor the pairing. Every occurrence of a
-candidate-defined symbol must then identify one retail RVA, every definition must map to a
-different allocation, and every mapped extent must remain within the same TU/storage contribution.
-Before a group closes, every retail HIGHLOW target in that contribution must be owned by one of its
-allocations. Ambiguity, overlap, a missing definition, or an uncovered reference leaves the whole
-group open; the generator never emits a partial closed-world group.
+The primary mapper replays candidate sections into independent `.rdata`, `.data`, and `.bss`
+streams in COFF section-table order with their encoded alignment. A retail contribution start plus
+the replayed section/symbol offset derives private RVAs directly. NB09 public RVAs are hard anchors;
+candidate DIR32 versus retail HIGHLOW sites and literal payload bytes validate identity. When the
+current source has a real stream-layout divergence, the exception mapper accepts only a hard public
+RVA, a unique aligned relocation proof, or a unique literal payload occurrence. Ambiguity, overlap,
+a missing definition, or an uncovered reference leaves the whole group open; the generator never
+emits a partial closed-world group.
 
 The generated reviewed manifest records candidate section offsets and symbol scope. The pinned
 delinker emits closed groups in that topology, resolves interior references as owner plus addend,
@@ -29,20 +30,68 @@ ownership.
 and exits unsuccessfully if any candidate data-bearing group remains open. Without that flag the
 tool emits only independently closed groups so they can be reviewed and integrated incrementally;
 that partial output is not evidence that the program-wide topology is complete.
+`--diagnostics-output` always writes a stable JSON queue, including overlapping cause and storage
+counts, even when `--require-all` refuses to write the manifest.
+
+## Target lifecycle
+
+`homm2 init` has two distinct modes. Before canonical manifests exist, it creates a permissive
+bootstrap target using `--recover-data-relocs-from-pdb`; that target exists only so candidate
+objects can be compiled and inspected. After canonical manifests are promoted, init reproduces the
+strict target from those versioned inputs instead.
+
+The explicit topology commands are:
+
+- `homm2 data-topology propose` writes a disposable partial manifest and structured diagnostics to
+  `build/gen/`. It never changes versioned configuration or target objects.
+- `homm2 data-topology promote` writes a versioned snapshot of every currently proved closed group,
+  the explicit unresolved-range allowlist, and the current coverage/open diagnostics. Partial
+  promotion is intentional: regenerate, run objdiff, review the delta, and iterate without silently
+  extending fallback beyond `config/delink_unresolved_data.tsv`.
+- `homm2 data-topology finalize` is the program-wide closure gate. It writes nothing unless every
+  candidate group is closed and the `.text`, retail file, loaded-RVA, and TU-data partition audits
+  have zero blockers.
+- Promoted snapshots live in `config/delink_data_topology.tsv`,
+  `config/delink_contributions.tsv`, `config/delink_unresolved_data.tsv`,
+  `config/retail_coverage.tsv`, and `config/retail_coverage_diagnostics.json` for review and commit.
+- `homm2 data-topology regenerate` consumes only those versioned canonical files and atomically
+  replaces `build/delink`. Its provenance stamp hashes every config, the retail executable, the
+  synthetic delinker-input PDB, and the pinned delinker executable.
+
+Normal `homm2 build` and `homm2 status` consume the fixed target. They never run the candidate
+mapper, rewrite a topology config, or refresh target objects. If a canonical input changes, they
+fail with an explicit regeneration instruction.
+
+Strict partial regeneration still uses legacy PDB naming for unresolved addresses, but only inside
+the promoted nonoverlapping unresolved-range union. That union is built from open compiland
+contributions plus exact unowned retail HIGHLOW targets (needed for linker-aggregated common/BSS
+storage). Vostok rejects any fallback target absent from this explicit allowlist.
+
+The coverage manifest contains independent exact partitions. `file` covers every byte from offset
+zero through the end of the appended debug payload, including headers, raw sections, alignment,
+FPO/MISC records, and the embedded NB09 stream. `loaded` covers RVA zero through `SizeOfImage`,
+including every section and virtual alignment/BSS tail. `text` is emitted only by the existing
+fail-closed procedure/jump-table/exclusion/padding audit. `tu-data` partitions every configured
+`.rdata`, initialized `.data`, and zero-fill `.bss` contribution into literal, constant, allocation,
+or explicit zero-padding records. Nonzero gaps, overlaps, cross-owner allocations, unowned publics,
+invalid HIGHLOW sites/targets, or any text evidence failure block promotion.
 
 ## Current census
 
-At the implementation checkpoint, candidate objects contain 6,733 defined symbols across 163
+At the stream-replay checkpoint, candidate objects contain 6,733 defined symbols across 167
 data-bearing object/storage groups. This denominator includes public data, compiler-local statics,
 string literals, constant pools, vtables, and other compiler-emitted definitions, not just the 281
 source lines spelling `DATA(...) static`.
 
-The first fail-closed pass proves 226 definitions in 59 complete groups. The remaining 104 groups
-are reported explicitly: 58 initialized-data, 29 BSS, and 17 read-only-data groups. Diagnostic
-classes overlap because one group can fail several checks: 85 have a referenced retail RVA not yet
-covered, 70 contain an unmapped candidate definition, 18 have an ambiguous relocation mapping, 14
-use multiple candidate COFF sections, 24 produce overlapping inferred retail extents, 10 have an
-extent outside the contribution, and 9 fail the one-to-one mapping check.
+The replay plus evidence exception path proves 908 definitions in 98 complete groups. The
+remaining 69 groups are reported explicitly; two formerly accepted BSS mappings are now open
+because no matching sstModule contribution owns them. The open set otherwise contains the prior
+47 initialized-data, 19 BSS, and one read-only-data
+group. Diagnostic classes overlap because one group can fail several checks: 53 have a referenced
+retail RVA not yet covered, 35 contain an unmapped candidate definition, 12 have an ambiguous
+mapping, 26 produce overlapping inferred retail extents, 12 have an extent outside retail storage,
+and 10 fail the one-to-one mapping check. Four groups retain nonzero unmodeled tail payload, three
+leave a public definition uncovered, and two lack a usable retail contribution.
 
 `BASE/Icondf2b` is the regression fixture. Its 37 candidate/retail `DIR32` sites, including two
 public `uDimPal` anchors, prove a bijection for all thirteen four-byte function statics. The target
