@@ -25,6 +25,8 @@ def _i(v): return int(v) if v not in (None, "") else 0
 
 
 def load_report():
+    from homm2.build.reviewed_data import ensure_reviewed_targets
+    ensure_reviewed_targets()
     od = REPO / "build/objdiff"; rep = od / "report.json"
     subprocess.run(["objdiff-cli", "report", "generate", "-p", str(od), "-o", str(rep)],
                    cwd=REPO, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

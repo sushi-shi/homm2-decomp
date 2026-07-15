@@ -11,7 +11,7 @@ Emits, from the one manifest:
 The delinked targets are produced once by `homm2 init` (synth_pdb -> vostok-delinker).
 Run inside `nix develop .#build`:  python3 configure.py && ninja
 """
-import json, sys, tomllib
+import csv, json, sys, tomllib
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent / "scripts"))
 from homm2.build import ninja_syntax
@@ -102,13 +102,22 @@ def main():
              + struct.pack("<I", 4))                                       # empty string table
     (od / "dummy.obj").write_bytes(dummy)
     delink = REPO / "build/delink"
+    reviewed_units = set()
+    reviewed = REPO / "config/required_initialized_storage.tsv"
+    if reviewed.exists():
+        with reviewed.open() as stream:
+            for row in csv.DictReader(
+                    (line for line in stream if not line.lstrip().startswith("#")),
+                    delimiter="\t"):
+                reviewed_units.add(row["unit"])
     units_j = []
     for u in units:
         tgt = delink / f"{u['unit']}.c.obj"
         units_j.append({
             "name": u["unit"],
             "base_path": f"./base/{u['unit']}.obj",
-            "target_path": f"../delink/{u['unit']}.c.obj" if tgt.exists() else "./dummy.obj",
+            "target_path": (f"../delink/{u['unit']}.c.obj"
+                            if tgt.exists() or u["unit"] in reviewed_units else "./dummy.obj"),
             "scratch": {"platform": build.get("platform", "win32"),
                         "compiler": build.get("compiler", "msvc4.2")},
         })
