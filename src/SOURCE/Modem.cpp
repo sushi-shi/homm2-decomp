@@ -14,16 +14,11 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/comwin.h>
 #include <SOURCE/kbwin.h>
-// @match-note
-// Complete 0xdc frame, reset/dial/wait/direct-connect CFG, queue/config layouts, and
-// all 52 relocations agree. Residuals begin in local-slot ordering and string aliases;
-// tried branch and switch dispatch plus separate/shared final Connect calls.
-// Revisit after config/queue layout evidence changes or in the last-mile phase.
 VA(0x0040c8f0, 0x24e)
 void ModemSetup(int mode)
 {
-    char directConnectMessage[104];
-    int resetAttempt;
+    char directConnectMessage3[104];
+    int resetAttempt9;
     char command[104];
 
     LogStr("MS1");
@@ -37,11 +32,11 @@ void ModemSetup(int mode)
     LogStr("MS2");
 
     if (gbDirectConnect == 0) {
-        for (resetAttempt = 0; resetAttempt < 2; ++resetAttempt) {
-            if (gConfig.comPort[gbDirectConnect] < 1)
-                sprintf(command, "ATZ");
-            else
+        for (resetAttempt9 = 0; resetAttempt9 < 2; ++resetAttempt9) {
+            if (gConfig.comPort[gbDirectConnect] >= 1)
                 sprintf(command, gConfig.modemInitString);
+            else
+                sprintf(command, "ATZ");
             PollSound();
             ModemCommand(command);
             DelayMilli(MODEM_RESET_DELAY);
@@ -57,14 +52,12 @@ void ModemSetup(int mode)
         if (gbDirectConnect == 0 && Dial() != 0) {
             RemoteCleanup();
             GameMode = 0;
-            return;
         }
         break;
     case MODEM_MODE_WAIT:
         if (gbDirectConnect == 0 && Wait() != 0) {
             RemoteCleanup();
             GameMode = 0;
-            return;
         }
         break;
     default:
@@ -75,21 +68,21 @@ void ModemSetup(int mode)
         LogStr("MS4");
         WFDCStage = 0;
         giWaitType = MODEM_WAIT_DIRECT_CONNECT;
-        strcpy(directConnectMessage,
+        strcpy(directConnectMessage3,
                "Waiting for other computer to log in to direct connection.\n\n"
                "Press 'CANCEL' to abort.");
-        NormalDialog(directConnectMessage, 6, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog(directConnectMessage3, 6, -1, -1, -1, 0, -1, 0, -1, 0);
         if (gbFunctionComplete == 0)
             ShutDown(0);
         LogStr("MS5");
+    } else {
+        Connect();
     }
-    Connect();
 }
 
-// @match-note
-// Complete 0x2c frame and dial command/response CFG; all 19 relocations agree.
-// Residual is pooled-string/local-slot identity after trying direct and staged returns.
-// Revisit in the last-mile phase.
+// @early-stop: all non-relocation bytes in the declared 0x9e-byte span agree and
+// all 19 relocation offsets are present. The residual is only delinked literal-pool
+// identities for the dial format/status/CONNECT strings.
 VA(0x0040cb3e, 0x9e)
 long int Dial(void)
 {
@@ -102,10 +95,9 @@ long int Dial(void)
     return GUIModemResponse(gText, "CONNECT") != 0;
 }
 
-// @match-note
-// Complete ring/answer/connect sequence and all 9 relocations agree. Remaining bytes
-// are pooled-string identities and continuation jumps after direct/staged returns.
-// Revisit in the last-mile phase.
+// @early-stop: all non-relocation bytes in the declared 0x54-byte span agree and
+// all 9 relocation offsets are present. The residual is only delinked literal-pool
+// identities for the ring/answer/connection strings.
 VA(0x0040cbdc, 0x54)
 long int Wait(void)
 {
@@ -126,10 +118,6 @@ void GUIModemCommand(char *message, char *command)
         ShutDown(0);
 }
 
-// @match-note
-// Complete timed character-send CFG and 0x4 local frame; all 13 relocations agree.
-// First residual is local strlen slot ordering, followed by one continuation jump;
-// tried inline strlen and the retained explicit length local. Revisit last-mile.
 VA(0x0040cca9, 0x95)
 signed char GUIModemCommandExec(void)
 {
@@ -143,23 +131,21 @@ signed char GUIModemCommandExec(void)
         write_buffer(cModemCommand + iModemCommandPos, 1);
         ++iModemCommandPos;
         return 0;
+    } else {
+        write_buffer("\r", 1);
+        return 1;
     }
-    write_buffer("\r", 1);
-    return 1;
 }
 
-// @match-note
-// Complete 0x8 frame, per-character delay loop, and all 5 relocations agree. Residuals
-// are the carriage-return string alias and local-slot order after inline/stored strlen.
-// Revisit in the last-mile phase.
 VA(0x0040cd3e, 0x8e)
 void ModemCommand(char *command)
 {
+    char modemText[MODEM_WORK_TEXT_SIZE];
     int commandLength = strlen(command);
-    int commandPosition;
-    for (commandPosition = 0; commandPosition < commandLength;
-         ++commandPosition) {
-        write_buffer(command + commandPosition, 1);
+    int commandPosition0;
+    for (commandPosition0 = 0; commandPosition0 < 0[&commandLength];
+         ++commandPosition0) {
+        write_buffer(command + commandPosition0, 1);
         DelayMilli(MODEM_COMMAND_DELAY);
     }
     write_buffer("\r", 1);
@@ -178,10 +164,12 @@ signed char GUIModemResponse(char *message, char *response)
     return 0;
 }
 
-// @match-note
-// Complete response accumulation/truncation/compare CFG and all 20 relocations agree.
-// Residuals are branch continuation placement around the >17 truncation arm; tried
-// nested returns and the retained shared final compare. Revisit in the last-mile phase.
+// @early-stop: the corrected response CFG truncates overlong lines before comparison
+// and returns immediately for non-printing non-terminators. Frame, all non-jump
+// opcodes/operands, and 20/20 relocation offsets agree; the GUIMRresponse[17]
+// relocation is delinked as a literal alias. Ours is exactly 0xa bytes short, equal
+// to the two missing five-byte continuation jumps. Tried nested else and explicit
+// else-if forms; the latter regressed to 90.19%.
 VA(0x0040ce4e, 0xe2)
 signed char GUIModemResponseExec(void)
 {
@@ -192,18 +180,20 @@ signed char GUIModemResponseExec(void)
         GUIMRresponse[GUIMRrespptr] = 0;
         if (GUIMRrespptr > 17) {
             GUIMRresponse[17] = 0;
-            return 0;
         }
-    } else if (GUIMRc >= 32) {
-        GUIMRresponse[GUIMRrespptr] = static_cast<char>(GUIMRc);
-        ++GUIMRrespptr;
+    } else {
+        if (GUIMRc >= 32) {
+            GUIMRresponse[GUIMRrespptr] = static_cast<char>(GUIMRc);
+            ++GUIMRrespptr;
+        }
         return 0;
     }
     if (strncmp(GUIMRresponse, GUIMRresp, strlen(GUIMRresp)) != 0) {
         GUIMRrespptr = 0;
         return 0;
+    } else {
+        return 1;
     }
-    return 1;
 }
 
 VA(0x0040cf30, 0x4e)
@@ -216,10 +206,6 @@ int write_buffer(char *buffer, int length)
     return 1;
 }
 
-// @match-note
-// Complete 0x8 frame and receive-result semantics; the sole relocation agrees. The
-// first residual is the compiler temporary slot for sign-extending com_rcv's short;
-// tried short and int result locals. Revisit in the last-mile phase.
 VA(0x0040cf7e, 0x47)
 int read_byte(void)
 {
@@ -227,7 +213,8 @@ int read_byte(void)
     int received = com_rcv(0, 1, value);
     if (received == 1)
         return value[0];
-    return -1;
+    else
+        return -1;
 }
 
 VA(0x0040cfc5, 0x27)
@@ -236,33 +223,38 @@ void write_byte(int value)
     com_snd(0, 0, 1, &value, 0);
 }
 
-// @match-note
-// Complete 0x18 frame, ID handshake/retry/drain CFG, and all 47 relocations agree.
-// Residuals begin with unsigned tick modulo temporaries and branch trampolines; tried
-// direct modulo, signed/unsigned seed locals, and both time-compare orders. Revisit last-mile.
+// @match-note: live 95.34%. The recovered 0x1c frame overwrites idSeed with the
+// unsigned modulo remainder, and the complete handshake/retry/drain semantics,
+// 0x1bb size, and all 47 relocation offsets agree. The residual is two retail
+// packet-validation trampolines (`je; jmp`) versus our direct `jne`, balanced by
+// two continuation jumps near the epilogue, plus packet[9]/literal alias identities.
+// Combined and nested packet-length/ID tests emit the same direct branches.
 VA(0x0040cfec, 0x1bb)
 void Connect(void)
 {
     char idMessage[20];
     unsigned int idSeed = KBTickCount();
-    sprintf(idstr, "%06d", idSeed % 1000000);
+    idSeed %= MODEM_ID_MODULUS;
+    sprintf(idstr, "%06d", idSeed);
     oldsec = -1;
     remotestage = 0;
     localstage = remotestage;
     for (;;) {
         if (ReadPacket()) {
             packet[packetlen] = 0;
-            if (packetlen == 10 && strncmp(packet, "ID", 2) == 0) {
-                if (strncmp(packet + 2, idstr, 6) == 0) {
-                    sprintf(gText,
-                            "Duplicate ID Strings!\nSorry Please Try Again\n");
-                    GOut(gText);
-                    RemoteCleanup();
+            if (packetlen == 10) {
+                if (strncmp(packet, "ID", 2) == 0) {
+                    if (strncmp(packet + 2, idstr, 6) == 0) {
+                        sprintf(gText,
+                                "Duplicate ID Strings!\nSorry Please Try Again\n");
+                        GOut(gText);
+                        RemoteCleanup();
+                    }
+                    strncpy(remoteidstr, packet + 2, 6);
+                    remotestage = packet[9] - '0';
+                    localstage = remotestage + 1;
+                    oldsec = -1;
                 }
-                strncpy(remoteidstr, packet + 2, 6);
-                remotestage = packet[9] - '0';
-                localstage = remotestage + 1;
-                oldsec = -1;
             }
         }
 
@@ -281,19 +273,19 @@ void Connect(void)
     }
 }
 
-// @match-note
-// Complete 0x1c frame, three-stage switch CFG, and all 49 relocations agree. Residuals
-// are stage/tick temporary slots and switch continuation jumps after trying if chains,
-// direct switch, and signed/unsigned ID seeds. Revisit in the last-mile phase.
+// @early-stop: all non-relocation bytes in the declared 0x211-byte span agree and
+// all 49 relocation offsets are present after removing the redundant stage local and
+// overwriting idSeed with its modulo remainder. Residuals are only literal identities
+// and the packet[9] interior alias synthesized by the delinker.
 VA(0x0040d1a7, 0x211)
 int WaitForDirectConnect(void)
 {
     char idMessage[20];
-    int stage = WFDCStage;
-    switch (stage) {
+    switch (WFDCStage) {
     case 0: {
         unsigned int idSeed = KBTickCount();
-        sprintf(idstr, "%06d", idSeed % 1000000);
+        idSeed %= MODEM_ID_MODULUS;
+        sprintf(idstr, "%06d", idSeed);
         oldsec = -1;
         remotestage = 0;
         localstage = remotestage;
@@ -335,10 +327,11 @@ int WaitForDirectConnect(void)
     return 0;
 }
 
-// @match-note
-// Complete escape/reset/overflow state machine and all 21 relocations agree. The first
-// residuals are delinked inque+4 and string identities, followed by continuation jumps;
-// tried goto and nested-loop forms, retaining retail body order. Revisit last-mile.
+// @early-stop: the complete 0x4-frame escape/reset/overflow state machine and all
+// non-jump opcodes/operands agree; all 21 relocation offsets are present, with only
+// delinked inque.writePosition and literal aliases. The explicit terminator `else if`
+// leaves one extra five-byte continuation jump and makes the base span 0x12c versus
+// retail 0x127. Separate inner tests move that jump to the return arm at 96.25%.
 VA(0x0040d3b8, 0x127)
 char ReadPacket(void)
 {
@@ -362,8 +355,7 @@ char ReadPacket(void)
                 if (input == MODEM_PACKET_END) {
                     newpacket = 1;
                     return 1;
-                }
-                if (input == 0) {
+                } else if (input == 0) {
                     newpacket = 1;
                     break;
                 }
@@ -384,10 +376,10 @@ char ReadPacket(void)
     }
 }
 
-// @match-note
-// Complete 0x234 frame, byte-stuffing loop, queue retry CFG, and all 4 relocations agree.
-// Residuals are local slot allocation and final loop continuations after trying separate
-// source/index locals and the retained in-place parameter/index form. Revisit last-mile.
+// @early-stop: all non-relocation bytes in the declared 0xff-byte span agree and all
+// 4 relocation offsets are present. The recovered loop assigns `remaining5 = length--`,
+// placing remaining at -0x228 and the encoded buffer at -0x224; the sole residual is
+// the delinked `TOO LONG` literal-pool identity.
 VA(0x0040d4df, 0xff)
 void WriteModemPacket(char *buffer, int length)
 {
@@ -395,15 +387,14 @@ void WriteModemPacket(char *buffer, int length)
     if (length > MODEM_PACKET_PAYLOAD_SIZE) {
         LogStr("TOO LONG");
     } else {
-        int remaining;
+        int remaining5;
         char encoded[MODEM_ENCODED_PACKET_SIZE];
 
         encoded[encodedPosition] = MODEM_ESCAPE_BYTE;
         ++encodedPosition;
         encoded[encodedPosition] = 0;
         ++encodedPosition;
-        remaining = length;
-        while (--remaining != 0) {
+        while ((remaining5 = length--) != 0) {
             if (*buffer == MODEM_ESCAPE_BYTE) {
                 encoded[encodedPosition] = MODEM_ESCAPE_BYTE;
                 ++encodedPosition;
