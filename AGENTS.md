@@ -49,24 +49,30 @@ authoritative. This file is the short, restart-ready Codex workflow.
    residual keeps it below 100%. Do not run extended compile searches or permutation passes:
    later shared-header/layout recovery can invalidate carefully tuned matches. Only after the
    syntactic-placeholder census reaches zero, start the last-mile phase and use
-   `scripts/permute_ast.py` on structurally aligned 96-99% functions.
-   For a remaining compiler/TU-state wall after those gates, use
-   `scripts/tu_state_noise.py` as a bounded diagnostic. It temporarily inserts deterministic
-   parser-visible declarations, harmless definitions, or curated includes and compiles outside
-   the normal object path. Probe-only symbols/storage may exist in that disposable object, but
-   the canonical target hash, identity, score/relocation extraction, siblings, predecessors, and
-   size/relocation distance are guarded. Curated include probes also fail closed on unresolved
-   headers or any supplied macro name referenced by the canonical target block. Generated probes
-   are never applied or committed. Sub-100 results are disposable diagnostics and must never enter
-   the retained maximum: they are phantom scores not produced by the canonical checked-in TU and
-   would distort queue priority and make later structural edits look like regressions. Guarded
-   `--record-max` may set only the target row to 100.0000, and only for an unrounded exact 100 with
-   exact CodeView size and a complete ordered relocation offset/type/identity/addend match under the
-   unchanged source hash. Otherwise it leaves the baseline byte-identical. A clean compiled run
-   deletes its entire temporary output unless such an audited exact closure exists; interruption
-   and fatal exits also clean by default. Exact closure preserves the seed/tag/body manifest for
-   reproduction regardless of `--record-max`. Explicit `--dry-run` is the only non-matching mode
-   that intentionally retains generated snippets for inspection.
+   `scripts/match_variants.py` on structurally aligned 96-99% functions. It is the exact-only
+   public frontend for hardened libclang AST mutations, parser-visible TU-state variants, and
+   optional hand-authored exact-span axes. Keep searches shallow and bounded, use repeatable
+   `--require-mutation` filters for the specific residual, and inspect every retained candidate;
+   syntax-aware mutations are not automatically semantically valid. The family-balanced enumerator
+   prevents one axis from consuming the finite candidate budget. `scripts/permute_ast.py` is only a
+   legacy compatibility wrapper, while standalone `scripts/tu_state_noise.py` remains a bounded
+   diagnostic for a specifically suspected TU-state wall.
+   TU-state trials temporarily insert deterministic parser-visible declarations, harmless
+   definitions, or curated includes and compile outside the normal object path. Probe-only
+   symbols/storage may exist in that disposable object, but the canonical target hash, identity,
+   score/relocation extraction, siblings, predecessors, and size/relocation distance are guarded.
+   Curated include probes also fail closed on unresolved headers or any supplied macro name
+   referenced by the canonical target block. Generated probes are never applied or committed.
+   Sub-100 results are disposable diagnostics and must never enter the retained maximum: they are
+   phantom scores not produced by the canonical checked-in TU and would distort queue priority and
+   make later structural edits look like regressions. Guarded `--record-max` may set only the target
+   row to 100.0000, and only for an unrounded exact 100 with exact CodeView size and a complete
+   ordered relocation offset/type/identity/addend match under the unchanged source hash. Otherwise
+   it leaves the baseline byte-identical. A clean compiled run deletes its entire temporary output
+   unless such an audited exact closure exists; interruption and fatal exits also clean by default.
+   Exact closure preserves the seed/tag/body manifest for reproduction regardless of `--record-max`.
+   Explicit `--dry-run` is the only non-matching mode that intentionally retains generated snippets
+   for inspection.
    Sweep every SOURCE TU in that phase. The campaign is complete only when every function's
    retained fuzzy maximum is 100%, and therefore every TU's fuzzy-max is 100%. If a byte-proven
    delinker artifact prevents the raw metric from reaching 100%, normalize or explicitly bless
