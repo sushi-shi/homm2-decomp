@@ -26,6 +26,7 @@ struct MemEntry {
     int line;           // +0x46  original source line supplied by the call site
 };
 #pragma pack(pop)
+SIZE(MemEntry, 0x4a);
 #ifdef HOMM2_MISC_INLINE_ICONENTRY
 #pragma pack(push, 1)
 struct IconEntry {

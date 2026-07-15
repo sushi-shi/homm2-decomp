@@ -80,28 +80,28 @@ void *BaseAlloc(unsigned int size, char *originalFile, int originalLine)
         return 0;
     }
     ++iMemEntries;
-    int i;
-    for (i = 0; i < 2000; ++i) {
-        if (!gpMemEntry[i].used) {
-            gpMemEntry[i].used = 1;
-            gpMemEntry[i].ptr = ptr;
-            gpMemEntry[i].size = size;
-            strcpy(gpMemEntry[i].file, originalFile);
-            gpMemEntry[i].line = originalLine;
-            i = 99999;
+    int entryIndex;
+    for (entryIndex = 0; entryIndex < 2000; ++entryIndex) {
+        if (!gpMemEntry[entryIndex].used) {
+            gpMemEntry[entryIndex].used = 1;
+            gpMemEntry[entryIndex].ptr = ptr;
+            gpMemEntry[entryIndex].size = size;
+            strcpy(gpMemEntry[entryIndex].file, originalFile);
+            gpMemEntry[entryIndex].line = originalLine;
+            entryIndex = 99999;
         }
     }
     if (giDebugLevel == 4) {
         sprintf(text, "KBAlloc    Size %d   Ptr %d   File %s  Line %d", size, ptr,
                 originalFile, originalLine);
         if (giDebugLevel >= 2) {
-            FILE *f = fopen("KB.LOG", "at+");
-            if (f != 0) {
+            FILE *logFile = fopen("KB.LOG", "at+");
+            if (logFile != 0) {
                 strcpy(logText, text);
                 *reinterpret_cast<unsigned short *>(logText + strlen(logText)) =
                     *reinterpret_cast<const unsigned short *>("\n");
-                fputs(logText, f);
-                fclose(f);
+                fputs(logText, logFile);
+                fclose(logFile);
                 if (giDebugLevel == 4)
                     OutputDebugStringA(logText);
             }
@@ -116,7 +116,8 @@ void *BaseAlloc(unsigned int size, char *originalFile, int originalLine)
 // base preloads the word then derives `buf+strlen`; retail scans first and writes `[edi-1]`.
 // The other two append sites have the same scheduling difference.  All allocation/free,
 // MemEntry, logging, and bad-delete paths agree.  The BaseAlloc append spellings were also
-// tested here; revisit only after exact-preserving predecessor/TU-state changes.
+// tested here; a cached MemEntry reference regressed the loop allocation. Revisit only
+// after exact-preserving predecessor/TU-state changes.
 VA(0x004c3f80, 0x386)
 void BaseFree(void *ptr, char *originalFile, int originalLine)
 {
@@ -132,13 +133,13 @@ void BaseFree(void *ptr, char *originalFile, int originalLine)
         LogInt("Free ", reinterpret_cast<int>(ptr), -999, -999, -999, -999, -999, -999);
     if (ptr == 0) {
         if (giDebugLevel >= 2) {
-            FILE *f = fopen("KB.LOG", "at+");
-            if (f != 0) {
+            FILE *logFile = fopen("KB.LOG", "at+");
+            if (logFile != 0) {
                 strcpy(logText, "NULL POINTER");
                 *reinterpret_cast<unsigned short *>(logText + strlen(logText)) =
                     *reinterpret_cast<const unsigned short *>("\n");
-                fputs(logText, f);
-                fclose(f);
+                fputs(logText, logFile);
+                fclose(logFile);
                 if (giDebugLevel == 4)
                     OutputDebugStringA(logText);
             }
@@ -148,41 +149,42 @@ void BaseFree(void *ptr, char *originalFile, int originalLine)
     --iMemEntries;
     if (iMemEntries < 0)
         LogInt("MemEntries Below 0", iMemEntries, -999, -999, -999, -999, -999, -999);
-    int i;
-    for (i = 0; i < 2000; ++i) {
-        if (gpMemEntry[i].ptr == ptr) {
+    int entryIndex;
+    for (entryIndex = 0; entryIndex < 2000; ++entryIndex) {
+        if (gpMemEntry[entryIndex].ptr == ptr) {
             if (giDebugLevel == 4) {
-                sprintf(text, "KBFree    Size %d   Ptr %d   File %s  Line %d", gpMemEntry[i].size,
-                        ptr, gpMemEntry[i].file, gpMemEntry[i].line);
+                sprintf(text, "KBFree    Size %d   Ptr %d   File %s  Line %d",
+                        gpMemEntry[entryIndex].size, ptr, gpMemEntry[entryIndex].file,
+                        gpMemEntry[entryIndex].line);
                 if (giDebugLevel >= 2) {
-                    FILE *f = fopen("KB.LOG", "at+");
-                    if (f != 0) {
+                    FILE *logFile = fopen("KB.LOG", "at+");
+                    if (logFile != 0) {
                         strcpy(logText, text);
                         *reinterpret_cast<unsigned short *>(logText + strlen(logText)) =
                             *reinterpret_cast<const unsigned short *>("\n");
-                        fputs(logText, f);
-                        fclose(f);
+                        fputs(logText, logFile);
+                        fclose(logFile);
                         if (giDebugLevel == 4)
                             OutputDebugStringA(logText);
                     }
                 }
             }
-            gpMemEntry[i].used = 0;
-            giTotalMemAllocated -= gpMemEntry[i].size;
-            i = 99999;
+            gpMemEntry[entryIndex].used = 0;
+            giTotalMemAllocated -= gpMemEntry[entryIndex].size;
+            entryIndex = 99999;
         }
     }
-    if (i < 99999) {
+    if (entryIndex < 99999) {
         sprintf(gText, "Bad Delete,  File '%13s'  Line % 4d, ptr %12d", originalFile,
                 originalLine, ptr);
         if (giDebugLevel >= 2) {
-            FILE *f = fopen("KB.LOG", "at+");
-            if (f != 0) {
+            FILE *logFile = fopen("KB.LOG", "at+");
+            if (logFile != 0) {
                 strcpy(logText, gText);
                 *reinterpret_cast<unsigned short *>(logText + strlen(logText)) =
                     *reinterpret_cast<const unsigned short *>("\n");
-                fputs(logText, f);
-                fclose(f);
+                fputs(logText, logFile);
+                fclose(logFile);
                 if (giDebugLevel == 4)
                     OutputDebugStringA(logText);
             }
@@ -199,6 +201,7 @@ void BaseFree(void *ptr, char *originalFile, int originalLine)
 // after `repne scasb` and stores through `[edi-1]`. LogInt, sprintf, fopen/fputs/
 // fclose and OutputDebugStringA targets are otherwise identical. `strcat`, strlen+
 // strcpy/memcpy, direct and named word stores, volatile load, and manual scan tried.
+// A bounded libclang AST pass tested nine variants in 30 walks and retained none.
 // Revisit through exact-preserving predecessor/TU-state variants; not byte-proven.
 VA(0x004c4310, 0x134)
 void PrintMemoryLeaks(void)
@@ -206,12 +209,13 @@ void PrintMemoryLeaks(void)
     char logText[500];
     if (giDebugLevel >= 1 && gpMemEntry != 0) {
         LogInt("Total Memory Leaks", iMemEntries, -999, -999, -999, -999, -999, -999);
-        int i = 0;
+        int entryIndex = 0;
         do {
-            if (gpMemEntry[i].used != 0) {
+            if (gpMemEntry[entryIndex].used != 0) {
                 sprintf(gText, "Memory Leak,  File '%13s'  Line % 4d, ptr %12d   size %6d",
-                        gpMemEntry[i].file, gpMemEntry[i].line, reinterpret_cast<int>(gpMemEntry[i].ptr),
-                        gpMemEntry[i].size);
+                        gpMemEntry[entryIndex].file, gpMemEntry[entryIndex].line,
+                        reinterpret_cast<int>(gpMemEntry[entryIndex].ptr),
+                        gpMemEntry[entryIndex].size);
                 if (giDebugLevel >= 2) {
                     FILE *logFile = fopen("KB.LOG", "at+");
                     if (logFile != 0) {
@@ -225,8 +229,8 @@ void PrintMemoryLeaks(void)
                     }
                 }
             }
-            i = i + 1;
-        } while (i < 2000);
+            entryIndex = entryIndex + 1;
+        } while (entryIndex < 2000);
     }
 }
 
