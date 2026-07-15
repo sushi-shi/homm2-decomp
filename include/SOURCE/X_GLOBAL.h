@@ -94,6 +94,12 @@ extern int xPasswordStringsIndex[];
 extern int xShrineBuildingCost[];
 
 // ---- globals (declarations, RVA order) ----
+typedef enum RadarColorTableCount {
+    RADAR_MAP_COLOR_COUNT = 16,
+    RADAR_OBJECT_COLOR_COUNT = 16,
+    RADAR_OWNER_COLOR_COUNT = 8
+} RadarColorTableCount;
+
 extern unsigned char giGroundShape[432];
 extern unsigned char gColorTableTan[256];
 extern unsigned char gColorTableGray[256];
@@ -102,9 +108,9 @@ extern unsigned char gColorTableDarkBrown[256];
 extern int giMainVideoModeWidth;
 extern int giMainVideoModeHeight;
 extern unsigned long glMilliCounter;
-extern unsigned char gMapColors[];
-extern unsigned char *gObjectColors;
-extern unsigned char gOwnerColors[];
+extern unsigned char gMapColors[RADAR_MAP_COLOR_COUNT];
+extern unsigned char gObjectColors[RADAR_OBJECT_COLOR_COUNT];
+extern unsigned char gOwnerColors[RADAR_OWNER_COLOR_COUNT];
 extern char *gTilesetFiles[64];
 extern unsigned char bPuzzleDraw[64];
 #include <SOURCE/dimPalette.h>

@@ -4587,9 +4587,15 @@ DATA(0x004f96cc) int giMainVideoModeColorDepth = 8;
 DATA(0x004f96d0) int giMainVideoModeWidth = 640;
 DATA(0x004f96d4) int giMainVideoModeHeight = 480;
 DATA(0x004f96d8) unsigned long glMilliCounter = 0;
-DATA(0x004f96e0) unsigned char gMapColors[16];
-DATA(0x004f96f0) unsigned char *gObjectColors;
-DATA(0x004f9700) unsigned char gOwnerColors[8];
+DATA(0x004f96e0) unsigned char gMapColors[RADAR_MAP_COLOR_COUNT] = {
+    77, 98, 13, 104, 32, 118, 54, 206, 41, 0, 0, 0, 0, 0, 0, 0
+};
+DATA(0x004f96f0) unsigned char gObjectColors[RADAR_OBJECT_COLOR_COUNT] = {
+    16, 48, 98, 160, 126, 74, 110, 179, 100, 218, 12, 12, 12, 12, 12, 12
+};
+DATA(0x004f9700) unsigned char gOwnerColors[RADAR_OWNER_COLOR_COUNT] = {
+    73, 105, 190, 114, 205, 138, 10, 0
+};
 DATA(0x004f9708) char *gTilesetFiles[64] = {
     "", "", "", "", "", "", "", "", "", "", "objnhaun.icn",
     "objnarti.icn", "mons32.icn", "art32.icn", "flag32.icn", "ressmall.icn",
