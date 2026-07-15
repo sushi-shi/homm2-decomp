@@ -7,6 +7,7 @@ from unittest.mock import patch
 
 from homm2.build.assert_relocs import (
     _PARSE_CACHE,
+    check_owner_offset_multisets,
     check_ordered_owner_offsets,
     check_ordered_reloc_addresses,
     parse_obj,
@@ -15,6 +16,7 @@ from homm2.build.reloc_owners import DataOwner, is_interior_reloc_alias, owners_
 
 
 GCONFIG_SYMBOL = "?gConfig@@3UconfigStruct@@A"
+GMONSTER_DATABASE_SYMBOL = "?gMonsterDatabase@@3PAUtag_monsterInfo@@A"
 
 
 class RelocOwnerTest(unittest.TestCase):
@@ -66,6 +68,52 @@ class OrderedRelocFieldTest(unittest.TestCase):
         self.assertIn("+0x5e", problems[0].diagnostic())
         self.assertIn("gConfig expected +0x30, actual +0x1c",
                       problems[0].diagnostic())
+
+    def test_process_random_objects_wrong_monster_field_regression(self):
+        # Captured from ProcessRandomObjects. Retail reads randomValue at +2;
+        # the bad anonymous union made candidate source read cost at +0.
+        monster_rva = 0xFAEB0
+        sym = {GMONSTER_DATABASE_SYMBOL: monster_rva}
+        owners = [DataOwner(
+            monster_rva, 0x6B8, GMONSTER_DATABASE_SYMBOL,
+            "gMonsterDatabase")]
+        target = [(0x2C2, "DIR32", "const_000faeb2", 0)]
+        base = [(0x2C2, "DIR32", GMONSTER_DATABASE_SYMBOL, 0)]
+        problems = check_ordered_owner_offsets(
+            sym, {}, owners, base, target)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("gMonsterDatabase expected +0x2, actual +0x0",
+                      problems[0].diagnostic())
+
+    def test_owner_multiset_catches_wrong_field_at_any_order(self):
+        target = [
+            (0x10, "DIR32", GCONFIG_SYMBOL, 0x4),
+            (0x20, "DIR32", GCONFIG_SYMBOL, 0x78),
+        ]
+        reordered = [
+            (0x10, "DIR32", GCONFIG_SYMBOL, 0x78),
+            (0x20, "DIR32", GCONFIG_SYMBOL, 0x4),
+        ]
+        self.assertEqual(check_owner_offset_multisets(
+            self.sym, {}, self.owners, reordered, target), [])
+
+        wrong = [
+            (0x10, "DIR32", GCONFIG_SYMBOL, 0x78),
+            (0x20, "DIR32", GCONFIG_SYMBOL, 0x1C),
+        ]
+        problems = check_owner_offset_multisets(
+            self.sym, {}, self.owners, wrong, target)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("WRONG OWNER OFFSETS: gConfig", problems[0].diagnostic())
+
+    def test_owner_multiset_defers_different_reference_counts(self):
+        target = [(0x10, "DIR32", GCONFIG_SYMBOL, 0x4)]
+        base = [
+            (0x10, "DIR32", GCONFIG_SYMBOL, 0x4),
+            (0x20, "DIR32", GCONFIG_SYMBOL, 0x78),
+        ]
+        self.assertEqual(check_owner_offset_multisets(
+            self.sym, {}, self.owners, base, target), [])
 
     def test_legitimate_external_symbol_displacement_matches(self):
         target = [(0x20, "DIR32", "const_00128d50", 0)]

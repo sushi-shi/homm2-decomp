@@ -5,12 +5,14 @@ produce one report row per COFF data symbol, and the synthetic PDB cannot fix th
 CodeView `S_LDATA32`/`S_GDATA32` records carry a name, type index, and address, but
 no allocation length or initialized-versus-loader-zero storage classification.
 
-`config/required_initialized_storage.tsv` is therefore the sole exact-extent input
-to reviewed target data. `scripts/homm2/build/reviewed_data.py` joins each enrolled
-name to the public inventory to validate address and compiland ownership, checks its
-retail PE storage and payload hash, and writes
-`build/gen/reviewed_delink_data.tsv`. The generated manifest labels every extent as
-`reviewed-required-initialized-storage`; it never promotes the provisional
+Two reviewed ledgers provide exact extents. `config/required_initialized_storage.tsv`
+records allocations whose initializer payload has been audited. The narrower
+`config/reloc_data_owners.tsv` records public owner regions whose source `DATA()` RVA
+and type-derived size are independently proven, including loader-zero `.bss` storage.
+`scripts/homm2/build/reviewed_data.py` joins both to the public inventory, validates
+address, compiland ownership, and PE storage, and writes
+`build/gen/reviewed_delink_data.tsv`. Initialized rows additionally validate the retail
+payload hash and relocation count. The generator never promotes a provisional
 next-public gap in `build/gen/symbol_names.csv` to CodeView truth.
 
 The patched delinker consumes the project-neutral columns `name`, `object`, `rva`,
@@ -28,8 +30,8 @@ are rejected. Names and RVAs are globally unique, extents must be non-zero,
 non-overlapping, and non-overflowing, and alignment must be a non-zero power of two.
 These checks are generic delinker input validation and do not depend on HoMM2 names.
 
-`homm2 status` hashes the ledger, public inventory, retail EXE, synthetic PDB, and
-delinker executable. A changed input triggers a focused delink into a temporary
+`homm2 status` hashes both ledgers, the relevant source `DATA()` definitions, public
+inventory, retail EXE, synthetic PDB, and delinker executable. A changed input triggers a focused delink into a temporary
 directory and replaces `build/delink` only after every reviewed owner object exists.
 This refresh does not regenerate the inventory, synthesize a PDB, or rerun the full
 `homm2 init` pipeline. Init records the same stamp after its normal delink, so the
