@@ -6,6 +6,7 @@
 #define HOMM2_MISC_INLINE_ICONENTRY
 #include <va.h>
 #include <BASE/Blur.h>
+#include <BASE/BlurConstants.h>
 #include <BASE/bitmap.h>
 #include <BASE/palette.h>
 #include <BASE/mouseManager.h>
@@ -22,13 +23,6 @@ DATA(0x004fa954) static int giCombatSpeed;
 
 #define BLUR_COMPONENT(table, offset)                                                              \
     (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(table) + (offset)))
-#define BLUR_COMPONENT_CHANNELS 3
-#define BLUR_COMPONENT_MAXIMUM 0x3f
-#define BLUR_COMPONENT_TABLE_BYTES 0x400
-#define BLUR_QUANTIZATION_SHIFT 5
-#define BLUR_QUANTIZATION_MASK ((1 << BLUR_QUANTIZATION_SHIFT) - 1)
-#define BLUR_LOOKUP_ROW_BYTES (1 << BLUR_QUANTIZATION_SHIFT)
-#define BLUR_SOUND_POLL_MASK 0x3f
 
 // @match-note
 // Coverage-phase structural checkpoint, not a proven wall. The complete CFG saves the source,
@@ -37,16 +31,19 @@ DATA(0x004fa954) static int giCombatSpeed;
 // releases all three explicit-provenance allocations. The RGB component tables are one contiguous
 // [3][256] aggregate and the lookup allocation is addressed as 1024 rows of 32 bytes; the related
 // H2X build independently corroborates those two source shapes, while PoL disassembly determines
-// the different red/green/blue order used here. Both sides reserve 0xc5c bytes and agree on
-// the saved bitmap (+0x10), row/y (+0x14/+0x18), sample spills (+0x20..+0x50), output/count
-// (+0x54/+0x64), and red/green/blue tables (+0x6c/+0x46c/+0x86c). First divergence is +0xb0:
-// ours loads gpBufferPalette before spilling the lookup pointer; retail spills it first and then
-// loads gpBufferPalette. Ours ends at +0x6ab versus retail +0x6a4. All 43 relocation identities
-// and their order agree; retail's delinked names at 0x4fa954 and for 350.0f were audited manually.
-// Correct channel-table declaration order, retail channel-addition order, named algorithm
-// constants, direct resource/palette aliases, lookup declaration initialization, and moving the
-// aggregate declaration across the lookup allocation were tried. Revisit after a reachable
-// TU-state change or in the post-coverage last-mile phase; no permutation tool was used.
+// the different red/green/blue order used here. Both sides reserve 0xc5c bytes and agree on the
+// saved bitmap (+0x10), row/y (+0x14/+0x18), sample spills (+0x20..+0x50), output/count
+// (+0x54/+0x64), and red/green/blue tables (+0x6c/+0x46c/+0x86c). First divergence is +0x22:
+// ours loads height into eax and loads gpWindowManager before pushing the four arguments; retail
+// loads height into ecx, pushes height/width/zero, then loads gpWindowManager before the last zero.
+// Ours ends at +0x6ab versus retail +0x6a4. All 43 ordered relocation identities agree; retail's
+// delinked names at 0x4fa954 and for 350.0f were audited manually. Correct channel-table declaration
+// order, retail channel-addition order, direct resource/palette aliases, lookup declaration
+// initialization, and moving the aggregate across the lookup allocation were tried. A named
+// BlurSampleIndex enum and fully semantic names for the three scalar samples grew the frame to
+// 0xc60, so the enum was removed and exact allocation-preserving names retained with semantic
+// comments. Revisit after a reachable TU-state change or in the post-coverage last-mile phase.
+// No AST permutation or TU-state noise was run because the canonical score is below their gate.
 VA(0x004d28e0, 0x6a4)
 void DoBlur(
     bitmap* destination,
@@ -56,174 +53,174 @@ void DoBlur(
     int greenAdjust,
     int blueAdjust
 ) {
-    const int screenWidth = 0x280;
-    const int border = 4;
-    const int componentCount = 0x100;
-    const int paletteBytes = 0x300;
-    const int lookupSize = 0x8000;
-    const int fizzleDelay = 0x96;
-
     PollSound();
     gpMouseManager->HideColorPointer();
-    gpWindowManager->SaveFizzleSource(0, 0, screenWidth, height);
+    gpWindowManager->SaveFizzleSource(0, 0, BLUR_SCREEN_WIDTH, height);
 
-    bitmap* saved = new bitmap(0, screenWidth, static_cast<short>(height));
-    unsigned int imageSize = height * screenWidth;
+    bitmap* saved = new bitmap(0, BLUR_SCREEN_WIDTH, static_cast<short>(height));
+    unsigned int imageSize = height * BLUR_SCREEN_WIDTH;
     memcpy(saved->m_pixels, source->m_pixels, imageSize);
 
-    unsigned char (*lookup)[BLUR_LOOKUP_ROW_BYTES] = static_cast<unsigned char (*)[BLUR_LOOKUP_ROW_BYTES]>(
-        H2_ALLOC(lookupSize, "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp", 0x19)
+    BlurLookupRow* lookup =
+        static_cast<BlurLookupRow*>(
+        H2_ALLOC(BLUR_LOOKUP_BYTE_COUNT,
+                 "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp", 0x19)
     );
-    int components[BLUR_COMPONENT_CHANNELS][componentCount];
+    BlurComponentTable components[BLUR_PALETTE_CHANNEL_COUNT];
     signed char* paletteColor = gpBufferPalette->m_data;
     int componentOffset = 0;
     do {
-        componentOffset += sizeof(unsigned int);
-        paletteColor += BLUR_COMPONENT_CHANNELS;
-        BLUR_COMPONENT(components[0], componentOffset - 4) = static_cast<unsigned char>(paletteColor[-3]);
-        BLUR_COMPONENT(components[1], componentOffset - 4) = static_cast<unsigned char>(paletteColor[-2]);
-        BLUR_COMPONENT(components[2], componentOffset - 4) = static_cast<unsigned char>(paletteColor[-1]);
-    } while (componentOffset < BLUR_COMPONENT_TABLE_BYTES);
+        componentOffset += sizeof(int);
+        paletteColor += BLUR_PALETTE_CHANNEL_COUNT;
+        BLUR_COMPONENT(components[BLUR_RED_CHANNEL], componentOffset - sizeof(int)) = static_cast<unsigned char>(paletteColor[-3]);
+        BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], componentOffset - sizeof(int)) = static_cast<unsigned char>(paletteColor[-2]);
+        BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], componentOffset - sizeof(int)) = static_cast<unsigned char>(paletteColor[-1]);
+    } while (componentOffset < BLUR_COMPONENT_TABLE_BYTE_COUNT);
 
     resourceManager* resourceMgr;
     unsigned long lookupId = (resourceMgr = gpResourceManager)->MakeId("RGBLOOKP.BIN", 1);
     resourceMgr->PointToFile(lookupId);
-    gpResourceManager->ReadBlock(reinterpret_cast<signed char*>(lookup), lookupSize);
+    gpResourceManager->ReadBlock(reinterpret_cast<signed char*>(lookup),
+                                 BLUR_LOOKUP_BYTE_COUNT);
     memcpy(destination->m_pixels, source->m_pixels, imageSize);
     PollSound();
 
-    int lastRow = height - border;
-    int y = border;
+    int lastRow = height - BLUR_BORDER_RADIUS;
+    int y = BLUR_BORDER_RADIUS;
     if (y < lastRow) {
-        int rowOffset = border * screenWidth;
+        int rowOffset = BLUR_BORDER_RADIUS * BLUR_SCREEN_WIDTH;
         do {
             if ((y & BLUR_SOUND_POLL_MASK) == BLUR_SOUND_POLL_MASK) {
                 PollSound();
             }
-            int samples[13];
-            int sample14;
-            int sample13;
-            int sample15;
-            unsigned char* input = destination->m_pixels + rowOffset + border;
-            int remaining = screenWidth - border * 2;
-            unsigned char* output = source->m_pixels + rowOffset + border;
+            int samples[BLUR_SPILLED_ARRAY_SAMPLE_COUNT];
+            int sample14; // north one row
+            int sample13; // west four pixels
+            int sample15; // south four rows
+            unsigned char* input = destination->m_pixels + rowOffset + BLUR_BORDER_RADIUS;
+            int remaining = BLUR_INTERIOR_COLUMN_COUNT;
+            unsigned char* output = source->m_pixels + rowOffset + BLUR_BORDER_RADIUS;
             do {
-                samples[0] = static_cast<unsigned int>(input[screenWidth]) << 2;
-                samples[1] = static_cast<unsigned int>(input[-screenWidth * 4]) << 2;
-                samples[2] = static_cast<unsigned int>(input[screenWidth * 2]) << 2;
-                samples[3] = static_cast<unsigned int>(input[-screenWidth * 2]) << 2;
-                samples[4] = static_cast<unsigned int>(input[1]) << 2;
-                samples[5] = static_cast<unsigned int>(input[-1]) << 2;
-                samples[6] = static_cast<unsigned int>(input[2]) << 2;
-                samples[7] = static_cast<unsigned int>(input[screenWidth * 3]) << 2;
-                samples[8] = static_cast<unsigned int>(input[-2]) << 2;
-                samples[9] = static_cast<unsigned int>(input[-screenWidth * 3]) << 2;
-                samples[10] = static_cast<unsigned int>(input[3]) << 2;
-                samples[11] = static_cast<unsigned int>(input[4]) << 2;
-                samples[12] = static_cast<unsigned int>(input[-3]) << 2;
-                sample13 = static_cast<unsigned int>(input[-4]) << 2;
-                sample14 = static_cast<unsigned int>(input[-screenWidth]) << 2;
-                sample15 = static_cast<unsigned int>(input[screenWidth * 4]) << 2;
+                samples[0] = static_cast<unsigned int>(input[BLUR_SCREEN_WIDTH]) << BLUR_COMPONENT_INDEX_SHIFT; // south 1
+                samples[1] = static_cast<unsigned int>(input[-BLUR_SCREEN_WIDTH * BLUR_BORDER_RADIUS]) << BLUR_COMPONENT_INDEX_SHIFT; // north 4
+                samples[2] = static_cast<unsigned int>(input[BLUR_SCREEN_WIDTH * 2]) << BLUR_COMPONENT_INDEX_SHIFT; // south 2
+                samples[3] = static_cast<unsigned int>(input[-BLUR_SCREEN_WIDTH * 2]) << BLUR_COMPONENT_INDEX_SHIFT; // north 2
+                samples[4] = static_cast<unsigned int>(input[1]) << BLUR_COMPONENT_INDEX_SHIFT; // east 1
+                samples[5] = static_cast<unsigned int>(input[-1]) << BLUR_COMPONENT_INDEX_SHIFT; // west 1
+                samples[6] = static_cast<unsigned int>(input[2]) << BLUR_COMPONENT_INDEX_SHIFT; // east 2
+                samples[7] = static_cast<unsigned int>(input[BLUR_SCREEN_WIDTH * 3]) << BLUR_COMPONENT_INDEX_SHIFT; // south 3
+                samples[8] = static_cast<unsigned int>(input[-2]) << BLUR_COMPONENT_INDEX_SHIFT; // west 2
+                samples[9] = static_cast<unsigned int>(input[-BLUR_SCREEN_WIDTH * 3]) << BLUR_COMPONENT_INDEX_SHIFT; // north 3
+                samples[10] = static_cast<unsigned int>(input[3]) << BLUR_COMPONENT_INDEX_SHIFT; // east 3
+                samples[11] = static_cast<unsigned int>(input[BLUR_BORDER_RADIUS]) << BLUR_COMPONENT_INDEX_SHIFT; // east 4
+                samples[12] = static_cast<unsigned int>(input[-3]) << BLUR_COMPONENT_INDEX_SHIFT; // west 3
+                sample13 = static_cast<unsigned int>(input[-BLUR_BORDER_RADIUS]) << BLUR_COMPONENT_INDEX_SHIFT;
+                sample14 = static_cast<unsigned int>(input[-BLUR_SCREEN_WIDTH]) << BLUR_COMPONENT_INDEX_SHIFT;
+                sample15 = static_cast<unsigned int>(input[BLUR_SCREEN_WIDTH * BLUR_BORDER_RADIUS]) << BLUR_COMPONENT_INDEX_SHIFT;
 
-                int redSum = BLUR_COMPONENT(components[0], samples[1]) + BLUR_COMPONENT(components[0], samples[0]);
-                redSum += BLUR_COMPONENT(components[0], samples[2]);
-                redSum += BLUR_COMPONENT(components[0], samples[3]);
-                redSum += BLUR_COMPONENT(components[0], samples[4]);
-                redSum += BLUR_COMPONENT(components[0], samples[5]);
-                redSum += BLUR_COMPONENT(components[0], samples[6]);
-                redSum += BLUR_COMPONENT(components[0], samples[7]);
-                redSum += BLUR_COMPONENT(components[0], samples[8]);
-                redSum += BLUR_COMPONENT(components[0], samples[9]);
-                redSum += BLUR_COMPONENT(components[0], samples[10]);
-                redSum += BLUR_COMPONENT(components[0], samples[11]);
-                redSum += BLUR_COMPONENT(components[0], samples[12]);
-                redSum += BLUR_COMPONENT(components[0], sample13);
-                redSum += BLUR_COMPONENT(components[0], sample14);
-                redSum += BLUR_COMPONENT(components[0], sample15);
+                int redSum = BLUR_COMPONENT(components[BLUR_RED_CHANNEL], samples[1]) + BLUR_COMPONENT(components[BLUR_RED_CHANNEL], samples[0]);
+                redSum += BLUR_COMPONENT(components[BLUR_RED_CHANNEL], samples[2]);
+                redSum += BLUR_COMPONENT(components[BLUR_RED_CHANNEL], samples[3]);
+                redSum += BLUR_COMPONENT(components[BLUR_RED_CHANNEL], samples[4]);
+                redSum += BLUR_COMPONENT(components[BLUR_RED_CHANNEL], samples[5]);
+                redSum += BLUR_COMPONENT(components[BLUR_RED_CHANNEL], samples[6]);
+                redSum += BLUR_COMPONENT(components[BLUR_RED_CHANNEL], samples[7]);
+                redSum += BLUR_COMPONENT(components[BLUR_RED_CHANNEL], samples[8]);
+                redSum += BLUR_COMPONENT(components[BLUR_RED_CHANNEL], samples[9]);
+                redSum += BLUR_COMPONENT(components[BLUR_RED_CHANNEL], samples[10]);
+                redSum += BLUR_COMPONENT(components[BLUR_RED_CHANNEL], samples[11]);
+                redSum += BLUR_COMPONENT(components[BLUR_RED_CHANNEL], samples[12]);
+                redSum += BLUR_COMPONENT(components[BLUR_RED_CHANNEL], sample13);
+                redSum += BLUR_COMPONENT(components[BLUR_RED_CHANNEL], sample14);
+                redSum += BLUR_COMPONENT(components[BLUR_RED_CHANNEL], sample15);
 
-                int greenSum = BLUR_COMPONENT(components[1], samples[0]) + BLUR_COMPONENT(components[1], sample15);
-                greenSum += BLUR_COMPONENT(components[1], sample14);
-                greenSum += BLUR_COMPONENT(components[1], samples[2]);
-                greenSum += BLUR_COMPONENT(components[1], samples[3]);
-                greenSum += BLUR_COMPONENT(components[1], samples[4]);
-                greenSum += BLUR_COMPONENT(components[1], samples[5]);
-                greenSum += BLUR_COMPONENT(components[1], samples[6]);
-                greenSum += BLUR_COMPONENT(components[1], samples[7]);
-                greenSum += BLUR_COMPONENT(components[1], samples[8]);
-                greenSum += BLUR_COMPONENT(components[1], samples[9]);
-                greenSum += BLUR_COMPONENT(components[1], samples[10]);
-                greenSum += BLUR_COMPONENT(components[1], samples[11]);
-                greenSum += BLUR_COMPONENT(components[1], samples[12]);
-                greenSum += BLUR_COMPONENT(components[1], sample13);
-                greenSum += BLUR_COMPONENT(components[1], samples[1]);
+                int greenSum = BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], samples[0]) + BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], sample15);
+                greenSum += BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], sample14);
+                greenSum += BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], samples[2]);
+                greenSum += BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], samples[3]);
+                greenSum += BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], samples[4]);
+                greenSum += BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], samples[5]);
+                greenSum += BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], samples[6]);
+                greenSum += BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], samples[7]);
+                greenSum += BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], samples[8]);
+                greenSum += BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], samples[9]);
+                greenSum += BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], samples[10]);
+                greenSum += BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], samples[11]);
+                greenSum += BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], samples[12]);
+                greenSum += BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], sample13);
+                greenSum += BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], samples[1]);
 
-                int blueSum = BLUR_COMPONENT(components[2], samples[0]) + BLUR_COMPONENT(components[2], sample14);
-                blueSum += BLUR_COMPONENT(components[2], sample15);
-                blueSum += BLUR_COMPONENT(components[2], samples[1]);
-                blueSum += BLUR_COMPONENT(components[2], samples[2]);
-                blueSum += BLUR_COMPONENT(components[2], samples[3]);
-                blueSum += BLUR_COMPONENT(components[2], samples[4]);
-                blueSum += BLUR_COMPONENT(components[2], samples[5]);
-                blueSum += BLUR_COMPONENT(components[2], samples[6]);
-                blueSum += BLUR_COMPONENT(components[2], samples[7]);
-                blueSum += BLUR_COMPONENT(components[2], samples[8]);
-                blueSum += BLUR_COMPONENT(components[2], samples[9]);
-                blueSum += BLUR_COMPONENT(components[2], samples[10]);
-                blueSum += BLUR_COMPONENT(components[2], samples[11]);
-                blueSum += BLUR_COMPONENT(components[2], samples[12]);
-                blueSum += BLUR_COMPONENT(components[2], sample13);
+                int blueSum = BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], samples[0]) + BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], sample14);
+                blueSum += BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], sample15);
+                blueSum += BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], samples[1]);
+                blueSum += BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], samples[2]);
+                blueSum += BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], samples[3]);
+                blueSum += BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], samples[4]);
+                blueSum += BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], samples[5]);
+                blueSum += BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], samples[6]);
+                blueSum += BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], samples[7]);
+                blueSum += BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], samples[8]);
+                blueSum += BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], samples[9]);
+                blueSum += BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], samples[10]);
+                blueSum += BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], samples[11]);
+                blueSum += BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], samples[12]);
+                blueSum += BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], sample13);
                 *output++ = lookup[redSum & ~BLUR_QUANTIZATION_MASK]
                                   [(greenSum & ~BLUR_QUANTIZATION_MASK)
                                    + (blueSum >> BLUR_QUANTIZATION_SHIFT)];
                 input++;
             } while (--remaining != 0);
-            rowOffset += screenWidth;
+            rowOffset += BLUR_SCREEN_WIDTH;
             y++;
         } while (y < lastRow);
     }
 
     PollSound();
     signed char* oldPalette = static_cast<signed char*>(
-        H2_ALLOC(paletteBytes, "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp", 0x8b)
+        H2_ALLOC(BLUR_PALETTE_BYTE_COUNT,
+                 "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp", 0x8b)
     );
     signed char* newPalette = static_cast<signed char*>(
-        H2_ALLOC(paletteBytes, "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp", 0x8c)
+        H2_ALLOC(BLUR_PALETTE_BYTE_COUNT,
+                 "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp", 0x8c)
     );
-    memcpy(oldPalette, gPalette->m_data, paletteBytes);
+    memcpy(oldPalette, gPalette->m_data, BLUR_PALETTE_BYTE_COUNT);
     signed char* oldColor = oldPalette;
-    int remainingColors = componentCount;
+    int remainingColors = BLUR_PALETTE_COLOR_COUNT;
     signed char* newColor = newPalette;
     do {
-        newColor[0] = oldColor[0] + static_cast<signed char>(redAdjust);
-        newColor[1] = oldColor[1] + static_cast<signed char>(greenAdjust);
-        newColor[2] = oldColor[2] + static_cast<signed char>(blueAdjust);
-        if (newColor[0] > BLUR_COMPONENT_MAXIMUM) {
-            newColor[0] = BLUR_COMPONENT_MAXIMUM;
+        newColor[BLUR_RED_CHANNEL] = oldColor[BLUR_RED_CHANNEL] + static_cast<signed char>(redAdjust);
+        newColor[BLUR_GREEN_CHANNEL] = oldColor[BLUR_GREEN_CHANNEL] + static_cast<signed char>(greenAdjust);
+        newColor[BLUR_BLUE_CHANNEL] = oldColor[BLUR_BLUE_CHANNEL] + static_cast<signed char>(blueAdjust);
+        if (newColor[BLUR_RED_CHANNEL] > BLUR_PALETTE_COMPONENT_MAXIMUM) {
+            newColor[BLUR_RED_CHANNEL] = BLUR_PALETTE_COMPONENT_MAXIMUM;
         }
-        if (newColor[0] < 0) {
-            newColor[0] = 0;
+        if (newColor[BLUR_RED_CHANNEL] < 0) {
+            newColor[BLUR_RED_CHANNEL] = 0;
         }
-        if (newColor[1] > BLUR_COMPONENT_MAXIMUM) {
-            newColor[1] = BLUR_COMPONENT_MAXIMUM;
+        if (newColor[BLUR_GREEN_CHANNEL] > BLUR_PALETTE_COMPONENT_MAXIMUM) {
+            newColor[BLUR_GREEN_CHANNEL] = BLUR_PALETTE_COMPONENT_MAXIMUM;
         }
-        if (newColor[1] < 0) {
-            newColor[1] = 0;
+        if (newColor[BLUR_GREEN_CHANNEL] < 0) {
+            newColor[BLUR_GREEN_CHANNEL] = 0;
         }
-        if (newColor[2] > BLUR_COMPONENT_MAXIMUM) {
-            newColor[2] = BLUR_COMPONENT_MAXIMUM;
+        if (newColor[BLUR_BLUE_CHANNEL] > BLUR_PALETTE_COMPONENT_MAXIMUM) {
+            newColor[BLUR_BLUE_CHANNEL] = BLUR_PALETTE_COMPONENT_MAXIMUM;
         }
-        if (newColor[2] < 0) {
-            newColor[2] = 0;
+        if (newColor[BLUR_BLUE_CHANNEL] < 0) {
+            newColor[BLUR_BLUE_CHANNEL] = 0;
         }
-        oldColor += BLUR_COMPONENT_CHANNELS;
-        newColor += BLUR_COMPONENT_CHANNELS;
+        oldColor += BLUR_PALETTE_CHANNEL_COUNT;
+        newColor += BLUR_PALETTE_CHANNEL_COUNT;
     } while (--remainingColors != 0);
 
-    gpWindowManager->FizzleForward(0, 0, screenWidth, height, fizzleDelay, oldPalette, newPalette);
+    gpWindowManager->FizzleForward(0, 0, BLUR_SCREEN_WIDTH, height,
+                                   BLUR_FIZZLE_DELAY, oldPalette, newPalette);
     DelayMilli(static_cast<long>(gfCombatSpeedMod[giCombatSpeed] * 350.0f));
-    gpWindowManager->SaveFizzleSource(0, 0, screenWidth, height);
+    gpWindowManager->SaveFizzleSource(0, 0, BLUR_SCREEN_WIDTH, height);
     memcpy(source->m_pixels, saved->m_pixels, imageSize);
-    gpWindowManager->FizzleForward(0, 0, screenWidth, height, fizzleDelay, newPalette, oldPalette);
+    gpWindowManager->FizzleForward(0, 0, BLUR_SCREEN_WIDTH, height,
+                                   BLUR_FIZZLE_DELAY, newPalette, oldPalette);
     H2_FREE(lookup, "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp", 0xa8);
     if (saved != 0) {
         delete saved;
@@ -234,10 +231,3 @@ void DoBlur(
 }
 
 #undef BLUR_COMPONENT
-#undef BLUR_COMPONENT_CHANNELS
-#undef BLUR_COMPONENT_MAXIMUM
-#undef BLUR_COMPONENT_TABLE_BYTES
-#undef BLUR_QUANTIZATION_SHIFT
-#undef BLUR_QUANTIZATION_MASK
-#undef BLUR_LOOKUP_ROW_BYTES
-#undef BLUR_SOUND_POLL_MASK
