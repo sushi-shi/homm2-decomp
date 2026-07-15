@@ -27,6 +27,8 @@ RETAIL_EXE = REPO / "build/orig/HEROES2W.EXE"
 IMAGE_BASE = 0x400000
 PE32_MAGIC = 0x10B
 COFF_SECTION_HEADER_SIZE = 40
+COFF_FILE_HEADER_SIZE = 20
+IMAGE_SCN_ALIGN_MASK = 0x00F00000
 IMAGE_SCN_MEM_EXECUTE = 0x20000000
 IMAGE_DIRECTORY_ENTRY_IMPORT = 1
 IMPORT_DESCRIPTOR_SIZE = 20
@@ -383,6 +385,34 @@ def parse_map_contributions(path):
     return contributions
 
 
+def read_coff_section(path, section_name):
+    """Read the raw and alignment-rounded size of one COFF object section."""
+    data = Path(path).read_bytes()
+    if len(data) < COFF_FILE_HEADER_SIZE:
+        raise ValueError("truncated COFF object: %s" % path)
+    section_count = struct.unpack_from("<H", data, 2)[0]
+    optional_size = struct.unpack_from("<H", data, 16)[0]
+    section_offset = COFF_FILE_HEADER_SIZE + optional_size
+    if section_offset + section_count * COFF_SECTION_HEADER_SIZE > len(data):
+        raise ValueError("truncated COFF section table: %s" % path)
+    for index in range(section_count):
+        offset = section_offset + index * COFF_SECTION_HEADER_SIZE
+        name = data[offset:offset + 8].split(b"\0", 1)[0].decode("ascii", "replace")
+        if name != section_name:
+            continue
+        raw_size = struct.unpack_from("<I", data, offset + 16)[0]
+        characteristics = struct.unpack_from("<I", data, offset + 36)[0]
+        alignment_code = (characteristics & IMAGE_SCN_ALIGN_MASK) >> 20
+        alignment = 1 << (alignment_code - 1) if alignment_code else 1
+        aligned_size = (raw_size + alignment - 1) & -alignment
+        return {
+            "raw_size": raw_size,
+            "alignment": alignment,
+            "aligned_size": aligned_size,
+        }
+    raise ValueError("COFF object %s has no %s section" % (path, section_name))
+
+
 def load_retail_data_symbols(path=None):
     path = Path(path or REPO / "build/gen/symbol_names.csv")
     symbols = []
@@ -611,8 +641,6 @@ def static_symbol_diagnostics(retail, candidate, map_path, retail_symbols=None):
             "reported once at its first symbol; later symbols in that run are cumulative layout "
             "consequences, not independent requests for padding or forced addresses."),
     }
-
-
 def section_diagnostics(retail, candidate):
     result = []
     names = list(retail["sections"])
@@ -873,12 +901,18 @@ def run_link(output, order_response, imports_libraries, resource_path):
         expected_rva, anchor_symbol, actual_va = (anchor if anchor else
                                                    (row["first_function_rva"],
                                                     row["first_function_symbol"], None))
+        candidate_text = read_coff_section(row["object"], ".text")
         report["units"].append({
             "unit": row["unit"],
             "rva_anchor": anchor_symbol,
             "retail_rva": "0x%x" % expected_rva,
             "contribution_rva": "0x%x" % row["contribution_rva"],
             "contribution_size": "0x%x" % row["contribution_size"],
+            "candidate_text_raw_size": "0x%x" % candidate_text["raw_size"],
+            "candidate_text_alignment": "0x%x" % candidate_text["alignment"],
+            "candidate_text_aligned_size": "0x%x" % candidate_text["aligned_size"],
+            "candidate_text_aligned_size_delta": (
+                candidate_text["aligned_size"] - row["contribution_size"]),
             "candidate_rva": "0x%x" % (actual_va - IMAGE_BASE) if actual_va is not None else None,
             "delta": actual_va - IMAGE_BASE - expected_rva if actual_va is not None else None,
         })
@@ -892,6 +926,16 @@ def run_link(output, order_response, imports_libraries, resource_path):
                         if unit["delta"] is not None and unit["delta"] != 0)
         print("link audit: %d NB09-ordered units; %d RVA anchors displaced, %d unavailable" %
               (len(order), displaced, missing_anchors))
+        first_size_mismatch = next(
+            (unit for unit in report["units"]
+             if unit["candidate_text_aligned_size_delta"] != 0), None)
+        if first_size_mismatch:
+            print("link audit: first .text contribution size mismatch %s: %s aligned vs %s "
+                  "retail (%+d bytes)" %
+                  (first_size_mismatch["unit"],
+                   first_size_mismatch["candidate_text_aligned_size"],
+                   first_size_mismatch["contribution_size"],
+                   first_size_mismatch["candidate_text_aligned_size_delta"]))
         print("link audit: entry RVA delta %+d; linker %s vs retail %s" %
               (report["entry_point_delta"], candidate["linker_version"], retail["linker_version"]))
         storage = report["static_storage"]

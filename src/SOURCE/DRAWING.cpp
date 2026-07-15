@@ -625,11 +625,18 @@ void combatManager::UpdateMouseGrid(int hexIndex, int forceUpdate)
 // @match-note
 // Complete draw order, castle switch/CFG, stack-resident wall tables, and 164/164
 // relocations.  Retail's frame is 0xdc (this at -0xc8), ours is 0xc8 (this at
-// -0xb4); retail has five unreferenced four-byte holes among the early locals.
-// The first non-identity divergence is instruction 205 in the captain-coordinate
-// bit expression and later CFG shape.  Ordinary ternaries regressed the prefix;
-// the retail-supported reuse of side for the occupant phase is retained.  Revisit
-// slot/compiler steering in the >=95% phase or after cumulative layout changes.
+// -0xb4); retail has five unreferenced four-byte holes among the early locals. The
+// first source-shape difference is instruction 36's side/armyIndex address
+// calculation; instruction 167's delinked data name still resolves to the same
+// retail address. Instruction 205 then differs in the captain-coordinate bit
+// expression and later CFG shape. A distinct occupant-phase local and ordinary
+// ternaries regressed the prefix, so retail-supported reuse of side is retained;
+// moving the four wall temporaries into the table scope kept the 0xc8 frame, added
+// only two bytes, and reduced the score from 90.94% to 90.59%. The current function
+// span is 0x162d versus retail 0x173f (short 0x112); candidate and retail tail
+// padding are 0xe and 0xc, respectively, producing the exact 0x110 displacement of
+// the following Wsnetwin contribution. Revisit scope/slot steering in the >=95%
+// phase or after cumulative layout changes.
 VA(0x004045cc, 0x173f)
 void combatManager::DrawFrame(int updateScreen, int computeExtent, int redrawExtent,
                               int extentOnly, int delay, int drawBackground,

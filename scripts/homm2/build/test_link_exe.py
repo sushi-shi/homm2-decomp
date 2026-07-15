@@ -6,7 +6,7 @@ from pathlib import Path
 from homm2.build.link_exe import (
     classify_pe_storage, load_retail_data_symbols, load_retail_order,
     normalized_vendor_imports, parse_map_contributions, parse_map_symbol_records,
-    parse_map_symbols, parse_unresolved, read_imports, read_order_response, read_pe,
+    parse_map_symbols, parse_unresolved, read_coff_section, read_imports, read_order_response, read_pe,
     static_symbol_diagnostics)
 
 
@@ -158,6 +158,20 @@ class LinkExeTest(unittest.TestCase):
         self.assertEqual(audit["summary"]["constant_displacement_runs"], 2)
         self.assertEqual(audit["displacement_runs"][0]["count"], 2)
         self.assertEqual([row["name"] for row in audit["first_divergences"]], ["a", "c"])
+
+    def test_coff_section_parser_reports_raw_and_alignment_rounded_size(self):
+        data = bytearray(0x100)
+        struct.pack_into("<HHIIIHH", data, 0, 0x14C, 1, 0, 0, 0, 0, 0)
+        section = 20
+        data[section:section + 8] = b".text\0\0\0"
+        struct.pack_into("<I", data, section + 16, 0x123)
+        struct.pack_into("<I", data, section + 36, 0x00500020)
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "test.obj"
+            path.write_bytes(data)
+            parsed = read_coff_section(path, ".text")
+        self.assertEqual(parsed, {"raw_size": 0x123, "alignment": 0x10,
+                                  "aligned_size": 0x130})
 
     def test_order_response_paths_are_relative_to_the_artifact(self):
         with tempfile.TemporaryDirectory() as temp:
