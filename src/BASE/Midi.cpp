@@ -5,7 +5,7 @@
 
 #include <va.h>
 #include <BASE/soundManager.h>
-#include <BASE/mss.h>
+#include <mss.h>
 #include <SOURCE/KB.h>
 #include <_globals_model.h>
 #include <SOURCE/X_GLOBAL.h>
@@ -26,7 +26,7 @@ void soundManager::MIDIStartup(void)
             hSequence[i] = 0;
         m_midiReady = 1;
         LogStr("Opening MIDI output");
-        i = _AIL_midiOutOpen_12(&hMDI, 0, MIDI_DEFAULT_DEVICE_ID);
+        i = AIL_midiOutOpen(&hMDI, 0, MIDI_DEFAULT_DEVICE_ID);
         LogInt("midiOutOpen = %d", i, -999, -999, -999, -999, -999, -999);
         if (i != 0)
             m_midiReady = 0;
@@ -42,11 +42,11 @@ void soundManager::MIDIShutdown(void)
         LogStr("MS1");
         for (i = 0; i < MIDI_TRACK_COUNT; i++) {
             if (hSequence[i] != 0)
-                _AIL_release_sequence_handle_4(hSequence[i]);
+                AIL_release_sequence_handle(hSequence[i]);
             hSequence[i] = 0;
         }
         LogStr("MS2");
-        _AIL_midiOutClose_4(hMDI);
+        AIL_midiOutClose(hMDI);
         hMDI = 0;
         m_midiReady = 0;
         for (i = 0; i < MIDI_TRACK_COUNT; i++) {
@@ -79,20 +79,20 @@ void soundManager::MIDIPlay(int midiTrack)
             char filename[16];
             sprintf(filename, "MIDI%04d.XMI", midiTrack);
             if (hSequence[midiTrack] == 0) {
-                hSequence[midiTrack] = _AIL_allocate_sequence_handle_4(hMDI);
+                hSequence[midiTrack] = AIL_allocate_sequence_handle(hMDI);
                 if (hSequence[midiTrack] == 0)
                     MIDIShutdown();
                 pMIDIWrap[midiTrack] = gpResourceManager->GetMIDIWrap(filename);
-                if (_AIL_init_sequence_12(hSequence[midiTrack], pMIDIWrap[midiTrack]->m_data, 0) == 0)
+                if (AIL_init_sequence(hSequence[midiTrack], pMIDIWrap[midiTrack]->m_data, 0) == 0)
                     return;
                 MIDISetVolume();
-                _AIL_start_sequence_4(hSequence[midiTrack]);
+                AIL_start_sequence(hSequence[midiTrack]);
                 if (bMusicIsLooping[midiTrack] != 0)
-                    _AIL_set_sequence_loop_count_8(hSequence[midiTrack], 0);
+                    AIL_set_sequence_loop_count(hSequence[midiTrack], 0);
                 else
-                    _AIL_set_sequence_loop_count_8(hSequence[midiTrack], 1);
+                    AIL_set_sequence_loop_count(hSequence[midiTrack], 1);
             } else {
-                _AIL_resume_sequence_4(hSequence[midiTrack]);
+                AIL_resume_sequence(hSequence[midiTrack]);
             }
             CurrentMidiFile = midiTrack;
             m_currentTrack = static_cast<char>(midiTrack);
@@ -105,9 +105,9 @@ inline void soundManager::MIDIStop(void)
 {
     if (gbNoSound == 0 && m_midiReady != 0 && CurrentMidiFile != MIDI_NO_TRACK) {
         if (MIDIIsPlaying() && hSequence[CurrentMidiFile] != 0) {
-            _AIL_stop_sequence_4(hSequence[CurrentMidiFile]);
+            AIL_stop_sequence(hSequence[CurrentMidiFile]);
             if (gbLowMemory != 0 || bSaveMusicPosition[CurrentMidiFile] == 0) {
-                _AIL_release_sequence_handle_4(hSequence[CurrentMidiFile]);
+                AIL_release_sequence_handle(hSequence[CurrentMidiFile]);
                 hSequence[CurrentMidiFile] = 0;
                 if (pMIDIWrap[CurrentMidiFile] != 0)
                     gpResourceManager->Dispose(pMIDIWrap[CurrentMidiFile]);
@@ -124,7 +124,7 @@ inline int soundManager::MIDIIsPlaying(void)
 {
     if (gbNoSound == 0 && gConfig.musicVolume != 0 && m_midiReady != 0 &&
         CurrentMidiFile != MIDI_NO_TRACK && hSequence[CurrentMidiFile] != 0) {
-        return _AIL_sequence_status_4(hSequence[CurrentMidiFile]) == MIDI_SEQUENCE_PLAYING;
+        return AIL_sequence_status(hSequence[CurrentMidiFile]) == MIDI_SEQUENCE_PLAYING;
     }
     return 0;
 }
@@ -142,7 +142,7 @@ inline void soundManager::MIDISetVolume(void)
                 volume = ((m_fadeSteps - MIDI_VOLUME_FADE_SPLIT) * MIDI_MAX_VOLUME) /
                          MIDI_VOLUME_HIGH_RANGE;
         }
-        _AIL_set_XMIDI_master_volume_8(hMDI, ConvertVolume(volume, MIDI_VOLUME_CONVERSION_MODE));
+        AIL_set_XMIDI_master_volume(hMDI, ConvertVolume(volume, MIDI_VOLUME_CONVERSION_MODE));
     }
 }
 

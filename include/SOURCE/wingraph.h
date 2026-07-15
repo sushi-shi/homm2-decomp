@@ -2,6 +2,7 @@
 #define HOMM2_WINGRAPH_H
 #include <windows.h>
 #include <ddraw.h>
+#include <wing.h>
 #include <va.h>
 // Declarations of the free functions DEFINED in wingraph.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
@@ -46,19 +47,6 @@ SIZE(_IMAGE, 0x42c);
 
 typedef HRESULT (__stdcall *DirectDrawCreateProc)(
     GUID *guid, IDirectDraw **directDraw, IUnknown *outerUnknown);
-
-extern "C" BOOL __stdcall WinGRecommendDIBFormat(BITMAPINFO *bitmapInfo);
-extern "C" HDC __stdcall WinGCreateDC(void);
-extern "C" HBITMAP __stdcall WinGCreateBitmap(
-    HDC hdc, BITMAPINFO *bitmapInfo, void **bits);
-extern "C" UINT __stdcall WinGSetDIBColorTable(
-    HDC hdc, UINT startIndex, UINT entryCount, RGBQUAD *colors);
-extern "C" BOOL __stdcall WinGBitBlt(HDC destination, int destinationX,
-    int destinationY, int width, int height, HDC source, int sourceX,
-    int sourceY);
-extern "C" BOOL __stdcall WinGStretchBlt(HDC destination, int destinationX,
-    int destinationY, int destinationWidth, int destinationHeight, HDC source,
-    int sourceX, int sourceY, int sourceWidth, int sourceHeight);
 
 void DDRestoreDisplayMode(void);
 int DDQueryNewPalette(void);

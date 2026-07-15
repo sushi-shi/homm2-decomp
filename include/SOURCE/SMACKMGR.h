@@ -2,6 +2,7 @@
 #define HOMM2_SMACKMGR_H
 #include <va.h>
 #include <smack.h>
+#include <mss.h>
 // Declarations of the free functions DEFINED in SMACKMGR.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
@@ -75,8 +76,6 @@ SIZE(tag_rect, 8);
 SIZE(SSmackOptions, 45);
 SIZE(SmackMilesDigitalDriver, 0x50);
 SIZE(SmackSum, 0x4c);
-
-extern "C" __declspec(dllimport) int __stdcall AIL_get_preference(unsigned int);
 
 void DoAdvance(Smack *, int, int, int, int);
 void SmackManagerMain(void);

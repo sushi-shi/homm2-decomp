@@ -17,11 +17,10 @@
 /*  Miles/Smacker imports use), so these are plain __stdcall externs with NO */
 /*  __declspec(dllimport) -- matching the classic WING32.LIB import stubs.   */
 /*                                                                           */
-/*  This header is a RECONSTRUCTED, self-contained copy of the documented    */
-/*  WinG 1.0 API.  It defines the minimal Win32/GDI types WinG needs (HDC,   */
-/*  HBITMAP, RGBQUAD, BITMAPINFO, ...) directly, rather than pulling in the  */
-/*  heavy MSVC <windows.h>, to stay consistent with this project's minimal   */
-/*  <win/windows.h>.  Do not combine with a full <windows.h> in one TU.      */
+/*  This header is a RECONSTRUCTED copy of the documented WinG 1.0 API.  It  */
+/*  supplies the minimal Win32/GDI types WinG needs when the canonical MSVC  */
+/*  headers have not already supplied them, while remaining compatible with */
+/*  translation units that include the full <windows.h>.                    */
 /*==========================================================================*/
 
 #ifdef __cplusplus
@@ -42,7 +41,7 @@ extern "C" {
 #endif
 
 /* ---- minimal Win32 scalar aliases --------------------------------------- */
-#ifndef _WINDEF_MINIMAL
+#if !defined(_WINDEF_) && !defined(_WINDEF_MINIMAL)
 #define _WINDEF_MINIMAL
 typedef int            BOOL;
 typedef unsigned int   UINT;
@@ -54,7 +53,7 @@ typedef DWORD          COLORREF;
 #endif
 
 /* ---- opaque GDI handles (modelled as void*, like <win/windows.h>) ------- */
-#ifndef _WINGDI_HANDLES_MINIMAL
+#if !defined(_WINGDI_) && !defined(_WINGDI_HANDLES_MINIMAL)
 #define _WINGDI_HANDLES_MINIMAL
 typedef void FAR* HDC;
 typedef void FAR* HBITMAP;
@@ -63,7 +62,7 @@ typedef void FAR* HBRUSH;
 #endif
 
 /* ---- GDI DIB structures (standard Win32 layouts) ------------------------ */
-#ifndef _WINGDI_DIB_MINIMAL
+#if !defined(_WINGDI_) && !defined(_WINGDI_DIB_MINIMAL)
 #define _WINGDI_DIB_MINIMAL
 typedef struct tagRGBQUAD {
    BYTE rgbBlue;
