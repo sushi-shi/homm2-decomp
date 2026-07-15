@@ -6,29 +6,63 @@
 #include <va.h>
 #include <BASE/BITS.h>
 
-// Bit-array primitives (winextra C file): index a flag by (unsigned) bit number. The byte holding
-// bit n is at p + n/8; the retail reads/writes it a dword at a time (`*(unsigned int *)`), bit n&7.
-// @match-note
-// The logic is correct (byte-indexed bit ops), but our MSVC 4.2 /O2 emits an
-// indexed [reg+reg] load/or/store with FPO, whereas the retail materializes the address into one
-// register and uses a direct `or [mem],reg` under an ebp frame. No flag combo (/O2, /O2 /Oy-, /O1,
-// /Ox, /Od, C, C++) reproduces it — same class as TILE's ebx-save. The winextra C-file primitives
-// appear built with a different/earlier MSVC than basewin/SOURCE (which match).
+// Retail keeps an EBP frame in all three optimized routines. Express that
+// proven TU-wide setting in source rather than adding a new manifest profile.
+#pragma optimize("y", off)
 
+// @match-note: complete 0/0-relocation checkpoint (live 27.63%; retained
+// 47.63%). Base is 0x27 bytes versus retail's 0x2e including two trailing NOPs.
+// The EBP frame, byte offset,
+// dword load, mask and explicit 0/1 result agree. First divergence: base hoists
+// the bit-index load ahead of `mov ebp,esp`, then selects indexed `test`/`setne`;
+// retail materializes the address in ESI and branches. `/Od` and `/Od /Oi`
+// supported profiles score lower; revisit on a genuine profile/TU-state find.
 VA(0x004d1594, 0x2e)
-extern "C" int __cdecl BitTest(void *p, unsigned int n)
+extern "C" int __cdecl BitTest(const void *bits, unsigned int bitIndex)
 {
-    return ((1 << (n & 7)) & *(unsigned int *)((char *)p + (n >> 3))) != 0;
+    const unsigned char *bytes = static_cast<const unsigned char *>(bits);
+    bytes += bitIndex >> 3;
+    const unsigned int *word = reinterpret_cast<const unsigned int *>(bytes);
+    bitIndex &= 7;
+    unsigned int mask = 1U;
+    mask <<= bitIndex;
+    if ((*word & mask) != 0)
+        return 1;
+    return 0;
 }
 
+// @match-note: complete 0/0-relocation checkpoint (live 29.33%; retained
+// 39.67%). Base is 0x27 bytes versus retail's 0x20. The EBP frame and
+// byte-addressed dword mask agree. First
+// divergence: base hoists the index load before `mov ebp,esp` and keeps an
+// indexed load/or/store; retail materializes the address in ESI and emits direct
+// `or [esi],eax`. The supported `/Od` profiles score lower; revisit with BitTest.
 VA(0x004d15c2, 0x20)
-extern "C" void __cdecl BitSet(void *p, unsigned int n)
+extern "C" void __cdecl BitSet(void *bits, unsigned int bitIndex)
 {
-    *(unsigned int *)((char *)p + (n >> 3)) |= 1 << (n & 7);
+    unsigned char *bytes = static_cast<unsigned char *>(bits);
+    bytes += bitIndex >> 3;
+    unsigned int *word = reinterpret_cast<unsigned int *>(bytes);
+    bitIndex &= 7;
+    unsigned int mask = 1U;
+    mask <<= bitIndex;
+    *word |= mask;
 }
 
+// @match-note: complete 0/0-relocation checkpoint (live 33.44%; retained
+// 43.12%). Base is 0x29 bytes versus retail's 0x22 including two trailing NOPs.
+// The EBP frame, address,
+// shift, complement and dword clear agree. First divergence is the same hoisted
+// index load and indexed load/and/store scheduling as BitSet; retail uses direct
+// `and [esi],eax`. The supported `/Od` profiles score lower; revisit with BitTest.
 VA(0x004d15e2, 0x22)
-extern "C" void __cdecl BitClear(void *p, unsigned int n)
+extern "C" void __cdecl BitClear(void *bits, unsigned int bitIndex)
 {
-    *(unsigned int *)((char *)p + (n >> 3)) &= ~(1 << (n & 7));
+    unsigned char *bytes = static_cast<unsigned char *>(bits);
+    bytes += bitIndex >> 3;
+    unsigned int *word = reinterpret_cast<unsigned int *>(bytes);
+    bitIndex &= 7;
+    unsigned int mask = 1U;
+    mask <<= bitIndex;
+    *word &= ~mask;
 }
