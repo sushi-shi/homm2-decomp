@@ -13,6 +13,7 @@ from generate_ast_variants import (
     classify_parse_errors,
     configure_libclang,
     declaration_edits,
+    declaration_hoist_edits,
     expression_edits,
     helper_parameters,
     helper_return_spelling,
@@ -314,6 +315,24 @@ class AstVariantSemanticTests(unittest.TestCase):
         families = {mutation.family for mutation in declaration_edits(function, self.blob)}
         self.assertEqual(families, {"declaration_split", "declaration_merge"})
 
+    def test_fundamental_nested_declaration_can_be_hoisted_without_moving_initializer(self):
+        function = self.functions["SafeDeclarationHoist"]
+        mutations = declaration_hoist_edits(function, self.blob)
+        rows = next(mutation for mutation in mutations if mutation.label.endswith("-rows"))
+        candidate = self._render_mutation(rows).decode()
+        self.assertIn("{\n    int rows;", candidate)
+        self.assertIn("if (count > 0) {\n        rows = count;", candidate)
+        tu = ci.Index.create().parse(
+            str(self.source), args=["-x", "c++", "-std=c++14"],
+            unsaved_files=[(str(self.source), candidate)],
+        )
+        errors = [item for item in tu.diagnostics if item.severity >= ci.Diagnostic.Error]
+        self.assertEqual(errors, [])
+
+    def test_const_and_shadowing_declarations_are_not_hoisted(self):
+        function = self.functions["RejectedDeclarationHoist"]
+        self.assertEqual(declaration_hoist_edits(function, self.blob), [])
+
     def test_one_safe_edit_from_every_family_remains_parseable(self):
         helpers = self.functions["SafeHelpers"]
         statements = self.functions["SafeStatementOrder"]
@@ -323,6 +342,7 @@ class AstVariantSemanticTests(unittest.TestCase):
             expression_edits(statements, self.blob),
             statement_order_edits(statements, self.blob),
             declaration_edits(declarations, self.blob),
+            declaration_hoist_edits(self.functions["SafeDeclarationHoist"], self.blob),
             inline_expression_edits(helpers, self.blob, helpers.extent.start.offset, 1),
             inline_member_access_edits(helpers, self.blob, helpers.extent.start.offset, 1),
             inline_nested_expression_edits(helpers, self.blob, helpers.extent.start.offset, 1),
