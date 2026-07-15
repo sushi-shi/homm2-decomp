@@ -74,6 +74,11 @@ authoritative. This file is the short, restart-ready Codex workflow.
    Its ranges are syntax-aware, but audit every retained mutation. Inequality +/-1 rewrites are
    disabled because they are invalid for floats and can cross integer overflow boundaries. Do not
    use the regex permuter unless every retained mutation receives the same audit.
+   Use `generate_ast_variants.py` plus `batch_source_variants.py` only after semantics, CFG, frame,
+   slots, and relocations align at roughly 96-97% or better. Select a small bounded family/depth,
+   inspect every emitted `find`/`replace` edit for value and lifetime preservation, then batch-score
+   it. Discard every sub-100 candidate; retain only strict exact closure, followed by `homm2 build`,
+   a raw-byte review, and the broad `homm2 relocs 0x<RVA>` audit before integration.
 7. Run a relocation-masked raw-byte comparison for near-exact functions. objdiff masks relocation
    bytes and can report less than 100% for delinked local-label identity even when every code byte is
    identical.

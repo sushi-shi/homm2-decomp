@@ -13,6 +13,11 @@ idiom.  It can merge several helper definitions at the same insertion point and 
 two-level helper chain for nested pure expressions.  Other sequencing changes are intentionally
 absent: author those as explicit literal axes after a semantic audit.
 
+Generated helpers pass scalar/pointer/enum values directly, preserve existing defensible lvalue
+references, and bind read-only record objects by const reference. Record returns, volatile access,
+implicit ``this``, member lvalue contexts, hidden calls/copies, and indirect assignment targets are
+rejected rather than left for the compiler to filter.
+
 Run inside ``nix develop .#build``::
 
     python3 scripts/generate_ast_variants.py src/BASE/icon2by.cpp 0xda270 \
@@ -43,6 +48,33 @@ FUNCTION_KINDS = (
     ci.CursorKind.CONSTRUCTOR,
     ci.CursorKind.DESTRUCTOR,
 )
+CALL_KINDS = {
+    kind for kind in (
+        getattr(ci.CursorKind, "CALL_EXPR", None),
+        getattr(ci.CursorKind, "CXX_MEMBER_CALL_EXPR", None),
+        getattr(ci.CursorKind, "CXX_OPERATOR_CALL_EXPR", None),
+        getattr(ci.CursorKind, "CXX_CONSTRUCT_EXPR", None),
+        getattr(ci.CursorKind, "CXX_TEMPORARY_OBJECT_EXPR", None),
+    ) if kind is not None
+}
+INTEGRAL_TYPE_KINDS = {
+    getattr(ci.TypeKind, name) for name in (
+        "BOOL", "CHAR_U", "UCHAR", "CHAR16", "CHAR32", "USHORT", "UINT", "ULONG",
+        "ULONGLONG", "UINT128", "CHAR_S", "SCHAR", "WCHAR", "SHORT", "INT", "LONG",
+        "LONGLONG", "INT128",
+    ) if hasattr(ci.TypeKind, name)
+}
+FLOAT_TYPE_KINDS = {
+    getattr(ci.TypeKind, name) for name in ("HALF", "FLOAT", "DOUBLE", "LONGDOUBLE")
+    if hasattr(ci.TypeKind, name)
+}
+REFERENCE_TYPE_KINDS = {
+    kind for kind in (
+        getattr(ci.TypeKind, "LVALUEREFERENCE", None),
+        getattr(ci.TypeKind, "RVALUEREFERENCE", None),
+    ) if kind is not None
+}
+CONTEXT_SENSITIVE_TOKENS = (b"__COUNTER__", b"__FUNCTION__", b"__FUNCSIG__", b"__LINE__")
 
 
 @dataclass(frozen=True)
@@ -83,7 +115,15 @@ def clang_args(root: Path, source: Path) -> list[str]:
         if entry_file.resolve() == source_resolved:
             raw = entry.get("arguments", [])
             break
-    out = ["-x", "c++", "-std=c++14", "-fms-compatibility", "-ferror-limit=0"]
+    out = [
+        "-x", "c++", "-std=c++14", "-fms-compatibility", "-ferror-limit=0",
+        "-Wno-writable-strings", "-fwritable-strings",
+        "-I", str(root / "include"),
+    ]
+    vendor = root / "vendor"
+    if vendor.is_dir():
+        for include in sorted(path for path in vendor.iterdir() if path.is_dir()):
+            out.extend(("-I", str(include)))
     index = 0
     while index < len(raw):
         arg = raw[index]
@@ -124,6 +164,28 @@ def target_function(tu: ci.TranslationUnit, source: Path, blob: bytes, rva: int)
     return matches[0]
 
 
+def classify_parse_errors(tu: ci.TranslationUnit, source: Path, fn):
+    """Only a nonfatal diagnostic strictly after the target cannot affect its parsed AST."""
+    blocking = []
+    trailing = []
+    source = source.resolve()
+    for diagnostic in tu.diagnostics:
+        if diagnostic.severity < ci.Diagnostic.Error:
+            continue
+        location_file = diagnostic.location.file
+        same_source = (
+            location_file is not None and Path(str(location_file)).resolve() == source
+        )
+        if (
+            diagnostic.severity >= ci.Diagnostic.Fatal or not same_source
+            or diagnostic.location.offset <= fn.extent.end.offset
+        ):
+            blocking.append(str(diagnostic))
+        else:
+            trailing.append(str(diagnostic))
+    return blocking, trailing
+
+
 def cursor_range(cursor) -> tuple[int, int]:
     return cursor.extent.start.offset, cursor.extent.end.offset
 
@@ -139,10 +201,8 @@ def operator_token(node, left_end: int, right_start: int, accepted: set[str]):
 
 def has_side_effect(cursor) -> bool:
     for node in cursor.walk_preorder():
-        if node.kind in (
-            ci.CursorKind.CALL_EXPR,
-            ci.CursorKind.CXX_NEW_EXPR,
-            ci.CursorKind.CXX_DELETE_EXPR,
+        if node.kind in CALL_KINDS or node.kind in (
+            ci.CursorKind.CXX_NEW_EXPR, ci.CursorKind.CXX_DELETE_EXPR,
         ):
             return True
         if node.kind == ci.CursorKind.BINARY_OPERATOR:
@@ -158,9 +218,56 @@ def has_side_effect(cursor) -> bool:
             spellings = {token.spelling for token in node.get_tokens()}
             if spellings & {"++", "--"}:
                 return True
-        if node.kind == ci.CursorKind.DECL_REF_EXPR and "volatile" in node.type.spelling.split():
+        if node.kind in (ci.CursorKind.DECL_REF_EXPR, ci.CursorKind.MEMBER_REF_EXPR) \
+                and type_is_volatile(node.type):
             return True
     return False
+
+
+def type_is_volatile(type_) -> bool:
+    spellings = (type_.spelling, type_.get_canonical().spelling)
+    return any(
+        "volatile" in spelling.replace("*", " ").replace("&", " ").split()
+        for spelling in spellings
+    )
+
+
+def canonical_kind(type_):
+    return type_.get_canonical().kind
+
+
+def is_integral_or_enum(type_) -> bool:
+    return canonical_kind(type_) in INTEGRAL_TYPE_KINDS | {ci.TypeKind.ENUM}
+
+
+def is_value_type(type_) -> bool:
+    return (
+        not type_is_volatile(type_)
+        and canonical_kind(type_) in INTEGRAL_TYPE_KINDS | FLOAT_TYPE_KINDS
+        | {ci.TypeKind.ENUM, ci.TypeKind.POINTER}
+    )
+
+
+def operator_is_value_neutral(operator: str, left, right) -> bool:
+    if not is_value_type(left.type) or not is_value_type(right.type):
+        return False
+    if operator in ("==", "!=") or operator in RELATIONAL_FLIP:
+        return True
+    if operator in ("&", "|", "^", "*"):
+        return is_integral_or_enum(left.type) and is_integral_or_enum(right.type)
+    if operator == "+":
+        left_pointer = canonical_kind(left.type) == ci.TypeKind.POINTER
+        right_pointer = canonical_kind(right.type) == ci.TypeKind.POINTER
+        return (
+            (is_integral_or_enum(left.type) and is_integral_or_enum(right.type))
+            or (left_pointer and is_integral_or_enum(right.type))
+            or (right_pointer and is_integral_or_enum(left.type))
+        )
+    return False
+
+
+def contains_context_sensitive_tokens(text: bytes) -> bool:
+    return any(token in text for token in CONTEXT_SENSITIVE_TOKENS)
 
 
 def line_number(blob: bytes, offset: int) -> int:
@@ -187,6 +294,11 @@ def expression_edits(fn, blob: bytes) -> list[AstMutation]:
         operator = token.spelling
         left_text = blob[left_start:left_end]
         right_text = blob[right_start:right_end]
+        if (
+            not operator_is_value_neutral(operator, left, right)
+            or contains_context_sensitive_tokens(left_text + right_text)
+        ):
+            continue
         if operator in COMMUTATIVE and left_text == right_text:
             continue
         middle = bytearray(blob[left_end:right_start])
@@ -218,13 +330,13 @@ def assignment_info(stmt, fn):
     token = operator_token(stmt, left.extent.end.offset, right.extent.start.offset, {"="})
     if token is None or has_side_effect(right):
         return None
-    refs = [node for node in left.walk_preorder() if node.kind == ci.CursorKind.DECL_REF_EXPR]
-    if len(refs) != 1 or any(node.kind == ci.CursorKind.MEMBER_REF_EXPR for node in left.walk_preorder()):
+    direct_left = unwrap_single_expression(left)
+    if direct_left.kind != ci.CursorKind.DECL_REF_EXPR:
         return None
-    declaration = refs[0].referenced
+    declaration = direct_left.referenced
     if declaration is None or declaration.kind != ci.CursorKind.VAR_DECL:
         return None
-    if declaration.semantic_parent != fn or "volatile" in declaration.type.spelling.split():
+    if declaration.semantic_parent != fn or not is_value_type(declaration.type):
         return None
     reads = set()
     for node in right.walk_preorder():
@@ -253,6 +365,8 @@ def statement_order_edits(fn, blob: bytes) -> list[AstMutation]:
             if not first_start < first_end <= second_start < second_end:
                 continue
             gap = blob[first_end:second_start]
+            if contains_context_sensitive_tokens(blob[first_start:second_end]):
+                continue
             replacement = blob[second_start:second_end] + gap + blob[first_start:first_end]
             edits.append(AstMutation(
                 "independent_statement_order",
@@ -296,6 +410,8 @@ def declaration_edits(fn, blob: bytes) -> list[AstMutation]:
             if len(variables) < 2:
                 continue
             start, end = cursor_range(statement)
+            if b"__LINE__" in blob[start:end]:
+                continue
             prefix = blob[start:variables[0].location.offset]
             if b"*" in prefix or b"&" in prefix or b"," in prefix:
                 continue
@@ -331,6 +447,8 @@ def declaration_edits(fn, blob: bytes) -> list[AstMutation]:
             second_prefix, second_value, second_start, second_end = second_decl
             if first_prefix != second_prefix or blob[first_end:second_start].strip():
                 continue
+            if b"__LINE__" in blob[first_start:second_end]:
+                continue
             replacement = first_prefix + first_value + b", " + second_value + b";"
             edits.append(AstMutation(
                 "declaration_merge",
@@ -349,13 +467,48 @@ def msvc42_type_spelling(spelling: str) -> str:
     return "int" if spelling == "bool" else spelling
 
 
+def helper_parameter_spelling(type_):
+    spelling = msvc42_type_spelling(type_.spelling)
+    if not usable_type_spelling(spelling) or type_is_volatile(type_):
+        return None
+    kind = canonical_kind(type_)
+    if kind in INTEGRAL_TYPE_KINDS | FLOAT_TYPE_KINDS | {ci.TypeKind.ENUM, ci.TypeKind.POINTER}:
+        return spelling
+    if kind == ci.TypeKind.LVALUEREFERENCE:
+        pointee = type_.get_pointee()
+        pointee_kind = canonical_kind(pointee)
+        if (
+            not type_is_volatile(pointee)
+            and pointee_kind in INTEGRAL_TYPE_KINDS | FLOAT_TYPE_KINDS
+            | {ci.TypeKind.ENUM, ci.TypeKind.POINTER, ci.TypeKind.RECORD}
+        ):
+            return spelling
+        return None
+    if kind == ci.TypeKind.RECORD:
+        return (spelling if spelling.startswith("const ") else "const " + spelling) + " &"
+    return None
+
+
+def helper_return_spelling(type_):
+    if not is_value_type(type_):
+        return None
+    spelling = msvc42_type_spelling(type_.spelling)
+    return spelling if usable_type_spelling(spelling) else None
+
+
 def helper_parameters(node, fn):
     declarations = {}
     spellings = {}
     for ref in node.walk_preorder():
+        if ref.kind == ci.CursorKind.CXX_THIS_EXPR or (
+            ref.kind == ci.CursorKind.MEMBER_REF_EXPR and not list(ref.get_children())
+        ):
+            return None
         if ref.kind != ci.CursorKind.DECL_REF_EXPR or ref.referenced is None:
             continue
         declaration = ref.referenced
+        if type_is_volatile(declaration.type):
+            return None
         is_parameter = declaration.kind == ci.CursorKind.PARM_DECL
         is_local = (
             declaration.kind == ci.CursorKind.VAR_DECL
@@ -365,14 +518,55 @@ def helper_parameters(node, fn):
         if not (is_parameter or is_local):
             continue
         name = declaration.spelling
-        type_spelling = declaration.type.spelling
-        if not name or not usable_type_spelling(type_spelling):
+        type_spelling = helper_parameter_spelling(declaration.type)
+        if not name or type_spelling is None:
             return None
         if name in spellings and spellings[name] != declaration.hash:
             return None
         spellings[name] = declaration.hash
         declarations[declaration.hash] = (declaration.location.offset, type_spelling, name)
     return [(type_spelling, name) for _offset, type_spelling, name in sorted(declarations.values())]
+
+
+def member_requires_lvalue(node, fn, parents) -> bool:
+    """Reject contexts where replacing a member lvalue with a returned value changes identity."""
+    current = node
+    while current.hash in parents:
+        parent = parents[current.hash]
+        if parent.kind in CALL_KINDS:
+            return True
+        if parent.kind == ci.CursorKind.UNARY_OPERATOR:
+            spellings = {token.spelling for token in parent.get_tokens()}
+            if spellings & {"&", "++", "--"}:
+                return True
+        if parent.kind == ci.CursorKind.BINARY_OPERATOR:
+            children = list(parent.get_children())
+            if len(children) == 2:
+                token = operator_token(
+                    parent, children[0].extent.end.offset, children[1].extent.start.offset,
+                    ASSIGNMENTS,
+                )
+                if (
+                    token is not None
+                    and children[0].extent.start.offset <= current.extent.start.offset
+                    and current.extent.end.offset <= children[0].extent.end.offset
+                ):
+                    return True
+        if parent.kind == ci.CursorKind.VAR_DECL \
+                and canonical_kind(parent.type) in REFERENCE_TYPE_KINDS:
+            return True
+        if parent.kind == ci.CursorKind.RETURN_STMT \
+                and canonical_kind(fn.result_type) in REFERENCE_TYPE_KINDS:
+            return True
+        if parent.kind in (
+            ci.CursorKind.CXX_STATIC_CAST_EXPR,
+            ci.CursorKind.CXX_REINTERPRET_CAST_EXPR,
+            ci.CursorKind.CXX_CONST_CAST_EXPR,
+            ci.CursorKind.CXX_FUNCTIONAL_CAST_EXPR,
+        ) and canonical_kind(parent.type) in REFERENCE_TYPE_KINDS:
+            return True
+        current = parent
+    return False
 
 
 def inline_expression_edits(fn, blob: bytes, insertion: int, helper_name_count: int) -> list[AstMutation]:
@@ -390,15 +584,15 @@ def inline_expression_edits(fn, blob: bytes, insertion: int, helper_name_count: 
         if not left_start < left_end <= right_start < right_end:
             continue
         token = operator_token(node, left_end, right_start, accepted)
-        if token is None:
+        if token is None or not operator_is_value_neutral(token.spelling, children[0], children[1]):
             continue
         start, end = cursor_range(node)
         expression = blob[start:end]
-        if len(expression) > 160:
+        if len(expression) > 160 or contains_context_sensitive_tokens(expression):
             continue
-        return_type = msvc42_type_spelling(node.type.spelling)
+        return_type = helper_return_spelling(node.type)
         parameters = helper_parameters(node, fn)
-        if parameters is None or len(parameters) > 4 or not usable_type_spelling(return_type):
+        if parameters is None or len(parameters) > 4 or return_type is None:
             continue
         parameter_text = ", ".join(f"{type_spelling} {name}" for type_spelling, name in parameters)
         argument_text = ", ".join(name for _type_spelling, name in parameters)
@@ -425,16 +619,24 @@ def inline_member_access_edits(
 ) -> list[AstMutation]:
     mutations = []
     member_index = 0
+    parents = {
+        child.hash: parent
+        for parent in fn.walk_preorder()
+        for child in parent.get_children()
+    }
     for node in fn.walk_preorder():
-        if node.kind != ci.CursorKind.MEMBER_REF_EXPR or has_side_effect(node):
+        if (
+            node.kind != ci.CursorKind.MEMBER_REF_EXPR or has_side_effect(node)
+            or member_requires_lvalue(node, fn, parents)
+        ):
             continue
         start, end = cursor_range(node)
         expression = blob[start:end]
-        return_type = msvc42_type_spelling(node.type.spelling)
+        return_type = helper_return_spelling(node.type)
         parameters = helper_parameters(node, fn)
         if (
             not expression or len(expression) > 160 or parameters is None or len(parameters) > 4
-            or not usable_type_spelling(return_type)
+            or return_type is None or contains_context_sensitive_tokens(expression)
         ):
             continue
         parameter_text = ", ".join(
@@ -473,14 +675,19 @@ def inline_nested_expression_edits(
             continue
         outer_left_start, outer_left_end = cursor_range(outer_children[0])
         outer_right_start, outer_right_end = cursor_range(outer_children[1])
-        if operator_token(outer, outer_left_end, outer_right_start, accepted) is None:
+        outer_token = operator_token(outer, outer_left_end, outer_right_start, accepted)
+        if (
+            outer_token is None
+            or not operator_is_value_neutral(outer_token.spelling, outer_children[0], outer_children[1])
+        ):
             continue
         outer_start, outer_end = cursor_range(outer)
         outer_parameters = helper_parameters(outer, fn)
-        outer_return_type = msvc42_type_spelling(outer.type.spelling)
+        outer_return_type = helper_return_spelling(outer.type)
         if (
             outer_parameters is None or len(outer_parameters) > 4
-            or not usable_type_spelling(outer_return_type) or outer_end - outer_start > 220
+            or outer_return_type is None or outer_end - outer_start > 220
+            or contains_context_sensitive_tokens(blob[outer_start:outer_end])
         ):
             continue
         for raw_inner in outer_children:
@@ -492,16 +699,22 @@ def inline_nested_expression_edits(
                 continue
             inner_left_start, inner_left_end = cursor_range(inner_children[0])
             inner_right_start, inner_right_end = cursor_range(inner_children[1])
-            if operator_token(inner, inner_left_end, inner_right_start, accepted) is None:
+            inner_token = operator_token(inner, inner_left_end, inner_right_start, accepted)
+            if (
+                inner_token is None
+                or not operator_is_value_neutral(
+                    inner_token.spelling, inner_children[0], inner_children[1]
+                )
+            ):
                 continue
             inner_start, inner_end = cursor_range(inner)
             if not outer_start <= inner_start < inner_end <= outer_end:
                 continue
             inner_parameters = helper_parameters(inner, fn)
-            inner_return_type = msvc42_type_spelling(inner.type.spelling)
+            inner_return_type = helper_return_spelling(inner.type)
             if (
                 inner_parameters is None or len(inner_parameters) > 4
-                or not usable_type_spelling(inner_return_type)
+                or inner_return_type is None
             ):
                 continue
             outer_parameter_text = ", ".join(
@@ -582,7 +795,10 @@ def inline_read_advance_edits(fn, blob: bytes, insertion: int, helper_name_count
                 continue
             destination, read_expr, _first_token = first_assignment
             pointer_lhs, advance_expr, _second_token = second_assignment
-            pointer_decl = referenced_variable(pointer_lhs)
+            direct_pointer_lhs = unwrap_single_expression(pointer_lhs)
+            if direct_pointer_lhs.kind != ci.CursorKind.DECL_REF_EXPR:
+                continue
+            pointer_decl = direct_pointer_lhs.referenced
             read_refs = [
                 cursor for cursor in read_expr.walk_preorder()
                 if cursor.kind == ci.CursorKind.DECL_REF_EXPR and cursor.referenced is not None
@@ -613,12 +829,29 @@ def inline_read_advance_edits(fn, blob: bytes, insertion: int, helper_name_count
                 or integer_tokens != ["1"]
             ):
                 continue
+            direct_destination = unwrap_single_expression(destination)
+            if direct_destination.kind != ci.CursorKind.DECL_REF_EXPR:
+                continue
+            destination_decl = direct_destination.referenced
+            if (
+                destination_decl is None or destination_decl.kind != ci.CursorKind.VAR_DECL
+                or destination_decl.semantic_parent != fn or destination_decl.hash == pointer_decl.hash
+                or not is_value_type(destination_decl.type)
+            ):
+                continue
+            if (
+                pointer_decl.kind not in (ci.CursorKind.VAR_DECL, ci.CursorKind.PARM_DECL)
+                or pointer_decl.semantic_parent != fn
+                or type_is_volatile(pointer_decl.type)
+            ):
+                continue
             pointer_type = pointer_decl.type
             if pointer_type.kind != ci.TypeKind.POINTER:
                 continue
             pointer_spelling = pointer_type.spelling
-            value_spelling = pointer_type.get_pointee().spelling
-            if not usable_type_spelling(pointer_spelling) or not usable_type_spelling(value_spelling):
+            pointee_type = pointer_type.get_pointee()
+            value_spelling = helper_return_spelling(pointee_type)
+            if not usable_type_spelling(pointer_spelling) or value_spelling is None:
                 continue
             destination_start, destination_end = cursor_range(destination)
             first_start, _first_end = cursor_range(first)
@@ -807,13 +1040,13 @@ def main(argv=None) -> int:
         unsaved_files=[(str(source), text)],
         options=ci.TranslationUnit.PARSE_DETAILED_PROCESSING_RECORD,
     )
-    diagnostics = [str(diagnostic) for diagnostic in tu.diagnostics if diagnostic.severity >= 3]
-    if diagnostics:
-        parser.error("libclang parse errors:\n" + "\n".join(diagnostics[:20]))
     try:
         fn = target_function(tu, source, blob, args.rva)
     except ValueError as exc:
         parser.error(str(exc))
+    diagnostics, trailing_diagnostics = classify_parse_errors(tu, source, fn)
+    if diagnostics:
+        parser.error("libclang parse errors:\n" + "\n".join(diagnostics[:20]))
     insertion, _span_end = marker_span(blob, args.rva)
     mutations = atomic_mutations(fn, blob, insertion, families, args.helper_name_count)
     available_names = {mutation_name(mutation) for mutation in mutations}
@@ -841,6 +1074,7 @@ def main(argv=None) -> int:
             "min_depth": args.min_depth,
             "limit": args.limit,
             "truncated": truncated,
+            "ignored_trailing_diagnostics": trailing_diagnostics,
             "required_mutations": sorted(required_names),
         },
         "candidates": candidates,
@@ -856,6 +1090,11 @@ def main(argv=None) -> int:
         + ("; limit reached" if truncated else "")
     )
     print(args.output)
+    if trailing_diagnostics:
+        print(
+            f"ignored {len(trailing_diagnostics)} nonfatal parse diagnostic(s) strictly after "
+            "the target; recorded in the manifest"
+        )
     return 0
 
 

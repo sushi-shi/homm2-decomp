@@ -1,9 +1,40 @@
+import tempfile
 import unittest
+from pathlib import Path
 
-from generate_ast_variants import AstEdit, AstMutation, candidate_payloads, mutation_name
+import clang.cindex as ci
+
+from generate_ast_variants import (
+    AstEdit,
+    AstMutation,
+    candidate_payloads,
+    clang_args,
+    classify_parse_errors,
+    configure_libclang,
+    declaration_edits,
+    expression_edits,
+    helper_parameters,
+    helper_return_spelling,
+    inline_expression_edits,
+    inline_member_access_edits,
+    inline_nested_expression_edits,
+    inline_read_advance_edits,
+    mutation_name,
+    statement_order_edits,
+)
 
 
 class AstVariantGenerationTests(unittest.TestCase):
+    def test_clang_args_include_project_and_vendor_headers_without_database_entry(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / "src/UNIT.cpp"
+            (root / "include").mkdir()
+            (root / "vendor/sdk").mkdir(parents=True)
+            args = clang_args(root, source)
+        self.assertIn(str(root / "include"), args)
+        self.assertIn(str(root / "vendor/sdk"), args)
+
     def test_disjoint_mutations_are_combined(self):
         blob = b"abcdefghij"
         mutations = [
@@ -55,6 +86,210 @@ class AstVariantGenerationTests(unittest.TestCase):
         self.assertFalse(truncated)
         self.assertEqual(len(candidates), 2)
         self.assertTrue(all(required in candidate["name"] for candidate in candidates))
+
+
+class AstVariantSemanticTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        configure_libclang()
+        cls.source = Path(__file__).with_name("testdata") / "ast_variant_semantics.cpp"
+        cls.blob = cls.source.read_bytes()
+        cls.tu = ci.Index.create().parse(
+            str(cls.source), args=["-x", "c++", "-std=c++14", "-fms-compatibility"]
+        )
+        errors = [str(item) for item in cls.tu.diagnostics if item.severity >= 3]
+        if errors:
+            raise AssertionError("fixture parse failed:\n" + "\n".join(errors))
+        cls.functions = {
+            cursor.spelling: cursor
+            for cursor in cls.tu.cursor.walk_preorder()
+            if cursor.kind in (ci.CursorKind.FUNCTION_DECL, ci.CursorKind.CXX_METHOD)
+            and cursor.is_definition()
+        }
+
+    @classmethod
+    def _text(cls, cursor):
+        return cls.blob[cursor.extent.start.offset:cursor.extent.end.offset].decode()
+
+    @classmethod
+    def _node(cls, function, kind, text):
+        matches = [
+            node for node in function.walk_preorder()
+            if node.kind == kind and cls._text(node) == text
+        ]
+        if len(matches) != 1:
+            raise AssertionError("expected one %s node, found %d" % (text, len(matches)))
+        return matches[0]
+
+    @classmethod
+    def _offset(cls, line, expression):
+        line_start = cls.blob.index(line.encode())
+        return line_start + line.index(expression)
+
+    @classmethod
+    def _render_mutation(cls, mutation):
+        rendered = cls.blob
+        for edit in sorted(mutation.edits, key=lambda item: (item.start, item.end), reverse=True):
+            rendered = rendered[:edit.start] + edit.replacement + rendered[edit.end:]
+        return rendered
+
+    def test_record_parameters_are_never_copied_by_helpers(self):
+        function = self.functions["SafeHelpers"]
+        by_value = self._node(
+            function, ci.CursorKind.BINARY_OPERATOR, "record.value + scalar"
+        )
+        by_reference = self._node(
+            function, ci.CursorKind.BINARY_OPERATOR, "recordRef.value + scalar"
+        )
+        self.assertEqual(
+            helper_parameters(by_value, function),
+            [("const AstRecord &", "record"), ("int", "scalar")],
+        )
+        record_parameter = next(
+            child for child in function.get_children()
+            if child.kind == ci.CursorKind.PARM_DECL and child.spelling == "record"
+        )
+        self.assertIsNone(helper_return_spelling(record_parameter.type))
+        self.assertEqual(
+            helper_parameters(by_reference, function),
+            [("AstRecord &", "recordRef"), ("int", "scalar")],
+        )
+
+        helpers = inline_expression_edits(function, self.blob, 0, 1)
+        helpers += inline_member_access_edits(function, self.blob, 0, 1)
+        helpers += inline_nested_expression_edits(function, self.blob, 0, 1)
+        helper_text = b"".join(
+            edit.replacement for mutation in helpers for edit in mutation.edits
+            if edit.start == edit.end
+        ).decode()
+        self.assertIn("const AstRecord & record", helper_text)
+        self.assertIn("AstRecord & recordRef", helper_text)
+        self.assertIn("AstChoice choice", helper_text)
+        self.assertIn("static inline int * H2AstMember", helper_text)
+        self.assertNotIn("AstRecord record", helper_text)
+
+    def test_member_helpers_skip_lvalue_and_volatile_contexts(self):
+        function = self.functions["RejectedMemberContexts"]
+        mutations = inline_member_access_edits(function, self.blob, 0, 1)
+        edited_offsets = {
+            edit.start for mutation in mutations for edit in mutation.edits if edit.start != edit.end
+        }
+        rejected = {
+            self._offset("    record.value = scalar;", "record.value"),
+            self._offset("    int *address = &record.value;", "record.value"),
+            self._offset("    ConsumeReference(record.value);", "record.value"),
+            self._offset("    const int &alias = record.value;", "record.value"),
+            self._offset(
+                "    int observed = volatileRecord.value + scalar;", "volatileRecord.value"
+            ),
+        }
+        self.assertTrue(edited_offsets.isdisjoint(rejected))
+
+    def test_volatile_expression_is_absent_from_all_expression_families(self):
+        function = self.functions["RejectedMemberContexts"]
+        line = "    int observed = volatileRecord.value + scalar;"
+        start = self._offset(line, "volatileRecord.value + scalar")
+        end = start + len("volatileRecord.value + scalar")
+        mutations = expression_edits(function, self.blob)
+        mutations += inline_expression_edits(function, self.blob, 0, 1)
+        mutations += inline_nested_expression_edits(function, self.blob, 0, 1)
+        self.assertFalse(any(
+            edit.start < end and start < edit.end
+            for mutation in mutations for edit in mutation.edits if edit.start != edit.end
+        ))
+
+    def test_read_advance_requires_independent_value_local(self):
+        safe = inline_read_advance_edits(
+            self.functions["SafeReadAdvance"], self.blob, 0, 1
+        )
+        rejected = inline_read_advance_edits(
+            self.functions["RejectedReadAdvance"], self.blob, 0, 1
+        )
+        self.assertEqual(len(safe), 1)
+        self.assertEqual(rejected, [])
+
+    def test_indirect_aliasing_stores_are_not_reordered(self):
+        function = self.functions["RejectedAliasingStores"]
+        self.assertEqual(statement_order_edits(function, self.blob), [])
+
+    def test_direct_independent_local_stores_remain_available(self):
+        function = self.functions["SafeStatementOrder"]
+        self.assertEqual(len(statement_order_edits(function, self.blob)), 1)
+
+    def test_volatile_member_read_is_not_reordered(self):
+        function = self.functions["RejectedVolatileOrder"]
+        self.assertEqual(statement_order_edits(function, self.blob), [])
+
+    def test_line_sensitive_declarations_and_statements_are_not_moved(self):
+        function = self.functions["RejectedLineMacros"]
+        self.assertEqual(declaration_edits(function, self.blob), [])
+        self.assertEqual(statement_order_edits(function, self.blob), [])
+
+    def test_safe_declaration_split_and_merge_remain_available(self):
+        function = self.functions["SafeDeclarations"]
+        families = {mutation.family for mutation in declaration_edits(function, self.blob)}
+        self.assertEqual(families, {"declaration_split", "declaration_merge"})
+
+    def test_one_safe_edit_from_every_family_remains_parseable(self):
+        helpers = self.functions["SafeHelpers"]
+        statements = self.functions["SafeStatementOrder"]
+        declarations = self.functions["SafeDeclarations"]
+        read_advance = self.functions["SafeReadAdvance"]
+        groups = [
+            expression_edits(statements, self.blob),
+            statement_order_edits(statements, self.blob),
+            declaration_edits(declarations, self.blob),
+            inline_expression_edits(helpers, self.blob, helpers.extent.start.offset, 1),
+            inline_member_access_edits(helpers, self.blob, helpers.extent.start.offset, 1),
+            inline_nested_expression_edits(helpers, self.blob, helpers.extent.start.offset, 1),
+            inline_read_advance_edits(
+                read_advance, self.blob, read_advance.extent.start.offset, 1
+            ),
+        ]
+        self.assertTrue(all(groups))
+        mutations = [group[0] for group in groups]
+        mutations.extend(
+            mutation for mutation in groups[2]
+            if mutation.family != mutations[2].family
+        )
+        for mutation in mutations:
+            candidate = self._render_mutation(mutation).decode()
+            tu = ci.Index.create().parse(
+                str(self.source), args=["-x", "c++", "-std=c++14"],
+                unsaved_files=[(str(self.source), candidate)],
+            )
+            errors = [item for item in tu.diagnostics if item.severity >= ci.Diagnostic.Error]
+            self.assertEqual(errors, [], mutation.family)
+
+    def test_floating_addition_is_not_treated_as_commutative(self):
+        function = self.functions["RejectedFloatingCommutative"]
+        self.assertEqual(expression_edits(function, self.blob), [])
+        self.assertEqual(inline_expression_edits(function, self.blob, 0, 1), [])
+
+    def test_implicit_this_is_not_extracted_to_namespace_helper(self):
+        function = self.functions["Read"]
+        self.assertEqual(inline_expression_edits(function, self.blob, 0, 1), [])
+        self.assertEqual(inline_member_access_edits(function, self.blob, 0, 1), [])
+
+    def test_only_nonfatal_errors_after_target_are_ignorable(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "trailing_error.cpp"
+            source.write_text(
+                "int Target() { return 1; }\n"
+                "int Later() { int *pointer = 1; return *pointer; }\n"
+            )
+            tu = ci.Index.create().parse(str(source), args=["-x", "c++", "-std=c++14"])
+            functions = {
+                cursor.spelling: cursor for cursor in tu.cursor.get_children()
+                if cursor.kind == ci.CursorKind.FUNCTION_DECL
+            }
+            blocking, trailing = classify_parse_errors(tu, source, functions["Target"])
+            later_blocking, _later_trailing = classify_parse_errors(
+                tu, source, functions["Later"]
+            )
+        self.assertEqual(blocking, [])
+        self.assertEqual(len(trailing), 1)
+        self.assertEqual(len(later_blocking), 1)
 
 
 if __name__ == "__main__":
