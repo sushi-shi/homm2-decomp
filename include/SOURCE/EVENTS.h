@@ -10,6 +10,7 @@ enum {
     COMBAT_REMOTE_HEADER_SIZE = 0x9b,
     COMBAT_REMOTE_HERO_FIRST_SIZE = 200,
     COMBAT_REMOTE_HERO_SECOND_SIZE = 50,
+    COMBAT_REMOTE_HERO_SECOND_SPELL_INDEX = 52,
     COMBAT_REMOTE_PACKET_HEADER_SIZE = 9,
     COMBAT_REMOTE_FRAGMENT_TYPE = 1,
     COMBAT_REMOTE_TIMEOUT = 90000
@@ -90,29 +91,7 @@ struct mapTownExtra {
     char name[15];
     signed char unknown28;
 };
-struct combatRemoteData {
-    signed char fragment;
-    signed char x;
-    signed char y;
-    signed char hasFirstHero;
-    signed char hasTown;
-    signed char hasSecondHero;
-    signed char firstSide;
-    signed char secondSide;
-    int randomSeed;
-    signed char combatResult;
-    signed char retreatWin;
-    signed char combatSurrender;
-    signed char firstOwner;
-    int firstGold;
-    signed char secondOwner;
-    int secondGold;
-    char firstArmy[15];
-    char secondArmy[15];
-    char townData[100];
-};
 #pragma pack(pop)
-SIZE(combatRemoteData, COMBAT_REMOTE_HEADER_SIZE);
 
 typedef enum MapEventType {
     MAP_EVENT_ALCHEMIST_LAB = 1,
