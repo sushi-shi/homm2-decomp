@@ -83,14 +83,16 @@ cannot silently address the wrong field of a recovered public DATA owner). Full 
 **`docs/build-asserts.md`**.
 
 **`homm2 relocs` — OPT-IN broad reloc-target audit.** The narrow owner-field subset is a hard gate;
-the order-independent whole-target review remains opt-in. Objdiff **MASKS every relocation**
-when scoring — it never checks a reloc's *target* — so a 100%-exact fn can silently read the wrong
-global/field or call a fabricated/wrong function and still score 100%. `homm2 relocs` resolves every
+the order-independent whole-target review remains opt-in. The generated objdiff report uses
+`functionRelocDiffs=data_value`, but that does not prove every target or owner-relative addend:
+equal-valued BSS fields and unresolved aliases can still hide or manufacture differences.
+`homm2 relocs` resolves every
 near-exact fn's reloc targets (via `symbol_names.csv` + definition `DATA()` VAs) and flags any address
 base references that retail never does. It's OPT-IN, not a hard gate, because it also surfaces
 unreproducible link artifacts — chiefly the delinker's `empty_stub` (the synthetic name for a
 COMDAT-folded empty `ret` fn that base still calls by its retained public name). `homm2 relocs 0x<rva>`
-reviews one function. See `[[objdiff-masks-all-relocs]]`.
+reviews one function. Manual relocation-masked raw-byte proof remains useful for separating code
+shape from target identity.
 
 ## `homm2 sema` — semantic navigation (matcher's read-only toolbox)
 
