@@ -75,14 +75,13 @@
     "\x7d\x3c\x8f\x3c\xa6\x3c\xd5\x3c\xe7\x3c\x0b\x3d\x20\x3d\x35\x3d\x4a\x3d\x5e\x3d\x70" \
     "\x3d\x94\x3d\xb8\x3d\xcd\x3d\xe7\x3d\x18\x3e\x2d\x3e\x1a\x3f"
 
-// fullMap is embedded in `game` at this+0xb3e; the retail folds the +0xb3e into the
-// member offsets and inlines Row/Extra (/Ob1), so access it inline via the cast.
-#define WORLDMAP (reinterpret_cast<fullMap *>(reinterpret_cast<char *>(this) + 0xb3e))
+// Retail folds the embedded member offset into Row/Extra accesses after inlining.
+#define WORLDMAP (&m_worldMap)
 
 // Inline accessors that reference gpGame directly (the retail emits `add [gpGame]`
 // + a per-call `jmp $+0`), so they are free inline helpers, not game methods.
 inline town *GetCastle(int idx) { return gpGame->GetTown(idx); }
-inline signed char PlayerEventByte(signed char color) { return reinterpret_cast<signed char *>(gpGame)[color * 283 + 0x49c]; }
+inline signed char PlayerEventByte(signed char color) { return gpGame->m_players[color].m_color; }
 
 VA(0x004708b0, 0x23d)
 void playerData::Write(int file)
@@ -177,8 +176,8 @@ VA(0x00470e47, 0x65)
 int playerData::HasMobileHero(void)
 {
     int i;
-    for (i = 0; i < reinterpret_cast<signed char *>(this)[1]; i++) {
-        if (gpGame->IsMobile(reinterpret_cast<signed char *>(this)[i + 4]))
+    for (i = 0; i < m_heroCount; i++) {
+        if (gpGame->IsMobile(m_heroIds[i]))
             return 1;
     }
     return 0;
@@ -189,28 +188,28 @@ int GetNumObelisks(int color)
 {
     int count = 0;
     int i;
-    for (i = 0; i < 0x30; i++) {
-        if (reinterpret_cast<signed char *>(gpGame)[i + 0x634d] & (1 << color))
+    for (i = 0; i < GAME_BOAT_COUNT; i++) {
+        if (gpGame->m_obeliskVisitors[i] & (1 << color))
             count++;
     }
     return count;
 }
 
 VA(0x00470f10, 0xca)
-int playerData::BuildingsOwned(int a, int b, int c)
+int playerData::BuildingsOwned(int townType, int buildingIndex, int buildState)
 {
     int count = 0;
     int i;
-    for (i = 0; i < reinterpret_cast<signed char *>(this)[0x44]; i++) {
-        signed char *town = reinterpret_cast<signed char *>(reinterpret_cast<char *>(gpGame) + reinterpret_cast<signed char *>(this)[i + 0x47] * 100 + 0xb53);
-        if (b < 0x13 || town[3] == a) {
-            if (b == 0) {
-                if (*reinterpret_cast<int *>(town + 0x18) & 1) {
-                    if (town[0x1c] == c)
+    for (i = 0; i < m_townCount; i++) {
+        town *ownedTown = &gpGame->m_castleRecs[m_townIds[i]];
+        if (buildingIndex < TOWN_BUILDING_INDEX_FIRST_DWELLING || ownedTown->m_type == townType) {
+            if (buildingIndex == TOWN_BUILDING_INDEX_MAGE_GUILD) {
+                if (ownedTown->m_buildings & TOWN_BUILDING_MAGE_GUILD) {
+                    if (ownedTown->m_buildState == buildState)
                         count++;
                 }
             } else {
-                if (*reinterpret_cast<int *>(town + 0x18) & (1 << b))
+                if (ownedTown->m_buildings & (1 << buildingIndex))
                     count++;
             }
         }
@@ -223,10 +222,10 @@ int playerData::NumOfGivenArtifact(int artifact)
 {
     int count = 0;
     int i;
-    for (i = 0; i < reinterpret_cast<signed char *>(this)[1]; i++) {
+    for (i = 0; i < m_heroCount; i++) {
         int j;
-        for (j = 0; j < 0xe; j++) {
-            if (reinterpret_cast<signed char *>(gpGame)[reinterpret_cast<signed char *>(this)[i + 4] * 250 + j + 0x2899] == artifact)
+        for (j = 0; j < HERO_ARTIFACT_SLOT_COUNT; j++) {
+            if (gpGame->m_heroRecs[m_heroIds[i]].m_artifacts[j] == artifact)
                 count++;
         }
     }
@@ -234,13 +233,13 @@ int playerData::NumOfGivenArtifact(int artifact)
 }
 
 VA(0x00471071, 0x82)
-int game::MineTypesOwned(int col, int row)
+int game::MineTypesOwned(int owner, int resourceType)
 {
     int num = 0;
     int i;
-    for (i = 0; i < 0x90; i++) {
-        if (reinterpret_cast<signed char *>(this)[i * 7 + 0x5cb7] == col &&
-            reinterpret_cast<signed char *>(this)[i * 7 + 0x5cb8] == row)
+    for (i = 0; i < GAME_MINE_COUNT; i++) {
+        if (m_mines[i].owner == owner &&
+            m_mines[i].resourceType == resourceType)
             num++;
     }
     return num;
@@ -359,16 +358,16 @@ int game::IsMobile(int heroId)
 {
     if (heroId == -1)
         return 0;
-    char *hp = reinterpret_cast<char *>(this) + heroId * 250 + 0x27c4;
-    mapCell *cp = gpAdvManager->GetCell(*reinterpret_cast<int *>(hp + 0x19), *reinterpret_cast<int *>(hp + 0x1d));
-    return CalcTerrainCost(giGroundToTerrain[cp->m_terrainImageIndex], 1, *reinterpret_cast<int *>(hp + 0x35),
-                           reinterpret_cast<signed char *>(hp)[0x74], cp->m_isRoad, 0) <= *reinterpret_cast<int *>(hp + 0x35);
+    hero *mobileHero = &m_heroRecs[heroId];
+    mapCell *cp = gpAdvManager->GetCell(mobileHero->m_x, mobileHero->m_y);
+    return CalcTerrainCost(giGroundToTerrain[cp->m_terrainImageIndex], 1, mobileHero->m_remainingMobility,
+                           mobileHero->m_secondarySkills[HERO_SKILL_PATHFINDING], cp->m_isRoad, 0) <= mobileHero->m_remainingMobility;
 }
 
 VA(0x00471861, 0x1e)
 fullMap *game::GetWorldMapData(void)
 {
-    return reinterpret_cast<fullMap *>(reinterpret_cast<char *>(this) + 0xb3e);
+    return &m_worldMap;
 }
 
 VA(0x0047187f, 0x11e)
@@ -457,9 +456,9 @@ VA(0x00471c80, 0x85)
 int game::GetTownId(int col, int row)
 {
     int i;
-    for (i = 0; i < 0x48; i++) {
-        if (reinterpret_cast<unsigned char *>(this)[i * 100 + 0xb57] == col &&
-            reinterpret_cast<unsigned char *>(this)[i * 100 + 0xb58] == row)
+    for (i = 0; i < GAME_TOWN_COUNT; i++) {
+        if (m_castleRecs[i].m_x == col &&
+            m_castleRecs[i].m_y == row)
             return i;
     }
     return -1;
@@ -469,9 +468,9 @@ VA(0x00471d05, 0x84)
 int game::GetMineId(int col, int row)
 {
     int i;
-    for (i = 0; i < 0x90; i++) {
-        if (reinterpret_cast<unsigned char *>(this)[i * 7 + 0x5cbb] == col &&
-            reinterpret_cast<unsigned char *>(this)[i * 7 + 0x5cbc] == row)
+    for (i = 0; i < GAME_MINE_COUNT; i++) {
+        if (m_mines[i].x == col &&
+            m_mines[i].y == row)
             return i;
     }
     return -1;
@@ -826,7 +825,7 @@ void game::LoadGame(char *filename, int loadFromFile, int)
     LogStr("LG2");
         int humansLoaded = 0;
         gbGameOver = 0;
-        reinterpret_cast<unsigned char *>(this)[0x660e] = 1;
+        m_gameLoaded = 1;
 
         char path[452];
         if (!loadFromFile && _strnicmp(filename, "RMT", 3) == 0)
