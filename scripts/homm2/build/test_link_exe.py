@@ -5,10 +5,10 @@ from pathlib import Path
 
 from homm2.build.link_exe import (
     classify_missing_public_data, classify_pe_storage, decode_map_symbol_name,
-    load_retail_data_symbols, load_retail_order,
+    decode_s_compile_banner, load_retail_data_symbols, load_retail_order,
     normalized_vendor_imports, parse_map_contributions, parse_map_symbol_records,
-    parse_map_symbols, parse_unresolved, read_coff_section, read_imports, read_order_response, read_pe,
-    static_symbol_diagnostics)
+    parse_map_symbols, parse_unresolved, read_coff_section, read_imports, read_order_response,
+    read_pe, resolve_link_executable, static_symbol_diagnostics)
 
 
 class LinkExeTest(unittest.TestCase):
@@ -40,6 +40,21 @@ class LinkExeTest(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "no CodeView function RVA"):
                 load_retail_order(root / "units.toml", root / "symbols.csv",
                                   module_contributions={})
+
+    def test_s_compile_banner_decodes_owned_tool_record(self):
+        body = b"\x03\x07\x00\x08\x04LINK"
+        self.assertEqual(decode_s_compile_banner(body), "LINK")
+
+    def test_explicit_linker_override_is_validated_and_selected(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            linker = root / "LINK30.EXE"
+            linker.write_bytes(b"MZ")
+            selected, source = resolve_link_executable(root, linker)
+            self.assertEqual(selected, linker.resolve())
+            self.assertEqual(source, "argument")
+            with self.assertRaisesRegex(RuntimeError, "override is not a file"):
+                resolve_link_executable(root, root / "missing.exe")
 
     def test_unresolved_symbols_are_grouped_by_owner(self):
         parsed = parse_unresolved(
