@@ -235,8 +235,32 @@ typedef enum KbGameTableConstant {
     KB_COMBAT_SPEED_TEXT_COUNT = KB_COMBAT_SPEED_COUNT + 1,
     KB_COMBAT_MINI_INFO_TEXT_COUNT = 4,
     KB_COMMAND_LINE_HELP_COUNT = 14,
-    KB_OVERVIEW_TEXT_COUNT = 6
+    KB_OVERVIEW_TEXT_COUNT = 6,
+    KB_WIN_COM_ERROR_TEXT_COUNT = 6,
+    KB_MINI_VIEW_TEXT_COUNT = 10,
+    KB_FILE_REQUEST_HELP_COUNT = 16,
+    KB_PERSONALITY_TEXT_COUNT = 4,
+    KB_ARMY_SIZE_NAME_COUNT = 9,
+    KB_ARMY_SIZE_NAME_VARIANT_COUNT = 3,
+    KB_RANDOM_TAVERN_TEXT_COUNT = 8,
+    KB_RANDOM_SIGN_TEXT_COUNT = 4,
+    KB_CAMPAIGN_AWARD_TEXT_COUNT = 12,
+    KB_SLOW_VIDEO_LEVEL_TEXT_COUNT = 2,
+    KB_SETTINGS_PANEL_HELP_COUNT = 10,
+    KB_BARRIER_COLOR_NAME_COUNT = 8,
+    KB_GENERIC_SITE_NAME_COUNT = 8,
+    KB_RECRUITMENT_SITE_NAME_COUNT = 6,
+    KB_WIN_SETUP_COUNT = 73,
+    KB_INIT_MENU_HOTSPOT_COUNT = 5
 } KbGameTableConstant;
+
+typedef enum InitMenuHotSpotField {
+    INIT_MENU_HOTSPOT_X = 0,
+    INIT_MENU_HOTSPOT_Y = 1,
+    INIT_MENU_HOTSPOT_WIDTH = 2,
+    INIT_MENU_HOTSPOT_HEIGHT = 3,
+    INIT_MENU_HOTSPOT_FIELD_COUNT = 4
+} InitMenuHotSpotField;
 
 extern unsigned char giGroundShape[GROUND_TILE_IMAGE_COUNT];
 extern unsigned char gColorTableTan[DIM_PALETTE_COLOR_COUNT];
@@ -445,28 +469,27 @@ extern char *gSecondarySkills[KB_SECONDARY_SKILL_TEXT_COUNT];
 extern char *cSecSkillDesc[HERO_SKILL_COUNT][SECONDARY_SKILL_VALUE_LEVEL_COUNT];
 extern char *cDirections[KB_DIRECTION_TEXT_COUNT];
 extern char *cRumourTerrainDescriptions[KB_RUMOUR_TERRAIN_DESCRIPTION_COUNT];
-extern char *cRandomTavernText[8];
 extern char *gInterfaceTypeText[KB_INTERFACE_TYPE_TEXT_COUNT];
 extern char *cBWMouseText[KB_BW_MOUSE_TEXT_COUNT];
 extern char *combatSpeedText[KB_COMBAT_SPEED_TEXT_COUNT];
 extern char *combatMiniInfoText[KB_COMBAT_MINI_INFO_TEXT_COUNT];
 extern char *gcCommandLineHelp[KB_COMMAND_LINE_HELP_COUNT];
 extern char *cOverviewText[KB_OVERVIEW_TEXT_COUNT];
-extern char *cWinComError[6];
-extern char *cMiniViewText[10];
-extern char *gFileRequestHelp[16];
-extern char *cPersonality[4];
-extern char *gArmySizeNames[9][3];
-extern char *cRandomTavernText[8];
-extern char *cRandomSignText[4];
-extern char *cCampaignAwards[12];
-extern char *cSlowVideoLevelText[2];
-extern char *gSPanelHelp[10];
-extern char *xBarrierColor[8];
-extern char *xGenericSiteNames[8];
+extern char *cWinComError[KB_WIN_COM_ERROR_TEXT_COUNT];
+extern char *cMiniViewText[KB_MINI_VIEW_TEXT_COUNT];
+extern char *gFileRequestHelp[KB_FILE_REQUEST_HELP_COUNT];
+extern char *cPersonality[KB_PERSONALITY_TEXT_COUNT];
+extern char *gArmySizeNames[KB_ARMY_SIZE_NAME_COUNT][KB_ARMY_SIZE_NAME_VARIANT_COUNT];
+extern char *cRandomTavernText[KB_RANDOM_TAVERN_TEXT_COUNT];
+extern char *cRandomSignText[KB_RANDOM_SIGN_TEXT_COUNT];
+extern char *cCampaignAwards[KB_CAMPAIGN_AWARD_TEXT_COUNT];
+extern char *cSlowVideoLevelText[KB_SLOW_VIDEO_LEVEL_TEXT_COUNT];
+extern char *gSPanelHelp[KB_SETTINGS_PANEL_HELP_COUNT];
+extern char *xBarrierColor[KB_BARRIER_COLOR_NAME_COUNT];
+extern char *xGenericSiteNames[KB_GENERIC_SITE_NAME_COUNT];
 extern char *xRecruitEmpty[X_GLOBAL_RECRUIT_EMPTY_COUNT];
 extern char *xRecruitBuy[X_GLOBAL_RECRUIT_BUY_COUNT];
-extern char *xRecruitmentSiteNames[6];
+extern char *xRecruitmentSiteNames[KB_RECRUITMENT_SITE_NAME_COUNT];
 extern int gbHeroWindShowing;
 extern int gbFullCombatScreenDrawn;
 extern int gbLimitedCombatUpdatePalette;
@@ -491,7 +514,8 @@ extern signed char xSmackFromNetwork;
 extern int bKBDone;
 extern struct _REDBOOK *hRedbookz;
 extern int bForceCheckTimeEvent;
-extern unsigned short IMHotSpots[5][4];
+extern unsigned short
+    IMHotSpots[KB_INIT_MENU_HOTSPOT_COUNT][INIT_MENU_HOTSPOT_FIELD_COUNT];
 extern int lastIMHoverID;
 extern int bInCheckEndGame;
 extern int gbHitEvent;

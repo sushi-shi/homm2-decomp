@@ -227,7 +227,12 @@ typedef enum MonsterAttribute {
     MONSTER_ATTRIBUTE_WOKE_FROM_DAMAGE = 0x80
 } MonsterAttribute;
 #pragma pack(push, 1)
-struct SWinSetup { unsigned char m_0; unsigned short m_1; char *m_3; };     // gWinSetup[] (7B, pack 1)
+struct SWinSetup {
+    unsigned char windowId;
+    unsigned short widgetId;
+    char *text;
+};
+SIZE(SWinSetup, 7);
 #pragma pack(pop)
 
 #endif // HOMM2_TYPES_H
