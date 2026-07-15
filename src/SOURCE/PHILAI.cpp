@@ -5401,13 +5401,25 @@ int philAI::EvaluateJail(mapCell *) {
 
 VA(0x00445ef0, 0xf6)
 void InitAIMapVars(void) {
+    // This scalar-lvalue spelling makes VC4.2 /Od emit the retail width-then-height
+    // relocation order at all five commutative products.
     CloseAIMapVars();
     SVSearchArray.Init();
-    gaiLiveChanceOfPos = (short *)BaseAlloc(MAP_WIDTH * MAP_HEIGHT * 2, PHFILE, *(short *)"\x86\x1b" + 8);
-    gaiHeroStrategicRVOfPos = (short *)BaseAlloc(MAP_WIDTH * MAP_HEIGHT * 2, PHFILE, *(short *)"\x86\x1b" + 9);
-    gaiHeroEventStratRVOfPos = (short *)BaseAlloc(MAP_WIDTH * MAP_HEIGHT * 2, PHFILE, *(short *)"\x86\x1b" + 10);
-    gaiTurnValueOfMine = (signed char *)BaseAlloc(MAP_WIDTH * MAP_HEIGHT, PHFILE, *(short *)"\x86\x1b" + 11);
-    gaiEnemyHeroReachable = (signed char *)BaseAlloc(MAP_WIDTH * MAP_HEIGHT, PHFILE, *(short *)"\x86\x1b" + 12);
+    gaiLiveChanceOfPos = static_cast<short *>(
+        BaseAlloc(0[&MAP_WIDTH] * MAP_HEIGHT * 2, PHFILE,
+                  *reinterpret_cast<const short *>("\x86\x1b") + 8));
+    gaiHeroStrategicRVOfPos = static_cast<short *>(
+        BaseAlloc(0[&MAP_WIDTH] * MAP_HEIGHT * 2, PHFILE,
+                  *reinterpret_cast<const short *>("\x86\x1b") + 9));
+    gaiHeroEventStratRVOfPos = static_cast<short *>(
+        BaseAlloc(0[&MAP_WIDTH] * MAP_HEIGHT * 2, PHFILE,
+                  *reinterpret_cast<const short *>("\x86\x1b") + 10));
+    gaiTurnValueOfMine = static_cast<signed char *>(
+        BaseAlloc(0[&MAP_WIDTH] * MAP_HEIGHT, PHFILE,
+                  *reinterpret_cast<const short *>("\x86\x1b") + 11));
+    gaiEnemyHeroReachable = static_cast<signed char *>(
+        BaseAlloc(0[&MAP_WIDTH] * MAP_HEIGHT, PHFILE,
+                  *reinterpret_cast<const short *>("\x86\x1b") + 12));
 }
 
 VA(0x00445fe6, 0x112)
