@@ -25,6 +25,10 @@ from homm2.build.reloc_owners import (
     OWNER_EXTENTS, load_definition_rvas, load_explicit_extents,
     load_owner_ranges,
 )
+from homm2.build.contribution_manifest import (
+    OUTPUT as CONTRIBUTION_MANIFEST,
+    manifest_bytes as contribution_manifest_bytes,
+)
 
 
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[3]))
@@ -116,13 +120,13 @@ def reviewed_manifest_bytes(symbols=SYMBOLS, ledger=LEDGER, exe=EXE):
     return ("\n".join(lines) + "\n").encode("utf-8")
 
 
-def _identity_inputs(delinker):
+def _identity_inputs(delinker, contribution_manifest):
     definitions = load_definition_rvas()
     owner_definitions = "\n".join(
         "%s=0x%x" % (name, definitions.get(name, -1))
         for name in sorted(load_explicit_extents()))
     return {
-        "schema": 1,
+        "schema": 3,
         "ledger_sha256": _digest(LEDGER),
         "owner_extents_sha256": _digest(REPO / OWNER_EXTENTS),
         "owner_definitions_sha256": hashlib.sha256(
@@ -132,12 +136,14 @@ def _identity_inputs(delinker):
         "pdb_sha256": _digest(PDB),
         "delinker_sha256": _digest(delinker),
         "adapter_sha256": _digest(__file__),
+        "contribution_manifest_sha256": hashlib.sha256(
+            contribution_manifest).hexdigest(),
     }
 
 
-def _identity(manifest, delinker):
+def _identity(manifest, contribution_manifest, delinker):
     return {
-        **_identity_inputs(delinker),
+        **_identity_inputs(delinker, contribution_manifest),
         "manifest_sha256": hashlib.sha256(manifest).hexdigest(),
     }
 
@@ -196,14 +202,17 @@ def ensure_reviewed_targets(delinker=None):
         current = json.loads(STAMP.read_text())
     except (FileNotFoundError, json.JSONDecodeError):
         current = None
-    if not refresh_required(current, _identity_inputs(delinker)):
+    contribution_manifest = contribution_manifest_bytes()
+    expected_inputs = _identity_inputs(delinker, contribution_manifest)
+    if not refresh_required(current, expected_inputs):
         _refresh_objdiff_targets()
         return False
     manifest = reviewed_manifest_bytes()
-    identity = _identity(manifest, delinker)
+    identity = _identity(manifest, contribution_manifest, delinker)
 
     MANIFEST.parent.mkdir(parents=True, exist_ok=True)
     MANIFEST.write_bytes(manifest)
+    CONTRIBUTION_MANIFEST.write_bytes(contribution_manifest)
     TARGET.parent.mkdir(parents=True, exist_ok=True)
     temporary = Path(tempfile.mkdtemp(prefix="delink-reviewed-", dir=TARGET.parent))
     backup = TARGET.with_name(TARGET.name + ".pre-reviewed")
@@ -212,6 +221,7 @@ def ensure_reviewed_targets(delinker=None):
             str(delinker), "--pdb-path", str(PDB), "--exe-path", str(EXE),
             "--output-path", str(temporary), "--engine-path", "c:\\proj\\",
             "--data-manifest", str(MANIFEST),
+            "--contribution-manifest", str(CONTRIBUTION_MANIFEST),
         ], cwd=REPO, check=True)
         _validate_owner_objects(temporary, manifest)
         (temporary / STAMP.name).write_text(json.dumps(identity, indent=2) + "\n")
@@ -236,10 +246,15 @@ def record_current_targets(delinker=None):
     if not delinker.is_file():
         raise RuntimeError("vostok-delinker is required to record target freshness")
     manifest = reviewed_manifest_bytes()
+    contribution_manifest = contribution_manifest_bytes()
     if not MANIFEST.is_file() or MANIFEST.read_bytes() != manifest:
         raise RuntimeError("generated reviewed data manifest is stale")
+    if (not CONTRIBUTION_MANIFEST.is_file() or
+            CONTRIBUTION_MANIFEST.read_bytes() != contribution_manifest):
+        raise RuntimeError("generated contribution manifest is stale")
     _validate_owner_objects(TARGET, manifest)
-    STAMP.write_text(json.dumps(_identity(manifest, delinker), indent=2) + "\n")
+    STAMP.write_text(json.dumps(
+        _identity(manifest, contribution_manifest, delinker), indent=2) + "\n")
 
 
 def main(argv=None):
@@ -252,6 +267,7 @@ def main(argv=None):
     if args.write_manifest:
         MANIFEST.parent.mkdir(parents=True, exist_ok=True)
         MANIFEST.write_bytes(reviewed_manifest_bytes())
+        CONTRIBUTION_MANIFEST.write_bytes(contribution_manifest_bytes())
     elif args.ensure:
         ensure_reviewed_targets()
     else:
