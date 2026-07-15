@@ -39,19 +39,20 @@ static short overviewDialogSourceLine = OVERVIEW_DIALOG_SOURCE_LINE;
 
 #define OVERVIEW_SETUP_LINE overviewSetupSourceLine
 
-// @match-note: retained/live 98.90%. Recovered row-major [row][item] accesses,
-// the cached row widget-ID base, dword counters/town frame, captain CFG and
-// 0x8000 building bit, shared text buffer, and shared secondary-skill/artifact
-// row/column locals computed before allocation. Frame 0xe8, this -0xdc, primary
-// slots, CFG, semantics, and all 340 external relocations now match. The first
-// opcode residuals are retail continuation jumps near +0x406 and +0x780; knob
-// scale/divisor remain ours -0x1c/-0x20 versus retail -0x20/-0x24, and late
-// hero-detail locals retain different slot identities. Rejected: row-pointer
-// globals (wrong ?@@3PAY0EG@ ABI), iconCounts[2] (96.44%), separate text locals
-// plus function-wide hero (0xf0), hoisted captainMana (wrong -0x40 use), an
-// unaddressed top-level dword (0xe4), separate detail-coordinate pairs (0xf4),
-// and semantic bucket suffixes (no score gain). Revisit after total SOURCE 95%
-// for continuation/slot tuning; do not repeat these structural attempts.
+// @match-note: live 98.94%. Recovered flat row-major cleanup indexing, the
+// GetTown/GetHero inline accessors and both retail continuation jumps, the two
+// distinct final icon-count increments, cached row widget-ID base, captain CFG,
+// and shared skill/artifact locals. Frame 0xe8, this -0xdc, primary slots, CFG,
+// and semantics agree. All 340 relocation offsets are present; the first real
+// residual is the cached-type equality at +0xc6/+0xcc, where ours names
+// giOverviewType then iLastDynamicType and retail names them in reverse. MSVC
+// canonicalizes both commuted equality spellings identically. Knob scale/divisor
+// remain ours -0x1c/-0x20 versus retail -0x20/-0x24, and later detail locals have
+// different slot identities. The next aligned symbol is now only one byte early
+// (ours +0x223f, retail +0x2240). Rejected: row-pointer globals (wrong ABI),
+// iconCounts[2] (96.44%), separate text locals plus function-wide hero (0xf0),
+// hoisted captainMana, top-level padding dword, coordinate-pair splits, and slot
+// suffix variants. Revisit for slot/equality steering; do not repeat these forms.
 VA(0x00407870, 0x223e)
 void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
 {
@@ -80,19 +81,19 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
 
     for (row = 0; row < OVERVIEW_VISIBLE_ROWS; row++) {
         for (item = 0; item < OVERVIEW_DYNAMIC_WIDGETS_PER_ROW; item++) {
-            if (reinterpret_cast<OverviewTextWidgetRow *>(textWidgetDynamic)[row][item] != 0) {
+            if (*(textWidgetDynamic + row * OVERVIEW_DYNAMIC_WIDGETS_PER_ROW + item) != 0) {
                 overWin->RemoveWidget(
-                    reinterpret_cast<OverviewTextWidgetRow *>(textWidgetDynamic)[row][item]
+                    *(textWidgetDynamic + row * OVERVIEW_DYNAMIC_WIDGETS_PER_ROW + item)
                 );
-                delete reinterpret_cast<OverviewTextWidgetRow *>(textWidgetDynamic)[row][item];
-                reinterpret_cast<OverviewTextWidgetRow *>(textWidgetDynamic)[row][item] = 0;
+                delete *(textWidgetDynamic + row * OVERVIEW_DYNAMIC_WIDGETS_PER_ROW + item);
+                *(textWidgetDynamic + row * OVERVIEW_DYNAMIC_WIDGETS_PER_ROW + item) = 0;
             }
-            if (reinterpret_cast<OverviewIconWidgetRow *>(iconWidgetDynamic)[row][item] != 0) {
+            if (*(iconWidgetDynamic + row * OVERVIEW_DYNAMIC_WIDGETS_PER_ROW + item) != 0) {
                 overWin->RemoveWidget(
-                    reinterpret_cast<OverviewIconWidgetRow *>(iconWidgetDynamic)[row][item]
+                    *(iconWidgetDynamic + row * OVERVIEW_DYNAMIC_WIDGETS_PER_ROW + item)
                 );
-                delete reinterpret_cast<OverviewIconWidgetRow *>(iconWidgetDynamic)[row][item];
-                reinterpret_cast<OverviewIconWidgetRow *>(iconWidgetDynamic)[row][item] = 0;
+                delete *(iconWidgetDynamic + row * OVERVIEW_DYNAMIC_WIDGETS_PER_ROW + item);
+                *(iconWidgetDynamic + row * OVERVIEW_DYNAMIC_WIDGETS_PER_ROW + item) = 0;
             }
         }
     }
@@ -129,8 +130,8 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
 
         if (giOverviewType == OVERVIEW_TOWNS) {
             hero *heroData0;
-            town *record = reinterpret_cast<town *>(
-                &m_castleRecs[gpCurPlayer->m_townIds[giOverviewTop[giOverviewType] + row]]
+            town *record = GetTown(
+                gpCurPlayer->m_townIds[giOverviewTop[giOverviewType] + row]
             );
             {
                 valueText0 = static_cast<char *>(BaseAlloc(
@@ -215,7 +216,7 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
             int hasCaptain = 0;
             heroData0 = 0;
             if (record->m_occupyingHeroId != -1) {
-                heroData0 = &m_heroRecs[record->m_occupyingHeroId];
+                heroData0 = GetHero(record->m_occupyingHeroId);
             } else {
                 if ((record->m_buildings & TOWN_BUILDING_CAPTAIN_QUARTERS) != 0) {
                     hasCaptain = 1;
@@ -836,7 +837,8 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
                         reinterpret_cast<OverviewIconWidgetRow *>(iconWidgetDynamic)[row][iconCount + 1],
                         -1
                     );
-                    iconCount += 2;
+                    iconCount++;
+                    iconCount++;
                     displayedArtifacts++;
                 }
             }
@@ -849,6 +851,15 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
     }
 }
 
+// @match-note: live 96.78%. The 0x50 frame, local-array bytes, CFG, semantics,
+// and ordered 52-relocation target sequence agree. In each of the two title
+// table arguments, ours loads giOverviewType before title; retail loads title
+// first and emits a one-byte-longer address sequence. The body is consequently
+// two bytes short, followed by one retail alignment byte (next symbol ours
+// +0x2594, retail +0x2598 including the inherited one-byte entry gap). Tried the
+// natural short[2][3] access, grouped byte-offset C++ casts (same code), and a
+// flat short[6] indexed title-first (96.03%, ten bytes shorter). Revisit with
+// audited AST/codegen steering; do not change the proven local storage layout.
 VA(0x00409aae, 0x357)
 void game::SetupNewOverviewType(int overviewType, int redrawFrom)
 {
@@ -1277,10 +1288,6 @@ int OverviewHandler(struct tag_message &message)
     return OVERVIEW_DIALOG_CONTINUE;
 }
 
-// @early-stop
-// jump-only: retail adds e9 00000000 continuations at +0x84 and +0x2b0.
-// The other 333 instructions and operands match, the 0xa size delta equals
-// those two five-byte jumps, frame/slots are exact, and relocs are 55/55.
 VA(0x0040ab6c, 0x4fa)
 int game::ProcessIconSelect(int widgetId, int quickView)
 {
@@ -1298,8 +1305,9 @@ int game::ProcessIconSelect(int widgetId, int quickView)
         widgetId %= OVERVIEW_ROW_ID_STRIDE;
 
         if (giOverviewType == OVERVIEW_HEROES) {
-            selectedHero13 =
-                &m_heroRecs[gpCurPlayer->m_heroIds[giOverviewTop[giOverviewType] + row0]];
+            selectedHero13 = GetHero(
+                gpCurPlayer->m_heroIds[giOverviewTop[giOverviewType] + row0]
+            );
             if (widgetId >= OVERVIEW_HERO_SELECT_FIRST && widgetId <= OVERVIEW_HERO_SELECT_LAST) {
                 giOverviewReturnAction = OVERVIEW_RETURN_HERO;
                 giOverviewReturnActionExtra =
@@ -1372,8 +1380,9 @@ int game::ProcessIconSelect(int widgetId, int quickView)
             }
         }
         if (giOverviewType == OVERVIEW_TOWNS) {
-            selectedTown3 =
-                &m_castleRecs[gpCurPlayer->m_townIds[giOverviewTop[giOverviewType] + row0]];
+            selectedTown3 = GetTown(
+                gpCurPlayer->m_townIds[giOverviewTop[giOverviewType] + row0]
+            );
             if (widgetId == OVERVIEW_TOWN_SELECT_WIDGET) {
                 giOverviewReturnAction = OVERVIEW_RETURN_TOWN;
                 giOverviewReturnActionExtra =
