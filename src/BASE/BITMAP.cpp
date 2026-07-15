@@ -16,7 +16,7 @@
 VA(0x004cffc0, 0x2a)
 bitmap::bitmap(void) : resource(0, 0, -1, 0)
 {
-    field_0x10 = 0;
+    m_bitmapType = BITMAP_TYPE_NONE;
     m_width = 0;
     m_height = 0;
     m_pixels = 0;
@@ -26,7 +26,7 @@ bitmap::bitmap(void) : resource(0, 0, -1, 0)
 VA(0x004d0040, 0x53)
 bitmap::bitmap(short p1, short p2, short p3) : resource(0, 0, -1, 0)
 {
-    field_0x10 = p1;
+    m_bitmapType = p1;
     m_width = p2;
     m_height = p3;
     m_pixels = static_cast<unsigned char *>(H2_ALLOC(p3 * p2, "I:\\Projects\\Heroes\\Prog\\BASE\\BITMAP.CPP", 21));
@@ -38,7 +38,7 @@ bitmap::bitmap(unsigned long id) : resource(0, id, 1, 0)
 {
     int size;
     gpResourceManager->PointToFile(id);
-    field_0x10 = gpResourceManager->ReadWord();
+    m_bitmapType = gpResourceManager->ReadWord();
     m_width = gpResourceManager->ReadWord();
     m_height = gpResourceManager->ReadWord();
     size = m_height * m_width;

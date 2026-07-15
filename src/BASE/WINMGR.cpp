@@ -193,7 +193,7 @@ int heroWindowManager::Open(int managerOrder)
     m_screen = new bitmap();
     if (m_screen == 0)
         MemError();
-    m_screen->field_0x10 = 0x21;
+    m_screen->m_bitmapType = BITMAP_TYPE_MEMORY;
     m_screen->m_width = WINDOW_SCREEN_WIDTH;
     m_screen->m_height = WINDOW_SCREEN_HEIGHT;
     m_screen->m_pixels = reinterpret_cast<unsigned char *>(lpInitWin);

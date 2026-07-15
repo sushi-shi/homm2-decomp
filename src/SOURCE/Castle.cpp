@@ -268,7 +268,7 @@ void townManager::SetupCastle(heroWindow *window, int updateOnly)
     int backgroundTop12 = CASTLE_BACKGROUND_TOP;
     terrainIconFrame27 =
         (giGroundToTerrain[
-             gpGame->m_worldMap.GetCell(m_town->m_x, m_town->m_y)->tile] - 1) *
+             gpGame->m_worldMap.GetCell(m_town->m_x, m_town->m_y)->m_terrainImageIndex] - 1) *
         CASTLE_TERRAIN_ICON_COLUMNS * CASTLE_TERRAIN_ICON_FRAMES;
     raceIconFrame = m_town->m_type << 5;
     if (updateOnly == 0) {
