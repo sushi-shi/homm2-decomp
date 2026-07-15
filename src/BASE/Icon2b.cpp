@@ -48,10 +48,14 @@ DATA(0x00534c5c) static unsigned int gIcCnt2;
 // the ascending-address owner order is retained because it preserves the better relocation shape.
 // NB09 has no per-compiland language/source record beyond `.\Win32_RE\Icon2b.obj`, so filename,
 // `#line`, or C/C++ mode steering is not evidence-backed.
-// Final raw audit: candidate 0x4cb versus retail 0x4ed; 639 of 685 relocation-union-unmasked
-// common bytes differ from +0x11 through +0x4c9, plus a 34-byte retail tail. Both are FPO with
-// EBX/ESI/EDI/EBP saves and ret 0x24; excluding three retail padding NOPs they are 363/364
-// instructions and 60/61 branches, with the same complete decoder state-machine coverage.
+// A 180-variant exact-span batch retested shared forward-decoder setup and byte-fetch lifetimes.
+// The highest fuzzy setup declared `entry` before its fields, but moved the first structural
+// divergence backward from +0x11 to +0x8, so it was rejected. A command lifetime outside the
+// loop and natural post-increment reads avoid decompiler-shaped `[-1]` source without changing
+// the complete state machine. Explicit labeled backedges are byte-identical and omitted.
+// Final raw audit: candidate 0x4c8 versus retail 0x4ed. Both are FPO with EBX/ESI/EDI/EBP saves
+// and ret 0x24; excluding three retail tail-padding NOPs they are 361/364 instructions and 60/61
+// branch sites, with the same complete decoder state-machine coverage.
 // This is an unresolved compiler-state residual, not a proven wall. Revisit after a real reachable
 // type/header change; no permutation tool was used.
 VA(0x004d0570, 0x4ed)
@@ -66,10 +70,8 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int fra
     unsigned char *cursor = data + srcOffset;
     gIcEntry = entry;
     gIcSrc = cursor;
-    int X = x;
-    X += entryX;
-    int Y = entry->y;
-    Y += y;
+    int X = entryX + x;
+    int Y = entry->y + y;
     gIcX0 = X;
     gIcPitch = dest->m_width;
     gIcY = Y;
@@ -84,9 +86,10 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int fra
         }
     }
     unsigned char *row = dest->m_pixels + gIcPitch * gIcY;
+    int cmd;
     for (;;) {
-        gIcSrc++;
-        int cmd = gIcSrc[-1];
+        unsigned char *commandByte = gIcSrc++;
+        cmd = *commandByte;
         if (static_cast<signed char>(cmd) < 0) {
             // ---- negative command ----
             if ((cmd & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
@@ -102,24 +105,20 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int fra
             // 0xc0 - 0xff
             gIcRun = cmd;
             unsigned int count = cmd & ICON_RLE_COMMAND_RUN_MASK;
-            int flags = 0;
+            int flags;
             if (count != 0) {
                 // 0xc1 - 0xff : solid colour run
                 if (cmd == ICON_RLE_LONG_SOLID_COMMAND) {
-                    gIcSrc++;
-                    count = gIcSrc[-1];
+                    count = *gIcSrc++;
                 }
-                gIcSrc++;
-                gIcColor = gIcSrc[-1];
+                gIcColor = *gIcSrc++;
                 goto do_fill;
             }
             // 0xc0 : shadow / dim run
-            gIcSrc++;
-            flags = gIcSrc[-1];
+            flags = *gIcSrc++;
             count = flags & ICON_RLE_DIM_SHORT_COUNT_MASK;
             if (count == 0) {
-                gIcSrc++;
-                count = gIcSrc[-1];
+                count = *gIcSrc++;
             }
             gIcDimLen = count;
             if (color != 0) {
