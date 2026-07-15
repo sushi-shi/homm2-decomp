@@ -4590,7 +4590,21 @@ DATA(0x004f96d8) unsigned long glMilliCounter = 0;
 DATA(0x004f96e0) unsigned char gMapColors[16];
 DATA(0x004f96f0) unsigned char *gObjectColors;
 DATA(0x004f9700) unsigned char gOwnerColors[8];
-DATA(0x004f9708) char *gTilesetFiles[64];
+DATA(0x004f9708) char *gTilesetFiles[64] = {
+    "", "", "", "", "", "", "", "", "", "", "objnhaun.icn",
+    "objnarti.icn", "mons32.icn", "art32.icn", "flag32.icn", "ressmall.icn",
+    "hourglas.icn", "route.icn", "", "stonback.icn", "minimon.icn",
+    "minihero.icn", "mtnsnow.icn", "mtnswmp.icn", "mtnlava.icn",
+    "mtndsrt.icn", "mtndirt.icn", "mtnmult.icn", "", "extraovr.icn",
+    "road.icn", "mtncrck.icn", "mtngras.icn", "trejngl.icn", "treevil.icn",
+    "objntown.icn", "objntwba.icn", "objntwsh.icn", "objntwrd.icn",
+    "objnxtra.icn", "objnwat2.icn", "objnmul2.icn", "tresnow.icn",
+    "trefir.icn", "trefall.icn", "stream.icn", "objnrsrc.icn", "dummy.icn",
+    "objngra2.icn", "tredeci.icn", "objnwatr.icn", "objngras.icn",
+    "objnsnow.icn", "objnswmp.icn", "objnlava.icn", "objndsrt.icn",
+    "objndirt.icn", "objncrck.icn", "objnlav3.icn", "objnmult.icn",
+    "objnlav2.icn", "x_loc1.icn", "x_loc2.icn", "x_loc3.icn"
+};
 DATA(0x004f9808) unsigned char bPuzzleDraw[64];
 DATA(0x004f9848) unsigned char uDimPal[3][4][256];
 DATA(0x004fa448) unsigned char gColorTableLighten[256];
