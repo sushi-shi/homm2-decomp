@@ -141,9 +141,9 @@ int AppInit(HINSTANCE instance, HINSTANCE previousInstance, int showCommand,
     }
 }
 
-// @match-note 96.47%: semantics, the zero-byte frame, and both return arms
-// agree. The only instruction-selection residual is retail's mov eax, 0 in
-// the false arm versus this compiler state's xor eax, eax; explicit if/else
+// @match-note 96.47%: semantics, the zero-byte frame, both return arms, and the
+// sole external relocation agree. The first residual is retail's `mov eax, 0`
+// in the false arm versus this compiler state's `xor eax, eax`; explicit if/else
 // is the best of the tested direct, comparison, and conditional-return forms.
 VA(0x0041c15f, 0x31)
 int AppIdle(void)
@@ -286,9 +286,9 @@ long int __stdcall AppWndProc(HWND window, unsigned int message,
     return DefWindowProcA(window, message, messageParam, messageData);
 }
 
-// @match-note 99.90%: semantics, the 0x10 frame, slots, CFG, and instruction
-// stream agree. The residual is the base EndDialog import relocation where
-// the delinked retail range retains the resolved import address.
+// @early-stop
+// Relocation-masked instruction streams, the 0x10 frame, and all local slots are
+// identical. The sole EndDialog import resolves to the same target in both objects.
 VA(0x0041c70e, 0x90)
 int __stdcall AppAbout(HWND dialog, unsigned int message,
     unsigned int messageParam, long int messageData)
@@ -344,9 +344,10 @@ void Process1WindowsMessage(void)
     }
 }
 
-// @match-note 99.80%: semantics, the 0x1c frame, local slots, CFG, and
-// instruction stream agree. Remaining differences are Win32 import fields
-// and typed gConfig references versus delinked interior labels.
+// @early-stop
+// Relocation-masked instruction streams, the 0x1c frame, and all local slots are
+// identical. All 16 relocation targets agree; retail uses resolved Win32 imports and
+// delinked interior gConfig labels where the base retains their typed identities.
 VA(0x0041c880, 0x147)
 void ResizeWindow(int x, int y, int width, int height)
 {
@@ -424,13 +425,13 @@ long int AppCommand(HWND window, unsigned int message,
     return 0;
 }
 
-// @match-note 99.87%: every opcode and branch agrees after the recovered early
-// return. Retail reserves a 0x0c frame and stores menu at -0x0c; the recovered
-// source has no evidence-backed occupants for -0x04/-0x08 and uses a 0x04
-// frame. First raw differences are frame size at +0x05 and menu slot at +0x0b.
 VA(0x0041cb5e, 0xd7)
 void UpdateDfltMenu(HMENU menu)
 {
+    // Retail reserves these dwords but never reads or initializes them.
+    int result;
+    int value;
+
     if (gConfig.gfx[giCurExe].showMenu == 0)
         return;
     if (giMainVideoModeWidth <= 640)
@@ -446,7 +447,7 @@ void UpdateDfltMenu(HMENU menu)
 }
 
 // @match-note 97.90%: semantics, the 0x04 frame, menu slot, both arms, and all
-// calls agree. Retail has one five-byte continuation jump immediately after
+// 11 relocation targets agree. Retail has one five-byte continuation jump immediately after
 // the null-menu fallback; an explicit empty positive arm lowered the match to
 // 94.70%. Remaining relocation identities are typed config/import references.
 VA(0x0041cc35, 0xac)
@@ -498,28 +499,25 @@ void SetMenuStatus(int showMenu)
     }
 }
 
-// @match-note 74.53%: the retail XOR truth table, 0x04 frame, state update, and
-// SetMenus call are reconstructed. Retail preserves continuation jumps after
-// each of the two boolean clauses and the hmnuApp guard; combined and nested
-// forms both collapse those blocks in the current compiler state.
 VA(0x0041ce3d, 0x7b)
 void SetNoDialogMenus(int menusEnabled)
 {
-    if (gbNoDialogMenusOn || menusEnabled) {
-        if (!gbNoDialogMenusOn || !menusEnabled) {
-            if (hmnuApp) {
-                gbNoDialogMenusOn = 1 - menusEnabled;
-                SetMenus(hmnuApp, menusEnabled);
-            }
-        }
-    }
+    if (gbNoDialogMenusOn && !menusEnabled)
+        return;
+    if (!gbNoDialogMenusOn && menusEnabled)
+        return;
+    if (!hmnuApp)
+        return;
+    gbNoDialogMenusOn = 1 - menusEnabled;
+    SetMenus(hmnuApp, menusEnabled);
 }
 
 // @match-note retained 100%, live 99.37%: this source was byte-exact before
-// the preceding TU reconstruction changed cumulative compiler state. The
-// recursive traversal, 0x18 frame, six local slots, menu-status layout, and
-// calls remain unchanged; retain the source-hash maximum rather than steering
-// this function independently.
+// preceding TU reconstruction changed cumulative compiler state. The recursive
+// traversal, 0x20 frame, eight parameter/local slots, menu-status layout, and CFG
+// remain unchanged. The first live residual is the equivalent outer loop test
+// `index >= count` versus `count <= index`. Base has one additional relocation
+// because retail resolves the recursive self-call; do not steer the retained exact hash.
 VA(0x0041ceb8, 0x159)
 void SetMenus(HMENU menu, int enabled)
 {
