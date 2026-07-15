@@ -699,7 +699,7 @@ void game::InitCampaignMap(void)
     int mapHeaderResult;
     int playerSlot;
     int bestHeroPosition;
-    playerRec *campaignPlayer;
+    playerData *campaignPlayer;
     int heroPosition;
     int scanPosition;
     int heroPriority;
@@ -759,20 +759,20 @@ void game::InitCampaignMap(void)
 
     bestHeroPosition = 0;
     campaignPlayer = &gpGame->m_players[0];
-    for (heroPosition = 0; heroPosition < campaignPlayer->heroCount;
+    for (heroPosition = 0; heroPosition < campaignPlayer->m_heroCount;
          ++heroPosition) {
         bestHeroPriority = -1;
         for (scanPosition = heroPosition;
-             scanPosition < campaignPlayer->heroCount; ++scanPosition) {
-            if (gpGame->m_heroRecs[campaignPlayer->heroes[scanPosition]].m_portrait ==
+             scanPosition < campaignPlayer->m_heroCount; ++scanPosition) {
+            if (gpGame->m_heroRecs[campaignPlayer->m_heroIds[scanPosition]].m_portrait ==
                     CAMPAIGN_HERO_ROLAND ||
-                gpGame->m_heroRecs[campaignPlayer->heroes[scanPosition]].m_portrait ==
+                gpGame->m_heroRecs[campaignPlayer->m_heroIds[scanPosition]].m_portrait ==
                     CAMPAIGN_HERO_ARCHIBALD) {
                 heroPriority = CAMPAIGN_HERO_PRIORITY_HIGH;
             } else if (
-                gpGame->m_heroRecs[campaignPlayer->heroes[scanPosition]].m_portrait ==
+                gpGame->m_heroRecs[campaignPlayer->m_heroIds[scanPosition]].m_portrait ==
                     CAMPAIGN_HERO_CORLAGON ||
-                gpGame->m_heroRecs[campaignPlayer->heroes[scanPosition]].m_portrait ==
+                gpGame->m_heroRecs[campaignPlayer->m_heroIds[scanPosition]].m_portrait ==
                     CAMPAIGN_HERO_HALTON) {
                 heroPriority = CAMPAIGN_HERO_PRIORITY_NORMAL;
             } else {
@@ -784,49 +784,49 @@ void game::InitCampaignMap(void)
             }
         }
         if (bestHeroPriority != -1) {
-            swappedHero = campaignPlayer->heroes[heroPosition];
-            campaignPlayer->heroes[heroPosition] =
-                campaignPlayer->heroes[bestHeroPosition];
-            campaignPlayer->heroes[bestHeroPosition] =
+            swappedHero = campaignPlayer->m_heroIds[heroPosition];
+            campaignPlayer->m_heroIds[heroPosition] =
+                campaignPlayer->m_heroIds[bestHeroPosition];
+            campaignPlayer->m_heroIds[bestHeroPosition] =
                 static_cast<signed char>(swappedHero);
         }
     }
-    if (campaignPlayer->heroCount)
-        campaignPlayer->currentHero = campaignPlayer->heroes[0];
+    if (campaignPlayer->m_heroCount)
+        campaignPlayer->m_currentHero = campaignPlayer->m_heroIds[0];
 
     switch (choice->type) {
     case CAMPAIGN_CHOICE_RESOURCE:
-        m_players[0].resources[choice->value] += choice->amount;
+        m_players[0].m_resources[choice->value] += choice->amount;
         break;
     case CAMPAIGN_CHOICE_ARTIFACT:
-        if (m_players[0].heroCount > 0)
+        if (m_players[0].m_heroCount > 0)
             GiveArtifact(GetPlayerHero(0, 0), choice->value, 0, -1);
         break;
     case CAMPAIGN_CHOICE_SPELL:
-        if (m_players[0].heroCount > 0) {
+        if (m_players[0].m_heroCount > 0) {
             bonusHeroIndex = 0;
             if (m_campaignType == CAMPAIGN_ROLAND &&
                 m_campaignScenario + 1 == 6 &&
-                m_players[0].heroCount > 1)
+                m_players[0].m_heroCount > 1)
                 bonusHeroIndex = 1;
             GetPlayerHero(0, bonusHeroIndex)->m_spells[choice->value] = 1;
         }
         break;
     case CAMPAIGN_CHOICE_SECONDARY_SKILL:
-        if (m_players[0].heroCount > 0)
+        if (m_players[0].m_heroCount > 0)
             GetPlayerHero(0, 0)->SetSS(choice->value, choice->amount);
         break;
     case CAMPAIGN_CHOICE_CREATURES:
-        if (m_players[0].heroCount > 0)
+        if (m_players[0].m_heroCount > 0)
             GetPlayerHero(0, 0)->m_army.Add(choice->value, choice->amount, -1);
         break;
     case CAMPAIGN_CHOICE_PUZZLE_PIECES:
-        m_players[0].unknown13 = static_cast<signed char>(choice->value);
+        m_players[0].m_cheatValue = static_cast<signed char>(choice->value);
         break;
     case CAMPAIGN_CHOICE_EXPERIENCE: {
         int savedNewGameSetup = gbInNewGameSetup;
         gbInNewGameSetup = 1;
-        if (m_players[0].heroCount > 0) {
+        if (m_players[0].m_heroCount > 0) {
             GetPlayerHero(0, 0)->m_experience += choice->value;
             GetPlayerHero(0, 0)->CheckLevel();
         }
@@ -840,7 +840,7 @@ void game::InitCampaignMap(void)
     if ((m_campaignAwards[CAMPAIGN_AWARD_ULTIMATE_CROWN] ||
          (m_campaignAwards[CAMPAIGN_AWARD_DRAGON_SLAYER] &&
           m_campaignScenario + 1 == CAMPAIGN_ROLAND_FINAL_SCENARIO + 1)) &&
-        m_players[0].heroCount > 0) {
+        m_players[0].m_heroCount > 0) {
         GiveArtifact(GetPlayerHero(0, 0), EVENT_ARTIFACT_ULTIMATE_CROWN, 0, -1);
     }
     gbRetreatWin = 1;

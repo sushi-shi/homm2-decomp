@@ -1440,9 +1440,9 @@ int townManager::Main(tag_message &message)
                     if (m_heroWindow0 == 0)
                         MemError();
                     SetWinText(m_heroWindow0, 12);
-                    if (gpGame->m_players[giCurPlayer].resources[RES_GOLD] <
+                    if (gpGame->m_players[giCurPlayer].m_resources[RES_GOLD] <
                             TOWN_BOAT_GOLD_COST ||
-                        gpGame->m_players[giCurPlayer].resources[RES_WOOD] <
+                        gpGame->m_players[giCurPlayer].m_resources[RES_WOOD] <
                             TOWN_BOAT_WOOD_COST) {
                         message.type = TOWN_MESSAGE_SELECT;
                         message.payload.widget.command = 5;
@@ -1462,9 +1462,9 @@ int townManager::Main(tag_message &message)
                                                m_town->m_boatY, 0) != -1) {
                             BuildObj(14);
                             gpGame->m_players[giCurPlayer]
-                                .resources[RES_GOLD] -= TOWN_BOAT_GOLD_COST;
+                                .m_resources[RES_GOLD] -= TOWN_BOAT_GOLD_COST;
                             gpGame->m_players[giCurPlayer]
-                                .resources[RES_WOOD] -= TOWN_BOAT_WOOD_COST;
+                                .m_resources[RES_WOOD] -= TOWN_BOAT_WOOD_COST;
                             m_bankBox->Update(1);
                         } else {
                             LogStr("Can't create boat!");
@@ -2973,7 +2973,7 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
                     static_cast<short>(category * 0x18 + 0x1b),
                     0x12, 0x16, "townwind.icn",
                     static_cast<short>(
-                        gpGame->m_players[categoryOrder[position]].color +
+                        gpGame->m_players[categoryOrder[position]].m_color +
                         TOWN_THIEVES_RANK_ICON_FRAME_BASE),
                     0, -1, 0x10, 1);
                 if (iconControl == 0)
@@ -2992,7 +2992,7 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
          ++position) {
         while (gpGame->m_playerDead[rank] != 0)
             ++rank;
-        sprintf(gText, gColors[gpGame->m_players[rank].color]);
+        sprintf(gText, gColors[gpGame->m_players[rank].m_color]);
         gText[0] -= ' ';
         message.type = TOWN_MESSAGE_SELECT;
         message.payload.widget.command = 3;
@@ -3005,10 +3005,10 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
             strongestHeroPosition = -1;
             strongestHeroValue = 0;
             for (heroPosition = 0;
-                 heroPosition < gpGame->m_players[rank].heroCount;
+                 heroPosition < gpGame->m_players[rank].m_heroCount;
                  ++heroPosition) {
                 strongestHero = &gpGame->m_heroRecs[
-                    gpGame->m_players[rank].heroes[heroPosition]];
+                    gpGame->m_players[rank].m_heroIds[heroPosition]];
                 heroValue = gpPhilAI->FightValueOfStack(
                     &strongestHero->m_army, strongestHero, 0, 0, 0, 0);
                 if (strongestHeroValue < heroValue) {
@@ -3020,7 +3020,7 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
             if (strongestHeroPosition != -1) {
                 strongestHero = &gpGame->m_heroRecs[
                     gpGame->m_players[rank]
-                        .heroes[strongestHeroPosition]];
+                        .m_heroIds[strongestHeroPosition]];
                 iconControl = new iconWidget(
                     static_cast<short>(position * 0x44 + 0xf6),
                     0x12d, 0, 0, "locators.icn", 0x16, 0, -1, 0x10, 1);
@@ -3041,7 +3041,7 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
                 if (strongestHeroPosition != -1) {
                     strongestHero = &gpGame->m_heroRecs[
                         gpGame->m_players[rank]
-                            .heroes[strongestHeroPosition]];
+                            .m_heroIds[strongestHeroPosition]];
                     sprintf(gText, "Att.\nDef.\nPower\nKnowl.");
                     widgetText = static_cast<char *>(BaseAlloc(
                         strlen(gText) + 1,
@@ -3079,7 +3079,7 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
                 if (informationLevel < TOWN_THIEVES_INFO_PERSONALITY) {
                 } else {
                     strcpy(gText, cPersonality[
-                        gpGame->m_players[rank].unknown0f]);
+                        gpGame->m_players[rank].m_aiDifficulty]);
                     widgetText = static_cast<char *>(BaseAlloc(
                         strlen(gText) + 1,
                         "I:\\Projects\\Heroes\\Prog\\SOURCE\\TOWNMGR.CPP",
@@ -3099,11 +3099,11 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
                         strongestCreatureValue = 0;
                         for (heroPosition = 0;
                              heroPosition <
-                             gpGame->m_players[rank].townCount;
+                             gpGame->m_players[rank].m_townCount;
                              ++heroPosition) {
                             playerTown = &gpGame->m_castleRecs[
                                 gpGame->m_players[rank]
-                                    .towns[heroPosition]];
+                                    .m_townIds[heroPosition]];
                             for (armySlot = 0;
                                  armySlot < TOWN_ARMY_SLOT_COUNT; ++armySlot) {
                                 if (playerTown->m_army
@@ -3127,11 +3127,11 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
                         }
                         for (heroPosition = 0;
                              heroPosition <
-                             gpGame->m_players[rank].heroCount;
+                             gpGame->m_players[rank].m_heroCount;
                              ++heroPosition) {
                             strongestHero = &gpGame->m_heroRecs[
                                 gpGame->m_players[rank]
-                                    .heroes[heroPosition]];
+                                    .m_heroIds[heroPosition]];
                             for (armySlot = 0;
                                  armySlot < TOWN_ARMY_SLOT_COUNT; ++armySlot) {
                                 if (strongestHero->m_army
@@ -3221,22 +3221,22 @@ void GetCategoryStats(int category, long int * const stats,
                 stats[player] = castleCount_p;
                 break;
             case TOWN_THIEVES_CATEGORY_HEROES:
-                stats[player] = gpGame->m_players[player].heroCount;
+                stats[player] = gpGame->m_players[player].m_heroCount;
                 break;
             case TOWN_THIEVES_CATEGORY_GOLD:
-                stats[player] = gpGame->m_players[player].resources[RES_GOLD];
+                stats[player] = gpGame->m_players[player].m_resources[RES_GOLD];
                 break;
             case TOWN_THIEVES_CATEGORY_WOOD_AND_ORE:
                 stats[player] =
-                    gpGame->m_players[player].resources[RES_WOOD] +
-                    gpGame->m_players[player].resources[RES_ORE];
+                    gpGame->m_players[player].m_resources[RES_WOOD] +
+                    gpGame->m_players[player].m_resources[RES_ORE];
                 break;
             case TOWN_THIEVES_CATEGORY_RARE_RESOURCES:
                 stats[player] =
-                    gpGame->m_players[player].resources[RES_MERCURY] +
-                    gpGame->m_players[player].resources[RES_SULFUR] +
-                    gpGame->m_players[player].resources[RES_CRYSTAL] +
-                    gpGame->m_players[player].resources[RES_GEMS];
+                    gpGame->m_players[player].m_resources[RES_MERCURY] +
+                    gpGame->m_players[player].m_resources[RES_SULFUR] +
+                    gpGame->m_players[player].m_resources[RES_CRYSTAL] +
+                    gpGame->m_players[player].m_resources[RES_GEMS];
                 break;
             case TOWN_THIEVES_CATEGORY_OBELISKS:
                 stats[player] = GetNumObelisks(player);
@@ -3244,10 +3244,10 @@ void GetCategoryStats(int category, long int * const stats,
             case TOWN_THIEVES_CATEGORY_ARTIFACTS:
                 stats[player] = 0;
                 for (townIndex_c = 0;
-                     townIndex_c < gpGame->m_players[player].heroCount;
+                     townIndex_c < gpGame->m_players[player].m_heroCount;
                      ++townIndex_c) {
                     playerHero_h = gpGame->GetHero(
-                        gpGame->m_players[player].heroes[townIndex_c]);
+                        gpGame->m_players[player].m_heroIds[townIndex_c]);
                     for (heroIndex_n = 0;
                          heroIndex_n < TOWN_MAX_ARTIFACTS; ++heroIndex_n) {
                         if (playerHero_h->m_artifacts[heroIndex_n] != -1 &&
@@ -3261,7 +3261,7 @@ void GetCategoryStats(int category, long int * const stats,
             case TOWN_THIEVES_CATEGORY_ARMY_STRENGTH:
                 armyStrength = 0;
                 for (heroIndex_n = 0;
-                     heroIndex_n < gpGame->m_players[player].heroCount;
+                     heroIndex_n < gpGame->m_players[player].m_heroCount;
                      ++heroIndex_n) {
                     playerHero_h =
                         gpGame->GetPlayerHero(player, heroIndex_n);
@@ -3269,7 +3269,7 @@ void GetCategoryStats(int category, long int * const stats,
                         &playerHero_h->m_army, playerHero_h, 0, 0, 0, 0);
                 }
                 for (heroIndex_n = 0;
-                     heroIndex_n < gpGame->m_players[player].townCount;
+                     heroIndex_n < gpGame->m_players[player].m_townCount;
                      ++heroIndex_n) {
                     playerTown =
                         gpGame->GetPlayerTown(player, heroIndex_n);

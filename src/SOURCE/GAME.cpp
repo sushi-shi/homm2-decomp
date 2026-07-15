@@ -82,7 +82,7 @@
 
 // Inline accessors that reference gpGame directly (the retail emits `add [gpGame]`
 // + a per-call `jmp $+0`), so they are free inline helpers, not game methods.
-inline town *GetCastle(int idx) { return reinterpret_cast<town *>(reinterpret_cast<char *>(gpGame) + idx * 100 + 0xb53); }
+inline town *GetCastle(int idx) { return gpGame->GetTown(idx); }
 inline signed char PlayerEventByte(signed char color) { return reinterpret_cast<signed char *>(gpGame)[color * 283 + 0x49c]; }
 
 VA(0x004708b0, 0x23d)
@@ -100,19 +100,19 @@ void playerData::Write(int file)
     _write(file, unused, 42);
     _write(file, &gpGame->m_cheated, 1);
     _write(file, &m_cheatValue, 1);
-    _write(file, &m_unknown0f, 4);
-    _write(file, &m_unknown0e, 1);
-    _write(file, &m_unknownab, 1);
-    _write(file, &m_canDig, 1);
-    _write(file, &m_unknown41, 1);
-    _write(file, &m_unknown42, 1);
+    _write(file, &m_aiDifficulty, 4);
+    _write(file, &m_minimumHeroCount, 1);
+    _write(file, &m_evilInterface, 1);
+    _write(file, &m_ultimateArtifactHintChance, 1);
+    _write(file, &m_ultimateArtifactHintX, 1);
+    _write(file, &m_ultimateArtifactHintY, 1);
     _write(file, &m_daysLeft, 1);
     _write(file, &m_townCount, 1);
     _write(file, &m_currentTown, 1);
     _write(file, &m_townLocatorPage, 1);
     _write(file, m_townIds, 72);
     _write(file, m_resources, 28);
-    _write(file, m_secondaryResources, 28);
+    _write(file, m_income, 28);
     _write(file, &m_barrierTents, 1);
     _write(file, &m_barrierTents, 1);
     _write(file, m_unknownad, 6);
@@ -132,19 +132,19 @@ void playerData::Read(int file)
     _read(file, unused, 42);
     _read(file, &gpGame->m_cheated, 1);
     _read(file, &m_cheatValue, 1);
-    _read(file, &m_unknown0f, 4);
-    _read(file, &m_unknown0e, 1);
-    _read(file, &m_unknownab, 1);
-    _read(file, &m_canDig, 1);
-    _read(file, &m_unknown41, 1);
-    _read(file, &m_unknown42, 1);
+    _read(file, &m_aiDifficulty, 4);
+    _read(file, &m_minimumHeroCount, 1);
+    _read(file, &m_evilInterface, 1);
+    _read(file, &m_ultimateArtifactHintChance, 1);
+    _read(file, &m_ultimateArtifactHintX, 1);
+    _read(file, &m_ultimateArtifactHintY, 1);
     _read(file, &m_daysLeft, 1);
     _read(file, &m_townCount, 1);
     _read(file, &m_currentTown, 1);
     _read(file, &m_townLocatorPage, 1);
     _read(file, m_townIds, 72);
     _read(file, m_resources, 28);
-    _read(file, m_secondaryResources, 28);
+    _read(file, m_income, 28);
     _read(file, &m_barrierTents, 1);
     _read(file, &m_barrierTents, 1);
     _read(file, m_unknownad, 6);
@@ -254,9 +254,9 @@ void ComputeUALoc(int player)
 {
     int result = gpGame->SetupPuzzlePieces(player, 1);
     if (result < 8 || gpGame->m_ultimateArtifactId == -1) {
-        gpGame->m_players[player].unknown40 = 0;
-        gpGame->m_players[player].unknown41 = -1;
-        gpGame->m_players[player].unknown42 = -1;
+        gpGame->m_players[player].m_ultimateArtifactHintChance = 0;
+        gpGame->m_players[player].m_ultimateArtifactHintX = -1;
+        gpGame->m_players[player].m_ultimateArtifactHintY = -1;
         return;
     }
 
@@ -265,11 +265,11 @@ void ComputeUALoc(int player)
         probability = 100;
     if (probability < 1)
         probability = 1;
-    gpGame->m_players[player].unknown40 = static_cast<signed char>(probability);
+    gpGame->m_players[player].m_ultimateArtifactHintChance = static_cast<signed char>(probability);
 
-    if (Random(1, 100) <= gpGame->m_players[player].unknown40) {
-        gpGame->m_players[player].unknown41 = gpGame->m_ultimateArtifactX;
-        gpGame->m_players[player].unknown42 = gpGame->m_ultimateArtifactY;
+    if (Random(1, 100) <= gpGame->m_players[player].m_ultimateArtifactHintChance) {
+        gpGame->m_players[player].m_ultimateArtifactHintX = gpGame->m_ultimateArtifactX;
+        gpGame->m_players[player].m_ultimateArtifactHintY = gpGame->m_ultimateArtifactY;
         return;
     }
 
@@ -298,8 +298,8 @@ void ComputeUALoc(int player)
         }
     }
 saveLocation:
-    gpGame->m_players[player].unknown41 = static_cast<signed char>(x);
-    gpGame->m_players[player].unknown42 = static_cast<signed char>(y);
+    gpGame->m_players[player].m_ultimateArtifactHintX = static_cast<signed char>(x);
+    gpGame->m_players[player].m_ultimateArtifactHintY = static_cast<signed char>(y);
 }
 
 VA(0x00471500, 0x2ac)
@@ -315,14 +315,14 @@ int game::SetupPuzzlePieces(int player, int justCount)
 
     if (GetNumObelisks(player) == m_obeliskCount)
         pieceCountTotal = 48;
-    pieceCountTotal += m_players[player].unknown13;
+    pieceCountTotal += m_players[player].m_cheatValue;
     if (pieceCountTotal > 48)
         pieceCountTotal = 48;
     if (justCount)
         return pieceCountTotal;
 
     memset(puzzlePiecesRemoved, 0, 6);
-    SRand(m_players[player].color + m_players[player].evilInterface * 3);
+    SRand(m_players[player].m_color + m_players[player].m_evilInterface * 3);
     int tries;
     int fallbackNum;
     int pieceValue;
@@ -613,7 +613,7 @@ int game::SaveGame(char *filename, int generateName, signed char expansionFormat
     _write(fileInfo, &m_week, 2);
     _write(fileInfo, &m_month, 2);
     for (indexFile = 0; indexFile < GAME_PLAYER_COUNT; indexFile++)
-        reinterpret_cast<playerData *>(&m_players[indexFile])->Write(fileInfo);
+        m_players[indexFile].Write(fileInfo);
 
     _write(fileInfo, &m_obeliskCount, 1);
     for (indexFile = 0; indexFile < GAME_HERO_COUNT; indexFile++)
@@ -713,14 +713,14 @@ void game::SetupOrigData(void)
             gbHumanPlayer[i] = 0;
         }
         memset(&m_players[i], 0, sizeof(m_players[i]));
-        m_players[i].color = static_cast<signed char>(i);
-        m_players[i].heroCount = 0;
-        m_players[i].townCount = 0;
-        m_players[i].daysLeft = -1;
-        m_players[i].unknown13 = 0;
-        memset(m_players[i].availableHeroes, -1, 2);
-        memset(m_players[i].heroes, -1, 8);
-        memset(m_players[i].towns, -1, GAME_TOWN_COUNT);
+        m_players[i].m_color = static_cast<signed char>(i);
+        m_players[i].m_heroCount = 0;
+        m_players[i].m_townCount = 0;
+        m_players[i].m_daysLeft = -1;
+        m_players[i].m_cheatValue = 0;
+        memset(m_players[i].m_availableHeroIds, -1, 2);
+        memset(m_players[i].m_heroIds, -1, 8);
+        memset(m_players[i].m_townIds, -1, GAME_TOWN_COUNT);
     }
 
     m_obeliskCount = 0;
@@ -805,7 +805,7 @@ void game::SetupOrigData(void)
     memset(m_obeliskVisitors, 0, 48);
     strcpy(gpGame->m_saveName, "NEWGAME");
     giCurPlayer = 0;
-    gpCurPlayer = reinterpret_cast<playerData *>(&gpGame->m_players[giCurPlayer]);
+    gpCurPlayer = &gpGame->m_players[giCurPlayer];
     giCurPlayerBit = static_cast<unsigned char>(1 << giCurPlayer);
     giCurWatchPlayer = giCurPlayer;
     while (!gbThisNetHumanPlayer[giCurWatchPlayer])
@@ -914,7 +914,7 @@ void game::LoadGame(char *filename, int loadFromFile, int)
         _read(file, &m_month, 2);
         giCurTurn = (m_week - 1) * 7 + (m_month - 1) * 28 + m_day;
         for (i = 0; i < GAME_PLAYER_COUNT; i++)
-            reinterpret_cast<playerData *>(&m_players[i])->Read(file);
+            m_players[i].Read(file);
 
         _read(file, &m_obeliskCount, 1);
         for (i = 0; i < GAME_HERO_COUNT; i++)
@@ -971,7 +971,7 @@ void game::LoadGame(char *filename, int loadFromFile, int)
         _close(file);
 
         gpAdvManager->m_heroContextLocked = 0;
-        gpCurPlayer = reinterpret_cast<playerData *>(&gpGame->m_players[giCurPlayer]);
+        gpCurPlayer = &gpGame->m_players[giCurPlayer];
         giCurPlayerBit = static_cast<unsigned char>(1 << giCurPlayer);
         giCurWatchPlayer = giCurPlayer;
         while (!gbThisNetHumanPlayer[giCurWatchPlayer])
@@ -1107,7 +1107,7 @@ void game::NewMap(char *filename)
 
     gbInNewGameSetup = 1;
     giCurPlayer = 0;
-    gpCurPlayer = reinterpret_cast<playerData *>(&gpGame->m_players[giCurPlayer]);
+    gpCurPlayer = &gpGame->m_players[giCurPlayer];
     giCurPlayerBit = static_cast<unsigned char>(1 << giCurPlayer);
     giCurWatchPlayerBit = giCurPlayerBit;
     giCurWatchPlayer = giCurPlayer;
@@ -1126,7 +1126,7 @@ void game::NewMap(char *filename)
         }
     }
     for (player2 = 0; player2 < GAME_PLAYER_COUNT; player2++) {
-        m_players[player2].color = -1;
+        m_players[player2].m_color = -1;
         gcColorToPlayerPos[player2] = -1;
         gcColorToSetupPos[player2] = -1;
         if (gpGame->m_setupPlayerRace[player2] == 7)
@@ -1137,17 +1137,17 @@ void game::NewMap(char *filename)
         gcColorToSetupPos[m_setupPlayerColor[player2]] =
             static_cast<signed char>(player2);
     for (player2 = 0; player2 < m_playerCount; player2++)
-        m_players[gbSetupGamePosToRealGamePos[player2]].color =
+        m_players[gbSetupGamePosToRealGamePos[player2]].m_color =
             m_setupPlayerColor[player2];
     for (player2 = 0; player2 < m_playerCount; player2++)
-        gcColorToPlayerPos[m_players[player2].color] = static_cast<signed char>(player2);
+        gcColorToPlayerPos[m_players[player2].m_color] = static_cast<signed char>(player2);
     for (player2 = 0; player2 < m_playerCount; player2++) {
-        m_players[player2].townCount = 0;
-        m_players[player2].townWindowTop = 0;
-        m_players[player2].currentTown = -1;
-        m_players[player2].heroCount = 0;
-        m_players[player2].heroWindowTop = 0;
-        m_players[player2].currentHero = -1;
+        m_players[player2].m_townCount = 0;
+        m_players[player2].m_townLocatorPage = 0;
+        m_players[player2].m_currentTown = -1;
+        m_players[player2].m_heroCount = 0;
+        m_players[player2].m_heroLocatorPage = 0;
+        m_players[player2].m_currentHero = -1;
     }
 
     RandomizeHeroPool();
@@ -1159,7 +1159,7 @@ void game::NewMap(char *filename)
     SetupTowns();
     InitializePasswords();
     for (player2 = 0; player2 < GAME_PLAYER_COUNT; player2++)
-        m_players[player2].unknownac = 0;
+        m_players[player2].m_barrierTents = 0;
     RandomizeEvents();
     ProcessOnMapHeroes();
     m_deadPlayerCount = 0;
@@ -1186,43 +1186,43 @@ void game::NewMap(char *filename)
         m_mapHeader.computerAlsoWins = 1;
 
     for (player2 = 0; player2 < m_playerCount; player2++) {
-        m_players[player2].unknown40 = 0;
-        m_players[player2].unknown41 = -1;
-        m_players[player2].unknown42 = -1;
+        m_players[player2].m_ultimateArtifactHintChance = 0;
+        m_players[player2].m_ultimateArtifactHintX = -1;
+        m_players[player2].m_ultimateArtifactHintY = -1;
         heroIndex1 = 0;
         selectedTown14 = -1;
         if (m_mapHeader.unknown25 == 0 &&
-            m_players[player2].townCount > 0) {
+            m_players[player2].m_townCount > 0) {
             for (pass27 = 0; pass27 < 2; pass27++) {
-                for (townIndex9 = 0; townIndex9 < m_players[player2].townCount; townIndex9++) {
+                for (townIndex9 = 0; townIndex9 < m_players[player2].m_townCount; townIndex9++) {
                     if (selectedTown14 == -1 &&
-                        m_castleRecs[(m_players + player2)->towns[townIndex9]].m_occupyingHeroId == -1 &&
-                        ((m_castleRecs[(m_players + player2)->towns[townIndex9]].m_buildings & 0x40) != 0 ||
+                        m_castleRecs[(m_players + player2)->m_townIds[townIndex9]].m_occupyingHeroId == -1 &&
+                        ((m_castleRecs[(m_players + player2)->m_townIds[townIndex9]].m_buildings & 0x40) != 0 ||
                          pass27 == 1))
                         selectedTown14 = townIndex9;
                 }
             }
         }
         if (selectedTown14 != -1) {
-            m_players[player2].heroes[m_players[player2].heroCount] =
+            m_players[player2].m_heroIds[m_players[player2].m_heroCount] =
                 static_cast<signed char>(GetNewHeroId(
-                    player2, m_castleRecs[m_players[player2].towns[selectedTown14]].m_type, 0));
-            m_availableHeroes[m_players[player2].heroes[m_players[player2].heroCount]] =
+                    player2, m_castleRecs[m_players[player2].m_townIds[selectedTown14]].m_type, 0));
+            m_availableHeroes[m_players[player2].m_heroIds[m_players[player2].m_heroCount]] =
                 static_cast<signed char>(player2);
-            m_heroRecs[m_players[player2].heroes[m_players[player2].heroCount]].m_owner =
+            m_heroRecs[m_players[player2].m_heroIds[m_players[player2].m_heroCount]].m_owner =
                 static_cast<signed char>(player2);
-            m_heroRecs[m_players[player2].heroes[m_players[player2].heroCount]].m_x =
-                m_castleRecs[m_players[player2].towns[selectedTown14]].m_x;
-            m_heroRecs[m_players[player2].heroes[m_players[player2].heroCount]].m_y =
-                m_castleRecs[m_players[player2].towns[selectedTown14]].m_y;
-            m_castleRecs[m_players[player2].towns[selectedTown14]].m_occupyingHeroId =
-                m_players[player2].heroes[m_players[player2].heroCount];
-            SetVisibility(m_heroRecs[m_players[player2].heroes[m_players[player2].heroCount]].m_x,
-                          m_heroRecs[m_players[player2].heroes[m_players[player2].heroCount]].m_y,
+            m_heroRecs[m_players[player2].m_heroIds[m_players[player2].m_heroCount]].m_x =
+                m_castleRecs[m_players[player2].m_townIds[selectedTown14]].m_x;
+            m_heroRecs[m_players[player2].m_heroIds[m_players[player2].m_heroCount]].m_y =
+                m_castleRecs[m_players[player2].m_townIds[selectedTown14]].m_y;
+            m_castleRecs[m_players[player2].m_townIds[selectedTown14]].m_occupyingHeroId =
+                m_players[player2].m_heroIds[m_players[player2].m_heroCount];
+            SetVisibility(m_heroRecs[m_players[player2].m_heroIds[m_players[player2].m_heroCount]].m_x,
+                          m_heroRecs[m_players[player2].m_heroIds[m_players[player2].m_heroCount]].m_y,
                           player2,
                           giVisRange[static_cast<signed char>(
-                              m_heroRecs[m_players[player2].heroes[0]].m_cursorType)]);
-            m_players[player2].heroCount++;
+                              m_heroRecs[m_players[player2].m_heroIds[0]].m_cursorType)]);
+            m_players[player2].m_heroCount++;
         }
     }
 
@@ -1251,8 +1251,8 @@ void game::NewMap(char *filename)
                     strcpy(m_heroRecs[campaignHero15].m_name, "Brother Brax");
                     m_heroRecs[campaignHero15].m_portrait = 59;
                 }
-                m_players[player2].availableHeroes[0] = static_cast<char>(campaignHero15);
-                m_availableHeroes[m_players[player2].availableHeroes[0]] = 64;
+                m_players[player2].m_availableHeroIds[0] = static_cast<char>(campaignHero15);
+                m_availableHeroes[m_players[player2].m_availableHeroIds[0]] = 64;
                 heroClass5 = m_heroRecs[campaignHero15].m_cursorType;
                 goto secondHero;
             }
@@ -1280,43 +1280,43 @@ void game::NewMap(char *filename)
                         m_heroRecs[campaignHero15].CheckLevel();
                         strcpy(m_heroRecs[campaignHero15].m_name, specialName3);
                         m_heroRecs[campaignHero15].m_portrait = specialPortrait6;
-                        m_players[player2].availableHeroes[0] = static_cast<char>(campaignHero15);
-                        m_availableHeroes[m_players[player2].availableHeroes[0]] = 64;
+                        m_players[player2].m_availableHeroIds[0] = static_cast<char>(campaignHero15);
+                        m_availableHeroes[m_players[player2].m_availableHeroIds[0]] = 64;
                         heroClass5 = m_heroRecs[campaignHero15].m_cursorType;
                         goto secondHero;
                     }
                 }
             }
             heroClass5 = Random(0, 5);
-            if (m_setupPlayerRace[gcColorToSetupPos[m_players[player2].color]] < 6)
-                heroClass5 = m_setupPlayerRace[gcColorToSetupPos[m_players[player2].color]];
-            m_players[player2].availableHeroes[0] =
+            if (m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]] < 6)
+                heroClass5 = m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]];
+            m_players[player2].m_availableHeroIds[0] =
                 static_cast<char>(GetNewHeroId(player2, heroClass5, 0));
-            m_availableHeroes[m_players[player2].availableHeroes[0]] = 64;
+            m_availableHeroes[m_players[player2].m_availableHeroIds[0]] = 64;
         }
 secondHero:
         heroClass5 = (Random(1, 5) + heroClass5) % 6;
-        m_players[player2].availableHeroes[1] =
+        m_players[player2].m_availableHeroIds[1] =
             static_cast<char>(GetNewHeroId(player2, heroClass5, 0));
-        m_availableHeroes[m_players[player2].availableHeroes[1]] = 64;
+        m_availableHeroes[m_players[player2].m_availableHeroIds[1]] = 64;
     }
 
     for (player2 = 0; player2 < m_playerCount; player2++) {
-        for (campaignHero15 = 0; campaignHero15 < m_players[player2].heroCount; campaignHero15++) {
-            heroX6 = m_heroRecs[m_players[player2].heroes[campaignHero15]].m_x;
-            heroY16 = m_heroRecs[m_players[player2].heroes[campaignHero15]].m_y;
-            m_heroRecs[m_players[player2].heroes[campaignHero15]].m_locationType =
+        for (campaignHero15 = 0; campaignHero15 < m_players[player2].m_heroCount; campaignHero15++) {
+            heroX6 = m_heroRecs[m_players[player2].m_heroIds[campaignHero15]].m_x;
+            heroY16 = m_heroRecs[m_players[player2].m_heroIds[campaignHero15]].m_y;
+            m_heroRecs[m_players[player2].m_heroIds[campaignHero15]].m_locationType =
                 m_worldMap.GetCell(heroX6, heroY16)->triggerType;
-            m_heroRecs[m_players[player2].heroes[campaignHero15]].m_occupiedTown =
+            m_heroRecs[m_players[player2].m_heroIds[campaignHero15]].m_occupiedTown =
                 m_worldMap.GetCell(heroX6, heroY16)->w4hi;
             m_worldMap.GetCell(heroX6, heroY16)->triggerType = 0xaa;
             m_worldMap.GetCell(heroX6, heroY16)->w4hi =
-                m_players[player2].heroes[campaignHero15];
+                m_players[player2].m_heroIds[campaignHero15];
         }
-        if (m_players[player2].heroCount > 0)
-            m_players[player2].currentHero = m_players[player2].heroes[0];
-        else if (m_players[player2].townCount > 0)
-            m_players[player2].currentTown = m_players[player2].towns[0];
+        if (m_players[player2].m_heroCount > 0)
+            m_players[player2].m_currentHero = m_players[player2].m_heroIds[0];
+        else if (m_players[player2].m_townCount > 0)
+            m_players[player2].m_currentTown = m_players[player2].m_townIds[0];
     }
 
     player2 = -1;
@@ -1330,8 +1330,8 @@ secondHero:
            giGroundToTerrain[m_worldMap.GetCell(player2, townIndex9)->tile] == 0 ||
            (giNumHumanPlayers == 1 && ultimateTries4 < 200 &&
             ultimateDistance5 >=
-                abs(player2 - m_heroRecs[m_players[0].heroes[0]].m_x) +
-                abs(townIndex9 - m_heroRecs[m_players[0].heroes[0]].m_y))) {
+                abs(player2 - m_heroRecs[m_players[0].m_heroIds[0]].m_x) +
+                abs(townIndex9 - m_heroRecs[m_players[0].m_heroIds[0]].m_y))) {
         if (ultimateTries4 < 400 && giUABaseX > 0) {
             player2 = giUABaseX +
                 (giUARadius != 0 ? Random(-giUARadius, giUARadius) : 0);
@@ -1353,8 +1353,8 @@ secondHero:
                     m_ultimateArtifactId = 6;
                 for (player2 = 0; player2 < m_playerCount; player2++) {
                     if (gbHumanPlayer[player2]) {
-                        m_players[player2].unknown0f = 3;
-                        memcpy(m_players[player2].resources,
+                        m_players[player2].m_aiDifficulty = 3;
+                        memcpy(m_players[player2].m_resources,
                                gInitResourcesHuman[m_difficulty],
                                28);
                         if (m_playerHandicap[player2] != 0) {
@@ -1364,13 +1364,13 @@ secondHero:
                                     resourceScale = 0.85;
                                 else
                                     resourceScale = 0.7;
-                                (m_players + player2)->resources[townIndex9] =
-                                    static_cast<int>((m_players + player2)->resources[townIndex9] * resourceScale);
+                                (m_players + player2)->m_resources[townIndex9] =
+                                    static_cast<int>((m_players + player2)->m_resources[townIndex9] * resourceScale);
                             }
                         }
                     } else {
-                        m_players[player2].unknown0f = Random(0, 2);
-                        memcpy(m_players[player2].resources,
+                        m_players[player2].m_aiDifficulty = Random(0, 2);
+                        memcpy(m_players[player2].m_resources,
                                gInitResourcesComputer[m_difficulty],
                                28);
                     }
@@ -1408,26 +1408,26 @@ secondHero:
                 }
                 for (player2 = 0; player2 < m_playerCount; player2++) {
                     heroClass5 = 0;
-                    if (m_setupPlayerRace[gcColorToSetupPos[m_players[player2].color]] >= 0 &&
-                        m_setupPlayerRace[gcColorToSetupPos[m_players[player2].color]] < 6) {
-                        heroClass5 = m_setupPlayerRace[gcColorToSetupPos[m_players[player2].color]];
+                    if (m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]] >= 0 &&
+                        m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]] < 6) {
+                        heroClass5 = m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]];
                     } else {
-                        if (!!m_players[player2].townCount) {
-                            heroClass5 = gpGame->m_castleRecs[m_players[player2].Town(0)].m_type;
-                        } else if (!!m_players[player2].heroCount) {
-                            heroClass5 = gpGame->m_heroRecs[m_players[player2].Hero(0)].m_cursorType;
+                        if (!!m_players[player2].m_townCount) {
+                            heroClass5 = gpGame->m_castleRecs[m_players[player2].TownId(0)].m_type;
+                        } else if (!!m_players[player2].m_heroCount) {
+                            heroClass5 = gpGame->m_heroRecs[m_players[player2].HeroId(0)].m_cursorType;
                         }
                     }
-                    m_players[player2].evilInterface =
+                    m_players[player2].m_evilInterface =
                         heroClass5 == 1 || heroClass5 == 3 || heroClass5 == 5;
                     if (gbInCampaign && player2 == 0)
-                        m_players[player2].evilInterface = m_campaignType == 1;
+                        m_players[player2].m_evilInterface = m_campaignType == 1;
                     for (townIndex9 = 0;
-                         townIndex9 < gpGame->m_players[player2].townCount;
+                         townIndex9 < gpGame->m_players[player2].m_townCount;
                          townIndex9++)
-                        GetCastle(gpGame->m_players[player2].towns[townIndex9])->GiveSpells(0);
-                    gpGame->m_players[player2].unknown0e =
-                        gpGame->m_players[player2].heroCount;
+                        GetCastle(gpGame->m_players[player2].m_townIds[townIndex9])->GiveSpells(0);
+                    gpGame->m_players[player2].m_minimumHeroCount =
+                        gpGame->m_players[player2].m_heroCount;
                 }
                 gpPhilAI->GetGameAIVars();
                 gbInNewGameSetup = 0;
@@ -1436,9 +1436,9 @@ secondHero:
                 return;
 }
 
-inline townSlot *GetCastleSlot(game *instance, int index)
+inline town *GetCastleSlot(game *instance, int index)
 {
-    return reinterpret_cast<townSlot *>(&instance->m_castleRecs[index]);
+    return &instance->m_castleRecs[index];
 }
 
 // @match-note
@@ -1474,7 +1474,7 @@ void game::RandomizeEvents(void)
     mapCell *townEntrance;
     mapCell *cell2;
     mapCellExtra *extra15;
-    townSlot *townRec4;
+    town *townRec4;
     unsigned char *eventData16;
     int valid27;
 
@@ -1725,18 +1725,18 @@ void game::RandomizeEvents(void)
                     }
                 }
                 townRec4 = GetCastleSlot(this, mineId2);
-                townRec4->unknown7 = -1;
-                townRec4->unknown6 = townRec4->unknown7;
+                townRec4->m_boatY = -1;
+                townRec4->m_boatX = townRec4->m_boatY;
                 if (yPos19 <= MAP_HEIGHT - 3) {
                     townEntrance = gpAdvManager->GetCell(xPos2 - 1, yPos19 + 2);
                     if (giGroundToTerrain[townEntrance->tile] == 0) {
-                        townRec4->unknown6 = static_cast<signed char>(xPos2 - 1);
-                        townRec4->unknown7 = static_cast<signed char>(yPos19 + 2);
+                        townRec4->m_boatX = static_cast<signed char>(xPos2 - 1);
+                        townRec4->m_boatY = static_cast<signed char>(yPos19 + 2);
                     } else {
                         townEntrance = gpAdvManager->GetCell(xPos2 + 1, yPos19 + 2);
                         if (giGroundToTerrain[townEntrance->tile] == 0) {
-                            townRec4->unknown6 = static_cast<signed char>(xPos2 + 1);
-                            townRec4->unknown7 = static_cast<signed char>(yPos19 + 2);
+                            townRec4->m_boatX = static_cast<signed char>(xPos2 + 1);
+                            townRec4->m_boatY = static_cast<signed char>(yPos19 + 2);
                         }
                     }
                 }
@@ -1993,35 +1993,35 @@ VA(0x00478fea, 0x3aa)
 void game::ClaimTown(int townId, int player, int suppressVisibility)
 {
     int i;
-    townSlot *townRec;
+    town *townRec;
     mapCell *cell;
 
     if (!gbInNewGameSetup)
         SendMapChange(7, static_cast<signed char>(townId), 0, 0, player, 0, 0);
-    townRec = reinterpret_cast<townSlot *>(&m_castleRecs[townId]);
-    if (townRec->owner == player)
+    townRec = &m_castleRecs[townId];
+    if (townRec->m_owner == player)
         return;
-    townRec->unknown38 = 0;
+    townRec->m_formation = 0;
     if (m_castleOwners[townId] != -1)
         GetCastle(townId)->Deallocate();
     for (i = 0; i < 5; i++) {
-        townRec->army[i] = -1;
-        *reinterpret_cast<short *>(townRec->army + 5 + i * 2) = 0;
+        townRec->m_army.m_creatureTypes[i] = -1;
+        townRec->m_army.m_creatureCounts[i] = 0;
     }
-    m_castleRecs[townId].m_unknown55 = m_castleRecs[townId].m_owner == -1 ? 2 : 0;
+    m_castleRecs[townId].m_turnsOwned = m_castleRecs[townId].m_owner == -1 ? 2 : 0;
     m_castleRecs[townId].m_owner = static_cast<signed char>(player);
     m_castleOwners[townId] = static_cast<signed char>(player);
-    m_players[player].towns[m_players[player].townCount] = static_cast<signed char>(townId);
-    m_players[player].townCount++;
+    m_players[player].m_townIds[m_players[player].m_townCount] = static_cast<signed char>(townId);
+    m_players[player].m_townCount++;
 
     cell = m_worldMap.GetCell(m_castleRecs[townId].m_x - 1, m_castleRecs[townId].m_y);
     m_worldMap.ChangeTilesetIndex(cell, m_castleRecs[townId].m_x - 1,
                                  m_castleRecs[townId].m_y, 14,
-                                 m_players[static_cast<signed char>(player)].color * 2, 1, -1);
+                                 m_players[static_cast<signed char>(player)].m_color * 2, 1, -1);
     cell = m_worldMap.GetCell(m_castleRecs[townId].m_x + 1, m_castleRecs[townId].m_y);
     m_worldMap.ChangeTilesetIndex(cell, m_castleRecs[townId].m_x + 1,
                                  m_castleRecs[townId].m_y, 14,
-                                 m_players[static_cast<signed char>(player)].color * 2 + 1, 1, -1);
+                                 m_players[static_cast<signed char>(player)].m_color * 2 + 1, 1, -1);
     if (suppressVisibility != 0)
         return;
     SetVisibility(m_castleRecs[townId].m_x, m_castleRecs[townId].m_y,
@@ -2061,7 +2061,7 @@ void game::ClaimMine(int mineId, int player)
         m_worldMap.ChangeTilesetIndex(acc, x, y, 14, 255, 1, -1);
     } else {
         m_worldMap.ChangeTilesetIndex(acc, x, y, 14,
-                                     m_players[static_cast<signed char>(player)].color + flag,
+                                     m_players[static_cast<signed char>(player)].m_color + flag,
                                      1, -1);
         if (m_mines[mineId].resourceType == 1) {
             ConvertFlagToLateOverlay(x, y);
@@ -2887,8 +2887,8 @@ void game::NextPlayer(void)
     }
 
     gpAdvManager->m_identifyHeroActive = 0;
-    if (gpGame->m_players[giCurPlayer].daysLeft > 0)
-        gpGame->m_players[giCurPlayer].daysLeft--;
+    if (gpGame->m_players[giCurPlayer].m_daysLeft > 0)
+        gpGame->m_players[giCurPlayer].m_daysLeft--;
     CheckEndGame(0, 0);
     gpAdvManager->DeactivateCurrTown();
     gpAdvManager->DeactivateCurrHero();
@@ -2901,10 +2901,10 @@ void game::NextPlayer(void)
         }
     } while (gpGame->m_playerDead[giCurPlayer]);
 
-    gpCurPlayer = reinterpret_cast<playerData *>(&gpGame->m_players[giCurPlayer]);
+    gpCurPlayer = &gpGame->m_players[giCurPlayer];
     giCurPlayerBit = static_cast<unsigned char>(1 << giCurPlayer);
-    for (index = 0; index < m_players[giCurPlayer].heroCount; index++) {
-        hero *currentHero = &m_heroRecs[m_players[giCurPlayer].heroes[index]];
+    for (index = 0; index < m_players[giCurPlayer].m_heroCount; index++) {
+        hero *currentHero = &m_heroRecs[m_players[giCurPlayer].m_heroIds[index]];
         currentHero->m_mobility = currentHero->CalcMobility();
         currentHero->m_remainingMobility = currentHero->m_mobility;
     }
@@ -2999,15 +2999,15 @@ int game::ComputeDailyGold(int player)
         }
     }
 
-    gold += reinterpret_cast<class playerData *>(&m_players[player])->NumOfGivenArtifact(30) * 1000;
-    gold += reinterpret_cast<class playerData *>(&m_players[player])->NumOfGivenArtifact(31) * 750;
-    gold += reinterpret_cast<class playerData *>(&m_players[player])->NumOfGivenArtifact(32) * 500;
-    gold += reinterpret_cast<class playerData *>(&m_players[player])->NumOfGivenArtifact(7) * 10000;
-    gold += reinterpret_cast<class playerData *>(&m_players[player])->NumOfGivenArtifact(69) * -250;
+    gold += m_players[player].NumOfGivenArtifact(30) * 1000;
+    gold += m_players[player].NumOfGivenArtifact(31) * 750;
+    gold += m_players[player].NumOfGivenArtifact(32) * 500;
+    gold += m_players[player].NumOfGivenArtifact(7) * 10000;
+    gold += m_players[player].NumOfGivenArtifact(69) * -250;
 
-    for (heroIndex = 0; heroIndex < m_players[player].heroCount; heroIndex++) {
+    for (heroIndex = 0; heroIndex < m_players[player].m_heroCount; heroIndex++) {
         gold += gEstatesGoldLevel[
-            gpGame->m_heroRecs[m_players[player].heroes[heroIndex]]
+            gpGame->m_heroRecs[m_players[player].m_heroIds[heroIndex]]
                 .m_secondarySkills[HERO_SKILL_ESTATES]];
     }
 
@@ -3052,8 +3052,8 @@ void game::PerDay(void)
 
     for (player = 0; player < gpGame->m_playerCount; player++) {
         for (resource8 = 0; resource8 < 7; resource8++) {
-            gpGame->m_players[player].secondaryResources[resource8] =
-                -m_players[player].resources[resource8];
+            gpGame->m_players[player].m_income[resource8] =
+                -m_players[player].m_resources[resource8];
         }
     }
 
@@ -3071,50 +3071,50 @@ void game::PerDay(void)
                 dailyIncome0 = 1;
 
             if (resourceType1 != RES_GOLD && resourceType1 <= RES_GOLD)
-                m_players[m_mines[player].owner].resources[resourceType1] += dailyIncome0;
+                m_players[m_mines[player].owner].m_resources[resourceType1] += dailyIncome0;
         }
     }
 
     for (player = 0; player < GAME_TOWN_COUNT; player++)
-        m_castleRecs[player].m_unknown55++;
+        m_castleRecs[player].m_turnsOwned++;
 
     for (player = 0; player < m_playerCount; player++) {
-        m_players[player].resources[RES_SULFUR] +=
-            reinterpret_cast<playerData *>(&m_players[player])->NumOfGivenArtifact(
+        m_players[player].m_resources[RES_SULFUR] +=
+            m_players[player].NumOfGivenArtifact(
                 ARTIFACT_ENDLESS_POUCH_SULFUR);
-        m_players[player].resources[RES_MERCURY] +=
-            reinterpret_cast<playerData *>(&m_players[player])->NumOfGivenArtifact(
+        m_players[player].m_resources[RES_MERCURY] +=
+            m_players[player].NumOfGivenArtifact(
                 ARTIFACT_ENDLESS_VIAL_MERCURY);
-        m_players[player].resources[RES_GEMS] +=
-            reinterpret_cast<playerData *>(&m_players[player])->NumOfGivenArtifact(
+        m_players[player].m_resources[RES_GEMS] +=
+            m_players[player].NumOfGivenArtifact(
                 ARTIFACT_ENDLESS_POUCH_GEMS);
-        m_players[player].resources[RES_WOOD] +=
-            reinterpret_cast<playerData *>(&m_players[player])->NumOfGivenArtifact(
+        m_players[player].m_resources[RES_WOOD] +=
+            m_players[player].NumOfGivenArtifact(
                 ARTIFACT_ENDLESS_CORD_WOOD);
-        m_players[player].resources[RES_ORE] +=
-            reinterpret_cast<playerData *>(&m_players[player])->NumOfGivenArtifact(
+        m_players[player].m_resources[RES_ORE] +=
+            m_players[player].NumOfGivenArtifact(
                 ARTIFACT_ENDLESS_CART_ORE);
-        m_players[player].resources[RES_CRYSTAL] +=
-            reinterpret_cast<playerData *>(&m_players[player])->NumOfGivenArtifact(
+        m_players[player].m_resources[RES_CRYSTAL] +=
+            m_players[player].NumOfGivenArtifact(
                 ARTIFACT_ENDLESS_POUCH_CRYSTAL);
-        m_players[player].resources[RES_GOLD] += ComputeDailyGold(player);
+        m_players[player].m_resources[RES_GOLD] += ComputeDailyGold(player);
     }
 
     if (xIsPlayingExpansionCampaign && xCampaign.HasAward(2))
-        m_players[0].resources[RES_WOOD] += 2;
+        m_players[0].m_resources[RES_WOOD] += 2;
 
     for (player = 0; player < m_playerCount; player++) {
         if (!gbHumanPlayer[player]) {
             if (gpGame->m_difficulty >= GAME_DIFFICULTY_HARD) {
-                m_players[player].resources[RES_WOOD]++;
-                m_players[player].resources[RES_ORE]++;
+                m_players[player].m_resources[RES_WOOD]++;
+                m_players[player].m_resources[RES_ORE]++;
             }
             if (gpGame->m_difficulty >= GAME_DIFFICULTY_EXPERT && m_day >= 1 && m_day <= 6)
-                m_players[player].resources[m_day - 1]++;
+                m_players[player].m_resources[m_day - 1]++;
             if (gpGame->m_difficulty >= GAME_DIFFICULTY_IMPOSSIBLE && m_day >= 1 && m_day <= 6)
-                m_players[player].resources[m_day - 1]++;
-            if (gpGame->m_players[player].unknown0f == 1 && m_day >= 1 && m_day <= 6)
-                m_players[player].resources[m_day - 1]++;
+                m_players[player].m_resources[m_day - 1]++;
+            if (gpGame->m_players[player].m_aiDifficulty == 1 && m_day >= 1 && m_day <= 6)
+                m_players[player].m_resources[m_day - 1]++;
         }
     }
 
@@ -3141,17 +3141,17 @@ void game::PerDay(void)
                     penaltyRate9 = 0.15;
                 else
                     penaltyRate9 = 0.30;
-                m_players[player].resources[resource8] -= static_cast<int>(
-                    (gpGame->m_players[player].secondaryResources[resource8] +
-                     m_players[player].resources[resource8]) * penaltyRate9);
+                m_players[player].m_resources[resource8] -= static_cast<int>(
+                    (gpGame->m_players[player].m_income[resource8] +
+                     m_players[player].m_resources[resource8]) * penaltyRate9);
             }
         }
     }
 
     for (player = 0; player < gpGame->m_playerCount; player++) {
         for (resource8 = 0; resource8 < 7; resource8++) {
-            gpGame->m_players[player].secondaryResources[resource8] +=
-                m_players[player].resources[resource8];
+            gpGame->m_players[player].m_income[resource8] +=
+                m_players[player].m_resources[resource8];
         }
     }
 
@@ -3197,7 +3197,7 @@ void game::PerWeek(void)
     int innerIndex3;
     int mapY5;
     int mapX8;
-    townSlot *castle37;
+    town *castle37;
     int growth13;
     int desiredClass1;
     int monsterIncrease16;
@@ -3215,21 +3215,21 @@ void game::PerWeek(void)
     }
 
     for (outerIndex5 = 0; outerIndex5 < GAME_TOWN_COUNT; outerIndex5++) {
-        castle37 = reinterpret_cast<townSlot *>(GetTown(outerIndex5));
+        castle37 = GetTown(outerIndex5);
         for (innerIndex3 = WEEKLY_FIRST_DWELLING; innerIndex3 <= WEEKLY_LAST_DWELLING;
              innerIndex3++) {
-            if (castle37->buildings & (1 << innerIndex3)) {
+            if (castle37->m_buildings & (1 << innerIndex3)) {
                 growth13 = gMonsterDatabase[
-                    gDwellingType[castle37->race][innerIndex3 - WEEKLY_FIRST_DWELLING]].growth;
-                if (castle37->buildings & 0x10)
+                    gDwellingType[castle37->m_type][innerIndex3 - WEEKLY_FIRST_DWELLING]].growth;
+                if (castle37->m_buildings & 0x10)
                     growth13 += 2;
-                if (innerIndex3 == WEEKLY_FIRST_DWELLING && (castle37->buildings & 0x800))
+                if (innerIndex3 == WEEKLY_FIRST_DWELLING && (castle37->m_buildings & 0x800))
                     growth13 += 8;
-                if (castle37->owner == -1)
+                if (castle37->m_owner == -1)
                     growth13 /= 2;
-                if (castle37->owner >= 0 &&
-                    castle37->dwellingGrowth[innerIndex3 - WEEKLY_FIRST_DWELLING] == 0 &&
-                    !gbHumanPlayer[castle37->owner]) {
+                if (castle37->m_owner >= 0 &&
+                    castle37->m_garrison[innerIndex3 - WEEKLY_FIRST_DWELLING] == 0 &&
+                    !gbHumanPlayer[castle37->m_owner]) {
                     if (gpGame->m_difficulty == GAME_DIFFICULTY_HARD)
                         growth13 = static_cast<int>(growth13 * 1.20);
                     if (gpGame->m_difficulty == GAME_DIFFICULTY_EXPERT)
@@ -3238,10 +3238,10 @@ void game::PerWeek(void)
                         growth13 = static_cast<int>(growth13 * 1.44);
                 }
                 if (giWeekType == 1 &&
-                    gDwellingType[castle37->race][innerIndex3 - WEEKLY_FIRST_DWELLING] ==
+                    gDwellingType[castle37->m_type][innerIndex3 - WEEKLY_FIRST_DWELLING] ==
                         giWeekTypeExtra)
                     growth13 += 5;
-                castle37->dwellingGrowth[innerIndex3 - WEEKLY_FIRST_DWELLING] += growth13;
+                castle37->m_garrison[innerIndex3 - WEEKLY_FIRST_DWELLING] += growth13;
             }
         }
     }
@@ -3250,25 +3250,25 @@ void game::PerWeek(void)
         for (innerIndex3 = 0; innerIndex3 < 2; innerIndex3++) {
             if (innerIndex3 == 1) {
                 heroClass18 =
-                    m_heroRecs[gpGame->m_players[outerIndex5].availableHeroes[0]].m_cursorType;
+                    m_heroRecs[gpGame->m_players[outerIndex5].m_availableHeroIds[0]].m_cursorType;
             }
             heroClass18 = (Random(1, 5) + heroClass18) % 6;
             desiredClass1 = heroClass18;
             if (innerIndex3 == 0 &&
-                m_setupPlayerRace[gcColorToSetupPos[m_players[outerIndex5].color]] <
+                m_setupPlayerRace[gcColorToSetupPos[m_players[outerIndex5].m_color]] <
                     GAME_PLAYER_COUNT) {
-                desiredClass1 = m_setupPlayerRace[gcColorToSetupPos[m_players[outerIndex5].color]];
+                desiredClass1 = m_setupPlayerRace[gcColorToSetupPos[m_players[outerIndex5].m_color]];
             }
 
             if (gpGame->m_availableHeroes[
                     (innerIndex3 - outerIndex5 +
                      outerIndex5 * (sizeof(playerData) + 1))[
-                        gpGame->m_players[0].availableHeroes]] ==
+                        gpGame->m_players[0].m_availableHeroIds]] ==
                 WEEKLY_AVAILABLE_HERO) {
                 if (gpGame->m_heroRecs[
                         (innerIndex3 - outerIndex5 +
                          outerIndex5 * (sizeof(playerData) + 1))[
-                            gpGame->m_players[0].availableHeroes]]
+                            gpGame->m_players[0].m_availableHeroIds]]
                         .m_eventFlags & WEEKLY_HERO_RESERVED_FLAG)
                     continue;
             }
@@ -3276,12 +3276,12 @@ void game::PerWeek(void)
                 if (gpGame->m_availableHeroes[
                         (innerIndex3 - outerIndex5 +
                          outerIndex5 * (sizeof(playerData) + 1))[
-                            gpGame->m_players[0].availableHeroes]] ==
+                            gpGame->m_players[0].m_availableHeroIds]] ==
                     WEEKLY_AVAILABLE_HERO)
                     gpGame->m_availableHeroes[
                         (innerIndex3 - outerIndex5 +
                          outerIndex5 * (sizeof(playerData) + 1))[
-                            gpGame->m_players[0].availableHeroes]] =
+                            gpGame->m_players[0].m_availableHeroIds]] =
                         -1;
                 if (innerIndex3 == 1 && !gbHumanPlayer[outerIndex5])
                     desiredClass1 = -1;
@@ -3289,12 +3289,12 @@ void game::PerWeek(void)
                     !gbHumanPlayer[outerIndex5] && gpGame->m_difficulty > 0;
                 (innerIndex3 - outerIndex5 +
                  outerIndex5 * (sizeof(playerData) + 1))[
-                    gpGame->m_players[0].availableHeroes] =
+                    gpGame->m_players[0].m_availableHeroIds] =
                     static_cast<signed char>(gpGame->GetNewHeroId(
                         outerIndex5, desiredClass1, useDifficultyBonus3));
                 m_availableHeroes[(innerIndex3 - outerIndex5 +
                                    outerIndex5 * (sizeof(playerData) + 1))[
-                    gpGame->m_players[0].availableHeroes]] =
+                    gpGame->m_players[0].m_availableHeroIds]] =
                     WEEKLY_AVAILABLE_HERO;
             }
         }
@@ -3490,7 +3490,7 @@ void game::PerMonth(void)
     int townIndex0;
     int building4;
     int growth9;
-    townSlot *castle10;
+    town *castle10;
     int firstCount5;
     int secondCount4;
 
@@ -3510,27 +3510,27 @@ void game::PerMonth(void)
     for (townIndex0 = 0; townIndex0 < GAME_TOWN_COUNT; townIndex0++) {
         for (building4 = WEEKLY_FIRST_DWELLING;
              building4 <= WEEKLY_LAST_DWELLING; building4++) {
-            castle10 = reinterpret_cast<townSlot *>(GetTown(townIndex0));
-            if (castle10->buildings & (1 << building4)) {
+            castle10 = GetTown(townIndex0);
+            if (castle10->m_buildings & (1 << building4)) {
                 growth9 = gMonsterDatabase[
-                    gDwellingType[castle10->race][building4 - WEEKLY_FIRST_DWELLING]].growth;
-                if (castle10->buildings & MONTH_WELL_BUILDING)
+                    gDwellingType[castle10->m_type][building4 - WEEKLY_FIRST_DWELLING]].growth;
+                if (castle10->m_buildings & MONTH_WELL_BUILDING)
                     growth9 += MONTH_WELL_GROWTH;
                 if (building4 == WEEKLY_FIRST_DWELLING &&
-                    (castle10->buildings & MONTH_FIRST_DWELLING_BONUS_BUILDING))
+                    (castle10->m_buildings & MONTH_FIRST_DWELLING_BONUS_BUILDING))
                     growth9 += MONTH_FIRST_DWELLING_GROWTH;
 
                 if (giMonthType == MONTH_TYPE_CREATURE &&
-                    gDwellingType[castle10->race][building4 - WEEKLY_FIRST_DWELLING] ==
+                    gDwellingType[castle10->m_type][building4 - WEEKLY_FIRST_DWELLING] ==
                         giMonthTypeExtra)
-                    castle10->dwellingGrowth[building4 - WEEKLY_FIRST_DWELLING] *= 2;
+                    castle10->m_garrison[building4 - WEEKLY_FIRST_DWELLING] *= 2;
 
                 if (giMonthType == MONTH_TYPE_PLAGUE) {
-                    castle10->dwellingGrowth[building4 - WEEKLY_FIRST_DWELLING] -= growth9;
-                    if (castle10->dwellingGrowth[building4 - WEEKLY_FIRST_DWELLING] < 0)
-                        castle10->dwellingGrowth[building4 - WEEKLY_FIRST_DWELLING] = 0;
-                    castle10->dwellingGrowth[building4 - WEEKLY_FIRST_DWELLING] =
-                        castle10->dwellingGrowth[building4 - WEEKLY_FIRST_DWELLING] >> 1;
+                    castle10->m_garrison[building4 - WEEKLY_FIRST_DWELLING] -= growth9;
+                    if (castle10->m_garrison[building4 - WEEKLY_FIRST_DWELLING] < 0)
+                        castle10->m_garrison[building4 - WEEKLY_FIRST_DWELLING] = 0;
+                    castle10->m_garrison[building4 - WEEKLY_FIRST_DWELLING] =
+                        castle10->m_garrison[building4 - WEEKLY_FIRST_DWELLING] >> 1;
                 }
             }
         }
@@ -3647,7 +3647,7 @@ void game::RandomizeTown(int x, int y, int)
 {
     int unused6[2];  // Two unaddressed words are present in the retail /Od frame.
     int townId0 = GetTownId(x, y);
-    townSlot *castle0 = reinterpret_cast<townSlot *>(GetTown(townId0));
+    town *castle0 = GetTown(townId0);
     mapTownExtra *extra = reinterpret_cast<mapTownExtra *>(
         ppMapExtra[WORLDMAP->GetCell(x, y)->w4hi]);
     int race0;
@@ -3657,7 +3657,7 @@ void game::RandomizeTown(int x, int y, int)
     else
         race0 = m_setupPlayerRace[gcColorToSetupPos[extra->color]];
 
-    castle0->unknown55 = RANDOM_TOWN_AGE;
+    castle0->m_turnsOwned = RANDOM_TOWN_AGE;
     ConvertObject(x + RANDOM_TOWN_LEFT, y + RANDOM_TOWN_TOP,
                   x + RANDOM_TOWN_RIGHT, y + RANDOM_TOWN_BOTTOM,
                   RANDOM_TOWN_SOURCE_TILESET,
@@ -4371,7 +4371,7 @@ void game::WaitForPlayer(char *text, int player)
         ShowHeroesLogo();
         gbAllBlack = 0;
         NormalDialog(text, 1, -1, -1, WAIT_DIALOG_TYPE,
-                     static_cast<signed char>(gpGame->m_players[player].color),
+                     static_cast<signed char>(gpGame->m_players[player].m_color),
                      -1, 0, -1, 0);
         gpSoundManager->SwitchAmbientMusic(-1);
     }
@@ -4529,13 +4529,13 @@ void game::SetupTowns(void)
     int combatSpells;
     int dwellingCount;
     unsigned int extraIndex;
-    townSlot *castle;
+    town *castle;
     mapTownExtra *extra;
 
     for (townIndex = 0; townIndex < GAME_TOWN_COUNT; townIndex++) {
         if (!m_castleRecs[townIndex].m_onMap)
             continue;
-        castle = reinterpret_cast<townSlot *>(GetTown(townIndex));
+        castle = GetTown(townIndex);
 
         extraIndex = castle->m_extraIndex;
         extra = reinterpret_cast<mapTownExtra *>(ppMapExtra[extraIndex]);
@@ -4566,10 +4566,10 @@ void game::SetupTowns(void)
         }
 
         if (extra->hasCustomBuildings) {
-            castle->buildings =
-                (gTownEligibleBuildMask[castle->race] & extra->buildings) |
-                (castle->buildings & 0x60);
-            castle->unknown1c = extra->mageGuildLevel;
+            castle->m_buildings =
+                (gTownEligibleBuildMask[castle->m_type] & extra->buildings) |
+                (castle->m_buildings & 0x60);
+            castle->m_buildState = extra->mageGuildLevel;
         } else {
             defaultDwellingRoll[0] = 1;
             defaultDwellingRoll[1] = 1;
@@ -4582,38 +4582,38 @@ void game::SetupTowns(void)
             defaultDwellingRoll[8] = 1;
             defaultDwellingRoll[9] = 2;
             dwellingCount = defaultDwellingRoll[Random(0, 99) / 10];
-            castle->buildings |= 0x80000;
-            if (!gbHumanPlayer[castle->owner] && dwellingCount == 1 && Random(1, 10) < 4)
+            castle->m_buildings |= 0x80000;
+            if (!gbHumanPlayer[castle->m_owner] && dwellingCount == 1 && Random(1, 10) < 4)
                 dwellingCount++;
             if (--dwellingCount != 0)
-                castle->buildings |= 0x100000;
+                castle->m_buildings |= 0x100000;
             dwellingCount--;
-            castle->unknown1c = 0;
+            castle->m_buildState = 0;
         }
 
         for (building = 25; building <= 30; building++) {
-            if (castle->buildings & (1 << building)) {
+            if (castle->m_buildings & (1 << building)) {
                 if (building == 30)
-                    castle->buildings &= -553648129;
+                    castle->m_buildings &= -553648129;
                 else
-                    castle->buildings &= -1 - (1 << (building - 5));
+                    castle->m_buildings &= -1 - (1 << (building - 5));
             }
         }
         for (building = 19; building <= 30; building++) {
-            if (castle->buildings & (1 << building)) {
-                castle->dwellingGrowth[building - 19] =
-                    gMonsterDatabase[gDwellingType[castle->race][building - 19]].growth;
+            if (castle->m_buildings & (1 << building)) {
+                castle->m_garrison[building - 19] =
+                    gMonsterDatabase[gDwellingType[castle->m_type][building - 19]].growth;
             }
         }
-        if (castle->buildings & 1) {
-            for (slot = 1; slot <= castle->unknown1c; slot++) {
+        if (castle->m_buildings & 1) {
+            for (slot = 1; slot <= castle->m_buildState; slot++) {
                 castle->m_spellCounts[slot] = gSpellLimits[slot - 1];
-                if (castle->race == 4 && (castle->buildings & 0x2000))
+                if (castle->m_type == 4 && (castle->m_buildings & 0x2000))
                     castle->m_spellCounts[slot]++;
             }
         }
         if (extra->hasShrine)
-            castle->buildings |= 0x8000;
+            castle->m_buildings |= 0x8000;
         castle->m_unknown37 = extra->unknown28;
         strcpy(castle->m_name, extra->name);
 
@@ -4625,7 +4625,7 @@ void game::SetupTowns(void)
                     [spellLevel * 4 + spellSlot] = -1;
         }
 
-        if (castle->race == 5 && castle->owner != -1 && !gbHumanPlayer[castle->owner]) {
+        if (castle->m_type == 5 && castle->m_owner != -1 && !gbHumanPlayer[castle->m_owner]) {
             if (Random(0, 100) < 50)
                 spell = 35;
             else
@@ -4679,7 +4679,7 @@ void game::SetupTowns(void)
                         spell = Random(0, 64);
                         while (gsSpellInfo[spell].level - 1 != spellLevel)
                             spell = Random(0, 64);
-                        if (castle->owner != -1 && !gbHumanPlayer[castle->owner])
+                        if (castle->m_owner != -1 && !gbHumanPlayer[castle->m_owner])
                             spellValue =
                                 (gsSpellInfo[spell].attributes & 1 ? 4 : 1) *
                                     gsSpellInfo[spell].aiValue +
@@ -4690,7 +4690,7 @@ void game::SetupTowns(void)
                             spellValue = 1500;
                     } while ((combatSpells == 1 &&
                               (gsSpellInfo[spell].attributes & 4)) ||
-                             gsSpellInfo[spell].raceChance[castle->race] < Random(0, 10) ||
+                             gsSpellInfo[spell].raceChance[castle->m_type] < Random(0, 10) ||
                              attempts++ > 500 || usedSpells[spell] ||
                              spellValue < Random(1, 1500));
                     if (gsSpellInfo[spell].attributes & 4)
@@ -4729,7 +4729,7 @@ void game::ProcessOnMapHeroes(void)
     mapHeroExtra *extra;
     mapCell *cell;
     mapCell *townCell;
-    townSlot *occupiedTown;
+    town *occupiedTown;
 
     memset(usedHeroes, 0, GAME_HERO_COUNT);
     for (pass = 0; pass < 3; pass++) {
@@ -4770,7 +4770,7 @@ void game::ProcessOnMapHeroes(void)
                         heroClass = cell->objIndex % 7;
                         if (heroClass == 6) {
                             heroClass = m_setupPlayerRace[
-                                gcColorToSetupPos[gpGame->m_players[extra->owner].color]];
+                                gcColorToSetupPos[gpGame->m_players[extra->owner].m_color]];
                         }
                     }
 
@@ -4829,8 +4829,8 @@ void game::ProcessOnMapHeroes(void)
                         mapHero->m_owner = extra->owner;
                         m_availableHeroes[extra->heroId] = mapHero->m_owner;
                         m_players[mapHero->m_owner]
-                            .heroes[m_players[mapHero->m_owner].heroCount] = mapHero->m_id;
-                        m_players[mapHero->m_owner].heroCount++;
+                            .m_heroIds[m_players[mapHero->m_owner].m_heroCount] = mapHero->m_id;
+                        m_players[mapHero->m_owner].m_heroCount++;
                     }
 
                     if (!isJail && mapY > 0) {
@@ -4839,9 +4839,8 @@ void game::ProcessOnMapHeroes(void)
                             (MAP_EVENT_ACTION_FLAG | MAP_EVENT_CASTLE)) {
                             mapHero->m_patrolY--;
                             mapHero->m_y--;
-                            occupiedTown = reinterpret_cast<townSlot *>(
-                                GetTown(GetTownId(mapX, mapY - 1)));
-                            occupiedTown->occupyingHeroId = mapHero->m_id;
+                            occupiedTown = GetTown(GetTownId(mapX, mapY - 1));
+                            occupiedTown->m_occupyingHeroId = mapHero->m_id;
                         }
                     }
 
@@ -4901,9 +4900,9 @@ void game::CheckHeroConsistency(void)
     for (player3 = 0; player3 < m_playerCount; player3++) {
         if (m_playerDead[player3] != 0)
             continue;
-        total26 += m_players[player3].heroCount;
-        for (slot1 = 0; slot1 < m_players[player3].heroCount; slot1++) {
-            if (m_heroRecs[m_players[player3].heroes[slot1]].m_owner != player3)
+        total26 += m_players[player3].m_heroCount;
+        for (slot1 = 0; slot1 < m_players[player3].m_heroCount; slot1++) {
+            if (m_heroRecs[m_players[player3].m_heroIds[slot1]].m_owner != player3)
                 consistent13 = 0;
         }
     }
@@ -4911,13 +4910,13 @@ void game::CheckHeroConsistency(void)
     for (player3 = 0; player3 < m_playerCount; player3++) {
         if (m_playerDead[player3] == 0) {
             for (slot1 = 0; slot1 < 2; slot1++) {
-                if ((m_availableHeroes[m_players[player3].availableHeroes[slot1]] >= 0 &&
-                     m_availableHeroes[m_players[player3].availableHeroes[slot1]] <= 5) ||
+                if ((m_availableHeroes[m_players[player3].m_availableHeroIds[slot1]] >= 0 &&
+                     m_availableHeroes[m_players[player3].m_availableHeroIds[slot1]] <= 5) ||
                     (total26 < 40 &&
-                     m_availableHeroes[m_players[player3].availableHeroes[slot1]] == -1)) {
-                    m_players[player3].availableHeroes[slot1] =
+                     m_availableHeroes[m_players[player3].m_availableHeroIds[slot1]] == -1)) {
+                    m_players[player3].m_availableHeroIds[slot1] =
                         static_cast<signed char>(GetNewHeroId(player3, -1, 0));
-                    m_availableHeroes[m_players[player3].availableHeroes[slot1]] = 64;
+                    m_availableHeroes[m_players[player3].m_availableHeroIds[slot1]] = 64;
                 }
             }
         }
@@ -5503,7 +5502,7 @@ int game::GetNumThievesGuilds(int color)
 {
     int num = 0;
     int i;
-    for (i = 0; i < m_players[color].townCount; i++) {
+    for (i = 0; i < m_players[color].m_townCount; i++) {
         if (gpGame->m_castleRecs[
                 reinterpret_cast<PlayerTownListView *>(this)->townIds[color][i]]
                 .m_buildings & TOWN_BUILDING_TAVERN)
@@ -6102,15 +6101,15 @@ void game::CheckForTimeEvent(void)
                  resourceIndex27 < TIME_EVENT_RESOURCE_COUNT;
                  resourceIndex27++) {
                 resourceAmount7 = event15->resources[resourceIndex27];
-                if (gpGame->m_players[giCurPlayer].resources[resourceIndex27] <
+                if (gpGame->m_players[giCurPlayer].m_resources[resourceIndex27] <
                     -resourceAmount7) {
                     resourceAmount7 =
-                        -gpGame->m_players[giCurPlayer].resources[resourceIndex27];
+                        -gpGame->m_players[giCurPlayer].m_resources[resourceIndex27];
                 }
-                gpGame->m_players[giCurPlayer].resources[resourceIndex27] +=
+                gpGame->m_players[giCurPlayer].m_resources[resourceIndex27] +=
                     event15->resources[resourceIndex27];
-                if (gpGame->m_players[giCurPlayer].resources[resourceIndex27] < 0)
-                    gpGame->m_players[giCurPlayer].resources[resourceIndex27] = 0;
+                if (gpGame->m_players[giCurPlayer].m_resources[resourceIndex27] < 0)
+                    gpGame->m_players[giCurPlayer].m_resources[resourceIndex27] = 0;
                 if (resourceAmount7 != 0) {
                     if (primaryType14 != -1) {
                         secondaryType18 = primaryType14;
@@ -6152,7 +6151,7 @@ void CheckValidAvailableHeroes(void)
 
     for (heroPlayer26 = 0; heroPlayer26 < gpGame->m_playerCount; heroPlayer26++) {
         for (heroIndex5 = 0;
-             heroIndex5 < gpGame->m_players[heroPlayer26].heroCount;
+             heroIndex5 < gpGame->m_players[heroPlayer26].m_heroCount;
              heroIndex5++) {
             for (candidatePlayer0 = 0;
                  candidatePlayer0 < gpGame->m_playerCount;
@@ -6161,10 +6160,10 @@ void CheckValidAvailableHeroes(void)
                      availableSlot13 < AVAILABLE_HERO_SLOTS;
                      availableSlot13++) {
                     if (gpGame->m_players[candidatePlayer0]
-                            .availableHeroes[availableSlot13] ==
-                        gpGame->m_players[heroPlayer26].heroes[heroIndex5]) {
+                            .m_availableHeroIds[availableSlot13] ==
+                        gpGame->m_players[heroPlayer26].m_heroIds[heroIndex5]) {
                         gpGame->m_players[candidatePlayer0]
-                            .availableHeroes[availableSlot13] =
+                            .m_availableHeroIds[availableSlot13] =
                             static_cast<signed char>(
                                 gpGame->GetNewHeroId(heroPlayer26, -1, 0));
                     }

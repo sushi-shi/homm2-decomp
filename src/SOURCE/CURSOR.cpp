@@ -730,15 +730,15 @@ movementDone:
             int secondaryAmount = 0;
             for (step = 0; step < 7; ++step) {
                 int eventAmount = mapEvent->resources[step];
-                if (gpGame->m_players[giCurPlayer].resources[step] <
+                if (gpGame->m_players[giCurPlayer].m_resources[step] <
                     -eventAmount) {
                     eventAmount =
-                        -gpGame->m_players[giCurPlayer].resources[step];
+                        -gpGame->m_players[giCurPlayer].m_resources[step];
                 }
-                gpGame->m_players[giCurPlayer].resources[step] +=
+                gpGame->m_players[giCurPlayer].m_resources[step] +=
                     mapEvent->resources[step];
-                if (gpGame->m_players[giCurPlayer].resources[step] < 0)
-                    gpGame->m_players[giCurPlayer].resources[step] = 0;
+                if (gpGame->m_players[giCurPlayer].m_resources[step] < 0)
+                    gpGame->m_players[giCurPlayer].m_resources[step] = 0;
                 if (eventAmount) {
                     if (primaryType != -1) {
                         secondaryType = primaryType;
@@ -771,10 +771,10 @@ movementDone:
             gbHitEvent = 1;
         } else if (mapEvent->applyToComputer) {
             for (step = 0; step < 7; ++step) {
-                gpGame->m_players[giCurPlayer].resources[step] +=
+                gpGame->m_players[giCurPlayer].m_resources[step] +=
                     mapEvent->resources[step];
-                if (gpGame->m_players[giCurPlayer].resources[step] < 0)
-                    gpGame->m_players[giCurPlayer].resources[step] = 0;
+                if (gpGame->m_players[giCurPlayer].m_resources[step] < 0)
+                    gpGame->m_players[giCurPlayer].m_resources[step] = 0;
             }
             if (mapEvent->artifact != -1 &&
                 movingHero->NumArtifacts() < CURSOR_ARTIFACT_CAPACITY)
@@ -1143,7 +1143,7 @@ void advManager::ProcessMapChange(SMapChange change)
         NormalDialog(gText, NORMAL_DIALOG_INFO,
                      NORMAL_DIALOG_NO_RESOURCE, NORMAL_DIALOG_NO_RESOURCE,
                      NORMAL_DIALOG_CREST,
-                     gpGame->m_players[change.id].color,
+                     gpGame->m_players[change.id].m_color,
                      NORMAL_DIALOG_NO_RESOURCE, NORMAL_DIALOG_NO_RESOURCE,
                      NORMAL_DIALOG_NO_RESOURCE,
                      CURSOR_DEAD_PLAYER_DIALOG_TIME);
