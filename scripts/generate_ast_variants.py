@@ -9,8 +9,9 @@ The batch runner validates those ranges against the unchanged source before comp
 Generated families are operand order for commutative/relational expressions, reorder of
 independent local assignments, split/merge of simple local declarations, extraction of a
 pure expression into an inline helper, and extraction of the common read-then-advance cursor
-idiom.  Other sequencing changes are intentionally absent: author those as explicit literal
-axes after a semantic audit.
+idiom.  It can merge several helper definitions at the same insertion point and generate a
+two-level helper chain for nested pure expressions.  Other sequencing changes are intentionally
+absent: author those as explicit literal axes after a semantic audit.
 
 Run inside ``nix develop .#build``::
 
@@ -342,6 +343,11 @@ def usable_type_spelling(spelling: str) -> bool:
     return bool(spelling) and not any(piece in spelling for piece in ("(anonymous", "{", "[", ")("))
 
 
+def msvc42_type_spelling(spelling: str) -> str:
+    # Retail's compiler predates built-in bool support; comparisons are represented as int.
+    return "int" if spelling == "bool" else spelling
+
+
 def helper_parameters(node, fn):
     declarations = {}
     spellings = {}
@@ -389,7 +395,7 @@ def inline_expression_edits(fn, blob: bytes, insertion: int, helper_name_count: 
         expression = blob[start:end]
         if len(expression) > 160:
             continue
-        return_type = node.type.spelling
+        return_type = msvc42_type_spelling(node.type.spelling)
         parameters = helper_parameters(node, fn)
         if parameters is None or len(parameters) > 4 or not usable_type_spelling(return_type):
             continue
@@ -410,6 +416,90 @@ def inline_expression_edits(fn, blob: bytes, insertion: int, helper_name_count: 
                 (AstEdit(insertion, insertion, helper), AstEdit(start, end, replacement)),
             ))
         expression_index += 1
+    return mutations
+
+
+def inline_nested_expression_edits(
+    fn, blob: bytes, insertion: int, helper_name_count: int
+) -> list[AstMutation]:
+    mutations = []
+    accepted = COMMUTATIVE | set(RELATIONAL_FLIP)
+    chain_index = 0
+    for outer in fn.walk_preorder():
+        if outer.kind != ci.CursorKind.BINARY_OPERATOR or has_side_effect(outer):
+            continue
+        outer_children = list(outer.get_children())
+        if len(outer_children) != 2:
+            continue
+        outer_left_start, outer_left_end = cursor_range(outer_children[0])
+        outer_right_start, outer_right_end = cursor_range(outer_children[1])
+        if operator_token(outer, outer_left_end, outer_right_start, accepted) is None:
+            continue
+        outer_start, outer_end = cursor_range(outer)
+        outer_parameters = helper_parameters(outer, fn)
+        outer_return_type = msvc42_type_spelling(outer.type.spelling)
+        if (
+            outer_parameters is None or len(outer_parameters) > 4
+            or not usable_type_spelling(outer_return_type) or outer_end - outer_start > 220
+        ):
+            continue
+        for raw_inner in outer_children:
+            inner = unwrap_single_expression(raw_inner)
+            if inner.kind != ci.CursorKind.BINARY_OPERATOR or has_side_effect(inner):
+                continue
+            inner_children = list(inner.get_children())
+            if len(inner_children) != 2:
+                continue
+            inner_left_start, inner_left_end = cursor_range(inner_children[0])
+            inner_right_start, inner_right_end = cursor_range(inner_children[1])
+            if operator_token(inner, inner_left_end, inner_right_start, accepted) is None:
+                continue
+            inner_start, inner_end = cursor_range(inner)
+            if not outer_start <= inner_start < inner_end <= outer_end:
+                continue
+            inner_parameters = helper_parameters(inner, fn)
+            inner_return_type = msvc42_type_spelling(inner.type.spelling)
+            if (
+                inner_parameters is None or len(inner_parameters) > 4
+                or not usable_type_spelling(inner_return_type)
+            ):
+                continue
+            outer_parameter_text = ", ".join(
+                f"{type_spelling} {name}" for type_spelling, name in outer_parameters
+            )
+            outer_argument_text = ", ".join(name for _type_spelling, name in outer_parameters)
+            inner_parameter_text = ", ".join(
+                f"{type_spelling} {name}" for type_spelling, name in inner_parameters
+            )
+            inner_argument_text = ", ".join(name for _type_spelling, name in inner_parameters)
+            outer_expression = blob[outer_start:outer_end]
+            inner_expression = blob[inner_start:inner_end]
+            for name_index in range(helper_name_count):
+                inner_name = f"H2AstNestedInner{chain_index:03d}_{name_index}"
+                outer_name = f"H2AstNestedOuter{chain_index:03d}_{name_index}"
+                inner_call = f"{inner_name}({inner_argument_text})".encode()
+                relative_start = inner_start - outer_start
+                relative_end = inner_end - outer_start
+                rewritten_outer = (
+                    outer_expression[:relative_start] + inner_call + outer_expression[relative_end:]
+                )
+                helpers = (
+                    f"static inline {inner_return_type} {inner_name}({inner_parameter_text})\n"
+                    "{\n"
+                    f"    return {inner_expression.decode('utf-8')};\n"
+                    "}\n\n"
+                    f"static inline {outer_return_type} {outer_name}({outer_parameter_text})\n"
+                    "{\n"
+                    f"    return {rewritten_outer.decode('utf-8')};\n"
+                    "}\n\n"
+                ).encode()
+                replacement = f"{outer_name}({outer_argument_text})".encode()
+                mutations.append(AstMutation(
+                    "inline_nested_expression",
+                    f"line-{line_number(blob, outer_start)}-{name_index}",
+                    (AstEdit(insertion, insertion, helpers), AstEdit(outer_start, outer_end, replacement)),
+                ))
+            chain_index += 1
     return mutations
 
 
@@ -521,6 +611,8 @@ def atomic_mutations(
     mutations = expression_edits(fn, blob) + statement_order_edits(fn, blob) + declaration_edits(fn, blob)
     if "inline_expression" in families:
         mutations += inline_expression_edits(fn, blob, insertion, helper_name_count)
+    if "inline_nested_expression" in families:
+        mutations += inline_nested_expression_edits(fn, blob, insertion, helper_name_count)
     if "inline_read_advance" in families:
         mutations += inline_read_advance_edits(fn, blob, insertion, helper_name_count)
     unique = {}
@@ -551,11 +643,29 @@ def non_overlapping(edits) -> bool:
     )
 
 
-def candidate_payloads(blob: bytes, mutations: list[AstMutation], max_depth: int, limit: int):
+def merge_insertions(edits) -> tuple[AstEdit, ...]:
+    insertions = {}
+    replacements = []
+    for edit in edits:
+        if edit.start == edit.end:
+            insertions.setdefault(edit.start, []).append(edit.replacement)
+        else:
+            replacements.append(edit)
+    replacements.extend(
+        AstEdit(offset, offset, b"".join(parts)) for offset, parts in insertions.items()
+    )
+    return tuple(sorted(replacements, key=lambda edit: (edit.start, edit.end)))
+
+
+def candidate_payloads(
+    blob: bytes, mutations: list[AstMutation], max_depth: int, limit: int, min_depth: int = 1
+):
     candidates = []
-    for depth in range(1, max_depth + 1):
+    for depth in range(min_depth, max_depth + 1):
         for combination in itertools.combinations(mutations, depth):
-            edits = tuple(edit for mutation in combination for edit in mutation.edits)
+            edits = merge_insertions(
+                tuple(edit for mutation in combination for edit in mutation.edits)
+            )
             if not non_overlapping(edits):
                 continue
             ordered = sorted(edits, key=lambda edit: edit.start)
@@ -585,12 +695,17 @@ def main(argv=None) -> int:
     parser.add_argument("source", type=Path)
     parser.add_argument("rva", type=lambda value: int(value, 0))
     parser.add_argument("--max-depth", type=int, default=3)
+    parser.add_argument(
+        "--min-depth", type=int, default=1,
+        help="minimum number of compatible AST mutations in each emitted candidate",
+    )
     parser.add_argument("--limit", type=int, default=4096)
     parser.add_argument(
         "--families",
         default=(
             "commutative_order,relational_order,independent_statement_order,declaration_split,"
             "declaration_merge,inline_expression,inline_read_advance"
+            ",inline_nested_expression"
         ),
         help="comma-separated AST edit families",
     )
@@ -600,8 +715,11 @@ def main(argv=None) -> int:
         help="number of deterministic identifier spellings for each generated inline helper",
     )
     args = parser.parse_args(argv)
-    if args.max_depth < 1 or args.limit < 1 or args.helper_name_count < 1:
-        parser.error("--max-depth, --limit, and --helper-name-count must be positive")
+    if (
+        args.min_depth < 1 or args.max_depth < args.min_depth
+        or args.limit < 1 or args.helper_name_count < 1
+    ):
+        parser.error("require 1 <= --min-depth <= --max-depth and positive limit/name count")
 
     root = Path(os.environ.get("HOMM2_DIR", Path.cwd())).resolve()
     source = (root / args.source).resolve()
@@ -613,6 +731,7 @@ def main(argv=None) -> int:
     known_families = {
         "commutative_order", "relational_order", "independent_statement_order",
         "declaration_split", "declaration_merge", "inline_expression", "inline_read_advance",
+        "inline_nested_expression",
     }
     unknown = families - known_families
     if unknown:
@@ -637,7 +756,9 @@ def main(argv=None) -> int:
         parser.error(str(exc))
     insertion, _span_end = marker_span(blob, args.rva)
     mutations = atomic_mutations(fn, blob, insertion, families, args.helper_name_count)
-    candidates, truncated = candidate_payloads(blob, mutations, args.max_depth, args.limit)
+    candidates, truncated = candidate_payloads(
+        blob, mutations, args.max_depth, args.limit, min_depth=args.min_depth
+    )
     if not candidates:
         parser.error("no AST variants generated")
     payload = {
@@ -649,6 +770,7 @@ def main(argv=None) -> int:
             "families": sorted(families),
             "atomic_mutation_count": len(mutations),
             "max_depth": args.max_depth,
+            "min_depth": args.min_depth,
             "limit": args.limit,
             "truncated": truncated,
         },
