@@ -1672,20 +1672,24 @@ int townManager::Main(tag_message &message)
     return 1;
 }
 
-// @match-note 98.13%: complete six-command CFG, exact 0x18 frame, and all 23/23
-// relocations agree. Retail reuses one int for swapped count/type; separate
-// short/char temporaries produced 0x1c and one shared merge/swap temp produced
-// 0x14. The remaining diff begins at delinked switch-table label identity.
-// The post-95 source audit confirms the command switch is already direct and
-// in retail case-body order. Revisit only if explicit-range comparison finds a
-// non-table opcode/operand difference.
+// @match-note 98.69%: exact 0x4e3 size, 0x18 frame, all six command bodies/CFG,
+// retail -0x4/-0x8/-0xc/-0x10 local slots, and 23/23 ordered relocation owners
+// and addends. Fifteen of sixteen external relocation offsets are exact; the
+// first gpGame site is five bytes late because the inlined GetHero continuation
+// is before its body here but after it in retail. Relocation-masked raw proof
+// leaves 90 bytes in the evaluation-order spans 0x6b-0xa3, 0xc7-0xce,
+// 0x207-0x233, 0x2ba-0x2e7, 0x32f-0x346, and 0x37b-0x3cf. Both hero-strip
+// equality orders compile identically. Combined-condition and compound-add
+// forms were worse; the explicit loop break and read/add/write are retail.
+// A 295-candidate value-neutral AST run found no exact-size improvement; its
+// 98.9088% best adds a spurious five-byte m_dialogResult inline continuation.
 VA(0x0041718d, 0x4e3)
 void townManager::DoCommand(int command)
 {
     hero *viewedHero;
-    int canDismiss;
+    int dismissAllowed;
     int slot;
-    int swapValue;
+    int oldValue;
 
     switch (command) {
     case TOWN_ARMY_COMMAND_SELECT:
@@ -1703,14 +1707,14 @@ void townManager::DoCommand(int command)
         if (m_castleDialogActive == 1 ||
             (m_selectedStrip == m_heroStrip &&
              m_selectedStrip->m_army->GetNumArmies() == 1))
-            canDismiss = 1;
+            dismissAllowed = 1;
         else
-            canDismiss = 0;
+            dismissAllowed = 0;
         gpGame->ViewArmy(
             TOWN_ARMY_VIEW_X, TOWN_ARMY_VIEW_Y,
             m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot],
             m_selectedStrip->m_army->m_creatureCounts[m_selectedArmySlot],
-            m_town, canDismiss, 1, 0, viewedHero, 0,
+            m_town, dismissAllowed, 1, 0, viewedHero, 0,
             m_selectedStrip->m_army, m_selectedArmySlot);
         m_bankBox->Update(1);
         if (gpWindowManager->m_dialogResult == TOWN_DIALOG_CONFIRM) {
@@ -1727,16 +1731,16 @@ void townManager::DoCommand(int command)
             m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot] !=
                 m_pendingStrip->m_army
                     ->m_creatureTypes[m_pendingArmySlot]) {
-            for (slot = 0;
-                 slot < TOWN_ARMY_SLOT_COUNT &&
-                 m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot] !=
-                     m_pendingStrip->m_army->m_creatureTypes[slot];
-                 ++slot) {
+            for (slot = 0; slot < TOWN_ARMY_SLOT_COUNT; ++slot) {
+                if (m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot] ==
+                    m_pendingStrip->m_army->m_creatureTypes[slot])
+                    break;
             }
             if (slot < TOWN_ARMY_SLOT_COUNT)
                 m_pendingArmySlot = slot;
         }
-        m_pendingStrip->m_army->m_creatureCounts[m_pendingArmySlot] +=
+        m_pendingStrip->m_army->m_creatureCounts[m_pendingArmySlot] =
+            m_pendingStrip->m_army->m_creatureCounts[m_pendingArmySlot] +
             m_swapStrip->m_army->m_creatureCounts[m_swapArmySlot];
         m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot] = -1;
         m_swapStrip->m_army->m_creatureCounts[m_swapArmySlot] = 0;
@@ -1744,16 +1748,16 @@ void townManager::DoCommand(int command)
         break;
 
     case TOWN_ARMY_COMMAND_SWAP:
-        swapValue = m_pendingStrip->m_army
+        oldValue = m_pendingStrip->m_army
                         ->m_creatureCounts[m_pendingArmySlot];
         m_pendingStrip->m_army->m_creatureCounts[m_pendingArmySlot] =
             m_swapStrip->m_army->m_creatureCounts[m_swapArmySlot];
-        m_swapStrip->m_army->m_creatureCounts[m_swapArmySlot] = swapValue;
-        swapValue = m_pendingStrip->m_army
+        m_swapStrip->m_army->m_creatureCounts[m_swapArmySlot] = oldValue;
+        oldValue = m_pendingStrip->m_army
                         ->m_creatureTypes[m_pendingArmySlot];
         m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot] =
             m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot];
-        m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot] = swapValue;
+        m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot] = oldValue;
         ResetStrips();
         break;
 
