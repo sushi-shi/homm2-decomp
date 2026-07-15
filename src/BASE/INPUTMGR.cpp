@@ -17,7 +17,9 @@
 #include <BASE/INPUTMGR.h>
 #include <_carcass_types.h>
 // @early-stop
-// reloc-masked raw bytes are identical over 0x004cdb50..0x004cde58; objdiff only retains $L jump-table identities instead of the delinked containing-function target
+// Relocation-masked raw bytes are identical over 0x004cdb50..0x004cde58. All 40
+// relocation occurrences align; residual identities are $L jump-table labels versus
+// the containing function and gConfig+0x30 versus its delinked interior constant.
 VA(0x004cdb50, 0x308)
 int KeyboardMessageHandler(void *, unsigned int message, unsigned int, long int messageData)
 {
@@ -32,53 +34,53 @@ int KeyboardMessageHandler(void *, unsigned int message, unsigned int, long int 
     event->payload.keyboard.unknown0x10 = 0;
     event->payload.keyboard.unknown0x08 = 0;
     event->payload.keyboard.keyCode = 0;
-    event->type = 0;
+    event->type = MESSAGE_NONE;
 
     switch (message) {
     case WM_KEYDOWN:
-        event->type = 1;
+        event->type = MESSAGE_KEY_DOWN;
         event->payload.keyboard.keyCode = static_cast<unsigned short>(static_cast<unsigned long>(messageData) >> 16) & 0xff;
         event->payload.keyboard.unknown0x08 = 0;
         event->payload.keyboard.modifiers = 0;
         switch (event->payload.keyboard.keyCode) {
         case 0x1d:
-            gpInputManager->field_0x85e |= 4;
+            gpInputManager->m_modifiers |= MESSAGE_MODIFIER_CONTROL;
             break;
         case 0x2a:
-            gpInputManager->field_0x85e |= 2;
+            gpInputManager->m_modifiers |= MESSAGE_MODIFIER_LEFT_SHIFT;
             break;
         case 0x36:
-            gpInputManager->field_0x85e |= 1;
+            gpInputManager->m_modifiers |= MESSAGE_MODIFIER_RIGHT_SHIFT;
             break;
         case 0x38:
-            gpInputManager->field_0x85e |= 0x20;
+            gpInputManager->m_modifiers |= MESSAGE_MODIFIER_ALT;
             break;
         }
         break;
     case WM_KEYUP:
-        event->type = 2;
+        event->type = MESSAGE_KEY_UP;
         event->payload.keyboard.keyCode = static_cast<unsigned short>(static_cast<unsigned long>(messageData) >> 16) & 0xff;
         event->payload.keyboard.unknown0x08 = 0;
         event->payload.keyboard.modifiers = 0;
         switch (event->payload.keyboard.keyCode) {
         case 0x1d:
-            gpInputManager->field_0x85e &= 0xfffb;
+            gpInputManager->m_modifiers &= 0xfffb;
             break;
         case 0x2a:
-            gpInputManager->field_0x85e &= 0xfffd;
+            gpInputManager->m_modifiers &= 0xfffd;
             break;
         case 0x36:
-            gpInputManager->field_0x85e &= 0xfffe;
+            gpInputManager->m_modifiers &= 0xfffe;
             break;
         case 0x38:
-            gpInputManager->field_0x85e &= 0xffdf;
+            gpInputManager->m_modifiers &= 0xffdf;
             break;
         }
         break;
     }
 
-    if (event->type != 0) {
-        event->payload.keyboard.modifiers = gpInputManager->field_0x85e;
+    if (event->type != MESSAGE_NONE) {
+        event->payload.keyboard.modifiers = gpInputManager->m_modifiers;
         gpInputManager->m_writeIndex++;
         gpInputManager->m_writeIndex %= 64;
         if (gpInputManager->m_writeIndex == gpInputManager->m_readIndex) {
@@ -88,22 +90,30 @@ int KeyboardMessageHandler(void *, unsigned int message, unsigned int, long int 
         gpInputManager->m_field_0x85a = 0;
 
         if (gpWindowManager->m_active == 1) {
-            if (event->type == 1 && event->payload.keyboard.keyCode == 0x58 &&
-                (event->payload.keyboard.modifiers & 3) != 0)
+            if (event->type == MESSAGE_KEY_DOWN && event->payload.keyboard.keyCode == 0x58 &&
+                (event->payload.keyboard.modifiers &
+                 (MESSAGE_MODIFIER_RIGHT_SHIFT | MESSAGE_MODIFIER_LEFT_SHIFT)) != 0)
                 gpWindowManager->ScreenShot();
-            if (event->type == 1 && event->payload.keyboard.keyCode == 0x3b) {
+            if (event->type == MESSAGE_KEY_DOWN && event->payload.keyboard.keyCode == 0x3b) {
                 SetFullScreenStatus(0);
                 AppCommand(hwndApp, 0, 0x9c74, 0);
             }
-            if (event->type == 1 && event->payload.keyboard.keyCode == 0x3e)
+            if (event->type == MESSAGE_KEY_DOWN && event->payload.keyboard.keyCode == 0x3e)
                 SetFullScreenStatus(1 - gConfig.gfx[giCurExe].fullScreen);
         }
     }
-    return event->type == 0;
+    return event->type == MESSAGE_NONE;
 }
 
-// @early-stop
-// /O2 wall: 0x004ce150..0x004ce191 is the same read-index collision update with eax/ecx exchanged (direct, pointer, and reference spellings exhausted); jump-table relocs are $L vs containing function
+// @match-note
+// Structurally complete /O2 checkpoint: frame, ordered CFG, event fields, and semantic
+// external targets agree. Base has four expected import relocations absent from the
+// delinked target: SetCapture x2 and ReleaseCapture x2 at the same indirect call sites.
+// The first code-shape residual at 0x004ce150 is the ring read-index collision update
+// with EAX/ECX exchanged; direct, pointer, and reference spellings, 20 guarded TU-state
+// trials, and a 25-iteration clang-AST pass produced no improvement. Jump-table relocs
+// are $L labels versus the containing function; gConfig members are interior aliases.
+// Revisit after a genuine combined-TU change; this is not a proven wall.
 VA(0x004cde60, 0x36c)
 int MouseMessageHandler(void *, unsigned int message, unsigned int, long int messageData)
 {
@@ -111,9 +121,9 @@ int MouseMessageHandler(void *, unsigned int message, unsigned int, long int mes
         return 1;
     if (gpInputManager->m_active != 1)
         return 1;
-    if (gpInputManager->field_0x73e != 0)
+    if (gpInputManager->m_mouseMessageActive != 0)
         return 1;
-    gpInputManager->field_0x73e = 1;
+    gpInputManager->m_mouseMessageActive = 1;
 
     tag_message *event = &gpInputManager->m_eventRing[gpInputManager->m_writeIndex];
     event->payload.mouse.modifiers = 0;
@@ -121,35 +131,35 @@ int MouseMessageHandler(void *, unsigned int message, unsigned int, long int mes
     event->payload.mouse.screenX = 0;
     event->payload.mouse.y = 0;
     event->payload.mouse.x = 0;
-    event->type = 0;
+    event->type = MESSAGE_NONE;
 
     switch (message - WM_MOUSEMOVE) {
     case WM_MOUSEMOVE - WM_MOUSEMOVE:
-        event->type = 4;
+        event->type = MESSAGE_MOUSE_MOVE;
         break;
     case WM_LBUTTONDOWN - WM_MOUSEMOVE:
-        event->type = 8;
+        event->type = MESSAGE_LEFT_BUTTON_DOWN;
         SetCapture(hwndApp);
         break;
     case WM_LBUTTONUP - WM_MOUSEMOVE:
-        event->type = 0x10;
+        event->type = MESSAGE_LEFT_BUTTON_UP;
         if (ReleaseCapture() == 0)
             LogStr("ReleaseCapture Failed");
         break;
     case WM_LBUTTONDBLCLK - WM_MOUSEMOVE:
-        event->type = 8;
+        event->type = MESSAGE_LEFT_BUTTON_DOWN;
         break;
     case WM_RBUTTONDOWN - WM_MOUSEMOVE:
-        event->type = 0x20;
+        event->type = MESSAGE_RIGHT_BUTTON_DOWN;
         SetCapture(hwndApp);
         break;
     case WM_RBUTTONUP - WM_MOUSEMOVE:
-        event->type = 0x40;
+        event->type = MESSAGE_RIGHT_BUTTON_UP;
         if (ReleaseCapture() == 0)
             LogStr("ReleaseCapture Failed");
         break;
     case WM_RBUTTONDBLCLK - WM_MOUSEMOVE:
-        event->type = 0x20;
+        event->type = MESSAGE_RIGHT_BUTTON_DOWN;
         break;
     default:
         goto afterMouseCoordinates;
@@ -196,8 +206,8 @@ afterMouseCoordinates:
         }
     }
 
-    if (event->type != 0) {
-        event->payload.mouse.modifiers = gpInputManager->field_0x85e;
+    if (event->type != MESSAGE_NONE) {
+        event->payload.mouse.modifiers = gpInputManager->m_modifiers;
         gpInputManager->m_writeIndex++;
         gpInputManager->m_writeIndex %= 64;
         if (gpInputManager->m_writeIndex == gpInputManager->m_readIndex) {
@@ -205,21 +215,21 @@ afterMouseCoordinates:
             gpInputManager->m_readIndex %= 64;
         }
     }
-    gpInputManager->field_0x73e = 0;
-    return event->type == 0;
+    gpInputManager->m_mouseMessageActive = 0;
+    return event->type == MESSAGE_NONE;
 }
 
 VA(0x004ce1d0, 0x56)
 inputManager::inputManager(void) : baseManager()
 {
     m_active = 0;
-    field_0x73e = 0;
+    m_mouseMessageActive = 0;
     field_0x852 = 1;
     field_0x84e = 0;
     field_0x742 = 0;
     field_0x746 = 0;
     field_0x74a = 1;
-    field_0x856 = 1;
+    m_keyCodeType = 1;
     field_0x866 = 0;
     field_0x862 = -1;
 }
@@ -231,7 +241,7 @@ int inputManager::Open(int param_1)
     m_writeIndex = 0;
     m_readIndex = 0;
     field_0x852 = param_1;
-    field_0x85e = 0;
+    m_modifiers = 0;
     MakeScanCodeTable();
     m_messageMask = 4;
     m_priority = -1;
@@ -270,10 +280,10 @@ tag_message inputManager::GetEvent(void)
         event = m_eventRing[m_readIndex];
         m_readIndex++;
         m_readIndex %= 64;
-        if (event.type == 1 && field_0x856 == 0)
+        if (event.type == MESSAGE_KEY_DOWN && m_keyCodeType == 0)
             AsciiConvert(event);
     } else {
-        event.type = 0;
+        event.type = MESSAGE_NONE;
         event.payload.unknown.unknown0x08 = 0;
         event.payload.unknown.unknown0x04 = 0;
         event.payload.unknown.unknown0x0c = 0;
@@ -289,10 +299,10 @@ tag_message inputManager::PeekEvent(void)
     if (gpInputManager->m_active == 1 && m_readIndex != m_writeIndex) {
         local_1c = m_eventRing[m_readIndex];
         m_readIndex = m_readIndex % 0x40;
-        if (local_1c.type == 1 && field_0x856 == 0)
+        if (local_1c.type == MESSAGE_KEY_DOWN && m_keyCodeType == 0)
             AsciiConvert(local_1c);
     } else {
-        local_1c.type = 0;
+        local_1c.type = MESSAGE_NONE;
         local_1c.payload.unknown.unknown0x08 = 0;
         local_1c.payload.unknown.unknown0x04 = 0;
         local_1c.payload.unknown.unknown0x0c = 0;
@@ -306,13 +316,20 @@ void inputManager::SetMouseCoords(int, int) {}
 VA(0x004ce460, 0x1b)
 void inputManager::SetKeyCodeType(int param_1)
 {
-    field_0x856 = param_1;
+    m_keyCodeType = param_1;
     m_writeIndex = 0;
     m_readIndex = 0;
 }
 
-// @early-stop
-// /O2 wall: 0x004ce4b2..0x004ce4d1 caches modifiers/code in eax/ecx oppositely; direct, split, converted, volatile, and SIB spellings exhausted; jump-table relocs are $L vs containing function
+// @match-note
+// Structurally complete /O2 checkpoint: frame, ordered CFG, key conversion semantics,
+// and external relocations agree. At 0x004ce4b2 retail loads modifiers into ECX
+// before storing the converted key from EAX; base stores the key first and then keeps
+// modifiers in EAX. Preloaded-modifier, converted-key-local, and duplicated-branch
+// spellings regressed; a 40-iteration clang-AST pass found no gain. Jump-table
+// relocations are delinked $L labels versus the containing function. Twenty guarded
+// TU-state trials also left 98.76% unchanged. Revisit only after a genuine combined-TU
+// change; this is not a proven wall.
 VA(0x004ce480, 0x1cb)
 void inputManager::AsciiConvert(tag_message &event)
 {
@@ -326,7 +343,8 @@ void inputManager::AsciiConvert(tag_message &event)
         event.payload.keyboard.keyCode =
             m_keyState[event.payload.keyboard.keyCode] & 0xff;
 
-    int modifiers = event.payload.keyboard.modifiers & 3;
+    int modifiers = event.payload.keyboard.modifiers &
+                    (MESSAGE_MODIFIER_RIGHT_SHIFT | MESSAGE_MODIFIER_LEFT_SHIFT);
     if (modifiers == 0) {
         int value = event.payload.keyboard.keyCode;
         if (value > 'A' - 1 && value < 'Z' + 1) {
@@ -457,9 +475,6 @@ void inputManager::MakeScanCodeTable(void)
     m_keyState[88] = 0x5800;
 }
 
-// @early-stop
-// Exact: the former EAX/ECX color-state residual closed under later combined-TU state. Current
-// candidate and retail match 100% over 0xe4 bytes with 18/18 relocation occurrences.
 VA(0x004ce990, 0xe4)
 void CheckChangeCursor(int x, int y, int force)
 {
@@ -486,30 +501,34 @@ void CheckChangeCursor(int x, int y, int force)
     bInCheckChangeCursor = 0;
 }
 
-// @early-stop
-// /O2 wall: 0x004cea81..0x004cea9e uses cmp [eax],0 instead of load/test via ecx/eax; pointer/value/reference and value-dependent store spellings exhausted; remaining body is identical
+// @match-note
+// Structurally complete /O2 checkpoint: the remaining body and all 11 relocation
+// occurrences agree. At 0x004cea81 retail forms the mouse-active-field pointer in
+// ECX, loads it into EAX, and tests EAX; base forms it in EAX and compares memory
+// directly. Pointer, value, reference, and value-dependent-store forms were tried.
+// A 30-trial guarded TU-state sweep and 40 clang-AST iterations left 97.43% unchanged.
+// Revisit after a genuine combined-TU change; this is not a proven wall.
 VA(0x004cea80, 0xe9)
 void inputManager::ForceMouseMove(void)
 {
-    int *busy = &gpInputManager->field_0x73e;
-    int busyValue = *busy;
-    if (busyValue != 0)
+    int mouseMessageActive = gpInputManager->m_mouseMessageActive;
+    if (mouseMessageActive != 0)
         return;
-    *busy = 1;
+    gpInputManager->m_mouseMessageActive = 1;
 
     tag_message *event = &gpInputManager->m_eventRing[gpInputManager->m_writeIndex];
-    event->type = 4;
+    event->type = MESSAGE_MOUSE_MOVE;
     gpMouseManager->MouseCoords(event->payload.mouse.x, event->payload.mouse.y);
     event->payload.mouse.screenX = event->payload.mouse.x;
     event->payload.mouse.screenY = event->payload.mouse.y;
-    event->payload.mouse.modifiers = gpInputManager->field_0x85e;
+    event->payload.mouse.modifiers = gpInputManager->m_modifiers;
     gpInputManager->m_writeIndex++;
     gpInputManager->m_writeIndex %= 64;
     if (gpInputManager->m_writeIndex == gpInputManager->m_readIndex) {
         gpInputManager->m_readIndex++;
         gpInputManager->m_readIndex %= 64;
     }
-    gpInputManager->field_0x73e = 0;
+    gpInputManager->m_mouseMessageActive = 0;
 }
 
 
