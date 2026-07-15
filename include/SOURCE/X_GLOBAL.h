@@ -138,6 +138,18 @@ typedef enum KbPaletteTableConstant {
     PUZZLE_DRAW_TABLE_COUNT = 64
 } KbPaletteTableConstant;
 
+typedef enum KbGameTableConstant {
+    KB_MAP_SIZE_COUNT = 4,
+    KB_INTERFACE_TYPE_COUNT = 37,
+    KB_INTERFACE_VARIANT_COUNT = 2,
+    KB_COMBAT_SPEED_COUNT = 3,
+    KB_COMBAT_FX_COUNT = 32,
+    KB_ARTIFACT_LEVEL_COUNT = 104,
+    KB_ARTIFACT_BASE_VALUE_COUNT = 100,
+    KB_STAT_POWER_COUNT = 42,
+    KB_SPELL_LIMIT_COUNT = 5
+} KbGameTableConstant;
+
 extern unsigned char giGroundShape[GROUND_TILE_IMAGE_COUNT];
 extern unsigned char gColorTableTan[DIM_PALETTE_COLOR_COUNT];
 extern unsigned char gColorTableGray[DIM_PALETTE_COLOR_COUNT];
@@ -160,22 +172,22 @@ extern int giMenuCommand;
 extern int gbSendMouseMoveMessages;
 extern int gbColorMice;
 extern unsigned long gTownEligibleBuildMask[TOWN_ELIGIBLE_BUILD_MASK_COUNT];
-extern unsigned char giMapSizes[4];
+extern unsigned char giMapSizes[KB_MAP_SIZE_COUNT];
 extern int gbUseEvilInterface;
-extern char *cEvilTranslate[37][2];  // CodeView size 0x128 = 37*2*4; array-decayed mangling
+extern char *cEvilTranslate[KB_INTERFACE_TYPE_COUNT][KB_INTERFACE_VARIANT_COUNT];
 extern char gcAnimPath[0x160];
 extern char gcGamePath[0x18];
 extern char gcMapPath[0x14];
 extern int gbDontTryRedbook;
 extern int gbDontTryMIDI;
 extern int gbDontTryDigital;
-extern float gfCombatSpeedMod[3];
+extern float gfCombatSpeedMod[KB_COMBAT_SPEED_COUNT];
 extern int giDialogTimeout;
 extern int giNewMonsterCycleFrame;
 extern int gbLeaveNetBoxAlone;
 extern int gbUseWaveout;
 extern int gbShowAllMaps;
-extern char *gCombatFxNames[32];
+extern char *gCombatFxNames[KB_COMBAT_FX_COUNT];
 extern short horseFrameFlip[MOVEMENT_FRAME_FLIP_COUNT];
 extern short boatFrameFlip[MOVEMENT_FRAME_FLIP_COUNT];
 extern signed char gCastleResources[CASTLE_RESOURCE_SLOT_COUNT];
@@ -187,12 +199,12 @@ extern int gInitResourcesComputer[STARTING_RESOURCE_DIFFICULTY_COUNT]
                                  [STARTING_RESOURCE_TYPE_COUNT];
 extern int gMineCharacteristics[MINE_CHARACTERISTIC_COUNT];
 extern int gSSValues[HERO_SKILL_COUNT][SECONDARY_SKILL_VALUE_LEVEL_COUNT];
-extern unsigned char gArtifactLevel[104];
+extern unsigned char gArtifactLevel[KB_ARTIFACT_LEVEL_COUNT];
 extern int gUltArtifactAvgValue;
 extern signed char giVisRangeTown;
-extern float gfStatPower[42];
-extern float gfBattleStat[42];
-extern signed char gSpellLimits[5];
+extern float gfStatPower[KB_STAT_POWER_COUNT];
+extern float gfBattleStat[KB_STAT_POWER_COUNT];
+extern signed char gSpellLimits[KB_SPELL_LIMIT_COUNT];
 extern float gfSpellCastableCombatMod[12];
 extern float gfSpellCastNumMod[12];
 extern float gfPhilAISpellPowerMod[12];
