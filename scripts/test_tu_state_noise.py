@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import importlib.util
+import os
 import sys
 import tempfile
+import time
 import unittest
+from unittest import mock
 from pathlib import Path
 
 
@@ -43,6 +46,46 @@ class TuStateNoiseTests(unittest.TestCase):
         )
         self.assertIn("#line 81\nVA(0x00401234", candidate)
 
+    def test_resolver_ignores_va_text_in_comment_before_real_marker(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / "src/BASE/unit.cpp"
+            source.parent.mkdir(parents=True)
+            source.write_text(
+                "int predecessor; // vtable: VA(0x00401234, 0x1)\n"
+                "\n// @match-note\n"
+                "VA(0x00401234, 0x1)\n"
+                "void Target() {}\n"
+            )
+            (root / "config").mkdir()
+            (root / "config/units.toml").write_text(
+                '[flags]\nbase = ["/c"]\n\n'
+                '[[unit]]\nunit = "BASE/unit"\nsource = "src/BASE/unit.cpp"\nflags = "base"\n'
+            )
+            (root / "build/gen").mkdir(parents=True)
+            (root / "build/gen/symbol_names.csv").write_text(
+                "kind,unit,rva,name,size\n"
+                "func,BASE/unit,0x1234,?Target@@YIXXZ,0x1\n"
+            )
+
+            target, _flags = noise.resolve_target(root, Path("src/BASE/unit.cpp"), 0x1234)
+            original = source.read_text()
+            self.assertEqual(target.marker_offset, original.rindex("VA(0x00401234"))
+            candidate = noise.insert_variant(
+                original,
+                target,
+                noise.Variant(1, "typedef", "tag", "typedef int PROBE_ALIAS;\n"),
+            )
+            self.assertLess(candidate.index("vtable: VA("), candidate.index("PROBE_ALIAS"))
+            self.assertLess(candidate.index("PROBE_ALIAS"), candidate.index("// @match-note"))
+            canonical_suffix = noise.target_suffix_digest(original, target.va)
+            self.assertIsNotNone(canonical_suffix)
+            self.assertEqual(noise.target_suffix_digest(candidate, target.va), canonical_suffix)
+            self.assertNotEqual(
+                noise.target_suffix_digest(candidate.replace("void Target", "int Target"), target.va),
+                canonical_suffix,
+            )
+
     def test_variants_are_deterministic_unique_and_parser_visible(self):
         count = len(noise.DEFAULT_FAMILIES) * 2
         left = noise.make_variants(count, noise.DEFAULT_FAMILIES, 123)
@@ -76,6 +119,62 @@ class TuStateNoiseTests(unittest.TestCase):
                     self.assertEqual(path.read_bytes(), b"candidate\n")
                     raise RuntimeError("stop")
             self.assertEqual(path.read_bytes(), original)
+
+    def test_compile_timeout_seconds_must_be_positive_and_finite(self):
+        self.assertEqual(noise.positive_seconds("0.25"), 0.25)
+        for value in ("0", "-1", "nan", "inf", "not-a-number"):
+            with self.subTest(value=value):
+                with self.assertRaises(noise.argparse.ArgumentTypeError):
+                    noise.positive_seconds(value)
+
+    @unittest.skipUnless(hasattr(os, "killpg"), "requires POSIX process groups")
+    def test_timeout_kills_compiler_process_group(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            marker = root / "survived"
+            child_code = (
+                "import pathlib,signal,time;"
+                "signal.signal(signal.SIGTERM, signal.SIG_IGN);"
+                "time.sleep(0.4);"
+                f"pathlib.Path({str(marker)!r}).write_text('alive')"
+            )
+            parent_code = (
+                "import signal,subprocess,sys,time;"
+                "signal.signal(signal.SIGTERM, signal.SIG_IGN);"
+                f"subprocess.Popen([sys.executable, '-c', {child_code!r}]);"
+                "time.sleep(10)"
+            )
+            with mock.patch.object(noise, "PROCESS_GROUP_TERMINATION_GRACE_SECONDS", 0.05):
+                returncode, _stdout, _stderr, timed_out = noise._run_command_with_timeout(
+                    [sys.executable, "-c", parent_code], root, 0.05
+                )
+            self.assertTrue(timed_out)
+            self.assertNotEqual(returncode, 0)
+            time.sleep(0.5)
+            self.assertFalse(marker.exists())
+
+    def test_compile_timeout_is_fail_closed_and_removes_partial_outputs(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            output = root / "candidate.obj"
+            output.write_bytes(b"partial")
+            Path(str(output) + ".d").write_bytes(b"partial dependency")
+            with mock.patch.object(
+                noise,
+                "_run_command_with_timeout",
+                return_value=(-9, "compiler stdout\n", "compiler stderr\n", True),
+            ):
+                ok, log, timed_out = noise.compile_object(
+                    root, root / "unit.cpp", output, ["/c"], 0.125
+                )
+            self.assertFalse(ok)
+            self.assertTrue(timed_out)
+            self.assertFalse(output.exists())
+            self.assertFalse(Path(str(output) + ".d").exists())
+            self.assertIn("compiler stdout", log)
+            self.assertIn("compiler stderr", log)
+            self.assertIn("timed out after 0.125 seconds", log)
+            self.assertIn("terminated compiler process group", log)
 
     def test_compiled_sub_100_artifacts_are_removed(self):
         with tempfile.TemporaryDirectory() as directory:

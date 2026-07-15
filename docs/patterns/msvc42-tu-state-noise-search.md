@@ -15,6 +15,13 @@ python3 scripts/tu_state_noise.py \
   --source src/BASE/WINMGR.cpp --rva 0xca6d0 --trials 40 --seed 0x484f4d32
 ```
 
+Each baseline and trial compile has a 120-second default ceiling. Override it with a
+positive finite `--compile-timeout-seconds`; expiry terminates the complete compiler
+process group, including Wine/MSVC descendants, records a rejected timeout trial, and
+continues with the next variant. A baseline timeout fails closed. The end-of-run timing
+summary and successful manifest separately report compile, target-integrity, objdiff,
+COFF-metric, and regression-gate costs.
+
 The default is diagnostic-only. Add `--record-max` only when asking the tool to close an unchanged
 target at exact 100.0000%. It never retains a sub-100 improvement. Generated probe text is never
 retained in reconstructed source, even when it produces 100%.
@@ -72,9 +79,14 @@ The ordered relocation stream records each function-relative offset, relocation 
 identity, and encoded addend. Unknown relocation widths fail exact closure closed.
 Because extra probe-only symbols/storage are allowed in the temporary object, whole-object symbol
 equality is not an acceptance rule. Instead, each trial fails closed unless the canonical target's
-normalized source hash is unchanged, the target remains uniquely identifiable to objdiff, and its
-retail size/score/relocations are extracted. Include-bearing trials must additionally pass the
-allowlist/macro-intersection guard above. The tool also rejects a candidate from best-candidate selection when:
+exact authored suffix from its real line-start `VA(...)` marker is unchanged, the target remains
+uniquely identifiable to objdiff, and its retail size/score/relocations are extracted. This exact
+suffix gate is stronger than recomputing the normalized target hash and avoids a repository-wide
+source-hash census for every trial. The canonical normalized hash is still captured once for the
+retained-max audit. Target resolution ignores incidental `VA(...)` text in trailing comments and
+vtable annotations. Include-bearing trials must additionally pass the allowlist/macro-intersection
+guard above. Invariant predecessor symbols are likewise collected once. The tool also rejects a
+candidate from best-candidate selection when:
 
 - any non-target sibling's objdiff score regresses;
 - any already-exact sibling's raw text or ordered relocation digest changes;
