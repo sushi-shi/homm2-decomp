@@ -5,6 +5,28 @@ linker that stamped PE version **3.00**, and CVTRES 4.00. Compiler identity is h
 confidence from static evidence and matching behavior. The exact final LINK.EXE binary
 is not yet locally available for an A/B link.
 
+The closest evidence-backed shipping pipeline is:
+
+```text
+CL:   /Od /Ob1 /MT /Gr ...          probably without /Z7 or /Zi
+LINK: /DEBUG:NOTMAPPED,MINIMAL
+      /DEBUGTYPE:CV
+      /PDB:NONE
+```
+
+The final LINK/CVPACK pass packed a complete minimal NB09 payload into the executable.
+`/PDB:NONE` is consistent with embedding the payload rather than retaining only an external
+PDB reference; `NOTMAPPED` is consistent with the CodeView debug entry's `AddressOfRawData`
+being zero and its `PointerToRawData` naming payload appended outside the loaded image; and
+`MINIMAL` explains the publics-only symbol inventory.
+The PE also sets `IMAGE_FILE_LOCAL_SYMS_STRIPPED` and `IMAGE_FILE_LINE_NUMS_STRIPPED`.
+
+Two build histories remain possible. The game objects may have been compiled without `/Z7` or
+`/Zi`, so private information never existed, or richer object/PDB debug information may have
+existed internally and then been removed by the minimal shipping link. The executable alone does
+not distinguish those histories. It does prove that no private procedure/type/line information
+survives in the shipped NB09 stream.
+
 ## Static evidence
 - `C:\MSDEV\LIB\{LIBCMT,kernel32,user32,...}.lib` — the VC4 Developer-Studio (MSDEV) layout
   (from CodeView `sstLibraries`).
@@ -16,6 +38,9 @@ is not yet locally available for an A/B link.
   producer, not the final executable linker. The one non-thunk `S_COMPILE` record is
   **`Microsoft CVTRES 4.00`** on `.\Win32_Re\heroes.res`. Game and BASE code objects
   have no `S_COMPILE` records.
+- All 3,541 retained named symbols are `S_PUB32` records with type index zero. There are no
+  game `S_GPROC32`, `S_LPROC32`, labels, locals, types, or source lines; consequently the
+  shipping stream does not provide function lengths.
 - **No Rich header** (`@comp.id`) — the Rich header is VC6+, so this is pre-VC6 (rules out VC5.0/6.0).
 - CRT (`LIBCMT`) exports the MBCS/locale helpers `_setmbcp`, `__initmbctable`,
   `__crtLCMapStringA/W`, `__crtGetStringTypeA/W`, `__crtGetEnvironmentStringsA/W` — the multibyte
