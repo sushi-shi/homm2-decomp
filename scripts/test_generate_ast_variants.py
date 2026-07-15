@@ -301,13 +301,50 @@ class AstVariantSemanticTests(unittest.TestCase):
                 cursor.spelling: cursor for cursor in tu.cursor.get_children()
                 if cursor.kind == ci.CursorKind.FUNCTION_DECL
             }
-            blocking, trailing = classify_parse_errors(tu, source, functions["Target"])
-            later_blocking, _later_trailing = classify_parse_errors(
+            blocking, trailing, allowed, unmatched = classify_parse_errors(
+                tu, source, functions["Target"]
+            )
+            later_blocking, _later_trailing, _allowed, _unmatched = classify_parse_errors(
                 tu, source, functions["Later"]
             )
         self.assertEqual(blocking, [])
         self.assertEqual(len(trailing), 1)
+        self.assertEqual(allowed, [])
+        self.assertEqual(unmatched, set())
         self.assertEqual(len(later_blocking), 1)
+
+    def test_reviewed_external_error_can_be_allowed_exactly(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "earlier_error.cpp"
+            source.write_text(
+                "int Earlier() { int *pointer = 1; return *pointer; }\n"
+                "int Target() { return 1; }\n"
+            )
+            tu = ci.Index.create().parse(str(source), args=["-x", "c++", "-std=c++14"])
+            target = next(
+                cursor for cursor in tu.cursor.get_children()
+                if cursor.kind == ci.CursorKind.FUNCTION_DECL and cursor.spelling == "Target"
+            )
+            blocking, trailing, allowed, unmatched = classify_parse_errors(
+                tu, source, target, ("cannot initialize a variable of type 'int *'",)
+            )
+            earlier = next(
+                cursor for cursor in tu.cursor.get_children()
+                if cursor.kind == ci.CursorKind.FUNCTION_DECL and cursor.spelling == "Earlier"
+            )
+            target_blocking, _trailing, target_allowed, target_unmatched = \
+                classify_parse_errors(
+                    tu, source, earlier, ("cannot initialize a variable of type 'int *'",)
+                )
+        self.assertEqual(blocking, [])
+        self.assertEqual(trailing, [])
+        self.assertEqual(len(allowed), 1)
+        self.assertEqual(unmatched, set())
+        self.assertEqual(len(target_blocking), 1)
+        self.assertEqual(target_allowed, [])
+        self.assertEqual(
+            target_unmatched, {"cannot initialize a variable of type 'int *'"}
+        )
 
 
 if __name__ == "__main__":

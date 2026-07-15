@@ -57,6 +57,9 @@ authoritative. This file is the short, restart-ready Codex workflow.
    prevents one axis from consuming the finite candidate budget. `scripts/permute_ast.py` is only a
    legacy compatibility wrapper, while standalone `scripts/tu_state_noise.py` remains a bounded
    diagnostic for a specifically suspected TU-state wall.
+   If modern libclang rejects a reviewed MSVC 4.2 construct in another function, use the repeatable
+   `--allow-external-diagnostic` exact-substring option. It cannot allow target-local, fatal, foreign-
+   file, or unmatched diagnostics, and every allowance is recorded in the generated manifest.
    TU-state trials temporarily insert deterministic parser-visible declarations, harmless
    definitions, or curated includes and compile outside the normal object path. Probe-only
    symbols/storage may exist in that disposable object, but the canonical target hash, identity,
