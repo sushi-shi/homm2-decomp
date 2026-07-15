@@ -51,8 +51,9 @@ DATA(0x00534c5c) static unsigned int gIcCnt2;
 // A 180-variant exact-span batch retested shared forward-decoder setup and byte-fetch lifetimes.
 // The highest fuzzy setup declared `entry` before its fields, but moved the first structural
 // divergence backward from +0x11 to +0x8, so it was rejected. A command lifetime outside the
-// loop and natural post-increment reads avoid decompiler-shaped `[-1]` source without changing
-// the complete state machine. Explicit labeled backedges are byte-identical and omitted.
+// loop preserves the complete state machine. Explicit labeled backedges are byte-identical and
+// omitted. A later family audit retained increment-then-previous command/payload reads: retail
+// emits that order here and the same source idiom is shared by Icond2b, Iconm2b, and icon2bc.
 // Final raw audit: candidate 0x4c8 versus retail 0x4ed. Both are FPO with EBX/ESI/EDI/EBP saves
 // and ret 0x24; excluding three retail tail-padding NOPs they are 361/364 instructions and 60/61
 // branch sites, with the same complete decoder state-machine coverage.
@@ -67,8 +68,9 @@ DATA(0x00534c5c) static unsigned int gIcCnt2;
 // cross reached 76.530220%, candidate 0x4cc versus retail 0x4ed, with 79/83 relocations. The useful
 // source lever was splitting each payload read into cursor increment followed by `gIcSrc[-1]`; the
 // typed repeated-index setup did not improve the canonical setup. The winning predecessor was a
-// prototype/include-equivalent state. This remains broad unresolved allocation/code generation;
-// neither the split-read source nor any generated declaration was retained below exact closure.
+// prototype/include-equivalent state. A repeat over 229 declaration states with the best local
+// setup/payload combination did not exceed 75.62637% or change 79/83 relocations. Generated
+// declarations remain disposable; the family-consistent read lifetime is retained below.
 VA(0x004d0570, 0x4ed)
 void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                   int clip, int clipX, int clipY, int clipW, int clipH, int color)
@@ -99,8 +101,8 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int fra
     unsigned char *row = dest->m_pixels + gIcPitch * gIcY;
     int cmd;
     for (;;) {
-        unsigned char *commandByte = gIcSrc++;
-        cmd = *commandByte;
+        gIcSrc++;
+        cmd = gIcSrc[-1];
         if (static_cast<signed char>(cmd) < 0) {
             // ---- negative command ----
             if ((cmd & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
@@ -120,16 +122,20 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int fra
             if (count != 0) {
                 // 0xc1 - 0xff : solid colour run
                 if (cmd == ICON_RLE_LONG_SOLID_COMMAND) {
-                    count = *gIcSrc++;
+                    gIcSrc++;
+                    count = gIcSrc[-1];
                 }
-                gIcColor = *gIcSrc++;
+                gIcSrc++;
+                gIcColor = gIcSrc[-1];
                 goto do_fill;
             }
             // 0xc0 : shadow / dim run
-            flags = *gIcSrc++;
+            gIcSrc++;
+            flags = gIcSrc[-1];
             count = flags & ICON_RLE_DIM_SHORT_COUNT_MASK;
             if (count == 0) {
-                count = *gIcSrc++;
+                gIcSrc++;
+                count = gIcSrc[-1];
             }
             gIcDimLen = count;
             if (color != 0) {
