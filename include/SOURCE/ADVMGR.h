@@ -160,7 +160,8 @@ typedef enum AdventureRemoteConstant {
     ADVMGR_REMOTE_COMMAND_PLAYER_EXIT = 31,
     ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT = 33,
     ADVMGR_REMOTE_COMMAND_GROUP_MAP_CHANGE = 41,
-    ADVMGR_REMOTE_LOAD_MAP_CHANGE = 11
+    ADVMGR_REMOTE_LOAD_MAP_CHANGE = 11,
+    ADVMGR_REMOTE_PAYLOAD_VIEW_SIZE = 16
 } AdventureRemoteConstant;
 
 typedef enum AdventureRemoteWaitConstant {
@@ -172,25 +173,6 @@ typedef enum AdventureRemoteWaitConstant {
     ADVMGR_REMOTE_WAIT_EXIT_MESSAGE = 0x4000,
     ADVMGR_REMOTE_WAIT_EXIT_RESULT = 2
 } AdventureRemoteWaitConstant;
-
-#pragma pack(push, 1)
-struct AdventureRemotePacket {
-    signed char sender;
-    char unknown1[4];
-    signed char type;
-    signed char command;
-    char unknown7[2];
-    union {
-        char payload[16];
-        struct {
-            int saveDataSize;
-            int saveCrc;
-            int saveTransmitCrc;
-            int savePlayerExited;
-        };
-    };
-};
-#pragma pack(pop)
 
 typedef enum AdventureEnvironmentSoundConstant {
     ADVMGR_ENVIRONMENT_SOUND_NONE = -1,
