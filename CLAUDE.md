@@ -194,13 +194,14 @@ dev shell's Ghidra env (in the flake).
 - `docs/patterns/INDEX.md` — codegen idiom catalog (grep by symptom/tag when a diff row sticks).
 - `docs/compiler-detection.md`, `docs/linker-flags.md` — toolchain facts.
 - `scripts/od_slots.py` (predict/solve slots) · `scripts/od_oracle.py` (verify vs real cl).
-- `scripts/permute_ast.py` — **preferred** permutation-search hill-climber: mutates via the
-  real clang AST (`clang.cindex`), swapping *true operand source ranges*, so precedence/parens
-  are handled without the regex tool's precedence-crossing false-match class. AST-correct ranges
-  do not prove semantic equivalence, so audit every retained mutation; unsafe inequality +/-1
-  rewrites are disabled. Parses with clangd's own flags and rejects mutations that regress sibling
-  functions. It will not fix a slot miss; use `od_slots.py` for that. Every retained gain still
-  needs a per-diff value-preservation audit.
+- `scripts/match_variants.py` — **preferred exact-only last-mile search frontend**. It combines
+  hardened libclang AST mutations, parser-visible TU-state variants, and optional hand-authored
+  exact-span axes in one validated, family-balanced search. Use shallow bounded searches and
+  repeatable `--require-mutation` filters only after semantics, CFG, frame/slots, and relocations
+  align. AST-correct ranges do not prove semantic equivalence, so inspect every candidate and
+  retain generated source only for audited exact 100% closure. It will not fix a slot miss; use
+  `od_slots.py` for that. `permute_ast.py` and `tu_state_noise.py` remain compatibility/diagnostic
+  frontends, not the default campaign entry point.
 - `homm2 sema <cmd>` — semantic navigation (xref/disasm/strings/match/rva/clangd; see
   Build loop). Modules in `scripts/homm2/analysis/`; Ghidra pipeline in `scripts/homm2/ghidra/`.
 - `editor/nvim` — `:Homm2` in-editor diff/build/status (auto-loaded by the dev-shell).
