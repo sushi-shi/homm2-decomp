@@ -33,6 +33,7 @@
         patches = [
           ./patches/vostok-delinker-canonical-data-alias.patch
           ./patches/vostok-delinker-reviewed-data.patch
+          ./patches/vostok-delinker-contribution-manifest.patch
         ];
         cargoHash = "sha256-ry3TH1fz7Aj/JdbmlgQFFn29m8E7EQHyGaVXnZTEcXo=";
       };

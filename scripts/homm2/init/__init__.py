@@ -26,7 +26,8 @@ def main(argv=None):
     shutil.rmtree(REPO / "build/delink", ignore_errors=True); (REPO / "build/delink").mkdir(parents=True)
     if run("vostok-delinker", "--pdb-path", "build/pdb/HEROES2W.pdb", "--exe-path", "build/orig/HEROES2W.EXE",
            "--output-path", "build/delink", "--engine-path", "c:\\proj\\",
-           "--data-manifest", "build/gen/reviewed_delink_data.tsv"): return 1
+           "--data-manifest", "build/gen/reviewed_delink_data.tsv",
+           "--contribution-manifest", "build/gen/delink_contributions.tsv"): return 1
     if run("python3", "-m", "homm2.build.reviewed_data", "--record-current"): return 1
     # 5. configure the base build + objdiff project
     if run("python3", "configure.py"): return 1
