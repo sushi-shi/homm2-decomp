@@ -19,6 +19,7 @@ typedef enum CursorConstant {
     CURSOR_MAP_DRAW_OFFSET = 7,
     CURSOR_DRAW_X = 0xe0,
     CURSOR_FLIPPED_DRAW_X = 0x100,
+    CURSOR_SHADOW_FLIP_X_ADJUST = 0x20,
     CURSOR_DRAW_Y = 0xff,
     CURSOR_BOAT_DRAW_Y = 0xf5,
     CURSOR_CLIP_SIZE = 0x1e0,
