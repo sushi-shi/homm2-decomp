@@ -7,7 +7,7 @@ non-overlapping edits, and writes their exact byte ranges and before/after text 
 The batch runner validates those ranges against the unchanged source before compiling.
 
 Generated families are operand order for commutative/relational expressions, reorder of
-independent local assignments, split/merge of simple local declarations, extraction of a
+independent local assignments, split/merge/hoist of simple local declarations, extraction of a
 pure expression into an inline helper, and extraction of the common read-then-advance cursor
 idiom.  It can merge several helper definitions at the same insertion point and generate a
 two-level helper chain for nested pure expressions.  Other sequencing changes are intentionally
@@ -491,6 +491,100 @@ def declaration_edits(fn, blob: bytes) -> list[AstMutation]:
                 (AstEdit(first_start, second_end, replacement),),
             ))
     return edits
+
+
+def declaration_hoist_edits(fn, blob: bytes) -> list[AstMutation]:
+    """Hoist a fundamental local declaration while leaving its initialization in place.
+
+    This changes only the lexical lifetime and compiler symbol-table position.  It is restricted
+    to one initialized scalar/enum/pointer local with no qualifiers, duplicate spelling, line-
+    sensitive token, or intervening reference that could be rebound by the wider scope.
+    """
+    bodies = [child for child in fn.get_children() if child.kind == ci.CursorKind.COMPOUND_STMT]
+    if len(bodies) != 1:
+        return []
+    body = bodies[0]
+    body_start, _body_end = cursor_range(body)
+    if blob[body_start:body_start + 1] != b"{":
+        return []
+    insertion = body_start + 1
+    open_line_start = blob.rfind(b"\n", 0, body_start) + 1
+    body_indent = blob[open_line_start:body_start] + b"    "
+
+    declarations = [
+        node for node in fn.walk_preorder()
+        if node.kind in (ci.CursorKind.VAR_DECL, ci.CursorKind.PARM_DECL)
+    ]
+    spelling_counts = {}
+    for declaration in declarations:
+        spelling_counts[declaration.spelling] = spelling_counts.get(declaration.spelling, 0) + 1
+
+    mutations = []
+    for statement in fn.walk_preorder():
+        if statement.kind != ci.CursorKind.DECL_STMT:
+            continue
+        variables = [child for child in statement.get_children() if child.kind == ci.CursorKind.VAR_DECL]
+        if len(variables) != 1:
+            continue
+        variable = variables[0]
+        if variable.semantic_parent != fn or spelling_counts.get(variable.spelling) != 1:
+            continue
+        kind = canonical_kind(variable.type)
+        if kind not in INTEGRAL_TYPE_KINDS | FLOAT_TYPE_KINDS | {ci.TypeKind.ENUM, ci.TypeKind.POINTER}:
+            continue
+        if (
+            type_is_volatile(variable.type) or variable.type.is_const_qualified()
+            or not variable.spelling
+            or variable.storage_class not in (
+                ci.StorageClass.NONE, ci.StorageClass.AUTO, ci.StorageClass.REGISTER
+            )
+        ):
+            continue
+        start, end = cursor_range(statement)
+        name_start = variable.location.offset
+        name_end = name_start + len(variable.spelling.encode("utf-8"))
+        variable_end = variable.extent.end.offset
+        if not insertion < start < name_start < name_end <= variable_end <= end:
+            continue
+        source = blob[start:end]
+        declaration_prefix = blob[start:name_start]
+        if (
+            contains_context_sensitive_tokens(source) or b"," in source
+            or b"auto" in declaration_prefix.split()
+        ):
+            continue
+        equal_tokens = [
+            token for token in variable.get_tokens()
+            if token.spelling == "=" and token.extent.start.offset >= name_end
+        ]
+        if len(equal_tokens) != 1:
+            continue
+        equal = equal_tokens[0]
+        if blob[variable_end:end].strip() != b";":
+            continue
+        if any(
+            node.kind == ci.CursorKind.DECL_REF_EXPR
+            and insertion < node.location.offset < start
+            and node.spelling == variable.spelling
+            and (node.referenced is None or node.referenced.hash != variable.hash)
+            for node in fn.walk_preorder()
+        ):
+            continue
+        declaration = blob[start:name_end].strip() + b";"
+        assignment = (
+            variable.spelling.encode("utf-8")
+            + b" " + blob[equal.extent.start.offset:variable_end]
+            + b";"
+        )
+        mutations.append(AstMutation(
+            "declaration_hoist",
+            f"line-{line_number(blob, start)}-{variable.spelling}",
+            (
+                AstEdit(insertion, insertion, b"\n" + body_indent + declaration),
+                AstEdit(start, end, assignment),
+            ),
+        ))
+    return mutations
 
 
 def usable_type_spelling(spelling: str) -> bool:
@@ -1060,6 +1154,8 @@ def atomic_mutations(
     rename_name_count: int, rename_identifiers: set[str], rename_candidates: tuple[str, ...],
 ) -> list[AstMutation]:
     mutations = expression_edits(fn, blob) + statement_order_edits(fn, blob) + declaration_edits(fn, blob)
+    if "declaration_hoist" in families:
+        mutations += declaration_hoist_edits(fn, blob)
     if "inline_expression" in families:
         mutations += inline_expression_edits(fn, blob, insertion, helper_name_count)
     if "inline_member_access" in families:
@@ -1216,7 +1312,7 @@ def main(argv=None, *, prog=None, description=None) -> int:
         "--families",
         default=(
             "commutative_order,relational_order,independent_statement_order,declaration_split,"
-            "declaration_merge,inline_expression,inline_read_advance"
+            "declaration_merge,declaration_hoist,inline_expression,inline_read_advance"
             ",inline_nested_expression,inline_member_access"
         ),
         help="comma-separated AST edit families",
@@ -1291,7 +1387,7 @@ def main(argv=None, *, prog=None, description=None) -> int:
     families = {family for family in args.families.split(",") if family}
     known_families = {
         "commutative_order", "relational_order", "independent_statement_order",
-        "declaration_split", "declaration_merge", "inline_expression", "inline_read_advance",
+        "declaration_split", "declaration_merge", "declaration_hoist", "inline_expression", "inline_read_advance",
         "inline_nested_expression", "inline_member_access", "identifier_rename",
         "inline_global_read",
     }

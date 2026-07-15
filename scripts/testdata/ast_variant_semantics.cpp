@@ -98,6 +98,26 @@ int SafeDeclarations()
     return first + second + third + fourth;
 }
 
+int SafeDeclarationHoist(int count)
+{
+    if (count > 0) {
+        int rows = count;
+        return rows;
+    }
+    return 0;
+}
+
+int RejectedDeclarationHoist(int count)
+{
+    static int persistent = count;
+    const int value = count;
+    if (count > 0) {
+        int value = count + 1;
+        return value;
+    }
+    return value + persistent;
+}
+
 int RejectedVolatileOrder(volatile AstRecord &record, int scalar)
 {
     int first;
