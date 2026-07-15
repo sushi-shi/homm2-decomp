@@ -42,6 +42,36 @@ strict target from those versioned inputs instead.
 
 The explicit topology commands are:
 
+- `homm2 data-topology census` compares every configured candidate object with its fixed delinked
+  target and writes `build/gen/data_topology_census.json`. It treats symbol names and complete COFF
+  topology records as multisets, so duplicated target symbols remain visible. `missing` means an
+  expected candidate identity is absent from the target; `extra` means a target-only identity. The
+  report includes per-object and whole-tree common/union counts and both lists with multiplicity,
+  defined/common/undefined state, data section, local/global scope, raw storage-class mismatches,
+  and `const_`/`string_`/`data_`/`bss_` inventories. Exact topology records are proved mappings;
+  same-name records with different definition/scope/storage topology are reported separately as
+  provisional real mappings. The canonical target may contain provisional real mappings while
+  recovery is in progress, but `const_`, `string_`, `data_`, `bss_`, `empty_stub`, and
+  `[section-N]` fallback identities are always hard errors.
+
+  Symbol equality is not sufficient for an exact object. A separate raw COFF data-section
+  multiset retains section-table ordinal/order, duplicate raw names such as Midi's COMDAT `.data`
+  contributions, size, characteristics, decoded alignment, COMDAT selection/associative parent,
+  relocation count, and section-definition symbol plus auxiliary metadata. It never uses objdiff's
+  synthesized `[.data-N]` display labels. Exact-object status requires both symbol and section
+  topology equality; section drift is also a strict hard error. The default iterative mode exits
+  successfully after writing all available diagnostics; `--strict` fails on a missing/invalid
+  object, any target fallback identity, or any real identity without a counterpart. Input roots,
+  suffixes, unit manifest, and output path are command-line options so the same COFF audit can be
+  run against another build tree.
+
+  The same JSON keeps allocation provenance separate. `DATA()` definitions in `src/**/*.cpp` are
+  canonical source allocations. Candidate definitions which map to those source names are reported
+  as DATA-covered; remaining candidate definitions are compiler-private derived topology. Rows in
+  `config/delink_data_topology.tsv` are supplemental linker metadata only. A supplemental row which
+  repeats a canonical DATA allocation, or disagrees with its owner/RVA/storage evidence, is a hard
+  error rather than a second definition. `--source-root`, `--supplemental`, and `--symbols` select
+  these inputs for another tree.
 - `homm2 data-topology propose` writes a disposable partial manifest and structured diagnostics to
   `build/gen/`. It never changes versioned configuration or target objects.
 - `homm2 data-topology promote` writes a versioned snapshot of every currently proved closed group,
