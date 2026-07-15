@@ -16,14 +16,18 @@ payload hash and relocation count. The generator never promotes a provisional
 next-public gap in `build/gen/symbol_names.csv` to CodeView truth.
 
 The patched delinker consumes the project-neutral columns `name`, `object`, `rva`,
-`size`, `storage`, `alignment`, and `provenance` through `--data-manifest`. It emits
+`size`, `storage`, `alignment`, `section_offset`, `scope`, and `provenance` through
+`--data-manifest`. It emits
 each full definition in its explicitly named target object, preserves the manifest
 `.data`/`.rdata`/`.bss` class and alignment, and converts base relocations inside the
 definition to COFF relocations. Function
 references to enrolled definitions become externals instead of creating duplicated
 four-byte target allocations.
 
-The header and seven-column row shape are exact. Names, object paths, and provenance
+The header and nine-column row shape are exact. A numeric `section_offset` enrolls the
+row in a candidate-topology group; `-` preserves the legacy reviewed allocation form.
+`scope` is `local` or `external` and controls the emitted COFF symbol scope. Names,
+object paths, and provenance
 must be non-empty and contain no control bytes. Object paths are normalized relative
 paths; absolute, drive-qualified, UNC, empty-component, and parent-component paths
 are rejected. Names and RVAs are globally unique, extents must be non-zero,

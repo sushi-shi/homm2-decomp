@@ -27,7 +27,8 @@ def main(argv=None):
     if run("vostok-delinker", "--pdb-path", "build/pdb/HEROES2W.pdb", "--exe-path", "build/orig/HEROES2W.EXE",
            "--output-path", "build/delink", "--engine-path", "c:\\proj\\",
            "--data-manifest", "build/gen/reviewed_delink_data.tsv",
-           "--contribution-manifest", "build/gen/delink_contributions.tsv"): return 1
+           "--contribution-manifest", "build/gen/delink_contributions.tsv",
+           "--recover-data-relocs-from-pdb"): return 1
     if run("python3", "-m", "homm2.build.reviewed_data", "--record-current"): return 1
     # 5. configure the base build + objdiff project
     if run("python3", "configure.py"): return 1
