@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import argparse
 import glob
+import hashlib
 import itertools
 import json
 import os
@@ -657,6 +658,16 @@ def merge_insertions(edits) -> tuple[AstEdit, ...]:
     return tuple(sorted(replacements, key=lambda edit: (edit.start, edit.end)))
 
 
+def mutation_name(mutation: AstMutation) -> str:
+    digest = hashlib.sha256()
+    for edit in mutation.edits:
+        digest.update(edit.start.to_bytes(8, "little"))
+        digest.update(edit.end.to_bytes(8, "little"))
+        digest.update(edit.replacement)
+    anchor = max(edit.start for edit in mutation.edits)
+    return f"{mutation.family}:{mutation.label}@{anchor}-{digest.hexdigest()[:8]}"
+
+
 def candidate_payloads(
     blob: bytes, mutations: list[AstMutation], max_depth: int, limit: int, min_depth: int = 1
 ):
@@ -671,8 +682,7 @@ def candidate_payloads(
             ordered = sorted(edits, key=lambda edit: edit.start)
             candidates.append({
                 "name": "+".join(
-                    f"{mutation.family}:{mutation.label}@{max(edit.start for edit in mutation.edits)}"
-                    for mutation in combination
+                    mutation_name(mutation) for mutation in combination
                 ),
                 "families": sorted({mutation.family for mutation in combination}),
                 "edits": [
