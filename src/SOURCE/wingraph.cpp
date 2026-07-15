@@ -626,8 +626,8 @@ void WGInitGraphics(void)
         screenImage.header.biBitCount = WINGRAPH_COLOR_DEPTH;
         screenImage.header.biCompression = BI_RGB;
         screenImage.header.biSizeImage = 0;
-        screenImage.header.biXPelsPerMeter = 0;
-        screenImage.header.biYPelsPerMeter = 0;
+        screenImage.header.biClrUsed = 0;
+        screenImage.header.biClrImportant = 0;
     }
     screenImage.header.biWidth = WINGRAPH_WIDTH;
     screenImage.header.biHeight = -WINGRAPH_HEIGHT;
