@@ -437,7 +437,7 @@ SOURCE/ADVMGR	?CheckSetEvilInterface@advManager@@QAEXHH@Z	99.8370	f51253f8c2d0
 SOURCE/ADVMGR	?ClearBottomView@advManager@@QAEXXZ	100.0000	ad1a473ee01a
 SOURCE/ADVMGR	?Close@advManager@@UAEXXZ	100.0000	2c5dbd8652cb
 SOURCE/ADVMGR	?ComboDraw@advManager@@QAEHH@Z	100.0000	c2dbe6f5f55b
-SOURCE/ADVMGR	?ComboDraw@advManager@@QAEHHHH@Z	99.2775	d68a22fdae0a
+SOURCE/ADVMGR	?ComboDraw@advManager@@QAEHHHH@Z	99.2775	5db3f416165c
 SOURCE/ADVMGR	?CompleteDraw@advManager@@QAEXH@Z	100.0000	35183578d1c2
 SOURCE/ADVMGR	?CompleteDraw@advManager@@QAEXHHHH@Z	100.0000	3d39efd3fef1
 SOURCE/ADVMGR	?ComputeAdvNetControl@@YIXXZ	99.7123	53e1bc95319c
@@ -446,11 +446,11 @@ SOURCE/ADVMGR	?DeactivateCurrHero@advManager@@QAEXXZ	100.0000	5d350ed465dd
 SOURCE/ADVMGR	?DeactivateCurrTown@advManager@@QAEXXZ	100.0000	b8067be323b6
 SOURCE/ADVMGR	?DemobilizeCurrHero@advManager@@QAEXXZ	96.5049	3e3ad19464ef
 SOURCE/ADVMGR	?DimensionDoor@advManager@@QAEXXZ	100.0000	59d18bbd3921
-SOURCE/ADVMGR	?DimensionDoorHandler@@YIHAAUtag_message@@@Z	98.2857	de91d45cf2f5
+SOURCE/ADVMGR	?DimensionDoorHandler@@YIHAAUtag_message@@@Z	98.2857	afd8ce5ee640
 SOURCE/ADVMGR	?DisableButtons@advManager@@QAEXXZ	100.0000	6321339f8a72
 SOURCE/ADVMGR	?DoAdvCommand@advManager@@QAEPAVmapCell@@XZ	99.9002	e6752ccba297
 SOURCE/ADVMGR	?DoHeroKnob@advManager@@QAEXXZ	99.0000	0693d9ad937d
-SOURCE/ADVMGR	?DoTownKnob@advManager@@QAEXXZ	99.0000	525546b72915
+SOURCE/ADVMGR	?DoTownKnob@advManager@@QAEXXZ	99.0000	ebee8160cca9
 SOURCE/ADVMGR	?DoVisions@advManager@@QAEHPAVhero@@@Z	100.0000	92724a78f3bb
 SOURCE/ADVMGR	?DrawAdventureBorder@advManager@@QAEXXZ	99.7901	05da242e3153
 SOURCE/ADVMGR	?DrawCell@advManager@@QAEXHHHHHH@Z	99.5504	a79934b1f278
