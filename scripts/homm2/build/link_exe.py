@@ -25,6 +25,7 @@ from homm2.build.gen_vendor_imports import LINK300_FORCED_VENDOR_IMPORTS
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO = next((p for p in SCRIPT_DIR.parents if (p / "flake.nix").exists()), SCRIPT_DIR)
 RETAIL_EXE = REPO / "build/orig/HEROES2W.EXE"
+REQUIRED_INITIALIZED_STORAGE = REPO / "config/required_initialized_storage.tsv"
 IMAGE_BASE = 0x400000
 PE32_MAGIC = 0x10B
 COFF_SECTION_HEADER_SIZE = 40
@@ -32,8 +33,10 @@ COFF_FILE_HEADER_SIZE = 20
 IMAGE_SCN_ALIGN_MASK = 0x00F00000
 IMAGE_SCN_MEM_EXECUTE = 0x20000000
 IMAGE_DIRECTORY_ENTRY_IMPORT = 1
+IMAGE_DIRECTORY_ENTRY_BASERELOC = 5
 IMPORT_DESCRIPTOR_SIZE = 20
 IMPORT_ORDINAL_FLAG32 = 0x80000000
+IMAGE_REL_BASED_HIGHLOW = 3
 NB09_SST_MODULE = 0x120
 NB09_SST_ALIGN_SYM = 0x125
 CODEVIEW_S_COMPILE = 0x0001
@@ -381,6 +384,88 @@ def read_pe(path):
     }
 
 
+def add_retail_payload_evidence(public_symbols, path, names=None):
+    """Attach authoritative retail bytes and base-relocation counts to public data rows."""
+    data = Path(path).read_bytes()
+    pe_offset = struct.unpack_from("<I", data, 0x3C)[0]
+    coff = pe_offset + 4
+    section_count = struct.unpack_from("<H", data, coff + 2)[0]
+    optional_size = struct.unpack_from("<H", data, coff + 16)[0]
+    optional = coff + 20
+    section_offset = optional + optional_size
+    sections = []
+    for index in range(section_count):
+        offset = section_offset + index * COFF_SECTION_HEADER_SIZE
+        virtual_size, rva, raw_size, raw_offset = struct.unpack_from(
+            "<IIII", data, offset + 8)
+        sections.append({
+            "rva": rva,
+            "virtual_size": virtual_size,
+            "raw_size": raw_size,
+            "raw_offset": raw_offset,
+        })
+
+    def raw_offset(rva):
+        for section in sections:
+            extent = max(section["virtual_size"], section["raw_size"])
+            if section["rva"] <= rva < section["rva"] + extent:
+                delta = rva - section["rva"]
+                if delta >= section["raw_size"]:
+                    return None
+                return section["raw_offset"] + delta
+        raise ValueError("RVA 0x%x is outside PE sections in %s" % (rva, path))
+
+    relocation_rvas = []
+    directory = optional + 96 + IMAGE_DIRECTORY_ENTRY_BASERELOC * 8
+    relocation_rva, relocation_size = struct.unpack_from("<II", data, directory)
+    if relocation_rva and relocation_size:
+        cursor = raw_offset(relocation_rva)
+        end = cursor + relocation_size
+        while cursor is not None and cursor + 8 <= end:
+            page_rva, block_size = struct.unpack_from("<II", data, cursor)
+            if block_size < 8 or cursor + block_size > end:
+                raise ValueError("invalid PE base-relocation block in %s" % path)
+            for entry_offset in range(cursor + 8, cursor + block_size, 2):
+                entry = struct.unpack_from("<H", data, entry_offset)[0]
+                if entry >> 12 == IMAGE_REL_BASED_HIGHLOW:
+                    relocation_rvas.append(page_rva + (entry & 0x0FFF))
+            cursor += block_size
+
+    for row in public_symbols["symbols"]:
+        if names is not None and row["name"] not in names:
+            continue
+        rva = int(row["retail_rva"], 16)
+        size = row["size"] or 0
+        payload = bytearray(size)
+        remaining = size
+        payload_offset = 0
+        current_rva = rva
+        while remaining:
+            section = next((section for section in sections
+                            if section["rva"] <= current_rva <
+                            section["rva"] + max(section["virtual_size"],
+                                                 section["raw_size"])), None)
+            if section is None:
+                raise ValueError("public data span at RVA 0x%x is outside PE sections" % rva)
+            delta = current_rva - section["rva"]
+            chunk = min(remaining,
+                        max(section["virtual_size"], section["raw_size"]) - delta)
+            raw_chunk = min(chunk, max(section["raw_size"] - delta, 0))
+            if raw_chunk:
+                start = section["raw_offset"] + delta
+                payload[payload_offset:payload_offset + raw_chunk] = data[start:start + raw_chunk]
+            remaining -= chunk
+            payload_offset += chunk
+            current_rva += chunk
+        row["retail_payload"] = {
+            "size": size,
+            "nonzero_byte_count": sum(byte != 0 for byte in payload),
+            "sha256": hashlib.sha256(payload).hexdigest(),
+            "highlow_base_relocation_count": sum(
+                rva <= relocation < rva + size for relocation in relocation_rvas),
+        }
+
+
 def read_imports(path):
     data = Path(path).read_bytes()
     pe_offset = struct.unpack_from("<I", data, 0x3C)[0]
@@ -574,6 +659,55 @@ def load_retail_data_symbols(path=None):
             })
     symbols.sort(key=lambda row: (row["rva"], row["name"]))
     return symbols
+
+
+def load_required_initialized_storage(path=None):
+    path = Path(path or REQUIRED_INITIALIZED_STORAGE)
+    if not path.exists():
+        raise RuntimeError("required initialized-storage enrollment missing: %s" % path)
+    with path.open(newline="") as f:
+        rows = csv.DictReader(
+            (line for line in f if not line.lstrip().startswith("#")), delimiter="\t")
+        return [{"name": row["name"], "unit": row["unit"]} for row in rows]
+
+
+def required_initialized_storage_diagnostics(public_symbols, required):
+    by_name = {row["name"]: row for row in public_symbols["symbols"]}
+    rows = []
+    for expectation in required:
+        symbol = by_name.get(expectation["name"])
+        if symbol is None:
+            status = "retail-symbol-missing"
+        elif symbol["unit"] != expectation["unit"]:
+            status = "owner-mismatch"
+        elif symbol["candidate_count"] != 1:
+            status = symbol["status"]
+        elif not symbol["storage_class_matches"]:
+            status = "storage-class-mismatch"
+        else:
+            status = "verified"
+        rows.append({
+            "name": expectation["name"],
+            "unit": expectation["unit"],
+            "status": status,
+            "retail_storage_class": (
+                symbol["retail_storage"]["class"] if symbol is not None else None),
+            "candidate_storage_class": (
+                symbol["candidate_storage"]["class"]
+                if symbol is not None and symbol["candidate_storage"] else None),
+            "retail_payload": symbol.get("retail_payload") if symbol is not None else None,
+        })
+    violations = [row for row in rows if row["status"] != "verified"]
+    return {
+        "required": len(rows),
+        "verified": len(rows) - len(violations),
+        "violations": violations,
+        "symbols": rows,
+        "note": (
+            "This checked enrollment contains reviewed initializer recoveries only. The known "
+            "transitional backlog remains visible in public_symbols; every recovered batch must "
+            "be enrolled so initialized storage cannot silently regress to loader-zero storage."),
+    }
 
 
 def classify_pe_storage(pe, rva):
@@ -1050,7 +1184,8 @@ def read_order_response(path):
     return objects
 
 
-def run_link(output, order_response, imports_libraries, resource_path, linker_override=None):
+def run_link(output, order_response, imports_libraries, resource_path, linker_override=None,
+             required_initialized_path=None):
     output = Path(output).resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
     report_path = output.with_suffix(".link.json")
@@ -1170,6 +1305,18 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
         },
         "units": [],
     }
+    required_storage_ok = True
+    if report["static_storage"]:
+        required = load_required_initialized_storage(required_initialized_path)
+        add_retail_payload_evidence(
+            report["static_storage"]["public_symbols"], RETAIL_EXE,
+            {row["name"] for row in required})
+        required_diagnostics = required_initialized_storage_diagnostics(
+            report["static_storage"]["public_symbols"], required)
+        report["static_storage"]["required_initialized"] = required_diagnostics
+        required_storage_ok = not required_diagnostics["violations"]
+        if not required_storage_ok and report["status"] == "linked":
+            report["status"] = "required-initialized-storage-mismatch"
     map_symbols = parse_map_symbols(map_path)
     for row in order:
         anchor = next(((rva, symbol, map_symbols[symbol][0])
@@ -1242,6 +1389,23 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
               (public_summary["storage_class_matches"],
                public_summary["storage_class_mismatches"],
                public_summary["constant_displacement_runs"]))
+        required_storage = storage["required_initialized"]
+        print("link audit: required initialized storage %d/%d verified" %
+              (required_storage["verified"], required_storage["required"]))
+        for violation in required_storage["violations"]:
+            print("link audit: required initialized storage FAIL %s (%s): retail %s, "
+                  "candidate %s" %
+                  (violation["name"], violation["unit"],
+                   violation["retail_storage_class"],
+                   violation["candidate_storage_class"]))
+        for verified in required_storage["symbols"]:
+            if verified["status"] != "verified":
+                continue
+            payload = verified["retail_payload"]
+            print("link audit: required initialized storage OK %s: %d/%d nonzero bytes, "
+                  "%d HIGHLOW relocations, sha256 %s" %
+                  (verified["name"], payload["nonzero_byte_count"], payload["size"],
+                   payload["highlow_base_relocation_count"], payload["sha256"]))
         if public_summary["missing_root_cause_counts"]:
             print("link audit: missing public-data causes: %s" % ", ".join(
                 "%s=%d" % item
@@ -1276,7 +1440,8 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
     print("link audit: %s" % report_path)
     print("link audit: %s" % missing_data_path)
     return (0 if run.returncode == 0 and output.exists() and vendor_import_abi_match and
-            vendor_import_order_match and advapi_import_abi_match and resource_match else
+            vendor_import_order_match and advapi_import_abi_match and resource_match and
+            required_storage_ok else
             (run.returncode or 1))
 
 
@@ -1287,6 +1452,9 @@ def main(argv=None):
     parser.add_argument("--imports", action="append")
     parser.add_argument("--resource", default=str(REPO / "build/link/HEROES2W.res"))
     parser.add_argument("--linker", help="alternate LINK.EXE for an isolated A/B link")
+    parser.add_argument(
+        "--required-initialized", default=str(REQUIRED_INITIALIZED_STORAGE),
+        help="checked TSV enrollment of reviewed globals that must retain retail storage class")
     parser.add_argument("--write-order", metavar="PATH")
     args = parser.parse_args(argv)
     try:
@@ -1298,7 +1466,8 @@ def main(argv=None):
             str(REPO / "build/link/vendor-imports-wing.lib"),
             str(REPO / "build/link/system-imports-advapi.lib"),
         ]
-        return run_link(args.out, args.order, imports, args.resource, args.linker)
+        return run_link(args.out, args.order, imports, args.resource, args.linker,
+                        args.required_initialized)
     except (OSError, ValueError, RuntimeError) as exc:
         return die(str(exc))
 

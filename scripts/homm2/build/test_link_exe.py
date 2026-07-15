@@ -7,11 +7,13 @@ from homm2.build.link_exe import (
     LINK300_FORCED_VENDOR_IMPORTS, RETAIL_LINK_FLAGS, SYSTEM_LIBS_AFTER_VENDOR,
     SYSTEM_LIBS_BEFORE_VENDOR, build_link_command, classify_missing_public_data,
     classify_pe_storage, decode_map_symbol_name,
-    decode_s_compile_banner, load_retail_data_symbols, load_retail_order,
+    decode_s_compile_banner, load_required_initialized_storage,
+    load_retail_data_symbols, load_retail_order,
     link_environment, normalized_dll_import, normalized_vendor_imports,
     parse_map_contributions, parse_map_symbol_records,
     parse_map_symbols, parse_unresolved, read_coff_section, read_imports, read_order_response,
-    read_pe, resolve_link_executable, sibling_tool_identities, static_symbol_diagnostics)
+    read_pe, required_initialized_storage_diagnostics, resolve_link_executable,
+    sibling_tool_identities, static_symbol_diagnostics)
 
 
 class LinkExeTest(unittest.TestCase):
@@ -244,6 +246,38 @@ class LinkExeTest(unittest.TestCase):
         self.assertEqual(audit["summary"]["constant_displacement_runs"], 2)
         self.assertEqual(audit["displacement_runs"][0]["count"], 2)
         self.assertEqual([row["name"] for row in audit["first_divergences"]], ["a", "c"])
+
+    def test_required_initialized_storage_rejects_loader_zero_regression(self):
+        public_symbols = {"symbols": [
+            {
+                "name": "recovered", "unit": "SOURCE/KB", "candidate_count": 1,
+                "status": "storage-class-mismatch", "storage_class_matches": False,
+                "retail_storage": {"class": "data-initialized"},
+                "candidate_storage": {"class": "data-loader-zero"},
+            },
+            {
+                "name": "pending", "unit": "SOURCE/KB", "candidate_count": 1,
+                "status": "storage-class-mismatch", "storage_class_matches": False,
+                "retail_storage": {"class": "data-initialized"},
+                "candidate_storage": {"class": "data-loader-zero"},
+            },
+        ]}
+        diagnostics = required_initialized_storage_diagnostics(
+            public_symbols, [{"name": "recovered", "unit": "SOURCE/KB"}])
+        self.assertEqual(diagnostics["verified"], 0)
+        self.assertEqual(diagnostics["violations"][0]["status"],
+                         "storage-class-mismatch")
+        self.assertNotIn("pending", [row["name"] for row in diagnostics["symbols"]])
+
+    def test_required_initialized_storage_loader_skips_comments(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "required.tsv"
+            path.write_text(
+                "# reviewed recovery enrollment\n"
+                "name\tunit\n"
+                "?global@@3HA\tSOURCE/KB\n")
+            required = load_required_initialized_storage(path)
+        self.assertEqual(required, [{"name": "?global@@3HA", "unit": "SOURCE/KB"}])
 
     def test_coff_section_parser_reports_raw_and_alignment_rounded_size(self):
         data = bytearray(0x100)
