@@ -57,7 +57,11 @@ DATA(0x00534c5c) static unsigned int gIcCnt2;
 // and ret 0x24; excluding three retail tail-padding NOPs they are 361/364 instructions and 60/61
 // branch sites, with the same complete decoder state-machine coverage.
 // This is an unresolved compiler-state residual, not a proven wall. Revisit after a real reachable
-// type/header change; no permutation tool was used.
+// type/header change. The 2026-07-15 libclang generator compiled 256 shallow AST/helper candidates
+// in 240.33s and 256 depth-2/3 combinations in 246.24s. Both disposable maxima were 74.565930%,
+// 0x4c9 candidate bytes versus 0x4ed retail and 80/83 relocations, from extracting the entry-offset
+// multiply into an inline helper. Nested and bundled helpers did not raise that maximum; no generated
+// source was retained because neither batch reached exact closure.
 VA(0x004d0570, 0x4ed)
 void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                   int clip, int clipX, int clipY, int clipW, int clipH, int color)
