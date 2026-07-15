@@ -604,7 +604,7 @@ void ReadPrefsFromRegistry(void)
     strcpy(szScratch, "");
     strcpy(szKey, "SOFTWARE\\New World Computing\\Heroes of Might and Magic 2\\1.0");
     hKey = 0;
-    if (RegOpenKeyA(HKEY_LOCAL_MACHINE, szKey, &hKey) != 0)
+    if (RegCreateKeyA(HKEY_LOCAL_MACHINE, szKey, &hKey) != 0)
         return;
     dwSize = 4;
     if (RegQueryValueExA(hKey, "Music Volume", 0, &dwType,

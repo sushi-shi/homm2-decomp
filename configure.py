@@ -74,7 +74,8 @@ def main():
                 inputs=["build/orig/HEROES2W.EXE",
                         "scripts/homm2/build/extract_resources.py"])
         link_outputs = ["build/link/HEROES2W.EXE", "build/link/HEROES2W.map",
-                        "build/link/HEROES2W.link.json"]
+                        "build/link/HEROES2W.link.json",
+                        "build/link/HEROES2W.missing-data.tsv"]
         w.build(link_outputs, "link_exe",
                 inputs=["build/link/objects.rsp"] + import_outputs + [resource_output],
                 implicit=objs + ["build/orig/HEROES2W.EXE", "scripts/homm2/build/link_exe.py"],
