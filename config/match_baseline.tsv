@@ -234,7 +234,7 @@ BASE/Misc	?ProcessAssert@@YIXHPADH@Z	100.0000	c90701b8ab70
 BASE/Misc	?Random@@YIHHH@Z	100.0000	1a18aa51eec7
 BASE/Misc	?ReadPrefs@@YIXXZ	100.0000	fae13d490334
 BASE/Misc	?ReadPrefsFromFile@@YIXXZ	100.0000	28ea51fe4825
-BASE/Misc	?ReadPrefsFromRegistry@@YIXXZ	100.0000	4138e2c5e940
+BASE/Misc	?ReadPrefsFromRegistry@@YIXXZ	100.0000	28f42c3494ae
 BASE/Misc	?SGenRand@@YIHXZ	90.6364	8110dca71695
 BASE/Misc	?SIncRandomize@@YIXHH@Z	100.0000	e3a257816152
 BASE/Misc	?SRand@@YIXH@Z	100.0000	1a1ff9207b28
@@ -349,8 +349,8 @@ BASE/WINMGR	?UpdateScreen@heroWindowManager@@QAEXXZ	100.0000	4077d1619d5f
 BASE/WINMGR	?UpdateScreenRegion@heroWindowManager@@QAEXHHHH@Z	100.0000	67a73e466f64
 BASE/bmap2	?BlitBitmap@@YIXPAVbitmap@@HHHH0HH@Z	100.0000	eb1685809646
 BASE/bmap2	?DimBitmapArea@@YIXPAVbitmap@@HHHHH@Z	100.0000	87da983049bd
-BASE/bmap2	?FillBitmapArea@@YIXPAVbitmap@@HHHHH@Z	100.0000	0ea6ad84f51a
-BASE/bmap2	?FillBitmapAreaClip@@YIXPAVbitmap@@HHHHHHHHH@Z	94.4444	5a8565510c2c
+BASE/bmap2	?FillBitmapArea@@YIXPAVbitmap@@HHHHH@Z	100.0000	ea50245acbe2
+BASE/bmap2	?FillBitmapAreaClip@@YIXPAVbitmap@@HHHHHHHHH@Z	98.4444	bbc24c228322
 BASE/droplist	??0dropListWidget@@QAE@XZ	100.0000	36ab848d613b
 BASE/droplist	??1dropListWidget@@UAE@XZ	100.0000	29c47fbb75ad
 BASE/droplist	?DeleteItem@dropListWidget@@QAEXH@Z	100.0000	39312fef206c
@@ -374,7 +374,7 @@ BASE/listbox	?DrawLBStuff@listBoxWidget@@QAEXH@Z	100.0000	bd3903067b29
 BASE/listbox	?Main@listBoxWidget@@UAEHAAUtag_message@@@Z	99.8781	130c74e0690d
 BASE/listbox	?ProcessMouseMessage@listBoxWidget@@QAEHAAUtag_message@@@Z	100.0000	095f2ad7a9cb
 BASE/listbox	?Read@listBoxWidget@@QAEXXZ	100.0000	5405bf8476ce
-BASE/miscwin	?AutoInitSVGA@@YIFXZ	100.0000	ba21e7c98ba3
+BASE/miscwin	?AutoInitSVGA@@YIFXZ	100.0000	d3a385d12d89
 BASE/miscwin	@BlitBitmapToScreenVesa@28	100.0000	d63e894c78f3
 BASE/soundmgr	??0soundManager@@QAE@XZ	100.0000	4c0e162f2b23
 BASE/soundmgr	?AdjustMusicVolumes@soundManager@@QAEXXZ	100.0000	23340c1c372e
@@ -516,7 +516,7 @@ SOURCE/ADVMGR	?ViewPuzzle@advManager@@QAEXXZ	99.8050	80117b1b4f68
 SOURCE/AI	?AICheckRetreat@combatManager@@QAEHXZ	99.7452	fe63e0f9adfe
 SOURCE/AI	?AttemptAdjacentAttack@combatManager@@QAEHPAVarmy@@@Z	98.9646	15153697ccf4
 SOURCE/AI	?AttemptAttack@combatManager@@QAEHPAVarmy@@HH@Z	100.0000	25409088a39a
-SOURCE/AI	?DoCompAI@combatManager@@QAEXH@Z	94.0952	db0c61922d11
+SOURCE/AI	?DoCompAI@combatManager@@QAEXH@Z	94.0961	db0c61922d11
 SOURCE/AI	?DoLichShot@combatManager@@QAEXPAVarmy@@@Z	99.9307	0c414b8cdd2c
 SOURCE/AI	?GetAllMask@combatManager@@QAEHH@Z	100.0000	cccc40393b4e
 SOURCE/AI	?GetBestArmy@combatManager@@QAEHHH@Z	100.0000	8098249c5433
@@ -566,7 +566,7 @@ SOURCE/ARMY	?ProcessDeath@army@@QAEXH@Z	100.0000	a44940dd0232
 SOURCE/ARMY	?ResetPath@army@@QAEXXZ	100.0000	c757f948eecd
 SOURCE/ARMY	?RightX@army@@QAEHXZ	100.0000	891bf0f76ec6
 SOURCE/ARMY	?SetSpellInfluence@army@@QAEHHH@Z	99.5833	a3dcb7b2b4df
-SOURCE/ARMY	?SpecialAttack@army@@QAEXXZ	98.9499	14c6090cf4fe
+SOURCE/ARMY	?SpecialAttack@army@@QAEXXZ	99.4639	14c6090cf4fe
 SOURCE/ARMY	?SpellCastWorkChance@army@@QAEMH@Z	99.7992	277f355a0617
 SOURCE/ARMY	?SpellCastWorks@army@@QAEHH@Z	100.0000	c2da36f062b5
 SOURCE/ARMY	?SpellEffect@army@@QAEXHHH@Z	99.7167	35e46d4350a5
@@ -1200,7 +1200,7 @@ SOURCE/SPELLAI	?ClearEffects@combatManager@@QAEXXZ	99.7333	37e6c0ce962a
 SOURCE/SPELLAI	?DetermineEffectOfSpell@combatManager@@QAEXHPAH0@Z	98.6109	53be9a732bd4
 SOURCE/SPELLAI	?DoSpellAI@combatManager@@QAEHHH@Z	99.7161	074529feeb63
 SOURCE/SPELLAI	?EffectSpellCreateCreature@combatManager@@QAEHHH@Z	99.0845	2a44cd82f352
-SOURCE/SPELLAI	?EffectSpellCure@combatManager@@QAEXPAHHHH@Z	97.0448	775b0ca6877e
+SOURCE/SPELLAI	?EffectSpellCure@combatManager@@QAEXPAHHHH@Z	97.0647	775b0ca6877e
 SOURCE/SPELLAI	?EffectSpellDamage@combatManager@@QAEXPAHHH@Z	97.4498	77c5e59f81a3
 SOURCE/SPELLAI	?EffectSpellResurrect@combatManager@@QAEXPAHHH@Z	99.7080	cc93ca7b3f0c
 SOURCE/SPELLAI	?FirstArmy@combatManager@@QAEHHHPAH@Z	100.0000	2702525f7d96
@@ -1281,7 +1281,7 @@ SOURCE/TOWNMGR	?BuildObj@townManager@@QAEXH@Z	98.2473	f76f538942fe
 SOURCE/TOWNMGR	?BuyBuild@townManager@@QAEHHHH@Z	99.0437	97bafed56f31
 SOURCE/TOWNMGR	?ChangeTown@townManager@@QAEXXZ	100.0000	c2ee986b9f36
 SOURCE/TOWNMGR	?Close@townManager@@UAEXXZ	100.0000	5dd7183ce94b
-SOURCE/TOWNMGR	?DoCommand@townManager@@QAEXH@Z	98.6710	a5b3f0ac98c4
+SOURCE/TOWNMGR	?DoCommand@townManager@@QAEXH@Z	98.6515	a5b3f0ac98c4
 SOURCE/TOWNMGR	?DoTavern@townManager@@QAEXXZ	100.0000	4fc5a08c816c
 SOURCE/TOWNMGR	?Draw@townObject@@QAEXH@Z	98.9307	8dd5b4dbce24
 SOURCE/TOWNMGR	?DrawTown@townManager@@QAEXHH@Z	100.0000	c846ec3a1eec
