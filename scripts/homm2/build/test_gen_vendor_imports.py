@@ -2,6 +2,7 @@ import struct
 import unittest
 
 from homm2.build.gen_vendor_imports import (
+    ADVAPI_IMPORTS,
     LINK300_FORCED_VENDOR_IMPORTS,
     LINK300_FORCE_MSS_IMPORTS,
     LINK300_FORCE_SMACK_IMPORTS,
@@ -21,6 +22,11 @@ class VendorImportTests(unittest.TestCase):
         self.assertEqual({ordinal for _, ordinal in SMACK_IMPORTS},
                          {14, 18, 19, 20, 21, 23, 28, 32, 33, 38})
         self.assertEqual(len(WING_IMPORTS), 6)
+        self.assertEqual(
+            [lookup for _, _, lookup in ADVAPI_IMPORTS],
+            ["RegOpenKeyExA", "RegSetValueExA", "RegCreateKeyA",
+             "RegQueryValueExA", "RegCloseKey"],
+        )
 
     def test_link300_force_order_covers_every_vendor_import_once(self):
         expected = ({symbol for symbol, _ in MSS_IMPORTS}
@@ -43,6 +49,8 @@ class VendorImportTests(unittest.TestCase):
                             for spec in specs if spec.dll == "smackw32.DLL"))
         self.assertTrue(all(not spec.noname and spec.lookup_name
                             for spec in specs if spec.dll == "WING32.dll"))
+        self.assertTrue(all(not spec.noname and spec.lookup_name
+                            for spec in specs if spec.dll == "ADVAPI32.dll"))
 
     def test_archive_parser_skips_linker_members(self):
         def member(name, payload):
