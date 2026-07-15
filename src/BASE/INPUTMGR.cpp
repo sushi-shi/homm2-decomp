@@ -105,17 +105,12 @@ int KeyboardMessageHandler(void *, unsigned int message, unsigned int, long int 
     return event->type == MESSAGE_NONE;
 }
 
-// @match-note
-// Structurally complete /O2 checkpoint: frame, ordered CFG, event fields, and semantic
-// external targets agree. Both functions are 0x36c bytes. Base has four expected import
-// relocations absent from the delinked target: SetCapture x2 and ReleaseCapture x2 at
-// the same indirect call sites. The first raw difference at +0x2b6 is only a displaced
-// branch; the first opcode/source-shape residual at +0x2f0 (0x004ce150) is the ring
-// read-index collision update with EAX/ECX exchanged, shifting the tail by two bytes.
-// Direct, pointer, and reference spellings, 20 guarded TU-state trials, and a
-// 25-iteration clang-AST pass produced no improvement. Jump-table relocs are $L labels
-// versus the containing function; gConfig members are interior aliases. Revisit after
-// a genuine combined-TU change; this is not a proven wall.
+// @early-stop
+// Both objects are 0x36c bytes and have zero differing bytes after masking the union of
+// their relocation fields. Base has 59 relocations versus retail's 55: the four extra
+// sites are SetCapture x2 and ReleaseCapture x2 IAT references where retail embeds the
+// same import addresses. The remaining differences are delinked jump-table $L labels
+// versus this function and gConfig interior aliases; semantic targets agree.
 VA(0x004cde60, 0x36c)
 int MouseMessageHandler(void *, unsigned int message, unsigned int, long int messageData)
 {
@@ -214,8 +209,9 @@ afterMouseCoordinates:
         event->payload.mouse.modifiers = gpInputManager->m_modifiers;
         gpInputManager->m_writeIndex++;
         gpInputManager->m_writeIndex %= INPUT_EVENT_RING_CAPACITY;
-        if (gpInputManager->m_writeIndex == gpInputManager->m_readIndex) {
-            gpInputManager->m_readIndex++;
+        int readIndex = gpInputManager->m_readIndex;
+        if (gpInputManager->m_writeIndex == readIndex) {
+            gpInputManager->m_readIndex = readIndex + 1;
             gpInputManager->m_readIndex %= INPUT_EVENT_RING_CAPACITY;
         }
     }
@@ -298,44 +294,45 @@ tag_message inputManager::GetEvent(void)
 VA(0x004ce3a0, 0xa1)
 tag_message inputManager::PeekEvent(void)
 {
-    tag_message local_1c;
+    tag_message event;
     PollSound();
     if (gpInputManager->m_active == 1 && m_readIndex != m_writeIndex) {
-        local_1c = m_eventRing[m_readIndex];
+        event = m_eventRing[m_readIndex];
         m_readIndex = m_readIndex % INPUT_EVENT_RING_CAPACITY;
-        if (local_1c.type == MESSAGE_KEY_DOWN && m_keyCodeType == INPUT_KEY_CODE_ASCII)
-            AsciiConvert(local_1c);
+        if (event.type == MESSAGE_KEY_DOWN && m_keyCodeType == INPUT_KEY_CODE_ASCII)
+            AsciiConvert(event);
     } else {
-        local_1c.type = MESSAGE_NONE;
-        local_1c.payload.unknown.unknown0x08 = 0;
-        local_1c.payload.unknown.unknown0x04 = 0;
-        local_1c.payload.unknown.unknown0x0c = 0;
+        event.type = MESSAGE_NONE;
+        event.payload.unknown.unknown0x08 = 0;
+        event.payload.unknown.unknown0x04 = 0;
+        event.payload.unknown.unknown0x0c = 0;
     }
-    return local_1c;
+    return event;
 }
 
 VA(0x004ce450, 0x3)
 void inputManager::SetMouseCoords(int, int) {}
 
 VA(0x004ce460, 0x1b)
-void inputManager::SetKeyCodeType(int param_1)
+void inputManager::SetKeyCodeType(int keyCodeType)
 {
-    m_keyCodeType = static_cast<InputManagerKeyCodeType>(param_1);
+    m_keyCodeType = static_cast<InputManagerKeyCodeType>(keyCodeType);
     m_writeIndex = 0;
     m_readIndex = 0;
 }
 
 // @match-note
-// Structurally complete /O2 checkpoint: frame, ordered CFG, key conversion semantics,
-// and external relocations agree. At 0x004ce4b2 retail loads modifiers into ECX
-// before storing the converted key from EAX; base stores the key first and then keeps
-// modifiers in EAX. Preloaded-modifier, converted-key local/ternary, split modifier
-// load/mask, and duplicated branch-local load/store spellings regressed; a 40-iteration
-// clang-AST pass found no gain. All 12 relocation-masked raw differences are confined
-// to +0x32..+0x51, and all 23 relocation occurrences align; jump-table identities are
-// delinked $L labels versus the containing function. Twenty guarded TU-state trials
-// also left 98.76% unchanged. Revisit only after a genuine combined-TU change; this is
-// not a proven wall.
+// The authoritative 0x1cb-byte CodeView span and all 23 relocation occurrences align.
+// After relocation masking, exactly 12 bytes differ, all at +0x32..+0x51: retail keeps
+// the converted key in EAX and modifiers in ECX, while base stores the key first and
+// then uses EAX for modifiers and ECX for the key. The operations, predicates, values,
+// CFG, and every byte after +0x51 agree. Preloaded/split modifiers, converted-key
+// local/ternary forms, their combined saved-key/saved-modifier form, duplicated
+// branch-local loads/stores, and const/name variants regressed or were byte-neutral.
+// The libclang AST pass has no valid mutations; 80 guarded TU-state trials across the
+// prior and integrated declaration states produced no exact closure. Jump-table
+// identities are delinked $L labels versus this function. Revisit on a genuine
+// predecessor/header/TU-state change; register scheduling is not a permitted artifact.
 VA(0x004ce480, 0x1cb)
 void inputManager::AsciiConvert(tag_message &event)
 {
@@ -387,8 +384,8 @@ void inputManager::AsciiConvert(tag_message &event)
 VA(0x004ce650, 0x33c)
 void inputManager::MakeScanCodeTable(void)
 {
-    for (unsigned int i = 0; i < INPUT_SCAN_CODE_CAPACITY; i++)
-        m_keyState[i] = i << 8;
+    for (unsigned int scanCode = 0; scanCode < INPUT_SCAN_CODE_CAPACITY; scanCode++)
+        m_keyState[scanCode] = scanCode << 8;
 
     m_keyState[INPUT_SCAN_NONE] = 0;
     m_keyState[INPUT_SCAN_ESCAPE] = '\x1b';
@@ -510,14 +507,16 @@ void CheckChangeCursor(int x, int y, int force)
 }
 
 // @match-note
-// Structurally complete /O2 checkpoint: base is 0xe6 bytes versus retail 0xe9, and all
-// 11 ordered relocation identities agree at retail offsets exactly three bytes later.
-// At 0x004cea81 retail forms the mouse-active-field pointer in ECX, loads it into EAX,
-// and tests EAX; base forms it in EAX and compares memory directly. The remaining
-// normalized instruction stream is identical after this three-byte shift. Pointer,
-// value, reference, and value-dependent-store forms were tried. A 30-trial guarded
-// TU-state sweep and 40 clang-AST iterations left 97.43% unchanged. Revisit after a
-// genuine combined-TU change; this is not a proven wall.
+// Base is 0xe6 bytes versus retail's 0xe9. At +0x01 retail forms the mouse-active-field
+// pointer in ECX, loads it into EAX, and tests EAX; base forms it in EAX and folds the
+// load/test into a memory compare. From base +0x1d / retail +0x20 through RET, all 0xc9
+// remaining bytes are identical. All 11 relocation identities/addends agree: the first
+// gpInputManager operand is at +0x02/+0x03 and every later retail site is base +3.
+// Direct and positive-guard forms, pointer/value/reference combinations, manager-field
+// pointers, value-dependent stores, and their combined form were tried. The libclang
+// AST exposes no valid mutation, and 90 guarded TU-state trials across the prior and
+// integrated declaration states produced no exact closure. Revisit on a genuine
+// predecessor/header/TU-state change; load folding is not a permitted artifact.
 VA(0x004cea80, 0xe9)
 void inputManager::ForceMouseMove(void)
 {
