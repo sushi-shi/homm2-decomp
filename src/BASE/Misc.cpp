@@ -29,6 +29,7 @@
 #include <io.h>
 #include <direct.h>
 #include <fcntl.h>
+#include <sys/stat.h>
 #include <string.h>
 #include <BASE/palette.h>
 #include <SOURCE/X_GLOBAL.h>
@@ -947,18 +948,21 @@ void BlitBitmapToScreen(class bitmap *bmp, int sourceX, int sourceY, int width, 
                            destinationX, destinationY);
 }
 
+#include <BASE/LogConstants.h>
+
 // @match-note
 // Structurally complete /O2 checkpoint: the 0x1f4 frame, CFG and 7/7 relocations agree.
 // Only base +0x5c..+0x7c differs from retail +0x5c..+0x75: base loads the newline
 // word before strlen and addresses via `not ecx`, while retail scans first and
 // writes through `[edi-1]`. Direct word stores, strcat, strcpy-at-strlen, memcpy
-// and a manual end scan were tried; the combined-TU strcat retest regressed badly.
+// and a manual end scan were tried. At integrated head 56a50b7, the combined-TU
+// strcat retest emitted a full second string scan/copy and regressed to 70.80%.
 VA(0x004c6070, 0xa6)
 void LogTruncate(void)
 {
-    char logText[500];
-    if (giDebugLevel >= 2) {
-        int fileHandle = _open("KB.LOG", 0x4301, 0x80);
+    char logText[LOG_TEXT_BUFFER_SIZE];
+    if (giDebugLevel >= LOG_FILE_DEBUG_LEVEL) {
+        int fileHandle = _open("KB.LOG", _O_WRONLY | _O_CREAT | _O_TRUNC | _O_TEXT, _S_IWRITE);
         if (fileHandle != -1) {
             strcpy(logText, "===========New Log==========");
             *reinterpret_cast<unsigned short *>(logText + strlen(logText)) =
@@ -974,22 +978,23 @@ void LogTruncate(void)
 // agree. The newline append is base +0x53..+0x73 versus retail
 // +0x4f..+0x6c (preloaded word/not-ECX versus post-scan `[edi-1]`); retail's raw
 // OutputDebugString IAT operand at +0x8e is not named by delink. The same direct,
-// strcpy-at-strlen, memcpy and manual-scan forms were tried; strcat regressed.
+// strcpy-at-strlen, memcpy and manual-scan forms were tried. At integrated head
+// 56a50b7, strcat emitted a full second string scan/copy and regressed to 64.70%.
 VA(0x004c6120, 0x9e)
 void LogStr(char *text)
 {
-    char logText[500];
-    if (giDebugLevel >= 2) {
-        FILE *f = fopen("KB.LOG", "at+");
-        if (f != 0) {
+    char logText[LOG_TEXT_BUFFER_SIZE];
+    if (giDebugLevel >= LOG_FILE_DEBUG_LEVEL) {
+        FILE *logFile = fopen("KB.LOG", "at+");
+        if (logFile != 0) {
             strcpy(logText, text);
             *reinterpret_cast<unsigned short *>(logText + strlen(logText)) =
                 *reinterpret_cast<const unsigned short *>("\n");
-            fputs(logText, f);
-            fclose(f);
+            fputs(logText, logFile);
+            fclose(logFile);
+            if (giDebugLevel == LOG_DEBUGGER_OUTPUT_LEVEL)
+                OutputDebugStringA(logText);
         }
-        if (giDebugLevel == 4)
-            OutputDebugStringA(logText);
     }
 }
 
@@ -998,32 +1003,33 @@ void LogStr(char *text)
 // all seven sprintf call/format branches agree. Only the newline
 // append differs (base +0x1c9..+0x1f2, retail +0x1c9..+0x1ec), followed by the
 // unnamed retail OutputDebugString IAT operand at +0x211. Direct word, strcat,
-// strcpy-at-strlen, memcpy and manual end-scan spellings were tried. A bounded
-// libclang AST pass found 10 single variants and retained none after 30 walks.
+// strcpy-at-strlen, memcpy and manual end-scan spellings were tried. At integrated
+// head 56a50b7, strcat regressed to 88.81%; a fresh bounded libclang AST pass found
+// 10 single variants and retained none after 30 walks with all 144 siblings pinned.
 VA(0x004c61c0, 0x224)
 void LogInt(char *label, int value1, int value2, int value3, int value4, int value5,
             int value6, int value7)
 {
-    char text[200];
-    char logText[500];
-    if (value7 != -999)
+    char text[LOG_FORMAT_BUFFER_SIZE];
+    char logText[LOG_TEXT_BUFFER_SIZE];
+    if (value7 != LOG_UNUSED_VALUE)
         sprintf(text, "%s : % 8d % 8d % 8d % 8d % 8d % 8d % 8d", label, value1, value2,
                 value3, value4, value5, value6, value7);
-    else if (value6 != -999)
+    else if (value6 != LOG_UNUSED_VALUE)
         sprintf(text, "%s : % 8d % 8d % 8d % 8d % 8d % 8d", label, value1, value2,
                 value3, value4, value5, value6);
-    else if (value5 != -999)
+    else if (value5 != LOG_UNUSED_VALUE)
         sprintf(text, "%s : % 8d % 8d % 8d % 8d % 8d", label, value1, value2, value3,
                 value4, value5);
-    else if (value4 != -999)
+    else if (value4 != LOG_UNUSED_VALUE)
         sprintf(text, "%s : % 8d % 8d % 8d % 8d", label, value1, value2, value3, value4);
-    else if (value3 != -999)
+    else if (value3 != LOG_UNUSED_VALUE)
         sprintf(text, "%s : % 8d % 8d % 8d", label, value1, value2, value3);
-    else if (value2 != -999)
+    else if (value2 != LOG_UNUSED_VALUE)
         sprintf(text, "%s : % 8d % 8d", label, value1, value2);
     else
         sprintf(text, "%s : % 8d", label, value1);
-    if (giDebugLevel >= 2) {
+    if (giDebugLevel >= LOG_FILE_DEBUG_LEVEL) {
         FILE *file = fopen("KB.LOG", "at+");
         if (file != 0) {
             strcpy(logText, text);
@@ -1031,7 +1037,7 @@ void LogInt(char *label, int value1, int value2, int value3, int value4, int val
                 *reinterpret_cast<const unsigned short *>("\n");
             fputs(logText, file);
             fclose(file);
-            if (giDebugLevel == 4)
+            if (giDebugLevel == LOG_DEBUGGER_OUTPUT_LEVEL)
                 OutputDebugStringA(logText);
         }
     }
