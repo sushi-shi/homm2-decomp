@@ -222,4 +222,4 @@ void town::CalcNumLevelArchers(int *numArchers, int *mageGuildLevel)
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x004f11b0) int bEnteringTown;
+DATA(0x004f11b0) int bEnteringTown = 0;

@@ -215,9 +215,9 @@ int nbnet_init(void)
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x004ee5c8) signed char iInitNetHostStatus;
-DATA(0x004ee5cc) signed char iInitNetGuestStatus;
-DATA(0x004ee5d0) int iNameRetryCount;
-DATA(0x004ee614) signed char iWaitForHostStatus;
-DATA(0x004ee658) signed char iWaitForGuestStatus;
-DATA(0x004ee65c) int iLastBroadcastTime;
+DATA(0x004ee5c8) signed char iInitNetHostStatus = 0;
+DATA(0x004ee5cc) signed char iInitNetGuestStatus = 0;
+DATA(0x004ee5d0) int iNameRetryCount = 0;
+DATA(0x004ee614) signed char iWaitForHostStatus = 0;
+DATA(0x004ee658) signed char iWaitForGuestStatus = 0;
+DATA(0x004ee65c) int iLastBroadcastTime = 0;

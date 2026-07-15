@@ -579,16 +579,16 @@ void InitVideo(void)
 // ---- globals (definitions, RVA order) ----
 DATA(0x004ef4c8) char szAppName[16] = "Heroes II";
 DATA(0x004ef4d8) char szTitle[32] = "Heroes of Might and Magic II";
-DATA(0x004ef4f8) HWND hwndApp;
-DATA(0x004ef4fc) HMENU hmnuApp;
-DATA(0x004ef500) HANDLE gEventHandle;
-DATA(0x004ef588) long lLastGTimerTickCount;
-DATA(0x004ef58c) long lLastCycleColorsTickCount;
-DATA(0x004ef590) int bRestartMusic;
-DATA(0x004ef594) int iLastMusic;
-DATA(0x004ef5b8) long lLastGetMessage;
-DATA(0x004ef5bc) long lLastAilServe;
-DATA(0x004ef5dc) int gbNoDialogMenusOn;
+DATA(0x004ef4f8) HWND hwndApp = 0;
+DATA(0x004ef4fc) HMENU hmnuApp = 0;
+DATA(0x004ef500) HANDLE gEventHandle = 0;
+DATA(0x004ef588) long lLastGTimerTickCount = 0;
+DATA(0x004ef58c) long lLastCycleColorsTickCount = 0;
+DATA(0x004ef590) int bRestartMusic = 0;
+DATA(0x004ef594) int iLastMusic = -1;
+DATA(0x004ef5b8) long lLastGetMessage = 0;
+DATA(0x004ef5bc) long lLastAilServe = 0;
+DATA(0x004ef5dc) int gbNoDialogMenusOn = 0;
 DATA(0x00524c08) HINSTANCE hInstApp;
 DATA(0x00524c10) RECT rcTemp;
 DATA(0x00524c20) int iMainWinScreenHeight;

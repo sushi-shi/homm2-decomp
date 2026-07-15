@@ -955,4 +955,4 @@ int BaseSetupHandler(struct tag_message &message)
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x004ee248) int gbDoModemConfig;
+DATA(0x004ee248) int gbDoModemConfig = 0;

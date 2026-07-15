@@ -1343,5 +1343,5 @@ void combatManager::DrawSmallView(int viewIndex, int updateScreen)
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x004ed25c) int bGridWasShowing;
-DATA(0x004ed290) int gbInDrawSmallView;
+DATA(0x004ed25c) int bGridWasShowing = 0;
+DATA(0x004ed290) int gbInDrawSmallView = 0;

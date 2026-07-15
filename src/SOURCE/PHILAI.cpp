@@ -5945,24 +5945,24 @@ int philAI::EvaluateTownEvent(int townId, int x, int y, int mode, int *liveChanc
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x004f20e0) float fFirstWeekTownFV;
-DATA(0x004f20e4) int iVepCacheHits;
-DATA(0x004f20e8) int iTotalVepHits;
-DATA(0x004f20ec) int giShowComputerRoute;
-DATA(0x004f20f0) short *gaiLiveChanceOfPos;
-DATA(0x004f20f4) short *gaiHeroStrategicRVOfPos;
-DATA(0x004f20f8) short *gaiHeroEventStratRVOfPos;
-DATA(0x004f20fc) signed char *gaiTurnValueOfMine;
-DATA(0x004f2100) signed char *gaiEnemyHeroReachable;
-DATA(0x004f2104) long glLastStartTick;
-DATA(0x004f2108) long glCurTicks;
-DATA(0x004f210c) long glTotalTicks;
-DATA(0x004f2110) hero *gpCurAIHero;
-DATA(0x004f2114) float gfAttackHumanBonus;
-DATA(0x004f2118) float gfAttackComputerBonus;
-DATA(0x004f211c) int iLastFrameRateTimer;
-DATA(0x004f22bc) int bSVSearchArrayInUse;
-DATA(0x004f2340) int bEvaluatingTravelGates;
+DATA(0x004f20e0) float fFirstWeekTownFV = 0.0f;
+DATA(0x004f20e4) int iVepCacheHits = 0;
+DATA(0x004f20e8) int iTotalVepHits = 0;
+DATA(0x004f20ec) int giShowComputerRoute = 0;
+DATA(0x004f20f0) short *gaiLiveChanceOfPos = 0;
+DATA(0x004f20f4) short *gaiHeroStrategicRVOfPos = 0;
+DATA(0x004f20f8) short *gaiHeroEventStratRVOfPos = 0;
+DATA(0x004f20fc) signed char *gaiTurnValueOfMine = 0;
+DATA(0x004f2100) signed char *gaiEnemyHeroReachable = 0;
+DATA(0x004f2104) long glLastStartTick = 0;
+DATA(0x004f2108) long glCurTicks = 0;
+DATA(0x004f210c) long glTotalTicks = 0;
+DATA(0x004f2110) hero *gpCurAIHero = 0;
+DATA(0x004f2114) float gfAttackHumanBonus = 2.0f;
+DATA(0x004f2118) float gfAttackComputerBonus = 0.8f;
+DATA(0x004f211c) int iLastFrameRateTimer = 0;
+DATA(0x004f22bc) int bSVSearchArrayInUse = 0;
+DATA(0x004f2340) int bEvaluatingTravelGates = 1;
 DATA(0x00525620) int gbReduceByBerserk;
 DATA(0x00525624) float fBerserkFactor;
 DATA(0x00525628) int giCurPlayer;

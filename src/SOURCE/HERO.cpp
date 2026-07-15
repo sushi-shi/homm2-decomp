@@ -1864,8 +1864,8 @@ void hero::CheckAnduranPieces(int showDialog) {
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x004f6c88) class hero *gpHVHero;
-DATA(0x004f6c8c) class heroWindow *gheroWin;
+DATA(0x004f6c88) class hero *gpHVHero = 0;
+DATA(0x004f6c8c) class heroWindow *gheroWin = 0;
 DATA(0x004f6cd0) short gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT] = {
     0, 1000, 2000, 3200, 4500, 6000, 7700, 9000, 11000, 13200, 15500, 18500
 };
