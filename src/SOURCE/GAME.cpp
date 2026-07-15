@@ -29,6 +29,7 @@
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/army.h>
 #include <SOURCE/combatManager.h>
+#include <SOURCE/Campaign.h>
 #include <SOURCE/townManager.h>
 #include <SOURCE/TOWNMGR.h>
 #include <SOURCE/ExpCampaign.h>
@@ -1220,9 +1221,9 @@ void game::NewMap(char *filename)
 
     for (player2 = 0; player2 < m_playerCount; player2++) {
         if (player2 == 0 && gbInCampaign &&
-            (reinterpret_cast<unsigned char *>(this)[0x7f] != 0 ||
-             reinterpret_cast<unsigned char *>(this)[0x84] != 0)) {
-            if (reinterpret_cast<unsigned char *>(this)[0x7f] != 0)
+            (m_campaignAwards[CAMPAIGN_AWARD_BATTLE_GARB] != 0 ||
+             m_campaignAwards[CAMPAIGN_AWARD_DWARFBANE] != 0)) {
+            if (m_campaignAwards[CAMPAIGN_AWARD_BATTLE_GARB] != 0)
                 specialPortrait6 = 2;
             else
                 specialPortrait6 = 5;
@@ -1232,7 +1233,7 @@ void game::NewMap(char *filename)
                     break;
             }
             if (campaignHero15 < GAME_HERO_COUNT) {
-                if (reinterpret_cast<unsigned char *>(this)[0x7f] != 0) {
+                if (m_campaignAwards[CAMPAIGN_AWARD_BATTLE_GARB] != 0) {
                     m_heroRecs[campaignHero15].m_experience += 5000;
                     m_heroRecs[campaignHero15].CheckLevel();
                     strcpy(m_heroRecs[campaignHero15].m_name, "Sister Eliza");
@@ -1631,29 +1632,25 @@ void game::RandomizeEvents(void)
                 break;
             case 0x9f:
                 cell2->m_objectMetadata = Random(0, 64) + 1;
-                while (reinterpret_cast<unsigned char *>(gMonsterDatabase)[
-                    (cell2->m_objectMetadata - 1) * 22 + 0xfd1] != 1) {
+                while (gsSpellInfo[cell2->m_objectMetadata - 1].level != 1) {
                     cell2->m_objectMetadata = Random(0, 64) + 1;
                 }
                 break;
             case 0xca:
                 cell2->m_objectMetadata = Random(0, 64) + 1;
-                while (reinterpret_cast<unsigned char *>(gMonsterDatabase)[
-                    (cell2->m_objectMetadata - 1) * 22 + 0xfd1] != 2) {
+                while (gsSpellInfo[cell2->m_objectMetadata - 1].level != 2) {
                     cell2->m_objectMetadata = Random(0, 64) + 1;
                 }
                 break;
             case 0xcb:
                 cell2->m_objectMetadata = Random(0, 64) + 1;
-                while (reinterpret_cast<unsigned char *>(gMonsterDatabase)[
-                    (cell2->m_objectMetadata - 1) * 22 + 0xfd1] != 3) {
+                while (gsSpellInfo[cell2->m_objectMetadata - 1].level != 3) {
                     cell2->m_objectMetadata = Random(0, 64) + 1;
                 }
                 break;
             case 0xcc:
                 cell2->m_objectMetadata = Random(0, 64) + 1;
-                while (reinterpret_cast<unsigned char *>(gMonsterDatabase)[
-                    (cell2->m_objectMetadata - 1) * 22 + 0xfd1] != 5) {
+                while (gsSpellInfo[cell2->m_objectMetadata - 1].level != 5) {
                     cell2->m_objectMetadata = Random(0, 64) + 1;
                 }
                 break;
@@ -1954,14 +1951,10 @@ int game::LoadMap(char *filename)
 
     m_mapHeader.magic = MAP_HEADER_MAGIC_EXPANSION_GAME;
     _read(file, &m_obeliskCount, 1);
-    _read(file, reinterpret_cast<unsigned char *>(this) + 0x64d9,
-          m_mapHeader.rumourCount * 2);
-    *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x64d7) =
-        m_mapHeader.rumourCount;
-    _read(file, reinterpret_cast<unsigned char *>(this) + 0x6517,
-          m_mapHeader.timeEventCount * 2);
-    *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x6515) =
-        m_mapHeader.timeEventCount;
+    _read(file, m_rumourEventIndices, m_mapHeader.rumourCount * 2);
+    m_rumourEventCount = m_mapHeader.rumourCount;
+    _read(file, m_timeEventIndices, m_mapHeader.timeEventCount * 2);
+    m_timeEventCount = m_mapHeader.timeEventCount;
     _read(file, &iMaxMapExtra, 4);
     ppMapExtra = reinterpret_cast<void **>(BaseAlloc(iMaxMapExtra * 4, GFILE, GMAPLINE + 0x59));
     pwSizeOfMapExtra = reinterpret_cast<short *>(BaseAlloc(iMaxMapExtra * 2, GFILE, GMAPLINE + 0x5a));
@@ -2445,11 +2438,11 @@ void game::ViewArmy(int x, int y, int monsterType, int numTroops, town *castle,
     }
 
     tag_monsterInfo *monster8 = &gMonsterDatabase[monsterType];
-    char *armyMonster11;
+    tag_monsterInfo *armyMonster11;
     if (theArmy)
-        armyMonster11 = reinterpret_cast<char *>(theArmy) + 0xba;
+        armyMonster11 = &theArmy->m_monster;
     else
-        armyMonster11 = reinterpret_cast<char *>(&gMonsterDatabase[monsterType]);
+        armyMonster11 = &gMonsterDatabase[monsterType];
 
     x = 19;
     y = 75;
@@ -2531,7 +2524,7 @@ void game::ViewArmy(int x, int y, int monsterType, int numTroops, town *castle,
     }
 
     if (monster8->flags.all & MONSTER_FLAGS_SHOOTER) {
-        int shots8 = static_cast<signed char>(armyMonster11[0x10]);
+        int shots8 = armyMonster11->shots;
         if (shots8 > 0) {
             if (gpCombatManager->m_active == 1)
                 sprintf(gText, "\n%s%d", cArmyDetail[2], shots8);
@@ -2554,7 +2547,7 @@ void game::ViewArmy(int x, int y, int monsterType, int numTroops, town *castle,
                 static_cast<unsigned int>(monster8->hitPoints) - theArmy->m_hitPointsLost);
         strcat(details9, gText);
     }
-    sprintf(gText, "\n%s%s", cArmyDetail[5], speedText[static_cast<signed char>(armyMonster11[0xb])]);
+    sprintf(gText, "\n%s%s", cArmyDetail[5], speedText[armyMonster11->speed]);
     strcat(details9, gText);
     sprintf(gText, "\n%s%s", cArmyDetail[6], gMoraleText[morale2 + 3]);
     strcat(details9, gText);
@@ -4610,11 +4603,11 @@ void game::SetupTowns(void)
         strcpy(castle->m_name, extra->name);
 
         memset(usedSpells, 0, 65);
-        for (spellLevel = 0; spellLevel < 5; spellLevel++) {
+        for (spellLevel = 0; spellLevel < TOWN_MAGE_GUILD_LEVEL_COUNT; spellLevel++) {
             spellsPerLevel[spellLevel] = 0;
-            for (spellSlot = 0; spellSlot < 4; spellSlot++)
-                reinterpret_cast<signed char *>(castle->m_spells)
-                    [spellLevel * 4 + spellSlot] = -1;
+            for (spellSlot = 0; spellSlot < TOWN_MAGE_GUILD_SPELLS_PER_LEVEL; spellSlot++)
+                castle->m_spellSlots[spellLevel * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL + spellSlot] =
+                    HERO_SPELL_NONE;
         }
 
         if (castle->m_type == 5 && castle->m_owner != -1 && !gbHumanPlayer[castle->m_owner]) {
@@ -4658,13 +4651,12 @@ void game::SetupTowns(void)
             static_cast<signed char>(spell);
         spellsPerLevel[spellLevel]++;
 
-        for (spellLevel = 0; spellLevel < 5; spellLevel++) {
+        for (spellLevel = 0; spellLevel < TOWN_MAGE_GUILD_LEVEL_COUNT; spellLevel++) {
             combatSpells = 0;
-            for (spellSlot = 0; spellSlot < 4; spellSlot++) {
-                if (reinterpret_cast<signed char *>(castle->m_spells)
-                        [spellLevel * 4 + spellSlot] != -1) {
-                    usedSpells[reinterpret_cast<signed char *>(castle->m_spells)
-                                   [spellLevel * 4 + spellSlot]] = 1;
+            for (spellSlot = 0; spellSlot < TOWN_MAGE_GUILD_SPELLS_PER_LEVEL; spellSlot++) {
+                if (castle->m_spellSlots[spellLevel * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL + spellSlot] != HERO_SPELL_NONE) {
+                    usedSpells[castle->m_spellSlots[
+                        spellLevel * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL + spellSlot]] = 1;
                 } else {
                     attempts = 0;
                     do {
@@ -4687,8 +4679,8 @@ void game::SetupTowns(void)
                              spellValue < Random(1, 1500));
                     if (gsSpellInfo[spell].attributes & 4)
                         combatSpells++;
-                    reinterpret_cast<signed char *>(castle->m_spells)
-                        [spellLevel * 4 + spellSlot] =
+                    castle->m_spellSlots[
+                        spellLevel * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL + spellSlot] =
                         static_cast<signed char>(spell);
                     usedSpells[spell] = 1;
                 }
