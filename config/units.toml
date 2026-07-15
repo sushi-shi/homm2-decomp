@@ -8,6 +8,7 @@ platform = "win32"
 [flags]
 base = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/QIfdiv"]
 o2 = ["/nologo", "/c", "/O2", "/MT", "/Gr", "/G5", "/QIfdiv"]
+o1_frame = ["/nologo", "/c", "/O1", "/Oy-", "/MT", "/Gr", "/G5", "/QIfdiv"]
 base_oi = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/QIfdiv", "/Oi"]
 
 [[unit]]
@@ -23,7 +24,7 @@ flags = "o2"
 [[unit]]
 unit = "BASE/BITS"
 source = "src/BASE/BITS.cpp"
-flags = "o2"
+flags = "o1_frame"
 
 [[unit]]
 unit = "BASE/BORDER"
@@ -484,4 +485,3 @@ flags = "base"
 unit = "SOURCE/x_cdtest"
 source = "src/SOURCE/x_cdtest.cpp"
 flags = "base"
-
