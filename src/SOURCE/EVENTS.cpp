@@ -38,15 +38,25 @@
 #include <SOURCE/swapManager.h>
 #include <SOURCE/tradpost.h>
 #include <SOURCE/town.h>
+#include <SOURCE/EVENTS_TYPES.h>
 #include <SOURCE/townManager.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/x_arena.h>
 
 #define EVENTS_FILE const_cast<char *>("I:\\Projects\\Heroes\\Prog\\SOURCE\\EVENTS.CPP")
+// Retail loads these line bases through relocated words; numeric constants change the code shape.
 #define EVENTS_NET_LINE (*reinterpret_cast<const short *>("U\x12"))
 #define EVENTS_COMBAT_LINE (*reinterpret_cast<const short *>("V\x12"))
 #define EVENTS_SEND_LINE (*reinterpret_cast<const short *>("_\x17"))
 #define EVENTS_RECEIVE_LINE (*reinterpret_cast<const short *>("=\x18"))
+#define EVENTS_REMOTE_MESSAGE(buffer) \
+    (reinterpret_cast<RemoteMessage *>(buffer))
+#define EVENTS_REMOTE_COMBAT(buffer) \
+    (reinterpret_cast<combatRemoteData *>(EVENTS_REMOTE_MESSAGE(buffer)->payload))
+#define EVENTS_REMOTE_HERO(buffer) \
+    (reinterpret_cast<combatRemoteHeroFragment *>(EVENTS_REMOTE_MESSAGE(buffer)->payload))
+#define EVENTS_HERO_BUFFER(buffer) \
+    (reinterpret_cast<combatRemoteHeroFragment *>(buffer))
 // @match-note
 // Complete semantics/CFG with the retail 0x350 frame, all source slots, and the
 // main plus eight nested-switch spills at -0x330..-0x350. All 972 relocation
@@ -5352,10 +5362,10 @@ void advManager::SendHeroTownData(
     } else {
         buffer->secondGold = 0;
     }
-    memcpy(buffer->firstArmy, firstArmy, sizeof(armyGroup));
-    memcpy(buffer->secondArmy, secondArmy, sizeof(armyGroup));
+    memcpy(&buffer->firstArmy, firstArmy, sizeof(armyGroup));
+    memcpy(&buffer->secondArmy, secondArmy, sizeof(armyGroup));
     if (combatTown)
-        memcpy(buffer->townData, combatTown, sizeof(town));
+        memcpy(&buffer->combatTown, combatTown, sizeof(town));
 
     result = TransmitAndWait(reinterpret_cast<char *>(buffer), remotePlayer,
                              COMBAT_REMOTE_HEADER_SIZE, COMBAT_REMOTE_COMMAND,
@@ -5364,8 +5374,8 @@ void advManager::SendHeroTownData(
         ShutDown(0);
 
     if (firstHero) {
-        buffer->fragment = COMBAT_REMOTE_FIRST_HERO_FIRST;
-        memcpy(reinterpret_cast<char *>(buffer) + 1, firstHero,
+        EVENTS_HERO_BUFFER(buffer)->fragment = COMBAT_REMOTE_FIRST_HERO_FIRST;
+        memcpy(EVENTS_HERO_BUFFER(buffer)->data, firstHero,
                COMBAT_REMOTE_HERO_FIRST_SIZE);
         result = TransmitRemoteData(
             reinterpret_cast<char *>(buffer), remotePlayer,
@@ -5374,10 +5384,9 @@ void advManager::SendHeroTownData(
             COMBAT_REMOTE_FRAGMENT_TYPE, -1);
         if (!result)
             ShutDown(0);
-        buffer->fragment = COMBAT_REMOTE_FIRST_HERO_SECOND;
-        memcpy(reinterpret_cast<char *>(buffer) + 1,
-               reinterpret_cast<char *>(firstHero) +
-                   COMBAT_REMOTE_HERO_FIRST_SIZE,
+        EVENTS_HERO_BUFFER(buffer)->fragment = COMBAT_REMOTE_FIRST_HERO_SECOND;
+        memcpy(EVENTS_HERO_BUFFER(buffer)->data,
+               &firstHero->m_spells[COMBAT_REMOTE_HERO_SECOND_SPELL_INDEX],
                COMBAT_REMOTE_HERO_SECOND_SIZE);
         result = TransmitRemoteData(
             reinterpret_cast<char *>(buffer), remotePlayer,
@@ -5388,8 +5397,8 @@ void advManager::SendHeroTownData(
             ShutDown(0);
     }
     if (secondHero) {
-        buffer->fragment = COMBAT_REMOTE_SECOND_HERO_FIRST;
-        memcpy(reinterpret_cast<char *>(buffer) + 1, secondHero,
+        EVENTS_HERO_BUFFER(buffer)->fragment = COMBAT_REMOTE_SECOND_HERO_FIRST;
+        memcpy(EVENTS_HERO_BUFFER(buffer)->data, secondHero,
                COMBAT_REMOTE_HERO_FIRST_SIZE);
         result = TransmitRemoteData(
             reinterpret_cast<char *>(buffer), remotePlayer,
@@ -5398,10 +5407,9 @@ void advManager::SendHeroTownData(
             COMBAT_REMOTE_FRAGMENT_TYPE, -1);
         if (!result)
             ShutDown(0);
-        buffer->fragment = COMBAT_REMOTE_SECOND_HERO_SECOND;
-        memcpy(reinterpret_cast<char *>(buffer) + 1,
-               reinterpret_cast<char *>(secondHero) +
-                   COMBAT_REMOTE_HERO_FIRST_SIZE,
+        EVENTS_HERO_BUFFER(buffer)->fragment = COMBAT_REMOTE_SECOND_HERO_SECOND;
+        memcpy(EVENTS_HERO_BUFFER(buffer)->data,
+               &secondHero->m_spells[COMBAT_REMOTE_HERO_SECOND_SPELL_INDEX],
                COMBAT_REMOTE_HERO_SECOND_SIZE);
         result = TransmitRemoteData(
             reinterpret_cast<char *>(buffer), remotePlayer,
@@ -5440,38 +5448,41 @@ void advManager::ReceiveHeroTownData(
     *secondHero = 0;
     *secondArmy = 0;
     hasFirstHero7 = hasSecondHero8 = hasTown0 = 0;
-    *remotePlayer = packet[0];
-    *x = packet[10];
-    *y = packet[11];
-    hasFirstHero7 = packet[12];
-    hasTown0 = packet[13];
-    hasSecondHero8 = packet[14];
-    *firstSide = packet[15];
-    *secondSide = packet[16];
-    *randomSeed = *reinterpret_cast<int *>(packet + 17);
-    *combatResult = packet[21];
-    *retreatWin = packet[22];
-    *combatSurrender = packet[23];
-    firstOwner29 = packet[24];
+    *remotePlayer = EVENTS_REMOTE_MESSAGE(packet)->sender;
+    *x = EVENTS_REMOTE_COMBAT(packet)->x;
+    *y = EVENTS_REMOTE_COMBAT(packet)->y;
+    hasFirstHero7 = EVENTS_REMOTE_COMBAT(packet)->hasFirstHero;
+    hasTown0 = EVENTS_REMOTE_COMBAT(packet)->hasTown;
+    hasSecondHero8 = EVENTS_REMOTE_COMBAT(packet)->hasSecondHero;
+    *firstSide = EVENTS_REMOTE_COMBAT(packet)->firstSide;
+    *secondSide = EVENTS_REMOTE_COMBAT(packet)->secondSide;
+    *randomSeed = EVENTS_REMOTE_COMBAT(packet)->randomSeed;
+    *combatResult = EVENTS_REMOTE_COMBAT(packet)->combatResult;
+    *retreatWin = EVENTS_REMOTE_COMBAT(packet)->retreatWin;
+    *combatSurrender = EVENTS_REMOTE_COMBAT(packet)->combatSurrender;
+    firstOwner29 = EVENTS_REMOTE_COMBAT(packet)->firstOwner;
     if (firstOwner29 > 0)
         gpGame->m_players[firstOwner29].m_resources[RES_GOLD] =
-            *reinterpret_cast<int *>(packet + 25);
-    secondOwner28 = packet[29];
+            EVENTS_REMOTE_COMBAT(packet)->firstGold;
+    secondOwner28 = EVENTS_REMOTE_COMBAT(packet)->secondOwner;
     if (secondOwner28 > 0)
         gpGame->m_players[secondOwner28].m_resources[RES_GOLD] =
-            *reinterpret_cast<int *>(packet + 30);
+            EVENTS_REMOTE_COMBAT(packet)->secondGold;
 
     *firstArmy = static_cast<armyGroup *>(
         BaseAlloc(sizeof(armyGroup), EVENTS_FILE, EVENTS_RECEIVE_LINE + 0x26));
-    memcpy(*firstArmy, packet + 34, sizeof(armyGroup));
+    memcpy(*firstArmy, &EVENTS_REMOTE_COMBAT(packet)->firstArmy,
+           sizeof(armyGroup));
     *secondArmy = static_cast<armyGroup *>(
         BaseAlloc(sizeof(armyGroup), EVENTS_FILE, EVENTS_RECEIVE_LINE + 0x29));
-    memcpy(*secondArmy, packet + 49, sizeof(armyGroup));
+    memcpy(*secondArmy, &EVENTS_REMOTE_COMBAT(packet)->secondArmy,
+           sizeof(armyGroup));
     if (hasTown0) {
         *combatTown = static_cast<town *>(
             BaseAlloc(sizeof(town), EVENTS_FILE,
                       EVENTS_RECEIVE_LINE + 0x2e));
-        memcpy(*combatTown, packet + 64, sizeof(town));
+        memcpy(*combatTown, &EVENTS_REMOTE_COMBAT(packet)->combatTown,
+               sizeof(town));
     }
 
     iCombatControlNetPos[COMBAT_ATTACKER_SIDE] = *remotePlayer;
@@ -5516,29 +5527,36 @@ void advManager::ReceiveHeroTownData(
                 ShutDown(const_cast<char *>("Game canceled."));
         }
         packet = GetRemoteData(1);
-        if (packet && packet[5] == 2 &&
-            packet[6] == COMBAT_REMOTE_COMMAND) {
+        if (packet &&
+            EVENTS_REMOTE_MESSAGE(packet)->type == REMOTE_MESSAGE_RELIABLE &&
+            EVENTS_REMOTE_MESSAGE(packet)->command == COMBAT_REMOTE_COMMAND) {
             lastPacketTime36 = KBTickCount();
-            if (packet[9] == COMBAT_REMOTE_FIRST_HERO_FIRST) {
-                memcpy(*firstHero, packet + 10,
+            if (EVENTS_REMOTE_HERO(packet)->fragment ==
+                COMBAT_REMOTE_FIRST_HERO_FIRST) {
+                memcpy(*firstHero, EVENTS_REMOTE_HERO(packet)->data,
                        COMBAT_REMOTE_HERO_FIRST_SIZE);
                 gotFirstHeroFirst3 = 1;
             }
-            if (packet[9] == COMBAT_REMOTE_FIRST_HERO_SECOND) {
-                memcpy(reinterpret_cast<char *>(*firstHero) +
-                           COMBAT_REMOTE_HERO_FIRST_SIZE,
-                       packet + 10, COMBAT_REMOTE_HERO_SECOND_SIZE);
+            if (EVENTS_REMOTE_HERO(packet)->fragment ==
+                COMBAT_REMOTE_FIRST_HERO_SECOND) {
+                memcpy(&(*firstHero)->m_spells[
+                           COMBAT_REMOTE_HERO_SECOND_SPELL_INDEX],
+                       EVENTS_REMOTE_HERO(packet)->data,
+                       COMBAT_REMOTE_HERO_SECOND_SIZE);
                 gotFirstHeroSecond9 = 1;
             }
-            if (packet[9] == COMBAT_REMOTE_SECOND_HERO_FIRST) {
-                memcpy(*secondHero, packet + 10,
+            if (EVENTS_REMOTE_HERO(packet)->fragment ==
+                COMBAT_REMOTE_SECOND_HERO_FIRST) {
+                memcpy(*secondHero, EVENTS_REMOTE_HERO(packet)->data,
                        COMBAT_REMOTE_HERO_FIRST_SIZE);
                 gotSecondHeroFirst13 = 1;
             }
-            if (packet[9] == COMBAT_REMOTE_SECOND_HERO_SECOND) {
-                memcpy(reinterpret_cast<char *>(*secondHero) +
-                           COMBAT_REMOTE_HERO_FIRST_SIZE,
-                       packet + 10, COMBAT_REMOTE_HERO_SECOND_SIZE);
+            if (EVENTS_REMOTE_HERO(packet)->fragment ==
+                COMBAT_REMOTE_SECOND_HERO_SECOND) {
+                memcpy(&(*secondHero)->m_spells[
+                           COMBAT_REMOTE_HERO_SECOND_SPELL_INDEX],
+                       EVENTS_REMOTE_HERO(packet)->data,
+                       COMBAT_REMOTE_HERO_SECOND_SIZE);
                 gotSecondHeroSecond6 = 1;
             }
         }
