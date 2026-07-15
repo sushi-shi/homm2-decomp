@@ -63,10 +63,10 @@
 #define ADVMGR_RESOURCE_VIEW_LINE (*reinterpret_cast<const short *>("\x2f\x12"))
 #define ADVMGR_KINGDOM_VIEW_LINE (*reinterpret_cast<const short *>("\x96\x12"))
 #define ADVMGR_BORDER_FREE_LINE (*reinterpret_cast<const short *>("\x24\x01"))
-#define ADVMGR_ENVIRONMENT_VOLUME(distance)                                \
-    (reinterpret_cast<const int *>("\x40\0\0\0\x39\0\0\0\x28\0\0\0" \
-                                   "\x15\0\0\0\x07\0\0\0\x05\0\0\0") \
-         [distance])
+
+static const int environmentVolumes[ADVMGR_ENVIRONMENT_VOLUME_COUNT] = {
+    64, 57, 40, 21, 7, 5, 3, 0
+};
 
 DATA(0x00527eb8) static unsigned short s_drawGroundTile;
 DATA(0x00527ebc) static int s_adjacentMonsterX;
@@ -5648,7 +5648,7 @@ void advManager::SetEnvironmentOrigin(int originX, int originY, int stopSounds)
                     m_loopingSamples[m_activeSounds[edgeOffset].soundId]
                         ->m_activeSample,
                     SOUND_SAMPLE_OPERATION_EFFECT_VOLUME,
-                    ADVMGR_ENVIRONMENT_VOLUME(m_activeSounds[edgeOffset].volume));
+                    environmentVolumes[m_activeSounds[edgeOffset].volume]);
             }
         }
     }
@@ -5836,7 +5836,7 @@ void advManager::InsertSound(int x, int mapY, int distance, int soundLayer)
         m_activeSounds[soundSlot].volume = distance;
         CheckLoadSample(soundId);
         m_loopingSamples[soundId]->m_volume =
-            ADVMGR_ENVIRONMENT_VOLUME(distance);
+            environmentVolumes[distance];
         m_loopingSamples[soundId]->m_loopCount = 0;
         m_loopingSamples[soundId]->m_channelType =
             ADVMGR_ENVIRONMENT_SOUND_CHANNEL_TYPE;
