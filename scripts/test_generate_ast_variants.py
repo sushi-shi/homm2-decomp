@@ -21,6 +21,7 @@ from generate_ast_variants import (
     inline_read_advance_edits,
     mutation_name,
     statement_order_edits,
+    utf8_byte_offset,
 )
 
 
@@ -86,6 +87,12 @@ class AstVariantGenerationTests(unittest.TestCase):
         self.assertFalse(truncated)
         self.assertEqual(len(candidates), 2)
         self.assertTrue(all(required in candidate["name"] for candidate in candidates))
+
+    def test_character_offsets_are_converted_for_utf8_manifests(self):
+        text = "// en dash –\nVA()\n"
+        character_offset = text.index("VA")
+        self.assertEqual(utf8_byte_offset(text, character_offset), len(text[:character_offset].encode()))
+        self.assertGreater(utf8_byte_offset(text, character_offset), character_offset)
 
 
 class AstVariantSemanticTests(unittest.TestCase):
