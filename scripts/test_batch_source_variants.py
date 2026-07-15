@@ -3,10 +3,26 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from batch_source_variants import iter_variants, load_manifest, render_candidate, render_variant
+from batch_source_variants import (
+    iter_variants,
+    load_manifest,
+    render_candidate,
+    render_variant,
+    result_rank,
+)
 
 
 class BatchSourceVariantManifestTests(unittest.TestCase):
+    def test_result_rank_prefers_score_then_size_relocs_and_trial(self):
+        rows = [
+            {"score": 99.0, "candidate_size": 101, "candidate_relocs": 4, "trial": 4},
+            {"score": 99.0, "candidate_size": 100, "candidate_relocs": 5, "trial": 3},
+            {"score": 99.0, "candidate_size": 100, "candidate_relocs": 4, "trial": 2},
+            {"score": 100.0, "candidate_size": 90, "candidate_relocs": 1, "trial": 1},
+        ]
+        ranked = sorted(rows, key=lambda row: result_rank(row, 100, 4))
+        self.assertEqual([row["trial"] for row in ranked], [1, 2, 3, 4])
+
     def write_case(self, source_text, axes):
         temporary = tempfile.TemporaryDirectory()
         root = Path(temporary.name)
