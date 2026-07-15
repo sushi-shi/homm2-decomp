@@ -6,12 +6,20 @@ from pathlib import Path
 from homm2.build.link_exe import (
     classify_missing_public_data, classify_pe_storage, decode_map_symbol_name,
     decode_s_compile_banner, load_retail_data_symbols, load_retail_order,
-    normalized_vendor_imports, parse_map_contributions, parse_map_symbol_records,
+    link_environment, normalized_vendor_imports, parse_map_contributions, parse_map_symbol_records,
     parse_map_symbols, parse_unresolved, read_coff_section, read_imports, read_order_response,
-    read_pe, resolve_link_executable, static_symbol_diagnostics)
+    read_pe, resolve_link_executable, sibling_tool_identities, static_symbol_diagnostics)
 
 
 class LinkExeTest(unittest.TestCase):
+    def test_link_environment_uses_historical_lib_search_path(self):
+        environment = link_environment(
+            r"Z:\vc42\lib", "/vc40/bin", {"PATH": "tools", "LIB": "stale"})
+        self.assertEqual(environment, {
+            "PATH": "/vc40/bin" + __import__("os").pathsep + "tools",
+            "LIB": r"Z:\vc42\lib",
+        })
+
     def test_order_uses_numeric_nb09_contribution_not_manifest_or_public_order(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
@@ -55,6 +63,19 @@ class LinkExeTest(unittest.TestCase):
             self.assertEqual(source, "argument")
             with self.assertRaisesRegex(RuntimeError, "override is not a file"):
                 resolve_link_executable(root, root / "missing.exe")
+
+    def test_sibling_tool_identities_records_only_present_tools(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            linker = root / "LINK.EXE"
+            linker.write_bytes(b"link")
+            (root / "CVPACK.EXE").write_bytes(b"pack")
+            identities = sibling_tool_identities(linker)
+        self.assertEqual(set(identities), {"CVPACK.EXE"})
+        self.assertEqual(
+            identities["CVPACK.EXE"]["sha256"],
+            "4862f447f2c7f272fa2f4aaf89dadb3b1ac09105bd5864f8d1a0c9452bb0a226",
+        )
 
     def test_unresolved_symbols_are_grouped_by_owner(self):
         parsed = parse_unresolved(

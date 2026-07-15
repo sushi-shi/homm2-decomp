@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the reproducible HoMM2 VC 4.2 toolchain release tarball.
+"""Build the reproducible HoMM2 compiler and final-link toolchain tarball.
 
 This is the Gruntz create-toolchain-release.py pattern adapted to the actual
 en_vc42ent disc1 layout. The RAR SFX already contains a complete installed
@@ -17,6 +17,7 @@ import tempfile
 from pathlib import Path
 
 import make_toolchain
+import make_linker
 
 
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parent.parent)).resolve()
@@ -42,9 +43,15 @@ def main() -> None:
     media = Path(media_value).expanduser().resolve()
     if not media.is_file():
         raise SystemExit(f"VC42_DISC1 does not exist: {media}")
+    linker_media_value = os.environ.get("VC40_ISO")
+    if not linker_media_value:
+        raise SystemExit("VC40_ISO is not set; use scripts/create-toolchain-release.nix")
+    linker_media = Path(linker_media_value).expanduser().resolve()
+    if not linker_media.is_file():
+        raise SystemExit(f"VC40_ISO does not exist: {linker_media}")
 
     output = Path(
-        os.environ.get("OUTPUT", REPO / "build" / "homm2-toolchain-vc42.tar.xz")
+        os.environ.get("OUTPUT", REPO / "build" / "homm2-toolchain-vc42-link300.tar.xz")
     ).expanduser().resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
 
@@ -55,6 +62,7 @@ def main() -> None:
         extracted = work / "media"
         stage = work / "stage"
         stage_msvc = stage / "msvc"
+        stage_linker = stage / "link300"
 
         log(f"extracting {media.name}")
         make_toolchain.archive_extract(media, extracted)
@@ -67,6 +75,9 @@ def main() -> None:
         make_toolchain.copy_tree(source_root, stage_msvc)
         make_toolchain.validate(stage_msvc, False, "en_vc42ent_disc1.exe", write=True)
 
+        log(f"staging final-link tools from {linker_media.name}")
+        make_linker.provision(linker_media, stage_linker, False, False)
+
         log(f"packaging {output}")
         subprocess.run(
             [
@@ -78,7 +89,7 @@ def main() -> None:
                 "--numeric-owner",
                 f"--mtime=@{RELEASE_EPOCH}",
                 "--transform",
-                r"s|^\.|homm2-toolchain-vc42|",
+                r"s|^\.|homm2-toolchain-vc42-link300|",
                 "-C",
                 str(stage),
                 "-cJf",
@@ -96,7 +107,7 @@ def main() -> None:
         print()
         print("Publish as a dedicated toolchain asset, not as source code:")
         print(
-            f"  gh release upload toolchain-vc42 {output} "
+            f"  gh release upload toolchain-vc42-link300 {output} "
             "--repo homm2-decomp/homm2-decomp --clobber"
         )
     finally:
