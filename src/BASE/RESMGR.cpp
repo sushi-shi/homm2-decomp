@@ -60,7 +60,7 @@ void resourceManager::GetBackdrop(char *name, class bitmap *backdrop, int useIco
     }
 }
 
-// @match-note
+// @semantic
 // Complete /Od frame/slots and CFG. Before the semantic ResourceManagerConstant
 // header enum this body was byte-exact. Under the combined TU state the first raw
 // difference is the +0x46 branch displacement caused by a two-byte row-loop delta;

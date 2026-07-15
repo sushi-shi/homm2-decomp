@@ -7,7 +7,7 @@
 #include <BASE/baseManager.h>
 #include <string.h>
 
-// @match-note: structurally complete /O2 checkpoint (live/retained 79.67%).
+// @semantic: structurally complete /O2 checkpoint (live/retained 79.67%).
 // Base and retail are both 0x47 bytes and have the same two relocation targets
 // and occurrences ("Unknown" and the baseManager vtable). Original PE bytes at
 // 0x004eba70 confirm the three __purecall slots and CodeView confirms baseManager

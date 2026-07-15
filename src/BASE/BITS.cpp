@@ -7,7 +7,7 @@
 #include <BASE/BITSConstants.h>
 #include <BASE/BITS.h>
 
-// @match-note
+// @semantic
 // Clean, structurally complete 0/0-relocation checkpoint. Base is 0x24; retail is 0x2e
 // including two trailing alignment NOPs. The EBP frame, byte offset, dword load, bit mask
 // and normalized 0/1 result agree. First divergence is +0x1: base zeroes EAX before
@@ -34,7 +34,7 @@ extern "C" int __cdecl BitTest(const void *bits, BitIndex bitIndex)
     return 0;
 }
 
-// @match-note
+// @semantic
 // Clean, structurally complete 0/0-relocation checkpoint. Base and retail are both 0x20
 // with the same EBP frame and direct byte-addressed dword OR. First divergence is +0x1:
 // base reads bitIndex through ESP before establishing EBP and retains quotient/base as an
@@ -54,7 +54,7 @@ extern "C" void __cdecl BitSet(void *bits, BitIndex bitIndex)
     *word |= mask;
 }
 
-// @match-note
+// @semantic
 // Clean, structurally complete 0/0-relocation checkpoint. Base and retail are both 0x22
 // (retail ends with two alignment NOPs) with the same EBP frame, shift, complement and
 // direct dword clear. First divergence is +0x1 and matches BitSet: base reads bitIndex

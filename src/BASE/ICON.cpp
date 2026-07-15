@@ -62,7 +62,7 @@ void icon::DrawToBuffer(int x, int y, int frame, int flip)
                      ICON_DRAW_SCREEN_HEIGHT, 0);
 }
 
-// @match-note
+// @semantic
 // /O2 residual begins at +0xb: base is 0x2b3 bytes and retail is 0x2bb. Both
 // have the same frame, CFG, and ordered 37-relocation identity stream; the draw
 // dispatcher is instruction-identical after aligning retail +0x146 with base
@@ -174,7 +174,7 @@ void icon::ClipFillToBuffer(int x, int y, int frame, int color, int flip,
                      ICON_DRAW_CLIP, clipX, clipY, clipW, clipH);
 }
 
-// @match-note: retail/base are both 0x103 bytes with the same 0x4-byte frame,
+// @semantic: retail/base are both 0x103 bytes with the same 0x4-byte frame,
 // saved registers, CFG, and exact ordered 10-relocation offset/type/identity
 // stream by manual COFF audit. Under the final named-orientation enum state,
 // the sole relocation-masked raw residual is +0xbf: base emits

@@ -58,7 +58,7 @@ mouseManager::mouseManager(void) : baseManager()
     m_hideCount = 1;
 }
 
-// @match-note coverage checkpoint: semantics, member layout, and no-frame CFG are
+// @semantic coverage checkpoint: semantics, member layout, and no-frame CFG are
 // complete. The relocation counts are 3/3; the delinked target embeds ShowCursor's
 // IAT address, but manual -dr review confirms the same external access at the same
 // call site. Base .text is 0x91 versus retail 0x94. The first code divergence is
@@ -91,7 +91,7 @@ int mouseManager::Open(int priority)
     return 0;
 }
 
-// @match-note coverage checkpoint: semantics and the zero-frame loop CFG are
+// @semantic coverage checkpoint: semantics and the zero-frame loop CFG are
 // complete; both bodies are 0xed bytes. Relocation counts are 14/14, and manual -dr
 // review confirms the same ordered arrays, allocator calls, resource manager, and
 // Dispose target; the delinked target embeds the four Win32 IAT addresses. The first
@@ -171,7 +171,7 @@ void mouseManager::SetPointer(char *name, int param_2, int param_3)
     }
 }
 
-// @match-note coverage checkpoint: semantics, 0x14-byte local area, CFG, cursor
+// @semantic coverage checkpoint: semantics, 0x14-byte local area, CFG, cursor
 // table types, and external relocations are reconstructed (70/70, no base-only
 // target). This is still not an early stop. Base code is 0x3d9 versus retail
 // 0x405. The first divergence is the
@@ -265,7 +265,7 @@ void mouseManager::SetPointer(int frame)
     gbPutzingWithMouseCtr--;
 }
 
-// @match-note coverage checkpoint: semantics, member layout, zero-frame CFG, local
+// @semantic coverage checkpoint: semantics, member layout, zero-frame CFG, local
 // lifetimes, and all 83 relocation occurrences are complete. Manual -dr review
 // confirms the canonical private globals and arrays; the delinked target uses
 // interior/addend aliases for their second columns and embeds two Win32 IAT addresses.

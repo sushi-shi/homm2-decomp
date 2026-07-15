@@ -11,7 +11,7 @@
 #include <SOURCE/wingraph.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/KB.h>
-// @match-note
+// @semantic
 // Complete /O2 checkpoint: both code streams end at the ret at +0x3a2 and contain
 // 261 instructions (retail's +0x3a3 nop is alignment outside the CodeView span).
 // Relocations are exact at 71/71 with no wrong target. Keeping the combat and
@@ -242,7 +242,7 @@ int heroWindowManager::ConvertToHover(struct tag_message &msg)
     return Main(msg);
 }
 
-// @match-note
+// @semantic
 // Structurally complete /O2 checkpoint: both code spans are 0x35, the 0x1c message
 // frame and every initialized message field agree, and there are no relocations.
 // Seven unmasked bytes differ from +0x24 solely because retail loads the vtable
@@ -263,7 +263,7 @@ int heroWindowManager::BroadcastMessage(int type, int p2, int p3, int p4)
     return Main(msg);
 }
 
-// @match-note
+// @semantic
 // Structurally complete /O2 checkpoint (live 98.97%): the Open call, ordered search,
 // and every head/tail/middle link agree; 1/1 relocation agrees. Base is 0xb9 bytes
 // versus retail 0xbc. The first residual is `xor ebp,ebp` versus retail
@@ -355,7 +355,7 @@ void heroWindowManager::RemoveWindow(class heroWindow *w)
     }
 }
 
-// @match-note
+// @semantic
 // Structurally complete /O2 checkpoint (live 99.19%): base is 0x1ce bytes versus
 // retail 0x1cf with the exact 0x38 frame, identical ordered CFG, and 31/31 resolved
 // relocations. Reordering the independent dialog-result/done stores via the clang-AST
@@ -533,7 +533,7 @@ void heroWindowManager::SaveFizzleSource(int x, int y, int width, int height)
 VA(0x004cb1d0, 0x1)
 void CreateFizzleTables(void) {}
 
-// @match-note
+// @semantic
 // Structurally complete /O2 checkpoint (live 99.30%): declaring the three row
 // cursors in saved/work/screen order makes the prefix through row-pointer setup
 // byte-exact and reduces base to 0x404 bytes versus retail's 0x402. The first raw

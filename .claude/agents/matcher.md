@@ -12,7 +12,8 @@ description: Byte-matches one function / TU of HoMM2 against retail HEROES2W.EXE
 
 > **Batches are WHOLE-TU (20+ functions). Finish EVERY function in the batch — do NOT
 > bail out early.** You are handed a whole TU — or a 20+ function chunk of one — not a
-> single function. Reconstruct them ALL, to 100% or a proven `@early-stop`, in retail-RVA
+> single function. Reconstruct them ALL, to 100%, a proven `@early-stop`, or a fully audited
+> `@semantic`, in retail-RVA
 > order, in the one TU file; report each function's result. Sibling functions share
 > idioms/types, so do them together. **Never** stop with functions left un-attempted and
 > report them "not-done": batch SIZE is the orchestrator's call, not yours — once you're
@@ -63,8 +64,9 @@ line records.
    `HOMM2_DIR`/`WINEPREFIX`/`MSVC_DIR` are fixed at shell entry to `$PWD`, so a
    shell opened in main, or a `cd` *after* `nix develop`, builds/scores the WRONG
    tree. Use absolute paths; never touch the repo root.
-4. **Iterate** on the per-function objdiff residual until 100% (or a byte-proven
-   `@early-stop`). **When a diff row is stuck, GREP `docs/patterns/INDEX.md` FIRST**
+4. **Iterate** on the per-function objdiff residual until 100%, a byte-proven `@early-stop`,
+   or a fully audited `@semantic` checkpoint. **When a diff row is stuck, GREP
+   `docs/patterns/INDEX.md` FIRST**
    (by symptom/tag); most /Od idioms are cataloged. New idiom → add a
    `docs/patterns/<name>.md` + one INDEX line in the SAME change. **A pattern doc MUST
    show the real byte-level asm of the diff (retail vs ours, side by side) AND what made
@@ -175,13 +177,15 @@ accessor `jmp $+0` fingerprint — most plateaus are one of these two, both fixa
 2. **At a wall, try a few obvious cases and move on.** Re-check `od_slots`, try the source
    polarity/operand/accessor spelling directly indicated by the diff, and consult the pattern
    catalog. If the residual is byte-proven, document it as `@early-stop`. Otherwise, after the body
-   and all structural proof are complete, add a provisional `@match-note` immediately above `VA()`
+   and all structural proof are complete, add `@semantic` immediately above `VA()`
    with the first retail/ours instruction divergence or byte span, frame/slot/CFG and relocation
-   status, and the exact obvious spellings already tried. Do not run extended permutation or
-   brute-force searches before total SOURCE fuzzy reaches 95%.
-3. **At 95% total fuzzy, start the last-mile pass.** Return to the `@match-note` and soft
-   `@early-stop` wall set, resume after the attempts recorded there, use the
-   audited AST permuter where appropriate, and push each residual to its highest reproducible match.
+   status, and the exact obvious spellings already tried. Under the current linking/runtime phase,
+   use `@semantic` instead of `@match-note` once behavior, real types/layout, frame/slots, CFG,
+   inline structure, and external relocations are complete. Do not run extended permutation or
+   brute-force searches on an `@semantic` function.
+3. **When a future byte-last-mile pass is explicitly resumed,** return to the `@semantic` and soft
+   `@early-stop` sets, resume after the attempts recorded there, use the audited AST permuter where
+   appropriate, and push each residual to its highest reproducible match.
 4. **Size is not a reason to defer.** Reconstruct large bodies leaf-first, in full.
 5. **Acceptable non-100% comes in exactly two `@early-stop` flavors — never a partial
    that under-counts because you stopped guessing.** Mark it `// @early-stop` (marker
@@ -200,15 +204,15 @@ accessor `jmp $+0` fingerprint — most plateaus are one of these two, both fixa
        VA(0x0040b396, 0x1d3)
        mapCellExtra *fullMap::GetNewCellExtraOverlay(int x, int y) { /* complete body */ }
 
-Before 95%, every integrated non-100 method carries exactly one durable marker:
+Every integrated non-100 method carries exactly one durable marker:
 
 - `@early-stop` means the permitted residual is byte-proven. `rg '@early-stop' src` is the
   proven-artifact set, never a "gave up" set.
-- `@match-note` means the method is semantically and structurally complete but the residual is not
-  yet a valid early-stop proof. It must name the first assembly/byte divergence, confirmed
+- `@semantic` means the method is semantically and structurally complete but the residual is not
+  necessarily a valid early-stop proof. It must name the first assembly/byte divergence, confirmed
   frame/slot/CFG and relocation state, obvious attempts already exhausted, and the revisit trigger.
-  It prevents restarts from repeating pre-95 work; it does not remove the method from the 95%
-  last-mile queue. Remove it when the method reaches 100% or replace it with a proved early-stop.
+  It removes the method from the current linking/runtime queue and becomes the explicit future
+  byte-last-mile queue. Remove it when the method reaches 100% or replace it with a proved early-stop.
 
 **Finish every function in your assigned batch** — never leave one un-attempted and never use a
 marker to excuse incomplete semantics, types/layout, frame/slots, CFG, inline-accessor recovery, or
