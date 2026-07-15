@@ -43,6 +43,12 @@ DLL-import middleware.
 | `sstGlobalSym` / `sstStaticSym` | header-only (`cbSymbol` 8 / 0) | empty |
 
 Two details worth remembering:
+- **The shipping stream has no procedure inventory or function lengths.** All 3,541 named
+  symbols are `S_PUB32` records. Game compilands have no `S_GPROC32`, `S_LPROC32`,
+  `S_LABEL32`, local-variable, type, or line records; every public has type index zero. A
+  next-public span is therefore a delinker heuristic, not a CodeView `pLen`. The procedure
+  records in the reconstruction's generated PDB are synthetic and must not be cited as retail
+  boundary evidence.
 - **`S_COMPILE` is tool/module provenance, not a final-linker banner.** There are 176
   *"Microsoft LINK 2.60.5112 (NT)"* records, and every owning module also contains an
   `S_THUNK32` import thunk. The only non-thunk record is *"Microsoft CVTRES 4.00"* on
@@ -60,9 +66,9 @@ Two details worth remembering:
 
 ## Decisively ABSENT (checked every byte)
 
-**No types, no `LF_CLASS`/`LF_STRUCTURE` records, no field lists, no member offsets, no member
-widths/types, no member visibility, no class sizes, no locals (`S_BPREL32`), no line numbers.**
-The `type` index on all 3541 publics is `0`.
+**No procedures (`S_GPROC32`/`S_LPROC32`), labels, types, `LF_CLASS`/`LF_STRUCTURE` records,
+field lists, member offsets, member widths/types, member visibility, class sizes, locals
+(`S_BPREL32`), or line numbers.** The `type` index on all 3,541 publics is `0`.
 
 **Consequence:** class **field layouts / sizes / member visibility have zero source in
 CodeView** and cannot be extracted. What *is* CodeView-authoritative: symbol names + addresses,
