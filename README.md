@@ -54,9 +54,17 @@ The final link is opt-in, so object matching stays fast. Its Ninja graph exposes
 (NB09 `sstModule` object order), `link-imports` (exact middleware import archive), `link`, and
 `link-map` (PE section, entry-point, unresolved-symbol, and per-unit RVA diagnostics).
 
-The matching toolchain (VC4.2) is provisioned into `build/toolchain/` from the
-`en_vc42ent` discs; `clang`/`clangd` is editor tooling only — the wine MSVC 4.2 build is the
-sole verdict on a match.
+The matching toolchain (VC4.2) is provisioned into `build/toolchain/` from an
+installed `MSDEV` tree or the `en_vc42ent` discs. The provisioner validates the pinned
+compiler, linker, headers, and CRT before publishing the tree atomically:
+
+```sh
+scripts/make-toolchain.sh /path/to/MSDEV
+scripts/make-toolchain.sh --check build/toolchain/msvc
+```
+
+Direct ISO/archive inputs are also accepted when 7z can recover a complete installed tree.
+`clang`/`clangd` is editor tooling only; the Wine MSVC 4.2 build is the sole verdict on a match.
 
 ninja **tracks header dependencies** (via `cc_wrap.py`, since MSVC 4.2 has no `/showIncludes`),
 so editing a shared header recompiles exactly its includers — no stale objects. `homm2 build`
