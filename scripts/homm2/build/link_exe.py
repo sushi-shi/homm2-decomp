@@ -344,6 +344,11 @@ def parse_map_symbols(path):
     return dict(symbols)
 
 
+def decode_map_symbol_name(value):
+    """Decode LINK MAP's printable octal escapes without changing decorated syntax."""
+    return re.sub(r"\\([0-7]{3})", lambda match: chr(int(match.group(1), 8)), value)
+
+
 def parse_map_symbol_records(path):
     records = []
     if not Path(path).exists():
@@ -358,7 +363,7 @@ def parse_map_symbol_records(path):
         records.append({
             "segment": int(match.group(1), 16),
             "offset": int(match.group(2), 16),
-            "name": fields[1],
+            "name": decode_map_symbol_name(fields[1]),
             "va": int(fields[2], 16),
             "flag": fields[3] if len(fields) >= 5 else None,
             "object": fields[-1] if len(fields) >= 4 else None,
@@ -481,6 +486,59 @@ def classify_candidate_storage(candidate, record, contributions):
     }
 
 
+def classify_missing_public_data(symbol, candidate_records):
+    name = symbol["name"]
+    unit = symbol.get("unit") or ""
+    candidate_names = set(candidate_records)
+    if name.startswith("??_C@") and not unit.startswith(("SOURCE/", "BASE/", "EDITOR/")):
+        return {
+            "root_cause": "runtime-library-private-literal",
+            "actionable": False,
+            "evidence": (
+                "Retail public is a compiler-generated literal owned by runtime compiland %s; "
+                "the current LIBCMT member selection/version does not expose the same identity."
+                % unit),
+        }
+    import_equivalents = {
+        "WING32_IMPORT_DESCRIPTOR": "__IMPORT_DESCRIPTOR_WING32",
+        "NULL_IMPORT_DESCRIPTOR": "__NULL_IMPORT_DESCRIPTOR",
+    }
+    if name in import_equivalents:
+        equivalent = import_equivalents[name]
+        return {
+            "root_cause": "legacy-import-library-bookkeeping-name",
+            "actionable": False,
+            "candidate_equivalent": equivalent if equivalent in candidate_names else None,
+            "evidence": (
+                "Retail wing32.def import bookkeeping uses the legacy %s name; the generated "
+                "import library exposes %s%s. This is linker-owned storage, not a source global."
+                % (name, equivalent,
+                   " at a different candidate RVA" if equivalent in candidate_names
+                   else " (not present)")),
+        }
+    if name.startswith("__imp__"):
+        return {
+            "root_cause": "unreferenced-system-import",
+            "actionable": True,
+            "evidence": (
+                "Retail IAT public has no exact candidate MAP entry. Audit the owning call-site "
+                "relocation before changing the system import set."),
+        }
+    if unit.startswith(("SOURCE/", "BASE/", "EDITOR/")):
+        return {
+            "root_cause": "project-definition-absent",
+            "actionable": True,
+            "evidence": (
+                "Retail public is owned by reconstructed project unit %s, but no exact candidate "
+                "MAP definition exists." % unit),
+        }
+    return {
+        "root_cause": "unsupported-or-unlinked-owner",
+        "actionable": False,
+        "evidence": "No exact candidate MAP definition or proven semantic equivalent exists.",
+    }
+
+
 def static_symbol_diagnostics(retail, candidate, map_path, retail_symbols=None):
     retail_symbols = (load_retail_data_symbols() if retail_symbols is None
                       else sorted(retail_symbols, key=lambda row: (row["rva"], row["name"])))
@@ -519,9 +577,17 @@ def static_symbol_diagnostics(retail, candidate, map_path, retail_symbols=None):
             record = matches[0]
             candidate_rva = record["va"] - candidate["image_base"]
             candidate_storage = classify_candidate_storage(candidate, record, contributions)
+            candidate_section = candidate["sections"].get(candidate_storage["section"])
+            candidate_storage["section_offset"] = (
+                candidate_rva - candidate_section["rva"] if candidate_section else None)
             class_matches = (normalized_storage(retail_storage["class"]) ==
                              normalized_storage(candidate_storage["class"]))
             delta = candidate_rva - symbol["rva"]
+            same_section = retail_storage["section"] == candidate_storage["section"]
+            section_relative_delta = (
+                candidate_storage["section_offset"] - retail_storage["section_offset"]
+                if same_section and candidate_storage["section_offset"] is not None and
+                retail_storage["section_offset"] is not None else None)
             if not class_matches:
                 status = "storage-class-mismatch"
             elif delta:
@@ -532,9 +598,12 @@ def static_symbol_diagnostics(retail, candidate, map_path, retail_symbols=None):
                 "candidate_rva": "0x%x" % candidate_rva,
                 "candidate_storage": candidate_storage,
                 "delta": delta,
+                "section_relative_delta": section_relative_delta,
                 "storage_class_matches": class_matches,
                 "status": status,
             })
+        else:
+            row.update(classify_missing_public_data(symbol, candidate_records))
         rows.append(row)
 
     runs = []
@@ -572,6 +641,27 @@ def static_symbol_diagnostics(retail, candidate, map_path, retail_symbols=None):
     for run in runs:
         del run["_key"]
 
+    section_relative_divergences = []
+    previous_by_section = {}
+    for row in rows:
+        if row["candidate_count"] != 1 or row.get("section_relative_delta") is None:
+            continue
+        section = row["retail_storage"]["section"]
+        previous = previous_by_section.get(section)
+        if row["section_relative_delta"] != 0 and row["section_relative_delta"] != previous:
+            section_relative_divergences.append({
+                "name": row["name"],
+                "unit": row["unit"],
+                "section": section,
+                "retail_rva": row["retail_rva"],
+                "candidate_rva": row["candidate_rva"],
+                "retail_section_offset": row["retail_storage"]["section_offset"],
+                "candidate_section_offset": row["candidate_storage"]["section_offset"],
+                "section_relative_delta": row["section_relative_delta"],
+                "previous_section_relative_delta": previous,
+            })
+        previous_by_section[section] = row["section_relative_delta"]
+
     run_starts = {run["start_index"]: run for run in runs}
     divergences = []
     previous_delta = None
@@ -603,11 +693,14 @@ def static_symbol_diagnostics(retail, candidate, map_path, retail_symbols=None):
     status_counts = defaultdict(int)
     retail_class_counts = defaultdict(int)
     candidate_class_counts = defaultdict(int)
+    missing_root_causes = defaultdict(int)
     for row in rows:
         status_counts[row["status"]] += 1
         retail_class_counts[row["retail_storage"]["class"]] += 1
         if row["candidate_storage"]:
             candidate_class_counts[row["candidate_storage"]["class"]] += 1
+        if row["status"] == "missing":
+            missing_root_causes[row["root_cause"]] += 1
     unique = sum(1 for row in rows if row["candidate_count"] == 1)
     class_matches = sum(1 for row in rows if row["storage_class_matches"] is True)
     class_mismatches = sum(1 for row in rows if row["storage_class_matches"] is False)
@@ -629,18 +722,41 @@ def static_symbol_diagnostics(retail, candidate, map_path, retail_symbols=None):
             "status_counts": dict(sorted(status_counts.items())),
             "retail_storage_class_counts": dict(sorted(retail_class_counts.items())),
             "candidate_storage_class_counts": dict(sorted(candidate_class_counts.items())),
+            "missing_root_cause_counts": dict(sorted(missing_root_causes.items())),
             "constant_displacement_runs": len(runs),
             "divergence_run_starts": sum(
                 1 for run in runs if run["delta"] != 0 or not run["storage_class_matches"]),
+            "section_relative_divergence_run_starts": len(section_relative_divergences),
         },
         "first_divergences": divergences[:20],
+        "first_section_relative_divergences": section_relative_divergences[:20],
+        "missing_symbols": [{
+            key: row.get(key) for key in (
+                "name", "unit", "retail_rva", "size", "retail_storage", "root_cause",
+                "actionable", "candidate_equivalent", "evidence")
+        } for row in rows if row["status"] == "missing"],
         "displacement_runs": runs,
         "symbols": rows,
         "interpretation": (
             "Only exact decorated-name matches are correlated. A constant-displacement run is "
             "reported once at its first symbol; later symbols in that run are cumulative layout "
-            "consequences, not independent requests for padding or forced addresses."),
+            "consequences, not independent requests for padding or forced addresses. Section-"
+            "relative deltas remove whole-section RVA drift and expose the first contribution "
+            "change within each section."),
     }
+def write_missing_data_report(path, public_symbols):
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    columns = [
+        "retail_rva", "name", "unit", "size", "root_cause", "actionable",
+        "candidate_equivalent", "evidence",
+    ]
+    with path.open("w", newline="") as output:
+        writer = csv.DictWriter(output, fieldnames=columns, delimiter="\t", extrasaction="ignore")
+        writer.writeheader()
+        writer.writerows(public_symbols["missing_symbols"])
+
+
 def section_diagnostics(retail, candidate):
     result = []
     names = list(retail["sections"])
@@ -798,6 +914,7 @@ def run_link(output, order_response, imports_libraries, resource_path):
     output = Path(output).resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
     report_path = output.with_suffix(".link.json")
+    missing_data_path = output.with_suffix(".missing-data.tsv")
     map_path = output.with_suffix(".map")
     log_path = output.with_suffix(".link.log")
     toolchain = msvc_dir()
@@ -917,6 +1034,7 @@ def run_link(output, order_response, imports_libraries, resource_path):
             "delta": actual_va - IMAGE_BASE - expected_rva if actual_va is not None else None,
         })
     report_path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
+    write_missing_data_report(missing_data_path, report["static_storage"]["public_symbols"])
 
     if run.stdout.strip():
         print(run.stdout.rstrip())
@@ -964,12 +1082,22 @@ def run_link(output, order_response, imports_libraries, resource_path):
               (public_summary["storage_class_matches"],
                public_summary["storage_class_mismatches"],
                public_summary["constant_displacement_runs"]))
+        if public_summary["missing_root_cause_counts"]:
+            print("link audit: missing public-data causes: %s" % ", ".join(
+                "%s=%d" % item
+                for item in public_summary["missing_root_cause_counts"].items()))
         for divergence in storage["public_symbols"]["first_divergences"][:3]:
             print("link audit: static first divergence %s: %s retail %s candidate %s delta %s" %
                   (divergence["kind"], divergence["name"], divergence["retail_rva"],
                    divergence.get("candidate_rva", "unavailable"),
                    "%+d" % divergence["delta"] if divergence.get("delta") is not None
                    else "unavailable"))
+        for divergence in storage["public_symbols"]["first_section_relative_divergences"][:2]:
+            print("link audit: %s first relative drift: %s (%s) offset %#x -> %#x, delta %+d" %
+                  (divergence["section"], divergence["name"], divergence["unit"],
+                   divergence["retail_section_offset"],
+                   divergence["candidate_section_offset"],
+                   divergence["section_relative_delta"]))
         print("link audit: vendor import ABI %s; intra-DLL IAT order %s" %
               ("matches retail" if vendor_import_abi_match else "DIFFERS FROM RETAIL",
                "matches retail" if vendor_import_order_match else "differs"))
@@ -984,6 +1112,7 @@ def run_link(output, order_response, imports_libraries, resource_path):
               (unresolved["count"], ", ".join("%s=%d" % (key, len(value))
                                                for key, value in unresolved["classes"].items())))
     print("link audit: %s" % report_path)
+    print("link audit: %s" % missing_data_path)
     return (0 if run.returncode == 0 and output.exists() and vendor_import_abi_match and
             resource_match else (run.returncode or 1))
 

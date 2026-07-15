@@ -309,6 +309,7 @@ extern int iVWMapOriginY;
 extern int iVWCenterOffset;
 extern int iVWXPixelOffset;
 extern class heroWindow *cPanel;
+extern struct tag_message USMsg;
 extern int iThisMaxY;
 extern int giTownPortalChoice;
 extern int iThisMinY;
@@ -319,6 +320,7 @@ extern int giLimitUpdMaxX;
 extern int giLimitUpdMaxY;
 extern int bPrefsChanged;
 extern int giLimitUpdMinY;
+extern struct tag_message CDMsg;
 extern signed char bComboDraw[18][18];
 extern int iLastAnimFrame;
 

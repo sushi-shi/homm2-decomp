@@ -4,7 +4,8 @@ import unittest
 from pathlib import Path
 
 from homm2.build.link_exe import (
-    classify_pe_storage, load_retail_data_symbols, load_retail_order,
+    classify_missing_public_data, classify_pe_storage, decode_map_symbol_name,
+    load_retail_data_symbols, load_retail_order,
     normalized_vendor_imports, parse_map_contributions, parse_map_symbol_records,
     parse_map_symbols, parse_unresolved, read_coff_section, read_imports, read_order_response, read_pe,
     static_symbol_diagnostics)
@@ -70,6 +71,24 @@ class LinkExeTest(unittest.TestCase):
             "segment": 3, "offset": 0x140, "name": "global", "va": 0x403140,
             "flag": None, "object": "<common>",
         })
+
+    def test_map_symbol_name_decodes_link_printable_octal_escape(self):
+        self.assertEqual(decode_map_symbol_name(r"\177KERNEL32_NULL_THUNK_DATA"),
+                         "\x7fKERNEL32_NULL_THUNK_DATA")
+
+    def test_missing_runtime_literal_is_classified_as_non_actionable(self):
+        result = classify_missing_public_data({
+            "name": "??_C@_0L@ODMK@new_p?5?$DN?$DN?50?$AA@", "unit": "handler",
+        }, {})
+        self.assertEqual(result["root_cause"], "runtime-library-private-literal")
+        self.assertFalse(result["actionable"])
+
+    def test_legacy_import_descriptor_reports_candidate_equivalent(self):
+        result = classify_missing_public_data({
+            "name": "WING32_IMPORT_DESCRIPTOR", "unit": "wing32.def",
+        }, {"__IMPORT_DESCRIPTOR_WING32": [{}]})
+        self.assertEqual(result["root_cause"], "legacy-import-library-bookkeeping-name")
+        self.assertEqual(result["candidate_equivalent"], "__IMPORT_DESCRIPTOR_WING32")
 
     def test_map_contribution_parser_keeps_initialized_and_bss_rows(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -172,6 +191,30 @@ class LinkExeTest(unittest.TestCase):
             parsed = read_coff_section(path, ".text")
         self.assertEqual(parsed, {"raw_size": 0x123, "alignment": 0x10,
                                   "aligned_size": 0x130})
+
+    def test_static_symbol_audit_separates_section_rva_and_contribution_drift(self):
+        retail = {"image_base": 0x400000, "sections": {
+            ".rdata": {"rva": 0x2000, "raw_size": 0x40, "virtual_size": 0x40},
+        }}
+        candidate = {"image_base": 0x400000, "sections": {
+            ".rdata": {"rva": 0x3000, "raw_size": 0x80, "virtual_size": 0x80},
+        }}
+        symbols = [
+            {"name": "same_offset", "unit": "ONE", "rva": 0x2004, "size": 4},
+            {"name": "later_offset", "unit": "TWO", "rva": 0x2008, "size": 4},
+        ]
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "test.map"
+            path.write_text(
+                " 0002:00000000 00000080H .rdata DATA\n"
+                " 0002:00000004 same_offset 00403004 one.obj\n"
+                " 0002:00000010 later_offset 00403010 two.obj\n")
+            audit = static_symbol_diagnostics(retail, candidate, path, symbols)
+        self.assertEqual(audit["symbols"][0]["delta"], 0x1000)
+        self.assertEqual(audit["symbols"][0]["section_relative_delta"], 0)
+        self.assertEqual(audit["symbols"][1]["section_relative_delta"], 8)
+        self.assertEqual(audit["first_section_relative_divergences"][0]["name"],
+                         "later_offset")
 
     def test_order_response_paths_are_relative_to_the_artifact(self):
         with tempfile.TemporaryDirectory() as temp:

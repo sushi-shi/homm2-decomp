@@ -60,6 +60,7 @@ enum {
     X_GLOBAL_EXPANSION_CAMPAIGN_AWARD_COUNT = 12,
     X_GLOBAL_EXPANSION_HERO_NAME_COUNT = 6,
     X_GLOBAL_SHORT_SKILL_LEVEL_COUNT = 4,
+    X_GLOBAL_NEW_HERO_ALIGNMENT_COUNT = 16,
     GLOBAL_MAP_NAME_SIZE = 0x18,
     GLOBAL_TCP_TEXT_SIZE = 0x18,
     GLOBAL_AGGREGATE_PATH_SIZE = 0x160,
@@ -88,6 +89,7 @@ extern char *xJosephName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT];
 extern char *xUncleIvanName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT];
 extern char *xShortSSLevelNames[X_GLOBAL_SHORT_SKILL_LEVEL_COUNT];
 extern char *xPasswordStrings[X_GLOBAL_PASSWORD_STRING_COUNT];
+extern unsigned char xNewHeroAlignment[X_GLOBAL_NEW_HERO_ALIGNMENT_COUNT];
 extern int xPasswordStringsIndex[];
 extern int xShrineBuildingCost[];
 
