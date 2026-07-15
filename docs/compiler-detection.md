@@ -2,8 +2,9 @@
 
 **Conclusion: Microsoft Visual C++ 4.2 compiler and CRT** (cl 10.20), with a final
 linker that stamped PE version **3.00**, and CVTRES 4.00. Compiler identity is high
-confidence from static evidence and matching behavior. The exact final LINK.EXE binary
-is not yet locally available for an A/B link.
+confidence from static evidence and matching behavior. A checksum-verified VC 4.0
+LINK 3.00.5270 from archive.org reproduces that final-link version and is now the
+pinned final-link component.
 
 The closest evidence-backed shipping pipeline is:
 
@@ -53,13 +54,21 @@ survives in the shipped NB09 stream.
 - The PE 3.00 linker stamp does not contradict a VC4.2 compiler and CRT. Microsoft tools
   can be mixed, and the shipping build may have retained an older final linker.
 
-## Final-linker A/B test
+## Final-linker identification
 
-All locally provisioned project toolchains contain the same LINK 4.20.6164 binary; no
-LINK 3.00 candidate was found under `/home/sheep`. Do not substitute an unproven download.
-The required external artifact is a provenance-known Microsoft 32-bit x86 LINK.EXE whose
-startup banner reports version 3.00, likely from the VC4.0-era distribution, plus any files
-that binary requires to run. Record its SHA-256 before testing.
+Archive.org item `msvc4x`, file `MSVC40.iso`, was verified against its published
+MD5 `772b1bbd7d7ff95399145f02d719587b` and SHA-1
+`81e139ac41d76740a6ba6d474355b37ed2e46c66`. Its LINK.EXE reports
+`3.00.5270`, has SHA-256
+`81109c8cb534debc0c5645db7c3a1b99dd646d982b0fd545070ceb1c77f9cb6c`,
+and writes the same PE linker version 3.00 as retail.
+
+The valid A/B must also select the sibling VC 4.0 CVPACK and MSPDB40. Mixing LINK
+3.00 with VC 4.2 CVPACK fails with LNK4027. CVTRES is byte-identical between the
+verified VC 4.0 and VC 4.2 media. The pinned combined run returns success, emits a
+minimal NB09 stream, matches the resource tree and vendor import ABI, and leaves
+the remaining section/public differences attributable to current objects,
+libraries, and static-storage reconstruction.
 
 The final-link driver accepts `--linker` or `HOMM2_LINK_EXE` without changing the VC4.2
 compiler, object files, SDK libraries, resource input, object order, or flags. After building

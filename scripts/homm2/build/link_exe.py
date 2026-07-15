@@ -94,6 +94,27 @@ def resolve_link_executable(toolchain, override=None):
     return path, "VC4.2 toolchain default"
 
 
+def link_environment(library_path, tool_directory, environ=None):
+    environment = dict(os.environ if environ is None else environ)
+    environment["LIB"] = str(library_path)
+    existing_path = environment.get("PATH")
+    environment["PATH"] = (str(tool_directory) + os.pathsep + existing_path
+                           if existing_path else str(tool_directory))
+    return environment
+
+
+def sibling_tool_identities(link_exe):
+    identities = {}
+    for name in ("CVPACK.EXE", "CVTRES.EXE", "MSPDB40.DLL", "MSPDB41.DLL"):
+        path = find_ci(Path(link_exe).parent, name)
+        if path is not None:
+            identities[name] = {
+                "path": str(path),
+                "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+            }
+    return identities
+
+
 def winepath_w(path):
     return winepaths_w([path])[0]
 
@@ -1033,20 +1054,21 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
     expected_objects = [row["object"].resolve() for row in order]
     if response_objects != expected_objects:
         raise RuntimeError("link-order response does not match current NB09 contribution order")
-    for stale in (output, map_path):
+    for stale in (output, map_path, missing_data_path):
         stale.unlink(missing_ok=True)
+    library_path = winepath_w(toolchain / "lib")
     command = [
         "wine", str(link_exe), *RETAIL_LINK_FLAGS,
         "/MAP:" + winepath_w(map_path),
         "/OUT:" + winepath_w(output),
-        "/LIBPATH:" + winepath_w(toolchain / "lib"),
     ]
     command.extend(winepaths_w(response_objects))
     command.append(winepath_w(resource_path))
     command.extend(SYSTEM_LIBS_BEFORE_VENDOR)
     command.extend(winepaths_w(imports_libraries))
     command.extend(SYSTEM_LIBS_AFTER_VENDOR)
-    run = subprocess.run(command, cwd=output.parent, text=True,
+    run = subprocess.run(command, cwd=output.parent,
+                         env=link_environment(library_path, link_exe.parent), text=True,
                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     log_path.write_text(run.stdout, encoding="utf-8")
 
@@ -1076,6 +1098,7 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
             "path": str(link_exe),
             "selection_source": linker_source,
             "sha256": hashlib.sha256(link_exe.read_bytes()).hexdigest(),
+            "sibling_tools": sibling_tool_identities(link_exe),
             "banner": banner,
             "retail_pe_version": retail["linker_version"],
             "retail_final_linker_evidence": "PE32 MajorLinkerVersion.MinorLinkerVersion",
@@ -1085,6 +1108,7 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
         },
         "order_source": "NB09 sstModule executable contribution order",
         "link_flags": list(RETAIL_LINK_FLAGS),
+        "library_search": {"mechanism": "LIB environment", "path": library_path},
         "resource_input": str(resource_path),
         "resources": resources,
         "unresolved": unresolved,
@@ -1126,7 +1150,8 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
             "delta": actual_va - IMAGE_BASE - expected_rva if actual_va is not None else None,
         })
     report_path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
-    write_missing_data_report(missing_data_path, report["static_storage"]["public_symbols"])
+    if report["static_storage"]:
+        write_missing_data_report(missing_data_path, report["static_storage"]["public_symbols"])
 
     if run.stdout.strip():
         print(run.stdout.rstrip())

@@ -128,12 +128,16 @@
             export PYTHONPATH="$HOMM2_DIR/scripts''${PYTHONPATH:+:$PYTHONPATH}"
             export HOMM2_TOOLCHAIN="''${HOMM2_TOOLCHAIN:-$HOMM2_DIR/build/toolchain}"
             export MSVC_DIR="$HOMM2_TOOLCHAIN/msvc"
+            if [ -f "$HOMM2_TOOLCHAIN/link300/bin/LINK.EXE" ]; then
+              export HOMM2_LINK_EXE="$HOMM2_TOOLCHAIN/link300/bin/LINK.EXE"
+            fi
             export WINEPREFIX="$HOMM2_DIR/build/wineprefix"
             export WINEDEBUG="fixme-all,err-kerberos"
             export WINEDLLOVERRIDES="mscoree,mshtml="
             case "$-" in *i*) trap 'wineserver -k >/dev/null 2>&1 || true' EXIT ;; esac
             git -C "$HOMM2_DIR" config --local core.hooksPath .githooks 2>/dev/null || true
             echo "[homm2] MSVC 4.2   : $MSVC_DIR/bin/CL.EXE (under wine)" >&2
+            echo "[homm2] final LINK : ''${HOMM2_LINK_EXE:-$MSVC_DIR/bin/LINK.EXE}" >&2
             if [ ! -f "$MSVC_DIR/bin/CL.EXE" ] && [ ! -f "$MSVC_DIR/bin/cl.exe" ]; then
               echo "[homm2] MSVC 4.2   : NOT PROVISIONED - run scripts/make-toolchain.sh on the en_vc42ent discs" >&2
             fi
