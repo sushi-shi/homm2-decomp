@@ -12,9 +12,13 @@
       url = "github:srp-survarium/vostok-delinker/8a42a0ba6f6b90651d62d1911eb97b80a5faa149";
       flake = false;
     };
+    objdiff-src = {
+      url = "github:encounter/objdiff/v3.7.1";
+      flake = false;
+    };
   };
 
-  outputs = { self, nixpkgs, rust-overlay, vostok-delinker-src }:
+  outputs = { self, nixpkgs, rust-overlay, vostok-delinker-src, objdiff-src }:
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; overlays = [ rust-overlay.overlays.default ]; };
@@ -33,15 +37,21 @@
         cargoHash = "sha256-ry3TH1fz7Aj/JdbmlgQFFn29m8E7EQHyGaVXnZTEcXo=";
       };
 
-      # objdiff - upstream prebuilt Linux binaries (foreign ELF patched), x86 + COFF.
+      # Build the CLI from the pinned upstream source so its machine-readable diff
+      # schema can expose the allocation evidence used by strict data audits.
       objdiffVersion = "3.7.1";
       objdiffUrl = name: "https://github.com/encounter/objdiff/releases/download/v${objdiffVersion}/${name}";
       objdiffGuiLibs = with pkgs; [ libGL libxkbcommon wayland fontconfig freetype libx11 libxcursor libxi libxrandr libxcb ];
-      objdiff-cli = pkgs.stdenv.mkDerivation {
+      objdiff-cli = nightly-rustPlatform.buildRustPackage {
         pname = "objdiff-cli"; version = objdiffVersion;
-        src = pkgs.fetchurl { url = objdiffUrl "objdiff-cli-linux-x86_64"; hash = "sha256-QNhW2gHgpnbA8zr1NOVi8JjNUORey2Tzs0ZBjHsmSuY="; };
-        dontUnpack = true; nativeBuildInputs = [ pkgs.autoPatchelfHook ]; buildInputs = [ pkgs.stdenv.cc.cc.lib ];
-        installPhase = "install -Dm755 $src $out/bin/objdiff-cli";
+        src = objdiff-src;
+        patches = [ ./patches/objdiff-data-symbol-details.patch ];
+        cargoHash = "sha256-KlNA9JleBd5TwpeVZrAhAL2nKyp28hKiQ59qyZq7nKg=";
+        cargoBuildFlags = [ "-p" "objdiff-cli" ];
+        cargoTestFlags = [ "-p" "objdiff-core" "-p" "objdiff-cli" ];
+        cargoInstallFlags = [ "-p" "objdiff-cli" ];
+        nativeBuildInputs = [ pkgs.protobuf ];
+        OBJDIFF_REGENERATE_PROTO = "1";
       };
       objdiff = pkgs.stdenv.mkDerivation {
         pname = "objdiff"; version = objdiffVersion;

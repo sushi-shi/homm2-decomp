@@ -16,9 +16,27 @@
         "type": "github"
       }
     },
+    "objdiff-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1774108449,
+        "narHash": "sha256-MBPZFQCddAvJ7Au7+Hl8dB/Nd7lfreCqIXDXdYmZUak=",
+        "owner": "encounter",
+        "repo": "objdiff",
+        "rev": "3cebee67667d440fa0fe1b64026c35db53ac40d6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "encounter",
+        "ref": "v3.7.1",
+        "repo": "objdiff",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "nixpkgs": "nixpkgs",
+        "objdiff-src": "objdiff-src",
         "rust-overlay": "rust-overlay",
         "vostok-delinker-src": "vostok-delinker-src"
       }

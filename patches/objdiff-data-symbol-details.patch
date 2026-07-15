@@ -1,0 +1,33 @@
+diff --git a/objdiff-core/build.rs b/objdiff-core/build.rs
+index 48e1a34..143e2f0 100644
+--- a/objdiff-core/build.rs
++++ b/objdiff-core/build.rs
+@@ -21 +21,2 @@ fn compile_protos() {
+-    let mut run_protoc = false;
++    let mut run_protoc =
++        std::env::var_os("OBJDIFF_REGENERATE_PROTO").is_some();
+diff --git a/objdiff-core/protos/diff.proto b/objdiff-core/protos/diff.proto
+index afb025a..44475b3 100644
+--- a/objdiff-core/protos/diff.proto
++++ b/objdiff-core/protos/diff.proto
+@@ -50,0 +51,4 @@ message DiffSymbol {
++  // Section index in the containing DiffObject.
++  optional uint32 section = 11;
++  // Relocation diff rows belonging to this data symbol.
++  repeated DiffDataRelocation data_relocations = 12;
+diff --git a/objdiff-core/src/bindings/diff.rs b/objdiff-core/src/bindings/diff.rs
+index 0dd22b6..18d97fc 100644
+--- a/objdiff-core/src/bindings/diff.rs
++++ b/objdiff-core/src/bindings/diff.rs
+@@ -104,0 +105,8 @@ impl DiffSymbol {
++        let data_relocations = symbol_diff
++            .data_rows
++            .iter()
++            .flat_map(|row| {
++                row.relocations.iter().map(|reloc| DiffDataRelocation::new(obj, reloc))
++            })
++            .collect();
++
+@@ -117,0 +126,2 @@ impl DiffSymbol {
++            section: symbol.section.map(|index| index as u32),
++            data_relocations,
