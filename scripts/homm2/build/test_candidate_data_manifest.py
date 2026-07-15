@@ -4,6 +4,7 @@ from homm2.build.candidate_data_manifest import (
     REPO,
     _contains,
     candidate_definitions,
+    diagnostics_bytes,
     derive_allocations,
 )
 
@@ -15,6 +16,18 @@ class CandidateDataManifestTest(unittest.TestCase):
         self.assertTrue(_contains(intervals, 0x11F))
         self.assertFalse(_contains(intervals, 0x0FF))
         self.assertFalse(_contains(intervals, 0x11F, 2))
+
+    def test_diagnostics_are_machine_readable_and_count_overlapping_causes(self):
+        from homm2.build.candidate_data_manifest import DerivationStats, GroupDiagnostic
+        import json
+
+        rows = [
+            GroupDiagnostic("A", "data", ("unmapped", "uncovered"), ("first",)),
+            GroupDiagnostic("B", "data", ("uncovered",), ("second",)),
+        ]
+        payload = json.loads(diagnostics_bytes(DerivationStats(open_groups=2), rows))
+        self.assertEqual(payload["open_by_storage"], {"data": 2})
+        self.assertEqual(payload["open_by_cause"], {"uncovered": 2, "unmapped": 1})
 
     def test_icondf2b_candidate_topology_and_retail_bijection(self):
         path = REPO / "build/objdiff/base/BASE/Icondf2b.obj"
@@ -33,6 +46,17 @@ class CandidateDataManifestTest(unittest.TestCase):
         self.assertEqual(len(mapped), 13, diagnostics)
         self.assertEqual({row.rva for row in mapped}, set(range(0x1381B8, 0x1381EC, 4)))
         self.assertTrue(all(row.proof_count >= 1 for row in mapped))
+        self.assertTrue(all(row.provenance == "candidate-coff-section-translation"
+                            for row in mapped))
+        self.assertFalse(any(
+            row.storage == "bss" and row.unit in ("BASE/BUTTON", "BASE/Blur")
+            for row in allocations))
+        missing_contribution = {
+            (row.unit, row.storage) for row in diagnostics
+            if "retail_contribution_missing" in row.causes
+        }
+        self.assertTrue({("BASE/BUTTON", "bss"), ("BASE/Blur", "bss")} <=
+                        missing_contribution)
 
 
 if __name__ == "__main__":

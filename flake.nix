@@ -35,6 +35,9 @@
           ./patches/vostok-delinker-reviewed-data.patch
           ./patches/vostok-delinker-contribution-manifest.patch
           ./patches/vostok-delinker-candidate-data.patch
+          ./patches/vostok-delinker-symbol-reuse.patch
+          ./patches/vostok-delinker-local-name-scope.patch
+          ./patches/vostok-delinker-explicit-unresolved.patch
         ];
         cargoHash = "sha256-ry3TH1fz7Aj/JdbmlgQFFn29m8E7EQHyGaVXnZTEcXo=";
       };
@@ -122,7 +125,7 @@
                 && echo "[homm2] hooks      : pre-commit auto-format on (.githooks)" >&2
             fi
             ${ghidraEnvHook}
-            echo "[homm2] target EXE : $HOMM2_EXE (CodeView NB09 - symbols are authoritative)" >&2
+            echo "[homm2] target EXE : $HOMM2_EXE (minimal CodeView NB09 - public names/RVAs only)" >&2
             echo "[homm2] tools      : vostok-delinker, objdiff(-cli), llvm-pdbutil, clang(d), ghidra" >&2
             echo "[homm2] cli        : 'homm2 <cmd>' (status/clangd/sema/ghidra/format/...)" >&2
             echo "[homm2] build/MSVC : 'nix develop .#build' for 'homm2 build' (VC4.2 + wine)" >&2

@@ -1,7 +1,7 @@
 """homm2 init - the one-time setup that splits HEROES2W.EXE into target objects.
 
-This does the heavy one-time work. It runs ONCE: CodeView plus validated hidden
-procedures -> manifest/coverage audit -> ??_C@ string names -> synth
+This does the heavy one-time work. It runs ONCE: minimal CodeView public anchors plus
+validated reconstructed private ranges -> manifest/coverage audit -> ??_C@ string names -> synth
 PDB -> vostok-delinker -> per-unit target objs -> configure. Needs `nix develop .#build`
 (wine + MSVC for the ??_C@ string oracle). Idempotent: safe to re-run.
 """
@@ -21,15 +21,31 @@ def main(argv=None):
     if run("python3", "scripts/name_strings.py"): return 1
     # 3. synthesize the PDB the delinker needs
     if run("python3", "-m", "homm2.build.synth_pdb"): return 1
-    if run("python3", "-m", "homm2.build.reviewed_data", "--write-manifest"): return 1
-    # 4. delink HEROES2W.EXE -> per-unit COFF target objects (folder-structured)
-    shutil.rmtree(REPO / "build/delink", ignore_errors=True); (REPO / "build/delink").mkdir(parents=True)
-    if run("vostok-delinker", "--pdb-path", "build/pdb/HEROES2W.pdb", "--exe-path", "build/orig/HEROES2W.EXE",
-           "--output-path", "build/delink", "--engine-path", "c:\\proj\\",
-           "--data-manifest", "build/gen/reviewed_delink_data.tsv",
-           "--contribution-manifest", "build/gen/delink_contributions.tsv",
-           "--recover-data-relocs-from-pdb"): return 1
-    if run("python3", "-m", "homm2.build.reviewed_data", "--record-current"): return 1
+    canonical = [
+        REPO / "config/delink_data_topology.tsv",
+        REPO / "config/delink_contributions.tsv",
+        REPO / "config/retail_coverage.tsv",
+        REPO / "config/retail_coverage_diagnostics.json",
+        REPO / "config/delink_unresolved_data.tsv",
+    ]
+    if any(path.is_file() for path in canonical) and not all(path.is_file() for path in canonical):
+        print("[init] canonical data topology is incomplete: all versioned manifests are required")
+        return 1
+    if all(path.is_file() for path in canonical):
+        # A promoted target is reproduced only from versioned canonical inputs.
+        if run("python3", "-m", "homm2.build.reviewed_data", "--regenerate"): return 1
+    else:
+        # Bootstrap is intentionally permissive. It exists only to compile candidates
+        # from which the complete canonical topology can later be proposed and promoted.
+        if run("python3", "-m", "homm2.build.reviewed_data", "--write-manifest"): return 1
+        shutil.rmtree(REPO / "build/delink", ignore_errors=True)
+        (REPO / "build/delink").mkdir(parents=True)
+        if run("vostok-delinker", "--pdb-path", "build/pdb/HEROES2W.pdb", "--exe-path", "build/orig/HEROES2W.EXE",
+               "--output-path", "build/delink", "--engine-path", "c:\\proj\\",
+               "--data-manifest", "build/gen/reviewed_delink_data.tsv",
+               "--contribution-manifest", "build/gen/delink_contributions.tsv",
+               "--recover-data-relocs-from-pdb"): return 1
+        if run("python3", "-m", "homm2.build.reviewed_data", "--record-current"): return 1
     # 5. configure the base build + objdiff project
     if run("python3", "configure.py"): return 1
     # 6. generate the clangd compile DB (editor tooling: resolves <va.h> + MSVC headers)

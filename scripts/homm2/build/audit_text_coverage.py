@@ -2,6 +2,7 @@
 """Audit exact delinker spans and every nested executable-entry candidate."""
 import bisect
 import csv
+import os
 import re
 import struct
 import subprocess
@@ -32,6 +33,49 @@ def text_section(path):
         virtual_size, rva, raw_size, raw = struct.unpack_from("<IIII", data, off + 8)
         return image_base, rva, data[raw:raw + min(virtual_size, raw_size)]
     raise SystemExit("PE has no .text section")
+
+
+def highlow_pointer_targets(path, image_base):
+    data = open(path, "rb").read()
+    pe = struct.unpack_from("<I", data, 0x3c)[0]
+    count = struct.unpack_from("<H", data, pe + 6)[0]
+    optional_size = struct.unpack_from("<H", data, pe + 20)[0]
+    optional = pe + 24
+    sections = []
+    for index in range(count):
+        offset = optional + optional_size + index * 40
+        _virtual_size, rva, raw_size, raw = struct.unpack_from(
+            "<IIII", data, offset + 8)
+        sections.append((rva, raw_size, raw))
+
+    def raw_offset(rva):
+        for start, size, raw in sections:
+            if start <= rva < start + size:
+                return raw + rva - start
+        return None
+
+    reloc_rva, reloc_size = struct.unpack_from("<II", data, optional + 96 + 5 * 8)
+    cursor = raw_offset(reloc_rva)
+    if cursor is None:
+        return {}
+    limit = cursor + reloc_size
+    targets = {}
+    while cursor + 8 <= limit:
+        page, block_size = struct.unpack_from("<II", data, cursor)
+        if block_size < 8 or cursor + block_size > limit:
+            raise ValueError("invalid PE base-relocation block")
+        for offset in range(cursor + 8, cursor + block_size, 2):
+            entry = struct.unpack_from("<H", data, offset)[0]
+            if entry >> 12 != 3:
+                continue
+            site = page + (entry & 0xFFF)
+            raw = raw_offset(site)
+            if raw is None or raw + 4 > len(data):
+                continue
+            target = (struct.unpack_from("<I", data, raw)[0] - image_base) & 0xFFFFFFFF
+            targets.setdefault(target, []).append(site)
+        cursor += block_size
+    return targets
 
 
 def parse_disassembly(exe, image_base):
@@ -92,6 +136,68 @@ def subtract_ranges(start, end, exclusions):
     return pieces
 
 
+def write_coverage_partition(path, text_rva, text_end, spans, gaps, exclusions,
+                             jump_tables, unit_by_name):
+    """Write the exact successful .text byte partition for canonical review."""
+    rows = []
+    table_ranges = []
+    for left, right in sorted(jump_tables):
+        if table_ranges and left <= table_ranges[-1][1]:
+            previous = table_ranges[-1]
+            table_ranges[-1] = (
+                previous[0], max(previous[1], right), "jump-table",
+                previous[3] + ",0x%x" % left)
+        else:
+            table_ranges.append((left, right, "jump-table", "0x%x" % left))
+    for start, end, aliases in spans:
+        names = sorted(name for name, _provenance in aliases)
+        owners = sorted({unit_by_name.get(name, "-") for name in names})
+        cuts = [(left, right, kind, identity)
+                for left, right, kind, identity in table_ranges
+                if start <= left and right <= end]
+        for left, right in subtract_ranges(start, end, cuts):
+            rows.append((left, right, "function", ",".join(owners),
+                         ",".join(names), "retained-or-recovered-procedure"))
+        for left, right, kind, identity in cuts:
+            rows.append((left, right, kind, ",".join(owners), identity,
+                         "build/gen/jump_tables.csv"))
+    for start, end, kind, reason in exclusions:
+        cuts = [(left, right, table_kind, identity)
+                for left, right, table_kind, identity in table_ranges
+                if start <= left and right <= end]
+        for left, right in subtract_ranges(start, end, cuts):
+            rows.append((left, right, kind, "-", reason,
+                         "config/delink_text_exclusions.csv"))
+        for left, right, table_kind, identity in cuts:
+            rows.append((left, right, table_kind, "-", identity,
+                         "build/gen/jump_tables.csv"))
+    for start, end in gaps:
+        for left, right in subtract_ranges(start, end, exclusions):
+            rows.append((left, right, "padding", "-", "-", "retail-padding-bytes"))
+    rows.sort()
+    cursor = text_rva
+    for start, end, _kind, _owner, _identity, _provenance in rows:
+        if start != cursor or end <= start:
+            raise RuntimeError("text coverage partition gap/overlap at 0x%x" % cursor)
+        cursor = end
+    if cursor != text_end:
+        raise RuntimeError("text coverage partition ends at 0x%x, expected 0x%x" %
+                           (cursor, text_end))
+    lines = [
+        "domain\towner\tstorage\tstart\tsize\tkind\tidentity\tprovenance",
+    ]
+    for start, end, kind, owner, identity, provenance in rows:
+        lines.append("text\t%s\ttext\t0x%x\t0x%x\t%s\t%s\t%s" % (
+            owner, start, end - start, kind,
+            identity.replace("\t", " "), provenance.replace("\t", " ")))
+    payload = ("\n".join(lines) + "\n").encode("utf-8")
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(".%s.tmp" % path.name)
+    temporary.write_bytes(payload)
+    os.replace(temporary, path)
+
+
 def main(argv=None):
     argv = list(argv or sys.argv[1:])
     exe = argv[0] if argv else "build/orig/HEROES2W.EXE"
@@ -101,14 +207,17 @@ def main(argv=None):
     rejection_path = Path("config/delink_candidate_rejections.csv")
     exclusion_path = Path("config/delink_text_exclusions.csv")
     jump_table_path = Path("build/gen/jump_tables.csv")
+    output_path = Path(argv[3]) if len(argv) > 3 else None
 
     image_base, text_rva, text = text_section(exe)
     text_end = text_rva + len(text)
     instructions, calls = parse_disassembly(exe, image_base)
+    pointer_targets = highlow_pointer_targets(exe, image_base)
     instruction_starts = sorted(instructions)
 
     manifest_rows = list(csv.DictReader(open(manifest, newline="")))
     intervals = []
+    unit_by_name = {}
     public_by_rva = {}
     nb09_starts = set()
     for row in manifest_rows:
@@ -119,11 +228,11 @@ def main(argv=None):
         provenance = row.get("provenance", "")
         if size and text_rva <= start < text_end:
             intervals.append((start, start + size, row["name"], provenance))
+            unit_by_name[row["name"]] = row["unit"]
         if provenance.startswith("cv-public"):
             public_by_rva.setdefault(start, (row["name"], row["unit"]))
             nb09_starts.add(start)
-        elif provenance.startswith("cv-lproc") or provenance.startswith("cv-gproc") \
-                or provenance.startswith("cv-thunk"):
+        elif provenance.startswith("cv-thunk"):
             nb09_starts.add(start)
 
     configured = {}
@@ -195,6 +304,7 @@ def main(argv=None):
             unit_display = owner_unit
             candidate_failures.append((rva, "unreviewed nested entry candidate"))
         caller_text = ",".join("0x%x" % caller for caller in incoming) or "none"
+        pointer_text = ",".join("0x%x" % site for site in pointer_targets.get(rva, [])) or "none"
         extent = "config=0x%x" % configured[rva][0] if rva in configured else "config=-"
         if gh_size:
             extent += ",ghidra=0x%x:%s" % (gh_size, gh_name)
@@ -202,15 +312,18 @@ def main(argv=None):
         if rva in configured:
             end = rva + configured[rva][0]
             owned_tables = sum(rva <= left and right <= end for left, right in jump_tables)
-        print("  0x%x in 0x%x..0x%x %s; callers=%s; boundary=%s; extent=%s; "
+        print("  0x%x in 0x%x..0x%x %s; callers=%s; pointers=%s; boundary=%s; extent=%s; "
               "unit=%s; jump_tables=%d; %s" %
-              (rva, owner_start, owner_end, owner_name, caller_text, boundary, extent,
+              (rva, owner_start, owner_end, owner_name, caller_text, pointer_text,
+               boundary, extent,
                unit_display, owned_tables, disposition))
 
     for rva, (size, name, _unit, provenance) in configured.items():
         end = rva + size
-        if rva not in nb09_starts and rva not in {candidate[0] for candidate in candidates}:
-            candidate_failures.append((rva, "%s has no direct-call or Ghidra entry evidence" % name))
+        if (rva not in nb09_starts and rva not in pointer_targets and
+                rva not in {candidate[0] for candidate in candidates}):
+            candidate_failures.append((
+                rva, "%s has no direct-call, stored-pointer, or Ghidra entry evidence" % name))
         if end not in instructions and end != text_end:
             previous_index = bisect.bisect_left(instruction_starts, end) - 1
             if previous_index < 0 or instruction_starts[previous_index] + \
@@ -300,7 +413,11 @@ def main(argv=None):
               (left_start, left_end, start, end, name))
     for rva, problem in candidate_failures + exclusion_failures:
         print("  EVIDENCE 0x%x: %s" % (rva, problem))
-    return 1 if unexplained or overlap or candidate_failures or exclusion_failures else 0
+    failed = bool(unexplained or overlap or candidate_failures or exclusion_failures)
+    if not failed and output_path is not None:
+        write_coverage_partition(output_path, text_rva, text_end, spans, gaps,
+                                 exclusions, jump_tables, unit_by_name)
+    return 1 if failed else 0
 
 
 if __name__ == "__main__":

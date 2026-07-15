@@ -19,5 +19,8 @@ preserves legacy behavior for addresses outside the supplied ranges.
 its proven extent before contribution-level fallback runs; contribution ranges are not symbol sizes
 and never authorize materializing an entire TU data interval as one object.
 
-Both `homm2 init` and the reviewed-target freshness refresh generate and pass the manifest. Its digest
-is part of `.reviewed-data-stamp.json`, so an NB09/parser/units change forces target regeneration.
+Bootstrap `homm2 init` generates and passes `build/gen/delink_contributions.tsv`. Canonical
+promotion copies the reviewed result to versioned `config/delink_contributions.tsv`; strict target
+regeneration consumes that file without rederiving it. Its digest is part of
+`.reviewed-data-stamp.json`. A changed canonical input makes normal build/status fail until the
+explicit `homm2 data-topology regenerate` command replaces the target.
