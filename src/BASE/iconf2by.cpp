@@ -48,6 +48,13 @@ static int gFYClipR;
 // A 2026-07-15 256-state exact-only typedef/enum/record/member/prototype/include sweep produced no
 // improvement over the 87.839140% direct baseline and no exact closure. Generated state was removed;
 // do not repeat or record it as MAX. The setup/body residual requires new source structure.
+// A later live-baseline audit at 88.806970%, 0x582, 142/144 exhaustively tested all 32 semantic
+// suffixes and 18 plausible whole-name spellings for clipWidth; every rename was byte-identical.
+// `register`, `const`, direct/split initialization, and moving that declaration beside Y or ClipR
+// were also byte-identical. Extracting the setup shear subtraction into 16 inline helper identities
+// fell to 86.206436%; all 127 safe scalar/nested helper sites topped out at 88.552280%. Generated
+// helper source was restored. These results rule out local spelling/scope and simple predecessor
+// helpers, but do not prove a wall or justify changing the correct enum/header ownership.
 VA(0x004d9ce0, 0x58d)
 void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                              int clip, int clipX, int clipY, int clipW, int clipH, int color,
