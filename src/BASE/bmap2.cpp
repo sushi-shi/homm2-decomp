@@ -35,20 +35,21 @@ void FillBitmapArea(class bitmap *bmp, int x, int y, int w, int h, int color)
     }
 }
 
-// @match-note: retail/base are both 0x114 bytes with the same 0x8-byte local
-// area, saved-register set, CFG, and 7/7 external relocation occurrences. The
-// first live divergence is +0x2d: base emits `cmp eax,ecx; jle`, retail
-// `cmp ecx,eax; jge`; equivalent operand-order residuals recur at +0x59,
-// +0x7b, +0x98, and the loop back-edge at +0x104. At +0xa2 retail schedules
-// the gFillRow zero store between loading m_pixels and adding it to
-// m_width*y, while base stores it before the pointer expression. Compound,
-// nested-positive (also seen in the secondary decomp), and early-return
-// overlap tests, +/-1 association, semantic bound names, a for-loop fill,
-// relational polarity, and pointer/counter initialization order were
-// byte-neutral or remained below the retained 94.44% maximum. A guarded
-// 40-trial parser-visible TU-state pass (seed 0x424d4150) found no exact
-// closure and retained nothing. Revisit only after an exact-preserving
-// predecessor or shared-header state change.
+// @match-note: the retail/base CodeView spans are both 0x114 bytes, with the
+// same 0x8-byte local area, saved-register set, CFG, and 7/7 external
+// relocation occurrences. Masking those relocations leaves only four byte
+// differences: +0x1a ca/d1 and +0x1c 8e/8d are base `cmp ecx,edx; jle`
+// versus retail `cmp edx,ecx; jge`; +0x4a df/fb and +0x4c 8e/8d repeat the
+// same equivalent reversal for EBX/EDI. Publishing gFillPtr before clearing
+// gFillRow is required: it makes the entire later address-calculation/store
+// schedule exact and raises the live match from 94.44% to 98.44%.
+// Relational polarity/reassociation, combined/split/const bound declarations,
+// positive and early-return overlap forms, semantic parameter/local names,
+// and exact-preserving predecessor expression/loop/include-order variants did
+// not steer the remaining compares. Moving or narrowing later-only headers
+// regressed this target (and in some cases the exact predecessor). A bounded
+// libclang AST pass found no gain. Revisit only after a genuine shared-header
+// or predecessor declaration-state change; this is not a certified wall.
 VA(0x004ca450, 0x114)
 void FillBitmapAreaClip(class bitmap *bmp, int x, int y, int w, int h, int color, int clipx,
                         int clipy, int clipw, int cliph)
@@ -68,8 +69,8 @@ void FillBitmapAreaClip(class bitmap *bmp, int x, int y, int w, int h, int color
             h = (h - clipy) + y;
             y = clipy;
         }
-        gFillRow = 0;
         gFillPtr = bmp->m_pixels + bmp->m_width * y + x;
+        gFillRow = 0;
         if (h > 0) {
             do {
                 memset(gFillPtr, color, w);
