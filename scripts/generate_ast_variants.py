@@ -38,6 +38,14 @@ from pathlib import Path
 
 import clang.cindex as ci
 
+from tu_state_noise import (
+    DEFAULT_FAMILIES as DEFAULT_STATE_FAMILIES,
+    include_macro_guard,
+    make_variants as make_state_variants,
+    resolve_target as resolve_state_target,
+    target_identifiers,
+)
+
 
 COMMUTATIVE = {"+", "*", "==", "!=", "&", "|", "^"}
 RELATIONAL_FLIP = {"<": ">", ">": "<", "<=": ">=", ">=": "<="}
@@ -272,6 +280,10 @@ def contains_context_sensitive_tokens(text: bytes) -> bool:
 
 def line_number(blob: bytes, offset: int) -> int:
     return blob.count(b"\n", 0, offset) + 1
+
+
+def utf8_byte_offset(text: str, character_offset: int) -> int:
+    return len(text[:character_offset].encode("utf-8"))
 
 
 def expression_edits(fn, blob: bytes) -> list[AstMutation]:
@@ -909,6 +921,41 @@ def atomic_mutations(
     return balanced
 
 
+def tu_state_mutations(
+    root: Path, source: Path, rva: int, blob: bytes, count: int,
+    families: tuple[str, ...], seed: int,
+) -> tuple[list[AstMutation], list[dict]]:
+    if count == 0:
+        return [], []
+    target, _flags = resolve_state_target(root, source, rva)
+    decoded = blob.decode("utf-8")
+    tokens = target_identifiers(decoded, target)
+    # tu_state_noise operates on Python string offsets; manifests and libclang ranges
+    # are byte offsets.  Convert explicitly because reconstructed comments contain UTF-8.
+    insertion_offset = utf8_byte_offset(decoded, target.insertion_offset)
+    mutations = []
+    rejected = []
+    for variant in make_state_variants(count, families, seed):
+        guard = include_macro_guard(root, variant.body, tokens)
+        record = {
+            "trial": variant.trial,
+            "family": variant.family,
+            "tag": variant.tag,
+            "include_macro_guard": guard,
+        }
+        if not guard.get("passed", True):
+            record["rejected"] = True
+            rejected.append(record)
+            continue
+        body = variant.block(target.logical_line).encode()
+        mutations.append(AstMutation(
+            f"tu_state_{variant.family}",
+            f"trial-{variant.trial}-{variant.tag}",
+            (AstEdit(insertion_offset, insertion_offset, body),),
+        ))
+    return mutations, rejected
+
+
 def non_overlapping(edits) -> bool:
     ordered = sorted(edits, key=lambda edit: edit.start)
     return all(
@@ -1007,10 +1054,28 @@ def main(argv=None) -> int:
         "--require-mutation", action="append", default=[],
         help="require an exact content-fingerprinted mutation name; may be repeated",
     )
+    parser.add_argument(
+        "--state-trials", type=int, default=0,
+        help="number of deterministic parser-visible TU-state mutations to add",
+    )
+    parser.add_argument(
+        "--state-families", default=",".join(DEFAULT_STATE_FAMILIES),
+        help="comma-separated TU-state families from tu_state_noise.py",
+    )
+    parser.add_argument("--state-seed", type=lambda value: int(value, 0), default=0x484F4D32)
+    parser.add_argument(
+        "--axes-from", type=Path,
+        help="copy hand-authored exact-span axes from another schema-1 manifest",
+    )
+    parser.add_argument("--run", action="store_true", help="compile and score the emitted manifest")
+    parser.add_argument("--top", type=int, default=12, help="ranked results printed by --run")
+    parser.add_argument("--compile-timeout", type=float, default=120.0)
+    parser.add_argument("--batch-output", type=Path, help="artifact directory used by --run")
     args = parser.parse_args(argv)
     if (
         args.min_depth < 1 or args.max_depth < args.min_depth
-        or args.limit < 1 or args.helper_name_count < 1
+        or args.limit < 1 or args.helper_name_count < 1 or args.state_trials < 0
+        or args.top < 1 or args.compile_timeout <= 0
     ):
         parser.error("require 1 <= --min-depth <= --max-depth and positive limit/name count")
 
@@ -1049,6 +1114,16 @@ def main(argv=None) -> int:
         parser.error("libclang parse errors:\n" + "\n".join(diagnostics[:20]))
     insertion, _span_end = marker_span(blob, args.rva)
     mutations = atomic_mutations(fn, blob, insertion, families, args.helper_name_count)
+    state_families = tuple(
+        family.strip() for family in args.state_families.split(",") if family.strip()
+    )
+    try:
+        state_mutations, rejected_state_mutations = tu_state_mutations(
+            root, source, args.rva, blob, args.state_trials, state_families, args.state_seed
+        )
+    except (OSError, KeyError, ValueError) as exc:
+        parser.error(str(exc))
+    mutations += state_mutations
     available_names = {mutation_name(mutation) for mutation in mutations}
     required_names = set(args.require_mutation)
     unknown_required = required_names - available_names
@@ -1076,9 +1151,33 @@ def main(argv=None) -> int:
             "truncated": truncated,
             "ignored_trailing_diagnostics": trailing_diagnostics,
             "required_mutations": sorted(required_names),
+            "tu_state": {
+                "trials_requested": args.state_trials,
+                "mutations_emitted": len(state_mutations),
+                "families": list(state_families),
+                "seed": args.state_seed,
+                "rejected": rejected_state_mutations,
+            },
         },
         "candidates": candidates,
     }
+    if args.axes_from is not None:
+        try:
+            axes_payload = json.loads(args.axes_from.read_text())
+        except (OSError, json.JSONDecodeError) as exc:
+            parser.error(f"cannot read --axes-from manifest: {exc}")
+        if axes_payload.get("schema") != 1 or not isinstance(axes_payload.get("axes"), list):
+            parser.error("--axes-from must be a schema-1 manifest containing axes")
+        if axes_payload.get("source") != payload["source"]:
+            parser.error("--axes-from source does not match generated manifest source")
+        axes_rva = axes_payload.get("rva")
+        try:
+            parsed_axes_rva = int(axes_rva, 0) if isinstance(axes_rva, str) else axes_rva
+        except ValueError:
+            parsed_axes_rva = None
+        if parsed_axes_rva != args.rva:
+            parser.error("--axes-from RVA does not match generated manifest RVA")
+        payload["axes"] = axes_payload["axes"]
     args.output.write_text(json.dumps(payload, indent=2) + "\n")
     counts = {
         family: sum(mutation.family == family for mutation in mutations)
@@ -1095,7 +1194,24 @@ def main(argv=None) -> int:
             f"ignored {len(trailing_diagnostics)} nonfatal parse diagnostic(s) strictly after "
             "the target; recorded in the manifest"
         )
+    if args.run:
+        from batch_source_variants import main as run_batch
+
+        batch_args = [
+            str(args.output), "--limit", str(len(candidates) * max(1, _axis_product(payload))),
+            "--top", str(args.top), "--compile-timeout", str(args.compile_timeout),
+        ]
+        if args.batch_output is not None:
+            batch_args.extend(("--output", str(args.batch_output)))
+        return run_batch(batch_args)
     return 0
+
+
+def _axis_product(payload: dict) -> int:
+    product = 1
+    for axis in payload.get("axes", []):
+        product *= len(axis.get("options", []))
+    return product
 
 
 if __name__ == "__main__":
