@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """move_model_singletons.py — ONE-TIME/repeatable: relocate each synthetic _globals_model.h global
 that the RETAIL binary references from exactly ONE module into that module's .cpp as a file-private
-`static` definition (DATA on the def). Multi-module globals stay shared in _globals_model.h; so do
-unsized arrays (`T g[]` — no size to give a static). Retail xref = which delinked TU objs carry a
+`static` definition (DATA on the def). Multi-module globals and unsized arrays (`T g[]` — no size
+to give a static) stay queued for a manually reconstructed shared owner; the global hard gates do
+not permit a DATA-bearing header declaration. Retail xref = which delinked TU objs carry a
 reloc resolving to the global's VA (authoritative; the source may be incompletely matched).
 
 The `static` def is inserted before the module's first VA() (so every function sees it), and the
@@ -61,9 +62,6 @@ for rva, (name, ln) in model.items():
     moves[unit].append((name, re.sub(r'\bextern\b', 'static', ln, count=1)))
     remove.add(rva)
 
-BLOCK = re.compile(r'\n?// ---- module-private synthetic globals \(retail xref: single-module\) ----\n'
-                   r'(?:DATA\(0x[0-9a-fA-F]+\) static .*\n)*', re.M)
-
 def find_plain_def(lines, name):
     """index of an existing file-scope plain def `<type> name<dims>;` (no static/DATA), else None."""
     for i, l in enumerate(lines):
@@ -76,15 +74,22 @@ def find_plain_def(lines, name):
             return i
     return None
 
+def has_static_def(lines, name):
+    return any(re.match(r'^DATA\(0x[0-9a-fA-F]+\)\s+static\b.*\b' +
+                        re.escape(name) + r'\s*(?:\[[^;]*\])*\s*;', line)
+               for line in lines)
+
 # 4. apply: convert an existing plain def in place, else insert before the first VA(); the module
 #    keeps #include <_globals_model.h> so struct element types stay available.
 for unit in sorted(moves):
     cpp = "src/%s.cpp" % unit
     if not os.path.exists(cpp):
         print("  MISSING .cpp: %s" % cpp); continue
-    lines = BLOCK.sub("\n", open(cpp).read()).splitlines(keepends=True)   # idempotency
+    lines = open(cpp).read().splitlines(keepends=True)
     converted, inserted = 0, []
     for name, staticline in moves[unit]:
+        if has_static_def(lines, name):
+            continue
         idx = find_plain_def(lines, name)
         if idx is not None:
             lines[idx] = staticline; converted += 1
@@ -92,6 +97,9 @@ for unit in sorted(moves):
             inserted.append(staticline)
     if inserted:
         ins = next((i for i, l in enumerate(lines) if l.startswith("VA(")), len(lines))
+        # Keep the first function's durable matcher checkpoint immediately above VA().
+        while ins > 0 and (not lines[ins - 1].strip() or lines[ins - 1].lstrip().startswith("//")):
+            ins -= 1
         block = ["\n// ---- module-private synthetic globals (retail xref: single-module) ----\n"] \
                 + sorted(inserted) + ["\n"]
         lines = lines[:ins] + block + lines[ins:]

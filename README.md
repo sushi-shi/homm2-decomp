@@ -46,8 +46,13 @@ flake.nix two dev shells: default (analysis+diff+clang), build (+wine+MSVC 4.2)
 nix develop .#build            # MSVC 4.2 under wine + the tools
 homm2 init                     # ONE-TIME: CodeView -> manifest -> ??_C@ names -> PDB -> delink -> configure
 homm2 build                    # compile src (wine cl) -> objdiff vs target -> refresh % below
+homm2 link                     # strict final link + section/RVA audit in build/link/
 homm2 status                   # per-unit + overall match %
 ```
+
+The final link is opt-in, so object matching stays fast. Its Ninja graph exposes `link-order`
+(NB09 `sstModule` object order), `link-imports` (exact middleware import archive), `link`, and
+`link-map` (PE section, entry-point, unresolved-symbol, and per-unit RVA diagnostics).
 
 The matching toolchain (VC4.2) is provisioned into `build/toolchain/` from the
 `en_vc42ent` discs; `clang`/`clangd` is editor tooling only — the wine MSVC 4.2 build is the

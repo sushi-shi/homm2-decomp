@@ -1,0 +1,608 @@
+#!/usr/bin/env python3
+"""Link the reconstruction in retail translation-unit order and emit a PE/RVA audit.
+
+The normal objdiff build remains relocatable-object only. This module is the explicit final-link
+path used by ``ninja link`` and ``homm2 link``. Object order comes from executable contribution
+records in CodeView NB09 ``sstModule``; missing or ambiguous evidence is a hard error.
+"""
+import argparse
+import csv
+import json
+import os
+import re
+import shutil
+import struct
+import subprocess
+import sys
+import tomllib
+from collections import defaultdict
+from pathlib import Path
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+REPO = next((p for p in SCRIPT_DIR.parents if (p / "flake.nix").exists()), SCRIPT_DIR)
+RETAIL_EXE = REPO / "build/orig/HEROES2W.EXE"
+IMAGE_BASE = 0x400000
+PE32_MAGIC = 0x10B
+COFF_SECTION_HEADER_SIZE = 40
+IMAGE_SCN_MEM_EXECUTE = 0x20000000
+IMAGE_DIRECTORY_ENTRY_IMPORT = 1
+IMPORT_DESCRIPTOR_SIZE = 20
+IMPORT_ORDINAL_FLAG32 = 0x80000000
+NB09_SST_MODULE = 0x120
+
+RETAIL_LINK_FLAGS = (
+    "/MACHINE:IX86",
+    "/DEBUG:NOTMAPPED,MINIMAL",
+    "/DEBUGTYPE:CV",
+    "/PDB:NONE",
+    "/BASE:0x400000",
+    "/ALIGN:0x1000",
+    "/SUBSYSTEM:WINDOWS,4.0",
+    "/STACK:66112,4096",
+    "/HEAP:1048576,4096",
+    "/INCREMENTAL:NO",
+    "/OPT:NOREF",
+)
+SYSTEM_LIBS_BEFORE_VENDOR = (
+    "KERNEL32.LIB",
+    "USER32.LIB",
+    "GDI32.LIB",
+    "WSOCK32.LIB",
+)
+SYSTEM_LIBS_AFTER_VENDOR = (
+    "NETAPI32.LIB",
+    "WINMM.LIB",
+    "ADVAPI32.LIB",
+)
+def die(message):
+    print("[link_exe] ERROR: %s" % message, file=sys.stderr)
+    return 1
+
+
+def find_ci(directory, name):
+    if not directory.is_dir():
+        return None
+    return next((p for p in directory.iterdir() if p.name.lower() == name.lower()), None)
+
+
+def msvc_dir():
+    candidate = Path(os.environ.get("MSVC_DIR", ""))
+    if candidate and find_ci(candidate / "bin", "link.exe"):
+        return candidate
+    return REPO / "build/toolchain/msvc"
+
+
+def winepath_w(path):
+    return winepaths_w([path])[0]
+
+
+def winepaths_w(paths):
+    output = subprocess.check_output(
+        ["winepath", "-w", *(str(Path(path).resolve()) for path in paths)], text=True,
+        stderr=subprocess.DEVNULL).splitlines()
+    if len(output) != len(paths):
+        raise RuntimeError("winepath returned %d paths for %d inputs" % (len(output), len(paths)))
+    return output
+
+
+def read_nb09_module_contributions(path):
+    """Return module stem -> executable sstModule contribution records."""
+    data = Path(path).read_bytes()
+    pe_offset = struct.unpack_from("<I", data, 0x3C)[0]
+    section_count = struct.unpack_from("<H", data, pe_offset + 6)[0]
+    optional_size = struct.unpack_from("<H", data, pe_offset + 20)[0]
+    section_offset = pe_offset + 24 + optional_size
+    executable_segments = set()
+    section_rvas = {}
+    for index in range(section_count):
+        offset = section_offset + index * COFF_SECTION_HEADER_SIZE
+        rva = struct.unpack_from("<I", data, offset + 12)[0]
+        characteristics = struct.unpack_from("<I", data, offset + 36)[0]
+        segment = index + 1
+        section_rvas[segment] = rva
+        if characteristics & IMAGE_SCN_MEM_EXECUTE:
+            executable_segments.add(segment)
+
+    tail = data.rfind(b"NB09")
+    if tail < 0:
+        raise ValueError("retail PE has no trailing NB09 directory pointer")
+    codeview_base = len(data) - struct.unpack_from("<I", data, tail + 4)[0]
+    if data[codeview_base:codeview_base + 4] != b"NB09":
+        raise ValueError("invalid NB09 base pointer")
+    directory = codeview_base + struct.unpack_from("<I", data, codeview_base + 4)[0]
+    header_size, entry_size = struct.unpack_from("<HH", data, directory)
+    entry_count = struct.unpack_from("<I", data, directory + 4)[0]
+    modules = defaultdict(list)
+    for index in range(entry_count):
+        entry = directory + header_size + index * entry_size
+        subsection, _module_index, offset, size = struct.unpack_from("<HHii", data, entry)
+        if subsection != NB09_SST_MODULE:
+            continue
+        blob = data[codeview_base + offset:codeview_base + offset + size]
+        segment_count = struct.unpack_from("<H", blob, 4)[0]
+        cursor = 8
+        contributions = []
+        for _ in range(segment_count):
+            segment, _pad, contribution_offset, contribution_size = struct.unpack_from(
+                "<HHII", blob, cursor)
+            cursor += 12
+            if segment in executable_segments and contribution_size:
+                contributions.append({
+                    "section": segment,
+                    "offset": contribution_offset,
+                    "size": contribution_size,
+                    "rva": section_rvas[segment] + contribution_offset,
+                })
+        name_length = blob[cursor]
+        name = blob[cursor + 1:cursor + 1 + name_length].decode("latin1", "replace")
+        stem = name.replace("\\", "/").rsplit("/", 1)[-1]
+        if stem.lower().endswith(".obj"):
+            stem = stem[:-4]
+        modules[stem.lower()].append({"module": name, "contributions": contributions})
+    return modules
+
+
+def load_retail_order(units_path=None, symbols_path=None, retail_exe=None,
+                      module_contributions=None):
+    units_path = Path(units_path or REPO / "config/units.toml")
+    symbols_path = Path(symbols_path or REPO / "build/gen/symbol_names.csv")
+    manifest = tomllib.loads(units_path.read_text())
+    units = manifest.get("unit", [])
+    functions = defaultdict(list)
+    with symbols_path.open(newline="") as f:
+        for row in csv.DictReader(f):
+            if row["kind"] == "func":
+                functions[row["unit"]].append((int(row["rva"], 16), row["name"]))
+
+    modules = (read_nb09_module_contributions(retail_exe or RETAIL_EXE)
+               if module_contributions is None else module_contributions)
+    ordered = []
+    seen = set()
+    for manifest_index, unit in enumerate(units):
+        name = unit["unit"]
+        if name in seen:
+            raise ValueError("duplicate manifest unit: %s" % name)
+        seen.add(name)
+        evidence = functions.get(name)
+        if not evidence:
+            raise ValueError("no CodeView function RVA establishes link order for %s" % name)
+        stem = Path(unit["source"]).stem.lower()
+        module_records = modules.get(stem, [])
+        if len(module_records) != 1:
+            raise ValueError("expected one NB09 module named %s for %s, found %d" %
+                             (stem, name, len(module_records)))
+        contributions = module_records[0]["contributions"]
+        if len(contributions) != 1:
+            raise ValueError("expected one executable NB09 contribution for %s, found %d" %
+                             (name, len(contributions)))
+        contribution = contributions[0]
+        ordered_functions = sorted(evidence)
+        first_rva, first_symbol = ordered_functions[0]
+        ordered.append({
+            "unit": name,
+            "source": unit["source"],
+            "manifest_index": manifest_index,
+            "first_function_rva": first_rva,
+            "first_function_symbol": first_symbol,
+            "function_anchors": ordered_functions,
+            "contribution_section": contribution["section"],
+            "contribution_offset": contribution["offset"],
+            "contribution_size": contribution["size"],
+            "contribution_rva": contribution["rva"],
+            "object": REPO / ("build/objdiff/base/%s.obj" % name),
+        })
+    ordered.sort(key=lambda row: (row["contribution_section"], row["contribution_offset"],
+                                  row["manifest_index"]))
+    return ordered
+
+
+def read_pe(path):
+    data = Path(path).read_bytes()
+    if len(data) < 0x40 or data[:2] != b"MZ":
+        raise ValueError("not a PE file: %s" % path)
+    pe_offset = struct.unpack_from("<I", data, 0x3C)[0]
+    if data[pe_offset:pe_offset + 4] != b"PE\0\0":
+        raise ValueError("missing PE signature: %s" % path)
+    coff = pe_offset + 4
+    section_count = struct.unpack_from("<H", data, coff + 2)[0]
+    optional_size = struct.unpack_from("<H", data, coff + 16)[0]
+    optional = coff + 20
+    if struct.unpack_from("<H", data, optional)[0] != PE32_MAGIC:
+        raise ValueError("expected PE32 optional header: %s" % path)
+    section_offset = optional + optional_size
+    sections = {}
+    for index in range(section_count):
+        offset = section_offset + index * COFF_SECTION_HEADER_SIZE
+        name = data[offset:offset + 8].split(b"\0", 1)[0].decode("ascii", "replace")
+        virtual_size, rva, raw_size = struct.unpack_from("<III", data, offset + 8)
+        sections[name] = {
+            "rva": rva,
+            "virtual_size": virtual_size,
+            "raw_size": raw_size,
+        }
+    return {
+        "linker_version": "%d.%d" % struct.unpack_from("<BB", data, optional + 2),
+        "size_of_code": struct.unpack_from("<I", data, optional + 4)[0],
+        "size_of_initialized_data": struct.unpack_from("<I", data, optional + 8)[0],
+        "size_of_uninitialized_data": struct.unpack_from("<I", data, optional + 12)[0],
+        "entry_point_rva": struct.unpack_from("<I", data, optional + 16)[0],
+        "image_base": struct.unpack_from("<I", data, optional + 28)[0],
+        "section_alignment": struct.unpack_from("<I", data, optional + 32)[0],
+        "file_alignment": struct.unpack_from("<I", data, optional + 36)[0],
+        "stack_reserve": struct.unpack_from("<I", data, optional + 72)[0],
+        "stack_commit": struct.unpack_from("<I", data, optional + 76)[0],
+        "heap_reserve": struct.unpack_from("<I", data, optional + 80)[0],
+        "heap_commit": struct.unpack_from("<I", data, optional + 84)[0],
+        "sections": sections,
+    }
+
+
+def read_imports(path):
+    data = Path(path).read_bytes()
+    pe_offset = struct.unpack_from("<I", data, 0x3C)[0]
+    coff = pe_offset + 4
+    section_count = struct.unpack_from("<H", data, coff + 2)[0]
+    optional_size = struct.unpack_from("<H", data, coff + 16)[0]
+    optional = coff + 20
+    section_offset = optional + optional_size
+    sections = []
+    for index in range(section_count):
+        offset = section_offset + index * COFF_SECTION_HEADER_SIZE
+        virtual_size, rva, raw_size, raw_offset = struct.unpack_from("<IIII", data, offset + 8)
+        sections.append((rva, max(virtual_size, raw_size), raw_offset))
+
+    def rva_offset(rva):
+        for section_rva, size, raw_offset in sections:
+            if section_rva <= rva < section_rva + size:
+                return raw_offset + rva - section_rva
+        raise ValueError("RVA 0x%x is outside raw PE sections in %s" % (rva, path))
+
+    def c_string(offset):
+        end = data.index(0, offset)
+        return data[offset:end].decode("ascii", "replace")
+
+    import_rva, _import_size = struct.unpack_from(
+        "<II", data, optional + 96 + IMAGE_DIRECTORY_ENTRY_IMPORT * 8)
+    if not import_rva:
+        return []
+    imports = []
+    descriptor = rva_offset(import_rva)
+    while True:
+        lookup_rva, timestamp, forwarder, name_rva, address_rva = struct.unpack_from(
+            "<IIIII", data, descriptor)
+        if not any((lookup_rva, timestamp, forwarder, name_rva, address_rva)):
+            break
+        dll = c_string(rva_offset(name_rva))
+        symbols = []
+        thunk = rva_offset(lookup_rva or address_rva)
+        while True:
+            value = struct.unpack_from("<I", data, thunk)[0]
+            thunk += 4
+            if not value:
+                break
+            if value & IMPORT_ORDINAL_FLAG32:
+                symbols.append({"ordinal": value & 0xFFFF})
+            else:
+                import_offset = rva_offset(value)
+                symbols.append({
+                    "name": c_string(import_offset + 2),
+                    "hint": struct.unpack_from("<H", data, import_offset)[0],
+                })
+        imports.append({"dll": dll, "symbols": symbols})
+        descriptor += IMPORT_DESCRIPTOR_SIZE
+    return imports
+
+
+def vendor_imports(imports):
+    vendor = {"smackw32.dll", "mss32.dll", "wing32.dll"}
+    return [entry for entry in imports if entry["dll"].lower() in vendor]
+
+
+def normalized_vendor_imports(imports):
+    """Preserve DLL order but ignore IAT extraction order within each exact ABI set."""
+    result = []
+    for entry in vendor_imports(imports):
+        symbols = sorted(entry["symbols"], key=lambda symbol: json.dumps(symbol, sort_keys=True))
+        result.append({"dll": entry["dll"], "symbols": symbols})
+    return result
+
+
+def parse_unresolved(output):
+    symbols = sorted(set(re.findall(r"unresolved external symbol\s+(\S+)", output)))
+    classes = defaultdict(list)
+    for symbol in symbols:
+        if "Smack" in symbol:
+            cls = "smackw32.dll"
+        elif "AIL_" in symbol:
+            cls = "mss32.dll"
+        elif "WinG" in symbol:
+            cls = "WING32.dll"
+        elif symbol.startswith("__imp_"):
+            cls = "other import"
+        else:
+            cls = "project or runtime"
+        classes[cls].append(symbol)
+    return {"count": len(symbols), "symbols": symbols, "classes": dict(sorted(classes.items()))}
+
+
+def parse_map_symbols(path):
+    symbols = defaultdict(list)
+    if not Path(path).exists():
+        return symbols
+    for line in Path(path).read_text(errors="replace").splitlines():
+        fields = line.split()
+        if len(fields) < 3 or not re.match(r"^[0-9A-Fa-f]{4}:[0-9A-Fa-f]{8}$", fields[0]):
+            continue
+        if re.match(r"^[0-9A-Fa-f]{8}$", fields[2]):
+            symbols[fields[1]].append(int(fields[2], 16))
+    return dict(symbols)
+
+
+def parse_map_contributions(path):
+    contributions = []
+    if not Path(path).exists():
+        return contributions
+    pattern = re.compile(
+        r"^\s*([0-9A-Fa-f]{4}):([0-9A-Fa-f]{8})\s+([0-9A-Fa-f]+)H\s+(\S+)\s+(\S+)")
+    for line in Path(path).read_text(errors="replace").splitlines():
+        match = pattern.match(line)
+        if match:
+            contributions.append({
+                "segment": int(match.group(1), 16),
+                "offset": int(match.group(2), 16),
+                "size": int(match.group(3), 16),
+                "name": match.group(4),
+                "class": match.group(5),
+            })
+    return contributions
+
+
+def section_diagnostics(retail, candidate):
+    result = []
+    names = list(retail["sections"])
+    names.extend(name for name in candidate["sections"] if name not in retail["sections"])
+    for name in names:
+        expected = retail["sections"].get(name)
+        actual = candidate["sections"].get(name)
+        delta = None
+        if expected and actual:
+            delta = {key: actual[key] - expected[key]
+                     for key in ("rva", "virtual_size", "raw_size")}
+        result.append({"name": name, "retail": expected, "candidate": actual, "delta": delta})
+    return result
+
+
+def static_storage_diagnostics(retail, candidate, map_path):
+    def section_pair(name):
+        expected = retail["sections"].get(name, {"raw_size": 0, "virtual_size": 0, "rva": 0})
+        actual = candidate["sections"].get(name, {"raw_size": 0, "virtual_size": 0, "rva": 0})
+        return {
+            "retail": expected,
+            "candidate": actual,
+            "delta": {key: actual[key] - expected[key]
+                      for key in ("rva", "raw_size", "virtual_size")},
+            "candidate_to_retail_percent": {
+                key: round(actual[key] * 100.0 / expected[key], 4) if expected[key] else None
+                for key in ("raw_size", "virtual_size")
+            },
+        }
+
+    writable = section_pair(".data")
+    readonly = section_pair(".rdata")
+    expected_data = writable["retail"]
+    actual_data = writable["candidate"]
+    contributions = parse_map_contributions(map_path)
+    section_names = list(candidate["sections"])
+    data_segment = section_names.index(".data") + 1 if ".data" in section_names else None
+    data_contributions = [row for row in contributions if row["segment"] == data_segment]
+    zero_names = {".bss", "bss", "common"}
+    zero_fill = [row for row in data_contributions if row["name"].lower() in zero_names]
+    initialized = [row for row in data_contributions if row not in zero_fill]
+    return {
+        "read_only_initialized": readonly,
+        "writable": writable,
+        "retail_writable_loader_zero_tail_bytes": max(
+            expected_data["virtual_size"] - expected_data["raw_size"], 0),
+        "candidate_writable_loader_zero_tail_bytes": max(
+            actual_data["virtual_size"] - actual_data["raw_size"], 0),
+        "candidate_map_initialized_contribution_bytes": sum(row["size"] for row in initialized),
+        "candidate_map_zero_fill_common_contribution_bytes": sum(row["size"] for row in zero_fill),
+        "candidate_map_zero_fill_common_contributions": zero_fill,
+        "retail_zero_fill_common_contribution_bytes": None,
+        "retail_pe_size_of_uninitialized_data": retail["size_of_uninitialized_data"],
+        "candidate_pe_size_of_uninitialized_data": candidate["size_of_uninitialized_data"],
+        "retail_zero_fill_note": (
+            "Retail has no map. PE evidence proves only a loader-zero writable .data tail; "
+            "it does not prove that the entire tail was an independent .bss/common contribution."),
+    }
+
+
+def write_order_response(path):
+    """Write a relocatable LINK response file in authoritative NB09 object order."""
+    path = Path(path).resolve()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    order = load_retail_order()
+    lines = []
+    for row in order:
+        relative = os.path.relpath(row["object"], path.parent).replace("/", "\\")
+        lines.append('"%s"' % relative)
+    path.write_text("\n".join(lines) + "\n", encoding="ascii")
+    print("link order: %d NB09 contributions -> %s" % (len(order), path))
+    return 0
+
+
+def read_order_response(path):
+    path = Path(path).resolve()
+    objects = []
+    for line in path.read_text(encoding="ascii").splitlines():
+        value = line.strip()
+        if not value:
+            continue
+        if len(value) < 2 or value[0] != '"' or value[-1] != '"':
+            raise ValueError("invalid object response line: %s" % line)
+        objects.append((path.parent / value[1:-1].replace("\\", "/")).resolve())
+    return objects
+
+
+def run_link(output, order_response, imports_libraries):
+    output = Path(output).resolve()
+    output.parent.mkdir(parents=True, exist_ok=True)
+    report_path = output.with_suffix(".link.json")
+    map_path = output.with_suffix(".map")
+    log_path = output.with_suffix(".link.log")
+    toolchain = msvc_dir()
+    link_exe = find_ci(toolchain / "bin", "link.exe")
+    if not link_exe:
+        raise RuntimeError("LINK.EXE not found under %s/bin" % toolchain)
+    if shutil.which("wine") is None or shutil.which("winepath") is None:
+        raise RuntimeError("wine and winepath are required; use `nix develop .#build`")
+    if not RETAIL_EXE.exists():
+        raise RuntimeError("retail executable missing: %s" % RETAIL_EXE)
+    order_response = Path(order_response).resolve()
+    imports_libraries = [Path(path).resolve() for path in imports_libraries]
+    if not order_response.exists():
+        raise RuntimeError("link-order response missing: %s" % order_response)
+    missing_imports = [str(path) for path in imports_libraries if not path.exists()]
+    if missing_imports:
+        raise RuntimeError("middleware import libraries missing:\n  " + "\n  ".join(missing_imports))
+
+    order = load_retail_order()
+    missing = [str(row["object"]) for row in order if not row["object"].exists()]
+    if missing:
+        raise RuntimeError("missing reconstruction objects:\n  " + "\n  ".join(missing))
+    response_objects = read_order_response(order_response)
+    expected_objects = [row["object"].resolve() for row in order]
+    if response_objects != expected_objects:
+        raise RuntimeError("link-order response does not match current NB09 contribution order")
+    for stale in (output, map_path):
+        stale.unlink(missing_ok=True)
+    command = [
+        "wine", str(link_exe), *RETAIL_LINK_FLAGS,
+        "/MAP:" + winepath_w(map_path),
+        "/OUT:" + winepath_w(output),
+        "/LIBPATH:" + winepath_w(toolchain / "lib"),
+    ]
+    command.extend(winepaths_w(response_objects))
+    command.extend(SYSTEM_LIBS_BEFORE_VENDOR)
+    command.extend(winepaths_w(imports_libraries))
+    command.extend(SYSTEM_LIBS_AFTER_VENDOR)
+    run = subprocess.run(command, cwd=output.parent, text=True,
+                         stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    log_path.write_text(run.stdout, encoding="utf-8")
+
+    unresolved = parse_unresolved(run.stdout)
+    retail = read_pe(RETAIL_EXE)
+    candidate = read_pe(output) if output.exists() else None
+    retail_imports = read_imports(RETAIL_EXE)
+    candidate_imports = read_imports(output) if candidate else []
+    vendor_import_order_match = (vendor_imports(candidate_imports) == vendor_imports(retail_imports)
+                                 if candidate else False)
+    vendor_import_abi_match = (
+        normalized_vendor_imports(candidate_imports) == normalized_vendor_imports(retail_imports)
+        if candidate else False)
+    banner = next((line.strip() for line in run.stdout.splitlines()
+                   if "Incremental Linker Version" in line), None)
+    report = {
+        "status": ("linked" if run.returncode == 0 and candidate and vendor_import_abi_match else
+                   "vendor-import-mismatch" if run.returncode == 0 and candidate else "failed"),
+        "return_code": run.returncode,
+        "linker": {
+            "path": str(link_exe),
+            "banner": banner,
+            "retail_pe_version": retail["linker_version"],
+            "retail_codeview_banner": "Microsoft LINK 2.60.5112 (NT)",
+            "version_matches_retail": bool(
+                candidate and candidate["linker_version"] == retail["linker_version"]),
+        },
+        "order_source": "NB09 sstModule executable contribution order",
+        "link_flags": list(RETAIL_LINK_FLAGS),
+        "unresolved": unresolved,
+        "retail": retail,
+        "candidate": candidate,
+        "entry_point_delta": (candidate["entry_point_rva"] - retail["entry_point_rva"]
+                              if candidate else None),
+        "sections": section_diagnostics(retail, candidate) if candidate else [],
+        "static_storage": static_storage_diagnostics(retail, candidate, map_path)
+                          if candidate else None,
+        "imports": {
+            "retail": retail_imports,
+            "candidate": candidate_imports,
+            "vendor_abi_matches_retail": vendor_import_abi_match,
+            "vendor_iat_order_matches_retail": vendor_import_order_match,
+        },
+        "units": [],
+    }
+    map_symbols = parse_map_symbols(map_path)
+    for row in order:
+        anchor = next(((rva, symbol, map_symbols[symbol][0])
+                       for rva, symbol in row["function_anchors"] if symbol in map_symbols), None)
+        expected_rva, anchor_symbol, actual_va = (anchor if anchor else
+                                                   (row["first_function_rva"],
+                                                    row["first_function_symbol"], None))
+        report["units"].append({
+            "unit": row["unit"],
+            "rva_anchor": anchor_symbol,
+            "retail_rva": "0x%x" % expected_rva,
+            "contribution_rva": "0x%x" % row["contribution_rva"],
+            "contribution_size": "0x%x" % row["contribution_size"],
+            "candidate_rva": "0x%x" % (actual_va - IMAGE_BASE) if actual_va is not None else None,
+            "delta": actual_va - IMAGE_BASE - expected_rva if actual_va is not None else None,
+        })
+    report_path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
+
+    if run.stdout.strip():
+        print(run.stdout.rstrip())
+    if candidate:
+        missing_anchors = sum(1 for unit in report["units"] if unit["delta"] is None)
+        displaced = sum(1 for unit in report["units"]
+                        if unit["delta"] is not None and unit["delta"] != 0)
+        print("link audit: %d NB09-ordered units; %d RVA anchors displaced, %d unavailable" %
+              (len(order), displaced, missing_anchors))
+        print("link audit: entry RVA delta %+d; linker %s vs retail %s" %
+              (report["entry_point_delta"], candidate["linker_version"], retail["linker_version"]))
+        storage = report["static_storage"]
+        print("link audit: .rdata raw/virtual %d/%d vs retail %d/%d; .data %d/%d vs %d/%d" %
+              (storage["read_only_initialized"]["candidate"]["raw_size"],
+               storage["read_only_initialized"]["candidate"]["virtual_size"],
+               storage["read_only_initialized"]["retail"]["raw_size"],
+               storage["read_only_initialized"]["retail"]["virtual_size"],
+               storage["writable"]["candidate"]["raw_size"],
+               storage["writable"]["candidate"]["virtual_size"],
+               storage["writable"]["retail"]["raw_size"],
+               storage["writable"]["retail"]["virtual_size"]))
+        print("link audit: candidate map initialized/zero-fill contributions %d/%d bytes" %
+              (storage["candidate_map_initialized_contribution_bytes"],
+               storage["candidate_map_zero_fill_common_contribution_bytes"]))
+        print("link audit: vendor import ABI %s; intra-DLL IAT order %s" %
+              ("matches retail" if vendor_import_abi_match else "DIFFERS FROM RETAIL",
+               "matches retail" if vendor_import_order_match else "differs"))
+    if unresolved["count"]:
+        print("link audit: %d unresolved symbols: %s" %
+              (unresolved["count"], ", ".join("%s=%d" % (key, len(value))
+                                               for key, value in unresolved["classes"].items())))
+    print("link audit: %s" % report_path)
+    return 0 if run.returncode == 0 and output.exists() and vendor_import_abi_match else (run.returncode or 1)
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--out", default=str(REPO / "build/link/HEROES2W.EXE"))
+    parser.add_argument("--order", default=str(REPO / "build/link/objects.rsp"))
+    parser.add_argument("--imports", action="append")
+    parser.add_argument("--write-order", metavar="PATH")
+    args = parser.parse_args(argv)
+    try:
+        if args.write_order:
+            return write_order_response(args.write_order)
+        imports = args.imports or [
+            str(REPO / "build/link/vendor-imports-smack.lib"),
+            str(REPO / "build/link/vendor-imports-mss.lib"),
+            str(REPO / "build/link/vendor-imports-wing.lib"),
+        ]
+        return run_link(args.out, args.order, imports)
+    except (OSError, ValueError, RuntimeError) as exc:
+        return die(str(exc))
+
+
+if __name__ == "__main__":
+    sys.exit(main())
