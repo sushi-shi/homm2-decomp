@@ -57,10 +57,13 @@
 // four base gSpellNames relocations use 0xff778+4*(n-1), while retail uses
 // 0xff774+4*n; raw instructions prove the same effective address. First
 // non-symbol divergence is the Sphinx resource loop: retail loads giCurPlayer
-// before eventValue, while base loads eventValue first. Identifier/declaration
-// ordering, the unused tag_message, one-case switches/scopes, shared ClaimMine,
-// resource sprintf calls, and duplicate artifact CheckLevel were recovered.
-// Retained max is 97.90%; revisit at total SOURCE 95% for compiler-shape work.
+// before eventValue, while base loads eventValue first. Reversed array indexing
+// and an explicit additive assignment emitted the same base order. The repeated
+// event-flag updates now match retail load/op/store form via static_cast<int>.
+// Identifier/declaration ordering, the unused tag_message, one-case switches/
+// scopes, shared ClaimMine, resource sprintf calls, and duplicate artifact
+// CheckLevel were recovered. Source-hash max is 96.62%; live is 96.56% after
+// the later shared-header/toolchain changes. Revisit at total SOURCE 95%.
 VA(0x004a8530, 0x5adb)
 void advManager::DoEvent(mapCell *cell, int x, int y)
 {
@@ -482,7 +485,9 @@ void advManager::DoEvent(mapCell *cell, int x, int y)
             if (eventHero2->m_spellPoints < wellSpellPoints5) {
                 NormalDialog("{Magic Well}\n\nA drink from the well has restored your spell points to maximum.",
                              1, -1, -1, -1, 0, -1, 0, -1, 0);
-                eventHero2->m_eventFlags |= HERO_EVENT_MAGIC_WELL;
+                eventHero2->m_eventFlags =
+                    static_cast<int>(eventHero2->m_eventFlags) |
+                    HERO_EVENT_MAGIC_WELL;
                 eventHero2->m_spellPoints = wellSpellPoints5;
             }
             else {
@@ -498,7 +503,9 @@ void advManager::DoEvent(mapCell *cell, int x, int y)
 
     case MAP_EVENT_COAST:
         if (eventHero2->m_eventFlags & HERO_EVENT_EMBARKED) {
-            eventHero2->m_eventFlags &= ~HERO_EVENT_EMBARKED;
+            eventHero2->m_eventFlags =
+                static_cast<int>(eventHero2->m_eventFlags) &
+                ~HERO_EVENT_EMBARKED;
             eventHero2->m_remainingMobility = 0;
             eventHero2->m_direction = static_cast<unsigned char>(m_cursorDirection);
             m_cursorType = eventHero2->m_cursorType;
@@ -519,7 +526,8 @@ void advManager::DoEvent(mapCell *cell, int x, int y)
     case MAP_EVENT_BOAT:
         boat_j = &gpGame->m_boats[cell->m_objectMetadata];
         gpGame->RestoreCell(-1, -1, boat_j->x, boat_j->y, cell, BOAT_RESTORE_MODE);
-        eventHero2->m_eventFlags |= HERO_EVENT_EMBARKED;
+        eventHero2->m_eventFlags =
+            static_cast<int>(eventHero2->m_eventFlags) | HERO_EVENT_EMBARKED;
         eventHero2->m_remainingMobility = 0;
         boat_j->heroId = eventHero2->m_id;
         boat_j->owner = eventHero2->m_owner;
@@ -618,7 +626,8 @@ chestGold:
     case MAP_EVENT_BUOY:
         if (!(eventHero2->m_eventFlags & HERO_EVENT_BUOY)) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            eventHero2->m_eventFlags |= HERO_EVENT_BUOY;
+            eventHero2->m_eventFlags =
+                static_cast<int>(eventHero2->m_eventFlags) | HERO_EVENT_BUOY;
             eventHero2->m_morale++;
             EventWindow(3, 1, "", 12, 0, -1, 0, -1);
         }
@@ -630,7 +639,9 @@ chestGold:
     case MAP_EVENT_FAERIE_RING:
         if (!(eventHero2->m_eventFlags & HERO_EVENT_FAERIE_RING)) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            eventHero2->m_eventFlags |= HERO_EVENT_FAERIE_RING;
+            eventHero2->m_eventFlags =
+                static_cast<int>(eventHero2->m_eventFlags) |
+                HERO_EVENT_FAERIE_RING;
             eventHero2->m_luck++;
             EventWindow(13, 1, "", 10, 0, -1, 0, -1);
         }
@@ -642,7 +653,8 @@ chestGold:
     case MAP_EVENT_IDOL:
         if (!(eventHero2->m_eventFlags & HERO_EVENT_IDOL)) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            eventHero2->m_eventFlags |= HERO_EVENT_IDOL;
+            eventHero2->m_eventFlags =
+                static_cast<int>(eventHero2->m_eventFlags) | HERO_EVENT_IDOL;
             eventHero2->m_luck++;
             EventWindow(-1, 1,
                         "{Idol}\n\nYou've found an ancient and weathered stone idol.  Kissing it is supposed to be lucky, so you do.  The stone is very cold to the touch.",
@@ -658,7 +670,8 @@ chestGold:
     case MAP_EVENT_FOUNTAIN:
         if (!(eventHero2->m_eventFlags & HERO_EVENT_FOUNTAIN)) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            eventHero2->m_eventFlags |= HERO_EVENT_FOUNTAIN;
+            eventHero2->m_eventFlags =
+                static_cast<int>(eventHero2->m_eventFlags) | HERO_EVENT_FOUNTAIN;
             eventHero2->m_luck++;
             EventWindow(16, 1, "", 10, 0, -1, 0, -1);
         }
@@ -670,7 +683,9 @@ chestGold:
     case MAP_EVENT_WATERING_HOLE:
         if (!(eventHero2->m_eventFlags & HERO_EVENT_WATERING_HOLE)) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            eventHero2->m_eventFlags |= HERO_EVENT_WATERING_HOLE;
+            eventHero2->m_eventFlags =
+                static_cast<int>(eventHero2->m_eventFlags) |
+                HERO_EVENT_WATERING_HOLE;
             eventHero2->m_morale++;
             eventHero2->m_mobility += WATERING_HOLE_MOBILITY_BONUS;
             eventHero2->m_remainingMobility += WATERING_HOLE_MOBILITY_BONUS;
@@ -688,7 +703,8 @@ chestGold:
     case MAP_EVENT_OASIS:
         if (!(eventHero2->m_eventFlags & HERO_EVENT_OASIS)) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            eventHero2->m_eventFlags |= HERO_EVENT_OASIS;
+            eventHero2->m_eventFlags =
+                static_cast<int>(eventHero2->m_eventFlags) | HERO_EVENT_OASIS;
             eventHero2->m_morale++;
             eventHero2->m_mobility += OASIS_MOBILITY_BONUS;
             eventHero2->m_remainingMobility += OASIS_MOBILITY_BONUS;
@@ -706,7 +722,8 @@ chestGold:
     case MAP_EVENT_TEMPLE:
         if (!(eventHero2->m_eventFlags & HERO_EVENT_TEMPLE)) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            eventHero2->m_eventFlags |= HERO_EVENT_TEMPLE;
+            eventHero2->m_eventFlags =
+                static_cast<int>(eventHero2->m_eventFlags) | HERO_EVENT_TEMPLE;
             eventHero2->m_morale += 2;
             NormalDialog("{Temple}\n\nA visit and a prayer at the temple raises the morale of your troops.",
                          1, -1, -1, 12, 0, 12, 0, -1, 0);
@@ -1645,7 +1662,9 @@ daemonExperienceGold:
                             "Upon defeating the Ghosts you spend several hours sifting through the debris and find nothing.  Such a despicable act reduces your army's morale.",
                             13, 0, -1, 0, -1);
                 if (!(eventHero2->m_eventFlags & HERO_EVENT_SHIPWRECK)) {
-                    eventHero2->m_eventFlags |= HERO_EVENT_SHIPWRECK;
+                    eventHero2->m_eventFlags =
+                        static_cast<int>(eventHero2->m_eventFlags) |
+                        HERO_EVENT_SHIPWRECK;
                     eventHero2->m_morale--;
                 }
                 break;
@@ -1672,7 +1691,9 @@ daemonExperienceGold:
                             "Upon defeating the Zombies you spend several hours searching the graves and find nothing.  Such a despicable act reduces your army's morale.",
                             13, 0, -1, 0, -1);
                 if (!(eventHero2->m_eventFlags & HERO_EVENT_GRAVEYARD)) {
-                    eventHero2->m_eventFlags |= HERO_EVENT_GRAVEYARD;
+                    eventHero2->m_eventFlags =
+                        static_cast<int>(eventHero2->m_eventFlags) |
+                        HERO_EVENT_GRAVEYARD;
                     eventHero2->m_morale--;
                 }
                 break;
@@ -1701,7 +1722,9 @@ daemonExperienceGold:
                             "Upon defeating the Skeletons you spend several hours sifting through the debris and find nothing.  Such a despicable act reduces your army's morale.",
                             13, 0, -1, 0, -1);
                 if (!(eventHero2->m_eventFlags & HERO_EVENT_DERELICT_SHIP)) {
-                    eventHero2->m_eventFlags |= HERO_EVENT_DERELICT_SHIP;
+                    eventHero2->m_eventFlags =
+                        static_cast<int>(eventHero2->m_eventFlags) |
+                        HERO_EVENT_DERELICT_SHIP;
                     eventHero2->m_morale--;
                 }
                 break;
@@ -1728,7 +1751,9 @@ daemonExperienceGold:
                 NormalDialog("You come upon the pyramid of a great and ancient king.  Routine exploration reveals that the pyramid is completely empty.",
                              1, -1, -1, 11, 0, 11, 0, -1, 0);
                 if (!(eventHero2->m_eventFlags & HERO_EVENT_PYRAMID)) {
-                    eventHero2->m_eventFlags |= HERO_EVENT_PYRAMID;
+                    eventHero2->m_eventFlags =
+                        static_cast<int>(eventHero2->m_eventFlags) |
+                        HERO_EVENT_PYRAMID;
                     eventHero2->m_luck -= 2;
                 }
             }
@@ -3556,9 +3581,13 @@ void advManager::FizzleCenter(int fizzleType)
 
 // @match-note
 // Complete body and CFG with the retail 0x150 frame, four jump tables, and
-// 356/356 relocation sites. First non-table divergence is +0x89: retail spills
-// m_eventFlags through eax before storing, while base uses a memory compound-op.
-// Explicit field = field op mask forms regressed the match; revisit at SOURCE 95%.
+// 356/356 relocation sites. All event-flag updates match retail load/op/store
+// form via static_cast<int>, and the mine-owner and combat-result early breaks
+// now match retail polarity and block order. First non-table divergence is
+// +0x53c: for (metadata * 4 - 4) * 125 retail emits lea [4*eax-4] then
+// three multiply-by-five LEAs, while base emits shl eax,2, folds -20 into the
+// first LEA, then emits two more LEAs. Writing 4 * metadata compiled identically.
+// Live fuzzy is 97.64%; revisit at total SOURCE 95% for compiler-shape work.
 VA(0x004b1e43, 0x2a40)
 void advManager::DoAIEvent(mapCell *cell, hero *eventHero, int x, int y)
 {
@@ -3628,7 +3657,8 @@ void advManager::DoAIEvent(mapCell *cell, hero *eventHero, int x, int y)
     switch (eventType_g) {
     case MAP_EVENT_COAST:
         if (eventHero->m_eventFlags & HERO_EVENT_EMBARKED) {
-            eventHero->m_eventFlags &= ~HERO_EVENT_EMBARKED;
+            eventHero->m_eventFlags =
+                static_cast<int>(eventHero->m_eventFlags) & ~HERO_EVENT_EMBARKED;
             eventHero->m_remainingMobility = 0;
             eventHero->m_direction = static_cast<unsigned char>(m_cursorDirection);
             m_cursorType = eventHero->m_cursorType;
@@ -3643,7 +3673,8 @@ void advManager::DoAIEvent(mapCell *cell, hero *eventHero, int x, int y)
         gpGame->RestoreCell(-1, -1, boat_k->savedTriggerType,
                             boat_k->savedEventData, cell,
                             AI_EVENT_BOAT_RESTORE_MODE);
-        eventHero->m_eventFlags |= HERO_EVENT_EMBARKED;
+        eventHero->m_eventFlags =
+            static_cast<int>(eventHero->m_eventFlags) | HERO_EVENT_EMBARKED;
         eventHero->m_remainingMobility = 0;
         boat_k->heroId = eventHero->m_id;
         boat_k->owner = eventHero->m_owner;
@@ -3656,40 +3687,38 @@ void advManager::DoAIEvent(mapCell *cell, hero *eventHero, int x, int y)
     case MAP_EVENT_ALCHEMIST_LAB:
     case MAP_EVENT_MINE:
     case MAP_EVENT_SAWMILL:
-        if (gpGame->m_mineOwners[cell->m_objectMetadata] != giCurPlayer) {
-            if (gpGame->m_mines[cell->m_objectMetadata].guardianType != AI_EVENT_NO_CREATURE) {
-                index_h = gpGame->m_mines[cell->m_objectMetadata].guardianCount;
-                combatResult_d = gpPhilAI->CombatMonsterEvent(
-                    eventHero, gpGame->m_mines[cell->m_objectMetadata].guardianType,
-                    &index_h, cell);
-                if (combatResult_d != 0) {
+        if (gpGame->m_mineOwners[cell->m_objectMetadata] == giCurPlayer)
+            break;
+        if (gpGame->m_mines[cell->m_objectMetadata].guardianType != AI_EVENT_NO_CREATURE) {
+            index_h = gpGame->m_mines[cell->m_objectMetadata].guardianCount;
+            combatResult_d = gpPhilAI->CombatMonsterEvent(
+                eventHero, gpGame->m_mines[cell->m_objectMetadata].guardianType,
+                &index_h, cell);
+            if (combatResult_d == 0)
+                break;
+            gpGame->m_mines[cell->m_objectMetadata].guardianType =
+                AI_EVENT_NO_CREATURE;
+            gpGame->m_mines[cell->m_objectMetadata].guardianCount = 0;
+            eventHero->CheckLevel();
+        }
+        gpGame->ClaimMine(cell->m_objectMetadata, giCurPlayer);
+        if (eventType_g == MAP_EVENT_MINE) {
+            for (index_h = AI_EVENT_MINE_SPELL_FIRST;
+                 index_h < AI_EVENT_MINE_SPELL_LAST; ++index_h) {
+                if (eventHero->HasSpell(index_h) &&
+                    GetManaCost(index_h, eventHero) < eventHero->m_spellPoints) {
+                    eventHero->m_spellPoints = static_cast<short>(
+                        eventHero->m_spellPoints -
+                        GetManaCost(index_h, eventHero));
                     gpGame->m_mines[cell->m_objectMetadata].guardianType =
-                        AI_EVENT_NO_CREATURE;
-                    gpGame->m_mines[cell->m_objectMetadata].guardianCount = 0;
-                    eventHero->CheckLevel();
-                } else {
-                    break;
-                }
-            }
-            gpGame->ClaimMine(cell->m_objectMetadata, giCurPlayer);
-            if (eventType_g == MAP_EVENT_MINE) {
-                for (index_h = AI_EVENT_MINE_SPELL_FIRST;
-                     index_h < AI_EVENT_MINE_SPELL_LAST; ++index_h) {
-                    if (eventHero->HasSpell(index_h) &&
-                        GetManaCost(index_h, eventHero) < eventHero->m_spellPoints) {
-                        eventHero->m_spellPoints = static_cast<short>(
-                            eventHero->m_spellPoints -
-                            GetManaCost(index_h, eventHero));
-                        gpGame->m_mines[cell->m_objectMetadata].guardianType =
-                            static_cast<signed char>(index_h + 1);
-                        spellPower_j = eventHero->Stats(HERO_PRIMARY_SPELL_POWER);
-                        if (spellPower_j > AI_EVENT_MINE_SPELL_POWER_MAX)
-                            spellPower_j = AI_EVENT_MINE_SPELL_POWER_MAX;
-                        gpGame->m_mines[cell->m_objectMetadata].guardianCount =
-                            static_cast<unsigned char>(
-                                spellPower_j * AI_EVENT_MINE_SPELL_COUNT_SCALE);
-                        index_h = 999;
-                    }
+                        static_cast<signed char>(index_h + 1);
+                    spellPower_j = eventHero->Stats(HERO_PRIMARY_SPELL_POWER);
+                    if (spellPower_j > AI_EVENT_MINE_SPELL_POWER_MAX)
+                        spellPower_j = AI_EVENT_MINE_SPELL_POWER_MAX;
+                    gpGame->m_mines[cell->m_objectMetadata].guardianCount =
+                        static_cast<unsigned char>(
+                            spellPower_j * AI_EVENT_MINE_SPELL_COUNT_SCALE);
+                    index_h = AI_EVENT_MINE_SPELL_LOOP_END;
                 }
             }
         }
@@ -3731,42 +3760,50 @@ chestGoldOrExperience:
         if ((eventHero->m_eventFlags & HERO_EVENT_WATERING_HOLE) == 0) {
             eventHero->m_mobility += WATERING_HOLE_MOBILITY_BONUS;
             eventHero->m_remainingMobility += WATERING_HOLE_MOBILITY_BONUS;
-            eventHero->m_eventFlags |= HERO_EVENT_WATERING_HOLE;
+            eventHero->m_eventFlags =
+                static_cast<int>(eventHero->m_eventFlags) |
+                HERO_EVENT_WATERING_HOLE;
             ++eventHero->m_morale;
         }
         break;
 
     case MAP_EVENT_BUOY:
         if ((eventHero->m_eventFlags & HERO_EVENT_BUOY) == 0) {
-            eventHero->m_eventFlags |= HERO_EVENT_BUOY;
+            eventHero->m_eventFlags =
+                static_cast<int>(eventHero->m_eventFlags) | HERO_EVENT_BUOY;
             ++eventHero->m_morale;
         }
         break;
 
     case MAP_EVENT_FAERIE_RING:
         if ((eventHero->m_eventFlags & HERO_EVENT_FAERIE_RING) == 0) {
-            eventHero->m_eventFlags |= HERO_EVENT_FAERIE_RING;
+            eventHero->m_eventFlags =
+                static_cast<int>(eventHero->m_eventFlags) |
+                HERO_EVENT_FAERIE_RING;
             ++eventHero->m_luck;
         }
         break;
 
     case MAP_EVENT_IDOL:
         if ((eventHero->m_eventFlags & HERO_EVENT_IDOL) == 0) {
-            eventHero->m_eventFlags |= HERO_EVENT_IDOL;
+            eventHero->m_eventFlags =
+                static_cast<int>(eventHero->m_eventFlags) | HERO_EVENT_IDOL;
             ++eventHero->m_luck;
         }
         break;
 
     case MAP_EVENT_FOUNTAIN:
         if ((eventHero->m_eventFlags & HERO_EVENT_FOUNTAIN) == 0) {
-            eventHero->m_eventFlags |= HERO_EVENT_FOUNTAIN;
+            eventHero->m_eventFlags =
+                static_cast<int>(eventHero->m_eventFlags) | HERO_EVENT_FOUNTAIN;
             ++eventHero->m_luck;
         }
         break;
 
     case MAP_EVENT_OASIS:
         if ((eventHero->m_eventFlags & HERO_EVENT_OASIS) == 0) {
-            eventHero->m_eventFlags |= HERO_EVENT_OASIS;
+            eventHero->m_eventFlags =
+                static_cast<int>(eventHero->m_eventFlags) | HERO_EVENT_OASIS;
             ++eventHero->m_morale;
             eventHero->m_mobility += OASIS_MOBILITY_BONUS;
             eventHero->m_remainingMobility += OASIS_MOBILITY_BONUS;
@@ -3775,7 +3812,8 @@ chestGoldOrExperience:
 
     case MAP_EVENT_TEMPLE:
         if ((eventHero->m_eventFlags & HERO_EVENT_TEMPLE) == 0) {
-            eventHero->m_eventFlags |= HERO_EVENT_TEMPLE;
+            eventHero->m_eventFlags =
+                static_cast<int>(eventHero->m_eventFlags) | HERO_EVENT_TEMPLE;
             eventHero->m_morale += 2;
         }
         break;
@@ -4438,7 +4476,9 @@ artifactPickup:
             cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
             spellPower_j = eventHero->Stats(HERO_PRIMARY_KNOWLEDGE);
             if (eventHero->m_spellPoints < spellPower_j * 10) {
-                eventHero->m_eventFlags |= HERO_EVENT_MAGIC_WELL;
+                eventHero->m_eventFlags =
+                    static_cast<int>(eventHero->m_eventFlags) |
+                    HERO_EVENT_MAGIC_WELL;
                 eventHero->m_spellPoints = static_cast<short>(spellPower_j * 10);
             }
         }
