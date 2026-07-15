@@ -238,20 +238,15 @@ void swapManager::DrawSelector(void)
     }
 }
 
-// @match-note 91.67%
-// First residual after the aligned skill-range cases: candidate +0x148 jumps to
-// the shared skill body epilogue and then the inner-switch epilogue; retail +0x14d
-// jumps directly to the inner-switch epilogue. Three unreachable case breaks are
-// now retained at +0xcd/+0xf1/+0x115, matching retail's /Od jump traces.
-// Frame 0x28 and slots match: slotIndex_8 -0x4, closeRequested_5 -0x8,
-// quickView -0xc, side -0x10, artifactSlot_2 -0x14, secondarySkill_1 -0x18;
-// this and the three switch temporaries occupy -0x1c..-0x28. The compressed
-// 0x41..0xe7 switch, case ranges/bodies, CFG semantics, and all 71 ordered external
-// relocation targets are recovered. Tried the direct skill guard (91.24%), the
-// related-version artifact/army body order (82.45%), redundant trailing breaks
-// (discarded by MSVC), close truthy/equality spellings, od_slots names, unsigned
-// hero id, shared skill bodies, and army split polarity. Revisit after coverage for
-// the remaining nested-switch/TU-state jump layout.
+// @early-stop 99.9042% -- delinked local jump-table identity only.
+// The complete 0xaf0 body, 0x28 frame/slots, CFG, and all 71 ordered external
+// relocations match. Table-aware comparison finds identical executable
+// instructions before and after the embedded tables and an identical 0xa7-byte
+// compressed index table. The eleven pointer entries resolve in both objects to
+// relative offsets 0x184, 0x1e7, 0x58e, 0x75c, 0x24a, 0x3ec, 0xb3, 0xfb, 0xd7,
+// 0x11f, and 0x92a. MSVC names those destinations as local $L symbols, while the
+// delinker records Main plus addends; the dispatch operands similarly spell the
+// same relative 0x983/0x957 tables through different relocation identities.
 VA(0x00454be3, 0xaf0)
 int swapManager::Main(tag_message &message)
 {
@@ -264,22 +259,20 @@ int swapManager::Main(tag_message &message)
 
     switch (message.type) {
     case SWAP_MESSAGE_REDRAW:
-        if (quickView) {
-        } else {
-            Reset();
-            Update();
-            DrawSwapWin();
-        }
+        if (quickView)
+            break;
+        Reset();
+        Update();
+        DrawSwapWin();
         break;
 
     case SWAP_MESSAGE_WIDGET:
         switch (message.payload.widget.command) {
         case SWAP_COMMAND_SELECT:
-            if (quickView) {
-            } else {
-                if (message.payload.widget.id == SWAP_CONTROL_CLOSE)
-                    closeRequested_5 = 1;
-            }
+            if (quickView)
+                break;
+            if (message.payload.widget.id == SWAP_CONTROL_CLOSE)
+                closeRequested_5 = 1;
             break;
 
         case SWAP_COMMAND_HOVER:
@@ -335,35 +328,32 @@ int swapManager::Main(tag_message &message)
                 side = SWAP_SIDE_RIGHT;
                 slotIndex_8 = message.payload.widget.id - SWAP_CONTROL_RIGHT_SKILL_LEVEL_FIRST;
             showSecondarySkill:
-                if (slotIndex_8 >= m_heroes[side]->m_secondarySkillCount) {
-                } else {
-                    secondarySkill_1 = m_heroes[side]->GetNthSS(slotIndex_8);
-                    m_heroes[side]->DoSSLevelDialog(secondarySkill_1, quickView);
-                }
+                if (slotIndex_8 >= m_heroes[side]->m_secondarySkillCount)
+                    break;
+                secondarySkill_1 = m_heroes[side]->GetNthSS(slotIndex_8);
+                m_heroes[side]->DoSSLevelDialog(secondarySkill_1, quickView);
                 break;
 
             case SWAP_CONTROL_LEFT_HERO:
-                if (quickView) {
-                } else {
-                    HeroView(m_heroes[SWAP_SIDE_LEFT]->m_id, 1, 0);
-                    gpAdvManager->RedrawAdvScreen(1, 0);
-                    Update();
-                    DrawSwapWin();
-                    Reset();
-                    gpWindowManager->FadeScreen(0, SWAP_FADE_STEPS, 0);
-                }
+                if (quickView)
+                    break;
+                HeroView(m_heroes[SWAP_SIDE_LEFT]->m_id, 1, 0);
+                gpAdvManager->RedrawAdvScreen(1, 0);
+                Update();
+                DrawSwapWin();
+                Reset();
+                gpWindowManager->FadeScreen(0, SWAP_FADE_STEPS, 0);
                 break;
 
             case SWAP_CONTROL_RIGHT_HERO:
-                if (quickView) {
-                } else {
-                    HeroView(m_heroes[SWAP_SIDE_RIGHT]->m_id, 1, 0);
-                    gpAdvManager->RedrawAdvScreen(1, 0);
-                    Update();
-                    DrawSwapWin();
-                    Reset();
-                    gpWindowManager->FadeScreen(0, SWAP_FADE_STEPS, 0);
-                }
+                if (quickView)
+                    break;
+                HeroView(m_heroes[SWAP_SIDE_RIGHT]->m_id, 1, 0);
+                gpAdvManager->RedrawAdvScreen(1, 0);
+                Update();
+                DrawSwapWin();
+                Reset();
+                gpWindowManager->FadeScreen(0, SWAP_FADE_STEPS, 0);
                 break;
 
             case SWAP_CONTROL_LEFT_ARTIFACT_FIRST:
@@ -389,22 +379,23 @@ int swapManager::Main(tag_message &message)
                                  NORMAL_DIALOG_NO_RESOURCE, 0,
                                  NORMAL_DIALOG_NO_VALUE, 0);
                 } else if (quickView) {
-                    if (m_heroes[SWAP_SIDE_LEFT]->m_artifacts[artifactSlot_2] !=
-                        SWAP_ARTIFACT_NONE)
-                        m_heroes[SWAP_SIDE_LEFT]->ViewArtifact(
-                            m_heroes[SWAP_SIDE_LEFT]->m_artifacts[artifactSlot_2],
-                            SWAP_VIEW_QUICK,
-                            m_heroes[SWAP_SIDE_LEFT]->m_artifactExtra[artifactSlot_2]);
-                } else if (m_itemType != SWAP_ITEM_ARTIFACT) {
                     if (m_heroes[SWAP_SIDE_LEFT]->m_artifacts[artifactSlot_2] ==
+                        SWAP_ARTIFACT_NONE)
+                        break;
+                    m_heroes[SWAP_SIDE_LEFT]->ViewArtifact(
+                        m_heroes[SWAP_SIDE_LEFT]->m_artifacts[artifactSlot_2],
+                        SWAP_VIEW_QUICK,
+                        m_heroes[SWAP_SIDE_LEFT]->m_artifactExtra[artifactSlot_2]);
+                } else if (m_itemType != SWAP_ITEM_ARTIFACT) {
+                    if (m_heroes[SWAP_SIDE_LEFT]->m_artifacts[artifactSlot_2] !=
                         SWAP_ARTIFACT_NONE) {
-                        Reset();
-                    } else {
                         m_selectedSide = SWAP_SIDE_LEFT;
                         m_targetSide = SWAP_SIDE_NONE;
                         m_itemType = SWAP_ITEM_ARTIFACT;
                         m_selectedSlot = artifactSlot_2;
                         m_targetSlot = SWAP_SLOT_NONE;
+                    } else {
+                        Reset();
                     }
                 } else {
                     m_targetSide = SWAP_SIDE_LEFT;
@@ -446,22 +437,23 @@ int swapManager::Main(tag_message &message)
                                  NORMAL_DIALOG_NO_RESOURCE, 0,
                                  NORMAL_DIALOG_NO_VALUE, 0);
                 } else if (quickView) {
-                    if (m_heroes[SWAP_SIDE_RIGHT]->m_artifacts[artifactSlot_2] !=
-                        SWAP_ARTIFACT_NONE)
-                        m_heroes[SWAP_SIDE_RIGHT]->ViewArtifact(
-                            m_heroes[SWAP_SIDE_RIGHT]->m_artifacts[artifactSlot_2],
-                            SWAP_VIEW_QUICK,
-                            m_heroes[SWAP_SIDE_RIGHT]->m_artifactExtra[artifactSlot_2]);
-                } else if (m_itemType != SWAP_ITEM_ARTIFACT) {
                     if (m_heroes[SWAP_SIDE_RIGHT]->m_artifacts[artifactSlot_2] ==
+                        SWAP_ARTIFACT_NONE)
+                        break;
+                    m_heroes[SWAP_SIDE_RIGHT]->ViewArtifact(
+                        m_heroes[SWAP_SIDE_RIGHT]->m_artifacts[artifactSlot_2],
+                        SWAP_VIEW_QUICK,
+                        m_heroes[SWAP_SIDE_RIGHT]->m_artifactExtra[artifactSlot_2]);
+                } else if (m_itemType != SWAP_ITEM_ARTIFACT) {
+                    if (m_heroes[SWAP_SIDE_RIGHT]->m_artifacts[artifactSlot_2] !=
                         SWAP_ARTIFACT_NONE) {
-                        Reset();
-                    } else {
                         m_selectedSide = SWAP_SIDE_RIGHT;
                         m_targetSide = SWAP_SIDE_NONE;
                         m_itemType = SWAP_ITEM_ARTIFACT;
                         m_selectedSlot = artifactSlot_2;
                         m_targetSlot = SWAP_SLOT_NONE;
+                    } else {
+                        Reset();
                     }
                 } else {
                     m_targetSide = SWAP_SIDE_RIGHT;
@@ -485,46 +477,58 @@ int swapManager::Main(tag_message &message)
             case SWAP_CONTROL_LEFT_ARMY_FIRST + 2:
             case SWAP_CONTROL_LEFT_ARMY_FIRST + 3:
             case SWAP_CONTROL_LEFT_ARMY_LAST:
-                slotIndex_8 = message.payload.widget.id - SWAP_CONTROL_LEFT_ARMY_FIRST;
                 if (quickView) {
-                    if (m_heroes[SWAP_SIDE_LEFT]->m_army.m_creatureTypes[slotIndex_8] !=
-                        SWAP_CREATURE_NONE)
+                    if (m_heroes[SWAP_SIDE_LEFT]
+                            ->m_army.m_creatureTypes[message.payload.widget.id -
+                                                    SWAP_CONTROL_LEFT_ARMY_FIRST] !=
+                        SWAP_CREATURE_NONE) {
                         gpGame->ViewArmy(
                             SWAP_ARMY_VIEW_X, SWAP_ARMY_VIEW_Y,
-                            m_heroes[SWAP_SIDE_LEFT]->m_army.m_creatureTypes[slotIndex_8],
-                            m_heroes[SWAP_SIDE_LEFT]->m_army.m_creatureCounts[slotIndex_8],
+                            m_heroes[SWAP_SIDE_LEFT]
+                                ->m_army.m_creatureTypes[message.payload.widget.id -
+                                                        SWAP_CONTROL_LEFT_ARMY_FIRST],
+                            m_heroes[SWAP_SIDE_LEFT]
+                                ->m_army.m_creatureCounts[message.payload.widget.id -
+                                                         SWAP_CONTROL_LEFT_ARMY_FIRST],
                             0, 0, 1, 1, m_heroes[SWAP_SIDE_LEFT], 0,
-                            &m_heroes[SWAP_SIDE_LEFT]->m_army, slotIndex_8);
+                            &m_heroes[SWAP_SIDE_LEFT]->m_army,
+                            message.payload.widget.id - SWAP_CONTROL_LEFT_ARMY_FIRST);
+                    }
                 } else if (m_itemType != SWAP_ITEM_ARMY) {
-                    if (m_heroes[SWAP_SIDE_LEFT]->m_army.m_creatureTypes[slotIndex_8] ==
+                    if (m_heroes[SWAP_SIDE_LEFT]
+                            ->m_army.m_creatureTypes[message.payload.widget.id -
+                                                    SWAP_CONTROL_LEFT_ARMY_FIRST] !=
                         SWAP_CREATURE_NONE) {
-                        Reset();
-                    } else {
                         m_selectedSide = SWAP_SIDE_LEFT;
                         m_targetSide = SWAP_SIDE_NONE;
                         m_itemType = SWAP_ITEM_ARMY;
-                        m_selectedSlot = slotIndex_8;
+                        m_selectedSlot =
+                            message.payload.widget.id - SWAP_CONTROL_LEFT_ARMY_FIRST;
                         m_targetSlot = SWAP_SLOT_NONE;
+                    } else {
+                        Reset();
                     }
                 } else {
                     m_targetSide = SWAP_SIDE_LEFT;
-                    m_targetSlot = slotIndex_8;
+                    m_targetSlot =
+                        message.payload.widget.id - SWAP_CONTROL_LEFT_ARMY_FIRST;
                     if (m_selectedSide == SWAP_SIDE_LEFT &&
                         m_selectedSlot == m_targetSlot) {
                         ViewMon();
                         Reset();
-                    } else if ((message.payload.widget.parameter & SWAP_SPLIT_MODIFIER_MASK) == 0 ||
+                    } else if ((message.payload.widget.parameter &
+                                SWAP_SPLIT_MODIFIER_MASK) != 0 &&
                                (m_heroes[m_targetSide]
-                                        ->m_army.m_creatureTypes[m_targetSlot] !=
-                                    SWAP_CREATURE_NONE &&
+                                        ->m_army.m_creatureTypes[m_targetSlot] ==
+                                    SWAP_CREATURE_NONE ||
                                 m_heroes[m_selectedSide]
-                                        ->m_army.m_creatureTypes[m_selectedSlot] !=
+                                        ->m_army.m_creatureTypes[m_selectedSlot] ==
                                     m_heroes[m_targetSide]
                                         ->m_army.m_creatureTypes[m_targetSlot])) {
-                        SwapMons();
+                        SplitMons();
                         Reset();
                     } else {
-                        SplitMons();
+                        SwapMons();
                         Reset();
                     }
                 }
@@ -535,49 +539,64 @@ int swapManager::Main(tag_message &message)
             case SWAP_CONTROL_RIGHT_ARMY_FIRST + 2:
             case SWAP_CONTROL_RIGHT_ARMY_FIRST + 3:
             case SWAP_CONTROL_RIGHT_ARMY_LAST:
-                slotIndex_8 = message.payload.widget.id - SWAP_CONTROL_RIGHT_ARMY_FIRST;
                 if (quickView) {
-                    if (m_heroes[SWAP_SIDE_RIGHT]->m_army.m_creatureTypes[slotIndex_8] !=
-                        SWAP_CREATURE_NONE)
+                    if (m_heroes[SWAP_SIDE_RIGHT]
+                            ->m_army.m_creatureTypes[message.payload.widget.id -
+                                                    SWAP_CONTROL_RIGHT_ARMY_FIRST] !=
+                        SWAP_CREATURE_NONE) {
                         gpGame->ViewArmy(
                             SWAP_ARMY_VIEW_X, SWAP_ARMY_VIEW_Y,
-                            m_heroes[SWAP_SIDE_RIGHT]->m_army.m_creatureTypes[slotIndex_8],
-                            m_heroes[SWAP_SIDE_RIGHT]->m_army.m_creatureCounts[slotIndex_8],
+                            m_heroes[SWAP_SIDE_RIGHT]
+                                ->m_army.m_creatureTypes[message.payload.widget.id -
+                                                        SWAP_CONTROL_RIGHT_ARMY_FIRST],
+                            m_heroes[SWAP_SIDE_RIGHT]
+                                ->m_army.m_creatureCounts[message.payload.widget.id -
+                                                         SWAP_CONTROL_RIGHT_ARMY_FIRST],
                             0, 0, 1, 1, m_heroes[SWAP_SIDE_RIGHT], 0,
-                            &m_heroes[SWAP_SIDE_RIGHT]->m_army, slotIndex_8);
+                            &m_heroes[SWAP_SIDE_RIGHT]->m_army,
+                            message.payload.widget.id - SWAP_CONTROL_RIGHT_ARMY_FIRST);
+                    }
                 } else if (m_itemType != SWAP_ITEM_ARMY) {
-                    if (m_heroes[SWAP_SIDE_RIGHT]->m_army.m_creatureTypes[slotIndex_8] ==
+                    if (m_heroes[SWAP_SIDE_RIGHT]
+                            ->m_army.m_creatureTypes[message.payload.widget.id -
+                                                    SWAP_CONTROL_RIGHT_ARMY_FIRST] !=
                         SWAP_CREATURE_NONE) {
-                        Reset();
-                    } else {
                         m_selectedSide = SWAP_SIDE_RIGHT;
                         m_targetSide = SWAP_SIDE_NONE;
                         m_itemType = SWAP_ITEM_ARMY;
-                        m_selectedSlot = slotIndex_8;
+                        m_selectedSlot =
+                            message.payload.widget.id - SWAP_CONTROL_RIGHT_ARMY_FIRST;
                         m_targetSlot = SWAP_SLOT_NONE;
+                    } else {
+                        Reset();
                     }
                 } else {
                     m_targetSide = SWAP_SIDE_RIGHT;
-                    m_targetSlot = slotIndex_8;
+                    m_targetSlot =
+                        message.payload.widget.id - SWAP_CONTROL_RIGHT_ARMY_FIRST;
                     if (m_selectedSide == SWAP_SIDE_RIGHT &&
                         m_selectedSlot == m_targetSlot) {
                         ViewMon();
                         Reset();
-                    } else if ((message.payload.widget.parameter & SWAP_SPLIT_MODIFIER_MASK) == 0 ||
+                    } else if ((message.payload.widget.parameter &
+                                SWAP_SPLIT_MODIFIER_MASK) != 0 &&
                                (m_heroes[m_targetSide]
-                                        ->m_army.m_creatureTypes[m_targetSlot] !=
-                                    SWAP_CREATURE_NONE &&
+                                        ->m_army.m_creatureTypes[m_targetSlot] ==
+                                    SWAP_CREATURE_NONE ||
                                 m_heroes[m_selectedSide]
-                                        ->m_army.m_creatureTypes[m_selectedSlot] !=
+                                        ->m_army.m_creatureTypes[m_selectedSlot] ==
                                     m_heroes[m_targetSide]
                                         ->m_army.m_creatureTypes[m_targetSlot])) {
-                        SwapMons();
+                        SplitMons();
                         Reset();
                     } else {
-                        SplitMons();
+                        SwapMons();
                         Reset();
                     }
                 }
+                break;
+
+            default:
                 break;
             }
 
@@ -587,7 +606,13 @@ int swapManager::Main(tag_message &message)
                 DrawSelector();
             }
             break;
+
+        default:
+            break;
         }
+        break;
+
+    default:
         break;
     }
 
