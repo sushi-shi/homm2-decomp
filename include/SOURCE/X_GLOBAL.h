@@ -166,6 +166,7 @@ typedef enum KbGameTableConstant {
     KB_CASTLE_TOWER_COUNT = 4,
     KB_CASTLE_DOOR_POSITION_COUNT = 2,
     KB_COMBAT_COORDINATE_COUNT = 2,
+    KB_TRADING_POST_EFFICIENCY_COUNT = 11,
     KB_MOAT_CELL_COUNT = 9,
     KB_ALIGNMENT_NAME_COUNT = HERO_CLASS_COUNT + 2,
     KB_QUICK_VIEW_TEXT_COUNT = 124,
@@ -388,7 +389,7 @@ extern unsigned char iTowerToHexCell[KB_CASTLE_TOWER_COUNT];
 extern unsigned short wallPos[KB_CASTLE_WALL_SEGMENT_COUNT][KB_COMBAT_COORDINATE_COUNT];
 extern unsigned short towerPos[KB_CASTLE_TOWER_COUNT][KB_COMBAT_COORDINATE_COUNT];
 extern unsigned short doorPos[KB_CASTLE_DOOR_POSITION_COUNT][KB_COMBAT_COORDINATE_COUNT];
-extern float *fTradingPostEfficency;
+extern float fTradingPostEfficency[KB_TRADING_POST_EFFICIENCY_COUNT];
 extern struct SElevationOverlay sElevationOverlay[ELEVATION_OVERLAY_COUNT];
 extern int gbDrawingPuzzle;
 extern int giWalkingFrom;
