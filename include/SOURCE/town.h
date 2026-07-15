@@ -48,6 +48,11 @@ typedef enum TownBuilding {
     TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6 = 0x40000000
 } TownBuilding;
 
+typedef enum TownBuildingIndex {
+    TOWN_BUILDING_INDEX_MAGE_GUILD = 0,
+    TOWN_BUILDING_INDEX_FIRST_DWELLING = 19
+} TownBuildingIndex;
+
 typedef enum TownConstant {
     TOWN_OWNER_NONE = -1,
     TOWN_ID_NONE = -1,
