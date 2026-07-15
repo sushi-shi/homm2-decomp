@@ -4618,7 +4618,7 @@ int philAI::ComputeValueOfSS(hero *h, int skill, int level) {
                     h->m_army.m_quantities[armyIndex4];
                 totalArmyValue2 += stackValue7;
                 if (gMonsterDatabase[h->m_army.m_creatureTypes[armyIndex4]]
-                        .flags.all & AI_SECONDARY_SKILL_RANGED_ATTRIBUTE) {
+                        .attributes & MONSTER_ATTRIBUTE_RANGED) {
                     rangedArmyValue28 += stackValue7;
                 }
             }

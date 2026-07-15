@@ -3148,7 +3148,7 @@ int advManager::CombatMonsterEvent(hero *eventHero, int monsterType,
     placement4[COMBAT_MONSTER_ARMY_SLOTS] = 0;
     SRand(combatX + combatY);
     if (stackCount == COMBAT_MONSTER_ARMY_SLOTS &&
-        (gMonsterDatabase[monsterType].flags.all & MONSTER_FLAGS_SHOOTER) == 0) {
+        (gMonsterDatabase[monsterType].attributes & MONSTER_ATTRIBUTE_RANGED) == 0) {
         int roll = SRandom(0, COMBAT_MONSTER_RANDOM_MAX);
         if (roll < COMBAT_MONSTER_REDUCED_STACK_CHANCE)
             stackCount = 3;
