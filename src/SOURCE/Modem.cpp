@@ -254,7 +254,8 @@ void Connect(void)
         }
 
         stime = KBTickCount();
-        if (stime / 1000 != oldsec / 1000) {
+        // Scalar-lvalue steering preserves oldsec but emits the retail relocation order.
+        if (0[&oldsec] / 1000 != stime / 1000) {
             oldsec = stime;
             sprintf(idMessage, "ID%s_%i", idstr, localstage);
             WriteModemPacket(idMessage, strlen(idMessage));
@@ -299,7 +300,8 @@ int WaitForDirectConnect(void)
             oldsec = -1;
         }
         stime = KBTickCount();
-        if (stime / 1000 != oldsec / 1000) {
+        // Scalar-lvalue steering preserves oldsec but emits the retail relocation order.
+        if (0[&oldsec] / 1000 != stime / 1000) {
             oldsec = stime;
             sprintf(idMessage, "ID%s_%i", idstr, localstage);
             WriteModemPacket(idMessage, strlen(idMessage));
