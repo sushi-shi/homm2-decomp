@@ -987,13 +987,15 @@ int InterpretCommandLine(void)
     return 1;
 }
 
-// @match-note
-// Pre-95 structural checkpoint (retained 99.565%): exact 0x24 frame, complete
-// event/help switch bodies, and 89/89 relocation sites with no base-only target.
-// The first residual is the first delinked switch table at +0xad; the second is
-// at +0x1ab, after which the generic diff parser loses local-label alignment.
-// Direct retail-order case bodies are present. Revisit at 95% for explicit-range
-// table exclusion and systematic continuation steering.
+// @semantic
+// Explicit-range first opcode divergence at +0x354: ours emits a five-byte
+// continuation jmp where retail enters the next body; retail later uses lea at
+// +0x39b where ours uses shl/sub at +0x3a0 after that shifted continuation.
+// The 0x24 frame/slots, source CFG and semantics are complete; jump tables at
+// +0xad/0x14 and +0x1ab/0x18 align, and all 89 relocations resolve with no
+// base-only target. Direct retail-order cases and the frame-expression operand
+// swap were tried without changing the residual. Revisit with focused exact-span
+// variants after the TU's pre-target libclang diagnostics are resolved.
 VA(0x00498d2d, 0x698)
 int InitMenuHandler(struct tag_message &msg)
 {
@@ -1266,11 +1268,6 @@ char *GetBuildingName(int race, int building)
         return gDwellingNames[race][building - KB_BUILDING_DWELLING_FIRST];
 }
 
-// @match-note
-// ~98%: 2-instruction /Od body-placement variance — retail emits the final
-// `else if (building<0x10)` body out-of-line (`jl body; jmp epi`); this build lowers it
-// inline (`jge skip`). Logic byte-exact otherwise; resisted every source structure tried.
-// Revisit at 95% for systematic body-placement steering.
 VA(0x004997d4, 0x138)
 void GetBuildingCost(int race, int building, int *const dest, int mageLevel)
 {
@@ -1287,7 +1284,9 @@ void GetBuildingCost(int race, int building, int *const dest, int mageLevel)
         memcpy(dest, gMageBuildingCosts[mageLevel + 1], KB_BUILDING_RESOURCE_COUNT * sizeof(int));
     } else if (building == KB_BUILDING_SPECIAL) {
         memcpy(dest, gSpecialBuildingCosts[race], KB_BUILDING_RESOURCE_COUNT * sizeof(int));
-    } else if (building < KB_BUILDING_NEUTRAL_LIMIT) {
+    } else {
+        if (building >= KB_BUILDING_NEUTRAL_LIMIT)
+            return;
         memcpy(dest, gNeutralBuildingCosts[building], KB_BUILDING_RESOURCE_COUNT * sizeof(int));
     }
 }
@@ -1299,8 +1298,9 @@ char *GetMonsterName(int m)
 }
 
 // @early-stop
-// ~99.6%: code bytes link-identical; residual is the switch jump/index-table reloc
-// names ($L... vs func+off) the delinker assigns differently. Confirmed same linked bytes.
+// All 320 relocation-masked bytes are identical and 11/11 effective targets
+// agree. Only delinked local-label DIR32 names differ at +0xe1, +0xe8 and the
+// +0xec..+0x108 switch table ($L... versus containing-function plus addend).
 VA(0x0049992c, 0x140)
 void GetMonsterCost(int monster, int *const cost)
 {
