@@ -3541,10 +3541,10 @@ void combatManager::ShowSpellMessage(int castByCreature, int spell,
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x004f00b0) int castX;
-DATA(0x004f00b4) int castY;
-DATA(0x004f00b8) int bInTeleportGetDest;
-DATA(0x004f0278) int indexToCastOn;
+DATA(0x004f00b0) int castX = 0;
+DATA(0x004f00b4) int castY = 0;
+DATA(0x004f00b8) int bInTeleportGetDest = 0;
+DATA(0x004f0278) int indexToCastOn = -1;
 DATA(0x004f04c0) unsigned char uRedBeam[] = {
     0x77, 0xb5, 0xbc, 0xc0, 0xc3
 };
@@ -3552,4 +3552,4 @@ DATA(0x004f04c8) unsigned char uRainbow[] = {
     0xbc, 0xba, 0xce, 0xca, 0xc8, 0x6f, 0x71, 0x73,
     0xde, 0x5a, 0x9f, 0x47, 0x4a, 0x8d, 0x8f
 };
-DATA(0x004f04e0) signed char *gyModify;
+DATA(0x004f04e0) signed char *gyModify = 0;

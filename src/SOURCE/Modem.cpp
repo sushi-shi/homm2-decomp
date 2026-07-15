@@ -422,10 +422,10 @@ void WriteModemPacket(char *buffer, int length)
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x004ede50) int iBaudBits;
-DATA(0x004ede54) int inescape;
-DATA(0x004ede58) int newpacket;
-DATA(0x004ede5c) int packetlen;
+DATA(0x004ede50) int iBaudBits = 8;
+DATA(0x004ede54) int inescape = 0;
+DATA(0x004ede58) int newpacket = 0;
+DATA(0x004ede5c) int packetlen = 0;
 DATA(0x00523280) char idstr[MODEM_ID_SIZE];
 DATA(0x00523288) int GUIMRc;
 DATA(0x0052328c) int iModemCommandPos;

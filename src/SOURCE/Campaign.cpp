@@ -941,7 +941,7 @@ void game::InitCampaignMap(void)
 
 // ---- globals (definitions, RVA order) ----
 DATA(0x004f4f28) short trackXY[2][13][2];
-DATA(0x004f4f90) class heroWindow *campWin;
+DATA(0x004f4f90) class heroWindow *campWin = 0;
 DATA(0x00527ea4) int iCurViewSide;
 DATA(0x00527ea8) int iCampaignTrackType;
 DATA(0x00527eac) int bCampaignViewOnly;

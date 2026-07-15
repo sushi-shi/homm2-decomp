@@ -301,4 +301,4 @@ void combatManager::ViewArmy(army *viewedArmy, int quickView)
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x004eddf4) int iViewGeneralWhichSide;
+DATA(0x004eddf4) int iViewGeneralWhichSide = 0;

@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <string.h>
 
-DATA(0x004f52e0) static HREDBOOK cdTestRedbook;
+DATA(0x004f52e0) static HREDBOOK cdTestRedbook = 0;
 
 VA(0x00449f80, 0x3b)
 int CDTest_Init(void)

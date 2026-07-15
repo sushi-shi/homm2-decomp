@@ -852,19 +852,19 @@ transmitComplete:
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x00516f60) int iInOrderCtr;
-DATA(0x00516f64) int iCurLastID;
-DATA(0x00516f68) int giLastConfirm;
-DATA(0x00516f6c) unsigned char GameMode;
-DATA(0x00516f70) long lLastHeartbeatSend;
-DATA(0x00516f74) int gbInRemoteMain;
-DATA(0x00516f78) int gbInRemoteCleanup;
-DATA(0x00516f7c) int iIDCtr;
-DATA(0x00516f80) int iTimesDropped;
-DATA(0x00516f84) signed char gbInNetSetup;
-DATA(0x00516f88) int bUseDirectPlay;
-DATA(0x00516f8c) int bUseWinsock;
-DATA(0x00516f90) signed char bInTimeoutFail;
+DATA(0x00516f60) int iInOrderCtr = 0;
+DATA(0x00516f64) int iCurLastID = 0;
+DATA(0x00516f68) int giLastConfirm = -1;
+DATA(0x00516f6c) unsigned char GameMode = 0;
+DATA(0x00516f70) long lLastHeartbeatSend = 0;
+DATA(0x00516f74) int gbInRemoteMain = 0;
+DATA(0x00516f78) int gbInRemoteCleanup = 0;
+DATA(0x00516f7c) int iIDCtr = 0;
+DATA(0x00516f80) int iTimesDropped = 0;
+DATA(0x00516f84) signed char gbInNetSetup = 0;
+DATA(0x00516f88) int bUseDirectPlay = 0;
+DATA(0x00516f8c) int bUseWinsock = 0;
+DATA(0x00516f90) signed char bInTimeoutFail = 0;
 DATA(0x00516f98) int *iBaud;
 DATA(0x00516fb8) int *iIRQ;
 DATA(0x0052a268) char rcvBufOut[REMOTE_TRANSPORT_BUFFER_SIZE];
