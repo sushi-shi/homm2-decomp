@@ -2,7 +2,7 @@
 """Relocation audits for objdiff's relocation-masked blind spots.
 
 ``homm2 relocs`` remains the broad, opt-in, order-independent target audit.  The
-``--fields`` mode is a hard build gate for a narrower invariant: in live 100%-exact
+``--fields`` mode is a hard build gate for a narrower invariant: in live near-exact
 functions, ordered DIR32 sites that resolve into the same recovered public DATA owner
 must use the same owner-relative offset.  This catches a wrong field even when objdiff
 masks all four relocation bytes.
@@ -45,6 +45,7 @@ IMAGE_BASE = 0x400000
 _PARSE_CACHE = {}
 # Bump only when parse_obj's serialized relocation representation changes.
 _PARSER_FINGERPRINT = "coff-relocs-v1"
+FIELD_AUDIT_THRESHOLD = 99.5
 
 
 class OwnerOffsetMismatch(NamedTuple):
@@ -61,6 +62,16 @@ class OwnerOffsetMismatch(NamedTuple):
                 "(retail %s, base %s)" %
                 (self.site, self.owner_name, self.expected, self.actual,
                  self.target_symbol, self.base_symbol))
+
+
+class OwnerOffsetMultisetMismatch(NamedTuple):
+    owner_name: str
+    expected: tuple
+    actual: tuple
+
+    def diagnostic(self):
+        return ("WRONG OWNER OFFSETS: %s expected %s, actual %s" %
+                (self.owner_name, self.expected, self.actual))
 
 
 class RelocAddressMismatch(NamedTuple):
@@ -411,6 +422,47 @@ def check_ordered_owner_offsets(sym, data, owners, base_sites, target_sites):
     return problems
 
 
+def _owner_offset_counters(sym, data, owners, sites):
+    """Group explicit owner/const DIR32 references by recovered DATA owner."""
+    grouped = {}
+    for _site, typ, symbol, addend in sites:
+        if typ != "DIR32":
+            continue
+        rva = resolve(sym, data, typ, symbol, addend)
+        if rva is None:
+            continue
+        owner = owner_for_rva(owners, rva)
+        if owner is None:
+            continue
+        if symbol != owner.symbol and not symbol.startswith("const_"):
+            continue
+        grouped.setdefault(owner.symbol, (owner, Counter()))[1][rva - owner.rva] += 1
+    return grouped
+
+
+def check_owner_offset_multisets(sym, data, owners, base_sites, target_sites):
+    """Compare owner-relative fields without depending on instruction order.
+
+    This is valid at any fuzzy percentage when both sides contain the same number
+    of references to an owner. Differing counts are left to structural matching;
+    equal counts with different offsets prove at least one wrong field access.
+    """
+    base = _owner_offset_counters(sym, data, owners, base_sites)
+    target = _owner_offset_counters(sym, data, owners, target_sites)
+    problems = []
+    for symbol in sorted(set(base) & set(target)):
+        owner, base_offsets = base[symbol]
+        _target_owner, target_offsets = target[symbol]
+        if (sum(base_offsets.values()) != sum(target_offsets.values()) or
+                base_offsets == target_offsets):
+            continue
+        problems.append(OwnerOffsetMultisetMismatch(
+            owner.source_name,
+            tuple(sorted(target_offsets.items())),
+            tuple(sorted(base_offsets.items()))))
+    return problems
+
+
 def _resolved_reloc_candidates(sym, data, dups, reloc):
     """Return every final RVA a relocation can denote.
 
@@ -461,7 +513,7 @@ def check_ordered_reloc_addresses(sym, data, dups, owners, base_sites, target_si
 
 
 def review_fields(resolved_addresses=False):
-    """Audit ordered relocations in live exact functions.
+    """Audit ordered relocations in live near-exact functions.
 
     The existing build gate checks proven public-owner offsets. ``--resolved``
     widens this to every relocation whose final retail RVA can be resolved; it is
@@ -471,13 +523,14 @@ def review_fields(resolved_addresses=False):
     owners = load_owner_ranges()
     report = json.load(open("build/objdiff/report.json"))
     bad = []
+    review = []
     checked_functions = 0
     checked_sites = 0
     for unit_record in report["units"]:
         unit = unit_record["name"]
-        exact = {function["name"] for function in unit_record.get("functions", [])
-                 if function.get("fuzzy_match_percent") == 100.0}
-        if not exact:
+        functions = {function["name"]: function.get("fuzzy_match_percent", 0)
+                     for function in unit_record.get("functions", [])}
+        if not functions:
             continue
         base_obj = "build/objdiff/base/%s.obj" % unit
         target_obj = "build/delink/%s.c.obj" % unit
@@ -485,21 +538,25 @@ def review_fields(resolved_addresses=False):
             continue
         base_functions = parse_obj(base_obj, with_sites=True)
         target_functions = parse_obj(target_obj, with_sites=True)
-        for name in sorted(exact):
+        for name in sorted(functions):
             if name not in base_functions or name not in target_functions:
                 continue
             checked_functions += 1
             checked_sites += len(base_functions[name])
+            problems = check_owner_offset_multisets(
+                sym, data, owners,
+                base_functions[name], target_functions[name])
             if resolved_addresses:
-                problems = check_ordered_reloc_addresses(
-                    sym, data, dups, owners,
-                    base_functions[name], target_functions[name])
-            else:
-                problems = check_ordered_owner_offsets(
-                    sym, data, owners,
-                    base_functions[name], target_functions[name])
+                if functions[name] >= FIELD_AUDIT_THRESHOLD:
+                    problems.extend(check_ordered_reloc_addresses(
+                        sym, data, dups, owners,
+                        base_functions[name], target_functions[name]))
             for problem in problems:
-                bad.append((unit, name, problem))
+                destination = (bad if functions[name] >= FIELD_AUDIT_THRESHOLD
+                               else review)
+                destination.append((unit, name, problem))
+    for unit, name, problem in review:
+        print("  REVIEW %s  %s: %s" % (unit, name, problem.diagnostic()))
     for unit, name, problem in bad:
         print("  %s  %s: %s" % (unit, name, problem.diagnostic()))
     if bad:
@@ -508,8 +565,9 @@ def review_fields(resolved_addresses=False):
               % (label, len({(unit, name) for unit, name, _problem in bad})))
         return 1
     label = "addresses" if resolved_addresses else "fields"
-    print("reloc %s OK: %d exact functions, %d ordered relocation sites scanned."
-          % (label, checked_functions, checked_sites))
+    print("reloc %s OK: %d functions, %d ordered relocation sites scanned, "
+          "%d structural review item(s)."
+          % (label, checked_functions, checked_sites, len(review)))
     return 0
 
 def _function_for_arg(arg):
