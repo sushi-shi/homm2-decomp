@@ -26,6 +26,9 @@ typedef enum ModemConstant {
     MODEM_WAIT_COMMAND = 5,
     MODEM_WAIT_RESPONSE = 6,
     MODEM_WAIT_DIRECT_CONNECT = 7,
+    MODEM_CONNECTION_INIT_STAGE = 0,
+    MODEM_CONNECTION_HANDSHAKE_STAGE = 1,
+    MODEM_CONNECTION_READY_STAGE = 2,
     MODEM_BAUD_CLOCK = 115200,
     MODEM_QUEUE_GUARD = 16,
     MODEM_OUT_QUEUE_SIZE = 0x800,
@@ -38,6 +41,7 @@ typedef enum ModemConstant {
     MODEM_COMMAND_BUFFER_SIZE = 40,
     MODEM_WORK_TEXT_SIZE = 200,
     MODEM_RESPONSE_SIZE = 80,
+    MODEM_RESPONSE_TRUNCATE_INDEX = 17,
     MODEM_PACKET_PAYLOAD_SIZE = 256,
     MODEM_PACKET_BUFFER_SIZE = 0x110,
     MODEM_ENCODED_PACKET_SIZE = 544,
@@ -84,5 +88,10 @@ extern inque_t inque;
 extern int iLastActionTime;
 extern char GUIMRresponse[MODEM_RESPONSE_SIZE];
 extern outque_t outque;
+
+inline void TruncateModemResponse(void)
+{
+    GUIMRresponse[MODEM_RESPONSE_TRUNCATE_INDEX] = 0;
+}
 
 #endif // HOMM2_MODEM_H
