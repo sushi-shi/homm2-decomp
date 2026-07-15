@@ -1030,8 +1030,8 @@ def candidate_payloads(
     return candidates, False
 
 
-def main(argv=None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
+def main(argv=None, *, prog=None, description=None) -> int:
+    parser = argparse.ArgumentParser(prog=prog, description=description or __doc__)
     parser.add_argument("source", type=Path)
     parser.add_argument("rva", type=lambda value: int(value, 0))
     parser.add_argument("--max-depth", type=int, default=3)

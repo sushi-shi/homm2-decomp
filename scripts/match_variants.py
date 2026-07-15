@@ -17,7 +17,11 @@ Example::
 this frontend.
 """
 
-from generate_ast_variants import main
+from generate_ast_variants import main as generate_main
+
+
+def main(argv=None) -> int:
+    return generate_main(argv, prog="match_variants.py", description=__doc__)
 
 
 if __name__ == "__main__":
