@@ -63,6 +63,7 @@
 #define ADVMGR_RESOURCE_VIEW_LINE (*reinterpret_cast<const short *>("\x2f\x12"))
 #define ADVMGR_KINGDOM_VIEW_LINE (*reinterpret_cast<const short *>("\x96\x12"))
 #define ADVMGR_BORDER_FREE_LINE (*reinterpret_cast<const short *>("\x24\x01"))
+#define ADVMGR_ENVIRONMENT_VOLUME(distance) environmentVolumes[distance]
 
 static const int environmentVolumes[ADVMGR_ENVIRONMENT_VOLUME_COUNT] = {
     64, 57, 40, 21, 7, 5, 3, 0
@@ -5564,10 +5565,12 @@ int advManager::ComboDraw(int update)
     return ComboDraw(m_mapOriginX, m_mapOriginY, update);
 }
 
-// @early-stop
+// @match-note
 // Raw bytes differ only at +0x1dd/+0x1e0, +0x1f4/+0x1f7,
 // +0x1fb/+0x1fe, and +0x215/+0x218: four commutative /Od add operand
-// orders. The frame, size, logic, and all 18 relocation targets agree.
+// orders. The frame, size, logic, and all 18 relocation targets agree. The
+// environment-volume relocation reaches the same retail table address; only
+// the delinker's synthetic constant-pool identity differs.
 VA(0x0046668e, 0x338)
 void advManager::SetEnvironmentOrigin(int originX, int originY, int stopSounds)
 {
@@ -5648,7 +5651,7 @@ void advManager::SetEnvironmentOrigin(int originX, int originY, int stopSounds)
                     m_loopingSamples[m_activeSounds[edgeOffset].soundId]
                         ->m_activeSample,
                     SOUND_SAMPLE_OPERATION_EFFECT_VOLUME,
-                    environmentVolumes[m_activeSounds[edgeOffset].volume]);
+                    ADVMGR_ENVIRONMENT_VOLUME(m_activeSounds[edgeOffset].volume));
             }
         }
     }
@@ -5780,12 +5783,12 @@ int advManager::GetSoundId(int x, int y)
     return ADVMGR_ENVIRONMENT_SOUND_NONE;
 }
 
-// @early-stop
-// Exact frame and instruction stream outside +0x2e..+0x3c. Retail evaluates
-// MAP_HEIGHT > mapY as a 15-byte reversed compare; MSVC emits the equivalent
-// 14-byte compare here. The resulting size delta is one byte, all 9 external
-// relocation addresses agree, and semantics-preserving AST operand swaps were
-// exhausted. The constant-pool relocation spelling differs but its address agrees.
+// @match-note
+// Exact 0x14 frame, 0x23a size, CFG, and instruction stream outside
+// +0x20..+0x3c. Retail and candidate emit equivalent 29-byte map-bound checks
+// with different operand order and polarity. All 9 external relocation
+// addresses agree. The environment-volume relocation reaches the same retail
+// table address; only the delinker's synthetic constant-pool identity differs.
 VA(0x00466ef0, 0x23a)
 void advManager::InsertSound(int x, int mapY, int distance, int soundLayer)
 {
@@ -5836,7 +5839,7 @@ void advManager::InsertSound(int x, int mapY, int distance, int soundLayer)
         m_activeSounds[soundSlot].volume = distance;
         CheckLoadSample(soundId);
         m_loopingSamples[soundId]->m_volume =
-            environmentVolumes[distance];
+            ADVMGR_ENVIRONMENT_VOLUME(distance);
         m_loopingSamples[soundId]->m_loopCount = 0;
         m_loopingSamples[soundId]->m_channelType =
             ADVMGR_ENVIRONMENT_SOUND_CHANNEL_TYPE;
