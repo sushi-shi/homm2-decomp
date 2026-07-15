@@ -7,6 +7,7 @@ import clang.cindex as ci
 from generate_ast_variants import (
     AstEdit,
     AstMutation,
+    balance_mutations,
     candidate_payloads,
     clang_args,
     classify_parse_errors,
@@ -93,6 +94,16 @@ class AstVariantGenerationTests(unittest.TestCase):
         character_offset = text.index("VA")
         self.assertEqual(utf8_byte_offset(text, character_offset), len(text[:character_offset].encode()))
         self.assertGreater(utf8_byte_offset(text, character_offset), character_offset)
+
+    def test_mutation_families_are_round_robin_balanced(self):
+        mutations = [
+            AstMutation("ast", "a", (AstEdit(0, 1, b"A"),)),
+            AstMutation("ast", "b", (AstEdit(2, 3, b"B"),)),
+            AstMutation("ast", "c", (AstEdit(4, 5, b"C"),)),
+            AstMutation("state", "a", (AstEdit(6, 6, b"typedef int X;"),)),
+        ]
+        balanced = balance_mutations(mutations)
+        self.assertEqual([mutation.family for mutation in balanced[:2]], ["ast", "state"])
 
 
 class AstVariantSemanticTests(unittest.TestCase):
