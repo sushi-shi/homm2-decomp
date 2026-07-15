@@ -36,8 +36,8 @@ DATA(0x00517148) static short gPollRemoteLineBase = 757;
 // and switch temporary at -0x04 agree, including the retail duplicate protocol
 // reset block. All 38 relocation occurrences and external targets agree. The
 // first residual is the delinked switch continuation/local-label trampoline.
-// Empty positive arms and direct early exits were both tested. Revisit after the
-// SOURCE placeholder census reaches zero.
+// Empty positive arms and direct early exits were both tested. Revisit in the
+// 95% last-mile phase when local-label walls enter the active queue.
 VA(0x004a3080, 0x188)
 void RemoteCleanup(void)
 {
@@ -93,8 +93,8 @@ void RemoteCleanup(void)
 // All 143 raw relocation entries and external targets agree. llvm-objdump starts
 // the retail post-table block one byte inside its compare at .text+0x559; the raw
 // relocation at +0x55c has a zero addend, matching base +0x557. Tested protocol
-// polarity, log placement, struct copies, and host-name arm order. Revisit after
-// the SOURCE placeholder census reaches zero.
+// polarity, log placement, struct copies, and host-name arm order. Revisit in the
+// 95% last-mile phase when local-label walls enter the active queue.
 VA(0x004a3208, 0x6da)
 void RemoteMain(int gameMode)
 {
@@ -379,12 +379,13 @@ int DecodePacket(unsigned char *data, int)
 }
 
 // @match-note
-// Complete destination folding and all network/modem switch bodies. The 0x11c
-// frame is exact: size -0x04, result -0x08, backend status -0x0c, the retail-proven
-// dead 260-byte scratch aggregate through -0x110, fastcall spills -0x114/-0x118,
-// and switch temporary -0x11c. All 23 relocations agree; objdiff stops at the
-// delinked switch dispatch. Tested both backend polarities and result propagation.
-// Revisit after the SOURCE placeholder census reaches zero.
+// Complete destination folding and all network/modem switch bodies, in retail
+// DirectPlay/Winsock/NetBIOS body order. The 0x11c frame is exact: size -0x04,
+// result -0x08, backend status -0x0c, the retail-proven dead 260-byte aggregate
+// through -0x110, fastcall spills -0x114/-0x118, and switch temporary -0x11c.
+// All 23 relocations agree; the first comparison boundary is the delinked switch
+// dispatch. Both nested inverse and positive backend polarities were tested.
+// Revisit in the 95% last-mile phase.
 VA(0x004a3be1, 0x18e)
 int SendRemoteData(unsigned char *dataToSend, unsigned char *, int destination,
                    int length)
@@ -404,21 +405,19 @@ int SendRemoteData(unsigned char *dataToSend, unsigned char *, int destination,
     switch (GameMode) {
     case REMOTE_GAME_NETWORK_HOST:
     case REMOTE_GAME_NETWORK_GUEST:
-        if (bUseDirectPlay == 0) {
-            if (bUseWinsock == 0) {
-                sendStatus = static_cast<short>(
-                    nb_snd(static_cast<short>(destination),
-                        static_cast<short>(size), PacketSend));
-                if (sendStatus != 0) {
-                    LogInt("Bad return on Send Data", destination,
-                        sendStatus, size, 0, 0, -999, -999);
-                    out = 0;
-                }
-            } else {
-                sendStatus = wsnet_snd(destination, size, PacketSend);
-            }
-        } else {
+        if (bUseDirectPlay != 0) {
             sendStatus = dpnet_snd(destination, size, PacketSend);
+        } else if (bUseWinsock != 0) {
+            sendStatus = wsnet_snd(destination, size, PacketSend);
+        } else {
+            sendStatus = static_cast<short>(
+                nb_snd(static_cast<short>(destination),
+                    static_cast<short>(size), PacketSend));
+            if (sendStatus != 0) {
+                LogInt("Bad return on Send Data", destination,
+                    sendStatus, size, 0, 0, -999, -999);
+                out = 0;
+            }
         }
         break;
     case REMOTE_GAME_MODEM_HOST:
@@ -430,51 +429,47 @@ int SendRemoteData(unsigned char *dataToSend, unsigned char *, int destination,
     return out;
 }
 
-// @match-note
-// Complete DirectPlay, Winsock, NetBIOS, and modem receive/decode paths, including
-// immediate failure returns. The 0x14 frame and live slots agree: result -0x04,
-// receive status -0x08, fastcall spills -0x0c/-0x10, switch temporary -0x14.
-// All 19 relocations agree; comparison first stops at the delinked switch table.
-// Tested ternary/common-result and explicit-return forms. Revisit after the SOURCE
-// placeholder census reaches zero.
+// @early-stop
+// Complete DirectPlay, Winsock, NetBIOS, and modem receive/decode paths. The 0x14
+// frame and slots agree: result -0x04, 32-bit receive status -0x08, fastcall spills
+// -0x0c/-0x10, and switch temporary -0x14. The functions have the same 0x158-byte
+// size and every non-relocation byte is identical. The only six raw byte differences
+// are switch relocation addends at +0x135/+0x136/+0x139/+0x13d/+0x141/+0x145;
+// all 19 relocation sites and external targets agree.
 VA(0x004a3d6f, 0x158)
 int ReceiveRemoteData(unsigned char *, unsigned char *data, int decodeType)
 {
     int result;
-    short receiveResult;
+    int receiveResult;
 
     result = 1;
     switch (GameMode) {
     case REMOTE_GAME_NETWORK_HOST:
     case REMOTE_GAME_NETWORK_GUEST:
         if (bUseDirectPlay != 0) {
-            receiveResult = dpnet_rcv(0, REMOTE_ENCODED_BUFFER_SIZE, packet);
+            receiveResult = dpnet_rcv(0, REMOTE_RECEIVE_BUFFER_SIZE, packet);
             if (receiveResult == 0)
                 return 0;
-            else
-                result = DecodePacket(data, decodeType);
+            result = DecodePacket(data, decodeType);
         } else if (bUseWinsock != 0) {
-            receiveResult = wsnet_rcv(0, REMOTE_ENCODED_BUFFER_SIZE, packet);
+            receiveResult = wsnet_rcv(0, REMOTE_RECEIVE_BUFFER_SIZE, packet);
             if (receiveResult == 0)
                 return 0;
-            else
-                result = DecodePacket(data, decodeType);
+            result = DecodePacket(data, decodeType);
         } else {
             receiveResult = static_cast<short>(
-                nb_rcv(REMOTE_ENCODED_BUFFER_SIZE, packet));
+                nb_rcv(REMOTE_RECEIVE_BUFFER_SIZE, packet));
             if (receiveResult == 0)
                 return 0;
-            else
-                result = DecodePacket(data, decodeType);
+            result = DecodePacket(data, decodeType);
         }
         break;
     case REMOTE_GAME_MODEM_HOST:
     case REMOTE_GAME_MODEM_GUEST:
-        receiveResult = static_cast<short>(ReadPacket());
+        receiveResult = ReadPacket();
         if (receiveResult == 0)
             return 0;
-        else
-            result = DecodePacket(data, decodeType);
+        result = DecodePacket(data, decodeType);
         break;
     }
     return result;
@@ -482,26 +477,28 @@ int ReceiveRemoteData(unsigned char *, unsigned char *data, int decodeType)
 
 // @match-note
 // Complete message construction, retry/dialog loop, confirmation polling, and
-// reliable/unreliable exits. The packed message begins at -0x108 and result/attempt
-// slots agree; the base frame is 0x114 versus retail 0x118, shifting only the two
-// fastcall spills below the aggregate. All 15 relocation targets agree. First CFG
-// residual is the post-memcpy loop guard; tested early-return and condition-loop
-// forms plus both message-type polarities. Revisit after the SOURCE placeholder
-// census reaches zero.
+// reliable/unreliable exits. The 0x118 frame is exact: result -0x04, message through
+// -0x108, retail-proven dead word -0x10c, attempt -0x110, poll -0x114, and fastcall
+// spills through -0x118. All 15 relocation targets agree. The first residual is a
+// retail five-byte continuation after the unreliable-success return, followed by
+// the iIDCtr/giLastConfirm load order. Guarded/early-return loops, both comparison
+// operand orders, and both message-type polarities were tested. Revisit in the 95%
+// last-mile phase.
 VA(0x004a3ec7, 0x21a)
 int TransmitRemoteData(char *data, int destination, int length,
                        signed char command, signed char reliable,
                        signed char allowRetryDialog, signed char messageType)
 {
     int poll;
-    int attempt;
+    int attempt0;
     RemoteMessage outgoing;
+    int unused4;
     int result;
 
     if (gbRemoteOn == 0 || gbInNetSetup != 0)
         return 1;
     result = 0;
-    attempt = 0;
+    attempt0 = 0;
     iIDCtr++;
     outgoing.sender = static_cast<signed char>(giThisNetPos);
     outgoing.id = iIDCtr;
@@ -517,37 +514,35 @@ int TransmitRemoteData(char *data, int destination, int length,
     outgoing.command = command;
     if (length > 0)
         memcpy(outgoing.payload, data, length);
-    while (1) {
-        if (result != 0)
-            return result;
-        if (attempt > REMOTE_RETRY_COUNT)
-            return 0;
+    while (result == 0 && attempt0 <= REMOTE_RETRY_COUNT) {
         result = SendRemoteData(
             reinterpret_cast<unsigned char *>(&outgoing), 0, destination,
             length + REMOTE_MESSAGE_HEADER_SIZE);
         if (reliable == 0 && result != 0)
-            break;
-        if (result == 0) {
-            DelayMilli(REMOTE_SEND_RETRY_DELAY);
-        } else {
-            for (poll = 0; poll < REMOTE_CONFIRM_POLL_COUNT; poll++) {
+            return 1;
+        if (result != 0) {
+            poll = 0;
+            while (poll < REMOTE_CONFIRM_POLL_COUNT) {
                 ForcePollSound();
-                if (giLastConfirm == iIDCtr)
+                if (iIDCtr == giLastConfirm)
                     return 1;
                 result = 0;
                 DelayMilli(REMOTE_CONFIRM_POLL_DELAY);
+                poll++;
             }
+        } else {
+            DelayMilli(REMOTE_SEND_RETRY_DELAY);
         }
-        if (allowRetryDialog != 0 && attempt == REMOTE_RETRY_COUNT &&
+        if (allowRetryDialog != 0 && attempt0 == REMOTE_RETRY_COUNT &&
             result == 0) {
             NormalDialog("Error sending data.  Keep trying??", 2,
                 -1, -1, -1, 0, -1, 0, -1, 0);
             if (gpWindowManager->m_dialogResult == PLAYER_EXIT_CONFIRM_OK)
-                attempt = -1;
+                attempt0 = -1;
         }
-        attempt++;
+        attempt0++;
     }
-    return 1;
+    return result;
 }
 
 VA(0x004a40e1, 0x10b)
@@ -583,13 +578,13 @@ char * GetRemoteData(signed char remove)
 
 // @match-note
 // Complete backend pumping, heartbeat, host/guest timeout recovery, confirmation,
-// duplicate suppression, queue allocation, and recent-ID rotation. Both distinct
-// seven-byte player-exit records and the reused heartbeat-command byte are present;
-// the base frame is 0x2c versus retail 0x30. All 132 relocation occurrences and
-// external targets agree, including the empty-string ShutDown argument. First
-// residual follows net-setup state capture at heartbeat-local initialization;
-// tested pointer locals, direct typed globals, empty guards, and arm polarity.
-// Revisit after the SOURCE placeholder census reaches zero.
+// duplicate suppression, queue allocation, and recent-ID rotation. The retail
+// queue-full snapshot is byte-sized; its -0x14 slot, queue count -0x0c, saved poll
+// state -0x08, both seven-byte exit records, and the 0x30 frame agree. All 132
+// relocation occurrences and external targets agree. Ignoring delinked literal
+// identities, the first code residual is the host-loop queueIndex/giThisNetPos load
+// order; both operand orders, empty guards, and arm polarities were tested. Revisit
+// in the 95% last-mile phase.
 VA(0x004a41ec, 0x6f4)
 void PollRemote(void)
 {
@@ -599,6 +594,7 @@ void PollRemote(void)
     int queueIndex;
     int receiveResult;
     signed char netCommand;
+    signed char queueFull;
     int destination;
     SPlayerExit hostExit;
     SPlayerExit guestExit;
@@ -619,9 +615,9 @@ void PollRemote(void)
     }
     if (gbInNetSetup != 0)
         return;
-    savedInPollSound = gbInPollSound;
-
     queueCount = 0;
+    savedInPollSound = gbInPollSound;
+    queueFull = 0;
     if (KBTickCount() - lLastHeartbeatSend > REMOTE_HEARTBEAT_INTERVAL) {
         reinterpret_cast<RemoteMessage *>(sndBuf)->sender =
             static_cast<signed char>(giThisNetPos);
@@ -631,7 +627,7 @@ void PollRemote(void)
         if (gbThisNetGotAdventureControl != 0) {
             reinterpret_cast<RemoteMessage *>(sndBuf)->command =
                 static_cast<signed char>(
-                ((static_cast<char>(giCurPlayer) + 1) << 4) |
+                ((giCurPlayer + 1) << 4) |
                 iCurHourGlassPhase | 0x80);
         } else {
             reinterpret_cast<RemoteMessage *>(sndBuf)->command = 0;
@@ -647,7 +643,7 @@ void PollRemote(void)
 
     if (giThisNetPos == 0) {
         for (queueIndex = 0; queueIndex < giNumHumanPlayers; queueIndex++) {
-            if (giThisNetPos != queueIndex &&
+            if (queueIndex != giThisNetPos &&
                 lLastHeartbeatReceive[queueIndex] + REMOTE_HOST_TIMEOUT <
                     KBTickCount() &&
                 bInTimeoutFail == 0) {
@@ -668,8 +664,8 @@ void PollRemote(void)
                     hostExit.eliminated = 0;
                     ReceiveRemotePlayerExit(hostExit);
                 }
-                bInTimeoutFail = 0;
                 gbInPollSound = savedInPollSound;
+                bInTimeoutFail = 0;
             }
         }
     } else {
@@ -709,8 +705,8 @@ void PollRemote(void)
                 else
                     ShutDown("");
             }
-            bInTimeoutFail = 1;
             gbInPollSound = savedInPollSound;
+            bInTimeoutFail = 1;
         }
     }
 
@@ -718,6 +714,8 @@ void PollRemote(void)
         if (rcvBuf[queueIndex] != 0)
             queueCount++;
     }
+    if (queueCount == REMOTE_QUEUE_CAPACITY)
+        queueFull = 1;
     receiveResult = 1;
     while (receiveResult != 0) {
         receiveResult = ReceiveRemoteData(0,
@@ -745,7 +743,7 @@ void PollRemote(void)
             iCurHourGlassPhase = netCommand & 0x0f;
             return;
         }
-        if (queueCount == REMOTE_QUEUE_CAPACITY)
+        if (queueFull)
             return;
         if (reinterpret_cast<RemoteMessage *>(rcvBufIn)->type ==
             REMOTE_MESSAGE_RELIABLE) {
@@ -800,12 +798,13 @@ void PollRemote(void)
 
 // @match-note
 // Complete transmit, timeout/retry dialog, response filtering, and common result
-// path. The completion flag is byte-sized; the base frame is 0x18 versus retail
-// 0x1c, with the retail fastcall spills four bytes deeper. All 11 relocation targets
-// agree. First residual is the successful-transmit trampoline, followed by a retail
-// response-test temporary. Tested direct cancellation returns, common-result break,
-// compound predicates, and nested arms. Revisit after the SOURCE placeholder
-// census reaches zero.
+// path. The 0x1c frame is exact: wait start -0x04, result -0x08, response -0x0c,
+// byte completion flag -0x10, retail-proven dead response state -0x14, and fastcall
+// spills -0x18/-0x1c. All 11 relocation targets agree. The first residual is one
+// retail five-byte continuation after successful transmit, with one final local-label
+// jump at the epilogue. Empty positive arms, direct cancellation returns, common
+// breaks, compound predicates, and the explicit common label were tested. Revisit
+// in the 95% last-mile phase.
 VA(0x004a48e0, 0x163)
 int TransmitAndWait(char *data, int destination, int length,
                     signed char command, signed char responseCommand,
@@ -815,6 +814,7 @@ int TransmitAndWait(char *data, int destination, int length,
     int result;
     int waitStart;
     signed char complete;
+    int unusedResponseState;
 
     if (gbRemoteOn == 0 || gbInNetSetup != 0)
         return 1;
@@ -832,20 +832,22 @@ int TransmitAndWait(char *data, int destination, int length,
                     waitStart = KBTickCount();
                 } else {
                     result = 0;
-                    break;
+                    goto transmitComplete;
                 }
             }
             ForcePollSound();
             receivedData = GetRemoteData(1);
+            if (receivedData != 0)
+                unusedResponseState = 0;
             if (receivedData != 0 &&
                 receivedData[5] == REMOTE_MESSAGE_RELIABLE &&
                 receivedData[6] == responseCommand) {
                 complete = 1;
             }
         }
-        if (result != 0)
-            *response = receivedData;
+        *response = receivedData;
     }
+transmitComplete:
     return result;
 }
 
