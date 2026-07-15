@@ -13,8 +13,9 @@
 // and normalized 0/1 result agree. First divergence is +0x1: base zeroes EAX before
 // `mov ebp,esp`, then uses indexed `test`/`setne`; retail establishes EBP immediately,
 // materializes the byte address in ESI, emits `and eax,[esi]`, and branches to two result
-// assignments. The dedicated TU profile records the measured `/O1 /Oy-` library mode;
-// it was byte-identical to the earlier `/O2` plus source-pragma probe. Direct and
+// assignments. The dedicated `/O1 /Oy-` TU profile is an empirical reproduction
+// setting, not a historical command line recovered from CodeView; it was byte-identical
+// to the earlier `/O2` plus source-pragma probe. Direct and
 // parameter-rebased lvalues, explicit quotient/remainder and offset/mask lifetimes,
 // register hints, result/switch forms,
 // C frontend, Windows preamble, G3/G4/G5/GB and Oa/Ow profiles were tried. No AST pass: the
