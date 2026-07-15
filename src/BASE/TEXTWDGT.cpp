@@ -22,7 +22,7 @@ VA(0x004d1060, 0x3e)
 textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, 0)
 {
     m_color = 1;
-    field_0x2a = 1;
+    m_alignment = 1;
     m_font = 0;
     m_text = 0;
     m_kind = EncodeWidgetKind(WIDGET_KIND_TEXT);
@@ -51,7 +51,7 @@ textWidget::textWidget(short p1, short p2, short p3, short p4, char *p5, char *p
     font *newFont = gpResourceManager->GetFont(p6);
     m_color = p7;
     m_font = newFont;
-    field_0x2a = static_cast<char>(p10);
+    m_alignment = static_cast<char>(p10);
     m_kind = EncodeWidgetKind(WIDGET_KIND_TEXT);
     m_text = p5;
 }
@@ -73,7 +73,7 @@ void textWidget::Read(void)
     m_font = gpResourceManager->GetFont(local_10);
     gpResourceManager->RestorePosition();
     m_color = gpResourceManager->ReadWord() & 0xff;
-    field_0x2a = static_cast<char>(gpResourceManager->ReadWord());
+    m_alignment = static_cast<char>(gpResourceManager->ReadWord());
     m_id = gpResourceManager->ReadWord();
     gpResourceManager->ReadWord();
     m_kind = EncodeWidgetKind(WIDGET_KIND_TEXT);
@@ -181,7 +181,7 @@ void textWidget::Draw(void)
         color = m_color;
     m_font->DrawBoundedString(m_text, m_x + m_owner->m_posX,
                                   m_y + m_owner->m_posY, m_width, m_height,
-                                  color, field_0x2a);
+                                  color, m_alignment);
 }
 
 VA(0x004d14e0, 0xc)

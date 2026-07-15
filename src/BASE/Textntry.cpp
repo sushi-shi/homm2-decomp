@@ -29,28 +29,31 @@ textEntryWidget::textEntryWidget(void) : textWidget()
     m_displayOffset = 0;
 }
 
-// Unresolved compiler folding artifact: keeping the standalone destructor exact makes VC4.2 emit a
+// @early-stop
+// Compiler folding artifact: keeping the standalone destructor exact makes VC4.2 emit a
 // 0x1f ??_G wrapper that calls it, while each retail ??_E body is 0x36 and folds the same
 // destructor operations inline. Marking the declaration inline reproduced the 0x36 body
 // and 5/5 targets byte-for-byte but removed the separately mapped exact ??1 destructor,
 // so the ABI-correct non-inline declaration is retained.
 // VA(0x004d8770, 0x36) ??_E/??_G textEntryWidget deleting destructor aliases
 
-// Active /O2 scheduling residual: base/retail sections are both 0x134 and all 6/6
-// relocation targets agree. The instruction streams differ only by retail storing p10
-// before the three constant flag stores, while VC4.2 delays that one store here.
+// @match-note
+// Base/retail sections are both 0x134 with the same frame, CFG, and all 6/6 ordered
+// external relocations. The only raw residual is +0x7f..+0x93: retail stores iconFrame
+// before initializing m_maxLines/m_preserveTextOnFocus/m_color, while VC4.2 delays that
+// independent store. A bounded AST pass found small fuzzy gains from store permutations,
+// but each broadened the structural diff, so none was retained. Revisit after TU state changes.
 VA(0x004d87b0, 0x134)
-textEntryWidget::textEntryWidget(short p1, short p2, short p3, short p4, short p5, char *p6,
-                                 char *p7, short p8, char *p9, short iconFrame, short p11, short p12,
-                                 short p13, int p14, int p15)
-    : textWidget(p1, p2, p3, p4, p6, p7, p8, p11, p12, 1)
+textEntryWidget::textEntryWidget(short x, short y, short width, short height, short maxLength,
+                                 char *text, char *fontName, short color, char *iconName,
+                                 short iconFrame, short id, short kind, short layout,
+                                 int horizontalInset, int verticalInset)
+    : textWidget(x, y, width, height, text, fontName, color, id, kind, 1)
 {
     m_cursorPosition = 0;
-    m_maxLength = p5;
-    icon *loadedIcon;
-    loadedIcon = gpResourceManager->GetIcon(p9);
-    short rectX;
-    rectX = m_x;
+    m_maxLength = maxLength;
+    icon *loadedIcon = gpResourceManager->GetIcon(iconName);
+    short rectX = m_x;
     m_displayOffset = 0;
     m_icon = loadedIcon;
     m_iconFrame = iconFrame;
@@ -58,20 +61,21 @@ textEntryWidget::textEntryWidget(short p1, short p2, short p3, short p4, short p
     m_kind = EncodeWidgetKind(WIDGET_KIND_TEXT_ENTRY);
     m_rectY = m_y;
     m_rectW = m_width;
-    m_maxLength = p5;
-    field_0x45 = 1;
-    m_hasInset = 0;
+    m_maxLength = maxLength;
+    m_maxLines = 1;
+    m_preserveTextOnFocus = 0;
     m_color = 1;
     m_rectH = m_height;
 #line 61 "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp"
     m_text = static_cast<char *>(
-        H2_ALLOC(static_cast<unsigned short>(p5) + 5, "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp", 0x3e));
-    strcpy(m_text, p6);
-    if (p13 == 4) {
-        m_innerX = p14 + m_x;
-        m_hasInset = 1;
-        m_innerY = p15 + m_y;
-        m_innerW = m_width + -2 * p14;
+        H2_ALLOC(static_cast<unsigned short>(maxLength) + 5,
+                 "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp", 0x3e));
+    strcpy(m_text, text);
+    if (layout == 4) {
+        m_innerX = horizontalInset + m_x;
+        m_preserveTextOnFocus = 1;
+        m_innerY = verticalInset + m_y;
+        m_innerW = m_width + -2 * horizontalInset;
         m_innerH = m_height;
     }
 }
@@ -82,30 +86,35 @@ textEntryWidget::~textEntryWidget()
     gpResourceManager->Dispose(m_icon);
 }
 
-// Active /O2 scheduling residual: all calls and 52/52 relocation targets agree.
-// Base/retail are both 0x26c; the streams differ only by retail comparing type before
-// loading m_height, while VC4.2 emits those two independent instructions in reverse order.
+// @match-note
+// Base/retail are both 0x26c with the same frame/CFG and all 52/52 ordered external
+// relocations. The only raw residual is +0x18b..+0x191: retail compares type before
+// loading m_height, while VC4.2 schedules those independent instructions in reverse.
+// Moving the comparison earlier broadened the diff; 22 bounded AST variants did not improve
+// the canonical score. Revisit after TU state changes.
 VA(0x004d8920, 0x26c)
 void textEntryWidget::Read(int type)
 {
-    char name[13];
+    char resourceName[13];
     m_x = gpResourceManager->ReadWord();
     m_y = gpResourceManager->ReadWord();
     m_width = gpResourceManager->ReadWord();
     m_height = gpResourceManager->ReadWord();
     m_maxLength = gpResourceManager->ReadWord();
 #line 99
-    m_text = static_cast<char *>(H2_ALLOC(m_maxLength + 5, "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp", 0x63));
+    m_text = static_cast<char *>(H2_ALLOC(
+        m_maxLength + 5,
+        "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp", 0x63));
     gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(m_text), m_maxLength);
-    gpResourceManager->Read13(reinterpret_cast<signed char *>(name));
+    gpResourceManager->Read13(reinterpret_cast<signed char *>(resourceName));
     gpResourceManager->SavePosition();
-    m_font = gpResourceManager->GetFont(name);
+    m_font = gpResourceManager->GetFont(resourceName);
     gpResourceManager->RestorePosition();
     m_color = gpResourceManager->ReadWord() & 0xff;
-    field_0x2a = static_cast<char>(gpResourceManager->ReadWord());
-    gpResourceManager->Read13(reinterpret_cast<signed char *>(name));
+    m_alignment = static_cast<char>(gpResourceManager->ReadWord());
+    gpResourceManager->Read13(reinterpret_cast<signed char *>(resourceName));
     gpResourceManager->SavePosition();
-    m_icon = gpResourceManager->GetIcon(name);
+    m_icon = gpResourceManager->GetIcon(resourceName);
     gpResourceManager->RestorePosition();
     m_entryType = static_cast<short>(type);
     if (type == 2) {
@@ -113,22 +122,22 @@ void textEntryWidget::Read(int type)
         m_rectY = gpResourceManager->ReadWord();
         m_rectW = gpResourceManager->ReadWord();
         m_rectH = gpResourceManager->ReadWord();
-        field_0x45 = gpResourceManager->ReadWord();
-        m_hasInset = gpResourceManager->ReadWord();
+        m_maxLines = gpResourceManager->ReadWord();
+        m_preserveTextOnFocus = gpResourceManager->ReadWord();
     } else {
         m_rectX = m_x;
         m_rectY = m_y;
         m_rectW = m_width;
-        int enabled;
+        int preserveText;
         m_rectH = m_height;
         if (type == 3)
-            enabled = 1;
+            preserveText = 1;
         else
-            enabled = 1;
-        field_0x45 = enabled;
-        m_hasInset = enabled;
+            preserveText = 1;
+        m_maxLines = preserveText;
+        m_preserveTextOnFocus = preserveText;
         if (type != 3)
-            m_hasInset = 0;
+            m_preserveTextOnFocus = 0;
     }
     if (type == 4) {
         m_innerX = m_x + 7;
@@ -153,36 +162,38 @@ void textEntryWidget::Read(int type)
 }
 
 // @match-note
-// Shared WidgetKind checkpoint: base/retail are both 0x874 with the exact 0x9a8
-// frame, CFG, and 55/55 relocation sites. Explicit-range comparison still differs
-// at +0x21, so the former local-label-only artifact claim is not valid. The ordered
-// external targets and jump-table structure agree; late enum inclusion emits no change.
+// Base/retail are both 0x874 with the exact 0x9a8 frame, CFG, jump-table structure,
+// and all 55/55 ordered external relocations. Relocation-masked raw comparison differs
+// only at +0x21: retail's MESSAGE_WIDGET branch targets the push using the existing ECX,
+// while VC4.2 targets an equivalent pointer reload first. An early guard and the direct
+// disabled-widget return/no-else spelling emit the same byte. Revisit after TU state changes.
 VA(0x004d8b90, 0x874)
 int textEntryWidget::Main(struct tag_message &message)
 {
-    if ((m_flags & 2) == 0) {
-        if (message.type != 0x200)
+    if ((m_flags & WIDGET_FLAG_ENABLED) == 0) {
+        if (message.type != MESSAGE_WIDGET)
             return 0;
-    } else {
-        switch (message.type) {
+        return widget::Main(message);
+    }
+    switch (message.type) {
         default:
         defaultMessage:
             return widget::Main(message);
-        case 8:
-        case 0x20: {
+        case MESSAGE_LEFT_BUTTON_DOWN:
+        case MESSAGE_RIGHT_BUTTON_DOWN: {
             m_cursorBlink = 1;
             short windowX = static_cast<short>(m_owner->m_posX);
             short mouseX = static_cast<short>(message.payload.mouse.x - windowX);
             short windowY = static_cast<short>(m_owner->m_posY);
             short mouseY = static_cast<short>(message.payload.mouse.y - windowY);
-            if (message.type == 0x20) {
+            if (message.type == MESSAGE_RIGHT_BUTTON_DOWN) {
                 if (mouseX < m_x || mouseY < m_y || mouseX >= m_x + m_width ||
                     mouseY >= m_y + m_height)
                     return 0;
-                message.payload.widget.command = 0xe;
-                message.type = 0x200;
+                message.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
+                message.type = MESSAGE_WIDGET;
                 message.payload.widget.id = m_id;
-                message.payload.widget.parameter = 0x200;
+                message.payload.widget.parameter = MESSAGE_MODIFIER_RIGHT_BUTTON;
                 return 2;
             }
             if (mouseX >= m_x && mouseY >= m_y && mouseX < m_x + m_width &&
@@ -194,7 +205,7 @@ int textEntryWidget::Main(struct tag_message &message)
                 char backup[600];
                 mouseY = m_y + windowY;
                 strcpy(original, m_text);
-                if ((m_hasInset & 1) != 0) {
+                if ((m_preserveTextOnFocus & 1) != 0) {
                     m_cursorPosition = static_cast<unsigned short>(strlen(m_text));
                 } else {
                     m_cursorPosition = 0;
@@ -216,7 +227,7 @@ int textEntryWidget::Main(struct tag_message &message)
                     }
                     Process1WindowsMessage();
                     event = gpInputManager->GetEvent();
-                    if (event.type == 1) {
+                    if (event.type == MESSAGE_KEY_DOWN) {
                         switch (event.payload.keyboard.keyCode) {
                         case 1:
                             if (gbAllowTextEntryEscape != 0) {
@@ -281,7 +292,9 @@ int textEntryWidget::Main(struct tag_message &message)
 #line 388
                                     H2_FREE(m_text, "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp", 0x184);
 #line 389
-                                    m_text = static_cast<char *>(H2_ALLOC(strlen(edit) + 6, "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp", 0x185));
+                                    m_text = static_cast<char *>(H2_ALLOC(
+                                        strlen(edit) + 6,
+                                        "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp", 0x185));
                                     strcpy(scratch, edit);
                                     scratch[m_cursorPosition] = typed;
                                     scratch[m_cursorPosition + 1] = 0;
@@ -291,7 +304,7 @@ int textEntryWidget::Main(struct tag_message &message)
                                     SetupDisplayString(edit, m_cursorPosition);
                                     if (m_entryType != 3) {
                                         int lineLength = m_font->LineLength(m_text, m_innerW);
-                                        if (field_0x45 >= lineLength) {
+                                        if (m_maxLines >= lineLength) {
                                         } else {
                                             strcpy(edit, backup);
                                             m_cursorPosition--;
@@ -311,28 +324,28 @@ int textEntryWidget::Main(struct tag_message &message)
                 m_displayOffset = 0;
                 Draw();
                 gpWindowManager->UpdateScreenRegion(mouseX, mouseY, m_width, m_height);
-                message.payload.widget.command = 0xc;
-                message.type = 0x200;
+                message.payload.widget.command = WIDGET_COMMAND_SELECT;
+                message.type = MESSAGE_WIDGET;
                 message.payload.widget.id = m_id;
                 return 2;
             }
             return 0;
         }
-        case 0x200:
+        case MESSAGE_WIDGET:
             switch (message.payload.widget.command) {
-            case 3:
+            case WIDGET_COMMAND_SET_TEXT:
                 if (message.payload.widget.id == m_id) {
                     SetText(message.payload.widget.data.text);
                     return 1;
                 }
                 break;
-            case 7:
+            case WIDGET_COMMAND_GET_TEXT:
                 if (message.payload.widget.id == m_id) {
                     message.payload.widget.data.text = m_text;
                     return 1;
                 }
                 break;
-            case 0x33:
+            case WIDGET_COMMAND_SET_MAX_LENGTH:
                 if (message.payload.widget.id == m_id) {
                     m_maxLength = static_cast<unsigned short>(message.payload.widget.data.value);
                     return 1;
@@ -340,15 +353,10 @@ int textEntryWidget::Main(struct tag_message &message)
                 break;
             }
             break;
-        }
     }
     goto defaultMessage;
 }
 
-// @match-note
-// Shared WidgetKind checkpoint: both sections are 0x160 with 6/6 matching
-// relocations, but explicit-range comparison has one real byte difference at +0x6d
-// in the equivalent stack displacement. This is not a delinked-label artifact.
 VA(0x004d9410, 0x160)
 void textEntryWidget::Draw(void)
 {
@@ -358,7 +366,7 @@ void textEntryWidget::Draw(void)
         unsigned int length = strlen(display);
         if (m_font->LineWidth(display) > m_innerW) {
             do {
-                display[length - 2] = 0;
+                display[length - 1] = 0;
                 length--;
             } while (m_font->LineWidth(display) > m_innerW);
         }
@@ -366,16 +374,16 @@ void textEntryWidget::Draw(void)
                              m_iconFrame, 0);
         m_font->DrawBoundedString(display, m_innerX + m_owner->m_posX,
                                   m_innerY + m_owner->m_posY, m_innerW, m_innerH,
-                                  m_color, field_0x2a);
+                                  m_color, m_alignment);
     } else {
         m_icon->DrawToBuffer(m_rectX + m_owner->m_posX, m_rectY + m_owner->m_posY,
                              m_iconFrame, 0);
         int color = 3;
-        if ((m_flags & 8) == 0)
+        if ((m_flags & WIDGET_FLAG_DIMMED) == 0)
             color = m_color;
         m_font->DrawBoundedString(m_text, m_innerX + m_owner->m_posX,
                                   m_innerY + m_owner->m_posY, m_innerW, m_innerH,
-                                  color, field_0x2a);
+                                  color, m_alignment);
     }
 }
 
