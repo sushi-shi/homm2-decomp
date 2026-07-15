@@ -52,7 +52,7 @@ BASE/Bzip	?allocateCompressStructures@@YIXXZ	100.0000	2842b1d87625
 BASE/Bzip	?arithCodeBitPlusFollow@@YIXPAUBitStream@@I@Z	100.0000	c94d93545004
 BASE/Bzip	?arithCodeDoneDecoding@@YIXPAUBitStream@@@Z	100.0000	06afde38b80a
 BASE/Bzip	?arithCodeDoneEncoding@@YIXPAUBitStream@@@Z	100.0000	a16c7821c16d
-BASE/Bzip	?arithCodeRenormalise_Encode@@YIXPAUBitStream@@@Z	100.0000	ac1ffd64c91e
+BASE/Bzip	?arithCodeRenormalise_Encode@@YIXPAUBitStream@@@Z	100.0000	3d55668b07be
 BASE/Bzip	?arithCodeStartDecoding@@YIXPAUBitStream@@@Z	100.0000	9af863b34637
 BASE/Bzip	?arithCodeStartEncoding@@YIXPAUBitStream@@@Z	100.0000	8b558a2de342
 BASE/Bzip	?arithCodeSymbol@@YIXPAUBitStream@@PAUModel@@H@Z	100.0000	0043be593046
