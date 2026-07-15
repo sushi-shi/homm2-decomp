@@ -2893,7 +2893,7 @@ int philAI::StrategicValueOfPosition(int targetX, int targetY, int immediate,
 
     if (*liveChance < 100)
         score4 -= (100 - *liveChance) * 2500 / 100;
-    score4 = static_cast<int>(score4 * 1.25f);
+    score4 = static_cast<int>(score4 * AI_STRATEGIC_POSITION_SCORE_FACTOR);
     if (score4 > 32000)
         score4 = 32000;
     if (!immediate && !extraDistance) {
@@ -2983,7 +2983,7 @@ float philAI::TurnValueOfObelisk(int player) {
 VA(0x0043fe81, 0x51)
 float philAI::FutureDeflator(int *const p) {
     float t = TurnsToBuy(p);
-    float v = 1.0f - t * 0.1f;
+    float v = 1.0f - t * AI_FUTURE_DEFLATION_RATE;
     if (v < 0.0)
         v = 0;
     return v;
@@ -3781,7 +3781,8 @@ void philAI::HeroInteractionAtTown(hero *heroPtr, town *townPtr, int doInteracti
     if (townPtr->m_buildings & AI_BUILDING_CASTLE_MASK)
         desiredShare0 = static_cast<float>(0.55 - primarySkills3 * 0.02);
     else
-        desiredShare0 = static_cast<float>(0.33 - primarySkills3 * 0.01);
+        desiredShare0 = static_cast<float>(AI_TOWN_PRIMARY_SKILL_SHARE_BASE -
+                                           primarySkills3 * 0.01);
     if (giCurTurn <= AI_EARLY_TOWN_SHARE_TURN)
         desiredShare0 = fFirstWeekTownFV;
     else if (giCurTurn <= AI_SECOND_WEEK_END_TURN)
@@ -4742,7 +4743,8 @@ int philAI::ValueOfEventAtPosition(int x, int y, int immediate, int *liveChance)
         }
         break;
     case AI_OBJECT_TREASURE_CHEST:
-        value_h = static_cast<int>(gafAITurnCostResource[RES_GOLD] * 1000.0f);
+        value_h = static_cast<int>(gafAITurnCostResource[RES_GOLD] *
+                                   AI_TREASURE_CHEST_GOLD_AMOUNT);
         break;
     case AI_OBJECT_HERO_EVENT:
         value_h = EvaluateHeroEvent(cell_k->m_objectMetadata, x, y, immediate, liveChance);
