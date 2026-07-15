@@ -553,6 +553,7 @@ typedef enum NetBoxConstant {
 
 typedef enum CongratsConstant {
     CONGRATS_PALETTE_SIZE = 0x300,
+    CONGRATS_PALETTE_BUFFER_SIZE = 0x304,
     CONGRATS_TEXT_SIZE = 500,
     CONGRATS_RATING_LENGTH = 32,
     CONGRATS_CAMPAIGN = 0,
@@ -645,6 +646,8 @@ typedef enum OldMainConstant {
     OLD_MAIN_REMOTE_HOST = 1,
     OLD_MAIN_REMOTE_CLIENT = 2,
     OLD_MAIN_REGULAR_COMPRESSION_MEMORY_LIMIT = 5999,
+    OLD_MAIN_NET_SETUP_SIZE = 0xd4,
+    OLD_MAIN_NET_BUFFER_SIZE = 256,
     OLD_MAIN_NETWORK_PACKET = 0x20,
     OLD_MAIN_ARCHIBALD_FINAL_SCENARIO = 10,
     OLD_MAIN_ROLAND_FINAL_SCENARIO = 9,
@@ -722,6 +725,12 @@ struct OldMainNetSetup {
 };
 #pragma pack(pop)
 SIZE(OldMainNetSetup, 0xd4);
+
+union OldMainNetBuffer {
+    OldMainNetSetup setup;
+    char bytes[OLD_MAIN_NET_BUFFER_SIZE];
+};
+SIZE(OldMainNetBuffer, OLD_MAIN_NET_BUFFER_SIZE);
 
 #pragma pack(push, 1)
 struct KbRemotePacket {
