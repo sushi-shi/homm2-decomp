@@ -1027,9 +1027,9 @@ SOURCE/Newgame	?ShowScenInfo@game@@QAEXXZ	100.0000	57c7bafb4859
 SOURCE/Newgame	?UpdateNewGameWindow@game@@QAEXXZ	99.8997	c087bb89c54b
 SOURCE/Overview	?DoKnob@game@@QAEXXZ	100.0000	bd646ea03ed8
 SOURCE/Overview	?Overview@game@@QAEXXZ	100.0000	e1411ffb3867
-SOURCE/Overview	?OverviewHandler@@YIHAAUtag_message@@@Z	99.8363	1766afff8094
-SOURCE/Overview	?ProcessIconSelect@game@@QAEHHH@Z	99.4030	49e7e4737fe0
-SOURCE/Overview	?SetupDynamicStuff@game@@QAEXHHH@Z	98.8959	44b8680b5dc4
+SOURCE/Overview	?OverviewHandler@@YIHAAUtag_message@@@Z	99.8363	04a208d92aa7
+SOURCE/Overview	?ProcessIconSelect@game@@QAEHHH@Z	100.0000	db8d8fb6a5de
+SOURCE/Overview	?SetupDynamicStuff@game@@QAEXHHH@Z	98.9362	020b585a91a3
 SOURCE/Overview	?SetupNewOverviewType@game@@QAEXHH@Z	100.0000	fe0018b6de5f
 SOURCE/Overview	?SetupResources@game@@QAEXXZ	100.0000	4a64f57f145e
 SOURCE/PATH	?FindPath@army@@QAEHHHHHH@Z	100.0000	cab1782b72c7
