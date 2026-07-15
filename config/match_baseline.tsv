@@ -1457,7 +1457,7 @@ SOURCE/wingraph	?SetupClipper@@YIXXZ	100.0000	b31f638ee3c2
 SOURCE/wingraph	?UpdatePalette@@YIXPAC@Z	100.0000	744becc5acc5
 SOURCE/wingraph	?WGAppPaint@@YIHPAX0@Z	100.0000	342ee27b7565
 SOURCE/wingraph	?WGCleanUpWinGraphics@@YIXXZ	100.0000	adee9fd6950e
-SOURCE/wingraph	?WGInitGraphics@@YIXXZ	100.0000	a16633650228
+SOURCE/wingraph	?WGInitGraphics@@YIXXZ	100.0000	b07120d048aa
 SOURCE/wingraph	?WGInitializePalette@@YIXXZ	100.0000	d9ba4cce2661
 SOURCE/wingraph	?WGQueryNewPalette@@YIHXZ	100.0000	2190ed2a8b52
 SOURCE/wingraph	?WGUpdatePalette@@YIXPAC@Z	100.0000	d809d51ac1ed
