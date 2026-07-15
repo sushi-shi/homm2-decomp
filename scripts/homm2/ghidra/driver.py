@@ -5,7 +5,7 @@ homm2's Ghidra use is MINIMAL, read-only, one-time and cached - CodeView is auth
 so Ghidra never *discovers* names. It exists only to:
   1. give xref the WHOLE-.text function-boundary map (incl. the library/runtime funcs
      CodeView omits), and
-  2. back `homm2 sema decomp` (the decompiler), with OUR names applied so the C reads well.
+  2. back `python3 -m homm2.analysis.decomp` with our names applied so the C reads well.
 
 `homm2 ghidra` boots PyGhidra in-process (CPython3 + JPype), imports HEROES2W.EXE into a
 cached project (build/ghidra/homm2.{gpr,rep}), auto-analyzes it once (SEVERAL MINUTES;
@@ -15,7 +15,7 @@ skipped on re-runs), then runs two GhidraScripts:
   - export_functions.py : dump build/ghidra/exports/functions.csv (entry_rva,byte_size,name).
 
 Re-run `homm2 ghidra --no-analyze` to re-apply/re-export instantly (no re-analysis).
-`sema decomp` reopens the same project with --no-analyze and runs decomp_export.py.
+The decomp module reopens the same project without analysis and runs decomp_export.py.
 
 Needs the dev shell's Ghidra env (GHIDRA_INSTALL_DIR / JAVA_HOME) and the pyghidra-carrying
 python - both provided by `nix develop` (see flake.nix).
@@ -140,7 +140,8 @@ def cli_main(argv) -> int:
         n = sum(1 for _ in FUNCTIONS_CSV.open()) - 1
         print(f"[homm2 ghidra] done - {n} function boundaries -> "
               f"{FUNCTIONS_CSV.relative_to(REPO)}")
-        print("[homm2 ghidra] xref now attributes library callers; `homm2 sema decomp <rva>` ready.")
+        print("[homm2 ghidra] xref now attributes library callers; "
+              "`python3 -m homm2.analysis.decomp <rva>` ready.")
     return rc
 
 

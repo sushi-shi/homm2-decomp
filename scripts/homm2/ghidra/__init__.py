@@ -1,1 +1,1 @@
-"""homm2.ghidra - minimal read-only Ghidra pipeline behind `homm2 ghidra` / `sema decomp`."""
+"""Read-only Ghidra pipeline behind `homm2 ghidra` and `homm2.analysis.decomp`."""

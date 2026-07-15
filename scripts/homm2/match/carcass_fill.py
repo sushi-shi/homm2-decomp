@@ -93,9 +93,8 @@ def transform(path):
                 bare += 1
         out.append(line); i += 1
     text = '\n'.join(out)
-    # NOTE: type includes are no longer added here. Since the <_all.h> umbrella was removed,
-    # a filled TU gets its specific class headers from own_header_pass.py + resolve_includes.py
-    # (compiler-driven). Adding <_all.h> here would reintroduce the deleted umbrella.
+    # Type includes are intentionally not added here. Reconstructed TUs own their explicit
+    # module/class includes; adding the removed <_all.h> umbrella would perturb TU state.
     return text, filled, bare, dropped
 
 if __name__ == "__main__":
