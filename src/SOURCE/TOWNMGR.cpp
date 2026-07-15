@@ -2633,13 +2633,6 @@ int townManager::RecruitHero(int availableHeroIndex, int cannotRecruit)
     return m_recruitState != -1;
 }
 
-// @match-note 97.60%: complete dialog and timed-animation CFG, exact 0x14
-// frame, and all 11/11 relocations agree. Direct field switches removed two
-// false dispatch locals; the first residual is two retail jump-to-next
-// continuations around the 0x7800..0x7802 range gate. Assignment-expression
-// switches compile like the former 0x1c frame. A 30-walk post-95 AST pass
-// tested all six local variants and retained no mutation. Revisit only with a
-// real inline-accessor identification for that range gate.
 VA(0x00419c29, 0x153)
 int TavernHandler(tag_message &message)
 {
@@ -2657,7 +2650,11 @@ int TavernHandler(tag_message &message)
                 message.payload.widget.id = 10;
                 message.payload.widget.command = message.payload.widget.id;
                 return 2;
+            default:
+                break;
             }
+            break;
+        default:
             break;
         }
     }
