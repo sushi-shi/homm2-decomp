@@ -12,7 +12,7 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/NOOPT.h>
-#include <BASE/mss.h>
+#include <mss.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -360,17 +360,18 @@ struct _DIG_DRIVER *WAVE_init_driver(unsigned long param_1, unsigned short param
         return 0;
     }
     if (gbUseWaveout != 0)
-        _AIL_set_preference_8(0xf, 1);
+        AIL_set_preference(0xf, 1);
     gWaveFormat.wFormatTag = 1;
     gWaveFormat.nChannels = param_3;
     gWaveFormat.nSamplesPerSec = param_1;
     gWaveFormat.nAvgBytesPerSec = (param_2 >> 3) * param_3 * param_1;
     gWaveFormat.nBlockAlign = (param_2 >> 3) * param_3;
     gWaveFormat.wBitsPerSample = param_2;
-    rc = _AIL_waveOutOpen_16(&drvr, 0, 0, &gWaveFormat);
+    rc = AIL_waveOutOpen(
+        &drvr, 0, 0, reinterpret_cast<LPWAVEFORMAT>(&gWaveFormat));
     if (rc != 0) {
         if (param_4 != 0)
-            MessageBoxA(static_cast<HWND>(hwndApp), _AIL_last_error_0(),
+            MessageBoxA(static_cast<HWND>(hwndApp), AIL_last_error(),
                         "Sound initialization error!", 0);
         drvr = 0;
         return 0;
@@ -441,7 +442,7 @@ int soundManager::Open(int)
         goto managerReady;
     }
     m_pollToggle = m_pollDue = m_pollRequested = 0;
-    _AIL_startup_0();
+    AIL_startup();
 
     if (gConfig.musicSource != CONFIG_MUSIC_SOURCE_MIDI) {
         CDStartup();
@@ -500,7 +501,7 @@ void soundManager::AllocateSampleHandles(void)
     if (m_digitalDriver == 0)
         return;
     for (local_8 = 0; local_8 < 0xe; local_8++) {
-        m_sampleHandles[local_8] = _AIL_allocate_sample_handle_4(m_digitalDriver);
+        m_sampleHandles[local_8] = AIL_allocate_sample_handle(m_digitalDriver);
         if (m_sampleHandles[local_8] == 0)
             break;
     }
@@ -519,7 +520,7 @@ void soundManager::Close(void)
     LogStr("Shutting down MIDI");
     MIDIShutdown();
     LogStr("Shutting down AIL");
-    _AIL_shutdown_0();
+    AIL_shutdown();
     LogStr("Sound shut down");
 soundClosed:
     m_active = 0;
@@ -546,9 +547,9 @@ void soundManager::StopAllSamples(int param_1)
         return;
     LogStr("SAS 1");
     for (sampleIdx = 0; sampleIdx < m_numSampleHandles; sampleIdx++) {
-        sampleStatus = _AIL_sample_status_4(m_sampleHandles[sampleIdx]);
+        sampleStatus = AIL_sample_status(m_sampleHandles[sampleIdx]);
         if (sampleStatus == 4)
-            _AIL_end_sample_4(m_sampleHandles[sampleIdx]);
+            AIL_end_sample(m_sampleHandles[sampleIdx]);
     }
     m_fadeSteps = 0;
     if (param_1 != 0) {
@@ -577,7 +578,7 @@ void soundManager::StopSample(struct _SAMPLE *param_1)
     LogStr("Stop Sample 1");
     if (m_sampleHandles[0] == param_1)
         local_10 = 1;
-    _AIL_end_sample_4(param_1);
+    AIL_end_sample(param_1);
     if (local_10 != 0) {
         for (local_c = 0; local_c < 10; local_c++) {
             ServiceSound();
@@ -617,18 +618,18 @@ void soundManager::ModifySample(struct _SAMPLE *sampleHandle, short operation, l
     switch (operation) {
     case 1:
     case 100:
-        _AIL_set_sample_volume_8(sampleHandle, ConvertVolume(value, 100));
+        AIL_set_sample_volume(sampleHandle, ConvertVolume(value, 100));
         if (foundChannel >= 0)
             iLastVolume[foundChannel] = static_cast<short>(value);
         break;
     case 101:
         H2_ASSERT(gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI, "I:\\Projects\\Heroes\\Prog\\BASE\\soundmgr.cpp", 0x52f);
-        _AIL_set_sample_volume_8(sampleHandle, ConvertVolume(value, 101));
+        AIL_set_sample_volume(sampleHandle, ConvertVolume(value, 101));
         if (foundChannel >= 0)
             iLastVolume[foundChannel] = static_cast<short>(value);
         break;
     case 5:
-        _AIL_start_sample_4(sampleHandle);
+        AIL_start_sample(sampleHandle);
         break;
     }
 
@@ -647,9 +648,9 @@ long soundManager::DigitalReport(struct _SAMPLE *param_1, short param_2)
         return 0;
     switch (param_2) {
     case 1:
-        return _AIL_sample_volume_4(param_1);
+        return AIL_sample_volume(param_1);
     case 4:
-        sampleStatus = _AIL_sample_status_4(param_1);
+        sampleStatus = AIL_sample_status(param_1);
         return sampleStatus == 4;
     }
     return 0;
@@ -894,7 +895,7 @@ struct _SAMPLE *soundManager::MemorySample(class sample *param_1)
     LogStr("Memory Sample 1");
     scs = &SCS[params[3]];
     for (ch = static_cast<short>(scs->startChannel); scs->endChannel > ch; ch++) {
-        if (_AIL_sample_status_4(m_sampleHandles[ch]) == 2)
+        if (AIL_sample_status(m_sampleHandles[ch]) == 2)
             break;
     }
     if (scs->endChannel == ch) {
@@ -913,16 +914,16 @@ struct _SAMPLE *soundManager::MemorySample(class sample *param_1)
     smp = m_sampleHandles[ch];
     m_channelVolumes[ch] = static_cast<char>(params[6]);
     iLastVolume[ch] = static_cast<short>(params[6]);
-    _AIL_init_sample_4(smp);
-    _AIL_set_sample_type_12(smp, params[5], 0);
-    _AIL_set_sample_playback_rate_8(smp, params[4]);
-    _AIL_set_sample_loop_count_8(smp, params[7]);
-    _AIL_set_sample_address_12(smp, params[1], params[2]);
+    AIL_init_sample(smp);
+    AIL_set_sample_type(smp, params[5], 0);
+    AIL_set_sample_playback_rate(smp, params[4]);
+    AIL_set_sample_loop_count(smp, params[7]);
+    AIL_set_sample_address(smp, reinterpret_cast<void *>(params[1]), params[2]);
     if (gConfig.soundVolume != 0)
-        _AIL_set_sample_volume_8(smp, ConvertVolume(params[6], 0x64));
+        AIL_set_sample_volume(smp, ConvertVolume(params[6], 0x64));
     else
-        _AIL_set_sample_volume_8(smp, 0);
-    _AIL_start_sample_4(smp);
+        AIL_set_sample_volume(smp, 0);
+    AIL_start_sample(smp);
     params[0] = reinterpret_cast<int>(smp);
     m_channelSamples[ch] = smp;
     m_sampleAddrLow[ch] = params[1];
@@ -939,7 +940,7 @@ void soundManager::ServiceSound(void)
 {
     if (gbNoSound != 0)
         return;
-    _AIL_serve_0();
+    AIL_serve();
 }
 
 VA(0x004cdad0, 0x7f)
