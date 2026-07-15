@@ -443,7 +443,7 @@ DATA(0x004ed2b8) int iWSAttempts = 0;
 DATA(0x004ed2bc) int iWSNextTickCount = 0;
 DATA(0x004ed2c0) int iWSWaitForHostStatus = 0;
 DATA(0x00522f88) int iRc = 0;
-DATA(0x00522f90) char cWSTextBuffer[WS_TRANSPORT_BUFFER_SIZE];
+DATA(0x00522f90) char cWSTextBuffer[WS_TRANSPORT_BUFFER_SIZE] = { 0 };
 DATA(0x00523090) struct sockaddr_in saddr_loc;
 DATA(0x005230a0) unsigned short wVer;
 DATA(0x005230a8) struct WSAData wsadata;

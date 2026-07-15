@@ -940,7 +940,12 @@ void game::InitCampaignMap(void)
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x004f4f28) short trackXY[2][13][2];
+DATA(0x004f4f28) short trackXY[2][13][2] = {
+    39, 336, 113, 336, 150, 294, 187, 336, 261, 336, 335, 336,
+    409, 378, 409, 294, 483, 336, 557, 336, -1, -1, 261, 378, -1, -1,
+    39, 336, 113, 336, 187, 294, 187, 378, 261, 336, 335, 336,
+    372, 294, 409, 336, 483, 294, 483, 378, 557, 336, 261, 294, 261, 378
+};
 DATA(0x004f4f90) class heroWindow *campWin = 0;
 DATA(0x00527ea4) int iCurViewSide;
 DATA(0x00527ea8) int iCampaignTrackType;

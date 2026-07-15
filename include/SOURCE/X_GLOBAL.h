@@ -54,6 +54,7 @@ enum {
     X_GLOBAL_RECRUIT_BUY_COUNT = 5,
     X_GLOBAL_PASSWORD_STRING_COUNT = 211,
     X_GLOBAL_STABLE_TEXT_COUNT = 4,
+    X_GLOBAL_BUILDING_RESOURCE_COUNT = 7,
     X_GLOBAL_SETUP_HELP_COUNT = 4,
     X_GLOBAL_EXPANSION_CAMPAIGN_COUNT = 4,
     X_GLOBAL_EXPANSION_CAMPAIGN_MAP_COUNT = 8,
@@ -91,7 +92,7 @@ extern char *xShortSSLevelNames[X_GLOBAL_SHORT_SKILL_LEVEL_COUNT];
 extern char *xPasswordStrings[X_GLOBAL_PASSWORD_STRING_COUNT];
 extern unsigned char xNewHeroAlignment[X_GLOBAL_NEW_HERO_ALIGNMENT_COUNT];
 extern int xPasswordStringsIndex[];
-extern int xShrineBuildingCost[];
+extern int xShrineBuildingCost[X_GLOBAL_BUILDING_RESOURCE_COUNT];
 
 // ---- globals (declarations, RVA order) ----
 typedef enum RadarColorTableCount {
