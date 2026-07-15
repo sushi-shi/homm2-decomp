@@ -474,7 +474,10 @@ DATA(0x004ee750) SBuildingInfo
 // each SBuildingInfo address with townType*0x120 in eax and buildingId*9 in
 // ecx; this compiler state selects the commutative reverse register order for
 // all five field reads. Direct indexing, inverted subscript, and explicit
-// typed pointer-add spellings select the same order. Revisit at SOURCE 95%.
+// typed pointer-add spellings select the same order. A guarded 20-trial
+// post-95 TU-state sweep found several disposable 99.7685% candidates but no
+// audited exact closure; every candidate failed the strict size/identity guard.
+// Revisit only after a material TU-state change.
 VA(0x00413900, 0x16a)
 townObject::townObject(int townType, int buildingId, char *iconBaseName)
 {
@@ -525,7 +528,9 @@ townObject::~townObject()
 // gate combined with the indicated 2*(3*state-3) spelling lowered the result
 // to 98.13%. The later
 // residual is the equivalent Necromancer frame arithmetic instruction shape.
-// Revisit condition polarity and arithmetic separately at SOURCE 95%.
+// Post-95 tests of both `2 * (3*n - 3)` operand orders reached only 98.42%,
+// below the retained 98.93% maximum, and reversing both animation-frame
+// equalities was byte-neutral. Revisit only with a new gate/accessor discovery.
 VA(0x00413aca, 0x437)
 void townObject::Draw(int advanceAnimation)
 {
@@ -1191,7 +1196,10 @@ void townManager::ShowText(char *)
 // @match-note 95.03%: complete event/hover/command CFG, exact 0x250 frame, and
 // all 215/215 external relocations agree. The first 144 normalized
 // instructions align; comparison then loses local-label identity at the
-// delinked dispatch boundary. Revisit switch/dispatch source shape at SOURCE 95%.
+// delinked dispatch boundary. A post-95 explicit diff still truncates at the
+// same boundary after the first 144 aligned instructions; the nested switches
+// already use direct message fields and retail body order. Revisit only with an
+// explicit-range instruction discrepancy, not the local-label score alone.
 VA(0x0041595d, 0x1830)
 int townManager::Main(tag_message &message)
 {
@@ -1641,7 +1649,9 @@ int townManager::Main(tag_message &message)
 // relocations agree. Retail reuses one int for swapped count/type; separate
 // short/char temporaries produced 0x1c and one shared merge/swap temp produced
 // 0x14. The remaining diff begins at delinked switch-table label identity.
-// Revisit dispatch layout at SOURCE 95%.
+// The post-95 source audit confirms the command switch is already direct and
+// in retail case-body order. Revisit only if explicit-range comparison finds a
+// non-table opcode/operand difference.
 VA(0x0041718d, 0x4e3)
 void townManager::DoCommand(int command)
 {
@@ -1869,7 +1879,9 @@ void townManager::DrawTown(int updateScreen, int drawFlags)
 // relocations agree. After initial literal identities, the first opcode-shape
 // divergence is neutral-cost indexing at normalized instruction 155: retail
 // loads index before building while this TU selects the reverse address order.
-// Revisit array-expression ordering at SOURCE 95%.
+// The post-95 commutative-subscript spelling was byte-neutral at the retained
+// source shape; the same evaluation-order residual remains in the neutral,
+// dwelling, and row-layout expressions. Revisit only after a TU-state change.
 VA(0x00417c9d, 0xf35)
 int townManager::BuyBuild(int building, int cannotBuy, int quickView)
 {
@@ -2285,8 +2297,10 @@ void townManager::BuildObj(int building)
 // 34/34 relocations agree. The Library mask is proven 0x2000. od_slots-derived
 // names align retail slots through message(-0x3c), but retail reserves an
 // unreferenced word at -0x48 and has lineCount/hasLibrary/this at
-// -0x58/-0x5c/-0x60 versus -0x54/-0x58/-0x5c. Do not invent padding; revisit
-// after a shared compiler-state/layout change or at SOURCE 95%.
+// -0x58/-0x5c/-0x60 versus -0x54/-0x58/-0x5c. Post-95 flattened and typed
+// row-pointer spellings regressed to 93.28% and 94.49%; neither naturally
+// recovered the compiler-reserved word. Do not invent padding; revisit only
+// after a shared compiler-state/layout change.
 VA(0x00418fbb, 0x3d8)
 void townManager::SetupMage(heroWindow *window)
 {
@@ -2396,30 +2410,23 @@ void townManager::SetupMage(heroWindow *window)
     window->BroadcastMessage(message_b);
 }
 
-// @match-note 93.76%: complete control-range, spell-count and dialog CFG with
-// all 5/5 relocations. Retail frame is 0x28 versus 0x2c. Inlining quickView
-// alone gave 89.95%, inlining level alone 79.56%, and inlining both gave 74.23%;
-// all preserved semantics but disrupted the retail division/slot sequence.
-// Revisit local allocation at SOURCE 95%.
 VA(0x00419393, 0x190)
 int MageGuildHandler(tag_message &message)
 {
     short unusedFirstSpell = TOWN_MAGE_FIRST_SPELL_CONTROL;
     short unusedFirstIcon = TOWN_MAGE_FIRST_ICON_CONTROL;
-    short unusedFirstDescription = TOWN_MAGE_FIRST_DESCRIPTION_CONTROL;
-    int action;
-    int quickView;
+    short unusedFirstDescription_l = TOWN_MAGE_FIRST_DESCRIPTION_CONTROL;
+    unsigned int quickView_f;
     int spellSlot;
     int level;
-    int slot;
+    int slot_p;
     int spell;
 
     if (message.type == TOWN_MESSAGE_SELECT) {
-        action = message.payload.widget.command;
-        switch (action) {
+        switch (message.payload.widget.command) {
         case TOWN_INPUT_SELECT:
         case TOWN_INPUT_ALTERNATE_SELECT:
-            quickView = message.payload.widget.parameter & TOWN_QUICK_VIEW_MODIFIER;
+            quickView_f = message.payload.widget.parameter & TOWN_QUICK_VIEW_MODIFIER;
             spellSlot = -1;
             if (message.payload.widget.id >= TOWN_MAGE_FIRST_SPELL_CONTROL &&
                 message.payload.widget.id < TOWN_MAGE_FIRST_SPELL_CONTROL +
@@ -2439,16 +2446,15 @@ int MageGuildHandler(tag_message &message)
                             TOWN_MAGE_FIRST_DESCRIPTION_CONTROL;
             if (spellSlot != -1) {
                 level = spellSlot / TOWN_MAGE_SPELLS_PER_LEVEL;
-                slot = spellSlot % TOWN_MAGE_SPELLS_PER_LEVEL;
-                if (gpTownManager->m_town->m_spellCounts[level + 1] <= slot)
+                slot_p = spellSlot % TOWN_MAGE_SPELLS_PER_LEVEL;
+                if (level[gpTownManager->m_town->m_spellCounts + 1] <= slot_p)
                     return 1;
-                spell = gpTownManager->m_town->m_spells[level][slot];
+                spell = gpTownManager->m_town->m_spells[level][slot_p];
                 NormalDialog(gSpellDesc[spell],
-                             quickView < 1 ? 1 : 4,
+                             quickView_f >= 1 ? 4 : 1,
                              -1, -1, 8, spell, -1, 0, -1, 0);
                 return 1;
             }
-            break;
         }
     }
     return EventWindowHandler(message);
@@ -2590,7 +2596,9 @@ int townManager::RecruitHero(int availableHeroIndex, int cannotRecruit)
 // frame, and all 11/11 relocations agree. Direct field switches removed two
 // false dispatch locals; the first residual is two retail jump-to-next
 // continuations around the 0x7800..0x7802 range gate. Assignment-expression
-// switches compile like the former 0x1c frame. Revisit at SOURCE 95%.
+// switches compile like the former 0x1c frame. A 30-walk post-95 AST pass
+// tested all six local variants and retained no mutation. Revisit only with a
+// real inline-accessor identification for that range gate.
 VA(0x00419c29, 0x153)
 int TavernHandler(tag_message &message)
 {
@@ -2650,11 +2658,14 @@ void townManager::DoTavern(void)
     delete m_heroWindow0;
 }
 
-// @match-note 97.28%: complete amount edit/clamp, confirm/cancel and redraw CFG,
-// exact 0x24 frame, and all 32/32 relocations agree. Retail avoids the explicit
-// outer-action copy but retains its word; fully direct switches score 98.29%
-// with an undersized 0x20 frame, while explicit control scores 96.09%.
-// Revisit dispatch temporary allocation at SOURCE 95%.
+// @match-note 98.45%: complete amount edit/clamp, confirm/cancel and redraw CFG,
+// exact 0x24 frame, and all 32/32 relocations agree. Retail reserves the action
+// word but switches directly on the message field; retaining the real unused
+// local while removing its copy improved the canonical function from 97.28%.
+// The first residual is one extra local jump before the ID dispatch, followed
+// by equivalent confirm-arm layout. Moving the confirm body before cancel
+// regressed to 91.74%, and the positive nonzero arm regressed to 98.09%.
+// Revisit only with a new dispatch-layout discovery.
 VA(0x00419e8c, 0x328)
 int SplitArmyHandler(tag_message &message)
 {
@@ -2665,8 +2676,7 @@ int SplitArmyHandler(tag_message &message)
     int action;
 
     if (message.type == TOWN_MESSAGE_SELECT) {
-        action = message.payload.widget.command;
-        switch (action) {
+        switch (message.payload.widget.command) {
         case TOWN_INPUT_SELECT:
             switch (message.payload.widget.id) {
             case TOWN_SPLIT_AMOUNT_CONTROL:
@@ -3172,11 +3182,14 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
     }
 }
 
-// @match-note 98.90%: complete all ten category cases, exact 0x2c frame, and
+// @match-note retained 98.90%: complete all ten category cases, exact 0x2c frame, and
 // all 42/42 relocations agree. Prologue and first 33 normalized instructions
-// are identical; objdiff then loses identity at the delinked category switch
-// dispatch while the case bodies and external targets remain aligned. Revisit
-// switch-label layout at SOURCE 95%.
+// are identical before objdiff loses identity at the delinked category switch.
+// Explicit ranges excluding the 0x1bbc3..0x1bbeb jump table contain 355
+// instructions on both sides. The two real residuals are the equivalent
+// playerData::m_heroIds address sequences in ARTIFACTS and ARMY_STRENGTH;
+// reversed subscripts/direct GetHero regressed to 97.94%. A 15-walk post-95
+// AST pass retained no mutation. Revisit only after a TU-state change.
 VA(0x0041b692, 0x56a)
 void GetCategoryStats(int category, long int * const stats,
                       signed char * const order)
