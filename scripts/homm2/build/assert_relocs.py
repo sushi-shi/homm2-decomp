@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-"""assert_relocs.py — OPT-IN reloc-target audit (`homm2 relocs`; NOT a hard build gate). For every
+"""Relocation audits for objdiff's relocation-masked blind spots.
+
+``homm2 relocs`` remains the broad, opt-in, order-independent target audit.  The
+``--fields`` mode is a hard build gate for a narrower invariant: in live 100%-exact
+functions, ordered DIR32 sites that resolve into the same recovered public DATA owner
+must use the same owner-relative offset.  This catches a wrong field even when objdiff
+masks all four relocation bytes.
+
+For every
 near-EXACT function, verify each relocation's TARGET address. objdiff MASKS all relocations when
 scoring, so it never checks the target — a "100% match" can silently reference the WRONG
 global/const/field/function, or even call a FABRICATED function that is declared, never defined, and
@@ -26,8 +34,28 @@ Run from repo root; exits 1 on any wrong/fabricated reloc target.
 """
 import sys, os, re, csv, json, glob, struct, subprocess
 from collections import Counter
+from typing import NamedTuple
+
+from homm2.build.reloc_owners import load_owner_ranges, owner_for_rva
 
 IMAGE_BASE = 0x400000
+
+
+class OwnerOffsetMismatch(NamedTuple):
+    site: int
+    owner_symbol: str
+    owner_name: str
+    expected: int
+    actual: int
+    target_symbol: str
+    base_symbol: str
+
+    def diagnostic(self):
+        return ("WRONG FIELD at +0x%x: %s expected +0x%x, actual +0x%x "
+                "(retail %s, base %s)" %
+                (self.site, self.owner_name, self.expected, self.actual,
+                 self.target_symbol, self.base_symbol))
+
 
 def _norm(s):   # llvm-objdump renders each non-printable mangled byte as one '_'; symbol_names.csv
     s = s.replace('\xef\xbf\xbd', '_')          # stores it as the UTF-8 replacement char (3 bytes)
@@ -95,28 +123,32 @@ def _addend(insn):
     imms = re.findall(r'\$(-?0x[0-9a-f]+)', insn)
     return int(imms[-1], 16) & 0xffffffff if imms else 0     # -0x4c disp -> 0xffffffb4 addend
 
-def _text_bytes(obj):
-    """Read the COFF .text payload so each relocation uses its own encoded addend.
+def _text_sections(obj):
+    """Read every COFF .text payload in section-table order.
 
     An x86 instruction may contain multiple relocation fields (for example a
     memory displacement and an immediate function pointer). Deriving both from
     the rendered instruction text assigns the first operand's displacement to
     every relocation. The four bytes at the relocation site are the actual COFF
-    addend and are unambiguous.
+    addend and are unambiguous. MSVC emits one .text COMDAT section per function,
+    so retaining every section is essential: their llvm-objdump addresses each
+    restart at zero.
     """
-    blob = open(obj, "rb").read()
+    with open(obj, "rb") as stream:
+        blob = stream.read()
     if len(blob) < 20:
-        return b""
+        return []
     section_count = struct.unpack_from("<H", blob, 2)[0]
     optional_size = struct.unpack_from("<H", blob, 16)[0]
     first = 20 + optional_size
+    sections = []
     for index in range(section_count):
         off = first + index * 40
         if blob[off:off + 8].rstrip(b"\0") != b".text":
             continue
         size, raw = struct.unpack_from("<II", blob, off + 16)
-        return blob[raw:raw + size]
-    return b""
+        sections.append(blob[raw:raw + size])
+    return sections
 
 def parse_obj(obj, with_sites=False):
     """llvm-objdump -dr -> ordered relocations per function; __imp__ skipped.
@@ -126,9 +158,18 @@ def parse_obj(obj, with_sites=False):
     weakening ordinary target checking.
     """
     out = subprocess.run(["llvm-objdump", "-dr", obj], capture_output=True, text=True).stdout
-    text_bytes = _text_bytes(obj)
+    text_sections = _text_sections(obj)
+    text_index = -1
+    text_bytes = b""
     funcs, cur, cur_start, prev = {}, None, 0, ""
     for ln in out.splitlines():
+        if ln == "Disassembly of section .text:":
+            text_index += 1
+            text_bytes = (text_sections[text_index]
+                          if text_index < len(text_sections) else b"")
+            cur = None
+            prev = ""
+            continue
         m = re.match(r'^([0-9a-f]+) <(.+?)>:', ln)
         if m:
             name = m.group(2)
@@ -279,6 +320,90 @@ def check_fn(sym, data, dups, unit, name, base_relocs, tgt_relocs):
         probs.append("WRONG: base references 0x%x (%s) x%d — retail never references it (or fewer)" % (v, bs, n))
     return probs
 
+
+def check_ordered_owner_offsets(sym, data, owners, base_sites, target_sites):
+    """Compare aligned absolute relocations as ``(public owner, field offset)``.
+
+    This deliberately ignores unaligned sites, relative calls, unknown owners, and
+    different owners.  Those cases need the broader opt-in audit.  For a function
+    whose ordinary bytes are already exact, equal function-relative sites identify
+    the same instruction operand without relying on relocation symbol names.
+    """
+    problems = []
+    target_by_site = {reloc[0]: reloc[1:] for reloc in target_sites}
+    for base_reloc in base_sites:
+        site, base_type, base_symbol, base_addend = base_reloc
+        target = target_by_site.get(site)
+        if target is None:
+            continue
+        target_type, target_symbol, target_addend = target
+        if base_type != "DIR32" or target_type != "DIR32":
+            continue
+        base_rva = resolve(sym, data, base_type, base_symbol, base_addend)
+        target_rva = resolve(sym, data, target_type, target_symbol, target_addend)
+        if base_rva is None or target_rva is None:
+            continue
+        base_owner = owner_for_rva(owners, base_rva)
+        target_owner = owner_for_rva(owners, target_rva)
+        if (base_owner is None or target_owner is None or
+                base_owner.rva != target_owner.rva or
+                base_owner.symbol != target_owner.symbol):
+            continue
+        # A provisional public-data extent can overlap an unrelated string or
+        # local constant.  Normalize only explicit references to the owner or a
+        # delinker const_<RVA> alias, never an arbitrary symbol that merely falls
+        # numerically inside that extent.
+        if not ((base_symbol == base_owner.symbol or base_symbol.startswith("const_")) and
+                (target_symbol == target_owner.symbol or target_symbol.startswith("const_"))):
+            continue
+        base_offset = base_rva - base_owner.rva
+        target_offset = target_rva - target_owner.rva
+        if base_offset == target_offset:
+            continue
+        problems.append(OwnerOffsetMismatch(
+            site, base_owner.symbol, base_owner.source_name,
+            target_offset, base_offset, target_symbol, base_symbol))
+    return problems
+
+
+def review_fields():
+    """Hard-gate owner-relative DIR32 offsets in live objdiff-exact functions."""
+    sym, data, _dups = load_symbols()
+    owners = load_owner_ranges()
+    report = json.load(open("build/objdiff/report.json"))
+    bad = []
+    checked_functions = 0
+    checked_sites = 0
+    for unit_record in report["units"]:
+        unit = unit_record["name"]
+        exact = {function["name"] for function in unit_record.get("functions", [])
+                 if function.get("fuzzy_match_percent") == 100.0}
+        if not exact:
+            continue
+        base_obj = "build/objdiff/base/%s.obj" % unit
+        target_obj = "build/delink/%s.c.obj" % unit
+        if not (os.path.exists(base_obj) and os.path.exists(target_obj)):
+            continue
+        base_functions = parse_obj(base_obj, with_sites=True)
+        target_functions = parse_obj(target_obj, with_sites=True)
+        for name in sorted(exact):
+            if name not in base_functions or name not in target_functions:
+                continue
+            checked_functions += 1
+            checked_sites += len(base_functions[name])
+            for problem in check_ordered_owner_offsets(
+                    sym, data, owners, base_functions[name], target_functions[name]):
+                bad.append((unit, name, problem))
+    for unit, name, problem in bad:
+        print("  %s  %s: %s" % (unit, name, problem.diagnostic()))
+    if bad:
+        print("\nRELOC FIELDS FAIL: %d exact function(s) use a wrong DATA-owner offset."
+              % len({(unit, name) for unit, name, _problem in bad}))
+        return 1
+    print("reloc fields OK: %d exact functions, %d ordered relocation sites checked."
+          % (checked_functions, checked_sites))
+    return 0
+
 def _function_for_arg(arg):
     """Resolve an RVA or decorated name to the generated (unit, function) identity."""
     try:
@@ -385,6 +510,8 @@ def review_counts(scope="BASE"):
     return 0
 
 def main():
+    if len(sys.argv) > 1 and sys.argv[1] == "--fields":
+        return review_fields()
     if len(sys.argv) > 1 and sys.argv[1] == "--counts":
         return review_counts(sys.argv[2] if len(sys.argv) > 2 else "BASE")
     if len(sys.argv) > 1:                        # single-function review mode

@@ -19,6 +19,11 @@ Pipeline:
 import argparse, csv, hashlib, os, re, struct, subprocess, sys
 from pathlib import Path
 
+from homm2.build.reloc_owners import (
+    is_interior_reloc_alias, load_definition_rvas, load_explicit_extents,
+    owners_from_rows,
+)
+
 REPO = next((p for p in Path(__file__).resolve().parents if (p / "flake.nix").exists()), Path.cwd())
 
 
@@ -65,7 +70,12 @@ def main(argv=None):
     text_seg, text_base = secs[".text"][0], secs[".text"][1]
 
     funcs, data = [], []
-    for row in csv.DictReader([ln for ln in open(a.csv) if not ln.lstrip().startswith("#")]):
+    rows = list(csv.DictReader(
+        [ln for ln in open(a.csv) if not ln.lstrip().startswith("#")]))
+    owners = owners_from_rows(
+        rows, load_definition_rvas(), load_explicit_extents())
+    canonicalized_aliases = 0
+    for row in rows:
         rva = int(row["rva"], 16); name = row["name"].strip(); unit = row["unit"].strip()
         size = int((row.get("size") or "0"), 16); kind = (row.get("kind") or "func").strip()
         seg, base = seg_of(secs, rva)
@@ -74,6 +84,9 @@ def main(argv=None):
         if kind == "func" and seg == text_seg and size > 0:
             funcs.append((rva, size, name, unit))
         else:
+            if is_interior_reloc_alias(row, owners):
+                canonicalized_aliases += 1
+                continue
             data.append((rva, name, seg, rva - base))
     funcs.sort(); data.sort()
 
@@ -138,7 +151,9 @@ def main(argv=None):
                   if (m := re.search(r"Stream\s+(\d+)\s+\(\s*0 bytes\)", line))), None)
     if empty is not None:
         _patch_dbi(out, empty)
-    print("[synth_pdb] %d funcs + %d data -> %s (%d units)" % (len(funcs), len(data), out, len(files)))
+    print("[synth_pdb] %d funcs + %d data -> %s (%d units); "
+          "%d interior aliases canonicalized to DATA owners" %
+          (len(funcs), len(data), out, len(files), canonicalized_aliases))
 
 
 def _patch_dbi(pdb, empty_stream):
