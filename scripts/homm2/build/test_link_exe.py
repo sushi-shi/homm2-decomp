@@ -4,7 +4,9 @@ import unittest
 from pathlib import Path
 
 from homm2.build.link_exe import (
-    classify_missing_public_data, classify_pe_storage, decode_map_symbol_name,
+    LINK300_FORCED_VENDOR_IMPORTS, RETAIL_LINK_FLAGS, SYSTEM_LIBS_AFTER_VENDOR,
+    SYSTEM_LIBS_BEFORE_VENDOR, build_link_command, classify_missing_public_data,
+    classify_pe_storage, decode_map_symbol_name,
     decode_s_compile_banner, load_retail_data_symbols, load_retail_order,
     link_environment, normalized_vendor_imports, parse_map_contributions, parse_map_symbol_records,
     parse_map_symbols, parse_unresolved, read_coff_section, read_imports, read_order_response,
@@ -12,6 +14,20 @@ from homm2.build.link_exe import (
 
 
 class LinkExeTest(unittest.TestCase):
+    def test_link300_command_forces_vendor_members_before_game_objects(self):
+        objects = [r"Z:\\obj\\one.obj", r"Z:\\obj\\two.obj"]
+        vendors = [r"Z:\\lib\\smack.lib", r"Z:\\lib\\mss.lib", r"Z:\\lib\\wing.lib"]
+        command = build_link_command(
+            "LINK.EXE", r"Z:\\out\\game.map", r"Z:\\out\\game.exe",
+            objects, vendors, r"Z:\\out\\game.res")
+        forced = ["/INCLUDE:" + symbol for symbol in LINK300_FORCED_VENDOR_IMPORTS]
+        self.assertEqual(command[2 + len(RETAIL_LINK_FLAGS):
+                                 2 + len(RETAIL_LINK_FLAGS) + len(forced)], forced)
+        self.assertLess(command.index(SYSTEM_LIBS_BEFORE_VENDOR[0]), command.index(vendors[0]))
+        self.assertLess(command.index(vendors[-1]), command.index(SYSTEM_LIBS_AFTER_VENDOR[0]))
+        self.assertLess(command.index(SYSTEM_LIBS_AFTER_VENDOR[-1]), command.index(objects[0]))
+        self.assertLess(command.index(objects[-1]), command.index(r"Z:\\out\\game.res"))
+
     def test_link_environment_uses_historical_lib_search_path(self):
         environment = link_environment(
             r"Z:\vc42\lib", "/vc40/bin", {"PATH": "tools", "LIB": "stale"})

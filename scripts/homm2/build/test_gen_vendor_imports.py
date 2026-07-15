@@ -2,6 +2,10 @@ import struct
 import unittest
 
 from homm2.build.gen_vendor_imports import (
+    LINK300_FORCED_VENDOR_IMPORTS,
+    LINK300_FORCE_MSS_IMPORTS,
+    LINK300_FORCE_SMACK_IMPORTS,
+    LINK300_FORCE_WING_IMPORTS,
     MSS_IMPORTS,
     SMACK_IMPORTS,
     WING_IMPORTS,
@@ -17,6 +21,19 @@ class VendorImportTests(unittest.TestCase):
         self.assertEqual({ordinal for _, ordinal in SMACK_IMPORTS},
                          {14, 18, 19, 20, 21, 23, 28, 32, 33, 38})
         self.assertEqual(len(WING_IMPORTS), 6)
+
+    def test_link300_force_order_covers_every_vendor_import_once(self):
+        expected = ({symbol for symbol, _ in MSS_IMPORTS}
+                    | {symbol for symbol, _ in SMACK_IMPORTS}
+                    | {symbol for symbol, _, _ in WING_IMPORTS})
+        self.assertEqual(set(LINK300_FORCED_VENDOR_IMPORTS), expected)
+        self.assertEqual(len(LINK300_FORCED_VENDOR_IMPORTS), len(expected))
+        self.assertEqual(LINK300_FORCE_MSS_IMPORTS,
+                         tuple(symbol for symbol, _ in reversed(MSS_IMPORTS)))
+        self.assertEqual(LINK300_FORCED_VENDOR_IMPORTS,
+                         LINK300_FORCE_WING_IMPORTS
+                         + LINK300_FORCE_SMACK_IMPORTS
+                         + LINK300_FORCE_MSS_IMPORTS)
 
     def test_each_dll_uses_its_retail_import_form(self):
         specs = import_specs()

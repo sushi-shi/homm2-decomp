@@ -91,6 +91,36 @@ WING_IMPORTS = (
     ("_WinGBitBlt@32", 0, "WinGBitBlt"),
 )
 
+# LINK 3.00 pulls old-style import-library members in response to unresolved
+# symbols.  These explicit roots reproduce the retail intra-DLL IAT order when
+# the vendor libraries precede game objects on the command line.
+LINK300_FORCE_WING_IMPORTS = (
+    "_WinGBitBlt@32",
+    "_WinGCreateDC@0",
+    "_WinGCreateBitmap@12",
+    "_WinGRecommendDIBFormat@4",
+    "_WinGSetDIBColorTable@16",
+    "_WinGStretchBlt@40",
+)
+LINK300_FORCE_SMACK_IMPORTS = (
+    "_SmackWait@4",
+    "_SmackOpen@12",
+    "_SmackClose@4",
+    "_SmackSummary@8",
+    "_SmackToBuffer@28",
+    "_SmackDoFrame@4",
+    "_SmackToBufferRect@8",
+    "_SmackNextFrame@4",
+    "_SmackSoundUseMSS@4",
+    "_SmackSoundUseDirectSound@4",
+)
+LINK300_FORCE_MSS_IMPORTS = tuple(symbol for symbol, _ in reversed(MSS_IMPORTS))
+LINK300_FORCED_VENDOR_IMPORTS = (
+    LINK300_FORCE_WING_IMPORTS
+    + LINK300_FORCE_SMACK_IMPORTS
+    + LINK300_FORCE_MSS_IMPORTS
+)
+
 
 def import_specs() -> tuple[ImportSpec, ...]:
     specs = [ImportSpec("mss32.dll", symbol, hint) for symbol, hint in MSS_IMPORTS]
