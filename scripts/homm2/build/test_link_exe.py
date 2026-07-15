@@ -263,7 +263,10 @@ class LinkExeTest(unittest.TestCase):
             },
         ]}
         diagnostics = required_initialized_storage_diagnostics(
-            public_symbols, [{"name": "recovered", "unit": "SOURCE/KB"}])
+            public_symbols, [{
+                "name": "recovered", "unit": "SOURCE/KB", "size": 4,
+                "retail_sha256": "retail", "highlow_count": 0, "audit": "bytes",
+            }])
         self.assertEqual(diagnostics["verified"], 0)
         self.assertEqual(diagnostics["violations"][0]["status"],
                          "storage-class-mismatch")
@@ -274,10 +277,40 @@ class LinkExeTest(unittest.TestCase):
             path = Path(temp) / "required.tsv"
             path.write_text(
                 "# reviewed recovery enrollment\n"
-                "name\tunit\n"
-                "?global@@3HA\tSOURCE/KB\n")
+                "name\tunit\tsize\tretail_sha256\thighlow_count\taudit\n"
+                "?global@@3HA\tSOURCE/KB\t0x4\tdeadbeef\t1\tbytes\n")
             required = load_required_initialized_storage(path)
-        self.assertEqual(required, [{"name": "?global@@3HA", "unit": "SOURCE/KB"}])
+        self.assertEqual(required, [{
+            "name": "?global@@3HA", "unit": "SOURCE/KB", "size": 4,
+            "retail_sha256": "deadbeef", "highlow_count": 1, "audit": "bytes",
+        }])
+
+    def test_required_initialized_storage_compares_candidate_payload_and_targets(self):
+        retail_payload = {
+            "size": 4, "sha256": "retail", "highlow_base_relocation_count": 1,
+            "highlow_relative_offsets": [0], "normalized_sha256": "normalized",
+            "cstring_targets": [{"sha256": "target", "text": "name"}],
+            "pointer_target_alias_pattern": [0],
+        }
+        candidate_payload = dict(retail_payload)
+        public_symbols = {"symbols": [{
+            "name": "table", "unit": "SOURCE/KB", "candidate_count": 1,
+            "status": "displaced", "storage_class_matches": True,
+            "retail_storage": {"class": "data-initialized"},
+            "candidate_storage": {"class": "data-initialized"},
+            "retail_payload": retail_payload, "candidate_payload": candidate_payload,
+        }]}
+        required = [{
+            "name": "table", "unit": "SOURCE/KB", "size": 4,
+            "retail_sha256": "retail", "highlow_count": 1,
+            "audit": "cstring-pointer-table",
+        }]
+        diagnostics = required_initialized_storage_diagnostics(public_symbols, required)
+        self.assertEqual(diagnostics["verified"], 1)
+        candidate_payload["normalized_sha256"] = "changed"
+        diagnostics = required_initialized_storage_diagnostics(public_symbols, required)
+        self.assertEqual(diagnostics["violations"][0]["status"],
+                         "normalized-payload-mismatch")
 
     def test_coff_section_parser_reports_raw_and_alignment_rounded_size(self):
         data = bytearray(0x100)
