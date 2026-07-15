@@ -80,7 +80,9 @@ def main():
                         "build/link/HEROES2W.missing-data.tsv"]
         w.build(link_outputs, "link_exe",
                 inputs=["build/link/objects.rsp"] + import_outputs + [resource_output],
-                implicit=objs + ["build/orig/HEROES2W.EXE", "scripts/homm2/build/link_exe.py"],
+                implicit=objs + ["build/orig/HEROES2W.EXE",
+                                 "config/required_initialized_storage.tsv",
+                                 "scripts/homm2/build/link_exe.py"],
                 variables={"exe": "build/link/HEROES2W.EXE"})
         w.build("link", "phony", inputs="build/link/HEROES2W.EXE")
         w.build("link-order", "phony", inputs="build/link/objects.rsp")

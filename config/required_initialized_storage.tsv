@@ -4,6 +4,8 @@
 # target regressions. Known legacy mismatches remain transitional diagnostics until
 # their initializers are recovered.
 name	unit	size	retail_sha256	highlow_count	audit
+?giGroundToTerrain@@3PAEA	SOURCE/KB	0x1b0	872023508ef106beee3deee322670c560e5df8c0828659b89ff19d0a5d2125a1	0	bytes
+?giGroundShape@@3PAEA	SOURCE/KB	0x1b0	f2acb8d122405c14d85fcd09ba854c7179136e318dd6e6605b50bcbabb9f3b2d	0	bytes
 ?gMapColors@@3PAEA	SOURCE/KB	0x10	db737e30f3ff98aa8f1ed1bfa7465c2307162af1aa84e999f49752a83d63dc45	0	bytes
 ?gObjectColors@@3PAEA	SOURCE/KB	0x10	fe54c8ff6e10d571a31dbd7f4053986b21478fbb3a5b47ca992acdec91d71baf	0	bytes
 ?gOwnerColors@@3PAEA	SOURCE/KB	0x8	21df38eaea33554635b2f87ba74bd60f19ba516f4a52714752e9c50ca0bbcc04	0	bytes
