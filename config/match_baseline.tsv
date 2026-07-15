@@ -1436,7 +1436,7 @@ SOURCE/wingraph	?CreatePrimary@@YIXXZ	100.0000	04a4310348ab
 SOURCE/wingraph	?DDAppPaint@@YIHPAX0@Z	100.0000	04b81f06fd84
 SOURCE/wingraph	?DDCleanUpWinGraphics@@YIXXZ	100.0000	b7c2ea81b9d5
 SOURCE/wingraph	?DDCreateSurface@@YIPAUIDirectDrawSurface@@KKH@Z	100.0000	af822f991609
-SOURCE/wingraph	?DDInitGraphics@@YIXXZ	100.0000	6712a4d2ed6a
+SOURCE/wingraph	?DDInitGraphics@@YIXXZ	100.0000	3ca6776fa0ba
 SOURCE/wingraph	?DDInitializePalette@@YIXXZ	100.0000	c951b4630cad
 SOURCE/wingraph	?DDQueryNewPalette@@YIHXZ	100.0000	a32ae6991025
 SOURCE/wingraph	?DDRestoreDisplayMode@@YIXXZ	100.0000	f489227f81ae
@@ -1453,7 +1453,7 @@ SOURCE/wingraph	?RestoreDisplayMode@@YIXXZ	100.0000	ed4fb428f9ee
 SOURCE/wingraph	?SetFullScreenStatus@@YIXH@Z	99.8214	0f1513e945cd
 SOURCE/wingraph	?SetGraphicsType@@YIHH@Z	100.0000	87806acf9b5e
 SOURCE/wingraph	?SetPalette@@YIHXZ	100.0000	d91f52f47967
-SOURCE/wingraph	?SetupClipper@@YIXXZ	100.0000	89b1290b9829
+SOURCE/wingraph	?SetupClipper@@YIXXZ	100.0000	b31f638ee3c2
 SOURCE/wingraph	?UpdatePalette@@YIXPAC@Z	100.0000	744becc5acc5
 SOURCE/wingraph	?WGAppPaint@@YIHPAX0@Z	100.0000	342ee27b7565
 SOURCE/wingraph	?WGCleanUpWinGraphics@@YIXXZ	100.0000	adee9fd6950e

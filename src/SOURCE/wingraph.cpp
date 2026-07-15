@@ -80,7 +80,7 @@ void SetupClipper(void)
 {
     HRESULT result;
 
-    if (gConfig.gfx[giCurExe].showMenu == 0) {
+    if (gConfig.gfx[giCurExe].fullScreen == 0) {
         result = lpDD->CreateClipper(0, &lpClipper, 0);
         if (result != DD_OK)
             DDSD(result, WINGRAPH_SOURCE_FILE, gSetupClipperLineBase + 8);
@@ -103,7 +103,7 @@ void DDInitGraphics(void)
     result = lpDirectDrawCreate(0, &lpDD, 0);
     if (result != DD_OK)
         DDSD(result, WINGRAPH_SOURCE_FILE, gDDInitLineBase + 8);
-    if (gConfig.gfx[giCurExe].showMenu != 0) {
+    if (gConfig.gfx[giCurExe].fullScreen != 0) {
         SetMenuStatus(0);
         result = lpDD->SetCooperativeLevel(hwndApp,
             DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN | DDSCL_ALLOWREBOOT);
