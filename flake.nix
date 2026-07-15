@@ -78,7 +78,7 @@
         ninja
         llvm                              # llvm-pdbutil (synth_pdb yaml2pdb)
         llvmPackages.clang-unwrapped      # clangd + clang-format + clang driver (UNWRAPPED: no host gcc/glibc include shadowing)
-        ripgrep file xxd jq binutils
+        ripgrep file xxd jq binutils p7zip
       ]);
 
       # PyGhidra env, shared by both shells: pyghidra.start() reads GHIDRA_INSTALL_DIR
