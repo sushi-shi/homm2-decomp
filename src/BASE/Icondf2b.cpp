@@ -5,6 +5,7 @@
 
 #include <va.h>
 #include <BASE/Icondf2b.h>
+#include <BASE/IconDraw.h>
 #include <BASE/IconEntry.h>
 #include <BASE/IconMonoRle.h>
 #include <BASE/icon.h>
@@ -26,17 +27,20 @@ DATA(0x005381e4) static IconEntry *gFDEntry;
 DATA(0x005381e8) static unsigned int gFDRun;
 
 // @match-note
-// Complete /O2 decoder: 166 instructions, 25 branches, the same four-byte frame/saved registers,
-// and exact 37/37 external relocation identity/multiplicity (all scratch owners plus uDimPal).
-// Candidate ends at +0x238 versus retail +0x23b. First divergence is +0x1d: retail schedules the
-// formal-x load before publishing gFDEntry, while this TU publishes the entry first and carries the
-// left edge in EDI. The remaining differences are broad register allocation/scheduling with the
-// same command-loop and clipping successors. gFDRow is a byte pointer and gFDY is ordinary scratch;
-// the former integer row model and `volatile` reload coercion were removed. Retail tests
-// clipX <= left both before the clipped run and before choosing its full arm, leaving the emitted
-// partial-left arm unreachable; preserve that shipped CFG. Prior entry/bound, destination/count,
-// loop-order, predicate, header-state, and AST families are exhausted. Revisit only after a genuine
-// shared-header/TU-state change; do not restore qualifiers or integer pointer arithmetic.
+// Complete /O2 decoder: candidate/retail have 166/167 instructions, both have 25 branches, both
+// reserve the same four-byte pitch home and save EBX/ESI/EDI/EBP, and all 37 ordered external
+// relocations resolve to the same scratch owners and uDimPal. Candidate ends at +0x235 versus
+// retail +0x23b. First divergence is +0x1d: retail schedules the formal-x load before publishing
+// gFDEntry, while this TU publishes the entry first and carries the left edge in EDI. The remaining
+// differences are register allocation/scheduling over the same command-loop and clipping
+// successors. gFDRow is a byte pointer and gFDY is ordinary scratch; the former integer row model
+// and volatile reload coercion were removed. Retail tests clipX <= left both before the clipped run
+// and before choosing its full arm, leaving the emitted partial-left arm unreachable; preserve that
+// shipped CFG. Moving the x0 declaration ahead of entry selection is byte-identical. Adding the
+// shared IconDraw mode enum and completing the existing monochrome-RLE opcode enum changed VC4.2's
+// TU state and improved the canonical schedule without changing the recovered body. Revisit after
+// a genuine shared-header/TU-state change or in the gated last-mile phase; do not restore qualifiers
+// or integer pointer arithmetic. No permutation or generated TU-state probe was run in this pass.
 VA(0x004daa20, 0x23b)
 void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                          int color, int clip, int clipX, int clipY, int clipW, int clipH)
@@ -56,15 +60,15 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, 
     gFDY = y + entryY;
     int X = w + x0 - 1;
     gFDXEnd = X;
-    if (clip != 0) {
+    if (clip != ICON_DRAW_NO_CLIP) {
         int currentY;
         if (x0 < clipX || clipW + clipX < w + x0 || (currentY = gFDY) < clipY ||
             entry->h + currentY > clipY + clipH) {
-            clip = 1;
+            clip = ICON_DRAW_CLIP;
             gFDClipR = clipX + clipW - 1;
             gFDClipB = clipY + clipH - 1;
         } else {
-            clip = 0;
+            clip = ICON_DRAW_NO_CLIP;
         }
     }
     short pitch = dest->m_width;
@@ -77,14 +81,14 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, 
         if (static_cast<signed char>(cmd) < 0) {
             gFDRun = cmd;
             int n = cmd & ICON_RLE_MONO_RUN_MASK;
-            if (n == 0)
+            if (n == ICON_RLE_MONO_END_COUNT)
                 return;
             X = X - n;
             continue;
         }
         gFDRun = cmd;
-        if (cmd != 0) {
-            if (clip == 0) {
+        if (cmd != ICON_RLE_MONO_NEWLINE_COMMAND) {
+            if (clip == ICON_DRAW_NO_CLIP) {
                 unsigned int cnt;
                 gFDCnt = 0;
                 unsigned char *dst = (gFDRow - cmd) + X + 1;
