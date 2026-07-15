@@ -1,6 +1,8 @@
 # Reviewed globals whose retail initialized-storage reconstruction is complete.
-# Add each verified recovery here. The link audit hard-fails if an enrolled symbol
-# becomes missing, ambiguous, or returns to a different storage class. Known legacy
-# mismatches remain transitional diagnostics until their initializers are recovered.
-name	unit
-?gHeroDefaultNames@@3PAPADA	SOURCE/KB
+# Add each verified recovery here with authoritative retail evidence. The link audit
+# hard-fails on storage, normalized bytes, relocation pattern, or reviewed pointer-
+# target regressions. Known legacy mismatches remain transitional diagnostics until
+# their initializers are recovered.
+name	unit	size	retail_sha256	highlow_count	audit
+?gHeroDefaultNames@@3PAPADA	SOURCE/KB	0xd8	d4e4bdf9c32daf767b5a6c266fb6390c27ebc6dc53cadbff288bf7989dc166ab	54	cstring-pointer-table
+?gTilesetFiles@@3PAPADA	SOURCE/KB	0x100	189087672ccef7e81f5a478e5e24517937bf785390940b7294f026d29a452679	64	cstring-pointer-table

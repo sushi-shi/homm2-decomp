@@ -384,22 +384,23 @@ def read_pe(path):
     }
 
 
-def add_retail_payload_evidence(public_symbols, path, names=None):
-    """Attach authoritative retail bytes and base-relocation counts to public data rows."""
+def read_pe_payload_evidence(path, rva, size, audit_kind="bytes"):
+    """Read one PE span with relocation-normalized and optional pointer-target evidence."""
     data = Path(path).read_bytes()
     pe_offset = struct.unpack_from("<I", data, 0x3C)[0]
     coff = pe_offset + 4
     section_count = struct.unpack_from("<H", data, coff + 2)[0]
     optional_size = struct.unpack_from("<H", data, coff + 16)[0]
     optional = coff + 20
+    image_base = struct.unpack_from("<I", data, optional + 28)[0]
     section_offset = optional + optional_size
     sections = []
     for index in range(section_count):
         offset = section_offset + index * COFF_SECTION_HEADER_SIZE
-        virtual_size, rva, raw_size, raw_offset = struct.unpack_from(
+        virtual_size, section_rva, raw_size, raw_offset = struct.unpack_from(
             "<IIII", data, offset + 8)
         sections.append({
-            "rva": rva,
+            "rva": section_rva,
             "virtual_size": virtual_size,
             "raw_size": raw_size,
             "raw_offset": raw_offset,
@@ -420,8 +421,10 @@ def add_retail_payload_evidence(public_symbols, path, names=None):
     relocation_rva, relocation_size = struct.unpack_from("<II", data, directory)
     if relocation_rva and relocation_size:
         cursor = raw_offset(relocation_rva)
+        if cursor is None:
+            raise ValueError("PE base-relocation directory has no raw bytes in %s" % path)
         end = cursor + relocation_size
-        while cursor is not None and cursor + 8 <= end:
+        while cursor + 8 <= end:
             page_rva, block_size = struct.unpack_from("<II", data, cursor)
             if block_size < 8 or cursor + block_size > end:
                 raise ValueError("invalid PE base-relocation block in %s" % path)
@@ -431,22 +434,19 @@ def add_retail_payload_evidence(public_symbols, path, names=None):
                     relocation_rvas.append(page_rva + (entry & 0x0FFF))
             cursor += block_size
 
-    for row in public_symbols["symbols"]:
-        if names is not None and row["name"] not in names:
-            continue
-        rva = int(row["retail_rva"], 16)
-        size = row["size"] or 0
-        payload = bytearray(size)
-        remaining = size
+    def read_span(span_rva, span_size):
+        payload = bytearray(span_size)
+        remaining = span_size
         payload_offset = 0
-        current_rva = rva
+        current_rva = span_rva
         while remaining:
             section = next((section for section in sections
                             if section["rva"] <= current_rva <
                             section["rva"] + max(section["virtual_size"],
                                                  section["raw_size"])), None)
             if section is None:
-                raise ValueError("public data span at RVA 0x%x is outside PE sections" % rva)
+                raise ValueError("PE span at RVA 0x%x is outside sections in %s" %
+                                 (span_rva, path))
             delta = current_rva - section["rva"]
             chunk = min(remaining,
                         max(section["virtual_size"], section["raw_size"]) - delta)
@@ -457,13 +457,64 @@ def add_retail_payload_evidence(public_symbols, path, names=None):
             remaining -= chunk
             payload_offset += chunk
             current_rva += chunk
-        row["retail_payload"] = {
-            "size": size,
-            "nonzero_byte_count": sum(byte != 0 for byte in payload),
-            "sha256": hashlib.sha256(payload).hexdigest(),
-            "highlow_base_relocation_count": sum(
-                rva <= relocation < rva + size for relocation in relocation_rvas),
-        }
+        return payload
+
+    payload = read_span(rva, size)
+    relative_relocations = sorted(
+        relocation - rva for relocation in relocation_rvas if rva <= relocation < rva + size)
+    normalized = bytearray(payload)
+    for offset in relative_relocations:
+        if offset + 4 > size:
+            raise ValueError("HIGHLOW relocation crosses audited span in %s" % path)
+        normalized[offset:offset + 4] = b"\0\0\0\0"
+    evidence = {
+        "size": size,
+        "nonzero_byte_count": sum(byte != 0 for byte in payload),
+        "sha256": hashlib.sha256(payload).hexdigest(),
+        "normalized_sha256": hashlib.sha256(normalized).hexdigest(),
+        "highlow_base_relocation_count": len(relative_relocations),
+        "highlow_relative_offsets": relative_relocations,
+    }
+    if audit_kind == "cstring-pointer-table":
+        targets = []
+        aliases = {}
+        alias_pattern = []
+        for offset in relative_relocations:
+            target_va = struct.unpack_from("<I", payload, offset)[0]
+            target_rva = target_va - image_base
+            target_offset = raw_offset(target_rva)
+            if target_offset is None:
+                raise ValueError("pointer target RVA 0x%x has no raw bytes in %s" %
+                                 (target_rva, path))
+            end = data.index(0, target_offset)
+            target = data[target_offset:end]
+            targets.append({
+                "sha256": hashlib.sha256(target).hexdigest(),
+                "text": target.decode("cp1252"),
+            })
+            if target_va not in aliases:
+                aliases[target_va] = len(aliases)
+            alias_pattern.append(aliases[target_va])
+        evidence["cstring_targets"] = targets
+        evidence["pointer_target_alias_pattern"] = alias_pattern
+    elif audit_kind != "bytes":
+        raise ValueError("unknown initialized-storage audit kind: %s" % audit_kind)
+    return evidence
+
+
+def add_payload_evidence(public_symbols, retail_path, candidate_path, required):
+    """Attach retail and candidate evidence only for explicitly reviewed enrollments."""
+    by_name = {row["name"]: row for row in public_symbols["symbols"]}
+    for expectation in required:
+        row = by_name.get(expectation["name"])
+        if row is None:
+            continue
+        size = row["size"] or 0
+        row["retail_payload"] = read_pe_payload_evidence(
+            retail_path, int(row["retail_rva"], 16), size, expectation["audit"])
+        if row["candidate_count"] == 1:
+            row["candidate_payload"] = read_pe_payload_evidence(
+                candidate_path, int(row["candidate_rva"], 16), size, expectation["audit"])
 
 
 def read_imports(path):
@@ -668,7 +719,14 @@ def load_required_initialized_storage(path=None):
     with path.open(newline="") as f:
         rows = csv.DictReader(
             (line for line in f if not line.lstrip().startswith("#")), delimiter="\t")
-        return [{"name": row["name"], "unit": row["unit"]} for row in rows]
+        return [{
+            "name": row["name"],
+            "unit": row["unit"],
+            "size": int(row["size"], 0),
+            "retail_sha256": row["retail_sha256"],
+            "highlow_count": int(row["highlow_count"], 0),
+            "audit": row["audit"],
+        } for row in rows]
 
 
 def required_initialized_storage_diagnostics(public_symbols, required):
@@ -684,6 +742,27 @@ def required_initialized_storage_diagnostics(public_symbols, required):
             status = symbol["status"]
         elif not symbol["storage_class_matches"]:
             status = "storage-class-mismatch"
+        elif (symbol["retail_payload"]["size"] != expectation["size"] or
+              symbol["retail_payload"]["sha256"] != expectation["retail_sha256"] or
+              symbol["retail_payload"]["highlow_base_relocation_count"] !=
+              expectation["highlow_count"]):
+            status = "reviewed-retail-evidence-mismatch"
+        elif symbol.get("candidate_payload") is None:
+            status = "candidate-payload-missing"
+        elif (symbol["candidate_payload"]["highlow_relative_offsets"] !=
+              symbol["retail_payload"]["highlow_relative_offsets"]):
+            status = "relocation-pattern-mismatch"
+        elif (symbol["candidate_payload"]["normalized_sha256"] !=
+              symbol["retail_payload"]["normalized_sha256"]):
+            status = "normalized-payload-mismatch"
+        elif (expectation["audit"] == "cstring-pointer-table" and
+              [target["sha256"] for target in symbol["candidate_payload"]["cstring_targets"]] !=
+              [target["sha256"] for target in symbol["retail_payload"]["cstring_targets"]]):
+            status = "pointer-target-content-mismatch"
+        elif (expectation["audit"] == "cstring-pointer-table" and
+              symbol["candidate_payload"]["pointer_target_alias_pattern"] !=
+              symbol["retail_payload"]["pointer_target_alias_pattern"]):
+            status = "pointer-target-alias-mismatch"
         else:
             status = "verified"
         rows.append({
@@ -695,7 +774,12 @@ def required_initialized_storage_diagnostics(public_symbols, required):
             "candidate_storage_class": (
                 symbol["candidate_storage"]["class"]
                 if symbol is not None and symbol["candidate_storage"] else None),
+            "audit": expectation["audit"],
+            "expected_size": expectation["size"],
+            "expected_retail_sha256": expectation["retail_sha256"],
+            "expected_highlow_count": expectation["highlow_count"],
             "retail_payload": symbol.get("retail_payload") if symbol is not None else None,
+            "candidate_payload": symbol.get("candidate_payload") if symbol is not None else None,
         })
     violations = [row for row in rows if row["status"] != "verified"]
     return {
@@ -704,9 +788,11 @@ def required_initialized_storage_diagnostics(public_symbols, required):
         "violations": violations,
         "symbols": rows,
         "note": (
-            "This checked enrollment contains reviewed initializer recoveries only. The known "
-            "transitional backlog remains visible in public_symbols; every recovered batch must "
-            "be enrolled so initialized storage cannot silently regress to loader-zero storage."),
+            "This checked enrollment contains reviewed initializer recoveries only. It pins "
+            "retail size/digest/relocation evidence and compares candidate relocation-normalized "
+            "bytes. CString pointer tables also compare target content and alias identity. The "
+            "known transitional backlog remains visible in public_symbols; every recovered batch "
+            "must be enrolled so initialized storage cannot silently regress."),
     }
 
 
@@ -1308,9 +1394,8 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
     required_storage_ok = True
     if report["static_storage"]:
         required = load_required_initialized_storage(required_initialized_path)
-        add_retail_payload_evidence(
-            report["static_storage"]["public_symbols"], RETAIL_EXE,
-            {row["name"] for row in required})
+        add_payload_evidence(
+            report["static_storage"]["public_symbols"], RETAIL_EXE, output, required)
         required_diagnostics = required_initialized_storage_diagnostics(
             report["static_storage"]["public_symbols"], required)
         report["static_storage"]["required_initialized"] = required_diagnostics
@@ -1393,17 +1478,18 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
         print("link audit: required initialized storage %d/%d verified" %
               (required_storage["verified"], required_storage["required"]))
         for violation in required_storage["violations"]:
-            print("link audit: required initialized storage FAIL %s (%s): retail %s, "
+            print("link audit: required initialized storage FAIL %s (%s): %s; retail %s, "
                   "candidate %s" %
-                  (violation["name"], violation["unit"],
+                  (violation["name"], violation["unit"], violation["status"],
                    violation["retail_storage_class"],
                    violation["candidate_storage_class"]))
         for verified in required_storage["symbols"]:
             if verified["status"] != "verified":
                 continue
             payload = verified["retail_payload"]
-            print("link audit: required initialized storage OK %s: %d/%d nonzero bytes, "
-                  "%d HIGHLOW relocations, sha256 %s" %
+            print("link audit: required initialized storage OK %s: candidate normalized bytes "
+                  "and targets match; retail %d/%d nonzero bytes, %d HIGHLOW relocations, "
+                  "sha256 %s" %
                   (verified["name"], payload["nonzero_byte_count"], payload["size"],
                    payload["highlow_base_relocation_count"], payload["sha256"]))
         if public_summary["missing_root_cause_counts"]:
