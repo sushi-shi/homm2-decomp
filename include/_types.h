@@ -156,9 +156,11 @@ struct tag_monsterInfo {
     union {
         struct {
             short cost;
-            int fightValue;
+            union {
+                int fightValue;
+                int randomValue;
+            };
         };
-        int randomValue;
     };
     signed char iconIndex;
     signed char growth;

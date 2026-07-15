@@ -641,9 +641,8 @@ int game::SaveGame(char *filename, int generateName, signed char expansionFormat
     _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x6515, 4);
     _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x6517,
            *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x6515) * 2);
-    _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x657b, 4);
-    _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x657d,
-           *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x657b) * 2);
+    _write(fileInfo, &m_mapEventCount, 4);
+    _write(fileInfo, m_mapEventIndices, m_mapEventCount * 2);
 
     int markerBuffer[3];
     markerBuffer[0] = GAME_FILE_MARKER;
@@ -942,9 +941,8 @@ void game::LoadGame(char *filename, int loadFromFile, int)
         _read(file, reinterpret_cast<unsigned char *>(this) + 0x6515, 4);
         _read(file, reinterpret_cast<unsigned char *>(this) + 0x6517,
               *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x6515) * 2);
-        _read(file, reinterpret_cast<unsigned char *>(this) + 0x657b, 4);
-        _read(file, reinterpret_cast<unsigned char *>(this) + 0x657d,
-              *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x657b) * 2);
+        _read(file, &m_mapEventCount, 4);
+        _read(file, m_mapEventIndices, m_mapEventCount * 2);
 
         char marker[8];
         _read(file, marker, 4);
@@ -1477,8 +1475,8 @@ void game::RandomizeEvents(void)
     unsigned char *eventData16;
     int valid27;
 
-    *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x657b) = 0;
-    memset(reinterpret_cast<unsigned char *>(this) + 0x657d, 0, 100);
+    m_mapEventCount = 0;
+    memset(m_mapEventIndices, 0, sizeof(m_mapEventIndices));
 
     for (yPos19 = 0; yPos19 < MAP_HEIGHT; yPos19++) {
         for (xPos2 = 0; (xPos2 | 0) < MAP_WIDTH; xPos2++) {
@@ -1501,9 +1499,7 @@ void game::RandomizeEvents(void)
                     eventData16[0] = 0;
                 break;
             case 0x93:
-                *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x657d +
-                    *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x657b) * 2) =
-                    cell2->m_objectMetadata;
+                m_mapEventIndices[m_mapEventCount] = cell2->m_objectMetadata;
                 mapEvent1 = ppMapExtra[cell2->m_objectMetadata];
                 *reinterpret_cast<short *>(reinterpret_cast<unsigned char *>(mapEvent1) + 0x26) = static_cast<short>(xPos2);
                 *reinterpret_cast<short *>(reinterpret_cast<unsigned char *>(mapEvent1) + 0x28) = static_cast<short>(yPos19);
@@ -1512,7 +1508,7 @@ void game::RandomizeEvents(void)
                 cell2->m_triggerType = 0;
                 cell2->m_objectIndex = 0xff;
                 cell2->m_objectTileset = 0;
-                (*reinterpret_cast<short *>(reinterpret_cast<unsigned char *>(this) + 0x657b))++;
+                m_mapEventCount++;
                 break;
             case 0x8a: cell2->m_objectMetadata = bottleId11++; break;
             case 0xbe: cell2->m_objectMetadata = jailId28++; break;
