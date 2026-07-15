@@ -527,6 +527,7 @@ def read_pe_payload_evidence(path, rva, size, audit_kind="bytes"):
             end = data.index(0, target_offset)
             target = data[target_offset:end]
             targets.append({
+                "rva": target_rva,
                 "sha256": hashlib.sha256(target).hexdigest(),
                 "text": target.decode("cp1252"),
             })
