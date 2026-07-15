@@ -327,15 +327,31 @@ def parse_unresolved(output):
 
 def parse_map_symbols(path):
     symbols = defaultdict(list)
+    for record in parse_map_symbol_records(path):
+        symbols[record["name"]].append(record["va"])
+    return dict(symbols)
+
+
+def parse_map_symbol_records(path):
+    records = []
     if not Path(path).exists():
-        return symbols
+        return records
+    address = re.compile(r"^([0-9A-Fa-f]{4}):([0-9A-Fa-f]{8})$")
+    absolute = re.compile(r"^[0-9A-Fa-f]{8}$")
     for line in Path(path).read_text(errors="replace").splitlines():
         fields = line.split()
-        if len(fields) < 3 or not re.match(r"^[0-9A-Fa-f]{4}:[0-9A-Fa-f]{8}$", fields[0]):
+        match = address.match(fields[0]) if len(fields) >= 3 else None
+        if not match or not absolute.match(fields[2]):
             continue
-        if re.match(r"^[0-9A-Fa-f]{8}$", fields[2]):
-            symbols[fields[1]].append(int(fields[2], 16))
-    return dict(symbols)
+        records.append({
+            "segment": int(match.group(1), 16),
+            "offset": int(match.group(2), 16),
+            "name": fields[1],
+            "va": int(fields[2], 16),
+            "flag": fields[3] if len(fields) >= 5 else None,
+            "object": fields[-1] if len(fields) >= 4 else None,
+        })
+    return records
 
 
 def parse_map_contributions(path):
@@ -357,6 +373,236 @@ def parse_map_contributions(path):
     return contributions
 
 
+def load_retail_data_symbols(path=None):
+    path = Path(path or REPO / "build/gen/symbol_names.csv")
+    symbols = []
+    with path.open(newline="") as f:
+        for row in csv.DictReader(f):
+            if row["kind"] != "data" or row["provenance"] != "cv-public-data":
+                continue
+            symbols.append({
+                "name": row["name"],
+                "unit": row["unit"],
+                "rva": int(row["rva"], 16),
+                "size": int(row["size"], 16),
+                "provenance": row["provenance"],
+            })
+    symbols.sort(key=lambda row: (row["rva"], row["name"]))
+    return symbols
+
+
+def classify_pe_storage(pe, rva):
+    readonly = pe["sections"].get(".rdata")
+    if readonly and readonly["rva"] <= rva < readonly["rva"] + readonly["virtual_size"]:
+        return {"class": "rdata", "section": ".rdata",
+                "section_offset": rva - readonly["rva"]}
+    writable = pe["sections"].get(".data")
+    if writable and writable["rva"] <= rva < writable["rva"] + writable["virtual_size"]:
+        offset = rva - writable["rva"]
+        storage_class = ("data-initialized" if offset < writable["raw_size"]
+                         else "data-loader-zero-tail")
+        return {"class": storage_class, "section": ".data", "section_offset": offset}
+    for name, section in pe["sections"].items():
+        extent = max(section["virtual_size"], section["raw_size"])
+        if section["rva"] <= rva < section["rva"] + extent:
+            return {"class": "other-section", "section": name,
+                    "section_offset": rva - section["rva"]}
+    return {"class": "outside-image", "section": None, "section_offset": None}
+
+
+def classify_candidate_storage(candidate, record, contributions):
+    contribution = next((row for row in contributions
+                         if row["segment"] == record["segment"] and
+                         row["offset"] <= record["offset"] < row["offset"] + row["size"]), None)
+    contribution_name = contribution["name"] if contribution else None
+    lower_name = contribution_name.lower() if contribution_name else ""
+    lower_object = (record["object"] or "").lower()
+    if lower_object == "<common>" or lower_name in {".bss", "bss", "common"}:
+        storage_class = "data-loader-zero"
+        section = ".data"
+    elif lower_name.startswith(".rdata"):
+        storage_class = "rdata"
+        section = ".rdata"
+    elif lower_name.startswith(".data") or lower_name.startswith(".crt"):
+        storage_class = "data-initialized"
+        section = ".data"
+    else:
+        fallback = classify_pe_storage(candidate, record["va"] - candidate["image_base"])
+        storage_class = fallback["class"]
+        section = fallback["section"]
+    return {
+        "class": storage_class,
+        "section": section,
+        "map_contribution": contribution_name,
+        "map_class": contribution["class"] if contribution else None,
+        "map_object": record["object"],
+        "segment": record["segment"],
+        "segment_offset": record["offset"],
+    }
+
+
+def static_symbol_diagnostics(retail, candidate, map_path, retail_symbols=None):
+    retail_symbols = (load_retail_data_symbols() if retail_symbols is None
+                      else sorted(retail_symbols, key=lambda row: (row["rva"], row["name"])))
+    contributions = parse_map_contributions(map_path)
+    candidate_records = defaultdict(list)
+    for record in parse_map_symbol_records(map_path):
+        candidate_records[record["name"]].append(record)
+
+    def normalized_storage(storage_class):
+        if storage_class in {"data-loader-zero", "data-loader-zero-tail"}:
+            return "data-loader-zero"
+        return storage_class
+
+    rows = []
+    for symbol in retail_symbols:
+        retail_storage = classify_pe_storage(retail, symbol["rva"])
+        matches = candidate_records.get(symbol["name"], [])
+        row = {
+            "name": symbol["name"],
+            "unit": symbol.get("unit"),
+            "size": symbol.get("size"),
+            "retail_rva": "0x%x" % symbol["rva"],
+            "retail_storage": retail_storage,
+            "candidate_count": len(matches),
+            "candidate_rva": None,
+            "candidate_storage": None,
+            "delta": None,
+            "storage_class_matches": None,
+            "status": "missing",
+        }
+        if len(matches) > 1:
+            row["status"] = "ambiguous"
+            row["candidate_rvas"] = [
+                "0x%x" % (record["va"] - candidate["image_base"]) for record in matches]
+        elif len(matches) == 1:
+            record = matches[0]
+            candidate_rva = record["va"] - candidate["image_base"]
+            candidate_storage = classify_candidate_storage(candidate, record, contributions)
+            class_matches = (normalized_storage(retail_storage["class"]) ==
+                             normalized_storage(candidate_storage["class"]))
+            delta = candidate_rva - symbol["rva"]
+            if not class_matches:
+                status = "storage-class-mismatch"
+            elif delta:
+                status = "displaced"
+            else:
+                status = "exact"
+            row.update({
+                "candidate_rva": "0x%x" % candidate_rva,
+                "candidate_storage": candidate_storage,
+                "delta": delta,
+                "storage_class_matches": class_matches,
+                "status": status,
+            })
+        rows.append(row)
+
+    runs = []
+    active = None
+    for index, row in enumerate(rows):
+        if row["candidate_count"] != 1:
+            active = None
+            continue
+        run_key = (row["delta"], row["retail_storage"]["class"],
+                   row["candidate_storage"]["class"], row["storage_class_matches"])
+        if active is None or active["_key"] != run_key:
+            active = {
+                "_key": run_key,
+                "start_index": index,
+                "end_index": index,
+                "count": 1,
+                "first_symbol": row["name"],
+                "last_symbol": row["name"],
+                "retail_start_rva": row["retail_rva"],
+                "retail_end_rva": row["retail_rva"],
+                "candidate_start_rva": row["candidate_rva"],
+                "candidate_end_rva": row["candidate_rva"],
+                "delta": row["delta"],
+                "retail_storage_class": row["retail_storage"]["class"],
+                "candidate_storage_class": row["candidate_storage"]["class"],
+                "storage_class_matches": row["storage_class_matches"],
+            }
+            runs.append(active)
+        else:
+            active["end_index"] = index
+            active["count"] += 1
+            active["last_symbol"] = row["name"]
+            active["retail_end_rva"] = row["retail_rva"]
+            active["candidate_end_rva"] = row["candidate_rva"]
+    for run in runs:
+        del run["_key"]
+
+    run_starts = {run["start_index"]: run for run in runs}
+    divergences = []
+    previous_delta = None
+    for index, row in enumerate(rows):
+        if row["candidate_count"] != 1:
+            divergences.append({
+                "kind": row["status"],
+                "name": row["name"],
+                "retail_rva": row["retail_rva"],
+                "candidate_count": row["candidate_count"],
+            })
+            continue
+        run = run_starts.get(index)
+        if run and (run["delta"] != 0 or not run["storage_class_matches"]):
+            divergences.append({
+                "kind": ("storage-class-run-start" if not run["storage_class_matches"]
+                         else "displacement-run-start"),
+                "name": row["name"],
+                "retail_rva": row["retail_rva"],
+                "candidate_rva": row["candidate_rva"],
+                "delta": row["delta"],
+                "previous_unique_delta": previous_delta,
+                "retail_storage_class": run["retail_storage_class"],
+                "candidate_storage_class": run["candidate_storage_class"],
+                "run_symbol_count": run["count"],
+            })
+        previous_delta = row["delta"]
+
+    status_counts = defaultdict(int)
+    retail_class_counts = defaultdict(int)
+    candidate_class_counts = defaultdict(int)
+    for row in rows:
+        status_counts[row["status"]] += 1
+        retail_class_counts[row["retail_storage"]["class"]] += 1
+        if row["candidate_storage"]:
+            candidate_class_counts[row["candidate_storage"]["class"]] += 1
+    unique = sum(1 for row in rows if row["candidate_count"] == 1)
+    class_matches = sum(1 for row in rows if row["storage_class_matches"] is True)
+    class_mismatches = sum(1 for row in rows if row["storage_class_matches"] is False)
+    return {
+        "retail_inventory": (
+            "Shipping NB09 S_PUB32 symbols classified as data by retail RVA; synthetic PDB "
+            "procedure records are not used."),
+        "summary": {
+            "retail_public_data_symbols": len(rows),
+            "candidate_unique_name_matches": unique,
+            "candidate_missing": status_counts["missing"],
+            "candidate_ambiguous": status_counts["ambiguous"],
+            "exact_rva": sum(1 for row in rows
+                             if row["candidate_count"] == 1 and row["delta"] == 0),
+            "displaced_rva": sum(1 for row in rows
+                                 if row["candidate_count"] == 1 and row["delta"] != 0),
+            "storage_class_matches": class_matches,
+            "storage_class_mismatches": class_mismatches,
+            "status_counts": dict(sorted(status_counts.items())),
+            "retail_storage_class_counts": dict(sorted(retail_class_counts.items())),
+            "candidate_storage_class_counts": dict(sorted(candidate_class_counts.items())),
+            "constant_displacement_runs": len(runs),
+            "divergence_run_starts": sum(
+                1 for run in runs if run["delta"] != 0 or not run["storage_class_matches"]),
+        },
+        "first_divergences": divergences[:20],
+        "displacement_runs": runs,
+        "symbols": rows,
+        "interpretation": (
+            "Only exact decorated-name matches are correlated. A constant-displacement run is "
+            "reported once at its first symbol; later symbols in that run are cumulative layout "
+            "consequences, not independent requests for padding or forced addresses."),
+    }
+
+
 def section_diagnostics(retail, candidate):
     result = []
     names = list(retail["sections"])
@@ -372,7 +618,7 @@ def section_diagnostics(retail, candidate):
     return result
 
 
-def static_storage_diagnostics(retail, candidate, map_path):
+def static_storage_diagnostics(retail, candidate, map_path, retail_symbols=None):
     def section_pair(name):
         expected = retail["sections"].get(name, {"raw_size": 0, "virtual_size": 0, "rva": 0})
         actual = candidate["sections"].get(name, {"raw_size": 0, "virtual_size": 0, "rva": 0})
@@ -411,6 +657,8 @@ def static_storage_diagnostics(retail, candidate, map_path):
         "retail_zero_fill_common_contribution_bytes": None,
         "retail_pe_size_of_uninitialized_data": retail["size_of_uninitialized_data"],
         "candidate_pe_size_of_uninitialized_data": candidate["size_of_uninitialized_data"],
+        "public_symbols": static_symbol_diagnostics(
+            retail, candidate, map_path, retail_symbols=retail_symbols),
         "retail_zero_fill_note": (
             "Retail has no map. PE evidence proves only a loader-zero writable .data tail; "
             "it does not prove that the entire tail was an independent .bss/common contribution."),
@@ -573,6 +821,25 @@ def run_link(output, order_response, imports_libraries):
         print("link audit: candidate map initialized/zero-fill contributions %d/%d bytes" %
               (storage["candidate_map_initialized_contribution_bytes"],
                storage["candidate_map_zero_fill_common_contribution_bytes"]))
+        public_summary = storage["public_symbols"]["summary"]
+        print("link audit: static public symbols %d; unique %d, missing %d, ambiguous %d; "
+              "exact RVA %d, displaced %d" %
+              (public_summary["retail_public_data_symbols"],
+               public_summary["candidate_unique_name_matches"],
+               public_summary["candidate_missing"],
+               public_summary["candidate_ambiguous"],
+               public_summary["exact_rva"],
+               public_summary["displaced_rva"]))
+        print("link audit: static storage class matches %d, mismatches %d; %d displacement runs" %
+              (public_summary["storage_class_matches"],
+               public_summary["storage_class_mismatches"],
+               public_summary["constant_displacement_runs"]))
+        for divergence in storage["public_symbols"]["first_divergences"][:3]:
+            print("link audit: static first divergence %s: %s retail %s candidate %s delta %s" %
+                  (divergence["kind"], divergence["name"], divergence["retail_rva"],
+                   divergence.get("candidate_rva", "unavailable"),
+                   "%+d" % divergence["delta"] if divergence.get("delta") is not None
+                   else "unavailable"))
         print("link audit: vendor import ABI %s; intra-DLL IAT order %s" %
               ("matches retail" if vendor_import_abi_match else "DIFFERS FROM RETAIL",
                "matches retail" if vendor_import_order_match else "differs"))
