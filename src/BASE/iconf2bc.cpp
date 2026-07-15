@@ -71,10 +71,14 @@ DATA(0x005380c0) static unsigned char *gFCDst;
 // residual is unresolved, not a byte-proven wall; no regex or AST permuter was used.
 // A fresh command-body/row-ownership audit on d8502da retained one source correction: the selected
 // IconEntry now owns the horizontal clip width directly instead of preserving that value through
-// the later destination-pitch local. This raises live match from 85.9925% to 86.31738%, grows the
-// candidate from 0x53c to 0x53e, and aligns row setup and decoder entry at retail +0xcc/+0xec.
-// Excluding retail's three trailing padding NOPs, candidate/retail are 392/397 instructions; both
-// retain the eight-byte frame and 59 branches with the previously proved 76-block topology.
+// the later destination-pitch local. This raises live match from 85.9925% to 86.31738% and aligns
+// row setup and decoder entry at retail +0xcc/+0xec. A current-header family batch then moved the
+// command lifetime outside the loop, matching the forward decoders' authored structure. Direct
+// target-to-candidate objdiff rises from 83.760704% to 84.554150%; candidate size grows one byte
+// toward retail without changing the setup divergence or relocation stream. Candidate is now
+// 0x542 versus retail 0x54d. Excluding retail's three trailing padding NOPs, candidate/retail are
+// 395/397 instructions; both retain the eight-byte frame and 59 branches with the previously
+// proved 76-block topology.
 // The first divergence remains +0x11. Candidate reloads entry->w at +0x61 for the second horizontal
 // clause, whereas retail spills the original width at +0x32 and consumes [esp+0x14] at +0x6b.
 // A clip-local width snapshot regresses to 85.93%, moves decoder entry back to +0xea, and does not
@@ -117,8 +121,9 @@ void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, 
     }
     pitch = dest->m_width;
     gFCRow = dest->m_pixels + gFCY * pitch;
+    int cmd;
     for (;;) {
-        int cmd = *src++;
+        cmd = *src++;
         if (static_cast<signed char>(cmd) < 0) {
             if ((cmd & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
                 // skip run / end-of-sprite
