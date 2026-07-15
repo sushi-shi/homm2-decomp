@@ -359,7 +359,7 @@ VA(0x004d4620, 0x98)
 void arithCodeRenormalise_Encode(BitStream *bs)
 {
     while (bigR <= TWO_TO_THE(smallB - 2)) {
-        if ((bigL + bigR) <= TWO_TO_THE(smallB - 1)) {
+        if ((0[&bigR] + bigL) <= TWO_TO_THE(smallB - 1)) {
             arithCodeBitPlusFollow(bs, 0);
         } else
         if (TWO_TO_THE(smallB - 1) <= bigL) {
