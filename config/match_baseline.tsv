@@ -337,7 +337,7 @@ BASE/WINMGR	?ConvertToHover@heroWindowManager@@QAEHAAUtag_message@@@Z	100.0000	9
 BASE/WINMGR	?CycleColors@@YIXH@Z	100.0000	9abcb55cd031
 BASE/WINMGR	?DoDialog@heroWindowManager@@QAEHPAVheroWindow@@P6IHAAUtag_message@@@ZH@Z	100.0000	45c82a1c5fa5
 BASE/WINMGR	?FadeScreen@heroWindowManager@@QAEXHHPAVpalette@@@Z	100.0000	76fa3ab96e6f
-BASE/WINMGR	?FizzleForward@heroWindowManager@@QAEXHHHHHPAC0@Z	99.3750	91eb2d7a2a72
+BASE/WINMGR	?FizzleForward@heroWindowManager@@QAEXHHHHHPAC0@Z	99.5230	91eb2d7a2a72
 BASE/WINMGR	?Main@heroWindowManager@@UAEHAAUtag_message@@@Z	100.0000	5ef8d637ceb1
 BASE/WINMGR	?Open@heroWindowManager@@UAEHH@Z	100.0000	f3bebca89676
 BASE/WINMGR	?RedrawScreen@heroWindowManager@@QAEXXZ	100.0000	c64b79610770
@@ -1225,7 +1225,7 @@ SOURCE/SPELLS	?ElementalStorm@combatManager@@QAEXXZ	100.0000	214ec6492970
 SOURCE/SPELLS	?FindResurrectArmyIndex@combatManager@@QAEHHHH@Z	96.5000	4e2ce5d6e4fa
 SOURCE/SPELLS	?Fireball@combatManager@@QAEXHH@Z	100.0000	156e1eb01e2f
 SOURCE/SPELLS	?GetNextChainLightningTarget@combatManager@@QAEHPAVarmy@@H@Z	100.0000	f0f4706a24cc
-SOURCE/SPELLS	?HandleCastSpell@@YIHAAUtag_message@@@Z	99.1885	3df38082bb35
+SOURCE/SPELLS	?HandleCastSpell@@YIHAAUtag_message@@@Z	99.8168	3df38082bb35
 SOURCE/SPELLS	?HasValidSpellTarget@combatManager@@QAEHH@Z	100.0000	2bd8a56335d5
 SOURCE/SPELLS	?MeteorShower@combatManager@@QAEXH@Z	100.0000	0a040ea9d87a
 SOURCE/SPELLS	?MirrorImage@combatManager@@QAEXH@Z	93.6271	ce7c8c44f6a3

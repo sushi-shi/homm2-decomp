@@ -5498,20 +5498,176 @@ DATA(0x004fbd50) void *hmnuDflt = 0;
 DATA(0x004fbd54) void *hmnuCmbt = 0;
 DATA(0x004fbd58) void *hmnuAdv = 0;
 DATA(0x004fbd5c) void *hmnuTown = 0;
-DATA(0x004fbd60) char *cMonFilename[66];
+DATA(0x004fbd60) char *cMonFilename[MONSTER_DATABASE_COUNT] = {
+    "peasant.icn", "archer.icn", "archer2.icn", "pikeman.icn",
+    "pikeman2.icn", "swordsmn.icn", "swordsm2.icn", "cavalryr.icn",
+    "cavalryb.icn", "paladin.icn", "paladin2.icn", "goblin.icn",
+    "orc.icn", "orc2.icn", "wolf.icn", "ogre.icn",
+    "ogre2.icn", "troll.icn", "troll2.icn", "cyclops.icn",
+    "sprite.icn", "dwarf.icn", "dwarf2.icn", "elf.icn",
+    "elf2.icn", "druid.icn", "druid2.icn", "unicorn.icn",
+    "phoenix.icn", "centaur.icn", "gargoyle.icn", "griffin.icn",
+    "minotaur.icn", "minotau2.icn", "hydra.icn", "draggree.icn",
+    "dragred.icn", "dragblak.icn", "halfling.icn", "boar.icn",
+    "golem.icn", "golem2.icn", "roc.icn", "mage1.icn",
+    "mage2.icn", "titanblu.icn", "titanbla.icn", "skeleton.icn",
+    "zombie.icn", "zombie2.icn", "mummyw.icn", "mummy2.icn",
+    "vampire.icn", "vampire2.icn", "lich.icn", "lich2.icn",
+    "dragbone.icn", "rogue.icn", "nomad.icn", "ghost.icn",
+    "genie.icn", "medusa.icn", "eelem.icn", "aelem.icn",
+    "felem.icn", "welem.icn"
+};
 DATA(0x004fbe68) int gbProcessingCombatAction = 0;
 DATA(0x004fbe6c) int iMPNetProtocol = 0;
 DATA(0x004fbe70) int iLastDiffSendTo = -2;
-DATA(0x004fbe78) SSpellInfo gsSpellInfo[65];
-DATA(0x004fc410) char *cArmyFrameFileNames[66];
-DATA(0x004fc518) unsigned char *gcSpellInfluenceIcons;
-DATA(0x004fc528) unsigned char giSpellInfluenceToSpell[16];
-DATA(0x004fc538) unsigned char giNumPowFrames[32];
+DATA(0x004fbe78) SSpellInfo gsSpellInfo[HERO_SPELL_COUNT] = {
+    { "fireball", 3, 8, 0, 500, 9, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT },
+    { "fireball", 4, 9, 0, 750, 15, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT },
+    { "lightblt", 2, 4, 15, 450, 7, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT },
+    { "chainlte", 4, 5, 15, 650, 15, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT },
+    { "telptout", 3, 10, 0, 30, 9, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_COMBAT },
+    { "cure", 1, 6, 1, 250, 6, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_COMBAT },
+    { "masscure", 4, 6, 1, 700, 15, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_COMBAT },
+    { "resurect", 4, 13, 1, 400, 12, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT },
+    { "resurtru", 5, 12, 1, 550, 15, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT },
+    { "haste", 1, 14, 24, 300, 3, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION },
+    { "masshast", 3, 14, 24, 950, 10, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION },
+    { "slow", 1, 1, 2, 350, 3, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION },
+    { "massslow", 4, 1, 2, 1000, 15, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION },
+    { "blind", 2, 21, 28, 500, 6, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION },
+    { "bless", 1, 7, 21, 200, 3, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION },
+    { "massbles", 3, 7, 21, 650, 12, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION },
+    { "stonskin", 1, 31, 30, 300, 3, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION },
+    { "stelskin", 2, 30, 31, 575, 6, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION },
+    { "curse", 1, 3, 29, 200, 3, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION },
+    { "masscurs", 3, 3, 29, 500, 12, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION },
+    { "masscurs", 3, 22, 8, 300, 9, { 10, 10, 10, 10, 10, 0 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT },
+    { "masscurs", 4, 23, 8, 450, 12, { 10, 10, 10, 10, 10, 0 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT },
+    { "antimagk", 3, 17, 6, 100, 7, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION },
+    { "dipmagk", 1, 18, 7, 275, 5, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_COMBAT },
+    { "dipmagk", 3, 18, 7, 450, 12, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_COMBAT },
+    { "magcarow", 1, 38, 0, 200, 3, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT },
+    { "berzerk", 4, 19, 22, 1000, 12, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION },
+    { "armgedn", 5, 16, 0, 2000, 20, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT },
+    { "storm", 4, 11, 0, 1300, 15, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT },
+    { "meteor~1", 4, 24, 0, 1000, 15, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT },
+    { "paralize", 3, 20, 25, 700, 9, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION },
+    { "hypnotiz", 5, 37, 26, 1300, 15, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION },
+    { "coldray", 2, 36, 19, 375, 6, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT },
+    { "coldring", 3, 35, 0, 500, 9, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT },
+    { "disruptr", 2, 34, 0, 500, 7, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT },
+    { "mnrdeath", 2, 29, 13, 300, 6, { 0, 0, 0, 0, 0, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT },
+    { "mnrdeath", 3, 28, 13, 450, 10, { 0, 0, 0, 0, 0, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT },
+    { "drgnslay", 2, 32, 27, 100, 6, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION },
+    { "bloodlus", 1, 27, 0, 300, 3, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION },
+    { "resurect", 3, 25, 6, 400, 10, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT },
+    { "mirrorim", 5, 26, 0, 800, 25, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION },
+    { "shield", 1, 15, 23, 150, 3, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION },
+    { "shield", 4, 15, 23, 375, 7, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION },
+    { "sumnelm", 5, 56, 0, 1000, 30, { 0, 0, 0, 0, 0, 0 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT },
+    { "sumnelm", 5, 57, 0, 1000, 30, { 0, 0, 0, 0, 0, 0 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT },
+    { "sumnelm", 5, 58, 0, 1000, 30, { 0, 0, 0, 0, 0, 0 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT },
+    { "sumnelm", 5, 59, 0, 1000, 30, { 0, 0, 0, 0, 0, 0 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT },
+    { "erthquak", 3, 33, 0, 300, 15, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT },
+    { "", 1, 39, 0, 30, 1, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_ADVENTURE },
+    { "", 1, 40, 0, 30, 1, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_ADVENTURE },
+    { "", 2, 41, 0, 30, 2, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_ADVENTURE },
+    { "", 3, 42, 0, 30, 2, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_ADVENTURE },
+    { "", 3, 43, 0, 30, 2, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_ADVENTURE },
+    { "", 4, 44, 0, 30, 3, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_ADVENTURE },
+    { "", 3, 45, 0, 30, 3, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_ADVENTURE },
+    { "", 2, 46, 0, 30, 5, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_ADVENTURE },
+    { "", 5, 47, 0, 1500, 10, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_ADVENTURE },
+    { "", 4, 48, 0, 30, 10, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_ADVENTURE },
+    { "", 5, 49, 0, 30, 20, { 0, 0, 0, 0, 0, 0 }, SPELL_INFO_ATTRIBUTE_ADVENTURE },
+    { "", 2, 50, 0, 30, 6, { 0, 0, 0, 0, 0, 0 }, SPELL_INFO_ATTRIBUTE_ADVENTURE },
+    { "", 2, 51, 0, 30, 8, { 0, 0, 0, 0, 0, 0 }, SPELL_INFO_ATTRIBUTE_ADVENTURE },
+    { "", 4, 52, 0, 700, 15, { 0, 0, 0, 0, 0, 0 }, SPELL_INFO_ATTRIBUTE_ADVENTURE },
+    { "", 4, 53, 0, 700, 15, { 0, 0, 0, 0, 0, 0 }, SPELL_INFO_ATTRIBUTE_ADVENTURE },
+    { "", 4, 54, 0, 700, 15, { 0, 0, 0, 0, 0, 0 }, SPELL_INFO_ATTRIBUTE_ADVENTURE },
+    { "", 4, 55, 0, 700, 15, { 0, 0, 0, 0, 0, 0 }, SPELL_INFO_ATTRIBUTE_ADVENTURE }
+};
+DATA(0x004fc410) char *cArmyFrameFileNames[MONSTER_DATABASE_COUNT] = {
+    "peas_frm.bin", "archrfrm.bin", "archrfrm.bin", "pikmnfrm.bin",
+    "pikmnfrm.bin", "swrdsfrm.bin", "swrdsfrm.bin", "cvlryfrm.bin",
+    "cvlr2frm.bin", "paladfrm.bin", "paladfrm.bin", "goblnfrm.bin",
+    "orc__frm.bin", "orc__frm.bin", "wolf_frm.bin", "ogre_frm.bin",
+    "ogre_frm.bin", "trollfrm.bin", "trollfrm.bin", "cyclofrm.bin",
+    "spritfrm.bin", "dwarffrm.bin", "dwarffrm.bin", "elf__frm.bin",
+    "elf__frm.bin", "druidfrm.bin", "druidfrm.bin", "unicofrm.bin",
+    "phoenfrm.bin", "centrfrm.bin", "garglfrm.bin", "grifffrm.bin",
+    "minotfrm.bin", "minotfrm.bin", "hydrafrm.bin", "draggfrm.bin",
+    "dragrfrm.bin", "dragbfrm.bin", "halflfrm.bin", "boar_frm.bin",
+    "golemfrm.bin", "golemfrm.bin", "roc__frm.bin", "mage1frm.bin",
+    "mage1frm.bin", "titanfrm.bin", "tita2frm.bin", "skel_frm.bin",
+    "zomb_frm.bin", "zomb_frm.bin", "mummyfrm.bin", "mummyfrm.bin",
+    "vampifrm.bin", "vampifrm.bin", "lich_frm.bin", "lich_frm.bin",
+    "drabnfrm.bin", "roguefrm.bin", "nomadfrm.bin", "ghostfrm.bin",
+    "geniefrm.bin", "medusfrm.bin", "felemfrm.bin", "felemfrm.bin",
+    "felemfrm.bin", "felemfrm.bin"
+};
+DATA(0x004fc518) unsigned char gcSpellInfluenceIcons[KB_SPELL_INFLUENCE_MAP_COUNT] = {
+    0x06, 0x07, 0x08, 0x09, 0x0b, 0x0f, 0x13, 0x02,
+    0x02, 0x02, 0x02, 0x02, 0x0d, 0x0a, 0x0a, 0x00
+};
+DATA(0x004fc528) unsigned char giSpellInfluenceToSpell[KB_SPELL_INFLUENCE_MAP_COUNT] = {
+    0x09, 0x0b, 0x0d, 0x0e, 0x12, 0x1a, 0x1e, 0x1f,
+    0x25, 0x26, 0x29, 0x65, 0x16, 0x10, 0x11, 0x00
+};
+DATA(0x004fc538) unsigned char giNumPowFrames[KB_SPELL_EFFECT_COUNT] = {
+    10, 10, 10, 10, 10, 10, 10, 10,
+    10, 8, 8, 10, 10, 10, 10, 15,
+    10, 10, 10, 10, 10, 16, 16, 14,
+    19, 22, 10, 17, 10, 12, 11, 16
+};
 DATA(0x004fc558) int giSpellEffectShowType = 2;
-DATA(0x004fc560) signed char gcColorToPlayerPos[8];
-DATA(0x004fc568) char *cCombatBkgNames[20];
-DATA(0x004fc5b8) struct SCmbtObstacle sCmbtObstacles[32];
-DATA(0x004fc778) int gEstatesGoldLevel[4];
+DATA(0x004fc560) signed char gcColorToPlayerPos[RADAR_OWNER_COLOR_COUNT] = {
+    0, 1, 2, 3, 4, 5, 0, 0
+};
+DATA(0x004fc568) char *cCombatBkgNames[KB_COMBAT_BACKGROUND_COUNT] = {
+    "CBKGWATR.icn", "", "CBKGGRTR.icn", "CBKGGRMT.icn",
+    "CBKGSNTR.icn", "CBKGSNMT.icn", "CBKGSWMP.icn", "",
+    "CBKGLAVA.icn", "", "CBKGDSRT.icn", "",
+    "CBKGDITR.icn", "CBKGDIMT.icn", "CBKGCRCK.icn", "",
+    "CBKGBEAC.icn", "", "CBKGGRAV.icn", 0
+};
+DATA(0x004fc5b8) struct SCmbtObstacle sCmbtObstacles[KB_COMBAT_OBSTACLE_COUNT] = {
+    { 0x00000200, 1, 1, { 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { 0x00000200, 1, 1, { 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { 0x00000042, 3, 1, { 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { 0x00000001, 1, 1, { 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { 0x00000000, 2, 2, { 0, 1, 0, 0, 0, 0, 0, 0 } },
+    { 0x0000014a, 2, 2, { 0, 1, 0, 0, 0, 0, 0, 0 } },
+    { 0x00000008, 1, 1, { 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { 0x00000048, 1, 2, { 0, 1, 0, 0, 0, 0, 0, 0 } },
+    { 0x0000000a, 2, 1, { 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { 0x000000a0, 3, 1, { 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { 0x00000001, 1, 1, { 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { 0x0000014a, 1, 2, { 0, 1, 0, 0, 0, 0, 0, 0 } },
+    { 0x0000000a, 1, 1, { 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { 0x000000a0, 2, 1, { 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { 0x00000048, 1, 2, { 0, 1, 0, 0, 0, 0, 0, 0 } },
+    { 0x0000000a, 2, 2, { 0, 1, 0, 0, 0, 0, 0, 0 } },
+    { 0x00000008, 1, 1, { 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { 0x00000008, 2, 2, { 0, 1, 0, 0, 0, 0, 0, 0 } },
+    { 0x00000080, 1, 2, { 0, 1, 0, 0, 0, 0, 0, 0 } },
+    { 0x00000142, 1, 2, { 0, 1, 0, 0, 0, 0, 0, 0 } },
+    { 0x00000080, 1, 2, { 0, 1, 0, 0, 0, 0, 0, 0 } },
+    { 0x00000080, 2, 1, { 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { 0x00000004, 2, 2, { 0, 1, 0, 0, 0, 0, 0, 0 } },
+    { 0x00000001, 1, 1, { 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { 0x000000a0, 1, 1, { 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { 0x00000200, 1, 2, { 0, 1, 0, 0, 0, 0, 0, 0 } },
+    { 0x00000004, 2, 1, { 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { 0x0000004a, 3, 1, { 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { 0x00000002, 3, 1, { 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { 0x00000010, 1, 1, { 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { 0x00000000, 1, 2, { 0, 1, 0, 0, 0, 0, 0, 0 } },
+    { 0x00000010, 2, 2, { 0, 1, 0, 0, 0, 0, 0, 0 } }
+};
+DATA(0x004fc778) int gEstatesGoldLevel[HERO_SKILL_LEVEL_COUNT] = {
+    0, 100, 250, 500
+};
 DATA(0x004fc788) float gfSSLogisticsMod[HERO_SKILL_LEVEL_COUNT];
 DATA(0x004fc798) float gfSSNavigationMod[HERO_SKILL_LEVEL_COUNT];
 DATA(0x004fc7a8) float gfSSArcheryMod[HERO_SKILL_LEVEL_COUNT];

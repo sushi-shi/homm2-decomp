@@ -151,7 +151,11 @@ typedef enum KbGameTableConstant {
     KB_SPELL_MOD_COUNT = 12,
     KB_QUICK_COMBAT_SPELL_TYPE_COUNT = 7,
     KB_CLOUD_MASK_COUNT = 256,
-    KB_HERO_LEVEL_BAND_COUNT = 2
+    KB_HERO_LEVEL_BAND_COUNT = 2,
+    KB_SPELL_INFLUENCE_MAP_COUNT = 16,
+    KB_SPELL_EFFECT_COUNT = 32,
+    KB_COMBAT_BACKGROUND_COUNT = 20,
+    KB_COMBAT_OBSTACLE_COUNT = 32
 } KbGameTableConstant;
 
 extern unsigned char giGroundShape[GROUND_TILE_IMAGE_COUNT];
@@ -244,19 +248,19 @@ extern int gbInSmackMgr;
 extern int glBottomRefresh;
 extern int gbBothMachinesWin95;
 extern int gbGotFirstHeartbeat;
-extern char *cMonFilename[66];
+extern char *cMonFilename[MONSTER_DATABASE_COUNT];
 extern int gbProcessingCombatAction;
 extern int iMPNetProtocol;
 extern int iLastDiffSendTo;
-extern char *cArmyFrameFileNames[66];
-extern unsigned char *gcSpellInfluenceIcons;
-extern unsigned char giSpellInfluenceToSpell[16];
-extern unsigned char giNumPowFrames[32];
+extern char *cArmyFrameFileNames[MONSTER_DATABASE_COUNT];
+extern unsigned char gcSpellInfluenceIcons[KB_SPELL_INFLUENCE_MAP_COUNT];
+extern unsigned char giSpellInfluenceToSpell[KB_SPELL_INFLUENCE_MAP_COUNT];
+extern unsigned char giNumPowFrames[KB_SPELL_EFFECT_COUNT];
 extern int giSpellEffectShowType;
-extern signed char gcColorToPlayerPos[8];
-extern char *cCombatBkgNames[20];
-extern struct SCmbtObstacle sCmbtObstacles[32];
-extern int gEstatesGoldLevel[4];
+extern signed char gcColorToPlayerPos[RADAR_OWNER_COLOR_COUNT];
+extern char *cCombatBkgNames[KB_COMBAT_BACKGROUND_COUNT];
+extern struct SCmbtObstacle sCmbtObstacles[KB_COMBAT_OBSTACLE_COUNT];
+extern int gEstatesGoldLevel[HERO_SKILL_LEVEL_COUNT];
 extern float gfSSLogisticsMod[HERO_SKILL_LEVEL_COUNT];
 extern float gfSSNavigationMod[HERO_SKILL_LEVEL_COUNT];
 extern float gfSSArcheryMod[HERO_SKILL_LEVEL_COUNT];
