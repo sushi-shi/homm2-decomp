@@ -100,7 +100,25 @@ typedef enum RadarColorTableCount {
     RADAR_OWNER_COLOR_COUNT = 8
 } RadarColorTableCount;
 
-extern unsigned char giGroundShape[432];
+typedef enum GroundTerrainType {
+    GROUND_TERRAIN_WATER = 0,
+    GROUND_TERRAIN_GRASS = 1,
+    GROUND_TERRAIN_SNOW = 2,
+    GROUND_TERRAIN_SWAMP = 3,
+    GROUND_TERRAIN_LAVA = 4,
+    GROUND_TERRAIN_DESERT = 5,
+    GROUND_TERRAIN_DIRT = 6,
+    GROUND_TERRAIN_WASTELAND = 7,
+    GROUND_TERRAIN_BEACH = 8,
+    GROUND_TERRAIN_TYPE_COUNT = 9
+} GroundTerrainType;
+
+typedef enum GroundTableConstant {
+    GROUND_TILE_IMAGE_COUNT = 432,
+    GROUND_SHAPE_FLIPPED = 0x80
+} GroundTableConstant;
+
+extern unsigned char giGroundShape[GROUND_TILE_IMAGE_COUNT];
 extern unsigned char gColorTableTan[256];
 extern unsigned char gColorTableGray[256];
 extern unsigned char gColorTableRed[256];
