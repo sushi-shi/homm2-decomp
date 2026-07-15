@@ -4616,9 +4616,9 @@ DATA(0x004fa670) unsigned long
 DATA(0x004fa688) unsigned char giMapSizes[4];
 DATA(0x004fa68c) int gbUseEvilInterface = 0;
 DATA(0x004fa690) char *cEvilTranslate[37][2];
-DATA(0x004fa7b8) char gcAnimPath[0x160];
-DATA(0x004fa918) char gcGamePath[0x18];
-DATA(0x004fa930) char gcMapPath[0x14];
+DATA(0x004fa7b8) char gcAnimPath[0x160] = "\\HEROES2\\ANIM\\";
+DATA(0x004fa918) char gcGamePath[0x18] = ".\\GAMES\\";
+DATA(0x004fa930) char gcMapPath[0x14] = ".\\MAPS\\";
 DATA(0x004fa944) int gbPutzingWithMouseCtr = 0;
 DATA(0x004fa948) int gbDontTryRedbook = 0;
 DATA(0x004fa94c) int gbDontTryMIDI = 0;
