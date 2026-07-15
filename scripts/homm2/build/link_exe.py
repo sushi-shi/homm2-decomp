@@ -20,6 +20,9 @@ from collections import defaultdict
 from pathlib import Path
 
 from homm2.build.extract_resources import read_pe_resources
+from homm2.build.build_libcmt_gfy import (
+    build_library as build_gfy_libcmt, expected_retail_literals,
+)
 from homm2.build.gen_vendor_imports import LINK300_FORCED_VENDOR_IMPORTS
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -124,6 +127,36 @@ def link_environment(library_path, tool_directory, environ=None):
     environment["PATH"] = (str(tool_directory) + os.pathsep + existing_path
                            if existing_path else str(tool_directory))
     return environment
+
+
+def audit_runtime_literal_storage(candidate, map_path, symbols_path=None):
+    symbols_path = symbols_path or REPO / "build/gen/symbol_names.csv"
+    expected = expected_retail_literals(symbols_path)
+    records = parse_map_symbol_records(map_path)
+    by_name = defaultdict(list)
+    for record in records:
+        by_name[record["name"]].append(record)
+    failures = []
+    verified = []
+    for name, unit in sorted(expected.items()):
+        matches = [record for record in by_name.get(name, [])
+                   if (record["object"] or "").lower() ==
+                   "libcmt:%s.obj" % unit.lower()]
+        if len(matches) != 1:
+            failures.append({"name": name, "unit": unit,
+                             "reason": "expected one LIBCMT map record, found %d" %
+                             len(matches)})
+            continue
+        storage = classify_pe_storage(
+            candidate, matches[0]["va"] - candidate["image_base"])
+        row = {"name": name, "unit": unit, "storage": storage}
+        if storage["class"] != "data-initialized":
+            row["reason"] = "expected data-initialized, found %s" % storage["class"]
+            failures.append(row)
+        else:
+            verified.append(row)
+    return {"required": len(expected), "verified": len(verified),
+            "failures": failures, "symbols": verified}
 
 
 def sibling_tool_identities(link_exe):
@@ -1319,7 +1352,15 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
         raise RuntimeError("link-order response does not match current NB09 contribution order")
     for stale in (output, map_path, missing_data_path):
         stale.unlink(missing_ok=True)
-    library_path = winepath_w(toolchain / "lib")
+    original_libcmt = find_ci(toolchain / "lib", "LIBCMT.LIB")
+    if original_libcmt is None:
+        raise RuntimeError("LIBCMT.LIB is missing from the VC4.2 toolchain")
+    derived_crt_dir = output.parent / "crt"
+    derived_libcmt = derived_crt_dir / "LIBCMT.LIB"
+    runtime_library = build_gfy_libcmt(
+        original_libcmt, derived_libcmt,
+        derived_crt_dir / "LIBCMT.gfy.json")
+    library_path = ";".join(winepaths_w((derived_crt_dir, toolchain / "lib")))
     command = build_link_command(
         link_exe,
         winepath_w(map_path),
@@ -1350,6 +1391,13 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
     resources = (resource_diagnostics(RETAIL_EXE, output, retail, candidate)
                  if candidate else None)
     resource_match = bool(resources and resources["semantic_match"])
+    runtime_literals = (audit_runtime_literal_storage(candidate, map_path)
+                        if candidate else {
+                            "required": 102, "verified": 0,
+                            "failures": [{"reason": "candidate executable is missing"}],
+                            "symbols": [],
+                        })
+    runtime_literals_ok = not runtime_literals["failures"]
     banner = next((line.strip() for line in run.stdout.splitlines()
                    if "Incremental Linker Version" in line), None)
     report = {
@@ -1386,6 +1434,8 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
             "resource": str(resource_path),
         },
         "library_search": {"mechanism": "LIB environment", "path": library_path},
+        "runtime_library": runtime_library,
+        "runtime_literal_storage": runtime_literals,
         "resource_input": str(resource_path),
         "resources": resources,
         "unresolved": unresolved,
@@ -1416,6 +1466,8 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
         required_storage_ok = not required_diagnostics["violations"]
         if not required_storage_ok and report["status"] == "linked":
             report["status"] = "required-initialized-storage-mismatch"
+    if not runtime_literals_ok and report["status"] == "linked":
+        report["status"] = "runtime-literal-storage-mismatch"
     map_symbols = parse_map_symbols(map_path)
     for row in order:
         anchor = next(((rva, symbol, map_symbols[symbol][0])
@@ -1488,6 +1540,11 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
               (public_summary["storage_class_matches"],
                public_summary["storage_class_mismatches"],
                public_summary["constant_displacement_runs"]))
+        print("link audit: VC4.2 /Gf runtime literals %d/%d in initialized .data" %
+              (runtime_literals["verified"], runtime_literals["required"]))
+        for failure in runtime_literals["failures"][:3]:
+            print("link audit: VC4.2 /Gf runtime literal FAIL %s: %s" %
+                  (failure.get("name", "<link>"), failure["reason"]))
         required_storage = storage["required_initialized"]
         print("link audit: required initialized storage %d/%d verified" %
               (required_storage["verified"], required_storage["required"]))
@@ -1541,7 +1598,7 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
     print("link audit: %s" % missing_data_path)
     return (0 if run.returncode == 0 and output.exists() and vendor_import_abi_match and
             vendor_import_order_match and advapi_import_abi_match and resource_match and
-            required_storage_ok else
+            required_storage_ok and runtime_literals_ok else
             (run.returncode or 1))
 
 
