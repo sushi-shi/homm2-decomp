@@ -14,6 +14,23 @@
 // forward declarations:
 struct tag_message;
 
+typedef enum BaseManagerMessageMask {
+    BASE_MANAGER_MESSAGE_MASK_ALL = -1
+} BaseManagerMessageMask;
+
+typedef enum BaseManagerPriority {
+    BASE_MANAGER_PRIORITY_UNASSIGNED = -1
+} BaseManagerPriority;
+
+typedef enum BaseManagerActivationState {
+    BASE_MANAGER_INACTIVE = 0,
+    BASE_MANAGER_ACTIVE = 1
+} BaseManagerActivationState;
+
+typedef enum BaseManagerConstant {
+    BASE_MANAGER_NAME_CAPACITY = 0x1e
+} BaseManagerConstant;
+
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class baseManager /* abstract */ {
 public:
@@ -24,11 +41,11 @@ public:
     baseManager *m_prev;  // +0x08  prev in the executive manager list
     int    m_messageMask;  // +0x0c  event/message classes accepted by Main
     int    m_priority;  // +0x10  executive manager-list ordering key
-    char   m_name[0x1e];  // +0x14  manager name (strcpy'd, e.g. "Unknown")
+    char   m_name[BASE_MANAGER_NAME_CAPACITY];  // +0x14  manager name
     int    m_active;  // +0x32
     // --- constructors ---
     baseManager(void);
-    void Activate(void) { m_active = 1; }
+    void Activate(void) { m_active = BASE_MANAGER_ACTIVE; }
     // --- virtual methods (vtable order) ---
     virtual int Open(int) = 0;
     virtual void Close(void) = 0;
