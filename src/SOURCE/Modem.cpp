@@ -66,7 +66,7 @@ void ModemSetup(int mode)
 
     if (gbDirectConnect != 0) {
         LogStr("MS4");
-        WFDCStage = 0;
+        WFDCStage = MODEM_CONNECTION_INIT_STAGE;
         giWaitType = MODEM_WAIT_DIRECT_CONNECT;
         strcpy(directConnectMessage3,
                "Waiting for other computer to log in to direct connection.\n\n"
@@ -164,12 +164,9 @@ signed char GUIModemResponse(char *message, char *response)
     return 0;
 }
 
-// @early-stop: the corrected response CFG truncates overlong lines before comparison
-// and returns immediately for non-printing non-terminators. Frame, all non-jump
-// opcodes/operands, and 20/20 relocation offsets agree; the GUIMRresponse[17]
-// relocation is delinked as a literal alias. Ours is exactly 0xa bytes short, equal
-// to the two missing five-byte continuation jumps. Tried nested else and explicit
-// else-if forms; the latter regressed to 90.19%.
+// @early-stop: all 0xe2 bytes agree after masking the 20 aligned relocation
+// fields. The only residual is the target delinker's synthetic literal name for
+// the interior byte at GUIMRresponse + MODEM_RESPONSE_TRUNCATE_INDEX.
 VA(0x0040ce4e, 0xe2)
 signed char GUIModemResponseExec(void)
 {
@@ -178,8 +175,8 @@ signed char GUIModemResponseExec(void)
         return 0;
     if (GUIMRc == '\n' || GUIMRrespptr == MODEM_RESPONSE_SIZE - 1) {
         GUIMRresponse[GUIMRrespptr] = 0;
-        if (GUIMRrespptr > 17) {
-            GUIMRresponse[17] = 0;
+        if (GUIMRrespptr > MODEM_RESPONSE_TRUNCATE_INDEX) {
+            TruncateModemResponse();
         }
     } else {
         if (GUIMRc >= 32) {
@@ -188,11 +185,13 @@ signed char GUIModemResponseExec(void)
         }
         return 0;
     }
-    if (strncmp(GUIMRresponse, GUIMRresp, strlen(GUIMRresp)) != 0) {
-        GUIMRrespptr = 0;
-        return 0;
-    } else {
-        return 1;
+    for (;;) {
+        if (strncmp(GUIMRresponse, GUIMRresp, strlen(GUIMRresp)) != 0) {
+            GUIMRrespptr = 0;
+            return 0;
+        } else {
+            return 1;
+        }
     }
 }
 
@@ -223,39 +222,35 @@ void write_byte(int value)
     com_snd(0, 0, 1, &value, 0);
 }
 
-// @match-note: live 95.34%. The recovered 0x1c frame overwrites idSeed with the
-// unsigned modulo remainder, and the complete handshake/retry/drain semantics,
-// 0x1bb size, and all 47 relocation offsets agree. The residual is two retail
-// packet-validation trampolines (`je; jmp`) versus our direct `jne`, balanced by
-// two continuation jumps near the epilogue, plus packet[9]/literal alias identities.
-// Combined and nested packet-length/ID tests emit the same direct branches.
 VA(0x0040cfec, 0x1bb)
 void Connect(void)
 {
     char idMessage[20];
     unsigned int idSeed = KBTickCount();
+    // The retail /Od frame retains this unused word between idMessage and idSeed.
+    int packetResult;
     idSeed %= MODEM_ID_MODULUS;
     sprintf(idstr, "%06d", idSeed);
     oldsec = -1;
     remotestage = 0;
     localstage = remotestage;
-    for (;;) {
+    do {
         if (ReadPacket()) {
             packet[packetlen] = 0;
-            if (packetlen == 10) {
-                if (strncmp(packet, "ID", 2) == 0) {
-                    if (strncmp(packet + 2, idstr, 6) == 0) {
-                        sprintf(gText,
-                                "Duplicate ID Strings!\nSorry Please Try Again\n");
-                        GOut(gText);
-                        RemoteCleanup();
-                    }
-                    strncpy(remoteidstr, packet + 2, 6);
-                    remotestage = packet[9] - '0';
-                    localstage = remotestage + 1;
-                    oldsec = -1;
-                }
+            if (packetlen != 10)
+                continue;
+            if (strncmp(packet, "ID", 2) != 0)
+                continue;
+            if (strncmp(packet + 2, idstr, 6) == 0) {
+                sprintf(gText,
+                        "Duplicate ID Strings!\nSorry Please Try Again\n");
+                GOut(gText);
+                RemoteCleanup();
             }
+            strncpy(remoteidstr, packet + 2, 6);
+            remotestage = packet[9] - '0';
+            localstage = remotestage + 1;
+            oldsec = -1;
         }
 
         stime = KBTickCount();
@@ -265,24 +260,17 @@ void Connect(void)
             WriteModemPacket(idMessage, strlen(idMessage));
         }
         PollSound();
-        if (localstage >= 1) {
-            while (ReadPacket()) {
-            }
-            return;
-        }
+    } while (localstage < MODEM_CONNECTION_READY_STAGE);
+    while (ReadPacket()) {
     }
 }
 
-// @early-stop: all non-relocation bytes in the declared 0x211-byte span agree and
-// all 49 relocation offsets are present after removing the redundant stage local and
-// overwriting idSeed with its modulo remainder. Residuals are only literal identities
-// and the packet[9] interior alias synthesized by the delinker.
 VA(0x0040d1a7, 0x211)
 int WaitForDirectConnect(void)
 {
     char idMessage[20];
     switch (WFDCStage) {
-    case 0: {
+    case MODEM_CONNECTION_INIT_STAGE: {
         unsigned int idSeed = KBTickCount();
         idSeed %= MODEM_ID_MODULUS;
         sprintf(idstr, "%06d", idSeed);
@@ -292,7 +280,7 @@ int WaitForDirectConnect(void)
         ++WFDCStage;
         break;
     }
-    case 1:
+    case MODEM_CONNECTION_HANDSHAKE_STAGE:
         if (ReadPacket()) {
             packet[packetlen] = 0;
             if (packetlen != 10)
@@ -316,10 +304,10 @@ int WaitForDirectConnect(void)
             sprintf(idMessage, "ID%s_%i", idstr, localstage);
             WriteModemPacket(idMessage, strlen(idMessage));
         }
-        if (localstage >= 1)
+        if (localstage >= MODEM_CONNECTION_READY_STAGE)
             ++WFDCStage;
         break;
-    case 2:
+    case MODEM_CONNECTION_READY_STAGE:
         if (ReadPacket() == 0)
             return 1;
         break;
@@ -327,11 +315,6 @@ int WaitForDirectConnect(void)
     return 0;
 }
 
-// @early-stop: the complete 0x4-frame escape/reset/overflow state machine and all
-// non-jump opcodes/operands agree; all 21 relocation offsets are present, with only
-// delinked inque.writePosition and literal aliases. The explicit terminator `else if`
-// leaves one extra five-byte continuation jump and makes the base span 0x12c versus
-// retail 0x127. Separate inner tests move that jump to the return arm at 96.25%.
 VA(0x0040d3b8, 0x127)
 char ReadPacket(void)
 {
@@ -341,38 +324,37 @@ char ReadPacket(void)
         inque.writePosition = 0;
         newpacket = 1;
     }
+readPacketStart:
+    if (newpacket != 0) {
+        packetlen = 0;
+        newpacket = 0;
+    }
     for (;;) {
-        if (newpacket != 0) {
-            packetlen = 0;
-            newpacket = 0;
-        }
-        for (;;) {
-            input = read_byte();
-            if (input < 0)
-                return 0;
-            if (inescape != 0) {
-                inescape = 0;
-                if (input == MODEM_PACKET_END) {
-                    newpacket = 1;
-                    return 1;
-                } else if (input == 0) {
-                    newpacket = 1;
-                    break;
-                }
-            } else {
-                if (input == MODEM_ESCAPE_BYTE) {
-                    inescape = 1;
-                    continue;
-                }
-            }
-            if (packetlen >= MODEM_PACKET_PAYLOAD_SIZE) {
+        input = read_byte();
+        if (input < 0)
+            return 0;
+        if (inescape != 0) {
+            inescape = 0;
+            if (input == MODEM_PACKET_END) {
                 newpacket = 1;
-                LogStr("OverFlow2");
-                break;
+                return 1;
+            } else if (input == 0) {
+                newpacket = 1;
+                goto readPacketStart;
             }
-            packet[packetlen] = static_cast<char>(input);
-            ++packetlen;
+        } else {
+            if (input == MODEM_ESCAPE_BYTE) {
+                inescape = 1;
+                continue;
+            }
         }
+        if (packetlen >= MODEM_PACKET_PAYLOAD_SIZE) {
+            newpacket = 1;
+            LogStr("OverFlow2");
+            goto readPacketStart;
+        }
+        packet[packetlen] = static_cast<char>(input);
+        ++packetlen;
     }
 }
 
