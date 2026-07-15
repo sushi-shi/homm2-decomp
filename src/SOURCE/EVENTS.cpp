@@ -56,13 +56,16 @@
 // four base gSpellNames relocations use 0xff778+4*(n-1), while retail uses
 // 0xff774+4*n; raw instructions prove the same effective address. First
 // non-symbol divergence is the Sphinx resource loop: retail loads giCurPlayer
-// before eventValue, while base loads eventValue first. Reversed array indexing
-// and an explicit additive assignment emitted the same base order. The repeated
-// event-flag updates now match retail load/op/store form via static_cast<int>.
-// Identifier/declaration ordering, the unused tag_message, one-case switches/
-// scopes, shared ClaimMine, resource sprintf calls, and duplicate artifact
-// CheckLevel were recovered. Source-hash max is 96.62%; live is 96.56% after
-// the later shared-header/toolchain changes. Revisit at total SOURCE 95%.
+// before eventValue, while base loads eventValue first. Reversed array indexing,
+// explicit pointer/additive forms, and inline giCurPlayer reads emitted the same
+// base order or regressed it; bounded TU-state probes did not improve the wall.
+// The repeated event-flag updates match retail load/op/store form via
+// static_cast<int>. Identifier/declaration ordering, the unused tag_message,
+// one-case switches/scopes, shared ClaimMine, resource sprintf calls, and
+// duplicate artifact CheckLevel were recovered. GetHero/GetTown now reproduce
+// the retail /Ob1 continuation jumps at +0x47bd and +0x483e. The retained
+// source-hash max is 97.9046%; revisit the Sphinx register-order wall only with
+// a new structural lead.
 VA(0x004a8530, 0x5adb)
 void advManager::DoEvent(mapCell *cell, int x, int y)
 {
@@ -1515,15 +1518,14 @@ giveArtifact:
 
     case MAP_EVENT_HERO_INTERACTION:
         DemobilizeCurrHero();
-        otherHero6 = &gpGame->m_heroRecs[cell->m_objectMetadata];
+        otherHero6 = gpGame->GetHero(cell->m_objectMetadata);
         if (otherHero6->m_owner == giCurPlayer) {
             HeroSwap(eventHero2, otherHero6);
         }
         else {
             occupiedTown4 = 0;
             if (otherHero6->m_locationType == HERO_TOWN_LOCATION) {
-                occupiedTown4 = reinterpret_cast<town *>(
-                    &gpGame->m_castleRecs[otherHero6->m_occupiedTown]);
+                occupiedTown4 = gpGame->GetTown(otherHero6->m_occupiedTown);
                 occupiedTown4->m_occupyingHeroId = otherHero6->m_id;
             }
             heroCombatResult3 = DoCombat(x, y, eventHero2, &eventHero2->m_army,
@@ -3585,8 +3587,11 @@ void advManager::FizzleCenter(int fizzleType)
 // now match retail polarity and block order. First non-table divergence is
 // +0x53c: for (metadata * 4 - 4) * 125 retail emits lea [4*eax-4] then
 // three multiply-by-five LEAs, while base emits shl eax,2, folds -20 into the
-// first LEA, then emits two more LEAs. Writing 4 * metadata compiled identically.
-// Live fuzzy is 97.64%; revisit at total SOURCE 95% for compiler-shape work.
+// first LEA, then emits two more LEAs. Commuted/parenthesized AST spellings and
+// 30 bounded TU-state probes did not fix it. A 137-site member-access sweep only
+// improved the score by changing the proven frame to 0x154 and was rejected.
+// GetHero/GetTown now reproduce the retail /Ob1 continuation jumps at +0x1b26
+// and +0x1bb1. Revisit the multiply shape only with a new structural lead.
 VA(0x004b1e43, 0x2a40)
 void advManager::DoAIEvent(mapCell *cell, hero *eventHero, int x, int y)
 {
@@ -4287,7 +4292,7 @@ artifactPickup:
         break;
 
     case MAP_EVENT_HERO_INTERACTION:
-        otherHero_e = &gpGame->m_heroRecs[cell->m_objectMetadata];
+        otherHero_e = gpGame->GetHero(cell->m_objectMetadata);
         savedShowIt_e = bShowIt;
         if (otherHero_e->m_owner == giCurPlayer) {
             gpPhilAI->HeroInteractionAtHero(eventHero, otherHero_e, 0,
@@ -4295,8 +4300,7 @@ artifactPickup:
             return;
         }
         if (otherHero_e->m_locationType == AI_EVENT_HERO_TOWN_LOCATION)
-            occupiedTown_b = reinterpret_cast<town *>(
-                &gpGame->m_castleRecs[otherHero_e->m_occupiedTown]);
+            occupiedTown_b = gpGame->GetTown(otherHero_e->m_occupiedTown);
 
         if (gbHumanPlayer[otherHero_e->m_owner] == 0) {
             combatResult_d = gpPhilAI->QuickCombat(
