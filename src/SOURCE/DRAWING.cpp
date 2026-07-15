@@ -58,6 +58,12 @@ void combatManager::CheckUpdateCombatMessages(void)
         CombatMessage("", 1, 0, 1);
 }
 
+// @match-note
+// Complete semantics and CFG; frame matches retail at 0x1bc and all 38 relocations
+// align.  After three literal identities, the first code difference is instruction
+// 121: ours loads message and emits cmp [newlinePtr],eax/jbe, while retail loads
+// newlinePtr and emits cmp [message],eax/jae.  Spelling the test as message <
+// newlinePtr produced the same code.  Revisit operand steering in the >=95% phase.
 VA(0x00402a88, 0x3f8)
 void combatManager::CombatMessage(char *message, int updateScreen, int retainPrevious,
                                   int clear)
@@ -147,9 +153,13 @@ void combatManager::CombatMessage(char *message, int updateScreen, int retainPre
     gbLimitToExtent = savedLimitToExtent;
 }
 
-// @early-stop
-// reloc-masked: all 0x3fe bytes match after masking 58 aligned COFF relocations,
-// including the jump table. String slots and local case labels delink under different names.
+// @match-note
+// Complete semantics, case order, CFG, and 0x18 frame; all 58 relocations align.
+// This source hash was previously raw-byte exact, but correcting tag_monsterInfo's
+// overlapping flag view changed MSVC's cumulative TU state.  The first current
+// divergence is instruction 15 in the army address calculation, followed by a
+// differently delinked jump-table layout.  Revisit compiler steering in the >=95%
+// phase or after later shared-header changes; do not restore the invalid flag alias.
 VA(0x00402e80, 0x3fe)
 void combatManager::CombatMessage(int messageType)
 {
@@ -434,9 +444,11 @@ CopyGridState:
     return retval;
 }
 
-// @early-stop
-// Reloc-masked instructions are byte-exact; only the three string-literal
-// relocation symbol identities differ.
+// @match-note
+// Complete semantics and CFG; all 42 relocations align and the normalized
+// instruction stream differs only in three string-literal identities.  Retail's
+// frame is 0x10 while ours is 0x08, so the prior raw-byte proof was invalid despite
+// the 99.87% score.  Revisit the two missing stack words in the >=95% phase.
 VA(0x00403c1c, 0x364)
 void combatManager::DrawBackground(void)
 {
@@ -610,6 +622,14 @@ void combatManager::UpdateMouseGrid(int hexIndex, int forceUpdate)
     m_mouseGridHex = hexIndex;
 }
 
+// @match-note
+// Complete draw order, castle switch/CFG, stack-resident wall tables, and 164/164
+// relocations.  Retail's frame is 0xdc (this at -0xc8), ours is 0xc8 (this at
+// -0xb4); retail has five unreferenced four-byte holes among the early locals.
+// The first non-identity divergence is instruction 205 in the captain-coordinate
+// bit expression and later CFG shape.  Ordinary ternaries regressed the prefix;
+// the retail-supported reuse of side for the occupant phase is retained.  Revisit
+// slot/compiler steering in the >=95% phase or after cumulative layout changes.
 VA(0x004045cc, 0x173f)
 void combatManager::DrawFrame(int updateScreen, int computeExtent, int redrawExtent,
                               int extentOnly, int delay, int drawBackground,
@@ -625,7 +645,6 @@ void combatManager::DrawFrame(int updateScreen, int computeExtent, int redrawExt
     int firstColumn;
     int endColumn;
     int columnStep;
-    int phase;
     int skipSpecialOccupants;
     int hexIndex;
     int wallFrame;
@@ -822,8 +841,8 @@ void combatManager::DrawFrame(int updateScreen, int computeExtent, int redrawExt
         for (column = firstColumn; column != endColumn; column += columnStep)
             m_hexCells[row * COMBAT_GRID_ROW_LENGTH + column].DrawUpperDeadOccupant();
 
-        for (phase = 0; phase < COMBAT_DRAW_PHASE_COUNT; phase++) {
-            if (phase == 1) {
+        for (side = 0; side < COMBAT_DRAW_PHASE_COUNT; side++) {
+            if (side == 1) {
                 for (column = firstColumn; column != endColumn; column += columnStep) {
                     if (m_hexCells[row * COMBAT_GRID_ROW_LENGTH + column]
                             .m_obstacleIndex != -1) {
@@ -844,7 +863,7 @@ void combatManager::DrawFrame(int updateScreen, int computeExtent, int redrawExt
                 };
                 unsigned char wallFrameOffsets[7] = { 0, 4, 8, 23, 27, 35, 31 };
 
-                if (m_inCastleCombat != 0 && phase == 0) {
+                if (m_inCastleCombat != 0 && side == 0) {
                     hexIndex = row * COMBAT_GRID_ROW_LENGTH + column;
                     wallFrame = 0;
                     wallX = 0;
@@ -912,7 +931,7 @@ void combatManager::DrawFrame(int updateScreen, int computeExtent, int redrawExt
                      row * COMBAT_GRID_ROW_LENGTH + column !=
                          COMBAT_CASTLE_SPECIAL_HEX_SECOND)) {
                     m_hexCells[row * COMBAT_GRID_ROW_LENGTH + column]
-                        .DrawOccupant(phase, 0);
+                        .DrawOccupant(side, 0);
                 }
             }
         }
@@ -1017,6 +1036,13 @@ finish:
     PollSound();
 }
 
+// @match-note
+// Complete semantics and CFG; all 100 relocations align.  Retail's frame is 0x7c
+// and ours is 0x74, with the same stack table base.  Differences through instruction
+// 777 are delinked gConfig/string identities; the first code residual is the
+// loop-exit condition-code residual at instruction 778 (ours jle, retail jge), after
+// which the instruction streams realign.  Revisit slot/condition steering in the
+// >=95% phase or after cumulative layout changes.
 VA(0x00405d0b, 0xb99)
 void combatManager::DrawSmallView(int viewIndex, int updateScreen)
 {

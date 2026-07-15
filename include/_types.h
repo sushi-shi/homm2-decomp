@@ -160,27 +160,17 @@ struct tag_monsterInfo {
     signed char damageMin;
     signed char damageMax;
     signed char shots;
+    char spriteName[MONSTER_SPRITE_NAME_SIZE];
     union {
-        struct {
-            char spriteName[MONSTER_SPRITE_NAME_SIZE];
-            int attributes;
-        };
-        struct {
-            char spriteNamePrefix[3];
-            union {
-                int all;
-                struct {
-                    char spriteNameSuffix;
-                    char spriteNameTerminator;
-                    signed char abilities;
-                    signed char attributes;
-                } bytes;
-                struct {
-                    char abilityFlagsPadding[2];
-                    int abilityFlags;
-                };
-            } flags;
-        };
+        int attributes;
+        union {
+            int all;
+            int abilityFlags;
+            struct {
+                signed char abilities;
+                signed char attributes;
+            } bytes;
+        } flags;
     };
 };
 #pragma pack(pop)
