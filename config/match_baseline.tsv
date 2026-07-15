@@ -164,7 +164,7 @@ BASE/INPUTMGR	?Close@inputManager@@UAEXXZ	100.0000	8f852ea0c1cf
 BASE/INPUTMGR	?Flush@inputManager@@QAEXXZ	100.0000	712b56c709ae
 BASE/INPUTMGR	?ForceMouseMove@inputManager@@QAEXXZ	97.4265	1c7431790894
 BASE/INPUTMGR	?GetEvent@inputManager@@QAE?AUtag_message@@XZ	100.0000	bb3319bc2535
-BASE/INPUTMGR	?KeyboardMessageHandler@@YIHPAXIIJ@Z	99.7166	aa87057bf491
+BASE/INPUTMGR	?KeyboardMessageHandler@@YIHPAXIIJ@Z	99.7166	f1ca62341980
 BASE/INPUTMGR	?Main@inputManager@@UAEHAAUtag_message@@@Z	100.0000	67af33cf7aae
 BASE/INPUTMGR	?MakeScanCodeTable@inputManager@@QAEXXZ	100.0000	3fa11559c6ac
 BASE/INPUTMGR	?MouseMessageHandler@@YIHPAXIIJ@Z	99.8305	5e43b5d37d41
@@ -251,7 +251,7 @@ BASE/PALETTE	??0palette@@QAE@K@Z	100.0000	f0d6149bb5b6
 BASE/PALETTE	??0palette@@QAE@XZ	100.0000	d0c9a7c66b13
 BASE/PALETTE	??1palette@@UAE@XZ	100.0000	66d4267d6fbc
 BASE/PALETTE	?Data@palette@@QAEPACXZ	100.0000	3bb1f3ed4160
-BASE/RESMGR	??0resourceManager@@QAE@XZ	99.9836	c7eab18da4c0
+BASE/RESMGR	??0resourceManager@@QAE@XZ	100.0000	5923f59e9ffe
 BASE/RESMGR	?AddResource@resourceManager@@QAEXPAVresource@@@Z	100.0000	0a30f09b41ba
 BASE/RESMGR	?Close@resourceManager@@UAEXXZ	100.0000	2a455fc48114
 BASE/RESMGR	?Dispose@resourceManager@@QAEXPAVresource@@@Z	100.0000	786c365d3830
@@ -314,7 +314,7 @@ BASE/WIDGET	??1widget@@UAE@XZ	100.0000	7e399133b272
 BASE/WIDGET	?Dim@widget@@QAEXXZ	100.0000	fa97c398f829
 BASE/WIDGET	?Main@widget@@UAEHAAUtag_message@@@Z	99.8500	6dc942264a97
 BASE/WIDGET	?Open@widget@@QAEHHPAVheroWindow@@@Z	100.0000	8a20fb239b00
-BASE/WINDOW	??0heroWindow@@QAE@HHHHH@Z	100.0000	0261e2bcc000
+BASE/WINDOW	??0heroWindow@@QAE@HHHHH@Z	100.0000	04be0846daba
 BASE/WINDOW	??0heroWindow@@QAE@HHPAD@Z	99.9167	a289f28315cb
 BASE/WINDOW	??0heroWindow@@QAE@XZ	100.0000	926d19bc2059
 BASE/WINDOW	?AddWidget@heroWindow@@QAEXPAVwidget@@H@Z	100.0000	cd3f531425a3
@@ -353,7 +353,7 @@ BASE/bmap2	?FillBitmapArea@@YIXPAVbitmap@@HHHHH@Z	100.0000	ef63f1dc9eb1
 BASE/bmap2	?FillBitmapAreaClip@@YIXPAVbitmap@@HHHHHHHHH@Z	98.4444	bbc24c228322
 BASE/droplist	??0dropListWidget@@QAE@XZ	100.0000	36ab848d613b
 BASE/droplist	??1dropListWidget@@UAE@XZ	100.0000	29c47fbb75ad
-BASE/droplist	?DeleteItem@dropListWidget@@QAEXH@Z	100.0000	39312fef206c
+BASE/droplist	?DeleteItem@dropListWidget@@QAEXH@Z	100.0000	a7fc3e1c0d01
 BASE/droplist	?Draw@dropListWidget@@UAEXXZ	100.0000	a9f68c5f29e3
 BASE/droplist	?DrawDropStuff@dropListWidget@@QAEXXZ	100.0000	02e6e36033be
 BASE/droplist	?Main@dropListWidget@@UAEHAAUtag_message@@@Z	99.8745	7dd105ecc0d9
@@ -405,7 +405,7 @@ BASE/soundmgr	?SetMusicQuality@soundManager@@QAEXH@Z	100.0000	26298faf14d2
 BASE/soundmgr	?SetReady2Poll@@YGXK@Z	100.0000	5940fda1fb2f
 BASE/soundmgr	?StartSample@soundManager@@QAEPAU_SAMPLE@@PADPAPADFFHHJ@Z	100.0000	0b90298d2458
 BASE/soundmgr	?StopAllSamples@soundManager@@QAEXH@Z	100.0000	61f17a244c67
-BASE/soundmgr	?StopSample@soundManager@@QAEXPAU_SAMPLE@@@Z	100.0000	715dc6661e2a
+BASE/soundmgr	?StopSample@soundManager@@QAEXPAU_SAMPLE@@@Z	100.0000	185a1c8b6422
 BASE/soundmgr	?SwitchAmbientMusic@soundManager@@QAEXH@Z	100.0000	1ad35860a06f
 BASE/soundmgr	?UpdateTimers@@YGXK@Z	100.0000	ad5307a49083
 BASE/soundmgr	?ValidatePreviousPosition@soundManager@@QAEXH@Z	100.0000	46a6fb8adada
