@@ -55,13 +55,21 @@ inline bitmap::~bitmap() {
     m_pixels = 0;
 }
 
+// @match-note
+// /O2 residual begins at +0x0: retail starts `sub esp,8`; ours first loads x into DX. Both are
+// 0xff bytes with the same frame, destinationY stack slot, CFG, and relocation sites/identities
+// (gpWindowManager +0x14/+0x4e/+0xad, PollSound +0x48/+0x6d, BlitBitmap +0x68/+0xf1).
+// Width/height/x/y declaration orders and an explicit screen-buffer local were tried after
+// replacing the old volatile array with the scalar evidenced by the single retail stack slot.
+// Revisit during the TU-state/last-mile pass after earlier BITMAP source shapes settle.
 VA(0x004d0160, 0xff)
 void bitmap::DrawToBufferCareful(short int x, short int y)
 {
-    int destinationX;
-    volatile int destinationY[2];
     int width;
+    int destinationY;
     int height;
+    int destinationX;
+    bitmap *screen;
 
     if (x >= 0 && x + m_width <= gpWindowManager->m_screen->m_width && y >= 0 &&
         y + m_height <= gpWindowManager->m_screen->m_height) {
@@ -77,17 +85,17 @@ void bitmap::DrawToBufferCareful(short int x, short int y)
         }
         if (y < 0) {
             height += y;
-            destinationY[0] = 0;
+            destinationY = 0;
         } else {
-            destinationY[0] = y;
+            destinationY = y;
         }
-        if (destinationX + width > gpWindowManager->m_screen->m_width)
-            width = gpWindowManager->m_screen->m_width - destinationX;
-        if (destinationY[0] + height > gpWindowManager->m_screen->m_height)
-            height = gpWindowManager->m_screen->m_height - destinationY[0];
+        screen = gpWindowManager->m_screen;
+        if (destinationX + width > screen->m_width)
+            width = screen->m_width - destinationX;
+        if (destinationY + height > screen->m_height)
+            height = screen->m_height - destinationY;
         if (width >= 0 && height >= 0)
-            BlitBitmap(this, 0, 0, width, height, gpWindowManager->m_screen, destinationX,
-                       destinationY[0]);
+            BlitBitmap(this, 0, 0, width, height, screen, destinationX, destinationY);
     }
 }
 
