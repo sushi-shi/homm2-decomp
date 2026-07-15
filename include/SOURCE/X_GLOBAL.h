@@ -166,7 +166,8 @@ typedef enum KbGameTableConstant {
     KB_CASTLE_TOWER_COUNT = 4,
     KB_CASTLE_DOOR_POSITION_COUNT = 2,
     KB_COMBAT_COORDINATE_COUNT = 2,
-    KB_MOAT_CELL_COUNT = 9
+    KB_MOAT_CELL_COUNT = 9,
+    KB_ALIGNMENT_NAME_COUNT = HERO_CLASS_COUNT + 2
 } KbGameTableConstant;
 
 extern unsigned char giGroundShape[GROUND_TILE_IMAGE_COUNT];
@@ -305,15 +306,15 @@ extern int giWalkingTo2;
 extern int giWalkingYMod;
 extern unsigned char moatCell[KB_MOAT_CELL_COUNT];
 extern char *congratsText;
-extern char *gArtifactNames[104];
-extern char *gArtifactDesc[104];
-extern char *gArtifactEvent[104];
-extern char *gStatNames[4];
-extern char *gStatDesc[4];
-extern char *gAlignmentNames[8];
-extern char *gArmyShortNames[66];
-extern char *gTerrainNames[10];
-extern char *gResourceNames[8];
+extern char *gArtifactNames[KB_ARTIFACT_LEVEL_COUNT];
+extern char *gArtifactDesc[KB_ARTIFACT_LEVEL_COUNT];
+extern char *gArtifactEvent[KB_ARTIFACT_LEVEL_COUNT];
+extern char *gStatNames[HERO_PRIMARY_STAT_COUNT];
+extern char *gStatDesc[HERO_PRIMARY_STAT_COUNT];
+extern char *gAlignmentNames[KB_ALIGNMENT_NAME_COUNT];
+extern char *gArmyShortNames[MONSTER_DATABASE_COUNT];
+extern char *gTerrainNames[KB_TERRAIN_TYPE_COUNT];
+extern char *gResourceNames[RESOURCE_VALUE_COUNT];
 extern char *gQuickViewText[124];
 extern char *gEventText[96];
 extern char *gCPanelHelp[6];

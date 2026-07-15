@@ -155,3 +155,14 @@ name	unit	size	retail_sha256	highlow_count	audit
 ?sElevationOverlay@@3PAUSElevationOverlay@@A	SOURCE/KB	0x1a9	327645aa7ea69583dc6058f3144ad767b50c0944ec80fb4f770396c137464d05	0	bytes
 ?captainStats@@3PAY03CA	SOURCE/KB	0x18	15b2929bfa7df32c2cd630cf2e7e38683f72ea3ed5bbe1567f164e64d55799ef	0	bytes
 ?moatCell@@3PAEA	SOURCE/KB	0x9	40cffe8c0604ff6ba00e5a63286269fa9521747c561cb729d76bf9a31955843d	0	bytes
+?gArtifactNames@@3PAPADA	SOURCE/KB	0x1a0	485e7132ead36da3abae6bdf1a606d7f736e1a9099059f9268cf8fb7a79374f0	103	cstring-pointer-table
+?gArtifactDesc@@3PAPADA	SOURCE/KB	0x1a0	2e9b8185c098345fa4f14b25b265da935233ba58725d80369573619efc23856f	103	cstring-pointer-table
+?gArtifactEvent@@3PAPADA	SOURCE/KB	0x1a0	03678f71ea099ea33ea692a49c15ed6307df7cd9d400cab5c49005c479e22403	103	cstring-pointer-table
+?gStatNames@@3PAPADA	SOURCE/KB	0x10	b0d8c758b0bc98ae0ce961ee69830634859da97511ba101e4798e626b912eb22	4	cstring-pointer-table
+?gStatDesc@@3PAPADA	SOURCE/KB	0x10	4cd209e91288e926e79e0f5a8a3aaedf673e628a9c66d9e7c5258cc0260bf2c1	4	cstring-pointer-table
+?gAlignmentNames@@3PAPADA	SOURCE/KB	0x20	7c1d17f912b965abd025aade3f83f9e527b8a55c5e8c0ffb09e59d29b71614f3	8	cstring-pointer-table
+?gArmyShortNames@@3PAPADA	SOURCE/KB	0x108	a431354e8e638942f09da153171a392e1fc3b9cfed10833a6ce4c83e934c7eef	66	cstring-pointer-table
+?gArmyNames@@3PAPADA	SOURCE/KB	0x108	0b877c7267b5b4e771b78c99b04a5517f4d79bc5b0288bc395e9c515f6830cf8	66	cstring-pointer-table
+?gArmyNamesPlural@@3PAPADA	SOURCE/KB	0x108	7e5899a66c134050954c776a080ae4516e0ea154bef001ae54129d8eeba6628a	66	cstring-pointer-table
+?gTerrainNames@@3PAPADA	SOURCE/KB	0x28	c29f30e08e522d7a91888c8954830360ba4972dc99fa8aea0945b4e2c9482740	9	cstring-pointer-table
+?gResourceNames@@3PAPADA	SOURCE/KB	0x20	2f8af5d2748b8c694fcc827e0575ebb694a6dd1d5d92a492b7e17001b154a2e8	7	cstring-pointer-table
