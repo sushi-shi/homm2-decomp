@@ -16,6 +16,7 @@
 #include <BASE/font.h>
 #include <BASE/textEntryWidget.h>
 #include <BASE/Misc.h>
+#include <BASE/MiscConstants.h>
 #undef HOMM2_MISC_INLINE_ICONENTRY
 #include <BASE/miscwin.h>        // this TU's own free functions + indexArray/IconEntry
 #include <SOURCE/KB.h>        // EventWindowHandler, FileError, ShutDown
@@ -1159,27 +1160,28 @@ int IsCycleColor(int color)
 }
 
 // @match-note
-// Structurally complete /O2 checkpoint: the 0x8c frame and all 14
-// relocations and every open/write/alloc/free/close target agree. Divergences are
-// confined to the RLE loop (base +0x67..+0xe0 / retail +0x67..+0xdf), where EBX
-// and EDI swap encoded-size/run-end roles, and palette scaling +0x19a..+0x1ae,
-// where equivalent indexed operands are commuted. `<2`, `==1`, and `<=1` run
-// tests, reordered locals, predicate polarity and commuted SIB forms were tried.
+// Structurally complete /O2 checkpoint: the 0x8c frame, all 14 ordered relocations,
+// and every open/write/alloc/free/close target agree. The PCX header, RLE and VGA
+// palette constants are now named in the private header. Differences are confined
+// to the RLE loop (base +0x67..+0xe0 / retail +0x67..+0xdf), where EBX and EDI swap
+// encoded-size/run-end roles. `<2`, `==1`, and `<=1` run tests, reordered locals,
+// predicate polarity and commuted SIB forms were tried. A bounded libclang AST pass
+// found 20 single variants and retained none after 30 walks.
 VA(0x004c66d0, 0x1ee)
 void CreatePCXFile(char *filename, unsigned char *pixels, int width, int height,
                    unsigned char *paletteData)
 {
     PCXHeader header;
     memset(&header, 0, sizeof(header));
-    header.manufacturer = 10;
-    header.version = 5;
-    header.encoding = 1;
-    header.bitsPerPixel = 8;
+    header.manufacturer = PCX_MANUFACTURER_ZSOFT;
+    header.version = PCX_VERSION_3_0;
+    header.encoding = PCX_ENCODING_RLE;
+    header.bitsPerPixel = PCX_BITS_PER_PIXEL;
     header.xMax = static_cast<unsigned short>(width - 1);
     header.yMax = static_cast<unsigned short>(height - 1);
-    header.planes = 1;
+    header.planes = PCX_PLANE_COUNT;
     header.bytesPerLine = static_cast<unsigned short>(width);
-    header.paletteType = 1;
+    header.paletteType = PCX_PALETTE_TYPE_COLOR;
     int file = _open(filename, 0x8301, 0x80);
     if (file == -1)
         return;
@@ -1192,14 +1194,16 @@ void CreatePCXFile(char *filename, unsigned char *pixels, int width, int height,
         while (sourceIndex < width) {
             unsigned char value = pixels[sourceIndex];
             int runEnd = sourceIndex;
-            while (runEnd < width && pixels[runEnd] == value && runEnd - sourceIndex + 1 < 0x40)
+            while (runEnd < width && pixels[runEnd] == value &&
+                   runEnd - sourceIndex + 1 < PCX_RLE_RUN_LIMIT)
                 ++runEnd;
             int runLength = runEnd - sourceIndex;
-            if (runLength <= 1 && (value & 0xc0) != 0xc0) {
+            if (runLength <= 1 && (value & PCX_RLE_RUN_MARKER) != PCX_RLE_RUN_MARKER) {
                 encoded[encodedSize++] = value;
                 ++sourceIndex;
             } else {
-                encoded[encodedSize++] = static_cast<unsigned char>(runLength | 0xc0);
+                encoded[encodedSize++] =
+                    static_cast<unsigned char>(runLength | PCX_RLE_RUN_MARKER);
                 encoded[encodedSize++] = value;
                 sourceIndex += runLength;
             }
@@ -1208,13 +1212,13 @@ void CreatePCXFile(char *filename, unsigned char *pixels, int width, int height,
         pixels += width;
     }
     H2_FREE(encoded, "I:\\Projects\\Heroes\\Prog\\BASE\\Misc.cpp", 0x5f0);
-    unsigned char paletteMarker = 0x0c;
+    unsigned char paletteMarker = PCX_VGA_PALETTE_MARKER;
     _write(file, &paletteMarker, 1);
     unsigned char *outputPalette = static_cast<unsigned char *>(
-        H2_ALLOC(0x300, "I:\\Projects\\Heroes\\Prog\\BASE\\Misc.cpp", 0x5f6));
-    for (int i = 0; i < 0x300; ++i)
-        outputPalette[i] = paletteData[i] << 2;
-    _write(file, outputPalette, 0x300);
+        H2_ALLOC(PCX_PALETTE_BYTE_COUNT, "I:\\Projects\\Heroes\\Prog\\BASE\\Misc.cpp", 0x5f6));
+    for (int i = 0; i < PCX_PALETTE_BYTE_COUNT; ++i)
+        outputPalette[i] = paletteData[i] << PCX_COMPONENT_SCALE_SHIFT;
+    _write(file, outputPalette, PCX_PALETTE_BYTE_COUNT);
     H2_FREE(outputPalette, "I:\\Projects\\Heroes\\Prog\\BASE\\Misc.cpp", 0x5fb);
     _close(file);
 }
@@ -1240,14 +1244,16 @@ struct IconEntry * GetIconEntry(class icon *iconPtr, int index)
     return &entries[index];
 }
 
+#include <BASE/MiscRuntimeConstants.h>
+
 // @match-note
-// Structurally complete /O2 checkpoint: all three relocations and the complete seeded
-// random CFG agree.  The current prefix matches through +0x43; base then uses EAX for
-// the feedback term and stores iLastSeed before range division, while retail uses ECX,
-// folds the range LEA first, and publishes the seed after division.  Direct term locals,
-// folded arithmetic, explicit bit-loop forms, and a volatile seed store were checked.
-// The broad score movement followed a required header-state change; do not retune it
-// until the shared/TU declaration state is stable.
+// Structurally complete /O2 checkpoint: base and retail are both 0xb8 with the same
+// seeded-random CFG and all 3 ordered relocations. Moving the result lifetime before
+// the mix recovered every instruction through the bit loop at +0x9c and raised live
+// match from 67.80% to 91.87%. Base then folds and publishes nextSeed before the range
+// division; retail incrementally forms it in EDI and stores it after idiv. Direct term
+// locals, folded/incremental seed arithmetic, explicit bit-loop forms and a volatile
+// seed store were checked; revisit after a new predecessor/header TU state.
 VA(0x004c6930, 0xb8)
 int SRandom(int low, int high)
 {
@@ -1258,41 +1264,45 @@ int SRandom(int low, int high)
         return low;
     }
 
-    int high_term = (high * 13) & 0xff;
-    int low_term = (low * 13) & 0xff;
-    iLastSeed += high_term << 5;
-    iLastSeed += low_term * 13233;
+    int high_term = (high * SEEDED_RANDOM_TERM_MULTIPLIER) & SEEDED_RANDOM_TERM_MASK;
+    int low_term = (low * SEEDED_RANDOM_TERM_MULTIPLIER) & SEEDED_RANDOM_TERM_MASK;
+    iLastSeed += high_term << SEEDED_RANDOM_HIGH_TERM_SHIFT;
+    iLastSeed += low_term * SEEDED_RANDOM_LOW_TERM_MULTIPLIER;
     iLastSeed += high_term;
-    iLastSeed += (iLastSeed & 0x3f) << 8;
-    iLastSeed &= 0xfff;
+    iLastSeed += (iLastSeed & SEEDED_RANDOM_FEEDBACK_MASK) << SEEDED_RANDOM_FEEDBACK_SHIFT;
+    iLastSeed &= SEEDED_RANDOM_SEED_MASK;
 
-    int mix = iLastSeed * 7;
-    mix += (mix & 0xff0) >> 4;
     int result = 0;
-    for (int i = 31; i >= 0; --i) {
+    int mix = iLastSeed * SEEDED_RANDOM_MIX_MULTIPLIER;
+    mix += (mix & SEEDED_RANDOM_MIX_MASK) >> SEEDED_RANDOM_MIX_SHIFT;
+    for (int i = SEEDED_RANDOM_TOP_BIT; i >= 0; --i) {
         if (mix & (1 << i)) {
             result |= 1 << i;
         }
     }
-    iLastSeed = mix + low + high * 8;
-    return low + result % (high - low + 1);
+    int nextSeed = mix + low;
+    nextSeed += high * 8;
+    int rangedResult = low + result % (high - low + 1);
+    iLastSeed = nextSeed;
+    return rangedResult;
 }
 
 // @match-note
-// Structurally complete /O2 checkpoint: base is 0x57 bytes, retail 0x5c and both
-// relocations agree. The complete +0x00..return span differs only in allocation:
-// base preserves EDI and uses EDX/ESI for terms; retail preserves EBP and uses
-// ESI/EDX. Split term locals and folded multiply/add expressions were checked;
-// the generated seed arithmetic and final store remain instruction-equivalent.
+// Structurally complete /O2 checkpoint: base is 0x58 bytes, retail 0x5c and both
+// ordered relocations agree. The complete span differs only in allocation/scheduling:
+// base preserves EDI, loads the seed early and uses EDX/ESI for terms; retail preserves
+// EBP, derives x then y into ESI/EDX, and holds the seed in ECX. Split term locals,
+// in-place y, a local seed and folded multiply/add expressions were checked; the named
+// algorithm constants, state arithmetic and final store remain instruction-equivalent.
 VA(0x004c69f0, 0x5c)
 void SIncRandomize(int x, int y)
 {
-    int x_term = (x * 13) & 0xff;
-    int y_term = (y * 13) & 0xff;
-    iLastSeed += y_term << 5;
-    iLastSeed += x_term * 13233;
+    int x_term = (x * SEEDED_RANDOM_TERM_MULTIPLIER) & SEEDED_RANDOM_TERM_MASK;
+    int y_term = (y * SEEDED_RANDOM_TERM_MULTIPLIER) & SEEDED_RANDOM_TERM_MASK;
+    iLastSeed += y_term << SEEDED_RANDOM_HIGH_TERM_SHIFT;
+    iLastSeed += x_term * SEEDED_RANDOM_LOW_TERM_MULTIPLIER;
     iLastSeed += y_term;
-    iLastSeed += (iLastSeed & 0x3f) << 8;
+    iLastSeed += (iLastSeed & SEEDED_RANDOM_FEEDBACK_MASK) << SEEDED_RANDOM_FEEDBACK_SHIFT;
 }
 
 VA(0x004c6a50, 0x10)
@@ -1313,10 +1323,10 @@ VA(0x004c6a60, 0x48)
 int SGenRand(void)
 {
     int result = 0;
-    iLastSeed &= 0xfff;
-    int mix = iLastSeed * 7;
-    mix += (mix & 0xff0) >> 4;
-    int i = 31;
+    iLastSeed &= SEEDED_RANDOM_SEED_MASK;
+    int mix = iLastSeed * SEEDED_RANDOM_MIX_MULTIPLIER;
+    mix += (mix & SEEDED_RANDOM_MIX_MASK) >> SEEDED_RANDOM_MIX_SHIFT;
+    int i = SEEDED_RANDOM_TOP_BIT;
     do {
         if (mix & (1 << i)) {
             result |= 1 << i;
@@ -1339,7 +1349,8 @@ int MemSize(int)
 // only 12 unmasked bytes: one `mov ecx,0x2d` schedule at +0xbc and swapped LEAs for
 // entryText/message near +0x141, plus three delinked empty-string owner names.
 // Boolean-mask/branched Y forms, direct/local empty strings and declaration order
-// were tried. Resume with exact-preserving predecessor/TU state, then AST last mile.
+// were tried. A bounded libclang AST pass found 25 single variants and retained none
+// after 30 walks; revisit only after exact-preserving predecessor/TU state changes.
 VA(0x004c6ac0, 0x386)
 void GetDataEntry(char *prompt, char *destination, int maximumLength, char *initialText,
                   int showCancel, int useImmediateHandler)
@@ -1369,9 +1380,9 @@ void GetDataEntry(char *prompt, char *destination, int maximumLength, char *init
         MemError();
 
     tag_message message;
-    message.type = 0x200;
-    message.payload.widget.command = 3;
-    message.payload.widget.id = 1;
+    message.type = MESSAGE_WIDGET;
+    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
+    message.payload.widget.id = DATA_ENTRY_PROMPT_WIDGET;
     message.payload.widget.data.text = prompt;
     DataEntryWin->BroadcastMessage(message);
 
@@ -1379,26 +1390,26 @@ void GetDataEntry(char *prompt, char *destination, int maximumLength, char *init
     if (initialText == 0)
         initialText = "";
     strcpy(entryText, initialText);
-    message.payload.widget.id = 10;
+    message.payload.widget.id = DATA_ENTRY_TEXT_WIDGET;
     message.payload.widget.data.text = entryText;
     DataEntryWin->BroadcastMessage(message);
     strcpy(destination, entryText);
 
-    message.type = 0x200;
-    message.payload.widget.command = 6;
-    message.payload.widget.id = 0x7801;
-    message.payload.widget.data.text = reinterpret_cast<char *>(6);
+    message.type = MESSAGE_WIDGET;
+    message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
+    message.payload.widget.id = DATA_ENTRY_BUTTON_ONE;
+    message.payload.widget.data.value = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW;
     DataEntryWin->BroadcastMessage(message);
-    message.payload.widget.id = 0x7807;
+    message.payload.widget.id = DATA_ENTRY_BUTTON_SEVEN;
     DataEntryWin->BroadcastMessage(message);
-    message.payload.widget.id = 0x7808;
+    message.payload.widget.id = DATA_ENTRY_BUTTON_EIGHT;
     DataEntryWin->BroadcastMessage(message);
-    message.payload.widget.id = 0x7805;
+    message.payload.widget.id = DATA_ENTRY_BUTTON_FIVE;
     DataEntryWin->BroadcastMessage(message);
-    message.payload.widget.id = 0x7806;
+    message.payload.widget.id = DATA_ENTRY_BUTTON_SIX;
     DataEntryWin->BroadcastMessage(message);
     if (showCancel == 0) {
-        message.payload.widget.id = 0x7802;
+        message.payload.widget.id = DATA_ENTRY_CANCEL_BUTTON;
         DataEntryWin->BroadcastMessage(message);
     }
 
@@ -1412,10 +1423,10 @@ void GetDataEntry(char *prompt, char *destination, int maximumLength, char *init
     DataEntryWin->AddWidget(entry, -1);
 
     if (useImmediateHandler != 0) {
-        bDataEntryTime = 0;
+        bDataEntryTime = DATA_ENTRY_PHASE_IMMEDIATE;
         gbAllowTextEntryEscape = 0;
     } else
-        bDataEntryTime = 2;
+        bDataEntryTime = DATA_ENTRY_PHASE_READY;
     gpWindowManager->DoDialog(DataEntryWin, DataEntryWindowHandler, 0);
     delete DataEntryWin;
     gpMouseManager->SetPointer("", savedCursorFrame, savedCursorType);
@@ -1427,61 +1438,63 @@ void GetDataEntry(char *prompt, char *destination, int maximumLength, char *init
 // broadcast/copy/draw/dialog-result path agree. Moving the possible-cancel tail
 // before the normal fallback recovered retail body order and shortened base to
 // 0x16f versus retail's 0x173. The remaining difference is widget id 0x7802 being
-// hoisted into the initial command dispatch instead of emitted in the tail. Direct
-// returns regressed badly; a volatile tail read emitted no change and was removed.
+// hoisted into the initial command dispatch instead of emitted in the tail. Message,
+// widget command/id and phase constants now use their proven enums, and the flag mask
+// uses the integer widget-data view rather than a fake text pointer. Direct returns
+// regressed badly; a volatile tail read emitted no change and was removed.
 VA(0x004c6e50, 0x173)
 int DataEntryWindowHandler(struct tag_message &message)
 {
-    if (bDataEntryTime == 0) {
+    if (bDataEntryTime == DATA_ENTRY_PHASE_IMMEDIATE) {
         ++bDataEntryTime;
-        message.type = 8;
+        message.type = MESSAGE_LEFT_BUTTON_DOWN;
         message.payload.mouse.x = inBoxX;
         message.payload.mouse.y = inBoxY;
         DataEntryWin->BroadcastMessage(message);
-        return 1;
+        return EVENT_WINDOW_CONTINUE;
     }
 
-    if (bDataEntryTime == 1)
+    if (bDataEntryTime == DATA_ENTRY_PHASE_POINTER_SENT)
         ++bDataEntryTime;
     else {
-        if (message.type != 0x200)
+        if (message.type != MESSAGE_WIDGET)
             goto normalEvent;
-        if (message.payload.widget.command != 0xc) {
-            if (message.payload.widget.command == 0xd)
+        if (message.payload.widget.command != WIDGET_COMMAND_SELECT) {
+            if (message.payload.widget.command == WIDGET_COMMAND_DESELECT)
                 goto possibleCancelEvent;
             goto normalEvent;
         }
-        if (message.payload.widget.id != 10)
+        if (message.payload.widget.id != DATA_ENTRY_TEXT_WIDGET)
             goto normalEvent;
     }
 
-    message.type = 0x200;
-    message.payload.widget.id = 0xA;
-    message.payload.widget.command = 7;
+    message.type = MESSAGE_WIDGET;
+    message.payload.widget.id = DATA_ENTRY_TEXT_WIDGET;
+    message.payload.widget.command = WIDGET_COMMAND_GET_TEXT;
     DataEntryWin->BroadcastMessage(message);
     if (strlen(message.payload.widget.data.text) != 0) {
         memset(cDEDest, 0, iDEMaxLen);
         strncpy(cDEDest, message.payload.widget.data.text, iDEMaxLen - 1);
-        message.type = 0x200;
-        message.payload.widget.command = 3;
-        message.payload.widget.id = 10;
+        message.type = MESSAGE_WIDGET;
+        message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
+        message.payload.widget.id = DATA_ENTRY_TEXT_WIDGET;
         message.payload.widget.data.text = cDEDest;
         DataEntryWin->BroadcastMessage(message);
         DataEntryWin->DrawWindow(1, 10, 10);
         if (gbTextEntryEscaped == 0) {
             gpWindowManager->m_dialogResult = message.payload.widget.id;
-            message.payload.widget.id = 10;
-            message.payload.widget.command = 10;
-            return 2;
+            message.payload.widget.id = DATA_ENTRY_TEXT_WIDGET;
+            message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+            return EVENT_WINDOW_CLOSE;
         }
     }
 
 possibleCancelEvent:
-    if (message.payload.widget.id != 0x7802)
+    if (message.payload.widget.id != DATA_ENTRY_CANCEL_BUTTON)
         goto normalEvent;
-    message.payload.widget.id = 10;
-    message.payload.widget.command = 10;
-    return 2;
+    message.payload.widget.id = DATA_ENTRY_TEXT_WIDGET;
+    message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+    return EVENT_WINDOW_CLOSE;
 
 normalEvent:
     return EventWindowHandler(message);
