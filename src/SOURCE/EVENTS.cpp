@@ -4363,7 +4363,7 @@ artifactPickup:
                 gpMonGroup->m_creatureCounts[index_h] = 10;
             }
             index_h = cell->m_objectMetadata - 1;
-            if (gsSpellInfo[index_h].m_e & 1) {
+            if (gsSpellInfo[index_h].attributes & 1) {
                 battleStatValue_o =
                     eventHero->Stats(HERO_PRIMARY_SPELL_POWER) > 40
                         ? gfBattleStat[40]

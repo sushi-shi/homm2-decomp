@@ -630,11 +630,11 @@ void combatManager::CastSpell(int spell, int targetHex, int castByCreature, int 
     } else {
         spellPower_i = m_spellPower[m_currentSide];
         if (m_heroes[m_currentSide]->HasArtifact(SPELL_ARTIFACT_ENCHANTED_HOURGLASS) &&
-            (gsSpellInfo[spell].m_e & SPELL_ATTRIBUTE_DURATION)) {
+            (gsSpellInfo[spell].attributes & SPELL_ATTRIBUTE_DURATION)) {
             spellPower_i += SPELL_HOURGLASS_POWER_BONUS;
         }
         if (m_heroes[m_currentSide]->HasArtifact(SPELL_ARTIFACT_WIZARD_HAT) &&
-            (gsSpellInfo[spell].m_e & SPELL_ATTRIBUTE_DURATION)) {
+            (gsSpellInfo[spell].attributes & SPELL_ATTRIBUTE_DURATION)) {
             spellPower_i += SPELL_WIZARD_HAT_POWER_BONUS;
         }
     }

@@ -191,10 +191,11 @@ struct SSpellInfo {
     unsigned char iconIndex;
     unsigned char combatEffect;
     short aiValue;
+    unsigned char cost;
     unsigned char raceChance[6];
     unsigned char attributes;
-    unsigned char m_e;
 };  // gsSpellInfo[] (sizeof 22)
+SIZE(SSpellInfo, 0x16);
 struct SAMPLE2 { class sample *pSample; struct _SAMPLE *pMem; };            // NULL_SAMPLE2
 
 typedef enum MonsterAttribute {
