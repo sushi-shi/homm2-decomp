@@ -54,7 +54,8 @@ typedef enum WindowFadeMode {
 typedef enum WindowScreenConstant {
     WINDOW_SCREEN_WIDTH = 640,
     WINDOW_SCREEN_HEIGHT = 480,
-    WINDOW_FRAMEBUFFER_DWORD_COUNT = 0x12c00
+    WINDOW_FRAMEBUFFER_DWORD_COUNT = 0x12c00,
+    WINDOW_FRAMEBUFFER_FILL_COLOR = 0x24
 } WindowScreenConstant;
 
 typedef enum WindowPaletteConstant {
