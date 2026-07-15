@@ -910,8 +910,12 @@ def atomic_mutations(
             continue
         key = tuple((edit.start, edit.end, edit.replacement) for edit in mutation.edits)
         unique[key] = mutation
+    return balance_mutations(unique.values())
+
+
+def balance_mutations(mutations) -> list[AstMutation]:
     groups = {}
-    for mutation in sorted(unique.values(), key=lambda item: (item.family, item.label)):
+    for mutation in sorted(mutations, key=lambda item: (item.family, item.label)):
         groups.setdefault(mutation.family, []).append(mutation)
     balanced = []
     for index in range(max(map(len, groups.values()), default=0)):
@@ -1124,6 +1128,7 @@ def main(argv=None) -> int:
     except (OSError, KeyError, ValueError) as exc:
         parser.error(str(exc))
     mutations += state_mutations
+    mutations = balance_mutations(mutations)
     available_names = {mutation_name(mutation) for mutation in mutations}
     required_names = set(args.require_mutation)
     unknown_required = required_names - available_names
