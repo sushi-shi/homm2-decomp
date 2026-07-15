@@ -1,11 +1,19 @@
 # Readonly contribution audit
 
 This audit separates whole-section placement from contribution drift. Retail `.rdata`
-starts at RVA `0xeb000`; the current LINK 4.20 candidate starts at RVA `0xf0000`.
+starts at RVA `0xeb000`; the pinned LINK 3.00 candidate starts at RVA `0xf0000`.
 Offsets below are relative to each image's own `.rdata`, so that `0x5000` section-RVA
 difference is intentionally removed.
 
-## TOWNMGR through SWAPMGR
+The current SOURCE result is structurally complete: every public readonly anchor
+from TOWNMGR through HISCORE is exact relative to `.rdata`. The first remaining
+relative drift is BASE/FONT (`0x9e4` retail, `0xb10` candidate, `+0x12c`), followed
+by BASE/RESMGR (`0x9f0` retail, `0xb18` candidate, `+0x128`).
+
+## Historical SOURCE recovery
+
+The measurements below record the contribution defects that led to the current
+exact SOURCE prefix. They are retained as recovery evidence, not current offsets.
 
 The first public, `??_7townManager@@6B@`, is at offset `0x140` in both images. The
 candidate `TOWNMGR.obj` ordinary readonly contribution is `0xc0` bytes at offset `0x80`;
@@ -53,10 +61,9 @@ Consequently the advManager vtable changes from an independent `-0x10` relative 
 the same `+0x58` cumulative delta as swapManager. The swap-to-adv boundary is structurally
 resolved even though earlier SPELLS/PHILAI/ARMY contributions still displace both.
 
-## Linker gate
+## Linker identity
 
-These measurements use the locally available LINK 4.20.6164. Retail's PE optional header
-records final-linker version 3.00, and no local LINK 3.00 binary is available. Do not tune
-remaining contribution offsets around behavior that a provenance-correct final linker may
-change. Use the isolated linker A/B path documented in `compiler-detection.md` when a
-provenance-known LINK 3.00 artifact becomes available.
+Current measurements use the archive.org-verified LINK 3.00.5270 component and
+its sibling CVPACK/CVTRES/MSPDB40 tools. Its PE linker version matches retail.
+The VC 4.2 LINK 4.20 result is no longer the final-link baseline. See
+`compiler-detection.md` and `toolchain-vc42.md` for hashes and reproduction.
