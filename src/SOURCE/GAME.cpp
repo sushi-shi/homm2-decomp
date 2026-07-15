@@ -584,7 +584,7 @@ int game::SaveGame(char *filename, int generateName, signed char expansionFormat
     } else {
         _write(fileInfo, &gbInCampaign, 4);
         if (gbInCampaign)
-            _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 2, 0x147);
+            _write(fileInfo, &m_campaignType, 0x147);
     }
     if (!expansionFormat)
         _write(fileInfo, &xIsExpansionMap, 1);
@@ -618,9 +618,9 @@ int game::SaveGame(char *filename, int generateName, signed char expansionFormat
         m_heroRecs[indexFile].Write(fileInfo, !expansionFormat);
     _write(fileInfo, m_availableHeroes, GAME_HERO_COUNT);
     _write(fileInfo, m_castleRecs, 0x1c20);
-    _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x2773, 0x48);
-    _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x27bb, 9);
-    _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x5cb6, 0x3f0);
+    _write(fileInfo, m_castleOwners, sizeof(m_castleOwners));
+    _write(fileInfo, m_dailyEventFlags, sizeof(m_dailyEventFlags));
+    _write(fileInfo, m_mines, sizeof(m_mines));
     _write(fileInfo, m_mineOwners, 0x90);
     if (!expansionFormat)
         _write(fileInfo, m_randomArtifacts, 0x67);
@@ -628,18 +628,16 @@ int game::SaveGame(char *filename, int generateName, signed char expansionFormat
         _write(fileInfo, m_randomArtifacts, 0x52);
     _write(fileInfo, m_boats, 0x180);
     _write(fileInfo, m_boatSlots, sizeof(m_boatSlots));
-    _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x634d, 0x30);
+    _write(fileInfo, m_obeliskVisitors, sizeof(m_obeliskVisitors));
     _write(fileInfo, &m_ultimateArtifactX, 1);
     _write(fileInfo, &m_ultimateArtifactY, 1);
     _write(fileInfo, &m_ultimateArtifactId, 1);
-    _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x63aa, 0x12d);
-    _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x637d, 0x18);
-    _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x64d7, 4);
-    _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x64d9,
-           *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x64d7) * 2);
-    _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x6515, 4);
-    _write(fileInfo, reinterpret_cast<unsigned char *>(this) + 0x6517,
-           *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x6515) * 2);
+    _write(fileInfo, m_rumour, sizeof(m_rumour));
+    _write(fileInfo, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
+    _write(fileInfo, &m_rumourEventCount, 4);
+    _write(fileInfo, m_rumourEventIndices, m_rumourEventCount * 2);
+    _write(fileInfo, &m_timeEventCount, 4);
+    _write(fileInfo, m_timeEventIndices, m_timeEventCount * 2);
     _write(fileInfo, &m_mapEventCount, 4);
     _write(fileInfo, m_mapEventIndices, m_mapEventCount * 2);
 
@@ -725,8 +723,8 @@ void game::SetupOrigData(void)
     memset(m_availableHeroes, -1, GAME_HERO_COUNT);
     for (i = 0; i < GAME_HERO_COUNT; i++) {
         memset(&m_heroRecs[i], 0, sizeof(m_heroRecs[i]));
-        memset(reinterpret_cast<unsigned char *>(&m_heroRecs[i]) + 0x94, 0, 0x41);
-        memset(m_heroRecs[i].m_artifacts, -1, 14);
+        memset(m_heroRecs[i].m_spells, 0, sizeof(m_heroRecs[i].m_spells));
+        memset(m_heroRecs[i].m_artifacts, -1, sizeof(m_heroRecs[i].m_artifacts));
         m_heroRecs[i].m_patrolY = -1;
         m_heroRecs[i].m_patrolX = m_heroRecs[i].m_patrolY;
         m_heroRecs[i].m_id = static_cast<signed char>(i);
@@ -738,8 +736,8 @@ void game::SetupOrigData(void)
         for (j = 0; j < HERO_STARTING_STAT_COUNT; j++)
             m_heroRecs[i].m_primaryStats[j] =
                 gStartingHeroStats[m_heroRecs[i].m_cursorType][j];
-        for (j = 0; j < 5; j++)
-            reinterpret_cast<signed char *>(&m_heroRecs[i].m_army)[j] = -1;
+        for (j = 0; j < ARMY_GROUP_SLOT_COUNT; j++)
+            m_heroRecs[i].m_army.m_creatureTypes[j] = ARMY_GROUP_EMPTY_SLOT;
         m_heroRecs[i].m_destinationY = -1;
         m_heroRecs[i].m_destinationX = m_heroRecs[i].m_destinationY;
         m_heroRecs[i].m_level = 1;
@@ -776,16 +774,16 @@ void game::SetupOrigData(void)
         }
     }
 
-    memset(reinterpret_cast<unsigned char *>(this) + 0x2773, -1, GAME_TOWN_COUNT);
+    memset(m_castleOwners, TOWN_OWNER_NONE, sizeof(m_castleOwners));
     for (i = 0; i < GAME_TOWN_COUNT; i++) {
-        memset(&m_castleRecs[i], 0, 100);
-        reinterpret_cast<unsigned char *>(&m_castleRecs[i])[0x36] = 0;
-        reinterpret_cast<unsigned char *>(&m_castleRecs[i])[0] = static_cast<unsigned char>(i);
-        reinterpret_cast<unsigned char *>(&m_castleRecs[i])[1] = 0xff;
-        reinterpret_cast<unsigned char *>(&m_castleRecs[i])[3] = static_cast<unsigned char>(i / 9);
-        reinterpret_cast<unsigned char *>(&m_castleRecs[i])[0x17] = 0xff;
-        for (j = 0; j < 5; j++)
-            reinterpret_cast<unsigned char *>(this)[(&j)[0] + i * 100 + 0xb5b] = 0xff;
+        memset(&m_castleRecs[i], 0, sizeof(m_castleRecs[i]));
+        m_castleRecs[i].m_onMap = 0;
+        m_castleRecs[i].m_id = static_cast<unsigned char>(i);
+        m_castleRecs[i].m_owner = TOWN_OWNER_NONE;
+        m_castleRecs[i].m_type = static_cast<unsigned char>(i / 9);
+        m_castleRecs[i].m_occupyingHeroId = TOWN_OCCUPYING_HERO_NONE;
+        for (j = 0; j < ARMY_GROUP_SLOT_COUNT; j++)
+            m_castleRecs[i].m_army.m_creatureTypes[j] = ARMY_GROUP_EMPTY_SLOT;
     }
     for (i = 0; i < GAME_MINE_COUNT; i++)
         memset(&m_mines[i], -1, sizeof(m_mines[i]));
@@ -795,7 +793,7 @@ void game::SetupOrigData(void)
         m_boats[i].id = static_cast<signed char>(i);
         m_boats[i].heroId = -1;
     }
-    memset(reinterpret_cast<unsigned char *>(this) + 0x27bb, 0, 9);
+    memset(m_dailyEventFlags, 0, sizeof(m_dailyEventFlags));
     memset(m_boatSlots, -1, sizeof(m_boatSlots));
     m_ultimateArtifactY = -1;
     m_ultimateArtifactX = m_ultimateArtifactY;
@@ -862,7 +860,7 @@ void game::LoadGame(char *filename, int loadFromFile, int)
         _read(file, oldData, 36);
         _read(file, &gbInCampaign, 4);
         if (gbInCampaign == 1) {
-            _read(file, reinterpret_cast<unsigned char *>(this) + 2, 0x147);
+            _read(file, &m_campaignType, 0x147);
         } else if (gbInCampaign == 2) {
             xIsPlayingExpansionCampaign = 1;
             gbInCampaign = 0;
@@ -918,8 +916,8 @@ void game::LoadGame(char *filename, int loadFromFile, int)
             m_heroRecs[i].Read(file, expansionMarker);
         _read(file, m_availableHeroes, GAME_HERO_COUNT);
         _read(file, m_castleRecs, 0x1c20);
-        _read(file, reinterpret_cast<unsigned char *>(this) + 0x2773, 0x48);
-        _read(file, reinterpret_cast<unsigned char *>(this) + 0x27bb, 9);
+        _read(file, m_castleOwners, sizeof(m_castleOwners));
+        _read(file, m_dailyEventFlags, sizeof(m_dailyEventFlags));
         _read(file, m_mines, 0x3f0);
         _read(file, m_mineOwners, 0x90);
         if (expansionMarker)
@@ -932,14 +930,12 @@ void game::LoadGame(char *filename, int loadFromFile, int)
         _read(file, &m_ultimateArtifactX, 1);
         _read(file, &m_ultimateArtifactY, 1);
         _read(file, &m_ultimateArtifactId, 1);
-        _read(file, reinterpret_cast<unsigned char *>(this) + 0x63aa, 0x12d);
+        _read(file, m_rumour, sizeof(m_rumour));
         _read(file, m_defaultPlayerNames, 0x18);
-        _read(file, reinterpret_cast<unsigned char *>(this) + 0x64d7, 4);
-        _read(file, reinterpret_cast<unsigned char *>(this) + 0x64d9,
-              *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x64d7) * 2);
-        _read(file, reinterpret_cast<unsigned char *>(this) + 0x6515, 4);
-        _read(file, reinterpret_cast<unsigned char *>(this) + 0x6517,
-              *reinterpret_cast<unsigned short *>(reinterpret_cast<unsigned char *>(this) + 0x6515) * 2);
+        _read(file, &m_rumourEventCount, 4);
+        _read(file, m_rumourEventIndices, m_rumourEventCount * 2);
+        _read(file, &m_timeEventCount, 4);
+        _read(file, m_timeEventIndices, m_timeEventCount * 2);
         _read(file, &m_mapEventCount, 4);
         _read(file, m_mapEventIndices, m_mapEventCount * 2);
 
@@ -1466,12 +1462,12 @@ void game::RandomizeEvents(void)
     int lowerTilesets4[5];
     int lowerIndexes7[5];
     int artifactChoices17[10];
-    void *mapEvent1;
+    EventExtra *mapEvent1;
     mapCell *townEntrance;
     mapCell *cell2;
     mapCellExtra *extra15;
     town *townRec4;
-    unsigned char *eventData16;
+    mapEventExtra *eventData16;
     int valid27;
 
     m_mapEventCount = 0;
@@ -1490,19 +1486,19 @@ void game::RandomizeEvents(void)
                 cell2->m_objectTileset = 0; cell2->m_objectIndex = 0xff; cell2->m_objectMetadata = 0;
                 cell2->m_triggerType = 0; CreateBoat(xPos2, yPos19, 1); break;
             case 0xcf:
-                eventData16 = reinterpret_cast<unsigned char *>(ppMapExtra[cell2->m_objectMetadata]);
-                if (strlen(reinterpret_cast<char *>(eventData16 + 0x88)) > 1 &&
-                    eventData16[0x1f] >= 1)
-                    eventData16[0] = 1;
+                eventData16 = reinterpret_cast<mapEventExtra *>(ppMapExtra[cell2->m_objectMetadata]);
+                if (strlen(eventData16->riddle) > 1 &&
+                    eventData16->answerCount >= 1)
+                    eventData16->active = 1;
                 else
-                    eventData16[0] = 0;
+                    eventData16->active = 0;
                 break;
             case 0x93:
                 m_mapEventIndices[m_mapEventCount] = cell2->m_objectMetadata;
-                mapEvent1 = ppMapExtra[cell2->m_objectMetadata];
-                *reinterpret_cast<short *>(reinterpret_cast<unsigned char *>(mapEvent1) + 0x26) = static_cast<short>(xPos2);
-                *reinterpret_cast<short *>(reinterpret_cast<unsigned char *>(mapEvent1) + 0x28) = static_cast<short>(yPos19);
-                reinterpret_cast<unsigned char *>(mapEvent1)[0x25] = 1;
+                mapEvent1 = reinterpret_cast<EventExtra *>(ppMapExtra[cell2->m_objectMetadata]);
+                mapEvent1->x = static_cast<short>(xPos2);
+                mapEvent1->y = static_cast<short>(yPos19);
+                mapEvent1->active = 1;
                 cell2->m_objectMetadata = 0;
                 cell2->m_triggerType = 0;
                 cell2->m_objectIndex = 0xff;

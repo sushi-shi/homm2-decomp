@@ -56,6 +56,7 @@ typedef enum TownBuildingIndex {
 typedef enum TownConstant {
     TOWN_OWNER_NONE = -1,
     TOWN_ID_NONE = -1,
+    TOWN_OCCUPYING_HERO_NONE = -1,
     TOWN_DOCK_COORDINATE_NONE = 0xff,
     TOWN_FORMATION_SPREAD = 0,
     TOWN_FORMATION_GROUPED = 1,
