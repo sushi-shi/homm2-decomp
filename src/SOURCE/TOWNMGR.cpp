@@ -518,18 +518,6 @@ townObject::~townObject()
     gpResourceManager->Dispose(m_icon);
 }
 
-// @match-note 98.93%: complete render gates and animation behavior, the exact
-// 0x08 frame (baseFrame at -0x04, this at -0x08), and all 37/37 relocations
-// agree. The first relocation-masked raw byte differs at +0x1a: retail 12
-// versus ours 15, the rel32 operand of the early jmp at +0x16. The first
-// opcode divergence is at +0x2b2: retail 84 versus ours 85, the second opcode
-// byte of the je/jne at +0x2b1 in the race-overlay gate. A nested negative
-// gate combined with the indicated 2*(3*state-3) spelling lowered the result
-// to 98.13%. The later
-// residual is the equivalent Necromancer frame arithmetic instruction shape.
-// Post-95 tests of both `2 * (3*n - 3)` operand orders reached only 98.42%,
-// below the retained 98.93% maximum, and reversing both animation-frame
-// equalities was byte-neutral. Revisit only with a new gate/accessor discovery.
 VA(0x00413aca, 0x437)
 void townObject::Draw(int advanceAnimation)
 {
@@ -591,20 +579,20 @@ void townObject::Draw(int advanceAnimation)
          gpTownManager->m_town->m_type == TOWN_TYPE_WARLOCK ||
          gpTownManager->m_town->m_type == TOWN_TYPE_SORCERESS ||
          gpTownManager->m_town->m_type == TOWN_TYPE_KNIGHT) &&
-        !(gpTownManager->m_town->m_buildings &
-          TOWN_RENDER_RACE_OVERLAY_FIRST_OPTION) &&
-        !(gpTownManager->m_town->m_buildings &
-          TOWN_RENDER_RACE_OVERLAY_SECOND_OPTION))
+        ((gpTownManager->m_town->m_buildings &
+          TOWN_RENDER_RACE_OVERLAY_FIRST_OPTION) ||
+         (gpTownManager->m_town->m_buildings &
+          TOWN_RENDER_RACE_OVERLAY_SECOND_OPTION)))
         return;
     if (m_buildingId == TOWN_OBJECT_DOCK &&
         (gpTownManager->m_town->m_buildings &
-         TOWN_RENDER_SORCERESS_LEFT_OPTION))
+         TOWN_RENDER_DOCK_GATE))
         return;
 
     if (m_buildingId == TOWN_OBJECT_PRIMARY_ANIMATION) {
         if (gpTownManager->m_town->m_type == TOWN_TYPE_NECROMANCER) {
-            baseFrame = gpTownManager->m_town->m_buildState * 3 - 3;
-            baseFrame *= 2;
+            baseFrame =
+                2 * (3 * (gpTownManager->m_town->m_buildState - 1));
         } else {
             baseFrame = gpTownManager->m_town->m_buildState - 1;
         }
@@ -622,15 +610,16 @@ void townObject::Draw(int advanceAnimation)
                     m_animationFrame = 0;
             }
         }
-    } else {
-        m_icon->DrawToBuffer(0, 0, 0, 0);
-        if (m_animationFrameCount != 0) {
-            m_icon->DrawToBuffer(0, 0, m_animationFrame + 1, 0);
-            if (advanceAnimation == 1) {
-                ++m_animationFrame;
-                if (m_animationFrame == m_animationFrameCount)
-                    m_animationFrame = 0;
-            }
+        return;
+    }
+
+    m_icon->DrawToBuffer(0, 0, 0, 0);
+    if (m_animationFrameCount != 0) {
+        m_icon->DrawToBuffer(0, 0, m_animationFrame + 1, 0);
+        if (advanceAnimation == 1) {
+            ++m_animationFrame;
+            if (m_animationFrame == m_animationFrameCount)
+                m_animationFrame = 0;
         }
     }
 }
