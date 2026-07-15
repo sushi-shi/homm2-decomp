@@ -357,7 +357,7 @@ BASE/droplist	?DeleteItem@dropListWidget@@QAEXH@Z	100.0000	a7fc3e1c0d01
 BASE/droplist	?Draw@dropListWidget@@UAEXXZ	100.0000	a9f68c5f29e3
 BASE/droplist	?DrawDropStuff@dropListWidget@@QAEXXZ	100.0000	02e6e36033be
 BASE/droplist	?Main@dropListWidget@@UAEHAAUtag_message@@@Z	99.8745	7dd105ecc0d9
-BASE/droplist	?ProcessSelectDialog@dropListWidget@@QAEXXZ	99.3675	3fd4ce773f8b
+BASE/droplist	?ProcessSelectDialog@dropListWidget@@QAEXXZ	99.3708	3fd4ce773f8b
 BASE/droplist	?Read@dropListWidget@@QAEXXZ	100.0000	3e0df002aca4
 BASE/droplist	?RestoreDropBackground@dropListWidget@@QAEXXZ	100.0000	44703f1483c6
 BASE/droplist	?SaveDropBackground@dropListWidget@@QAEXXZ	100.0000	b3d5c9e1b5dd
@@ -584,8 +584,8 @@ SOURCE/ARMYGRP	?DamageGroup@armyGroup@@QAEXM@Z	100.0000	56478671c7e3
 SOURCE/ARMYGRP	?Dismiss@armyGroup@@QAEXH@Z	100.0000	ba5b6b31f1e3
 SOURCE/ARMYGRP	?GetMorale@armyGroup@@QAEHPAVhero@@PAVtown@@PAV1@@Z	100.0000	6bad676bfbb7
 SOURCE/ARMYGRP	?GetNumArmies@armyGroup@@QAEHXZ	100.0000	6a7ef470d873
-SOURCE/ARMYGRP	?HasAllUndead@armyGroup@@QAEHXZ	100.0000	57da71250e86
-SOURCE/ARMYGRP	?HasSomeUndead@armyGroup@@QAEHXZ	100.0000	f82f328d0e6d
+SOURCE/ARMYGRP	?HasAllUndead@armyGroup@@QAEHXZ	100.0000	d892d2b03754
+SOURCE/ARMYGRP	?HasSomeUndead@armyGroup@@QAEHXZ	100.0000	e37d831c55d2
 SOURCE/ARMYGRP	?IsHomogeneous@armyGroup@@QAEHH@Z	100.0000	f9a1d8cd81d8
 SOURCE/ARMYGRP	?IsMember@armyGroup@@QAEHH@Z	100.0000	8e5113106f1a
 SOURCE/ARMYGRP	?Swap@armyGroup@@QAEXHPAV1@H@Z	100.0000	aea4cf3cf784
@@ -1066,7 +1066,7 @@ SOURCE/PHILAI	?ComputeValueOfSS@philAI@@QAEHPAVhero@@HH@Z	99.8370	8f96f03e452f
 SOURCE/PHILAI	?CreaturesToBuy@philAI@@QAEHHH@Z	100.0000	6b9ea4620c5a
 SOURCE/PHILAI	?CreaturesToBuy@philAI@@QAEHPAVtown@@H@Z	100.0000	640dd23b13a3
 SOURCE/PHILAI	?DamageGroup@philAI@@QAEHPAVarmyGroup@@PAVhero@@1M@Z	100.0000	f5f9f7242847
-SOURCE/PHILAI	?DetermineHeroToMove@philAI@@QAEPAVhero@@H@Z	92.2820	fac44c2ceae9
+SOURCE/PHILAI	?DetermineHeroToMove@philAI@@QAEPAVhero@@H@Z	93.0769	fac44c2ceae9
 SOURCE/PHILAI	?DetermineTargetPosition@philAI@@QAEHAAH0H0@Z	99.6728	ce7f72b6bb4c
 SOURCE/PHILAI	?DimensionDoorTo@philAI@@QAEXHH@Z	100.0000	c94964d2b047
 SOURCE/PHILAI	?DoAI@philAI@@QAEXH@Z	97.5265	00b31c4e92a5
@@ -1257,7 +1257,7 @@ SOURCE/SWAPMGR	??0swapManager@@QAE@XZ	100.0000	66f46459a5a8
 SOURCE/SWAPMGR	?Close@swapManager@@UAEXXZ	100.0000	ded64277b429
 SOURCE/SWAPMGR	?DrawSelector@swapManager@@QAEXXZ	100.0000	5548ea00ca96
 SOURCE/SWAPMGR	?DrawSwapWin@swapManager@@QAEHXZ	100.0000	5e03a8abb696
-SOURCE/SWAPMGR	?Main@swapManager@@UAEHAAUtag_message@@@Z	91.6724	6bb57420939c
+SOURCE/SWAPMGR	?Main@swapManager@@UAEHAAUtag_message@@@Z	91.6804	6bb57420939c
 SOURCE/SWAPMGR	?Open@swapManager@@UAEHH@Z	100.0000	c4282e62f300
 SOURCE/SWAPMGR	?Reset@swapManager@@QAEXXZ	100.0000	d5ea27ddec93
 SOURCE/SWAPMGR	?SplitMons@swapManager@@QAEXXZ	100.0000	e9d42a65dc5e
