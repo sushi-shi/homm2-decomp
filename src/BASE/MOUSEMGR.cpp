@@ -500,14 +500,6 @@ void mouseManager::CheckUpdateMousePos(void)
     }
 }
 
-// @match-note coverage checkpoint: semantics, zero-frame CFG, member lifetimes, and
-// relocations are complete (29/29, no base-only target). Base .text is 0x18f versus
-// retail 0x191. The first divergence is the prologue: base compares the argument
-// directly with memory, while retail first loads gbColorMice and compares two
-// registers. Additional register/load-order spans end at base +0xb3 / retail +0xb5;
-// the suffix is identical. saved type-before-frame declaration order retains 96.84%.
-// Direct/reversed comparisons, an old-color temp, volatile reference, and `| 0`
-// still fold the global into the memory CMP. Revisit after TU-state changes.
 VA(0x004ca230, 0x191)
 void mouseManager::SetColorMice(int param_1)
 {
@@ -524,8 +516,8 @@ void mouseManager::SetColorMice(int param_1)
         } else {
             ShowCursor(0);
         }
-        int savedY = m_cursorType;
         int savedX = m_cursorFrame;
+        int savedY = m_cursorType;
         int saved7e = m_forcePointerUpdate;
         m_cursorReady = 0;
         gbColorMice = param_1;
