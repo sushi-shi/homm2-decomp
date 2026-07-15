@@ -51,6 +51,8 @@ DATA(0x005381b4) static int gFMXEnd;
 // byte-identical at 80.742516%, candidate 0x202 versus retail 0x212, with the unchanged correct
 // 26/27 relocation distribution. The pair is a closed local plateau; no generated source/state was
 // retained. Revisit only with a different structural or real reachable declaration hypothesis.
+// The temporary `src = gFMSrc + 1; cmd = src[-1]` shape was an inline-helper trace. The recovered
+// reader raises live matching to 78.32934% and leaves the honest 26/27 multiset: only gFMY is short.
 VA(0x004da800, 0x212)
 void FlipMonoIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                           int color, int clip, int clipX, int clipY, int clipW, int clipH)
@@ -86,10 +88,8 @@ void FlipMonoIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y,
     short pitch = dest->m_width;
     gFMRow = dest->m_pixels + gFMY * pitch;
     for (;;) {
-        unsigned char *src = gFMSrc + 1;
+        int cmd = ReadIconRleByte(gFMSrc);
         gFMX = X;
-        gFMSrc = src;
-        int cmd = src[-1];
         if (static_cast<signed char>(cmd) < 0) {
             gFMRun = cmd;
             int n = cmd & ICON_RLE_MONO_RUN_MASK;

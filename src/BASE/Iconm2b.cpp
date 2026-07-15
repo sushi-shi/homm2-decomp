@@ -64,6 +64,8 @@ DATA(0x00534bec) static int gMonoX;
 // A 2026-07-15 real-header audit found only a disposable 80.569060% state from button.h versus the
 // 78.276245% direct baseline; MIDIWrap/tileset regressed and the historical resource tail was
 // neutral. No unused header was retained. This does not change the unresolved X0/Y owner deficit.
+// The split command-byte advance/read was an inline-helper trace. Restoring the shared reader raises
+// live matching to 80.09945% while preserving 36/38 relocations; only gMonoX0 and gMonoY are short.
 VA(0x004cfae0, 0x266)
 void MonoIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                       int color, int clip, int clipX, int clipY, int clipW, int clipH)
@@ -88,8 +90,7 @@ void MonoIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int
     short pitch = dest->m_width;
     unsigned char *row = dest->m_pixels + gMonoY * pitch;
     for (;;) {
-        gMonoSrc++;
-        int cmd = gMonoSrc[-1];
+        int cmd = ReadIconRleByte(gMonoSrc);
         if (static_cast<signed char>(cmd) < 0) {
             // skip run / end-of-sprite (negative command masks 7 bits)
             gMonoRow = row;
