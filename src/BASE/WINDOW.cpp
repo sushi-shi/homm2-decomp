@@ -60,11 +60,11 @@ heroWindow::heroWindow(int x, int y, int w, int h, int flags)
 }
 
 // @early-stop
-// 99.92%: all 320 instructions byte-exact (llvm-objdump -dr, base vs target). Sole residual is
-// the switch jump-table jmp: mine `ff 24 85 00000000` reloc=$L2210 (MSVC-emitted local table
-// symbol, addend 0) vs delink `ff 24 85 d7040000` reloc=??0heroWindow+0x4d7 (same func+0x4d7
-// table, identical 5 handler entries). A required jump table (retail dispatches 0x202..0x206
-// via one); objdiff can't mask the differing table-reloc symbol — a delinker reloc-naming artifact.
+// The explicit 0x521-byte CodeView range is raw-exact after relocation-union masking;
+// retail's enclosing row has three trailing padding bytes. Frame/slots, CFG, and all 51
+// external relocation targets/addends are exact. The remaining six of 57 ordered sites
+// are the dispatch at +0x4d3 and five-word table at +0x4d7: MSVC emits $L local symbols,
+// while the delinker rewrites them as this constructor plus the same local offsets.
 VA(0x004cecd0, 0x521)
 heroWindow::heroWindow(int param_1, int param_2, char *param_3)
 {
