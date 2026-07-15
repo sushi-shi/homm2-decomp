@@ -400,13 +400,13 @@ int wsWaitForHost(void) {
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x004ed2ac) int bHostFound;
-DATA(0x004ed2b0) unsigned int sd_dg;
-DATA(0x004ed2b4) int iWSLastMsgNumHumanPlayers;
-DATA(0x004ed2b8) int iWSAttempts;
-DATA(0x004ed2bc) int iWSNextTickCount;
-DATA(0x004ed2c0) int iWSWaitForHostStatus;
-DATA(0x00522f88) int iRc;
+DATA(0x004ed2ac) int bHostFound = 0;
+DATA(0x004ed2b0) unsigned int sd_dg = 0xffffffffU;
+DATA(0x004ed2b4) int iWSLastMsgNumHumanPlayers = 1;
+DATA(0x004ed2b8) int iWSAttempts = 0;
+DATA(0x004ed2bc) int iWSNextTickCount = 0;
+DATA(0x004ed2c0) int iWSWaitForHostStatus = 0;
+DATA(0x00522f88) int iRc = 0;
 DATA(0x00522f90) char cWSTextBuffer[WS_TRANSPORT_BUFFER_SIZE];
 DATA(0x00523090) struct sockaddr_in saddr_loc;
 DATA(0x005230a0) unsigned short wVer;

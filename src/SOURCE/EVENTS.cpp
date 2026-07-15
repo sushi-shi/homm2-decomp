@@ -5589,4 +5589,4 @@ int RiddleStringsEqual(char *answer, char *expected)
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x0051cc0c) int gbNoShowCombat;
+DATA(0x0051cc0c) int gbNoShowCombat = 0;

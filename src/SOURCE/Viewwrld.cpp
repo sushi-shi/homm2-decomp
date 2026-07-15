@@ -634,9 +634,9 @@ int ViewWorldDialogHandler(struct tag_message &message)
 
 // ---- globals (definitions, RVA order) ----
 DATA(0x004f11b8) signed char iVWHalf[3][6][2];
-DATA(0x004f11dc) int giViewWorldScale;
-DATA(0x004f11e0) int giViewWorldScaleLookup;
-DATA(0x004f11e4) int gbInViewWorld;
+DATA(0x004f11dc) int giViewWorldScale = 6;
+DATA(0x004f11e0) int giViewWorldScaleLookup = 1;
+DATA(0x004f11e4) int gbInViewWorld = 0;
 DATA(0x00525110) class icon *pVWMisc;
 DATA(0x00525114) class icon *pVWLetters;
 DATA(0x00525118) int iVWYPixelOffset;

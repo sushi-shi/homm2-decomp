@@ -1048,30 +1048,30 @@ int SetGraphicsType(int graphicsType)
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x004f1288) int gbWinGAttached;
-DATA(0x004f128c) int gbDDrawAttached;
-DATA(0x004f1290) int giGraphicsType;
-DATA(0x004f1294) long Orientation;
+DATA(0x004f1288) int gbWinGAttached = 1;
+DATA(0x004f128c) int gbDDrawAttached = 0;
+DATA(0x004f1290) int giGraphicsType = 1;
+DATA(0x004f1294) long Orientation = 1;
 DATA(0x004f1298) struct _PALETTE LogicalPalette = {
     WINGRAPH_PALETTE_VERSION, WINGRAPH_PALETTE_SIZE
 };
-DATA(0x004f169c) void *lpInitWin;
-DATA(0x004f16a0) int bPaletteInitialized;
-DATA(0x004f16a4) int giTtlBlts;
-DATA(0x004f16a8) int gbWinGraphBusy;
-DATA(0x004f16ac) DirectDrawCreateProc lpDirectDrawCreate;
-DATA(0x004f16b0) struct IDirectDraw *lpDD;
-DATA(0x004f16b4) struct IDirectDrawSurface *lpDDSPrimary;
-DATA(0x004f16b8) struct IDirectDrawSurface *lpDDSOne;
-DATA(0x004f16bc) struct IDirectDrawClipper *lpClipper;
-DATA(0x004f16c0) struct IDirectDrawPalette *lpDDPal;
-DATA(0x004f17b0) int iBusyRetry;
-DATA(0x004f1a14) int bInDDSD;
-DATA(0x004f1e78) HDC hdcImage;
-DATA(0x004f1e7c) HBITMAP gbmOldMonoBitmap;
-DATA(0x004f1e80) HPALETTE hpalApp;
-DATA(0x004f1f60) HINSTANCE hWinGLibrary;
-DATA(0x004f1f64) HINSTANCE hDDrawLibrary;
-DATA(0x004f2080) long lDelayRefresh;
+DATA(0x004f169c) void *lpInitWin = 0;
+DATA(0x004f16a0) int bPaletteInitialized = 0;
+DATA(0x004f16a4) int giTtlBlts = 0;
+DATA(0x004f16a8) int gbWinGraphBusy = 0;
+DATA(0x004f16ac) DirectDrawCreateProc lpDirectDrawCreate = 0;
+DATA(0x004f16b0) struct IDirectDraw *lpDD = 0;
+DATA(0x004f16b4) struct IDirectDrawSurface *lpDDSPrimary = 0;
+DATA(0x004f16b8) struct IDirectDrawSurface *lpDDSOne = 0;
+DATA(0x004f16bc) struct IDirectDrawClipper *lpClipper = 0;
+DATA(0x004f16c0) struct IDirectDrawPalette *lpDDPal = 0;
+DATA(0x004f17b0) int iBusyRetry = 0;
+DATA(0x004f1a14) int bInDDSD = 0;
+DATA(0x004f1e78) HDC hdcImage = 0;
+DATA(0x004f1e7c) HBITMAP gbmOldMonoBitmap = 0;
+DATA(0x004f1e80) HPALETTE hpalApp = 0;
+DATA(0x004f1f60) HINSTANCE hWinGLibrary = 0;
+DATA(0x004f1f64) HINSTANCE hDDrawLibrary = 0;
+DATA(0x004f2080) long lDelayRefresh = 0;
 DATA(0x00525168) long lPaintStart;
 DATA(0x00525180) struct _IMAGE screenImage;

@@ -6325,11 +6325,11 @@ int game::CountShrines(int player)
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x004f70e0) int gbGameOver;
+DATA(0x004f70e0) int gbGameOver = 0;
 DATA(0x004f7550) signed char giMonType[] = {
     0, 0x11, 0x15, 0x2a, 0x0f, 0x19, 0x34, 0x0e, 0x1d, 0x1e, 0x1b, 0x36
 };
-DATA(0x004f7a08) char bMapInitialized;
+DATA(0x004f7a08) char bMapInitialized = 0;
 DATA(0x005280e8) int iViewArmyNumTroops;
 DATA(0x005280ec) signed char *gbNGHeroType;
 DATA(0x005280f8) SMonFrameInfo sViewArmyMonFrameInfo;

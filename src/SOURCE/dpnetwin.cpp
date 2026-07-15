@@ -568,25 +568,25 @@ void DPSD(int result, char *file, int line) {
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x004ef7c8) struct IDirectPlay *lpIDC;
-DATA(0x004ef7cc) unsigned long dcoID;
-DATA(0x004ef7d0) struct _GUID *IPXGuid;
-DATA(0x004ef7d4) struct _GUID *TCPGuid;
-DATA(0x004ef7d8) void *dphEvent;
-DATA(0x004ef7dc) int iDPRcvBufferHead;
-DATA(0x004ef7e0) int iDPRcvBufferTail;
-DATA(0x004ef7e4) unsigned char **ppDPRcvBuffer;
-DATA(0x004ef7e8) int *piDPRcvBufferSize;
-DATA(0x004ef7ec) int bStartUpInfoReceived;
-DATA(0x004ef7f0) void *hinstDplayx;
-DATA(0x004ef7f4) int iDPWaitForFirstGuestStatus;
-DATA(0x004ef7f8) int iDPWaitForHostStatus;
-DATA(0x004ef7fc) int iWaitForHostWaitCount;
-DATA(0x004ef800) int iEnumCount;
-DATA(0x004ef804) int iLastHereIAmTickCount;
-DATA(0x004ef808) int bInDPSD;
-DATA(0x004ef80c) int iGUIDCount;
-DATA(0x004ef810) int iLastMsgNumHumanPlayers;
+DATA(0x004ef7c8) struct IDirectPlay *lpIDC = 0;
+DATA(0x004ef7cc) unsigned long dcoID = 0;
+DATA(0x004ef7d0) struct _GUID *IPXGuid = 0;
+DATA(0x004ef7d4) struct _GUID *TCPGuid = 0;
+DATA(0x004ef7d8) void *dphEvent = 0;
+DATA(0x004ef7dc) int iDPRcvBufferHead = 0;
+DATA(0x004ef7e0) int iDPRcvBufferTail = 0;
+DATA(0x004ef7e4) unsigned char **ppDPRcvBuffer = 0;
+DATA(0x004ef7e8) int *piDPRcvBufferSize = 0;
+DATA(0x004ef7ec) int bStartUpInfoReceived = 0;
+DATA(0x004ef7f0) void *hinstDplayx = 0;
+DATA(0x004ef7f4) int iDPWaitForFirstGuestStatus = 0;
+DATA(0x004ef7f8) int iDPWaitForHostStatus = 0;
+DATA(0x004ef7fc) int iWaitForHostWaitCount = 0;
+DATA(0x004ef800) int iEnumCount = 0;
+DATA(0x004ef804) int iLastHereIAmTickCount = 0;
+DATA(0x004ef808) int bInDPSD = 0;
+DATA(0x004ef80c) int iGUIDCount = 0;
+DATA(0x004ef810) int iLastMsgNumHumanPlayers = 1;
 DATA(0x00525060) int iMaxSession;
 DATA(0x00525064) int giHostAcceptStatus;
 DATA(0x00525068) struct _GUID *g_lpGuid;

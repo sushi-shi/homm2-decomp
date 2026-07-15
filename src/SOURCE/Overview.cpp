@@ -1441,12 +1441,12 @@ int game::ProcessIconSelect(int widgetId, int quickView)
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x004ed9e8) class heroWindow *overWin;
-DATA(0x004ed9ec) class textWidget **textWidgetDynamic;
-DATA(0x004ed9f0) class iconWidget **iconWidgetDynamic;
-DATA(0x004ed9f4) int giOverviewType;
-DATA(0x004ed9f8) int giOverviewTop[2];
-DATA(0x004eda00) class iconWidget *OVScrollKnob;
+DATA(0x004ed9e8) class heroWindow *overWin = 0;
+DATA(0x004ed9ec) class textWidget **textWidgetDynamic = 0;
+DATA(0x004ed9f0) class iconWidget **iconWidgetDynamic = 0;
+DATA(0x004ed9f4) int giOverviewType = 0;
+DATA(0x004ed9f8) int giOverviewTop[2] = {0};
+DATA(0x004eda00) class iconWidget *OVScrollKnob = 0;
 DATA(0x00523258) int iLastDynamicType;
 DATA(0x0052325c) int iLastDynamicTop;
 DATA(0x00523260) int iOverviewItems;

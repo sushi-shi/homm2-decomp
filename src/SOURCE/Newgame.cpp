@@ -1849,8 +1849,8 @@ int game::GetSideDesc(char *text, int firstPlayer, int lastPlayer)
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x0051cd20) int gbNewGameDialogOver;
-DATA(0x0051cd24) int NGKPcursorFlashOn;
+DATA(0x0051cd20) int gbNewGameDialogOver = 1;
+DATA(0x0051cd24) int NGKPcursorFlashOn = 1;
 DATA(0x00533150) char *cNGKPDisplay;
 DATA(0x00533154) int gbNewGameShadowHidden;
 DATA(0x00533158) char *cNGKPCore;

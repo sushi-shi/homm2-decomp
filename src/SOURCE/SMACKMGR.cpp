@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <string.h>
 
-DATA(0x00522f7c) static signed char bExpansionSmackNum;
+DATA(0x00522f7c) static signed char bExpansionSmackNum = 0;
 
 VA(0x00401000, 0x4e)
 void ConvertSmackerPalette(unsigned char *paletteData) {
@@ -453,8 +453,8 @@ int PlaySmacker(int smackNumber) {
     return gbPlayedThrough;
 }
 
-DATA(0x004ec040) int bSmackSound;
-DATA(0x004ec044) icon *brotherIcon;
+DATA(0x004ec040) int bSmackSound = 0;
+DATA(0x004ec044) icon *brotherIcon = 0;
 static tag_rect expansionCampaignRects[SMACK_EXPANSION_RECT_COUNT] = {
     {215, 49, 230, 150}, {217, 275, 230, 150},
     {475, 132, 120, 180}, {41, 132, 120, 180}
@@ -524,7 +524,7 @@ void PrintSummaryInfo(SmackSum *summary) {
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x004ec068) icon *backImage;
+DATA(0x004ec068) icon *backImage = 0;
 DATA(0x004ec070) SSmackOptions SmackOptions[73] = {
     {"H2INTRO", "", "SH2INTRO", "", 1, 1, 0, 0, 0, 0, 0},
     {"NWCLOGO", "", "SNWCLOGO", "", 1, 1, 0, 0, 0, 0, 0},
@@ -600,11 +600,11 @@ DATA(0x004ec070) SSmackOptions SmackOptions[73] = {
     {"IVYVOY", "", "IVYVOY", "", 0, 0, 1, 1, 1, 41, 132},
     {"CYBCREDS", "", "SCYBCRED", "", 1, 0, 1, 1, 0, 0, 0}
 };
-DATA(0x004ecd48) int bTesting;
-DATA(0x004ecd4c) Smack *smk1;
-DATA(0x004ecd50) Smack *smk2;
-DATA(0x00522f20) signed char bSmackNum;
-DATA(0x00522f24) int gbLastFramePlayed;
-DATA(0x00522f28) SmackSum smksum;
-DATA(0x00522f80) int gbPlayedThrough;
-DATA(0x00522f84) signed char bMainDone;
+DATA(0x004ecd48) int bTesting = 0;
+DATA(0x004ecd4c) Smack *smk1 = 0;
+DATA(0x004ecd50) Smack *smk2 = 0;
+DATA(0x00522f20) signed char bSmackNum = 0;
+DATA(0x00522f24) int gbLastFramePlayed = 0;
+DATA(0x00522f28) SmackSum smksum = {0};
+DATA(0x00522f80) int gbPlayedThrough = 0;
+DATA(0x00522f84) signed char bMainDone = 0;

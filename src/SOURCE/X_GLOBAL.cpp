@@ -94,7 +94,7 @@ DATA(0x004f2740) char *xShortSSLevelNames[X_GLOBAL_SHORT_SKILL_LEVEL_COUNT] = {
     "Bas.", "Adv.", "Exp.", 0
 };
 DATA(0x004f2750) char *xPasswordStrings[X_GLOBAL_PASSWORD_STRING_COUNT];
-DATA(0x004f2a9c) signed char xNetHasOldPlayers;
+DATA(0x004f2a9c) signed char xNetHasOldPlayers = 0;
 DATA(0x004f2ab0) int xShrineBuildingCost[2334];
 DATA(0x00527e78) int xPasswordStringsIndex[8];
 DATA(0x00527e98) signed char xIsExpansionMap;

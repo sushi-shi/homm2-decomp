@@ -18,12 +18,12 @@
 
 
 // ---- module-private globals (retail xref: single-module) ----
-DATA(0x0051739c) static unsigned char gNbCallRetries;      // nb_call_done retry counter
-DATA(0x005173a0) static unsigned char gNetbiosAvail;
-DATA(0x005173a4) static unsigned char gNetbiosLana;
-DATA(0x005173a8) static unsigned char gNbShutdown;         // shutdown flag, cleared by nb_init
+DATA(0x0051739c) static unsigned char gNbCallRetries = 0;      // nb_call_done retry counter
+DATA(0x005173a0) static unsigned char gNetbiosAvail = 0;
+DATA(0x005173a4) static unsigned char gNetbiosLana = 0;
+DATA(0x005173a8) static unsigned char gNbShutdown = 0;         // shutdown flag, cleared by nb_init
 DATA(0x005173ac) static unsigned char gNbMaxSess = NETBIOS_INVALID_ID;
-DATA(0x005173b0) static unsigned char gNbLocalNum;         // local netbios name number
+DATA(0x005173b0) static unsigned char gNbLocalNum = 0;         // local netbios name number
 DATA(0x005173b4) static unsigned char gNetStatus[NETBIOS_SESSION_COUNT];
 DATA(0x005173c0) static char         *gNbGroupName = "Empire Too ";
 DATA(0x005173c4) static char         *gNbListenName = "*";

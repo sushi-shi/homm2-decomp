@@ -3507,5 +3507,5 @@ int army::GetPowBaseY(void)
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x004f54a8) int bSecondAttack;
+DATA(0x004f54a8) int bSecondAttack = 0;
 DATA(0x00527eb4) int gbGenieHalf;
