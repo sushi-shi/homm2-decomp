@@ -540,16 +540,19 @@ VA(0x004cb1d0, 0x1)
 void CreateFizzleTables(void) {}
 
 // @match-note
-// Structurally complete /O2 checkpoint (combined live 91.38%; retained 93.51%): direct clipping removed the
-// decompiler-only coordinate snapshots, and declaring `remaining` inside the
-// non-empty row recovered retail's missing pixel-loop block. Base is 0x418 bytes/
-// 311 instructions versus retail's 0x402/304; both now have the same 34-block,
-// 19-branch ordered CFG, 0x2c frame, and 33/33 matching relocations. The eight
-// resource/read/pixel/palette passes, delays, blits, deletes and frees agree; both
-// H2_ALLOC/H2_FREE sites carry the retail WINMGR.CPP filename and line numbers.
-// Of 815 comparable unmasked bytes, 555 differ from +0x18 through register/stack
-// coloring and equivalent 16-bit lookup SIB order. Revisit after a genuine
-// predecessor/header TU-state change; this is not a proven wall.
+// Structurally complete /O2 checkpoint (live 89.80%; retained 93.51%): direct
+// clipping removed the decompiler-only coordinate snapshots, and declaring
+// `remaining` inside the non-empty row recovered retail's missing pixel-loop
+// block. Base is 0x416 bytes/308 instructions versus retail's 0x402/304; both
+// have the same 34-block, 19-branch ordered CFG and 0x2c frame. Manual COFF
+// review confirms all 33 relocations in the same target order (the helper
+// misidentifies duplicated delinker symbols). The first disassembly divergence
+// after clipping is register/stack coloring while saving `m_updateFlags`; all
+// eight resource/read/pixel/palette passes, delays, blits, deletes and frees
+// agree. Pixel variants tried: signed loads with casts, unsigned stepped loads,
+// and both operand orders of the combined 16-bit lookup; low-byte-first is best.
+// Revisit after a genuine predecessor/header TU-state change; this is not a
+// proven wall.
 VA(0x004cb1e0, 0x402)
 void heroWindowManager::FizzleForward(int x, int y, int width, int height, int delay,
                                       signed char *startPalette, signed char *endPalette)
@@ -589,17 +592,16 @@ void heroWindowManager::FizzleForward(int x, int y, int width, int height, int d
                     int screenOffset = y * WINDOW_SCREEN_WIDTH;
                     int workOffset = 0;
                     do {
-                        signed char *savedPixel = reinterpret_cast<signed char *>(m_fizzleSource->m_pixels) +
+                        unsigned char *savedPixel = m_fizzleSource->m_pixels +
                             m_fizzleSource->m_width * (sourceY - y);
-                        signed char *screenPixel = reinterpret_cast<signed char *>(m_screen->m_pixels) +
+                        unsigned char *screenPixel = m_screen->m_pixels +
                             x + screenOffset;
-                        signed char *workPixel = reinterpret_cast<signed char *>(m_fizzleWork->m_pixels) + workOffset;
+                        unsigned char *workPixel = m_fizzleWork->m_pixels + workOffset;
                         if (x < x + width) {
                             int remaining = width;
                             do {
-                                unsigned short lookup = static_cast<unsigned char>(*savedPixel++);
-                                lookup <<= 8;
-                                lookup |= static_cast<unsigned char>(*workPixel++);
+                                unsigned short lookup =
+                                    *workPixel++ | (*savedPixel++ << 8);
                                 *screenPixel++ = cycleTable[lookup];
                                 remaining--;
                             } while (remaining != 0);

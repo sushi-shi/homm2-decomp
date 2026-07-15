@@ -337,7 +337,7 @@ BASE/WINMGR	?ConvertToHover@heroWindowManager@@QAEHAAUtag_message@@@Z	100.0000	d
 BASE/WINMGR	?CycleColors@@YIXH@Z	99.8276	94ab27b245be
 BASE/WINMGR	?DoDialog@heroWindowManager@@QAEHPAVheroWindow@@P6IHAAUtag_message@@@ZH@Z	99.1111	6108b31b7e68
 BASE/WINMGR	?FadeScreen@heroWindowManager@@QAEXHHPAVpalette@@@Z	100.0000	76fa3ab96e6f
-BASE/WINMGR	?FizzleForward@heroWindowManager@@QAEXHHHHHPAC0@Z	93.5132	cac1f61ab946
+BASE/WINMGR	?FizzleForward@heroWindowManager@@QAEXHHHHHPAC0@Z	89.8026	31bb10c3eb37
 BASE/WINMGR	?Main@heroWindowManager@@UAEHAAUtag_message@@@Z	100.0000	5ef8d637ceb1
 BASE/WINMGR	?Open@heroWindowManager@@UAEHH@Z	94.1364	a9e3d9500e6f
 BASE/WINMGR	?RedrawScreen@heroWindowManager@@QAEXXZ	100.0000	c64b79610770
