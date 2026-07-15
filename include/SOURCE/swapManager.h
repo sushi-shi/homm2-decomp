@@ -82,6 +82,7 @@ typedef enum SwapManagerConstant {
     SWAP_FADE_STEPS = 8,
     SWAP_VIEW_FULL = 0,
     SWAP_VIEW_QUICK = 1,
+    SWAP_CLOSE_REQUESTED = 1,
     SWAP_RESULT_CONTINUE = 1,
     SWAP_RESULT_CLOSE = 2,
     SWAP_SELECTOR_WIDTH = 0x2e,
