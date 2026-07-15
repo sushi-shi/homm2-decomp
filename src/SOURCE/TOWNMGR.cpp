@@ -1901,288 +1901,295 @@ void townManager::DrawTown(int updateScreen, int drawFlags)
     PollSound();
 }
 
-// @match-note 96.72%: complete cost/prerequisite, two-row widget, quick-view,
-// purchase and resource-deduction CFG, exact 0x14c frame, and all 102/102
-// relocations agree. After initial literal identities, the first opcode-shape
-// divergence is neutral-cost indexing at normalized instruction 155: retail
-// loads index before building while this TU selects the reverse address order.
-// The post-95 commutative-subscript spelling was byte-neutral at the retained
-// source shape; the same evaluation-order residual remains in the neutral,
-// dwelling, and row-layout expressions. Revisit only after a TU-state change.
+// @early-stop 99.29%: exact 0xf35 span, 801 instructions, 0x14c frame, every
+// visible slot/CFG edge, and all 102/102 relocation sites and targets agree.
+// The 54 unmasked bytes are five value-neutral evaluation-order spans:
+// +0x2f5..+0x303 and +0x326..+0x334 form neutral-cost addresses index-first
+// versus building-first; +0xb98..+0xb9f, +0xc18..+0xc1f and +0xca1..+0xca8
+// reverse commutative widget-offset/spacing loads. Operand/subscript reversal
+// was byte-neutral, flattening shortened both neutral accesses, and bounded
+// 31-name index plus 32-name offset AST searches retained no gain.
 VA(0x00417c9d, 0xf35)
 int townManager::BuyBuild(int building, int cannotBuy, int quickView)
 {
-    int mageLevel = 0;
-    int index = 0;
-    int costCount = 0;
-    char *description = static_cast<char *>(BaseAlloc(
+    unsigned long prerequisiteMask_c;
+    int prerequisiteCount_p;
+    short dialogLeft_a;
+    int mageLevel_k;
+    char *amountText_n[TOWN_RESOURCE_COUNT];
+    int windowY_m;
+    int bottomRowCount_o;
+    int resourcesInRow_l;
+    int resourceCount_a;
+    short dialogWidth_e;
+    int entryWidth_o;
+    int costCount_o;
+    short dialogButtonCount_m;
+    iconWidget *resourceWidgets_m[TOWN_RESOURCE_COUNT];
+    int xStart_b;
+    int index_h;
+    widget *descriptionWidget_g;
+    int windowHeight_a;
+    short costs_e[8];
+    int dwelling_k;
+    int topRowCount_c;
+    tag_message message_m;
+    signed char resourceTypes_o[8];
+    int windowRows_b;
+    int row_l;
+    icon *resourceIcon_c;
+    short dialogControl_g;
+    short dialogResult_b;
+    int rowWidth_h;
+    int lineCount_j;
+    heroWindow *window_a;
+    short dialogHeight_f;
+    short dialogButtonWidth_l;
+    textWidget *amountWidgets_b[TOWN_RESOURCE_COUNT];
+    int rowResourceTypes_a[4];
+    int x_d;
+    int spacing_h;
+    int rowY_o;
+    char iconName_o[16];
+    int widgetIndex_f;
+    char *description_b;
+
+    mageLevel_k = 0;
+    index_h = 0;
+    costCount_o = 0;
+    description_b = static_cast<char *>(BaseAlloc(
         400, "I:\\Projects\\Heroes\\Prog\\SOURCE\\TOWNMGR.CPP",
         *reinterpret_cast<short *>(const_cast<char *>("\x48\x09")) + 8));
-    short costs[8];
-    signed char resourceTypes[8];
-    int dwelling;
-    short dialogWidth;
-    short dialogHeight;
-    short dialogLeft;
-    short dialogControl;
-    short dialogResult;
-    short dialogButtonWidth;
-    short dialogButtonCount;
-    int widgetIndex;
-    int resourceCount;
-    int topRowCount;
-    int bottomRowCount;
-    int prerequisiteCount;
-    unsigned long prerequisiteMask;
-    int lineCount;
-    int windowY;
-    int windowHeight;
-    int windowRows;
-    heroWindow *window;
-    tag_message message;
-    char iconName[16];
-    widget *descriptionWidget;
-    icon *resourceIcon;
-    int row;
-    int rowY;
-    int resourcesInRow;
-    int rowWidth;
-    int nextResource;
-    int rowResourceTypes[4];
-    int spacing;
-    int xStart;
-    int x;
-    int entryWidth;
-    char *amountText[TOWN_RESOURCE_COUNT];
-    textWidget *amountWidgets[TOWN_RESOURCE_COUNT];
-    iconWidget *resourceWidgets[TOWN_RESOURCE_COUNT];
 
-    for (index = 0; index < TOWN_RESOURCE_COUNT; ++index) {
-        costs[index] = -1;
-        resourceTypes[index] = static_cast<signed char>(costs[index]);
+    for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
+        costs_e[index_h] = -1;
+        resourceTypes_o[index_h] = static_cast<signed char>(costs_e[index_h]);
     }
 
-    dwelling = -1;
+    dwelling_k = -1;
     if (building >= 19 && building <= 30)
-        dwelling = building - 19;
+        dwelling_k = building - 19;
 
     if (building == TOWN_COMMAND_TAVERN &&
         m_town->m_type == TOWN_TYPE_NECROMANCER) {
-        for (index = 0; index < TOWN_RESOURCE_COUNT; ++index) {
-            if (xShrineBuildingCost[index] > 0) {
-                resourceTypes[costCount] = static_cast<signed char>(index);
-                costs[costCount] = static_cast<short>(xShrineBuildingCost[index]);
-                ++costCount;
+        for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
+            if (xShrineBuildingCost[index_h] > 0) {
+                resourceTypes_o[costCount_o] = static_cast<signed char>(index_h);
+                costs_e[costCount_o] = static_cast<short>(xShrineBuildingCost[index_h]);
+                ++costCount_o;
             }
         }
     } else if (building == TOWN_COMMAND_MAGE_GUILD) {
-        mageLevel = gpTownManager->m_town->m_buildState;
-        for (index = 0; index < TOWN_RESOURCE_COUNT; ++index) {
+        mageLevel_k = gpTownManager->m_town->m_buildState;
+        for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
             if (gMageBuildingCosts[
-                    mageLevel + 1 < TOWN_MAGE_GUILD_MAX_LEVEL
-                        ? mageLevel + 1
-                        : TOWN_MAGE_GUILD_MAX_LEVEL][index] > 0) {
-                resourceTypes[costCount] = static_cast<signed char>(index);
-                costs[costCount] = static_cast<short>(
+                    mageLevel_k + 1 < TOWN_MAGE_GUILD_MAX_LEVEL
+                        ? mageLevel_k + 1
+                        : TOWN_MAGE_GUILD_MAX_LEVEL][index_h] > 0) {
+                resourceTypes_o[costCount_o] = static_cast<signed char>(index_h);
+                costs_e[costCount_o] = static_cast<short>(
                     gMageBuildingCosts[
-                        mageLevel + 1 < TOWN_MAGE_GUILD_MAX_LEVEL
-                            ? mageLevel + 1
-                            : TOWN_MAGE_GUILD_MAX_LEVEL][index]);
-                ++costCount;
+                        mageLevel_k + 1 < TOWN_MAGE_GUILD_MAX_LEVEL
+                            ? mageLevel_k + 1
+                            : TOWN_MAGE_GUILD_MAX_LEVEL][index_h]);
+                ++costCount_o;
             }
         }
     } else if (building == TOWN_COMMAND_SPECIAL_BUILDING) {
-        for (index = 0; index < TOWN_RESOURCE_COUNT; ++index) {
-            if (gSpecialBuildingCosts[gpTownManager->m_town->m_type][index] > 0) {
-                resourceTypes[costCount] = static_cast<signed char>(index);
-                costs[costCount] = static_cast<short>(
-                    gSpecialBuildingCosts[gpTownManager->m_town->m_type][index]);
-                ++costCount;
+        for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
+            if (gSpecialBuildingCosts[gpTownManager->m_town->m_type][index_h] > 0) {
+                resourceTypes_o[costCount_o] = static_cast<signed char>(index_h);
+                costs_e[costCount_o] = static_cast<short>(
+                    gSpecialBuildingCosts[gpTownManager->m_town->m_type][index_h]);
+                ++costCount_o;
             }
         }
     } else if (building <= TOWN_COMMAND_LAST_NEUTRAL_BUILDING) {
-        for (index = 0; index < TOWN_RESOURCE_COUNT; ++index) {
-            if (gNeutralBuildingCosts[building][index] > 0) {
-                resourceTypes[costCount] = static_cast<signed char>(index);
-                costs[costCount] = static_cast<short>(
-                    gNeutralBuildingCosts[building][index]);
-                ++costCount;
+        for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
+            if (gNeutralBuildingCosts[building][index_h] > 0) {
+                resourceTypes_o[costCount_o] = static_cast<signed char>(index_h);
+                costs_e[costCount_o] = static_cast<short>(
+                    gNeutralBuildingCosts[building][index_h]);
+                ++costCount_o;
             }
         }
     } else {
-        for (index = 0; index < TOWN_RESOURCE_COUNT; ++index) {
+        for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
             if (gDwellingCosts[gpTownManager->m_town->m_type]
-                              [dwelling][index] > 0) {
-                resourceTypes[costCount] = static_cast<signed char>(index);
-                costs[costCount] = static_cast<short>(
+                              [dwelling_k][index_h] > 0) {
+                resourceTypes_o[costCount_o] = static_cast<signed char>(index_h);
+                costs_e[costCount_o] = static_cast<short>(
                     gDwellingCosts[gpTownManager->m_town->m_type]
-                                  [dwelling][index]);
-                ++costCount;
+                                  [dwelling_k][index_h]);
+                ++costCount_o;
             }
         }
     }
 
-    dialogWidth = 0x50;
-    dialogHeight = 0x28;
-    dialogLeft = 0x20;
-    dialogControl = 0x121;
-    dialogResult = 0;
-    dialogButtonWidth = 2;
-    dialogButtonCount = 3;
-    widgetIndex = 0;
-    resourceCount = 0;
-    topRowCount = 0;
-    bottomRowCount = 0;
+    dialogWidth_e = 0x50;
+    dialogHeight_f = 0x28;
+    dialogLeft_a = 0x20;
+    dialogControl_g = 0x121;
+    dialogResult_b = 0;
+    dialogButtonWidth_l = 2;
+    dialogButtonCount_m = 3;
+    widgetIndex_f = 0;
+    resourceCount_a = 0;
+    topRowCount_c = 0;
+    bottomRowCount_o = 0;
 
-    for (index = 0; index < TOWN_RESOURCE_COUNT; ++index) {
-        if (resourceTypes[index] != -1)
-            ++resourceCount;
+    for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
+        if (resourceTypes_o[index_h] != -1)
+            ++resourceCount_a;
     }
-    if (resourceCount < 5) {
-        topRowCount = resourceCount;
-    } else if (resourceCount == 5) {
-        topRowCount = 2;
-        bottomRowCount = 3;
-    } else if (resourceCount == 6) {
-        topRowCount = 3;
-        bottomRowCount = 3;
-    } else if (resourceCount == TOWN_RESOURCE_COUNT) {
-        topRowCount = 3;
-        bottomRowCount = 4;
+    if (resourceCount_a <= 4) {
+        topRowCount_c = resourceCount_a;
+    } else if (resourceCount_a == 5) {
+        topRowCount_c = 2;
+        bottomRowCount_o = 3;
+    } else if (resourceCount_a == 6) {
+        topRowCount_c = 3;
+        bottomRowCount_o = 3;
+    } else if (resourceCount_a == TOWN_RESOURCE_COUNT) {
+        topRowCount_c = 3;
+        bottomRowCount_o = 4;
     }
 
-    sprintf(description, GetBuildingInfo(m_town->m_type, building, 0));
-    if (dwelling >= 0) {
-        prerequisiteCount = 0;
-        prerequisiteMask = gHierarchyMask[m_town->m_type][dwelling];
-        for (index = 0; index < 32; ++index) {
-            if (prerequisiteMask & (1L << index)) {
-                if (prerequisiteCount == 0)
-                    strcat(description, "\n\nRequires:");
-                ++prerequisiteCount;
-                strcat(description, "\n");
-                strcat(description, GetBuildingName(m_town->m_type, index));
+    sprintf(description_b, GetBuildingInfo(m_town->m_type, building, 0));
+    if (dwelling_k >= 0) {
+        prerequisiteCount_p = 0;
+        prerequisiteMask_c = gHierarchyMask[m_town->m_type][dwelling_k];
+        for (index_h = 0; index_h < 32; ++index_h) {
+            if (prerequisiteMask_c & (1L << index_h)) {
+                if (prerequisiteCount_p == 0)
+                    strcat(description_b, "\n\nRequires:");
+                ++prerequisiteCount_p;
+                strcat(description_b, "\n");
+                strcat(description_b, GetBuildingName(m_town->m_type, index_h));
             }
         }
         if (m_town->m_type == TOWN_TYPE_NECROMANCER &&
             building == TOWN_COMMAND_NECROMANCER_MAGE_GUILD_PREREQUISITE &&
             m_town->m_buildState <= 2)
-            strcat(description, "\nLevel 2 Mage Guild");
+            strcat(description_b, "\nLevel 2 Mage Guild");
     }
-    strcat(description, "\n ");
+    strcat(description_b, "\n ");
 
-    lineCount = bigFont->LineLength(description, 0xf0);
-    windowY = 0x97;
-    windowHeight = windowY;
-    windowHeight += lineCount << 4;
-    if (resourceCount <= 4)
-        windowHeight += 0x2c;
+    lineCount_j = bigFont->LineLength(description_b, 0xf0);
+    windowY_m = 0x97;
+    windowHeight_a = windowY_m;
+    windowHeight_a += lineCount_j << 4;
+    if (resourceCount_a <= 4)
+        windowHeight_a += 0x2c;
     else
-        windowHeight += 0x58;
+        windowHeight_a += 0x58;
     if (quickView == 0)
-        windowHeight += 0x27;
-    windowRows = (windowHeight - 0x45) / 0x2d;
-    if (windowRows < 3)
-        windowRows = 3;
-    if (windowRows > 6)
-        windowRows = 6;
+        windowHeight_a += 0x27;
+    windowRows_b = (windowHeight_a - 0x45) / 0x2d;
+    if (windowRows_b < 3)
+        windowRows_b = 3;
+    if (windowRows_b > 6)
+        windowRows_b = 6;
 
-    sprintf(gText, "buybuil%d.bin", windowRows);
-    window = new heroWindow(0x9e, 0x10, gText);
-    if (window == 0)
+    sprintf(gText, "buybuil%d.bin", windowRows_b);
+    window_a = new heroWindow(0x9e, 0x10, gText);
+    if (window_a == 0)
         MemError();
 
-    message.type = TOWN_MESSAGE_SELECT;
-    message.payload.widget.command = 9;
-    message.payload.widget.id = 2;
-    sprintf(iconName, "cstl%s.icn", cHeroTypeShortName[m_town->m_type]);
-    message.payload.widget.data.text = iconName;
-    window->BroadcastMessage(message);
-    message.payload.widget.command = 4;
-    message.payload.widget.id = 2;
-    message.payload.widget.data.value = building;
-    window->BroadcastMessage(message);
+    message_m.type = TOWN_MESSAGE_SELECT;
+    message_m.payload.widget.command = 9;
+    message_m.payload.widget.id = 2;
+    sprintf(iconName_o, "cstl%s.icn", cHeroTypeShortName[m_town->m_type]);
+    message_m.payload.widget.data.text = iconName_o;
+    window_a->BroadcastMessage(message_m);
+    message_m.payload.widget.command = 4;
+    message_m.payload.widget.id = 2;
+    message_m.payload.widget.data.value = building;
+    window_a->BroadcastMessage(message_m);
 
     if (building == TOWN_COMMAND_MAGE_GUILD) {
         sprintf(gText, "Mage Guild, Level %d",
-                mageLevel + 1 < TOWN_MAGE_GUILD_MAX_LEVEL
-                    ? mageLevel + 1
+                mageLevel_k + 1 < TOWN_MAGE_GUILD_MAX_LEVEL
+                    ? mageLevel_k + 1
                     : TOWN_MAGE_GUILD_MAX_LEVEL);
     } else {
         strcpy(gText, GetBuildingName(m_town->m_type, building));
     }
-    message.payload.widget.command = 3;
-    message.payload.widget.id = 3;
-    message.payload.widget.data.text = gText;
-    window->BroadcastMessage(message);
+    message_m.payload.widget.command = 3;
+    message_m.payload.widget.id = 3;
+    message_m.payload.widget.data.text = gText;
+    window_a->BroadcastMessage(message_m);
 
-    descriptionWidget = new textWidget(
-        0x2b, static_cast<short>(windowY + 0x18), 0xf0,
-        static_cast<short>(lineCount << 4), description, "bigfont.fnt",
+    descriptionWidget_g = new textWidget(
+        0x2b, static_cast<short>(windowY_m + 0x18), 0xf0,
+        static_cast<short>(lineCount_j << 4), description_b, "bigfont.fnt",
         1, -1, 8, 1);
-    if (descriptionWidget == 0)
+    if (descriptionWidget_g == 0)
         MemError();
-    window->AddWidget(descriptionWidget, -1);
+    window_a->AddWidget(descriptionWidget_g, -1);
 
-    widgetIndex = 0;
-    resourceIcon = gpResourceManager->GetIcon("resource.icn");
-    for (row = 0; row < 2; ++row) {
-        rowY = row * 0x2c + lineCount * 0x10 + windowY + 0xc;
-        if (row == 0)
-            resourcesInRow = topRowCount;
+    widgetIndex_f = 0;
+    resourceIcon_c = gpResourceManager->GetIcon("resource.icn");
+    for (row_l = 0; row_l < 2; ++row_l) {
+        rowY_o = row_l * 0x2c + lineCount_j * 0x10 + windowY_m + 0xc;
+        if (row_l == 0)
+            resourcesInRow_l = topRowCount_c;
         else
-            resourcesInRow = bottomRowCount;
-        if (resourcesInRow > 0) {
-            rowWidth = 0;
-            nextResource = widgetIndex;
-            for (index = 0; index < 4; ++index) {
-                if (index < resourcesInRow) {
-                    while (resourceTypes[nextResource] == -1)
-                        ++nextResource;
-                    rowResourceTypes[index] = resourceTypes[nextResource];
-                    ++nextResource;
+            resourcesInRow_l = bottomRowCount_o;
+        if (resourcesInRow_l > 0) {
+            rowWidth_h = 0;
+            costCount_o = widgetIndex_f;
+            for (index_h = 0; index_h < 4; ++index_h) {
+                if (index_h < resourcesInRow_l) {
+                    while (resourceTypes_o[costCount_o] == -1)
+                        ++costCount_o;
+                    rowResourceTypes_a[index_h] = resourceTypes_o[costCount_o];
+                    ++costCount_o;
                 } else {
-                    rowResourceTypes[index] = -1;
+                    rowResourceTypes_a[index_h] = -1;
                 }
             }
-            for (index = 0; index < resourcesInRow; ++index) {
-                rowWidth += GetIconEntry(
-                    resourceIcon, rowResourceTypes[index])->w;
+            for (index_h = 0; index_h < resourcesInRow_l; ++index_h) {
+                rowWidth_h += GetIconEntry(
+                    resourceIcon_c, rowResourceTypes_a[index_h])->w;
             }
-            spacing = (0x100 - rowWidth) / (resourcesInRow + 1);
-            xStart = spacing + 0x20;
-            x = xStart;
-            for (index = 0; index < resourcesInRow; ++index) {
-                entryWidth = GetIconEntry(
-                    resourceIcon, rowResourceTypes[index])->w;
-                amountText[widgetIndex] = static_cast<char *>(BaseAlloc(
+            spacing_h = (0x100 - rowWidth_h) / (resourcesInRow_l + 1);
+            xStart_b = spacing_h + 0x20;
+            x_d = xStart_b;
+            for (index_h = 0; index_h < resourcesInRow_l; ++index_h) {
+                entryWidth_o = GetIconEntry(
+                    resourceIcon_c, rowResourceTypes_a[index_h])->w;
+                amountText_n[widgetIndex_f] = static_cast<char *>(BaseAlloc(
                     10, "I:\\Projects\\Heroes\\Prog\\SOURCE\\TOWNMGR.CPP",
                     *reinterpret_cast<short *>(const_cast<char *>("\x48\x09")) +
                     0x128));
-                sprintf(amountText[widgetIndex], "%d", costs[widgetIndex]);
-                amountWidgets[widgetIndex] = new textWidget(
-                    static_cast<short>(x), static_cast<short>(rowY + 0x23),
-                    static_cast<short>(entryWidth), 0xc,
-                    amountText[widgetIndex], "smalfont.fnt", 1, -1, 8, 1);
-                if (amountWidgets[widgetIndex] == 0)
+                sprintf(amountText_n[widgetIndex_f], "%d", costs_e[widgetIndex_f]);
+                int widgetXOffset = 0;
+                amountWidgets_b[widgetIndex_f] = new textWidget(
+                    static_cast<short>(x_d + widgetXOffset),
+                    static_cast<short>(rowY_o + 0x23),
+                    static_cast<short>(entryWidth_o), 0xc,
+                    amountText_n[widgetIndex_f], "smalfont.fnt", 1, -1, 8, 1);
+                if (amountWidgets_b[widgetIndex_f] == 0)
                     MemError();
-                resourceWidgets[widgetIndex] = new iconWidget(
+                resourceWidgets_m[widgetIndex_f] = new iconWidget(
                     static_cast<short>(
-                        x - GetIconEntry(resourceIcon,
-                                         rowResourceTypes[index])->x),
-                    static_cast<short>(rowY),
-                    static_cast<short>(entryWidth), 0xc, "resource.icn",
-                    resourceTypes[widgetIndex], 0, -1, 0x10, 1);
-                if (resourceWidgets[widgetIndex] == 0)
+                        x_d + widgetXOffset -
+                        GetIconEntry(resourceIcon_c,
+                                     rowResourceTypes_a[index_h])->x),
+                    static_cast<short>(rowY_o),
+                    static_cast<short>(entryWidth_o), 0xc, "resource.icn",
+                    resourceTypes_o[widgetIndex_f], 0, -1, 0x10, 1);
+                if (resourceWidgets_m[widgetIndex_f] == 0)
                     MemError();
-                window->AddWidget(amountWidgets[widgetIndex], -1);
-                window->AddWidget(resourceWidgets[widgetIndex], -1);
-                ++widgetIndex;
-                x += spacing + entryWidth;
+                window_a->AddWidget(amountWidgets_b[widgetIndex_f], -1);
+                window_a->AddWidget(resourceWidgets_m[widgetIndex_f], -1);
+                ++widgetIndex_f;
+                x_d += spacing_h + entryWidth_o;
             }
         }
     }
-    gpResourceManager->Dispose(resourceIcon);
+    gpResourceManager->Dispose(resourceIcon_c);
 
     if (quickView == 0)
         gpWindowManager->BroadcastMessage(
@@ -2190,86 +2197,88 @@ int townManager::BuyBuild(int building, int cannotBuy, int quickView)
             TOWN_INTERFACE_BROADCAST_FLAGS);
     m_selectedBuilding = -1;
     if (quickView != 0) {
-        message.payload.widget.command = 6;
-        message.payload.widget.data.value = 6;
-        message.payload.widget.id = TOWN_DIALOG_CONFIRM;
-        window->BroadcastMessage(message);
-        message.payload.widget.command = 6;
-        message.payload.widget.data.value = 6;
-        message.payload.widget.id = 0x7801;
-        window->BroadcastMessage(message);
-        message.payload.widget.command = 6;
-        message.payload.widget.data.value = 6;
-        message.payload.widget.id = 0;
-        window->BroadcastMessage(message);
-        gpWindowManager->AddWindow(window, -1, 1);
+        message_m.payload.widget.command = 6;
+        message_m.payload.widget.data.value = 6;
+        message_m.payload.widget.id = TOWN_DIALOG_CONFIRM;
+        window_a->BroadcastMessage(message_m);
+        message_m.payload.widget.command = 6;
+        message_m.payload.widget.data.value = 6;
+        message_m.payload.widget.id = 0x7801;
+        window_a->BroadcastMessage(message_m);
+        message_m.payload.widget.command = 6;
+        message_m.payload.widget.data.value = 6;
+        message_m.payload.widget.id = 0;
+        window_a->BroadcastMessage(message_m);
+        gpWindowManager->AddWindow(window_a, -1, 1);
         QuickViewWait();
-        gpWindowManager->RemoveWindow(window);
+        gpWindowManager->RemoveWindow(window_a);
     } else {
         if (cannotBuy != 0) {
-            message.payload.widget.command = 6;
-            message.payload.widget.id = TOWN_DIALOG_CONFIRM;
-            message.payload.widget.data.value = 2;
-            window->BroadcastMessage(message);
-            message.payload.widget.command = 5;
-            message.payload.widget.id = TOWN_DIALOG_CONFIRM;
-            message.payload.widget.data.value = 0x1000;
-            window->BroadcastMessage(message);
+            message_m.payload.widget.command = 6;
+            message_m.payload.widget.id = TOWN_DIALOG_CONFIRM;
+            message_m.payload.widget.data.value = 2;
+            window_a->BroadcastMessage(message_m);
+            message_m.payload.widget.command = 5;
+            message_m.payload.widget.id = TOWN_DIALOG_CONFIRM;
+            message_m.payload.widget.data.value = 0x1000;
+            window_a->BroadcastMessage(message_m);
         }
-        gpWindowManager->DoDialog(window, TrueFalseDialogHandler, 0);
+        gpWindowManager->DoDialog(window_a, TrueFalseDialogHandler, 0);
         if (gpWindowManager->m_dialogResult == TOWN_DIALOG_CONFIRM) {
             m_selectedBuilding = building;
-            for (index = 0; index < resourceCount; ++index)
-                gpCurPlayer->m_resources[resourceTypes[index]] -= costs[index];
+            for (index_h = 0; index_h < resourceCount_a; ++index_h)
+                gpCurPlayer->m_resources[resourceTypes_o[index_h]] -= costs_e[index_h];
         }
     }
     if (quickView == 0)
         gpWindowManager->BroadcastMessage(
             TOWN_MESSAGE_SELECT, 6, TOWN_CONTROL_CLOSE,
             TOWN_INTERFACE_BROADCAST_FLAGS);
-    delete window;
-    if (quickView != 0)
+    delete window_a;
+    if (quickView != 0) {
         return 0;
-    return gpWindowManager->m_dialogResult == TOWN_DIALOG_CONFIRM;
+    } else {
+        return gpWindowManager->m_dialogResult == TOWN_DIALOG_CONFIRM;
+    }
 }
 
-// @match-note 98.25%: complete build/visibility, extent, fizzle, sample and
-// redraw CFG, exact 0x30 frame, and all 47/47 external relocations agree.
-// Retail has two jump-to-next continuations in the entry predicate and forms
-// the Necromancer frame with lea(3*n-3),add; nested predicates and both
-// 2*(3*n-3) operand orders compile like the current form. Revisit at SOURCE 95%.
 VA(0x00418bd2, 0x3e9)
 void townManager::BuildObj(int building)
 {
-    int objectIndex;
-    SLimitData limits;
-    int index;
-    SAMPLE2 buildSample;
-    int frame;
+    int objectIndex_k;
+    SLimitData limits_h;
+    int index_j;
+    SAMPLE2 buildSample_b;
+    int frame_g;
 
-    if (((!(m_town->m_buildings & (1L << building))) ||
-         (building == TOWN_COMMAND_MAGE_GUILD &&
-          m_town->m_buildState != TOWN_MAGE_GUILD_MAX_LEVEL)) &&
-        (building != TOWN_COMMAND_DOCK || m_town->CanBuildDock())) {
+    if ((m_town->m_buildings & (1L << building)) &&
+        (building != TOWN_COMMAND_MAGE_GUILD ||
+         m_town->m_buildState == TOWN_MAGE_GUILD_MAX_LEVEL)) {
+        return;
+    }
+    if (building == TOWN_COMMAND_DOCK && !m_town->CanBuildDock()) {
+        return;
+    }
+    {
         DrawTown(1, 1);
         m_town->BuildBuilding(building);
-        for (index = 0; index < m_townObjectCount; ++index) {
+        for (index_j = 0; index_j < m_townObjectCount; ++index_j) {
             if (m_town->m_buildings &
-                (1L << m_townObjects[index]->m_buildingId)) {
-                m_townObjects[index]->m_visible = 1;
-                m_townObjects[index]->m_border->m_flags |=
+                (1L << m_townObjects[index_j]->m_buildingId)) {
+                m_townObjects[index_j]->m_visible = 1;
+                m_townObjects[index_j]->m_border->m_flags |=
                     TOWN_OBJECT_BORDER_ENABLED;
             } else {
-                m_townObjects[index]->m_visible = 0;
-                m_townObjects[index]->m_border->m_flags &=
+                m_townObjects[index_j]->m_visible = 0;
+                m_townObjects[index_j]->m_border->m_flags &=
                     ~TOWN_OBJECT_BORDER_ENABLED;
             }
         }
 
-        objectIndex = -1;
-        for (index = 0; index < m_townObjectCount; ++index) {
-            if (m_townObjects[index]->m_buildingId == building)
-                objectIndex = index;
+        objectIndex_k = -1;
+        for (index_j = 0; index_j < m_townObjectCount; ++index_j) {
+            if (m_townObjects[index_j]->m_buildingId == building)
+                objectIndex_k = index_j;
         }
 
         giMaxExtentY = 0;
@@ -2281,20 +2290,20 @@ void townManager::BuildObj(int building)
         gbReturnAfterComputeExtent = 1;
         if (building == TOWN_COMMAND_MAGE_GUILD) {
             if (gpTownManager->m_town->m_type == TOWN_TYPE_NECROMANCER)
-                frame = (gpTownManager->m_town->m_buildState * 3 - 3) << 1;
+                frame_g = (gpTownManager->m_town->m_buildState - 1) * 3 * 2;
             else
-                frame = gpTownManager->m_town->m_buildState - 1;
-            m_townObjects[objectIndex]->m_icon->CombatClipDrawToBuffer(
-                0, 0, frame, &limits, 0, 0, 0, 0);
-            if (m_townObjects[objectIndex]->m_animationFrameCount != 0)
-                m_townObjects[objectIndex]->m_icon->CombatClipDrawToBuffer(
-                    0, 0, frame + 1, &limits, 0, 0, 0, 0);
+                frame_g = gpTownManager->m_town->m_buildState - 1;
+            m_townObjects[objectIndex_k]->m_icon->CombatClipDrawToBuffer(
+                0, 0, frame_g, &limits_h, 0, 0, 0, 0);
+            if (m_townObjects[objectIndex_k]->m_animationFrameCount != 0)
+                m_townObjects[objectIndex_k]->m_icon->CombatClipDrawToBuffer(
+                    0, 0, frame_g + 1, &limits_h, 0, 0, 0, 0);
         } else {
-            m_townObjects[objectIndex]->m_icon->CombatClipDrawToBuffer(
-                0, 0, 0, &limits, 0, 0, 0, 0);
-            if (m_townObjects[objectIndex]->m_animationFrameCount != 0)
-                m_townObjects[objectIndex]->m_icon->CombatClipDrawToBuffer(
-                    0, 0, 1, &limits, 0, 0, 0, 0);
+            m_townObjects[objectIndex_k]->m_icon->CombatClipDrawToBuffer(
+                0, 0, 0, &limits_h, 0, 0, 0, 0);
+            if (m_townObjects[objectIndex_k]->m_animationFrameCount != 0)
+                m_townObjects[objectIndex_k]->m_icon->CombatClipDrawToBuffer(
+                    0, 0, 1, &limits_h, 0, 0, 0, 0);
         }
         gbComputeExtent = 0;
         gbSaveBiggestExtent = 0;
@@ -2305,13 +2314,13 @@ void townManager::BuildObj(int building)
             giMaxExtentX - giMinExtentX + 1,
             giMaxExtentY - giMinExtentY + 1);
         DrawTown(0, 1);
-        buildSample = NULL_SAMPLE2;
-        buildSample = LoadPlaySample("buildtwn.82M");
+        buildSample_b = NULL_SAMPLE2;
+        buildSample_b = LoadPlaySample("buildtwn.82M");
         gpWindowManager->FizzleForward(
             giMinExtentX, giMinExtentY,
             giMaxExtentX - giMinExtentX + 1,
             giMaxExtentY - giMinExtentY + 1, -1, 0, 0);
-        WaitEndSample(buildSample, -1);
+        WaitEndSample(buildSample_b, -1);
         PollSound();
         m_selectedBuilding = -1;
         gpWindowManager->BroadcastMessage(
