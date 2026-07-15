@@ -124,7 +124,10 @@ void dropListWidget::DeleteItem(int index)
 }
 
 // @early-stop
-// delinker jump-table artifact: relocation-masked raw compare is 848/848 bytes identical; unmasked addends differ only at +0x15b..0x15e and the six table words +0x338..0x34f ($L1973 locals vs Main-relative retail labels).
+// The complete 0x350-byte range is raw-exact after relocation-union masking, proving
+// frame/slots and CFG. All 15 external relocation targets/addends agree. The other seven
+// of 22 ordered sites are the dispatch at +0x15b and six-word table at +0x338: MSVC
+// emits $L locals, while the delinker rewrites them as Main plus the same local offsets.
 VA(0x004dc2e0, 0x350)
 int dropListWidget::Main(tag_message &message)
 {

@@ -21,10 +21,6 @@
 #include <BASE/font.h>
 #include <BASE/bitmap.h>
 #include <BASE/palette.h>
-// @early-stop
-// Relocation-masked code, frame/slots, and CFG are exact. The only raw residual is
-// the manager-name relocation field: the local $SG string and retail
-// const_0011e9a0 resolve to the same bytes; all 3 ordered runtime targets agree.
 VA(0x004c7fa0, 0xdb)
 resourceManager::resourceManager(void) : baseManager()
 {
@@ -32,7 +28,7 @@ resourceManager::resourceManager(void) : baseManager()
     m_active = 0;
     m_resourceListHead = 0;
     m_expunging = 0;
-    strcpy(m_name, "resourceManager");
+    strcpy(m_lastFileName, "");
     m_lastFileId = 0;
     for (aggregateIndex = 0; aggregateIndex < RESOURCE_MANAGER_AGGREGATE_LIMIT; aggregateIndex++) {
         m_aggregateFd[aggregateIndex] = RESOURCE_MANAGER_INVALID_FILE;
