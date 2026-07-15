@@ -1292,8 +1292,9 @@ int SRandom(int low, int high)
 // ordered relocations agree. The complete span differs only in allocation/scheduling:
 // base preserves EDI, loads the seed early and uses EDX/ESI for terms; retail preserves
 // EBP, derives x then y into ESI/EDX, and holds the seed in ECX. Split term locals,
-// in-place y, a local seed and folded multiply/add expressions were checked; the named
-// algorithm constants, state arithmetic and final store remain instruction-equivalent.
+// in-place y, local/single-expression seeds, x-first updates, and folded multiply/add
+// expressions were checked; the named algorithm constants, state arithmetic and final
+// store remain instruction-equivalent.
 VA(0x004c69f0, 0x5c)
 void SIncRandomize(int x, int y)
 {
@@ -1434,14 +1435,12 @@ void GetDataEntry(char *prompt, char *destination, int maximumLength, char *init
 }
 
 // @match-note
-// Structurally complete /O2 checkpoint: all 23 relocations and the complete
-// broadcast/copy/draw/dialog-result path agree. Moving the possible-cancel tail
-// before the normal fallback recovered retail body order and shortened base to
-// 0x16f versus retail's 0x173. The remaining difference is widget id 0x7802 being
-// hoisted into the initial command dispatch instead of emitted in the tail. Message,
-// widget command/id and phase constants now use their proven enums, and the flag mask
-// uses the integer widget-data view rather than a fake text pointer. Direct returns
-// regressed badly; a volatile tail read emitted no change and was removed.
+// Structurally complete /O2 checkpoint: the command-domain switch preserves the
+// retail case-body order, including the physical cancel tail. Base and retail are
+// both 0x173 with identical normalized instruction and 23-relocation streams. The
+// remaining raw residual is one exchanged near/short JE and one near/short JNE; the
+// total size is unchanged. A bounded libclang AST pass tested 16 variants in 30 walks
+// and retained none. Revisit after an exact-preserving predecessor/TU-state change.
 VA(0x004c6e50, 0x173)
 int DataEntryWindowHandler(struct tag_message &message)
 {
@@ -1459,13 +1458,16 @@ int DataEntryWindowHandler(struct tag_message &message)
     else {
         if (message.type != MESSAGE_WIDGET)
             goto normalEvent;
-        if (message.payload.widget.command != WIDGET_COMMAND_SELECT) {
-            if (message.payload.widget.command == WIDGET_COMMAND_DESELECT)
-                goto possibleCancelEvent;
+        switch (message.payload.widget.command) {
+        case WIDGET_COMMAND_SELECT:
+            if (message.payload.widget.id != DATA_ENTRY_TEXT_WIDGET)
+                goto normalEvent;
+            break;
+        case WIDGET_COMMAND_DESELECT:
+            goto possibleCancelEvent;
+        default:
             goto normalEvent;
         }
-        if (message.payload.widget.id != DATA_ENTRY_TEXT_WIDGET)
-            goto normalEvent;
     }
 
     message.type = MESSAGE_WIDGET;
