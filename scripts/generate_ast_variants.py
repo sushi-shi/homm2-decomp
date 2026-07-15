@@ -700,6 +700,85 @@ def inline_member_access_edits(
     return mutations
 
 
+def inline_global_read_edits(
+    fn, blob: bytes, insertion: int, helper_name_count: int
+) -> list[AstMutation]:
+    """Extract pure integral global reads nested in value-producing binary expressions."""
+    parents = {
+        child.hash: parent
+        for parent in fn.walk_preorder()
+        for child in parent.get_children()
+    }
+    mutations = []
+    read_index = 0
+    for node in fn.walk_preorder():
+        if node.kind != ci.CursorKind.DECL_REF_EXPR or node.referenced is None:
+            continue
+        declaration = node.referenced
+        parent = declaration.semantic_parent
+        if (
+            declaration.kind != ci.CursorKind.VAR_DECL
+            or parent is None or parent.kind != ci.CursorKind.TRANSLATION_UNIT
+            or canonical_kind(declaration.type) not in INTEGRAL_TYPE_KINDS | {ci.TypeKind.ENUM}
+            or type_is_volatile(declaration.type)
+        ):
+            continue
+        start, end = cursor_range(node)
+        spelling = declaration.spelling
+        if not spelling or blob[start:end] != spelling.encode("utf-8"):
+            continue
+
+        current = node
+        enclosing_binary = None
+        rejected = False
+        while current.hash in parents:
+            ancestor = parents[current.hash]
+            if ancestor.kind == ci.CursorKind.UNARY_OPERATOR:
+                tokens = {token.spelling for token in ancestor.get_tokens()}
+                if tokens & {"&", "++", "--"}:
+                    rejected = True
+                    break
+            if ancestor.kind == ci.CursorKind.BINARY_OPERATOR:
+                children = list(ancestor.get_children())
+                if len(children) != 2:
+                    rejected = True
+                    break
+                token = operator_token(
+                    ancestor, children[0].extent.end.offset, children[1].extent.start.offset,
+                    PURE_INLINE_BINARY | ASSIGNMENTS,
+                )
+                if token is None or token.spelling in ASSIGNMENTS or has_side_effect(ancestor):
+                    rejected = True
+                    break
+                enclosing_binary = ancestor
+                break
+            if ancestor.kind in CALL_KINDS:
+                rejected = True
+                break
+            current = ancestor
+        if rejected or enclosing_binary is None:
+            continue
+
+        return_type = helper_return_spelling(declaration.type)
+        if return_type is None:
+            continue
+        for name_index in range(helper_name_count):
+            helper_name = f"H2AstGlobal{read_index:03d}_{name_index}"
+            helper = (
+                f"static inline {return_type} {helper_name}()\n"
+                "{\n"
+                f"    return {spelling};\n"
+                "}\n\n"
+            ).encode()
+            mutations.append(AstMutation(
+                "inline_global_read",
+                f"line-{line_number(blob, start)}-{spelling}-{name_index}",
+                (AstEdit(insertion, insertion, helper), AstEdit(start, end, f"{helper_name}()".encode())),
+            ))
+        read_index += 1
+    return mutations
+
+
 def inline_nested_expression_edits(
     fn, blob: bytes, insertion: int, helper_name_count: int
 ) -> list[AstMutation]:
@@ -973,6 +1052,8 @@ def atomic_mutations(
         mutations += inline_expression_edits(fn, blob, insertion, helper_name_count)
     if "inline_member_access" in families:
         mutations += inline_member_access_edits(fn, blob, insertion, helper_name_count)
+    if "inline_global_read" in families:
+        mutations += inline_global_read_edits(fn, blob, insertion, helper_name_count)
     if "inline_nested_expression" in families:
         mutations += inline_nested_expression_edits(fn, blob, insertion, helper_name_count)
     if "inline_read_advance" in families:
@@ -1193,6 +1274,7 @@ def main(argv=None, *, prog=None, description=None) -> int:
         "commutative_order", "relational_order", "independent_statement_order",
         "declaration_split", "declaration_merge", "inline_expression", "inline_read_advance",
         "inline_nested_expression", "inline_member_access", "identifier_rename",
+        "inline_global_read",
     }
     unknown = families - known_families
     if unknown:
