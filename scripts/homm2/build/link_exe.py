@@ -184,21 +184,28 @@ def winepaths_w(paths):
     return output
 
 
-def read_nb09_module_contributions(path):
-    """Return module stem -> executable sstModule contribution records."""
+def read_nb09_module_contributions(path, executable_only=True):
+    """Return module stem -> sstModule ranges, optionally limited to executable sections."""
     data = Path(path).read_bytes()
     pe_offset = struct.unpack_from("<I", data, 0x3C)[0]
     section_count = struct.unpack_from("<H", data, pe_offset + 6)[0]
     optional_size = struct.unpack_from("<H", data, pe_offset + 20)[0]
     section_offset = pe_offset + 24 + optional_size
     executable_segments = set()
-    section_rvas = {}
+    sections = {}
     for index in range(section_count):
         offset = section_offset + index * COFF_SECTION_HEADER_SIZE
-        rva = struct.unpack_from("<I", data, offset + 12)[0]
+        name = data[offset:offset + 8].split(b"\0", 1)[0].decode("ascii", "replace")
+        virtual_size, rva, raw_size = struct.unpack_from("<III", data, offset + 8)
         characteristics = struct.unpack_from("<I", data, offset + 36)[0]
         segment = index + 1
-        section_rvas[segment] = rva
+        sections[segment] = {
+            "name": name,
+            "rva": rva,
+            "virtual_size": virtual_size,
+            "raw_size": raw_size,
+            "characteristics": characteristics,
+        }
         if characteristics & IMAGE_SCN_MEM_EXECUTE:
             executable_segments.add(segment)
 
@@ -225,12 +232,19 @@ def read_nb09_module_contributions(path):
             segment, _pad, contribution_offset, contribution_size = struct.unpack_from(
                 "<HHII", blob, cursor)
             cursor += 12
-            if segment in executable_segments and contribution_size:
+            if (not executable_only or segment in executable_segments) and contribution_size:
+                section = sections.get(segment)
+                if section is None:
+                    raise ValueError("NB09 contribution names unknown PE segment %d" % segment)
                 contributions.append({
                     "section": segment,
+                    "section_name": section["name"],
+                    "section_rva": section["rva"],
+                    "section_virtual_size": section["virtual_size"],
+                    "section_raw_size": section["raw_size"],
                     "offset": contribution_offset,
                     "size": contribution_size,
-                    "rva": section_rvas[segment] + contribution_offset,
+                    "rva": section["rva"] + contribution_offset,
                 })
         name_length = blob[cursor]
         name = blob[cursor + 1:cursor + 1 + name_length].decode("latin1", "replace")

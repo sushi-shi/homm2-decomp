@@ -35,7 +35,7 @@ DLL-import middleware.
 | Subsection | Content | Use |
 | :--- | :--- | :--- |
 | `sstGlobalPub` (201 KB, 3541 `S_PUB32`) | symbol name + address; **type index = 0 on all** | → `symbol_names.csv` (funcs, data, `??_7` vtables, `??_C@` literals) |
-| `sstModule` (498) | per-compiland name + segment ranges + lib index | → TU ownership + tier |
+| `sstModule` (498) | per-compiland name + all segment ranges + lib index | → TU ownership, tier, and delinker contribution-owner manifest |
 | `sstAlignSym` | `S_COMPILE` (linker-stamped), `S_OBJNAME`, `S_THUNK32`, `S_END` | thunks below |
 | `sstLibraries` | the 19 libs above | tier / vendor ID |
 | `sstSegMap` (7 segs) | segment RWX flags + sizes (seg1 RX=.text, seg3 RW=.data, …) | corroborates PE sections |
