@@ -281,7 +281,6 @@ normalEvent:
     return widget::Main(msg);
 }
 
-// @semantic
 // After removing BUTTON's unused synthetic _globals_model include, candidate is 0x95
 // versus retail 0x96 and live match returns to 94.72%. The first non-relocation
 // divergence is +0x0a: candidate loads both owner coordinates first; retail starts
