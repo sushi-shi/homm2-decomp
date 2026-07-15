@@ -2459,7 +2459,7 @@ VTBL(combatManager, 0x004eb898);
 // ---- globals (definitions, RVA order) ----
 DATA(0x004f8900) int bInHighMoraleBonus = 0;
 DATA(0x004f8904) int giSeed = 1;
-DATA(0x004f8c1c) unsigned char *wallHex;
+DATA(0x004f8c1c) unsigned char wallHex[4] = { 9, 34, 86, 113 };
 DATA(0x00528588) int bMouseWasVis;
 DATA(0x0052858c) class heroWindow *CSPanel;
 DATA(0x00528590) int bCPrefsChanged;

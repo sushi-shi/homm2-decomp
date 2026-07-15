@@ -865,8 +865,10 @@ DATA(0x00516f84) signed char gbInNetSetup = 0;
 DATA(0x00516f88) int bUseDirectPlay = 0;
 DATA(0x00516f8c) int bUseWinsock = 0;
 DATA(0x00516f90) signed char bInTimeoutFail = 0;
-DATA(0x00516f98) int *iBaud;
-DATA(0x00516fb8) int *iIRQ;
+DATA(0x00516f98) int iBaud[REMOTE_BAUD_RATE_COUNT] = {
+    300, 1200, 2400, 9600, 19200, 38400, 57600, 0
+};
+DATA(0x00516fb8) int iIRQ[REMOTE_IRQ_COUNT] = { 1, 2, 3, 4, 5, 7, 9 };
 DATA(0x0052a268) char rcvBufOut[REMOTE_TRANSPORT_BUFFER_SIZE];
 DATA(0x0052a378) int iLastIds[REMOTE_RECENT_ID_COUNT];
 DATA(0x0052a3f0) char PacketSend[REMOTE_ENCODED_BUFFER_SIZE];

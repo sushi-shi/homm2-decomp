@@ -1132,7 +1132,8 @@ char * fileRequester::GetFilename(void)
 VTBL(fileRequester, 0x004eb888);
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x004f8674) FileRequesterMapSizeFilter giMapSizeFilter;
+DATA(0x004f8674) FileRequesterMapSizeFilter giMapSizeFilter =
+    FILE_REQUESTER_MAP_SIZE_ALL;
 DATA(0x004f88c4) char *cFRDummy = "";
 DATA(0x0052857c) float fGutterMinY;
 DATA(0x00528580) float fGutterTravelLength;

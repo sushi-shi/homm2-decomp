@@ -78,9 +78,28 @@ class LinkExeTest(unittest.TestCase):
             root = Path(temp)
             (root / "units.toml").write_text('[[unit]]\nunit="missing"\nsource="x.cpp"\n')
             (root / "symbols.csv").write_text("rva,name,unit,size,kind,provenance\n")
-            with self.assertRaisesRegex(ValueError, "no CodeView function RVA"):
+            with self.assertRaisesRegex(ValueError, "expected one NB09 module"):
                 load_retail_order(root / "units.toml", root / "symbols.csv",
                                   module_contributions={})
+
+    def test_data_only_unit_uses_nb09_module_contribution_order(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / "units.toml").write_text(
+                '[[unit]]\nunit="data_only"\nsource="data_only.cpp"\n')
+            (root / "symbols.csv").write_text(
+                "rva,name,unit,size,kind,provenance\n"
+                "0x3000,global,data_only,0x4,data,test\n")
+            modules = {
+                "data_only": [{"module": "data_only.obj", "contributions": [
+                    {"section": 1, "offset": 0x220, "size": 0x10, "rva": 0x1220}]}],
+            }
+            order = load_retail_order(root / "units.toml", root / "symbols.csv",
+                                      module_contributions=modules)
+            self.assertEqual(order[0]["function_anchors"], [])
+            self.assertEqual(order[0]["first_function_rva"], 0x1220)
+            self.assertIsNone(order[0]["first_function_symbol"])
+            self.assertEqual(order[0]["order_evidence"], "module-contribution")
 
     def test_s_compile_banner_decodes_owned_tool_record(self):
         body = b"\x03\x07\x00\x08\x04LINK"
@@ -177,6 +196,19 @@ class LinkExeTest(unittest.TestCase):
                 "0x3000,global,UNIT,0x4,data,cv-public-data\n"
                 "0x2000,const,_const,0x0,data,pe-reloc-constant\n"
                 "0x1000,fn,UNIT,0x10,func,cv-public-gap\n")
+            symbols = load_retail_data_symbols(path)
+        self.assertEqual(symbols, [{
+            "name": "global", "unit": "UNIT", "rva": 0x3000, "size": 4,
+            "provenance": "cv-public-data",
+        }])
+
+    def test_retail_public_data_loader_accepts_legacy_generated_schema(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "symbols.csv"
+            path.write_text(
+                "rva,name,unit,size,kind\n"
+                "0x3000,global,UNIT,0x4,data\n"
+                "0x2000,const,_const,0x0,data\n")
             symbols = load_retail_data_symbols(path)
         self.assertEqual(symbols, [{
             "name": "global", "unit": "UNIT", "rva": 0x3000, "size": 4,

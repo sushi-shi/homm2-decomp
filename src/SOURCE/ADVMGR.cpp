@@ -8253,7 +8253,9 @@ DATA(0x004f57d4) int iLastHourGlassPhase = 1;
 DATA(0x004f57d8) int gbForceUpdate = 0;
 DATA(0x004f59e8) int giCheatSeq = 0;
 DATA(0x004f59ec) int iQWE = 0;
-DATA(0x004f5e38) unsigned char monAnimDrawFrame[15];
+DATA(0x004f5e38) unsigned char monAnimDrawFrame[15] = {
+    0, 0, 0, 1, 2, 2, 1, 0, 0, 0, 3, 4, 5, 5, 4
+};
 DATA(0x004f60e0) int iLastSandAnimTime = 0;
 DATA(0x004f60e4) int iLastNewSandAnimTime = 0;
 DATA(0x004f6720) int giFrameCount = 0;
