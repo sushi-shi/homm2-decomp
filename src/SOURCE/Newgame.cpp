@@ -518,9 +518,17 @@ void game::InitNewGameWindow(void)
             static_cast<short>(playerSpacingTemp * playerCounter +
                                firstPlayerXLocal + 11),
             197, 68,
-            static_cast<short>(((giNumHumanPlayers <= 1) - 1 & 0x11) + 0x2f),
+            static_cast<short>(
+                ((giNumHumanPlayers <= 1) - 1 &
+                 (NEW_GAME_RACE_WIDGET_MULTIPLAYER_HEIGHT -
+                  NEW_GAME_RACE_WIDGET_SINGLE_HEIGHT)) +
+                NEW_GAME_RACE_WIDGET_SINGLE_HEIGHT),
             "ngextra.icn",
-            static_cast<short>(((giNumHumanPlayers <= 1) - 1 & -0x13) + 0x4f),
+            static_cast<short>(
+                ((giNumHumanPlayers <= 1) - 1 &
+                 (NEW_GAME_RACE_WIDGET_MULTIPLAYER_FRAME -
+                  NEW_GAME_RACE_WIDGET_SINGLE_FRAME)) +
+                NEW_GAME_RACE_WIDGET_SINGLE_FRAME),
             0, static_cast<short>(playerCounter + NEW_GAME_RACE_FIRST), 16, 1);
         if (iconControlLocal == 0)
             MemError();
@@ -530,9 +538,17 @@ void game::InitNewGameWindow(void)
             static_cast<short>(playerSpacingTemp * playerCounter +
                                firstPlayerXLocal + 13),
             191, 68,
-            static_cast<short>(((giNumHumanPlayers <= 1) - 1 & 0x0d) + 0x33),
+            static_cast<short>(
+                ((giNumHumanPlayers <= 1) - 1 &
+                 (NEW_GAME_PLAYER_WIDGET_MULTIPLAYER_HEIGHT -
+                  NEW_GAME_PLAYER_WIDGET_SINGLE_HEIGHT)) +
+                NEW_GAME_PLAYER_WIDGET_SINGLE_HEIGHT),
             "ngextra.icn",
-            static_cast<short>(((giNumHumanPlayers <= 1) - 1 & -0x11) + 0x50),
+            static_cast<short>(
+                ((giNumHumanPlayers <= 1) - 1 &
+                 (NEW_GAME_PLAYER_WIDGET_MULTIPLAYER_FRAME -
+                  NEW_GAME_PLAYER_WIDGET_SINGLE_FRAME)) +
+                NEW_GAME_PLAYER_WIDGET_SINGLE_FRAME),
             0, static_cast<short>(playerCounter + NEW_GAME_PLAYER_SELECT_FIRST),
             16, 1);
         if (iconControlLocal == 0)
@@ -543,7 +559,11 @@ void game::InitNewGameWindow(void)
             static_cast<short>(playerSpacingTemp * playerCounter +
                                firstPlayerXLocal + 16),
             194, 62, 58, "ngextra.icn",
-            static_cast<short>(((giNumHumanPlayers <= 1) - 1 & 0x18) + 3), 0,
+            static_cast<short>(
+                ((giNumHumanPlayers <= 1) - 1 &
+                 (NEW_GAME_COLOR_WIDGET_MULTIPLAYER_FRAME -
+                  NEW_GAME_COLOR_WIDGET_SINGLE_FRAME)) +
+                NEW_GAME_COLOR_WIDGET_SINGLE_FRAME), 0,
             static_cast<short>(playerCounter + NEW_GAME_COLOR_FIRST), 16, 1);
         if (iconControlLocal == 0)
             MemError();
@@ -1408,9 +1428,6 @@ void game::DrawNGKPDisplayString(int updateScreen)
     }
 }
 
-// @early-stop
-// Instruction bytes, frame slots, and all 118 relocation sites and targets
-// agree. Residual rows are string and local static-constant symbol identities.
 VA(0x004ba39c, 0xb71)
 void game::ShowScenInfo(void)
 {
@@ -1516,9 +1533,17 @@ void game::ShowScenInfo(void)
             static_cast<short>(playerSpacingTemp * playerCounter + firstPlayerXLocal +
                                11),
             163, 68,
-            static_cast<short>(((giNumHumanPlayers <= 1) - 1 & 0x11) + 0x2f),
+            static_cast<short>(
+                ((giNumHumanPlayers <= 1) - 1 &
+                 (NEW_GAME_RACE_WIDGET_MULTIPLAYER_HEIGHT -
+                  NEW_GAME_RACE_WIDGET_SINGLE_HEIGHT)) +
+                NEW_GAME_RACE_WIDGET_SINGLE_HEIGHT),
             "ngextra.icn",
-            static_cast<short>(((giNumHumanPlayers <= 1) - 1 & -0x13) + 0x4f),
+            static_cast<short>(
+                ((giNumHumanPlayers <= 1) - 1 &
+                 (NEW_GAME_RACE_WIDGET_MULTIPLAYER_FRAME -
+                  NEW_GAME_RACE_WIDGET_SINGLE_FRAME)) +
+                NEW_GAME_RACE_WIDGET_SINGLE_FRAME),
             0, static_cast<short>(playerCounter + NEW_GAME_RACE_FIRST), 16, 1);
         if (iconControlLocal == 0)
             MemError();
@@ -1528,7 +1553,11 @@ void game::ShowScenInfo(void)
             static_cast<short>(playerSpacingTemp * playerCounter + firstPlayerXLocal +
                                16),
             160, 62, 58, "ngextra.icn",
-            static_cast<short>(((giNumHumanPlayers <= 1) - 1 & 0x18) + 3), 0,
+            static_cast<short>(
+                ((giNumHumanPlayers <= 1) - 1 &
+                 (NEW_GAME_COLOR_WIDGET_MULTIPLAYER_FRAME -
+                  NEW_GAME_COLOR_WIDGET_SINGLE_FRAME)) +
+                NEW_GAME_COLOR_WIDGET_SINGLE_FRAME), 0,
             static_cast<short>(playerCounter + NEW_GAME_COLOR_FIRST), 16, 1);
         if (iconControlLocal == 0)
             MemError();
