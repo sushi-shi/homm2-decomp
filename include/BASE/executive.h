@@ -6,6 +6,21 @@
 // forward declarations:
 class baseManager;
 
+typedef enum ExecutiveCommand {
+    EXECUTIVE_COMMAND_TERMINATE_LOOP = 1,
+    EXECUTIVE_COMMAND_REMOVE_MANAGER = 2,
+    EXECUTIVE_COMMAND_RETURN_RESULT = 4
+} ExecutiveCommand;
+
+typedef enum ExecutiveManagerConstant {
+    EXECUTIVE_MANAGER_DEFAULT_PRIORITY = -1,
+    EXECUTIVE_MANAGER_SUCCESS = 0,
+    EXECUTIVE_MANAGER_STOP_DISPATCH = 1,
+    EXECUTIVE_MANAGER_HANDLE_EXECUTIVE_MESSAGE = 2,
+    EXECUTIVE_MANAGER_ERROR = 3,
+    EXECUTIVE_DIALOG_MANAGER_CAPACITY = 20
+} ExecutiveManagerConstant;
+
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class executive {
 public:
@@ -14,7 +29,7 @@ public:
     baseManager *m_managerListHead;  // +0x00  manager-list head
     baseManager *m_managerListTail;  // +0x04  manager-list tail
     baseManager *m_activeManager;  // +0x08  the current/active manager
-    int    field_0xc;  // +0x0c
+    int    m_result;  // +0x0c  result returned by an executive dialog/main loop
     // --- constructors ---
     executive(void);
     // --- methods ---
