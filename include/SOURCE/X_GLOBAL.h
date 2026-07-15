@@ -178,7 +178,27 @@ typedef enum KbGameTableConstant {
     KB_LUCK_TEXT_COUNT = 8,
     KB_MORALE_TEXT_COUNT = 8,
     KB_ON_OFF_TEXT_COUNT = 12,
-    KB_WALK_SPEED_TEXT_COUNT = 6
+    KB_WALK_SPEED_TEXT_COUNT = 6,
+    KB_MONTH_NAME_COUNT = 10,
+    KB_WEEK_NAME_COUNT = 16,
+    KB_HERO_SCREEN_TEXT_COUNT = 26,
+    KB_CASTLE_INFO_TEXT_COUNT = 16,
+    KB_LUCK_INFO_TEXT_COUNT = 22,
+    KB_IQ_NAME_COUNT = 6,
+    KB_SPELL_HELP_TEXT_COUNT = 10,
+    KB_SPEED_TEXT_COUNT = 10,
+    KB_ARMY_DETAIL_TEXT_COUNT = 10,
+    KB_WELL_DETAIL_TEXT_COUNT = 10,
+    KB_KINGDOM_OVERVIEW_TEXT_COUNT = 4,
+    KB_NEW_TURN_TEXT_COUNT = 8,
+    KB_VIEW_GENERAL_LABEL_COUNT = 8,
+    KB_VIEW_GENERAL_HELP_COUNT = 8,
+    KB_VIEW_GENERAL_LONG_HELP_COUNT = 4,
+    KB_COMBAT_MESSAGE_COUNT = 12,
+    KB_HERO_LEVEL_TEXT_COUNT = 4,
+    KB_COMBAT_HELP_COUNT = 6,
+    KB_LONG_COMBAT_HELP_COUNT = 6,
+    KB_NEW_GAME_HELP_COUNT = 8
 } KbGameTableConstant;
 
 extern unsigned char giGroundShape[GROUND_TILE_IMAGE_COUNT];
@@ -338,28 +358,28 @@ extern char *gMoraleText[KB_MORALE_TEXT_COUNT];
 extern char *onOffText[KB_ON_OFF_TEXT_COUNT];
 extern char *walkSpeedText[KB_WALK_SPEED_TEXT_COUNT];
 extern char *gColors[HERO_CLASS_COUNT];
-extern char *gMonthNames[10];
-extern char *gWeekNames[16];
-extern char *cHeroScreen[26];
-extern char *cCastleInfo[16];
-extern char *cLuckInfo[22];
-extern char *IQnames[6];
-extern char *cSpellHelp[10];
-extern char *speedText[10];
-extern char *cArmyDetail[10];
-extern char *cWellDetail[10];
-extern char *cKingdomOverview[4];
-extern char *cNewTurn[8];
-extern char *cViewGeneralLabels[8];
-extern char *cViewGeneralHelp[8];
-extern char *cViewGeneralLongHelp[4];
-extern char *cCombatMessage[12];
-extern char *cHeroLevel[4];
-extern char *cCombatHelp[6];
-extern char *cLongCombatHelp[6];
+extern char *gMonthNames[KB_MONTH_NAME_COUNT];
+extern char *gWeekNames[KB_WEEK_NAME_COUNT];
+extern char *cHeroScreen[KB_HERO_SCREEN_TEXT_COUNT];
+extern char *cCastleInfo[KB_CASTLE_INFO_TEXT_COUNT];
+extern char *cLuckInfo[KB_LUCK_INFO_TEXT_COUNT];
+extern char *IQnames[KB_IQ_NAME_COUNT];
+extern char *cSpellHelp[KB_SPELL_HELP_TEXT_COUNT];
+extern char *speedText[KB_SPEED_TEXT_COUNT];
+extern char *cArmyDetail[KB_ARMY_DETAIL_TEXT_COUNT];
+extern char *cWellDetail[KB_WELL_DETAIL_TEXT_COUNT];
+extern char *cKingdomOverview[KB_KINGDOM_OVERVIEW_TEXT_COUNT];
+extern char *cNewTurn[KB_NEW_TURN_TEXT_COUNT];
+extern char *cViewGeneralLabels[KB_VIEW_GENERAL_LABEL_COUNT];
+extern char *cViewGeneralHelp[KB_VIEW_GENERAL_HELP_COUNT];
+extern char *cViewGeneralLongHelp[KB_VIEW_GENERAL_LONG_HELP_COUNT];
+extern char *cCombatMessage[KB_COMBAT_MESSAGE_COUNT];
+extern char *cHeroLevel[KB_HERO_LEVEL_TEXT_COUNT];
+extern char *cCombatHelp[KB_COMBAT_HELP_COUNT];
+extern char *cLongCombatHelp[KB_LONG_COMBAT_HELP_COUNT];
 extern char *cTownCommand[28];
 extern char *gHeroDefaultNames[54];
-extern char *gNewGameHelp[8];
+extern char *gNewGameHelp[KB_NEW_GAME_HELP_COUNT];
 extern char *gSetupBaudHelp[6];
 extern char *gSetupComPortHelp[6];
 extern char *gSetupDCBaudHelp[6];
