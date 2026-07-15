@@ -487,7 +487,7 @@ managerReady:
     m_messageMask = 0x10;
     m_priority = -1;
     m_active = 1;
-    strcpy(name, "soundManager");
+    strcpy(m_name, "soundManager");
     return 0;
 }
 

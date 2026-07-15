@@ -126,7 +126,7 @@ void executive::PrintManagerList(void)
     LogStr(gText);
     LogStr("-----");
     for (baseManager *m = m_managerListHead; m != 0; m = m->m_next) {
-        sprintf(gText, "Manager: %20s this: %d prev: %d next: %d", m->name, m,
+        sprintf(gText, "Manager: %20s this: %d prev: %d next: %d", m->m_name, m,
                 m->m_prev, m->m_next);
         LogStr(gText);
     }

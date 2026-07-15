@@ -236,7 +236,7 @@ int inputManager::Open(int param_1)
     m_messageMask = 4;
     m_priority = -1;
     m_active = 1;
-    strcpy(name, "inputManager");
+    strcpy(m_name, "inputManager");
     return 0;
 }
 

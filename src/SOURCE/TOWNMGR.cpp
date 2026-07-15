@@ -706,7 +706,7 @@ int townManager::Open(int id)
     m_messageMask = TOWN_MANAGER_EVENT_MASK;
     m_priority = id;
     m_active = 1;
-    strcpy(name, "townManager");
+    strcpy(m_name, "townManager");
     gpWindowManager->FadeScreen(0, TOWN_FADE_STEPS, 0);
     return 0;
 }
