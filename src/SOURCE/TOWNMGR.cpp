@@ -2915,13 +2915,16 @@ void townManager::SetupWell(heroWindow *window)
     }
 }
 
-// @match-note 98.53%: complete category/rank, hero/stats/personality/creature
-// CFG, exact 0x1b0 frame, all 14 initializer offsets, every used local offset,
-// and all 114/114 ordered relocations agree. The 0xef6-byte candidate is 0x1a
-// short: retail has five nested information-level continuation jumps and one
-// trailing nop. The remaining non-size residual is the equivalent lastAtRank
-// comparison operand order. Relational, 192-atomic, and 512-depth-two guarded
-// AST passes retained no mutation; revisit with a shared TU-state discovery.
+// @early-stop
+// Jump-only /Od block-topology wall: every non-jump instruction agrees with
+// the exact 0x1b0 frame/slots, and all 114/114 ordered relocations agree. The
+// 0xee7 candidate span is exactly 0x28 short of retail's 0xf0f: eight five-byte
+// jumps at retail +0x576/+0x7f6/+0xa74/+0xb81 and
+// +0xef4/+0xef9/+0xefe/+0xf03. Direct m_heroCount/m_townCount reads remove
+// three false inline continuations, and value-before-position assignment is
+// byte-exact. Positive, negated, empty-else, and explicit-continue nestings
+// were worse or changed rank progression; 256 consolidated atomic variants
+// found no exact closure.
 VA(0x0041a783, 0xf0f)
 void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
 {
@@ -3059,15 +3062,15 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
             strongestHeroPosition_first = -1;
             strongestHeroValue_current = 0;
             for (heroPosition_index = 0;
-                 heroPosition_index < gpGame->m_players[rank].HeroCount();
+                 heroPosition_index < gpGame->m_players[rank].m_heroCount;
                  ++heroPosition_index) {
                 strongestHero_x =
                     gpGame->GetPlayerHero(rank, heroPosition_index);
                 heroValue_j = gpPhilAI->FightValueOfStack(
                     &strongestHero_x->m_army, strongestHero_x, 0, 0, 0, 0);
                 if (!(heroValue_j <= strongestHeroValue_current)) {
-                    strongestHeroPosition_first = heroPosition_index;
                     strongestHeroValue_current = heroValue_j;
+                    strongestHeroPosition_first = heroPosition_index;
                 }
             }
 
@@ -3154,7 +3157,7 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
                         strongestCreatureValue = 0;
                         for (heroPosition_index = 0;
                              heroPosition_index <
-                             gpGame->m_players[rank].TownCount();
+                             gpGame->m_players[rank].m_townCount;
                              ++heroPosition_index) {
                             playerTown_k =
                                 gpGame->GetPlayerTown(rank, heroPosition_index);
@@ -3181,7 +3184,7 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
                         }
                         for (heroPosition_index = 0;
                              heroPosition_index <
-                             gpGame->m_players[rank].HeroCount();
+                             gpGame->m_players[rank].m_heroCount;
                              ++heroPosition_index) {
                             strongestHero_x =
                                 gpGame->GetPlayerHero(rank, heroPosition_index);
