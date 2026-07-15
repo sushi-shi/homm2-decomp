@@ -57,6 +57,14 @@ DATA(0x0053818c) static int gYMClipR;
 // 88.883250% maximum (enum trial 62), not an exact closure; generated state was restored and must
 // not be committed or recorded as 100%. The remaining residual is still structural/compiler-state
 // work, not a proven wall.
+// A later consolidated-runner audit kept the 89.974620%, 0x57c, 129/130 baseline. Extracting only
+// the missing full-copy gYMX read into an inlined global accessor was identical for all 16 helper
+// names and fell to 88.718280%, 0x579, 128/130. All 21 atomic relational-order mutations were
+// either byte-neutral or worse. Branch-local X/ClipR snapshots raised the raw score to 90.266495%
+// in the literal block but over-CSE'd it to 0x559 and 123/130 relocations; coordinated dim/fill/copy
+// forms were worse. A second upper-Y local was byte-neutral in all eight block combinations. None
+// was retained. History proves the older ~95.1% state came from moving the same IconShearConstant
+// typedef enum between headers, so do not merge the correctly separated domains merely for score.
 VA(0x004da270, 0x588)
 void IconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int y, int frame, int clip,
                          int clipX, int clipY, int clipW, int clipH, int color, signed char *shear)
