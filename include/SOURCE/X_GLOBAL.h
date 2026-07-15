@@ -119,6 +119,20 @@ typedef enum GroundTableConstant {
     GROUND_SHAPE_FLIPPED = 0x80
 } GroundTableConstant;
 
+typedef enum KbControlTableConstant {
+    MOVEMENT_FRAME_FLIP_COUNT = 16,
+    CASTLE_RESOURCE_SLOT_COUNT = 8,
+    CASTLE_AMOUNT_COUNT = 4,
+    VESA_MODE_VALUE_COUNT = 8,
+    NORMAL_DIRECTION_COUNT = 8,
+    RESOURCE_VALUE_COUNT = 8,
+    STARTING_RESOURCE_DIFFICULTY_COUNT = 5,
+    STARTING_RESOURCE_TYPE_COUNT = 7,
+    MINE_CHARACTERISTIC_COUNT = 8,
+    VESA_SET_MODE_FUNCTION = 0x4f02,
+    VESA_MODE_640_480_256 = 0x0101
+} KbControlTableConstant;
+
 extern unsigned char giGroundShape[GROUND_TILE_IMAGE_COUNT];
 extern unsigned char gColorTableTan[256];
 extern unsigned char gColorTableGray[256];
@@ -158,14 +172,16 @@ extern int gbLeaveNetBoxAlone;
 extern int gbUseWaveout;
 extern int gbShowAllMaps;
 extern char *gCombatFxNames[32];
-extern short horseFrameFlip[16];
-extern short boatFrameFlip[16];
-extern signed char *gCastleResources;
-extern short *gCastleAmounts;
-extern short *gVesaMode;
-extern int gInitResourcesHuman[5][7];
-extern int gInitResourcesComputer[5][7];
-extern int gMineCharacteristics[8];
+extern short horseFrameFlip[MOVEMENT_FRAME_FLIP_COUNT];
+extern short boatFrameFlip[MOVEMENT_FRAME_FLIP_COUNT];
+extern signed char gCastleResources[CASTLE_RESOURCE_SLOT_COUNT];
+extern short gCastleAmounts[CASTLE_AMOUNT_COUNT];
+extern short gVesaMode[VESA_MODE_VALUE_COUNT];
+extern int gInitResourcesHuman[STARTING_RESOURCE_DIFFICULTY_COUNT]
+                              [STARTING_RESOURCE_TYPE_COUNT];
+extern int gInitResourcesComputer[STARTING_RESOURCE_DIFFICULTY_COUNT]
+                                 [STARTING_RESOURCE_TYPE_COUNT];
+extern int gMineCharacteristics[MINE_CHARACTERISTIC_COUNT];
 extern int gSSValues[HERO_SKILL_COUNT][SECONDARY_SKILL_VALUE_LEVEL_COUNT];
 extern unsigned char gArtifactLevel[104];
 extern int gUltArtifactAvgValue;

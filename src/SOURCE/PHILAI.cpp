@@ -320,7 +320,7 @@ inline hero *GetHeroSlot(int id) {
 // At the retained source-hash max, raw disassembly differs only at the two
 // owned-current-turn exits: retail uses direct JE branches while /Od emits
 // equivalent JNE + continuation JMP blocks. All frame roles agree; 42/42
-// relocations agree after the delinker's normalDirTable+2 string-symbol alias.
+// relocations agree after the delinker's normalDirTable+1 string-symbol alias.
 VA(0x0043849d, 0x2e8)
 int philAI::GoodAdjacent(int *direction) {
     int ra;
@@ -618,10 +618,6 @@ int philAI::DoAnywhereDDoorTownGate(int targetValue) {
     return 0;
 }
 
-// @early-stop
-// Complete & byte-exact except ONE `movsbl normalDirTable[dir].y`: cl emits disp 0x2
-// (reloc normalDirTable) where retail shows disp 0x0 + a distinct reloc — the delinker
-// split normalDirTable+2 into its own symbol. Same effective address; delinker artifact.
 VA(0x004393a9, 0x158)
 int philAI::DoDimensionDoor(hero *pHero) {
     int node;           // i
@@ -1409,7 +1405,7 @@ hero *philAI::DetermineHeroToMove(int player) {
 }
 
 // @early-stop
-// The 0x90 frame and all 179 relocation sites align; normalDirTable+2 is the
+// The 0x90 frame and all 179 relocation sites align; normalDirTable+1 is the
 // sole delinker alias, for the proven .y field. Relocation-masked comparison
 // leaves only: the IsEmbarked /Ob1 continuation moved from +0x454..+0x469 to
 // the shared tail at +0xe6f..+0xe74 (the exact five-byte span difference), and

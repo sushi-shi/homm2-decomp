@@ -136,7 +136,12 @@ struct configStruct {                    // gConfig, 0x1a0 bytes
 #pragma pack(pop)
 SIZE(exeGfxConfig, CONFIG_GRAPHICS_SIZE);
 SIZE(configStruct, CONFIG_STRUCT_SIZE);
-struct tag_tilePoint { signed char x; signed char _1; signed char y; signed char _3; };  // normalDirTable[]
+struct tag_tilePoint {
+    signed char x;
+    signed char y;
+    short frameOffset;
+};
+SIZE(tag_tilePoint, 4);
 typedef enum MonsterDatabaseConstant {
     MONSTER_DATABASE_COUNT = 66,
     MONSTER_SPRITE_NAME_SIZE = 5
