@@ -1362,12 +1362,12 @@ void SendMapChange(int type, signed char id, unsigned char x, unsigned char y,
 
 // ---- globals (definitions, RVA order) ----
 DATA(0x004ee020) int bMoveSoundMade = 1;
-DATA(0x004ee028) int giPixelsPerStep[6];
-DATA(0x004ee040) int giStepDelay[5];
+DATA(0x004ee028) int giPixelsPerStep[6] = { 2, 4, 6, 8, 16, 0 };
+DATA(0x004ee040) int giStepDelay[5] = { 20, 25, 20, 15, 15 };
 DATA(0x004ee054) struct _SAMPLE *hOldWalkSample = 0;
 DATA(0x004ee058) struct _SAMPLE *hNewWalkSample = 0;
 DATA(0x004ee05c) int EveryOther = 0;
-DATA(0x004ee060) int startVals[3];
+DATA(0x004ee060) int startVals[3] = { 16, 0, -16 };
 DATA(0x00524bc0) int S1cursorCycle;
 DATA(0x00524bc4) int S1cursorFrameCount;
 DATA(0x00524bc8) int S1cursorTurning;

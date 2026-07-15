@@ -633,7 +633,11 @@ int ViewWorldDialogHandler(struct tag_message &message)
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x004f11b8) signed char iVWHalf[3][6][2];
+DATA(0x004f11b8) signed char iVWHalf[3][6][2] = {
+    3, 3, 5, 5, 6, 6, 8, 5, 2, 3, 2, 2,
+    4, 5, 6, 6, 8, 8, 11, 7, 3, 4, 3, 3,
+    7, 7, 8, 8, 10, 10, 14, 8, 3, 6, 4, 4
+};
 DATA(0x004f11dc) int giViewWorldScale = 6;
 DATA(0x004f11e0) int giViewWorldScaleLookup = 1;
 DATA(0x004f11e4) int gbInViewWorld = 0;

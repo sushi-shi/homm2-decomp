@@ -968,7 +968,7 @@ extern float gfDurationMods[12];
 extern float gfCancelDurationMods[11];
 extern int bInHighMoraleBonus;
 extern int giSeed;
-extern unsigned char *wallHex;
+extern unsigned char wallHex[4];
 extern int gbThisNetHasControl;
 extern int iCurTransferArtifact;
 extern signed char iTransferArtifactsInfo[16];

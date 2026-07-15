@@ -303,9 +303,6 @@ def load_retail_order(units_path=None, symbols_path=None, retail_exe=None,
         if name in seen:
             raise ValueError("duplicate manifest unit: %s" % name)
         seen.add(name)
-        evidence = functions.get(name)
-        if not evidence:
-            raise ValueError("no CodeView function RVA establishes link order for %s" % name)
         stem = Path(unit["source"]).stem.lower()
         module_records = modules.get(stem, [])
         if len(module_records) != 1:
@@ -316,8 +313,14 @@ def load_retail_order(units_path=None, symbols_path=None, retail_exe=None,
             raise ValueError("expected one executable NB09 contribution for %s, found %d" %
                              (name, len(contributions)))
         contribution = contributions[0]
-        ordered_functions = sorted(evidence)
-        first_rva, first_symbol = ordered_functions[0]
+        ordered_functions = sorted(functions.get(name, []))
+        if ordered_functions:
+            first_rva, first_symbol = ordered_functions[0]
+        else:
+            # Data-only TUs can still carry compiler-generated executable startup code.
+            # Their NB09 module contribution is sufficient ordering evidence even when
+            # the public symbol stream exposes no function anchor.
+            first_rva, first_symbol = contribution["rva"], None
         ordered.append({
             "unit": name,
             "source": unit["source"],
@@ -325,6 +328,8 @@ def load_retail_order(units_path=None, symbols_path=None, retail_exe=None,
             "first_function_rva": first_rva,
             "first_function_symbol": first_symbol,
             "function_anchors": ordered_functions,
+            "order_evidence": ("public-function" if ordered_functions
+                               else "module-contribution"),
             "contribution_section": contribution["section"],
             "contribution_offset": contribution["offset"],
             "contribution_size": contribution["size"],
@@ -701,14 +706,21 @@ def load_retail_data_symbols(path=None):
     symbols = []
     with path.open(newline="") as f:
         for row in csv.DictReader(f):
-            if row["kind"] != "data" or row["provenance"] != "cv-public-data":
+            provenance = row.get("provenance")
+            if provenance is None:
+                # Persistent worktrees can retain the pre-provenance generated schema.
+                # In that schema only the _const unit is synthetic; all other data rows
+                # originate in the retained public stream.
+                provenance = ("pe-reloc-constant" if row["unit"] == "_const"
+                              else "cv-public-data")
+            if row["kind"] != "data" or provenance != "cv-public-data":
                 continue
             symbols.append({
                 "name": row["name"],
                 "unit": row["unit"],
                 "rva": int(row["rva"], 16),
                 "size": int(row["size"], 16),
-                "provenance": row["provenance"],
+                "provenance": provenance,
             })
     symbols.sort(key=lambda row: (row["rva"], row["name"]))
     return symbols

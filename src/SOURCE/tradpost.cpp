@@ -335,7 +335,9 @@ int TradingPostHandler(struct tag_message &message) {
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x0051d9d0) unsigned short coreRatio[TRADING_POST_RESOURCE_COUNT];
+DATA(0x0051d9d0) unsigned short coreRatio[TRADING_POST_RESOURCE_COUNT] = {
+    250, 500, 250, 500, 500, 500, 1
+};
 DATA(0x00533170) class iconWidget *tradeKnob;
 DATA(0x00533174) int qtyToTrade;
 DATA(0x00533178) int leftResource;

@@ -20,6 +20,8 @@ typedef enum RemoteConstant {
     REMOTE_BROADCAST_PLAYER = 0x7f,
     REMOTE_RETRY_COUNT = 25,
     REMOTE_CONFIRM_POLL_COUNT = 50,
+    REMOTE_BAUD_RATE_COUNT = 8,
+    REMOTE_IRQ_COUNT = 7,
     REMOTE_CONFIRM_POLL_DELAY = 20,
     REMOTE_SEND_RETRY_DELAY = 1000,
     REMOTE_HEARTBEAT_INTERVAL = 5000,
@@ -107,8 +109,8 @@ extern signed char gbInNetSetup;
 extern int bUseDirectPlay;
 extern int bUseWinsock;
 extern signed char bInTimeoutFail;
-extern int *iBaud;
-extern int *iIRQ;
+extern int iBaud[REMOTE_BAUD_RATE_COUNT];
+extern int iIRQ[REMOTE_IRQ_COUNT];
 extern char rcvBufOut[REMOTE_TRANSPORT_BUFFER_SIZE];
 extern int iLastIds[REMOTE_RECENT_ID_COUNT];
 extern char PacketSend[REMOTE_ENCODED_BUFFER_SIZE];
