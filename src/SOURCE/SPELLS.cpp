@@ -46,15 +46,16 @@ int combatManager::HasValidSpellTarget(int spell)
     return 0;
 }
 
-// @match-note 93.37%: semantics and CFG agree, including the selected-spell
-// positive arm, cleanup path, and retail body order (earthquake, elementals,
-// mass spells, mirror/default). The 0x0c frame has elementalType at -0x4,
-// this at -0x8, the switch temporary at -0x0c, and the unused argument at +0x8;
-// there are no other locals. First residual is the delinked switch dispatch after
-// +0x27; manual range audit found no mismatched external call/global target. Tried
-// early return, cleanup goto, positive wrapper, and semantic/body ordering. Revisit
-// only after total SOURCE fuzzy reaches 95%, or earlier if later same-TU structural
-// work changes this function.
+// @match-note 99.7447% retained: recovered retail body order and CFG, including the
+// in-switch common action block, all four elemental continuation jumps, ordinary
+// switch-break cleanup, and the no-selection scope. The 0x0c frame has
+// elementalType at -0x4, this at -0x8, and the switch temporary at -0x0c. Explicit
+// objdiff ranges align every switch instruction and the embedded tables relative
+// to the function; external relocations agree. The first residual is the entry
+// no-selection branch: retail jumps directly to the false result, while the
+// equal-size canonical form jumps to the final comparison. Explicit early label,
+// nested return, and explicit else forms added 5-10 bytes or reversed the branch;
+// do not retry them without a TU-state change.
 VA(0x00420546, 0x44a)
 int combatManager::ViewSpells(int)
 {
@@ -71,9 +72,9 @@ int combatManager::ViewSpells(int)
                          NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_NO_RESOURCE, 0,
                          NORMAL_DIALOG_NO_RESOURCE, 0,
                          NORMAL_DIALOG_NO_VALUE, 0);
-            goto restore_pointer;
-        }
-        break;
+            break;
+        } else
+            goto set_action;
 
     case SPELL_SUMMON_EARTH_ELEMENTAL:
         elementalType = SPELL_MONSTER_EARTH_ELEMENTAL;
@@ -86,6 +87,7 @@ int combatManager::ViewSpells(int)
         goto check_elemental;
     case SPELL_SUMMON_WATER_ELEMENTAL:
         elementalType = SPELL_MONSTER_WATER_ELEMENTAL;
+        goto check_elemental;
 check_elemental:
         if (m_unknown351D[m_currentSide] != 0 &&
             m_unknown351D[m_currentSide] != elementalType) {
@@ -115,7 +117,7 @@ check_elemental:
                          NORMAL_DIALOG_NO_VALUE, 0);
             return 0;
         }
-        break;
+        goto set_action;
 
     case SPELL_MASS_CURE:
     case SPELL_MASS_HASTE:
@@ -138,6 +140,9 @@ check_elemental:
                          NORMAL_DIALOG_NO_VALUE, 0);
             return 0;
         }
+set_action:
+        giNextAction = SPELL_ACTION_CAST;
+        giNextActionExtra = m_selectedSpell;
         break;
 
     case SPELL_MIRROR_IMAGE:
@@ -167,15 +172,12 @@ check_elemental:
                                    gsSpellInfo[m_selectedSpell].iconIndex,
                                    SPELL_POINTER_DEFAULT_ID);
         gpWindowManager->DoDialog(0, HandleCastSpell, 0);
-        goto restore_pointer;
+        break;
         }
 
-        giNextAction = SPELL_ACTION_CAST;
-        giNextActionExtra = m_selectedSpell;
-    }
-
 restore_pointer:
-    gpMouseManager->SetPointer("cmbtmous.mse", 0, SPELL_POINTER_DEFAULT_ID);
+        gpMouseManager->SetPointer("cmbtmous.mse", 0, SPELL_POINTER_DEFAULT_ID);
+    }
     return m_selectedSpell != SPELL_NO_SELECTION;
 }
 
@@ -225,16 +227,16 @@ int CombatSpecialHandler(tag_message &message)
     return SPELL_HANDLER_CONTINUE;
 }
 
-// @match-note 92.25%: semantics and CFG agree, including the two-stage teleport,
-// recursive hover, close/cancel paths, and all message mutations. The message
-// reference arrives in ECX and is stored at -0x8; the 0x0c frame also has hex at
-// -0x4 and the implicit switch temporary at -0x0c, with no other locals. The
-// helper reports one extra base self-call relocation; manual target decomp/range
-// review confirms retail recursively calls HandleCastSpell at that same site,
-// represented by the target delinker as an intra-function label. First residual
-// is the switch dispatch after +0x09. Explicit ranges confirm retail body order
-// is hover, select, then mouse-down/cancel; the opposite order was also tried.
-// Revisit for switch shaping after structural recovery.
+// @match-note 99.1885% retained: complete two-stage teleport, recursive hover,
+// select, and mouse-down/cancel CFG. Reordering the teleport-destination arm and
+// replacing the cancel goto with case fallthrough recovered every middle/tail
+// structural difference. The message reference is at -0x8, hex at -0x4, and the
+// switch temporary at -0x0c. Explicit objdiff ranges align relative instruction
+// positions through the embedded table. The first residual at +0x35 is load order:
+// retail loads hex then compares indexToCastOn, while MSVC canonicalizes both
+// operand spellings to the reverse order. The target delinker also represents the
+// recursive self-call as an intra-function label; external relocation identities
+// otherwise agree. Revisit only after a TU-state change.
 VA(0x00420aec, 0x2aa)
 int HandleCastSpell(tag_message &message)
 {
@@ -268,7 +270,9 @@ int HandleCastSpell(tag_message &message)
 
     case SPELL_MESSAGE_SELECT:
         if (indexToCastOn != SPELL_NO_SELECTION) {
-            if (!bInTeleportGetDest) {
+            if (bInTeleportGetDest) {
+                giNextActionGridIndex2 = indexToCastOn;
+            } else {
                 giNextActionGridIndex = indexToCastOn;
                 if (gpCombatManager->m_selectedSpell == SPELL_TELEPORT) {
                     bInTeleportGetDest = 1;
@@ -281,8 +285,6 @@ int HandleCastSpell(tag_message &message)
                         "Select teleport destination.", 1, 0, 0);
                     return SPELL_HANDLER_CONTINUE;
                 }
-            } else {
-                giNextActionGridIndex2 = indexToCastOn;
             }
             bInTeleportGetDest = 0;
             message.type = SPELL_MESSAGE_DIALOG;
@@ -292,12 +294,11 @@ int HandleCastSpell(tag_message &message)
         break;
 
     case SPELL_MESSAGE_MOUSE_DOWN:
-        if (message.payload.keyboard.keyCode == SPELL_COMMAND_CANCEL)
-            goto cancel_spell;
-        break;
+        if (message.payload.keyboard.keyCode != SPELL_COMMAND_CANCEL)
+            break;
+        // fall through
 
     case SPELL_MESSAGE_CANCEL:
-cancel_spell:
         gpCombatManager->m_selectedSpell = SPELL_NO_SELECTION;
         giNextAction = 0;
         message.type = SPELL_MESSAGE_DIALOG;
@@ -1028,8 +1029,9 @@ void combatManager::CastSpell(int spell, int targetHex, int castByCreature, int 
 // are branch-displacement bytes at +0x18 and +0x40; the normalized stream then
 // differs only in the typed gsSpellInfo relocation versus retail's interior
 // combatEffect label. Tried a combined guard, nested positive guard, empty
-// negative arm, and a shared empty invalid/negative arm. Revisit at 95% or if
-// earlier SPELLS work changes TU branch layout.
+// negative arm, and a shared empty invalid/negative arm. The syntax-aware AST
+// pass had one canonical variant, and a 36-trial guarded TU-state sweep found no
+// audited exact closure. Revisit only after a material TU-state change.
 VA(0x00423688, 0xda)
 void combatManager::DefaultSpell(int targetHex)
 {
@@ -1054,8 +1056,9 @@ void combatManager::DefaultSpell(int targetHex)
 // affectedHexes/anyAffected/damage range four bytes shallow. A same-bucket
 // targetY suffix and split declaration/assignment were byte-neutral. Previously
 // tried cached/direct hex fields, removing side/index temporaries, typed short
-// storage, and in-place damage shifts. Revisit only after a TU identifier-state
-// change or a new source-scope discovery; do not repeat these spellings.
+// storage, and in-place damage shifts. A 48-trial guarded TU-state sweep found no
+// audited exact closure. Revisit only after a TU identifier-state change or a new
+// source-scope discovery; do not repeat these spellings.
 VA(0x00423762, 0x623)
 void combatManager::Fireball(int targetHex, int spell)
 {
@@ -2895,7 +2898,9 @@ mirror_found:
 // +0xd7/+0xda: retail loads randomOffset at -0x18 then offset at -0x14, while
 // ours loads the equivalent addition in the opposite order. Both operand
 // spellings compile identically, and a bounded syntax-aware AST pass found no
-// improvement. Revisit only after a TU compiler-state change.
+// improvement. An 80-trial guarded TU-state-noise sweep also found no audited
+// exact closure; all rounded-100 candidates failed a strict identity/size guard.
+// Revisit only after a TU compiler-state change.
 VA(0x00428951, 0x218)
 void combatManager::SummonElemental(int monsterType, int spellPower)
 {
@@ -2933,14 +2938,14 @@ void combatManager::SummonElemental(int monsterType, int spellPower)
         spellPower += SPELL_WIZARD_HAT_POWER_BONUS;
 }
 
-// @match-note live 87.70% after named-header state changes: complete fixed
-// frame-info lookup, edge selection, clamping, and
-// rainbow-bolt call; the 0x18 frame and all 3 relocation targets agree. The
-// current first divergence is side/index multiplication; the first local CFG
-// divergence is facing/targetX arm order after the exact army+0x2ae signed-byte
-// frame load. Tried m_animationFrame, a dynamic
-// standing-frame lookup, and the fixed reconstructed table entry. Revisit at
-// 95% for condition polarity; do not retry the two incorrect frame sources.
+// @match-note retained 99.3061%: complete fixed frame-info lookup, edge selection,
+// clamping, and rainbow-bolt call; the 0x18 frame and all 3 relocation targets
+// agree. Putting the non-facing-right `targetX > 200` arm first recovered the
+// retail middle CFG. The only masked instruction residual is now the final color
+// predicate: ours emits `setg`, retail `setge`, with otherwise identical opcode
+// flow. `>=`, negated `<`, positive reverse-arm, and both ternary body orders were
+// tried; the last form also regressed the earlier arm layout. Revisit only after
+// a TU-state change; do not retry m_animationFrame or dynamic standing lookup.
 VA(0x00428b69, 0x1e6)
 void combatManager::DoLuck(int side, int armyIndex)
 {
@@ -2962,10 +2967,10 @@ void combatManager::DoLuck(int side, int armyIndex)
             startX = targetX + targetY / 2 + LUCK_EDGE_INSET;
         else
             startX = targetX - LUCK_EDGE_INSET - targetY / 2;
-    } else if (targetX < 201) {
-        startX = targetX + targetY / 2 + LUCK_EDGE_INSET;
-    } else {
+    } else if (targetX > 200) {
         startX = targetX - LUCK_EDGE_INSET - targetY / 2;
+    } else {
+        startX = targetX + targetY / 2 + LUCK_EDGE_INSET;
     }
     if (targetY < LUCK_SHORT_BOLT_HEIGHT) {
         startX = side == 0 ? 0 : COMBAT_SCREEN_WIDTH - 1;
@@ -2977,8 +2982,8 @@ void combatManager::DoLuck(int side, int armyIndex)
         startX = COMBAT_SCREEN_WIDTH - 1;
     DoBolt(0, startX, startY, targetX, targetY, 0, 0, LUCK_BOLT_WIDTH,
            LUCK_BOLT_WIDTH,
-           startX <= targetX ? BOLT_COLOR_RAINBOW_FORWARD
-                             : BOLT_COLOR_RAINBOW_REVERSE,
+           targetX < startX ? BOLT_COLOR_RAINBOW_REVERSE
+                            : BOLT_COLOR_RAINBOW_FORWARD,
            LUCK_BOLT_ANGLE, LUCK_BOLT_ANGLE,
            LUCK_BOLT_DISTANCE, LUCK_BOLT_FORCE_ANGLE, 1,
            LUCK_BOLT_FRAME_DELAY, 0);
