@@ -93,14 +93,14 @@ inline button::~button()
 
 // @match-note
 // First executable divergence is the +0x47 vptr-load/store/this scheduling order.
-// Base is 0x58d, retail 0x595, with the complete event CFG, modal loop, calls,
-// message writes, icon replacement, stackless FPO shape, and 36/36 relocations.
-// Later residuals are the flags register (DX versus CX), signed hit-test register
-// assignment, repeated deselection blocks, and release-block scheduling. Direct and
-// cached flags, signed/unsigned flags, direct/local event type, positive/rejection
-// hit tests, helper/expanded deselection, and duplicated/shared widget fallbacks
-// were tried; the shared expanded form is retained. Revisit after a real TU/header
-// state change or in the >=95% last-mile phase, not by replaying these families.
+// Base is 0x585, retail 0x595, with the modal loop, calls, message writes, icon
+// replacement, stackless FPO shape, and 36/36 relocations. Key draw/dim gate failures
+// now follow retail to widget::Main while missing/mismatched hotkeys return zero; the
+// initial left-click containment is retained as retail's positive arm. Remaining
+// residuals are DX-versus-CX flags allocation, signed hit-test registers, repeated
+// deselection scheduling, and the release block. Cached flag widths and goto/break
+// fallbacks were checked in this corrected CFG; no alias is retained. Revisit after
+// a real TU/header-state change or in the >=95% last-mile phase.
 VA(0x004dd6d0, 0x595)
 int button::Main(tag_message &msg)
 {
@@ -130,29 +130,35 @@ int button::Main(tag_message &msg)
     switch (eventType) {
     case MESSAGE_KEY_DOWN:
         if ((m_flags & WIDGET_FLAG_ENABLED) != 0 && (m_flags & WIDGET_FLAG_DRAW) != 0 &&
-            (m_flags & WIDGET_FLAG_DIMMED) == 0 && m_hotkey != BUTTON_NO_HOTKEY &&
-            m_hotkey == msg.payload.keyboard.keyCode)
-            return Select(msg);
-        return 0;
+            (m_flags & WIDGET_FLAG_DIMMED) == 0) {
+            if (m_hotkey != BUTTON_NO_HOTKEY &&
+                m_hotkey == msg.payload.keyboard.keyCode)
+                return Select(msg);
+            return 0;
+        }
+        break;
 
     case MESSAGE_KEY_UP:
         if ((m_flags & WIDGET_FLAG_ENABLED) != 0 && (m_flags & WIDGET_FLAG_DRAW) != 0 &&
-            (m_flags & WIDGET_FLAG_DIMMED) == 0 && m_hotkey != BUTTON_NO_HOTKEY &&
-            m_hotkey == msg.payload.keyboard.keyCode) {
-            if ((m_flags & WIDGET_FLAG_SELECTED) == 0)
+            (m_flags & WIDGET_FLAG_DIMMED) == 0) {
+            if (m_hotkey == BUTTON_NO_HOTKEY ||
+                m_hotkey != msg.payload.keyboard.keyCode)
                 return 0;
-            m_flags &= ~WIDGET_FLAG_SELECTED;
-            Draw();
-            gpWindowManager->UpdateScreenRegion(m_x + m_owner->m_posX,
-                                                m_y + m_owner->m_posY, m_width, m_height);
-            msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
-            msg.type = MESSAGE_WIDGET;
-            msg.payload.widget.id = m_id;
-            msg.payload.widget.parameter = iLeftRightSave;
-            iLeftRightSave = 0;
-            return 2;
+            if ((m_flags & WIDGET_FLAG_SELECTED) != 0) {
+                m_flags &= ~WIDGET_FLAG_SELECTED;
+                Draw();
+                gpWindowManager->UpdateScreenRegion(m_x + m_owner->m_posX,
+                                                    m_y + m_owner->m_posY, m_width, m_height);
+                msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
+                msg.type = MESSAGE_WIDGET;
+                msg.payload.widget.id = m_id;
+                msg.payload.widget.parameter = iLeftRightSave;
+                iLeftRightSave = 0;
+                return 2;
+            }
+            return 0;
         }
-        return 0;
+        break;
 
     case MESSAGE_LEFT_BUTTON_DOWN:
     case MESSAGE_RIGHT_BUTTON_DOWN: {
@@ -175,52 +181,52 @@ int button::Main(tag_message &msg)
             return 0;
         }
 
-        if ((m_flags & WIDGET_FLAG_DIMMED) != 0 || m_x > relativeX || m_y > relativeY ||
-            relativeX >= m_x + m_width || relativeY >= m_y + m_height)
-            return 0;
-
-        Select(msg);
-        while (msg.type != MESSAGE_LEFT_BUTTON_UP && msg.type != MESSAGE_RIGHT_BUTTON_UP) {
-            PollSound();
-            gpMouseManager->Main(msg);
-            if (msg.type == MESSAGE_MOUSE_MOVE) {
-                relativeX = static_cast<short>(msg.payload.mouse.x) -
-                            static_cast<short>(m_owner->m_posX);
-                relativeY = static_cast<short>(msg.payload.mouse.y) -
-                            static_cast<short>(m_owner->m_posY);
-                if (m_x > relativeX || m_y > relativeY ||
-                    relativeX >= m_x + m_width || relativeY >= m_y + m_height) {
-                    if ((m_flags & WIDGET_FLAG_SELECTED) != 0) {
-                        m_flags &= ~WIDGET_FLAG_SELECTED;
-                        Draw();
-                        gpWindowManager->UpdateScreenRegion(
-                            m_x + m_owner->m_posX, m_y + m_owner->m_posY, m_width, m_height);
-                        msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
-                        msg.type = MESSAGE_WIDGET;
-                        msg.payload.widget.id = m_id;
-                        msg.payload.widget.parameter = iLeftRightSave;
-                        iLeftRightSave = 0;
+        if ((m_flags & WIDGET_FLAG_DIMMED) == 0 && m_x <= relativeX && m_y <= relativeY &&
+            relativeX < m_x + m_width && relativeY < m_y + m_height) {
+            Select(msg);
+            while (msg.type != MESSAGE_LEFT_BUTTON_UP && msg.type != MESSAGE_RIGHT_BUTTON_UP) {
+                PollSound();
+                gpMouseManager->Main(msg);
+                if (msg.type == MESSAGE_MOUSE_MOVE) {
+                    relativeX = static_cast<short>(msg.payload.mouse.x) -
+                                static_cast<short>(m_owner->m_posX);
+                    relativeY = static_cast<short>(msg.payload.mouse.y) -
+                                static_cast<short>(m_owner->m_posY);
+                    if (m_x > relativeX || m_y > relativeY ||
+                        relativeX >= m_x + m_width || relativeY >= m_y + m_height) {
+                        if ((m_flags & WIDGET_FLAG_SELECTED) != 0) {
+                            m_flags &= ~WIDGET_FLAG_SELECTED;
+                            Draw();
+                            gpWindowManager->UpdateScreenRegion(
+                                m_x + m_owner->m_posX, m_y + m_owner->m_posY, m_width, m_height);
+                            msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
+                            msg.type = MESSAGE_WIDGET;
+                            msg.payload.widget.id = m_id;
+                            msg.payload.widget.parameter = iLeftRightSave;
+                            iLeftRightSave = 0;
+                        }
+                    } else if ((m_flags & WIDGET_FLAG_SELECTED) == 0) {
+                        Select(msg);
                     }
-                } else if ((m_flags & WIDGET_FLAG_SELECTED) == 0) {
-                    Select(msg);
                 }
+                Process1WindowsMessage();
+                msg = gpInputManager->GetEvent();
             }
-            Process1WindowsMessage();
-            msg = gpInputManager->GetEvent();
+            if ((m_flags & WIDGET_FLAG_SELECTED) != 0) {
+                m_flags &= ~WIDGET_FLAG_SELECTED;
+                Draw();
+                gpWindowManager->UpdateScreenRegion(m_x + m_owner->m_posX,
+                                                    m_y + m_owner->m_posY, m_width, m_height);
+                msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
+                msg.type = MESSAGE_WIDGET;
+                msg.payload.widget.id = m_id;
+                msg.payload.widget.parameter = iLeftRightSave;
+                iLeftRightSave = 0;
+                return 2;
+            }
+            return 1;
         }
-        if ((m_flags & WIDGET_FLAG_SELECTED) != 0) {
-            m_flags &= ~WIDGET_FLAG_SELECTED;
-            Draw();
-            gpWindowManager->UpdateScreenRegion(m_x + m_owner->m_posX,
-                                                m_y + m_owner->m_posY, m_width, m_height);
-            msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
-            msg.type = MESSAGE_WIDGET;
-            msg.payload.widget.id = m_id;
-            msg.payload.widget.parameter = iLeftRightSave;
-            iLeftRightSave = 0;
-            return 2;
-        }
-        return 1;
+        return 0;
     }
 
     case MESSAGE_LEFT_BUTTON_UP:
