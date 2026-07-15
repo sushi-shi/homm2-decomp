@@ -1,0 +1,6 @@
+# Reviewed globals whose retail initialized-storage reconstruction is complete.
+# Add each verified recovery here. The link audit hard-fails if an enrolled symbol
+# becomes missing, ambiguous, or returns to a different storage class. Known legacy
+# mismatches remain transitional diagnostics until their initializers are recovered.
+name	unit
+?gHeroDefaultNames@@3PAPADA	SOURCE/KB
