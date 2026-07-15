@@ -134,6 +134,10 @@ void ForcePollSound(void)
     PollSound();
 }
 
+// @early-stop
+// Normalized disassembly is identical for all 264 instructions; the frame and
+// 62/62 relocation sites also match with no base-only target. The retained
+// 99.995% residual is local compiler-symbol identity, not a code-byte mismatch.
 VA(0x004965be, 0x39e)
 void InitMainClasses(void)
 {
@@ -261,30 +265,44 @@ int EarlySetup(void)
     return 1;
 }
 
+// @match-note
+// Pre-95 structural checkpoint (97.74%): exact 0x164 frame and live slots after
+// recovering the 0x100 network buffer with its 0xd4 transmitted prefix, the
+// shared game-player index, and four retail-unreferenced /Od words. The first
+// non-relocation residual is one local continuation jump before the first menu
+// table. Base tables are [0x4d1,0x501) and [0x8d6,0x8ea); retail tables are
+// [0x4d4,0x504) and [0x8f4,0x908). Relocations are 486/489 with no base-only
+// external target. Tried direct giSetupGameType dispatch, both menu case orders,
+// inline high-score/credits bodies, and the shared setup label. Revisit at 95%
+// for systematic continuation/table-placement steering.
 VA(0x00496e98, 0x16c0)
 int oldmain(void)
 {
-    int command;
-    int quit;
-    int mainScreenLoaded;
-    int firstMainScreen;
-    int savedUpdateFlags;
-    int player;
-    int netPlayer;
-    int gamePlayer;
-    int result;
-    int firstFreeGamePlayer;
-    int transmissionResult;
-    char matchedNetPlayers[OLD_MAIN_MATCH_BUFFER_SIZE];
-    char matchedGamePlayers[OLD_MAIN_MATCH_BUFFER_SIZE];
-    OldMainNetSetup netSetup;
+    int command_a;
+    int quit_g;
+    int mainScreenLoaded_b;
+    int firstMainScreen_c;
+    int savedUpdateFlags_l;
+    int player_h;
+    // Retail reserves four unreferenced /Od locals around the live state slots.
+    int unusedMainState_o;
+    int unusedMenuState_d;
+    int unusedPlayerState_c;
+    int unusedNetworkState_i;
+    int netPlayer_i;
+    int gamePlayer_m;
+    int result_i;
+    int transmissionResult_i;
+    char matchedNetPlayers_d[OLD_MAIN_MATCH_BUFFER_SIZE];
+    char matchedGamePlayers_e[OLD_MAIN_MATCH_BUFFER_SIZE];
+    OldMainNetBuffer netBuffer_b;
 
     if (bKBDone)
         return 0;
     bKBDone = 1;
     LogStr("OM1");
     LogStr("OM2");
-    command = -1;
+    command_a = -1;
     if (gpExec->InitSystem())
         ShutDown("Initialization failed!");
     LogStr("OM3");
@@ -310,45 +328,45 @@ int oldmain(void)
         BlitBitmapToScreen(gpWindowManager->m_screen, 0, 0,
                            OLD_MAIN_SCREEN_WIDTH, OLD_MAIN_SCREEN_HEIGHT, 0, 0);
         if (!gbSkipIntro) {
-            savedUpdateFlags = gpWindowManager->m_updateFlags;
+            savedUpdateFlags_l = gpWindowManager->m_updateFlags;
             gpWindowManager->m_updateFlags = 0;
             if (PlaySmacker(OLD_MAIN_INTRO_PRIMARY_VIDEO))
                 PlaySmacker(OLD_MAIN_INTRO_FALLBACK_VIDEO);
             PlaySmacker(OLD_MAIN_INTRO_SECONDARY_VIDEO);
-            gpWindowManager->m_updateFlags = savedUpdateFlags;
+            gpWindowManager->m_updateFlags = savedUpdateFlags_l;
         }
     }
 
     LoadSystemwideIcons();
     memset(gbThisNetHumanPlayer, 0, OLD_MAIN_PLAYER_COUNT);
     gpMouseManager->ShowColorPointer();
-    quit = 0;
-    mainScreenLoaded = 0;
-    firstMainScreen = 1;
+    quit_g = 0;
+    mainScreenLoaded_b = 0;
+    firstMainScreen_c = 1;
 
-    while (!quit) {
+    while (!quit_g) {
 main_menu:
         if (!gShingleAnim)
             gShingleAnim = gpResourceManager->GetIcon("shnganim.icn");
         if (gGameCommand != OLD_MAIN_EXIT)
             gpSoundManager->SwitchAmbientMusic(OLD_MAIN_MAIN_MUSIC);
 
-        if (!mainScreenLoaded) {
+        if (!mainScreenLoaded_b) {
             if (gGameCommand != OLD_MAIN_EXIT) {
                 gpResourceManager->GetBackdrop("heroes.icn", gpWindowManager->m_screen, 1);
                 gpWindowManager->UpdateScreenRegion(0, 0,
                                                     OLD_MAIN_SCREEN_WIDTH,
                                                     OLD_MAIN_SCREEN_HEIGHT);
-                if (firstMainScreen)
+                if (firstMainScreen_c)
                     SetPalette(gPalette->m_data, 1);
                 else
                     gpWindowManager->FadeScreen(0, OLD_MAIN_FADE_SPEED,
                                                 gPalette);
-                firstMainScreen = 0;
+                firstMainScreen_c = 0;
             }
             gpMouseManager->SetPointer("advmice.mse", 0, OLD_MAIN_POINTER_TYPE);
         }
-        mainScreenLoaded = 1;
+        mainScreenLoaded_b = 1;
         if (gGameCommand != OLD_MAIN_EXIT)
             gpWindowManager->m_updateFlags = 1;
 
@@ -364,8 +382,7 @@ main_menu:
             gbWaitForRemoteReceive =
                 iMPExtendedType == OLD_MAIN_REMOTE_CLIENT;
             giTCPHostStatus = -1;
-            result = giSetupGameType;
-            switch (result) {
+            switch (giSetupGameType) {
             case OLD_MAIN_SETUP_NEW:
                 if (!gpGame->NewGame())
                     goto main_menu;
@@ -375,26 +392,12 @@ main_menu:
                     goto main_menu;
                 break;
             }
-            command = -1;
             goto game_setup_complete;
         }
 
 process_menu_command:
         if (giMenuCommand != -1) {
             switch (giMenuCommand) {
-            case APP_MENU_LOAD_0:
-            case APP_MENU_LOAD_1:
-            case APP_MENU_LOAD_2:
-            case APP_MENU_LOAD_3:
-            case APP_MENU_LOAD_4:
-            case APP_MENU_LOAD_5:
-            case APP_MENU_LOAD_6:
-            case APP_MENU_LOAD_7:
-            case APP_MENU_LOAD_8:
-            case APP_MENU_LOAD_9:
-            case APP_MENU_LOAD_10:
-                result = gpGame->PickLoadGame();
-                break;
             case APP_MENU_RESTART_0:
             case APP_MENU_RESTART_1:
             case APP_MENU_RESTART_2:
@@ -409,15 +412,28 @@ process_menu_command:
             case APP_MENU_RESTART_11:
             case APP_MENU_RESTART_12:
             case APP_MENU_RESTART_13:
-                result = gpGame->NewGame();
+                result_i = gpGame->NewGame();
                 break;
             default:
-                result = 1;
+                result_i = 1;
+                break;
+            case APP_MENU_LOAD_0:
+            case APP_MENU_LOAD_1:
+            case APP_MENU_LOAD_2:
+            case APP_MENU_LOAD_3:
+            case APP_MENU_LOAD_4:
+            case APP_MENU_LOAD_5:
+            case APP_MENU_LOAD_6:
+            case APP_MENU_LOAD_7:
+            case APP_MENU_LOAD_8:
+            case APP_MENU_LOAD_9:
+            case APP_MENU_LOAD_10:
+                result_i = gpGame->PickLoadGame();
                 break;
             }
-            if (!result)
+            if (!result_i)
                 goto main_menu;
-            command = -1;
+            command_a = -1;
             goto game_setup_complete;
         }
 
@@ -429,166 +445,161 @@ process_menu_command:
             gpWindowManager->DoDialog(gpInitWin, InitMenuHandler, 0);
             delete gpInitWin;
             gpInitWin = 0;
-            command = gpWindowManager->m_dialogResult;
+            command_a = gpWindowManager->m_dialogResult;
             gbInSetupDialog = 0;
         } else {
-            command = gGameCommand;
+            command_a = gGameCommand;
             gGameCommand = -1;
         }
         if (giMenuCommand != -1)
             goto process_menu_command;
 
-        switch (command) {
-        case OLD_MAIN_NEW_GAME:
-            giSetupGameType = OLD_MAIN_SETUP_NEW;
-            break;
+        switch (command_a) {
         case OLD_MAIN_LOAD_GAME:
             giSetupGameType = OLD_MAIN_SETUP_LOAD;
-            break;
+            goto setup_selected;
+        case OLD_MAIN_NEW_GAME:
+            giSetupGameType = OLD_MAIN_SETUP_NEW;
+
+setup_selected:
+            for (player_h = 0; player_h < OLD_MAIN_PLAYER_COUNT; player_h++)
+                sprintf(cPlayerNames[player_h], "");
+            if (!gpGame->SetupGame())
+                goto main_menu;
+
+            result_i = giSetupGameType;
+            if (result_i == OLD_MAIN_SETUP_NEW) {
+                if (gbInCampaign) {
+                    gpGame->InitEntireCampaign(gbCampaignSideChoice);
+                    if (gpGame->HandleCampaignWin()) {
+                        gpGame->InitCampaignMap();
+                        goto initialize_game;
+                    } else {
+                        gpWindowManager->FadeScreen(1, OLD_MAIN_FADE_SPEED,
+                                                    gPalette);
+                        mainScreenLoaded_b = 0;
+                        goto main_menu;
+                    }
+                }
+                if (xIsPlayingExpansionCampaign) {
+                    if (xCampaign.HandleVictory()) {
+                        xCampaign.InitMap();
+                        goto initialize_game;
+                    }
+                    gpWindowManager->FadeScreen(1, OLD_MAIN_FADE_SPEED, gPalette);
+                    mainScreenLoaded_b = 0;
+                    goto main_menu;
+                }
+                LogStr("New Game 1");
+                if (!gpGame->NewGame())
+                    goto main_menu;
+                LogStr("New Game 2");
+            } else if (result_i == OLD_MAIN_SETUP_LOAD) {
+                LogStr("Load Game 1");
+                if (!gpGame->PickLoadGame())
+                    goto main_menu;
+                LogStr("Load Game 2");
+            }
+            goto game_setup_complete;
         case OLD_MAIN_HIGH_SCORES:
-            goto show_high_scores;
+            if (gpExec->AddManager(gpHighScoreManager, -1))
+                ShutDown("Can't add manager!");
+            gpExec->MainLoop();
+            gpExec->RemoveManager(gpHighScoreManager);
+            mainScreenLoaded_b = 0;
+            goto main_menu;
         case OLD_MAIN_CREDITS:
-            goto show_credits;
+            gpWindowManager->FadeScreen(1, OLD_MAIN_FADE_SPEED, gPalette);
+            PlaySmacker(OLD_MAIN_CREDITS_FIRST_VIDEO);
+            PlaySmacker(OLD_MAIN_CREDITS_SECOND_VIDEO);
+            mainScreenLoaded_b = 0;
+            gpWindowManager->FadeScreen(1, OLD_MAIN_LONG_FADE_SPEED, gPalette);
+            goto main_menu;
         case OLD_MAIN_EXIT:
-            quit = 1;
-            continue;
+            quit_g = 1;
+            goto game_setup_complete;
         default:
             goto game_setup_complete;
         }
 
-        for (player = 0; player < OLD_MAIN_PLAYER_COUNT; player++)
-            sprintf(cPlayerNames[player], "");
-        if (!gpGame->SetupGame())
-            goto main_menu;
-
-        result = giSetupGameType;
-        if (result == OLD_MAIN_SETUP_NEW) {
-            if (gbInCampaign) {
-                gpGame->InitEntireCampaign(gbCampaignSideChoice);
-                if (gpGame->HandleCampaignWin()) {
-                    gpGame->InitCampaignMap();
-                    goto initialize_game;
-                } else {
-                    gpWindowManager->FadeScreen(1, OLD_MAIN_FADE_SPEED,
-                                                gPalette);
-                    mainScreenLoaded = 0;
-                    goto main_menu;
-                }
-            }
-            if (xIsPlayingExpansionCampaign) {
-                if (xCampaign.HandleVictory()) {
-                    xCampaign.InitMap();
-                    goto initialize_game;
-                }
-                gpWindowManager->FadeScreen(1, OLD_MAIN_FADE_SPEED, gPalette);
-                mainScreenLoaded = 0;
-                goto main_menu;
-            }
-            LogStr("New Game 1");
-            if (!gpGame->NewGame())
-                goto main_menu;
-            LogStr("New Game 2");
-        } else if (result == OLD_MAIN_SETUP_LOAD) {
-            LogStr("Load Game 1");
-            if (!gpGame->PickLoadGame())
-                goto main_menu;
-            LogStr("Load Game 2");
-        }
-
-        goto game_setup_complete;
-
-show_high_scores:
-        if (gpExec->AddManager(gpHighScoreManager, -1))
-            ShutDown("Can't add manager!");
-        gpExec->MainLoop();
-        gpExec->RemoveManager(gpHighScoreManager);
-        mainScreenLoaded = 0;
-        goto main_menu;
-
-show_credits:
-        gpWindowManager->FadeScreen(1, OLD_MAIN_FADE_SPEED, gPalette);
-        PlaySmacker(OLD_MAIN_CREDITS_FIRST_VIDEO);
-        PlaySmacker(OLD_MAIN_CREDITS_SECOND_VIDEO);
-        mainScreenLoaded = 0;
-        gpWindowManager->FadeScreen(1, OLD_MAIN_LONG_FADE_SPEED, gPalette);
-        goto main_menu;
-
 game_setup_complete:
         if (giMenuCommand == -1) {
             LogStr("DWM 1");
-            if (quit)
+            if (quit_g)
                 goto game_finished;
             LogStr("DWM 2");
             if (gbRemoteOn && giThisNetPos == 0) {
                 LogStr("DWM 3");
-                memset(matchedGamePlayers, 0, OLD_MAIN_PLAYER_COUNT);
-                memset(matchedNetPlayers, 0, OLD_MAIN_PLAYER_COUNT);
-                for (netPlayer = 0; netPlayer < OLD_MAIN_PLAYER_COUNT; netPlayer++) {
-                    if (gbHumanPlayer[netPlayer]) {
-                        for (gamePlayer = 0; gamePlayer < OLD_MAIN_PLAYER_COUNT; gamePlayer++) {
+                memset(matchedGamePlayers_e, 0, OLD_MAIN_PLAYER_COUNT);
+                memset(matchedNetPlayers_d, 0, OLD_MAIN_PLAYER_COUNT);
+                for (netPlayer_i = 0; netPlayer_i < OLD_MAIN_PLAYER_COUNT; netPlayer_i++) {
+                    if (gbHumanPlayer[netPlayer_i]) {
+                        for (gamePlayer_m = 0; gamePlayer_m < OLD_MAIN_PLAYER_COUNT; gamePlayer_m++) {
                             char *defaultName =
                                 &gpGame->m_defaultPlayerNames[
-                                    gamePlayer * OLD_MAIN_DEFAULT_NAME_STRIDE];
+                                    gamePlayer_m * OLD_MAIN_DEFAULT_NAME_STRIDE];
                             if (strlen(defaultName) == OLD_MAIN_DEFAULT_NAME_LENGTH &&
-                                !strcmp(defaultName, gsNetPlayerInfo[netPlayer].name) &&
-                                !gpGame->m_playerDead[gamePlayer] &&
-                                !matchedGamePlayers[gamePlayer] &&
-                                !matchedNetPlayers[netPlayer]) {
-                                matchedGamePlayers[gamePlayer] = 1;
-                                matchedNetPlayers[netPlayer] = 1;
-                                gbGamePosToNetPos[gamePlayer] = static_cast<signed char>(netPlayer);
+                                !strcmp(defaultName, gsNetPlayerInfo[netPlayer_i].name) &&
+                                !gpGame->m_playerDead[gamePlayer_m] &&
+                                !matchedGamePlayers_e[gamePlayer_m] &&
+                                !matchedNetPlayers_d[netPlayer_i]) {
+                                matchedGamePlayers_e[gamePlayer_m] = 1;
+                                matchedNetPlayers_d[netPlayer_i] = 1;
+                                gbGamePosToNetPos[gamePlayer_m] = static_cast<signed char>(netPlayer_i);
                             }
                         }
                     }
                 }
-                for (firstFreeGamePlayer = 0;
-                     firstFreeGamePlayer < OLD_MAIN_PLAYER_COUNT &&
-                         matchedGamePlayers[firstFreeGamePlayer];
-                     firstFreeGamePlayer++) {
+                for (gamePlayer_m = 0;
+                     gamePlayer_m < OLD_MAIN_PLAYER_COUNT &&
+                         matchedGamePlayers_e[gamePlayer_m];
+                     gamePlayer_m++) {
                 }
-                for (netPlayer = 0; netPlayer < OLD_MAIN_PLAYER_COUNT; netPlayer++) {
-                    if (!matchedNetPlayers[netPlayer]) {
-                        if (!gbHumanPlayer[netPlayer]) {
-                            gbGamePosToNetPos[netPlayer] = -1;
+                for (netPlayer_i = 0; netPlayer_i < OLD_MAIN_PLAYER_COUNT; netPlayer_i++) {
+                    if (!matchedNetPlayers_d[netPlayer_i]) {
+                        if (!gbHumanPlayer[netPlayer_i]) {
+                            gbGamePosToNetPos[netPlayer_i] = -1;
                         } else {
-                            gbGamePosToNetPos[netPlayer] =
-                                static_cast<signed char>(firstFreeGamePlayer);
+                            gbGamePosToNetPos[netPlayer_i] =
+                                static_cast<signed char>(gamePlayer_m);
                             strcpy(&gpGame->m_defaultPlayerNames[
-                                       firstFreeGamePlayer *
+                                       gamePlayer_m *
                                        OLD_MAIN_DEFAULT_NAME_STRIDE],
-                                   gsNetPlayerInfo[netPlayer].name);
-                            for (firstFreeGamePlayer++;
-                                 firstFreeGamePlayer < OLD_MAIN_PLAYER_COUNT &&
-                                     matchedGamePlayers[firstFreeGamePlayer];
-                                 firstFreeGamePlayer++) {
+                                   gsNetPlayerInfo[netPlayer_i].name);
+                            for (gamePlayer_m++;
+                                 gamePlayer_m < OLD_MAIN_PLAYER_COUNT &&
+                                     matchedGamePlayers_e[gamePlayer_m];
+                                 gamePlayer_m++) {
                             }
                         }
                     }
                 }
 
-                memcpy(netSetup.gamePosToNetPos, gbGamePosToNetPos, OLD_MAIN_PLAYER_COUNT);
-                memcpy(netSetup.players, gsNetPlayerInfo, sizeof(netSetup.players));
+                memcpy(netBuffer_b.setup.gamePosToNetPos, gbGamePosToNetPos,
+                       OLD_MAIN_PLAYER_COUNT);
+                memcpy(netBuffer_b.setup.players, gsNetPlayerInfo,
+                       sizeof(netBuffer_b.setup.players));
                 giThisGamePos = NetPosToGamePos(0);
                 gbUseDiffCompression = 1;
                 gbUseRegularCompression =
                     giHighMemBuffer > OLD_MAIN_REGULAR_COMPRESSION_MEMORY_LIMIT;
-                for (netPlayer = 0; netPlayer < giNumHumanPlayers; netPlayer++) {
-                    if (!gsNetPlayerInfo[netPlayer].useRegularCompression)
+                for (netPlayer_i = 0; netPlayer_i < giNumHumanPlayers; netPlayer_i++) {
+                    if (!gsNetPlayerInfo[netPlayer_i].useRegularCompression)
                         gbUseRegularCompression = 0;
-                    if (!gsNetPlayerInfo[netPlayer].useDiffCompression)
+                    if (!gsNetPlayerInfo[netPlayer_i].useDiffCompression)
                         gbUseDiffCompression = 0;
                 }
-                netSetup.useRegularCompression = gbUseRegularCompression;
-                netSetup.useDiffCompression = gbUseDiffCompression;
-                for (netPlayer = 1; netPlayer < giNumHumanPlayers; netPlayer++) {
-                    transmissionResult = TransmitRemoteData(
-                        reinterpret_cast<char *>(&netSetup), netPlayer,
-                        sizeof(netSetup), OLD_MAIN_NETWORK_PACKET, 1, 1, -1);
-                    if (!transmissionResult)
+                netBuffer_b.setup.useRegularCompression = gbUseRegularCompression;
+                netBuffer_b.setup.useDiffCompression = gbUseDiffCompression;
+                for (netPlayer_i = 1; netPlayer_i < giNumHumanPlayers; netPlayer_i++) {
+                    transmissionResult_i = TransmitRemoteData(
+                        netBuffer_b.bytes, netPlayer_i, OLD_MAIN_NET_SETUP_SIZE,
+                        OLD_MAIN_NETWORK_PACKET, 1, 1, -1);
+                    if (!transmissionResult_i)
                         ShutDown(0);
                 }
-                for (netPlayer = 1; netPlayer < giNumHumanPlayers; netPlayer++) {
-                    if (!gpGame->TransmitSaveGame(netPlayer, 0, 1))
+                for (netPlayer_i = 1; netPlayer_i < giNumHumanPlayers; netPlayer_i++) {
+                    if (!gpGame->TransmitSaveGame(netPlayer_i, 0, 1))
                         ShutDown(0);
                 }
                 memset(gbThisNetHumanPlayer, 0, OLD_MAIN_PLAYER_COUNT);
@@ -618,22 +629,22 @@ initialize_game:
         gShingleAnim = 0;
 
         if (giNumHumanPlayers > 1) {
-            for (player = 0; player < giNumHumanPlayers; player++) {
+            for (player_h = 0; player_h < giNumHumanPlayers; player_h++) {
                 if (iMPBaseType != OLD_MAIN_MULTIPLAYER_LOCAL)
-                    strcpy(cPlayerNames[NetPosToGamePos(player)],
-                           gsNetPlayerInfo[player].name);
+                    strcpy(cPlayerNames[NetPosToGamePos(player_h)],
+                           gsNetPlayerInfo[player_h].name);
             }
         }
-        for (player = 0; player < gpGame->m_playerCount; player++) {
-            if (!strlen(cPlayerNames[player])) {
-                sprintf(cPlayerNames[player], "%s player",
-                        gColors[gpGame->m_players[player].color]);
-                cPlayerNames[player][0] -= ' ';
+        for (player_h = 0; player_h < gpGame->m_playerCount; player_h++) {
+            if (!strlen(cPlayerNames[player_h])) {
+                sprintf(cPlayerNames[player_h], "%s player",
+                        gColors[gpGame->m_players[player_h].color]);
+                cPlayerNames[player_h][0] -= ' ';
             }
         }
         ComputeAdvNetControl();
         gbGameInitialized = 1;
-        mainScreenLoaded = 0;
+        mainScreenLoaded_b = 0;
         gpSoundManager->StopAllSamples(1);
         gpWindowManager->FadeScreen(1, OLD_MAIN_FADE_SPEED, 0);
         gMapX = 0;
@@ -651,11 +662,11 @@ initialize_game:
         } else {
             if (gpExec->AddManager(gpAdvManager, -1))
                 ShutDown("Can't add manager!");
-            if (command == OLD_MAIN_NEW_GAME) {
+            if (command_a == OLD_MAIN_NEW_GAME) {
                 gpAdvManager->SetHeroContext(
                     reinterpret_cast<playerData *>(&gpGame->m_players[0])->NextHero(0), 0);
             }
-            if (command == OLD_MAIN_NEW_GAME || bForceCheckTimeEvent) {
+            if (command_a == OLD_MAIN_NEW_GAME || bForceCheckTimeEvent) {
                 bForceCheckTimeEvent = 0;
                 gpGame->CheckForTimeEvent();
             }
@@ -688,10 +699,10 @@ initialize_game:
                                                 OLD_MAIN_SCREEN_HEIGHT);
             gpWindowManager->FadeScreen(0, OLD_MAIN_FADE_SPEED, gPalette);
             gpWindowManager->m_updateFlags = 1;
-            mainScreenLoaded = 1;
+            mainScreenLoaded_b = 1;
             gpSoundManager->PlayAmbientMusic(OLD_MAIN_MAIN_MUSIC, 0, -1);
         } else if (gbInCampaign) {
-            result = gpGame->HandleCampaignWin();
+            result_i = gpGame->HandleCampaignWin();
             if ((gpGame->m_campaignScenario == OLD_MAIN_ARCHIBALD_FINAL_SCENARIO &&
                  gpGame->m_campaignScenarioCompleted[gpGame->m_campaignType]
                                                     [OLD_MAIN_ARCHIBALD_FINAL_SCENARIO]) ||
@@ -706,16 +717,16 @@ initialize_game:
                                     CONGRATS_CAMPAIGN,
                                     gpGame->m_campaignType ? "Archibald" : "Roland");
             }
-            if (result) {
-                for (player = 0; player < OLD_MAIN_PLAYER_COUNT; player++)
-                    sprintf(cPlayerNames[player], "");
+            if (result_i) {
+                for (player_h = 0; player_h < OLD_MAIN_PLAYER_COUNT; player_h++)
+                    sprintf(cPlayerNames[player_h], "");
                 gpGame->InitCampaignMap();
                 gbGameOver = 0;
                 bForceCheckTimeEvent = 1;
                 goto initialize_game;
             }
         } else if (xIsPlayingExpansionCampaign) {
-            result = xCampaign.HandleVictory();
+            result_i = xCampaign.HandleVictory();
             if (xCampaign.IsCompleted()) {
                 gbShowHighScore = 1;
                 ShowCongrats(CONGRATS_EXPANSION_CAMPAIGN);
@@ -723,9 +734,9 @@ initialize_game:
                                     CONGRATS_EXPANSION_CAMPAIGN,
                                     xHSCampaignNames[xCampaign.CampaignID()]);
             }
-            if (result) {
-                for (player = 0; player < OLD_MAIN_PLAYER_COUNT; player++)
-                    sprintf(cPlayerNames[player], "");
+            if (result_i) {
+                for (player_h = 0; player_h < OLD_MAIN_PLAYER_COUNT; player_h++)
+                    sprintf(cPlayerNames[player_h], "");
                 xCampaign.InitMap();
                 gbGameOver = 0;
                 bForceCheckTimeEvent = 1;
@@ -740,7 +751,7 @@ initialize_game:
                     0, 0, OLD_MAIN_SCREEN_WIDTH, OLD_MAIN_SCREEN_HEIGHT);
                 gpWindowManager->FadeScreen(0, OLD_MAIN_FADE_SPEED, gPalette);
                 gpWindowManager->m_updateFlags = 1;
-                mainScreenLoaded = 1;
+                mainScreenLoaded_b = 1;
                 gpSoundManager->PlayAmbientMusic(OLD_MAIN_MAIN_MUSIC, 0, -1);
             } else {
                 gpSoundManager->PlayAmbientMusic(OLD_MAIN_HIGH_SCORE_MUSIC, 0, -1);
@@ -761,12 +772,12 @@ initialize_game:
                                                 OLD_MAIN_SCREEN_WIDTH,
                                                 OLD_MAIN_SCREEN_HEIGHT);
             gpWindowManager->FadeScreen(0, OLD_MAIN_FADE_SPEED, gPalette);
-            mainScreenLoaded = 1;
+            mainScreenLoaded_b = 1;
         }
 
 game_finished:
         if (gbRemoteOn)
-            quit = 1;
+            quit_g = 1;
     }
 
     ShutDown(0);
@@ -782,6 +793,13 @@ char toupper(char c)
         return c;
 }
 
+// @match-note
+// Pre-95 structural checkpoint (retained 99.831%): exact 0x28 frame and 139/139
+// relocation sites with no base-only target. The first code residual is the
+// outer command-line scan backedge (`jge` here versus retail `jle`); subsequent
+// diff alignment is obscured by two delinked character tables at +0x567 and
+// +0x5bd. The direct buffer-index and positive-bound spellings are represented;
+// revisit at 95% for systematic loop-polarity/table steering.
 VA(0x0049859c, 0x791)
 int InterpretCommandLine(void)
 {
@@ -970,6 +988,13 @@ int InterpretCommandLine(void)
     return 1;
 }
 
+// @match-note
+// Pre-95 structural checkpoint (retained 99.565%): exact 0x24 frame, complete
+// event/help switch bodies, and 89/89 relocation sites with no base-only target.
+// The first residual is the first delinked switch table at +0xad; the second is
+// at +0x1ab, after which the generic diff parser loses local-label alignment.
+// Direct retail-order case bodies are present. Revisit at 95% for explicit-range
+// table exclusion and systematic continuation steering.
 VA(0x00498d2d, 0x698)
 int InitMenuHandler(struct tag_message &msg)
 {
@@ -1231,10 +1256,11 @@ char *GetBuildingName(int race, int building)
         return gDwellingNames[race][building - KB_BUILDING_DWELLING_FIRST];
 }
 
-// @early-stop
+// @match-note
 // ~98%: 2-instruction /Od body-placement variance — retail emits the final
 // `else if (building<0x10)` body out-of-line (`jl body; jmp epi`); this build lowers it
 // inline (`jge skip`). Logic byte-exact otherwise; resisted every source structure tried.
+// Revisit at 95% for systematic body-placement steering.
 VA(0x004997d4, 0x138)
 void GetBuildingCost(int race, int building, int *const dest, int mageLevel)
 {
@@ -1298,11 +1324,6 @@ void GetMonsterCost(int monster, int *const cost)
     }
 }
 
-// @early-stop
-// tu-cumulative: logic + all frame slots byte-exact (reqMask@-8, haveMask@-4 match
-// retail); the only residual is 2 bytes — the commutative `&` operand load-order in
-// `(reqMask & haveMask) == reqMask` (retail loads reqMask first, this cl loads the
-// just-OR'd haveMask first). Not source-steerable (tried both `&` orders, `==` swap).
 VA(0x00499a6c, 0x2b5)
 int CanBuild(town *t, int building)
 {
@@ -1638,6 +1659,14 @@ void PlayerDead(int player)
     }
 }
 
+// @match-note
+// Pre-95 structural checkpoint (99.57%): exact 0x1c4 frame, slots, CFG, and
+// 300/300 relocation sites with no base-only target. The first code residual is
+// the first player/giThisGamePos equality: retail loads player then compares the
+// global, while this TU loads the global then compares player. The next two
+// player/giCurPlayer tests have the same commutative load-order residual; the
+// remaining diff rows are literal/interior-symbol identities. Both equality
+// operand orders compile identically. Revisit at 95% for last-mile steering.
 VA(0x0049a6c1, 0x19bb)
 void CheckEndGame(int forcedResult, int dragonCityCaptured)
 {
@@ -1694,7 +1723,7 @@ void CheckEndGame(int forcedResult, int dragonCityCaptured)
                 if ((rec->heroCount == 0 && rec->townCount == 0) ||
                     (xIsPlayingExpansionCampaign && xCampaign.IsSpecialLossCondition(player))) {
                     PlayerDead(player);
-                    if (player == giThisGamePos) {
+                    if (giThisGamePos == player) {
                         dialogShown = 1;
                         sprintf(gText, "You have been eliminated from the game!!!");
                         NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -1706,7 +1735,7 @@ void CheckEndGame(int forcedResult, int dragonCityCaptured)
                     }
                 } else if (rec->townCount == 0) {
                     if (rec->daysLeft == -1) {
-                        if (gbThisNetHumanPlayer[player] && player == giCurPlayer) {
+                        if (gbThisNetHumanPlayer[player] && giCurPlayer == player) {
                             sprintf(gText,
                                     "%s, you have lost your last town.  If you do not conquer another "
                                     "town in the next week, you will be eliminated.",
@@ -1717,7 +1746,7 @@ void CheckEndGame(int forcedResult, int dragonCityCaptured)
                         rec->daysLeft = CHECK_END_GAME_GRACE_DAYS;
                     } else if (rec->daysLeft == 0) {
                         PlayerDead(player);
-                        if (gbThisNetHumanPlayer[player] && player == giCurPlayer) {
+                        if (gbThisNetHumanPlayer[player] && giCurPlayer == player) {
                             if (!dialogShown) {
                                 dialogShown = 1;
                                 sprintf(gText,
@@ -2197,6 +2226,12 @@ void InitVars(void)
     }
 }
 
+// @match-note
+// Pre-95 structural checkpoint (99.399%): exact 0xe0 frame and 119/119
+// relocation sites with no base-only target. The first real code residual is a
+// retail continuation jump after the mixed-undead strcat; other early rows are
+// string/interior-symbol aliases. The direct nested undead test is represented;
+// revisit at 95% for systematic continuation and condition-shape steering.
 VA(0x0049c312, 0x61b)
 void game::ShowMoraleInfo(hero *h, int dialogType)
 {
@@ -2414,6 +2449,10 @@ int GetMonType(int score, int campaign)
     return giScoreMon[0][1];
 }
 
+// @early-stop
+// Exact 0x574 frame and 27/27 relocation sites with no base-only target.
+// Normalized instructions are identical; the retained 99.996% residual consists
+// only of delinked filename and prompt literal identities.
 VA(0x0049ce14, 0x4ac)
 int AddScoreToHighScore(int score, int days, int scenario, int highScoreType, char *scenarioName)
 {
@@ -2543,11 +2582,12 @@ int WaitForOtherPlayer(void)
     return result;
 }
 
-// @early-stop
+// @match-note
 // Retail frame 0x158, CFG, and every stack slot align; relocations are 131/131
 // with only delinked literal/addend aliases. The sole code residual is the
 // printable-key guard: equivalent byte-vs-zero-extend comparisons, with the
-// retail direct-byte sequence eight bytes shorter.
+// retail direct-byte sequence eight bytes shorter. Revisit at 95% for systematic
+// guard-expression steering.
 VA(0x0049d4a6, 0xb85)
 void PopNetBox(char *text, int netPlayer)
 {
@@ -2905,13 +2945,14 @@ void FileError(char *filename)
     ShutDown(buf);
 }
 
-// @early-stop
+// @match-note
 // tu-cumulative: logic + all 14 frame slots byte-exact (od_oracle-verified). The only
 // residual (coffcmp: 40 bytes, all in the two brightness averages + the minDist test)
 // is a /Od operand-evaluation-order difference this cl renders vs retail: the 3-term
 // sum `p[2]+p[0]+p[1]` reads +2,+1,+0 here but +2,+0,+1 in retail, and the `d>p`
 // compare loads the other operand first. Not source-steerable (probed every term
 // ordering, explicit grouping, `|0`, and an inline helper — all identical here).
+// Revisit at 95% for systematic evaluation-order steering.
 VA(0x0049e3a8, 0x255)
 void SmackFade(unsigned char *src, unsigned char *dst)
 {
@@ -2963,10 +3004,14 @@ void SmackFade(unsigned char *src, unsigned char *dst)
     BaseFree(f, KBFILE, (*(short *)"\x61\x0f") + 0x32);
 }
 
+// @early-stop
+// Exact 0x330 frame after recovering the 0x304 palette aggregate with its 0x300
+// copied prefix. All normalized instructions and 69/69 relocation sites align;
+// the 99.92% residual is limited to delinked source-line and string identities.
 VA(0x0049e5fd, 0x303)
 void ShowCongrats(int highScoreType)
 {
-    unsigned char savedPalette[CONGRATS_PALETTE_SIZE];
+    unsigned char savedPalette[CONGRATS_PALETTE_BUFFER_SIZE];
     int baseScore;
     int score;
     char rating[CONGRATS_RATING_LENGTH];
@@ -3381,6 +3426,13 @@ adjustSound:
     return 0;
 }
 
+// @match-note
+// Pre-95 structural checkpoint (94.755%): exact 0x10 frame, exact 0x310 span,
+// complete music/sound menu loops and switches, and 38/38 relocation sites with
+// no base-only target. Both 0x28-byte tables start at the retail offsets +0x130
+// and +0x24a. The first residual is a delinked gConfig interior-symbol identity;
+// direct loops and retail-order cases are present. Revisit at 95% for explicit-
+// range raw-byte proof and any remaining local-label steering.
 VA(0x0049f61d, 0x310)
 void UpdateSystemOptionsMenu(void)
 {
@@ -3456,10 +3508,6 @@ void CleanUpMenus(void)
     hmnuApp = 0;
 }
 
-// @early-stop
-// Frame 0x4, CFG, and every instruction role align; only the symmetric hMenu /
-// hmnuAdv comparison load order differs, making retail one byte longer. Reversing
-// the operands compiles identically in this TU.
 VA(0x0049f9c6, 0x2a)
 void UpdateAppSpecificMenus(void *hMenu)
 {
@@ -3480,10 +3528,6 @@ int InMapArea(int x, int y)
     return (x >= 16 && x < 448 && y >= 16 && y < 448);
 }
 
-// @early-stop
-// Explicit-range comparison finds 503 aligned instructions, exact 0x6bc span,
-// 0x90 frame, and every stack slot. The sole code residual is one equivalent
-// inner-loop comparison operand order; reversing the relation compiles identically.
 VA(0x0049fa70, 0x6bc)
 void SetupDynamicWindow(int x, int y, int centered, int boundsWidth, int boundsHeight,
                         int contentWidth, int contentHeight, int *windowWidth,
@@ -3666,10 +3710,6 @@ void TestDynamicWindow(int p1, int p2)
     delete p;
 }
 
-// @early-stop
-// Frame 0xc, packet slots, and CFG align; only the symmetric pos / giThisGamePos
-// comparison load order differs, making retail one byte longer. Reversed operands
-// and the value-|0 spelling compile identically in this TU.
 VA(0x004a0234, 0x91)
 void HandleRemoteDeadPlayerExit(int pos)
 {
@@ -3713,10 +3753,6 @@ void HandleRemoteSuddenExit(void)
     DelayMilli(500);
 }
 
-// @early-stop
-// Frame 0x4, loop CFG, and all stack uses align; only the symmetric loop-index /
-// giThisNetPos comparison load order differs, making retail one byte longer.
-// Reversed operands and the value-|0 spelling compile identically in this TU.
 VA(0x004a036f, 0x62)
 void DropDownToOnePlayer(void)
 {
@@ -3967,46 +4003,54 @@ void CheckShingleUpdate(void)
     }
 }
 
+// @match-note
+// Pre-95 structural checkpoint (97.02%): exact 0x120 frame, named slots, switch
+// case semantics/order, and external relocation targets (253/257 sites with no
+// base-only target). The first residual is table placement: base table ranges
+// begin at +0x2b2 and +0xafc, while retail begins at +0x2c6 and +0xb50. Split
+// the sizing and drawing heights, restored the inner panel-Y lifetime, aligned
+// every /Od bucket, and tried both resource-order and retail body-order sizing
+// switches. Revisit at 95% for systematic table/continuation steering.
 VA(0x004a0d9f, 0x17c6)
 void NormalDialog(char *text, int dialogType, int windowX, int windowY,
                   int firstResourceType, int firstResourceValue,
                   int secondResourceType, int secondResourceValue,
                   int showOrText, int timeout)
 {
-    short panelY;
-    short panelHeight;
-    short labelY;
-    widget *borderWidget;
-    char iconFile[NORMAL_DIALOG_FILENAME_LENGTH];
-    char *resourceText[NORMAL_DIALOG_RESOURCE_COUNT];
-    int iconHeight;
-    int showPrimaryBonus;
-    int resourceType[NORMAL_DIALOG_RESOURCE_COUNT];
-    int lineCount;
-    widget *iconPanel;
-    heroWindow *savedNormalDialogWindow;
-    int windowWidth;
-    int savedFirstResourceType;
-    int resourceImageHeight;
-    short showMessage;
-    int windowHeight;
-    int resourceSlot;
-    int savedPointerType;
-    int dialogContentHeight;
-    int textWidgetId;
-    tag_message message;
-    int savedSecondResourceType;
-    int windowRows;
-    int maxIconHeight;
-    int savedFirstResourceValue;
-    int resourceY;
-    int resourceFrame;
-    widget *textPanel;
-    int resourceCenterX;
-    int resourceValue[NORMAL_DIALOG_RESOURCE_COUNT];
-    int savedSecondResourceValue;
-    char *orText;
-    int savedPointerFrame;
+    short panelHeight_p;
+    short labelY_o;
+    widget *borderWidget_o;
+    char iconFile_h[NORMAL_DIALOG_FILENAME_LENGTH];
+    char *resourceText_e[NORMAL_DIALOG_RESOURCE_COUNT];
+    int iconHeight_d;
+    int sizingIconHeight_l;
+    int showPrimaryBonus_e;
+    int resourceType_l[NORMAL_DIALOG_RESOURCE_COUNT];
+    int lineCount_d;
+    widget *iconPanel_j;
+    heroWindow *savedNormalDialogWindow_o;
+    int windowWidth_a;
+    int savedFirstResourceType_p;
+    int resourceImageHeight_g;
+    short showMessage_h;
+    int windowHeight_k;
+    int resourceSlot_n;
+    int savedPointerType_e;
+    int dialogContentHeight_h;
+    int textWidgetId_h;
+    tag_message message_e;
+    int savedSecondResourceType_f;
+    int windowRows_j;
+    int maxIconHeight_a;
+    int savedFirstResourceValue_i;
+    int resourceY_l;
+    int resourceFrame_g;
+    widget *textPanel_h;
+    int resourceCenterX_a;
+    int resourceValue_l[NORMAL_DIALOG_RESOURCE_COUNT];
+    int savedSecondResourceValue_j;
+    char *orText_f;
+    int savedPointerFrame_j;
 
     if (!gbRemoteOn)
         timeout = 0;
@@ -4017,474 +4061,475 @@ void NormalDialog(char *text, int dialogType, int windowX, int windowY,
         giDialogTimeout = timeout;
     }
 
-    resourceCenterX = 0;
-    resourceY = 0;
-    resourceFrame = 0;
-    textWidgetId = NORMAL_DIALOG_TEXT_WIDGET_FIRST_ID;
-    resourceImageHeight = 0;
-    iconHeight = 0;
-    showPrimaryBonus = 0;
-    showMessage = 1;
+    resourceCenterX_a = 0;
+    resourceY_l = 0;
+    resourceFrame_g = 0;
+    textWidgetId_h = NORMAL_DIALOG_TEXT_WIDGET_FIRST_ID;
+    resourceImageHeight_g = 0;
+    iconHeight_d = 0;
+    showPrimaryBonus_e = 0;
+    showMessage_h = 1;
 
     if (firstResourceType == NORMAL_DIALOG_PRIMARY_SKILL &&
         firstResourceValue >= NORMAL_DIALOG_PRIMARY_BONUS_OFFSET) {
         firstResourceValue -= NORMAL_DIALOG_PRIMARY_BONUS_OFFSET;
-        showPrimaryBonus = 1;
+        showPrimaryBonus_e = 1;
     }
     if (firstResourceType >= NORMAL_DIALOG_MONSTER + 1 &&
         firstResourceType <= NORMAL_DIALOG_PRIMARY_SKILL - 1) {
         firstResourceType = NORMAL_DIALOG_NO_RESOURCE;
     }
 
-    savedNormalDialogWindow = pNormalDialogWindow;
-    savedFirstResourceType = giResType1;
-    savedFirstResourceValue = giResExtra1;
-    savedSecondResourceType = giResType2;
-    savedSecondResourceValue = giResExtra2;
+    savedNormalDialogWindow_o = pNormalDialogWindow;
+    savedFirstResourceType_p = giResType1;
+    savedFirstResourceValue_i = giResExtra1;
+    savedSecondResourceType_f = giResType2;
+    savedSecondResourceValue_j = giResExtra2;
     giResType1 = firstResourceType;
     giResExtra1 = firstResourceValue;
     giResType2 = secondResourceType;
     giResExtra2 = secondResourceValue;
 
-    resourceType[0] = firstResourceType;
-    resourceValue[0] = firstResourceValue;
-    resourceType[1] = secondResourceType;
-    resourceValue[1] = secondResourceValue;
+    resourceType_l[0] = firstResourceType;
+    resourceValue_l[0] = firstResourceValue;
+    resourceType_l[1] = secondResourceType;
+    resourceValue_l[1] = secondResourceValue;
 
-    lineCount = bigFont->LineLength(text, NORMAL_DIALOG_TEXT_LINE_WIDTH);
-    dialogContentHeight = lineCount * NORMAL_DIALOG_TEXT_LINE_HEIGHT;
-    maxIconHeight = 0;
+    lineCount_d = bigFont->LineLength(text, NORMAL_DIALOG_TEXT_LINE_WIDTH);
+    dialogContentHeight_h = lineCount_d * NORMAL_DIALOG_TEXT_LINE_HEIGHT;
+    maxIconHeight_a = 0;
     if (dialogType != NORMAL_DIALOG_QUICK_VIEW)
-        dialogContentHeight += 39;
+        dialogContentHeight_h += 39;
 
-    for (resourceSlot = 0; resourceSlot < NORMAL_DIALOG_RESOURCE_COUNT;
-         resourceSlot++) {
-        switch (resourceType[resourceSlot]) {
+    for (resourceSlot_n = 0; resourceSlot_n < NORMAL_DIALOG_RESOURCE_COUNT;
+         resourceSlot_n++) {
+        switch (resourceType_l[resourceSlot_n]) {
+        case NORMAL_DIALOG_ARTIFACT:
+            sizingIconHeight_l = 76;
+            break;
+        case NORMAL_DIALOG_EXPMRL_FIRST:
+            sizingIconHeight_l = 28;
+            break;
+        case NORMAL_DIALOG_EXPMRL_FIRST + 1:
+            sizingIconHeight_l = 57;
+            break;
+        case NORMAL_DIALOG_EXPMRL_FIRST + 2:
+            sizingIconHeight_l = 62;
+            break;
+        case NORMAL_DIALOG_EXPMRL_FIRST + 3:
+            sizingIconHeight_l = 59;
+            break;
+        case NORMAL_DIALOG_EXPMRL_LAST:
+            sizingIconHeight_l =
+                ((resourceValue_l[resourceSlot_n] == NORMAL_DIALOG_NO_VALUE) - 1 &
+                 12) + 64;
+            break;
+        case NORMAL_DIALOG_CREST:
+            sizingIconHeight_l = 55;
+            break;
+        case NORMAL_DIALOG_HERO:
+            sizingIconHeight_l = 111;
+            break;
+        case RES_GOLD:
+            sizingIconHeight_l = 26;
+            break;
         case RES_WOOD:
         case RES_MERCURY:
         case RES_ORE:
         case RES_SULFUR:
         case RES_CRYSTAL:
         case RES_GEMS:
-            iconHeight = 44;
-            break;
-        case RES_GOLD:
-            iconHeight = 26;
-            break;
-        case NORMAL_DIALOG_ARTIFACT:
-            iconHeight = 76;
+            sizingIconHeight_l = 44;
             break;
         case NORMAL_DIALOG_SPELL:
-            iconHeight = 79;
-            break;
-        case NORMAL_DIALOG_CREST:
-            iconHeight = 55;
-            break;
-        case NORMAL_DIALOG_EXPMRL_FIRST:
-            iconHeight = 28;
-            break;
-        case NORMAL_DIALOG_EXPMRL_FIRST + 1:
-            iconHeight = 57;
-            break;
-        case NORMAL_DIALOG_EXPMRL_FIRST + 2:
-            iconHeight = 62;
-            break;
-        case NORMAL_DIALOG_EXPMRL_FIRST + 3:
-            iconHeight = 59;
-            break;
-        case NORMAL_DIALOG_EXPMRL_LAST:
-            iconHeight =
-                ((resourceValue[resourceSlot] == NORMAL_DIALOG_NO_VALUE) - 1 &
-                 12) + 64;
-            break;
-        case NORMAL_DIALOG_HERO:
-            iconHeight = 111;
-            break;
-        default:
-            iconHeight = 0;
+            sizingIconHeight_l = 79;
             break;
         case NORMAL_DIALOG_SECONDARY_SKILL:
-            iconHeight = 81;
+            sizingIconHeight_l = 81;
             break;
         case NORMAL_DIALOG_MONSTER:
         case NORMAL_DIALOG_PRIMARY_SKILL:
-            iconHeight = 105;
+            sizingIconHeight_l = 105;
+            break;
+        default:
+            sizingIconHeight_l = 0;
             break;
         }
-        if (maxIconHeight < iconHeight)
-            maxIconHeight = iconHeight;
+        if (maxIconHeight_a < sizingIconHeight_l)
+            maxIconHeight_a = sizingIconHeight_l;
     }
 
-    if (maxIconHeight)
-        dialogContentHeight += maxIconHeight + 14;
-    windowRows = (dialogContentHeight - 25) / NORMAL_DIALOG_WINDOW_ROW_HEIGHT;
-    if (windowRows > NORMAL_DIALOG_MAX_ROWS)
-        windowRows = NORMAL_DIALOG_MAX_ROWS;
-    windowWidth = NORMAL_DIALOG_WINDOW_WIDTH;
-    windowHeight = windowRows * NORMAL_DIALOG_WINDOW_ROW_HEIGHT +
+    if (maxIconHeight_a)
+        dialogContentHeight_h += maxIconHeight_a + 14;
+    windowRows_j = (dialogContentHeight_h - 25) / NORMAL_DIALOG_WINDOW_ROW_HEIGHT;
+    if (windowRows_j > NORMAL_DIALOG_MAX_ROWS)
+        windowRows_j = NORMAL_DIALOG_MAX_ROWS;
+    windowWidth_a = NORMAL_DIALOG_WINDOW_WIDTH;
+    windowHeight_k = windowRows_j * NORMAL_DIALOG_WINDOW_ROW_HEIGHT +
                    NORMAL_DIALOG_WINDOW_BASE_HEIGHT;
 
-    if (windowX == -1 || windowX + windowWidth > 638)
+    if (windowX == -1 || windowX + windowWidth_a > 638)
         windowX = 159;
-    if (windowY == -1 || windowY + windowHeight > 478) {
-        windowY = (480 - windowHeight) / 2;
+    if (windowY == -1 || windowY + windowHeight_k > 478) {
+        windowY = (480 - windowHeight_k) / 2;
         if (windowY > 28)
             windowY = 28;
     }
 
-    sprintf(iconFile, "evntwin%d.bin", windowRows);
-    pNormalDialogWindow = new heroWindow(windowX, windowY, iconFile);
+    sprintf(iconFile_h, "evntwin%d.bin", windowRows_j);
+    pNormalDialogWindow = new heroWindow(windowX, windowY, iconFile_h);
     if (!pNormalDialogWindow)
         MemError();
 
-    message.type = NORMAL_DIALOG_DISABLE_MESSAGE;
-    message.payload.widget.command = NORMAL_DIALOG_DISABLE_COMMAND;
-    message.payload.widget.data.text = reinterpret_cast<char *>(NORMAL_DIALOG_DISABLE_COMMAND);
+    message_e.type = NORMAL_DIALOG_DISABLE_MESSAGE;
+    message_e.payload.widget.command = NORMAL_DIALOG_DISABLE_COMMAND;
+    message_e.payload.widget.data.text = reinterpret_cast<char *>(NORMAL_DIALOG_DISABLE_COMMAND);
     if (dialogType != NORMAL_DIALOG_DISABLE_SEVENTH &&
         dialogType != NORMAL_DIALOG_DISABLE_EIGHTH) {
-        message.payload.widget.id = NORMAL_DIALOG_BUTTON_SEVEN;
-        pNormalDialogWindow->BroadcastMessage(message);
+        message_e.payload.widget.id = NORMAL_DIALOG_BUTTON_SEVEN;
+        pNormalDialogWindow->BroadcastMessage(message_e);
     }
     if (dialogType != NORMAL_DIALOG_DISABLE_SEVENTH) {
-        message.payload.widget.id = NORMAL_DIALOG_BUTTON_EIGHT;
-        pNormalDialogWindow->BroadcastMessage(message);
+        message_e.payload.widget.id = NORMAL_DIALOG_BUTTON_EIGHT;
+        pNormalDialogWindow->BroadcastMessage(message_e);
     }
     if (dialogType != NORMAL_DIALOG_WAIT_LAST &&
         dialogType != NORMAL_DIALOG_BUTTON_PAIR) {
-        message.payload.widget.id = NORMAL_DIALOG_BUTTON_ONE;
-        pNormalDialogWindow->BroadcastMessage(message);
+        message_e.payload.widget.id = NORMAL_DIALOG_BUTTON_ONE;
+        pNormalDialogWindow->BroadcastMessage(message_e);
     }
     if (dialogType != NORMAL_DIALOG_WAIT_FIRST &&
         dialogType != NORMAL_DIALOG_INFO &&
         dialogType != NORMAL_DIALOG_BUTTON_PAIR) {
-        message.payload.widget.id = NORMAL_DIALOG_BUTTON_TWO;
-        pNormalDialogWindow->BroadcastMessage(message);
+        message_e.payload.widget.id = NORMAL_DIALOG_BUTTON_TWO;
+        pNormalDialogWindow->BroadcastMessage(message_e);
     }
     if (dialogType != NORMAL_DIALOG_CONFIRM) {
-        message.payload.widget.id = NORMAL_DIALOG_BUTTON_FIVE;
-        pNormalDialogWindow->BroadcastMessage(message);
-        message.payload.widget.id = NORMAL_DIALOG_BUTTON_SIX;
-        pNormalDialogWindow->BroadcastMessage(message);
+        message_e.payload.widget.id = NORMAL_DIALOG_BUTTON_FIVE;
+        pNormalDialogWindow->BroadcastMessage(message_e);
+        message_e.payload.widget.id = NORMAL_DIALOG_BUTTON_SIX;
+        pNormalDialogWindow->BroadcastMessage(message_e);
     }
 
-    for (resourceSlot = 0; resourceSlot < NORMAL_DIALOG_RESOURCE_COUNT;
-         resourceSlot++) {
-        iconPanel = 0;
-        textPanel = 0;
-        if (resourceType[resourceSlot] == NORMAL_DIALOG_NO_RESOURCE)
+    for (resourceSlot_n = 0; resourceSlot_n < NORMAL_DIALOG_RESOURCE_COUNT;
+         resourceSlot_n++) {
+        iconPanel_j = 0;
+        textPanel_h = 0;
+        if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_NO_RESOURCE)
             break;
 
-        resourceText[resourceSlot] = static_cast<char *>(BaseAlloc(
+        resourceText_e[resourceSlot_n] = static_cast<char *>(BaseAlloc(
             NORMAL_DIALOG_TEXT_LENGTH, KBFILE, NORMAL_DIALOG_FIRST_TEXT_LINE));
-        if (resourceType[resourceSlot] >= NORMAL_DIALOG_RESOURCE_FIRST &&
-            resourceType[resourceSlot] <= NORMAL_DIALOG_RESOURCE_LAST) {
-            if (resourceValue[resourceSlot] < 1) {
-                if (resourceValue[resourceSlot] == 0) {
-                    strcpy(resourceText[resourceSlot], "");
-                } else if (resourceValue[resourceSlot] <
+        if (resourceType_l[resourceSlot_n] >= NORMAL_DIALOG_RESOURCE_FIRST &&
+            resourceType_l[resourceSlot_n] <= NORMAL_DIALOG_RESOURCE_LAST) {
+            if (resourceValue_l[resourceSlot_n] < 1) {
+                if (resourceValue_l[resourceSlot_n] == 0) {
+                    strcpy(resourceText_e[resourceSlot_n], "");
+                } else if (resourceValue_l[resourceSlot_n] <
                            -NORMAL_DIALOG_DAILY_RESOURCE_OFFSET) {
-                    sprintf(resourceText[resourceSlot], "%d",
-                            resourceValue[resourceSlot] +
+                    sprintf(resourceText_e[resourceSlot_n], "%d",
+                            resourceValue_l[resourceSlot_n] +
                                 NORMAL_DIALOG_DAILY_RESOURCE_OFFSET);
                 } else {
-                    sprintf(resourceText[resourceSlot], "%d/day",
-                            -resourceValue[resourceSlot]);
+                    sprintf(resourceText_e[resourceSlot_n], "%d/day",
+                            -resourceValue_l[resourceSlot_n]);
                 }
             } else {
-                sprintf(resourceText[resourceSlot], "%d",
-                        resourceValue[resourceSlot]);
+                sprintf(resourceText_e[resourceSlot_n], "%d",
+                        resourceValue_l[resourceSlot_n]);
             }
-            strcpy(iconFile, "resource.icn");
-            resourceFrame = resourceType[resourceSlot];
-        } else if (resourceType[resourceSlot] == NORMAL_DIALOG_SPELL) {
-            sprintf(resourceText[resourceSlot], "%s",
-                    gSpellNames[resourceValue[resourceSlot]]);
-            strcpy(iconFile, "spells.icn");
-            resourceFrame = gsSpellInfo[resourceValue[resourceSlot]].iconIndex;
-        } else if (resourceType[resourceSlot] == NORMAL_DIALOG_CREST) {
-            sprintf(resourceText[resourceSlot], "%s", "");
-            strcpy(iconFile, "brcrest.icn");
-            resourceFrame = resourceValue[resourceSlot];
-        } else if (resourceType[resourceSlot] == NORMAL_DIALOG_PRIMARY_SKILL) {
-            sprintf(resourceText[resourceSlot], "%s", "");
-            strcpy(iconFile, "primskil.icn");
-            resourceFrame = 4;
-        } else if (resourceType[resourceSlot] == NORMAL_DIALOG_MONSTER) {
-            sprintf(resourceText[resourceSlot], "%s", "");
-            strcpy(iconFile, "strip.icn");
-            resourceFrame = 12;
-        } else if (resourceType[resourceSlot] == NORMAL_DIALOG_SECONDARY_SKILL) {
-            sprintf(resourceText[resourceSlot], "%s",
-                    gSecondarySkills[resourceValue[resourceSlot] /
+            strcpy(iconFile_h, "resource.icn");
+            resourceFrame_g = resourceType_l[resourceSlot_n];
+        } else if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SPELL) {
+            sprintf(resourceText_e[resourceSlot_n], "%s",
+                    gSpellNames[resourceValue_l[resourceSlot_n]]);
+            strcpy(iconFile_h, "spells.icn");
+            resourceFrame_g = gsSpellInfo[resourceValue_l[resourceSlot_n]].iconIndex;
+        } else if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_CREST) {
+            sprintf(resourceText_e[resourceSlot_n], "%s", "");
+            strcpy(iconFile_h, "brcrest.icn");
+            resourceFrame_g = resourceValue_l[resourceSlot_n];
+        } else if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_PRIMARY_SKILL) {
+            sprintf(resourceText_e[resourceSlot_n], "%s", "");
+            strcpy(iconFile_h, "primskil.icn");
+            resourceFrame_g = 4;
+        } else if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_MONSTER) {
+            sprintf(resourceText_e[resourceSlot_n], "%s", "");
+            strcpy(iconFile_h, "strip.icn");
+            resourceFrame_g = 12;
+        } else if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SECONDARY_SKILL) {
+            sprintf(resourceText_e[resourceSlot_n], "%s",
+                    gSecondarySkills[resourceValue_l[resourceSlot_n] /
                                      SECONDARY_SKILL_VALUE_LEVEL_COUNT]);
-            strcpy(iconFile, "secskill.icn");
-            resourceFrame = resourceValue[resourceSlot] /
+            strcpy(iconFile_h, "secskill.icn");
+            resourceFrame_g = resourceValue_l[resourceSlot_n] /
                                 SECONDARY_SKILL_VALUE_LEVEL_COUNT +
                             1;
-        } else if (resourceType[resourceSlot] == NORMAL_DIALOG_HERO) {
-            sprintf(resourceText[resourceSlot], "%s", "");
-            sprintf(iconFile, "surrendr.icn");
-            resourceFrame = 4;
-        } else if (resourceType[resourceSlot] >= NORMAL_DIALOG_EXPMRL_FIRST &&
-                   resourceType[resourceSlot] <= NORMAL_DIALOG_EXPMRL_LAST) {
-            strcpy(resourceText[resourceSlot], "");
-            strcpy(iconFile, "expmrl.icn");
-            resourceFrame = resourceType[resourceSlot] - NORMAL_DIALOG_EXPMRL_FIRST;
-            if (resourceType[resourceSlot] == NORMAL_DIALOG_EXPMRL_LAST &&
-                resourceValue[resourceSlot] != NORMAL_DIALOG_NO_VALUE) {
-                sprintf(resourceText[resourceSlot], "%d",
-                        resourceValue[resourceSlot]);
+        } else if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_HERO) {
+            sprintf(resourceText_e[resourceSlot_n], "%s", "");
+            sprintf(iconFile_h, "surrendr.icn");
+            resourceFrame_g = 4;
+        } else if (resourceType_l[resourceSlot_n] >= NORMAL_DIALOG_EXPMRL_FIRST &&
+                   resourceType_l[resourceSlot_n] <= NORMAL_DIALOG_EXPMRL_LAST) {
+            strcpy(resourceText_e[resourceSlot_n], "");
+            strcpy(iconFile_h, "expmrl.icn");
+            resourceFrame_g = resourceType_l[resourceSlot_n] - NORMAL_DIALOG_EXPMRL_FIRST;
+            if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_EXPMRL_LAST &&
+                resourceValue_l[resourceSlot_n] != NORMAL_DIALOG_NO_VALUE) {
+                sprintf(resourceText_e[resourceSlot_n], "%d",
+                        resourceValue_l[resourceSlot_n]);
             }
         } else {
-            strcpy(resourceText[resourceSlot], "");
-            strcpy(iconFile, "resource.icn");
-            resourceFrame = resourceType[resourceSlot];
+            strcpy(resourceText_e[resourceSlot_n], "");
+            strcpy(iconFile_h, "resource.icn");
+            resourceFrame_g = resourceType_l[resourceSlot_n];
         }
 
-        switch (resourceType[resourceSlot]) {
+        switch (resourceType_l[resourceSlot_n]) {
         case RES_WOOD:
         case RES_MERCURY:
         case RES_ORE:
         case RES_SULFUR:
         case RES_CRYSTAL:
         case RES_GEMS:
-            resourceImageHeight = 38;
-            iconHeight = 32;
+            resourceImageHeight_g = 38;
+            sizingIconHeight_l = 32;
             break;
         case RES_GOLD:
-            resourceImageHeight = 76;
-            iconHeight = 26;
+            resourceImageHeight_g = 76;
+            sizingIconHeight_l = 26;
             break;
         case NORMAL_DIALOG_ARTIFACT:
-            resourceImageHeight = 76;
-            iconHeight = 76;
+            resourceImageHeight_g = 76;
+            sizingIconHeight_l = 76;
             break;
         case NORMAL_DIALOG_SPELL:
-            resourceImageHeight = 70;
-            iconHeight = 55;
+            resourceImageHeight_g = 70;
+            sizingIconHeight_l = 55;
             break;
         case NORMAL_DIALOG_CREST:
-            resourceImageHeight = 50;
-            iconHeight = 55;
+            resourceImageHeight_g = 50;
+            sizingIconHeight_l = 55;
             break;
         case NORMAL_DIALOG_EXPMRL_FIRST:
-            resourceImageHeight = 64;
-            iconHeight = 28;
+            resourceImageHeight_g = 64;
+            sizingIconHeight_l = 28;
             break;
         case NORMAL_DIALOG_EXPMRL_FIRST + 1:
-            resourceImageHeight = 64;
-            iconHeight = 57;
+            resourceImageHeight_g = 64;
+            sizingIconHeight_l = 57;
             break;
         case NORMAL_DIALOG_EXPMRL_FIRST + 2:
-            resourceImageHeight = 64;
-            iconHeight = 62;
+            resourceImageHeight_g = 64;
+            sizingIconHeight_l = 62;
             break;
         case NORMAL_DIALOG_EXPMRL_FIRST + 3:
-            resourceImageHeight = 64;
-            iconHeight = 59;
+            resourceImageHeight_g = 64;
+            sizingIconHeight_l = 59;
             break;
         case NORMAL_DIALOG_EXPMRL_LAST:
-            resourceImageHeight = 64;
-            iconHeight = 64;
+            resourceImageHeight_g = 64;
+            sizingIconHeight_l = 64;
             break;
         case NORMAL_DIALOG_HERO:
-            resourceImageHeight = 111;
-            iconHeight = 105;
+            resourceImageHeight_g = 111;
+            sizingIconHeight_l = 105;
             break;
         case NORMAL_DIALOG_SECONDARY_SKILL:
-            resourceImageHeight = 75;
-            iconHeight = 65;
+            resourceImageHeight_g = 75;
+            sizingIconHeight_l = 65;
             break;
         case NORMAL_DIALOG_MONSTER:
         case NORMAL_DIALOG_PRIMARY_SKILL:
-            resourceImageHeight = 94;
-            iconHeight = 105;
+            resourceImageHeight_g = 94;
+            sizingIconHeight_l = 105;
             break;
         }
 
-        int imageHeight = iconHeight;
-        if (strlen(resourceText[resourceSlot]))
-            iconHeight += 12;
+        iconHeight_d = sizingIconHeight_l;
+        if (strlen(resourceText_e[resourceSlot_n]))
+            iconHeight_d += 12;
 
-        if (resourceSlot == 0) {
+        if (resourceSlot_n == 0) {
             if (secondResourceType == NORMAL_DIALOG_NO_RESOURCE)
-                resourceCenterX = (windowWidth - 17) / 2 + 17;
+                resourceCenterX_a = (windowWidth_a - 17) / 2 + 17;
             else
-                resourceCenterX = 104;
+                resourceCenterX_a = 104;
         } else {
-            resourceCenterX = windowWidth - 87;
+            resourceCenterX_a = windowWidth_a - 87;
         }
-        resourceY = windowHeight - iconHeight - 48;
+        resourceY_l = windowHeight_k - iconHeight_d - 48;
         if (dialogType != NORMAL_DIALOG_QUICK_VIEW)
-            resourceY = windowHeight - iconHeight - 87;
-        if (resourceType[0] == NORMAL_DIALOG_SECONDARY_SKILL &&
+            resourceY_l = windowHeight_k - iconHeight_d - 87;
+        if (resourceType_l[0] == NORMAL_DIALOG_SECONDARY_SKILL &&
             secondResourceType == NORMAL_DIALOG_SECONDARY_SKILL) {
-            if (resourceSlot == 0)
-                resourceCenterX -= 4;
+            if (resourceSlot_n == 0)
+                resourceCenterX_a -= 4;
             else
-                resourceCenterX += 4;
+                resourceCenterX_a += 4;
         }
 
-        iconPanel = new iconWidget(
-            resourceCenterX - resourceImageHeight / 2 +
-                (resourceType[resourceSlot] == NORMAL_DIALOG_SPELL) * 2,
-            resourceY, resourceImageHeight, imageHeight, iconFile, resourceFrame,
+        iconPanel_j = new iconWidget(
+            resourceCenterX_a - resourceImageHeight_g / 2 +
+                (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SPELL) * 2,
+            resourceY_l, resourceImageHeight_g, sizingIconHeight_l, iconFile_h, resourceFrame_g,
             0, -1, NORMAL_DIALOG_WIDGET_COLOR +
-                        (resourceType[resourceSlot] == NORMAL_DIALOG_SPELL),
+                        (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SPELL),
             1);
-        if (!iconPanel)
+        if (!iconPanel_j)
             MemError();
-        pNormalDialogWindow->AddWidget(iconPanel, -1);
+        pNormalDialogWindow->AddWidget(iconPanel_j, -1);
 
-        if (resourceType[resourceSlot] == NORMAL_DIALOG_ARTIFACT) {
-            iconPanel = new iconWidget(
-                resourceCenterX - resourceImageHeight / 2 + 6,
-                resourceY + 6, 76, 76, "artifact.icn",
-                resourceValue[resourceSlot] + 1, 0, -1,
+        if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_ARTIFACT) {
+            iconPanel_j = new iconWidget(
+                resourceCenterX_a - resourceImageHeight_g / 2 + 6,
+                resourceY_l + 6, 76, 76, "artifact.icn",
+                resourceValue_l[resourceSlot_n] + 1, 0, -1,
                 NORMAL_DIALOG_WIDGET_COLOR, 1);
-            if (!iconPanel)
+            if (!iconPanel_j)
                 MemError();
-            pNormalDialogWindow->AddWidget(iconPanel, -1);
+            pNormalDialogWindow->AddWidget(iconPanel_j, -1);
         }
-        if (resourceType[resourceSlot] == NORMAL_DIALOG_PRIMARY_SKILL) {
-            iconPanel = new iconWidget(
-                resourceCenterX - resourceImageHeight / 2 + 6,
-                resourceY + 6, 82, 93, "primskil.icn",
-                resourceValue[resourceSlot], 0, -1,
+        if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_PRIMARY_SKILL) {
+            iconPanel_j = new iconWidget(
+                resourceCenterX_a - resourceImageHeight_g / 2 + 6,
+                resourceY_l + 6, 82, 93, "primskil.icn",
+                resourceValue_l[resourceSlot_n], 0, -1,
                 NORMAL_DIALOG_WIDGET_COLOR, 1);
-            if (!iconPanel)
+            if (!iconPanel_j)
                 MemError();
-            pNormalDialogWindow->AddWidget(iconPanel, -1);
-            strcpy(resourceText[resourceSlot],
-                   gStatNames[resourceValue[resourceSlot]]);
+            pNormalDialogWindow->AddWidget(iconPanel_j, -1);
+            strcpy(resourceText_e[resourceSlot_n],
+                   gStatNames[resourceValue_l[resourceSlot_n]]);
         }
-        if (resourceType[resourceSlot] == NORMAL_DIALOG_MONSTER) {
-            iconPanel = new iconWidget(
-                resourceCenterX - resourceImageHeight / 2 + 6,
-                resourceY + 6, 82, 93, "strip.icn",
-                gMonsterDatabase[resourceValue[resourceSlot]].race + 4,
+        if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_MONSTER) {
+            iconPanel_j = new iconWidget(
+                resourceCenterX_a - resourceImageHeight_g / 2 + 6,
+                resourceY_l + 6, 82, 93, "strip.icn",
+                gMonsterDatabase[resourceValue_l[resourceSlot_n]].race + 4,
                 0, -1, NORMAL_DIALOG_WIDGET_COLOR, 1);
-            if (!iconPanel)
+            if (!iconPanel_j)
                 MemError();
-            pNormalDialogWindow->AddWidget(iconPanel, -1);
+            pNormalDialogWindow->AddWidget(iconPanel_j, -1);
 
-            sprintf(gText, "monh%04d.icn", resourceValue[resourceSlot]);
-            iconPanel = new iconWidget(
-                resourceCenterX - resourceImageHeight / 2 + 6,
-                resourceY + 6, 82, 93, gText, 0, 0, -1,
+            sprintf(gText, "monh%04d.icn", resourceValue_l[resourceSlot_n]);
+            iconPanel_j = new iconWidget(
+                resourceCenterX_a - resourceImageHeight_g / 2 + 6,
+                resourceY_l + 6, 82, 93, gText, 0, 0, -1,
                 NORMAL_DIALOG_WIDGET_COLOR, 1);
-            if (!iconPanel)
+            if (!iconPanel_j)
                 MemError();
-            pNormalDialogWindow->AddWidget(iconPanel, -1);
+            pNormalDialogWindow->AddWidget(iconPanel_j, -1);
         }
-        if (resourceType[resourceSlot] == NORMAL_DIALOG_CREST) {
-            iconPanel = new iconWidget(
-                resourceCenterX - resourceImageHeight / 2 - 4,
-                resourceY - 4, 58, 55, "brcrest.icn", 6, 0, -1,
+        if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_CREST) {
+            iconPanel_j = new iconWidget(
+                resourceCenterX_a - resourceImageHeight_g / 2 - 4,
+                resourceY_l - 4, 58, 55, "brcrest.icn", 6, 0, -1,
                 NORMAL_DIALOG_WIDGET_COLOR, 1);
-            if (!iconPanel)
+            if (!iconPanel_j)
                 MemError();
-            pNormalDialogWindow->AddWidget(iconPanel, -1);
+            pNormalDialogWindow->AddWidget(iconPanel_j, -1);
         }
-        if (resourceType[resourceSlot] == NORMAL_DIALOG_SECONDARY_SKILL) {
-            iconPanel = new iconWidget(
-                resourceCenterX - resourceImageHeight / 2 - 3,
-                resourceY - 3, 71, 81, "secskill.icn", 15, 0, -1,
+        if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SECONDARY_SKILL) {
+            iconPanel_j = new iconWidget(
+                resourceCenterX_a - resourceImageHeight_g / 2 - 3,
+                resourceY_l - 3, 71, 81, "secskill.icn", 15, 0, -1,
                 NORMAL_DIALOG_WIDGET_COLOR, 1);
-            if (!iconPanel)
+            if (!iconPanel_j)
                 MemError();
-            pNormalDialogWindow->AddWidget(iconPanel, -1);
+            pNormalDialogWindow->AddWidget(iconPanel_j, -1);
         }
-        if (resourceType[resourceSlot] == NORMAL_DIALOG_HERO) {
-            sprintf(iconFile, "port%04d.icn", resourceValue[resourceSlot]);
-            iconPanel = new iconWidget(
-                resourceCenterX - resourceImageHeight / 2 + 5,
-                resourceY + 5, 101, 95, iconFile, 0, 0, -1,
+        if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_HERO) {
+            sprintf(iconFile_h, "port%04d.icn", resourceValue_l[resourceSlot_n]);
+            iconPanel_j = new iconWidget(
+                resourceCenterX_a - resourceImageHeight_g / 2 + 5,
+                resourceY_l + 5, 101, 95, iconFile_h, 0, 0, -1,
                 NORMAL_DIALOG_WIDGET_COLOR, 1);
-            if (!iconPanel)
+            if (!iconPanel_j)
                 MemError();
-            pNormalDialogWindow->AddWidget(iconPanel, -1);
+            pNormalDialogWindow->AddWidget(iconPanel_j, -1);
         }
 
-        panelHeight = iconHeight;
-        panelY = resourceY;
-        if (resourceType[resourceSlot] == NORMAL_DIALOG_SECONDARY_SKILL) {
-            textPanel = new textWidget(
-                resourceCenterX - 50, panelHeight + panelY - 72, 100,
-                (resourceType[resourceSlot] == NORMAL_DIALOG_SPELL) * 12 + 12,
-                resourceText[resourceSlot], "smalfont.fnt", 1,
-                textWidgetId++, NORMAL_DIALOG_WIDGET_FLAGS, 1);
-            if (!textPanel)
+        short panelY;
+        panelHeight_p = iconHeight_d;
+        panelY = resourceY_l;
+        if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SECONDARY_SKILL) {
+            textPanel_h = new textWidget(
+                resourceCenterX_a - 50, panelHeight_p + panelY - 72, 100,
+                (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SPELL) * 12 + 12,
+                resourceText_e[resourceSlot_n], "smalfont.fnt", 1,
+                textWidgetId_h++, NORMAL_DIALOG_WIDGET_FLAGS, 1);
+            if (!textPanel_h)
                 MemError();
-            pNormalDialogWindow->AddWidget(textPanel, -1);
+            pNormalDialogWindow->AddWidget(textPanel_h, -1);
 
-            resourceText[resourceSlot] = static_cast<char *>(BaseAlloc(
+            resourceText_e[resourceSlot_n] = static_cast<char *>(BaseAlloc(
                 NORMAL_DIALOG_TEXT_LENGTH, KBFILE,
                 NORMAL_DIALOG_SECONDARY_TEXT_LINE));
-            labelY = static_cast<short>(iconHeight) +
-                     static_cast<short>(resourceY) - 24;
-            sprintf(resourceText[resourceSlot], "%s",
+            labelY_o = static_cast<short>(iconHeight_d) +
+                     static_cast<short>(resourceY_l) - 24;
+            sprintf(resourceText_e[resourceSlot_n], "%s",
                     gSecondarySkillLevels[
-                        resourceValue[resourceSlot] %
+                        resourceValue_l[resourceSlot_n] %
                         SECONDARY_SKILL_VALUE_LEVEL_COUNT]);
-        } else if (resourceType[resourceSlot] == NORMAL_DIALOG_PRIMARY_SKILL) {
-            labelY = panelHeight + panelY - 93;
+        } else if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_PRIMARY_SKILL) {
+            labelY_o = panelHeight_p + panelY - 93;
         } else {
-            labelY = panelHeight + panelY - 10;
+            labelY_o = panelHeight_p + panelY - 10;
         }
 
-        textPanel = new textWidget(
-            resourceCenterX - 50, labelY, 100,
-            (resourceType[resourceSlot] == NORMAL_DIALOG_SPELL) * 12 + 12,
-            resourceText[resourceSlot], "smalfont.fnt", 1,
-            textWidgetId++, NORMAL_DIALOG_WIDGET_FLAGS, 1);
-        if (!textPanel)
+        textPanel_h = new textWidget(
+            resourceCenterX_a - 50, labelY_o, 100,
+            (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SPELL) * 12 + 12,
+            resourceText_e[resourceSlot_n], "smalfont.fnt", 1,
+            textWidgetId_h++, NORMAL_DIALOG_WIDGET_FLAGS, 1);
+        if (!textPanel_h)
             MemError();
-        pNormalDialogWindow->AddWidget(textPanel, -1);
+        pNormalDialogWindow->AddWidget(textPanel_h, -1);
 
-        if (resourceType[resourceSlot] == NORMAL_DIALOG_PRIMARY_SKILL &&
-            showPrimaryBonus) {
+        if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_PRIMARY_SKILL &&
+            showPrimaryBonus_e) {
             char *bonusText = static_cast<char *>(BaseAlloc(
                 5, KBFILE, NORMAL_DIALOG_PRIMARY_BONUS_LINE));
             strcpy(bonusText, "+1 ");
-            textPanel = new textWidget(
-                resourceCenterX - 50, iconHeight + resourceY - 22, 100, 16,
-                bonusText, "bigfont.fnt", 1, textWidgetId++,
+            textPanel_h = new textWidget(
+                resourceCenterX_a - 50, iconHeight_d + resourceY_l - 22, 100, 16,
+                bonusText, "bigfont.fnt", 1, textWidgetId_h++,
                 NORMAL_DIALOG_WIDGET_FLAGS, 1);
-            if (!textPanel)
+            if (!textPanel_h)
                 MemError();
-            pNormalDialogWindow->AddWidget(textPanel, -1);
+            pNormalDialogWindow->AddWidget(textPanel_h, -1);
         }
 
-        borderWidget = new border(
-            resourceCenterX - resourceImageHeight / 2, resourceY,
-            resourceImageHeight, iconHeight,
-            resourceSlot + NORMAL_DIALOG_RESOURCE_BORDER_FIRST_ID,
+        borderWidget_o = new border(
+            resourceCenterX_a - resourceImageHeight_g / 2, resourceY_l,
+            resourceImageHeight_g, iconHeight_d,
+            resourceSlot_n + NORMAL_DIALOG_RESOURCE_BORDER_FIRST_ID,
             1, 0, 0);
-        pNormalDialogWindow->AddWidget(borderWidget, -1);
+        pNormalDialogWindow->AddWidget(borderWidget_o, -1);
     }
 
-    message.type = NORMAL_DIALOG_DISABLE_MESSAGE;
-    message.payload.widget.command = NORMAL_DIALOG_SET_TEXT_COMMAND;
-    message.payload.widget.id = NORMAL_DIALOG_TEXT_WIDGET_ID;
-    message.payload.widget.data.text = text;
-    pNormalDialogWindow->BroadcastMessage(message);
+    message_e.type = NORMAL_DIALOG_DISABLE_MESSAGE;
+    message_e.payload.widget.command = NORMAL_DIALOG_SET_TEXT_COMMAND;
+    message_e.payload.widget.id = NORMAL_DIALOG_TEXT_WIDGET_ID;
+    message_e.payload.widget.data.text = text;
+    pNormalDialogWindow->BroadcastMessage(message_e);
 
     if (showOrText == NORMAL_DIALOG_SHOW_OR_TEXT) {
-        orText = static_cast<char *>(BaseAlloc(
+        orText_f = static_cast<char *>(BaseAlloc(
             3, KBFILE, NORMAL_DIALOG_OR_TEXT_LINE));
-        strcpy(orText, "or");
-        textPanel = new textWidget(
-            windowWidth / 2 - 10, resourceY + 43, 40, 12,
-            orText, "smalfont.fnt", 1, textWidgetId++,
+        strcpy(orText_f, "or");
+        textPanel_h = new textWidget(
+            windowWidth_a / 2 - 10, resourceY_l + 43, 40, 12,
+            orText_f, "smalfont.fnt", 1, textWidgetId_h++,
             NORMAL_DIALOG_WIDGET_FLAGS, 1);
-        if (!textPanel)
+        if (!textPanel_h)
             MemError();
-        pNormalDialogWindow->AddWidget(textPanel, -1);
+        pNormalDialogWindow->AddWidget(textPanel_h, -1);
     }
 
-    savedPointerType = gpMouseManager->m_cursorType;
-    savedPointerFrame = gpMouseManager->m_cursorFrame;
+    savedPointerType_e = gpMouseManager->m_cursorType;
+    savedPointerFrame_j = gpMouseManager->m_cursorFrame;
     while (gpMouseManager->m_hideCount)
         gpMouseManager->ShowColorPointer();
     gpMouseManager->SetPointer("advmice.mse", 0, NORMAL_DIALOG_POINTER_ID);
@@ -4501,12 +4546,12 @@ void NormalDialog(char *text, int dialogType, int windowX, int windowY,
     }
 
     delete pNormalDialogWindow;
-    gpMouseManager->SetPointer("", savedPointerFrame, savedPointerType);
-    giResType1 = savedFirstResourceType;
-    giResExtra1 = savedFirstResourceValue;
-    giResType2 = savedSecondResourceType;
-    giResExtra2 = savedSecondResourceValue;
-    pNormalDialogWindow = savedNormalDialogWindow;
+    gpMouseManager->SetPointer("", savedPointerFrame_j, savedPointerType_e);
+    giResType1 = savedFirstResourceType_p;
+    giResExtra1 = savedFirstResourceValue_i;
+    giResType2 = savedSecondResourceType_f;
+    giResExtra2 = savedSecondResourceValue_j;
+    pNormalDialogWindow = savedNormalDialogWindow_o;
 }
 
 VA(0x004a2565, 0x71)
