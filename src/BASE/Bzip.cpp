@@ -526,9 +526,10 @@ void dumpAllModelStats(void)
 }
 
 // @early-stop
-// Explicit-range audit (the embedded 0x2c-byte jump table truncates symbol disassembly):
-// every non-table instruction and all 28 effective relocation targets agree.  Retail
-// delinks models+0x424..+0x1cfc and the table labels as local const/function symbols.
+// The explicit 0x153-byte range is raw-byte exact after masking the union of the 28
+// aligned relocation fields.  The only identity differences are models interior aliases
+// and the embedded 0x2c-byte jump table's local labels; effective targets/addends agree.
+// Retail's next-public row has one alignment NOP at +0x153, outside this function range.
 VA(0x004d4e90, 0x153)
 Int32 getMTFVal(BitStream *bs)
 {
@@ -783,9 +784,10 @@ void sendZeroes(BitStream *outStream, Int32 zeroesPending)
     }
 }
 
-// @early-stop
-// All 106 instructions and all 13 relocation targets agree; the remaining objdiff
-// residual is delinked local-label identity metadata.
+// @semantic
+// The recovered 0x120 frame, CFG, and all 13 effective relocations agree.  This is not a
+// byte-proven wall: the first structural residual is the local initialized at +0x18,
+// stored at [ebp-4] here versus retail [ebp-8], with later slot/branch encodings shifted.
 VA(0x004d5930, 0x189)
 void moveToFrontCodeAndSend(BitStream *outStream, Bool thisIsTheLastBlock)
 {
@@ -832,9 +834,10 @@ void moveToFrontCodeAndSend(BitStream *outStream, Bool thisIsTheLastBlock)
     sendMTFVal(outStream, EOB);
 }
 
-// @early-stop
-// Every instruction and all 28 relocation targets agree; the only residuals are the two
-// delinked local diagnostic-string identities.
+// @semantic
+// The recovered 0x11c frame, CFG, and all 28 effective relocations agree, including both
+// diagnostics.  The first structural residual is +0x2a: candidate stores the initialized
+// local at [ebp-0x10c], while retail uses [ebp-4]; later slots and branch encodings differ.
 VA(0x004d5ac0, 0x2d9)
 Bool getAndMoveToFrontDecode(BitStream *inStream)
 {
@@ -976,9 +979,10 @@ Bool fullGt(Int32 i1, Int32 i2)
      zptr[RC(zr)] = zt;                                       \
    }
 
-// @early-stop
-// All 320 instructions and all 44 relocation targets agree; the remaining objdiff
-// residual is delinked local-label identity metadata.
+// @semantic
+// The recovered 0x1b0 frame, sorting CFG, and all 44 effective relocations agree.  The
+// first structural residual is +0x18: candidate initializes [ebp-8], retail [ebp-0xc0];
+// the resulting local-slot and branch encodings are not a proven delinker artifact.
 VA(0x004d6000, 0x548)
 void qsortFull(Int32 left, Int32 right)
 {
@@ -1061,9 +1065,10 @@ Bool trivialGt(Int32 i1, Int32 i2)
     return False;
 }
 
-// @early-stop
-// All 88 instructions and all seven relocation targets agree; the remaining objdiff
-// residual is delinked local-label identity metadata.
+// @semantic
+// The recovered 0x1c frame, shell-sort CFG, and all seven effective relocations agree.
+// The first structural residual is +0x9: candidate initializes [ebp-0x1c], while retail
+// uses [ebp-4]; the later slot encodings therefore remain unresolved.
 VA(0x004d6610, 0x10f)
 void shellTrivial(void)
 {
@@ -1284,9 +1289,10 @@ void spotBlock(Bool weAreCompressing)
     }
 }
 
-// @early-stop
-// Every instruction and all 18 relocation targets agree; the only residual is the
-// delinked local panic-string identity.
+// @semantic
+// The recovered 0x14 frame, RLE CFG, and all 18 effective relocations agree; the panic
+// string differs only in local symbol identity.  The first code residual is +0x44:
+// candidate runLength is [ebp-0xc] while retail uses [ebp-4], so slots are not exact.
 VA(0x004d6f40, 0x15c)
 Int32 getRLEpair(FILE *src)
 {
@@ -1370,9 +1376,10 @@ Bool loadAndRLEsource(FILE *src)
     return (ch == MY_EOF);
 }
 
-// @early-stop
-// All 125 instructions and all 15 relocation targets agree; the remaining objdiff
-// residual is delinked local-label identity metadata.
+// @semantic
+// The recovered 0x28 frame, output CFG, and all 15 effective relocations agree.  The
+// first structural residual is +0x1f: candidate stores the first local at [ebp-4], while
+// retail uses [ebp-0x18]; later slot and branch encodings remain unresolved.
 VA(0x004d7290, 0x18d)
 void unRLEandDump(FILE *dst, Bool thisIsTheLastBlock)
 {
@@ -1420,9 +1427,10 @@ void unRLEandDump(FILE *dst, Bool thisIsTheLastBlock)
     if (thisIsTheLastBlock && block[last] != 42) unblockError();
 }
 
-// @early-stop
-// All instructions and all 79 relocations agree.  The residual report mismatch is
-// limited to delinked local string/float-constant symbol identities ($SG/$T vs ??_C/const_).
+// @semantic
+// The recovered 0x34 frame, stream CFG, and all 79 effective relocations agree; local
+// string/float symbols differ only in delinker identity.  The first code residual is
+// +0x11: candidate's initialized local is [ebp-0xc], retail's is [ebp-8].
 VA(0x004d7420, 0x2e6)
 void compressStream(FILE *stream, FILE *zStream)
 {
@@ -1489,9 +1497,10 @@ void compressStream(FILE *stream, FILE *zStream)
     if (veryVerbose) { sprintf(gText, "\n"); LogStr(gText); }
 }
 
-// @early-stop
-// All instructions agree and both objects contain 56 aligned relocations.  The only
-// residuals are seven delinked local string identities ($SG vs decorated ??_C names).
+// @semantic
+// The recovered 0x30 frame, stream CFG, and all 56 effective relocations agree; seven
+// strings differ only in local symbol identity.  The first code residual is +0x19:
+// candidate stores a local at [ebp-0x24], while retail uses [ebp-0x28].
 VA(0x004d7710, 0x26e)
 Bool uncompressStream(FILE *zStream, FILE *stream)
 {
@@ -1708,8 +1717,8 @@ void compressOutOfMemory(Int32 draw, Int32 blockSize)
 }
 
 // @early-stop
-// All 42 instructions are identical and neither object has a relocation; the remaining
-// objdiff residual is local-label identity metadata.
+// The explicit 0x83-byte range is raw-byte exact and has no relocations.  Retail's
+// next-public row contributes one alignment NOP at +0x83, outside this function range.
 VA(0x004d7cd0, 0x83)
 Bool endsInBz(Char *name)
 {
@@ -1717,13 +1726,14 @@ Bool endsInBz(Char *name)
     if (n <= 3) return False;
     return
         (name[n-3] == '.' &&
-         name[n-2] == 'b' &&
-         name[n-1] == 'z');
+         name[n-2] == 'n' &&
+         name[n-1] == 'w');
 }
 
-// @early-stop
-// All instructions and all 16 relocations agree; only delinked local string identities
-// differ in the objdiff report.
+// @semantic
+// The recovered 0x14 frame, file-flow CFG, and all 16 effective relocations agree; the
+// .nw/rb/wb literals differ only in local symbol identity.  The first code residual is
+// +0x84: candidate stores inStr at [ebp-8], while retail uses [ebp-0xc].
 VA(0x004d7d60, 0xe2)
 void compress(Char *name)
 {
@@ -1733,7 +1743,7 @@ void compress(Char *name)
 
     strcpy(inName, name);
     strcpy(outName, name);
-    strcat(outName, ".bz");
+    strcat(outName, ".nw");
 
     inStr = fopen(inName, "rb");
     outStr = fopen(outName, "wb");
@@ -1746,10 +1756,10 @@ void compress(Char *name)
     retVal = remove(inName);
 }
 
-// @early-stop
-// All external relocation targets agree (19 per object).  The sole address residual is
-// `outName-3`: retail encodes outName plus displacement -3, while the delinker names the
-// same effective address 0x53742d as const_0013742d with displacement 0.
+// @semantic
+// The recovered 0x1c frame, file-flow CFG, and all 19 effective relocations agree.  The
+// outName-3 access is the same effective address under different delinker identities.
+// The first slot residual is +0xa0: candidate [ebp-0xc], retail [ebp-0x10].
 VA(0x004d7e50, 0x110)
 void uncompress(Char *name)
 {
@@ -1775,9 +1785,10 @@ void uncompress(Char *name)
     ERROR_IF_NOT_ZERO(retVal);
 }
 
-// @early-stop
-// All instructions and all 28 relocations agree; the residuals are delinked local string
-// identities only.
+// @semantic
+// The recovered 0x1f0 frame, encode/file CFG, and all 28 effective relocations agree;
+// literal differences are local identities.  The first slot residual is +0x1a7:
+// candidate fd is [ebp-0x1c8], while retail uses [ebp-0x1cc].
 VA(0x004d7f60, 0x2d5)
 long EncodeData(char *dst, char *src, unsigned long srcLen)
 {
@@ -1820,9 +1831,10 @@ long EncodeData(char *dst, char *src, unsigned long srcLen)
     return flen;
 }
 
-// @early-stop
-// All instructions and all 26 relocations agree; the residuals are delinked local string
-// identities only.
+// @semantic
+// The recovered 0x1f4 frame, decode/file CFG, and all 26 effective relocations agree;
+// literal differences are local identities.  The first slot residual is +0x1b4:
+// candidate fd is [ebp-0x1c8], while retail uses [ebp-0x1cc].
 VA(0x004d8240, 0x2f3)
 long DecodeData(char *dst, char *src, unsigned long srcLen)
 {
