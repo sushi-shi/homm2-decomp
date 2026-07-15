@@ -1,7 +1,9 @@
 import unittest
+from contextlib import redirect_stdout
+from io import StringIO
 from pathlib import Path
 
-from .census import evaluate_declarations, parse_declarations
+from .census import EnumDeclaration, Enumerator, evaluate_declarations, parse_declarations, validate_manifest
 
 
 class CensusTest(unittest.TestCase):
@@ -32,6 +34,37 @@ HOMM2_ENUM_END(Second)
         declaration = parse_declarations(Path(__file__), text)[0]
         self.assertEqual(declaration.name, "AnonymousEnum@THING_WIDTH")
         self.assertEqual(declaration.form, "anonymous-enum")
+
+    def test_manifest_requires_explicit_valid_enumerators(self):
+        declaration = EnumDeclaration(
+            name="Mode", tag="Mode", owner="include/mode.h", line=1, end_line=3,
+            form="dual-mode", enumerators=[Enumerator("MODE_ONE", "1", 1, 2)],
+        )
+        manifest = {"version": 1, "domain": [{
+            "name": "Mode", "declaration": "Mode", "owner": "include/mode.h",
+            "category": "value", "production_carrier": "int", "strict": True,
+            "status": "reviewed", "sentinels": [], "enumerators": ["MODE_ONE"],
+            "interfaces": [], "members": [], "storage": [], "conversions": [],
+            "evidence": ["test evidence"],
+        }]}
+        with redirect_stdout(StringIO()):
+            result = validate_manifest([declaration], manifest, require_complete=True)
+        self.assertEqual(result, 0)
+        manifest["domain"][0]["enumerators"] = ["MODE_UNKNOWN"]
+        with redirect_stdout(StringIO()):
+            result = validate_manifest([declaration], manifest)
+        self.assertEqual(result, 1)
+
+    def test_complete_manifest_rejects_unclassified_declarations(self):
+        declaration = EnumDeclaration(
+            name="Mode", tag="Mode", owner="include/mode.h", line=1, end_line=3,
+            form="typedef-enum", enumerators=[Enumerator("MODE_ONE", "1", 1, 2)],
+        )
+        with redirect_stdout(StringIO()):
+            result = validate_manifest(
+                [declaration], {"version": 1, "domain": []}, require_complete=True
+            )
+        self.assertEqual(result, 1)
 
 
 if __name__ == "__main__":

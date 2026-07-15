@@ -11,19 +11,24 @@ def main(argv=None):
 
     census_parser = commands.add_parser("census", help="write enum inventory reports")
     census_parser.add_argument("--check-manifest", action="store_true")
+    census_parser.add_argument("--require-complete", action="store_true",
+                               help="fail while any enumerator is unclassified")
 
     strict_parser = commands.add_parser("strict", help="run whole-tree strict Clang checks")
     strict_parser.add_argument("-j", "--jobs", type=int, default=0)
     strict_parser.add_argument("--tu", action="append", default=[], help="limit to a unit/source")
 
     commands.add_parser("symbols", help="audit retail and production enum mangling")
-    commands.add_parser("validate", help="validate config/integer_domains.toml")
+    validate_parser = commands.add_parser("validate", help="validate config/integer_domains.toml")
+    validate_parser.add_argument("--complete", action="store_true",
+                                 help="also require every enumerator to be classified")
 
     args = parser.parse_args(argv)
     if args.command == "census":
-        return census.run(check_manifest=args.check_manifest)
+        return census.run(check_manifest=args.check_manifest or args.require_complete,
+                          require_complete=args.require_complete)
     if args.command == "strict":
         return strict.run(jobs=args.jobs, filters=args.tu)
     if args.command == "symbols":
         return symbols.run()
-    return census.validate_manifest()
+    return census.validate_manifest(require_complete=args.complete)

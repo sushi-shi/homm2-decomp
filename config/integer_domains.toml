@@ -8,6 +8,12 @@ category = "value"
 production_carrier = "int"
 strict = true
 sentinels = []
+enumerators = [
+  "FILE_REQUESTER_MAP_GAME",
+  "FILE_REQUESTER_LOAD_GAME",
+  "FILE_REQUESTER_SAVE_GAME",
+  "FILE_REQUESTER_MAP",
+]
 interfaces = ["fileRequester constructor integer decode boundary"]
 members = ["fileRequester::m_mode"]
 storage = []
@@ -26,6 +32,19 @@ category = "serialized"
 production_carrier = "short storage boundary"
 strict = true
 sentinels = []
+enumerators = [
+  "WIDGET_KIND_DEFAULT",
+  "WIDGET_KIND_UNDIMMED",
+  "WIDGET_KIND_ICON_DIRECT",
+  "WIDGET_KIND_ICON_CENTERED",
+  "WIDGET_KIND_ICON_FILL",
+  "WIDGET_KIND_TEXT",
+  "WIDGET_KIND_SOLID",
+  "WIDGET_KIND_BITMAP",
+  "WIDGET_KIND_ICON",
+  "WIDGET_KIND_AUTO_REPEAT",
+  "WIDGET_KIND_TEXT_ENTRY",
+]
 interfaces = ["DecodeWidgetKind", "EncodeWidgetKind", "widget constructor raw short boundary"]
 members = ["widget::m_kind"]
 storage = ["packed short at widget +0x14", "resourceManager ReadWord streams"]
@@ -48,6 +67,14 @@ category = "value"
 production_carrier = "int"
 strict = true
 sentinels = []
+enumerators = [
+  "FILE_REQUESTER_MAP_SIZE_SMALL",
+  "FILE_REQUESTER_MAP_SIZE_MEDIUM",
+  "FILE_REQUESTER_MAP_SIZE_LARGE",
+  "FILE_REQUESTER_MAP_SIZE_XLARGE",
+  "FILE_REQUESTER_MAP_SIZE_ALL",
+  "FILE_REQUESTER_MAP_SIZE_COUNT",
+]
 interfaces = ["fileRequester::MapExistsForFilter integer decode boundary"]
 members = []
 storage = ["giMapSizeFilter"]

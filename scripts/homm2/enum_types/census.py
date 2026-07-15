@@ -60,6 +60,7 @@ class EnumDeclaration:
     type_uses: dict[str, list[str]] = field(default_factory=dict)
     dependent_tus: list[str] = field(default_factory=list)
     manifest_status: str = "unclassified"
+    manifest_classified_enumerators: list[str] = field(default_factory=list)
 
 
 def source_files() -> list[Path]:
@@ -437,12 +438,29 @@ def _load_manifest() -> dict:
 
 
 def _apply_manifest(declarations: list[EnumDeclaration], manifest: dict) -> None:
-    classified = {entry["declaration"]: entry.get("status", "reviewed")
-                  for entry in manifest.get("domain", [])}
-    classified.update({entry["declaration"]: entry.get("status", "reviewed")
-                       for entry in manifest.get("constant_group", [])})
+    entries_by_declaration = {}
+    for section in ("domain", "constant_group"):
+        for entry in manifest.get(section, []):
+            key = (entry.get("declaration"), entry.get("owner"))
+            if all(isinstance(value, str) for value in key):
+                entries_by_declaration.setdefault(key, []).append(entry)
     for declaration in declarations:
-        declaration.manifest_status = classified.get(declaration.name, "unclassified")
+        entries = entries_by_declaration.get((declaration.name, declaration.owner), [])
+        source_names = {item.name for item in declaration.enumerators}
+        classified_names = {
+            name for entry in entries
+            for name in (entry.get("enumerators")
+                         if isinstance(entry.get("enumerators"), list) else [])
+            if name in source_names
+        }
+        declaration.manifest_classified_enumerators = sorted(classified_names)
+        if not entries:
+            declaration.manifest_status = "unclassified"
+        elif classified_names != source_names:
+            declaration.manifest_status = "partial"
+        else:
+            statuses = {entry.get("status", "reviewed") for entry in entries}
+            declaration.manifest_status = statuses.pop() if len(statuses) == 1 else "mixed"
 
 
 def build_census() -> tuple[list[EnumDeclaration], dict]:
@@ -467,11 +485,36 @@ def _json_report(declarations: list[EnumDeclaration]) -> dict:
     constant_only = [item.name for item in declarations if not item.type_uses]
     constant_only_typedefs = [item.name for item in declarations
                               if item.form == "typedef-enum" and not item.type_uses]
+    status_counts = {}
+    for item in declarations:
+        status_counts[item.manifest_status] = status_counts.get(item.manifest_status, 0) + 1
+    incomplete = [item for item in declarations
+                  if item.manifest_status in ("unclassified", "partial")]
+    classified_enumerators = sum(len(item.manifest_classified_enumerators)
+                                 for item in declarations)
+    total_enumerators = sum(len(item.enumerators) for item in declarations)
     return {
         "schema_version": 1,
         "declaration_count": len(declarations),
         "enumerator_count": sum(len(item.enumerators) for item in declarations),
         "unclassified": [item.name for item in declarations if item.manifest_status == "unclassified"],
+        "unclassified_declarations": [
+            {"name": item.name, "owner": item.owner, "line": item.line}
+            for item in declarations if item.manifest_status == "unclassified"
+        ],
+        "incomplete_declarations": [
+            {"name": item.name, "owner": item.owner, "line": item.line,
+             "status": item.manifest_status}
+            for item in incomplete
+        ],
+        "manifest_coverage": {
+            "classified": sum(item.manifest_status not in ("unclassified", "partial")
+                              for item in declarations),
+            "total": len(declarations),
+            "classified_enumerators": classified_enumerators,
+            "total_enumerators": total_enumerators,
+            "status_counts": dict(sorted(status_counts.items())),
+        },
         "audits": {
             "constant_only_declarations": constant_only,
             "constant_only_typedef_enums": constant_only_typedefs,
@@ -488,6 +531,10 @@ def _markdown_report(report: dict) -> str:
         f"- Declarations: {report['declaration_count']}",
         f"- Enumerators: {report['enumerator_count']}",
         f"- Unclassified: {len(report['unclassified'])}",
+        f"- Manifest coverage: {report['manifest_coverage']['classified']}/"
+        f"{report['manifest_coverage']['total']}",
+        f"- Enumerator coverage: {report['manifest_coverage']['classified_enumerators']}/"
+        f"{report['manifest_coverage']['total_enumerators']}",
         f"- Constant-only declarations: {len(report['audits']['constant_only_declarations'])}",
         f"- Constant-only typedef enums: {len(report['audits']['constant_only_typedef_enums'])}",
         f"- Mixed `*Constant` candidates: {len(report['audits']['mixed_constant_groups'])}",
@@ -506,30 +553,81 @@ def _markdown_report(report: dict) -> str:
     return "\n".join(lines)
 
 
-def validate_manifest(declarations: list[EnumDeclaration] | None = None, manifest: dict | None = None) -> int:
+def validate_manifest(declarations: list[EnumDeclaration] | None = None,
+                      manifest: dict | None = None, require_complete: bool = False) -> int:
     declarations, loaded = build_census() if declarations is None else (declarations, manifest or _load_manifest())
     manifest = loaded
     errors = []
-    known = {(item.name, item.owner) for item in declarations}
-    seen = set()
+    if manifest.get("version") != 1:
+        errors.append(f"unsupported manifest version {manifest.get('version')!r}")
+    known = {(item.name, item.owner): item for item in declarations}
+    seen_names = set()
+    enumerator_claims = {}
     for section in ("domain", "constant_group"):
         for entry in manifest.get(section, []):
             name = entry.get("name")
             declaration = entry.get("declaration")
             owner = entry.get("owner")
-            key = (section, name)
-            if key in seen:
-                errors.append(f"duplicate {section} name {name}")
-            seen.add(key)
-            if (declaration, owner) not in known:
+            if name in seen_names:
+                errors.append(f"duplicate manifest name {name}")
+            seen_names.add(name)
+            declaration_key = (declaration, owner)
+            source_declaration = known.get(declaration_key)
+            if source_declaration is None:
                 errors.append(f"{section} {name}: declaration {declaration!r} not found in {owner!r}")
             category = entry.get("category")
             if category not in DOMAIN_CATEGORIES:
                 errors.append(f"{section} {name}: invalid category {category!r}")
             if section == "domain" and not entry.get("production_carrier"):
                 errors.append(f"domain {name}: missing production_carrier")
+            if section == "domain" and not isinstance(entry.get("strict"), bool):
+                errors.append(f"domain {name}: strict must be a boolean")
+            if section == "domain":
+                for field_name in ("interfaces", "members", "storage", "conversions"):
+                    if not isinstance(entry.get(field_name), list):
+                        errors.append(f"domain {name}: {field_name} must be a list")
+            if entry.get("status") not in ("reviewed", "provisional", "deferred"):
+                errors.append(f"{section} {name}: invalid status {entry.get('status')!r}")
+            enumerators = entry.get("enumerators")
+            if not isinstance(enumerators, list) or not enumerators:
+                errors.append(f"{section} {name}: enumerators must be a non-empty list")
+            elif source_declaration is not None:
+                source_names = {item.name for item in source_declaration.enumerators}
+                unknown = sorted(set(enumerators) - source_names)
+                if unknown:
+                    errors.append(f"{section} {name}: unknown enumerators {', '.join(unknown)}")
+                if len(enumerators) != len(set(enumerators)):
+                    errors.append(f"{section} {name}: duplicate enumerators")
+                claims = enumerator_claims.setdefault(declaration_key, set())
+                overlap = sorted(claims & set(enumerators))
+                if overlap:
+                    errors.append(f"{section} {name}: enumerators classified more than once: "
+                                  f"{', '.join(overlap)}")
+                claims.update(enumerators)
+            sentinels = entry.get("sentinels")
+            if section == "domain" and not isinstance(sentinels, list):
+                errors.append(f"domain {name}: sentinels must be a list")
+            elif isinstance(sentinels, list) and isinstance(enumerators, list):
+                unknown_sentinels = sorted(set(sentinels) - set(enumerators))
+                if unknown_sentinels:
+                    errors.append(f"domain {name}: sentinels are not domain enumerators: "
+                                  f"{', '.join(unknown_sentinels)}")
             if not entry.get("evidence"):
                 errors.append(f"{section} {name}: missing evidence")
+    if require_complete:
+        missing = []
+        for declaration_key, source_declaration in known.items():
+            claimed = enumerator_claims.get(declaration_key, set())
+            missing.extend((name, declaration_key[0], declaration_key[1])
+                           for name in {item.name for item in source_declaration.enumerators} - claimed)
+        missing.sort(key=lambda item: (item[2], item[1], item[0]))
+        if missing:
+            preview = ", ".join(
+                f"{enumerator} in {declaration} ({owner})"
+                for enumerator, declaration, owner in missing[:20]
+            )
+            suffix = f"; and {len(missing) - 20} more" if len(missing) > 20 else ""
+            errors.append(f"{len(missing)} enumerators remain unclassified: {preview}{suffix}")
     if errors:
         for error in errors:
             print(f"[enum-types] manifest: {error}")
@@ -539,7 +637,7 @@ def validate_manifest(declarations: list[EnumDeclaration] | None = None, manifes
     return 0
 
 
-def run(check_manifest: bool = False) -> int:
+def run(check_manifest: bool = False, require_complete: bool = False) -> int:
     declarations, manifest = build_census()
     report = _json_report(declarations)
     OUTPUT.mkdir(parents=True, exist_ok=True)
@@ -548,6 +646,8 @@ def run(check_manifest: bool = False) -> int:
     print(f"[enum-types] wrote build/enum-types/census.json and census.md: "
           f"{report['declaration_count']} declarations, {report['enumerator_count']} enumerators")
     print(f"[enum-types] unclassified={len(report['unclassified'])} "
+          f"enumerator-coverage={report['manifest_coverage']['classified_enumerators']}/"
+          f"{report['manifest_coverage']['total_enumerators']} "
           f"constant-only={len(report['audits']['constant_only_typedef_enums'])} "
           f"mixed-constant={len(report['audits']['mixed_constant_groups'])}")
-    return validate_manifest(declarations, manifest) if check_manifest else 0
+    return validate_manifest(declarations, manifest, require_complete) if check_manifest else 0
