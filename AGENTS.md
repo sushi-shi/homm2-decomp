@@ -88,9 +88,10 @@ authoritative. This file is the short, restart-ready Codex workflow.
    inspect every emitted `find`/`replace` edit for value and lifetime preservation, then batch-score
    it. Discard every sub-100 candidate; retain only strict exact closure, followed by `homm2 build`,
    a raw-byte review, and the broad `homm2 relocs 0x<RVA>` audit before integration.
-7. Run a relocation-masked raw-byte comparison for near-exact functions. objdiff masks relocation
-   bytes and can report less than 100% for delinked local-label identity even when every code byte is
-   identical.
+7. The generated objdiff report uses `functionRelocDiffs=data_value`. For near-exact functions,
+   also run a relocation-masked raw-byte comparison to isolate code-shape differences, but never use
+   that masked result as target-correctness proof. The resolved owner/addend gate and relocation
+   audit remain authoritative, especially for equal-valued zero-fill storage.
 8. Audit relocation targets with `homm2 relocs 0x<RVA>`. If the helper misidentifies a delinked
    boundary, compare `llvm-objdump -r` entries manually over the function ranges. Jump-table local
    labels may be delinked as the containing function; external globals and callees must agree.
