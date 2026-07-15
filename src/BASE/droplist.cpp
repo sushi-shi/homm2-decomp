@@ -60,7 +60,7 @@ void dropListWidget::Read(void)
     m_contentY = m_y + gpResourceManager->ReadWord();
     field_0x2c = gpResourceManager->ReadWord();
     field_0x2e = gpResourceManager->ReadWord();
-    field_0x30 = gpResourceManager->ReadWord();
+    m_maxVisibleItems = gpResourceManager->ReadWord();
     m_normalColor = gpResourceManager->ReadWord();
     m_selColor = gpResourceManager->ReadWord();
     field_0x38 = gpResourceManager->ReadWord();
@@ -244,7 +244,7 @@ void dropListWidget::DrawDropStuff(void)
         y + 4, field_0x86 - 10, m_font->m_height + 1, color, m_textMode);
     int i = 1;
     y += field_0x74;
-    while (i < field_0x32 - 1 && m_topIndex + i < m_itemCount) {
+    while (i < m_visibleItemCount - 1 && m_topIndex + i < m_itemCount) {
         m_icon->DrawToBuffer(m_owner->m_posX + field_0x82, y, field_0x50, 0);
         int item = m_topIndex + i;
         color = m_selectedIndex == item ? m_selColor : m_normalColor;
@@ -260,7 +260,7 @@ void dropListWidget::DrawDropStuff(void)
         m_font->DrawBoundedString(m_items[item], m_owner->m_posX + field_0x82 + 5,
             y + 2, field_0x86 - 10, m_font->m_height + 1, color, m_textMode);
     }
-    if (field_0x46 > 0) {
+    if (m_scrollRange > 0) {
         int frame;
         if (field_0xac != 0)
             frame = field_0x56;
@@ -269,7 +269,7 @@ void dropListWidget::DrawDropStuff(void)
         m_icon->DrawToBuffer(m_owner->m_posX + field_0x8a, m_owner->m_posY + field_0x8c, frame, 0);
         m_icon->DrawToBuffer(m_owner->m_posX + field_0x92, m_owner->m_posY + field_0x94, field_0x5c, 0);
         i = 2;
-        while (i < field_0x32 - 2) {
+        while (i < m_visibleItemCount - 2) {
             m_icon->DrawToBuffer(m_owner->m_posX + field_0x92,
                 m_owner->m_posY + field_0x94 + field_0x76 * (i - 1), field_0x5e, 0);
             i++;
@@ -283,7 +283,7 @@ void dropListWidget::DrawDropStuff(void)
         m_icon->DrawToBuffer(m_owner->m_posX + field_0x9a, m_owner->m_posY + field_0x9c, frame, 0);
         field_0xa2 = static_cast<short>(m_owner->m_posX) + field_0x92 + 5;
         field_0xa4 = static_cast<short>(m_owner->m_posY) +
-            (field_0xaa * m_topIndex) / field_0x46 + field_0x94 + 3;
+            (field_0xaa * m_topIndex) / m_scrollRange + field_0x94 + 3;
         m_icon->DrawToBuffer(field_0xa2, field_0xa4, field_0x62, 0);
     }
     gpWindowManager->UpdateScreenRegion(m_x, m_y, m_width, field_0x80 + m_height);
@@ -306,6 +306,18 @@ void dropListWidget::RestoreDropBackground(void)
     m_savedBackground = 0;
 }
 
+// @match-note: complete shared-header/TU-state checkpoint (live 95.256714%;
+// retained 99.3675%). Explicit ranges are base 0x827 versus retail 0x81f.
+// Retail has a 0x48 frame; base has 0x4c, with every real stack object shifted
+// uniformly by four bytes rather than an extra live variable. With the embedded
+// tables excluded, both have 76 branches and 17 calls. All 36 relocation targets
+// remain in the same order, but base's 24 external sites are shifted +7 and its
+// twelve local-table sites +8. The historical 0x81f/0x48 retained state had only
+// three scheduling residuals; current tagged-message/shared-header state changed
+// the prologue before any event access. Retried after that trigger: plausible
+// include orders, exact Save assignment/call, semantic local names, and owner
+// scope were byte-identical; narrowing the message scope fell to 95.19%.
+// Do not run AST permutations until the retail frame/size state is recovered.
 VA(0x004dcb10, 0x81f)
 void dropListWidget::ProcessSelectDialog(void)
 {
@@ -324,23 +336,23 @@ void dropListWidget::ProcessSelectDialog(void)
     field_0xaf = 0;
     field_0xae = 0;
     m_topIndex = 0;
-    field_0x46 = 0;
+    m_scrollRange = 0;
 
     short numItems = m_itemCount;
-    if (numItems > field_0x30) {
-        field_0x46 = numItems - field_0x30;
+    if (numItems > m_maxVisibleItems) {
+        m_scrollRange = numItems - m_maxVisibleItems;
         m_topIndex = m_selectedIndex;
         if (m_selectedIndex < 0)
             m_topIndex = 0;
-        if (field_0x46 < m_topIndex)
-            m_topIndex = field_0x46;
+        if (m_scrollRange < m_topIndex)
+            m_topIndex = m_scrollRange;
     }
-    if (field_0x46 > 0) {
-        field_0x32 = field_0x30;
+    if (m_scrollRange > 0) {
+        m_visibleItemCount = m_maxVisibleItems;
     } else {
         if (numItems <= 3)
             numItems = 3;
-        field_0x32 = numItems;
+        m_visibleItemCount = numItems;
     }
 
     short topHeight = reinterpret_cast<IconEntry *>(m_icon->m_data)[field_0x4e].h;
@@ -352,7 +364,7 @@ void dropListWidget::ProcessSelectDialog(void)
     field_0x82 = m_iconX;
     field_0x84 = m_iconY + field_0x72;
     field_0x86 = reinterpret_cast<IconEntry *>(m_icon->m_data)[field_0x4e].w;
-    field_0x88 = (field_0x32 - 2) * field_0x76 + field_0x74 + field_0x78;
+    field_0x88 = (m_visibleItemCount - 2) * field_0x76 + field_0x74 + field_0x78;
     iconEntry = reinterpret_cast<IconEntry *>(m_icon->m_data) + field_0x54;
     scrollWidth[0] = iconEntry->w;
     field_0x8e = scrollWidth[0];
@@ -365,10 +377,10 @@ void dropListWidget::ProcessSelectDialog(void)
     field_0xa0 = scrollBottomHeight;
     field_0x7a = m_iconX;
     field_0x7c = field_0x84;
-    field_0x7e = field_0x46 > 0 ? scrollWidth[0] + field_0x86 : field_0x86;
+    field_0x7e = m_scrollRange > 0 ? scrollWidth[0] + field_0x86 : field_0x86;
     field_0x80 = field_0x88;
 
-    if (field_0x46 > 0) {
+    if (m_scrollRange > 0) {
         short scrollX = m_x + m_width - scrollWidth[0];
         field_0x8a = scrollX;
         field_0x8c = field_0x84;
@@ -419,31 +431,31 @@ void dropListWidget::ProcessSelectDialog(void)
                 DrawDropStuff();
                 continue;
             case 0x49:
-                m_topIndex = m_topIndex - field_0x30 + 1;
+                m_topIndex = m_topIndex - m_maxVisibleItems + 1;
                 if (m_topIndex < 0)
                     m_topIndex = 0;
-                m_selectedIndex = m_selectedIndex - field_0x30 + 1;
+                m_selectedIndex = m_selectedIndex - m_maxVisibleItems + 1;
                 if (m_selectedIndex < 0)
                     m_selectedIndex = 0;
                 DrawDropStuff();
                 continue;
             case 0x4f:
-                m_topIndex = field_0x46;
+                m_topIndex = m_scrollRange;
                 m_selectedIndex = m_itemCount - 1;
                 DrawDropStuff();
                 continue;
             case 0x50:
                 if (m_selectedIndex < m_itemCount - 1)
                     m_selectedIndex++;
-                if (m_topIndex + field_0x30 - 1 < m_selectedIndex)
-                    m_topIndex = m_selectedIndex - field_0x30 + 1;
+                if (m_topIndex + m_maxVisibleItems - 1 < m_selectedIndex)
+                    m_topIndex = m_selectedIndex - m_maxVisibleItems + 1;
                 DrawDropStuff();
                 continue;
             case 0x51:
-                m_topIndex = m_topIndex - 1 + field_0x30;
-                if (field_0x46 < m_topIndex)
-                    m_topIndex = field_0x46;
-                m_selectedIndex = m_selectedIndex - 1 + field_0x30;
+                m_topIndex = m_topIndex - 1 + m_maxVisibleItems;
+                if (m_scrollRange < m_topIndex)
+                    m_topIndex = m_scrollRange;
+                m_selectedIndex = m_selectedIndex - 1 + m_maxVisibleItems;
                 if (m_itemCount - 1 < m_selectedIndex)
                     m_selectedIndex = m_itemCount - 1;
                 DrawDropStuff();
@@ -460,8 +472,8 @@ void dropListWidget::ProcessSelectDialog(void)
                     item = 0;
                 if (item < 0)
                     item = 0;
-                if (item >= field_0x32)
-                    item = field_0x32 - 1;
+                if (item >= m_visibleItemCount)
+                    item = m_visibleItemCount - 1;
                 int selected = m_topIndex + item;
                 if (selected < m_itemCount && m_selectedIndex != selected) {
                     m_selectedIndex = static_cast<short>(item) + m_topIndex;
@@ -469,7 +481,7 @@ void dropListWidget::ProcessSelectDialog(void)
                     continue;
                 }
             } else if (field_0xae != 0) {
-                int scrollRange = field_0x46;
+                int scrollRange = m_scrollRange;
                 int top = ((mouseY - field_0xa8 / 2 - field_0x94 - 4) *
                     (scrollRange + 1)) / field_0xaa;
                 if (top < 0)
@@ -507,13 +519,13 @@ void dropListWidget::ProcessSelectDialog(void)
                         m_topIndex--;
                     field_0xac = 1;
                 } else if (mouseY >= field_0x9c) {
-                    if (m_topIndex < field_0x46)
+                    if (m_topIndex < m_scrollRange)
                         m_topIndex++;
                     field_0xad = 1;
                 } else {
                     if (mouseY >= field_0xa4 && mouseY < field_0xa4 + field_0xa8)
                         field_0xae = 1;
-                    short scrollRange = field_0x46;
+                    short scrollRange = m_scrollRange;
                     m_topIndex = static_cast<short>(((mouseY - field_0xa8 / 2 - field_0x94 - 4) *
                         (scrollRange + 1)) / field_0xaa);
                     if (m_topIndex < 0)
