@@ -500,26 +500,26 @@ void SetInstallDefaults(void)
 VA(0x004c49a0, 0x1b5)
 void SetGameDefaults(void)
 {
-    exeGfxConfig *gfx = &gConfig.gfx[0];
+    int *fullScreen = &gConfig.gfx[0].fullScreen;
     gConfig.musicVolume = 1;
     gConfig.soundVolume = 1;
     gConfig.autosave = 1;
     gConfig.showRoute = 1;
     do {
-        gfx->showMenu = 1;
-        gfx->x = MISC_DEFAULT_WINDOW_ORIGIN;
-        gfx->y = MISC_DEFAULT_WINDOW_ORIGIN;
-        gfx->fullScreen = 1;
-        gfx->colorMouseCursor = 0;
+        fullScreen[MISC_GRAPHICS_SHOW_MENU_FROM_FULLSCREEN] = 1;
+        fullScreen[MISC_GRAPHICS_X_FROM_FULLSCREEN] = MISC_DEFAULT_WINDOW_ORIGIN;
+        fullScreen[MISC_GRAPHICS_Y_FROM_FULLSCREEN] = MISC_DEFAULT_WINDOW_ORIGIN;
+        fullScreen[MISC_GRAPHICS_COLOR_MOUSE_FROM_FULLSCREEN] = 0;
+        fullScreen[MISC_GRAPHICS_FULLSCREEN] = 1;
         if (giMainVideoModeWidth <= MISC_DEFAULT_WINDOW_WIDTH) {
-            gfx->width = MISC_DEFAULT_SMALL_WINDOW_WIDTH;
-            gfx->height = MISC_DEFAULT_SMALL_WINDOW_HEIGHT;
+            fullScreen[MISC_GRAPHICS_WIDTH_FROM_FULLSCREEN] = MISC_DEFAULT_SMALL_WINDOW_WIDTH;
+            fullScreen[MISC_GRAPHICS_HEIGHT_FROM_FULLSCREEN] = MISC_DEFAULT_SMALL_WINDOW_HEIGHT;
         } else {
-            gfx->width = MISC_DEFAULT_WINDOW_WIDTH;
-            gfx->height = MISC_DEFAULT_WINDOW_HEIGHT;
+            fullScreen[MISC_GRAPHICS_WIDTH_FROM_FULLSCREEN] = MISC_DEFAULT_WINDOW_WIDTH;
+            fullScreen[MISC_GRAPHICS_HEIGHT_FROM_FULLSCREEN] = MISC_DEFAULT_WINDOW_HEIGHT;
         }
-        ++gfx;
-    } while (&gfx->fullScreen < &gConfig.showCombatGrid);
+        fullScreen += CONFIG_GRAPHICS_SIZE / sizeof(*fullScreen);
+    } while (fullScreen < &gConfig.showCombatGrid);
     gConfig.showCombatGrid = 0;
     gConfig.showCombatMouseHex = 0;
     gConfig.combatShadeLevel = 0;
