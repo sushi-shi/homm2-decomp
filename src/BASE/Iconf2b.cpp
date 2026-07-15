@@ -44,6 +44,11 @@ DATA(0x00534c60) static int gFlipSkip;
 // loads were byte-identical. This is not a wall or permitted stop. Continue from the setup Y/X
 // allocation and right-skip spill after a newly proved lifetime/header/compiler-state change;
 // do not replay either older matrix or iconf2b-fresh-214bd52.tsv.
+// A later consolidated 239-candidate audit forced the best safe `srcIcon->m_data` inline accessor
+// across balanced declaration/predecessor states. Every cross regressed from the accessor-only
+// 84.771880% maximum; the best combined state was 84.692310%, candidate 0x4f4 versus retail 0x4f1,
+// with the same exact 81/81 relocation multiplicity. Predecessor noise is therefore closed for
+// this helper; no generated source/state was retained. Continue from structural setup/spill evidence.
 // The 032a2b3 retry exhausted a new typed-alias/right-skip ownership family. Whole-entry
 // references, a separate right-arm temporary, semantic skip-name buckets, cn/skip declaration
 // order, setup-width slot reuse, compound updates, and the new icon2bc decoder-lifetime
