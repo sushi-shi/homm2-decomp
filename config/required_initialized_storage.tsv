@@ -114,3 +114,13 @@ name	unit	size	retail_sha256	highlow_count	audit
 ?giScoreMon@@3PAY01FA	SOURCE/KB	0x108	7095fcf94fc59f77d7e983794c3d65c00d4bdd5535bcee1f3b34a0f0019ad1e1	0	bytes
 ?giScoreCampaignMon@@3PAY01FA	SOURCE/KB	0x108	db0b71563816090ce46bb6591f19433560a403798f70a0eb38550674fa76bcfb	0	bytes
 ?gHeroSkillBonus@@3PAY113CA	SOURCE/KB	0x30	8c40ba676446b05ef9baef33c184de2bea210ae5f97404473e70bf07658df52c	0	bytes
+?cMonFilename@@3PAPADA	SOURCE/KB	0x108	b5c6c078ab65bbacdb02250ce2e2d5a87f00e3a460ca58a502a1f2e607276bc4	66	cstring-pointer-table
+?gsSpellInfo@@3PAUSSpellInfo@@A	SOURCE/KB	0x596	edc31d35a6140e1ec1177751385af546f27c12b633cb71562a21ac8fb98bd4b5	0	bytes
+?cArmyFrameFileNames@@3PAPADA	SOURCE/KB	0x108	2eb6c5e5ab2369a7e9e55de80679ba073ed839b1fb1b180d08ce67db662f6c7e	66	cstring-pointer-table
+?gcSpellInfluenceIcons@@3PAEA	SOURCE/KB	0x10	da6cb2ba50a9502b20a41d5d7afa025b818dd9c205ab17e8854abc1ad50a6d64	0	bytes
+?giSpellInfluenceToSpell@@3PAEA	SOURCE/KB	0x10	900791eae3deaabcc689b29d69ee5c1a990d2322cc2701c5d95151fc401611ca	0	bytes
+?giNumPowFrames@@3PAEA	SOURCE/KB	0x20	3f02eda1a10aca817d5f3f53f6be00ecea0d42879c9a15dcd07f02d14cb18705	0	bytes
+?gcColorToPlayerPos@@3PACA	SOURCE/KB	0x8	07d0ed0d36adcf9f965ce9c8f553e7f65bb9b0d73eb0e203c3fcd2850fc07b40	0	bytes
+?cCombatBkgNames@@3PAPADA	SOURCE/KB	0x50	685a090c3ce6302ea1ae517e64f2f400e3bbe1461d2a170d35498c2b51eb2df8	19	cstring-pointer-table
+?sCmbtObstacles@@3PAUSCmbtObstacle@@A	SOURCE/KB	0x1c0	2b4970f7d2464eb206c199791d615248b02cc066826ed2e3f0e7f06fb2461a76	0	bytes
+?gEstatesGoldLevel@@3PAHA	SOURCE/KB	0x10	c46c923624e1c41ee6cedc58cd5fa5e4f669e9b69321b1c3cc35d833717c69e3	0	bytes

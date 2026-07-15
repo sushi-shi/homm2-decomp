@@ -190,6 +190,13 @@ struct SCmbtHero {
 };
 SIZE(SCmbtHero, 0x81);
 #pragma pack(pop)
+typedef enum SpellInfoAttribute {
+    SPELL_INFO_ATTRIBUTE_POWER = 0x01,
+    SPELL_INFO_ATTRIBUTE_COMBAT = 0x02,
+    SPELL_INFO_ATTRIBUTE_ADVENTURE = 0x04,
+    SPELL_INFO_ATTRIBUTE_DURATION = 0x08
+} SpellInfoAttribute;
+
 struct SSpellInfo {
     char soundName[9];
     unsigned char level;
