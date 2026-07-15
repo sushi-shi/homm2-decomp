@@ -2,6 +2,7 @@
 #define HOMM2_NEWGAME_H
 // Declarations of the free functions DEFINED in Newgame.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
+#include <EnumTypes.h>
 #include <SOURCE/REQUEST.h>
 // forward declarations (was <_all.h>):
 struct tag_message;
@@ -118,7 +119,7 @@ typedef enum NewGameKeyCode {
     NEW_GAME_KEYPAD_INSERT = 0x52
 } NewGameKeyCode;
 
-typedef enum NewGameControl {
+HOMM2_ENUM_BEGIN(NewGameControl)
     NEW_GAME_DIFFICULTY_HELP_FIRST = 1,
     NEW_GAME_DIFFICULTY_FIRST = 0x43,
     NEW_GAME_RACE_FIRST = 6,
@@ -135,7 +136,34 @@ typedef enum NewGameControl {
     NEW_GAME_SHADOW = 0x49,
     NEW_GAME_CHAT_FIRST = 0x4a,
     NEW_GAME_RACE_NAME_FIRST = 0x4e
-} NewGameControl;
+HOMM2_ENUM_END(NewGameControl)
+
+#ifdef HOMM2_STRICT_ENUM_TYPES
+inline int EncodeNewGameControl(NewGameControl control)
+{
+    return static_cast<int>(control);
+}
+
+inline NewGameControl DecodeNewGameControl(int value)
+{
+    return static_cast<NewGameControl>(value);
+}
+
+inline int EncodeNewGameControlIndex(NewGameControl first, int index)
+{
+    return index + static_cast<int>(first);
+}
+
+inline int LastNewGameControl(NewGameControl first, int count)
+{
+    return static_cast<int>(first) + count - 1;
+}
+#else
+#define EncodeNewGameControl(control) (control)
+#define DecodeNewGameControl(value) (value)
+#define EncodeNewGameControlIndex(first, index) ((index) + (first))
+#define LastNewGameControl(first, count) ((first) + (count) - 1)
+#endif
 
 #pragma pack(push, 1)
 struct NewGameRemotePacket {

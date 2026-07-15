@@ -25,6 +25,57 @@ evidence = [
 status = "reviewed"
 
 [[domain]]
+name = "NewGameControl"
+declaration = "NewGameControl"
+owner = "include/SOURCE/Newgame.h"
+category = "message-id"
+production_carrier = "int message field and short widget storage boundaries"
+strict = true
+sentinels = []
+enumerators = [
+  "NEW_GAME_DIFFICULTY_HELP_FIRST",
+  "NEW_GAME_DIFFICULTY_FIRST",
+  "NEW_GAME_RACE_FIRST",
+  "NEW_GAME_COLOR_FIRST",
+  "NEW_GAME_PLAYER_SELECT_FIRST",
+  "NEW_GAME_PLAYER_NAME_FIRST",
+  "NEW_GAME_RACE_ICON_FIRST",
+  "NEW_GAME_RACE_CYCLE_FIRST",
+  "NEW_GAME_HANDICAP_FIRST",
+  "NEW_GAME_PLAYER_HUMAN_FIRST",
+  "NEW_GAME_SCENARIO_NAME",
+  "NEW_GAME_RATING",
+  "NEW_GAME_MAP_SELECT",
+  "NEW_GAME_SHADOW",
+  "NEW_GAME_CHAT_FIRST",
+  "NEW_GAME_RACE_NAME_FIRST",
+]
+interfaces = [
+  "game::UpdateNewGameWindow message producer",
+  "NewGameHandler widget dispatch",
+  "game::ShowScenInfo message producer",
+  "widget constructors receiving control IDs",
+]
+members = []
+storage = [
+  "tag_messageWidgetPayload::id four-byte integer transport",
+  "widget::m_id packed short storage boundary",
+]
+conversions = [
+  "NewGameControl to int via EncodeNewGameControl",
+  "int to NewGameControl via DecodeNewGameControl",
+  "range base and index to int via EncodeNewGameControlIndex",
+  "range base and scalar count to inclusive upper bound via LastNewGameControl",
+  "range IDs to short via existing static_cast at widget constructor boundaries",
+]
+evidence = [
+  "all members are exact widget IDs or first IDs of bounded new-game control ranges",
+  "UpdateNewGameWindow and ShowScenInfo emit the same ranges that NewGameHandler dispatches",
+  "message transport is four bytes while widget constructors and widget storage use short IDs",
+]
+status = "reviewed"
+
+[[domain]]
 name = "AdventureSystemOption"
 declaration = "AdventureSystemOption"
 owner = "include/SOURCE/ADVMGR.h"
