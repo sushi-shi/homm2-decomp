@@ -927,7 +927,7 @@ extern icon *gShingleAnim;
 extern int gSpecialBuildingBaseResourceValues[];
 extern int gSpecialBuildingCosts[][7];
 extern char *gSpecialBuildingNames[];
-extern SSpellInfo gsSpellInfo[];
+extern SSpellInfo gsSpellInfo[HERO_SPELL_COUNT];
 extern icon *gSystemIcons;
 extern char gText[];
 extern char *gWellExtraNames[];
