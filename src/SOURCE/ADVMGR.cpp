@@ -43,6 +43,7 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/ADVMGR.h>
+#include <SOURCE/ADVMGR_TYPES.h>
 #include <SOURCE/game.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/playerData.h>
@@ -55,6 +56,7 @@
 #include <string.h>
 
 #define ADVMGR_SOURCE_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\ADVMGR.CPP"
+// Retail loads these line bases through relocated words; numeric constants change the code shape.
 #define ADVMGR_QUICK_VIEW_LINE (*reinterpret_cast<const short *>("\x76\x21"))
 #define ADVMGR_TOWN_VIEW_LINE (*reinterpret_cast<const short *>("\x5f\x5e"))
 #define ADVMGR_BOTTOM_HERO_LINE (*reinterpret_cast<const short *>("\x5f\x21"))
@@ -63,6 +65,8 @@
 #define ADVMGR_KINGDOM_VIEW_LINE (*reinterpret_cast<const short *>("\x96\x12"))
 #define ADVMGR_BORDER_FREE_LINE (*reinterpret_cast<const short *>("\x24\x01"))
 #define ADVMGR_ENVIRONMENT_VOLUME(distance) environmentVolumes[distance]
+#define ADVMGR_REMOTE_PAYLOAD(packet) \
+    (reinterpret_cast<AdventureRemotePayload *>((packet)->payload))
 
 static const int environmentVolumes[ADVMGR_ENVIRONMENT_VOLUME_COUNT] = {
     64, 57, 40, 21, 7, 5, 3, 0
@@ -5261,13 +5265,14 @@ int DimensionDoorHandler(tag_message &message)
 // Complete 0x1c frame/slots and draw CFG; all 161 resolved relocation targets agree.
 // After masking relocations, the first code-byte difference is +0x3ed: ours loads
 // mapRow before forming the column stride, while retail forms the stride first. The
-// byte-addressed visibility loads recover retail's effective addresses; the first
-// retains an equivalent MAP_WIDTH/mapY imul operand order at +0xaa6 and is one byte
-// longer. Later residuals are equivalent min/max load/compare orders, delinked biased
-// bComboDraw aliases, and three retail alignment NOPs. Direct/reversed flat-index,
-// multiplication, and relational AST forms compile identically or regress; explicit
-// temporaries, pointer/subscript variants, and grouped byte offsets were also worse.
-// Revisit after a material TU-state change or in the post-coverage last-mile phase.
+// typed visibility-grid access retains an equivalent MAP_WIDTH/mapY imul operand order
+// at +0xaa6. A byte-pointer cast plus constant offset raised the live score to 99.17%
+// but was removed because it was a fake view of this real unsigned-short array; the
+// retained source maximum remains 99.28%. Later residuals are equivalent min/max
+// load/compare orders, delinked biased bComboDraw aliases, and three retail alignment
+// NOPs. Direct/reversed flat-index, multiplication, and relational AST forms compile
+// identically or regress; explicit temporaries and pointer/subscript variants were also
+// worse. Revisit after a material TU-state change or in the post-coverage last-mile phase.
 VA(0x004654ad, 0x11a9)
 int advManager::ComboDraw(int originX, int originY, int animate)
 {
@@ -5450,15 +5455,9 @@ int advManager::ComboDraw(int originX, int originY, int animate)
                 if (mapCellX < 0 || mapCellX > MAP_WIDTH - 1 || mapYValue < 1 ||
                     mapYValue > MAP_HEIGHT - 2)
                     continue;
-                if (*reinterpret_cast<unsigned short *>(
-                        reinterpret_cast<unsigned char *>(m_visibilityMap) +
-                        mapYValue * MAP_WIDTH * sizeof(unsigned short) +
-                        mapCellX * sizeof(unsigned short)) != 0)
+                if (m_visibilityMap[mapYValue * MAP_WIDTH + mapCellX] != 0)
                     ++bComboDraw[column][mapRow + 1];
-                if (*reinterpret_cast<unsigned short *>(
-                        reinterpret_cast<unsigned char *>(m_visibilityMap) +
-                        (mapYValue - 1) * MAP_WIDTH * sizeof(unsigned short) +
-                        mapCellX * sizeof(unsigned short)) != 0)
+                if (m_visibilityMap[(mapYValue - 1) * MAP_WIDTH + mapCellX] != 0)
                     ++bComboDraw[column][mapRow - 1];
             }
         }
@@ -6751,8 +6750,7 @@ void advManager::SetInitialMapOrigin(void)
 
     if (gbThisNetHumanPlayer[giCurPlayer] &&
         gpCurPlayer->CurrentTown() != ADVMGR_INVALID_CELL) {
-        currentTown9 = reinterpret_cast<town *>(
-            &gpGame->m_castleRecs[gpCurPlayer->CurrentTown()]);
+        currentTown9 = &gpGame->m_castleRecs[gpCurPlayer->CurrentTown()];
         m_mapOriginX = currentTown9->m_x - ADVMGR_VIEW_CENTER_OFFSET;
         m_mapOriginY = currentTown9->m_y - ADVMGR_VIEW_CENTER_OFFSET;
     } else if (gbThisNetHumanPlayer[giCurPlayer] &&
@@ -6762,8 +6760,7 @@ void advManager::SetInitialMapOrigin(void)
         if (gbThisNetHumanPlayer[giCurPlayer])
             initialPlayer8 = gpCurPlayer;
         else
-            initialPlayer8 = reinterpret_cast<playerData *>(
-                &gpGame->m_players[giThisGamePos]);
+            initialPlayer8 = &gpGame->m_players[giThisGamePos];
 
         if (initialPlayer8->m_heroCount > 0) {
             initialHero5 =
@@ -6771,8 +6768,7 @@ void advManager::SetInitialMapOrigin(void)
             m_mapOriginX = initialHero5->m_x - ADVMGR_VIEW_CENTER_OFFSET;
             m_mapOriginY = initialHero5->m_y - ADVMGR_VIEW_CENTER_OFFSET;
         } else if (initialPlayer8->m_townCount > 0) {
-            initialTown9 = reinterpret_cast<town *>(
-                &gpGame->m_castleRecs[initialPlayer8->m_townIds[0]]);
+            initialTown9 = &gpGame->m_castleRecs[initialPlayer8->m_townIds[0]];
             m_mapOriginX = initialTown9->m_x - ADVMGR_VIEW_CENTER_OFFSET;
             m_mapOriginY = initialTown9->m_y - ADVMGR_VIEW_CENTER_OFFSET;
         } else {
@@ -6839,21 +6835,23 @@ void advManager::LoadRemote(void)
 VA(0x0046931e, 0x20c)
 char * advManager::CheckHandleNet(void)
 {
-    AdventureRemotePacket *packet9;
+    RemoteMessage *packet9;
     int playerExited5;
     SPlayerExit exitInfo4;
 
-    packet9 = reinterpret_cast<AdventureRemotePacket *>(
+    packet9 = reinterpret_cast<RemoteMessage *>(
         GetRemoteData(ADVMGR_REMOTE_DATA_REQUEST));
     if (packet9 &&
         (packet9->type == ADVMGR_REMOTE_PACKET_TYPE_GAME ||
          packet9->type == ADVMGR_REMOTE_PACKET_TYPE_ALT)) {
         switch (packet9->command) {
         case ADVMGR_REMOTE_COMMAND_SAVE_GAME:
-            playerExited5 = packet9->savePlayerExited;
+            playerExited5 = ADVMGR_REMOTE_PAYLOAD(packet9)->savePlayerExited;
             if (!gpGame->ReceiveSaveGame(
-                    packet9->saveDataSize, packet9->saveCrc,
-                    packet9->saveTransmitCrc, packet9->sender)) {
+                    ADVMGR_REMOTE_PAYLOAD(packet9)->saveDataSize,
+                    ADVMGR_REMOTE_PAYLOAD(packet9)->saveCrc,
+                    ADVMGR_REMOTE_PAYLOAD(packet9)->saveTransmitCrc,
+                    packet9->sender)) {
                 ShutDown(0);
             }
             if (playerExited5) {
@@ -6870,7 +6868,7 @@ char * advManager::CheckHandleNet(void)
             break;
 
         case ADVMGR_REMOTE_COMMAND_POP_NET_BOX:
-            PopNetBox(packet9->payload, packet9->sender);
+            PopNetBox(ADVMGR_REMOTE_PAYLOAD(packet9)->bytes, packet9->sender);
             break;
 
         case ADVMGR_REMOTE_COMMAND_COMBAT:
@@ -6883,19 +6881,18 @@ char * advManager::CheckHandleNet(void)
 
         case ADVMGR_REMOTE_COMMAND_PLAYER_EXIT:
             LogStr("Receive Remote Player Exit");
-            ReceiveRemotePlayerExit(
-                *reinterpret_cast<SPlayerExit *>(packet9->payload));
+            ReceiveRemotePlayerExit(ADVMGR_REMOTE_PAYLOAD(packet9)->playerExit);
             break;
 
         case ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT:
             LogStr("Host Reports Player Exit");
             ReceiveHostReportsPlayerExit(
                 packet9->sender,
-                *reinterpret_cast<SPlayerExit *>(packet9->payload), 0);
+                ADVMGR_REMOTE_PAYLOAD(packet9)->playerExit, 0);
             break;
 
         case ADVMGR_REMOTE_COMMAND_GROUP_MAP_CHANGE:
-            ProcessIncomingGroupMapChange(packet9->payload);
+            ProcessIncomingGroupMapChange(ADVMGR_REMOTE_PAYLOAD(packet9)->bytes);
             break;
 
         default:
