@@ -48,25 +48,25 @@ icon::~icon()
 }
 
 VA(0x004c7b00, 0x44)
-void icon::DrawToBuffer(int p1, int p2, int p3, int p4)
+void icon::DrawToBuffer(int x, int y, int frame, int flip)
 {
-    if (p4 == 0) {
-        IconToBitmap(this, gpWindowManager->m_screen, p1, p2, p3, 0, 0, 0, 0x280, 0x1e0, 0);
+    if (flip == 0) {
+        IconToBitmap(this, gpWindowManager->m_screen, x, y, frame, 0, 0, 0, 0x280, 0x1e0, 0);
         return;
     }
-    FlipIconToBitmap(this, gpWindowManager->m_screen, p1, p2, p3, 0, 0, 0, 0x280, 0x1e0, 0);
+    FlipIconToBitmap(this, gpWindowManager->m_screen, x, y, frame, 0, 0, 0, 0x280, 0x1e0, 0);
 }
 
-// @early-stop
-// /O2 register-allocation wall: base is 0x2b3 bytes, retail 0x2bb, and all 37
-// relocation targets agree. The only residual spans are extent construction
-// +0x0b..+0xde and extent rejection +0xf0..+0x146: retail colors flip/index/limits
-// as EAX/EBX/EDI, while base uses EBX/EDI/EBX and schedules equivalent loads and
-// signed comparisons around the same stores. The complete draw dispatcher from
-// +0x146 through return is instruction-identical, including all six rasterizer
-// targets and arguments. Cached IconEntry pointers, repeated typed indexing,
-// a shared byte offset, both flip-branch orientations, direct/cached flip values,
-// direct versus local clipped dimensions, and reordered bound predicates were tried.
+// @match-note
+// /O2 residual begins at +0xb: base is 0x2b3 bytes and retail is 0x2bb. Both have the same
+// CFG and ordered 37-relocation identity stream; the draw dispatcher is instruction-identical
+// after aligning retail +0x146 with base +0x13e. Only extent construction/rejection differs:
+// retail colors flip/index/limits as EAX/EBX/EDI while base uses EBX/EDI/EBX and factors the
+// entry-y load after the flip join. Cached/repeated typed entries, shared offsets, flip branch
+// orientations, direct/cached values, clipped-dimension locals, and reordered predicates were
+// already tried. Branch-produced/local top variants regressed to 81.49%/87.73% by changing
+// frame/liveness; an audited 80-attempt libclang AST pass retained nothing. Revisit after a
+// material exact predecessor/header-state change; this is not a certified permanent wall.
 VA(0x004c7b50, 0x2bb)
 int icon::CombatClipDrawToBuffer(int x, int y, int frame, struct SLimitData *limits,
                                  int flip, int offset, unsigned char *colorTable,
