@@ -50,6 +50,13 @@ DATA(0x0053818c) static int gYMClipR;
 // comparison polarities, per-arm dim destinations, semantic locals, inclusive bounds, and 129 AST
 // variants. Revisit only after a shared-header/TU-state change produces structural alignment at
 // 96%+; do not treat this broad scheduling residual as a proven wall.
+// The 2026-07-15 post-enum lifetime batch retained the retail-evidenced second-Y lifetime after
+// each shear test. Plain/register spellings are byte-identical and raise the direct score from
+// 88.477160% to 88.819790% without changing 0x578 size or 129/130 relocations. A 256-state
+// typedef/enum/record/member/prototype/include diagnostic sweep produced only a disposable
+// 88.883250% maximum (enum trial 62), not an exact closure; generated state was restored and must
+// not be committed or recorded as 100%. The remaining residual is still structural/compiler-state
+// work, not a proven wall.
 VA(0x004da270, 0x588)
 void IconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int y, int frame, int clip,
                          int clipX, int clipY, int clipW, int clipH, int color, signed char *shear)
@@ -104,8 +111,9 @@ void IconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int y, 
                 gYMDimPal = reinterpret_cast<unsigned char *>(uDimPal) +
                             (gYMRun & ICON_RLE_DIM_LEVEL_MASK) *
                                 ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
-                if (shear[gYMY] != ICON_SHEAR_SKIP_ROW && clipY <= gYMY &&
-                    gYMClipB >= gYMY &&
+                int currentY;
+                if (shear[gYMY] != ICON_SHEAR_SKIP_ROW &&
+                    clipY <= (currentY = gYMY) && currentY <= gYMClipB &&
                     static_cast<int>(gYMDimLen + gYMX) > clipX && gYMClipR >= gYMX) {
                     int dimRight = gYMDimLen + gYMX;
                     if (clipX <= gYMX) {
@@ -132,8 +140,9 @@ void IconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int y, 
             gYMX = gYMX + gYMDimLen2;
             continue;
         do_fill:
-            if (shear[gYMY] != ICON_SHEAR_SKIP_ROW && clipY <= gYMY &&
-                gYMClipB >= gYMY &&
+            int currentY;
+            if (shear[gYMY] != ICON_SHEAR_SKIP_ROW &&
+                clipY <= (currentY = gYMY) && currentY <= gYMClipB &&
                 static_cast<int>(gYMX + gYMRun) > clipX && gYMClipR >= gYMX) {
                 int fillRight = gYMX + gYMRun;
                 if (clipX <= gYMX) {
@@ -155,8 +164,9 @@ void IconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int y, 
         }
         // ---- positive command : literal copy / newline ----
         if (gYMRun != 0) {
-            if (shear[gYMY] != ICON_SHEAR_SKIP_ROW && clipY <= gYMY &&
-                gYMClipB >= gYMY &&
+            int currentY;
+            if (shear[gYMY] != ICON_SHEAR_SKIP_ROW &&
+                clipY <= (currentY = gYMY) && currentY <= gYMClipB &&
                 static_cast<int>(gYMX + gYMRun) > clipX && gYMClipR >= gYMX) {
                 int copyRight = gYMX + gYMRun;
                 if (clipX <= gYMX) {
