@@ -22,27 +22,34 @@ executive::executive(void)
     m_managerListHead = 0;
     m_managerListTail = 0;
     m_activeManager = 0;
-    field_0xc = 0;
+    m_result = 0;
 }
 
 VA(0x004d1620, 0x9e)
 int executive::InitSystem(void)
 {
-    if (gpResourceManager->Open(-1) != 0)
+    if (gpResourceManager->Open(EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown("Unable to initialize resources!");
-    if (gpInputManager->Open(-1) != 0)
+    if (gpInputManager->Open(EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown("Unable to initialize input devices!");
     if (giCurExe == 1) {
-        if (gpSoundManager->Open(-1) != 0)
+        if (gpSoundManager->Open(EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
             ShutDown("Unable to initialize sound!");
     }
-    if (AddManager(gpMouseManager, -1) != 0)
+    if (AddManager(gpMouseManager, EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown("Unable to initialize mouse!");
-    if (AddManager(gpWindowManager, -1) != 0)
+    if (AddManager(gpWindowManager, EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown("Unable to initialize windows!  Perhaps you are low on memory?");
     return 0;
 }
 
+// @match-note
+// Complete /O2 structure with an exact frame/CFG and 11/11 ordered external
+// relocations. The only canonical byte residual is the commutative comparison at
+// +0x2d (ours cmp ECX,EAX; retail cmp EAX,ECX). Reordering the condition, naming
+// the window-manager operand, and 20 AST permutations did not steer it. A bounded
+// tu_state_noise seed-45 enum probe produced an audited exact closure without
+// changing exact siblings; revisit only if earlier EXEC TU state changes.
 VA(0x004d16c0, 0x86)
 void executive::ShutDownSystem(void)
 {
@@ -63,26 +70,30 @@ void executive::ShutDownSystem(void)
     gpResourceManager->Close();
 }
 
-// @early-stop
-// /O2 register-allocation wall at +0x19..+0x40: only EAX/ECX are exchanged in the
-// manager snapshot loop; +0x00..+0x18 and +0x42..+0xfa are byte-identical.
+// @match-note
+// Complete /O2 structure with the retail frame/CFG and all 16 ordered external
+// relocations. The first and only structural residual is +0x19..+0x40 in the
+// manager snapshot loop: ours assigns EAX=listManager/ECX=index while retail
+// assigns ECX=listManager/EAX=index. Declaration/init reordering and 25 AST
+// permutations did not steer it; two bounded TU-state probes (78 trials total)
+// reached only a disposable 99.4375%. Revisit after earlier EXEC TU-state changes.
 VA(0x004d1750, 0xfb)
 int executive::DoDialog(class baseManager *manager)
 {
-    baseManager *managerList[20];
-    baseManager *previousList[20];
-    baseManager *nextList[20];
+    baseManager *managerList[EXECUTIVE_DIALOG_MANAGER_CAPACITY];
+    baseManager *previousList[EXECUTIVE_DIALOG_MANAGER_CAPACITY];
+    baseManager *nextList[EXECUTIVE_DIALOG_MANAGER_CAPACITY];
     int dialogStorage[4];
     executive *dialog = reinterpret_cast<executive *>(dialogStorage);
-    int managerCount;
-    int managerIndex;
     baseManager *listManager;
+    int managerIndex;
+    int managerCount;
     managerCount = 0;
     dialog->m_managerListHead = 0;
     dialog->m_managerListTail = 0;
     dialog->m_activeManager = 0;
     listManager = m_managerListHead;
-    dialog->field_0xc = 0;
+    dialog->m_result = 0;
     managerIndex = 0;
     if (listManager != 0) {
         do {
@@ -94,13 +105,13 @@ int executive::DoDialog(class baseManager *manager)
             managerCount++;
         } while (listManager != 0);
     }
-    if (AddManager(manager, -1) != 0)
+    if (AddManager(manager, EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown("Can't add manager!");
-    if (dialog->AddManager(gpMouseManager, -1) != 0)
+    if (dialog->AddManager(gpMouseManager, EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown("Can't add manager!");
-    if (dialog->AddManager(gpWindowManager, -1) != 0)
+    if (dialog->AddManager(gpWindowManager, EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown("Can't add manager!");
-    if (dialog->AddManager(manager, -1) != 0)
+    if (dialog->AddManager(manager, EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown("Can't add manager!");
     dialog->MainLoop();
     RemoveManager(manager);
@@ -114,7 +125,7 @@ int executive::DoDialog(class baseManager *manager)
             managerCount--;
         } while (managerCount != 0);
     }
-    return dialog->field_0xc;
+    return dialog->m_result;
 }
 
 VA(0x004d1850, 0x86)
@@ -137,12 +148,12 @@ VA(0x004d18e0, 0xce)
 int executive::AddManager(class baseManager *mgr, int param_2)
 {
     if (mgr == 0)
-        return 3;
-    if (param_2 == -1) {
+        return EXECUTIVE_MANAGER_ERROR;
+    if (param_2 == EXECUTIVE_MANAGER_DEFAULT_PRIORITY) {
         param_2 = m_managerListTail == 0 ? 0 : m_managerListTail->m_priority + 1;
     }
     if (mgr->m_active == 0 && mgr->Open(param_2) != 0)
-        return 3;
+        return EXECUTIVE_MANAGER_ERROR;
     baseManager *tail = m_managerListTail;
     baseManager *cur = m_managerListTail;
     if (cur != 0) {
@@ -171,21 +182,30 @@ int executive::AddManager(class baseManager *mgr, int param_2)
         cur->m_next->m_prev = mgr;
         cur->m_next = mgr;
     }
-    return 0;
+    return EXECUTIVE_MANAGER_SUCCESS;
 }
 
+// @match-note
+// Complete /O2 structure and CFG with 0/0 relocations. The only canonical byte
+// residual is +0x15..+0x1b: ours loads head then tail, while retail loads tail then
+// head before the same equality test. A shared next lifetime, an explicit tail
+// local, swapped condition spelling, and 25 AST permutations were tried. A bounded
+// tu_state_noise seed-45 enum probe produced an audited exact closure without
+// changing exact siblings; revisit only if earlier EXEC TU state changes.
 VA(0x004d19b0, 0x76)
 void executive::RemoveManager(class baseManager *mgr)
 {
     if (mgr != 0) {
         mgr->Close();
+        baseManager *next;
         baseManager *prev = mgr->m_prev;
         if (prev == 0) {
-            if (m_managerListHead == m_managerListTail) {
+            baseManager *tail = m_managerListTail;
+            if (m_managerListHead == tail) {
                 m_managerListTail = 0;
                 m_managerListHead = 0;
             } else {
-                baseManager *next = mgr->m_next;
+                next = mgr->m_next;
                 m_managerListHead = next;
                 next->m_prev = 0;
             }
@@ -193,7 +213,7 @@ void executive::RemoveManager(class baseManager *mgr)
             mgr->m_next = 0;
             return;
         }
-        baseManager *next = mgr->m_next;
+        next = mgr->m_next;
         prev->m_next = next;
         if (next == 0)
             m_managerListTail = prev;
@@ -209,18 +229,15 @@ void executive::CallManager(class baseManager *mgr)
 {
     baseManager *saved = m_activeManager;
     RemoveManager(saved);
-    if (AddManager(mgr, -1) != 0)
+    if (AddManager(mgr, EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown("Can't add manager!");
     MainLoop();
     RemoveManager(mgr);
-    if (AddManager(saved, -1) != 0)
+    if (AddManager(saved, EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown("Can't add manager!");
     m_activeManager = saved;
 }
 
-// @early-stop
-// /O2 comparison-order wall at +0x7c: only CMP bytes 3b c8 vs retail 3b c1 differ;
-// the equality operands are commutative and +0x00..+0x7b/+0x7e..+0xf9 are byte-identical.
 VA(0x004d1a90, 0xfa)
 void executive::MainLoop(void)
 {
@@ -245,25 +262,25 @@ void executive::MainLoop(void)
                     return;
                 manager = m_activeManager;
                 if (manager->m_active == 1 &&
-                    (message.type != 4 || gpWindowManager != manager)) {
+                    (message.type != MESSAGE_MOUSE_MOVE || gpWindowManager != manager)) {
                     result = manager->Main(message);
                     switch (result) {
-                    case 1:
+                    case EXECUTIVE_MANAGER_STOP_DISPATCH:
                         keepDispatching = 0;
                         break;
-                    case 2:
-                        if ((message.type & 0x4000) == 0)
+                    case EXECUTIVE_MANAGER_HANDLE_EXECUTIVE_MESSAGE:
+                        if ((message.type & MESSAGE_EXECUTIVE) == 0)
                             break;
                         switch (message.payload.executive.command) {
-                        case 1:
+                        case EXECUTIVE_COMMAND_TERMINATE_LOOP:
                             done++;
                             break;
-                        case 2:
+                        case EXECUTIVE_COMMAND_REMOVE_MANAGER:
                             RemoveManager(m_activeManager);
                             m_activeManager = 0;
                             break;
-                        case 4:
-                            field_0xc = message.payload.executive.result;
+                        case EXECUTIVE_COMMAND_RETURN_RESULT:
+                            m_result = message.payload.executive.result;
                             done++;
                             break;
                         }
