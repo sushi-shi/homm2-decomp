@@ -23,6 +23,19 @@ struct aggEntry {  // one .agg directory record (0xc bytes)
     unsigned long size;
 };
 
+typedef enum ResourceManagerConstant {
+    RESOURCE_MANAGER_INVALID_FILE = -1,
+    RESOURCE_MANAGER_SUCCESS = 0,
+    RESOURCE_MANAGER_ERROR = 3,
+    RESOURCE_MANAGER_AGGREGATE_LIMIT = 2,
+    RESOURCE_MANAGER_ENTRY_BYTES = 0xc,
+    RESOURCE_MANAGER_READ13_BYTES = 0xd,
+    RESOURCE_MANAGER_EVIL_TRANSLATION_COUNT = 37,
+    RESOURCE_MANAGER_MESSAGE_MASK = 0x80,
+    RESOURCE_MANAGER_BACKDROP_ROW_BYTES = 640,
+    RESOURCE_MANAGER_BINARY_OPEN_MODE = 0x8000
+} ResourceManagerConstant;
+
 class resourceManager : public baseManager {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
@@ -31,11 +44,11 @@ public:
     resource *m_resourceListHead;  // +0x36  resource-list head
     int    m_numAggregates;  // +0x3a
     int    m_curAggregate;  // +0x3e
-    int    m_aggregateFd[2];  // +0x42  per-aggregate file descriptors
-    aggEntry *m_aggregateDir[2];  // +0x4a  per-aggregate directory
-    int    m_aggregateEntryCount[2];  // +0x52
+    int    m_aggregateFd[RESOURCE_MANAGER_AGGREGATE_LIMIT];  // +0x42  per-aggregate file descriptors
+    aggEntry *m_aggregateDir[RESOURCE_MANAGER_AGGREGATE_LIMIT];  // +0x4a  per-aggregate directory
+    int    m_aggregateEntryCount[RESOURCE_MANAGER_AGGREGATE_LIMIT];  // +0x52
     int    m_expunging;  // +0x5a
-    char _pad_0x5e[0x4];
+    int    m_reserved;  // +0x5e  unreferenced/reserved state
     char   m_lastFileName[0x3c];  // +0x62
     int    m_lastFileId;  // +0x9e
     // --- constructors ---
