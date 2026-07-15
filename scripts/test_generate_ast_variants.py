@@ -15,7 +15,7 @@ class AstVariantGenerationTests(unittest.TestCase):
         self.assertEqual(len(candidates), 3)
         self.assertEqual(len(candidates[-1]["edits"]), 2)
 
-    def test_helpers_at_the_same_insertion_point_are_not_combined(self):
+    def test_helpers_at_the_same_insertion_point_are_merged(self):
         blob = b"abcdefghij"
         mutations = [
             AstMutation("inline", "one", (
@@ -27,8 +27,10 @@ class AstVariantGenerationTests(unittest.TestCase):
         ]
         candidates, truncated = candidate_payloads(blob, mutations, 2, 20)
         self.assertFalse(truncated)
-        self.assertEqual(len(candidates), 2)
-        self.assertTrue(all(len(candidate["edits"]) == 2 for candidate in candidates))
+        self.assertEqual(len(candidates), 3)
+        combined = candidates[-1]
+        self.assertEqual(len(combined["edits"]), 3)
+        self.assertEqual(combined["edits"][0]["replace"], "helper1 helper2 ")
 
 
 if __name__ == "__main__":
