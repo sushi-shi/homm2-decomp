@@ -155,7 +155,11 @@ typedef enum KbGameTableConstant {
     KB_SPELL_INFLUENCE_MAP_COUNT = 16,
     KB_SPELL_EFFECT_COUNT = 32,
     KB_COMBAT_BACKGROUND_COUNT = 20,
-    KB_COMBAT_OBSTACLE_COUNT = 32
+    KB_COMBAT_OBSTACLE_COUNT = 32,
+    KB_TERRAIN_TYPE_COUNT = GROUND_TERRAIN_TYPE_COUNT + 1,
+    KB_TERRAIN_STEP_TYPE_COUNT = 2,
+    KB_TRIGGER_TYPE_COUNT = 128,
+    KB_TOWN_OBJECT_NAME_COUNT = 32
 } KbGameTableConstant;
 
 extern unsigned char giGroundShape[GROUND_TILE_IMAGE_COUNT];
@@ -264,12 +268,13 @@ extern int gEstatesGoldLevel[HERO_SKILL_LEVEL_COUNT];
 extern float gfSSLogisticsMod[HERO_SKILL_LEVEL_COUNT];
 extern float gfSSNavigationMod[HERO_SKILL_LEVEL_COUNT];
 extern float gfSSArcheryMod[HERO_SKILL_LEVEL_COUNT];
-extern float gfSSAIArcheryMod[4];
-extern signed char giVisRange[8];
-extern unsigned char gStartingHeroStats[6][5];
-extern int giTerrainCost[10][4][2];
-extern char *gTownPrefixNames[6];
-extern char *gTownObjNames[32];
+extern float gfSSAIArcheryMod[HERO_SKILL_LEVEL_COUNT];
+extern signed char giVisRange[HERO_SKILL_LEVEL_COUNT];
+extern unsigned char gStartingHeroStats[HERO_CLASS_COUNT][HERO_STARTING_STAT_COUNT];
+extern int giTerrainCost[KB_TERRAIN_TYPE_COUNT][HERO_SKILL_LEVEL_COUNT]
+                        [KB_TERRAIN_STEP_TYPE_COUNT];
+extern char *gTownPrefixNames[HERO_CLASS_COUNT];
+extern char *gTownObjNames[KB_TOWN_OBJECT_NAME_COUNT];
 extern int giDebugBuildingToBuild;
 extern unsigned char giTerrainToMusicTrack[16];
 extern char *cHeroTypeShortName[6];
