@@ -21,7 +21,6 @@
 #include <BASE/font.h>
 #include <BASE/bitmap.h>
 #include <BASE/palette.h>
-#include <_globals_model.h>
 // @early-stop
 // Relocation-masked code, frame/slots, and CFG are exact. The only raw residual is
 // the manager-name relocation field: the local $SG string and retail

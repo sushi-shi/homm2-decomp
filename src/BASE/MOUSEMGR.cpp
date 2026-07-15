@@ -18,7 +18,6 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/kbwin.h>
 #include <BASE/INPUTMGR.h>
-#include <_globals_model.h>
 
 
 DATA(0x0051ef24) static char gDefaultCursorName[] = "";

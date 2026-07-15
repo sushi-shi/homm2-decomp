@@ -7,7 +7,6 @@
 #include <BASE/soundManager.h>
 #include <mss.h>
 #include <SOURCE/KB.h>
-#include <_globals_model.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <BASE/resourceManager.h>
 #include <BASE/MIDIWrap.h>

@@ -5,7 +5,6 @@
 
 #include <va.h>
 #include <_carcass_types.h>
-#include <_globals_model.h>
 #include <_types.h>
 #include <BASE/Misc.h>
 #include <BASE/border.h>

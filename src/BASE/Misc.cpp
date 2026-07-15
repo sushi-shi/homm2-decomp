@@ -8,7 +8,6 @@
 #include <SOURCE/kbwin.h>
 #include <BASE/heroWindow.h>
 #include <BASE/mouseManager.h>
-#include <_globals_model.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/bitmap.h>
 #include <BASE/icon.h>
