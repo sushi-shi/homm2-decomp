@@ -201,7 +201,9 @@ dev shell's Ghidra env (in the flake).
   align. AST-correct ranges do not prove semantic equivalence, so inspect every candidate and
   retain generated source only for audited exact 100% closure. It will not fix a slot miss; use
   `od_slots.py` for that. `permute_ast.py` and `tu_state_noise.py` remain compatibility/diagnostic
-  frontends, not the default campaign entry point.
+  frontends, not the default campaign entry point. A reviewed MSVC 4.2 compatibility error outside
+  the target may be named exactly with repeatable `--allow-external-diagnostic`; target-local,
+  fatal, foreign-file, and unmatched diagnostics still fail closed and allowances enter the manifest.
 - `homm2 sema <cmd>` — semantic navigation (xref/disasm/strings/match/rva/clangd; see
   Build loop). Modules in `scripts/homm2/analysis/`; Ghidra pipeline in `scripts/homm2/ghidra/`.
 - `editor/nvim` — `:Homm2` in-editor diff/build/status (auto-loaded by the dev-shell).
