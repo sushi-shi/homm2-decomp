@@ -32,6 +32,15 @@ class AstVariantGenerationTests(unittest.TestCase):
         self.assertEqual(len(combined["edits"]), 3)
         self.assertEqual(combined["edits"][0]["replace"], "helper1 helper2 ")
 
+    def test_distinct_edits_with_the_same_human_label_have_unique_names(self):
+        blob = b"abcdefghij"
+        mutations = [
+            AstMutation("inline", "same", (AstEdit(2, 3, b"C"),)),
+            AstMutation("inline", "same", (AstEdit(2, 3, b"X"),)),
+        ]
+        candidates, _truncated = candidate_payloads(blob, mutations, 1, 20)
+        self.assertEqual(len({candidate["name"] for candidate in candidates}), 2)
+
 
 if __name__ == "__main__":
     unittest.main()
