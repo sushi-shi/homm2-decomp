@@ -24,8 +24,8 @@ DATA(0x00528cf8) static long gButtonRepeatTime; // button auto-repeat deadline t
 VA(0x004dd440, 0x34)
 button::button(void) : widget(0, 0, 0, 0, 0, 0)
 {
-    m_pressedFrame = 0;
     m_normalFrame = 0;
+    m_pressedFrame = 0;
     m_iconId = 0;
     m_selectMode = 0;
     m_hotkey = BUTTON_NO_HOTKEY;
@@ -33,45 +33,49 @@ button::button(void) : widget(0, 0, 0, 0, 0, 0)
 }
 
 VA(0x004dd4c0, 0x6e)
-button::button(short int x, short int y, short int w, short int h, unsigned long int iconId, short int p6, short int p7, short int p8, short int p9, short int p10, short int p11)
-    : widget(x, y, w, h, p10, p11)
+button::button(short int x, short int y, short int width, short int height,
+               unsigned long int iconId, short int normalFrame, short int pressedFrame,
+               short int selectMode, short int hotkey, short int id, short int kind)
+    : widget(x, y, width, height, id, kind)
 {
     m_iconId = iconId;
     m_icon = gpResourceManager->GetIcon(iconId);
-    m_pressedFrame = p6;
-    m_normalFrame = p7;
-    m_selectMode = p8;
-    m_hotkey = p9;
+    m_normalFrame = normalFrame;
+    m_pressedFrame = pressedFrame;
+    m_selectMode = selectMode;
+    m_hotkey = hotkey;
 }
 
 VA(0x004dd530, 0x7c)
-button::button(short int x, short int y, short int w, short int h, char *name, short int p6, short int p7, short int p8, short int p9, short int p10, short int p11)
-    : widget(x, y, w, h, p10, p11)
+button::button(short int x, short int y, short int width, short int height, char *iconName,
+               short int normalFrame, short int pressedFrame, short int selectMode,
+               short int hotkey, short int id, short int kind)
+    : widget(x, y, width, height, id, kind)
 {
-    unsigned long id = gpResourceManager->MakeId(name, 1);
-    m_iconId = id;
-    m_icon = gpResourceManager->GetIcon(id);
-    m_pressedFrame = p6;
-    m_normalFrame = p7;
-    m_selectMode = p8;
-    m_hotkey = p9;
+    unsigned long iconId = gpResourceManager->MakeId(iconName, 1);
+    m_iconId = iconId;
+    m_icon = gpResourceManager->GetIcon(iconId);
+    m_normalFrame = normalFrame;
+    m_pressedFrame = pressedFrame;
+    m_selectMode = selectMode;
+    m_hotkey = hotkey;
 }
 
 VA(0x004dd5b0, 0xeb)
 void button::Read(void)
 {
-    char local_10[16];
+    char iconName[16];
     m_x = gpResourceManager->ReadWord();
     m_y = gpResourceManager->ReadWord();
     m_width = gpResourceManager->ReadWord();
     m_height = gpResourceManager->ReadWord();
-    gpResourceManager->Read13(reinterpret_cast<signed char *>(local_10));
+    gpResourceManager->Read13(reinterpret_cast<signed char *>(iconName));
     gpResourceManager->SavePosition();
-    m_iconId = gpResourceManager->MakeId(local_10, 1);
+    m_iconId = gpResourceManager->MakeId(iconName, 1);
     m_icon = gpResourceManager->GetIcon(m_iconId);
     gpResourceManager->RestorePosition();
-    m_pressedFrame = gpResourceManager->ReadWord();
     m_normalFrame = gpResourceManager->ReadWord();
+    m_pressedFrame = gpResourceManager->ReadWord();
     m_selectMode = gpResourceManager->ReadWord();
     m_hotkey = gpResourceManager->ReadWord();
     m_id = gpResourceManager->ReadWord();
@@ -92,15 +96,17 @@ inline button::~button()
 // VA(0x004dd480, 0x36) ??_E/??_G button deleting-destructor aliases
 
 // @match-note
-// First executable divergence is the +0x47 vptr-load/store/this scheduling order.
-// Base is 0x585, retail 0x595, with the modal loop, calls, message writes, icon
-// replacement, stackless FPO shape, and 36/36 relocations. Key draw/dim gate failures
-// now follow retail to widget::Main while missing/mismatched hotkeys return zero; the
-// initial left-click containment is retained as retail's positive arm. Remaining
-// residuals are DX-versus-CX flags allocation, signed hit-test registers, repeated
-// deselection scheduling, and the release block. Cached flag widths and goto/break
-// fallbacks were checked in this corrected CFG; no alias is retained. Revisit after
-// a real TU/header-state change or in the >=95% last-mile phase.
+// Candidate is 0x585 versus retail 0x595. The first non-relocation byte divergence
+// is +0x47: candidate loads the vptr after storing m_flags, while retail loads it
+// before the store. The modal loop, message CFG, frame, calls, and all 36 ordered
+// relocations are present; identities agree except the proven gButtonRepeatTime
+// interior-label name. Later residuals are CX/DX flag allocation, hit-test register
+// allocation/polarity, and four deselection schedules; relocation offsets accumulate
+// retail deltas of +6, +12, then +16 bytes. Negative key-up gating, per-site short
+// flag snapshots, cached/global flags, hit-test polarity, and goto/break spellings
+// were tried. A completed 40-iteration libclang AST pass and 24 guarded TU-state
+// probes found no improvement or exact closure. Revisit after a real predecessor,
+// header, or TU-state change; this is not a byte-proven early stop.
 VA(0x004dd6d0, 0x595)
 int button::Main(tag_message &msg)
 {
@@ -144,19 +150,20 @@ int button::Main(tag_message &msg)
             if (m_hotkey == BUTTON_NO_HOTKEY ||
                 m_hotkey != msg.payload.keyboard.keyCode)
                 return 0;
-            if ((m_flags & WIDGET_FLAG_SELECTED) != 0) {
-                m_flags &= ~WIDGET_FLAG_SELECTED;
-                Draw();
-                gpWindowManager->UpdateScreenRegion(m_x + m_owner->m_posX,
-                                                    m_y + m_owner->m_posY, m_width, m_height);
-                msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
-                msg.type = MESSAGE_WIDGET;
-                msg.payload.widget.id = m_id;
-                msg.payload.widget.parameter = iLeftRightSave;
-                iLeftRightSave = 0;
-                return 2;
-            }
-            return 0;
+            short keyFlags = m_flags;
+            if ((keyFlags & WIDGET_FLAG_SELECTED) == 0)
+                return 0;
+            keyFlags &= ~WIDGET_FLAG_SELECTED;
+            m_flags = keyFlags;
+            Draw();
+            gpWindowManager->UpdateScreenRegion(m_x + m_owner->m_posX,
+                                                m_y + m_owner->m_posY, m_width, m_height);
+            msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
+            msg.type = MESSAGE_WIDGET;
+            msg.payload.widget.id = m_id;
+            msg.payload.widget.parameter = iLeftRightSave;
+            iLeftRightSave = 0;
+            return 2;
         }
         break;
 
@@ -194,8 +201,10 @@ int button::Main(tag_message &msg)
                                 static_cast<short>(m_owner->m_posY);
                     if (m_x > relativeX || m_y > relativeY ||
                         relativeX >= m_x + m_width || relativeY >= m_y + m_height) {
-                        if ((m_flags & WIDGET_FLAG_SELECTED) != 0) {
-                            m_flags &= ~WIDGET_FLAG_SELECTED;
+                        short moveFlags = m_flags;
+                        if ((moveFlags & WIDGET_FLAG_SELECTED) != 0) {
+                            moveFlags &= ~WIDGET_FLAG_SELECTED;
+                            m_flags = moveFlags;
                             Draw();
                             gpWindowManager->UpdateScreenRegion(
                                 m_x + m_owner->m_posX, m_y + m_owner->m_posY, m_width, m_height);
@@ -212,8 +221,10 @@ int button::Main(tag_message &msg)
                 Process1WindowsMessage();
                 msg = gpInputManager->GetEvent();
             }
-            if ((m_flags & WIDGET_FLAG_SELECTED) != 0) {
-                m_flags &= ~WIDGET_FLAG_SELECTED;
+            short releaseFlags = m_flags;
+            if ((releaseFlags & WIDGET_FLAG_SELECTED) != 0) {
+                releaseFlags &= ~WIDGET_FLAG_SELECTED;
+                m_flags = releaseFlags;
                 Draw();
                 gpWindowManager->UpdateScreenRegion(m_x + m_owner->m_posX,
                                                     m_y + m_owner->m_posY, m_width, m_height);
@@ -229,9 +240,12 @@ int button::Main(tag_message &msg)
         return 0;
     }
 
-    case MESSAGE_LEFT_BUTTON_UP:
-        if ((m_flags & WIDGET_FLAG_DRAW) != 0 && (m_flags & WIDGET_FLAG_SELECTED) != 0) {
-            m_flags &= ~WIDGET_FLAG_SELECTED;
+    case MESSAGE_LEFT_BUTTON_UP: {
+        short releaseFlags = m_flags;
+        if ((releaseFlags & WIDGET_FLAG_DRAW) != 0 &&
+            (releaseFlags & WIDGET_FLAG_SELECTED) != 0) {
+            releaseFlags &= ~WIDGET_FLAG_SELECTED;
+            m_flags = releaseFlags;
             Draw();
             gpWindowManager->UpdateScreenRegion(m_x + m_owner->m_posX,
                                                 m_y + m_owner->m_posY, m_width, m_height);
@@ -243,9 +257,10 @@ int button::Main(tag_message &msg)
             return 2;
         }
         goto normalEvent;
+    }
 
     case MESSAGE_WIDGET:
-        if (msg.payload.widget.command == BUTTON_COMMAND_REPLACE_ICON) {
+        if (msg.payload.widget.command == WIDGET_COMMAND_REPLACE_ICON) {
             if (msg.payload.widget.id == m_iconId) {
                 m_iconId = msg.payload.widget.data.value;
                 gpResourceManager->Dispose(m_icon);
@@ -264,17 +279,21 @@ normalEvent:
 }
 
 // @match-note
-// In the exact-alias TU state the message tail is exact; the remaining divergence is
-// coordinate register allocation. Cached/direct owner access, X/Y declaration order,
-// and split/combined additions were tried. Direct X-then-Y sums plus the positive
-// m_selectMode arm establish the retained 94.72% source-hash maximum. Revisit only
-// after a real TU/header-state change or in the >=95% last-mile phase.
+// Candidate is 0x95 versus retail 0x96. The first divergence is the coordinate setup
+// at +0x0a: retail starts m_y in CX, completes X in DX, then adds owner Y to CX;
+// candidate loads both owner coordinates first. Everything from DrawToBuffer onward
+// is instruction-identical after the one-byte shift. All 6 ordered relocations agree
+// in type and target except the proven gButtonRepeatTime interior-label name. Cached
+// and direct owner access, X/Y declaration order, staged Y, and split/combined sums
+// were tried. Revisit after a real predecessor/header TU-state change; this is not a
+// byte-proven early stop.
 VA(0x004ddc70, 0x96)
 short button::Select(struct tag_message &msg)
 {
-    short x = static_cast<short>(m_owner->m_posX + m_x);
-    short y = static_cast<short>(m_owner->m_posY + m_y);
-    m_icon->DrawToBuffer(x, y, m_normalFrame, 0);
+    heroWindow *window = m_owner;
+    short x = static_cast<short>(window->m_posX + m_x);
+    short y = static_cast<short>(window->m_posY + m_y);
+    m_icon->DrawToBuffer(x, y, m_pressedFrame, 0);
     gpWindowManager->UpdateScreenRegion(x, y, m_width, m_height);
     m_flags |= WIDGET_FLAG_SELECTED;
     msg.type = MESSAGE_WIDGET;
@@ -290,9 +309,13 @@ short button::Select(struct tag_message &msg)
 }
 
 // @match-note
-// Base and retail are 0x83 with 4/4 relocations and two relocation-masked byte
-// differences. Only the vptr/store/this three-instruction schedule differs; the
-// virtual call and every later message byte are exact. Revisit in the >=95% phase.
+// Candidate and retail are both 0x83. The only non-relocation byte spans are
+// +0x19..+0x1a and +0x1f..+0x20: candidate stores m_flags, sets this, then loads the
+// vptr; retail loads the vptr, stores m_flags, then sets this. The virtual call and
+// every later byte are exact, as are all 4 ordered relocation offsets/types/targets.
+// Direct/combined flag stores, a 40-iteration libclang AST pass, and 24 guarded
+// TU-state probes produced no change or exact closure. Revisit after a real
+// predecessor/header TU-state change; this is not a byte-proven early stop.
 VA(0x004ddd10, 0x83)
 short button::Deselect(struct tag_message &msg)
 {
@@ -318,11 +341,11 @@ void button::Draw(void)
     heroWindow *win = m_owner;
     if ((m_flags & WIDGET_FLAG_SELECTED) != 0) {
         m_icon->DrawToBuffer(m_x + win->m_posX, m_y + win->m_posY,
-                                 m_normalFrame, 0);
+                                 m_pressedFrame, 0);
         return;
     }
     m_icon->DrawToBuffer(m_x + win->m_posX, m_y + win->m_posY,
-                             m_pressedFrame, 0);
+                             m_normalFrame, 0);
 }
 
 
