@@ -19,6 +19,14 @@
 #include <SOURCE/searchArray.h>
 #include <SOURCE/town.h>
 
+// @semantic live 99.75%: semantics, CFG, the 0x168 frame/local slots, and all
+// 29/29 effective relocation targets agree. Typed flattened army indexing fixed
+// the six repeated address-generation residuals. The first remaining code
+// difference is at +0x8ad: ours compares the ratio with retreatChance and then
+// stores retreatThreshold (`fcom; fstp`), while retail stores the threshold and
+// then compares (`fst; fcomp`). Splitting the threshold assignment from the
+// condition emitted the same sequence. Pooled floating-constant symbol names
+// differ, but their values/targets agree. Revisit after the 95% phase switch.
 VA(0x004c0790, 0x8d7)
 int combatManager::AICheckRetreat(void)
 {
@@ -72,17 +80,30 @@ int combatManager::AICheckRetreat(void)
         for (armyIndex36 = 0;
              armyIndex36 < COMBAT_AI_ARMY_SLOT_COUNT;
              armyIndex36++) {
-            if (m_armies[side9][armyIndex36].IsAlive()) {
+            if ((m_armies[0] +
+                 side9 * COMBAT_ARMY_STORAGE_SLOT_COUNT +
+                 armyIndex36)->IsAlive()) {
                 armyGroupPtr1->m_creatureTypes[groupCount8] =
-                    static_cast<signed char>(m_armies[side9][armyIndex36].m_monsterType);
-                if ((m_armies[side9][armyIndex36].m_monster.flags.all &
-                     MONSTER_FLAGS_FULL_AI_QUANTITY) != 0) {
+                    static_cast<signed char>(
+                        (m_armies[0] +
+                         side9 * COMBAT_ARMY_STORAGE_SLOT_COUNT +
+                         armyIndex36)->m_monsterType);
+                if (((m_armies[0] +
+                      side9 * COMBAT_ARMY_STORAGE_SLOT_COUNT +
+                      armyIndex36)->m_monster.flags.abilityFlags &
+                     MONSTER_ABILITY_FLAG_FULL_AI_QUANTITY) != 0) {
                     armyGroupPtr1->m_creatureCounts[groupCount8] =
-                        static_cast<short>(m_armies[side9][armyIndex36].m_quantity);
+                        static_cast<short>(
+                            (m_armies[0] +
+                             side9 * COMBAT_ARMY_STORAGE_SLOT_COUNT +
+                             armyIndex36)->m_quantity);
                 } else {
                     armyGroupPtr1->m_creatureCounts[groupCount8] = static_cast<short>(
-                        static_cast<int>(m_armies[side9][armyIndex36].m_quantity *
-                                         COMBAT_AI_QUANTITY_ESTIMATE));
+                        static_cast<int>(
+                            (m_armies[0] +
+                             side9 * COMBAT_ARMY_STORAGE_SLOT_COUNT +
+                             armyIndex36)->m_quantity *
+                            COMBAT_AI_QUANTITY_ESTIMATE));
                 }
                 groupCount8++;
             }
@@ -170,6 +191,16 @@ int combatManager::AICheckRetreat(void)
     return 0;
 }
 
+// @semantic live 97.08% (observed 97.14% before later TU-state movement): the
+// complete 0xb4 frame, local slots, behavior, and all 92/92 relocation targets
+// agree. Both sides have 923 non-jump instructions; current non-jump residuals
+// are operand order at +0x25c in the five-mask OR and +0x5bf in a strength
+// comparison. Retail is net 27 five-byte /Ob1 continuation jumps larger.
+// Right-nesting the OR reduced its peak-state residual from five loads to three;
+// left association was worse. Combining the independent AttemptAttack guards
+// into OR chains fell to 86.27% and was restored. Typed flattened army indexing
+// removed all six raw-offset address blocks. Revisit after 95% once TU state is
+// stable; do not repeat these spellings beforehand.
 VA(0x004c1067, 0x129c)
 void combatManager::DoCompAI(int)
 {
@@ -224,9 +255,12 @@ void combatManager::DoCompAI(int)
     shooterStrengths37[m_currentSide] = GetStrength(m_currentSide, shooterMasks6[m_currentSide]);
     shooterStrengths37[enemySide12] = GetStrength(enemySide12, shooterMasks6[enemySide12]);
     totalArmyStrength11 = GetStrength(
-        m_currentSide, shooterMasks6[m_currentSide] | flyerMasks14[m_currentSide] |
-                           walkerMasks15[m_currentSide] | outOfItMasks15[m_currentSide] |
-                           traitorMasks13[m_currentSide]);
+        m_currentSide,
+        shooterMasks6[m_currentSide] |
+            (flyerMasks14[m_currentSide] |
+             (walkerMasks15[m_currentSide] |
+              (outOfItMasks15[m_currentSide] |
+               traitorMasks13[m_currentSide]))));
     fifthArmyStrength5 =
         static_cast<int>(totalArmyStrength11 + COMBAT_AI_STRENGTH_ROUNDING) /
         COMBAT_AI_STRENGTH_FRACTION;
@@ -301,13 +335,14 @@ void combatManager::DoCompAI(int)
         static_cast<int>(currentShooterStrength5))
         enemyStronger3 = 1;
 
-    if ((currentArmy9->m_monster.flags.all & MONSTER_FLAGS_SHOOTER) != 0) {
+    if ((currentArmy9->m_monster.flags.abilityFlags &
+         MONSTER_ABILITY_FLAG_SHOOTER) != 0) {
         if (currentArmy9->m_monster.shots > 0)
             attackType3 = COMBAT_AI_ATTACK_SHOOT;
         else
             attackType3 = COMBAT_AI_ATTACK_WALK;
-    } else if ((currentArmy9->m_monster.flags.all &
-                MONSTER_FLAGS_FLYING) != 0) {
+    } else if ((currentArmy9->m_monster.flags.abilityFlags &
+                MONSTER_ABILITY_FLAG_FLYING) != 0) {
         attackType3 = COMBAT_AI_ATTACK_FLY;
     } else {
         attackType3 = COMBAT_AI_ATTACK_WALK;
@@ -326,10 +361,8 @@ void combatManager::DoCompAI(int)
         if (targetArmy16 != -1) {
             giNextAction = COMBAT_AI_ACTION_MOVE;
             giNextActionGridIndex =
-                (reinterpret_cast<army *>(
-                     reinterpret_cast<unsigned char *>(m_armies) +
-                     enemySide12 * sizeof(m_armies[0])) +
-                 targetArmy16)
+                (m_armies[0] + targetArmy16 +
+                 enemySide12 * COMBAT_ARMY_STORAGE_SLOT_COUNT)
                     ->m_hex;
             goto finish;
         }
@@ -337,10 +370,8 @@ void combatManager::DoCompAI(int)
         if (targetArmy16 != -1) {
             giNextAction = COMBAT_AI_ACTION_MOVE;
             giNextActionGridIndex =
-                (reinterpret_cast<army *>(
-                     reinterpret_cast<unsigned char *>(m_armies) +
-                     enemySide12 * sizeof(m_armies[0])) +
-                 targetArmy16)
+                (m_armies[0] + targetArmy16 +
+                 enemySide12 * COMBAT_ARMY_STORAGE_SLOT_COUNT)
                     ->m_hex;
             goto finish;
         }
@@ -348,10 +379,8 @@ void combatManager::DoCompAI(int)
         if (targetArmy16 != -1) {
             giNextAction = COMBAT_AI_ACTION_MOVE;
             giNextActionGridIndex =
-                (reinterpret_cast<army *>(
-                     reinterpret_cast<unsigned char *>(m_armies) +
-                     enemySide12 * sizeof(m_armies[0])) +
-                 targetArmy16)
+                (m_armies[0] + targetArmy16 +
+                 enemySide12 * COMBAT_ARMY_STORAGE_SLOT_COUNT)
                     ->m_hex;
             goto finish;
         }
@@ -360,10 +389,8 @@ void combatManager::DoCompAI(int)
             if (targetArmy16 != -1) {
                 giNextAction = COMBAT_AI_ACTION_MOVE;
                 giNextActionGridIndex =
-                    (reinterpret_cast<army *>(
-                         reinterpret_cast<unsigned char *>(m_armies) +
-                         enemySide12 * sizeof(m_armies[0])) +
-                     targetArmy16)
+                    (m_armies[0] + targetArmy16 +
+                     enemySide12 * COMBAT_ARMY_STORAGE_SLOT_COUNT)
                         ->m_hex;
                 goto finish;
             }
@@ -372,10 +399,8 @@ void combatManager::DoCompAI(int)
         if (targetArmy16 != -1) {
             giNextAction = COMBAT_AI_ACTION_MOVE;
             giNextActionGridIndex =
-                (reinterpret_cast<army *>(
-                     reinterpret_cast<unsigned char *>(m_armies) +
-                     enemySide12 * sizeof(m_armies[0])) +
-                 targetArmy16)
+                (m_armies[0] + targetArmy16 +
+                 enemySide12 * COMBAT_ARMY_STORAGE_SLOT_COUNT)
                     ->m_hex;
             goto finish;
         }
@@ -383,10 +408,8 @@ void combatManager::DoCompAI(int)
         if (targetArmy16 != -1) {
             giNextAction = COMBAT_AI_ACTION_MOVE;
             giNextActionGridIndex =
-                (reinterpret_cast<army *>(
-                     reinterpret_cast<unsigned char *>(m_armies) +
-                     enemySide12 * sizeof(m_armies[0])) +
-                 targetArmy16)
+                (m_armies[0] + targetArmy16 +
+                 enemySide12 * COMBAT_ARMY_STORAGE_SLOT_COUNT)
                     ->m_hex;
             goto finish;
         }
@@ -487,10 +510,12 @@ float combatManager::GetModLichDamage(class army *target, float damage)
 
     if (remainingHitPoints < modifiedDamage)
         modifiedDamage = remainingHitPoints;
-    if ((target->m_monster.flags.all & MONSTER_FLAGS_SHOOTER) != 0)
+    if ((target->m_monster.flags.abilityFlags &
+         MONSTER_ABILITY_FLAG_SHOOTER) != 0)
         modifiedDamage = static_cast<float>(
             modifiedDamage * COMBAT_AI_LICH_PRIORITY_MULTIPLIER);
-    if ((target->m_monster.flags.all & MONSTER_FLAGS_FLYING) != 0)
+    if ((target->m_monster.flags.abilityFlags &
+         MONSTER_ABILITY_FLAG_FLYING) != 0)
         modifiedDamage = static_cast<float>(
             modifiedDamage * COMBAT_AI_LICH_PRIORITY_MULTIPLIER);
     modifiedDamage = static_cast<float>(
@@ -508,7 +533,7 @@ void combatManager::DoLichShot(class army *lich)
     float lichDamage5 = static_cast<float>(
         lich->m_quantity * COMBAT_AI_LICH_DAMAGE_PER_CREATURE);
     int armyIndex37;
-    unsigned char damaged19[COMBAT_AI_SIDE_COUNT][COMBAT_AI_ARMY_SLOT_COUNT];
+    unsigned char damaged19[COMBAT_AI_SIDE_COUNT * COMBAT_AI_ARMY_SLOT_COUNT];
     float damageValue10;
     float adjacentDamage6;
     int direction37;
@@ -520,44 +545,47 @@ void combatManager::DoLichShot(class army *lich)
          armyIndex37 < m_armyCount[COMBAT_DEFENDER_SIDE - m_currentSide];
          armyIndex37++) {
         memset(damaged19, 0, sizeof(damaged19));
-        target17 = 0;
+        damageValue10 = 0;
         target17 = &m_armies[COMBAT_DEFENDER_SIDE - m_currentSide][armyIndex37];
-        if (target17 != 0 &&
+        if (target17 == 0 ||
             (target17->m_monster.flags.abilityFlags &
-             MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0) {
-            if (target17->m_quantity <= 0) {
-            } else {
-                damageValue10 = GetModLichDamage(target17, lichDamage5);
-                damaged19[target17->m_side][target17->m_index] = 1;
-                targetHex36 = target17->m_hex;
-                for (direction37 = 0;
-                     direction37 < COMBAT_AI_ADJACENT_DIRECTION_COUNT;
-                     direction37++) {
-                    adjacentHex13 = GetAdjacentCellIndexNoArmy(targetHex36, direction37);
-                    if (adjacentHex13 >= 0 && adjacentHex13 < COMBAT_HEX_COUNT &&
-                        m_hexCells[adjacentHex13].m_occupantSide != -1 &&
-                        m_hexCells[adjacentHex13].m_occupantIndex != -1 &&
-                        damaged19[m_hexCells[adjacentHex13].m_occupantSide]
-                               [m_hexCells[adjacentHex13].m_occupantIndex] == 0) {
-                        adjacentDamage6 = GetModLichDamage(
-                            &m_armies[m_hexCells[adjacentHex13].m_occupantSide]
-                                     [m_hexCells[adjacentHex13].m_occupantIndex],
-                            lichDamage5);
-                        damaged19[m_hexCells[adjacentHex13].m_occupantSide]
-                               [m_hexCells[adjacentHex13].m_occupantIndex] = 1;
-                        if (m_hexCells[adjacentHex13].m_occupantSide == m_currentSide)
-                            damageValue10 -= adjacentDamage6;
-                        else
-                            damageValue10 += adjacentDamage6;
-                    }
-                }
-                if (bestArmy12 == COMBAT_AI_NO_ARMY || bestDamage15 < damageValue10) {
-                    bestDamage15 = damageValue10;
-                    bestArmy12 = armyIndex37;
-                    giNextAction = COMBAT_AI_ACTION_MOVE;
-                    giNextActionGridIndex = targetHex36;
-                }
+             MONSTER_ABILITY_FLAG_AI_EXCLUDED) != 0 ||
+            target17->m_quantity <= 0)
+            continue;
+        damageValue10 = GetModLichDamage(target17, lichDamage5);
+        damaged19[target17->m_side * COMBAT_AI_ARMY_SLOT_COUNT +
+                  target17->m_index] = 1;
+        targetHex36 = target17->m_hex;
+        for (direction37 = 0;
+             direction37 < COMBAT_AI_ADJACENT_DIRECTION_COUNT;
+             direction37++) {
+            adjacentHex13 = GetAdjacentCellIndexNoArmy(targetHex36, direction37);
+            if (adjacentHex13 >= 0 && adjacentHex13 < COMBAT_HEX_COUNT &&
+                m_hexCells[adjacentHex13].m_occupantSide != -1 &&
+                m_hexCells[adjacentHex13].m_occupantIndex != -1 &&
+                damaged19[
+                    m_hexCells[adjacentHex13].m_occupantSide *
+                        COMBAT_AI_ARMY_SLOT_COUNT +
+                    m_hexCells[adjacentHex13].m_occupantIndex] == 0) {
+                adjacentDamage6 = GetModLichDamage(
+                    &m_armies[m_hexCells[adjacentHex13].m_occupantSide]
+                             [m_hexCells[adjacentHex13].m_occupantIndex],
+                    lichDamage5);
+                damaged19[
+                    m_hexCells[adjacentHex13].m_occupantSide *
+                        COMBAT_AI_ARMY_SLOT_COUNT +
+                    m_hexCells[adjacentHex13].m_occupantIndex] = 1;
+                if (m_hexCells[adjacentHex13].m_occupantSide == m_currentSide)
+                    damageValue10 -= adjacentDamage6;
+                else
+                    damageValue10 += adjacentDamage6;
             }
+        }
+        if (bestArmy12 == COMBAT_AI_NO_ARMY || bestDamage15 < damageValue10) {
+            bestDamage15 = damageValue10;
+            bestArmy12 = armyIndex37;
+            giNextAction = COMBAT_AI_ACTION_MOVE;
+            giNextActionGridIndex = targetHex36;
         }
     }
 }
@@ -575,7 +603,8 @@ int combatManager::GetShooterMask(int side)
         if (currentArmy10 != 0 &&
             (currentArmy10->m_monster.flags.abilityFlags &
              MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0 &&
-            (currentArmy10->m_monster.flags.all & MONSTER_FLAGS_SHOOTER) != 0 &&
+            (currentArmy10->m_monster.flags.abilityFlags &
+             MONSTER_ABILITY_FLAG_SHOOTER) != 0 &&
             currentArmy10->m_monster.shots > 0 &&
             currentArmy10->m_spellInfluence[SPELL_INFLUENCE_BLIND] == 0 &&
             currentArmy10->m_spellInfluence[SPELL_INFLUENCE_PARALYZE] == 0 &&
@@ -620,9 +649,10 @@ int combatManager::GetFlyerMask(int side)
     for (armyIndex2 = 0; armyIndex2 < m_armyCount[side]; armyIndex2++) {
         currentArmy10 = m_armies[side] + armyIndex2;
         if (currentArmy10 != 0 &&
-            (currentArmy10->m_monster.flags.all &
-             MONSTER_FLAGS_AI_EXCLUDED) == 0 &&
-            (currentArmy10->m_monster.flags.all & MONSTER_FLAGS_FLYING) != 0 &&
+            (currentArmy10->m_monster.flags.abilityFlags &
+             MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0 &&
+            (currentArmy10->m_monster.flags.abilityFlags &
+             MONSTER_ABILITY_FLAG_FLYING) != 0 &&
             currentArmy10->m_spellInfluence[SPELL_INFLUENCE_BLIND] == 0 &&
             currentArmy10->m_spellInfluence[SPELL_INFLUENCE_PARALYZE] == 0 &&
             currentArmy10->m_spellInfluence[SPELL_INFLUENCE_MIRROR_IMAGE] == 0 &&
@@ -668,11 +698,13 @@ int combatManager::GetWalkerMask(int side)
     for (armyIndex2 = 0; armyIndex2 < m_armyCount[side]; armyIndex2++) {
         currentArmy10 = m_armies[side] + armyIndex2;
         if (currentArmy10 != 0 &&
-            (currentArmy10->m_monster.flags.all &
-             MONSTER_FLAGS_AI_EXCLUDED) == 0 &&
-            (currentArmy10->m_monster.flags.all & MONSTER_FLAGS_FLYING) == 0 &&
-            ((currentArmy10->m_monster.flags.all & MONSTER_FLAGS_SHOOTER) == 0 ||
-             currentArmy10->m_monster.shots < 1) &&
+            (currentArmy10->m_monster.flags.abilityFlags &
+             MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0 &&
+            (currentArmy10->m_monster.flags.abilityFlags &
+             MONSTER_ABILITY_FLAG_FLYING) == 0 &&
+            ((currentArmy10->m_monster.flags.abilityFlags &
+              MONSTER_ABILITY_FLAG_SHOOTER) == 0 ||
+             currentArmy10->m_monster.shots <= 0) &&
             currentArmy10->m_spellInfluence[SPELL_INFLUENCE_BLIND] == 0 &&
             currentArmy10->m_spellInfluence[SPELL_INFLUENCE_PARALYZE] == 0 &&
             currentArmy10->m_spellInfluence[SPELL_INFLUENCE_MIRROR_IMAGE] == 0 &&
@@ -695,8 +727,8 @@ int combatManager::GetOutOfItMask(int side)
     for (armyIndex2 = 0; armyIndex2 < m_armyCount[side]; armyIndex2++) {
         currentArmy10 = m_armies[side] + armyIndex2;
         if (currentArmy10 != 0 &&
-            (currentArmy10->m_monster.flags.all &
-             MONSTER_FLAGS_AI_EXCLUDED) == 0 &&
+            (currentArmy10->m_monster.flags.abilityFlags &
+             MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0 &&
             (currentArmy10->m_spellInfluence[SPELL_INFLUENCE_BLIND] != 0 ||
              currentArmy10->m_spellInfluence[SPELL_INFLUENCE_PARALYZE] != 0 ||
              currentArmy10->m_spellInfluence[SPELL_INFLUENCE_MIRROR_IMAGE] != 0))
@@ -782,34 +814,44 @@ int combatManager::GetWorstArmy(int side, int mask)
     return worstArmy6;
 }
 
+// @semantic retained 99.25%, observed 99.44%, live 93.71% after the exact
+// DoLichShot reconstruction moved TU-cumulative codegen: semantics, CFG, the
+// 0x1c frame and every slot are complete (closestValue -0x4, value -0x8, bit
+// -0xc, armyIndex -0x10, closestArmy -0x14, target -0x18, this -0x1c), with
+// both relocation targets agreeing. The current first residual at +0x59 scales
+// side before armyIndex while retail scales armyIndex first; +0x140 reverses the
+// two compare loads. Direct indexing and typed flattened expressions in both
+// term orders emitted the same address order; `closestValue > value` and
+// `value < closestValue` emitted the same compare. Revisit only after 95% and
+// stable TU state.
 VA(0x004c307d, 0x16f)
 int combatManager::GetClosestArmy(class army *currentArmy, int side, int mask)
 {
-    unsigned int bit = COMBAT_AI_MASK_FIRST_BIT;
-    int closestValue = COMBAT_AI_CLOSEST_ARMY_LIMIT;
-    int closestArmy = COMBAT_AI_NO_ARMY;
-    int armyIndex = 0;
-    int value;
-    army *target;
+    int armyIndex2 = 0;
+    unsigned int bit1 = COMBAT_AI_MASK_FIRST_BIT;
+    int closestValue29 = COMBAT_AI_CLOSEST_ARMY_LIMIT;
+    int closestArmy7 = COMBAT_AI_NO_ARMY;
+    int value19;
+    army *target26;
 
-    for (armyIndex = 0; armyIndex < m_armyCount[side]; armyIndex++) {
-        if ((mask & bit) != 0) {
-            target = armyIndex + m_armies[side];
-            value = gpSearchArray->QuickDistance(
+    for (armyIndex2 = 0; armyIndex2 < m_armyCount[side]; armyIndex2++) {
+        if ((mask & bit1) != 0) {
+            target26 = &m_armies[side][armyIndex2];
+            value19 = gpSearchArray->QuickDistance(
                 m_hexCells[currentArmy->m_hex].m_x,
                 m_hexCells[currentArmy->m_hex].m_y,
-                m_hexCells[target->m_hex].m_x,
-                m_hexCells[target->m_hex].m_y);
-            value = value * COMBAT_AI_DISTANCE_WEIGHT -
-                target->m_monster.hitPoints * target->m_quantity;
-            if (closestValue > value) {
-                closestArmy = armyIndex;
-                closestValue = value;
+                m_hexCells[target26->m_hex].m_x,
+                m_hexCells[target26->m_hex].m_y);
+            value19 = value19 * COMBAT_AI_DISTANCE_WEIGHT -
+                target26->m_monster.hitPoints * target26->m_quantity;
+            if (value19 < closestValue29) {
+                closestArmy7 = armyIndex2;
+                closestValue29 = value19;
             }
         }
-        bit <<= 1;
+        bit1 <<= 1;
     }
-    return closestArmy;
+    return closestArmy7;
 }
 
 VA(0x004c31ec, 0xc1)
@@ -859,8 +901,8 @@ int combatManager::AttemptAttack(class army *currentArmy, int side, int mask)
             giNextActionGridIndex = targetHex;
             return 1;
         }
-        if (((targetArmy + m_armies[side])->m_monster.flags.all &
-             MONSTER_FLAGS_WIDE) != 0) {
+        if (((targetArmy + m_armies[side])->m_monster.flags.abilityFlags &
+             MONSTER_ABILITY_FLAG_WIDE) != 0) {
             if ((targetArmy + m_armies[side])->m_facing == 0)
                 targetHex--;
             else
@@ -877,42 +919,47 @@ int combatManager::AttemptAttack(class army *currentArmy, int side, int mask)
     return 0;
 }
 
+// @early-stop 99.12%: all 99 non-jump opcodes/operands, the 0x20 frame/local
+// slots, CFG, and all 6/6 external relocation targets agree. Retail's 0x182
+// code span is exactly five bytes larger than ours (0x17d): the sole residual
+// is its extra /Ob1 continuation `jmp` at +0x16f before the false return.
 VA(0x004c3468, 0x182)
 int combatManager::AttemptAdjacentAttack(class army *currentArmy)
 {
-    unsigned int availableMask = ~currentArmy->GetAttackMask(
+    unsigned int availableMask4 = ~currentArmy->GetAttackMask(
         currentArmy->m_hex, 1, -1);
-    unsigned int bit;
-    unsigned int targetMask;
-    int direction;
-    int attackHexes[2];
-    int targetArmy;
+    unsigned int bit0;
+    unsigned int targetMask29;
+    int direction36;
+    int attackHexes5[2];
+    int targetArmy15;
 
-    if (availableMask == 0)
+    if (availableMask4 == 0)
         return 0;
 
-    bit = COMBAT_AI_MASK_FIRST_BIT;
-    targetMask = 0;
-    for (direction = 0;
-         direction < COMBAT_AI_ATTACK_DIRECTION_COUNT;
-         direction++) {
-        if ((availableMask & bit) != 0 &&
-            currentArmy->ValidAttack(currentArmy->m_hex, direction,
-                                     1, -1, attackHexes) &&
-            attackHexes[0] >= 0)
-            targetMask |= 1 << m_hexCells[attackHexes[0]].m_occupantIndex;
-        bit <<= 1;
+    bit0 = COMBAT_AI_MASK_FIRST_BIT;
+    targetMask29 = 0;
+    for (direction36 = 0;
+         direction36 < COMBAT_AI_ATTACK_DIRECTION_COUNT;
+         direction36++) {
+        if ((availableMask4 & bit0) != 0 &&
+            currentArmy->ValidAttack(currentArmy->m_hex, direction36,
+                                     1, -1, attackHexes5) &&
+            attackHexes5[0] >= 0)
+            targetMask29 |=
+                1 << m_hexCells[attackHexes5[0]].m_occupantIndex;
+        bit0 <<= 1;
     }
     if (currentArmy->m_monsterType == ARMY_CREATURE_GHOST)
-        targetArmy = GetWorstArmy(
-            COMBAT_DEFENDER_SIDE - m_currentSide, targetMask);
+        targetArmy15 = GetWorstArmy(
+            COMBAT_DEFENDER_SIDE - m_currentSide, targetMask29);
     else
-        targetArmy = GetBestArmy(
-            COMBAT_DEFENDER_SIDE - m_currentSide, targetMask);
-    if (targetArmy != COMBAT_AI_NO_ARMY) {
+        targetArmy15 = GetBestArmy(
+            COMBAT_DEFENDER_SIDE - m_currentSide, targetMask29);
+    if (targetArmy15 != COMBAT_AI_NO_ARMY) {
         giNextAction = COMBAT_AI_ACTION_MOVE;
         giNextActionGridIndex =
-            m_armies[COMBAT_DEFENDER_SIDE - m_currentSide][targetArmy].m_hex;
+            m_armies[COMBAT_DEFENDER_SIDE - m_currentSide][targetArmy15].m_hex;
         return 1;
     }
     return 0;
@@ -938,8 +985,8 @@ int combatManager::WalkTowardArmyFront(class army *currentArmy,
 
     frontOffset13 = 1;
     targetHex7 = (targetArmy6 + m_armies[side])->m_hex;
-    if (((targetArmy6 + m_armies[side])->m_monster.flags.all &
-         MONSTER_FLAGS_WIDE) != 0)
+    if (((targetArmy6 + m_armies[side])->m_monster.flags.abilityFlags &
+         MONSTER_ABILITY_FLAG_WIDE) != 0)
         frontOffset13 = 2;
     if (currentArmy->m_facing == 1)
         targetHex7 += frontOffset13;
@@ -1011,7 +1058,8 @@ int combatManager::WalkTowardArmy(class army *currentArmy, int side, int mask)
         currentArmy->m_hex, targetHex7, currentArmy,
         COMBAT_AI_PATH_TO_TARGET, 0);
     if (pathFound5 == 0 &&
-        (targetPtr9->m_monster.flags.all & MONSTER_FLAGS_WIDE) != 0) {
+        (targetPtr9->m_monster.flags.abilityFlags &
+         MONSTER_ABILITY_FLAG_WIDE) != 0) {
         switch (targetPtr9->m_facing) {
         case 0:
             targetHex7--;
