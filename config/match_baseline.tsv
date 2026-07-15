@@ -209,7 +209,7 @@ BASE/Misc	?BitmapToScreen@@YIXPAVbitmap@@@Z	100.0000	ddaa22cc3922
 BASE/Misc	?BlitBitmapToScreen@@YIXPAVbitmap@@HHHHHH@Z	98.3704	9272c84ef61d
 BASE/Misc	?BlitBitmapToScreenNoMouseCheck@@YIXPAVbitmap@@HHHHHH@Z	100.0000	fdea32be7502
 BASE/Misc	?CreatePCXFile@@YIXPADPAEHH1@Z	98.3108	4281db990423
-BASE/Misc	?DataEntryWindowHandler@@YIHAAUtag_message@@@Z	93.7963	61b5c14065b5
+BASE/Misc	?DataEntryWindowHandler@@YIHAAUtag_message@@@Z	98.8889	31ae34d532fa
 BASE/Misc	?FadeIn@@YIXH@Z	97.4074	f79b9f04de07
 BASE/Misc	?FadeOut@@YIXH@Z	100.0000	501727236f25
 BASE/Misc	?FadeTo@@YIXPAE0H@Z	95.1169	9d800a35a5ba
@@ -219,7 +219,7 @@ BASE/Misc	?FindIndex@@YIHPAUindexArray@@HHH@Z	98.3333	9725ba6bfb31
 BASE/Misc	?FindLastToken@@YIPADPADD@Z	100.0000	b6990f2c3e5a
 BASE/Misc	?FindStringInString@@YIPADPAD0@Z	100.0000	ed4d5700c2ac
 BASE/Misc	?FindToken@@YIPADPADD@Z	99.6552	76e38f6285ed
-BASE/Misc	?GetDataEntry@@YIXPAD0H0HH@Z	99.1020	a4fc3f71f211
+BASE/Misc	?GetDataEntry@@YIXPAD0H0HH@Z	99.1020	d801af2bfa94
 BASE/Misc	?GetIconEntry@@YIPAUIconEntry@@PAVicon@@H@Z	100.0000	9cfdfb80be11
 BASE/Misc	?InitMemEntry@@YIXXZ	100.0000	c4affdfb9125
 BASE/Misc	?IsCDDrive@@YIHH@Z	100.0000	72b1e342be60
@@ -238,7 +238,7 @@ BASE/Misc	?ReadPrefsFromRegistry@@YIXXZ	100.0000	4138e2c5e940
 BASE/Misc	?SGenRand@@YIHXZ	90.6364	8110dca71695
 BASE/Misc	?SIncRandomize@@YIXHH@Z	54.8125	1d7f5f60b706
 BASE/Misc	?SRand@@YIXH@Z	100.0000	48faf7bbdee5
-BASE/Misc	?SRandom@@YIHHH@Z	91.8667	ce041a60fc47
+BASE/Misc	?SRandom@@YIHHH@Z	91.8667	0814d629c755
 BASE/Misc	?SetGameDefaults@@YIXXZ	95.3684	be708eae6dc2
 BASE/Misc	?SetInstallDefaults@@YIXXZ	100.0000	eae265fd46e2
 BASE/Misc	?SetPalette@@YIXPACH@Z	100.0000	cac530879e68
