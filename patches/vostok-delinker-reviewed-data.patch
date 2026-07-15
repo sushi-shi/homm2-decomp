@@ -1,0 +1,405 @@
+diff --git a/src/data_manifest.rs b/src/data_manifest.rs
+new file mode 100644
+--- /dev/null
++++ b/src/data_manifest.rs
+@@ -0,0 +1,163 @@
++use pdb2::RawString;
++
++use std::collections::HashSet;
++use std::path::Path;
++
++#[derive(Clone, Copy, Debug, Eq, PartialEq)]
++pub enum DataStorage {
++    Data,
++    Rdata,
++    Bss,
++}
++
++#[derive(Clone, Copy, Debug)]
++pub struct DataDefinition {
++    pub name: RawString<'static>,
++    pub object: &'static [u8],
++    pub rva: usize,
++    pub size: usize,
++    pub storage: DataStorage,
++    pub alignment: u64,
++}
++
++#[derive(Default)]
++pub struct DataManifest {
++    definitions: Vec<DataDefinition>,
++    names: HashSet<&'static [u8]>,
++}
++
++impl DataManifest {
++    pub fn load(path: Option<&Path>) -> anyhow::Result<Self> {
++        let Some(path) = path else {
++            return Ok(Self::default());
++        };
++        let bytes = std::fs::read(path)?;
++        let mut definitions = Vec::new();
++        let mut names = HashSet::new();
++        let mut rvas = HashSet::new();
++        for (line_index, line) in bytes.split(|byte| *byte == b'\n').enumerate() {
++            let line = line.strip_suffix(b"\r").unwrap_or(line);
++            if line.is_empty() || line.starts_with(b"#") {
++                continue;
++            }
++            let columns = line.split(|byte| *byte == b'\t').collect::<Vec<_>>();
++            if columns.first() == Some(&b"name".as_slice()) {
++                continue;
++            }
++            if columns.len() < 7 {
++                anyhow::bail!("{}:{}: expected seven tab-separated columns", path.display(), line_index + 1);
++            }
++            let name: &'static [u8] = columns[0].to_vec().leak();
++            let object = std::str::from_utf8(columns[1])?.replace('/', "\\");
++            let rva = parse_number(columns[2])?;
++            let size = parse_number(columns[3])?;
++            if name.is_empty() || object.is_empty() || size == 0 {
++                anyhow::bail!("{}:{}: empty name/object or zero size", path.display(), line_index + 1);
++            }
++            if rva.checked_add(size).is_none() {
++                anyhow::bail!("{}:{}: data extent overflows the address space", path.display(), line_index + 1);
++            }
++            if object.split('\\').any(|part| part.is_empty() || part == "." || part == "..") {
++                anyhow::bail!("{}:{}: object path must be relative and normalized", path.display(), line_index + 1);
++            }
++            let storage = match columns[4] {
++                b"data" => DataStorage::Data,
++                b"rdata" => DataStorage::Rdata,
++                b"bss" => DataStorage::Bss,
++                value => anyhow::bail!(
++                    "{}:{}: unsupported storage {}",
++                    path.display(),
++                    line_index + 1,
++                    String::from_utf8_lossy(value)
++                ),
++            };
++            let alignment = parse_number(columns[5])? as u64;
++            if alignment == 0 || !alignment.is_power_of_two() {
++                anyhow::bail!("{}:{}: alignment is not a power of two", path.display(), line_index + 1);
++            }
++            if !names.insert(name) || !rvas.insert(rva) {
++                anyhow::bail!("{}:{}: duplicate data name or RVA", path.display(), line_index + 1);
++            }
++            let object: &'static [u8] = object.into_bytes().leak();
++            definitions.push(DataDefinition {
++                name: RawString::from(name),
++                object,
++                rva,
++                size,
++                storage,
++                alignment,
++            });
++        }
++        definitions.sort_by_key(|definition| (definition.object, definition.rva));
++        let mut by_rva = definitions.clone();
++        by_rva.sort_by_key(|definition| definition.rva);
++        for pair in by_rva.windows(2) {
++            if pair[0].rva.checked_add(pair[0].size).unwrap() > pair[1].rva {
++                anyhow::bail!("overlapping reviewed data definitions");
++            }
++        }
++        Ok(Self { definitions, names })
++    }
++
++    pub fn definitions(&self) -> &[DataDefinition] {
++        &self.definitions
++    }
++
++    pub fn contains_name(&self, name: &[u8]) -> bool {
++        self.names.contains(name)
++    }
++
++    pub fn owner_for_rva(&self, rva: usize) -> Option<DataDefinition> {
++        self.definitions.iter().copied().find(|definition| {
++            definition.rva <= rva && rva - definition.rva < definition.size
++        })
++    }
++}
++
++fn parse_number(value: &[u8]) -> anyhow::Result<usize> {
++    let value = std::str::from_utf8(value)?;
++    let result = match value.strip_prefix("0x") {
++        Some(hex) => usize::from_str_radix(hex, 16),
++        None => value.parse(),
++    }?;
++    Ok(result)
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    #[test]
++    fn parses_reviewed_definition() {
++        let path = std::env::temp_dir().join("vostok-data-manifest-test.tsv");
++        std::fs::write(
++            &path,
++            "name\tobject\trva\tsize\tstorage\talignment\tprovenance\n_table\tengine/world.c\t0xf0000\t0x20\tdata\t0x4\treviewed\n",
++        )
++        .unwrap();
++        let manifest = DataManifest::load(Some(&path)).unwrap();
++        let definition = manifest.definitions()[0];
++        assert_eq!(definition.name.as_bytes(), b"_table");
++        assert_eq!(definition.object, b"engine\\world.c");
++        assert_eq!(definition.rva, 0xf0000);
++        assert_eq!(definition.size, 0x20);
++        assert_eq!(definition.storage, DataStorage::Data);
++        assert_eq!(definition.alignment, 4);
++        assert!(manifest.contains_name(b"_table"));
++        assert_eq!(manifest.owner_for_rva(0xf0004).unwrap().name.as_bytes(), b"_table");
++        std::fs::remove_file(path).unwrap();
++    }
++
++    #[test]
++    fn rejects_overlapping_definitions() {
++        let path = std::env::temp_dir().join("vostok-overlapping-data-manifest-test.tsv");
++        std::fs::write(
++            &path,
++            "name\tobject\trva\tsize\tstorage\talignment\tprovenance\na\tu.c\t0x100\t0x20\tdata\t4\ttest\nb\tu.c\t0x110\t4\tdata\t4\ttest\n",
++        )
++        .unwrap();
++        let error = DataManifest::load(Some(&path)).err().unwrap().to_string();
++        assert!(error.contains("overlapping"));
++        std::fs::remove_file(path).unwrap();
++    }
++}
+diff --git a/src/main.rs b/src/main.rs
+--- a/src/main.rs
++++ b/src/main.rs
+@@ -2,0 +3 @@
++mod data_manifest;
+@@ -47,0 +49,4 @@
++
++    /// Reviewed public-data definitions to emit into their owning target objects.
++    #[arg(long, value_hint = clap::ValueHint::FilePath)]
++    pub data_manifest: Option<std::path::PathBuf>,
+@@ -75,0 +81 @@
++        data_manifest,
+@@ -98,0 +105 @@
++        data_manifest.as_deref(),
+@@ -111,0 +119 @@
++    data_manifest_path: Option<&std::path::Path>,
+@@ -115,0 +124 @@
++    let data_manifest = data_manifest::DataManifest::load(data_manifest_path)?;
+@@ -117 +126,2 @@
+-    let (coff_data, relocs_rva) = relocs::resolve_absolute_relocations(&env, exe, &pdb_symbols)?;
++    let (coff_data, relocs_rva) =
++        relocs::resolve_absolute_relocations(&env, exe, &pdb_symbols, &data_manifest)?;
+@@ -141,0 +152 @@
++        &data_manifest,
+diff --git a/src/object_files.rs b/src/object_files.rs
+--- a/src/object_files.rs
++++ b/src/object_files.rs
+@@ -0,0 +1 @@
++use crate::data_manifest::{DataDefinition, DataManifest, DataStorage};
+@@ -13,0 +15 @@
++use object::write::SymbolId;
+@@ -22,0 +25 @@
++    pub bss_section_id: Option<object::write::SectionId>,
+@@ -23,0 +27,2 @@
++    pub symbols: HashMap<Vec<u8>, SymbolId>,
++    pub data_offsets: HashMap<usize, ObjectOffset>,
+@@ -49,0 +55 @@
++        data_manifest: &DataManifest,
+@@ -57,0 +64,28 @@
++        for definition in data_manifest.definitions() {
++            let definition_end = definition.rva.checked_add(definition.size).unwrap();
++            let section = match definition.storage {
++                DataStorage::Rdata => env.rdata,
++                DataStorage::Data | DataStorage::Bss => env.data,
++            };
++            if definition.rva < section.rva || definition_end > section.rva + section.size {
++                anyhow::bail!("data manifest storage does not match the PE section");
++            }
++            let object_file = this
++                .objects
++                .entry(definition.object)
++                .or_insert_with(|| ObjectFile::empty(pad_empty_rdata));
++            object_file.add_data_definition(*definition, coff_data)?;
++        }
++        for definition in data_manifest.definitions() {
++            this.objects
++                .get_mut(definition.object)
++                .unwrap()
++                .add_data_relocations(
++                    *definition,
++                    matcher,
++                    coff_data,
++                    &relocs_rva,
++                    data_manifest,
++                )?;
++        }
++
+@@ -130,0 +165,2 @@
++                        data_manifest,
++                        true,
+@@ -190,0 +227 @@
++            bss_section_id: None,
+@@ -191,0 +229,2 @@
++            symbols: HashMap::new(),
++            data_offsets: HashMap::new(),
+@@ -354,0 +394,2 @@
++        data_manifest: &DataManifest,
++        materialize_target: bool,
+@@ -358,0 +400,9 @@
++        if !materialize_target || data_manifest.contains_name(reloc_name.as_bytes()) {
++            let relative = match reloc_kind {
++                RelocKind::Function { relative, .. } => relative,
++                _ => false,
++            };
++            self.add_relocation(reloc_name, ObjectLocation::Extern, reloc_offset, relative)?;
++            return Ok(());
++        }
++
+@@ -400,0 +451,2 @@
++                            data_manifest,
++                            true,
+@@ -430,0 +483,2 @@
++                            data_manifest,
++                            true,
+@@ -438,0 +493,90 @@
++
++    fn add_data_definition(
++        &mut self,
++        definition: DataDefinition,
++        coff_data: &[u8],
++    ) -> anyhow::Result<()> {
++        let definition_end = definition.rva.checked_add(definition.size)
++            .ok_or_else(|| anyhow::anyhow!("reviewed data definition extent overflows"))?;
++        if definition_end > coff_data.len() {
++            anyhow::bail!("reviewed data definition is outside mapped PE image");
++        }
++        let offset = match definition.storage {
++            DataStorage::Data => ObjectOffset {
++                offset: self.object.append_section_data(
++                    self.data_section_id,
++                    &coff_data[definition.rva..definition_end],
++                    definition.alignment,
++                ),
++                section_id: self.data_section_id,
++            },
++            DataStorage::Rdata => ObjectOffset {
++                offset: self.object.append_section_data(
++                    self.rdata_section_id,
++                    &coff_data[definition.rva..definition_end],
++                    definition.alignment,
++                ),
++                section_id: self.rdata_section_id,
++            },
++            DataStorage::Bss => {
++                let section_id = *self.bss_section_id.get_or_insert_with(|| {
++                    self.object.add_section(
++                        vec![], b".bss".into(), SectionKind::UninitializedData)
++                });
++                let offset = self.object.append_section_bss(
++                    section_id,
++                    definition.size.to_u64(),
++                    definition.alignment,
++                );
++                ObjectOffset {
++                    offset,
++                    section_id,
++                }
++            }
++        };
++        let symbol = self.object.add_symbol(object::write::Symbol {
++            name: definition.name.as_bytes().to_vec(),
++            value: offset.offset,
++            size: definition.size.to_u64(),
++            kind: object::SymbolKind::Data,
++            scope: object::SymbolScope::Linkage,
++            weak: false,
++            section: object::write::SymbolSection::Section(offset.section_id),
++            flags: object::SymbolFlags::None,
++        });
++        if self.symbols.insert(definition.name.as_bytes().to_vec(), symbol).is_some() {
++            anyhow::bail!("duplicate reviewed data definition in owner object");
++        }
++        self.data_offsets.insert(definition.rva, offset);
++        Ok(())
++    }
++
++    fn add_data_relocations(
++        &mut self,
++        definition: DataDefinition,
++        matcher: &SymbolMatcher,
++        coff_data: &[u8],
++        relocs_rva: &BTreeMap<usize, RelocKind>,
++        data_manifest: &DataManifest,
++    ) -> anyhow::Result<()> {
++        let definition_end = definition.rva.checked_add(definition.size).unwrap();
++        let offset = *self.data_offsets.get(&definition.rva).unwrap();
++        let sites = relocs_rva.range(definition.rva..definition_end);
++        if definition.storage == DataStorage::Bss && sites.clone().next().is_some() {
++            anyhow::bail!("reviewed BSS definition contains a PE base relocation");
++        }
++        for (reloc_rva, reloc_kind) in sites {
++            let mut visited = HashSet::new();
++            self.add_relocation_at(
++                *reloc_kind,
++                offset + (*reloc_rva - definition.rva),
++                matcher,
++                coff_data,
++                relocs_rva,
++                &mut visited,
++                data_manifest,
++                false,
++            )?;
++        }
++        Ok(())
++    }
+@@ -480,10 +624,14 @@
+-        let symbol = self.object.add_symbol(object::write::Symbol {
+-            name: name.as_bytes().to_vec(),
+-            value,
+-            size: u64::MAX,
+-            kind,
+-            scope: object::SymbolScope::Linkage,
+-            weak: false,
+-            section,
+-            flags: object::SymbolFlags::None,
+-        });
++        let symbol = if let Some(symbol) = self.symbols.get(name.as_bytes()) {
++            *symbol
++        } else {
++            self.object.add_symbol(object::write::Symbol {
++                name: name.as_bytes().to_vec(),
++                value,
++                size: u64::MAX,
++                kind,
++                scope: object::SymbolScope::Linkage,
++                weak: false,
++                section,
++                flags: object::SymbolFlags::None,
++            })
++        };
+diff --git a/src/relocs.rs b/src/relocs.rs
+--- a/src/relocs.rs
++++ b/src/relocs.rs
+@@ -0,0 +1 @@
++use crate::data_manifest::DataManifest;
+@@ -118,0 +120 @@
++    data_manifest: &DataManifest,
+@@ -190,0 +193,9 @@
++                    if let Some(owner) = data_manifest.owner_for_rva(target_rva) {
++                        let diff = u32::try_from(target_rva - owner.rva)?;
++                        coff_data_reloc.copy_from_slice(&diff.to_le_bytes());
++                        relocs_rva.insert(reloc_rva, RelocKind::Constant {
++                            symbol: owner.name,
++                            target_rva,
++                        });
++                        continue;
++                    }
+@@ -238,0 +250,9 @@
++                    if let Some(owner) = data_manifest.owner_for_rva(target_rva) {
++                        let diff = u32::try_from(target_rva - owner.rva)?;
++                        coff_data_reloc.copy_from_slice(&diff.to_le_bytes());
++                        relocs_rva.insert(reloc_rva, RelocKind::Static {
++                            symbol: owner.name,
++                            target_rva,
++                        });
++                        continue;
++                    }

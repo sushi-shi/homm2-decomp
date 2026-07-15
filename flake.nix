@@ -26,7 +26,10 @@
       vostok-delinker = nightly-rustPlatform.buildRustPackage {
         pname = "vostok-delinker"; version = "0.1.0";
         src = vostok-delinker-src;
-        patches = [ ./patches/vostok-delinker-canonical-data-alias.patch ];
+        patches = [
+          ./patches/vostok-delinker-canonical-data-alias.patch
+          ./patches/vostok-delinker-reviewed-data.patch
+        ];
         cargoHash = "sha256-ry3TH1fz7Aj/JdbmlgQFFn29m8E7EQHyGaVXnZTEcXo=";
       };
 
