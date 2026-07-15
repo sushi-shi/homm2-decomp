@@ -7,6 +7,7 @@ records in CodeView NB09 ``sstModule``; missing or ambiguous evidence is a hard 
 """
 import argparse
 import csv
+import hashlib
 import json
 import os
 import re
@@ -17,6 +18,8 @@ import sys
 import tomllib
 from collections import defaultdict
 from pathlib import Path
+
+from homm2.build.extract_resources import read_pe_resources
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO = next((p for p in SCRIPT_DIR.parents if (p / "flake.nix").exists()), SCRIPT_DIR)
@@ -211,6 +214,7 @@ def read_pe(path):
         raise ValueError("expected PE32 optional header: %s" % path)
     section_offset = optional + optional_size
     sections = {}
+    section_order = []
     for index in range(section_count):
         offset = section_offset + index * COFF_SECTION_HEADER_SIZE
         name = data[offset:offset + 8].split(b"\0", 1)[0].decode("ascii", "replace")
@@ -219,7 +223,11 @@ def read_pe(path):
             "rva": rva,
             "virtual_size": virtual_size,
             "raw_size": raw_size,
+            "characteristics": struct.unpack_from("<I", data, offset + 36)[0],
         }
+        section_order.append(name)
+    resource_rva, resource_size = struct.unpack_from(
+        "<II", data, optional + 96 + 2 * 8)
     return {
         "linker_version": "%d.%d" % struct.unpack_from("<BB", data, optional + 2),
         "size_of_code": struct.unpack_from("<I", data, optional + 4)[0],
@@ -234,6 +242,8 @@ def read_pe(path):
         "heap_reserve": struct.unpack_from("<I", data, optional + 80)[0],
         "heap_commit": struct.unpack_from("<I", data, optional + 84)[0],
         "sections": sections,
+        "section_order": section_order,
+        "resource_directory": {"rva": resource_rva, "size": resource_size},
     }
 
 
@@ -618,6 +628,70 @@ def section_diagnostics(retail, candidate):
     return result
 
 
+def resource_diagnostics(retail_path, candidate_path, retail, candidate):
+    retail_resources = read_pe_resources(retail_path)
+    candidate_resources = read_pe_resources(candidate_path)
+
+    def identity(resource):
+        return (resource["type"], resource["name"], resource["language"])
+
+    def record(resource):
+        return {
+            "type": resource["type"],
+            "name": resource["name"],
+            "language": resource["language"],
+            "size": len(resource["data"]),
+            "sha256": hashlib.sha256(resource["data"]).hexdigest(),
+        }
+
+    retail_records = [record(resource) for resource in retail_resources]
+    candidate_records = [record(resource) for resource in candidate_resources]
+    retail_by_identity = {identity(resource): resource for resource in retail_resources}
+    candidate_by_identity = {identity(resource): resource for resource in candidate_resources}
+    identities_match = set(retail_by_identity) == set(candidate_by_identity)
+    payloads_match = identities_match and all(
+        retail_by_identity[key]["data"] == candidate_by_identity[key]["data"]
+        for key in retail_by_identity)
+    payload_order_matches = ([identity(resource) for resource in retail_resources] ==
+                             [identity(resource) for resource in candidate_resources])
+    expected = retail["sections"].get(".rsrc")
+    actual = candidate["sections"].get(".rsrc")
+    section_size_matches = bool(expected and actual and
+                                expected["raw_size"] == actual["raw_size"] and
+                                expected["virtual_size"] == actual["virtual_size"])
+    characteristics_match = bool(expected and actual and
+                                 expected["characteristics"] == actual["characteristics"])
+    section_order_matches = retail["section_order"] == candidate["section_order"]
+    return {
+        "semantic_match": (identities_match and payloads_match and payload_order_matches and
+                           section_size_matches and characteristics_match and
+                           section_order_matches),
+        "inventory_matches": identities_match,
+        "payloads_match": payloads_match,
+        "payload_order_matches": payload_order_matches,
+        "section_size_matches": section_size_matches,
+        "section_characteristics_match": characteristics_match,
+        "section_order_matches": section_order_matches,
+        "retail_section": expected,
+        "candidate_section": actual,
+        "section_rva_delta": actual["rva"] - expected["rva"] if expected and actual else None,
+        "retail_directory": retail["resource_directory"],
+        "candidate_directory": candidate["resource_directory"],
+        "retail_section_order": retail["section_order"],
+        "candidate_section_order": candidate["section_order"],
+        "retail_directory_timestamps": sorted(set(
+            resource["directory_timestamp"] for resource in retail_resources)),
+        "candidate_directory_timestamps": sorted(set(
+            resource["directory_timestamp"] for resource in candidate_resources)),
+        "retail": retail_records,
+        "candidate": candidate_records,
+        "note": (
+            "Directory timestamps are linker-generated and intentionally excluded from the "
+            "semantic match. Resource identities, languages, payload bytes, payload order, "
+            "section sizes, section characteristics, and PE section order are enforced."),
+    }
+
+
 def static_storage_diagnostics(retail, candidate, map_path, retail_symbols=None):
     def section_pair(name):
         expected = retail["sections"].get(name, {"raw_size": 0, "virtual_size": 0, "rva": 0})
@@ -692,7 +766,7 @@ def read_order_response(path):
     return objects
 
 
-def run_link(output, order_response, imports_libraries):
+def run_link(output, order_response, imports_libraries, resource_path):
     output = Path(output).resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
     report_path = output.with_suffix(".link.json")
@@ -708,11 +782,14 @@ def run_link(output, order_response, imports_libraries):
         raise RuntimeError("retail executable missing: %s" % RETAIL_EXE)
     order_response = Path(order_response).resolve()
     imports_libraries = [Path(path).resolve() for path in imports_libraries]
+    resource_path = Path(resource_path).resolve()
     if not order_response.exists():
         raise RuntimeError("link-order response missing: %s" % order_response)
     missing_imports = [str(path) for path in imports_libraries if not path.exists()]
     if missing_imports:
         raise RuntimeError("middleware import libraries missing:\n  " + "\n  ".join(missing_imports))
+    if not resource_path.exists():
+        raise RuntimeError("reconstructed resource input missing: %s" % resource_path)
 
     order = load_retail_order()
     missing = [str(row["object"]) for row in order if not row["object"].exists()]
@@ -731,6 +808,7 @@ def run_link(output, order_response, imports_libraries):
         "/LIBPATH:" + winepath_w(toolchain / "lib"),
     ]
     command.extend(winepaths_w(response_objects))
+    command.append(winepath_w(resource_path))
     command.extend(SYSTEM_LIBS_BEFORE_VENDOR)
     command.extend(winepaths_w(imports_libraries))
     command.extend(SYSTEM_LIBS_AFTER_VENDOR)
@@ -748,10 +826,16 @@ def run_link(output, order_response, imports_libraries):
     vendor_import_abi_match = (
         normalized_vendor_imports(candidate_imports) == normalized_vendor_imports(retail_imports)
         if candidate else False)
+    resources = (resource_diagnostics(RETAIL_EXE, output, retail, candidate)
+                 if candidate else None)
+    resource_match = bool(resources and resources["semantic_match"])
     banner = next((line.strip() for line in run.stdout.splitlines()
                    if "Incremental Linker Version" in line), None)
     report = {
-        "status": ("linked" if run.returncode == 0 and candidate and vendor_import_abi_match else
+        "status": ("linked" if run.returncode == 0 and candidate and vendor_import_abi_match and
+                   resource_match else
+                   "resource-mismatch" if run.returncode == 0 and candidate and
+                   vendor_import_abi_match else
                    "vendor-import-mismatch" if run.returncode == 0 and candidate else "failed"),
         "return_code": run.returncode,
         "linker": {
@@ -764,6 +848,8 @@ def run_link(output, order_response, imports_libraries):
         },
         "order_source": "NB09 sstModule executable contribution order",
         "link_flags": list(RETAIL_LINK_FLAGS),
+        "resource_input": str(resource_path),
+        "resources": resources,
         "unresolved": unresolved,
         "retail": retail,
         "candidate": candidate,
@@ -843,12 +929,19 @@ def run_link(output, order_response, imports_libraries):
         print("link audit: vendor import ABI %s; intra-DLL IAT order %s" %
               ("matches retail" if vendor_import_abi_match else "DIFFERS FROM RETAIL",
                "matches retail" if vendor_import_order_match else "differs"))
+        print("link audit: resources %s; %d leaves; .rsrc raw/virtual %d/%d, RVA delta %+d" %
+              ("match retail" if resource_match else "DIFFER FROM RETAIL",
+               len(resources["candidate"]),
+               resources["candidate_section"]["raw_size"],
+               resources["candidate_section"]["virtual_size"],
+               resources["section_rva_delta"]))
     if unresolved["count"]:
         print("link audit: %d unresolved symbols: %s" %
               (unresolved["count"], ", ".join("%s=%d" % (key, len(value))
                                                for key, value in unresolved["classes"].items())))
     print("link audit: %s" % report_path)
-    return 0 if run.returncode == 0 and output.exists() and vendor_import_abi_match else (run.returncode or 1)
+    return (0 if run.returncode == 0 and output.exists() and vendor_import_abi_match and
+            resource_match else (run.returncode or 1))
 
 
 def main(argv=None):
@@ -856,6 +949,7 @@ def main(argv=None):
     parser.add_argument("--out", default=str(REPO / "build/link/HEROES2W.EXE"))
     parser.add_argument("--order", default=str(REPO / "build/link/objects.rsp"))
     parser.add_argument("--imports", action="append")
+    parser.add_argument("--resource", default=str(REPO / "build/link/HEROES2W.res"))
     parser.add_argument("--write-order", metavar="PATH")
     args = parser.parse_args(argv)
     try:
@@ -866,7 +960,7 @@ def main(argv=None):
             str(REPO / "build/link/vendor-imports-mss.lib"),
             str(REPO / "build/link/vendor-imports-wing.lib"),
         ]
-        return run_link(args.out, args.order, imports)
+        return run_link(args.out, args.order, imports, args.resource)
     except (OSError, ValueError, RuntimeError) as exc:
         return die(str(exc))
 

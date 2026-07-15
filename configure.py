@@ -37,6 +37,7 @@ def main():
         w.rule("link_exe",
                command=(f"{PY} -m homm2.build.link_exe --out $exe "
                         "--order build/link/objects.rsp "
+                        "--resource build/link/HEROES2W.res "
                         "--imports build/link/vendor-imports-smack.lib "
                         "--imports build/link/vendor-imports-mss.lib "
                         "--imports build/link/vendor-imports-wing.lib"),
@@ -47,6 +48,11 @@ def main():
         w.rule("link_imports",
                command=f"{PY} -m homm2.build.gen_vendor_imports --out-dir build/link",
                description="link-imports middleware libraries")
+        w.rule("link_resources",
+               command=(f"{PY} -m homm2.build.extract_resources "
+                        "--exe build/orig/HEROES2W.EXE --out build/link/HEROES2W.res "
+                        "--report build/link/HEROES2W.resources.json"),
+               description="link-resources HEROES2W.res")
         objs = []
         for u in units:
             obj = f"build/objdiff/base/{u['unit']}.obj"
@@ -63,15 +69,20 @@ def main():
                           "build/link/vendor-imports-wing.lib"]
         w.build(import_outputs, "link_imports",
                 inputs="scripts/homm2/build/gen_vendor_imports.py")
+        resource_output = "build/link/HEROES2W.res"
+        w.build([resource_output, "build/link/HEROES2W.resources.json"], "link_resources",
+                inputs=["build/orig/HEROES2W.EXE",
+                        "scripts/homm2/build/extract_resources.py"])
         link_outputs = ["build/link/HEROES2W.EXE", "build/link/HEROES2W.map",
                         "build/link/HEROES2W.link.json"]
         w.build(link_outputs, "link_exe",
-                inputs=["build/link/objects.rsp"] + import_outputs,
+                inputs=["build/link/objects.rsp"] + import_outputs + [resource_output],
                 implicit=objs + ["build/orig/HEROES2W.EXE", "scripts/homm2/build/link_exe.py"],
                 variables={"exe": "build/link/HEROES2W.EXE"})
         w.build("link", "phony", inputs="build/link/HEROES2W.EXE")
         w.build("link-order", "phony", inputs="build/link/objects.rsp")
         w.build("link-imports", "phony", inputs=import_outputs)
+        w.build("link-resources", "phony", inputs=resource_output)
         w.build("link-map", "phony",
                 inputs=["build/link/HEROES2W.map", "build/link/HEROES2W.link.json"])
         w.default("all")
