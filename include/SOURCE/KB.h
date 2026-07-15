@@ -237,7 +237,10 @@ typedef enum KbBuildingType {
 typedef enum KbBuildingConstant {
     KB_BUILDING_NEUTRAL_LIMIT = 16,
     KB_BUILDING_RESOURCE_COUNT = 7,
-    KB_MAGE_GUILD_MAX_LEVEL = 5
+    KB_MAGE_GUILD_MAX_LEVEL = 5,
+    KB_MAGE_GUILD_LEVEL_COUNT = KB_MAGE_GUILD_MAX_LEVEL + 1,
+    KB_DWELLING_TYPE_COUNT =
+        KB_BUILDING_DWELLING_LAST - KB_BUILDING_DWELLING_FIRST + 1
 } KbBuildingConstant;
 
 typedef enum KbDwellingFlag {
@@ -876,13 +879,13 @@ extern char *gBuildingInfoSpecial[];
 extern icon *gBuyBuildIcons;
 extern char gcBottomViewText[];
 extern configStruct gConfig;
-extern int gDwellingBaseResourceValues[][12];
-extern int gDwellingCosts[][12][7];
-extern char *gDwellingNames[][12];
-extern signed char gDwellingType[][12];
+extern int gDwellingBaseResourceValues[][KB_DWELLING_TYPE_COUNT];
+extern int gDwellingCosts[][KB_DWELLING_TYPE_COUNT][KB_BUILDING_RESOURCE_COUNT];
+extern char *gDwellingNames[][KB_DWELLING_TYPE_COUNT];
+extern signed char gDwellingType[][KB_DWELLING_TYPE_COUNT];
 extern int gGameCommand;
 extern int gHeroGoldCost;
-extern unsigned long gHierarchyMask[][12];
+extern unsigned long gHierarchyMask[][KB_DWELLING_TYPE_COUNT];
 extern int giBottomViewOverride;
 extern int giBottomViewOverrideEndTime;
 extern int giBottomViewResource;
@@ -903,10 +906,10 @@ extern int giTotalHighMem;
 extern int giWaitType;
 extern int glTimers[GLOBAL_TIMER_COUNT];
 extern int gMageBaseResourceValues[];
-extern int gMageBuildingCosts[][7];
+extern int gMageBuildingCosts[][KB_BUILDING_RESOURCE_COUNT];
 extern tag_monsterInfo gMonsterDatabase[MONSTER_DATABASE_COUNT];
 extern int gNeutralBaseResourceValues[];
-extern int gNeutralBuildingCosts[][7];
+extern int gNeutralBuildingCosts[][KB_BUILDING_RESOURCE_COUNT];
 extern char *gNeutralBuildingNames[];
 extern advManager *gpAdvManager;
 extern palette *gPalette;
@@ -925,7 +928,7 @@ extern class heroWindowManager *gpWindowManager;
 extern int gResourceBaseValue[];
 extern icon *gShingleAnim;
 extern int gSpecialBuildingBaseResourceValues[];
-extern int gSpecialBuildingCosts[][7];
+extern int gSpecialBuildingCosts[][KB_BUILDING_RESOURCE_COUNT];
 extern char *gSpecialBuildingNames[];
 extern SSpellInfo gsSpellInfo[HERO_SPELL_COUNT];
 extern icon *gSystemIcons;
