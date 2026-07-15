@@ -166,3 +166,15 @@ name	unit	size	retail_sha256	highlow_count	audit
 ?gArmyNamesPlural@@3PAPADA	SOURCE/KB	0x108	7e5899a66c134050954c776a080ae4516e0ea154bef001ae54129d8eeba6628a	66	cstring-pointer-table
 ?gTerrainNames@@3PAPADA	SOURCE/KB	0x28	c29f30e08e522d7a91888c8954830360ba4972dc99fa8aea0945b4e2c9482740	9	cstring-pointer-table
 ?gResourceNames@@3PAPADA	SOURCE/KB	0x20	2f8af5d2748b8c694fcc827e0575ebb694a6dd1d5d92a492b7e17001b154a2e8	7	cstring-pointer-table
+?gQuickViewText@@3PAPADA	SOURCE/KB	0x1f0	50df2d2c5bf66a6a25b38b93e358e02c8a6a3712f2a12b083a75dfb922b7ac04	124	cstring-pointer-table
+?gEventText@@3PAPADA	SOURCE/KB	0x180	10cf6fb7d3f06e3e5793fc2928c0eda23423859f748579a087b7f5f85ff15dd2	95	cstring-pointer-table
+?gCPanelHelp@@3PAPADA	SOURCE/KB	0x18	d8e6f34fcb14d8a2b581ae1e3222e7c182d09ac0b495dc38e841ecc6686b3fc4	5	cstring-pointer-table
+?gCSPanelHelp@@3PAPADA	SOURCE/KB	0x20	0cd3202a92ebbbdd1a54e8e0c743de2e564968344532a83831b2be3422b13dcd	7	cstring-pointer-table
+?gAPanelHelp@@3PAPADA	SOURCE/KB	0x18	67b33b224efde438af4df0cd781c04c3a4ccf949a4ae44d16e32e84f234bf0af	5	cstring-pointer-table
+?gInitMenuHelp@@3PAPADA	SOURCE/KB	0x18	8367f88798e66bd9789146a56876c6c2e5a11a46aea567439e2c227d5bb7664a	5	cstring-pointer-table
+?gAdvMenuHelp@@3PAPADA	SOURCE/KB	0x20	64b2e046baf30a466dcea80d20a6018a7634d4d9856a488b6866e83734d8c7c5	8	cstring-pointer-table
+?gLuckText@@3PAPADA	SOURCE/KB	0x20	533966a59e1bef3002e3245f069d320b8c2b64a6cd19a1408e65f5173f47dc0d	7	cstring-pointer-table
+?gMoraleText@@3PAPADA	SOURCE/KB	0x20	2cfbe5deb84a298e4f562086284244e86dfc8b060776e3f88e43069fb87064e6	7	cstring-pointer-table
+?onOffText@@3PAPADA	SOURCE/KB	0x30	99401fbd9920188b97e716bef947bc47663e0365deca622924f10ecd2e123b70	11	cstring-pointer-table
+?walkSpeedText@@3PAPADA	SOURCE/KB	0x18	102bbd1ad8f491ae537a91b38a336b8166778458831cfd7cf470a4054e2fe1d5	5	cstring-pointer-table
+?gColors@@3PAPADA	SOURCE/KB	0x18	20745ead9c9563dd01ec046d238a8f873bc7c753953c5f90a5c5271a15662646	6	cstring-pointer-table
