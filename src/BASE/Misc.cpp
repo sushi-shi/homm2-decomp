@@ -554,7 +554,7 @@ void SetGameDefaults(void)
     idAdd += KBTickCount();
     idSeed += idAdd;
     gConfig.uniqueSystemID[0] = static_cast<char>(idSeed % MISC_UNIQUE_ID_ALPHA_COUNT + 'A');
-    gConfig.autoSaveName[MISC_AUTOSAVE_SENTINEL_INDEX] = 0;
+    gConfig.needsDefaultInitialization = 0;
 }
 
 VA(0x004c4b60, 0x13f)
@@ -572,7 +572,7 @@ void ReadPrefsFromFile(void)
             FileError(gText);
         fread(&gConfig, CONFIG_PERSISTED_SIZE, 1, f);
         fclose(f);
-        if (gConfig.autoSaveName[0xe] == 0)
+        if (gConfig.needsDefaultInitialization == 0)
             goto skipDefaults;
     }
     SetGameDefaults();
