@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""homm2.analysis.decomp - Ghidra decompiler C for a function (`homm2 sema decomp`).
+"""homm2.analysis.decomp - Ghidra decompiler C for a function.
 
 Reopens the cached Ghidra project (build/ghidra, built by `homm2 ghidra`) with NO
 re-analysis, runs decomp_export.py over the requested RVAs, and prints the decompiler C
 plus caller/callee xrefs. Names read from our CodeView seeding (apply_names.py).
 
 Accepts RVAs or full VAs (a value >= the image base is reduced to its RVA).
+This command is currently exposed through the module entry point, not `homm2 sema`.
 
     python3 -m homm2.analysis.decomp 0x0004a3c0
     python3 -m homm2.analysis.decomp 0x0004a3c0 --force   # create the fn first if Ghidra missed it

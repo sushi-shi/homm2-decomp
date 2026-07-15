@@ -37,8 +37,8 @@ a real retail symbol — the source may only reconstruct symbols the binary actu
 - every `DATA()` VA is **unique** (one VA == one definition).
 
 Rationale for def-not-extern: the VA describes *storage*, which the definition owns; a caller that
-`#include`s the header sees the plain `extern` and never a duplicated address. `migrate_data_to_defs.py`
-performed the one-time move; `gen_global_defs.py` now emits `DATA(VA) T g;`. Anonymous or synthetic
+`#include`s the header sees the plain `extern` and never a duplicated address. The one-time
+migration is complete; `gen_global_defs.py` emits `DATA(VA) T g;`. Anonymous or synthetic
 storage without a retained public symbol is a `DATA(VA) static T g;` definition in the sole owning
 module. A real cross-TU external necessarily has a retained public symbol and uses its owner header;
 def-less synthetic externs are rejected.
