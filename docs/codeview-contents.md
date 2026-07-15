@@ -43,10 +43,13 @@ DLL-import middleware.
 | `sstGlobalSym` / `sstStaticSym` | header-only (`cbSymbol` 8 / 0) | empty |
 
 Two details worth remembering:
-- **`S_COMPILE` is the *linker's* record** — every one says *"Microsoft LINK 2.60.5112 (NT)"*,
-  machine 0x386. There is **no per-compiland compiler record**, which is exactly why the opt
-  level (`/Od` vs `/O2`) is absent from CodeView and `gen_manifest.py` infers it from the
-  prologue (FPO vs full `ebp` frame).
+- **`S_COMPILE` is tool/module provenance, not a final-linker banner.** There are 176
+  *"Microsoft LINK 2.60.5112 (NT)"* records, and every owning module also contains an
+  `S_THUNK32` import thunk. The only non-thunk record is *"Microsoft CVTRES 4.00"* on
+  `.\Win32_Re\heroes.res`. Game and BASE code objects have no per-compiland compiler
+  record, which is why the opt level (`/Od` vs `/O2`) is absent and `gen_manifest.py`
+  infers it from the prologue (FPO vs full `ebp` frame). The PE optional-header 3.00
+  stamp is the direct evidence for the final executable linker version.
 - **`S_THUNK32` = 182 import thunks** — the Win32/multimedia/WinG IAT jump-stubs
   (`_waveOutGetNumDevs@0`, `_WinGBitBlt@32`, `_GetFileAttributesA@4`, … each a 6-byte
   `jmp [__imp__…]`). **Already fully captured**: the linker emits an `S_PUB32` public for each
