@@ -525,6 +525,6 @@ void resourceManager::ReadBlock(signed char *destination, unsigned long size)
 VTBL(resourceManager, 0x004eb9f0);
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x0051e99c) int iSaveCtr;
+DATA(0x0051e99c) int iSaveCtr = 0;
 DATA(0x005331e8) int lastAggZ[10];
 DATA(0x00533210) long lastPositionZ[12];

@@ -1545,11 +1545,13 @@ normalEvent:
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x0051dce8) int iMemEntries;
-DATA(0x0051dcec) MemEntry *gpMemEntry;
-DATA(0x0051dcf0) int giTotalMemAllocated;
-DATA(0x0051dcf8) unsigned char giChangeThreshold[16];
-DATA(0x0051dd08) int iLastSeed;
+DATA(0x0051dce8) int iMemEntries = 0;
+DATA(0x0051dcec) MemEntry *gpMemEntry = 0;
+DATA(0x0051dcf0) int giTotalMemAllocated = 0;
+DATA(0x0051dcf8) unsigned char giChangeThreshold[16] = {
+    0, 1, 2, 3, 4, 6, 8, 10, 13, 16, 19, 22, 26, 31, 37, 46
+};
+DATA(0x0051dd08) int iLastSeed = 0x08156a03;
 DATA(0x005331c4) class heroWindow *DataEntryWin;
 DATA(0x005331c8) char *cDEDest;
 DATA(0x005331d4) int iDEMaxLen;

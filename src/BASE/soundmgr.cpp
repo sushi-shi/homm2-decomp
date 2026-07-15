@@ -973,12 +973,21 @@ int soundManager::MusicPlaying(void)
 VTBL(soundManager, 0x004eba20);
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x0051f018) char *digitalDriverNames[14];
-DATA(0x0051f050) SampleChannelStruct SCS[4];
-DATA(0x0051f080) char CDPreviousPosition[60][15];
-DATA(0x0051f404) int CDWaiting;
-DATA(0x0051f408) int CDPlaying;
-DATA(0x0051f40c) int iCalibrateLoop;
+DATA(0x0051f018) char *digitalDriverNames[14] = {
+    "", "ultra.dig", "sndsys.dig", "sndscape.dig", "jammer.dig",
+    "audiodrv.dig", "proaudio.dig", "rap10.dig", "iwav.dig",
+    "nvdig.dig", "sb16.dig", "sbpro.dig", "sblaster.dig", 0
+};
+DATA(0x0051f050) SampleChannelStruct SCS[4] = {
+    { 0, 1, 0 },
+    { 1, 2, 1 },
+    { 2, 6, 2 },
+    { 6, 16, 6 }
+};
+DATA(0x0051f080) char CDPreviousPosition[60][15] = { 0 };
+DATA(0x0051f404) int CDWaiting = -1;
+DATA(0x0051f408) int CDPlaying = 0;
+DATA(0x0051f40c) int iCalibrateLoop = 0;
 DATA(0x00534980) char lpszReturnString[0x100];
 DATA(0x00534a80) unsigned long nMCIError;
 DATA(0x00534a88) short iLastVolume[0x20];

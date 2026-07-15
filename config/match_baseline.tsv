@@ -1379,7 +1379,7 @@ SOURCE/dpnetwin	?dpEnumSession@@YGHPAUDPSESSIONDESC@@PAXPAKK@Z	100.0000	14c943f9
 SOURCE/dpnetwin	?dpEvaluateMessage@@YIXKH@Z	99.8148	a0c4c079bf8b
 SOURCE/dpnetwin	?dpProcessMessages@@YIXXZ	99.9057	679ea774f267
 SOURCE/dpnetwin	?dpSendMessage@@YIXHEGPAX@Z	100.0000	9fb4ffa9bfc6
-SOURCE/dpnetwin	?dpWaitForExtraGuests@@YIHXZ	100.0000	66e8ec56ce6b
+SOURCE/dpnetwin	?dpWaitForExtraGuests@@YIHXZ	100.0000	6331dd71627e
 SOURCE/dpnetwin	?dpWaitForFirstGuest@@YIHXZ	98.7864	e3e07ebda515
 SOURCE/dpnetwin	?dpWaitForHost@@YIHXZ	99.8472	20f9d98f76b6
 SOURCE/dpnetwin	?dpnet_init@@YIFXZ	99.9485	22821a9da261
