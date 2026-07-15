@@ -7,11 +7,14 @@ with the original **MSVC 4.2** toolchain under wine, produces object files
 
 ## What makes this decomp different (read before matching)
 
-- **CodeView is authoritative.** PoL ships an NB09 debug stream, so function
-  **names, RVAs, sizes, owning class/TU/tier, vtables, and class layouts are
-  ground truth** — already extracted to `build/gen/symbol_names.csv` and the
-  recovered `include/` headers. **Never guess or re-derive them; there is no
-  Ghidra / FID / name-recovery stage**.
+- **The shipping CodeView is minimal/publics-only.** PoL embeds an NB09 stream whose
+  3,541 named symbols are `S_PUB32` records with type index zero. It authoritatively
+  supplies each retained public symbol's name and start RVA, but not its length, TU
+  ownership, private/static helpers, local symbols, types, lines, vtables, or class
+  layouts. Those are reconstruction results in `build/gen/`, the manifest, and
+  `include/`; preserve their evidence and uncertainty instead of attributing them to
+  CodeView. A next-public span is only a provisional function boundary and can absorb
+  an unlisted helper.
 - **Most TUs are `/Od` (debug), but optimization is PER-TU — 39 of 95 ship `/O2`.**
   Default flags: **`/nologo /c /Od /MT /Gr /G5 /Ob1 /QIfdiv`** — unoptimized (full `ebp`
   frames, every local spilled), static LIBCMT, **`__fastcall` default** (free fns
@@ -29,7 +32,8 @@ with the original **MSVC 4.2** toolchain under wine, produces object files
   - **`/Od` TUs**: all SOURCE game logic (GAME, HERO, ARMY, CMBTMGR, SPELLS, AI, …),
     EDITOR/mapcell, and 7 BASE TUs (BITS, Bzip, FONT, RESMGR, TILE, WINDOW, soundmgr).
     No EH/regalloc wall — lowering is literal, body ~1:1 to asm.
-  - Opt level is **not in CodeView** (S_COMPILE omits it). `gen_manifest.py`
+  - Opt level is **not in the game CodeView records** (the game compilands have no
+    `S_COMPILE`; surviving records describe linker import-thunk modules). `gen_manifest.py`
     classifies each TU by prologue (`push ebp;mov ebp,esp` = /Od, FPO = /O2) →
     `flags="base"|"o2"` in `config/units.toml`. See `[[optimization-is-per-tu]]`.
 - **But inline expansion is ON (`/Ob1`) — separate axis from `/Od`.** "Unoptimized but
@@ -54,7 +58,7 @@ the CLI). `HOMM2_DIR`/`HOMM2_EXE`/`MSVC_DIR`/`WINEPREFIX` are fixed at shell ent
 many commands inside ONE open shell over `nix develop … --command` per call.
 
 ```sh
-homm2 init      # ONE-TIME: CodeView -> manifest -> ??_C@ names -> synth PDB -> delink -> configure
+homm2 init      # ONE-TIME: public symbols + recovered manifest -> synth PDB -> delink -> configure
 homm2 build     # configure + ninja (wine cl per TU) + objdiff vs target + refresh README %
 homm2 status    # per-unit + overall match %   (also: status update | status check)
 ```
@@ -65,7 +69,7 @@ header deps** (MSVC 4.2 has no `/showIncludes`, so `cc_wrap.py` scans each TU's 
 graph into a depfile) — editing a shared header recompiles exactly its includers, so a header
 change can't leave a stale obj. It then runs **six hard gates** (a red gate fails the build):
 `assert_decls` (no local `class/struct/enum`/`extern`/fwd-decl in any .cpp), `assert_no_fake_labels`
-(no emitted fn symbol absent from CodeView), `assert_globals_data` (every global's **definition**
+(no emitted fn symbol absent from the recovered inventory), `assert_globals_data` (every global's **definition**
 carries a unique `DATA(<VA>)`; no `DATA()` on a header `extern` bar `_globals_model.h`),
 `assert_defs_declared` (every free-fn definition is declared in its
 owner header), `assert_globals_defined` (every extern global has a definition in its owner TU —
@@ -78,7 +82,7 @@ global/field or call a fabricated/wrong function and still score 100%. `homm2 re
 near-exact fn's reloc targets (via `symbol_names.csv` + header `DATA()` VAs) and flags any address
 base references that retail never does. It's OPT-IN, not a hard gate, because it also surfaces
 unreproducible link artifacts — chiefly the delinker's `empty_stub` (the synthetic name for a
-COMDAT-folded empty `ret` fn that base still calls by its own CodeView name). `homm2 relocs 0x<rva>`
+COMDAT-folded empty `ret` fn that base still calls by its retained public name). `homm2 relocs 0x<rva>`
 reviews one function. See `[[objdiff-masks-all-relocs]]`.
 
 ## `homm2 sema` — semantic navigation (matcher's read-only toolbox)
@@ -104,17 +108,18 @@ Addresses are **RVAs** (as in `symbol_names.csv`); `rva` also accepts a full VA 
 library-boundary half of `xref` needs a one-time Ghidra project. Build it with:
 
 ```sh
-homm2 ghidra          # ONE-TIME: import HEROES2W.EXE -> auto-analyze -> apply OUR CodeView
+homm2 ghidra          # ONE-TIME: import HEROES2W.EXE -> analyze -> apply retained/recovered
                       # names -> export build/ghidra/exports/functions.csv  (SEVERAL MINUTES)
 homm2 ghidra --no-analyze   # re-apply names + re-export instantly (no re-analysis)
 ```
 
-Ghidra is read-only here — it never *discovers* names (CodeView is authoritative); it's fed
-the EXE + our known symbols. Needs the dev shell's Ghidra env (in the flake).
+Ghidra is read-only here. It is fed the EXE plus retained public and recovered names; use its
+analysis as evidence for private-helper boundaries, never as invented source identity. Needs the
+dev shell's Ghidra env (in the flake).
 
 ## Conventions
 
-- One TU per CodeView compiland under `src/<TIER>/<TU>.cpp` (TIER ∈ BASE, SOURCE,
+- One reconstructed TU under `src/<TIER>/<TU>.cpp` (TIER ∈ BASE, SOURCE,
   EDITOR), shared headers in `include/<TIER>/`. Define functions in **retail-RVA order**.
 - Above each function: **`VA(0x........, 0x..)`** (8-hex-digit zero-padded address,
   unpadded size); globals: **`DATA(0x........)`** on the **definition** in the owner `.cpp` (the
@@ -128,7 +133,7 @@ the EXE + our known symbols. Needs the dev shell's Ghidra env (in the flake).
   declared ONLY in its owner header `include/<TIER>/<TU>.h`; callers `#include` that. A .cpp
   carries **no** local `class/struct/enum`/`extern`/forward-decls — types come from the recovered
   class headers, cross-TU functions from their owner header. **Globals** live on their owner TU:
-  a plain `extern T g;` in `<TIER>/<TU>.h` (CodeView says which TU owns each) + the **definition**
+  a plain `extern T g;` in `<TIER>/<TU>.h` (the recovered owner model says which TU owns each) + the **definition**
   `DATA(<VA>) T g;` in that owner `.cpp` (the VA rides the definition, not the extern). Globals with
   no CodeView symbol go in `_globals_model.h` — UNLESS the retail binary references one from a single
   module (`homm2 relocs`/`move_model_singletons.py` xref), in which case it becomes a module-private
@@ -152,7 +157,7 @@ the EXE + our known symbols. Needs the dev shell's Ghidra env (in the flake).
   results **serially into linear `master`**. See `.claude/agents/orchestrator.md`.
 - **matcher** (`.claude/agents/matcher.md`) reconstructs one TU; uses `od_slots.py`
   for stack naming; reports a diff. Single worker — never spawns subagents.
-- Queue: `python3 -m homm2.match.gen_queue` → `config/match-queue.md` (CodeView funcs
+- Queue: `python3 -m homm2.match.gen_queue` → `config/match-queue.md` (recovered functions
   not yet bodied, size-band order).
 - Baseline: `homm2 status update` records each function's **max fuzzy% keyed by a hash of its
   SOURCE block** to `config/match_baseline.tsv` (`unit<TAB>fn<TAB>max%<TAB>src_hash`). Max% only
