@@ -451,6 +451,14 @@ def normalized_vendor_imports(imports):
     return result
 
 
+def normalized_dll_import(imports, dll):
+    entry = next((item for item in imports if item["dll"].lower() == dll.lower()), None)
+    if entry is None:
+        return None
+    symbols = sorted(entry["symbols"], key=lambda symbol: json.dumps(symbol, sort_keys=True))
+    return {"dll": entry["dll"].lower(), "symbols": symbols}
+
+
 def parse_unresolved(output):
     symbols = sorted(set(re.findall(r"unresolved external symbol\s+(\S+)", output)))
     classes = defaultdict(list)
@@ -1100,6 +1108,10 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
     vendor_import_abi_match = (
         normalized_vendor_imports(candidate_imports) == normalized_vendor_imports(retail_imports)
         if candidate else False)
+    advapi_import_abi_match = (
+        normalized_dll_import(candidate_imports, "ADVAPI32.dll") ==
+        normalized_dll_import(retail_imports, "ADVAPI32.dll")
+        if candidate else False)
     resources = (resource_diagnostics(RETAIL_EXE, output, retail, candidate)
                  if candidate else None)
     resource_match = bool(resources and resources["semantic_match"])
@@ -1107,8 +1119,10 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
                    if "Incremental Linker Version" in line), None)
     report = {
         "status": ("linked" if run.returncode == 0 and candidate and vendor_import_abi_match and
-                   vendor_import_order_match and resource_match else
+                   vendor_import_order_match and advapi_import_abi_match and resource_match else
                    "resource-mismatch" if run.returncode == 0 and candidate and
+                   vendor_import_abi_match and vendor_import_order_match and advapi_import_abi_match else
+                   "system-import-mismatch" if run.returncode == 0 and candidate and
                    vendor_import_abi_match and vendor_import_order_match else
                    "vendor-import-order-mismatch" if run.returncode == 0 and candidate and
                    vendor_import_abi_match else
@@ -1152,6 +1166,7 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
             "candidate": candidate_imports,
             "vendor_abi_matches_retail": vendor_import_abi_match,
             "vendor_iat_order_matches_retail": vendor_import_order_match,
+            "advapi_abi_matches_retail": advapi_import_abi_match,
         },
         "units": [],
     }
@@ -1246,6 +1261,8 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
         print("link audit: vendor import ABI %s; intra-DLL IAT order %s" %
               ("matches retail" if vendor_import_abi_match else "DIFFERS FROM RETAIL",
                "matches retail" if vendor_import_order_match else "differs"))
+        print("link audit: ADVAPI import ABI %s" %
+              ("matches retail" if advapi_import_abi_match else "DIFFERS FROM RETAIL"))
         print("link audit: resources %s; %d leaves; .rsrc raw/virtual %d/%d, RVA delta %+d" %
               ("match retail" if resource_match else "DIFFER FROM RETAIL",
                len(resources["candidate"]),
@@ -1259,7 +1276,8 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
     print("link audit: %s" % report_path)
     print("link audit: %s" % missing_data_path)
     return (0 if run.returncode == 0 and output.exists() and vendor_import_abi_match and
-            vendor_import_order_match and resource_match else (run.returncode or 1))
+            vendor_import_order_match and advapi_import_abi_match and resource_match else
+            (run.returncode or 1))
 
 
 def main(argv=None):
@@ -1278,6 +1296,7 @@ def main(argv=None):
             str(REPO / "build/link/vendor-imports-smack.lib"),
             str(REPO / "build/link/vendor-imports-mss.lib"),
             str(REPO / "build/link/vendor-imports-wing.lib"),
+            str(REPO / "build/link/system-imports-advapi.lib"),
         ]
         return run_link(args.out, args.order, imports, args.resource, args.linker)
     except (OSError, ValueError, RuntimeError) as exc:

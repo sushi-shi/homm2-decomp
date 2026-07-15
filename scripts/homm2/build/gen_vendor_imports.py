@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate a VC 4.2-compatible middleware import library.
+"""Generate VC 4.2-compatible import libraries for the final link.
 
 VC 4.2 ``LIB /DEF`` emits old-style COFF import members, but it adds an extra
 leading underscore to already-decorated exports and cannot express WinG's
@@ -121,6 +121,18 @@ LINK300_FORCED_VENDOR_IMPORTS = (
     + LINK300_FORCE_MSS_IMPORTS
 )
 
+# With the bundled VC 4.2 SDK ADVAPI32.LIB, final LINK resolves the object's
+# __imp__RegCreateKeyA@12 reference as RegOpenKeyA. Build the small retail
+# import set explicitly so startup retains RegCreateKeyA semantics as well as
+# retail's IAT order and hint values.
+ADVAPI_IMPORTS = (
+    ("_RegOpenKeyExA@20", 217, "RegOpenKeyExA"),
+    ("_RegSetValueExA@24", 236, "RegSetValueExA"),
+    ("_RegCreateKeyA@12", 197, "RegCreateKeyA"),
+    ("_RegQueryValueExA@24", 225, "RegQueryValueExA"),
+    ("_RegCloseKey@4", 194, "RegCloseKey"),
+)
+
 
 def import_specs() -> tuple[ImportSpec, ...]:
     specs = [ImportSpec("mss32.dll", symbol, hint) for symbol, hint in MSS_IMPORTS]
@@ -131,6 +143,10 @@ def import_specs() -> tuple[ImportSpec, ...]:
     specs.extend(
         ImportSpec("WING32.dll", symbol, hint, lookup_name=lookup)
         for symbol, hint, lookup in WING_IMPORTS
+    )
+    specs.extend(
+        ImportSpec("ADVAPI32.dll", symbol, hint, lookup_name=lookup)
+        for symbol, hint, lookup in ADVAPI_IMPORTS
     )
     return tuple(specs)
 
@@ -405,7 +421,7 @@ def _run_lib(lib_exe: Path, args: list[str]) -> None:
     subprocess.run(["wine", str(lib_exe), "/NOLOGO", *args], check=True)
 
 
-def generate_import_libraries(out_dir: Path) -> tuple[Path, Path, Path]:
+def generate_import_libraries(out_dir: Path) -> tuple[Path, ...]:
     if shutil.which("wine") is None or shutil.which("winepath") is None:
         raise RuntimeError("wine/winepath not found; run inside `nix develop .#build`")
     lib_exe = find_ci(msvc_dir() / "bin", "lib.exe")
@@ -420,7 +436,7 @@ def generate_import_libraries(out_dir: Path) -> tuple[Path, Path, Path]:
     out_dir.mkdir(parents=True, exist_ok=True)
     specs = import_specs()
     by_dll = {dll: tuple(spec for spec in specs if spec.dll == dll)
-              for dll in ("mss32.dll", "smackw32.DLL", "WING32.dll")}
+              for dll in ("mss32.dll", "smackw32.DLL", "WING32.dll", "ADVAPI32.dll")}
 
     with tempfile.TemporaryDirectory(prefix="homm2-vendor-imports-") as temp_name:
         temp = Path(temp_name)
@@ -435,8 +451,13 @@ def generate_import_libraries(out_dir: Path) -> tuple[Path, Path, Path]:
                 ["/MACHINE:IX86", f"/DEF:{winepath_w(def_path)}",
                  f"/OUT:{winepath_w(lib_path)}"],
             )
-            suffix = ("mss", "smack", "wing")[dll_index]
-            output = out_dir / f"vendor-imports-{suffix}.lib"
+            output_name = (
+                "vendor-imports-mss.lib",
+                "vendor-imports-smack.lib",
+                "vendor-imports-wing.lib",
+                "system-imports-advapi.lib",
+            )[dll_index]
+            output = out_dir / output_name
             output.write_bytes(patch_import_archive(lib_path.read_bytes(), dll_specs))
             outputs.append(output)
         return tuple(outputs)
@@ -450,7 +471,7 @@ def main() -> None:
     print(
         f"generated {', '.join(str(path) for path in outputs)}: "
         f"{len(MSS_IMPORTS)} Miles, {len(SMACK_IMPORTS)} Smacker, "
-        f"{len(WING_IMPORTS)} WinG imports"
+        f"{len(WING_IMPORTS)} WinG, {len(ADVAPI_IMPORTS)} ADVAPI imports"
     )
 
 

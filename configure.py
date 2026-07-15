@@ -40,7 +40,8 @@ def main():
                         "--resource build/link/HEROES2W.res "
                         "--imports build/link/vendor-imports-smack.lib "
                         "--imports build/link/vendor-imports-mss.lib "
-                        "--imports build/link/vendor-imports-wing.lib"),
+                        "--imports build/link/vendor-imports-wing.lib "
+                        "--imports build/link/system-imports-advapi.lib"),
                description="link HEROES2W.EXE")
         w.rule("link_order",
                command=f"{PY} -m homm2.build.link_exe --write-order $out",
@@ -66,7 +67,8 @@ def main():
         w.build("build/link/objects.rsp", "link_order", inputs=order_inputs)
         import_outputs = ["build/link/vendor-imports-mss.lib",
                           "build/link/vendor-imports-smack.lib",
-                          "build/link/vendor-imports-wing.lib"]
+                          "build/link/vendor-imports-wing.lib",
+                          "build/link/system-imports-advapi.lib"]
         w.build(import_outputs, "link_imports",
                 inputs="scripts/homm2/build/gen_vendor_imports.py")
         resource_output = "build/link/HEROES2W.res"
