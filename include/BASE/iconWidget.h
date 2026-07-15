@@ -21,8 +21,12 @@ public:
     unsigned long m_iconId;  // +0x29  aggregate resource id
     // --- constructors ---
     iconWidget(void);
-    iconWidget(short int, short int, short int, short int, unsigned long int, short int, signed char, short int, short int, short int);
-    iconWidget(short int, short int, short int, short int, char *, short int, signed char, short int, short int, short int);
+    iconWidget(short int x, short int y, short int width, short int height,
+               unsigned long int iconId, short int frame, signed char flip,
+               short int id, short int kind, short int fillColor);
+    iconWidget(short int x, short int y, short int width, short int height,
+               char *iconName, short int frame, signed char flip,
+               short int id, short int kind, short int fillColor);
     virtual ~iconWidget() OVERRIDE;
     // --- virtual methods (vtable order) ---
     virtual void Draw(void) OVERRIDE;
