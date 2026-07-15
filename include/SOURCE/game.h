@@ -115,6 +115,7 @@ public:
     unsigned short m_rumourEventIndices[30];  // +0x64d9
     unsigned short m_timeEventCount;  // +0x6515
     unsigned short m_timeEventIndices[50];  // +0x6517
+    char m_pad_0x657b[0x66];
     class heroWindow *m_viewArmyWindow;  // +0x65e1
     int m_viewArmyResult;  // +0x65e5
     class heroWindow *m_viewSpellsWindow;  // +0x65e9
