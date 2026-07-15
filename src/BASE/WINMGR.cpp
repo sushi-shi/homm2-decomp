@@ -179,12 +179,6 @@ heroWindowManager::heroWindowManager(void) : baseManager()
     m_dialogResult = -1;
 }
 
-// @match-note
-// Structurally complete /O2 checkpoint: both code spans are 0xd6, there is no
-// local frame, and all 9 relocations agree. Bytes through the framebuffer rep
-// stosd match; the final manager-field/string-copy block leaves 24 unmasked bytes
-// from +0x95 because retail schedules the Open argument in ECX rather than EAX
-// around the same three stores. An explicit open-mode lifetime emitted no change.
 VA(0x004caad0, 0xd6)
 int heroWindowManager::Open(int managerOrder)
 {
@@ -203,11 +197,8 @@ int heroWindowManager::Open(int managerOrder)
     m_screen->m_width = WINDOW_SCREEN_WIDTH;
     m_screen->m_height = WINDOW_SCREEN_HEIGHT;
     m_screen->m_pixels = reinterpret_cast<unsigned char *>(lpInitWin);
-    int *fb = reinterpret_cast<int *>(m_screen->m_pixels);
-    for (i = WINDOW_FRAMEBUFFER_DWORD_COUNT; i != 0; i--) {
-        *fb = 0x24242424;
-        fb++;
-    }
+    memset(m_screen->m_pixels, WINDOW_FRAMEBUFFER_FILL_COLOR,
+           WINDOW_SCREEN_WIDTH * WINDOW_SCREEN_HEIGHT);
     m_priority = managerOrder;
     m_messageMask = 0x20;
     m_active = 1;

@@ -329,7 +329,7 @@ BASE/WINDOW	?RemoveAndDeleteWidget@heroWindow@@QAEXH@Z	100.0000	729dcdcf9c3b
 BASE/WINDOW	?RemoveWidget@heroWindow@@QAEXPAVwidget@@@Z	100.0000	04796a289906
 BASE/WINDOW	?RestoreBackground@heroWindow@@QAEXXZ	100.0000	1ad6adddfb67
 BASE/WINDOW	?SaveBackground@heroWindow@@QAEHXZ	100.0000	b4aefb12dfaa
-BASE/WINMGR	??0heroWindowManager@@QAE@XZ	100.0000	4113cba8c1df
+BASE/WINMGR	??0heroWindowManager@@QAE@XZ	100.0000	01910bbb05ce
 BASE/WINMGR	?AddWindow@heroWindowManager@@QAEXPAVheroWindow@@HH@Z	97.3513	a33e6b526892
 BASE/WINMGR	?BroadcastMessage@heroWindowManager@@QAEHHHHH@Z	81.1765	afb90999266e
 BASE/WINMGR	?Close@heroWindowManager@@UAEXXZ	100.0000	87919b3de056
@@ -339,7 +339,7 @@ BASE/WINMGR	?DoDialog@heroWindowManager@@QAEHPAVheroWindow@@P6IHAAUtag_message@@
 BASE/WINMGR	?FadeScreen@heroWindowManager@@QAEXHHPAVpalette@@@Z	100.0000	76fa3ab96e6f
 BASE/WINMGR	?FizzleForward@heroWindowManager@@QAEXHHHHHPAC0@Z	89.8026	31bb10c3eb37
 BASE/WINMGR	?Main@heroWindowManager@@UAEHAAUtag_message@@@Z	100.0000	5ef8d637ceb1
-BASE/WINMGR	?Open@heroWindowManager@@UAEHH@Z	94.1364	a9e3d9500e6f
+BASE/WINMGR	?Open@heroWindowManager@@UAEHH@Z	100.0000	5eb80cea321d
 BASE/WINMGR	?RedrawScreen@heroWindowManager@@QAEXXZ	100.0000	c64b79610770
 BASE/WINMGR	?ReleaseFizzleSource@heroWindowManager@@QAEXXZ	100.0000	a858996d798a
 BASE/WINMGR	?RemoveWindow@heroWindowManager@@QAEXPAVheroWindow@@@Z	93.8775	908cf8ee8864
