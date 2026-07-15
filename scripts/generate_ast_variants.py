@@ -997,7 +997,8 @@ def inline_read_advance_edits(fn, blob: bytes, insertion: int, helper_name_count
 
 
 def identifier_rename_edits(
-    fn, blob: bytes, name_count: int, selected_names: set[str] | None = None
+    fn, blob: bytes, name_count: int, selected_names: set[str] | None = None,
+    explicit_names: tuple[str, ...] = (),
 ) -> list[AstMutation]:
     declarations = {}
     for node in fn.walk_preorder():
@@ -1007,7 +1008,14 @@ def identifier_rename_edits(
         if parent is None or parent.hash != fn.hash or not node.spelling.isidentifier():
             continue
         declarations[node.hash] = node
-    existing_names = {declaration.spelling for declaration in declarations.values()}
+    referenced_names = {
+        node.referenced.spelling
+        for node in fn.walk_preorder()
+        if node.kind == ci.CursorKind.DECL_REF_EXPR and node.referenced is not None
+    }
+    existing_names = {
+        declaration.spelling for declaration in declarations.values()
+    } | referenced_names
     mutations = []
     for declaration in sorted(declarations.values(), key=lambda item: item.location.offset):
         original = declaration.spelling
@@ -1028,9 +1036,13 @@ def identifier_rename_edits(
             blob[start:end] != original.encode("utf-8") for start, end in occurrences
         ):
             continue
-        for suffix in RENAME_SUFFIXES[:name_count]:
-            replacement = original + suffix
-            if replacement in existing_names:
+        replacements = [original + suffix for suffix in RENAME_SUFFIXES[:name_count]]
+        replacements.extend(explicit_names)
+        for replacement in dict.fromkeys(replacements):
+            if (
+                replacement == original or not replacement.isidentifier()
+                or replacement in existing_names
+            ):
                 continue
             mutations.append(AstMutation(
                 "identifier_rename",
@@ -1045,7 +1057,7 @@ def identifier_rename_edits(
 
 def atomic_mutations(
     fn, blob: bytes, insertion: int, families: set[str], helper_name_count: int,
-    rename_name_count: int, rename_identifiers: set[str],
+    rename_name_count: int, rename_identifiers: set[str], rename_candidates: tuple[str, ...],
 ) -> list[AstMutation]:
     mutations = expression_edits(fn, blob) + statement_order_edits(fn, blob) + declaration_edits(fn, blob)
     if "inline_expression" in families:
@@ -1060,7 +1072,7 @@ def atomic_mutations(
         mutations += inline_read_advance_edits(fn, blob, insertion, helper_name_count)
     if "identifier_rename" in families:
         mutations += identifier_rename_edits(
-            fn, blob, rename_name_count, rename_identifiers
+            fn, blob, rename_name_count, rename_identifiers, rename_candidates
         )
     unique = {}
     for mutation in mutations:
@@ -1223,6 +1235,13 @@ def main(argv=None, *, prog=None, description=None) -> int:
         help="limit identifier_rename to this bound declaration spelling; may be repeated",
     )
     parser.add_argument(
+        "--rename-candidate", action="append", default=[],
+        help=(
+            "additional whole-identifier spelling for identity-safe identifier_rename; may be "
+            "repeated and is rejected on a declaration/reference collision"
+        ),
+    )
+    parser.add_argument(
         "--require-mutation", action="append", default=[],
         help="require an exact content-fingerprinted mutation name; may be repeated",
     )
@@ -1306,7 +1325,7 @@ def main(argv=None, *, prog=None, description=None) -> int:
     insertion, _span_end = marker_span(blob, args.rva)
     mutations = atomic_mutations(
         fn, blob, insertion, families, args.helper_name_count, args.rename_name_count,
-        set(args.rename_identifier),
+        set(args.rename_identifier), tuple(args.rename_candidate),
     )
     state_families = tuple(
         family.strip() for family in args.state_families.split(",") if family.strip()
@@ -1348,6 +1367,7 @@ def main(argv=None, *, prog=None, description=None) -> int:
             "allowed_external_diagnostics": allowed_diagnostics,
             "required_mutations": sorted(required_names),
             "rename_name_count": args.rename_name_count,
+            "rename_candidates": args.rename_candidate,
             "rename_identifiers": sorted(set(args.rename_identifier)),
             "tu_state": {
                 "trials_requested": args.state_trials,
