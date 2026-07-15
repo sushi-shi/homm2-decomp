@@ -168,13 +168,16 @@ void listBoxWidget::DeleteItem(int index)
         m_visibleItemCount = m_itemCount;
 }
 
-// Two-byte /O2 compare-polarity residual after the exact Read reconstruction changed TU state.
-// Both sides are 0x368 bytes with 23 relocations at identical offsets and matching external
-// targets. The jump-table base (+0x12a) and six entries (+0x350-364) differ only in local-label
-// identity. After masking them, the only byte differences are +0xa5 (3B versus 39) and +0xa8
-// (7C versus 7F): `cmp dx,[m_y]; jl` versus the equivalent `cmp [m_y],dx; jg`. Direct and
-// reversed relations, positive bounds, declaration order, casts, and libclang AST permutations
-// were tried; the remaining instruction stream is identical.
+// @semantic
+// Semantics, types, 0x8 frame, CFG, and the 0x368 CodeView span are complete. All 23
+// ordered relocation sites/types and semantic targets align: 16 external identities/addends
+// are exact, while the dispatch at +0x12a and six tail-table entries at +0x350..+0x364
+// differ only by compiler-local label versus delinked containing-function identity.
+// Relocation-masked raw comparison leaves 23 bytes, all in +0x8a..+0xb7: retail and
+// candidate assign owner-relative mouse X/Y and list left/top to different registers and use
+// equivalent signed compare polarity for the same half-open bounds. Mouse and widget-message
+// dispatch, ID gates, set/get/replace/append/delete/clear behavior, and fallback Main call agree.
+// A bounded 512-trial exact-only TU-state diagnostic found no closure; no probe was retained.
 VA(0x004db520, 0x368)
 int listBoxWidget::Main(tag_message &message)
 {
