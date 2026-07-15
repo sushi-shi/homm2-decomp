@@ -22,7 +22,7 @@ _**Functions exact** = byte-identical now. **Functions exact-max** = byte-identi
 | Module   | Units |    Functions exact | Functions exact-max |  Fuzzy | Fuzzy-max |
 | :------- | ----: | -----------------: | ------------------: | -----: | --------: |
 | `SOURCE` |    50 | 521 / 1058 (49.2%) |  604 / 1058 (57.1%) |  98.0% |     98.6% |
-| `BASE`   |    44 |  289 / 445 (64.9%) |   321 / 445 (72.1%) |  94.9% |     95.7% |
+| `BASE`   |    44 |  289 / 445 (64.9%) |   321 / 445 (72.1%) |  95.0% |     95.7% |
 | `EDITOR` |     1 |    10 / 11 (90.9%) |    11 / 11 (100.0%) | 100.0% |    100.0% |
 
 <!-- match-score:end -->
