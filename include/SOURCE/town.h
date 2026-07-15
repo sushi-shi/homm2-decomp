@@ -61,6 +61,7 @@ typedef enum TownConstant {
     TOWN_FORMATION_SPREAD = 0,
     TOWN_FORMATION_GROUPED = 1,
     TOWN_PLAYER_WINDOW_SIZE = 5,
+    TOWN_MAGE_GUILD_LEVEL_COUNT = 5,
     TOWN_MAGE_GUILD_FIRST_LEVEL = 1,
     TOWN_MAGE_GUILD_WISDOM_LEVEL_BONUS = 2,
     TOWN_MAGE_GUILD_SPELLS_PER_LEVEL = 4,
@@ -100,7 +101,8 @@ public:
     signed char m_originalOwner;  // +0x39
     unsigned short m_extraIndex;  // +0x3a
     union {
-        signed char m_spells[5][4];  // +0x3c
+        signed char m_spells[TOWN_MAGE_GUILD_LEVEL_COUNT][TOWN_MAGE_GUILD_SPELLS_PER_LEVEL];  // +0x3c
+        signed char m_spellSlots[TOWN_MAGE_GUILD_LEVEL_COUNT * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL];
         struct {
             char m_spellPad[19];
             signed char m_spellCounts[6];
