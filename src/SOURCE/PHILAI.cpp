@@ -5575,70 +5575,79 @@ int philAI::EvaluateArtifactEvent(int artifact, int eventData) {
     return result5;
 }
 
+// @semantic live 99.42% after the shared MonsterAbilityFlags declaration moved
+// PHILAI's TU-cumulative compiler state.  On the immediately preceding master
+// state this body was 100%: all 244 instructions, the 0x30 frame and exact local
+// slots, the 778-byte extent, and 38/38 relocation targets matched retail.  The
+// mine-value else arm restores the retail /Ob1 continuation shape.  Preserve
+// this reconstruction until the enum/type pass settles, then revisit the live
+// compiler-state residual during final maxing.
 VA(0x0044661e, 0x30a)
 int philAI::EvaluateMineEvent(int mineIndex, int x, int y, int *liveChance) {
     float winChance;
-    int attackerLoss;
-    int guardianCount;
+    int attackerLoss2;
+    int guardianCount5;
     int defenderLoss;
     int attackerRemaining;
-    int defenderRemaining;
-    int stackIndex;
-    int outcomeValue;
-    int result = 0;
-    int mineValue;
-    float attackBonus;
+    int defenderRemaining0;
+    int stackIndex1;
+    int result1 = 0;
+    int outcomeValue4;
+    int mineValue0;
+    float attackBonus0;
     if (gpGame->m_mineOwners[mineIndex] == gpCurAIHero->m_owner ||
         OnMySide(gpGame->m_mineOwners[mineIndex]))
-        return result;
+        return result1;
 
     if (gpGame->m_mines[mineIndex].guardianType != ARMY_GROUP_EMPTY_SLOT) {
-        guardianCount = gpGame->m_mines[mineIndex].guardianCount;
+        guardianCount5 = gpGame->m_mines[mineIndex].guardianCount;
         memset(gpMonGroup->m_creatureTypes, ARMY_GROUP_EMPTY_SLOT,
                ARMY_GROUP_SLOT_COUNT);
         memset(gpMonGroup->m_quantities, 0,
                ARMY_GROUP_SLOT_COUNT * sizeof(gpMonGroup->m_quantities[0]));
 
-        if (guardianCount / ARMY_GROUP_SLOT_COUNT > 0) {
-            for (stackIndex = 0; stackIndex < ARMY_GROUP_SLOT_COUNT; stackIndex++) {
-                gpMonGroup->m_creatureTypes[stackIndex] =
+        if (guardianCount5 / ARMY_GROUP_SLOT_COUNT > 0) {
+            for (stackIndex1 = 0; stackIndex1 < ARMY_GROUP_SLOT_COUNT; stackIndex1++) {
+                gpMonGroup->m_creatureTypes[stackIndex1] =
                     gpGame->m_mines[mineIndex].guardianType;
-                gpMonGroup->m_quantities[stackIndex] = static_cast<short>(
-                    guardianCount / ARMY_GROUP_SLOT_COUNT);
+                gpMonGroup->m_quantities[stackIndex1] = static_cast<short>(
+                    guardianCount5 / ARMY_GROUP_SLOT_COUNT);
             }
         }
-        for (stackIndex = guardianCount % ARMY_GROUP_SLOT_COUNT - 1;
-             stackIndex >= 0; stackIndex--) {
-            gpMonGroup->m_creatureTypes[stackIndex] =
+        for (stackIndex1 = guardianCount5 % ARMY_GROUP_SLOT_COUNT - 1;
+             stackIndex1 >= 0; stackIndex1--) {
+            gpMonGroup->m_creatureTypes[stackIndex1] =
                 gpGame->m_mines[mineIndex].guardianType;
-            gpMonGroup->m_quantities[stackIndex]++;
+            gpMonGroup->m_quantities[stackIndex1]++;
         }
 
-        ProbableOutcomeOfBattle(&gpCurAIHero->m_army, gpCurAIHero, gpMonGroup, 0,
-                                0, 0, 0, -1, winChance, attackerLoss,
-                                defenderLoss, attackerRemaining, defenderRemaining,
-                                outcomeValue);
+        ProbableOutcomeOfBattle(
+            &gpCurAIHero->m_army, gpCurAIHero, gpMonGroup, 0, 0, 0, 0, -1,
+            winChance, attackerLoss2, defenderLoss, attackerRemaining,
+            defenderRemaining0, outcomeValue4);
         *liveChance = static_cast<int>(winChance);
-        result = outcomeValue;
+        result1 = outcomeValue4;
     }
 
     if (gbIAmGreatest && gpGame->m_mineOwners[mineIndex] >= 0 &&
         !gbHumanPlayer[gpGame->m_mineOwners[mineIndex]])
-        return result;
-
-    mineValue = static_cast<int>(
-        static_cast<float>(gMineCharacteristics[gpGame->m_mines[mineIndex].resourceType]) *
-        gafAITurnCostResource[gpGame->m_mines[mineIndex].resourceType] *
-        gaiTurnValueOfMine[x + MAP_WIDTH * y]);
-    if (gpGame->m_mineOwners[mineIndex] >= 0) {
-        if (gbHumanPlayer[gpGame->m_mineOwners[mineIndex]])
-            attackBonus = gfAttackHumanBonus;
-        else
-            attackBonus = gfAttackComputerBonus;
-        mineValue = static_cast<int>(mineValue * attackBonus);
+        return result1;
+    else {
+        mineValue0 = static_cast<int>(
+            static_cast<float>(
+                gMineCharacteristics[gpGame->m_mines[mineIndex].resourceType]) *
+            gafAITurnCostResource[gpGame->m_mines[mineIndex].resourceType] *
+            gaiTurnValueOfMine[x + MAP_WIDTH * y]);
+        if (gpGame->m_mineOwners[mineIndex] >= 0) {
+            if (gbHumanPlayer[gpGame->m_mineOwners[mineIndex]])
+                attackBonus0 = gfAttackHumanBonus;
+            else
+                attackBonus0 = gfAttackComputerBonus;
+            mineValue0 = static_cast<int>(mineValue0 * attackBonus0);
+        }
+        result1 += mineValue0;
     }
-    result += mineValue;
-    return result;
+    return result1;
 }
 
 VA(0x00446928, 0x33e)
