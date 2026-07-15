@@ -34,6 +34,11 @@ Both paths require the pinned SHA-256 identities of the code-generating compiler
 phases, linker, CVTRES/PDB support, core headers, and CRT libraries. An explicitly
 unpinned tree is allowed only through `--allow-unpinned` for isolated A/B tests.
 
+The strict final link also derives the retail `/Gf` writable-literal variant from
+the pinned VC4.2 `LIBCMT.LIB`. The byte-constrained archive transform and its
+official-source proof are documented in
+[`vc42-libcmt-gf.md`](vc42-libcmt-gf.md).
+
 ## Local provisioning
 
 ```sh
