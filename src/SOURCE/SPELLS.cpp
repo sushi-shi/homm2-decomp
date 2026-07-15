@@ -481,13 +481,13 @@ int combatManager::ValidSpellTarget(int spell, int hex)
     return 1;
 }
 
-// @match-note 94.35%: the retail physical switch shape, target-name formatting,
-// and final CombatMessage CFG agree. The 0x10 frame has target_i at -0x4,
-// armyName at -0x8, this at -0x0c, and switch storage at -0x10. All 27 external
-// relocation targets agree. The normal diff stops at the delinked switch
-// dispatch; explicit range review leaves only local-label identities. Tried the
-// former shared post-switch formatting, explicit occupied-target ordering, and
-// both teleport polarities. Revisit for switch-label shaping after 95%.
+// @early-stop 99.70149%: byte-proven delinker/constant-pool artifact. Target and
+// base are both 0x222 bytes with the same 201-instruction stream and 27/27
+// ordered relocation offsets/types/semantic targets. The positive teleport arm
+// followed by the occupied-target goto recovers the retail CFG. Remaining
+// objdiff arguments are only retail string-pool names versus $SG names and
+// switch-local labels represented as the containing function versus $L labels;
+// there is no opcode, stack, CFG, external-callee, or external-global residual.
 VA(0x0042159c, 0x222)
 void combatManager::SpellMessage(int spell, int hex)
 {
@@ -505,10 +505,11 @@ void combatManager::SpellMessage(int spell, int hex)
         sprintf(gText, "Cast %s", gSpellNames[spell]);
         break;
     case SPELL_TELEPORT:
-        if (!bInTeleportGetDest)
-            goto occupied_target;
-        sprintf(gText, "Teleport Here");
-        break;
+        if (bInTeleportGetDest) {
+            sprintf(gText, "Teleport Here");
+            break;
+        }
+        goto occupied_target;
     case SPELL_RESURRECT:
     case SPELL_TRUE_RESURRECT:
     case SPELL_ANIMATE_DEAD:
@@ -1023,15 +1024,11 @@ void combatManager::CastSpell(int spell, int targetHex, int castByCreature, int 
     CheckChangeSelector();
 }
 
-// @match-note retained 99.86%, combined live 91.17%: semantics, 0x08 frame,
-// CFG, and all 3 relocation
-// targets agree. After masking the relocation union, the only raw residuals
-// are branch-displacement bytes at +0x18 and +0x40; the normalized stream then
-// differs only in the typed gsSpellInfo relocation versus retail's interior
-// combatEffect label. Tried a combined guard, nested positive guard, empty
-// negative arm, and a shared empty invalid/negative arm. The syntax-aware AST
-// pass had one canonical variant, and a 36-trial guarded TU-state sweep found no
-// audited exact closure. Revisit only after a material TU-state change.
+// @early-stop 99.86%: byte-proven delinker artifact. The 0x08 frame, full
+// instruction/CFG stream, and 3/3 relocation offsets/types/semantic targets
+// agree. The only normalized residual is retail's interior combatEffect label
+// versus the typed gsSpellInfo field relocation; raw local-branch displacements
+// differ only because the delinker assigns the containing-function identity.
 VA(0x00423688, 0xda)
 void combatManager::DefaultSpell(int targetHex)
 {
@@ -1047,135 +1044,135 @@ void combatManager::DefaultSpell(int targetHex)
     }
 }
 
-// @match-note retained 99.71%, live 98.26%: complete animation, 19-cell
-// selection, duplicate filtering, damage, message, and PowEffect CFG; all 51
-// relocation targets agree. Reusing one function-scope frame counter and moving
-// damage to that scope recovered retail's 0x5c frame. The od_slots suffix pass
-// now aligns baseDamage/target/targetX/frame and the compiler tail. The remaining
-// first slot residual is targetY at -0x4c versus retail -0x8, which leaves the
-// affectedHexes/anyAffected/damage range four bytes shallow. A same-bucket
-// targetY suffix and split declaration/assignment were byte-neutral. Previously
-// tried cached/direct hex fields, removing side/index temporaries, typed short
-// storage, and in-place damage shifts. A 48-trial guarded TU-state sweep found no
-// audited exact closure. Revisit only after a TU identifier-state change or a new
-// source-scope discovery; do not repeat these spellings.
 VA(0x00423762, 0x623)
 void combatManager::Fireball(int targetHex, int spell)
 {
     if (!ValidHex(targetHex))
         return;
 
-    int targetX_a = m_hexCells[targetHex].m_x;
-    int targetY = m_hexCells[targetHex].m_y - COMBAT_SPELL_TARGET_Y_OFFSET;
-    int frame;
+    long baseDamage_w;
+    icon *spellIcon_n;
+    int affectedCount_n;
+    army *target_n;
+    int targetX_n;
+    int frame_i;
+    int targetY_p;
+    short affectedHexes_e[SPELL_FIREBALL_AFFECTED_HEX_COUNT];
+    int anyAffected_g;
+    long damage_f;
+    int frameCount_i;
+
+    targetX_n = m_hexCells[targetHex].m_x;
+    targetY_p = m_hexCells[targetHex].m_y - COMBAT_SPELL_TARGET_Y_OFFSET;
     if (!gbNoShowCombat) {
-        int frameCount = SPELL_FIREBALL_FRAME_COUNT;
-        icon *spellIcon;
+        frameCount_i = SPELL_FIREBALL_FRAME_COUNT;
         if (spell == SPELL_FIREBALL)
-            spellIcon = gpResourceManager->GetIcon("fireball.icn");
+            spellIcon_n = gpResourceManager->GetIcon("fireball.icn");
         else if (spell == SPELL_FIREBLAST)
-            spellIcon = gpResourceManager->GetIcon("firebal2.icn");
+            spellIcon_n = gpResourceManager->GetIcon("firebal2.icn");
         else {
-            spellIcon = gpResourceManager->GetIcon("coldring.icn");
-            frameCount = SPELL_COLD_RING_FRAME_COUNT;
+            spellIcon_n = gpResourceManager->GetIcon("coldring.icn");
+            frameCount_i = SPELL_COLD_RING_FRAME_COUNT;
         }
 
-        for (frame = 0; frame < frameCount; ++frame) {
+        for (frame_i = 0; frame_i < frameCount_i; ++frame_i) {
             glTimers[0] = static_cast<int>(
                 KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] *
                                     SPELL_AREA_ANIMATION_DELAY);
-            IconToBitmap(spellIcon, gpWindowManager->m_screen, targetX_a,
-                         targetY, frame, 1, 0, 0, COMBAT_SCREEN_WIDTH,
+            IconToBitmap(spellIcon_n, gpWindowManager->m_screen, targetX_n,
+                         targetY_p, frame_i, 1, 0, 0, COMBAT_SCREEN_WIDTH,
                          COMBAT_AREA_HEIGHT, 0);
             if (spell == SPELL_COLD_RING) {
-                FlipIconToBitmap(spellIcon, gpWindowManager->m_screen,
-                                 targetX_a, targetY, frame, 1, 0, 0,
+                FlipIconToBitmap(spellIcon_n, gpWindowManager->m_screen,
+                                 targetX_n, targetY_p, frame_i, 1, 0, 0,
                                  COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT, 0);
             }
             UpdateCombatArea();
             DrawFrame(0, 0, 0, 0, COMBAT_DRAW_DELAY, 1, 1);
             DelayTil(&glTimers[0]);
         }
-        gpResourceManager->Dispose(spellIcon);
+        gpResourceManager->Dispose(spellIcon_n);
     }
 
     DrawFrame(1, 0, 0, 0, COMBAT_DRAW_DELAY, 1, 1);
-    army *target_b = &m_armies[m_currentSide][m_currentArmyIndex];
-    short affectedHexes_f[SPELL_FIREBALL_AFFECTED_HEX_COUNT];
-    for (frame = 0; frame < SPELL_FIREBALL_AFFECTED_HEX_COUNT; ++frame)
-        affectedHexes_f[frame] = COMBAT_HEX_EMPTY;
+    target_n = m_armies[0] +
+               m_currentSide * COMBAT_ARMY_STORAGE_SLOT_COUNT +
+               m_currentArmyIndex;
+    for (frame_i = 0; frame_i < SPELL_FIREBALL_AFFECTED_HEX_COUNT; ++frame_i)
+        affectedHexes_e[frame_i] = COMBAT_HEX_EMPTY;
     if (spell != SPELL_COLD_RING)
-        affectedHexes_f[0] = static_cast<short>(targetHex);
+        affectedHexes_e[0] = static_cast<short>(targetHex);
 
-    for (frame = 0; frame < SPELL_ADJACENT_DIRECTION_COUNT; ++frame) {
-        affectedHexes_f[frame + 1] = static_cast<short>(
-            GetAdjacentCellIndexNoArmy(targetHex, frame));
+    for (frame_i = 0; frame_i < SPELL_ADJACENT_DIRECTION_COUNT; ++frame_i) {
+        affectedHexes_e[frame_i + 1] = static_cast<short>(
+            GetAdjacentCellIndexNoArmy(targetHex, frame_i));
         if (spell == SPELL_FIREBLAST) {
-            affectedHexes_f[frame + SPELL_FIREBLAST_SECOND_RING_FIRST] =
+            affectedHexes_e[frame_i + SPELL_FIREBLAST_SECOND_RING_FIRST] =
                 static_cast<short>(
-                target_b->GetAdjacentCellIndex(affectedHexes_f[frame + 1], frame));
+                target_n->GetAdjacentCellIndex(affectedHexes_e[frame_i + 1], frame_i));
         }
     }
     if (spell == SPELL_FIREBLAST) {
-        affectedHexes_f[SPELL_FIREBLAST_AXIAL_FIRST] = static_cast<short>(
+        affectedHexes_e[SPELL_FIREBLAST_AXIAL_FIRST] = static_cast<short>(
             targetHex - SPELL_FIREBLAST_HEX_ROW_STRIDE);
-        if (affectedHexes_f[SPELL_FIREBLAST_AXIAL_FIRST] < 0)
-            affectedHexes_f[SPELL_FIREBLAST_AXIAL_FIRST] = COMBAT_HEX_EMPTY;
-        affectedHexes_f[SPELL_FIREBLAST_AXIAL_SECOND] = static_cast<short>(
+        if (affectedHexes_e[SPELL_FIREBLAST_AXIAL_FIRST] < 0)
+            affectedHexes_e[SPELL_FIREBLAST_AXIAL_FIRST] = COMBAT_HEX_EMPTY;
+        affectedHexes_e[SPELL_FIREBLAST_AXIAL_SECOND] = static_cast<short>(
             targetHex + SPELL_FIREBLAST_HEX_ROW_STRIDE);
-        if (affectedHexes_f[SPELL_FIREBLAST_AXIAL_SECOND] >= COMBAT_HEX_COUNT)
-            affectedHexes_f[SPELL_FIREBLAST_AXIAL_SECOND] = COMBAT_HEX_EMPTY;
-        affectedHexes_f[SPELL_FIREBLAST_CORNER_FIRST] = static_cast<short>(
-            GetAdjacentCellIndexNoArmy(affectedHexes_f[2], 0));
-        affectedHexes_f[SPELL_FIREBLAST_CORNER_FIRST + 1] = static_cast<short>(
-            GetAdjacentCellIndexNoArmy(affectedHexes_f[2], 2));
-        affectedHexes_f[SPELL_FIREBLAST_CORNER_FIRST + 2] = static_cast<short>(
-            GetAdjacentCellIndexNoArmy(affectedHexes_f[5], 5));
-        affectedHexes_f[SPELL_FIREBLAST_CORNER_FIRST + 3] = static_cast<short>(
-            GetAdjacentCellIndexNoArmy(affectedHexes_f[5], 3));
+        if (affectedHexes_e[SPELL_FIREBLAST_AXIAL_SECOND] >= COMBAT_HEX_COUNT)
+            affectedHexes_e[SPELL_FIREBLAST_AXIAL_SECOND] = COMBAT_HEX_EMPTY;
+        affectedHexes_e[SPELL_FIREBLAST_CORNER_FIRST] = static_cast<short>(
+            GetAdjacentCellIndexNoArmy(affectedHexes_e[2], 0));
+        affectedHexes_e[SPELL_FIREBLAST_CORNER_FIRST + 1] = static_cast<short>(
+            GetAdjacentCellIndexNoArmy(affectedHexes_e[2], 2));
+        affectedHexes_e[SPELL_FIREBLAST_CORNER_FIRST + 2] = static_cast<short>(
+            GetAdjacentCellIndexNoArmy(affectedHexes_e[5], 5));
+        affectedHexes_e[SPELL_FIREBLAST_CORNER_FIRST + 3] = static_cast<short>(
+            GetAdjacentCellIndexNoArmy(affectedHexes_e[5], 3));
     }
 
-    long baseDamage_w =
+    baseDamage_w =
         m_spellPower[m_currentSide] * SPELL_FIREBALL_DAMAGE_PER_POWER;
     ClearEffects();
-    int anyAffected_h = 0;
-    int affectedCount = SPELL_FIREBALL_AFFECTED_HEX_COUNT;
-    long damage_c;
-    for (frame = 0; frame < affectedCount; ++frame) {
-        if (affectedHexes_f[frame] != COMBAT_HEX_EMPTY &&
-            m_hexCells[affectedHexes_f[frame]].m_occupantSide !=
+    anyAffected_g = 0;
+    affectedCount_n = SPELL_FIREBALL_AFFECTED_HEX_COUNT;
+    for (frame_i = 0; frame_i < affectedCount_n; ++frame_i) {
+        if (affectedHexes_e[frame_i] != COMBAT_HEX_EMPTY &&
+            m_hexCells[affectedHexes_e[frame_i]].m_occupantSide !=
                 COMBAT_HEX_EMPTY) {
-            target_b =
-                &m_armies[m_hexCells[affectedHexes_f[frame]].m_occupantSide]
-                         [m_hexCells[affectedHexes_f[frame]].m_occupantIndex];
-            if (target_b->SpellCastWorks(spell) &&
-                !gArmyEffected
-                    [m_hexCells[affectedHexes_f[frame]].m_occupantSide]
-                    [m_hexCells[affectedHexes_f[frame]].m_occupantIndex]) {
-                gArmyEffected
-                    [m_hexCells[affectedHexes_f[frame]].m_occupantSide]
-                    [m_hexCells[affectedHexes_f[frame]].m_occupantIndex] = 1;
-                if (target_b->m_damagePending == 0) {
-                    damage_c = baseDamage_w;
+            target_n =
+                &m_armies[m_hexCells[affectedHexes_e[frame_i]].m_occupantSide]
+                         [m_hexCells[affectedHexes_e[frame_i]].m_occupantIndex];
+            if (target_n->SpellCastWorks(spell) &&
+                !*(gArmyEffected[0] +
+                   m_hexCells[affectedHexes_e[frame_i]].m_occupantSide *
+                       COMBAT_ARMY_SLOT_COUNT +
+                   m_hexCells[affectedHexes_e[frame_i]].m_occupantIndex)) {
+                *(gArmyEffected[0] +
+                  m_hexCells[affectedHexes_e[frame_i]].m_occupantSide *
+                      COMBAT_ARMY_SLOT_COUNT +
+                  m_hexCells[affectedHexes_e[frame_i]].m_occupantIndex) = 1;
+                if (target_n->m_damagePending == 0) {
+                    damage_f = baseDamage_w;
                     if (spell == SPELL_COLD_RING &&
-                        target_b->m_monsterType == SPELL_MONSTER_FIRE_ELEMENTAL)
-                        damage_c <<= 1;
+                        target_n->m_monsterType == SPELL_MONSTER_FIRE_ELEMENTAL)
+                        damage_f <<= 1;
                     if ((spell == SPELL_FIREBALL ||
                          spell == SPELL_FIREBLAST) &&
-                        target_b->m_monsterType == SPELL_MONSTER_WATER_ELEMENTAL)
-                        damage_c *= 2;
-                    if (target_b->m_monsterType == SPELL_MONSTER_IRON_GOLEM ||
-                        target_b->m_monsterType == SPELL_MONSTER_STEEL_GOLEM) {
-                        damage_c = static_cast<long>(
-                            damage_c * SPELL_GOLEM_DAMAGE_MULTIPLIER);
+                        target_n->m_monsterType == SPELL_MONSTER_WATER_ELEMENTAL)
+                        damage_f *= 2;
+                    if (target_n->m_monsterType == SPELL_MONSTER_IRON_GOLEM ||
+                        target_n->m_monsterType == SPELL_MONSTER_STEEL_GOLEM) {
+                        damage_f = static_cast<long>(
+                            damage_f * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                     }
-                    target_b->Damage(damage_c, spell);
-                    anyAffected_h = 1;
+                    target_n->Damage(damage_f, spell);
+                    anyAffected_g = 1;
                 }
             }
         }
     }
-    if (anyAffected_h) {
+    if (anyAffected_g) {
         ModifyDamageForArtifacts(&baseDamage_w, spell, m_heroes[m_currentSide],
                                  m_heroes[1 - m_currentSide]);
         if (spell == SPELL_COLD_RING)
@@ -1183,7 +1180,7 @@ void combatManager::Fireball(int targetHex, int spell)
         else
             sprintf(gText, "The fireball does %d damage.", baseDamage_w);
         CombatMessage(gText, 1, 1, 0);
-        target_b->PowEffect(-1, 1, -1, -1);
+        target_n->PowEffect(-1, 1, -1, -1);
     }
 }
 
@@ -1238,12 +1235,14 @@ void combatManager::MeteorShower(int targetHex)
                 &m_armies[m_hexCells[affectedHexes_f[direction]].m_occupantSide]
                          [m_hexCells[affectedHexes_f[direction]].m_occupantIndex];
             if (target_k->SpellCastWorks(SPELL_METEOR_SHOWER) &&
-                !gArmyEffected
-                    [m_hexCells[affectedHexes_f[direction]].m_occupantSide]
-                    [m_hexCells[affectedHexes_f[direction]].m_occupantIndex]) {
-                gArmyEffected
-                    [m_hexCells[affectedHexes_f[direction]].m_occupantSide]
-                    [m_hexCells[affectedHexes_f[direction]].m_occupantIndex] = 1;
+                !*(gArmyEffected[0] +
+                   m_hexCells[affectedHexes_f[direction]].m_occupantSide *
+                       COMBAT_ARMY_SLOT_COUNT +
+                   m_hexCells[affectedHexes_f[direction]].m_occupantIndex)) {
+                *(gArmyEffected[0] +
+                  m_hexCells[affectedHexes_f[direction]].m_occupantSide *
+                      COMBAT_ARMY_SLOT_COUNT +
+                  m_hexCells[affectedHexes_f[direction]].m_occupantIndex) = 1;
                 if (target_k->m_damagePending == 0) {
                     damage_c = baseDamage_w;
                     if (target_k->m_monsterType ==
@@ -1262,83 +1261,81 @@ void combatManager::MeteorShower(int targetHex)
     }
 }
 
-// @match-note retained 99.75%, combined live 96.80%: complete tiled animation,
-// global
-// damage, artifact/golem handling, message, and PowEffect CFG. The 0x4c frame
-// size and all 31 relocation targets agree. Retail slots side/index/target/
-// damage at -0x24/-0x8/-0xc/-0x28; current semantic names use
-// -0xc/-0x38/-0x10/-0x3c, with the first structural divergence at retail
-// +0x1bc in the army-address evaluation. Tried direct indexing, row-plus-index,
-// reversed pointer addition, uninitialized target, and in-place doubling.
-// Revisit at 95% for slot suffixing; do not repeat these spellings beforehand.
 VA(0x0042414e, 0x2fb)
 void combatManager::ElementalStorm(void)
 {
+    int baseDamage_w;
+    int column_e;
+    army *target_m;
+    int armyIndex_e;
+    int frame_i;
+    int row_b;
+    int pass_c;
+    int side_h;
+    int anyAffected_f;
+    long damage_e;
+    icon *stormIcon_i;
+    SLimitData limits_n;
+
     if (!gbNoShowCombat) {
-        SLimitData limits;
-        icon *stormIcon = gpResourceManager->GetIcon("storm.icn");
-        int pass;
-        for (pass = 0; pass < SPELL_STORM_PASS_COUNT; ++pass) {
-            int frame;
-            for (frame = 0; frame < SPELL_STORM_FRAME_COUNT; ++frame) {
+        stormIcon_i = gpResourceManager->GetIcon("storm.icn");
+        for (pass_c = 0; pass_c < SPELL_STORM_PASS_COUNT; ++pass_c) {
+            for (frame_i = 0; frame_i < SPELL_STORM_FRAME_COUNT; ++frame_i) {
                 glTimers[0] = static_cast<int>(
                     KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] *
                                         SPELL_AREA_ANIMATION_DELAY);
                 DrawFrame(0, 0, 0, 0, COMBAT_DRAW_DELAY, 1, 1);
-                int row;
-                for (row = 0; row < SPELL_STORM_ROW_COUNT; ++row) {
-                    int column;
-                    for (column = 0; column < SPELL_STORM_COLUMN_COUNT;
-                         ++column) {
-                        stormIcon->CombatClipDrawToBuffer(
-                            column * SPELL_STORM_TILE_SIZE,
-                            row * SPELL_STORM_TILE_SIZE,
-                            (column * SPELL_STORM_FRAME_COLUMN_STEP + frame +
-                             row) %
+                for (row_b = 0; row_b < SPELL_STORM_ROW_COUNT; ++row_b) {
+                    for (column_e = 0; column_e < SPELL_STORM_COLUMN_COUNT;
+                         ++column_e) {
+                        stormIcon_i->CombatClipDrawToBuffer(
+                            column_e * SPELL_STORM_TILE_SIZE,
+                            row_b * SPELL_STORM_TILE_SIZE,
+                            (column_e * SPELL_STORM_FRAME_COLUMN_STEP + frame_i +
+                             row_b) %
                                 SPELL_STORM_FRAME_COUNT,
-                            &limits, 0, 0, 0, 0);
+                            &limits_n, 0, 0, 0, 0);
                     }
                 }
                 UpdateCombatArea();
                 DelayTil(&glTimers[0]);
             }
         }
-        gpResourceManager->Dispose(stormIcon);
+        gpResourceManager->Dispose(stormIcon_i);
     }
 
     DrawFrame(1, 0, 0, 0, COMBAT_DRAW_DELAY, 1, 1);
-    int anyAffected = 0;
-    int baseDamage =
+    anyAffected_f = 0;
+    baseDamage_w =
         m_spellPower[m_currentSide] * SPELL_ELEMENTAL_STORM_DAMAGE_PER_POWER;
-    army *target;
-    int side;
-    for (side = 0; side < COMBAT_SIDE_COUNT; ++side) {
-        int armyIndex;
-        for (armyIndex = 0; armyIndex < m_armyCount[side]; ++armyIndex) {
-            target = armyIndex + m_armies[side];
-            if (target->SpellCastWorks(SPELL_ELEMENTAL_STORM)) {
-                long damage = baseDamage;
-                if (target->m_monsterType == SPELL_MONSTER_AIR_ELEMENTAL)
-                    damage <<= 1;
-                if (target->m_monsterType == SPELL_MONSTER_IRON_GOLEM ||
-                    target->m_monsterType == SPELL_MONSTER_STEEL_GOLEM) {
-                    damage = static_cast<long>(
-                        damage * SPELL_GOLEM_DAMAGE_MULTIPLIER);
+    for (side_h = 0; side_h < COMBAT_SIDE_COUNT; ++side_h) {
+        for (armyIndex_e = 0; armyIndex_e < m_armyCount[side_h];
+             ++armyIndex_e) {
+            target_m = m_armies[0] +
+                       side_h * COMBAT_ARMY_STORAGE_SLOT_COUNT + armyIndex_e;
+            if (target_m->SpellCastWorks(SPELL_ELEMENTAL_STORM)) {
+                damage_e = baseDamage_w;
+                if (target_m->m_monsterType == SPELL_MONSTER_AIR_ELEMENTAL)
+                    damage_e <<= 1;
+                if (target_m->m_monsterType == SPELL_MONSTER_IRON_GOLEM ||
+                    target_m->m_monsterType == SPELL_MONSTER_STEEL_GOLEM) {
+                    damage_e = static_cast<long>(
+                        damage_e * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                 }
-                if (m_heroes[side] && m_heroes[side]->HasArtifact(
+                if (m_heroes[side_h] && m_heroes[side_h]->HasArtifact(
                                           SPELL_ARTIFACT_BROACH_SHIELDING)) {
-                    damage = static_cast<long>(
-                        damage * SPELL_GOLEM_DAMAGE_MULTIPLIER);
+                    damage_e = static_cast<long>(
+                        damage_e * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                 }
-                target->Damage(damage, SPELL_ELEMENTAL_STORM);
-                anyAffected = 1;
+                target_m->Damage(damage_e, SPELL_ELEMENTAL_STORM);
+                anyAffected_f = 1;
             }
         }
     }
-    if (anyAffected) {
-        sprintf(gText, "The elemental storm does %d damage.", baseDamage);
+    if (anyAffected_f) {
+        sprintf(gText, "The elemental storm does %d damage.", baseDamage_w);
         CombatMessage(gText, 1, 1, 0);
-        target->PowEffect(-1, 1, -1, -1);
+        target_m->PowEffect(-1, 1, -1, -1);
     }
 }
 
@@ -1371,7 +1368,7 @@ void combatManager::Armageddon(void)
         int armyIndex3;
         for (armyIndex3 = 0; armyIndex3 < m_armyCount[side11];
              ++armyIndex3) {
-            target18 = armyIndex3 + m_armies[side11];
+            target18 = &m_armies[side11][armyIndex3];
             if (target18->SpellCastWorks(SPELL_ARMAGEDDON)) {
                 long damage9 = baseDamage2;
                 if (target18->m_monsterType == SPELL_MONSTER_IRON_GOLEM ||
@@ -2154,43 +2151,53 @@ skipBranch:
     gpWindowManager->m_updateFlags = 1;
 }
 
-// @match-note retained 99.68%, combined live 94.16%: semantics, CFG, frame,
-// and all 12 relocation targets agree. Later TU/header state changed the two
-// side/index multiply sequences; the remaining relocation-only residual is the
-// zero-float label ($T8947 versus retail const_000eb150). Revisit after shared
-// layout stabilization; do not repeat the already exact source spelling.
+// @match-note: complete candidate filtering and nearest-distance selection; the
+// 0x2c frame, all ten semantic local slots, CFG, and 12/12 relocation targets
+// agree. The first normalized residual is the equivalent final minimum test:
+// retail emits `cmp distance,closestDistance; jge`, while the direct positive
+// arm emits the reversed operands and `jle`. Reversed positive operands, an
+// empty >= arm, and a >= continue arm were tried; the latter two add a trampoline.
+// The other residual is only $T versus retail's zero-float constant identity.
+// Revisit after a material TU-state change.
 VA(0x004266ce, 0x18c)
 int combatManager::GetNextChainLightningTarget(army *source, int requireWorks)
 {
-    int closestDistance = 999999;
-    int closestHex = COMBAT_HEX_EMPTY;
-    int sourceX = source->MidX();
-    int sourceY = source->MidY();
-
+    army *candidate_p;
+    int closestHex_f;
+    int distance;
+    int sourceX;
+    int sourceY;
+    int deltaX_e;
     int side;
+    int deltaY_n;
+    int closestDistance;
+    int armyIndex_g;
+    closestDistance = 999999;
+    closestHex_f = COMBAT_HEX_EMPTY;
+    sourceX = source->MidX();
+    sourceY = source->MidY();
     for (side = 0; side < COMBAT_SIDE_COUNT; ++side) {
-        int armyIndex;
-        for (armyIndex = 0; armyIndex < m_armyCount[side]; ++armyIndex) {
-            army *candidate = &m_armies[side][armyIndex];
-            if (gArmyEffected[side][armyIndex] == 0) {
+        for (armyIndex_g = 0; armyIndex_g < m_armyCount[side]; ++armyIndex_g) {
+            candidate_p = &m_armies[side][armyIndex_g];
+            if (gArmyEffected[side][armyIndex_g] == 0) {
                 if ((requireWorks != 0 &&
-                     candidate->SpellCastWorks(SPELL_CHAIN_LIGHTNING)) ||
+                     candidate_p->SpellCastWorks(SPELL_CHAIN_LIGHTNING)) ||
                     (requireWorks == 0 &&
-                     candidate->SpellCastWorkChance(SPELL_CHAIN_LIGHTNING) !=
+                     candidate_p->SpellCastWorkChance(SPELL_CHAIN_LIGHTNING) !=
                          0.0f)) {
-                    int deltaX = abs(candidate->MidX() - sourceX);
-                    int deltaY = abs(candidate->MidY() - sourceY);
-                    int distance = static_cast<int>(sqrt(static_cast<double>(
-                        deltaX * deltaX + deltaY * deltaY)));
-                    if (distance < closestDistance) {
+                    deltaX_e = abs(candidate_p->MidX() - sourceX);
+                    deltaY_n = abs(candidate_p->MidY() - sourceY);
+                    distance = static_cast<int>(sqrt(static_cast<double>(
+                        deltaX_e * deltaX_e + deltaY_n * deltaY_n)));
+                    if (closestDistance > distance) {
                         closestDistance = distance;
-                        closestHex = candidate->m_hex;
+                        closestHex_f = candidate_p->m_hex;
                     }
                 }
             }
         }
     }
-    return closestHex;
+    return closestHex_f;
 }
 
 // @match-note 99.41%: complete four-target damage/selection/bolt CFG; all 37
@@ -2891,8 +2898,9 @@ mirror_found:
     DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 }
 
-// @match-note 99.97%: complete hex selection, quantity artifact, AddArmy,
-// ability flag, and duration artifacts; the 0x1c frame, every local slot, all
+// @early-stop 99.97%: soft TU-cumulative operand-evaluation artifact. Complete
+// hex selection, quantity artifact, AddArmy, ability flag, and duration
+// artifacts; the 0x1c frame, every local slot, all
 // 157 instructions, and all five external relocation targets agree. The only
 // raw residual is four stack-displacement bytes at +0x94/+0x97 and
 // +0xd7/+0xda: retail loads randomOffset at -0x18 then offset at -0x14, while
@@ -2938,52 +2946,53 @@ void combatManager::SummonElemental(int monsterType, int spellPower)
         spellPower += SPELL_WIZARD_HAT_POWER_BONUS;
 }
 
-// @match-note retained 99.3061%: complete fixed frame-info lookup, edge selection,
-// clamping, and rainbow-bolt call; the 0x18 frame and all 3 relocation targets
-// agree. Putting the non-facing-right `targetX > 200` arm first recovered the
-// retail middle CFG. The only masked instruction residual is now the final color
-// predicate: ours emits `setg`, retail `setge`, with otherwise identical opcode
-// flow. `>=`, negated `<`, positive reverse-arm, and both ternary body orders were
-// tried; the last form also regressed the earlier arm layout. Revisit only after
-// a TU-state change; do not retry m_animationFrame or dynamic standing lookup.
+// @match-note: complete standing-frame lookup, edge selection, clamping, and
+// rainbow-bolt call; the 0x18 frame, all five semantic local slots, CFG, and 3/3
+// relocation targets agree. Retail uses animationFrames[ARMY_ANIMATION_STAND][0]
+// at army+0x2ae. The first residual is the final equivalent color selection:
+// retail emits `cmp targetX,startX; setge; dec; and -3; add 303`, while MSVC
+// lowers the direct `targetX >= startX` spelling as `cmp startX,targetX; setg;
+// dec; and 3; add 300`; both select reverse exactly when targetX >= startX.
+// All relational operand orientations, negated `<`, and both ternary arm orders
+// were tried. Revisit only after a material TU-state change.
 VA(0x00428b69, 0x1e6)
 void combatManager::DoLuck(int side, int armyIndex)
 {
-    army *target = &m_armies[side][armyIndex];
-    int targetX = target->MidX();
-    int targetY = m_hexCells[target->m_hex].m_y;
-    targetY -= GetIconEntry(
-                   target->m_creatureIcon,
-                   target->m_frameInfo.animationFrames
-                       [ARMY_ANIMATION_STANDING_END - 1]
+    army *target_i = &m_armies[side][armyIndex];
+    int targetX_k = target_i->MidX();
+    int targetY_l = m_hexCells[target_i->m_hex].m_y;
+    targetY_l -= GetIconEntry(
+                   target_i->m_creatureIcon,
+                   target_i->m_frameInfo.animationFrames
+                       [ARMY_ANIMATION_STAND]
                        [LUCK_TARGET_FRAME_INDEX])->h +
                LUCK_ICON_Y_PADDING;
-    if (targetY < LUCK_MIN_TARGET_Y)
-        targetY = LUCK_MIN_TARGET_Y;
-    int startY = LUCK_EDGE_START_Y;
-    int startX;
-    if (target->m_facing == ARMY_FACING_RIGHT) {
-        if (targetX < 480)
-            startX = targetX + targetY / 2 + LUCK_EDGE_INSET;
+    if (targetY_l < LUCK_MIN_TARGET_Y)
+        targetY_l = LUCK_MIN_TARGET_Y;
+    int startY_n = LUCK_EDGE_START_Y;
+    int startX_b;
+    if (target_i->m_facing == ARMY_FACING_RIGHT) {
+        if (targetX_k < 480)
+            startX_b = targetX_k + targetY_l / 2 + LUCK_EDGE_INSET;
         else
-            startX = targetX - LUCK_EDGE_INSET - targetY / 2;
-    } else if (targetX > 200) {
-        startX = targetX - LUCK_EDGE_INSET - targetY / 2;
+            startX_b = targetX_k - LUCK_EDGE_INSET - targetY_l / 2;
+    } else if (targetX_k > 200) {
+        startX_b = targetX_k - LUCK_EDGE_INSET - targetY_l / 2;
     } else {
-        startX = targetX + targetY / 2 + LUCK_EDGE_INSET;
+        startX_b = targetX_k + targetY_l / 2 + LUCK_EDGE_INSET;
     }
-    if (targetY < LUCK_SHORT_BOLT_HEIGHT) {
-        startX = side == 0 ? 0 : COMBAT_SCREEN_WIDTH - 1;
-        startY = targetY + LUCK_MIN_TARGET_Y;
+    if (targetY_l < LUCK_SHORT_BOLT_HEIGHT) {
+        startX_b = side == 0 ? 0 : COMBAT_SCREEN_WIDTH - 1;
+        startY_n = targetY_l + LUCK_MIN_TARGET_Y;
     }
-    if (startX < 0)
-        startX = 0;
-    if (COMBAT_SCREEN_WIDTH - 1 < startX)
-        startX = COMBAT_SCREEN_WIDTH - 1;
-    DoBolt(0, startX, startY, targetX, targetY, 0, 0, LUCK_BOLT_WIDTH,
+    if (startX_b < 0)
+        startX_b = 0;
+    if (COMBAT_SCREEN_WIDTH - 1 < startX_b)
+        startX_b = COMBAT_SCREEN_WIDTH - 1;
+    DoBolt(0, startX_b, startY_n, targetX_k, targetY_l, 0, 0, LUCK_BOLT_WIDTH,
            LUCK_BOLT_WIDTH,
-           targetX < startX ? BOLT_COLOR_RAINBOW_REVERSE
-                            : BOLT_COLOR_RAINBOW_FORWARD,
+           targetX_k >= startX_b ? BOLT_COLOR_RAINBOW_REVERSE
+                                 : BOLT_COLOR_RAINBOW_FORWARD,
            LUCK_BOLT_ANGLE, LUCK_BOLT_ANGLE,
            LUCK_BOLT_DISTANCE, LUCK_BOLT_FORCE_ANGLE, 1,
            LUCK_BOLT_FRAME_DELAY, 0);
