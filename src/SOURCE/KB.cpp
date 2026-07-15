@@ -264,16 +264,15 @@ int EarlySetup(void)
     return 1;
 }
 
-// @match-note
-// Pre-95 structural checkpoint (97.74%): exact 0x164 frame and live slots after
-// recovering the 0x100 network buffer with its 0xd4 transmitted prefix, the
-// shared game-player index, and four retail-unreferenced /Od words. The first
-// non-relocation residual is one local continuation jump before the first menu
-// table. Base tables are [0x4d1,0x501) and [0x8d6,0x8ea); retail tables are
-// [0x4d4,0x504) and [0x8f4,0x908). Relocations are 486/489 with no base-only
-// external target. Tried direct giSetupGameType dispatch, both menu case orders,
-// inline high-score/credits bodies, and the shared setup label. Revisit at 95%
-// for systematic continuation/table-placement steering.
+// @semantic
+// Exact 0x164 frame, live/generated slots, CFG, and first table at +0x4d4 after
+// recovering the menu/TCP arm order and both setup switches. Excluding table
+// data, the first residual is retail's local continuation jump at +0x533; two
+// more retail-only continuations at +0x652/+0x657 account exactly for the
+// second-table offset (base +0x8e5, retail +0x8f4) and 486/489 relocations.
+// External targets agree except two proven gsNetPlayerInfo interior aliases.
+// Tried raw assignments, a void setter (wrong local jmp $+0), and a reference
+// accessor (wrong pointer temporaries/frame). Revisit for inline-tail placement.
 VA(0x00496e98, 0x16c0)
 int oldmain(void)
 {
@@ -283,11 +282,10 @@ int oldmain(void)
     int firstMainScreen_c;
     int savedUpdateFlags_l;
     int player_h;
-    // Retail reserves four unreferenced /Od locals around the live state slots.
+    // Retail reserves three unreferenced /Od locals around the live state slots.
     int unusedMainState_o;
     int unusedMenuState_d;
     int unusedPlayerState_c;
-    int unusedNetworkState_i;
     int netPlayer_i;
     int gamePlayer_m;
     int result_i;
@@ -391,64 +389,60 @@ main_menu:
                     goto main_menu;
                 break;
             }
-            goto game_setup_complete;
-        }
+        } else {
 
 process_menu_command:
-        if (giMenuCommand != -1) {
-            switch (giMenuCommand) {
-            case APP_MENU_RESTART_0:
-            case APP_MENU_RESTART_1:
-            case APP_MENU_RESTART_2:
-            case APP_MENU_RESTART_3:
-            case APP_MENU_RESTART_4:
-            case APP_MENU_RESTART_5:
-            case APP_MENU_RESTART_6:
-            case APP_MENU_RESTART_7:
-            case APP_MENU_RESTART_8:
-            case APP_MENU_RESTART_9:
-            case APP_MENU_RESTART_10:
-            case APP_MENU_RESTART_11:
-            case APP_MENU_RESTART_12:
-            case APP_MENU_RESTART_13:
-                result_i = gpGame->NewGame();
-                break;
-            default:
-                result_i = 1;
-                break;
-            case APP_MENU_LOAD_0:
-            case APP_MENU_LOAD_1:
-            case APP_MENU_LOAD_2:
-            case APP_MENU_LOAD_3:
-            case APP_MENU_LOAD_4:
-            case APP_MENU_LOAD_5:
-            case APP_MENU_LOAD_6:
-            case APP_MENU_LOAD_7:
-            case APP_MENU_LOAD_8:
-            case APP_MENU_LOAD_9:
-            case APP_MENU_LOAD_10:
-                result_i = gpGame->PickLoadGame();
-                break;
+            if (giMenuCommand != -1) {
+                switch (giMenuCommand) {
+                case APP_MENU_LOAD_0:
+                case APP_MENU_LOAD_1:
+                case APP_MENU_LOAD_2:
+                case APP_MENU_LOAD_3:
+                case APP_MENU_LOAD_4:
+                case APP_MENU_LOAD_5:
+                case APP_MENU_LOAD_6:
+                case APP_MENU_LOAD_7:
+                case APP_MENU_LOAD_8:
+                case APP_MENU_LOAD_9:
+                case APP_MENU_LOAD_10:
+                    if (!gpGame->PickLoadGame())
+                        goto main_menu;
+                    break;
+                case APP_MENU_RESTART_0:
+                case APP_MENU_RESTART_1:
+                case APP_MENU_RESTART_2:
+                case APP_MENU_RESTART_3:
+                case APP_MENU_RESTART_4:
+                case APP_MENU_RESTART_5:
+                case APP_MENU_RESTART_6:
+                case APP_MENU_RESTART_7:
+                case APP_MENU_RESTART_8:
+                case APP_MENU_RESTART_9:
+                case APP_MENU_RESTART_10:
+                case APP_MENU_RESTART_11:
+                case APP_MENU_RESTART_12:
+                case APP_MENU_RESTART_13:
+                    if (!gpGame->NewGame())
+                        goto main_menu;
+                    break;
+                }
+                goto game_setup_complete;
             }
-            if (!result_i)
-                goto main_menu;
-            command_a = -1;
-            goto game_setup_complete;
-        }
 
-        if (gGameCommand == -1) {
-            gpInitWin = new heroWindow(0, 0, "stpmain.bin");
-            if (!gpInitWin)
-                MemError();
-            gbInSetupDialog = 1;
-            gpWindowManager->DoDialog(gpInitWin, InitMenuHandler, 0);
-            delete gpInitWin;
-            gpInitWin = 0;
-            command_a = gpWindowManager->m_dialogResult;
-            gbInSetupDialog = 0;
-        } else {
-            command_a = gGameCommand;
-            gGameCommand = -1;
+            if (gGameCommand != -1) {
+                command_a = gGameCommand;
+                gGameCommand = -1;
+            } else {
+                gpInitWin = new heroWindow(0, 0, "stpmain.bin");
+                if (!gpInitWin)
+                    MemError();
+                gbInSetupDialog = 1;
+                gpWindowManager->DoDialog(gpInitWin, InitMenuHandler, 0);
+                delete gpInitWin;
+                gpInitWin = 0;
+                command_a = gpWindowManager->m_dialogResult;
+                gbInSetupDialog = 0;
+            }
         }
         if (giMenuCommand != -1)
             goto process_menu_command;
@@ -466,11 +460,12 @@ setup_selected:
             if (!gpGame->SetupGame())
                 goto main_menu;
 
-            result_i = giSetupGameType;
-            if (result_i == OLD_MAIN_SETUP_NEW) {
+            switch (giSetupGameType) {
+            case OLD_MAIN_SETUP_NEW:
                 if (gbInCampaign) {
                     gpGame->InitEntireCampaign(gbCampaignSideChoice);
-                    if (gpGame->HandleCampaignWin()) {
+                    result_i = gpGame->HandleCampaignWin();
+                    if (result_i) {
                         gpGame->InitCampaignMap();
                         goto initialize_game;
                     } else {
@@ -479,25 +474,31 @@ setup_selected:
                         mainScreenLoaded_b = 0;
                         goto main_menu;
                     }
-                }
-                if (xIsPlayingExpansionCampaign) {
-                    if (xCampaign.HandleVictory()) {
-                        xCampaign.InitMap();
-                        goto initialize_game;
+                } else {
+                    if (xIsPlayingExpansionCampaign) {
+                        if (xCampaign.HandleVictory()) {
+                            xCampaign.InitMap();
+                            goto initialize_game;
+                        } else {
+                            gpWindowManager->FadeScreen(1, OLD_MAIN_FADE_SPEED,
+                                                        gPalette);
+                            mainScreenLoaded_b = 0;
+                            goto main_menu;
+                        }
+                    } else {
+                        LogStr("New Game 1");
+                        if (!gpGame->NewGame())
+                            goto main_menu;
+                        LogStr("New Game 2");
                     }
-                    gpWindowManager->FadeScreen(1, OLD_MAIN_FADE_SPEED, gPalette);
-                    mainScreenLoaded_b = 0;
-                    goto main_menu;
                 }
-                LogStr("New Game 1");
-                if (!gpGame->NewGame())
-                    goto main_menu;
-                LogStr("New Game 2");
-            } else if (result_i == OLD_MAIN_SETUP_LOAD) {
+                break;
+            case OLD_MAIN_SETUP_LOAD:
                 LogStr("Load Game 1");
                 if (!gpGame->PickLoadGame())
                     goto main_menu;
                 LogStr("Load Game 2");
+                break;
             }
             goto game_setup_complete;
         case OLD_MAIN_HIGH_SCORES:
@@ -516,9 +517,7 @@ setup_selected:
             goto main_menu;
         case OLD_MAIN_EXIT:
             quit_g = 1;
-            goto game_setup_complete;
-        default:
-            goto game_setup_complete;
+            break;
         }
 
 game_setup_complete:
@@ -792,13 +791,14 @@ char toupper(char c)
         return c;
 }
 
-// @match-note
-// Pre-95 structural checkpoint (retained 99.831%): exact 0x28 frame and 139/139
-// relocation sites with no base-only target. The first code residual is the
-// outer command-line scan backedge (`jge` here versus retail `jle`); subsequent
-// diff alignment is obscured by two delinked character tables at +0x567 and
-// +0x5bd. The direct buffer-index and positive-bound spellings are represented;
-// revisit at 95% for systematic loop-polarity/table steering.
+// @semantic
+// Exact 0x28 frame and 139/139 relocation sites. The first code residual is the
+// outer scan test: base loads len then emits `cmp i,len; jge`, while retail loads
+// i then emits `cmp len,i; jle`. Direct `i < len`, `len > i`, and negated-bound
+// spellings are byte-identical; an explicit break loop gets the operand order
+// but adds a branch. Later diff alignment crosses tables at +0x567/+0x5bd.
+// The 18 reported base-only targets are gConfig/gcCommandLine interior aliases;
+// effective addresses agree. Revisit for TU-cumulative operand ordering.
 VA(0x0049859c, 0x791)
 int InterpretCommandLine(void)
 {
