@@ -5,7 +5,6 @@
 
 #include <va.h>
 #include <_carcass_types.h>
-#include <_globals_model.h>
 #include <BASE/icon.h>
 #include <BASE/font.h>
 #include <BASE/bitmap.h>

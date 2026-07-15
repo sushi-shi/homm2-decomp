@@ -8,7 +8,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <_globals_model.h>
 #include <BASE/bitmap.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>

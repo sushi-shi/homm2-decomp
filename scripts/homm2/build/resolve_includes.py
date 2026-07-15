@@ -24,7 +24,8 @@ for r in csv.DictReader(open("build/gen/symbol_names.csv")):
     gm = re.match(r'\?([A-Za-z_]\w*)@@', r["name"]) or re.match(r'[_@]?([A-Za-z_]\w*)', r["name"])
     if gm:
         u = r["unit"]
-        name2hdr.setdefault(gm.group(1), "_globals_model.h" if u in (None, "_const") else "%s.h" % u)
+        if u and u != "_const":
+            name2hdr.setdefault(gm.group(1), "%s.h" % u)
 
 cpp_of = {os.path.basename(c)[:-4]: c for c in glob.glob("src/**/*.cpp", recursive=True)}
 # type named by either a quote-first error ('X' : is not a class / undeclared) or C2027

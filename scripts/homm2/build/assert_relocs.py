@@ -8,10 +8,10 @@ global/const/field/function, or even call a FABRICATED function that is declared
 Order-INDEPENDENT: we resolve each side's relocs to a SET of final RVAs (symbol RVA + instruction
 addend; REL32 -> the symbol's own RVA) and flag any address the BASE references that retail never
 does. We also flag any base '?'-mangled symbol that resolves to NEITHER CodeView (symbol_names.csv)
-NOR a header DATA() global — i.e. fabricated.
+NOR a DATA()-pinned definition — i.e. fabricated.
 
-Data offsets come from symbol_names.csv (authoritative CodeView RVAs). Synthetic _globals_model.h
-globals carry no CodeView symbol, so their VA is read from their header DATA(0x..) annotation.
+Data offsets come from symbol_names.csv (authoritative CodeView RVAs). Module-private synthetic
+storage has no CodeView symbol, so its VA is read from the owning .cpp DATA(0x..) definition.
 
 It is OPT-IN (not in `homm2 build`'s hard gates) because it also surfaces unreproducible link
 artifacts — chiefly the delinker's `empty_stub`, the synthetic name for a COMDAT-folded empty (`ret`)
@@ -48,9 +48,9 @@ def load_symbols():
                 # name (e.g. two "!" literals). Record every address per name so an ambiguous target
                 # reloc can match ANY of them (they're value-identical), not just the last one loaded.
                 sym.setdefault(k, v); dups.setdefault(k, set()).add(v)
-    data = {}                                    # DATA() now lives on .cpp definitions (+ the
+    data = {}                                    # DATA() lives on canonical .cpp definitions;
     for f in glob.glob("src/**/*.cpp", recursive=True) + glob.glob("include/**/*.h", recursive=True):
-        for ln in open(f, encoding="latin-1"):   # _globals_model.h externs, for def-less synthetics)
+        for ln in open(f, encoding="latin-1"):   # headers are scanned to diagnose stale violations
             m = re.search(r'DATA\(0x([0-9a-fA-F]+)\).*?\b([A-Za-z_]\w*)\s*(?:\[|;|=)', ln)
             if m:
                 data[m.group(2)] = int(m.group(1), 16) - IMAGE_BASE

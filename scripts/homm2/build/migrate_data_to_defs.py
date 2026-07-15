@@ -2,13 +2,12 @@
 """migrate_data_to_defs.py — ONE-TIME: move DATA(0x..) from an owner-header `extern` onto the
 global's actual DEFINITION in its owner .cpp. A global that has a file-scope definition in some
 .cpp gets `DATA(0x<VA>)` prepended to that definition, and the DATA() is stripped from its header
-`extern` (leaving a plain `extern T g;`). Synthetic globals in _globals_model.h are left alone
-(they have no definition — they alias real storage). The VA is preserved verbatim from the header.
+`extern` (leaving a plain `extern T g;`). The VA is preserved verbatim from the header.
 
     migrate_data_to_defs.py            # dry-run: report per-file counts
     migrate_data_to_defs.py --write    # apply
 Run from repo root."""
-import re, glob, os, sys, csv
+import re, glob, sys, csv
 
 WRITE = '--write' in sys.argv
 IMG = 0x400000
@@ -40,11 +39,9 @@ for r in csv.DictReader(open("build/gen/symbol_names.csv")):
     if m and m.group(1) in defined:
         va_for.setdefault(m.group(1), "%08x" % (int(r["rva"], 16) + IMG))
 
-# 2. strip DATA from header externs whose global is DEFINED (skip _globals_model.h)
+# 2. strip DATA from header externs whose global is DEFINED
 hdr_hits = 0
 for h in sorted(glob.glob("include/**/*.h", recursive=True)):
-    if os.path.basename(h) == "_globals_model.h":
-        continue
     out, changed = [], 0
     for ln in open(h):
         m = re.match(r'^(DATA\(0x([0-9a-fA-F]+)\)\s+)(extern\s+.*)$', ln.rstrip('\n'))

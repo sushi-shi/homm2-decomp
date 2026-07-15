@@ -3,8 +3,8 @@
 project links (headers only DECLARE them: plain `extern T g;`). The definition carries the address:
 `DATA(0x<VA>) T g;`, emitted in retail-RVA order in a data section at the owner .cpp's tail.
 Scalars/pointers/sized-arrays are the header decl minus `extern`; unsized `T g[]` gets its outer dim
-from the CodeView byte size. Synthetic globals (no CodeView symbol -> _globals_model.h) alias real
-storage and get no definition. Idempotent: replaces the generated block. Run from repo root."""
+from the CodeView byte size. Synthetic storage without a public symbol is module-private and is not
+declared in a header. Idempotent: replaces the generated block. Run from repo root."""
 import csv, re, os, glob
 from collections import defaultdict
 
@@ -51,8 +51,6 @@ def make_def(rest, name):
 BLOCK = re.compile(r'\n// ---- globals \(definitions, RVA order\) ----\n(?:.*\n)*?(?=\Z)', re.M)
 by_cpp = defaultdict(list)
 for h in glob.glob("include/**/*.h", recursive=True):
-    if os.path.basename(h) == "_globals_model.h":
-        continue                                       # synthetic aliases: no definition
     for line in open(h):
         m = re.match(r'^extern\s+(.*;)', line)     # DATA now goes on the def we emit, not the header
         if not m:

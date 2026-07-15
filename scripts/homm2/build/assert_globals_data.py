@@ -2,11 +2,11 @@
 """assert_globals_data.py — hard build gate for global DATA(VA) placement. DATA(0x<VA>) lives on
 the global's DEFINITION in its owner .cpp (not on the header `extern`). Enforces:
   * every file-scope DEFINITION of a CodeView data symbol carries DATA(0x<its exact VA>);
-  * NO DATA() on a header `extern`, including synthetic model declarations;
-  * a header extern with no CodeView symbol lives ONLY in _globals_model.h;
+  * NO DATA() on a header `extern`;
+  * every header global extern has a CodeView public symbol and an owner TU;
   * every DATA() VA is UNIQUE (one VA == one definition).
 Run from repo root; exits 1 on any violation."""
-import csv, re, sys, glob, os
+import csv, re, sys, glob
 
 IMG = 0x400000
 rva_of = {}
@@ -58,10 +58,9 @@ for c in sorted(glob.glob("src/**/*.cpp", recursive=True)):
         else:
             note(dm.group(1), loc)
 
-# (2) HEADERS: declarations never claim storage. Synthetic model externs are allowed, but DATA()
-#     belongs on their canonical .cpp definition just as it does for CodeView-backed globals.
+# (2) HEADERS: declarations never claim storage, and every cross-TU global must have a retained
+#     CodeView public symbol. Anonymous/synthetic storage is module-private in its owning .cpp.
 for h in sorted(glob.glob("include/**/*.h", recursive=True)):
-    is_model = os.path.basename(h) == "_globals_model.h"
     for i, line in enumerate(open(h), 1):
         loc = "%s:%d" % (h, i)
         dm = DATA_RE.match(line)
@@ -74,13 +73,12 @@ for h in sorted(glob.glob("include/**/*.h", recursive=True)):
         name = nm.group(1) if nm else None
         if not name:
             continue                                  # `extern "C" T f(...);` — a function
-        if is_model:
-            if dm:
-                bad.append((loc, name, "DATA() on model extern — move it to the .cpp definition", "—"))
-        elif dm:
+        if dm:
             bad.append((loc, name, "DATA() on header extern — move it to the .cpp definition", "—"))
         elif name not in rva_of:
-            bad.append((loc, name, "no CodeView symbol -> belongs in _globals_model.h", "—"))
+            bad.append((loc, name,
+                        "no CodeView public symbol -> make storage module-private or recover owner",
+                        "—"))
 
 for loc, name, got, want in bad:
     print("  %s  %s  %s  (want DATA %s)" % (loc, name, got, want))
