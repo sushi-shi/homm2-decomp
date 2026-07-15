@@ -50,16 +50,18 @@
 #define EVENTS_RECEIVE_LINE (*reinterpret_cast<const short *>("=\x18"))
 // @match-note
 // Complete semantics/CFG with the retail 0x350 frame, all source slots, and the
-// main plus eight nested-switch spills at -0x330..-0x350. Effective external
-// relocation targets agree; base has 966 sites versus retail's 972 from local
-// label/table identity. The four apparent base-only gSpellNames relocations use
-// gSpellNames+4*(n-1) at 0xff778; retail uses const_000ff774+4*n, the same address.
-// The first non-symbol divergence is the Sphinx resource
+// main plus eight nested-switch spills at -0x330..-0x350. Base has 966 external
+// relocation sites versus retail's 972: three gpGame and three gpWindowManager
+// occurrences remain unmapped and are an unfinished structural gap. The four
+// apparent base-only gSpellNames relocations use gSpellNames+4*(n-1) at 0xff778;
+// retail uses const_000ff774+4*n, the same effective address. The first
+// non-symbol divergence is the Sphinx resource
 // loop: retail loads giCurPlayer before eventValue, while base loads eventValue
 // first. Identifier/declaration ordering, the unused tag_message, one-case
 // switches/scopes, the shared ClaimMine tail, resource sprintf calls, and the
 // duplicate artifact CheckLevel were recovered; retained max is 97.90% despite
-// the expected live TU-state dip. Revisit at total SOURCE 95%.
+// the expected live TU-state dip. Revisit now for the six missing external
+// occurrences; do not park this function as a compiler wall.
 VA(0x004a8530, 0x5adb)
 void advManager::DoEvent(mapCell *cell, int x, int y)
 {
