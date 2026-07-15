@@ -15,4 +15,12 @@ typedef enum IconRleCommandConstant {
     ICON_RLE_DIM_PALETTE_LEVEL_STRIDE = 0x40
 } IconRleCommandConstant;
 
+// Preserve the original advance-before-read source order. MSVC inlines this as a cursor publication
+// followed by a load from the previous byte; reversing the two statements changes its scheduling.
+inline unsigned char ReadIconRleByte(unsigned char *&cursor)
+{
+    cursor++;
+    return cursor[-1];
+}
+
 #endif // HOMM2_BASE_ICONRLE_H

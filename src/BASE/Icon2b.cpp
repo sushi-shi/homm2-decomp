@@ -71,6 +71,9 @@ DATA(0x00534c5c) static unsigned int gIcCnt2;
 // prototype/include-equivalent state. A repeat over 229 declaration states with the best local
 // setup/payload combination did not exceed 75.62637% or change 79/83 relocations. Generated
 // declarations remain disposable; the family-consistent read lifetime is retained below.
+// The split `gIcSrc++; gIcSrc[-1]` form was an inlined helper trace, not intended source. Restoring
+// the shared advance-and-read helper raises live matching to 75.60989% with 80/83 relocations; the
+// only occurrence deficits are gIcX0, gIcY, and gIcCnt2, with no excess cursor reference.
 VA(0x004d0570, 0x4ed)
 void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                   int clip, int clipX, int clipY, int clipW, int clipH, int color)
@@ -101,8 +104,7 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int fra
     unsigned char *row = dest->m_pixels + gIcPitch * gIcY;
     int cmd;
     for (;;) {
-        gIcSrc++;
-        cmd = gIcSrc[-1];
+        cmd = ReadIconRleByte(gIcSrc);
         if (static_cast<signed char>(cmd) < 0) {
             // ---- negative command ----
             if ((cmd & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
@@ -122,20 +124,16 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int fra
             if (count != 0) {
                 // 0xc1 - 0xff : solid colour run
                 if (cmd == ICON_RLE_LONG_SOLID_COMMAND) {
-                    gIcSrc++;
-                    count = gIcSrc[-1];
+                    count = ReadIconRleByte(gIcSrc);
                 }
-                gIcSrc++;
-                gIcColor = gIcSrc[-1];
+                gIcColor = ReadIconRleByte(gIcSrc);
                 goto do_fill;
             }
             // 0xc0 : shadow / dim run
-            gIcSrc++;
-            flags = gIcSrc[-1];
+            flags = ReadIconRleByte(gIcSrc);
             count = flags & ICON_RLE_DIM_SHORT_COUNT_MASK;
             if (count == 0) {
-                gIcSrc++;
-                count = gIcSrc[-1];
+                count = ReadIconRleByte(gIcSrc);
             }
             gIcDimLen = count;
             if (color != 0) {
