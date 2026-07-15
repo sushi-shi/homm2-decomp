@@ -1229,7 +1229,8 @@ char *GetBuildingInfo(int race, int building, int mode)
     } else {
         sprintf(gText, "The %s produces %s.",
                 GetBuildingName(race, building),
-                gArmyNamesPlural[gDwellingType[race][building]]);
+                gArmyNamesPlural[
+                    gDwellingType[race][building - KB_BUILDING_DWELLING_FIRST]]);
         return gText;
     }
     if (mode) {
