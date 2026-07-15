@@ -3958,7 +3958,7 @@ int CheckMem(void)
 VA(0x004a0b6d, 0x109)
 int GetManaCost(int spell, hero *h)
 {
-    int c = gsSpellInfo[spell].m_e;
+    int c = gsSpellInfo[spell].cost;
     if (h != 0) {
         if (h->HasArtifact(0x29) && (spell == 0x12 || spell == 0x13))
             c >>= 1;
@@ -5030,7 +5030,17 @@ DATA(0x004ff2d8) char *cTownCommand[28] = {
     "Marketplace",
     "Captain's Quarters"
 };
-DATA(0x004ff348) char *gHeroDefaultNames[54];
+DATA(0x004ff348) char *gHeroDefaultNames[54] = {
+    "Lord Kilburn", "Sir Gallant", "Ector", "Gwenneth", "Tyro", "Ambrose",
+    "Ruby", "Maximus", "Dimitri", "Thundax", "Fineous", "Jojosh",
+    "Crag Hack", "Jezebel", "Jaclyn", "Ergon", "Tsabu", "Atlas",
+    "Astra", "Natasha", "Troyan", "Vatawna", "Rebecca", "Gem",
+    "Ariel", "Carlawn", "Luna", "Arie", "Alamar", "Vesper", "Crodo",
+    "Barok", "Kastore", "Agar", "Falagar", "Wrathmont", "Myra", "Flint",
+    "Dawn", "Halon", "Myrini", "Wilfrey", "Sarakin", "Kalindra",
+    "Mandigal", "Zom", "Darlana", "Zam", "Ranloo", "Charity", "Rialdo",
+    "Roxana", "Sandro", "Celia"
+};
 DATA(0x004ff420) char *gNewGameHelp[8];
 DATA(0x004ff440) char *gSetupBaudHelp[6];
 DATA(0x004ff458) char *gSetupComPortHelp[6];

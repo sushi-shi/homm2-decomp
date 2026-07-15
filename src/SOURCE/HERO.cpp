@@ -156,7 +156,7 @@ int hero::HasSpell(int spell) {
 // the second argument and compares the count (two displacement bytes, same equality).
 // Operand swaps, the AST permuter, semantic identifier changes, unary-plus,
 // subtraction, and an explicit continue shape did not retain an improvement. The
-// two gsSpellInfo relocations resolve to the same m_e bytes through retail's
+// two gsSpellInfo relocations resolve to the same attributes bytes through retail's
 // interior const_000fbe8d label; the remaining delta is TU code-selection noise.
 VA(0x0046c86c, 0xc5)
 int hero::GetNthSpell(int type, int spellNumber) {
@@ -167,9 +167,9 @@ int hero::GetNthSpell(int type, int spellNumber) {
         if (HasSpell(spell)) {
             if (type == HERO_SPELL_TYPE_ALL ||
                 (type == HERO_SPELL_TYPE_COMBAT &&
-                 (gsSpellInfo[spell].m_e & SPELL_ATTRIBUTE_COMBAT)) ||
+                 (gsSpellInfo[spell].attributes & SPELL_ATTRIBUTE_COMBAT)) ||
                 (type == HERO_SPELL_TYPE_ADVENTURE &&
-                 !(gsSpellInfo[spell].m_e & SPELL_ATTRIBUTE_COMBAT))) {
+                 !(gsSpellInfo[spell].attributes & SPELL_ATTRIBUTE_COMBAT))) {
                 spellOrdinalCount++;
             }
             if (spellOrdinalCount == spellNumber)
@@ -181,7 +181,7 @@ int hero::GetNthSpell(int type, int spellNumber) {
 
 // @early-stop
 // All 0xd0 bytes match after masking the two aligned COFF relocations.
-// Both relocation targets agree; retail delinks gsSpellInfo[0].m_e as the interior
+// Both relocation targets agree; retail delinks gsSpellInfo[0].attributes as the interior
 // label const_000fbe8d while the typed source uses gsSpellInfo with addend 0x15.
 VA(0x0046c931, 0xd0)
 int hero::GetNumSpells(int type) {
@@ -193,7 +193,7 @@ int hero::GetNumSpells(int type) {
     numAdventureSpells = 0;
     for (spellIndexCurrent = 0; spellIndexCurrent < HERO_SPELL_COUNT; spellIndexCurrent++) {
         if (HasSpell(spellIndexCurrent)) {
-            if (gsSpellInfo[spellIndexCurrent].m_e & SPELL_ATTRIBUTE_COMBAT)
+            if (gsSpellInfo[spellIndexCurrent].attributes & SPELL_ATTRIBUTE_COMBAT)
                 numCombatSpells++;
             else
                 numAdventureSpells++;

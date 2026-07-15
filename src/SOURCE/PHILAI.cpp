@@ -3177,9 +3177,9 @@ int philAI::FightValueOfStack(armyGroup *group, hero *heroPtr, int useHero,
             for (armySlotRecord = 0; armySlotRecord < 46; armySlotRecord++) {
                 if (heroPtr->HasSpell(armySlotRecord)) {
                     spellScoreTotal = gsSpellInfo[armySlotRecord].aiValue;
-                    if (gsSpellInfo[armySlotRecord].m_e & 8)
+                    if (gsSpellInfo[armySlotRecord].attributes & 8)
                         spellScoreTotal = static_cast<int>(spellScoreTotal * durationModifier7);
-                    else if (gsSpellInfo[armySlotRecord].m_e & 1)
+                    else if (gsSpellInfo[armySlotRecord].attributes & 1)
                         spellScoreTotal = static_cast<int>(spellScoreTotal * spellPowerModifier);
                     numSpellCastsValue = heroPtr->m_spellPoints / GetManaCost(armySlotRecord, heroPtr);
                     if (numSpellCastsValue > 10)
@@ -3492,7 +3492,7 @@ int philAI::QuickCombat(armyGroup *attacker, hero *attackerHero,
                 victoriousHero4->HasSpell(armyIndex0) == 0 &&
                 gsSpellInfo[armyIndex0].level <=
                     victoriousHero4->m_secondarySkills[HERO_SKILL_EAGLE_EYE] + 1 &&
-                (gsSpellInfo[armyIndex0].m_e &
+                (gsSpellInfo[armyIndex0].attributes &
                  AI_QUICK_COMBAT_LEARNABLE_SPELL)) {
                 victoriousHero4->m_spells[armyIndex0] = 1;
                 break;
@@ -3755,7 +3755,7 @@ void philAI::HeroInteractionAtTown(hero *heroPtr, town *townPtr, int doInteracti
                 if (!heroPtr->HasSpell(
                         townPtr->m_spells[spellLevel14 - 1][spellIndex])) {
                     if (gsSpellInfo[
-                            townPtr->m_spells[spellLevel14 - 1][spellIndex]].m_e & 1)
+                            townPtr->m_spells[spellLevel14 - 1][spellIndex]].attributes & 1)
                         spellMultiplier1 = heroPtr->Stats(3);
                     else
                         spellMultiplier1 = 1;
@@ -4818,7 +4818,7 @@ int philAI::ValueOfEventAtPosition(int x, int y, int immediate, int *liveChance)
             if (gsSpellInfo[cell_k->m_objectMetadata - 1].level <=
                 gpCurAIHero->m_secondarySkills[7] + 2) {
                 value_h = gsSpellInfo[cell_k->m_objectMetadata - 1].aiValue;
-                if (gsSpellInfo[cell_k->m_objectMetadata - 1].m_e & 1) {
+                if (gsSpellInfo[cell_k->m_objectMetadata - 1].attributes & 1) {
                     if (gpCurAIHero->Stats(3) > 40)
                         shrinePowerMod_p = gfStatPower[40];
                     else
@@ -5026,7 +5026,7 @@ creature_purchase:
             value_h = 0;
         } else {
             index_k = cell_k->m_objectMetadata - 1;
-            if (gsSpellInfo[index_k].m_e & 1) {
+            if (gsSpellInfo[index_k].attributes & 1) {
                 battleStatMod_n = gpCurAIHero->Stats(2) > AI_MAX_BATTLE_STAT ?
                     gfBattleStat[AI_MAX_BATTLE_STAT] :
                     gfBattleStat[gpCurAIHero->Stats(2)];

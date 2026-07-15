@@ -29,7 +29,7 @@ int combatManager::DoSpellAI(int side, int restricted)
 
     for (spell = 0; spell < COMBAT_SPELL_COUNT; spell++) {
         if (m_heroes[side]->HasSpell(spell) &&
-            (gsSpellInfo[spell].m_e & SPELL_ATTRIBUTE_COMBAT) &&
+            (gsSpellInfo[spell].attributes & SPELL_ATTRIBUTE_COMBAT) &&
             GetManaCost(spell, m_heroes[side]) <= m_heroes[side]->m_spellPoints) {
             if (restricted && spell != SPELL_FIREBALL && spell != SPELL_FIREBLAST &&
                 spell != SPELL_LIGHTNING_BOLT && spell != SPELL_CHAIN_LIGHTNING &&
