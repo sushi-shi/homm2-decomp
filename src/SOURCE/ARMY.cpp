@@ -850,7 +850,7 @@ void army::SpecialAttack(void)
     } else {
         slope = static_cast<float>(-initialYDistance_8) / initialXDistance_6;
         angle_2 = static_cast<float>(atan(static_cast<double>(slope)) *
-            180.0 / 3.14159265358979323846);
+            180.0 / ARMY_PROJECTILE_PI);
         for (direction = 1;
              direction < m_frameInfo.projectileDirectionCount;
              direction++) {
@@ -865,15 +865,15 @@ void army::SpecialAttack(void)
             directionFrame_2 = m_frameInfo.projectileDirectionCount - 1;
         }
     }
-    if (-45.0f >= angle_2) {
-        m_animationSequence = ARMY_ANIMATION_SHOOT_DOWN;
-        attackDirection_3 = 2;
-    } else if (45.0f >= angle_2) {
+    if (angle_2 > ARMY_SHOOT_UP_MIN_ANGLE) {
+        m_animationSequence = ARMY_ANIMATION_SHOOT_UP;
+        attackDirection_3 = 0;
+    } else if (angle_2 > ARMY_SHOOT_FORWARD_MIN_ANGLE) {
         m_animationSequence = ARMY_ANIMATION_SHOOT_FORWARD;
         attackDirection_3 = 1;
     } else {
-        m_animationSequence = ARMY_ANIMATION_SHOOT_UP;
-        attackDirection_3 = 0;
+        m_animationSequence = ARMY_ANIMATION_SHOOT_DOWN;
+        attackDirection_3 = 2;
     }
     for (m_animationFrame = 0;
          m_animationFrame < m_frameInfo.animationFrameCount[m_animationSequence];
@@ -933,7 +933,7 @@ void army::SpecialAttack(void)
             giMaxExtentX - giMinExtentX + 1,
             giMaxExtentY - giMinExtentY + 1);
         DelayMilli(static_cast<long>(gfCombatSpeedMod[gConfig.combatSpeed] *
-                                     ARMY_COMBAT_FRAME_DELAY));
+                                     ARMY_MAGE_BOLT_DELAY));
         gpCombatManager->DoBolt(
             1, missileX_7, missileY_7, endX_36, endY_19, 0, 0, 5, 4, 302, 0, 0,
             distance_6 / 15 + 15, 1, 0, 10, 0);
