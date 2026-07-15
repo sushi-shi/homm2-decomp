@@ -1175,8 +1175,9 @@ int IsCycleColor(int color)
 // palette constants are now named in the private header. Differences are confined
 // to the RLE loop (base +0x67..+0xe0 / retail +0x67..+0xdf), where EBX and EDI swap
 // encoded-size/run-end roles. `<2`, `==1`, and `<=1` run tests, reordered locals,
-// predicate polarity and commuted SIB forms were tried. A bounded libclang AST pass
-// found 20 single variants and retained none after 30 walks.
+// predicate polarity and commuted SIB forms were tried. At integrated head b8c73ff,
+// a fresh bounded libclang AST pass found 23 single variants and retained none after
+// 30 walks with all 144 siblings pinned.
 VA(0x004c66d0, 0x1ee)
 void CreatePCXFile(char *filename, unsigned char *pixels, int width, int height,
                    unsigned char *paletteData)
@@ -1192,11 +1193,12 @@ void CreatePCXFile(char *filename, unsigned char *pixels, int width, int height,
     header.planes = PCX_PLANE_COUNT;
     header.bytesPerLine = static_cast<unsigned short>(width);
     header.paletteType = PCX_PALETTE_TYPE_COLOR;
-    int file = _open(filename, 0x8301, 0x80);
-    if (file == -1)
+    int fileHandle =
+        _open(filename, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
+    if (fileHandle == -1)
         return;
-    _write(file, &header, sizeof(header));
-    unsigned char *encoded = static_cast<unsigned char *>(
+    _write(fileHandle, &header, sizeof(header));
+    unsigned char *encodedRow = static_cast<unsigned char *>(
         H2_ALLOC(width * 2, "I:\\Projects\\Heroes\\Prog\\BASE\\Misc.cpp", 0x5c8));
     for (int row = 0; row < height; ++row) {
         int sourceIndex = 0;
@@ -1209,28 +1211,28 @@ void CreatePCXFile(char *filename, unsigned char *pixels, int width, int height,
                 ++runEnd;
             int runLength = runEnd - sourceIndex;
             if (runLength <= 1 && (value & PCX_RLE_RUN_MARKER) != PCX_RLE_RUN_MARKER) {
-                encoded[encodedSize++] = value;
+                encodedRow[encodedSize++] = value;
                 ++sourceIndex;
             } else {
-                encoded[encodedSize++] =
+                encodedRow[encodedSize++] =
                     static_cast<unsigned char>(runLength | PCX_RLE_RUN_MARKER);
-                encoded[encodedSize++] = value;
+                encodedRow[encodedSize++] = value;
                 sourceIndex += runLength;
             }
         }
-        _write(file, encoded, encodedSize);
+        _write(fileHandle, encodedRow, encodedSize);
         pixels += width;
     }
-    H2_FREE(encoded, "I:\\Projects\\Heroes\\Prog\\BASE\\Misc.cpp", 0x5f0);
+    H2_FREE(encodedRow, "I:\\Projects\\Heroes\\Prog\\BASE\\Misc.cpp", 0x5f0);
     unsigned char paletteMarker = PCX_VGA_PALETTE_MARKER;
-    _write(file, &paletteMarker, 1);
+    _write(fileHandle, &paletteMarker, 1);
     unsigned char *outputPalette = static_cast<unsigned char *>(
         H2_ALLOC(PCX_PALETTE_BYTE_COUNT, "I:\\Projects\\Heroes\\Prog\\BASE\\Misc.cpp", 0x5f6));
     for (int i = 0; i < PCX_PALETTE_BYTE_COUNT; ++i)
         outputPalette[i] = paletteData[i] << PCX_COMPONENT_SCALE_SHIFT;
-    _write(file, outputPalette, PCX_PALETTE_BYTE_COUNT);
+    _write(fileHandle, outputPalette, PCX_PALETTE_BYTE_COUNT);
     H2_FREE(outputPalette, "I:\\Projects\\Heroes\\Prog\\BASE\\Misc.cpp", 0x5fb);
-    _close(file);
+    _close(fileHandle);
 }
 
 VA(0x004c68c0, 0x52)
@@ -1254,16 +1256,17 @@ struct IconEntry * GetIconEntry(class icon *iconPtr, int index)
     return &entries[index];
 }
 
-#include <BASE/MiscRuntimeConstants.h>
+#include <BASE/SeededRandomConstants.h>
 
 // @match-note
 // Structurally complete /O2 checkpoint: base and retail are both 0xb8 with the same
 // seeded-random CFG and all 3 ordered relocations. Moving the result lifetime before
-// the mix recovered every instruction through the bit loop at +0x9c and raised live
-// match from 67.80% to 91.87%. Base then folds and publishes nextSeed before the range
-// division; retail incrementally forms it in EDI and stores it after idiv. Direct term
-// locals, folded/incremental seed arithmetic, explicit bit-loop forms and a volatile
-// seed store were checked; revisit after a new predecessor/header TU state.
+// the mix raised the retained maximum from 67.80% to 91.87%. After splitting the RNG
+// and later data-entry enum domains at their real boundaries, live is 91.67%: the bit
+// test has the symmetric operand encoding, then base folds and publishes nextSeed
+// before the range division while retail incrementally forms it in EDI and stores it
+// after idiv. Direct term locals, folded/incremental seed arithmetic, explicit bit-loop
+// forms, commuted bit tests and a volatile seed store were checked.
 VA(0x004c6930, 0xb8)
 int SRandom(int low, int high)
 {
@@ -1274,11 +1277,11 @@ int SRandom(int low, int high)
         return low;
     }
 
-    int high_term = (high * SEEDED_RANDOM_TERM_MULTIPLIER) & SEEDED_RANDOM_TERM_MASK;
-    int low_term = (low * SEEDED_RANDOM_TERM_MULTIPLIER) & SEEDED_RANDOM_TERM_MASK;
-    iLastSeed += high_term << SEEDED_RANDOM_HIGH_TERM_SHIFT;
-    iLastSeed += low_term * SEEDED_RANDOM_LOW_TERM_MULTIPLIER;
-    iLastSeed += high_term;
+    int highTerm = (high * SEEDED_RANDOM_TERM_MULTIPLIER) & SEEDED_RANDOM_TERM_MASK;
+    int lowTerm = (low * SEEDED_RANDOM_TERM_MULTIPLIER) & SEEDED_RANDOM_TERM_MASK;
+    iLastSeed += highTerm << SEEDED_RANDOM_HIGH_TERM_SHIFT;
+    iLastSeed += lowTerm * SEEDED_RANDOM_LOW_TERM_MULTIPLIER;
+    iLastSeed += highTerm;
     iLastSeed += (iLastSeed & SEEDED_RANDOM_FEEDBACK_MASK) << SEEDED_RANDOM_FEEDBACK_SHIFT;
     iLastSeed &= SEEDED_RANDOM_SEED_MASK;
 
@@ -1303,16 +1306,17 @@ int SRandom(int low, int high)
 // base preserves EDI, loads the seed early and uses EDX/ESI for terms; retail preserves
 // EBP, derives x then y into ESI/EDX, and holds the seed in ECX. Split term locals,
 // in-place y, local/single-expression seeds, x-first updates, and folded multiply/add
-// expressions were checked; the named algorithm constants, state arithmetic and final
-// store remain instruction-equivalent.
+// expressions were checked; at integrated head b8c73ff the local-seed retest regressed
+// to 46.53%. The named algorithm constants, state arithmetic and final store remain
+// instruction-equivalent.
 VA(0x004c69f0, 0x5c)
 void SIncRandomize(int x, int y)
 {
-    int x_term = (x * SEEDED_RANDOM_TERM_MULTIPLIER) & SEEDED_RANDOM_TERM_MASK;
-    int y_term = (y * SEEDED_RANDOM_TERM_MULTIPLIER) & SEEDED_RANDOM_TERM_MASK;
-    iLastSeed += y_term << SEEDED_RANDOM_HIGH_TERM_SHIFT;
-    iLastSeed += x_term * SEEDED_RANDOM_LOW_TERM_MULTIPLIER;
-    iLastSeed += y_term;
+    int xTerm = (x * SEEDED_RANDOM_TERM_MULTIPLIER) & SEEDED_RANDOM_TERM_MASK;
+    int yTerm = (y * SEEDED_RANDOM_TERM_MULTIPLIER) & SEEDED_RANDOM_TERM_MASK;
+    iLastSeed += yTerm << SEEDED_RANDOM_HIGH_TERM_SHIFT;
+    iLastSeed += xTerm * SEEDED_RANDOM_LOW_TERM_MULTIPLIER;
+    iLastSeed += yTerm;
     iLastSeed += (iLastSeed & SEEDED_RANDOM_FEEDBACK_MASK) << SEEDED_RANDOM_FEEDBACK_SHIFT;
 }
 
@@ -1325,11 +1329,12 @@ void SRand(int seed)
 
 // @match-note
 // Structurally complete /O2 checkpoint: base and retail are both 0x48 bytes and
-// all 3 relocations agree. Every byte matches except the six-byte iLastSeed store:
-// base +0x30..+0x35 places it before the bit loop; retail +0x3e..+0x43 places it
-// after `dec ecx` in the loop. for/do-while placement and a volatile store were
-// tried; volatile spills the mix and caused broad TU regressions, while nonvolatile
-// forms are hoisted. Revisit only after a new predecessor/header TU state.
+// all 3 relocations agree. The retained 90.64% state differed only in the six-byte
+// iLastSeed store: base placed it before the bit loop and retail after `dec ecx` inside
+// the loop. Splitting the RNG/data-entry enum domains leaves live at 90.18% with one
+// additional symmetric `test` operand encoding. for/do-while placement, commuted bit
+// tests and a volatile store were tried; volatile spills the mix and caused broad TU
+// regressions, while nonvolatile forms are hoisted.
 VA(0x004c6a60, 0x48)
 int SGenRand(void)
 {
@@ -1353,6 +1358,8 @@ int MemSize(int)
 {
     return 0x3ea2;
 }
+
+#include <BASE/DataEntryConstants.h>
 
 // @match-note
 // Structurally aligned /O2 checkpoint: both code spans are 0x386, the 0x9c frame,
