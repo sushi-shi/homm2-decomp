@@ -22,13 +22,23 @@
 #include <SOURCE/Wsnetwin.h>
 
 #define WSFILE const_cast<char *>("I:\\Projects\\Heroes\\Prog\\SOURCE\\Wsnetwin.cpp")
+#define WS_INIT_LINE_BASE (*reinterpret_cast<const short *>("="))
+#define WS_TERM_LINE_BASE (*reinterpret_cast<const short *>("_"))
+#define WS_SEND_LINE_BASE (*reinterpret_cast<const short *>("\x17\x01"))
+#define WS_RCV_LINE_BASE (*reinterpret_cast<const short *>("\x67\x01"))
+#define WS_EVALUATE_LINE_BASE (*reinterpret_cast<const short *>("\x9d\x01"))
 
+// @semantic
+// Complete 0x128 frame/slots and 164/164 relocation targets. First raw residual is the
+// +0x4b3 local branch byte; the first CFG divergence is the final invalid-address test
+// (ours JE+JMP, retail JNE). Tried direct/commuted/SIB loop tests and if/else/continue/break arms;
+// revisit after later Wsnetwin source/header changes alter TU-cumulative block selection.
 VA(0x004068b0, 0x5b5)
 short int wsnet_init(void) {
     WinsockStartupMessage startup;
-    struct hostent *host;
-    unsigned long nonBlocking;
-    char hostName[WS_TRANSPORT_BUFFER_SIZE];
+    struct hostent *pHost;
+    unsigned long socketMode;
+    char localHostName[WS_TRANSPORT_BUFFER_SIZE];
     int player;
 
     if (gConfig.gfx[giCurExe].fullScreen != 0) {
@@ -38,9 +48,11 @@ short int wsnet_init(void) {
     }
     gbRemoteOn = 1;
     ppDPRcvBuffer = static_cast<unsigned char **>(
-        BaseAlloc(WS_TRANSPORT_BUFFER_COUNT * sizeof(unsigned char *), WSFILE, 0x23a));
+        BaseAlloc(WS_TRANSPORT_BUFFER_COUNT * sizeof(unsigned char *), WSFILE,
+                  WS_INIT_LINE_BASE + 0xa));
     piDPRcvBufferSize = static_cast<int *>(
-        BaseAlloc(WS_TRANSPORT_BUFFER_COUNT * sizeof(int), WSFILE, 0x23b));
+        BaseAlloc(WS_TRANSPORT_BUFFER_COUNT * sizeof(int), WSFILE,
+                  WS_INIT_LINE_BASE + 0xb));
     memset(ppDPRcvBuffer, 0,
            WS_TRANSPORT_BUFFER_COUNT * sizeof(unsigned char *));
     memset(piDPRcvBufferSize, 0,
@@ -67,20 +79,20 @@ short int wsnet_init(void) {
         sprintf(cWSTextBuffer, "Error During bind(): %d", WSAGetLastError());
         ShutDown(cWSTextBuffer);
     }
-    nonBlocking = 1;
-    iRc = ioctlsocket(sd_dg, FIONBIO, &nonBlocking);
+    socketMode = 1;
+    iRc = ioctlsocket(sd_dg, FIONBIO, &socketMode);
     if (iRc == SOCKET_ERROR) {
         sprintf(cWSTextBuffer, "Error During ioctlsocket(): %d", WSAGetLastError());
         ShutDown(cWSTextBuffer);
     }
-    iRc = gethostname(hostName, sizeof(hostName) - 1);
+    iRc = gethostname(localHostName, sizeof(localHostName) - 1);
     if (iRc == SOCKET_ERROR) {
         sprintf(cWSTextBuffer, "Error During gethostname(): %d", WSAGetLastError());
         ShutDown(cWSTextBuffer);
     }
-    host = gethostbyname(hostName);
-    gIn_addrIP = *reinterpret_cast<struct in_addr *>(host->h_addr);
-    sprintf(cWSTextBuffer, "%s", inet_ntoa(gIn_addrIP), hostName);
+    pHost = gethostbyname(localHostName);
+    gIn_addrIP = *reinterpret_cast<struct in_addr *>(pHost->h_addr);
+    sprintf(cWSTextBuffer, "%s", inet_ntoa(gIn_addrIP));
     giNetPosToDCOPos[giThisNetPos] = static_cast<int>(inet_addr(cWSTextBuffer));
 
     if (GameMode == REMOTE_GAME_NETWORK_HOST) {
@@ -118,19 +130,19 @@ short int wsnet_init(void) {
         startup.playerCount = static_cast<unsigned char>(giNumHumanPlayers);
         memcpy(startup.playerAddresses, giNetPosToDCOPos,
                sizeof(giNetPosToDCOPos));
-        for (player = 1; giNumHumanPlayers > player; player++) {
+        for (player = 1; 0[&giNumHumanPlayers] > player; player++) {
             startup.netPosition = static_cast<unsigned char>(player);
             wsSendMessage(giNetPosToDCOPos[player], WS_MESSAGE_STARTUP,
                           sizeof(startup), &startup);
         }
     } else {
         while (1) {
-            if (giTCPHostStatus == -1 || strlen(gcTCPAddress) == 0) {
-                GetDataEntry("Enter the host IP address.\n(i.e. 220.415.119.223)",
-                             cWSTextBuffer, 20, 0, 0, 1);
-            } else {
+            if (giTCPHostStatus != -1 && strlen(gcTCPAddress) != 0) {
                 strcpy(cWSTextBuffer, gcTCPAddress);
                 strcpy(gcTCPAddress, "");
+            } else {
+                GetDataEntry("Enter the host IP address.\n(i.e. 220.415.119.223)",
+                             cWSTextBuffer, 20, 0, 0, 1);
             }
             giNetPosToDCOPos[0] = static_cast<int>(inet_addr(cWSTextBuffer));
             if (giNetPosToDCOPos[0] != static_cast<int>(INADDR_NONE))
@@ -152,10 +164,10 @@ void wsnet_term(void) {
     if (sd_dg != INVALID_SOCKET)
         closesocket(sd_dg);
     if (ppDPRcvBuffer != 0)
-        BaseFree(ppDPRcvBuffer, WSFILE, 0x2a7);
+        BaseFree(ppDPRcvBuffer, WSFILE, WS_TERM_LINE_BASE + 7);
     ppDPRcvBuffer = 0;
     if (piDPRcvBufferSize != 0)
-        BaseFree(piDPRcvBufferSize, WSFILE, 0x2ab);
+        BaseFree(piDPRcvBufferSize, WSFILE, WS_TERM_LINE_BASE + 0xb);
     piDPRcvBufferSize = 0;
     WSACleanup();
     bHostFound = 0;
@@ -167,59 +179,67 @@ void wsnet_term(void) {
     CleanupDPVars();
 }
 
+// @semantic
+// Complete 0x28 frame/slots and 32/32 relocation targets. First raw residual is the +0x7b
+// local branch byte; the first opcode-count divergence is two extra five-byte return
+// trampolines after the broadcast send-error dialog. Tried both SOCKET_ERROR polarities,
+// direct/commuted/SIB player tests, and nested/direct return arms; revisit after TU-state changes.
 VA(0x00406f37, 0x1f5)
 void wsSendMessage(int destination, unsigned char type, unsigned short int size,
                    void *data) {
-    unsigned char *message = static_cast<unsigned char *>(
-        BaseAlloc(size + 1, WSFILE, 0x2c2));
-    struct sockaddr_in remote;
-    int attempts;
+    unsigned char *packetBuffer = static_cast<unsigned char *>(
+        BaseAlloc(size + 1, WSFILE, WS_SEND_LINE_BASE + 2));
+    struct sockaddr_in peerAddress;
+    int attemptCount;
     int error;
-    int player;
+    int netPlayer;
 
-    message[0] = type;
+    packetBuffer[0] = type;
     if (size != 0)
-        memcpy(message + 1, data, size);
-    remote.sin_family = AF_INET;
-    remote.sin_port = htons(WS_TRANSPORT_PORT);
+        memcpy(packetBuffer + 1, data, size);
+    peerAddress.sin_family = AF_INET;
+    peerAddress.sin_port = htons(WS_TRANSPORT_PORT);
     if (destination == 0) {
-        for (player = 0; giNumHumanPlayers > player; player++) {
-            if (player == giThisNetPos)
+        for (netPlayer = 0; netPlayer < giNumHumanPlayers; netPlayer++) {
+            if (giThisNetPos == 0[&netPlayer])
                 continue;
-            attempts = 0;
-            remote.sin_addr.s_addr = giNetPosToDCOPos[player];
+            attemptCount = 0;
+            peerAddress.sin_addr.s_addr = giNetPosToDCOPos[netPlayer];
             while (1) {
-                iRc = sendto(sd_dg, reinterpret_cast<char *>(message), size + 1, 0,
-                             reinterpret_cast<struct sockaddr *>(&remote),
-                             sizeof(remote));
-                if (iRc != SOCKET_ERROR)
-                    break;
-                error = WSAGetLastError();
-                if (attempts < 20) {
-                    DelayMilli(WS_TRANSPORT_SEND_RETRY_DELAY);
-                    continue;
+                iRc = sendto(sd_dg, reinterpret_cast<char *>(packetBuffer), size + 1, 0,
+                             reinterpret_cast<struct sockaddr *>(&peerAddress),
+                             sizeof(peerAddress));
+                if (iRc == SOCKET_ERROR) {
+                    error = WSAGetLastError();
+                    if (attemptCount < 20) {
+                        DelayMilli(WS_TRANSPORT_SEND_RETRY_DELAY);
+                        continue;
+                    }
+                    sprintf(cWSTextBuffer,
+                            "TCP/IP Error During command 'sendto': %d", error);
+                    NormalDialog(cWSTextBuffer, 5, -1, -1, -1, 0, -1, 0, -1, 0);
+                    return;
                 }
-                sprintf(cWSTextBuffer,
-                        "TCP/IP Error During command 'sendto': %d", error);
-                NormalDialog(cWSTextBuffer, 5, -1, -1, -1, 0, -1, 0, -1, 0);
-                return;
+                break;
             }
         }
     } else {
-        remote.sin_addr.s_addr = destination;
-        iRc = sendto(sd_dg, reinterpret_cast<char *>(message), size + 1, 0,
-                     reinterpret_cast<struct sockaddr *>(&remote), sizeof(remote));
+        peerAddress.sin_addr.s_addr = destination;
+        iRc = sendto(sd_dg, reinterpret_cast<char *>(packetBuffer), size + 1, 0,
+                     reinterpret_cast<struct sockaddr *>(&peerAddress), sizeof(peerAddress));
         if (iRc == SOCKET_ERROR) {
             sprintf(cWSTextBuffer, "Error During sendto(): %d", WSAGetLastError());
             NormalDialog(cWSTextBuffer, 5, -1, -1, -1, 0, -1, 0, -1, 0);
             return;
         }
     }
-    BaseFree(message, WSFILE, 0x2f9);
+    BaseFree(packetBuffer, WSFILE, WS_SEND_LINE_BASE + 0x39);
 }
 
 VA(0x0040712c, 0x61)
 int wsnet_snd(int destination, int size, void *data) {
+    int result;
+
     wsProcessMessages();
     if (destination != WS_TRANSPORT_BROADCAST_POSITION)
         wsSendMessage(giNetPosToDCOPos[destination], WS_MESSAGE_DATA,
@@ -238,18 +258,24 @@ short int wsnet_rcv(short int, unsigned short int, void *data) {
         return 0;
     size = piDPRcvBufferSize[iDPRcvBufferTail];
     memcpy(data, ppDPRcvBuffer[iDPRcvBufferTail], size);
-    BaseFree(ppDPRcvBuffer[iDPRcvBufferTail], WSFILE, 0x309);
+    BaseFree(ppDPRcvBuffer[iDPRcvBufferTail], WSFILE, WS_RCV_LINE_BASE + 9);
     iDPRcvBufferTail = (iDPRcvBufferTail + 1) % WS_TRANSPORT_BUFFER_COUNT;
     return static_cast<short>(size);
 }
 
+// @semantic
+// Complete 0x18 frame, stack slots, CFG instruction stream, and 13/13 ordered relocations.
+// Only local branch destination bytes +0x62 and +0x74 differ. Continue, positive-call, and
+// explicit empty self-packet arms were tried; revisit after later Wsnetwin TU-state changes.
 VA(0x00407234, 0xaf)
 void wsProcessMessages(void) {
     struct sockaddr_in remote;
     int addressLength = sizeof(remote);
+    int receiveSize;
 
     while (1) {
-        iRc = recvfrom(sd_dg, rcvBufIn, WS_TRANSPORT_BUFFER_SIZE, 0,
+        receiveSize = WS_TRANSPORT_BUFFER_SIZE;
+        iRc = recvfrom(sd_dg, rcvBufIn, receiveSize, 0,
                        reinterpret_cast<struct sockaddr *>(&remote), &addressLength);
         if (iRc == SOCKET_ERROR) {
             iRc = WSAGetLastError();
@@ -258,12 +284,17 @@ void wsProcessMessages(void) {
         }
         if (iRc == 0)
             break;
-        if (giNetPosToDCOPos[giThisNetPos] !=
-            static_cast<int>(remote.sin_addr.s_addr))
+        if (giNetPosToDCOPos[giThisNetPos] ==
+            static_cast<int>(remote.sin_addr.s_addr)) {
+        } else {
             wsEvaluateMessage(iRc, static_cast<int>(remote.sin_addr.s_addr));
+        }
     }
 }
 
+// @early-stop
+// The full 0x37d CodeView span is raw-exact after relocation masking, with all 77 ordered
+// relocation sites/types/targets aligned. Objdiff's residual is the delinked switch jump table.
 VA(0x004072e3, 0x37d)
 void wsEvaluateMessage(unsigned long int size, int sender) {
     char *message = rcvBufIn + 1;
@@ -273,7 +304,7 @@ void wsEvaluateMessage(unsigned long int size, int sender) {
     switch (rcvBufIn[0]) {
     case WS_MESSAGE_DATA:
         ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<unsigned char *>(
-            BaseAlloc(size - 1, WSFILE, 0x32a));
+            BaseAlloc(size - 1, WSFILE, WS_EVALUATE_LINE_BASE + 10));
         memcpy(ppDPRcvBuffer[iDPRcvBufferHead], rcvBufIn + 1, size - 1);
         piDPRcvBufferSize[iDPRcvBufferHead] = size;
         iDPRcvBufferHead = (iDPRcvBufferHead + 1) % WS_TRANSPORT_BUFFER_COUNT;
@@ -281,9 +312,10 @@ void wsEvaluateMessage(unsigned long int size, int sender) {
     case WS_MESSAGE_GUEST_ARRIVED:
         if (GameMode == REMOTE_GAME_NETWORK_HOST) {
             if (gbRemoteGameOpen != 0) {
-                for (player = 1; giNumHumanPlayers > player; player++) {
+                for (player = 1; player < giNumHumanPlayers; player++) {
                     if (giNetPosToDCOPos[player] == sender ||
-                        reinterpret_cast<int>(&gsNetPlayerInfo[player]) == sender) {
+                        &gsNetPlayerInfo[player] ==
+                            reinterpret_cast<SNetPlayerInfo *>(message)) {
                         wsSendMessage(giNetPosToDCOPos[player],
                                       WS_MESSAGE_GUEST_ACCEPTED, 0, 0);
                         return;
@@ -339,6 +371,9 @@ void wsEvaluateMessage(unsigned long int size, int sender) {
     }
 }
 
+// @early-stop
+// All non-branch bytes and both ordered relocations are exact; only the +0x1e local JMP
+// displacement differs (retail targets the common epilogue, ours its equivalent JMP block).
 VA(0x00407660, 0x2e)
 int wsWaitForFirstGuest(void) {
     wsProcessMessages();
@@ -350,8 +385,9 @@ int wsWaitForExtraGuests(void) {
     tag_message message;
 
     wsProcessMessages();
-    if (giNumHumanPlayers != iWSLastMsgNumHumanPlayers) {
-        if (giTCPHostStatus != -1 && giNumHumanPlayers >= giTCPNumPlayers)
+    if (iWSLastMsgNumHumanPlayers != 0[&giNumHumanPlayers]) {
+        if (giTCPHostStatus != -1 &&
+            !(giTCPNumPlayers > 0[&giNumHumanPlayers]))
             return 1;
         iWSLastMsgNumHumanPlayers = giNumHumanPlayers;
         sprintf(cWSTextBuffer,
