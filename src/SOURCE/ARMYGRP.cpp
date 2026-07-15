@@ -24,8 +24,9 @@ VA(0x0048c094, 0x73)
 int armyGroup::HasAllUndead(void)
 {
     for (int slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
-        if (m_creatureTypes[slot] != ARMY_GROUP_EMPTY_SLOT
-            && !(gMonsterDatabase[m_creatureTypes[slot]].flags.all & MONSTER_FLAGS_UNDEAD))
+        if (m_creatureTypes[slot] != ARMY_GROUP_EMPTY_SLOT &&
+            !(gMonsterDatabase[m_creatureTypes[slot]].attributes &
+              MONSTER_ATTRIBUTE_UNDEAD))
             return 0;
     }
     return 1;
@@ -35,8 +36,9 @@ VA(0x0048c107, 0x73)
 int armyGroup::HasSomeUndead(void)
 {
     for (int slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
-        if (m_creatureTypes[slot] != ARMY_GROUP_EMPTY_SLOT
-            && (gMonsterDatabase[m_creatureTypes[slot]].flags.all & MONSTER_FLAGS_UNDEAD))
+        if (m_creatureTypes[slot] != ARMY_GROUP_EMPTY_SLOT &&
+            (gMonsterDatabase[m_creatureTypes[slot]].attributes &
+             MONSTER_ATTRIBUTE_UNDEAD))
             return 1;
     }
     return 0;
