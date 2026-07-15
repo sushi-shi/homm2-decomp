@@ -11,10 +11,10 @@ non-100 functions are ordinary queue work; this ledger does not invent wall evid
 ## Summary
 
 - SOURCE functions: 1058
-- Retained max 100%: 651
+- Retained max 100%: 653
 - Accepted non-100 walls: 209
-- Provisional non-100 checkpoints: 194
-- Unmarked non-100 queue functions: 4
+- Provisional non-100 checkpoints: 196
+- Unmarked non-100 queue functions: 0
 - Resolved 100% functions with stale markers: 69
 
 ## Accepted Walls
@@ -429,15 +429,13 @@ non-100 functions are ordinary queue work; this ledger does not invent wall evid
 | 99.9851% | 99.9851% | 278 | void __fastcall dpnet_term(void) | [src/SOURCE/dpnetwin.cpp:174](../src/SOURCE/dpnetwin.cpp#L174) | 99.99%: semantics, CFG, the 0x68 drain-buffer frame, and all 27 ordered relocations agree. The first non-relocation byte residual is the local branch at +0x65; the only structural disassembly residual is FreeLibrary's imported-call representation near +0xf9. Direct and casted HMODULE spellings are exhausted. Revisit with the import-thunk normalization work. |
 | 96.4706% | 96.4706% | 49 | int __fastcall AppIdle(void) | [src/SOURCE/kbwin.cpp:147](../src/SOURCE/kbwin.cpp#L147) | 96.47%: semantics, the zero-byte frame, both return arms, and the sole external relocation agree. The first residual is retail's 'mov eax, 0' in the false arm versus this compiler state's 'xor eax, eax'; explicit if/else is the best of the tested direct, comparison, and conditional-return forms. |
 | 97.9000% | 97.9000% | 172 | void __fastcall KBChangeMenu(void *) | [src/SOURCE/kbwin.cpp:452](../src/SOURCE/kbwin.cpp#L452) | 97.90%: semantics, the 0x04 frame, menu slot, both arms, and all 11 relocation targets agree. Retail has one five-byte continuation jump immediately after the null-menu fallback; an explicit empty positive arm lowered the match to 94.70%. Remaining relocation identities are typed config/import references. |
+| 98.9254% | 98.9254% | 1430 | void __fastcall UpdateTradingPost(int) | [src/SOURCE/tradpost.cpp:56](../src/SOURCE/tradpost.cpp#L56) | 99.64%: complete text, control-state, offer-icon, ratio, and knob CFG; the 0x3c frame and all recovered local slots agree. Candidate span is 0x597 versus 0x596 retail code, with 312/312 non-jump instructions and 23/23 jumps. The visible residual is the selected-resource compare loading the loop local before the global instead of after it. All 112 relocations agree as a multiset; ordered review has five commutative swapped pairs (three left/right validity tests and two qty/ratio products). Reversing those expressions was byte-identical; the De Morgan selection predicate worsened block order. Revisit after TU state changes. |
+| 99.7205% | 99.7205% | 950 | int __fastcall TradingPostHandler(struct tag_message &) | [src/SOURCE/tradpost.cpp:264](../src/SOURCE/tradpost.cpp#L264) | 99.41%: complete nested select/deselect switches, case-body order, 0x20 frame, stack slots, and embedded pointer/index tables. Both object spans are 0x3b8 (retail code 0x3b6); excluding table data leaves 154/154 non-jump instructions and 25/25 jumps. The four residual sites are commuted comparisons: the upper clamp, left and right resource selection, and increment bound. All 51 relocations agree as a multiset; ordered review has four swapped external pairs (clamp, two qty/ratio products, increment), while local-table spellings are delinker aliases. Direct commuted spellings compiled byte-identically. |
 
 ## Unmarked Non-100 Functions
 
 | Retained | Live | Bytes | Function | Source | Evidence |
 | --- | --- | --- | --- | --- | --- |
-| 98.0920% | 98.0920% | 357 | void __fastcall DoTradingPost(int, float) | [src/SOURCE/tradpost.cpp:21](../src/SOURCE/tradpost.cpp#L21) | No durable evidence recorded. |
-| 95.4806% | 94.4149% | 1430 | void __fastcall UpdateTradingPost(int) | [src/SOURCE/tradpost.cpp:45](../src/SOURCE/tradpost.cpp#L45) | No durable evidence recorded. |
-| 99.9444% | 99.9444% | 254 | void __fastcall ComputeTradeRatios(int, int, int *, int *, int *) | [src/SOURCE/tradpost.cpp:182](../src/SOURCE/tradpost.cpp#L182) | No durable evidence recorded. |
-| 94.5556% | 94.4531% | 950 | int __fastcall TradingPostHandler(struct tag_message &) | [src/SOURCE/tradpost.cpp:240](../src/SOURCE/tradpost.cpp#L240) | No durable evidence recorded. |
 
 ## Resolved Markers
 
