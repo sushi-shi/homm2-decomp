@@ -49,7 +49,7 @@ SIZE(SCmbtObstacle, 0xe);
 SIZE(SElevationOverlay, 0x11);
 
 enum {
-    HERO_TYPE_INITIAL_COUNT = 8,
+    HERO_TYPE_INITIAL_COUNT = HERO_CLASS_COUNT,
     EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT = 4,
     X_GLOBAL_RECRUIT_EMPTY_COUNT = 6,
     X_GLOBAL_RECRUIT_BUY_COUNT = 5,
@@ -159,7 +159,14 @@ typedef enum KbGameTableConstant {
     KB_TERRAIN_TYPE_COUNT = GROUND_TERRAIN_TYPE_COUNT + 1,
     KB_TERRAIN_STEP_TYPE_COUNT = 2,
     KB_TRIGGER_TYPE_COUNT = 128,
-    KB_TOWN_OBJECT_NAME_COUNT = 32
+    KB_TOWN_OBJECT_NAME_COUNT = 32,
+    KB_COMBAT_HERO_VARIANT_COUNT = 2,
+    KB_COMBAT_HERO_SPRITE_COUNT = HERO_CLASS_COUNT * KB_COMBAT_HERO_VARIANT_COUNT,
+    KB_CASTLE_WALL_SEGMENT_COUNT = 4,
+    KB_CASTLE_TOWER_COUNT = 4,
+    KB_CASTLE_DOOR_POSITION_COUNT = 2,
+    KB_COMBAT_COORDINATE_COUNT = 2,
+    KB_MOAT_CELL_COUNT = 9
 } KbGameTableConstant;
 
 extern unsigned char giGroundShape[GROUND_TILE_IMAGE_COUNT];
@@ -277,17 +284,17 @@ extern char *gTownPrefixNames[HERO_CLASS_COUNT];
 extern char *gTownObjNames[KB_TOWN_OBJECT_NAME_COUNT];
 extern int giDebugBuildingToBuild;
 extern unsigned char giTerrainToMusicTrack[GROUND_TERRAIN_TYPE_COUNT];
-extern char *cHeroTypeShortName[6];
+extern char *cHeroTypeShortName[HERO_CLASS_COUNT];
 extern char cHeroTypeInitial[HERO_TYPE_INITIAL_COUNT];
 extern int giDeferObjDrawX;
 extern int giDeferObjDrawY;
 extern class heroWindow *gpInitWin;
-extern struct SCmbtHero sCmbtHero[12];
-extern unsigned char iWallToHexCell[4];
-extern unsigned char iTowerToHexCell[4];
-extern unsigned short wallPos[4][2];
-extern unsigned short towerPos[4][2];
-extern unsigned short doorPos[2][2];
+extern struct SCmbtHero sCmbtHero[KB_COMBAT_HERO_SPRITE_COUNT];
+extern unsigned char iWallToHexCell[KB_CASTLE_WALL_SEGMENT_COUNT];
+extern unsigned char iTowerToHexCell[KB_CASTLE_TOWER_COUNT];
+extern unsigned short wallPos[KB_CASTLE_WALL_SEGMENT_COUNT][KB_COMBAT_COORDINATE_COUNT];
+extern unsigned short towerPos[KB_CASTLE_TOWER_COUNT][KB_COMBAT_COORDINATE_COUNT];
+extern unsigned short doorPos[KB_CASTLE_DOOR_POSITION_COUNT][KB_COMBAT_COORDINATE_COUNT];
 extern float *fTradingPostEfficency;
 extern struct SElevationOverlay sElevationOverlay[ELEVATION_OVERLAY_COUNT];
 extern int gbDrawingPuzzle;
@@ -296,7 +303,7 @@ extern int giWalkingFrom2;
 extern int giWalkingTo;
 extern int giWalkingTo2;
 extern int giWalkingYMod;
-extern unsigned char moatCell[16];
+extern unsigned char moatCell[KB_MOAT_CELL_COUNT];
 extern char *congratsText;
 extern char *gArtifactNames[104];
 extern char *gArtifactDesc[104];
