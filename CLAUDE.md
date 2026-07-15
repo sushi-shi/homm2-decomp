@@ -67,16 +67,19 @@ homm2 status    # per-unit + overall match %   (also: status update | status che
 and diffs it against the delinked retail target `build/delink/<unit>.c.obj`. ninja **tracks
 header deps** (MSVC 4.2 has no `/showIncludes`, so `cc_wrap.py` scans each TU's `#include`
 graph into a depfile) — editing a shared header recompiles exactly its includers, so a header
-change can't leave a stale obj. It then runs **six hard gates** (a red gate fails the build):
+change can't leave a stale obj. It then runs **seven hard gates** (a red gate fails the build):
 `assert_decls` (no local `class/struct/enum`/`extern`/fwd-decl in any .cpp), `assert_no_fake_labels`
 (no emitted fn symbol absent from the recovered inventory), `assert_globals_data` (every global's **definition**
 carries a unique `DATA(<VA>)`; no `DATA()` on a header `extern`),
 `assert_defs_declared` (every free-fn definition is declared in its
 owner header), `assert_globals_defined` (every extern global has a definition in its owner TU —
 link-completeness), `assert_vtables` (every class vtable is claimed by a `VTBL()` census marker in
-its owner TU — no drift, no fake classes). Full catalog + rationale: **`docs/build-asserts.md`**.
+its owner TU — no drift, no fake classes), and ordered `assert_relocs --fields` (an exact function
+cannot silently address the wrong field of a recovered public DATA owner). Full catalog + rationale:
+**`docs/build-asserts.md`**.
 
-**`homm2 relocs` — OPT-IN reloc-target audit (not a build gate).** objdiff **MASKS every relocation**
+**`homm2 relocs` — OPT-IN broad reloc-target audit.** The narrow owner-field subset is a hard gate;
+the order-independent whole-target review remains opt-in. Objdiff **MASKS every relocation**
 when scoring — it never checks a reloc's *target* — so a 100%-exact fn can silently read the wrong
 global/field or call a fabricated/wrong function and still score 100%. `homm2 relocs` resolves every
 near-exact fn's reloc targets (via `symbol_names.csv` + definition `DATA()` VAs) and flags any address
