@@ -2,10 +2,9 @@
 """assert_globals_data.py — hard build gate for global DATA(VA) placement. DATA(0x<VA>) lives on
 the global's DEFINITION in its owner .cpp (not on the header `extern`). Enforces:
   * every file-scope DEFINITION of a CodeView data symbol carries DATA(0x<its exact VA>);
-  * NO DATA() on a header `extern` — EXCEPT _globals_model.h (synthetic globals with no definition:
-    they alias real storage, so their VA is pinned on the model extern);
+  * NO DATA() on a header `extern`, including synthetic model declarations;
   * a header extern with no CodeView symbol lives ONLY in _globals_model.h;
-  * every DATA() VA is UNIQUE (one VA == one global), across .cpp definitions + _globals_model.h.
+  * every DATA() VA is UNIQUE (one VA == one definition).
 Run from repo root; exits 1 on any violation."""
 import csv, re, sys, glob, os
 
@@ -59,7 +58,8 @@ for c in sorted(glob.glob("src/**/*.cpp", recursive=True)):
         else:
             note(dm.group(1), loc)
 
-# (2) HEADERS: an extern must NOT carry DATA — except _globals_model.h (synthetic, no definition).
+# (2) HEADERS: declarations never claim storage. Synthetic model externs are allowed, but DATA()
+#     belongs on their canonical .cpp definition just as it does for CodeView-backed globals.
 for h in sorted(glob.glob("include/**/*.h", recursive=True)):
     is_model = os.path.basename(h) == "_globals_model.h"
     for i, line in enumerate(open(h), 1):
@@ -75,12 +75,8 @@ for h in sorted(glob.glob("include/**/*.h", recursive=True)):
         if not name:
             continue                                  # `extern "C" T f(...);` — a function
         if is_model:
-            if not dm:
-                bad.append((loc, name, "no DATA() in _globals_model.h", "(pin from retail)"))
-            else:
-                note(dm.group(1), loc)
-                if name in rva_of and int(dm.group(1), 16) != rva_of[name] + IMG:
-                    bad.append((loc, name, "DATA(%#010x)" % int(dm.group(1), 16), "%#010x" % (rva_of[name] + IMG)))
+            if dm:
+                bad.append((loc, name, "DATA() on model extern — move it to the .cpp definition", "—"))
         elif dm:
             bad.append((loc, name, "DATA() on header extern — move it to the .cpp definition", "—"))
         elif name not in rva_of:
@@ -94,4 +90,4 @@ if bad or dup:
     print("\nGLOBALS-DATA FAIL: %d placement issue(s), %d duplicate VA(s)." % (len(bad), len(dup)))
     sys.exit(1)
 print("globals-data OK: every CodeView global's DEFINITION carries DATA(its VA); no DATA on header "
-      "externs (bar _globals_model.h); VAs unique.")
+      "externs; definition VAs unique.")

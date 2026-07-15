@@ -32,17 +32,16 @@ a real retail symbol — the source may only reconstruct symbols the binary actu
 ### 3. `assert_globals_data` — DATA(VA) discipline
 `DATA(0x<VA>)` rides the global's **definition** in its owner `.cpp`, not the header `extern`:
 - every file-scope **definition** of a CodeView data symbol carries `DATA(0x<its exact VA>)`;
-- **no `DATA()` on a header `extern`** — EXCEPT `include/_globals_model.h`, whose synthetic globals
-  have no definition (they alias real storage), so their VA is pinned on the model `extern`;
+- **no `DATA()` on a header `extern`**, including `include/_globals_model.h`;
 - a header `extern` with **no** CodeView symbol lives only in `_globals_model.h`;
-- every `DATA()` VA is **unique** (one VA == one global), across `.cpp` definitions + `_globals_model.h`.
+- every `DATA()` VA is **unique** (one VA == one definition).
 
 Rationale for def-not-extern: the VA describes *storage*, which the definition owns; a caller that
 `#include`s the header sees the plain `extern` and never a duplicated address. `migrate_data_to_defs.py`
 performed the one-time move; `gen_global_defs.py` now emits `DATA(VA) T g;`. Single-module synthetic
 globals are pulled out of `_globals_model.h` into their module as `static` defs by
 `move_model_singletons.py` (retail xref), shrinking the shared model header to genuinely cross-module
-/ def-less synthetics.
+synthetics. Any shared synthetic keeps a plain header `extern` and a canonical `.cpp` definition.
 
 ### 4. `assert_defs_declared` — every definition has a header declaration
 Every free function **defined** in a `.cpp` is **declared** in that TU's owner header
@@ -54,8 +53,8 @@ bootstrapped by `gen_module_header.py`.
 ### 5. `assert_globals_defined` — link-completeness
 Every global **declared** `extern` in a header has a **definition** in its owner TU's object
 (symbol defined, section > 0, in `build/objdiff/base/<owner>.obj`) — so the project has no
-unresolved externals and can link. Synthetic globals (`_globals_model.h`) and the `_const`
-pseudo-unit are exempt (they alias real storage / have no owning TU). Definitions are generated
+unresolved externals and can link. Synthetic globals in `_globals_model.h` are checked across all
+reconstruction objects; only the `_const` pseudo-unit is exempt. Definitions are generated
 by `gen_global_defs.py` (`DATA(VA) T g;` in retail-RVA order; the header keeps a plain `extern`).
 
 ### 6. `assert_vtables` — vtable census (drift-proof, no fake classes)

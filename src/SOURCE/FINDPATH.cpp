@@ -23,6 +23,22 @@
 
 #define FINDPATH_SOURCE_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\FINDPATH.CPP"
 
+// ---- module-private synthetic globals (retail xref: single-module) ----
+// Retail .data raw storage ends at VA 0x00523000. These VAs are in its loader-zero
+// virtual tail, so the definitions intentionally have no initializer.
+DATA(0x0052adc0) static int gSearchLow;
+DATA(0x0052adc4) static mapCell *gSearchNextCell;
+DATA(0x0052ae40) static searchNode *gSearchCell;
+DATA(0x0052ae44) static int gSearchNextY;
+DATA(0x0052ae48) static mapCell *gSearchCurrentCell;
+DATA(0x0052ae4c) static int gSearchDirection;
+DATA(0x0052ae50) static int gSearchTriggerType;
+DATA(0x0052ae54) static int gSearchNextX;
+DATA(0x0052ae58) static int gSearchTerrain;
+DATA(0x0052ae5c) static searchNode *gSearchQueueNode;
+DATA(0x0052ae60) static int gSearchMiddle;
+DATA(0x0052ae64) static int gSearchHigh;
+
 // @early-stop: all 14 meaningful bytes are raw-identical and both sides have zero
 // relocations; retail's only residual is the trailing 8B FF two-byte alignment pad.
 VA(0x004a4a50, 0x10)
