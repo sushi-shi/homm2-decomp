@@ -548,7 +548,7 @@ void soundManager::StopAllSamples(int param_1)
     LogStr("SAS 1");
     for (sampleIdx = 0; sampleIdx < m_numSampleHandles; sampleIdx++) {
         sampleStatus = AIL_sample_status(m_sampleHandles[sampleIdx]);
-        if (sampleStatus == 4)
+        if (sampleStatus == SOUND_SAMPLE_STATUS_PLAYING)
             AIL_end_sample(m_sampleHandles[sampleIdx]);
     }
     m_fadeSteps = 0;
@@ -618,19 +618,19 @@ void soundManager::ModifySample(struct _SAMPLE *sampleHandle, short operation, l
     }
 
     switch (operation) {
-    case 1:
-    case 100:
+    case SOUND_SAMPLE_OPERATION_VOLUME:
+    case SOUND_SAMPLE_OPERATION_EFFECT_VOLUME:
         AIL_set_sample_volume(sampleHandle, ConvertVolume(value, SOUND_VOLUME_EFFECT));
         if (foundChannel >= 0)
             iLastVolume[foundChannel] = static_cast<short>(value);
         break;
-    case 101:
+    case SOUND_SAMPLE_OPERATION_MUSIC_VOLUME:
         H2_ASSERT(gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI, "I:\\Projects\\Heroes\\Prog\\BASE\\soundmgr.cpp", 0x52f);
         AIL_set_sample_volume(sampleHandle, ConvertVolume(value, SOUND_VOLUME_MUSIC));
         if (foundChannel >= 0)
             iLastVolume[foundChannel] = static_cast<short>(value);
         break;
-    case 5:
+    case SOUND_SAMPLE_OPERATION_START:
         AIL_start_sample(sampleHandle);
         break;
     }
@@ -649,11 +649,11 @@ long soundManager::DigitalReport(struct _SAMPLE *param_1, short param_2)
     if (m_digitalDriver == 0)
         return 0;
     switch (param_2) {
-    case 1:
+    case SOUND_DIGITAL_REPORT_VOLUME:
         return AIL_sample_volume(param_1);
-    case 4:
+    case SOUND_DIGITAL_REPORT_PLAYING:
         sampleStatus = AIL_sample_status(param_1);
-        return sampleStatus == 4;
+        return sampleStatus == SOUND_SAMPLE_STATUS_PLAYING;
     }
     return 0;
 }
@@ -675,10 +675,11 @@ void soundManager::AdjustSoundVolumes(void)
     for (sampleIndex = 1; sampleIndex < m_numSampleHandles; sampleIndex++) {
         sampleHandle = m_sampleHandles[sampleIndex];
         if (gConfig.soundVolume != 0) {
-            if (DigitalReport(sampleHandle, 4) != 0)
-                ModifySample(sampleHandle, 100, iLastVolume[sampleIndex]);
+            if (DigitalReport(sampleHandle, SOUND_DIGITAL_REPORT_PLAYING) != 0)
+                ModifySample(sampleHandle, SOUND_SAMPLE_OPERATION_EFFECT_VOLUME,
+                             iLastVolume[sampleIndex]);
         } else {
-            ModifySample(sampleHandle, 1, 0);
+            ModifySample(sampleHandle, SOUND_SAMPLE_OPERATION_VOLUME, 0);
         }
     }
     LogStr("Adjust Sound Volumes 2");
@@ -876,13 +877,6 @@ void soundManager::SwitchAmbientMusic(int param_1)
     LogStr("Switch Ambient Music 2");
 }
 
-// @match-note
-// After the header enum/type recovery, the 0x14 frame, CFG, and 13/13 relocation
-// targets still agree. The only non-relocation bytes are +0x133, +0x139, and +0x13a:
-// candidate loads endChannel then compares currentChannel/endChannel with JL; retail
-// loads currentChannel then compares endChannel/currentChannel with JG. Both skip the
-// reset exactly when currentChannel < endChannel. The equivalent >= operand spelling
-// emits the same candidate bytes; revisit only after later soundmgr TU-state changes.
 VA(0x004cd7f0, 0x28f)
 struct _SAMPLE *soundManager::MemorySample(class sample *param_1)
 {
@@ -904,7 +898,7 @@ struct _SAMPLE *soundManager::MemorySample(class sample *param_1)
     LogStr("Memory Sample 1");
     scs = &SCS[params[3]];
     for (ch = static_cast<short>(scs->startChannel); scs->endChannel > ch; ch++) {
-        if (AIL_sample_status(m_sampleHandles[ch]) == 2)
+        if (AIL_sample_status(m_sampleHandles[ch]) == SOUND_SAMPLE_STATUS_DONE)
             break;
     }
     if (scs->endChannel == ch) {

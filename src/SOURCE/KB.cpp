@@ -3104,7 +3104,8 @@ void WaitEndSample(SAMPLE2 s, int waitTime)
         waitTime = 4000;
     endTime = KBTickCount() + waitTime;
     if (s.pMem)
-        while (gpSoundManager->DigitalReport(s.pMem, 4) && KBTickCount() < endTime) {
+        while (gpSoundManager->DigitalReport(s.pMem, SOUND_DIGITAL_REPORT_PLAYING) &&
+               KBTickCount() < endTime) {
             Process1WindowsMessage();
             PollSound();
         }

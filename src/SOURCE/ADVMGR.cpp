@@ -5647,7 +5647,7 @@ void advManager::SetEnvironmentOrigin(int originX, int originY, int stopSounds)
                 gpSoundManager->ModifySample(
                     m_loopingSamples[m_activeSounds[edgeOffset].soundId]
                         ->m_activeSample,
-                    ADVMGR_ENVIRONMENT_SOUND_PAN,
+                    SOUND_SAMPLE_OPERATION_EFFECT_VOLUME,
                     ADVMGR_ENVIRONMENT_VOLUME(m_activeSounds[edgeOffset].volume));
             }
         }
