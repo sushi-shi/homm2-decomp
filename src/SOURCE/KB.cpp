@@ -4709,19 +4709,56 @@ DATA(0x004fa980) int gbCheatMenus = 0;
 DATA(0x004fa984) int gbUseWaveout = 0;
 DATA(0x004fa988) int gbShowAllMaps = 0;
 DATA(0x004fa990) char *gCombatFxNames[32];
-DATA(0x004faa10) short horseFrameFlip[16];
-DATA(0x004faa30) short boatFrameFlip[16];
-DATA(0x004faa50) signed char *gCastleResources;
-DATA(0x004faa58) short *gCastleAmounts;
+DATA(0x004faa10) short horseFrameFlip[MOVEMENT_FRAME_FLIP_COUNT] = {
+    45, 46, 47, 48, 49, 50, 51, 52, 53, 179, 178, 177, 54, 175, 174, 55
+};
+DATA(0x004faa30) short boatFrameFlip[MOVEMENT_FRAME_FLIP_COUNT] = {
+    0, 0, 9, 9, 18, 18, 27, 27, 36, 36, 155, 155, 146, 146, 137, 137
+};
+DATA(0x004faa50) signed char gCastleResources[CASTLE_RESOURCE_SLOT_COUNT] = {
+    RES_WOOD, RES_ORE, -1, -1, 0, 0, 0, 0
+};
+DATA(0x004faa58) short gCastleAmounts[CASTLE_AMOUNT_COUNT] = { 20, 20, 0, 0 };
 DATA(0x004faa60) int gHeroGoldCost = 2500;
-DATA(0x004faa68) short *gVesaMode;
-DATA(0x004faa78) tag_tilePoint normalDirTable[8];
-DATA(0x004faa98) int gResourceBaseValue[8];
-DATA(0x004faab8) int gInitResourcesHuman[5][7];
-DATA(0x004fab48) int gInitResourcesComputer[5][7];
-DATA(0x004fabd8) int gMineCharacteristics[8];
+DATA(0x004faa68) short gVesaMode[VESA_MODE_VALUE_COUNT] = {
+    640, 480, 256, VESA_SET_MODE_FUNCTION, VESA_MODE_640_480_256, 0, 0, 0
+};
+DATA(0x004faa78) tag_tilePoint normalDirTable[NORMAL_DIRECTION_COUNT] = {
+    { 0, -1, 16 }, { 1, -1, 16 }, { 1, 0, 16 },  { 1, 1, 16 },
+    { 0, 1, 16 },  { -1, 1, 16 }, { -1, 0, 16 }, { -1, -1, 16 }
+};
+DATA(0x004faa98) int gResourceBaseValue[RESOURCE_VALUE_COUNT] = {
+    200, 300, 200, 300, 300, 300, 1, 0
+};
+DATA(0x004faab8) int
+    gInitResourcesHuman[STARTING_RESOURCE_DIFFICULTY_COUNT]
+                       [STARTING_RESOURCE_TYPE_COUNT] = {
+        { 30, 10, 30, 10, 10, 10, 10000 },
+        { 20, 5, 20, 5, 5, 5, 7500 },
+        { 10, 2, 10, 2, 2, 2, 5000 },
+        { 5, 0, 5, 0, 0, 0, 2500 },
+        { 0, 0, 0, 0, 0, 0, 0 }
+    };
+DATA(0x004fab48) int
+    gInitResourcesComputer[STARTING_RESOURCE_DIFFICULTY_COUNT]
+                          [STARTING_RESOURCE_TYPE_COUNT] = {
+        { 20, 5, 20, 5, 5, 5, 7500 },
+        { 20, 5, 20, 5, 5, 5, 7500 },
+        { 30, 10, 30, 10, 10, 10, 10000 },
+        { 30, 10, 30, 10, 10, 10, 10000 },
+        { 30, 10, 30, 10, 10, 10, 10000 }
+    };
+DATA(0x004fabd8) int gMineCharacteristics[MINE_CHARACTERISTIC_COUNT] = {
+    2, 1, 2, 1, 1, 1, 1000, 0
+};
 DATA(0x004fabf8) int gSSValues[HERO_SKILL_COUNT]
-                                 [SECONDARY_SKILL_VALUE_LEVEL_COUNT];
+                                 [SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
+    { 400, 750, 1000 }, { 200, 450, 850 }, { 450, 1000, 1675 },
+    { 1, 2, 3 },        { 50, 100, 150 },  { 150, 275, 375 },
+    { 300, 550, 800 },  { 300, 600, 900 }, { 250, 425, 650 },
+    { 300, 550, 800 },  { 100, 200, 300 }, { 50, 100, 150 },
+    { 100, 450, 950 },  { 445, 950, 1500 }
+};
 DATA(0x004faca0) unsigned char gArtifactLevel[104];
 DATA(0x004fad08) int gArtifactBaseRV[100];
 DATA(0x004faea4) int gUltArtifactAvgValue = 16500;

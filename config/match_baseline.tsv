@@ -496,7 +496,7 @@ SOURCE/ADVMGR	?SummonBoat@advManager@@QAEXXZ	99.4259	e45880daa4eb
 SOURCE/ADVMGR	?SystemOptions@advManager@@QAEXXZ	99.7426	0a2e06a56a9c
 SOURCE/ADVMGR	?SystemOptionsHandler@@YIHAAUtag_message@@@Z	99.9081	ef7f3a0e8f0c
 SOURCE/ADVMGR	?TeleportTo@advManager@@QAEXPAVhero@@HHHH@Z	98.7456	fad7f4321091
-SOURCE/ADVMGR	?TownGate@advManager@@QAEXH@Z	100.0000	ed871752d786
+SOURCE/ADVMGR	?TownGate@advManager@@QAEXH@Z	100.0000	c95ae49be1f8
 SOURCE/ADVMGR	?TownPortalHandler@@YIHAAUtag_message@@@Z	100.0000	2273d6ca43f1
 SOURCE/ADVMGR	?TownQuickView@advManager@@QAEXHHHH@Z	99.9973	c50da7d14d34
 SOURCE/ADVMGR	?TrimLoopingSounds@advManager@@QAEXH@Z	97.8829	d90d0b816d0f
@@ -614,7 +614,7 @@ SOURCE/CMBTMGR	?LoadArmies@combatManager@@QAEXXZ	100.0000	dad8fbade916
 SOURCE/CMBTMGR	?LoadIcons@combatManager@@QAEXXZ	99.0950	da837039512f
 SOURCE/CMBTMGR	?LowerDoor@combatManager@@QAEXXZ	100.0000	918dcc68e92c
 SOURCE/CMBTMGR	?MakeCreaturesVanish@combatManager@@QAEXXZ	97.1768	7c9c366912f7
-SOURCE/CMBTMGR	?MoreTreesNear@combatManager@@QAEHXZ	99.8714	095212314883
+SOURCE/CMBTMGR	?MoreTreesNear@combatManager@@QAEHXZ	99.8714	e6e753c9aacd
 SOURCE/CMBTMGR	?Open@combatManager@@UAEHH@Z	100.0000	ee94fe0590e7
 SOURCE/CMBTMGR	?RaiseDoor@combatManager@@QAEXXZ	100.0000	9a674310a467
 SOURCE/CMBTMGR	?ResetHitByCreature@combatManager@@QAEXXZ	100.0000	9c52e2ebb50d
@@ -664,11 +664,11 @@ SOURCE/COMMAND	?ShowWinLoseArtifact@combatManager@@QAEXPAVheroWindow@@H@Z	100.00
 SOURCE/COMMAND	?ValidHexToStandOn@combatManager@@QAEHH@Z	100.0000	e927a27b1dee
 SOURCE/COMMAND	?ViewBallista@combatManager@@QAEXH@Z	100.0000	f6a0dff66919
 SOURCE/COMMAND	?WinCombatHandler@@YIHAAUtag_message@@@Z	100.0000	f6fdad7e7fc6
-SOURCE/CURSOR	?CheckAdjacentMon@advManager@@QAEXPAH@Z	100.0000	4ba0c6b865bf
+SOURCE/CURSOR	?CheckAdjacentMon@advManager@@QAEXPAH@Z	100.0000	0a8512456d72
 SOURCE/CURSOR	?DrawCursor@advManager@@QAEXXZ	100.0000	eb5b0525c620
 SOURCE/CURSOR	?DrawCursorShadow@advManager@@QAEXXZ	100.0000	472357463aa0
 SOURCE/CURSOR	?GetCursorBaseFrame@advManager@@QAEHH@Z	100.0000	8a55a38bf33a
-SOURCE/CURSOR	?GetMoveShowIt@advManager@@QAEHPAVhero@@H@Z	100.0000	4b83029b6f76
+SOURCE/CURSOR	?GetMoveShowIt@advManager@@QAEHPAVhero@@H@Z	100.0000	edbf6cf49238
 SOURCE/CURSOR	?MoveHero@advManager@@QAEPAVmapCell@@HHPAH00H0H@Z	97.2163	b4ee4cda3678
 SOURCE/CURSOR	?MoveOrigin@advManager@@QAEXHH@Z	95.0494	6091954d5bad
 SOURCE/CURSOR	?ProcessIncomingGroupMapChange@advManager@@QAEXPAD@Z	100.0000	ee4da9b71032
@@ -681,7 +681,7 @@ SOURCE/CURSOR	?StopCursor@advManager@@QAEXH@Z	100.0000	f93176136a31
 SOURCE/CURSOR	?TurnTo@advManager@@QAEXH@Z	100.0000	05bbcc40a530
 SOURCE/CURSOR	?UnwindMapChangeQueue@advManager@@QAEXHH@Z	99.9180	1a249c7c08f7
 SOURCE/CURSOR	?ValidMove@advManager@@QAEHHH@Z	99.9883	7b3684dc630a
-SOURCE/CURSOR	?ValidMoveWithEvent@advManager@@QAEHPAVhero@@H@Z	100.0000	8855ac85ee27
+SOURCE/CURSOR	?ValidMoveWithEvent@advManager@@QAEHPAVhero@@H@Z	100.0000	f3b383aa6a6d
 SOURCE/Campaign	?CampaignHandler@@YIHAAUtag_message@@@Z	98.1125	6d1b2ee7c0a0
 SOURCE/Campaign	?CampaignInfoUpdate@game@@QAEXH@Z	98.2302	eaf387fcd0df
 SOURCE/Campaign	?HandleCampaignWin@game@@QAEHXZ	99.8463	1ad149cc6aa6
@@ -711,7 +711,7 @@ SOURCE/EVENTS	?CombatMonsterEvent@advManager@@QAEHPAVhero@@HHPAVmapCell@@HHHHHHH
 SOURCE/EVENTS	?ComputerMonsterInteract@advManager@@QAEXPAVmapCell@@PAVhero@@PAH@Z	98.1614	1a89ad0c7be6
 SOURCE/EVENTS	?DoAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	97.6423	41a36f454645
 SOURCE/EVENTS	?DoCombat@advManager@@QAEHHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHH@Z	99.9428	b853a5dbdd6b
-SOURCE/EVENTS	?DoEvent@advManager@@QAEXPAVmapCell@@HH@Z	97.9046	b2215703bd1b
+SOURCE/EVENTS	?DoEvent@advManager@@QAEXPAVmapCell@@HH@Z	97.9046	a636fd98c074
 SOURCE/EVENTS	?DoNetCombat@advManager@@QAEHPAD@Z	100.0000	0145d3505e8e
 SOURCE/EVENTS	?DoWhirlpool@advManager@@QAEXPAVhero@@@Z	99.8765	9be475b7aff7
 SOURCE/EVENTS	?EraseObj@advManager@@QAEXPAVmapCell@@HH@Z	99.9705	2bf4a7443a42
@@ -1029,7 +1029,7 @@ SOURCE/Overview	?DoKnob@game@@QAEXXZ	100.0000	bd646ea03ed8
 SOURCE/Overview	?Overview@game@@QAEXXZ	100.0000	e1411ffb3867
 SOURCE/Overview	?OverviewHandler@@YIHAAUtag_message@@@Z	99.8363	04a208d92aa7
 SOURCE/Overview	?ProcessIconSelect@game@@QAEHHH@Z	100.0000	db8d8fb6a5de
-SOURCE/Overview	?SetupDynamicStuff@game@@QAEXHHH@Z	98.9362	020b585a91a3
+SOURCE/Overview	?SetupDynamicStuff@game@@QAEXHHH@Z	98.9366	020b585a91a3
 SOURCE/Overview	?SetupNewOverviewType@game@@QAEXHH@Z	100.0000	fe0018b6de5f
 SOURCE/Overview	?SetupResources@game@@QAEXXZ	100.0000	4a64f57f145e
 SOURCE/PATH	?FindPath@army@@QAEHHHHHH@Z	100.0000	cab1782b72c7
@@ -1050,7 +1050,7 @@ SOURCE/PHILAI	?BuildCreature@philAI@@QAEXPAVtown@@HH@Z	100.0000	c093bb6fbcf1
 SOURCE/PHILAI	?BuildHero@philAI@@QAEXPAVtown@@H@Z	100.0000	bc8776e5a6ca
 SOURCE/PHILAI	?CanBuyBHC@philAI@@QAEHAAUBHC@@@Z	100.0000	83bd7f82fe53
 SOURCE/PHILAI	?CheckBerserk@philAI@@QAEXXZ	100.0000	b5864f3a0eca
-SOURCE/PHILAI	?CheckBuyStuff@philAI@@QAEXXZ	99.9815	b8128bc2efc8
+SOURCE/PHILAI	?CheckBuyStuff@philAI@@QAEXXZ	99.9815	84107ffea5b6
 SOURCE/PHILAI	?CheckDoMain@@YIXHH@Z	100.0000	dd977559addb
 SOURCE/PHILAI	?CheckForCreatureUpgrades@philAI@@QAEXXZ	99.5650	eeb9a0b36543
 SOURCE/PHILAI	?CheckReload@philAI@@QAEXXZ	100.0000	f77c37d7d023
@@ -1066,12 +1066,12 @@ SOURCE/PHILAI	?ComputeValueOfSS@philAI@@QAEHPAVhero@@HH@Z	99.8370	8f96f03e452f
 SOURCE/PHILAI	?CreaturesToBuy@philAI@@QAEHHH@Z	100.0000	6b9ea4620c5a
 SOURCE/PHILAI	?CreaturesToBuy@philAI@@QAEHPAVtown@@H@Z	100.0000	640dd23b13a3
 SOURCE/PHILAI	?DamageGroup@philAI@@QAEHPAVarmyGroup@@PAVhero@@1M@Z	100.0000	f5f9f7242847
-SOURCE/PHILAI	?DetermineHeroToMove@philAI@@QAEPAVhero@@H@Z	93.0769	fac44c2ceae9
+SOURCE/PHILAI	?DetermineHeroToMove@philAI@@QAEPAVhero@@H@Z	93.0769	77345d375872
 SOURCE/PHILAI	?DetermineTargetPosition@philAI@@QAEHAAH0H0@Z	99.6728	ce7f72b6bb4c
 SOURCE/PHILAI	?DimensionDoorTo@philAI@@QAEXHH@Z	100.0000	c94964d2b047
 SOURCE/PHILAI	?DoAI@philAI@@QAEXH@Z	97.5265	00b31c4e92a5
 SOURCE/PHILAI	?DoAllHeroInteractions@philAI@@QAEXXZ	100.0000	94a34f29920a
-SOURCE/PHILAI	?DoAnywhereDDoorTownGate@philAI@@QAEHH@Z	99.7153	759d6d3a1174
+SOURCE/PHILAI	?DoAnywhereDDoorTownGate@philAI@@QAEHH@Z	99.7153	f389d59dc3aa
 SOURCE/PHILAI	?DoDimensionDoor@philAI@@QAEHPAVhero@@@Z	100.0000	61b2ab8596d3
 SOURCE/PHILAI	?EvaluateArtifactEvent@philAI@@QAEHHH@Z	99.2893	5e470919df12
 SOURCE/PHILAI	?EvaluateBarrier@philAI@@QAEHPAVmapCell@@@Z	100.0000	631584ec4322
@@ -1163,7 +1163,7 @@ SOURCE/REQUEST	?SetupFiles@fileRequester@@QAEXXZ	100.0000	5ce10854a1c7
 SOURCE/REQUEST	?ShowThisMap@@YIHPAD@Z	100.0000	dc067d7b03ab
 SOURCE/REQUEST	?ShowThisMapGame@@YIHPAD@Z	99.7917	77864e414baa
 SOURCE/REQUEST	?Update@fileRequester@@QAEXH@Z	99.9908	98e2c7d2ca07
-SOURCE/SEARCH	?BuildPath@searchArray@@QAEHHHHHH@Z	98.1818	dbcbfac43fb5
+SOURCE/SEARCH	?BuildPath@searchArray@@QAEHHHHHH@Z	98.1818	da21beb27d42
 SOURCE/SEARCH	?SeedPosition@searchArray@@QAEXHHHHHHHHHHHH@Z	94.2147	a9fe13065493
 SOURCE/SETUP	?BaseSetupHandler@@YIHAAUtag_message@@@Z	97.2241	41b83cd273f8
 SOURCE/SETUP	?ExpLoadCampaignHandler@@YIHAAUtag_message@@@Z	100.0000	4808bee3ee9a
@@ -1217,7 +1217,7 @@ SOURCE/SPELLS	?ChainLightning@combatManager@@QAEXHH@Z	99.4217	25f02b89a4bd
 SOURCE/SPELLS	?CombatSpecialHandler@@YIHAAUtag_message@@@Z	91.4262	9ebd4b3c486c
 SOURCE/SPELLS	?DefaultSpell@combatManager@@QAEXH@Z	99.8611	6414565c313a
 SOURCE/SPELLS	?DoBlast@combatManager@@QAEXHH@Z	99.7533	0081fba16f7f
-SOURCE/SPELLS	?DoBolt@combatManager@@QAEXHHHHHHHHHHHHHHHHH@Z	98.7582	b6d118331544
+SOURCE/SPELLS	?DoBolt@combatManager@@QAEXHHHHHHHHHHHHHHHHH@Z	98.8366	b6d118331544
 SOURCE/SPELLS	?DoLuck@combatManager@@QAEXHH@Z	99.5646	1902ac98ff5c
 SOURCE/SPELLS	?DrawBolt@combatManager@@QAEXPAUSBolt@@H@Z	94.8357	1d3dcef2238a
 SOURCE/SPELLS	?Earthquake@combatManager@@QAEXXZ	97.1952	bc869ce18315

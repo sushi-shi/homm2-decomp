@@ -39,7 +39,7 @@ DATA(0x004ee1dc) static short s_groupLineBase = CURSOR_GROUP_LINE_BASE;
 
 // @early-stop
 // All non-relocation bytes and all six effective targets match. Retail delinks
-// normalDirTable.y at 0xfaa7a as ??_C@_02DNGE while base uses normalDirTable+2.
+// normalDirTable.y at 0xfaa79 as ??_C@_02DNGE while base uses normalDirTable+1.
 VA(0x0040d5e0, 0x138)
 void advManager::StartCursor(int direction)
 {
@@ -395,7 +395,7 @@ int advManager::GetMoveShowIt(hero *movingHero, int direction)
 
 // @match-note 97.22%: semantics, 0x84 frame, all named/temporary slots, case-body
 // order, jump-table data ranges, and 158/158 relocations are accounted for; the
-// only target identity absent from base is delinked normalDirTable.y at 0xfaa7a.
+// only target identity absent from base is delinked normalDirTable.y at 0xfaa79.
 // First non-reloc residual is one extra retail continuation jump after the hero
 // embarked test; later residuals are step/halfSteps and player-resource address
 // register order plus local-scope trampoline counts. Explicit nested hero arms,
@@ -844,8 +844,6 @@ void advManager::CheckAdjacentMon(int *adjacentMonster)
     }
 }
 
-// @early-stop
-// Code bytes are exact; retail delinks normalDirTable.y at 0xfaa7a as ??_C@_02DNGE.
 VA(0x0040f8c7, 0x14e)
 int advManager::ValidMoveWithEvent(hero *movingHero, int direction)
 {
@@ -881,7 +879,7 @@ int advManager::ValidMoveWithEvent(hero *movingHero, int direction)
 
 // @early-stop
 // All instructions and eight other relocations match; retail delinks
-// normalDirTable.y at 0xfaa7a as ??_C@_02DNGE while base uses normalDirTable+2.
+// normalDirTable.y at 0xfaa79 as ??_C@_02DNGE while base uses normalDirTable+1.
 VA(0x0040fa15, 0x4f2)
 int advManager::ValidMove(int direction, int eventMode)
 {

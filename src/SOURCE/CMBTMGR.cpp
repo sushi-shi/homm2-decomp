@@ -680,7 +680,7 @@ int combatManager::MoreTreesNear(void)
     for (radius = 0; radius < 3; radius++) {
         for (nearbyDirection = 0; nearbyDirection < 8; nearbyDirection++) {
             x = normalDirTable[nearbyDirection].x * radius + combatOriginX;
-            y = normalDirTable[nearbyDirection]._1 * radius + centerY;
+            y = normalDirTable[nearbyDirection].y * radius + centerY;
             if (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT) {
                 combatCell = gpAdvManager->GetCell(x, y);
                 nearbyTileset = combatCell->m_objectTileset;
