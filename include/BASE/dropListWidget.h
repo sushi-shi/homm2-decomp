@@ -22,8 +22,8 @@ public:
     short  m_contentY;  // +0x2a
     short  field_0x2c;  // +0x2c
     short  field_0x2e;  // +0x2e
-    short  field_0x30;  // +0x30
-    short  field_0x32;  // +0x32
+    short  m_maxVisibleItems;  // +0x30  configured maximum list rows
+    short  m_visibleItemCount;  // +0x32  rows in the current drop-down
     short  m_normalColor;  // +0x34
     short  m_selColor;  // +0x36
     short  field_0x38;  // +0x38
@@ -32,7 +32,7 @@ public:
     short  m_selectedIndex;  // +0x3e
     char   **m_items;  // +0x40  item-string array
     short  m_topIndex;  // +0x44
-    short  field_0x46;  // +0x46
+    short  m_scrollRange;  // +0x46  maximum valid top-item index
     short  field_0x48;  // +0x48
     short  field_0x4a;  // +0x4a
     short  field_0x4c;  // +0x4c
