@@ -48,6 +48,12 @@ typedef enum CampaignSide {
     CAMPAIGN_SIDE_COUNT = 2
 } CampaignSide;
 
+typedef enum MonsterScoreField {
+    MONSTER_SCORE_THRESHOLD = 0,
+    MONSTER_SCORE_TYPE = 1,
+    MONSTER_SCORE_FIELD_COUNT = 2
+} MonsterScoreField;
+
 typedef enum CampaignChoiceType {
     CAMPAIGN_CHOICE_RESOURCE = 0,
     CAMPAIGN_CHOICE_ARTIFACT = 1,
@@ -888,8 +894,8 @@ extern unsigned char giGroundToTerrain[];
 extern int giHighMemBuffer;
 extern int giMainVideoModeColorDepth;
 extern int giNumHumanPlayers;
-extern short giScoreCampaignMon[][2];
-extern short giScoreMon[][2];
+extern short giScoreCampaignMon[][MONSTER_SCORE_FIELD_COUNT];
+extern short giScoreMon[][MONSTER_SCORE_FIELD_COUNT];
 extern int giTCPHostStatus;
 extern int giThisGamePos;
 extern int giThisNetPos;
