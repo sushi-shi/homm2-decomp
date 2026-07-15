@@ -30,7 +30,7 @@ DATA(0x00538184) static unsigned char gYMColor;
 DATA(0x00538188) static unsigned int gYMDimLen2;
 DATA(0x0053818c) static int gYMClipR;
 
-// @match-note
+// @semantic
 // Complete /O2 decoder at 90.177666%: candidate 0x579 versus retail 0x588. Both are frame-free and
 // have the same 64 basic blocks, 99 directed CFG edges, and ordered successor topology (388 versus
 // 394 instructions). Relocation-union masking leaves 669 comparable bytes, 394 different, first

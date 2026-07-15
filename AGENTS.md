@@ -43,8 +43,8 @@ authoritative. This file is the short, restart-ready Codex workflow.
    relocation targets across the whole program.
    At a compiler-shape wall, try only a few obvious semantics-preserving spellings, record the
    byte-level residual and exhausted attempts in a durable source marker, and move on. Use
-   `@early-stop` only for a byte-proven permitted wall; otherwise use `@match-note` for a complete
-   coverage-phase structural checkpoint. A function is ready for integration when its recovered
+   `@early-stop` only for a byte-proven permitted wall; otherwise use `@semantic` for a complete
+   semantic/structural checkpoint. A function is ready for integration when its recovered
    structure is credible and all external relocations match, even if a documented compiler-shape
    residual keeps it below 100%. Do not run extended compile searches or permutation passes:
    later shared-header/layout recovery can invalidate carefully tuned matches. Only after the
@@ -121,13 +121,14 @@ authoritative. This file is the short, restart-ready Codex workflow.
   not the phase-switch trigger. This prevents later shared-header and class-layout discoveries from
   invalidating carefully crafted byte matches.
 - Every integrated non-100 function must carry a durable marker immediately above its `VA()`.
-  `@early-stop` is the byte-proven artifact set. `@match-note` is a provisional coverage-phase
+  `@early-stop` is the byte-proven artifact set. `@semantic` is the current linking/runtime
   checkpoint:
   record the first retail/ours assembly divergence or byte span, frame/slot/CFG and relocation
-  status, the obvious spellings already tried, and the condition for revisiting it. During coverage,
-  do not repeat attempts listed in `@match-note`; after all placeholders are gone, build the
-  last-mile queue from those notes.
-  Remove a stale `@match-note` when the function reaches 100% or gains a valid `@early-stop` proof.
+  status, the obvious spellings already tried, and the condition for revisiting it. Do not repeat
+  attempts listed in `@semantic` while linking and runtime testing are the active priority. The
+  marker does not claim byte exactness or a proven wall; it is the explicit queue for a future
+  byte-last-mile campaign. Remove it when the function reaches 100% or gains a valid
+  `@early-stop` proof.
 - Integrate exactly one worker at a time. Apply only its declared source/header files; never copy a
   worker's `README.md`, `config/match_baseline.tsv`, or transient queue. On `source-matching`, run the
   full build, verify the reported functions, run `homm2 status update`, stage the worker files plus
@@ -140,7 +141,7 @@ authoritative. This file is the short, restart-ready Codex workflow.
   to that same worker and lane before assigning new work. During coverage, advance only after each
   target
   is structurally complete and is either 100%, a byte-proven permitted `@early-stop`, or a fully
-  evidenced `@match-note` checkpoint under `.claude/agents/matcher.md`; a note cannot excuse missing
+  evidenced `@semantic` checkpoint under `.claude/agents/matcher.md`; a marker cannot excuse missing
   semantics, layout, frame/slot, CFG, or relocation work.
 - Do not repeatedly poll worker worktrees, reports, or percentages while a batch is active. Rely on
   matcher milestone/completion messages and let workers tune uninterrupted. Inspect a lane only for
@@ -179,10 +180,11 @@ authoritative. This file is the short, restart-ready Codex workflow.
   Use plain `homm2 status update` for direct function edits that should establish a new maximum.
 - Mark `@early-stop` only for 100% matches or a byte-proven residual such as delinked local-label or
   constant-pool naming. Document the exact byte span and reason.
-- Mark a structurally complete but not yet byte-proven coverage-phase wall with `@match-note`,
+- Mark a structurally and behaviorally complete but nonexact function with `@semantic`,
   immediately above `VA()`. Record the first differing instructions/offsets, confirmed frame/slot/CFG and
-  relocation state, and every obvious steering attempt already exhausted. This is a restart
-  checkpoint, not an early-stop proof and not permission to leave reconstruction work unfinished.
+  relocation state, and every obvious steering attempt already exhausted. This is the current
+  linking/runtime stop, not an early-stop proof and not permission to leave reconstruction work
+  unfinished.
 - Before the placeholder census reaches zero, a wall proof requires complete
   semantics/frame/slots/CFG and relocation review, but only a few obvious source-shape attempts.
   Do not exhaustively permute or brute-force it.

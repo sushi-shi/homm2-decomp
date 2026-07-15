@@ -23,7 +23,7 @@ DATA(0x005381ac) static int gFMY;
 DATA(0x005381b0) static int gFMClipR;
 DATA(0x005381b4) static int gFMXEnd;
 
-// @match-note
+// @semantic
 // Fresh geometry/type recovery. Candidate is 0x205 bytes versus retail 0x212, with 166 versus 167
 // instructions. Both have 26 basic blocks, 20 branch instructions, an identical ordered successor
 // graph, one four-byte pitch home, the same saved registers, and `ret 0x24`.

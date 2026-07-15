@@ -43,7 +43,7 @@ int executive::InitSystem(void)
     return 0;
 }
 
-// @match-note
+// @semantic
 // Complete /O2 structure with an exact frame/CFG and 11/11 ordered external
 // relocations. The only canonical byte residual is the commutative comparison at
 // +0x2d (ours cmp ECX,EAX; retail cmp EAX,ECX). Reordering the condition, naming
@@ -70,7 +70,7 @@ void executive::ShutDownSystem(void)
     gpResourceManager->Close();
 }
 
-// @match-note
+// @semantic
 // Complete /O2 structure with the retail frame/CFG and all 16 ordered external
 // relocations. The first and only structural residual is +0x19..+0x40 in the
 // manager snapshot loop: ours assigns EAX=listManager/ECX=index while retail
@@ -185,7 +185,7 @@ int executive::AddManager(class baseManager *mgr, int param_2)
     return EXECUTIVE_MANAGER_SUCCESS;
 }
 
-// @match-note
+// @semantic
 // Complete /O2 structure and CFG with 0/0 relocations. The only canonical byte
 // residual is +0x15..+0x1b: ours loads head then tail, while retail loads tail then
 // head before the same equality test. A shared next lifetime, an explicit tail

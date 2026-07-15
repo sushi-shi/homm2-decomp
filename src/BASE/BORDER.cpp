@@ -21,7 +21,7 @@ border::border(void) : widget(0, 0, 0, 0, 0, 0)
     m_fillColor = 0;
 }
 
-// @match-note
+// @semantic
 // Generated-alias checkpoint: candidate emits a 0x1f ??_G with 2 relocations that
 // calls the exact standalone destructor; each retail ??_E is 0x4d with 7 relocations
 // and inlines both resource disposals plus widget::~widget. Inlining border::~border
@@ -80,7 +80,7 @@ void border::Read(void)
     m_fillColor = gpResourceManager->ReadWord() & 0xff;
 }
 
-// @match-note
+// @semantic
 // The shared WidgetKind header invalidates the former raw-exact TU state. Both
 // sections remain 0x181 bytes with 9/9 relocations and matching external calls;
 // explicit-range comparison differs only at +0x78 and +0x7b, where the equivalent

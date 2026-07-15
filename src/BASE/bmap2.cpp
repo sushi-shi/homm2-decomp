@@ -34,7 +34,7 @@ void FillBitmapArea(class bitmap *bmp, int x, int y, int w, int h, int color)
     }
 }
 
-// @match-note: the retail/base CodeView spans are both 0x114 bytes, with the
+// @semantic: the retail/base CodeView spans are both 0x114 bytes, with the
 // same 0x8-byte local area, saved-register set, CFG, and 7/7 external
 // relocation occurrences. Masking those relocations leaves only four byte
 // differences: +0x1a ca/d1 and +0x1c 8e/8d are base `cmp ecx,edx; jle`
@@ -96,7 +96,7 @@ void BlitBitmap(class bitmap *src, int sx, int sy, int w, int h, class bitmap *d
     }
 }
 
-// @match-note: retail/base are both 0xa8 bytes, save EBX/ESI/EDI/EBP with no
+// @semantic: retail/base are both 0xa8 bytes, save EBX/ESI/EDI/EBP with no
 // local frame, share the same CFG, and have 15/15 relocations by manual COFF
 // audit, including uDimPal at +0x5f on both sides (the helper misresolves its
 // addend). The first non-relocation byte divergence is +0x80: base emits

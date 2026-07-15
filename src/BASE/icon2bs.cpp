@@ -10,7 +10,7 @@
 #include <BASE/Icon2b.h>
 #include <string.h>
 
-// @match-note
+// @semantic
 // Clean /O2 scale-wrapper reconstruction; live 72.89% after correcting the retail statement order
 // (the older structurally-wrong order had a retained 76.3262% maximum). Candidate is 0x16d bytes
 // versus retail 0x179. The first raw divergence is +0x0: candidate reserves 0x10 frame bytes while

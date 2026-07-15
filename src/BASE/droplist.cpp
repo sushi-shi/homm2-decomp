@@ -306,7 +306,7 @@ void dropListWidget::RestoreDropBackground(void)
     m_savedBackground = 0;
 }
 
-// @match-note: complete shared-header/TU-state checkpoint (live 95.256714%;
+// @semantic: complete shared-header/TU-state checkpoint (live 95.256714%;
 // retained 99.3675%). Explicit ranges are base 0x827 versus retail 0x81f.
 // Retail has a 0x48 frame; base has 0x4c, with every real stack object shifted
 // uniformly by four bytes rather than an extra live variable. With the embedded

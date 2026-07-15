@@ -61,7 +61,7 @@ int widget::Open(int zOrder, class heroWindow *owner)
 VA(0x004dded0, 0x1)
 void widget::Close(void) {}
 
-// @match-note
+// @semantic
 // Both sections are 0x2f4 with the same frame/CFG and all 17/17 ordered
 // relocations. Explicit relocation-masked comparison differs only at
 // +0x23,+0x38,+0x46,+0x4a,+0x4f,+0x51 in the mouse hit test: ours retains the
@@ -172,7 +172,7 @@ int widget::Main(tag_message &message)
     return 0;
 }
 
-// @match-note
+// @semantic
 // The emitted body is 0x46 bytes against the 0x47 CodeView span, with the same CFG,
 // call operands, and 2/2 ordered relocations. From +0x0b, VC4.2 schedules the same
 // coordinate loads/extensions and argument pushes differently. Direct, staged,

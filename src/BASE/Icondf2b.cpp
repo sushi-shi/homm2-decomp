@@ -26,7 +26,7 @@ DATA(0x005381e0) static int gFDY;
 DATA(0x005381e4) static IconEntry *gFDEntry;
 DATA(0x005381e8) static unsigned int gFDRun;
 
-// @match-note
+// @semantic
 // Complete /O2 decoder: candidate/retail have 166/167 instructions, both have 25 branches, both
 // reserve the same four-byte pitch home and save EBX/ESI/EDI/EBP, and all 37 ordered external
 // relocations resolve to the same scratch owners and uDimPal. Candidate ends at +0x235 versus

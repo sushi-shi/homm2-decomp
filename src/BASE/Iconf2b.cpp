@@ -30,7 +30,7 @@ DATA(0x00534c88) static unsigned char *gFlipDimDst;
 DATA(0x00534ca0) static unsigned char *gFlipDst;
 DATA(0x00534c60) static int gFlipSkip;
 
-// @match-note
+// @semantic
 // 214bd52 fresh structural pass: complete CFG, sub esp,8 frame, and all external relocation
 // targets; candidate .text remains 0x4e5 versus retail 0x4f1, with 82/81 relocations. The sole
 // count excess is the setup gFlipY reload (9/8): retail keeps the +0x73 load through the fourth

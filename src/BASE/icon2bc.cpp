@@ -33,7 +33,7 @@ DATA(0x00534ce8) static unsigned int gCTRun;
 // Colour-table variant: literals and solid runs use colorTable[], and dimming is gated by dimGate.
 // Earlier setup, owner, command, lifetime, and CFG families are hash-pinned under
 // docs/matching-matrices/icon2bc-*.tsv; do not replay them without a real header/type trigger.
-// @match-note
+// @semantic
 // /O2 typed checkpoint on master e34ed0d with the canonical header-level IconRle and IconShear
 // typedef enums: 78.95071%, candidate 0x58c versus retail 0x5af. Relocation-union masking leaves
 // 767 differing bytes among 822 common unmasked bytes, first +0x12 and last +0x588, plus a 0x23

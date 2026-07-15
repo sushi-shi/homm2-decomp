@@ -32,7 +32,7 @@ static unsigned char *gFYDst;
 static int gFYSkip;
 static int gFYClipR;
 
-// @match-note
+// @semantic
 // /O2 structural checkpoint in the corrected 1470-row delinker universe with consumer-only enum
 // ownership. Reconstructing gFYRow as the byte pointer owned by every sibling decoder removes the
 // integer-address casts and raises live match from 89.77212% to 90.20107%; candidate remains 0x57f

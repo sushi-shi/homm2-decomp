@@ -93,7 +93,7 @@ void font::DrawString(char *s, int x, int y, int mode)
     DrawStringExecute(s, x, y, mode, 0, 0, 0x280, 0x1e0);
 }
 
-// @match-note
+// @semantic
 // /Od residual is +0x82..+0x98: retail loads m_glyphIcon->m_data into EAX before forming
 // the c*13 index in ECX; ours forms the index first and loads the base into ECX. The 0xaf-byte
 // function, EBP frame/this slot, CFG, and zero-relocation stream otherwise agree. This body
