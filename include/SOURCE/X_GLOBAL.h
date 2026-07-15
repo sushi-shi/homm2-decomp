@@ -276,7 +276,7 @@ extern int giTerrainCost[KB_TERRAIN_TYPE_COUNT][HERO_SKILL_LEVEL_COUNT]
 extern char *gTownPrefixNames[HERO_CLASS_COUNT];
 extern char *gTownObjNames[KB_TOWN_OBJECT_NAME_COUNT];
 extern int giDebugBuildingToBuild;
-extern unsigned char giTerrainToMusicTrack[16];
+extern unsigned char giTerrainToMusicTrack[GROUND_TERRAIN_TYPE_COUNT];
 extern char *cHeroTypeShortName[6];
 extern char cHeroTypeInitial[HERO_TYPE_INITIAL_COUNT];
 extern int giDeferObjDrawX;
