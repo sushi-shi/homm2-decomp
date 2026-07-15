@@ -423,7 +423,7 @@ void hero::Deallocate(int updateMap) {
         if (m_owner == giCurPlayer) {
             gpAdvManager->m_cursorActive = 0;
             mapCellRecord = gpGame->m_worldMap.GetCell(m_x, m_y);
-            mapCellRecord->field8 &= ~HERO_MAP_CELL_PRESENT;
+            mapCellRecord->m_flags &= ~HERO_MAP_CELL_PRESENT;
         }
         if (giCurPlayer == heroOwner)
             gpAdvManager->m_heroContextLocked = 0;
@@ -1307,9 +1307,9 @@ int HeroView(int heroId, int noDismiss, int fadeAlreadyOut) {
 
     if (gpCurPlayer->m_currentHero == gpHVHero->m_id) {
         heroCell = gpAdvManager->GetCell(gpHVHero->m_x, gpHVHero->m_y);
-        if (heroCell->triggerType != ADVMGR_HERO_TRIGGER) {
-            gpHVHero->m_locationType = heroCell->triggerType;
-            gpHVHero->m_occupiedTown = heroCell->w4hi;
+        if (heroCell->m_triggerType != ADVMGR_HERO_TRIGGER) {
+            gpHVHero->m_locationType = heroCell->m_triggerType;
+            gpHVHero->m_occupiedTown = heroCell->m_objectMetadata;
         }
     }
 

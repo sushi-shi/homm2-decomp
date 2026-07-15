@@ -69,26 +69,26 @@ void listBoxWidget::Read(void)
     gpResourceManager->SavePosition();
     m_icon = gpResourceManager->GetIcon(reinterpret_cast<char *>(iconName));
     gpResourceManager->RestorePosition();
-    field_0x28 = gpResourceManager->ReadWord();
-    field_0x2c = gpResourceManager->ReadWord();
-    field_0x2e = gpResourceManager->ReadWord();
-    field_0x30 = gpResourceManager->ReadWord();
+    m_maxVisibleItems = gpResourceManager->ReadWord();
+    m_normalColor = gpResourceManager->ReadWord();
+    m_selectedColor = gpResourceManager->ReadWord();
+    m_textMode = gpResourceManager->ReadWord();
     m_id = gpResourceManager->ReadWord();
-    field_0x44 = 0;
-    field_0x46 = 1;
-    field_0x48 = 2;
-    field_0x4a = 3;
-    field_0x4c = 4;
-    field_0x4e = 5;
-    field_0x50 = 6;
-    field_0x52 = 7;
-    field_0x54 = 8;
-    field_0x56 = 9;
-    field_0x58 = 10;
+    m_firstRowFrame = 0;
+    m_middleRowFrame = 1;
+    m_lastRowFrame = 2;
+    m_scrollUpFrame = 3;
+    m_scrollUpPressedFrame = 4;
+    m_scrollDownFrame = 5;
+    m_scrollDownPressedFrame = 6;
+    m_scrollTrackFirstFrame = 7;
+    m_scrollTrackMiddleFrame = 8;
+    m_scrollTrackLastFrame = 9;
+    m_scrollThumbFrame = 10;
     iconEntry = reinterpret_cast<IconEntry *>(m_icon->m_data) + 10;
-    field_0x84 = iconEntry->w;
+    m_scrollThumbWidth = iconEntry->w;
     frameHeight[0] = iconEntry->h;
-    field_0x86 = frameHeight[0];
+    m_scrollThumbHeight = frameHeight[0];
     firstRowHeight = reinterpret_cast<IconEntry *>(m_icon->m_data)[0].h;
     m_firstRowHeight = firstRowHeight;
     listX = m_x;
@@ -99,34 +99,34 @@ void listBoxWidget::Read(void)
     m_lastRowHeight = lastRowHeight;
     m_listX = listX;
     m_listY = listY;
-    field_0x64 = reinterpret_cast<IconEntry *>(m_icon->m_data)[0].w;
-    field_0x66 = (field_0x28 - 2) * m_rowHeight + m_firstRowHeight + m_lastRowHeight;
+    m_listWidth = reinterpret_cast<IconEntry *>(m_icon->m_data)[0].w;
+    m_listHeight = (m_maxVisibleItems - 2) * m_rowHeight + m_firstRowHeight + m_lastRowHeight;
     iconEntry = reinterpret_cast<IconEntry *>(m_icon->m_data) + 3;
-    field_0x6c = iconEntry->w;
-    field_0x6e = iconEntry->h;
+    m_scrollUpWidth = iconEntry->w;
+    m_scrollUpHeight = iconEntry->h;
     iconEntry = reinterpret_cast<IconEntry *>(m_icon->m_data) + 5;
-    field_0x7c = iconEntry->w;
-    field_0x7e = iconEntry->h;
-    rightX = m_width - field_0x6c + m_x;
-    field_0x68 = rightX;
-    field_0x6a = m_y;
-    field_0x78 = rightX;
-    bottomY = m_y + m_height - field_0x7e;
-    field_0x7a = bottomY;
-    field_0x70 = rightX;
-    topY = m_y + field_0x6e;
+    m_scrollDownWidth = iconEntry->w;
+    m_scrollDownHeight = iconEntry->h;
+    rightX = m_width - m_scrollUpWidth + m_x;
+    m_scrollUpX = rightX;
+    m_scrollUpY = m_y;
+    m_scrollDownX = rightX;
+    bottomY = m_y + m_height - m_scrollDownHeight;
+    m_scrollDownY = bottomY;
+    m_scrollTrackX = rightX;
+    topY = m_y + m_scrollUpHeight;
     bottomY -= topY;
-    field_0x72 = topY;
-    field_0x74 = field_0x7c;
-    field_0x76 = bottomY;
-    field_0x88 = field_0x76 - frameHeight[0] - 7;
-    field_0x8a = 0;
-    field_0x8b = 0;
-    field_0x8d = 0;
-    field_0x8c = 0;
+    m_scrollTrackY = topY;
+    m_scrollTrackWidth = m_scrollDownWidth;
+    m_scrollTrackHeight = bottomY;
+    m_scrollThumbTravel = m_scrollTrackHeight - frameHeight[0] - 7;
+    m_scrollUpPressed = 0;
+    m_scrollDownPressed = 0;
+    m_itemSelectionTracking = 0;
+    m_scrollThumbDragging = 0;
     m_topIndex = 0;
-    field_0x42 = 0;
-    field_0x2a = 0;
+    m_scrollRange = 0;
+    m_visibleItemCount = 0;
 }
 
 VA(0x004db3d0, 0x142)
@@ -136,14 +136,14 @@ void listBoxWidget::DeleteItem(int index)
         return;
     if (m_selectedIndex == index)
         m_selectedIndex = -1;
-    if (m_topIndex == index && field_0x42 <= m_topIndex)
+    if (m_topIndex == index && m_scrollRange <= m_topIndex)
         m_topIndex--;
-    if (--field_0x42 < 0)
-        field_0x42 = 0;
+    if (--m_scrollRange < 0)
+        m_scrollRange = 0;
     if (m_topIndex < 0)
         m_topIndex = 0;
-    if (m_topIndex > field_0x42)
-        m_topIndex = field_0x42;
+    if (m_topIndex > m_scrollRange)
+        m_topIndex = m_scrollRange;
     if (m_itemCount == 1) {
 #line 156
         H2_FREE(m_items[0], "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp", 0x9c);
@@ -162,10 +162,10 @@ void listBoxWidget::DeleteItem(int index)
         m_items = newItems;
     }
     m_itemCount--;
-    if (field_0x42 > 0)
-        field_0x2a = field_0x28;
+    if (m_scrollRange > 0)
+        m_visibleItemCount = m_maxVisibleItems;
     else
-        field_0x2a = m_itemCount;
+        m_visibleItemCount = m_itemCount;
 }
 
 // Two-byte /O2 compare-polarity residual after the exact Read reconstruction changed TU state.
@@ -249,18 +249,18 @@ int listBoxWidget::Main(tag_message &message)
 #line 240
                     H2_FREE(m_items, "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp", 0xf0);
                 m_items = newItems;
-                if (field_0x28 < m_itemCount) {
-                    field_0x42 = m_itemCount - field_0x28;
+                if (m_maxVisibleItems < m_itemCount) {
+                    m_scrollRange = m_itemCount - m_maxVisibleItems;
                     m_topIndex = m_selectedIndex;
                     if (m_topIndex < 0)
                         m_topIndex = 0;
-                    if (m_topIndex > field_0x42)
-                        m_topIndex = field_0x42;
+                    if (m_topIndex > m_scrollRange)
+                        m_topIndex = m_scrollRange;
                 }
-                if (field_0x42 > 0)
-                    field_0x2a = field_0x28;
+                if (m_scrollRange > 0)
+                    m_visibleItemCount = m_maxVisibleItems;
                 else
-                    field_0x2a = m_itemCount;
+                    m_visibleItemCount = m_itemCount;
             }
             break;
         case 0x3a:
@@ -291,58 +291,58 @@ void listBoxWidget::DrawLBStuff(int doUpdate)
     int x;
     x = m_listX + m_owner->m_posX;
     y = m_listY + m_owner->m_posY;
-    for (int i = 0; i < field_0x28; i++) {
+    for (int i = 0; i < m_maxVisibleItems; i++) {
         if (i == 0) {
-            m_icon->DrawToBuffer(x, y, field_0x44, 0);
-            if (i < field_0x2a) {
-                int color = m_selectedIndex == m_topIndex ? field_0x2e : field_0x2c;
+            m_icon->DrawToBuffer(x, y, m_firstRowFrame, 0);
+            if (i < m_visibleItemCount) {
+                int color = m_selectedIndex == m_topIndex ? m_selectedColor : m_normalColor;
                 m_font->DrawBoundedString(m_items[m_topIndex], x + 5,
-                                          y + 4, field_0x64 - 10, m_font->m_height + 1, color,
-                                          field_0x30);
+                                          y + 4, m_listWidth - 10, m_font->m_height + 1, color,
+                                          m_textMode);
             }
             y += m_firstRowHeight;
-        } else if (1 == field_0x28 - i) {
-            m_icon->DrawToBuffer(x, y, field_0x48, 0);
-            if (field_0x2a > i) {
+        } else if (1 == m_maxVisibleItems - i) {
+            m_icon->DrawToBuffer(x, y, m_lastRowFrame, 0);
+            if (m_visibleItemCount > i) {
                 int itemIndex = m_topIndex + i;
-                int color = m_selectedIndex == itemIndex ? field_0x2e : field_0x2c;
+                int color = m_selectedIndex == itemIndex ? m_selectedColor : m_normalColor;
                 m_font->DrawBoundedString(m_items[itemIndex], x + 5,
-                                          y + 2, field_0x64 - 10, m_font->m_height + 1, color,
-                                          field_0x30);
+                                          y + 2, m_listWidth - 10, m_font->m_height + 1, color,
+                                          m_textMode);
             }
         } else {
-            m_icon->DrawToBuffer(x, y, field_0x46, 0);
-            if (i < field_0x2a) {
+            m_icon->DrawToBuffer(x, y, m_middleRowFrame, 0);
+            if (i < m_visibleItemCount) {
                 int itemIndex = m_topIndex + i;
-                int color = m_selectedIndex == itemIndex ? field_0x2e : field_0x2c;
+                int color = m_selectedIndex == itemIndex ? m_selectedColor : m_normalColor;
                 m_font->DrawBoundedString(m_items[itemIndex], x + 5,
-                                          y + 2, field_0x64 - 10, m_font->m_height + 1, color,
-                                          field_0x30);
+                                          y + 2, m_listWidth - 10, m_font->m_height + 1, color,
+                                          m_textMode);
             }
             y += m_rowHeight;
         }
     }
-    int upFrame = field_0x8a ? field_0x4c : field_0x4a;
-    m_icon->DrawToBuffer(field_0x68 + m_owner->m_posX, field_0x6a + m_owner->m_posY, upFrame, 0);
-    m_icon->DrawToBuffer(field_0x70 + m_owner->m_posX, field_0x72 + m_owner->m_posY, field_0x52, 0);
+    int upFrame = m_scrollUpPressed ? m_scrollUpPressedFrame : m_scrollUpFrame;
+    m_icon->DrawToBuffer(m_scrollUpX + m_owner->m_posX, m_scrollUpY + m_owner->m_posY, upFrame, 0);
+    m_icon->DrawToBuffer(m_scrollTrackX + m_owner->m_posX, m_scrollTrackY + m_owner->m_posY, m_scrollTrackFirstFrame, 0);
     int j;
-    for (j = 2; j < field_0x28 - 2; j++)
-        m_icon->DrawToBuffer(field_0x70 + m_owner->m_posX,
-                             (j - 1) * m_rowHeight + field_0x72 + m_owner->m_posY, field_0x54, 0);
-    m_icon->DrawToBuffer(field_0x70 + m_owner->m_posX,
-                         (j - 1) * m_rowHeight + field_0x72 + m_owner->m_posY, field_0x56, 0);
-    int downFrame = field_0x8b ? field_0x50 : field_0x4e;
-    m_icon->DrawToBuffer(field_0x78 + m_owner->m_posX, field_0x7a + m_owner->m_posY, downFrame, 0);
-    short thumbX = m_owner->m_posX + field_0x70 + 5;
-    field_0x80 = thumbX;
+    for (j = 2; j < m_maxVisibleItems - 2; j++)
+        m_icon->DrawToBuffer(m_scrollTrackX + m_owner->m_posX,
+                             (j - 1) * m_rowHeight + m_scrollTrackY + m_owner->m_posY, m_scrollTrackMiddleFrame, 0);
+    m_icon->DrawToBuffer(m_scrollTrackX + m_owner->m_posX,
+                         (j - 1) * m_rowHeight + m_scrollTrackY + m_owner->m_posY, m_scrollTrackLastFrame, 0);
+    int downFrame = m_scrollDownPressed ? m_scrollDownPressedFrame : m_scrollDownFrame;
+    m_icon->DrawToBuffer(m_scrollDownX + m_owner->m_posX, m_scrollDownY + m_owner->m_posY, downFrame, 0);
+    short thumbX = m_owner->m_posX + m_scrollTrackX + 5;
+    m_scrollThumbX = thumbX;
     int offset;
-    if (field_0x42 > 0)
-        offset = m_topIndex * field_0x88 / field_0x42;
+    if (m_scrollRange > 0)
+        offset = m_topIndex * m_scrollThumbTravel / m_scrollRange;
     else
-        offset = field_0x88 / 2;
-    short thumbY = offset + m_owner->m_posY + field_0x72 + 3;
-    field_0x82 = thumbY;
-    m_icon->DrawToBuffer(thumbX, thumbY, field_0x58, 0);
+        offset = m_scrollThumbTravel / 2;
+    short thumbY = offset + m_owner->m_posY + m_scrollTrackY + 3;
+    m_scrollThumbY = thumbY;
+    m_icon->DrawToBuffer(thumbX, thumbY, m_scrollThumbFrame, 0);
     if (doUpdate)
         gpWindowManager->UpdateScreenRegion(m_x + m_owner->m_posX, m_y + m_owner->m_posY, m_width,
                                             m_height);
@@ -356,7 +356,7 @@ int listBoxWidget::ProcessMouseMessage(tag_message &message)
     int adjY = mouseY - m_listY;
     switch (message.type) {
     case 4:
-        if (field_0x8d) {
+        if (m_itemSelectionTracking) {
             int row;
             short firstRowHeight = m_firstRowHeight;
             if (adjY > firstRowHeight)
@@ -365,17 +365,17 @@ int listBoxWidget::ProcessMouseMessage(tag_message &message)
                 row = 0;
             if (row < 0)
                 row = 0;
-            if (row >= field_0x2a)
-                row = field_0x2a - 1;
+            if (row >= m_visibleItemCount)
+                row = m_visibleItemCount - 1;
             if (m_topIndex + row == m_selectedIndex)
                 goto done;
             m_selectedIndex = row + m_topIndex;
-        } else if (field_0x8c) {
-            int newTop = (mouseY - field_0x86 / 2 - field_0x72 - 4) * (field_0x42 + 1) / field_0x88;
+        } else if (m_scrollThumbDragging) {
+            int newTop = (mouseY - m_scrollThumbHeight / 2 - m_scrollTrackY - 4) * (m_scrollRange + 1) / m_scrollThumbTravel;
             if (newTop < 0)
                 newTop = 0;
-            if (newTop > field_0x42)
-                newTop = field_0x42;
+            if (newTop > m_scrollRange)
+                newTop = m_scrollRange;
             if (m_topIndex == newTop)
                 goto done;
             m_topIndex = newTop;
@@ -386,8 +386,8 @@ int listBoxWidget::ProcessMouseMessage(tag_message &message)
     case 8:
         if (m_itemCount == 0)
             goto done;
-        if (m_listX <= mouseX && m_listY <= mouseY && mouseX < m_listX + field_0x64
-            && mouseY < m_listY + field_0x66) {
+        if (m_listX <= mouseX && m_listY <= mouseY && mouseX < m_listX + m_listWidth
+            && mouseY < m_listY + m_listHeight) {
             int clickedIndex;
             if (adjY > m_firstRowHeight)
                 clickedIndex = m_topIndex + (adjY - m_firstRowHeight) / m_rowHeight + 1;
@@ -395,41 +395,41 @@ int listBoxWidget::ProcessMouseMessage(tag_message &message)
                 clickedIndex = m_topIndex;
             if (m_itemCount <= clickedIndex)
                 goto done;
-            field_0x8d = 1;
+            m_itemSelectionTracking = 1;
             gbSendMouseMoveMessages = 1;
             if (m_selectedIndex == clickedIndex)
                 goto done;
             m_selectedIndex = clickedIndex;
-        } else if (mouseY < field_0x6a + field_0x6e) {
+        } else if (mouseY < m_scrollUpY + m_scrollUpHeight) {
             if (m_topIndex > 0)
                 m_topIndex--;
-            field_0x8a = 1;
-        } else if (mouseY >= field_0x7a) {
-            if (m_topIndex < field_0x42)
+            m_scrollUpPressed = 1;
+        } else if (mouseY >= m_scrollDownY) {
+            if (m_topIndex < m_scrollRange)
                 m_topIndex++;
-            field_0x8b = 1;
+            m_scrollDownPressed = 1;
         } else {
-            if (field_0x82 <= mouseY && mouseY < field_0x82 + field_0x86) {
-                field_0x8c = 1;
+            if (m_scrollThumbY <= mouseY && mouseY < m_scrollThumbY + m_scrollThumbHeight) {
+                m_scrollThumbDragging = 1;
                 gbSendMouseMoveMessages = 1;
             }
-            m_topIndex = (mouseY - field_0x86 / 2 - field_0x72 - 4) * (field_0x42 + 1) / field_0x88;
+            m_topIndex = (mouseY - m_scrollThumbHeight / 2 - m_scrollTrackY - 4) * (m_scrollRange + 1) / m_scrollThumbTravel;
             if (m_topIndex < 0)
                 m_topIndex = 0;
-            if (m_topIndex > field_0x42)
-                m_topIndex = field_0x42;
+            if (m_topIndex > m_scrollRange)
+                m_topIndex = m_scrollRange;
         }
         goto redraw;
     case 0x10:
         gbSendMouseMoveMessages = 0;
-        if (field_0x8a || field_0x8b || field_0x8c) {
-            field_0x8c = 0;
-            field_0x8b = 0;
-            field_0x8a = 0;
+        if (m_scrollUpPressed || m_scrollDownPressed || m_scrollThumbDragging) {
+            m_scrollThumbDragging = 0;
+            m_scrollDownPressed = 0;
+            m_scrollUpPressed = 0;
             goto redraw;
         }
-        if (field_0x8d) {
-            field_0x8d = 0;
+        if (m_itemSelectionTracking) {
+            m_itemSelectionTracking = 0;
             message.payload.widget.command = 0xc;
             message.type = 0x200;
             message.payload.widget.id = m_id;

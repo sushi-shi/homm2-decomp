@@ -268,7 +268,7 @@ void philAI::CheckBuyStuff(void) {
                 gpCurPlayer->m_resources[RES_GOLD] >= 1000 &&
                 gpCurPlayer->m_resources[RES_WOOD] >= 10) {
                 if (gpGame->GetBoatsBuilt() < 48 &&
-                    gpAdvManager->GetCell(idx->m_boatX, idx->m_boatY)->triggerType == 0 &&
+                    gpAdvManager->GetCell(idx->m_boatX, idx->m_boatY)->m_triggerType == 0 &&
                     gpGame->CreateBoat(idx->m_boatX, idx->m_boatY, 0) != -1) {
                     gpCurPlayer->m_resources[RES_GOLD] -= 1000;
                     gpCurPlayer->m_resources[RES_WOOD] -= 10;
@@ -343,24 +343,24 @@ int philAI::GoodAdjacent(int *direction) {
     fBerserkFactor = 1.0f;
     bestValue = 100;
     if ((gpAdvManager->GetCell(gpCurAIHero->m_x,
-                               gpCurAIHero->m_y)->triggerType & 0x7f) == AI_OBJECT_MONSTER)
+                               gpCurAIHero->m_y)->m_triggerType & 0x7f) == AI_OBJECT_MONSTER)
         return 0;
     for (jb = 0; jb < 8; jb++) {
         if (gpAdvManager->ValidMoveWithEvent(gpCurAIHero, jb)) {
             kn = normalDirTable[jb].x + gpCurAIHero->m_x;
             nb = normalDirTable[jb].y + gpCurAIHero->m_y;
-            if ((gpAdvManager->GetCell(kn, nb)->triggerType & 0x80) &&
+            if ((gpAdvManager->GetCell(kn, nb)->m_triggerType & 0x80) &&
                 !(mapExtra[kn + (MAP_WIDTH | 0) * nb] & 0x80) &&
-                ((gpAdvManager->GetCell(kn, nb)->triggerType & 0x7f) != AI_OBJECT_MONSTER) &&
-                ((gpAdvManager->GetCell(kn, nb)->triggerType & 0x7f) != AI_OBJECT_ARTIFACT)) {
-                if (gpAdvManager->GetCell(kn, nb)->triggerType == AI_OBJECT_TOWN) {
-                    ra = gpAdvManager->GetCell(kn, nb)->w4hi;
+                ((gpAdvManager->GetCell(kn, nb)->m_triggerType & 0x7f) != AI_OBJECT_MONSTER) &&
+                ((gpAdvManager->GetCell(kn, nb)->m_triggerType & 0x7f) != AI_OBJECT_ARTIFACT)) {
+                if (gpAdvManager->GetCell(kn, nb)->m_triggerType == AI_OBJECT_TOWN) {
+                    ra = gpAdvManager->GetCell(kn, nb)->m_objectMetadata;
                     if (GetCastleSlot(ra)->m_owner == giCurPlayer)
                         if (gpCurAIHero->m_lastTownInteractionTurn == giCurTurn)
                             continue;
                 }
-                if (gpAdvManager->GetCell(kn, nb)->triggerType == AI_OBJECT_HERO) {
-                    heroId = gpAdvManager->GetCell(kn, nb)->w4hi;
+                if (gpAdvManager->GetCell(kn, nb)->m_triggerType == AI_OBJECT_HERO) {
+                    heroId = gpAdvManager->GetCell(kn, nb)->m_objectMetadata;
                     if (GetHeroSlot(heroId)->m_owner == giCurPlayer)
                         if (gpCurAIHero->m_lastHeroInteractionTurn == giCurTurn)
                             continue;
@@ -408,13 +408,13 @@ void philAI::CheckReload(void) {
         for (p = 0; p < MAP_HEIGHT; p++) {
             if (gpSearchArray->GetRow(MAP_WIDTH, p)[node].visited) {
                 nb = gpAdvManager->GetCell(node, p);
-                switch (nb->triggerType) {
+                switch (nb->m_triggerType) {
                 case AI_OBJECT_TOWN:
                     jb = FightValueOfStack(
                     reinterpret_cast<armyGroup *>(
-                        reinterpret_cast<char *>(GetCastleSlot(nb->w4hi)) + 8),
+                        reinterpret_cast<char *>(GetCastleSlot(nb->m_objectMetadata)) + 8),
                     0, 0, 0, 0, 0);
-                    if (gpGame->m_castleOwners[nb->w4hi] == gpCurAIHero->m_owner) {
+                    if (gpGame->m_castleOwners[nb->m_objectMetadata] == gpCurAIHero->m_owner) {
                         if (kn * 2 < jb) {
                             friendly += (gpCurAIHero->m_mobility + 10) *
                                 (static_cast<float>(jb) / (kn * 2) - 1.0f) /
@@ -427,8 +427,8 @@ void philAI::CheckReload(void) {
                     }
                     break;
                 case AI_OBJECT_HERO:
-                    if (gpGame->m_availableHeroes[nb->w4hi] != gpCurAIHero->m_owner) {
-                        jb = FightValueOfStack(&GetHeroSlot(nb->w4hi)->m_army,
+                    if (gpGame->m_availableHeroes[nb->m_objectMetadata] != gpCurAIHero->m_owner) {
+                        jb = FightValueOfStack(&GetHeroSlot(nb->m_objectMetadata)->m_army,
                                                0, 0, 0, 0, 0);
                         if ((kn >> 1) < jb) {
                             idx += (gpCurAIHero->m_mobility + 30) *
@@ -473,14 +473,14 @@ void philAI::CheckBerserk(void) {
         for (column1 = 0; column1 < MAP_WIDTH; column1++) {
             for (row17 = 0; row17 < MAP_HEIGHT; row17++) {
                 kn = gpAdvManager->GetCell(column1, row17);
-                switch (kn->triggerType) {
+                switch (kn->m_triggerType) {
                 case AI_OBJECT_TOWN:
-                    if (gpGame->m_castleOwners[kn->w4hi] != gpCurAIHero->m_owner) {
-                        if (gpGame->m_castleOwners[kn->w4hi] != -1) {
+                    if (gpGame->m_castleOwners[kn->m_objectMetadata] != gpCurAIHero->m_owner) {
+                        if (gpGame->m_castleOwners[kn->m_objectMetadata] != -1) {
                         idx = FightValueOfStack(
                             reinterpret_cast<armyGroup *>(
-                                reinterpret_cast<char *>(GetCastleSlot(kn->w4hi)) + 8),
-                            0, 1, 1, kn->w4hi, 0);
+                                reinterpret_cast<char *>(GetCastleSlot(kn->m_objectMetadata)) + 8),
+                            0, 1, 1, kn->m_objectMetadata, 0);
                         if (idx > jb)
                             return;
                         if (idx > best)
@@ -489,8 +489,8 @@ void philAI::CheckBerserk(void) {
                     }
                     break;
                 case AI_OBJECT_HERO:
-                    if (gpGame->m_availableHeroes[kn->w4hi] != gpCurAIHero->m_owner) {
-                    heroPtr = GetHeroSlot(kn->w4hi);
+                    if (gpGame->m_availableHeroes[kn->m_objectMetadata] != gpCurAIHero->m_owner) {
+                    heroPtr = GetHeroSlot(kn->m_objectMetadata);
                     idx = FightValueOfStack(&heroPtr->m_army, 0, 1,
                         heroPtr->m_locationType == AI_OBJECT_TOWN,
                         heroPtr->m_occupiedTown, 0);
@@ -559,9 +559,9 @@ int philAI::DoAnywhereDDoorTownGate(int targetValue) {
                     if (gpCurAIHero->m_x == x && gpCurAIHero->m_y == y)
                         continue;
                     cell = gpAdvManager->GetCell(x, y);
-                    if (giGroundToTerrain[cell->tile] == 0)
+                    if (giGroundToTerrain[cell->m_terrainImageIndex] == 0)
                         continue;
-                    if (!((cell->triggerType & 0x80) ||
+                    if (!((cell->m_triggerType & 0x80) ||
                           (targetValue < 25 && Random(0, 10) < 2))) {
                     } else {
                     positionValue = RVOfPosition(
@@ -592,13 +592,13 @@ int philAI::DoAnywhereDDoorTownGate(int targetValue) {
                                     &monsterX, &monsterY, -1, -1))
                                 continue;
                             cell = gpAdvManager->GetCell(candidateX, candidateY);
-                            if (giGroundToTerrain[cell->tile] == 0)
+                            if (giGroundToTerrain[cell->m_terrainImageIndex] == 0)
                                 continue;
-                            if (cell->field8 & 8)
+                            if (cell->m_flags & 8)
                                 continue;
-                            if (cell->triggerType & 0x80)
+                            if (cell->m_triggerType & 0x80)
                                 continue;
-                            if (cell->objIndex != 0xff && !(cell->field8 & 0x80))
+                            if (cell->m_objectIndex != 0xff && !(cell->m_flags & 0x80))
                                 continue;
                             bestX = candidateX;
                             bestY = candidateY;
@@ -834,7 +834,7 @@ void philAI::DoAI(int player) {
                                                 gpCurAIHero->m_destinationX,
                                                 gpCurAIHero->m_destinationY
                                             )
-                                            ->triggerType
+                                            ->m_triggerType
                                         & 0x7f)
                                            != AI_OBJECT_BOAT) {
                                     gpCurAIHero->m_remainingMobility = 0;
@@ -862,7 +862,7 @@ void philAI::DoAI(int player) {
                                                gpCurAIHero->m_destinationX,
                                                gpCurAIHero->m_destinationY
                                            )
-                                           ->triggerType
+                                           ->m_triggerType
                                        != AI_OBJECT_TOWN) {
                                 gpCurAIHero->m_remainingMobility = 0;
                             }
@@ -1168,8 +1168,8 @@ firstWeekDone:
                         if (!(y4 != 0)) {
                         } else {
                             cell12 = gpAdvManager->GetCell(x8, y4 - 1);
-                            if (cell12->triggerType == AI_OBJECT_TOWN ||
-                                (cell12->triggerType & 0x7f) == AI_OBJECT_BOAT) {
+                            if (cell12->m_triggerType == AI_OBJECT_TOWN ||
+                                (cell12->m_triggerType & 0x7f) == AI_OBJECT_BOAT) {
                                 int threatTownId8 = gpGame->GetTownId(x8, y4 - 1);
                                 if (threatTownId8 == -1) {
                                 } else {
@@ -1461,7 +1461,7 @@ int philAI::DetermineTargetPosition(int &targetX, int &targetY, int mobility,
     gbActualBoatFound = 0;
 
     candidateCell = gpAdvManager->GetCell(gpCurAIHero->m_x, gpCurAIHero->m_y);
-    mapTerrain = giGroundToTerrain[candidateCell->tile];
+    mapTerrain = giGroundToTerrain[candidateCell->m_terrainImageIndex];
     if (gpCurAIHero->m_secondarySkills[0] <= HERO_SKILL_LEVEL_BASIC) {
         if (mapTerrain == 2 || mapTerrain == 3)
             mobility = static_cast<int>(mobility * 1.15);
@@ -1527,19 +1527,19 @@ int philAI::DetermineTargetPosition(int &targetX, int &targetY, int mobility,
                              (gpCurAIHero->m_destinationX != x ||
                               gpCurAIHero->m_destinationY != y) &&
                              ((travelDistanceRange | 0) >= 16 ||
-                              (gpAdvManager->GetCell(x, y)->triggerType != AI_OBJECT_HERO &&
-                               (gpAdvManager->GetCell(x, y)->triggerType != AI_OBJECT_TOWN ||
+                              (gpAdvManager->GetCell(x, y)->m_triggerType != AI_OBJECT_HERO &&
+                               (gpAdvManager->GetCell(x, y)->m_triggerType != AI_OBJECT_TOWN ||
                                 GetCastleSlot(
-                                    gpAdvManager->GetCell(x, y)->w4hi)->m_owner == giCurPlayer)))) ||
+                                    gpAdvManager->GetCell(x, y)->m_objectMetadata)->m_owner == giCurPlayer)))) ||
                             (searchPassIndex == 1 &&
                              (travelDistanceRange <= 5 ||
                               (gpCurAIHero->m_destinationX == x &&
                                gpCurAIHero->m_destinationY == y) ||
                               ((travelDistanceRange | 0) < 16 &&
-                               (gpAdvManager->GetCell(x, y)->triggerType == AI_OBJECT_HERO ||
-                                (gpAdvManager->GetCell(x, y)->triggerType == AI_OBJECT_TOWN &&
+                               (gpAdvManager->GetCell(x, y)->m_triggerType == AI_OBJECT_HERO ||
+                                (gpAdvManager->GetCell(x, y)->m_triggerType == AI_OBJECT_TOWN &&
                                  GetCastleSlot(
-                                     gpAdvManager->GetCell(x, y)->w4hi)->m_owner != giCurPlayer))))))
+                                     gpAdvManager->GetCell(x, y)->m_objectMetadata)->m_owner != giCurPlayer))))))
                             continue;
                     }
 
@@ -1547,22 +1547,22 @@ int philAI::DetermineTargetPosition(int &targetX, int &targetY, int mobility,
                     if (mobility < gpSearchArray->GetNode(x, y).distance) {
                         if (doubledMobilityScore < gpSearchArray->GetNode(x, y).distance) {
                             candidate = 0;
-                        } else if (candidateCell->triggerType == AI_OBJECT_TOWN ||
-                                   candidateCell->triggerType == AI_OBJECT_HERO ||
-                                   (candidateCell->triggerType == AI_OBJECT_BOAT &&
+                        } else if (candidateCell->m_triggerType == AI_OBJECT_TOWN ||
+                                   candidateCell->m_triggerType == AI_OBJECT_HERO ||
+                                   (candidateCell->m_triggerType == AI_OBJECT_BOAT &&
                                     !(gpCurAIHero->m_eventFlags & HERO_EVENT_EMBARKED))) {
                             candidate = 1;
                         } else {
                             candidate = 0;
                         }
-                    } else if ((candidateCell->triggerType & 0x80) ||
-                               (candidateCell->triggerType == AI_OBJECT_BOAT_TRIGGER &&
+                    } else if ((candidateCell->m_triggerType & 0x80) ||
+                               (candidateCell->m_triggerType == AI_OBJECT_BOAT_TRIGGER &&
                                 (gpCurAIHero->m_eventFlags & HERO_EVENT_EMBARKED)) ||
                                (x % scanSpacingStep == 0 && y % scanSpacingStep == 0 &&
                                  (((gpCurAIHero->m_eventFlags & HERO_EVENT_EMBARKED) &&
-                                   giGroundToTerrain[candidateCell->tile] == 0) ||
+                                   giGroundToTerrain[candidateCell->m_terrainImageIndex] == 0) ||
                                   (!(gpCurAIHero->m_eventFlags & HERO_EVENT_EMBARKED) &&
-                                   giGroundToTerrain[candidateCell->tile] != 0))) ||
+                                   giGroundToTerrain[candidateCell->m_terrainImageIndex] != 0))) ||
                                (gpCurPlayer->m_ultimateArtifactHintX == x &&
                                 gpCurPlayer->m_ultimateArtifactHintY == y)) {
                         candidate = 1;
@@ -1581,8 +1581,8 @@ int philAI::DetermineTargetPosition(int &targetX, int &targetY, int mobility,
                         for (heroIndexSearch = 0;
                              heroIndexSearch < gpCurPlayer->m_heroCount;
                              heroIndexSearch++) {
-                            if (candidateCell->triggerType != AI_OBJECT_TOWN &&
-                                candidateCell->triggerType != AI_OBJECT_HERO &&
+                            if (candidateCell->m_triggerType != AI_OBJECT_TOWN &&
+                                candidateCell->m_triggerType != AI_OBJECT_HERO &&
                                 gpCurPlayer->m_heroIds[heroIndexSearch] !=
                                     static_cast<unsigned char>(gpCurAIHero->m_id) &&
                                 gpGame->m_heroRecs[
@@ -1626,8 +1626,8 @@ candidate_scored:
                         targetBestYLocal = y;
                         bestValue = targetScoreLocal;
                     } else if ((bestValue | 0) == targetScoreLocal && targetScoreLocal == 0 &&
-                               !(gpAdvManager->GetCell(x, y)->triggerType & 0x80)) {
-                        if ((gpAdvManager->GetCell(targetBestXRange, targetBestYLocal)->triggerType & 0x80) ||
+                               !(gpAdvManager->GetCell(x, y)->m_triggerType & 0x80)) {
+                        if ((gpAdvManager->GetCell(targetBestXRange, targetBestYLocal)->m_triggerType & 0x80) ||
                             ((abs(targetBestXRange - gpCurAIHero->m_x) +
                               abs(targetBestYLocal - gpCurAIHero->m_y)) | 0) <
                             abs(x - gpCurAIHero->m_x) + abs(y - gpCurAIHero->m_y)) {
@@ -2455,7 +2455,7 @@ void philAI::GetBestHero(town *townPtr, BHC &best, float &bestValue) {
     best.what = bestHeroIndex;
     bestValue = bestRawLocal;
     if (gpGame->m_worldMap.cells[
-            gpGame->m_worldMap.width * townPtr->m_y + townPtr->m_x].triggerType ==
+            gpGame->m_worldMap.width * townPtr->m_y + townPtr->m_x].m_triggerType ==
         AI_OBJECT_HERO) {
         bestValue -= AI_HERO_PURCHASE_CELL_PENALTY;
     }
@@ -2592,7 +2592,7 @@ int philAI::RVOfPosition(int x, int y, int hasEvent, int eventX, int eventY,
     strategicEventValue = 0;
     targetLiveChance = AI_POSITION_FULL_CHANCE;
     adjacentEventChance = AI_POSITION_FULL_CHANCE;
-    triggerType = gpAdvManager->GetCell(x, y)->triggerType;
+    triggerType = gpAdvManager->GetCell(x, y)->m_triggerType;
     objectType = triggerType & 0x7f;
     primaryEventChance = AI_POSITION_FULL_CHANCE;
     strategicLiveChance = AI_POSITION_FULL_CHANCE;
@@ -2761,9 +2761,9 @@ int philAI::StrategicValueOfPosition(int targetX, int targetY, int immediate,
     allocatedSearch2 = 0;
     friendlyTown1 = 0;
     cell9 = gpAdvManager->GetCell(targetX, targetY);
-    if (cell9->triggerType == AI_OBJECT_TOWN &&
-        GetCastleSlot(cell9->w4hi)->m_owner == giCurPlayer &&
-        (GetCastleSlot(cell9->w4hi)->m_buildings & 0x40000000)) {
+    if (cell9->m_triggerType == AI_OBJECT_TOWN &&
+        GetCastleSlot(cell9->m_objectMetadata)->m_owner == giCurPlayer &&
+        (GetCastleSlot(cell9->m_objectMetadata)->m_buildings & 0x40000000)) {
         friendlyTown1 = 1;
     }
     *liveChance = 100;
@@ -2786,7 +2786,7 @@ int philAI::StrategicValueOfPosition(int targetX, int targetY, int immediate,
     }
 
     eventFlags8 = gpCurAIHero->m_eventFlags & 0x80;
-    if (eventFlags8 && gpAdvManager->GetCell(targetX, targetY)->triggerType == 0x1c)
+    if (eventFlags8 && gpAdvManager->GetCell(targetX, targetY)->m_triggerType == 0x1c)
         eventFlags8 = 0;
     shortDistance13 = 700;
     if (immediate || checkEnemies)
@@ -2801,40 +2801,40 @@ int philAI::StrategicValueOfPosition(int targetX, int targetY, int immediate,
         for (yCounter = 0; MAP_HEIGHT > (yCounter | 0); yCounter++) {
             if (search5->GetNode(x13, yCounter).visited) {
             cell9 = gpAdvManager->GetCell(x13, yCounter);
-            if ((!immediate && (cell9->triggerType & 0x80) &&
+            if ((!immediate && (cell9->m_triggerType & 0x80) &&
                  search5->GetNode(x13, yCounter).distance <= shortDistance13) ||
-                (checkEnemies && cell9->triggerType == AI_OBJECT_HERO)) {
+                (checkEnemies && cell9->m_triggerType == AI_OBJECT_HERO)) {
                 CheckDoMain(0, 0);
                 eventValue13 = static_cast<int>((ValueOfEventAtPosition(x13, yCounter, 0, &iDummy) * 25) /
                     (search5->GetNode(x13, yCounter).distance + 50.0));
-                if (!friendlyTown1 || cell9->triggerType != AI_OBJECT_HERO || eventValue13 >= 0)
+                if (!friendlyTown1 || cell9->m_triggerType != AI_OBJECT_HERO || eventValue13 >= 0)
                     score4 += eventValue13;
             }
 
-            if (cell9->triggerType == AI_OBJECT_HERO) {
-                if (gaiHeroLiveChance[cell9->w4hi] == AI_RV_UNSET)
+            if (cell9->m_triggerType == AI_OBJECT_HERO) {
+                if (gaiHeroLiveChance[cell9->m_objectMetadata] == AI_RV_UNSET)
                     ValueOfEventAtPosition(x13, yCounter, 0, &iDummy);
-                if (gaiHeroLiveChance[cell9->w4hi] != AI_RV_UNSET &&
-                    gaiHeroLiveChance[cell9->w4hi] < 100) {
+                if (gaiHeroLiveChance[cell9->m_objectMetadata] != AI_RV_UNSET &&
+                    gaiHeroLiveChance[cell9->m_objectMetadata] < 100) {
                     if (!friendlyTown1) {
-                        enemyMobility19 = GetHeroSlot(cell9->w4hi)->m_mobility;
-                        if (gbHumanPlayer[gpGame->m_availableHeroes[cell9->w4hi]]) {
+                        enemyMobility19 = GetHeroSlot(cell9->m_objectMetadata)->m_mobility;
+                        if (gbHumanPlayer[gpGame->m_availableHeroes[cell9->m_objectMetadata]]) {
                             if (search5->GetNode(x13, yCounter).distance + extraDistance <=
                                 enemyMobility19) {
                                 if (search5->GetNode(x13, yCounter).distance + extraDistance <= 500) {
-                                    danger26 = 100 - gaiHeroLiveChance[cell9->w4hi];
+                                    danger26 = 100 - gaiHeroLiveChance[cell9->m_objectMetadata];
                                 } else {
                                     danger26 = ((enemyMobility19 -
                                         (search5->GetNode(x13, yCounter).distance + extraDistance)) + 250) *
-                                        (100 - gaiHeroLiveChance[cell9->w4hi]) / enemyMobility19;
+                                        (100 - gaiHeroLiveChance[cell9->m_objectMetadata]) / enemyMobility19;
                                 }
                             } else {
-                                danger26 = static_cast<int>((100 - gaiHeroLiveChance[cell9->w4hi]) * 0.9);
+                                danger26 = static_cast<int>((100 - gaiHeroLiveChance[cell9->m_objectMetadata]) * 0.9);
                             }
                         } else {
                             danger26 = ((enemyMobility19 + 500) -
                                 (search5->GetNode(x13, yCounter).distance + extraDistance)) *
-                                (100 - gaiHeroLiveChance[cell9->w4hi]) /
+                                (100 - gaiHeroLiveChance[cell9->m_objectMetadata]) /
                                 (enemyMobility19 + 500);
                         }
                         *liveChance = (100 - danger26) * *liveChance / 100;
@@ -2845,10 +2845,10 @@ int philAI::StrategicValueOfPosition(int targetX, int targetY, int immediate,
             if (static_cast<unsigned char>(gpCurAIHero->m_id) != iAlphaMale &&
                 (targetX != x13 || targetY != yCounter) &&
                 search5->GetNode(x13, yCounter).distance < 1024 &&
-                gpAdvManager->GetCell(x13, yCounter)->triggerType == AI_OBJECT_HERO &&
-                gpAdvManager->GetCell(x13, yCounter)->w4hi !=
+                gpAdvManager->GetCell(x13, yCounter)->m_triggerType == AI_OBJECT_HERO &&
+                gpAdvManager->GetCell(x13, yCounter)->m_objectMetadata !=
                     static_cast<unsigned char>(gpCurAIHero->m_id) &&
-                gpGame->m_availableHeroes[gpAdvManager->GetCell(x13, yCounter)->w4hi] ==
+                gpGame->m_availableHeroes[gpAdvManager->GetCell(x13, yCounter)->m_objectMetadata] ==
                     gpCurAIHero->m_owner) {
                 penalty = (1024 - search5->GetNode(x13, yCounter).distance) * 600 >> 10;
                 if (penalty > 0)
@@ -2858,7 +2858,7 @@ int philAI::StrategicValueOfPosition(int targetX, int targetY, int immediate,
         }
     }
 
-    targetTerrain29 = giGroundToTerrain[gpAdvManager->GetCell(targetX, targetY)->tile];
+    targetTerrain29 = giGroundToTerrain[gpAdvManager->GetCell(targetX, targetY)->m_terrainImageIndex];
     for (heroIndex2 = 0;
          heroIndex2 < gpCurPlayer->m_heroCount;
          heroIndex2++) {
@@ -2876,7 +2876,7 @@ int philAI::StrategicValueOfPosition(int targetX, int targetY, int immediate,
                         gpGame->m_heroRecs[
                             gpCurPlayer->m_heroIds[heroIndex2]].m_x,
                         gpGame->m_heroRecs[
-                            gpCurPlayer->m_heroIds[heroIndex2]].m_y)->tile];
+                            gpCurPlayer->m_heroIds[heroIndex2]].m_y)->m_terrainImageIndex];
                 if (targetTerrain29 != 0 || heroTerrain7 <= 0) {
                     if (targetTerrain29 <= 0 || heroTerrain7 != 0) {
                         score4 -= (9 - distance15) * 600 / 9;
@@ -3705,7 +3705,7 @@ void philAI::HeroInteractionAtTown(hero *heroPtr, town *townPtr, int doInteracti
         } else if ((townPtr->m_buildings & AI_BUILDING_CASTLE_MASK) &&
                    giGroundToTerrain[gpAdvManager->GetCell(
                        townPtr->m_x - 1,
-                       townPtr->m_y + 1)->tile] == 0 &&
+                       townPtr->m_y + 1)->m_terrainImageIndex] == 0 &&
                    !gbActualShipyardFound &&
                    townPtr->m_id != giBestShipyardId) {
             index7 = abs(townPtr->m_y - heroPtr->m_y) +
@@ -4138,11 +4138,11 @@ void philAI::BuildHero(town *townPtr, int availableHeroIndex) {
     newHero6->m_mobility = newHero6->m_remainingMobility;
 
     newHero6->m_locationType =
-        gpGame->m_worldMap.GetCell(townX37, townY9)->triggerType;
+        gpGame->m_worldMap.GetCell(townX37, townY9)->m_triggerType;
     newHero6->m_occupiedTown =
-        gpGame->m_worldMap.GetCell(townX37, townY9)->w4hi;
-    gpGame->m_worldMap.GetCell(townX37, townY9)->triggerType = AI_OBJECT_HERO;
-    gpGame->m_worldMap.GetCell(townX37, townY9)->w4hi =
+        gpGame->m_worldMap.GetCell(townX37, townY9)->m_objectMetadata;
+    gpGame->m_worldMap.GetCell(townX37, townY9)->m_triggerType = AI_OBJECT_HERO;
+    gpGame->m_worldMap.GetCell(townX37, townY9)->m_objectMetadata =
         gpCurPlayer->m_availableHeroIds[availableHeroIndex];
     gpGame->m_availableHeroes[static_cast<unsigned char>(newHero6->m_id)] =
         townPtr->m_owner;
@@ -4310,8 +4310,8 @@ int philAI::FightEvent(hero *h, mapCell *cell, int evaluateOnly) {
     int combatResult18;
     int unusedValue8;
 
-    eventType16 = cell->triggerType & 0x7f;
-    if (cell->w4hi == AI_FIGHT_EVENT_EMPTY)
+    eventType16 = cell->m_triggerType & 0x7f;
+    if (cell->m_objectMetadata == AI_FIGHT_EVENT_EMPTY)
         return 0;
 
     int shipwreckCounts15[AI_FIGHT_EVENT_LEVEL_COUNT] = {
@@ -4336,15 +4336,15 @@ int philAI::FightEvent(hero *h, mapCell *cell, int evaluateOnly) {
     switch (eventType16) {
     case AI_OBJECT_SHIPWRECK:
         monsterType6 = AI_CREATURE_GHOST;
-        monsterCount28 = shipwreckCounts15[cell->w4hi - AI_FIGHT_EVENT_LEVEL_OFFSET];
+        monsterCount28 = shipwreckCounts15[cell->m_objectMetadata - AI_FIGHT_EVENT_LEVEL_OFFSET];
         break;
     case AI_OBJECT_GRAVEYARD:
         monsterType6 = AI_CREATURE_ZOMBIE;
-        monsterCount28 = graveyardCounts37[cell->w4hi - AI_FIGHT_EVENT_LEVEL_OFFSET];
+        monsterCount28 = graveyardCounts37[cell->m_objectMetadata - AI_FIGHT_EVENT_LEVEL_OFFSET];
         break;
     default:
         monsterType6 = AI_CREATURE_SKELETON;
-        monsterCount28 = derelictCounts28[cell->w4hi - AI_FIGHT_EVENT_LEVEL_OFFSET];
+        monsterCount28 = derelictCounts28[cell->m_objectMetadata - AI_FIGHT_EVENT_LEVEL_OFFSET];
         break;
     }
 
@@ -4356,7 +4356,7 @@ int philAI::FightEvent(hero *h, mapCell *cell, int evaluateOnly) {
     rewardValue7 = 0;
     switch (eventType16) {
     case AI_OBJECT_GRAVEYARD:
-        switch (cell->w4hi) {
+        switch (cell->m_objectMetadata) {
         case AI_FIGHT_EVENT_LEVEL_1:
             rewardValue7 = static_cast<int>(
                 gafAITurnCostResource[RES_GOLD] * AI_FIGHT_EVENT_REWARD_500);
@@ -4377,7 +4377,7 @@ int philAI::FightEvent(hero *h, mapCell *cell, int evaluateOnly) {
         }
         break;
     case AI_OBJECT_SHIPWRECK:
-        switch (cell->w4hi) {
+        switch (cell->m_objectMetadata) {
         case AI_FIGHT_EVENT_LEVEL_1:
             rewardValue7 = static_cast<int>(
                 gafAITurnCostResource[RES_GOLD] * AI_FIGHT_EVENT_REWARD_1000);
@@ -4398,7 +4398,7 @@ int philAI::FightEvent(hero *h, mapCell *cell, int evaluateOnly) {
         }
         break;
     case AI_OBJECT_DERELICT_SHIP:
-        switch (cell->w4hi) {
+        switch (cell->m_objectMetadata) {
         case AI_FIGHT_EVENT_LEVEL_1:
             rewardValue7 = static_cast<int>(
                 gafAITurnCostResource[RES_GOLD] * AI_FIGHT_EVENT_REWARD_500);
@@ -4428,7 +4428,7 @@ int philAI::FightEvent(hero *h, mapCell *cell, int evaluateOnly) {
                                       attackerLoss5, defenderLoss4)) != 0) {
         switch (eventType16) {
         case AI_OBJECT_SHIPWRECK:
-            switch (cell->w4hi) {
+            switch (cell->m_objectMetadata) {
             case AI_FIGHT_EVENT_LEVEL_1:
                 gpAdvManager->GiveResource(h, RES_GOLD, AI_FIGHT_EVENT_REWARD_1000);
                 break;
@@ -4445,7 +4445,7 @@ int philAI::FightEvent(hero *h, mapCell *cell, int evaluateOnly) {
             }
             break;
         case AI_OBJECT_GRAVEYARD:
-            switch (cell->w4hi) {
+            switch (cell->m_objectMetadata) {
             case AI_FIGHT_EVENT_LEVEL_1:
                 gpAdvManager->GiveResource(h, RES_GOLD, AI_FIGHT_EVENT_REWARD_500);
                 break;
@@ -4462,7 +4462,7 @@ int philAI::FightEvent(hero *h, mapCell *cell, int evaluateOnly) {
             }
             break;
         case AI_OBJECT_DERELICT_SHIP:
-            switch (cell->w4hi) {
+            switch (cell->m_objectMetadata) {
             case AI_FIGHT_EVENT_LEVEL_1:
                 gpAdvManager->GiveResource(h, RES_GOLD, AI_FIGHT_EVENT_REWARD_500);
                 break;
@@ -4478,7 +4478,7 @@ int philAI::FightEvent(hero *h, mapCell *cell, int evaluateOnly) {
             }
             break;
         }
-        cell->w4hi = AI_FIGHT_EVENT_EMPTY;
+        cell->m_objectMetadata = AI_FIGHT_EVENT_EMPTY;
     }
     return 0;
 }
@@ -4525,7 +4525,7 @@ void philAI::TownEvent(mapCell *cell, hero *h, int x, int y) {
     int combatResult7;
     hero *defendingHero0;
 
-    townPtr2 = GetCastleSlot(cell->w4hi);
+    townPtr2 = GetCastleSlot(cell->m_objectMetadata);
     currentPlayer26 = giCurPlayer;
     gpAdvManager->DemobilizeCurrHero();
 
@@ -4723,21 +4723,21 @@ int philAI::ValueOfEventAtPosition(int x, int y, int immediate, int *liveChance)
         gpCurPlayer->m_ultimateArtifactHintY == y) {
         value_h = (gpCurPlayer->m_ultimateArtifactHintChance - 15) *
                 gUltArtifactAvgValue / 100;
-    } else if (cell_k->triggerType & 0x80) {
-        switch (cell_k->triggerType & 0x7f) {
+    } else if (cell_k->m_triggerType & 0x80) {
+        switch (cell_k->m_triggerType & 0x7f) {
     case AI_OBJECT_MONSTER:
-        value_h = EvaluateMonsterEvent(cell_k->objIndex, cell_k->w4hi, liveChance);
+        value_h = EvaluateMonsterEvent(cell_k->m_objectIndex, cell_k->m_objectMetadata, liveChance);
         break;
     case AI_OBJECT_RESOURCE:
-        resource = cell_k->objIndex >> 1;
+        resource = cell_k->m_objectIndex >> 1;
         switch (resource) {
         case RES_GOLD:
             value_h = static_cast<int>(
                 gafAITurnCostResource[resource] *
-                (cell_k->w4hi * AI_GOLD_RESOURCE_MULTIPLIER));
+                (cell_k->m_objectMetadata * AI_GOLD_RESOURCE_MULTIPLIER));
             break;
         default:
-            value_h = static_cast<int>(gafAITurnCostResource[resource] * cell_k->w4hi);
+            value_h = static_cast<int>(gafAITurnCostResource[resource] * cell_k->m_objectMetadata);
             break;
         }
         break;
@@ -4745,10 +4745,10 @@ int philAI::ValueOfEventAtPosition(int x, int y, int immediate, int *liveChance)
         value_h = static_cast<int>(gafAITurnCostResource[RES_GOLD] * 1000.0f);
         break;
     case AI_OBJECT_HERO_EVENT:
-        value_h = EvaluateHeroEvent(cell_k->w4hi, x, y, immediate, liveChance);
+        value_h = EvaluateHeroEvent(cell_k->m_objectMetadata, x, y, immediate, liveChance);
         break;
     case AI_OBJECT_TOWN_EVENT:
-        value_h = EvaluateTownEvent(cell_k->w4hi, x, y, immediate, liveChance);
+        value_h = EvaluateTownEvent(cell_k->m_objectMetadata, x, y, immediate, liveChance);
         break;
     case AI_OBJECT_CAMPFIRE:
         value_h = static_cast<int>(
@@ -4763,15 +4763,15 @@ int philAI::ValueOfEventAtPosition(int x, int y, int immediate, int *liveChance)
             gafAITurnCostResource[RES_GOLD] * AI_CAMPFIRE_GOLD_AMOUNT);
         break;
     case AI_OBJECT_ARTIFACT:
-        value_h = EvaluateArtifactEvent(cell_k->objIndex >> 1, cell_k->w4hi);
+        value_h = EvaluateArtifactEvent(cell_k->m_objectIndex >> 1, cell_k->m_objectMetadata);
         break;
     case AI_OBJECT_ALCHEMIST_LAB:
     case AI_OBJECT_MINE:
     case AI_OBJECT_SAWMILL:
-        value_h = EvaluateMineEvent(cell_k->w4hi, x, y, liveChance);
+        value_h = EvaluateMineEvent(cell_k->m_objectMetadata, x, y, liveChance);
         break;
     case AI_OBJECT_OBELISK:
-        value_h = (giCurPlayerBit & gpGame->m_obeliskVisitors[cell_k->w4hi - 1]) ? 0 :
+        value_h = (giCurPlayerBit & gpGame->m_obeliskVisitors[cell_k->m_objectMetadata - 1]) ? 0 :
                 gpCurPlayer->m_obeliskValue;
         break;
     case AI_OBJECT_OASIS:
@@ -4813,11 +4813,11 @@ int philAI::ValueOfEventAtPosition(int x, int y, int immediate, int *liveChance)
     case AI_OBJECT_SHRINE_THIRD:
         if (gpCurAIHero->Stats(3) > 0 &&
             gpCurAIHero->HasArtifact(AI_ARTIFACT_MAGIC_BOOK) &&
-            !gpCurAIHero->HasSpell(cell_k->w4hi - 1)) {
-            if (gsSpellInfo[cell_k->w4hi - 1].level <=
+            !gpCurAIHero->HasSpell(cell_k->m_objectMetadata - 1)) {
+            if (gsSpellInfo[cell_k->m_objectMetadata - 1].level <=
                 gpCurAIHero->m_secondarySkills[7] + 2) {
-                value_h = gsSpellInfo[cell_k->w4hi - 1].aiValue;
-                if (gsSpellInfo[cell_k->w4hi - 1].m_e & 1) {
+                value_h = gsSpellInfo[cell_k->m_objectMetadata - 1].aiValue;
+                if (gsSpellInfo[cell_k->m_objectMetadata - 1].m_e & 1) {
                     if (gpCurAIHero->Stats(3) > 40)
                         shrinePowerMod_p = gfStatPower[40];
                     else
@@ -4829,7 +4829,7 @@ int philAI::ValueOfEventAtPosition(int x, int y, int immediate, int *liveChance)
             value_h = 0;
         break;
     case AI_OBJECT_GAZEBO:
-        if (gpCurAIHero->m_gazeboVisits & (1U << cell_k->w4hi))
+        if (gpCurAIHero->m_gazeboVisits & (1U << cell_k->m_objectMetadata))
             value_h = 0;
         else
             value_h = static_cast<int>(
@@ -4837,8 +4837,8 @@ int philAI::ValueOfEventAtPosition(int x, int y, int immediate, int *liveChance)
         break;
     case AI_OBJECT_TREE_OF_KNOWLEDGE:
         value_h = 0;
-        if (!(gpCurAIHero->m_treeKnowledgeVisits & (1U << (cell_k->w4hi & 31)))) {
-            switch (cell_k->w4hi >> 6) {
+        if (!(gpCurAIHero->m_treeKnowledgeVisits & (1U << (cell_k->m_objectMetadata & 31)))) {
+            switch (cell_k->m_objectMetadata >> 6) {
             case 1:
                 value_h = static_cast<int>(
                     gpCurAIHero->m_aiFightValue * AI_TREE_KNOWLEDGE_VALUE_FACTOR);
@@ -4869,22 +4869,22 @@ int philAI::ValueOfEventAtPosition(int x, int y, int immediate, int *liveChance)
         }
         break;
     case AI_OBJECT_WINDMILL:
-        if (cell_k->w4hi == 99) {
+        if (cell_k->m_objectMetadata == 99) {
             value_h = 0;
         } else {
             memset(resources_e, 0, sizeof(resources_e));
-            resources_e[cell_k->w4hi] = 2;
+            resources_e[cell_k->m_objectMetadata] = 2;
             value_h = RVConversion(resources_e);
         }
         break;
     case AI_OBJECT_MAGIC_GARDEN:
-        if (!cell_k->w4hi)
+        if (!cell_k->m_objectMetadata)
             value_h = 0;
-        else if (cell_k->w4hi - 1 == RES_GOLD)
+        else if (cell_k->m_objectMetadata - 1 == RES_GOLD)
             value_h = static_cast<int>(
                 gafAITurnCostResource[RES_GOLD] * AI_MAGIC_GARDEN_GOLD_AMOUNT);
         else
-            value_h = static_cast<int>(gafAITurnCostResource[cell_k->w4hi] * 5.0f);
+            value_h = static_cast<int>(gafAITurnCostResource[cell_k->m_objectMetadata] * 5.0f);
         break;
     case AI_OBJECT_FLOTSAM:
         value_h = static_cast<int>(
@@ -4893,12 +4893,12 @@ int philAI::ValueOfEventAtPosition(int x, int y, int immediate, int *liveChance)
             gafAITurnCostResource[RES_WOOD] * AI_FLOTSAM_WOOD_AMOUNT);
         break;
     case AI_OBJECT_SEA_CHEST:
-        if (cell_k->w4hi & 0x100)
+        if (cell_k->m_objectMetadata & 0x100)
             value_h = static_cast<int>(
                 gafAITurnCostResource[RES_GOLD] *
                     AI_SEA_CHEST_ARTIFACT_GOLD_AMOUNT +
-                gArtifactBaseRV[cell_k->w4hi & 0xff]);
-        else if (cell_k->w4hi == 1)
+                gArtifactBaseRV[cell_k->m_objectMetadata & 0xff]);
+        else if (cell_k->m_objectMetadata == 1)
             value_h = static_cast<int>(
                 gafAITurnCostResource[RES_GOLD] * AI_SEA_CHEST_LARGE_GOLD_AMOUNT);
         else
@@ -4909,13 +4909,13 @@ int philAI::ValueOfEventAtPosition(int x, int y, int immediate, int *liveChance)
         break;
     case AI_OBJECT_WAGON:
     case AI_OBJECT_LEAN_TO:
-        if (!cell_k->w4hi)
+        if (!cell_k->m_objectMetadata)
             value_h = 0;
-        else if (cell_k->w4hi & 0x80) {
-            value_h = gArtifactBaseRV[cell_k->w4hi & 0x7f];
+        else if (cell_k->m_objectMetadata & 0x80) {
+            value_h = gArtifactBaseRV[cell_k->m_objectMetadata & 0x7f];
         } else {
-            resource = (cell_k->w4hi & 0xf) - 1;
-            amount_j = (cell_k->w4hi & 0xf0) >> 4;
+            resource = (cell_k->m_objectMetadata & 0xf) - 1;
+            amount_j = (cell_k->m_objectMetadata & 0xf0) >> 4;
             value_h = static_cast<int>(gafAITurnCostResource[resource] * amount_j);
         }
         break;
@@ -4948,7 +4948,7 @@ int philAI::ValueOfEventAtPosition(int x, int y, int immediate, int *liveChance)
         creatureFlag_k = 0;
         goto creature_purchase;
     case AI_OBJECT_TROLL_BRIDGE:
-        if (cell_k->w4hi & 0x100) {
+        if (cell_k->m_objectMetadata & 0x100) {
             value_h = 0;
         } else {
             creature = AI_CREATURE_TROLL;
@@ -4957,7 +4957,7 @@ int philAI::ValueOfEventAtPosition(int x, int y, int immediate, int *liveChance)
         }
         break;
     case AI_OBJECT_DRAGON_CITY:
-        if (cell_k->w4hi & 0x100) {
+        if (cell_k->m_objectMetadata & 0x100) {
             value_h = 0;
         } else {
             creature = AI_CREATURE_RED_DRAGON;
@@ -4966,7 +4966,7 @@ int philAI::ValueOfEventAtPosition(int x, int y, int immediate, int *liveChance)
         }
         break;
     case AI_OBJECT_CITY_OF_DEAD:
-        if (cell_k->w4hi & 0x100) {
+        if (cell_k->m_objectMetadata & 0x100) {
             value_h = 0;
         } else {
             creature = AI_CREATURE_POWER_LICH;
@@ -5003,17 +5003,17 @@ int philAI::ValueOfEventAtPosition(int x, int y, int immediate, int *liveChance)
         creature = AI_CREATURE_ROGUE;
         creatureFlag_k = 0;
 creature_purchase:
-        EvaluateOneTimeCreaturePurchase(creature, cell_k->w4hi, creatureFlag_k,
+        EvaluateOneTimeCreaturePurchase(creature, cell_k->m_objectMetadata, creatureFlag_k,
                                         purchaseCost_j, value_h, purchaseValue_n);
         gbReduceByReload = 0;
         break;
     case AI_OBJECT_SHIPWRECK_SURVIVOR:
-        value_h = gArtifactBaseRV[cell_k->w4hi];
+        value_h = gArtifactBaseRV[cell_k->m_objectMetadata];
         if (value_h < 125)
             value_h = 125;
         break;
     case AI_OBJECT_SKELETON:
-        value_h = cell_k->w4hi == 1 ? 0 : gArtifactBaseRV[cell_k->w4hi];
+        value_h = cell_k->m_objectMetadata == 1 ? 0 : gArtifactBaseRV[cell_k->m_objectMetadata];
         break;
     case AI_OBJECT_GRAVEYARD:
     case AI_OBJECT_SHIPWRECK:
@@ -5021,10 +5021,10 @@ creature_purchase:
         value_h = FightEvent(gpCurAIHero, cell_k, 1);
         break;
     case AI_OBJECT_PYRAMID:
-        if (!cell_k->w4hi) {
+        if (!cell_k->m_objectMetadata) {
             value_h = 0;
         } else {
-            index_k = cell_k->w4hi - 1;
+            index_k = cell_k->m_objectMetadata - 1;
             if (gsSpellInfo[index_k].m_e & 1) {
                 battleStatMod_n = gpCurAIHero->Stats(2) > AI_MAX_BATTLE_STAT ?
                     gfBattleStat[AI_MAX_BATTLE_STAT] :
@@ -5047,7 +5047,7 @@ creature_purchase:
         }
         break;
     case AI_OBJECT_DAEMON_CAVE:
-        if (cell_k->w4hi == 1)
+        if (cell_k->m_objectMetadata == 1)
             value_h = 0;
         else {
             value_h = static_cast<int>(
@@ -5058,7 +5058,7 @@ creature_purchase:
                    gpCurPlayer->m_artifactValue) +
                   (gafAITurnCostResource[RES_GOLD] * AI_DAEMON_GOLD_VALUE_FACTOR +
                    gpCurAIHero->m_aiFightValue * AI_DAEMON_FIGHT_VALUE_FACTOR))));
-            if (cell_k->w4hi == 5 &&
+            if (cell_k->m_objectMetadata == 5 &&
                 gpCurPlayer->m_resources[RES_GOLD] <
                     AI_DAEMON_CAVE_GOLD_REQUIRED)
                 value_h = -100;
@@ -5071,10 +5071,10 @@ creature_purchase:
         for (index_k = 0; index_k < AI_TOWN_ARMY_SLOTS; index_k++) {
             gpMonGroup->m_creatureTypes[index_k] =
                 *reinterpret_cast<signed char *>(
-                reinterpret_cast<char *>(gpGame) + 0x5cb9 + cell_k->w4hi * 7);
+                reinterpret_cast<char *>(gpGame) + 0x5cb9 + cell_k->m_objectMetadata * 7);
             gpMonGroup->m_quantities[index_k] = static_cast<short>(
                 *reinterpret_cast<unsigned char *>(reinterpret_cast<char *>(gpGame) +
-                                                    0x5cba + cell_k->w4hi * 7) / 5);
+                                                    0x5cba + cell_k->m_objectMetadata * 7) / 5);
         }
         ChooseEvaluateBattle(&gpCurAIHero->m_army, gpCurAIHero, gpMonGroup, 0,
                              0, 0, battleValue_b, battleWon_p, value_h);
@@ -5092,8 +5092,8 @@ creature_purchase:
         for (exitY_p = 0; exitY_p < MAP_HEIGHT; exitY_p++) {
             for (exitX_p = 0; exitX_p < MAP_WIDTH; exitX_p++) {
                 otherCell_j = gpAdvManager->GetCell(exitX_p, exitY_p);
-                if ((cell_k->triggerType | 0) == otherCell_j->triggerType &&
-                    (cell_k->objIndex | 0) == otherCell_j->objIndex &&
+                if ((cell_k->m_triggerType | 0) == otherCell_j->m_triggerType &&
+                    (cell_k->m_objectIndex | 0) == otherCell_j->m_objectIndex &&
                     (abs(x - exitX_p) | 0) + abs(y - exitY_p) >
                         AI_TRAVEL_GATE_EXIT_RADIUS) {
                     exitValue_i = StrategicValueOfPosition(
@@ -5120,35 +5120,35 @@ creature_purchase:
         gbReduceByReload = 0;
         break;
     case AI_OBJECT_FORT:
-        if (gpCurAIHero->m_fortVisits & (1U << cell_k->w4hi))
+        if (gpCurAIHero->m_fortVisits & (1U << cell_k->m_objectMetadata))
             value_h = 0;
         else
             value_h = static_cast<int>(
                 gpCurAIHero->m_aiFightValue * AI_TRAINING_SITE_VALUE_FACTOR);
         break;
     case AI_OBJECT_WITCH_DOCTORS_HUT:
-        if (gpCurAIHero->m_witchDoctorVisits & (1U << cell_k->w4hi))
+        if (gpCurAIHero->m_witchDoctorVisits & (1U << cell_k->m_objectMetadata))
             value_h = 0;
         else
             value_h = static_cast<int>(
                 gpCurAIHero->m_aiFightValue * AI_TRAINING_SITE_VALUE_FACTOR);
         break;
     case AI_OBJECT_STANDING_STONES:
-        if (gpCurAIHero->m_standingStoneVisits & (1U << cell_k->w4hi))
+        if (gpCurAIHero->m_standingStoneVisits & (1U << cell_k->m_objectMetadata))
             value_h = 0;
         else
             value_h = static_cast<int>(
                 gpCurAIHero->m_aiFightValue * AI_TRAINING_SITE_VALUE_FACTOR);
         break;
     case AI_OBJECT_MERCENARY_CAMP:
-        if (gpCurAIHero->m_mercenaryCampVisits & (1U << cell_k->w4hi))
+        if (gpCurAIHero->m_mercenaryCampVisits & (1U << cell_k->m_objectMetadata))
             value_h = 0;
         else
             value_h = static_cast<int>(
                 gpCurAIHero->m_aiFightValue * AI_TRAINING_SITE_VALUE_FACTOR);
         break;
     case AI_OBJECT_XANADU:
-        if (gpCurAIHero->m_xanaduVisits & (1U << cell_k->w4hi))
+        if (gpCurAIHero->m_xanaduVisits & (1U << cell_k->m_objectMetadata))
             value_h = 0;
         else {
             if (gpCurAIHero->m_level + gpCurAIHero->m_secondarySkills[4] * 2 >= 10)
@@ -5160,17 +5160,17 @@ creature_purchase:
         break;
     case AI_OBJECT_LIGHTHOUSE:
         if (*reinterpret_cast<signed char *>(reinterpret_cast<char *>(gpGame) +
-                                             0x5cb7 + cell_k->w4hi * 7) ==
+                                             0x5cb7 + cell_k->m_objectMetadata * 7) ==
                 gpCurAIHero->m_owner ||
             OnMySide(*reinterpret_cast<signed char *>(reinterpret_cast<char *>(gpGame) +
-                                                       0x5cb7 + cell_k->w4hi * 7)))
+                                                       0x5cb7 + cell_k->m_objectMetadata * 7)))
             value_h = 0;
         else
             value_h = 1000;
         break;
     case AI_OBJECT_WATER_WHEEL:
         value_h = static_cast<int>(
-            cell_k->w4hi * AI_WATER_WHEEL_GOLD_AMOUNT *
+            cell_k->m_objectMetadata * AI_WATER_WHEEL_GOLD_AMOUNT *
             gafAITurnCostResource[RES_GOLD]);
         break;
     case AI_OBJECT_BOAT_EVENT:
@@ -5197,13 +5197,13 @@ creature_purchase:
         value_h = ManaRefreshValue(gpCurAIHero, 1);
         break;
     case AI_OBJECT_ARTESIAN_SPRING:
-        if (!cell_k->w4hi)
+        if (!cell_k->m_objectMetadata)
             value_h = 0;
         else
             value_h = ManaRefreshValue(gpCurAIHero, 2);
         break;
     case AI_OBJECT_WITCHS_HUT:
-        value_h = ComputeValueOfFreeSS(gpCurAIHero, cell_k->w4hi);
+        value_h = ComputeValueOfFreeSS(gpCurAIHero, cell_k->m_objectMetadata);
         break;
     case AI_OBJECT_SIGN:
     case 0x1e:
@@ -5231,7 +5231,7 @@ creature_purchase:
         break;
     default:
         sprintf(gText, "AI encountered object type %d and doesn't know what to do",
-                cell_k->triggerType & 0x7f);
+                cell_k->m_triggerType & 0x7f);
         NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
         value_h = 0;
         break;
@@ -5246,9 +5246,9 @@ creature_purchase:
         value_h = static_cast<int>(value_h * fBerserkFactor);
     if (!immediate) {
         if (value_h > 0 && (mapExtra[(MAP_WIDTH | 0) * y + x] & 0x80) &&
-            (cell_k->triggerType & 0x7f) != AI_OBJECT_MONSTER)
+            (cell_k->m_triggerType & 0x7f) != AI_OBJECT_MONSTER)
             value_h = 0;
-        if (value_h < 0 && (cell_k->triggerType & 0x7f) != AI_OBJECT_HERO_EVENT)
+        if (value_h < 0 && (cell_k->m_triggerType & 0x7f) != AI_OBJECT_HERO_EVENT)
             value_h = 0;
         else if (value_h > 32000)
             value_h = 32000;

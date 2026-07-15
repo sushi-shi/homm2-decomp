@@ -20,73 +20,73 @@ public:
     icon   *m_icon;  // +0x24  drop button icon
     short  m_contentX;  // +0x28
     short  m_contentY;  // +0x2a
-    short  field_0x2c;  // +0x2c
-    short  field_0x2e;  // +0x2e
+    short  m_contentWidth;  // +0x2c
+    short  m_contentHeight;  // +0x2e
     short  m_maxVisibleItems;  // +0x30  configured maximum list rows
     short  m_visibleItemCount;  // +0x32  rows in the current drop-down
     short  m_normalColor;  // +0x34
     short  m_selColor;  // +0x36
-    short  field_0x38;  // +0x38
+    short  m_unusedColor;  // +0x38  serialized color value, retained but never read
     short  m_textMode;  // +0x3a
     short  m_itemCount;  // +0x3c
     short  m_selectedIndex;  // +0x3e
     char   **m_items;  // +0x40  item-string array
     short  m_topIndex;  // +0x44
     short  m_scrollRange;  // +0x46  maximum valid top-item index
-    short  field_0x48;  // +0x48
-    short  field_0x4a;  // +0x4a
-    short  field_0x4c;  // +0x4c
-    short  field_0x4e;  // +0x4e
-    short  field_0x50;  // +0x50
-    short  field_0x52;  // +0x52
-    short  field_0x54;  // +0x54
-    short  field_0x56;  // +0x56
-    short  field_0x58;  // +0x58
-    short  field_0x5a;  // +0x5a
-    short  field_0x5c;  // +0x5c
-    short  field_0x5e;  // +0x5e
-    short  field_0x60;  // +0x60
-    short  field_0x62;  // +0x62
-    short  field_0x64;  // +0x64
-    short  field_0x66;  // +0x66
-    short  field_0x68;  // +0x68
-    short  field_0x6a;  // +0x6a
+    short  m_closedContentFrame;  // +0x48
+    short  m_dropButtonFrame;  // +0x4a
+    short  m_dropButtonPressedFrame;  // +0x4c
+    short  m_firstRowFrame;  // +0x4e
+    short  m_middleRowFrame;  // +0x50
+    short  m_lastRowFrame;  // +0x52
+    short  m_scrollUpFrame;  // +0x54
+    short  m_scrollUpPressedFrame;  // +0x56
+    short  m_scrollDownFrame;  // +0x58
+    short  m_scrollDownPressedFrame;  // +0x5a
+    short  m_scrollTrackFirstFrame;  // +0x5c
+    short  m_scrollTrackMiddleFrame;  // +0x5e
+    short  m_scrollTrackLastFrame;  // +0x60
+    short  m_scrollThumbFrame;  // +0x62
+    short  m_dropButtonX;  // +0x64
+    short  m_dropButtonY;  // +0x66
+    short  m_dropButtonWidth;  // +0x68
+    short  m_dropButtonHeight;  // +0x6a
     short  m_iconX;  // +0x6c
     short  m_iconY;  // +0x6e
-    short  field_0x70;  // +0x70
-    short  field_0x72;  // +0x72
-    short  field_0x74;  // +0x74
-    short  field_0x76;  // +0x76
-    short  field_0x78;  // +0x78
-    short  field_0x7a;  // +0x7a
-    short  field_0x7c;  // +0x7c
-    short  field_0x7e;  // +0x7e
-    short  field_0x80;  // +0x80
-    short  field_0x82;  // +0x82
-    short  field_0x84;  // +0x84
-    short  field_0x86;  // +0x86
-    short  field_0x88;  // +0x88
-    short  field_0x8a;  // +0x8a
-    short  field_0x8c;  // +0x8c
-    short  field_0x8e;  // +0x8e
-    short  field_0x90;  // +0x90
-    short  field_0x92;  // +0x92
-    short  field_0x94;  // +0x94
-    short  field_0x96;  // +0x96
-    short  field_0x98;  // +0x98
-    short  field_0x9a;  // +0x9a
-    short  field_0x9c;  // +0x9c
-    short  field_0x9e;  // +0x9e
-    short  field_0xa0;  // +0xa0
-    short  field_0xa2;  // +0xa2
-    short  field_0xa4;  // +0xa4
-    short  field_0xa6;  // +0xa6
-    short  field_0xa8;  // +0xa8
-    short  field_0xaa;  // +0xaa
-    char   field_0xac;  // +0xac
-    char   field_0xad;  // +0xad
-    char   field_0xae;  // +0xae
-    char   field_0xaf;  // +0xaf
+    short  m_closedContentWidth;  // +0x70
+    short  m_closedContentHeight;  // +0x72
+    short  m_firstRowHeight;  // +0x74
+    short  m_middleRowHeight;  // +0x76
+    short  m_lastRowHeight;  // +0x78
+    short  m_savedBackgroundX;  // +0x7a
+    short  m_savedBackgroundY;  // +0x7c
+    short  m_savedBackgroundWidth;  // +0x7e
+    short  m_savedBackgroundHeight;  // +0x80
+    short  m_listX;  // +0x82
+    short  m_listY;  // +0x84
+    short  m_listWidth;  // +0x86
+    short  m_listHeight;  // +0x88
+    short  m_scrollUpX;  // +0x8a
+    short  m_scrollUpY;  // +0x8c
+    short  m_scrollUpWidth;  // +0x8e
+    short  m_scrollUpHeight;  // +0x90
+    short  m_scrollTrackX;  // +0x92
+    short  m_scrollTrackY;  // +0x94
+    short  m_scrollTrackWidth;  // +0x96
+    short  m_scrollTrackHeight;  // +0x98
+    short  m_scrollDownX;  // +0x9a
+    short  m_scrollDownY;  // +0x9c
+    short  m_scrollDownWidth;  // +0x9e
+    short  m_scrollDownHeight;  // +0xa0
+    short  m_scrollThumbX;  // +0xa2
+    short  m_scrollThumbY;  // +0xa4
+    short  m_scrollThumbWidth;  // +0xa6
+    short  m_scrollThumbHeight;  // +0xa8
+    short  m_scrollThumbTravel;  // +0xaa
+    char   m_scrollUpPressed;  // +0xac
+    char   m_scrollDownPressed;  // +0xad
+    char   m_scrollThumbDragging;  // +0xae
+    char   m_itemSelectionTracking;  // +0xaf
     bitmap *m_savedBackground;  // +0xb0  saved drop-background bitmap
     // --- constructors ---
     dropListWidget(void);
