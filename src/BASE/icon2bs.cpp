@@ -37,6 +37,13 @@
 // reached 81.58%, proving strong allocator-state sensitivity but not an exact closure. Adding a
 // scale alias was byte-neutral in all 24 setup/row/column ownership combinations. No unused header
 // or generated declaration is retained, and no sub-100 result may be recorded as MAX.
+// A follow-up 315-variant structural audit crossed row scope, all outer/inner update orders, inner
+// declaration order, and scale/column gate ownership with the MIDIWrap/tileset predecessor states.
+// Moving `rows` before the outer gate and declaring dstPix/srcPix before cols raised the disposable
+// best to 85.666664%, candidate 0x16b versus retail 0x179, with the same correct 4/4 relocations.
+// Every inner-order variant remained in the same 0x16b-0x16c allocation family: retail still owns
+// scale/step/src/dst as EBX/EBP/EDI/ESI and a 0x18 frame, while candidates use a 0x10 frame and
+// coalesce those roles. No sub-100 source or generated predecessor state was retained.
 VA(0x004d2f90, 0x179)
 void IconToBitmapScale(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                        int clip, int clipX, int clipY, int clipW, int clipH, int scale)

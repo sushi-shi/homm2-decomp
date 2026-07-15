@@ -46,6 +46,11 @@ DATA(0x005381b4) static int gFMXEnd;
 // The 2026-07-15 publication batch found an 80.592810% comma form, but it moved the first divergence
 // earlier by hoisting formal x and was structurally rejected; split cursor owners returned to the
 // baseline bytes. Real headers reached only a disposable 78.449104% palette state. Nothing is retained.
+// A 256-candidate consolidated follow-up forced the known frame-offset and vertical-gate inline
+// helper pair, then crossed every balanced third AST/TU-state family. All top candidates were
+// byte-identical at 80.742516%, candidate 0x202 versus retail 0x212, with the unchanged correct
+// 26/27 relocation distribution. The pair is a closed local plateau; no generated source/state was
+// retained. Revisit only with a different structural or real reachable declaration hypothesis.
 VA(0x004da800, 0x212)
 void FlipMonoIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                           int color, int clip, int clipX, int clipY, int clipW, int clipH)

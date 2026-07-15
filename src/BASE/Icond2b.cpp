@@ -39,6 +39,11 @@ DATA(0x00534c1c) static int gDimX0;
 // A 2026-07-15 entry/source publication batch was byte-neutral or worse. Real MIDIWrap/tileset and
 // historical resource-tail surfaces reached only a disposable 77.517240% with the same 34/37
 // relocation deficit; no unused header or generated state is retained.
+// The consolidated libclang/TU-state follow-up forced the previously best value-preserving inline
+// palette-index helper and crossed 256 balanced AST/declaration states. It reached 79.758620%,
+// candidate 0x25a versus retail 0x26e, but every winner remained 34/37 relocations. Thus helper and
+// predecessor state steer scheduling without restoring the two X0 and one Y scratch reloads. No
+// generated helper/declaration or sub-100 source was retained; do not replay this pair-state batch.
 VA(0x004cfd50, 0x26e)
 void DimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                      int color, int clip, int clipX, int clipY, int clipW, int clipH)
