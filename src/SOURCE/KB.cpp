@@ -2436,16 +2436,16 @@ VA(0x0049cd75, 0x9f)
 int GetMonType(int score, int campaign)
 {
     int idx;
-    for (idx = 0x41; idx >= 0; idx--) {
-        if (campaign == 0 || campaign == 2) {
-            if (giScoreCampaignMon[idx][0] >= score)
-                return giScoreCampaignMon[idx][1];
+    for (idx = MONSTER_DATABASE_COUNT - 1; idx >= 0; idx--) {
+        if (campaign == HIGH_SCORE_CAMPAIGN || campaign == HIGH_SCORE_EXPANSION_CAMPAIGN) {
+            if (giScoreCampaignMon[idx][MONSTER_SCORE_THRESHOLD] >= score)
+                return giScoreCampaignMon[idx][MONSTER_SCORE_TYPE];
         } else {
-            if (giScoreMon[idx][0] <= score)
-                return giScoreMon[idx][1];
+            if (giScoreMon[idx][MONSTER_SCORE_THRESHOLD] <= score)
+                return giScoreMon[idx][MONSTER_SCORE_TYPE];
         }
     }
-    return giScoreMon[0][1];
+    return giScoreMon[0][MONSTER_SCORE_TYPE];
 }
 
 // @early-stop
@@ -5311,16 +5311,80 @@ DATA(0x004fb610) float gfBattleStat[KB_STAT_POWER_COUNT] = {
 DATA(0x004fb6b8) signed char gSpellLimits[KB_SPELL_LIMIT_COUNT] = {
     3, 3, 2, 2, 1
 };
-DATA(0x004fb6c0) float gfSpellCastableCombatMod[12];
-DATA(0x004fb6f0) float gfSpellCastNumMod[12];
-DATA(0x004fb720) float gfPhilAISpellPowerMod[12];
-DATA(0x004fb750) float gfPhilAIDurationMod[12];
-DATA(0x004fb780) float gfSpellTypeNumMod[7];
+DATA(0x004fb6c0) float gfSpellCastableCombatMod[KB_SPELL_MOD_COUNT] = {
+    0.27f, 0.4f, 0.48f, 0.56f, 0.64f, 0.73f,
+    0.81f, 0.88f, 0.93f, 0.97f, 1.0f, 0.0f
+};
+DATA(0x004fb6f0) float gfSpellCastNumMod[KB_SPELL_MOD_COUNT] = {
+    0.0f, 1.0f, 1.75f, 2.35f, 2.85f, 3.35f,
+    3.7f, 4.0f, 4.26f, 4.5f, 4.7f, 0.0f
+};
+DATA(0x004fb720) float gfPhilAISpellPowerMod[KB_SPELL_MOD_COUNT] = {
+    0.0f, 1.0f, 1.75f, 2.5f, 3.1f, 3.5f,
+    4.0f, 4.5f, 5.4f, 5.75f, 6.15f, 0.0f
+};
+DATA(0x004fb750) float gfPhilAIDurationMod[KB_SPELL_MOD_COUNT] = {
+    0.0f, 0.4f, 0.65f, 0.8f, 1.0f, 1.16f,
+    1.3f, 1.43f, 1.54f, 1.64f, 1.74f, 0.0f
+};
+DATA(0x004fb780) float gfSpellTypeNumMod[KB_QUICK_COMBAT_SPELL_TYPE_COUNT] = {
+    1.0f, 0.75f, 0.55f, 0.4f, 0.28f, 0.2f, 0.15f
+};
 DATA(0x004fb79c) int gbDrawSavedCursor = 0;
-DATA(0x004fb7a0) signed char gbArrow[8][8];
-DATA(0x004fb7e0) unsigned char giCloudType[256];
-DATA(0x004fb8e0) short giScoreMon[66][2];
-DATA(0x004fb9e8) short giScoreCampaignMon[66][2];
+DATA(0x004fb7a0) signed char gbArrow[NORMAL_DIRECTION_COUNT][NORMAL_DIRECTION_COUNT] = {
+    { 8, 0, 0, 0, 8, 16, 16, 16 },
+    { 17, 9, 1, 1, 1, 9, 17, 17 },
+    { 18, 18, 10, 2, 2, 2, 10, 18 },
+    { 19, 19, 19, 11, 3, 3, 3, 11 },
+    { 12, 20, 20, 20, 12, 4, 4, 4 },
+    { 5, 13, 21, 21, 21, 13, 5, 5 },
+    { 6, 6, 14, 22, 22, 22, 14, 6 },
+    { 7, 7, 7, 15, 23, 23, 23, 15 }
+};
+DATA(0x004fb7e0) unsigned char giCloudType[KB_CLOUD_MASK_COUNT] = {
+    0x0b, 0x07, 0x08, 0x81, 0x09, 0x0a, 0x80, 0x21, 0x6c, 0x1d, 0x1e, 0x20, 0x1c, 0x85, 0x22, 0x16,
+    0x0b, 0x07, 0x08, 0x71, 0x09, 0x0a, 0x80, 0x7e, 0x6c, 0x1d, 0x1e, 0x83, 0x1c, 0x85, 0x22, 0x78,
+    0x0b, 0x07, 0x08, 0x81, 0x09, 0x0a, 0x70, 0x7f, 0x6c, 0x1d, 0x1e, 0x20, 0x1c, 0x85, 0x7d, 0x79,
+    0x0b, 0x07, 0x08, 0x71, 0x09, 0x0a, 0x70, 0x67, 0x6c, 0x1d, 0x1e, 0x83, 0x1c, 0x85, 0x7d, 0x75,
+    0x0b, 0x07, 0x08, 0x81, 0x09, 0x0a, 0x80, 0x21, 0x6c, 0x1d, 0x1e, 0x20, 0x0c, 0x1b, 0x19, 0x15,
+    0x0b, 0x07, 0x08, 0x71, 0x09, 0x0a, 0x80, 0x7e, 0x6c, 0x1d, 0x1e, 0x83, 0x0c, 0x1b, 0x19, 0x76,
+    0x0b, 0x07, 0x08, 0x81, 0x09, 0x0a, 0x70, 0x7f, 0x6c, 0x1d, 0x1e, 0x20, 0x0c, 0x1b, 0x01, 0x13,
+    0x0b, 0x07, 0x08, 0x71, 0x09, 0x0a, 0x72, 0x67, 0x6c, 0x1d, 0x1e, 0x83, 0x0c, 0x1b, 0x01, 0x74,
+    0x0b, 0x07, 0x08, 0x81, 0x09, 0x0a, 0x80, 0x21, 0x6c, 0x0d, 0x1e, 0x1f, 0x1c, 0x1a, 0x22, 0x14,
+    0x0b, 0x07, 0x08, 0x71, 0x09, 0x0a, 0x80, 0x7e, 0x6c, 0x0d, 0x1e, 0x05, 0x1c, 0x1a, 0x22, 0x18,
+    0x0b, 0x07, 0x08, 0x81, 0x09, 0x0a, 0x70, 0x7f, 0x6c, 0x0d, 0x1e, 0x1f, 0x1c, 0x1a, 0x7d, 0x12,
+    0x0b, 0x07, 0x08, 0x73, 0x09, 0x0a, 0x70, 0x67, 0x6c, 0x0d, 0x1e, 0x05, 0x1c, 0x1a, 0x7d, 0x7b,
+    0x0b, 0x07, 0x08, 0x81, 0x09, 0x0a, 0x80, 0x21, 0x6c, 0x0d, 0x1e, 0x1f, 0x0c, 0x03, 0x19, 0x11,
+    0x0b, 0x07, 0x08, 0x71, 0x09, 0x0a, 0x80, 0x7e, 0x6c, 0x0f, 0x1e, 0x05, 0x0c, 0x03, 0x19, 0x17,
+    0x0b, 0x07, 0x08, 0x81, 0x09, 0x0a, 0x70, 0x7f, 0x6c, 0x0d, 0x1e, 0x1f, 0x0e, 0x03, 0x01, 0x10,
+    0x0b, 0x07, 0x08, 0x73, 0x09, 0x0a, 0x72, 0x67, 0x6c, 0x0f, 0x1e, 0x05, 0x0e, 0x03, 0x01, 0x00
+};
+DATA(0x004fb8e0) short giScoreMon[MONSTER_DATABASE_COUNT][MONSTER_SCORE_FIELD_COUNT] = {
+    { 0, 0 }, { 4, 11 }, { 8, 20 }, { 12, 38 }, { 16, 29 }, { 20, 57 },
+    { 24, 47 }, { 28, 12 }, { 32, 48 }, { 36, 1 }, { 40, 2 }, { 44, 39 },
+    { 48, 21 }, { 52, 49 }, { 56, 13 }, { 60, 23 }, { 64, 30 }, { 68, 3 },
+    { 72, 24 }, { 76, 22 }, { 80, 58 }, { 84, 4 }, { 88, 14 }, { 92, 50 },
+    { 96, 40 }, { 100, 51 }, { 104, 15 }, { 108, 31 }, { 112, 5 }, { 116, 25 },
+    { 120, 41 }, { 124, 6 }, { 128, 63 }, { 132, 26 }, { 135, 64 }, { 138, 59 },
+    { 141, 52 }, { 144, 65 }, { 147, 62 }, { 150, 42 }, { 153, 32 }, { 156, 7 },
+    { 159, 17 }, { 162, 43 }, { 165, 61 }, { 168, 54 }, { 171, 16 }, { 174, 33 },
+    { 177, 8 }, { 180, 18 }, { 183, 53 }, { 186, 44 }, { 189, 55 }, { 192, 27 },
+    { 195, 34 }, { 198, 9 }, { 201, 60 }, { 204, 10 }, { 207, 19 }, { 210, 45 },
+    { 213, 28 }, { 216, 56 }, { 219, 35 }, { 222, 36 }, { 225, 46 }, { 228, 37 }
+};
+DATA(0x004fb9e8) short giScoreCampaignMon[MONSTER_DATABASE_COUNT][MONSTER_SCORE_FIELD_COUNT] = {
+    { 9999, 0 }, { 5800, 11 }, { 5600, 20 }, { 5400, 38 }, { 5200, 29 }, { 5000, 57 },
+    { 4800, 47 }, { 4600, 12 }, { 4400, 48 }, { 4200, 1 }, { 4000, 2 }, { 3800, 39 },
+    { 3600, 21 }, { 3400, 49 }, { 3200, 13 }, { 3000, 23 }, { 2800, 30 }, { 2600, 3 },
+    { 2400, 24 }, { 2200, 22 }, { 2000, 58 }, { 1900, 4 }, { 1800, 14 }, { 1700, 50 },
+    { 1600, 40 }, { 1500, 51 }, { 1400, 15 }, { 1300, 31 }, { 1200, 5 }, { 1100, 25 },
+    { 1000, 41 }, { 980, 6 }, { 960, 63 }, { 940, 26 }, { 920, 64 }, { 900, 59 },
+    { 880, 52 }, { 860, 65 }, { 840, 62 }, { 820, 42 }, { 800, 32 }, { 780, 7 },
+    { 760, 17 }, { 740, 43 }, { 720, 61 }, { 700, 54 }, { 680, 16 }, { 660, 33 },
+    { 640, 8 }, { 620, 18 }, { 600, 53 }, { 580, 44 }, { 560, 55 }, { 540, 27 },
+    { 520, 34 }, { 500, 9 }, { 480, 60 }, { 460, 10 }, { 440, 19 }, { 420, 45 },
+    { 400, 28 }, { 380, 56 }, { 360, 35 }, { 340, 36 }, { 320, 46 }, { 300, 37 }
+};
 DATA(0x004fbaf0) signed char townTheme[TOWN_MUSIC_TABLE_SIZE] = {
     TOWN_MUSIC_KNIGHT,
     TOWN_MUSIC_BARBARIAN,
@@ -5331,7 +5395,15 @@ DATA(0x004fbaf0) signed char townTheme[TOWN_MUSIC_TABLE_SIZE] = {
     TOWN_MUSIC_NONE,
     TOWN_MUSIC_NONE
 };
-DATA(0x004fbaf8) signed char gHeroSkillBonus[6][2][4];
+DATA(0x004fbaf8) signed char
+    gHeroSkillBonus[HERO_CLASS_COUNT][KB_HERO_LEVEL_BAND_COUNT][HERO_PRIMARY_STAT_COUNT] = {
+        { { 35, 45, 10, 10 }, { 25, 25, 25, 25 } },
+        { { 55, 35, 5, 5 }, { 25, 25, 25, 25 } },
+        { { 10, 10, 30, 50 }, { 20, 20, 30, 30 } },
+        { { 10, 10, 50, 30 }, { 20, 20, 30, 30 } },
+        { { 10, 10, 40, 40 }, { 20, 20, 30, 30 } },
+        { { 15, 15, 35, 35 }, { 25, 25, 25, 25 } }
+    };
 DATA(0x004fbb28) int gbLoadingMonoIcon = 0;
 DATA(0x004fbb2c) int giMonoIconSkip = -1;
 DATA(0x004fbb30) int giScrollX = 0;
