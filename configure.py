@@ -34,6 +34,19 @@ def main():
                command=f"{PY} -m homm2.build.cc_wrap --out $out --src $in -- $flags",
                depfile="$out.d", deps="gcc",
                description="cl $unit")
+        w.rule("link_exe",
+               command=(f"{PY} -m homm2.build.link_exe --out $exe "
+                        "--order build/link/objects.rsp "
+                        "--imports build/link/vendor-imports-smack.lib "
+                        "--imports build/link/vendor-imports-mss.lib "
+                        "--imports build/link/vendor-imports-wing.lib"),
+               description="link HEROES2W.EXE")
+        w.rule("link_order",
+               command=f"{PY} -m homm2.build.link_exe --write-order $out",
+               description="link-order objects.rsp")
+        w.rule("link_imports",
+               command=f"{PY} -m homm2.build.gen_vendor_imports --out-dir build/link",
+               description="link-imports middleware libraries")
         objs = []
         for u in units:
             obj = f"build/objdiff/base/{u['unit']}.obj"
@@ -42,6 +55,25 @@ def main():
                                "unit": u["unit"]})
             objs.append(obj)
         w.build("all", "phony", inputs=objs)
+        order_inputs = ["config/units.toml", "build/gen/symbol_names.csv",
+                        "build/orig/HEROES2W.EXE", "scripts/homm2/build/link_exe.py"]
+        w.build("build/link/objects.rsp", "link_order", inputs=order_inputs)
+        import_outputs = ["build/link/vendor-imports-mss.lib",
+                          "build/link/vendor-imports-smack.lib",
+                          "build/link/vendor-imports-wing.lib"]
+        w.build(import_outputs, "link_imports",
+                inputs="scripts/homm2/build/gen_vendor_imports.py")
+        link_outputs = ["build/link/HEROES2W.EXE", "build/link/HEROES2W.map",
+                        "build/link/HEROES2W.link.json"]
+        w.build(link_outputs, "link_exe",
+                inputs=["build/link/objects.rsp"] + import_outputs,
+                implicit=objs + ["build/orig/HEROES2W.EXE", "scripts/homm2/build/link_exe.py"],
+                variables={"exe": "build/link/HEROES2W.EXE"})
+        w.build("link", "phony", inputs="build/link/HEROES2W.EXE")
+        w.build("link-order", "phony", inputs="build/link/objects.rsp")
+        w.build("link-imports", "phony", inputs=import_outputs)
+        w.build("link-map", "phony",
+                inputs=["build/link/HEROES2W.map", "build/link/HEROES2W.link.json"])
         w.default("all")
 
     od = REPO / "build/objdiff"; od.mkdir(parents=True, exist_ok=True)

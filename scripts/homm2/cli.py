@@ -1,4 +1,4 @@
-"""homm2 CLI - python -m homm2 {init|configure|build|status}."""
+"""homm2 CLI - python -m homm2 {init|configure|build|link|status}."""
 import os, subprocess, sys
 from pathlib import Path
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[2]))
@@ -34,6 +34,9 @@ def main(argv=None):
             return 1
         st(["--write-readme"], report)
         return st([], report)   # refresh README % block + print summary
+    if cmd == "link":
+        if sh("python3", "configure.py"): return 1
+        return sh("ninja", "link", *rest)
     if cmd == "relocs":
         # OPT-IN reloc-target audit (NOT a hard build gate): objdiff masks every relocation, so a
         # 100%-exact fn can silently read the wrong global/field or call a fabricated fn. This checks
@@ -46,6 +49,6 @@ def main(argv=None):
         from homm2.analysis.sema import main as m; return m(rest)
     if cmd == "ghidra":
         from homm2.ghidra.driver import cli_main as m; return m(rest)
-    print("usage: homm2 {init|configure|build|clangd|enum-types|status|relocs|sema|ghidra}",
+    print("usage: homm2 {init|configure|build|link|clangd|enum-types|status|relocs|sema|ghidra}",
           file=sys.stderr)
     return 0 if cmd in ("help", "-h", "--help") else 1
