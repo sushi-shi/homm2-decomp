@@ -26,7 +26,7 @@ void soundManager::MIDIStartup(void)
             hSequence[i] = 0;
         m_midiReady = 1;
         LogStr("Opening MIDI output");
-        i = AIL_midiOutOpen(&hMDI, 0, MIDI_DEFAULT_DEVICE_ID);
+        i = AIL_midiOutOpen(&hMDI, 0, MIDI_MAPPER);
         LogInt("midiOutOpen = %d", i, -999, -999, -999, -999, -999, -999);
         if (i != 0)
             m_midiReady = 0;
@@ -142,7 +142,7 @@ inline void soundManager::MIDISetVolume(void)
                 volume = ((m_fadeSteps - MIDI_VOLUME_FADE_SPLIT) * MIDI_MAX_VOLUME) /
                          MIDI_VOLUME_HIGH_RANGE;
         }
-        AIL_set_XMIDI_master_volume(hMDI, ConvertVolume(volume, MIDI_VOLUME_CONVERSION_MODE));
+        AIL_set_XMIDI_master_volume(hMDI, ConvertVolume(volume, SOUND_VOLUME_MUSIC));
     }
 }
 

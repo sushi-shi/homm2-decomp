@@ -286,7 +286,7 @@ VA(0x004cc1c0, 0xdd)
 int soundManager::ConvertVolume(int param_1, int param_2)
 {
     int local_8 = 0;
-    if (param_2 == 0x65) {
+    if (param_2 == SOUND_VOLUME_MUSIC) {
         if (gConfig.musicVolume >= 1 && gConfig.musicVolume <= 0xa) {
             local_8 = ((0xb - gConfig.musicVolume) * param_1) / 10;
             if (local_8 < 1)
@@ -590,8 +590,10 @@ void soundManager::StopSample(struct _SAMPLE *param_1)
 
 // @early-stop
 // The complete +0x0..+0x202 range is raw-exact after masking the union of 23 relocation
-// payload offsets. This includes the address table at +0x16e..+0x182, byte-index table at
-// +0x182..+0x1e7, and resumed code at +0x1e7; only fixed-IAT/self-relocation identity differs.
+// payload offsets (candidate 23, retail 20). The candidate-only sites +0xc8, +0x11a, and
+// +0x141 are fixed-IAT calls in retail. The address table at +0x16e..+0x182, byte-index
+// table at +0x182..+0x1e7, and resumed code at +0x1e7 are otherwise byte-identical;
+// the remaining relocation-name differences are delinked self/local-label identities.
 VA(0x004ccc80, 0x202)
 void soundManager::ModifySample(struct _SAMPLE *sampleHandle, short operation, long value)
 {
@@ -618,13 +620,13 @@ void soundManager::ModifySample(struct _SAMPLE *sampleHandle, short operation, l
     switch (operation) {
     case 1:
     case 100:
-        AIL_set_sample_volume(sampleHandle, ConvertVolume(value, 100));
+        AIL_set_sample_volume(sampleHandle, ConvertVolume(value, SOUND_VOLUME_EFFECT));
         if (foundChannel >= 0)
             iLastVolume[foundChannel] = static_cast<short>(value);
         break;
     case 101:
         H2_ASSERT(gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI, "I:\\Projects\\Heroes\\Prog\\BASE\\soundmgr.cpp", 0x52f);
-        AIL_set_sample_volume(sampleHandle, ConvertVolume(value, 101));
+        AIL_set_sample_volume(sampleHandle, ConvertVolume(value, SOUND_VOLUME_MUSIC));
         if (foundChannel >= 0)
             iLastVolume[foundChannel] = static_cast<short>(value);
         break;
@@ -796,10 +798,10 @@ void soundManager::PollSound(void)
         if (m_fadeSteps <= 0xa && m_currentTrack != m_fadeTargetTrack) {
             if (m_midiFile != 0 && bSaveMusicPosition[m_currentTrack] != 0) {
                 if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
-                    H2_ASSERT(m_midiFile, "I:\\Projects\\Heroes\\Prog\\BASE\\soundmgr.cpp",
+                    H2_ASSERT(reinterpret_cast<int>(m_midiFile), "I:\\Projects\\Heroes\\Prog\\BASE\\soundmgr.cpp",
                               0x61a);
                     m_savedTrackPositions[m_currentTrack] =
-                        ftell(reinterpret_cast<FILE *>(m_midiFile));
+                        ftell(m_midiFile);
                 }
             } else {
                 gMusicFadeTimer = KBTickCount();
@@ -874,6 +876,13 @@ void soundManager::SwitchAmbientMusic(int param_1)
     LogStr("Switch Ambient Music 2");
 }
 
+// @match-note
+// After the header enum/type recovery, the 0x14 frame, CFG, and 13/13 relocation
+// targets still agree. The only non-relocation bytes are +0x133, +0x139, and +0x13a:
+// candidate loads endChannel then compares currentChannel/endChannel with JL; retail
+// loads currentChannel then compares endChannel/currentChannel with JG. Both skip the
+// reset exactly when currentChannel < endChannel. The equivalent >= operand spelling
+// emits the same candidate bytes; revisit only after later soundmgr TU-state changes.
 VA(0x004cd7f0, 0x28f)
 struct _SAMPLE *soundManager::MemorySample(class sample *param_1)
 {
@@ -920,14 +929,14 @@ struct _SAMPLE *soundManager::MemorySample(class sample *param_1)
     AIL_set_sample_loop_count(smp, params[7]);
     AIL_set_sample_address(smp, reinterpret_cast<void *>(params[1]), params[2]);
     if (gConfig.soundVolume != 0)
-        AIL_set_sample_volume(smp, ConvertVolume(params[6], 0x64));
+        AIL_set_sample_volume(smp, ConvertVolume(params[6], SOUND_VOLUME_EFFECT));
     else
         AIL_set_sample_volume(smp, 0);
     AIL_start_sample(smp);
     params[0] = reinterpret_cast<int>(smp);
     m_channelSamples[ch] = smp;
-    m_sampleAddrLow[ch] = params[1];
-    m_sampleAddrHigh[ch] = params[2];
+    m_channelSampleData[ch] = reinterpret_cast<void *>(params[1]);
+    m_channelSampleSizes[ch] = params[2];
     LogStr("Memory Sample 2b");
     return smp;
 }

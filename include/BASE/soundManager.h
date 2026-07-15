@@ -3,17 +3,29 @@
 // Reconstructed class (BASE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // 37 methods, 3 own-virtual, 0 static data.
 #include <va.h>
+#include <stdio.h>
 #include "baseManager.h"
 
-#define MIDI_TRACK_COUNT 60
-#define MIDI_NO_TRACK (-1)
-#define MIDI_SEQUENCE_PLAYING 4
-#define MIDI_MAX_VOLUME 127
-#define MIDI_VOLUME_FADE_SPLIT 10
-#define MIDI_VOLUME_LOW_RANGE 11
-#define MIDI_VOLUME_HIGH_RANGE 6
-#define MIDI_VOLUME_CONVERSION_MODE 101
-#define MIDI_DEFAULT_DEVICE_ID 0xffffffffUL
+typedef enum MidiTrackConstant {
+    MIDI_NO_TRACK = -1,
+    MIDI_TRACK_COUNT = 60
+} MidiTrackConstant;
+
+typedef enum MidiSequenceStatus {
+    MIDI_SEQUENCE_PLAYING = 4
+} MidiSequenceStatus;
+
+typedef enum MidiVolumeConstant {
+    MIDI_VOLUME_HIGH_RANGE = 6,
+    MIDI_VOLUME_FADE_SPLIT = 10,
+    MIDI_VOLUME_LOW_RANGE = 11,
+    MIDI_MAX_VOLUME = 127
+} MidiVolumeConstant;
+
+typedef enum SoundVolumeConversionMode {
+    SOUND_VOLUME_EFFECT = 100,
+    SOUND_VOLUME_MUSIC = 101
+} SoundVolumeConversionMode;
 // forward declarations:
 class sample;
 struct _SAMPLE;
@@ -36,7 +48,7 @@ public:
     int    field_0x3a;  // +0x3a
     int    m_ready;  // +0x3e
     char _pad_0x42[0xe];
-    int    m_midiFile;  // +0x50
+    FILE *m_midiFile;  // +0x50
     struct _SAMPLE *m_sampleHandles[14];  // +0x54  sample handles
     char _pad_0x8c[0x8];
     int    m_numSampleHandles;  // +0x94
@@ -44,9 +56,9 @@ public:
     char   m_channelVolumes[0x14];          // 0xd8  per-channel volume byte
     struct _SAMPLE *m_channelSamples[14];   // 0xec  active sample per channel
     char _pad_0x124[0x8];             // 0x124..0x12c
-    int    m_sampleAddrLow[14];           // 0x12c  sample address low per channel
+    void   *m_channelSampleData[14];       // 0x12c  sample data per channel
     char _pad_0x164[0x8];             // 0x164..0x16c
-    int    m_sampleAddrHigh[14];           // 0x16c  sample address high per channel
+    unsigned long m_channelSampleSizes[14]; // 0x16c  sample byte length per channel
     char _pad_0x1a4[0x3c8];           // 0x1a4..0x56c
     int    field_0x56c;  // +0x56c
     char _pad_0x570[0x4];
