@@ -951,7 +951,7 @@ SOURCE/KB	?HandleRemoteDeadPlayerExit@@YIXH@Z	100.0000	ab7636d5cbe1
 SOURCE/KB	?HandleRemoteSuddenExit@@YIXXZ	100.0000	d2f613624d9a
 SOURCE/KB	?InMapArea@@YIHHH@Z	100.0000	859568a5858c
 SOURCE/KB	?InitMainClasses@@YIXXZ	99.9951	bf0bca89d2e4
-SOURCE/KB	?InitMenuHandler@@YIHAAUtag_message@@@Z	99.5646	5cd353d50ce5
+SOURCE/KB	?InitMenuHandler@@YIHAAUtag_message@@@Z	99.5646	26703199975a
 SOURCE/KB	?InitVars@@YIXXZ	100.0000	e83193b901d1
 SOURCE/KB	?InterpretCommandLine@@YIHXZ	99.8311	1e068c4d77be
 SOURCE/KB	?LoadPlaySample@@YI?AUSAMPLE2@@PAD@Z	100.0000	98ffe613df26
@@ -966,7 +966,7 @@ SOURCE/KB	?QuickViewWait@@YIXXZ	100.0000	6119bf14432c
 SOURCE/KB	?ReceiveHostReportsPlayerExit@@YIXHUSPlayerExit@@H@Z	100.0000	2df4eba96ff7
 SOURCE/KB	?ReceiveRemotePlayerExit@@YIXUSPlayerExit@@@Z	99.9783	f3adf0d2a9ec
 SOURCE/KB	?RecruitHeroHandler@@YIHAAUtag_message@@@Z	100.0000	bf153664066f
-SOURCE/KB	?SetWinText@@YIXPAVheroWindow@@H@Z	100.0000	14f14227bbad
+SOURCE/KB	?SetWinText@@YIXPAVheroWindow@@H@Z	100.0000	d96ee922ebf0
 SOURCE/KB	?SetupCDRom@@YIXXZ	100.0000	8d54750df930
 SOURCE/KB	?SetupDynamicWindow@@YIXHHHHHHHPAH00000PAPAVheroWindow@@H@Z	100.0000	c34fbb9900fd
 SOURCE/KB	?ShowCongrats@@YIXH@Z	99.9200	53fade598595

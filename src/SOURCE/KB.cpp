@@ -1073,8 +1073,10 @@ int InitMenuHandler(struct tag_message &msg)
                 gpInitWin->BroadcastMessage(msg);
                 gpInitWin->DrawWindow(0, idx, idx);
                 gpWindowManager->UpdateScreenRegion(
-                    IMHotSpots[menu][0], IMHotSpots[menu][1],
-                    IMHotSpots[menu][2], IMHotSpots[menu][3]);
+                    IMHotSpots[menu][INIT_MENU_HOTSPOT_X],
+                    IMHotSpots[menu][INIT_MENU_HOTSPOT_Y],
+                    IMHotSpots[menu][INIT_MENU_HOTSPOT_WIDTH],
+                    IMHotSpots[menu][INIT_MENU_HOTSPOT_HEIGHT]);
                 break;
             case INIT_MENU_CLICK_COMMAND:
                 if (msg.payload.widget.id == INIT_MENU_MOVIE) {
@@ -1110,10 +1112,14 @@ int InitMenuHandler(struct tag_message &msg)
         } else if (msg.type == INIT_MENU_MOUSE_MOVE) {
             hoverIndex = -1;
             for (idx = 0; idx < INIT_MENU_HOTSPOT_COUNT; idx++) {
-                if (IMHotSpots[idx][0] <= msg.payload.mouse.screenX &&
-                    IMHotSpots[idx][1] <= msg.payload.mouse.screenY &&
-                    msg.payload.mouse.screenX < IMHotSpots[idx][0] + IMHotSpots[idx][2] &&
-                    msg.payload.mouse.screenY < IMHotSpots[idx][1] + IMHotSpots[idx][3]) {
+                if (IMHotSpots[idx][INIT_MENU_HOTSPOT_X] <= msg.payload.mouse.screenX &&
+                    IMHotSpots[idx][INIT_MENU_HOTSPOT_Y] <= msg.payload.mouse.screenY &&
+                    msg.payload.mouse.screenX <
+                        IMHotSpots[idx][INIT_MENU_HOTSPOT_X] +
+                            IMHotSpots[idx][INIT_MENU_HOTSPOT_WIDTH] &&
+                    msg.payload.mouse.screenY <
+                        IMHotSpots[idx][INIT_MENU_HOTSPOT_Y] +
+                            IMHotSpots[idx][INIT_MENU_HOTSPOT_HEIGHT]) {
                     hoverIndex = idx;
                 }
             }
@@ -1128,8 +1134,10 @@ int InitMenuHandler(struct tag_message &msg)
                     gpInitWin->DrawWindow(0, lastIMHoverID + INIT_MENU_WIDGET_OFFSET,
                                           lastIMHoverID + INIT_MENU_WIDGET_OFFSET);
                     gpWindowManager->UpdateScreenRegion(
-                        IMHotSpots[lastIMHoverID][0], IMHotSpots[lastIMHoverID][1],
-                        IMHotSpots[lastIMHoverID][2], IMHotSpots[lastIMHoverID][3]);
+                        IMHotSpots[lastIMHoverID][INIT_MENU_HOTSPOT_X],
+                        IMHotSpots[lastIMHoverID][INIT_MENU_HOTSPOT_Y],
+                        IMHotSpots[lastIMHoverID][INIT_MENU_HOTSPOT_WIDTH],
+                        IMHotSpots[lastIMHoverID][INIT_MENU_HOTSPOT_HEIGHT]);
                 }
                 if (hoverIndex != -1) {
                     msg.type = INIT_MENU_MESSAGE;
@@ -1141,8 +1149,10 @@ int InitMenuHandler(struct tag_message &msg)
                     gpInitWin->DrawWindow(0, hoverIndex + INIT_MENU_WIDGET_OFFSET,
                                           hoverIndex + INIT_MENU_WIDGET_OFFSET);
                     gpWindowManager->UpdateScreenRegion(
-                        IMHotSpots[hoverIndex][0], IMHotSpots[hoverIndex][1],
-                        IMHotSpots[hoverIndex][2], IMHotSpots[hoverIndex][3]);
+                        IMHotSpots[hoverIndex][INIT_MENU_HOTSPOT_X],
+                        IMHotSpots[hoverIndex][INIT_MENU_HOTSPOT_Y],
+                        IMHotSpots[hoverIndex][INIT_MENU_HOTSPOT_WIDTH],
+                        IMHotSpots[hoverIndex][INIT_MENU_HOTSPOT_HEIGHT]);
                 }
                 lastIMHoverID = hoverIndex;
             }
@@ -3979,13 +3989,13 @@ void SetWinText(heroWindow *j, int id)
     int a = 0;
     int i;
     tag_message c;
-    for (i = 0; i < 0x49; i++) {
-        if (gWinSetup[i].m_0 == id) {
+    for (i = 0; i < KB_WIN_SETUP_COUNT; i++) {
+        if (gWinSetup[i].windowId == id) {
             a++;
             c.type = 0x200;
             c.payload.widget.command = 3;
-            c.payload.widget.id = gWinSetup[i].m_1;
-            c.payload.widget.data.text = gWinSetup[i].m_3;
+            c.payload.widget.id = gWinSetup[i].widgetId;
+            c.payload.widget.data.text = gWinSetup[i].text;
             j->BroadcastMessage(c);
         }
     }
@@ -8330,14 +8340,127 @@ DATA(0x004ffc48) char *cOverviewText[KB_OVERVIEW_TEXT_COUNT] = {
     "Garrison",
     "Available"
 };
-DATA(0x004ffc60) char *cWinComError[6];
-DATA(0x004ffc78) char *cMiniViewText[10];
-DATA(0x004ffca0) char *gFileRequestHelp[16];
-DATA(0x004ffce0) char *cPersonality[4];
-DATA(0x004ffcf0) char *gArmySizeNames[9][3];
-DATA(0x004ffd60) char *cRandomTavernText[8];
-DATA(0x004ffd80) char *cRandomSignText[4];
-DATA(0x004ffd90) char *cCampaignAwards[12];
+DATA(0x004ffc60) char *cWinComError[KB_WIN_COM_ERROR_TEXT_COUNT] = {
+    "Communications error on function '%s'\n\nWin95 Error Code: %d\nWin95 Error Meaning: %s\n\n",
+    "Suggested solutions:",
+    "\n  1) Make sure all cables are firmly connected.",
+    "\n  2) Reboot computer.",
+    "\n  3) Check to make sure you have the correct COM port setting in 'CONFIG'. (The 3rd button down on the screen where you choose Host or Guest.)",
+    "\n  4) Consider lowering the BAUD rate in 'CONFIG' to 19200 or 9600."
+};
+DATA(0x004ffc78) char *cMiniViewText[KB_MINI_VIEW_TEXT_COUNT] = {
+    "%d Units",
+    "%d Unit",
+    "Attack",
+    "Defense",
+    "HP ",
+    "Dmg",
+    "Mrl",
+    "Luk",
+    "Shots",
+    0
+};
+DATA(0x004ffca0) char *gFileRequestHelp[KB_FILE_REQUEST_HELP_COUNT] = {
+    "{Small Maps}\n\nView only maps of size small (36 x 36).",
+    "{Medium Maps}\n\nView only maps of size medium (72 x 72).",
+    "{Large Maps}\n\nView only maps of size large (108 x 108).",
+    "{Extra Large Maps}\n\nView only maps of size extra large (144 x 144).",
+    "{All Maps}\n\nView all maps, regardless of size.",
+    "{Enter Name}\n\nEnter the name of the file you wish to save.",
+    "{OK}\n\nAccept the choice made.",
+    "{Cancel}\n\nCancel without making a choice.",
+    "{Size Icon}\n\nIndicates whether the map is small (36 x 36), medium (72 x 72), large (108 x 108), or extra large (144 x 144).",
+    "{Players Icon}\n\nIndicates how many players total are in the scenario.  Any positions not occupied by humans will be occupied by computer players.",
+    "{Victory Condition Icon}\n\nThere are 6 possibilities:\n\n{Tombstone} - Defeat all enemy heroes and towns.\n\n{Town} - Capture a specific town.\n\n{Hero Face} - Defeat a specific hero.\n\n{Medal} - Find a specific artifact.\n\n{Handshake} - Your side defeats the opposing side.\n\n{Coins} - Accumulate a large amount of gold.",
+    "{Loss Condition Icon}\n\nThere are 4 possible loss conditions, as indicated by the following icons:\n\n{Tombstone} - Lose all your heroes and towns.\n\n{Town} - Lose a specific town.\n\n{Hero Face} - Lose a specific hero.\n\n{Hourglass} - Run out of time. (Fail to win by a certain point.)",
+    "{Selected Name}\n\nThe name of the currently selected map.",
+    "{Selected Description}\n\nThe description of the currently selected map.",
+    "{Selected Map Difficulty}\n\nThe map difficulty of the currently selected map.  The map difficulty is determined by the scenario designer.  More difficult maps might include more or stronger enemies, fewer resources, or other special conditions making things tougher for the human player.",
+    0
+};
+DATA(0x004ffce0) char *cPersonality[KB_PERSONALITY_TEXT_COUNT] = {
+    "Warrior",
+    "Builder",
+    "Explorer",
+    "Human"
+};
+DATA(0x004ffcf0) char *gArmySizeNames[KB_ARMY_SIZE_NAME_COUNT][KB_ARMY_SIZE_NAME_VARIANT_COUNT] = {
+    {
+        "Few",
+        "A few",
+        "a few"
+    },
+    {
+        "Several",
+        "Several",
+        "several"
+    },
+    {
+        "Pack",
+        "A pack of",
+        "a pack of"
+    },
+    {
+        "Lots",
+        "Lots of",
+        "lots of"
+    },
+    {
+        "Horde",
+        "A Horde of",
+        "a horde of"
+    },
+    {
+        "Throng",
+        "A Throng of",
+        "a throng of"
+    },
+    {
+        "Swarm",
+        "A Swarm of",
+        "a swarm of"
+    },
+    {
+        "Zounds",
+        "Zounds...",
+        "zounds of"
+    },
+    {
+        "Legion",
+        "A Legion of",
+        "a legion of"
+    }
+};
+DATA(0x004ffd60) char *cRandomTavernText[KB_RANDOM_TAVERN_TEXT_COUNT] = {
+    "The truth is out there.",
+    "The dark side is stronger.",
+    "The end of the world is near.",
+    "The bones of Lord Slayer are buried in the foundation of the arena.",
+    "He's innocent.",
+    "A Black Dragon will take out a Titan any day of the week.",
+    "He told her \"Yada yada yada\"...  and then she said \"Blah, blah, blah...\"",
+    "There once was a man from Nantucket..."
+};
+DATA(0x004ffd80) char *cRandomSignText[KB_RANDOM_SIGN_TEXT_COUNT] = {
+    "See Rock City",
+    "This space for rent",
+    "Next sign 50 miles",
+    "Burma shave"
+};
+DATA(0x004ffd90) char *cCampaignAwards[KB_CAMPAIGN_AWARD_TEXT_COUNT] = {
+    "Dwarven alliance",
+    "Sorceress guild",
+    "Roland strengthened",
+    "Carry over forces",
+    "Corlagon defeated",
+    "Ultimate crown",
+    "Necromancer guild",
+    "DwarfBane",
+    "Ogre alliance",
+    "Dragon alliance",
+    "Ultimate crown",
+    "Carry over forces"
+};
 DATA(0x004ffdc0) char *cCampaignName[CAMPAIGN_SIDE_COUNT][CAMPAIGN_MAP_COUNT] = {
     {
         "Force of Arms", "Annexation", "Save the Dwarves", "Carator Mines",
@@ -8430,13 +8553,126 @@ DATA(0x004ffe20) char *cCampaignDescription[CAMPAIGN_SIDE_COUNT][CAMPAIGN_MAP_CO
         "battle will be the easiest one you will face for the rest of the war...traitor."
     }
 };
-DATA(0x004ffe80) char *cOutOfMemory;
-DATA(0x004ffe88) char *cSlowVideoLevelText[2];
-DATA(0x004ffe90) char *gSPanelHelp[10];
-DATA(0x004ffeb8) char *xBarrierColor[8];
-DATA(0x004ffed8) char *xGenericSiteNames[8];
-DATA(0x004ffef8) char *xRecruitmentSiteNames[6];
-DATA(0x004fff10) SWinSetup gWinSetup[73];
+DATA(0x004ffe80) char *cOutOfMemory = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n%s\nHeroes II requires a minimum of\n%dK of Extended Memory (XMS) and\n480K of Conventional Memory\n\n";
+DATA(0x004ffe88) char *cSlowVideoLevelText[KB_SLOW_VIDEO_LEVEL_TEXT_COUNT] = {
+    "Normal",
+    "Interlaced"
+};
+DATA(0x004ffe90) char *gSPanelHelp[KB_SETTINGS_PANEL_HELP_COUNT] = {
+    "{OK}\n\nExit this menu.",
+    "{Music}\n\nToggle ambient music level.\n\n(Note: When using CD Stereo music in DOS, the music may only be turned on or off - the level has no effect.)",
+    "{Effects}\n\nToggle foreground sounds level.",
+    "{Speed}\n\nChange the speed at which your heroes move on the main screen.",
+    "{Music Type}\n\nChange the type of music.  MIDI music does not usually sound as good, but hurts performance less than CD Stereo.  If you use CD Stereo, you can select whether or not to have the operatic town themes play or not.\n\n(Note: Some older computers do not handle CD Stereo music well.  If you have a computer that leaves the music playing when you quit or crashes when you switch music tracks, try MIDI music.)",
+    "{Show Path}\n\nToggle 'Show Path' on/off.  If 'Show Path' is on, your first click on a map location will show the path to get there, your second will start you moving. If this option is off, one click starts you moving immediately.",
+    "{Enemy Speed}\n\nSets the speed that A.I. heroes move at.  You can also elect not to view A.I. movement at all.",
+    "{Interface}\n\nSets what type of interface you want to use.  The default selection is a dynamic interface, which uses Evil graphics for the 3 evil heroes (Barbarian, Warlock, and Necromancer).",
+    "{Video}\n\nDetermines if the video sequences play normally or in interlaced mode.  Interlaced mode runs better on slower machines, or machines with double-speed CD drives.",
+    "{Mouse Cursor}\n\nToggle color cursors on/off.  Color cursors look nicer, but sometimes don't move as smoothly as black and white ones."
+};
+DATA(0x004ffeb8) char *xBarrierColor[KB_BARRIER_COLOR_NAME_COUNT] = {
+    "aqua",
+    "blue",
+    "brown",
+    "gold",
+    "green",
+    "orange",
+    "purple",
+    "red"
+};
+DATA(0x004ffed8) char *xGenericSiteNames[KB_GENERIC_SITE_NAME_COUNT] = {
+    "Alchemist's Tower",
+    "Arena",
+    "Hut of the Magi",
+    "Eye of the Magi",
+    "Stables",
+    "Mermaid",
+    "Sirens",
+    0
+};
+DATA(0x004ffef8) char *xRecruitmentSiteNames[KB_RECRUITMENT_SITE_NAME_COUNT] = {
+    "Barrow Mounds",
+    "Earth Summoning Altar",
+    "Air Summoning Altar",
+    "Fire Summoning Altar",
+    "Water Summoning Altar",
+    0
+};
+DATA(0x004fff10) SWinSetup gWinSetup[KB_WIN_SETUP_COUNT] = {
+    {0, 100, "Build improvement:"},
+    {1, 100, "Speed"},
+    {1, 101, "Monster Info"},
+    {1, 102, "Auto Combat\nSpell Casting"},
+    {1, 103, "Grid"},
+    {1, 104, "Shadow\nCursor"},
+    {1, 105, "Shadow\nMovement"},
+    {2, 100, "Music"},
+    {2, 101, "Effects"},
+    {2, 102, "Music Type"},
+    {2, 103, "Speed"},
+    {2, 104, "Show Path"},
+    {2, 105, "Enemy Speed"},
+    {2, 106, "Interface"},
+    {2, 107, "Video"},
+    {2, 108, "Mouse Cursor"},
+    {6, 300, "Attack Skill"},
+    {6, 301, "Defense Skill"},
+    {6, 302, "Spell Power"},
+    {6, 303, "Knowledge"},
+    {7, 600, "Game Difficulty:"},
+    {7, 57, "Easy"},
+    {7, 58, "Normal"},
+    {7, 59, "Hard"},
+    {7, 60, "Expert"},
+    {7, 61, "Impossible"},
+    {7, 62, "Opponents:"},
+    {7, 84, "Class:"},
+    {9, 41, "Gold Per Day:"},
+    {12, 0, "Build a new ship:"},
+    {12, 1, "Resource cost:"},
+    {14, 800, "1st"},
+    {14, 801, "2nd"},
+    {14, 802, "3rd"},
+    {14, 803, "4th"},
+    {14, 804, "5th"},
+    {14, 805, "6th"},
+    {14, 604, "Number of Towns:"},
+    {14, 605, "Number of Castles:"},
+    {14, 606, "Number of Heroes:"},
+    {14, 607, "Gold in Treasury:"},
+    {14, 608, "Wood & Ore:"},
+    {14, 609, "Gems, Cr, Slf & Mer:"},
+    {14, 610, "Obelisks Found:"},
+    {14, 611, "Artifacts:"},
+    {14, 612, "Total Army Strength:"},
+    {14, 613, "Income:"},
+    {14, 620, "Best Hero:"},
+    {14, 621, "Best Hero Stats:"},
+    {14, 622, "Personality:"},
+    {14, 623, "Best Monster:"},
+    {14, 0, "Thieves' Guild: Player Rankings"},
+    {17, 110, "The above spells have been added to your book."},
+    {18, 600, "Attack:"},
+    {18, 601, "Defense:"},
+    {18, 602, "Spell Power:"},
+    {18, 603, "Knowledge:"},
+    {18, 604, "Spell Points:"},
+    {19, 600, "Defenders:"},
+    {20, 600, "Recruit Hero"},
+    {21, 600, "Attack Skill"},
+    {21, 601, "Defense Skill"},
+    {21, 602, "Spell Power"},
+    {21, 603, "Knowledge"},
+    {22, 0, "Tavern"},
+    {23, 600, "Map\nDifficulty"},
+    {23, 601, "Game\nDifficulty"},
+    {23, 602, "\nRating"},
+    {23, 603, "\nMap Size"},
+    {23, 604, "Opponents"},
+    {23, 605, "Class"},
+    {23, 606, "Victory\nConditions"},
+    {23, 607, "Loss\nConditions"}
+};
 DATA(0x00500110) int gbHeroWindShowing = 0;
 DATA(0x00500114) int gbFullCombatScreenDrawn = 1;
 DATA(0x00500118) int gbLimitedCombatUpdatePalette = 0;
@@ -8468,7 +8704,14 @@ DATA(0x005157ac) int bEarlySetupDone = 0;
 DATA(0x005159f8) int bKBDone = 0;
 DATA(0x005159fc) struct _REDBOOK *hRedbookz = 0;
 DATA(0x00515a00) int bForceCheckTimeEvent = 0;
-DATA(0x00515ca0) unsigned short IMHotSpots[5][4];
+DATA(0x00515ca0) unsigned short
+    IMHotSpots[KB_INIT_MENU_HOTSPOT_COUNT][INIT_MENU_HOTSPOT_FIELD_COUNT] = {
+    {481, 185, 83, 96},
+    {194, 179, 82, 79},
+    {412, 105, 75, 76},
+    {303, 137, 75, 44},
+    {0, 389, 86, 90}
+};
 DATA(0x00515cc8) int lastIMHoverID = -1;
 DATA(0x00515f78) int bInCheckEndGame = 0;
 DATA(0x005165dc) int bInShutDown = 0;
