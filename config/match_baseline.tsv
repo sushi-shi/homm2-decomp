@@ -1073,7 +1073,7 @@ SOURCE/PHILAI	?DoAI@philAI@@QAEXH@Z	97.5265	00b31c4e92a5
 SOURCE/PHILAI	?DoAllHeroInteractions@philAI@@QAEXXZ	100.0000	94a34f29920a
 SOURCE/PHILAI	?DoAnywhereDDoorTownGate@philAI@@QAEHH@Z	99.7153	f389d59dc3aa
 SOURCE/PHILAI	?DoDimensionDoor@philAI@@QAEHPAVhero@@@Z	100.0000	61b2ab8596d3
-SOURCE/PHILAI	?EvaluateArtifactEvent@philAI@@QAEHHH@Z	99.2893	5e470919df12
+SOURCE/PHILAI	?EvaluateArtifactEvent@philAI@@QAEHHH@Z	99.2893	7b1eac87bf2e
 SOURCE/PHILAI	?EvaluateBarrier@philAI@@QAEHPAVmapCell@@@Z	100.0000	631584ec4322
 SOURCE/PHILAI	?EvaluateGenericSite@philAI@@QAEHPAVmapCell@@@Z	99.7590	3abf88c92763
 SOURCE/PHILAI	?EvaluateHeroEvent@philAI@@QAEHHHHHPAH@Z	96.7286	3827e4fbd092
@@ -1423,12 +1423,12 @@ SOURCE/netwin	@nb_snd@12	100.0000	83c93ea56a7b
 SOURCE/netwin	@nb_stat@4	100.0000	89939d3bcf86
 SOURCE/netwin	@nb_term@0	100.0000	d564da2e1d0b
 SOURCE/netwin	_nb_sess	99.8446	1868a668e05b
-SOURCE/tradpost	?ComputeTradeRatios@@YIXHHPAH00@Z	99.9444	b9a53cd4881c
+SOURCE/tradpost	?ComputeTradeRatios@@YIXHHPAH00@Z	100.0000	a43d41e7b384
 SOURCE/tradpost	?DoTradeKnob@@YIXUtag_message@@@Z	100.0000	58a78fccfc3a
-SOURCE/tradpost	?DoTradingPost@@YIXHM@Z	98.0920	ae8fb9ffc908
-SOURCE/tradpost	?SetupNewTrade@@YIXXZ	100.0000	785f9b716a7b
-SOURCE/tradpost	?TradingPostHandler@@YIHAAUtag_message@@@Z	94.5556	bfc672246389
-SOURCE/tradpost	?UpdateTradingPost@@YIXH@Z	95.4806	255467bcedf9
+SOURCE/tradpost	?DoTradingPost@@YIXHM@Z	100.0000	293c4ea83d01
+SOURCE/tradpost	?SetupNewTrade@@YIXXZ	100.0000	ae1e958cec06
+SOURCE/tradpost	?TradingPostHandler@@YIHAAUtag_message@@@Z	99.7205	35a6f53c5c02
+SOURCE/tradpost	?UpdateTradingPost@@YIXH@Z	98.9254	91962f8f02ec
 SOURCE/wingraph	?AppPaint@@YIHPAX0@Z	100.0000	9e09371bf440
 SOURCE/wingraph	?CleanUpWinGraphics@@YIXXZ	100.0000	458e21da26e7
 SOURCE/wingraph	?ConnectToDLLs@@YIXXZ	100.0000	534192f75c27
