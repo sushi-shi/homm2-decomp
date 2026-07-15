@@ -1188,6 +1188,10 @@ void townManager::ShowText(char *)
         TOWN_STATUS_REGION_HEIGHT);
 }
 
+// @match-note 95.03%: complete event/hover/command CFG, exact 0x250 frame, and
+// all 215/215 external relocations agree. The first 144 normalized
+// instructions align; comparison then loses local-label identity at the
+// delinked dispatch boundary. Revisit switch/dispatch source shape at SOURCE 95%.
 VA(0x0041595d, 0x1830)
 int townManager::Main(tag_message &message)
 {
@@ -1633,12 +1637,18 @@ int townManager::Main(tag_message &message)
     return 1;
 }
 
+// @match-note 98.13%: complete six-command CFG, exact 0x18 frame, and all 23/23
+// relocations agree. Retail reuses one int for swapped count/type; separate
+// short/char temporaries produced 0x1c and one shared merge/swap temp produced
+// 0x14. The remaining diff begins at delinked switch-table label identity.
+// Revisit dispatch layout at SOURCE 95%.
 VA(0x0041718d, 0x4e3)
 void townManager::DoCommand(int command)
 {
     hero *viewedHero;
     int canDismiss;
     int slot;
+    int swapValue;
 
     switch (command) {
     case TOWN_ARMY_COMMAND_SELECT:
@@ -1696,20 +1706,19 @@ void townManager::DoCommand(int command)
         ResetStrips();
         break;
 
-    case TOWN_ARMY_COMMAND_SWAP: {
-        short count = m_pendingStrip->m_army
-                          ->m_creatureCounts[m_pendingArmySlot];
+    case TOWN_ARMY_COMMAND_SWAP:
+        swapValue = m_pendingStrip->m_army
+                        ->m_creatureCounts[m_pendingArmySlot];
         m_pendingStrip->m_army->m_creatureCounts[m_pendingArmySlot] =
             m_swapStrip->m_army->m_creatureCounts[m_swapArmySlot];
-        m_swapStrip->m_army->m_creatureCounts[m_swapArmySlot] = count;
-        signed char type = m_pendingStrip->m_army
-                               ->m_creatureTypes[m_pendingArmySlot];
+        m_swapStrip->m_army->m_creatureCounts[m_swapArmySlot] = swapValue;
+        swapValue = m_pendingStrip->m_army
+                        ->m_creatureTypes[m_pendingArmySlot];
         m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot] =
             m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot];
-        m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot] = type;
+        m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot] = swapValue;
         ResetStrips();
         break;
-    }
 
     case TOWN_ARMY_COMMAND_VIEW_HERO:
         HeroView(m_town->m_occupyingHeroId, 1, 0);
@@ -1743,6 +1752,10 @@ void townManager::RedrawTownScreen(void)
     gpWindowManager->UpdateScreenRegion(0, 0, 0x280, 0x1e0);
 }
 
+// @early-stop
+// Relocation-masked instruction streams are identical with the exact 0x40
+// frame and 27/27 relocations; only delinked string-literal symbol identities
+// differ (splitwin.bin, prompt/army labels, and numeric format).
 VA(0x0041771d, 0x374)
 void townManager::SplitArmy(void)
 {
@@ -1851,6 +1864,12 @@ void townManager::DrawTown(int updateScreen, int drawFlags)
     PollSound();
 }
 
+// @match-note 96.72%: complete cost/prerequisite, two-row widget, quick-view,
+// purchase and resource-deduction CFG, exact 0x14c frame, and all 102/102
+// relocations agree. After initial literal identities, the first opcode-shape
+// divergence is neutral-cost indexing at normalized instruction 155: retail
+// loads index before building while this TU selects the reverse address order.
+// Revisit array-expression ordering at SOURCE 95%.
 VA(0x00417c9d, 0xf35)
 int townManager::BuyBuild(int building, int cannotBuy, int quickView)
 {
@@ -2174,6 +2193,11 @@ int townManager::BuyBuild(int building, int cannotBuy, int quickView)
     return gpWindowManager->m_dialogResult == TOWN_DIALOG_CONFIRM;
 }
 
+// @match-note 98.25%: complete build/visibility, extent, fizzle, sample and
+// redraw CFG, exact 0x30 frame, and all 47/47 external relocations agree.
+// Retail has two jump-to-next continuations in the entry predicate and forms
+// the Necromancer frame with lea(3*n-3),add; nested predicates and both
+// 2*(3*n-3) operand orders compile like the current form. Revisit at SOURCE 95%.
 VA(0x00418bd2, 0x3e9)
 void townManager::BuildObj(int building)
 {
@@ -2257,115 +2281,126 @@ void townManager::BuildObj(int building)
     }
 }
 
+// @match-note 94.49%: complete spell availability/widget/text CFG and all
+// 34/34 relocations agree. The Library mask is proven 0x2000. od_slots-derived
+// names align retail slots through message(-0x3c), but retail reserves an
+// unreferenced word at -0x48 and has lineCount/hasLibrary/this at
+// -0x58/-0x5c/-0x60 versus -0x54/-0x58/-0x5c. Do not invent padding; revisit
+// after a shared compiler-state/layout change or at SOURCE 95%.
 VA(0x00418fbb, 0x3d8)
 void townManager::SetupMage(heroWindow *window)
 {
-    short unusedZero = 0;
-    short unusedAvailable = 1;
-    short unusedInvalid = TOWN_MAGE_SPELL_UNAVAILABLE;
-    short unusedIconState = 2;
-    short unusedFirstSpell = TOWN_MAGE_FIRST_SPELL_CONTROL;
-    short unusedFirstIcon = TOWN_MAGE_FIRST_ICON_CONTROL;
-    short unusedFirstDescription = TOWN_MAGE_FIRST_DESCRIPTION_CONTROL;
-    short unusedGuildIcon = TOWN_MAGE_GUILD_ICON_CONTROL;
-    short unusedDescription = TOWN_MAGE_DESCRIPTION_CONTROL;
-    tag_message message;
+    short unusedZero_f = 0;
+    short unusedAvailable_j = 1;
+    short unusedInvalid_c = TOWN_MAGE_SPELL_UNAVAILABLE;
+    short unusedIconState_h = 2;
+    short unusedFirstSpell_p = TOWN_MAGE_FIRST_SPELL_CONTROL;
+    short unusedFirstIcon_m = TOWN_MAGE_FIRST_ICON_CONTROL;
+    short unusedFirstDescription_o = TOWN_MAGE_FIRST_DESCRIPTION_CONTROL;
+    short unusedGuildIcon_i = TOWN_MAGE_GUILD_ICON_CONTROL;
+    short unusedDescription_g = TOWN_MAGE_DESCRIPTION_CONTROL;
+    tag_message message_b;
     int level;
-    int slot;
-    int spellState;
-    int hasLibrary;
-    int lineCount;
-    int unusedGuildFrame;
+    int slot_m;
+    int spellState_m;
+    int hasLibrary_k;
+    int lineCount_m;
+    int unusedGuildFrame_n;
 
-    message.type = TOWN_MESSAGE_SELECT;
+    message_b.type = TOWN_MESSAGE_SELECT;
     if (m_town->m_occupyingHeroId == -1) {
         strcpy(gText, "The above spells are available here.");
-        message.payload.widget.command = 3;
-        message.payload.widget.id = TOWN_MAGE_DESCRIPTION_CONTROL;
-        message.payload.widget.data.text = gText;
-        window->BroadcastMessage(message);
+        message_b.payload.widget.command = 3;
+        message_b.payload.widget.id = TOWN_MAGE_DESCRIPTION_CONTROL;
+        message_b.payload.widget.data.text = gText;
+        window->BroadcastMessage(message_b);
     }
 
     for (level = 0; level < TOWN_MAGE_GUILD_MAX_LEVEL; ++level) {
-        for (slot = 0; slot < TOWN_MAGE_SPELLS_PER_LEVEL; ++slot) {
+        for (slot_m = 0; slot_m < TOWN_MAGE_SPELLS_PER_LEVEL; ++slot_m) {
             if (m_town->m_type == TOWN_TYPE_WIZARD &&
                 (m_town->m_buildings & TOWN_WIZARD_LIBRARY_BUILDING_FLAG))
-                hasLibrary = 1;
+                hasLibrary_k = 1;
             else
-                hasLibrary = 0;
+                hasLibrary_k = 0;
 
-            if (gSpellLimits[level] + hasLibrary <= slot) {
-                spellState = TOWN_MAGE_SPELL_UNAVAILABLE;
-            } else if (m_town->m_spellCounts[level + 1] <= slot) {
-                spellState = 1;
+            if (gSpellLimits[level] + hasLibrary_k <= slot_m) {
+                spellState_m = TOWN_MAGE_SPELL_UNAVAILABLE;
+            } else if (m_town->m_spellCounts[level + 1] <= slot_m) {
+                spellState_m = 1;
             } else {
-                spellState = 0;
+                spellState_m = 0;
             }
 
-            if (spellState == TOWN_MAGE_SPELL_UNAVAILABLE)
-                message.payload.widget.command = 6;
+            if (spellState_m == TOWN_MAGE_SPELL_UNAVAILABLE)
+                message_b.payload.widget.command = 6;
             else
-                message.payload.widget.command = 5;
-            message.payload.widget.id = level * TOWN_MAGE_SPELLS_PER_LEVEL + slot +
+                message_b.payload.widget.command = 5;
+            message_b.payload.widget.id = level * TOWN_MAGE_SPELLS_PER_LEVEL + slot_m +
                              TOWN_MAGE_FIRST_SPELL_CONTROL;
-            message.payload.widget.data.value = 4;
-            window->BroadcastMessage(message);
+            message_b.payload.widget.data.value = 4;
+            window->BroadcastMessage(message_b);
 
-            if (spellState != TOWN_MAGE_SPELL_UNAVAILABLE) {
-                message.payload.widget.command = 4;
-                message.payload.widget.id = level * TOWN_MAGE_SPELLS_PER_LEVEL + slot +
+            if (spellState_m != TOWN_MAGE_SPELL_UNAVAILABLE) {
+                message_b.payload.widget.command = 4;
+                message_b.payload.widget.id = level * TOWN_MAGE_SPELLS_PER_LEVEL + slot_m +
                                  TOWN_MAGE_FIRST_SPELL_CONTROL;
-                message.payload.widget.data.value = spellState;
-                window->BroadcastMessage(message);
+                message_b.payload.widget.data.value = spellState_m;
+                window->BroadcastMessage(message_b);
             }
 
-            if (spellState != 0) {
-                message.payload.widget.command = 6;
-                message.payload.widget.data.value = 4;
-                message.payload.widget.id = level * TOWN_MAGE_SPELLS_PER_LEVEL + slot +
+            if (spellState_m != 0) {
+                message_b.payload.widget.command = 6;
+                message_b.payload.widget.data.value = 4;
+                message_b.payload.widget.id = level * TOWN_MAGE_SPELLS_PER_LEVEL + slot_m +
                                  TOWN_MAGE_FIRST_ICON_CONTROL;
-                window->BroadcastMessage(message);
-                message.payload.widget.id = level * TOWN_MAGE_SPELLS_PER_LEVEL + slot +
+                window->BroadcastMessage(message_b);
+                message_b.payload.widget.id = level * TOWN_MAGE_SPELLS_PER_LEVEL + slot_m +
                                  TOWN_MAGE_FIRST_DESCRIPTION_CONTROL;
-                window->BroadcastMessage(message);
+                window->BroadcastMessage(message_b);
             } else {
-                message.payload.widget.command = 4;
-                message.payload.widget.id = level * TOWN_MAGE_SPELLS_PER_LEVEL + slot +
+                message_b.payload.widget.command = 4;
+                message_b.payload.widget.id = level * TOWN_MAGE_SPELLS_PER_LEVEL + slot_m +
                                  TOWN_MAGE_FIRST_ICON_CONTROL;
-                message.payload.widget.data.value = gsSpellInfo[
-                    m_town->m_spells[level][slot]].iconIndex;
-                window->BroadcastMessage(message);
-                lineCount = smallFont->LineLength(
-                    gSpellNames[m_town->m_spells[level][slot]], 0x4a);
-                if (lineCount == 1)
+                message_b.payload.widget.data.value = gsSpellInfo[
+                    m_town->m_spells[level][slot_m]].iconIndex;
+                window->BroadcastMessage(message_b);
+                lineCount_m = smallFont->LineLength(
+                    gSpellNames[m_town->m_spells[level][slot_m]], 0x4a);
+                if (lineCount_m == 1)
                     sprintf(gText, "%s\n[%d]",
-                            gSpellNames[m_town->m_spells[level][slot]],
-                            GetManaCost(m_town->m_spells[level][slot], 0));
+                            gSpellNames[m_town->m_spells[level][slot_m]],
+                            GetManaCost(m_town->m_spells[level][slot_m], 0));
                 else
                     sprintf(gText, "%s  [%d]",
-                            gSpellNames[m_town->m_spells[level][slot]],
-                            GetManaCost(m_town->m_spells[level][slot], 0));
-                message.payload.widget.command = 3;
-                message.payload.widget.id = level * TOWN_MAGE_SPELLS_PER_LEVEL + slot +
+                            gSpellNames[m_town->m_spells[level][slot_m]],
+                            GetManaCost(m_town->m_spells[level][slot_m], 0));
+                message_b.payload.widget.command = 3;
+                message_b.payload.widget.id = level * TOWN_MAGE_SPELLS_PER_LEVEL + slot_m +
                                  TOWN_MAGE_FIRST_DESCRIPTION_CONTROL;
-                message.payload.widget.data.text = gText;
-                window->BroadcastMessage(message);
+                message_b.payload.widget.data.text = gText;
+                window->BroadcastMessage(message_b);
             }
         }
     }
 
-    message.payload.widget.data.value = m_town->m_buildState - 1;
-    message.payload.widget.command = 4;
-    message.payload.widget.id = TOWN_MAGE_GUILD_ICON_CONTROL;
-    unusedGuildFrame = message.payload.widget.data.value;
-    window->BroadcastMessage(message);
+    message_b.payload.widget.data.value = m_town->m_buildState - 1;
+    message_b.payload.widget.command = 4;
+    message_b.payload.widget.id = TOWN_MAGE_GUILD_ICON_CONTROL;
+    unusedGuildFrame_n = message_b.payload.widget.data.value;
+    window->BroadcastMessage(message_b);
     sprintf(gText, "magegld%c.icn", cHeroTypeInitial[m_town->m_type]);
-    message.payload.widget.command = 9;
-    message.payload.widget.id = TOWN_MAGE_GUILD_ICON_CONTROL;
-    message.payload.widget.data.text = gText;
-    window->BroadcastMessage(message);
+    message_b.payload.widget.command = 9;
+    message_b.payload.widget.id = TOWN_MAGE_GUILD_ICON_CONTROL;
+    message_b.payload.widget.data.text = gText;
+    window->BroadcastMessage(message_b);
 }
 
+// @match-note 93.76%: complete control-range, spell-count and dialog CFG with
+// all 5/5 relocations. Retail frame is 0x28 versus 0x2c. Inlining quickView
+// alone gave 89.95%, inlining level alone 79.56%, and inlining both gave 74.23%;
+// all preserved semantics but disrupted the retail division/slot sequence.
+// Revisit local allocation at SOURCE 95%.
 VA(0x00419393, 0x190)
 int MageGuildHandler(tag_message &message)
 {
@@ -2419,6 +2454,10 @@ int MageGuildHandler(tag_message &message)
     return EventWindowHandler(message);
 }
 
+// @early-stop
+// Relocation-masked instruction streams are identical with the exact 0x68
+// frame and 65/65 relocations. The only reported residuals are three delinked
+// string-literal identities (window, hero description, and portrait format).
 VA(0x00419523, 0x706)
 int townManager::RecruitHero(int availableHeroIndex, int cannotRecruit)
 {
@@ -2523,8 +2562,7 @@ int townManager::RecruitHero(int availableHeroIndex, int cannotRecruit)
 
         newHeroClass =
             gpCurPlayer->m_availableHeroIds[1 - m_recruitState] / 9;
-        newHeroClass = Random(1, 5) + newHeroClass;
-        newHeroClass %= TOWN_HERO_CLASS_COUNT;
+        newHeroClass = (Random(1, 5) + newHeroClass) % TOWN_HERO_CLASS_COUNT;
         gpCurPlayer->m_availableHeroIds[m_recruitState] =
             static_cast<signed char>(
                 gpGame->GetNewHeroId(giCurPlayer, newHeroClass, 0));
@@ -2548,20 +2586,21 @@ int townManager::RecruitHero(int availableHeroIndex, int cannotRecruit)
     return m_recruitState != -1;
 }
 
+// @match-note 97.60%: complete dialog and timed-animation CFG, exact 0x14
+// frame, and all 11/11 relocations agree. Direct field switches removed two
+// false dispatch locals; the first residual is two retail jump-to-next
+// continuations around the 0x7800..0x7802 range gate. Assignment-expression
+// switches compile like the former 0x1c frame. Revisit at SOURCE 95%.
 VA(0x00419c29, 0x153)
 int TavernHandler(tag_message &message)
 {
     int unusedDelay = TOWN_TAVERN_ANIMATION_DELAY;
     short unusedFirstFrame = TOWN_TAVERN_FIRST_ANIMATION_FRAME;
-    int action;
-    int control;
 
     if (message.type == TOWN_MESSAGE_SELECT) {
-        action = message.payload.widget.command;
-        switch (action) {
+        switch (message.payload.widget.command) {
         case TOWN_INPUT_DESELECT:
-            control = message.payload.widget.id;
-            switch (control) {
+            switch (message.payload.widget.id) {
             case 0x7800:
             case 0x7801:
             case TOWN_DIALOG_CONFIRM:
@@ -2611,6 +2650,11 @@ void townManager::DoTavern(void)
     delete m_heroWindow0;
 }
 
+// @match-note 97.28%: complete amount edit/clamp, confirm/cancel and redraw CFG,
+// exact 0x24 frame, and all 32/32 relocations agree. Retail avoids the explicit
+// outer-action copy but retains its word; fully direct switches score 98.29%
+// with an undersized 0x20 frame, while explicit control scores 96.09%.
+// Revisit dispatch temporary allocation at SOURCE 95%.
 VA(0x00419e8c, 0x328)
 int SplitArmyHandler(tag_message &message)
 {
@@ -2619,14 +2663,12 @@ int SplitArmyHandler(tag_message &message)
     short unusedDecreaseControl = TOWN_SPLIT_DECREASE_CONTROL;
     int handled = 0;
     int action;
-    int control;
 
     if (message.type == TOWN_MESSAGE_SELECT) {
         action = message.payload.widget.command;
         switch (action) {
         case TOWN_INPUT_SELECT:
-            control = message.payload.widget.id;
-            switch (control) {
+            switch (message.payload.widget.id) {
             case TOWN_SPLIT_AMOUNT_CONTROL:
                 message.payload.widget.command = 7;
                 gpTownManager->m_heroWindow1->BroadcastMessage(message);
@@ -2641,8 +2683,7 @@ int SplitArmyHandler(tag_message &message)
             }
             break;
         case TOWN_INPUT_DESELECT:
-            control = message.payload.widget.id;
-            switch (control) {
+            switch (message.payload.widget.id) {
             case TOWN_SPLIT_INCREASE_CONTROL:
                 ++gpTownManager->m_splitAmount;
                 if (gpTownManager->m_splitAmount >=
@@ -2824,6 +2865,12 @@ void townManager::SetupWell(heroWindow *window)
     }
 }
 
+// @match-note 93.76%: complete category/rank, strongest-hero/stats/personality,
+// creature and information-level widget CFG; all 114/114 relocations agree.
+// Retail's 14 geometry constants and rank-group lastAtRank flow are recovered,
+// with rank/position/heroPosition reused across later loops. Frame is 0x1ac
+// versus retail 0x1b0. Positive information gates and comparison reversals
+// regressed to 92.91/92.99%. Revisit the unreferenced frame word at SOURCE 95%.
 VA(0x0041a783, 0xf0f)
 void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
 {
@@ -2831,10 +2878,15 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
     short unusedRankWidth = 0x44;
     short unusedRankY = 0x1b;
     short unusedRankHeight = 0x18;
+    short unusedRankIconHeight = 0x16;
     short unusedIconWidth = 0x12;
+    short unusedIconHeight = 0x16;
     short unusedPlayerWidth = 0x48;
     short unusedFirstRankControl = TOWN_THIEVES_FIRST_RANK_CONTROL;
     short unusedFirstPlayerControl = TOWN_THIEVES_FIRST_PLAYER_CONTROL;
+    short unusedHeroY = 0x12c;
+    short unusedPrimaryStatsY = 0x153;
+    short unusedPersonalityY = 0x18d;
     short unusedCreatureY = 0x1a2;
     int maxCategories;
     int category;
@@ -2848,8 +2900,6 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
     int position;
     widget *iconControl;
     tag_message message;
-    int playerIndex;
-    int displayPlayer;
     int heroPosition;
     int strongestHeroPosition;
     int strongestHeroValue;
@@ -2858,8 +2908,6 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
     char *widgetText;
     widget *textControl;
     char statText[200];
-    int stat;
-    int townPosition;
     int armySlot;
     town *playerTown;
     int strongestCreature;
@@ -2904,18 +2952,20 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
         GetCategoryStats(category, categoryStats, categoryOrder);
         SortStats(categoryStats, categoryOrder);
         firstAtRank = 0;
+        lastAtRank = 0;
         for (rank = 0;
              rank < TOWN_THIEVES_PLAYER_COUNT &&
              gpGame->m_playerCount - gpGame->m_deadPlayerCount !=
                  firstAtRank;
              ++rank) {
             tiedCount = 1;
-            for (lastAtRank = firstAtRank;
-                 lastAtRank + 1 < gpGame->m_playerCount &&
-                 categoryStats[lastAtRank] == categoryStats[lastAtRank + 1];
-                 ++lastAtRank)
+            while (lastAtRank + 1 < gpGame->m_playerCount &&
+                   categoryStats[lastAtRank + 1] ==
+                       categoryStats[lastAtRank]) {
                 ++tiedCount;
-            rankX = rank * 0x44 + 0x102 - (tiedCount * 9 - 9);
+                ++lastAtRank;
+            }
+            rankX = 0x44 * rank + 0x102 - (9 * tiedCount - 9);
             for (position = firstAtRank; position <= lastAtRank; ++position) {
                 iconControl = new iconWidget(
                     static_cast<short>(
@@ -2930,22 +2980,23 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
                     MemError();
                 window->AddWidget(iconControl, -1);
             }
-            firstAtRank = lastAtRank + 1;
+            ++lastAtRank;
+            firstAtRank = lastAtRank;
         }
     }
 
-    playerIndex = 0;
-    for (displayPlayer = 0;
-         displayPlayer <
+    rank = 0;
+    for (position = 0;
+         position <
              gpGame->m_playerCount - gpGame->m_deadPlayerCount;
-         ++displayPlayer) {
-        while (gpGame->m_playerDead[playerIndex] != 0)
-            ++playerIndex;
-        sprintf(gText, gColors[gpGame->m_players[playerIndex].color]);
+         ++position) {
+        while (gpGame->m_playerDead[rank] != 0)
+            ++rank;
+        sprintf(gText, gColors[gpGame->m_players[rank].color]);
         gText[0] -= ' ';
         message.type = TOWN_MESSAGE_SELECT;
         message.payload.widget.command = 3;
-        message.payload.widget.id = displayPlayer + TOWN_THIEVES_FIRST_PLAYER_CONTROL;
+        message.payload.widget.id = position + TOWN_THIEVES_FIRST_PLAYER_CONTROL;
         message.payload.widget.data.text = gText;
         window->BroadcastMessage(message);
 
@@ -2954,10 +3005,10 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
             strongestHeroPosition = -1;
             strongestHeroValue = 0;
             for (heroPosition = 0;
-                 heroPosition < gpGame->m_players[playerIndex].heroCount;
+                 heroPosition < gpGame->m_players[rank].heroCount;
                  ++heroPosition) {
                 strongestHero = &gpGame->m_heroRecs[
-                    gpGame->m_players[playerIndex].heroes[heroPosition]];
+                    gpGame->m_players[rank].heroes[heroPosition]];
                 heroValue = gpPhilAI->FightValueOfStack(
                     &strongestHero->m_army, strongestHero, 0, 0, 0, 0);
                 if (strongestHeroValue < heroValue) {
@@ -2968,16 +3019,16 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
 
             if (strongestHeroPosition != -1) {
                 strongestHero = &gpGame->m_heroRecs[
-                    gpGame->m_players[playerIndex]
+                    gpGame->m_players[rank]
                         .heroes[strongestHeroPosition]];
                 iconControl = new iconWidget(
-                    static_cast<short>(displayPlayer * 0x44 + 0xf6),
+                    static_cast<short>(position * 0x44 + 0xf6),
                     0x12d, 0, 0, "locators.icn", 0x16, 0, -1, 0x10, 1);
                 if (iconControl == 0)
                     MemError();
                 window->AddWidget(iconControl, -1);
                 iconControl = new iconWidget(
-                    static_cast<short>(displayPlayer * 0x44 + 0xed),
+                    static_cast<short>(position * 0x44 + 0xed),
                     300, 0, 0, "miniport.icn",
                     strongestHero->m_portrait, 0, -1, 0x10, 1);
                 if (iconControl == 0)
@@ -2989,7 +3040,7 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
             } else {
                 if (strongestHeroPosition != -1) {
                     strongestHero = &gpGame->m_heroRecs[
-                        gpGame->m_players[playerIndex]
+                        gpGame->m_players[rank]
                             .heroes[strongestHeroPosition]];
                     sprintf(gText, "Att.\nDef.\nPower\nKnowl.");
                     widgetText = static_cast<char *>(BaseAlloc(
@@ -2999,15 +3050,17 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
                             TOWN_THIEVES_SOURCE_LINE_HERO_LABELS));
                     strcpy(widgetText, gText);
                     textControl = new textWidget(
-                        static_cast<short>(displayPlayer * 0x44 + 0xef),
+                        static_cast<short>(position * 0x44 + 0xef),
                         0x153, 0x28, 0x30, widgetText, "smalfont.fnt",
                         1, -1, 0x200, 0);
                     window->AddWidget(textControl, -1);
 
                     sprintf(gText, "");
-                    for (stat = 0; stat < TOWN_THIEVES_PRIMARY_STAT_COUNT;
-                         ++stat) {
-                        sprintf(statText, "%d\n", strongestHero->Stats(stat));
+                    for (heroPosition = 0;
+                         heroPosition < TOWN_THIEVES_PRIMARY_STAT_COUNT;
+                         ++heroPosition) {
+                        sprintf(statText, "%d\n",
+                                strongestHero->Stats(heroPosition));
                         strcat(gText, statText);
                     }
                     widgetText = static_cast<char *>(BaseAlloc(
@@ -3017,7 +3070,7 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
                             TOWN_THIEVES_SOURCE_LINE_HERO_STATS));
                     strcpy(widgetText, gText);
                     textControl = new textWidget(
-                        static_cast<short>(displayPlayer * 0x44 + 0x11c),
+                        static_cast<short>(position * 0x44 + 0x11c),
                         0x153, 0xf, 0x30, widgetText, "smalfont.fnt",
                         1, -1, 0x200, 0);
                     window->AddWidget(textControl, -1);
@@ -3026,7 +3079,7 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
                 if (informationLevel < TOWN_THIEVES_INFO_PERSONALITY) {
                 } else {
                     strcpy(gText, cPersonality[
-                        gpGame->m_players[playerIndex].unknown0f]);
+                        gpGame->m_players[rank].unknown0f]);
                     widgetText = static_cast<char *>(BaseAlloc(
                         strlen(gText) + 1,
                         "I:\\Projects\\Heroes\\Prog\\SOURCE\\TOWNMGR.CPP",
@@ -3034,7 +3087,7 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
                             TOWN_THIEVES_SOURCE_LINE_PERSONALITY));
                     strcpy(widgetText, gText);
                     textControl = new textWidget(
-                        static_cast<short>(displayPlayer * 0x44 + 0xe3),
+                        static_cast<short>(position * 0x44 + 0xe3),
                         0x18d, 0x4a, 0x10, widgetText, "smalfont.fnt",
                         1, -1, 8, 1);
                     window->AddWidget(textControl, -1);
@@ -3044,13 +3097,13 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
                     } else {
                         strongestCreature = -1;
                         strongestCreatureValue = 0;
-                        for (townPosition = 0;
-                             townPosition <
-                             gpGame->m_players[playerIndex].townCount;
-                             ++townPosition) {
+                        for (heroPosition = 0;
+                             heroPosition <
+                             gpGame->m_players[rank].townCount;
+                             ++heroPosition) {
                             playerTown = &gpGame->m_castleRecs[
-                                gpGame->m_players[playerIndex]
-                                    .towns[townPosition]];
+                                gpGame->m_players[rank]
+                                    .towns[heroPosition]];
                             for (armySlot = 0;
                                  armySlot < TOWN_ARMY_SLOT_COUNT; ++armySlot) {
                                 if (playerTown->m_army
@@ -3074,10 +3127,10 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
                         }
                         for (heroPosition = 0;
                              heroPosition <
-                             gpGame->m_players[playerIndex].heroCount;
+                             gpGame->m_players[rank].heroCount;
                              ++heroPosition) {
                             strongestHero = &gpGame->m_heroRecs[
-                                gpGame->m_players[playerIndex]
+                                gpGame->m_players[rank]
                                     .heroes[heroPosition]];
                             for (armySlot = 0;
                                  armySlot < TOWN_ARMY_SLOT_COUNT; ++armySlot) {
@@ -3103,7 +3156,7 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
                         if (strongestCreature != -1) {
                             iconControl = new iconWidget(
                                 static_cast<short>(
-                                    displayPlayer * 0x44 + 0xf4),
+                                    position * 0x44 + 0xf4),
                                 0x1a2, 0x28, 0x22, "mons32.icn",
                                 static_cast<short>(strongestCreature),
                                 0, -1, 0x11, 1);
@@ -3115,10 +3168,15 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
                 }
             }
         }
-        ++playerIndex;
+        ++rank;
     }
 }
 
+// @match-note 98.90%: complete all ten category cases, exact 0x2c frame, and
+// all 42/42 relocations agree. Prologue and first 33 normalized instructions
+// are identical; objdiff then loses identity at the delinked category switch
+// dispatch while the case bodies and external targets remain aligned. Revisit
+// switch-label layout at SOURCE 95%.
 VA(0x0041b692, 0x56a)
 void GetCategoryStats(int category, long int * const stats,
                       signed char * const order)
@@ -3242,7 +3300,7 @@ void SortStats(long int * const stats, signed char * const order)
          ++firstPlayer) {
         for (secondPlayer = firstPlayer + 1;
              secondPlayer < gpGame->m_playerCount; ++secondPlayer) {
-            if (stats[firstPlayer] < stats[secondPlayer]) {
+            if (stats[secondPlayer] > stats[firstPlayer]) {
                 tempStat = stats[firstPlayer];
                 stats[firstPlayer] = stats[secondPlayer];
                 stats[secondPlayer] = tempStat;
