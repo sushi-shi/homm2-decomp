@@ -4,7 +4,7 @@ The final-link target reconstructs the shipping executable's Win32 resources as
 structured linker input. `ninja link-resources` reads the user's
 `build/orig/HEROES2W.EXE` and writes:
 
-- `build/link/HEROES2W.res`, a standard Win32 resource stream consumed by LINK 4.20.
+- `build/link/HEROES2W.res`, a standard Win32 resource stream consumed by the pinned LINK 3.00.
 - `build/link/HEROES2W.resources.json`, a resource identity and size inventory.
 
 No retail resource payload is committed to the repository. The extractor walks the
