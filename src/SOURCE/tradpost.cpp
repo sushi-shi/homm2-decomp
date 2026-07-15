@@ -21,11 +21,13 @@
 
 VA(0x004bf340, 0x165)
 void DoTradingPost(int isMarketplace, float efficiency) {
+    tag_message messageTemp;
+
+    bIsMarketPlace = isMarketplace;
     fTradingPostEfficiency = efficiency;
     bTradeMade = 0;
     tpX = TRADING_POST_WINDOW_X;
     tpY = TRADING_POST_WINDOW_Y;
-    bIsMarketPlace = isMarketplace;
     tpWindow = new heroWindow(tpX, tpY, "tradpost.bin");
     if (tpWindow == 0)
         MemError();
@@ -43,33 +45,41 @@ void DoTradingPost(int isMarketplace, float efficiency) {
     delete tpWindow;
 }
 
+// @semantic 99.64%: complete text, control-state, offer-icon, ratio, and knob CFG;
+// the 0x3c frame and all recovered local slots agree. Candidate span is 0x597
+// versus 0x596 retail code, with 312/312 non-jump instructions and 23/23 jumps.
+// The visible residual is the selected-resource compare loading the loop local
+// before the global instead of after it. All 112 relocations agree as a multiset;
+// ordered review has five commutative swapped pairs (three left/right validity
+// tests and two qty/ratio products). Reversing those expressions was byte-identical;
+// the De Morgan selection predicate worsened block order. Revisit after TU state changes.
 VA(0x004bf4a5, 0x596)
 void UpdateTradingPost(int draw) {
-    tag_message message;
-    int ratio;
-    int maxTrade;
-    int leftDenominated;
-    int offered;
-    int requested;
-    int side;
+    tag_message messageTemp;
+    int ratioLocal;
+    int maxTradeField;
+    int leftDenominatedLocal;
+    int offeredValue;
+    int requestedValue;
+    int sideCurrent;
     int resource;
 
-    message.type = MESSAGE_WIDGET;
+    messageTemp.type = MESSAGE_WIDGET;
     if (leftResource != -1 && rightResource != -1 &&
-        rightResource != leftResource) {
+        leftResource != rightResource) {
         if (bLeftDenominated != 0) {
-            requested = 1;
-            offered = iTradeRatio;
+            requestedValue = 1;
+            offeredValue = iTradeRatio;
         } else {
-            requested = iTradeRatio;
-            offered = 1;
+            requestedValue = iTradeRatio;
+            offeredValue = 1;
         }
         sprintf(gText,
                 "{%s}\n\nI can offer you %d %s of %s for %d %s of %s.",
                 bIsMarketPlace != 0 ? "Marketplace" : "Trading Post",
-                offered, offered > 1 ? "units" : "unit",
-                gResourceNames[rightResource], requested,
-                requested > 1 ? "units" : "unit",
+                offeredValue, offeredValue > 1 ? "units" : "unit",
+                gResourceNames[rightResource], requestedValue,
+                requestedValue > 1 ? "units" : "unit",
                 gResourceNames[leftResource]);
     } else if (bTradeMade != 0) {
         sprintf(gText,
@@ -80,100 +90,105 @@ void UpdateTradingPost(int draw) {
                 "{%s}\n\nPlease inspect our fine wares.  If you feel like offering a trade, click on the items you wish to trade with and for.",
                 bIsMarketPlace != 0 ? "Marketplace" : "Trading Post");
     }
-    message.payload.widget.command = TRADING_POST_SET_TEXT;
-    message.payload.widget.id = 1;
-    message.payload.widget.data.text = gText;
-    tpWindow->BroadcastMessage(message);
+    messageTemp.type = MESSAGE_WIDGET;
+    messageTemp.payload.widget.command = TRADING_POST_SET_TEXT;
+    messageTemp.payload.widget.id = 1;
+    messageTemp.payload.widget.data.text = gText;
+    tpWindow->BroadcastMessage(messageTemp);
 
     for (resource = TRADING_POST_CONTROL_FIRST;
          resource <= TRADING_POST_CONTROL_LAST; resource++) {
         if (leftResource != -1 && rightResource != -1 &&
-            rightResource != leftResource)
-            message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
+            leftResource != rightResource)
+            messageTemp.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
         else
-            message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message.payload.widget.id = resource;
-        message.payload.widget.data.value = WIDGET_FLAG_ENABLED;
-        tpWindow->BroadcastMessage(message);
+            messageTemp.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
+        messageTemp.payload.widget.id = resource;
+        messageTemp.payload.widget.data.value =
+            WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW;
+        tpWindow->BroadcastMessage(messageTemp);
     }
 
-    for (side = 0; side < 2; side++) {
+    for (sideCurrent = 0; sideCurrent < 2; sideCurrent++) {
         if (leftResource != -1 && rightResource != -1 &&
-            rightResource != leftResource) {
-            message.payload.widget.command = TRADING_POST_SET_ICON;
-            if (side == 0) {
-                message.payload.widget.id = TRADING_POST_LEFT_OFFER_ICON;
-                message.payload.widget.data.value = leftResource;
+            leftResource != rightResource) {
+            messageTemp.payload.widget.command = TRADING_POST_SET_ICON;
+            if (sideCurrent == 0) {
+                messageTemp.payload.widget.id = TRADING_POST_LEFT_OFFER_ICON;
             } else {
-                message.payload.widget.id = TRADING_POST_RIGHT_OFFER_ICON;
-                message.payload.widget.data.value = rightResource;
+                messageTemp.payload.widget.id = TRADING_POST_RIGHT_OFFER_ICON;
             }
-            tpWindow->BroadcastMessage(message);
-            message.payload.widget.command = TRADING_POST_SET_TEXT;
-            message.payload.widget.data.text = gText;
-            if (side == 0) {
-                message.payload.widget.id = TRADING_POST_LEFT_OFFER_TEXT;
+            if (sideCurrent == 0) {
+                messageTemp.payload.widget.data.value = leftResource;
+            } else {
+                messageTemp.payload.widget.data.value = rightResource;
+            }
+            tpWindow->BroadcastMessage(messageTemp);
+            messageTemp.payload.widget.command = TRADING_POST_SET_TEXT;
+            messageTemp.payload.widget.data.text = gText;
+            if (sideCurrent == 0) {
+                messageTemp.payload.widget.id = TRADING_POST_LEFT_OFFER_TEXT;
                 if (bLeftDenominated != 0)
                     sprintf(gText, "%d", qtyToTrade);
                 else
                     sprintf(gText, "%d", qtyToTrade * iTradeRatio);
             } else {
-                message.payload.widget.id = TRADING_POST_RIGHT_OFFER_TEXT;
+                messageTemp.payload.widget.id = TRADING_POST_RIGHT_OFFER_TEXT;
                 if (bLeftDenominated != 0)
                     sprintf(gText, "%d", qtyToTrade * iTradeRatio);
                 else
                     sprintf(gText, "%d", qtyToTrade);
             }
-            tpWindow->BroadcastMessage(message);
+            tpWindow->BroadcastMessage(messageTemp);
         }
 
         for (resource = 0; resource < TRADING_POST_RESOURCE_COUNT; resource++) {
-            message.payload.widget.command = TRADING_POST_SET_TEXT;
-            message.payload.widget.data.text = gText;
-            if (side == 0) {
-                message.payload.widget.id =
+            messageTemp.payload.widget.command = TRADING_POST_SET_TEXT;
+            messageTemp.payload.widget.data.text = gText;
+            if (sideCurrent == 0) {
+                messageTemp.payload.widget.id =
                     TRADING_POST_LEFT_TEXT_FIRST + resource;
                 sprintf(gText, "%d", gpCurPlayer->m_resources[resource]);
             } else {
-                message.payload.widget.id =
+                messageTemp.payload.widget.id =
                     TRADING_POST_RIGHT_TEXT_FIRST + resource;
                 if (leftResource != -1) {
                     if (resource == leftResource) {
                         sprintf(gText, "n/a");
                     } else {
-                        ComputeTradeRatios(leftResource, resource, &ratio,
-                                           &leftDenominated, &maxTrade);
-                        if (leftDenominated != 0)
-                            sprintf(gText, "%d", ratio);
+                        ComputeTradeRatios(leftResource, resource, &ratioLocal,
+                                           &leftDenominatedLocal, &maxTradeField);
+                        if (leftDenominatedLocal != 0)
+                            sprintf(gText, "%d", ratioLocal);
                         else
-                            sprintf(gText, "1/%d", ratio);
+                            sprintf(gText, "1/%d", ratioLocal);
                     }
                 } else {
                     sprintf(gText, "");
                 }
             }
-            tpWindow->BroadcastMessage(message);
-            if ((side == 0 && resource == leftResource) ||
-                (side == 1 && resource == rightResource))
-                message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
+            tpWindow->BroadcastMessage(messageTemp);
+            if ((sideCurrent == 0 && leftResource == resource) ||
+                (sideCurrent == 1 && rightResource == resource))
+                messageTemp.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
             else
-                message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            if (side == 0)
-                message.payload.widget.id =
+                messageTemp.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
+            if (sideCurrent == 0)
+                messageTemp.payload.widget.id =
                     TRADING_POST_LEFT_ICON_FIRST + resource;
             else
-                message.payload.widget.id =
+                messageTemp.payload.widget.id =
                     TRADING_POST_RIGHT_ICON_FIRST + resource;
-            message.payload.widget.data.value = WIDGET_FLAG_DRAW;
-            tpWindow->BroadcastMessage(message);
+            messageTemp.payload.widget.data.value = WIDGET_FLAG_DRAW;
+            tpWindow->BroadcastMessage(messageTemp);
         }
     }
-    if (iMaxUnitsToTrade == 0)
-        tradeKnob->m_x = TRADING_POST_KNOB_X;
-    else
+    if (iMaxUnitsToTrade != 0)
         tradeKnob->m_x = static_cast<short>(
             qtyToTrade * TRADING_POST_KNOB_TRAVEL / iMaxUnitsToTrade +
             TRADING_POST_KNOB_X);
+    else
+        tradeKnob->m_x = TRADING_POST_KNOB_X;
     if (draw != 0) {
         tpWindow->DrawWindow(0);
         gpWindowManager->UpdateScreenRegion(tpX + 0x20, tpY, 0x102, 0x1a2);
@@ -183,10 +198,10 @@ void UpdateTradingPost(int draw) {
 VA(0x004bfa3b, 0xfe)
 void ComputeTradeRatios(int sourceResource, int destinationResource, int *ratio,
                         int *leftDenominated, int *maxTrade) {
-    float sourceValue = coreRatio[sourceResource] * fTradingPostEfficiency;
-    float destinationValue =
+    float sourceValueLocal = coreRatio[sourceResource] * fTradingPostEfficiency;
+    float destinationValueValue =
         static_cast<unsigned int>(coreRatio[destinationResource]);
-    float tradeRatio = destinationValue / sourceValue;
+    float tradeRatio = destinationValueValue / sourceValueLocal;
 
     if (tradeRatio >= 1.0f) {
         *leftDenominated = 0;
@@ -238,24 +253,35 @@ void SetupNewTrade(void) {
                        &bLeftDenominated, &iMaxUnitsToTrade);
 }
 
+// @semantic 99.41%: complete nested select/deselect switches, case-body order,
+// 0x20 frame, stack slots, and embedded pointer/index tables. Both object spans
+// are 0x3b8 (retail code 0x3b6); excluding table data leaves 154/154 non-jump
+// instructions and 25/25 jumps. The four residual sites are commuted comparisons:
+// the upper clamp, left and right resource selection, and increment bound.
+// All 51 relocations agree as a multiset; ordered review has four swapped external
+// pairs (clamp, two qty/ratio products, increment), while local-table spellings are
+// delinker aliases. Direct commuted spellings compiled byte-identically.
 VA(0x004bfcbb, 0x3b6)
 int TradingPostHandler(struct tag_message &message) {
-    int exitDialog = 0;
+    int exitFlag = 0;
     int updateDisplay = 0;
-    int resource;
+    int resourceData;
+    int knobPositionValue;
 
     if (message.type == MESSAGE_WIDGET) {
-        if (message.payload.widget.command == WIDGET_COMMAND_SELECT) {
+        switch (message.payload.widget.command) {
+        case WIDGET_COMMAND_SELECT:
             switch (message.payload.widget.id) {
             case TRADING_POST_TRACK:
-                if (iMaxUnitsToTrade != 0) {
-                    qtyToTrade = (iMaxUnitsToTrade + 1) *
-                        (message.payload.widget.screenX - tpX -
-                         TRADING_POST_KNOB_TRACK_OFFSET) /
+                if (iMaxUnitsToTrade == 0) {
+                } else {
+                    knobPositionValue = message.payload.widget.screenX - tpX -
+                                        TRADING_POST_KNOB_TRACK_OFFSET;
+                    qtyToTrade = (iMaxUnitsToTrade + 1) * knobPositionValue /
                         TRADING_POST_KNOB_TRACK_WIDTH;
                     if (qtyToTrade < 0)
                         qtyToTrade = 0;
-                    if (qtyToTrade > iMaxUnitsToTrade)
+                    if (iMaxUnitsToTrade < qtyToTrade)
                         qtyToTrade = iMaxUnitsToTrade;
                     updateDisplay = 1;
                 }
@@ -270,11 +296,11 @@ int TradingPostHandler(struct tag_message &message) {
             case TRADING_POST_LEFT_SELECT_FIRST + 4:
             case TRADING_POST_LEFT_SELECT_FIRST + 5:
             case TRADING_POST_LEFT_SELECT_FIRST + 6:
-                updateDisplay = message.payload.widget.id -
-                                TRADING_POST_LEFT_SELECT_FIRST != leftResource;
-                if (updateDisplay) {
-                    leftResource = message.payload.widget.id -
-                                   TRADING_POST_LEFT_SELECT_FIRST;
+                resourceData = message.payload.widget.id -
+                               TRADING_POST_LEFT_SELECT_FIRST;
+                if (leftResource != resourceData) {
+                    leftResource = resourceData;
+                    updateDisplay = 1;
                     SetupNewTrade();
                 }
                 break;
@@ -285,48 +311,58 @@ int TradingPostHandler(struct tag_message &message) {
             case TRADING_POST_RIGHT_SELECT_FIRST + 4:
             case TRADING_POST_RIGHT_SELECT_FIRST + 5:
             case TRADING_POST_RIGHT_SELECT_FIRST + 6:
-                resource = message.payload.widget.id -
-                           TRADING_POST_RIGHT_SELECT_FIRST;
-                if (resource != rightResource) {
-                    rightResource = resource;
+                resourceData = message.payload.widget.id -
+                               TRADING_POST_RIGHT_SELECT_FIRST;
+                if (rightResource != resourceData) {
+                    rightResource = resourceData;
                     updateDisplay = 1;
                     if (leftResource != -1)
                         SetupNewTrade();
                 }
                 break;
             }
-        } else if (message.payload.widget.command == WIDGET_COMMAND_DESELECT) {
-            if (message.payload.widget.id == NORMAL_DIALOG_BUTTON_TWO) {
-                exitDialog = 1;
-            } else if (message.payload.widget.id == TRADING_POST_DECREMENT) {
-                updateDisplay = qtyToTrade > 0;
-                if (updateDisplay)
-                    qtyToTrade--;
-            } else if (message.payload.widget.id == TRADING_POST_INCREMENT) {
-                updateDisplay = qtyToTrade < iMaxUnitsToTrade;
-                if (updateDisplay)
-                    qtyToTrade++;
-            } else if (message.payload.widget.id == TRADING_POST_EXECUTE &&
-                       qtyToTrade != 0) {
-                if (bLeftDenominated == 0) {
-                    gpCurPlayer->m_resources[leftResource] -=
-                        qtyToTrade * iTradeRatio;
-                    gpCurPlayer->m_resources[rightResource] += qtyToTrade;
-                } else {
+            break;
+        case WIDGET_COMMAND_DESELECT:
+            switch (message.payload.widget.id) {
+            case NORMAL_DIALOG_BUTTON_TWO:
+                exitFlag = 1;
+                break;
+            case TRADING_POST_EXECUTE:
+                if (qtyToTrade == 0)
+                    break;
+                if (bLeftDenominated != 0) {
                     gpCurPlayer->m_resources[leftResource] -= qtyToTrade;
                     gpCurPlayer->m_resources[rightResource] +=
                         qtyToTrade * iTradeRatio;
+                } else {
+                    gpCurPlayer->m_resources[leftResource] -=
+                        qtyToTrade * iTradeRatio;
+                    gpCurPlayer->m_resources[rightResource] += qtyToTrade;
                 }
                 bTradeMade = 1;
                 rightResource = -1;
                 leftResource = rightResource;
                 updateDisplay = 1;
+                break;
+            case TRADING_POST_DECREMENT:
+                if (qtyToTrade > 0) {
+                    --qtyToTrade;
+                    updateDisplay = 1;
+                }
+                break;
+            case TRADING_POST_INCREMENT:
+                if (iMaxUnitsToTrade > qtyToTrade) {
+                    ++qtyToTrade;
+                    updateDisplay = 1;
+                }
+                break;
             }
+            break;
         }
     }
     if (updateDisplay)
         UpdateTradingPost(1);
-    if (exitDialog) {
+    if (exitFlag) {
         message.payload.widget.id = WIDGET_COMMAND_DIALOG_SELECT;
         message.payload.widget.command = message.payload.widget.id;
         return TRADING_POST_HANDLER_EXIT;
