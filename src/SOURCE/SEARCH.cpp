@@ -47,23 +47,27 @@ DATA(0x0052a258) static signed char s_directionCosts[SEARCH_DIRECTION_COUNT];
 DATA(0x0052a260) static hero *s_currentHero;
 
 // @match-note
-// /O2 structural checkpoint: complete loop/CFG and FPO frame; base is 0xbc bytes versus
-// retail 0xc0 (the extra retail bytes are trailing alignment). First divergence is +0x0:
-// base stores m_pathLength before saving EBX, while retail saves EBX and materializes the
-// path pointer in EAX first. Relocs are 3/3; retail's normalDirTable.y relocation is delinked
-// as the adjacent local ??_C alias, and the other external targets agree. Tried path/length
-// declaration order, path-vs-aiPath union spellings, register pointer, condition polarity,
-// multiplication order, and shared-return CFG. Revisit in the post-95 /O2 register pass.
+// /O2 structural checkpoint: complete loop/CFG and FPO saved-register set; base has
+// 0xbc meaningful bytes versus retail 0xbc plus a four-byte trailing alignment LEA.
+// First divergence is +0x0: base loads destination X into EAX before saving EBX,
+// while retail saves EBX and materializes the path cursor in EAX first. Relocs are
+// 3/3; retail's normalDirTable.y relocation is delinked as the adjacent local ??_C
+// alias, and MAP_WIDTH agrees. Tried explicit and register cursors, direct member
+// indexing, comma sequencing, coordinate aliases, both union views, condition
+// polarity, multiplication order, and shared-return CFG. Revisit in the 95% /O2 pass.
 VA(0x004a25e0, 0xc0)
 int searchArray::BuildPath(int startX, int startY, int destinationX,
                            int destinationY, int maximumCost)
 {
-    register signed char *pathDirection = &m_storage.path.directions[1];
+    register int currentDestinationX = destinationX;
+    register int currentDestinationY = destinationY;
+    signed char *pathDirection = &m_storage.path.directions[1];
     m_pathLength = 0;
-    while (startX != destinationX || startY != destinationY) {
+    while (startX != currentDestinationX || startY != currentDestinationY) {
         searchNode *node =
-            m_storage.nodes + destinationY * MAP_WIDTH + destinationX;
-        if (node->x != destinationX && node->y != destinationY)
+            m_storage.nodes + currentDestinationY * MAP_WIDTH +
+                currentDestinationX;
+        if (node->x != currentDestinationX && node->y != currentDestinationY)
             return 0;
         if (node->distance <= maximumCost) {
             *pathDirection = node->direction;
@@ -76,22 +80,23 @@ int searchArray::BuildPath(int startX, int startY, int destinationX,
         }
         int reverseDirection =
             (node->direction + SEARCH_DIRECTION_REVERSE) & SEARCH_DIRECTION_MASK;
-        destinationX += normalDirTable[reverseDirection].x;
-        destinationY += normalDirTable[reverseDirection].y;
+        currentDestinationX += normalDirTable[reverseDirection].x;
+        currentDestinationY += normalDirTable[reverseDirection].y;
     }
     return m_pathLength;
 }
 
 // @match-note
-// /O2 structural checkpoint: complete semantics, 1024x9 queue layout, FPO frame, stack
-// arguments, case/loop CFG, and call order; base is 0x9e3 bytes versus retail 0x9df. First
-// divergence is the prologue: base `push ebx; push esi; mov ebx,[esp+0x34]`, retail
-// `push ebx; push esi; push edi; mov esi,ecx`. The aligned body then swaps ESI/EDI live
-// ranges for this/targetX. Relocs are base 234/retail 232; the two only-base entries are
-// normalDirTable.y references delinked in retail as adjacent local ??_C aliases; all external
-// globals and callees agree. Tried positive branch polarity, the shared continuation label,
-// nested CalcTerrainCost arguments, direct queue indexing, register/const aliases, alias
-// declaration orders, and an explicit reset live range. Revisit in the post-95 /O2 pass.
+// /O2 structural checkpoint: complete semantics, 1024x9 queue layout, stack arguments,
+// call order, and bottom-tested queue CFG. The FPO prologue is exact: EBX/ESI/EDI/EBP
+// are saved, this is ESI, continueSeed is EBX, and target X is EDI. Base has 0x9ea
+// meaningful bytes versus retail 0x9df plus one pad byte. The first code divergence is
+// target visibility indexing: base adds mapExtra before target X and tests [EAX+EDI],
+// while retail adds target X first and tests [EAX+ECX]. Relocs are base 234/retail 232;
+// the two extra base entries are normalDirTable.y references delinked in retail as local
+// ??_C aliases, and every external global/callee count agrees. Tried direct/local target
+// indexing, branch polarities, nested cost arguments, queue aliases, register/const alias
+// orders, and both top- and bottom-tested queue loops. Revisit in the 95% /O2 pass.
 VA(0x004a26a0, 0x9df)
 void searchArray::SeedPosition(int seedX, int seedY, int seedDirection,
                                int maximumCost, int waterMode,
@@ -162,82 +167,7 @@ continue_check:
 seed_loop:
     s_currentHero = gpGame->GetHero(gpCurPlayer->m_currentHero);
 
-    for (;;) {
-        if (search->m_queueSize == 0) {
-            if (scanMap) {
-                s_mapX = 0;
-                if (MAP_WIDTH > 0) {
-                    do {
-                        s_mapY = 0;
-                        if (MAP_WIDTH > 0) {
-                            do {
-                                mapCell *mapPosition =
-                                    gpAdvManager->GetCell(s_mapX, s_mapY);
-                                if ((mapPosition->triggerType & SEARCH_TRIGGER_MASK) ==
-                                    SEARCH_TRIGGER_MONSTER) {
-                                    s_targetCell =
-                                        gpAdvManager->GetCell(s_mapX, s_mapY);
-                                    s_direction = 0;
-                                    do {
-                                        s_adjacentX = normalDirTable[s_direction].x + s_mapX;
-                                        s_candidateY = normalDirTable[s_direction].y + s_mapY;
-                                        if (s_adjacentX >= 0 && s_adjacentX < MAP_WIDTH &&
-                                            s_candidateY >= 0 && s_candidateY < MAP_HEIGHT) {
-                                            s_neighborCell = gpAdvManager->GetCell(
-                                                s_adjacentX, s_candidateY);
-                                            s_directionBlocked = 1;
-                                            if (((1 << s_direction) &
-                                                 SEARCH_DIRECTION_OBJECT_MASK) != 0 &&
-                                                s_neighborCell->objIndex != SEARCH_NO_OBJECT &&
-                                                (s_neighborCell->m_objTypeBits &
-                                                 SEARCH_OBJECT_TYPE_MASK) !=
-                                                    SEARCH_BLOCKING_OBJECT_TYPE &&
-                                                !(s_neighborCell->field8 &
-                                                  SEARCH_CELL_BLOCKED)) {
-                                                s_directionBlocked = 0;
-                                            }
-
-                                            int adjacentIndex =
-                                                MAP_WIDTH * s_candidateY + s_adjacentX;
-                                            if (s_directionBlocked &&
-                                                search->m_storage.nodes[adjacentIndex].visited &&
-                                                !(s_neighborCell->triggerType &
-                                                  SEARCH_CELL_BLOCKED)) {
-                                                s_terrain = giGroundToTerrain[
-                                                    s_neighborCell->tile];
-                                                s_adjacentCost = search->m_storage
-                                                    .nodes[adjacentIndex].distance;
-                                                search->PushPoint(
-                                                    s_mapX, s_mapY,
-                                                    (s_direction + SEARCH_DIRECTION_REVERSE) &
-                                                        SEARCH_DIRECTION_MASK,
-                                                    s_adjacentCost + CalcTerrainCost(
-                                                        s_terrain, s_direction,
-                                                        giCurTempMobility - s_adjacentCost,
-                                                        pathfindingSkill,
-                                                        (s_neighborCell->m_objTypeBits & 2) >> 1,
-                                                        (s_targetCell->m_objTypeBits & 2) >> 1),
-                                                    maximumCost, 1, 0,
-                                                    SEARCH_INVALID_COORDINATE,
-                                                    SEARCH_INVALID_COORDINATE, 0,
-                                                    SEARCH_INVALID_COORDINATE,
-                                                    SEARCH_INVALID_COORDINATE);
-                                            }
-                                        }
-                                        ++s_direction;
-                                    } while (s_direction < SEARCH_DIRECTION_COUNT);
-                                }
-                                ++s_mapY;
-                            } while (s_mapY < MAP_WIDTH);
-                        }
-                        ++s_mapX;
-                    } while (s_mapX < MAP_WIDTH);
-                }
-            }
-            giFullySeeded = 1;
-            return;
-        }
-
+    while (search->m_queueSize != 0) {
         --search->m_queueSize;
         s_currentNode = search->m_queue[search->m_queueSize];
 
@@ -379,4 +309,79 @@ expand_directions:
 point_complete:
         s_processedPointCount++;
     }
+
+    if (scanMap) {
+        s_mapX = 0;
+        if (MAP_WIDTH > 0) {
+            do {
+                s_mapY = 0;
+                if (MAP_WIDTH > 0) {
+                    do {
+                        mapCell *mapPosition =
+                            gpAdvManager->GetCell(s_mapX, s_mapY);
+                        if ((mapPosition->triggerType & SEARCH_TRIGGER_MASK) ==
+                            SEARCH_TRIGGER_MONSTER) {
+                            s_targetCell = gpAdvManager->GetCell(s_mapX, s_mapY);
+                            s_direction = 0;
+                            do {
+                                s_adjacentX =
+                                    normalDirTable[s_direction].x + s_mapX;
+                                s_candidateY =
+                                    normalDirTable[s_direction].y + s_mapY;
+                                if (s_adjacentX >= 0 && s_adjacentX < MAP_WIDTH &&
+                                    s_candidateY >= 0 &&
+                                    s_candidateY < MAP_HEIGHT) {
+                                    s_neighborCell = gpAdvManager->GetCell(
+                                        s_adjacentX, s_candidateY);
+                                    s_directionBlocked = 1;
+                                    if (((1 << s_direction) &
+                                         SEARCH_DIRECTION_OBJECT_MASK) != 0 &&
+                                        s_neighborCell->objIndex != SEARCH_NO_OBJECT &&
+                                        (s_neighborCell->m_objTypeBits &
+                                         SEARCH_OBJECT_TYPE_MASK) !=
+                                            SEARCH_BLOCKING_OBJECT_TYPE &&
+                                        !(s_neighborCell->field8 &
+                                          SEARCH_CELL_BLOCKED)) {
+                                        s_directionBlocked = 0;
+                                    }
+
+                                    int adjacentIndex =
+                                        MAP_WIDTH * s_candidateY + s_adjacentX;
+                                    if (s_directionBlocked &&
+                                        search->m_storage.nodes[adjacentIndex].visited &&
+                                        !(s_neighborCell->triggerType &
+                                          SEARCH_CELL_BLOCKED)) {
+                                        s_terrain = giGroundToTerrain[
+                                            s_neighborCell->tile];
+                                        s_adjacentCost = search->m_storage
+                                            .nodes[adjacentIndex].distance;
+                                        search->PushPoint(
+                                            s_mapX, s_mapY,
+                                            (s_direction +
+                                             SEARCH_DIRECTION_REVERSE) &
+                                                SEARCH_DIRECTION_MASK,
+                                            s_adjacentCost + CalcTerrainCost(
+                                                s_terrain, s_direction,
+                                                giCurTempMobility - s_adjacentCost,
+                                                pathfindingSkill,
+                                                (s_neighborCell->m_objTypeBits & 2) >> 1,
+                                                (s_targetCell->m_objTypeBits & 2) >> 1),
+                                            maximumCost, 1, 0,
+                                            SEARCH_INVALID_COORDINATE,
+                                            SEARCH_INVALID_COORDINATE, 0,
+                                            SEARCH_INVALID_COORDINATE,
+                                            SEARCH_INVALID_COORDINATE);
+                                    }
+                                }
+                                ++s_direction;
+                            } while (s_direction < SEARCH_DIRECTION_COUNT);
+                        }
+                        ++s_mapY;
+                    } while (s_mapY < MAP_WIDTH);
+                }
+                ++s_mapX;
+            } while (s_mapX < MAP_WIDTH);
+        }
+    }
+    giFullySeeded = 1;
 }
