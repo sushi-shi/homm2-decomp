@@ -249,8 +249,10 @@ int heroWindowManager::ConvertToHover(struct tag_message &msg)
 // Seven unmasked bytes differ from +0x24 solely because retail loads the vtable
 // before storing message.payload.widget.data.value while base performs those two
 // operations in reverse; both make the same slot-2 virtual call. A 30-trial
-// guarded TU-state sweep (seed 0x484f4d32) left the score unchanged. Revisit after
-// a genuine combined-TU change; this is not a proven wall.
+// guarded TU-state sweep (seed 0x484f4d32) left the score unchanged. Moving the
+// final assignment into the return comma expression and calling through a
+// baseManager alias were byte-identical. Revisit after a genuine combined-TU
+// change; this is not a proven wall.
 VA(0x004cac40, 0x35)
 int heroWindowManager::BroadcastMessage(int type, int p2, int p3, int p4)
 {
@@ -269,8 +271,9 @@ int heroWindowManager::BroadcastMessage(int type, int p2, int p3, int p4)
 // `mov ebp,0` after the z == -1 branch; the three-byte encoding delta accounts for
 // the size difference. The only other instruction diff is EAX versus ECX for the
 // saved head snapshot. Nested/comma z forms and direct/cached/duplicated head forms
-// were tried; 30 guarded TU-state trials and 80 clang-AST iterations found no gain.
-// Revisit after a genuine combined-TU change; this is not a proven wall.
+// were tried; reusing the zOrder parameter was byte-identical. Thirty guarded
+// TU-state trials and 80 clang-AST iterations found no gain. Revisit after a
+// genuine combined-TU change; this is not a proven wall.
 VA(0x004cac80, 0xbc)
 void heroWindowManager::AddWindow(class heroWindow *w, int zOrder, int openFlags)
 {
@@ -532,19 +535,27 @@ VA(0x004cb1d0, 0x1)
 void CreateFizzleTables(void) {}
 
 // @match-note
-// Structurally complete /O2 checkpoint (live 89.80%; retained 93.51%): direct
-// clipping removed the decompiler-only coordinate snapshots, and declaring
-// `remaining` inside the non-empty row recovered retail's missing pixel-loop
-// block. Base is 0x416 bytes/308 instructions versus retail's 0x402/304; both
-// have the same 34-block, 19-branch ordered CFG and 0x2c frame. Manual COFF
-// review confirms all 33 relocations in the same target order (the helper
-// misidentifies duplicated delinker symbols). The first disassembly divergence
-// after clipping is register/stack coloring while saving `m_updateFlags`; all
-// eight resource/read/pixel/palette passes, delays, blits, deletes and frees
-// agree. Pixel variants tried: signed loads with casts, unsigned stepped loads,
-// and both operand orders of the combined 16-bit lookup; low-byte-first is best.
-// Revisit after a genuine predecessor/header TU-state change; this is not a
-// proven wall.
+// Structurally complete /O2 checkpoint (live 99.30%): declaring the three row
+// cursors in saved/work/screen order makes the prefix through row-pointer setup
+// byte-exact and reduces base to 0x404 bytes versus retail's 0x402. The first raw
+// divergence is +0x206: base loads screenOffset from [esp+24h] before x from
+// [esp+40h], while retail retains x in EDX and adds screenOffset afterward. At
+// +0x219 base reloads the row end into EDX and uses EDX for the 16-bit lookup;
+// retail loads the row end into EBX and uses EBX for that lookup. The row-backedge
+// compare polarity and three later palette-loop SIB encodings are equivalent.
+// Both retain the 0x2c frame and ordered CFG. Manual COFF review finds the same
+// 33 relocation identities in the same order: offsets agree through ReadBlock at
+// +0x1ab, then base's remaining 14 sites are +2 because of the pixel-block size
+// delta; homm2 relocs' base-only aliases are delinker duplicate-name failures.
+// The other five cursor declaration orders score 88.47-95.78%. Manager/source-row/
+// source-bitmap aliases, pointer-add and palette-index operand swaps, sequential
+// and split high/low lookup spellings, and loop-polarity swaps did not improve the
+// retained structure. An 80-iteration libclang AST pass pinned every sibling and
+// retained no mutation. This declaration state moves unchanged retained-exact
+// FadeScreen/DoDialog live output to 97.25/99.19%; fresh pinned AST passes on those
+// predecessors retained no mutation, so their exact-max 100 records carry this
+// TU-cumulative dip. Revisit after a genuine predecessor/header TU-state change;
+// this is not a proven wall.
 VA(0x004cb1e0, 0x402)
 void heroWindowManager::FizzleForward(int x, int y, int width, int height, int delay,
                                       signed char *startPalette, signed char *endPalette)
@@ -586,9 +597,9 @@ void heroWindowManager::FizzleForward(int x, int y, int width, int height, int d
                     do {
                         unsigned char *savedPixel = m_fizzleSource->m_pixels +
                             m_fizzleSource->m_width * (sourceY - y);
+                        unsigned char *workPixel = m_fizzleWork->m_pixels + workOffset;
                         unsigned char *screenPixel = m_screen->m_pixels +
                             x + screenOffset;
-                        unsigned char *workPixel = m_fizzleWork->m_pixels + workOffset;
                         if (x < x + width) {
                             int remaining = width;
                             do {
