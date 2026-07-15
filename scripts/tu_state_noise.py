@@ -7,9 +7,11 @@ curated includes before the target's ``VA`` metadata block, compiles the real tr
 unit with VC 4.2, scores the requested symbol with objdiff, and restores the source
 immediately.  Probe-emitted symbols/storage exist only in the disposable candidate object.
 
-The source is unchanged on normal exit, compiler failure, or Ctrl-C. Results, exact
-snippets, and COFF metrics are written to ``build/tu-state-noise``. Generated noise
-is diagnostic input only and is never written back to reconstructed source.
+The source is unchanged on normal exit, compiler failure, timeout, or Ctrl-C. Each
+baseline/trial compile has a bounded timeout; on expiry the complete compiler process
+group is terminated so Wine/MSVC descendants cannot survive. Results, exact snippets,
+and COFF metrics are written to ``build/tu-state-noise``. Generated noise is diagnostic
+input only and is never written back to reconstructed source.
 
 Run inside ``nix develop .#build`` after entering the worktree first::
 
@@ -58,6 +60,8 @@ CURATED_INCLUDES = (
     "<va.h>", "<Ints.h>", "<windows.h>", "<BASE/bitmap.h>",
     "<BASE/IconEntry.h>", "<BASE/WINMGR.h>",
 )
+DEFAULT_COMPILE_TIMEOUT_SECONDS = 120.0
+PROCESS_GROUP_TERMINATION_GRACE_SECONDS = 1.0
 
 
 class BaselineUpdateError(ValueError):
@@ -73,6 +77,16 @@ def parse_int(value: str) -> int:
         return int(value, 0)
     except ValueError as exc:
         raise argparse.ArgumentTypeError(f"invalid integer: {value}") from exc
+
+
+def positive_seconds(value: str) -> float:
+    try:
+        seconds = float(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(f"invalid timeout: {value}") from exc
+    if not math.isfinite(seconds) or seconds <= 0:
+        raise argparse.ArgumentTypeError("timeout must be a positive finite number")
+    return seconds
 
 
 @dataclass(frozen=True)
@@ -135,6 +149,7 @@ _LINE_DIRECTIVE = re.compile(r'^\s*#\s*line\s+(\d+)(?:\s+"[^"]*")?')
 _INCLUDE_DIRECTIVE = re.compile(r'^\s*#\s*include\s*[<"]([^>"]+)[>"]', re.M)
 _DEFINE_DIRECTIVE = re.compile(r'^\s*#\s*define\s+([A-Za-z_]\w*)', re.M)
 _IDENTIFIER = re.compile(r'\b[A-Za-z_]\w*\b')
+_VA_MARKER_LINE = re.compile(r'^[ \t]*VA\(0x[0-9a-f]+,', re.M | re.I)
 
 
 def logical_line_at(text: str, offset: int) -> int:
@@ -148,9 +163,22 @@ def logical_line_at(text: str, offset: int) -> int:
 
 def target_identifiers(text: str, target: Target) -> set[str]:
     """Conservative identifier census for the canonical target's VA-delimited block."""
-    end = text.find("\nVA(0x", target.marker_offset + 1)
-    block = text[target.marker_offset : end if end >= 0 else len(text)]
+    next_marker = _VA_MARKER_LINE.search(text, target.marker_offset + 1)
+    block = text[target.marker_offset : next_marker.start() if next_marker else len(text)]
     return set(_IDENTIFIER.findall(block))
+
+
+def target_suffix_digest(text: str, va: int) -> str | None:
+    """Hash the exact authored suffix beginning at one real target VA marker.
+
+    Noise is inserted before that marker, so suffix identity is a stronger and much
+    cheaper per-trial invariant than recomputing normalized hashes for the whole tree.
+    """
+    marker_pattern = re.compile(rf"^[ \t]*(VA\(0x{va:08x},)", re.M | re.I)
+    matches = list(marker_pattern.finditer(text))
+    if len(matches) != 1:
+        return None
+    return sha256_bytes(text[matches[0].start(1) :].encode("utf-8"))
 
 
 def _case_insensitive_child(parent: Path, relative: str) -> Path | None:
@@ -238,7 +266,11 @@ def resolve_target(root: Path, source_arg: Path, requested_rva: int) -> tuple[Ta
     text = source.read_text()
     va = rva + IMAGE_BASE
     marker = f"VA(0x{va:08x},"
-    positions = [match.start() for match in re.finditer(re.escape(marker), text)]
+    marker_pattern = re.compile(
+        rf"^[ \t]*(VA\(0x{va:08x},)",
+        re.M | re.I,
+    )
+    positions = [match.start(1) for match in marker_pattern.finditer(text)]
     if len(positions) != 1:
         raise ValueError(f"expected one source marker {marker}, found {len(positions)}")
     marker_offset = positions[0]
@@ -390,6 +422,27 @@ def temporary_source(path: Path, original: bytes, candidate: bytes):
         path.write_bytes(original)
 
 
+@contextmanager
+def measure_stage(timings: dict[str, dict[str, float | int]], stage: str):
+    """Accumulate monotonic wall time for one diagnostic pipeline stage."""
+    started = time.perf_counter()
+    try:
+        yield
+    finally:
+        entry = timings.setdefault(stage, {"seconds": 0.0, "calls": 0})
+        entry["seconds"] += time.perf_counter() - started
+        entry["calls"] += 1
+
+
+def format_timings(timings: dict[str, dict[str, float | int]]) -> str:
+    fields = []
+    for stage, entry in timings.items():
+        seconds = float(entry["seconds"])
+        calls = int(entry["calls"])
+        fields.append(f"{stage}={seconds:.3f}s/{calls} ({seconds / calls:.3f}s avg)")
+    return "timings: " + "; ".join(fields)
+
+
 def finalize_compiled_artifacts(
     scratch: tempfile.TemporaryDirectory,
     scratch_path: Path,
@@ -405,7 +458,59 @@ def finalize_compiled_artifacts(
     return None
 
 
-def compile_object(root: Path, source: Path, output: Path, flags: list[str]) -> tuple[bool, str]:
+def _terminate_process_group(process: subprocess.Popen) -> tuple[str, str]:
+    """Terminate and reap a process group created with ``start_new_session=True``."""
+    try:
+        os.killpg(process.pid, signal.SIGTERM)
+    except ProcessLookupError:
+        pass
+    try:
+        stdout, stderr = process.communicate(timeout=PROCESS_GROUP_TERMINATION_GRACE_SECONDS)
+    except subprocess.TimeoutExpired:
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+        stdout, stderr = process.communicate()
+    else:
+        # The session leader may have exited while a descendant closed its inherited
+        # pipes and ignored SIGTERM. Fail closed by killing any remaining group member.
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+    return stdout or "", stderr or ""
+
+
+def _run_command_with_timeout(
+    command: list[str], cwd: Path, timeout_seconds: float
+) -> tuple[int | None, str, str, bool]:
+    process = subprocess.Popen(
+        command,
+        cwd=cwd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        start_new_session=True,
+    )
+    try:
+        stdout, stderr = process.communicate(timeout=timeout_seconds)
+        return process.returncode, stdout or "", stderr or "", False
+    except subprocess.TimeoutExpired:
+        stdout, stderr = _terminate_process_group(process)
+        return process.returncode, stdout, stderr, True
+    except BaseException:
+        _terminate_process_group(process)
+        raise
+
+
+def compile_object(
+    root: Path,
+    source: Path,
+    output: Path,
+    flags: list[str],
+    timeout_seconds: float,
+) -> tuple[bool, str, bool]:
     command = [
         sys.executable,
         "-m",
@@ -417,9 +522,19 @@ def compile_object(root: Path, source: Path, output: Path, flags: list[str]) -> 
         "--",
         *flags,
     ]
-    result = subprocess.run(command, cwd=root, capture_output=True, text=True)
-    log = result.stdout + result.stderr
-    return result.returncode == 0 and output.exists(), log
+    returncode, stdout, stderr, timed_out = _run_command_with_timeout(
+        command, root, timeout_seconds
+    )
+    log = stdout + stderr
+    if timed_out:
+        output.unlink(missing_ok=True)
+        Path(str(output) + ".d").unlink(missing_ok=True)
+        log += (
+            f"\ncompile timed out after {timeout_seconds:g} seconds; "
+            "terminated compiler process group\n"
+        )
+        return False, log, True
+    return returncode == 0 and output.exists(), log, False
 
 
 def objdiff_scores(
@@ -518,14 +633,17 @@ def _exact_sibling_metric_regressions(
     return out
 
 
-def _predecessor_regressions(
-    target: Target, baseline_metrics: dict[str, dict], candidate_metrics: dict[str, dict], root: Path
-) -> list[str]:
+def predecessor_symbols(target: Target, root: Path) -> set[str]:
     with (root / "build/gen/symbol_names.csv").open(newline="") as handle:
-        predecessors = {
+        return {
             row["name"] for row in csv.DictReader(handle)
             if row["kind"] == "func" and row["unit"] == target.unit and int(row["rva"], 0) < target.rva
         }
+
+
+def _predecessor_regressions(
+    predecessors: set[str], baseline_metrics: dict[str, dict], candidate_metrics: dict[str, dict]
+) -> list[str]:
     return [
         f"predecessor raw/reloc metrics changed: {symbol}"
         for symbol in sorted(predecessors)
@@ -632,6 +750,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--source", required=True, type=Path, help="configured TU source path")
     parser.add_argument("--rva", required=True, type=parse_int, help="exact CodeView RVA or image VA")
     parser.add_argument("--trials", type=int, default=30, help="number of deterministic trials")
+    parser.add_argument(
+        "--compile-timeout-seconds",
+        type=positive_seconds,
+        default=DEFAULT_COMPILE_TIMEOUT_SECONDS,
+        help=(
+            "maximum seconds for each baseline/trial compile; a timeout terminates the "
+            "compiler process group (default: 120)"
+        ),
+    )
     parser.add_argument("--seed", type=parse_int, default=0x484F4D32)
     parser.add_argument(
         "--families", default=",".join(DEFAULT_FAMILIES),
@@ -675,6 +802,10 @@ def main(argv: list[str] | None = None) -> int:
         parser.error(f"normalized source hash is missing for {target.unit}::{target.symbol}")
     canonical_target_tokens = target_identifiers(original, target)
     target_token_digest = sha256_bytes("\n".join(sorted(canonical_target_tokens)).encode("utf-8"))
+    canonical_target_suffix_digest = target_suffix_digest(original, target.va)
+    if canonical_target_suffix_digest is None:
+        parser.error(f"target VA marker is not uniquely identifiable in {source_rel}")
+    predecessors = predecessor_symbols(target, root)
 
     target_obj = root / "build/delink" / f"{target.unit}.c.obj"
     if not args.dry_run and not target_obj.exists():
@@ -713,6 +844,7 @@ def main(argv: list[str] | None = None) -> int:
             "canonical_identifier_digest": target_token_digest,
         },
         "compiler_flags": flags,
+        "compile_timeout_seconds": args.compile_timeout_seconds,
         "seed": args.seed,
         "policy": {
             "parser_visible_temporary_probes": True,
@@ -725,6 +857,7 @@ def main(argv: list[str] | None = None) -> int:
             "sibling_score_regressions_allowed": False,
             "exact_sibling_raw_or_reloc_changes_allowed": False,
             "target_size_or_reloc_count_distance_may_not_worsen": True,
+            "compiler_process_group_terminated_on_timeout": True,
         },
         "baseline": None,
         "trials": [],
@@ -732,6 +865,8 @@ def main(argv: list[str] | None = None) -> int:
         "exact_closure": None,
         "record_max": {"requested": args.record_max, "updated": False},
     }
+    timings = {}
+    manifest["timings"] = timings
 
     if args.dry_run:
         for variant in variants:
@@ -749,18 +884,24 @@ def main(argv: list[str] | None = None) -> int:
     assert scratch is not None
 
     baseline_obj = output / "baseline.obj"
-    ok, log = compile_object(root, target.source, baseline_obj, flags)
+    with measure_stage(timings, "baseline_compile"):
+        ok, log, baseline_timed_out = compile_object(
+            root, target.source, baseline_obj, flags, args.compile_timeout_seconds
+        )
     (output / "baseline.compile.log").write_text(log)
     if not ok:
         finalize_compiled_artifacts(scratch, output, final_output, False)
-        print("baseline compile failed; disposable artifacts removed", file=sys.stderr)
+        reason = "timed out" if baseline_timed_out else "failed"
+        print(f"baseline compile {reason}; disposable artifacts removed", file=sys.stderr)
         return 2
-    baseline_scores, baseline_sizes, baseline_counts, diff_log = objdiff_scores(
-        target_obj, baseline_obj, target.symbol
-    )
+    with measure_stage(timings, "baseline_objdiff"):
+        baseline_scores, baseline_sizes, baseline_counts, diff_log = objdiff_scores(
+            target_obj, baseline_obj, target.symbol
+        )
     (output / "baseline.objdiff.log").write_text(diff_log)
-    baseline_metrics = object_metrics(baseline_obj)
-    retail_metrics = object_metrics(target_obj)
+    with measure_stage(timings, "baseline_coff_metrics"):
+        baseline_metrics = object_metrics(baseline_obj)
+        retail_metrics = object_metrics(target_obj)
     if baseline_counts.get(target.symbol) != 1:
         finalize_compiled_artifacts(scratch, output, final_output, False)
         print(f"target symbol is not unique in baseline objdiff: {target.symbol}", file=sys.stderr)
@@ -806,8 +947,14 @@ def main(argv: list[str] | None = None) -> int:
             candidate_bytes = candidate.encode("utf-8")
             trial_obj = output / f"trial-{variant.trial:04d}.obj"
             include_guard = include_macro_guard(root, variant.body, canonical_target_tokens)
+            compile_timed_out = False
             with temporary_source(target.source, original_bytes, candidate_bytes):
-                candidate_target_hash = project_source_hashes().get(target_key)
+                with measure_stage(timings, "target_hash_check"):
+                    candidate_target_hash = (
+                        canonical_target_hash
+                        if target_suffix_digest(candidate, target.va) == canonical_target_suffix_digest
+                        else None
+                    )
                 if candidate_target_hash != canonical_target_hash:
                     ok = False
                     compile_log = (
@@ -818,11 +965,19 @@ def main(argv: list[str] | None = None) -> int:
                     ok = False
                     compile_log = "include macro guard rejected candidate: " + json.dumps(include_guard) + "\n"
                 else:
-                    ok, compile_log = compile_object(root, target.source, trial_obj, flags)
+                    with measure_stage(timings, "trial_compile"):
+                        ok, compile_log, compile_timed_out = compile_object(
+                            root,
+                            target.source,
+                            trial_obj,
+                            flags,
+                            args.compile_timeout_seconds,
+                        )
             trial = {
                 **asdict(variant),
                 "source_sha256": sha256_bytes(candidate_bytes),
                 "compiled": ok,
+                "compile_timed_out": compile_timed_out,
                 "score": None,
                 "score_delta": None,
                 "candidate": None,
@@ -839,15 +994,19 @@ def main(argv: list[str] | None = None) -> int:
                     trial["rejections"].append("canonical target normalized source hash changed")
                 elif not include_guard.get("passed", True):
                     trial["rejections"].append("include macro guard failed")
+                elif compile_timed_out:
+                    trial["rejections"].append("compile timed out")
                 else:
                     trial["rejections"].append("compile failed")
             else:
-                scores, sizes, symbol_counts, trial_diff_log = objdiff_scores(
-                    target_obj, trial_obj, target.symbol
-                )
+                with measure_stage(timings, "trial_objdiff"):
+                    scores, sizes, symbol_counts, trial_diff_log = objdiff_scores(
+                        target_obj, trial_obj, target.symbol
+                    )
                 if trial_diff_log:
                     (output / f"trial-{variant.trial:04d}.objdiff.log").write_text(trial_diff_log)
-                metrics = object_metrics(trial_obj)
+                with measure_stage(timings, "trial_coff_metrics"):
+                    metrics = object_metrics(trial_obj)
                 score = scores.get(target.symbol)
                 target_metrics = metrics.get(target.symbol)
                 if symbol_counts.get(target.symbol) != 1:
@@ -859,37 +1018,44 @@ def main(argv: list[str] | None = None) -> int:
                     trial["score"] = score
                     trial["score_delta"] = score - baseline_score
                     trial["candidate"] = target_metrics
-                    trial["rejections"].extend(_regressions(baseline_scores, scores, target.symbol))
-                    trial["rejections"].extend(
-                        _exact_sibling_metric_regressions(
-                            baseline_scores, baseline_metrics, metrics, target.symbol
+                    with measure_stage(timings, "regression_gates"):
+                        trial["rejections"].extend(
+                            _regressions(baseline_scores, scores, target.symbol)
                         )
-                    )
-                    trial["rejections"].extend(
-                        _predecessor_regressions(target, baseline_metrics, metrics, root)
-                    )
-                    candidate_size = target_metrics.get("objdiff_size")
-                    baseline_size = baseline_target.get("objdiff_size")
-                    if candidate_size is None or baseline_size is None:
-                        trial["rejections"].append("objdiff function size unavailable")
-                    elif abs(candidate_size - target.retail_size) > abs(baseline_size - target.retail_size):
-                        trial["rejections"].append("target size distance from retail worsened")
-                    retail_relocs = retail_target.get("relocs")
-                    if retail_relocs is not None and abs(target_metrics["relocs"] - retail_relocs) > abs(
-                        baseline_target["relocs"] - retail_relocs
-                    ):
-                        trial["rejections"].append("target relocation-count distance from retail worsened")
-                    trial["eligible"] = not trial["rejections"]
-                    trial["exact_closure_rejections"] = exact_closure_rejections(
-                        score,
-                        candidate_size,
-                        target.retail_size,
-                        target_metrics,
-                        retail_target,
-                    )
-                    trial["exact_closure_eligible"] = (
-                        trial["eligible"] and not trial["exact_closure_rejections"]
-                    )
+                        trial["rejections"].extend(
+                            _exact_sibling_metric_regressions(
+                                baseline_scores, baseline_metrics, metrics, target.symbol
+                            )
+                        )
+                        trial["rejections"].extend(
+                            _predecessor_regressions(predecessors, baseline_metrics, metrics)
+                        )
+                        candidate_size = target_metrics.get("objdiff_size")
+                        baseline_size = baseline_target.get("objdiff_size")
+                        if candidate_size is None or baseline_size is None:
+                            trial["rejections"].append("objdiff function size unavailable")
+                        elif abs(candidate_size - target.retail_size) > abs(
+                            baseline_size - target.retail_size
+                        ):
+                            trial["rejections"].append("target size distance from retail worsened")
+                        retail_relocs = retail_target.get("relocs")
+                        if retail_relocs is not None and abs(
+                            target_metrics["relocs"] - retail_relocs
+                        ) > abs(baseline_target["relocs"] - retail_relocs):
+                            trial["rejections"].append(
+                                "target relocation-count distance from retail worsened"
+                            )
+                        trial["eligible"] = not trial["rejections"]
+                        trial["exact_closure_rejections"] = exact_closure_rejections(
+                            score,
+                            candidate_size,
+                            target.retail_size,
+                            target_metrics,
+                            retail_target,
+                        )
+                        trial["exact_closure_eligible"] = (
+                            trial["eligible"] and not trial["exact_closure_rejections"]
+                        )
                     if trial["exact_closure_eligible"] and exact_closure is None:
                         exact_closure = trial
                     if trial["eligible"] and score > baseline_score + 1e-6:
@@ -975,6 +1141,7 @@ def main(argv: list[str] | None = None) -> int:
                 "error": str(exc),
             }
     (output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
+    print(format_timings(timings), flush=True)
     if record_error:
         finalize_compiled_artifacts(scratch, output, final_output, False)
         print(f"record-max refused: {manifest['record_max']['error']}", file=sys.stderr)
