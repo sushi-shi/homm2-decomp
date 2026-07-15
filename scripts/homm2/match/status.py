@@ -3,6 +3,7 @@
   homm2 status                 print per-unit + overall match %
   homm2 status update          refresh the baseline (per-function max% keyed by source hash)
   homm2 status check           gate: fail only if an EDITED function lost ground vs its own max
+  homm2 status --force-refresh regenerate report.json even when its inputs are unchanged
   homm2 status --write-readme  refresh the <!-- match-score --> block in README.md
 
 Max-% model: each function's SOURCE block is hashed. The baseline stores, per source-backed
@@ -13,24 +14,162 @@ When the function's OWN source changes, its hash changes and max% resets to the 
 Compiler-generated functions without their own source block remain in live objdiff/exact counts,
 but have no meaningful retained source-hash maximum and are not written to the baseline.
 """
-import json, os, re, subprocess, sys, hashlib, csv
+import csv, hashlib, json, os, re, shutil, subprocess, sys, tempfile
 from pathlib import Path
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[3]))
 RM_START, RM_END = "<!-- match-score:start -->", "<!-- match-score:end -->"
 RVA_BASE = 0x400000
 EXACT_MATCH_PERCENT = 100.0
+REPORT_CACHE_SCHEMA = 1
+REPORT_STAMP = "report.stamp.json"
 
 
 def _i(v): return int(v) if v not in (None, "") else 0
 
 
-def load_report():
+def _sha256(path):
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _report_inputs_identity(objdiff_dir, executable):
+    """Content identity for every input consumed by `objdiff-cli report generate`."""
+    objdiff_dir = Path(objdiff_dir)
+    config_path = objdiff_dir / "objdiff.json"
+    config = json.loads(config_path.read_text())
+    digests = {}
+    objects = []
+    for unit in config.get("units", []):
+        for role in ("base", "target"):
+            reference = unit.get(role + "_path")
+            if not reference:
+                raise RuntimeError("objdiff unit %s has no %s_path" %
+                                   (unit.get("name", "?"), role))
+            path = (objdiff_dir / reference).resolve()
+            if not path.is_file():
+                raise RuntimeError("objdiff %s object is missing: %s" % (role, path))
+            key = str(path)
+            if key not in digests:
+                digests[key] = _sha256(path)
+            objects.append({
+                "unit": unit.get("name", "?"),
+                "role": role,
+                "reference": reference,
+                "sha256": digests[key],
+            })
+
+    executable = Path(executable).resolve(strict=True)
+    if not executable.is_file():
+        raise RuntimeError("objdiff-cli is not a file: %s" % executable)
+    return {
+        "objdiff_config_sha256": _sha256(config_path),
+        "objects": objects,
+        "objdiff_cli": {"path": str(executable), "sha256": _sha256(executable)},
+    }
+
+
+def _read_json(path):
+    try:
+        return json.loads(Path(path).read_text())
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        return None
+
+
+def _valid_report(data):
+    return (isinstance(data, dict) and isinstance(data.get("units"), list) and
+            isinstance(data.get("measures", {}), dict))
+
+
+def _load_cached_report(report_path, stamp_path, inputs, force_refresh=False,
+                        reviewed_targets_refreshed=False):
+    if force_refresh or reviewed_targets_refreshed:
+        return None
+    report = _read_json(report_path)
+    stamp = _read_json(stamp_path)
+    if not _valid_report(report) or not isinstance(stamp, dict):
+        return None
+    if stamp.get("schema") != REPORT_CACHE_SCHEMA or stamp.get("inputs") != inputs:
+        return None
+    try:
+        if stamp.get("report_sha256") != _sha256(report_path):
+            return None
+    except OSError:
+        return None
+    return report
+
+
+def _atomic_write(path, data):
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    handle, temporary = tempfile.mkstemp(prefix=".%s." % path.name, dir=path.parent)
+    try:
+        with os.fdopen(handle, "wb") as stream:
+            stream.write(data)
+        os.replace(temporary, path)
+    except BaseException:
+        try:
+            os.unlink(temporary)
+        except FileNotFoundError:
+            pass
+        raise
+
+
+def _store_report_stamp(report_path, stamp_path, inputs, reviewed_targets_refreshed):
+    stamp = {
+        "schema": REPORT_CACHE_SCHEMA,
+        "inputs": inputs,
+        "report_sha256": _sha256(report_path),
+        "reviewed_targets_refreshed_before_generation": bool(reviewed_targets_refreshed),
+    }
+    _atomic_write(stamp_path, (json.dumps(stamp, indent=2) + "\n").encode("utf-8"))
+
+
+def _generate_report(objdiff_dir, report_path, executable):
+    handle, temporary = tempfile.mkstemp(prefix=".report.", suffix=".json",
+                                         dir=objdiff_dir)
+    os.close(handle)
+    os.unlink(temporary)
+    try:
+        subprocess.run([str(executable), "report", "generate", "-p", str(objdiff_dir),
+                        "-o", temporary], cwd=REPO, check=True,
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        report = _read_json(temporary)
+        if not _valid_report(report):
+            raise RuntimeError("objdiff-cli generated an invalid report")
+        os.replace(temporary, report_path)
+        return report
+    finally:
+        try:
+            os.unlink(temporary)
+        except FileNotFoundError:
+            pass
+
+
+def load_report(force_refresh=False):
     from homm2.build.reviewed_data import ensure_reviewed_targets
-    ensure_reviewed_targets()
-    od = REPO / "build/objdiff"; rep = od / "report.json"
-    subprocess.run(["objdiff-cli", "report", "generate", "-p", str(od), "-o", str(rep)],
-                   cwd=REPO, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    return json.loads(rep.read_text()) if rep.exists() else None
+    reviewed_targets_refreshed = ensure_reviewed_targets()
+    od = REPO / "build/objdiff"
+    rep = od / "report.json"
+    stamp = od / REPORT_STAMP
+    executable_name = shutil.which("objdiff-cli")
+    if not executable_name:
+        raise RuntimeError("objdiff-cli is required to generate the match report")
+    executable = Path(executable_name).resolve(strict=True)
+    inputs = _report_inputs_identity(od, executable)
+    cached = _load_cached_report(rep, stamp, inputs, force_refresh,
+                                 reviewed_targets_refreshed)
+    if cached is not None:
+        return cached
+
+    report = _generate_report(od, rep, executable)
+    final_inputs = _report_inputs_identity(od, executable)
+    if final_inputs != inputs:
+        raise RuntimeError("objdiff report inputs changed during generation")
+    _store_report_stamp(rep, stamp, final_inputs, reviewed_targets_refreshed)
+    return report
 
 
 def unit_pct(u):
@@ -296,8 +435,10 @@ def cmd_check(data, eps=0.05):
 
 def main(argv=None, data=None):
     argv = list(argv or [])
+    force_refresh = "--force-refresh" in argv
+    argv = [arg for arg in argv if arg != "--force-refresh"]
     if data is None:
-        data = load_report()
+        data = load_report(force_refresh=force_refresh)
     if data is None:
         print("[status] no report (run 'homm2 build' first)"); return 1
     if argv and argv[0] == "update":

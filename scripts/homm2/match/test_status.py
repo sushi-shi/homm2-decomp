@@ -1,9 +1,119 @@
+import json
 import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock
 
 from homm2.match import status
+
+
+class ReportCacheTest(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.root = Path(self.temporary.name)
+        self.objdiff = self.root / "build/objdiff"
+        self.base = self.objdiff / "base/SOURCE/UNIT.obj"
+        self.target = self.root / "build/delink/SOURCE/UNIT.c.obj"
+        self.tool = self.root / "bin/objdiff-cli"
+        for path, contents in ((self.base, b"base"), (self.target, b"target"),
+                               (self.tool, b"objdiff")):
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(contents)
+        self.config = self.objdiff / "objdiff.json"
+        self.config.write_text(json.dumps({
+            "units": [{
+                "name": "SOURCE/UNIT",
+                "base_path": "./base/SOURCE/UNIT.obj",
+                "target_path": "../delink/SOURCE/UNIT.c.obj",
+            }]
+        }, indent=2) + "\n")
+        self.report = self.objdiff / "report.json"
+        self.stamp = self.objdiff / status.REPORT_STAMP
+        self.report_data = {"units": [], "measures": {"matched_code_percent": 0}}
+
+    def tearDown(self):
+        self.temporary.cleanup()
+
+    def _identity(self, tool=None):
+        return status._report_inputs_identity(self.objdiff, tool or self.tool)
+
+    def _seed(self):
+        identity = self._identity()
+        self.report.write_text(json.dumps(self.report_data))
+        status._store_report_stamp(self.report, self.stamp, identity, False)
+        return identity
+
+    def _cached(self, identity=None, **kwargs):
+        return status._load_cached_report(
+            self.report, self.stamp, identity or self._identity(), **kwargs)
+
+    def test_unchanged_inputs_reuse_report(self):
+        identity = self._seed()
+        self.assertEqual(self._cached(identity), self.report_data)
+
+    def test_config_content_change_invalidates_report(self):
+        identity = self._seed()
+        self.config.write_text(self.config.read_text() + "\n")
+        self.assertNotEqual(self._identity(), identity)
+        self.assertIsNone(self._cached())
+
+    def test_base_object_content_change_invalidates_report(self):
+        self._seed()
+        self.base.write_bytes(b"new base")
+        self.assertIsNone(self._cached())
+
+    def test_target_object_content_change_invalidates_report(self):
+        self._seed()
+        self.target.write_bytes(b"new target")
+        self.assertIsNone(self._cached())
+
+    def test_executable_path_and_content_changes_invalidate_report(self):
+        original = self._seed()
+        second_tool = self.tool.with_name("objdiff-cli-new")
+        second_tool.write_bytes(self.tool.read_bytes())
+        moved = self._identity(second_tool)
+        self.assertNotEqual(moved, original)
+        self.assertIsNone(self._cached(moved))
+
+        self.tool.write_bytes(b"new objdiff")
+        replaced = self._identity()
+        self.assertNotEqual(replaced, original)
+        self.assertIsNone(self._cached(replaced))
+
+    def test_reviewed_target_refresh_invalidates_report(self):
+        identity = self._seed()
+        self.assertIsNone(self._cached(identity, reviewed_targets_refreshed=True))
+
+    def test_force_refresh_invalidates_report(self):
+        identity = self._seed()
+        self.assertIsNone(self._cached(identity, force_refresh=True))
+
+    def test_missing_or_corrupt_report_invalidates_cache(self):
+        identity = self._seed()
+        self.report.unlink()
+        self.assertIsNone(self._cached(identity))
+        self.report.write_text("not json")
+        self.assertIsNone(self._cached(identity))
+
+    def test_missing_or_corrupt_stamp_invalidates_cache(self):
+        identity = self._seed()
+        self.stamp.unlink()
+        self.assertIsNone(self._cached(identity))
+        self.stamp.write_text("not json")
+        self.assertIsNone(self._cached(identity))
+
+    def test_modified_valid_report_invalidates_cache(self):
+        identity = self._seed()
+        self.report.write_text(json.dumps({"units": [], "measures": {}}))
+        self.assertIsNone(self._cached(identity))
+
+    def test_status_force_option_reaches_report_loader(self):
+        data = {"units": [], "measures": {}}
+        with mock.patch.object(status, "load_report", return_value=data) as loader, \
+                mock.patch.object(status, "load_baseline", return_value={}), \
+                mock.patch.object(status, "source_hashes", return_value={}):
+            self.assertEqual(status.main(["--force-refresh"]), 0)
+        loader.assert_called_once_with(force_refresh=True)
 
 
 class BaselineTest(unittest.TestCase):

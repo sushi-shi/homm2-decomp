@@ -63,6 +63,10 @@ homm2 build     # configure + ninja (wine cl per TU) + objdiff vs target + refre
 homm2 status    # per-unit + overall match %   (also: status update | status check)
 ```
 
+The objdiff report is content-addressed over `objdiff.json`, every configured base/target object,
+and the resolved `objdiff-cli` binary. An unchanged `homm2 build` reuses the verified report;
+`homm2 status --force-refresh` explicitly regenerates it.
+
 `homm2 build` compiles each `config/units.toml` unit to `build/objdiff/base/<unit>.obj`
 and diffs it against the delinked retail target `build/delink/<unit>.c.obj`. ninja **tracks
 header deps** (MSVC 4.2 has no `/showIncludes`, so `cc_wrap.py` scans each TU's `#include`
