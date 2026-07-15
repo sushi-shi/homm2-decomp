@@ -8,7 +8,8 @@ from homm2.build.link_exe import (
     SYSTEM_LIBS_BEFORE_VENDOR, build_link_command, classify_missing_public_data,
     classify_pe_storage, decode_map_symbol_name,
     decode_s_compile_banner, load_retail_data_symbols, load_retail_order,
-    link_environment, normalized_vendor_imports, parse_map_contributions, parse_map_symbol_records,
+    link_environment, normalized_dll_import, normalized_vendor_imports,
+    parse_map_contributions, parse_map_symbol_records,
     parse_map_symbols, parse_unresolved, read_coff_section, read_imports, read_order_response,
     read_pe, resolve_link_executable, sibling_tool_identities, static_symbol_diagnostics)
 
@@ -27,6 +28,20 @@ class LinkExeTest(unittest.TestCase):
         self.assertLess(command.index(vendors[-1]), command.index(SYSTEM_LIBS_AFTER_VENDOR[0]))
         self.assertLess(command.index(SYSTEM_LIBS_AFTER_VENDOR[-1]), command.index(objects[0]))
         self.assertLess(command.index(objects[-1]), command.index(r"Z:\\out\\game.res"))
+
+    def test_dll_import_normalization_detects_wrong_runtime_symbol(self):
+        imports = [{"dll": "ADVAPI32.dll", "symbols": [
+            {"name": "RegQueryValueExA", "hint": 225},
+            {"name": "RegCreateKeyA", "hint": 197},
+        ]}]
+        self.assertEqual(normalized_dll_import(imports, "advapi32.DLL"), {
+            "dll": "advapi32.dll",
+            "symbols": [
+                {"name": "RegCreateKeyA", "hint": 197},
+                {"name": "RegQueryValueExA", "hint": 225},
+            ],
+        })
+        self.assertIsNone(normalized_dll_import(imports, "missing.dll"))
 
     def test_link_environment_uses_historical_lib_search_path(self):
         environment = link_environment(
