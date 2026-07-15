@@ -119,7 +119,10 @@ struct configStruct {                    // gConfig, 0x1a0 bytes
     int combatArmyInfoLevel;             // 0x74  "Combat Army Info Level"
     int evilInterfaceUsage;              // 0x78  "Evil Interface Usage"
     char autoLoadName[0xd];              // 0x7c  default "AUTO"
-    char autoSaveName[0x21];             // 0x89  default "AUTO"
+    char autoSaveName[0xd];              // 0x89  default "AUTO"
+    char mciError;                       // 0x96  persistent CD/MCI error latch
+    char needsDefaultInitialization;     // 0x97  nonzero requests current defaults
+    char reservedAfterAutoSave[0x12];    // 0x98
     int musicSource;                     // 0xaa  persisted as "Sound Quality"
     char modemInitString[0x64];          // 0xae  "Modem Init String"
     int comPort[CONFIG_CONNECTION_COUNT]; // 0x112 modem, 0x116 direct connect
