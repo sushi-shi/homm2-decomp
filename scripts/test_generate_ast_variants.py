@@ -249,6 +249,17 @@ class AstVariantSemanticTests(unittest.TestCase):
         self.assertEqual(len(mutations), 2)
         self.assertTrue(all("divisor-to-divisor" in item.label for item in mutations))
 
+    def test_identifier_rename_accepts_safe_whole_names_and_rejects_collisions(self):
+        function = self.functions["SafeIntegerOperators"]
+        mutations = identifier_rename_edits(
+            function, self.blob, 1, {"divisor"}, ("width", "value")
+        )
+        whole_name = next(item for item in mutations if "divisor-to-width" in item.label)
+        candidate = self._render_mutation(whole_name).decode()
+        self.assertIn("int width", candidate)
+        self.assertIn("value / width", candidate)
+        self.assertFalse(any("divisor-to-value" in item.label for item in mutations))
+
     def test_integral_global_read_can_be_inlined_without_parameters(self):
         function = self.functions["SafeGlobalRead"]
         insertion = self.blob.index(b"int SafeGlobalRead")
