@@ -94,3 +94,13 @@ name	unit	size	retail_sha256	highlow_count	audit
 ?uDimPal@@3PAY13BAA@EA	SOURCE/KB	0xc00	c826ee0c36ab9f5cd8f0b72ab6d5150e0fc77a4496d163732d84ac7b4c266f8a	0	bytes
 ?gColorTableLighten@@3PAEA	SOURCE/KB	0x100	d7ca8ce3ee5a2c40cd3a287f735a2858aa6fbf214eaefd5204a7038a1d199001	0	bytes
 ?gColorTableNoCycle@@3PAEA	SOURCE/KB	0x100	8591b81a41ea7672a855d4b14094e91646e35530e8be45577da51d15d1bfe1da	0	bytes
+?giMapSizes@@3PAEA	SOURCE/KB	0x4	cdfcd3a229b8ab006c5cdb740fc530ef63f5d01be5cebe584ec9a518b6e237b1	0	bytes
+?cEvilTranslate@@3PAY01PADA	SOURCE/KB	0x128	23e6ea1ed07bdd2f1579b3db6b74bcf0d9d4016d9936837544c50638c0f8f46b	74	cstring-pointer-table
+?gfCombatSpeedMod@@3PAMA	SOURCE/KB	0xc	402fb14a9aa0c9209e8ab5b8fdbc06c7e0f3ecd122887dce2d6fe56754bae9c0	0	bytes
+?gCombatFxNames@@3PAPADA	SOURCE/KB	0x80	5867184a5aea03349c0b7320ffa2c0ab05e64a9bdda5a66689195127a64f8644	32	cstring-pointer-table
+?gArtifactLevel@@3PAEA	SOURCE/KB	0x68	502d569f42aca24614bec865426e496a6af711254e435bcfa8ba3ca8a2949fef	0	bytes
+?gArtifactBaseRV@@3PAHA	SOURCE/KB	0x190	f56e69f6a97ab13d50e9675cd9eaf1b6f4b00b35c0ff7d123504e1a8932144fe	0	bytes
+?gMonsterDatabase@@3PAUtag_monsterInfo@@A	SOURCE/KB	0x6b4	bb6793526c7d46eb3f3c5351b5386176b6421b4b0fca3deacd2014afda651a19	0	bytes
+?gfStatPower@@3PAMA	SOURCE/KB	0xa8	502f9a8e466577a3eeffd3e63337f1552ea2db8db9c38903e23518b4693ef727	0	bytes
+?gfBattleStat@@3PAMA	SOURCE/KB	0xa8	51ca4928d3f4b68add26123aac240322c71929b3dbf49e3021c99adc3ccc04a5	0	bytes
+?gSpellLimits@@3PACA	SOURCE/KB	0x5	e2166b2b17564ef13c98b01eef6fe5627ef96bf06396c4961d20de507c873daf	0	bytes
