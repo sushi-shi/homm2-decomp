@@ -6,6 +6,7 @@
 #include <va.h>
 #include <BASE/Icondf2b.h>
 #include <BASE/IconEntry.h>
+#include <BASE/IconMonoRle.h>
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
 #include <SOURCE/dimPalette.h>
@@ -16,40 +17,33 @@ DATA(0x005381c0) static unsigned int gFDCnt;
 DATA(0x005381c4) static int gFDX;
 DATA(0x005381c8) static int gFDClipR;
 DATA(0x005381cc) static unsigned int gFDCnt2;
-DATA(0x005381d0) static int gFDRow;
+DATA(0x005381d0) static unsigned char *gFDRow;
 DATA(0x005381d4) static int gFDClipB;
 DATA(0x005381d8) static unsigned char *gFDSrc;
 DATA(0x005381dc) static unsigned char *gFDDst;
-DATA(0x005381e0) static volatile int gFDY;
+DATA(0x005381e0) static int gFDY;
 DATA(0x005381e4) static IconEntry *gFDEntry;
 DATA(0x005381e8) static unsigned int gFDRun;
 
 // @match-note
-// Structurally recovered /O2 decoder. Candidate is 0x236 bytes versus retail 0x23b. Both have 166
-// instructions, 31 basic blocks, 25 branches, the same 0x4-byte
-// frame/saved registers, and an exact 37/37 relocation target/multiplicity sequence (all 13 scratch
-// globals plus uDimPal; only-base=0). The first relocation-masked raw divergence is +0x1d: retail
-// loads formal x into EBX before publishing gFDEntry, while candidate publishes gFDEntry first and
-// later carries x0 in EDI. The remaining residual is broad register allocation and scheduling.
-// The decoder now has the real geometry lifetimes seen in the retail instructions and sibling flip
-// blitters: x0 remains the left edge through clipping, while X starts at the right edge and moves
-// left through command runs. Delaying the gFDY snapshot to its short-circuit operand removes the
-// non-retail spill and restores the 0x4 frame. Retail deliberately tests clipX <= left both before
-// entering a clipped run and before selecting the full/partial arm; the redundant predicate makes
-// the partial arm unreachable, but retail emits the full arm first and that shipped CFG is retained.
-// Rejected fresh variants: an eager Y snapshot and explicit left/right homes widen the frame to 0x8;
-// a typed pixel-base owner, explicit entry-X owner, and post-setup right recomputation regress or
-// retain the wrong schedule. Earlier typed-entry, local/global bounds, destination-pointer, count,
-// loop-schedule, header-state, predicate-spelling, and AST-search families remain closed. No regex
-// or AST permutation was used here. This is an unresolved checkpoint, not a byte-proven wall;
-// revisit after a real shared-header/TU-state change or in the post-placeholder last-mile phase.
+// Complete /O2 decoder: 166 instructions, 25 branches, the same four-byte frame/saved registers,
+// and exact 37/37 external relocation identity/multiplicity (all scratch owners plus uDimPal).
+// Candidate ends at +0x238 versus retail +0x23b. First divergence is +0x1d: retail schedules the
+// formal-x load before publishing gFDEntry, while this TU publishes the entry first and carries the
+// left edge in EDI. The remaining differences are broad register allocation/scheduling with the
+// same command-loop and clipping successors. gFDRow is a byte pointer and gFDY is ordinary scratch;
+// the former integer row model and `volatile` reload coercion were removed. Retail tests
+// clipX <= left both before the clipped run and before choosing its full arm, leaving the emitted
+// partial-left arm unreachable; preserve that shipped CFG. Prior entry/bound, destination/count,
+// loop-order, predicate, header-state, and AST families are exhausted. Revisit only after a genuine
+// shared-header/TU-state change; do not restore qualifiers or integer pointer arithmetic.
 VA(0x004daa20, 0x23b)
 void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                          int color, int clip, int clipX, int clipY, int clipW, int clipH)
 {
-    char *data = srcIcon->m_data;
-    IconEntry *entry = reinterpret_cast<IconEntry *>(data + frame * sizeof(IconEntry));
-    unsigned char *srcData = reinterpret_cast<unsigned char *>(data + entry->srcOffset);
+    IconEntry *entries = reinterpret_cast<IconEntry *>(srcIcon->m_data);
+    IconEntry *entry = &entries[frame];
+    unsigned char *srcData = reinterpret_cast<unsigned char *>(entries) + entry->srcOffset;
     int x0 = x;
     gFDEntry = entry;
     gFDSrc = srcData;
@@ -74,7 +68,7 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, 
         }
     }
     short pitch = dest->m_width;
-    gFDRow = gFDY * pitch + reinterpret_cast<int>(dest->m_pixels);
+    gFDRow = dest->m_pixels + gFDY * pitch;
     for (;;) {
         unsigned char *src = gFDSrc + 1;
         gFDX = X;
@@ -82,7 +76,7 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, 
         int cmd = src[-1];
         if (static_cast<signed char>(cmd) < 0) {
             gFDRun = cmd;
-            int n = cmd & 0x7f;
+            int n = cmd & ICON_RLE_MONO_RUN_MASK;
             if (n == 0)
                 return;
             X = X - n;
@@ -93,7 +87,7 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, 
             if (clip == 0) {
                 unsigned int cnt;
                 gFDCnt = 0;
-                unsigned char *dst = reinterpret_cast<unsigned char *>((gFDRow - cmd) + X + 1);
+                unsigned char *dst = (gFDRow - cmd) + X + 1;
                 gFDDst = dst;
                 if (static_cast<int>(cmd) > 0) {
                     cnt = cmd;
@@ -102,8 +96,7 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, 
                         int px = *dst++;
                         cnt--;
                         gFDDst = dst;
-                        dst[-1] =
-                            (color * 0x100 + reinterpret_cast<unsigned char *>(uDimPal))[px];
+                        dst[-1] = uDimPal[0][color][px];
                     } while (cnt != 0);
                 }
             } else {
@@ -115,9 +108,9 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, 
                     unsigned char *dst;
                     if (clipX <= left) {
                         cn = cmd;
-                        dst = reinterpret_cast<unsigned char *>((gFDRow - cmd) + X + 1);
+                        dst = (gFDRow - cmd) + X + 1;
                     } else {
-                        dst = reinterpret_cast<unsigned char *>(gFDRow + clipX);
+                        dst = gFDRow + clipX;
                         cn = (X - clipX) + 1;
                     }
                     gFDCnt2 = cn;
@@ -130,8 +123,7 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, 
                             int px = *dst++;
                             cnt--;
                             gFDDst = dst;
-                            dst[-1] =
-                                (reinterpret_cast<unsigned char *>(uDimPal) + color * 0x100)[px];
+                            dst[-1] = uDimPal[0][color][px];
                         } while (cnt != 0);
                     }
                 }
