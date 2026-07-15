@@ -22,7 +22,6 @@
 
 // ---- module-private synthetic globals (retail xref: single-module) ----
 DATA(0x00528d00) static long gMusicFadeTimer; // ambient-music fade deadline tick (soundManager::SwitchAmbientMusic)
-DATA(0x00528db6) static char gMciErrorFlag; // MCI error latch (byte-accessed) (HandleMCIError)
 DATA(0x00534970) static WAVEFORMATEX gWaveFormat; // digital-driver PCM format (WAVE_init_driver)
 
 VA(0x004cb630, 0x68)
@@ -30,7 +29,7 @@ void HandleMCIError(int param_1, char *param_2)
 {
     mciGetErrorStringA(param_1, lpszReturnString, 0xff);
     sprintf(gText, "CD MUSIC ERROR\nDescription: %s\nCall: %s", lpszReturnString, param_2);
-    gMciErrorFlag = 1;
+    gConfig.mciError = 1;
     gConfig.musicSource = CONFIG_MUSIC_SOURCE_MIDI;
     WritePrefs();
     ShutDown(gText);
@@ -101,7 +100,7 @@ void soundManager::CDStartup(void)
     m_cdReady = 0;
     if (gbNoCDRom != 0)
         return;
-    if (gMciErrorFlag != 0)
+    if (gConfig.mciError != 0)
         return;
     if (gbDontTryRedbook != 0)
         return;
@@ -111,7 +110,7 @@ void soundManager::CDStartup(void)
                                lpszReturnString, 0xff, 0);
     if (nMCIError != 0) {
         m_cdReady = 0;
-        gMciErrorFlag = 1;
+        gConfig.mciError = 1;
         gConfig.musicSource = CONFIG_MUSIC_SOURCE_MIDI;
         WritePrefs();
         return;
