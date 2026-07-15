@@ -49,10 +49,10 @@ typedef enum DirectPlayMessageType {
 
 typedef enum DirectPlayResult {
     DP_RESULT_OK = 0,
-    DP_RESULT_INVALID_ARGUMENT = (int)0x80070057,
-    DP_RESULT_INVALID_PLAYER = (int)0x88770096,
-    DP_RESULT_NO_MESSAGES = (int)0x887700be,
-    DP_RESULT_NO_SESSIONS = (int)0x887700dc
+    DP_RESULT_INVALID_ARGUMENT = static_cast<int>(0x80070057),
+    DP_RESULT_INVALID_PLAYER = static_cast<int>(0x88770096),
+    DP_RESULT_NO_MESSAGES = static_cast<int>(0x887700be),
+    DP_RESULT_NO_SESSIONS = static_cast<int>(0x887700dc)
 } DirectPlayResult;
 
 #pragma pack(push, 1)
@@ -86,13 +86,13 @@ extern struct IDirectPlay *lpIDC;
 extern unsigned long dcoID;
 extern struct _GUID *IPXGuid;
 extern struct _GUID *TCPGuid;
-extern void *dphEvent;
+extern HANDLE dphEvent;
 extern int iDPRcvBufferHead;
 extern int iDPRcvBufferTail;
 extern unsigned char **ppDPRcvBuffer;
 extern int *piDPRcvBufferSize;
 extern int bStartUpInfoReceived;
-extern void *hinstDplayx;
+extern HMODULE hinstDplayx;
 extern int iDPWaitForFirstGuestStatus;
 extern int iDPWaitForHostStatus;
 extern int iWaitForHostWaitCount;

@@ -47,11 +47,10 @@ int __stdcall dpEnumSession(DPSESSIONDESC *session, void *,
     if (flags & 1)
         return 0;
     LogStr("Sessions:");
-    LogInt(reinterpret_cast<char *>(session) + 0x24,
-           *reinterpret_cast<int *>(reinterpret_cast<char *>(session) + 0x14),
+    LogInt(session->szSessionName,
+           session->dwSession,
            -999, -999, -999, -999, -999, -999);
-    lSessions[iMaxSession] =
-        *reinterpret_cast<long *>(reinterpret_cast<char *>(session) + 0x14);
+    lSessions[iMaxSession] = session->dwSession;
     iMaxSession++;
     return 1;
 }
@@ -91,11 +90,11 @@ short int dpnet_init(void) {
         enumerateFunction = 0;
         createFunction = 0;
         createFunction = reinterpret_cast<DirectPlayCreateFunction>(
-            GetProcAddress(static_cast<HMODULE>(hinstDplayx), "DirectPlayCreate"));
+            GetProcAddress(hinstDplayx, "DirectPlayCreate"));
         if (createFunction == 0)
             ShutDown("Can't load 'DPLAYX.DLL'");
         enumerateFunction = reinterpret_cast<DirectPlayEnumerateFunction>(
-            GetProcAddress(static_cast<HMODULE>(hinstDplayx), "DirectPlayEnumerateA"));
+            GetProcAddress(hinstDplayx, "DirectPlayEnumerateA"));
         if (enumerateFunction == 0)
             ShutDown("Can't load 'DPLAYX.DLL'");
         enumerateFunction(dpEnumServiceProvider, 0);
@@ -169,8 +168,9 @@ void CleanupDPVars(void) {
 // @match-note 99.99%: semantics, CFG, the 0x68 drain-buffer frame, and all 27
 // ordered relocations agree. The first non-relocation byte residual is the local
 // branch at +0x65; the only structural disassembly residual is FreeLibrary's
-// imported-call representation near +0xf9. Direct and casted HMODULE spellings
-// are exhausted. Revisit with the import-thunk normalization work.
+// imported-call representation near +0xf9. Both the prior void*/static_cast
+// spelling and the typed HMODULE/direct spelling have been tested. Revisit with
+// the import-thunk normalization work.
 VA(0x0041f28e, 0x116)
 void dpnet_term(void) {
     char drainBuffer[DP_TRANSPORT_TERM_DRAIN_SIZE];
@@ -190,7 +190,7 @@ void dpnet_term(void) {
         BaseFree(piDPRcvBufferSize, DPFILE, DP_TERM_LINE_BASE + 0x12);
     piDPRcvBufferSize = 0;
     if (hinstDplayx != 0)
-        FreeLibrary(static_cast<HMODULE>(hinstDplayx));
+        FreeLibrary(hinstDplayx);
     hinstDplayx = 0;
     CleanupDPVars();
 }
@@ -365,8 +365,7 @@ int dpWaitForFirstGuest(void) {
         iDPWaitForFirstGuestStatus++;
         break;
     case 2:
-        result = lpIDC->CreatePlayer(&dcoID, "Heroes Player", "Dude",
-                                     reinterpret_cast<HANDLE *>(&dphEvent));
+        result = lpIDC->CreatePlayer(&dcoID, "Heroes Player", "Dude", &dphEvent);
         if (result != DP_RESULT_OK)
             DPSD(result, DPFILE, DP_FIRST_GUEST_LINE_BASE + 0x2e);
         giNetPosToDCOPos[0] = dcoID;
@@ -457,8 +456,7 @@ int dpWaitForHost(void) {
         iDPWaitForHostStatus++;
         break;
     case 2:
-        playResult = lpIDC->CreatePlayer(&dcoID, "Heroes Player", "Dude",
-                                         reinterpret_cast<HANDLE *>(&dphEvent));
+        playResult = lpIDC->CreatePlayer(&dcoID, "Heroes Player", "Dude", &dphEvent);
         if (playResult != DP_RESULT_OK)
             DPSD(playResult, DPFILE, DP_HOST_LINE_BASE + 0x43);
         iDPWaitForHostStatus++;
@@ -612,13 +610,13 @@ DATA(0x004ef7c8) struct IDirectPlay *lpIDC = 0;
 DATA(0x004ef7cc) unsigned long dcoID = 0;
 DATA(0x004ef7d0) struct _GUID *IPXGuid = 0;
 DATA(0x004ef7d4) struct _GUID *TCPGuid = 0;
-DATA(0x004ef7d8) void *dphEvent = 0;
+DATA(0x004ef7d8) HANDLE dphEvent = 0;
 DATA(0x004ef7dc) int iDPRcvBufferHead = 0;
 DATA(0x004ef7e0) int iDPRcvBufferTail = 0;
 DATA(0x004ef7e4) unsigned char **ppDPRcvBuffer = 0;
 DATA(0x004ef7e8) int *piDPRcvBufferSize = 0;
 DATA(0x004ef7ec) int bStartUpInfoReceived = 0;
-DATA(0x004ef7f0) void *hinstDplayx = 0;
+DATA(0x004ef7f0) HMODULE hinstDplayx = 0;
 DATA(0x004ef7f4) int iDPWaitForFirstGuestStatus = 0;
 DATA(0x004ef7f8) int iDPWaitForHostStatus = 0;
 DATA(0x004ef7fc) int iWaitForHostWaitCount = 0;
