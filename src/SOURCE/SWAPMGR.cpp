@@ -238,17 +238,20 @@ void swapManager::DrawSelector(void)
     }
 }
 
-// @match-note 91.37%
-// First residual: retail +0xa0 jumps directly to the inner-switch epilogue;
-// ours branches over a compiler-folded closeRequested_5 = 0 store at +0xa5..+0xab.
+// @match-note 91.67%
+// First residual after the aligned skill-range cases: candidate +0x148 jumps to
+// the shared skill body epilogue and then the inner-switch epilogue; retail +0x14d
+// jumps directly to the inner-switch epilogue. Three unreachable case breaks are
+// now retained at +0xcd/+0xf1/+0x115, matching retail's /Od jump traces.
 // Frame 0x28 and slots match: slotIndex_8 -0x4, closeRequested_5 -0x8,
 // quickView -0xc, side -0x10, artifactSlot_2 -0x14, secondarySkill_1 -0x18;
 // this and the three switch temporaries occupy -0x1c..-0x28. The compressed
-// 0x41..0xe7 switch, all case ranges/bodies, CFG semantics, and 71/71 relocation
-// targets are recovered; external targets agree as a multiset (only body order and
-// local jump-table labels differ). Tried direct/empty-arm condition polarities,
-// od_slots names, unsigned hero id, a shared skill body, close inequality/early
-// break spellings, and inverted army split polarity. Revisit at 95% total fuzzy.
+// 0x41..0xe7 switch, case ranges/bodies, CFG semantics, and all 71 ordered external
+// relocation targets are recovered. Tried the direct skill guard (91.24%), the
+// related-version artifact/army body order (82.45%), redundant trailing breaks
+// (discarded by MSVC), close truthy/equality spellings, od_slots names, unsigned
+// hero id, shared skill bodies, and army split polarity. Revisit after coverage for
+// the remaining nested-switch/TU-state jump layout.
 VA(0x00454be3, 0xaf0)
 int swapManager::Main(tag_message &message)
 {
@@ -293,6 +296,7 @@ int swapManager::Main(tag_message &message)
                 side = SWAP_SIDE_LEFT;
                 slotIndex_8 = message.payload.widget.id - SWAP_CONTROL_LEFT_SKILL_FIRST;
                 goto showSecondarySkill;
+                break;
 
             case SWAP_CONTROL_LEFT_SKILL_LEVEL_FIRST:
             case SWAP_CONTROL_LEFT_SKILL_LEVEL_FIRST + 1:
@@ -305,6 +309,7 @@ int swapManager::Main(tag_message &message)
                 side = SWAP_SIDE_LEFT;
                 slotIndex_8 = message.payload.widget.id - SWAP_CONTROL_LEFT_SKILL_LEVEL_FIRST;
                 goto showSecondarySkill;
+                break;
 
             case SWAP_CONTROL_RIGHT_SKILL_FIRST:
             case SWAP_CONTROL_RIGHT_SKILL_FIRST + 1:
@@ -317,6 +322,7 @@ int swapManager::Main(tag_message &message)
                 side = SWAP_SIDE_RIGHT;
                 slotIndex_8 = message.payload.widget.id - SWAP_CONTROL_RIGHT_SKILL_FIRST;
                 goto showSecondarySkill;
+                break;
 
             case SWAP_CONTROL_RIGHT_SKILL_LEVEL_FIRST:
             case SWAP_CONTROL_RIGHT_SKILL_LEVEL_FIRST + 1:
@@ -585,7 +591,7 @@ int swapManager::Main(tag_message &message)
         break;
     }
 
-    if (closeRequested_5) {
+    if (closeRequested_5 == SWAP_CLOSE_REQUESTED) {
         message.type = SWAP_MESSAGE_EXIT;
         message.payload.widget.command = SWAP_COMMAND_EXIT;
         return SWAP_RESULT_CLOSE;
@@ -650,15 +656,6 @@ void swapManager::SwapArtifacts(void)
     }
 }
 
-// @match-note 99.98%
-// Only raw residual: candidate +0x11b loads selectedArmy from -0x4 and compares
-// targetArmy at -0x10; retail loads targetArmy from -0x10 and compares
-// selectedArmy at -0x4 (displacement bytes +0x11d/+0x120). Frame 0x14 and slots
-// match: selectedArmy -0x4, selectedArmyCount -0x8, slot_1 -0xc,
-// targetArmy -0x10, this -0x14. All 113 normalized instructions, CFG semantics,
-// and 3/3 relocation sites/targets agree. Tried both != operand orders (same
-// bytes); retail-positive ==/GetNumArmies()!=1/target-occupied form regressed to
-// 98.53% and perturbed SplitMons, so it was rejected. Revisit at 95% total fuzzy.
 VA(0x004559cb, 0x177)
 void swapManager::SwapMons(void)
 {
