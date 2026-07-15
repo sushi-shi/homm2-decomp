@@ -7,7 +7,6 @@
 #include <SOURCE/ADVMGR.h>
 #include <SOURCE/PHILAI.h>
 #include <_types.h>
-#include <_globals_model.h>
 #include <BASE/Misc.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/NOOPT.h>

@@ -5,7 +5,6 @@
 
 #include <va.h>
 #include <BASE/TILE.h>
-#include <_globals_model.h>
 
 // Hand-written inline-asm tile blitter — the map renderer's hottest inner loop (one call per
 // visible tile per frame), so New World Computing wrote it in assembly instead of leaving it to

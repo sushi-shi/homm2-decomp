@@ -70,7 +70,7 @@ graph into a depfile) — editing a shared header recompiles exactly its include
 change can't leave a stale obj. It then runs **six hard gates** (a red gate fails the build):
 `assert_decls` (no local `class/struct/enum`/`extern`/fwd-decl in any .cpp), `assert_no_fake_labels`
 (no emitted fn symbol absent from the recovered inventory), `assert_globals_data` (every global's **definition**
-carries a unique `DATA(<VA>)`; no `DATA()` on a header `extern` bar `_globals_model.h`),
+carries a unique `DATA(<VA>)`; no `DATA()` on a header `extern`),
 `assert_defs_declared` (every free-fn definition is declared in its
 owner header), `assert_globals_defined` (every extern global has a definition in its owner TU —
 link-completeness), `assert_vtables` (every class vtable is claimed by a `VTBL()` census marker in
@@ -79,7 +79,7 @@ its owner TU — no drift, no fake classes). Full catalog + rationale: **`docs/b
 **`homm2 relocs` — OPT-IN reloc-target audit (not a build gate).** objdiff **MASKS every relocation**
 when scoring — it never checks a reloc's *target* — so a 100%-exact fn can silently read the wrong
 global/field or call a fabricated/wrong function and still score 100%. `homm2 relocs` resolves every
-near-exact fn's reloc targets (via `symbol_names.csv` + header `DATA()` VAs) and flags any address
+near-exact fn's reloc targets (via `symbol_names.csv` + definition `DATA()` VAs) and flags any address
 base references that retail never does. It's OPT-IN, not a hard gate, because it also surfaces
 unreproducible link artifacts — chiefly the delinker's `empty_stub` (the synthetic name for a
 COMDAT-folded empty `ret` fn that base still calls by its retained public name). `homm2 relocs 0x<rva>`
@@ -134,10 +134,10 @@ dev shell's Ghidra env (in the flake).
   carries **no** local `class/struct/enum`/`extern`/forward-decls — types come from the recovered
   class headers, cross-TU functions from their owner header. **Globals** live on their owner TU:
   a plain `extern T g;` in `<TIER>/<TU>.h` (the recovered owner model says which TU owns each) + the **definition**
-  `DATA(<VA>) T g;` in that owner `.cpp` (the VA rides the definition, not the extern). Globals with
-  no CodeView symbol go in `_globals_model.h` — UNLESS the retail binary references one from a single
-  module (`homm2 relocs`/`move_model_singletons.py` xref), in which case it becomes a module-private
-  `DATA(<VA>) static T g;`. `_globals_model.h` keeps only genuinely cross-module / def-less synthetics.
+  `DATA(<VA>) T g;` in that owner `.cpp` (the VA rides the definition, not the extern). Storage with
+  no CodeView public symbol is a module-private `DATA(<VA>) static T g;` definition in the one TU
+  that references it. A cross-TU external must have a retained public symbol and belongs in that
+  symbol's owner header; do not create def-less synthetic externs.
   Win32 from the custom minimal `include/win/windows.h`, CRT from real `<io.h>`/`<string.h>`.
   Include the **specific** headers a TU uses — there is no `_all.h` or `_globals.h` umbrella (both
   dissolved). The six build gates (`docs/build-asserts.md`) enforce all of this; bootstrap an

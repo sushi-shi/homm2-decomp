@@ -8,7 +8,6 @@
 #include <BASE/sample.h>
 #include <BASE/soundmgr.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <_globals_model.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/NOOPT.h>

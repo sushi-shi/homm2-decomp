@@ -7,7 +7,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <_globals_model.h>
 #include <BASE/bmap2.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>

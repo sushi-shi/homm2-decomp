@@ -6,7 +6,6 @@
 #include <va.h>
 #include <BASE/bmap2.h>
 #include <BASE/bitmap.h>
-#include <_globals_model.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <string.h>
 DATA(0x005348f0) static int gFillRow;

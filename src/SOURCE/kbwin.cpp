@@ -7,7 +7,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <va.h>
-#include <_globals_model.h>
 #include <BASE/INPUTMGR.h>
 #include <BASE/Misc.h>
 #include <BASE/heroWindowManager.h>

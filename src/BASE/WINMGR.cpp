@@ -156,7 +156,6 @@ updatePalette:
 #include <BASE/resourceManager.h>
 #include <stdio.h>
 #include <SOURCE/kbwin.h>
-#include <_globals_model.h>
 #include <SOURCE/NOOPT.h>
 
 // ---- module-private synthetic globals (retail xref: single-module) ----
