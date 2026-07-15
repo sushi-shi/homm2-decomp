@@ -5070,9 +5070,51 @@ DATA(0x004fa670) unsigned long
         TOWN_ELIGIBLE_BUILD_WIZARD_MASK,
         TOWN_ELIGIBLE_BUILD_NECROMANCER_MASK
     };
-DATA(0x004fa688) unsigned char giMapSizes[4];
+DATA(0x004fa688) unsigned char giMapSizes[KB_MAP_SIZE_COUNT] = {
+    MAP_DIMENSION_SMALL, MAP_DIMENSION_MEDIUM, MAP_DIMENSION_LARGE,
+    MAP_DIMENSION_XLARGE
+};
 DATA(0x004fa68c) int gbUseEvilInterface = 0;
-DATA(0x004fa690) char *cEvilTranslate[37][2];
+DATA(0x004fa690) char
+    *cEvilTranslate[KB_INTERFACE_TYPE_COUNT][KB_INTERFACE_VARIANT_COUNT] = {
+    { "advbord.icn", "advborde.icn" },
+    { "heroextg.icn", "heroexte.icn" },
+    { "buybuild.icn", "buybuile.icn" },
+    { "advbtns.icn", "advebtns.icn" },
+    { "herologo.icn", "herologe.icn" },
+    { "sunmoon.icn", "sunmoone.icn" },
+    { "stonback.icn", "stonbake.icn" },
+    { "scroll.icn", "scrolle.icn" },
+    { "locators.icn", "locatore.icn" },
+    { "system.icn", "systeme.icn" },
+    { "CPANBKG.ICN", "CPANBKGE.ICN" },
+    { "CPANEL.ICN", "CPANELE.ICN" },
+    { "APANBKG.ICN", "APANBKGE.ICN" },
+    { "APANEL.ICN", "APANELE.ICN" },
+    { "VIEWWRLD.ICN", "EVIWWRLD.ICN" },
+    { "VIEWRSRC.ICN", "EVIWRSRC.ICN" },
+    { "VIEWRTFX.ICN", "EVIWRTFX.ICN" },
+    { "VIEWTWNS.ICN", "EVIWTWNS.ICN" },
+    { "VIEWHROS.ICN", "EVIWHROS.ICN" },
+    { "VIEW_ALL.ICN", "EVIW_ALL.ICN" },
+    { "VIEWMINE.ICN", "EVIWMINE.ICN" },
+    { "VIEWDDOR.ICN", "EVIWDDOR.ICN" },
+    { "VIEWPUZL.ICN", "EVIWPUZL.ICN" },
+    { "LGNDXTRA.ICN", "LGNDXTRE.ICN" },
+    { "SPANBKG.ICN", "SPANBKGE.ICN" },
+    { "SPANBTN.ICN", "SPANBTNE.ICN" },
+    { "CSPANBKG.ICN", "CSPANBKE.ICN" },
+    { "CSPANBTN.ICN", "CSPANBTE.ICN" },
+    { "TRADPOST.ICN", "TRADPOSE.ICN" },
+    { "VIEWARMY.ICN", "VIEWARME.ICN" },
+    { "WINLOSE.ICN", "WINLOSEE.ICN" },
+    { "WINCMBTB.ICN", "WINCMBBE.ICN" },
+    { "SURRENDR.ICN", "SURRENDE.ICN" },
+    { "SURDRBKG.ICN", "SURDRBKE.ICN" },
+    { "VGENBKG.ICN", "VGENBKGE.ICN" },
+    { "campbkgg.ICN", "campbkge.ICN" },
+    { "campxtrg.ICN", "campxtre.ICN" }
+};
 DATA(0x004fa7b8) char gcAnimPath[0x160] = "\\HEROES2\\ANIM\\";
 DATA(0x004fa918) char gcGamePath[0x18] = ".\\GAMES\\";
 DATA(0x004fa930) char gcMapPath[0x14] = ".\\MAPS\\";
@@ -5080,7 +5122,9 @@ DATA(0x004fa944) int gbPutzingWithMouseCtr = 0;
 DATA(0x004fa948) int gbDontTryRedbook = 0;
 DATA(0x004fa94c) int gbDontTryMIDI = 0;
 DATA(0x004fa950) int gbDontTryDigital = 0;
-DATA(0x004fa958) float gfCombatSpeedMod[3];
+DATA(0x004fa958) float gfCombatSpeedMod[KB_COMBAT_SPEED_COUNT] = {
+    1.0f, 0.7f, 0.35f
+};
 DATA(0x004fa964) icon *gShingleAnim = 0;
 DATA(0x004fa968) int iNextShingleAnim = 0;
 DATA(0x004fa96c) int giDialogTimeout = 0;
@@ -5091,7 +5135,16 @@ DATA(0x004fa97c) int gbDrawWindowBackground = 1;
 DATA(0x004fa980) int gbCheatMenus = 0;
 DATA(0x004fa984) int gbUseWaveout = 0;
 DATA(0x004fa988) int gbShowAllMaps = 0;
-DATA(0x004fa990) char *gCombatFxNames[32];
+DATA(0x004fa990) char *gCombatFxNames[KB_COMBAT_FX_COUNT] = {
+    "", "magic01.icn", "magic02.icn", "magic03.icn",
+    "magic04.icn", "magic05.icn", "magic06.icn", "magic07.icn",
+    "magic08.icn", "rainbluk.icn", "cloudluk.icn", "moraleg.icn",
+    "moraleb.icn", "reddeath.icn", "redfire.icn", "sparks.icn",
+    "electric.icn", "physical.icn", "bluefire.icn", "icecloud.icn",
+    "lichclod.icn", "bless.icn", "berzerk.icn", "shield.icn",
+    "haste.icn", "paralyze.icn", "hypnotiz.icn", "dragslay.icn",
+    "blind.icn", "curse.icn", "stonskin.icn", "stelskin.icn"
+};
 DATA(0x004faa10) short horseFrameFlip[MOVEMENT_FRAME_FLIP_COUNT] = {
     45, 46, 47, 48, 49, 50, 51, 52, 53, 179, 178, 177, 54, 175, 174, 55
 };
@@ -5142,15 +5195,122 @@ DATA(0x004fabf8) int gSSValues[HERO_SKILL_COUNT]
     { 300, 550, 800 },  { 100, 200, 300 }, { 50, 100, 150 },
     { 100, 450, 950 },  { 445, 950, 1500 }
 };
-DATA(0x004faca0) unsigned char gArtifactLevel[104];
-DATA(0x004fad08) int gArtifactBaseRV[100];
+DATA(0x004faca0) unsigned char gArtifactLevel[KB_ARTIFACT_LEVEL_COUNT] = {
+    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x02, 0x04, 0x04, 0x02, 0x08, 0x08, 0x08, 0x08,
+    0x08, 0x08, 0x08, 0x08, 0x08, 0x02, 0x04, 0x02, 0x04, 0x02, 0x04, 0x02, 0x02, 0x02, 0x02, 0x02,
+    0x04, 0x02, 0x02, 0x08, 0x08, 0x08, 0x08, 0x02, 0x04, 0x04, 0x08, 0x04, 0x04, 0x08, 0x08, 0x08,
+    0x04, 0x04, 0x04, 0x08, 0x04, 0x04, 0x04, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x02, 0x08,
+    0x08, 0x08, 0x02, 0x04, 0x04, 0x08, 0x08, 0x02, 0x02, 0x02, 0x04, 0x04, 0x02, 0x04, 0x02, 0x04,
+    0x02, 0x10, 0x20, 0x20, 0x20, 0x20, 0x02, 0x08, 0x02, 0x08, 0x02, 0x02, 0x08, 0x08, 0x02, 0x02,
+    0x02, 0x04, 0x02, 0x02, 0x02, 0x02, 0x04, 0x00
+};
+DATA(0x004fad08) int gArtifactBaseRV[KB_ARTIFACT_BASE_VALUE_COUNT] = {
+    13600, 22000, 18000, 14000, 19000, 18500, 22200, 25000,
+    6000, 4000, 4000, 5600, 1200, 1200, 1200, 1200,
+    -1200, 2000, 1800, 1800, 2000, 1000, 3600, 5600,
+    4000, 5040, 3060, 4420, 5610, 6630, 7000, 6000,
+    4000, 4500, 2250, 1200, 1200, 1200, 1200, 3500,
+    1500, 500, 1000, 750, 500, 750, 750, 750,
+    750, 750, 750, 500, 1500, 1000, 1000, 750,
+    750, 750, 750, 750, 750, 750, 1250, 750,
+    150, 250, 3500, 1250, 250, -1, -1, 4000,
+    4000, 4000, 2000, 2000, 4000, 3800, 7600, 3700,
+    7400, 0, 0, 0, 0, 0, 2500, 4800,
+    9000, -3250, 36200, 2000, -1050, -1050, 10000, 10000,
+    15000, 720, 7500, 10000
+};
 DATA(0x004faea4) int gUltArtifactAvgValue = 16500;
 DATA(0x004faea8) int giDebugLevel = 0;
 DATA(0x004faeac) signed char giVisRangeTown = 5;
-DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[MONSTER_DATABASE_COUNT];
-DATA(0x004fb568) float gfStatPower[42];
-DATA(0x004fb610) float gfBattleStat[42];
-DATA(0x004fb6b8) signed char gSpellLimits[5];
+DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[MONSTER_DATABASE_COUNT] = {
+    { { 20, 33 }, 17, 12, 1, 0, 2, 1, 1, 1, 1, 0, "psnt", 0 },
+    { { 150, 312 }, 21, 8, 10, 0, 2, 5, 3, 2, 3, 12, "arch", MONSTER_ATTRIBUTE_RANGED },
+    { { 200, 463 }, 23, 8, 10, 0, 4, 5, 3, 2, 3, 24, "arch", MONSTER_ATTRIBUTE_RANGED },
+    { { 200, 639 }, 32, 5, 15, 0, 4, 5, 9, 3, 4, 0, "pike", 0 },
+    { { 250, 824 }, 33, 5, 20, 0, 5, 5, 9, 3, 4, 0, "pike", 0 },
+    { { 250, 1130 }, 45, 4, 25, 0, 4, 7, 9, 4, 6, 0, "swdm", 0 },
+    { { 300, 1350 }, 45, 4, 30, 0, 5, 7, 9, 4, 6, 0, "swdm", 0 },
+    { { 300, 1830 }, 61, 3, 30, 0, 6, 10, 9, 5, 10, 0, "cavl", MONSTER_ATTRIBUTE_WIDE },
+    { { 375, 2273 }, 61, 3, 40, 0, 7, 10, 9, 5, 10, 0, "cavl", MONSTER_ATTRIBUTE_WIDE },
+    { { 600, 4704 }, 78, 2, 50, 0, 5, 11, 12, 10, 20, 0, "pldn", 0 },
+    { { 1000, 5822 }, 58, 2, 65, 0, 6, 11, 12, 10, 20, 0, "pldn", 0 },
+    { { 40, 109 }, 27, 10, 3, 1, 4, 3, 1, 1, 2, 0, "gbln", 0 },
+    { { 140, 299 }, 21, 8, 10, 1, 2, 3, 4, 2, 3, 8, "elf_", MONSTER_ATTRIBUTE_RANGED },
+    { { 175, 512 }, 29, 8, 15, 1, 3, 3, 4, 3, 4, 16, "elf_", MONSTER_ATTRIBUTE_RANGED },
+    { { 200, 865 }, 43, 5, 20, 1, 6, 6, 2, 3, 5, 0, "wolf", MONSTER_ATTRIBUTE_WIDE },
+    { { 300, 1065 }, 36, 4, 40, 1, 2, 9, 5, 4, 6, 0, "ogre", 0 },
+    { { 500, 2070 }, 41, 4, 60, 1, 4, 9, 5, 5, 7, 0, "ogre", 0 },
+    { { 600, 1921 }, 32, 3, 40, 1, 4, 10, 5, 5, 7, 8, "trll", MONSTER_ATTRIBUTE_RANGED },
+    { { 700, 2337 }, 33, 3, 40, 1, 5, 10, 5, 7, 9, 16, "trll", MONSTER_ATTRIBUTE_RANGED },
+    { { 750, 6074 }, 58, 2, 80, 1, 5, 12, 9, 12, 24, 0, "cycl", MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER },
+    { { 50, 129 }, 26, 8, 2, 2, 4, 4, 2, 1, 2, 0, "sprt", MONSTER_ATTRIBUTE_FLYING },
+    { { 200, 500 }, 25, 6, 20, 2, 2, 6, 5, 2, 4, 0, "dwrf", 0 },
+    { { 250, 716 }, 29, 6, 20, 2, 4, 6, 6, 2, 4, 0, "dwrf", 0 },
+    { { 250, 554 }, 22, 4, 15, 2, 4, 4, 3, 2, 3, 24, "elf_", MONSTER_ATTRIBUTE_RANGED },
+    { { 300, 658 }, 22, 4, 15, 2, 6, 5, 5, 2, 3, 24, "elf_", MONSTER_ATTRIBUTE_RANGED },
+    { { 350, 1290 }, 37, 3, 25, 2, 5, 7, 5, 5, 8, 8, "drui", MONSTER_ATTRIBUTE_RANGED },
+    { { 400, 1428 }, 36, 3, 25, 2, 6, 7, 7, 5, 8, 16, "drui", MONSTER_ATTRIBUTE_RANGED },
+    { { 500, 2702 }, 54, 2, 40, 2, 5, 10, 9, 7, 14, 0, "unic", MONSTER_ATTRIBUTE_WIDE },
+    { { 1500, 10114 }, 56, 1, 100, 2, 7, 12, 10, 20, 40, 0, "phoe", MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER },
+    { { 60, 154 }, 26, 8, 5, 3, 4, 3, 1, 1, 2, 8, "cntr", MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_RANGED },
+    { { 200, 579 }, 29, 6, 15, 3, 6, 4, 7, 2, 3, 0, "garg", MONSTER_ATTRIBUTE_FLYING },
+    { { 300, 1101 }, 37, 4, 25, 3, 4, 6, 6, 3, 5, 0, "grif", MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING },
+    { { 400, 1751 }, 44, 3, 35, 3, 4, 9, 8, 5, 10, 0, "mino", 0 },
+    { { 500, 2252 }, 45, 3, 45, 3, 6, 9, 8, 5, 10, 0, "mino", 0 },
+    { { 800, 2878 }, 36, 2, 75, 3, 2, 8, 9, 6, 12, 0, "hydr", MONSTER_ATTRIBUTE_WIDE },
+    { { 3000, 18153 }, 55, 1, 200, 3, 4, 12, 12, 25, 50, 0, "drgn", MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER },
+    { { 3500, 22962 }, 68, 1, 250, 3, 5, 13, 13, 25, 50, 0, "drgn", MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER },
+    { { 4000, 28144 }, 74, 1, 300, 3, 6, 14, 14, 25, 50, 0, "drgn", MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER },
+    { { 50, 134 }, 27, 8, 3, 4, 3, 2, 1, 1, 3, 12, "half", MONSTER_ATTRIBUTE_RANGED },
+    { { 150, 493 }, 33, 6, 15, 4, 6, 5, 4, 2, 3, 0, "boar", MONSTER_ATTRIBUTE_WIDE },
+    { { 300, 951 }, 19, 4, 30, 4, 2, 5, 10, 4, 5, 0, "golm", 0 },
+    { { 350, 1324 }, 24, 4, 35, 4, 3, 7, 10, 4, 5, 0, "golm", 0 },
+    { { 400, 1739 }, 43, 3, 40, 4, 4, 7, 7, 4, 8, 0, "roc_", MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING },
+    { { 600, 1935 }, 32, 2, 30, 4, 5, 11, 7, 7, 9, 12, "mage", MONSTER_ATTRIBUTE_RANGED },
+    { { 700, 2469 }, 35, 2, 35, 4, 6, 12, 8, 7, 9, 24, "mage", MONSTER_ATTRIBUTE_RANGED },
+    { { 2000, 9589 }, 42, 1, 150, 4, 4, 13, 10, 20, 30, 0, "titn", 0 },
+    { { 5000, 22933 }, 79, 1, 300, 4, 6, 15, 15, 20, 30, 24, "titn", MONSTER_ATTRIBUTE_RANGED },
+    { { 75, 203 }, 27, 8, 4, 5, 4, 4, 3, 2, 3, 0, "skel", MONSTER_ATTRIBUTE_UNDEAD },
+    { { 150, 310 }, 21, 6, 15, 5, 2, 5, 2, 2, 3, 0, "zomb", MONSTER_ATTRIBUTE_UNDEAD },
+    { { 200, 506 }, 25, 6, 20, 5, 4, 5, 2, 2, 3, 0, "zomb", MONSTER_ATTRIBUTE_UNDEAD },
+    { { 250, 868 }, 35, 4, 25, 5, 4, 6, 6, 3, 4, 0, "mumy", MONSTER_ATTRIBUTE_UNDEAD },
+    { { 300, 1056 }, 35, 4, 30, 5, 5, 6, 6, 3, 4, 0, "mumy", MONSTER_ATTRIBUTE_UNDEAD },
+    { { 500, 1685 }, 42, 3, 30, 5, 4, 8, 6, 5, 7, 0, "vamp", MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD },
+    { { 650, 2461 }, 45, 3, 40, 5, 5, 8, 6, 5, 7, 0, "vamp", MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD },
+    { { 750, 2069 }, 28, 2, 25, 5, 5, 7, 12, 8, 10, 12, "lich", MONSTER_ATTRIBUTE_RANGED | MONSTER_ATTRIBUTE_UNDEAD },
+    { { 900, 2625 }, 29, 2, 35, 5, 6, 7, 13, 8, 10, 24, "lich", MONSTER_ATTRIBUTE_RANGED | MONSTER_ATTRIBUTE_UNDEAD },
+    { { 1500, 11744 }, 78, 1, 150, 5, 4, 11, 9, 25, 45, 0, "drgn", MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD },
+    { { 50, 177 }, 35, 12, 4, 6, 5, 6, 1, 1, 2, 0, "rogu", 0 },
+    { { 200, 805 }, 40, 4, 20, 6, 6, 7, 6, 2, 5, 0, "nmad", MONSTER_ATTRIBUTE_WIDE },
+    { { 1000, 1545 }, 62, 3, 20, 6, 5, 8, 7, 4, 6, 0, "ghst", MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD },
+    { { 650, 5692 }, 60, 2, 50, 6, 6, 10, 9, 20, 30, 0, "geni", MONSTER_ATTRIBUTE_FLYING },
+    { { 500, 1979 }, 40, 5, 35, 6, 4, 8, 9, 6, 10, 0, "meds", MONSTER_ATTRIBUTE_WIDE },
+    { { 500, 1732 }, 35, 3, 50, 6, 3, 8, 8, 4, 5, 0, "eelm", 0 },
+    { { 500, 1412 }, 28, 3, 35, 6, 6, 7, 7, 2, 8, 0, "aelm", 0 },
+    { { 500, 1501 }, 30, 3, 40, 6, 5, 8, 6, 4, 6, 0, "felm", 0 },
+    { { 500, 1690 }, 34, 3, 45, 6, 4, 6, 8, 3, 7, 0, "welm", 0 }
+};
+DATA(0x004fb568) float gfStatPower[KB_STAT_POWER_COUNT] = {
+    0.5f, 0.5f, 0.5f, 0.5f, 0.52f, 0.54f,
+    0.56f, 0.58f, 0.6f, 0.62f, 0.64f, 0.67f,
+    0.7f, 0.74f, 0.77f, 0.8f, 0.84f, 0.88f,
+    0.92f, 0.96f, 1.0f, 1.04f, 1.08f, 1.12f,
+    1.16f, 1.2f, 1.24f, 1.28f, 1.32f, 1.36f,
+    1.4f, 1.44f, 1.48f, 1.52f, 1.56f, 1.6f,
+    1.64f, 1.68f, 1.72f, 1.76f, 1.8f, 0.0f
+};
+DATA(0x004fb610) float gfBattleStat[KB_STAT_POWER_COUNT] = {
+    0.2f, 0.2f, 0.2f, 0.2f, 0.2f, 0.25f,
+    0.3f, 0.35f, 0.4f, 0.45f, 0.5f, 0.55f,
+    0.6f, 0.65f, 0.7f, 0.75f, 0.8f, 0.85f,
+    0.9f, 0.95f, 1.0f, 1.1f, 1.2f, 1.3f,
+    1.4f, 1.5f, 1.6f, 1.7f, 1.8f, 1.9f,
+    2.0f, 2.1f, 2.2f, 2.3f, 2.4f, 2.5f,
+    2.6f, 2.7f, 2.8f, 2.9f, 3.0f, 0.0f
+};
+DATA(0x004fb6b8) signed char gSpellLimits[KB_SPELL_LIMIT_COUNT] = {
+    3, 3, 2, 2, 1
+};
 DATA(0x004fb6c0) float gfSpellCastableCombatMod[12];
 DATA(0x004fb6f0) float gfSpellCastNumMod[12];
 DATA(0x004fb720) float gfPhilAISpellPowerMod[12];
