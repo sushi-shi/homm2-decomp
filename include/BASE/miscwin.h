@@ -6,4 +6,7 @@
 extern "C" void __fastcall BlitBitmapToScreenVesa(int, int, int, int, int, int, int);
 short int AutoInitSVGA(void);
 
+struct tagPAINTSTRUCT;
+extern struct tagPAINTSTRUCT ps;
+
 #endif // HOMM2_MISCWIN_H
