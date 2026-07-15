@@ -2341,7 +2341,7 @@ void combatManager::VaporizeCreature(int side, int armyIndex)
         }
     }
     DelayMilli(static_cast<long>(gfCombatSpeedMod[gConfig.combatSpeed] *
-                                 SPELL_FIZZLE_FRAME_DELAY));
+                                 SPELL_VANISH_END_DELAY));
     target->m_palette = 0;
     target->m_drawEnabled = 1;
     BaseFree(gyModify, SPELLS_SOURCE_FILE, 0);
@@ -2481,7 +2481,7 @@ void combatManager::RippleCreature(int side, int armyIndex, int mode)
         }
     }
     DelayMilli(static_cast<long>(gfCombatSpeedMod[gConfig.combatSpeed] *
-                                 SPELL_FIZZLE_FRAME_DELAY));
+                                 SPELL_VANISH_END_DELAY));
     target->m_palette = 0;
     target->m_drawEnabled = 1;
     BaseFree(gyModify, SPELLS_SOURCE_FILE, 0);
@@ -2795,7 +2795,10 @@ void combatManager::CastMassSpell(int spell, int spellPower)
 // match. Restoring the combat-speed deadline before the first slide frame closed
 // four missing targets. The first residual is search-loop initialization and
 // trampoline order. Tried success inline and retail failure-before-success via
-// goto. Revisit at 95% for loop CFG/slots; do not repeat either body placement.
+// goto. The recovered 50.0f slide delay and DoBlast's 10.0f delay make SPELLS
+// .rdata exact-sized; its only raw pool residual is those final two values in
+// reverse `$T` order. Swapping their header declaration order did not change
+// emission. Revisit at 95% for loop CFG/slots; do not repeat either body placement.
 VA(0x00428389, 0x5c8)
 void combatManager::MirrorImage(int targetHex)
 {
@@ -2874,7 +2877,7 @@ mirror_found:
     gpCombatManager->DrawFrame(0, 1, 0, 1, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
     int deadline = static_cast<int>(
         KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] *
-                            SPELL_FIZZLE_FRAME_DELAY);
+                            MIRROR_SLIDE_FRAME_DELAY);
     int frame;
     for (frame = 0; frame < MIRROR_SLIDE_FRAME_COUNT; ++frame) {
         image->m_xOffset = (MIRROR_SLIDE_FRAME_COUNT - frame) * xOffset /
@@ -2890,7 +2893,7 @@ mirror_found:
         DelayTil(&deadline);
         deadline = static_cast<int>(
             KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] *
-                                SPELL_FIZZLE_FRAME_DELAY);
+                                MIRROR_SLIDE_FRAME_DELAY);
     }
     image->m_xOffset = 0;
     image->m_yOffset = 0;
@@ -3004,6 +3007,8 @@ void combatManager::DoLuck(int side, int armyIndex)
 // string/constant identities; current TU state first differs at the segment
 // loop branch (`jle` versus retail `jge`). Tried `count > segment`, `<`, and an
 // explicit break (worse). Revisit at 95% after headers settle, not before.
+// The 10.0f deadline value and relocation now agree with retail; see MirrorImage's
+// durable note for the remaining two-value constant-pool ordering residual.
 VA(0x00428d4f, 0x33a)
 void combatManager::DoBlast(int targetHex, int spell)
 {
@@ -3055,7 +3060,7 @@ void combatManager::DoBlast(int targetHex, int spell)
         DelayTil(&deadline);
         deadline = static_cast<int>(
             KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] *
-                                SPELL_FIZZLE_FRAME_DELAY);
+                                BLAST_FRAME_DELAY);
         gpWindowManager->UpdateScreenRegion(
             giMinExtentX, giMinExtentY, giMaxExtentX - giMinExtentX + 1,
             giMaxExtentY - giMinExtentY + 1);
