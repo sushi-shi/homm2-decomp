@@ -56,13 +56,15 @@ void townManager::SetupCastle(heroWindow *window, int updateOnly)
               (1L << (castleSlotsBase[slot7] + CASTLE_UPGRADE_OFFSET))) ||
              (castleSlotsBase[slot7] == CASTLE_WARLOCK_TOP_DWELLING &&
               m_town->m_type == TOWN_TYPE_WARLOCK &&
-              (m_town->m_buildings & TOWN_BUILDING_CASTLE))) &&
+              (m_town->m_buildings &
+               TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))) &&
             (gTownEligibleBuildMask[m_town->m_type] &
              (1L << (castleSlotsBase[slot7] + CASTLE_UPGRADE_OFFSET)))) {
             if (castleSlotsBase[slot7] == CASTLE_WARLOCK_TOP_DWELLING &&
                 m_town->m_type == TOWN_TYPE_WARLOCK &&
-                ((m_town->m_buildings & TOWN_BUILDING_TENT) ||
-                 (m_town->m_buildings & TOWN_BUILDING_CASTLE))) {
+                ((m_town->m_buildings & TOWN_BUILDING_UPGRADED_DWELLING_6) ||
+                 (m_town->m_buildings &
+                  TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))) {
                 castleSlotsUse[slot7] = CASTLE_WARLOCK_TOP_UPGRADE;
             } else {
                 castleSlotsUse[slot7] =

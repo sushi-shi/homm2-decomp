@@ -1061,7 +1061,7 @@ void game::GiveTroopsToNeutralTowns(void)
     int i;
     for (i = 0; i < GAME_TOWN_COUNT; i++) {
         GiveTroopsToNeutralTown(i);
-        if (m_castleRecs[i].m_buildings & TOWN_BUILDING_NEUTRAL_GROWTH_BONUS) {
+        if (m_castleRecs[i].m_buildings & TOWN_BUILDING_CASTLE) {
             if (Random(0, 100) < 0x50)
                 GiveTroopsToNeutralTown(i);
         } else {
