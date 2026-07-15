@@ -993,7 +993,8 @@ void LogStr(char *text)
 // all seven sprintf call/format branches agree. Only the newline
 // append differs (base +0x1c9..+0x1f2, retail +0x1c9..+0x1ec), followed by the
 // unnamed retail OutputDebugString IAT operand at +0x211. Direct word, strcat,
-// strcpy-at-strlen, memcpy and manual end-scan spellings were tried.
+// strcpy-at-strlen, memcpy and manual end-scan spellings were tried. A bounded
+// libclang AST pass found 10 single variants and retained none after 30 walks.
 VA(0x004c61c0, 0x224)
 void LogInt(char *label, int value1, int value2, int value3, int value4, int value5,
             int value6, int value7)
@@ -1101,12 +1102,16 @@ void FadeTo(unsigned char *source, unsigned char *destination, int increment)
 }
 
 // @match-note
-// Structurally complete /O2 checkpoint: the 0x304 frame, complete two-loop CFG and
-// all 8 relocations agree. Differences are limited to palette translation
-// +0x22..+0x51 and screen remapping +0x65..+0x87: retail holds the row count in
-// EDI and advances EDX, while base uses EDX and advances EAX. Indexed output,
-// pre/post-increment output, explicit row pointers and a single linear pointer
-// loop were tried; revisit only after a new predecessor/header TU state.
+// Structurally complete /O2 checkpoint: base is 0xba versus retail 0xb8; both have
+// the 0x304 frame, complete two-loop CFG, and all 8 ordered relocations. Recovering
+// the palette-entry pointer, split index advance, outer row lifetime and column local
+// raised the live match from 87.10% to 95.71%. The first residual is the equivalent
+// palette-address SIB encoding at +0x3d; later residuals are FadeTo argument
+// scheduling and EAX/ECX exchange between the screen column counter and byte
+// temporary. Indexed output, pre/post-increment output, explicit row pointers,
+// a linear pointer loop, inner/outer
+// column scope, and explicit pixel value were tried; revisit after predecessor/header
+// TU state changes.
 VA(0x004c65e0, 0xb8)
 void FadeToColorTable(unsigned char *colorTable, int increment)
 {
@@ -1117,19 +1122,23 @@ void FadeToColorTable(unsigned char *colorTable, int increment)
     unsigned char *output = translatedPalette;
     int index = 0;
     do {
-        int paletteIndex = colorTable[index++] * 3;
+        int paletteIndex = colorTable[index] * 3;
         output += 3;
-        output[-3] = paletteData[paletteIndex];
-        output[-2] = paletteData[paletteIndex + 1];
-        output[-1] = paletteData[paletteIndex + 2];
+        ++index;
+        unsigned char *sourceColor = reinterpret_cast<unsigned char *>(paletteData) + paletteIndex;
+        output[-3] = sourceColor[0];
+        output[-2] = sourceColor[1];
+        output[-1] = sourceColor[2];
     } while (output < translatedPalette + sizeof(translatedPalette));
-    FadeTo(reinterpret_cast<unsigned char *>(paletteData), translatedPalette, increment);
-    unsigned char *pixel = gpWindowManager->m_screen->m_pixels;
     int rows = 0x1e0;
+    FadeTo(reinterpret_cast<unsigned char *>(paletteData), translatedPalette, increment);
+    int columns;
+    unsigned char *pixel = gpWindowManager->m_screen->m_pixels;
     do {
-        int columns = 0x280;
+        columns = 0x280;
         do {
-            *pixel = colorTable[*pixel];
+            unsigned char pixelValue = *pixel;
+            *pixel = colorTable[pixelValue];
             ++pixel;
             --columns;
         } while (columns != 0);
