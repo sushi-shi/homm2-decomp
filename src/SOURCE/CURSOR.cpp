@@ -40,6 +40,8 @@ void advManager::StartCursor(int direction)
 {
     int directionX;
     int directionY;
+    int cellX;
+    int cellY;
     mapCell *cell;
 
     m_cursorDirection = direction;
@@ -55,9 +57,9 @@ void advManager::StartCursor(int direction)
     m_previousCursorMapY = m_cursorMapY;
     m_cursorMapX += directionX;
     m_cursorMapY += directionY;
-    directionX = m_cursorMapX + m_mapOriginX;
-    directionY = m_cursorMapY + m_mapOriginY;
-    cell = m_mapData->GetCell(directionX, directionY);
+    cellX = m_cursorMapX + m_mapOriginX;
+    cellY = m_cursorMapY + m_mapOriginY;
+    cell = m_mapData->GetCell(cellX, cellY);
     cell->field8 |= CURSOR_MAP_VISIBLE_FLAG;
 }
 
@@ -122,14 +124,17 @@ void advManager::DrawCursor(void)
                              drawFrame, 1, 0, 0, CURSOR_CLIP_SIZE,
                              CURSOR_CLIP_SIZE, 0);
             if (m_cursorType == CURSOR_HERO_TYPE_BOAT) {
+                int flagDrawn;
+
                 FlipIconToBitmap(m_boatFlagIcons[gpCurPlayer->m_color],
                                  gpWindowManager->m_screen, drawX, drawY,
                                  drawFrame, 0, 0, 0, 0, 0, 0);
+                flagDrawn = 1;
             } else {
                 if (m_cursorCycle == 0) {
-                    drawFrame = (m_cursorFrame & CURSOR_FRAME_MASK) +
-                                m_updateMaxY % CURSOR_DIRECTION_COUNT +
-                                CURSOR_FLAG_FRAME_BASE;
+                    drawFrame = m_updateMaxY % CURSOR_DIRECTION_COUNT +
+                                ((m_cursorFrame & CURSOR_FRAME_MASK) +
+                                 CURSOR_FLAG_FRAME_BASE);
                 }
                 FlipIconToBitmap(m_flagIcons[gpCurPlayer->m_color],
                                  gpWindowManager->m_screen, drawX, drawY,
@@ -152,14 +157,17 @@ void advManager::DrawCursor(void)
                          drawX, drawY, drawFrame, 1, 0, 0,
                          CURSOR_CLIP_SIZE, CURSOR_CLIP_SIZE, 0);
             if (m_cursorType == CURSOR_HERO_TYPE_BOAT) {
+                int flagDrawn;
+
                 IconToBitmap(m_boatFlagIcons[gpCurPlayer->m_color],
                              gpWindowManager->m_screen, drawX, drawY,
                              drawFrame, 0, 0, 0, 0, 0, 0);
+                flagDrawn = 1;
             } else {
                 if (m_cursorCycle == 0) {
-                    drawFrame = (m_cursorFrame & CURSOR_FRAME_MASK) +
-                                m_updateMaxY % CURSOR_DIRECTION_COUNT +
-                                CURSOR_FLAG_FRAME_BASE;
+                    drawFrame = m_updateMaxY % CURSOR_DIRECTION_COUNT +
+                                ((m_cursorFrame & CURSOR_FRAME_MASK) +
+                                 CURSOR_FLAG_FRAME_BASE);
                 }
                 IconToBitmap(m_flagIcons[gpCurPlayer->m_color],
                              gpWindowManager->m_screen, drawX, drawY,
@@ -190,11 +198,11 @@ void advManager::DrawCursor(void)
                  !bMoveSoundMade)) {
                 bMoveSoundMade = 1;
                 if (EveryOther == 0) {
-                    mapCell *cell = GetCell(
-                        m_mapOriginX + CURSOR_MAP_DRAW_OFFSET,
-                        m_mapOriginY + CURSOR_MAP_DRAW_OFFSET);
                     hNewWalkSample = gpSoundManager->MemorySample(
-                        m_cursorSamples[giGroundToTerrain[cell->tile]]);
+                        m_cursorSamples[giGroundToTerrain[
+                            GetCell(m_mapOriginX + CURSOR_MAP_DRAW_OFFSET,
+                                    m_mapOriginY + CURSOR_MAP_DRAW_OFFSET)
+                                ->tile]]);
                 }
             }
         }
@@ -216,6 +224,8 @@ void advManager::DrawCursorShadow(void)
     int shadowOffset;
     int boatShadowOffset;
     int drawFrame;
+    int boatFrame;
+    int shadowFrame;
     int drawY;
 
     if (bShowIt) {
@@ -228,45 +238,48 @@ void advManager::DrawCursorShadow(void)
             m_cursorTurning = S1cursorTurning;
         }
 
-        int drawX = m_updateMinX;
+        int drawX = m_updateMinX + CURSOR_DRAW_X;
         drawY = m_updateMinY + CURSOR_DRAW_Y;
         if (m_cursorType == CURSOR_HERO_TYPE_BOAT)
             drawY -= CURSOR_DRAW_Y - CURSOR_BOAT_DRAW_Y;
 
         if (m_cursorFrame & CURSOR_FLIP_FLAG) {
+            drawX += CURSOR_SHADOW_FLIP_X_ADJUST;
             drawFrame = (m_cursorFrame & CURSOR_FRAME_MASK) +
                         m_cursorFrameCount;
             if (m_drawHeroShadows &&
                 m_cursorType == CURSOR_HERO_TYPE_BOAT) {
-                if (drawFrame >= CURSOR_SHADOW_ANIM_FIRST &&
-                    drawFrame < CURSOR_SHADOW_ANIM_END)
+                boatFrame = drawFrame;
+                if (boatFrame >= CURSOR_SHADOW_ANIM_FIRST &&
+                    boatFrame < CURSOR_SHADOW_ANIM_END)
                     boatShadowOffset = CURSOR_BOAT_SHADOW_OFFSET;
                 else
                     boatShadowOffset = 0;
                 IconToBitmap(m_boatShadowIcon, gpWindowManager->m_screen,
-                             drawX + CURSOR_DRAW_X, drawY,
-                             drawFrame + boatShadowOffset, 1, 0, 0,
+                             drawX - CURSOR_SHADOW_FLIP_X_ADJUST, drawY,
+                             boatFrame + boatShadowOffset, 1, 0, 0,
                              CURSOR_CLIP_SIZE, CURSOR_CLIP_SIZE, 0);
             } else if (m_drawHeroShadows &&
                        m_cursorType != CURSOR_HERO_TYPE_BOAT) {
-                if (drawFrame == 0x33)
-                    drawFrame = 0x38;
-                if (drawFrame == 0x32)
-                    drawFrame = 0x39;
-                if (drawFrame == 0x31)
-                    drawFrame = 0x3a;
-                if (drawFrame == 0x2f)
-                    drawFrame = 0x37;
-                if (drawFrame == 0x2e)
-                    drawFrame = 0x37;
-                if (drawFrame >= CURSOR_SHADOW_ANIM_FIRST &&
-                    drawFrame < CURSOR_SHADOW_ANIM_END)
+                shadowFrame = drawFrame;
+                if (shadowFrame == 0x33)
+                    shadowFrame = 0x38;
+                if (shadowFrame == 0x32)
+                    shadowFrame = 0x39;
+                if (shadowFrame == 0x31)
+                    shadowFrame = 0x3a;
+                if (shadowFrame == 0x2f)
+                    shadowFrame = 0x37;
+                if (shadowFrame == 0x2e)
+                    shadowFrame = 0x37;
+                if (shadowFrame >= CURSOR_SHADOW_ANIM_FIRST &&
+                    shadowFrame < CURSOR_SHADOW_ANIM_END)
                     shadowOffset = CURSOR_HORSE_SHADOW_OFFSET;
                 else
                     shadowOffset = 0;
                 IconToBitmap(m_shadowIcon, gpWindowManager->m_screen,
-                             drawX + CURSOR_DRAW_X, drawY,
-                             drawFrame + shadowOffset, 1, 0, 0,
+                             drawX - CURSOR_SHADOW_FLIP_X_ADJUST, drawY,
+                             shadowFrame + shadowOffset, 1, 0, 0,
                              CURSOR_CLIP_SIZE, CURSOR_CLIP_SIZE, 0);
             }
         } else {
@@ -274,14 +287,14 @@ void advManager::DrawCursorShadow(void)
             if (m_drawHeroShadows &&
                 m_cursorType == CURSOR_HERO_TYPE_BOAT) {
                 IconToBitmap(m_boatShadowIcon, gpWindowManager->m_screen,
-                             drawX + CURSOR_DRAW_X, drawY,
+                             drawX, drawY,
                              drawFrame,
                              1, 0, 0, CURSOR_CLIP_SIZE,
                              CURSOR_CLIP_SIZE, 0);
             } else if (m_drawHeroShadows &&
                        m_cursorType != CURSOR_HERO_TYPE_BOAT) {
                 IconToBitmap(m_shadowIcon, gpWindowManager->m_screen,
-                             drawX + CURSOR_DRAW_X, drawY,
+                             drawX, drawY,
                              drawFrame,
                              1, 0, 0, CURSOR_CLIP_SIZE,
                              CURSOR_CLIP_SIZE, 0);
@@ -810,36 +823,32 @@ void advManager::CheckAdjacentMon(int *adjacentMonster)
 VA(0x0040f8c7, 0x14e)
 int advManager::ValidMoveWithEvent(hero *movingHero, int direction)
 {
-    int destinationX;
-    int destinationY;
-    int directionX;
-    int directionY;
-    mapCell *destinationCell;
-    int valid;
+    int directionX0;
+    int destinationX0;
+    int directionY0;
+    int destinationY0;
+    mapCell *destinationCell0;
 
-    directionX = normalDirTable[direction].x;
-    directionY = normalDirTable[direction].y;
-    destinationX = movingHero->m_x + directionX;
-    destinationY = movingHero->m_y + directionY;
-    if (destinationX < 0 || destinationX > MAP_WIDTH - 1 ||
-        destinationY < 0 || destinationY > MAP_HEIGHT - 1) {
-        valid = 0;
-    } else {
-        destinationCell = m_mapData->GetCell(destinationX, destinationY);
-        if ((destinationCell->triggerType & MAP_EVENT_TYPE_MASK) ==
-            MAP_EVENT_HERO_INTERACTION) {
-            if (!(movingHero->m_eventFlags & HERO_EVENT_EMBARKED))
-                valid = 1;
-            else if (!(gpGame->m_heroRecs[destinationCell->w4hi].m_eventFlags &
-                       HERO_EVENT_EMBARKED))
-                valid = 0;
-            else
-                valid = 1;
-        } else {
-            valid = ValidMove(direction, 1);
-        }
+    directionX0 = normalDirTable[direction].x;
+    directionY0 = normalDirTable[direction].y;
+    destinationX0 = movingHero->m_x + directionX0;
+    destinationY0 = movingHero->m_y + directionY0;
+    if (destinationX0 < 0 || destinationX0 > MAP_WIDTH - 1 ||
+        destinationY0 < 0 || destinationY0 > MAP_HEIGHT - 1)
+        return 0;
+
+    destinationCell0 = m_mapData->GetCell(destinationX0, destinationY0);
+    switch (destinationCell0->triggerType & MAP_EVENT_TYPE_MASK) {
+    case MAP_EVENT_HERO_INTERACTION:
+        if (!(movingHero->m_eventFlags & HERO_EVENT_EMBARKED))
+            return 1;
+        if (!(gpGame->m_heroRecs[destinationCell0->w4hi].m_eventFlags &
+              HERO_EVENT_EMBARKED))
+            return 0;
+        return 1;
+    default:
+        return ValidMove(direction, 1);
     }
-    return valid;
 }
 
 VA(0x0040fa15, 0x4f2)
@@ -853,7 +862,10 @@ int advManager::ValidMove(int direction, int eventMode)
     int centerY;
     mapCell *destinationCell;
     mapCell *currentCell;
-    mapCell *neighborCell;
+    mapCell *horizontalCell;
+    mapCell *verticalCell;
+    mapCell *northNeighborCell;
+    mapCell *southNeighborCell;
     int northDirection;
     int southDirection;
 
@@ -863,11 +875,16 @@ int advManager::ValidMove(int direction, int eventMode)
     destinationY = m_mapOriginY + directionY;
     centerX = m_mapOriginX + CURSOR_MAP_DRAW_OFFSET;
     centerY = m_mapOriginY + CURSOR_MAP_DRAW_OFFSET;
-    destinationX += CURSOR_MAP_DRAW_OFFSET;
-    destinationY += CURSOR_MAP_DRAW_OFFSET;
+    destinationX = destinationX + CURSOR_MAP_DRAW_OFFSET;
+    destinationY = destinationY + CURSOR_MAP_DRAW_OFFSET;
 
-    if (destinationX < 0 || destinationX > MAP_WIDTH - 1 ||
-        destinationY < 0 || destinationY > MAP_HEIGHT - 1)
+    if (destinationX < 0)
+        return 0;
+    if (destinationX > MAP_WIDTH - 1)
+        return 0;
+    if (destinationY < 0)
+        return 0;
+    if (destinationY > MAP_HEIGHT - 1)
         return 0;
 
     destinationCell = m_mapData->GetCell(destinationX, destinationY);
@@ -882,8 +899,8 @@ int advManager::ValidMove(int direction, int eventMode)
             destinationCell->triggerType !=
                 (MAP_EVENT_ACTION_FLAG | MAP_EVENT_SHIPWRECK))
             return 0;
-        if (directionX != 0 && directionY != 0 &&
-            giGroundToTerrain[currentCell->tile] == CURSOR_WATER_TERRAIN) {
+        if (giGroundToTerrain[currentCell->tile] == CURSOR_WATER_TERRAIN &&
+            directionX != 0 && directionY != 0) {
             if (giGroundToTerrain[
                     m_mapData->GetCell(centerX + directionX, centerY)->tile] !=
                 CURSOR_WATER_TERRAIN)
@@ -908,11 +925,11 @@ int advManager::ValidMove(int direction, int eventMode)
                 (MAP_EVENT_ACTION_FLAG | MAP_EVENT_WHIRLPOOL))
             return 0;
         if (destinationCell->ovlIndex != CURSOR_EMPTY_OBJECT_INDEX) {
-            neighborCell = m_mapData->GetCell(destinationX,
-                                              destinationY + 1);
-            if (neighborCell->objIndex != CURSOR_EMPTY_OBJECT_INDEX &&
-                neighborCell->objTileset != CURSOR_PASSABLE_OBJECT_TILESET &&
-                !(neighborCell->field8 & CURSOR_OBJECT_PASSABLE_FLAG))
+            northNeighborCell = m_mapData->GetCell(destinationX,
+                                                   destinationY + 1);
+            if (northNeighborCell->objIndex != CURSOR_EMPTY_OBJECT_INDEX &&
+                northNeighborCell->objTileset != CURSOR_PASSABLE_OBJECT_TILESET &&
+                !(northNeighborCell->field8 & CURSOR_OBJECT_PASSABLE_FLAG))
                 return 0;
         }
     } else if (southDirection) {
@@ -925,13 +942,13 @@ int advManager::ValidMove(int direction, int eventMode)
              !StopOnTrigger(destinationCell)))
             return 0;
         if (currentCell->ovlIndex != CURSOR_EMPTY_OBJECT_INDEX) {
-            neighborCell = m_mapData->GetCell(
+            southNeighborCell = m_mapData->GetCell(
                 m_cursorMapX + m_mapOriginX,
                 m_cursorMapY + m_mapOriginY + 1);
-            if (neighborCell->objIndex != CURSOR_EMPTY_OBJECT_INDEX &&
-                neighborCell->objTileset != CURSOR_PASSABLE_OBJECT_TILESET &&
-                !(neighborCell->field8 & CURSOR_OBJECT_PASSABLE_FLAG) &&
-                !(neighborCell->triggerType & MAP_EVENT_ACTION_FLAG))
+            if (southNeighborCell->objIndex != CURSOR_EMPTY_OBJECT_INDEX &&
+                southNeighborCell->objTileset != CURSOR_PASSABLE_OBJECT_TILESET &&
+                !(southNeighborCell->field8 & CURSOR_OBJECT_PASSABLE_FLAG) &&
+                !(southNeighborCell->triggerType & MAP_EVENT_ACTION_FLAG))
                 return 0;
         }
     }
@@ -941,34 +958,42 @@ int advManager::ValidMove(int direction, int eventMode)
 VA(0x0040ff07, 0x24b)
 void advManager::MoveOrigin(int directionX, int directionY)
 {
-    int oldOriginX;
-    int oldOriginY;
-    mapCell *cell;
+    int oldOriginX0;
+    int cellY1;
+    int cellX5;
+    int oldOriginY9;
+    mapCell *newCursorCell5;
+    mapCell *oldCursorCell0;
+    mapCell *newPreviousCell4;
+    mapCell *oldPreviousCell2;
 
-    oldOriginX = m_mapOriginX;
-    oldOriginY = m_mapOriginY;
+    oldOriginX0 = m_mapOriginX;
+    oldOriginY9 = m_mapOriginY;
     m_mapOriginX += directionX;
     m_mapOriginY += directionY;
-    directionX = oldOriginX - m_mapOriginX;
-    directionY = oldOriginY - m_mapOriginY;
+    directionX = oldOriginX0 - m_mapOriginX;
+    directionY = oldOriginY9 - m_mapOriginY;
     if (directionX != 0 || directionY != 0) {
-        cell = m_mapData->GetCell(m_cursorMapX + oldOriginX,
-                                  m_cursorMapY + oldOriginY);
-        cell->field8 &= ~CURSOR_MAP_VISIBLE_FLAG;
+        oldCursorCell0 = m_mapData->GetCell(m_cursorMapX + oldOriginX0,
+                                            m_cursorMapY + oldOriginY9);
+        oldCursorCell0->field8 &= ~CURSOR_MAP_VISIBLE_FLAG;
         m_cursorMapX += directionX;
         m_cursorMapY += directionY;
-        cell = m_mapData->GetCell(m_cursorMapX + m_mapOriginX,
-                                  m_cursorMapY + m_mapOriginY);
-        cell->field8 |= CURSOR_MAP_VISIBLE_FLAG;
+        cellX5 = m_cursorMapX + m_mapOriginX;
+        cellY1 = m_cursorMapY + m_mapOriginY;
+        newCursorCell5 = m_mapData->GetCell(cellX5, cellY1);
+        newCursorCell5->field8 |= CURSOR_MAP_VISIBLE_FLAG;
         if (m_previousCursorMapX != CURSOR_INVALID_POSITION) {
-            cell = m_mapData->GetCell(m_previousCursorMapX + oldOriginX,
-                                      m_previousCursorMapY + oldOriginY);
-            cell->field8 &= ~CURSOR_MAP_VISIBLE_FLAG;
+            oldPreviousCell2 = m_mapData->GetCell(
+                m_previousCursorMapX + oldOriginX0,
+                m_previousCursorMapY + oldOriginY9);
+            oldPreviousCell2->field8 &= ~CURSOR_MAP_VISIBLE_FLAG;
             m_previousCursorMapX += directionX;
             m_previousCursorMapY += directionY;
-            cell = m_mapData->GetCell(m_previousCursorMapX + m_mapOriginX,
-                                      m_previousCursorMapY + m_mapOriginY);
-            cell->field8 |= CURSOR_MAP_VISIBLE_FLAG;
+            cellX5 = m_previousCursorMapX + m_mapOriginX;
+            cellY1 = m_previousCursorMapY + m_mapOriginY;
+            newPreviousCell4 = m_mapData->GetCell(cellX5, cellY1);
+            newPreviousCell4->field8 |= CURSOR_MAP_VISIBLE_FLAG;
         }
     }
     m_forceCompleteDraw = 1;
