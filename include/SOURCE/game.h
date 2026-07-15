@@ -127,6 +127,7 @@ public:
     int m_viewSpell;  // +0x6605
     int (*m_viewSpellsCallback)(struct tag_message &);  // +0x6609
     signed char m_viewSpellsReadOnly;  // +0x660d
+    unsigned char m_gameLoaded;  // +0x660e
     // --- methods ---
     void SetupDynamicStuff(int, int, int);
     void SetupNewOverviewType(int, int);
@@ -253,6 +254,7 @@ public:
     int GetSideDesc(char *, int, int);
 };
 #pragma pack(pop)
+SIZE(game, 0x660f);
 // ---- globals (declarations, RVA order) ----
 extern class heroWindow *overWin;
 extern char gcCurMapName[16];
