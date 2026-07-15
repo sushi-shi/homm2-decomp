@@ -188,7 +188,10 @@ class LinkExeTest(unittest.TestCase):
         self.assertEqual(pe["linker_version"], "4.20")
         self.assertEqual(pe["entry_point_rva"], 0x1234)
         self.assertEqual(pe["sections"][".data"],
-                         {"rva": 0x2000, "virtual_size": 0x90, "raw_size": 0x40})
+                         {"rva": 0x2000, "virtual_size": 0x90, "raw_size": 0x40,
+                          "characteristics": 0})
+        self.assertEqual(pe["section_order"], [".data"])
+        self.assertEqual(pe["resource_directory"], {"rva": 0, "size": 0})
 
     def test_import_parser_preserves_name_and_ordinal(self):
         data = bytearray(0x400)
