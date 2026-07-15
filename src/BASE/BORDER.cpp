@@ -21,7 +21,6 @@ border::border(void) : widget(0, 0, 0, 0, 0, 0)
     m_fillColor = 0;
 }
 
-// @semantic
 // Generated-alias checkpoint: candidate emits a 0x1f ??_G with 2 relocations that
 // calls the exact standalone destructor; each retail ??_E is 0x4d with 7 relocations
 // and inlines both resource disposals plus widget::~widget. Inlining border::~border

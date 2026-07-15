@@ -172,7 +172,6 @@ int widget::Main(tag_message &message)
     return 0;
 }
 
-// @semantic
 // The emitted body is 0x46 bytes against the 0x47 CodeView span, with the same CFG,
 // call operands, and 2/2 ordered relocations. From +0x0b, VC4.2 schedules the same
 // coordinate loads/extensions and argument pushes differently. Direct, staged,
