@@ -260,6 +260,10 @@ void army::FreeResources(void)
     }
 }
 
+// @early-stop
+// All instructions before the function-local compressed switch table and all
+// 42 relocation sites align. The table/selector span at +0x4f0..+0x513 has only
+// local-label identities; its dispatch and five case bodies were audited raw.
 VA(0x0044b456, 0x7d2)
 void army::DrawToBuffer(int x, int y, int effectsOnly)
 {
@@ -375,7 +379,7 @@ void army::DrawToBuffer(int x, int y, int effectsOnly)
         if (m_facing == 1)
             quantityX5 += quantityOffset0;
         else
-            quantityX5 += -quantityOffset0;
+            quantityX5 -= -(-quantityOffset0);
         quantityY0 = m_facing == 1 ? y - 11 : y - 23;
         goodEffects0 = 0;
         badEffects0 = 0;
@@ -469,21 +473,28 @@ void army::Wince(void)
     m_animationFrame = 0;
 }
 
+// @early-stop
+// Logic, frame slots, CFG, and all 151 relocation sites align. The residual is
+// limited to TU-cumulative operand order in four extent clamps and two final
+// hex-range comparisons, plus one delinked gConfig relocation identity. Direct,
+// commuted, negated, and scalar-SIB comparison spellings were audited.
 VA(0x0044bc55, 0xb90)
 void army::Walk(int direction, int finishStanding, int skipDrawing)
 {
-    int destination;
-    int otherHex;
+    int oldMaxX_1;
+    int oldMaxY_1;
+    int destination_3;
+    int otherHex_1;
     int frame;
     int oldMinX;
-    int oldMinY;
-    int oldMaxX;
-    int oldMaxY;
+    int oldHex_7;
+    int oldMinY_4;
+    int finalDestination;
 
-    destination = GetAdjacentCellIndex(m_hex, direction);
+    destination_3 = GetAdjacentCellIndex(m_hex, direction);
     if (m_side == 1 && gpCombatManager->m_inCastleCombat &&
-        (destination == 58 || destination == 59 ||
-         (destination == 60 && m_side == 1 &&
+        (destination_3 == 58 || destination_3 == 59 ||
+         (destination_3 == 60 && m_side == 1 &&
           (m_monster.flags.all & MONSTER_FLAGS_WIDE))) &&
         gpCombatManager->m_drawbridgeState == 4) {
         m_animationSequence = ARMY_ANIMATION_STAND;
@@ -495,13 +506,16 @@ void army::Walk(int direction, int finishStanding, int skipDrawing)
 
     giWalkingFrom = m_hex;
     if (m_monster.flags.all & MONSTER_FLAGS_WIDE) {
-        giWalkingFrom2 = ((-(m_facing == 1) & 2) - 1) + m_hex;
+        giWalkingFrom2 =
+            (static_cast<unsigned int>(m_facing - 1) < 1 ? 1 : -1) + m_hex;
     } else {
         giWalkingFrom2 = -1;
     }
-    giWalkingTo = destination;
+    giWalkingTo = destination_3;
     if (m_monster.flags.all & MONSTER_FLAGS_WIDE) {
-        giWalkingTo2 = ((-(m_facing == 1) & 2) - 1) + destination;
+        giWalkingTo2 =
+            (static_cast<unsigned int>(m_facing - 1) < 1 ? 1 : -1) +
+            destination_3;
     } else {
         giWalkingTo2 = -1;
     }
@@ -530,9 +544,9 @@ void army::Walk(int direction, int finishStanding, int skipDrawing)
     if (giMaxExtentX > ARMY_COMBAT_MAX_X) giMaxExtentX = ARMY_COMBAT_MAX_X;
     if (giMaxExtentY > ARMY_COMBAT_MAX_Y) giMaxExtentY = ARMY_COMBAT_MAX_Y;
     oldMinX = giMinExtentX;
-    oldMinY = giMinExtentY;
-    oldMaxX = giMaxExtentX;
-    oldMaxY = giMaxExtentY;
+    oldMinY_4 = giMinExtentY;
+    oldMaxX_1 = giMaxExtentX;
+    oldMaxY_1 = giMaxExtentY;
 
     m_facingChanged = 0;
     if (direction < 3) {
@@ -556,6 +570,7 @@ void army::Walk(int direction, int finishStanding, int skipDrawing)
     if (direction == 2 || direction == 3) {
         m_drawState = 3;
     }
+    oldHex_7 = m_hex;
     m_animationFrame = 0;
     m_animationSequence = ARMY_ANIMATION_WALK;
     if (!gbNoShowCombat) {
@@ -596,9 +611,9 @@ void army::Walk(int direction, int finishStanding, int skipDrawing)
                 if (giMaxExtentY > ARMY_COMBAT_MAX_Y)
                     giMaxExtentY = ARMY_COMBAT_MAX_Y;
                 oldMinX = giMinExtentX;
-                oldMinY = giMinExtentY;
-                oldMaxX = giMaxExtentX;
-                oldMaxY = giMaxExtentY;
+                oldMinY_4 = giMinExtentY;
+                oldMaxX_1 = giMaxExtentX;
+                oldMaxY_1 = giMaxExtentY;
             }
             giMinExtentY = ARMY_COMBAT_WIDTH;
             giMinExtentX = giMinExtentY;
@@ -630,49 +645,62 @@ void army::Walk(int direction, int finishStanding, int skipDrawing)
             gbLimitToExtent = 0;
             gbComputeExtent = 0;
             gbCurrArmyDrawn = 1;
-            if (giMinExtentX < oldMinX) oldMinX = giMinExtentX;
-            if (giMinExtentY < oldMinY) oldMinY = giMinExtentY;
-            if (giMaxExtentX > oldMaxX) oldMaxX = giMaxExtentX;
-            if (giMaxExtentY > oldMaxY) oldMaxY = giMaxExtentY;
+            if (!(oldMinX <= giMinExtentX)) {
+                oldMinX = giMinExtentX;
+            }
+            if (!(oldMinY_4 <= giMinExtentY)) {
+                oldMinY_4 = giMinExtentY;
+            }
+            if (!(oldMaxX_1 >= giMaxExtentX)) {
+                oldMaxX_1 = giMaxExtentX;
+            }
+            if (!(oldMaxY_1 >= giMaxExtentY)) {
+                oldMaxY_1 = giMaxExtentY;
+            }
             DelayTil(glTimers);
             glTimers[0] = static_cast<int>(
                 KBTickCount() +
                 m_walkDuration * gfCombatSpeedMod[gConfig.combatSpeed] /
                     m_frameInfo.animationFrameCount[ARMY_ANIMATION_WALK]);
             gpWindowManager->UpdateScreenRegion(
-                oldMinX, oldMinY, oldMaxX - oldMinX + 1, oldMaxY - oldMinY + 1);
+                oldMinX, oldMinY_4,
+                oldMaxX_1 - oldMinX + 1,
+                oldMaxY_1 - oldMinY_4 + 1);
         }
     }
 
-    destination = GetAdjacentCellIndex(m_hex, direction);
+    finalDestination = GetAdjacentCellIndex(m_hex, direction);
     gpCombatManager->m_hexCells[m_hex].m_occupantIndex = -1;
     gpCombatManager->m_hexCells[m_hex].m_occupantSide = -1;
     gpCombatManager->m_hexCells[m_hex].m_occupantFrame = -1;
     if (m_monster.flags.all & MONSTER_FLAGS_WIDE) {
-        otherHex = ((-(m_facing == 1) & 2) - 1) + m_hex;
-        gpCombatManager->m_hexCells[otherHex].m_occupantIndex = -1;
-        gpCombatManager->m_hexCells[otherHex].m_occupantSide = -1;
-        gpCombatManager->m_hexCells[otherHex].m_occupantFrame = -1;
+        otherHex_1 =
+            (static_cast<unsigned int>(m_facing - 1) < 1 ? 1 : -1) + m_hex;
+        gpCombatManager->m_hexCells[otherHex_1].m_occupantIndex = -1;
+        gpCombatManager->m_hexCells[otherHex_1].m_occupantSide = -1;
+        gpCombatManager->m_hexCells[otherHex_1].m_occupantFrame = -1;
     }
-    gpCombatManager->m_hexCells[destination].m_occupantSide = m_side;
-    gpCombatManager->m_hexCells[destination].m_occupantIndex = m_index;
-    gpCombatManager->m_hexCells[destination].m_occupantFrame = -1;
+    gpCombatManager->m_hexCells[finalDestination].m_occupantSide = m_side;
+    gpCombatManager->m_hexCells[finalDestination].m_occupantIndex = m_index;
+    gpCombatManager->m_hexCells[finalDestination].m_occupantFrame = -1;
     if (m_monster.flags.all & MONSTER_FLAGS_WIDE) {
-        otherHex = ((-(m_facing == 1) & 2) - 1) + destination;
-        gpCombatManager->m_hexCells[otherHex].m_occupantSide = m_side;
-        gpCombatManager->m_hexCells[otherHex].m_occupantIndex = m_index;
-        if (otherHex < destination) {
-            gpCombatManager->m_hexCells[otherHex].m_occupantFrame = 0;
+        otherHex_1 =
+            (static_cast<unsigned int>(m_facing - 1) < 1 ? 1 : -1) +
+            finalDestination;
+        gpCombatManager->m_hexCells[otherHex_1].m_occupantSide = m_side;
+        gpCombatManager->m_hexCells[otherHex_1].m_occupantIndex = m_index;
+        if (otherHex_1 >= finalDestination) {
+            gpCombatManager->m_hexCells[otherHex_1].m_occupantFrame = 1;
         } else {
-            gpCombatManager->m_hexCells[otherHex].m_occupantFrame = 1;
+            gpCombatManager->m_hexCells[otherHex_1].m_occupantFrame = 0;
         }
-        if (destination < otherHex) {
-            gpCombatManager->m_hexCells[destination].m_occupantFrame = 0;
+        if (finalDestination >= otherHex_1) {
+            gpCombatManager->m_hexCells[finalDestination].m_occupantFrame = 1;
         } else {
-            gpCombatManager->m_hexCells[destination].m_occupantFrame = 1;
+            gpCombatManager->m_hexCells[finalDestination].m_occupantFrame = 0;
         }
     }
-    m_hex = destination;
+    m_hex = finalDestination;
     if (m_facingChanged) {
         m_facing = 1 - m_facing;
         if (m_monster.flags.all & MONSTER_FLAGS_WIDE) {
@@ -696,73 +724,83 @@ void army::Walk(int direction, int finishStanding, int skipDrawing)
     }
 }
 
+// @early-stop
+// Logic, 0x1d8 frame/slots, CFG, and all external relocations align. Residuals
+// are TU-cumulative army-array/extent operand order, equivalent float-compare
+// polarity, constant-pool identities, one continuation jump, and the delinked
+// recursive local call. Manual variants and an audited AST permutation pass
+// were exhausted; revisit after later ARMY source/header changes.
 VA(0x0044c7e5, 0x14aa)
 void army::SpecialAttack(void)
 {
-    army *splashTarget;
-    bitmap *missileBackground;
     char combatText[ARMY_COMBAT_TEXT_SIZE];
-    int damage;
-    int killed;
-    int originalFacing;
-    char targetColumn;
-    char targetRow;
-    char sourceColumn;
+    int missileDelay_2;
+    int minY_1;
+    int oldX_16;
+    char targetColumn_2;
+    int minX_1;
+    float angle_2;
+    int missileHalfHeight_1;
+    char sourceColumn_8;
+    int attackDirection_3;
+    int effectType_1;
+    int initialXDistance_6;
+    int yStep_6;
+    int currentMissileY_7;
+    int xStep_29;
+    int currentMissileX_7;
+    int effectY_28;
     char sourceRow;
-    int targetX;
-    int targetY;
-    int sourceX;
-    int sourceY;
-    int xDistance;
-    int yDistance;
+    int missileSteps_7;
+    int oldY_9;
+    int effectX_2;
+    char targetRow_1;
     char reverseMissile;
-    int directionFrame;
-    int attackDirection;
-    int direction;
-    int frame;
-    int missileHalfWidth;
-    int missileHalfHeight;
-    int missileSpacing;
-    int missileX;
-    int missileY;
-    int endX;
-    int endY;
-    int distance;
-    int missileSteps;
-    int xStep;
-    int yStep;
-    int oldX;
-    int oldY;
-    int backgroundX;
-    int backgroundY;
-    int minX;
-    int minY;
-    int maxX;
-    int maxY;
-    int adjacentHex;
+    int distance_6;
+    int originalFacing_6;
+    int initialYDistance_8;
+    int backgroundX_4;
+    int maxX_3;
+    int xDistance_7;
+    int maxY_3;
+    bitmap *missileBackground;
+    int backgroundY_6;
     int originalAttack;
-    int effectType;
-    int effectX;
-    int effectY;
-    float angle;
+    int direction;
+    int missileHalfWidth;
+    int sourceY_1;
+    int targetY_1;
+    int missileSpacing_1;
+    int missileY_7;
+    int endX_36;
+    int yDistance_16;
+    int sourceX_1;
+    int targetX_1;
+    int missileX_7;
+    int damage;
     float slope;
+    int directionFrame_2;
+    int endY_19;
+    int killed_13;
+    army *target_1;
 
     damage = 0;
-    killed = 0;
-    army *target = &gpCombatManager->m_armies[m_targetSide][m_targetIndex];
+    killed_13 = 0;
+    originalFacing_6 = m_facing;
     m_palette = 0;
-    targetColumn = target->m_hex % 13;
-    targetRow = target->m_hex / 13;
-    sourceColumn = m_hex % 13;
+    target_1 = m_targetIndex + gpCombatManager->m_armies[m_targetSide];
+    targetColumn_2 = target_1->m_hex % 13;
+    targetRow_1 = target_1->m_hex / 13;
+    sourceColumn_8 = m_hex % 13;
     sourceRow = m_hex / 13;
-    originalFacing = m_facing;
-    if (sourceColumn > targetColumn ||
-        ((sourceRow & 1) != 0 && sourceColumn == targetColumn)) {
-        m_facing = 0;
-    } else {
+    originalFacing_6 = m_facing;
+    if (!(targetColumn_2 <= sourceColumn_8) ||
+        (!(sourceRow & 1) && targetColumn_2 == sourceColumn_8)) {
         m_facing = 1;
+    } else {
+        m_facing = 0;
     }
-    if (m_facing != originalFacing) {
+    if (m_facing != originalFacing_6) {
         if (m_monster.flags.all & MONSTER_FLAGS_WIDE) {
             if (m_facing == 1) {
                 m_hex--;
@@ -779,66 +817,67 @@ void army::SpecialAttack(void)
     gpCombatManager->m_limitCreatureCount[m_side][m_index]++;
     gpCombatManager->DrawFrame(0, 1, 0, 1, ARMY_COMBAT_FRAME_DELAY, 1, 1);
 
-    targetX = target->MidX();
-    targetY = target->MidY();
+    targetX_1 = target_1->MidX();
+    targetY_1 = target_1->MidY();
     if (m_monsterType == ARMY_CREATURE_LICH ||
         m_monsterType == ARMY_CREATURE_POWER_LICH) {
-        targetX = gpCombatManager->m_hexCells[target->m_hex].m_x;
-        targetY = gpCombatManager->m_hexCells[target->m_hex].m_y - 17;
+        targetX_1 = gpCombatManager->m_hexCells[target_1->m_hex].m_x;
+        targetY_1 = gpCombatManager->m_hexCells[target_1->m_hex].m_y - 17;
     }
     if (m_facing == 1) {
-        sourceX = gpCombatManager->m_hexCells[m_hex].m_x +
+        sourceX_1 = gpCombatManager->m_hexCells[m_hex].m_x +
             m_frameInfo.missileOffsets[1].x;
     } else {
-        sourceX = gpCombatManager->m_hexCells[m_hex].m_x -
+        sourceX_1 = gpCombatManager->m_hexCells[m_hex].m_x -
             m_frameInfo.missileOffsets[1].x;
     }
-    sourceY = gpCombatManager->m_hexCells[m_hex].m_y +
+    sourceY_1 = gpCombatManager->m_hexCells[m_hex].m_y +
         m_frameInfo.missileOffsets[1].y;
-    xDistance = targetX - sourceX;
+    initialXDistance_6 = targetX_1 - sourceX_1;
     reverseMissile = 0;
-    if (xDistance < 0) {
+    if (initialXDistance_6 < 0) {
         reverseMissile = 1;
-        xDistance = -xDistance;
+        initialXDistance_6 = -initialXDistance_6;
     }
-    yDistance = targetY - sourceY;
-    if (xDistance == 0) {
-        if (yDistance > 0) {
-            directionFrame = m_frameInfo.projectileDirectionCount - 1;
+    initialYDistance_8 = targetY_1 - sourceY_1;
+    if (initialXDistance_6 == 0) {
+        if (initialYDistance_8 > 0) {
+            directionFrame_2 = m_frameInfo.projectileDirectionCount - 1;
         } else {
-            directionFrame = 0;
+            directionFrame_2 = 0;
         }
-        angle = static_cast<float>(((yDistance <= 0) - 1 & -180) + 90);
+        angle_2 = static_cast<float>(((initialYDistance_8 <= 0) - 1 & -180) + 90);
     } else {
-        slope = static_cast<float>(-yDistance) / xDistance;
-        angle = static_cast<float>(atan(static_cast<double>(slope)) *
+        slope = static_cast<float>(-initialYDistance_8) / initialXDistance_6;
+        angle_2 = static_cast<float>(atan(static_cast<double>(slope)) *
             180.0 / 3.14159265358979323846);
         for (direction = 1;
              direction < m_frameInfo.projectileDirectionCount;
              direction++) {
             if ((m_frameInfo.projectileAngles[direction - 1] +
-                 m_frameInfo.projectileAngles[direction]) / 2.0f < angle) {
+                 m_frameInfo.projectileAngles[direction]) / 2.0f < angle_2) {
                 break;
             }
         }
         if (direction < m_frameInfo.projectileDirectionCount) {
-            directionFrame = direction - 1;
+            directionFrame_2 = direction - 1;
         } else {
-            directionFrame = m_frameInfo.projectileDirectionCount - 1;
+            directionFrame_2 = m_frameInfo.projectileDirectionCount - 1;
         }
     }
-    if (angle <= -45.0f) {
+    if (-45.0f >= angle_2) {
         m_animationSequence = ARMY_ANIMATION_SHOOT_DOWN;
-        attackDirection = 2;
-    } else if (angle <= 45.0f) {
+        attackDirection_3 = 2;
+    } else if (45.0f >= angle_2) {
         m_animationSequence = ARMY_ANIMATION_SHOOT_FORWARD;
-        attackDirection = 1;
+        attackDirection_3 = 1;
     } else {
         m_animationSequence = ARMY_ANIMATION_SHOOT_UP;
-        attackDirection = 0;
+        attackDirection_3 = 0;
     }
-    m_animationFrame = 0;
-    while (m_animationFrame < m_frameInfo.animationFrameCount[m_animationSequence]) {
+    for (m_animationFrame = 0;
+         m_animationFrame < m_frameInfo.animationFrameCount[m_animationSequence];
+         m_animationFrame++) {
         if (m_animationFrame ==
             m_frameInfo.animationFrameCount[m_animationSequence] - 1) {
             gpCombatManager->DrawFrame(0, 1, 0, 0,
@@ -847,7 +886,6 @@ void army::SpecialAttack(void)
             gpCombatManager->DrawFrame(1, 1, 0, 0,
                                        ARMY_COMBAT_FRAME_DELAY, 1, 1);
         }
-        m_animationFrame++;
         glTimers[0] = static_cast<int>(
             KBTickCount() + m_frameInfo.attackDuration *
             gfCombatSpeedMod[gConfig.combatSpeed] /
@@ -856,31 +894,36 @@ void army::SpecialAttack(void)
     m_animationFrame = m_frameInfo.animationFrameCount[m_animationSequence] - 1;
 
     missileHalfWidth = 25;
-    missileHalfHeight = 25;
-    missileSpacing = 31;
+    missileHalfHeight_1 = 25;
+    missileSpacing_1 = 31;
+    missileDelay_2 = 25;
     if (m_monsterType == ARMY_CREATURE_LICH ||
         m_monsterType == ARMY_CREATURE_POWER_LICH) {
-        missileSpacing = 26;
-        directionFrame = 7;
+        missileSpacing_1 = 26;
+        missileDelay_2 = 7;
         missileHalfWidth = 10;
-        missileHalfHeight = 10;
+        missileHalfHeight_1 = 10;
     }
+    maxX_3 = 0;
+    minX_1 = ARMY_COMBAT_MAX_X;
+    maxY_3 = 0;
+    minY_1 = ARMY_PROJECTILE_CLIP_HEIGHT - 1;
     if (m_facing == 1) {
-        missileX = gpCombatManager->m_hexCells[m_hex].m_x +
-            m_frameInfo.missileOffsets[attackDirection].x;
+        missileX_7 = gpCombatManager->m_hexCells[m_hex].m_x +
+            m_frameInfo.missileOffsets[attackDirection_3].x;
     } else {
-        missileX = gpCombatManager->m_hexCells[m_hex].m_x -
-            m_frameInfo.missileOffsets[attackDirection].x;
+        missileX_7 = gpCombatManager->m_hexCells[m_hex].m_x -
+            m_frameInfo.missileOffsets[attackDirection_3].x;
     }
-    missileY = gpCombatManager->m_hexCells[m_hex].m_y +
-        m_frameInfo.missileOffsets[attackDirection].y;
-    endX = target->MidX();
-    endY = target->MidY();
-    xDistance = endX - missileX;
-    yDistance = endY - missileY;
-    distance = static_cast<int>(sqrt(static_cast<double>(
-        xDistance * xDistance + yDistance * yDistance)));
-    missileSteps = (distance + (missileSpacing >> 1)) / missileSpacing;
+    missileY_7 = gpCombatManager->m_hexCells[m_hex].m_y +
+        m_frameInfo.missileOffsets[attackDirection_3].y;
+    endX_36 = target_1->MidX();
+    endY_19 = target_1->MidY();
+    xDistance_7 = endX_36 - missileX_7;
+    yDistance_16 = endY_19 - missileY_7;
+    distance_6 = static_cast<int>(sqrt(static_cast<double>(
+        xDistance_7 * xDistance_7 + yDistance_16 * yDistance_16)));
+    missileSteps_7 = (distance_6 + (missileSpacing_1 >> 1)) / missileSpacing_1;
 
     if (m_monsterType == ARMY_CREATURE_MAGE ||
         m_monsterType == ARMY_CREATURE_ARCHMAGE) {
@@ -892,63 +935,74 @@ void army::SpecialAttack(void)
         DelayMilli(static_cast<long>(gfCombatSpeedMod[gConfig.combatSpeed] *
                                      ARMY_COMBAT_FRAME_DELAY));
         gpCombatManager->DoBolt(
-            1, missileX, missileY, endX, endY, 0, 0, 5, 4, 302, 0, 0,
-            distance / 15 + 15, 1, 0, 10, 0);
+            1, missileX_7, missileY_7, endX_36, endY_19, 0, 0, 5, 4, 302, 0, 0,
+            distance_6 / 15 + 15, 1, 0, 10, 0);
     } else {
-        if (missileSteps < 2) {
-            xStep = xDistance;
-            yStep = yDistance;
+        if (missileSteps_7 > 1) {
+            xStep_29 = xDistance_7 / (missileSteps_7 - 1);
+            yStep_6 = yDistance_16 / (missileSteps_7 - 1);
         } else {
-            xStep = xDistance / (missileSteps - 1);
-            yStep = yDistance / (missileSteps - 1);
+            xStep_29 = xDistance_7;
+            yStep_6 = yDistance_16;
         }
-        oldX = missileX;
-        oldY = missileY;
+        currentMissileX_7 = missileX_7;
+        currentMissileY_7 = missileY_7;
         missileBackground = new bitmap(
             33,
             static_cast<short>(missileHalfWidth * 2),
-            static_cast<short>(missileHalfHeight * 2));
+            static_cast<short>(missileHalfHeight_1 * 2));
         missileBackground->GrabBitmapCareful(
             gpWindowManager->m_screen,
-            static_cast<short>(missileX - missileHalfWidth),
-            static_cast<short>(missileY - missileHalfHeight));
-        backgroundX = missileX;
-        backgroundY = missileY;
-        for (frame = 0; frame < missileSteps; frame++) {
-            minX = missileX - missileHalfWidth;
-            if (minX < 0) minX = 0;
-            maxX = missileX + missileHalfWidth;
-            if (maxX > ARMY_COMBAT_MAX_X) maxX = ARMY_COMBAT_MAX_X;
-            minY = missileY - missileHalfHeight;
-            if (minY < 0) minY = 0;
-            maxY = missileY + missileHalfHeight;
-            if (maxY > ARMY_COMBAT_MAX_Y) maxY = ARMY_COMBAT_MAX_Y;
-            if (frame == 0) {
-                if (minX < giMinExtentX) giMinExtentX = minX;
-                if (maxX > giMaxExtentX) giMaxExtentX = maxX;
-                if (minY < giMinExtentY) giMinExtentY = minY;
-                if (maxY > giMaxExtentY) giMaxExtentY = maxY;
-            } else {
+            static_cast<short>(currentMissileX_7 - missileHalfWidth),
+            static_cast<short>(currentMissileY_7 - missileHalfHeight_1));
+        oldX_16 = currentMissileX_7;
+        oldY_9 = currentMissileY_7;
+        backgroundX_4 = 0;
+        backgroundY_6 = 0;
+        for (direction = 0; direction < missileSteps_7; direction++) {
+            if (oldX_16 - missileHalfWidth < minX_1) {
+                minX_1 = oldX_16 - missileHalfWidth;
+            }
+            if (minX_1 < 0) minX_1 = 0;
+            if (maxX_3 < oldX_16 + missileHalfWidth) {
+                maxX_3 = oldX_16 + missileHalfWidth;
+            }
+            if (maxX_3 > ARMY_COMBAT_MAX_X) maxX_3 = ARMY_COMBAT_MAX_X;
+            if (oldY_9 - missileHalfHeight_1 < minY_1) {
+                minY_1 = oldY_9 - missileHalfHeight_1;
+            }
+            if (minY_1 < 0) minY_1 = 0;
+            if (maxY_3 < oldY_9 + missileHalfHeight_1) {
+                maxY_3 = oldY_9 + missileHalfHeight_1;
+            }
+            if (maxY_3 > ARMY_COMBAT_MAX_Y) maxY_3 = ARMY_COMBAT_MAX_Y;
+            if (direction != 0) {
                 missileBackground->DrawToBufferCareful(
-                    static_cast<short>(backgroundX), static_cast<short>(backgroundY));
+                    static_cast<short>(backgroundX_4),
+                    static_cast<short>(backgroundY_6));
+            } else {
+                if (minX_1 < giMinExtentX) giMinExtentX = minX_1;
+                if (giMaxExtentX < maxX_3) giMaxExtentX = maxX_3;
+                if (giMinExtentY > minY_1) giMinExtentY = minY_1;
+                if (maxY_3 > giMaxExtentY) giMaxExtentY = maxY_3;
             }
-            backgroundX = oldX - missileHalfWidth;
-            if (backgroundX < 0) backgroundX = 0;
-            if (backgroundX + missileBackground->m_width > ARMY_COMBAT_WIDTH) {
-                backgroundX = ARMY_COMBAT_WIDTH - missileBackground->m_width;
+            backgroundX_4 = currentMissileX_7 - missileHalfWidth;
+            if (backgroundX_4 < 0) backgroundX_4 = 0;
+            if (backgroundX_4 + missileBackground->m_width > ARMY_COMBAT_WIDTH) {
+                backgroundX_4 = ARMY_COMBAT_WIDTH - missileBackground->m_width;
             }
-            backgroundY = oldY - missileHalfHeight;
-            if (backgroundY < 0) backgroundY = 0;
-            if (backgroundY + missileBackground->m_height > ARMY_COMBAT_WIDTH) {
-                backgroundY = ARMY_COMBAT_WIDTH - missileBackground->m_height;
+            backgroundY_6 = currentMissileY_7 - missileHalfHeight_1;
+            if (backgroundY_6 < 0) backgroundY_6 = 0;
+            if (backgroundY_6 + missileBackground->m_height > ARMY_COMBAT_WIDTH) {
+                backgroundY_6 = ARMY_COMBAT_WIDTH - missileBackground->m_height;
             }
             missileBackground->GrabBitmapCareful(
                 gpWindowManager->m_screen,
-                static_cast<short>(backgroundX),
-                static_cast<short>(backgroundY));
+                static_cast<short>(backgroundX_4),
+                static_cast<short>(backgroundY_6));
             m_missileIcon->DrawToBuffer(
-                missileX, missileY, directionFrame, reverseMissile);
-            if (frame == 0) {
+                currentMissileX_7, currentMissileY_7, directionFrame_2, reverseMissile);
+            if (direction == 0) {
                 gpWindowManager->UpdateScreenRegion(
                     giMinExtentX,
                     giMinExtentY,
@@ -957,22 +1011,27 @@ void army::SpecialAttack(void)
             } else {
                 DelayTil(glTimers);
                 gpWindowManager->UpdateScreenRegion(
-                    minX, minY, maxX - minX + 1, maxY - minY + 1);
+                    minX_1, minY_1, maxX_3 - minX_1 + 1, maxY_3 - minY_1 + 1);
             }
             glTimers[0] = static_cast<int>(
-                KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * 15);
-            oldX = missileX;
-            oldY = missileY;
-            missileX += xStep;
-            missileY += yStep;
+                KBTickCount() +
+                missileDelay_2 * gfCombatSpeedMod[gConfig.combatSpeed]);
+            oldX_16 = currentMissileX_7;
+            oldY_9 = currentMissileY_7;
+            currentMissileX_7 += xStep_29;
+            currentMissileY_7 += yStep_6;
+            minX_1 = currentMissileX_7 - missileHalfWidth;
+            maxX_3 = currentMissileX_7 + missileHalfWidth;
+            minY_1 = currentMissileY_7 - missileHalfHeight_1;
+            maxY_3 = currentMissileY_7 + missileHalfHeight_1;
         }
         missileBackground->DrawToBuffer(
-            static_cast<short>(backgroundX), static_cast<short>(backgroundY));
+            static_cast<short>(backgroundX_4), static_cast<short>(backgroundY_6));
         gpWindowManager->UpdateScreenRegion(
-            oldX - missileHalfWidth,
-            oldY - missileHalfHeight,
+            oldX_16 - missileHalfWidth,
+            oldY_9 - missileHalfHeight_1,
             missileHalfWidth * 2,
-            missileHalfHeight * 2);
+            missileHalfHeight_1 * 2);
         delete missileBackground;
         if (!gpCombatManager->m_heroes[m_side] ||
             !gpCombatManager->m_heroes[m_side]->HasArtifact(
@@ -982,71 +1041,84 @@ void army::SpecialAttack(void)
     }
 
     originalAttack = m_monster.attack;
-    effectType = -1;
-    effectX = -1;
-    effectY = -1;
+    effectType_1 = -1;
+    effectX_2 = -1;
+    effectY_28 = -1;
     if (m_monsterType == ARMY_CREATURE_LICH ||
         m_monsterType == ARMY_CREATURE_POWER_LICH) {
+        int adjacentHex;
+        army *splashTarget;
+
         gpCombatManager->ClearEffects();
         for (direction = 0; direction < 7; direction++) {
             if (direction < 6) {
-                adjacentHex = target->GetAdjacentCellIndex(target->m_hex, direction);
+                adjacentHex = target_1->GetAdjacentCellIndex(target_1->m_hex, direction);
             } else {
-                adjacentHex = target->m_hex;
+                adjacentHex = target_1->m_hex;
             }
-            if (adjacentHex != -1 &&
-                gpCombatManager->m_hexCells[adjacentHex].m_occupantSide != -1) {
+            if (adjacentHex == -1) {
+                continue;
+            }
+            if (gpCombatManager->m_hexCells[adjacentHex].m_occupantSide != -1) {
                 splashTarget = &gpCombatManager->m_armies
                     [gpCombatManager->m_hexCells[adjacentHex].m_occupantSide]
                     [gpCombatManager->m_hexCells[adjacentHex].m_occupantIndex];
                 if (!gArmyEffected[splashTarget->m_side][splashTarget->m_index] &&
-                    (target != splashTarget || direction == 6)) {
+                    (target_1 != splashTarget || direction == 6)) {
                     gArmyEffected[splashTarget->m_side][splashTarget->m_index] = 1;
-                    DamageEnemy(splashTarget, &damage, &killed, 1, 0);
+                    DamageEnemy(splashTarget, &damage, &killed_13, 1, 0);
                 }
             }
         }
         m_spellEffectYOffset = 0;
-        effectType = ARMY_LICH_EXPLOSION_EFFECT;
-        effectX = gpCombatManager->m_hexCells[adjacentHex].m_x;
-        effectY = gpCombatManager->m_hexCells[adjacentHex].m_y - 17;
+        effectType_1 = ARMY_LICH_EXPLOSION_EFFECT;
+        effectX_2 = gpCombatManager->m_hexCells[adjacentHex].m_x;
+        effectY_28 = gpCombatManager->m_hexCells[adjacentHex].m_y - 17;
         gpSoundManager->MemorySample(m_samples[ARMY_SAMPLE_EXTRA_ONE]);
     } else {
-        DamageEnemy(target, &damage, &killed, 1, 0);
+        DamageEnemy(target_1, &damage, &killed_13, 1, 0);
     }
     m_monster.attack = originalAttack;
 
-    if (killed < 1) {
+    if (killed_13 > 0) {
+        if (damage == -1) {
+            sprintf(gText, "The mirror image is destroyed!");
+        } else {
+            sprintf(gText, "%s %s %d %s, %d %s %s.",
+                m_quantity > 1 ? gArmyNamesPlural[m_monsterType] :
+                                 gArmyNames[m_monsterType],
+                m_quantity > 1 ? "do" : "does",
+                damage,
+                "damage",
+                killed_13,
+                killed_13 > 1 ? gArmyNamesPlural[target_1->m_monsterType] :
+                             gArmyNames[target_1->m_monsterType],
+                killed_13 > 1 ? "perish" : "perishes");
+            gText[0] -= ARMY_ASCII_CASE_OFFSET;
+        }
+    } else {
         sprintf(gText, "%s %s %d %s.",
-            m_quantity < 2 ? gArmyNames[m_monsterType] : gArmyNamesPlural[m_monsterType],
-            m_quantity < 2 ? "does" : "do",
+            m_quantity > 1 ? gArmyNamesPlural[m_monsterType] :
+                             gArmyNames[m_monsterType],
+            m_quantity > 1 ? "do" : "does",
             damage,
             "damage");
-        gText[0] -= 32;
-    } else if (damage == -1) {
-        sprintf(gText, "The mirror image is destroyed!");
-    } else {
-        sprintf(gText, "%s %s %d damage, %d %s %s.",
-            m_quantity < 2 ? gArmyNames[m_monsterType] : gArmyNamesPlural[m_monsterType],
-            m_quantity < 2 ? "does" : "do",
-            damage,
-            killed,
-            killed < 2 ? gArmyNames[target->m_monsterType] :
-                         gArmyNamesPlural[target->m_monsterType],
-            killed < 2 ? "perishes" : "perish");
-        gText[0] -= 32;
+        gText[0] -= ARMY_ASCII_CASE_OFFSET;
     }
     strcpy(combatText, gText);
-    if (m_monsterType == ARMY_CREATURE_ARCHMAGE &&
-        SRandom(1, ARMY_PERCENT_MAX) < ARMY_ARCHMAGE_DISPEL_CHANCE && target &&
-        target->SpellCastWorks(102)) {
-        target->m_spellEffect = 102;
+    switch (m_monsterType) {
+    case ARMY_CREATURE_ARCHMAGE:
+        if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ARCHMAGE_DISPEL_CHANCE &&
+            target_1 && target_1->SpellCastWorks(102)) {
+            target_1->m_spellEffect = 102;
+        }
+        break;
     }
-    PowEffect(effectType, 0, effectX, effectY);
+    PowEffect(effectType_1, 0, effectX_2, effectY_28);
     gpCombatManager->CombatMessage(combatText, 1, 1, 0);
     WaitSample(ARMY_SAMPLE_SHOT);
 
-    if (m_facing != originalFacing) {
+    if (m_facing != originalFacing_6) {
         if (m_monster.flags.all & MONSTER_FLAGS_WIDE) {
             if (m_facing == 1) {
                 m_hex++;
@@ -1054,13 +1126,13 @@ void army::SpecialAttack(void)
                 m_hex--;
             }
         }
-        m_facing = originalFacing;
+        m_facing = originalFacing_6;
     }
     if (!bSecondAttack &&
         (m_monsterType == ARMY_CREATURE_ELF ||
          m_monsterType == ARMY_CREATURE_GRAND_ELF ||
          m_monsterType == ARMY_CREATURE_RANGER) &&
-        target->m_quantity > 0) {
+        target_1->m_quantity > 0) {
         bSecondAttack = 1;
         SpecialAttack();
         bSecondAttack = 0;
@@ -1079,6 +1151,11 @@ void army::DirDoAttack(int direction)
     DoAttack(0);
 }
 
+// @early-stop
+// Logic, frame slots, CFG, and all 48 relocation sites align. The remaining
+// code differences are TU-cumulative side/index address evaluation at three
+// army-array sites; direct, commuted, flat-pointer, and scalar-SIB spellings
+// were audited. Other residual identities are delinked string literals.
 VA(0x0044dcba, 0x4e7)
 void army::DoHydraAttack(int)
 {
@@ -1167,34 +1244,45 @@ void army::DoHydraAttack(int)
     gpCombatManager->m_limitCreatureCount[m_side][m_index] = 1;
 }
 
+// @early-stop
+// Logic, the 0x124 frame, stack slots, switch-body order, and external relocation
+// targets align. Excluding the 0x24 local-label jump table, the remaining code
+// differences are two side/index evaluation orders, two condition-polarity
+// trampolines, and eight five-byte inline continuations. The 0x2b compressed
+// case map is byte-exact; all 11 jump-table DIR32 entries agree by case order.
+// The two base-only self REL32 entries are the retail-resolved recursive calls;
+// remaining relocation identities are strings, gConfig, and constant-pool names.
 VA(0x0044e1a1, 0x1267)
 void army::DoAttack(int retaliation)
 {
-    char combatText[ARMY_COMBAT_TEXT_SIZE];
-    army *target;
-    army *breathTarget;
-    int damage;
-    int killed;
-    int breathDamage;
-    int breathKilled;
-    int targetHex;
-    int breathHex;
-    int originalFacing;
-    int targetOriginalFacing;
-    int desiredFacing;
+    int targetOriginalFacing_5;
     int originalDirection;
-    int effectStopsRetaliation;
-    int occupantSide;
+    army *breathTarget_6;
+    int secondAttackDirection_6;
+    int breathDamage;
+    int desiredFacing;
+    int effectStopsRetaliation_4;
+    int originalFacing_6;
+    int occupantSide_5;
+    char combatText[ARMY_COMBAT_TEXT_SIZE];
+    int damage;
+    int targetHex_3;
+    int killed_13;
+    army *target_1;
+    int breathKilled;
+    int adjacentHex_1;
+    int revivedQuantity_3;
+    int breathHex_1;
 
     m_drawState = 3;
     damage = 0;
-    killed = 0;
+    killed_13 = 0;
     breathDamage = 0;
     breathKilled = 0;
-    target = 0;
-    breathTarget = 0;
-    effectStopsRetaliation = 0;
-    originalFacing = m_facing;
+    effectStopsRetaliation_4 = 0;
+    target_1 = 0;
+    breathTarget_6 = 0;
+    originalFacing_6 = m_facing;
     if (retaliation) {
         gpCombatManager->m_currentSide = 1 - gpCombatManager->m_currentSide;
     }
@@ -1202,45 +1290,45 @@ void army::DoAttack(int retaliation)
         DoHydraAttack(retaliation);
     } else {
         originalDirection = m_attackDirection;
-        targetHex = m_hex;
+        targetHex_3 = m_hex;
         if ((m_monster.flags.all & MONSTER_FLAGS_WIDE) &&
-            ((m_facing == 0 && m_attackDirection > 2) ||
+            ((m_facing == 0 && m_attackDirection >= 3) ||
              (m_facing == 1 &&
-              (m_attackDirection < 3 || m_attackDirection > 5)))) {
-            if (originalFacing == 0) {
-                targetHex = m_hex - 1;
+              (m_attackDirection <= 2 || m_attackDirection >= 6)))) {
+            if (originalFacing_6 == 0) {
+                targetHex_3 = m_hex - 1;
             } else {
-                targetHex = m_hex + 1;
+                targetHex_3 = m_hex + 1;
             }
         }
-        targetHex = GetAdjacentCellIndex(targetHex, m_attackDirection);
-        target = &gpCombatManager->m_armies
-            [gpCombatManager->m_hexCells[targetHex].m_occupantSide]
-            [gpCombatManager->m_hexCells[targetHex].m_occupantIndex];
+        targetHex_3 = GetAdjacentCellIndex(targetHex_3, m_attackDirection);
+        target_1 = &gpCombatManager->m_armies
+            [gpCombatManager->m_hexCells[targetHex_3].m_occupantSide]
+            [gpCombatManager->m_hexCells[targetHex_3].m_occupantIndex];
         if (m_monster.flags.all & MONSTER_FLAGS_BREATH_ATTACK) {
-            breathHex = GetAdjacentCellIndex(targetHex, m_attackDirection);
-            if (ValidHex(breathHex) &&
-                gpCombatManager->m_hexCells[breathHex].m_occupantSide >= 0 &&
-                gpCombatManager->m_hexCells[breathHex].m_occupantIndex >= 0 &&
-                (gpCombatManager->m_hexCells[breathHex].m_occupantSide != target->m_side ||
-                 gpCombatManager->m_hexCells[breathHex].m_occupantIndex != target->m_index)) {
-                breathTarget = &gpCombatManager->m_armies
-                    [gpCombatManager->m_hexCells[breathHex].m_occupantSide]
-                    [gpCombatManager->m_hexCells[breathHex].m_occupantIndex];
+            breathHex_1 = GetAdjacentCellIndex(targetHex_3, m_attackDirection);
+            if (ValidHex(breathHex_1) &&
+                gpCombatManager->m_hexCells[breathHex_1].m_occupantSide >= 0 &&
+                gpCombatManager->m_hexCells[breathHex_1].m_occupantIndex >= 0 &&
+                (gpCombatManager->m_hexCells[breathHex_1].m_occupantSide != target_1->m_side ||
+                 gpCombatManager->m_hexCells[breathHex_1].m_occupantIndex != target_1->m_index)) {
+                breathTarget_6 = &gpCombatManager->m_armies
+                    [gpCombatManager->m_hexCells[breathHex_1].m_occupantSide]
+                    [gpCombatManager->m_hexCells[breathHex_1].m_occupantIndex];
             }
         }
         gpCombatManager->ResetLimitCreature();
         gpCombatManager->m_limitCreatureCount[m_side][m_index]++;
-        gpCombatManager->m_limitCreatureCount[target->m_side][target->m_index]++;
-        if (breathTarget) {
-            gpCombatManager->m_limitCreatureCount
-                [breathTarget->m_side][breathTarget->m_index]++;
+        gpCombatManager->m_limitCreatureCount[target_1->m_side][target_1->m_index]++;
+        if (breathTarget_6) {
+            breathTarget_6->m_index[
+                gpCombatManager->m_limitCreatureCount[breathTarget_6->m_side]]++;
         }
         gpCombatManager->DrawFrame(0, 1, 0, 1, ARMY_COMBAT_FRAME_DELAY, 1, 1);
-        targetOriginalFacing = target->m_facing;
-        if (m_attackDirection < 3) {
+        targetOriginalFacing_5 = target_1->m_facing;
+        if (m_attackDirection <= 2) {
             desiredFacing = 1;
-        } else if (m_attackDirection < 6) {
+        } else if (m_attackDirection <= 5) {
             desiredFacing = 0;
         } else {
             desiredFacing = m_facing;
@@ -1254,13 +1342,13 @@ void army::DoAttack(int retaliation)
                     m_hex++;
                 }
             }
-            target->m_facing = 1 - m_facing;
-            if (target->m_facing != targetOriginalFacing &&
-                (target->m_monster.flags.all & MONSTER_FLAGS_WIDE)) {
-                if (target->m_facing == 1) {
-                    target->m_hex--;
+            target_1->m_facing = 1 - m_facing;
+            if (target_1->m_facing != targetOriginalFacing_5 &&
+                (target_1->m_monster.flags.all & MONSTER_FLAGS_WIDE)) {
+                if (target_1->m_facing == 1) {
+                    target_1->m_hex--;
                 } else {
-                    target->m_hex++;
+                    target_1->m_hex++;
                 }
             }
         }
@@ -1274,193 +1362,202 @@ void army::DoAttack(int retaliation)
         } else {
             m_pendingAnimationSequence = ARMY_ATTACK_DELAY_LONG;
         }
-        if (breathTarget) {
+        if (breathTarget_6) {
             m_pendingAnimationSequence += ARMY_BREATH_ATTACK_DELAY_BONUS;
         }
         gpSoundManager->MemorySample(m_samples[ARMY_SAMPLE_ATTACK]);
-        DamageEnemy(target, &damage, &killed, 0, 0);
-        if (breathTarget) {
-            DamageEnemy(breathTarget, &breathDamage, &breathKilled, 0, 0);
+        DamageEnemy(target_1, &damage, &killed_13, 0, 0);
+        if (breathTarget_6) {
+            DamageEnemy(breathTarget_6, &breathDamage, &breathKilled, 0, 0);
         }
         if (damage == -1) {
             sprintf(gText, "The mirror image is destroyed!");
-        } else if (!gbGenieHalf) {
-            if (killed < 1) {
-                sprintf(gText, "%s %s %d %s.",
-                    m_quantity < 2 ? gArmyNames[m_monsterType] :
-                                     gArmyNamesPlural[m_monsterType],
-                    m_quantity < 2 ? "does" : "do", damage, "damage");
-                gText[0] -= ARMY_ASCII_CASE_OFFSET;
-            } else {
-                sprintf(gText, "%s %s %d %s, %d %s %s.",
+        } else if (gbGenieHalf) {
+            sprintf(gText, "%s %s half the enemy troops!",
+                m_quantity > 1 ? gArmyNamesPlural[m_monsterType] :
+                                 gArmyNames[m_monsterType],
+                m_quantity > 1 ? "destroy" : "destroys");
+            gText[0] -= ARMY_ASCII_CASE_OFFSET;
+        } else {
+            if (killed_13 > 0) {
+                sprintf(gText, "%s %s %d %s.\n%d %s %s.",
                     m_quantity > 1 ? gArmyNamesPlural[m_monsterType] :
                                      gArmyNames[m_monsterType],
                     m_quantity > 1 ? "do" : "does",
                     damage,
                     "damage",
-                    killed,
-                    killed > 1 ? gArmyNamesPlural[target->m_monsterType] :
-                                 gArmyNames[target->m_monsterType],
-                    killed > 1 ? "perish" : "perishes");
+                    killed_13,
+                    killed_13 > 1 ? gArmyNamesPlural[target_1->m_monsterType] :
+                                 gArmyNames[target_1->m_monsterType],
+                    killed_13 > 1 ? "perish" : "perishes");
+                gText[0] -= ARMY_ASCII_CASE_OFFSET;
+            } else {
+                sprintf(gText, "%s %s %d %s.",
+                    m_quantity > 1 ? gArmyNamesPlural[m_monsterType] :
+                                     gArmyNames[m_monsterType],
+                    m_quantity > 1 ? "do" : "does", damage, "damage");
                 gText[0] -= ARMY_ASCII_CASE_OFFSET;
             }
-        } else {
-            sprintf(gText, "%s %s half the enemy troops!",
-                m_quantity < 2 ? gArmyNames[m_monsterType] :
-                                 gArmyNamesPlural[m_monsterType],
-                m_quantity < 2 ? "destroys" : "destroy");
-            gText[0] -= ARMY_ASCII_CASE_OFFSET;
         }
         strcpy(combatText, gText);
 
         switch (m_monsterType) {
         case ARMY_CREATURE_CYCLOPS:
-            if (target->m_quantity > 0 && (!breathTarget || breathTarget->m_quantity > 0)) {
-                if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE) {
-                    if (target && target->SpellCastWorks(ARMY_ATTACK_SPELL_CYCLOPS)) {
-                        target->m_spellEffect = ARMY_ATTACK_SPELL_CYCLOPS;
-                        effectStopsRetaliation = 1;
+            if (target_1->m_quantity > 0) {
+                if (!breathTarget_6 || breathTarget_6->m_quantity > 0) {
+                    if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE) {
+                        if (target_1 && target_1->SpellCastWorks(ARMY_ATTACK_SPELL_CYCLOPS)) {
+                            target_1->m_spellEffect = ARMY_ATTACK_SPELL_CYCLOPS;
+                            effectStopsRetaliation_4 = 1;
+                        }
+                    } else if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE &&
+                               breathTarget_6 &&
+                               breathTarget_6->SpellCastWorks(ARMY_ATTACK_SPELL_CYCLOPS)) {
+                        breathTarget_6->m_spellEffect = ARMY_ATTACK_SPELL_CYCLOPS;
                     }
-                } else if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE &&
-                           breathTarget &&
-                           breathTarget->SpellCastWorks(ARMY_ATTACK_SPELL_CYCLOPS)) {
-                    breathTarget->m_spellEffect = ARMY_ATTACK_SPELL_CYCLOPS;
                 }
             }
             break;
         case ARMY_CREATURE_UNICORN:
-            if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE && target &&
-                target->SpellCastWorks(ARMY_ATTACK_SPELL_UNICORN)) {
-                target->m_spellEffect = ARMY_ATTACK_SPELL_UNICORN;
-                effectStopsRetaliation = 1;
+            if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE && target_1 &&
+                target_1->SpellCastWorks(ARMY_ATTACK_SPELL_UNICORN)) {
+                target_1->m_spellEffect = ARMY_ATTACK_SPELL_UNICORN;
+                effectStopsRetaliation_4 = 1;
             }
             break;
-        case ARMY_CREATURE_ARCHMAGE:
-            if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE && target &&
-                target->SpellCastWorks(ARMY_ATTACK_SPELL_ARCHMAGE)) {
-                target->m_spellEffect = ARMY_ATTACK_SPELL_ARCHMAGE;
+        case ARMY_CREATURE_MEDUSA:
+            if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE && target_1 &&
+                target_1->SpellCastWorks(ARMY_ATTACK_SPELL_MEDUSA)) {
+                target_1->m_spellEffect = ARMY_ATTACK_SPELL_MEDUSA;
+                effectStopsRetaliation_4 = 1;
             }
             break;
         case ARMY_CREATURE_MUMMY:
-            if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE && target &&
-                target->SpellCastWorks(ARMY_ATTACK_SPELL_MUMMY)) {
-                target->m_spellEffect = ARMY_ATTACK_SPELL_MUMMY;
+            if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE) {
+                goto applyMummySpell;
             }
             break;
         case ARMY_CREATURE_ROYAL_MUMMY:
-            if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ROYAL_MUMMY_EFFECT_CHANCE && target &&
-                target->SpellCastWorks(ARMY_ATTACK_SPELL_MUMMY)) {
-                target->m_spellEffect = ARMY_ATTACK_SPELL_MUMMY;
+            if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ROYAL_MUMMY_EFFECT_CHANCE) {
+applyMummySpell:
+                if (target_1 && target_1->SpellCastWorks(ARMY_ATTACK_SPELL_MUMMY)) {
+                    target_1->m_spellEffect = ARMY_ATTACK_SPELL_MUMMY;
+                }
             }
             break;
-        case ARMY_CREATURE_VAMPIRE_LORD:
-            occupantSide = gpCombatManager->m_hexCells[m_hex].m_occupantSide;
-            gpCombatManager->m_killBenefit[occupantSide] =
-                target->m_monster.hitPoints * killed;
+        case ARMY_CREATURE_ARCHMAGE:
+            if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE && target_1 &&
+                target_1->SpellCastWorks(ARMY_ATTACK_SPELL_ARCHMAGE)) {
+                target_1->m_spellEffect = ARMY_ATTACK_SPELL_ARCHMAGE;
+            }
             break;
         case ARMY_CREATURE_GHOST:
-            occupantSide = gpCombatManager->m_hexCells[m_hex].m_occupantSide;
-            gpCombatManager->m_killBenefit[occupantSide] = killed;
+            gpCombatManager->m_killBenefit[
+                gpCombatManager->m_hexCells[m_hex].m_occupantSide] = killed_13;
             break;
-        case ARMY_CREATURE_MEDUSA:
-            if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE && target &&
-                target->SpellCastWorks(ARMY_ATTACK_SPELL_MEDUSA)) {
-                target->m_spellEffect = ARMY_ATTACK_SPELL_MEDUSA;
-                effectStopsRetaliation = 1;
-            }
+        case ARMY_CREATURE_VAMPIRE_LORD:
+            gpCombatManager->m_killBenefit[
+                gpCombatManager->m_hexCells[m_hex].m_occupantSide] =
+                target_1->m_monster.hitPoints * killed_13;
             break;
         }
         PowEffect(-1, 0, -1, -1);
         gpCombatManager->CombatMessage(combatText, 1, 1, 0);
-        gpCombatManager->m_limitCreatureCount[m_side][m_index] = 1;
+        m_index[gpCombatManager->m_limitCreatureCount[m_side]] = 1;
 
-        occupantSide = gpCombatManager->m_hexCells[m_hex].m_occupantSide;
         if (m_monsterType == ARMY_CREATURE_GHOST) {
-            m_quantity += gpCombatManager->m_killBenefit[occupantSide];
+            m_quantity += gpCombatManager->m_killBenefit[
+                gpCombatManager->m_hexCells[m_hex].m_occupantSide];
         }
         if (m_monsterType == ARMY_CREATURE_VAMPIRE_LORD) {
-            if (gpCombatManager->m_killBenefit[occupantSide] < m_hitPointsLost) {
-                m_hitPointsLost -= gpCombatManager->m_killBenefit[occupantSide];
+            if (gpCombatManager->m_killBenefit[
+                    gpCombatManager->m_hexCells[m_hex].m_occupantSide] < m_hitPointsLost) {
+                m_hitPointsLost -= gpCombatManager->m_killBenefit[
+                    gpCombatManager->m_hexCells[m_hex].m_occupantSide];
             } else {
-                gpCombatManager->m_killBenefit[occupantSide] -= m_hitPointsLost;
+                gpCombatManager->m_killBenefit[
+                    gpCombatManager->m_hexCells[m_hex].m_occupantSide] -= m_hitPointsLost;
                 m_hitPointsLost = 0;
-                if (gpCombatManager->m_killBenefit[occupantSide] /
-                        m_monster.hitPoints <
-                    m_initialQuantity - m_quantity) {
-                    m_quantity += gpCombatManager->m_killBenefit[occupantSide] /
-                        m_monster.hitPoints;
+                revivedQuantity_3 = gpCombatManager->m_killBenefit[
+                    gpCombatManager->m_hexCells[m_hex].m_occupantSide] / m_monster.hitPoints;
+                if (revivedQuantity_3 < m_initialQuantity - m_quantity) {
+                    m_quantity += revivedQuantity_3;
                 } else {
                     m_quantity = m_initialQuantity;
                 }
             }
         }
 
-        if (target && target->m_quantity > 0 &&
-            !target->m_spellInfluence[ARMY_SPELL_INFLUENCE_PARALYZE] &&
-            !target->m_spellInfluence[ARMY_SPELL_INFLUENCE_PETRIFIED] &&
-            (target->m_monsterType == ARMY_CREATURE_GRIFFIN ||
-             !(target->m_monster.flags.all & MONSTER_FLAGS_RETALIATED)) &&
+        if (target_1 && target_1->m_quantity > 0 &&
+            !target_1->m_spellInfluence[ARMY_SPELL_INFLUENCE_PARALYZE] &&
+            !target_1->m_spellInfluence[ARMY_SPELL_INFLUENCE_PETRIFIED] &&
+            (target_1->m_monsterType == ARMY_CREATURE_GRIFFIN ||
+             !(target_1->m_monster.flags.all & MONSTER_FLAGS_RETALIATED)) &&
             m_monsterType != ARMY_CREATURE_ROGUE &&
             m_monsterType != ARMY_CREATURE_SPRITE &&
             m_monsterType != ARMY_CREATURE_VAMPIRE &&
             m_monsterType != ARMY_CREATURE_VAMPIRE_LORD &&
-            !effectStopsRetaliation && !retaliation) {
+            !effectStopsRetaliation_4 && !retaliation) {
             DelayMilli(static_cast<long>(
                 gfCombatSpeedMod[gConfig.combatSpeed] * ARMY_RETALIATION_DELAY));
-            target->m_attackDirection = OppositeDirection(m_attackDirection);
-            if (target->m_monster.flags.all & MONSTER_FLAGS_WIDE) {
-                if (GetAdjacentCellIndex(
-                        target->m_hex, ((target->m_facing == 1) - 1) & 5) == m_hex) {
-                    target->m_attackDirection = 6;
+            target_1->m_attackDirection = OppositeDirection(m_attackDirection);
+            if (target_1->m_monster.flags.all & MONSTER_FLAGS_WIDE) {
+                adjacentHex_1 = GetAdjacentCellIndex(
+                    target_1->m_hex,
+                    (static_cast<unsigned int>(target_1->m_facing - 1) < 1 ? 0 : -1) & 5);
+                if (adjacentHex_1 == m_hex) {
+                    target_1->m_attackDirection = 6;
                 }
-                if (GetAdjacentCellIndex(
-                        target->m_hex, 3 - (target->m_facing == 1)) == m_hex) {
-                    target->m_attackDirection = 7;
+                adjacentHex_1 = GetAdjacentCellIndex(
+                    target_1->m_hex,
+                    static_cast<unsigned int>(target_1->m_facing - 1) < 1 ? 2 : 3);
+                if (adjacentHex_1 == m_hex) {
+                    target_1->m_attackDirection = 7;
                 }
             }
-            target->DoAttack(1);
-            target->m_monster.attributes |= MONSTER_ATTRIBUTE_RETALIATED;
+            target_1->DoAttack(1);
+            target_1->m_monster.attributes |= MONSTER_ATTRIBUTE_RETALIATED;
             if (gbRemoteOn && gpCombatManager->m_networkArmyPresent[0] &&
                 gpCombatManager->m_networkArmyPresent[1] &&
-                target->m_monsterType == ARMY_CREATURE_GHOST) {
-                occupantSide = gpCombatManager->m_hexCells[target->m_hex].m_occupantSide;
-                target->m_quantity += gpCombatManager->m_killBenefit[occupantSide];
+                target_1->m_monsterType == ARMY_CREATURE_GHOST) {
+                target_1->m_quantity += gpCombatManager->m_killBenefit[
+                    gpCombatManager->m_hexCells[target_1->m_hex].m_occupantSide];
             }
         }
         if ((m_monsterType == ARMY_CREATURE_WOLF ||
              m_monsterType == ARMY_CREATURE_PALADIN ||
              m_monsterType == ARMY_CREATURE_CRUSADER) &&
-            target && target->m_quantity > 0 && !retaliation &&
+            target_1 && target_1->m_quantity > 0 && !retaliation &&
             !m_spellInfluence[ARMY_SPELL_INFLUENCE_PARALYZE] &&
             !m_spellInfluence[ARMY_SPELL_INFLUENCE_PETRIFIED] &&
             !m_spellInfluence[ARMY_SPELL_INFLUENCE_BLIND] &&
             m_quantity > 0) {
             DelayMilli(static_cast<long>(
                 gfCombatSpeedMod[gConfig.combatSpeed] * ARMY_SECOND_ATTACK_DELAY));
-            desiredFacing = m_attackDirection;
+            secondAttackDirection_6 = m_attackDirection;
             m_attackDirection = originalDirection;
             DoAttack(1);
-            m_attackDirection = desiredFacing;
+            m_attackDirection = secondAttackDirection_6;
         }
-        if (m_facing != originalFacing) {
+        if (m_facing != originalFacing_6) {
             if (!(m_monster.flags.all & MONSTER_FLAGS_DEAD)) {
-                m_facing = originalFacing;
+                m_facing = originalFacing_6;
                 if (m_monster.flags.all & MONSTER_FLAGS_WIDE) {
-                    if (originalFacing == 1) {
+                    if (originalFacing_6 == 1) {
                         m_hex--;
                     } else {
                         m_hex++;
                     }
                 }
             }
-            if (!(target->m_monster.flags.all & MONSTER_FLAGS_DEAD) &&
-                target->m_facing != targetOriginalFacing) {
-                target->m_facing = targetOriginalFacing;
-                if (target->m_monster.flags.all & MONSTER_FLAGS_WIDE) {
-                    if (target->m_facing == 1) {
-                        target->m_hex--;
+            if (!(target_1->m_monster.flags.all & MONSTER_FLAGS_DEAD) &&
+                target_1->m_facing != targetOriginalFacing_5) {
+                target_1->m_facing = targetOriginalFacing_5;
+                if (target_1->m_monster.flags.all & MONSTER_FLAGS_WIDE) {
+                    if (target_1->m_facing == 1) {
+                        target_1->m_hex--;
                     } else {
-                        target->m_hex++;
+                        target_1->m_hex++;
                     }
                 }
             }
@@ -1472,7 +1569,8 @@ void army::DoAttack(int retaliation)
         CancelSpellType(1);
         gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
     }
-    m_targetSide = -1;
+    targetHex_3 = -1;
+    m_targetSide = targetHex_3;
     if (retaliation) {
         gpCombatManager->m_currentSide = 1 - gpCombatManager->m_currentSide;
     }
@@ -1635,6 +1733,9 @@ int army::AttackTo(int destination)
     return ARMY_PATH_BLOCKED;
 }
 
+// @early-stop
+// The complete instruction stream and all 37 relocation sites align. The
+// residual is limited to delinked string and NULL_SAMPLE2 symbol identities.
 VA(0x0044f93e, 0x282)
 void army::CheckLuck(void)
 {
@@ -1652,7 +1753,7 @@ void army::CheckLuck(void)
         m_luckOutcome = -1;
     }
     if (m_luckOutcome) {
-        luckSample = GetNullSample();
+        luckSample = NULL_SAMPLE2;
         if (m_luckOutcome < 0) {
             sprintf(gText, "badluck.82m");
         } else {
@@ -1687,6 +1788,10 @@ void army::CheckLuck(void)
     }
 }
 
+// @early-stop
+// All 41 relocation sites align. The only non-pool code difference is the
+// value-equivalent genie clamp operand order at target 0x581f-0x5825; direct,
+// reversed, negated, and empty-arm comparison spellings were audited.
 VA(0x0044fbc0, 0x56e)
 void army::DamageEnemy(army *target, int *damageResult, int *killedResult,
                        int rangedAttack, int defenseModifier)
@@ -1865,75 +1970,76 @@ int army::Damage(long damage, int spell)
     return killed;
 }
 
+// @early-stop
+// The complete instruction stream and all 119 relocation sites align. The only
+// residual is two delinked gConfig relocation identities.
 VA(0x0045036a, 0x1361)
 void army::PowEffect(int effect, int resetLimits, int effectX, int effectY)
 {
-    army *current;
-    IconEntry *entry;
-    int side;
-    int index;
-    int frame;
-    int maximumStartFrames;
-    int maximumEndFrames;
-    int maximumDamageFrames;
-    int startFrames;
-    int endFrames;
     int damageFrames;
-    int overlapAdjustment;
-    int minimumX;
-    int minimumY;
-    int maximumX;
-    int maximumY;
-    unsigned int effectFrames;
-    unsigned int totalFrames;
-    int keepAnimating;
-    int drawEffect;
+    int side_4;
+    int maximumDamageFrames_3;
+    army *current;
+    int drawEffect_1;
+    int effectFrames_1;
+    int index_10;
+    int overlapAdjustment_7;
+    int frame;
+    int maximumEndFrames_1;
+    int keepAnimating_1;
+    int endFrames_1;
+    int maximumStartFrames;
+    int totalFrames_4;
+    int frameDelay_6;
+    int startFrames_5;
+    IconEntry *entry_1;
 
     maximumStartFrames = 0;
-    maximumEndFrames = 0;
-    maximumDamageFrames = 0;
-    startFrames = 0;
-    endFrames = 0;
+    maximumEndFrames_1 = 0;
+    maximumDamageFrames_3 = 0;
+    startFrames_5 = 0;
+    endFrames_1 = 0;
     damageFrames = 0;
-    effectFrames = 0;
-    drawEffect = 0;
-    overlapAdjustment = 1;
+    effectFrames_1 = 0;
+    totalFrames_4 = 0;
+    drawEffect_1 = 0;
+    overlapAdjustment_7 = 1;
     if (m_monsterType == ARMY_CREATURE_PALADIN ||
         m_monsterType == ARMY_CREATURE_CRUSADER) {
-        overlapAdjustment = 0;
+        overlapAdjustment_7 = 0;
     }
     if (m_monsterType == ARMY_CREATURE_DWARF ||
         m_monsterType == ARMY_CREATURE_BATTLE_DWARF) {
-        overlapAdjustment = 2;
+        overlapAdjustment_7 = 2;
     }
     if (effectX != ARMY_NO_EFFECT) {
-        drawEffect = 1;
+        drawEffect_1 = 1;
     } else if (effect != ARMY_NO_EFFECT) {
-        for (side = 0; side < ARMY_COMBAT_SIDE_COUNT; side++) {
-            for (index = 0; index < gpCombatManager->m_armyCount[side]; index++) {
-                if (gpCombatManager->m_armies[side][index].m_drawSpellEffect) {
-                    drawEffect = 1;
+        for (side_4 = 0; side_4 < ARMY_COMBAT_SIDE_COUNT; side_4++) {
+            for (index_10 = 0; index_10 < gpCombatManager->m_armyCount[side_4]; index_10++) {
+                if (gpCombatManager->m_armies[side_4][index_10].m_drawSpellEffect) {
+                    drawEffect_1 = 1;
                 }
             }
         }
     }
-    if (!gbNoShowCombat && effect != ARMY_NO_EFFECT && drawEffect &&
-        effect != gCurLoadedSpellEffect) {
+    if (!gbNoShowCombat && effect != ARMY_NO_EFFECT && drawEffect_1 &&
+        gCurLoadedSpellEffect != 0[&effect]) {
         gpResourceManager->Dispose(gCurLoadedSpellIcon);
         gCurLoadedSpellIcon = gpResourceManager->GetIcon(gCombatFxNames[effect]);
         gCurLoadedSpellEffect = effect;
     }
-    if (drawEffect) {
-        effectFrames = giNumPowFrames[gCurLoadedSpellEffect];
+    if (drawEffect_1) {
+        effectFrames_1 = giNumPowFrames[gCurLoadedSpellEffect];
     }
-        for (side = 0; side < ARMY_COMBAT_SIDE_COUNT; side++) {
-        for (index = 0; index < gpCombatManager->m_armyCount[side]; index++) {
-            current = &gpCombatManager->m_armies[side][index];
-            if (current->m_animationState) {
-                startFrames = current->m_frameInfo.animationFrameCount[
-                    current->m_pendingAnimationSequence];
-                endFrames = current->m_frameInfo.animationFrameCount[
-                    current->m_pendingAnimationSequence + 1] + 1;
+        for (side_4 = 0; side_4 < ARMY_COMBAT_SIDE_COUNT; side_4++) {
+        for (index_10 = 0; index_10 < gpCombatManager->m_armyCount[side_4]; index_10++) {
+            current = &gpCombatManager->m_armies[side_4][index_10];
+            if (static_cast<unsigned char>(current->m_animationState)) {
+                startFrames_5 = current->m_frameInfo.animationFrameCount[
+                    m_pendingAnimationSequence];
+                endFrames_1 = current->m_frameInfo.animationFrameCount[
+                    m_pendingAnimationSequence + 1] + 1;
             } else {
                 if (current->m_deathPending) {
                     damageFrames = current->m_frameInfo.animationFrameCount[
@@ -1945,88 +2051,90 @@ void army::PowEffect(int effect, int resetLimits, int effectX, int effectY)
                             ARMY_ANIMATION_WINCE_RETURN] + 1;
                 }
             }
-            if (maximumStartFrames <= startFrames) {
-                maximumStartFrames = startFrames;
-            }
-            if (maximumEndFrames <= endFrames) {
-                maximumEndFrames = endFrames;
-            }
-            if (maximumDamageFrames <= damageFrames) {
-                maximumDamageFrames = damageFrames;
-            }
+            maximumStartFrames = maximumStartFrames > startFrames_5
+                ? maximumStartFrames : startFrames_5;
+            maximumEndFrames_1 = maximumEndFrames_1 > endFrames_1
+                ? maximumEndFrames_1 : endFrames_1;
+            maximumDamageFrames_3 = maximumDamageFrames_3 > damageFrames
+                ? maximumDamageFrames_3 : damageFrames;
         }
     }
-    totalFrames = maximumStartFrames + maximumDamageFrames - overlapAdjustment;
-    if (static_cast<int>(totalFrames) <= maximumStartFrames + maximumEndFrames) {
-        totalFrames = maximumStartFrames + maximumEndFrames;
-    }
-    if (maximumDamageFrames <= static_cast<int>(totalFrames)) {
-        maximumDamageFrames = totalFrames;
-    }
-    if (static_cast<int>(effectFrames) <= maximumDamageFrames) {
-        effectFrames = maximumDamageFrames;
-    }
+    totalFrames_4 = maximumStartFrames + maximumEndFrames_1;
+    totalFrames_4 = maximumStartFrames + maximumDamageFrames_3 - overlapAdjustment_7 >
+            totalFrames_4
+        ? maximumStartFrames + maximumDamageFrames_3 - overlapAdjustment_7
+        : totalFrames_4;
+    totalFrames_4 = maximumDamageFrames_3 > totalFrames_4
+        ? maximumDamageFrames_3 : totalFrames_4;
+    effectFrames_1 = effectFrames_1 > totalFrames_4
+        ? effectFrames_1 : totalFrames_4;
+    frameDelay_6 = ARMY_POW_EFFECT_DELAY;
     if (resetLimits) {
         gpCombatManager->ResetLimitCreature();
     }
-    for (side = 0; side < ARMY_COMBAT_SIDE_COUNT; side++) {
-        for (index = 0; index < gpCombatManager->m_armyCount[side]; index++) {
-            current = &gpCombatManager->m_armies[side][index];
-            if (current->m_monsterType == ARMY_CREATURE_PHOENIX ||
-                current->m_monsterType == ARMY_CREATURE_GARGOYLE ||
-                current->m_monsterType == ARMY_CREATURE_MINOTAUR) {
-                current->m_animationCycle = 1;
+    for (side_4 = 0; side_4 < ARMY_COMBAT_SIDE_COUNT; side_4++) {
+        for (index_10 = 0; index_10 < gpCombatManager->m_armyCount[side_4]; index_10++) {
+            if (gpCombatManager->m_armies[side_4][index_10].m_animationSequence ==
+                    ARMY_ANIMATION_SHOOT_UP ||
+                gpCombatManager->m_armies[side_4][index_10].m_animationSequence ==
+                    ARMY_ANIMATION_SHOOT_FORWARD ||
+                gpCombatManager->m_armies[side_4][index_10].m_animationSequence ==
+                    ARMY_ANIMATION_SHOOT_DOWN) {
+                gpCombatManager->m_armies[side_4][index_10].m_animationCycle = 1;
             } else {
-                current->m_animationCycle = 0;
+                gpCombatManager->m_armies[side_4][index_10].m_animationCycle = 0;
             }
-            if ((current->m_damagePending || current->m_animationState ||
-                 current->m_animationCycle) &&
-                !gpCombatManager->m_limitCreatureCount[side][index]) {
-                gpCombatManager->m_limitCreatureCount[side][index]++;
+            if ((gpCombatManager->m_armies[side_4][index_10].m_damagePending ||
+                 static_cast<unsigned char>(
+                     gpCombatManager->m_armies[side_4][index_10].m_animationState) ||
+                 static_cast<unsigned char>(
+                     gpCombatManager->m_armies[side_4][index_10].m_animationCycle)) &&
+                !*reinterpret_cast<int *>(
+                    index_10 * sizeof(gpCombatManager->m_limitCreatureCount[0][0]) +
+                    0[&side_4] * sizeof(gpCombatManager->m_limitCreatureCount[0]) +
+                    reinterpret_cast<char *>(
+                        gpCombatManager->m_limitCreatureCount))) {
+                (*reinterpret_cast<int *>(
+                    index_10 * sizeof(gpCombatManager->m_limitCreatureCount[0][0]) +
+                    0[&side_4] * sizeof(gpCombatManager->m_limitCreatureCount[0]) +
+                    reinterpret_cast<char *>(
+                        gpCombatManager->m_limitCreatureCount)))++;
             }
         }
     }
     gpCombatManager->DrawFrame(0, 1, 0, 1, ARMY_COMBAT_FRAME_DELAY, 1, 1);
     if (effectX != ARMY_NO_EFFECT) {
-        for (index = 0; index < gCurLoadedSpellIcon->m_frameCount; index++) {
-            entry = reinterpret_cast<IconEntry *>(gCurLoadedSpellIcon->m_data) + index;
-            minimumX = entry->x + effectX;
-            if (giMinExtentX <= minimumX) {
-                minimumX = giMinExtentX;
-            }
-            minimumY = entry->y + effectY;
-            if (giMinExtentY <= minimumY) {
-                minimumY = giMinExtentY;
-            }
-            maximumX = entry->x + entry->w + effectX - 1;
-            if (maximumX <= giMaxExtentX) {
-                maximumX = giMaxExtentX;
-            }
-            maximumY = entry->y + entry->h + effectY - 1;
-            if (maximumY <= giMaxExtentY) {
-                maximumY = giMaxExtentY;
-            }
-            giMinExtentX = minimumX;
-            giMinExtentY = minimumY;
-            giMaxExtentX = maximumX;
-            giMaxExtentY = maximumY;
+        for (index_10 = 0; index_10 < gCurLoadedSpellIcon->m_frameCount; index_10++) {
+            entry_1 = reinterpret_cast<IconEntry *>(
+                index_10 * sizeof(IconEntry) + gCurLoadedSpellIcon->m_data);
+            giMinExtentX = entry_1->x + effectX < giMinExtentX
+                ? entry_1->x + effectX : giMinExtentX;
+            giMinExtentY = entry_1->y + effectY < giMinExtentY
+                ? entry_1->y + effectY : giMinExtentY;
+            giMaxExtentX = entry_1->x + entry_1->w + effectX - 1 > giMaxExtentX
+                ? entry_1->x + entry_1->w + effectX - 1 : giMaxExtentX;
+            giMaxExtentY = entry_1->y + entry_1->h + effectY - 1 > giMaxExtentY
+                ? entry_1->y + entry_1->h + effectY - 1 : giMaxExtentY;
         }
-        if (giMinExtentX < 1) giMinExtentX = 0;
-        if (giMinExtentY < 1) giMinExtentY = 0;
-        if (giMaxExtentX > ARMY_COMBAT_MAX_X - 1) giMaxExtentX = ARMY_COMBAT_MAX_X;
-        if (giMaxExtentY > ARMY_COMBAT_MAX_Y - 1) giMaxExtentY = ARMY_COMBAT_MAX_Y;
+        giMinExtentX = giMinExtentX > 0 ? giMinExtentX : 0;
+        giMinExtentY = giMinExtentY > 0 ? giMinExtentY : 0;
+        giMaxExtentX = giMaxExtentX < ARMY_COMBAT_MAX_X
+            ? giMaxExtentX : ARMY_COMBAT_MAX_X;
+        giMaxExtentY = giMaxExtentY < ARMY_COMBAT_MAX_Y
+            ? giMaxExtentY : ARMY_COMBAT_MAX_Y;
     }
-    for (side = 0; side < ARMY_COMBAT_SIDE_COUNT; side++) {
-        for (index = 0; index < gpCombatManager->m_armyCount[side]; index++) {
-            current = &gpCombatManager->m_armies[side][index];
+    for (side_4 = 0; side_4 < ARMY_COMBAT_SIDE_COUNT; side_4++) {
+        for (index_10 = 0; index_10 < gpCombatManager->m_armyCount[side_4]; index_10++) {
+            current = &gpCombatManager->m_armies[side_4][index_10];
             current->m_effectAnimationStart = -1;
             current->m_effectAnimationEnd = -1;
             current->m_effectAnimationStarted = 0;
-            if (current->m_damagePending || current->m_animationState) {
-                if (current->m_animationState) {
-                    current->m_effectAnimationStart = current->m_pendingAnimationSequence;
+            if (current->m_damagePending ||
+                static_cast<unsigned char>(current->m_animationState)) {
+                if (static_cast<unsigned char>(current->m_animationState)) {
+                    current->m_effectAnimationStart = m_pendingAnimationSequence;
                     current->m_effectAnimationEnd =
-                        current->m_pendingAnimationSequence + 1;
+                        m_pendingAnimationSequence + 1;
                 } else if (current->m_deathPending) {
                     current->m_effectAnimationStart = ARMY_ANIMATION_DEATH;
                 } else {
@@ -2041,22 +2149,23 @@ void army::PowEffect(int effect, int resetLimits, int effectX, int effectY)
                         current->m_frameInfo.animationFrameCount[
                             current->m_effectAnimationStart] +
                         current->m_frameInfo.animationFrameCount[
-                            current->m_effectAnimationEnd];
+                            current->m_effectAnimationStart + 1];
                 }
                 if (current->m_animationSequence == current->m_effectAnimationStart) {
                     current->m_effectAnimationLength--;
                 }
-                if (current->m_drawState < 2) {
-                    current->m_drawState = 2;
+                if (m_drawState < 2) {
+                    m_drawState = 2;
                 }
             }
         }
     }
-    for (frame = 0; frame < static_cast<int>(effectFrames); frame++) {
-        for (side = 0; side < ARMY_COMBAT_SIDE_COUNT; side++) {
-            for (index = 0; index < gpCombatManager->m_armyCount[side]; index++) {
-                current = &gpCombatManager->m_armies[side][index];
-                if (current->m_animationCycle) {
+    frame = 0;
+    for (frame = 0; 0[&effectFrames_1] > frame; frame++) {
+        for (side_4 = 0; side_4 < ARMY_COMBAT_SIDE_COUNT; side_4++) {
+            for (index_10 = 0; index_10 < gpCombatManager->m_armyCount[side_4]; index_10++) {
+                current = &gpCombatManager->m_armies[side_4][index_10];
+                if (static_cast<unsigned char>(current->m_animationCycle)) {
                     if (current->m_animationSequence == ARMY_ANIMATION_SHOOT_UP ||
                         current->m_animationSequence == ARMY_ANIMATION_SHOOT_FORWARD ||
                         current->m_animationSequence == ARMY_ANIMATION_SHOOT_DOWN) {
@@ -2075,8 +2184,8 @@ void army::PowEffect(int effect, int resetLimits, int effectX, int effectY)
                 }
                 if (current->m_effectAnimationStart != -1 &&
                     !current->m_effectAnimationStarted &&
-                    (current->m_animationState ||
-                     static_cast<int>(effectFrames - frame - 1) <=
+                    (static_cast<unsigned char>(current->m_animationState) ||
+                     static_cast<int>(effectFrames_1 - frame - 1) <=
                          current->m_effectAnimationLength ||
                      (maximumStartFrames && frame >= maximumStartFrames - 1) ||
                      (!maximumStartFrames &&
@@ -2085,45 +2194,47 @@ void army::PowEffect(int effect, int resetLimits, int effectX, int effectY)
                        current->m_animationFrame + 1 <
                            current->m_frameInfo.animationFrameCount[
                                current->m_animationSequence])))) {
-                    if (current->m_animationSequence == current->m_effectAnimationStart ||
-                        current->m_animationSequence == current->m_effectAnimationEnd) {
+                    if (current->m_animationSequence != current->m_effectAnimationStart &&
+                        current->m_animationSequence != current->m_effectAnimationEnd) {
+                        if (!gbNoShowCombat && current->m_effectAnimationStart ==
+                                ARMY_ANIMATION_WINCE) {
+                            gpSoundManager->MemorySample(
+                                gpCombatManager->m_armies[side_4][index_10]
+                                    .m_samples[ARMY_SAMPLE_WINCE]);
+                        }
+                        if (!gbNoShowCombat && current->m_effectAnimationStart ==
+                                ARMY_ANIMATION_DEATH) {
+                            gpSoundManager->MemorySample(
+                                gpCombatManager->m_armies[side_4][index_10]
+                                    .m_samples[ARMY_SAMPLE_KILL]);
+                        }
+                        current->m_animationSequence = current->m_effectAnimationStart;
+                        current->m_animationFrame = 0;
+                    } else {
                         if (current->m_animationFrame + 1 <
                             current->m_frameInfo.animationFrameCount[
                                 current->m_animationSequence]) {
                             current->m_animationFrame++;
-                        } else if (current->m_animationSequence ==
-                                       current->m_effectAnimationEnd ||
-                                   current->m_effectAnimationEnd == -1) {
+                        } else if (current->m_animationSequence !=
+                                       current->m_effectAnimationEnd &&
+                                   current->m_effectAnimationEnd != -1) {
+                            current->m_animationSequence = current->m_effectAnimationEnd;
+                            current->m_animationFrame = 0;
+                        } else {
                             if (current->m_animationSequence != ARMY_ANIMATION_STAND &&
                                 current->m_animationSequence != ARMY_ANIMATION_DEATH) {
                                 current->m_animationSequence = ARMY_ANIMATION_STAND;
                                 current->m_animationFrame = 0;
                                 current->m_effectAnimationStarted = 1;
                             }
-                        } else {
-                            current->m_animationSequence = current->m_effectAnimationEnd;
-                            current->m_animationFrame = 0;
                         }
-                    } else {
-                        if (!gbNoShowCombat && current->m_effectAnimationStart ==
-                                ARMY_ANIMATION_WINCE) {
-                            gpSoundManager->MemorySample(
-                                current->m_samples[ARMY_SAMPLE_WINCE]);
-                        }
-                        if (!gbNoShowCombat && current->m_effectAnimationStart ==
-                                ARMY_ANIMATION_DEATH) {
-                            gpSoundManager->MemorySample(
-                                current->m_samples[ARMY_SAMPLE_KILL]);
-                        }
-                        current->m_animationSequence = current->m_effectAnimationStart;
-                        current->m_animationFrame = 0;
                     }
                 }
             }
         }
         glTimers[0] = static_cast<int>(KBTickCount() +
-            gfCombatSpeedMod[gConfig.combatSpeed] * ARMY_COMBAT_FRAME_DELAY);
-        if (drawEffect && frame < giNumPowFrames[gCurLoadedSpellEffect]) {
+            frameDelay_6 * gfCombatSpeedMod[gConfig.combatSpeed]);
+        if (drawEffect_1 && frame < giNumPowFrames[gCurLoadedSpellEffect]) {
             gCurSpellEffectFrame = frame;
         }
         gpCombatManager->DrawFrame(0, 1, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
@@ -2141,9 +2252,9 @@ void army::PowEffect(int effect, int resetLimits, int effectX, int effectY)
     if (!gbNoShowCombat) {
         WaitSample(ARMY_SAMPLE_ATTACK);
     }
-    for (side = 0; side < ARMY_COMBAT_SIDE_COUNT; side++) {
-        for (index = 0; index < gpCombatManager->m_armyCount[side]; index++) {
-            current = &gpCombatManager->m_armies[side][index];
+    for (side_4 = 0; side_4 < ARMY_COMBAT_SIDE_COUNT; side_4++) {
+        for (index_10 = 0; index_10 < gpCombatManager->m_armyCount[side_4]; index_10++) {
+            current = &gpCombatManager->m_armies[side_4][index_10];
             if (current->m_damagePending && current->m_spellEffect != ARMY_NO_EFFECT &&
                 current->m_spellEffect != ARMY_DELAYED_MEDUSA_EFFECT) {
                 gpCombatManager->CastSpell(
@@ -2152,12 +2263,12 @@ void army::PowEffect(int effect, int resetLimits, int effectX, int effectY)
             }
         }
     }
-    keepAnimating = 1;
-    while (keepAnimating) {
-        keepAnimating = 0;
-        for (side = 0; side < ARMY_COMBAT_SIDE_COUNT; side++) {
-            for (index = 0; index < gpCombatManager->m_armyCount[side]; index++) {
-                current = &gpCombatManager->m_armies[side][index];
+    keepAnimating_1 = 1;
+    while (keepAnimating_1) {
+        keepAnimating_1 = 0;
+        for (side_4 = 0; side_4 < ARMY_COMBAT_SIDE_COUNT; side_4++) {
+            for (index_10 = 0; index_10 < gpCombatManager->m_armyCount[side_4]; index_10++) {
+                current = &gpCombatManager->m_armies[side_4][index_10];
                 if (current->m_animationSequence == 14 ||
                     current->m_animationSequence == 16 ||
                     current->m_animationSequence == 20 ||
@@ -2170,7 +2281,7 @@ void army::PowEffect(int effect, int resetLimits, int effectX, int effectY)
                     current->m_animationSequence == 32) {
                     current->m_animationSequence++;
                     current->m_animationFrame = 0;
-                    keepAnimating = 1;
+                    keepAnimating_1 = 1;
                 } else if (current->m_animationSequence == 13 ||
                            current->m_animationSequence == 15 ||
                            current->m_animationSequence == 17 ||
@@ -2186,18 +2297,18 @@ void army::PowEffect(int effect, int resetLimits, int effectX, int effectY)
                         current->m_frameInfo.animationFrameCount[
                             current->m_animationSequence]) {
                         current->m_animationFrame++;
-                        keepAnimating = 1;
+                        keepAnimating_1 = 1;
                     } else if (current->m_animationSequence != ARMY_ANIMATION_DEATH) {
                         current->m_animationSequence = ARMY_ANIMATION_STAND;
                         current->m_animationFrame = 0;
-                        keepAnimating = 1;
+                        keepAnimating_1 = 1;
                     }
                 }
             }
         }
-        if (keepAnimating) {
+        if (keepAnimating_1) {
             glTimers[0] = static_cast<int>(KBTickCount() +
-                gfCombatSpeedMod[gConfig.combatSpeed] * ARMY_COMBAT_FRAME_DELAY);
+                frameDelay_6 * gfCombatSpeedMod[gConfig.combatSpeed]);
             gpCombatManager->DrawFrame(1, 1, 0, 0,
                                        ARMY_COMBAT_FRAME_DELAY, 1, 1);
         }
@@ -2208,9 +2319,9 @@ void army::PowEffect(int effect, int resetLimits, int effectX, int effectY)
     memset(gpCombatManager->m_removedArmies, 0,
            sizeof(gpCombatManager->m_removedArmies));
     gpCombatManager->m_removedArmyPresent = 0;
-    for (side = 0; side < ARMY_COMBAT_SIDE_COUNT; side++) {
-        for (index = 0; index < gpCombatManager->m_armyCount[side]; index++) {
-            current = &gpCombatManager->m_armies[side][index];
+    for (side_4 = 0; side_4 < ARMY_COMBAT_SIDE_COUNT; side_4++) {
+        for (index_10 = 0; index_10 < gpCombatManager->m_armyCount[side_4]; index_10++) {
+            current = &gpCombatManager->m_armies[side_4][index_10];
             if (current->m_deathPending) {
                 current->ProcessDeath(0);
             }
@@ -2219,17 +2330,17 @@ void army::PowEffect(int effect, int resetLimits, int effectX, int effectY)
     if (gpCombatManager->m_removedArmyPresent) {
         gpCombatManager->MakeCreaturesVanish();
     }
-    for (side = 0; side < ARMY_COMBAT_SIDE_COUNT; side++) {
-        for (index = 0; index < gpCombatManager->m_armyCount[side]; index++) {
-            current = &gpCombatManager->m_armies[side][index];
+    for (side_4 = 0; side_4 < ARMY_COMBAT_SIDE_COUNT; side_4++) {
+        for (index_10 = 0; index_10 < gpCombatManager->m_armyCount[side_4]; index_10++) {
+            current = &gpCombatManager->m_armies[side_4][index_10];
             if (current->m_damagePending &&
                 current->m_spellEffect == ARMY_DELAYED_MEDUSA_EFFECT) {
                 gpCombatManager->CastSpell(
                     current->m_spellEffect, current->m_hex, 1, ARMY_NO_EFFECT);
                 current->m_spellEffect = ARMY_NO_EFFECT;
             }
+            current->m_drawSpellEffect = 0;
             current->m_damagePending = 0;
-            current->m_deathPending = 0;
             current->m_killPending = 0;
             current->m_drawState = 1;
             current->m_animationState = 0;
@@ -2237,9 +2348,9 @@ void army::PowEffect(int effect, int resetLimits, int effectX, int effectY)
         }
     }
     gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
-    for (side = 0; side < ARMY_COMBAT_SIDE_COUNT; side++) {
-        for (index = 0; index < gpCombatManager->m_armyCount[side]; index++) {
-            gpCombatManager->m_armies[side][index].WaitSample(ARMY_SAMPLE_WINCE);
+    for (side_4 = 0; side_4 < ARMY_COMBAT_SIDE_COUNT; side_4++) {
+        for (index_10 = 0; index_10 < gpCombatManager->m_armyCount[side_4]; index_10++) {
+            gpCombatManager->m_armies[side_4][index_10].WaitSample(ARMY_SAMPLE_WINCE);
         }
     }
 }
@@ -2342,6 +2453,9 @@ void army::ProcessDeath(int immediate)
     }
 }
 
+// @early-stop
+// The complete instruction stream and all 54 relocation sites align. The
+// residual is limited to delinked gConfig and glTimers symbol identities.
 VA(0x00451b5b, 0x39d)
 void army::SpellEffect(int effect, int effectFrameDelay, int animateCreature)
 {
@@ -2620,106 +2734,114 @@ void army::DecrementSpellRounds(void)
     }
 }
 
+// @early-stop
+// Logic, the 0x50 frame, every retail stack slot, and all 55 relocation sites
+// align. Raw instruction review limits the non-jump residue to the candidate
+// army side/index SIB evaluation and three equivalent comparison operand orders.
+// The remaining extent delta is inline-accessor continuation and condition-
+// polarity jumps; positive, negative, nested, and compound forms were audited.
 VA(0x00452495, 0x644)
 void army::GoBerserk(void)
 {
-    int masks[5];
-    int savedQuantity;
-    int direction;
-    int targetHex;
-    int nearestSide;
-    int nearestIndex;
-    int nearestDistance;
-    int side;
-    int index;
-    int distance;
-    int sideZeroTarget;
-    int sideOneTarget;
+    int masks_28[5];
+    int savedQuantity_10;
+    int direction_4;
+    int targetHex_9;
+    int nearestSide_8;
+    int nearestIndex_19;
+    int nearestDistance_2;
+    int side_8;
+    int index_11;
+    int distance_6;
 
-    masks[4] = 0;
-    direction = 0;
-    masks[3] = 0;
-    savedQuantity = m_quantity;
+    masks_28[4] = 0;
+    direction_4 = 0;
+    masks_28[3] = 0;
+    savedQuantity_10 = m_quantity;
     m_quantity = 0;
-    masks[0] = gpCombatManager->GetAllMask(0);
-    masks[1] = gpCombatManager->GetAllMask(1);
-    m_quantity = savedQuantity;
-    masks[2] = GetAttackMask(m_hex, 2, -1);
-    if (masks[2] != ARMY_ALL_ATTACK_DIRECTIONS) {
+    masks_28[0] = gpCombatManager->GetAllMask(0);
+    masks_28[1] = gpCombatManager->GetAllMask(1);
+    m_quantity = savedQuantity_10;
+    masks_28[2] = GetAttackMask(m_hex, 2, -1);
+    if (masks_28[2] != ARMY_ALL_ATTACK_DIRECTIONS) {
         do {
-            if (masks[4]) {
+            if (!masks_28[4]) {
+                direction_4 = Random(0, ARMY_COMBAT_DIRECTION_COUNT - 1);
+            } else {
                 goto walkToward;
             }
-            direction = Random(0, ARMY_COMBAT_DIRECTION_COUNT - 1);
-        } while (masks[2] & (1 << direction));
+        } while (masks_28[2] & (1 << direction_4));
         giNextAction = COMBAT_AI_ACTION_MOVE;
-        ValidAttack(m_hex, direction, 2, -1, &targetHex);
-        giNextActionGridIndex = targetHex;
+        ValidAttack(m_hex, direction_4, 2, -1, &targetHex_9);
+        giNextActionGridIndex = targetHex_9;
+        masks_28[4] = 1;
         goto berserkFinish;
     }
     {
-        nearestIndex = -1;
-        nearestSide = -1;
-        nearestDistance = ARMY_NEAREST_DISTANCE_LIMIT;
-        for (side = 0; side < ARMY_COMBAT_SIDE_COUNT; side++) {
-            for (index = 0; index < gpCombatManager->m_armyCount[side]; index++) {
-                if (m_side != side || m_index != index) {
-                    army *candidate = &gpCombatManager->m_armies[side][index];
-                    if (!(candidate->m_monster.flags.all & MONSTER_FLAGS_DEAD) &&
-                        candidate->m_quantity > 0) {
-                        distance = gpSearchArray->QuickDistance(
+        nearestIndex_19 = -1;
+        nearestSide_8 = -1;
+        nearestDistance_2 = ARMY_NEAREST_DISTANCE_LIMIT;
+        for (side_8 = 0; side_8 < ARMY_COMBAT_SIDE_COUNT; side_8++) {
+            for (index_11 = 0; index_11 < gpCombatManager->m_armyCount[side_8]; index_11++) {
+                if (m_side == side_8 && m_index == index_11) {
+                    continue;
+                }
+                army *candidate_16 = &gpCombatManager->m_armies[side_8][index_11];
+                if (!(candidate_16->m_monster.flags.all & MONSTER_FLAGS_DEAD)) {
+                    if (candidate_16->m_quantity > 0) {
+                        distance_6 = gpSearchArray->QuickDistance(
                             gpCombatManager->m_hexCells[m_hex].m_x,
                             gpCombatManager->m_hexCells[m_hex].m_y,
-                            gpCombatManager->m_hexCells[candidate->m_hex].m_x,
-                            gpCombatManager->m_hexCells[candidate->m_hex].m_y);
-                        if (distance < nearestDistance) {
-                            nearestIndex = index;
-                            nearestSide = side;
-                            nearestDistance = distance;
+                            gpCombatManager->m_hexCells[candidate_16->m_hex].m_x,
+                            gpCombatManager->m_hexCells[candidate_16->m_hex].m_y);
+                        if (distance_6 < nearestDistance_2) {
+                            nearestIndex_19 = index_11;
+                            nearestSide_8 = side_8;
+                            nearestDistance_2 = distance_6;
                         }
                     }
                 }
             }
         }
-        if (nearestIndex != -1 &&
+        if (nearestIndex_19 != -1 &&
             (m_monster.flags.all & MONSTER_FLAGS_SHOOTER) &&
             m_monster.shots > 0) {
             giNextAction = COMBAT_AI_ACTION_MOVE;
             giNextActionGridIndex =
-                gpCombatManager->m_armies[nearestSide][nearestIndex].m_hex;
+                gpCombatManager->m_armies[nearestSide_8][nearestIndex_19].m_hex;
         } else {
-            sideZeroTarget = -1;
-            sideOneTarget = -1;
-            if (gpCombatManager->AttemptAttack(this, 0, masks[0])) {
+            int sideZeroTarget_12 = -1;
+            int sideOneTarget_18 = -1;
+            if (gpCombatManager->AttemptAttack(this, 0, masks_28[0])) {
                 giNextAction = COMBAT_AI_ACTION_MOVE;
-                sideZeroTarget = giNextActionGridIndex;
+                sideZeroTarget_12 = giNextActionGridIndex;
             }
-            if (gpCombatManager->AttemptAttack(this, 1, masks[1])) {
+            if (gpCombatManager->AttemptAttack(this, 1, masks_28[1])) {
                 giNextAction = COMBAT_AI_ACTION_MOVE;
-                sideOneTarget = giNextActionGridIndex;
+                sideOneTarget_18 = giNextActionGridIndex;
             }
             giNextActionGridIndex = -1;
-            if (sideZeroTarget != -1 || sideOneTarget != -1) {
-                if (sideZeroTarget != -1 && sideOneTarget != -1) {
+            if (sideZeroTarget_12 != -1 || sideOneTarget_18 != -1) {
+                if (sideZeroTarget_12 != -1 && sideOneTarget_18 != -1) {
                     int sideZeroDistance = gpSearchArray->QuickDistance(
                         gpCombatManager->m_hexCells[m_hex].m_x,
                         gpCombatManager->m_hexCells[m_hex].m_y,
-                        gpCombatManager->m_hexCells[sideZeroTarget].m_x,
-                        gpCombatManager->m_hexCells[sideZeroTarget].m_y);
+                        gpCombatManager->m_hexCells[sideZeroTarget_12].m_x,
+                        gpCombatManager->m_hexCells[sideZeroTarget_12].m_y);
                     int sideOneDistance = gpSearchArray->QuickDistance(
                         gpCombatManager->m_hexCells[m_hex].m_x,
                         gpCombatManager->m_hexCells[m_hex].m_y,
-                        gpCombatManager->m_hexCells[sideOneTarget].m_x,
-                        gpCombatManager->m_hexCells[sideOneTarget].m_y);
-                    if (sideZeroDistance < sideOneDistance) {
-                        giNextActionGridIndex = sideZeroTarget;
+                        gpCombatManager->m_hexCells[sideOneTarget_18].m_x,
+                        gpCombatManager->m_hexCells[sideOneTarget_18].m_y);
+                    if (sideOneDistance > sideZeroDistance) {
+                        giNextActionGridIndex = sideZeroTarget_12;
                     } else {
-                        giNextActionGridIndex = sideOneTarget;
+                        giNextActionGridIndex = sideOneTarget_18;
                     }
-                } else if (sideZeroTarget != -1) {
-                    giNextActionGridIndex = sideZeroTarget;
-                } else if (sideOneTarget != -1) {
-                    giNextActionGridIndex = sideOneTarget;
+                } else if (sideZeroTarget_12 != -1) {
+                    giNextActionGridIndex = sideZeroTarget_12;
+                } else if (sideOneTarget_18 != -1) {
+                    giNextActionGridIndex = sideOneTarget_18;
                 }
             }
             if (giNextActionGridIndex == -1) {
@@ -2730,9 +2852,9 @@ void army::GoBerserk(void)
     goto berserkFinish;
 walkToward:
     if ((m_monster.flags.all & MONSTER_FLAGS_FLYING) ||
-        (!gpCombatManager->WalkTowardArmy(this, m_side, masks[m_side]) &&
+        (!gpCombatManager->WalkTowardArmy(this, m_side, masks_28[m_side]) &&
          !gpCombatManager->WalkTowardArmy(
-             this, 1 - m_side, masks[1 - m_side]))) {
+             this, 1 - m_side, masks_28[1 - m_side]))) {
         giNextAction = COMBAT_AI_ACTION_WAIT;
     }
 berserkFinish:
@@ -2742,6 +2864,10 @@ berserkFinish:
     }
 }
 
+// @early-stop
+// All non-jump opcodes/operands and all 24 relocation sites align. The 32-byte
+// object extent delta is limited to seven five-byte inline-accessor continuation
+// jumps plus the equivalent first-condition branch encoding.
 VA(0x00452ad9, 0x3f1)
 void army::MoveAttack(int destination, int moveOnly)
 {
