@@ -6185,7 +6185,7 @@ void advManager::TownGate(int spellId)
 // sums at +0x3e8..+0x40d reverse commutative stack loads, and the unreachable
 // +0x5a3 jump has a different local target. Direct/accessor hero spellings and
 // both coordinate operand orders were checked. The two apparent relocation
-// extras resolve to normalDirTable+2 at retail RVA 0xfaa7a; one is delinked as
+// extras resolve to normalDirTable+1 at retail RVA 0xfaa79; one is delinked as
 // the interior string symbol at RVA 0xfaa79. Revisit after material TU-state change.
 VA(0x00467c9b, 0x5ac)
 void advManager::SummonBoat(void) {

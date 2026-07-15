@@ -1698,7 +1698,7 @@ daemonExperienceGold:
                 break;
             default:
                 zombieCell6 = GetCell(x - normalDirTable[eventHero2->m_direction].x,
-                                     y - normalDirTable[eventHero2->m_direction]._1);
+                                     y - normalDirTable[eventHero2->m_direction].y);
                 if (ZombieEvent(eventHero2, zombieCell6,
                                 "Upon defeating the zomies you search the graves and find something!",
                                 x, y))
@@ -1729,7 +1729,7 @@ daemonExperienceGold:
                 break;
             default:
                 skeletonCell1 = GetCell(x - normalDirTable[eventHero2->m_direction].x,
-                                       y - normalDirTable[eventHero2->m_direction]._1);
+                                       y - normalDirTable[eventHero2->m_direction].y);
                 if (SkeletonEvent(eventHero2, skeletonCell1,
                                   "Upon defeating the Skeletons you sift through the debris and find something!",
                                   x, y))
