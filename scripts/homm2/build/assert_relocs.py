@@ -28,17 +28,23 @@ source bug, so it must not break every build.
 
 Review one function (order-independent; usable on <100% walls):
     homm2 relocs 0x<rva>
+Review every resolvable same-site target in live exact functions:
+    homm2 relocs --resolved
 Review relocation-count deficits among incomplete functions:
     homm2 relocs --counts BASE
 Run from repo root; exits 1 on any wrong/fabricated reloc target.
 """
-import sys, os, re, csv, json, glob, struct, subprocess
+import sys, os, re, csv, json, glob, struct, subprocess, hashlib
 from collections import Counter
+from pathlib import Path
 from typing import NamedTuple
 
 from homm2.build.reloc_owners import load_owner_ranges, owner_for_rva
 
 IMAGE_BASE = 0x400000
+_PARSE_CACHE = {}
+# Bump only when parse_obj's serialized relocation representation changes.
+_PARSER_FINGERPRINT = "coff-relocs-v1"
 
 
 class OwnerOffsetMismatch(NamedTuple):
@@ -54,6 +60,20 @@ class OwnerOffsetMismatch(NamedTuple):
         return ("WRONG FIELD at +0x%x: %s expected +0x%x, actual +0x%x "
                 "(retail %s, base %s)" %
                 (self.site, self.owner_name, self.expected, self.actual,
+                 self.target_symbol, self.base_symbol))
+
+
+class RelocAddressMismatch(NamedTuple):
+    site: int
+    expected: int
+    actual: int
+    target_symbol: str
+    base_symbol: str
+
+    def diagnostic(self):
+        return ("WRONG RELOC at +0x%x: expected RVA 0x%x, actual RVA 0x%x "
+                "(retail %s, base %s)" %
+                (self.site, self.expected, self.actual,
                  self.target_symbol, self.base_symbol))
 
 
@@ -157,7 +177,27 @@ def parse_obj(obj, with_sites=False):
     let the empty-COMDAT audit recover the original retail REL32 destination from the PE without
     weakening ordinary target checking.
     """
-    out = subprocess.run(["llvm-objdump", "-dr", obj], capture_output=True, text=True).stdout
+    object_path = Path(obj).resolve()
+    object_digest = hashlib.sha256(object_path.read_bytes()).hexdigest()
+    cache_key = "%s\0%s\0%s\0%s" % (
+        object_path, int(with_sites), object_digest, _PARSER_FINGERPRINT)
+    if cache_key in _PARSE_CACHE:
+        return _PARSE_CACHE[cache_key]
+    cache_name = hashlib.sha256(cache_key.encode("utf-8")).hexdigest() + ".json"
+    cache_path = Path("build/cache/relocs") / cache_name
+    try:
+        cached = json.loads(cache_path.read_text(encoding="utf-8"))
+        funcs = {name: [tuple(reloc) for reloc in relocs]
+                 for name, relocs in cached.items()}
+        _PARSE_CACHE[cache_key] = funcs
+        return funcs
+    except (OSError, ValueError, TypeError):
+        pass
+
+    run = subprocess.run(["llvm-objdump", "-dr", obj], capture_output=True, text=True)
+    if run.returncode != 0:
+        return {}
+    out = run.stdout
     text_sections = _text_sections(obj)
     text_index = -1
     text_bytes = b""
@@ -205,6 +245,11 @@ def parse_obj(obj, with_sites=False):
         mi = re.match(r'^\s*[0-9a-f]+:\s+(?:[0-9a-f]{2}\s+)+(.+)$', ln)
         if mi:
             prev = mi.group(1).replace('\t', ' ').strip()
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = cache_path.with_suffix(".tmp.%d" % os.getpid())
+    temporary.write_text(json.dumps(funcs, separators=(",", ":")), encoding="utf-8")
+    os.replace(str(temporary), str(cache_path))
+    _PARSE_CACHE[cache_key] = funcs
     return funcs
 
 _PE_SECTIONS = None
@@ -366,9 +411,63 @@ def check_ordered_owner_offsets(sym, data, owners, base_sites, target_sites):
     return problems
 
 
-def review_fields():
-    """Hard-gate owner-relative DIR32 offsets in live objdiff-exact functions."""
-    sym, data, _dups = load_symbols()
+def _resolved_reloc_candidates(sym, data, dups, reloc):
+    """Return every final RVA a relocation can denote.
+
+    Duplicate content-hashed string symbols are value-equivalent and may legitimately
+    resolve to more than one retail address. Other resolvable relocations have one final
+    address, regardless of whether their COFF spelling is ``owner+addend`` or
+    ``const_<RVA>+0``.
+    """
+    typ, symbol, addend = reloc
+    resolved = resolve(sym, data, typ, symbol, addend)
+    if resolved is None:
+        return set()
+    candidates = {resolved}
+    if typ != "REL32":
+        candidates.update(_cands(dups, symbol, addend))
+    return candidates
+
+
+def check_ordered_reloc_addresses(sym, data, dups, owners, base_sites, target_sites):
+    """Compare final RVAs at aligned relocation sites in an exact function."""
+    problems = []
+    target_by_site = {reloc[0]: reloc[1:] for reloc in target_sites}
+    for site, base_type, base_symbol, base_addend in base_sites:
+        target = target_by_site.get(site)
+        if target is None or target[0] != base_type:
+            continue
+        base = (base_type, base_symbol, base_addend)
+        base_rvas = _resolved_reloc_candidates(sym, data, dups, base)
+        target_rvas = _resolved_reloc_candidates(sym, data, dups, target)
+        if not base_rvas or not target_rvas or base_rvas & target_rvas:
+            continue
+
+        base_rva = min(base_rvas)
+        target_rva = min(target_rvas)
+        base_owner = owner_for_rva(owners, base_rva)
+        target_owner = owner_for_rva(owners, target_rva)
+        if (base_owner is not None and target_owner is not None and
+                base_owner.rva == target_owner.rva and
+                base_owner.symbol == target_owner.symbol):
+            problems.append(OwnerOffsetMismatch(
+                site, base_owner.symbol, base_owner.source_name,
+                target_rva - target_owner.rva, base_rva - base_owner.rva,
+                target[1], base_symbol))
+        else:
+            problems.append(RelocAddressMismatch(
+                site, target_rva, base_rva, target[1], base_symbol))
+    return problems
+
+
+def review_fields(resolved_addresses=False):
+    """Audit ordered relocations in live exact functions.
+
+    The existing build gate checks proven public-owner offsets. ``--resolved``
+    widens this to every relocation whose final retail RVA can be resolved; it is
+    promoted to the hard gate after its initial findings are repaired.
+    """
+    sym, data, dups = load_symbols()
     owners = load_owner_ranges()
     report = json.load(open("build/objdiff/report.json"))
     bad = []
@@ -391,17 +490,26 @@ def review_fields():
                 continue
             checked_functions += 1
             checked_sites += len(base_functions[name])
-            for problem in check_ordered_owner_offsets(
-                    sym, data, owners, base_functions[name], target_functions[name]):
+            if resolved_addresses:
+                problems = check_ordered_reloc_addresses(
+                    sym, data, dups, owners,
+                    base_functions[name], target_functions[name])
+            else:
+                problems = check_ordered_owner_offsets(
+                    sym, data, owners,
+                    base_functions[name], target_functions[name])
+            for problem in problems:
                 bad.append((unit, name, problem))
     for unit, name, problem in bad:
         print("  %s  %s: %s" % (unit, name, problem.diagnostic()))
     if bad:
-        print("\nRELOC FIELDS FAIL: %d exact function(s) use a wrong DATA-owner offset."
-              % len({(unit, name) for unit, name, _problem in bad}))
+        label = "ADDRESSES" if resolved_addresses else "FIELDS"
+        print("\nRELOC %s FAIL: %d exact function(s) use a wrong resolved target."
+              % (label, len({(unit, name) for unit, name, _problem in bad})))
         return 1
-    print("reloc fields OK: %d exact functions, %d ordered relocation sites checked."
-          % (checked_functions, checked_sites))
+    label = "addresses" if resolved_addresses else "fields"
+    print("reloc %s OK: %d exact functions, %d ordered relocation sites scanned."
+          % (label, checked_functions, checked_sites))
     return 0
 
 def _function_for_arg(arg):
@@ -510,6 +618,8 @@ def review_counts(scope="BASE"):
     return 0
 
 def main():
+    if len(sys.argv) > 1 and sys.argv[1] == "--resolved":
+        return review_fields(resolved_addresses=True)
     if len(sys.argv) > 1 and sys.argv[1] == "--fields":
         return review_fields()
     if len(sys.argv) > 1 and sys.argv[1] == "--counts":
