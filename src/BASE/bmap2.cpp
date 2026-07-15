@@ -96,7 +96,7 @@ void BlitBitmap(class bitmap *src, int sx, int sy, int w, int h, class bitmap *d
     }
 }
 
-// @semantic: retail/base are both 0xa8 bytes, save EBX/ESI/EDI/EBP with no
+// Retained exact-max checkpoint: retail/base are both 0xa8 bytes, save EBX/ESI/EDI/EBP with no
 // local frame, share the same CFG, and have 15/15 relocations by manual COFF
 // audit, including uDimPal at +0x5f on both sides (the helper misresolves its
 // addend). The first non-relocation byte divergence is +0x80: base emits

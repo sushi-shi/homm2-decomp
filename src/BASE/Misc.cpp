@@ -246,7 +246,6 @@ void ShowMemoryStatus(void)
     giDebugLevel = savedDebugLevel;
 }
 
-// @semantic
 // Structurally complete /O2 checkpoint: both sections are 0x48 with identical CFG and
 // no relocations.  Recovering the explicit shifted-hash temporary changed the rotate from
 // base `shr eax,25; shl esi,5` to retail's `shl eax,5; shr esi,25`, raising this from
@@ -416,7 +415,6 @@ void ProcessAssert(int condition, char *file, int line)
     }
 }
 
-// @semantic
 // Structurally complete /O2 checkpoint with equal 0x66-byte sections, the same frame/CFG,
 // and the sole strncmp relocation.  The explicit MAKEFILEID rotate temporary moved this
 // from the old wholesale register-allocation residual to 98.60%; all instructions now agree
@@ -796,7 +794,6 @@ int IsCDDrive(int driveIndex)
     return GetDriveTypeA(gText) == DRIVE_CDROM;
 }
 
-// @semantic
 // Structurally complete /O2 checkpoint: both sections are 0x3ed with the same 0x2f0 frame,
 // CFG and 51 relocation occurrences. Manual raw review confirms the indirect Win32/MCI
 // targets; `homm2 relocs` reports only three delinker owner aliases (the archive literal and

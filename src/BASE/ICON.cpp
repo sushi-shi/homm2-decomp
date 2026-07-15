@@ -174,7 +174,7 @@ void icon::ClipFillToBuffer(int x, int y, int frame, int color, int flip,
                      ICON_DRAW_CLIP, clipX, clipY, clipW, clipH);
 }
 
-// @semantic: retail/base are both 0x103 bytes with the same 0x4-byte frame,
+// Retained exact-max checkpoint: retail/base are both 0x103 bytes with the same 0x4-byte frame,
 // saved registers, CFG, and exact ordered 10-relocation offset/type/identity
 // stream by manual COFF audit. Under the final named-orientation enum state,
 // the sole relocation-masked raw residual is +0xbf: base emits

@@ -11,7 +11,6 @@
 #include <SOURCE/wingraph.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/KB.h>
-// @semantic
 // Complete /O2 checkpoint: both code streams end at the ret at +0x3a2 and contain
 // 261 instructions (retail's +0x3a3 nop is alignment outside the CodeView span).
 // Relocations are exact at 71/71 with no wrong target. Keeping the combat and
@@ -355,7 +354,6 @@ void heroWindowManager::RemoveWindow(class heroWindow *w)
     }
 }
 
-// @semantic
 // Structurally complete /O2 checkpoint (live 99.19%): base is 0x1ce bytes versus
 // retail 0x1cf with the exact 0x38 frame, identical ordered CFG, and 31/31 resolved
 // relocations. Reordering the independent dialog-result/done stores via the clang-AST
