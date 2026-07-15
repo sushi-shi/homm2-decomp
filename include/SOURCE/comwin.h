@@ -15,7 +15,7 @@ struct tag_Node {
     union {
         unsigned char comData[1]; // +0x0a COM payload (variable length)
         struct {
-            unsigned char field_0xa; // NetBIOS session
+            unsigned char sessionIndex; // NetBIOS session table index
             unsigned char data[1];   // NetBIOS payload (variable length)
         };
     };

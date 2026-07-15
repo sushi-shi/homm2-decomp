@@ -119,25 +119,25 @@ void town::View(int noFade)
 VA(0x00432f54, 0x14d)
 void town::Deallocate(void)
 {
-    playerRec *playerRecord = &gpGame->m_players[m_owner];
+    playerData *playerRecord = &gpGame->m_players[m_owner];
     int position = TOWN_ID_NONE;
     int i;
 
-    for (i = 0; i < playerRecord->townCount; ++i) {
-        if (playerRecord->towns[i] == m_id)
+    for (i = 0; i < playerRecord->m_townCount; ++i) {
+        if (playerRecord->m_townIds[i] == m_id)
             position = i;
     }
-    for (i = position; i < playerRecord->townCount - 1; ++i)
-        playerRecord->towns[i] = playerRecord->towns[i + 1];
+    for (i = position; i < playerRecord->m_townCount - 1; ++i)
+        playerRecord->m_townIds[i] = playerRecord->m_townIds[i + 1];
 
-    playerRecord->towns[playerRecord->townCount - 1] = TOWN_ID_NONE;
-    if (m_id - playerRecord->currentTown == 0)
-        playerRecord->currentTown = TOWN_ID_NONE;
-    --playerRecord->townCount;
-    if (playerRecord->townCount < TOWN_PLAYER_WINDOW_SIZE)
-        playerRecord->townWindowTop = 0;
-    else if (playerRecord->townWindowTop + TOWN_PLAYER_WINDOW_SIZE > playerRecord->townCount)
-        playerRecord->townWindowTop = playerRecord->townCount - TOWN_PLAYER_WINDOW_SIZE;
+    playerRecord->m_townIds[playerRecord->m_townCount - 1] = TOWN_ID_NONE;
+    if (m_id - playerRecord->m_currentTown == 0)
+        playerRecord->m_currentTown = TOWN_ID_NONE;
+    --playerRecord->m_townCount;
+    if (playerRecord->m_townCount < TOWN_PLAYER_WINDOW_SIZE)
+        playerRecord->m_townLocatorPage = 0;
+    else if (playerRecord->m_townLocatorPage + TOWN_PLAYER_WINDOW_SIZE > playerRecord->m_townCount)
+        playerRecord->m_townLocatorPage = playerRecord->m_townCount - TOWN_PLAYER_WINDOW_SIZE;
 
     gpGame->m_townOwners[m_id] = TOWN_OWNER_NONE;
     m_owner = TOWN_OWNER_NONE;

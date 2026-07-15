@@ -295,12 +295,12 @@ int advManager::Open(int id)
     int oldPlayer = giCurPlayer;
     int oldShowIt = bShowIt;
     giCurPlayer = giCurWatchPlayer;
-    gpCurPlayer = reinterpret_cast<playerData *>(&gpGame->m_players[giCurPlayer]);
+    gpCurPlayer = &gpGame->m_players[giCurPlayer];
     bShowIt = 1;
     RedrawAdvScreen(1, 0);
     giCurPlayer = oldPlayer;
     bShowIt = oldShowIt;
-    gpCurPlayer = reinterpret_cast<playerData *>(&gpGame->m_players[giCurPlayer]);
+    gpCurPlayer = &gpGame->m_players[giCurPlayer];
     if (!gbThisNetHumanPlayer[giCurPlayer])
         gpGame->ShowComputerScreen();
     KBChangeMenu(hmnuAdv);
@@ -575,7 +575,7 @@ void advManager::CheckSetEvilInterface(int redraw, int player)
     else if (gConfig.evilInterfaceUsage == ADVMGR_INTERFACE_GOOD && gbUseEvilInterface)
         shouldChange = 1;
     else if (gConfig.evilInterfaceUsage == ADVMGR_INTERFACE_AUTO &&
-             gpGame->m_players[player].evilInterface != gbUseEvilInterface)
+             gpGame->m_players[player].m_evilInterface != gbUseEvilInterface)
         shouldChange = 1;
 
     if (shouldChange) {
@@ -1454,7 +1454,7 @@ int advManager::ProcessSearch(int x, int y)
             CheckEndGame(0, 0);
     return 1;
 search_end:
-    gpCurPlayer->m_canDig = 0;
+    gpCurPlayer->m_ultimateArtifactHintChance = 0;
     return 1;
 }
 
@@ -2342,7 +2342,7 @@ void advManager::DrawCell(int mapX, int mapY, int screenX, int screenY,
                 if (s_drawCell->triggerType == ADVMGR_HERO_TRIGGER) {
                     s_drawHero = gpGame->GetHero(s_drawCell->w4hi);
                     s_drawPlayerColor =
-                        gpGame->m_players[s_drawHero->m_owner].color;
+                        gpGame->m_players[s_drawHero->m_owner].m_color;
                     if (s_drawHero->m_eventFlags & 0x80)
                         s_drawHeroType = ADVMGR_HERO_TYPE_BOAT;
                     else
@@ -2753,7 +2753,7 @@ void advManager::UpdateRadar(int updateScreen, int partial)
                 if ((cellValue->field8 & 0x40) != 0 &&
                     m_mapOriginX + ADVMGR_RADAR_CURRENT_CELL == mapColumnLimit &&
                     m_mapOriginY + ADVMGR_RADAR_CURRENT_CELL == mapRow) {
-                    radarColorValue = gOwnerColors[gpGame->m_players[giCurPlayer].color];
+                    radarColorValue = gOwnerColors[gpGame->m_players[giCurPlayer].m_color];
                 } else {
                     if ((cellValue->triggerType & ADVMGR_TRIGGER_TYPE_MASK) ==
                         ADVMGR_RADAR_TOWN_TRIGGER) {
@@ -2761,7 +2761,7 @@ void advManager::UpdateRadar(int updateScreen, int partial)
                         if (!(giCurPlayer != ownerIndexValue)) {
                             int ownerColorIndex;
                             if (ownerIndexValue >= 0)
-                                ownerColorIndex = gpGame->m_players[ownerIndexValue].color;
+                                ownerColorIndex = gpGame->m_players[ownerIndexValue].m_color;
                             else
                                 ownerColorIndex = ADVMGR_RADAR_NEUTRAL_OWNER;
                             radarColorValue = gOwnerColors[ownerColorIndex];
@@ -2797,7 +2797,7 @@ void advManager::UpdateRadar(int updateScreen, int partial)
                                 townXValue = gpGame->GetTown(cellValue->w4hi)->m_x;
                                 townYValue = gpGame->GetTown(cellValue->w4hi)->m_y;
                                 if (ownerIndexValue >= 0)
-                                    ownerColorIndex = gpGame->m_players[ownerIndexValue].color;
+                                    ownerColorIndex = gpGame->m_players[ownerIndexValue].m_color;
                                 else
                                     ownerColorIndex = ADVMGR_RADAR_NEUTRAL_OWNER;
                                 radarColorValue = gOwnerColors[ownerColorIndex];
@@ -2818,7 +2818,7 @@ void advManager::UpdateRadar(int updateScreen, int partial)
                                     int ownerColorIndex;
                                     ownerIndexValue = gpGame->m_mineOwners[cellValue->w4hi];
                                     if (ownerIndexValue >= 0)
-                                        ownerColorIndex = gpGame->m_players[ownerIndexValue].color;
+                                        ownerColorIndex = gpGame->m_players[ownerIndexValue].m_color;
                                     else
                                         ownerColorIndex = ADVMGR_RADAR_NEUTRAL_OWNER;
                                     radarColorValue = gOwnerColors[ownerColorIndex];
@@ -2838,7 +2838,7 @@ radar_default_object:
                                     int ownerColorIndex;
                                     ownerIndexValue = gpGame->m_mineOwners[cellValue->w4hi];
                                     if (ownerIndexValue >= 0)
-                                        ownerColorIndex = gpGame->m_players[ownerIndexValue].color;
+                                        ownerColorIndex = gpGame->m_players[ownerIndexValue].m_color;
                                     else
                                         ownerColorIndex = ADVMGR_RADAR_NEUTRAL_OWNER;
                                     radarColorValue = gOwnerColors[ownerColorIndex];
@@ -3602,7 +3602,7 @@ void advManager::UpdBottomView(int forceUpdate, int drawWindow,
     }
 
     if (!gbThisNetHumanPlayer[giCurPlayer] || gbAllBlack ||
-        gpGame->m_players[giCurPlayer].color != gpCurPlayer->m_color) {
+        gpGame->m_players[giCurPlayer].m_color != gpCurPlayer->m_color) {
         updated = UpdBottomViewEnemyTurn();
     } else if (gpCurPlayer->m_currentHero == ADVMGR_INVALID_HERO) {
         updated = UpdBottomViewKingdom();
@@ -8147,7 +8147,7 @@ int advManager::DoVisions(hero *visionHero)
 
             joiningCostIndex = gMonsterDatabase[creatureData].cost * monsterCountIndex * 2;
             if (joiningCostIndex >
-                gpGame->m_players[visionHero->m_owner].resources[RES_GOLD]) {
+                gpGame->m_players[visionHero->m_owner].m_resources[RES_GOLD]) {
                 if (strengthRatioCurrent > MONSTER_STRENGTH_FLEE) {
                     goto creaturesFlee;
                 } else {

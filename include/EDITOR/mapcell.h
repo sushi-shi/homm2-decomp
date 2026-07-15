@@ -54,6 +54,10 @@ public:
             u16 w4c : 1;    // +4 bit2
             u16 w4hi : 13;  // +4 bits3-15
         };
+        struct {
+            u16 m_tentFlags : 3;
+            u16 m_tentColor : 13;
+        };
     };
     u8  ovlFlag0   : 1;     // +6 bit0
     u8  ovlFlag1   : 1;     // +6 bit1

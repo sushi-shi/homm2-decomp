@@ -145,55 +145,6 @@ extern SCampaignChoice campaignChoices[CAMPAIGN_SIDE_COUNT]
 extern char *cCampaignName[CAMPAIGN_SIDE_COUNT][CAMPAIGN_MAP_COUNT];
 extern char *cCampaignDescription[CAMPAIGN_SIDE_COUNT][CAMPAIGN_MAP_COUNT];
 
-// KB-private record structs (shared ones -- tag_message/SAMPLE2/tag_monsterInfo/SSpellInfo/
-// SWinSetup live in _types.h / _carcass_types.h; SNetPlayerInfo is REMOTE-owned).
-#ifndef HOMM2_GAME_RECORD_TYPES
-#define HOMM2_GAME_RECORD_TYPES
-#pragma pack(push, 1)
-struct townArmyRecord {
-    signed char m_troopTypes[5];
-    union {
-        unsigned short m_troopCounts[5];
-        short m_creatureCounts[5];
-    };
-};
-struct townSlot {
-    signed char id;
-    signed char owner;
-    signed char unknown2;
-    signed char race;
-    unsigned char x;
-    unsigned char y;
-    signed char unknown6;
-    signed char unknown7;
-    union {
-        townArmyRecord m_army;
-        signed char army[15];
-    };
-    signed char occupyingHeroId;
-    int buildings;
-    char unknown1c;
-    char unknown1d;
-    short dwellingGrowth[12];
-    unsigned char m_onMap;
-    signed char m_unknown37;
-    signed char unknown38;
-    signed char m_originalOwner;
-    unsigned short m_extraIndex;
-    union {
-        signed char m_spells[5][4];
-        struct {
-            char m_spellPad[19];
-            signed char m_spellCounts[6];
-        };
-    };
-    short unknown55;
-    char m_name[13];
-};
-#pragma pack(pop)
-SIZE(townSlot, 0x64);
-struct heroRec  { char m_pad[250]; };
-#endif
 struct SPlayerExit {
     signed char netPosition;
     signed char gamePosition;

@@ -214,7 +214,7 @@ extern "C" unsigned short __fastcall nb_snd(short session, short len, void *data
         gNbSendSourceLineBase +
             (NETWIN_SOURCE_LINE_SEND_ALLOC - NETWIN_SOURCE_LINE_SEND_BASE)));
     node->len = len;
-    node->field_0xa = static_cast<unsigned char>(session);
+    node->sessionIndex = static_cast<unsigned char>(session);
     memcpy(node->data, data, len);
     EnterCriticalSection(&gNbSndLock);
     add_node(&gNbSndQueue, node);
@@ -397,7 +397,7 @@ void nb_thr_ctl(void)
                 keepRunning = 0;
             } else {
                 memset(&gNbCtlNcb, 0, sizeof(gNbCtlNcb));
-                gNbCtlNcb.sessionNumber = gNbSessLsn[node->field_0xa];
+                gNbCtlNcb.sessionNumber = gNbSessLsn[node->sessionIndex];
                 if (gNbCtlNcb.sessionNumber != NETBIOS_INVALID_ID) {
                     memcpy(gNbSessBuf.bytes, node->data, node->len);
                     gNbCtlNcb.buffer = gNbSessBuf.bytes;
@@ -422,7 +422,7 @@ void nb_thr_ctl(void)
                         case NETBIOS_RESULT_SESSION_OUT_OF_RANGE:
                         case NETBIOS_RESULT_SESSION_CLOSED:
                         case NETBIOS_RESULT_SESSION_ENDED:
-                            gNetStatus[node->field_0xa] &= ~NETBIOS_SESSION_ACTIVE;
+                            gNetStatus[node->sessionIndex] &= ~NETBIOS_SESSION_ACTIVE;
                             break;
                         default:
                             break;
@@ -676,7 +676,7 @@ static void __fastcall nb_recv_complete(int session)
                      NETWIN_SOURCE_LINE_RECEIVE_COMPLETE_BASE)));
             if (node != 0) {
                 node->len = gNbSessNcb[session].length;
-                node->field_0xa = static_cast<unsigned char>(session);
+                node->sessionIndex = static_cast<unsigned char>(session);
                 memcpy(node->data, gNbRcvData[session].bytes, node->len);
                 EnterCriticalSection(&gNbRcvLock);
                 add_node(&gNbRcvQueue, node);

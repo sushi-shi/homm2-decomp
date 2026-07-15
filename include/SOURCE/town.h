@@ -76,7 +76,7 @@ public:
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     char   m_id;  // +0x00
     char   m_owner;  // +0x01
-    char _pad_0x2[0x1];
+    signed char m_threat;  // +0x02
     char   m_type;  // +0x03
     unsigned char m_x;  // +0x04
     unsigned char m_y;  // +0x05
@@ -100,7 +100,7 @@ public:
             signed char m_spellCounts[6];
         };
     };
-    short m_unknown55;  // +0x55
+    unsigned short m_turnsOwned;  // +0x55
     char m_name[13];  // +0x57
     // Packed retail stride is 0x64 bytes.
     // --- constructors ---

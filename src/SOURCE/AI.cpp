@@ -32,8 +32,8 @@ int combatManager::AICheckRetreat(void)
         static_cast<unsigned char>(m_heroes[m_currentSide]->m_id) ==
             gpGame->m_mapHeader.victoryConditionValue)
         return 0;
-    if (gpGame->m_players[m_heroes[m_currentSide]->m_owner].townCount == 0 &&
-        gpGame->m_players[m_heroes[m_currentSide]->m_owner].heroCount ==
+    if (gpGame->m_players[m_heroes[m_currentSide]->m_owner].m_townCount == 0 &&
+        gpGame->m_players[m_heroes[m_currentSide]->m_owner].m_heroCount ==
             COMBAT_AI_LAST_HERO_COUNT)
         return 0;
 

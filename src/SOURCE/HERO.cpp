@@ -125,7 +125,7 @@ int hero::CalcMobility(void) {
     if (m_owner >= 0 && m_owner < 6 && !gbHumanPlayer[m_owner] &&
         gpGame->m_difficulty >= 2) {
         mobilityResult += HERO_AI_DIFFICULTY_MOBILITY_BONUS;
-        if (gpGame->m_players[m_owner].unknown0f == 2)
+        if (gpGame->m_players[m_owner].m_aiDifficulty == 2)
             mobilityResult += HERO_AI_STATE_MOBILITY_BONUS;
     }
     return mobilityResult;
@@ -366,7 +366,7 @@ int hero::Dismiss(void) {
 VA(0x0046cee8, 0x587)
 void hero::Deallocate(int updateMap) {
     int availableHeroSlotCurrent;
-    playerRec *player;
+    playerData *player;
     int playerHeroIndex;
     int heroOwner;
     int index;
@@ -399,7 +399,7 @@ void hero::Deallocate(int updateMap) {
         occupiedTownValue->m_occupyingHeroId = -1;
     }
 
-    if (m_owner != giCurPlayer || gpGame->m_players[m_owner].currentHero != m_id ||
+    if (m_owner != giCurPlayer || gpGame->m_players[m_owner].m_currentHero != m_id ||
         gpAdvManager->m_heroContextLocked == 0) {
         gpGame->RestoreCell(m_x, m_y, m_locationType, m_occupiedTown, 0, 1);
     }
@@ -410,16 +410,16 @@ void hero::Deallocate(int updateMap) {
     }
 
     playerHeroIndex = -1;
-    for (index = 0; index < player->heroCount; index++) {
-        if (player->heroes[index] == m_id)
+    for (index = 0; index < player->m_heroCount; index++) {
+        if (player->m_heroIds[index] == m_id)
             playerHeroIndex = index;
     }
-    for (index = playerHeroIndex; index < player->heroCount - 1; index++)
-        player->heroes[index] = player->heroes[index + 1];
-    player->heroes[player->heroCount - 1] = -1;
+    for (index = playerHeroIndex; index < player->m_heroCount - 1; index++)
+        player->m_heroIds[index] = player->m_heroIds[index + 1];
+    player->m_heroIds[player->m_heroCount - 1] = -1;
 
-    if (player->currentHero == m_id) {
-        player->currentHero = -1;
+    if (player->m_currentHero == m_id) {
+        player->m_currentHero = -1;
         if (m_owner == giCurPlayer) {
             gpAdvManager->m_cursorActive = 0;
             mapCellRecord = gpGame->m_worldMap.GetCell(m_x, m_y);
@@ -429,25 +429,25 @@ void hero::Deallocate(int updateMap) {
             gpAdvManager->m_heroContextLocked = 0;
     }
 
-    player->heroCount--;
-    player->heroWindowTop = 0;
+    player->m_heroCount--;
+    player->m_heroLocatorPage = 0;
     gpGame->m_availableHeroes[m_id] = HERO_AVAILABILITY_UNAVAILABLE;
 
     if (gbRetreatWin) {
         availableHeroSlotCurrent = Random(0, HERO_AVAILABLE_SLOT_COUNT - 1);
         if (gpGame->m_heroRecs[gpGame->m_players[m_owner]
-                                   .availableHeroes[availableHeroSlotCurrent]]
+                                   .m_availableHeroIds[availableHeroSlotCurrent]]
                 .m_eventFlags & HERO_EVENT_WEEKLY_VISIT) {
             availableHeroSlotCurrent = 1 - availableHeroSlotCurrent;
         }
         if (gpGame->m_availableHeroes[gpGame->m_players[m_owner]
-                                          .availableHeroes[availableHeroSlotCurrent]] ==
+                                          .m_availableHeroIds[availableHeroSlotCurrent]] ==
             HERO_AVAILABILITY_RETREATED) {
             gpGame->m_availableHeroes[gpGame->m_players[m_owner]
-                                          .availableHeroes[availableHeroSlotCurrent]] =
+                                          .m_availableHeroIds[availableHeroSlotCurrent]] =
                 HERO_AVAILABILITY_UNAVAILABLE;
         }
-        gpGame->m_players[m_owner].availableHeroes[availableHeroSlotCurrent] = m_id;
+        gpGame->m_players[m_owner].m_availableHeroIds[availableHeroSlotCurrent] = m_id;
         gpGame->m_availableHeroes[m_id] = HERO_AVAILABILITY_RETREATED;
         m_eventFlags = m_eventFlags | HERO_EVENT_WEEKLY_VISIT;
     }

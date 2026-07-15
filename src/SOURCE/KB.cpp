@@ -63,7 +63,7 @@
 // Types now from headers: game/mouseManager/townManager/town/executive + combatManager/
 // palette/font -> _all.h; tag_message -> _carcass_types.h; SAMPLE2/tag_monsterInfo/SSpellInfo/
 // SWinSetup -> _types.h; SNetPlayerInfo -> REMOTE_TYPES.h;
-// townSlot/heroRec/SPlayerExit/playerRec -> KB.h.
+// SPlayerExit -> KB.h.
 
 #define KBFILE ((char *)"I:\\Projects\\Heroes\\Prog\\SOURCE\\KB.CPP")
 #define KBLINE (*(short *)"\xBE\x0C")
@@ -84,9 +84,9 @@ static long glNextCycleTime;
 
 static char cBlank0[4], cBlank1[4], cBlank2[4], cBlank3[4];
 
-inline townSlot *GetCastleRec(int i)
+inline town *GetCastleRec(int i)
 {
-    return reinterpret_cast<townSlot *>(&gpGame->m_castleRecs[i]);
+    return &gpGame->m_castleRecs[i];
 }
 
 inline hero *GetHeroSlot(int i)
@@ -638,7 +638,7 @@ initialize_game:
         for (player_h = 0; player_h < gpGame->m_playerCount; player_h++) {
             if (!strlen(cPlayerNames[player_h])) {
                 sprintf(cPlayerNames[player_h], "%s player",
-                        gColors[gpGame->m_players[player_h].color]);
+                        gColors[gpGame->m_players[player_h].m_color]);
                 cPlayerNames[player_h][0] -= ' ';
             }
         }
@@ -664,7 +664,7 @@ initialize_game:
                 ShutDown("Can't add manager!");
             if (command_a == OLD_MAIN_NEW_GAME) {
                 gpAdvManager->SetHeroContext(
-                    reinterpret_cast<playerData *>(&gpGame->m_players[0])->NextHero(0), 0);
+                    gpGame->m_players[0].NextHero(0), 0);
             }
             if (command_a == OLD_MAIN_NEW_GAME || bForceCheckTimeEvent) {
                 bForceCheckTimeEvent = 0;
@@ -1391,12 +1391,12 @@ VA(0x00499d21, 0x9a)
 int CanBuy(town *t, int type)
 {
     int buf[KB_BUILDING_RESOURCE_COUNT];
-    playerRec *ptr;
+    playerData *ptr;
     int idx;
     GetBuildingCost(t->m_type, type, buf, t->m_buildState);
     ptr = &gpGame->m_players[giCurPlayer];
     for (idx = 0; idx < KB_BUILDING_RESOURCE_COUNT; idx++)
-        if (ptr->resources[idx] < buf[idx])
+        if (ptr->m_resources[idx] < buf[idx])
             return 0;
     return 1;
 }
@@ -1633,7 +1633,7 @@ int TrueFalseDialogHandler(struct tag_message &msg)
 VA(0x0049a52f, 0x192)
 void PlayerDead(int player)
 {
-    playerRec *rec;
+    playerData *rec;
     int i;
     gbRetreatWin = 0;
     rec = &gpGame->m_players[player];
@@ -1643,12 +1643,12 @@ void PlayerDead(int player)
         if (gpGame->m_mineOwners[i] == player)
             gpGame->ClaimMine(i, -1);
     }
-    for (i = rec->heroCount - 1; i >= 0; i--) {
-        GetHeroSlot(rec->heroes[i])->Deallocate(1);
+    for (i = rec->m_heroCount - 1; i >= 0; i--) {
+        GetHeroSlot(rec->m_heroIds[i])->Deallocate(1);
     }
     for (i = 0; i < AVAILABLE_HERO_SLOTS; i++) {
-        if (gpGame->m_availableHeroes[rec->availableHeroes[i]] == WEEKLY_AVAILABLE_HERO)
-            gpGame->m_availableHeroes[rec->availableHeroes[i]] = -1;
+        if (gpGame->m_availableHeroes[rec->m_availableHeroIds[i]] == WEEKLY_AVAILABLE_HERO)
+            gpGame->m_availableHeroes[rec->m_availableHeroIds[i]] = -1;
     }
     if (gbRemoteOn) {
         if (gbHumanPlayer[player])
@@ -1700,7 +1700,7 @@ void CheckEndGame(int forcedResult, int dragonCityCaptured)
     int normalVictoryAllowed;
     int player;
     int heroIndex;
-    playerRec *rec;
+    playerData *rec;
     town *victoryTown;
     town *lossTown;
 
@@ -1720,7 +1720,7 @@ void CheckEndGame(int forcedResult, int dragonCityCaptured)
         for (player = 0; player < gpGame->m_playerCount; player++) {
             if (!gpGame->m_playerDead[player]) {
                 rec = &gpGame->m_players[player];
-                if ((rec->heroCount == 0 && rec->townCount == 0) ||
+                if ((rec->m_heroCount == 0 && rec->m_townCount == 0) ||
                     (xIsPlayingExpansionCampaign && xCampaign.IsSpecialLossCondition(player))) {
                     PlayerDead(player);
                     if (giThisGamePos == player) {
@@ -1733,8 +1733,8 @@ void CheckEndGame(int forcedResult, int dragonCityCaptured)
                                      gpGame->GetPlayerColor(static_cast<signed char>(player)), -1, -1, -1,
                                      CHECK_END_GAME_REMOTE_DIALOG_TIME);
                     }
-                } else if (rec->townCount == 0) {
-                    if (rec->daysLeft == -1) {
+                } else if (rec->m_townCount == 0) {
+                    if (rec->m_daysLeft == -1) {
                         if (gbThisNetHumanPlayer[player] && giCurPlayer == player) {
                             sprintf(gText,
                                     "%s, you have lost your last town.  If you do not conquer another "
@@ -1743,8 +1743,8 @@ void CheckEndGame(int forcedResult, int dragonCityCaptured)
                             NormalDialog(gText, 1, -1, -1, CHECK_END_GAME_PLAYER_DIALOG_ICON,
                                          gpGame->GetPlayerColor(static_cast<signed char>(player)), -1, 0, -1, 0);
                         }
-                        rec->daysLeft = CHECK_END_GAME_GRACE_DAYS;
-                    } else if (rec->daysLeft == 0) {
+                        rec->m_daysLeft = CHECK_END_GAME_GRACE_DAYS;
+                    } else if (rec->m_daysLeft == 0) {
                         PlayerDead(player);
                         if (gbThisNetHumanPlayer[player] && giCurPlayer == player) {
                             if (!dialogShown) {
@@ -1764,7 +1764,7 @@ void CheckEndGame(int forcedResult, int dragonCityCaptured)
                                      gpGame->GetPlayerColor(static_cast<signed char>(player)), -1, 0, -1, 0);
                     }
                 } else {
-                    rec->daysLeft = -1;
+                    rec->m_daysLeft = -1;
                 }
             }
         }
@@ -1805,7 +1805,7 @@ void CheckEndGame(int forcedResult, int dragonCityCaptured)
             sideAbove = 0;
             for (player = 0; player < gpGame->m_playerCount; player++) {
                 if (!gpGame->m_playerDead[player]) {
-                    if (gpGame->m_players[player].color < gpGame->m_mapHeader.victorySideThreshold) {
+                    if (gpGame->m_players[player].m_color < gpGame->m_mapHeader.victorySideThreshold) {
                         sideBelow++;
                     } else {
                         sideAbove++;
@@ -1815,14 +1815,14 @@ void CheckEndGame(int forcedResult, int dragonCityCaptured)
             if (sideBelow == 0) {
                 for (player = 0; player < gpGame->m_playerCount; player++) {
                     if (gbThisNetHumanPlayer[player] && !gpGame->m_playerDead[player] &&
-                        gpGame->m_players[player].color >= gpGame->m_mapHeader.victorySideThreshold) {
+                        gpGame->m_players[player].m_color >= gpGame->m_mapHeader.victorySideThreshold) {
                         victory = 1;
                     }
                 }
             } else if (sideAbove == 0) {
                 for (player = 0; player < gpGame->m_playerCount; player++) {
                     if (gbThisNetHumanPlayer[player] && !gpGame->m_playerDead[player] &&
-                        gpGame->m_players[player].color < gpGame->m_mapHeader.victorySideThreshold) {
+                        gpGame->m_players[player].m_color < gpGame->m_mapHeader.victorySideThreshold) {
                         victory = 1;
                     }
                 }
@@ -1877,10 +1877,10 @@ void CheckEndGame(int forcedResult, int dragonCityCaptured)
             winner = CHECK_END_GAME_NO_PLAYER;
             for (player = 0; player < gpGame->m_playerCount; player++) {
                 if ((gbHumanPlayer[player] || gpGame->m_mapHeader.computerAlsoWins) &&
-                    gpGame->m_players[player].resources[CHECK_END_GAME_GOLD_RESOURCE] >=
+                    gpGame->m_players[player].m_resources[CHECK_END_GAME_GOLD_RESOURCE] >=
                         gpGame->m_mapHeader.victoryConditionValue * CHECK_END_GAME_GOLD_SCALE &&
-                    gpGame->m_players[player].resources[CHECK_END_GAME_GOLD_RESOURCE] >= bestGold) {
-                    bestGold = gpGame->m_players[player].resources[CHECK_END_GAME_GOLD_RESOURCE];
+                    gpGame->m_players[player].m_resources[CHECK_END_GAME_GOLD_RESOURCE] >= bestGold) {
+                    bestGold = gpGame->m_players[player].m_resources[CHECK_END_GAME_GOLD_RESOURCE];
                     winner = player;
                 }
                 if (winner != CHECK_END_GAME_NO_PLAYER) {
@@ -1952,7 +1952,7 @@ void CheckEndGame(int forcedResult, int dragonCityCaptured)
             artifactWinner = CHECK_END_GAME_NO_PLAYER;
             for (player = 0; player < gpGame->m_playerCount; player++) {
                 if (!gpGame->m_playerDead[player]) {
-                    for (heroIndex = 0; heroIndex < gpGame->m_players[player].heroCount; heroIndex++) {
+                    for (heroIndex = 0; heroIndex < gpGame->m_players[player].m_heroCount; heroIndex++) {
                         artifactHero = gpGame->GetPlayerHero(player, heroIndex);
                         if (gpGame->m_mapHeader.victoryConditionValue > CHECK_END_GAME_ULTIMATE_ARTIFACT) {
                             if (artifactHero->HasArtifact(gpGame->m_mapHeader.victoryConditionValue - 1)) {
@@ -1995,8 +1995,8 @@ void CheckEndGame(int forcedResult, int dragonCityCaptured)
         if (gbInCampaign && gpGame->m_campaignType == CHECK_END_GAME_ROLAND_CAMPAIGN &&
             gpGame->m_campaignScenario + CHECK_END_GAME_SCENARIO_OFFSET == CHECK_END_GAME_DWARF_SCENARIO) {
             hasDwarfTown = 0;
-            for (player = 0; player < gpGame->m_players[0].townCount; player++) {
-                if (gpGame->GetTown(gpGame->m_players[0].towns[player])->m_type == CHECK_END_GAME_DWARF_TOWN) {
+            for (player = 0; player < gpGame->m_players[0].m_townCount; player++) {
+                if (gpGame->GetTown(gpGame->m_players[0].m_townIds[player])->m_type == CHECK_END_GAME_DWARF_TOWN) {
                     hasDwarfTown = 1;
                 }
             }
@@ -2046,8 +2046,8 @@ void CheckEndGame(int forcedResult, int dragonCityCaptured)
             gpGame->m_campaignScenario + CHECK_END_GAME_SCENARIO_OFFSET == CHECK_END_GAME_ROLAND_CAPTURE_SCENARIO) {
             enemyRemains = 0;
             for (player = 0; player < gpGame->m_playerCount; player++) {
-                if (!gpGame->m_playerDead[player] && gpGame->m_players[player].color != CHECK_END_GAME_ROLAND_COLOR &&
-                    gpGame->m_players[player].color != CHECK_END_GAME_ALLY_COLOR) {
+                if (!gpGame->m_playerDead[player] && gpGame->m_players[player].m_color != CHECK_END_GAME_ROLAND_COLOR &&
+                    gpGame->m_players[player].m_color != CHECK_END_GAME_ALLY_COLOR) {
                     enemyRemains = 1;
                 }
             }
@@ -2129,24 +2129,24 @@ void CheckEndGame(int forcedResult, int dragonCityCaptured)
                     gpGame->m_campaignCarryoverCreatureTypes[player] = CHECK_END_GAME_EMPTY_ARMY;
                     gpGame->m_campaignCarryoverCreatureCounts[player] = 0;
                 }
-                for (carryoverHeroIndex = 0; carryoverHeroIndex < gpGame->m_players[0].heroCount;
+                for (carryoverHeroIndex = 0; carryoverHeroIndex < gpGame->m_players[0].m_heroCount;
                      carryoverHeroIndex++) {
                     if (carryoverHeroId != CHECK_END_GAME_SIDE_SPECIAL_VALUE &&
-                        gpGame->m_heroRecs[gpGame->m_players[0].heroes[carryoverHeroIndex]].m_portrait ==
+                        gpGame->m_heroRecs[gpGame->m_players[0].m_heroIds[carryoverHeroIndex]].m_portrait ==
                             carryoverHeroId) {
                         break;
                     }
                 }
-                if (gpGame->m_players[0].heroCount == carryoverHeroIndex) {
+                if (gpGame->m_players[0].m_heroCount == carryoverHeroIndex) {
                     gpGame->m_campaignCarryoverCreatureTypes[0] = 0;
                     gpGame->m_campaignCarryoverCreatureCounts[0] = 1;
                 } else {
                     for (player = 0; player < CHECK_END_GAME_ARMY_SLOTS; player++) {
                         gpGame->m_campaignCarryoverCreatureTypes[player] =
-                            gpGame->m_heroRecs[gpGame->m_players[0].heroes[carryoverHeroIndex]]
+                            gpGame->m_heroRecs[gpGame->m_players[0].m_heroIds[carryoverHeroIndex]]
                                 .m_army.m_creatureTypes[player];
                         gpGame->m_campaignCarryoverCreatureCounts[player] =
-                            gpGame->m_heroRecs[gpGame->m_players[0].heroes[carryoverHeroIndex]]
+                            gpGame->m_heroRecs[gpGame->m_players[0].m_heroIds[carryoverHeroIndex]]
                                 .m_army.m_creatureCounts[player];
                     }
                 }
@@ -2627,7 +2627,7 @@ void PopNetBox(char *text, int netPlayer)
         if (netPlayer >= 0) {
             sprintf(gText, "%s:  %s", gsNetPlayerInfo[netPlayer].name, text);
             gText[NET_BOX_LINE_TEXT_LIMIT] = 0;
-            AddNetBoxLine(gText, gpGame->m_players[NetPosToGamePos(netPlayer)].color);
+            AddNetBoxLine(gText, gpGame->m_players[NetPosToGamePos(netPlayer)].m_color);
         } else {
             sprintf(gText, text);
             gText[NET_BOX_LINE_TEXT_LIMIT] = 0;
@@ -2672,7 +2672,7 @@ void PopNetBox(char *text, int netPlayer)
     updateMessage_f.payload.widget.data.value = cNetBoxColor[3] + 1;
     netWindow_j->BroadcastMessage(updateMessage_f);
     updateMessage_f.payload.widget.id = NET_BOX_THIS_PLAYER_COLOR_ID;
-    updateMessage_f.payload.widget.data.value = gpGame->m_players[NetPosToGamePos(giThisNetPos)].color + 1;
+    updateMessage_f.payload.widget.data.value = gpGame->m_players[NetPosToGamePos(giThisNetPos)].m_color + 1;
     netWindow_j->BroadcastMessage(updateMessage_f);
 
     gpWindowManager->AddWindow(netWindow_j, -1, 1);
@@ -2714,7 +2714,7 @@ void PopNetBox(char *text, int netPlayer)
                     sprintf(gText, "%s:  %s", gsNetPlayerInfo[remoteData_g->sender].name,
                             remoteData_g->payload.data);
                     AddNetBoxLine(gText,
-                                  gpGame->m_players[NetPosToGamePos(remoteData_g->sender)].color);
+                                  gpGame->m_players[NetPosToGamePos(remoteData_g->sender)].m_color);
                     redrawLines_a = 1;
                     if (messageTime_b != 0)
                         messageTime_b = KBTickCount();
@@ -2773,7 +2773,7 @@ void PopNetBox(char *text, int netPlayer)
         if (sendText_h) {
             sendText_h = 0;
             inputText_c[inputLength_a] = 0;
-            AddNetBoxLine(inputText_c, gpGame->m_players[NetPosToGamePos(giThisNetPos)].color);
+            AddNetBoxLine(inputText_c, gpGame->m_players[NetPosToGamePos(giThisNetPos)].m_color);
             result_a = TransmitRemoteData(inputText_c, NET_BOX_PACKET_BUFFER_SIZE,
                                         strlen(inputText_c) + 1,
                                         NET_BOX_REMOTE_CHAT, 1, 1, -1);
@@ -3126,8 +3126,8 @@ void MemError(void)
 VA(0x0049ead9, 0x3b)
 char *GetTownName(int i)
 {
-    townSlot *t = GetCastleRec(i);
-    return (char *)t + 0x57;
+    town *t = GetCastleRec(i);
+    return t->m_name;
 }
 
 VA(0x0049eb14, 0x3a)
