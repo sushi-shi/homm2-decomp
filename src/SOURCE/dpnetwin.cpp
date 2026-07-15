@@ -19,6 +19,14 @@
 #include <SOURCE/dpnetwin.h>
 
 #define DPFILE const_cast<char *>("I:\\Projects\\Heroes\\Prog\\SOURCE\\dpnetwin.cpp")
+#define DP_INIT_LINE_BASE (*reinterpret_cast<const short *>("_"))
+#define DP_TERM_LINE_BASE (*reinterpret_cast<const short *>("\xdb"))
+#define DP_SEND_LINE_BASE (*reinterpret_cast<const short *>("\xfe"))
+#define DP_RCV_LINE_BASE (*reinterpret_cast<const short *>("\x1c\x01"))
+#define DP_PROCESS_LINE_BASE (*reinterpret_cast<const short *>("\x38\x01"))
+#define DP_EVALUATE_LINE_BASE (*reinterpret_cast<const short *>("\x63\x01"))
+#define DP_FIRST_GUEST_LINE_BASE (*reinterpret_cast<const short *>("\xaa\x01"))
+#define DP_HOST_LINE_BASE (*reinterpret_cast<const short *>("\xfe\x01"))
 
 VA(0x0041eda0, 0x95)
 int __stdcall dpEnumServiceProvider(struct _GUID *guid, char *name,
@@ -48,6 +56,12 @@ int __stdcall dpEnumSession(DPSESSIONDESC *session, void *,
     return 1;
 }
 
+// @match-note 99.95%: semantics, CFG, the 0x30 frame/local slots, and all 71
+// ordered relocations agree. The first raw residual at +0x8d is the delinked
+// LoadLibraryA/import-call shape; later residuals are the corresponding
+// GetProcAddress imports and local branch displacements. Direct Win32 calls and
+// explicitly typed resolver pointers are already retained. Revisit after import
+// thunk normalization or shared Win32 declaration recovery.
 VA(0x0041eeaf, 0x311)
 short int dpnet_init(void) {
     DirectPlayStartupMessage startup;
@@ -62,9 +76,11 @@ short int dpnet_init(void) {
         return 0;
     {
         ppDPRcvBuffer = static_cast<unsigned char **>(
-            BaseAlloc(DP_TRANSPORT_BUFFER_COUNT * sizeof(unsigned char *), DPFILE, 0x3f9));
+            BaseAlloc(DP_TRANSPORT_BUFFER_COUNT * sizeof(unsigned char *), DPFILE,
+                      DP_INIT_LINE_BASE + 7));
         piDPRcvBufferSize = static_cast<int *>(
-            BaseAlloc(DP_TRANSPORT_BUFFER_COUNT * sizeof(int), DPFILE, 0x3fa));
+            BaseAlloc(DP_TRANSPORT_BUFFER_COUNT * sizeof(int), DPFILE,
+                      DP_INIT_LINE_BASE + 8));
         memset(ppDPRcvBuffer, 0,
                DP_TRANSPORT_BUFFER_COUNT * sizeof(unsigned char *));
         memset(piDPRcvBufferSize, 0,
@@ -93,7 +109,7 @@ short int dpnet_init(void) {
         }
         result = createFunction(g_lpGuid, &lpIDC, 0);
         if (result != DP_RESULT_OK)
-            DPSD(result, DPFILE, 0x41a);
+            DPSD(result, DPFILE, DP_INIT_LINE_BASE + 0x29);
 
         if (GameMode == REMOTE_GAME_NETWORK_HOST) {
             gbRemoteGameOpen = 1;
@@ -150,6 +166,11 @@ void CleanupDPVars(void) {
     iLastMsgNumHumanPlayers = 1;
 }
 
+// @match-note 99.99%: semantics, CFG, the 0x68 drain-buffer frame, and all 27
+// ordered relocations agree. The first non-relocation byte residual is the local
+// branch at +0x65; the only structural disassembly residual is FreeLibrary's
+// imported-call representation near +0xf9. Direct and casted HMODULE spellings
+// are exhausted. Revisit with the import-thunk normalization work.
 VA(0x0041f28e, 0x116)
 void dpnet_term(void) {
     char drainBuffer[DP_TRANSPORT_TERM_DRAIN_SIZE];
@@ -163,10 +184,10 @@ void dpnet_term(void) {
     while (dpnet_rcv(0, DP_TRANSPORT_TERM_DRAIN_SIZE, drainBuffer) != 0) {
     }
     if (ppDPRcvBuffer != 0)
-        BaseFree(ppDPRcvBuffer, DPFILE, 0x4c6);
+        BaseFree(ppDPRcvBuffer, DPFILE, DP_TERM_LINE_BASE + 0xe);
     ppDPRcvBuffer = 0;
     if (piDPRcvBufferSize != 0)
-        BaseFree(piDPRcvBufferSize, DPFILE, 0x4ca);
+        BaseFree(piDPRcvBufferSize, DPFILE, DP_TERM_LINE_BASE + 0x12);
     piDPRcvBufferSize = 0;
     if (hinstDplayx != 0)
         FreeLibrary(static_cast<HMODULE>(hinstDplayx));
@@ -178,7 +199,7 @@ VA(0x0041f3a4, 0xee)
 void dpSendMessage(int destination, unsigned char type, unsigned short int size,
                    void *data) {
     unsigned char *message = static_cast<unsigned char *>(
-        BaseAlloc(size + 1, DPFILE, 0x4dc));
+        BaseAlloc(size + 1, DPFILE, DP_SEND_LINE_BASE + 2));
     int result;
 
     message[0] = type;
@@ -187,9 +208,9 @@ void dpSendMessage(int destination, unsigned char type, unsigned short int size,
     result = lpIDC->Send(dcoID, destination, 0, message, size + 1);
     if (result != DP_RESULT_OK && result != DP_RESULT_INVALID_PLAYER &&
         result != DP_RESULT_INVALID_ARGUMENT) {
-        DPSD(result, DPFILE, 0x4e8);
+        DPSD(result, DPFILE, DP_SEND_LINE_BASE + 0xe);
     }
-    BaseFree(message, DPFILE, 0x4ea);
+    BaseFree(message, DPFILE, DP_SEND_LINE_BASE + 0x10);
 }
 
 VA(0x0041f492, 0x5a)
@@ -214,7 +235,7 @@ short int dpnet_rcv(short int, unsigned short int, void *data) {
         return 0;
     size = piDPRcvBufferSize[iDPRcvBufferTail];
     memcpy(data, ppDPRcvBuffer[iDPRcvBufferTail], size);
-    BaseFree(ppDPRcvBuffer[iDPRcvBufferTail], DPFILE, 0x4f3);
+    BaseFree(ppDPRcvBuffer[iDPRcvBufferTail], DPFILE, DP_RCV_LINE_BASE + 9);
     iDPRcvBufferTail = (iDPRcvBufferTail + 1) % DP_TRANSPORT_BUFFER_COUNT;
     return static_cast<short>(size);
 }
@@ -225,34 +246,41 @@ unsigned char dpnet_stat(short int, unsigned short int) { return 0; }
 VA(0x0041f5b0, 0x13)
 short int __cdecl dpnet_sess(int, int, ...) { return 0; }
 
+// @early-stop 99.91%: frame 0x18 and senderId/packetSize/destinationIds/
+// receiveResult slots match, all 9 ordered relocations agree, and every
+// non-jump opcode and operand matches. Base is exactly five bytes larger because
+// the no-messages branch targets one extra continuation jump at +0xb4; retail
+// skips that jump and targets the common epilogue directly.
 VA(0x0041f5c3, 0xbe)
 void dpProcessMessages(void) {
-    unsigned long size;
-    int destination[2];
-    int sender;
-    int result;
+    unsigned long packetSize[2];
+    int destinationIds[2];
+    int senderId;
+    int receiveResult;
 
     if (lpIDC == 0)
         return;
     while (1) {
-        size = DP_TRANSPORT_RECEIVE_SIZE;
-        result = lpIDC->Receive(reinterpret_cast<unsigned long *>(&sender),
-                                reinterpret_cast<unsigned long *>(destination),
-                                1, rcvBufIn, &size);
-        if (result == DP_RESULT_NO_MESSAGES)
+        packetSize[0] = DP_TRANSPORT_RECEIVE_SIZE;
+        receiveResult = lpIDC->Receive(reinterpret_cast<unsigned long *>(&senderId),
+                                       reinterpret_cast<unsigned long *>(destinationIds),
+                                       1, rcvBufIn, packetSize);
+        if (receiveResult == DP_RESULT_NO_MESSAGES)
             break;
-        if (result == DP_RESULT_OK) {
+        if (receiveResult != DP_RESULT_OK)
+            DPSD(receiveResult, DPFILE, DP_PROCESS_LINE_BASE + 0x17);
+        if (senderId == 0) {
         } else {
-            DPSD(result, DPFILE, 0x507);
-        }
-        if (sender != 0) {
-            if (destination[0] == 0 ||
-                static_cast<unsigned long>(destination[0]) == dcoID)
-                dpEvaluateMessage(size, sender);
+            if (destinationIds[0] == 0 ||
+                destinationIds[0] == 0[&dcoID])
+                dpEvaluateMessage(packetSize[0], senderId);
         }
     }
 }
 
+// @early-stop 99.81%: all 0x274 relocation-masked bytes and all 52 ordered
+// relocations match. The retained objdiff residual is solely the delinked switch
+// jump-table/local-label identity; case-body order and external targets agree.
 VA(0x0041f681, 0x274)
 void dpEvaluateMessage(unsigned long int size, int sender) {
     char *ptr = rcvBufIn + 1;
@@ -261,7 +289,7 @@ void dpEvaluateMessage(unsigned long int size, int sender) {
     switch (rcvBufIn[0]) {
     case DP_MESSAGE_DATA:
         ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<unsigned char *>(
-            BaseAlloc(size - 1, DPFILE, 0x51c));
+            BaseAlloc(size - 1, DPFILE, DP_EVALUATE_LINE_BASE + 8));
         memcpy(ppDPRcvBuffer[iDPRcvBufferHead], rcvBufIn + 1, size - 1);
         piDPRcvBufferSize[iDPRcvBufferHead] = size;
         iDPRcvBufferHead = (iDPRcvBufferHead + 1) % DP_TRANSPORT_BUFFER_COUNT;
@@ -287,18 +315,18 @@ void dpEvaluateMessage(unsigned long int size, int sender) {
             }
         }
         break;
+    case DP_MESSAGE_GUEST_ACCEPTED:
+        giHostAcceptStatus = 1;
+        break;
+    case DP_MESSAGE_GUEST_REJECTED:
+        giHostAcceptStatus = 2;
+        break;
     case DP_MESSAGE_STARTUP:
         giNumHumanPlayers = ptr[0];
         giThisNetPos = ptr[1];
         LogInt("DPMSGSTARTUP", giThisNetPos, sender, -999, -999, -999, -999, -999);
         memcpy(giNetPosToDCOPos, ptr + 2, sizeof(giNetPosToDCOPos));
         bStartUpInfoReceived = 1;
-        break;
-    case DP_MESSAGE_GUEST_ACCEPTED:
-        giHostAcceptStatus = 1;
-        break;
-    case DP_MESSAGE_GUEST_REJECTED:
-        giHostAcceptStatus = 2;
         break;
     default:
         sprintf(gText, "Unknown message: %d", static_cast<int>(rcvBufIn[0]));
@@ -307,6 +335,12 @@ void dpEvaluateMessage(unsigned long int size, int sender) {
     }
 }
 
+// @early-stop 98.79%: frame 0x84 and all session/result/compiler slots match.
+// Excluding the retail jump table at +0x166/0x10, every non-jump opcode and
+// operand matches and all 33 ordered relocations agree. Base is exactly five
+// bytes larger: one continuation jump after case 3 shifts the dispatch/table and
+// epilogue by five bytes; the two target literal aliases resolve to the proven
+// gsThisNetPlayerInfo +26/+27 fields.
 VA(0x0041f8f5, 0x182)
 int dpWaitForFirstGuest(void) {
     DPSESSIONDESC session;
@@ -322,7 +356,7 @@ int dpWaitForFirstGuest(void) {
         strcpy(session.szSessionName, "Heroes 2");
         result = lpIDC->Open(&session);
         if (result != DP_RESULT_OK)
-            DPSD(result, DPFILE, 0x52c);
+            DPSD(result, DPFILE, DP_FIRST_GUEST_LINE_BASE + 0x10);
         iDPWaitForFirstGuestStatus++;
         break;
     case 1:
@@ -334,7 +368,7 @@ int dpWaitForFirstGuest(void) {
         result = lpIDC->CreatePlayer(&dcoID, "Heroes Player", "Dude",
                                      reinterpret_cast<HANDLE *>(&dphEvent));
         if (result != DP_RESULT_OK)
-            DPSD(result, DPFILE, 0x54a);
+            DPSD(result, DPFILE, DP_FIRST_GUEST_LINE_BASE + 0x2e);
         giNetPosToDCOPos[0] = dcoID;
         iDPWaitForFirstGuestStatus++;
         break;
@@ -366,15 +400,18 @@ int dpWaitForExtraGuests(void) {
     return 0;
 }
 
+// @early-stop 99.85%: all 0x3d2 relocation-masked bytes, the 0xa8 frame and
+// status/result/session/timeout slots, and all 78 ordered relocations match.
+// The objdiff residual is only delinked switch-table/local-label identity.
 VA(0x0041fafb, 0x3d2)
 int dpWaitForHost(void) {
-    unsigned long enumTimeout;
-    DPSESSIONDESC session;
-    int result;
-    char statusText[32];
+    unsigned long enumerationTimeout;
+    DPSESSIONDESC sessionDescription;
+    int playResult;
+    char statusString[32];
 
-    sprintf(statusText, "WFHS %d", iDPWaitForHostStatus);
-    AiPrint(statusText);
+    sprintf(statusString, "WFHS %d", iDPWaitForHostStatus);
+    AiPrint(statusString);
     switch (iDPWaitForHostStatus) {
     case 0:
         if (iWaitForHostWaitCount != 0) {
@@ -383,46 +420,47 @@ int dpWaitForHost(void) {
             return 0;
         }
         iSessionToTry = 0;
-        memset(&session, 0, sizeof(session));
-        session.dwSize = sizeof(session);
-        session.guidSession = *g_lpGuid;
+        memset(&sessionDescription, 0, sizeof(sessionDescription));
+        sessionDescription.dwSize = sizeof(sessionDescription);
+        sessionDescription.guidSession = *g_lpGuid;
         iMaxSession = 0;
-        if (iEnumCount % DP_TRANSPORT_ENUM_LONG_INTERVAL ==
+        if (iEnumCount % DP_TRANSPORT_ENUM_LONG_INTERVAL !=
             DP_TRANSPORT_ENUM_LONG_PHASE)
-            enumTimeout = DP_TRANSPORT_ENUM_LONG_TIMEOUT;
+            enumerationTimeout = DP_TRANSPORT_ENUM_SHORT_TIMEOUT;
         else
-            enumTimeout = DP_TRANSPORT_ENUM_SHORT_TIMEOUT;
-        result = lpIDC->EnumSessions(&session, enumTimeout, dpEnumSession, 0, 0);
+            enumerationTimeout = DP_TRANSPORT_ENUM_LONG_TIMEOUT;
+        playResult = lpIDC->EnumSessions(&sessionDescription, enumerationTimeout,
+                                         dpEnumSession, 0, 0);
         iEnumCount++;
-        if (result == DP_RESULT_NO_SESSIONS) {
+        if (playResult == DP_RESULT_NO_SESSIONS) {
             iWaitForHostWaitCount = DP_TRANSPORT_RETRY_WAIT_COUNT;
             return 0;
         }
-        if (result != DP_RESULT_OK)
-            DPSD(result, DPFILE, 0x56e);
+        if (playResult != DP_RESULT_OK)
+            DPSD(playResult, DPFILE, DP_HOST_LINE_BASE + 0x26);
         if (iMaxSession > 0) {
             iWaitForHostWaitCount = DP_TRANSPORT_RETRY_WAIT_COUNT;
             iDPWaitForHostStatus++;
         }
         break;
     case 1:
-        memset(&session, 0, sizeof(session));
-        session.dwSize = sizeof(session);
-        session.dwMaxPlayers = DP_TRANSPORT_MAX_PLAYERS;
-        session.guidSession = *g_lpGuid;
-        session.dwFlags = DP_SESSION_OPEN_JOIN;
-        session.dwSession = lSessions[iSessionToTry];
-        strcpy(session.szSessionName, "Heroes 2");
-        result = lpIDC->Open(&session);
-        if (result != DP_RESULT_OK)
-            DPSD(result, DPFILE, 0x581);
+        memset(&sessionDescription, 0, sizeof(sessionDescription));
+        sessionDescription.dwSize = sizeof(sessionDescription);
+        sessionDescription.dwMaxPlayers = DP_TRANSPORT_MAX_PLAYERS;
+        sessionDescription.guidSession = *g_lpGuid;
+        sessionDescription.dwFlags = DP_SESSION_OPEN_JOIN;
+        sessionDescription.dwSession = lSessions[iSessionToTry];
+        strcpy(sessionDescription.szSessionName, "Heroes 2");
+        playResult = lpIDC->Open(&sessionDescription);
+        if (playResult != DP_RESULT_OK)
+            DPSD(playResult, DPFILE, DP_HOST_LINE_BASE + 0x39);
         iDPWaitForHostStatus++;
         break;
     case 2:
-        result = lpIDC->CreatePlayer(&dcoID, "Heroes Player", "Dude",
-                                     reinterpret_cast<HANDLE *>(&dphEvent));
-        if (result != DP_RESULT_OK)
-            DPSD(result, DPFILE, 0x58b);
+        playResult = lpIDC->CreatePlayer(&dcoID, "Heroes Player", "Dude",
+                                         reinterpret_cast<HANDLE *>(&dphEvent));
+        if (playResult != DP_RESULT_OK)
+            DPSD(playResult, DPFILE, DP_HOST_LINE_BASE + 0x43);
         iDPWaitForHostStatus++;
         break;
     case 3:
@@ -437,15 +475,15 @@ int dpWaitForHost(void) {
         if (giHostAcceptStatus == 1) {
             iDPWaitForHostStatus++;
         } else if (giHostAcceptStatus == 2) {
-            if (iSessionToTry + 1 < iMaxSession) {
+            if (iSessionToTry + 1 >= iMaxSession) {
+                iDPWaitForHostStatus = 0;
+            } else {
                 iDPWaitForHostStatus = 1;
                 iSessionToTry++;
-            } else {
-                iDPWaitForHostStatus = 0;
             }
-            result = lpIDC->Close();
-            if (result != DP_RESULT_OK)
-                DPSD(result, DPFILE, 0x59f);
+            playResult = lpIDC->Close();
+            if (playResult != DP_RESULT_OK)
+                DPSD(playResult, DPFILE, DP_HOST_LINE_BASE + 0x5d);
         } else if (iLastHereIAmTickCount + DP_TRANSPORT_ACCEPT_TIMEOUT <
                    KBTickCount()) {
             iDPWaitForHostStatus--;
@@ -463,25 +501,26 @@ int dpWaitForHost(void) {
 VA(0x0041fecd, 0x5eb)
 void DPSD(int result, char *file, int line) {
     char errorText[200];
+    int errorFlag;
 
     if (bInDPSD != 0)
         return;
     bInDPSD = 1;
+    errorFlag = 0;
     switch (result) {
+    case DP_RESULT_OK:
+        return;
+    case DPERR_ALREADYINITIALIZED:
+        strcpy(errorText, "DPERR_ALREADYINITIALIZED ");
+        break;
     case DPERR_ACCESSDENIED:
         strcpy(errorText, "DPERR_ACCESSDENIED       ");
         break;
     case DPERR_ACTIVEPLAYERS:
         strcpy(errorText, "DPERR_ACTIVEPLAYERS      ");
         break;
-    case DPERR_ALREADYINITIALIZED:
-        strcpy(errorText, "DPERR_ALREADYINITIALIZED ");
-        break;
     case DPERR_BUFFERTOOSMALL:
         strcpy(errorText, "DPERR_BUFFERTOOSMALL     ");
-        break;
-    case DPERR_BUSY:
-        strcpy(errorText, "DPERR_BUSY               ");
         break;
     case DPERR_CANTADDPLAYER:
         strcpy(errorText, "DPERR_CANTADDPLAYER      ");
@@ -522,6 +561,9 @@ void DPSD(int result, char *file, int line) {
     case DPERR_NOCONNECTION:
         strcpy(errorText, "DPERR_NOCONNECTION       ");
         break;
+    case DPERR_OUTOFMEMORY:
+        strcpy(errorText, "DPERR_OUTOFMEMORY        ");
+        break;
     case DPERR_NOMESSAGES:
         strcpy(errorText, "DPERR_NOMESSAGES         ");
         break;
@@ -533,9 +575,6 @@ void DPSD(int result, char *file, int line) {
         break;
     case DPERR_NOSESSIONS:
         strcpy(errorText, "DPERR_NOSESSIONS         ");
-        break;
-    case DPERR_OUTOFMEMORY:
-        strcpy(errorText, "DPERR_OUTOFMEMORY        ");
         break;
     case DPERR_SENDTOOBIG:
         strcpy(errorText, "DPERR_SENDTOOBIG         ");
@@ -549,11 +588,12 @@ void DPSD(int result, char *file, int line) {
     case DPERR_UNSUPPORTED:
         strcpy(errorText, "DPERR_UNSUPPORTED        ");
         break;
+    case DPERR_BUSY:
+        strcpy(errorText, "DPERR_BUSY               ");
+        break;
     case DPERR_USERCANCEL:
         strcpy(errorText, "DPERR_USERCANCEL         ");
         break;
-    case DP_RESULT_OK:
-        return;
     default:
         strcpy(errorText, "Error type unknown");
         break;
@@ -592,4 +632,4 @@ DATA(0x00525064) int giHostAcceptStatus;
 DATA(0x00525068) struct _GUID *g_lpGuid;
 DATA(0x00525070) int giNetPosToDCOPos[6];
 DATA(0x00525088) int iSessionToTry;
-DATA(0x00525090) long *lSessions;
+DATA(0x00525090) long lSessions[10];
