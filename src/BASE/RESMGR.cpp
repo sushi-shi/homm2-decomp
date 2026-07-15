@@ -31,7 +31,7 @@ resourceManager::resourceManager(void) : baseManager()
     m_active = 0;
     m_resourceListHead = 0;
     m_expunging = 0;
-    strcpy(name, "resourceManager");
+    strcpy(m_name, "resourceManager");
     m_lastFileId = 0;
     for (aggregateIndex = 0; aggregateIndex < 2; aggregateIndex++) {
         m_aggregateFd[aggregateIndex] = -1;
@@ -263,7 +263,7 @@ int resourceManager::Open(int param_1)
     m_messageMask = 0x80;
     m_priority = param_1;
     m_active = 1;
-    strcpy(name, "resourceManager");
+    strcpy(m_name, "resourceManager");
     m_resourceListHead = 0;
     return 0;
 }

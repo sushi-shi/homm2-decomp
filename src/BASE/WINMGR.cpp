@@ -211,7 +211,7 @@ int heroWindowManager::Open(int managerOrder)
     m_priority = managerOrder;
     m_messageMask = 0x20;
     m_active = 1;
-    strcpy(name, "heroWindowManager");
+    strcpy(m_name, "heroWindowManager");
     return 0;
 }
 

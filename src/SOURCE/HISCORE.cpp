@@ -49,7 +49,7 @@ int highScoreManager::Open(int id)
     m_messageMask = HIGH_SCORE_MESSAGE_EXECUTIVE;
     m_priority = id;
     m_active = 1;
-    strcpy(name, "highScoreManager");
+    strcpy(m_name, "highScoreManager");
     KBChangeMenu(hmnuDflt);
     gpWindowManager->FadeScreen(0, HIGH_SCORE_FADE_STEPS, 0);
     glTimers[HIGH_SCORE_TIMER_SLOT] =

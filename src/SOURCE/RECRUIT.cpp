@@ -125,7 +125,7 @@ int recruitUnit::Open(int priority)
     m_messageMask = RECRUIT_MANAGER_MASK;
     m_priority = priority;
     m_active = 1;
-    strcpy(name, "recruitManager");
+    strcpy(m_name, "recruitManager");
     return 0;
 }
 

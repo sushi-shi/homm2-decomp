@@ -312,7 +312,7 @@ int advManager::Open(int id)
     m_messageMask = ADVMGR_MANAGER_MESSAGE;
     m_priority = id;
     m_active = 1;
-    strcpy(name, "advManager");
+    strcpy(m_name, "advManager");
     return 0;
 }
 
