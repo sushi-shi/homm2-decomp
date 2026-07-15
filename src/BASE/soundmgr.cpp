@@ -56,7 +56,7 @@ void soundManager::ValidatePreviousPosition(int param_1)
 VA(0x004cb770, 0x13c)
 void soundManager::CDStop(void)
 {
-    unsigned int local_18[5];
+    char position[20];
     if (gbNoSound != 0)
         return;
     if (m_cdReady == 0)
@@ -68,11 +68,10 @@ void soundManager::CDStop(void)
         HandleMCIError(nMCIError, CommandString);
     if (stricmp(lpszReturnString, "stopped") != 0 && m_currentTrack >= 0) {
         wsprintfA(CommandString, "status CD position");
-        nMCIError = mciSendStringA(CommandString,
-                                   reinterpret_cast<char *>(local_18), 0x14, 0);
+        nMCIError = mciSendStringA(CommandString, position, sizeof(position), 0);
         if (nMCIError != 0)
             HandleMCIError(nMCIError, CommandString);
-        strcpy(CDPreviousPosition[m_currentTrack], reinterpret_cast<char *>(local_18));
+        strcpy(CDPreviousPosition[m_currentTrack], position);
         ValidatePreviousPosition(m_currentTrack);
     }
     CDPlaying = 0;
@@ -737,7 +736,7 @@ void soundManager::SetMusicQuality(int param_1)
     if (gConfig.musicSource != CONFIG_MUSIC_SOURCE_MIDI) {
         local_8 = m_currentTrack;
         CDStop();
-        m_currentTrack = static_cast<char>(0xff);
+        m_currentTrack = MIDI_NO_TRACK;
     } else {
         local_8 = m_currentTrack;
         MIDIStop();
@@ -878,11 +877,18 @@ void soundManager::SwitchAmbientMusic(int param_1)
     LogStr("Switch Ambient Music 2");
 }
 
+// @semantic
+// The sample class fields are accessed directly; the former `int *` overlay at +0x10
+// was a decompiler artifact. Semantics and CFG are complete and all 13 external
+// relocations agree with no base-only target. Candidate uses a 0x10-byte frame and
+// ends at +0x280; retail uses a 0x14-byte frame and ends at +0x288. The first code
+// divergence is retail +0x5f, which materializes `sample + 0x10` in a stack local,
+// while the typed source reloads the sample argument for each field. Revisit only
+// with evidence for a genuine named payload subobject; do not restore the raw overlay.
 VA(0x004cd7f0, 0x28f)
-struct _SAMPLE *soundManager::MemorySample(class sample *param_1)
+struct _SAMPLE *soundManager::MemorySample(class sample *sampleResource)
 {
     struct _SAMPLE *smp;
-    int *params;
     short ch;
     SampleChannelStruct *scs;
     if (gbNoSound != 0)
@@ -893,17 +899,16 @@ struct _SAMPLE *soundManager::MemorySample(class sample *param_1)
         return 0;
     if (gConfig.soundVolume == 0)
         return 0;
-    params = reinterpret_cast<int *>(param_1) + 4;
-    if (m_ready == 0 || params[6] == 0)
+    if (m_ready == 0 || sampleResource->m_volume == 0)
         return 0;
     LogStr("Memory Sample 1");
-    scs = &SCS[params[3]];
+    scs = &SCS[sampleResource->m_channelType];
     for (ch = static_cast<short>(scs->startChannel); scs->endChannel > ch; ch++) {
         if (AIL_sample_status(m_sampleHandles[ch]) == SOUND_SAMPLE_STATUS_DONE)
             break;
     }
     if (scs->endChannel == ch) {
-        if (params[3] == 4) {
+        if (sampleResource->m_channelType == 4) {
             LogStr("Memory Sample 2a");
             return 0;
         }
@@ -916,22 +921,22 @@ struct _SAMPLE *soundManager::MemorySample(class sample *param_1)
         StopSample(m_sampleHandles[ch]);
     }
     smp = m_sampleHandles[ch];
-    m_channelVolumes[ch] = static_cast<char>(params[6]);
-    iLastVolume[ch] = static_cast<short>(params[6]);
+    m_channelVolumes[ch] = static_cast<char>(sampleResource->m_volume);
+    iLastVolume[ch] = static_cast<short>(sampleResource->m_volume);
     AIL_init_sample(smp);
-    AIL_set_sample_type(smp, params[5], 0);
-    AIL_set_sample_playback_rate(smp, params[4]);
-    AIL_set_sample_loop_count(smp, params[7]);
-    AIL_set_sample_address(smp, reinterpret_cast<void *>(params[1]), params[2]);
+    AIL_set_sample_type(smp, sampleResource->m_format, 0);
+    AIL_set_sample_playback_rate(smp, sampleResource->m_sampleRate);
+    AIL_set_sample_loop_count(smp, sampleResource->m_loopCount);
+    AIL_set_sample_address(smp, sampleResource->m_data, sampleResource->m_size);
     if (gConfig.soundVolume != 0)
-        AIL_set_sample_volume(smp, ConvertVolume(params[6], SOUND_VOLUME_EFFECT));
+        AIL_set_sample_volume(smp, ConvertVolume(sampleResource->m_volume, SOUND_VOLUME_EFFECT));
     else
         AIL_set_sample_volume(smp, 0);
     AIL_start_sample(smp);
-    params[0] = reinterpret_cast<int>(smp);
+    sampleResource->m_activeSample = smp;
     m_channelSamples[ch] = smp;
-    m_channelSampleData[ch] = reinterpret_cast<void *>(params[1]);
-    m_channelSampleSizes[ch] = params[2];
+    m_channelSampleData[ch] = sampleResource->m_data;
+    m_channelSampleSizes[ch] = sampleResource->m_size;
     LogStr("Memory Sample 2b");
     return smp;
 }
