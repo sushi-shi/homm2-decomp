@@ -18,6 +18,7 @@ from generate_ast_variants import (
     helper_return_spelling,
     inline_expression_edits,
     inline_member_access_edits,
+    inline_global_read_edits,
     inline_nested_expression_edits,
     inline_read_advance_edits,
     identifier_rename_edits,
@@ -247,6 +248,28 @@ class AstVariantSemanticTests(unittest.TestCase):
         mutations = identifier_rename_edits(function, self.blob, 2, {"divisor"})
         self.assertEqual(len(mutations), 2)
         self.assertTrue(all("divisor-to-divisor" in item.label for item in mutations))
+
+    def test_integral_global_read_can_be_inlined_without_parameters(self):
+        function = self.functions["SafeGlobalRead"]
+        insertion = self.blob.index(b"int SafeGlobalRead")
+        mutations = inline_global_read_edits(function, self.blob, insertion, 2)
+        self.assertEqual(len(mutations), 2)
+        candidate = self._render_mutation(mutations[0]).decode()
+        self.assertIn("static inline int H2AstGlobal000_0()", candidate)
+        self.assertIn("return gSafeGlobal;", candidate)
+        self.assertIn("value + H2AstGlobal000_0()", candidate)
+        tu = ci.Index.create().parse(
+            str(self.source), args=["-x", "c++", "-std=c++14"],
+            unsaved_files=[(str(self.source), candidate)],
+        )
+        errors = [item for item in tu.diagnostics if item.severity >= ci.Diagnostic.Error]
+        self.assertEqual(errors, [])
+
+    def test_global_write_is_not_inlined(self):
+        mutations = inline_global_read_edits(
+            self.functions["RejectedGlobalWrite"], self.blob, 0, 2
+        )
+        self.assertEqual(mutations, [])
 
     def test_read_advance_requires_independent_value_local(self):
         safe = inline_read_advance_edits(
