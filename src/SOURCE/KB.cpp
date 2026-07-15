@@ -7690,26 +7690,182 @@ DATA(0x004ff420) char *gNewGameHelp[KB_NEW_GAME_HELP_COUNT] = {
     "{OK}\n\nClick to accept these settings and start a new game.",
     "{Cancel}\n\nClick to return to the main menu."
 };
-DATA(0x004ff440) char *gSetupBaudHelp[6];
-DATA(0x004ff458) char *gSetupComPortHelp[6];
-DATA(0x004ff470) char *gSetupDCBaudHelp[6];
-DATA(0x004ff488) char *gSetupDCComPortHelp[6];
-DATA(0x004ff4a0) char *gSetupHotSeatGameHelp[6];
-DATA(0x004ff4b8) char *gSetupModemGameHelp[4];
-DATA(0x004ff4c8) char *gSetupDCGameHelp[4];
-DATA(0x004ff4d8) char *gSetupMultiPlayerGameHelp[6];
-DATA(0x004ff4f0) char *gSetupNetworkGameHelp[4];
-DATA(0x004ff500) char *gSetupNetworkGame2Help[4];
-DATA(0x004ff510) char *gSetupGameHelp[4];
-DATA(0x004ff520) char *cBattleResults[12];
-DATA(0x004ff550) char *cMoraleInfo[32];
-DATA(0x004ff5d0) char *cMapSize[4];
-DATA(0x004ff5e0) char *cDifficulty[6];
-DATA(0x004ff5f8) char *cStartDifficulty[4];
-DATA(0x004ff608) char *cCampaignLeaders[4];
-DATA(0x004ff618) char *cWinText[6];
-DATA(0x004ff630) char *cHumanDifficulty[6];
-DATA(0x004ff648) char *cHumanInfoDifficulty[6];
+DATA(0x004ff440) char *gSetupBaudHelp[KB_SETUP_BAUD_HELP_COUNT] = {
+    "{2400 Baud}\n\nUse a 2400 baud connection speed. \n\nNote: For a 14400 baud modem, use the 19200 baud speed.  For a 28800 baud modem, use the 38400 baud speed.",
+    "{9600 Baud}\n\nUse a 9600 baud connection speed. \n\nNote: For a 14400 baud modem, use the 19200 baud speed.  For a 28800 baud modem, use the 38400 baud speed.",
+    "{19200 Baud}\n\nUse a 19200 baud connection speed.\n\nNote: For a 14400 baud modem, use the 19200 baud speed.  For a 28800 baud modem, use the 38400 baud speed.",
+    "{38400 Baud}\n\nUse a 38400 baud connection speed.\n\nNote: For a 14400 baud modem, use the 19200 baud speed.  For a 28800 baud modem, use the 38400 baud speed.",
+    "{Cancel}\n\nCancel back to the main menu.",
+    0
+};
+DATA(0x004ff458) char *gSetupComPortHelp[KB_SETUP_COM_PORT_HELP_COUNT] = {
+    "{COM 1}\n\nUse COM Port 1 for the modem connection.",
+    "{COM 2}\n\nUse COM Port 2 for the modem connection.",
+    "{COM 3}\n\nUse COM Port 3 for the modem connection.",
+    "{COM 4}\n\nUse COM Port 4 for the modem connection.",
+    "{Cancel}\n\nCancel back to the main menu.",
+    0
+};
+DATA(0x004ff470) char *gSetupDCBaudHelp[KB_SETUP_DC_BAUD_HELP_COUNT] = {
+    "{2400 Baud}\n\nUse a 2400 baud connection speed. \n\nNote: In general, computers with the older UART 8250 chip should use 19200 baud, and computers with the newer UART 16550 chip should use 38400 baud.  When in doubt, try slower speeds first, and if they work, then try faster speeds.  Most computers made in 1994 or later have a UART 16550 chip.",
+    "{9600 Baud}\n\nUse a 9600 baud connection speed. \n\nNote: In general, computers with the older UART 8250 chip should use 19200 baud, and computers with the newer UART 16550 chip should use 38400 baud.  When in doubt, try slower speeds first, and if they work, then try faster speeds.  Most computers made in 1994 or later have a UART 16550 chip.",
+    "{19200 Baud}\n\nUse a 19200 baud connection speed.\n\nNote: In general, computers with the older UART 8250 chip should use 19200 baud, and computers with the newer UART 16550 chip should use 38400 baud.  When in doubt, try slower speeds first, and if they work, then try faster speeds.  Most computers made in 1994 or later have a UART 16550 chip.",
+    "{38400 Baud}\n\nUse a 38400 baud connection speed.\n\nNote: In general, computers with the older UART 8250 chip should use 19200 baud, and computers with the newer UART 16550 chip should use 38400 baud.  When in doubt, try slower speeds first, and if they work, then try faster speeds.  Most computers made in 1994 or later have a UART 16550 chip.",
+    "{Cancel}\n\nCancel back to the main menu.",
+    0
+};
+DATA(0x004ff488) char *gSetupDCComPortHelp[KB_SETUP_DC_COM_PORT_HELP_COUNT] = {
+    "{COM 1}\n\nUse COM Port 1 for the direct connection.",
+    "{COM 2}\n\nUse COM Port 2 for the direct connection.",
+    "{COM 3}\n\nUse COM Port 3 for the direct connection.",
+    "{Com 4}\n\nUse COM Port 4 for the direct connection.",
+    "{Cancel}\n\nCancel back to the main menu.",
+    0
+};
+DATA(0x004ff4a0) char *gSetupHotSeatGameHelp[KB_SETUP_HOT_SEAT_HELP_COUNT] = {
+    "{2 Players}\n\nPlay with 2 human players, and optionally, up to 4 additional computer players.",
+    "{3 Players}\n\nPlay with 3 human players, and optionally, up to 3 additional computer players.",
+    "{4 Players}\n\nPlay with 4 human players, and optionally, up to 2 additional computer players.",
+    "{5 Players}\n\nPlay with 5 human players, and optionally 1 computer player.",
+    "{6 Players}\n\nPlay with 6 human players.",
+    "{Cancel}\n\nCancel back to the main menu."
+};
+DATA(0x004ff4b8) char *gSetupModemGameHelp[KB_SETUP_MODEM_HELP_COUNT] = {
+    "{Host}\n\nThe host sets up the game options, chooses the number to dial, and places the call.",
+    "{Guest}\n\nThe guest waits for the host to call and set up the game.",
+    "{Config}\n\nChange your modem configuration.",
+    "{Cancel}\n\nCancel back to the main menu."
+};
+DATA(0x004ff4c8) char *gSetupDCGameHelp[KB_SETUP_DIRECT_CONNECT_HELP_COUNT] = {
+    "{Host}\n\nThe host sets up the game options.",
+    "{Guest}\n\nThe guest waits for the host to set up the game.",
+    "{Config}\n\nChange your direct connect port configuration.",
+    "{Cancel}\n\nCancel back to the main menu."
+};
+DATA(0x004ff4d8) char *gSetupMultiPlayerGameHelp[KB_SETUP_MULTIPLAYER_HELP_COUNT] = {
+    "{Hot Seat}\n\nPlay a Hot Seat game, where 2 to 4 players play around the same computer, switching into the 'Hot Seat' when it is their turn.",
+    "{Network}\n\nPlay a network game, where 2 players use their own computers connected through a LAN (Local Area Network).",
+    "{Modem}\n\nPlay a modem game, where 2 players use their own computers connected over the phone lines using modems.",
+    "{Direct Connect}\n\nPlay a direct connect game, where 2 players use their own computers directly connected through their serial port by a null modem.",
+    "{Cancel}\n\nCancel back to the main menu.",
+    0
+};
+DATA(0x004ff4f0) char *gSetupNetworkGameHelp[KB_SETUP_NETWORK_HELP_COUNT] = {
+    "{Host}\n\nThe host sets up the game options.  There can only be one host per network game.",
+    "{Guest}\n\nThe guest waits for the host to set up the game, then is automatically added in.  There can be multiple guests for TCP/IP and IPX games, but only 1 guest for NetBIOS games.",
+    "{Cancel}\n\nCancel back to the main menu.",
+    0
+};
+DATA(0x004ff500) char *gSetupNetworkGame2Help[KB_SETUP_NETWORK_SECOND_HELP_COUNT] = {
+    "{IPX}\n\nIPX networking is the most commonly used form of network in Windows 95.  Up to 6 players can play using IPX.  Only the Windows 95 version of Heroes II supports IPX networking.",
+    "{TCP/IP}\n\nTCP/IP is most commonly used as a way of connecting machines over the internet.  Up to 6 players can play using IPX.  To connect over the internet, you must have an account with an ISP (Independent Service Provider).  Only the Windows 95 version of Heroes II supports TCP/IP networking.",
+    "{NETBios}\n\nNETBios networking is the only form of networking available for DOS machines, and is also available for Windows 95.  Only two players may connect with NetBIOS.  If all machines you wish to connect are using the Windows 95 version of Heroes II, then IPX networking is recommended.",
+    "{Cancel}\n\nCancel back to the main menu."
+};
+DATA(0x004ff510) char *gSetupGameHelp[KB_SETUP_GAME_HELP_COUNT] = {
+    "{Standard Game}\n\nA single player game playing out a single map.",
+    "{Campaign Game}\n\nA single player game playing through a series of maps.",
+    "{Multi-Player Game}\n\nA multi-player game, with several human players competing against each other on a single map.",
+    "{Cancel}\n\nCancel back to the main menu."
+};
+DATA(0x004ff520) char *cBattleResults[KB_BATTLE_RESULT_TEXT_COUNT] = {
+    "The enemy has surrendered!",
+    "The enemy has fled!",
+    "A glorious victory!",
+    "\n\nFor valor in combat, %s receives %d experience",
+    "%s surrenders to the enemy, and departs in shame.",
+    "The cowardly %s flees from battle.",
+    "Your forces suffer a bitter defeat, and %s abandons your cause.",
+    "Your forces surrender to the enemy, and depart in shame.",
+    "Your cowardly forces flee from battle.",
+    "Your forces suffer a bitter defeat.",
+    "\n\nFor valor in combat, %s receives %d experience, and gains %d level(s).",
+    0
+};
+DATA(0x004ff550) char *cMoraleInfo[KB_MORALE_INFO_TEXT_COUNT] = {
+    "{Good Morale}\n\nGood morale may give your armies extra attacks in combat.",
+    "{Neutral Morale}\n\nNeutral morale means your armies will never be blessed with extra attacks or freeze in combat.",
+    "{Bad Morale}\n\nBad morale may cause your armies to freeze in combat.",
+    "%s\n\n\nCurrent Morale Modifiers:",
+    "\nKnight bonus +1",
+    "\nAll %s troops +1",
+    "\nTroops of 3 alignments -1",
+    "\nTroops of 4 alignments -2",
+    "\nMedal of Valor +1",
+    "\nMedal of Courage +1",
+    "\nMedal of Honor +1",
+    "\nMedal of Distinction +1",
+    "\nFizbin of Misfortune -2",
+    "\nBuoy visited +1",
+    "\nOasis visited +1",
+    "\nTemple visited +2",
+    "\nGraveyard robber -1",
+    "\nShipwreck robber -1",
+    "\nBattle cowardice %d",
+    "\nnone",
+    "\nTroops of 5 alignments -3",
+    "\nEntire unit is undead, so morale does not apply.",
+    "\nSome undead in group -1",
+    "\nWatering hole visited +1",
+    "\nDerelict ship robber -1",
+    "\nBarbarian Coliseum +2",
+    "\nTavern +1",
+    "\nBasic Leadership +1",
+    "\nAdvanced Leadership +2",
+    "\nExpert Leadership +3",
+    "\nMasthead bonus at sea +1",
+    "\nBattle Garb of Anduran gives you maximum morale."
+};
+DATA(0x004ff5d0) char *cMapSize[KB_MAP_SIZE_TEXT_COUNT] = {
+    "Small",
+    "Medium",
+    "Large",
+    "Huge"
+};
+DATA(0x004ff5e0) char *cDifficulty[KB_DIFFICULTY_TEXT_COUNT] = {
+    "Easy",
+    "Normal",
+    "Hard",
+    "Expert",
+    "Impossible",
+    0
+};
+DATA(0x004ff5f8) char *cStartDifficulty[KB_START_DIFFICULTY_TEXT_COUNT] = {
+    "Easy",
+    "Normal",
+    "Hard",
+    "Expert"
+};
+DATA(0x004ff608) char *cCampaignLeaders[KB_CAMPAIGN_LEADER_TEXT_COUNT] = {
+    "Lord Ironfist",
+    "Lord Slayer",
+    "Queen Lamanda",
+    "Lord Alamar"
+};
+DATA(0x004ff618) char *cWinText[KB_WIN_TEXT_COUNT] = {
+    "Days Spent:",
+    "Base Score:",
+    "Difficulty Rating:",
+    "Final Score:",
+    "Ranking:",
+    0
+};
+DATA(0x004ff630) char *cHumanDifficulty[KB_HUMAN_DIFFICULTY_TEXT_COUNT] = {
+    "Human\n",
+    "Human\nEasy",
+    "Human\nNormal",
+    "Human\nHard",
+    "Human\nExpert",
+    0
+};
+DATA(0x004ff648) char *cHumanInfoDifficulty[KB_HUMAN_INFO_DIFFICULTY_TEXT_COUNT] = {
+    "Human-",
+    "Human-Easy",
+    "Human-Normal",
+    "Human-Hard",
+    "Human-Expert",
+    0
+};
 DATA(0x004ff660) char *musicQualityText[4];
 DATA(0x004ff670) char *gSpellDesc[66];
 DATA(0x004ff778) char *gSpellNames[66];

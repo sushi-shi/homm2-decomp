@@ -198,7 +198,27 @@ typedef enum KbGameTableConstant {
     KB_HERO_LEVEL_TEXT_COUNT = 4,
     KB_COMBAT_HELP_COUNT = 6,
     KB_LONG_COMBAT_HELP_COUNT = 6,
-    KB_NEW_GAME_HELP_COUNT = 8
+    KB_NEW_GAME_HELP_COUNT = 8,
+    KB_SETUP_BAUD_HELP_COUNT = 6,
+    KB_SETUP_COM_PORT_HELP_COUNT = 6,
+    KB_SETUP_DC_BAUD_HELP_COUNT = 6,
+    KB_SETUP_DC_COM_PORT_HELP_COUNT = 6,
+    KB_SETUP_HOT_SEAT_HELP_COUNT = 6,
+    KB_SETUP_MODEM_HELP_COUNT = 4,
+    KB_SETUP_DIRECT_CONNECT_HELP_COUNT = 4,
+    KB_SETUP_MULTIPLAYER_HELP_COUNT = 6,
+    KB_SETUP_NETWORK_HELP_COUNT = 4,
+    KB_SETUP_NETWORK_SECOND_HELP_COUNT = 4,
+    KB_SETUP_GAME_HELP_COUNT = 4,
+    KB_BATTLE_RESULT_TEXT_COUNT = 12,
+    KB_MORALE_INFO_TEXT_COUNT = 32,
+    KB_MAP_SIZE_TEXT_COUNT = 4,
+    KB_DIFFICULTY_TEXT_COUNT = 6,
+    KB_START_DIFFICULTY_TEXT_COUNT = 4,
+    KB_CAMPAIGN_LEADER_TEXT_COUNT = 4,
+    KB_WIN_TEXT_COUNT = 6,
+    KB_HUMAN_DIFFICULTY_TEXT_COUNT = 6,
+    KB_HUMAN_INFO_DIFFICULTY_TEXT_COUNT = 6
 } KbGameTableConstant;
 
 extern unsigned char giGroundShape[GROUND_TILE_IMAGE_COUNT];
@@ -380,26 +400,26 @@ extern char *cLongCombatHelp[KB_LONG_COMBAT_HELP_COUNT];
 extern char *cTownCommand[28];
 extern char *gHeroDefaultNames[54];
 extern char *gNewGameHelp[KB_NEW_GAME_HELP_COUNT];
-extern char *gSetupBaudHelp[6];
-extern char *gSetupComPortHelp[6];
-extern char *gSetupDCBaudHelp[6];
-extern char *gSetupDCComPortHelp[6];
-extern char *gSetupHotSeatGameHelp[6];
-extern char *gSetupModemGameHelp[4];
-extern char *gSetupDCGameHelp[4];
-extern char *gSetupMultiPlayerGameHelp[6];
-extern char *gSetupNetworkGameHelp[4];
-extern char *gSetupNetworkGame2Help[4];
-extern char *gSetupGameHelp[4];
-extern char *cBattleResults[12];
-extern char *cMoraleInfo[32];
-extern char *cMapSize[4];
-extern char *cDifficulty[6];
-extern char *cStartDifficulty[4];
-extern char *cCampaignLeaders[4];
-extern char *cWinText[6];
-extern char *cHumanDifficulty[6];
-extern char *cHumanInfoDifficulty[6];
+extern char *gSetupBaudHelp[KB_SETUP_BAUD_HELP_COUNT];
+extern char *gSetupComPortHelp[KB_SETUP_COM_PORT_HELP_COUNT];
+extern char *gSetupDCBaudHelp[KB_SETUP_DC_BAUD_HELP_COUNT];
+extern char *gSetupDCComPortHelp[KB_SETUP_DC_COM_PORT_HELP_COUNT];
+extern char *gSetupHotSeatGameHelp[KB_SETUP_HOT_SEAT_HELP_COUNT];
+extern char *gSetupModemGameHelp[KB_SETUP_MODEM_HELP_COUNT];
+extern char *gSetupDCGameHelp[KB_SETUP_DIRECT_CONNECT_HELP_COUNT];
+extern char *gSetupMultiPlayerGameHelp[KB_SETUP_MULTIPLAYER_HELP_COUNT];
+extern char *gSetupNetworkGameHelp[KB_SETUP_NETWORK_HELP_COUNT];
+extern char *gSetupNetworkGame2Help[KB_SETUP_NETWORK_SECOND_HELP_COUNT];
+extern char *gSetupGameHelp[KB_SETUP_GAME_HELP_COUNT];
+extern char *cBattleResults[KB_BATTLE_RESULT_TEXT_COUNT];
+extern char *cMoraleInfo[KB_MORALE_INFO_TEXT_COUNT];
+extern char *cMapSize[KB_MAP_SIZE_TEXT_COUNT];
+extern char *cDifficulty[KB_DIFFICULTY_TEXT_COUNT];
+extern char *cStartDifficulty[KB_START_DIFFICULTY_TEXT_COUNT];
+extern char *cCampaignLeaders[KB_CAMPAIGN_LEADER_TEXT_COUNT];
+extern char *cWinText[KB_WIN_TEXT_COUNT];
+extern char *cHumanDifficulty[KB_HUMAN_DIFFICULTY_TEXT_COUNT];
+extern char *cHumanInfoDifficulty[KB_HUMAN_INFO_DIFFICULTY_TEXT_COUNT];
 extern char *musicQualityText[4];
 extern char *gSpellDesc[66];
 extern char *gSpellNames[66];
