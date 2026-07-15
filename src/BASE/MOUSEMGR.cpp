@@ -59,15 +59,17 @@ mouseManager::mouseManager(void) : baseManager()
     m_hideCount = 1;
 }
 
-// @match-note coverage checkpoint: semantics, member layout, no-frame CFG, and
-// relocations are complete (3/3, no base-only target). Base .text is 0x91 versus
-// retail 0x94. The first code divergence is base +0x52: MSVC keeps 0xf0 in ECX and
+// @match-note coverage checkpoint: semantics, member layout, and no-frame CFG are
+// complete. The relocation counts are 3/3; the delinked target embeds ShowCursor's
+// IAT address, but manual -dr review confirms the same external access at the same
+// call site. Base .text is 0x91 versus retail 0x94. The first code divergence is
+// base +0x52: MSVC keeps 0xf0 in ECX and
 // shares it across the two stores, while retail emits two immediate stores at
 // +0x5b..+0x68; the suffix is identical after the three-byte shift. Direct stores
 // and spelling the second value as 0xef+1 still select the shared-load form.
 // Revisit after a predecessor/shared-header TU-state change, not with predicates.
 VA(0x004c9350, 0x94)
-int mouseManager::Open(int id)
+int mouseManager::Open(int priority)
 {
     m_forcePointerUpdate = 0;
     m_savedUnderlying = new bitmap(MOUSE_SAVED_BITMAP_TYPE, MOUSE_SAVED_BITMAP_WIDTH,
@@ -86,40 +88,43 @@ int mouseManager::Open(int id)
         ShowCursor(0);
     m_messageMask = MOUSE_MANAGER_MESSAGE_MASK;
     m_active = 1;
-    m_priority = id;
+    m_priority = priority;
     return 0;
 }
 
-// @match-note coverage checkpoint: semantics, zero-frame loop CFG, and relocations
-// are complete (14/14, no base-only target); both bodies are 0xed bytes. The first
+// @match-note coverage checkpoint: semantics and the zero-frame loop CFG are
+// complete; both bodies are 0xed bytes. Relocation counts are 14/14, and manual -dr
+// review confirms the same ordered arrays, allocator calls, resource manager, and
+// Dispose target; the delinked target embeds the four Win32 IAT addresses. The first
 // divergence is the loop setup at +0x2b: base uses EBX as the byte offset and EBP
 // for DeleteObject, while retail uses EBP as the offset and EBX for DeleteObject.
 // The later differences are only that register exchange. for-scope, hoisted, and
-// register-qualified counters retain the base allocation. Revisit after TU-state
-// changes or during the AST last-mile phase.
+// register-qualified counters retain the base allocation. A bounded libclang AST
+// pass tested eight single mutations in 30 walks and retained none. Revisit after
+// TU-state changes or during the AST last-mile phase.
 VA(0x004c93f0, 0xed)
 void mouseManager::Close(void)
 {
-    int i;
+    int cursorIndex;
     if (m_active == 1) {
         m_active = 0;
         if (m_savedUnderlying != 0)
             delete m_savedUnderlying;
         m_savedUnderlying = 0;
         SetCursor(LoadCursorA(0, IDC_ARROW));
-        for (i = 0; i < MOUSE_CURSOR_COUNT; i++) {
-            if (hMouseCursor[i] != 0)
-                DestroyIcon(hMouseCursor[i]);
-            hMouseCursor[i] = 0;
-            if (cAndBits[i] != 0)
-                H2_FREE(cAndBits[i], "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x14a);
-            cAndBits[i] = 0;
-            if (cColorBits[i] != 0)
-                H2_FREE(cColorBits[i], "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x14e);
-            cColorBits[i] = 0;
-            if (hbmpAndMask[i] != 0)
-                DeleteObject(hbmpAndMask[i]);
-            hbmpAndMask[i] = 0;
+        for (cursorIndex = 0; cursorIndex < MOUSE_CURSOR_COUNT; cursorIndex++) {
+            if (hMouseCursor[cursorIndex] != 0)
+                DestroyIcon(hMouseCursor[cursorIndex]);
+            hMouseCursor[cursorIndex] = 0;
+            if (cAndBits[cursorIndex] != 0)
+                H2_FREE(cAndBits[cursorIndex], "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x14a);
+            cAndBits[cursorIndex] = 0;
+            if (cColorBits[cursorIndex] != 0)
+                H2_FREE(cColorBits[cursorIndex], "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x14e);
+            cColorBits[cursorIndex] = 0;
+            if (hbmpAndMask[cursorIndex] != 0)
+                DeleteObject(hbmpAndMask[cursorIndex]);
+            hbmpAndMask[cursorIndex] = 0;
         }
         if (m_cursorIcon != 0)
             gpResourceManager->Dispose(m_cursorIcon);
@@ -262,16 +267,17 @@ void mouseManager::SetPointer(int frame)
 }
 
 // @match-note coverage checkpoint: semantics, member layout, zero-frame CFG, local
-// lifetimes, and relocations are complete (83/83, no base-only target). The overlap
-// path must jump past the current-rectangle rebuild; without this join it discarded
-// the expanded update bounds and emitted an extra gOldMouseBottom occurrence. Base
-// .text is now 0x46a versus retail 0x47a, live 98.39%. After private-data and array-
-// column relocation identities, the first code divergence is equivalent condition
-// lowering near +0x1cf: base emits CMP savedLeft,oldRight/JG while retail emits CMP
-// oldRight,savedLeft/JL. Later residuals are the same operand/polarity allocation in
-// the overlap expansion and clipping comparisons. Direct/reversed comparison
-// spellings were previously byte-neutral; ternary/direct-field width forms regress.
-// No permutation was run. Revisit after a predecessor/shared-layout TU-state change.
+// lifetimes, and all 83 relocation occurrences are complete. Manual -dr review
+// confirms the canonical private globals and arrays; the delinked target uses
+// interior/addend aliases for their second columns and embeds two Win32 IAT addresses.
+// Base .text is 0x46a versus retail 0x47a. Their non-branch instruction streams are
+// otherwise aligned: retail selects the near form for two additional JG and two
+// additional JL instructions, accounting exactly for the 16-byte delta (4 * 4).
+// Direct/reversed comparisons were byte-neutral, while ternary/direct-field width
+// forms regress. A libclang pass exposed 62 syntax-valid variants but produced no
+// retained improvement before its nine-minute bound; interrupted candidates were
+// reverted. Revisit after a predecessor/shared-layout TU-state change, or with a
+// last-mile branch-width-aware pass rather than more local predicate spellings.
 VA(0x004c9a40, 0x47a)
 void mouseManager::NewUpdate(int force)
 {
