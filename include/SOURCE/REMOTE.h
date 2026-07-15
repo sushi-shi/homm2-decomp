@@ -25,7 +25,11 @@ typedef enum RemoteConstant {
     REMOTE_CONFIRM_POLL_DELAY = 20,
     REMOTE_SEND_RETRY_DELAY = 1000,
     REMOTE_HEARTBEAT_INTERVAL = 5000,
+    REMOTE_HEARTBEAT_MESSAGE_SIZE = 10,
+    REMOTE_HEARTBEAT_CONTROL_FLAG = 0x80,
+    REMOTE_HEARTBEAT_PHASE_MASK = 0x0f,
     REMOTE_HOST_TIMEOUT = 15000,
+    REMOTE_CHAIN_GUEST_TIMEOUT_INCREMENT = 30000,
     REMOTE_GUEST_TIMEOUT = 60000,
     REMOTE_CHAIN_TIMEOUT = 90000,
     REMOTE_INITIAL_HEARTBEAT = 1999999999,
@@ -64,6 +68,14 @@ typedef enum RemoteSetupCommand {
 } RemoteSetupCommand;
 
 #pragma pack(push, 1)
+struct RemotePacketHeader {
+    char source;
+    char destination;
+    char reserved;
+    char payloadSize;
+    unsigned short crc;
+};
+
 struct RemoteMessage {
     signed char sender;
     int id;
@@ -73,6 +85,7 @@ struct RemoteMessage {
     unsigned char payload[REMOTE_MESSAGE_PAYLOAD_SIZE];
 };
 #pragma pack(pop)
+SIZE(RemotePacketHeader, REMOTE_PACKET_HEADER_SIZE);
 SIZE(RemoteMessage, REMOTE_MESSAGE_SIZE);
 
 void RemoteCleanup(void);

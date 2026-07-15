@@ -4,13 +4,14 @@
 #include <va.h>
 
 typedef enum NetPlayerInfoConstant {
+    NET_PLAYER_INFO_SYSTEM_ID_SIZE = 4,
     NET_PLAYER_INFO_NAME_SIZE = 21,
     NET_PLAYER_INFO_RESERVED_SIZE = 6
 } NetPlayerInfoConstant;
 
 #pragma pack(push, 1)
 struct SNetPlayerInfo {
-    int networkId;
+    char uniqueSystemID[NET_PLAYER_INFO_SYSTEM_ID_SIZE];
     char name[NET_PLAYER_INFO_NAME_SIZE];
     signed char connectionType;
     signed char useRegularCompression;
