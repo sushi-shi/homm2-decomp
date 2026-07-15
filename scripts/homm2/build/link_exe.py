@@ -34,6 +34,9 @@ IMAGE_DIRECTORY_ENTRY_IMPORT = 1
 IMPORT_DESCRIPTOR_SIZE = 20
 IMPORT_ORDINAL_FLAG32 = 0x80000000
 NB09_SST_MODULE = 0x120
+NB09_SST_ALIGN_SYM = 0x125
+CODEVIEW_S_COMPILE = 0x0001
+CODEVIEW_S_THUNK32 = 0x0206
 
 RETAIL_LINK_FLAGS = (
     "/MACHINE:IX86",
@@ -75,6 +78,20 @@ def msvc_dir():
     if candidate and find_ci(candidate / "bin", "link.exe"):
         return candidate
     return REPO / "build/toolchain/msvc"
+
+
+def resolve_link_executable(toolchain, override=None):
+    override = override or os.environ.get("HOMM2_LINK_EXE")
+    if override:
+        path = Path(override).expanduser().resolve()
+        if not path.is_file():
+            raise RuntimeError("linker override is not a file: %s" % path)
+        return path, ("argument" if override != os.environ.get("HOMM2_LINK_EXE") else
+                      "HOMM2_LINK_EXE")
+    path = find_ci(Path(toolchain) / "bin", "link.exe")
+    if not path:
+        raise RuntimeError("LINK.EXE not found under %s/bin" % toolchain)
+    return path, "VC4.2 toolchain default"
 
 
 def winepath_w(path):
@@ -145,6 +162,80 @@ def read_nb09_module_contributions(path):
             stem = stem[:-4]
         modules[stem.lower()].append({"module": name, "contributions": contributions})
     return modules
+
+
+def decode_s_compile_banner(body):
+    if len(body) < 5:
+        raise ValueError("truncated CodeView S_COMPILE record")
+    length = body[4]
+    if len(body) < 5 + length:
+        raise ValueError("truncated CodeView S_COMPILE banner")
+    return body[5:5 + length].decode("latin1", "replace")
+
+
+def read_nb09_tool_provenance(path):
+    data = Path(path).read_bytes()
+    tail = data.rfind(b"NB09")
+    if tail < 0:
+        raise ValueError("retail PE has no trailing NB09 directory pointer")
+    codeview_base = len(data) - struct.unpack_from("<I", data, tail + 4)[0]
+    directory = codeview_base + struct.unpack_from("<I", data, codeview_base + 4)[0]
+    header_size, entry_size = struct.unpack_from("<HH", data, directory)
+    entry_count = struct.unpack_from("<I", data, directory + 4)[0]
+    entries = [struct.unpack_from(
+        "<HHii", data, directory + header_size + index * entry_size)
+        for index in range(entry_count)]
+
+    modules = {}
+    for subsection, module, offset, size in entries:
+        if subsection != NB09_SST_MODULE:
+            continue
+        blob = data[codeview_base + offset:codeview_base + offset + size]
+        segment_count = struct.unpack_from("<H", blob, 4)[0]
+        cursor = 8 + segment_count * 12
+        name_length = blob[cursor]
+        modules[module] = blob[cursor + 1:cursor + 1 + name_length].decode(
+            "latin1", "replace")
+
+    compile_rows = []
+    for subsection, module, offset, size in entries:
+        if subsection != NB09_SST_ALIGN_SYM:
+            continue
+        blob = data[codeview_base + offset:codeview_base + offset + size]
+        cursor = 4
+        records = []
+        while cursor + 4 <= len(blob):
+            record_length, record_type = struct.unpack_from("<HH", blob, cursor)
+            if not record_length:
+                break
+            body = blob[cursor + 4:cursor + 2 + record_length]
+            records.append((record_type, body))
+            cursor += 2 + record_length
+        has_thunk = any(record_type == CODEVIEW_S_THUNK32 for record_type, _ in records)
+        for record_type, body in records:
+            if record_type == CODEVIEW_S_COMPILE:
+                compile_rows.append({
+                    "banner": decode_s_compile_banner(body),
+                    "module": modules.get(module, "<unknown module %d>" % module),
+                    "has_thunk": has_thunk,
+                })
+
+    banners = []
+    for banner in sorted(set(row["banner"] for row in compile_rows)):
+        rows = [row for row in compile_rows if row["banner"] == banner]
+        banners.append({
+            "banner": banner,
+            "count": len(rows),
+            "thunk_module_count": sum(row["has_thunk"] for row in rows),
+            "module_names": sorted(set(row["module"] for row in rows)),
+        })
+    return {
+        "compile_record_count": len(compile_rows),
+        "banners": banners,
+        "interpretation": (
+            "S_COMPILE banners describe their owning NB09 modules. The LINK 2.60 records "
+            "are import-thunk modules, not direct evidence for the final executable linker."),
+    }
 
 
 def load_retail_order(units_path=None, symbols_path=None, retail_exe=None,
@@ -910,7 +1001,7 @@ def read_order_response(path):
     return objects
 
 
-def run_link(output, order_response, imports_libraries, resource_path):
+def run_link(output, order_response, imports_libraries, resource_path, linker_override=None):
     output = Path(output).resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
     report_path = output.with_suffix(".link.json")
@@ -918,9 +1009,7 @@ def run_link(output, order_response, imports_libraries, resource_path):
     map_path = output.with_suffix(".map")
     log_path = output.with_suffix(".link.log")
     toolchain = msvc_dir()
-    link_exe = find_ci(toolchain / "bin", "link.exe")
-    if not link_exe:
-        raise RuntimeError("LINK.EXE not found under %s/bin" % toolchain)
+    link_exe, linker_source = resolve_link_executable(toolchain, linker_override)
     if shutil.which("wine") is None or shutil.which("winepath") is None:
         raise RuntimeError("wine and winepath are required; use `nix develop .#build`")
     if not RETAIL_EXE.exists():
@@ -985,9 +1074,12 @@ def run_link(output, order_response, imports_libraries, resource_path):
         "return_code": run.returncode,
         "linker": {
             "path": str(link_exe),
+            "selection_source": linker_source,
+            "sha256": hashlib.sha256(link_exe.read_bytes()).hexdigest(),
             "banner": banner,
             "retail_pe_version": retail["linker_version"],
-            "retail_codeview_banner": "Microsoft LINK 2.60.5112 (NT)",
+            "retail_final_linker_evidence": "PE32 MajorLinkerVersion.MinorLinkerVersion",
+            "retail_codeview_tool_provenance": read_nb09_tool_provenance(RETAIL_EXE),
             "version_matches_retail": bool(
                 candidate and candidate["linker_version"] == retail["linker_version"]),
         },
@@ -1123,6 +1215,7 @@ def main(argv=None):
     parser.add_argument("--order", default=str(REPO / "build/link/objects.rsp"))
     parser.add_argument("--imports", action="append")
     parser.add_argument("--resource", default=str(REPO / "build/link/HEROES2W.res"))
+    parser.add_argument("--linker", help="alternate LINK.EXE for an isolated A/B link")
     parser.add_argument("--write-order", metavar="PATH")
     args = parser.parse_args(argv)
     try:
@@ -1133,7 +1226,7 @@ def main(argv=None):
             str(REPO / "build/link/vendor-imports-mss.lib"),
             str(REPO / "build/link/vendor-imports-wing.lib"),
         ]
-        return run_link(args.out, args.order, imports, args.resource)
+        return run_link(args.out, args.order, imports, args.resource, args.linker)
     except (OSError, ValueError, RuntimeError) as exc:
         return die(str(exc))
 
