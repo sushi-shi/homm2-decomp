@@ -72,7 +72,7 @@ void combatManager::DetermineEffectOfSpell(int spell, int *bestEffect, int *best
     int done = 0;
     int side = 0;
     int hex = COMBAT_SPELL_AI_FIRST_HEX;
-    float durationMod = 1.0f;
+    float durationMod = COMBAT_SPELL_AI_FULL_EFFECT_MODIFIER;
     int fullQuantity = 1;
     int totalEffect = 0;
     army *target = 0;
@@ -702,7 +702,7 @@ int combatManager::RawEffectSpellInfluence(army *target, int influence)
     army *otherArmy = 0;
     float workChance =
         target->SpellCastWorkChance(giSpellInfluenceToSpell[influence]);
-    if (workChance <= 0.0)
+    if (workChance <= COMBAT_SPELL_AI_ZERO_EFFECT)
         return 0;
 
     int armyValue = target->m_monster.fightValue * target->m_quantity;

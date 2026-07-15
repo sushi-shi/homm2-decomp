@@ -75,6 +75,11 @@ typedef enum GameScoreConstant {
     GAME_SCORE_MINIMUM = 20
 } GameScoreConstant;
 
+#define GAME_SCORE_EXTRA_LARGE_DAY_SCALE 0.6
+#define GAME_SCORE_LARGE_DAY_SCALE 0.8
+#define GAME_SCORE_SMALL_DAY_SCALE 1.4
+#define GAME_VIEW_ARMY_FRAME_DELAY_SCALE 1.35
+
 typedef enum GameJoinConstant {
     GAME_JOIN_HEADER_SIZE = 2,
     GAME_JOIN_BUFFER_SIZE = 700000,
