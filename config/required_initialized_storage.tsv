@@ -134,3 +134,13 @@ name	unit	size	retail_sha256	highlow_count	audit
 ?bStopOnTrigger@@3PAEA	SOURCE/KB	0x80	05bdf0b50f0fa467dc9b9519e65caff489c1b8004336a01468a48cd5306b27c9	0	bytes
 ?gTownPrefixNames@@3PAPADA	SOURCE/KB	0x18	ce09e75926a5640136e40b7477298804969f82908ef18b450e0c9f02ff6b5be9	6	cstring-pointer-table
 ?gTownObjNames@@3PAPADA	SOURCE/KB	0x80	588c676707552eeabced3ce23cf2d3a8b57ea3de01058b3a19e9efb056cfb04c	32	cstring-pointer-table
+?gMageBuildingCosts@@3PAY06HA	SOURCE/KB	0xa8	9b81e067737018a7ea53332304cd5108c74ae66ec7f41a7d0502c912d9067822	0	bytes
+?gSpecialBuildingCosts@@3PAY06HA	SOURCE/KB	0xa8	57cbd4af68a650da30b390b239760c9ef801bf232ec0c933ae0d36ade892ebfa	0	bytes
+?gNeutralBuildingCosts@@3PAY06HA	SOURCE/KB	0x1c0	18a0f9ae8f2ac1caa4ddb8f3413c5cfdf4a7b64a7eb462e4a9a8e4abacb09d69	0	bytes
+?gMageBaseResourceValues@@3PAHA	SOURCE/KB	0x18	caa65a4847df46d384f52e970c4c6e1a98a5b53471efc04e91223a3fbcb81099	0	bytes
+?gNeutralBaseResourceValues@@3PAHA	SOURCE/KB	0x40	861425936c09920466b053d227d3230c25c3cad28991a843d5fe143e4e0ad3d0	0	bytes
+?gSpecialBuildingBaseResourceValues@@3PAHA	SOURCE/KB	0x18	9e0f1c6f92ddf2d808c2238d51b17111c7fff525ad5b5a8fe7520387657285af	0	bytes
+?gDwellingBaseResourceValues@@3PAY0M@HA	SOURCE/KB	0x120	23e99f63007263c7b59a6c763ac6568d3d317594eeeeefe3d5ada73182e28bb0	0	bytes
+?gDwellingCosts@@3PAY1M@6HA	SOURCE/KB	0x7e0	7127c6a4b93cdcfb6a4bf30bd6e5b3753180cf30ada820a0887620950ecf586a	0	bytes
+?gHierarchyMask@@3PAY0M@KA	SOURCE/KB	0x120	eedf2582e1470841ef36df434c9254a9ed06f18c9d67f40e7fab68b9f9e4ecbb	0	bytes
+?giTerrainToMusicTrack@@3PAEA	SOURCE/KB	0x9	a3fdd2258ab1e25ec7691ca528172084c1773d6415f3929d9a02c47711699d86	0	bytes

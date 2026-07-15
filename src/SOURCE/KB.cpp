@@ -5729,7 +5729,7 @@ DATA(0x004fc9c8) char *gTownObjNames[KB_TOWN_OBJECT_NAME_COUNT] = {
     "dw_5", "up_1", "up_2", "up_3",
     "up_4", "up_5", "up5b", "ext3"
 };
-DATA(0x004fca48) signed char gDwellingType[TOWN_TYPE_COUNT][12] = {
+DATA(0x004fca48) signed char gDwellingType[TOWN_TYPE_COUNT][KB_DWELLING_TYPE_COUNT] = {
     { ARMY_CREATURE_PEASANT, ARMY_CREATURE_ARCHER, ARMY_CREATURE_PIKEMAN,
       ARMY_CREATURE_SWORDSMAN, ARMY_CREATURE_CAVALRY,
       ARMY_CREATURE_PALADIN, ARMY_CREATURE_RANGER,
@@ -5761,17 +5761,138 @@ DATA(0x004fca48) signed char gDwellingType[TOWN_TYPE_COUNT][12] = {
       ARMY_CREATURE_VAMPIRE_LORD, ARMY_CREATURE_POWER_LICH,
       ARMY_GROUP_EMPTY_SLOT, ARMY_GROUP_EMPTY_SLOT }
 };
-DATA(0x004fca90) int gMageBuildingCosts[6][7];
-DATA(0x004fcb38) int gSpecialBuildingCosts[6][7];
-DATA(0x004fcbe0) int gNeutralBuildingCosts[16][7];
-DATA(0x004fcda0) int gMageBaseResourceValues[6];
-DATA(0x004fcdb8) int gNeutralBaseResourceValues[20];
-DATA(0x004fce08) int gSpecialBuildingBaseResourceValues[6];
-DATA(0x004fce20) int gDwellingBaseResourceValues[6][12];
-DATA(0x004fcf40) int gDwellingCosts[6][12][7];
-DATA(0x004fd720) unsigned long gHierarchyMask[6][12];
+DATA(0x004fca90)
+int gMageBuildingCosts[KB_MAGE_GUILD_LEVEL_COUNT][KB_BUILDING_RESOURCE_COUNT] = {
+    { 0, 0, 0, 0, 0, 0, 0 },
+    { 5, 0, 5, 0, 0, 0, 2000 },
+    { 5, 4, 5, 4, 4, 4, 1000 },
+    { 5, 6, 5, 6, 6, 6, 1000 },
+    { 5, 8, 5, 8, 8, 8, 1000 },
+    { 5, 10, 5, 10, 10, 10, 1000 }
+};
+DATA(0x004fcb38)
+int gSpecialBuildingCosts[TOWN_TYPE_COUNT][KB_BUILDING_RESOURCE_COUNT] = {
+    { 5, 0, 15, 0, 0, 0, 1500 },
+    { 10, 0, 10, 0, 0, 0, 2000 },
+    { 0, 0, 0, 0, 10, 0, 1500 },
+    { 5, 0, 10, 0, 0, 0, 3000 },
+    { 5, 5, 5, 5, 5, 5, 1500 },
+    { 0, 10, 0, 10, 0, 0, 1000 }
+};
+DATA(0x004fcbe0)
+int gNeutralBuildingCosts[KB_BUILDING_NEUTRAL_LIMIT][KB_BUILDING_RESOURCE_COUNT] = {
+    { 5, 0, 5, 0, 0, 0, 2000 },
+    { 5, 0, 0, 0, 0, 0, 750 },
+    { 5, 0, 0, 0, 0, 0, 500 },
+    { 20, 0, 0, 0, 0, 0, 2000 },
+    { 0, 0, 0, 0, 0, 0, 500 },
+    { 0, 0, 0, 0, 0, 0, 0 },
+    { 20, 0, 20, 0, 0, 0, 5000 },
+    { 0, 0, 5, 0, 0, 0, 1250 },
+    { 0, 0, 5, 0, 0, 0, 1500 },
+    { 0, 0, 5, 0, 0, 0, 1500 },
+    { 5, 0, 0, 0, 0, 0, 500 },
+    { 0, 0, 0, 0, 0, 0, 1000 },
+    { 0, 0, 0, 0, 0, 0, 750 },
+    { 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 500 }
+};
+DATA(0x004fcda0) int gMageBaseResourceValues[KB_MAGE_GUILD_LEVEL_COUNT] = {
+    0, 4000, 6500, 8500, 10500, 15000
+};
+DATA(0x004fcdb8) int gNeutralBaseResourceValues[KB_BUILDING_NEUTRAL_LIMIT] = {
+    5000, 300, 350, 2000, 3000, 0, 12000, 2500,
+    1500, 1500, 200, 1000, 500, 0, 0, 1100
+};
+DATA(0x004fce08) int gSpecialBuildingBaseResourceValues[TOWN_TYPE_COUNT] = {
+    1500, 1000, 1000, 4500, 3500, 1000
+};
+DATA(0x004fce20)
+int gDwellingBaseResourceValues[TOWN_TYPE_COUNT][KB_DWELLING_TYPE_COUNT] = {
+    { 858, 2225, 2816, 7385, 13754, 29785, 4000, 3200, 8000, 16000, 40000, 0 },
+    { 1802, 2615, 3414, 6967, 13212, 38141, 3500, 0, 8000, 16000, 0, 0 },
+    { 1684, 3000, 3500, 7213, 15181, 27684, 4000, 4000, 12000, 0, 0, 0 },
+    { 1956, 2607, 3869, 7510, 16002, 90000, 0, 0, 8500, 0, 120000, 180000 },
+    { 1700, 3500, 2800, 9000, 11500, 85000, 0, 3500, 0, 15000, 155000, 0 },
+    { 2200, 2100, 3800, 6000, 9500, 90000, 3000, 4900, 15000, 12000, 0, 0 }
+};
+DATA(0x004fcf40)
+int gDwellingCosts[TOWN_TYPE_COUNT][KB_DWELLING_TYPE_COUNT][KB_BUILDING_RESOURCE_COUNT] = {
+    {
+        { 0, 0, 0, 0, 0, 0, 200 }, { 0, 0, 0, 0, 0, 0, 1000 },
+        { 0, 0, 5, 0, 0, 0, 1000 }, { 10, 0, 10, 0, 0, 0, 2000 },
+        { 20, 0, 0, 0, 0, 0, 3000 }, { 20, 0, 0, 0, 20, 0, 5000 },
+        { 5, 0, 0, 0, 0, 0, 1500 }, { 0, 0, 5, 0, 0, 0, 1500 },
+        { 5, 0, 5, 0, 0, 0, 2000 }, { 10, 0, 0, 0, 0, 0, 3000 },
+        { 10, 0, 0, 0, 10, 0, 5000 }, { 0, 0, 0, 0, 0, 0, 0 }
+    },
+    {
+        { 0, 0, 0, 0, 0, 0, 300 }, { 5, 0, 0, 0, 0, 0, 800 },
+        { 0, 0, 0, 0, 0, 0, 1000 }, { 10, 0, 10, 0, 0, 0, 2000 },
+        { 0, 0, 20, 0, 0, 0, 4000 }, { 0, 0, 20, 0, 20, 0, 6000 },
+        { 5, 0, 0, 0, 0, 0, 1200 }, { 0, 0, 0, 0, 0, 0, 0 },
+        { 5, 0, 5, 0, 0, 0, 3000 }, { 0, 0, 10, 0, 0, 0, 2000 },
+        { 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0 }
+    },
+    {
+        { 5, 0, 0, 0, 0, 0, 500 }, { 5, 0, 0, 0, 0, 0, 1000 },
+        { 0, 0, 0, 0, 0, 0, 1500 }, { 0, 0, 10, 0, 0, 0, 2500 },
+        { 10, 0, 0, 0, 0, 10, 3000 }, { 0, 20, 30, 0, 0, 0, 10000 },
+        { 5, 0, 0, 0, 0, 0, 1500 }, { 5, 0, 0, 0, 0, 0, 1500 },
+        { 0, 5, 0, 0, 0, 0, 1500 }, { 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0 }
+    },
+    {
+        { 0, 0, 0, 0, 0, 0, 500 }, { 0, 0, 10, 0, 0, 0, 1000 },
+        { 0, 0, 0, 0, 0, 0, 2000 }, { 0, 0, 0, 0, 0, 10, 3000 },
+        { 0, 0, 0, 10, 0, 0, 4000 }, { 0, 0, 30, 20, 0, 0, 15000 },
+        { 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 5, 2000 }, { 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 5, 10, 0, 0, 5000 }, { 0, 0, 5, 10, 0, 0, 5000 }
+    },
+    {
+        { 0, 0, 0, 0, 0, 0, 400 }, { 0, 0, 0, 0, 0, 0, 800 },
+        { 5, 0, 5, 0, 0, 0, 1500 }, { 5, 0, 0, 0, 0, 0, 3000 },
+        { 5, 5, 5, 5, 5, 5, 3500 }, { 5, 0, 5, 0, 0, 20, 12500 },
+        { 0, 0, 0, 0, 0, 0, 0 }, { 0, 5, 0, 0, 0, 0, 1500 },
+        { 0, 0, 0, 0, 0, 0, 0 }, { 5, 0, 5, 0, 0, 0, 4000 },
+        { 5, 0, 5, 0, 0, 20, 12500 }, { 0, 0, 0, 0, 0, 0, 0 }
+    },
+    {
+        { 0, 0, 0, 0, 0, 0, 400 }, { 0, 0, 0, 0, 0, 0, 1000 },
+        { 0, 0, 10, 0, 0, 0, 1500 }, { 10, 0, 0, 0, 0, 0, 3000 },
+        { 10, 0, 0, 10, 0, 0, 4000 }, { 10, 5, 10, 5, 5, 5, 10000 },
+        { 0, 0, 0, 0, 0, 0, 1000 }, { 0, 0, 5, 0, 0, 0, 1500 },
+        { 5, 0, 0, 0, 10, 10, 4000 }, { 0, 0, 5, 0, 5, 0, 3000 },
+        { 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0 }
+    }
+};
+DATA(0x004fd720)
+unsigned long gHierarchyMask[TOWN_TYPE_COUNT][KB_DWELLING_TYPE_COUNT] = {
+    { 0x00000000UL, 0x00080000UL, 0x00080010UL, 0x00080004UL,
+      0x00700000UL, 0x00700000UL, 0x00700000UL, 0x00700000UL,
+      0x00700000UL, 0x00800000UL, 0x01000000UL, 0xffffffffUL },
+    { 0x00000000UL, 0x00080000UL, 0x00080000UL, 0x00080000UL,
+      0x00700000UL, 0x00800000UL, 0x00700000UL, 0xffffffffUL,
+      0x00700000UL, 0x00800000UL, 0xffffffffUL, 0xffffffffUL },
+    { 0x00000000UL, 0x00080004UL, 0x00080000UL, 0x00200001UL,
+      0x00400000UL, 0x00800000UL, 0x00100010UL, 0x00400000UL,
+      0x00400000UL, 0xffffffffUL, 0xffffffffUL, 0xffffffffUL },
+    { 0x00000000UL, 0x00080000UL, 0x00080000UL, 0x00100000UL,
+      0x00200000UL, 0x00c00000UL, 0xffffffffUL, 0xffffffffUL,
+      0x00400000UL, 0xffffffffUL, 0x01000000UL, 0x20000000UL },
+    { 0x00000000UL, 0x00080000UL, 0x00080000UL, 0x00100000UL,
+      0x00200001UL, 0x00c00000UL, 0xffffffffUL, 0x00200010UL,
+      0xffffffffUL, 0x00802000UL, 0x01000000UL, 0xffffffffUL },
+    { 0x00000000UL, 0x00080000UL, 0x00080000UL, 0x00200002UL,
+      0x00100001UL, 0x00800000UL, 0x00100000UL, 0x00200000UL,
+      0x00400000UL, 0x00800000UL, 0xffffffffUL, 0xffffffffUL }
+};
 DATA(0x004fd840) int giDebugBuildingToBuild = -1;
-DATA(0x004fd848) unsigned char giTerrainToMusicTrack[16];
+DATA(0x004fd848) unsigned char giTerrainToMusicTrack[GROUND_TERRAIN_TYPE_COUNT] = {
+    16, 18, 14, 15, 11, 13, 17, 12, 16
+};
 DATA(0x004fd858) char *cHeroTypeShortName[6];
 DATA(0x004fd870) char cHeroTypeInitial[HERO_TYPE_INITIAL_COUNT];
 DATA(0x004fd878) int giDeferObjDrawX = -1;
@@ -6003,7 +6124,7 @@ DATA(0x004ff890) char *gSecondarySkills[14];
 DATA(0x004ff8c8) char *gNeutralBuildingNames[20];
 DATA(0x004ff918) char *gWellExtraNames[8];
 DATA(0x004ff938) char *gSpecialBuildingNames[8];
-DATA(0x004ff958) char *gDwellingNames[6][12];
+DATA(0x004ff958) char *gDwellingNames[TOWN_TYPE_COUNT][KB_DWELLING_TYPE_COUNT];
 DATA(0x004ffa78) char *cSecSkillDesc[14][3];
 DATA(0x004ffb20) char *cBuildingInfoNeutral[20];
 DATA(0x004ffb70) char *gBuildingInfoSpecial[6];
