@@ -386,7 +386,7 @@ int dpWaitForExtraGuests(void) {
     tag_message message;
 
     dpProcessMessages();
-    if (giNumHumanPlayers != iLastMsgNumHumanPlayers) {
+    if (iLastMsgNumHumanPlayers != 0[&giNumHumanPlayers]) {
         iLastMsgNumHumanPlayers = giNumHumanPlayers;
         sprintf(gText, "You have %d guest(s) now logged in.",
                 giNumHumanPlayers - 1);

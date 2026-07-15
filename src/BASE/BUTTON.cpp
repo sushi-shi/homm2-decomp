@@ -362,4 +362,4 @@ void button::Draw(void)
 VTBL(button, 0x004ebaf0);
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x0052125c) int iLeftRightSave;
+DATA(0x0052125c) int iLeftRightSave = 0;
