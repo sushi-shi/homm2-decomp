@@ -608,7 +608,7 @@ SOURCE/CMBTMGR	?GetGridIndex@combatManager@@QAEHHH@Z	100.0000	42f2d46193e7
 SOURCE/CMBTMGR	?GetNextArmy@combatManager@@QAEHH@Z	100.0000	caf97be53cc6
 SOURCE/CMBTMGR	?InCastle@combatManager@@QAEHH@Z	99.9039	49529f99d90a
 SOURCE/CMBTMGR	?InitNonVisualVars@combatManager@@QAEXXZ	100.0000	7eadaa41fc7b
-SOURCE/CMBTMGR	?IsWinner@combatManager@@QAEHH@Z	100.0000	d8a51664aba6
+SOURCE/CMBTMGR	?IsWinner@combatManager@@QAEHH@Z	100.0000	be60eb1576bc
 SOURCE/CMBTMGR	?KeepAttack@combatManager@@QAEXH@Z	99.9802	cde5e4f66ed4
 SOURCE/CMBTMGR	?LoadArmies@combatManager@@QAEXXZ	100.0000	dad8fbade916
 SOURCE/CMBTMGR	?LoadIcons@combatManager@@QAEXXZ	99.0950	da837039512f
@@ -620,7 +620,7 @@ SOURCE/CMBTMGR	?RaiseDoor@combatManager@@QAEXXZ	100.0000	9a674310a467
 SOURCE/CMBTMGR	?ResetHitByCreature@combatManager@@QAEXXZ	100.0000	9c52e2ebb50d
 SOURCE/CMBTMGR	?SaveCombatBorder@combatManager@@QAEXXZ	100.0000	c0c673290cf8
 SOURCE/CMBTMGR	?SetupAdjacencyArray@combatManager@@QAEXXZ	99.8504	9352838f095e
-SOURCE/CMBTMGR	?SetupAndLoadObstacles@combatManager@@QAEXXZ	96.6975	1fd853efcc68
+SOURCE/CMBTMGR	?SetupAndLoadObstacles@combatManager@@QAEXXZ	96.6975	89080cb71c6b
 SOURCE/CMBTMGR	?SetupCombat@combatManager@@QAEXHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHH@Z	100.0000	2c735218c7b9
 SOURCE/CMBTMGR	?ShootMissile@combatManager@@QAEXHHHHPAMPAVicon@@@Z	99.0745	8d6b1fc77ccf
 SOURCE/CMBTMGR	?ShotIsThroughWall@combatManager@@QAEHHHH@Z	99.7673	8898823dd9c7
@@ -690,7 +690,7 @@ SOURCE/Campaign	?InitEntireCampaign@game@@QAEXH@Z	100.0000	8da432c583f2
 SOURCE/Campaign	?PlayPreScenarioSmacker@game@@QAEXHH@Z	99.5491	bc9f52c7ba48
 SOURCE/Campaign	?ShowCampaignInfo@game@@QAEXHH@Z	99.8986	474151714ed8
 SOURCE/Castle	?CastleHandler@@YIHAAUtag_message@@@Z	98.1465	cd4ca38cedcb
-SOURCE/Castle	?SetupCastle@townManager@@QAEXPAVheroWindow@@H@Z	100.0000	a4dab7f91586
+SOURCE/Castle	?SetupCastle@townManager@@QAEXPAVheroWindow@@H@Z	100.0000	b83546e336f1
 SOURCE/DRAWING	?CheckUpdateCombatMessages@combatManager@@QAEXXZ	100.0000	8adb3be6999f
 SOURCE/DRAWING	?ClearCombatMessages@combatManager@@QAEXH@Z	100.0000	a13385b2bc8b
 SOURCE/DRAWING	?CombatMessage@combatManager@@QAEXH@Z	99.8103	b431be4bdee0
@@ -801,7 +801,7 @@ SOURCE/GAME	?GetTownId@game@@QAEHHH@Z	100.0000	b40eaad84ec7
 SOURCE/GAME	?GetWorldMapData@game@@QAEPAVfullMap@@XZ	100.0000	645c5053f291
 SOURCE/GAME	?GiveArmy@game@@QAEXPAVarmyGroup@@HHH@Z	100.0000	bb571b966b96
 SOURCE/GAME	?GiveTroopsToNeutralTown@game@@QAEXH@Z	99.4291	95028454f5f0
-SOURCE/GAME	?GiveTroopsToNeutralTowns@game@@QAEXXZ	100.0000	80df3d23891b
+SOURCE/GAME	?GiveTroopsToNeutralTowns@game@@QAEXXZ	100.0000	8cb490860308
 SOURCE/GAME	?HasLateOverlay@game@@QAEHHH@Z	94.6753	2bda2607d691
 SOURCE/GAME	?HasMobileHero@playerData@@QAEHXZ	100.0000	c64bbd3150ab
 SOURCE/GAME	?HasObjectTilesetIndex@game@@QAEHHHHH@Z	95.4945	a8dc9fddd0df
