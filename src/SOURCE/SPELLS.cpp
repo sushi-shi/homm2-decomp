@@ -533,15 +533,19 @@ format_target:
 
 // @match-note: The complete dispatch, creature-cast handling, spell-specific
 // bodies, sound/hero animation, cleanup, and final selector CFG agree with retail.
-// All 270 external relocation targets agree. Retail uses a 0xb4 frame versus
-// ours 0xa8; the recovered named buffers and float[9] occupy the proven retail
-// ranges, while the remaining three words are compiler temporaries rather than
-// missing semantic locals. The first normalized residual is the typed
+// All 270 external relocation targets agree. Retail reserves a 0xb4 frame and
+// stores this at -0xa4; ours reserves 0xa8 and stores this at -0x9c. Retail has
+// unreferenced interior words at -0x10 and -0x3c and places the three
+// case-specific army-name pointers at -0x98..-0xa0; ours places those pointers
+// at -0x7c..-0x84, ahead of the switch temporaries. The recovered sample buffer,
+// SAMPLE2, and float[9] ranges otherwise account for every named aggregate. The
+// first normalized residual is the typed
 // gsSpellInfo field relocation versus retail's interior label, followed by one
 // inline continuation jump and side/index multiplication order. Local scopes,
-// direct member expressions, and the recovered aggregate shapes were audited;
-// adding fake padding would not recover the retail stack layout. Revisit for
-// compiler slot shaping after the pre-95 structural campaign.
+// direct member expressions, the aggregate shapes, and flattening the final
+// Eagle Eye predicate were audited; flattening was byte-neutral, and fake
+// padding would not recover the interior layout. Revisit for switch/case scope
+// and compiler-slot shaping.
 VA(0x004217be, 0x1eca)
 void combatManager::CastSpell(int spell, int targetHex, int castByCreature, int teleportDestination)
 {
@@ -1041,23 +1045,26 @@ void combatManager::DefaultSpell(int targetHex)
     }
 }
 
-// @match-note retained 99.71%, combined live 99.42%: complete animation,
-// 19-cell selection, duplicate-effect
-// filtering, elemental/golem damage, message, and PowEffect CFG. All 51
-// relocation targets agree and the normalized instruction stream is otherwise
-// aligned. Retail uses a 0x5c frame while this semantic-name layout uses 0x60;
-// the relocation-union raw audit retains 123 stack/branch bytes. Tried cached
-// versus direct hex fields, removing side/index temporaries, typed short
-// storage, and in-place damage shifts. Revisit at 95% for an od_slots semantic
-// suffix pass, or earlier after predecessor/header changes.
+// @match-note retained 99.71%, live 98.26%: complete animation, 19-cell
+// selection, duplicate filtering, damage, message, and PowEffect CFG; all 51
+// relocation targets agree. Reusing one function-scope frame counter and moving
+// damage to that scope recovered retail's 0x5c frame. The od_slots suffix pass
+// now aligns baseDamage/target/targetX/frame and the compiler tail. The remaining
+// first slot residual is targetY at -0x4c versus retail -0x8, which leaves the
+// affectedHexes/anyAffected/damage range four bytes shallow. A same-bucket
+// targetY suffix and split declaration/assignment were byte-neutral. Previously
+// tried cached/direct hex fields, removing side/index temporaries, typed short
+// storage, and in-place damage shifts. Revisit only after a TU identifier-state
+// change or a new source-scope discovery; do not repeat these spellings.
 VA(0x00423762, 0x623)
 void combatManager::Fireball(int targetHex, int spell)
 {
     if (!ValidHex(targetHex))
         return;
 
-    int targetX = m_hexCells[targetHex].m_x;
+    int targetX_a = m_hexCells[targetHex].m_x;
     int targetY = m_hexCells[targetHex].m_y - COMBAT_SPELL_TARGET_Y_OFFSET;
+    int frame;
     if (!gbNoShowCombat) {
         int frameCount = SPELL_FIREBALL_FRAME_COUNT;
         icon *spellIcon;
@@ -1070,17 +1077,16 @@ void combatManager::Fireball(int targetHex, int spell)
             frameCount = SPELL_COLD_RING_FRAME_COUNT;
         }
 
-        int frame;
         for (frame = 0; frame < frameCount; ++frame) {
             glTimers[0] = static_cast<int>(
                 KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] *
                                     SPELL_AREA_ANIMATION_DELAY);
-            IconToBitmap(spellIcon, gpWindowManager->m_screen, targetX,
+            IconToBitmap(spellIcon, gpWindowManager->m_screen, targetX_a,
                          targetY, frame, 1, 0, 0, COMBAT_SCREEN_WIDTH,
                          COMBAT_AREA_HEIGHT, 0);
             if (spell == SPELL_COLD_RING) {
                 FlipIconToBitmap(spellIcon, gpWindowManager->m_screen,
-                                 targetX, targetY, frame, 1, 0, 0,
+                                 targetX_a, targetY, frame, 1, 0, 0,
                                  COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT, 0);
             }
             UpdateCombatArea();
@@ -1091,115 +1097,107 @@ void combatManager::Fireball(int targetHex, int spell)
     }
 
     DrawFrame(1, 0, 0, 0, COMBAT_DRAW_DELAY, 1, 1);
-    army *target = &m_armies[m_currentSide][m_currentArmyIndex];
-    short affectedHexes[SPELL_FIREBALL_AFFECTED_HEX_COUNT];
-    int frame;
+    army *target_b = &m_armies[m_currentSide][m_currentArmyIndex];
+    short affectedHexes_f[SPELL_FIREBALL_AFFECTED_HEX_COUNT];
     for (frame = 0; frame < SPELL_FIREBALL_AFFECTED_HEX_COUNT; ++frame)
-        affectedHexes[frame] = COMBAT_HEX_EMPTY;
+        affectedHexes_f[frame] = COMBAT_HEX_EMPTY;
     if (spell != SPELL_COLD_RING)
-        affectedHexes[0] = static_cast<short>(targetHex);
+        affectedHexes_f[0] = static_cast<short>(targetHex);
 
     for (frame = 0; frame < SPELL_ADJACENT_DIRECTION_COUNT; ++frame) {
-        affectedHexes[frame + 1] = static_cast<short>(
+        affectedHexes_f[frame + 1] = static_cast<short>(
             GetAdjacentCellIndexNoArmy(targetHex, frame));
         if (spell == SPELL_FIREBLAST) {
-            affectedHexes[frame + SPELL_FIREBLAST_SECOND_RING_FIRST] =
+            affectedHexes_f[frame + SPELL_FIREBLAST_SECOND_RING_FIRST] =
                 static_cast<short>(
-                target->GetAdjacentCellIndex(affectedHexes[frame + 1], frame));
+                target_b->GetAdjacentCellIndex(affectedHexes_f[frame + 1], frame));
         }
     }
     if (spell == SPELL_FIREBLAST) {
-        affectedHexes[SPELL_FIREBLAST_AXIAL_FIRST] = static_cast<short>(
+        affectedHexes_f[SPELL_FIREBLAST_AXIAL_FIRST] = static_cast<short>(
             targetHex - SPELL_FIREBLAST_HEX_ROW_STRIDE);
-        if (affectedHexes[SPELL_FIREBLAST_AXIAL_FIRST] < 0)
-            affectedHexes[SPELL_FIREBLAST_AXIAL_FIRST] = COMBAT_HEX_EMPTY;
-        affectedHexes[SPELL_FIREBLAST_AXIAL_SECOND] = static_cast<short>(
+        if (affectedHexes_f[SPELL_FIREBLAST_AXIAL_FIRST] < 0)
+            affectedHexes_f[SPELL_FIREBLAST_AXIAL_FIRST] = COMBAT_HEX_EMPTY;
+        affectedHexes_f[SPELL_FIREBLAST_AXIAL_SECOND] = static_cast<short>(
             targetHex + SPELL_FIREBLAST_HEX_ROW_STRIDE);
-        if (affectedHexes[SPELL_FIREBLAST_AXIAL_SECOND] >= COMBAT_HEX_COUNT)
-            affectedHexes[SPELL_FIREBLAST_AXIAL_SECOND] = COMBAT_HEX_EMPTY;
-        affectedHexes[SPELL_FIREBLAST_CORNER_FIRST] = static_cast<short>(
-            GetAdjacentCellIndexNoArmy(affectedHexes[2], 0));
-        affectedHexes[SPELL_FIREBLAST_CORNER_FIRST + 1] = static_cast<short>(
-            GetAdjacentCellIndexNoArmy(affectedHexes[2], 2));
-        affectedHexes[SPELL_FIREBLAST_CORNER_FIRST + 2] = static_cast<short>(
-            GetAdjacentCellIndexNoArmy(affectedHexes[5], 5));
-        affectedHexes[SPELL_FIREBLAST_CORNER_FIRST + 3] = static_cast<short>(
-            GetAdjacentCellIndexNoArmy(affectedHexes[5], 3));
+        if (affectedHexes_f[SPELL_FIREBLAST_AXIAL_SECOND] >= COMBAT_HEX_COUNT)
+            affectedHexes_f[SPELL_FIREBLAST_AXIAL_SECOND] = COMBAT_HEX_EMPTY;
+        affectedHexes_f[SPELL_FIREBLAST_CORNER_FIRST] = static_cast<short>(
+            GetAdjacentCellIndexNoArmy(affectedHexes_f[2], 0));
+        affectedHexes_f[SPELL_FIREBLAST_CORNER_FIRST + 1] = static_cast<short>(
+            GetAdjacentCellIndexNoArmy(affectedHexes_f[2], 2));
+        affectedHexes_f[SPELL_FIREBLAST_CORNER_FIRST + 2] = static_cast<short>(
+            GetAdjacentCellIndexNoArmy(affectedHexes_f[5], 5));
+        affectedHexes_f[SPELL_FIREBLAST_CORNER_FIRST + 3] = static_cast<short>(
+            GetAdjacentCellIndexNoArmy(affectedHexes_f[5], 3));
     }
 
-    long baseDamage =
+    long baseDamage_w =
         m_spellPower[m_currentSide] * SPELL_FIREBALL_DAMAGE_PER_POWER;
     ClearEffects();
-    int anyAffected = 0;
+    int anyAffected_h = 0;
     int affectedCount = SPELL_FIREBALL_AFFECTED_HEX_COUNT;
+    long damage_c;
     for (frame = 0; frame < affectedCount; ++frame) {
-        if (affectedHexes[frame] != COMBAT_HEX_EMPTY &&
-            m_hexCells[affectedHexes[frame]].m_occupantSide !=
+        if (affectedHexes_f[frame] != COMBAT_HEX_EMPTY &&
+            m_hexCells[affectedHexes_f[frame]].m_occupantSide !=
                 COMBAT_HEX_EMPTY) {
-            target =
-                &m_armies[m_hexCells[affectedHexes[frame]].m_occupantSide]
-                         [m_hexCells[affectedHexes[frame]].m_occupantIndex];
-            if (target->SpellCastWorks(spell) &&
+            target_b =
+                &m_armies[m_hexCells[affectedHexes_f[frame]].m_occupantSide]
+                         [m_hexCells[affectedHexes_f[frame]].m_occupantIndex];
+            if (target_b->SpellCastWorks(spell) &&
                 !gArmyEffected
-                    [m_hexCells[affectedHexes[frame]].m_occupantSide]
-                    [m_hexCells[affectedHexes[frame]].m_occupantIndex]) {
+                    [m_hexCells[affectedHexes_f[frame]].m_occupantSide]
+                    [m_hexCells[affectedHexes_f[frame]].m_occupantIndex]) {
                 gArmyEffected
-                    [m_hexCells[affectedHexes[frame]].m_occupantSide]
-                    [m_hexCells[affectedHexes[frame]].m_occupantIndex] = 1;
-                if (target->m_damagePending == 0) {
-                    long damage = baseDamage;
+                    [m_hexCells[affectedHexes_f[frame]].m_occupantSide]
+                    [m_hexCells[affectedHexes_f[frame]].m_occupantIndex] = 1;
+                if (target_b->m_damagePending == 0) {
+                    damage_c = baseDamage_w;
                     if (spell == SPELL_COLD_RING &&
-                        target->m_monsterType == SPELL_MONSTER_FIRE_ELEMENTAL)
-                        damage <<= 1;
+                        target_b->m_monsterType == SPELL_MONSTER_FIRE_ELEMENTAL)
+                        damage_c <<= 1;
                     if ((spell == SPELL_FIREBALL ||
                          spell == SPELL_FIREBLAST) &&
-                        target->m_monsterType == SPELL_MONSTER_WATER_ELEMENTAL)
-                        damage *= 2;
-                    if (target->m_monsterType == SPELL_MONSTER_IRON_GOLEM ||
-                        target->m_monsterType == SPELL_MONSTER_STEEL_GOLEM) {
-                        damage = static_cast<long>(
-                            damage * SPELL_GOLEM_DAMAGE_MULTIPLIER);
+                        target_b->m_monsterType == SPELL_MONSTER_WATER_ELEMENTAL)
+                        damage_c *= 2;
+                    if (target_b->m_monsterType == SPELL_MONSTER_IRON_GOLEM ||
+                        target_b->m_monsterType == SPELL_MONSTER_STEEL_GOLEM) {
+                        damage_c = static_cast<long>(
+                            damage_c * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                     }
-                    target->Damage(damage, spell);
-                    anyAffected = 1;
+                    target_b->Damage(damage_c, spell);
+                    anyAffected_h = 1;
                 }
             }
         }
     }
-    if (anyAffected) {
-        ModifyDamageForArtifacts(&baseDamage, spell, m_heroes[m_currentSide],
+    if (anyAffected_h) {
+        ModifyDamageForArtifacts(&baseDamage_w, spell, m_heroes[m_currentSide],
                                  m_heroes[1 - m_currentSide]);
         if (spell == SPELL_COLD_RING)
-            sprintf(gText, "The cold ring does %d damage.", baseDamage);
+            sprintf(gText, "The cold ring does %d damage.", baseDamage_w);
         else
-            sprintf(gText, "The fireball does %d damage.", baseDamage);
+            sprintf(gText, "The fireball does %d damage.", baseDamage_w);
         CombatMessage(gText, 1, 1, 0);
-        target->PowEffect(-1, 1, -1, -1);
+        target_b->PowEffect(-1, 1, -1, -1);
     }
 }
 
-// @match-note retained 99.88%, combined live 96.91%: semantics, 0x40 frame
-// size, animation/damage CFG, and all
-// 30 relocation targets agree. The normalized instruction stream differs only
-// by delinked string/config/constant identities, but the relocation-union raw
-// audit retains 33 stack-slot and dependent branch bytes: retail places target,
-// frame, base damage, affected flag, and damage at -0x8/-0x10/-0x4/-0x30/-0x34;
-// current semantic names place them at -0x2c/-0x34/-0x8/-0x4/-0x38. Tried both
-// multidimensional and row-plus-index army addressing plus in-place doubling.
-// Revisit at 95% for the od_slots suffix pass or after predecessor changes.
 VA(0x00423d85, 0x3c9)
 void combatManager::MeteorShower(int targetHex)
 {
     if (!ValidHex(targetHex))
         return;
 
-    army *target = &m_armies[m_currentSide][0] + m_currentArmyIndex;
-    int affectedHexes[SPELL_METEOR_AFFECTED_HEX_COUNT];
-    affectedHexes[0] = targetHex;
+    army *target_k = &m_armies[m_currentSide][0] + m_currentArmyIndex;
+    int affectedHexes_f[SPELL_METEOR_AFFECTED_HEX_COUNT];
+    affectedHexes_f[0] = targetHex;
     int direction;
+    int frame;
     for (direction = 0; direction < SPELL_ADJACENT_DIRECTION_COUNT;
          ++direction) {
-        affectedHexes[direction + 1] =
+        affectedHexes_f[direction + 1] =
             GetAdjacentCellIndexNoArmy(targetHex, direction);
     }
 
@@ -1207,7 +1205,6 @@ void combatManager::MeteorShower(int targetHex)
         icon *meteorIcon = gpResourceManager->GetIcon("meteor.icn");
         for (direction = 0; direction < SPELL_METEOR_PASS_COUNT;
              ++direction) {
-            int frame;
             for (frame = 0; frame < SPELL_METEOR_FRAME_COUNT; ++frame) {
                 glTimers[0] = static_cast<int>(
                     KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] *
@@ -1224,40 +1221,41 @@ void combatManager::MeteorShower(int targetHex)
         gpResourceManager->Dispose(meteorIcon);
     }
 
-    int baseDamage =
+    int baseDamage_w =
         m_spellPower[m_currentSide] * SPELL_METEOR_DAMAGE_PER_POWER;
     ClearEffects();
-    int anyAffected = 0;
+    int anyAffected_h = 0;
+    long damage_c;
     for (direction = 0; direction < SPELL_METEOR_AFFECTED_HEX_COUNT;
          ++direction) {
-        if (affectedHexes[direction] != COMBAT_HEX_EMPTY &&
-            m_hexCells[affectedHexes[direction]].m_occupantSide !=
+        if (affectedHexes_f[direction] != COMBAT_HEX_EMPTY &&
+            m_hexCells[affectedHexes_f[direction]].m_occupantSide !=
                 COMBAT_HEX_EMPTY) {
-            target =
-                &m_armies[m_hexCells[affectedHexes[direction]].m_occupantSide]
-                         [m_hexCells[affectedHexes[direction]].m_occupantIndex];
-            if (target->SpellCastWorks(SPELL_METEOR_SHOWER) &&
+            target_k =
+                &m_armies[m_hexCells[affectedHexes_f[direction]].m_occupantSide]
+                         [m_hexCells[affectedHexes_f[direction]].m_occupantIndex];
+            if (target_k->SpellCastWorks(SPELL_METEOR_SHOWER) &&
                 !gArmyEffected
-                    [m_hexCells[affectedHexes[direction]].m_occupantSide]
-                    [m_hexCells[affectedHexes[direction]].m_occupantIndex]) {
+                    [m_hexCells[affectedHexes_f[direction]].m_occupantSide]
+                    [m_hexCells[affectedHexes_f[direction]].m_occupantIndex]) {
                 gArmyEffected
-                    [m_hexCells[affectedHexes[direction]].m_occupantSide]
-                    [m_hexCells[affectedHexes[direction]].m_occupantIndex] = 1;
-                if (target->m_damagePending == 0) {
-                    long damage = baseDamage;
-                    if (target->m_monsterType ==
+                    [m_hexCells[affectedHexes_f[direction]].m_occupantSide]
+                    [m_hexCells[affectedHexes_f[direction]].m_occupantIndex] = 1;
+                if (target_k->m_damagePending == 0) {
+                    damage_c = baseDamage_w;
+                    if (target_k->m_monsterType ==
                         SPELL_MONSTER_EARTH_ELEMENTAL)
-                        damage <<= 1;
-                    target->Damage(damage, SPELL_METEOR_SHOWER);
-                    anyAffected = 1;
+                        damage_c <<= 1;
+                    target_k->Damage(damage_c, SPELL_METEOR_SHOWER);
+                    anyAffected_h = 1;
                 }
             }
         }
     }
-    if (anyAffected) {
-        sprintf(gText, "The meteor shower does %d damage.", baseDamage);
+    if (anyAffected_h) {
+        sprintf(gText, "The meteor shower does %d damage.", baseDamage_w);
         CombatMessage(gText, 1, 1, 0);
-        target->PowEffect(-1, 1, -1, -1);
+        target_k->PowEffect(-1, 1, -1, -1);
     }
 }
 
@@ -2890,34 +2888,36 @@ mirror_found:
     DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 }
 
-// @match-note retained 99.88%, live 90.97% after later named-header constants:
-// complete hex selection, quantity artifact, AddArmy, ability flag, and duration
-// artifact semantics; the 0x1c frame and all 5 relocation targets agree. Before
-// the later header additions all 157 masked instructions were identical. The
-// current first divergence is modulo/index evaluation order. Do not tune this
-// affected function before 95%; accept the retained maximum with the new hash.
+// @match-note 99.97%: complete hex selection, quantity artifact, AddArmy,
+// ability flag, and duration artifacts; the 0x1c frame, every local slot, all
+// 157 instructions, and all five external relocation targets agree. The only
+// raw residual is four stack-displacement bytes at +0x94/+0x97 and
+// +0xd7/+0xda: retail loads randomOffset at -0x18 then offset at -0x14, while
+// ours loads the equivalent addition in the opposite order. Both operand
+// spellings compile identically, and a bounded syntax-aware AST pass found no
+// improvement. Revisit only after a TU compiler-state change.
 VA(0x00428951, 0x218)
 void combatManager::SummonElemental(int monsterType, int spellPower)
 {
-    unsigned char summonHexes[8];
-    summonHexes[0] = 14;
-    summonHexes[1] = 27;
-    summonHexes[2] = 40;
-    summonHexes[3] = 11;
-    summonHexes[4] = 24;
-    summonHexes[5] = 37;
-    int randomOffset = SRandom(0, 2);
+    unsigned char summonHexes_l[8];
+    summonHexes_l[0] = 14;
+    summonHexes_l[1] = 27;
+    summonHexes_l[2] = 40;
+    summonHexes_l[3] = 11;
+    summonHexes_l[4] = 24;
+    summonHexes_l[5] = 37;
+    int randomOffset_a = SRandom(0, 2);
     unsigned int summonHex = static_cast<unsigned int>(COMBAT_HEX_EMPTY);
     if (m_heroes[m_currentSide] != 0 &&
         m_heroes[m_currentSide]->HasArtifact(SPELL_ARTIFACT_BOOK_ELEMENTS))
         spellPower <<= 1;
     int offset;
     for (offset = 0; offset < 3; ++offset) {
-        if (m_hexCells[summonHexes[m_currentSide * 3 +
-                                   (randomOffset + offset) % 3]]
+        if (m_hexCells[summonHexes_l[m_currentSide * 3 +
+                                     (offset + randomOffset_a) % 3]]
                 .m_occupantSide == COMBAT_HEX_EMPTY)
-            summonHex = summonHexes[m_currentSide * 3 +
-                                    (randomOffset + offset) % 3];
+            summonHex = summonHexes_l[m_currentSide * 3 +
+                                      (offset + randomOffset_a) % 3];
     }
     m_unknown351D[m_currentSide] = static_cast<unsigned char>(monsterType);
     AddArmy(m_currentSide, monsterType,
@@ -3192,11 +3192,6 @@ void combatManager::Resurrect(int spell, int targetHex, int spellPower)
     target_i->m_monster.flags.abilityFlags &= ~RESURRECT_MONSTER_ABILITY;
 }
 
-// @match-note 97.87%: complete side-specific three-cell test; the 0x04 frame
-// matches and neither side has relocations. The only normalized residual is one
-// retail continuation `jmp` before the true return. Tried nested side arms and
-// the combined early-return condition. Revisit at 95% for inline continuation
-// shaping; do not repeat those equivalent condition forms.
 VA(0x004296de, 0xb9)
 int combatManager::SpaceForElementalExists(void)
 {
@@ -3209,7 +3204,8 @@ int combatManager::SpaceForElementalExists(void)
          m_hexCells[24].m_occupantSide != COMBAT_HEX_EMPTY &&
          m_hexCells[37].m_occupantSide != COMBAT_HEX_EMPTY))
         return 0;
-    return 1;
+    else
+        return 1;
 }
 
 // @early-stop
@@ -3280,7 +3276,9 @@ void combatManager::ModifyDamageForArtifacts(long *damage, int spell,
 // is the screen-copy row loop branch (`jge` versus retail `jle`); later residuals
 // are packed wallPos/towerPos local-label identities and keep impact ordering.
 // Tried cached/direct offsets, both height association orders, <= zero tests,
-// and both loop polarities. Revisit at 95% after layout/header stabilization.
+// both loop polarities, and an 80-walk syntax-aware AST permutation pass after
+// the 95% phase switch; the AST pass was byte-neutral. Revisit only for a new
+// frame/layout discovery, not further generic permutation.
 VA(0x00429ae0, 0x931)
 void combatManager::Earthquake(void)
 {
