@@ -5,6 +5,7 @@
 
 #include <va.h>
 #include <BASE/icon.h>
+#include <BASE/IconDraw.h>
 #include <BASE/resource.h>
 #include <BASE/resourceManager.h>
 #include <BASE/Misc.h>
@@ -50,23 +51,32 @@ icon::~icon()
 VA(0x004c7b00, 0x44)
 void icon::DrawToBuffer(int x, int y, int frame, int flip)
 {
-    if (flip == 0) {
-        IconToBitmap(this, gpWindowManager->m_screen, x, y, frame, 0, 0, 0, 0x280, 0x1e0, 0);
+    if (flip == ICON_DRAW_NORMAL) {
+        IconToBitmap(this, gpWindowManager->m_screen, x, y, frame,
+                     ICON_DRAW_NO_CLIP, 0, 0, ICON_DRAW_SCREEN_WIDTH,
+                     ICON_DRAW_SCREEN_HEIGHT, 0);
         return;
     }
-    FlipIconToBitmap(this, gpWindowManager->m_screen, x, y, frame, 0, 0, 0, 0x280, 0x1e0, 0);
+    FlipIconToBitmap(this, gpWindowManager->m_screen, x, y, frame,
+                     ICON_DRAW_NO_CLIP, 0, 0, ICON_DRAW_SCREEN_WIDTH,
+                     ICON_DRAW_SCREEN_HEIGHT, 0);
 }
 
 // @match-note
-// /O2 residual begins at +0xb: base is 0x2b3 bytes and retail is 0x2bb. Both have the same
-// CFG and ordered 37-relocation identity stream; the draw dispatcher is instruction-identical
-// after aligning retail +0x146 with base +0x13e. Only extent construction/rejection differs:
-// retail colors flip/index/limits as EAX/EBX/EDI while base uses EBX/EDI/EBX and factors the
-// entry-y load after the flip join. Cached/repeated typed entries, shared offsets, flip branch
-// orientations, direct/cached values, clipped-dimension locals, and reordered predicates were
-// already tried. Branch-produced/local top variants regressed to 81.49%/87.73% by changing
-// frame/liveness; an audited 80-attempt libclang AST pass retained nothing. Revisit after a
-// material exact predecessor/header-state change; this is not a certified permanent wall.
+// /O2 residual begins at +0xb: base is 0x2b3 bytes and retail is 0x2bb. Both
+// have the same frame, CFG, and ordered 37-relocation identity stream; the draw
+// dispatcher is instruction-identical after aligning retail +0x146 with base
+// +0x13e. Only extent construction/rejection differs: retail colors
+// flip/index/limits as EAX/EBX/EDI while base uses EBX/EDI/EBX and factors the
+// entry-y load after the flip join. Cached/repeated typed entries, shared
+// offsets, flip branch orientations, direct/cached values, clipped-dimension
+// locals, and reordered predicates were already tried. Branch-produced/local
+// top variants regressed to 81.49%/87.73% by changing frame/liveness. The old
+// literal-source 80-variant AST pass and a fresh 37-variant pass over the named
+// enum source retained nothing. A guarded 40-trial parser-visible TU-state pass
+// (seed 0x49434f4e) found no exact closure and retained nothing. Revisit only
+// after a material exact predecessor/header-state change; this is not a
+// certified permanent wall.
 VA(0x004c7b50, 0x2bb)
 int icon::CombatClipDrawToBuffer(int x, int y, int frame, struct SLimitData *limits,
                                  int flip, int offset, unsigned char *colorTable,
@@ -99,63 +109,88 @@ int icon::CombatClipDrawToBuffer(int x, int y, int frame, struct SLimitData *lim
                 giMaxExtentY = limits->bottom;
         }
         if (gbReturnAfterComputeExtent != 0)
-            return 0;
+            return ICON_DRAW_SKIPPED;
     }
 
     if (gbLimitToExtent != 0 &&
         (gbCurrArmyDrawn == 0 || limits->left > giMaxExtentX ||
          limits->right < giMinExtentX || limits->top > giMaxExtentY ||
          limits->bottom < giMinExtentY))
-        return 0;
+        return ICON_DRAW_SKIPPED;
 
     if (yModify != 0) {
-        if (flip == 0)
-            IconToBitmapYModify(this, gpWindowManager->m_screen, x, y, frame, 1,
-                                0, 0, 0x280, 0x1bc, offset, yModify);
+        if (flip == ICON_DRAW_NORMAL)
+            IconToBitmapYModify(this, gpWindowManager->m_screen, x, y, frame,
+                                ICON_DRAW_CLIP, 0, 0, ICON_DRAW_SCREEN_WIDTH,
+                                ICON_DRAW_COMBAT_HEIGHT, offset, yModify);
         else
-            FlipIconToBitmapYModify(this, gpWindowManager->m_screen, x, y, frame, 1,
-                                    0, 0, 0x280, 0x1bc, offset, yModify);
+            FlipIconToBitmapYModify(this, gpWindowManager->m_screen, x, y,
+                                    frame, ICON_DRAW_CLIP, 0, 0,
+                                    ICON_DRAW_SCREEN_WIDTH,
+                                    ICON_DRAW_COMBAT_HEIGHT, offset, yModify);
     } else if (colorTable != 0) {
-        if (flip == 0)
-            IconToBitmapColorTable(this, gpWindowManager->m_screen, x, y, frame, 1,
-                                   0, 0, 0x280, 0x1bc, offset, colorTable, 1);
+        if (flip == ICON_DRAW_NORMAL)
+            IconToBitmapColorTable(this, gpWindowManager->m_screen, x, y,
+                                   frame, ICON_DRAW_CLIP, 0, 0,
+                                   ICON_DRAW_SCREEN_WIDTH,
+                                   ICON_DRAW_COMBAT_HEIGHT, offset, colorTable,
+                                   ICON_COLOR_TABLE_APPLY_DIM);
         else
-            FlipIconToBitmapColorTable(this, gpWindowManager->m_screen, x, y, frame, 1,
-                                       0, 0, 0x280, 0x1bc, offset, colorTable);
+            FlipIconToBitmapColorTable(this, gpWindowManager->m_screen, x, y,
+                                       frame, ICON_DRAW_CLIP, 0, 0,
+                                       ICON_DRAW_SCREEN_WIDTH,
+                                       ICON_DRAW_COMBAT_HEIGHT, offset,
+                                       colorTable);
     } else if (gbLimitToExtent != 0) {
-        if (flip == 0)
-            IconToBitmap(this, gpWindowManager->m_screen, x, y, frame, 1,
+        if (flip == ICON_DRAW_NORMAL)
+            IconToBitmap(this, gpWindowManager->m_screen, x, y, frame,
+                         ICON_DRAW_CLIP,
                          giMinExtentX, giMinExtentY,
                          giMaxExtentX - giMinExtentX + 1,
                          giMaxExtentY - giMinExtentY + 1, offset);
         else
-            FlipIconToBitmap(this, gpWindowManager->m_screen, x, y, frame, 1,
+            FlipIconToBitmap(this, gpWindowManager->m_screen, x, y, frame,
+                             ICON_DRAW_CLIP,
                              giMinExtentX, giMinExtentY,
                              giMaxExtentX - giMinExtentX + 1,
                              giMaxExtentY - giMinExtentY + 1, offset);
-    } else if (flip == 0) {
-        IconToBitmap(this, gpWindowManager->m_screen, x, y, frame, 1,
-                     0, 0, 0x280, 0x1bc, offset);
+    } else if (flip == ICON_DRAW_NORMAL) {
+        IconToBitmap(this, gpWindowManager->m_screen, x, y, frame,
+                     ICON_DRAW_CLIP, 0, 0, ICON_DRAW_SCREEN_WIDTH,
+                     ICON_DRAW_COMBAT_HEIGHT, offset);
     } else {
-        FlipIconToBitmap(this, gpWindowManager->m_screen, x, y, frame, 1,
-                         0, 0, 0x280, 0x1bc, offset);
+        FlipIconToBitmap(this, gpWindowManager->m_screen, x, y, frame,
+                         ICON_DRAW_CLIP, 0, 0, ICON_DRAW_SCREEN_WIDTH,
+                         ICON_DRAW_COMBAT_HEIGHT, offset);
     }
-    return 1;
+    return ICON_DRAW_COMPLETED;
 }
 
 VA(0x004c7e10, 0x3d)
-void icon::ClipFillToBuffer(int p1, int p2, int p3, int p4, int p5, int p6, int p7, int p8, int p9)
+void icon::ClipFillToBuffer(int x, int y, int frame, int color, int flip,
+                            int clipX, int clipY, int clipW, int clipH)
 {
-    MonoIconToBitmap(this, gpWindowManager->m_screen, p1, p2, p3, p4, 1, p6, p7, p8, p9);
+    MonoIconToBitmap(this, gpWindowManager->m_screen, x, y, frame, color,
+                     ICON_DRAW_CLIP, clipX, clipY, clipW, clipH);
 }
 
+// @match-note: retail/base are both 0x103 bytes with the same 0x4-byte frame,
+// saved registers, CFG, and exact ordered 10-relocation offset/type/identity
+// stream by manual COFF audit. Under the final named-orientation enum state,
+// the sole relocation-masked raw residual is +0xbf: base emits
+// `cmp ebp,edx; jg`, retail `cmp edx,ebp; jl` for the equivalent top/max-Y
+// rejection. The same declaration changed the prior min-X compare residual
+// into exact bytes without changing the score. Reversing both predicates in
+// their respective TU states was byte-neutral; a bounded 13-variant libclang
+// AST pass found no gain. Revisit after an exact predecessor or shared-header
+// state change.
 VA(0x004c7e50, 0x103)
 void icon::FillToBuffer(int x, int y, int frame, int color, int flip,
                         struct SLimitData *limits)
 {
-    if (flip != 0) {
+    if (flip != ICON_DRAW_NORMAL) {
         FlipMonoIconToBitmap(this, gpWindowManager->m_screen, x, y, frame, color,
-                             0, 0, 0, 0, 0);
+                             ICON_DRAW_NO_CLIP, 0, 0, 0, 0);
         return;
     }
     if (gbLimitToExtent != 0 && limits != 0) {
@@ -171,17 +206,19 @@ void icon::FillToBuffer(int x, int y, int frame, int color, int flip,
             return;
     }
     MonoIconToBitmap(this, gpWindowManager->m_screen, x, y, frame, color,
-                     0, 0, 0, 0, 0);
+                     ICON_DRAW_NO_CLIP, 0, 0, 0, 0);
 }
 
 VA(0x004c7f60, 0x3e)
-void icon::DimToBuffer(int p1, int p2, int p3, int p4)
+void icon::DimToBuffer(int x, int y, int frame, int flip)
 {
-    if (p4 == 0) {
-        DimIconToBitmap(this, gpWindowManager->m_screen, p1, p2, p3, 0, 0, 0, 0, 0, 0);
+    if (flip == ICON_DRAW_NORMAL) {
+        DimIconToBitmap(this, gpWindowManager->m_screen, x, y, frame,
+                        ICON_DRAW_NO_CLIP, 0, 0, 0, 0, 0);
         return;
     }
-    FlipDimIconToBitmap(this, gpWindowManager->m_screen, p1, p2, p3, 0, 0, 0, 0, 0, 0);
+    FlipDimIconToBitmap(this, gpWindowManager->m_screen, x, y, frame,
+                        ICON_DRAW_NO_CLIP, 0, 0, 0, 0, 0);
 }
 
 
