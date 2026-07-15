@@ -588,11 +588,13 @@ void soundManager::StopSample(struct _SAMPLE *param_1)
 }
 
 // @early-stop
-// The complete +0x0..+0x202 range is raw-exact after masking the union of 23 relocation
-// payload offsets (candidate 23, retail 20). The candidate-only sites +0xc8, +0x11a, and
-// +0x141 are fixed-IAT calls in retail. The address table at +0x16e..+0x182, byte-index
-// table at +0x182..+0x1e7, and resumed code at +0x1e7 are otherwise byte-identical;
-// the remaining relocation-name differences are delinked self/local-label identities.
+// The explicit 0x202-byte CodeView range is raw-exact after relocation-union masking;
+// retail's enclosing row has two trailing padding bytes. Frame/slots and CFG are exact.
+// Candidate has 23 relocations versus retail's 20: candidate-only calls +0xc8/+0x11a
+// resolve to the linked AIL_set_sample_volume IAT VA 0x0053a78c, and +0x141 resolves
+// to AIL_start_sample at 0x0053a780, exactly the immediates embedded by retail. Other
+// residual identities are local switch labels, three $SG versus delinker-named string
+// constants with the same bytes, and gConfig+0xaa at the same retail VA 0x00528dca.
 VA(0x004ccc80, 0x202)
 void soundManager::ModifySample(struct _SAMPLE *sampleHandle, short operation, long value)
 {

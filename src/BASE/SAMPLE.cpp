@@ -11,16 +11,12 @@
 #include <SOURCE/KB.h>
 #include <string.h>
 // @early-stop
-// Byte-proven delinker-local artifact: moving the independent formatFlags assignment
-// after the three member stores recovered retail's constructor schedule. A direct
-// comparison of both 0x181-byte .text contributions now differs only in relocation
-// payloads at +0x94/+0x9b and the eight jump-table words at +0x124..+0x143 (the latter
-// range is recorded in build/gen/jump_tables.csv). Masking those 10 local relocations
-// leaves every code byte through +0x123 and the byte map at +0x144..+0x180 exact.
-// Manual COFF review gives 23/23 ordered relocations with every external target exact;
-// base names the local dispatch/table entries $L2430/$L2431/$L2389..., while delink
-// rewrites them to the containing constructor. Live 99.70% is therefore normalized
-// 100% source and must not be steered by changing layout, calls, or table structure.
+// The explicit 0x181-byte CodeView range is raw-exact after relocation-union masking;
+// retail's enclosing row has three trailing padding bytes. Frame/slots and CFG are
+// exact, as are all 13 external targets/addends. The remaining ten of 23 ordered sites
+// are dispatch/table locals at +0x94/+0x9b and +0x124..+0x143 (the table is recorded in
+// build/gen/jump_tables.csv): MSVC emits $L symbols, while the delinker rewrites them
+// as this constructor plus the same local offsets.
 VA(0x004dad60, 0x181)
 sample::sample(char *name, long channelType, long volume, long loopCount)
     : resource(6, gpResourceManager->MakeId(name, 1), 1, 0)

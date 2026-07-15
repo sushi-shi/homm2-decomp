@@ -17,9 +17,11 @@
 #include <BASE/INPUTMGR.h>
 #include <_carcass_types.h>
 // @early-stop
-// Relocation-masked raw bytes are identical over 0x004cdb50..0x004cde58. All 40
-// relocation occurrences align; residual identities are $L jump-table labels versus
-// the containing function and gConfig+0x30 versus its delinked interior constant.
+// The explicit 0x308-byte range is raw-exact after relocation-union masking, proving
+// frame/slots and CFG. All 40 ordered sites/types and every nonlocal runtime address
+// agree. Residual identities/addends are 14 local dispatch/table $L symbols rewritten
+// by the delinker as this function plus local offsets, and gConfig+0x30, whose retail
+// interior label is the same VA 0x00528d50.
 VA(0x004cdb50, 0x308)
 int KeyboardMessageHandler(void *, unsigned int message, unsigned int, long int messageData)
 {
@@ -106,11 +108,12 @@ int KeyboardMessageHandler(void *, unsigned int message, unsigned int, long int 
 }
 
 // @early-stop
-// Both objects are 0x36c bytes and have zero differing bytes after masking the union of
-// their relocation fields. Base has 59 relocations versus retail's 55: the four extra
-// sites are SetCapture x2 and ReleaseCapture x2 IAT references where retail embeds the
-// same import addresses. The remaining differences are delinked jump-table $L labels
-// versus this function and gConfig interior aliases; semantic targets agree.
+// The complete 0x36c-byte range is raw-exact after relocation-union masking, proving
+// frame/slots and CFG. Candidate has 59 relocations versus retail's 55. Its four extra
+// sites are SetCapture (+0xc1/+0xf9) and ReleaseCapture (+0xcf/+0x107); USER32's linked
+// IAT order proves the embedded retail VAs 0x0053a668/0x0053a66c are those exact calls.
+// Other identities are the eight local switch sites and gConfig+0x30/+0x34 interior
+// labels at the same retail VAs 0x00528d50/0x00528d54.
 VA(0x004cde60, 0x36c)
 int MouseMessageHandler(void *, unsigned int message, unsigned int, long int messageData)
 {
