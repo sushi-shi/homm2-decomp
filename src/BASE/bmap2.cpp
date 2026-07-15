@@ -36,14 +36,19 @@ void FillBitmapArea(class bitmap *bmp, int x, int y, int w, int h, int color)
 }
 
 // @match-note: retail/base are both 0x114 bytes with the same 0x8-byte local
-// area, saved-register set, CFG, and 7/7 external relocations. The first live
-// divergence is at +0x0: retail loads clipw before `sub esp,8`, while base
-// allocates the locals first; register allocation then differs throughout.
-// Compound, nested-positive (also seen in the secondary decomp), and early-
-// return overlap tests, +/-1 association, semantic bound names, a for-loop
-// fill, and pointer/counter initialization order were byte-neutral or remained
-// below the retained 94.44% maximum. Revisit only after a predecessor/TU-state
-// change or the systematic last-mile noise pass.
+// area, saved-register set, CFG, and 7/7 external relocation occurrences. The
+// first live divergence is +0x2d: base emits `cmp eax,ecx; jle`, retail
+// `cmp ecx,eax; jge`; equivalent operand-order residuals recur at +0x59,
+// +0x7b, +0x98, and the loop back-edge at +0x104. At +0xa2 retail schedules
+// the gFillRow zero store between loading m_pixels and adding it to
+// m_width*y, while base stores it before the pointer expression. Compound,
+// nested-positive (also seen in the secondary decomp), and early-return
+// overlap tests, +/-1 association, semantic bound names, a for-loop fill,
+// relational polarity, and pointer/counter initialization order were
+// byte-neutral or remained below the retained 94.44% maximum. A guarded
+// 40-trial parser-visible TU-state pass (seed 0x424d4150) found no exact
+// closure and retained nothing. Revisit only after an exact-preserving
+// predecessor or shared-header state change.
 VA(0x004ca450, 0x114)
 void FillBitmapAreaClip(class bitmap *bmp, int x, int y, int w, int h, int color, int clipx,
                         int clipy, int clipw, int cliph)
@@ -96,8 +101,11 @@ void BlitBitmap(class bitmap *src, int sx, int sy, int w, int h, class bitmap *d
 // audit, including uDimPal at +0x5f on both sides (the helper misresolves its
 // addend). The first non-relocation byte divergence is +0x80: base emits
 // `cmp eax,ebx; jg`, retail `cmp ebx,eax; jl`; the outer loop repeats that at
-// +0x9d. Relational reversals and a bounded libclang AST pass found no gain.
-// Revisit after a predecessor/TU-state change or the systematic last-mile pass.
+// +0x9d. Naming the 256-entry dim-palette level stride moved the canonical
+// live match to 97.20%, but relational reversals and a bounded libclang AST
+// pass found no further gain. A corrected 300-trial parser-visible TU-state
+// pass also found no exact closure and retained nothing. Revisit only after a
+// predecessor or shared-header state change.
 VA(0x004ca620, 0xa8)
 void DimBitmapArea(class bitmap *bmp, int x, int y, int w, int h, int level)
 {
@@ -105,7 +113,7 @@ void DimBitmapArea(class bitmap *bmp, int x, int y, int w, int h, int level)
     for (gDimRow = 0; gDimRow < h; gDimRow++) {
         gDimNext = gDimPtr + bmp->m_width;
         for (gDimCol = 0; gDimCol < w; gDimCol++) {
-            *gDimPtr = uDimPal[0][0][level * 256 + *gDimPtr];
+            *gDimPtr = uDimPal[0][0][level * BITMAP_DIM_PALETTE_LEVEL_STRIDE + *gDimPtr];
             gDimPtr++;
         }
         gDimPtr = gDimNext;

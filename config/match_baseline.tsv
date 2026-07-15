@@ -347,9 +347,9 @@ BASE/WINMGR	?SaveFizzleSource@heroWindowManager@@QAEXHHHH@Z	100.0000	f1d436323ca
 BASE/WINMGR	?ScreenShot@heroWindowManager@@QAEXXZ	100.0000	44ad654f69c2
 BASE/WINMGR	?UpdateScreen@heroWindowManager@@QAEXXZ	100.0000	4077d1619d5f
 BASE/WINMGR	?UpdateScreenRegion@heroWindowManager@@QAEXHHHH@Z	100.0000	67a73e466f64
-BASE/bmap2	?BlitBitmap@@YIXPAVbitmap@@HHHH0HH@Z	100.0000	5e0b0dd6c9fb
-BASE/bmap2	?DimBitmapArea@@YIXPAVbitmap@@HHHHH@Z	97.2000	db245b4a968b
-BASE/bmap2	?FillBitmapArea@@YIXPAVbitmap@@HHHHH@Z	100.0000	572b2dc2349c
+BASE/bmap2	?BlitBitmap@@YIXPAVbitmap@@HHHH0HH@Z	100.0000	eb1685809646
+BASE/bmap2	?DimBitmapArea@@YIXPAVbitmap@@HHHHH@Z	97.2000	87da983049bd
+BASE/bmap2	?FillBitmapArea@@YIXPAVbitmap@@HHHHH@Z	100.0000	0ea6ad84f51a
 BASE/bmap2	?FillBitmapAreaClip@@YIXPAVbitmap@@HHHHHHHHH@Z	94.4444	5a8565510c2c
 BASE/droplist	??0dropListWidget@@QAE@XZ	100.0000	36ab848d613b
 BASE/droplist	??1dropListWidget@@UAE@XZ	100.0000	29c47fbb75ad
@@ -639,7 +639,7 @@ SOURCE/COMMAND	?CycleCombatScreen@combatManager@@QAEXXZ	97.7986	f8639a129065
 SOURCE/COMMAND	?DoCommand@combatManager@@QAEXH@Z	99.5785	414c6f4727dd
 SOURCE/COMMAND	?DoLoseWindow@combatManager@@QAEXXZ	99.7385	e06a82438dbe
 SOURCE/COMMAND	?DoSurrender@combatManager@@QAEHXZ	99.8723	dfcac7898ec2
-SOURCE/COMMAND	?DoVictory@combatManager@@QAEXH@Z	97.7321	4ddd86e596cb
+SOURCE/COMMAND	?DoVictory@combatManager@@QAEXH@Z	97.7338	4ddd86e596cb
 SOURCE/COMMAND	?GetCommand@combatManager@@QAEHH@Z	94.5875	cf061ce68599
 SOURCE/COMMAND	?GetControl@combatManager@@QAEXXZ	96.5185	65d38ff46ade
 SOURCE/COMMAND	?GetPointer@combatManager@@QAEHHH@Z	100.0000	a95296cdb0a6
