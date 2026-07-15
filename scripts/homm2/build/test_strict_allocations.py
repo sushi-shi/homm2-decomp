@@ -35,6 +35,10 @@ def _relocation(start, target):
     }
 
 
+def _set_data(symbol, data):
+    symbol["data_diff"] = [{"data": _encoded(data), "size": str(len(data))}]
+
+
 def fixture():
     target_table = _symbol("table", 0, b"\0" * 8)
     target_table["data_relocations"] = [_relocation(0, 1), _relocation(4, 2)]
@@ -84,16 +88,80 @@ class StrictAllocationAdapterTests(unittest.TestCase):
                 return_value=retail):
             return derive_manifest("SOURCE/UNIT", rows, diff, inventory, "retail.exe")
 
-    def test_derives_payload_proven_bijective_mapping(self):
+    def test_derives_const_target_occurrence_mappings(self):
         diff, row, retail, inventory = fixture()
         inventory["const_a"].append({"rva": 0x9000})
         manifest, excluded = self.derive(diff, [row], retail, inventory)
         self.assertEqual(excluded, [])
-        self.assertEqual(manifest["symbol_mappings"], {
-            "const_a": "$SG1",
-            "const_b": "$SG2",
-        })
+        self.assertEqual(manifest["symbol_mappings"], {})
         self.assertEqual(manifest["allocations"][0]["target_name"], "table")
+        self.assertEqual(manifest["allocations"][0]["relocation_mappings"], [
+            {"offset": 0, "type": 6, "addend": 0,
+             "target_name": "const_a", "base_name": "$SG1"},
+            {"offset": 4, "type": 6, "addend": 0,
+             "target_name": "const_b", "base_name": "$SG2"},
+        ])
+
+    def test_derives_decorated_name_collision_by_authoritative_rva(self):
+        diff, row, retail, inventory = fixture()
+        decorated = "??_C@_04DEMO@same?$AA@"
+        diff["left"]["symbols"][1]["name"] = decorated
+        diff["left"]["symbols"][0]["data_relocations"][1]["relocation"][
+            "target_symbol"] = 1
+        inventory = {decorated: [{"rva": 0x3000}, {"rva": 0x3010}]}
+        manifest, excluded = self.derive(diff, [row], retail, inventory)
+        self.assertEqual(excluded, [])
+        mappings = manifest["allocations"][0]["relocation_mappings"]
+        self.assertEqual([item["target_name"] for item in mappings],
+                         [decorated, decorated])
+        self.assertEqual([item["base_name"] for item in mappings], ["$SG1", "$SG2"])
+
+    def test_derives_cross_table_decorated_collision_by_rva(self):
+        decorated = "??_C@_04DEMO@same?$AA@"
+        left_one = _symbol("table", 0, b"\0" * 4)
+        left_two = _symbol("table_two", 4, b"\0" * 4)
+        left_one["data_relocations"] = [_relocation(0, 2)]
+        left_two["data_relocations"] = [_relocation(4, 2)]
+        right_one = _symbol("table", 16, b"\0" * 4)
+        right_two = _symbol("table_two", 20, b"\0" * 4)
+        right_one["data_relocations"] = [_relocation(16, 2)]
+        right_two["data_relocations"] = [_relocation(20, 3)]
+        diff = {
+            "left": {
+                "sections": [{"name": ".data", "kind": "SECTION_DATA"}],
+                "symbols": [left_one, left_two, _symbol(decorated)],
+            },
+            "right": {
+                "sections": [{"name": ".data", "kind": "SECTION_DATA"}],
+                "symbols": [right_one, right_two,
+                            _symbol("$SG1", data=b"same\0"),
+                            _symbol("$SG2", data=b"same\0")],
+            },
+        }
+        row = {
+            "name": "table", "unit": "SOURCE/UNIT", "size": 4,
+            "retail_rva": 0x2000, "retail_sha256": "table-hash",
+            "highlow_count": 1, "audit": "cstring-pointer-table",
+        }
+        second = {**row, "name": "table_two", "retail_rva": 0x2010}
+        literal_hash = hashlib.sha256(b"same").hexdigest()
+        retail = [{
+            "sha256": "table-hash", "highlow_base_relocation_count": 1,
+            "highlow_relative_offsets": [0],
+            "cstring_targets": [{"rva": 0x3000, "sha256": literal_hash}],
+        }, {
+            "sha256": "table-hash", "highlow_base_relocation_count": 1,
+            "highlow_relative_offsets": [0],
+            "cstring_targets": [{"rva": 0x3010, "sha256": literal_hash}],
+        }]
+        inventory = {decorated: [{"rva": 0x3000}, {"rva": 0x3010}]}
+        with mock.patch(
+                "homm2.build.strict_allocations.read_pe_payload_evidence",
+                side_effect=retail):
+            manifest, excluded = derive_manifest(
+                "SOURCE/UNIT", [row, second], diff, inventory, "retail.exe")
+        self.assertEqual(excluded, [])
+        self.assertEqual(len(manifest["allocations"]), 2)
 
     def test_rejects_rows_from_another_unit(self):
         diff, row, retail, inventory = fixture()
@@ -118,7 +186,7 @@ class StrictAllocationAdapterTests(unittest.TestCase):
 
     def test_rejects_candidate_payload_mismatch(self):
         diff, row, retail, inventory = fixture()
-        diff["right"]["symbols"][1]["data_diff"][0]["data"] = _encoded(b"wrong\0")
+        _set_data(diff["right"]["symbols"][1], b"wrong\0")
         manifest, excluded = self.derive(diff, [row], retail, inventory)
         self.assertEqual(manifest["allocations"], [])
         self.assertIn("payload differs", excluded[0]["reason"])
@@ -130,19 +198,19 @@ class StrictAllocationAdapterTests(unittest.TestCase):
         self.assertEqual(manifest["allocations"], [])
         self.assertIn("2 defined object identities", excluded[0]["reason"])
 
-    def test_rejects_identity_partition_mismatch(self):
+    def test_rejects_retail_alias_split_across_base_identities(self):
         diff, row, retail, inventory = fixture()
         diff["left"]["symbols"][0]["data_relocations"][1]["relocation"][
             "target_symbol"] = 1
-        diff["right"]["symbols"][2]["data_diff"][0]["data"] = _encoded(b"same\0")
+        _set_data(diff["right"]["symbols"][2], b"same\0")
         retail["cstring_targets"][1] = dict(retail["cstring_targets"][0])
         manifest, excluded = self.derive(diff, [row], retail, inventory)
         self.assertEqual(manifest["allocations"], [])
-        self.assertIn("equality partition differs", excluded[0]["reason"])
+        self.assertIn("RVA to base identity mapping", excluded[0]["reason"])
 
     def test_rejects_non_bijective_cross_table_mapping(self):
         diff, row, retail, inventory = fixture()
-        diff["right"]["symbols"][2]["data_diff"][0]["data"] = _encoded(b"same\0")
+        _set_data(diff["right"]["symbols"][2], b"same\0")
         retail["cstring_targets"][1]["sha256"] = hashlib.sha256(b"same").hexdigest()
         second = copy.deepcopy(row)
         second["name"] = "table_two"

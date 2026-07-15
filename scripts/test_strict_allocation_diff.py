@@ -120,6 +120,57 @@ class StrictAllocationDiffTests(unittest.TestCase):
                 relocation["relocation"][field] = value
                 self.assertIn("relocations differ", audit(diff, manifest)[0])
 
+    def test_explicit_relocation_mapping_checks_each_occurrence(self):
+        diff, manifest = fixture()
+        manifest["symbol_mappings"] = {"target_data": "base_data"}
+        manifest["allocations"][0]["relocation_mappings"] = [{
+            "offset": 4,
+            "type": 6,
+            "addend": 4,
+            "target_name": "target_ref",
+            "base_name": "base_ref",
+        }]
+        self.assertEqual(audit(diff, manifest), [])
+
+        manifest["allocations"][0]["relocation_mappings"][0]["base_name"] = "wrong_ref"
+        self.assertIn("base relocations differ from reviewed", audit(diff, manifest)[0])
+
+    def test_explicit_relocation_mapping_must_cover_exact_offsets(self):
+        diff, manifest = fixture()
+        manifest["allocations"][0]["relocation_mappings"] = []
+        self.assertIn("target relocations differ from reviewed", audit(diff, manifest)[0])
+
+    def test_negative_section_index_is_rejected(self):
+        diff, manifest = fixture()
+        diff["left"]["symbols"][0]["section"] = -1
+        self.assertIn("section index -1 is invalid", audit(diff, manifest)[0])
+
+    def test_negative_relocation_target_index_is_rejected(self):
+        diff, manifest = fixture()
+        relocation = diff["left"]["symbols"][0]["data_relocations"][0]
+        relocation["relocation"]["target_symbol"] = -1
+        self.assertIn("invalid relocation target -1", audit(diff, manifest)[0])
+
+    def test_data_diff_chunks_are_concatenated_without_opposite_side_segments(self):
+        diff, manifest = fixture()
+        for side in ("left", "right"):
+            diff[side]["symbols"][0]["data_diff"] = [
+                {"data": encoded(b"ABCD"), "size": 4},
+                {"kind": "DIFF_INSERT", "size": 12},
+                {"data": encoded(b"1234"), "size": 4},
+            ]
+        self.assertEqual(audit(diff, manifest), [])
+
+    def test_data_diff_chunk_size_mismatch_is_rejected(self):
+        diff, manifest = fixture()
+        diff["left"]["symbols"][0]["data_diff"][0]["size"] = 7
+        self.assertIn("segment payload has size", audit(diff, manifest)[0])
+
+    def test_unknown_payload_free_data_diff_segment_is_rejected(self):
+        diff, manifest = fixture()
+        diff["left"]["symbols"][0]["data_diff"] = [{"kind": "UNKNOWN", "size": 8}]
+        self.assertIn("neither payload nor diff-side kind", audit(diff, manifest)[0])
+
     def test_duplicate_definition_fails(self):
         diff, manifest = fixture()
         diff["left"]["symbols"].insert(1, copy.deepcopy(diff["left"]["symbols"][0]))

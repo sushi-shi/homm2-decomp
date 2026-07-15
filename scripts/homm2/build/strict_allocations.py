@@ -38,10 +38,18 @@ def _number(value):
 
 
 def _payload(symbol):
-    return b"".join(
-        base64.b64decode(segment.get("data", ""))
-        for segment in symbol.get("data_diff", [])
-    )
+    chunks = []
+    for segment in symbol.get("data_diff", []):
+        if "data" not in segment:
+            if segment.get("kind") not in {"DIFF_DELETE", "DIFF_INSERT"}:
+                raise ValueError("data_diff segment has neither payload nor diff-side kind")
+            continue
+        chunk = base64.b64decode(segment["data"])
+        size = _number(segment.get("size"))
+        if len(chunk) != size:
+            raise ValueError("data_diff segment payload size differs from its serialized size")
+        chunks.append(chunk)
+    return b"".join(chunks)
 
 
 def _cstring(symbol):
@@ -97,11 +105,6 @@ def load_literal_inventory(path=SYMBOLS):
                 continue
             by_name[row["name"]].append({**row, "rva": int(row["rva"], 0)})
     return dict(by_name)
-
-
-def _identity_pattern(values):
-    identities = {}
-    return [identities.setdefault(value, len(identities)) for value in values]
 
 
 def _prove_base_literal(side, symbol):
@@ -216,61 +219,53 @@ def derive_manifest(unit, rows, diff, literal_inventory, retail_exe=RETAIL_EXE):
                     "base_name": base_name,
                 })
 
-            target_pattern = _identity_pattern(
-                [item["target_name"] for item in row_observations])
-            rva_pattern = _identity_pattern(
-                [item["target_rva"] for item in row_observations])
-            base_pattern = _identity_pattern(
-                [item["base_name"] for item in row_observations])
-            if not target_pattern == rva_pattern == base_pattern:
-                raise ValueError(
-                    "literal equality partition differs between target names, retail RVAs, and base names")
             observations.extend(row_observations)
         except (KeyError, TypeError, ValueError) as error:
             _exclude(excluded, row, str(error))
 
     active = [item for item in observations if item["row"]["name"] not in excluded]
-    target_to_base = defaultdict(set)
-    base_to_target = defaultdict(set)
+    rva_to_base = defaultdict(set)
+    base_to_rva = defaultdict(set)
     for item in active:
-        target_to_base[item["target_name"]].add(item["base_name"])
-        base_to_target[item["base_name"]].add(item["target_name"])
-    ambiguous_targets = {name for name, values in target_to_base.items() if len(values) != 1}
-    ambiguous_bases = {name for name, values in base_to_target.items() if len(values) != 1}
+        rva_to_base[item["target_rva"]].add(item["base_name"])
+        base_to_rva[item["base_name"]].add(item["target_rva"])
+    ambiguous_rvas = {rva for rva, values in rva_to_base.items() if len(values) != 1}
+    ambiguous_bases = {name for name, values in base_to_rva.items() if len(values) != 1}
     for item in active:
-        if item["target_name"] in ambiguous_targets or item["base_name"] in ambiguous_bases:
+        if item["target_rva"] in ambiguous_rvas or item["base_name"] in ambiguous_bases:
             _exclude(
                 excluded,
                 item["row"],
-                "literal mapping is not globally bijective (%r -> %r)" %
-                (item["target_name"], item["base_name"]),
+                "retail literal RVA to base identity mapping is not globally bijective "
+                "(%#x -> %r)" % (item["target_rva"], item["base_name"]),
             )
 
     active = [item for item in observations if item["row"]["name"] not in excluded]
-    mappings = {}
-    target_partitions = defaultdict(set)
-    base_partitions = defaultdict(set)
+    observations_by_row = defaultdict(list)
     for item in active:
-        mappings[item["target_name"]] = item["base_name"]
-        signature = (item["row"]["name"], item["offset"], item["type"], item["addend"])
-        target_partitions[item["target_name"]].add(signature)
-        base_partitions[item["base_name"]].add(signature)
-    for target_name, base_name in mappings.items():
-        if target_partitions[target_name] != base_partitions[base_name]:
-            raise AssertionError("internal literal occurrence partition mismatch")
-
-    accepted_names = {item["row"]["name"] for item in active}
+        observations_by_row[item["row"]["name"]].append(item)
     for row in rows:
-        if row["audit"] == "cstring-pointer-table" and row["name"] in accepted_names:
+        if row["audit"] == "cstring-pointer-table" and row["name"] in observations_by_row:
             allocations.append({
                 "target_name": row["name"],
                 "extent": row["size"],
                 "section_kind": "SECTION_DATA",
+                "relocation_mappings": [
+                    {
+                        "offset": item["offset"],
+                        "type": item["type"],
+                        "addend": item["addend"],
+                        "target_name": item["target_name"],
+                        "base_name": item["base_name"],
+                    }
+                    for item in sorted(
+                        observations_by_row[row["name"]], key=lambda item: item["offset"])
+                ],
             })
     allocations.sort(key=lambda item: item["target_name"])
     return {
         "version": 1,
-        "symbol_mappings": dict(sorted(mappings.items())),
+        "symbol_mappings": {},
         "section_mappings": {},
         "allocations": allocations,
     }, sorted(excluded.values(), key=lambda item: item["name"])
@@ -349,7 +344,9 @@ def audit_units(units=None, output=OUTPUT, runner=_run, keep_diffs=False):
             "ledger_rows": len(by_unit[unit]),
             "audited_rows": len(manifest["allocations"]),
             "excluded_rows": len(excluded),
-            "mapping_count": len(manifest["symbol_mappings"]),
+            "mapping_count": len(manifest["symbol_mappings"]) + sum(
+                len(allocation.get("relocation_mappings", []))
+                for allocation in manifest["allocations"]),
             "status": "passed" if check.returncode == 0 else "failed",
             "errors": [line for line in check.stderr.splitlines() if line],
         })
