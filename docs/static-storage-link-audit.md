@@ -38,6 +38,8 @@ are not independent requests for padding, address annotations, or linker tricks.
 Fix the earliest credible cause, relink, and inspect the new run boundaries. Source
 definitions must continue to model the proven initializer and storage class. Do not
 add giant padding objects or overlapping storage to reproduce a final-image gap.
+The byte and owner analysis for the first `.rdata` transition is recorded in
+[`rdata-contribution-audit.md`](rdata-contribution-audit.md).
 
 ## Limits
 
