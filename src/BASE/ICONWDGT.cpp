@@ -5,6 +5,7 @@
 
 #include <va.h>
 #include <BASE/iconWidget.h>
+#include <BASE/widgetKind.h>
 #include <BASE/icon.h>
 #include <BASE/heroWindow.h>
 #include <BASE/Misc.h>
@@ -71,7 +72,7 @@ void iconWidget::Read(void)
     m_icon = gpResourceManager->GetIcon(m_iconId);
     gpResourceManager->RestorePosition();
     m_frame = gpResourceManager->ReadWord();
-    m_flip = static_cast<char>(gpResourceManager->ReadWord());
+    m_flip = static_cast<signed char>(gpResourceManager->ReadWord());
     m_id = gpResourceManager->ReadWord();
     m_kind = gpResourceManager->ReadWord();
     m_fillColor = gpResourceManager->ReadWord() & 0xff;
@@ -83,11 +84,17 @@ iconWidget::~iconWidget()
     gpResourceManager->Dispose(m_icon);
 }
 
-// @early-stop
-// All 0x291 code bytes are identical after masking 17 aligned relocations, and all
-// external targets agree. Objdiff's residual is only the retail containing-function
-// identity for two switch-dispatch references and five jump-table entries versus
-// VC4.2's equivalent $L local-label relocations.
+// @match-note
+// Candidate and retail are both 0x291 with the same frame and CFG. In the required
+// WidgetKind enum TU state, the only non-relocation spans are +0x9e..+0x9f and
+// +0xa1..+0xa2: candidate compares m_x to relativeX and branches JG, while retail
+// compares relativeX to m_x and branches JL. All 17 relocation offsets/types align;
+// the 10 external targets agree, while two switch-dispatch references and five
+// jump-table entries are the proven retail-containing-function versus $L identity
+// artifact. m_x<=relativeX, relativeX>=m_x, and !(relativeX<m_x) lower identically
+// in this typed TU state. The latter polarity was raw exact before introducing the
+// canonical enum header, but that untyped state is not retained. Revisit after a real
+// predecessor/header TU-state change; this is not a byte-proven early stop.
 VA(0x004d0cd0, 0x291)
 int iconWidget::Main(tag_message &msg)
 {
@@ -180,12 +187,18 @@ normalEvent:
 }
 
 // @match-note
-// /O2 two-instruction scheduling wall: base and retail are both 0xe5 bytes and all
-// 4 relocation targets agree. All instructions are identical except +0x64..+0x6b:
-// base loads m_width before subtracting entry->y, while retail performs those two
-// independent instructions in the opposite order. Direct member expressions,
-// cached width/icon-width locals, declaration/statement reordering, comma sequencing,
-// both x/y subtraction orders, and all three syntax-aware AST variants were tried.
+// Candidate and retail are both 0xe5 with the same frame, switch CFG, and 4 ordered
+// relocation offsets/types/targets. In the required WidgetKind enum TU state the
+// non-relocation spans are +0x62..+0x63, +0x65..+0x68, +0x69..+0x6c, +0x71..+0x72,
+// +0x76..+0x77, +0x79..+0x7a, +0x7b..+0x7c, +0x7d..+0x7e, and +0x80..+0x81.
+// Candidate assigns iconWidth/widgetWidth to CX/DX and centers through EDX; retail
+// uses DX/CX and EBP. Direct/cached widths, declaration and subtraction order,
+// comma sequencing, all three libclang AST variants, normal enum-include positions,
+// and a separate semantic top/left-local form were tried. Twenty-four guarded
+// typed-TU probes produced no exact closure; several recovered the earlier six-byte
+// schedule residual, but those sub-100 probe scores were correctly discarded.
+// Revisit after a real predecessor/header TU-state change; this is not a
+// byte-proven early stop.
 VA(0x004d0f70, 0xe5)
 void iconWidget::Draw(void)
 {
@@ -196,12 +209,12 @@ void iconWidget::Draw(void)
     x += m_x;
     y += m_y;
 
-    switch (kind) {
-    case 0x10:
+    switch (DecodeWidgetKind(kind)) {
+    case WIDGET_KIND_ICON_DIRECT:
         m_icon->DrawToBuffer(x, y, m_frame, m_flip);
         return;
 
-    case 0x11: {
+    case WIDGET_KIND_ICON_CENTERED: {
         IconEntry *entry = GetIconEntry(m_icon, m_frame);
         short widgetWidth;
         short iconWidth;
@@ -217,7 +230,7 @@ void iconWidget::Draw(void)
         return;
     }
 
-    case 0x80:
+    case WIDGET_KIND_ICON_FILL:
         m_icon->FillToBuffer(x, y, m_frame, m_fillColor, m_flip, 0);
         return;
     }
