@@ -363,6 +363,9 @@ int hero::Dismiss(void) {
 // to load/OR-or-AND/store, while whole-word compound and explicit assignments select memory
 // operations. The removed 32-bit/split bitfield aliases were also tried; the residual is
 // compiler-selected accessor and mask-operation shape.
+// A post-95 40-walk AST pass retained no mutation. An isolated eight-trial
+// TU-state sweep also found no audited exact closure; generated probes were
+// discarded. Revisit only after a material accessor or shared-layout change.
 VA(0x0046cee8, 0x587)
 void hero::Deallocate(int updateMap) {
     int availableHeroSlotCurrent;
@@ -587,7 +590,8 @@ void hero::ApplyBattleLossTemps(void) {
     ApplyBattleWinTemps();
 }
 
-// @match-note 99.52%: semantics, CFG, the 0x118 frame, line/statBonuses/newLevel/
+// @early-stop
+// 99.52%: semantics, CFG, the 0x118 frame, line/statBonuses/newLevel/
 // levelsGained/currentLevel/sample/index/highLevel/skillChoices/attempts/skillIndex/
 // skillWeight/randomValue slots at -0xc8/-0xd8/-0xdc/-0xe0/-0xe4/-0xec..-0xe8/
 // -0xf0/-0xf4/-0xfc..-0xf8/-0x100/-0x104/-0x108/-0x10c, and all 58/58
@@ -597,7 +601,9 @@ void hero::ApplyBattleLossTemps(void) {
 // by exactly those 10 bytes and every non-jump opcode, operand, and visible stack offset
 // agrees. Empty-positive/else outer flow, branch polarity, regular `break`, indexed Wisdom
 // assignment, real table typing, and computed stack-name/declaration order were tried;
-// only the byte-proven local-label/trampoline shape remains.
+// only the byte-proven local-label/trampoline shape remains. A post-95
+// 30-walk AST pass retained no mutation. Fresh masked disassembly reconfirmed
+// the two jumps as the only non-relocation instruction differences.
 VA(0x0046d83f, 0x828)
 void hero::CheckLevel(void) {
     int statBonuses[HERO_PRIMARY_STAT_COUNT];
@@ -780,7 +786,9 @@ int hero::NumArtifacts(void) {
 // secondary-skill range near +0x59e: retail uses one jge plus tail trampolines,
 // while the value-equivalent invalid-range spelling uses jl and continuation
 // jumps. Direct range bounds and both positive/negative third-range forms select
-// the same residual range-check lowering.
+// the same residual range-check lowering. A post-95 30-walk AST pass retained
+// no mutation, and an isolated eight-trial TU-state sweep found no audited
+// exact closure. Revisit only after a material TU-state change.
 VA(0x0046e0be, 0x758)
 void UpdateHeroScreenStatusBar(struct tag_message &message) {
     int armySlot;
@@ -946,7 +954,7 @@ default_hero_text:
     HeroMessageUpdate(gText);
 }
 
-// @match-note 93.73%: complete message, hero-cycle, stat, army, artifact, skill,
+// @match-note 94.47%: complete message, hero-cycle, stat, army, artifact, skill,
 // formation, and exit behavior. Retail and base both use a 0x60 frame: message is
 // at -0x4c, exit/quick-view at -0x10/-0x18, army temporaries at -0x08/-0x0c,
 // secondary skill at -0x14, hero position at -0x1c, experience temporaries at
@@ -955,9 +963,11 @@ default_hero_text:
 // the main jump table agree; the relocation multiset differs only by retail's two
 // extra gpHVHero loads in the formation assignments. Retail call order places the
 // ViewArmy body before transfer/split, recovered with the positive view condition.
-// Residuals are hover operand load order, hero-cycle arithmetic lowering and local
-// continuations, plus the two load/modify/store formation updates; the equivalent
-// source polarities and assignment spellings select the remaining base forms.
+// The direct direction ternary recovers retail's `sbb; and -2; inc` hero-cycle
+// arithmetic and raised the retained score from 94.00%. Residuals are hover
+// operand load order, two local continuations, and the two load/modify/store
+// formation updates; reversing the hover equality was byte-neutral. An isolated
+// eight-trial TU-state sweep found no audited exact closure.
 VA(0x0046e816, 0xaef)
 int HeroHandler(struct tag_message &message) {
     int handlerValue16;
@@ -1026,10 +1036,9 @@ int HeroHandler(struct tag_message &message) {
                             heroPosition5 =
                                 gpGame->HeroIDToHeroPos(gpCurPlayer, gpHVHero->m_id);
                             heroPosition5 =
-                                (((static_cast<unsigned int>(message.payload.widget.id -
-                                        HERO_UI_PREVIOUS_HERO) >= 1) - 1 &
-                                    HERO_UI_PREVIOUS_HERO_MASK) +
-                                    1 + gpCurPlayer->m_heroCount + heroPosition5) %
+                                ((static_cast<unsigned int>(message.payload.widget.id -
+                                      HERO_UI_PREVIOUS_HERO) >= 1 ? 1 : -1) +
+                                    gpCurPlayer->m_heroCount + heroPosition5) %
                                 gpCurPlayer->m_heroCount;
                             gpHVHero = &gpGame->m_heroRecs[
                                 gpCurPlayer->m_heroIds[heroPosition5]];
@@ -1331,7 +1340,7 @@ int HeroView(int heroId, int noDismiss, int fadeAlreadyOut) {
     }
 }
 
-// @match-note 98.77%: complete title, hero-cycle, stat, dismissal, portrait,
+// @match-note retained 98.99%: complete title, hero-cycle, stat, dismissal, portrait,
 // luck, morale, experience, formation, spell-point, crest, army, secondary-
 // skill, artifact, and status-message behavior. The retail 0x58 frame is
 // restored with distinct luck, morale, and skill-bonus locals. All 143
@@ -1345,7 +1354,9 @@ int HeroView(int heroId, int noDismiss, int fadeAlreadyOut) {
 // repeated modifier-icon comparisons. The player-color inline accessor
 // continuation is present, with its jump placed before rather than after the
 // field load. Structural recovery and direct source-polarity steering are
-// exhausted; the remaining differences are TU-cumulative compiler shape.
+// exhausted. A post-95 30-walk AST pass retained no mutation, and an isolated
+// eight-trial TU-state sweep found no audited exact closure. The remaining
+// differences are TU-cumulative compiler shape.
 VA(0x0046f56c, 0x9c5)
 void SetupHeroView(void) {
     int cannotDismiss;
