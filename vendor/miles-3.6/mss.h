@@ -27,6 +27,10 @@
 /*    emit the observed `call dword ptr [__imp__AIL_*@N]` indirect thunks.   */
 /*==========================================================================*/
 
+/* This clean-room API shim uses the canonical MSVC Win32 multimedia types. */
+#include <windows.h>
+#include <mmsystem.h>
+
 /* ---- fixed-width scalars (Miles' own aliases; not defined elsewhere) ---- */
 #ifndef U8
 #define U8  unsigned char
@@ -66,23 +70,6 @@ typedef struct _MDI_DRIVER FAR* HMDIDRIVER;   /* XMIDI driver                */
 typedef struct _SAMPLE     FAR* HSAMPLE;      /* digital sample              */
 typedef struct _SEQUENCE   FAR* HSEQUENCE;    /* XMIDI sequence              */
 typedef struct _REDBOOK    FAR* HREDBOOK;     /* Red Book (CD audio) handle  */
-
-/* ---- Win32 multimedia handles used by the MMSYSTEM pass-throughs -------- */
-typedef void FAR* HMIDIOUT;
-typedef HMIDIOUT FAR* LPHMIDIOUT;
-typedef void FAR* HWAVEOUT;
-typedef HWAVEOUT FAR* LPHWAVEOUT;
-
-/* Base (non-EX) waveform-format descriptor, as passed to AIL_waveOutOpen.   */
-typedef struct tWAVEFORMAT
-{
-   U16 wFormatTag;         /* format type                                   */
-   U16 nChannels;          /* number of channels (mono = 1, stereo = 2)     */
-   U32 nSamplesPerSec;     /* sample rate                                   */
-   U32 nAvgBytesPerSec;    /* for buffer estimation                         */
-   U16 nBlockAlign;        /* block size of data                            */
-} WAVEFORMAT;
-typedef WAVEFORMAT FAR* LPWAVEFORMAT;
 
 #ifdef __cplusplus
 extern "C" {
