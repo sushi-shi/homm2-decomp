@@ -48,10 +48,10 @@ VA(0x004ddea0, 0x7)
 widget::~widget() {}
 
 VA(0x004ddeb0, 0x14)
-int widget::Open(int id, class heroWindow *win)
+int widget::Open(int zOrder, class heroWindow *owner)
 {
-    m_zOrder = id;
-    m_owner = win;
+    m_zOrder = zOrder;
+    m_owner = owner;
     return 0;
 }
 
@@ -62,45 +62,13 @@ VA(0x004dded0, 0x1)
 void widget::Close(void) {}
 
 // @match-note
-// Both sections are 0x2f4 with 17/17 explicit-range relocations and matching
-// external targets. The helper truncates the candidate at a delinked local label,
-// so the explicit object range is authoritative. The remaining 8 non-relocation
-// bytes are +0x23,+0x38,+0x41,+0x42,+0x46,+0x4a,+0x4f,+0x51, all in the
-// mouse-hit-test register coloring; first is our `mov bx,[esi+18h]` versus retail
-// `mov bp,[esi+18h]`. The dispatcher from +0x77 onward is byte-identical. Declaring
-// mouse X/Y before the left snapshot reduced the prior 12-byte residual and raised
-// 99.2% to 99.4833% while preserving exact Dim. A retail-timed top snapshot reached
-// 99.7167% in Main but changed exact Dim by 25 raw bytes through TU state. Typed
-// payload references emitted an extra `lea`; width/top snapshots, direct/staged
-// coordinate assignments, positive/rejection CFGs, explicit right/bottom bounds,
-// owner pointer/reference spellings, and audited commutative/relational AST forms
-// did not close the residual without losing an exact sibling. Retry after an
-// exact-preserving predecessor/TU-state change or new lifetime evidence. The
-// bounded declaration-context retest for this combined checkpoint is recorded in
-// docs/matching-matrices/widget-whole-tu-214bd52.tsv. A Main-only compile at
-// checkpoint 2158e9b regressed to 95.8533% with 408 raw-byte differences despite
-// retaining 17/17 relocations. The six-argument constructor and every other
-// ordinary predecessor are now exact; Main remains at the same eight-byte
-// mouse-hit-test residual and exact Dim remains pinned. A subsequent
-// exact-constructor-state sweep covered parameter/link aliases, snapshots,
-// register-lifetime reuse, neutral scopes/order boundaries, and a register
-// qualifier. Every state either left this tuple unchanged or perturbed Dim; each
-// fully pinned state combined with the retail-timed top snapshot reached the same
-// six-byte Main residual while changing 25 raw bytes in Dim. See the matrix for
-// the bounded results. A final dispatcher-only pass kept the improved mouse shape
-// fixed and exhausted 68 syntax-aware single mutations plus bounded combinations
-// of later declaration splits/qualifiers/semantic names and operand order. Manual
-// typed owner/screen/command/value lifetimes, merged declarations, explicit case
-// scopes, parameter naming, and equivalent early-rejection CFGs either preserved
-// the same Main/Dim tuple or moved Dim farther from retail; none exposed a frame,
-// CFG, or relocation defect. Canonical source is retained because it keeps exact
-// Dim at the pinned f45 state. After a237782 made SIZE declarations neutral, the
-// identical body rebuilds with Main at 93.89%, Dim at 74.31%, and Main relocations
-// still clean at 17/17. This confirms that the old exact-Dim pin and mouse residual
-// are compiler-state-local, not new source defects. Defer that unstable coloring
-// to whole-TU last-mile work.
-// The standalone-exact requirement still fails, so this remains unresolved, not
-// a soft TU-cumulative wall.
+// Both sections are 0x2f4 with the same frame/CFG and all 17/17 ordered
+// relocations. Explicit relocation-masked comparison differs only at
+// +0x23,+0x38,+0x46,+0x4a,+0x4f,+0x51 in the mouse hit test: ours retains the
+// left edge in BX/EBP while retail uses BP/EBX. The dispatcher from +0x77 onward
+// is raw-identical. Declaration/lifetime orders, cached bounds/owner, positive and
+// rejection CFG spellings, 38 current-state AST variants, and 36 guarded TU-state
+// trials did not close it. Revisit after a real predecessor/header state change.
 VA(0x004ddee0, 0x2f4)
 int widget::Main(tag_message &message)
 {
@@ -204,6 +172,14 @@ int widget::Main(tag_message &message)
     return 0;
 }
 
+// @match-note
+// The emitted body is 0x46 bytes against the 0x47 CodeView span, with the same CFG,
+// call operands, and 2/2 ordered relocations. From +0x0b, VC4.2 schedules the same
+// coordinate loads/extensions and argument pushes differently. Direct, staged,
+// cached-owner, operand-order, widened-lifetime, and const spellings emit the same
+// live body. Several guarded declaration-state probes scored 100%, but none was an
+// auditable exact closure: generated state is disposable and the 0x46/0x47 size
+// mismatch remained. Revisit after a real header/TU-state change.
 VA(0x004de1e0, 0x47)
 void widget::Dim(void)
 {

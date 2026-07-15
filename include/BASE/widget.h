@@ -58,14 +58,15 @@ public:
     short  m_width;  // +0x1c
     short  m_height;  // +0x1e
     // --- constructors ---
-    widget(short int, short int, short int, short int, short int, short int);
+    widget(short int x, short int y, short int width, short int height,
+           short int id, short int kind);
     widget(void);
     // --- virtual methods (vtable order) ---
     virtual void Draw(void) = 0;
     virtual ~widget(void) = 0;
-    virtual int Main(struct tag_message &) = 0;
+    virtual int Main(struct tag_message &message) = 0;
     // --- methods ---
-    int Open(int, class heroWindow *);
+    int Open(int zOrder, class heroWindow *owner);
     void Close(void);
     void Dim(void);
 };
