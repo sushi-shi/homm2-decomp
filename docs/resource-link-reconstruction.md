@@ -31,3 +31,7 @@ the expected aligned `0x3000` RVA span. The live candidate/retail RVA delta is r
 in `HEROES2W.link.json`; it is cumulative from earlier sections and will change as
 those sections converge. Do not compensate for it with resource padding or forced
 section addresses.
+
+Source-level reconstruction of these resources is intentionally deferred. See
+[`resource-source-reconstruction-plan.md`](resource-source-reconstruction-plan.md)
+for the staged plan; the extracted `.res` remains the active linker input and oracle.
