@@ -167,7 +167,18 @@ typedef enum KbGameTableConstant {
     KB_CASTLE_DOOR_POSITION_COUNT = 2,
     KB_COMBAT_COORDINATE_COUNT = 2,
     KB_MOAT_CELL_COUNT = 9,
-    KB_ALIGNMENT_NAME_COUNT = HERO_CLASS_COUNT + 2
+    KB_ALIGNMENT_NAME_COUNT = HERO_CLASS_COUNT + 2,
+    KB_QUICK_VIEW_TEXT_COUNT = 124,
+    KB_EVENT_TEXT_TABLE_COUNT = 96,
+    KB_CONTROL_PANEL_HELP_COUNT = 6,
+    KB_COMBAT_SPELL_PANEL_HELP_COUNT = 8,
+    KB_ADVENTURE_PANEL_HELP_COUNT = 6,
+    KB_INIT_MENU_HELP_COUNT = 6,
+    KB_ADVENTURE_MENU_HELP_COUNT = 8,
+    KB_LUCK_TEXT_COUNT = 8,
+    KB_MORALE_TEXT_COUNT = 8,
+    KB_ON_OFF_TEXT_COUNT = 12,
+    KB_WALK_SPEED_TEXT_COUNT = 6
 } KbGameTableConstant;
 
 extern unsigned char giGroundShape[GROUND_TILE_IMAGE_COUNT];
@@ -315,18 +326,18 @@ extern char *gAlignmentNames[KB_ALIGNMENT_NAME_COUNT];
 extern char *gArmyShortNames[MONSTER_DATABASE_COUNT];
 extern char *gTerrainNames[KB_TERRAIN_TYPE_COUNT];
 extern char *gResourceNames[RESOURCE_VALUE_COUNT];
-extern char *gQuickViewText[124];
-extern char *gEventText[96];
-extern char *gCPanelHelp[6];
-extern char *gCSPanelHelp[8];
-extern char *gAPanelHelp[6];
-extern char *gInitMenuHelp[6];
-extern char *gAdvMenuHelp[8];
-extern char *gLuckText[8];
-extern char *gMoraleText[8];
-extern char *onOffText[12];
-extern char *walkSpeedText[6];
-extern char *gColors[6];
+extern char *gQuickViewText[KB_QUICK_VIEW_TEXT_COUNT];
+extern char *gEventText[KB_EVENT_TEXT_TABLE_COUNT];
+extern char *gCPanelHelp[KB_CONTROL_PANEL_HELP_COUNT];
+extern char *gCSPanelHelp[KB_COMBAT_SPELL_PANEL_HELP_COUNT];
+extern char *gAPanelHelp[KB_ADVENTURE_PANEL_HELP_COUNT];
+extern char *gInitMenuHelp[KB_INIT_MENU_HELP_COUNT];
+extern char *gAdvMenuHelp[KB_ADVENTURE_MENU_HELP_COUNT];
+extern char *gLuckText[KB_LUCK_TEXT_COUNT];
+extern char *gMoraleText[KB_MORALE_TEXT_COUNT];
+extern char *onOffText[KB_ON_OFF_TEXT_COUNT];
+extern char *walkSpeedText[KB_WALK_SPEED_TEXT_COUNT];
+extern char *gColors[HERO_CLASS_COUNT];
 extern char *gMonthNames[10];
 extern char *gWeekNames[16];
 extern char *cHeroScreen[26];
