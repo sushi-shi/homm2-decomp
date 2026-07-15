@@ -8,6 +8,7 @@
 #include <BASE/IconDraw.h>
 #include <BASE/IconEntry.h>
 #include <BASE/IconMonoRle.h>
+#include <BASE/IconRle.h>
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
 #include <SOURCE/dimPalette.h>
@@ -43,6 +44,9 @@ DATA(0x005381e8) static unsigned int gFDRun;
 // or integer pointer arithmetic. No permutation or generated TU-state probe was run in this pass.
 // A 2026-07-15 real-header audit tested MIDIWrap, tileset, palette, font, button, and the historical
 // resource tail; every state regressed from the 78.433740% direct baseline. No header is retained.
+// Replacing the split cursor publication/`src[-1]` residue with the shared inline reader preserves
+// the complete 37/37 per-owner relocation multiset. The 79.06626% live score is TU-state-sensitive;
+// the semantic helper is retained rather than restoring compiler-shaped source for a higher score.
 VA(0x004daa20, 0x23b)
 void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                          int color, int clip, int clipX, int clipY, int clipW, int clipH)
@@ -76,10 +80,8 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, 
     short pitch = dest->m_width;
     gFDRow = dest->m_pixels + gFDY * pitch;
     for (;;) {
-        unsigned char *src = gFDSrc + 1;
         gFDX = X;
-        gFDSrc = src;
-        int cmd = src[-1];
+        int cmd = ReadIconRleByte(gFDSrc);
         if (static_cast<signed char>(cmd) < 0) {
             gFDRun = cmd;
             int n = cmd & ICON_RLE_MONO_RUN_MASK;

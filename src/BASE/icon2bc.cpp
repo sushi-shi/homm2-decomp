@@ -98,6 +98,9 @@ DATA(0x00534ce8) static unsigned int gCTRun;
 // 427 instructions, 67 branch sites, the exact 86-block topology and one-word frame; relocations
 // remain 90/91 with no wrong target, and the first broad divergence remains +0x12. Reversing the
 // three equivalent literal comparisons and spelling (clipX-X)+gCTSrc are byte-identical; omitted.
+// The five split cursor-advance/previous-byte sequences were inlined reader traces. Restoring the
+// shared helper gives 81.14554% and 91/91 relocations without inventing targets. Per-owner counts
+// still expose the real residual: gCTX0 and gCTCnt are each short once while gCTY is excess twice.
 VA(0x004d32a0, 0x5af)
 void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                             int clip, int clipX, int clipY, int clipW, int clipH, int color,
@@ -130,8 +133,7 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
     savedDst = gCTDst;
     int cmd;
     for (;;) {
-        gCTSrc++;
-        cmd = gCTSrc[-1];
+        cmd = ReadIconRleByte(gCTSrc);
         if (static_cast<signed char>(cmd) < 0) {
             if ((cmd & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
                 // skip run / end-of-sprite
@@ -151,20 +153,16 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
             if (count != 0) {
                 // 0xc1 - 0xff : solid colour run
                 if (cmd == ICON_RLE_LONG_SOLID_COMMAND) {
-                    gCTSrc++;
-                    count = gCTSrc[-1];
+                    count = ReadIconRleByte(gCTSrc);
                 }
-                gCTSrc++;
-                gCTColor = colorTable[gCTSrc[-1]];
+                gCTColor = colorTable[ReadIconRleByte(gCTSrc)];
                 goto do_fill;
             }
             // 0xc0 : shadow / dim run
-            gCTSrc++;
-            flags = gCTSrc[-1];
+            flags = ReadIconRleByte(gCTSrc);
             count = flags & ICON_RLE_DIM_SHORT_COUNT_MASK;
             if (count == 0) {
-                gCTSrc++;
-                count = gCTSrc[-1];
+                count = ReadIconRleByte(gCTSrc);
             }
             gCTCnt2 = count;
             if (color != 0) {

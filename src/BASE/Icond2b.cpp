@@ -44,6 +44,9 @@ DATA(0x00534c1c) static int gDimX0;
 // candidate 0x25a versus retail 0x26e, but every winner remained 34/37 relocations. Thus helper and
 // predecessor state steer scheduling without restoring the two X0 and one Y scratch reloads. No
 // generated helper/declaration or sub-100 source was retained; do not replay this pair-state batch.
+// The command-byte split advance/read was itself an inlined helper trace. The shared helper keeps
+// the honest 34/37 relocation shape and raises the live score to 79.24138%; two gDimX0 and one
+// gDimY reload remain absent, with the row symbol difference only a delinked owner alias.
 VA(0x004cfd50, 0x26e)
 void DimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                      int color, int clip, int clipX, int clipY, int clipW, int clipH)
@@ -77,8 +80,7 @@ void DimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int 
     unsigned char *row = dest->m_pixels + rowOffset;
     for (;;) {
         gDimX = X;
-        gDimSrc++;
-        int cmd = gDimSrc[-1];
+        int cmd = ReadIconRleByte(gDimSrc);
         if (static_cast<signed char>(cmd) < 0) {
             // skip run / end-of-sprite
             gDimRow = row;
