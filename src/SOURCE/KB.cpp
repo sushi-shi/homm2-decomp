@@ -5668,16 +5668,67 @@ DATA(0x004fc5b8) struct SCmbtObstacle sCmbtObstacles[KB_COMBAT_OBSTACLE_COUNT] =
 DATA(0x004fc778) int gEstatesGoldLevel[HERO_SKILL_LEVEL_COUNT] = {
     0, 100, 250, 500
 };
-DATA(0x004fc788) float gfSSLogisticsMod[HERO_SKILL_LEVEL_COUNT];
-DATA(0x004fc798) float gfSSNavigationMod[HERO_SKILL_LEVEL_COUNT];
-DATA(0x004fc7a8) float gfSSArcheryMod[HERO_SKILL_LEVEL_COUNT];
-DATA(0x004fc7b8) float gfSSAIArcheryMod[4];
-DATA(0x004fc7c8) signed char giVisRange[8];
-DATA(0x004fc7d0) unsigned char gStartingHeroStats[6][5];
-DATA(0x004fc7f0) int giTerrainCost[10][4][2];
-DATA(0x004fc930) unsigned char bStopOnTrigger[128];
-DATA(0x004fc9b0) char *gTownPrefixNames[6];
-DATA(0x004fc9c8) char *gTownObjNames[32];
+DATA(0x004fc788) float gfSSLogisticsMod[HERO_SKILL_LEVEL_COUNT] = {
+    1.0f, 1.1f, 1.2f, 1.3f
+};
+DATA(0x004fc798) float gfSSNavigationMod[HERO_SKILL_LEVEL_COUNT] = {
+    1.0f, 1.33f, 1.66f, 2.0f
+};
+DATA(0x004fc7a8) float gfSSArcheryMod[HERO_SKILL_LEVEL_COUNT] = {
+    1.0f, 1.1f, 1.25f, 1.5f
+};
+DATA(0x004fc7b8) float gfSSAIArcheryMod[HERO_SKILL_LEVEL_COUNT] = {
+    1.0f, 1.04f, 1.1f, 1.2f
+};
+DATA(0x004fc7c8) signed char giVisRange[HERO_SKILL_LEVEL_COUNT] = {
+    4, 5, 6, 7
+};
+DATA(0x004fc7d0)
+unsigned char gStartingHeroStats[HERO_CLASS_COUNT][HERO_STARTING_STAT_COUNT] = {
+    { 2, 2, 1, 1, 1 },
+    { 3, 1, 1, 1, 1 },
+    { 0, 0, 2, 3, 1 },
+    { 0, 0, 3, 2, 1 },
+    { 0, 1, 2, 2, 1 },
+    { 1, 0, 2, 2, 1 }
+};
+DATA(0x004fc7f0)
+int giTerrainCost[KB_TERRAIN_TYPE_COUNT][HERO_SKILL_LEVEL_COUNT]
+                 [KB_TERRAIN_STEP_TYPE_COUNT] = {
+    { { 100, 150 }, { 100, 150 }, { 100, 150 }, { 100, 150 } },
+    { { 100, 150 }, { 100, 150 }, { 100, 150 }, { 100, 150 } },
+    { { 150, 225 }, { 125, 187 }, { 100, 150 }, { 100, 150 } },
+    { { 175, 262 }, { 150, 225 }, { 125, 187 }, { 100, 150 } },
+    { { 100, 150 }, { 100, 150 }, { 100, 150 }, { 100, 150 } },
+    { { 200, 300 }, { 175, 262 }, { 150, 225 }, { 100, 150 } },
+    { { 100, 150 }, { 100, 150 }, { 100, 150 }, { 100, 150 } },
+    { { 125, 187 }, { 100, 150 }, { 100, 150 }, { 100, 150 } },
+    { { 125, 187 }, { 100, 150 }, { 100, 150 }, { 100, 150 } },
+    { { 75, 112 }, { 75, 112 }, { 75, 112 }, { 75, 112 } }
+};
+DATA(0x004fc930) unsigned char bStopOnTrigger[KB_TRIGGER_TYPE_COUNT] = {
+    0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0,
+    0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0,
+    1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0,
+    0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0
+};
+DATA(0x004fc9b0) char *gTownPrefixNames[HERO_CLASS_COUNT] = {
+    "twnk", "twnb", "twns", "twnw", "twnz", "twnn"
+};
+DATA(0x004fc9c8) char *gTownObjNames[KB_TOWN_OBJECT_NAME_COUNT] = {
+    "mage", "thie", "tvrn", "dock",
+    "well", "tent", "cstl", "stat",
+    "ltur", "rtur", "mark", "wel2",
+    "moat", "spec", "boat", "capt",
+    "ext0", "ext1", "ext2", "dw_0",
+    "dw_1", "dw_2", "dw_3", "dw_4",
+    "dw_5", "up_1", "up_2", "up_3",
+    "up_4", "up_5", "up5b", "ext3"
+};
 DATA(0x004fca48) signed char gDwellingType[TOWN_TYPE_COUNT][12] = {
     { ARMY_CREATURE_PEASANT, ARMY_CREATURE_ARCHER, ARMY_CREATURE_PIKEMAN,
       ARMY_CREATURE_SWORDSMAN, ARMY_CREATURE_CAVALRY,
