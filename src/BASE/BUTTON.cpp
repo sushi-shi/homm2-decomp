@@ -14,7 +14,6 @@
 #include <BASE/mouseManager.h>
 #include <BASE/inputManager.h>
 #include <SOURCE/KB.h>
-#include <_globals_model.h>
 
 
 
@@ -107,8 +106,10 @@ inline button::~button()
 // were tried. A completed 40-iteration libclang AST pass and 24 guarded TU-state
 // probes found no improvement or exact closure. Revisit after a real predecessor,
 // header, or TU-state change; correcting m_iconId to its unsigned resource-ID type
-// preserved the 0x585 body and first +0x47 divergence. This is not a byte-proven
-// early stop.
+// preserved the 0x585 body and first +0x47 divergence. Removing the unused synthetic
+// _globals_model include restored the retained 95.57% schedule without changing any
+// exact predecessor. This residual remains unresolved; it is not a byte-proven early
+// stop.
 VA(0x004dd6d0, 0x595)
 int button::Main(tag_message &msg)
 {
@@ -281,16 +282,17 @@ normalEvent:
 }
 
 // @match-note
-// With the corrected unsigned m_iconId header state, candidate is 0x97 versus retail
-// 0x96. The first non-relocation divergence is +0x02: candidate starts button X in DX
-// before loading m_owner; retail loads m_owner, starts button Y in CX, then loads the
-// owner's X dword into EDX and adds button X to DX. Everything from DrawToBuffer onward
-// is instruction-identical after the setup shift, and all 6 ordered relocations agree
-// in type and target except the proven gButtonRepeatTime interior-label name. Cached
-// and direct owner access, X/Y declaration order, staged Y, and split/combined sums
-// were tried. A retail-shaped int X/Y staged form raised live match only to 90.15% and
-// was reverted because it was below the retained canonical shape. Revisit after a real
-// predecessor/header TU-state change; this is not a byte-proven early stop.
+// After removing BUTTON's unused synthetic _globals_model include, candidate is 0x95
+// versus retail 0x96 and live match returns to 94.72%. The first non-relocation
+// divergence is +0x0a: candidate loads both owner coordinates first; retail starts
+// button Y in CX, completes X in DX, then adds owner Y to CX. Everything from
+// DrawToBuffer onward is instruction-identical after the one-byte setup shift, and all
+// 6 ordered relocations agree in type and target except the proven gButtonRepeatTime
+// interior-label name. Cached/direct owner access, X/Y declaration order, staged Y,
+// split/combined sums, and the matching iconWidget staged-coordinate pattern were
+// tried. A separate int X/Y form reached only 90.15% and was reverted. Revisit after a
+// real predecessor/header TU-state change. This residual remains unresolved; it is not
+// a byte-proven early stop.
 VA(0x004ddc70, 0x96)
 short button::Select(struct tag_message &msg)
 {
@@ -320,7 +322,8 @@ short button::Select(struct tag_message &msg)
 // flag stores and 24 guarded TU-state probes produced no change. The prior 40-iteration
 // libclang pass and the one permitted rerun after the unsigned m_iconId correction both
 // found no valid AST variants or exact closure. Revisit after another real predecessor
-// or header TU-state change; this is not a byte-proven early stop.
+// or header TU-state change. This residual remains unresolved; it is not a byte-proven
+// early stop.
 VA(0x004ddd10, 0x83)
 short button::Deselect(struct tag_message &msg)
 {
