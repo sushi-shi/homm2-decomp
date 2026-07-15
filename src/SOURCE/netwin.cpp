@@ -460,7 +460,13 @@ static void nb_add_name(void)
     }
 }
 
-VA(0x004a7a81, 0x174)
+// @early-stop
+// All 0x1ca bytes match after masking 35 aligned relocations.  The 0x08 frame,
+// j at -0x04, switch value at -0x08, CFG, 0x20-byte case-pointer table, and
+// adjacent 0x31-byte selector table agree.  The 99.70% residual is delinked
+// private-global, string, interior-array, and local-label symbol identity only;
+// every resolved external relocation target agrees.
+VA(0x004a7a81, 0x1ca)
 static void __stdcall nb_add_name_done(NetbiosControlBlock *ncb)
 {
     int j;
@@ -660,7 +666,14 @@ static void __fastcall nb_close_session(int session)
     }
 }
 
-VA(0x004a832a, 0x147)
+// @early-stop
+// The complete 0x179-byte instruction stream, 0x10 frame (node -0x04,
+// session -0x08, outer/inner switch values -0x0c/-0x10), CFG, 0x14-byte
+// case-pointer table, and adjacent 0x19-byte selector table agree.  The 24/24
+// resolved targets match.  Retail uses interior aliases for
+// gNbSessNcb.returnCode/length and fixed IAT operands for Enter/LeaveCriticalSection;
+// base retains the owner-relative field addends and two corresponding COFF relocs.
+VA(0x004a832a, 0x179)
 static void __fastcall nb_recv_complete(int session)
 {
     tag_Node *node;

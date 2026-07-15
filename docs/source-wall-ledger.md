@@ -12,9 +12,9 @@ non-100 functions are ordinary queue work; this ledger does not invent wall evid
 
 - SOURCE functions: 1058
 - Retained max 100%: 648
-- Accepted non-100 walls: 206
+- Accepted non-100 walls: 208
 - Provisional non-100 checkpoints: 190
-- Unmarked non-100 queue functions: 14
+- Unmarked non-100 queue functions: 12
 - Resolved 100% functions with stale markers: 69
 
 ## Accepted Walls
@@ -225,6 +225,8 @@ non-100 functions are ordinary queue work; this ledger does not invent wall evid
 | 99.8000% | 99.8000% | 327 | void __fastcall ResizeWindow(int, int, int, int) | [src/SOURCE/kbwin.cpp:350](../src/SOURCE/kbwin.cpp#L350) | delinker/relocation identity | Relocation-masked instruction streams, the 0x1c frame, and all local slots are identical. All 16 relocation targets agree; retail uses resolved Win32 imports and delinked interior gConfig labels where the base retains their typed identities. |
 | 99.6599% | 99.6599% | 407 | long __fastcall AppCommand(void *, unsigned int, unsigned int, long) | [src/SOURCE/kbwin.cpp:388](../src/SOURCE/kbwin.cpp#L388) | delinker/relocation identity | All 0x197 bytes, including the 0x20-byte jump table at retail RVA 0x1caff, match after masking aligned COFF relocations. The 99.66% fuzzy result is delinked local-label identity; all 6/6 external REL32 callees agree. |
 | 99.8446% | 99.8446% | 1229 | _nb_sess | [src/SOURCE/netwin.cpp:229](../src/SOURCE/netwin.cpp#L229) | delinker/relocation identity | reloc-masked: all 0x4cd bytes match; 99.84% is delinked jump-table local-label identity only; external relocations agree. |
+| 99.7041% | 99.7041% | 458 | void __stdcall nb_add_name_done(struct NetbiosControlBlock *) | [src/SOURCE/netwin.cpp:469](../src/SOURCE/netwin.cpp#L469) | delinker/relocation identity | All 0x1ca bytes match after masking 35 aligned relocations. The 0x08 frame, j at -0x04, switch value at -0x08, CFG, 0x20-byte case-pointer table, and adjacent 0x31-byte selector table agree. The 99.70% residual is delinked private-global, string, interior-array, and local-label symbol identity only; every resolved external relocation target agrees. |
+| 99.7518% | 99.7518% | 377 | void __fastcall nb_recv_complete(int) | [src/SOURCE/netwin.cpp:676](../src/SOURCE/netwin.cpp#L676) | other byte-proven artifact | The complete 0x179-byte instruction stream, 0x10 frame (node -0x04, session -0x08, outer/inner switch values -0x0c/-0x10), CFG, 0x14-byte case-pointer table, and adjacent 0x19-byte selector table agree. The 24/24 resolved targets match. Retail uses interior aliases for gNbSessNcb.returnCode/length and fixed IAT operands for Enter/LeaveCriticalSection; base retains the owner-relative field addends and two corresponding COFF relocs. |
 | 97.1601% | 97.1601% | 1490 | void __fastcall DDSD(int, char *, int) | [src/SOURCE/wingraph.cpp:347](../src/SOURCE/wingraph.cpp#L347) | delinker/relocation identity | reloc-masked: all 1450 non-table bytes are identical; 0x52c..0x553 is a delinked local-label jump table. Only local/constant relocation names differ; every external relocation target agrees. |
 | 99.8214% | 99.8214% | 225 | void __fastcall SetFullScreenStatus(int) | [src/SOURCE/wingraph.cpp:954](../src/SOURCE/wingraph.cpp#L954) | delinker/relocation identity | Relocation-masked code bytes and the 0x4 frame are identical. The only two objdiff rows are gConfig+0x30 versus retail's delinked const_00128d50 label; both indexed operands resolve to VA 0x00528d50 and all 13 relocations align. |
 
@@ -435,8 +437,6 @@ non-100 functions are ordinary queue work; this ledger does not invent wall evid
 | 98.9646% | 98.9646% | 386 | public: int __thiscall combatManager::AttemptAdjacentAttack(class army *) | [src/SOURCE/AI.cpp:879](../src/SOURCE/AI.cpp#L879) | No durable evidence recorded. |
 | 99.9940% | 92.3772% | 576 | public: int __thiscall combatManager::WalkTowardArmyFront(class army *, int, int) | [src/SOURCE/AI.cpp:920](../src/SOURCE/AI.cpp#L920) | No durable evidence recorded. |
 | 99.3447% | 99.3447% | 778 | public: int __thiscall philAI::EvaluateMineEvent(int, int, int, int *) | [src/SOURCE/PHILAI.cpp:5577](../src/SOURCE/PHILAI.cpp#L5577) | No durable evidence recorded. |
-| 99.7041% | 99.7041% | 458 | void __stdcall nb_add_name_done(struct NetbiosControlBlock *) | [src/SOURCE/netwin.cpp:462](../src/SOURCE/netwin.cpp#L462) | No durable evidence recorded. |
-| 99.7518% | 99.7518% | 377 | void __fastcall nb_recv_complete(int) | [src/SOURCE/netwin.cpp:662](../src/SOURCE/netwin.cpp#L662) | No durable evidence recorded. |
 | 98.0920% | 98.0920% | 357 | void __fastcall DoTradingPost(int, float) | [src/SOURCE/tradpost.cpp:21](../src/SOURCE/tradpost.cpp#L21) | No durable evidence recorded. |
 | 95.4806% | 94.7702% | 1430 | void __fastcall UpdateTradingPost(int) | [src/SOURCE/tradpost.cpp:45](../src/SOURCE/tradpost.cpp#L45) | No durable evidence recorded. |
 | 99.9444% | 99.9444% | 254 | void __fastcall ComputeTradeRatios(int, int, int *, int *, int *) | [src/SOURCE/tradpost.cpp:182](../src/SOURCE/tradpost.cpp#L182) | No durable evidence recorded. |
