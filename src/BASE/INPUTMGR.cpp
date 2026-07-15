@@ -39,41 +39,41 @@ int KeyboardMessageHandler(void *, unsigned int message, unsigned int, long int 
     switch (message) {
     case WM_KEYDOWN:
         event->type = MESSAGE_KEY_DOWN;
-        event->payload.keyboard.keyCode = static_cast<unsigned short>(static_cast<unsigned long>(messageData) >> 16) & 0xff;
+        event->payload.keyboard.keyCode = static_cast<unsigned short>(static_cast<unsigned long>(messageData) >> 16) & INPUT_SCAN_CODE_MASK;
         event->payload.keyboard.unknown0x08 = 0;
         event->payload.keyboard.modifiers = 0;
         switch (event->payload.keyboard.keyCode) {
-        case 0x1d:
+        case INPUT_SCAN_CONTROL:
             gpInputManager->m_modifiers |= MESSAGE_MODIFIER_CONTROL;
             break;
-        case 0x2a:
+        case INPUT_SCAN_LEFT_SHIFT:
             gpInputManager->m_modifiers |= MESSAGE_MODIFIER_LEFT_SHIFT;
             break;
-        case 0x36:
+        case INPUT_SCAN_RIGHT_SHIFT:
             gpInputManager->m_modifiers |= MESSAGE_MODIFIER_RIGHT_SHIFT;
             break;
-        case 0x38:
+        case INPUT_SCAN_ALT:
             gpInputManager->m_modifiers |= MESSAGE_MODIFIER_ALT;
             break;
         }
         break;
     case WM_KEYUP:
         event->type = MESSAGE_KEY_UP;
-        event->payload.keyboard.keyCode = static_cast<unsigned short>(static_cast<unsigned long>(messageData) >> 16) & 0xff;
+        event->payload.keyboard.keyCode = static_cast<unsigned short>(static_cast<unsigned long>(messageData) >> 16) & INPUT_SCAN_CODE_MASK;
         event->payload.keyboard.unknown0x08 = 0;
         event->payload.keyboard.modifiers = 0;
         switch (event->payload.keyboard.keyCode) {
-        case 0x1d:
-            gpInputManager->m_modifiers &= 0xfffb;
+        case INPUT_SCAN_CONTROL:
+            gpInputManager->m_modifiers &= INPUT_CLEAR_CONTROL_MASK;
             break;
-        case 0x2a:
-            gpInputManager->m_modifiers &= 0xfffd;
+        case INPUT_SCAN_LEFT_SHIFT:
+            gpInputManager->m_modifiers &= INPUT_CLEAR_LEFT_SHIFT_MASK;
             break;
-        case 0x36:
-            gpInputManager->m_modifiers &= 0xfffe;
+        case INPUT_SCAN_RIGHT_SHIFT:
+            gpInputManager->m_modifiers &= INPUT_CLEAR_RIGHT_SHIFT_MASK;
             break;
-        case 0x38:
-            gpInputManager->m_modifiers &= 0xffdf;
+        case INPUT_SCAN_ALT:
+            gpInputManager->m_modifiers &= INPUT_CLEAR_ALT_MASK;
             break;
         }
         break;
@@ -82,23 +82,23 @@ int KeyboardMessageHandler(void *, unsigned int message, unsigned int, long int 
     if (event->type != MESSAGE_NONE) {
         event->payload.keyboard.modifiers = gpInputManager->m_modifiers;
         gpInputManager->m_writeIndex++;
-        gpInputManager->m_writeIndex %= 64;
+        gpInputManager->m_writeIndex %= INPUT_EVENT_RING_CAPACITY;
         if (gpInputManager->m_writeIndex == gpInputManager->m_readIndex) {
             gpInputManager->m_readIndex++;
-            gpInputManager->m_readIndex %= 64;
+            gpInputManager->m_readIndex %= INPUT_EVENT_RING_CAPACITY;
         }
         gpInputManager->m_field_0x85a = 0;
 
         if (gpWindowManager->m_active == 1) {
-            if (event->type == MESSAGE_KEY_DOWN && event->payload.keyboard.keyCode == 0x58 &&
+            if (event->type == MESSAGE_KEY_DOWN && event->payload.keyboard.keyCode == INPUT_SCAN_F12 &&
                 (event->payload.keyboard.modifiers &
                  (MESSAGE_MODIFIER_RIGHT_SHIFT | MESSAGE_MODIFIER_LEFT_SHIFT)) != 0)
                 gpWindowManager->ScreenShot();
-            if (event->type == MESSAGE_KEY_DOWN && event->payload.keyboard.keyCode == 0x3b) {
+            if (event->type == MESSAGE_KEY_DOWN && event->payload.keyboard.keyCode == INPUT_SCAN_F1) {
                 SetFullScreenStatus(0);
-                AppCommand(hwndApp, 0, 0x9c74, 0);
+                AppCommand(hwndApp, 0, KBWIN_MENU_HELP, 0);
             }
-            if (event->type == MESSAGE_KEY_DOWN && event->payload.keyboard.keyCode == 0x3e)
+            if (event->type == MESSAGE_KEY_DOWN && event->payload.keyboard.keyCode == INPUT_SCAN_F4)
                 SetFullScreenStatus(1 - gConfig.gfx[giCurExe].fullScreen);
         }
     }
@@ -107,13 +107,15 @@ int KeyboardMessageHandler(void *, unsigned int message, unsigned int, long int 
 
 // @match-note
 // Structurally complete /O2 checkpoint: frame, ordered CFG, event fields, and semantic
-// external targets agree. Base has four expected import relocations absent from the
-// delinked target: SetCapture x2 and ReleaseCapture x2 at the same indirect call sites.
-// The first code-shape residual at 0x004ce150 is the ring read-index collision update
-// with EAX/ECX exchanged; direct, pointer, and reference spellings, 20 guarded TU-state
-// trials, and a 25-iteration clang-AST pass produced no improvement. Jump-table relocs
-// are $L labels versus the containing function; gConfig members are interior aliases.
-// Revisit after a genuine combined-TU change; this is not a proven wall.
+// external targets agree. Both functions are 0x36c bytes. Base has four expected import
+// relocations absent from the delinked target: SetCapture x2 and ReleaseCapture x2 at
+// the same indirect call sites. The first raw difference at +0x2b6 is only a displaced
+// branch; the first opcode/source-shape residual at +0x2f0 (0x004ce150) is the ring
+// read-index collision update with EAX/ECX exchanged, shifting the tail by two bytes.
+// Direct, pointer, and reference spellings, 20 guarded TU-state trials, and a
+// 25-iteration clang-AST pass produced no improvement. Jump-table relocs are $L labels
+// versus the containing function; gConfig members are interior aliases. Revisit after
+// a genuine combined-TU change; this is not a proven wall.
 VA(0x004cde60, 0x36c)
 int MouseMessageHandler(void *, unsigned int message, unsigned int, long int messageData)
 {
@@ -166,9 +168,9 @@ int MouseMessageHandler(void *, unsigned int message, unsigned int, long int mes
     }
 
     event->payload.mouse.x =
-        (static_cast<short>(messageData) * 640) / iMainWinScreenWidth;
+        (static_cast<short>(messageData) * MOUSE_SCREEN_WIDTH) / iMainWinScreenWidth;
     event->payload.mouse.y =
-        (static_cast<short>(static_cast<unsigned long>(messageData) >> 16) * 480) /
+        (static_cast<short>(static_cast<unsigned long>(messageData) >> 16) * MOUSE_SCREEN_HEIGHT) /
         iMainWinScreenHeight;
     event->payload.mouse.screenX = event->payload.mouse.x;
     event->payload.mouse.screenY = event->payload.mouse.y;
@@ -176,10 +178,12 @@ int MouseMessageHandler(void *, unsigned int message, unsigned int, long int mes
     if (gConfig.gfx[giCurExe].fullScreen == 0 &&
         gConfig.gfx[giCurExe].colorMouseCursor == 0 &&
         KBTickCount() > iLastBWOnScreenCheck &&
-        event->payload.mouse.x > 3 && event->payload.mouse.x < 636 &&
-        event->payload.mouse.y > 3 && event->payload.mouse.y < 476) {
-        iLastBWOnScreenCheck = KBTickCount() + 500;
-        gpMouseManager->SetPointer(1000);
+        event->payload.mouse.x > INPUT_CURSOR_INTERIOR_MIN_EXCLUSIVE &&
+        event->payload.mouse.x < INPUT_CURSOR_INTERIOR_MAX_X_EXCLUSIVE &&
+        event->payload.mouse.y > INPUT_CURSOR_INTERIOR_MIN_EXCLUSIVE &&
+        event->payload.mouse.y < INPUT_CURSOR_INTERIOR_MAX_Y_EXCLUSIVE) {
+        iLastBWOnScreenCheck = KBTickCount() + INPUT_CURSOR_CHECK_DELAY;
+        gpMouseManager->SetPointer(MOUSE_KEEP_CURRENT_FRAME);
     }
 
 afterMouseCoordinates:
@@ -189,10 +193,10 @@ afterMouseCoordinates:
         if (bInCheckChangeCursor == 0 && gConfig.gfx[giCurExe].fullScreen == 0 &&
             gConfig.gfx[giCurExe].colorMouseCursor != 0) {
             bInCheckChangeCursor = 1;
-            if (x >= 0 && x < 640 && y >= 0 && y < 480) {
+            if (x >= 0 && x < MOUSE_SCREEN_WIDTH && y >= 0 && y < MOUSE_SCREEN_HEIGHT) {
                 if (bLastMouseOffscreen != 0) {
                     bLastMouseOffscreen = 0;
-                    gpMouseManager->SetPointer(1000);
+                    gpMouseManager->SetPointer(MOUSE_KEEP_CURRENT_FRAME);
                 }
                 if (bLastOnscreenMouseColor != gbColorMice)
                     gpMouseManager->SetColorMice(1);
@@ -209,10 +213,10 @@ afterMouseCoordinates:
     if (event->type != MESSAGE_NONE) {
         event->payload.mouse.modifiers = gpInputManager->m_modifiers;
         gpInputManager->m_writeIndex++;
-        gpInputManager->m_writeIndex %= 64;
+        gpInputManager->m_writeIndex %= INPUT_EVENT_RING_CAPACITY;
         if (gpInputManager->m_writeIndex == gpInputManager->m_readIndex) {
             gpInputManager->m_readIndex++;
-            gpInputManager->m_readIndex %= 64;
+            gpInputManager->m_readIndex %= INPUT_EVENT_RING_CAPACITY;
         }
     }
     gpInputManager->m_mouseMessageActive = 0;
@@ -229,7 +233,7 @@ inputManager::inputManager(void) : baseManager()
     field_0x742 = 0;
     field_0x746 = 0;
     field_0x74a = 1;
-    m_keyCodeType = 1;
+    m_keyCodeType = INPUT_KEY_CODE_SCAN;
     field_0x866 = 0;
     field_0x862 = -1;
 }
@@ -279,8 +283,8 @@ tag_message inputManager::GetEvent(void)
     if (gpInputManager->m_active == 1 && m_readIndex != m_writeIndex) {
         event = m_eventRing[m_readIndex];
         m_readIndex++;
-        m_readIndex %= 64;
-        if (event.type == MESSAGE_KEY_DOWN && m_keyCodeType == 0)
+        m_readIndex %= INPUT_EVENT_RING_CAPACITY;
+        if (event.type == MESSAGE_KEY_DOWN && m_keyCodeType == INPUT_KEY_CODE_ASCII)
             AsciiConvert(event);
     } else {
         event.type = MESSAGE_NONE;
@@ -298,8 +302,8 @@ tag_message inputManager::PeekEvent(void)
     PollSound();
     if (gpInputManager->m_active == 1 && m_readIndex != m_writeIndex) {
         local_1c = m_eventRing[m_readIndex];
-        m_readIndex = m_readIndex % 0x40;
-        if (local_1c.type == MESSAGE_KEY_DOWN && m_keyCodeType == 0)
+        m_readIndex = m_readIndex % INPUT_EVENT_RING_CAPACITY;
+        if (local_1c.type == MESSAGE_KEY_DOWN && m_keyCodeType == INPUT_KEY_CODE_ASCII)
             AsciiConvert(local_1c);
     } else {
         local_1c.type = MESSAGE_NONE;
@@ -316,7 +320,7 @@ void inputManager::SetMouseCoords(int, int) {}
 VA(0x004ce460, 0x1b)
 void inputManager::SetKeyCodeType(int param_1)
 {
-    m_keyCodeType = param_1;
+    m_keyCodeType = static_cast<InputManagerKeyCodeType>(param_1);
     m_writeIndex = 0;
     m_readIndex = 0;
 }
@@ -325,11 +329,13 @@ void inputManager::SetKeyCodeType(int param_1)
 // Structurally complete /O2 checkpoint: frame, ordered CFG, key conversion semantics,
 // and external relocations agree. At 0x004ce4b2 retail loads modifiers into ECX
 // before storing the converted key from EAX; base stores the key first and then keeps
-// modifiers in EAX. Preloaded-modifier, converted-key-local, and duplicated-branch
-// spellings regressed; a 40-iteration clang-AST pass found no gain. Jump-table
-// relocations are delinked $L labels versus the containing function. Twenty guarded
-// TU-state trials also left 98.76% unchanged. Revisit only after a genuine combined-TU
-// change; this is not a proven wall.
+// modifiers in EAX. Preloaded-modifier, converted-key local/ternary, split modifier
+// load/mask, and duplicated branch-local load/store spellings regressed; a 40-iteration
+// clang-AST pass found no gain. All 12 relocation-masked raw differences are confined
+// to +0x32..+0x51, and all 23 relocation occurrences align; jump-table identities are
+// delinked $L labels versus the containing function. Twenty guarded TU-state trials
+// also left 98.76% unchanged. Revisit only after a genuine combined-TU change; this is
+// not a proven wall.
 VA(0x004ce480, 0x1cb)
 void inputManager::AsciiConvert(tag_message &event)
 {
@@ -381,98 +387,99 @@ void inputManager::AsciiConvert(tag_message &event)
 VA(0x004ce650, 0x33c)
 void inputManager::MakeScanCodeTable(void)
 {
-    for (unsigned int i = 0; i < 128; i++)
+    for (unsigned int i = 0; i < INPUT_SCAN_CODE_CAPACITY; i++)
         m_keyState[i] = i << 8;
 
-    m_keyState[0] = 0;
-    m_keyState[1] = 0x1b;
-    m_keyState[2] = '1';
-    m_keyState[3] = '2';
-    m_keyState[4] = '3';
-    m_keyState[5] = '4';
-    m_keyState[6] = '5';
-    m_keyState[7] = '6';
-    m_keyState[8] = '7';
-    m_keyState[9] = '8';
-    m_keyState[10] = '9';
-    m_keyState[11] = '0';
-    m_keyState[12] = '-';
-    m_keyState[13] = '=';
-    m_keyState[14] = 0x7f;
-    m_keyState[15] = '\t';
-    m_keyState[16] = 'Q';
-    m_keyState[17] = 'W';
-    m_keyState[18] = 'E';
-    m_keyState[19] = 'R';
-    m_keyState[20] = 'T';
-    m_keyState[21] = 'Y';
-    m_keyState[22] = 'U';
-    m_keyState[23] = 'I';
-    m_keyState[24] = 'O';
-    m_keyState[25] = 'P';
-    m_keyState[26] = '[';
-    m_keyState[27] = ']';
-    m_keyState[28] = '\n';
-    m_keyState[29] = 0x1d00;
-    m_keyState[30] = 'A';
-    m_keyState[31] = 'S';
-    m_keyState[32] = 'D';
-    m_keyState[33] = 'F';
-    m_keyState[34] = 'G';
-    m_keyState[35] = 'H';
-    m_keyState[36] = 'J';
-    m_keyState[37] = 'K';
-    m_keyState[38] = 'L';
-    m_keyState[39] = '\'';
-    m_keyState[40] = '\'';
-    m_keyState[41] = 0x2900;
-    m_keyState[42] = 0x2a00;
-    m_keyState[43] = '\\';
-    m_keyState[44] = 'Z';
-    m_keyState[45] = 'X';
-    m_keyState[46] = 'C';
-    m_keyState[47] = 'V';
-    m_keyState[48] = 'B';
-    m_keyState[49] = 'N';
-    m_keyState[50] = 'M';
-    m_keyState[51] = ',';
-    m_keyState[52] = '.';
-    m_keyState[53] = '/';
-    m_keyState[54] = 0x3600;
-    m_keyState[55] = '*';
-    m_keyState[56] = 0x3800;
-    m_keyState[57] = ' ';
-    m_keyState[58] = 0x3a00;
-    m_keyState[59] = 0x3b00;
-    m_keyState[60] = 0x3c00;
-    m_keyState[61] = 0x3d00;
-    m_keyState[62] = 0x3e00;
-    m_keyState[63] = 0x3f00;
-    m_keyState[64] = 0x4000;
-    m_keyState[65] = 0x4100;
-    m_keyState[66] = 0x4200;
-    m_keyState[67] = 0x4300;
-    m_keyState[68] = 0x4400;
-    m_keyState[69] = 0x4500;
-    m_keyState[70] = 0x4600;
-    m_keyState[71] = 0x4700;
-    m_keyState[72] = 0x4800;
-    m_keyState[73] = 0x4900;
-    m_keyState[74] = '-';
-    m_keyState[75] = 0x4b00;
-    m_keyState[76] = 0x4c00;
-    m_keyState[77] = 0x4d00;
-    m_keyState[78] = '+';
-    m_keyState[79] = 0x4f00;
-    m_keyState[80] = 0x5000;
-    m_keyState[81] = 0x5100;
-    m_keyState[82] = 0x5200;
-    m_keyState[83] = 0x5300;
-    m_keyState[84] = 0x5400;
-    m_keyState[85] = 0x5500;
-    m_keyState[86] = 0x5600;
-    m_keyState[87] = 0x5700;
-    m_keyState[88] = 0x5800;
+    m_keyState[INPUT_SCAN_NONE] = 0;
+    m_keyState[INPUT_SCAN_ESCAPE] = '\x1b';
+    m_keyState[INPUT_SCAN_1] = '1';
+    m_keyState[INPUT_SCAN_2] = '2';
+    m_keyState[INPUT_SCAN_3] = '3';
+    m_keyState[INPUT_SCAN_4] = '4';
+    m_keyState[INPUT_SCAN_5] = '5';
+    m_keyState[INPUT_SCAN_6] = '6';
+    m_keyState[INPUT_SCAN_7] = '7';
+    m_keyState[INPUT_SCAN_8] = '8';
+    m_keyState[INPUT_SCAN_9] = '9';
+    m_keyState[INPUT_SCAN_0] = '0';
+    m_keyState[INPUT_SCAN_MINUS] = '-';
+    m_keyState[INPUT_SCAN_EQUALS] = '=';
+    m_keyState[INPUT_SCAN_BACKSPACE] = 0x7f;
+    m_keyState[INPUT_SCAN_TAB] = '\t';
+    m_keyState[INPUT_SCAN_Q] = 'Q';
+    m_keyState[INPUT_SCAN_W] = 'W';
+    m_keyState[INPUT_SCAN_E] = 'E';
+    m_keyState[INPUT_SCAN_R] = 'R';
+    m_keyState[INPUT_SCAN_T] = 'T';
+    m_keyState[INPUT_SCAN_Y] = 'Y';
+    m_keyState[INPUT_SCAN_U] = 'U';
+    m_keyState[INPUT_SCAN_I] = 'I';
+    m_keyState[INPUT_SCAN_O] = 'O';
+    m_keyState[INPUT_SCAN_P] = 'P';
+    m_keyState[INPUT_SCAN_LEFT_BRACKET] = '[';
+    m_keyState[INPUT_SCAN_RIGHT_BRACKET] = ']';
+    m_keyState[INPUT_SCAN_ENTER] = '\n';
+    m_keyState[INPUT_SCAN_CONTROL] = INPUT_SCAN_CONTROL << 8;
+    m_keyState[INPUT_SCAN_A] = 'A';
+    m_keyState[INPUT_SCAN_S] = 'S';
+    m_keyState[INPUT_SCAN_D] = 'D';
+    m_keyState[INPUT_SCAN_F] = 'F';
+    m_keyState[INPUT_SCAN_G] = 'G';
+    m_keyState[INPUT_SCAN_H] = 'H';
+    m_keyState[INPUT_SCAN_J] = 'J';
+    m_keyState[INPUT_SCAN_K] = 'K';
+    m_keyState[INPUT_SCAN_L] = 'L';
+    // Retail deliberately maps both physical scan keys 0x27 and 0x28 to apostrophe.
+    m_keyState[INPUT_SCAN_SEMICOLON] = '\'';
+    m_keyState[INPUT_SCAN_APOSTROPHE] = '\'';
+    m_keyState[INPUT_SCAN_GRAVE] = INPUT_SCAN_GRAVE << 8;
+    m_keyState[INPUT_SCAN_LEFT_SHIFT] = INPUT_SCAN_LEFT_SHIFT << 8;
+    m_keyState[INPUT_SCAN_BACKSLASH] = '\\';
+    m_keyState[INPUT_SCAN_Z] = 'Z';
+    m_keyState[INPUT_SCAN_X] = 'X';
+    m_keyState[INPUT_SCAN_C] = 'C';
+    m_keyState[INPUT_SCAN_V] = 'V';
+    m_keyState[INPUT_SCAN_B] = 'B';
+    m_keyState[INPUT_SCAN_N] = 'N';
+    m_keyState[INPUT_SCAN_M] = 'M';
+    m_keyState[INPUT_SCAN_COMMA] = ',';
+    m_keyState[INPUT_SCAN_PERIOD] = '.';
+    m_keyState[INPUT_SCAN_SLASH] = '/';
+    m_keyState[INPUT_SCAN_RIGHT_SHIFT] = INPUT_SCAN_RIGHT_SHIFT << 8;
+    m_keyState[INPUT_SCAN_NUMPAD_MULTIPLY] = '*';
+    m_keyState[INPUT_SCAN_ALT] = INPUT_SCAN_ALT << 8;
+    m_keyState[INPUT_SCAN_SPACE] = ' ';
+    m_keyState[INPUT_SCAN_CAPS_LOCK] = INPUT_SCAN_CAPS_LOCK << 8;
+    m_keyState[INPUT_SCAN_F1] = INPUT_SCAN_F1 << 8;
+    m_keyState[INPUT_SCAN_F2] = INPUT_SCAN_F2 << 8;
+    m_keyState[INPUT_SCAN_F3] = INPUT_SCAN_F3 << 8;
+    m_keyState[INPUT_SCAN_F4] = INPUT_SCAN_F4 << 8;
+    m_keyState[INPUT_SCAN_F5] = INPUT_SCAN_F5 << 8;
+    m_keyState[INPUT_SCAN_F6] = INPUT_SCAN_F6 << 8;
+    m_keyState[INPUT_SCAN_F7] = INPUT_SCAN_F7 << 8;
+    m_keyState[INPUT_SCAN_F8] = INPUT_SCAN_F8 << 8;
+    m_keyState[INPUT_SCAN_F9] = INPUT_SCAN_F9 << 8;
+    m_keyState[INPUT_SCAN_F10] = INPUT_SCAN_F10 << 8;
+    m_keyState[INPUT_SCAN_NUM_LOCK] = INPUT_SCAN_NUM_LOCK << 8;
+    m_keyState[INPUT_SCAN_SCROLL_LOCK] = INPUT_SCAN_SCROLL_LOCK << 8;
+    m_keyState[INPUT_SCAN_NUMPAD_7] = INPUT_SCAN_NUMPAD_7 << 8;
+    m_keyState[INPUT_SCAN_NUMPAD_8] = INPUT_SCAN_NUMPAD_8 << 8;
+    m_keyState[INPUT_SCAN_NUMPAD_9] = INPUT_SCAN_NUMPAD_9 << 8;
+    m_keyState[INPUT_SCAN_NUMPAD_MINUS] = '-';
+    m_keyState[INPUT_SCAN_NUMPAD_4] = INPUT_SCAN_NUMPAD_4 << 8;
+    m_keyState[INPUT_SCAN_NUMPAD_5] = INPUT_SCAN_NUMPAD_5 << 8;
+    m_keyState[INPUT_SCAN_NUMPAD_6] = INPUT_SCAN_NUMPAD_6 << 8;
+    m_keyState[INPUT_SCAN_NUMPAD_PLUS] = '+';
+    m_keyState[INPUT_SCAN_NUMPAD_1] = INPUT_SCAN_NUMPAD_1 << 8;
+    m_keyState[INPUT_SCAN_NUMPAD_2] = INPUT_SCAN_NUMPAD_2 << 8;
+    m_keyState[INPUT_SCAN_NUMPAD_3] = INPUT_SCAN_NUMPAD_3 << 8;
+    m_keyState[INPUT_SCAN_NUMPAD_0] = INPUT_SCAN_NUMPAD_0 << 8;
+    m_keyState[INPUT_SCAN_NUMPAD_DELETE] = INPUT_SCAN_NUMPAD_DELETE << 8;
+    m_keyState[INPUT_SCAN_SYSREQ] = INPUT_SCAN_SYSREQ << 8;
+    m_keyState[INPUT_SCAN_RESERVED_55] = INPUT_SCAN_RESERVED_55 << 8;
+    m_keyState[INPUT_SCAN_ISO_BACKSLASH] = INPUT_SCAN_ISO_BACKSLASH << 8;
+    m_keyState[INPUT_SCAN_F11] = INPUT_SCAN_F11 << 8;
+    m_keyState[INPUT_SCAN_F12] = INPUT_SCAN_F12 << 8;
 }
 
 VA(0x004ce990, 0xe4)
@@ -486,10 +493,11 @@ void CheckChangeCursor(int x, int y, int force)
         return;
 
     bInCheckChangeCursor = 1;
-    if (force != 0 || (x >= 0 && x < 640 && y >= 0 && y < 480)) {
+    if (force != 0 ||
+        (x >= 0 && x < MOUSE_SCREEN_WIDTH && y >= 0 && y < MOUSE_SCREEN_HEIGHT)) {
         if (bLastMouseOffscreen != 0) {
             bLastMouseOffscreen = 0;
-            gpMouseManager->SetPointer(1000);
+            gpMouseManager->SetPointer(MOUSE_KEEP_CURRENT_FRAME);
         }
         if (gbColorMice != bLastOnscreenMouseColor)
             gpMouseManager->SetColorMice(1);
@@ -502,12 +510,14 @@ void CheckChangeCursor(int x, int y, int force)
 }
 
 // @match-note
-// Structurally complete /O2 checkpoint: the remaining body and all 11 relocation
-// occurrences agree. At 0x004cea81 retail forms the mouse-active-field pointer in
-// ECX, loads it into EAX, and tests EAX; base forms it in EAX and compares memory
-// directly. Pointer, value, reference, and value-dependent-store forms were tried.
-// A 30-trial guarded TU-state sweep and 40 clang-AST iterations left 97.43% unchanged.
-// Revisit after a genuine combined-TU change; this is not a proven wall.
+// Structurally complete /O2 checkpoint: base is 0xe6 bytes versus retail 0xe9, and all
+// 11 ordered relocation identities agree at retail offsets exactly three bytes later.
+// At 0x004cea81 retail forms the mouse-active-field pointer in ECX, loads it into EAX,
+// and tests EAX; base forms it in EAX and compares memory directly. The remaining
+// normalized instruction stream is identical after this three-byte shift. Pointer,
+// value, reference, and value-dependent-store forms were tried. A 30-trial guarded
+// TU-state sweep and 40 clang-AST iterations left 97.43% unchanged. Revisit after a
+// genuine combined-TU change; this is not a proven wall.
 VA(0x004cea80, 0xe9)
 void inputManager::ForceMouseMove(void)
 {
@@ -523,10 +533,10 @@ void inputManager::ForceMouseMove(void)
     event->payload.mouse.screenY = event->payload.mouse.y;
     event->payload.mouse.modifiers = gpInputManager->m_modifiers;
     gpInputManager->m_writeIndex++;
-    gpInputManager->m_writeIndex %= 64;
+    gpInputManager->m_writeIndex %= INPUT_EVENT_RING_CAPACITY;
     if (gpInputManager->m_writeIndex == gpInputManager->m_readIndex) {
         gpInputManager->m_readIndex++;
-        gpInputManager->m_readIndex %= 64;
+        gpInputManager->m_readIndex %= INPUT_EVENT_RING_CAPACITY;
     }
     gpInputManager->m_mouseMessageActive = 0;
 }
