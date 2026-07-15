@@ -1,6 +1,6 @@
 import unittest
 
-from generate_ast_variants import AstEdit, AstMutation, candidate_payloads
+from generate_ast_variants import AstEdit, AstMutation, candidate_payloads, mutation_name
 
 
 class AstVariantGenerationTests(unittest.TestCase):
@@ -40,6 +40,21 @@ class AstVariantGenerationTests(unittest.TestCase):
         ]
         candidates, _truncated = candidate_payloads(blob, mutations, 1, 20)
         self.assertEqual(len({candidate["name"] for candidate in candidates}), 2)
+
+    def test_required_mutation_is_present_in_every_combination(self):
+        blob = b"abcdefghij"
+        mutations = [
+            AstMutation("family", "a", (AstEdit(0, 1, b"A"),)),
+            AstMutation("family", "b", (AstEdit(2, 3, b"C"),)),
+            AstMutation("family", "c", (AstEdit(4, 5, b"E"),)),
+        ]
+        required = mutation_name(mutations[1])
+        candidates, truncated = candidate_payloads(
+            blob, mutations, 2, 20, min_depth=2, required_names={required}
+        )
+        self.assertFalse(truncated)
+        self.assertEqual(len(candidates), 2)
+        self.assertTrue(all(required in candidate["name"] for candidate in candidates))
 
 
 if __name__ == "__main__":

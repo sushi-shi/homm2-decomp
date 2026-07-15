@@ -710,11 +710,16 @@ def mutation_name(mutation: AstMutation) -> str:
 
 
 def candidate_payloads(
-    blob: bytes, mutations: list[AstMutation], max_depth: int, limit: int, min_depth: int = 1
+    blob: bytes, mutations: list[AstMutation], max_depth: int, limit: int, min_depth: int = 1,
+    required_names: set[str] | None = None,
 ):
     candidates = []
+    required_names = required_names or set()
     for depth in range(min_depth, max_depth + 1):
         for combination in itertools.combinations(mutations, depth):
+            combination_names = {mutation_name(mutation) for mutation in combination}
+            if not required_names <= combination_names:
+                continue
             edits = merge_insertions(
                 tuple(edit for mutation in combination for edit in mutation.edits)
             )
@@ -765,6 +770,10 @@ def main(argv=None) -> int:
         "--helper-name-count", type=int, default=1,
         help="number of deterministic identifier spellings for each generated inline helper",
     )
+    parser.add_argument(
+        "--require-mutation", action="append", default=[],
+        help="require an exact content-fingerprinted mutation name; may be repeated",
+    )
     args = parser.parse_args(argv)
     if (
         args.min_depth < 1 or args.max_depth < args.min_depth
@@ -807,8 +816,16 @@ def main(argv=None) -> int:
         parser.error(str(exc))
     insertion, _span_end = marker_span(blob, args.rva)
     mutations = atomic_mutations(fn, blob, insertion, families, args.helper_name_count)
+    available_names = {mutation_name(mutation) for mutation in mutations}
+    required_names = set(args.require_mutation)
+    unknown_required = required_names - available_names
+    if unknown_required:
+        parser.error("required mutations not generated:\n" + "\n".join(sorted(unknown_required)))
+    if len(required_names) > args.max_depth:
+        parser.error("number of required mutations exceeds --max-depth")
     candidates, truncated = candidate_payloads(
-        blob, mutations, args.max_depth, args.limit, min_depth=args.min_depth
+        blob, mutations, args.max_depth, args.limit, min_depth=args.min_depth,
+        required_names=required_names,
     )
     if not candidates:
         parser.error("no AST variants generated")
@@ -824,6 +841,7 @@ def main(argv=None) -> int:
             "min_depth": args.min_depth,
             "limit": args.limit,
             "truncated": truncated,
+            "required_mutations": sorted(required_names),
         },
         "candidates": candidates,
     }
