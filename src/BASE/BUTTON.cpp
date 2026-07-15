@@ -106,7 +106,9 @@ inline button::~button()
 // flag snapshots, cached/global flags, hit-test polarity, and goto/break spellings
 // were tried. A completed 40-iteration libclang AST pass and 24 guarded TU-state
 // probes found no improvement or exact closure. Revisit after a real predecessor,
-// header, or TU-state change; this is not a byte-proven early stop.
+// header, or TU-state change; correcting m_iconId to its unsigned resource-ID type
+// preserved the 0x585 body and first +0x47 divergence. This is not a byte-proven
+// early stop.
 VA(0x004dd6d0, 0x595)
 int button::Main(tag_message &msg)
 {
@@ -279,14 +281,16 @@ normalEvent:
 }
 
 // @match-note
-// Candidate is 0x95 versus retail 0x96. The first divergence is the coordinate setup
-// at +0x0a: retail starts m_y in CX, completes X in DX, then adds owner Y to CX;
-// candidate loads both owner coordinates first. Everything from DrawToBuffer onward
-// is instruction-identical after the one-byte shift. All 6 ordered relocations agree
+// With the corrected unsigned m_iconId header state, candidate is 0x97 versus retail
+// 0x96. The first non-relocation divergence is +0x02: candidate starts button X in DX
+// before loading m_owner; retail loads m_owner, starts button Y in CX, then loads the
+// owner's X dword into EDX and adds button X to DX. Everything from DrawToBuffer onward
+// is instruction-identical after the setup shift, and all 6 ordered relocations agree
 // in type and target except the proven gButtonRepeatTime interior-label name. Cached
 // and direct owner access, X/Y declaration order, staged Y, and split/combined sums
-// were tried. Revisit after a real predecessor/header TU-state change; this is not a
-// byte-proven early stop.
+// were tried. A retail-shaped int X/Y staged form raised live match only to 90.15% and
+// was reverted because it was below the retained canonical shape. Revisit after a real
+// predecessor/header TU-state change; this is not a byte-proven early stop.
 VA(0x004ddc70, 0x96)
 short button::Select(struct tag_message &msg)
 {
@@ -309,13 +313,14 @@ short button::Select(struct tag_message &msg)
 }
 
 // @match-note
-// Candidate and retail are both 0x83. The only non-relocation byte spans are
-// +0x19..+0x1a and +0x1f..+0x20: candidate stores m_flags, sets this, then loads the
-// vptr; retail loads the vptr, stores m_flags, then sets this. The virtual call and
-// every later byte are exact, as are all 4 ordered relocation offsets/types/targets.
-// Direct/combined flag stores, a 40-iteration libclang AST pass, and 24 guarded
-// TU-state probes produced no change or exact closure. Revisit after a real
-// predecessor/header TU-state change; this is not a byte-proven early stop.
+// Candidate and retail are both 0x83. The only relocation-masked byte differences are
+// +0x19 and +0x1f: candidate stores m_flags, sets this, then loads the vptr; retail
+// loads the vptr, stores m_flags, then sets this. The virtual call and every later byte
+// are exact, as are all 4 ordered relocation offsets/types/targets. Direct/combined
+// flag stores and 24 guarded TU-state probes produced no change. The prior 40-iteration
+// libclang pass and the one permitted rerun after the unsigned m_iconId correction both
+// found no valid AST variants or exact closure. Revisit after another real predecessor
+// or header TU-state change; this is not a byte-proven early stop.
 VA(0x004ddd10, 0x83)
 short button::Deselect(struct tag_message &msg)
 {
