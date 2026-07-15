@@ -45,7 +45,7 @@ army::army(void)
     m_targetSide = -1;
     m_targetIndex = -1;
     m_attackDirection = -1;
-    field_0x5e = 0;
+    m_unknown5e = 0;
     m_moveTargetHex = 0;
     m_palette = 0;
     m_showQuantity = 1;
@@ -91,7 +91,7 @@ void army::Init(int monsterType, int quantity, int side, int index, int hex, int
     m_monsterType = monsterType;
     m_drawState = 1;
     m_monster = gMonsterDatabase[monsterType];
-    field_0xd4 = 6;
+    m_unknownD4 = 6;
     commander = gpCombatManager->m_heroes[side];
     if (commander) {
         m_monster.attack += commander->Stats(HERO_PRIMARY_ATTACK);

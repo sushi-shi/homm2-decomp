@@ -30,7 +30,7 @@ public:
     int    m_targetSide;  // +0x52
     int    m_targetIndex;  // +0x56
     int    m_attackDirection;  // +0x5a
-    int    field_0x5e;  // +0x5e
+    int    m_unknown5e;  // +0x5e (only observed initialization: 0)
     int    m_moveTargetHex;  // +0x62
     int    m_drawSpellEffect;  // +0x66
     int    m_mirrorSourceIndex;  // +0x6a
@@ -54,7 +54,7 @@ public:
     int    m_walkDuration;  // +0xb2
     int    m_luckOutcome;  // +0xb6
     struct tag_monsterInfo m_monster;  // +0xba
-    short  field_0xd4;  // +0xd4
+    short  m_unknownD4;  // +0xd4 (only observed initialization: 6)
     int    m_damagePending;  // +0xd6
     int    m_killPending;  // +0xda
     int    m_deathPending;  // +0xde

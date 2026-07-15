@@ -176,9 +176,9 @@ void advManager::DoEvent(mapCell *cell, int x, int y)
                     secondaryReward_f = MAP_EVENT_REWARD_NONE;
                     secondaryAmount = 0;
                     for (eventValue1 = 0; eventValue1 < SPHINX_RESOURCE_COUNT; eventValue1++) {
-                        gpGame->m_players[giCurPlayer].resources[eventValue1] += eventExtra1->resources[eventValue1];
-                        if (gpGame->m_players[giCurPlayer].resources[eventValue1] < 0)
-                            gpGame->m_players[giCurPlayer].resources[eventValue1] = 0;
+                        gpGame->m_players[giCurPlayer].m_resources[eventValue1] += eventExtra1->resources[eventValue1];
+                        if (gpGame->m_players[giCurPlayer].m_resources[eventValue1] < 0)
+                            gpGame->m_players[giCurPlayer].m_resources[eventValue1] = 0;
                         if (eventExtra1->resources[eventValue1] != 0) {
                             if (primaryReward3 != MAP_EVENT_REWARD_NONE) {
                                 secondaryReward_f = primaryReward3;
@@ -1380,8 +1380,8 @@ artifactPickup:
                 EventWindow(-1, 2, gText, MAP_EVENT_REWARD_ARTIFACT, artifact8,
                             -1, 0, -1);
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
-                    if (gpGame->m_players[eventHero2->m_owner].resources[RES_GOLD] >= ARTIFACT_GOLD_COST) {
-                        gpGame->m_players[eventHero2->m_owner].resources[RES_GOLD] -= ARTIFACT_GOLD_COST;
+                    if (gpGame->m_players[eventHero2->m_owner].m_resources[RES_GOLD] >= ARTIFACT_GOLD_COST) {
+                        gpGame->m_players[eventHero2->m_owner].m_resources[RES_GOLD] -= ARTIFACT_GOLD_COST;
                         goto giveArtifact;
                     }
                     NormalDialog("You try to pay the leprechaun, but realize that you can't afford it.  The leprechaun stamps his foot and ignores you.",
@@ -1421,10 +1421,10 @@ artifactPickup:
                 NormalDialog(gText, 2, -1, -1, MAP_EVENT_REWARD_ARTIFACT, artifact8,
                              -1, 0, -1, 0);
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
-                    if (gpGame->m_players[eventHero2->m_owner].resources[RES_GOLD] >= ARTIFACT_RESOURCE_3_GOLD_COST &&
-                        gpGame->m_players[eventHero2->m_owner].resources[artifactResourceType] >= ARTIFACT_RESOURCE_3_AMOUNT) {
-                        gpGame->m_players[eventHero2->m_owner].resources[RES_GOLD] -= ARTIFACT_RESOURCE_3_GOLD_COST;
-                        gpGame->m_players[eventHero2->m_owner].resources[artifactResourceType] -= ARTIFACT_RESOURCE_3_AMOUNT;
+                    if (gpGame->m_players[eventHero2->m_owner].m_resources[RES_GOLD] >= ARTIFACT_RESOURCE_3_GOLD_COST &&
+                        gpGame->m_players[eventHero2->m_owner].m_resources[artifactResourceType] >= ARTIFACT_RESOURCE_3_AMOUNT) {
+                        gpGame->m_players[eventHero2->m_owner].m_resources[RES_GOLD] -= ARTIFACT_RESOURCE_3_GOLD_COST;
+                        gpGame->m_players[eventHero2->m_owner].m_resources[artifactResourceType] -= ARTIFACT_RESOURCE_3_AMOUNT;
                         goto giveArtifact;
                     }
                     NormalDialog("You try to pay the leprechaun, but realize that you can't afford it.  The leprechaun stamps his foot and ignores you.",
@@ -1446,10 +1446,10 @@ artifactPickup:
                 NormalDialog(gText, 2, -1, -1, MAP_EVENT_REWARD_ARTIFACT, artifact8,
                              -1, 0, -1, 0);
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
-                    if (gpGame->m_players[eventHero2->m_owner].resources[RES_GOLD] >= ARTIFACT_RESOURCE_5_GOLD_COST &&
-                        gpGame->m_players[eventHero2->m_owner].resources[artifactResourceType] >= ARTIFACT_RESOURCE_5_AMOUNT) {
-                        gpGame->m_players[eventHero2->m_owner].resources[RES_GOLD] -= ARTIFACT_RESOURCE_5_GOLD_COST;
-                        gpGame->m_players[eventHero2->m_owner].resources[artifactResourceType] -= ARTIFACT_RESOURCE_5_AMOUNT;
+                    if (gpGame->m_players[eventHero2->m_owner].m_resources[RES_GOLD] >= ARTIFACT_RESOURCE_5_GOLD_COST &&
+                        gpGame->m_players[eventHero2->m_owner].m_resources[artifactResourceType] >= ARTIFACT_RESOURCE_5_AMOUNT) {
+                        gpGame->m_players[eventHero2->m_owner].m_resources[RES_GOLD] -= ARTIFACT_RESOURCE_5_GOLD_COST;
+                        gpGame->m_players[eventHero2->m_owner].m_resources[artifactResourceType] -= ARTIFACT_RESOURCE_5_AMOUNT;
                         goto giveArtifact;
                     }
                     NormalDialog("You try to pay the leprechaun, but realize that you can't afford it.  The leprechaun stamps his foot and ignores you.",
@@ -1614,14 +1614,14 @@ daemonExperienceGold:
                         "The Demon leaps upon you and has its claws at your throat before you can even draw your sword.  \"Your life is mine,\" it says.  \"I will sell it back to you for 2,500 gold.\"",
                         -1, 0, -1, 0, -1);
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
-                if (gpGame->m_players[eventHero2->m_owner].resources[RES_GOLD] < DAEMON_GOLD) {
+                if (gpGame->m_players[eventHero2->m_owner].m_resources[RES_GOLD] < DAEMON_GOLD) {
                     EventWindow(-1, 1,
                                 "Seeing that you do not have 2500 gold, the demon slashes you with its claws, and the last thing you see is a red haze.",
                                 -1, 0, -1, 0, -1);
                     HeroLoses(eventHero2);
                 }
                 else {
-                    gpGame->m_players[eventHero2->m_owner].resources[RES_GOLD] -= DAEMON_GOLD;
+                    gpGame->m_players[eventHero2->m_owner].m_resources[RES_GOLD] -= DAEMON_GOLD;
                 }
             }
             else {
@@ -2791,7 +2791,7 @@ VA(0x004b01ae, 0x80)
 void advManager::GiveResource(hero *eventHero, int resourceType, int amount)
 {
     if (resourceType >= 0 && resourceType <= RES_GOLD)
-        gpGame->m_players[eventHero->m_owner].resources[resourceType] += amount;
+        gpGame->m_players[eventHero->m_owner].m_resources[resourceType] += amount;
     if (resourceType == RES_GOLD && gbHumanPlayer[eventHero->m_owner])
         CheckEndGame(0, 0);
 }
@@ -4209,7 +4209,7 @@ artifactPickup:
         case ARTIFACT_MODE_GOLD:
             if (gpPhilAI->NetValueOfArtifact(
                     artifact_g, AI_EVENT_ARTIFACT_GOLD, 0, 0)) {
-                gpGame->m_players[eventHero->m_owner].resources[RES_GOLD] -=
+                gpGame->m_players[eventHero->m_owner].m_resources[RES_GOLD] -=
                     AI_EVENT_ARTIFACT_GOLD;
                 goto artifactPickup;
             }
@@ -4226,10 +4226,10 @@ artifactPickup:
             if (gpPhilAI->NetValueOfArtifact(
                     artifact_g, AI_EVENT_ARTIFACT_RESOURCE_3_GOLD,
                     artifactResource_p, AI_EVENT_ARTIFACT_RESOURCE_3)) {
-                gpGame->m_players[eventHero->m_owner].resources[RES_GOLD] -=
+                gpGame->m_players[eventHero->m_owner].m_resources[RES_GOLD] -=
                     AI_EVENT_ARTIFACT_RESOURCE_3_GOLD;
                 gpGame->m_players[eventHero->m_owner]
-                    .resources[artifactResource_p] -=
+                    .m_resources[artifactResource_p] -=
                     AI_EVENT_ARTIFACT_RESOURCE_3;
                 goto artifactPickup;
             }
@@ -4238,10 +4238,10 @@ artifactPickup:
             if (gpPhilAI->NetValueOfArtifact(
                     artifact_g, AI_EVENT_ARTIFACT_RESOURCE_5_GOLD,
                     artifactResource_p, AI_EVENT_ARTIFACT_RESOURCE_5)) {
-                gpGame->m_players[eventHero->m_owner].resources[RES_GOLD] -=
+                gpGame->m_players[eventHero->m_owner].m_resources[RES_GOLD] -=
                     AI_EVENT_ARTIFACT_RESOURCE_5_GOLD;
                 gpGame->m_players[eventHero->m_owner]
-                    .resources[artifactResource_p] -=
+                    .m_resources[artifactResource_p] -=
                     AI_EVENT_ARTIFACT_RESOURCE_5;
                 goto artifactPickup;
             }
@@ -4302,10 +4302,10 @@ artifactPickup:
             GiveResource(eventHero, RES_GOLD, AI_EVENT_DAEMON_GOLD);
             break;
         case DAEMON_REWARD_RANSOM:
-            if (gpGame->m_players[eventHero->m_owner].resources[RES_GOLD] >=
+            if (gpGame->m_players[eventHero->m_owner].m_resources[RES_GOLD] >=
                 AI_EVENT_DAEMON_GOLD) {
                 if (gpPhilAI->ChooseToPayRansomOnHero(AI_EVENT_DAEMON_GOLD)) {
-                    gpGame->m_players[eventHero->m_owner].resources[RES_GOLD] -=
+                    gpGame->m_players[eventHero->m_owner].m_resources[RES_GOLD] -=
                         AI_EVENT_DAEMON_GOLD;
                 } else {
                     HeroLoses(eventHero);
@@ -4338,7 +4338,7 @@ artifactPickup:
             }
             pyramidBattleValue_l = static_cast<int>(
                 gsSpellInfo[index_h].aiValue *
-                gpCurPlayer->m_aiSpellValueMultiplier * spellValueFactor_i);
+                gpCurPlayer->m_upgradeValueWeight * spellValueFactor_i);
             gpPhilAI->ChooseEvaluateBattle(
                 &eventHero->m_army, eventHero, gpMonGroup, 0, 0, 0,
                 pyramidBattleValue_l, battleWon_j, battleResult_l);
@@ -4458,10 +4458,10 @@ artifactPickup:
             if (Random(0, AI_EVENT_RANDOM_PERCENT_MAX) <
                 AI_EVENT_RANDOM_EVENT_SUCCESS) {
                 for (index_h = 0; index_h < AI_EVENT_RESOURCE_COUNT; ++index_h) {
-                    gpGame->m_players[giCurPlayer].resources[index_h] +=
+                    gpGame->m_players[giCurPlayer].m_resources[index_h] +=
                         eventExtra_o->resources[index_h];
-                    if (gpGame->m_players[giCurPlayer].resources[index_h] < 0)
-                        gpGame->m_players[giCurPlayer].resources[index_h] = 0;
+                    if (gpGame->m_players[giCurPlayer].m_resources[index_h] < 0)
+                        gpGame->m_players[giCurPlayer].m_resources[index_h] = 0;
                 }
                 if (eventExtra_o->artifact != -1 &&
                     eventHero->NumArtifacts() < AI_EVENT_ARTIFACT_LIMIT) {
@@ -4869,7 +4869,7 @@ void advManager::PlayerMonsterInteract(mapCell *cell, mapCell *combatCell, hero 
                 joining = 1;
 
             joiningCost_i = gMonsterDatabase[monster_n].cost * monsterCount_n;
-            if (joiningCost_i > gpGame->m_players[eventHero->m_owner].resources[RES_GOLD]) {
+            if (joiningCost_i > gpGame->m_players[eventHero->m_owner].m_resources[RES_GOLD]) {
                 if (strengthRatio_p > MONSTER_STRENGTH_FLEE)
                     goto monstersFlee;
                 else
@@ -4899,7 +4899,7 @@ void advManager::PlayerMonsterInteract(mapCell *cell, mapCell *combatCell, hero 
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 eventHero->m_army.Add(monster_n, joining, -1);
                 *handled = 1;
-                gpGame->m_players[eventHero->m_owner].resources[RES_GOLD] -= joiningCost_i;
+                gpGame->m_players[eventHero->m_owner].m_resources[RES_GOLD] -= joiningCost_i;
                 return;
             }
             else {
@@ -4990,7 +4990,7 @@ void advManager::ComputerMonsterInteract(mapCell *cell, hero *eventHero,
                 int joiningCost = static_cast<int>(
                     gMonsterDatabase[monsterType].cost * joiningCount *
                     MONSTER_AI_JOIN_COST_FRACTION);
-                if (gpGame->m_players[eventHero->m_owner].resources[RES_GOLD] <
+                if (gpGame->m_players[eventHero->m_owner].m_resources[RES_GOLD] <
                     joiningCost) {
                     if (strengthRatio > MONSTER_STRENGTH_FLEE)
                         goto computerMonstersFlee;
@@ -5000,7 +5000,7 @@ void advManager::ComputerMonsterInteract(mapCell *cell, hero *eventHero,
                     monsterType, monsterCount[0], 1, purchaseCount,
                     purchaseValue, replacementSlot);
                 if (purchaseCount > 0) {
-                    gpGame->m_players[eventHero->m_owner].resources[RES_GOLD] -=
+                    gpGame->m_players[eventHero->m_owner].m_resources[RES_GOLD] -=
                         joiningCost;
                     gpGame->GiveArmy(&eventHero->m_army, monsterType,
                                      joiningCount, replacementSlot);
@@ -5294,7 +5294,7 @@ void advManager::SendHeroTownData(
     }
     if (firstHero) {
         buffer->firstGold =
-            gpGame->m_players[firstHero->m_owner].resources[RES_GOLD];
+            gpGame->m_players[firstHero->m_owner].m_resources[RES_GOLD];
     } else {
         buffer->firstGold = 0;
     }
@@ -5305,7 +5305,7 @@ void advManager::SendHeroTownData(
     }
     if (secondHero) {
         buffer->secondGold =
-            gpGame->m_players[secondHero->m_owner].resources[RES_GOLD];
+            gpGame->m_players[secondHero->m_owner].m_resources[RES_GOLD];
     } else {
         buffer->secondGold = 0;
     }
@@ -5411,11 +5411,11 @@ void advManager::ReceiveHeroTownData(
     *combatSurrender = packet[23];
     firstOwner29 = packet[24];
     if (firstOwner29 > 0)
-        gpGame->m_players[firstOwner29].resources[RES_GOLD] =
+        gpGame->m_players[firstOwner29].m_resources[RES_GOLD] =
             *reinterpret_cast<int *>(packet + 25);
     secondOwner28 = packet[29];
     if (secondOwner28 > 0)
-        gpGame->m_players[secondOwner28].resources[RES_GOLD] =
+        gpGame->m_players[secondOwner28].m_resources[RES_GOLD] =
             *reinterpret_cast<int *>(packet + 30);
 
     *firstArmy = static_cast<armyGroup *>(

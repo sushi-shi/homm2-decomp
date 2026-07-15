@@ -6,6 +6,7 @@
 #include <EDITOR/fullMap.h>
 #include <SOURCE/REQUEST.h>
 #include <SOURCE/hero.h>
+#include <SOURCE/playerData.h>
 #include <SOURCE/town.h>
 // forward declarations:
 class army;
@@ -16,54 +17,6 @@ class mapCell;
 class playerData;
 class town;
 struct tag_message;
-
-// game data records owned by the game struct (also declared in KB.h under the same guard)
-#ifndef HOMM2_GAME_RECORD_TYPES
-#define HOMM2_GAME_RECORD_TYPES
-#pragma pack(push, 1)
-struct townArmyRecord {
-    signed char m_troopTypes[5];
-    union {
-        unsigned short m_troopCounts[5];
-        short m_creatureCounts[5];
-    };
-};
-struct townSlot {
-    signed char id;
-    signed char owner;
-    signed char unknown2;
-    signed char race;
-    unsigned char x;
-    unsigned char y;
-    signed char unknown6;
-    signed char unknown7;
-    union {
-        townArmyRecord m_army;
-        signed char army[15];
-    };
-    signed char occupyingHeroId;
-    int buildings;
-    char unknown1c;
-    char unknown1d;
-    short dwellingGrowth[12];
-    unsigned char m_onMap;
-    signed char m_unknown37;
-    signed char unknown38;
-    signed char m_originalOwner;
-    unsigned short m_extraIndex;
-    union {
-        signed char m_spells[5][4];
-        struct {
-            char m_spellPad[19];
-            signed char m_spellCounts[6];
-        };
-    };
-    short unknown55;
-    char m_name[13];
-};
-#pragma pack(pop)
-SIZE(townSlot, 0x64);
-#endif
 
 #pragma pack(push, 1)
 struct mineRecord {
@@ -87,43 +40,6 @@ struct boatRecord {
 };
 #pragma pack(pop)
 SIZE(boatRecord, 8);
-
-#ifndef HOMM2_PLAYER_RECORD_TYPE
-#define HOMM2_PLAYER_RECORD_TYPE
-#pragma pack(push, 1)
-struct playerRec {
-    signed char color;
-    signed char heroCount;
-    signed char currentHero;
-    signed char heroWindowTop;
-    signed char heroes[8];
-    signed char availableHeroes[2];
-    signed char unknown0e;
-    int unknown0f;
-    signed char unknown13;
-    char pad14[0x2c];
-    signed char unknown40;
-    signed char unknown41;
-    signed char unknown42;
-    signed char daysLeft;
-    signed char townCount;
-    signed char currentTown;
-    signed char townWindowTop;
-    signed char towns[72];
-    int resources[7];
-    signed char evilInterface;
-    signed char unknownac;
-    char padad[0x3a];
-    int secondaryResources[7];
-    char pad103[0x18];
-
-    signed char Town(int index) { return towns[index]; }
-    signed char Hero(int index) { return heroes[index]; }
-    signed char TownCount(void) { return townCount; }
-    signed char HeroCount(void) { return heroCount; }
-};
-#pragma pack(pop)
-#endif
 
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class game {
@@ -166,7 +82,7 @@ public:
     unsigned short m_day;  // +0x496
     unsigned short m_week;  // +0x498
     unsigned short m_month;  // +0x49a
-    struct playerRec m_players[6];  // +0x49c
+    class playerData m_players[6];  // +0x49c
     class fullMap m_worldMap;  // +0xb3e
     signed char m_obeliskCount;  // +0xb52
     town m_castleRecs[72];  // 0xb53
@@ -244,12 +160,12 @@ public:
     hero *GetHero(int id) { return &m_heroRecs[id]; }
     town *GetTown(int id) { return &m_castleRecs[id]; }
     hero *GetPlayerHero(int player, int index) {
-        return &m_heroRecs[m_players[player].heroes[index]];
+        return &m_heroRecs[m_players[player].m_heroIds[index]];
     }
     town *GetPlayerTown(int player, int index) {
-        return &m_castleRecs[m_players[player].towns[index]];
+        return &m_castleRecs[m_players[player].m_townIds[index]];
     }
-    signed char GetPlayerColor(int player) { return m_players[player].color; }
+    signed char GetPlayerColor(int player) { return m_players[player].m_color; }
     int GetMineId(int, int);
     int SaveGame(char *, int, signed char);
     void SetupOrigData(void);

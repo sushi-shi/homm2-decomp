@@ -385,7 +385,7 @@ void advManager::VWCompleteDraw(void)
                 if (playerColor26 < 0)
                     playerColor26 = VIEW_WORLD_NO_OWNER_COLOR;
                 else
-                    playerColor26 = gpGame->m_players[playerColor26].color;
+                    playerColor26 = gpGame->m_players[playerColor26].m_color;
                 townFlagX15[0] = -2;
                 townFlagX15[1] = -3;
                 townFlagX15[2] = -6;
@@ -431,7 +431,7 @@ void advManager::VWCompleteDraw(void)
                 else
                     playerColor26 = gpGame->m_availableHeroes[gpCurPlayer->m_currentHero];
                 if (playerColor26 >= 0) {
-                    groundFrame29 = gpGame->m_players[playerColor26].color;
+                    groundFrame29 = gpGame->m_players[playerColor26].m_color;
                     if (iVWWhatToDraw == VIEW_WORLD_HEROES)
                         heroHighlight8 = groundFrame29 + VIEW_WORLD_HIGHLIGHT_BASE;
                     else
@@ -474,7 +474,7 @@ void advManager::VWCompleteDraw(void)
                 if (playerColor26 < 0)
                     groundFrame29 = VIEW_WORLD_NO_OWNER_COLOR;
                 else
-                    groundFrame29 = gpGame->m_players[playerColor26].color;
+                    groundFrame29 = gpGame->m_players[playerColor26].m_color;
                 if (iVWWhatToDraw == VIEW_WORLD_MINES)
                     mineHighlight18 = groundFrame29 + VIEW_WORLD_HIGHLIGHT_BASE;
                 else

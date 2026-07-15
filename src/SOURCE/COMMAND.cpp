@@ -1169,7 +1169,7 @@ void combatManager::DoCommand(int command)
         break;
     case COMBAT_MESSAGE_COMMAND_SURRENDER:
         if (DoSurrender() == 1) {
-            if (gpGame->m_players[m_playerId[m_currentSide]].resources[RES_GOLD] <
+            if (gpGame->m_players[m_playerId[m_currentSide]].m_resources[RES_GOLD] <
                 giSurrenderCost) {
                 NormalDialog("You don't have enough gold!",
                              NORMAL_DIALOG_INFO, NORMAL_DIALOG_NO_RESOURCE,
@@ -2141,7 +2141,7 @@ int combatManager::DoSurrender(void)
             message.payload.widget.data.value =
                 gpGame->m_players
                     [m_playerId[COMBAT_DEFENDER_SIDE - m_currentSide]]
-                        .color;
+                        .m_color;
         window->BroadcastMessage(message);
     }
     message.payload.widget.data.text = gText;
@@ -2413,11 +2413,11 @@ int combatManager::ProcessNextAction(struct tag_message &message)
             gbCombatSurrender = 1;
             gbRetreatWin = 1;
             m_sideDefeated[m_currentSide] = 1;
-            gpGame->m_players[m_playerId[m_currentSide]].resources[RES_GOLD] -=
+            gpGame->m_players[m_playerId[m_currentSide]].m_resources[RES_GOLD] -=
                 giNextActionExtra;
             gpGame->m_players
                 [m_playerId[COMBAT_DEFENDER_SIDE - m_currentSide]]
-                .resources[RES_GOLD] += giNextActionExtra;
+                .m_resources[RES_GOLD] += giNextActionExtra;
             ResetCycleTimers();
             break;
         case COMBAT_ACTION_WAIT:
