@@ -225,9 +225,10 @@ for _va,_raw in pubs:
 def profile_of(unit):
     # A frame-pointer majority is not a complete optimization fingerprint. All
     # public functions in these four units currently have 55 8b ec prologues,
-    # yet their established byte matches require the profiles below (BITS/TILE
-    # /O2; FONT/RESMGR /Od plus /Oi). Keep those proven settings across init.
-    established={"BASE/BITS":"o2", "BASE/FONT":"base_oi",
+    # yet their established byte matches require the profiles below (BITS
+    # /O1 with frame pointers; TILE /O2; FONT/RESMGR /Od plus /Oi). Keep those
+    # proven settings across init.
+    established={"BASE/BITS":"o1_frame", "BASE/FONT":"base_oi",
                  "BASE/RESMGR":"base_oi", "BASE/TILE":"o2"}
     if unit in established: return established[unit]
     fns=unit_funcs.get(unit,[])
@@ -341,9 +342,12 @@ with open(os.path.join(REPO,"config","units.toml"),"w") as f:
     # float divides, so a function that already matches without one is unaffected.
     f.write('base = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/QIfdiv"]\n')
     f.write('o2 = ["/nologo", "/c", "/O2", "/MT", "/Gr", "/G5", "/QIfdiv"]\n')
+    f.write('o1_frame = ["/nologo", "/c", "/O1", "/Oy-", "/MT", "/Gr", "/G5", "/QIfdiv"]\n')
     f.write('base_oi = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/QIfdiv", "/Oi"]\n\n')
-    for st,src in units:
-        f.write(f'[[unit]]\nunit = "{st}"\nsource = "{src}"\nflags = "{profile_of(st)}"\n\n')
+    for index,(st,src) in enumerate(units):
+        if index:
+            f.write('\n')
+        f.write(f'[[unit]]\nunit = "{st}"\nsource = "{src}"\nflags = "{profile_of(st)}"\n')
 
 print(f"symbol_names.csv: {n_func} funcs + {n_data} data = {n_func+n_data} symbols")
 print(f"units.toml: {len(units)} NWC reconstruction units")
