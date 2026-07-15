@@ -465,26 +465,24 @@ void SetInstallDefaults(void)
 }
 
 // @match-note
-// Structurally complete /O2 checkpoint: base is 0x1b9, retail 0x1b5, with the same
-// three-branch CFG and exact 42/42 ordered relocations.  Retail's induction is now
-// recovered: &gfx[0].fullScreen (+0x30), seven-word stride, endpoint showCombatGrid
-// (+0x68), with semantic exeGfxConfig field access and no interior aliases.  The earlier
-// gConfig.musicSource store was not present in retail and was removed.  The first residual
-// is +0x1: after the common `push ebx`, base loads the induction address before saving the
-// other registers and later preserves EBP, while retail saves ESI/EDI first and preserves
-// only EBX/ESI/EDI.  Prior pointer/index/field-order variants are exhausted; revisit only
-// after exact-preserving predecessor/shared-header TU state.
+// Structurally complete /O2 checkpoint: base is 0x1b7, retail 0x1b5, with the same
+// three-branch CFG and exact 42/42 ordered relocations.  Iteration now uses the real
+// exeGfxConfig type and advances one seven-word record at a time to the showCombatGrid
+// endpoint (+0x68); the former interior-int reconstruction and its EBP spill are gone.
+// The first residual is +0x1: after the common `push ebx`, base materializes gfx[0]
+// (+0x1c) before saving ESI/EDI, while retail saves them first and materializes
+// &gfx[0].fullScreen (+0x30), addressing the other fields relative to that member.
+// Direct typed-pointer, interior-member, index, and field-order variants have been tried;
+// revisit after exact-preserving predecessor/shared-header TU state.
 VA(0x004c49a0, 0x1b5)
 void SetGameDefaults(void)
 {
-    int *fullScreen = &gConfig.gfx[0].fullScreen;
+    exeGfxConfig *gfx = &gConfig.gfx[0];
     gConfig.musicVolume = 1;
     gConfig.soundVolume = 1;
     gConfig.autosave = 1;
     gConfig.showRoute = 1;
     do {
-        exeGfxConfig *gfx = reinterpret_cast<exeGfxConfig *>(
-            fullScreen - (CONFIG_GRAPHICS_SIZE / sizeof(int) - 2));
         gfx->showMenu = 1;
         gfx->x = 10;
         gfx->y = 10;
@@ -497,8 +495,8 @@ void SetGameDefaults(void)
             gfx->width = 0x280;
             gfx->height = 0x1e0;
         }
-        fullScreen += CONFIG_GRAPHICS_SIZE / sizeof(int);
-    } while (fullScreen < &gConfig.showCombatGrid);
+        ++gfx;
+    } while (&gfx->fullScreen < &gConfig.showCombatGrid);
     gConfig.showCombatGrid = 0;
     gConfig.showCombatMouseHex = 0;
     gConfig.combatShadeLevel = 0;
