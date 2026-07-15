@@ -10,27 +10,26 @@
 #include <BASE/resourceManager.h>
 #include <SOURCE/KB.h>
 #include <string.h>
-// @match-note
-// First divergence: base +0x24 hoists `mov ebp,2` across resource::resource;
-// retail +0x24 calls the constructor and assigns EBP after the three argument reloads.
-// Relocation-masked raw bytes differ only at +0x24..+0x25, +0x29..+0x39,
-// +0x43..+0x48, and +0x4b..+0x4c (27 bytes); +0x4d..+0x180 are identical.
-// Both are FPO with the exact 0x20 filename area, callee-save set, stack accesses,
-// CFG, switch tables, and load tail. Manual COFF review gives 23/23 relocations;
-// `homm2 relocs` undercounts base as 7 because its local $L jump-table symbols do
-// not survive delinking. Joined/split pre-store formatFlags initialization is
-// byte-identical; placing the assignment after m_channelType reaches 96.47% and
-// perturbs strcpy lowering. Revisit only after a real TU/header-state change or in
-// the >=95% last-mile phase; do not repeat the recorded shapes.
+// @early-stop
+// Byte-proven delinker-local artifact: moving the independent formatFlags assignment
+// after the three member stores recovered retail's constructor schedule. A direct
+// comparison of both 0x181-byte .text contributions now differs only in relocation
+// payloads at +0x94/+0x9b and the eight jump-table words at +0x124..+0x143 (the latter
+// range is recorded in build/gen/jump_tables.csv). Masking those 10 local relocations
+// leaves every code byte through +0x123 and the byte map at +0x144..+0x180 exact.
+// Manual COFF review gives 23/23 ordered relocations with every external target exact;
+// base names the local dispatch/table entries $L2430/$L2431/$L2389..., while delink
+// rewrites them to the containing constructor. Live 99.70% is therefore normalized
+// 100% source and must not be steered by changing layout, calls, or table structure.
 VA(0x004dad60, 0x181)
 sample::sample(char *name, long channelType, long volume, long loopCount)
     : resource(6, gpResourceManager->MakeId(name, 1), 1, 0)
 {
     int formatFlags;
-    formatFlags = SAMPLE_FORMAT_STEREO;
     m_channelType = channelType;
     m_volume = volume;
     m_loopCount = loopCount;
+    formatFlags = SAMPLE_FORMAT_STEREO;
 
     char filename[32];
     strcpy(filename, name);
