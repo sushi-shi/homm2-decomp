@@ -7866,26 +7866,470 @@ DATA(0x004ff648) char *cHumanInfoDifficulty[KB_HUMAN_INFO_DIFFICULTY_TEXT_COUNT]
     "Human-Expert",
     0
 };
-DATA(0x004ff660) char *musicQualityText[4];
-DATA(0x004ff670) char *gSpellDesc[66];
-DATA(0x004ff778) char *gSpellNames[66];
-DATA(0x004ff880) char *gSecondarySkillLevels[4];
-DATA(0x004ff890) char *gSecondarySkills[14];
-DATA(0x004ff8c8) char *gNeutralBuildingNames[20];
-DATA(0x004ff918) char *gWellExtraNames[8];
-DATA(0x004ff938) char *gSpecialBuildingNames[8];
-DATA(0x004ff958) char *gDwellingNames[TOWN_TYPE_COUNT][KB_DWELLING_TYPE_COUNT];
-DATA(0x004ffa78) char *cSecSkillDesc[14][3];
-DATA(0x004ffb20) char *cBuildingInfoNeutral[20];
-DATA(0x004ffb70) char *gBuildingInfoSpecial[6];
-DATA(0x004ffb88) char *cDirections[10];
-DATA(0x004ffbb0) char *cRumourTerrainDescriptions[10];
-DATA(0x004ffbd8) char *gInterfaceTypeText[4];
-DATA(0x004ffbe8) char *cBWMouseText[2];
-DATA(0x004ffbf0) char *combatSpeedText[4];
-DATA(0x004ffc00) char *combatMiniInfoText[4];
-DATA(0x004ffc10) char *gcCommandLineHelp[14];
-DATA(0x004ffc48) char *cOverviewText[6];
+DATA(0x004ff660) char *musicQualityText[KB_MUSIC_QUALITY_TEXT_COUNT] = {
+    "MIDI",
+    "CD Stereo w/o Opera",
+    "CD Stereo with Opera",
+    0
+};
+DATA(0x004ff670) char *gSpellDesc[KB_SPELL_TEXT_COUNT] = {
+    "{Fireball}\n\nCauses a giant fireball to strike the selected area, damaging all nearby creatures.",
+    "{Fireblast}\n\nAn improved version of fireball, fireblast affects two hexes around the center point of the spell, rather than one.",
+    "{Lightning Bolt}\n\nCauses a bolt of electrical energy to strike the selected creature.",
+    "{Chain Lightning}\n\nCauses a bolt of electrical energy to strike a selected creature, then strike the nearest creature with half damage, then strike the NEXT nearest creature with half again damage, and so on, until it becomes too weak to be harmful.  Warning:  This spell can hit your own creatures!",
+    "{Teleport}\n\nTeleports the creature you select to any open position on the battlefield.",
+    "{Cure}\n\nRemoves all negative spells cast upon one of your units, and restores up to 5 HP per level of spell power.",
+    "{Mass Cure}\n\nRemoves all negative spells cast upon your forces, and restores up to 5 HP per level of spell power, per creature.",
+    "{Resurrect}\n\nResurrects creatures from a damaged or dead unit until end of combat.",
+    "{Resurrect True}\n\nResurrects creatures from a damaged or dead unit permanently.",
+    "{Haste}\n\nIncreases the speed of any creature by two.",
+    "{Mass Haste}\n\nIncreases the speed of all of your creatures by two.",
+    "{Slow}\n\nSlows target to half movement rate.",
+    "{Mass Slow}\n\nSlows all enemies to half movement rate.",
+    "{Blind }\n\nClouds the affected creatures' eyes, preventing them from moving.",
+    "{Bless}\n\nCauses the selected creatures to inflict maximum damage.",
+    "{Mass Bless}\n\nCauses all of your units to inflict maximum damage.",
+    "{Stoneskin}\n\nMagically increases the defense skill of the selected creatures.",
+    "{Steelskin}\n\nIncreases the defense skill of the targeted creatures.  This is an improved version of Stoneskin.",
+    "{Curse}\n\nCauses the selected creatures to inflict minimum damage.",
+    "{Mass Curse}\n\nCauses all enemy troops to inflict minimum damage.",
+    "{Holy Word}\n\nDamages all undead in the battle.",
+    "{Holy Shout}\n\nDamages all undead in the battle.  This is an improved version of Holy Word.",
+    "{Anti-Magic}\n\nPrevents harmful magic against the selected creatures.",
+    "{Dispel Magic}\n\nRemoves all magic spells from a single target.",
+    "{Mass Dispel}\n\nRemoves all magic spells from all creatures.",
+    "{Magic Arrow}\n\nCauses a magic arrow to strike the selected target.",
+    "{Berzerker}\n\nCauses a creature to attack its nearest neighbor.",
+    "{Armageddon}\n\nHoly terror strikes the battlefield, causing severe damage to all creatures.",
+    "{Elemental Storm}\n\nMagical elements pour down on the battlefield, damaging all creatures.",
+    "{Meteor Shower}\n\nA rain of rocks strikes an area of the battlefield, damaging all nearby creatures.",
+    "{Paralyze}\n\nThe targeted creatures are paralyzed, unable to move or retaliate.",
+    "{Hypnotize}\n\nBrings a single enemy unit under your control for one combat round if its hits are less than 25 times the caster's spell power.",
+    "{Cold Ray}\n\nDrains body heat from a single enemy unit.",
+    "{Cold Ring}\n\nDrains body heat from all units surrounding the center point, but not including the center point.",
+    "{Disrupting Ray}\n\nReduces the defense rating of an enemy unit by three.",
+    "{Death Ripple}\n\nDamages all living (non-undead) units in the battle.",
+    "{Death Wave}\n\nDamages all living (non-undead) units in the battle.  This spell is an improved version of Death Ripple.",
+    "{Dragon Slayer}\n\nGreatly increases a unit's attack skill vs. Dragons.",
+    "{Blood Lust}\n\nIncreases a unit's attack skill.",
+    "{Animate Dead}\n\n'Resurrects' creatures from a damaged or dead undead unit permanently.",
+    "{Mirror Image}\n\nCreates an illusionary unit that duplicates one of your existing units.  This illusionary unit does the same damages as the original, but will vanish if it takes any damage.",
+    "{Shield}\n\nHalves damage received from ranged attacks for a single unit.",
+    "{Mass Shield}\n\nHalves damage received from ranged attacks for all of your units.",
+    "{Summon Earth Elemental}\n\nSummons Earth Elementals to fight for your army.",
+    "{Summon Air Elemental}\n\nSummons Air Elementals to fight for your army.",
+    "{Summon Fire Elemental}\n\nSummons Fire Elementals to fight for your army.",
+    "{Summon Water Elemental}\n\nSummons Water Elementals to fight for your army.",
+    "{Earthquake}\n\nDamages castle walls.",
+    "{View Mines}\n\nCauses all mines across the land to become visible.",
+    "{View Resources}\n\nCauses all resources across the land to become visible.",
+    "{View Artifacts}\n\nCauses all artifacts across the land to become visible.",
+    "{View Towns}\n\nCauses all towns and castles across the land to become visible.",
+    "{View Heroes}\n\nCauses all Heroes across the land to become visible.",
+    "{View All}\n\nCauses the entire land to become visible.",
+    "{Identify Hero}\n\nAllows the caster to view detailed information on enemy Heroes.",
+    "{Summon Boat}\n\nSummons the nearest unoccupied, friendly boat to an adjacent shore location.  A friendly boat is one which you just built or were the most recent player to occupy.",
+    "{Dimension Door}\n\nAllows the caster to magically transport to a nearby location.",
+    "{Town Gate}\n\nReturns the caster to any town or castle currently owned.",
+    "{Town Portal}\n\nReturns the hero to the town or castle of choice, provided it is controlled by you.",
+    "{Visions}\n\n Visions predicts the likely outcome of an encounter with a neutral army camp.",
+    "{Haunt}\n\nHaunts a mine you control with Ghosts.  This mine stops producing resources.  (If I can't keep it, nobody will!)",
+    "{Set Earth Guardian}\n\nSets Earth Elementals to guard a mine against enemy armies.",
+    "{Set Air Guardian}\n\nSets Air Elementals to guard a mine against enemy armies.",
+    "{Set Fire Guardian}\n\nSets Fire Elementals to guard a mine against enemy armies.",
+    "{Set Water Guardian}\n\nSets Water Elementals to guard a mine against enemy armies.",
+    0
+};
+DATA(0x004ff778) char *gSpellNames[KB_SPELL_TEXT_COUNT] = {
+    "Fireball",
+    "Fireblast",
+    "Lightning Bolt",
+    "Chain Lightning",
+    "Teleport",
+    "Cure",
+    "Mass Cure",
+    "Resurrect",
+    "Resurrect True",
+    "Haste",
+    "Mass Haste",
+    "Slow",
+    "Mass Slow",
+    "Blind ",
+    "Bless",
+    "Mass Bless",
+    "Stoneskin",
+    "Steelskin",
+    "Curse",
+    "Mass Curse",
+    "Holy Word",
+    "Holy Shout",
+    "Anti-Magic",
+    "Dispel Magic",
+    "Mass Dispel",
+    "Magic Arrow",
+    "Berzerker",
+    "Armageddon",
+    "Elemental Storm",
+    "Meteor Shower",
+    "Paralyze",
+    "Hypnotize",
+    "Cold Ray",
+    "Cold Ring",
+    "Disrupting Ray",
+    "Death Ripple",
+    "Death Wave",
+    "Dragon Slayer",
+    "Blood Lust",
+    "Animate Dead",
+    "Mirror Image",
+    "Shield",
+    "Mass Shield",
+    "Summon Earth Elemental",
+    "Summon Air Elemental",
+    "Summon Fire Elemental",
+    "Summon Water Elemental",
+    "Earthquake",
+    "View Mines",
+    "View Resources",
+    "View Artifacts",
+    "View Towns",
+    "View Heroes",
+    "View All",
+    "Identify Hero",
+    "Summon Boat",
+    "Dimension Door",
+    "Town Gate",
+    "Town Portal",
+    "Visions",
+    "Haunt",
+    "Set Earth Guardian",
+    "Set Air Guardian",
+    "Set Fire Guardian",
+    "Set Water Guardian",
+    0
+};
+DATA(0x004ff880) char *gSecondarySkillLevels[KB_SECONDARY_SKILL_LEVEL_TEXT_COUNT] = {
+    "Basic",
+    "Advanced",
+    "Expert",
+    0
+};
+DATA(0x004ff890) char *gSecondarySkills[KB_SECONDARY_SKILL_TEXT_COUNT] = {
+    "Pathfinding",
+    "Archery",
+    "Logistics",
+    "Scouting",
+    "Diplomacy",
+    "Navigation",
+    "Leadership",
+    "Wisdom",
+    "Mysticism",
+    "Luck",
+    "Ballistics",
+    "Eagle Eye",
+    "Necromancy",
+    "Estates"
+};
+DATA(0x004ff8c8) char *gNeutralBuildingNames[KB_NEUTRAL_BUILDING_TEXT_COUNT] = {
+    "Mage Guild",
+    "Thieves' Guild",
+    "Tavern",
+    "Shipyard",
+    "Well",
+    "Tent",
+    "Castle",
+    "Statue",
+    "Left Turret",
+    "Right Turret",
+    "Marketplace",
+    "",
+    "Moat",
+    "",
+    "Dock with boat",
+    "Captain's Quarters",
+    "",
+    "",
+    "",
+    0
+};
+DATA(0x004ff918) char *gWellExtraNames[KB_WELL_EXTRA_NAME_COUNT] = {
+    "Farm",
+    "Garbage Heap",
+    "Crystal Garden",
+    "Waterfall",
+    "Orchard",
+    "Skull Pile",
+    "1st Lvl Growth",
+    0
+};
+DATA(0x004ff938) char *gSpecialBuildingNames[KB_SPECIAL_BUILDING_NAME_COUNT] = {
+    "Fortifications",
+    "Coliseum",
+    "Rainbow",
+    "Dungeon",
+    "Library",
+    "Storm",
+    "Special",
+    0
+};
+DATA(0x004ff958) char *gDwellingNames[TOWN_TYPE_COUNT][KB_DWELLING_TYPE_COUNT] = {
+    {
+        "Thatched Hut",
+        "Archery Range",
+        "Blacksmith",
+        "Armory",
+        "Jousting Arena",
+        "Cathedral",
+        "Upg. Archery Range",
+        "Upg. Blacksmith",
+        "Upg. Armory",
+        "Upg. Jousting Arena",
+        "Upg. Cathedral",
+        ""
+    },
+    {
+        "Hut",
+        "Stick Hut",
+        "Den",
+        "Adobe",
+        "Bridge",
+        "Pyramid",
+        "Upg. Stick Hut",
+        "",
+        "Upg. Adobe",
+        "Upg. Bridge",
+        "",
+        ""
+    },
+    {
+        "Treehouse",
+        "Cottage",
+        "Archery Range",
+        "Stonehenge",
+        "Fenced Meadow",
+        "Red Tower",
+        "Upg. Cottage",
+        "Upg. Archery Range",
+        "Upg. Stonehenge",
+        "",
+        "",
+        ""
+    },
+    {
+        "Cave",
+        "Crypt",
+        "Nest",
+        "Maze",
+        "Swamp",
+        "Green Tower",
+        "",
+        "",
+        "Upg. Maze",
+        "",
+        "Red Tower",
+        "Black Tower"
+    },
+    {
+        "Habitat",
+        "Pen",
+        "Foundry",
+        "Cliff Nest",
+        "Ivory Tower",
+        "Cloud Castle",
+        "",
+        "Upg. Foundry",
+        "",
+        "Upg. Ivory Tower",
+        "Upg. Cloud Castle",
+        ""
+    },
+    {
+        "Excavation",
+        "Graveyard",
+        "Pyramid",
+        "Mansion",
+        "Mausoleum",
+        "Laboratory",
+        "Upg. Graveyard",
+        "Upg. Pyramid",
+        "Upg. Mansion",
+        "Upg. Mausoleum",
+        "",
+        ""
+    }
+};
+DATA(0x004ffa78) char *cSecSkillDesc[HERO_SKILL_COUNT][SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
+    {
+        "{Basic Pathfinding}\n\nBasic Pathfinding reduces the movement penalty for rough terrain by 25 percent.",
+        "{Advanced Pathfinding}\n\nAdvanced Pathfinding reduces the movement penalty for rough terrain by 50 percent.",
+        "{Expert Pathfinding}\n\nExpert Pathfinding eliminates the movement penalty for rough terrain."
+    },
+    {
+        "{Basic Archery}\n\nBasic Archery increases the damage done by range attacking creatures by 10 percent.",
+        "{Advanced Archery}\n\nAdvanced Archery increases the damage done by range attacking creatures by 25 percent.",
+        "{Expert Archery}\n\nExpert Archery increases the damage done by range attacking creatures by 50 percent."
+    },
+    {
+        "{Basic Logistics}\n\nBasic Logistics increases your hero's movement points by 10 percent.",
+        "{Advanced Logistics}\n\nAdvanced Logistics increases your hero's movement points by 20 percent.",
+        "{Expert Logistics}\n\nExpert Logistics increases your hero's movement points by 30 percent."
+    },
+    {
+        "{Basic Scouting}\n\nBasic Scouting increases your hero's viewable area by 1 square.",
+        "{Advanced Scouting}\n\nAdvanced Scouting increases your hero's viewable area by 2 squares.",
+        "{Expert Scouting}\n\nExpert Scouting increases your hero's viewable area by 3 squares."
+    },
+    {
+        "{Basic Diplomacy}\n\nBasic Diplomacy allows you to negotiate with monsters who are weaker than your group.  Approximately 1/4 of the creatures may offer to join you.",
+        "{Advanced Diplomacy}\n\nAdvanced Diplomacy allows you to negotiate with monsters who are weaker than your group.  Approximately 1/2 of the creatures may offer to join you.",
+        "{Expert Diplomacy}\n\nExpert Diplomacy allows you to negotiate with monsters who are weaker than your group.  All of the creatures may offer to join you."
+    },
+    {
+        "{Basic Navigation}\n\nBasic Navigation increases your hero's movement points over water by 1/3.",
+        "{Advanced Navigation}\n\nAdvanced Navigation increases your hero's movement points over water by 2/3.",
+        "{Expert Navigation}\n\nExpert Navigation doubles your hero's movement points over water."
+    },
+    {
+        "{Basic Leadership}\n\nBasic Leadership increases your hero's troops' morale by 1.",
+        "{Advanced Leadership}\n\nAdvanced Leadership increases your hero's troops' morale by 2.",
+        "{Expert Leadership}\n\nExpert Leadership increases your hero's troops' morale by 3."
+    },
+    {
+        "{Basic Wisdom}\n\nBasic Wisdom allows your hero to learn third level spells.",
+        "{Advanced Wisdom}\n\nAdvanced Wisdom allows your hero to learn fourth level spells.",
+        "{Expert Wisdom}\n\nExpert Wisdom allows your hero to learn fifth level spells."
+    },
+    {
+        "{Basic Mysticism}\n\nBasic Mysticism regenerates two of your hero's spell points per day.",
+        "{Advanced Mysticism}\n\nAdvanced Mysticism regenerates three of your hero's spell points per day.",
+        "{Expert Mysticism}\n\nExpert Mysticism regenerates four of your hero's spell points per day."
+    },
+    {
+        "{Basic Luck}\n\nBasic Luck increases your hero's luck by 1.",
+        "{Advanced Luck}\n\nAdvanced Luck increases your hero's luck by 2.",
+        "{Expert Luck}\n\nExpert Luck increases your hero's luck by 3."
+    },
+    {
+        "{Basic Ballistics}\n\nBasic Ballistics gives your hero's catapult shots a greater chance to hit and do damage to castle walls.",
+        "{Advanced Ballistics}\n\nAdvanced Ballistics gives your hero's catapult an extra shot, and each shot has a greater chance to hit and do damage to castle walls.",
+        "{Expert Ballistics}\n\nExpert Ballistics gives your hero's catapult an extra shot, and each shot automatically destroys any wall, except a fortified wall in a Knight town."
+    },
+    {
+        "{Basic Eagle Eye}\n\nBasic Eagle Eye gives your hero a 20 percent chance to learn any given 1st or 2nd level enemy spell used against him in a combat.",
+        "{Advanced Eagle Eye}\n\nAdvanced Eagle Eye gives your hero a 30 percent chance to learn any given 3rd level spell (or below) used against him in combat.",
+        "{Expert Eagle Eye}\n\nExpert Eagle Eye gives your hero a 40 percent chance to learn any given 4th level spell (or below) used against him in combat."
+    },
+    {
+        "{Basic Necromancy}\n\nBasic Necromancy allows 10 percent of the creatures killed in combat to be brought back from the dead as Skeletons.",
+        "{Advanced Necromancy}\n\nAdvanced Necromancy allows 20 percent of the creatures killed in combat to be brought back from the dead as Skeletons.",
+        "{Expert Necromancy}\n\nExpert Necromancy allows 30 percent of the creatures killed in combat to be brought back from the dead as Skeletons."
+    },
+    {
+        "{Small Estates}\n\nYour hero produces 100 gold pieces per turn as tax revenue from estates.",
+        "{Moderate Estates}\n\nYour hero produces 250 gold pieces per turn as tax revenue from estates.",
+        "{Grand Estates}\n\nYour hero produces 500 gold pieces per turn as tax revenue from estates."
+    }
+};
+DATA(0x004ffb20) char *cBuildingInfoNeutral[KB_NEUTRAL_BUILDING_INFO_COUNT] = {
+    "The Mage Guild allows heroes to learn spells and replenish their spell points.",
+    "The Thieves' Guild provides information on enemy players.  Thieves' Guilds can also provide scouting information on enemy towns.  Additional Guilds provide more information.",
+    "The Tavern increases morale for troops defending the castle.",
+    "The Shipyard allows ships to be built.",
+    "The Well increases the growth rate of all dwellings by 2 creatures per week.",
+    "The Tent provides workers to build a castle, provided the materials and the gold are available.",
+    "The Castle improves town defense and increases income to 1000 gold per day.",
+    "The Statue increases your town's income by 250 per day.",
+    "The Left Turret provides extra firepower during castle combat.",
+    "The Right Turret provides extra firepower during castle combat.",
+    "The Marketplace can be used to convert one type of resource into another.  The more marketplaces you control, the better the exchange rate.",
+    "",
+    "The Moat slows attacking units.  Any unit entering the moat must end its turn there and becomes more vulnerable to attack.",
+    "",
+    "The Shipyard allows ships to be built.",
+    "The Captain's Quarters provides a captain to assist in the castle's defense when no hero is present.",
+    "",
+    "",
+    "",
+    0
+};
+DATA(0x004ffb70) char *gBuildingInfoSpecial[KB_SPECIAL_BUILDING_INFO_COUNT] = {
+    "The Fortifications increase the toughness of the walls, increasing the number of turns it takes to knock them down.",
+    "The Coliseum provides inspiring spectacles to defending troops, raising their morale by two during combat.",
+    "The Rainbow increases the luck of the defending units by two.",
+    "The Dungeon increases the income of the town by 500 / day.",
+    "The Library increases the number of spells in the Guild by one for each level of the guild.",
+    "The Storm adds +2 to the power of spells of a defending spell caster."
+};
+DATA(0x004ffb88) char *cDirections[KB_DIRECTION_TEXT_COUNT] = {
+    "northern",
+    "northeastern",
+    "eastern",
+    "southeastern",
+    "southern",
+    "southwestern",
+    "western",
+    "northwestern",
+    "central",
+    0
+};
+DATA(0x004ffbb0) char *cRumourTerrainDescriptions[KB_RUMOUR_TERRAIN_DESCRIPTION_COUNT] = {
+    "in the murky depths of the ocean.",
+    "on a grassy plain.",
+    "in the driven snow.",
+    "in a murky swamp.",
+    "buried in barren lava.",
+    "under a desert drift.",
+    "in the dirt.",
+    "in a parched wasteland.",
+    "buried on a beach.",
+    0
+};
+DATA(0x004ffbd8) char *gInterfaceTypeText[KB_INTERFACE_TYPE_TEXT_COUNT] = {
+    "Dynamic",
+    "Good",
+    "Evil",
+    0
+};
+DATA(0x004ffbe8) char *cBWMouseText[KB_BW_MOUSE_TEXT_COUNT] = {
+    "Black & White",
+    "Color"
+};
+DATA(0x004ffbf0) char *combatSpeedText[KB_COMBAT_SPEED_TEXT_COUNT] = {
+    "Normal",
+    "Fast",
+    "Very Fast",
+    0
+};
+DATA(0x004ffc00) char *combatMiniInfoText[KB_COMBAT_MINI_INFO_TEXT_COUNT] = {
+    "None",
+    "Spells Only",
+    "Full",
+    0
+};
+DATA(0x004ffc10) char *gcCommandLineHelp[KB_COMMAND_LINE_HELP_COUNT] = {
+    "\n\n\n***Command Line Help***\n",
+    "\n",
+    "/D0 - disable digital sound\n",
+    "/M0 - disable MIDI music\n",
+    "/R0 - disable Redbook music\n",
+    "/I0 - skip the intro\n",
+    "\n",
+    "\n",
+    "Example:\n",
+    "\n",
+    "HEROES2D /R0 /I0\n",
+    "\n",
+    "Starts the DOS version of Heroes2 with redbook\n",
+    "sound disabled and the intro skipped.\n"
+};
+DATA(0x004ffc48) char *cOverviewText[KB_OVERVIEW_TEXT_COUNT] = {
+    "Hero/Stats",
+    "Skills",
+    "Artifacts",
+    "Town/Castle",
+    "Garrison",
+    "Available"
+};
 DATA(0x004ffc60) char *cWinComError[6];
 DATA(0x004ffc78) char *cMiniViewText[10];
 DATA(0x004ffca0) char *gFileRequestHelp[16];
