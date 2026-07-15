@@ -509,7 +509,9 @@ def add_payload_evidence(public_symbols, retail_path, candidate_path, required):
         row = by_name.get(expectation["name"])
         if row is None:
             continue
-        size = row["size"] or 0
+        # Minimal NB09 public records do not carry type sizes. symbol_names.csv uses
+        # the next-public gap, so the reviewed enrollment is authoritative here.
+        size = expectation["size"]
         row["retail_payload"] = read_pe_payload_evidence(
             retail_path, int(row["retail_rva"], 16), size, expectation["audit"])
         if row["candidate_count"] == 1:
