@@ -603,7 +603,11 @@ void hero::ApplyBattleLossTemps(void) {
 // assignment, real table typing, and computed stack-name/declaration order were tried;
 // only the byte-proven local-label/trampoline shape remains. A post-95
 // 30-walk AST pass retained no mutation. Fresh masked disassembly reconfirmed
-// the two jumps as the only non-relocation instruction differences.
+// the two jumps as the only non-relocation instruction differences. Ordered
+// COFF audit proves the disputed +0xc3 relocation: base cHeroLevel+4 and retail
+// ??_C@_03HHHK... both resolve to RVA 0xff29c. symbol_names classifies the
+// retail identity as a pe-reloc-constant at that interior pointer slot; the
+// retail PE stores 0x50cb24 there, the " a level.\n" cHeroLevel[1] string.
 VA(0x0046d83f, 0x828)
 void hero::CheckLevel(void) {
     int statBonuses[HERO_PRIMARY_STAT_COUNT];
