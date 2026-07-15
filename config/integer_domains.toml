@@ -25,6 +25,56 @@ evidence = [
 status = "reviewed"
 
 [[domain]]
+name = "AdventureSystemOption"
+declaration = "AdventureSystemOption"
+owner = "include/SOURCE/ADVMGR.h"
+category = "message-id"
+production_carrier = "int message field"
+strict = true
+sentinels = []
+enumerators = [
+  "ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME",
+  "ADVMGR_SYSTEM_OPTION_SOUND_VOLUME",
+  "ADVMGR_SYSTEM_OPTION_HERO_SPEED",
+  "ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE",
+  "ADVMGR_SYSTEM_OPTION_SHOW_ROUTE",
+  "ADVMGR_SYSTEM_OPTION_COMPUTER_SPEED",
+  "ADVMGR_SYSTEM_OPTION_INTERFACE",
+  "ADVMGR_SYSTEM_OPTION_VIDEO",
+  "ADVMGR_SYSTEM_OPTION_COLOR_CURSOR",
+  "ADVMGR_SYSTEM_OPTION_FIRST",
+  "ADVMGR_SYSTEM_OPTION_LAST",
+]
+interfaces = ["UpdateSystemOptions widget message producer", "SystemOptionsHandler dispatch"]
+members = []
+storage = ["tag_messageWidgetPayload::id integer transport boundary"]
+conversions = [
+  "AdventureSystemOption to int via EncodeAdventureSystemOption",
+  "int to AdventureSystemOption via DecodeAdventureSystemOption",
+  "AdventureSystemOption to text-control ID via EncodeAdventureSystemOptionTextControl",
+]
+evidence = [
+  "values 10 through 18 are consecutive option widget IDs emitted by UpdateSystemOptions",
+  "FIRST and LAST are aliases of the two endpoint IDs, and FIRST is emitted after dialog acceptance",
+  "SystemOptionsHandler dispatches the same IDs to nine distinct configuration updates",
+  "the generic message payload stores widget IDs in a proven four-byte integer field",
+]
+status = "reviewed"
+
+[[constant_group]]
+name = "AdventureSystemOptionCount"
+declaration = "AdventureSystemOption"
+owner = "include/SOURCE/ADVMGR.h"
+category = "scalar"
+enumerators = [
+  "ADVMGR_SYSTEM_OPTION_COUNT",
+]
+evidence = [
+  "COUNT is derived range metadata rather than a carried system-option ID",
+]
+status = "reviewed"
+
+[[domain]]
 name = "WidgetKind"
 declaration = "WidgetKind"
 owner = "include/BASE/widgetKind.h"
