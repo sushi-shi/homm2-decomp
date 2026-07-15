@@ -2699,22 +2699,24 @@ void townManager::DoTavern(void)
     delete m_heroWindow0;
 }
 
-// @match-note 98.45%: complete amount edit/clamp, confirm/cancel and redraw CFG,
-// exact 0x24 frame, and all 32/32 relocations agree. Retail reserves the action
-// word but switches directly on the message field; retaining the real unused
-// local while removing its copy improved the canonical function from 97.28%.
-// The first residual is one extra local jump before the ID dispatch, followed
-// by equivalent confirm-arm layout. Moving the confirm body before cancel
-// regressed to 91.74%, and the positive nonzero arm regressed to 98.09%.
-// Revisit only with a new dispatch-layout discovery.
+// @match-note 98.81%: exact 0x328 size, 0x24 frame, complete amount/clamp,
+// confirm/cancel/redraw CFG, and 32/32 resolved relocation owners/addends.
+// Retail slots are plusButton -0x4, handled -0x8, unusedAction -0xc,
+// minusButton -0x10, amountControl -0x14, and message -0x18; their initializer
+// order and the final handled == 1 predicate are byte-exact. Relocation-masked
+// raw proof leaves 71 bytes at +0x10c, +0x1b6, and +0x1f1..+0x241: equivalent
+// branch destinations around one extra pre-ID-dispatch jump and the confirm
+// arm. Removing the empty default shrank incorrectly to 0x323; moving confirm
+// before cancel regressed to 91.74%. All 106 safe atomic AST variants found no
+// gain. Revisit only with a new dispatch/body placement discovery.
 VA(0x00419e8c, 0x328)
 int SplitArmyHandler(tag_message &message)
 {
-    short unusedAmountControl = TOWN_SPLIT_AMOUNT_CONTROL;
-    short unusedIncreaseControl = TOWN_SPLIT_INCREASE_CONTROL;
-    short unusedDecreaseControl = TOWN_SPLIT_DECREASE_CONTROL;
+    short plusButton = TOWN_SPLIT_INCREASE_CONTROL;
+    short minusButton = TOWN_SPLIT_DECREASE_CONTROL;
+    short amountControl = TOWN_SPLIT_AMOUNT_CONTROL;
     int handled = 0;
-    int action;
+    int unusedAction;
 
     if (message.type == TOWN_MESSAGE_SELECT) {
         switch (message.payload.widget.command) {
@@ -2767,7 +2769,7 @@ int SplitArmyHandler(tag_message &message)
         }
     }
 
-    if (handled != 0) {
+    if (handled == 1) {
         message.payload.widget.id = 10;
         message.payload.widget.command = message.payload.widget.id;
         return 2;
@@ -3226,14 +3228,14 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
     }
 }
 
-// @match-note retained 98.90%: complete all ten category_stat cases, exact 0x2c frame, and
-// all 42/42 relocations agree. Prologue and first 33 normalized instructions
-// are identical before objdiff loses identity at the delinked category switch.
-// Explicit ranges excluding the 0x1bbc3..0x1bbeb jump table contain 355
-// instructions on both sides. The two real residuals are the equivalent
-// playerData::m_heroIds address sequences in ARTIFACTS and ARMY_STRENGTH;
-// reversed subscripts/direct GetHero regressed to 97.94%. A 15-walk post-95
-// AST pass retained no mutation. Revisit only after a TU-state change.
+// @match-note retained 98.90%: complete ten-case CFG, exact 0x56a size, 0x2c
+// frame/slots, and the exact +0x531/0x28 jump table. All 31 external and 42
+// total relocations agree in ordered offset/type/identity/addend. Relocation-
+// masked raw proof leaves 38 bytes: four one-byte branches crossing the two
+// equivalent playerData::m_heroIds address spans at +0x3df..+0x3f2 and
+// +0x47e..+0x491. Reversed subscripts compile identically; direct GetHero was
+// worse. The consolidated runner tried all 122 safe atomic AST mutations with
+// no gain. Revisit only after a playerData/accessor or TU-state change.
 VA(0x0041b692, 0x56a)
 void GetCategoryStats(int category, long int * const stats,
                       signed char * const order)
