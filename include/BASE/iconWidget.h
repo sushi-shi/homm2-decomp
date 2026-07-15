@@ -15,8 +15,8 @@ public:
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base widget = 0x20 bytes at 0x00 via ': public widget'; own fields below)
     icon   *m_icon;  // +0x20  the icon resource
-    short  m_frame;  // +0x24
-    char   m_flip;  // +0x26
+    short  m_frame;  // +0x24  icon frame index
+    signed char m_flip;  // +0x26  signed flip/mirror flag passed to icon drawing
     short  m_fillColor;  // +0x27  color index used by filled-icon draw mode
     unsigned long m_iconId;  // +0x29  aggregate resource id
     // --- constructors ---
