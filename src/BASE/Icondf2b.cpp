@@ -41,6 +41,8 @@ DATA(0x005381e8) static unsigned int gFDRun;
 // TU state and improved the canonical schedule without changing the recovered body. Revisit after
 // a genuine shared-header/TU-state change or in the gated last-mile phase; do not restore qualifiers
 // or integer pointer arithmetic. No permutation or generated TU-state probe was run in this pass.
+// A 2026-07-15 real-header audit tested MIDIWrap, tileset, palette, font, button, and the historical
+// resource tail; every state regressed from the 78.433740% direct baseline. No header is retained.
 VA(0x004daa20, 0x23b)
 void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                          int color, int clip, int clipX, int clipY, int clipW, int clipH)
