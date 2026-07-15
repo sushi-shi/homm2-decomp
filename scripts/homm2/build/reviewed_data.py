@@ -21,6 +21,10 @@ from homm2.build.link_exe import (
     read_pe,
     read_pe_payload_evidence,
 )
+from homm2.build.reloc_owners import (
+    OWNER_EXTENTS, load_definition_rvas, load_explicit_extents,
+    load_owner_ranges,
+)
 
 
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[3]))
@@ -41,7 +45,7 @@ def reviewed_manifest_bytes(symbols=SYMBOLS, ledger=LEDGER, exe=EXE):
     with Path(symbols).open(newline="", encoding="latin-1") as stream:
         inventory = {row["name"]: row for row in csv.DictReader(stream)}
     retail = read_pe(exe)
-    rows = []
+    rows = {}
     for required in load_required_initialized_storage(ledger):
         symbol = inventory.get(required["name"])
         if symbol is None:
@@ -63,22 +67,66 @@ def reviewed_manifest_bytes(symbols=SYMBOLS, ledger=LEDGER, exe=EXE):
         if (evidence["sha256"] != required["retail_sha256"] or
                 evidence["highlow_base_relocation_count"] != required["highlow_count"]):
             raise RuntimeError("reviewed retail evidence changed: %s" % required["name"])
-        rows.append((required["unit"], rva, required["name"], required["size"]))
+        rows[required["name"]] = {
+            "unit": required["unit"], "rva": rva,
+            "name": required["name"], "size": required["size"],
+            "storage": "data", "provenance": "reviewed-required-initialized-storage",
+        }
+
+    storage_names = {
+        "rdata": "rdata",
+        "data-initialized": "data",
+        "data-loader-zero-tail": "bss",
+    }
+    for owner in load_owner_ranges(symbols_path=str(symbols)):
+        symbol = inventory.get(owner.symbol)
+        if symbol is None or symbol.get("kind") != "data":
+            raise RuntimeError("reviewed owner is absent from public inventory: %s" %
+                               owner.symbol)
+        if int(symbol["rva"], 0) != owner.rva:
+            raise RuntimeError("reviewed owner public RVA mismatch: %s" % owner.symbol)
+        start = classify_pe_storage(retail, owner.rva)["class"]
+        end = classify_pe_storage(retail, owner.rva + owner.size - 1)["class"]
+        if start != end or start not in storage_names:
+            raise RuntimeError(
+                "reviewed owner crosses unsupported retail storage %s -> %s: %s" %
+                (start, end, owner.symbol))
+        record = {
+            "unit": symbol["unit"], "rva": owner.rva,
+            "name": owner.symbol, "size": owner.size,
+            "storage": storage_names[start], "provenance": "reviewed-public-owner-extent",
+        }
+        previous = rows.get(owner.symbol)
+        if previous is not None:
+            if (previous["unit"], previous["rva"], previous["size"]) != (
+                    record["unit"], record["rva"], record["size"]):
+                raise RuntimeError(
+                    "reviewed allocation and owner extent disagree: %s" % owner.symbol)
+            continue
+        rows[owner.symbol] = record
     lines = [
         "# Sizes are reviewed required_initialized_storage.tsv evidence, not NB09 lengths.",
         "name\tobject\trva\tsize\tstorage\talignment\tprovenance",
     ]
-    for unit, rva, name, size in sorted(rows):
-        object_name = unit.replace("/", "\\") + ".c"
-        lines.append("%s\t%s\t0x%x\t0x%x\tdata\t0x4\treviewed-required-initialized-storage" %
-                     (name, object_name, rva, size))
+    for row in sorted(rows.values(), key=lambda value: (value["unit"], value["rva"])):
+        object_name = row["unit"].replace("/", "\\") + ".c"
+        lines.append("%s\t%s\t0x%x\t0x%x\t%s\t0x4\t%s" % (
+            row["name"], object_name, row["rva"], row["size"],
+            row["storage"], row["provenance"]))
     return ("\n".join(lines) + "\n").encode("utf-8")
 
 
 def _identity_inputs(delinker):
+    definitions = load_definition_rvas()
+    owner_definitions = "\n".join(
+        "%s=0x%x" % (name, definitions.get(name, -1))
+        for name in sorted(load_explicit_extents()))
     return {
         "schema": 1,
         "ledger_sha256": _digest(LEDGER),
+        "owner_extents_sha256": _digest(REPO / OWNER_EXTENTS),
+        "owner_definitions_sha256": hashlib.sha256(
+            owner_definitions.encode("utf-8")).hexdigest(),
         "symbols_sha256": _digest(SYMBOLS),
         "exe_sha256": _digest(EXE),
         "pdb_sha256": _digest(PDB),
