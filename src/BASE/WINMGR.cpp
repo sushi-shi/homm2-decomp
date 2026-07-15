@@ -248,8 +248,9 @@ int heroWindowManager::ConvertToHover(struct tag_message &msg)
 // frame and every initialized message field agree, and there are no relocations.
 // Seven unmasked bytes differ from +0x24 solely because retail loads the vtable
 // before storing message.payload.widget.data.value while base performs those two
-// operations in reverse;
-// both make the same slot-2 virtual call. Revisit after a new combined TU state.
+// operations in reverse; both make the same slot-2 virtual call. A 30-trial
+// guarded TU-state sweep (seed 0x484f4d32) left the score unchanged. Revisit after
+// a genuine combined-TU change; this is not a proven wall.
 VA(0x004cac40, 0x35)
 int heroWindowManager::BroadcastMessage(int type, int p2, int p3, int p4)
 {
@@ -257,27 +258,33 @@ int heroWindowManager::BroadcastMessage(int type, int p2, int p3, int p4)
     msg.type = type;
     msg.payload.widget.command = p2;
     msg.payload.widget.id = p3;
-    msg.payload.widget.data.text = reinterpret_cast<char *>(p4);
+    msg.payload.widget.data.value = p4;
     return Main(msg);
 }
 
 // @match-note
-// Structurally complete /O2 checkpoint: retail link-assignment order and an
-// explicit second head snapshot raised this from 92.16% to 97.35%. The Open call,
-// ordered search and all head/tail/middle links now agree; 1/1 relocation agrees.
-// Base is 0xb6 bytes versus retail 0xbc. The remaining semantic diff is two
-// `xor ebp,ebp` encodings versus `mov ebp,0`, plus EAX/ECX selection for the head
-// snapshot; raw branch displacements make 149 bytes differ from +0x0d. Cached-head,
-// cached-tail and alternate assignment-order variants are recorded in the matrix.
+// Structurally complete /O2 checkpoint (live 98.97%): the Open call, ordered search,
+// and every head/tail/middle link agree; 1/1 relocation agrees. Base is 0xb9 bytes
+// versus retail 0xbc. The first residual is `xor ebp,ebp` versus retail
+// `mov ebp,0` after the z == -1 branch; the three-byte encoding delta accounts for
+// the size difference. The only other instruction diff is EAX versus ECX for the
+// saved head snapshot. Nested/comma z forms and direct/cached/duplicated head forms
+// were tried; 30 guarded TU-state trials and 80 clang-AST iterations found no gain.
+// Revisit after a genuine combined-TU change; this is not a proven wall.
 VA(0x004cac80, 0xbc)
 void heroWindowManager::AddWindow(class heroWindow *w, int zOrder, int openFlags)
 {
     heroWindow *cur = m_windowListTail;
-    int z = 0;
-    if ((w->m_winFlags & 1) == 0)
+    int z;
+    if ((w->m_winFlags & 1) != 0)
+        z = 0;
+    else
         z = zOrder;
-    if (z == -1 && (z = 0, cur != 0))
-        z = cur->m_zOrder + 1;
+    if (z == -1) {
+        z = 0;
+        if (cur != 0)
+            z = cur->m_zOrder + 1;
+    }
     if (z != 0 && m_windowListHead == 0)
         return;
     if (w->Open(z, openFlags) != 0)
@@ -292,9 +299,9 @@ void heroWindowManager::AddWindow(class heroWindow *w, int zOrder, int openFlags
     if (cur == 0) {
         w->m_nextWindow = m_windowListHead;
         w->m_prevWindow = 0;
-        heroWindow *head = m_windowListHead;
+        heroWindow *oldHead = m_windowListHead;
         m_windowListHead = w;
-        if (head == 0)
+        if (oldHead == 0)
             m_windowListTail = w;
     } else if (cur->m_nextWindow == 0) {
         w->m_prevWindow = m_windowListTail;
@@ -311,14 +318,6 @@ void heroWindowManager::AddWindow(class heroWindow *w, int zOrder, int openFlags
     m_focusWindow = w;
 }
 
-// @match-note
-// Structurally complete /O2 checkpoint (93.88%): moving next-link repair into the
-// non-tail arm recovered retail semantics. Base is 0x89 bytes/50 instructions and
-// retail is 0x87/49; both have the same 17-block, 11-branch ordered CFG, no local
-// frame, and the single relocation agrees. Retail compares [this+tail] directly
-// while base first loads it into ECX, leaving 81 unmasked positional bytes different
-// from +0xb. Branch-local previous-pointer lifetimes regressed to 90.10%; retain the
-// shared lifetime and revisit only after TU state changes. This is not a proven wall.
 VA(0x004cad40, 0x87)
 void heroWindowManager::RemoveWindow(class heroWindow *w)
 {
@@ -332,11 +331,12 @@ void heroWindowManager::RemoveWindow(class heroWindow *w)
             else
                 next->m_prevWindow = 0;
         } else {
-            heroWindow *prev = w->m_prevWindow;
             if (m_windowListTail == w) {
+                heroWindow *prev = w->m_prevWindow;
                 m_windowListTail = prev;
                 prev->m_nextWindow = 0;
             } else {
+                heroWindow *prev = w->m_prevWindow;
                 if (prev != 0)
                     prev->m_nextWindow = w->m_nextWindow;
                 if (w->m_nextWindow != 0)
@@ -354,13 +354,15 @@ void heroWindowManager::RemoveWindow(class heroWindow *w)
 }
 
 // @match-note
-// Structurally complete /O2 checkpoint (combined live and retained 99.11%): both code spans are 0x1cf with
-// 135 instructions, the exact 0x38 frame, identical 31-block/20-branch ordered CFG,
-// and 31/31 relocations with matching resolved targets. Nine unmasked bytes differ
-// at +0x152 because the message.payload.widget.id load crosses `mov ebp,1`. The two
-// displayed gFadeSavedUpdate names resolve to DATA(0x0053496c), but the scheduling
-// residual is real. Revisit after a genuine TU-state change; this is not an artifact
-// wall and does not justify repeating local predicate synonyms.
+// Structurally complete /O2 checkpoint (live 99.19%): base is 0x1ce bytes versus
+// retail 0x1cf with the exact 0x38 frame, identical ordered CFG, and 31/31 resolved
+// relocations. Reordering the independent dialog-result/done stores via the clang-AST
+// permuter removed the prior +0x152 residual. The sole code-shape difference is now
+// immediately after FadeIn: base emits `or edi,[gFadeSavedUpdate]`, while retail
+// emits `mov eax,[gFadeSavedUpdate]; or eax,edi`; both store the same flags. Direct,
+// swapped, local-accumulator, and two-store forms were tried. Guarded TU-state trials
+// reached disposable 99.78% candidates but rejected all that changed protected
+// siblings. Revisit after a genuine TU-state change; this is not a proven wall.
 VA(0x004cadd0, 0x1cf)
 int heroWindowManager::DoDialog(class heroWindow *window, int (*handler)(struct tag_message &),
                                 int fade)
@@ -414,9 +416,8 @@ int heroWindowManager::DoDialog(class heroWindow *window, int (*handler)(struct 
             result = window->BroadcastMessage(message);
             if (result == 2 && message.type == MESSAGE_WIDGET &&
                 message.payload.widget.command == WIDGET_COMMAND_DIALOG_SELECT) {
-                int dialogResult = message.payload.widget.id;
+                m_dialogResult = message.payload.widget.id;
                 done = 1;
-                m_dialogResult = dialogResult;
             }
         }
         result = handler(message);
