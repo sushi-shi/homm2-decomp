@@ -206,7 +206,7 @@ BASE/Misc	?AiPrint@@YIXPAD@Z	100.0000	5ed5d2f199a7
 BASE/Misc	?BaseAlloc@@YIPAXIPADH@Z	95.4595	48dbd30c1ee5
 BASE/Misc	?BaseFree@@YIXPAXPADH@Z	91.3333	b2940cf17b54
 BASE/Misc	?BitmapToScreen@@YIXPAVbitmap@@@Z	100.0000	ddaa22cc3922
-BASE/Misc	?BlitBitmapToScreen@@YIXPAVbitmap@@HHHHHH@Z	98.8889	9272c84ef61d
+BASE/Misc	?BlitBitmapToScreen@@YIXPAVbitmap@@HHHHHH@Z	98.8889	35aeaec45cf6
 BASE/Misc	?BlitBitmapToScreenNoMouseCheck@@YIXPAVbitmap@@HHHHHH@Z	100.0000	fdea32be7502
 BASE/Misc	?CreatePCXFile@@YIXPADPAEHH1@Z	98.3108	4281db990423
 BASE/Misc	?DataEntryWindowHandler@@YIHAAUtag_message@@@Z	98.8889	31ae34d532fa
@@ -224,9 +224,9 @@ BASE/Misc	?GetIconEntry@@YIPAUIconEntry@@PAVicon@@H@Z	100.0000	9cfdfb80be11
 BASE/Misc	?InitMemEntry@@YIXXZ	100.0000	c4affdfb9125
 BASE/Misc	?IsCDDrive@@YIHH@Z	100.0000	72b1e342be60
 BASE/Misc	?IsCycleColor@@YIHH@Z	100.0000	abe1d9cdd359
-BASE/Misc	?LogInt@@YIXPADHHHHHHH@Z	96.6000	dd43ee93ddb3
-BASE/Misc	?LogStr@@YIXPAD@Z	88.2222	65b1b73d5253
-BASE/Misc	?LogTruncate@@YIXXZ	92.5000	99a230e8174d
+BASE/Misc	?LogInt@@YIXPADHHHHHHH@Z	96.6000	43c01af6f55b
+BASE/Misc	?LogStr@@YIXPAD@Z	88.5000	4ddfe6221539
+BASE/Misc	?LogTruncate@@YIXXZ	92.5000	3a83ccf3a5f6
 BASE/Misc	?MAKEFILEID@@YIKPAD@Z	100.0000	fe018c518230
 BASE/Misc	?MemSize@@YIHH@Z	100.0000	adae663d19a8
 BASE/Misc	?PrintMemoryLeaks@@YIXXZ	96.0439	180a206ebc6f
