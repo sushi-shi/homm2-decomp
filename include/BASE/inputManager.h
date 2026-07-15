@@ -17,16 +17,16 @@ public:
     tag_message m_eventRing[64];  // +0x36  event ring (64 x 0x1c)
     int    m_readIndex;  // +0x736
     int    m_writeIndex;  // +0x73a
-    int    field_0x73e;  // +0x73e
+    int    m_mouseMessageActive;  // +0x73e  reentrancy guard shared by mouse event producers
     int    field_0x742;  // +0x742
     int    field_0x746;  // +0x746
     int    field_0x74a;  // +0x74a
     short  m_keyState[128];  // +0x74e  scan-code to ASCII/extended-key table
     int    field_0x84e;  // +0x84e
     int    field_0x852;  // +0x852
-    int    field_0x856;  // +0x856
+    int    m_keyCodeType;  // +0x856  zero converts scan codes to ASCII on dequeue
     int    m_field_0x85a;  // +0x85a
-    int    field_0x85e;  // +0x85e
+    int    m_modifiers;  // +0x85e  current keyboard modifier mask
     int    field_0x862;  // +0x862
     int    field_0x866;  // +0x866
     // --- constructors ---
