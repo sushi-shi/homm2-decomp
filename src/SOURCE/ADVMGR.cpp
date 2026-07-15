@@ -4997,7 +4997,8 @@ void advManager::DoTownKnob(void)
 
 // @early-stop
 // All 0x397 relocation-masked bytes are identical and all 38 relocation targets
-// agree; objdiff's residual is only delinked switch/jump-table local-label identity.
+// agree; ours only has one trailing alignment NOP. Objdiff's residual is delinked
+// switch/jump-table local-label identity.
 VA(0x00464b08, 0x397)
 void advManager::CastSpell(int spell)
 {
@@ -5257,11 +5258,16 @@ int DimensionDoorHandler(tag_message &message)
 }
 
 // @match-note
-// The retained source-hash object has the complete 0x1c frame/slots, draw CFG, and all
-// 161 relocation targets. Its residuals are delinked biased bComboDraw aliases,
-// commutative flat-index/min-max evaluation, and three retail alignment NOPs.
-// Direct and reversed index/min-max spellings and explicit temporaries compile to
-// the same evaluation order. Revisit after a material TU-state change.
+// Complete 0x1c frame/slots and draw CFG; all 161 resolved relocation targets agree.
+// After masking relocations, the first code-byte difference is +0x3ed: ours loads
+// mapRow before forming the column stride, while retail forms the stride first. The
+// byte-addressed visibility loads recover retail's effective addresses; the first
+// retains an equivalent MAP_WIDTH/mapY imul operand order at +0xaa6 and is one byte
+// longer. Later residuals are equivalent min/max load/compare orders, delinked biased
+// bComboDraw aliases, and three retail alignment NOPs. Direct/reversed flat-index,
+// multiplication, and relational AST forms compile identically or regress; explicit
+// temporaries, pointer/subscript variants, and grouped byte offsets were also worse.
+// Revisit after a material TU-state change or in the post-coverage last-mile phase.
 VA(0x004654ad, 0x11a9)
 int advManager::ComboDraw(int originX, int originY, int animate)
 {
@@ -5444,9 +5450,15 @@ int advManager::ComboDraw(int originX, int originY, int animate)
                 if (mapCellX < 0 || mapCellX > MAP_WIDTH - 1 || mapYValue < 1 ||
                     mapYValue > MAP_HEIGHT - 2)
                     continue;
-                if (m_visibilityMap[mapYValue * MAP_WIDTH + mapCellX] != 0)
+                if (*reinterpret_cast<unsigned short *>(
+                        reinterpret_cast<unsigned char *>(m_visibilityMap) +
+                        mapYValue * MAP_WIDTH * sizeof(unsigned short) +
+                        mapCellX * sizeof(unsigned short)) != 0)
                     ++bComboDraw[column][mapRow + 1];
-                if (m_visibilityMap[(mapYValue - 1) * MAP_WIDTH + mapCellX] != 0)
+                if (*reinterpret_cast<unsigned short *>(
+                        reinterpret_cast<unsigned char *>(m_visibilityMap) +
+                        (mapYValue - 1) * MAP_WIDTH * sizeof(unsigned short) +
+                        mapCellX * sizeof(unsigned short)) != 0)
                     ++bComboDraw[column][mapRow - 1];
             }
         }
