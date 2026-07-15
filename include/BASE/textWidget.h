@@ -19,7 +19,7 @@ public:
     char   *m_text;  // +0x20  the text buffer (BaseAlloc'd)
     font   *m_font;  // +0x24  the loaded font (disposed as resource in dtor)
     short  m_color;  // +0x28
-    char   field_0x2a;  // +0x2a
+    char   m_alignment;  // +0x2a  DrawBoundedString alignment mode
     // --- constructors ---
     textWidget(void);
     textWidget(short int, short int, short int, short int, char *, char *, short int, short int, short int, short int);

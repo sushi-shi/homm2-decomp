@@ -29,14 +29,17 @@ public:
     short  m_innerH;  // +0x3f
     short  m_innerX;  // +0x41
     short  m_innerY;  // +0x43
-    short  field_0x45;  // +0x45
-    short  m_hasInset;  // +0x47  !union: conflicting widths
+    short  m_maxLines;  // +0x45  maximum accepted wrapped line count
+    short  m_preserveTextOnFocus;  // +0x47  nonzero begins editing at the existing text
     short  m_entryType;  // +0x49
     short  m_displayOffset;  // +0x4b
     char   m_cursorBlink;  // +0x4d
     // --- constructors ---
     textEntryWidget(void);
-    textEntryWidget(short int, short int, short int, short int, short int, char *, char *, short int, char *, short int, short int, short int, short int, int, int);
+    textEntryWidget(short int x, short int y, short int width, short int height,
+                    short int maxLength, char *text, char *fontName, short int color,
+                    char *iconName, short int iconFrame, short int id, short int kind,
+                    short int layout, int horizontalInset, int verticalInset);
     virtual ~textEntryWidget() OVERRIDE;
     // --- virtual methods (vtable order) ---
     virtual void Draw(void) OVERRIDE;
