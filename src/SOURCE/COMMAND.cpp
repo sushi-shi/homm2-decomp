@@ -31,6 +31,14 @@
 #include <SOURCE/REMOTE.h>
 #include <SOURCE/town.h>
 #include <SOURCE/X_GLOBAL.h>
+// @match-note retained/live 97.02%: the complete input/timer, network,
+// turn-processing, selector, and win/lose CFG has the exact 0x36d span and 0x38
+// frame. All 39/39 relocation targets agree; the earlier diff rows are only
+// delinked identities for gConfig/glTimers and the float constant. The first
+// normalized code residual is instruction 131, where the final current-army
+// address uses the opposite side/index strength-reduction order. Direct [][] is
+// the recovered source spelling; revisit its evaluation shape at total SOURCE
+// 95%, after shared COMMAND layout stabilizes.
 VA(0x0042a6d0, 0x36d)
 int combatManager::Main(tag_message &message)
 {
@@ -156,207 +164,221 @@ int combatManager::ValidHexToStandOn(int hexIndex)
     return 1;
 }
 
-// @match-note retained/combined-live 87.85%: code size 0x8a1, frame 0x7c, and
-// all 5/5 relocations
-// agree. The first residual is instruction 13 in current-army address strength
-// reduction, repeated for targetArmy at instruction 42; later residuals are
-// condition layout in the direction/rear loops. Emitting the wide special arm
-// first fixed the earlier CFG wall.
+// @match-note retained/live 98.54%: the complete direction, rear-hex, path,
+// sector-fill, and pending-sector CFG has the exact 0x8a1 span and 0x7c frame;
+// all 5/5 relocation targets agree. The first raw residual is +0x26, where
+// retail loads m_currentArmySide (+0xf2a3) before m_currentArmyIndex (+0xf2a7)
+// and ours evaluates those array subscripts in the reverse order. All later
+// normalized instructions align. Raw local slots still differ: retail places
+// mapped/unresolved/path/targetIndex/next/currentArmy at -0x04..-0x1c and
+// directionHexes/rearHexes/direction/output/previous/targetArmy/standable/
+// targetSide at -0x5c..-0x78; the retained semantic suffixes establish the
+// correct frame but not that complete nested-scope reuse order. Direct [][] and
+// row-plus-index army access, reversed index[array] access, and an explicit
+// sizeof-based byte-offset expression were tried. Revisit at total SOURCE 95%.
 VA(0x0042abbe, 0x8a1)
 void combatManager::SetCombatDirections(int targetHex)
 {
     if (m_gridSelectionDisabled != 0)
         return;
 
-    char standable[COMBAT_DIRECTION_COUNT];
-    int directionHexes[COMBAT_DIRECTION_COUNT];
-    int rearHexes[COMBAT_DIRECTION_COUNT];
-    char pathValid[COMBAT_DIRECTION_COUNT];
-    army *currentArmy = &m_armies[m_currentArmySide][m_currentArmyIndex];
-    int targetSide = currentArmy->m_targetSide;
-    int targetIndex = currentArmy->m_targetIndex;
-    currentArmy->m_targetSide = -1;
-    currentArmy->m_targetIndex = -1;
-    army *targetArmy = &m_armies[targetSide][targetIndex];
+    char standable_3[COMBAT_DIRECTION_COUNT];
+    int directionHexes_4[COMBAT_DIRECTION_COUNT];
+    int rearHexes_15[COMBAT_DIRECTION_COUNT];
+    char pathValid_1[COMBAT_DIRECTION_COUNT];
+    army *currentArmy_3 = &m_armies[m_currentArmySide][m_currentArmyIndex];
+    int targetSide_36 = currentArmy_3->m_targetSide;
+    int targetIndex_6 = currentArmy_3->m_targetIndex;
+    currentArmy_3->m_targetSide = -1;
+    currentArmy_3->m_targetIndex = -1;
+    army *targetArmy_1 = &m_armies[targetSide_36][targetIndex_6];
 
-    int direction;
-    for (direction = 0; direction < COMBAT_DIRECTION_COUNT; direction++) {
-        if (direction == COMBAT_DIRECTION_SPECIAL_FIRST ||
-            direction == COMBAT_DIRECTION_SPECIAL_SECOND) {
-            if ((currentArmy->m_monster.flags.all & MONSTER_FLAGS_WIDE) != 0) {
-                if (currentArmy->m_facing == 1) {
-                    if (direction == COMBAT_DIRECTION_SPECIAL_FIRST)
-                        directionHexes[direction] = m_adjacency[targetHex][5];
-                    if (direction == COMBAT_DIRECTION_SPECIAL_SECOND)
-                        directionHexes[direction] = m_adjacency[targetHex][3];
+    int direction_27;
+    for (direction_27 = 0; direction_27 < COMBAT_DIRECTION_COUNT; direction_27++) {
+        if (direction_27 == COMBAT_DIRECTION_SPECIAL_FIRST ||
+            direction_27 == COMBAT_DIRECTION_SPECIAL_SECOND) {
+            if ((currentArmy_3->m_monster.flags.all & MONSTER_FLAGS_WIDE) != 0) {
+                if (currentArmy_3->m_facing == 1) {
+                    if (direction_27 == COMBAT_DIRECTION_SPECIAL_FIRST)
+                        directionHexes_4[direction_27] = m_adjacency[targetHex][5];
+                    if (direction_27 == COMBAT_DIRECTION_SPECIAL_SECOND)
+                        directionHexes_4[direction_27] = m_adjacency[targetHex][3];
                 } else {
-                    if (direction == COMBAT_DIRECTION_SPECIAL_FIRST)
-                        directionHexes[direction] = m_adjacency[targetHex][0];
-                    if (direction == COMBAT_DIRECTION_SPECIAL_SECOND)
-                        directionHexes[direction] = m_adjacency[targetHex][2];
+                    if (direction_27 == COMBAT_DIRECTION_SPECIAL_FIRST)
+                        directionHexes_4[direction_27] = m_adjacency[targetHex][0];
+                    if (direction_27 == COMBAT_DIRECTION_SPECIAL_SECOND)
+                        directionHexes_4[direction_27] = m_adjacency[targetHex][2];
                 }
             } else {
-                directionHexes[direction] = COMBAT_INVALID_HEX;
+                directionHexes_4[direction_27] = COMBAT_INVALID_HEX;
             }
         } else {
-            directionHexes[direction] = m_adjacency[targetHex][direction];
+            directionHexes_4[direction_27] =
+                *(&m_adjacency[0][0] +
+                  targetHex * COMBAT_ADJACENT_DIRECTION_COUNT + direction_27);
         }
 
-        if ((currentArmy->m_monster.flags.all & MONSTER_FLAGS_WIDE) == 0 ||
-            directionHexes[direction] == COMBAT_INVALID_HEX) {
-            rearHexes[direction] = COMBAT_IGNORED_HEX;
-        } else if (currentArmy->m_facing == 1) {
-            if (direction == 5 || direction == 4 || direction == 3) {
-                if (directionHexes[direction] % COMBAT_GRID_ROW_LENGTH ==
-                    COMBAT_GRID_FIRST_COLUMN)
-                    directionHexes[direction] = COMBAT_INVALID_HEX;
-                else
-                    directionHexes[direction]--;
-            }
-            if (directionHexes[direction] % COMBAT_GRID_ROW_LENGTH ==
-                COMBAT_GRID_REVERSE_FIRST_COLUMN)
-                rearHexes[direction] = COMBAT_INVALID_HEX;
-            else
-                rearHexes[direction] = directionHexes[direction] + 1;
-        } else {
-            if (direction == 0 || direction == 1 || direction == 2) {
-                if (directionHexes[direction] % COMBAT_GRID_ROW_LENGTH ==
+        if ((currentArmy_3->m_monster.flags.all & MONSTER_FLAGS_WIDE) != 0 &&
+            directionHexes_4[direction_27] != COMBAT_INVALID_HEX) {
+            if (currentArmy_3->m_facing == 1) {
+                if (direction_27 == 5 || direction_27 == 4 || direction_27 == 3) {
+                    if (directionHexes_4[direction_27] %
+                            COMBAT_GRID_ROW_LENGTH ==
+                        COMBAT_GRID_FIRST_COLUMN)
+                        directionHexes_4[direction_27] = COMBAT_INVALID_HEX;
+                    else
+                        directionHexes_4[direction_27]--;
+                }
+                if (directionHexes_4[direction_27] % COMBAT_GRID_ROW_LENGTH ==
                     COMBAT_GRID_REVERSE_FIRST_COLUMN)
-                    directionHexes[direction] = COMBAT_INVALID_HEX;
+                    rearHexes_15[direction_27] = COMBAT_INVALID_HEX;
                 else
-                    directionHexes[direction]++;
+                    rearHexes_15[direction_27] =
+                        directionHexes_4[direction_27] + 1;
+            } else {
+                if (direction_27 == 0 || direction_27 == 1 || direction_27 == 2) {
+                    if (directionHexes_4[direction_27] %
+                            COMBAT_GRID_ROW_LENGTH ==
+                        COMBAT_GRID_REVERSE_FIRST_COLUMN)
+                        directionHexes_4[direction_27] = COMBAT_INVALID_HEX;
+                    else
+                        directionHexes_4[direction_27]++;
+                }
+                if (directionHexes_4[direction_27] % COMBAT_GRID_ROW_LENGTH ==
+                    COMBAT_GRID_FIRST_COLUMN)
+                    rearHexes_15[direction_27] = COMBAT_INVALID_HEX;
+                else
+                    rearHexes_15[direction_27] =
+                        directionHexes_4[direction_27] - 1;
             }
-            if (directionHexes[direction] % COMBAT_GRID_ROW_LENGTH ==
-                COMBAT_GRID_FIRST_COLUMN)
-                rearHexes[direction] = COMBAT_INVALID_HEX;
-            else
-                rearHexes[direction] = directionHexes[direction] - 1;
+        } else {
+            rearHexes_15[direction_27] = COMBAT_IGNORED_HEX;
         }
 
-        if (ValidHexToStandOn(directionHexes[direction]) == 0 ||
-            ValidHexToStandOn(rearHexes[direction]) == 0)
-            standable[direction] = 0;
+        if (ValidHexToStandOn(directionHexes_4[direction_27]) != 0 &&
+            ValidHexToStandOn(rearHexes_15[direction_27]) != 0)
+            standable_3[direction_27] = 1;
         else
-            standable[direction] = 1;
+            standable_3[direction_27] = 0;
     }
 
-    if ((currentArmy->m_monster.flags.all & MONSTER_FLAGS_FLYING) == 0) {
-        for (direction = 0; direction < COMBAT_DIRECTION_COUNT; direction++) {
-            if (standable[direction] == 0) {
-                pathValid[direction] = 0;
-            } else if (directionHexes[direction] == currentArmy->m_hex ||
-                       currentArmy->ValidPath(directionHexes[direction], 1) !=
-                           0) {
-                pathValid[direction] = 1;
+    if ((currentArmy_3->m_monster.flags.all & MONSTER_FLAGS_FLYING) != 0) {
+        for (direction_27 = 0; direction_27 < COMBAT_DIRECTION_COUNT;
+             direction_27++)
+            pathValid_1[direction_27] = standable_3[direction_27];
+    } else {
+        for (direction_27 = 0; direction_27 < COMBAT_DIRECTION_COUNT; direction_27++) {
+            if (standable_3[direction_27] != 0) {
+                if (directionHexes_4[direction_27] == currentArmy_3->m_hex ||
+                    currentArmy_3->ValidPath(
+                        directionHexes_4[direction_27], 1) != 0)
+                    pathValid_1[direction_27] = 1;
+                else
+                    pathValid_1[direction_27] = 0;
             } else {
-                pathValid[direction] = 0;
+                pathValid_1[direction_27] = 0;
             }
         }
-    } else {
-        for (direction = 0; direction < COMBAT_DIRECTION_COUNT; direction++)
-            pathValid[direction] = standable[direction];
     }
 
     m_validDirectionCount = 0;
-    for (direction = 0; direction < COMBAT_DIRECTION_COUNT; direction++) {
-        if (pathValid[direction] != 0)
+    for (direction_27 = 0; direction_27 < COMBAT_DIRECTION_COUNT; direction_27++) {
+        if (pathValid_1[direction_27] != 0)
             m_validDirectionCount++;
     }
     if (m_validDirectionCount == 0)
-        pathValid[COMBAT_DIRECTION_SPECIAL_FIRST] = 1;
+        pathValid_1[COMBAT_DIRECTION_SPECIAL_FIRST] = 1;
 
     memset(m_directionMap, -1, sizeof(m_directionMap));
-    for (direction = 0; direction < COMBAT_DIRECTION_COUNT; direction++) {
-        int outputDirection = direction;
-        int mappedDirection;
-        if (direction < COMBAT_ADJACENT_DIRECTION_COUNT)
-            mappedDirection = (direction + 3) % COMBAT_ADJACENT_DIRECTION_COUNT;
-        else if (direction == COMBAT_DIRECTION_SPECIAL_FIRST)
-            mappedDirection = COMBAT_DIRECTION_SPECIAL_SECOND;
+    for (direction_27 = 0; direction_27 < COMBAT_DIRECTION_COUNT; direction_27++) {
+        int outputDirection_11 = direction_27;
+        int mappedDirection_7;
+        if (direction_27 < COMBAT_ADJACENT_DIRECTION_COUNT)
+            mappedDirection_7 = (direction_27 + 3) % COMBAT_ADJACENT_DIRECTION_COUNT;
+        else if (direction_27 == COMBAT_DIRECTION_SPECIAL_FIRST)
+            mappedDirection_7 = COMBAT_DIRECTION_SPECIAL_SECOND;
         else
-            mappedDirection = COMBAT_DIRECTION_SPECIAL_FIRST;
+            mappedDirection_7 = COMBAT_DIRECTION_SPECIAL_FIRST;
 
-        if (pathValid[mappedDirection] != 0) {
-            if ((targetArmy->m_monster.flags.all & MONSTER_FLAGS_WIDE) != 0) {
-                if (direction == 0 &&
-                    m_hexCells[targetHex - 1].m_occupantSide == targetSide &&
-                    m_hexCells[targetHex - 1].m_occupantIndex == targetIndex) {
-                    outputDirection = COMBAT_DIRECTION_SPECIAL_FIRST;
-                } else if (direction == 5 &&
-                           m_hexCells[targetHex + 1].m_occupantSide == targetSide &&
-                           m_hexCells[targetHex + 1].m_occupantIndex == targetIndex) {
-                    outputDirection = COMBAT_DIRECTION_SPECIAL_FIRST;
-                } else if (direction == 2 &&
-                           m_hexCells[targetHex - 1].m_occupantSide == targetSide &&
-                           m_hexCells[targetHex - 1].m_occupantIndex == targetIndex) {
-                    outputDirection = COMBAT_DIRECTION_SPECIAL_SECOND;
-                } else if (direction == 3 &&
-                           m_hexCells[targetHex + 1].m_occupantSide == targetSide &&
-                           m_hexCells[targetHex + 1].m_occupantIndex == targetIndex) {
-                    outputDirection = COMBAT_DIRECTION_SPECIAL_SECOND;
+        if (pathValid_1[mappedDirection_7] != 0) {
+            if ((targetArmy_1->m_monster.flags.all & MONSTER_FLAGS_WIDE) != 0) {
+                if (direction_27 == 0 &&
+                    m_hexCells[targetHex - 1].m_occupantSide == targetSide_36 &&
+                    m_hexCells[targetHex - 1].m_occupantIndex == targetIndex_6) {
+                    outputDirection_11 = COMBAT_DIRECTION_SPECIAL_FIRST;
+                } else if (direction_27 == 5 &&
+                           m_hexCells[targetHex + 1].m_occupantSide == targetSide_36 &&
+                           m_hexCells[targetHex + 1].m_occupantIndex == targetIndex_6) {
+                    outputDirection_11 = COMBAT_DIRECTION_SPECIAL_FIRST;
+                } else if (direction_27 == 2 &&
+                           m_hexCells[targetHex - 1].m_occupantSide == targetSide_36 &&
+                           m_hexCells[targetHex - 1].m_occupantIndex == targetIndex_6) {
+                    outputDirection_11 = COMBAT_DIRECTION_SPECIAL_SECOND;
+                } else if (direction_27 == 3 &&
+                           m_hexCells[targetHex + 1].m_occupantSide == targetSide_36 &&
+                           m_hexCells[targetHex + 1].m_occupantIndex == targetIndex_6) {
+                    outputDirection_11 = COMBAT_DIRECTION_SPECIAL_SECOND;
                 }
             }
 
-            if (direction < COMBAT_ADJACENT_DIRECTION_COUNT) {
-                memset(&m_directionMap[mappedDirection *
+            if (direction_27 < COMBAT_ADJACENT_DIRECTION_COUNT) {
+                memset(&m_directionMap[mappedDirection_7 *
                                        COMBAT_DIRECTION_SECTORS_PER_ADJACENT],
-                       outputDirection,
+                       outputDirection_11,
                        COMBAT_DIRECTION_SECTORS_PER_ADJACENT);
-            } else if (direction == COMBAT_DIRECTION_SPECIAL_FIRST) {
+            } else if (direction_27 == COMBAT_DIRECTION_SPECIAL_FIRST) {
                 m_directionMap[COMBAT_DIRECTION_SPECIAL_FIRST_SECTOR_START] =
-                    static_cast<signed char>(outputDirection);
+                    static_cast<signed char>(outputDirection_11);
                 m_directionMap[COMBAT_DIRECTION_SPECIAL_FIRST_SECTOR_CENTER] =
-                    static_cast<signed char>(outputDirection);
+                    static_cast<signed char>(outputDirection_11);
                 m_directionMap[COMBAT_DIRECTION_SPECIAL_FIRST_SECTOR_END] =
-                    static_cast<signed char>(outputDirection);
+                    static_cast<signed char>(outputDirection_11);
             } else {
                 m_directionMap[COMBAT_DIRECTION_SPECIAL_SECOND_SECTOR_CENTER] =
-                    static_cast<signed char>(outputDirection);
+                    static_cast<signed char>(outputDirection_11);
                 m_directionMap[COMBAT_DIRECTION_SPECIAL_SECOND_SECTOR_NEXT] =
-                    static_cast<signed char>(outputDirection);
+                    static_cast<signed char>(outputDirection_11);
                 m_directionMap[COMBAT_DIRECTION_SPECIAL_SECOND_SECTOR_PREVIOUS] =
-                    static_cast<signed char>(outputDirection);
+                    static_cast<signed char>(outputDirection_11);
             }
         }
     }
 
-    int unresolved = COMBAT_DIRECTION_SECTOR_COUNT;
-    while (unresolved > 0) {
-        for (direction = 0; direction < COMBAT_DIRECTION_SECTOR_COUNT;
-             direction++) {
-            if (m_directionMap[direction] == -1) {
-                int next = (direction + 1) % COMBAT_DIRECTION_SECTOR_COUNT;
-                int previous =
-                    (direction + COMBAT_DIRECTION_SECTOR_COUNT - 1) %
+    int unresolved_7 = COMBAT_DIRECTION_SECTOR_COUNT;
+    while (unresolved_7 > 0) {
+        for (direction_27 = 0; direction_27 < COMBAT_DIRECTION_SECTOR_COUNT;
+             direction_27++) {
+            if (m_directionMap[direction_27] == -1) {
+                int next_3 = (direction_27 + 1) % COMBAT_DIRECTION_SECTOR_COUNT;
+                int previous_1 =
+                    (direction_27 + COMBAT_DIRECTION_SECTOR_COUNT - 1) %
                     COMBAT_DIRECTION_SECTOR_COUNT;
-                if (m_directionMap[next] < 0 ||
-                    m_directionMap[next] >= COMBAT_DIRECTION_COUNT) {
-                    if (m_directionMap[previous] >= 0 &&
-                        m_directionMap[previous] < COMBAT_DIRECTION_COUNT) {
-                        m_directionMap[direction] =
-                            m_directionMap[previous] +
-                            COMBAT_DIRECTION_PENDING_OFFSET;
-                    }
-                } else {
-                    m_directionMap[direction] =
-                        m_directionMap[next] + COMBAT_DIRECTION_PENDING_OFFSET;
+                if (m_directionMap[next_3] >= 0 &&
+                    m_directionMap[next_3] <= COMBAT_DIRECTION_SPECIAL_SECOND) {
+                    m_directionMap[direction_27] =
+                        m_directionMap[next_3] + COMBAT_DIRECTION_PENDING_OFFSET;
+                } else if (m_directionMap[previous_1] >= 0 &&
+                           m_directionMap[previous_1] <=
+                               COMBAT_DIRECTION_SPECIAL_SECOND) {
+                    m_directionMap[direction_27] =
+                        m_directionMap[previous_1] +
+                        COMBAT_DIRECTION_PENDING_OFFSET;
                 }
             }
         }
-        unresolved = 0;
-        for (direction = 0; direction < COMBAT_DIRECTION_SECTOR_COUNT;
-             direction++) {
-            if (m_directionMap[direction] < COMBAT_DIRECTION_PENDING_OFFSET) {
-                if (m_directionMap[direction] == -1)
-                    unresolved++;
-            } else {
-                m_directionMap[direction] -= COMBAT_DIRECTION_PENDING_OFFSET;
+        unresolved_7 = 0;
+        for (direction_27 = 0; direction_27 < COMBAT_DIRECTION_SECTOR_COUNT;
+             direction_27++) {
+            if (m_directionMap[direction_27] >= COMBAT_DIRECTION_PENDING_OFFSET) {
+                m_directionMap[direction_27] -= COMBAT_DIRECTION_PENDING_OFFSET;
+            } else if (m_directionMap[direction_27] == COMBAT_INVALID_HEX) {
+                unresolved_7++;
             }
         }
     }
 
-    currentArmy->m_targetSide = targetSide;
-    currentArmy->m_targetIndex = targetIndex;
+    currentArmy_3->m_targetSide = targetSide_36;
+    currentArmy_3->m_targetIndex = targetIndex_6;
 }
 
 // @match-note 98.80%: frame 0x34 and all 19/19
@@ -529,18 +551,26 @@ int combatManager::GetPointer(int command, int hexIndex)
     }
 }
 
-// @match-note 94.06%: current span is 0x8a9 versus retail 0x8e4 and frame is
-// 0x68 versus 0x70. Manual range review finds 109 relocation entries on both
-// sides with matching external-call multiplicities; the helper truncates at the
-// first delinked switch label. The first normalized residual follows instruction
-// 30 at the help switch table. Retail body order, all event cases, and dialog,
-// pointer, grid, spell, and debug paths are reconstructed; local-slot recovery remains.
+// @match-note retained/live 96.93%: the complete window, mouse, keyboard,
+// dialog, pointer, grid, spell, and debug CFG now has the exact 0x70 frame and
+// compiles to 0x8da bytes versus retail 0x8e4. The real slots match: result -0x04,
+// selectedHex -0x08, mouse X/Y -0x0c/-0x10, pendingMessage -0x2c..-0x14,
+// helpIndex -0x30, MouseCoords X/Y -0x34/-0x38, and this -0x58; the five switch
+// temporaries occupy -0x5c..-0x70. Manual range review finds 109 relocation
+// entries on both sides with no base-only target. The semantic diff first loses
+// synchronization after instruction 30 at the delinked help jump table; retail
+// tables are target +0xe5/0x1c, +0x227/0x10, and +0x815/0x38. Widening the real
+// selectedHex/pendingMessage scopes and restoring the command, hover-ID, and
+// click-ID nested switches fixed the frame and 0x31 bytes. Revisit the remaining
+// ten-byte switch-continuation residual at total SOURCE 95%, not before.
 VA(0x0042bb26, 0x8e4)
 int combatManager::ProcessCombatMsg(tag_message &message)
 {
     int mouseX = message.payload.mouse.screenX;
     int mouseY = message.payload.mouse.screenY;
-    int unusedResult = 0;
+    int unusedResult_14 = 0;
+    int selectedHex_36;
+    tag_message pendingMessage;
 
     switch (message.type) {
     case COMBAT_EVENT_WINDOW:
@@ -581,22 +611,30 @@ int combatManager::ProcessCombatMsg(tag_message &message)
                                  NORMAL_DIALOG_NO_RESOURCE, 0);
                 }
             }
-        } else if (message.payload.widget.command == COMBAT_WINDOW_HOVER) {
-            if (message.payload.widget.id == COMBAT_WINDOW_MAIN_BUTTON)
-                DoCommand(m_currentCommand);
-        } else if (message.payload.widget.command == COMBAT_WINDOW_CLICK) {
-            switch (message.payload.widget.id) {
-            case COMBAT_CONTROL_ATTACK:
-                giNextAction = COMBAT_MESSAGE_COMMAND_ATTACK;
+        } else {
+            switch (message.payload.widget.command) {
+            case COMBAT_WINDOW_HOVER:
+                switch (message.payload.widget.id) {
+                case COMBAT_WINDOW_MAIN_BUTTON:
+                    DoCommand(m_currentCommand);
+                    break;
+                }
                 break;
-            case COMBAT_CONTROL_WAIT:
-                giNextAction = COMBAT_AI_ACTION_WAIT;
-                break;
-            case COMBAT_CONTROL_DISABLE_SELECTION:
-                m_gridSelectionDisabled = 1;
-                break;
-            case COMBAT_CONTROL_SYSTEM_OPTIONS:
-                CombatSystemOptions();
+            case COMBAT_WINDOW_CLICK:
+                switch (message.payload.widget.id) {
+                case COMBAT_CONTROL_ATTACK:
+                    giNextAction = COMBAT_MESSAGE_COMMAND_ATTACK;
+                    break;
+                case COMBAT_CONTROL_WAIT:
+                    giNextAction = COMBAT_AI_ACTION_WAIT;
+                    break;
+                case COMBAT_CONTROL_DISABLE_SELECTION:
+                    m_gridSelectionDisabled = 1;
+                    break;
+                case COMBAT_CONTROL_SYSTEM_OPTIONS:
+                    CombatSystemOptions();
+                    break;
+                }
                 break;
             }
         }
@@ -604,31 +642,30 @@ int combatManager::ProcessCombatMsg(tag_message &message)
 
     case COMBAT_EVENT_MOUSE_MOVE:
         if (m_gridSelectionDisabled == 0) {
-            tag_message pendingMessage = gpInputManager->PeekEvent();
+            pendingMessage = gpInputManager->PeekEvent();
             if (pendingMessage.type != COMBAT_EVENT_MOUSE_MOVE) {
-                int selectedHex;
                 if (InCombatArea(message.payload.mouse.screenX, message.payload.mouse.screenY) != 0)
-                    selectedHex = GetGridIndex(mouseX, mouseY);
+                    selectedHex_36 = GetGridIndex(mouseX, mouseY);
                 else
-                    selectedHex = COMBAT_INVALID_HEX;
+                    selectedHex_36 = COMBAT_INVALID_HEX;
 
-                UpdateMouseGrid(selectedHex, 0);
+                UpdateMouseGrid(selectedHex_36, 0);
                 if (InCombatArea(message.payload.mouse.screenX, message.payload.mouse.screenY) != 0) {
-                    if (m_selectedHex != selectedHex ||
-                        selectedHex == COMBAT_INVALID_HEX) {
-                        m_selectedHex = selectedHex;
+                    if (m_selectedHex != selectedHex_36 ||
+                        selectedHex_36 == COMBAT_INVALID_HEX) {
+                        m_selectedHex = selectedHex_36;
                         m_previousCommand = COMBAT_INVALID_COMMAND;
                         m_currentCommand = GetCommand(m_selectedHex);
                         m_mouseDirection = COMBAT_INVALID_HEX;
                         if (m_currentCommand == COMBAT_MESSAGE_COMMAND_ATTACK) {
-                            SetCombatDirections(selectedHex);
-                            CheckSetMouseDirection(mouseX, mouseY, selectedHex);
+                            SetCombatDirections(selectedHex_36);
+                            CheckSetMouseDirection(mouseX, mouseY, selectedHex_36);
                         } else {
                             gpMouseManager->SetPointer(
-                                GetPointer(m_currentCommand, selectedHex));
+                                GetPointer(m_currentCommand, selectedHex_36));
                         }
                     } else if (m_currentCommand == COMBAT_MESSAGE_COMMAND_ATTACK) {
-                        CheckSetMouseDirection(mouseX, mouseY, selectedHex);
+                        CheckSetMouseDirection(mouseX, mouseY, selectedHex_36);
                     }
                     if (m_previousCommand != m_currentCommand) {
                         m_previousCommand = m_currentCommand;
@@ -702,9 +739,9 @@ int combatManager::ProcessCombatMsg(tag_message &message)
             giNextAction = COMBAT_AI_ACTION_WAIT;
             break;
         case COMBAT_KEY_MOUSE_COORDS: {
-            int currentMouseX;
-            int currentMouseY;
-            gpMouseManager->MouseCoords(currentMouseX, currentMouseY);
+            int currentMouseX_18;
+            int currentMouseY_18;
+            gpMouseManager->MouseCoords(currentMouseX_18, currentMouseY_18);
             break;
         }
         case COMBAT_KEY_VIEW_GENERAL:
@@ -1512,165 +1549,183 @@ void combatManager::ShowEagleEyeSpell(class heroWindow *window)
     WaitEndSample(playedSample, -1);
 }
 
-// @match-note retained/live 91.57%: the complete casualty/widget CFG compiles to
-// 0xa22 bytes versus retail 0x9cc. Retail uses a 0x1a4 frame (`this` -0x1a4, quantity[42]
-// -0x184, type[2][20] -0xac, army/side/y -0xdc..-0xd4, width/bottom
-// -0xb4/-0xb0, spacing/text -0x0c/-0x08, window +0x08); ours is 0x188.
-// First normalized residual is instruction 34, the side/army strength reduction.
-// All 55 retail calls/relocations are reconstructed; offsets diverge after that
-// loop, while external targets and local strings are accounted for. Direct and
-// cached army access, cached versus four repeated GetIconEntry calls, and both
-// index operand orders were tried. Revisit when total SOURCE fuzzy reaches 95%.
+// @match-note retained/live 98.65%: the complete casualty scan and widget CFG
+// compiles to 0x9cb bytes versus retail 0x9cc; all 55/55 relocation targets
+// agree. Width/bottom are exact at -0xb0/-0xac, and the type array, text,
+// spacing, integer geometry, clamp, and constructor argument flow are recovered.
+// Retail still reserves a 0x1a4 frame versus ours 0x188: side/army/y and the
+// quantity[42] array are uniformly 0x10 too shallow, followed by a 0x0c tail gap
+// before `this`, consistent with unrecovered hidden constructor temporaries. The
+// first non-relocation normalized residual is instruction 399, ours `jle` versus
+// retail `jge` at the displayed-army loop; two later constructor-coordinate
+// expressions differ only in constant association and the last uses retail
+// `movsx ax`/add versus ours increment. Restored the shared clear/side counter,
+// flat aggregate access, 32-bit spacing/startX, two-arm clamp, and constant width;
+// direct multidimensional access, cached icon entries, and short geometry were
+// worse. Revisit hidden-temporary slots and the three residual shapes at 95%.
 VA(0x0042e2bf, 0x9cc)
 void combatManager::ShowDeadArmies(class heroWindow *window)
 {
-    int casualtyQuantity[COMBAT_CASUALTY_QUANTITY_STORAGE_COUNT];
-    int casualtyType[COMBAT_MANAGER_SIDE_COUNT][COMBAT_ARMY_SLOT_COUNT];
-    int side;
-    int armyIndex;
-    int y;
-    short width = 320;
-    short bottom = 458;
-    int displayedCount;
-    short spacing;
-    short startX;
-    char *text;
-    icon *monsterIcons;
+    int casualtyQuantity_0[COMBAT_CASUALTY_QUANTITY_STORAGE_COUNT];
+    int casualtyType_1[COMBAT_MANAGER_SIDE_COUNT][COMBAT_ARMY_SLOT_COUNT];
+    int side_9;
+    int armyIndex_8;
+    int y_29;
+    short width_9 = COMBAT_CASUALTY_WINDOW_WIDTH;
+    short bottom_4 = COMBAT_CASUALTY_WINDOW_BOTTOM;
+    int displayedCount_11;
+    int spacing_9;
+    int startX_0;
+    char *text_27;
+    icon *monsterIcons_2;
 
-    for (armyIndex = 0; armyIndex < COMBAT_WIN_LOSE_WIDGET_COUNT;
-         ++armyIndex) {
-        m_winLoseBottomWidgets[armyIndex] = 0;
-        m_winLoseBottomTextWidgets[armyIndex] = 0;
+    for (side_9 = 0; side_9 < COMBAT_WIN_LOSE_WIDGET_COUNT; ++side_9) {
+        m_winLoseBottomWidgets[side_9] = 0;
+        m_winLoseBottomTextWidgets[side_9] = 0;
     }
-    for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; ++side) {
-        casualtyQuantity[side] = 0;
-        for (armyIndex = 0; armyIndex < COMBAT_ARMY_SLOT_COUNT; ++armyIndex) {
-            if (m_armies[side][armyIndex].m_monsterType != -1 &&
-                m_armies[side][armyIndex].m_quantity <
-                    m_armies[side][armyIndex].m_initialQuantity) {
-                casualtyType[side][casualtyQuantity[side]] =
-                    m_armies[side][armyIndex].m_monsterType;
-                casualtyQuantity[COMBAT_MANAGER_SIDE_COUNT +
-                                 side * COMBAT_ARMY_SLOT_COUNT +
-                                 casualtyQuantity[side]] =
-                    m_armies[side][armyIndex].m_initialQuantity -
-                    m_armies[side][armyIndex].m_quantity;
-                ++casualtyQuantity[side];
+    for (side_9 = 0; side_9 < COMBAT_MANAGER_SIDE_COUNT; ++side_9) {
+        casualtyQuantity_0[side_9] = 0;
+        for (armyIndex_8 = 0; armyIndex_8 < COMBAT_ARMY_SLOT_COUNT; ++armyIndex_8) {
+            if (m_armies[side_9][armyIndex_8].m_monsterType != -1 &&
+                m_armies[side_9][armyIndex_8].m_quantity <
+                    m_armies[side_9][armyIndex_8].m_initialQuantity) {
+                *(&casualtyType_1[0][0] +
+                  side_9 * COMBAT_ARMY_SLOT_COUNT +
+                  casualtyQuantity_0[side_9]) =
+                    m_armies[side_9][armyIndex_8].m_monsterType;
+                *(&casualtyQuantity_0[COMBAT_MANAGER_SIDE_COUNT] +
+                  side_9 * COMBAT_ARMY_SLOT_COUNT +
+                  casualtyQuantity_0[side_9]) =
+                    m_armies[side_9][armyIndex_8].m_initialQuantity -
+                    m_armies[side_9][armyIndex_8].m_quantity;
+                ++casualtyQuantity_0[side_9];
             }
         }
     }
 
-    text = static_cast<char *>(BaseAlloc(
+    text_27 = static_cast<char *>(BaseAlloc(
         30, COMMAND_SOURCE_FILE, COMMAND_CASUALTY_TITLE_ALLOC_LINE));
-    sprintf(text, "Battlefield Casualties");
+    sprintf(text_27, "Battlefield Casualties");
     m_winLoseBottomTextWidgets[17] =
-        new textWidget(16, 263, width, 20, text, "smalfont.fnt", 1, 2110,
+        new textWidget(16, 263, COMBAT_CASUALTY_WINDOW_WIDTH, 20, text_27,
+                       "smalfont.fnt", 1, 2110,
                        COMBAT_WIN_LOSE_TEXT_FLAGS, 1);
     if (m_winLoseBottomTextWidgets[17] == 0)
         MemError();
     window->AddWidget(m_winLoseBottomTextWidgets[17], -1);
 
-    for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; ++side) {
-        if (side == COMBAT_ATTACKER_SIDE)
-            y = 279;
+    for (side_9 = 0; side_9 < COMBAT_MANAGER_SIDE_COUNT; ++side_9) {
+        if (side_9 == COMBAT_ATTACKER_SIDE)
+            y_29 = 279;
         else
-            y = 346;
-        text = static_cast<char *>(BaseAlloc(
+            y_29 = 346;
+        text_27 = static_cast<char *>(BaseAlloc(
             30, COMMAND_SOURCE_FILE, COMMAND_CASUALTY_HEADER_ALLOC_LINE));
-        sprintf(text,
-                side == COMBAT_ATTACKER_SIDE ? "Attacker" : "Defender");
-        m_winLoseBottomTextWidgets[15 + side] =
-            new textWidget(16, static_cast<short>(y) + 3, width, 20, text,
+        sprintf(text_27,
+                side_9 == COMBAT_ATTACKER_SIDE ? "Attacker" : "Defender");
+        m_winLoseBottomTextWidgets[15 + side_9] =
+            new textWidget(16, y_29 + 3, COMBAT_CASUALTY_WINDOW_WIDTH, 20,
+                           text_27,
                            "smalfont.fnt", 1, 2110,
                            COMBAT_WIN_LOSE_TEXT_FLAGS, 1);
-        if (m_winLoseBottomTextWidgets[15 + side] == 0)
+        if (m_winLoseBottomTextWidgets[15 + side_9] == 0)
             MemError();
-        window->AddWidget(m_winLoseBottomTextWidgets[15 + side], -1);
+        window->AddWidget(m_winLoseBottomTextWidgets[15 + side_9], -1);
 
-        if (casualtyQuantity[side] < 1) {
-            text = static_cast<char *>(BaseAlloc(
+        if (casualtyQuantity_0[side_9] <= 0) {
+            text_27 = static_cast<char *>(BaseAlloc(
                 10, COMMAND_SOURCE_FILE, COMMAND_CASUALTY_NONE_ALLOC_LINE));
-            sprintf(text, "None");
-            m_winLoseBottomTextWidgets[side * COMBAT_CASUALTY_WIDGETS_PER_SIDE] =
-                new textWidget(16, static_cast<short>(y) + 21, width, 20,
-                               text, "smalfont.fnt", 1, side * 5 + 2100,
+            sprintf(text_27, "None");
+            m_winLoseBottomTextWidgets[side_9 * COMBAT_CASUALTY_WIDGETS_PER_SIDE] =
+                new textWidget(16, y_29 + 21, COMBAT_CASUALTY_WINDOW_WIDTH, 20,
+                               text_27, "smalfont.fnt", 1, side_9 * 5 + 2100,
                                COMBAT_WIN_LOSE_TEXT_FLAGS, 1);
             if (m_winLoseBottomTextWidgets
-                    [side * COMBAT_CASUALTY_WIDGETS_PER_SIDE] == 0)
+                    [side_9 * COMBAT_CASUALTY_WIDGETS_PER_SIDE] == 0)
                 MemError();
             window->AddWidget(
                 m_winLoseBottomTextWidgets
-                    [side * COMBAT_CASUALTY_WIDGETS_PER_SIDE],
+                    [side_9 * COMBAT_CASUALTY_WIDGETS_PER_SIDE],
                 -1);
         }
 
-        monsterIcons = gpResourceManager->GetIcon("mons32.icn");
-        displayedCount = casualtyQuantity[side];
-        if (displayedCount > COMBAT_CASUALTY_DISPLAY_LIMIT)
-            displayedCount = COMBAT_CASUALTY_DISPLAY_LIMIT;
-        spacing = 40;
-        startX = static_cast<short>((320 - displayedCount * 40) / 2) + 3;
-        for (armyIndex = 0; armyIndex < displayedCount; ++armyIndex) {
+        monsterIcons_2 = gpResourceManager->GetIcon("mons32.icn");
+        displayedCount_11 =
+            casualtyQuantity_0[side_9] < COMBAT_CASUALTY_DISPLAY_LIMIT
+                ? casualtyQuantity_0[side_9]
+                : COMBAT_CASUALTY_DISPLAY_LIMIT;
+        spacing_9 = 40;
+        startX_0 = (COMBAT_CASUALTY_WINDOW_WIDTH -
+                    displayedCount_11 * spacing_9) /
+                       2 +
+                   3;
+        for (armyIndex_8 = 0; displayedCount_11 > armyIndex_8; ++armyIndex_8) {
             m_winLoseBottomWidgets
-                [side * COMBAT_CASUALTY_WIDGETS_PER_SIDE + armyIndex] =
+                [side_9 * COMBAT_CASUALTY_WIDGETS_PER_SIDE + armyIndex_8] =
                 new iconWidget(
-                    static_cast<short>(armyIndex) * spacing + startX -
-                        GetIconEntry(monsterIcons,
-                                     casualtyType[side][armyIndex])
+                    armyIndex_8 * spacing_9 + startX_0 -
+                        GetIconEntry(monsterIcons_2,
+                                     *(&casualtyType_1[0][0] +
+                                       side_9 * COMBAT_ARMY_SLOT_COUNT +
+                                       armyIndex_8))
                             ->x +
                         static_cast<short>(
                             (32 - GetIconEntry(
-                                      monsterIcons,
-                                      casualtyType[side][armyIndex])
+                                      monsterIcons_2,
+                                      *(&casualtyType_1[0][0] +
+                                        side_9 * COMBAT_ARMY_SLOT_COUNT +
+                                        armyIndex_8))
                                       ->w) /
                             2) +
                         17,
-                    (static_cast<short>(y) -
-                     GetIconEntry(monsterIcons,
-                                  casualtyType[side][armyIndex])
+                    (y_29 -
+                     GetIconEntry(monsterIcons_2,
+                                  *(&casualtyType_1[0][0] +
+                                    side_9 * COMBAT_ARMY_SLOT_COUNT +
+                                    armyIndex_8))
                          ->y -
-                     GetIconEntry(monsterIcons,
-                                  casualtyType[side][armyIndex])
+                     GetIconEntry(monsterIcons_2,
+                                  *(&casualtyType_1[0][0] +
+                                    side_9 * COMBAT_ARMY_SLOT_COUNT +
+                                    armyIndex_8))
                          ->h) +
                         51,
                     32, 28, "mons32.icn",
-                    static_cast<short>(casualtyType[side][armyIndex]), 0,
-                    static_cast<short>(side) * 5 +
-                        static_cast<short>(armyIndex) + 2000,
+                    *(&casualtyType_1[0][0] +
+                      side_9 * COMBAT_ARMY_SLOT_COUNT + armyIndex_8),
+                    0,
+                    side_9 * 5 + armyIndex_8 + 2000,
                     COMBAT_WIN_LOSE_ICON_FLAGS, 1);
             if (m_winLoseBottomWidgets
-                    [side * COMBAT_CASUALTY_WIDGETS_PER_SIDE + armyIndex] == 0)
+                    [side_9 * COMBAT_CASUALTY_WIDGETS_PER_SIDE + armyIndex_8] == 0)
                 MemError();
 
-            text = static_cast<char *>(BaseAlloc(
+            text_27 = static_cast<char *>(BaseAlloc(
                 9, COMMAND_SOURCE_FILE,
                 COMMAND_CASUALTY_QUANTITY_ALLOC_LINE));
-            sprintf(text, "%d",
-                    casualtyQuantity[COMBAT_MANAGER_SIDE_COUNT +
-                                     side * COMBAT_ARMY_SLOT_COUNT +
-                                     armyIndex]);
+            sprintf(text_27, "%d",
+                    *(&casualtyQuantity_0[COMBAT_MANAGER_SIDE_COUNT] +
+                      side_9 * COMBAT_ARMY_SLOT_COUNT + armyIndex_8));
             m_winLoseBottomTextWidgets
-                [side * COMBAT_CASUALTY_WIDGETS_PER_SIDE + armyIndex] =
-                new textWidget(static_cast<short>(armyIndex) * spacing +
-                                   startX + 16,
-                               static_cast<short>(y) + 53, 32, 12, text,
+                [side_9 * COMBAT_CASUALTY_WIDGETS_PER_SIDE + armyIndex_8] =
+                new textWidget(armyIndex_8 * spacing_9 + startX_0 + 16,
+                               y_29 + 53, 32, 12, text_27,
                                "smalfont.fnt", 1,
-                               static_cast<short>(side) * 5 +
-                                   static_cast<short>(armyIndex) + 2100,
+                               side_9 * 5 + armyIndex_8 + 2100,
                                COMBAT_WIN_LOSE_TEXT_FLAGS, 1);
             if (m_winLoseBottomTextWidgets
-                    [side * COMBAT_CASUALTY_WIDGETS_PER_SIDE + armyIndex] == 0)
+                    [side_9 * COMBAT_CASUALTY_WIDGETS_PER_SIDE + armyIndex_8] == 0)
                 MemError();
             window->AddWidget(
                 m_winLoseBottomWidgets
-                    [side * COMBAT_CASUALTY_WIDGETS_PER_SIDE + armyIndex],
+                    [side_9 * COMBAT_CASUALTY_WIDGETS_PER_SIDE + armyIndex_8],
                 -1);
             window->AddWidget(
                 m_winLoseBottomTextWidgets
-                    [side * COMBAT_CASUALTY_WIDGETS_PER_SIDE + armyIndex],
+                    [side_9 * COMBAT_CASUALTY_WIDGETS_PER_SIDE + armyIndex_8],
                 -1);
         }
-        gpResourceManager->Dispose(monsterIcons);
+        gpResourceManager->Dispose(monsterIcons_2);
     }
 }
 

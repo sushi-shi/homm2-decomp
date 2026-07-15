@@ -205,7 +205,9 @@ typedef enum CombatCommandGeometry {
 typedef enum CombatCasualtyConstant {
     COMBAT_CASUALTY_QUANTITY_STORAGE_COUNT = 42,
     COMBAT_CASUALTY_DISPLAY_LIMIT = 7,
-    COMBAT_CASUALTY_WIDGETS_PER_SIDE = 7
+    COMBAT_CASUALTY_WIDGETS_PER_SIDE = 7,
+    COMBAT_CASUALTY_WINDOW_WIDTH = 320,
+    COMBAT_CASUALTY_WINDOW_BOTTOM = 458
 } CombatCasualtyConstant;
 
 typedef enum CombatCycleConstant {
