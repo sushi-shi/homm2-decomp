@@ -44,16 +44,6 @@ typedef enum GameSerializationConstant {
     GAME_BOAT_COUNT = 48
 } GameSerializationConstant;
 
-typedef enum GameLayoutConstant {
-    GAME_PLAYER_TOWN_LIST_OFFSET = 0x4e3,
-    GAME_PLAYER_RECORD_SIZE = 283
-} GameLayoutConstant;
-
-struct PlayerTownListView {
-    char pad[GAME_PLAYER_TOWN_LIST_OFFSET];
-    signed char townIds[GAME_PLAYER_COUNT][GAME_PLAYER_RECORD_SIZE];
-};
-
 typedef enum GameSourceLine {
     GAME_SET_MAP_SIZE_FREE_OFFSET = 0xc,
     GAME_SET_MAP_SIZE_ALLOC_OFFSET = 0xd,
