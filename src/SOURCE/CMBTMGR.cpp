@@ -415,7 +415,7 @@ int combatManager::Open(int openFlags)
     m_messageMask = 0x200;
     m_priority = openFlags;
     m_active = 1;
-    strcpy(name, "combatManager");
+    strcpy(m_name, "combatManager");
     LogStr("Op5");
     return 0;
 }

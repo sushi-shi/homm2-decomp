@@ -387,7 +387,7 @@ int fileRequester::Open(int id)
     m_messageMask = 0x4000;
     m_priority = id;
     m_active = 1;
-    strcpy(name, "fileRequester");
+    strcpy(m_name, "fileRequester");
     return 0;
 }
 

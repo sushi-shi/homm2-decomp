@@ -38,7 +38,7 @@ mouseManager::mouseManager(void) : baseManager()
     m_savedUnderlying = 0;
     m_active = 0;
     m_cursorType = MOUSE_INVALID_CURSOR_TYPE;
-    strcpy(name, "mouseManager");
+    strcpy(m_name, "mouseManager");
     m_cursorFrame = 0;
     m_cursorReady = 1;
     m_cursorIcon = 0;

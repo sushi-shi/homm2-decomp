@@ -6,15 +6,23 @@
 #include <va.h>
 #include <BASE/baseManager.h>
 #include <string.h>
+
+// @match-note: structurally complete /O2 checkpoint (live/retained 79.67%).
+// Base and retail are both 0x47 bytes with the same two ordered text relocations
+// ("Unknown", vtable), and original PE bytes at 0x004eba70 confirm three
+// __purecall slots. Retail stores next/prev zero before the vptr, then priority/
+// message-mask -1 and active zero; from the priority store onward the objects are
+// byte-identical. Base instead schedules the vptr before its register saves.
+// Right-associative body assignment chains preserve retail's field-store order;
+// an initializer list cannot, because declaration order would reverse the two
+// -1 stores. Revisit after a genuine class-header/TU-state change.
 VA(0x004d2530, 0x47)
 baseManager::baseManager(void)
 {
-    m_next = 0;
-    m_prev = 0;
-    m_priority = -1;
-    m_messageMask = -1;
+    m_prev = m_next = 0;
+    m_messageMask = m_priority = -1;
     m_active = 0;
-    strcpy(name, "Unknown");
+    strcpy(m_name, "Unknown");
 }
 
 

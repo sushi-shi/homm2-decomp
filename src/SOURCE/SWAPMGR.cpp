@@ -143,7 +143,7 @@ int swapManager::Open(int id)
     m_messageMask = SWAP_MANAGER_MESSAGE;
     m_priority = id;
     m_active = 1;
-    strcpy(name, "swapManager");
+    strcpy(m_name, "swapManager");
     return 0;
 }
 

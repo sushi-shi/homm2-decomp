@@ -24,7 +24,7 @@ public:
     baseManager *m_prev;  // +0x08  prev in the executive manager list
     int    m_messageMask;  // +0x0c  event/message classes accepted by Main
     int    m_priority;  // +0x10  executive manager-list ordering key
-    char   name[0x1e];  // +0x14  manager name (strcpy'd, e.g. "Unknown")
+    char   m_name[0x1e];  // +0x14  manager name (strcpy'd, e.g. "Unknown")
     int    m_active;  // +0x32
     // --- constructors ---
     baseManager(void);
