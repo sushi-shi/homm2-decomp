@@ -225,9 +225,9 @@ for _va,_raw in pubs:
 def profile_of(unit):
     # A frame-pointer majority is not a complete optimization fingerprint. All
     # public functions in these four units currently have 55 8b ec prologues,
-    # yet their established byte matches require the profiles below (BITS
-    # /O1 with frame pointers; TILE /O2; FONT/RESMGR /Od plus /Oi). Keep those
-    # proven settings across init.
+    # yet the empirically selected reproduction profiles below differ (BITS
+    # /O1 with frame pointers; TILE /O2; FONT/RESMGR /Od plus /Oi). CodeView does
+    # not prove the literal optimization flags. Keep the selected profiles across init.
     established={"BASE/BITS":"o1_frame", "BASE/FONT":"base_oi",
                  "BASE/RESMGR":"base_oi", "BASE/TILE":"o2"}
     if unit in established: return established[unit]
