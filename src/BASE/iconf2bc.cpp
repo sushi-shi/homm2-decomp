@@ -86,6 +86,8 @@ DATA(0x005380c0) static unsigned char *gFCDst;
 // stores at relocation +0x51 and loads at +0x78/+0x86; retail stores at +0x55 and loads once at
 // +0x77 while retaining ECX. Revisit only after real type/declaration/TU-state evidence changes
 // this allocation; do not introduce an alias, dummy reload, volatile state, or count-only local.
+// A 2026-07-15 256-state exact-only sweep reached only a disposable 84.654915% (baseline
+// 84.554150%) and no exact closure; all generated declarations were removed and no MAX was recorded.
 VA(0x004d9790, 0x54d)
 void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                                 int clip, int clipX, int clipY, int clipW, int clipH, int color,

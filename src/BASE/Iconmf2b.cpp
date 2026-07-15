@@ -43,6 +43,9 @@ DATA(0x005381b4) static int gFMXEnd;
 // predicate, header-state, and AST-search families remain closed. Retail's redundant clipX <= left
 // test and full/partial arm order are retained. This remains unresolved/not-a-wall; no regex or AST
 // permutation was used. Revisit after a real TU-state change or in the post-placeholder last mile.
+// The 2026-07-15 publication batch found an 80.592810% comma form, but it moved the first divergence
+// earlier by hoisting formal x and was structurally rejected; split cursor owners returned to the
+// baseline bytes. Real headers reached only a disposable 78.449104% palette state. Nothing is retained.
 VA(0x004da800, 0x212)
 void FlipMonoIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                           int color, int clip, int clipX, int clipY, int clipW, int clipH)

@@ -45,6 +45,9 @@ static int gFYClipR;
 // agree with the non-flipped/color-table siblings and related H2X lineage. Revisit only after new
 // retail-evidenced lifetime/type structure; no regex or AST permuter was used, and dummy reloads,
 // aliases, volatile state, and count-only locals are forbidden.
+// A 2026-07-15 256-state exact-only typedef/enum/record/member/prototype/include sweep produced no
+// improvement over the 87.839140% direct baseline and no exact closure. Generated state was removed;
+// do not repeat or record it as MAX. The setup/body residual requires new source structure.
 VA(0x004d9ce0, 0x58d)
 void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                              int clip, int clipX, int clipY, int clipW, int clipH, int color,

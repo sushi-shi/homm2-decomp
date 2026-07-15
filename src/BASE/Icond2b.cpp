@@ -36,6 +36,9 @@ DATA(0x00534c1c) static int gDimX0;
 // qualifiers manufactured those reloads and were removed. Tried the typed IconEntry array root,
 // retail publication lifetimes, and retail-positive clipping predicates. Revisit after a genuine
 // shared-header/TU-state change; do not restore qualifiers or add alias/reload coercion.
+// A 2026-07-15 entry/source publication batch was byte-neutral or worse. Real MIDIWrap/tileset and
+// historical resource-tail surfaces reached only a disposable 77.517240% with the same 34/37
+// relocation deficit; no unused header or generated state is retained.
 VA(0x004cfd50, 0x26e)
 void DimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                      int color, int clip, int clipX, int clipY, int clipW, int clipH)
