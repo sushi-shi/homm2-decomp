@@ -32,29 +32,23 @@ static unsigned char *gFYDst;
 static int gFYSkip;
 static int gFYClipR;
 
+static inline int IconRowVisible(signed char *shear, int clipTop)
+{
+    return shear[gFYY] != ICON_SHEAR_SKIP_ROW && clipTop <= gFYY && gFYY <= gFYClipB;
+}
+
 // @semantic
-// /O2 structural checkpoint in the corrected 1470-row delinker universe with consumer-only enum
-// ownership. Reconstructing gFYRow as the byte pointer owned by every sibling decoder removes the
-// integer-address casts and raises live match from 89.77212% to 90.20107%; candidate remains 0x57f
-// versus retail 0x58d with one four-byte frame word. The required named IconShear typedef is kept;
-// omitting that consumer header can recover a higher temporary TU-state score but leaves raw 0x7f
-// sentinels and is rejected. First raw divergence remains +0x5c: candidate keeps shear in EBP,
-// while retail loads shear into ESI and then clipW into EBP. Relocations remain 142/144 with no
-// wrong or excess target; missing occurrences are retail gFYX in the full dim destination and
-// gFYClipR in the right-clipped literal count. Direct shear indexing and the typed byte-row model
-// agree with the non-flipped/color-table siblings and related H2X lineage. Revisit only after new
-// retail-evidenced lifetime/type structure; no regex or AST permuter was used, and dummy reloads,
-// aliases, volatile state, and count-only locals are forbidden.
-// A 2026-07-15 256-state exact-only typedef/enum/record/member/prototype/include sweep produced no
-// improvement over the 87.839140% direct baseline and no exact closure. Generated state was removed;
-// do not repeat or record it as MAX. The setup/body residual requires new source structure.
-// A later live-baseline audit at 88.806970%, 0x582, 142/144 exhaustively tested all 32 semantic
-// suffixes and 18 plausible whole-name spellings for clipWidth; every rename was byte-identical.
-// `register`, `const`, direct/split initialization, and moving that declaration beside Y or ClipR
-// were also byte-identical. Extracting the setup shear subtraction into 16 inline helper identities
-// fell to 86.206436%; all 127 safe scalar/nested helper sites topped out at 88.552280%. Generated
-// helper source was restored. These results rule out local spelling/scope and simple predecessor
-// helpers, but do not prove a wall or justify changing the correct enum/header ownership.
+// The decoder is structured as one command-fetch loop with `continue` edges. Replacing the former
+// `goto do_fill` reconstruction with an if/else fallthrough to one shared fill block is byte-neutral;
+// extracting that block into an inline function instead duplicates it (0x628, 156 relocations), so
+// the shared block is intentional CFG rather than a helper. The literal paths likewise need no
+// labels: nested setup arms flow into one copy tail, then continue the outer loop.
+// Current structured source has the retail four-byte frame home, candidate 0x586 versus retail
+// 0x58d, and exact 144/144 external relocation occurrences. The repeated complete row-visibility
+// predicate is retained as the only helper supported by both reuse and codegen evidence; nested,
+// row-only, one-use geometry, fill, and literal helpers were rejected. First raw divergence is the
+// setup lifetime at +0x5c: retail keeps shear in ESI and clipW in EBP, while candidate keeps shear
+// in EBP and later reloads width. Do not reintroduce labels merely to chase fuzzy scheduling.
 VA(0x004d9ce0, 0x58d)
 void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                              int clip, int clipX, int clipY, int clipW, int clipH, int color,
@@ -72,8 +66,7 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
     gFYClipR = clipX + clipWidth - 1;
     gFYRow = dest->m_pixels + dest->m_width * gFYY;
     for (;;) {
-        gFYRun = *gFYSrc;
-        gFYSrc = gFYSrc + 1;
+        gFYRun = *gFYSrc++;
         if (static_cast<signed char>(gFYRun) < 0) {
             if ((gFYRun & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
                 if ((gFYRun & ICON_RLE_COMMAND_RUN_MASK) == 0)
@@ -83,58 +76,54 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
             }
             if ((gFYRun & ICON_RLE_COMMAND_RUN_MASK) != 0) {
                 if (gFYRun == ICON_RLE_LONG_SOLID_COMMAND) {
-                    gFYRun = *gFYSrc;
-                    gFYSrc = gFYSrc + 1;
+                    gFYRun = *gFYSrc++;
                 } else {
                     gFYRun = gFYRun & ICON_RLE_COMMAND_RUN_MASK;
                 }
-                gFYColor = *gFYSrc;
-                gFYSrc = gFYSrc + 1;
-                goto do_fill;
-            }
-            gFYRun = *gFYSrc;
-            gFYSrc = gFYSrc + 1;
-            if ((gFYRun & ICON_RLE_DIM_SHORT_COUNT_MASK) != 0) {
-                gFYDimLen = gFYRun & ICON_RLE_DIM_SHORT_COUNT_MASK;
+                gFYColor = *gFYSrc++;
             } else {
-                gFYDimLen = *gFYSrc;
-                gFYSrc = gFYSrc + 1;
-            }
-            gFYDimLen2 = gFYDimLen;
-            if (color != 0 && (gFYRun & ICON_RLE_DIM_RECOLOR_FLAG) != 0) {
-                gFYRun = gFYDimLen;
-                gFYColor = static_cast<unsigned char>(color);
-                goto do_fill;
-            }
-            if ((gFYRun & ICON_RLE_DIM_APPLY_FLAG) != 0) {
-                gFYDimPal =
-                    reinterpret_cast<unsigned char *>(uDimPal) +
-                    (gFYRun & ICON_RLE_DIM_LEVEL_MASK) * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
-                if (shear[gFYY] != ICON_SHEAR_SKIP_ROW && clipY <= gFYY && gFYY <= gFYClipB) {
-                    if (clipX <= (gFYX - gFYDimLen) + 1 && gFYX <= gFYClipR) {
-                        unsigned char *dimDst;
-                        if (clipX <= (gFYX - gFYDimLen) + 1) {
-                            dimDst = (gFYRow - gFYDimLen) + gFYX + 1;
-                        } else {
-                            gFYDimLen = (gFYX - clipX) + 1;
-                            dimDst = gFYRow + clipX;
-                        }
-                        gFYDimIdx = 0;
-                        gFYDimDst = dimDst;
-                        if (0 < static_cast<int>(gFYDimLen)) {
-                            do {
-                                *gFYDimDst = gFYDimPal[*gFYDimDst];
-                                gFYDimDst = gFYDimDst + 1;
-                                gFYDimIdx = gFYDimIdx + 1;
-                            } while (gFYDimIdx < static_cast<int>(gFYDimLen));
+                gFYRun = *gFYSrc++;
+                if ((gFYRun & ICON_RLE_DIM_SHORT_COUNT_MASK) != 0) {
+                    gFYDimLen = gFYRun & ICON_RLE_DIM_SHORT_COUNT_MASK;
+                } else {
+                    gFYDimLen = *gFYSrc++;
+                }
+                gFYDimLen2 = gFYDimLen;
+                if (color != 0 && (gFYRun & ICON_RLE_DIM_RECOLOR_FLAG) != 0) {
+                    gFYRun = gFYDimLen;
+                    gFYColor = static_cast<unsigned char>(color);
+                } else {
+                    if ((gFYRun & ICON_RLE_DIM_APPLY_FLAG) != 0) {
+                        gFYDimPal =
+                            reinterpret_cast<unsigned char *>(uDimPal) +
+                            (gFYRun & ICON_RLE_DIM_LEVEL_MASK) *
+                                ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
+                        if (IconRowVisible(shear, clipY)) {
+                            if (clipX <= (gFYX - gFYDimLen) + 1 && gFYX <= gFYClipR) {
+                                unsigned char *dimDst;
+                                if (clipX <= (gFYX - gFYDimLen) + 1) {
+                                    dimDst = (gFYRow - gFYDimLen) + gFYX + 1;
+                                } else {
+                                    gFYDimLen = (gFYX - clipX) + 1;
+                                    dimDst = gFYRow + clipX;
+                                }
+                                gFYDimIdx = 0;
+                                gFYDimDst = dimDst;
+                                if (0 < static_cast<int>(gFYDimLen)) {
+                                    do {
+                                        *gFYDimDst = gFYDimPal[*gFYDimDst];
+                                        gFYDimDst = gFYDimDst + 1;
+                                        gFYDimIdx = gFYDimIdx + 1;
+                                    } while (gFYDimIdx < static_cast<int>(gFYDimLen));
+                                }
+                            }
                         }
                     }
+                    gFYX = gFYX - gFYDimLen2;
+                    continue;
                 }
             }
-            gFYX = gFYX - gFYDimLen2;
-            continue;
-        do_fill:
-            if (shear[gFYY] != ICON_SHEAR_SKIP_ROW && clipY <= gFYY && gFYY <= gFYClipB) {
+            if (IconRowVisible(shear, clipY)) {
                 unsigned int fillCount = gFYRun;
                 if (clipX <= static_cast<int>((gFYX - fillCount) + 1) && gFYX <= gFYClipR) {
                     if (clipX <= static_cast<int>((gFYX - fillCount) + 1)) {
@@ -149,55 +138,45 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
         }
         // ---- positive command : backward literal copy / newline ----
         if (gFYRun != 0) {
-            if (shear[gFYY] != ICON_SHEAR_SKIP_ROW && clipY <= gFYY && gFYY <= gFYClipB) {
+            if (IconRowVisible(shear, clipY)) {
                 int left = (gFYX - gFYRun) + 1;
-                int pendingSkip;
                 if (left <= gFYClipR && clipX <= gFYX) {
                     if (gFYX <= gFYClipR) {
                         gFYDst = gFYRow + gFYX;
                         if (clipX <= left) {
                             gFYSkip = 0;
                             gFYDimLen = gFYRun;
-                            goto copy_literal;
                         } else {
                             gFYDimLen = (gFYX - clipX) + 1;
-                            pendingSkip = gFYRun - gFYDimLen;
-                            goto publish_literal_skip;
+                            gFYSkip = gFYRun - gFYDimLen;
                         }
                     } else {
-                        gFYSrc = gFYSrc + (gFYX - gFYClipR);
-                        unsigned char *rightDst = gFYRow + gFYClipR;
-                        if (clipX <= (gFYX - gFYRun)) {
-                            gFYDst = rightDst;
+                        gFYSrc += gFYX - gFYClipR;
+                        gFYDst = gFYRow + gFYClipR;
+                        if (clipX <= gFYX - gFYRun) {
                             gFYSkip = 0;
-                            gFYDimLen = (gFYRun - gFYX) + gFYClipR;
-                            goto copy_literal;
+                            gFYDimLen = gFYRun - gFYX + gFYClipR;
                         } else {
-                            gFYDst = rightDst;
-                            pendingSkip = ((gFYRun - gFYX) - clipWidth) + gFYClipR;
+                            int pendingSkip = ((gFYRun - gFYX) - clipWidth) + gFYClipR;
                             gFYDimLen = clipWidth;
-                            goto publish_literal_skip;
+                            gFYSkip = pendingSkip;
                         }
                     }
-                publish_literal_skip:
-                    gFYSkip = pendingSkip;
-                copy_literal:
                     gFYDimIdx = 0;
-                    if (0 < static_cast<int>(gFYDimLen)) {
+                    if (gFYDimLen > 0) {
                         do {
-                            *gFYDst = *gFYSrc;
-                            gFYSrc = gFYSrc + 1;
-                            gFYDst = gFYDst - 1;
-                            gFYDimIdx = gFYDimIdx + 1;
-                        } while (gFYDimIdx < static_cast<int>(gFYDimLen));
+                            *gFYDst-- = *gFYSrc++;
+                            gFYDimIdx++;
+                        } while (gFYDimIdx < gFYDimLen);
                     }
-                    gFYSrc = gFYSrc + gFYSkip;
-                    goto literal_advance_done;
+                    gFYSrc += gFYSkip;
+                } else {
+                    gFYSrc += gFYRun;
                 }
+            } else {
+                gFYSrc += gFYRun;
             }
-            gFYSrc = gFYSrc + gFYRun;
-        literal_advance_done:
-            gFYX = gFYX - gFYRun;
+            gFYX -= gFYRun;
             continue;
         }
         // newline
