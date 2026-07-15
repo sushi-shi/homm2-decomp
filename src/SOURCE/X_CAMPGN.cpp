@@ -164,20 +164,16 @@ void ExpCampaign::InitNewCampaign(int campaignId)
     ResetBonusChoices();
 }
 
-// @match-note retained 94.20%, live 94.06% after named-enum recovery (pre-95
-// structural checkpoint): semantics, 0x34 frame,
-// cases, and external targets are recovered. The first non-data divergence is
-// after NewMap: retail stores gpGame + 0x49c at [ebp-0xc], while this build
-// stores the playerRec pointer at [ebp-0x8] and eagerly saves
-// gbInNewGameSetup. homm2 relocs reports 27/81 because retail's two jump tables
-// are delinked as function-local targets; no base-only external target remains.
-// Tried a real playerRec pointer, retaining GetMapHeader's result, direct
-// m_mapDays[0], and both gpGame/player spellings. Revisit after 95% for switch
-// temporary/source-shape and od_slots tuning; do not repeat these spellings.
+// @early-stop
+// The retail-sized 0x7cb raw body is identical after masking its 81 relocation
+// fields, and homm2 relocs reports 81/81 with no base-only external target. The
+// only objdiff residual is the 24 local DIR32 identities at +0x4fb..+0x527 and
+// +0x785..+0x7b1: retail delinks them as this function while our object uses $L
+// labels for the two jump tables.
 VA(0x004bb843, 0x7cb)
 void ExpCampaign::InitMap(void)
 {
-    SCampaignChoice *choice =
+    SCampaignChoice *campaignChoice =
         &xCampaignChoices[m_campaignId][m_currentMap]
                          [m_bonusChoices[m_currentMap]];
 
@@ -199,129 +195,142 @@ void ExpCampaign::InitMap(void)
     gpGame->NewMap(gMapName);
 
     playerRec *player = &gpGame->m_players[0];
-    int savedNewGameSetup = gbInNewGameSetup;
-    int heroIndex;
+    int heroPosition;
     hero *choiceHero;
-    switch (choice->type) {
+    switch (campaignChoice->type) {
     case CAMPAIGN_CHOICE_RESOURCE:
-        player->resources[choice->value] += choice->amount;
+        player->resources[campaignChoice->value] += campaignChoice->amount;
         break;
     case CAMPAIGN_CHOICE_ARTIFACT:
-        if (gpGame->m_players[0].heroCount > 0)
-            GiveArtifact(gpGame->GetPlayerHero(0, 0), choice->value, 0, -1);
+        if (player->heroCount > 0)
+            GiveArtifact(gpGame->GetHero(player->heroes[0]),
+                         campaignChoice->value, 0, -1);
         break;
     case CAMPAIGN_CHOICE_SPELL:
-        if (gpGame->m_players[0].heroCount > 0)
-            gpGame->GetPlayerHero(0, 0)->m_spells[choice->value] = 1;
+        if (player->heroCount > 0)
+            gpGame->GetHero(player->heroes[0])
+                ->m_spells[campaignChoice->value] = 1;
         break;
     case CAMPAIGN_CHOICE_SECONDARY_SKILL:
-        if (gpGame->m_players[0].heroCount > 0) {
-            for (heroIndex = 0;
-                 heroIndex < gpGame->m_players[0].heroCount; ++heroIndex) {
-                choiceHero = gpGame->GetPlayerHero(0, heroIndex);
+        if (player->heroCount > 0) {
+            for (heroPosition = 0;
+                 heroPosition < player->heroCount; ++heroPosition) {
+                choiceHero = gpGame->GetHero(player->heroes[heroPosition]);
                 if (m_campaignId == EXPANSION_CAMPAIGN_VOYAGE_HOME &&
                     m_currentMap == 3) {
                     if (choiceHero->m_portrait == EXPANSION_HERO_GALLAVANT)
                         break;
-                } else if (m_campaignId != EXPANSION_CAMPAIGN_VOYAGE_HOME ||
-                           m_currentMap != 2 ||
-                           choiceHero->m_portrait == EXPANSION_HERO_CEALLACH) {
-                    break;
+                } else {
+                    if (m_campaignId == EXPANSION_CAMPAIGN_VOYAGE_HOME &&
+                        m_currentMap == 2) {
+                        if (choiceHero->m_portrait == EXPANSION_HERO_CEALLACH)
+                            break;
+                    } else {
+                        break;
+                    }
                 }
             }
-            choiceHero->SetSS(choice->value, choice->amount);
+            choiceHero->SetSS(campaignChoice->value, campaignChoice->amount);
         }
         break;
     case CAMPAIGN_CHOICE_CREATURES:
-        if (gpGame->m_players[0].heroCount > 0)
-            gpGame->GetPlayerHero(0, 0)->m_army.Add(
-                choice->value, choice->amount, -1);
+        if (player->heroCount > 0)
+            gpGame->GetHero(player->heroes[0])->m_army.Add(
+                campaignChoice->value, campaignChoice->amount, -1);
         break;
     case CAMPAIGN_CHOICE_PUZZLE_PIECES:
-        gpGame->m_players[0].unknown13 =
-            static_cast<signed char>(choice->value);
+        player->unknown13 =
+            static_cast<signed char>(campaignChoice->value);
         break;
-    case CAMPAIGN_CHOICE_EXPERIENCE:
+    case CAMPAIGN_CHOICE_EXPERIENCE: {
+        int savedNewGameSetup = gbInNewGameSetup;
         gbInNewGameSetup = 1;
-        if (gpGame->m_players[0].heroCount > 0) {
-            gpGame->GetPlayerHero(0, 0)->m_experience += choice->value;
-            gpGame->GetPlayerHero(0, 0)->CheckLevel();
+        if (player->heroCount > 0) {
+            gpGame->GetHero(player->heroes[0])->m_experience +=
+                campaignChoice->value;
+            gpGame->GetHero(player->heroes[0])->CheckLevel();
         }
+        gbInNewGameSetup = savedNewGameSetup;
         break;
+    }
     case CAMPAIGN_CHOICE_NONE:
         break;
     case CAMPAIGN_CHOICE_PRIMARY_SKILL:
-        if (gpGame->m_players[0].heroCount > 0) {
-            for (heroIndex = 0;
-                 heroIndex < gpGame->m_players[0].heroCount; ++heroIndex) {
-                choiceHero = gpGame->GetPlayerHero(0, heroIndex);
-                if (m_campaignId != EXPANSION_CAMPAIGN_VOYAGE_HOME ||
-                    m_currentMap != 2 ||
-                    choiceHero->m_portrait == EXPANSION_HERO_CEALLACH)
+        if (player->heroCount > 0) {
+            for (heroPosition = 0;
+                 heroPosition < player->heroCount; ++heroPosition) {
+                choiceHero = gpGame->GetHero(player->heroes[heroPosition]);
+                if (m_campaignId == EXPANSION_CAMPAIGN_VOYAGE_HOME &&
+                    m_currentMap == 2) {
+                    if (choiceHero->m_portrait == EXPANSION_HERO_CEALLACH)
+                        break;
+                } else {
                     break;
+                }
             }
-            choiceHero->m_primaryStats[choice->value] += choice->amount;
+            choiceHero->m_primaryStats[campaignChoice->value] +=
+                campaignChoice->amount;
         }
         break;
     case CAMPAIGN_CHOICE_SPELL_SCROLL:
-        if (gpGame->m_players[0].heroCount > 0)
-            GiveArtifact(gpGame->GetPlayerHero(0, 0),
+        if (player->heroCount > 0)
+            GiveArtifact(gpGame->GetHero(player->heroes[0]),
                          EVENT_ARTIFACT_SPELL_SCROLL, 0,
-                         static_cast<signed char>(choice->value));
+                         static_cast<signed char>(campaignChoice->value));
         break;
     }
-    gbInNewGameSetup = savedNewGameSetup;
 
     int award;
     for (award = 0; award < EXPANSION_CAMPAIGN_AWARD_COUNT; ++award) {
-        if (m_awards[award] == 0)
-            continue;
-        switch (award) {
-        case EXPANSION_AWARD_ELVEN_ALLIANCE:
-            break;
-        case EXPANSION_AWARD_BREASTPLATE_ANDURAN:
-            if (player->heroCount > 0)
-                GiveArtifact(gpGame->GetPlayerHero(0, 0),
-                             EVENT_ARTIFACT_BREASTPLATE_ANDURAN, 0, -1);
-            break;
-        case EXPANSION_AWARD_WOOD_BONUS:
-            break;
-        case EXPANSION_AWARD_HELMET_ANDURAN:
-            if (player->heroCount > 0)
-                GiveArtifact(gpGame->GetPlayerHero(0, 0),
-                             EVENT_ARTIFACT_HELMET_ANDURAN, 0, -1);
-            break;
-        case EXPANSION_AWARD_DEFEAT_KRAEGER:
-            for (heroIndex = 0; heroIndex < EXPANSION_CAMPAIGN_HERO_COUNT;
-                 ++heroIndex) {
-                if (gpGame->m_heroRecs[heroIndex].m_portrait ==
-                    EXPANSION_HERO_DAINWIN)
-                    gpGame->m_heroRecs[heroIndex].Deallocate(0);
+        if (m_awards[award] != 0) {
+            switch (award) {
+            case EXPANSION_AWARD_ELVEN_ALLIANCE:
+                break;
+            case EXPANSION_AWARD_BREASTPLATE_ANDURAN:
+                if (player->heroCount > 0)
+                    GiveArtifact(gpGame->GetHero(player->heroes[0]),
+                                 EVENT_ARTIFACT_BREASTPLATE_ANDURAN, 0, -1);
+                break;
+            case EXPANSION_AWARD_WOOD_BONUS:
+                break;
+            case EXPANSION_AWARD_HELMET_ANDURAN:
+                if (player->heroCount > 0)
+                    GiveArtifact(gpGame->GetHero(player->heroes[0]),
+                                 EVENT_ARTIFACT_HELMET_ANDURAN, 0, -1);
+                break;
+            case EXPANSION_AWARD_DEFEAT_KRAEGER:
+                for (heroPosition = 0;
+                     heroPosition < EXPANSION_CAMPAIGN_HERO_COUNT;
+                     ++heroPosition) {
+                    if (gpGame->m_heroRecs[heroPosition].m_portrait ==
+                        EXPANSION_HERO_DAINWIN)
+                        gpGame->m_heroRecs[heroPosition].Deallocate(0);
+                }
+                break;
+            case EXPANSION_AWARD_BATTLE_GARB:
+                if (player->heroCount > 0)
+                    GiveArtifact(gpGame->GetHero(player->heroes[0]),
+                                 EVENT_ARTIFACT_BATTLE_GARB, 0, -1);
+                break;
+            case EXPANSION_AWARD_WAYWARD_SON:
+            case EXPANSION_AWARD_UNCLE_IVAN:
+                break;
+            case EXPANSION_AWARD_LEGENDARY_SCEPTER:
+                if (player->heroCount > 0)
+                    GiveArtifact(gpGame->GetHero(player->heroes[0]),
+                                 EVENT_ARTIFACT_LEGENDARY_SCEPTER, 0, -1);
+                break;
+            case EXPANSION_AWARD_SET_GUARDIAN:
+                if (player->heroCount > 0)
+                    gpGame->GetHero(player->heroes[0])
+                        ->m_spells[EXPANSION_CAMPAIGN_SET_GUARDIAN_SPELL] = 1;
+                break;
+            case EXPANSION_AWARD_SPHERE_NEGATION:
+                if (player->heroCount > 0)
+                    GiveArtifact(gpGame->GetHero(player->heroes[0]),
+                                 EVENT_ARTIFACT_SPHERE_NEGATION, 0, -1);
+                break;
             }
-            break;
-        case EXPANSION_AWARD_BATTLE_GARB:
-            if (player->heroCount > 0)
-                GiveArtifact(gpGame->GetPlayerHero(0, 0),
-                             EVENT_ARTIFACT_BATTLE_GARB, 0, -1);
-            break;
-        case EXPANSION_AWARD_WAYWARD_SON:
-        case EXPANSION_AWARD_UNCLE_IVAN:
-            break;
-        case EXPANSION_AWARD_LEGENDARY_SCEPTER:
-            if (player->heroCount > 0)
-                GiveArtifact(gpGame->GetPlayerHero(0, 0),
-                             EVENT_ARTIFACT_LEGENDARY_SCEPTER, 0, -1);
-            break;
-        case EXPANSION_AWARD_SET_GUARDIAN:
-            if (player->heroCount > 0)
-                gpGame->GetPlayerHero(0, 0)
-                    ->m_spells[EXPANSION_CAMPAIGN_SET_GUARDIAN_SPELL] = 1;
-            break;
-        case EXPANSION_AWARD_SPHERE_NEGATION:
-            if (player->heroCount > 0)
-                GiveArtifact(gpGame->GetPlayerHero(0, 0),
-                             EVENT_ARTIFACT_SPHERE_NEGATION, 0, -1);
-            break;
         }
     }
     gbRetreatWin = 1;
@@ -412,24 +421,24 @@ void ExpCampaign::ShowInfo(int viewOnly, int)
     }
 }
 
-// @match-note 92.22% (pre-95 structural checkpoint): all UI semantics, case
-// bodies/order, and external targets are recovered. Retail frame is 0x84 versus
-// 0x74 here; the first code-shape divergence is +0x36, where retail folds the
-// selected-frame +3 into lea and this build emits lea/add. homm2 relocs reports
-// 39/177 because both retail jump tables are delinked as function-local targets;
-// no base-only external target remains. Tried signed-char hasAwards, retail
-// artifact body order, explicit choiceOffset/selectedSpell/showScroll locals,
-// multidimensional versus flattened choice indexing, and an od_slots semantic
-// suffix for the 52-byte army-name buffer. Revisit after 95% for frame/switch
-// temporary and expression-shape tuning; do not repeat these spellings.
+// @match-note 98.85% (pre-95 structural checkpoint): all UI semantics, the
+// 0x84 frame and local slots, both selector maps/jump tables, CFG, and all 177
+// relocation targets are recovered. The first raw difference is the forward
+// branch displacement at +0x2a9; the first instruction divergence is +0x2b0,
+// where retail evaluates m_viewMap before m_campaignId for the flattened choice
+// index and this build uses the opposite register order. Retail code is 0x921
+// bytes versus 0x926 here. Tried direct multidimensional indexing, a stored
+// flattened offset, inline flattened terms in both orders, and a partially
+// indexed base; all retained the nonretail evaluation order. Revisit after 95%
+// for last-mile expression tuning; do not repeat these spellings.
 VA(0x004bc34d, 0x921)
 void ExpCampaign::UpdateInfo(int redraw)
 {
     tag_message message;
+    signed char hasVisibleAward;
+    int unusedCampaignData[5];
     int map;
     SCampaignChoice *choice;
-    int choiceOffset;
-    short selectedSpell;
     signed char showScroll;
     char armyName8[EXPANSION_CAMPAIGN_ARMY_NAME_BUFFER_SIZE];
 
@@ -442,7 +451,7 @@ void ExpCampaign::UpdateInfo(int redraw)
         else
             message.payload.widget.data.value = 2;
         if (m_viewMap == map)
-            message.payload.widget.data.value += m_campaignId * 3 + 3;
+            message.payload.widget.data.value += (m_campaignId + 1) * 3;
         message.payload.widget.command = CAMPAIGN_MESSAGE_SET_FRAME;
         message.payload.widget.id = map + CAMPAIGN_TRACK_WIDGET_FIRST;
         m_window->BroadcastMessage(message);
@@ -472,27 +481,25 @@ void ExpCampaign::UpdateInfo(int redraw)
     sprintf(gText, "%d", m_mapDays[m_viewMap]);
     m_window->BroadcastMessage(message);
 
-    signed char hasAwards = 0;
+    hasVisibleAward = 0;
     message.payload.widget.id = CAMPAIGN_AWARDS_WIDGET;
     strcpy(gText, "");
     for (map = 0; map < EXPANSION_CAMPAIGN_AWARD_COUNT; ++map) {
         if (m_awards[map] != 0) {
-            hasAwards = 1;
+            hasVisibleAward = 1;
             strcat(gText, xCampaignAwards[map]);
             strcat(gText, "\n");
         }
     }
-    if (hasAwards == 0)
+    if (hasVisibleAward == 0)
         sprintf(gText, "None");
     m_window->BroadcastMessage(message);
 
     for (map = 0; map < EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT; ++map) {
-        choiceOffset = m_viewMap *
-                           EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT +
-                       m_campaignId * EXPANSION_CAMPAIGN_MAX_MAP_COUNT *
-                           EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT +
-                       map;
-        choice = xCampaignChoices[0][0] + choiceOffset;
+        choice = xCampaignChoices[0][m_viewMap] +
+                 m_campaignId * EXPANSION_CAMPAIGN_MAX_MAP_COUNT *
+                     EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT +
+                 map;
         switch (choice->type) {
         case CAMPAIGN_CHOICE_RESOURCE:
             sprintf(gText, "%d %s", choice->amount,
@@ -545,6 +552,10 @@ void ExpCampaign::UpdateInfo(int redraw)
             case EVENT_ARTIFACT_TRAVELER_BOOTS:
                 strcpy(gText, "Traveler's Boots");
                 break;
+            case EVENT_ARTIFACT_HIDEOUS_MASK:
+                ;
+            case EVENT_ARTIFACT_BLACK_PEARL:
+                ;
             default:
                 sprintf(gText, "%s", gArtifactNames[choice->value]);
                 break;
@@ -567,7 +578,7 @@ void ExpCampaign::UpdateInfo(int redraw)
                         gSecondarySkills[choice->value]);
             } else {
                 sprintf(gText, "%s %s",
-                        gSecondarySkillLevels[choice->amount],
+                        gSecondarySkillLevels[choice->amount - 1],
                         gSecondarySkills[choice->value]);
             }
             break;
@@ -592,12 +603,14 @@ void ExpCampaign::UpdateInfo(int redraw)
             sprintf(gText, "%s +%d", gStatNames[choice->value],
                     choice->amount);
             break;
-        case CAMPAIGN_CHOICE_SPELL_SCROLL:
+        case CAMPAIGN_CHOICE_SPELL_SCROLL: {
             showScroll = 1;
-            selectedSpell = choice->value;
-            if (selectedSpell == EXPANSION_CAMPAIGN_NON_SCROLL_SPELL_FIRST ||
-                selectedSpell == EXPANSION_CAMPAIGN_NON_SCROLL_SPELL_SECOND)
+            switch (choice->value) {
+            case EXPANSION_CAMPAIGN_NON_SCROLL_SPELL_FIRST:
+            case EXPANSION_CAMPAIGN_NON_SCROLL_SPELL_SECOND:
                 showScroll = 0;
+                break;
+            }
             if (showScroll != 0) {
                 sprintf(gText, "%s %s", gSpellNames[choice->value],
                         "Scroll");
@@ -605,6 +618,7 @@ void ExpCampaign::UpdateInfo(int redraw)
                 sprintf(gText, "%s", gSpellNames[choice->value]);
             }
             break;
+        }
         }
         message.payload.widget.id = map + CAMPAIGN_BONUS_TEXT_WIDGET_FIRST;
         m_window->BroadcastMessage(message);
@@ -1130,11 +1144,6 @@ int ExpCampaign::Choose(void)
     return xLastChoice;
 }
 
-// @match-note
-// Complete arithmetic semantics, 0x4 frame, CFG, and three gpGame relocations.
-// First divergence is +0x2a: retail accumulates the seven-day week term before
-// the 28-day month term, while MSVC emits the month term first here. Both source
-// term orders and explicit grouping were tried. Revisit at 95% for last-mile AST tuning.
 VA(0x004bd9f8, 0x64)
 short int ExpCampaign::Days(void)
 {
