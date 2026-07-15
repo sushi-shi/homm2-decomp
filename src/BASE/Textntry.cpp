@@ -37,7 +37,7 @@ textEntryWidget::textEntryWidget(void) : textWidget()
 // so the ABI-correct non-inline declaration is retained.
 // VA(0x004d8770, 0x36) ??_E/??_G textEntryWidget deleting destructor aliases
 
-// @match-note
+// @semantic
 // Base/retail sections are both 0x134 with the same frame, CFG, and all 6/6 ordered
 // external relocations. The only raw residual is +0x7f..+0x93: retail stores iconFrame
 // before initializing m_maxLines/m_preserveTextOnFocus/m_color, while VC4.2 delays that
@@ -86,7 +86,7 @@ textEntryWidget::~textEntryWidget()
     gpResourceManager->Dispose(m_icon);
 }
 
-// @match-note
+// @semantic
 // Base/retail are both 0x26c with the same frame/CFG and all 52/52 ordered external
 // relocations. The only raw residual is +0x18b..+0x191: retail compares type before
 // loading m_height, while VC4.2 schedules those independent instructions in reverse.
@@ -161,7 +161,7 @@ void textEntryWidget::Read(int type)
     m_kind = EncodeWidgetKind(WIDGET_KIND_TEXT_ENTRY);
 }
 
-// @match-note
+// @semantic
 // Base/retail are both 0x874 with the exact 0x9a8 frame, CFG, jump-table structure,
 // and all 55/55 ordered external relocations. Relocation-masked raw comparison differs
 // only at +0x21: retail's MESSAGE_WIDGET branch targets the push using the existing ECX,
