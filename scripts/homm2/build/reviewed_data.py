@@ -29,6 +29,7 @@ from homm2.build.contribution_manifest import (
     OUTPUT as CONTRIBUTION_MANIFEST,
     manifest_bytes as contribution_manifest_bytes,
 )
+from homm2.build.candidate_data_manifest import derive_allocations
 
 
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[3]))
@@ -45,7 +46,8 @@ def _digest(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def reviewed_manifest_bytes(symbols=SYMBOLS, ledger=LEDGER, exe=EXE):
+def reviewed_manifest_bytes(symbols=SYMBOLS, ledger=LEDGER, exe=EXE,
+                            include_candidate=False):
     with Path(symbols).open(newline="", encoding="latin-1") as stream:
         inventory = {row["name"]: row for row in csv.DictReader(stream)}
     retail = read_pe(exe)
@@ -108,25 +110,53 @@ def reviewed_manifest_bytes(symbols=SYMBOLS, ledger=LEDGER, exe=EXE):
                     "reviewed allocation and owner extent disagree: %s" % owner.symbol)
             continue
         rows[owner.symbol] = record
+    if include_candidate:
+        candidate, _stats, _diagnostics = derive_allocations(
+            exe=exe, symbols_path=symbols)
+        closed_groups = {(row.unit, row.storage) for row in candidate}
+        rows = {name: row for name, row in rows.items()
+                if (row["unit"], row["storage"]) not in closed_groups}
+        for allocation in candidate:
+            if allocation.name in rows:
+                raise RuntimeError("candidate allocation duplicates reviewed name: %s" %
+                                   allocation.name)
+            rows[allocation.name] = {
+                "unit": allocation.unit,
+                "rva": allocation.rva,
+                "name": allocation.name,
+                "size": allocation.size,
+                "storage": allocation.storage,
+                "alignment": allocation.alignment,
+                "section_offset": allocation.section_offset,
+                "scope": allocation.scope,
+                "provenance": allocation.provenance,
+            }
+
     lines = [
-        "# Sizes are reviewed required_initialized_storage.tsv evidence, not NB09 lengths.",
-        "name\tobject\trva\tsize\tstorage\talignment\tprovenance",
+        "# Explicit reviewed allocations plus complete candidate-COFF topology groups.",
+        "name\tobject\trva\tsize\tstorage\talignment\tsection_offset\tscope\tprovenance",
     ]
-    for row in sorted(rows.values(), key=lambda value: (value["unit"], value["rva"])):
+    for row in sorted(rows.values(), key=lambda value: (
+            value["unit"], value["storage"],
+            value.get("section_offset", value["rva"]), value["rva"])):
         object_name = row["unit"].replace("/", "\\") + ".c"
-        lines.append("%s\t%s\t0x%x\t0x%x\t%s\t0x4\t%s" % (
+        alignment = row.get("alignment", 4)
+        section_offset = row.get("section_offset")
+        lines.append("%s\t%s\t0x%x\t0x%x\t%s\t0x%x\t%s\t%s\t%s" % (
             row["name"], object_name, row["rva"], row["size"],
-            row["storage"], row["provenance"]))
+            row["storage"], alignment,
+            ("0x%x" % section_offset) if section_offset is not None else "-",
+            row.get("scope", "external"), row["provenance"]))
     return ("\n".join(lines) + "\n").encode("utf-8")
 
 
-def _identity_inputs(delinker, contribution_manifest):
+def _identity_inputs(delinker, contribution_manifest, manifest):
     definitions = load_definition_rvas()
     owner_definitions = "\n".join(
         "%s=0x%x" % (name, definitions.get(name, -1))
         for name in sorted(load_explicit_extents()))
     return {
-        "schema": 3,
+        "schema": 4,
         "ledger_sha256": _digest(LEDGER),
         "owner_extents_sha256": _digest(REPO / OWNER_EXTENTS),
         "owner_definitions_sha256": hashlib.sha256(
@@ -138,14 +168,12 @@ def _identity_inputs(delinker, contribution_manifest):
         "adapter_sha256": _digest(__file__),
         "contribution_manifest_sha256": hashlib.sha256(
             contribution_manifest).hexdigest(),
+        "manifest_sha256": hashlib.sha256(manifest).hexdigest(),
     }
 
 
 def _identity(manifest, contribution_manifest, delinker):
-    return {
-        **_identity_inputs(delinker, contribution_manifest),
-        "manifest_sha256": hashlib.sha256(manifest).hexdigest(),
-    }
+    return _identity_inputs(delinker, contribution_manifest, manifest)
 
 
 def refresh_required(current, expected):
@@ -203,11 +231,11 @@ def ensure_reviewed_targets(delinker=None):
     except (FileNotFoundError, json.JSONDecodeError):
         current = None
     contribution_manifest = contribution_manifest_bytes()
-    expected_inputs = _identity_inputs(delinker, contribution_manifest)
+    manifest = reviewed_manifest_bytes(include_candidate=True)
+    expected_inputs = _identity_inputs(delinker, contribution_manifest, manifest)
     if not refresh_required(current, expected_inputs):
         _refresh_objdiff_targets()
         return False
-    manifest = reviewed_manifest_bytes()
     identity = _identity(manifest, contribution_manifest, delinker)
 
     MANIFEST.parent.mkdir(parents=True, exist_ok=True)

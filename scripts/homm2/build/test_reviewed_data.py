@@ -21,8 +21,9 @@ class ReviewedDataTest(unittest.TestCase):
 
     def test_manifest_object_paths_map_to_delinker_outputs(self):
         manifest = (
-            b"name\tobject\trva\tsize\tstorage\talignment\tprovenance\n"
-            b"table\tengine\\world.c\t0x100\t4\tdata\t4\ttest\n")
+            b"name\tobject\trva\tsize\tstorage\talignment\tsection_offset\t"
+            b"scope\tprovenance\n"
+            b"table\tengine\\world.c\t0x100\t4\tdata\t4\t-\texternal\ttest\n")
         self.assertEqual(_expected_objects(manifest), {"engine/world.c.obj"})
 
     def test_refresh_fails_when_required_target_inputs_are_missing(self):
