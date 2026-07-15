@@ -1566,11 +1566,13 @@ foundMissHex:
     LogStr("CA2");
 }
 
-// @match-note: retained 99.83%, combined live 99.67%; frame, slots, CFG, and
-// all 44/44 relocation targets align. The residual at +0x25d/+0x260/+0x262 is the same
-// equivalent operand-load/reversed-branch class. Relational swaps, De
-// Morgan forms, explicit control flow, volatile intermediates, and the attempted
-// AST mutation did not change it; do not resume local source-shape grinding.
+// @match-note: retained 99.98%, live 99.67%; frame, slots, CFG, 0x74f retail
+// span, and all 44/44 relocation targets align. Normalized instructions 129 and
+// 306 are the same commutative operand-load/reversed-branch residual (base jge,
+// retail jle); remaining diff rows are delinked string/NULL_SAMPLE2 identities.
+// Relational swaps, De Morgan forms, explicit control flow, volatile
+// intermediates, and the attempted AST mutation did not change it. Do not
+// resume source-shape grinding before the post-95% phase.
 VA(0x0049412d, 0x74f)
 void combatManager::KeepAttack(int tower)
 {
@@ -1715,6 +1717,16 @@ void combatManager::KeepAttack(int tower)
     LogStr("KA2");
 }
 
+// @match-note: retained 100.00% at source hash f53df3a552e3; do not replace this
+// exact recovered body to improve a transient live score. The 0xc frame, all
+// three stack slots, 0x17b size, loop CFG, and sole relocation still align. The
+// current TU expands the commutative army index before the side offset, while
+// retail used side-first order. Flattened pointer arithmetic raised the live
+// score to 84.09% but changed the exact source hash; reversed/indexed subscripts,
+// explicit array casts, operand swaps, scalar wrappers, and an inline side-offset
+// helper did not restore exact output. A diagnostic TU-state probe reached
+// 99.99167% but invented a class solely for matching and regressed a sibling.
+// Revisit only after real TU/header state changes or post-95% TU-state work.
 VA(0x0049487c, 0x17b)
 int combatManager::ExperienceValueOfStack(int side)
 {
@@ -1749,11 +1761,11 @@ void combatManager::ResetHitByCreature(void)
     }
 }
 
-VA(0x00494a7f, 0x36)
 // @early-stop
 // All 0x36 instruction bytes match except +0x26, where the
 // success jump selects an equivalent delinked local label (0x07 versus 0x02).
 // The function has no relocations.
+VA(0x00494a7f, 0x36)
 int ValidHex(int hex)
 {
     if (hex >= 0 && hex <= COMBAT_VALID_HEX_MAX)
@@ -1773,33 +1785,52 @@ void combatManager::DrawCombatBorder(void)
     return;
 }
 
-// @match-note: retained/combined-live 96.70%; first residual is the
-// 0x60 base frame versus retail 0x58, with shifted slots. CFG first diverges at normalized
-// instruction 161 in the obstacle-loop exits/continues. All 22/22 relocation
-// sites align; member fields use different delinked aliases to the same DATA.
-// Combined while conditions and early continues worsened 96.69% to 89.96%.
+// @match-note: retained/live 98.43%; the 0x58 frame, every local slot, semantics,
+// CFG, and all 22/22 external relocation targets align. Candidate size 0x4c9 is
+// exactly 15 bytes below retail 0x4d8. The first residual is instruction 187: three
+// equivalent positive-arm tests compile as direct jne/jg/jne branches, while
+// retail uses je/jle/je followed by three five-byte continuation jumps. Splitting
+// terrain/used tests and spelling bounds as <= 2 and >= 10 raised the checkpoint;
+// two explicit loop exits scored 97.02%, while explicit else/continue blocks
+// scored 96.32% and moved six jumps to the loop tail. The remaining relocation
+// row is the same cobj%04d.icn literal under a delinked identity. Do not retry
+// those forms.
 // The table is exactly 0x1c0 bytes (32 * 0xe) before gEstatesGoldLevel; retail
 // SRandom is inclusive and its literal high 32 can index past both 32-entry
 // arrays. Preserve that retail defect; never expand the table or change it to 31.
+// Revisit continuation steering only in the post-95% last-mile phase.
 VA(0x00494ae1, 0x4d8)
 void combatManager::SetupAndLoadObstacles(void)
 {
+    unsigned char obstacleUsed[COMBAT_OBSTACLE_TYPE_COUNT];
+    int overlayIndex14;
+    int obstacleType4;
+    int blocked6;
+    int anchorHex9;
+    int tryCount28;
+    int anchorRow2;
+    int obstacleCells18;
+    int cellIndex1;
+    unsigned int terrainMask9;
+    int obstacleHex2;
+    int elevationCells4;
+    int obstacleGoal7;
+
     m_debugFormation = 0;
     if (m_inCastleCombat) {
         m_wallStates[COMBAT_WALL_SLOT_KEEP] = COMBAT_WALL_STATE_KEEP_STANDING;
-        int structureIndex;
-        for (structureIndex = 0;
-             structureIndex < COMBAT_CASTLE_STRUCTURE_COUNT;
-             structureIndex++) {
-            m_wallStates[structureIndex + COMBAT_WALL_SLOT_SECTION_FIRST] =
+        for (cellIndex1 = 0;
+             cellIndex1 < COMBAT_CASTLE_STRUCTURE_COUNT;
+             cellIndex1++) {
+            m_wallStates[cellIndex1 + COMBAT_WALL_SLOT_SECTION_FIRST] =
                 COMBAT_WALL_STATE_KEEP_STANDING;
             if (m_originalCombatTown->m_type == TOWN_TYPE_KNIGHT &&
                 (m_originalCombatTown->m_buildings &
                  TOWN_BUILDING_FORTIFICATIONS)) {
-                m_wallStates[structureIndex + COMBAT_WALL_SLOT_SECTION_FIRST] =
+                m_wallStates[cellIndex1 + COMBAT_WALL_SLOT_SECTION_FIRST] =
                     COMBAT_WALL_STATE_SECTION_DAMAGE_FIRST;
             }
-            m_wallStates[structureIndex] = COMBAT_WALL_STATE_KEEP_STANDING;
+            m_wallStates[cellIndex1] = COMBAT_WALL_STATE_KEEP_STANDING;
         }
         if (m_originalCombatTown->m_buildings & TOWN_BUILDING_LEFT_TURRET)
             m_wallStates[COMBAT_WALL_SLOT_TOP_TOWER] =
@@ -1819,91 +1850,86 @@ void combatManager::SetupAndLoadObstacles(void)
         m_hexCells[COMBAT_CASTLE_HEX_BOTTOM_TOWER].m_blocked = 1;
         m_hexCells[COMBAT_CASTLE_HEX_MOAT].m_blocked = 1;
     } else {
-        int obstacleGoal = SRandom(COMBAT_RANDOM_OBSTACLE_MIN,
-                                   COMBAT_RANDOM_OBSTACLE_MAX);
-        int obstacleCells = 0;
-        unsigned int terrainMask = 1 << m_terrainType;
-        int tryCount = 0;
-        int elevationCells = 0;
+        obstacleGoal7 = SRandom(COMBAT_RANDOM_OBSTACLE_MIN,
+                                COMBAT_RANDOM_OBSTACLE_MAX);
+        obstacleCells18 = 0;
+        terrainMask9 = 1 << m_terrainType;
+        tryCount28 = 0;
+        elevationCells4 = 0;
         if (SRandom(0, COMBAT_RANDOM_PERCENT_MAX) <
             COMBAT_ELEVATION_OVERLAY_CHANCE) {
-            while (tryCount++ < COMBAT_ELEVATION_OVERLAY_TRY_LIMIT) {
-                int overlayIndex =
-                    SRandom(0, COMBAT_ELEVATION_OVERLAY_COUNT - 1);
-                if (terrainMask & sElevationOverlay[overlayIndex].terrainMask) {
-                    m_debugFormation = overlayIndex;
-                    int cellIndex;
-                    for (cellIndex = 0;
-                         cellIndex < COMBAT_ELEVATION_OVERLAY_CELL_COUNT;
-                         cellIndex++) {
+            while (tryCount28++ < COMBAT_ELEVATION_OVERLAY_TRY_LIMIT) {
+                overlayIndex14 = SRandom(0, COMBAT_ELEVATION_OVERLAY_COUNT - 1);
+                if (terrainMask9 &
+                    sElevationOverlay[overlayIndex14].terrainMask) {
+                    m_debugFormation = overlayIndex14;
+                    for (cellIndex1 = 0;
+                         cellIndex1 < COMBAT_ELEVATION_OVERLAY_CELL_COUNT;
+                         cellIndex1++) {
                         if (sElevationOverlay[m_debugFormation]
-                                .cellOffsets[cellIndex] != -1) {
+                                .cellOffsets[cellIndex1] != -1) {
                             m_hexCells[sElevationOverlay[m_debugFormation]
-                                           .cellOffsets[cellIndex]]
+                                           .cellOffsets[cellIndex1]]
                                 .m_blocked = 1;
-                            elevationCells++;
+                            elevationCells4++;
                         }
                     }
                     break;
                 }
             }
         }
-        obstacleGoal -= elevationCells / 2;
-        tryCount = 0;
-        unsigned char obstacleUsed[COMBAT_OBSTACLE_TYPE_COUNT];
+        obstacleGoal7 -= elevationCells4 / 2;
+        tryCount28 = 0;
         memset(obstacleUsed, 0, sizeof(obstacleUsed));
-        while (1) {
-            if (obstacleCells >= obstacleGoal)
-                break;
-            if (tryCount >= COMBAT_OBSTACLE_TRY_LIMIT)
-                break;
-            tryCount++;
-            int anchorHex = SRandom(0, COMBAT_OBSTACLE_CELL_ROLL_MAX);
+        while (obstacleCells18 < obstacleGoal7 &&
+               tryCount28 < COMBAT_OBSTACLE_TRY_LIMIT) {
+            tryCount28++;
+            anchorHex9 = SRandom(0, COMBAT_OBSTACLE_CELL_ROLL_MAX);
             // Retail's inclusive high endpoint permits the out-of-range value 32.
-            int obstacleType =
-                SRandom(0, COMBAT_OBSTACLE_INCLUSIVE_ROLL_HIGH);
-            if ((terrainMask & sCmbtObstacles[obstacleType].terrainMask) &&
-                obstacleUsed[obstacleType] == 0) {
-                int anchorRow = anchorHex / COMBAT_GRID_ROW_LENGTH;
-                if (sCmbtObstacles[obstacleType].minimumColumn <=
-                    anchorRow + COMBAT_OBSTACLE_MIN_COLUMN_OFFSET) {
-                    int blocked = 0;
-                    int cellIndex;
-                    for (cellIndex = 0;
-                         cellIndex < sCmbtObstacles[obstacleType].cellCount;
-                         cellIndex++) {
-                        int obstacleHex =
-                            anchorHex +
-                            sCmbtObstacles[obstacleType].cellOffsets[cellIndex];
-                        if (obstacleHex % COMBAT_GRID_ROW_LENGTH <
-                                COMBAT_OBSTACLE_LEFT_COLUMN_LIMIT ||
-                            obstacleHex % COMBAT_GRID_ROW_LENGTH >
-                                COMBAT_OBSTACLE_RIGHT_COLUMN_FIRST - 1) {
-                            blocked = 1;
+            obstacleType4 = SRandom(0, COMBAT_OBSTACLE_INCLUSIVE_ROLL_HIGH);
+            if (terrainMask9 & sCmbtObstacles[obstacleType4].terrainMask) {
+                if (obstacleUsed[obstacleType4] == 0) {
+                    anchorRow2 = anchorHex9 / COMBAT_GRID_ROW_LENGTH;
+                    if (sCmbtObstacles[obstacleType4].minimumColumn <=
+                        anchorRow2 + COMBAT_OBSTACLE_MIN_COLUMN_OFFSET) {
+                        blocked6 = 0;
+                        for (cellIndex1 = 0;
+                             cellIndex1 < sCmbtObstacles[obstacleType4].cellCount;
+                             cellIndex1++) {
+                            obstacleHex2 =
+                                anchorHex9 +
+                                sCmbtObstacles[obstacleType4]
+                                    .cellOffsets[cellIndex1];
+                            if (obstacleHex2 % COMBAT_GRID_ROW_LENGTH <=
+                                    COMBAT_OBSTACLE_LEFT_COLUMN_LIMIT - 1 ||
+                                obstacleHex2 % COMBAT_GRID_ROW_LENGTH >=
+                                    COMBAT_OBSTACLE_RIGHT_COLUMN_FIRST) {
+                                blocked6 = 1;
+                            }
+                            if (m_hexCells[obstacleHex2].m_blocked != 0)
+                                blocked6 = 1;
                         }
-                        if (m_hexCells[obstacleHex].m_blocked != 0)
-                            blocked = 1;
-                    }
-                    if (blocked == 0) {
-                        tryCount = 0;
-                        obstacleCells +=
-                            sCmbtObstacles[obstacleType].cellCount;
-                        obstacleUsed[obstacleType] = 1;
-                        for (cellIndex = 0;
-                             cellIndex <
-                                 sCmbtObstacles[obstacleType].cellCount;
-                             cellIndex++) {
-                            m_hexCells[anchorHex +
-                                       sCmbtObstacles[obstacleType]
-                                           .cellOffsets[cellIndex]]
-                                .m_blocked = 1;
+                        if (blocked6 == 0) {
+                            tryCount28 = 0;
+                            obstacleCells18 +=
+                                sCmbtObstacles[obstacleType4].cellCount;
+                            obstacleUsed[obstacleType4] = 1;
+                            for (cellIndex1 = 0;
+                                 cellIndex1 <
+                                     sCmbtObstacles[obstacleType4].cellCount;
+                                 cellIndex1++) {
+                                m_hexCells[anchorHex9 +
+                                           sCmbtObstacles[obstacleType4]
+                                               .cellOffsets[cellIndex1]]
+                                    .m_blocked = 1;
+                            }
+                            sprintf(gText, "cobj%04d.icn", obstacleType4);
+                            m_obstacleIcons[m_obstacleCount] =
+                                gpResourceManager->GetIcon(gText);
+                            m_hexCells[anchorHex9].m_obstacleIndex =
+                                static_cast<signed char>(m_obstacleCount);
+                            m_obstacleCount++;
                         }
-                        sprintf(gText, "cobj%04d.icn", obstacleType);
-                        m_obstacleIcons[m_obstacleCount] =
-                            gpResourceManager->GetIcon(gText);
-                        m_hexCells[anchorHex].m_obstacleIndex =
-                            static_cast<signed char>(m_obstacleCount);
-                        m_obstacleCount++;
                     }
                 }
             }
