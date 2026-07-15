@@ -1091,6 +1091,10 @@ void shellTrivial(void)
     } while (h != 1);
 }
 
+// @semantic
+// The bzip-0.21 trivial/graded BWT paths, 0x3c frame, five grade ranges, and NWC
+// LogStr redirection match retail; all 68 relocation occurrences agree. Residual code
+// begins with the initial zptr-loop comparison order and continues through switch lowering.
 VA(0x004d6720, 0x434)
 void sortIt(void)
 {
@@ -1200,6 +1204,10 @@ void doReversibleTransformation(void)
     if (origPtr == -1) panic(const_cast<char *>("doReversibleTransformation"));
 }
 
+// @semantic
+// The bzip-0.21 inverse-BWT count, prefix-sum, and backward traversal loops match retail,
+// with the same 0x418 frame and all 8 relocation occurrences. Residual code begins with
+// different local slots for the loop indices and 256-entry count array.
 VA(0x004d6c10, 0x158)
 void undoReversibleTransformation(void)
 {
@@ -1230,6 +1238,10 @@ void undoReversibleTransformation(void)
 
 #define SPOT_BASIS_STEP 8000
 
+// @semantic
+// Both spot/unspot byte paths and the complete nine-case delta cycle match retail, with
+// the same 0x18 frame and all 17 relocation occurrences. Residual code begins with the
+// local slot selected for pos and continues through equivalent switch lowering.
 VA(0x004d6d70, 0x1c1)
 void spotBlock(Bool weAreCompressing)
 {
@@ -1314,6 +1326,10 @@ Int32 getRLEpair(FILE *src)
     }
 }
 
+// @semantic
+// The bzip-0.21 block bound, RLE cases 1/2/3/default, EOF sentinel byte 42, and return
+// condition match retail, with the same 0x18 frame and all 40 relocation occurrences.
+// Residual code begins with the local slot for ch and equivalent loop-comparison order.
 VA(0x004d70a0, 0x1eb)
 Bool loadAndRLEsource(FILE *src)
 {
