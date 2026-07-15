@@ -50,18 +50,17 @@
 #define EVENTS_RECEIVE_LINE (*reinterpret_cast<const short *>("=\x18"))
 // @match-note
 // Complete semantics/CFG with the retail 0x350 frame, all source slots, and the
-// main plus eight nested-switch spills at -0x330..-0x350. Base has 966 external
-// relocation sites versus retail's 972: three gpGame and three gpWindowManager
-// occurrences remain unmapped and are an unfinished structural gap. The four
-// apparent base-only gSpellNames relocations use gSpellNames+4*(n-1) at 0xff778;
-// retail uses const_000ff774+4*n, the same effective address. The first
-// non-symbol divergence is the Sphinx resource
-// loop: retail loads giCurPlayer before eventValue, while base loads eventValue
-// first. Identifier/declaration ordering, the unused tag_message, one-case
-// switches/scopes, the shared ClaimMine tail, resource sprintf calls, and the
-// duplicate artifact CheckLevel were recovered; retained max is 97.90% despite
-// the expected live TU-state dip. Revisit now for the six missing external
-// occurrences; do not park this function as a compiler wall.
+// main plus eight nested-switch spills at -0x330..-0x350. All 972 relocation
+// sites agree: gpGame is 62/62 and gpWindowManager is 34/34. The mine uses four
+// direct resource-type loads; Troll Bridge, City of the Dead, and Dragon City
+// put the guarded arm first and share each recruit call through a label. The
+// four base gSpellNames relocations use 0xff778+4*(n-1), while retail uses
+// 0xff774+4*n; raw instructions prove the same effective address. First
+// non-symbol divergence is the Sphinx resource loop: retail loads giCurPlayer
+// before eventValue, while base loads eventValue first. Identifier/declaration
+// ordering, the unused tag_message, one-case switches/scopes, shared ClaimMine,
+// resource sprintf calls, and duplicate artifact CheckLevel were recovered.
+// Retained max is 97.90%; revisit at total SOURCE 95% for compiler-shape work.
 VA(0x004a8530, 0x5adb)
 void advManager::DoEvent(mapCell *cell, int x, int y)
 {
@@ -546,15 +545,16 @@ void advManager::DoEvent(mapCell *cell, int x, int y)
                 eventHero2->CheckLevel();
             }
             EventSound(eventType_g, cell->w4hi, &eventSample_f);
-            resourceType = gpGame->m_mines[cell->w4hi].resourceType;
-            if (resourceType == RES_GOLD)
+            if (gpGame->m_mines[cell->w4hi].resourceType == RES_GOLD)
                 resourceAmount6 = MINE_GOLD_INCOME;
-            else if (resourceType == RES_ORE)
+            else if (gpGame->m_mines[cell->w4hi].resourceType == RES_ORE)
                 resourceAmount6 = MINE_ORE_INCOME;
             else
                 resourceAmount6 = 1;
-            EventWindow(resourceType + MINE_RESOURCE_ICON_OFFSET, 1, "",
-                        resourceType, -resourceAmount6, -1, 0, -1);
+            EventWindow(gpGame->m_mines[cell->w4hi].resourceType +
+                            MINE_RESOURCE_ICON_OFFSET,
+                        1, "", gpGame->m_mines[cell->w4hi].resourceType,
+                        -resourceAmount6, -1, 0, -1);
 claimMine:
             gpGame->ClaimMine(cell->w4hi, giCurPlayer);
         }
@@ -997,33 +997,35 @@ chestGold:
                         "{Troll Bridge}\n\nYou've found one of those bridges that Trolls are so fond of living under, but there are none here.  Perhaps there will be some next week.",
                         -1, 0, -1, 0, -1);
         }
-        else {
-            if (!(cell->w4hi & DWELLING_GUARDED_FLAG)) {
-                EventSound(eventType_g, cell->w4hi, &eventSample_f);
-                EventWindow(-1, 2,
-                            "{Troll Bridge}\n\nSome Trolls living under a bridge are willing to join your army, but for a price.  Do you want to recruit Trolls?",
-                            -1, 0, -1, 0, -1);
-            }
-            else {
-                EventWindow(-1, 2,
-                            "{Troll Bridge}\n\nTrolls living under the bridge challenge you.  Will you fight them?",
-                            -1, 0, -1, 0, -1);
-                if (gpWindowManager->m_dialogResult != MONSTER_DIALOG_YES)
-                    break;
-                if (CombatMonsterEvent(eventHero2, TROLL_BRIDGE_TROLL, 12,
-                                       cell, x, y, 0, x, y,
-                                       TROLL_BRIDGE_WAR_TROLL, 8, 2,
-                                       -1, 0, 0) != 0)
-                    break;
-                eventHero2->CheckLevel();
-                cell->w4hi -= DWELLING_GUARDED_FLAG;
-                EventSound(eventType_g, cell->w4hi, &eventSample_f);
-                EventWindow(-1, 2,
-                            "{Troll Bridge}\n\nA few Trolls remain, cowering under the bridge.  They approach you and offer to join your forces as mercenaries.  Do you want to buy any Trolls?",
-                            -1, 0, -1, 0, -1);
-            }
+        else if (cell->w4hi & DWELLING_GUARDED_FLAG) {
+            EventWindow(-1, 2,
+                        "{Troll Bridge}\n\nTrolls living under the bridge challenge you.  Will you fight them?",
+                        -1, 0, -1, 0, -1);
+            if (gpWindowManager->m_dialogResult != MONSTER_DIALOG_YES)
+                break;
+            if (CombatMonsterEvent(eventHero2, TROLL_BRIDGE_TROLL, 12,
+                                   cell, x, y, 0, x, y,
+                                   TROLL_BRIDGE_WAR_TROLL, 8, 2,
+                                   -1, 0, 0) != 0)
+                break;
+            eventHero2->CheckLevel();
+            cell->w4hi -= DWELLING_GUARDED_FLAG;
+            EventSound(eventType_g, cell->w4hi, &eventSample_f);
+            EventWindow(-1, 2,
+                        "{Troll Bridge}\n\nA few Trolls remain, cowering under the bridge.  They approach you and offer to join your forces as mercenaries.  Do you want to buy any Trolls?",
+                        -1, 0, -1, 0, -1);
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
-                RecruitEvent(eventHero2, TROLL_BRIDGE_TROLL, cell);
+                goto recruitTroll;
+        }
+        else {
+            EventSound(eventType_g, cell->w4hi, &eventSample_f);
+            EventWindow(-1, 2,
+                        "{Troll Bridge}\n\nSome Trolls living under a bridge are willing to join your army, but for a price.  Do you want to recruit Trolls?",
+                        -1, 0, -1, 0, -1);
+            if (gpWindowManager->m_dialogResult != MONSTER_DIALOG_YES)
+                break;
+recruitTroll:
+            RecruitEvent(eventHero2, TROLL_BRIDGE_TROLL, cell);
         }
         break;
 
@@ -1033,33 +1035,35 @@ chestGold:
                         "{City of the Dead}\n\nThe City of the Dead is empty of life, and empty of unlife as well.  Perhaps some undead will move in next week.",
                         -1, 0, -1, 0, -1);
         }
-        else {
-            if (!(cell->w4hi & DWELLING_GUARDED_FLAG)) {
-                EventSound(eventType_g, cell->w4hi, &eventSample_f);
-                EventWindow(-1, 2,
-                            "{City of the Dead}\n\nSome Liches living here are willing to join your army for a price.  Do you want to recruit Liches?",
-                            -1, 0, -1, 0, -1);
-            }
-            else {
-                EventWindow(-1, 2,
-                            "{City of the Dead}\n\nYou've found the ruins of an ancient city, now inhabited solely by the undead.  Will you search?",
-                            -1, 0, -1, 0, -1);
-                if (gpWindowManager->m_dialogResult != MONSTER_DIALOG_YES)
-                    break;
-                if (CombatMonsterEvent(eventHero2, CITY_DEAD_PRIMARY, 10,
-                                       cell, x, y, 0, x, y,
-                                       CITY_DEAD_SECONDARY, 40, 2,
-                                       CITY_DEAD_TERTIARY, 5, 1) != 0)
-                    break;
-                eventHero2->CheckLevel();
-                cell->w4hi -= DWELLING_GUARDED_FLAG;
-                EventSound(eventType_g, cell->w4hi, &eventSample_f);
-                EventWindow(-1, 2,
-                            "{City of the Dead}\n\nSome of the surviving Liches are impressed by your victory over their fellows, and offer to join you for a price.  Do you want to recruit Liches?",
-                            -1, 0, -1, 0, -1);
-            }
+        else if (cell->w4hi & DWELLING_GUARDED_FLAG) {
+            EventWindow(-1, 2,
+                        "{City of the Dead}\n\nYou've found the ruins of an ancient city, now inhabited solely by the undead.  Will you search?",
+                        -1, 0, -1, 0, -1);
+            if (gpWindowManager->m_dialogResult != MONSTER_DIALOG_YES)
+                break;
+            if (CombatMonsterEvent(eventHero2, CITY_DEAD_PRIMARY, 10,
+                                   cell, x, y, 0, x, y,
+                                   CITY_DEAD_SECONDARY, 40, 2,
+                                   CITY_DEAD_TERTIARY, 5, 1) != 0)
+                break;
+            eventHero2->CheckLevel();
+            cell->w4hi -= DWELLING_GUARDED_FLAG;
+            EventSound(eventType_g, cell->w4hi, &eventSample_f);
+            EventWindow(-1, 2,
+                        "{City of the Dead}\n\nSome of the surviving Liches are impressed by your victory over their fellows, and offer to join you for a price.  Do you want to recruit Liches?",
+                        -1, 0, -1, 0, -1);
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
-                RecruitEvent(eventHero2, CITY_DEAD_RECRUIT, cell);
+                goto recruitLich;
+        }
+        else {
+            EventSound(eventType_g, cell->w4hi, &eventSample_f);
+            EventWindow(-1, 2,
+                        "{City of the Dead}\n\nSome Liches living here are willing to join your army for a price.  Do you want to recruit Liches?",
+                        -1, 0, -1, 0, -1);
+            if (gpWindowManager->m_dialogResult != MONSTER_DIALOG_YES)
+                break;
+recruitLich:
+            RecruitEvent(eventHero2, CITY_DEAD_RECRUIT, cell);
         }
         break;
 
@@ -1069,40 +1073,42 @@ chestGold:
                         "{Dragon City}\n\nThe Dragon city has no Dragons willing to join you this week.  Perhaps a Dragon will become available next week.",
                         -1, 0, -1, 0, -1);
         }
-        else {
-            if (!(cell->w4hi & DWELLING_GUARDED_FLAG)) {
-                EventSound(eventType_g, cell->w4hi, &eventSample_f);
-                EventWindow(-1, 2,
-                            "{Dragon City}\n\nThe Dragon city is willing to offer some Dragons for your army for a price.  Do you wish to recruit Dragons?",
-                            -1, 0, -1, 0, -1);
-            }
-            else {
-                EventWindow(-1, 2,
-                            "{Dragon City}\n\nYou stand before the Dragon City, a place off-limits to mere humans.  Do you wish to violate this rule and challenge the Dragons to a fight?",
-                            -1, 0, -1, 0, -1);
-                if (gpWindowManager->m_dialogResult != MONSTER_DIALOG_YES)
-                    break;
-                dragonFactor_d = 1;
-                if (gbInCampaign && gpGame->m_campaignType == 1 &&
-                    gpGame->m_campaignScenario == 6)
-                    dragonFactor_d = 2;
-                if (CombatMonsterEvent(eventHero2, DRAGON_CITY_GREEN_DRAGON,
-                                       dragonFactor_d * 3, cell, x, y, 0, x, y,
-                                       DRAGON_CITY_RED_DRAGON, dragonFactor_d, 1,
-                                       DRAGON_CITY_BLACK_DRAGON, dragonFactor_d, 1) != 0)
-                    break;
-                CheckEndGame(0, 1);
-                if (gbGameOver)
-                    break;
-                eventHero2->CheckLevel();
-                cell->w4hi -= DWELLING_GUARDED_FLAG;
-                EventSound(eventType_g, cell->w4hi, &eventSample_f);
-                EventWindow(-1, 2,
-                            "{Dragon City}\n\nHaving defeated the Dragon champions, the city's leaders agree to supply some Dragons to your army for a price.  Do you wish to recruit Dragons?",
-                            -1, 0, -1, 0, -1);
-            }
+        else if (cell->w4hi & DWELLING_GUARDED_FLAG) {
+            EventWindow(-1, 2,
+                        "{Dragon City}\n\nYou stand before the Dragon City, a place off-limits to mere humans.  Do you wish to violate this rule and challenge the Dragons to a fight?",
+                        -1, 0, -1, 0, -1);
+            if (gpWindowManager->m_dialogResult != MONSTER_DIALOG_YES)
+                break;
+            dragonFactor_d = 1;
+            if (gbInCampaign && gpGame->m_campaignType == 1 &&
+                gpGame->m_campaignScenario == 6)
+                dragonFactor_d = 2;
+            if (CombatMonsterEvent(eventHero2, DRAGON_CITY_GREEN_DRAGON,
+                                   dragonFactor_d * 3, cell, x, y, 0, x, y,
+                                   DRAGON_CITY_RED_DRAGON, dragonFactor_d, 1,
+                                   DRAGON_CITY_BLACK_DRAGON, dragonFactor_d, 1) != 0)
+                break;
+            CheckEndGame(0, 1);
+            if (gbGameOver)
+                break;
+            eventHero2->CheckLevel();
+            cell->w4hi -= DWELLING_GUARDED_FLAG;
+            EventSound(eventType_g, cell->w4hi, &eventSample_f);
+            EventWindow(-1, 2,
+                        "{Dragon City}\n\nHaving defeated the Dragon champions, the city's leaders agree to supply some Dragons to your army for a price.  Do you wish to recruit Dragons?",
+                        -1, 0, -1, 0, -1);
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
-                RecruitEvent(eventHero2, DRAGON_CITY_RECRUIT, cell);
+                goto recruitDragon;
+        }
+        else {
+            EventSound(eventType_g, cell->w4hi, &eventSample_f);
+            EventWindow(-1, 2,
+                        "{Dragon City}\n\nThe Dragon city is willing to offer some Dragons for your army for a price.  Do you wish to recruit Dragons?",
+                        -1, 0, -1, 0, -1);
+            if (gpWindowManager->m_dialogResult != MONSTER_DIALOG_YES)
+                break;
+recruitDragon:
+            RecruitEvent(eventHero2, DRAGON_CITY_RECRUIT, cell);
         }
         break;
 
