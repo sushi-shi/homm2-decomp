@@ -1,6 +1,7 @@
 #ifndef HOMM2_ADVMGR_H
 #define HOMM2_ADVMGR_H
 #include <va.h>
+#include <EnumTypes.h>
 // Declarations of the free functions DEFINED in ADVMGR.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
@@ -356,7 +357,7 @@ typedef enum AdventureSystemOptionsMessage {
     ADVMGR_SYSTEM_OPTIONS_HANDLED = 2
 } AdventureSystemOptionsMessage;
 
-typedef enum AdventureSystemOption {
+HOMM2_ENUM_BEGIN(AdventureSystemOption)
     ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME = 10,
     ADVMGR_SYSTEM_OPTION_SOUND_VOLUME = 11,
     ADVMGR_SYSTEM_OPTION_HERO_SPEED = 12,
@@ -369,7 +370,22 @@ typedef enum AdventureSystemOption {
     ADVMGR_SYSTEM_OPTION_FIRST = ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME,
     ADVMGR_SYSTEM_OPTION_LAST = ADVMGR_SYSTEM_OPTION_COLOR_CURSOR,
     ADVMGR_SYSTEM_OPTION_COUNT = ADVMGR_SYSTEM_OPTION_LAST - ADVMGR_SYSTEM_OPTION_FIRST + 1
-} AdventureSystemOption;
+HOMM2_ENUM_END(AdventureSystemOption)
+
+#ifdef HOMM2_STRICT_ENUM_TYPES
+inline int EncodeAdventureSystemOption(AdventureSystemOption option)
+{
+    return static_cast<int>(option);
+}
+
+inline AdventureSystemOption DecodeAdventureSystemOption(int value)
+{
+    return static_cast<AdventureSystemOption>(value);
+}
+#else
+#define EncodeAdventureSystemOption(option) (option)
+#define DecodeAdventureSystemOption(value) (value)
+#endif
 
 typedef enum AdventureSystemOptionConstant {
     ADVMGR_OPTION_VOLUME_LEVELS = 11,
@@ -950,6 +966,16 @@ typedef enum AdventureSystemOptionsConstant {
     ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET = 10,
     ADVMGR_SYSTEM_OPTIONS_DRAW_MASK = 0x7fff
 } AdventureSystemOptionsConstant;
+
+#ifdef HOMM2_STRICT_ENUM_TYPES
+inline int EncodeAdventureSystemOptionTextControl(AdventureSystemOption option)
+{
+    return EncodeAdventureSystemOption(option) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+}
+#else
+#define EncodeAdventureSystemOptionTextControl(option) \
+    ((option) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET)
+#endif
 
 int SaveGame(void);
 int DimensionDoorHandler(struct tag_message &);

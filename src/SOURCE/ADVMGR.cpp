@@ -7706,21 +7706,25 @@ void UpdateSystemOptions(int initialDraw)
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = ADVMGR_SYSTEM_OPTIONS_SET_FRAME;
 
-    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME;
+    message.payload.widget.id =
+        EncodeAdventureSystemOption(ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME);
     message.payload.widget.data.value = gConfig.musicVolume != 0;
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_SOUND_VOLUME;
+    message.payload.widget.id =
+        EncodeAdventureSystemOption(ADVMGR_SYSTEM_OPTION_SOUND_VOLUME);
     if (gConfig.soundVolume == 0)
         message.payload.widget.data.value = ADVMGR_SYSTEM_OPTIONS_SOUND_FRAME_BASE;
     else
         message.payload.widget.data.value =
             ADVMGR_SYSTEM_OPTIONS_SOUND_FRAME_BASE + 1;
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_HERO_SPEED;
+    message.payload.widget.id =
+        EncodeAdventureSystemOption(ADVMGR_SYSTEM_OPTION_HERO_SPEED);
     message.payload.widget.data.value =
         gConfig.walkSpeed + ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE;
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE;
+    message.payload.widget.id =
+        EncodeAdventureSystemOption(ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE);
     if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI)
         musicQuality = 0;
     else if (gConfig.useOpera == CONFIG_OPERA_DISABLED)
@@ -7730,11 +7734,13 @@ void UpdateSystemOptions(int initialDraw)
     message.payload.widget.data.value =
         musicQuality + ADVMGR_SYSTEM_OPTIONS_MUSIC_SOURCE_FRAME_BASE;
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_SHOW_ROUTE;
+    message.payload.widget.id =
+        EncodeAdventureSystemOption(ADVMGR_SYSTEM_OPTION_SHOW_ROUTE);
     message.payload.widget.data.value =
         (gConfig.showRoute == 0) + ADVMGR_SYSTEM_OPTIONS_ROUTE_FRAME_BASE;
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_COMPUTER_SPEED;
+    message.payload.widget.id =
+        EncodeAdventureSystemOption(ADVMGR_SYSTEM_OPTION_COMPUTER_SPEED);
     if (gConfig.blackoutComputer == 0)
         message.payload.widget.data.value =
             gConfig.computerWalkSpeed + ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE;
@@ -7742,60 +7748,63 @@ void UpdateSystemOptions(int initialDraw)
         message.payload.widget.data.value =
             ADVMGR_SYSTEM_OPTIONS_COMPUTER_HIDDEN_FRAME;
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_INTERFACE;
+    message.payload.widget.id =
+        EncodeAdventureSystemOption(ADVMGR_SYSTEM_OPTION_INTERFACE);
     message.payload.widget.data.value =
         gConfig.evilInterfaceUsage + ADVMGR_SYSTEM_OPTIONS_INTERFACE_FRAME_BASE;
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_VIDEO;
+    message.payload.widget.id =
+        EncodeAdventureSystemOption(ADVMGR_SYSTEM_OPTION_VIDEO);
     message.payload.widget.data.value =
         ADVMGR_SYSTEM_OPTIONS_VIDEO_FRAME_BASE + (gConfig.slowVideo != 0);
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_COLOR_CURSOR;
+    message.payload.widget.id =
+        EncodeAdventureSystemOption(ADVMGR_SYSTEM_OPTION_COLOR_CURSOR);
     message.payload.widget.data.value =
         gConfig.gfx[0].colorMouseCursor + ADVMGR_SYSTEM_OPTIONS_CURSOR_FRAME_BASE;
     cPanel->BroadcastMessage(message);
 
     message.payload.widget.command = ADVMGR_SYSTEM_OPTIONS_SET_TEXT;
-    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME +
-                                ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    message.payload.widget.id =
+        EncodeAdventureSystemOptionTextControl(ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME);
     message.payload.widget.data.text = onOffText[gConfig.musicVolume];
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_SOUND_VOLUME +
-                                ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    message.payload.widget.id =
+        EncodeAdventureSystemOptionTextControl(ADVMGR_SYSTEM_OPTION_SOUND_VOLUME);
     message.payload.widget.data.text = onOffText[gConfig.soundVolume];
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_HERO_SPEED +
-                                ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    message.payload.widget.id =
+        EncodeAdventureSystemOptionTextControl(ADVMGR_SYSTEM_OPTION_HERO_SPEED);
     message.payload.widget.data.text = walkSpeedText[gConfig.walkSpeed];
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE +
-                                ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    message.payload.widget.id =
+        EncodeAdventureSystemOptionTextControl(ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE);
     message.payload.widget.data.text = musicQualityText[musicQuality];
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_SHOW_ROUTE +
-                                ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    message.payload.widget.id =
+        EncodeAdventureSystemOptionTextControl(ADVMGR_SYSTEM_OPTION_SHOW_ROUTE);
     message.payload.widget.data.text = onOffText[gConfig.showRoute];
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_COMPUTER_SPEED +
-                                ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    message.payload.widget.id =
+        EncodeAdventureSystemOptionTextControl(ADVMGR_SYSTEM_OPTION_COMPUTER_SPEED);
     if (gConfig.blackoutComputer == 0)
         message.payload.widget.data.text =
             walkSpeedText[gConfig.computerWalkSpeed];
     else
         message.payload.widget.data.text = "Don't Show";
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_INTERFACE +
-                                ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    message.payload.widget.id =
+        EncodeAdventureSystemOptionTextControl(ADVMGR_SYSTEM_OPTION_INTERFACE);
     message.payload.widget.data.text =
         gInterfaceTypeText[gConfig.evilInterfaceUsage];
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_VIDEO +
-                                ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    message.payload.widget.id =
+        EncodeAdventureSystemOptionTextControl(ADVMGR_SYSTEM_OPTION_VIDEO);
     message.payload.widget.data.text =
         cSlowVideoLevelText[gConfig.slowVideo != 0];
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_COLOR_CURSOR +
-                                ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    message.payload.widget.id =
+        EncodeAdventureSystemOptionTextControl(ADVMGR_SYSTEM_OPTION_COLOR_CURSOR);
     message.payload.widget.data.text =
         cBWMouseText[gConfig.gfx[0].colorMouseCursor];
     cPanel->BroadcastMessage(message);
@@ -7878,7 +7887,7 @@ int SystemOptionsHandler(struct tag_message& message) {
                     break;
 
                 case ADVMGR_SYSTEM_OPTIONS_ACTIVATE: {
-                    switch (message.payload.widget.id) {
+                    switch (DecodeAdventureSystemOption(message.payload.widget.id)) {
                         case ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME:
                             if (gConfig.musicVolume == 0 && gpSoundManager->m_cdReady == 0
                                 && gpSoundManager->m_midiReady == 0) {
@@ -8032,6 +8041,10 @@ int SystemOptionsHandler(struct tag_message& message) {
                             bPrefsChanged = 1;
                             gpMouseManager->SetColorMice(gConfig.gfx[0].colorMouseCursor);
                             break;
+#ifdef HOMM2_STRICT_ENUM_TYPES
+                        case ADVMGR_SYSTEM_OPTION_COUNT:
+                            break;
+#endif
                     }
                     break;
                 }
@@ -8044,7 +8057,8 @@ int SystemOptionsHandler(struct tag_message& message) {
     }
     if (accepted) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
-        message.payload.widget.id = ADVMGR_SYSTEM_OPTION_FIRST;
+        message.payload.widget.id =
+            EncodeAdventureSystemOption(ADVMGR_SYSTEM_OPTION_FIRST);
         message.payload.widget.command = message.payload.widget.id;
         return ADVMGR_SYSTEM_OPTIONS_HANDLED;
     }
