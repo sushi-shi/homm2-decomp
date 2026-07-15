@@ -15,51 +15,47 @@
 DATA(0x00534bf0) static unsigned char *gDimRow;
 DATA(0x00534bf4) static unsigned int gDimCnt;
 DATA(0x00534bf8) static unsigned int gDimRun;
-DATA(0x00534bfc) static volatile int gDimY;
-DATA(0x00534c00) static volatile unsigned int gDimCnt2;
+DATA(0x00534bfc) static int gDimY;
+DATA(0x00534c00) static unsigned int gDimCnt2;
 DATA(0x00534c04) static IconEntry *gDimEntry;
 DATA(0x00534c08) static int gDimClipB;
 DATA(0x00534c0c) static unsigned char *gDimSrc;
-DATA(0x00534c10) static unsigned char * volatile gDimDst;
+DATA(0x00534c10) static unsigned char *gDimDst;
 DATA(0x00534c14) static int gDimX;
 DATA(0x00534c18) static int gDimClipR;
-DATA(0x00534c1c) static volatile int gDimX0;
+DATA(0x00534c1c) static int gDimX0;
 
 // @match-note
-// Coverage checkpoint: the decoder semantics and CFG are complete, including the four clipped-run
-// quadrants and the negative-run/newline exits.  Both objects have a four-byte frame; [esp+0x10]
-// retains the signed destination pitch.  All 37 external relocations match in identity,
-// multiplicity, and order (the 12 scratch owners plus uDimPal).
-// Consumer-only mono/shear enum headers raise the unchanged body from 83.29% to 84.99% while
-// preserving the exact 37/37 relocation stream. The first raw divergence is +0x21: ours
-// adds the caller X to ECX before publishing gDimEntry/gDimSrc, while retail publishes those
-// pointers, loads entry->y, then loads/adds X and publishes gDimX0.  Ours ends at +0x269 versus
-// retail +0x26e; later differences are register/source-order choices with the same CFG successors.
-// Tried: real IconEntry/row/palette types, the canonical palette header, named RLE constants, the
-// palette-plane `sizeof` stride, and a retail-ordered entryX/entryY lifetime split (rejected:
-// 63.28%).  This is not a proven wall;
-// revisit after shared-header/TU-state changes or in the last-mile AST phase, not during coverage.
+// Complete decoder CFG: negative skip/end, newline, unclipped dim, and all four clipped-run
+// quadrants. Both objects use a four-byte frame and [esp+0x10] retains the signed destination
+// pitch. The first divergence is +0x1f: retail adds the icon-data base to the encoded source offset
+// before publishing gDimEntry; this TU state schedules that add after the store. Candidate code ends
+// at +0x258 versus retail +0x26e. Relocations are 34/37 with no excess: MSVC forwards the live X
+// value through the two initial gDimX0 predicates and forwards the first gDimY clipping value into
+// the second predicate, omitting exactly two gDimX0 loads and one gDimY load. Prior `volatile`
+// qualifiers manufactured those reloads and were removed. Tried the typed IconEntry array root,
+// retail publication lifetimes, and retail-positive clipping predicates. Revisit after a genuine
+// shared-header/TU-state change; do not restore qualifiers or add alias/reload coercion.
 VA(0x004cfd50, 0x26e)
 void DimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                      int color, int clip, int clipX, int clipY, int clipW, int clipH)
 {
-    char *data = srcIcon->m_data;
-    int entryOffset = frame * sizeof(IconEntry);
-    int X = reinterpret_cast<IconEntry *>(data + entryOffset)->x;
-    int srcOffset = reinterpret_cast<IconEntry *>(data + entryOffset)->srcOffset;
-    IconEntry * const entry = reinterpret_cast<IconEntry *>(data + entryOffset);
-    unsigned char * const srcData = reinterpret_cast<unsigned char *>(data + srcOffset);
-    const int entryY = entry->y;
+    IconEntry *entries = reinterpret_cast<IconEntry *>(srcIcon->m_data);
+    int entryX = entries[frame].x;
+    IconEntry * const entry = &entries[frame];
+    unsigned char * const srcData =
+        reinterpret_cast<unsigned char *>(entries) + entries[frame].srcOffset;
     gDimEntry = entry;
+    const int entryY = entry->y;
     gDimSrc = srcData;
-    X = gDimX0 = x + X;
+    int X = x + entryX;
+    gDimX0 = X;
     gDimY = y + entryY;
-    int currentY;
     int right;
     unsigned int cnt;
     if (clip != 0) {
-        if (gDimX0 < clipX || clipW + clipX < entry->w + gDimX0 || gDimY < clipY ||
-            clipY + clipH < entry->h + gDimY) {
+        if (clipX > gDimX0 || gDimX0 + entry->w > clipX + clipW || gDimY < clipY ||
+            gDimY + entry->h > clipY + clipH) {
             clip = 1;
             gDimClipR = clipX + clipW - 1;
             gDimClipB = clipY + clipH - 1;
@@ -104,10 +100,8 @@ void DimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int 
                     } while (cnt != 0);
                 }
             } else {
-                currentY = gDimY;
-                if (clipY > currentY || gDimClipB < currentY ||
-                    (right = X + cmd, clipX >= right) || gDimClipR < X) {
-                } else {
+                if (gDimY >= clipY && gDimY <= gDimClipB &&
+                    (right = X + cmd, clipX < right) && X <= gDimClipR) {
                     unsigned int palOffset;
                     unsigned char *dst;
                     if (X >= clipX) {
