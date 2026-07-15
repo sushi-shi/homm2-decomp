@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Probe temporary parser-visible TU-state inputs before one MSVC 4.2 function.
 
-This is a deliberately isolated last-mile tool.  It does not rewrite the target.  Each
+This remains the standalone diagnostic/record-max compatibility engine. New combined
+searches should use ``scripts/match_variants.py``, which imports these state families and
+crosses them with libclang mutations and hand-authored axes. It does not rewrite the target. Each
 trial temporarily inserts deterministic parser-visible declarations, definitions, or
 curated includes before the target's ``VA`` metadata block, compiles the real translation
 unit with VC 4.2, scores the requested symbol with objdiff, and restores the source
