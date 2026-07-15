@@ -20,6 +20,7 @@ from generate_ast_variants import (
     inline_member_access_edits,
     inline_nested_expression_edits,
     inline_read_advance_edits,
+    identifier_rename_edits,
     mutation_name,
     statement_order_edits,
     utf8_byte_offset,
@@ -215,6 +216,37 @@ class AstVariantSemanticTests(unittest.TestCase):
             edit.start < end and start < edit.end
             for mutation in mutations for edit in mutation.edits if edit.start != edit.end
         ))
+
+    def test_pure_integer_division_and_subtraction_can_be_inlined(self):
+        function = self.functions["SafeIntegerOperators"]
+        mutations = inline_expression_edits(function, self.blob, 0, 1)
+        helpers = b"".join(
+            edit.replacement for mutation in mutations for edit in mutation.edits
+            if edit.start == edit.end
+        )
+        self.assertIn(b"return value / divisor;", helpers)
+        self.assertIn(b"return value - divisor;", helpers)
+
+    def test_identifier_rename_tracks_declaration_identity_and_all_references(self):
+        function = self.functions["SafeIntegerOperators"]
+        mutations = identifier_rename_edits(function, self.blob, 2)
+        mutation = next(item for item in mutations if "divisor-to-divisorValue" in item.label)
+        candidate = self._render_mutation(mutation).decode()
+        self.assertIn("int divisorValue", candidate)
+        self.assertIn("value / divisorValue", candidate)
+        self.assertIn("value - divisorValue", candidate)
+        tu = ci.Index.create().parse(
+            str(self.source), args=["-x", "c++", "-std=c++14"],
+            unsaved_files=[(str(self.source), candidate)],
+        )
+        errors = [item for item in tu.diagnostics if item.severity >= ci.Diagnostic.Error]
+        self.assertEqual(errors, [])
+
+    def test_identifier_rename_can_be_limited_by_declaration_spelling(self):
+        function = self.functions["SafeIntegerOperators"]
+        mutations = identifier_rename_edits(function, self.blob, 2, {"divisor"})
+        self.assertEqual(len(mutations), 2)
+        self.assertTrue(all("divisor-to-divisor" in item.label for item in mutations))
 
     def test_read_advance_requires_independent_value_local(self):
         safe = inline_read_advance_edits(

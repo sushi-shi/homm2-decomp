@@ -49,6 +49,7 @@ from tu_state_noise import (
 
 COMMUTATIVE = {"+", "*", "==", "!=", "&", "|", "^"}
 RELATIONAL_FLIP = {"<": ">", ">": "<", "<=": ">=", ">=": "<="}
+PURE_INLINE_BINARY = COMMUTATIVE | set(RELATIONAL_FLIP) | {"-", "/", "%", "<<", ">>"}
 ASSIGNMENTS = {"=", "+=", "-=", "*=", "/=", "%=", "&=", "|=", "^=", "<<=", ">>="}
 FUNCTION_KINDS = (
     ci.CursorKind.FUNCTION_DECL,
@@ -83,6 +84,12 @@ REFERENCE_TYPE_KINDS = {
     ) if kind is not None
 }
 CONTEXT_SENSITIVE_TOKENS = (b"__COUNTER__", b"__FUNCTION__", b"__FUNCSIG__", b"__LINE__")
+RENAME_SUFFIXES = (
+    "Value", "Count", "Index", "Offset", "Position", "Size", "Length", "Amount",
+    "Delta", "Stride", "Factor", "Current", "Next", "Source", "Destination", "Row",
+    "Column", "Pixel", "Pointer", "Buffer", "Work", "Temp", "Local", "Result",
+    "State", "Number", "Coordinate", "Accumulator", "Input", "Output", "Start", "End",
+)
 
 
 @dataclass(frozen=True)
@@ -599,7 +606,7 @@ def member_requires_lvalue(node, fn, parents) -> bool:
 
 def inline_expression_edits(fn, blob: bytes, insertion: int, helper_name_count: int) -> list[AstMutation]:
     mutations = []
-    accepted = COMMUTATIVE | set(RELATIONAL_FLIP)
+    accepted = PURE_INLINE_BINARY
     expression_index = 0
     for node in fn.walk_preorder():
         if node.kind != ci.CursorKind.BINARY_OPERATOR or has_side_effect(node):
@@ -612,7 +619,11 @@ def inline_expression_edits(fn, blob: bytes, insertion: int, helper_name_count: 
         if not left_start < left_end <= right_start < right_end:
             continue
         token = operator_token(node, left_end, right_start, accepted)
-        if token is None or not operator_is_value_neutral(token.spelling, children[0], children[1]):
+        result_kind = canonical_kind(node.type)
+        if token is None or not (
+            result_kind in INTEGRAL_TYPE_KINDS
+            or result_kind in {ci.TypeKind.ENUM, ci.TypeKind.POINTER}
+        ):
             continue
         start, end = cursor_range(node)
         expression = blob[start:end]
@@ -906,8 +917,56 @@ def inline_read_advance_edits(fn, blob: bytes, insertion: int, helper_name_count
     return mutations
 
 
+def identifier_rename_edits(
+    fn, blob: bytes, name_count: int, selected_names: set[str] | None = None
+) -> list[AstMutation]:
+    declarations = {}
+    for node in fn.walk_preorder():
+        if node.kind not in (ci.CursorKind.PARM_DECL, ci.CursorKind.VAR_DECL):
+            continue
+        parent = node.semantic_parent
+        if parent is None or parent.hash != fn.hash or not node.spelling.isidentifier():
+            continue
+        declarations[node.hash] = node
+    existing_names = {declaration.spelling for declaration in declarations.values()}
+    mutations = []
+    for declaration in sorted(declarations.values(), key=lambda item: item.location.offset):
+        original = declaration.spelling
+        if selected_names and original not in selected_names:
+            continue
+        occurrences = [(declaration.location.offset, declaration.location.offset + len(original))]
+        occurrences.extend(
+            cursor_range(node)
+            for node in fn.walk_preorder()
+            if (
+                node.kind == ci.CursorKind.DECL_REF_EXPR
+                and node.referenced is not None
+                and node.referenced.hash == declaration.hash
+            )
+        )
+        occurrences = sorted(set(occurrences))
+        if not occurrences or any(
+            blob[start:end] != original.encode("utf-8") for start, end in occurrences
+        ):
+            continue
+        for suffix in RENAME_SUFFIXES[:name_count]:
+            replacement = original + suffix
+            if replacement in existing_names:
+                continue
+            mutations.append(AstMutation(
+                "identifier_rename",
+                f"line-{line_number(blob, occurrences[0][0])}-{original}-to-{replacement}",
+                tuple(
+                    AstEdit(start, end, replacement.encode("utf-8"))
+                    for start, end in occurrences
+                ),
+            ))
+    return mutations
+
+
 def atomic_mutations(
-    fn, blob: bytes, insertion: int, families: set[str], helper_name_count: int
+    fn, blob: bytes, insertion: int, families: set[str], helper_name_count: int,
+    rename_name_count: int, rename_identifiers: set[str],
 ) -> list[AstMutation]:
     mutations = expression_edits(fn, blob) + statement_order_edits(fn, blob) + declaration_edits(fn, blob)
     if "inline_expression" in families:
@@ -918,6 +977,10 @@ def atomic_mutations(
         mutations += inline_nested_expression_edits(fn, blob, insertion, helper_name_count)
     if "inline_read_advance" in families:
         mutations += inline_read_advance_edits(fn, blob, insertion, helper_name_count)
+    if "identifier_rename" in families:
+        mutations += identifier_rename_edits(
+            fn, blob, rename_name_count, rename_identifiers
+        )
     unique = {}
     for mutation in mutations:
         if mutation.family not in families:
@@ -1071,6 +1134,14 @@ def main(argv=None, *, prog=None, description=None) -> int:
         help="number of deterministic identifier spellings for each generated inline helper",
     )
     parser.add_argument(
+        "--rename-name-count", type=int, default=8,
+        help="semantic suffix spellings emitted per declaration by identifier_rename",
+    )
+    parser.add_argument(
+        "--rename-identifier", action="append", default=[],
+        help="limit identifier_rename to this bound declaration spelling; may be repeated",
+    )
+    parser.add_argument(
         "--require-mutation", action="append", default=[],
         help="require an exact content-fingerprinted mutation name; may be repeated",
     )
@@ -1098,10 +1169,15 @@ def main(argv=None, *, prog=None, description=None) -> int:
     parser.add_argument("--top", type=int, default=12, help="ranked results printed by --run")
     parser.add_argument("--compile-timeout", type=float, default=120.0)
     parser.add_argument("--batch-output", type=Path, help="artifact directory used by --run")
+    parser.add_argument(
+        "--show-best-disasm", action="store_true",
+        help="with --run, print the best disposable object before it is deleted",
+    )
     args = parser.parse_args(argv)
     if (
         args.min_depth < 1 or args.max_depth < args.min_depth
-        or args.limit < 1 or args.helper_name_count < 1 or args.state_trials < 0
+        or args.limit < 1 or args.helper_name_count < 1
+        or not 1 <= args.rename_name_count <= len(RENAME_SUFFIXES) or args.state_trials < 0
         or args.top < 1 or args.compile_timeout <= 0
     ):
         parser.error("require 1 <= --min-depth <= --max-depth and positive limit/name count")
@@ -1116,7 +1192,7 @@ def main(argv=None, *, prog=None, description=None) -> int:
     known_families = {
         "commutative_order", "relational_order", "independent_statement_order",
         "declaration_split", "declaration_merge", "inline_expression", "inline_read_advance",
-        "inline_nested_expression", "inline_member_access",
+        "inline_nested_expression", "inline_member_access", "identifier_rename",
     }
     unknown = families - known_families
     if unknown:
@@ -1146,7 +1222,10 @@ def main(argv=None, *, prog=None, description=None) -> int:
     if diagnostics:
         parser.error("libclang parse errors:\n" + "\n".join(diagnostics[:20]))
     insertion, _span_end = marker_span(blob, args.rva)
-    mutations = atomic_mutations(fn, blob, insertion, families, args.helper_name_count)
+    mutations = atomic_mutations(
+        fn, blob, insertion, families, args.helper_name_count, args.rename_name_count,
+        set(args.rename_identifier),
+    )
     state_families = tuple(
         family.strip() for family in args.state_families.split(",") if family.strip()
     )
@@ -1186,6 +1265,8 @@ def main(argv=None, *, prog=None, description=None) -> int:
             "ignored_trailing_diagnostics": trailing_diagnostics,
             "allowed_external_diagnostics": allowed_diagnostics,
             "required_mutations": sorted(required_names),
+            "rename_name_count": args.rename_name_count,
+            "rename_identifiers": sorted(set(args.rename_identifier)),
             "tu_state": {
                 "trials_requested": args.state_trials,
                 "mutations_emitted": len(state_mutations),
@@ -1243,6 +1324,8 @@ def main(argv=None, *, prog=None, description=None) -> int:
         ]
         if args.batch_output is not None:
             batch_args.extend(("--output", str(args.batch_output)))
+        if args.show_best_disasm:
+            batch_args.append("--show-best-disasm")
         return run_batch(batch_args)
     return 0
 
