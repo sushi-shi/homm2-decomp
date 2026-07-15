@@ -1,9 +1,14 @@
 # Strict data-allocation audits
 
+## Standalone project-neutral workflow
+
 The patched `objdiff-cli diff` JSON exposes the section index and data relocation
 rows for every symbol. `scripts/strict_allocation_diff.py` uses those raw side
 records to audit reviewed allocations without relying on objdiff's fuzzy score.
 The format and checker are project-neutral and work with any objdiff project.
+Vostok, Gruntz, or another consumer supplies its own reviewed manifest and
+one-shot objdiff evidence; this standalone path does not read HoMM2's storage
+ledger, PE, symbol inventory, or build configuration.
 
 Generate a one-shot diff for a unit, then audit it:
 
@@ -30,7 +35,16 @@ The review manifest is external to objdiff:
     {
       "target_name": "target_symbol",
       "extent": "0x28",
-      "section_kind": "SECTION_DATA"
+      "section_kind": "SECTION_DATA",
+      "relocation_mappings": [
+        {
+          "offset": "0x10",
+          "type": 6,
+          "addend": 0,
+          "target_name": "target_relocation",
+          "base_name": "base_relocation"
+        }
+      ]
     }
   ]
 }
@@ -39,6 +53,14 @@ The review manifest is external to objdiff:
 `base_name` may be placed on an allocation when it should not use the global
 symbol mapping. `section_kind` is optional; when present it is one of
 `SECTION_DATA`, `SECTION_BSS`, or `SECTION_COMMON`.
+
+`relocation_mappings` is optional. When absent, relocation names use the global
+`symbol_mappings` dictionary. When present, it is a complete reviewed list for
+that allocation: every relocation must appear exactly once, and the checker
+requires its offset, numeric type, addend, raw target name, and raw base name to
+match. This occurrence form represents distinct identities that happen to share
+a symbol spelling without inferring identity from declaration or relocation
+order.
 
 The checker requires unique presence on both sides and compares the mapped symbol
 name, section name and kind, extent, payload, and every relocation's
@@ -58,9 +80,17 @@ criterion. The core may accept same-address relocation targets and uses fuzzy
 payload matching. The strict checker compares the serialized target and base
 records directly.
 
+Objdiff serializes `data_diff` as an ordered edit stream, not sparse chunks with
+addresses. Payload-bearing segments concatenate in stream order and their
+decoded length must equal `size`; `DIFF_INSERT`/`DIFF_DELETE` segments without a
+payload belong only to the opposite side. The checker rejects malformed segment
+sizes, unknown payload-free segments, negative section indices, and negative
+relocation symbol indices.
+
 ## HoMM2 adapter
 
-`homm2 strict-allocations` converts the reviewed rows in
+This adapter is separate from the standalone interface above. `homm2
+strict-allocations` converts the reviewed rows in
 `config/required_initialized_storage.tsv` into one strict manifest per object
 unit, runs objdiff once per unit, and invokes the project-neutral checker above.
 Use `--unit SOURCE/KB` to limit a run. Generated manifests and the
@@ -73,12 +103,19 @@ have a stronger mapping gate because retail delinked literals and reconstructed
 MSVC literals use different names. For each relocation, the adapter requires:
 
 - the delinked target name has exactly one authoritative
-  `pe-reloc-constant` RVA in `build/gen/symbol_names.csv`;
-- that RVA is the actual pointer target in the retail PE;
+  `pe-reloc-constant` record at the actual retail pointer-target RVA in
+  `build/gen/symbol_names.csv`;
 - the retail cstring hash equals the candidate `$SG` symbol payload;
 - relocation offsets, types, and addends agree; and
-- target names, retail target RVAs, and candidate names have identical equality
-  partitions, with a globally bijective target-to-candidate mapping.
+- retail target RVAs and candidate names have identical equality partitions,
+  with a globally bijective RVA-to-candidate mapping.
+
+MSVC decorated literal spellings are not identities: the same `??_C@_` spelling
+can describe distinct delinked constants at distinct retail RVAs. The adapter
+therefore emits the occurrence mappings above after proving each raw target name
+at its exact RVA and each candidate payload. It supports both decorated and
+`const_*` target spellings; neither spelling nor `$SG` ordinals determine a
+mapping.
 
 No mapping is inferred from literal order alone. A table that cannot satisfy the
 proof is omitted from its generated strict manifest and listed by name with the

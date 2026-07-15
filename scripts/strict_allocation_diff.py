@@ -22,10 +22,20 @@ def _number(value: object) -> int:
 
 
 def _payload(symbol: dict) -> bytes:
-    return b"".join(
-        base64.b64decode(segment.get("data", ""))
-        for segment in symbol.get("data_diff", [])
-    )
+    chunks: list[bytes] = []
+    for segment in symbol.get("data_diff", []):
+        if "data" not in segment:
+            if segment.get("kind") not in {"DIFF_DELETE", "DIFF_INSERT"}:
+                raise ValueError("data_diff segment has neither payload nor diff-side kind")
+            continue
+        chunk = base64.b64decode(segment["data"])
+        size = _number(segment.get("size"))
+        if len(chunk) != size:
+            raise ValueError(
+                f"data_diff segment payload has size {len(chunk):#x}, expected {size:#x}"
+            )
+        chunks.append(chunk)
+    return b"".join(chunks)
 
 
 def _symbol_section(side: dict, symbol: dict) -> dict:
@@ -33,7 +43,7 @@ def _symbol_section(side: dict, symbol: dict) -> dict:
         raise ValueError(f"{symbol.get('name', '<unnamed>')}: objdiff JSON has no section index")
     index = _number(symbol["section"])
     sections = side.get("sections", [])
-    if index >= len(sections):
+    if index < 0 or index >= len(sections):
         raise ValueError(f"{symbol.get('name', '<unnamed>')}: section index {index} is invalid")
     return sections[index]
 
@@ -95,7 +105,7 @@ def _relocations(
             )
         relocation = item.get("relocation") or {}
         target_index = _number(relocation.get("target_symbol"))
-        if target_index >= len(symbols):
+        if target_index < 0 or target_index >= len(symbols):
             raise ValueError(f"{symbol.get('name')}: invalid relocation target {target_index}")
         target_name = symbols[target_index].get("name", "")
         if map_names:
@@ -110,6 +120,31 @@ def _relocations(
         )
     rows.sort()
     return rows
+
+
+def _reviewed_relocations(rows: object) -> list[dict]:
+    if not isinstance(rows, list):
+        raise ValueError("relocation_mappings must be an array")
+    reviewed: list[dict] = []
+    offsets: set[int] = set()
+    for row in rows:
+        if not isinstance(row, dict):
+            raise ValueError("relocation_mappings entries must be objects")
+        offset = _number(row["offset"])
+        if offset in offsets:
+            raise ValueError(f"relocation_mappings repeats offset {offset:#x}")
+        offsets.add(offset)
+        reviewed.append(
+            {
+                "offset": offset,
+                "type": _number(row["type"]),
+                "addend": _number(row.get("addend")),
+                "target_name": row["target_name"],
+                "base_name": row["base_name"],
+            }
+        )
+    reviewed.sort(key=lambda row: row["offset"])
+    return reviewed
 
 
 def audit(diff: dict, manifest: dict) -> list[str]:
@@ -181,24 +216,50 @@ def audit(diff: dict, manifest: dict) -> list[str]:
             elif _payload(target_symbol) or _payload(base_symbol):
                 raise ValueError("BSS/common allocation unexpectedly contains payload bytes")
 
-            target_relocs = _relocations(
-                target,
-                target_symbol,
-                target_extent,
-                symbol_mappings,
-                True,
-            )
-            base_relocs = _relocations(
-                base,
-                base_symbol,
-                base_extent,
-                symbol_mappings,
-                False,
-            )
-            if target_relocs != base_relocs:
-                raise ValueError(
-                    f"relocations differ: target={target_relocs!r}, base={base_relocs!r}"
+            reviewed_relocs = allocation.get("relocation_mappings")
+            if reviewed_relocs is None:
+                target_relocs = _relocations(
+                    target,
+                    target_symbol,
+                    target_extent,
+                    symbol_mappings,
+                    True,
                 )
+                base_relocs = _relocations(
+                    base,
+                    base_symbol,
+                    base_extent,
+                    symbol_mappings,
+                    False,
+                )
+                if target_relocs != base_relocs:
+                    raise ValueError(
+                        f"relocations differ: target={target_relocs!r}, base={base_relocs!r}"
+                    )
+            else:
+                reviewed = _reviewed_relocations(reviewed_relocs)
+                expected_target = [
+                    (row["offset"], row["type"], row["target_name"], row["addend"])
+                    for row in reviewed
+                ]
+                expected_base = [
+                    (row["offset"], row["type"], row["base_name"], row["addend"])
+                    for row in reviewed
+                ]
+                target_relocs = _relocations(
+                    target, target_symbol, target_extent, {}, False)
+                base_relocs = _relocations(
+                    base, base_symbol, base_extent, {}, False)
+                if target_relocs != expected_target:
+                    raise ValueError(
+                        f"target relocations differ from reviewed: "
+                        f"actual={target_relocs!r}, reviewed={expected_target!r}"
+                    )
+                if base_relocs != expected_base:
+                    raise ValueError(
+                        f"base relocations differ from reviewed: "
+                        f"actual={base_relocs!r}, reviewed={expected_base!r}"
+                    )
         except (KeyError, TypeError, ValueError) as error:
             errors.append(f"allocation {row_number}: {error}")
     return errors
