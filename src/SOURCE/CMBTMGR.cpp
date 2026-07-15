@@ -1180,6 +1180,13 @@ int combatManager::IsWinner(int side)
     return winner;
 }
 
+// @early-stop
+// Raw size, frame/slots, CFG, and all 150 ordered relocations agree. The only
+// instruction residuals are commutative /Od load order at +0x636..+0x63d,
+// +0xac5..+0xac8, and +0xe94..+0xe9b; DIR32 addends at +0x347, +0x358,
+// +0x874, +0xcb6, and +0xda2 resolve to the same final targets.
+// Exhausted direct/AST operand commutation, projectile +=, prefix increment,
+// SIB i[p]/(p)[i], val|0, and +=1; revisit after CMBTMGR TU/header changes.
 VA(0x0049311f, 0x100e)
 void combatManager::CatAttack(int side)
 {
