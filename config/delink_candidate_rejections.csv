@@ -2,6 +2,3 @@
 # entries. The coverage audit fails on every unreviewed nested direct-call or
 # Ghidra candidate, so this file is the durable evidence for the rejected set.
 rva,reason
-0xc65ef,mid-prologue split after a nop; no incoming call and predecessor falls through
-0xc7e5a,mid-prologue split after a nop; no incoming call and predecessor falls through
-0xdf8f5,shared x87 tail label after an argument load; no incoming call and predecessor falls through

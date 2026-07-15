@@ -34,12 +34,21 @@ are rejected. Names and RVAs are globally unique, extents must be non-zero,
 non-overlapping, and non-overflowing, and alignment must be a non-zero power of two.
 These checks are generic delinker input validation and do not depend on HoMM2 names.
 
-`homm2 status` hashes both ledgers, the relevant source `DATA()` definitions, public
-inventory, retail EXE, synthetic PDB, and delinker executable. A changed input triggers a focused delink into a temporary
-directory and replaces `build/delink` only after every reviewed owner object exists.
-This refresh does not regenerate the inventory, synthesize a PDB, or rerun the full
-`homm2 init` pipeline. Init records the same stamp after its normal delink, so the
-first status run does not repeat that work.
+The reviewed manifest is a bootstrap input, not a self-updating baseline. Normal `homm2 build` and
+`homm2 status` validate and consume the existing target without deriving candidate data or invoking
+the delinker. Bootstrap targets carry a bootstrap provenance stamp and remain fixed until an
+explicit init.
+
+Candidate topology snapshots are promoted separately to the versioned
+`config/delink_data_topology.tsv`, `config/delink_contributions.tsv`, and the exact partition in
+`config/retail_coverage.tsv`. An explicit
+`homm2 data-topology regenerate` delinks into a temporary directory, verifies every owner object,
+and replaces `build/delink` only after success. Its canonical stamp hashes all committed configs,
+the retail EXE, synthetic delinker-input PDB, and delinker executable. Normal commands refuse a
+stale canonical stamp and instruct the user to regenerate; they never rewrite configs or targets.
+The versioned `config/delink_unresolved_data.tsv` is the only range in which strict partial
+regeneration may retain legacy PDB fallback. `homm2 data-topology finalize` requires that inventory
+and every machine-readable coverage diagnostic to reach zero.
 
 The delinker manifest and parser are project-neutral. Only the HoMM2 adapter knows
 about NB09 and `required_initialized_storage.tsv`, so another reconstruction project
