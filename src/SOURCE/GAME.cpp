@@ -5493,18 +5493,16 @@ int game::GetBoatsBuilt(void)
 }
 
 // @match-note
-// Complete logic and frame; the sole relocation agrees. The first divergence is the
-// equivalent townIds[color][i] address expression: retail forms i + color * 283 while
-// this TU forms color * 283 + i. Direct m_players access, the inline Town accessor, and
-// direct/local PlayerTownListView spellings were tried. Revisit after shared-header state.
+// Complete logic and frame; the sole relocation agrees. The canonical player layout
+// leaves an operand-order residual: retail forms i + color * sizeof(playerData), while
+// this TU forms color * sizeof(playerData) + i. Keep the retained maximum.
 VA(0x00484471, 0x9c)
 int game::GetNumThievesGuilds(int color)
 {
     int num = 0;
     int i;
     for (i = 0; i < m_players[color].m_townCount; i++) {
-        if (gpGame->m_castleRecs[
-                reinterpret_cast<PlayerTownListView *>(this)->townIds[color][i]]
+        if (gpGame->m_castleRecs[m_players[color].m_townIds[i]]
                 .m_buildings & TOWN_BUILDING_TAVERN)
             num++;
     }
