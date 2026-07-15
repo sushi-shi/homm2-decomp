@@ -106,6 +106,6 @@ extern int giHostAcceptStatus;
 extern struct _GUID *g_lpGuid;
 extern int giNetPosToDCOPos[6];
 extern int iSessionToTry;
-extern long *lSessions;
+extern long lSessions[10];
 
 #endif // HOMM2_DPNETWIN_H
