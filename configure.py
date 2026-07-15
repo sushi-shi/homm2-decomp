@@ -124,6 +124,7 @@ def main():
     (od / "objdiff.json").write_text(json.dumps({
         "$schema": "https://raw.githubusercontent.com/encounter/objdiff/main/config.schema.json",
         "build_base": False, "build_target": False,
+        "options": {"functionRelocDiffs": "data_value"},
         "watch_patterns": ["*.obj"], "units": units_j,
     }, indent=2) + "\n")
     print(f"configure: {len(units)} units -> build.ninja + build/objdiff/objdiff.json")

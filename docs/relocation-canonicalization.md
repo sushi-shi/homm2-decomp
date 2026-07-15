@@ -1,7 +1,11 @@
 # Candidate-proved relocation target experiment
 
-Objdiff's normal report uses `functionRelocDiffs=none`. That is useful for code-shape
-matching, but it ignores a COFF relocation's symbol and implicit addend. The stricter
+> Historical note: the generated project now uses `functionRelocDiffs=data_value` by default.
+> Candidate-object topology recovery is replacing synthetic local data identities; the independent
+> resolved owner/addend audit remains authoritative for address correctness.
+
+Objdiff's report historically used `functionRelocDiffs=none`. That remains useful as a separate
+code-shape diagnostic, but it ignores a COFF relocation's symbol and implicit addend. The normal
 `data_value` mode exposes two different classes together:
 
 1. real wrong resolved addresses; and
