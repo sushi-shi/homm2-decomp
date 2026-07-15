@@ -294,14 +294,17 @@ int FindIndex(struct indexArray *entries, int low, int high, int key)
     return 0xFFFF;
 }
 
+#include <BASE/MiscGraphicsConstants.h>
+
 // @match-note
 // Structurally complete /O2 checkpoint: both sections are 0xea with the same CFG and
-// exact 11/11 relocations.  Explicit `threshold = 0x3f - level` preserves the recovered
-// loop semantics.  In the current required-header TU state the first divergence is the
-// allocation at +0x7: base carries fadePalette in ESI and tests ECX after construction;
-// retail initially uses EBX and tests EAX before construction.  `new palette`, value-init,
-// and split declaration/assignment were tried.  This register allocation moved after the
-// icon type include; revisit after further exact-preserving shared-header/TU changes.
+// exact 11/11 relocation identities (the retail gConfig reference is its interior member).
+// Explicit `threshold = maxLevel - level` preserves the recovered loop semantics. The
+// typed graphics-domain boundary rotates base's EBX/ESI/EBP allocation and leaves live at
+// 95.56% versus a retained 96.79%; the first divergence remains base testing ECX after
+// allocation while retail tests EAX before construction. `new palette`, value-init and
+// split declaration/assignment were tried. At head 34c93d1, the pre-domain bounded AST
+// pass found eight variants and retained none after 30 walks with all 144 siblings pinned.
 VA(0x004c45e0, 0xea)
 void FadeIn(int increment)
 {
@@ -311,25 +314,25 @@ void FadeIn(int increment)
     int done = 0;
     if (gConfig.gfx[giCurExe].fullScreen == 0)
         increment *= 2;
-    memset(fadePalette->m_data, 0, 0x300);
+    memset(fadePalette->m_data, 0, MISC_PALETTE_BYTE_COUNT);
     int level = 0;
     for (;;) {
-        if (level >= 0x40) {
+        if (level >= MISC_PALETTE_LEVEL_COUNT) {
             if (done) {
                 delete fadePalette;
                 return;
             }
-            level = 0x3f;
+            level = MISC_PALETTE_MAX_LEVEL;
         }
-        int delayUntil = KBTickCount() + 0x14;
+        int delayUntil = KBTickCount() + MISC_FADE_IN_FRAME_DELAY;
         PollSound();
         signed char *colors;
-        if (level == 0x3f) {
+        if (level == MISC_PALETTE_MAX_LEVEL) {
             done = 1;
             colors = gpBufferPalette->m_data;
         } else {
-            int threshold = 0x3f - level;
-            for (int i = 0; i < 0x300; ++i) {
+            int threshold = MISC_PALETTE_MAX_LEVEL - level;
+            for (int i = 0; i < MISC_PALETTE_BYTE_COUNT; ++i) {
                 signed char color = gpBufferPalette->m_data[i];
                 if (color > threshold)
                     fadePalette->m_data[i] = color - threshold;
@@ -887,64 +890,57 @@ void BlitBitmapToScreenNoMouseCheck(class bitmap *bmp, int sourceX, int sourceY,
 }
 
 // @match-note
-// Structurally complete /O2 checkpoint: base is 0x188 versus retail 0x18b; both use the
-// eight-byte frame and same 13-branch/four-blit CFG. External relocation identity/order is exact,
-// but base has 23 occurrences versus retail 24. The instruction stream agrees through the IsVis
-// test; the first opcode divergence is +0xac, where base loads gpMouseManager into EAX and carries
-// it through both axes. Retail loads it into ECX at +0xac (reloc +0xad), then reloads it into EAX
-// at +0xcb (reloc +0xcc) for the vertical test. Union-masking relocation fields leaves 270 common
-// comparable bytes, 121 different (+0xa8..+0x187; +0xa8 is the shifted local branch), and a
-// three-byte retail tail. Using bmp directly on the early call, placing the real width assignment
-// between sourceX/sourceY, and declaring savedY before savedX recovered the call, scroll and saved
-// coordinate schedules. Flat and fully nested predicates, relational operand reversal, sourceX
-// splitting and width-first order were retested; the latter two changed broad register allocation.
-// The libclang AST pass found 22 value-preserving variants and retained none after a 30-walk pass.
-// At integrated head 5a48d4c, all 65 single AST variants across the 19 exact predecessors and 149
-// deterministic two-to-five-variant predecessor combinations were downstream-byte-neutral while
-// all 144 Misc symbols were pinned. Moving the two private bound definitions to this function's
-// source boundary, or making them function-static, also emitted identical code; the latter only
-// changed their COFF identities into unauditable local-static names. Revisit only after a real
-// semantic header/type or predecessor change; this CSE residual is not a proven wall.
+// Structurally complete /O2 checkpoint: retail decomp proves a real adjusted-source-X local;
+// recovering it removes the prior unjustified volatile bitmap alias and gives the same 0x18b
+// code span, four-blit CFG, and 24 relocation occurrences. Base reserves four stack bytes while
+// retail reserves eight and spills bmp in the second slot. The current 88.61% live score is lower
+// than the artifact-assisted retained 98.89%, but the source is now structurally honest. Manual
+// relocation audit shows the same globals/callees and totals, with gpMouseManager CSE placement
+// still differing: retail reloads between the horizontal/vertical entry tests, while base reloads
+// between the later redraw tests. Flat versus axis-nested predicates are byte-neutral in this TU.
+// Prior work exhausted relational reversal, width/source ordering, 22 local AST variants,
+// 65 exact-predecessor variants, 149 deterministic predecessor combinations, and private-bound
+// placement. Revisit only after a semantic predecessor/type change, never by restoring the
+// volatile alias or inventing reloads.
 VA(0x004c5ee0, 0x18b)
 void BlitBitmapToScreen(class bitmap *bmp, int sourceX, int sourceY, int width, int height,
                         int destinationX, int destinationY)
 {
-    bitmap *volatile sourceBitmap = bmp;
+    int blitSourceX = sourceX;
     if (gbColorMice == 0) {
-        BlitBitmapToScreenVesa(reinterpret_cast<int>(bmp), sourceX, sourceY, width, height,
+        BlitBitmapToScreenVesa(reinterpret_cast<int>(bmp), blitSourceX, sourceY, width, height,
                                destinationX, destinationY);
         return;
     }
     if (giScrollX != 0 || giScrollY != 0) {
-        sourceX = giScrollX + 0x10;
-        width = 0x1c0;
-        sourceY = giScrollY + 0x10;
-        height = 0x1c0;
+        blitSourceX = giScrollX + MISC_BLIT_SCROLL_OFFSET;
+        width = MISC_BLIT_SCROLL_EXTENT;
+        sourceY = giScrollY + MISC_BLIT_SCROLL_OFFSET;
+        height = MISC_BLIT_SCROLL_EXTENT;
     }
     gBlitRight = width + destinationX - 1;
     gBlitBottom = height + destinationY - 1;
     if (gpMouseManager->IsVis() != 0 && gBlitRight >= gpMouseManager->m_savedLeft &&
-        gpMouseManager->m_cursorRight >= destinationX) {
-        if (gBlitBottom >= gpMouseManager->m_savedTop &&
-            gpMouseManager->m_cursorBottom >= destinationY) {
-            gpMouseManager->SaveAndDraw();
-            BlitBitmapToScreenVesa(reinterpret_cast<int>(sourceBitmap), sourceX, sourceY, width, height,
-                                   destinationX, destinationY);
-            if (gpMouseManager->m_cursorRight > gBlitRight ||
-                gpMouseManager->m_savedLeft < destinationX ||
-                gpMouseManager->m_cursorBottom > gBlitBottom ||
-                gpMouseManager->m_savedTop < destinationY) {
-                int savedY = gpMouseManager->m_savedTop;
-                int savedX = gpMouseManager->m_savedLeft;
-                BlitBitmapToScreenVesa(reinterpret_cast<int>(sourceBitmap), savedX, savedY,
-                                       gpMouseManager->m_cursorRight - savedX + 1,
-                                       gpMouseManager->m_cursorBottom - savedY + 1, savedX, savedY);
-            }
-            gpMouseManager->RestoreUnderlying();
-            return;
+        gpMouseManager->m_cursorRight >= destinationX &&
+        gBlitBottom >= gpMouseManager->m_savedTop &&
+        gpMouseManager->m_cursorBottom >= destinationY) {
+        gpMouseManager->SaveAndDraw();
+        BlitBitmapToScreenVesa(reinterpret_cast<int>(bmp), blitSourceX, sourceY, width, height,
+                               destinationX, destinationY);
+        if (gpMouseManager->m_cursorRight > gBlitRight ||
+            gpMouseManager->m_savedLeft < destinationX ||
+            gpMouseManager->m_cursorBottom > gBlitBottom ||
+            gpMouseManager->m_savedTop < destinationY) {
+            int savedY = gpMouseManager->m_savedTop;
+            int savedX = gpMouseManager->m_savedLeft;
+            BlitBitmapToScreenVesa(reinterpret_cast<int>(bmp), savedX, savedY,
+                                   gpMouseManager->m_cursorRight - savedX + 1,
+                                   gpMouseManager->m_cursorBottom - savedY + 1, savedX, savedY);
         }
+        gpMouseManager->RestoreUnderlying();
+        return;
     }
-    BlitBitmapToScreenVesa(reinterpret_cast<int>(sourceBitmap), sourceX, sourceY, width, height,
+    BlitBitmapToScreenVesa(reinterpret_cast<int>(bmp), blitSourceX, sourceY, width, height,
                            destinationX, destinationY);
 }
 
@@ -1065,36 +1061,37 @@ void AbsAiPrint(char *text)
 }
 
 // @match-note
-// Structurally complete /O2 checkpoint: the calls, 768-byte loop, CFG and 6/6
-// relocations agree. The current combined-TU state reserves 0x314 bytes versus
-// retail's 0x310 and moves the palette base by four bytes; the retained source-hash
-// maximum had the retail frame. The remaining inner adjustment differs by register
-// allocation and threshold scheduling. Signed/unsigned difference, abs/ternary,
-// comparison polarity and volatile level forms were tried; volatile regressed.
+// Structurally complete /O2 checkpoint: the typed graphics-domain boundary restores the
+// retail 0x310 frame and makes every byte through PollSound at +0x55 exact, raising live
+// from 86.18% to 95.12%. The 768-byte loop, CFG and all six relocation identities agree.
+// The residual begins with threshold/cursor scheduling and then exchanges ECX/EBX roles
+// in the byte adjustment. Signed/unsigned difference, abs/ternary and volatile level forms
+// were tried earlier; at head 34c93d1, cursor/threshold lifetime order regressed to 92.79%
+// and `distance > threshold` versus its commuted spelling was byte-neutral.
 VA(0x004c64e0, 0xf8)
 void FadeTo(unsigned char *source, unsigned char *destination, int increment)
 {
-    unsigned char colors[0x300];
+    unsigned char colors[MISC_PALETTE_BYTE_COUNT];
     memcpy(colors, source, sizeof(colors));
-    increment >>= 2;
+    increment >>= MISC_FADE_TO_INCREMENT_SHIFT;
     if (increment < 1)
         increment = 1;
-    int level = 0x30;
+    int level = MISC_FADE_TO_START_LEVEL;
     do {
-        int delayUntil = KBTickCount() + 0x32;
+        int delayUntil = KBTickCount() + MISC_FADE_TO_FRAME_DELAY;
         PollSound();
-        int thresholdIndex = 0x40 - level - increment;
+        int thresholdIndex = MISC_PALETTE_LEVEL_COUNT - level - increment;
         if (thresholdIndex < 0)
             thresholdIndex = 0;
         unsigned char threshold = giChangeThreshold[thresholdIndex];
         unsigned char *current = colors;
         unsigned char *target = destination;
-        int count = 0x300;
+        int count = MISC_PALETTE_BYTE_COUNT;
         do {
             unsigned char value = *current;
             int difference = static_cast<int>(*target) - static_cast<int>(value);
             int distance = difference < 0 ? -difference : difference;
-            if (threshold < distance) {
+            if (distance > threshold) {
                 distance -= threshold;
                 if (difference > 0)
                     *current = static_cast<unsigned char>(value + distance);
@@ -1108,45 +1105,42 @@ void FadeTo(unsigned char *source, unsigned char *destination, int increment)
         UpdatePalette(reinterpret_cast<signed char *>(colors));
         DelayTil(&delayUntil);
         level += increment;
-    } while (level < 0x40);
+    } while (level < MISC_PALETTE_LEVEL_COUNT);
     UpdatePalette(reinterpret_cast<signed char *>(destination));
 }
 
 // @match-note
-// Structurally complete /O2 checkpoint: base is 0xba versus retail 0xb8; both have
-// the 0x304 frame, complete two-loop CFG, and all 8 ordered relocations. Recovering
-// the palette-entry pointer, split index advance, outer row lifetime and column local
-// raised the live match from 87.10% to 95.71%. The first residual is the equivalent
-// palette-address SIB encoding at +0x3d; later residuals are FadeTo argument
-// scheduling and EAX/ECX exchange between the screen column counter and byte
-// temporary. Indexed output, pre/post-increment output, explicit row pointers,
-// a linear pointer loop, inner/outer
-// column scope, and explicit pixel value were tried; revisit after predecessor/header
-// TU state changes.
+// Structurally complete /O2 checkpoint: base is 0xba versus retail 0xb8; both have the
+// 0x304 frame, complete two-loop CFG, and all eight ordered relocation identities. The
+// typed palette/screen constants leave live at 95.55% (retained 95.71%). Current residuals
+// are equivalent SIB base/index encodings in the color-table/palette reads, FadeTo argument
+// scheduling, and EAX/ECX exchange in the screen loop. Indexed output, pre/post-increment,
+// explicit row pointers, linear pointer loop, inner/outer column scope and explicit pixel
+// value were tried; at head 34c93d1, commuted palette-pointer addition was byte-neutral.
 VA(0x004c65e0, 0xb8)
 void FadeToColorTable(unsigned char *colorTable, int increment)
 {
-    unsigned char translatedPalette[0x300];
+    unsigned char translatedPalette[MISC_PALETTE_BYTE_COUNT];
     int savedUpdateFlags = gpWindowManager->m_updateFlags;
     gpWindowManager->m_updateFlags = 0;
     signed char *paletteData = gpBufferPalette->m_data;
     unsigned char *output = translatedPalette;
     int index = 0;
     do {
-        int paletteIndex = colorTable[index] * 3;
-        output += 3;
+        int paletteIndex = colorTable[index] * MISC_PALETTE_COMPONENT_BYTES;
+        output += MISC_PALETTE_COMPONENT_BYTES;
         ++index;
         unsigned char *sourceColor = reinterpret_cast<unsigned char *>(paletteData) + paletteIndex;
         output[-3] = sourceColor[0];
         output[-2] = sourceColor[1];
         output[-1] = sourceColor[2];
     } while (output < translatedPalette + sizeof(translatedPalette));
-    int rows = 0x1e0;
+    int rows = MISC_BLIT_SCREEN_HEIGHT;
     FadeTo(reinterpret_cast<unsigned char *>(paletteData), translatedPalette, increment);
     int columns;
     unsigned char *pixel = gpWindowManager->m_screen->m_pixels;
     do {
-        columns = 0x280;
+        columns = MISC_BLIT_SCREEN_WIDTH;
         do {
             unsigned char pixelValue = *pixel;
             *pixel = colorTable[pixelValue];
