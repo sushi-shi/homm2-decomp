@@ -711,7 +711,7 @@ SOURCE/EVENTS	?CombatMonsterEvent@advManager@@QAEHPAVhero@@HHPAVmapCell@@HHHHHHH
 SOURCE/EVENTS	?ComputerMonsterInteract@advManager@@QAEXPAVmapCell@@PAVhero@@PAH@Z	98.1614	2ac8c508d7d8
 SOURCE/EVENTS	?DoAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	96.9650	c0ed974fc45d
 SOURCE/EVENTS	?DoCombat@advManager@@QAEHHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHH@Z	99.9428	b853a5dbdd6b
-SOURCE/EVENTS	?DoEvent@advManager@@QAEXPAVmapCell@@HH@Z	97.9046	96382322627e
+SOURCE/EVENTS	?DoEvent@advManager@@QAEXPAVmapCell@@HH@Z	97.9046	9dde119f00ca
 SOURCE/EVENTS	?DoNetCombat@advManager@@QAEHPAD@Z	100.0000	0145d3505e8e
 SOURCE/EVENTS	?DoWhirlpool@advManager@@QAEXPAVhero@@@Z	99.8765	9be475b7aff7
 SOURCE/EVENTS	?EraseObj@advManager@@QAEXPAVmapCell@@HH@Z	99.9705	c7e56d42d2f3
