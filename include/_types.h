@@ -180,13 +180,19 @@ struct tag_monsterInfo {
 };
 #pragma pack(pop)
 SIZE(tag_monsterInfo, 0x1a);
+typedef enum CombatHeroAnimationConstant {
+    COMBAT_HERO_ANIMATION_COUNT = 12,
+    COMBAT_HERO_ANIMATION_FRAME_COUNT = 9
+} CombatHeroAnimationConstant;
+
 #pragma pack(push, 1)
 struct SCmbtHero {
     short x[2];
     short y[2];
     unsigned char idleAnimationCount;
-    signed char animationFrameCount[12];
-    signed char animationFrames[12][9];
+    signed char animationFrameCount[COMBAT_HERO_ANIMATION_COUNT];
+    signed char animationFrames[COMBAT_HERO_ANIMATION_COUNT]
+                               [COMBAT_HERO_ANIMATION_FRAME_COUNT];
 };
 SIZE(SCmbtHero, 0x81);
 #pragma pack(pop)

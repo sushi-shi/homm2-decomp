@@ -851,7 +851,7 @@ extern int gbAllBlack;
 extern int gbCheatMenus;
 extern int gbClosingApp;
 extern signed char gbCombatSurrender;
-extern signed char captainStats[6][HERO_PRIMARY_STAT_COUNT];
+extern signed char captainStats[HERO_CLASS_COUNT][HERO_PRIMARY_STAT_COUNT];
 extern int gbDrawSavedCursor;
 extern int gbForegroundApp;
 extern int gbFunctionComplete;
@@ -953,6 +953,6 @@ extern heroWindow *pNormalDialogWindow;
 extern void **ppMapExtra;
 extern short *pwSizeOfMapExtra;
 extern font *smallFont;
-extern unsigned char iGetSSByAlignment[HERO_SKILL_COUNT][6];
+extern unsigned char iGetSSByAlignment[HERO_SKILL_COUNT][HERO_CLASS_COUNT];
 
 #endif // HOMM2_KB_H
