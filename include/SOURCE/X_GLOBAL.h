@@ -4,6 +4,7 @@
 #include <_types.h>
 #include <va.h>
 #include <SOURCE/CURSOR.h>
+#include <SOURCE/dimPalette.h>
 #include <SOURCE/hero.h>
 
 class ExpCampaign;
@@ -133,11 +134,15 @@ typedef enum KbControlTableConstant {
     VESA_MODE_640_480_256 = 0x0101
 } KbControlTableConstant;
 
+typedef enum KbPaletteTableConstant {
+    PUZZLE_DRAW_TABLE_COUNT = 64
+} KbPaletteTableConstant;
+
 extern unsigned char giGroundShape[GROUND_TILE_IMAGE_COUNT];
-extern unsigned char gColorTableTan[256];
-extern unsigned char gColorTableGray[256];
-extern unsigned char gColorTableRed[256];
-extern unsigned char gColorTableDarkBrown[256];
+extern unsigned char gColorTableTan[DIM_PALETTE_COLOR_COUNT];
+extern unsigned char gColorTableGray[DIM_PALETTE_COLOR_COUNT];
+extern unsigned char gColorTableRed[DIM_PALETTE_COLOR_COUNT];
+extern unsigned char gColorTableDarkBrown[DIM_PALETTE_COLOR_COUNT];
 extern int giMainVideoModeWidth;
 extern int giMainVideoModeHeight;
 extern unsigned long glMilliCounter;
@@ -145,10 +150,9 @@ extern unsigned char gMapColors[RADAR_MAP_COLOR_COUNT];
 extern unsigned char gObjectColors[RADAR_OBJECT_COLOR_COUNT];
 extern unsigned char gOwnerColors[RADAR_OWNER_COLOR_COUNT];
 extern char *gTilesetFiles[64];
-extern unsigned char bPuzzleDraw[64];
-#include <SOURCE/dimPalette.h>
-extern unsigned char gColorTableLighten[256];
-extern unsigned char *gColorTableNoCycle;
+extern unsigned char bPuzzleDraw[PUZZLE_DRAW_TABLE_COUNT];
+extern unsigned char gColorTableLighten[DIM_PALETTE_COLOR_COUNT];
+extern unsigned char gColorTableNoCycle[DIM_PALETTE_COLOR_COUNT];
 extern int gbReturnAfterComputeExtent;
 extern int gbAllowTextEntryEscape;
 extern int giScreenScroll;
