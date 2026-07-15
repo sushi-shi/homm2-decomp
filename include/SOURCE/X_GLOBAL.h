@@ -218,7 +218,24 @@ typedef enum KbGameTableConstant {
     KB_CAMPAIGN_LEADER_TEXT_COUNT = 4,
     KB_WIN_TEXT_COUNT = 6,
     KB_HUMAN_DIFFICULTY_TEXT_COUNT = 6,
-    KB_HUMAN_INFO_DIFFICULTY_TEXT_COUNT = 6
+    KB_HUMAN_INFO_DIFFICULTY_TEXT_COUNT = 6,
+    KB_MUSIC_QUALITY_TEXT_COUNT = 4,
+    KB_SPELL_TEXT_COUNT = HERO_SPELL_COUNT + 1,
+    KB_SECONDARY_SKILL_LEVEL_TEXT_COUNT = HERO_SKILL_LEVEL_COUNT,
+    KB_SECONDARY_SKILL_TEXT_COUNT = HERO_SKILL_COUNT,
+    KB_NEUTRAL_BUILDING_TEXT_COUNT = 20,
+    KB_WELL_EXTRA_NAME_COUNT = 8,
+    KB_SPECIAL_BUILDING_NAME_COUNT = 8,
+    KB_NEUTRAL_BUILDING_INFO_COUNT = 20,
+    KB_SPECIAL_BUILDING_INFO_COUNT = HERO_CLASS_COUNT,
+    KB_DIRECTION_TEXT_COUNT = 10,
+    KB_RUMOUR_TERRAIN_DESCRIPTION_COUNT = KB_TERRAIN_TYPE_COUNT,
+    KB_INTERFACE_TYPE_TEXT_COUNT = 4,
+    KB_BW_MOUSE_TEXT_COUNT = 2,
+    KB_COMBAT_SPEED_TEXT_COUNT = KB_COMBAT_SPEED_COUNT + 1,
+    KB_COMBAT_MINI_INFO_TEXT_COUNT = 4,
+    KB_COMMAND_LINE_HELP_COUNT = 14,
+    KB_OVERVIEW_TEXT_COUNT = 6
 } KbGameTableConstant;
 
 extern unsigned char giGroundShape[GROUND_TILE_IMAGE_COUNT];
@@ -420,21 +437,21 @@ extern char *cCampaignLeaders[KB_CAMPAIGN_LEADER_TEXT_COUNT];
 extern char *cWinText[KB_WIN_TEXT_COUNT];
 extern char *cHumanDifficulty[KB_HUMAN_DIFFICULTY_TEXT_COUNT];
 extern char *cHumanInfoDifficulty[KB_HUMAN_INFO_DIFFICULTY_TEXT_COUNT];
-extern char *musicQualityText[4];
-extern char *gSpellDesc[66];
-extern char *gSpellNames[66];
-extern char *gSecondarySkillLevels[4];
-extern char *gSecondarySkills[14];
-extern char *cSecSkillDesc[14][3];
-extern char *cDirections[10];
-extern char *cRumourTerrainDescriptions[10];
+extern char *musicQualityText[KB_MUSIC_QUALITY_TEXT_COUNT];
+extern char *gSpellDesc[KB_SPELL_TEXT_COUNT];
+extern char *gSpellNames[KB_SPELL_TEXT_COUNT];
+extern char *gSecondarySkillLevels[KB_SECONDARY_SKILL_LEVEL_TEXT_COUNT];
+extern char *gSecondarySkills[KB_SECONDARY_SKILL_TEXT_COUNT];
+extern char *cSecSkillDesc[HERO_SKILL_COUNT][SECONDARY_SKILL_VALUE_LEVEL_COUNT];
+extern char *cDirections[KB_DIRECTION_TEXT_COUNT];
+extern char *cRumourTerrainDescriptions[KB_RUMOUR_TERRAIN_DESCRIPTION_COUNT];
 extern char *cRandomTavernText[8];
-extern char *gInterfaceTypeText[4];
-extern char *cBWMouseText[2];
-extern char *combatSpeedText[4];
-extern char *combatMiniInfoText[4];
-extern char *gcCommandLineHelp[14];
-extern char *cOverviewText[6];
+extern char *gInterfaceTypeText[KB_INTERFACE_TYPE_TEXT_COUNT];
+extern char *cBWMouseText[KB_BW_MOUSE_TEXT_COUNT];
+extern char *combatSpeedText[KB_COMBAT_SPEED_TEXT_COUNT];
+extern char *combatMiniInfoText[KB_COMBAT_MINI_INFO_TEXT_COUNT];
+extern char *gcCommandLineHelp[KB_COMMAND_LINE_HELP_COUNT];
+extern char *cOverviewText[KB_OVERVIEW_TEXT_COUNT];
 extern char *cWinComError[6];
 extern char *cMiniViewText[10];
 extern char *gFileRequestHelp[16];
