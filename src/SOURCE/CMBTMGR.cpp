@@ -1794,7 +1794,8 @@ void combatManager::SetupAndLoadObstacles(void)
             m_wallStates[structureIndex + COMBAT_WALL_SLOT_SECTION_FIRST] =
                 COMBAT_WALL_STATE_KEEP_STANDING;
             if (m_originalCombatTown->m_type == TOWN_TYPE_KNIGHT &&
-                (m_originalCombatTown->m_buildings & TOWN_BUILDING_TENT)) {
+                (m_originalCombatTown->m_buildings &
+                 TOWN_BUILDING_FORTIFICATIONS)) {
                 m_wallStates[structureIndex + COMBAT_WALL_SLOT_SECTION_FIRST] =
                     COMBAT_WALL_STATE_SECTION_DAMAGE_FIRST;
             }
