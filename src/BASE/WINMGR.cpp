@@ -672,11 +672,11 @@ void CreateColorLookupTables(void) {}
 VTBL(heroWindowManager, 0x004eba10);
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x0051ef28) int iCombatCycleFrame;
-DATA(0x0051ef2c) int gbEveryOtherCycle;
-DATA(0x0051ef30) int iCycle1Count;
-DATA(0x0051ef34) int iCycle2Count;
-DATA(0x0051ef38) int iCycle3Count;
-DATA(0x0051ef3c) int iDialogNestCount;
+DATA(0x0051ef28) int iCombatCycleFrame = 0;
+DATA(0x0051ef2c) int gbEveryOtherCycle = 1;
+DATA(0x0051ef30) int iCycle1Count = 0;
+DATA(0x0051ef34) int iCycle2Count = 0;
+DATA(0x0051ef38) int iCycle3Count = 0;
+DATA(0x0051ef3c) int iDialogNestCount = 0;
 DATA(0x00534908) signed char gCyclePal[0x60];
 DATA(0x00534968) short memSelector;

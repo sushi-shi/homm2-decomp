@@ -553,8 +553,8 @@ void inputManager::ForceMouseMove(void)
 VTBL(inputManager, 0x004eba30);
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x0051f980) int iCurSwapPalette;
-DATA(0x0051f984) int bLastMouseOffscreen;
-DATA(0x0051f988) int bLastOnscreenMouseColor;
-DATA(0x0051f98c) int bInCheckChangeCursor;
+DATA(0x0051f980) int iCurSwapPalette = 0;
+DATA(0x0051f984) int bLastMouseOffscreen = 0;
+DATA(0x0051f988) int bLastOnscreenMouseColor = 0;
+DATA(0x0051f98c) int bInCheckChangeCursor = 0;
 DATA(0x00534bc8) int iLastBWOnScreenCheck;
