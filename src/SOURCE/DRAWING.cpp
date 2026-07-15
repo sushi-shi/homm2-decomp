@@ -623,43 +623,41 @@ void combatManager::UpdateMouseGrid(int hexIndex, int forceUpdate)
 }
 
 // @match-note
-// Complete draw order, castle switch/CFG, stack-resident wall tables, and 164/164
-// relocations.  Retail's frame is 0xdc (this at -0xc8), ours is 0xc8 (this at
-// -0xb4); retail has five unreferenced four-byte holes among the early locals. The
-// first source-shape difference is instruction 36's side/armyIndex address
-// calculation; instruction 167's delinked data name still resolves to the same
-// retail address. Instruction 205 then differs in the captain-coordinate bit
-// expression and later CFG shape. A distinct occupant-phase local and ordinary
-// ternaries regressed the prefix, so retail-supported reuse of side is retained;
-// moving the four wall temporaries into the table scope kept the 0xc8 frame, added
-// only two bytes, and reduced the score from 90.94% to 90.59%. The current function
-// span is 0x162d versus retail 0x173f (short 0x112); candidate and retail tail
-// padding are 0xe and 0xc, respectively, producing the exact 0x110 displacement of
-// the following Wsnetwin contribution. Revisit scope/slot steering in the >=95%
-// phase or after cumulative layout changes.
+// Retained/live 99.33%; complete draw order, castle switch and moat early-exit CFG.
+// The 0xdc frame, every named/compiler slot and EBP reference count, and all 164
+// external relocations match.  After excluding the 0x91-byte switch tables, both
+// streams contain 1230 instructions; ours has 5379 code bytes versus retail's 5376.
+// The first residual is instruction 146's delinked SCmbtHero+0x15 versus retail
+// const_000fd8f5 identity; both resolve to the same address. The first opcode-order
+// residual is instruction 304: fixed-side hero frames evaluate frame/sprite/state,
+// while retail uses sprite/state/frame; enum-indexed direct arrays compile the same.
+// Flat-pointer and flat-index forms regressed to 98.22%/97.93% before the last shared
+// TU-state change. At instruction 984 ours emits jl plus two immediate scope thunks,
+// while retail emits jle and places two thunks after the first moat arm. Structured
+// and goto forms of walkingFrom >, walkingFrom <=, and walkingTo < walkingFrom were
+// tried. Delinked gConfig fields and jump-table locals also resolve to the same retail
+// addresses. Revisit compiler steering after total SOURCE fuzzy reaches 95% or a
+// shared type/TU-state change moves this source hash.
 VA(0x004045cc, 0x173f)
 void combatManager::DrawFrame(int updateScreen, int computeExtent, int redrawExtent,
                               int extentOnly, int delay, int drawBackground,
                               int waitForTimer)
 {
-    int side;
-    int armyIndex;
-    int extentChanged;
-    int heroX;
-    int heroY;
+    int column1;
+    int unusedDrawState11;
+    int unusedDrawState05;
+    int side5;
     int row;
-    int column;
+    int unusedDrawState213;
+    int unusedDrawState3;
+    int armyIndex2;
+    int unusedDrawState4;
+    int extentChanged1;
     int firstColumn;
+    int skipSpecialOccupants6;
+    int columnStep3;
     int endColumn;
-    int columnStep;
-    int skipSpecialOccupants;
-    int hexIndex;
-    int wallFrame;
-    int wallX;
-    int wallY;
-    int drawbridgeY;
-    int drawbridgeBottom;
-    int gridWasShowing;
+    int gridWasShowing1;
 
     if (m_nonVisualCombat != 0)
         return;
@@ -672,17 +670,17 @@ void combatManager::DrawFrame(int updateScreen, int computeExtent, int redrawExt
     gpMouseManager->m_cursorReady = 0;
 
     if (computeExtent != 0) {
-        extentChanged = 0;
-        for (side = 0; side < COMBAT_SIDE_COUNT_DRAWING; side++) {
-            for (armyIndex = 0; armyIndex < COMBAT_ARMY_SLOT_COUNT_DRAWING; armyIndex++) {
-                if (m_limitCreatureCount[side][armyIndex] > 0) {
-                    extentChanged = 1;
+        extentChanged1 = 0;
+        for (side5 = 0; side5 < COMBAT_SIDE_COUNT_DRAWING; side5++) {
+            for (armyIndex2 = 0; armyIndex2 < COMBAT_ARMY_SLOT_COUNT_DRAWING; armyIndex2++) {
+                if (m_limitCreatureCount[side5][armyIndex2] > 0) {
+                    extentChanged1 = 1;
                     gbComputeExtent = 1;
                     gbSaveBiggestExtent = 1;
                     gbReturnAfterComputeExtent = 1;
-                    armyIndex[m_armies[side]].DrawToBuffer(
-                        m_hexCells[armyIndex[m_armies[side]].m_hex].m_x,
-                        m_hexCells[armyIndex[m_armies[side]].m_hex].m_y, 0);
+                    m_armies[side5][armyIndex2].DrawToBuffer(
+                        m_hexCells[m_armies[side5][armyIndex2].m_hex].m_x,
+                        m_hexCells[m_armies[side5][armyIndex2].m_hex].m_y, 0);
                     gbReturnAfterComputeExtent = 0;
                     gbComputeExtent = 0;
                     gbSaveBiggestExtent = 0;
@@ -690,49 +688,50 @@ void combatManager::DrawFrame(int updateScreen, int computeExtent, int redrawExt
             }
         }
 
-        for (side = 0; side < COMBAT_SIDE_COUNT_DRAWING; side++) {
-            if (m_drawHero[side] != 0) {
-                extentChanged = 1;
+        for (side5 = 0; side5 < COMBAT_SIDE_COUNT_DRAWING; side5++) {
+            if (m_drawHero[side5] != 0) {
+                extentChanged1 = 1;
                 gbComputeExtent = 1;
                 gbSaveBiggestExtent = 1;
                 gbReturnAfterComputeExtent = 1;
-                m_heroIcons[side]->CombatClipDrawToBuffer(
-                    side == 0 ? COMBAT_HERO_LEFT_X : COMBAT_HERO_RIGHT_X,
-                    side == 0 ? COMBAT_HERO_LEFT_Y : COMBAT_HERO_RIGHT_Y,
-                    sCmbtHero[m_heroSpriteIndex[side]]
-                        .animationFrames[m_heroAnimationState[side]][m_heroAnimationFrame[side]],
-                    &m_heroLimits[side], 1, 0, 0, 0);
+                m_heroIcons[side5]->CombatClipDrawToBuffer(
+                    side5 == 0 ? COMBAT_HERO_LEFT_X : COMBAT_HERO_RIGHT_X,
+                    side5 == 0 ? COMBAT_HERO_LEFT_Y : COMBAT_HERO_RIGHT_Y,
+                    sCmbtHero[m_heroSpriteIndex[side5]]
+                        .animationFrames[m_heroAnimationState[side5]][m_heroAnimationFrame[side5]],
+                    &m_heroLimits[side5], 1, 0, 0, 0);
                 gbReturnAfterComputeExtent = 0;
                 gbComputeExtent = 0;
                 gbSaveBiggestExtent = 0;
             }
 
-            if (m_drawHeroOverlay[side] != 0) {
-                extentChanged = 1;
+            if (m_drawHeroOverlay[side5] != 0) {
+                extentChanged1 = 1;
                 gbComputeExtent = 1;
                 gbSaveBiggestExtent = 1;
                 gbReturnAfterComputeExtent = 1;
-                if (side == 0) {
-                    heroY = COMBAT_HERO_LEFT_Y;
-                    heroX = COMBAT_HERO_LEFT_X;
-                } else {
-                    heroY = ((m_heroes[side]->m_isCaptain < 1) - 1 &
-                             (COMBAT_HERO_RIGHT_ALT_Y - COMBAT_HERO_RIGHT_Y)) +
-                            COMBAT_HERO_RIGHT_Y;
-                    heroX = ((m_heroes[side]->m_isCaptain < 1) - 1 &
-                             (COMBAT_HERO_RIGHT_ALT_X - COMBAT_HERO_RIGHT_X)) +
-                            COMBAT_HERO_RIGHT_X;
-                }
-                m_heroOverlayIcons[side]->CombatClipDrawToBuffer(
-                    heroX, heroY, m_heroOverlayFrame[side], &m_heroOverlayLimits[side],
-                    1, 0, 0, 0);
+                m_heroOverlayIcons[side5]->CombatClipDrawToBuffer(
+                    side5 == 0
+                        ? COMBAT_HERO_LEFT_X
+                        : ((m_heroes[side5]->m_isCaptain ? -1 : 0) &
+                           (COMBAT_HERO_RIGHT_ALT_X - COMBAT_HERO_RIGHT_X)) +
+                              COMBAT_HERO_RIGHT_X,
+                    side5 == 0
+                        ? COMBAT_HERO_LEFT_Y
+                        : ((m_heroes[side5]->m_isCaptain ? -1 : 0) &
+                           (COMBAT_HERO_RIGHT_ALT_Y - COMBAT_HERO_RIGHT_Y)) +
+                              COMBAT_HERO_RIGHT_Y,
+                    m_heroOverlayFrame[side5], &m_heroOverlayLimits[side5], 1, 0, 0,
+                    0);
                 gbReturnAfterComputeExtent = 0;
                 gbComputeExtent = 0;
                 gbSaveBiggestExtent = 0;
             }
         }
 
-        if (extentOnly != 0 || extentChanged == 0)
+        if (extentOnly != 0)
+            goto finish;
+        if (extentChanged1 == 0)
             goto finish;
 
         giMinExtentX--;
@@ -773,14 +772,15 @@ void combatManager::DrawFrame(int updateScreen, int computeExtent, int redrawExt
     for (row = 0; row < COMBAT_DRAW_LAYER_COUNT; row++) {
         if (row == COMBAT_DRAW_RIGHT_HERO_LAYER && m_heroes[1] != 0) {
             m_heroIcons[1]->CombatClipDrawToBuffer(
-                ((m_heroes[1]->m_isCaptain < 1) - 1 &
+                ((m_heroes[1]->m_isCaptain ? -1 : 0) &
                  (COMBAT_HERO_RIGHT_ALT_X - COMBAT_HERO_RIGHT_X)) +
                     COMBAT_HERO_RIGHT_X,
-                ((m_heroes[1]->m_isCaptain < 1) - 1 &
+                ((m_heroes[1]->m_isCaptain ? -1 : 0) &
                  (COMBAT_HERO_RIGHT_ALT_Y - COMBAT_HERO_RIGHT_Y)) +
                     COMBAT_HERO_RIGHT_Y,
-                sCmbtHero[m_heroSpriteIndex[1]]
-                    .animationFrames[m_heroAnimationState[1]][m_heroAnimationFrame[1]],
+                sCmbtHero[m_heroSpriteIndex[COMBAT_DEFENDER_SIDE]]
+                    .animationFrames[m_heroAnimationState[COMBAT_DEFENDER_SIDE]]
+                                    [m_heroAnimationFrame[COMBAT_DEFENDER_SIDE]],
                 &m_heroLimits[1], 1, 0, 0, 0);
             m_heroOverlayIcons[1]->CombatClipDrawToBuffer(
                 COMBAT_HERO_RIGHT_X, COMBAT_HERO_RIGHT_Y,
@@ -790,8 +790,9 @@ void combatManager::DrawFrame(int updateScreen, int computeExtent, int redrawExt
         if (row == COMBAT_DRAW_LEFT_HERO_LAYER && m_heroes[0] != 0) {
             m_heroIcons[0]->CombatClipDrawToBuffer(
                 COMBAT_HERO_LEFT_X, COMBAT_HERO_LEFT_Y,
-                sCmbtHero[m_heroSpriteIndex[0]]
-                    .animationFrames[m_heroAnimationState[0]][m_heroAnimationFrame[0]],
+                sCmbtHero[m_heroSpriteIndex[COMBAT_ATTACKER_SIDE]]
+                    .animationFrames[m_heroAnimationState[COMBAT_ATTACKER_SIDE]]
+                                    [m_heroAnimationFrame[COMBAT_ATTACKER_SIDE]],
                 &m_heroLimits[0], 0, 0, 0, 0);
             m_heroOverlayIcons[0]->CombatClipDrawToBuffer(
                 COMBAT_HERO_LEFT_X, COMBAT_HERO_LEFT_Y,
@@ -800,11 +801,11 @@ void combatManager::DrawFrame(int updateScreen, int computeExtent, int redrawExt
 
         firstColumn = COMBAT_GRID_FIRST_COLUMN;
         endColumn = COMBAT_GRID_COLUMN_END;
-        columnStep = 1;
+        columnStep3 = 1;
         if (m_inCastleCombat != 0 && row >= COMBAT_CASTLE_REVERSE_ROW) {
             firstColumn = COMBAT_GRID_REVERSE_FIRST_COLUMN;
             endColumn = COMBAT_GRID_REVERSE_COLUMN_END;
-            columnStep = -1;
+            columnStep3 = -1;
         }
 
         if (m_inCastleCombat != 0 && row == COMBAT_DRAW_CATAPULT_LAYER) {
@@ -833,34 +834,36 @@ void combatManager::DrawFrame(int updateScreen, int computeExtent, int redrawExt
                 &m_gateLimits, 0, 0, 0, 0);
         }
 
-        skipSpecialOccupants = 0;
+        skipSpecialOccupants6 = 0;
         if (m_inCastleCombat != 0 && m_wallStates[7] != 2 && m_wallStates[7] != 6) {
-            skipSpecialOccupants = 1;
-            for (side = 0; side < COMBAT_DRAW_PHASE_COUNT; side++) {
-                m_hexCells[COMBAT_CASTLE_SPECIAL_HEX_FIRST].DrawOccupant(side, 0);
-                m_hexCells[COMBAT_CASTLE_SPECIAL_HEX_SECOND].DrawOccupant(side, 0);
+            skipSpecialOccupants6 = 1;
+            for (side5 = 0; side5 < COMBAT_DRAW_PHASE_COUNT; side5++) {
+                m_hexCells[COMBAT_CASTLE_SPECIAL_HEX_FIRST].DrawOccupant(side5, 0);
+                m_hexCells[COMBAT_CASTLE_SPECIAL_HEX_SECOND].DrawOccupant(side5, 0);
             }
         }
 
-        for (column = firstColumn; column != endColumn; column += columnStep)
-            m_hexCells[row * COMBAT_GRID_ROW_LENGTH + column].DrawLowerDeadOccupants();
+        for (column1 = firstColumn; endColumn != column1; column1 += columnStep3)
+            m_hexCells[row * COMBAT_GRID_ROW_LENGTH + column1].DrawLowerDeadOccupants();
 
-        for (column = firstColumn; column != endColumn; column += columnStep)
-            m_hexCells[row * COMBAT_GRID_ROW_LENGTH + column].DrawUpperDeadOccupant();
+        for (column1 = firstColumn; endColumn != column1; column1 += columnStep3)
+            m_hexCells[row * COMBAT_GRID_ROW_LENGTH + column1].DrawUpperDeadOccupant();
 
-        for (side = 0; side < COMBAT_DRAW_PHASE_COUNT; side++) {
-            if (side == 1) {
-                for (column = firstColumn; column != endColumn; column += columnStep) {
-                    if (m_hexCells[row * COMBAT_GRID_ROW_LENGTH + column]
+        for (side5 = 0; side5 < COMBAT_DRAW_PHASE_COUNT; side5++) {
+            if (side5 == 1) {
+                for (column1 = firstColumn; endColumn != column1;
+                     column1 += columnStep3) {
+                    if (m_hexCells[row * COMBAT_GRID_ROW_LENGTH + column1]
                             .m_obstacleIndex != -1) {
-                        m_hexCells[row * COMBAT_GRID_ROW_LENGTH + column]
+                        m_hexCells[row * COMBAT_GRID_ROW_LENGTH + column1]
                             .DrawObstacle();
                     }
                 }
             }
 
-            for (column = firstColumn; column != endColumn; column += columnStep) {
-                unsigned short wallCoordinates[6][8] = {
+            for (column1 = firstColumn; endColumn != column1;
+                 column1 += columnStep3) {
+                unsigned short wallCoordinates1[6][8] = {
                     { 443, 153, 399, 237, 399, 321, 443, 405 },
                     { 443, 153, 399, 237, 399, 321, 443, 405 },
                     { 443, 153, 399, 237, 399, 321, 443, 405 },
@@ -868,140 +871,157 @@ void combatManager::DrawFrame(int updateScreen, int computeExtent, int redrawExt
                     { 443, 153, 399, 237, 399, 321, 443, 405 },
                     { 443, 153, 399, 237, 399, 321, 443, 405 }
                 };
-                unsigned char wallFrameOffsets[7] = { 0, 4, 8, 23, 27, 35, 31 };
+                unsigned char wallFrameOffsets1[7] = { 0, 4, 8, 23, 27, 35, 31 };
+                int wallX7;
+                int wallFrame1;
+                int wallY;
+                int hexIndex6;
 
-                if (m_inCastleCombat != 0 && side == 0) {
-                    hexIndex = row * COMBAT_GRID_ROW_LENGTH + column;
-                    wallFrame = 0;
-                    wallX = 0;
+                if (m_inCastleCombat != 0 && side5 == 0) {
+                    hexIndex6 = row * COMBAT_GRID_ROW_LENGTH + column1;
+                    wallFrame1 = 0;
+                    wallX7 = 0;
                     wallY = 0;
-                    switch (hexIndex) {
+                    switch (hexIndex6) {
                     case COMBAT_CASTLE_HEX_TOP_TOWER:
-                        wallFrame = wallFrameOffsets[m_wallStates[4]] + 5;
+                        wallFrame1 = wallFrameOffsets1[m_wallStates[4]] + 5;
                         break;
                     case COMBAT_CASTLE_HEX_SECOND_TOWER:
-                        wallFrame = wallFrameOffsets[m_wallStates[5]] + 6;
+                        wallFrame1 = wallFrameOffsets1[m_wallStates[5]] + 6;
                         break;
                     case COMBAT_CASTLE_HEX_THIRD_TOWER:
-                        wallFrame = wallFrameOffsets[m_wallStates[6]] + 7;
+                        wallFrame1 = wallFrameOffsets1[m_wallStates[6]] + 7;
                         break;
                     case COMBAT_CASTLE_HEX_BOTTOM_TOWER:
-                        wallFrame = wallFrameOffsets[m_wallStates[7]] + 8;
+                        wallFrame1 = wallFrameOffsets1[m_wallStates[7]] + 8;
                         break;
                     case COMBAT_CASTLE_HEX_TOP_WALL:
-                        wallFrame =
+                        wallFrame1 =
                             m_wallStates[0] + COMBAT_CASTLE_WALL_BASE_FRAME;
-                        wallX = wallCoordinates[
+                        wallX7 = wallCoordinates1[
                             m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type][0];
-                        wallY = wallCoordinates[
+                        wallY = wallCoordinates1[
                             m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type][1];
                         break;
                     case COMBAT_CASTLE_HEX_SECOND_WALL:
-                        wallFrame =
+                        wallFrame1 =
                             m_wallStates[1] + COMBAT_CASTLE_WALL_BASE_FRAME;
-                        wallX = wallCoordinates[
+                        wallX7 = wallCoordinates1[
                             m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type][2];
-                        wallY = wallCoordinates[
+                        wallY = wallCoordinates1[
                             m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type][3];
                         break;
                     case COMBAT_CASTLE_HEX_THIRD_WALL:
-                        wallFrame =
+                        wallFrame1 =
                             m_wallStates[2] + COMBAT_CASTLE_WALL_BASE_FRAME;
-                        wallX = wallCoordinates[
+                        wallX7 = wallCoordinates1[
                             m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type][4];
-                        wallY = wallCoordinates[
+                        wallY = wallCoordinates1[
                             m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type][5];
                         break;
                     case COMBAT_CASTLE_HEX_BOTTOM_WALL:
-                        wallFrame =
+                        wallFrame1 =
                             m_wallStates[3] + COMBAT_CASTLE_WALL_BASE_FRAME;
-                        wallX = wallCoordinates[
+                        wallX7 = wallCoordinates1[
                             m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type][6];
-                        wallY = wallCoordinates[
+                        wallY = wallCoordinates1[
                             m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type][7];
                         break;
                     case COMBAT_CASTLE_HEX_GATE:
                         if (m_drawbridgeState != COMBAT_CASTLE_GATE_HIDDEN)
-                            wallFrame = 4;
+                            wallFrame1 = 4;
                         break;
                     }
-                    if (wallFrame != 0) {
+                    if (wallFrame1 != 0) {
                         m_combatIcons[COMBAT_ICON_TOWER]->CombatClipDrawToBuffer(
-                            wallX, wallY, wallFrame, &m_hexCells[hexIndex].m_limits[0],
+                            wallX7, wallY, wallFrame1,
+                            &m_hexCells[hexIndex6].m_limits[0],
                             0, 0, 0, 0);
                     }
                 }
 
-                if (skipSpecialOccupants == 0 ||
-                    (row * COMBAT_GRID_ROW_LENGTH + column !=
+                if (skipSpecialOccupants6 == 0 ||
+                    (row * COMBAT_GRID_ROW_LENGTH + column1 !=
                          COMBAT_CASTLE_SPECIAL_HEX_FIRST &&
-                     row * COMBAT_GRID_ROW_LENGTH + column !=
+                     row * COMBAT_GRID_ROW_LENGTH + column1 !=
                          COMBAT_CASTLE_SPECIAL_HEX_SECOND)) {
-                    m_hexCells[row * COMBAT_GRID_ROW_LENGTH + column]
-                        .DrawOccupant(side, 0);
+                    m_hexCells[row * COMBAT_GRID_ROW_LENGTH + column1]
+                        .DrawOccupant(side5, 0);
                 }
             }
         }
 
-        if (m_inCastleCombat != 0 &&
+        if (m_inCastleCombat == 0 ||
             (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings &
-             TOWN_BUILDING_MOAT) != 0 &&
-            (row != COMBAT_CASTLE_GATE_ROW ||
-             m_drawbridgeState == COMBAT_CASTLE_GATE_OPEN)) {
-            if (moatCell[row] == giWalkingTo || moatCell[row] == giWalkingTo2 ||
-                moatCell[row] == giWalkingFrom || moatCell[row] == giWalkingFrom2) {
-                if (abs(giWalkingTo - giWalkingFrom) <= 1)
+             TOWN_BUILDING_MOAT) == 0)
+            goto endRow;
+        if (row == COMBAT_CASTLE_GATE_ROW &&
+            m_drawbridgeState != COMBAT_CASTLE_GATE_OPEN)
+            goto endRow;
+
+        if (moatCell[row] == giWalkingTo || moatCell[row] == giWalkingTo2 ||
+            moatCell[row] == giWalkingFrom || moatCell[row] == giWalkingFrom2) {
+            if (abs(giWalkingTo - giWalkingFrom) <= 1)
+                goto drawMoat;
+            if ((giWalkingFrom / COMBAT_GRID_ROW_LENGTH >
+                         giWalkingTo / COMBAT_GRID_ROW_LENGTH
+                     ? giWalkingFrom / COMBAT_GRID_ROW_LENGTH
+                     : giWalkingTo / COMBAT_GRID_ROW_LENGTH) != row)
+                goto endRow;
+
+            if (gpCombatManager->m_drawbridgeState != COMBAT_CASTLE_GATE_OPEN &&
+                (giWalkingTo / COMBAT_GRID_ROW_LENGTH == COMBAT_CASTLE_GATE_ROW ||
+                 giWalkingFrom / COMBAT_GRID_ROW_LENGTH == COMBAT_CASTLE_GATE_ROW)) {
+                if (giWalkingTo / COMBAT_GRID_ROW_LENGTH == COMBAT_CASTLE_GATE_ROW &&
+                    giWalkingFrom / COMBAT_GRID_ROW_LENGTH ==
+                        COMBAT_CASTLE_GATE_ROW - 1)
+                    goto endRow;
+                if (giWalkingTo / COMBAT_GRID_ROW_LENGTH ==
+                        COMBAT_CASTLE_GATE_ROW - 1 &&
+                    giWalkingFrom / COMBAT_GRID_ROW_LENGTH == COMBAT_CASTLE_GATE_ROW)
+                    goto endRow;
+
+                if (giWalkingFrom <= giWalkingTo)
+                    goto checkWalkingTo;
+                if (moatCell[row] == giWalkingFrom ||
+                    moatCell[row] == giWalkingFrom2)
                     goto drawMoat;
-                if ((giWalkingTo / COMBAT_GRID_ROW_LENGTH <
-                     giWalkingFrom / COMBAT_GRID_ROW_LENGTH
-                         ? giWalkingFrom / COMBAT_GRID_ROW_LENGTH
-                         : giWalkingTo / COMBAT_GRID_ROW_LENGTH) == row) {
-                    if (gpCombatManager->m_drawbridgeState != COMBAT_CASTLE_GATE_OPEN &&
-                        (giWalkingTo / COMBAT_GRID_ROW_LENGTH == COMBAT_CASTLE_GATE_ROW ||
-                         giWalkingFrom / COMBAT_GRID_ROW_LENGTH == COMBAT_CASTLE_GATE_ROW)) {
-                        if ((giWalkingTo / COMBAT_GRID_ROW_LENGTH !=
-                                 COMBAT_CASTLE_GATE_ROW ||
-                             giWalkingFrom / COMBAT_GRID_ROW_LENGTH !=
-                                 COMBAT_CASTLE_GATE_ROW - 1) &&
-                            (giWalkingTo / COMBAT_GRID_ROW_LENGTH !=
-                                 COMBAT_CASTLE_GATE_ROW - 1 ||
-                             giWalkingFrom / COMBAT_GRID_ROW_LENGTH !=
-                                 COMBAT_CASTLE_GATE_ROW)) {
-                            if (giWalkingTo < giWalkingFrom) {
-                                if (moatCell[row] == giWalkingFrom ||
-                                    moatCell[row] == giWalkingFrom2)
-                                    goto drawMoat;
-                            } else if (moatCell[row] == giWalkingTo ||
-                                       moatCell[row] == giWalkingTo2) {
-                                goto drawMoat;
-                            }
-                        }
-                    } else {
-                        drawbridgeY = m_hexCells[giWalkingFrom].m_y - 9 + giWalkingYMod;
-                        drawbridgeBottom =
-                            m_hexCells[giWalkingFrom <= giWalkingTo
-                                           ? giWalkingTo
-                                           : giWalkingFrom]
-                                .m_y + 5;
-                        IconToBitmap(m_combatIcons[COMBAT_ICON_DRAWBRIDGE], gpWindowManager->m_screen,
-                                     0, 0, 0, 1, 0, drawbridgeY,
-                                     COMBAT_SCREEN_WIDTH,
-                                     drawbridgeBottom - drawbridgeY + 1, 0);
-                    }
-                }
-            } else if (m_hexCells[moatCell[row]].m_occupantSide != -1) {
-drawMoat:
-                m_combatIcons[COMBAT_ICON_MOAT]->CombatClipDrawToBuffer(
-                    0, 0, row, &m_moatLimits[row], 0, 0, 0, 0);
-                m_hexCells[moatCell[row] - 1].DrawOccupant(
-                    COMBAT_DRAW_ALL_OCCUPANTS, 1);
-                m_hexCells[moatCell[row]].DrawOccupant(
-                    COMBAT_DRAW_ALL_OCCUPANTS, 1);
-                m_hexCells[moatCell[row] + 1].DrawOccupant(
-                    COMBAT_DRAW_ALL_OCCUPANTS, 1);
+                goto endRow;
+checkWalkingTo:
+                if (moatCell[row] == giWalkingTo ||
+                    moatCell[row] == giWalkingTo2)
+                    goto drawMoat;
+                goto endRow;
+            } else {
+                int drawbridgeY;
+                int drawbridgeBottom;
+
+                drawbridgeY = m_hexCells[giWalkingFrom].m_y - 9 + giWalkingYMod;
+                drawbridgeBottom =
+                    m_hexCells[giWalkingFrom > giWalkingTo ? giWalkingFrom
+                                                            : giWalkingTo]
+                        .m_y + 5;
+                IconToBitmap(m_combatIcons[COMBAT_ICON_DRAWBRIDGE],
+                             gpWindowManager->m_screen, 0, 0, 0, 1, 0,
+                             drawbridgeY, COMBAT_SCREEN_WIDTH,
+                             drawbridgeBottom - drawbridgeY + 1, 0);
+                goto endRow;
             }
+        } else {
+            if (m_hexCells[moatCell[row]].m_occupantSide == -1)
+                goto endRow;
+drawMoat:
+            m_combatIcons[COMBAT_ICON_MOAT]->CombatClipDrawToBuffer(
+                0, 0, row, &m_moatLimits[row], 0, 0, 0, 0);
+            m_hexCells[moatCell[row] - 1].DrawOccupant(
+                COMBAT_DRAW_ALL_OCCUPANTS, 1);
+            m_hexCells[moatCell[row]].DrawOccupant(
+                COMBAT_DRAW_ALL_OCCUPANTS, 1);
+            m_hexCells[moatCell[row] + 1].DrawOccupant(
+                COMBAT_DRAW_ALL_OCCUPANTS, 1);
         }
-        gridWasShowing = 0;
+endRow:
+        gridWasShowing1 = 0;
     }
 
     if (gConfig.combatArmyInfoLevel > 0 && m_smallViewSide[0] != -1) {

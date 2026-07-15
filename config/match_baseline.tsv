@@ -696,14 +696,14 @@ SOURCE/DRAWING	?ClearCombatMessages@combatManager@@QAEXH@Z	100.0000	a13385b2bc8b
 SOURCE/DRAWING	?CombatMessage@combatManager@@QAEXH@Z	99.8103	b431be4bdee0
 SOURCE/DRAWING	?CombatMessage@combatManager@@QAEXPADHHH@Z	100.0000	05038edf4a46
 SOURCE/DRAWING	?DrawBackground@combatManager@@QAEXXZ	99.8655	ec9943534f35
-SOURCE/DRAWING	?DrawFrame@combatManager@@QAEXHHHHHHH@Z	91.2536	f0e750b57a68
+SOURCE/DRAWING	?DrawFrame@combatManager@@QAEXHHHHHHH@Z	99.3296	371edb3504ca
 SOURCE/DRAWING	?DrawSmallView@combatManager@@QAEXHH@Z	99.9244	81dabbeff233
 SOURCE/DRAWING	?NoShowCombatLog@combatManager@@QAEXPAD@Z	100.0000	3de47f29d606
 SOURCE/DRAWING	?ResetLimitCreature@combatManager@@QAEXXZ	100.0000	1f50e7bb3f02
 SOURCE/DRAWING	?SetupGridForArmy@combatManager@@QAEXPAVarmy@@@Z	100.0000	bcc7104d870c
 SOURCE/DRAWING	?UpdateCombatArea@combatManager@@QAEXXZ	100.0000	d644e5959fbc
 SOURCE/DRAWING	?UpdateGrid@combatManager@@QAEHHH@Z	99.9897	fecd113b6932
-SOURCE/DRAWING	?UpdateMouseGrid@combatManager@@QAEXHH@Z	99.9482	dca14322e005
+SOURCE/DRAWING	?UpdateMouseGrid@combatManager@@QAEXHH@Z	99.9482	56ebb043489c
 SOURCE/EVENTS	?AutoResolveCombat@advManager@@QAEHHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHH@Z	98.5000	94663c0c8936
 SOURCE/EVENTS	?BarrierAIEvent@advManager@@QAEHPAVmapCell@@PAVhero@@@Z	100.0000	fdd8eaa33100
 SOURCE/EVENTS	?BarrierEvent@advManager@@QAEHPAVmapCell@@PAVhero@@@Z	100.0000	496009e3b5d6
