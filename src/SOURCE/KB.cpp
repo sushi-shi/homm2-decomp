@@ -6408,7 +6408,11 @@ DATA(0x004fdf18)
 unsigned short doorPos[KB_CASTLE_DOOR_POSITION_COUNT][KB_COMBAT_COORDINATE_COUNT] = {
     { 393, 192 }, { 348, 262 }
 };
-DATA(0x004fdf20) float *fTradingPostEfficency = 0;
+DATA(0x004fdf20)
+float fTradingPostEfficency[KB_TRADING_POST_EFFICIENCY_COUNT] = {
+    0.0f, 0.1f, 0.15f, 0.2f, 0.25f, 0.3f,
+    0.35f, 0.4f, 0.45f, 0.5f, 0.5f
+};
 DATA(0x004fdf50) struct SElevationOverlay
     sElevationOverlay[ELEVATION_OVERLAY_COUNT] = {
     { 0x0000, { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },

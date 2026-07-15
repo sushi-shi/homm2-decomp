@@ -53,6 +53,8 @@ public:
     signed char CurrentHero(void) { return m_currentHero; }
     signed char CurrentTown(void) { return m_currentTown; }
     signed char Color(void) { return m_color; }
+    signed char HeroCount(void) { return m_heroCount; }
+    signed char TownCount(void) { return m_townCount; }
     signed char HeroId(int index) { return m_heroIds[index]; }
     signed char TownId(int index) { return m_townIds[index]; }
     signed char AvailableHeroId(int index) { return m_availableHeroIds[index]; }
