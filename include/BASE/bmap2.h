@@ -5,6 +5,10 @@
 // forward declarations (was <_all.h>):
 class bitmap;
 
+typedef enum BitmapDimConstant {
+    BITMAP_DIM_PALETTE_LEVEL_STRIDE = 256
+} BitmapDimConstant;
+
 void FillBitmapArea(class bitmap *, int, int, int, int, int);
 void FillBitmapAreaClip(class bitmap *, int, int, int, int, int, int, int, int, int);
 void BlitBitmap(class bitmap *, int, int, int, int, class bitmap *, int, int);
