@@ -179,7 +179,7 @@ BASE/Iconf2b	?FlipIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	87.0133	7be27
 BASE/Iconm2b	?MonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	81.8674	236a498b090a
 BASE/Iconmf2b	?FlipMonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	78.3713	a4e272a47ae3
 BASE/MOUSEMGR	??0mouseManager@@QAE@XZ	100.0000	85b3def79d19
-BASE/MOUSEMGR	?CheckUpdateMousePos@mouseManager@@QAEXXZ	100.0000	e476029d63cb
+BASE/MOUSEMGR	?CheckUpdateMousePos@mouseManager@@QAEXXZ	100.0000	6bea5c63ef98
 BASE/MOUSEMGR	?Close@mouseManager@@UAEXXZ	98.9231	152004791510
 BASE/MOUSEMGR	?HideColorPointer@mouseManager@@QAEXXZ	100.0000	1e6da043c43a
 BASE/MOUSEMGR	?IsVis@mouseManager@@QAEHXZ	100.0000	9461e339108c
@@ -191,7 +191,7 @@ BASE/MOUSEMGR	?ReallyHidePointer@mouseManager@@QAEXXZ	100.0000	398eba112499
 BASE/MOUSEMGR	?ReallyShowPointer@mouseManager@@QAEXXZ	100.0000	c951c08548e3
 BASE/MOUSEMGR	?RestoreUnderlying@mouseManager@@QAEXXZ	100.0000	d4e30a1a3feb
 BASE/MOUSEMGR	?SaveAndDraw@mouseManager@@QAEXXZ	100.0000	442cd693bbbe
-BASE/MOUSEMGR	?SetColorMice@mouseManager@@QAEXH@Z	96.8381	42e75ea8853b
+BASE/MOUSEMGR	?SetColorMice@mouseManager@@QAEXH@Z	100.0000	16b82ab1b665
 BASE/MOUSEMGR	?SetPointer@mouseManager@@QAEXH@Z	75.1165	94d96449e39e
 BASE/MOUSEMGR	?SetPointer@mouseManager@@QAEXPADHH@Z	100.0000	2d3ad9ce800a
 BASE/MOUSEMGR	?ShowColorPointer@mouseManager@@QAEXXZ	100.0000	da10af2af0b7
