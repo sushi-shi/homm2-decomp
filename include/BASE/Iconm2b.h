@@ -6,6 +6,7 @@
 class bitmap;
 class icon;
 
-void MonoIconToBitmap(class icon *, class bitmap *, int, int, int, int, int, int, int, int, int);
+void MonoIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
+                      int color, int clip, int clipX, int clipY, int clipW, int clipH);
 
 #endif // HOMM2_ICONM2B_H
