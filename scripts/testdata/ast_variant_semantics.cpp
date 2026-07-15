@@ -27,6 +27,13 @@ int SafeHelpers(AstRecord record, AstRecord &recordRef, int scalar, AstChoice ch
     return local + nested + pointerValue;
 }
 
+int SafeIntegerOperators(int value, int divisor)
+{
+    int quotient = value / divisor;
+    int difference = value - divisor;
+    return quotient + difference;
+}
+
 int RejectedMemberContexts(AstRecord record, volatile AstRecord &volatileRecord, int scalar)
 {
     record.value = scalar;

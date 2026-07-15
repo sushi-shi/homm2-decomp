@@ -43,7 +43,9 @@ import hashlib
 import itertools
 import json
 import os
+import shutil
 import signal
+import subprocess
 import sys
 import tempfile
 import time
@@ -85,6 +87,15 @@ class Candidate:
 
 def sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+def result_rank(row: dict, retail_size: int, retail_relocs: int):
+    return (
+        -row["score"],
+        abs(row["candidate_size"] - retail_size),
+        abs(row["candidate_relocs"] - retail_relocs),
+        row["trial"],
+    )
 
 
 def load_manifest(path: Path, root: Path):
@@ -266,6 +277,10 @@ def main(argv=None) -> int:
     parser.add_argument("--top", type=int, default=12)
     parser.add_argument("--compile-timeout", type=float, default=120.0)
     parser.add_argument("--output", type=Path)
+    parser.add_argument(
+        "--show-best-disasm", action="store_true",
+        help="print the best candidate object disassembly before deleting disposable artifacts",
+    )
     args = parser.parse_args(argv)
     if args.limit < 1 or args.top < 1 or args.compile_timeout <= 0:
         parser.error("--limit, --top, and --compile-timeout must be positive")
@@ -306,6 +321,8 @@ def main(argv=None) -> int:
     best_score = -1.0
     exact_source = None
     baseline_summary = None
+    best_object_rank = None
+    best_disasm = None
     original_handler = signal.getsignal(signal.SIGTERM)
 
     def interrupt(_signum, _frame):
@@ -429,6 +446,12 @@ def main(argv=None) -> int:
                     "exact_rejections": rejections,
                 })
                 results.append(row)
+                rank = result_rank(row, target.retail_size, retail_target["relocs"])
+                if args.show_best_disasm and (
+                    best_object_rank is None or rank < best_object_rank
+                ):
+                    shutil.copyfile(candidate_obj, scratch / "best.obj")
+                    best_object_rank = rank
                 if score > best_score:
                     best_score = score
                     print(
@@ -441,6 +464,13 @@ def main(argv=None) -> int:
                     exact_source = candidate
                 candidate_obj.unlink(missing_ok=True)
                 Path(str(candidate_obj) + ".d").unlink(missing_ok=True)
+            if args.show_best_disasm and best_object_rank is not None:
+                command = [
+                    "llvm-objdump", "-dr", f"--disassemble-symbols={target.symbol}",
+                    str(scratch / "best.obj"),
+                ]
+                disassembly = subprocess.run(command, capture_output=True, text=True)
+                best_disasm = disassembly.stdout + disassembly.stderr
     except KeyboardInterrupt:
         print("interrupted; source restored", file=sys.stderr)
         return 130
@@ -451,12 +481,7 @@ def main(argv=None) -> int:
 
     ranked = sorted(
         (row for row in results if row.get("score") is not None),
-        key=lambda row: (
-            -row["score"],
-            abs(row["candidate_size"] - target.retail_size),
-            abs(row["candidate_relocs"] - retail_target["relocs"]),
-            row["trial"],
-        ),
+        key=lambda row: result_rank(row, target.retail_size, retail_target["relocs"]),
     )
     summary = {
         "schema": 1,
@@ -495,6 +520,9 @@ def main(argv=None) -> int:
             f"{row['score']:.6f}% size {row['candidate_size']} "
             f"relocs {row['candidate_relocs']}/{row['retail_relocs']} trial {row['trial']} {labels}"
         )
+    if best_disasm is not None:
+        print("--- best disposable candidate disassembly (object deleted after inspection) ---")
+        print(best_disasm.rstrip())
     print(output)
     return 0
 
