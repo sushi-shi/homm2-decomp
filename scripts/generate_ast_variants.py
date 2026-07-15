@@ -172,26 +172,42 @@ def target_function(tu: ci.TranslationUnit, source: Path, blob: bytes, rva: int)
     return matches[0]
 
 
-def classify_parse_errors(tu: ci.TranslationUnit, source: Path, fn):
-    """Only a nonfatal diagnostic strictly after the target cannot affect its parsed AST."""
+def classify_parse_errors(tu: ci.TranslationUnit, source: Path, fn, allowed_external=()):
+    """Classify errors, allowing only reviewed nonfatal diagnostics outside the target."""
     blocking = []
     trailing = []
+    allowed = []
+    matched_allowances = set()
     source = source.resolve()
     for diagnostic in tu.diagnostics:
         if diagnostic.severity < ci.Diagnostic.Error:
             continue
+        rendered = str(diagnostic)
         location_file = diagnostic.location.file
         same_source = (
             location_file is not None and Path(str(location_file)).resolve() == source
         )
+        outside_target = not (
+            fn.extent.start.offset <= diagnostic.location.offset <= fn.extent.end.offset
+        )
+        allowance = next(
+            (item for item in allowed_external if item and item in rendered), None
+        )
+        if (
+            allowance is not None and diagnostic.severity < ci.Diagnostic.Fatal
+            and same_source and outside_target
+        ):
+            allowed.append(rendered)
+            matched_allowances.add(allowance)
+            continue
         if (
             diagnostic.severity >= ci.Diagnostic.Fatal or not same_source
             or diagnostic.location.offset <= fn.extent.end.offset
         ):
-            blocking.append(str(diagnostic))
+            blocking.append(rendered)
         else:
-            trailing.append(str(diagnostic))
-    return blocking, trailing
+            trailing.append(rendered)
+    return blocking, trailing, allowed, set(allowed_external) - matched_allowances
 
 
 def cursor_range(cursor) -> tuple[int, int]:
@@ -1071,6 +1087,13 @@ def main(argv=None, *, prog=None, description=None) -> int:
         "--axes-from", type=Path,
         help="copy hand-authored exact-span axes from another schema-1 manifest",
     )
+    parser.add_argument(
+        "--allow-external-diagnostic", action="append", default=[],
+        help=(
+            "allow a reviewed nonfatal libclang diagnostic outside the target function by "
+            "exact substring; may be repeated, must match, and is recorded in the manifest"
+        ),
+    )
     parser.add_argument("--run", action="store_true", help="compile and score the emitted manifest")
     parser.add_argument("--top", type=int, default=12, help="ranked results printed by --run")
     parser.add_argument("--compile-timeout", type=float, default=120.0)
@@ -1113,7 +1136,13 @@ def main(argv=None, *, prog=None, description=None) -> int:
         fn = target_function(tu, source, blob, args.rva)
     except ValueError as exc:
         parser.error(str(exc))
-    diagnostics, trailing_diagnostics = classify_parse_errors(tu, source, fn)
+    diagnostics, trailing_diagnostics, allowed_diagnostics, unmatched_allowances = \
+        classify_parse_errors(tu, source, fn, args.allow_external_diagnostic)
+    if unmatched_allowances:
+        parser.error(
+            "external diagnostic allowances did not match:\n"
+            + "\n".join(sorted(unmatched_allowances))
+        )
     if diagnostics:
         parser.error("libclang parse errors:\n" + "\n".join(diagnostics[:20]))
     insertion, _span_end = marker_span(blob, args.rva)
@@ -1155,6 +1184,7 @@ def main(argv=None, *, prog=None, description=None) -> int:
             "limit": args.limit,
             "truncated": truncated,
             "ignored_trailing_diagnostics": trailing_diagnostics,
+            "allowed_external_diagnostics": allowed_diagnostics,
             "required_mutations": sorted(required_names),
             "tu_state": {
                 "trials_requested": args.state_trials,
@@ -1198,6 +1228,11 @@ def main(argv=None, *, prog=None, description=None) -> int:
         print(
             f"ignored {len(trailing_diagnostics)} nonfatal parse diagnostic(s) strictly after "
             "the target; recorded in the manifest"
+        )
+    if allowed_diagnostics:
+        print(
+            f"allowed {len(allowed_diagnostics)} reviewed external parse diagnostic(s); "
+            "recorded in the manifest"
         )
     if args.run:
         from batch_source_variants import main as run_batch
