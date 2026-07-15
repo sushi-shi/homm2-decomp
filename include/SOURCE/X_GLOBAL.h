@@ -147,7 +147,11 @@ typedef enum KbGameTableConstant {
     KB_ARTIFACT_LEVEL_COUNT = 104,
     KB_ARTIFACT_BASE_VALUE_COUNT = 100,
     KB_STAT_POWER_COUNT = 42,
-    KB_SPELL_LIMIT_COUNT = 5
+    KB_SPELL_LIMIT_COUNT = 5,
+    KB_SPELL_MOD_COUNT = 12,
+    KB_QUICK_COMBAT_SPELL_TYPE_COUNT = 7,
+    KB_CLOUD_MASK_COUNT = 256,
+    KB_HERO_LEVEL_BAND_COUNT = 2
 } KbGameTableConstant;
 
 extern unsigned char giGroundShape[GROUND_TILE_IMAGE_COUNT];
@@ -205,13 +209,13 @@ extern signed char giVisRangeTown;
 extern float gfStatPower[KB_STAT_POWER_COUNT];
 extern float gfBattleStat[KB_STAT_POWER_COUNT];
 extern signed char gSpellLimits[KB_SPELL_LIMIT_COUNT];
-extern float gfSpellCastableCombatMod[12];
-extern float gfSpellCastNumMod[12];
-extern float gfPhilAISpellPowerMod[12];
-extern float gfPhilAIDurationMod[12];
-extern float gfSpellTypeNumMod[7];
-extern signed char gbArrow[8][8];
-extern unsigned char giCloudType[256];
+extern float gfSpellCastableCombatMod[KB_SPELL_MOD_COUNT];
+extern float gfSpellCastNumMod[KB_SPELL_MOD_COUNT];
+extern float gfPhilAISpellPowerMod[KB_SPELL_MOD_COUNT];
+extern float gfPhilAIDurationMod[KB_SPELL_MOD_COUNT];
+extern float gfSpellTypeNumMod[KB_QUICK_COMBAT_SPELL_TYPE_COUNT];
+extern signed char gbArrow[NORMAL_DIRECTION_COUNT][NORMAL_DIRECTION_COUNT];
+extern unsigned char giCloudType[KB_CLOUD_MASK_COUNT];
 typedef enum TownMusicTrack {
     TOWN_MUSIC_NONE = 0,
     TOWN_MUSIC_WARLOCK = 5,
@@ -224,7 +228,8 @@ typedef enum TownMusicTrack {
 } TownMusicTrack;
 
 extern signed char townTheme[TOWN_MUSIC_TABLE_SIZE];
-extern signed char gHeroSkillBonus[6][2][4];
+extern signed char gHeroSkillBonus[HERO_CLASS_COUNT][KB_HERO_LEVEL_BAND_COUNT]
+                                  [HERO_PRIMARY_STAT_COUNT];
 extern int giMonoIconSkip;
 extern int giScrollX;
 extern int giScrollY;
