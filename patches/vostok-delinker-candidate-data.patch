@@ -1,0 +1,813 @@
+diff --git a/src/contribution_manifest.rs b/src/contribution_manifest.rs
+index 38f661e..d3de755 100644
+--- a/src/contribution_manifest.rs
++++ b/src/contribution_manifest.rs
+@@ -168,7 +168,7 @@ impl ContributionManifest {
+         })
+     }
+ 
+-    fn owner_for_rva(&self, storage: ContributionStorage, rva: usize) -> Option<&'static [u8]> {
++    pub fn owner_for_rva(&self, storage: ContributionStorage, rva: usize) -> Option<&'static [u8]> {
+         self.contributions.iter().find_map(|contribution| {
+             if contribution.storage == storage
+                 && contribution.rva <= rva
+diff --git a/src/data_manifest.rs b/src/data_manifest.rs
+index 3a8fccd..a79c217 100644
+--- a/src/data_manifest.rs
++++ b/src/data_manifest.rs
+@@ -3,15 +3,22 @@ use pdb2::RawString;
+ use std::collections::HashSet;
+ use std::path::Path;
+ 
+-const HEADER: &[u8] = b"name\tobject\trva\tsize\tstorage\talignment\tprovenance";
++const HEADER: &[u8] =
++    b"name\tobject\trva\tsize\tstorage\talignment\tsection_offset\tscope\tprovenance";
+ 
+-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
++#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+ pub enum DataStorage {
+     Data,
+     Rdata,
+     Bss,
+ }
+ 
++#[derive(Clone, Copy, Debug, Eq, PartialEq)]
++pub enum DataScope {
++    External,
++    Local,
++}
++
+ #[derive(Clone, Copy, Debug)]
+ pub struct DataDefinition {
+     pub name: RawString<'static>,
+@@ -20,12 +27,15 @@ pub struct DataDefinition {
+     pub size: usize,
+     pub storage: DataStorage,
+     pub alignment: u64,
++    pub section_offset: Option<usize>,
++    pub scope: DataScope,
+ }
+ 
+ #[derive(Default)]
+ pub struct DataManifest {
+     definitions: Vec<DataDefinition>,
+     names: HashSet<&'static [u8]>,
++    closed_groups: HashSet<(&'static [u8], DataStorage)>,
+ }
+ 
+ impl DataManifest {
+@@ -68,17 +78,18 @@ impl DataManifest {
+             }
+ 
+             let columns = line.split(|byte| *byte == b'\t').collect::<Vec<_>>();
+-            if columns.len() != 7 {
++            if columns.len() != 9 {
+                 anyhow::bail!(
+-                    "{}:{}: expected exactly seven tab-separated columns",
++                    "{}:{}: expected exactly nine tab-separated columns",
+                     path.display(),
+                     line_number
+                 );
+             }
+             validate_text(path, line_number, "name", columns[0])?;
+             validate_text(path, line_number, "object", columns[1])?;
+-            validate_text(path, line_number, "provenance", columns[6])?;
+-            if columns[0].is_empty() || columns[1].is_empty() || columns[6].is_empty() {
++            validate_text(path, line_number, "scope", columns[7])?;
++            validate_text(path, line_number, "provenance", columns[8])?;
++            if columns[0].is_empty() || columns[1].is_empty() || columns[8].is_empty() {
+                 anyhow::bail!(
+                     "{}:{}: name, object, and provenance must be non-empty",
+                     path.display(),
+@@ -135,6 +146,21 @@ impl DataManifest {
+                     line_number
+                 );
+             }
++            let section_offset = if columns[6] == b"-" {
++                None
++            } else {
++                Some(parse_number(columns[6])?)
++            };
++            let scope = match columns[7] {
++                b"external" => DataScope::External,
++                b"local" => DataScope::Local,
++                value => anyhow::bail!(
++                    "{}:{}: unsupported scope {}",
++                    path.display(),
++                    line_number,
++                    String::from_utf8_lossy(value)
++                ),
++            };
+             if !names.insert(name) {
+                 anyhow::bail!("{}:{}: duplicate data name", path.display(), line_number);
+             }
+@@ -150,13 +176,22 @@ impl DataManifest {
+                 size,
+                 storage,
+                 alignment,
++                section_offset,
++                scope,
+             });
+         }
+         if !saw_header {
+             anyhow::bail!("{}: missing data manifest header", path.display());
+         }
+ 
+-        definitions.sort_by_key(|definition| (definition.object, definition.rva));
++        definitions.sort_by_key(|definition| {
++            (
++                definition.object,
++                definition.storage,
++                definition.section_offset.unwrap_or(definition.rva),
++                definition.rva,
++            )
++        });
+         let mut by_rva = definitions.clone();
+         by_rva.sort_by_key(|definition| definition.rva);
+         for pair in by_rva.windows(2) {
+@@ -164,7 +199,19 @@ impl DataManifest {
+                 anyhow::bail!("overlapping data manifest definitions");
+             }
+         }
+-        Ok(Self { definitions, names })
++        let closed_groups = definitions
++            .iter()
++            .filter_map(|definition| {
++                definition
++                    .section_offset
++                    .map(|_| (definition.object, definition.storage))
++            })
++            .collect();
++        Ok(Self {
++            definitions,
++            names,
++            closed_groups,
++        })
+     }
+ 
+     pub fn definitions(&self) -> &[DataDefinition] {
+@@ -184,6 +231,10 @@ impl DataManifest {
+             }
+         })
+     }
++
++    pub fn is_closed(&self, object: &[u8], storage: DataStorage) -> bool {
++        self.closed_groups.contains(&(object, storage))
++    }
+ }
+ 
+ fn validate_text(path: &Path, line: usize, field: &str, value: &[u8]) -> anyhow::Result<()> {
+@@ -214,7 +265,8 @@ fn parse_number(value: &[u8]) -> anyhow::Result<usize> {
+ mod tests {
+     use super::*;
+ 
+-    const HEADER_TEXT: &str = "name\tobject\trva\tsize\tstorage\talignment\tprovenance\n";
++    const HEADER_TEXT: &str =
++        "name\tobject\trva\tsize\tstorage\talignment\tsection_offset\tscope\tprovenance\n";
+ 
+     fn parse(body: &str) -> anyhow::Result<DataManifest> {
+         DataManifest::parse(body.as_bytes(), Path::new("test.tsv"))
+@@ -238,10 +290,10 @@ mod tests {
+     fn accepts_comments_crlf_paths_and_all_storage_classes() {
+         let text = concat!(
+             "# generated evidence\r\n",
+-            "name\tobject\trva\tsize\tstorage\talignment\tprovenance\r\n",
+-            "table\tengine/world.c\t0x100\t0x20\tdata\t0x4\treviewed\r\n",
+-            "constant\tengine/constants.c\t0X200\t16\trdata\t8\treviewed\r\n",
+-            "scratch\tengine/state.c\t0x300\t4\tbss\t1\treviewed\r\n",
++            "name\tobject\trva\tsize\tstorage\talignment\tsection_offset\tscope\tprovenance\r\n",
++            "table\tengine/world.c\t0x100\t0x20\tdata\t0x4\t-\texternal\treviewed\r\n",
++            "constant\tengine/constants.c\t0X200\t16\trdata\t8\t0\tlocal\treviewed\r\n",
++            "scratch\tengine/state.c\t0x300\t4\tbss\t1\t0\tlocal\treviewed\r\n",
+         );
+         let parsed = parse(text).unwrap();
+         assert_eq!(parsed.definitions().len(), 3);
+@@ -254,6 +306,8 @@ mod tests {
+         assert_eq!(table.storage, DataStorage::Data);
+         assert_eq!(table.alignment, 4);
+         assert!(parsed.contains_name(b"constant"));
++        assert!(parsed.is_closed(b"engine\\constants.c", DataStorage::Rdata));
++        assert!(!parsed.is_closed(b"engine\\world.c", DataStorage::Data));
+     }
+ 
+     #[test]
+@@ -288,8 +342,10 @@ mod tests {
+ 
+     #[test]
+     fn rejects_wrong_column_counts() {
+-        assert!(error("a\tu.c\t0x100\t4\tdata\t4").contains("exactly seven"));
+-        assert!(error("a\tu.c\t0x100\t4\tdata\t4\ttest\textra").contains("exactly seven"));
++        assert!(error("a\tu.c\t0x100\t4\tdata\t4").contains("exactly nine"));
++        assert!(
++            error("a\tu.c\t0x100\t4\tdata\t4\t-\texternal\ttest\textra").contains("exactly nine")
++        );
+     }
+ 
+     #[test]
+@@ -304,7 +360,7 @@ mod tests {
+             "a/./u.c",
+             "a//u.c",
+         ] {
+-            let row = format!("a\t{object}\t0x100\t4\tdata\t4\ttest");
++            let row = format!("a\t{object}\t0x100\t4\tdata\t4\t-\texternal\ttest");
+             assert!(
+                 error(&row).contains("relative and normalized"),
+                 "accepted {object}"
+@@ -315,9 +371,9 @@ mod tests {
+     #[test]
+     fn rejects_nul_and_control_bytes_in_text_fields() {
+         for row in [
+-            "a\0b\tu.c\t0x100\t4\tdata\t4\ttest",
+-            "a\tu\x7f.c\t0x100\t4\tdata\t4\ttest",
+-            "a\tu.c\t0x100\t4\tdata\t4\ttest\x01",
++            "a\0b\tu.c\t0x100\t4\tdata\t4\t-\texternal\ttest",
++            "a\tu\x7f.c\t0x100\t4\tdata\t4\t-\texternal\ttest",
++            "a\tu.c\t0x100\t4\tdata\t4\t-\texternal\ttest\x01",
+         ] {
+             assert!(error(row).contains("control byte"));
+         }
+@@ -326,7 +382,7 @@ mod tests {
+     #[test]
+     fn rejects_duplicate_names() {
+         let text = format!(
+-            "{HEADER_TEXT}a\tone.c\t0x100\t4\tdata\t4\ttest\na\ttwo.c\t0x200\t4\tdata\t4\ttest\n"
++            "{HEADER_TEXT}a\tone.c\t0x100\t4\tdata\t4\t-\texternal\ttest\na\ttwo.c\t0x200\t4\tdata\t4\t-\texternal\ttest\n"
+         );
+         assert!(
+             parse(&text)
+@@ -340,7 +396,7 @@ mod tests {
+     #[test]
+     fn rejects_duplicate_rvas() {
+         let text = format!(
+-            "{HEADER_TEXT}a\tone.c\t0x100\t4\tdata\t4\ttest\nb\ttwo.c\t0x100\t4\tdata\t4\ttest\n"
++            "{HEADER_TEXT}a\tone.c\t0x100\t4\tdata\t4\t-\texternal\ttest\nb\ttwo.c\t0x100\t4\tdata\t4\t-\texternal\ttest\n"
+         );
+         assert!(
+             parse(&text)
+@@ -354,7 +410,7 @@ mod tests {
+     #[test]
+     fn rejects_overlaps_across_owner_objects() {
+         let text = format!(
+-            "{HEADER_TEXT}a\tone.c\t0x100\t0x20\tdata\t4\ttest\nb\ttwo.c\t0x110\t4\tdata\t4\ttest\n"
++            "{HEADER_TEXT}a\tone.c\t0x100\t0x20\tdata\t4\t-\texternal\ttest\nb\ttwo.c\t0x110\t4\tdata\t4\t-\texternal\ttest\n"
+         );
+         assert!(
+             parse(&text)
+@@ -368,27 +424,30 @@ mod tests {
+     #[test]
+     fn accepts_adjacent_extents_across_owner_objects() {
+         let text = format!(
+-            "{HEADER_TEXT}a\tone.c\t0x100\t0x20\tdata\t4\ttest\nb\ttwo.c\t0x120\t4\tdata\t4\ttest\n"
++            "{HEADER_TEXT}a\tone.c\t0x100\t0x20\tdata\t4\t-\texternal\ttest\nb\ttwo.c\t0x120\t4\tdata\t4\t-\texternal\ttest\n"
+         );
+         assert_eq!(parse(&text).unwrap().definitions().len(), 2);
+     }
+ 
+     #[test]
+     fn rejects_extent_overflow_and_zero_size() {
+-        let overflow = format!("a\tu.c\t{}\t2\tdata\t4\ttest", usize::MAX);
++        let overflow = format!("a\tu.c\t{}\t2\tdata\t4\t-\texternal\ttest", usize::MAX);
+         assert!(error(&overflow).contains("overflows"));
+-        assert!(error("a\tu.c\t0x100\t0\tdata\t4\ttest").contains("non-zero"));
++        assert!(error("a\tu.c\t0x100\t0\tdata\t4\t-\texternal\ttest").contains("non-zero"));
+     }
+ 
+     #[test]
+     fn rejects_zero_and_non_power_of_two_alignment() {
+-        assert!(error("a\tu.c\t0x100\t4\tdata\t0\ttest").contains("power of two"));
+-        assert!(error("a\tu.c\t0x100\t4\tdata\t3\ttest").contains("power of two"));
++        assert!(error("a\tu.c\t0x100\t4\tdata\t0\t-\texternal\ttest").contains("power of two"));
++        assert!(error("a\tu.c\t0x100\t4\tdata\t3\t-\texternal\ttest").contains("power of two"));
+     }
+ 
+     #[test]
+     fn resolves_interior_owner_and_addend_at_exact_boundaries() {
+-        let parsed = parse(&manifest("table\tu.c\t0x100\t0x20\tdata\t4\ttest")).unwrap();
++        let parsed = parse(&manifest(
++            "table\tu.c\t0x100\t0x20\tdata\t4\t-\texternal\ttest",
++        ))
++        .unwrap();
+         assert!(parsed.owner_and_addend_for_rva(0xff).is_none());
+         let (owner, addend) = parsed.owner_and_addend_for_rva(0x100).unwrap();
+         assert_eq!(owner.name.as_bytes(), b"table");
+diff --git a/src/main.rs b/src/main.rs
+index 81b8dab..5eaa31c 100644
+--- a/src/main.rs
++++ b/src/main.rs
+@@ -11,7 +11,7 @@ mod utils;
+ use crate::object_files::ObjectFiles;
+ use crate::pdb_symbols::PdbSymbols;
+ use crate::symbol_matcher::SymbolMatcher;
+-use crate::utils::{leak, ToUsize};
++use crate::utils::{ToUsize, leak};
+ 
+ use clap::Parser;
+ use object::LittleEndian;
+@@ -55,6 +55,12 @@ pub struct Cli {
+     /// Per-compiland PE contribution intervals used to disambiguate data owners.
+     #[arg(long, value_hint = clap::ValueHint::FilePath)]
+     pub contribution_manifest: Option<std::path::PathBuf>,
++
++    /// Compatibility mode: recover uncovered data relocations from permissive
++    /// nearest-symbol PDB heuristics. The strict candidate-manifest path is
++    /// preferred because this mode can retain synthetic const/string identities.
++    #[arg(long)]
++    pub recover_data_relocs_from_pdb: bool,
+ }
+ 
+ #[derive(Clone, Debug, Default, Copy)]
+@@ -85,6 +91,7 @@ fn main() -> anyhow::Result<()> {
+         read_symbol_map,
+         data_manifest,
+         contribution_manifest,
++        recover_data_relocs_from_pdb,
+     } = Cli::parse();
+ 
+     let exe: &[u8] = std::fs::read(exe_path)?.leak();
+@@ -110,6 +117,7 @@ fn main() -> anyhow::Result<()> {
+         read_symbol_map.as_deref(),
+         data_manifest.as_deref(),
+         contribution_manifest.as_deref(),
++        recover_data_relocs_from_pdb,
+     )?;
+ 
+     Ok(())
+@@ -125,6 +133,7 @@ fn process_executable<S: pdb2::Source<'static> + 'static>(
+     read_symbol_map: Option<&std::path::Path>,
+     data_manifest_path: Option<&std::path::Path>,
+     contribution_manifest_path: Option<&std::path::Path>,
++    recover_data_relocs_from_pdb: bool,
+ ) -> anyhow::Result<()> {
+     let env = Env::build(exe, &mut pdb)?;
+ 
+@@ -133,14 +142,14 @@ fn process_executable<S: pdb2::Source<'static> + 'static>(
+     let contribution_manifest =
+         contribution_manifest::ContributionManifest::load(contribution_manifest_path)?;
+ 
+-    let (coff_data, relocs_rva) =
+-        relocs::resolve_absolute_relocations(
+-            &env,
+-            exe,
+-            &pdb_symbols,
+-            &data_manifest,
+-            &contribution_manifest,
+-        )?;
++    let (coff_data, relocs_rva) = relocs::resolve_absolute_relocations(
++        &env,
++        exe,
++        &pdb_symbols,
++        &data_manifest,
++        &contribution_manifest,
++        recover_data_relocs_from_pdb,
++    )?;
+ 
+     // Base side reconciles its folded names against the target's recorded
+     // choices; the target side (and a plain run) just emits local defaults.
+diff --git a/src/object_files.rs b/src/object_files.rs
+index be70ef2..58d77ac 100644
+--- a/src/object_files.rs
++++ b/src/object_files.rs
+@@ -1,9 +1,10 @@
+-use crate::data_manifest::{DataDefinition, DataManifest, DataStorage};
++use crate::Env;
++use crate::contribution_manifest::ContributionStorage;
++use crate::data_manifest::{DataDefinition, DataManifest, DataScope, DataStorage};
+ use crate::pdb_symbols::PdbSymbols;
+ use crate::relocs::RelocKind;
+-use crate::symbol_matcher::{canonical_name, SymbolMatcher};
+-use crate::utils::{contains, leak, ToU64, ToUsize};
+-use crate::Env;
++use crate::symbol_matcher::{SymbolMatcher, canonical_name};
++use crate::utils::{ToU64, ToUsize, contains, leak};
+ 
+ use std::collections::{BTreeMap, HashMap, HashSet};
+ 
+@@ -362,7 +363,10 @@ fn resolve_relative_relocations<'s>(
+         let old_reloc = relocs_rva.insert(
+             fun_rva + offset_in_fun - 4,
+             // A decoded call/jmp/jcc target -> PC-relative branch.
+-            RelocKind::Function { overloads, relative: true },
++            RelocKind::Function {
++                overloads,
++                relative: true,
++            },
+         );
+ 
+         if let Some(old_reloc) = old_reloc {
+@@ -407,7 +411,10 @@ impl ObjectFile {
+         }
+ 
+         match reloc_kind {
+-            RelocKind::Function { overloads: _, relative } => {
++            RelocKind::Function {
++                overloads: _,
++                relative,
++            } => {
+                 self.add_relocation(reloc_name, ObjectLocation::Extern, reloc_offset, relative)?;
+             }
+ 
+@@ -458,11 +465,26 @@ impl ObjectFile {
+             RelocKind::Static {
+                 symbol: _,
+                 target_rva,
++                storage,
+             } => {
+-                let new_data =
+-                    bytemuck::pod_read_unaligned::<[u8; 4]>(&coff_data[target_rva..target_rva + 4]);
+-                let static_offset_in_coff_data =
+-                    self.append_section_data(self.data_section_id, &new_data, 0x00);
++                let static_offset_in_coff_data = if storage == ContributionStorage::Bss {
++                    let section_id = *self.bss_section_id.get_or_insert_with(|| {
++                        self.object.add_section(
++                            vec![],
++                            b".bss".into(),
++                            SectionKind::UninitializedData,
++                        )
++                    });
++                    ObjectOffset {
++                        offset: self.object.append_section_bss(section_id, 4, 1),
++                        section_id,
++                    }
++                } else {
++                    let new_data = bytemuck::pod_read_unaligned::<[u8; 4]>(
++                        &coff_data[target_rva..target_rva + 4],
++                    );
++                    self.append_section_data(self.data_section_id, &new_data, 0x00)
++                };
+                 self.add_relocation(
+                     reloc_name,
+                     ObjectLocation::Offset(static_offset_in_coff_data),
+@@ -471,18 +493,20 @@ impl ObjectFile {
+                 )?;
+ 
+                 // Same cycle guard as the Constant arm above.
+-                if let Some(reloc_kind) = relocs_rva.get(&target_rva) {
+-                    if visited.insert(target_rva) {
+-                        self.add_relocation_at(
+-                            *reloc_kind,
+-                            static_offset_in_coff_data,
+-                            matcher,
+-                            coff_data,
+-                            relocs_rva,
+-                            visited,
+-                            data_manifest,
+-                            true,
+-                        )?;
++                if storage != ContributionStorage::Bss {
++                    if let Some(reloc_kind) = relocs_rva.get(&target_rva) {
++                        if visited.insert(target_rva) {
++                            self.add_relocation_at(
++                                *reloc_kind,
++                                static_offset_in_coff_data,
++                                matcher,
++                                coff_data,
++                                relocs_rva,
++                                visited,
++                                data_manifest,
++                                true,
++                            )?;
++                        }
+                     }
+                 }
+             }
+@@ -496,7 +520,9 @@ impl ObjectFile {
+         definition: DataDefinition,
+         coff_data: &[u8],
+     ) -> anyhow::Result<()> {
+-        let definition_end = definition.rva.checked_add(definition.size)
++        let definition_end = definition
++            .rva
++            .checked_add(definition.size)
+             .ok_or_else(|| anyhow::anyhow!("reviewed data definition extent overflows"))?;
+         if definition_end > coff_data.len() {
+             anyhow::bail!("reviewed data definition is outside mapped PE image");
+@@ -520,31 +546,44 @@ impl ObjectFile {
+             },
+             DataStorage::Bss => {
+                 let section_id = *self.bss_section_id.get_or_insert_with(|| {
+-                    self.object.add_section(
+-                        vec![], b".bss".into(), SectionKind::UninitializedData)
++                    self.object
++                        .add_section(vec![], b".bss".into(), SectionKind::UninitializedData)
+                 });
+                 let offset = self.object.append_section_bss(
+                     section_id,
+                     definition.size.to_u64(),
+                     definition.alignment,
+                 );
+-                ObjectOffset {
+-                    offset,
+-                    section_id,
+-                }
++                ObjectOffset { offset, section_id }
+             }
+         };
++        if let Some(expected) = definition.section_offset {
++            if offset.offset.to_usize() != expected {
++                anyhow::bail!(
++                    "candidate data topology mismatch for {}: expected section offset {expected:#x}, emitted {:#x}",
++                    definition.name,
++                    offset.offset,
++                );
++            }
++        }
+         let symbol = self.object.add_symbol(object::write::Symbol {
+             name: definition.name.as_bytes().to_vec(),
+             value: offset.offset,
+             size: definition.size.to_u64(),
+             kind: object::SymbolKind::Data,
+-            scope: object::SymbolScope::Linkage,
++            scope: match definition.scope {
++                DataScope::External => object::SymbolScope::Linkage,
++                DataScope::Local => object::SymbolScope::Compilation,
++            },
+             weak: false,
+             section: object::write::SymbolSection::Section(offset.section_id),
+             flags: object::SymbolFlags::None,
+         });
+-        if self.symbols.insert(definition.name.as_bytes().to_vec(), symbol).is_some() {
++        if self
++            .symbols
++            .insert(definition.name.as_bytes().to_vec(), symbol)
++            .is_some()
++        {
+             anyhow::bail!("duplicate reviewed data definition in owner object");
+         }
+         self.data_offsets.insert(definition.rva, offset);
+@@ -706,9 +745,25 @@ impl<'a> RelocKind<'a> {
+             Self::Static {
+                 symbol: reloc_name,
+                 target_rva: _,
++                storage: _,
+             } => Name::Borrowed(reloc_name),
+         }
+     }
++
++    #[cfg(test)] fn recovered_data_storage(self) -> Option<DataStorage> {
++        match self {
++            Self::ConstantString { .. } | Self::Constant { .. } => Some(DataStorage::Rdata),
++            Self::Static {
++                storage: ContributionStorage::Data,
++                ..
++            } => Some(DataStorage::Data),
++            Self::Static {
++                storage: ContributionStorage::Bss,
++                ..
++            } => Some(DataStorage::Bss),
++            _ => None,
++        }
++    }
+ }
+ 
+ impl Name<'_> {
+@@ -731,6 +786,30 @@ impl std::ops::Add<usize> for ObjectOffset {
+     }
+ }
+ 
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    #[test]
++    fn permissive_pdb_recovery_preserves_all_data_storage_classes() {
++        let symbol: RawString<'static> = b"fixture".as_slice().into();
++        let rdata = RelocKind::Constant { symbol, target_rva: 0x100 };
++        let data = RelocKind::Static {
++            symbol,
++            target_rva: 0x200,
++            storage: ContributionStorage::Data,
++        };
++        let bss = RelocKind::Static {
++            symbol,
++            target_rva: 0x300,
++            storage: ContributionStorage::Bss,
++        };
++        assert_eq!(rdata.recovered_data_storage(), Some(DataStorage::Rdata));
++        assert_eq!(data.recovered_data_storage(), Some(DataStorage::Data));
++        assert_eq!(bss.recovered_data_storage(), Some(DataStorage::Bss));
++    }
++}
++
+ // Always pads to 4
+ fn append_with_padding(
+     object: &mut object::write::Object,
+diff --git a/src/relocs.rs b/src/relocs.rs
+index 472e1a5..24ddc13 100644
+--- a/src/relocs.rs
++++ b/src/relocs.rs
+@@ -1,8 +1,8 @@
+-use crate::data_manifest::DataManifest;
++use crate::Env;
+ use crate::contribution_manifest::{ContributionManifest, ContributionStorage};
++use crate::data_manifest::{DataManifest, DataStorage};
+ use crate::pdb_symbols;
+ use crate::utils::ToUsize;
+-use crate::Env;
+ 
+ use pdb2::RawString;
+ 
+@@ -36,6 +36,7 @@ pub enum RelocKind<'a> {
+     Static {
+         symbol: RawString<'static>,
+         target_rva: usize,
++        storage: ContributionStorage,
+     },
+ }
+ 
+@@ -128,6 +129,7 @@ pub fn resolve_absolute_relocations<'s>(
+     symbols: &'s pdb_symbols::PdbSymbols,
+     data_manifest: &DataManifest,
+     contributions: &ContributionManifest,
++    recover_data_relocs_from_pdb: bool,
+ ) -> anyhow::Result<(Vec<u8>, BTreeMap<usize, RelocKind<'s>>)> {
+     let Some(reloc_sec) = exe.section_by_name(".reloc") else {
+         anyhow::bail!("Missing .reloc section");
+@@ -205,19 +207,37 @@ pub fn resolve_absolute_relocations<'s>(
+                     {
+                         let diff = u32::try_from(addend)?;
+                         coff_data_reloc.copy_from_slice(&diff.to_le_bytes());
+-                        relocs_rva.insert(reloc_rva, RelocKind::Constant {
+-                            symbol: owner.name,
+-                            target_rva,
+-                        });
++                        relocs_rva.insert(
++                            reloc_rva,
++                            RelocKind::Constant {
++                                symbol: owner.name,
++                                target_rva,
++                            },
++                        );
+                         continue;
+                     }
+-                    match symbols.strings.range(..=target_rva).rev().find(|(string_rva, _)| {
+-                        contributions.same_owner(
+-                            ContributionStorage::Rdata,
+-                            **string_rva,
+-                            target_rva,
+-                        )
+-                    }) {
++                    if !recover_data_relocs_from_pdb {
++                        if let Some(object) =
++                            contributions.owner_for_rva(ContributionStorage::Rdata, target_rva)
++                        {
++                            if data_manifest.is_closed(object, DataStorage::Rdata) {
++                                anyhow::bail!(
++                                    "closed candidate .rdata contribution has no allocation owning RVA {target_rva:#x}"
++                                );
++                            }
++                        }
++                    }
++                    match symbols
++                        .strings
++                        .range(..=target_rva)
++                        .rev()
++                        .find(|(string_rva, _)| {
++                            contributions.same_owner(
++                                ContributionStorage::Rdata,
++                                **string_rva,
++                                target_rva,
++                            )
++                        }) {
+                         Some((string_rva, (string_mangled_name, string)))
+                             if target_rva - string_rva < string.len() =>
+                         {
+@@ -234,14 +254,12 @@ pub fn resolve_absolute_relocations<'s>(
+                         }
+ 
+                         Some(_) | None => {
+-                            let Some((constant_rva, constant_name)) =
+-                                closest_data_symbol(
+-                                    &symbols.constants,
+-                                    target_rva,
+-                                    ContributionStorage::Rdata,
+-                                    contributions,
+-                                )
+-                            else {
++                            let Some((constant_rva, constant_name)) = closest_data_symbol(
++                                &symbols.constants,
++                                target_rva,
++                                ContributionStorage::Rdata,
++                                contributions,
++                            ) else {
+                                 anyhow::bail!(
+                                     "no .rdata symbol in contribution owning RVA {target_rva:#x}"
+                                 );
+@@ -256,10 +274,9 @@ pub fn resolve_absolute_relocations<'s>(
+                                 contributions,
+                             )? {
+                                 Some((addend, owner)) => (addend, owner),
+-                                None => (
+-                                    u32::try_from(target_rva - *constant_rva)?,
+-                                    *constant_name,
+-                                ),
++                                None => {
++                                    (u32::try_from(target_rva - *constant_rva)?, *constant_name)
++                                }
+                             };
+                             coff_data_reloc.copy_from_slice(&diff.to_le_bytes());
+ 
+@@ -277,12 +294,23 @@ pub fn resolve_absolute_relocations<'s>(
+                     if let Some((owner, addend)) =
+                         data_manifest.owner_and_addend_for_rva(target_rva)
+                     {
++                        let storage = match owner.storage {
++                            DataStorage::Bss => ContributionStorage::Bss,
++                            DataStorage::Data => ContributionStorage::Data,
++                            DataStorage::Rdata => {
++                                anyhow::bail!(".rdata manifest owner lies in writable PE storage")
++                            }
++                        };
+                         let diff = u32::try_from(addend)?;
+                         coff_data_reloc.copy_from_slice(&diff.to_le_bytes());
+-                        relocs_rva.insert(reloc_rva, RelocKind::Static {
+-                            symbol: owner.name,
+-                            target_rva,
+-                        });
++                        relocs_rva.insert(
++                            reloc_rva,
++                            RelocKind::Static {
++                                symbol: owner.name,
++                                target_rva,
++                                storage,
++                            },
++                        );
+                         continue;
+                     }
+                     let storage = contributions
+@@ -294,13 +322,22 @@ pub fn resolve_absolute_relocations<'s>(
+                             )
+                         })
+                         .unwrap_or(ContributionStorage::Data);
++                    if !recover_data_relocs_from_pdb {
++                        if let Some(object) = contributions.owner_for_rva(storage, target_rva) {
++                            let manifest_storage = match storage {
++                                ContributionStorage::Data => DataStorage::Data,
++                                ContributionStorage::Bss => DataStorage::Bss,
++                                _ => unreachable!(),
++                            };
++                            if data_manifest.is_closed(object, manifest_storage) {
++                                anyhow::bail!(
++                                    "closed candidate writable contribution has no allocation owning RVA {target_rva:#x}"
++                                );
++                            }
++                        }
++                    }
+                     let Some((static_rva, static_name)) =
+-                        closest_data_symbol(
+-                            &symbols.statics,
+-                            target_rva,
+-                            storage,
+-                            contributions,
+-                        )
++                        closest_data_symbol(&symbols.statics, target_rva, storage, contributions)
+                     else {
+                         let _reloc_va = reloc_rva + env.image_base.to_usize();
+                         // @TODO: There is a "single" unnamed static relocation in base, which is a
+@@ -317,10 +354,7 @@ pub fn resolve_absolute_relocations<'s>(
+                         contributions,
+                     )? {
+                         Some((addend, owner)) => (addend, owner),
+-                        None => (
+-                            u32::try_from(target_rva - *static_rva)?,
+-                            *static_name,
+-                        ),
++                        None => (u32::try_from(target_rva - *static_rva)?, *static_name),
+                     };
+                     coff_data_reloc.copy_from_slice(&diff.to_le_bytes());
+ 
+@@ -329,6 +363,7 @@ pub fn resolve_absolute_relocations<'s>(
+                         RelocKind::Static {
+                             symbol: reloc_name,
+                             target_rva,
++                            storage,
+                         },
+                     );
+                 }
+@@ -371,10 +406,9 @@ mod tests {
+     #[test]
+     fn canonical_alias_decodes_and_validates() {
+         let owner: RawString<'static> = b"?gConfig@@3UconfigStruct@@A".as_slice().into();
+-        let alias: RawString<'static> =
+-            b"__homm2_data_alias$00000030$?gConfig@@3UconfigStruct@@A"
+-                .as_slice()
+-                .into();
++        let alias: RawString<'static> = b"__homm2_data_alias$00000030$?gConfig@@3UconfigStruct@@A"
++            .as_slice()
++            .into();
+         let mut symbols = BTreeMap::new();
+         symbols.insert(0x128d20, owner);
+         symbols.insert(0x128d50, alias);
+@@ -397,10 +431,9 @@ mod tests {
+     #[test]
+     fn canonical_alias_rejects_wrong_addend() {
+         let owner: RawString<'static> = b"?gConfig@@3UconfigStruct@@A".as_slice().into();
+-        let alias: RawString<'static> =
+-            b"__homm2_data_alias$0000001C$?gConfig@@3UconfigStruct@@A"
+-                .as_slice()
+-                .into();
++        let alias: RawString<'static> = b"__homm2_data_alias$0000001C$?gConfig@@3UconfigStruct@@A"
++            .as_slice()
++            .into();
+         let mut symbols = BTreeMap::new();
+         symbols.insert(0x128d20, owner);
+         symbols.insert(0x128d50, alias);
