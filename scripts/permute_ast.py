@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """permute_ast.py - libclang (clang.cindex) permutation-search hill-climber.
 
-Same idea as scripts/permute.py (candidate source mutations -> real MSVC 4.2
--> objdiff score -> keep improvements), but the mutator walks the REAL clang AST instead of
-regexes. Because libclang gives the exact source RANGE of each operand sub-expression (it
+Candidate source mutations are compiled with real MSVC 4.2, scored with objdiff, and retained
+only when they improve the target without regressing siblings. The mutator walks the real clang
+AST instead of regexes. Because libclang gives the exact source RANGE of each operand sub-expression (it
 knows `b*c` and `(x+y)` are single operands, and knows precedence/parens), swapping two
 operand ranges is CORRECT BY CONSTRUCTION - the precedence-crossing false-match class that
 the regex tool needed a conservative guard for simply cannot occur here.
@@ -71,7 +71,7 @@ _ARGS = _clang_args()
 _INDEX = ci.Index.create()
 
 
-# ---- objdiff scoring (identical to permute.py) -----------------------------------
+# ---- objdiff scoring -------------------------------------------------------------
 def _symmap(d):
     return {s["name"]: s["match_percent"] for s in d.get("right", {}).get("symbols", [])
             if isinstance(s.get("name"), str) and s.get("match_percent") is not None}

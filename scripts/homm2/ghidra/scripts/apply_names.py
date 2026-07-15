@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # apply_names.py - seed the Ghidra DB with OUR CodeView names ("set the symbols we know").
 #
-# CodeView (build/gen/symbol_names.csv) is authoritative: every game function's start,
-# size and (mangled) name is ground truth. This creates a function at each func RVA Ghidra
-# missed and applies the demangled name, so:
+# CodeView is authoritative for each retained public name and start RVA. Recovered boundaries
+# and ownership are carried in build/gen/symbol_names.csv. This creates a function at each RVA
+# Ghidra missed and applies the demangled name, so:
 #   - functions.csv carries real names for game funcs (Ghidra fills the library remainder), and
-#   - `homm2 sema decomp` output reads with real names instead of FUN_xxxx.
+#   - decompiler output reads with real names instead of FUN_xxxx.
 # No structs/prototypes/enums - names only (that's all decomp readability needs). One-shot;
 # nothing is discovered.
 #
