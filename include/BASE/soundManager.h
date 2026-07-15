@@ -26,6 +26,23 @@ typedef enum SoundVolumeConversionMode {
     SOUND_VOLUME_EFFECT = 100,
     SOUND_VOLUME_MUSIC = 101
 } SoundVolumeConversionMode;
+
+typedef enum SoundSampleOperation {
+    SOUND_SAMPLE_OPERATION_VOLUME = 1,
+    SOUND_SAMPLE_OPERATION_START = 5,
+    SOUND_SAMPLE_OPERATION_EFFECT_VOLUME = 100,
+    SOUND_SAMPLE_OPERATION_MUSIC_VOLUME = 101
+} SoundSampleOperation;
+
+typedef enum SoundDigitalReportQuery {
+    SOUND_DIGITAL_REPORT_VOLUME = 1,
+    SOUND_DIGITAL_REPORT_PLAYING = 4
+} SoundDigitalReportQuery;
+
+typedef enum SoundSampleStatus {
+    SOUND_SAMPLE_STATUS_DONE = 2,
+    SOUND_SAMPLE_STATUS_PLAYING = 4
+} SoundSampleStatus;
 // forward declarations:
 class sample;
 struct _SAMPLE;
