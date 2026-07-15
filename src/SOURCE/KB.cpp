@@ -7405,25 +7405,240 @@ DATA(0x004fefb0) char *gColors[HERO_CLASS_COUNT] = {
     "orange",
     "purple"
 };
-DATA(0x004fefc8) char *gMonthNames[10];
-DATA(0x004feff0) char *gWeekNames[16];
-DATA(0x004ff030) char *cHeroScreen[26];
-DATA(0x004ff098) char *cCastleInfo[16];
-DATA(0x004ff0d8) char *cLuckInfo[22];
-DATA(0x004ff130) char *IQnames[6];
-DATA(0x004ff148) char *cSpellHelp[10];
-DATA(0x004ff170) char *speedText[10];
-DATA(0x004ff198) char *cArmyDetail[10];
-DATA(0x004ff1c0) char *cWellDetail[10];
-DATA(0x004ff1e8) char *cKingdomOverview[4];
-DATA(0x004ff1f8) char *cNewTurn[8];
-DATA(0x004ff218) char *cViewGeneralLabels[8];
-DATA(0x004ff238) char *cViewGeneralHelp[8];
-DATA(0x004ff258) char *cViewGeneralLongHelp[4];
-DATA(0x004ff268) char *cCombatMessage[12];
-DATA(0x004ff298) char *cHeroLevel[4];
-DATA(0x004ff2a8) char *cCombatHelp[6];
-DATA(0x004ff2c0) char *cLongCombatHelp[6];
+DATA(0x004fefc8) char *gMonthNames[KB_MONTH_NAME_COUNT] = {
+    "Grasshopper",
+    "Ant",
+    "Dragonfly",
+    "Spider",
+    "Butterfly",
+    "Bumblebee",
+    "Locust",
+    "Earthworm",
+    "Hornet",
+    "Beetle"
+};
+DATA(0x004feff0) char *gWeekNames[KB_WEEK_NAME_COUNT] = {
+    "Squirrel",
+    "Rabbit",
+    "Gopher",
+    "Badger",
+    "Rat",
+    "Eagle",
+    "Weasel",
+    "Raven",
+    "Mongoose",
+    "Dog",
+    "Aardvark",
+    "Lizard",
+    "Tortoise",
+    "Hedgehog",
+    "Condor",
+    0
+};
+DATA(0x004ff030) char *cHeroScreen[KB_HERO_SCREEN_TEXT_COUNT] = {
+    "Kingdom Overview",
+    "View %s Info",
+    "Additional hero characteristics",
+    "View Good Morale Info",
+    "View Neutral Morale Info",
+    "View Bad Morale Info",
+    "View Good Luck Info",
+    "View Neutral Luck Info",
+    "View Bad Luck Info",
+    "View Experience Info",
+    "Select %s",
+    "Empty",
+    "Move %s",
+    "Exchange %s with %s",
+    "View Spells",
+    "View %s Info",
+    "Dismiss %s the %s",
+    "Exit Hero Screen",
+    "Hero Screen",
+    "Combine %s",
+    "Split %s",
+    "View %s %s Info",
+    "View Spell Points Info",
+    "Set army combat formation to 'Spread'",
+    "Set army combat formation to 'Grouped'",
+    0
+};
+DATA(0x004ff098) char *cCastleInfo[KB_CASTLE_INFO_TEXT_COUNT] = {
+    "Build Mage Guild",
+    "Mage Guild is at highest level.",
+    "Cannot afford next level.",
+    "Add another level to Mage Guild",
+    "%s is already built",
+    "Cannot build %s",
+    "Cannot afford %s",
+    "Build %s",
+    "Cannot afford a Hero.",
+    "Cannot recruit - you already have %d Heroes.",
+    "Cannot recruit - you already have a Hero in this town.",
+    "Recruit %s the %s",
+    "Exit Castle",
+    "Castle Options",
+    "Set garrison combat formation to 'Grouped'",
+    "Set garrison combat formation to 'Spread'"
+};
+DATA(0x004ff0d8) char *cLuckInfo[KB_LUCK_INFO_TEXT_COUNT] = {
+    "{Good Luck}\n\nGood luck sometimes lets your armies get lucky attacks (double strength) in combat.",
+    "{Neutral Luck}\n\nNeutral luck means your armies will never get lucky or unlucky attacks on the enemy.",
+    "{Bad Luck}\n\nBad luck sometimes falls on your armies in combat, causing their attacks to only do half damage.",
+    "%s\n\n\nCurrent Luck Modifiers:",
+    "\nLucky Rabbit's Foot +1",
+    "\nGolden Horseshoe +1",
+    "\nGambler's Lucky Coin +1",
+    "\nFour-Leaf Clover +1",
+    "\nFaerie ring visited +1",
+    "\nFountain visited +1",
+    "\nnone",
+    "\nTomb robber -1",
+    "\nSorceress Rainbow +2",
+    "\nIdol visited +1",
+    "\nPyramid raided -2",
+    "\nBasic Luck +1",
+    "\nAdvanced Luck +2",
+    "\nExpert Luck +3",
+    "\nMasthead bonus at sea +1",
+    "\nMermaid visited +1",
+    "\nBattle Garb of Anduran gives you maximum luck.",
+    0
+};
+DATA(0x004ff130) char *IQnames[KB_IQ_NAME_COUNT] = {
+    "None",
+    "Dumb",
+    "Average",
+    "Smart",
+    "Genius",
+    0
+};
+DATA(0x004ff148) char *cSpellHelp[KB_SPELL_HELP_TEXT_COUNT] = {
+    "View previous page",
+    "View next page",
+    "View adventure Spells",
+    "View Combat Spells",
+    "Close Spellbook",
+    "View Spells",
+    "Select Spell",
+    "View Combat Spells",
+    "Your hero has %d spell points remaining",
+    0
+};
+DATA(0x004ff170) char *speedText[KB_SPEED_TEXT_COUNT] = {
+    "",
+    "Crawling",
+    "Very slow",
+    "Slow",
+    "Average",
+    "Fast",
+    "Very Fast",
+    "Ultra Fast",
+    "Blazing",
+    "Instant"
+};
+DATA(0x004ff198) char *cArmyDetail[KB_ARMY_DETAIL_TEXT_COUNT] = {
+    "Attack Skill: ",
+    "Defense Skill: ",
+    "Shots left: ",
+    "Damage: ",
+    "Hit Points: ",
+    "Speed: ",
+    "Morale: ",
+    "Luck: ",
+    "Shots: ",
+    0
+};
+DATA(0x004ff1c0) char *cWellDetail[KB_WELL_DETAIL_TEXT_COUNT] = {
+    "Attack: ",
+    "Defense: ",
+    "Shots: ",
+    "Damg: ",
+    "HP: ",
+    "Speed: ",
+    "Available: ",
+    "\n\nSpeed:\n%s",
+    "\n\nGrowth\n + %d / week",
+    0
+};
+DATA(0x004ff1e8) char *cKingdomOverview[KB_KINGDOM_OVERVIEW_TEXT_COUNT] = {
+    "Kingdom Overview     Month %d, Week %d, Day %d",
+    "You own Dragon City.",
+    "You own the Lighthouse.",
+    0
+};
+DATA(0x004ff1f8) char *cNewTurn[KB_NEW_TURN_TEXT_COUNT] = {
+    "%s, you only have %d days left to capture a town, or you will be banished from this land.",
+    "%s, this is your last day to capture a town, or you will be banished from this land.",
+    "Astrologers proclaim month of the %s.\n\nAll dwellings increase population.",
+    "Astrologers proclaim month of the %s.\n\n%s population doubles!\n\nAll dwellings increase population.",
+    "Astrologers proclaim month of the PLAGUE!\n\nAll populations are halved.",
+    "Astrologers proclaim week of the %s.\n\nAll dwellings increase population.",
+    "Astrologers proclaim week of the %s.\n\n%s growth +5.\n\nAll dwellings increase population.",
+    0
+};
+DATA(0x004ff218) char *cViewGeneralLabels[KB_VIEW_GENERAL_LABEL_COUNT] = {
+    "Attack: ",
+    "Defense: ",
+    "Spell Power: ",
+    "Knowledge: ",
+    "Morale: ",
+    "Luck: ",
+    "Spell Points: ",
+    0
+};
+DATA(0x004ff238) char *cViewGeneralHelp[KB_VIEW_GENERAL_HELP_COUNT] = {
+    "Stop Catapult",
+    "Cast Spell",
+    "Retreat",
+    "Surrender",
+    "Cancel",
+    "Hero's Options",
+    "Captain's Options",
+    0
+};
+DATA(0x004ff258) char *cViewGeneralLongHelp[KB_VIEW_GENERAL_LONG_HELP_COUNT] = {
+    "{Cast Spell}\n\nCast a magical spell.  You may only cast one spell per combat round.  The round is reset when every creature has had a turn.",
+    "{Retreat}\n\nRetreat your hero, abandoning your creatures.  Your hero will be available for you to recruit again, however, the hero will have only a novice hero's forces.",
+    "{Surrender}\n\nSurrendering costs gold.  However, if you pay the ransom, the hero and all of his or her surviving creatures will be available to recruit again.",
+    "{Cancel}\n\nReturn to the battle."
+};
+DATA(0x004ff268) char *cCombatMessage[KB_COMBAT_MESSAGE_COUNT] = {
+    "",
+    "Move %s here.",
+    "Fly %s here.",
+    "Attack %s",
+    "Shoot %s(%d shot(s) left)",
+    "Hero's Options",
+    "View Opposing Hero",
+    "View %s info.",
+    "No shots left!",
+    "Captain's Options",
+    "View Opposing Captain",
+    "View Ballista Info"
+};
+DATA(0x004ff298) char *cHeroLevel[KB_HERO_LEVEL_TEXT_COUNT] = {
+    "%s has gained",
+    " a level.\n",
+    " %d levels.\n",
+    0
+};
+DATA(0x004ff2a8) char *cCombatHelp[KB_COMBAT_HELP_COUNT] = {
+    "Wait for other units to go.",
+    "Skip this unit",
+    "Auto combat",
+    "Customize system options.",
+    "",
+    0
+};
+DATA(0x004ff2c0) char *cLongCombatHelp[KB_LONG_COMBAT_HELP_COUNT] = {
+    "{Wait}\n\nHave the current creature wait to take its turn until all the other creatures have gone.  The creature does not lose its turn.",
+    "{Skip}\n\nSkips the current creature.  The current creature loses its turn and does not get to go again until the next round.",
+    "{Auto Combat}\n\nAllows the computer to fight out the battle for you.",
+    "{System Options}\n\nAllows you to customize the combat screen.",
+    "{Message Bar}\n\nShows the results of individual monster's actions.",
+    0
+};
 DATA(0x004ff2d8) char *cTownCommand[28] = {
     "Redistribute %s army",
     "Cannot combine hero's last army",
@@ -7465,7 +7680,16 @@ DATA(0x004ff348) char *gHeroDefaultNames[54] = {
     "Mandigal", "Zom", "Darlana", "Zam", "Ranloo", "Charity", "Rialdo",
     "Roxana", "Sandro", "Celia"
 };
-DATA(0x004ff420) char *gNewGameHelp[8];
+DATA(0x004ff420) char *gNewGameHelp[KB_NEW_GAME_HELP_COUNT] = {
+    "{Game Difficulty}\n\nThis lets you change the starting difficulty at which you will play.  Higher difficulty levels start you off with fewer resources, and at the higher settings, give extra resources to the computer.",
+    "{Handicap}\n\nThis lets you change the handicap of a particular player.  Only humans may be handicapped.  Handicapped players start with fewer resources and earn 15 or 30% fewer resources per turn for mild and severe handicaps, respectively.",
+    "{Opponents}\n\nThis lets you change player starting positions and colors.  A particular color will always start in a particular location.  Some positions may only be played by a computer player or only by a human player.",
+    "{Class}\n\nThis lets you change the class of a player.  Classes are not always changeable.  Depending on the scenario, a player may receive additional towns and/or heroes not of their primary alignment.",
+    "{Scenario}\n\nClick here to select which scenario to play.",
+    "{Difficulty Rating}\n\nThe difficulty rating reflects a combination of various settings for your game.  This number will be applied to your final score.",
+    "{OK}\n\nClick to accept these settings and start a new game.",
+    "{Cancel}\n\nClick to return to the main menu."
+};
 DATA(0x004ff440) char *gSetupBaudHelp[6];
 DATA(0x004ff458) char *gSetupComPortHelp[6];
 DATA(0x004ff470) char *gSetupDCBaudHelp[6];
