@@ -999,6 +999,9 @@ void LogTruncate(void)
     }
 }
 
+// LogTruncate matching history: `strchr(logText, '\0')` emitted an out-of-line call
+// and regressed to 84.98%; it is not a viable spelling for the retail inline scan.
+
 // @match-note
 // Structurally complete /O2 checkpoint: the 0x1f4 frame, CFG and external targets
 // agree. The newline append is base +0x53..+0x73 versus retail
@@ -1029,9 +1032,9 @@ void LogStr(char *text)
 // all seven sprintf call/format branches agree. Only the newline
 // append differs (base +0x1c9..+0x1f2, retail +0x1c9..+0x1ec), followed by the
 // unnamed retail OutputDebugString IAT operand at +0x211. Direct word, strcat,
-// strcpy-at-strlen, memcpy and manual end-scan spellings were tried. At integrated
-// head 56a50b7, strcat regressed to 88.81%; a fresh bounded libclang AST pass found
-// 10 single variants and retained none after 30 walks with all 144 siblings pinned.
+// strcpy-at-strlen, memcpy and manual end-scan spellings were tried. Strcat regressed
+// to 88.81%; a bounded libclang AST pass retained none after 30 walks, and 24 reversible
+// predecessor/TU-state probes produced no exact closure or eligible score change.
 VA(0x004c61c0, 0x224)
 void LogInt(char *label, int value1, int value2, int value3, int value4, int value5,
             int value6, int value7)
@@ -1276,8 +1279,7 @@ long int FileSize(char *filename)
 VA(0x004c6920, 0xc)
 struct IconEntry * GetIconEntry(class icon *iconPtr, int index)
 {
-    IconEntry *entries = reinterpret_cast<IconEntry *>(iconPtr->m_data);
-    return &entries[index];
+    return reinterpret_cast<IconEntry *>(iconPtr->m_data) + index;
 }
 
 #include <BASE/SeededRandomConstants.h>
@@ -1285,12 +1287,14 @@ struct IconEntry * GetIconEntry(class icon *iconPtr, int index)
 // @match-note
 // Structurally complete /O2 checkpoint: base and retail are both 0xb8 with the same
 // seeded-random CFG and all 3 ordered relocations. Moving the result lifetime before
-// the mix raised the retained maximum from 67.80% to 91.87%. After splitting the RNG
-// and later data-entry enum domains at their real boundaries, live is 91.67%: the bit
-// test has the symmetric operand encoding, then base folds and publishes nextSeed
-// before the range division while retail incrementally forms it in EDI and stores it
-// after idiv. Direct term locals, folded/incremental seed arithmetic, explicit bit-loop
-// forms, commuted bit tests and a volatile seed store were checked.
+// the mix raised the retained maximum from 67.80% to 91.87%. Reusing `mix` for the
+// post-loop seed and naming the range restores retail's first `add edi,esi`; live is
+// 91.87%. The bit test still has the symmetric operand encoding, then base folds the
+// high contribution into ECX and stores before idiv while retail keeps EDI live and
+// stores after idiv. Direct term locals, folded/incremental seed arithmetic, both
+// final-update orders, explicit bit-loop forms, commuted bit tests and a volatile seed
+// store were checked. In-place modulo regressed to 88.13%; 24 reversible TU-state
+// probes found no exact closure, so every generated variant was discarded.
 VA(0x004c6930, 0xb8)
 int SRandom(int low, int high)
 {
@@ -1317,30 +1321,24 @@ int SRandom(int low, int high)
             result |= 1 << i;
         }
     }
-    int nextSeed = mix + low;
-    nextSeed += high * 8;
-    int rangedResult = low + result % (high - low + 1);
-    iLastSeed = nextSeed;
+    mix += low;
+    int range = high - low;
+    mix += high * 8;
+    int rangedResult = low + result % (range + 1);
+    iLastSeed = mix;
     return rangedResult;
 }
 
-// @match-note
-// Structurally complete /O2 checkpoint: base is 0x58 bytes, retail 0x5c and both
-// ordered relocations agree. The complete span differs only in allocation/scheduling:
-// base preserves EDI, loads the seed early and uses EDX/ESI for terms; retail preserves
-// EBP, derives x then y into ESI/EDX, and holds the seed in ECX. Split term locals,
-// in-place y, local/single-expression seeds, x-first updates, and folded multiply/add
-// expressions were checked; at integrated head b8c73ff the local-seed retest regressed
-// to 46.53%. The named algorithm constants, state arithmetic and final store remain
-// instruction-equivalent.
 VA(0x004c69f0, 0x5c)
 void SIncRandomize(int x, int y)
 {
-    int xTerm = (x * SEEDED_RANDOM_TERM_MULTIPLIER) & SEEDED_RANDOM_TERM_MASK;
-    int yTerm = (y * SEEDED_RANDOM_TERM_MULTIPLIER) & SEEDED_RANDOM_TERM_MASK;
-    iLastSeed += yTerm << SEEDED_RANDOM_HIGH_TERM_SHIFT;
-    iLastSeed += xTerm * SEEDED_RANDOM_LOW_TERM_MULTIPLIER;
-    iLastSeed += yTerm;
+    x *= SEEDED_RANDOM_TERM_MULTIPLIER;
+    x &= SEEDED_RANDOM_TERM_MASK;
+    y *= SEEDED_RANDOM_TERM_MULTIPLIER;
+    y &= SEEDED_RANDOM_TERM_MASK;
+    iLastSeed += y << SEEDED_RANDOM_HIGH_TERM_SHIFT;
+    iLastSeed += x * SEEDED_RANDOM_LOW_TERM_MULTIPLIER;
+    iLastSeed += y;
     iLastSeed += (iLastSeed & SEEDED_RANDOM_FEEDBACK_MASK) << SEEDED_RANDOM_FEEDBACK_SHIFT;
 }
 
@@ -1357,8 +1355,10 @@ void SRand(int seed)
 // iLastSeed store: base placed it before the bit loop and retail after `dec ecx` inside
 // the loop. Splitting the RNG/data-entry enum domains leaves live at 90.18% with one
 // additional symmetric `test` operand encoding. for/do-while placement, commuted bit
-// tests and a volatile store were tried; volatile spills the mix and caused broad TU
-// regressions, while nonvolatile forms are hoisted.
+// tests, assignment in the loop condition and a volatile store were tried; the condition
+// spelling was byte-neutral, volatile spills the mix, and nonvolatile forms are hoisted.
+// Twenty-four reversible predecessor/TU-state probes found no exact closure; their
+// sub-100 disposable improvement was discarded.
 VA(0x004c6a60, 0x48)
 int SGenRand(void)
 {
