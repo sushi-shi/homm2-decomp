@@ -20,14 +20,13 @@ int combatManager::DoSpellAI(int side, int restricted)
     if (m_heroes[side] == 0)
         return 0;
 
-    int heroSide;
-    for (heroSide = 0; heroSide < COMBAT_SIDE_COUNT; heroSide++) {
-        if (m_heroes[heroSide] != 0 &&
-            m_heroes[heroSide]->HasArtifact(SPELL_ARTIFACT_SPHERE_NEGATION))
+    int spell;
+    for (spell = 0; spell < COMBAT_SIDE_COUNT; spell++) {
+        if (m_heroes[spell] != 0 &&
+            m_heroes[spell]->HasArtifact(SPELL_ARTIFACT_SPHERE_NEGATION))
             return 0;
     }
 
-    int spell;
     for (spell = 0; spell < COMBAT_SPELL_COUNT; spell++) {
         if (m_heroes[side]->HasSpell(spell) &&
             (gsSpellInfo[spell].m_e & SPELL_ATTRIBUTE_COMBAT) &&
@@ -50,7 +49,7 @@ int combatManager::DoSpellAI(int side, int restricted)
                 manaRatio = COMBAT_SPELL_AI_MAX_MANA_RATIO;
             effect = static_cast<int>(effect * gfSpellCastableCombatMod[manaRatio]);
 
-            if (bestEffect < effect) {
+            if (effect > bestEffect) {
                 bestEffect = effect;
                 bestSpell = spell;
                 bestHex = hex;
@@ -711,17 +710,17 @@ int combatManager::RawEffectSpellInfluence(army *target, int influence)
     case ARMY_SPELL_INFLUENCE_HASTE:
     case ARMY_SPELL_INFLUENCE_SLOW: {
         int newSpeed;
-        if (influence == ARMY_SPELL_INFLUENCE_HASTE) {
+        if (influence == ARMY_SPELL_INFLUENCE_SLOW) {
+            newSpeed = (target->m_monster.speed + 1) >> 1;
+        } else {
             newSpeed = target->m_monster.speed +
                        COMBAT_SPELL_AI_HASTE_SPEED_BONUS;
-            if (target->m_monster.flags.bytes.abilities & 2)
+            if (target->m_monster.flags.all & MONSTER_FLAGS_FLYING)
                 return 0;
-        } else {
-            newSpeed = (target->m_monster.speed + 1) >> 1;
         }
         if (m_inCastleCombat && target->m_side == 1)
             return 0;
-        if (target->m_monster.flags.bytes.abilities & 4)
+        if (target->m_monster.flags.all & MONSTER_FLAGS_SHOOTER)
             return 0;
         int attackMask = target->GetAttackMask(target->m_hex, 1, -1);
         if (attackMask != COMBAT_SPELL_AI_ALL_ATTACK_DIRECTIONS)
@@ -740,7 +739,7 @@ int combatManager::RawEffectSpellInfluence(army *target, int influence)
             distance += COMBAT_SPELL_AI_CASTLE_DISTANCE_BONUS;
 
         float oldTurns;
-        if (target->m_monster.flags.bytes.abilities & 2)
+        if (target->m_monster.flags.all & MONSTER_FLAGS_FLYING)
             oldTurns = COMBAT_SPELL_AI_FULL_EFFECT_MODIFIER;
         else
             oldTurns = static_cast<float>(distance) / target->m_monster.speed;
@@ -753,25 +752,24 @@ int combatManager::RawEffectSpellInfluence(army *target, int influence)
                                   COMBAT_SPELL_AI_TURN_DIVISOR * armyValue);
         break;
     }
-    case ARMY_SPELL_INFLUENCE_BLIND:
-        effect = static_cast<int>(armyValue * COMBAT_SPELL_AI_BLIND_MODIFIER);
-        break;
     case ARMY_SPELL_INFLUENCE_BLESS:
     case ARMY_SPELL_INFLUENCE_CURSE: {
         float averageDamage =
-            static_cast<float>((target->m_monster.damageMin +
-                                target->m_monster.damageMax) *
-                               COMBAT_SPELL_AI_AVERAGE_DAMAGE_MODIFIER);
+            (static_cast<float>(target->m_monster.damageMin) +
+             static_cast<float>(target->m_monster.damageMax)) *
+            COMBAT_SPELL_AI_AVERAGE_DAMAGE_MODIFIER;
         float damageEffect =
             static_cast<float>((target->m_monster.damageMax - averageDamage) /
                                averageDamage * armyValue *
                                COMBAT_SPELL_AI_BLESS_CURSE_MODIFIER);
-        if (influence == ARMY_SPELL_INFLUENCE_BLESS)
-            effect = static_cast<int>(damageEffect);
-        else
-            effect = static_cast<int>(-damageEffect);
+        effect = static_cast<int>(influence == ARMY_SPELL_INFLUENCE_BLESS
+                                      ? damageEffect
+                                      : -damageEffect);
         break;
     }
+    case ARMY_SPELL_INFLUENCE_BLIND:
+        effect = static_cast<int>(armyValue * COMBAT_SPELL_AI_BLIND_MODIFIER);
+        break;
     case ARMY_SPELL_INFLUENCE_BERSERK:
         effect = static_cast<int>(armyValue * COMBAT_SPELL_AI_BERSERK_MODIFIER);
         break;
@@ -781,6 +779,26 @@ int combatManager::RawEffectSpellInfluence(army *target, int influence)
     case ARMY_SPELL_INFLUENCE_HYPNOTIZE:
         effect = static_cast<int>(armyValue *
                                   COMBAT_SPELL_AI_HYPNOTIZE_MODIFIER);
+        break;
+    case ARMY_SPELL_INFLUENCE_BLOODLUST:
+        effect = static_cast<int>(armyValue *
+                                  COMBAT_SPELL_AI_BLOODLUST_MODIFIER);
+        break;
+    case ARMY_SPELL_INFLUENCE_PETRIFIED:
+        effect = static_cast<int>(armyValue *
+                                  COMBAT_SPELL_AI_PETRIFIED_MODIFIER);
+        break;
+    case ARMY_SPELL_INFLUENCE_ANTI_MAGIC:
+        effect = static_cast<int>(armyValue *
+                                  COMBAT_SPELL_AI_ANTI_MAGIC_MODIFIER);
+        break;
+    case ARMY_SPELL_INFLUENCE_STONESKIN:
+        effect = static_cast<int>(armyValue *
+                                  COMBAT_SPELL_AI_STONE_SKIN_MODIFIER);
+        break;
+    case ARMY_SPELL_INFLUENCE_STEELSKIN:
+        effect = static_cast<int>(armyValue *
+                                  COMBAT_SPELL_AI_STEEL_SKIN_MODIFIER);
         break;
     case ARMY_SPELL_INFLUENCE_DRAGON_SLAYER: {
         int adjacent = 0;
@@ -808,16 +826,12 @@ int combatManager::RawEffectSpellInfluence(army *target, int influence)
                                   dragonMod);
         break;
     }
-    case ARMY_SPELL_INFLUENCE_BLOODLUST:
-        effect = static_cast<int>(armyValue *
-                                  COMBAT_SPELL_AI_BLOODLUST_MODIFIER);
-        break;
     case ARMY_SPELL_INFLUENCE_SHIELD: {
         int shooterCount = 0;
         int i;
         for (i = 0; i < m_armyCount[1 - target->m_side]; i++) {
             otherArmy = &m_armies[target->m_side][i];
-            if (otherArmy->m_monster.flags.bytes.abilities & 4)
+            if (otherArmy->m_monster.flags.all & MONSTER_FLAGS_SHOOTER)
                 shooterCount++;
         }
         float shooterMod = static_cast<float>(
@@ -832,22 +846,6 @@ int combatManager::RawEffectSpellInfluence(army *target, int influence)
                                   shooterMod);
         break;
     }
-    case ARMY_SPELL_INFLUENCE_PETRIFIED:
-        effect = static_cast<int>(armyValue *
-                                  COMBAT_SPELL_AI_PETRIFIED_MODIFIER);
-        break;
-    case ARMY_SPELL_INFLUENCE_ANTI_MAGIC:
-        effect = static_cast<int>(armyValue *
-                                  COMBAT_SPELL_AI_ANTI_MAGIC_MODIFIER);
-        break;
-    case ARMY_SPELL_INFLUENCE_STONESKIN:
-        effect = static_cast<int>(armyValue *
-                                  COMBAT_SPELL_AI_STONE_SKIN_MODIFIER);
-        break;
-    case ARMY_SPELL_INFLUENCE_STEELSKIN:
-        effect = static_cast<int>(armyValue *
-                                  COMBAT_SPELL_AI_STEEL_SKIN_MODIFIER);
-        break;
     default:
         effect = 0;
         break;
@@ -928,7 +926,7 @@ void combatManager::EffectSpellCure(int *effect, int targetSide,
         int negativeEffect = 0;
         int index;
         for (index = 0; index < COMBAT_ARMY_SLOT_COUNT; index++) {
-            if ((targetIndex == -1 || index == targetIndex) &&
+            if ((targetIndex == -1 || targetIndex == index) &&
                 m_armies[side][index].m_monsterType >= 0 &&
                 m_armies[side][index].m_quantity > 0) {
                 army *target = &m_armies[side][index];
@@ -939,17 +937,19 @@ void combatManager::EffectSpellCure(int *effect, int targetSide,
                         curePoints = target->m_hitPointsLost;
                     positiveEffect = static_cast<int>(
                         positiveEffect +
-                        gMonsterDatabase[target->m_monsterType].fightValue *
+                        static_cast<float>(
+                            gMonsterDatabase[target->m_monsterType].fightValue) *
                             curePoints * COMBAT_SPELL_AI_CURE_VALUE_MODIFIER /
                             target->m_monster.hitPoints);
                 }
 
                 int fullQuantity =
-                    (target->m_monster.flags.bytes.abilities & 0x80) != 0;
+                    (target->m_monster.flags.all &
+                     MONSTER_FLAGS_FULL_AI_QUANTITY) != 0;
                 int armyValue =
                     gMonsterDatabase[target->m_monsterType].fightValue *
                     target->m_quantity;
-                if (target->m_monster.flags.bytes.attributes & 1) {
+                if (target->m_monster.flags.all & MONSTER_FLAGS_UNDEAD) {
                     negativeEffect = armyValue;
                     continue;
                 }
@@ -959,10 +959,6 @@ void combatManager::EffectSpellCure(int *effect, int targetSide,
                      influence++) {
                     if (!target->m_spellInfluence[influence])
                         continue;
-                    int duration = target->m_spellInfluence[influence] +
-                                   fullQuantity;
-                    if (duration >= COMBAT_SPELL_AI_MAX_DURATION)
-                        duration = COMBAT_SPELL_AI_MAX_DURATION;
                     switch (influence) {
                     case ARMY_SPELL_INFLUENCE_HASTE:
                     case ARMY_SPELL_INFLUENCE_BLESS:
@@ -974,7 +970,13 @@ void combatManager::EffectSpellCure(int *effect, int targetSide,
                         positiveEffect = static_cast<int>(
                             positiveEffect +
                             RawEffectSpellInfluence(target, influence) *
-                                gfCancelDurationMods[duration]);
+                                gfCancelDurationMods[
+                                    target->m_spellInfluence[influence] +
+                                                fullQuantity >=
+                                            COMBAT_SPELL_AI_MAX_DURATION
+                                        ? COMBAT_SPELL_AI_MAX_DURATION
+                                        : target->m_spellInfluence[influence] +
+                                              fullQuantity]);
                         break;
                     case ARMY_SPELL_INFLUENCE_SLOW:
                     case ARMY_SPELL_INFLUENCE_BLIND:
@@ -986,7 +988,13 @@ void combatManager::EffectSpellCure(int *effect, int targetSide,
                         negativeEffect = static_cast<int>(
                             negativeEffect +
                             RawEffectSpellInfluence(target, influence) *
-                                gfCancelDurationMods[duration]);
+                                gfCancelDurationMods[
+                                    target->m_spellInfluence[influence] +
+                                                fullQuantity >=
+                                            COMBAT_SPELL_AI_MAX_DURATION
+                                        ? COMBAT_SPELL_AI_MAX_DURATION
+                                        : target->m_spellInfluence[influence] +
+                                              fullQuantity]);
                         break;
                     case ARMY_SPELL_INFLUENCE_ANTI_MAGIC:
                         break;
@@ -1033,18 +1041,8 @@ void combatManager::EffectSpellDamage(int *effect, int spell, int targetHex)
 {
     int damagePerPower;
     switch (spell) {
-    case SPELL_FIREBALL:
-    case SPELL_FIREBLAST:
-        damagePerPower = COMBAT_SPELL_AI_FIRE_DAMAGE_PER_POWER;
-        break;
-    case SPELL_LIGHTNING_BOLT:
-        damagePerPower = COMBAT_SPELL_AI_LIGHTNING_DAMAGE_PER_POWER;
-        break;
-    case SPELL_CHAIN_LIGHTNING:
-        damagePerPower = COMBAT_SPELL_AI_CHAIN_LIGHTNING_DAMAGE_PER_POWER;
-        break;
-    default:
-        damagePerPower = 0;
+    case SPELL_ARMAGEDDON:
+        damagePerPower = COMBAT_SPELL_AI_ARMAGEDDON_DAMAGE_PER_POWER;
         break;
     case SPELL_HOLY_WORD:
         damagePerPower = COMBAT_SPELL_AI_HOLY_WORD_DAMAGE_PER_POWER;
@@ -1052,15 +1050,32 @@ void combatManager::EffectSpellDamage(int *effect, int spell, int targetHex)
     case SPELL_HOLY_SHOUT:
         damagePerPower = COMBAT_SPELL_AI_HOLY_SHOUT_DAMAGE_PER_POWER;
         break;
+    case SPELL_DEATH_RIPPLE:
+        damagePerPower = COMBAT_SPELL_AI_DEATH_RIPPLE_DAMAGE_PER_POWER;
+        break;
+    case SPELL_DEATH_WAVE:
+        damagePerPower = COMBAT_SPELL_AI_DEATH_WAVE_DAMAGE_PER_POWER;
+        break;
+    case SPELL_ELEMENTAL_STORM:
+        damagePerPower = COMBAT_SPELL_AI_ELEMENTAL_STORM_DAMAGE_PER_POWER;
+        break;
+    case SPELL_FIREBALL:
+        damagePerPower = COMBAT_SPELL_AI_FIRE_DAMAGE_PER_POWER;
+        break;
+    case SPELL_FIREBLAST:
+        damagePerPower = COMBAT_SPELL_AI_FIRE_DAMAGE_PER_POWER;
+        break;
+    case SPELL_METEOR_SHOWER:
+        damagePerPower = COMBAT_SPELL_AI_ELEMENTAL_STORM_DAMAGE_PER_POWER;
+        break;
+    case SPELL_LIGHTNING_BOLT:
+        damagePerPower = COMBAT_SPELL_AI_LIGHTNING_DAMAGE_PER_POWER;
+        break;
     case SPELL_MAGIC_ARROW:
         damagePerPower = COMBAT_SPELL_AI_MAGIC_ARROW_DAMAGE_PER_POWER;
         break;
-    case SPELL_ARMAGEDDON:
-        damagePerPower = COMBAT_SPELL_AI_ARMAGEDDON_DAMAGE_PER_POWER;
-        break;
-    case SPELL_ELEMENTAL_STORM:
-    case SPELL_METEOR_SHOWER:
-        damagePerPower = COMBAT_SPELL_AI_ELEMENTAL_STORM_DAMAGE_PER_POWER;
+    case SPELL_CHAIN_LIGHTNING:
+        damagePerPower = COMBAT_SPELL_AI_CHAIN_LIGHTNING_DAMAGE_PER_POWER;
         break;
     case SPELL_COLD_RAY:
         damagePerPower = COMBAT_SPELL_AI_COLD_RAY_DAMAGE_PER_POWER;
@@ -1068,11 +1083,8 @@ void combatManager::EffectSpellDamage(int *effect, int spell, int targetHex)
     case SPELL_COLD_RING:
         damagePerPower = COMBAT_SPELL_AI_COLD_RING_DAMAGE_PER_POWER;
         break;
-    case SPELL_DEATH_RIPPLE:
-        damagePerPower = COMBAT_SPELL_AI_DEATH_RIPPLE_DAMAGE_PER_POWER;
-        break;
-    case SPELL_DEATH_WAVE:
-        damagePerPower = COMBAT_SPELL_AI_DEATH_WAVE_DAMAGE_PER_POWER;
+    default:
+        damagePerPower = 0;
         break;
     }
 
@@ -1083,7 +1095,7 @@ void combatManager::EffectSpellDamage(int *effect, int spell, int targetHex)
     int killedValue[2];
     int damageValue[5];
     int disruptingRayValue = 0;
-    army *target;
+    army *target = 0;
     if (m_hexCells[targetHex].m_occupantIndex >= 0)
         target = &m_armies[m_hexCells[targetHex].m_occupantSide]
                             [m_hexCells[targetHex].m_occupantIndex];
@@ -1277,7 +1289,7 @@ void combatManager::EffectSpellDamage(int *effect, int spell, int targetHex)
                     ModifyDamageForArtifacts(
                         &spellDamage, spell, m_heroes[m_currentSide],
                         m_heroes[target->m_side]);
-                    if ((target->m_monster.flags.bytes.attributes & 1) &&
+                    if ((target->m_monster.flags.all & MONSTER_FLAGS_UNDEAD) &&
                         spellDamage != 0)
                         spellDamage = COMBAT_SPELL_AI_MIRROR_LETHAL_DAMAGE;
 
@@ -1308,7 +1320,7 @@ void combatManager::EffectSpellDamage(int *effect, int spell, int targetHex)
                         gMonsterDatabase[target->m_monsterType].fightValue *
                         target->m_monster.hitPoints * damageValue[2] /
                         target->m_monster.hitPoints;
-                    if (target->m_monster.flags.bytes.attributes & 1) {
+                    if (target->m_monster.flags.all & MONSTER_FLAGS_UNDEAD) {
                         killedValue[m_hexCells[currentHex].m_occupantSide] /= 2;
                         damageValue[m_hexCells[currentHex].m_occupantSide + 3] /= 2;
                     }
