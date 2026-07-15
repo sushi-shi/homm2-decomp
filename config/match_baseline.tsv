@@ -1311,10 +1311,10 @@ SOURCE/VIEW	?HandleViewGeneral@@YIHAAUtag_message@@@Z	95.4894	ec2c49b56970
 SOURCE/VIEW	?ViewArmy@combatManager@@QAEXPAVarmy@@H@Z	97.7921	cde9ad067236
 SOURCE/VIEW	?ViewGeneral@combatManager@@QAEHHHH@Z	98.8501	f02b276c5540
 SOURCE/Viewwrld	?VWCleanup@advManager@@QAEXXZ	100.0000	2755ca65f5bf
-SOURCE/Viewwrld	?VWCompleteDraw@advManager@@QAEXXZ	98.6940	f56e0e6f3eca
-SOURCE/Viewwrld	?VWInit@advManager@@QAEXHH@Z	100.0000	cea936b37533
-SOURCE/Viewwrld	?ViewWorld@advManager@@QAEXHHH@Z	99.7803	9a6d28abce07
-SOURCE/Viewwrld	?ViewWorldDialogHandler@@YIHAAUtag_message@@@Z	98.8452	ffaeac71521a
+SOURCE/Viewwrld	?VWCompleteDraw@advManager@@QAEXXZ	98.6940	3377239cb850
+SOURCE/Viewwrld	?VWInit@advManager@@QAEXHH@Z	100.0000	7ef5ed8afe22
+SOURCE/Viewwrld	?ViewWorld@advManager@@QAEXHHH@Z	99.9394	8d89d11c1bdd
+SOURCE/Viewwrld	?ViewWorldDialogHandler@@YIHAAUtag_message@@@Z	99.9677	37d07930d88e
 SOURCE/Wsnetwin	?wsEvaluateMessage@@YIXKH@Z	99.8684	384e0547eaf9
 SOURCE/Wsnetwin	?wsProcessMessages@@YIXXZ	99.7778	6483cb9b67da
 SOURCE/Wsnetwin	?wsSendMessage@@YIXHEGPAX@Z	98.4615	b3dd9b31e807

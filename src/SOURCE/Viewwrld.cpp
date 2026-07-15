@@ -34,16 +34,21 @@
 #include <stdio.h>
 #include <string.h>
 
+// @semantic
+// Exact 0x350 frame, 0x267 extent, CFG/semantics, and 42/42 broad relocation targets.
+// The eight raw residual bytes at +0xc7/+0xcd/+0xe6/+0x15e/+0x173/+0x179/+0x1d7/+0x1dd
+// are a three-slot permutation: retail allocation/delete/legend at -0x340/-0x344/-0x348,
+// ours legend/allocation/delete. Semantic bucket names and moving the legend declaration
+// beside its first use were tried; revisit for hidden-temporary ordering in the last-mile phase.
 VA(0x004333c0, 0x267)
 void advManager::ViewWorld(int whatToDraw, int drawAllObjects, int drawAllTerrains)
 {
-    int viewIndex;
-    signed char savedPalette[VIEW_WORLD_PALETTE_SIZE];
-    char *viewNames[7];
-    tag_message message;
-    heroWindow *viewWindow;
+    signed char paletteData[VIEW_WORLD_PALETTE_SIZE];
+    char *viewIconNames[7];
+    tag_message dialogMessage;
+    heroWindow *viewWorldWindow;
 
-    memcpy(savedPalette, gpBufferPalette->m_data, VIEW_WORLD_PALETTE_SIZE);
+    memcpy(paletteData, gpBufferPalette->m_data, VIEW_WORLD_PALETTE_SIZE);
     gbInViewWorld = 1;
     iVWWhatToDraw = whatToDraw;
     iVWDrawAllObjs = drawAllObjects;
@@ -55,29 +60,30 @@ void advManager::ViewWorld(int whatToDraw, int drawAllObjects, int drawAllTerrai
     gpWindowManager->m_updateFlags = 1;
 
     sprintf(gText, "viewlgnd.bin");
-    viewWindow = new heroWindow(VIEW_WORLD_WINDOW_X, VIEW_WORLD_WINDOW_Y, gText);
-    if (viewWindow == 0)
+    viewWorldWindow = new heroWindow(VIEW_WORLD_WINDOW_X, VIEW_WORLD_WINDOW_Y, gText);
+    if (viewWorldWindow == 0)
         MemError();
 
-    viewNames[0] = "MINE";
-    viewNames[1] = "RSRC";
-    viewNames[2] = "RTFX";
-    viewNames[3] = "TWNS";
-    viewNames[4] = "HROS";
-    viewNames[5] = "_ALL";
-    viewNames[6] = "WRLD";
+    int legendMode;
+    viewIconNames[0] = "MINE";
+    viewIconNames[1] = "RSRC";
+    viewIconNames[2] = "RTFX";
+    viewIconNames[3] = "TWNS";
+    viewIconNames[4] = "HROS";
+    viewIconNames[5] = "_ALL";
+    viewIconNames[6] = "WRLD";
     if (whatToDraw == VIEW_WORLD_ALL && drawAllObjects == 0 && drawAllTerrains == 0)
-        viewIndex = 6;
+        legendMode = 6;
     else
-        viewIndex = whatToDraw - VIEW_WORLD_MINES;
-    sprintf(gText, "view%s.icn", viewNames[viewIndex]);
-    message.type = VIEW_WORLD_MESSAGE;
-    message.payload.widget.command = VIEW_WORLD_ICON_MESSAGE;
-    message.payload.widget.id = VIEW_WORLD_ICON_WIDGET;
-    message.payload.widget.data.text = gText;
-    viewWindow->BroadcastMessage(message);
-    gpWindowManager->DoDialog(viewWindow, ViewWorldDialogHandler, 0);
-    delete viewWindow;
+        legendMode = whatToDraw - VIEW_WORLD_MINES;
+    sprintf(gText, "view%s.icn", viewIconNames[legendMode]);
+    dialogMessage.type = VIEW_WORLD_MESSAGE;
+    dialogMessage.payload.widget.command = VIEW_WORLD_ICON_MESSAGE;
+    dialogMessage.payload.widget.id = VIEW_WORLD_ICON_WIDGET;
+    dialogMessage.payload.widget.data.text = gText;
+    viewWorldWindow->BroadcastMessage(dialogMessage);
+    gpWindowManager->DoDialog(viewWorldWindow, ViewWorldDialogHandler, 0);
+    delete viewWorldWindow;
 
     UpdateRadar(1, 0);
     VWCleanup();
@@ -86,7 +92,7 @@ void advManager::ViewWorld(int whatToDraw, int drawAllObjects, int drawAllTerrai
     RedrawAdvScreen(1, 0);
     giCycleType = 0;
     gpWindowManager->m_updateFlags = 1;
-    SetPalette(savedPalette, 1);
+    SetPalette(paletteData, 1);
 }
 
 VA(0x00433627, 0x5a)
@@ -142,6 +148,13 @@ void advManager::VWInit(int centerX, int centerY)
     UpdateRadar(1, 0);
 }
 
+// @semantic
+// Exact 0xa8 frame, live/generated stack slots, complete source CFG/semantics, and 198/198
+// broad relocation targets. The first residual at +0x65 is the Y-bound global load order;
+// the first opcode-shape residual at +0xb3 is ours `mov mapY; imul MAP_WIDTH` versus retail
+// `mov MAP_WIDTH; imul mapY`. The 0x58-byte first jump table starts at ours +0x23b versus
+// retail +0x23a after restoring retail's two explicit default continuations. Both Y-bound
+// operand orders and both multiply orders compile byte-identically; revisit in last-mile.
 VA(0x004338d4, 0x1346)
 void advManager::VWCompleteDraw(void)
 {
@@ -159,6 +172,7 @@ void advManager::VWCompleteDraw(void)
     unsigned char *pixel4;
     signed char drawTilesets0[VIEW_WORLD_TILESET_COUNT];
     unsigned char *rowEnd37;
+    int unusedRowState14;
     int mapY3;
     mapCell *cell0;
     int mapX7;
@@ -167,6 +181,7 @@ void advManager::VWCompleteDraw(void)
     unsigned int groundFrame29;
     int resourceType9;
     unsigned int flipped5;
+    int unusedExtraState29;
     mapCellExtra *extra15;
 
     groundFrame29 = 0;
@@ -233,6 +248,8 @@ void advManager::VWCompleteDraw(void)
                     break;
                 case 8:
                     groundFrame29 = 8;
+                    break;
+                default:
                     break;
                 }
                 if (cell0->m_flags & 2)
@@ -503,14 +520,20 @@ void advManager::VWCompleteDraw(void)
                                         VIEW_WORLD_DRAW_SIZE, VIEW_WORLD_DRAW_SIZE);
 }
 
+// @semantic
+// Exact 0x9c frame, all named/generated slots, complete CFG/semantics, and 99/99 broad
+// relocation targets. Explicit switch defaults recover the three retail continuation jumps.
+// The remaining normalized residuals are only commutative global-load order at +0x218,
+// +0x433, and +0x4e3 (Y bounds and the second VWInit argument). Swapping each addition's
+// operands compiled byte-identically; revisit for TU-state/evaluation order in last-mile.
 VA(0x00434c1a, 0x5e2)
 int ViewWorldDialogHandler(struct tag_message &message)
 {
-    float radarScale;
-    int radarY;
-    int radarX;
+    float radarScale6;
+    int radarY1;
+    int radarX0;
     tag_message savedMessage;
-    tag_message currentMessage;
+    tag_message currentMessage7;
 
     if (!gpSoundManager->MusicPlaying())
         gpSoundManager->SwitchAmbientMusic(
@@ -529,24 +552,25 @@ int ViewWorldDialogHandler(struct tag_message &message)
                     break;
                 switch (MAP_HEIGHT) {
                 case VIEW_WORLD_NEAR_MAX_MAP_SIZE:
-                    radarScale = 4.0f;
+                    radarScale6 = 4.0f;
                     break;
                 case VIEW_WORLD_MIDDLE_MAX_MAP_SIZE:
-                    radarScale = 2.0f;
+                    radarScale6 = 2.0f;
                     break;
                 case VIEW_WORLD_FAR_MAX_MAP_SIZE:
-                    radarScale = 1.3333f;
+                    radarScale6 = 1.3333f;
                     break;
                 default:
-                    radarScale = 1.0f;
+                    radarScale6 = 1.0f;
+                    break;
                 }
 
-                radarX = message.payload.mouse.screenX;
-                radarY = message.payload.mouse.screenY;
-                radarX = static_cast<int>((radarX - VIEW_WORLD_RADAR_LEFT) / radarScale);
-                radarY = static_cast<int>((radarY - VIEW_WORLD_RADAR_TOP) / radarScale);
-                iVWMapOriginX = radarX - iVWCenterOffset;
-                iVWMapOriginY = radarY - iVWCenterOffset;
+                radarX0 = message.payload.mouse.screenX;
+                radarY1 = message.payload.mouse.screenY;
+                radarX0 = static_cast<int>((radarX0 - VIEW_WORLD_RADAR_LEFT) / radarScale6);
+                radarY1 = static_cast<int>((radarY1 - VIEW_WORLD_RADAR_TOP) / radarScale6);
+                iVWMapOriginX = radarX0 - iVWCenterOffset;
+                iVWMapOriginY = radarY1 - iVWCenterOffset;
                 if (iVWMapOriginX < 0)
                     iVWMapOriginX = 0;
                 if (iVWMapOriginY < 0)
@@ -558,17 +582,17 @@ int ViewWorldDialogHandler(struct tag_message &message)
                 gpAdvManager->UpdateRadar(1, 0);
                 gpAdvManager->VWCompleteDraw();
 
-                currentMessage.type = 0;
-                while (currentMessage.type != VIEW_WORLD_MOUSE_UP) {
+                currentMessage7.type = 0;
+                while (currentMessage7.type != VIEW_WORLD_MOUSE_UP) {
                     Process1WindowsMessage();
-                    currentMessage = gpInputManager->GetEvent();
-                    savedMessage = currentMessage;
-                    while (currentMessage.type != VIEW_WORLD_MOUSE_UP &&
-                           currentMessage.type != 0) {
-                        if (currentMessage.type == VIEW_WORLD_MOUSE_MOVE)
-                            savedMessage = currentMessage;
+                    currentMessage7 = gpInputManager->GetEvent();
+                    savedMessage = currentMessage7;
+                    while (currentMessage7.type != VIEW_WORLD_MOUSE_UP &&
+                           currentMessage7.type != 0) {
+                        if (currentMessage7.type == VIEW_WORLD_MOUSE_MOVE)
+                            savedMessage = currentMessage7;
                         Process1WindowsMessage();
-                        currentMessage = gpInputManager->GetEvent();
+                        currentMessage7 = gpInputManager->GetEvent();
                     }
                     if (savedMessage.type == VIEW_WORLD_MOUSE_MOVE) {
                         if (savedMessage.payload.mouse.x < VIEW_WORLD_RADAR_LEFT)
@@ -580,12 +604,12 @@ int ViewWorldDialogHandler(struct tag_message &message)
                         if (savedMessage.payload.mouse.y >= VIEW_WORLD_RADAR_BOTTOM)
                             savedMessage.payload.mouse.y = MAP_HEIGHT * 2 + VIEW_WORLD_RADAR_TOP - 1;
                         gpMouseManager->Main(savedMessage);
-                        radarX = static_cast<int>(
-                            (savedMessage.payload.mouse.x - VIEW_WORLD_RADAR_LEFT) / radarScale);
-                        radarY = static_cast<int>(
-                            (savedMessage.payload.mouse.y - VIEW_WORLD_RADAR_TOP) / radarScale);
-                        iVWMapOriginX = radarX - iVWCenterOffset;
-                        iVWMapOriginY = radarY - iVWCenterOffset;
+                        radarX0 = static_cast<int>(
+                            (savedMessage.payload.mouse.x - VIEW_WORLD_RADAR_LEFT) / radarScale6);
+                        radarY1 = static_cast<int>(
+                            (savedMessage.payload.mouse.y - VIEW_WORLD_RADAR_TOP) / radarScale6);
+                        iVWMapOriginX = radarX0 - iVWCenterOffset;
+                        iVWMapOriginY = radarY1 - iVWCenterOffset;
                         if (iVWMapOriginX < 0)
                             iVWMapOriginX = 0;
                         if (iVWMapOriginY < 0)
@@ -625,7 +649,11 @@ int ViewWorldDialogHandler(struct tag_message &message)
                 message.payload.widget.id = VIEW_WORLD_DIALOG_CLOSE;
                 message.payload.widget.command = message.payload.widget.id;
                 return 2;
+            default:
+                break;
             }
+            break;
+        default:
             break;
         }
     }
