@@ -545,7 +545,7 @@ SOURCE/ARMY	?DamageEnemy@army@@QAEXPAV1@PAH1HH@Z	99.9849	d7066a35161c
 SOURCE/ARMY	?DecrementSpellRounds@army@@QAEXXZ	100.0000	4c14fb55a708
 SOURCE/ARMY	?DirDoAttack@army@@QAEXH@Z	100.0000	07d8b4447ef3
 SOURCE/ARMY	?DispelGood@army@@QAEXXZ	100.0000	f80ec0fb9ffc
-SOURCE/ARMY	?DoAttack@army@@QAEXH@Z	97.9746	555225dd07b2
+SOURCE/ARMY	?DoAttack@army@@QAEXH@Z	97.9828	555225dd07b2
 SOURCE/ARMY	?DoHydraAttack@army@@QAEXH@Z	98.6329	b9c787e6330c
 SOURCE/ARMY	?DrawToBuffer@army@@QAEXHHH@Z	98.2505	7e861f0a2b24
 SOURCE/ARMY	?FreeResources@army@@QAEXXZ	100.0000	737c74156c9e
@@ -696,7 +696,7 @@ SOURCE/DRAWING	?ClearCombatMessages@combatManager@@QAEXH@Z	100.0000	a13385b2bc8b
 SOURCE/DRAWING	?CombatMessage@combatManager@@QAEXH@Z	99.8103	b431be4bdee0
 SOURCE/DRAWING	?CombatMessage@combatManager@@QAEXPADHHH@Z	100.0000	05038edf4a46
 SOURCE/DRAWING	?DrawBackground@combatManager@@QAEXXZ	99.8655	ec9943534f35
-SOURCE/DRAWING	?DrawFrame@combatManager@@QAEXHHHHHHH@Z	99.3296	371edb3504ca
+SOURCE/DRAWING	?DrawFrame@combatManager@@QAEXHHHHHHH@Z	99.7142	371edb3504ca
 SOURCE/DRAWING	?DrawSmallView@combatManager@@QAEXHH@Z	99.9244	81dabbeff233
 SOURCE/DRAWING	?NoShowCombatLog@combatManager@@QAEXPAD@Z	100.0000	3de47f29d606
 SOURCE/DRAWING	?ResetLimitCreature@combatManager@@QAEXXZ	100.0000	1f50e7bb3f02
@@ -896,7 +896,7 @@ SOURCE/HERO	?SetupHeroView@@YIXXZ	98.9874	7abcdced42fc
 SOURCE/HERO	?Stats@hero@@QAECH@Z	100.0000	8d28d866e52c
 SOURCE/HERO	?TakeSS@hero@@QAEHHH@Z	100.0000	122a2e337637
 SOURCE/HERO	?UpdateArmies@hero@@QAEXXZ	100.0000	cd948b3d3b30
-SOURCE/HERO	?UpdateHeroScreenStatusBar@@YIXAAUtag_message@@@Z	98.8558	b383bc0f78c9
+SOURCE/HERO	?UpdateHeroScreenStatusBar@@YIXAAUtag_message@@@Z	99.1304	b383bc0f78c9
 SOURCE/HERO	?UpgradeCreatures@hero@@QAEXHH@Z	100.0000	5fad3af3ade4
 SOURCE/HERO	?UseSpell@hero@@QAEXH@Z	100.0000	5f6d7ac841b7
 SOURCE/HERO	?ViewArtifact@hero@@QAEXHHH@Z	100.0000	76433cd28415
@@ -1124,7 +1124,7 @@ SOURCE/PHILAI	?ValidateHero@@YIXPAVhero@@@Z	100.0000	e4f9a0d14336
 SOURCE/PHILAI	?ValueOfBuyingBuilding@philAI@@QAEXPAVtown@@HAAHAAM@Z	99.8659	a785e57c5531
 SOURCE/PHILAI	?ValueOfBuyingCreature@philAI@@QAEXPAVtown@@HAAHHAAM@Z	97.1818	91ea9eefad1a
 SOURCE/PHILAI	?ValueOfBuyingHero@philAI@@QAEXPAVtown@@PAVhero@@AAHAAM@Z	99.9447	83c8534a8de5
-SOURCE/PHILAI	?ValueOfEventAtPosition@philAI@@QAEHHHHPAH@Z	99.7735	f332c8f4188d
+SOURCE/PHILAI	?ValueOfEventAtPosition@philAI@@QAEHHHHPAH@Z	99.7786	f332c8f4188d
 SOURCE/PHILAI	?ValueOfTown@philAI@@QAEHPAVtown@@@Z	98.5169	b9c529eb70ed
 SOURCE/RECRUIT	??0recruitUnit@@QAE@PAVarmyGroup@@HPAF@Z	100.0000	8b8f463035e2
 SOURCE/RECRUIT	??0recruitUnit@@QAE@PAVtown@@HH@Z	100.0000	ad06ea7c74ce
@@ -1208,7 +1208,7 @@ SOURCE/SPELLAI	?FirstResurrectable@combatManager@@QAEHHPAHH@Z	100.0000	2fe2117ad
 SOURCE/SPELLAI	?NextPos@combatManager@@QAEXPAH@Z	100.0000	c70cafebb9b6
 SOURCE/SPELLAI	?RawEffectSpellInfluence@combatManager@@QAEHPAVarmy@@H@Z	97.4750	415d95dc407e
 SOURCE/SPELLS	?AddBolt@combatManager@@QAEXPAUSBolt@@HHHHHHHHHHHH@Z	100.0000	bada6baff5f3
-SOURCE/SPELLS	?Armageddon@combatManager@@QAEXXZ	98.5262	da5400020c19
+SOURCE/SPELLS	?Armageddon@combatManager@@QAEXXZ	99.4703	da5400020c19
 SOURCE/SPELLS	?BloodLustEffect@combatManager@@QAEXPAVarmy@@H@Z	100.0000	2755ea9fbd27
 SOURCE/SPELLS	?Blur@combatManager@@QAEXHHH@Z	100.0000	d31f1e9aaf6f
 SOURCE/SPELLS	?CastMassSpell@combatManager@@QAEXHH@Z	96.4921	bd3197677e32
@@ -1224,7 +1224,7 @@ SOURCE/SPELLS	?Earthquake@combatManager@@QAEXXZ	97.1952	bc869ce18315
 SOURCE/SPELLS	?ElementalStorm@combatManager@@QAEXXZ	100.0000	214ec6492970
 SOURCE/SPELLS	?FindResurrectArmyIndex@combatManager@@QAEHHHH@Z	91.3982	4e2ce5d6e4fa
 SOURCE/SPELLS	?Fireball@combatManager@@QAEXHH@Z	100.0000	156e1eb01e2f
-SOURCE/SPELLS	?GetNextChainLightningTarget@combatManager@@QAEHPAVarmy@@H@Z	99.4159	f0f4706a24cc
+SOURCE/SPELLS	?GetNextChainLightningTarget@combatManager@@QAEHPAVarmy@@H@Z	100.0000	f0f4706a24cc
 SOURCE/SPELLS	?HandleCastSpell@@YIHAAUtag_message@@@Z	99.1885	3df38082bb35
 SOURCE/SPELLS	?HasValidSpellTarget@combatManager@@QAEHH@Z	100.0000	2bd8a56335d5
 SOURCE/SPELLS	?MeteorShower@combatManager@@QAEXH@Z	100.0000	0a040ea9d87a
@@ -1281,7 +1281,7 @@ SOURCE/TOWNMGR	?BuildObj@townManager@@QAEXH@Z	98.2473	c48fb1c9c9da
 SOURCE/TOWNMGR	?BuyBuild@townManager@@QAEHHHH@Z	99.0437	97bafed56f31
 SOURCE/TOWNMGR	?ChangeTown@townManager@@QAEXXZ	100.0000	c2ee986b9f36
 SOURCE/TOWNMGR	?Close@townManager@@UAEXXZ	100.0000	5dd7183ce94b
-SOURCE/TOWNMGR	?DoCommand@townManager@@QAEXH@Z	98.6515	a5b3f0ac98c4
+SOURCE/TOWNMGR	?DoCommand@townManager@@QAEXH@Z	98.6710	a5b3f0ac98c4
 SOURCE/TOWNMGR	?DoTavern@townManager@@QAEXXZ	100.0000	6701e6171a61
 SOURCE/TOWNMGR	?Draw@townObject@@QAEXH@Z	98.9307	8dd5b4dbce24
 SOURCE/TOWNMGR	?DrawTown@townManager@@QAEXHH@Z	100.0000	9d0bb71ce9fe
