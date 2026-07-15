@@ -1,9 +1,15 @@
-# Visual C++ 4.2 matching toolchain
+# Visual C++ 4.2 compiler and LINK 3.00 toolchain
 
 The project compiles retail-matching objects with the English Visual C++ 4.2
 Enterprise toolchain preserved as archive.org item `en_vc42ent`. Disc 1 is a RAR
 self-extracting executable containing a complete installed
 `MSDEV/{BIN,INCLUDE,LIB}` tree.
+
+The retail executable's PE header was produced by linker version 3.00, not the
+VC 4.2 tree's LINK 4.20.6164. The final-link component therefore comes from
+archive.org item `msvc4x`, file `MSVC40.iso`. The verified VC 4.0 tools are LINK
+3.00.5270, CVPACK, CVTRES, and MSPDB40; object compilation and libraries remain
+VC 4.2.
 
 ## Historical gap
 
@@ -19,6 +25,8 @@ The recovered workflow has two explicit entry points:
 
 - `scripts/make-toolchain.sh` provisions or verifies a local tree. It supports
   the original RAR SFX, other archive/disc inputs, and installed `MSDEV` trees.
+- `scripts/make-linker.sh` provisions the separate pinned LINK 3.00 component
+  from VC 4.0 media without replacing the VC 4.2 compiler or libraries.
 - `scripts/create-toolchain-release.nix` reproduces a normalized `.tar.xz` from
   the preserved disc1 media, following the Gruntz release-builder pattern.
 
@@ -30,7 +38,9 @@ unpinned tree is allowed only through `--allow-unpinned` for isolated A/B tests.
 
 ```sh
 scripts/make-toolchain.sh /path/to/en_vc42ent_disc1.exe
+scripts/make-linker.sh /path/to/MSVC40.iso
 scripts/make-toolchain.sh --check build/toolchain/msvc
+scripts/make-linker.sh --check build/toolchain/link300
 ```
 
 The RAR SFX path requires `unrar` on `PATH`; an already installed `MSDEV` tree
@@ -48,12 +58,15 @@ artifact hashes are the gate.
 nix-shell scripts/create-toolchain-release.nix
 ```
 
-The Nix entrypoint pins the archive.org original by its published SHA-1. The
-builder then applies the stronger extracted-file SHA-256 gate and creates
-`build/homm2-toolchain-vc42.tar.xz` with sorted entries, fixed ownership, a fixed
-timestamp, and normalized GNU tar metadata. Two clean reproductions produced the
-same release SHA-256:
+The Nix entrypoint pins both archive.org originals by their published SHA-1.
+Because archive.org mirrors can terminate the 555 MB VC 4.0 ISO response early,
+the single fixed-output download resumes the same file until its published full
+size and SHA-1 both match.
+The builder then applies stronger extracted-file SHA-256 gates and creates
+`build/homm2-toolchain-vc42-link300.tar.xz` with sorted entries, fixed ownership,
+a fixed timestamp, and normalized GNU tar metadata. Two independent packaging
+runs produced the same release SHA-256:
 
 ```text
-892a47ee106b26de139a6a0a2ac044884ac899bf644b89a4e63491c4d6e5faf5
+db9f74f75ed4325deebd57e21a733e1e0aeefc745bfaa3991b8d1dc5d961e219
 ```

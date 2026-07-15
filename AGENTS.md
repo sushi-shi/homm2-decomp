@@ -151,6 +151,11 @@ authoritative. This file is the short, restart-ready Codex workflow.
 ## Compiler Constraints
 
 - Retail is MSVC 4.2 with `/Od /Ob1`. Inlining is enabled even though optimization is disabled.
+- Compile objects with the pinned VC 4.2 toolchain, but final-link with the separately pinned VC
+  4.0 LINK 3.00.5270 component under `build/toolchain/link300`. The build shell selects it through
+  `HOMM2_LINK_EXE`. Keep its sibling CVPACK/CVTRES/MSPDB40 directory first on `PATH`; mixing LINK
+  3.00 with VC 4.2 CVPACK fails. Provision/verify it with `scripts/make-linker.sh`, and use the
+  combined one-shot `scripts/create-toolchain-release.nix` for reproducible releases.
 - A `jmp $+0` is commonly an inlined accessor continuation, not an unbreakable compiler wall.
   Reconstruct the accessor and its expression context. These traces should not simply be accepted.
 - Local stack positions are controlled by MSVC identifier hashes. Use `scripts/od_slots.py` and
