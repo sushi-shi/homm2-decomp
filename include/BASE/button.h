@@ -32,7 +32,7 @@ public:
     short  m_pressedFrame;  // +0x26  frame drawn while selected/armed
     short  m_selectMode;  // +0x28  1 emits dialog-select command 10; other values emit command 12
     short  m_hotkey;  // +0x2a
-    int    m_iconId;  // +0x2c
+    unsigned long m_iconId;  // +0x2c  aggregate resource id
     // --- constructors ---
     button(void);
     button(short int x, short int y, short int width, short int height,
