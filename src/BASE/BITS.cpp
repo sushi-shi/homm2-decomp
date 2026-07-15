@@ -4,65 +4,71 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <BASE/BITSConstants.h>
 #include <BASE/BITS.h>
 
-// Retail keeps an EBP frame in all three optimized routines. Express that
-// proven TU-wide setting in source rather than adding a new manifest profile.
-#pragma optimize("y", off)
-
-// @match-note: complete 0/0-relocation checkpoint (live 27.63%; retained
-// 47.63%). Base is 0x27 bytes versus retail's 0x2e including two trailing NOPs.
-// The EBP frame, byte offset,
-// dword load, mask and explicit 0/1 result agree. First divergence: base hoists
-// the bit-index load ahead of `mov ebp,esp`, then selects indexed `test`/`setne`;
-// retail materializes the address in ESI and branches. `/Od` and `/Od /Oi`
-// supported profiles score lower; revisit on a genuine profile/TU-state find.
+// @match-note
+// Clean, structurally complete 0/0-relocation checkpoint. Base is 0x24; retail is 0x2e
+// including two trailing alignment NOPs. The EBP frame, byte offset, dword load, bit mask
+// and normalized 0/1 result agree. First divergence is +0x1: base zeroes EAX before
+// `mov ebp,esp`, then uses indexed `test`/`setne`; retail establishes EBP immediately,
+// materializes the byte address in ESI, emits `and eax,[esi]`, and branches to two result
+// assignments. The dedicated TU profile records the measured `/O1 /Oy-` library mode;
+// it was byte-identical to the earlier `/O2` plus source-pragma probe. Direct and
+// parameter-rebased lvalues, explicit quotient/remainder and offset/mask lifetimes,
+// register hints, result/switch forms,
+// C frontend, Windows preamble, G3/G4/G5/GB and Oa/Ow profiles were tried. No AST pass: the
+// residual is not structurally aligned. Revisit only on a genuine predecessor/header state.
 VA(0x004d1594, 0x2e)
-extern "C" int __cdecl BitTest(const void *bits, unsigned int bitIndex)
+extern "C" int __cdecl BitTest(const void *bits, BitIndex bitIndex)
 {
-    const unsigned char *bytes = static_cast<const unsigned char *>(bits);
-    bytes += bitIndex >> 3;
-    const unsigned int *word = reinterpret_cast<const unsigned int *>(bytes);
-    bitIndex &= 7;
-    unsigned int mask = 1U;
+    const BitByte *bytes = static_cast<const BitByte *>(bits);
+    bytes += bitIndex >> BIT_INDEX_BYTE_SHIFT;
+    const BitWord *word = reinterpret_cast<const BitWord *>(bytes);
+    bitIndex &= BIT_INDEX_WITHIN_BYTE_MASK;
+    BitWord mask = 1U;
     mask <<= bitIndex;
     if ((*word & mask) != 0)
         return 1;
     return 0;
 }
 
-// @match-note: complete 0/0-relocation checkpoint (live 29.33%; retained
-// 39.67%). Base is 0x27 bytes versus retail's 0x20. The EBP frame and
-// byte-addressed dword mask agree. First
-// divergence: base hoists the index load before `mov ebp,esp` and keeps an
-// indexed load/or/store; retail materializes the address in ESI and emits direct
-// `or [esi],eax`. The supported `/Od` profiles score lower; revisit with BitTest.
+// @match-note
+// Clean, structurally complete 0/0-relocation checkpoint. Base and retail are both 0x20
+// with the same EBP frame and direct byte-addressed dword OR. First divergence is +0x1:
+// base reads bitIndex through ESP before establishing EBP and retains quotient/base as an
+// indexed address with the mask in ESI; retail establishes EBP first, materializes the byte
+// address in ESI and uses EAX for quotient then mask (`or [esi],eax`). The profile, source,
+// frontend, preamble and CPU/alias variants listed at BitTest were also tested here; none
+// changed this allocation. No AST pass below structural alignment. Revisit with BitTest.
 VA(0x004d15c2, 0x20)
-extern "C" void __cdecl BitSet(void *bits, unsigned int bitIndex)
+extern "C" void __cdecl BitSet(void *bits, BitIndex bitIndex)
 {
-    unsigned char *bytes = static_cast<unsigned char *>(bits);
-    bytes += bitIndex >> 3;
-    unsigned int *word = reinterpret_cast<unsigned int *>(bytes);
-    bitIndex &= 7;
-    unsigned int mask = 1U;
+    BitByte *bytes = static_cast<BitByte *>(bits);
+    bytes += bitIndex >> BIT_INDEX_BYTE_SHIFT;
+    BitWord *word = reinterpret_cast<BitWord *>(bytes);
+    bitIndex &= BIT_INDEX_WITHIN_BYTE_MASK;
+    BitWord mask = 1U;
     mask <<= bitIndex;
     *word |= mask;
 }
 
-// @match-note: complete 0/0-relocation checkpoint (live 33.44%; retained
-// 43.12%). Base is 0x29 bytes versus retail's 0x22 including two trailing NOPs.
-// The EBP frame, address,
-// shift, complement and dword clear agree. First divergence is the same hoisted
-// index load and indexed load/and/store scheduling as BitSet; retail uses direct
-// `and [esi],eax`. The supported `/Od` profiles score lower; revisit with BitTest.
+// @match-note
+// Clean, structurally complete 0/0-relocation checkpoint. Base and retail are both 0x22
+// (retail ends with two alignment NOPs) with the same EBP frame, shift, complement and
+// direct dword clear. First divergence is +0x1 and matches BitSet: base reads bitIndex
+// through ESP before EBP and keeps an indexed address/mask-in-ESI allocation; retail uses
+// materialized ESI address and quotient-then-mask EAX (`and [esi],eax`). The same bounded
+// profile/source/frontend/preamble/CPU experiments were exhausted. No AST pass below
+// structural alignment. Revisit with BitTest.
 VA(0x004d15e2, 0x22)
-extern "C" void __cdecl BitClear(void *bits, unsigned int bitIndex)
+extern "C" void __cdecl BitClear(void *bits, BitIndex bitIndex)
 {
-    unsigned char *bytes = static_cast<unsigned char *>(bits);
-    bytes += bitIndex >> 3;
-    unsigned int *word = reinterpret_cast<unsigned int *>(bytes);
-    bitIndex &= 7;
-    unsigned int mask = 1U;
+    BitByte *bytes = static_cast<BitByte *>(bits);
+    bytes += bitIndex >> BIT_INDEX_BYTE_SHIFT;
+    BitWord *word = reinterpret_cast<BitWord *>(bytes);
+    bitIndex &= BIT_INDEX_WITHIN_BYTE_MASK;
+    BitWord mask = 1U;
     mask <<= bitIndex;
     *word &= ~mask;
 }
