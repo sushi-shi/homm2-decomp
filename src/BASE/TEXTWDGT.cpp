@@ -12,12 +12,15 @@
 #include <BASE/heroWindow.h>
 #include <SOURCE/KB.h>
 #include <string.h>
-// @early-stop
-// /O2 register-allocation wall: base and retail are both 0x3e bytes and both
+// @match-note
+// /O2 register-allocation checkpoint: base and retail are both 0x3e bytes and both
 // relocation targets agree. Instruction selection, ordering, and immediates are
 // identical; only the retained this register differs (ESI in base, EDI in retail),
-// at +0x00, +0x03..+0x04, +0x19..+0x3c. Direct stores, a cached self pointer,
+// producing raw differences at +0x00,+0x04,+0x1a,+0x21,+0x24,+0x27,+0x2e,
+// +0x36,+0x3b,+0x3c. Direct stores, a cached self pointer,
 // and chained versus separate initialization of the two value-1 fields were tried.
+// Four sibling-pinned AST variants and 60 guarded TU-state trials found no exact
+// closure. Revisit only after a real predecessor/header state change.
 VA(0x004d1060, 0x3e)
 textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, 0)
 {
@@ -36,30 +39,23 @@ textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, 0)
 // would trade away the separately mapped exact ??1 body.
 // VA(0x004d10a0, 0x45) ??_E/??_G textWidget deleting-destructor aliases
 
-// @early-stop
-// /O2 register-allocation wall: base and retail are both 0x64 bytes and all 4
-// relocation targets agree. Bytes +0x00..+0x41 and +0x5d..+0x63 are identical;
-// only +0x42..+0x5c colors the text/alignment parameters as EDX/AL instead of
-// retail EAX/DL and schedules their same stores differently. A direct GetFont
-// assignment, a cached result, cached alignment, and assignment-order variants
-// were tried; the cached-result form shown is best.
 VA(0x004d10f0, 0x64)
-textWidget::textWidget(short p1, short p2, short p3, short p4, char *p5, char *p6, short p7,
-                       short p8, short p9, short p10)
-    : widget(p1, p2, p3, p4, p8, p9)
+textWidget::textWidget(short x, short y, short width, short height, char *text, char *fontName,
+                       short color, short id, short kind, short alignment)
+    : widget(x, y, width, height, id, kind)
 {
-    font *newFont = gpResourceManager->GetFont(p6);
-    m_color = p7;
-    m_font = newFont;
-    m_alignment = static_cast<char>(p10);
+    font *loadedFont = gpResourceManager->GetFont(fontName);
+    m_color = color;
+    m_font = loadedFont;
+    m_text = text;
+    m_alignment = static_cast<char>(alignment);
     m_kind = EncodeWidgetKind(WIDGET_KIND_TEXT);
-    m_text = p5;
 }
 
 VA(0x004d1160, 0xef)
 void textWidget::Read(void)
 {
-    char local_10[16];
+    char resourceName[16];
     m_x = gpResourceManager->ReadWord();
     m_y = gpResourceManager->ReadWord();
     m_width = gpResourceManager->ReadWord();
@@ -68,9 +64,9 @@ void textWidget::Read(void)
     m_text = static_cast<char *>(
         H2_ALLOC(len, "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP", 0x39));
     gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(m_text), len);
-    gpResourceManager->Read13(reinterpret_cast<signed char *>(local_10));
+    gpResourceManager->Read13(reinterpret_cast<signed char *>(resourceName));
     gpResourceManager->SavePosition();
-    m_font = gpResourceManager->GetFont(local_10);
+    m_font = gpResourceManager->GetFont(resourceName);
     gpResourceManager->RestorePosition();
     m_color = gpResourceManager->ReadWord() & 0xff;
     m_alignment = static_cast<char>(gpResourceManager->ReadWord());
@@ -86,25 +82,19 @@ textWidget::~textWidget()
     H2_FREE(m_text, "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP", 0x55);
 }
 
-// @early-stop
-// /O2 compare-orientation wall: base and retail are both 0x210 bytes and all 6
-// relocation targets agree. Every instruction is identical except +0x83..+0x87:
-// base emits `cmp ax,di; jg` and retail emits the equivalent `cmp di,ax; jl` for
-// relativeX < m_x. Positive and rejection-form hit tests, swapped relational
-// spelling, an explicit cached left edge, and the `value | 0` spelling were tried.
 VA(0x004d1280, 0x210)
 int textWidget::Main(tag_message &msg)
 {
     unsigned short flags = m_flags;
-    if ((flags & 2) == 0) {
-        if (msg.type == 0x200)
+    if ((flags & WIDGET_FLAG_ENABLED) == 0) {
+        if (msg.type == MESSAGE_WIDGET)
             return widget::Main(msg);
         return 0;
     }
 
     switch (msg.type) {
-    case 8:
-    case 0x20: {
+    case MESSAGE_LEFT_BUTTON_DOWN:
+    case MESSAGE_RIGHT_BUTTON_DOWN: {
         short relativeX = static_cast<short>(msg.payload.mouse.x) -
                           static_cast<short>(m_owner->m_posX);
         short relativeY = static_cast<short>(msg.payload.mouse.y) -
@@ -112,31 +102,31 @@ int textWidget::Main(tag_message &msg)
         if (relativeX < m_x || relativeY < m_y ||
             relativeX >= m_x + m_width || relativeY >= m_y + m_height)
             return 0;
-        m_flags = flags | 1;
-        if (msg.type == 0x20)
-            msg.payload.widget.parameter = 0x200;
-        msg.type = 0x200;
-        msg.payload.widget.command = 0xc;
+        m_flags = flags | WIDGET_FLAG_SELECTED;
+        if (msg.type == MESSAGE_RIGHT_BUTTON_DOWN)
+            msg.payload.widget.parameter = MESSAGE_MODIFIER_RIGHT_BUTTON;
+        msg.type = MESSAGE_WIDGET;
+        msg.payload.widget.command = WIDGET_COMMAND_SELECT;
         msg.payload.widget.id = m_id;
         return 2;
     }
 
-    case 0x10:
-    case 0x40:
-        if ((flags & 1) != 0) {
-            m_flags = flags & 0xfffe;
-            if (msg.type == 0x40)
-                msg.payload.widget.parameter = 0x200;
-            msg.type = 0x200;
-            msg.payload.widget.command = 0xd;
+    case MESSAGE_LEFT_BUTTON_UP:
+    case MESSAGE_RIGHT_BUTTON_UP:
+        if ((flags & WIDGET_FLAG_SELECTED) != 0) {
+            m_flags = flags & ~WIDGET_FLAG_SELECTED;
+            if (msg.type == MESSAGE_RIGHT_BUTTON_UP)
+                msg.payload.widget.parameter = MESSAGE_MODIFIER_RIGHT_BUTTON;
+            msg.type = MESSAGE_WIDGET;
+            msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
             msg.payload.widget.id = m_id;
             return 2;
         }
         return 0;
 
-    case 0x200:
+    case MESSAGE_WIDGET:
         switch (msg.payload.widget.command) {
-        case 3: {
+        case WIDGET_COMMAND_SET_TEXT: {
             if (m_id != msg.payload.widget.id)
                 goto normalEvent;
             char *newText = msg.payload.widget.data.text;
@@ -155,7 +145,7 @@ int textWidget::Main(tag_message &msg)
             return 1;
         }
 
-        case 8:
+        case WIDGET_COMMAND_SET_FILL_COLOR:
             if (m_id != msg.payload.widget.id)
                 goto normalEvent;
             m_color = msg.payload.widget.data.value;
@@ -177,7 +167,7 @@ VA(0x004d1490, 0x49)
 void textWidget::Draw(void)
 {
     int color = 3;
-    if ((m_flags & 8) == 0)
+    if ((m_flags & WIDGET_FLAG_DIMMED) == 0)
         color = m_color;
     m_font->DrawBoundedString(m_text, m_x + m_owner->m_posX,
                                   m_y + m_owner->m_posY, m_width, m_height,
@@ -185,26 +175,26 @@ void textWidget::Draw(void)
 }
 
 VA(0x004d14e0, 0xc)
-void textWidget::SetColorIndex(short int param_1)
+void textWidget::SetColorIndex(short int color)
 {
-    m_color = param_1;
+    m_color = color;
 }
 
 VA(0x004d14f0, 0xa2)
-void textWidget::SetText(char *param_1)
+void textWidget::SetText(char *text)
 {
     if (DecodeWidgetKind(m_kind) != WIDGET_KIND_TEXT &&
         DecodeWidgetKind(m_kind) != WIDGET_KIND_TEXT_ENTRY) {
-        m_text = param_1;
+        m_text = text;
         return;
     }
-    unsigned short newLen = strlen(param_1);
+    unsigned short newLen = strlen(text);
     if (strlen(m_text) < newLen) {
         H2_FREE(m_text, "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP", 0xd3);
         m_text = static_cast<char *>(H2_ALLOC(
             newLen + 5, "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP", 0xd4));
     }
-    strcpy(m_text, param_1);
+    strcpy(m_text, text);
 }
 
 

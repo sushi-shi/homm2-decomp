@@ -22,15 +22,17 @@ public:
     char   m_alignment;  // +0x2a  DrawBoundedString alignment mode
     // --- constructors ---
     textWidget(void);
-    textWidget(short int, short int, short int, short int, char *, char *, short int, short int, short int, short int);
+    textWidget(short int x, short int y, short int width, short int height,
+               char *text, char *fontName, short int color, short int id,
+               short int kind, short int alignment);
     virtual ~textWidget() OVERRIDE;
     // --- virtual methods (vtable order) ---
     virtual void Draw(void) OVERRIDE;
     virtual int Main(struct tag_message &) OVERRIDE;
     // --- methods ---
     void Read(void);
-    void SetColorIndex(short int);
-    void SetText(char *);
+    void SetColorIndex(short int color);
+    void SetText(char *text);
 };
 #pragma pack(pop)
 SIZE(textWidget, 0x2b);
