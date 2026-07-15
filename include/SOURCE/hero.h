@@ -63,6 +63,7 @@ typedef enum HeroConstant {
     HERO_LOCATION_TOWN = 0xa3,
     HERO_MAP_CHANGE_UNUSED = -999,
     HERO_MAP_CELL_PRESENT = 0x40,
+    HERO_STARTING_STAT_COUNT = 5,
     HERO_AVAILABLE_SLOT_COUNT = 2,
     HERO_AVAILABILITY_UNAVAILABLE = -1,
     HERO_AVAILABILITY_RETREATED = 0x40,
@@ -197,8 +198,7 @@ public:
     int m_remainingMobility;  // +0x35
     int m_experience;  // +0x39
     short m_level;  // +0x3d
-    signed char m_primaryStats[4];  // +0x3f
-    signed char m_unknown43;  // +0x43
+    signed char m_primaryStats[HERO_STARTING_STAT_COUNT];  // +0x3f
     signed char m_morale;  // +0x44
     signed char m_luck;  // +0x45
     char _pad_0x46[0x1];

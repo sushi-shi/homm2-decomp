@@ -16,7 +16,7 @@ struct EventExtra {
     unsigned char applyToComputer;
     unsigned char cancelAfterVisit;
     char unknown21[4];
-    unsigned char active;
+    signed char active;
     unsigned short x;
     unsigned short y;
     unsigned char unknown2a;
@@ -25,7 +25,6 @@ struct EventExtra {
 };
 #pragma pack(pop)
 SIZE(EventExtra, 0x32);
-struct SThievesData { char pad[0x4e3]; signed char list[8][283]; };
 struct RandomHeroArmyRange {
     short creature;
     short minimum;
@@ -44,6 +43,29 @@ typedef enum GameSerializationConstant {
     GAME_MINE_COUNT = 144,
     GAME_BOAT_COUNT = 48
 } GameSerializationConstant;
+
+typedef enum GameLayoutConstant {
+    GAME_PLAYER_TOWN_LIST_OFFSET = 0x4e3,
+    GAME_PLAYER_RECORD_SIZE = 283
+} GameLayoutConstant;
+
+struct PlayerTownListView {
+    char pad[GAME_PLAYER_TOWN_LIST_OFFSET];
+    signed char townIds[GAME_PLAYER_COUNT][GAME_PLAYER_RECORD_SIZE];
+};
+
+typedef enum GameSourceLine {
+    GAME_SET_MAP_SIZE_FREE_OFFSET = 0xc,
+    GAME_SET_MAP_SIZE_ALLOC_OFFSET = 0xd,
+    GAME_CALC_CRC_ALLOC_OFFSET = 3,
+    GAME_CALC_CRC_FREE_OFFSET = 0xe
+} GameSourceLine;
+
+typedef enum GameMapTrigger {
+    MAP_TRIGGER_TOWN_BASE = 0x23,
+    MAP_TRIGGER_TOWN = 0xa3,
+    MAP_TRIGGER_RANDOM_ARTIFACT = 0xa9
+} GameMapTrigger;
 
 typedef enum GameDifficultyConstant {
     GAME_DIFFICULTY_HARD = 2,
