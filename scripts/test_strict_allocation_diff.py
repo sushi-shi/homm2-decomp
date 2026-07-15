@@ -171,6 +171,24 @@ class StrictAllocationDiffTests(unittest.TestCase):
         diff["left"]["symbols"][0]["data_diff"] = [{"kind": "UNKNOWN", "size": 8}]
         self.assertIn("neither payload nor diff-side kind", audit(diff, manifest)[0])
 
+    def test_exact_relocation_duplicate_at_data_diff_boundary_is_collapsed(self):
+        diff, manifest = fixture()
+        for side in ("left", "right"):
+            symbol = diff[side]["symbols"][0]
+            symbol["data_diff"] = [
+                {"data": encoded(b"ABCD12"), "size": 6},
+                {"data": encoded(b"34"), "size": 2},
+            ]
+            symbol["data_relocations"].append(
+                copy.deepcopy(symbol["data_relocations"][0]))
+        self.assertEqual(audit(diff, manifest), [])
+
+    def test_unexplained_exact_relocation_duplicate_is_rejected(self):
+        diff, manifest = fixture()
+        diff["left"]["symbols"][0]["data_relocations"].append(
+            copy.deepcopy(diff["left"]["symbols"][0]["data_relocations"][0]))
+        self.assertIn("repeated 2 times but crosses 0", audit(diff, manifest)[0])
+
     def test_duplicate_definition_fails(self):
         diff, manifest = fixture()
         diff["left"]["symbols"].insert(1, copy.deepcopy(diff["left"]["symbols"][0]))

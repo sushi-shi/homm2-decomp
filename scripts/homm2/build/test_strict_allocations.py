@@ -163,6 +163,29 @@ class StrictAllocationAdapterTests(unittest.TestCase):
         self.assertEqual(excluded, [])
         self.assertEqual(len(manifest["allocations"]), 2)
 
+    def test_collapses_objdiff_relocation_duplicate_at_payload_boundary(self):
+        diff, row, retail, inventory = fixture()
+        target = diff["left"]["symbols"][0]
+        base = diff["right"]["symbols"][0]
+        target["data_diff"] = [
+            {"data": _encoded(b"\0" * 4), "size": "4"},
+            {"data": _encoded(b"\0" * 4), "size": "4"},
+        ]
+        base["data_diff"] = copy.deepcopy(target["data_diff"])
+        target_reloc = _relocation(3, 1)
+        base_reloc = _relocation(35, 1)
+        target["data_relocations"] = [target_reloc, copy.deepcopy(target_reloc)]
+        base["data_relocations"] = [base_reloc, copy.deepcopy(base_reloc)]
+        row["highlow_count"] = 1
+        retail["highlow_base_relocation_count"] = 1
+        retail["highlow_relative_offsets"] = [3]
+        retail["cstring_targets"] = retail["cstring_targets"][:1]
+        manifest, excluded = self.derive(diff, [row], retail, inventory)
+        self.assertEqual(excluded, [])
+        mappings = manifest["allocations"][0]["relocation_mappings"]
+        self.assertEqual(len(mappings), 1)
+        self.assertEqual(mappings[0]["offset"], 3)
+
     def test_rejects_rows_from_another_unit(self):
         diff, row, retail, inventory = fixture()
         row["unit"] = "SOURCE/OTHER"

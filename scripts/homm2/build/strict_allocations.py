@@ -70,11 +70,22 @@ def _unique_object(side, name):
     return matches[0]
 
 
+def _payload_boundaries(symbol):
+    boundaries = set()
+    offset = 0
+    for segment in symbol.get("data_diff", []):
+        if "data" not in segment:
+            continue
+        offset += _number(segment.get("size"))
+        boundaries.add(offset)
+    return boundaries
+
+
 def _allocation_relocations(side, symbol, extent):
     start = _number(symbol.get("address"))
     end = start + extent
     symbols = side.get("symbols", [])
-    rows = []
+    grouped = {}
     for item in symbol.get("data_relocations", []):
         item_start = _number(item.get("start"))
         item_end = _number(item.get("end"))
@@ -86,10 +97,30 @@ def _allocation_relocations(side, symbol, extent):
         target_index = _number(relocation.get("target_symbol"))
         if target_index < 0 or target_index >= len(symbols):
             raise ValueError("invalid relocation target index %d" % target_index)
+        key = (
+            item_start,
+            item_end,
+            _number(relocation.get("type")),
+            target_index,
+            _number(relocation.get("addend")),
+        )
+        grouped[key] = grouped.get(key, 0) + 1
+
+    boundaries = _payload_boundaries(symbol)
+    rows = []
+    for (item_start, item_end, reloc_type, target_index, addend), count in grouped.items():
+        relative_start = item_start - start
+        relative_end = item_end - start
+        serialized_copies = 1 + sum(
+            relative_start < boundary < relative_end for boundary in boundaries)
+        if count != 1 and count != serialized_copies:
+            raise ValueError(
+                "relocation at %#x is repeated %d times but crosses %d data_diff boundaries" %
+                (relative_start, count, serialized_copies - 1))
         rows.append({
-            "offset": item_start - start,
-            "type": _number(relocation.get("type")),
-            "addend": _number(relocation.get("addend")),
+            "offset": relative_start,
+            "type": reloc_type,
+            "addend": addend,
             "target": symbols[target_index],
         })
     return sorted(rows, key=lambda row: row["offset"])

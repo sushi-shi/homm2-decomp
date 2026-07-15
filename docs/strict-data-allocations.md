@@ -87,6 +87,14 @@ payload belong only to the opposite side. The checker rejects malformed segment
 sizes, unknown payload-free segments, negative section indices, and negative
 relocation symbol indices.
 
+Objdiff may serialize the same relocation once for each payload chunk it
+overlaps. The checker collapses only byte-identical relocation records whose
+copy count is exactly explained by crossed `data_diff` boundaries. An
+unexplained exact duplicate remains a hard failure; differing records remain
+distinct and must satisfy the normal manifest checks. The resulting unique
+relocation count still has to match the reviewed manifest; HoMM2 additionally
+requires its PE HIGHLOW count and offsets.
+
 ## HoMM2 adapter
 
 This adapter is separate from the standalone interface above. `homm2

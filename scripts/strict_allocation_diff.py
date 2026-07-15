@@ -83,6 +83,17 @@ def _effective_extent(symbol: dict, reviewed_extent: int | None, label: str) -> 
     return reviewed_extent
 
 
+def _payload_boundaries(symbol: dict) -> set[int]:
+    boundaries: set[int] = set()
+    offset = 0
+    for segment in symbol.get("data_diff", []):
+        if "data" not in segment:
+            continue
+        offset += _number(segment.get("size"))
+        boundaries.add(offset)
+    return boundaries
+
+
 def _relocations(
     side: dict,
     symbol: dict,
@@ -92,7 +103,7 @@ def _relocations(
 ) -> list[tuple[int, int, str, int]]:
     start = _number(symbol.get("address"))
     end = start + extent
-    rows: list[tuple[int, int, str, int]] = []
+    grouped: dict[tuple[int, int, int, int, int], int] = {}
     symbols = side.get("symbols", [])
     for item in symbol.get("data_relocations", []):
         reloc_start = _number(item.get("start"))
@@ -107,15 +118,36 @@ def _relocations(
         target_index = _number(relocation.get("target_symbol"))
         if target_index < 0 or target_index >= len(symbols):
             raise ValueError(f"{symbol.get('name')}: invalid relocation target {target_index}")
+        key = (
+            reloc_start,
+            reloc_end,
+            _number(relocation.get("type")),
+            target_index,
+            _number(relocation.get("addend")),
+        )
+        grouped[key] = grouped.get(key, 0) + 1
+
+    boundaries = _payload_boundaries(symbol)
+    rows: list[tuple[int, int, str, int]] = []
+    for (reloc_start, reloc_end, reloc_type, target_index, addend), count in grouped.items():
+        relative_start = reloc_start - start
+        relative_end = reloc_end - start
+        serialized_copies = 1 + sum(
+            relative_start < boundary < relative_end for boundary in boundaries)
+        if count != 1 and count != serialized_copies:
+            raise ValueError(
+                f"{symbol.get('name')}: relocation at {relative_start:#x} is repeated "
+                f"{count} times but crosses {serialized_copies - 1} data_diff boundaries"
+            )
         target_name = symbols[target_index].get("name", "")
         if map_names:
             target_name = symbol_mappings.get(target_name, target_name)
         rows.append(
             (
-                reloc_start - start,
-                _number(relocation.get("type")),
+                relative_start,
+                reloc_type,
                 target_name,
-                _number(relocation.get("addend")),
+                addend,
             )
         )
     rows.sort()
