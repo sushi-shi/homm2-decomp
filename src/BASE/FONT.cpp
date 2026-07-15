@@ -27,7 +27,7 @@ font::font(unsigned long id) : resource(5, id, 1, 0)
     char fname[13];
     // Read13 takes signed char*, GetIcon char* — one filename buffer feeds both, so bridge the
     // API signedness once (codegen-identical: both are byte pointers).
-    gpResourceManager->Read13((signed char *)fname);
+    gpResourceManager->Read13(reinterpret_cast<signed char *>(fname));
     gbLoadingMonoIcon = 1;
     m_glyphIcon = gpResourceManager->GetIcon(fname);
     gbLoadingMonoIcon = 0;
@@ -52,7 +52,7 @@ void font::DrawStringExecute(char *str, int x, int y, int mode,
     while (str[i] != 0) {
         c = str[i];
         if (c == 0x1f) {
-            pos += GetCharacterWidth(reinterpret_cast<unsigned char *>(str)[i]);
+            pos += GetCharacterWidth(static_cast<unsigned char>(str[i]));
             goto next;
         }
         if (c == '{') {
@@ -80,19 +80,27 @@ void font::DrawStringExecute(char *str, int x, int y, int mode,
                 IconToBitmapColorTable(m_glyphIcon, gpWindowManager->m_screen, pos, y, c, 1,
                                        clipL, clipT, clipR, clipB, 0, gColorTableDarkGray, 1);
         }
-        pos += GetCharacterWidth(reinterpret_cast<unsigned char *>(str)[i]);
+        pos += GetCharacterWidth(static_cast<unsigned char>(str[i]));
     next:
         i++;
     }
 }
 
 VA(0x004c7370, 0x48)
-void font::DrawString(char *s, int x, int y, int c)
+void font::DrawString(char *s, int x, int y, int mode)
 {
     m_suppressDraw = 0;
-    DrawStringExecute(s, x, y, c, 0, 0, 0x280, 0x1e0);
+    DrawStringExecute(s, x, y, mode, 0, 0, 0x280, 0x1e0);
 }
 
+// @match-note
+// /Od residual is +0x82..+0x98: retail loads m_glyphIcon->m_data into EAX before forming
+// the c*13 index in ECX; ours forms the index first and loads the base into ECX. The 0xaf-byte
+// function, EBP frame/this slot, CFG, and zero-relocation stream otherwise agree. This body
+// reached 100% in 5491423 before the required icon.h SLimitData layout correction.
+// Ordinary/commuted subscripts and raw byte-offset spelling were byte-neutral; exact predecessor
+// cast cleanups and the DrawString mode rename did not move it. Revisit after material FONT/icon
+// header state changes; current 86.93% is below the audited AST-permuter threshold.
 VA(0x004c73c0, 0xaf)
 int font::GetCharacterWidth(unsigned char c)
 {
