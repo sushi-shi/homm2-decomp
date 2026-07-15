@@ -30,6 +30,13 @@
 // rowOff before tmpPixels reaches 0x185/78.81% only with the old wrong loop order. No volatile,
 // padding, alias, or permutation was used. This is not a proved wall; revisit after a real
 // bitmap/icon/header TU-state change or in the post-coverage last-mile phase.
+// The 2026-07-15 batched TU-state audit tested the historical pre-deumbrella `_all.h` order, all
+// eight meaningful owner-header orders, 20 real BASE-header sequences, and 256 disposable
+// declaration states. The full historical aggregate scored only 74.70%; order alone was neutral.
+// A lone real MIDIWrap/tileset class surface reached 84.99%, while the best generated member state
+// reached 81.58%, proving strong allocator-state sensitivity but not an exact closure. Adding a
+// scale alias was byte-neutral in all 24 setup/row/column ownership combinations. No unused header
+// or generated declaration is retained, and no sub-100 result may be recorded as MAX.
 VA(0x004d2f90, 0x179)
 void IconToBitmapScale(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
                        int clip, int clipX, int clipY, int clipW, int clipH, int scale)
