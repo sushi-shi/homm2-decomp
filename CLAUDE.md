@@ -127,8 +127,11 @@ dev shell's Ghidra env (in the flake).
   vtable: **`VTBL(class, 0x........)`** census marker at the owner TU's tail. Macros vanish under MSVC
   (`include/va.h`). A *placeholder* is `VA(...)` then a `// signature;` comment; a
   *reconstruction* has a real body.
-- Mark a parked-below-100% match with **`// @early-stop`** + a byte-level reason line
-  (see matcher.md). `rg '@early-stop' src` is the deferred set.
+- Mark a byte-proven artifact with **`// @early-stop`** + a byte-level reason line
+  (see matcher.md). Mark a behaviorally and structurally complete nonexact function with
+  **`// @semantic`** + its remaining compiler/code-shape residual. `@semantic` is the current
+  linking/runtime-testing stop: it does not claim byte exactness or a proven compiler wall.
+  `rg -n '@(?:early-stop|semantic)' src` is the completed nonexact set.
 - **Header discipline (owner model, gate-enforced):** a symbol defined in `<TU>.cpp` is
   declared ONLY in its owner header `include/<TIER>/<TU>.h`; callers `#include` that. A .cpp
   carries **no** local `class/struct/enum`/`extern`/forward-decls — types come from the recovered

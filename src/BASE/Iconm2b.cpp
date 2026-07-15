@@ -23,7 +23,7 @@ DATA(0x00534be4) static int gMonoY;
 DATA(0x00534be8) static int gMonoClipB;
 DATA(0x00534bec) static int gMonoX;
 
-// @match-note
+// @semantic
 // Complete mono-RLE decoder with the selected IconEntry kept as one typed lifetime: entry/source
 // publication, initial clipping, skip/end, solid fill, four clipped-fill quadrants, and newline
 // state agree semantically. Both sides reserve only the four-byte pitch home (`sub esp,4`), save

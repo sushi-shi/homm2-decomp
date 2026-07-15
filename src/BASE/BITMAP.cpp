@@ -55,7 +55,7 @@ inline bitmap::~bitmap() {
     m_pixels = 0;
 }
 
-// @match-note
+// @semantic
 // /O2 residual begins at +0x0: retail starts `sub esp,8`; ours first loads x into DX. Both are
 // 0xff bytes with the same frame, destinationY stack slot, CFG, and relocation sites/identities
 // (gpWindowManager +0x14/+0x4e/+0xad, PollSound +0x48/+0x6d, BlitBitmap +0x68/+0xf1).

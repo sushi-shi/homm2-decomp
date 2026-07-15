@@ -25,7 +25,7 @@ DATA(0x00534c14) static int gDimX;
 DATA(0x00534c18) static int gDimClipR;
 DATA(0x00534c1c) static int gDimX0;
 
-// @match-note
+// @semantic
 // Complete decoder CFG: negative skip/end, newline, unclipped dim, and all four clipped-run
 // quadrants. Both objects use a four-byte frame and [esp+0x10] retains the signed destination
 // pitch. The first divergence is +0x1f: retail adds the icon-data base to the encoded source offset

@@ -51,7 +51,7 @@ void InitMemEntry(void)
         gpMemEntry[i].used = 0;
 }
 
-// @match-note
+// @semantic
 // Structurally complete /O2 checkpoint: allocation/tracking semantics, the 12-branch CFG,
 // and all 29 relocations agree.  With the required real icon definition in this TU, base
 // currently reserves 0x2c4 bytes and ends at 0x204; retail reserves 0x2bc and is 0x20f.
@@ -110,7 +110,7 @@ void *BaseAlloc(unsigned int size, char *originalFile, int originalLine)
     return ptr;
 }
 
-// @match-note
+// @semantic
 // Structurally complete /O2 checkpoint: both spans are 0x386 with the same 0x2c4 frame,
 // 20-branch CFG, and all 52 relocations.  The first residual is the first newline append:
 // base preloads the word then derives `buf+strlen`; retail scans first and writes `[edi-1]`.
@@ -194,7 +194,7 @@ void BaseFree(void *ptr, char *originalFile, int originalLine)
     }
 }
 
-// @match-note
+// @semantic
 // Structurally complete /O2 checkpoint: base .text is 0x137 bytes versus retail 0x134.
 // Only the completed log-line append differs: base loads `"\n"` at +0xd6 (reloc
 // +0xd9) before deriving `buf+strlen`, while retail loads it at +0xe3 (reloc +0xe6)
@@ -246,7 +246,7 @@ void ShowMemoryStatus(void)
     giDebugLevel = savedDebugLevel;
 }
 
-// @match-note
+// @semantic
 // Structurally complete /O2 checkpoint: both sections are 0x48 with identical CFG and
 // no relocations.  Recovering the explicit shifted-hash temporary changed the rotate from
 // base `shr eax,25; shl esi,5` to retail's `shl eax,5; shr esi,25`, raising this from
@@ -272,7 +272,7 @@ unsigned long int MAKEFILEID(char *text)
     return hash;
 }
 
-// @match-note
+// @semantic
 // Structurally complete /O2 checkpoint: base is 0x97 bytes, retail 0x95, with the same
 // eight-branch CFG and four giFindMid relocations to 0x5331c0.  The first current
 // divergence is +0x2a: base emits `cmp edi,eax; jge`, retail `cmp eax,edi; jle` and then
@@ -305,7 +305,7 @@ int FindIndex(struct indexArray *entries, int low, int high, int key)
 
 #include <BASE/MiscGraphicsConstants.h>
 
-// @match-note
+// @semantic
 // Structurally complete /O2 checkpoint: both sections are 0xea with the same CFG and
 // exact 11/11 relocation identities (the retail gConfig reference is its interior member).
 // Explicit `threshold = maxLevel - level` preserves the recovered loop semantics. The
@@ -416,7 +416,7 @@ void ProcessAssert(int condition, char *file, int line)
     }
 }
 
-// @match-note
+// @semantic
 // Structurally complete /O2 checkpoint with equal 0x66-byte sections, the same frame/CFG,
 // and the sole strncmp relocation.  The explicit MAKEFILEID rotate temporary moved this
 // from the old wholesale register-allocation residual to 98.60%; all instructions now agree
@@ -441,7 +441,7 @@ char * FindStringInString(char *text, char *pattern)
     return 0;
 }
 
-// @match-note
+// @semantic
 // Structurally complete /O2 checkpoint with equal 0x31-byte sections and no relocs/calls.
 // The MAKEFILEID predecessor change fixed the old SIB residual; the only current difference
 // is the +0x21 loop test (`cmp eax,ecx; jl` versus `cmp ecx,eax; jg`).
@@ -486,7 +486,7 @@ void SetInstallDefaults(void)
 
 #include <BASE/MiscConfigConstants.h>
 
-// @match-note
+// @semantic
 // Structurally complete /O2 checkpoint: base is 0x1b7, retail 0x1b5, with the same
 // three-branch CFG and the same 42 relocation occurrences. Manual target-address review
 // confirms the intended gConfig/giMainVideoModeWidth owners; `homm2 relocs` reports six
@@ -796,7 +796,7 @@ int IsCDDrive(int driveIndex)
     return GetDriveTypeA(gText) == DRIVE_CDROM;
 }
 
-// @match-note
+// @semantic
 // Structurally complete /O2 checkpoint: both sections are 0x3ed with the same 0x2f0 frame,
 // CFG and 51 relocation occurrences. Manual raw review confirms the indirect Win32/MCI
 // targets; `homm2 relocs` reports only three delinker owner aliases (the archive literal and
@@ -918,7 +918,7 @@ void BlitBitmapToScreenNoMouseCheck(class bitmap *bmp, int sourceX, int sourceY,
                            destinationX, destinationY);
 }
 
-// @match-note
+// @semantic
 // Structurally complete /O2 checkpoint: retail decomp proves a real adjusted-source-X local;
 // recovering it removes the prior unjustified volatile bitmap alias and gives the same 0x18b
 // code span, four-blit CFG, and 24 relocation occurrences. Base reserves four stack bytes while
@@ -975,7 +975,7 @@ void BlitBitmapToScreen(class bitmap *bmp, int sourceX, int sourceY, int width, 
 
 #include <BASE/LogConstants.h>
 
-// @match-note
+// @semantic
 // Structurally complete /O2 checkpoint: the 0x1f4 frame, CFG and 7/7 relocations agree.
 // Only base +0x5c..+0x7c differs from retail +0x5c..+0x75: base loads the newline
 // word before strlen and addresses via `not ecx`, while retail scans first and
@@ -1001,7 +1001,7 @@ void LogTruncate(void)
 // LogTruncate matching history: `strchr(logText, '\0')` emitted an out-of-line call
 // and regressed to 84.98%; it is not a viable spelling for the retail inline scan.
 
-// @match-note
+// @semantic
 // Structurally complete /O2 checkpoint: the 0x1f4 frame, CFG and external targets
 // agree. The newline append is base +0x53..+0x73 versus retail
 // +0x4f..+0x6c (preloaded word/not-ECX versus post-scan `[edi-1]`); retail's raw
@@ -1026,7 +1026,7 @@ void LogStr(char *text)
     }
 }
 
-// @match-note
+// @semantic
 // Structurally complete /O2 checkpoint: the 0x2bc frame, all external targets and
 // all seven sprintf call/format branches agree. Only the newline
 // append differs (base +0x1c9..+0x1f2, retail +0x1c9..+0x1ec), followed by the
@@ -1092,7 +1092,7 @@ void AbsAiPrint(char *text)
     giDebugLevel = saved;
 }
 
-// @match-note
+// @semantic
 // Structurally complete /O2 checkpoint: the typed graphics-domain boundary restores the
 // retail 0x310 frame and makes every byte through PollSound at +0x55 exact, raising live
 // from 86.18% to 95.12%. The 768-byte loop, CFG and all six relocation identities agree.
@@ -1141,7 +1141,7 @@ void FadeTo(unsigned char *source, unsigned char *destination, int increment)
     UpdatePalette(reinterpret_cast<signed char *>(destination));
 }
 
-// @match-note
+// @semantic
 // Structurally complete /O2 checkpoint: base is 0xba versus retail 0xb8; both have the
 // 0x304 frame, complete two-loop CFG, and all eight ordered relocation identities. The
 // typed palette/screen constants leave live at 95.55% (retained 95.71%). Current residuals
@@ -1195,7 +1195,7 @@ int IsCycleColor(int color)
     return 0;
 }
 
-// @match-note
+// @semantic
 // Structurally complete /O2 checkpoint: the 0x8c frame, all 14 ordered relocations,
 // and every open/write/alloc/free/close target agree. The PCX header, RLE and VGA
 // palette constants are now named in the private header. Differences are confined
@@ -1283,7 +1283,7 @@ struct IconEntry * GetIconEntry(class icon *iconPtr, int index)
 
 #include <BASE/SeededRandomConstants.h>
 
-// @match-note
+// @semantic
 // Structurally complete /O2 checkpoint: base and retail are both 0xb8 with the same
 // seeded-random CFG and all 3 ordered relocations. Moving the result lifetime before
 // the mix raised the retained maximum from 67.80% to 91.87%. Reusing `mix` for the
@@ -1348,7 +1348,7 @@ void SRand(int seed)
     srand(seed);
 }
 
-// @match-note
+// @semantic
 // Structurally complete /O2 checkpoint: base and retail are both 0x48 bytes and
 // all 3 relocations agree. The retained 90.64% state differed only in the six-byte
 // iLastSeed store: base placed it before the bit loop and retail after `dec ecx` inside
@@ -1384,7 +1384,7 @@ int MemSize(int)
 
 #include <BASE/DataEntryConstants.h>
 
-// @match-note
+// @semantic
 // Structurally aligned /O2 checkpoint: both code spans are 0x386, the 0x9c frame,
 // CFG and 59 relocation occurrences agree. The recovered conditional Y adjustment leaves
 // only 12 unmasked bytes: one `mov ecx,0x2d` schedule at +0xbc and swapped LEAs for
@@ -1476,7 +1476,7 @@ void GetDataEntry(char *prompt, char *destination, int maximumLength, char *init
     gbAllowTextEntryEscape = 1;
 }
 
-// @match-note
+// @semantic
 // Structurally complete /O2 checkpoint: the command-domain switch preserves the
 // retail case-body order, including the physical cancel tail. Base and retail are
 // both 0x173 with an identical relocation-masked instruction stream and 23 relocation

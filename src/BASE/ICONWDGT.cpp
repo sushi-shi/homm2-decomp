@@ -84,7 +84,7 @@ iconWidget::~iconWidget()
     gpResourceManager->Dispose(m_icon);
 }
 
-// @match-note
+// @semantic
 // Candidate and retail are both 0x291 with the same frame and CFG. In the required
 // WidgetKind enum TU state, the only non-relocation spans are +0x9e..+0x9f and
 // +0xa1..+0xa2: candidate compares m_x to relativeX and branches JG, while retail
@@ -186,7 +186,7 @@ normalEvent:
     return widget::Main(msg);
 }
 
-// @match-note
+// @semantic
 // Candidate and retail are both 0xe5 with the same frame, switch CFG, and 4 ordered
 // relocation offsets/types/targets. In the required WidgetKind enum TU state the
 // non-relocation spans are +0x62..+0x63, +0x65..+0x68, +0x69..+0x6c, +0x71..+0x72,

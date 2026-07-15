@@ -321,7 +321,7 @@ void inputManager::SetKeyCodeType(int keyCodeType)
     m_readIndex = 0;
 }
 
-// @match-note
+// @semantic
 // The authoritative 0x1cb-byte CodeView span and all 23 relocation occurrences align.
 // After relocation masking, exactly 12 bytes differ, all at +0x32..+0x51: retail keeps
 // the converted key in EAX and modifiers in ECX, while base stores the key first and
@@ -506,7 +506,7 @@ void CheckChangeCursor(int x, int y, int force)
     bInCheckChangeCursor = 0;
 }
 
-// @match-note
+// @semantic
 // Base is 0xe6 bytes versus retail's 0xe9. At +0x01 retail forms the mouse-active-field
 // pointer in ECX, loads it into EAX, and tests EAX; base forms it in EAX and folds the
 // load/test into a memory compare. From base +0x1d / retail +0x20 through RET, all 0xc9

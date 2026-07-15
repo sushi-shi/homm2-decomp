@@ -24,7 +24,7 @@ DATA(0x004fa954) static int giCombatSpeed;
 #define BLUR_COMPONENT(table, offset)                                                              \
     (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(table) + (offset)))
 
-// @match-note
+// @semantic
 // Coverage-phase structural checkpoint, not a proven wall. The complete CFG saves the source,
 // loads the RGB quantization table, applies the 16-sample blur to rows 4..height-5 and columns
 // 4..635, builds a clamped adjusted palette, performs both fizzles, restores the source, and

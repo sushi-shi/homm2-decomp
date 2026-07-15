@@ -30,7 +30,7 @@ DATA(0x005380cc) static unsigned char gFCColor;
 DATA(0x005380c8) static int gFCClipR;
 DATA(0x005380c0) static unsigned char *gFCDst;
 
-// @match-note
+// @semantic
 // Complete typed decoder with the canonical IconEntry/layout, enum constants, dim-palette owner,
 // byte-pointer rows, retail DATA owners, eight-byte frame, and the same 76 ordered blocks and 59
 // branches as retail. On master 71bdca9 the unused IconShear typedef in IconRle.h lowered this TU

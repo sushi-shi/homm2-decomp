@@ -14,9 +14,11 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/NOOPT.h>
 #include <string.h>
-// @early-stop
-// Reloc-masked: only code-byte residual is +0x156, SIB 08 vs 01 for the same
-// profileIndex + position LEA; all 13 relocation targets agree.
+// @semantic
+// The recovered /O2 kernel has the retail 0x2c4 frame, CFG, loop bounds, and all 13
+// external relocations. The retained canonical-source state differs after relocation
+// masking only at +0x156 (SIB 08 versus 01) for commutative profileIndex + position;
+// current shared-header state additionally reschedules equivalent pixel-address loads.
 VA(0x004d26a0, 0x23f)
 void DoRipple(bitmap *source, bitmap *destination, int height, int strength)
 {

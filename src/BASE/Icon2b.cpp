@@ -29,7 +29,7 @@ DATA(0x00534c54) static int gIcX;
 DATA(0x00534c58) static IconEntry *gIcEntry;
 DATA(0x00534c5c) static unsigned int gIcCnt2;
 
-// @match-note
+// @semantic
 // Macro-neutral structural checkpoint: complete no-frame CFG and correct relocation targets.
 // First divergence is +0x11: ours hoists x before the indexed entry fields; retail retains the
 // 13-byte frame offset in EBX, reads entry.x/srcOffset, forms EDI, then publishes entry/source/X0.

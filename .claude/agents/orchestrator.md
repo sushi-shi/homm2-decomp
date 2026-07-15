@@ -74,7 +74,7 @@ Better: open ONE `nix develop .#build` shell per slot.
    retail-RVA (define) order.
 2. **Skip already-reconstructed RVAs.** The queue already drops them; if cross-checking
    by hand, src `VA()` macros carry **absolute VAs** (`RVA + 0x400000`), so normalise
-   before comparing to the queue's RVAs. Also skip anything already `@early-stop`.
+   before comparing to the queue's RVAs. Also skip anything already `@early-stop` or `@semantic`.
 3. **Match TU-by-TU, not function-by-function.** Hand a lane a **whole TU** (or a
    **20+ function chunk** of a large one) and keep that lane on that TU until it is
    **fully matched**, then give the lane the next simple TU. Tiny TUs (1–8 funcs):
@@ -96,7 +96,9 @@ Spawn a **matcher** (`subagent_type: matcher`), **`run_in_background: true`**, *
 3. Carry a **whole-TU batch — each as RVA / mangled+demangled name / size** — plus the
    TU name, the 8-digit ABSOLUTE-VA convention (`VA(RVA+0x400000, size)`; placeholders in
    the scaffold already show it), the **`scripts/od_slots.py` stack-naming workflow**, and
-   the push-to-100% mandate + byte-proven `@early-stop` (marker line + byte reason, no %).
+   the push-to-100% preference where useful + byte-proven `@early-stop` (marker line + byte reason,
+   no %) or fully audited `@semantic` (behavior/structure/types/frame/CFG/relocations complete;
+   remaining compiler/code-shape residual recorded without claiming a wall).
    Tell the matcher to do the functions in retail-RVA order and to report each one's
    result. **Batch SIZING is YOUR job — the matcher finishes every function it's handed
    and does NOT bail, so size the batch to be completable in one matcher run:** ~20+ for
@@ -143,8 +145,8 @@ Process completed matchers **one at a time** (master has one `build/`, one HEAD)
    scoreboard never drifts from the commits), message `match: <fn> -> <result>` with the
    `Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>` trailer.
    One matcher = one commit. **Do NOT stage `config/match-queue.md`** (a transient
-   regenerated worklist — `git checkout --` it if it's dirty). A clean `@early-stop`
-   partial is a legitimate commit; a mis-attributed / wrong-shape reconstruction is NOT
+   regenerated worklist — `git checkout --` it if it's dirty). A clean `@early-stop` artifact or
+   fully audited `@semantic` checkpoint is a legitimate commit; a mis-attributed / wrong-shape reconstruction is NOT
    — keep it stubbed.
 6. **Refill:** `git -C .claude/worktrees/matcher-N reset --hard master` (its `build/`
    survives), pick the next target (cross-check skip), dispatch a new background matcher.

@@ -12,7 +12,7 @@
 #include <BASE/heroWindow.h>
 #include <SOURCE/KB.h>
 #include <string.h>
-// @match-note
+// @semantic
 // /O2 register-allocation checkpoint: base and retail are both 0x3e bytes and both
 // relocation targets agree. Instruction selection, ordering, and immediates are
 // identical; only the retained this register differs (ESI in base, EDI in retail),
