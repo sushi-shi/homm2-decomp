@@ -2656,8 +2656,9 @@ void game::ViewArmy(int x, int y, int monsterType, int numTroops, town *castle,
 }
 
 // @early-stop
-// Relocation-masked comparison is identical for the full 0x3f5-byte span;
-// both objects contain the same 52 relocation sites and objdiff reports 100%.
+// The full 0x3f5 instruction stream is byte-identical and both objects contain
+// 52 relocation sites. The residual is delinked local identities for strings,
+// aggregate interiors, and the now byte-identical GAME constant pool.
 VA(0x0047b2cf, 0x3f5)
 int ViewArmyHandler(tag_message &msg)
 {
@@ -2761,7 +2762,8 @@ int ViewArmyHandler(tag_message &msg)
         gpGame->m_viewArmyWindow->DrawWindow(1, 0, 0x7fff);
         glTimers[0] = static_cast<int>(
             KBTickCount() +
-            sViewArmyMonFrameInfo.walkDuration * 0.1 /
+            sViewArmyMonFrameInfo.walkDuration *
+                GAME_VIEW_ARMY_FRAME_DELAY_SCALE /
                 sViewArmyMonFrameInfo.animationFrameCount[ARMY_ANIMATION_WALK]);
     }
     return 1;
@@ -5544,12 +5546,12 @@ int CalcBaseScore(int days)
     int score = GAME_SCORE_BASE;
 
     if (gpGame->m_mapHeader.width == GAME_SCORE_MAP_EXTRA_LARGE)
-        days = static_cast<int>(days * 1.2);
+        days = static_cast<int>(days * GAME_SCORE_EXTRA_LARGE_DAY_SCALE);
     else if (gpGame->m_mapHeader.width == GAME_SCORE_MAP_LARGE)
-        days = static_cast<int>(days * 1.1);
+        days = static_cast<int>(days * GAME_SCORE_LARGE_DAY_SCALE);
     else if (gpGame->m_mapHeader.width == GAME_SCORE_MAP_MEDIUM) {
     } else if (gpGame->m_mapHeader.width == GAME_SCORE_MAP_SMALL)
-        days = static_cast<int>(days * 0.95);
+        days = static_cast<int>(days * GAME_SCORE_SMALL_DAY_SCALE);
 
     if (days <= GAME_SCORE_FIRST_TIER) {
         score -= -(-days);
