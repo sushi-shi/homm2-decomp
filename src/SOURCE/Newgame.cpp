@@ -38,42 +38,47 @@ DATA(0x0051d0fc) static short scenarioInfoSourceLineBase =
 VA(0x004b6f40, 0x1d5)
 void game::GetMap(void)
 {
-    char savedMapName[44];
-    char filePattern[16];
-    fileRequester *requester;
-    int dialogResult;
+    fileRequester *requesterResult;
+    int resultCode;
+    char fileMask[16];
+    char savedName[44];
 
-    strcpy(savedMapName, gMapName);
+    strcpy(savedName, gMapName);
     strcpy(gcCurMapName, "");
     if (gbRemoteOn && xNetHasOldPlayers) {
         NormalDialog(
             "At least one player does not have the Heroes II Expansion set.  You will only be able to choose from original Heroes II games.",
             1, -1, -1, -1, 0, -1, 0, -1, 0);
-        sprintf(filePattern, "*.%s", "MP2");
+        sprintf(fileMask, "*.%s", "MP2");
     } else if (xIsExpansionMap) {
-        sprintf(filePattern, "*.%s", "MX2");
+        sprintf(fileMask, "*.%s", "MX2");
     } else {
-        sprintf(filePattern, "*.%s", "MP2");
+        sprintf(fileMask, "*.%s", "MP2");
     }
 
-    requester = new fileRequester(212, 9, FILE_REQUESTER_MAP_GAME,
-                                  filePattern, gcMapPath, filePattern);
-    if (requester == 0)
+    requesterResult = new fileRequester(212, 9, FILE_REQUESTER_MAP_GAME,
+                                        fileMask, gcMapPath, fileMask);
+    if (requesterResult == 0)
         MemError();
-    dialogResult = gpExec->DoDialog(requester);
-    if (dialogResult == FILE_REQUESTER_OK) {
-        delete requester;
+    resultCode = gpExec->DoDialog(requesterResult);
+    if (resultCode == FILE_REQUESTER_OK) {
+        delete requesterResult;
         strcpy(gMapName, gLastFilename);
-        if (_strcmpi(savedMapName, gMapName) != 0) {
+        if (_strcmpi(savedName, gMapName) != 0) {
             strcpy(m_mapFilename, gMapName);
             ProcessNewMap(0);
         }
     } else {
-        delete requester;
-        strcpy(gMapName, savedMapName);
+        delete requesterResult;
+        strcpy(gMapName, savedName);
     }
 }
 
+// @early-stop 99.85714%: byte-proven branch-destination wall. The 0x04 frame,
+// all 33 non-jump instructions and operands, and all 6 ordered relocation
+// types/resolved targets agree. The sole unmasked byte residual is the branch
+// displacement at +0x35. A positive-arm spelling emitted an extra jne/jmp pair
+// and dropped to 95.43%; do not retry it without a TU-state change.
 VA(0x004b7115, 0x77)
 void game::ProcessNewMap(struct SMapHeader *header)
 {
@@ -89,6 +94,11 @@ void game::ProcessNewMap(struct SMapHeader *header)
     }
 }
 
+// @early-stop 99.22932%: byte-proven /Od continuation-jump wall. The 0x1c
+// frame and local slots, all 244 non-jump instructions and operands, and all 7
+// ordered relocation types/resolved targets agree. Retail has 22 unconditional
+// jumps versus 20 here, exactly accounting for the 10-byte size delta. Commuting
+// the two human-player comparisons removed the only operand-order residual.
 VA(0x004b718c, 0x491)
 void game::InitNewGame(struct SMapHeader *header)
 {
@@ -158,7 +168,7 @@ void game::InitNewGame(struct SMapHeader *header)
             }
         }
 
-        if (giNumHumanPlayers > humanPlayers &&
+        if (humanPlayers < giNumHumanPlayers &&
             computerPlayers < m_mapHeader.playerCount - giNumHumanPlayers)
             flexiblePlayerType = NEW_GAME_PLAYER_FLEXIBLE;
         else
@@ -173,7 +183,7 @@ void game::InitNewGame(struct SMapHeader *header)
         for (player = 0; player < m_mapHeader.playerCount; ++player) {
             if (m_setupPlayerNetworkId[player] != NEW_GAME_NETWORK_PLAYER_NONE)
                 continue;
-            if (giNumHumanPlayers > humanPlayers &&
+            if (humanPlayers < giNumHumanPlayers &&
                 m_mapHeader.playerCanHuman[m_setupPlayerColor[player]]) {
                 m_setupPlayerNetworkId[player] =
                     static_cast<signed char>(humanPlayers);
@@ -201,6 +211,13 @@ void game::SetupNetPlayerNames(void)
     }
 }
 
+// @early-stop 98.35664%: byte-proven /Od continuation-jump wall. The complete
+// new-game menu, allocation, remote packet wait/dispatch, map selection,
+// transmit, dialog, and cleanup flow has the retail 0x1f0 frame. All 537
+// non-jump instructions and operands and all 156 ordered relocation types and
+// semantic targets agree; every resolvable pair has the same RVA/addend. Retail
+// has 35 unconditional jumps versus 30 here, exactly accounting for the
+// 25-byte size delta.
 VA(0x004b769e, 0xaca)
 int game::NewGame(void)
 {
@@ -267,25 +284,27 @@ int game::NewGame(void)
         mapHeaderLoaded = 0;
         playerDataReceived = 0;
         do {
-            PollSound();
-            remoteBuffer = reinterpret_cast<NewGameRemotePacket *>(
-                GetRemoteData(1));
-            if (remoteBuffer != 0 &&
-                remoteBuffer->type == NEW_GAME_REMOTE_PACKET_TYPE) {
-                switch (remoteBuffer->command) {
-                case NEW_GAME_REMOTE_MAP_HEADER:
-                    memset(&m_mapHeader, 0, sizeof(m_mapHeader));
-                    memcpy(&m_mapHeader, remoteBuffer->payload,
-                           NEW_GAME_MAP_PACKET_SIZE);
-                    mapHeaderLoaded = 1;
-                    break;
-                case NEW_GAME_REMOTE_PLAYER_INFO:
-                    memcpy(gsNetPlayerInfo, remoteBuffer->payload,
-                           NEW_GAME_PLAYER_INFO_PACKET_SIZE);
-                    SetupNetPlayerNames();
-                    playerDataReceived = 1;
-                    break;
-                }
+            do {
+                do {
+                    PollSound();
+                    remoteBuffer = reinterpret_cast<NewGameRemotePacket *>(
+                        GetRemoteData(1));
+                } while (remoteBuffer == 0);
+            } while (remoteBuffer->type != NEW_GAME_REMOTE_PACKET_TYPE);
+
+            switch (remoteBuffer->command) {
+            case NEW_GAME_REMOTE_MAP_HEADER:
+                memset(&m_mapHeader, 0, sizeof(m_mapHeader));
+                memcpy(&m_mapHeader, remoteBuffer->payload,
+                       NEW_GAME_MAP_PACKET_SIZE);
+                mapHeaderLoaded = 1;
+                break;
+            case NEW_GAME_REMOTE_PLAYER_INFO:
+                memcpy(gsNetPlayerInfo, remoteBuffer->payload,
+                       NEW_GAME_PLAYER_INFO_PACKET_SIZE);
+                SetupNetPlayerNames();
+                playerDataReceived = 1;
+                break;
             }
         } while (!playerDataReceived || !mapHeaderLoaded);
 
