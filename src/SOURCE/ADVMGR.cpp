@@ -2986,10 +2986,9 @@ radar_default_object:
 }
 
 // @early-stop
-// Excluding the 0x7c pointer table and adjacent 0x7b byte lookup, all 1017
-// executable instructions, the 0x1fc frame, and all 205 relocation targets match.
-// The only displayed operand difference is the delinked byte-table reference
-// ([eax + 0x110b] versus [eax]); retail also has two trailing alignment NOPs.
+// All 0x133e retail bytes match after masking the 205 relocation fields, including
+// the 0x7c pointer table and adjacent byte lookup. All resolved relocation targets,
+// the 0x1fc frame, slots, and CFG agree; ours only has two trailing alignment NOPs.
 VA(0x0045f127, 0x133e)
 void advManager::QuickInfo(int cellX, int cellY)
 {
@@ -4428,9 +4427,12 @@ char * advManager::GetArmySizeName(int armySize, int grammar)
 }
 
 // @early-stop
-// The relocation-masked lite diff has no opcode or operand differences: the
-// complete 0xec frame/slots and CFG agree, and all 102 external relocation
-// targets resolve identically. The residual is delinked relocation-symbol identity.
+// Objdiff is 100%. Across the 0xc29 retail bytes, relocation-masked raw comparison
+// differs only at +0x831..+0x838: retail loads secondRowCountState then adds
+// firstRowCountState, while ours loads/adds the same two ints in the opposite order.
+// Textual operand reversal, unary-plus/cast/zero grouping, and focused inline-helper
+// spellings were identical or worse. The 0xec frame/slots, CFG, and all 102 resolved
+// relocation targets agree; ours only has three trailing alignment NOPs.
 VA(0x004631ad, 0xc29)
 void advManager::TownQuickView(int townId, int locatorSlot, int windowX, int windowY)
 {
@@ -4589,7 +4591,7 @@ void advManager::TownQuickView(int townId, int locatorSlot, int windowX, int win
                 ++creatureSlotLocal;
             creatureLocal = quickTownLocal->m_army.m_creatureTypes[creatureSlotLocal];
             armyIcons[widgetIndexWidget] = new iconWidget(
-                static_cast<short>(slotWidthSlot * widgetIndexWidget + slotStartState +
+                static_cast<short>(widgetIndexWidget * slotWidthSlot + slotStartState +
                     fiveArmyShiftValue - GetIconEntry(monsterIconLocal, creatureLocal)->x +
                     (32 - GetIconEntry(monsterIconLocal, creatureLocal)->w) / 2 + 1),
                 static_cast<short>(rowY - GetIconEntry(monsterIconLocal, creatureLocal)->y -
@@ -4609,7 +4611,7 @@ void advManager::TownQuickView(int townId, int locatorSlot, int windowX, int win
             else
                 strcpy(armyLabelsResult[widgetIndexWidget], "???");
             armyTexts[widgetIndexWidget] = new textWidget(
-                static_cast<short>(slotWidthSlot * widgetIndexWidget + slotStartState +
+                static_cast<short>(widgetIndexWidget * slotWidthSlot + slotStartState +
                     fiveArmyShiftValue - 14), static_cast<short>(rowY + 32), 60, 12,
                 armyLabelsResult[widgetIndexWidget], "smalfont.fnt", 1, -1,
                 0x200, 1);

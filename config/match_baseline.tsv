@@ -457,7 +457,7 @@ SOURCE/ADVMGR	?DrawCell@advManager@@QAEXHHHHHH@Z	99.5504	a79934b1f278
 SOURCE/ADVMGR	?EnableButtons@advManager@@QAEXXZ	100.0000	482a23117b3b
 SOURCE/ADVMGR	?FindAdjacentMonster@advManager@@QAEHHHPAH0HH@Z	100.0000	0061835fe486
 SOURCE/ADVMGR	?ForceNewHover@advManager@@QAEXXZ	100.0000	22365eeaebb7
-SOURCE/ADVMGR	?GetArmySizeName@advManager@@QAEPADHH@Z	100.0000	0dbcc0d186ae
+SOURCE/ADVMGR	?GetArmySizeName@advManager@@QAEPADHH@Z	100.0000	c5eb146b8606
 SOURCE/ADVMGR	?GetCell@advManager@@QAEPAVmapCell@@HH@Z	100.0000	67cacc819ed9
 SOURCE/ADVMGR	?GetCloudLookup@advManager@@QAEHHH@Z	97.3663	914e1b6fa0e4
 SOURCE/ADVMGR	?GetCursorSampleSet@advManager@@QAEXH@Z	100.0000	c568e8348efb
@@ -498,7 +498,7 @@ SOURCE/ADVMGR	?SystemOptionsHandler@@YIHAAUtag_message@@@Z	99.9081	ef7f3a0e8f0c
 SOURCE/ADVMGR	?TeleportTo@advManager@@QAEXPAVhero@@HHHH@Z	98.7456	fad7f4321091
 SOURCE/ADVMGR	?TownGate@advManager@@QAEXH@Z	100.0000	c95ae49be1f8
 SOURCE/ADVMGR	?TownPortalHandler@@YIHAAUtag_message@@@Z	100.0000	2273d6ca43f1
-SOURCE/ADVMGR	?TownQuickView@advManager@@QAEXHHHH@Z	99.9973	c50da7d14d34
+SOURCE/ADVMGR	?TownQuickView@advManager@@QAEXHHHH@Z	99.9973	34a50e48174b
 SOURCE/ADVMGR	?TrimLoopingSounds@advManager@@QAEXH@Z	97.8829	d90d0b816d0f
 SOURCE/ADVMGR	?UpdBottomView@advManager@@QAEXHHH@Z	99.0654	4fd5266e5ee5
 SOURCE/ADVMGR	?UpdBottomViewEnemyTurn@advManager@@QAEHXZ	99.3548	75b2632215c2
@@ -508,7 +508,7 @@ SOURCE/ADVMGR	?UpdBottomViewNewTurn@advManager@@QAEHXZ	99.8053	87a4dbbfc54f
 SOURCE/ADVMGR	?UpdBottomViewResMsg@advManager@@QAEHXZ	100.0000	47398bdc911b
 SOURCE/ADVMGR	?UpdateHeroLocator@advManager@@QAEXHHH@Z	99.0610	65ed239b077e
 SOURCE/ADVMGR	?UpdateHeroLocators@advManager@@QAEXHH@Z	100.0000	ff9cf9e945ca
-SOURCE/ADVMGR	?UpdateRadar@advManager@@QAEXHH@Z	99.5591	9a641c53433d
+SOURCE/ADVMGR	?UpdateRadar@advManager@@QAEXHH@Z	98.6977	128d9a8d8c9d
 SOURCE/ADVMGR	?UpdateScreen@advManager@@QAEXHH@Z	99.9603	980674020b54
 SOURCE/ADVMGR	?UpdateSystemOptions@@YIXH@Z	94.0829	ccf4d7103a25
 SOURCE/ADVMGR	?UpdateTownLocators@advManager@@QAEXHH@Z	100.0000	d2217b855df8
