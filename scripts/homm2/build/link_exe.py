@@ -20,6 +20,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from homm2.build.extract_resources import read_pe_resources
+from homm2.build.gen_vendor_imports import LINK300_FORCED_VENDOR_IMPORTS
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO = next((p for p in SCRIPT_DIR.parents if (p / "flake.nix").exists()), SCRIPT_DIR)
@@ -62,6 +63,25 @@ SYSTEM_LIBS_AFTER_VENDOR = (
     "WINMM.LIB",
     "ADVAPI32.LIB",
 )
+
+
+def build_link_command(link_exe, map_path, output, object_paths, import_libraries,
+                       resource_path):
+    """Compose the proven LINK 3.00 input and forced-import order."""
+    command = [
+        "wine", str(link_exe), *RETAIL_LINK_FLAGS,
+        *("/INCLUDE:" + symbol for symbol in LINK300_FORCED_VENDOR_IMPORTS),
+        "/MAP:" + str(map_path),
+        "/OUT:" + str(output),
+        *SYSTEM_LIBS_BEFORE_VENDOR,
+        *map(str, import_libraries),
+        *SYSTEM_LIBS_AFTER_VENDOR,
+        *map(str, object_paths),
+        str(resource_path),
+    ]
+    return command
+
+
 def die(message):
     print("[link_exe] ERROR: %s" % message, file=sys.stderr)
     return 1
@@ -1057,16 +1077,14 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
     for stale in (output, map_path, missing_data_path):
         stale.unlink(missing_ok=True)
     library_path = winepath_w(toolchain / "lib")
-    command = [
-        "wine", str(link_exe), *RETAIL_LINK_FLAGS,
-        "/MAP:" + winepath_w(map_path),
-        "/OUT:" + winepath_w(output),
-    ]
-    command.extend(winepaths_w(response_objects))
-    command.append(winepath_w(resource_path))
-    command.extend(SYSTEM_LIBS_BEFORE_VENDOR)
-    command.extend(winepaths_w(imports_libraries))
-    command.extend(SYSTEM_LIBS_AFTER_VENDOR)
+    command = build_link_command(
+        link_exe,
+        winepath_w(map_path),
+        winepath_w(output),
+        winepaths_w(response_objects),
+        winepaths_w(imports_libraries),
+        winepath_w(resource_path),
+    )
     run = subprocess.run(command, cwd=output.parent,
                          env=link_environment(library_path, link_exe.parent), text=True,
                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -1089,8 +1107,10 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
                    if "Incremental Linker Version" in line), None)
     report = {
         "status": ("linked" if run.returncode == 0 and candidate and vendor_import_abi_match and
-                   resource_match else
+                   vendor_import_order_match and resource_match else
                    "resource-mismatch" if run.returncode == 0 and candidate and
+                   vendor_import_abi_match and vendor_import_order_match else
+                   "vendor-import-order-mismatch" if run.returncode == 0 and candidate and
                    vendor_import_abi_match else
                    "vendor-import-mismatch" if run.returncode == 0 and candidate else "failed"),
         "return_code": run.returncode,
@@ -1108,6 +1128,14 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
         },
         "order_source": "NB09 sstModule executable contribution order",
         "link_flags": list(RETAIL_LINK_FLAGS),
+        "forced_vendor_imports": list(LINK300_FORCED_VENDOR_IMPORTS),
+        "link_input_order": {
+            "system_libraries_before_vendor": list(SYSTEM_LIBS_BEFORE_VENDOR),
+            "vendor_import_libraries": [str(path) for path in imports_libraries],
+            "system_libraries_after_vendor": list(SYSTEM_LIBS_AFTER_VENDOR),
+            "objects": [str(path) for path in response_objects],
+            "resource": str(resource_path),
+        },
         "library_search": {"mechanism": "LIB environment", "path": library_path},
         "resource_input": str(resource_path),
         "resources": resources,
@@ -1231,7 +1259,7 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
     print("link audit: %s" % report_path)
     print("link audit: %s" % missing_data_path)
     return (0 if run.returncode == 0 and output.exists() and vendor_import_abi_match and
-            resource_match else (run.returncode or 1))
+            vendor_import_order_match and resource_match else (run.returncode or 1))
 
 
 def main(argv=None):
