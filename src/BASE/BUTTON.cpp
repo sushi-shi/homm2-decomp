@@ -94,7 +94,7 @@ inline button::~button()
 // the separately mapped 0x21 ??1 destructor remains raw exact at 4/4 relocations.
 // VA(0x004dd480, 0x36) ??_E/??_G button deleting-destructor aliases
 
-// @match-note
+// @semantic
 // Candidate is 0x585 versus retail 0x595. The first non-relocation byte divergence
 // is +0x47: candidate loads the vptr after storing m_flags, while retail loads it
 // before the store. The modal loop, message CFG, frame, calls, and all 36 ordered
@@ -281,7 +281,7 @@ normalEvent:
     return widget::Main(msg);
 }
 
-// @match-note
+// @semantic
 // After removing BUTTON's unused synthetic _globals_model include, candidate is 0x95
 // versus retail 0x96 and live match returns to 94.72%. The first non-relocation
 // divergence is +0x0a: candidate loads both owner coordinates first; retail starts
@@ -314,16 +314,13 @@ short button::Select(struct tag_message &msg)
     return 2;
 }
 
-// @match-note
-// Candidate and retail are both 0x83. The only relocation-masked byte differences are
-// +0x19 and +0x1f: candidate stores m_flags, sets this, then loads the vptr; retail
-// loads the vptr, stores m_flags, then sets this. The virtual call and every later byte
-// are exact, as are all 4 ordered relocation offsets/types/targets. Direct/combined
-// flag stores and 24 guarded TU-state probes produced no change. The prior 40-iteration
-// libclang pass and the one permitted rerun after the unsigned m_iconId correction both
-// found no valid AST variants or exact closure. Revisit after another real predecessor
-// or header TU-state change. This residual remains unresolved; it is not a byte-proven
-// early stop.
+// @semantic
+// Semantics, types, CFG, frame, 0x83 CodeView body, virtual Draw dispatch, and all four
+// ordered relocations are correct. The only residual is scheduling at +0x19/+0x1f:
+// retail loads the vptr, stores m_flags, then sets ECX; candidate stores m_flags, sets
+// ECX, then loads the vptr. Exact-preserving ctor/dtor inline, dllexport, definition,
+// and declaration-placement variants did not change it; variants that changed COMDAT
+// emission broke the destructor/alias shape.
 VA(0x004ddd10, 0x83)
 short button::Deselect(struct tag_message &msg)
 {
