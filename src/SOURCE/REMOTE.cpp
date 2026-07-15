@@ -27,6 +27,12 @@
 #include <SOURCE/X_GLOBAL.h>
 
 #define REMOTE_SOURCE_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\REMOTE.CPP"
+#define REMOTE_PACKET(buffer) \
+    (reinterpret_cast<RemotePacketHeader *>(buffer))
+#define REMOTE_MESSAGE(buffer) \
+    (reinterpret_cast<RemoteMessage *>(buffer))
+#define REMOTE_PLAYER_INFO(message) \
+    (reinterpret_cast<SNetPlayerInfo *>((message)->payload))
 
 DATA(0x00517118) static short gGetRemoteDataLineBase = 716;
 DATA(0x00517148) static short gPollRemoteLineBase = 757;
@@ -156,8 +162,7 @@ void RemoteMain(int gameMode)
     }
     strcpy(gConfig.networkDefaultName, gsThisNetPlayerInfo.name);
     WritePrefs();
-    strcpy(reinterpret_cast<char *>(&gsThisNetPlayerInfo),
-        gConfig.uniqueSystemID);
+    strcpy(gsThisNetPlayerInfo.uniqueSystemID, gConfig.uniqueSystemID);
     gsThisNetPlayerInfo.connectionType = 2;
     gsThisNetPlayerInfo.useRegularCompression = 1;
     gsThisNetPlayerInfo.useDiffCompression = 1;
@@ -216,12 +221,12 @@ initializeNetwork:
                 incomingData = GetRemoteData(1);
                 LogStr("RM 4");
                 if (incomingData != 0 &&
-                    incomingData[5] == REMOTE_MESSAGE_RELIABLE) {
-                    switch (incomingData[6]) {
+                    REMOTE_MESSAGE(incomingData)->type == REMOTE_MESSAGE_RELIABLE) {
+                    switch (REMOTE_MESSAGE(incomingData)->command) {
                     case REMOTE_SETUP_PLAYER_INFO:
-                        netPlayer = incomingData[0];
+                        netPlayer = REMOTE_MESSAGE(incomingData)->sender;
                         gsNetPlayerInfo[netPlayer] =
-                            *reinterpret_cast<SNetPlayerInfo *>(incomingData + 9);
+                            *REMOTE_PLAYER_INFO(REMOTE_MESSAGE(incomingData));
                         receivedPlayers[netPlayer] = 1;
                         if (gsNetPlayerInfo[netPlayer].reserved[0] == 0)
                             xNetHasOldPlayers = 1;
@@ -252,21 +257,21 @@ initializeNetwork:
             PollSound();
             remoteGameType = GetRemoteData(1);
             if (remoteGameType != 0 &&
-                remoteGameType[5] == REMOTE_MESSAGE_RELIABLE) {
+                REMOTE_MESSAGE(remoteGameType)->type == REMOTE_MESSAGE_RELIABLE) {
                 setupCounter = 0;
                 setupCounter++;
                 setupCounter++;
                 setupCounter++;
             }
             if (remoteGameType != 0 &&
-                remoteGameType[5] == REMOTE_MESSAGE_RELIABLE &&
-                remoteGameType[6] == REMOTE_SETUP_CAMPAIGN_GAME) {
+                REMOTE_MESSAGE(remoteGameType)->type == REMOTE_MESSAGE_RELIABLE &&
+                REMOTE_MESSAGE(remoteGameType)->command == REMOTE_SETUP_CAMPAIGN_GAME) {
                 bGotGameType = 1;
                 giSetupGameType = 1;
             }
             if (remoteGameType != 0 &&
-                remoteGameType[5] == REMOTE_MESSAGE_RELIABLE &&
-                remoteGameType[6] == REMOTE_SETUP_STANDARD_GAME) {
+                REMOTE_MESSAGE(remoteGameType)->type == REMOTE_MESSAGE_RELIABLE &&
+                REMOTE_MESSAGE(remoteGameType)->command == REMOTE_SETUP_STANDARD_GAME) {
                 bGotGameType = 1;
                 giSetupGameType = 0;
             }
@@ -330,16 +335,16 @@ int EncodePacket(unsigned char *data, char source, char destination, int length)
 {
     unsigned short crc[2];
 
-    PacketSend[0] = source;
-    PacketSend[1] = destination;
-    PacketSend[2] = 0;
-    PacketSend[3] = static_cast<char>(length);
+    REMOTE_PACKET(PacketSend)->source = source;
+    REMOTE_PACKET(PacketSend)->destination = destination;
+    REMOTE_PACKET(PacketSend)->reserved = 0;
+    REMOTE_PACKET(PacketSend)->payloadSize = static_cast<char>(length);
     crc[0] = 0;
-    *reinterpret_cast<unsigned short *>(PacketSend + 4) = crc[0];
+    REMOTE_PACKET(PacketSend)->crc = crc[0];
     memcpy(PacketSend + REMOTE_PACKET_HEADER_SIZE, data, length);
     calc_crc(crc, reinterpret_cast<unsigned char *>(PacketSend),
         length + REMOTE_PACKET_HEADER_SIZE);
-    *reinterpret_cast<unsigned short *>(PacketSend + 4) = crc[0];
+    REMOTE_PACKET(PacketSend)->crc = crc[0];
     return length + REMOTE_PACKET_HEADER_SIZE;
 }
 
@@ -357,15 +362,15 @@ int DecodePacket(unsigned char *data, int)
     char errorText[200];
 
     calculatedCRC[0] = 0;
-    if (packet[1] != giThisNetPos &&
-        packet[1] != REMOTE_BROADCAST_PLAYER) {
-        sprintf(errorText, "not mine %d\n", packet[1]);
+    if (REMOTE_PACKET(packet)->destination != giThisNetPos &&
+        REMOTE_PACKET(packet)->destination != REMOTE_BROADCAST_PLAYER) {
+        sprintf(errorText, "not mine %d\n", REMOTE_PACKET(packet)->destination);
         LogStr(errorText);
         return 0;
     }
-    length = static_cast<unsigned char>(packet[3]);
-    receivedCRC = *reinterpret_cast<unsigned short *>(packet + 4);
-    *reinterpret_cast<unsigned short *>(packet + 4) = 0;
+    length = static_cast<unsigned char>(REMOTE_PACKET(packet)->payloadSize);
+    receivedCRC = REMOTE_PACKET(packet)->crc;
+    REMOTE_PACKET(packet)->crc = 0;
     calc_crc(calculatedCRC, reinterpret_cast<unsigned char *>(packet),
         length + REMOTE_PACKET_HEADER_SIZE);
     if (receivedCRC != calculatedCRC[0]) {
@@ -619,25 +624,25 @@ void PollRemote(void)
     savedInPollSound = gbInPollSound;
     queueFull = 0;
     if (KBTickCount() - lLastHeartbeatSend > REMOTE_HEARTBEAT_INTERVAL) {
-        reinterpret_cast<RemoteMessage *>(sndBuf)->sender =
+        REMOTE_MESSAGE(sndBuf)->sender =
             static_cast<signed char>(giThisNetPos);
-        reinterpret_cast<RemoteMessage *>(sndBuf)->type =
+        REMOTE_MESSAGE(sndBuf)->type =
             REMOTE_MESSAGE_HEARTBEAT;
-        reinterpret_cast<RemoteMessage *>(sndBuf)->payloadSize = 0;
+        REMOTE_MESSAGE(sndBuf)->payloadSize = 0;
         if (gbThisNetGotAdventureControl != 0) {
-            reinterpret_cast<RemoteMessage *>(sndBuf)->command =
+            REMOTE_MESSAGE(sndBuf)->command =
                 static_cast<signed char>(
-                ((giCurPlayer + 1) << 4) |
-                iCurHourGlassPhase | 0x80);
+                    ((giCurPlayer + 1) << 4) | iCurHourGlassPhase |
+                    REMOTE_HEARTBEAT_CONTROL_FLAG);
         } else {
-            reinterpret_cast<RemoteMessage *>(sndBuf)->command = 0;
+            REMOTE_MESSAGE(sndBuf)->command = 0;
         }
         if (giThisNetPos == 0 || gbThisNetGotAdventureControl != 0)
             destination = REMOTE_BROADCAST_PLAYER;
         else
             destination = 0;
         SendRemoteData(reinterpret_cast<unsigned char *>(sndBuf), 0,
-            destination, 10);
+            destination, REMOTE_HEARTBEAT_MESSAGE_SIZE);
         lLastHeartbeatSend = KBTickCount();
     }
 
@@ -671,7 +676,7 @@ void PollRemote(void)
     } else {
         timeout = REMOTE_GUEST_TIMEOUT;
         if (giThisNetPos != 1)
-            timeout += 30000;
+            timeout += REMOTE_CHAIN_GUEST_TIMEOUT_INCREMENT;
         if (lLastHeartbeatReceive[0] + timeout < KBTickCount() &&
             bInTimeoutFail == 0) {
             bInTimeoutFail = 1;
@@ -722,46 +727,46 @@ void PollRemote(void)
             reinterpret_cast<unsigned char *>(rcvBufIn),
             REMOTE_BROADCAST_PLAYER);
         if (receiveResult == 0 ||
-            reinterpret_cast<RemoteMessage *>(rcvBufIn)->sender == giThisNetPos)
+            REMOTE_MESSAGE(rcvBufIn)->sender == giThisNetPos)
             continue;
-        if (reinterpret_cast<RemoteMessage *>(rcvBufIn)->type ==
+        if (REMOTE_MESSAGE(rcvBufIn)->type ==
             REMOTE_MESSAGE_CONFIRM) {
-            giLastConfirm = reinterpret_cast<RemoteMessage *>(rcvBufIn)->id;
+            giLastConfirm = REMOTE_MESSAGE(rcvBufIn)->id;
             return;
         }
-        if (reinterpret_cast<RemoteMessage *>(rcvBufIn)->type ==
+        if (REMOTE_MESSAGE(rcvBufIn)->type ==
             REMOTE_MESSAGE_HEARTBEAT) {
             lLastHeartbeatReceive[
-                reinterpret_cast<RemoteMessage *>(rcvBufIn)->sender] =
+                REMOTE_MESSAGE(rcvBufIn)->sender] =
                 KBTickCount();
             netCommand =
-                reinterpret_cast<RemoteMessage *>(rcvBufIn)->command;
-            if ((netCommand & 0x80) == 0)
+                REMOTE_MESSAGE(rcvBufIn)->command;
+            if ((netCommand & REMOTE_HEARTBEAT_CONTROL_FLAG) == 0)
                 return;
             if (gbThisNetGotAdventureControl != 0)
                 return;
-            iCurHourGlassPhase = netCommand & 0x0f;
+            iCurHourGlassPhase = netCommand & REMOTE_HEARTBEAT_PHASE_MASK;
             return;
         }
         if (queueFull)
             return;
-        if (reinterpret_cast<RemoteMessage *>(rcvBufIn)->type ==
+        if (REMOTE_MESSAGE(rcvBufIn)->type ==
             REMOTE_MESSAGE_RELIABLE) {
-            reinterpret_cast<RemoteMessage *>(sndBuf)->sender =
+            REMOTE_MESSAGE(sndBuf)->sender =
                 static_cast<signed char>(giThisNetPos);
-            reinterpret_cast<RemoteMessage *>(sndBuf)->id =
-                reinterpret_cast<RemoteMessage *>(rcvBufIn)->id;
-            reinterpret_cast<RemoteMessage *>(sndBuf)->type =
+            REMOTE_MESSAGE(sndBuf)->id =
+                REMOTE_MESSAGE(rcvBufIn)->id;
+            REMOTE_MESSAGE(sndBuf)->type =
                 REMOTE_MESSAGE_CONFIRM;
-            reinterpret_cast<RemoteMessage *>(sndBuf)->payloadSize = 0;
+            REMOTE_MESSAGE(sndBuf)->payloadSize = 0;
             SendRemoteData(reinterpret_cast<unsigned char *>(sndBuf), 0,
-                reinterpret_cast<RemoteMessage *>(rcvBufIn)->sender,
+                REMOTE_MESSAGE(rcvBufIn)->sender,
                 REMOTE_MESSAGE_HEADER_SIZE);
         }
         for (queueIndex = 0; queueIndex < REMOTE_QUEUE_CAPACITY; queueIndex++) {
             if (rcvBuf[queueIndex] != 0 &&
-                reinterpret_cast<RemoteMessage *>(rcvBuf[queueIndex])->id ==
-                    reinterpret_cast<RemoteMessage *>(rcvBufIn)->id) {
+                REMOTE_MESSAGE(rcvBuf[queueIndex])->id ==
+                    REMOTE_MESSAGE(rcvBufIn)->id) {
                 break;
             }
         }
@@ -769,7 +774,7 @@ void PollRemote(void)
             continue;
         for (queueIndex = 0; queueIndex < REMOTE_RECENT_ID_COUNT; queueIndex++) {
             if (iLastIds[queueIndex] ==
-                reinterpret_cast<RemoteMessage *>(rcvBufIn)->id)
+                REMOTE_MESSAGE(rcvBufIn)->id)
                 break;
         }
         if (queueIndex < REMOTE_RECENT_ID_COUNT)
@@ -787,7 +792,7 @@ void PollRemote(void)
         memcpy(rcvBuf[queueIndex], rcvBufIn, REMOTE_MESSAGE_SIZE);
         queueCount++;
         iLastIds[iCurLastID] =
-            reinterpret_cast<RemoteMessage *>(rcvBufIn)->id;
+            REMOTE_MESSAGE(rcvBufIn)->id;
         iCurLastID = (iCurLastID + 1) % REMOTE_RECENT_ID_COUNT;
         if (queueCount == REMOTE_QUEUE_CAPACITY)
             return;
@@ -840,8 +845,8 @@ int TransmitAndWait(char *data, int destination, int length,
             if (receivedData != 0)
                 unusedResponseState = 0;
             if (receivedData != 0 &&
-                receivedData[5] == REMOTE_MESSAGE_RELIABLE &&
-                receivedData[6] == responseCommand) {
+                REMOTE_MESSAGE(receivedData)->type == REMOTE_MESSAGE_RELIABLE &&
+                REMOTE_MESSAGE(receivedData)->command == responseCommand) {
                 complete = 1;
             }
         }
