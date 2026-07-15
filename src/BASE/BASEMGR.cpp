@@ -8,20 +8,26 @@
 #include <string.h>
 
 // @match-note: structurally complete /O2 checkpoint (live/retained 79.67%).
-// Base and retail are both 0x47 bytes with the same two ordered text relocations
-// ("Unknown", vtable), and original PE bytes at 0x004eba70 confirm three
-// __purecall slots. Retail stores next/prev zero before the vptr, then priority/
-// message-mask -1 and active zero; from the priority store onward the objects are
-// byte-identical. Base instead schedules the vptr before its register saves.
-// Right-associative body assignment chains preserve retail's field-store order;
-// an initializer list cannot, because declaration order would reverse the two
-// -1 stores. Revisit after a genuine class-header/TU-state change.
+// Base and retail are both 0x47 bytes and have the same two relocation targets
+// and occurrences ("Unknown" and the baseManager vtable). Original PE bytes at
+// 0x004eba70 confirm the three __purecall slots and CodeView confirms baseManager
+// is a root class, so the early next/prev stores are not a hidden base ctor.
+// The first divergence is at +0x00: base emits the vptr store before saving
+// registers, while retail saves ebx, copies this to edx, saves esi/edi, then
+// initializes next/prev before storing the vptr. From the priority store onward
+// the instruction bytes are identical. Right-associative assignment chains,
+// separate semantic-enum assignments, and a local this alias do not alter the
+// scheduling. An initializer list was rejected because declaration order would
+// reverse retail's priority-before-message-mask stores. No AST permutation was
+// run below structural alignment. Revisit after an exact-preserving shared-header
+// or predecessor/TU-state change; this is not a certified compiler wall.
 VA(0x004d2530, 0x47)
 baseManager::baseManager(void)
 {
     m_prev = m_next = 0;
-    m_messageMask = m_priority = -1;
-    m_active = 0;
+    m_priority = BASE_MANAGER_PRIORITY_UNASSIGNED;
+    m_messageMask = BASE_MANAGER_MESSAGE_MASK_ALL;
+    m_active = BASE_MANAGER_INACTIVE;
     strcpy(m_name, "Unknown");
 }
 
