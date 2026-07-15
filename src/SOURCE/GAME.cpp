@@ -670,10 +670,12 @@ int game::SaveGame(char *filename, int generateName, signed char expansionFormat
     return 1;
 }
 
-// @early-stop
-// Complete semantics and layout. The typed four-byte primary-stat
-// array requires the adjacent byte at hero+0x43 to be initialized separately;
-// retail's aliasing five-iteration loop accounts for the remaining code shape.
+// @match-note
+// Complete semantics, frame, CFG, and all 75 external relocations agree. Reconstructing
+// hero+0x3f as the retail five-byte starting-stat array removed the missing loop body.
+// The retained maximum is 99.9948%; the current first real divergence is equivalent
+// hero-record index arithmetic in that loop. Split 4+1 fields and the contiguous
+// five-byte array have both been tried; revisit after later shared-layout recovery.
 VA(0x00472a7b, 0xb44)
 void game::SetupOrigData(void)
 {
@@ -736,12 +738,9 @@ void game::SetupOrigData(void)
         m_heroRecs[i].m_direction = 2;
         strcpy(m_heroRecs[i].m_name, gHeroDefaultNames[i]);
         m_heroRecs[i].m_cursorType = static_cast<unsigned char>(i / 9);
-        for (j = 0; j < HERO_PRIMARY_STAT_COUNT; j++)
+        for (j = 0; j < HERO_STARTING_STAT_COUNT; j++)
             m_heroRecs[i].m_primaryStats[j] =
                 gStartingHeroStats[m_heroRecs[i].m_cursorType][j];
-        m_heroRecs[i].m_unknown43 =
-            gStartingHeroStats[m_heroRecs[i].m_cursorType]
-                              [HERO_PRIMARY_STAT_COUNT];
         for (j = 0; j < 5; j++)
             reinterpret_cast<signed char *>(&m_heroRecs[i].m_army)[j] = -1;
         m_heroRecs[i].m_destinationY = -1;
@@ -1061,9 +1060,9 @@ VA(0x004745d4, 0xa4)
 void game::GiveTroopsToNeutralTowns(void)
 {
     int i;
-    for (i = 0; i < 0x48; i++) {
+    for (i = 0; i < GAME_TOWN_COUNT; i++) {
         GiveTroopsToNeutralTown(i);
-        if (*(int *)((char *)this + i * 100 + 0xb6b) & 0x40) {
+        if (m_castleRecs[i].m_buildings & TOWN_BUILDING_NEUTRAL_GROWTH_BONUS) {
             if (Random(0, 100) < 0x50)
                 GiveTroopsToNeutralTown(i);
         } else {
@@ -1442,7 +1441,7 @@ inline townSlot *GetCastleSlot(game *instance, int index)
     return reinterpret_cast<townSlot *>(&instance->m_castleRecs[index]);
 }
 
-// @early-stop
+// @match-note
 // soft/TU-cumulative: frame 0x1d8 exact; base 0x25fe vs retail 0x2601. Residual is three MAP_WIDTH/xPos2 commutative compare encodings (+0x9d, +0x1db7, +0x1ee4; one byte each) and equal-length packed-w4hi RHS/cell-word evaluation order at +0x2e1; val|0, setter, union, cast, and bitfield-type spellings do not steer MSVC 4.2.
 VA(0x00476448, 0x2601)
 void game::RandomizeEvents(void)
@@ -2219,7 +2218,7 @@ void game::UpdateSpellWidgets(void)
     }
 }
 
-// @early-stop
+// @match-note
 // Exact 0x692-byte span and 101 relocation sites. The live residual is the
 // commutative equality at +0x14: retail loads the window-manager field before
 // the hover id, while this TU loads the hover id first. Both source operand orders
@@ -2372,7 +2371,7 @@ int ViewSpellsHandler(tag_message &msg)
     return 1;
 }
 
-// @early-stop
+// @match-note
 // Manual relocation audit finds 35 sites in both objects. This body is 0x17d versus
 // retail's 0x17c solely because the commutative hover equality loads msg first into eax
 // (15 bytes) instead of the window manager first into eax (14 bytes); all later blocks
@@ -2850,16 +2849,16 @@ void game::TurnOnAIMusic(void)
 {
     gpSoundManager->StopAllSamples(1);
     gpSoundManager->SwitchAmbientMusic(0x1c);
-    *(int *)((char *)gpSoundManager + 0x684) = 0;
+    gpSoundManager->m_samplesReady = 0;
 }
 
 VA(0x0047bd74, 0x25)
 void game::TurnOffAIMusic(void)
 {
-    *(int *)((char *)gpSoundManager + 0x684) = 1;
+    gpSoundManager->m_samplesReady = 1;
 }
 
-// @early-stop
+// @match-note
 // The reconstructed body realigns after each of the first two flag clears and thereafter
 // matches instruction-for-instruction. Retail expands each clear into a 0x1e-byte longer
 // address/load/and/address/store sequence (114 relocations versus 112); direct, bitfield,
@@ -3032,7 +3031,7 @@ int game::ComputeDailyGold(int player)
     return gold;
 }
 
-// @early-stop
+// @match-note
 // Frame/slots and 30 relocations are exact. The only residual is target 0x47ce94..0x47cec2:
 // the commutative handicap sum loads gpGame secondary income before this->primary income;
 // this partial /Od TU loads the same two operands in the opposite order, then realigns at fild.
@@ -3184,7 +3183,7 @@ void game::PerDay(void)
     }
 }
 
-// @early-stop
+// @match-note
 // 99.09%: frame and control flow are byte-exact. The six hero-slot index residuals
 // differ only in when a commutative subtraction is issued, and the map-height loop
 // differs only in compare operand order; both are the documented TU-cumulative /Od
@@ -3564,7 +3563,7 @@ void game::PerMonth(void)
     gpAdvManager->CompleteDraw(0);
 }
 
-// @early-stop
+// @match-note
 // The complete control flow and both relocations align. The AST-permuted bounds spelling
 // improves the match to 99.19%: this 0x472-byte body materializes y + 1 with a one-byte inc,
 // while retail's 0x476-byte body compares y directly and retains a five-byte continuation.
@@ -3686,7 +3685,7 @@ void game::RandomizeTown(int x, int y, int)
     m_castleRecs[townId0].m_type = static_cast<signed char>(race0);
 }
 
-// @early-stop
+// @match-note
 // Exact 0x619-byte span and 22 relocation sites. The remaining /Od differences
 // are operand evaluation in the inlined GetCell(x + 1, ...) accessors and the
 // columnOffset + x expressions. Both operand spellings were tested unchanged;
@@ -3824,13 +3823,13 @@ VA(0x0047fc0a, 0xc6)
 void game::InitRandomArtifacts(void)
 {
     int xx;
-    memset((char *)this + 0x6136, 0, 0x67);
+    memset(m_randomArtifacts, 0, sizeof(m_randomArtifacts));
     int x;
     for (x = 0; x < MAP_WIDTH; x++) {
         for (int y = 0; y < MAP_HEIGHT; y++) {
             mapCell *cell = WORLDMAP->Row(y) + x;
-            if (((unsigned char *)cell)[9] == 0xa9)
-                ((char *)this)[0x6136 + (((unsigned char *)cell)[3] >> 1)] = 1;
+            if (cell->triggerType == MAP_TRIGGER_RANDOM_ARTIFACT)
+                m_randomArtifacts[cell->objIndex >> 1] = 1;
         }
     }
 }
@@ -4132,7 +4131,7 @@ monsterBoundsReady:
     }
 }
 
-// @early-stop
+// @match-note
 // Logic and frame slots are byte-exact. The only residual is the TU-cumulative /Od
 // polarity/load order of cutoff <= visibility: retail emits cmp cutoff,visibility; jg,
 // while this partial TU emits the relationally equivalent cmp visibility,cutoff; jl.
@@ -4186,18 +4185,16 @@ void game::SetVisibility(int x, int y, int player, int radius)
     }
 }
 
-// @early-stop
-// Logic + frame slots byte-exact; residual is 3 commutative operand-load swaps (the
+// @match-note
+// Logic and frame slots are byte-exact; residual is three commutative operand-load swaps (the
 // inner-loop test y<MAP_HEIGHT and the two y*MAP_WIDTH index multiplies load the OTHER
 // operand into eax first). Not source-steerable (operand order / reversed compare /
-// extra temp all tested - no effect): it is the TU-cumulative /Od eval-order parity of
-// the partial GAME TU (most preceding functions are still placeholders, so the temp
-// counter is off from retail). Same class as the ExperienceValueOfStack @early-stop;
-// aligns when GAME is fuller.
+// extra temp all tested with no effect). Revisit after later GAME/header reconstruction
+// changes cumulative compiler state; do not retry those spellings before 95% total fuzzy.
 VA(0x00480d94, 0xd8)
 void game::MakeAllWaterVisible(int player)
 {
-    char mask = (char)(1 << player);
+    char mask = static_cast<char>(1 << player);
     int x;
     int y;
     for (x = 0; x < MAP_WIDTH; x++) {
@@ -4215,17 +4212,17 @@ void game::GiveArmy(armyGroup *group, int type, int count, int slot)
     int i;
     if (slot >= 0) {
         i = slot;
-        ((char *)group)[i] = (char)type;
-        i[(short *)((char *)group + 5)] = 0;
+        group->m_creatureTypes[i] = static_cast<signed char>(type);
+        group->m_creatureCounts[i] = 0;
     } else {
         for (i = 0; i < 5; i++) {
-            if (((signed char *)group)[i] == type)
+            if (group->m_creatureTypes[i] == type)
                 break;
         }
         if (i >= 5) {
             for (i = 0; i < 5; i++) {
-                if (((signed char *)group)[i] < 0) {
-                    i[(short *)((char *)group + 5)] = 0;
+                if (group->m_creatureTypes[i] < 0) {
+                    group->m_creatureCounts[i] = 0;
                     break;
                 }
             }
@@ -4233,8 +4230,8 @@ void game::GiveArmy(armyGroup *group, int type, int count, int slot)
         if (i >= 5)
             return;
     }
-    ((char *)group)[i] = (char)type;
-    i[(short *)((char *)group + 5)] += count;
+    group->m_creatureTypes[i] = static_cast<signed char>(type);
+    group->m_creatureCounts[i] += count;
 }
 
 VA(0x00480f68, 0x91)
@@ -4287,7 +4284,7 @@ int game::GetLuck(hero *h, class army *, town *castle)
     return luck;
 }
 
-// @early-stop
+// @match-note
 // Logic + frame slots byte-exact (col/row/mask + nested x/y land on retail's -0x4..-0x14
 // via the {} block); residual is the same TU-cumulative /Od eval-order parity as
 // MakeAllWaterVisible - the inner-loop test and the y*MAP_WIDTH multiplies load the other
@@ -4339,7 +4336,7 @@ void game::ShowComputerScreen(void)
         gpAdvManager->UpdBottomView(1, 1, 1);
         gpAdvManager->UpdateScreen(0, 1);
         gbAllBlack = 0;
-        gbThisNetHumanPlayer[giCurPlayer] = (signed char)saved;
+        gbThisNetHumanPlayer[giCurPlayer] = static_cast<signed char>(saved);
     }
     ShowHeroesLogo();
 }
@@ -4347,13 +4344,13 @@ void game::ShowComputerScreen(void)
 VA(0x0048135e, 0xa0)
 void game::ShowHeroesLogo(void)
 {
-    if (*(int *)((char *)gpAdvManager + 0x37a) == 0) {
-        *(int *)((char *)gpAdvManager + 0x37a) = 1;
+    if (gpAdvManager->m_openState == 0) {
+        gpAdvManager->m_openState = 1;
         icon *theIcon = gpResourceManager->GetIcon("herologo.icn");
-        IconToBitmap(theIcon, *(bitmap **)((char *)gpWindowManager + 0x46),
+        IconToBitmap(theIcon, gpWindowManager->m_screen,
                      0x1e0, 0x10, 0, 0, 0, 0, 0x280, 0x1e0, 0);
         gpWindowManager->UpdateScreenRegion(0x1e0, 0x10, 0x90, 0x90);
-        gpResourceManager->Dispose((resource *)theIcon);
+        gpResourceManager->Dispose(static_cast<resource *>(theIcon));
     }
 }
 
@@ -4455,7 +4452,7 @@ void game::ConvertAllToLateOverlay(int col, int row)
     }
 }
 
-// @early-stop
+// @match-note
 // Logic is complete. The residual is one coupled TU-cumulative /Od lowering choice:
 // retail evaluates the packed w4hi lvalue first and reserves two hidden temporary words;
 // this partial TU evaluates townId first and omits them. The same parity flips the three
@@ -4884,7 +4881,7 @@ void game::ProcessOnMapHeroes(void)
     }
 }
 
-// @early-stop
+// @match-note
 // Frame layout and all seven relocations are exact. The 0x8-byte size residual is one
 // five-byte inlined hero-bounds continuation plus three bytes of equivalent commutative
 // packed-record index arithmetic; every ownership, repair, and army check realigns.
@@ -4995,7 +4992,7 @@ void game::CheckHeroConsistency(void)
 #define samplesReady samplesReady1
 #define success success14
 
-// @early-stop
+// @match-note
 // Exact 0x71e-byte span with the same 94 relocation sites. Five masked bytes
 // differ: +0x524/+0x527/+0x529 reverse the packet/batch-bound loads, and
 // +0x640/+0x643 reverse the fileData/transmitData equality loads. Both source
@@ -5496,13 +5493,20 @@ int game::GetBoatsBuilt(void)
     return count;
 }
 
+// @match-note
+// Complete logic and frame; the sole relocation agrees. The first divergence is the
+// equivalent townIds[color][i] address expression: retail forms i + color * 283 while
+// this TU forms color * 283 + i. Direct m_players access, the inline Town accessor, and
+// direct/local PlayerTownListView spellings were tried. Revisit after shared-header state.
 VA(0x00484471, 0x9c)
 int game::GetNumThievesGuilds(int color)
 {
     int num = 0;
     int i;
-    for (i = 0; i < ((signed char *)this)[color * 283 + 0x4e0]; i++) {
-        if (*(int *)((char *)gpGame + ((SThievesData *)this)->list[color][i] * 100 + 0xb6b) & 2)
+    for (i = 0; i < m_players[color].townCount; i++) {
+        if (gpGame->m_castleRecs[
+                reinterpret_cast<PlayerTownListView *>(this)->townIds[color][i]]
+                .m_buildings & TOWN_BUILDING_TAVERN)
             num++;
     }
     return num;
@@ -5576,9 +5580,8 @@ int CalcBaseScore(int days)
 }
 
 // @early-stop
-// ~99.9%: logic byte-exact (matched 100% standalone); tiny residual is the same
-// TU-cumulative /Od operand-load-order parity as the other GAME parks — should resolve
-// as the surrounding GAME functions are reconstructed.
+// Relocation-masked instruction streams are identical for all 0xb5 bytes and all
+// four relocation targets agree. The residual is delinked local-label identity.
 VA(0x0048480a, 0xb5)
 void game::RestoreCell(int x, int y, int obj, int barrier, mapCell *passedCell, int p6)
 {
@@ -5587,26 +5590,26 @@ void game::RestoreCell(int x, int y, int obj, int barrier, mapCell *passedCell, 
         cell = passedCell;
     else
         cell = gpAdvManager->GetCell(x, y);
-    if (y > 0 && obj == 0xa3 &&
-        ((unsigned char *)gpAdvManager->GetCell(x, y - 1))[9] != 0x23) {
-        ((char *)cell)[9] = 0;
+    if (y > 0 && obj == MAP_TRIGGER_TOWN &&
+        gpAdvManager->GetCell(x, y - 1)->triggerType != MAP_TRIGGER_TOWN_BASE) {
+        cell->triggerType = 0;
         cell->w4hi = 0;
     } else {
-        ((char *)cell)[9] = (char)obj;
+        cell->triggerType = static_cast<unsigned char>(obj);
         cell->w4hi = barrier;
     }
 }
 
-// @early-stop
-// Condition (3-term &&), reinit, and realloc (BaseFree/BaseAlloc/memset) all byte-exact;
-// residual is 2 redundant jumps retail /Od emits for the empty then-branch of the
-// if/else - an end-of-function trampoline (jmp $+0 class) plus a dead `jmp realloc` -
-// that my build collapses to one direct jmp. A /Od jump-layout artifact of the empty
-// then; not behaviorally meaningful.
+// @match-note
+// Frame, reinit, realloc, and all 23 relocations agree. The first divergence is the
+// height equality's commutative load order; retail also retains two redundant jumps
+// for the empty then-branch: an end-of-function trampoline and a dead `jmp realloc`
+// while this build collapses to one direct jump. Both equality operand orders and named
+// source-line offsets were tried; revisit for inline/jump placement after 95%.
 VA(0x004848bf, 0xe3)
 void game::SetMapSize(int w, int h)
 {
-    if (MAP_HEIGHT == h && MAP_WIDTH == w && bMapInitialized) {
+    if (h == MAP_HEIGHT && w == MAP_WIDTH && bMapInitialized) {
     } else {
         bMapInitialized = 1;
         MAP_WIDTH = w;
@@ -5614,12 +5617,17 @@ void game::SetMapSize(int w, int h)
         gpSearchArray->Init();
     }
     if (mapExtra)
-        BaseFree(mapExtra, GFILE, *(short *)"\x0d\x1d" + 0xc);
-    mapExtra = (unsigned char *)BaseAlloc(MAP_WIDTH * MAP_HEIGHT, GFILE, *(short *)"\x0d\x1d" + 0xd);
+        BaseFree(mapExtra, GFILE,
+                 *reinterpret_cast<const short *>("\x0d\x1d") +
+                     GAME_SET_MAP_SIZE_FREE_OFFSET);
+    mapExtra = static_cast<unsigned char *>(
+        BaseAlloc(MAP_WIDTH * MAP_HEIGHT, GFILE,
+                  *reinterpret_cast<const short *>("\x0d\x1d") +
+                      GAME_SET_MAP_SIZE_ALLOC_OFFSET));
     memset(mapExtra, 0, MAP_WIDTH * MAP_HEIGHT);
 }
 
-// @early-stop
+// @match-note
 // Logic + frame slots byte-exact; residual is the operand-eval order of the two
 // `flags |= <extracted len bits>` ORs: retail loads `flags` into al first (then keeps
 // len in ecx and pulls the shifted byte via ch), my build evaluates the value first and
@@ -5633,19 +5641,19 @@ void WriteDiffHeaderInfo(unsigned char cmd, int len, unsigned char *buf, int *po
     if (len > 0x1fff) {
         flags |= 0x40;
         flags |= (len & 0x2f0000) >> 16;
-        unsigned short word = (unsigned short)(len & 0xffff);
+        unsigned short word = static_cast<unsigned short>(len & 0xffff);
         buf[*pos] = flags;
-        *(unsigned short *)(buf + *pos + 1) = word;
+        *reinterpret_cast<unsigned short *>(buf + *pos + 1) = word;
         *pos += 3;
     } else if (len > 0x1f) {
         flags |= 0x20;
         flags |= (len >> 8) & 0x1f;
-        unsigned char lo = (unsigned char)len;
+        unsigned char lo = static_cast<unsigned char>(len);
         buf[*pos] = flags;
         buf[*pos + 1] = lo;
         *pos += 2;
     } else {
-        flags |= (unsigned char)len;
+        flags |= static_cast<unsigned char>(len);
         buf[*pos] = flags;
         (*pos)++;
     }
@@ -5659,7 +5667,7 @@ int GetSkipCopyLen(unsigned char *buf, int *pos)
     if (b & 0x40) {
         len = b & 0x3f;
         len <<= 16;
-        len |= *(unsigned short *)(buf + *pos + 1);
+        len |= *reinterpret_cast<unsigned short *>(buf + *pos + 1);
         *pos += 3;
     } else if (b & 0x20) {
         len = b & 0x1f;
@@ -5827,7 +5835,7 @@ void CreateDiffFile(char *oldName, char *joinName, char *diffName,
     return;
 }
 
-// @early-stop
+// @match-note
 // Logic and all 0x34-frame slots match. At +0x1e8..+0x1f4 only, /Od emits the
 // equivalent TU-cumulative loop test with the two operand loads reversed.
 VA(0x00485107, 0x3ce)
@@ -5920,8 +5928,8 @@ VA(0x004854d5, 0x5d)
 int game::HeroIDToHeroPos(playerData *pd, int heroId)
 {
     int i;
-    for (i = 0; i < ((signed char *)pd)[1]; i++) {
-        if (((signed char *)pd)[i + 4] == heroId)
+    for (i = 0; i < pd->m_heroCount; i++) {
+        if (pd->m_heroIds[i] == heroId)
             return i;
     }
     return -1;
@@ -5931,8 +5939,8 @@ VA(0x00485532, 0x5d)
 int game::TownIDToTownPos(playerData *pd, int townId)
 {
     int i;
-    for (i = 0; i < ((signed char *)pd)[0x44]; i++) {
-        if (((signed char *)pd)[i + 0x47] == townId)
+    for (i = 0; i < pd->m_townCount; i++) {
+        if (pd->m_townIds[i] == townId)
             return i;
     }
     return -1;
@@ -6039,22 +6047,24 @@ ultimateRumour:
     }
 }
 
+// @early-stop
+// Relocation-masked instruction streams are identical for all 0xd9 bytes and all
+// five relocation targets agree. The residual is delinked local-label identity.
 VA(0x00485d2e, 0xd9)
 EventExtra *GetMapEvent(int x, int y)
 {
     int i;
-    for (i = 0; i < *(unsigned short *)((char *)gpGame + 0x657b); i++) {
-        EventExtra *ev = reinterpret_cast<EventExtra *>(ppMapExtra[*(unsigned short *)((char *)gpGame + 0x657d + i * 2)]);
-        if (*(unsigned short *)((char *)ev + 0x26) == x &&
-            *(unsigned short *)((char *)ev + 0x28) == y &&
-            ((signed char *)ev)[0x25] != 0 &&
-            ((unsigned char *)ev)[0x2b + PlayerEventByte(giCurPlayer)] != 0)
+    for (i = 0; i < gpGame->m_timeEventCount; i++) {
+        EventExtra *ev = reinterpret_cast<EventExtra *>(
+            ppMapExtra[gpGame->m_timeEventIndices[i]]);
+        if (ev->x == x && ev->y == y && ev->active != 0 &&
+            ev->players[PlayerEventByte(giCurPlayer)] != 0)
             return ev;
     }
     return 0;
 }
 
-// @early-stop
+// @match-note
 // Frame/CFG/logic match. Only +0xc..+0x37 (calendar term register order) and
 // +0x19d..+0x286 (four equivalent player-resource address orders) are TU-cumulative.
 VA(0x00485e07, 0x34c)
@@ -6129,7 +6139,7 @@ void game::CheckForTimeEvent(void)
     }
 }
 
-// @early-stop
+// @match-note
 // Frame/loops match; +0xc5..+0xe8 is only the equivalent packed expression
 // heroIndex + player * 283. Direct, commuted, accessor, and AST variants did not steer it.
 VA(0x00486153, 0x143)
@@ -6168,18 +6178,22 @@ VA(0x00486296, 0xab)
 int CalcFileCRC(char *filename)
 {
     long size = FileSize(filename);
-    char *block = (char *)BaseAlloc(size, GFILE, *(short *)"\x5e\x1f" + 3);
+    char *block = static_cast<char *>(BaseAlloc(
+        size, GFILE, *reinterpret_cast<const short *>("\x5e\x1f") +
+                         GAME_CALC_CRC_ALLOC_OFFSET));
     int hand = _open(filename, 0x8000);
     if (hand == -1)
         FileError(filename);
     _read(hand, block, size);
-    int crc = calc_crc_long((unsigned char *)block, size);
+    int crc = calc_crc_long(reinterpret_cast<unsigned char *>(block), size);
     _close(hand);
-    BaseFree(block, GFILE, *(short *)"\x5e\x1f" + 0xe);
+    BaseFree(block, GFILE,
+             *reinterpret_cast<const short *>("\x5e\x1f") +
+                 GAME_CALC_CRC_FREE_OFFSET);
     return crc;
 }
 
-// @early-stop
+// @match-note
 // All bytes except +0x8d..+0x99 match; /Od reverses the equivalent index/size
 // loop-test load order and branch polarity. Relational and AST variants did not steer it.
 VA(0x00486341, 0x153)
@@ -6286,11 +6300,6 @@ void CompressTest3(void)
     }
 }
 
-// @early-stop
-// Logic + frame slots byte-exact (count/cell function-scope, col/row/castle in the {}
-// block -> retail's -0x4..-0x14); residual is the same TU-cumulative /Od eval-order
-// parity - both loop tests (row<MAP_HEIGHT, col<MAP_WIDTH) load the global into eax
-// first in retail vs the loop var in my build. Aligns when GAME is fuller.
 VA(0x004866a5, 0x119)
 int game::CountShrines(int player)
 {
@@ -6305,11 +6314,11 @@ int game::CountShrines(int player)
         for (row = 0; row < MAP_HEIGHT; row++) {
             for (col = 0; col < MAP_WIDTH; col++) {
                 cell = WORLDMAP->Row(row) + col;
-                if (((unsigned char *)cell)[9] == 0xa3) {
+                if (cell->triggerType == MAP_TRIGGER_TOWN) {
                     castle = GetCastle(cell->w4hi);
-                    if (((signed char *)castle)[1] == player &&
-                        (*(int *)((char *)castle + 0x18) & 4) &&
-                        ((signed char *)castle)[3] == 5)
+                    if (castle->m_owner == player &&
+                        (castle->m_buildings & TOWN_BUILDING_TAVERN) &&
+                        castle->m_type == TOWN_TYPE_NECROMANCER)
                         count++;
                 }
             }
