@@ -15,6 +15,20 @@ import sys
 from pathlib import Path
 
 
+_I386_RELOCATION_WIDTHS = {
+    0x0001: 2,  # DIR16
+    0x0002: 2,  # REL16
+    0x0006: 4,  # DIR32
+    0x0007: 4,  # DIR32NB
+    0x0009: 2,  # SEG12
+    0x000A: 2,  # SECTION
+    0x000B: 4,  # SECREL
+    0x000C: 4,  # TOKEN
+    0x000D: 1,  # SECREL7
+    0x0014: 4,  # REL32
+}
+
+
 def _sha(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()[:16]
 
@@ -75,7 +89,11 @@ def read_coff(path: Path):
         for j in range(sec["nrel"]):
             roff = sec["relptr"] + j * 10
             offset, symidx, reltype = struct.unpack_from("<LLH", data, roff)
-            relocs.append((offset, f"{reltype:04x}:{symbols.get(symidx, '#' + str(symidx))}"))
+            width = _I386_RELOCATION_WIDTHS.get(reltype)
+            addend = sec["bytes"][offset : offset + width].hex() if width is not None else None
+            relocs.append(
+                (offset, reltype, symbols.get(symidx, "#" + str(symidx)), addend)
+            )
         starts = sorted(set(value for value, _name in functions))
         next_start = {
             start: starts[i + 1] if i + 1 < len(starts) else len(sec["bytes"])
@@ -84,7 +102,12 @@ def read_coff(path: Path):
         for start, fn in sorted(functions):
             end = next_start[start]
             body = sec["bytes"][start:end]
-            targets = [target for offset, target in relocs if start <= offset < end]
+            selected_relocs = [reloc for reloc in relocs if start <= reloc[0] < end]
+            targets = [f"{reltype:04x}:{target}" for _offset, reltype, target, _addend in selected_relocs]
+            relocation_stream = [
+                f"{offset - start:08x}:{reltype:04x}:{target}:{addend if addend is not None else '<unknown>'}"
+                for offset, reltype, target, addend in selected_relocs
+            ]
             rows.append(
                 {
                     "function": fn,
@@ -93,6 +116,11 @@ def read_coff(path: Path):
                     "text_sha": _sha(body),
                     "relocs": len(targets),
                     "reloc_sha": _sha("\n".join(targets).encode()),
+                    "reloc_stream": relocation_stream,
+                    "reloc_detail_sha": _sha("\n".join(relocation_stream).encode()),
+                    "reloc_stream_complete": all(
+                        addend is not None for _offset, _reltype, _target, addend in selected_relocs
+                    ),
                 }
             )
     return _sha(data), rows
