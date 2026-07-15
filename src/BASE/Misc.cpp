@@ -247,6 +247,14 @@ void ShowMemoryStatus(void)
     giDebugLevel = savedDebugLevel;
 }
 
+// @match-note
+// Structurally complete /O2 checkpoint: both sections are 0x48 with identical CFG and
+// no relocations.  Recovering the explicit shifted-hash temporary changed the rotate from
+// base `shr eax,25; shl esi,5` to retail's `shl eax,5; shr esi,25`, raising this from
+// 93.29% to 99.14%. The only remaining bytes are the three equivalent SIB encodings at
+// +0x1b, +0x28 and +0x35 (`[ecx+edx]` versus `[edx+ecx]`).  `text[i]`, `i[text]`, both
+// rotate-expression orders were tried. A bounded 30-walk libclang AST pass exposed four
+// variants and retained none; revisit after an exact-preserving predecessor/TU-state change.
 VA(0x004c44f0, 0x48)
 unsigned long int MAKEFILEID(char *text)
 {
@@ -256,7 +264,9 @@ unsigned long int MAKEFILEID(char *text)
         if (text[i] >= 'a' && text[i] <= 'z') {
             text[i] &= ~0x20;
         }
-        hash = (hash << 5) + (hash >> 25);
+        unsigned int shiftedHash = hash << 5;
+        hash >>= 25;
+        hash += shiftedHash;
         sum += text[i];
         hash += text[i] + sum;
     }
@@ -409,11 +419,12 @@ void ProcessAssert(int condition, char *file, int line)
 
 // @match-note
 // Structurally complete /O2 checkpoint with equal 0x66-byte sections, the same frame/CFG,
-// and the sole strncmp relocation.  In the current required-header state the first
-// divergence is +0xa: base carries text/count/index in EBX/EBP/EDI while retail uses
-// EBP/EBX/ESI; all calls, bounds, and return values remain equivalent.  Pointer operand
-// swaps, `&i[text]`, lvalue count loads, for/while/do forms, count|0, and reversed bounds
-// were tried.  This is a TU-state register allocation residual, not a proven artifact.
+// and the sole strncmp relocation.  The explicit MAKEFILEID rotate temporary moved this
+// from the old wholesale register-allocation residual to 98.60%; all instructions now agree
+// except the final +0x57 loop test (`cmp esi,ebx; jl` versus `cmp ebx,esi; jg`). Pointer
+// swaps, `&i[text]`, lvalue count loads, for/while/do forms, count|0, reversed bounds and a
+// bounded 30-walk libclang AST pass were tried. Revisit only after another exact-preserving
+// predecessor/TU-state change; this operand order is not a proven artifact.
 VA(0x004c4850, 0x66)
 char * FindStringInString(char *text, char *pattern)
 {
@@ -433,11 +444,12 @@ char * FindStringInString(char *text, char *pattern)
 
 // @match-note
 // Structurally complete /O2 checkpoint with equal 0x31-byte sections and no relocs/calls.
-// The current differences are the equivalent SIB at +0x17 (`[eax+esi]` versus
-// `[esi+eax]`) and loop test at +0x21 (`cmp eax,ecx; jl` versus `cmp ecx,eax; jg`).
+// The MAKEFILEID predecessor change fixed the old SIB residual; the only current difference
+// is the +0x21 loop test (`cmp eax,ecx; jl` versus `cmp ecx,eax; jg`).
 // for/while/do loops, explicit backedges, length/index `|0`, reversed bounds/returns,
-// `i[text]`, and lvalue length loads did not steer them.  Revisit after TU-state changes;
-// these operand-order encodings are not byte-proven artifacts.
+// `i[text]`, lvalue length loads and a bounded 30-walk libclang AST pass did not steer
+// them. Revisit after exact-preserving TU-state changes; these operand-order encodings are
+// not byte-proven artifacts.
 VA(0x004c48c0, 0x31)
 char * FindToken(char *text, char token)
 {
@@ -473,10 +485,15 @@ void SetInstallDefaults(void)
     gConfig.musicSource = CONFIG_MUSIC_SOURCE_CD;
 }
 
+#include <BASE/MiscConfigConstants.h>
+
 // @match-note
 // Structurally complete /O2 checkpoint: base is 0x1b7, retail 0x1b5, with the same
-// three-branch CFG and exact 42/42 ordered relocations.  Iteration now uses the real
-// exeGfxConfig type and advances one seven-word record at a time to the showCombatGrid
+// three-branch CFG and the same 42 relocation occurrences. Manual target-address review
+// confirms the intended gConfig/giMainVideoModeWidth owners; `homm2 relocs` reports six
+// only-base entries because the delinker names gConfig interior labels as constants/strings.
+// Iteration now uses the real exeGfxConfig type and advances one seven-word record at a time
+// to the showCombatGrid
 // endpoint (+0x68); the former interior-int reconstruction and its EBP spill are gone.
 // The first residual is +0x1: after the common `push ebx`, base materializes gfx[0]
 // (+0x1c) before saving ESI/EDI, while retail saves them first and materializes
@@ -493,16 +510,16 @@ void SetGameDefaults(void)
     gConfig.showRoute = 1;
     do {
         gfx->showMenu = 1;
-        gfx->x = 10;
-        gfx->y = 10;
+        gfx->x = MISC_DEFAULT_WINDOW_ORIGIN;
+        gfx->y = MISC_DEFAULT_WINDOW_ORIGIN;
         gfx->fullScreen = 1;
         gfx->colorMouseCursor = 0;
-        if (giMainVideoModeWidth <= 0x280) {
-            gfx->width = 0x1e0;
-            gfx->height = 0x168;
+        if (giMainVideoModeWidth <= MISC_DEFAULT_WINDOW_WIDTH) {
+            gfx->width = MISC_DEFAULT_SMALL_WINDOW_WIDTH;
+            gfx->height = MISC_DEFAULT_SMALL_WINDOW_HEIGHT;
         } else {
-            gfx->width = 0x280;
-            gfx->height = 0x1e0;
+            gfx->width = MISC_DEFAULT_WINDOW_WIDTH;
+            gfx->height = MISC_DEFAULT_WINDOW_HEIGHT;
         }
         ++gfx;
     } while (&gfx->fullScreen < &gConfig.showCombatGrid);
@@ -517,7 +534,7 @@ void SetGameDefaults(void)
     gConfig.autoCombatUseSpells = 0;
     gConfig.blackoutComputer = 0;
     gConfig.currentMapOffset = 0;
-    gConfig.firstMapOffset = rand() % 32001;
+    gConfig.firstMapOffset = rand() % MISC_DEFAULT_MAP_OFFSET_COUNT;
     gConfig.showObjectBoxes = 0;
     gConfig.editorScreenAnimation = 0;
     gConfig.editorPaletteCycling = 0;
@@ -527,18 +544,20 @@ void SetGameDefaults(void)
     gConfig.walkSpeed = 2;
     strcpy(gConfig.networkDefaultName, "The Unknown Hero");
     *reinterpret_cast<int *>(gConfig.uniqueSystemID) = 0;
-    int idSeed = rand() % 999999 + 1;
+    int idSeed = rand() % MISC_UNIQUE_ID_RANDOM_MODULUS + 1;
     idSeed += KBTickCount();
-    gConfig.uniqueSystemID[2] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[idSeed % 36];
-    int idAdd = rand() % 999999 + 1;
+    gConfig.uniqueSystemID[2] =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[idSeed % MISC_UNIQUE_ID_ALPHANUMERIC_COUNT];
+    int idAdd = rand() % MISC_UNIQUE_ID_RANDOM_MODULUS + 1;
     idAdd += KBTickCount();
     idSeed += idAdd;
-    gConfig.uniqueSystemID[1] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[idSeed % 36];
-    idAdd = rand() % 999999 + 1;
+    gConfig.uniqueSystemID[1] =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[idSeed % MISC_UNIQUE_ID_ALPHANUMERIC_COUNT];
+    idAdd = rand() % MISC_UNIQUE_ID_RANDOM_MODULUS + 1;
     idAdd += KBTickCount();
     idSeed += idAdd;
-    gConfig.uniqueSystemID[0] = static_cast<char>(idSeed % 26 + 'A');
-    gConfig.autoSaveName[14] = 0;
+    gConfig.uniqueSystemID[0] = static_cast<char>(idSeed % MISC_UNIQUE_ID_ALPHA_COUNT + 'A');
+    gConfig.autoSaveName[MISC_AUTOSAVE_SENTINEL_INDEX] = 0;
 }
 
 VA(0x004c4b60, 0x13f)
@@ -778,31 +797,40 @@ int IsCDDrive(int driveIndex)
     return GetDriveTypeA(gText) == DRIVE_CDROM;
 }
 
+// @match-note
+// Structurally complete /O2 checkpoint: both sections are 0x3ed with the same 0x2f0 frame,
+// CFG and 51 relocation occurrences. Manual raw review confirms the indirect Win32/MCI
+// targets; `homm2 relocs` reports only three delinker owner aliases (the archive literal and
+// gText interior labels). The sole code-order residual is +0x19b: base loads mciSendStringA
+// into ESI then wsprintfA into EBP, while retail loads EBP then ESI; every following use is
+// identical. Standard `_O_BINARY`, `SEEK_*`, `KEY_WRITE`, typed buffers/results and a bounded
+// 30-walk libclang AST pass preserve that residual. Revisit after an exact-preserving
+// predecessor/TU-state change; this is not a proven artifact.
 VA(0x004c5a60, 0x3ed)
 int SetupCDDrive(void)
 {
-    unsigned char registryPath[100];
-    char registryKey[100];
-    char cdDrives[26];
+    char registryPath[MISC_CD_PATH_BUFFER_SIZE];
+    char registryKey[MISC_CD_PATH_BUFFER_SIZE];
+    char cdDrives[MISC_CD_DRIVE_SLOT_COUNT];
     char count;
     int attempts;
     HKEY key;
 
     sprintf(gText, ".\\DATA\\HEROES2.AGG");
-    int file = _open(gText, 0x8000);
+    int file = _open(gText, _O_BINARY);
     if (file == -1) {
         if (_chdir(gcRegAppPath) == -1)
-            return 3;
-        file = _open(gText, 0x8000);
+            return MISC_CD_APP_PATH_UNAVAILABLE;
+        file = _open(gText, _O_BINARY);
         if (file == -1)
-            return 4;
+            return MISC_CD_DATA_ARCHIVE_UNAVAILABLE;
     }
     _close(file);
 
     unsigned long logicalDrives = GetLogicalDrives();
     int cdDriveCount = 0;
     memset(cdDrives, 0, sizeof(cdDrives));
-    for (int drive = 2; drive < 26; ++drive) {
+    for (int drive = MISC_CD_FIRST_DRIVE_INDEX; drive < MISC_CD_DRIVE_SLOT_COUNT; ++drive) {
         if (logicalDrives & (1 << drive)) {
             sprintf(gText, "A:\\");
             gText[0] += static_cast<char>(drive);
@@ -816,52 +844,54 @@ int SetupCDDrive(void)
 
     if (strlen(gcRegCDRomPath) != 0) {
         sprintf(gText, "%s\\heroes2\\anim\\voy24.smk", gcRegCDRomPath);
-        file = _open(gText, 0x8000);
+        file = _open(gText, _O_BINARY);
         if (file != -1) {
             _close(file);
             sprintf(gText + 2, "%s", gcAnimPath);
             strcpy(gcAnimPath, gText);
-            return 0;
+            return MISC_CD_DRIVE_READY;
         }
     }
 
     attempts = 0;
     {
-        char resultBuffer[256];
-        char command[256];
+        char resultBuffer[MISC_CD_MCI_BUFFER_SIZE];
+        char command[MISC_CD_MCI_BUFFER_SIZE];
         for (;;) {
             for (int index = 0; index < count; ++index) {
                 wsprintfA(command, "open %c: type cdaudio alias CD", cdDrives[index] + 'A');
-                if (mciSendStringA(command, resultBuffer, 0xff, 0) == 0) {
+                if (mciSendStringA(command, resultBuffer, MISC_CD_MCI_RESULT_LENGTH, 0) == 0) {
                     wsprintfA(command, "info CD UPC wait");
-                    mciSendStringA(command, resultBuffer, 0xff, 0);
+                    mciSendStringA(command, resultBuffer, MISC_CD_MCI_RESULT_LENGTH, 0);
                     wsprintfA(command, "close CD");
-                    mciSendStringA(command, resultBuffer, 0xff, 0);
+                    mciSendStringA(command, resultBuffer, MISC_CD_MCI_RESULT_LENGTH, 0);
                 }
                 sprintf(gText, "%c:\\heroes2\\anim\\voy24.smk", cdDrives[index] + 'A');
-                file = _open(gText, 0x8000);
+                file = _open(gText, _O_BINARY);
                 if (file != -1) {
-                    if (_lseek(file, 0, 2) != -1 && _lseek(file, -100, 1) != -1)
-                        _read(file, resultBuffer, 100);
+                    if (_lseek(file, 0, SEEK_END) != -1 &&
+                        _lseek(file, -MISC_CD_PROBE_TRAILER_SIZE, SEEK_CUR) != -1)
+                        _read(file, resultBuffer, MISC_CD_PROBE_TRAILER_SIZE);
                     _close(file);
 
                     strcpy(registryKey, "SOFTWARE\\New World Computing\\Heroes of Might and Magic 2\\1.0");
                     key = 0;
-                    if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, registryKey, 0, 0x20006, &key) == 0) {
-                        wsprintfA(reinterpret_cast<char *>(registryPath), "%c:", cdDrives[index] + 'A');
-                        RegSetValueExA(key, "CDDrive", 0, REG_SZ, registryPath,
-                                       lstrlenA(reinterpret_cast<char *>(registryPath)) + 1);
+                    if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, registryKey, 0, KEY_WRITE, &key) == 0) {
+                        wsprintfA(registryPath, "%c:", cdDrives[index] + 'A');
+                        RegSetValueExA(key, "CDDrive", 0, REG_SZ,
+                                       reinterpret_cast<unsigned char *>(registryPath),
+                                       lstrlenA(registryPath) + 1);
                         RegCloseKey(key);
                     }
                     sprintf(gText, "%c:%s", cdDrives[index] + 'A', gcAnimPath);
                     strcpy(gcAnimPath, gText);
-                    return 0;
+                    return MISC_CD_DRIVE_READY;
                 }
             }
-            Sleep(3000);
+            Sleep(MISC_CD_RETRY_DELAY_MILLISECONDS);
             ++attempts;
-            if (attempts >= 2)
-                return 2;
+            if (attempts >= MISC_CD_RETRY_LIMIT)
+                return MISC_CD_DRIVE_NOT_FOUND;
         }
     }
 }
@@ -1357,12 +1387,14 @@ int MemSize(int)
 
 // @match-note
 // Structurally aligned /O2 checkpoint: both code spans are 0x386, the 0x9c frame,
-// CFG and all 59 relocations agree. The recovered conditional Y adjustment leaves
+// CFG and 59 relocation occurrences agree. The recovered conditional Y adjustment leaves
 // only 12 unmasked bytes: one `mov ecx,0x2d` schedule at +0xbc and swapped LEAs for
 // entryText/message near +0x141, plus three delinked empty-string owner names.
 // Boolean-mask/branched Y forms, direct/local empty strings and declaration order
 // were tried. A bounded libclang AST pass found 25 single variants and retained none
-// after 30 walks; revisit only after exact-preserving predecessor/TU state changes.
+// after 30 walks. The current manual relocation audit remains 59/59; its four only-base
+// reports are delinked gpMouseManager/empty-string owner identities. Revisit only after
+// exact-preserving predecessor/TU state changes.
 VA(0x004c6ac0, 0x386)
 void GetDataEntry(char *prompt, char *destination, int maximumLength, char *initialText,
                   int showCancel, int useImmediateHandler)
@@ -1448,10 +1480,13 @@ void GetDataEntry(char *prompt, char *destination, int maximumLength, char *init
 // @match-note
 // Structurally complete /O2 checkpoint: the command-domain switch preserves the
 // retail case-body order, including the physical cancel tail. Base and retail are
-// both 0x173 with identical normalized instruction and 23-relocation streams. The
-// remaining raw residual is one exchanged near/short JE and one near/short JNE; the
-// total size is unchanged. A bounded libclang AST pass tested 16 variants in 30 walks
-// and retained none. Revisit after an exact-preserving predecessor/TU-state change.
+// both 0x173 with an identical relocation-masked instruction stream and 23 relocation
+// occurrences. The remaining raw residual is one exchanged near/short JE and one near/short
+// JNE; the
+// total size is unchanged. The current manual audit remains 23/23 relocations; its seven
+// only-base reports are interior aliases for the same DataEntry globals. A bounded libclang
+// AST pass tested 16 variants in 30 walks and retained none. Revisit after an
+// exact-preserving predecessor/TU-state change.
 VA(0x004c6e50, 0x173)
 int DataEntryWindowHandler(struct tag_message &message)
 {
