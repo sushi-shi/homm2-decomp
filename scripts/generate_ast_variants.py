@@ -420,6 +420,45 @@ def inline_expression_edits(fn, blob: bytes, insertion: int, helper_name_count: 
     return mutations
 
 
+def inline_member_access_edits(
+    fn, blob: bytes, insertion: int, helper_name_count: int
+) -> list[AstMutation]:
+    mutations = []
+    member_index = 0
+    for node in fn.walk_preorder():
+        if node.kind != ci.CursorKind.MEMBER_REF_EXPR or has_side_effect(node):
+            continue
+        start, end = cursor_range(node)
+        expression = blob[start:end]
+        return_type = msvc42_type_spelling(node.type.spelling)
+        parameters = helper_parameters(node, fn)
+        if (
+            not expression or len(expression) > 160 or parameters is None or len(parameters) > 4
+            or not usable_type_spelling(return_type)
+        ):
+            continue
+        parameter_text = ", ".join(
+            f"{type_spelling} {name}" for type_spelling, name in parameters
+        )
+        argument_text = ", ".join(name for _type_spelling, name in parameters)
+        for name_index in range(helper_name_count):
+            helper_name = f"H2AstMember{member_index:03d}_{name_index}"
+            helper = (
+                f"static inline {return_type} {helper_name}({parameter_text})\n"
+                "{\n"
+                f"    return {expression.decode('utf-8')};\n"
+                "}\n\n"
+            ).encode()
+            replacement = f"{helper_name}({argument_text})".encode()
+            mutations.append(AstMutation(
+                "inline_member_access",
+                f"line-{line_number(blob, start)}-{node.spelling}-{name_index}",
+                (AstEdit(insertion, insertion, helper), AstEdit(start, end, replacement)),
+            ))
+        member_index += 1
+    return mutations
+
+
 def inline_nested_expression_edits(
     fn, blob: bytes, insertion: int, helper_name_count: int
 ) -> list[AstMutation]:
@@ -612,6 +651,8 @@ def atomic_mutations(
     mutations = expression_edits(fn, blob) + statement_order_edits(fn, blob) + declaration_edits(fn, blob)
     if "inline_expression" in families:
         mutations += inline_expression_edits(fn, blob, insertion, helper_name_count)
+    if "inline_member_access" in families:
+        mutations += inline_member_access_edits(fn, blob, insertion, helper_name_count)
     if "inline_nested_expression" in families:
         mutations += inline_nested_expression_edits(fn, blob, insertion, helper_name_count)
     if "inline_read_advance" in families:
@@ -715,7 +756,7 @@ def main(argv=None) -> int:
         default=(
             "commutative_order,relational_order,independent_statement_order,declaration_split,"
             "declaration_merge,inline_expression,inline_read_advance"
-            ",inline_nested_expression"
+            ",inline_nested_expression,inline_member_access"
         ),
         help="comma-separated AST edit families",
     )
@@ -741,7 +782,7 @@ def main(argv=None) -> int:
     known_families = {
         "commutative_order", "relational_order", "independent_statement_order",
         "declaration_split", "declaration_merge", "inline_expression", "inline_read_advance",
-        "inline_nested_expression",
+        "inline_nested_expression", "inline_member_access",
     }
     unknown = families - known_families
     if unknown:
