@@ -59,9 +59,6 @@ nix-shell scripts/create-toolchain-release.nix
 ```
 
 The Nix entrypoint pins both archive.org originals by their published SHA-1.
-Because archive.org mirrors can terminate the 555 MB VC 4.0 ISO response early,
-the single fixed-output download resumes the same file until its published full
-size and SHA-1 both match.
 The builder then applies stronger extracted-file SHA-256 gates and creates
 `build/homm2-toolchain-vc42-link300.tar.xz` with sorted entries, fixed ownership,
 a fixed timestamp, and normalized GNU tar metadata. Two independent packaging

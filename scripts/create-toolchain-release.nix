@@ -24,33 +24,10 @@ let
   #   size 555,663,360 bytes
   #   md5  772b1bbd7d7ff95399145f02d719587b
   #   sha1 81e139ac41d76740a6ba6d474355b37ed2e46c66
-  vc40-iso = pkgs.stdenvNoCC.mkDerivation {
+  vc40-iso = pkgs.fetchurl {
     name = "MSVC40.iso";
-    outputHash = "sha1-geE5rEHXZ0Cmum1HQ1WzftLkbGY=";
-    outputHashAlgo = "sha1";
-    outputHashMode = "flat";
-    nativeBuildInputs = [ pkgs.coreutils pkgs.curl ];
-    buildCommand = ''
-      set -euo pipefail
-      partial="$TMPDIR/MSVC40.iso"
-      for attempt in $(seq 1 20); do
-        curl --fail --location --retry 3 --retry-all-errors --continue-at - \
-          https://archive.org/download/msvc4x/MSVC40.iso --output "$partial" || true
-        size=$(stat -c %s "$partial" 2>/dev/null || echo 0)
-        if [ "$size" = 555663360 ] && \
-           echo "81e139ac41d76740a6ba6d474355b37ed2e46c66  $partial" | sha1sum -c -; then
-          cp "$partial" "$out"
-          exit 0
-        fi
-        if [ "$size" -gt 555663360 ]; then
-          : > "$partial"
-        fi
-        echo "archive.org transfer incomplete at $size bytes; resuming (attempt $attempt)" >&2
-        sleep 1
-      done
-      echo "could not retrieve the complete verified MSVC40.iso" >&2
-      exit 1
-    '';
+    url = "https://archive.org/download/msvc4x/MSVC40.iso";
+    hash = "sha1-geE5rEHXZ0Cmum1HQ1WzftLkbGY=";
   };
 in
 pkgs.mkShell {
