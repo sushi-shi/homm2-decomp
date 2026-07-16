@@ -74,17 +74,6 @@ void DoAdvance(Smack *smack, int drawFrame, int advanceFrame, int updatePalette,
         SmackNextFrame(smack);
 }
 
-// @semantic
-// Complete 98.95699% coverage checkpoint: retail/base use the same 0x510 frame,
-// stack slots, CFG, event jump table, and 334 relocation occurrences.  Base is
-// 0x118b bytes versus retail's 0x118c.  The first code-shape residual is +0xb0b:
-// retail loads campaignChoice4 and compares gbCampaignSideChoice, while base
-// loads the global and compares the same stack value; the condition is identical
-// but the latter encoding is one byte shorter.  Equality operand reversal was
-// canonicalized to the same base code; an explicit inequality/two-arm spelling
-// added a non-retail five-byte jump.  The broad relocation audit's five base-only
-// reports are gConfig owner references at retail synthetic data-alias sites, not
-// extra calls or globals.  Revisit after later SMACKMGR/header TU-state changes.
 VA(0x0040126d, 0x118c)
 void SmackManagerMain(void) {
     int soundFlags4;
@@ -233,7 +222,7 @@ void SmackManagerMain(void) {
             if ((!primaryStarted9 || smk1->Frames > 1) &&
                 (bSmackNum != SMACK_CONGRATS || smk1->Frames - 1 != smk1->FrameNum)) {
                 DoAdvance(smk1, 1, 1,
-                          !primaryStarted9 || !SmackOptions[bSmackNum].fadeIn, 0);
+                          primaryStarted9 || !SmackOptions[bSmackNum].fadeIn, 0);
             }
             if (smk1->FrameNum > 0 || smk1->Frames <= 1) {
                 if (!primaryStarted9) {
@@ -373,9 +362,9 @@ void SmackManagerMain(void) {
         if (!SmackOptions[bSmackNum].waitForInput &&
             (gbLastFramePlayed ||
              (smk2 && (smk2->Frames - 1 <= smk2->FrameNum ||
-                       (!smk2->FrameNum && companionStarted1))) ||
+                       (smk2->FrameNum <= 0 && companionStarted1))) ||
              (!smk2 && (smk1->Frames <= smk1->FrameNum ||
-                        (!smk1->FrameNum && primaryStarted9))))) {
+                        (smk1->FrameNum <= 0 && primaryStarted9))))) {
             playing16 = 0;
             gbPlayedThrough = 1;
         }
@@ -435,12 +424,10 @@ void ShutDownSmacker(void) {
     smk2 = 0;
 }
 
-// @early-stop
-// reloc-masked: code bytes are identical; delinked gConfig/SmackSum field symbols differ.
 VA(0x0040244f, 0x17f)
 int PlaySmacker(int smackNumber) {
     signed char savedPalette[SMACK_PALETTE_SIZE];
-    int savedUpdateFlags;
+    int oldUpdateFlags;
 
     xLastChoice = -1;
     if (gbNoCDRom)
@@ -449,7 +436,7 @@ int PlaySmacker(int smackNumber) {
     gbInSmackMgr = 1;
     gbPlayedThrough = 0;
     memcpy(savedPalette, gpBufferPalette->m_data, SMACK_PALETTE_SIZE);
-    savedUpdateFlags = gpWindowManager->m_updateFlags;
+    oldUpdateFlags = gpWindowManager->m_updateFlags;
     gpWindowManager->m_updateFlags = 0;
     if (smackNumber != SMACK_EXPANSION_CAMPAIGN) {
         gpSoundManager->m_samplesReady = 1;
@@ -462,7 +449,7 @@ int PlaySmacker(int smackNumber) {
         bTesting = 1;
         SmackManagerMain();
         bTesting = 0;
-        if (smksum.TotalReadTime + smksum.TotalOpenTime >= 2000 ||
+        if (smksum.TotalOpenTime + smksum.TotalReadTime >= 2000 ||
             smksum.TotalDecompTime >= 1300 || gbLowMemory) {
             gConfig.slowVideo = 1;
             WritePrefs();
@@ -472,7 +459,7 @@ int PlaySmacker(int smackNumber) {
     bSmackNum = static_cast<signed char>(smackNumber);
     SmackManagerMain();
     memcpy(gpBufferPalette->m_data, savedPalette, SMACK_PALETTE_SIZE);
-    gpWindowManager->m_updateFlags = savedUpdateFlags;
+    gpWindowManager->m_updateFlags = oldUpdateFlags;
     gbInSmackMgr = 0;
     return gbPlayedThrough;
 }
