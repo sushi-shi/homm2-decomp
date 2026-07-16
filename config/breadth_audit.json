@@ -1454,6 +1454,138 @@
       "note": "complete frame CFG and 11 relocs; null arm routes through equivalent continuation"
     },
     {
+      "unit": "SOURCE/FINDPATH",
+      "function": "??0searchArray@@QAE@XZ",
+      "source_hash": "76cdb65084a7",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 83.333336,
+      "after": 83.333336,
+      "note": "All 14 meaningful bytes and zero relocations match; retail alone has a two-byte alignment pad."
+    },
+    {
+      "unit": "SOURCE/FINDPATH",
+      "function": "??1searchArray@@QAE@XZ",
+      "source_hash": "f8a4755a5941",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 92.85714,
+      "after": 92.85714,
+      "note": "All meaningful instructions and 3 relocations agree; only reviewed line-record identity and a trailing alignment LEA remain."
+    },
+    {
+      "unit": "SOURCE/FINDPATH",
+      "function": "?CalcTerrainCost@@YIHHHHHHH@Z",
+      "source_hash": "2d60b0a92521",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 82.155556,
+      "after": 82.155556,
+      "note": "Complete terrain/road/pathfinding semantics, CFG, and 5 relocations; optimized EBX/EBP versus EDI/EBX register allocation remains after documented variants."
+    },
+    {
+      "unit": "SOURCE/FINDPATH",
+      "function": "?Clear@searchArray@@QAEXXZ",
+      "source_hash": "9086effb5b64",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 95.652176,
+      "after": 95.652176,
+      "note": "Every meaningful instruction and both relocations match; retail alone has a trailing alignment LEA."
+    },
+    {
+      "unit": "SOURCE/FINDPATH",
+      "function": "?Close@searchArray@@QAEXXZ",
+      "source_hash": "7ba451af2d96",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 92.85714,
+      "after": 92.85714,
+      "note": "All meaningful instructions and 3 relocations agree; only reviewed line-record identity and a trailing alignment LEA remain."
+    },
+    {
+      "unit": "SOURCE/FINDPATH",
+      "function": "?FindCombatPath@searchArray@@QAEHHHPAVarmy@@HH@Z",
+      "source_hash": "1b63da3d0922",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 90.81138,
+      "after": 90.81138,
+      "note": "Complete moat, queue, attack, and reconstruction CFG with 0x30 frame and 23 relocations; optimized moat-byte register assignment remains."
+    },
+    {
+      "unit": "SOURCE/FINDPATH",
+      "function": "?Init@searchArray@@QAEXXZ",
+      "source_hash": "82d60cc3a9b4",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 91.666664,
+      "after": 91.666664,
+      "note": "All meaningful instructions and 8 relocations agree; only two reviewed line-record identities and retail post-return alignment remain."
+    },
+    {
+      "unit": "SOURCE/FINDPATH",
+      "function": "?PushCombatPoint@searchArray@@QAEXHHHH@Z",
+      "source_hash": "ecbbd0a97c04",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 92.54256,
+      "after": 92.54256,
+      "note": "Complete nested gates, binary search, packed writes, and both relocations; optimized register ownership remains after documented variants."
+    },
+    {
+      "unit": "SOURCE/FINDPATH",
+      "function": "?PushPoint@searchArray@@QAEXHHHHHHHHHHHH@Z",
+      "source_hash": "05b67a371ae1",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 93.71277,
+      "after": 93.71277,
+      "note": "Complete queue semantics and 38 relocations; a reversed equivalent limit predicate was byte-neutral and scratch-register ownership remains."
+    },
+    {
+      "unit": "SOURCE/FINDPATH",
+      "function": "?QuickDistance@searchArray@@QAEHHHHH@Z",
+      "source_hash": "98a114a34458",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 3,
+      "before": 94.333336,
+      "after": 94.333336,
+      "note": "Complete semantics and return blocks with zero relocations; compare operand/order remains after four equivalent predicate/arm spellings, plus retail alignment."
+    },
+    {
+      "unit": "SOURCE/FINDPATH",
+      "function": "?SeedCombatPosition@searchArray@@QAEXPAVarmy@@@Z",
+      "source_hash": "b99f7d8b9cf4",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 98.55844,
+      "after": 99.33766,
+      "note": "Restored the signed speed <= 0 predicate; every meaningful instruction and all 16 relocations match, with only a trailing retail alignment LEA."
+    },
+    {
+      "unit": "SOURCE/FINDPATH",
+      "function": "?TestPossibleDirections@searchArray@@QAEXHHQAC0HH@Z",
+      "source_hash": "674103a31036",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 91.908714,
+      "after": 91.908714,
+      "note": "Complete eight-direction object/terrain CFG and 66 relocations; residual begins with optimized occupied-array register ownership."
+    },
+    {
       "unit": "SOURCE/GAME",
       "function": "?CalcBaseScore@@YIHH@Z",
       "source_hash": "1f4082d38a49",
@@ -2357,6 +2489,17 @@
     },
     {
       "unit": "SOURCE/PATH",
+      "function": "?GetAdjacentCellIndex@army@@QAEHHH@Z",
+      "source_hash": "aa64b14a40b7",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 93.1,
+      "after": 93.1,
+      "note": "Complete frame/CFG and sole relocation; only the documented direction-plus-sourceHex-times-six evaluation order differs."
+    },
+    {
+      "unit": "SOURCE/PATH",
       "function": "?GetAdjacentCellIndexNoArmy@@YIHHH@Z",
       "source_hash": "c55ef86c7330",
       "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
@@ -2365,6 +2508,17 @@
       "before": 91.09677,
       "after": 100.0,
       "note": "Qualified direction operand in inverted adjacency subscript."
+    },
+    {
+      "unit": "SOURCE/PATH",
+      "function": "?ValidAttack@army@@QAEHHHHHPAH@Z",
+      "source_hash": "333b57c084ba",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.29412,
+      "after": 100.0,
+      "note": "Corrected the reversed wide-east facing branch; all 627 bytes and 11 ordered relocations now match."
     },
     {
       "unit": "SOURCE/PHILAI",
@@ -2871,6 +3025,61 @@
       "before": 97.03371,
       "after": 97.03371,
       "note": "two castle-coordinate equalities load byte and word operands in reverse order; 11 external relocs align"
+    },
+    {
+      "unit": "SOURCE/RECRUIT",
+      "function": "?Main@recruitUnit@@UAEHAAUtag_message@@@Z",
+      "source_hash": "26841651260c",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 5,
+      "before": 90.33086,
+      "after": 97.49071,
+      "note": "Fixed right-button quick view and recovered guard-clause/shared-tail CFG; residual is exactly six retail-only five-byte continuation jumps with 16 relocations matching."
+    },
+    {
+      "unit": "SOURCE/RECRUIT",
+      "function": "?Open@recruitUnit@@UAEHH@Z",
+      "source_hash": "75c97fac0226",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 2,
+      "before": 95.79394,
+      "after": 99.98788,
+      "note": "Recovered the 0x10 frame, two affordability locals, minimum expression, and no-resource arm; only pooled-string identities remain across 26 relocations."
+    },
+    {
+      "unit": "SOURCE/RECRUIT",
+      "function": "?QuickViewRecruit@@YIXPAVtown@@H@Z",
+      "source_hash": "982aaa3dd392",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.68041,
+      "after": 99.68041,
+      "note": "Complete cost/window lifecycle and 13 ordered relocations; only two pooled window-name identities differ."
+    },
+    {
+      "unit": "SOURCE/RECRUIT",
+      "function": "?SetupRecruitWin@@YIXPAVheroWindow@@HHHHH@Z",
+      "source_hash": "240211a71e4e",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.70909,
+      "after": 99.70909,
+      "note": "All non-relocation instructions and 25 ordered relocations agree; residual is delinked pooled-string identity only."
+    },
+    {
+      "unit": "SOURCE/RECRUIT",
+      "function": "?Update@recruitUnit@@QAEXXZ",
+      "source_hash": "98f438a6e74f",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.670586,
+      "after": 99.62353,
+      "note": "All non-relocation instructions and 18 ordered relocations agree; TU-local pooled-string numbering changed after the structural fixes."
     },
     {
       "unit": "SOURCE/REMOTE",
