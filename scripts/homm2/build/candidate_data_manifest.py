@@ -199,7 +199,9 @@ def _reviewed_group_allocations(unit, storage, definitions, reviewed):
 
 
 def _validate_constrained_reviewed_group(unit, storage, definitions, coff,
-                                         allocations, intervals, read_bytes):
+                                         allocations, intervals, read_bytes,
+                                         image_base=IMAGE_BASE, highlow=(),
+                                         read_u32=None, public=None):
     """Validate a complete remaining-slot/equivalence-class reconstruction."""
     constrained = [
         row for row in allocations if row.provenance.startswith((
@@ -216,6 +218,9 @@ def _validate_constrained_reviewed_group(unit, storage, definitions, coff,
             (unit, storage))
     start, end = merged[0]
     by_name = {row["name"]: row for row in definitions}
+    allocation_by_name = {row.name: row for row in allocations}
+    public = public or {}
+    highlow = set(highlow)
     covered = bytearray(end - start)
     payloads = {}
     for allocation in allocations:
@@ -233,10 +238,52 @@ def _validate_constrained_reviewed_group(unit, storage, definitions, coff,
         candidate = by_name[allocation.name]
         section = coff.sections[candidate["section"] - 1]
         offset = section.raw_offset + candidate["section_offset"]
-        payload = bytes(coff.data[offset:offset + allocation.size])
-        payloads[allocation.name] = payload
-        if storage != "bss" and payload != read_bytes(
-                allocation.rva, allocation.size):
+        payload = bytearray(coff.data[offset:offset + allocation.size])
+        payloads[allocation.name] = bytes(payload)
+        retail_payload = bytearray(read_bytes(allocation.rva, allocation.size))
+        candidate_relocations = []
+        for (section_index, site), relocation in getattr(
+                coff, "relocations", {}).items():
+            if (section_index == candidate["section"]
+                    and candidate["section_offset"] <= site
+                    < candidate["section_offset"] + allocation.size):
+                candidate_relocations.append((
+                    site - candidate["section_offset"], relocation))
+        retail_relocations = sorted(
+            site - allocation.rva for site in highlow
+            if allocation.rva <= site < allocation.rva + allocation.size)
+        if sorted(site for site, _relocation in candidate_relocations) != \
+                retail_relocations:
+            raise ValueError(
+                "constrained reviewed allocation %s:%s relocation offsets differ" %
+                (unit, allocation.name))
+        for site, relocation in candidate_relocations:
+            if relocation.typ != DIR32 or site + 4 > allocation.size:
+                raise ValueError(
+                    "constrained reviewed allocation %s:%s has unsupported relocation" %
+                    (unit, allocation.name))
+            symbol = coff.symbols.get(relocation.symbol_index)
+            if symbol is None:
+                raise ValueError(
+                    "constrained reviewed allocation %s:%s references an auxiliary symbol" %
+                    (unit, allocation.name))
+            target = allocation_by_name.get(symbol.name)
+            target_rva = target.rva if target is not None else public.get(symbol.name)
+            if target_rva is None:
+                raise ValueError(
+                    "constrained reviewed allocation %s:%s has unresolved relocation %s" %
+                    (unit, allocation.name, symbol.name))
+            addend = struct.unpack_from("<I", payload, site)[0]
+            actual = (read_u32(allocation.rva + site) if read_u32 is not None
+                      else struct.unpack_from("<I", retail_payload, site)[0])
+            expected = (image_base + target_rva + addend) & 0xFFFFFFFF
+            if actual != expected:
+                raise ValueError(
+                    "constrained reviewed allocation %s:%s relocation %s differs" %
+                    (unit, allocation.name, symbol.name))
+            payload[site:site + 4] = b"\0" * 4
+            retail_payload[site:site + 4] = b"\0" * 4
+        if storage != "bss" and payload != retail_payload:
             raise ValueError(
                 "constrained reviewed allocation %s:%s payload differs at 0x%x" %
                 (unit, allocation.name, allocation.rva))
@@ -756,7 +803,7 @@ def derive_allocations(base_dir=REPO / "build/objdiff/base",
             if reviewed_group is not None:
                 _validate_constrained_reviewed_group(
                     unit, storage, source_group, coff, reviewed_group,
-                    intervals, read_bytes)
+                    intervals, read_bytes, image_base, highlow, read_u32, public)
                 allocations.extend(reviewed_group)
                 stats.closed_groups += 1
                 stats.evidenced_definitions += len(reviewed_group)
