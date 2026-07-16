@@ -18,10 +18,10 @@
 #include <windows.h>
 #include <BASE/Misc.h>
 
+#define MUSIC_FADE_TIMER_SLOT 4
 
 
 // ---- module-private synthetic globals (retail xref: single-module) ----
-DATA(0x00528d00) static long gMusicFadeTimer; // ambient-music fade deadline tick (soundManager::SwitchAmbientMusic)
 DATA(0x00534970) static WAVEFORMATEX gWaveFormat; // digital-driver PCM format (WAVE_init_driver)
 
 VA(0x004cb630, 0x68)
@@ -249,7 +249,7 @@ void soundManager::CDPlay(int param_1, int param_2, int param_3, int param_4)
     ServiceSound();
     if (m_fadeSteps > 0) {
         m_fadeSteps = 0xb;
-        gMusicFadeTimer = KBTickCount() + 0x1e0;
+        glTimers[MUSIC_FADE_TIMER_SLOT] = KBTickCount() + 0x1e0;
         CDSetVolume(0xa, 0);
     } else {
         CDSetVolume(param_3, 0);
@@ -789,8 +789,8 @@ void soundManager::PollSound(void)
         LogStr("Poll Sound 1a");
         Process1WindowsMessage();
         if (m_currentTrack < 8 || m_currentTrack > 0xf)
-            gMusicFadeTimer = KBTickCount();
-        delta = gMusicFadeTimer - KBTickCount();
+            glTimers[MUSIC_FADE_TIMER_SLOT] = KBTickCount();
+        delta = glTimers[MUSIC_FADE_TIMER_SLOT] - KBTickCount();
         m_fadeSteps = delta / 0x3c;
         if (m_fadeSteps < 1)
             m_fadeSteps = 0;
@@ -804,7 +804,7 @@ void soundManager::PollSound(void)
                         ftell(m_midiFile);
                 }
             } else {
-                gMusicFadeTimer = KBTickCount();
+                glTimers[MUSIC_FADE_TIMER_SLOT] = KBTickCount();
             }
             m_fading = 1;
             if (bSaveMusicPosition[m_fadeTargetTrack] != 0)
@@ -812,7 +812,7 @@ void soundManager::PollSound(void)
                                  m_savedTrackPositions[m_fadeTargetTrack], -1);
             else
                 PlayAmbientMusic(m_fadeTargetTrack, 0, -1);
-            now = gMusicFadeTimer - KBTickCount();
+            now = glTimers[MUSIC_FADE_TIMER_SLOT] - KBTickCount();
             m_fadeSteps = now / 0x3c;
             if (m_fadeSteps < 1)
                 m_fadeSteps = 0;
@@ -868,7 +868,7 @@ void soundManager::SwitchAmbientMusic(int param_1)
         (m_fadeSteps == 0 && m_currentTrack != param_1)) {
         if (m_fadeSteps <= 0xa) {
             m_fadeSteps = 0xb;
-            gMusicFadeTimer = KBTickCount() + 900;
+            glTimers[MUSIC_FADE_TIMER_SLOT] = KBTickCount() + 900;
         }
         m_fadeTargetTrack = param_1;
         PollSound();
