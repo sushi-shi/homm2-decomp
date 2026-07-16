@@ -4,8 +4,8 @@ import unittest
 from pathlib import Path
 
 from homm2.match.breadth_audit import (
-    AuditError, _load_batch, classify, comparison_epoch, load_state, record_audits,
-    write_state,
+    AuditError, _load_batch, classify, comparison_epoch, exact_max_rows,
+    load_state, record_audits, write_state,
 )
 
 
@@ -139,6 +139,17 @@ class AuditStateTest(unittest.TestCase):
         self.assertEqual([], result["exact"])
         self.assertEqual(["formerly-exact"],
                          [row["function"] for row in result["pending"]])
+
+    def test_exact_max_fast_lane_requires_same_source_hash(self):
+        result = classify(self.report, self.hashes, self.empty, EPOCH_A)
+        baseline = {
+            ("SOURCE/A", "near"): (100.0, "222222222222"),
+            ("SOURCE/A", "far"): (100.0, "oldoldoldold"),
+        }
+        self.assertEqual(
+            ["near"],
+            [row["function"] for row in exact_max_rows(result["pending"], baseline)],
+        )
 
     def test_matching_hash_and_epoch_are_the_only_nonexact_exclusion(self):
         state = record_audits(
