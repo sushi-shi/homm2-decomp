@@ -91,6 +91,6 @@ SIZE(resourceManager, 0xa2);
 // ---- globals (declarations, RVA order) ----
 extern int iSaveCtr;
 extern int lastAggZ[10];
-extern long lastPositionZ[12];
+extern long lastPositionZ[10];
 
 #endif // HOMM2_BASE_RESOURCEMANAGER_H
