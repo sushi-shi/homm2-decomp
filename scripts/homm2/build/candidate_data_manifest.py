@@ -552,6 +552,58 @@ def _payload_matches_at(row, coff, rva, highlow, read_bytes):
     return candidate == read_bytes(rva, row["size"])
 
 
+def _allocation_has_relocation(row, coff):
+    first = row["symbol_offset"]
+    last = first + row["size"]
+    return any(
+        section == row["section"] and first <= site < last
+        for section, site in coff.relocations
+    )
+
+
+def _bounded_section_delta_proofs(group, mapped, evidence, coff, intervals,
+                                  highlow, read_bytes):
+    """Map relocation-free runs bracketed by one proved section translation.
+
+    Reconstructed source owners can move relative to compiler-generated literals,
+    so a whole candidate section is not always a valid retail translation.  A run
+    between two already-proved owners is still exact when both endpoints imply the
+    same retail-minus-candidate delta and every projected payload byte agrees.
+    """
+    index = 0
+    while index < len(group):
+        if group[index]["name"] in mapped:
+            index += 1
+            continue
+        first = index
+        while index < len(group) and group[index]["name"] not in mapped:
+            index += 1
+        last = index
+        if first == 0 or last == len(group):
+            continue
+        before = group[first - 1]
+        after = group[last]
+        before_delta = mapped[before["name"]][0] - before["section_offset"]
+        after_delta = mapped[after["name"]][0] - after["section_offset"]
+        if before_delta != after_delta:
+            continue
+
+        projected = []
+        for row in group[first:last]:
+            rva = before_delta + row["section_offset"]
+            if (_allocation_has_relocation(row, coff)
+                    or any(rva <= site < rva + row["size"] for site in highlow)
+                    or not _contains(intervals, rva, row["size"])
+                    or not _payload_matches_at(
+                        row, coff, rva, highlow, read_bytes)):
+                projected = []
+                break
+            projected.append((row, rva))
+        for row, rva in projected:
+            mapped[row["name"]] = (rva, 2)
+            evidence[row["name"]] = "bounded-section-delta"
+
+
 def _literal_rvas(row, coff, intervals, highlow, read_bytes, cache):
     if not (row["name"].startswith("$SG") or row["name"].startswith("??_C@")):
         return []
@@ -688,6 +740,9 @@ def derive_allocations(base_dir=REPO / "build/objdiff/base",
                     if len(literal_rvas) == 1:
                         mapped[row["name"]] = (literal_rvas[0], 1)
                         evidence[row["name"]] = "unique-literal-payload"
+                _bounded_section_delta_proofs(
+                    group, mapped, evidence, coff, intervals,
+                    highlow, read_bytes)
             mapped = mapped or {}
             failures = []
             causes = set()
@@ -812,7 +867,7 @@ def derive_allocations(base_dir=REPO / "build/objdiff/base",
                     row["section_offset"], row["size"], row["alignment"], rva,
                     proof_count, row["scope"],
                     ("candidate-coff-section-translation" if translated
-                     else "candidate-coff-reloc-bijection")))
+                     else evidence[row["name"]])))
     return allocations, stats, diagnostics
 
 

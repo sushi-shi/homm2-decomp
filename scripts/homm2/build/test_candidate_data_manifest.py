@@ -3,6 +3,7 @@ from types import SimpleNamespace
 
 from homm2.build.candidate_data_manifest import (
     REPO,
+    _bounded_section_delta_proofs,
     _contains,
     _function_relocation_offsets_align,
     _function_relocation_proofs,
@@ -164,6 +165,56 @@ class CandidateDataManifestTest(unittest.TestCase):
             _payload_rvas(row, coff, [(0x100, 0x108)], [], read_bytes, {}),
             [0x100],
         )
+
+    def test_bounded_section_delta_maps_duplicate_payloads_in_order(self):
+        coff = SimpleNamespace(
+            data=b"leftsamesameright",
+            sections=[SimpleNamespace(raw_offset=0)],
+            relocations={},
+        )
+        group = [
+            {"name": "left", "storage": "data", "section": 1,
+             "symbol_offset": 0, "section_offset": 0, "size": 4},
+            {"name": "same_one", "storage": "data", "section": 1,
+             "symbol_offset": 4, "section_offset": 4, "size": 4},
+            {"name": "same_two", "storage": "data", "section": 1,
+             "symbol_offset": 8, "section_offset": 8, "size": 4},
+            {"name": "right", "storage": "data", "section": 1,
+             "symbol_offset": 12, "section_offset": 12, "size": 5},
+        ]
+        retail = b"xxxxleftsamesamerightyyyy"
+
+        def read_bytes(rva, size):
+            return retail[rva - 0x100:rva - 0x100 + size]
+
+        mapped = {"left": (0x104, 1), "right": (0x110, 1)}
+        evidence = {"left": "anchor", "right": "anchor"}
+        _bounded_section_delta_proofs(
+            group, mapped, evidence, coff, [(0x104, 0x115)], [], read_bytes)
+        self.assertEqual(mapped["same_one"], (0x108, 2))
+        self.assertEqual(mapped["same_two"], (0x10C, 2))
+        self.assertEqual(evidence["same_one"], "bounded-section-delta")
+
+    def test_bounded_section_delta_rejects_disagreeing_anchors(self):
+        coff = SimpleNamespace(
+            data=b"leftsameright",
+            sections=[SimpleNamespace(raw_offset=0)],
+            relocations={},
+        )
+        group = [
+            {"name": "left", "storage": "data", "section": 1,
+             "symbol_offset": 0, "section_offset": 0, "size": 4},
+            {"name": "same", "storage": "data", "section": 1,
+             "symbol_offset": 4, "section_offset": 4, "size": 4},
+            {"name": "right", "storage": "data", "section": 1,
+             "symbol_offset": 8, "section_offset": 8, "size": 5},
+        ]
+        mapped = {"left": (0x104, 1), "right": (0x114, 1)}
+        evidence = {"left": "anchor", "right": "anchor"}
+        _bounded_section_delta_proofs(
+            group, mapped, evidence, coff, [(0x100, 0x120)], [],
+            lambda _rva, size: b"same"[:size])
+        self.assertNotIn("same", mapped)
 
     def test_fully_reviewed_group_closes_with_reordered_retail_owners(self):
         definitions = [
