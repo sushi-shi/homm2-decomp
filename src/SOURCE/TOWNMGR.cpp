@@ -257,24 +257,18 @@ DATA(0x004eb080) static const signed char
     };
 
 // @data-layout-note Retail's initialized TOWNMGR contribution is
-// 0xee750..0xef4c8 (0xd78); candidate .data is 0xd77. sBuildingInfo is exact at
-// the contribution base with a 0x6c0 logical extent. Before owner recovery, the
-// following literal stream was byte-identical through retail offset 0xa24.
-// Retail's two signed-short source-line owners are independently proved at
-// 0xef174 (BuyBuild, two HIGHLOW sites)
-// and 0xef3b4 (SetupThievesGuild, three HIGHLOW sites). Replacing five raw
-// string casts with those two typed function statics removes the exact 0xc bytes
-// of duplicated owners from the former 0xd83 candidate. VC4.2 hoists the typed
-// owners to candidate offsets 0x6c0 and 0x6c4, while retail interleaves them at
-// offsets 0xa24 and 0xc64. Internal inline accessors also hoist both payloads;
-// external inline accessors create separate three-byte COMDAT sections, so
-// neither recovers the natural retail stream. The 0xc0 object-order table and
+// 0xee750..0xef4c8 (0xd78); candidate .data is 0xd77. The 84 candidate owners
+// cover every candidate byte: sBuildingInfo, two signed-short function line
+// bases, and 81 private literals. Owner-wise translation is byte-exact with
+// SHA-256 8bd72565ea607f957ee8d39c3c3f1e087251f2ae67d401d1d336aefcccf94fa.
+// Retail interleaves the line bases at 0xef174 and 0xef3b4, while VC4.2 hoists
+// them to candidate offsets 0x6c0 and 0x6c4. The three repeated port/build
+// filenames at 0xeeeac, 0xeeebc, and 0xeeecc are fixed by their code relocation
+// sites. Retail has one terminal zero byte. The 0xc0 object-order table and
 // 0xc townManager vtable sections are assigned at 0xeb080 and 0xeb140; the
 // latter occupies a retail 0x10 contribution with four zero tail bytes. There
-// is no TOWNMGR BSS contribution. Revisit only with evidence for the original
-// private-owner source form; do not add padding, fallback identities, aliases,
-// cursor adjustments, or section pragmas to force the two offsets or terminal
-// alignment byte.
+// is no TOWNMGR BSS contribution. Do not add padding, fallback identities,
+// aliases, cursor adjustments, or section pragmas to force allocation order.
 DATA(0x004ee750) SBuildingInfo
     sBuildingInfo[TOWN_TYPE_COUNT][TOWN_BUILDING_COUNT] = {
         { // Knight
