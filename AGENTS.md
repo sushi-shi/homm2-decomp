@@ -106,6 +106,11 @@ Detailed contracts live in `docs/delinker-contribution-manifest.md`,
 
 ## Orchestration
 
+- Every assignment names the absolute worktree and expected branch. Before editing, a
+  worker verifies `pwd` and `git branch --show-current`; before compiling, it enters
+  `nix develop` only after changing to that worktree and confirms `HOMM2_DIR` resolves
+  there. Evidence from a sibling worktree or a shell opened in the wrong directory is
+  invalid for integration.
 - Keep one TU per active lane. Workers may change shared owner headers when correctness
   requires it; the orchestrator resolves overlap and integrates one result at a time.
 - Reuse a worker after substantive verified work, especially on the same TU. Return
