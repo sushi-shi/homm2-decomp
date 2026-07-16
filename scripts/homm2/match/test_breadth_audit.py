@@ -1,11 +1,13 @@
 import json
+import io
 import tempfile
 import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
 
 from homm2.match.breadth_audit import (
     AuditError, _load_batch, classify, comparison_epoch, exact_max_rows,
-    load_state, record_audits, write_state,
+    load_state, main, record_audits, write_state,
 )
 
 
@@ -258,6 +260,15 @@ class AuditStateTest(unittest.TestCase):
             path.write_text("unit\tfunction\nSOURCE/A\tnear\n")
             with self.assertRaisesRegex(AuditError, "batch TSV requires"):
                 _load_batch(path)
+
+
+class BreadthAuditCliTest(unittest.TestCase):
+    def test_queue_help_formats_literal_percent(self):
+        output = io.StringIO()
+        with redirect_stdout(output), self.assertRaises(SystemExit) as exit_context:
+            main(["queue", "--help"])
+        self.assertEqual(exit_context.exception.code, 0)
+        self.assertIn("previously reached 100%", output.getvalue())
 
 
 if __name__ == "__main__":
