@@ -6,7 +6,10 @@ base either (only *multiple* inheritance names bases, via `??_7C@@6B<Base>@@@`; 
 are single). So — like the class *fields* (recovered from disassembly via Ghidra) — the **inheritance
 hierarchy must be recovered from the binary**.
 
-## Method (`scripts/recover_inheritance.py`)
+## Method (`scripts/archive/recover_inheritance.py`)
+
+This was a one-shot evidence-recovery script and is archived with the other historical
+reconstruction tools. The checked-in hierarchy below is the maintained result.
 
 Every derived ctor calls its base ctor on `this` **before** it stores its own vtable; a member
 subobject's ctor is called on `this + offset`. So disassembling each `??0Class@@` ctor and tracking

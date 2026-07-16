@@ -1,14 +1,8 @@
 #!/usr/bin/env python3
-"""Legacy CLI compatibility wrapper for scripts/match_variants.py.
+"""Archived compatibility wrapper for the former ``permute_ast.py`` CLI.
 
-The former in-place AST hill climber has been consolidated into the unified manifest
-search.  This wrapper accepts the historical positional arguments, resolves the symbol's
-RVA, and runs the libclang-backed exact-only pipeline.  It never writes a sub-100 best
-candidate into the source file.
-
-Historical usage::
-
-    python3 scripts/permute_ast.py <src.cpp> <TU> <mangled-symbol> [variant-limit]
+Current matching work uses ``scripts/match_variants.py`` directly. This wrapper
+is retained only to reproduce historical commands recorded in audit ledgers.
 """
 
 from __future__ import annotations
@@ -16,8 +10,12 @@ from __future__ import annotations
 import argparse
 import csv
 import os
+import sys
 import time
 from pathlib import Path
+
+SCRIPTS = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(SCRIPTS))
 
 from generate_ast_variants import main as unified_main
 
@@ -51,10 +49,13 @@ def main(argv=None) -> int:
     except (OSError, KeyError, ValueError) as exc:
         parser.error(str(exc))
     stamp = time.strftime("%Y%m%d-%H%M%S")
-    manifest = root / "build/source-variant-manifests" / f"{stamp}-{args.unit.replace('/', '-')}-0x{rva:x}.json"
+    manifest = (
+        root / "build/source-variant-manifests" /
+        f"{stamp}-{args.unit.replace('/', '-')}-0x{rva:x}.json"
+    )
     manifest.parent.mkdir(parents=True, exist_ok=True)
     print(
-        "permute_ast.py is a compatibility wrapper; using the unified exact-only "
+        "archived permute_ast.py compatibility command; using the unified "
         "match_variants.py pipeline",
         flush=True,
     )

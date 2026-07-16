@@ -225,7 +225,8 @@ function from retail evidence on a clean slate instead of editing the decompile 
    family, then exact-preserving predecessor/header/TU variants under the combined root.  Record
    full source/header hashes, raw pins and rejection reasons in a matrix so the same family is not
    repeated.  A score increase that moves an already-correct byte is rejected.
-6. Use `scripts/permute_ast.py` only once the function is structurally aligned at roughly 96--99%,
+6. Use `scripts/match_variants.py` only once the function is structurally aligned at roughly
+   96--99%,
    and audit every retained mutation.  Do not use the regex permuter.  The current durable negative
    searches are indexed by [`matching-matrices/README.md`](matching-matrices/README.md) and
    [`matching-soft-defer-ledger.md`](matching-soft-defer-ledger.md).

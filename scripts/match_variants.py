@@ -13,8 +13,8 @@ Example::
         --state-trials 32 --min-depth 2 --max-depth 3 --limit 512 \
         -o /tmp/icon2bs-combined.json --run
 
-``permute_ast.py`` remains only for legacy command compatibility; new searches should use
-this frontend.
+The historical ``permute_ast.py`` command is retained under ``scripts/archive`` only to
+reproduce old audit-ledger commands. New searches should use this frontend.
 """
 
 from generate_ast_variants import main as generate_main

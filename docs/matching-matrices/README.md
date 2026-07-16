@@ -349,7 +349,8 @@ span remained raw-exact with 23 candidate and 20 retail relocations. Do not retr
 
 ## BASE/Textntry AST searches
 
-All three searches used only `scripts/permute_ast.py`, never the regex permuter, and required all 11
+All three searches used only the then-current `scripts/permute_ast.py`, never the regex permuter,
+and required all 11
 siblings to remain pinned:
 
 - `textntry-ctor-ast-e4e96c0.tsv`: initial constructor pass, 562 unique hashes; SHA-256
@@ -400,7 +401,8 @@ source/header hashes agree. No permutation tool was used.
 
 ## BASE/Textntry SetupDisplayString AST pass
 
-`textntry-setup-ast-341e775.tsv` records a focused `scripts/permute_ast.py` pass from integrated
+`textntry-setup-ast-341e775.tsv` records a focused pass with the then-current
+`scripts/permute_ast.py` from integrated
 checkpoint `341e775` and source SHA-256
 `fd22c7692d4e9293c47a13eb83b422b678371fe4ee19755d78b515c9b94fd5cb`. The pass exposed 18 legal
 first-order variants and ran a deterministic 300-attempt walk with seed `341775`. Existing matrix
@@ -469,7 +471,8 @@ and `8207f088751e59f5a467c7a7e582c4870d82c3fb4e060262d02d5e3a07a17517`.
 
 The exact Setup lifetime changed the combined TU state, authorizing one fresh pass over each of the
 two remaining Textntry residuals from checkpoint `2aeff38`. Both used only
-`scripts/permute_ast.py`; the regex permuter was never used, unsafe inequality rewrites were
+the then-current `scripts/permute_ast.py`; the regex permuter was never used, unsafe inequality
+rewrites were
 disabled, and all previously listed Textntry hashes were skipped before compilation.
 
 `textntry-ctor-ast-ac8dd.tsv` contains 286 new unique whole-file hashes from seed `28482744` and 20
