@@ -6,11 +6,12 @@ from unittest import mock
 from homm2.build.data_manifest_adapter import (
     CandidateDefinition,
     CandidateSection,
-    breakpoint_report,
     candidate_topology,
     resolve_source_definitions,
     source_definitions,
     validate_symbol_rows,
+    _classified_contribution_rows,
+    _section_rows,
     _symbol_row,
 )
 from homm2.build.test_data_topology_census import (
@@ -26,6 +27,28 @@ def candidate(unit, symbol, ordinal=1, value=0):
         "global" if symbol.startswith("?") else "local",
         2 if symbol.startswith("?") else 3, DATA_FLAGS, 0, None,
     )
+
+
+def section(unit, ordinal, size, alignment=1, storage="data", selection=0):
+    name = ".bss" if storage == "bss" else ".data"
+    return CandidateSection(
+        unit, unit + ".c", ordinal, name, size, alignment, DATA_FLAGS,
+        storage, selection, None)
+
+
+def contribution(unit, rva, size):
+    return {
+        "object": unit + ".c", "storage": "data", "rva": rva, "size": size,
+        "segment": 3, "section": ".data", "provenance": "fixture-NB09",
+    }
+
+
+def anchor(unit, ordinal, rva, offset=0, name="anchor"):
+    return {
+        "object": unit + ".c", "name": name, "rva": hex(rva), "size": "0x4",
+        "storage": "data", "alignment": "0x4", "section_ordinal": str(ordinal),
+        "section_offset": hex(offset), "scope": "local", "provenance": "fixture",
+    }
 
 
 class DataManifestAdapterTest(unittest.TestCase):
@@ -120,32 +143,85 @@ class DataManifestAdapterTest(unittest.TestCase):
         self.assertEqual(row["size"], "0x5")
         self.assertEqual(row["scope"], "local")
 
-    def test_breakpoint_replay_never_snaps_cursor_to_observed_anchor(self):
-        sections = [
-            CandidateSection("A", "A.c", 1, ".data", 4, 4, DATA_FLAGS,
-                             "data", 0, None),
-            CandidateSection("B", "B.c", 1, ".data", 4, 4, DATA_FLAGS,
-                             "data", 0, None),
-        ]
-        topology = {"A": ([], [sections[0]]), "B": ([], [sections[1]])}
-        section_rows = [
-            {"object": "A.c", "ordinal": "1", "rva": "0x110"},
-            {"object": "B.c", "ordinal": "1", "rva": "0x114"},
-        ]
-        order = [{"unit": "A"}, {"unit": "B"}]
-        pe = {"sections": {
-            ".rdata": {"rva": 0x80, "virtual_size": 0},
-            ".data": {"rva": 0x100, "raw_size": 0x20, "virtual_size": 0x40},
-        }}
-        with (mock.patch("homm2.build.data_manifest_adapter.load_retail_order",
-                         return_value=order),
-              mock.patch("homm2.build.data_manifest_adapter.read_pe", return_value=pe)):
-            report = breakpoint_report(topology, section_rows, [], "u", "s", "e")
-        intervals = report["streams"]["data"]["intervals"]
-        self.assertEqual(intervals[0]["predicted_rva"], 0x100)
-        self.assertEqual(intervals[0]["drift"], 0x10)
-        self.assertEqual(intervals[1]["predicted_rva"], 0x104)
-        self.assertEqual(intervals[1]["drift"], 0x10)
+    def test_multiple_sections_pack_in_candidate_order(self):
+        topology = {"A": ([], [section("A", 2, 4, 4), section("A", 5, 8, 4)])}
+        rows, diagnostics, _physical = _section_rows(
+            topology, [], {}, [contribution("A", 0x100, 0x0c)])
+        self.assertEqual([row["rva"] for row in rows], ["0x100", "0x104"])
+        self.assertEqual(diagnostics, [])
+
+    def test_alignment_gap_is_implicit_not_a_padding_symbol(self):
+        topology = {"A": ([], [section("A", 1, 3), section("A", 2, 4, 4)])}
+        rows, diagnostics, _physical = _section_rows(
+            topology, [], {}, [contribution("A", 0x100, 8)])
+        self.assertEqual([row["rva"] for row in rows], ["0x100", "0x104"])
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(diagnostics, [])
+
+    def test_breakpoint_drift_never_snaps_replay_cursor(self):
+        topology = {"A": ([], [section("A", 1, 4), section("A", 2, 4)])}
+        rows, diagnostics, _physical = _section_rows(
+            topology, [anchor("A", 1, 0x110)], {},
+            [contribution("A", 0x100, 8)])
+        self.assertEqual([row["rva"] for row in rows], ["0x100", "0x104"])
+        self.assertEqual([row["cause"] for row in diagnostics], ["breakpoint-drift"])
+        self.assertEqual(diagnostics[0]["predicted_base"], 0x100)
+
+    def test_multiple_contribution_chunks_restart_cursor(self):
+        topology = {"A": ([], [section("A", 1, 4), section("A", 2, 8, 8)])}
+        rows, diagnostics, _physical = _section_rows(
+            topology, [], {}, [
+                contribution("A", 0x100, 4), contribution("A", 0x200, 8),
+            ])
+        self.assertEqual([row["rva"] for row in rows], ["0x100", "0x200"])
+        self.assertEqual(diagnostics, [])
+
+    def test_adjacent_nb09_chunks_remain_distinct(self):
+        topology = {"A": ([], [section("A", 1, 4), section("A", 2, 4)])}
+        rows, diagnostics, physical = _section_rows(
+            topology, [], {}, [
+                contribution("A", 0x100, 4), contribution("A", 0x104, 4),
+            ])
+        self.assertEqual(len(physical), 2)
+        self.assertEqual([row["rva"] for row in rows], ["0x100", "0x104"])
+        self.assertEqual(diagnostics, [])
+
+    def test_comdat_without_contribution_requires_explicit_anchor(self):
+        topology = {"A": ([], [
+            section("A", 1, 4, selection=2),
+            section("A", 2, 4, selection=2),
+        ])}
+        rows, diagnostics, physical = _section_rows(
+            topology, [anchor("A", 1, 0x180)], {}, [])
+        self.assertEqual(rows[0]["rva"], "0x180")
+        self.assertEqual(rows[0]["provenance"], "explicit-comdat-anchor+validated-anchor")
+        self.assertEqual(rows[1]["rva"], "-")
+        self.assertEqual(diagnostics[0]["cause"],
+                         "unanchored-comdat-without-contribution")
+        classified = _classified_contribution_rows(physical, rows)
+        self.assertEqual(classified, [])
+
+    def test_candidate_bss_classifies_physical_writable_contribution(self):
+        topology = {"A": ([], [section("A", 1, 8, 4, storage="bss")])}
+        rows, diagnostics, physical = _section_rows(
+            topology, [], {}, [contribution("A", 0x122f20, 8)])
+        classified = _classified_contribution_rows(physical, rows)
+        self.assertEqual(diagnostics, [])
+        self.assertEqual(classified[0]["storage"], "bss")
+        self.assertEqual(classified[0]["rva"], 0x122f20)
+
+    def test_raw_boundary_fragments_rejoin_before_candidate_classification(self):
+        topology = {"A": ([], [section("A", 1, 8, 4, storage="bss")])}
+        first = contribution("A", 0x122f20, 4)
+        second = contribution("A", 0x122f24, 4)
+        second["storage"] = "bss"
+        rows, diagnostics, physical = _section_rows(
+            topology, [], {}, [first, second])
+        self.assertEqual(len(physical), 1)
+        classified = _classified_contribution_rows(physical, rows)
+        self.assertEqual(diagnostics, [])
+        self.assertEqual(classified[0]["storage"], "bss")
+        self.assertEqual(classified[0]["size"], 8)
 
 
 if __name__ == "__main__":
