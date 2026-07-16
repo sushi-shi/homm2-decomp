@@ -3,14 +3,59 @@
 // functions: 21   data: 9
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
+// Keep the DATA labels available before va.h: its tooling-only typedefs perturb
+// VC42's BSS allocation order even when included later in this translation unit.
+#ifdef __clang__
+#define DATA(addr) __attribute__((annotate("data:" #addr)))
+#else
+#define DATA(addr)
+#endif
+
+DATA(0x00534908) signed char gCyclePal[0x60];
+DATA(0x00534968) short memSelector;
+
+static inline unsigned int &FadeSavedUpdate(void)
+{
+    DATA(0x0053496c) static unsigned int savedUpdate;
+    return savedUpdate;
+}
+
+#undef DATA
 #include <va.h>
 #include <BASE/WINMGR.h>
+#include <BASE/WINMGR_TYPES.h>
+
+DATA(0x0051ef28) int iCombatCycleFrame = 0;
+DATA(0x0051ef2c) int gbEveryOtherCycle = 1;
+DATA(0x0051ef30) int iCycle1Count = 0;
+DATA(0x0051ef34) int iCycle2Count = 0;
+DATA(0x0051ef38) int iCycle3Count = 0;
+DATA(0x0051ef3c) int iDialogNestCount = 0;
+DATA(0x0051ef40) static SWindowManagerText gWindowManagerText = {
+    "heroWindowManager",
+    "SHOT%04d.PCX",
+    "I:\\Projects\\Heroes\\Prog\\BASE\\WINMGR.CPP",
+    "I:\\Projects\\Heroes\\Prog\\BASE\\WINMGR.CPP",
+    "CCYCLE%02d.BIN",
+    "I:\\Projects\\Heroes\\Prog\\BASE\\WINMGR.CPP",
+    "I:\\Projects\\Heroes\\Prog\\BASE\\WINMGR.CPP"
+};
+
 #include <BASE/heroWindowManager.h>
 #include <BASE/palette.h>
 #include <string.h>
 #include <SOURCE/wingraph.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/KB.h>
+
+// @data-layout-note NB09 assigns WINMGR a 0xf0 initialized-data contribution
+// at 0x11ef28. Six public integers form its 0x18 prefix; gWindowManagerText
+// reproduces the remaining 0xd8 bytes and the seven owner addends used by Open,
+// ScreenShot, and FizzleForward. Its four source paths are distinct owners.
+// The loader-zero contribution at 0x134908 is gCyclePal, memSelector, two bytes
+// of natural alignment, then FadeSavedUpdate's function-local static.
+// The inline accessor reproduces that 0x68-byte BSS topology without a padding
+// symbol or an unretained external data identity.
 // Complete /O2 checkpoint: both code streams end at the ret at +0x3a2 and contain
 // 261 instructions (retail's +0x3a3 nop is alignment outside the CodeView span).
 // Relocations are exact at 71/71 with no wrong target. Keeping the combat and
@@ -157,9 +202,6 @@ updatePalette:
 #include <SOURCE/kbwin.h>
 #include <SOURCE/NOOPT.h>
 
-// ---- module-private synthetic globals (retail xref: single-module) ----
-DATA(0x0053496c) static unsigned int gFadeSavedUpdate; // saved update flag across a fade (heroWindowManager::FadeScreen)
-
 VA(0x004caa80, 0x41)
 heroWindowManager::heroWindowManager(void) : baseManager()
 {
@@ -200,7 +242,7 @@ int heroWindowManager::Open(int managerOrder)
     m_priority = managerOrder;
     m_messageMask = 0x20;
     m_active = 1;
-    strcpy(m_name, "heroWindowManager");
+    strcpy(m_name, gWindowManagerText.managerName);
     return 0;
 }
 
@@ -390,11 +432,11 @@ int heroWindowManager::DoDialog(class heroWindow *window, int (*handler)(struct 
             manager->m_updateFlags = 0;
             PollSound();
             FadeIn(8);
-            manager->m_updateFlags = gFadeSavedUpdate | savedUpdate;
+            manager->m_updateFlags = FadeSavedUpdate() | savedUpdate;
             break;
         }
         case WINDOW_FADE_OUT:
-            gFadeSavedUpdate = manager->m_updateFlags;
+            FadeSavedUpdate() = manager->m_updateFlags;
             manager->m_updateFlags = 0;
             PollSound();
             FadeOut(8);
@@ -471,12 +513,12 @@ void heroWindowManager::FadeScreen(int param_1, int param_2, class palette *pal)
         m_updateFlags = 0;
         PollSound();
         FadeIn(param_2);
-        m_updateFlags = gFadeSavedUpdate | saved;
+        m_updateFlags = FadeSavedUpdate() | saved;
         PollSound();
         break;
     }
     case 1:
-        gFadeSavedUpdate = m_updateFlags;
+        FadeSavedUpdate() = m_updateFlags;
         m_updateFlags = 0;
         PollSound();
         FadeOut(param_2);
@@ -492,7 +534,7 @@ VA(0x004cb0b0, 0x53)
 void heroWindowManager::ScreenShot(void)
 {
     char local_10[16];
-    sprintf(local_10, "SHOT%04d.PCX", m_screenshotIndex);
+    sprintf(local_10, gWindowManagerText.screenshotFormat, m_screenshotIndex);
     CreatePCXFile(local_10, m_screen->m_pixels, WINDOW_SCREEN_WIDTH,
                   WINDOW_SCREEN_HEIGHT,
                   reinterpret_cast<unsigned char *>(gPalette->m_data));
@@ -576,13 +618,15 @@ void heroWindowManager::FizzleForward(int x, int y, int width, int height, int d
             m_updateFlags = 0;
             if (delay == -1)
                 delay = WINDOW_FIZZLE_DEFAULT_DELAY;
-            signed char *fadePalette = static_cast<signed char *>(H2_ALLOC(WINDOW_PALETTE_BYTE_COUNT, "I:\\Projects\\Heroes\\Prog\\BASE\\WINMGR.CPP", 808));
+            signed char *fadePalette = static_cast<signed char *>(H2_ALLOC(
+                WINDOW_PALETTE_BYTE_COUNT, gWindowManagerText.fadePaletteAllocSource, 808));
             m_fizzleWork = new bitmap(0, static_cast<short>(width), static_cast<short>(height));
-            signed char *cycleTable = static_cast<signed char *>(H2_ALLOC(WINDOW_FIZZLE_CYCLE_TABLE_BYTES, "I:\\Projects\\Heroes\\Prog\\BASE\\WINMGR.CPP", 810));
+            signed char *cycleTable = static_cast<signed char *>(H2_ALLOC(
+                WINDOW_FIZZLE_CYCLE_TABLE_BYTES, gWindowManagerText.cycleTableAllocSource, 810));
             BlitBitmap(m_screen, x, y, width, height, m_fizzleWork, 0, 0);
 
             for (int frame = 0; frame < WINDOW_CYCLE_FRAME_COUNT; frame++) {
-                sprintf(gText, "CCYCLE%02d.BIN", frame);
+                sprintf(gText, gWindowManagerText.cycleFilenameFormat, frame);
                 unsigned long id = gpResourceManager->MakeId(gText, 1);
                 gpResourceManager->PointToFile(id);
                 gpResourceManager->ReadBlock(cycleTable, WINDOW_FIZZLE_CYCLE_TABLE_BYTES);
@@ -635,8 +679,8 @@ void heroWindowManager::FizzleForward(int x, int y, int width, int height, int d
             if (m_fizzleWork != 0)
                 delete m_fizzleWork;
             m_fizzleWork = 0;
-            H2_FREE(cycleTable, "I:\\Projects\\Heroes\\Prog\\BASE\\WINMGR.CPP", 897);
-            H2_FREE(fadePalette, "I:\\Projects\\Heroes\\Prog\\BASE\\WINMGR.CPP", 898);
+            H2_FREE(cycleTable, gWindowManagerText.cycleTableFreeSource, 897);
+            H2_FREE(fadePalette, gWindowManagerText.fadePaletteFreeSource, 898);
         }
     }
 }
@@ -667,13 +711,3 @@ void CreateColorLookupTables(void) {}
 
 // ---- vtables (compiler-emitted; census) ----
 VTBL(heroWindowManager, 0x004eba10);
-
-// ---- globals (definitions, RVA order) ----
-DATA(0x0051ef28) int iCombatCycleFrame = 0;
-DATA(0x0051ef2c) int gbEveryOtherCycle = 1;
-DATA(0x0051ef30) int iCycle1Count = 0;
-DATA(0x0051ef34) int iCycle2Count = 0;
-DATA(0x0051ef38) int iCycle3Count = 0;
-DATA(0x0051ef3c) int iDialogNestCount = 0;
-DATA(0x00534908) signed char gCyclePal[0x60];
-DATA(0x00534968) short memSelector;
