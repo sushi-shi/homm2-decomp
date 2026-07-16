@@ -739,6 +739,17 @@
       "note": "Complete frame slots and 150 relocs; equality load order and third skill-row branch topology resist bounded steering."
     },
     {
+      "unit": "SOURCE/HISCORE",
+      "function": "?Update@highScoreManager@@QAEXXZ",
+      "source_hash": "5e862e03cbff",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.96314,
+      "after": 99.96314,
+      "note": "All relocation-masked bytes and 73 effective targets align; only CRT COFF symbol spellings remain."
+    },
+    {
       "unit": "SOURCE/KB",
       "function": "?AddScoreToHighScore@@YIHHHHHPAD@Z",
       "source_hash": "caad0d5ec9ee",
