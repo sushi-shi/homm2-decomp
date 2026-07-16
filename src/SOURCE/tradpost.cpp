@@ -45,14 +45,17 @@ void DoTradingPost(int isMarketplace, float efficiency) {
     delete tpWindow;
 }
 
-// @semantic 99.64%: complete text, control-state, offer-icon, ratio, and knob CFG;
+// @semantic
+// Complete text, control-state, offer-icon, ratio, and knob CFG;
 // the 0x3c frame and all recovered local slots agree. Candidate span is 0x597
 // versus 0x596 retail code, with 312/312 non-jump instructions and 23/23 jumps.
 // The visible residual is the selected-resource compare loading the loop local
 // before the global instead of after it. All 112 relocations agree as a multiset;
 // ordered review has five commutative swapped pairs (three left/right validity
 // tests and two qty/ratio products). Reversing those expressions was byte-identical;
-// the De Morgan selection predicate worsened block order. Revisit after TU state changes.
+// the De Morgan selection predicate worsened block order. Ten reviewed depth-one
+// commutative/relational AST variants did not improve the raw match. Revisit after TU-state
+// changes or a new structural discovery.
 VA(0x004bf4a5, 0x596)
 void UpdateTradingPost(int draw) {
     tag_message messageTemp;
@@ -214,6 +217,13 @@ void ComputeTradeRatios(int sourceResource, int destinationResource, int *ratio,
     }
 }
 
+// @semantic
+// Exact 0x90 frame, stack slots, 0x148 extent, CFG/semantics, and 22/22 external
+// relocations. The sole residual starts at +0x67: ours loads iMaxUnitsToTrade,
+// compares qtyToTrade, and uses jle; retail loads qtyToTrade, compares
+// iMaxUnitsToTrade, and uses jge. Reversing the comparison, an explicit empty
+// positive arm, `qtyToTrade | 0`, and the zero-index SIB spelling compiled the
+// same or added a jump. Revisit only after TU-state changes.
 VA(0x004bfb39, 0x148)
 void DoTradeKnob(struct tag_message message) {
     tag_message nextMessage;
@@ -253,14 +263,16 @@ void SetupNewTrade(void) {
                        &bLeftDenominated, &iMaxUnitsToTrade);
 }
 
-// @semantic 99.41%: complete nested select/deselect switches, case-body order,
+// @semantic
+// Complete nested select/deselect switches, case-body order,
 // 0x20 frame, stack slots, and embedded pointer/index tables. Both object spans
 // are 0x3b8 (retail code 0x3b6); excluding table data leaves 154/154 non-jump
 // instructions and 25/25 jumps. The four residual sites are commuted comparisons:
 // the upper clamp, left and right resource selection, and increment bound.
 // All 51 relocations agree as a multiset; ordered review has four swapped external
 // pairs (clamp, two qty/ratio products, increment), while local-table spellings are
-// delinker aliases. Direct commuted spellings compiled byte-identically.
+// delinker aliases. Direct commuted spellings and ten reviewed depth-one
+// commutative/relational AST variants compiled byte-identically. Revisit after TU-state changes.
 VA(0x004bfcbb, 0x3b6)
 int TradingPostHandler(struct tag_message &message) {
     int exitFlag = 0;
