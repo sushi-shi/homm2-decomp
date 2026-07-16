@@ -3544,10 +3544,11 @@ int InMapArea(int x, int y)
 // @early-stop
 // @early-stop-reloc-only: Current KB.cpp/header epoch: all 0x6bc bytes match
 // after masking 51 ordered relocation sites. Qualifying columnIndex through
-// 0[&columnIndex] closes the sole loop load/polarity residual; all remaining
-// disassembly rows are equivalent delinked string identities. Eight bounded
-// variants were compiled, including four exact forms. Revisit only after the KB
-// source/TU/header or comparison epoch.
+// 0[&columnIndex] and spelling the first edge loop as columnsSize > 0[&edge]
+// close the two loop load/polarity residuals; all remaining disassembly rows are
+// equivalent delinked string identities. Nine bounded variants were compiled,
+// including five exact forms. Revisit only after the KB source/TU/header or
+// comparison epoch.
 VA(0x0049fa70, 0x6bc)
 void SetupDynamicWindow(int x, int y, int centered, int boundsWidth, int boundsHeight,
                         int contentWidth, int contentHeight, int *windowWidth,
@@ -3662,7 +3663,7 @@ void SetupDynamicWindow(int x, int y, int centered, int boundsWidth, int boundsH
         MemError();
     (*window)->AddWidget(newWidgetTemp, -1);
 
-    for (edge = 0; edge < columnsSize; edge++) {
+    for (edge = 0; columnsSize > 0[&edge]; edge++) {
         newWidgetTemp = new iconWidget(
             edge * DYNAMIC_TILE_SIZE + leftOffset - DYNAMIC_EDGE_OFFSET,
             topOffsetNum - DYNAMIC_CORNER_LEFT,
