@@ -56,8 +56,7 @@ int widget::Open(int zOrder, class heroWindow *owner)
 }
 
 // @early-stop
-// Delinker symbol artifact: base emits the named 1-byte Close section and retail
-// maps the same lone C3 byte as `empty_stub`; neither side has relocations.
+// Both sides emit the named one-byte Close body; neither side has relocations.
 VA(0x004dded0, 0x1)
 void widget::Close(void) {}
 
