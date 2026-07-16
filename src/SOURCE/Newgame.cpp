@@ -29,6 +29,10 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/Newgame.h>
 
+// @early-stop
+// @early-stop-reloc-only: Current Newgame.cpp/header epoch: all 0x1d5 bytes
+// match after masking 37 ordered relocation sites. Effective targets agree;
+// residual rows only rename compiler-local strings and _strcmpi/__strcmpi.
 VA(0x004b6f40, 0x1d5)
 void game::GetMap(void)
 {
@@ -639,15 +643,16 @@ void game::InitNewGameWindow(void)
 }
 
 // @early-stop
-// The full instruction stream and all 50 relocation sites match.
-// Objdiff's residual is only string/local-constant relocation identity.
+// @early-stop-reloc-only: Current Newgame.cpp/header epoch: all 0x59c bytes
+// match after masking 50 ordered relocation sites. Effective targets agree;
+// residual rows only rename three compiler-local string symbols.
 VA(0x004b88d6, 0x59c)
 void game::UpdateNewGameWindow(void)
 {
     int playerLockedValue;
     tag_message messageTemp;
-    int player;
-    int previousPlayer;
+    int playerIndex3;
+    int unusedPlayer17;
 
     strcpy(gText, m_mapHeader.name);
     messageTemp.type = NEW_GAME_MESSAGE_WIDGET;
@@ -658,9 +663,9 @@ void game::UpdateNewGameWindow(void)
 
     messageTemp.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
     messageTemp.payload.widget.data.value = NEW_GAME_WIDGET_REFRESH_FRAME;
-    for (player = 0; player < NEW_GAME_DIFFICULTY_COUNT; ++player) {
+    for (playerIndex3 = 0; playerIndex3 < NEW_GAME_DIFFICULTY_COUNT; ++playerIndex3) {
         messageTemp.payload.widget.id =
-            EncodeNewGameControlIndex(NEW_GAME_DIFFICULTY_FIRST, player);
+            EncodeNewGameControlIndex(NEW_GAME_DIFFICULTY_FIRST, playerIndex3);
         m_newGameWindow->BroadcastMessage(messageTemp);
     }
     messageTemp.payload.widget.command = NEW_GAME_WIDGET_ENABLE;
@@ -669,54 +674,54 @@ void game::UpdateNewGameWindow(void)
     m_newGameWindow->BroadcastMessage(messageTemp);
 
     if (giNumHumanPlayers > 1) {
-        for (player = 0; player < NEW_GAME_CHAT_LINE_COUNT; ++player) {
-            sprintf(gText, cTextReceivedBuffer[player]);
+        for (playerIndex3 = 0; playerIndex3 < NEW_GAME_CHAT_LINE_COUNT; ++playerIndex3) {
+            sprintf(gText, cTextReceivedBuffer[playerIndex3]);
             messageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
             messageTemp.payload.widget.id =
-                EncodeNewGameControlIndex(NEW_GAME_CHAT_FIRST, player);
+                EncodeNewGameControlIndex(NEW_GAME_CHAT_FIRST, playerIndex3);
             messageTemp.payload.widget.data.text = gText;
             m_newGameWindow->BroadcastMessage(messageTemp);
         }
     }
 
-    for (player = 0; player < m_mapHeader.playerCount; ++player) {
-        if (m_setupPlayerNetworkId[player] == NEW_GAME_COMPUTER_PLAYER) {
+    for (playerIndex3 = 0; playerIndex3 < m_mapHeader.playerCount; ++playerIndex3) {
+        if (m_setupPlayerNetworkId[playerIndex3] == NEW_GAME_COMPUTER_PLAYER) {
             sprintf(gText, "");
-        } else if (strlen(cPlayerNames[m_setupPlayerNetworkId[player]]) != 0) {
-            sprintf(gText, cPlayerNames[m_setupPlayerNetworkId[player]]);
+        } else if (strlen(cPlayerNames[m_setupPlayerNetworkId[playerIndex3]]) != 0) {
+            sprintf(gText, cPlayerNames[m_setupPlayerNetworkId[playerIndex3]]);
         } else {
-            sprintf(gText, "Player %d", m_setupPlayerNetworkId[player] + 1);
+            sprintf(gText, "Player %d", m_setupPlayerNetworkId[playerIndex3] + 1);
         }
         messageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
         messageTemp.payload.widget.id =
-            EncodeNewGameControlIndex(NEW_GAME_PLAYER_NAME_FIRST, player);
+            EncodeNewGameControlIndex(NEW_GAME_PLAYER_NAME_FIRST, playerIndex3);
         messageTemp.payload.widget.data.text = gText;
         m_newGameWindow->BroadcastMessage(messageTemp);
 
-        if (m_selectedSetupPlayer == player)
+        if (m_selectedSetupPlayer == playerIndex3)
             messageTemp.payload.widget.command = NEW_GAME_WIDGET_ENABLE;
         else
             messageTemp.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
         messageTemp.payload.widget.id =
-            EncodeNewGameControlIndex(NEW_GAME_PLAYER_SELECT_FIRST, player);
+            EncodeNewGameControlIndex(NEW_GAME_PLAYER_SELECT_FIRST, playerIndex3);
         messageTemp.payload.widget.data.value = NEW_GAME_WIDGET_REFRESH_FRAME;
         m_newGameWindow->BroadcastMessage(messageTemp);
 
-        if (m_setupPlayerType[player] != NEW_GAME_PLAYER_DEFAULT ||
+        if (m_setupPlayerType[playerIndex3] != NEW_GAME_PLAYER_DEFAULT ||
             (giNumHumanPlayers > 1 &&
-             m_setupPlayerNetworkId[player] != NEW_GAME_COMPUTER_PLAYER))
+             m_setupPlayerNetworkId[playerIndex3] != NEW_GAME_COMPUTER_PLAYER))
             playerLockedValue = 0;
         else
             playerLockedValue = 1;
         messageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_FRAME;
         messageTemp.payload.widget.id =
-            EncodeNewGameControlIndex(NEW_GAME_COLOR_FIRST, player);
-        if (m_setupPlayerNetworkId[player] == NEW_GAME_COMPUTER_PLAYER)
-            messageTemp.payload.widget.data.value = m_setupPlayerColor[player] +
+            EncodeNewGameControlIndex(NEW_GAME_COLOR_FIRST, playerIndex3);
+        if (m_setupPlayerNetworkId[playerIndex3] == NEW_GAME_COMPUTER_PLAYER)
+            messageTemp.payload.widget.data.value = m_setupPlayerColor[playerIndex3] +
                 (playerLockedValue ? NEW_GAME_COMPUTER_COLOR_LOCKED_FRAME
                                    : NEW_GAME_COMPUTER_COLOR_UNLOCKED_FRAME);
         else
-            messageTemp.payload.widget.data.value = m_setupPlayerColor[player] +
+            messageTemp.payload.widget.data.value = m_setupPlayerColor[playerIndex3] +
                 (playerLockedValue ? NEW_GAME_HUMAN_COLOR_LOCKED_FRAME
                                    : NEW_GAME_HUMAN_COLOR_UNLOCKED_FRAME);
         if (giNumHumanPlayers > 1)
@@ -732,20 +737,20 @@ void game::UpdateNewGameWindow(void)
 
         messageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_FRAME;
         messageTemp.payload.widget.id =
-            EncodeNewGameControlIndex(NEW_GAME_HANDICAP_FIRST, player);
-        if (m_setupPlayerNetworkId[player] == NEW_GAME_COMPUTER_PLAYER)
+            EncodeNewGameControlIndex(NEW_GAME_HANDICAP_FIRST, playerIndex3);
+        if (m_setupPlayerNetworkId[playerIndex3] == NEW_GAME_COMPUTER_PLAYER)
             messageTemp.payload.widget.data.value = NEW_GAME_RACE_NAME_FIRST;
         else
-            messageTemp.payload.widget.data.value = m_playerHandicap[player];
+            messageTemp.payload.widget.data.value = m_playerHandicap[playerIndex3];
         m_newGameWindow->BroadcastMessage(messageTemp);
-        if (m_setupPlayerNetworkId[player] == NEW_GAME_COMPUTER_PLAYER)
+        if (m_setupPlayerNetworkId[playerIndex3] == NEW_GAME_COMPUTER_PLAYER)
             messageTemp.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
         else
             messageTemp.payload.widget.command = NEW_GAME_WIDGET_ENABLE;
         messageTemp.payload.widget.data.value = NEW_GAME_WIDGET_INACTIVE_FRAME;
         m_newGameWindow->BroadcastMessage(messageTemp);
 
-        if (m_mapHeader.playerRace[m_setupPlayerColor[player]] ==
+        if (m_mapHeader.playerRace[m_setupPlayerColor[playerIndex3]] ==
             NEW_GAME_RANDOM_RACE)
             playerLockedValue = 0;
         else
@@ -755,16 +760,16 @@ void game::UpdateNewGameWindow(void)
         m_newGameWindow->BroadcastMessage(messageTemp);
         messageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_FRAME;
         messageTemp.payload.widget.id =
-            EncodeNewGameControlIndex(NEW_GAME_RACE_CYCLE_FIRST, player);
-        messageTemp.payload.widget.data.value = m_setupPlayerRace[player] +
+            EncodeNewGameControlIndex(NEW_GAME_RACE_CYCLE_FIRST, playerIndex3);
+        messageTemp.payload.widget.data.value = m_setupPlayerRace[playerIndex3] +
             (playerLockedValue ? NEW_GAME_FIXED_RACE_FRAME_BASE
                                : NEW_GAME_RANDOM_RACE_FRAME_BASE);
         m_newGameWindow->BroadcastMessage(messageTemp);
 
-        sprintf(gText, gAlignmentNames[m_setupPlayerRace[player]]);
+        sprintf(gText, gAlignmentNames[m_setupPlayerRace[playerIndex3]]);
         messageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
         messageTemp.payload.widget.id =
-            EncodeNewGameControlIndex(NEW_GAME_RACE_NAME_FIRST, player);
+            EncodeNewGameControlIndex(NEW_GAME_RACE_NAME_FIRST, playerIndex3);
         messageTemp.payload.widget.data.text = gText;
         m_newGameWindow->BroadcastMessage(messageTemp);
         if (playerLockedValue)
@@ -1255,10 +1260,14 @@ finish:
     return 1;
 }
 
-// @early-stop
-// Excluding jump-table data at retail +0x259..+0x289 and +0x399..+0x400,
-// every instruction byte agrees. Both objects have 84 relocation sites and every
-// external target agrees; residuals are delinked gText+1/local-table identities.
+// @semantic: Current Newgame.cpp/header epoch has the exact 0x80 frame/slots,
+// 0x418 extent, complete semantics, and 84/84 ordered relocation sites/effective
+// targets. The real local branch residuals are +0x16d (adjacent +0x370 hop versus
+// direct +0x400) and +0x289 (no-op brace filter +0x297 versus direct insertion
+// +0x2b5). Ten bounded CFG/guard attempts exhausted shared/default labels,
+// nested/zero-aware/empty arms, operand reversals, and backspace polarity; the
+// best alternatives regressed to 99.39341%. Revisit only after a relevant
+// Newgame source/TU/header or comparison-state change affects local routing.
 VA(0x004b9db8, 0x418)
 int game::ProcessNGKeyPress(struct tag_message &message)
 {
@@ -1426,6 +1435,11 @@ void game::DrawNGKPDisplayString(int updateScreen)
     }
 }
 
+// @early-stop
+// @early-stop-reloc-only: Current Newgame.cpp/header epoch: all 0xb71 bytes
+// match after masking 118 ordered relocation sites. The scalar-lvalue spelling
+// `0[&playerSpacingTemp]` restores retail's counter-first load at all eight
+// player-position products; remaining rows only rename compiler-local strings.
 VA(0x004ba39c, 0xb71)
 void game::ShowScenInfo(void)
 {
@@ -1508,7 +1522,7 @@ void game::ShowScenInfo(void)
     for (playerCounter = 0; playerCounter < m_mapHeader.playerCount; ++playerCounter) {
         if (giNumHumanPlayers > 1) {
             iconControlLocal = new iconWidget(
-                static_cast<short>(playerSpacingTemp * playerCounter +
+                static_cast<short>(0[&playerSpacingTemp] * playerCounter +
                                    firstPlayerXLocal + 13),
                 static_cast<short>(multiplayerYOffsetValue + 309), 64, 28,
                 "ngextra.icn", 59, 0,
@@ -1519,7 +1533,7 @@ void game::ShowScenInfo(void)
             scenarioWindowValue->AddWidget(iconControlLocal, -1);
 
             iconControlLocal = new iconWidget(
-                static_cast<short>(playerSpacingTemp * playerCounter +
+                static_cast<short>(0[&playerSpacingTemp] * playerCounter +
                                    firstPlayerXLocal + 16),
                 static_cast<short>(multiplayerYOffsetValue + 306), 62, 26,
                 "ngextra.icn", 0, 0,
@@ -1530,7 +1544,7 @@ void game::ShowScenInfo(void)
         }
 
         iconControlLocal = new iconWidget(
-            static_cast<short>(playerSpacingTemp * playerCounter + firstPlayerXLocal +
+            static_cast<short>(0[&playerSpacingTemp] * playerCounter + firstPlayerXLocal +
                                11),
             163, 68,
             static_cast<short>(
@@ -1550,7 +1564,7 @@ void game::ShowScenInfo(void)
         scenarioWindowValue->AddWidget(iconControlLocal, -1);
 
         iconControlLocal = new iconWidget(
-            static_cast<short>(playerSpacingTemp * playerCounter + firstPlayerXLocal +
+            static_cast<short>(0[&playerSpacingTemp] * playerCounter + firstPlayerXLocal +
                                16),
             160, 62, 58, "ngextra.icn",
             static_cast<short>(
@@ -1569,7 +1583,7 @@ void game::ShowScenInfo(void)
                 scenarioInfoSourceLineBase + 0x72));
             sprintf(label, " ");
             textControlLocal = new textWidget(
-                static_cast<short>(playerSpacingTemp * playerCounter +
+                static_cast<short>(0[&playerSpacingTemp] * playerCounter +
                                    firstPlayerXLocal + 19),
                 206, 56, 9, label, "smalfont.fnt", 1,
                 static_cast<short>(playerCounter + NEW_GAME_PLAYER_NAME_FIRST),
@@ -1581,7 +1595,7 @@ void game::ShowScenInfo(void)
 
         singlePlayerYOffsetValue = 0;
         iconControlLocal = new iconWidget(
-            static_cast<short>(playerSpacingTemp * playerCounter + firstPlayerXLocal +
+            static_cast<short>(0[&playerSpacingTemp] * playerCounter + firstPlayerXLocal +
                                11),
             static_cast<short>(multiplayerYOffsetValue +
                                singlePlayerYOffsetValue + 243),
@@ -1605,7 +1619,7 @@ void game::ShowScenInfo(void)
             raceTextWidth = 26;
         }
         textControlLocal = new textWidget(
-            static_cast<short>(playerSpacingTemp * playerCounter + firstPlayerXLocal +
+            static_cast<short>(0[&playerSpacingTemp] * playerCounter + firstPlayerXLocal +
                                15 - raceTextWidth / 2),
             static_cast<short>(multiplayerYOffsetValue +
                                singlePlayerYOffsetValue + 288),
@@ -1618,7 +1632,7 @@ void game::ShowScenInfo(void)
         scenarioWindowValue->AddWidget(textControlLocal, -1);
 
         iconControlLocal = new iconWidget(
-            static_cast<short>(playerSpacingTemp * playerCounter + firstPlayerXLocal +
+            static_cast<short>(0[&playerSpacingTemp] * playerCounter + firstPlayerXLocal +
                                16),
             static_cast<short>(multiplayerYOffsetValue +
                                singlePlayerYOffsetValue + 240),
@@ -1718,50 +1732,51 @@ void game::ShowScenInfo(void)
 }
 
 // @early-stop
-// The instruction stream is identical with relocations masked and all 14
-// relocation sites and targets agree; only string symbol identities differ.
+// @early-stop-reloc-only: Current Newgame.cpp/header epoch: all 0x1c7 bytes
+// match after masking 14 ordered relocation sites. Semantic suffixes restore
+// the six retail local slots; remaining rows only rename string symbols.
 VA(0x004baf0d, 0x1c7)
 void game::GetLossConditionText(char *text)
 {
-    int week;
-    hero *lossHero;
-    int day;
-    int month;
-    town *lossTown;
-    int townId;
+    int week2;
+    hero *lossHero11;
+    int day26;
+    int month19;
+    town *lossTown9;
+    int townId12;
 
     if (m_mapHeader.lossCondition != MAP_LOSS_STANDARD) {
         switch (m_mapHeader.lossCondition) {
         case MAP_LOSS_TOWN:
-            townId = GetTownId(m_mapHeader.lossConditionValue,
-                               m_mapHeader.lossTownY);
-            lossTown = GetTown(townId);
+            townId12 = GetTownId(m_mapHeader.lossConditionValue,
+                                 m_mapHeader.lossTownY);
+            lossTown9 = GetTown(townId12);
             sprintf(text, "Lose the %s '%s'.",
-                    (lossTown->m_buildings & TOWN_BUILDING_CASTLE)
+                    (lossTown9->m_buildings & TOWN_BUILDING_CASTLE)
                         ? "castle"
                         : "town",
-                    lossTown->m_name);
+                    lossTown9->m_name);
             break;
 
         case MAP_LOSS_HERO:
-            lossHero = GetHero(m_mapHeader.lossConditionValue);
-            sprintf(text, "Lose the hero '%s'.", lossHero->m_name);
+            lossHero11 = GetHero(m_mapHeader.lossConditionValue);
+            sprintf(text, "Lose the hero '%s'.", lossHero11->m_name);
             break;
 
         case MAP_LOSS_TIME:
-            month = (gpGame->m_mapHeader.lossConditionValue - 1) /
-                        NEW_GAME_DAYS_PER_MONTH +
+            month19 = (gpGame->m_mapHeader.lossConditionValue - 1) /
+                          NEW_GAME_DAYS_PER_MONTH +
+                      1;
+            week2 = (gpGame->m_mapHeader.lossConditionValue -
+                     (month19 - 1) * NEW_GAME_DAYS_PER_MONTH - 1) /
+                        NEW_GAME_DAYS_PER_WEEK +
                     1;
-            week = (gpGame->m_mapHeader.lossConditionValue -
-                    (month - 1) * NEW_GAME_DAYS_PER_MONTH - 1) /
-                       NEW_GAME_DAYS_PER_WEEK +
-                   1;
-            day = (gpGame->m_mapHeader.lossConditionValue - 1) %
-                      NEW_GAME_DAYS_PER_WEEK +
-                  1;
+            day26 = (gpGame->m_mapHeader.lossConditionValue - 1) %
+                        NEW_GAME_DAYS_PER_WEEK +
+                    1;
             sprintf(text,
                     "Fail to win by the end of month %d, week %d, day %d.",
-                    month, week, day);
+                    month19, week2, day26);
             break;
         }
     } else {

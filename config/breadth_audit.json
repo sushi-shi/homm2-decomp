@@ -673,6 +673,61 @@
       "note": "All relocation-masked instructions match; metric residual is only function-local data identity."
     },
     {
+      "unit": "SOURCE/Newgame",
+      "function": "?GetLossConditionText@game@@QAEXPAD@Z",
+      "source_hash": "5bd97b05a3f8",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.91549,
+      "after": 100.0,
+      "note": "Semantic local suffixes restore all six retail stack slots; function is exact."
+    },
+    {
+      "unit": "SOURCE/Newgame",
+      "function": "?GetMap@game@@QAEXXZ",
+      "source_hash": "fa2312998aaf",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.96212,
+      "after": 99.96212,
+      "note": "All non-relocation bytes and 37 effective targets match; residuals are compiler-local string and CRT spellings."
+    },
+    {
+      "unit": "SOURCE/Newgame",
+      "function": "?ProcessNGKeyPress@game@@QAEHAAUtag_message@@@Z",
+      "source_hash": "1f930e99521d",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 99.98682,
+      "after": 99.98682,
+      "note": "Exact frame slots and 84 relocs; two real local branch residuals remain after ten bounded CFG and guard families."
+    },
+    {
+      "unit": "SOURCE/Newgame",
+      "function": "?ShowScenInfo@game@@QAEXXZ",
+      "source_hash": "adf8f86079db",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "exact",
+      "iterations": 2,
+      "before": 99.978806,
+      "after": 100.0,
+      "note": "Scalar-lvalue spelling restores all eight retail player-position products; function is exact."
+    },
+    {
+      "unit": "SOURCE/Newgame",
+      "function": "?UpdateNewGameWindow@game@@QAEXXZ",
+      "source_hash": "338c02c0754d",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.899704,
+      "after": 100.0,
+      "note": "Semantic local suffixes restore the retail slots; function is exact."
+    },
+    {
       "unit": "SOURCE/PHILAI",
       "function": "?CheckBerserk@philAI@@QAEXXZ",
       "source_hash": "256ff2ac6bc1",
