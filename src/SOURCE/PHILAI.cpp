@@ -70,7 +70,7 @@ DATA(0x004f2474) static short s_closeAIMapLineBase = PHILAI_CLOSE_MAP_LINE_BASE;
 
 DATA(0x005256f0) searchArray SVSearchArray;
 
-// @early-stop
+// @semantic
 // Bytes 0x000-0x1b5 are instruction-identical with relocations masked, and all 17
 // relocation targets agree. Retail's three NOPs begin after the CodeView function range.
 VA(0x0043781b, 0x1b5)
@@ -168,6 +168,10 @@ void philAI::DoAllHeroInteractions(void) {
     }
 }
 
+// @semantic: Complete 0x37e-byte CFG, frame/slots, and all 11 external
+// relocations align. Current code has extra /Ob1 continuation jumps at the
+// first hero-count and empty-slot tests. Revisit after PHILAI TU/header state
+// changes or in the byte-last-mile phase.
 VA(0x00437c61, 0x37e)
 void philAI::CheckForCreatureUpgrades(void) {
     int upgradeType = -1;
@@ -255,7 +259,7 @@ inline town *GetCastleSlot(int id) {
     return &gpGame->m_castleRecs[id];
 }
 
-// @early-stop
+// @semantic
 // Instruction stream is identical with relocations masked and all 80 relocation
 // targets agree; residual rows are delinker names for the two log strings.
 VA(0x00437fdf, 0x4be)
@@ -352,7 +356,7 @@ inline hero *GetHeroSlot(int id) {
     return &gpGame->m_heroRecs[id];
 }
 
-// @early-stop
+// @semantic
 // At the retained source-hash max, raw disassembly differs only at the two
 // owned-current-turn exits: retail uses direct JE branches while /Od emits
 // equivalent JNE + continuation JMP blocks. All frame roles agree; 42/42
@@ -560,7 +564,7 @@ void philAI::DimensionDoorTo(int x, int y) {
     gpCurAIHero->UseSpell(0x38);
 }
 
-// @match-note
+// @semantic
 // The 0x38 frame and all 34 external relocations agree. The remaining instruction
 // delta is the equivalent MAP_WIDTH loop comparison operand/polarity.
 VA(0x00438fb0, 0x3f9)
@@ -737,7 +741,7 @@ void ValidateHero(hero *pHero) {
     }
 }
 
-// @early-stop
+// @semantic
 // Raw disassembly has identical logic and frame roles. Residual rows are one
 // TU-cumulative comparison load order, leading/trailing /Ob1 continuations, and
 // equivalent conditional/tail-thunk encodings at reconstructed loop/exit edges;
@@ -1077,7 +1081,7 @@ void philAI::GetGameAIVars(void) {
         GetGameAttentionValue(i);
 }
 
-// @match-note
+// @semantic
 // The threat scan and early-turn hero/town pointers retain their retail scopes,
 // including the initialized unused fight-value word. The 0xac frame and all 171
 // external relocations agree; residuals are local constant identities and
@@ -1330,7 +1334,7 @@ firstWeekDone:
         giMaxHeroesForThisPlayer = gpCurPlayer->m_minimumHeroCount;
 }
 
-// @early-stop
+// @semantic
 // Instruction stream is identical with relocations masked; all residual rows are
 // delinker names for string literals and compiler-emitted floating constants.
 VA(0x0043b154, 0x5f4)
@@ -1426,7 +1430,7 @@ void philAI::GetBestBHC(int player, BHC &best) {
         best.type = -1;
 }
 
-// @early-stop
+// @semantic
 // Complete & correct; two residuals are /Od codegen-shape picks (verified via scratch cl,
 // not source-steerable): (1) the hero-slot 2D access gpGame[0x4a0+player*283+i] — cl emits
 // the full player*283 then `+i`; retail strength-reduces to (i-player)+player*284 (identical
@@ -1455,7 +1459,7 @@ hero *philAI::DetermineHeroToMove(int player) {
     return 0;
 }
 
-// @early-stop
+// @semantic
 // The 0x90 frame and all 179 relocation sites align; normalDirTable+1 is the
 // sole delinker alias, for the proven .y field. Relocation-masked comparison
 // leaves only: the IsEmbarked /Ob1 continuation moved from +0x454..+0x469 to
@@ -2183,7 +2187,7 @@ void philAI::GetBestBuilding(town *t, BHC &bhc, float &fOut) {
     fOut = nb;
 }
 
-// @match-note
+// @semantic
 // Retail structure is recovered: the 0x84-byte frame, monster/cost evaluation,
 // visiting-hero and garrison ranged-stack passes, danger cube, deflator, and final
 // ratio all align. All semantic locals occupy their retail slots (-0x4 through
@@ -2266,7 +2270,7 @@ void philAI::ValueOfBuyingCreature(town *townPtr, int creature, int &resourceVal
     benefitCost = static_cast<float>(resourceValue) / purchaseCost;
 }
 
-// @match-note
+// @semantic
 // The instruction stream and all external targets align. Remaining differences are
 // four delinked interior names for gMonsterDatabase: all four retail operands resolve
 // to 0x4faeb2 (gMonsterDatabase + 2), while our COFF expresses the same address as
@@ -2402,7 +2406,7 @@ int philAI::MaxBuyableCreatures(int level) {
     return res;
 }
 
-// @match-note
+// @semantic
 // Hero experience, artifact filtering, player factors, class/town preference,
 // deflation, benefit/cost output, and the magic/non-magic build-state polarity are
 // reconstructed. The 0x50 frame and all 27 relocations agree. The typed 0.16 and
@@ -2460,7 +2464,7 @@ void philAI::ValueOfBuyingHero(town *townPtr, hero *heroPtr, int &resourceValue,
     resourceValue = value27;
 }
 
-// @match-note
+// @semantic
 // Candidate traversal, scoring, best-choice updates, logging, BHC output, frame,
 // and the occupied-map-cell penalty align. The eight semantic locals occupy the
 // retail -0x4 through -0x20 slots. Residuals are literal identities, an equivalent
@@ -2523,11 +2527,12 @@ void philAI::LikelihoodOfEnemyAttacking(town *, hero *, float &chanceA, float &c
 VA(0x0043e4be, 0x1a)
 int philAI::MeanRVOfUnexploredTerritory(int) { return 0; }
 
-// @match-note
-// Both randomized game weights, player-count scaling, and remainder assignment are
-// reconstructed with the retail 0x18-byte frame and field offsets. Typed float and
-// double constants retain all three identity normalizations and all 45 relocation
-// occurrences agree.
+// @early-stop
+// @early-stop-reloc-only: Current PHILAI.cpp/header epoch: all 0x1d8 code bytes
+// match after masking 45 ordered relocation sites. Correcting the final identity
+// literal to the modeled float removed the sole opcode-width residual; remaining
+// rows are compiler constant and division-guard identities. Revisit only after
+// PHILAI source/TU/header or comparison state changes.
 VA(0x0043e4d8, 0x1d8)
 void philAI::GetGameAttentionValue(int player) {
     playerAttentionWeights *attention =
@@ -2552,7 +2557,8 @@ void philAI::GetGameAttentionValue(int player) {
         ((AI_ATTENTION_PLAYER_CENTER - gpGame->m_playerCount) *
              AI_ATTENTION_WEIGHT_A_PLAYER_FACTOR + 1.0) * attention->gameWeightA);
     attention->gameRemainder =
-        static_cast<float>((1.0 - attention->gameWeightB) - attention->gameWeightA);
+        static_cast<float>((AI_ATTENTION_IDENTITY_FLOAT - attention->gameWeightB) -
+                           attention->gameWeightA);
 }
 
 VA(0x0043e6b0, 0xf2)
@@ -2591,6 +2597,11 @@ int philAI::RVConversion(int *const p) {
                + (float)p[RES_CRYSTAL] * gafAITurnCostResource[RES_CRYSTAL]);
 }
 
+// @semantic: All 61 normalized instructions and all 4 ordered relocations align.
+// Raw bytes differ only at +0xa4/+0xa7: retail loads maxT then turns for the
+// x87 maximum comparison, while ours loads turns then maxT. The equivalent
+// `maxT < turns` spelling was neutral; guarded probes reached disposable 100%
+// but failed global eligibility. Revisit in the byte-last-mile phase.
 VA(0x0043e848, 0xd0)
 float philAI::TurnsToBuy(int *const p) {
     float maxT = 0;
@@ -2609,7 +2620,7 @@ float philAI::TurnsToBuy(int *const p) {
     return maxT;
 }
 
-// @match-note
+// @semantic
 // The 0xc8-byte frame and full CFG align: strategic/event deltas, chained live
 // chances, adjacent-monster handling, mobility curve, embarked bonus, and debug log
 // are present. Normalized residual code is one MAP_WIDTH operand-load choice; the
@@ -2761,7 +2772,7 @@ int philAI::RVOfPosition(int x, int y, int hasEvent, int eventX, int eventY,
     return totalValue;
 }
 
-// @early-stop
+// @semantic
 // At +0x2f9..+0x30d, cl loads MAP_HEIGHT first and emits `cmp [y], eax; jge`
 // (19 bytes); retail loads y first and emits `cmp [MAP_HEIGHT], eax; jle`
 // (20 bytes). Both are the same signed `y < MAP_HEIGHT` loop condition. A focused
@@ -2979,7 +2990,7 @@ int philAI::ValueOfTown(town *t) {
     return sum;
 }
 
-// @early-stop
+// @semantic
 // Complete & correct except the final `/ gResourceBaseValue[i]`: cl evaluates the simple
 // int divisor before the float numerator -> fdivrp (guard al=0xd); retail evaluates the
 // numerator first -> fdivp (al=0xf). Identical quotient; an /Od operand-eval-order pick.
@@ -3007,6 +3018,10 @@ void philAI::TurnCostResource(int player) {
     }
 }
 
+// @semantic: Complete 0x175-byte CFG, frame/slots, and all 22 external
+// relocations align. Current differences are compiler float constants and
+// division-guard identities, with shifted relocation sites in that guarded
+// sequence. Revisit in the byte-last-mile phase.
 VA(0x0043fd0c, 0x175)
 float philAI::TurnValueOfObelisk(int player) {
     int jb;             // artifact RV
@@ -3713,7 +3728,7 @@ void philAI::HeroInteractionAtHero(hero *firstHero, hero *secondHero,
     }
 }
 
-// @early-stop
+// @semantic
 // Exact 0x882 span and 0x78 frame; all 71 relocation sites and targets agree. The
 // 25 relocation-masked residual bytes are only commutative load order at
 // +0x45..+0x64, +0x139..+0x158, and +0x37d..+0x380; equivalent x87 comparison
@@ -3943,7 +3958,7 @@ void philAI::HeroInteractionAtTown(hero *heroPtr, town *townPtr, int doInteracti
     }
 }
 
-// @early-stop
+// @semantic
 // Exact 0x4ba span and 0x48 frame; all 19 relocation sites and targets agree.
 // The only masked residual is TU-cumulative comparison load order at +0x3b9,
 // +0x3bc, and +0x3be (transfer count vs total creature count).
@@ -4225,6 +4240,11 @@ void philAI::BuildHero(town *townPtr, int availableHeroIndex) {
     ShowStatus();
 }
 
+// @early-stop
+// @early-stop-reloc-only: Current PHILAI.cpp/header epoch: all 0x2cd code bytes
+// match after masking 29 ordered relocation sites. The fuzzy residual is only
+// compiler string/constant and delinked-local identity. Revisit only after the
+// PHILAI source/TU/header or comparison epoch changes.
 VA(0x00442be0, 0x2cd)
 void philAI::BuildCreature(town *townPtr, int dwelling, int purchaseCount) {
     int canJoin6;
@@ -4642,7 +4662,7 @@ int philAI::ComputeUpgradeValue(int a1, int a2) {
 }
 
 // @early-stop
-// All 0x271 bytes match after masking 34 aligned COFF relocations.
+// @early-stop-reloc-only: All 0x271 bytes match after masking 34 aligned COFF relocations.
 // Objdiff's residual is symbol identity: table/field addends and compiler constant
 // pools resolve to the retail addresses, while jump-table labels delink as this function.
 VA(0x00443c54, 0x271)
@@ -4714,6 +4734,11 @@ int philAI::ComputeValueOfFreeSS(hero *h, int ss) {
         return ComputeValueOfSS(h, ss, 1);
 }
 
+// @early-stop
+// @early-stop-reloc-only: Current PHILAI.cpp/header epoch: all 0xa6 code bytes
+// match after masking 4 ordered relocation sites. The fuzzy residual is only
+// compiler float-constant/division-guard identity. Revisit only after the
+// PHILAI source/TU/header or comparison epoch changes.
 VA(0x00443f1e, 0xa6)
 int philAI::ManaRefreshValue(hero *h, int level) {
     int v = 0;
@@ -4727,6 +4752,12 @@ int philAI::ManaRefreshValue(hero *h, int level) {
     return v;
 }
 
+// @semantic: The complete event switch, frame/slots, case order, and 356 ordered
+// relocation sites are reconstructed. The next-public retail span absorbs
+// delinked private code, so symbol-only disassembly truncates our body after the
+// first switch arm; explicit-range review is required. One canonical
+// gafAITurnCostResource reference remains delinked under a different identity.
+// Revisit when private-function boundaries are normalized.
 VA(0x00443fc4, 0x1ac5)
 int philAI::ValueOfEventAtPosition(int x, int y, int immediate, int *liveChance) {
     mapCell *cell_k;
@@ -5631,13 +5662,13 @@ int philAI::EvaluateArtifactEvent(int artifact, int eventData) {
     return result5;
 }
 
-// @semantic live 99.42% after the shared MonsterAbilityFlags declaration moved
-// PHILAI's TU-cumulative compiler state.  On the immediately preceding master
-// state this body was 100%: all 244 instructions, the 0x30 frame and exact local
-// slots, the 778-byte extent, and 38/38 relocation targets matched retail.  The
-// mine-value else arm restores the retail /Ob1 continuation shape.  Preserve
-// this reconstruction until the enum/type pass settles, then revisit the live
-// compiler-state residual during final maxing.
+// @semantic: Current live score is 92.91% after the corrected PHILAI float/double
+// declarations moved TU-cumulative codegen; this unchanged source hash retains
+// a prior exact maximum. All 244 instructions, the 0x30 frame and exact slots,
+// the 778-byte extent, and 38/38 relocation targets are complete. Ten guarded
+// probes again reached disposable 100% but failed global eligibility. Forcing
+// MAP_WIDTH-first multiplication regressed FPU scheduling and was discarded.
+// Revisit only after PHILAI TU/header state stabilizes for final maxing.
 VA(0x0044661e, 0x30a)
 int philAI::EvaluateMineEvent(int mineIndex, int x, int y, int *liveChance) {
     float winChance;
@@ -5792,7 +5823,7 @@ int philAI::EvaluateMonsterEvent(int monsterType, int eventData, int *liveChance
     return result5;
 }
 
-// @match-note
+// @semantic
 // Battle outputs, town-defense context, live-chance bands, and the unconditional
 // berserk reset match retail. The frame is 0x54 and all 73 external relocations
 // agree; residuals are /Od branch trampolines, constant identities, and equivalent
