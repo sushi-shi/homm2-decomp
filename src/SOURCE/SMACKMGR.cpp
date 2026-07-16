@@ -630,13 +630,16 @@ DATA(0x004ecd50) Smack *smk2 = 0;
 // @data-layout-note
 // Retail initialized storage is 0xec040..0xed22c (0x11ec bytes). Candidate
 // ordinal 2 is a byte-exact 0x11e9-byte prefix; retail contributes the three
-// trailing zero alignment bytes. The public objects and the 0x20-byte
-// expansionCampaignRects record have exact payloads and owner offsets. Twenty-four
-// unique compiler literals from $SG34107 through $SG34291 have reviewed exact
-// payload/offset translations. The repeated literals at $SG34124, $SG34126,
-// $SG34138, $SG34140, $SG34154, $SG34157, $SG34158, $SG34170, $SG34212, and
-// $SG34231 remain unresolved because payload equality cannot identify an owner;
-// do not select an arbitrary copy or create aliases.
+// trailing zero alignment bytes. The exact prefix SHA-256 is
+// b74e91cd227e894136650c6d7121bdf092353b72cba98d19148809e3a6b428b6.
+// All 34 compiler literals have exact same-offset payload/owner translations
+// and one zero-addend reference each. Candidate and retail both have 141
+// references to the same 49 initialized-data RVAs, including every public owner
+// and SmackOptions interior addend. All 12 retained public identities have exact
+// source DATA definitions. Their NB09 next-public spans are not object sizes:
+// brotherIcon's span contains expansionCampaignRects, smk2's span contains the
+// literal pool, and smksum's span contains bExpansionSmackNum. These private
+// allocations are not missing public storage and must not become aliases.
 //
 // Retail loader-zero storage is 0x522f20..0x522f88 (0x68 bytes). Smacker 3.0g's
 // SmackSummary implementation writes output offsets +0x4c and +0x50 after
@@ -648,8 +651,9 @@ DATA(0x004ecd50) Smack *smk2 = 0;
 // gbLastFramePlayed +4, gbPlayedThrough +0x60, and bMainDone +0x64: a three-way
 // COMMON allocation-order difference. Declaration reorder,
 // extern-before-definition, file/function static placement, /Z7, /Gy, /Gf, and
-// a custom bss_seg retain the candidate order. Do not add padding, aliases, or
-// section pragmas to hide this remaining allocation-order wall.
+// a custom bss_seg retain the candidate order. All 65 BSS references match the
+// same 9 retail RVAs, including smksum addends +0x8, +0x1c, and +0x20. Do not
+// add padding, aliases, or section pragmas to hide this allocation-order wall.
 DATA(0x00522f20) signed char bSmackNum;
 DATA(0x00522f24) int gbLastFramePlayed;
 DATA(0x00522f28) SmackSum smksum;
