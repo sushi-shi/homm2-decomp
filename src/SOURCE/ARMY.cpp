@@ -1672,13 +1672,11 @@ int army::AttackTo(void)
     return AttackTo(m_moveTargetHex);
 }
 
-// @early-stop
-// The complete instruction stream and all 18/18 relocation sites align.
 VA(0x0044f756, 0x1e8)
 int army::AttackTo(int destination)
 {
     int finishStanding;
-    int pathIndex;
+    int pathIndex_4;
     int steps;
 
     if (m_monster.flags.all & MONSTER_FLAGS_FLYING) {
@@ -1700,22 +1698,22 @@ int army::AttackTo(int destination)
             gpCombatManager->TestRaiseDoor();
             DoAttack(0);
         } else {
-            pathIndex = 0;
+            pathIndex_4 = 0;
             steps = 0;
-            for (pathIndex = gpSearchArray->m_pathLength - 1;
-                 pathIndex != 0;
-                 pathIndex--) {
+            for (pathIndex_4 = gpSearchArray->m_pathLength - 1;
+                 pathIndex_4 != 0;
+                 pathIndex_4--) {
                 steps++;
-                if (pathIndex == 1 || steps >= m_monster.speed) {
+                if (pathIndex_4 == 1 || steps >= m_monster.speed) {
                     finishStanding = 1;
                 } else {
                     finishStanding = 0;
                 }
                 Walk(static_cast<unsigned char>(
-                         gpSearchArray->m_storage.path.directions[pathIndex + 1]),
+                         gpSearchArray->m_storage.path.directions[pathIndex_4 + 1]),
                      finishStanding,
-                     gpSearchArray->m_pathLength - 1 != pathIndex);
-                if (steps >= m_monster.speed && pathIndex != 1) {
+                     gpSearchArray->m_pathLength - 1 != pathIndex_4);
+                if (steps >= m_monster.speed && pathIndex_4 != 1) {
                     return ARMY_PATH_BLOCKED;
                 }
             }
@@ -1913,12 +1911,10 @@ void army::DamageEnemy(army *target, int *damageResult, int *killedResult,
     *killedResult = target->Damage(damageDone2, -1);
 }
 
-// @early-stop
-// The complete 159-instruction stream and all 15/15 relocations align.
 VA(0x0045012e, 0x23c)
 int army::Damage(long damage, int spell)
 {
-    int killed;
+    int killed_13;
     int originalFacing;
     int quantityFifth;
 
@@ -1936,25 +1932,25 @@ int army::Damage(long damage, int spell)
                 gpCombatManager->m_heroes[m_side]);
         }
     }
-    killed = damage / m_monster.hitPoints;
+    killed_13 = damage / m_monster.hitPoints;
     m_hitPointsLost = damage % m_monster.hitPoints;
     quantityFifth = m_quantity / 5;
     if (m_monster.flags.all & MONSTER_FLAGS_MIRROR_IMAGE) {
-        killed = m_quantity;
+        killed_13 = m_quantity;
         m_hitPointsLost = 0;
     }
     if (!quantityFifth) {
         quantityFifth = 1;
     }
     m_damagePending = 1;
-    if (killed > 0) {
+    if (killed_13 > 0) {
         m_killPending = 1;
         m_lastTargetHex = m_quantity;
     }
-    if (killed > m_quantity) {
-        killed = m_quantity;
+    if (killed_13 > m_quantity) {
+        killed_13 = m_quantity;
     }
-    m_quantity -= killed;
+    m_quantity -= killed_13;
     if (m_quantity <= 0) {
         m_deathPending = 1;
     }
@@ -1964,7 +1960,7 @@ int army::Damage(long damage, int spell)
                    [gpCombatManager->m_currentArmyIndex].m_facing ^ 1;
     m_facing = originalFacing;
     CancelSpellType(ARMY_CANCEL_SPELLS_AFTER_DAMAGE);
-    return killed;
+    return killed_13;
 }
 
 // @early-stop
@@ -3384,10 +3380,13 @@ int army::LeftX(void)
     }
 }
 
-// @early-stop
-// At the retained 99.92% pass, the relocation-masked instruction stream and
-// all 3/3 relocations aligned. Exact sibling edits only changed the live
-// two-dimensional army-array address evaluation order.
+// @semantic: The complete 108-instruction CFG, 0x1c frame, all seven stack
+// slots, and all 3/3 ordered relocations align. At +0xae/+0xb1 and +0xc4/+0xc7
+// (repeated at +0x134/+0x137 and +0x14a/+0x14d), retail loads adjacentHex into
+// eax and compares the other hex slot; ours loads the other slot and compares
+// adjacentHex. Reversed equality operands, | 0 on either side, and negated
+// inequality forms all canonicalized unchanged. Revisit in the byte-last-mile
+// phase or after ARMY TU/header state changes.
 VA(0x00453fa6, 0x171)
 int army::OtherArmyAdjacent(int side, int index)
 {
@@ -3428,9 +3427,6 @@ int army::OtherArmyAdjacent(int side, int index)
     return 0;
 }
 
-// @early-stop
-// Code bytes and all 12/12 relocation targets align; only delinked
-// gMonsterDatabase/float-constant relocation identities differ.
 VA(0x00454117, 0x1e1)
 void ModifyFrameInfo(struct SMonFrameInfo *frameInfo, int monsterType)
 {

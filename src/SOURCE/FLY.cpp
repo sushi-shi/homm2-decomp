@@ -275,9 +275,9 @@ int army::FlyTo(int destination)
     distance = static_cast<int>(sqrt(static_cast<double>(
         xDistance * xDistance + yDistance * yDistance)));
     flightSegmentCount = 0;
-    if (m_frameInfo.attackDuration > 0) {
-        flightSegmentCount = ((m_frameInfo.attackDuration >> 1) + distance) /
-                             m_frameInfo.attackDuration;
+    if (m_frameInfo.flightSpeed > 0) {
+        flightSegmentCount = ((m_frameInfo.flightSpeed >> 1) + distance) /
+                             m_frameInfo.flightSpeed;
     }
     if (flightSegmentCount <= 0) {
         flightSegmentCount = 1;
