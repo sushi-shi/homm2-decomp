@@ -7,9 +7,9 @@
       url = "github:oxalica/rust-overlay/6cddd512fa2bf7231f098d3a2f92f6e4cff71e0a";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # vostok-delinker (the delinker) (fix/absolute-data-relocs: DIR32 for abs refs, REL32 for branches).
+    # Vostok branch with reviewed data topology and real folded-symbol identities.
     vostok-delinker-src = {
-      url = "github:srp-survarium/vostok-delinker/8a42a0ba6f6b90651d62d1911eb97b80a5faa149";
+      url = "github:srp-survarium/vostok-delinker/fe8e3c50be307e7412adacf755af1051e6c98d04";
       flake = false;
     };
     objdiff-src = {
@@ -30,15 +30,6 @@
       vostok-delinker = nightly-rustPlatform.buildRustPackage {
         pname = "vostok-delinker"; version = "0.1.0";
         src = vostok-delinker-src;
-        patches = [
-          ./patches/vostok-delinker-canonical-data-alias.patch
-          ./patches/vostok-delinker-reviewed-data.patch
-          ./patches/vostok-delinker-contribution-manifest.patch
-          ./patches/vostok-delinker-candidate-data.patch
-          ./patches/vostok-delinker-symbol-reuse.patch
-          ./patches/vostok-delinker-local-name-scope.patch
-          ./patches/vostok-delinker-explicit-unresolved.patch
-        ];
         cargoHash = "sha256-ry3TH1fz7Aj/JdbmlgQFFn29m8E7EQHyGaVXnZTEcXo=";
       };
 
