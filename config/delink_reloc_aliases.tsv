@@ -10,9 +10,6 @@ function_rva	target_rva	site_rva	owner	addend	occurrences	provenance
 0x00048443	0x000ff87c	*	?gSecondarySkillLevels@@3PAPADA	0xfffffffc	1	reviewed-array-index-and-tu-owner
 0x0004a061	0x000f5180	*	?cdTestTrackData@@3PAUsCDTest_Track_Data@@A	0xfffffff8	1	reviewed-array-index-and-tu-owner
 0x0004a061	0x000f5184	*	?cdTestTrackData@@3PAUsCDTest_Track_Data@@A	0xfffffffc	1	reviewed-array-index-and-tu-owner
-0x0004a0f0	0x000e0130	*	__write	0x00000000	11	reviewed-crt-call-alias
-0x0004a0f0	0x000e0660	*	__close	0x00000000	1	reviewed-crt-call-alias
-0x0004a0f0	0x000e0760	*	__open	0x00000000	1	reviewed-crt-call-alias
 0x0004f443	0x000fe12f	*	?moatCell@@3PAEA	0xffffffff	1	reviewed-array-index-and-tu-owner
 0x000654ad	0x00127f4e	*	?bComboDraw@@3PAY0BC@CA	0xfffffffe	4	reviewed-array-index-and-tu-owner
 0x000654ad	0x00127f4f	*	?bComboDraw@@3PAY0BC@CA	0xffffffff	19	reviewed-array-index-and-tu-owner

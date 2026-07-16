@@ -22,12 +22,12 @@ function, that the named owner exists, `owner RVA + addend == target RVA` with 3
 wrapping, and that each selected row's configured occurrence count closes. Reviewed
 aliases take precedence over data-manifest ownership and nearest-symbol selection.
 
-The same manifest resolves ambiguous code aliases for decoded `REL32` calls and
+The same manifest can resolve ambiguous code aliases for decoded `REL32` calls and
 jumps. For a code target, Vostok requires a zero addend and requires the selected name
-to be one of the public symbols at that exact target RVA. This covers statically linked
-CRT aliases such as retail `_write`/`__write`: the executable proves only the shared
-destination, while the compiled caller object proves which COFF spelling belongs to
-that call site.
+to be one of the public symbols at that exact target RVA. Do not use this to compensate
+for a wrong CRT source declaration: for example, VC4.2's `_write` and legacy `write`
+declarations naturally emit different C++ COFF spellings. Reconstruct the declaration
+that emits retail's spelling instead of forcing the target to match the candidate.
 
 These rows are reconstruction evidence. They are added whenever owner/addend identity
 is certain; fuzzy percentage is not an acceptance criterion. Exact same-site code can
