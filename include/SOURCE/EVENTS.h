@@ -66,16 +66,19 @@ struct mapHeroExtra {
     unsigned char hasCustomHero;
     signed char heroId;
     signed char artifacts[3];
+    char unknown16;
     int experience;
     unsigned char hasCustomSkills;
     signed char skillTypes[8];
     signed char skillLevels[8];
-    char unused2c;
+    char unknown2c;
     unsigned char hasCustomName;
     char name[13];
     unsigned char hasPatrol;
-    signed char patrolRadius;
-    signed char heroClass;
+    union {
+        signed char patrolRadius;
+        signed char heroClass;
+    };
     signed char hasAssignedHero;
 };
 struct mapTownExtra {
