@@ -55,10 +55,13 @@ the section manifest retains the candidate storage/ordinal/size with `rva=-`; th
 zero-initializes that candidate-shaped section, copies each definition and its relocations from the
 definition's own retail RVA, and rejects candidate-offset overflow or overlap. Such rows are exact
 classifications in `delink_data_breakpoints.json`, not unresolved diagnostics.
-Normal assembly also never rewrites a reviewed supplemental identity from its section offset. A
-stale compiler-local name or topology is a hard error. The explicit migration path may generate a
-candidate translation, but that versioned diff must be reviewed and committed before it becomes a
-canonical input.
+Normal assembly never rewrites the versioned supplemental manifest. Semantic/public identities and
+all topology fields remain strict. A local compiler-private counter rename may be associated at its
+exact reviewed section coordinate only when the current candidate and fixed target canonicalize to
+the same symbol family, payload, extent, and relocation identity. This avoids manifest churn from
+MSVC `$SG`/`$T` counters without accepting reordered or changed data. Every unproved rename or real
+topology/content change remains a hard error; the explicit migration path still produces a
+reviewable versioned diff for those changes.
 
 Candidate discovery is separated from that canonical path. `homm2 data-topology propose` writes
 `build/gen/data_topology_review_queue.tsv`, whose non-manifest schema records individually evidenced

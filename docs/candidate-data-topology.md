@@ -55,9 +55,11 @@ The explicit topology commands are:
   reviewed-supplement inputs, derives the review queue once, and refreshes whole-image coverage.
   It never regenerates or replaces target objects. `--jobs N` controls Ninja parallelism;
   `--strict` fails while any symbol group, section assignment, or coverage diagnostic remains.
-  After a source/header edit perturbs MSVC compiler-local numbering,
-  `--migrate-identities` updates the reviewed names only when section ordinal/offset, storage,
-  alignment, scope, and extent remain invariant; structural changes still fail and require review.
+  MSVC compiler-local counters are not canonical identities. A counter-only `$SG`, `$T`, or
+  `name$S<number>` drift is accepted without rewriting the reviewed manifest only when the fixed
+  target and current candidate have the same private-symbol family at the exact section
+  ordinal/offset and canonical payload/relocation identity. Structural or content changes still
+  fail and require review.
 - `homm2 data-topology census` compares every configured candidate object with its fixed delinked
   target and writes `build/gen/data_topology_census.json`. It treats symbol names and complete COFF
   topology records as multisets, so duplicated target symbols remain visible. `missing` means an
@@ -89,9 +91,11 @@ The explicit topology commands are:
   `config/delink_data_supplemental.tsv` are supplemental linker metadata only. A supplemental row which
   repeats a canonical DATA allocation, or disagrees with its owner/RVA/storage evidence, is a hard
   error rather than a second definition. Normal assembly preserves reviewed supplemental rows
-  byte-for-byte and fails when a compiler-local identity or candidate topology has gone stale; it
-  never repairs a row by section offset. Identity translation is available only through the
-  explicit `--migrate-from` path, whose versioned output must be reviewed before use.
+  byte-for-byte. Semantic/public names remain exact. For local compiler-private counters only, an
+  exact-coordinate fallback additionally requires unchanged size/storage/alignment/scope and a
+  matching canonical payload plus relocation identity against the fixed reviewed target object.
+  Any unproved rename or topology/content change fails. Explicit `--migrate-from` remains available
+  for a real reviewed identity/topology change, whose versioned output must be reviewed before use.
   Ordinary COFF symbols do not carry logical sizes, so a reviewed size may be smaller than the
   physical span to the next symbol; assembly preserves that size and requires it to fit the span.
   `--source-root`, `--supplemental`, and `--symbols` select these inputs for another tree.
