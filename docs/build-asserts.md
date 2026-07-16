@@ -102,6 +102,11 @@ compare alike, and objdiff has no project-specific public-owner extent map.
 
 ## Related checks
 
+- **`homm2 data-relocs`** — opt-in raw-COFF whole-object data relocation census. It
+  compares section/offset/type, direct symbol identity and status, owner-relative addend,
+  multiplicity, and section class, then emits per-TU JSON residuals. Source `DATA()` is the
+  primary HoMM2 provenance anchor and synthetic/fallback target identities are hard errors.
+  See `docs/coff-data-relocations.md`.
 - **`homm2 relocs`** (`assert_relocs.py`) — **opt-in broad reloc-target audit.** The hard
   owner-field subset above is always run; this wider order-independent review remains opt-in.
   Objdiff's `data_value` score compares referenced data where representable, but does not prove every
@@ -110,10 +115,10 @@ compare alike, and objdiff has no project-specific public-owner extent map.
   targets (from `symbol_names.csv` + definition `DATA()` VAs — REL32→symbol RVA, DIR32→symbol+addend,
   **signed** disp, `const_<rva>` and content-hash-collision names handled) and flags any address base
   references that retail never does, plus any base `?`-symbol resolving to neither CodeView nor a
-  `DATA()` global (fabricated). It is **deliberately NOT a hard gate**: it also surfaces
-  unreproducible link artifacts — chiefly the delinker's **`empty_stub`**, the synthetic name for a
-  COMDAT-folded empty (`ret`) function that base still calls by its own CodeView name (a delinker-side
-  concern, not a source bug). `homm2 relocs 0x<rva>` reviews one function. Full rationale:
+  `DATA()` global (fabricated). It is **deliberately NOT a hard gate** because incomplete
+  functions may still have legitimate relocation-shape differences. Canonical targets retain
+  real folded-function identities; synthetic relocation identities are errors.
+  `homm2 relocs 0x<rva>` reviews one function. Full rationale:
   memory `[[objdiff-masks-all-relocs]]`.
 - `verify_carcass.py` — every CodeView **function** symbol is present in its object (carcass
   completeness). Was the carcass-phase acceptance check; run it manually

@@ -21,10 +21,9 @@ NOR a DATA()-pinned definition — i.e. fabricated.
 Data offsets come from symbol_names.csv (authoritative CodeView RVAs). Module-private synthetic
 storage has no CodeView symbol, so its VA is read from the owning .cpp DATA(0x..) definition.
 
-It is OPT-IN (not in `homm2 build`'s hard gates) because it also surfaces unreproducible link
-artifacts — chiefly the delinker's `empty_stub`, the synthetic name for a COMDAT-folded empty (`ret`)
-function that base still calls by its own CodeView name. That is a delinker-side concern, not a
-source bug, so it must not break every build.
+It is OPT-IN (not in `homm2 build`'s hard gates) because incomplete functions can still carry
+legitimate relocation-shape differences. Canonical targets retain real folded-function identities;
+synthetic relocation names are errors rather than normalized artifacts.
 
 Review one function (order-independent; usable on <100% walls):
     homm2 relocs 0x<rva>
@@ -263,62 +262,41 @@ def parse_obj(obj, with_sites=False):
     _PARSE_CACHE[cache_key] = funcs
     return funcs
 
+
 _PE_SECTIONS = None
 
+
 def _pe_sections():
-    """Return (image bytes, [(rva, span, raw offset), ...]) for the authoritative retail PE."""
+    """Return the authoritative retail image and its RVA-to-file mappings."""
     global _PE_SECTIONS
     if _PE_SECTIONS is not None:
         return _PE_SECTIONS
+
     data = open("build/orig/HEROES2W.EXE", "rb").read()
     pe = struct.unpack_from("<L", data, 0x3c)[0]
-    nsec = struct.unpack_from("<H", data, pe + 6)[0]
-    optsz = struct.unpack_from("<H", data, pe + 20)[0]
+    section_count = struct.unpack_from("<H", data, pe + 6)[0]
+    optional_header_size = struct.unpack_from("<H", data, pe + 20)[0]
+    section_table = pe + 24 + optional_header_size
     sections = []
-    off = pe + 24 + optsz
-    for i in range(nsec):
-        sh = off + i * 40
-        vsize, rva, raw_size, raw = struct.unpack_from("<LLLL", data, sh + 8)
-        sections.append((rva, max(vsize, raw_size), raw))
+    for index in range(section_count):
+        section_header = section_table + index * 40
+        virtual_size, rva, raw_size, raw_offset = struct.unpack_from(
+            "<LLLL", data, section_header + 8
+        )
+        sections.append((rva, max(virtual_size, raw_size), raw_offset))
+
     _PE_SECTIONS = data, sections
     return _PE_SECTIONS
 
+
 def _pe_read(rva, size):
     data, sections = _pe_sections()
-    for start, span, raw in sections:
+    for start, span, raw_offset in sections:
         if start <= rva and rva + size <= start + span:
-            off = raw + rva - start
-            return data[off:off + size]
+            offset = raw_offset + rva - start
+            return data[offset:offset + size]
     return None
 
-def _normalize_empty_stub_relocs(function_rva, target_relocs, base_sites, target_sites, sym, data):
-    """Recover delinked ``empty_stub`` identities from the original retail REL32 bytes.
-
-    Acceptance is site-specific: the base and target relocations must occupy the same relative
-    field, and the retail PE displacement at that field must resolve to the base CodeView callee.
-    A wrong named empty function therefore remains a wrong target instead of being generically
-    allowlisted merely because its body also returns.
-    """
-    base_by_site = {r[0]: r[1:] for r in base_sites}
-    normalized = []
-    for reloc, site_reloc in zip(target_relocs, target_sites):
-        site, typ, target_name, _add = site_reloc
-        if typ != 'REL32' or target_name != 'empty_stub':
-            normalized.append(reloc)
-            continue
-        base = base_by_site.get(site)
-        if base is None or base[0] != 'REL32':
-            normalized.append(reloc)
-            continue
-        base_rva = resolve(sym, data, *base)
-        disp_bytes = _pe_read(function_rva + site, 4)
-        if base_rva is None or disp_bytes is None:
-            normalized.append(reloc)
-            continue
-        disp = struct.unpack("<l", disp_bytes)[0]
-        retail_rva = (function_rva + site + 4 + disp) & 0xffffffff
-        normalized.append(base if retail_rva == base_rva else reloc)
-    return normalized
 
 # Pre-existing reloc-target discrepancies surfaced when this gate was introduced (objdiff masked
 # them, so they scored ~100%). Two kinds: (A) SUSPECTED wrong VA — a base symbol that disagrees with
@@ -591,14 +569,11 @@ def _function_for_arg(arg):
 def review(rva):
     """Single-function multiset review (order-independent; usable on <100% walls)."""
     sym, data, dups = load_symbols()
-    unit, name, function_rva = _function_for_arg(rva)
+    unit, name, _function_rva = _function_for_arg(rva)
     base_obj = "build/objdiff/base/%s.obj" % unit
     target_obj = "build/delink/%s.c.obj" % unit
     B = parse_obj(base_obj).get(name, [])
     T = parse_obj(target_obj).get(name, [])
-    BS = parse_obj(base_obj, with_sites=True).get(name, [])
-    TS = parse_obj(target_obj, with_sites=True).get(name, [])
-    T = _normalize_empty_stub_relocs(function_rva, T, BS, TS, sym, data)
     for s in sorted({r[1] for r in B if is_fake(sym, data, r[1])}):
         print("  !! FAKE base references '%s'" % s)
     def bvas(rs):
@@ -685,11 +660,6 @@ def main():
     if len(sys.argv) > 1:                        # single-function review mode
         review(sys.argv[1]); return 0
     sym, data, dups = load_symbols()
-    function_rvas = {}
-    with open("build/gen/symbol_names.csv", encoding="latin-1") as f:
-        for row in csv.DictReader(f):
-            if row.get("kind") == "func":
-                function_rvas[(row["unit"], row["name"])] = int(row["rva"], 0)
     report = json.load(open("build/objdiff/report.json"))
     bad = []
     # A WRONG reloc doesn't drop objdiff to a low %, it costs a TINY fraction (~0.005%/reloc) that
@@ -706,14 +676,10 @@ def main():
         if not (os.path.exists(base_obj) and os.path.exists(tgt_obj)):
             continue
         bf, tf = parse_obj(base_obj), parse_obj(tgt_obj)
-        bfs = parse_obj(base_obj, with_sites=True)
-        tfs = parse_obj(tgt_obj, with_sites=True)
         for name in sorted(exact):
             if name not in bf or name not in tf:
                 continue
-            target_relocs = _normalize_empty_stub_relocs(
-                function_rvas[(unit, name)], tf[name], bfs[name], tfs[name], sym, data)
-            for p in check_fn(sym, data, dups, unit, name, bf[name], target_relocs):
+            for p in check_fn(sym, data, dups, unit, name, bf[name], tf[name]):
                 bad.append((unit, name, p))
     for unit, name, p in bad:
         print("  %s  %s: %s" % (unit, name, p))

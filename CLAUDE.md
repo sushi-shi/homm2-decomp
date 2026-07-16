@@ -88,9 +88,9 @@ the order-independent whole-target review remains opt-in. The generated objdiff 
 equal-valued BSS fields and unresolved aliases can still hide or manufacture differences.
 `homm2 relocs` resolves every
 near-exact fn's reloc targets (via `symbol_names.csv` + definition `DATA()` VAs) and flags any address
-base references that retail never does. It's OPT-IN, not a hard gate, because it also surfaces
-unreproducible link artifacts — chiefly the delinker's `empty_stub` (the synthetic name for a
-COMDAT-folded empty `ret` fn that base still calls by its retained public name). `homm2 relocs 0x<rva>`
+base references that retail never does. It's OPT-IN, not a hard gate, because incomplete functions
+can still carry legitimate relocation-shape differences. Canonical targets retain real folded
+function identities and synthetic relocation names are errors. `homm2 relocs 0x<rva>`
 reviews one function. Manual relocation-masked raw-byte proof remains useful for separating code
 shape from target identity.
 
