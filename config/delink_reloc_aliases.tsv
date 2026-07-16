@@ -2,9 +2,11 @@ function_rva	target_rva	site_rva	owner	addend	occurrences	provenance
 0x0001531b	0x000fca35	*	?gDwellingType@@3PAY0M@CA	0xffffffed	1	reviewed-array-index-and-tu-owner
 0x000330a1	0x000fb6b7	*	?gSpellLimits@@3PACA	0xffffffff	1	reviewed-array-index-and-tu-owner
 0x000330a1	0x000fca35	*	?gDwellingType@@3PAY0M@CA	0xffffffed	1	reviewed-array-index-and-tu-owner
+0x00037c61	0x000fca35	*	?gDwellingType@@3PAY0M@CA	0xffffffed	1	reviewed-array-index-and-tu-owner
 0x0003ce91	0x000fca35	*	?gDwellingType@@3PAY0M@CA	0xffffffed	2	reviewed-array-index-and-tu-owner
 0x00041419	0x000fabf4	*	?gSSValues@@3PAY02HA	0xfffffffc	1	reviewed-array-index-and-tu-owner
 0x00043c54	0x000fabf4	*	?gSSValues@@3PAY02HA	0xfffffffc	1	reviewed-array-index-and-tu-owner
+0x00043fc4	0x000fad00	*	?gArtifactBaseRV@@3PAHA	0xfffffff8	1	reviewed-array-index-and-tu-owner
 0x00048443	0x000ff87c	*	?gSecondarySkillLevels@@3PAPADA	0xfffffffc	1	reviewed-array-index-and-tu-owner
 0x0004a061	0x000f5180	*	?cdTestTrackData@@3PAUsCDTest_Track_Data@@A	0xfffffff8	1	reviewed-array-index-and-tu-owner
 0x0004a061	0x000f5184	*	?cdTestTrackData@@3PAUsCDTest_Track_Data@@A	0xfffffffc	1	reviewed-array-index-and-tu-owner
