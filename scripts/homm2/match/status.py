@@ -316,13 +316,14 @@ def _rva_to_sym():
     csvp = REPO / "build/gen/symbol_names.csv"
     if not csvp.exists():
         return out
-    for row in csv.reader(csvp.open()):
-        if len(row) < 5 or row[4] != "func":
-            continue
-        try:
-            out[int(row[0], 16)] = (row[2], row[1])
-        except ValueError:
-            pass
+    with csvp.open() as stream:
+        for row in csv.reader(stream):
+            if len(row) < 5 or row[4] != "func":
+                continue
+            try:
+                out[int(row[0], 16)] = (row[2], row[1])
+            except ValueError:
+                pass
     return out
 
 
@@ -384,22 +385,141 @@ def _normalize(block, cmap):
     return n
 
 
+_VA_MARKER_RE = re.compile(r"VA\(0x([0-9a-fA-F]+)\s*,")
+_TOP_LEVEL_BOUNDARY_RE = re.compile(
+    r"[ \t]*(?:DATA\(|VTBL\(|// ===|#endif\b)")
+
+
+def _source_function_blocks(text):
+    """Yield ``(absolute_va, block)`` using lexical top-level boundaries.
+
+    Keep the historical hash surface: each block starts immediately after the
+    comma in its column-zero ``VA(...)`` marker and ends at the next top-level
+    VA/DATA/VTBL/section/#endif marker. Unlike the old regular-expression
+    split, markers inside a function body are not boundaries. This matters for
+    function-local ``DATA(...)`` definitions and remains robust in the presence
+    of nested blocks or marker-like text in comments and literals.
+    """
+    markers = []
+    depth = 0
+    state = "code"
+    at_line_start = True
+    index = 0
+    length = len(text)
+
+    while index < length:
+        if at_line_start and state == "code" and depth == 0:
+            va = _VA_MARKER_RE.match(text, index)
+            if va is not None:
+                markers.append((index, va.end(), int(va.group(1), 16)))
+            elif _TOP_LEVEL_BOUNDARY_RE.match(text, index) is not None:
+                # The historical ``^\s*BOUNDARY`` regex consumed blank lines
+                # before a file-scope boundary. Preserve that hash surface.
+                boundary_start = index
+                while boundary_start > 0:
+                    previous_end = boundary_start - 1
+                    previous_start = text.rfind("\n", 0, previous_end) + 1
+                    if text[previous_start:previous_end].strip():
+                        break
+                    boundary_start = previous_start
+                markers.append((boundary_start, None, None))
+
+        char = text[index]
+        following = text[index + 1] if index + 1 < length else ""
+
+        if state == "line-comment":
+            if char == "\n":
+                state = "code"
+                at_line_start = True
+            else:
+                at_line_start = False
+            index += 1
+            continue
+        if state == "block-comment":
+            if char == "*" and following == "/":
+                state = "code"
+                index += 2
+                at_line_start = False
+            else:
+                at_line_start = char == "\n"
+                index += 1
+            continue
+        if state in ("string", "character"):
+            delimiter = '"' if state == "string" else "'"
+            if char == "\\" and following:
+                at_line_start = following == "\n"
+                index += 2
+            else:
+                if char == delimiter:
+                    state = "code"
+                at_line_start = char == "\n"
+                index += 1
+            continue
+        if state == "preprocessor":
+            if char == "\\" and following == "\n":
+                index += 2
+                at_line_start = True
+            elif char == "\n":
+                state = "code"
+                at_line_start = True
+                index += 1
+            else:
+                at_line_start = False
+                index += 1
+            continue
+
+        if at_line_start:
+            line_end = text.find("\n", index)
+            if line_end < 0:
+                line_end = length
+            first = index
+            while first < line_end and text[first] in " \t":
+                first += 1
+            if first < line_end and text[first] == "#":
+                state = "preprocessor"
+                index = first + 1
+                at_line_start = False
+                continue
+        if char == "/" and following == "/":
+            state = "line-comment"
+            index += 2
+            at_line_start = False
+            continue
+        if char == "/" and following == "*":
+            state = "block-comment"
+            index += 2
+            at_line_start = False
+            continue
+        if char == '"':
+            state = "string"
+        elif char == "'":
+            state = "character"
+        elif char == "{":
+            depth += 1
+        elif char == "}" and depth:
+            depth -= 1
+        at_line_start = char == "\n"
+        index += 1
+
+    for position, marker in enumerate(markers):
+        marker_start, block_start, absolute_va = marker
+        if block_start is None:
+            continue
+        block_end = markers[position + 1][0] if position + 1 < len(markers) else length
+        yield absolute_va, text[block_start:block_end]
+
+
 def source_hashes():
     """{(unit, function): 12-hex sha1 of that function's NORMALIZED source block}. A block runs from
-    its VA(...) marker to the next VA/DATA/VTBL/section marker; names are normalized (see _normalize)
-    so editing one function changes only its own hash, and codegen-neutral arg/member renames don't."""
+    its VA(...) marker to the next top-level VA/DATA/VTBL/section marker; names are normalized
+    (see _normalize) so editing one function changes only its own hash, and codegen-neutral
+    arg/member renames don't. Function-local audit markers remain part of the function block."""
     sym = _rva_to_sym(); cmap = _class_members()
     out = {}
     for cpp in sorted((REPO / "src").rglob("*.cpp")):
         text = cpp.read_text(errors="replace")
-        parts = re.split(r"(?m)^VA\(0x([0-9a-fA-F]+)\s*,", text)
-        for i in range(1, len(parts), 2):
-            try:
-                rva = int(parts[i], 16) - RVA_BASE
-            except ValueError:
-                continue
-            block = parts[i + 1] if i + 1 < len(parts) else ""
-            block = re.split(r"(?m)^\s*(?:DATA\(|VTBL\(|// ===|#endif)", block)[0]
+        for absolute_va, block in _source_function_blocks(text):
+            rva = absolute_va - RVA_BASE
             key = sym.get(rva)
             if key:
                 norm = _normalize(block, cmap)
