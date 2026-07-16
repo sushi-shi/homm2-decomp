@@ -1160,7 +1160,7 @@ VA(0x004bd9f8, 0x64)
 short int ExpCampaign::Days(void)
 {
     return (m_mapDays[m_currentMap] +
-            (gpGame->m_week - 1) * EXPANSION_CAMPAIGN_DAYS_PER_WEEK) +
+            (0[&gpGame->m_week] - 1) * EXPANSION_CAMPAIGN_DAYS_PER_WEEK) +
            (gpGame->m_month - 1) * EXPANSION_CAMPAIGN_DAYS_PER_MONTH +
            gpGame->m_day;
 }

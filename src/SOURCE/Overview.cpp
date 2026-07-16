@@ -861,15 +861,6 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
     }
 }
 
-// @match-note: live 96.78%. The 0x50 frame, local-array bytes, CFG, semantics,
-// and ordered 52-relocation target sequence agree. In each of the two title
-// table arguments, ours loads giOverviewType before title; retail loads title
-// first and emits a one-byte-longer address sequence. The body is consequently
-// two bytes short, followed by one retail alignment byte (next symbol ours
-// +0x2594, retail +0x2598 including the inherited one-byte entry gap). Tried the
-// natural short[2][3] access, grouped byte-offset C++ casts (same code), and a
-// flat short[6] indexed title-first (96.03%, ten bytes shorter). Revisit with
-// audited AST/codegen steering; do not change the proven local storage layout.
 VA(0x00409aae, 0x357)
 void game::SetupNewOverviewType(int overviewType, int redrawFrom)
 {
@@ -926,9 +917,9 @@ void game::SetupNewOverviewType(int overviewType, int redrawFrom)
         ));
         strcpy(titleCopy, cOverviewText[giOverviewType * OVERVIEW_TITLE_COUNT + title]);
         textWidgetTitle[title] = new textWidget(
-            titleLefts[giOverviewType][title],
+            titleLefts[giOverviewType][0[&title]],
             3,
-            titleWidth[giOverviewType][title],
+            titleWidth[giOverviewType][0[&title]],
             12,
             titleCopy,
             const_cast<char *>("smalfont.fnt"),

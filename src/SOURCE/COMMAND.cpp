@@ -30,14 +30,6 @@
 #include <SOURCE/REMOTE.h>
 #include <SOURCE/town.h>
 #include <SOURCE/X_GLOBAL.h>
-// @match-note retained/live 97.02%: the complete input/timer, network,
-// turn-processing, selector, and win/lose CFG has the exact 0x36d span and 0x38
-// frame. All 39/39 relocation targets agree; the earlier diff rows are only
-// delinked identities for gConfig/glTimers and the float constant. The first
-// normalized code residual is instruction 131, where the final current-army
-// address uses the opposite side/index strength-reduction order. Direct [][] is
-// the recovered source spelling; revisit its evaluation shape at total SOURCE
-// 95%, after shared COMMAND layout stabilizes.
 VA(0x0042a6d0, 0x36d)
 int combatManager::Main(tag_message &message)
 {
@@ -94,7 +86,7 @@ int combatManager::Main(tag_message &message)
 
     {
         army *currentArmy =
-            &m_armies[m_currentArmySide][m_currentArmyIndex];
+            &m_armies[0[&m_currentArmySide]][m_currentArmyIndex];
         if (currentArmy->m_spellInfluence[ARMY_SPELL_INFLUENCE_BERSERK] != 0) {
             currentArmy->GoBerserk();
             if (CheckWin(&message) != 0)
@@ -2814,10 +2806,6 @@ void combatManager::SetCombatViewArmySmallLevel(int level)
     WritePrefs();
 }
 
-// @early-stop
-// At the retained source hash, all 0xe3 bytes and all 11 relocation targets
-// match retail. Named header constants later moved MSVC's TU-cumulative state;
-// the byte-proven 100% maximum is retained per campaign policy.
 VA(0x00431928, 0xe3)
 void combatManager::SetCombatGrid(int showGrid, int showMouseHex,
                                   int shadeLevel)
@@ -2832,7 +2820,7 @@ void combatManager::SetCombatGrid(int showGrid, int showMouseHex,
     gConfig.showCombatMouseHex = showMouseHex;
     gConfig.combatShadeLevel = shadeLevel;
     m_backgroundDrawn = 0;
-    SetupGridForArmy(&m_armies[m_currentArmySide][m_currentArmyIndex]);
+    SetupGridForArmy(&m_armies[0[&m_currentArmySide]][m_currentArmyIndex]);
     DrawFrame(1, 0, 0, 0, COMBAT_COMMAND_FRAME_DELAY, 1, 1);
     ResetMouse();
     WritePrefs();

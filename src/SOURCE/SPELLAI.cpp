@@ -14,8 +14,8 @@
 // Exact 0x24 frame/live slots and 11/11 external relocations. The only raw
 // residual is +0x21c/+0x21f/+0x221: ours loads effectScore then emits JGE,
 // while retail loads bestEffectWork then emits JLE. Direct, commuted,
-// negated, empty-if/else, and continue spellings were tried; revisit after
-// later SPELLAI TU-state changes or in the byte-last-mile phase.
+// negated, empty-if/else, continue, and both bestEffectWork 0[&...] spellings
+// were tried; revisit after later SPELLAI TU-state changes.
 VA(0x004867c0, 0x279)
 int combatManager::DoSpellAI(int side, int restricted)
 {
