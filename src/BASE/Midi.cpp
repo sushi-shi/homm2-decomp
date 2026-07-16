@@ -16,17 +16,17 @@ VA(0x004d3850, 0xb8)
 void soundManager::MIDIStartup(void)
 {
     int i;
-    LogStr("MIDIStartup");
+    LogStr("MS1");
     if (gbNoSound == 0 && (m_midiStarted = 1, gbDontTryMIDI == 0)) {
-        LogStr("Clearing MIDI slots");
+        LogStr("MS2");
         for (i = 0; i < MIDI_TRACK_COUNT; i++)
             pMIDIWrap[i] = 0;
         for (i = 0; i < MIDI_TRACK_COUNT; i++)
             hSequence[i] = 0;
         m_midiReady = 1;
-        LogStr("Opening MIDI output");
+        LogStr("MS6b");
         i = AIL_midiOutOpen(&hMDI, 0, MIDI_MAPPER);
-        LogInt("midiOutOpen = %d", i, -999, -999, -999, -999, -999, -999);
+        LogInt("MS6c", i, -999, -999, -999, -999, -999, -999);
         if (i != 0)
             m_midiReady = 0;
     }
@@ -148,6 +148,22 @@ inline void soundManager::MIDISetVolume(void)
 VA(0x004d4040, 0x1)
 void soundManager::MIDIPoll(void) {}
 
+// @data-layout-note
+// Midi has no candidate `.rdata`. Its ordinary initialized `.data` is byte-exact
+// over retail 0x11fec8..0x11ff10 (0x48 bytes), and its zero-fill contribution is
+// exactly two 0xf0-byte arrays over 0x134cf0..0x134ed0. All 89 relevant candidate
+// DIR32 sites are retail HIGHLOW sites. Global references use owner addend zero,
+// apart from the proven pMIDIWrap+0xf0 and hSequence+0xf0 end sentinels.
+//
+// `/O2` emits seven distinct writable `.data` COMDATs (selection Any, alignment
+// four) at raw COFF ordinals 5, 6, 7, 8, 11, 14, and 15. The MS6c, MS6b, MS4,
+// filename, and MP1a payloads and owning relocation targets prove their reviewed
+// retail RVAs. Plain repeated MS1 and MS2 literals are pooled into candidate
+// ordinals 8 and 7, but retail references separate byte-identical copies at
+// 0x11ff10/0x11ff28 and 0x11ff14/0x11ff2c. Leave those two identities without
+// canonical allocations until a source-shaped split is proved; do not flatten
+// the retail copies or invent supplemental identities, padding, or static-array
+// storage.
 // ---- globals (definitions, RVA order) ----
 DATA(0x0051fec8) struct _MDI_DRIVER *hMDI = 0;
 DATA(0x0051fecc) int CurrentMidiFile = MIDI_NO_TRACK;
