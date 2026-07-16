@@ -56,6 +56,7 @@
 #include <string.h>
 
 #define ADVMGR_SOURCE_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\ADVMGR.CPP"
+#define ADVMGR_PUZZLE_OBJECT_ICON 17
 #define ADVMGR_ENVIRONMENT_VOLUME(distance) environmentVolumes[distance]
 #define ADVMGR_REMOTE_PAYLOAD(packet) \
     (reinterpret_cast<AdventureRemotePayload *>((packet)->payload))
@@ -147,8 +148,6 @@ advManager::advManager(void)
     m_cursorTurning = 0;
 }
 
-// @early-stop
-// Raw instructions and relocation sites are byte-identical; only delinked string/global relocation symbol names differ.
 VA(0x0045665f, 0x9c9)
 int advManager::Open(int id)
 {
@@ -157,10 +156,10 @@ int advManager::Open(int id)
     bShowIt = 0;
     m_adventureBorder = 0;
 
-    int index;
-    for (index = 0; index < 12; ++index) {
-        m_heroLocatorState[index] = 0;
-        m_townLocatorState[index] = 0;
+    int resourceIndex;
+    for (resourceIndex = 0; resourceIndex < 12; ++resourceIndex) {
+        m_heroLocatorState[resourceIndex] = 0;
+        m_townLocatorState[resourceIndex] = 0;
     }
 
     if (m_adventureWindow == 0) {
@@ -205,10 +204,13 @@ int advManager::Open(int id)
     if (m_cloudOverlayIcon == 0)
         m_cloudOverlayIcon = gpResourceManager->GetIcon("clop32.icn");
 
-    for (index = 0; index < ADVMGR_OBJECT_ICON_COUNT; ++index) {
-        if (strlen(gTilesetFiles[index]) > 1 && m_objectIcons[index] == 0 &&
-            index != ADVMGR_UNUSED_OBJECT_ICON_1 && index != ADVMGR_UNUSED_OBJECT_ICON_2)
-            m_objectIcons[index] = gpResourceManager->GetIcon(gTilesetFiles[index]);
+    for (resourceIndex = 0; resourceIndex < ADVMGR_OBJECT_ICON_COUNT; ++resourceIndex) {
+        if (strlen(gTilesetFiles[resourceIndex]) > 1 &&
+            m_objectIcons[resourceIndex] == 0 &&
+            resourceIndex != ADVMGR_UNUSED_OBJECT_ICON_1 &&
+            resourceIndex != ADVMGR_UNUSED_OBJECT_ICON_2)
+            m_objectIcons[resourceIndex] =
+                gpResourceManager->GetIcon(gTilesetFiles[resourceIndex]);
     }
 
     if (m_heroIcons[0] == 0)
@@ -265,11 +267,14 @@ int advManager::Open(int id)
         m_puzzleIcon = gpResourceManager->GetIcon("radar.icn");
     gbLoadingMonoIcon = 0;
 
-    for (index = 0; index < ADVMGR_LOOPING_SAMPLE_COUNT; ++index)
-        m_loopingSamples[index] = 0;
-    for (index = 0; index < ADVMGR_SOUND_CELL_COUNT; ++index) {
-        m_activeSounds[index].soundId = ADVMGR_ENVIRONMENT_SOUND_NONE;
-        m_activeSounds[index].volume = ADVMGR_ENVIRONMENT_SOUND_DEFAULT_VOLUME;
+    for (resourceIndex = 0; resourceIndex < ADVMGR_LOOPING_SAMPLE_COUNT;
+         ++resourceIndex)
+        m_loopingSamples[resourceIndex] = 0;
+    for (resourceIndex = 0; resourceIndex < ADVMGR_SOUND_CELL_COUNT;
+         ++resourceIndex) {
+        m_activeSounds[resourceIndex].soundId = ADVMGR_ENVIRONMENT_SOUND_NONE;
+        m_activeSounds[resourceIndex].volume =
+            ADVMGR_ENVIRONMENT_SOUND_DEFAULT_VOLUME;
         m_activeSoundMask = 0;
     }
 
@@ -282,20 +287,20 @@ int advManager::Open(int id)
     }
 
     glTimers[0] = KBTickCount() + ADVMGR_TIMER_DELAY;
-    int oldSampleVolume = gConfig.soundVolume;
+    int oldSampleVolumeState = gConfig.soundVolume;
     if (gConfig.soundVolume != 0)
         gConfig.soundVolume = 10;
     SetInitialMapOrigin();
 
     bShowIt = gbThisNetHumanPlayer[giCurPlayer];
     int oldPlayer = giCurPlayer;
-    int oldShowIt = bShowIt;
+    int oldShowItValue = bShowIt;
     giCurPlayer = giCurWatchPlayer;
     gpCurPlayer = &gpGame->m_players[giCurPlayer];
     bShowIt = 1;
     RedrawAdvScreen(1, 0);
     giCurPlayer = oldPlayer;
-    bShowIt = oldShowIt;
+    bShowIt = oldShowItValue;
     gpCurPlayer = &gpGame->m_players[giCurPlayer];
     if (!gbThisNetHumanPlayer[giCurPlayer])
         gpGame->ShowComputerScreen();
@@ -303,7 +308,7 @@ int advManager::Open(int id)
     ForceNewHover();
     gpWindowManager->FadeScreen(0, 8, gPalette);
     giBottomViewOverride = 0;
-    gConfig.soundVolume = oldSampleVolume;
+    gConfig.soundVolume = oldSampleVolumeState;
     gpSoundManager->AdjustSoundVolumes();
     m_messageMask = ADVMGR_MANAGER_MESSAGE;
     m_priority = id;
@@ -601,12 +606,15 @@ void advManager::CheckSetEvilInterface(int redraw, int player)
     }
 }
 
-// @early-stop
-// Excluding the 0x20 and 0x94 pointer tables and the latter's adjacent 0x51
-// byte lookup, all 902 executable instructions, the 0x48 frame, and all 232
-// relocation targets match. Retail's const_00128d28 is gConfig + 0x08
-// (musicVolume); the other displayed addend is the delinked byte table.
-// Retail has two trailing alignment NOPs.
+// @semantic: after compiler-local table normalization, the 0x48 frame, CFG
+// semantics, all 232 ordered relocations, and every non-relocation byte agree
+// except +0x7f0. Retail's failed coordinate-cheat comparison selects the first
+// of two adjacent jumps to the same case epilogue; VC4.2 selects the second.
+// Ten bounded attempts are exhausted: inverted guard, removed inner break,
+// comparison-order AST swap, matched/miss gotos, empty-else, negated/boolean
+// guards, single-case switch, and do/while body. Revisit only after Main's
+// source hash or an included declaration changes, or the canonicalizer learns
+// a proven same-destination branch normalization; this is not a permanent wall.
 VA(0x00457d6c, 0xfda)
 int advManager::Main(struct tag_message &message)
 {
@@ -1710,60 +1718,56 @@ int advManager::ProcessHover(int mouseX, int mouseY) {
     }
 }
 
-// @early-stop
-// The 0x4 frame/slots, CFG, instructions, and all 31 relocation targets match;
-// only +0x42 branches to the adjacent jmp-to-epilogue instead of directly to
-// that same epilogue.
 VA(0x0045b094, 0x21a)
 void advManager::UpdateScreen(int, int forceUpdate)
 {
     if (forceUpdate == 0 && bShowIt == 0) {
         if (KBTickCount() > glTimers[0])
             glTimers[0] = KBTickCount() + ADVMGR_TIMER_DELAY;
-    } else {
-        PollSound();
-        giScrollX = m_updateMinX;
-        giScrollY = m_updateMinY;
-        if (giLimitUpdMinX == ADVMGR_UPDATE_NONE) {
-            BlitBitmapToScreen(
-                gpWindowManager->m_screen, ADVMGR_UPDATE_VIEWPORT_ORIGIN,
-                ADVMGR_UPDATE_VIEWPORT_ORIGIN, ADVMGR_UPDATE_VIEWPORT_SIZE,
-                ADVMGR_UPDATE_VIEWPORT_SIZE, ADVMGR_UPDATE_VIEWPORT_ORIGIN,
-                ADVMGR_UPDATE_VIEWPORT_ORIGIN);
-        } else {
-            BlitBitmapToScreen(
-                gpWindowManager->m_screen, giLimitUpdMinX, giLimitUpdMinY,
-                giLimitUpdMaxX - giLimitUpdMinX,
-                giLimitUpdMaxY - giLimitUpdMinY, giLimitUpdMinX,
-                giLimitUpdMinY);
-        }
-        giScrollY = 0;
-        giScrollX = giScrollY;
-        PollSound();
-
-        if (KBTickCount() > glTimers[0]) {
-            ++m_updateMaxY;
-            ++m_updateMaxX;
-            if (m_updateMaxX >= ADVMGR_UPDATE_ANIMATION_PHASES)
-                m_updateMaxX = 0;
-            glTimers[0] = KBTickCount() + ADVMGR_TIMER_DELAY;
-
-            if (m_updateMaxX == 1 || m_updateMaxX == 3 ||
-                m_updateMaxX == 5) {
-                ++m_viewBounds[1];
-                m_viewBounds[1] %= ADVMGR_UPDATE_FRAME_CYCLE;
-                ++m_viewBounds[3];
-                m_viewBounds[3] %= ADVMGR_UPDATE_FRAME_CYCLE;
-            } else {
-                ++m_viewBounds[0];
-                m_viewBounds[0] %= ADVMGR_UPDATE_FRAME_CYCLE;
-                ++m_viewBounds[2];
-                m_viewBounds[2] %= ADVMGR_UPDATE_FRAME_CYCLE;
-            }
-        }
-        giLimitUpdMinX = ADVMGR_UPDATE_NONE;
-        Process1WindowsMessage();
+        return;
     }
+    PollSound();
+    giScrollX = m_updateMinX;
+    giScrollY = m_updateMinY;
+    if (giLimitUpdMinX == ADVMGR_UPDATE_NONE) {
+        BlitBitmapToScreen(
+            gpWindowManager->m_screen, ADVMGR_UPDATE_VIEWPORT_ORIGIN,
+            ADVMGR_UPDATE_VIEWPORT_ORIGIN, ADVMGR_UPDATE_VIEWPORT_SIZE,
+            ADVMGR_UPDATE_VIEWPORT_SIZE, ADVMGR_UPDATE_VIEWPORT_ORIGIN,
+            ADVMGR_UPDATE_VIEWPORT_ORIGIN);
+    } else {
+        BlitBitmapToScreen(
+            gpWindowManager->m_screen, giLimitUpdMinX, giLimitUpdMinY,
+            giLimitUpdMaxX - giLimitUpdMinX,
+            giLimitUpdMaxY - giLimitUpdMinY, giLimitUpdMinX,
+            giLimitUpdMinY);
+    }
+    giScrollY = 0;
+    giScrollX = giScrollY;
+    PollSound();
+
+    if (KBTickCount() > glTimers[0]) {
+        ++m_updateMaxY;
+        ++m_updateMaxX;
+        if (m_updateMaxX >= ADVMGR_UPDATE_ANIMATION_PHASES)
+            m_updateMaxX = 0;
+        glTimers[0] = KBTickCount() + ADVMGR_TIMER_DELAY;
+
+        if (m_updateMaxX == 1 || m_updateMaxX == 3 ||
+            m_updateMaxX == 5) {
+            ++m_viewBounds[1];
+            m_viewBounds[1] %= ADVMGR_UPDATE_FRAME_CYCLE;
+            ++m_viewBounds[3];
+            m_viewBounds[3] %= ADVMGR_UPDATE_FRAME_CYCLE;
+        } else {
+            ++m_viewBounds[0];
+            m_viewBounds[0] %= ADVMGR_UPDATE_FRAME_CYCLE;
+            ++m_viewBounds[2];
+            m_viewBounds[2] %= ADVMGR_UPDATE_FRAME_CYCLE;
+        }
+    }
+    giLimitUpdMinX = ADVMGR_UPDATE_NONE;
+    Process1WindowsMessage();
 }
 
 // @early-stop
@@ -3453,9 +3457,9 @@ void advManager::UpdateHeroLocator(int locatorSlot, int drawWindow,
 }
 
 // @early-stop
-// Relocation-masked instructions, the 0x10 frame/slots, and CFG are exact.
-// All 14 relocation offsets and effective targets agree; the delinker names
-// retail's __adjust_fdiv test address as the coincident iLeftRightSave symbol.
+// @early-stop-reloc-only: all 0x102 bytes agree after masking the 14 identical
+// ordered relocation fields; every effective target agrees. The sole raw byte
+// residual is inside the delinked __adjust_fdiv/iLeftRightSave relocation.
 VA(0x004607ad, 0x102)
 void advManager::UpdateHeroLocators(int drawWindow, int updateScreen)
 {
@@ -3484,9 +3488,9 @@ void advManager::UpdateHeroLocators(int drawWindow, int updateScreen)
 }
 
 // @early-stop
-// Relocation-masked instructions, the 0x60 frame/slots, and CFG are exact.
-// All 30 relocation offsets and effective targets agree; the delinker names
-// retail's __adjust_fdiv test address as the coincident iLeftRightSave symbol.
+// @early-stop-reloc-only: all 0x2e8 bytes agree after masking the 30 identical
+// ordered relocation fields; every effective target agrees. The sole raw byte
+// residual is inside the delinked __adjust_fdiv/iLeftRightSave relocation.
 VA(0x004608af, 0x2e8)
 void advManager::UpdateTownLocators(int drawWindow, int updateScreen)
 {
@@ -4459,13 +4463,11 @@ char * advManager::GetArmySizeName(int armySize, int grammar)
     return gArmySizeNames[8][grammar];
 }
 
-// @early-stop
-// Objdiff is 100%. Across the 0xc29 retail bytes, relocation-masked raw comparison
-// differs only at +0x831..+0x838: retail loads secondRowCountState then adds
-// firstRowCountState, while ours loads/adds the same two ints in the opposite order.
-// Textual operand reversal, unary-plus/cast/zero grouping, and focused inline-helper
-// spellings were identical or worse. The 0xec frame/slots, CFG, and all 102 resolved
-// relocation targets agree; ours only has three trailing alignment NOPs.
+// @early-stop: the 0xec frame, CFG, and all 102 ordered relocation targets
+// agree. OR-zero steering closes both first-row multiplication-order residuals.
+// Only +0x831..+0x838 remain: retail loads firstRowCountState then adds
+// secondRowCountState, while VC4.2 loads/adds the same ints oppositely. Textual
+// reversal, unary-plus/cast/zero grouping, and inline helpers were no better.
 VA(0x004631ad, 0xc29)
 void advManager::TownQuickView(int townId, int locatorSlot, int windowX, int windowY)
 {
@@ -4628,7 +4630,8 @@ void advManager::TownQuickView(int townId, int locatorSlot, int windowX, int win
                 ++creatureSlotLocal;
             creatureLocal = quickTownLocal->m_army.m_creatureTypes[creatureSlotLocal];
             armyIcons[widgetIndexWidget] = new iconWidget(
-                static_cast<short>(widgetIndexWidget * slotWidthSlot + slotStartState +
+                static_cast<short>(slotWidthSlot * (widgetIndexWidget | 0) +
+                    slotStartState +
                     fiveArmyShiftValue - GetIconEntry(monsterIconLocal, creatureLocal)->x +
                     (32 - GetIconEntry(monsterIconLocal, creatureLocal)->w) / 2 + 1),
                 static_cast<short>(rowY - GetIconEntry(monsterIconLocal, creatureLocal)->y -
@@ -4650,7 +4653,8 @@ void advManager::TownQuickView(int townId, int locatorSlot, int windowX, int win
             else
                 strcpy(armyLabelsResult[widgetIndexWidget], "???");
             armyTexts[widgetIndexWidget] = new textWidget(
-                static_cast<short>(widgetIndexWidget * slotWidthSlot + slotStartState +
+                static_cast<short>(slotWidthSlot * (widgetIndexWidget | 0) +
+                    slotStartState +
                     fiveArmyShiftValue - 14), static_cast<short>(rowY + 32), 60, 12,
                 armyLabelsResult[widgetIndexWidget], "smalfont.fnt", 1, -1,
                 0x200, 1);
@@ -6573,19 +6577,15 @@ void advManager::HideRoute(int redraw, int clearDestination, int updateButton)
     }
 }
 
-// @early-stop
-// all 52 instructions, both inline-continuation jumps, and ten relocation targets match
 VA(0x00468827, 0x8d)
 void advManager::CheckDimHero(void) {
-    if (gbThisNetHumanPlayer[giCurPlayer]) {
-        if (gpCurPlayer->CurrentHero() == ADVMGR_INVALID_HERO) {
-            return;
-        }
-        if (!gpGame->IsMobile(gpCurPlayer->CurrentHero())) {
-            ShowRoute(1, 0, 0);
-            UpdateHeroLocators(1, 1);
-            gpAdvManager->CheckDimNextHeroBut();
-        }
+    if (!gbThisNetHumanPlayer[giCurPlayer] ||
+        gpCurPlayer->CurrentHero() == ADVMGR_INVALID_HERO)
+        return;
+    if (!gpGame->IsMobile(gpCurPlayer->CurrentHero())) {
+        ShowRoute(1, 0, 0);
+        UpdateHeroLocators(1, 1);
+        gpAdvManager->CheckDimNextHeroBut();
     }
 }
 
@@ -7402,15 +7402,20 @@ void advManager::ViewPuzzle(void)
     gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
 }
 
-// @early-stop
-// all 49 instructions and five relocation targets match; residual is the TU object span
+// @semantic: retail and source now both pass object icon 17 (this+0x112) to
+// IconToBitmap; the prior m_puzzleIcon (this+0x1ce) access was a runtime bug.
+// All opcodes, CFG, and five ordered relocations agree. The remaining four bytes
+// are frame/slot shape: retail reserves 0x1c and saves this at -0x1c, while the
+// reconstructed body needs 0x04/-0x04. Do not invent six unused locals; revisit
+// when adjacent source or recovered local evidence explains the retail frame.
 VA(0x0046a6a3, 0x81)
 void advManager::PuzzleDraw(int left, int top, int right, int bottom)
 {
     gbDrawingPuzzle = 1;
     CompleteDraw(left, top, 0, 0);
     gbDrawingPuzzle = 0;
-    IconToBitmap(m_puzzleIcon, gpWindowManager->m_screen,
+    IconToBitmap(m_objectIcons[ADVMGR_PUZZLE_OBJECT_ICON],
+                 gpWindowManager->m_screen,
                  (right - left) * ADVMGR_PUZZLE_TILE_SIZE - ADVMGR_PUZZLE_X_TRIM,
                  (bottom - top) * ADVMGR_PUZZLE_TILE_SIZE, 0, 1, 0, 0,
                  ADVMGR_SCREEN_HEIGHT, ADVMGR_SCREEN_HEIGHT, 0);
