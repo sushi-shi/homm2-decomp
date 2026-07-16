@@ -90,6 +90,83 @@
       "note": "Relocation-masked code is exact and all 30 effective targets agree; only folded relocation identity remains."
     },
     {
+      "unit": "SOURCE/CURSOR",
+      "function": "?MoveHero@advManager@@QAEPAVmapCell@@HHPAH00H0H@Z",
+      "source_hash": "b4ee4cda3678",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 5,
+      "before": 97.19727,
+      "after": 97.19727,
+      "note": "Complete frame slots tables and 158 relocs; five bounded families leave continuation and register-order residuals."
+    },
+    {
+      "unit": "SOURCE/CURSOR",
+      "function": "?MoveOrigin@advManager@@QAEXHH@Z",
+      "source_hash": "309b85081cb9",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 95.03704,
+      "after": 95.03704,
+      "note": "Complete frame and operands; four GetCell continuation placements remain after accessor variant regressed."
+    },
+    {
+      "unit": "SOURCE/CURSOR",
+      "function": "?ProcessMapChange@advManager@@QAEXUSMapChange@@@Z",
+      "source_hash": "b3f781aee4b6",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.24386,
+      "after": 99.24386,
+      "note": "Complete frame and 98 relocs; two GetCell continuation placements and one trailing NOP remain."
+    },
+    {
+      "unit": "SOURCE/CURSOR",
+      "function": "?StartCursor@advManager@@QAEXH@Z",
+      "source_hash": "427ee9282cc3",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 5,
+      "before": 99.97561,
+      "after": 99.97561,
+      "note": "Exact frame CFG and six relocs; reversed commutative cursor-origin Y loads resist five bounded forms."
+    },
+    {
+      "unit": "SOURCE/CURSOR",
+      "function": "?StopCursor@advManager@@QAEXH@Z",
+      "source_hash": "f93176136a31",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 9,
+      "before": 99.970146,
+      "after": 99.970146,
+      "note": "Exact frame CFG and five relocs; reversed commutative origin-cursor X loads resist nine bounded forms."
+    },
+    {
+      "unit": "SOURCE/CURSOR",
+      "function": "?UnwindMapChangeQueue@advManager@@QAEXHH@Z",
+      "source_hash": "1a249c7c08f7",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 4,
+      "before": 99.327866,
+      "after": 99.327866,
+      "note": "Complete frame CFG and 12 relocs; loop-bound compare polarity resists four bounded condition families."
+    },
+    {
+      "unit": "SOURCE/CURSOR",
+      "function": "?ValidMove@advManager@@QAEHHH@Z",
+      "source_hash": "0cd3266bcffc",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "improved",
+      "iterations": 9,
+      "before": 99.988335,
+      "after": 99.99417,
+      "note": "OR-zero closes one commutative Y sum; one reversed cursor-origin sum remains with nine relocs aligned."
+    },
+    {
       "unit": "SOURCE/Campaign",
       "function": "?CampaignHandler@@YIHAAUtag_message@@@Z",
       "source_hash": "7d6f5ca4afd4",
