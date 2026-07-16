@@ -11,6 +11,7 @@ from homm2.build.assert_relocs import (
     check_ordered_owner_offsets,
     check_ordered_reloc_addresses,
     compare_function_reloc_addends,
+    load_canonical_data_names,
     parse_obj,
     relocation_addend_map,
 )
@@ -182,11 +183,29 @@ class CoffAddendTest(unittest.TestCase):
 
     def test_addend_comparison_catches_missing_relocation_name(self):
         differences = compare_function_reloc_addends(
-            [], [("REL32", "?callee@@YIXXZ", 0)])
+            [], [("REL32", "?callee@@YIXXZ", 0)],
+            canonical_data_names={"?callee@@YIXXZ"})
         self.assertEqual(differences[0]["symbol"], "?callee@@YIXXZ")
         self.assertEqual(differences[0]["missing"], (0,))
         self.assertEqual(differences[0]["excess"], ())
         self.assertEqual(differences[0]["classification"], "one-sided")
+        self.assertTrue(differences[0]["canonical_data"])
+
+    def test_canonical_data_inventory_combines_public_and_manifest_names(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            symbols = root / "symbols.csv"
+            manifest = root / "manifest.tsv"
+            symbols.write_text(
+                "rva,name,unit,size,kind\n"
+                "0x100,public_data,A,0x4,data\n"
+                "0x200,public_function,A,0x10,func\n")
+            manifest.write_text(
+                "name\tobject\trva\tsize\tstorage\n"
+                "private_data\tA.c\t0x300\t0x4\tdata\n")
+            self.assertEqual(load_canonical_data_names(symbols, manifest), {
+                "public_data", "private_data",
+            })
 
     def test_addend_comparison_separates_count_only_difference(self):
         differences = compare_function_reloc_addends(

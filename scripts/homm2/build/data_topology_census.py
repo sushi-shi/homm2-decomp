@@ -199,8 +199,34 @@ def _scope(storage_class):
     return "other"
 
 
-def data_symbols(path):
-    """Return meaningful defined, common, and undefined data COFF symbols."""
+def _undefined_external_names(path):
+    coff = CoffFile(path)
+    names = Counter()
+    for symbol in coff.symbols.values():
+        symbol_type, storage_class = struct.unpack_from(
+            "<HB", coff.data, symbol.offset + 14)
+        if symbol.section == 0 and symbol_type == 0 and storage_class in (2, 105):
+            names[symbol.name] += 1
+    return names
+
+
+def _function_symbol_names(path):
+    coff = CoffFile(path)
+    names = set()
+    for symbol in coff.symbols.values():
+        symbol_type = struct.unpack_from("<H", coff.data, symbol.offset + 14)[0]
+        if symbol_type & 0x30 == 0x20:
+            names.add(symbol.name)
+    return names
+
+
+def data_symbols(path, undefined_data_names=None):
+    """Return defined and independently identified undefined data symbols.
+
+    COFF type zero alone does not distinguish data from a delinker's untyped
+    function reference. Callers with a recovered inventory therefore provide
+    the exact undefined identities which are data.
+    """
     coff = CoffFile(path)
     sections = {}
     for section in coff.sections:
@@ -225,9 +251,11 @@ def data_symbols(path):
                 storage_class_name, symbol_type))
             continue
 
-        # COFF type 0 externals are the only undefined records that can be
-        # identified as data without guessing from a function relocation.
-        if symbol.section == 0 and symbol_type == 0 and storage_class in (2, 105):
+        if (symbol.section == 0 and symbol_type == 0 and
+                storage_class in (2, 105) and
+                (undefined_data_names is None or
+                 symbol.name in undefined_data_names or
+                 _fallback_kind(symbol.name) is not None)):
             state = "common" if symbol.value else "undefined"
             rows.append(DataSymbol(
                 symbol.name, state, state, "", _scope(storage_class),
@@ -319,31 +347,15 @@ def source_definitions(source_root):
             for row in annotated_source_definitions(Path(source_root), REPO)]
 
 
-def _public_source_names(path):
-    names = {}
+def _public_symbol_kinds(path):
+    kinds = {}
     if path is None or not path.is_file():
-        return names
+        return kinds
     with path.open(encoding="latin-1", newline="") as stream:
         for row in csv.DictReader(stream):
-            if row.get("kind") != "data":
-                continue
-            match = (re.match(r"\?([A-Za-z_]\w*)@@", row["name"]) or
-                     re.match(r"[_@]?([A-Za-z_]\w*)", row["name"]))
-            if match:
-                names[row["name"]] = match.group(1)
-    return names
-
-
-def _source_spelling(symbol_name, public_names):
-    if symbol_name in public_names:
-        return public_names[symbol_name]
-    match = re.match(r"_?([A-Za-z_]\w*?)\$S[0-9]+$", symbol_name)
-    if match:
-        return match.group(1)
-    match = re.match(r"\?([A-Za-z_]\w*)@@", symbol_name)
-    if match:
-        return match.group(1)
-    return symbol_name.removeprefix("_")
+            if row.get("kind") in ("data", "func"):
+                kinds[row["name"]] = row["kind"]
+    return kinds
 
 
 def _supplemental_rows(path):
@@ -364,21 +376,27 @@ def _supplemental_rows(path):
 
 
 def provenance_census(units, base_root, source_root, supplemental_path,
-                      symbols_path, base_suffix=".obj"):
+                      source_manifest_path, base_suffix=".obj"):
     """Separate canonical DATA definitions from derived and supplemental rows."""
-    public_names = _public_source_names(symbols_path)
     definitions = source_definitions(source_root) if source_root is not None else []
-    definitions_by_unit_name = {
-        (row.unit, row.name): row for row in definitions
-    }
     definitions_by_rva = {}
-    definitions_by_name = {}
+    definitions_by_unit_rva = {}
     for row in definitions:
         definitions_by_rva.setdefault(row.rva, []).append(row)
-        definitions_by_name.setdefault(row.name, []).append(row)
+        definitions_by_unit_rva.setdefault((row.unit, row.rva), []).append(row)
+
+    source_identities = {}
+    unmatched_source_manifest = []
+    for row in _source_manifest_rows(source_manifest_path):
+        matches = definitions_by_unit_rva.get((row["unit"], row["rva"]), [])
+        if len(matches) != 1:
+            unmatched_source_manifest.append(row)
+            continue
+        source_identities[(row["unit"], row["name"])] = matches[0]
 
     object_rows = {}
     candidate_class = {}
+    candidate_source_identities_seen = set()
     for unit in units:
         path = _path(base_root, unit, base_suffix)
         if not path.is_file():
@@ -393,10 +411,10 @@ def provenance_census(units, base_root, source_root, supplemental_path,
         for symbol in symbols:
             if symbol.state != "defined":
                 continue
-            source_name = _source_spelling(symbol.name, public_names)
-            definition = definitions_by_unit_name.get((unit, source_name))
+            definition = source_identities.get((unit, symbol.name))
             if definition is not None:
-                covered[(symbol.name, source_name)] += 1
+                covered[(symbol.name, definition.name)] += 1
+                candidate_source_identities_seen.add((unit, symbol.name))
                 candidate_class[(unit, symbol.name)] = "source-data"
             else:
                 private[symbol.name] += 1
@@ -421,12 +439,7 @@ def provenance_census(units, base_root, source_root, supplemental_path,
     supplemental_classes = Counter()
     for row in supplemental:
         unit = row["unit"]
-        source_name = _source_spelling(row["name"], public_names)
-        named_definition = definitions_by_unit_name.get((unit, source_name))
-        if named_definition is None:
-            same_name = definitions_by_name.get(source_name, [])
-            if len(same_name) == 1:
-                named_definition = same_name[0]
+        named_definition = source_identities.get((unit, row["name"]))
         rva_definitions = definitions_by_rva.get(row["rva"], [])
         duplicate_definitions = list(rva_definitions)
         if named_definition is not None and named_definition not in duplicate_definitions:
@@ -487,8 +500,19 @@ def provenance_census(units, base_root, source_root, supplemental_path,
         {"rva": rva, "definitions": [asdict(row) for row in sorted(rows)]}
         for rva, rows in sorted(definitions_by_rva.items()) if len(rows) > 1
     ]
+    candidate_source_identities_missing = [
+        {"unit": unit, "symbol": name, "source": asdict(definition)}
+        for (unit, name), definition in sorted(source_identities.items())
+        if (unit, name) not in candidate_source_identities_seen
+    ]
     summary = {
         "source_data_definitions": len(definitions),
+        "source_manifest_rows": len(source_identities) + len(unmatched_source_manifest),
+        "source_manifest_unmatched": len(unmatched_source_manifest),
+        "source_definitions_without_manifest_identity": (
+            len(definitions) - len(set(source_identities.values()))),
+        "candidate_source_identities_missing": len(
+            candidate_source_identities_missing),
         "candidate_data_covered": sum(
             item["count"] for row in object_rows.values()
             for item in row["candidate_data_covered"]),
@@ -508,6 +532,8 @@ def provenance_census(units, base_root, source_root, supplemental_path,
         "supplemental_duplicates": duplicate_rows,
         "supplemental_disagreements": disagreement_rows,
         "duplicate_source_rvas": source_duplicate_rvas,
+        "unmatched_source_manifest": unmatched_source_manifest,
+        "candidate_source_identities_missing": candidate_source_identities_missing,
     }
 
 
@@ -538,6 +564,41 @@ def _data_section_rows(counter):
         row["count"] = count
         rows.append(row)
     return rows
+
+
+def _source_manifest_rows(path):
+    if path is None or not path.is_file():
+        return []
+    with path.open(encoding="utf-8", newline="") as stream:
+        reader = csv.DictReader(
+            (line for line in stream if not line.lstrip().startswith("#")),
+            delimiter="\t")
+        rows = []
+        for row in reader:
+            rows.append({
+                "unit": row["object"].replace("\\", "/").removesuffix(".c"),
+                "name": row["name"],
+                "rva": int(row["rva"], 0),
+            })
+        return rows
+
+
+def _candidate_symbol_inventory(units, base_root, base_suffix, symbols_path,
+                                data_manifest_path):
+    public = _public_symbol_kinds(symbols_path)
+    data_names = {name for name, kind in public.items() if kind == "data"}
+    function_names = {name for name, kind in public.items() if kind == "func"}
+    for row in _source_manifest_rows(data_manifest_path):
+        data_names.add(row["name"])
+    for unit in units:
+        path = _path(base_root, unit, base_suffix)
+        if not path.is_file():
+            continue
+        data_names.update(symbol.name for symbol in data_symbols(path)
+                          if symbol.state == "defined")
+        function_names.update(_function_symbol_names(path))
+    function_names.difference_update(data_names)
+    return data_names, function_names
 
 
 def _attribute_distance(base, target, attribute):
@@ -593,9 +654,10 @@ def _synthetic_inventory(symbols):
     return result
 
 
-def compare_object(unit, base_path, target_path):
-    base_symbols = data_symbols(base_path)
-    target_symbols = data_symbols(target_path)
+def compare_object(unit, base_path, target_path, data_names=None,
+                   function_names=None):
+    base_symbols = data_symbols(base_path, data_names)
+    target_symbols = data_symbols(target_path, data_names)
     base_sections = data_sections(base_path)
     target_sections = data_sections(target_path)
     base_topology = Counter(base_symbols)
@@ -642,8 +704,31 @@ def compare_object(unit, base_path, target_path):
     unmapped_target = real_target_names - real_base_names
     unmapped_base = real_base_names - real_target_names
     fallback_count = sum(row["count"] for row in fallback["target"])
+    base_undefined = _undefined_external_names(base_path)
+    target_undefined = _undefined_external_names(target_path)
+    target_function_references = Counter({
+        name: count for name, count in target_undefined.items()
+        if function_names is not None and name in function_names
+    })
+    base_unclassified = Counter({
+        name: count for name, count in base_undefined.items()
+        if data_names is not None and name not in data_names and
+        (function_names is None or name not in function_names) and
+        _fallback_kind(name) is None
+    })
+    target_unclassified = Counter({
+        name: count for name, count in target_undefined.items()
+        if data_names is not None and name not in data_names and
+        (function_names is None or name not in function_names) and
+        _fallback_kind(name) is None
+    })
+    shared_unclassified = base_unclassified & target_unclassified
+    base_only_unclassified = base_unclassified - target_unclassified
+    target_only_unclassified = target_unclassified - base_unclassified
     object_hard_errors = (fallback_count + sum(unmapped_target.values()) +
                           sum(unmapped_base.values()) +
+                          sum(base_only_unclassified.values()) +
+                          sum(target_only_unclassified.values()) +
                           sum(missing_sections.values()) +
                           sum(extra_sections.values()))
     symbol_exact = base_topology == target_topology
@@ -679,6 +764,12 @@ def compare_object(unit, base_path, target_path):
             "unmapped_target_identities": sum(unmapped_target.values()),
             "unmapped_base_identities": sum(unmapped_base.values()),
             "target_fallback_identities": fallback_count,
+            "target_function_references": sum(target_function_references.values()),
+            "shared_unclassified_undefined": sum(shared_unclassified.values()),
+            "base_only_unclassified_undefined": sum(
+                base_only_unclassified.values()),
+            "target_only_unclassified_undefined": sum(
+                target_only_unclassified.values()),
             "defined_vs_undefined_mismatches": mismatch_counts["definition_state"],
             "local_global_mismatches": mismatch_counts["scope"],
             "storage_class_mismatches": mismatch_counts["storage_class"],
@@ -703,6 +794,12 @@ def compare_object(unit, base_path, target_path):
             "unmapped_base": _name_rows(unmapped_base),
         },
         "fallback_identities": fallback,
+        "target_undefined_inventory": {
+            "function": _name_rows(target_function_references),
+            "shared_unclassified": _name_rows(shared_unclassified),
+            "base_only_unclassified": _name_rows(base_only_unclassified),
+            "target_only_unclassified": _name_rows(target_only_unclassified),
+        },
         "canonical_status": "error" if object_hard_errors else "clean",
         "canonical_hard_errors": object_hard_errors,
         "synthetic": {
@@ -729,7 +826,10 @@ def _path(root, unit, suffix):
 
 def build_census(units, base_root, target_root, base_suffix=".obj",
                  target_suffix=".c.obj", source_root=None,
-                 supplemental_path=None, symbols_path=None):
+                 supplemental_path=None, symbols_path=None,
+                 source_manifest_path=None, data_manifest_path=None):
+    data_names, function_names = _candidate_symbol_inventory(
+        units, base_root, base_suffix, symbols_path, data_manifest_path)
     objects = []
     aggregate_counts = Counter()
     aggregate_mismatches = Counter()
@@ -759,7 +859,8 @@ def build_census(units, base_root, target_root, base_suffix=".obj",
             })
             continue
         try:
-            row = compare_object(unit, base_path, target_path)
+            row = compare_object(
+                unit, base_path, target_path, data_names, function_names)
         except (OSError, ValueError, struct.error) as error:
             error_objects += 1
             objects.append({
@@ -811,6 +912,8 @@ def build_census(units, base_root, target_root, base_suffix=".obj",
         summary.get("target_fallback_identities", 0) +
         summary.get("unmapped_target_identities", 0) +
         summary.get("unmapped_base_identities", 0) +
+        summary.get("base_only_unclassified_undefined", 0) +
+        summary.get("target_only_unclassified_undefined", 0) +
         summary.get("missing_data_sections", 0) +
         summary.get("extra_data_sections", 0))
     payload = {
@@ -821,14 +924,18 @@ def build_census(units, base_root, target_root, base_suffix=".obj",
     }
     if source_root is not None:
         provenance = provenance_census(
-            units, base_root, source_root, supplemental_path, symbols_path,
+            units, base_root, source_root, supplemental_path,
+            source_manifest_path,
             base_suffix)
         payload["provenance"] = provenance
         summary["provenance"] = provenance["summary"]
         canonical_hard_errors += (
             provenance["summary"]["source_data_duplicates_in_supplemental"] +
             provenance["summary"]["source_data_supplemental_disagreements"] +
-            provenance["summary"]["duplicate_source_rvas"])
+            provenance["summary"]["duplicate_source_rvas"] +
+            provenance["summary"]["source_manifest_unmatched"] +
+            provenance["summary"]["source_definitions_without_manifest_identity"] +
+            provenance["summary"]["candidate_source_identities_missing"])
     summary["canonical_hard_errors"] = canonical_hard_errors
     return payload
 
@@ -850,6 +957,11 @@ def _print_summary(payload, output):
         summary.get("name_common", 0), summary.get("name_union", 0)))
     print("missing/extra name records: %d/%d; diagnostics: %s" % (
         summary.get("missing_names", 0), summary.get("extra_names", 0), output))
+    print("target function/shared/base-only/target-only unclassified: %d/%d/%d/%d" % (
+        summary.get("target_function_references", 0),
+        summary.get("shared_unclassified_undefined", 0),
+        summary.get("base_only_unclassified_undefined", 0),
+        summary.get("target_only_unclassified_undefined", 0)))
     print("proved/provisional real mappings: %d/%d; canonical hard errors: %d" % (
         summary.get("proved_mappings", 0), summary.get("provisional_mappings", 0),
         summary["canonical_hard_errors"]))
@@ -874,9 +986,13 @@ def main(argv=None):
     parser.add_argument("--target-root", type=Path, default=Path("build/delink"))
     parser.add_argument("--source-root", type=Path, default=Path("src"))
     parser.add_argument("--supplemental", type=Path,
-                        default=Path("config/delink_data_supplemental.tsv"))
+                        default=Path("build/gen/delink_data_from_supplemental.tsv"))
     parser.add_argument("--symbols", type=Path,
                         default=Path("build/gen/symbol_names.csv"))
+    parser.add_argument("--source-manifest", type=Path,
+                        default=Path("build/gen/delink_data_from_source.tsv"))
+    parser.add_argument("--data-manifest", type=Path,
+                        default=Path("build/gen/delink_data_manifest.tsv"))
     parser.add_argument("--base-suffix", default=".obj")
     parser.add_argument("--target-suffix", default=".c.obj")
     parser.add_argument("--output", type=Path,
@@ -893,7 +1009,8 @@ def main(argv=None):
             _load_units(units_path), _resolve(args.base_root),
             _resolve(args.target_root), args.base_suffix, args.target_suffix,
             _resolve(args.source_root), _resolve(args.supplemental),
-            _resolve(args.symbols))
+            _resolve(args.symbols), _resolve(args.source_manifest),
+            _resolve(args.data_manifest))
     except (OSError, ValueError, tomllib.TOMLDecodeError) as error:
         parser.error(str(error))
 
