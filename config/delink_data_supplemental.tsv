@@ -352,11 +352,11 @@ $SG32606	SOURCE\Modem.c	0xedff0	0x8	data	0x4	2	0x1a0	local	candidate-coff-sectio
 $SG32614	SOURCE\Modem.c	0xedff8	0xc	data	0x4	2	0x1a8	local	candidate-coff-section-translation
 $SG32628	SOURCE\Modem.c	0xee004	0xc	data	0x4	2	0x1b4	local	candidate-coff-section-translation
 $SG32635	SOURCE\Modem.c	0xee010	0x9	data	0x4	2	0x1c0	local	candidate-coff-section-translation
-$T36547	SOURCE\Overview.c	0xeb058	0x8	rdata	0x8	5	0x0	local	candidate-coff-section-translation
-$T36548	SOURCE\Overview.c	0xeb060	0x8	rdata	0x8	5	0x8	local	candidate-coff-section-translation
-$T36549	SOURCE\Overview.c	0xeb068	0x8	rdata	0x8	5	0x10	local	candidate-coff-section-translation
-$T36579	SOURCE\Overview.c	0xeb070	0x4	rdata	0x8	5	0x18	local	candidate-coff-section-translation
-$T36580	SOURCE\Overview.c	0xeb074	0x4	rdata	0x4	5	0x1c	local	candidate-coff-section-translation
+$T36552	SOURCE\Overview.c	0xeb058	0x8	rdata	0x8	5	0x0	local	candidate-coff-section-translation
+$T36553	SOURCE\Overview.c	0xeb060	0x8	rdata	0x8	5	0x8	local	candidate-coff-section-translation
+$T36554	SOURCE\Overview.c	0xeb068	0x8	rdata	0x8	5	0x10	local	candidate-coff-section-translation
+$T36584	SOURCE\Overview.c	0xeb070	0x4	rdata	0x8	5	0x18	local	candidate-coff-section-translation
+$T36585	SOURCE\Overview.c	0xeb074	0x4	rdata	0x4	5	0x1c	local	candidate-coff-section-translation
 _$S5$S36850	SOURCE\PHILAI.c	0xec004	0x4	data	0x4	3	0x0	local	candidate-coff-reloc-bijection
 _AI_EVENT_HUMAN_VALUE_FACTOR$S1520	SOURCE\PHILAI.c	0xeb280	0x4	rdata	0x8	4	0x0	local	candidate-coff-section-translation
 _AI_STRATEGIC_POSITION_SCORE_FACTOR$S1521	SOURCE\PHILAI.c	0xeb284	0x4	rdata	0x4	4	0x4	local	candidate-coff-section-translation

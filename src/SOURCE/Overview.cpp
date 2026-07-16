@@ -32,12 +32,6 @@
 
 #define OVERVIEW_SOURCE_FILE const_cast<char *>("I:\\Projects\\Heroes\\Prog\\SOURCE\\Overview.cpp")
 
-DATA(0x004edca8)
-static short overviewSetupSourceLine = OVERVIEW_SETUP_SOURCE_LINE;
-DATA(0x004edcec)
-static short overviewDialogSourceLine = OVERVIEW_DIALOG_SOURCE_LINE;
-
-#define OVERVIEW_SETUP_LINE overviewSetupSourceLine
 #define OVERVIEW_TEXT_WIDGET_ROWS \
     (reinterpret_cast<OverviewTextWidgetRow *>(textWidgetDynamic))
 #define OVERVIEW_ICON_WIDGET_ROWS \
@@ -65,6 +59,8 @@ static short overviewDialogSourceLine = OVERVIEW_DIALOG_SOURCE_LINE;
 VA(0x00407870, 0x223e)
 void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
 {
+    DATA(0x004eda04) static short overviewDynamicSourceLine =
+        OVERVIEW_DYNAMIC_SOURCE_LINE;
     int row;
     int item;
     int textItemCount;
@@ -146,7 +142,7 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
                 valueText0 = static_cast<char *>(BaseAlloc(
                     strlen(record->m_name) + 1,
                     OVERVIEW_SOURCE_FILE,
-                    OVERVIEW_SETUP_LINE + 0x4f
+                    overviewDynamicSourceLine + 0x4f
                 ));
                 strcpy(valueText0, record->m_name);
 
@@ -363,7 +359,8 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
                     iconCount++;
 
                         valueText0 = static_cast<char *>(
-                            BaseAlloc(6, OVERVIEW_SOURCE_FILE, OVERVIEW_SETUP_LINE + 0xee)
+                            BaseAlloc(6, OVERVIEW_SOURCE_FILE,
+                                      overviewDynamicSourceLine + 0xee)
                         );
                         sprintf(
                             valueText0,
@@ -468,7 +465,8 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
                     iconCount++;
 
                         valueText0 = static_cast<char *>(
-                            BaseAlloc(6, OVERVIEW_SOURCE_FILE, OVERVIEW_SETUP_LINE + 0x12a)
+                            BaseAlloc(6, OVERVIEW_SOURCE_FILE,
+                                      overviewDynamicSourceLine + 0x12a)
                         );
                         sprintf(valueText0, "%d", static_cast<int>(record->m_garrison[detailIndex]));
                         OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] =
@@ -588,7 +586,8 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
 
             for (item = 0; item < 4; item++) {
                 valueText0 = static_cast<char *>(
-                    BaseAlloc(4, OVERVIEW_SOURCE_FILE, OVERVIEW_SETUP_LINE + 0x182)
+                    BaseAlloc(4, OVERVIEW_SOURCE_FILE,
+                              overviewDynamicSourceLine + 0x182)
                 );
                 sprintf(valueText0, "%d", static_cast<int>(heroData0->Stats(item)));
                 OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] =
@@ -666,7 +665,8 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
                     iconCount++;
 
                         valueText0 = static_cast<char *>(
-                            BaseAlloc(6, OVERVIEW_SOURCE_FILE, OVERVIEW_SETUP_LINE + 0x1bd)
+                            BaseAlloc(6, OVERVIEW_SOURCE_FILE,
+                                      overviewDynamicSourceLine + 0x1bd)
                         );
                         sprintf(
                             valueText0,
@@ -759,7 +759,8 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
                     iconCount += 2;
 
                     valueText0 = static_cast<char *>(
-                        BaseAlloc(2, OVERVIEW_SOURCE_FILE, OVERVIEW_SETUP_LINE + 0x1fb)
+                        BaseAlloc(2, OVERVIEW_SOURCE_FILE,
+                                  overviewDynamicSourceLine + 0x1fb)
                     );
                     sprintf(valueText0, "%d", static_cast<int>(heroData0->GetSSLevel(detailIndex)));
                     OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] =
@@ -872,6 +873,8 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
 VA(0x00409aae, 0x357)
 void game::SetupNewOverviewType(int overviewType, int redrawFrom)
 {
+    DATA(0x004edca8) static short overviewSetupSourceLine =
+        OVERVIEW_SETUP_SOURCE_LINE;
     int title;
     tag_message message;
     char *titleCopy;
@@ -919,7 +922,7 @@ void game::SetupNewOverviewType(int overviewType, int redrawFrom)
         titleCopy = static_cast<char *>(BaseAlloc(
             strlen(cOverviewText[giOverviewType * OVERVIEW_TITLE_COUNT + title]) + 1,
             OVERVIEW_SOURCE_FILE,
-            OVERVIEW_SETUP_LINE + 0x2a
+            overviewSetupSourceLine + 0x2a
         ));
         strcpy(titleCopy, cOverviewText[giOverviewType * OVERVIEW_TITLE_COUNT + title]);
         textWidgetTitle[title] = new textWidget(
@@ -968,6 +971,8 @@ void game::SetupResources(void)
 VA(0x00409e89, 0x4c7)
 void game::Overview(void)
 {
+    DATA(0x004edcec) static short overviewDialogSourceLine =
+        OVERVIEW_DIALOG_SOURCE_LINE;
     char mineCounts4[8];
     int sawmills4;
     int mine4;
@@ -1458,6 +1463,33 @@ int game::ProcessIconSelect(int widgetId, int quickView)
     return 0;
 }
 
+// @data-layout-note
+// Retail `.rdata` and the candidate are byte-exact over 0xeb058..0xeb078
+// (0x20 bytes). The five reviewed candidate allocations are `$T36552`,
+// `$T36553`, `$T36554`, `$T36584`, and `$T36585`; all referenced relocation
+// owners and interior addends agree with the retail constants.
+//
+// Retail initialized storage spans 0xed9e8..0xeddf4 (0x40c bytes), including
+// three trailing zero alignment bytes. Before recovery the candidate was
+// 0x405 bytes and omitted the 0x0074 short at 0xeda04. The candidate is now
+// 0x40d bytes and contains every retail payload byte. Retail interleaves the
+// dynamic, setup, and dialog source-line words at offsets 0x1c, 0x2c0, and
+// 0x304; VC 4.2 groups the three function statics at 0x0, 0x4, and 0x8 and
+// inserts a four-byte zero alignment hole before giOverviewTop. Focused
+// relocation audits are 340/340 for SetupDynamicStuff, 52/52 for
+// SetupNewOverviewType, and 90/90 for Overview, with no candidate-only sites;
+// the only warnings are the expected private-name versus delinked literal or
+// `const_<rva>` identities. The resulting data section-outside-contribution
+// and unconsumed-contribution diagnostics replace the former single
+// inconsistent-anchor-bases diagnostic. Do not restore the synthetic `"t"`
+// owner, add padding, or alias these words to hide this allocation-order wall.
+//
+// Retail zero-fill spans 0x123258..0x123280 (0x28 bytes) and includes a
+// four-byte alignment hole before giOverviewItems. The candidate `.bss` is
+// 0x24 bytes and contains the same 36 logical bytes in COMMON order:
+// giOverviewItems, iLastDynamicTop, iLastDynamicType, textWidgetTitle,
+// iOverviewItems. Every public extent and relocation is present; retain the
+// inconsistent-anchor-bases diagnostic rather than inventing storage.
 // ---- globals (definitions, RVA order) ----
 DATA(0x004ed9e8) class heroWindow *overWin = 0;
 DATA(0x004ed9ec) class textWidget **textWidgetDynamic = 0;
