@@ -115,6 +115,10 @@ The explicit topology commands are:
   filtered, and canonical identities are omitted. `row_kind=allocation-symbol` makes explicit that
   the current queue contains COFF allocation symbols; aliases and section-definition metadata are
   not flattened into fake allocations and remain in topology diagnostics until separately modeled.
+  A group whose every candidate definition already has an exact source-DATA or reviewed
+  supplemental row is closed directly from that canonical evidence after candidate section,
+  offset, storage, scope, alignment, and extent validation. This permits a reviewed retail owner
+  order to differ from candidate allocation order without asking for the same rows again.
 
   Proposal does not refresh coverage, source-DATA, combined symbol/section, contribution, or target
   artifacts. The queue is review input only: it is never read by promote, finalize, regenerate, or
