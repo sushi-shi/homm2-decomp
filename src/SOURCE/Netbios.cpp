@@ -216,10 +216,13 @@ int nbnet_init(void)
 
 // ---- globals (definitions, RVA order) ----
 // @data-layout-note Retail .data is 0xee5c8+0x188 and places these public
-// initialized zeros at +0/+4/+8/+0x4c/+0x90/+0x94 among private literal
-// allocations. Candidate .data is 0x186 and groups the same identities at
-// +0/+4/+8/+0xc/+0x10/+0x14. Preserve initialized storage and retail RVAs;
-// the intervening private allocations must be recovered independently.
+// initialized zeros at +0/+4/+8/+0x4c/+0x90/+0x94 among 15 private literal
+// allocations. Candidate .data is 0x186 and groups the public identities at
+// +0/+4/+8/+0xc/+0x10/+0x14. Public and unique-payload anchors force the four
+// repeated literal spans to 0xee5d4, 0xee5f4, 0xee618, and 0xee638; each span
+// is byte-exact against retail. All later private owners have singleton
+// relocation proof. The final two retail bytes are zero alignment; do not add
+// a fake owner for them.
 DATA(0x004ee5c8) signed char iInitNetHostStatus = 0;
 DATA(0x004ee5cc) signed char iInitNetGuestStatus = 0;
 DATA(0x004ee5d0) int iNameRetryCount = 0;
