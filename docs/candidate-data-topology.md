@@ -92,7 +92,9 @@ The explicit topology commands are:
   explicit signed drift, and missing or inconsistent section bases remain diagnostics.
   `--strict` rejects any such unresolved assignment. The generated contribution and whole-image
   coverage manifests remain hard regeneration inputs under `build/gen`; they are not copied into
-  version control.
+  version control. The Clang DATA inventory is cached under `build/gen` per TU, keyed by source,
+  recursively resolved project/vendor headers, candidate object, compile database, and parser
+  implementation. Missing objects disable reuse; source or header changes reparse the affected TU.
 - `homm2 data-topology propose` writes only structured candidate diagnostics and
   `build/gen/data_topology_review_queue.tsv`. The queue is deliberately not a Vostok manifest: its
   header adds evidence kind, proof count, group blockers, and group contradictions. It contains
