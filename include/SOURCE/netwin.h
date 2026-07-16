@@ -6,7 +6,9 @@
 
 typedef enum NetbiosConstant {
     NETBIOS_SESSION_COUNT = 7,
+    NETBIOS_STATUS_COUNT = 10,
     NETBIOS_THREAD_EVENT_COUNT = 9,
+    NETBIOS_THREAD_EVENT_STORAGE_COUNT = 10,
     NETBIOS_RECEIVE_EVENT_FIRST = 2,
     NETBIOS_RECEIVE_EVENT_COUNT = 5,
     NETBIOS_NAME_SIZE = 0x10,
@@ -96,13 +98,15 @@ struct NetbiosControlBlock {
     unsigned char reserved[10];
     void *event;
 };
+#pragma pack(pop)
 
 struct NetbiosName {
     unsigned char bytes[NETBIOS_NAME_SIZE];
 };
 
-struct NetbiosPayload {
+union NetbiosPayload {
     unsigned char bytes[NETBIOS_PAYLOAD_SIZE];
+    unsigned long words[NETBIOS_PAYLOAD_SIZE / sizeof(unsigned long)];
 };
 
 struct NetbiosSessionBuffer {
@@ -110,14 +114,13 @@ struct NetbiosSessionBuffer {
 };
 
 struct NetbiosThreadEvents {
-    void *handles[NETBIOS_THREAD_EVENT_COUNT];
+    void *handles[NETBIOS_THREAD_EVENT_STORAGE_COUNT];
 };
-#pragma pack(pop)
 SIZE(NetbiosControlBlock, NETBIOS_CONTROL_BLOCK_SIZE);
 SIZE(NetbiosName, NETBIOS_NAME_SIZE);
 SIZE(NetbiosPayload, NETBIOS_PAYLOAD_SIZE);
 SIZE(NetbiosSessionBuffer, NETBIOS_PAYLOAD_SIZE);
-SIZE(NetbiosThreadEvents, NETBIOS_THREAD_EVENTS_SIZE);
+SIZE(NetbiosThreadEvents, NETBIOS_THREAD_EVENT_STORAGE_COUNT * sizeof(void *));
 
 int is_netbios_avail(void);
 extern "C" unsigned short __fastcall nb_init(unsigned short, unsigned short);
