@@ -419,22 +419,6 @@ def _validate_owner_objects(root, manifest):
         raise RuntimeError("reviewed delink omitted owner objects: %s" % ", ".join(missing))
 
 
-def _refresh_objdiff_targets():
-    path = REPO / "build/objdiff/objdiff.json"
-    if not path.exists():
-        return
-    config = json.loads(path.read_text())
-    changed = False
-    for unit in config.get("units", []):
-        target = TARGET / (unit["name"] + ".c.obj")
-        expected = "../delink/%s.c.obj" % unit["name"]
-        if target.exists() and unit.get("target_path") != expected:
-            unit["target_path"] = expected
-            changed = True
-    if changed:
-        path.write_text(json.dumps(config, indent=2) + "\n")
-
-
 def ensure_reviewed_targets(delinker=None):
     """Validate the fixed target without deriving data or changing target objects."""
     if not TARGET.is_dir():
@@ -461,7 +445,6 @@ def ensure_reviewed_targets(delinker=None):
             raise RuntimeError(
                 "canonical target inputs changed; run `homm2 data-topology regenerate` "
                 "explicitly")
-    _refresh_objdiff_targets()
     return False
 
 
@@ -570,7 +553,6 @@ def regenerate_canonical_targets(delinker=None):
             backup.rename(TARGET)
         shutil.rmtree(temporary, ignore_errors=True)
         raise
-    _refresh_objdiff_targets()
 
 
 def record_current_targets(delinker=None):
