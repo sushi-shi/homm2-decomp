@@ -56,6 +56,20 @@ def anchor(unit, ordinal, rva, offset=0, name="anchor"):
 
 
 class DataManifestAdapterTest(unittest.TestCase):
+    def test_stale_local_identity_migrates_by_section_local_position(self):
+        topology = {"A": ([
+            candidate("A", "$Tnew", ordinal=7, value=0),
+        ], [])}
+        row = anchor("A", 7, 0x100, name="$Told")
+        row.update({
+            "size": "0x4", "storage": "data", "alignment": "0x4",
+            "scope": "local", "provenance": "reviewed",
+        })
+        normalized = _normalize_symbol_row(row, topology)
+        self.assertEqual(normalized["name"], "$Tnew")
+        self.assertEqual(normalized["section_ordinal"], "7")
+        self.assertEqual(normalized["section_offset"], "0x0")
+
     def test_source_scanner_handles_multiline_arrays_and_initializers(self):
         with TemporaryDirectory() as directory:
             root = Path(directory)
