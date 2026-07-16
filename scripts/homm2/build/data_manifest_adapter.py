@@ -98,8 +98,12 @@ class CandidateSection:
     associative_ordinal: int | None
 
 
-def source_definitions(source_root: Path = SOURCE_ROOT) -> list[SourceDefinition]:
-    return annotated_source_definitions(Path(source_root), REPO)
+def source_definitions(source_root: Path = SOURCE_ROOT,
+                       base_root: Path = BASE_ROOT) -> list[SourceDefinition]:
+    source_root = Path(source_root)
+    if source_root.resolve() != SOURCE_ROOT.resolve():
+        return annotated_source_definitions(source_root, REPO)
+    return annotated_source_definitions(source_root, REPO, Path(base_root))
 
 
 def _decoded_symbol_names(symbol: str) -> set[str]:
@@ -769,7 +773,7 @@ def breakpoint_report(topology_by_unit, section_rows, section_diagnostics,
 def build_manifests(source_root=SOURCE_ROOT, base_root=BASE_ROOT, symbols=SYMBOLS,
                     units=UNITS, exe=EXE, supplemental=SUPPLEMENTAL,
                     migrate_from: Path | None = None, strict=False):
-    definitions = source_definitions(Path(source_root))
+    definitions = source_definitions(Path(source_root), Path(base_root))
     manifest = tomllib.loads(Path(units).read_text())
     topology_by_unit = {}
     for unit in sorted(row["unit"] for row in manifest.get("unit", [])):
