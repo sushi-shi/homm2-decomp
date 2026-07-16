@@ -238,15 +238,17 @@ void swapManager::DrawSelector(void)
     }
 }
 
-// @early-stop 99.9042% -- delinked local jump-table identity only.
-// The complete 0xaf0 body, 0x28 frame/slots, CFG, and all 71 ordered external
-// relocations match. Table-aware comparison finds identical executable
-// instructions before and after the embedded tables and an identical 0xa7-byte
-// compressed index table. The eleven pointer entries resolve in both objects to
-// relative offsets 0x184, 0x1e7, 0x58e, 0x75c, 0x24a, 0x3ec, 0xb3, 0xfb, 0xd7,
-// 0x11f, and 0x92a. MSVC names those destinations as local $L symbols, while the
-// delinker records Main plus addends; the dispatch operands similarly spell the
-// same relative 0x983/0x957 tables through different relocation identities.
+// @semantic
+// Complete 0xaf0 body, 0x28 frame/slots, source CFG, and all 71 ordered relocation
+// sites/effective targets align. Fifty-six identities agree literally; two are
+// equivalent string owners and thirteen are delinked local table labels. The
+// embedded pointer/index tables and their eleven resolved body offsets agree.
+// Outside table data, twelve branch bytes differ at +0x29a/+0x29b, +0x2f9/+0x2fa,
+// +0x43c/+0x43d, +0x49b/+0x49c, +0x60b/+0x60c, and +0x7d9/+0x7da: retail's six
+// completed dialog/view arms jump directly to the shared post-command block,
+// while ours first reaches the matching case-local tail. An explicit shared goto
+// grew the case layout and shifted later relocations, so it was rejected. Revisit
+// after an earlier SWAPMGR/header change or new evidence for case-exit lowering.
 VA(0x00454be3, 0xaf0)
 int swapManager::Main(tag_message &message)
 {
@@ -698,13 +700,14 @@ void swapManager::SwapMons(void)
         targetArmy->m_creatureTypes[m_targetSlot]) {
         if (selectedArmy->GetNumArmies() == 1)
             return;
-        targetArmy->m_creatureCounts[m_targetSlot] +=
-            selectedArmy->m_creatureCounts[m_selectedSlot];
+        targetArmy->m_creatureCounts[m_targetSlot] =
+            0[&selectedArmy->m_creatureCounts[m_selectedSlot]] +
+            targetArmy->m_creatureCounts[m_targetSlot];
         selectedArmy->m_creatureTypes[m_selectedSlot] = SWAP_CREATURE_NONE;
         selectedArmy->m_creatureCounts[m_selectedSlot] = 0;
         return;
     }
-    if (targetArmy != selectedArmy && selectedArmy->GetNumArmies() == 1 &&
+    if (0[&selectedArmy] != targetArmy && selectedArmy->GetNumArmies() == 1 &&
         targetArmy->m_creatureTypes[m_targetSlot] == SWAP_CREATURE_NONE)
         return;
     selectedArmy->Swap(m_selectedSlot, targetArmy, m_targetSlot);
