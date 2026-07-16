@@ -940,6 +940,13 @@ void game::InitCampaignMap(void)
 }
 
 // ---- globals (definitions, RVA order) ----
+// @data-layout-note Retail initialized storage is 0xf4f28+0x260. Candidate
+// .data is 0x25d: trackXY, campWin, and 40 literal allocations have exact
+// payloads after mapping the nine artifact-name literals as a pure permutation
+// inside +0x10c..+0x18c. The sole uncovered extent is three terminal zero
+// alignment bytes at +0x25d. All 65 retail HIGHLOW targets are owned: trackXY
+// uses addends 0/2, the final literal uses 0/8/0xc (two suffix references from
+// other code), and every other initialized-data reference uses addend zero.
 DATA(0x004f4f28) short trackXY[2][13][2] = {
     39, 336, 113, 336, 150, 294, 187, 336, 261, 336, 335, 336,
     409, 378, 409, 294, 483, 336, 557, 336, -1, -1, 261, 378, -1, -1,
@@ -951,7 +958,11 @@ DATA(0x004f4f90) class heroWindow *campWin = 0;
 // these four public identities. Retail COMMON order is side/track/viewOnly/map
 // at +0/+4/+8/+0xc; VC4.2 currently emits track/viewOnly/side/map. Declaration
 // order is byte-neutral for these fixed external names, so retain the proven
-// storage and RVAs rather than introducing aliases or initialized data.
+// storage and RVAs rather than introducing aliases or initialized data. Track,
+// viewOnly, and side have exact candidate/retail reference counts (11/4/24),
+// all with addend zero. iCurViewMap has 27 candidate versus 29 retail references;
+// that two-site code residual belongs to incomplete function reconstruction,
+// not to BSS ownership.
 DATA(0x00527ea4) int iCurViewSide;
 DATA(0x00527ea8) int iCampaignTrackType;
 DATA(0x00527eac) int bCampaignViewOnly;
