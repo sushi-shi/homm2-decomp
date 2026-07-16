@@ -53,6 +53,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from tu_state_noise import (
+    SourceMutationError,
+    acquire_source_mutation_lock,
     compile_object,
     exact_closure_rejections,
     object_metrics,
@@ -288,8 +290,15 @@ def main(argv=None) -> int:
     root = Path(os.environ.get("HOMM2_DIR", Path.cwd())).resolve()
     try:
         payload, source, original, axes, candidates, rva = load_manifest(args.manifest, root)
-        target, flags = resolve_target(root, source, rva)
     except (OSError, ValueError, KeyError, json.JSONDecodeError) as exc:
+        parser.error(str(exc))
+    try:
+        source_lock = acquire_source_mutation_lock(root, source)
+        if source.read_bytes() != original:
+            source_lock.close()
+            raise SourceMutationError(f"source changed while acquiring mutation lock: {source}")
+        target, flags = resolve_target(root, source, rva)
+    except (OSError, SourceMutationError, ValueError, KeyError) as exc:
         parser.error(str(exc))
 
     combinations = len(candidates) if candidates else 1
@@ -324,6 +333,7 @@ def main(argv=None) -> int:
     best_object_rank = None
     best_disasm = None
     original_handler = signal.getsignal(signal.SIGTERM)
+    restoration_conflict = False
 
     def interrupt(_signum, _frame):
         raise KeyboardInterrupt
@@ -341,6 +351,7 @@ def main(argv=None) -> int:
                 (output / "baseline.compile.log").write_text(baseline_log)
                 reason = "timed out" if baseline_timed_out else "failed"
                 print(f"baseline compile {reason}; source restored", file=sys.stderr)
+                source_lock.close()
                 return 2
             baseline_scores, baseline_sizes, baseline_counts, baseline_diff_log = objdiff_scores(
                 target_obj, baseline_obj, target.symbol
@@ -355,6 +366,7 @@ def main(argv=None) -> int:
             ):
                 (output / "baseline.objdiff.log").write_text(baseline_diff_log)
                 print("target symbol missing or non-unique in baseline object", file=sys.stderr)
+                source_lock.close()
                 return 2
             baseline_summary = {
                 "score": baseline_score,
@@ -473,11 +485,21 @@ def main(argv=None) -> int:
                 best_disasm = disassembly.stdout + disassembly.stderr
     except KeyboardInterrupt:
         print("interrupted; source restored", file=sys.stderr)
+        source_lock.close()
         return 130
     finally:
         signal.signal(signal.SIGTERM, original_handler)
         if source.read_bytes() != original:
-            source.write_bytes(original)
+            restoration_conflict = True
+
+    if restoration_conflict:
+        print(
+            "FATAL: source changed outside the guarded candidate interval; "
+            "refusing stale restoration",
+            file=sys.stderr,
+        )
+        source_lock.close()
+        return 3
 
     ranked = sorted(
         (row for row in results if row.get("score") is not None),
@@ -524,6 +546,7 @@ def main(argv=None) -> int:
         print("--- best disposable candidate disassembly (object deleted after inspection) ---")
         print(best_disasm.rstrip())
     print(output)
+    source_lock.close()
     return 0
 
 

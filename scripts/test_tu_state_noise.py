@@ -120,6 +120,34 @@ class TuStateNoiseTests(unittest.TestCase):
                     raise RuntimeError("stop")
             self.assertEqual(path.read_bytes(), original)
 
+    def test_temporary_source_refuses_stale_original(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "unit.cpp"
+            path.write_bytes(b"newer\n")
+            with self.assertRaisesRegex(noise.SourceMutationError, "changed before probe"):
+                with noise.temporary_source(path, b"older\n", b"candidate\n"):
+                    pass
+            self.assertEqual(path.read_bytes(), b"newer\n")
+
+    def test_temporary_source_does_not_overwrite_concurrent_edit(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "unit.cpp"
+            path.write_bytes(b"original\n")
+            with self.assertRaisesRegex(noise.SourceMutationError, "refusing stale restoration"):
+                with noise.temporary_source(path, b"original\n", b"candidate\n"):
+                    path.write_bytes(b"concurrent\n")
+            self.assertEqual(path.read_bytes(), b"concurrent\n")
+
+    def test_source_mutation_lock_rejects_second_holder(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / "unit.cpp"
+            source.write_bytes(b"source\n")
+            first = noise.acquire_source_mutation_lock(root, source)
+            self.addCleanup(first.close)
+            with self.assertRaisesRegex(noise.SourceMutationError, "another source-variant"):
+                noise.acquire_source_mutation_lock(root, source)
+
     def test_compile_timeout_seconds_must_be_positive_and_finite(self):
         self.assertEqual(noise.positive_seconds("0.25"), 0.25)
         for value in ("0", "-1", "nan", "inf", "not-a-number"):
