@@ -39,16 +39,15 @@ The reviewed manifest is a bootstrap input, not a self-updating baseline. Normal
 the delinker. Bootstrap targets carry a bootstrap provenance stamp and remain fixed until an
 explicit init.
 
-Candidate topology snapshots are promoted separately to the versioned
-`config/delink_data_topology.tsv`, `config/delink_contributions.tsv`, and the exact partition in
-`config/retail_coverage.tsv`. An explicit
+Candidate topology is generated from source DATA definitions plus the only versioned supplement,
+`config/delink_data_supplemental.tsv`. The combined symbol/section manifests, contribution replay,
+and exact coverage partition live under `build/gen`. An explicit
 `homm2 data-topology regenerate` delinks into a temporary directory, verifies every owner object,
 and replaces `build/delink` only after success. Its canonical stamp hashes all committed configs,
 the retail EXE, synthetic delinker-input PDB, and delinker executable. Normal commands refuse a
 stale canonical stamp and instruct the user to regenerate; they never rewrite configs or targets.
-The versioned `config/delink_unresolved_data.tsv` is the only range in which strict partial
-regeneration may retain legacy PDB fallback. `homm2 data-topology finalize` requires that inventory
-and every machine-readable coverage diagnostic to reach zero.
+There is no canonical unresolved-data fallback. `homm2 data-topology finalize` requires every
+machine-readable symbol, section, contribution, and coverage diagnostic to reach zero.
 
 The delinker manifest and parser are project-neutral. Only the HoMM2 adapter knows
 about NB09 and `required_initialized_storage.tsv`, so another reconstruction project

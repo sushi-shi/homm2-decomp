@@ -250,6 +250,7 @@ class DataTopologyCensusTest(unittest.TestCase):
             _coff(root / "target/A.c.obj", sections, symbols)
             (root / "src").mkdir()
             (root / "src/A.cpp").write_text(
+                "#define DATA(x)\n"
                 "DATA(0x00400100) int global;\n"
                 "DATA(0x00400104) static int\n"
                 "local;\n")
