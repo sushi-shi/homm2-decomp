@@ -80,8 +80,13 @@ The explicit topology commands are:
   candidate definitions are compiler-private derived topology. Rows in
   `config/delink_data_supplemental.tsv` are supplemental linker metadata only. A supplemental row which
   repeats a canonical DATA allocation, or disagrees with its owner/RVA/storage evidence, is a hard
-  error rather than a second definition. `--source-root`, `--supplemental`, and `--symbols` select
-  these inputs for another tree.
+  error rather than a second definition. Normal assembly preserves reviewed supplemental rows
+  byte-for-byte and fails when a compiler-local identity or candidate topology has gone stale; it
+  never repairs a row by section offset. Identity translation is available only through the
+  explicit `--migrate-from` path, whose versioned output must be reviewed before use.
+  Ordinary COFF symbols do not carry logical sizes, so a reviewed size may be smaller than the
+  physical span to the next symbol; assembly preserves that size and requires it to fit the span.
+  `--source-root`, `--supplemental`, and `--symbols` select these inputs for another tree.
 - `homm2 data-topology assemble` creates all HoMM2-specific Vostok inputs. It resolves every source
   definition to one exact candidate decorated symbol, COFF section ordinal and value, scope, and
   storage class. The generated `build/gen/delink_data_from_source.tsv` and versioned

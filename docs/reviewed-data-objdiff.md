@@ -48,6 +48,10 @@ the retail EXE, synthetic delinker-input PDB, and delinker executable. Normal co
 stale canonical stamp and instruct the user to regenerate; they never rewrite configs or targets.
 There is no canonical unresolved-data fallback. `homm2 data-topology finalize` requires every
 machine-readable symbol, section, contribution, and coverage diagnostic to reach zero.
+Normal assembly also never rewrites a reviewed supplemental identity from its section offset. A
+stale compiler-local name or topology is a hard error. The explicit migration path may generate a
+candidate translation, but that versioned diff must be reviewed and committed before it becomes a
+canonical input.
 
 Candidate discovery is separated from that canonical path. `homm2 data-topology propose` writes
 `build/gen/data_topology_review_queue.tsv`, whose non-manifest schema records individually evidenced
