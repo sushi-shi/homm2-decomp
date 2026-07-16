@@ -50,6 +50,14 @@ available, init assembles their exact generated union and reproduces the strict 
 
 The explicit topology commands are:
 
+- `homm2 data-topology audit` is the normal iterative entrypoint. It runs Ninja's parallel,
+  incremental `all` target to refresh candidate COFFs, assembles the canonical source-DATA plus
+  reviewed-supplement inputs, derives the review queue once, and refreshes whole-image coverage.
+  It never regenerates or replaces target objects. `--jobs N` controls Ninja parallelism;
+  `--strict` fails while any symbol group, section assignment, or coverage diagnostic remains.
+  After a source/header edit perturbs MSVC compiler-local numbering,
+  `--migrate-identities` updates the reviewed names only when section ordinal/offset, storage,
+  alignment, scope, and extent remain invariant; structural changes still fail and require review.
 - `homm2 data-topology census` compares every configured candidate object with its fixed delinked
   target and writes `build/gen/data_topology_census.json`. It treats symbol names and complete COFF
   topology records as multisets, so duplicated target symbols remain visible. `missing` means an
