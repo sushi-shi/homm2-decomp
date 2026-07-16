@@ -67,7 +67,7 @@ int combatManager::ViewSpells(int)
         switch (m_selectedSpell) {
     case SPELL_EARTHQUAKE:
         if (m_combatTowns[COMBAT_DEFENDER_SIDE] == 0) {
-            NormalDialog("An earthquake will do you no good in this battle.",
+            NormalDialog("An earthquake will do you no good unless there are town walls to damage.",
                          NORMAL_DIALOG_INFO, NORMAL_DIALOG_NO_VALUE,
                          NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_NO_RESOURCE, 0,
                          NORMAL_DIALOG_NO_RESOURCE, 0,
@@ -100,7 +100,7 @@ check_elemental:
         }
         if (m_armyCount[m_currentSide] >= SPELL_ELEMENTAL_ARMY_LIMIT) {
             sprintf(gText,
-                    "You already have %d creatures in your army.  You cannot summon more.",
+                    "You already have %d creatures groups in combat and cannot add any more.",
                     m_armyCount[m_currentSide]);
             NormalDialog(gText, NORMAL_DIALOG_INFO, NORMAL_DIALOG_NO_VALUE,
                          NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_NO_RESOURCE, 0,
@@ -110,7 +110,7 @@ check_elemental:
         }
         if (!SpaceForElementalExists()) {
             sprintf(gText,
-                    "There is no open space adjacent to your hero to summon an elemental to.");
+                    "There is no open space adjacent to your hero to summon an Elemental to.");
             NormalDialog(gText, NORMAL_DIALOG_INFO, NORMAL_DIALOG_NO_VALUE,
                          NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_NO_RESOURCE, 0,
                          NORMAL_DIALOG_NO_RESOURCE, 0,
@@ -148,7 +148,7 @@ set_action:
     case SPELL_MIRROR_IMAGE:
         if (m_armyCount[m_currentSide] >= SPELL_ELEMENTAL_ARMY_LIMIT) {
             sprintf(gText,
-                    "You already have %d creatures in your army.  You cannot create a mirror image.",
+                    "You already have %d creatures groups in combat and cannot add any more.",
                     m_armyCount[m_currentSide]);
             NormalDialog(gText, NORMAL_DIALOG_INFO, NORMAL_DIALOG_NO_VALUE,
                          NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_NO_RESOURCE, 0,
@@ -253,9 +253,9 @@ int HandleCastSpell(tag_message &message)
                 if (gpCombatManager->m_selectedSpell == SPELL_TELEPORT &&
                     bInTeleportGetDest) {
                     gpCombatManager->CombatMessage(
-                        "Invalid Teleport Destination.", 1, 0, 0);
+                        "Invalid Teleport Destination", 1, 0, 0);
                 } else {
-                    gpCombatManager->CombatMessage("Select Spell Target.", 1, 0,
+                    gpCombatManager->CombatMessage("Select Spell Target", 1, 0,
                                                    0);
                 }
             } else {
@@ -788,7 +788,8 @@ void combatManager::CastSpell(int spell, int targetHex, int castByCreature, int 
                                      m_heroes[1 - m_currentSide]);
             coldRayArmyName_f = target_i->m_quantity < 2 ? gArmyNames[target_i->m_monsterType]
                                                      : gArmyNamesPlural[target_i->m_monsterType];
-            sprintf(gText, "The cold ray does %d damage to the %s.", damage_m, coldRayArmyName_f);
+            sprintf(gText, "The cold ray does %d\n damage to the %s.", damage_m,
+                coldRayArmyName_f);
             CombatMessage(gText, 1, 1, 0);
             DoBlast(targetHex, spell);
             target_i->SpellEffect(gsSpellInfo[SPELL_COLD_RAY].combatEffect, 0, 0);
@@ -805,7 +806,7 @@ void combatManager::CastSpell(int spell, int targetHex, int castByCreature, int 
                                      m_heroes[1 - m_currentSide]);
             magicArrowArmyName_n = target_i->m_quantity < 2 ? gArmyNames[target_i->m_monsterType]
                                                         : gArmyNamesPlural[target_i->m_monsterType];
-            sprintf(gText, "The magic arrow does %d damage to the %s.", damage_m,
+            sprintf(gText, "The magic arrow does %d\n damage to the %s.", damage_m,
                     magicArrowArmyName_n);
             CombatMessage(gText, 1, 1, 0);
             missileIcon_p = gpResourceManager->GetIcon("keep.icn");
@@ -834,7 +835,7 @@ void combatManager::CastSpell(int spell, int targetHex, int castByCreature, int 
                                      m_heroes[1 - m_currentSide]);
             lightningArmyName_d = target_i->m_quantity < 2 ? gArmyNames[target_i->m_monsterType]
                                                        : gArmyNamesPlural[target_i->m_monsterType];
-            sprintf(gText, "The lightning bolt does %d damage to the %s.", damage_m,
+            sprintf(gText, "The lightning bolt does %d\n damage to the %s.", damage_m,
                     lightningArmyName_d);
             CombatMessage(gText, 1, 1, 0);
             DoBolt(1, castX, castY, target_i->MidX(), target_i->MidY(), 150, 100, 9, 2, 301,
@@ -2280,22 +2281,23 @@ void combatManager::ChainLightning(int targetHex, int spellPower)
 // @match-note 94.56%: The complete three-phase vapor mask and cleanup CFG agree. Retail
 // stores the initial extent height, then replaces it with a stripe count based on
 // the scaled first Y, 5 * (giMinExtentY / 5); both operations are preserved.
-// Retail has a 0x30 frame and 31 relocations versus ours 0x28 and 29,
-// with no wrong external target. Manual range review identifies the two
-// target-only relocations as local allocator line records, not calls or globals.
-// The first normalized residual is that BaseAlloc source-line expression,
-// followed by stripe address evaluation order. Tried extent initialization
-// before/after palette assignment and semantic slot suffixes. Revisit for
-// source-line identity and slot shaping.
+// Retail has a 0x30 frame versus ours 0x28. All 31 relocations now agree after
+// recovering the 0x09dc source-line owner and its +9/+0x38 allocator offsets.
+// The first normalized residual is stripe address evaluation order. Tried
+// extent initialization before/after palette assignment and semantic slot
+// suffixes. Revisit for slot shaping.
 VA(0x00426bbb, 0x292)
 void combatManager::VaporizeCreature(int side, int armyIndex)
 {
+    DATA(0x004f04e4) static short vaporizeSourceLineBase =
+        SPELL_VAPORIZE_SOURCE_LINE_BASE;
     army *target = &m_armies[side][armyIndex];
     ResetLimitCreature();
     ++m_limitCreatureCount[side][armyIndex];
     gpCombatManager->DrawFrame(1, 1, 1, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
     gyModify = static_cast<signed char *>(
-        BaseAlloc(SPELL_MODIFIER_ROW_COUNT, SPELLS_SOURCE_FILE, 0));
+        BaseAlloc(SPELL_MODIFIER_ROW_COUNT, SPELLS_SOURCE_FILE,
+            vaporizeSourceLineBase + SPELL_VAPORIZE_ALLOC_LINE_OFFSET));
     memset(gyModify, 0, SPELL_MODIFIER_ROW_COUNT);
     int rowCount = giMaxExtentY - giMinExtentY + 1;
     target->m_palette = gyModify;
@@ -2344,7 +2346,8 @@ void combatManager::VaporizeCreature(int side, int armyIndex)
                                  SPELL_VANISH_END_DELAY));
     target->m_palette = 0;
     target->m_drawEnabled = 1;
-    BaseFree(gyModify, SPELLS_SOURCE_FILE, 0);
+    BaseFree(gyModify, SPELLS_SOURCE_FILE,
+        vaporizeSourceLineBase + SPELL_VAPORIZE_FREE_LINE_OFFSET);
     gyModify = 0;
     gpCombatManager->DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 }
@@ -2353,14 +2356,16 @@ void combatManager::VaporizeCreature(int side, int armyIndex)
 // both fade masks, draw, and cleanup CFG agree. The effect predicate matches
 // retail: phases outside the center band always draw, while center-band phases
 // skip only five distances. Restoring the otherwise-unused initial extent height
-// closed both missing extent-global targets. Retail has a 0x54 frame/68 relocs
-// versus ours 0x58/64; manual range review shows the four target-only entries are
-// local allocator line records and every external call/global agrees. The first
-// normalized residual is side/index multiplication order, followed by those
-// source-line identities. Tried both wave scalings and direct/pointer army access.
+// closed both missing extent-global targets. Retail has a 0x54 frame versus
+// ours 0x58. All 68 relocations now agree after recovering the 0x0a1b
+// source-line owner and its +0x2c/+0x2d/+0x8e/+0x8f allocator offsets. The
+// first normalized residual is side/index multiplication order. Tried both
+// wave scalings and direct/pointer army access.
 VA(0x00426e4d, 0x592)
 void combatManager::RippleCreature(int side, int armyIndex, int mode)
 {
+    DATA(0x004f0540) static short rippleSourceLineBase =
+        SPELL_RIPPLE_SOURCE_LINE_BASE;
     army *target = &m_armies[side][armyIndex];
     int phaseStep;
     int frameDelay;
@@ -2396,10 +2401,12 @@ void combatManager::RippleCreature(int side, int armyIndex, int mode)
 
     int extentHeight = giMaxExtentY - giMinExtentY + 1;
     gyModify = static_cast<signed char *>(
-        BaseAlloc(SPELL_MODIFIER_ROW_COUNT, SPELLS_SOURCE_FILE, 0));
+        BaseAlloc(SPELL_MODIFIER_ROW_COUNT, SPELLS_SOURCE_FILE,
+            rippleSourceLineBase + SPELL_RIPPLE_MODIFIER_ALLOC_LINE_OFFSET));
     float *wave = static_cast<float *>(
         BaseAlloc(sizeof(float) * SPELL_MODIFIER_ROW_COUNT,
-                  SPELLS_SOURCE_FILE, 0));
+                  SPELLS_SOURCE_FILE,
+                  rippleSourceLineBase + SPELL_RIPPLE_WAVE_ALLOC_LINE_OFFSET));
     memset(gyModify, 0, SPELL_MODIFIER_ROW_COUNT);
     int row;
     for (row = 0; row < SPELL_MODIFIER_ROW_COUNT; ++row) {
@@ -2484,8 +2491,10 @@ void combatManager::RippleCreature(int side, int armyIndex, int mode)
                                  SPELL_VANISH_END_DELAY));
     target->m_palette = 0;
     target->m_drawEnabled = 1;
-    BaseFree(gyModify, SPELLS_SOURCE_FILE, 0);
-    BaseFree(wave, SPELLS_SOURCE_FILE, 0);
+    BaseFree(gyModify, SPELLS_SOURCE_FILE,
+        rippleSourceLineBase + SPELL_RIPPLE_MODIFIER_FREE_LINE_OFFSET);
+    BaseFree(wave, SPELLS_SOURCE_FILE,
+        rippleSourceLineBase + SPELL_RIPPLE_WAVE_FREE_LINE_OFFSET);
     gyModify = 0;
     if (mode != SPELL_RIPPLE_MODE_DEATH_RIPPLE)
         gpCombatManager->DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
@@ -2706,7 +2715,8 @@ void combatManager::CastMassSpell(int spell, int spellPower)
                     m_armies[side_i][armyIndex_k].Damage(damage_c, COMBAT_HEX_EMPTY);
             }
         }
-        sprintf(gText, "The %s spell does %d damage", gSpellNames[spell], damage_c);
+        sprintf(gText, "The %s spell does %d damage\nto all undead creatures.",
+            gSpellNames[spell], damage_c);
         CombatMessage(gText, 1, 1, 0);
         break;
     }
@@ -2730,7 +2740,8 @@ void combatManager::CastMassSpell(int spell, int spellPower)
                     m_armies[side_i][armyIndex_k].Damage(damage_c, COMBAT_HEX_EMPTY);
             }
         }
-        sprintf(gText, "The Death spell does %d damage", damage_c);
+        sprintf(gText, "The Death spell does %d damage\nto all living creatures.",
+            damage_c);
         CombatMessage(gText, 1, 1, 0);
         break;
     }
@@ -3534,7 +3545,7 @@ void combatManager::ShowSpellMessage(int castByCreature, int spell,
         else if (spell == SPELL_CURSE)
             sprintf(message, "The Mummies' curse falls upon the %s!", targetName);
         else if (spell == SPELL_CREATURE_DISPEL)
-            sprintf(message, "The Archmages dispel all good spells", targetName);
+            sprintf(message, "The Archmages dispel all good spells\non your %s!", targetName);
         else {
             int unhandledSpell = 0;
             ++unhandledSpell;
@@ -3559,6 +3570,39 @@ void combatManager::ShowSpellMessage(int castByCreature, int spell,
     CombatMessage(message, 1, 1, 0);
 }
 
+// @data-layout-note
+// Fresh VC 4.2 storage contains 104 real definitions: 71 initialized owners
+// in a 0x7af-byte .data section and 33 constant-pool owners in a 0xb4-byte
+// .rdata section. Retail contributes 0x7b0 bytes at 0xf00b0..0xf0860 and
+// 0xb8 bytes at 0xeb150..0xeb208. All 104 logical extents are disjoint and
+// byte-exact. The only uncovered data bytes are alignment at 0xf04c5..0xf04c8,
+// 0xf04d7, 0xf04e6..0xf04e8, 0xf0542..0xf0544, and the 0xf085f tail byte;
+// rdata has four bytes of tail alignment. Candidate section SHA-256 values are
+// f1d571be911cbefa4a7e71a321c94eb2066288bf93972fed8b6ff79f2a196b85
+// for data and b34aa88d87447a6f3ecc02cc0ec32e87b57466a46817b252b16af407ca052173
+// for rdata.
+//
+// The 62 compiler-local data owners each have one zero-addend code reference,
+// and all 62 pair to exact retail targets. Sixty use equal-count function
+// sequences. CastMassSpell has one later candidate-only jump-table relocation;
+// before it, $SG37516 is bracketed by gSpellNames/gText at candidate
+// +0x3fb and retail +0x3f9 -> 0xf05f4, while $SG37532 is bracketed by gText
+// sites at candidate +0x5d6 and retail +0x5d0 -> 0xf062c.
+//
+// The rdata bijection uses 65 exact sites across 19 referenced owners, then
+// payload/extent compatibility uniquely forces the other 14; removing any
+// chosen edge prevents a perfect matching. Candidate pooling still combines
+// two byte-identical uses that retail splits: $T38049 maps to its unique pool
+// slot at 0xeb184 while ChainLightning refers to the equal value at 0xeb160,
+// and $T38127 maps to 0xeb200 while RippleCreature refers to the equal value at
+// 0xeb190. These are reference-pooling walls, not aliases or missing storage.
+//
+// Retail disassembly also proved the function-local source-line owners at
+// 0xf04e4 and 0xf0540 and all six offset uses. Exact owner payload comparison
+// recovered twelve incorrect user-visible literals, including allocator-path
+// line records, embedded damage-message newlines, mass-spell target text, and
+// Archmage target substitution. Do not restore the old strings or replace the
+// proven topology with synthetic aliases, padding owners, or cursor replay.
 // ---- globals (definitions, RVA order) ----
 DATA(0x004f00b0) int castX = 0;
 DATA(0x004f00b4) int castY = 0;
