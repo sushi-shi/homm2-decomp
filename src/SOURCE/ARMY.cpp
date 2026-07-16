@@ -1084,7 +1084,7 @@ void army::SpecialAttack(void)
         if (damage == -1) {
             sprintf(gText, "The mirror image is destroyed!");
         } else {
-            sprintf(gText, "%s %s %d %s, %d %s %s.",
+            sprintf(gText, "%s %s %d %s.\n%d %s %s.",
                 m_quantity > 1 ? gArmyNamesPlural[m_monsterType] :
                                  gArmyNames[m_monsterType],
                 m_quantity > 1 ? "do" : "does",
@@ -1222,7 +1222,7 @@ void army::DoHydraAttack(int)
     m_pendingAnimationSequence = ARMY_ATTACK_DELAY_NORMAL;
     gpSoundManager->MemorySample(m_samples[ARMY_SAMPLE_ATTACK]);
     if (totalKilled_7 > 0) {
-        sprintf(gText, "%s %s %d %s, %d %s %s.",
+        sprintf(gText, "%s %s %d %s.\n%d %s %s.",
             m_quantity > 1 ? gArmyNamesPlural[m_monsterType] : gArmyNames[m_monsterType],
             m_quantity > 1 ? "do" : "does",
             totalDamage_1,
@@ -3507,10 +3507,13 @@ int army::GetPowBaseY(void)
 }
 
 // ---- globals (definitions, RVA order) ----
-// @data-layout-note Retail .data is 0xf53c4+0x2f4 and places bSecondAttack at
-// +0xe4, after the first function literal pool. Candidate .data is 0x2f3 and
-// places this external definition at +0 while several later literals still
-// differ in spelling/order. Revisit with exact function literals; do not model
-// the 0xe4 prefix as invented storage.
+// @data-layout-note Retail .data is 0xf53c4+0x2f4: 58 exact literal payloads
+// plus bSecondAttack account for 59 allocations and all 61 HIGHLOW references.
+// Retail places bSecondAttack at +0xe4, while candidate COFF places it at +0;
+// this is allocation order, not missing storage. The sole uncovered retail byte
+// is terminal zero alignment at +0x2f3. Retail .rdata 0xeb5e0..0xeb650 matches
+// the complete candidate section (18 constants, 63 references), and .bss
+// 0x127eb4..0x127eb8 is exactly gbGenieHalf (3 references, addend zero). Do not
+// model the .data order or terminal alignment with aliases or invented padding.
 DATA(0x004f54a8) int bSecondAttack = 0;
 DATA(0x00527eb4) int gbGenieHalf;
