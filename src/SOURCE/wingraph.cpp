@@ -451,7 +451,7 @@ void DDSD(int error, char *file, int line)
     MessageBeep(0);
     MessageBeep(0);
     sprintf(gText,
-        "DirectDraw Error:\n\n  '%s'\n\n  File: '%s'\n\n  Line: %d",
+        "DirectDraw Error:\n\n  '%s'\n\n  File: '%s'\n  Line: %d",
         errorMessage0, file, line);
     LogStr(gText);
     ShutDown(gText);
@@ -885,7 +885,10 @@ void GetGraphicsInfo(void)
         giMainVideoModeHeight = GetDeviceCaps(screenDC, VERTRES);
         ReleaseDC(0, screenDC);
         if (giMainVideoModeColorDepth < WINGRAPH_COLOR_DEPTH)
-            ShutDown("Heroes II requires 256 color mode or higher.");
+            ShutDown("Heroes II requires 256 color mode or higher.\n\n"
+                "To change color mode, right click in an open area on the Windows 95 "
+                "background, choose 'Properties', then the 'Settings' tab, then change "
+                "the entry in the 'Color Palette Box'.");
     }
 }
 
@@ -1047,6 +1050,33 @@ int SetGraphicsType(int graphicsType)
     return 1;
 }
 
+// @data-layout-note
+// Fresh VC 4.2 storage has 113 definitions: 106 initialized owners in a
+// 0xe58-byte .data section and seven source-defined owners in a 0x4d4-byte
+// .bss section. Retail contributes 0xe58 bytes at 0xf1288..0xf20e0 and 0x4d8
+// zero-fill bytes at 0x125148..0x125620. The initialized allocation order
+// differs because the candidate groups the twelve explicit line-number
+// statics first, but every one of the 113 logical owner extents is disjoint
+// and has exact retail payload. The twelve shorts each leave two zero
+// alignment bytes in retail. Zero-fill has only the real four-byte hole at
+// 0x12516c and four-byte tail alignment at 0x12561c.
+//
+// All 71 compiler-local initialized owners have exactly one zero-addend code
+// reference. Function-relative relocation pairing proves all 71 retail owner
+// RVAs, while another 505 known owner/addend pairs anchor the sequences. Every
+// containing function has equal candidate/retail DIR32 counts except
+// SetGraphicsType: its first 29 sites align, including $SG33754 at retail site
+// +0xdb -> 0xf2088 and $SG33759 at +0x1a2 -> 0xf20b4. Retail's final three
+// sites (+0x23c, +0x259, +0x273) are unrelated text/search-array targets.
+//
+// The payload audit also recovered two real source errors: DDSD has one
+// newline, not two, between its File and Line fields, and the color-depth
+// shutdown message includes the complete Windows 95 instructions. The latter
+// expands $SG33695 from 0x30 to the retail 0xe0 bytes and accounts for the
+// former 0xb0 gap. Candidate initialized-section SHA-256 is
+// 5ef4b5f038b2c91e98bbc71294a6f418f2b74fd357543b8a9158cb538fc0e5c6;
+// the aggregate retail hash differs only because of the proven owner order.
+// Do not add aliases, padding owners, or synthetic storage for these gaps.
 // ---- globals (definitions, RVA order) ----
 DATA(0x004f1288) int gbWinGAttached = 1;
 DATA(0x004f128c) int gbDDrawAttached = 0;
