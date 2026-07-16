@@ -281,7 +281,8 @@ def relocation_addend_map(relocations):
             for symbol, addends in grouped.items()}
 
 
-def compare_function_reloc_addends(base_relocs, target_relocs):
+def compare_function_reloc_addends(base_relocs, target_relocs,
+                                    function_symbol=None):
     """Return raw-symbol addend differences for one function."""
     base = relocation_addend_map(base_relocs)
     target = relocation_addend_map(target_relocs)
@@ -293,12 +294,21 @@ def compare_function_reloc_addends(base_relocs, target_relocs):
             continue
         missing = tuple(sorted((Counter(expected) - Counter(actual)).elements()))
         excess = tuple(sorted((Counter(actual) - Counter(expected)).elements()))
+        if symbol == function_symbol:
+            classification = "code-local"
+        elif not expected or not actual:
+            classification = "one-sided"
+        elif set(expected) != set(actual):
+            classification = "value-set"
+        else:
+            classification = "count-only"
         differences.append({
             "symbol": symbol,
             "target": expected,
             "base": actual,
             "missing": missing,
             "excess": excess,
+            "classification": classification,
         })
     return differences
 
@@ -701,7 +711,7 @@ def review_addends(scope=None):
     prefix = scope.rstrip("/") + "/" if scope else None
     report = json.load(open("build/objdiff/report.json"))
     output = {
-        "schema": 1,
+        "schema": 2,
         "scope": scope or "all",
         "compared_functions": 0,
         "mismatched_functions": 0,
@@ -735,7 +745,7 @@ def review_addends(scope=None):
                 })
                 continue
             differences = compare_function_reloc_addends(
-                base_functions[name], target_functions[name])
+                base_functions[name], target_functions[name], name)
             if differences:
                 output["functions"].append({
                     "unit": unit,
@@ -746,6 +756,23 @@ def review_addends(scope=None):
                 })
 
     output["mismatched_functions"] = len(output["functions"])
+    difference_counts = Counter(
+        difference["classification"]
+        for function in output["functions"]
+        for difference in function["differences"])
+    value_mismatch_functions = {
+        (function["unit"], function["function"])
+        for function in output["functions"]
+        for difference in function["differences"]
+        if difference["classification"] == "value-set"
+    }
+    output["difference_rows"] = {
+        "value_set": difference_counts["value-set"],
+        "count_only": difference_counts["count-only"],
+        "one_sided": difference_counts["one-sided"],
+        "code_local": difference_counts["code-local"],
+    }
+    output["value_mismatch_functions"] = len(value_mismatch_functions)
     output_path = Path("build/gen/function_reloc_addends.json")
     output_path.parent.mkdir(parents=True, exist_ok=True)
     temporary = output_path.with_suffix(".tmp.%d" % os.getpid())
@@ -759,14 +786,24 @@ def review_addends(scope=None):
                 function["base_present"], function["target_present"]))
             continue
         for difference in function["differences"]:
+            if difference["classification"] != "value-set":
+                continue
             print("  %s  %s: %s target=%s base=%s missing=%s excess=%s" % (
                 function["unit"], function["function"], difference["symbol"],
                 difference["target"], difference["base"],
                 difference["missing"], difference["excess"]))
-    print("reloc addends: %d function(s) compared, %d mismatch(es), "
-          "%d missing object(s); report=%s" % (
-              output["compared_functions"], output["mismatched_functions"],
-              len(output["missing_objects"]), output_path))
+    print("reloc addends: %d function(s) compared, %d value-set row(s) in "
+          "%d function(s), %d count-only row(s), %d one-sided row(s), "
+          "%d code-local row(s), "
+          "%d total mismatched function(s), %d missing object(s); report=%s" % (
+              output["compared_functions"],
+              output["difference_rows"]["value_set"],
+              output["value_mismatch_functions"],
+              output["difference_rows"]["count_only"],
+              output["difference_rows"]["one_sided"],
+              output["difference_rows"]["code_local"],
+              output["mismatched_functions"], len(output["missing_objects"]),
+              output_path))
     return 1 if output["functions"] or output["missing_objects"] else 0
 
 def main():

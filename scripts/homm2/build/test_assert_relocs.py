@@ -178,6 +178,7 @@ class CoffAddendTest(unittest.TestCase):
         self.assertEqual(len(differences), 1)
         self.assertEqual(differences[0]["missing"], (0x30,))
         self.assertEqual(differences[0]["excess"], (0x1C,))
+        self.assertEqual(differences[0]["classification"], "value-set")
 
     def test_addend_comparison_catches_missing_relocation_name(self):
         differences = compare_function_reloc_addends(
@@ -185,6 +186,22 @@ class CoffAddendTest(unittest.TestCase):
         self.assertEqual(differences[0]["symbol"], "?callee@@YIXXZ")
         self.assertEqual(differences[0]["missing"], (0,))
         self.assertEqual(differences[0]["excess"], ())
+        self.assertEqual(differences[0]["classification"], "one-sided")
+
+    def test_addend_comparison_separates_count_only_difference(self):
+        differences = compare_function_reloc_addends(
+            [("DIR32", GCONFIG_SYMBOL, 0x30)],
+            [("DIR32", GCONFIG_SYMBOL, 0x30),
+             ("DIR32", GCONFIG_SYMBOL, 0x30)])
+        self.assertEqual(differences[0]["classification"], "count-only")
+
+    def test_addend_comparison_separates_function_local_difference(self):
+        function = "?Switch@@YIHH@Z"
+        differences = compare_function_reloc_addends(
+            [("DIR32", function, 0)],
+            [("DIR32", function, 0x20)],
+            function)
+        self.assertEqual(differences[0]["classification"], "code-local")
 
     def test_each_text_comdat_uses_its_own_implicit_addend(self):
         data = bytearray(0x8A)

@@ -10,12 +10,16 @@ Canonical target generation accepts reviewed disambiguation rows from
 `config/delink_reloc_aliases.tsv`:
 
 ```text
-function_rva  target_rva  owner  addend  occurrences  provenance
+function_rva  target_rva  site_rva  owner  addend  occurrences  provenance
 ```
 
-The key is the containing retail function plus the encoded target RVA. Vostok checks
-that the named owner exists, `owner RVA + addend == target RVA` with 32-bit wrapping,
-and the configured occurrence count matches the retail relocation sites. Reviewed
+The normal key is the containing retail function plus the encoded target RVA, with
+`site_rva=*`. When multiple relocations in that function encode the same address but
+need different COFF spellings, `site_rva` is the absolute retail RVA of the four-byte
+relocation field. An exact-site row overrides a matching wildcard row and must have
+one occurrence. Vostok checks that every numeric site lies inside the containing
+function, that the named owner exists, `owner RVA + addend == target RVA` with 32-bit
+wrapping, and that each selected row's configured occurrence count closes. Reviewed
 aliases take precedence over data-manifest ownership and nearest-symbol selection.
 
 The same manifest resolves ambiguous code aliases for decoded `REL32` calls and
