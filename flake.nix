@@ -43,7 +43,6 @@
         src = objdiff-src;
         patches = [
           ./patches/objdiff-data-symbol-details.patch
-          ./patches/objdiff-data-alias-size.patch
         ];
         cargoHash = "sha256-KlNA9JleBd5TwpeVZrAhAL2nKyp28hKiQ59qyZq7nKg=";
         cargoBuildFlags = [ "-p" "objdiff-cli" ];
