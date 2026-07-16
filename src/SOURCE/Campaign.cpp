@@ -106,15 +106,15 @@ int game::HandleCampaignWin(void)
             PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4_END);
             m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][4] = 1;
             m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][11] = 1;
-            m_campaignAwards[CAMPAIGN_AWARD_DWARFBANE] = 1;
+            m_campaignAwards[CAMPAIGN_AWARD_NECROMANCER_GUILD] = 1;
             break;
         case 4:
             PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4B);
             PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4_END);
             m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][4] = 1;
             m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][11] = 1;
+            m_campaignAwards[CAMPAIGN_AWARD_DWARFBANE] = 1;
             m_campaignAwards[CAMPAIGN_AWARD_OGRE_ALLIANCE] = 1;
-            m_campaignAwards[CAMPAIGN_AWARD_DRAGON_ALLIANCE] = 1;
             break;
         case 5:
             if (m_campaignStartingSide == CAMPAIGN_ARCHIBALD)
@@ -131,7 +131,7 @@ int game::HandleCampaignWin(void)
         case 7:
             PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_7B);
             m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][7] = 1;
-            m_campaignAwards[CAMPAIGN_AWARD_NECROMANCER_GUILD] = 1;
+            m_campaignAwards[CAMPAIGN_AWARD_DRAGON_ALLIANCE] = 1;
             break;
         case 8:
             PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_8);
