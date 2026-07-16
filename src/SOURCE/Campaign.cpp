@@ -163,7 +163,7 @@ int game::HandleCampaignWin(void)
         m_campaignScenario = CAMPAIGN_NO_SCENARIO;
         for (sideIndex = 0; sideIndex < CAMPAIGN_SIDE_COUNT; ++sideIndex) {
             for (mapIndex = 0; mapIndex < CAMPAIGN_REGULAR_MAP_COUNT; ++mapIndex) {
-                if (m_campaignMapEnabled[sideIndex][mapIndex]) {
+                if (m_campaignMapEnabled[sideIndex][0[&mapIndex]]) {
                     gpGame->m_campaignScenarioBonus[sideIndex][mapIndex] = m_campaignScore;
                     if (m_campaignScenario == CAMPAIGN_NO_SCENARIO) {
                         m_campaignType = static_cast<unsigned char>(sideIndex);
