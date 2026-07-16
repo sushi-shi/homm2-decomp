@@ -14,6 +14,28 @@
     },
     {
       "unit": "SOURCE/ADVMGR",
+      "function": "?DoVisions@advManager@@QAEHPAVhero@@@Z",
+      "source_hash": "5ec4eee3332f",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.98485,
+      "after": 99.98485,
+      "note": "All relocation-masked bytes and 42 effective targets align; only compiler-local string and float identities remain."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?HeroQuickView@advManager@@QAEXHHHH@Z",
+      "source_hash": "aada01a6d3be",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 2,
+      "before": 99.79162,
+      "after": 99.79162,
+      "note": "Complete frame CFG and 109 relocs; commutative loop order and constant-folding residuals resist bounded steering."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
       "function": "?Main@advManager@@UAEHAAUtag_message@@@Z",
       "source_hash": "9e6f9cde9deb",
       "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
@@ -47,6 +69,17 @@
     },
     {
       "unit": "SOURCE/ADVMGR",
+      "function": "?SaveAdventureBorder@advManager@@QAEXXZ",
+      "source_hash": "34598b85aa6b",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.80232,
+      "after": 100.0,
+      "note": "Deterministic local-name bucket correction restores all three retail stack slots; function is exact."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
       "function": "?TownQuickView@advManager@@QAEXHHHH@Z",
       "source_hash": "4e7e3b2af55d",
       "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
@@ -55,6 +88,17 @@
       "before": 99.907234,
       "after": 99.99727,
       "note": "Full-body re-audit confirms only eight commutative row-count load-order bytes; frame CFG tail and 102 relocations agree."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?UpdBottomViewNewTurn@advManager@@QAEHXZ",
+      "source_hash": "fa80c3cc15ee",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.80531,
+      "after": 99.80531,
+      "note": "Complete CFG and 45 relocs; retail has one unexplained unreferenced frame word with no source-supported local."
     },
     {
       "unit": "SOURCE/ADVMGR",
@@ -88,6 +132,17 @@
       "before": 99.97175,
       "after": 99.97175,
       "note": "Relocation-masked code is exact and all 30 effective targets agree; only folded relocation identity remains."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?ViewPuzzle@advManager@@QAEXXZ",
+      "source_hash": "8208b0271937",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 99.80503,
+      "after": 99.80503,
+      "note": "Exact frame slots and 54 relocs; one commutative compare load order remains after reversed relation was byte-neutral."
     },
     {
       "unit": "SOURCE/CURSOR",
