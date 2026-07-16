@@ -257,8 +257,8 @@ void heroWindow::RemoveWidget(class widget *w)
 {
     if (w == 0)
         return;
-    // Retail call VA 0x004cf51e resolves to CodeView widget::Close at 0x004dded0. The delinked
-    // relocation calls it empty_stub; both retail and candidate Close bodies are the same lone C3.
+    // Retail call VA 0x004cf51e resolves to CodeView widget::Close at 0x004dded0;
+    // both retail and candidate Close bodies are the same lone C3.
     w->Close();
     if (m_widgetListTail == w) {
         m_widgetListTail = w->m_prev;

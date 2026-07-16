@@ -525,9 +525,8 @@ void heroWindowManager::SaveFizzleSource(int x, int y, int width, int height)
     }
 }
 
-// @early-stop: retail is the one byte `ret` at delinked object +0xaa8, followed
-// only by alignment NOPs and carrying no relocations; the delinker names the
-// COMDAT-folded symbol empty_stub. This empty body emits the same `c3` byte.
+// @early-stop: retail is the named one-byte `ret` at delinked object +0xaa8,
+// followed only by alignment NOPs and carrying no relocations.
 VA(0x004cb1d0, 0x1)
 void CreateFizzleTables(void) {}
 
@@ -650,15 +649,13 @@ void heroWindowManager::ReleaseFizzleSource(void)
     m_fizzleSource = 0;
 }
 
-// @early-stop: retail is the one byte `ret` at delinked object +0xecc, followed
-// only by alignment NOPs and carrying no relocations; the delinker names the
-// COMDAT-folded symbol empty_stub. This empty body emits the same `c3` byte.
+// @early-stop: retail is the named one-byte `ret` at delinked object +0xecc,
+// followed only by alignment NOPs and carrying no relocations.
 VA(0x004cb610, 0x1)
 void CreateColorTables(void) {}
 
-// @early-stop: retail is the one byte `ret` at delinked object +0xed0, followed
-// only by alignment NOPs and carrying no relocations; the delinker names the
-// COMDAT-folded symbol empty_stub. This empty body emits the same `c3` byte.
+// @early-stop: retail is the named one-byte `ret` at delinked object +0xed0,
+// followed only by alignment NOPs and carrying no relocations.
 VA(0x004cb620, 0x1)
 void CreateColorLookupTables(void) {}
 
