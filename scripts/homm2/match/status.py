@@ -14,7 +14,7 @@ When the function's OWN source changes, its hash changes and max% resets to the 
 Compiler-generated functions without their own source block remain in live objdiff/exact counts,
 but have no meaningful retained source-hash maximum and are not written to the baseline.
 """
-import csv, hashlib, json, os, re, shutil, subprocess, sys, tempfile
+import csv, hashlib, json, os, re, shutil, struct, subprocess, sys, tempfile
 from pathlib import Path
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[3]))
 RM_START, RM_END = "<!-- match-score:start -->", "<!-- match-score:end -->"
@@ -148,6 +148,129 @@ def _generate_report(objdiff_dir, report_path, executable):
             pass
 
 
+def _trusted_incremental_base_units(report_path, stamp_path, inputs):
+    """Return the prior report and base-only changed units, or fail closed."""
+    report = _read_json(report_path)
+    stamp = _read_json(stamp_path)
+    if not _valid_report(report) or not isinstance(stamp, dict):
+        return None, None
+    if stamp.get("schema") != REPORT_CACHE_SCHEMA:
+        return None, None
+    try:
+        if stamp.get("report_sha256") != _sha256(report_path):
+            return None, None
+    except OSError:
+        return None, None
+
+    previous = stamp.get("inputs")
+    if not isinstance(previous, dict):
+        return None, None
+    if (previous.get("objdiff_config_sha256") != inputs.get("objdiff_config_sha256") or
+            previous.get("objdiff_cli") != inputs.get("objdiff_cli")):
+        return None, None
+
+    old_objects = previous.get("objects")
+    new_objects = inputs.get("objects")
+    if not isinstance(old_objects, list) or not isinstance(new_objects, list):
+        return None, None
+    if len(old_objects) != len(new_objects):
+        return None, None
+
+    changed = []
+    for old, new in zip(old_objects, new_objects):
+        identity = ("unit", "role", "reference")
+        if any(old.get(key) != new.get(key) for key in identity):
+            return None, None
+        if old.get("sha256") == new.get("sha256"):
+            continue
+        if new.get("role") != "base":
+            return None, None
+        changed.append(new.get("unit"))
+    if not changed:
+        return None, None
+    return report, sorted(set(changed))
+
+
+def _generate_partial_report(objdiff_dir, executable, units):
+    objdiff_dir = Path(objdiff_dir).resolve()
+    config = json.loads((objdiff_dir / "objdiff.json").read_text())
+    selected = set(units)
+    partial_units = []
+    for unit in config.get("units", []):
+        if unit.get("name") not in selected:
+            continue
+        unit = dict(unit)
+        for role in ("base", "target"):
+            key = role + "_path"
+            unit[key] = str((objdiff_dir / unit[key]).resolve())
+        partial_units.append(unit)
+    if {unit.get("name") for unit in partial_units} != selected:
+        raise RuntimeError("incremental objdiff units are absent from objdiff.json")
+    config["units"] = partial_units
+
+    with tempfile.TemporaryDirectory(prefix=".partial-report.", dir=objdiff_dir) as directory:
+        project = Path(directory)
+        _atomic_write(project / "objdiff.json",
+                      (json.dumps(config, indent=2) + "\n").encode("utf-8"))
+        return _generate_report(project, project / "report.json", executable)
+
+
+def _float32(value):
+    return struct.unpack("f", struct.pack("f", float(value)))[0]
+
+
+def _aggregate_measures(units):
+    def integer(measures, key):
+        return int(measures.get(key, 0) or 0)
+
+    total_code = sum(integer(unit.get("measures", {}), "total_code") for unit in units)
+    matched_code = sum(integer(unit.get("measures", {}), "matched_code") for unit in units)
+    total_data = sum(integer(unit.get("measures", {}), "total_data") for unit in units)
+    matched_data = sum(integer(unit.get("measures", {}), "matched_data") for unit in units)
+    total_functions = sum(integer(unit.get("measures", {}), "total_functions")
+                          for unit in units)
+    matched_functions = sum(integer(unit.get("measures", {}), "matched_functions")
+                            for unit in units)
+    fuzzy_numerator = sum(
+        float(unit.get("measures", {}).get("fuzzy_match_percent", 0) or 0) *
+        integer(unit.get("measures", {}), "total_code")
+        for unit in units)
+
+    def percent(matched, total, empty=0.0):
+        return _float32(100.0 * matched / total) if total else empty
+
+    return {
+        "fuzzy_match_percent": _float32(fuzzy_numerator / total_code) if total_code else 0.0,
+        "total_code": str(total_code),
+        "matched_code": str(matched_code),
+        "matched_code_percent": percent(matched_code, total_code),
+        "total_data": str(total_data),
+        "matched_data": str(matched_data),
+        "matched_data_percent": percent(matched_data, total_data, 100.0),
+        "total_functions": total_functions,
+        "matched_functions": matched_functions,
+        "matched_functions_percent": percent(matched_functions, total_functions),
+        "total_units": len(units),
+    }
+
+
+def _merge_partial_report(previous, partial, unit_order, changed_units):
+    changed = set(changed_units)
+    replacements = {unit.get("name"): unit for unit in partial.get("units", [])}
+    if set(replacements) != changed:
+        raise RuntimeError("incremental objdiff report returned unexpected units")
+    by_name = {unit.get("name"): unit for unit in previous.get("units", [])}
+    by_name.update(replacements)
+    if set(by_name) != set(unit_order):
+        raise RuntimeError("incremental objdiff report does not cover objdiff.json")
+    merged_units = [by_name[name] for name in unit_order]
+    return {
+        "version": partial.get("version", previous.get("version")),
+        "units": merged_units,
+        "measures": _aggregate_measures(merged_units),
+    }
+
+
 def load_report(force_refresh=False):
     from homm2.build.reviewed_data import ensure_reviewed_targets
     reviewed_targets_refreshed = ensure_reviewed_targets()
@@ -164,7 +287,17 @@ def load_report(force_refresh=False):
     if cached is not None:
         return cached
 
-    report = _generate_report(od, rep, executable)
+    report = None
+    if not force_refresh and not reviewed_targets_refreshed:
+        previous, changed_units = _trusted_incremental_base_units(rep, stamp, inputs)
+        if previous is not None:
+            partial = _generate_partial_report(od, executable, changed_units)
+            config = json.loads((od / "objdiff.json").read_text())
+            unit_order = [unit.get("name") for unit in config.get("units", [])]
+            report = _merge_partial_report(previous, partial, unit_order, changed_units)
+            _atomic_write(rep, json.dumps(report, separators=(",", ":")).encode("utf-8"))
+    if report is None:
+        report = _generate_report(od, rep, executable)
     final_inputs = _report_inputs_identity(od, executable)
     if final_inputs != inputs:
         raise RuntimeError("objdiff report inputs changed during generation")
