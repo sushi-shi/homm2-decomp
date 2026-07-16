@@ -191,6 +191,70 @@ def _reviewed_group_allocations(unit, storage, definitions, reviewed):
     return rows
 
 
+def _validate_constrained_reviewed_group(unit, storage, definitions, coff,
+                                         allocations, intervals, read_bytes):
+    """Validate a complete remaining-slot/equivalence-class reconstruction."""
+    constrained = [
+        row for row in allocations if row.provenance.startswith((
+            "candidate-coff-remaining-slot-bijection",
+            "candidate-coff-equivalence-class:",
+        ))
+    ]
+    if not constrained:
+        return
+    merged = _merge_adjacent_intervals(intervals)
+    if len(merged) != 1:
+        raise ValueError(
+            "constrained reviewed group %s:%s requires one contiguous retail interval" %
+            (unit, storage))
+    start, end = merged[0]
+    by_name = {row["name"]: row for row in definitions}
+    covered = bytearray(end - start)
+    payloads = {}
+    for allocation in allocations:
+        if not start <= allocation.rva < allocation.rva + allocation.size <= end:
+            raise ValueError(
+                "constrained reviewed allocation %s:%s escapes 0x%x..0x%x" %
+                (unit, allocation.name, start, end))
+        first = allocation.rva - start
+        last = first + allocation.size
+        if any(covered[first:last]):
+            raise ValueError(
+                "constrained reviewed allocation %s:%s overlaps another owner" %
+                (unit, allocation.name))
+        covered[first:last] = b"\1" * allocation.size
+        candidate = by_name[allocation.name]
+        section = coff.sections[candidate["section"] - 1]
+        offset = section.raw_offset + candidate["section_offset"]
+        payload = bytes(coff.data[offset:offset + allocation.size])
+        payloads[allocation.name] = payload
+        if storage != "bss" and payload != read_bytes(
+                allocation.rva, allocation.size):
+            raise ValueError(
+                "constrained reviewed allocation %s:%s payload differs at 0x%x" %
+                (unit, allocation.name, allocation.rva))
+    if storage != "bss":
+        retail = read_bytes(start, end - start)
+        nonzero_gap = next((index for index, value in enumerate(retail)
+                            if not covered[index] and value), None)
+        if nonzero_gap is not None:
+            raise ValueError(
+                "constrained reviewed group %s:%s leaves nonzero retail byte 0x%x uncovered" %
+                (unit, storage, start + nonzero_gap))
+    equivalence = defaultdict(list)
+    for allocation in allocations:
+        if allocation.provenance.startswith("candidate-coff-equivalence-class:"):
+            equivalence[allocation.provenance].append(allocation)
+    for provenance, members in equivalence.items():
+        if len(members) < 2:
+            raise ValueError("equivalence class %s has fewer than two owners" % provenance)
+        identities = {(row.size, payloads[row.name]) for row in members}
+        if len(identities) != 1:
+            raise ValueError(
+                "equivalence class %s does not have identical logical payloads" %
+                provenance)
+
+
 def _virtual_section_bytes(data, sections, rva, size):
     """Read PE section payload using loader zero-fill semantics."""
     for start, span, raw_size, raw in sections:
@@ -679,9 +743,13 @@ def derive_allocations(base_dir=REPO / "build/objdiff/base",
 
         for storage in sorted({row["storage"] for row in definitions}):
             source_group = [row for row in definitions if row["storage"] == storage]
+            intervals = contributions.get((unit, storage), [])
             reviewed_group = _reviewed_group_allocations(
                 unit, storage, source_group, reviewed)
             if reviewed_group is not None:
+                _validate_constrained_reviewed_group(
+                    unit, storage, source_group, coff, reviewed_group,
+                    intervals, read_bytes)
                 allocations.extend(reviewed_group)
                 stats.closed_groups += 1
                 stats.mapped_definitions += len(reviewed_group)
@@ -698,7 +766,6 @@ def derive_allocations(base_dir=REPO / "build/objdiff/base",
                 if source_row["name"] in partial_reviewed:
                     row["size"] = partial_reviewed[source_row["name"]].size
                 analysis_group.append(row)
-            intervals = contributions.get((unit, storage), [])
             if partial_reviewed:
                 mapped, translation_causes, translation_details = (
                     None, ("partial_reviewed_group",),
