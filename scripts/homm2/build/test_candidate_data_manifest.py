@@ -5,6 +5,7 @@ from homm2.build.candidate_data_manifest import (
     REPO,
     _contains,
     _function_relocation_offsets_align,
+    _function_relocation_proofs,
     _payload_rvas,
     _reviewed_group_allocations,
     candidate_definitions,
@@ -23,6 +24,32 @@ class CandidateDataManifestTest(unittest.TestCase):
             candidate, 0x4000, [0x4010, 0x4028]))
         self.assertFalse(_function_relocation_offsets_align(
             candidate, 0x4000, [0x4010, 0x402C]))
+
+    def test_partial_function_pairs_only_identical_relocation_sites(self):
+        from types import SimpleNamespace
+
+        local_one = SimpleNamespace(name="$SG1")
+        anchor = SimpleNamespace(name="?known@@3HA")
+        shifted_local = SimpleNamespace(name="$SG2")
+        candidate = [
+            (0x10, local_one, 0),
+            (0x20, anchor, 4),
+            (0x30, shifted_local, 0),
+        ]
+        retail_values = {
+            0x4010: 0x400000 + 0x700,
+            0x4020: 0x400000 + 0x204,
+            0x4034: 0x400000 + 0x900,
+        }
+        result = _function_relocation_proofs(
+            candidate, 0x4000, sorted(retail_values), retail_values.__getitem__,
+            0x400000, {"$SG1": {}, "$SG2": {}}, {"?known@@3HA": 0x200})
+        proposed, anchors, paired, offsets_align, valid = result
+        self.assertEqual(proposed, [("$SG1", 0x700)])
+        self.assertEqual(anchors, 1)
+        self.assertEqual(paired, 2)
+        self.assertFalse(offsets_align)
+        self.assertTrue(valid)
 
     def test_replay_payload_requires_a_unique_retail_occurrence(self):
         coff = SimpleNamespace(
