@@ -44,22 +44,23 @@ int CheckSumIsDemoOK(char *)
     return 1;
 }
 
-// @match-note 99.79%: semantics, CFG, the 0x134 frame, and all 4/4 external
-// relocations agree. Retail's declared 0xbb-byte range differs only at the
-// pooled "BROKENA" string identity after normalization; this build retains an
-// additional dead-code exit sequence beyond that comparison range. Revisit the
-// unreachable return shape after SOURCE reaches 95% globally.
+// @early-stop
+// @early-stop-reloc-only
+// All relocation-masked bytes in the retail extent, the 0x134 frame/slots,
+// CFG, and four ordered effective targets agree. Only the pooled "BROKENA"
+// and _strcmpi compiler/import aliases differ.
 VA(0x0048c9bb, 0xbb)
 int ShowThisMapGame(char *filename)
 {
     return 1;
 
     char mapName[300];
+    int ix;
     strcpy(mapName, filename);
     mapName[8] = 0;
-    for (int i = 0; i < 8; ++i) {
-        if (mapName[i] == '.') {
-            mapName[i] = 0;
+    for (ix = 0; ix < 8; ++ix) {
+        if (mapName[ix] == '.') {
+            mapName[ix] = 0;
         }
     }
     if (_strcmpi(mapName, "BROKENA") == 0 && CheckSumIsDemoOK(filename)) {
@@ -74,16 +75,15 @@ int ShowThisMap(char *)
     return 1;
 }
 
-// @match-note retained 95.32%, live 94.22%: both enumeration passes,
-// allocation, sorted insertion, extensions, and map-header population are
-// complete, with all 53 external relocations agreeing. The retail 0x65c frame
-// and every aggregate/local slot now agree: fullPath/mapHeader/findData at
-// -0x658/-0x52c/-0x378, extension/fileName at -0x238/-0x164, and the reused
-// index at -0x37c. The first residual is the map-size comparison: ours emits a
-// local jne, while retail emits je followed by two continuation jumps. The old
-// negative predicate retained the maximum; the combined positive predicate is
-// structurally closer, while splitting it into nested positive arms fell to
-// 89.81%. Revisit only in the post-95 CFG/continuation phase.
+// @semantic
+// Both enumeration passes, allocation, sorted insertion, extensions, and
+// map-header population are complete; the 0x65c frame, aggregate/local slots,
+// CFG, and all 53 ordered effective relocation targets agree. The first
+// executable residual is the map-size comparison: base emits a local jne,
+// while retail emits je followed by two continuation jumps. Negative and
+// combined-positive predicates were tried; splitting nested positive arms
+// lowered the match materially. Revisit if REQUEST TU state or inline
+// continuation normalization changes.
 VA(0x0048ca91, 0x7c1)
 int fileRequester::InitializeFiles(char *directory, char *pattern, int countOnly)
 {
@@ -303,10 +303,11 @@ void fileRequester::Close(void)
     m_active = 0;
 }
 
-// @early-stop 99.92%: normalized instructions, the 0x44 frame and all local
-// slots are exact; all 47 external relocations agree. Objdiff's remaining
-// bytes are only delinked pooled-string symbol identities (requests.bin,
-// request.bin, scrollcn.icn and dialog labels), not code or target changes.
+// @early-stop
+// @early-stop-reloc-only
+// All relocation-masked bytes, the 0x44 frame/slots, CFG, and 47 ordered
+// effective targets agree. Only pooled-string and _strcmpi import aliases
+// differ.
 VA(0x0048d5e1, 0x466)
 int fileRequester::Open(int id)
 {
@@ -331,10 +332,10 @@ int fileRequester::Open(int id)
     tag_message message;
     message.type = 0x200;
     message.payload.widget.command = 3;
-    unsigned char okEnabled;
-    int i;
+    unsigned char okEnabled3;
+    int fileIndex;
     if (m_mode == FILE_REQUESTER_SAVE_GAME) {
-        okEnabled = 1;
+        okEnabled3 = 1;
         strcpy(m_filename, gpGame->m_saveName);
         char *dot = FindLastToken(m_filename, '.');
         if (dot != 0) {
@@ -347,25 +348,26 @@ int fileRequester::Open(int id)
         sprintf(gText, "File to Save:");
         message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
-        for (i = 0; i < m_fileCount; ++i) {
-            if (_strcmpi(m_fileNames[i].text, m_filename) == 0) {
-                m_selectedIndex = i;
+        for (fileIndex = 0; fileIndex < m_fileCount; ++fileIndex) {
+            if (_strcmpi(m_fileNames[fileIndex].text, m_filename) == 0) {
+                m_selectedIndex = fileIndex;
             }
         }
     } else {
-        okEnabled = 0;
+        okEnabled3 = 0;
         if (m_mode == FILE_REQUESTER_MAP_GAME) {
             char mapName[12];
-            i = 0;
+            fileIndex = 0;
             memset(mapName, 0, 9);
-            while (i < 8 && gMapName[i] != 0 && gMapName[i] != '.') {
-                mapName[i] = gMapName[i];
-                ++i;
+            while (fileIndex < 8 && gMapName[fileIndex] != 0 &&
+                   gMapName[fileIndex] != '.') {
+                mapName[fileIndex] = gMapName[fileIndex];
+                ++fileIndex;
             }
-            for (i = 0; i < m_fileCount; ++i) {
-                if (_strcmpi(m_fileNames[i].text, mapName) == 0) {
-                    m_selectedIndex = i;
-                    okEnabled = 1;
+            for (fileIndex = 0; fileIndex < m_fileCount; ++fileIndex) {
+                if (_strcmpi(m_fileNames[fileIndex].text, mapName) == 0) {
+                    m_selectedIndex = fileIndex;
+                    okEnabled3 = 1;
                 }
             }
         }
@@ -382,17 +384,17 @@ int fileRequester::Open(int id)
     m_window->BroadcastMessage(message);
     Update(0);
     if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
-        okEnabled = 1;
+        okEnabled3 = 1;
     }
     gpWindowManager->AddWindow(m_window, -1, 1);
     if (m_fileCount == 0) {
-        okEnabled = 0;
+        okEnabled3 = 0;
     }
     if (m_mode == FILE_REQUESTER_SAVE_GAME && _strcmpi(m_filename, "NEWGAME") == 0 &&
         m_selectedIndex == FILE_REQUESTER_SELECTION_NONE) {
-        okEnabled = 1;
+        okEnabled3 = 1;
     }
-    SetOK(okEnabled);
+    SetOK(okEnabled3);
     m_messageMask = 0x4000;
     m_priority = id;
     m_active = 1;
@@ -426,17 +428,15 @@ void fileRequester::SetOK(int enabled)
     m_window->BroadcastMessage(message);
 }
 
-// @match-note retained/live 95.11%: key, click, hover/help, filters, filename,
-// knob, list selection, saved-game validation and executive exit are complete.
-// All primary retail slots agree: this/accept/index at -0x3fc/-0x16c/-0x170,
-// edit buffer -0x160, names -0x2a0/-0x3f4, help -0x2a4 and message -0x2c0.
-// This build's 0x41c frame is short only one compiler-generated FP temporary
-// below this versus retail 0x420; adding a source local shifts this and is not
-// valid. The first code residual is the key-up selected/top compare polarity.
-// Empty positive <= and >= spellings both fell to 95.08%; moving click behind
-// hover/help fell to 88.20%. Explicit jump-table-excluded object-range review
-// finds all 76 external relocations agreeing; only local tables/pooled strings
-// differ. Revisit the switch/FP compiler shape after global SOURCE reaches 95%.
+// @semantic
+// Key, click, hover/help, filters, filename editing, knob/list selection,
+// saved-game validation, and executive exit are complete. The primary retail
+// slots and all 76 jump-table-excluded external relocations agree. Base's 0x41c
+// frame lacks one retail compiler-generated FP temporary below this; adding a
+// source local shifts real slots and is invalid. The first executable residual
+// is the key-up selected/top comparison polarity. Empty positive <= and >=
+// arms and moving click behind hover/help were rejected by lower scores.
+// Revisit if switch/FP lowering or REQUEST TU state changes.
 VA(0x0048daec, 0x11ae)
 int fileRequester::Main(struct tag_message &message)
 {
@@ -854,37 +854,42 @@ int fileRequester::Main(struct tag_message &message)
     return FILE_REQUESTER_MAIN_CONTINUE;
 }
 
-// @early-stop 99.82%: all 228 normalized instructions and the 0x94 frame/local
-// slots are exact, and all 36 external relocations agree. The residual is only
-// delinked local-symbol identity after relocation masking; no opcode, operand,
-// stack displacement, call target or external data target differs.
+// @early-stop
+// @early-stop-reloc-only
+// All 228 relocation-masked instructions, the 0x94 frame/slots, CFG, and 36
+// ordered effective targets agree. Only the FP-adjust compiler alias differs.
 VA(0x0048ec9a, 0x2e8)
 void fileRequester::DoKnob(void)
 {
     int oldTopIndex = m_topIndex;
-    double gutterStep = fGutterTravelLength / (m_fileCount - (iMaxListSize - 1));
-    int mouseX;
-    int mouseY;
-    gpMouseManager->MouseCoords(mouseX, mouseY);
-    int mouseOffset = mouseY - m_scrollKnob->m_y;
+    double gutterStep9 =
+        fGutterTravelLength / (m_fileCount - (iMaxListSize - 1));
+    int mouseX7;
+    int mouseY5;
+    int newTopIndex;
+    gpMouseManager->MouseCoords(mouseX7, mouseY5);
+    int mouseOffset2 = mouseY5 - m_scrollKnob->m_y;
 
     gpInputManager->Flush();
-    tag_message message = gpInputManager->GetEvent();
-    while (message.type != 0x10 && message.type != 0x40) {
-        if (message.type == 4) {
-            if (static_cast<float>(message.payload.mouse.y) < mouseOffset + fGutterMinY) {
-                message.payload.mouse.y = static_cast<int>(mouseOffset + fGutterMinY);
+    tag_message dragMessage = gpInputManager->GetEvent();
+    while (dragMessage.type != 0x10 && dragMessage.type != 0x40) {
+        if (dragMessage.type == 4) {
+            if (static_cast<float>(dragMessage.payload.mouse.y) <
+                mouseOffset2 + fGutterMinY) {
+                dragMessage.payload.mouse.y =
+                    static_cast<int>(mouseOffset2 + fGutterMinY);
             }
-            if (mouseOffset + fGutterTravelLength + fGutterMinY <
-                static_cast<float>(message.payload.mouse.y)) {
-                message.payload.mouse.y = static_cast<int>(mouseOffset + fGutterTravelLength +
-                                                  fGutterMinY);
+            if (mouseOffset2 + fGutterTravelLength + fGutterMinY <
+                static_cast<float>(dragMessage.payload.mouse.y)) {
+                dragMessage.payload.mouse.y = static_cast<int>(
+                    mouseOffset2 + fGutterTravelLength + fGutterMinY);
             }
-            gpMouseManager->Main(message);
-            m_scrollKnob->m_y = message.payload.mouse.y - mouseOffset;
+            gpMouseManager->Main(dragMessage);
+            m_scrollKnob->m_y =
+                dragMessage.payload.mouse.y - mouseOffset2;
             if (m_fileCount > iMaxListSize) {
-                int newTopIndex = static_cast<int>((m_scrollKnob->m_y - fGutterMinY) /
-                                                   gutterStep);
+                newTopIndex = static_cast<int>(
+                    (m_scrollKnob->m_y - fGutterMinY) / gutterStep9);
                 if (newTopIndex != oldTopIndex) {
                     if (newTopIndex > m_fileCount - iMaxListSize) {
                         newTopIndex = m_fileCount - iMaxListSize;
@@ -894,7 +899,8 @@ void fileRequester::DoKnob(void)
                     }
                     m_topIndex = newTopIndex;
                     Update(0);
-                    m_scrollKnob->m_y = message.payload.mouse.y - mouseOffset;
+                    m_scrollKnob->m_y =
+                        dragMessage.payload.mouse.y - mouseOffset2;
                     m_window->DrawWindow(1, 0, 0x7fff);
                     oldTopIndex = newTopIndex;
                 } else {
@@ -905,30 +911,28 @@ void fileRequester::DoKnob(void)
             }
         }
         Process1WindowsMessage();
-        message = gpInputManager->GetEvent();
+        dragMessage = gpInputManager->GetEvent();
     }
     m_scrollKnob->m_flags &= ~1;
     Update(1);
 }
 
-// @match-note retained 99.65%, live 99.53%: behavior and CFG are complete; all
-// 71 external relocations agree. The 0x1bc frame and accessed slots now match,
-// including message -0x19c, index -0x1a0, state -0x180 and this -0x1b4; retail
-// also reserves the evidenced 380-byte local storage and unused eight-byte
-// gutter state. The first code residual is operand load order for the filter
-// equality, followed by the equivalent list-bound comparison. Reversing both
-// source comparisons did not change those instructions. The remaining diff is
-// pooled %s/float-constant identity. Revisit register steering after 95%.
+// @early-stop
+// @early-stop-reloc-only
+// All relocation-masked instructions, the 0x1bc frame/slots, CFG, and 71
+// ordered effective targets agree. Only pooled %s identities and the FP-adjust
+// compiler alias differ.
 VA(0x0048ef82, 0xc42)
 void fileRequester::Update(int drawWindow)
 {
     tag_message broadcastMessage;
     char localStorage[FILE_REQUESTER_UPDATE_STORAGE_SIZE];
-    int localState = 0;
+    int localState;
     int i;
     double gutterStepCount;
-    double gutterState;
+    double gutterState0;
     broadcastMessage.type = 0x200;
+    localState = 0;
 
     if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP) {
         for (i = 0; i < FILE_REQUESTER_MAP_SIZE_COUNT;
