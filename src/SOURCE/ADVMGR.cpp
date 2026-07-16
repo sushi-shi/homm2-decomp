@@ -316,7 +316,7 @@ VA(0x00457028, 0x40a)
 void advManager::Close(void)
 {
     DATA(0x004f59a8) static short s_closeBorderFreeLineBase =
-        ADVMGR_BORDER_FREE_LINE_BASE;
+        ADVMGR_CLOSE_BORDER_FREE_LINE_BASE;
 
     ClearBottomView();
     gpMouseManager->SetPointer(-1);
@@ -4725,7 +4725,7 @@ VA(0x00463dd6, 0x11f)
 void advManager::RedrawAdvScreen(int update, int freeBorder)
 {
     DATA(0x004f6590) static short s_redrawBorderFreeLineBase =
-        ADVMGR_BORDER_FREE_LINE_BASE;
+        ADVMGR_REDRAW_BORDER_FREE_LINE_BASE;
 
     if (!bShowIt)
         return;
@@ -7062,7 +7062,7 @@ VA(0x00469976, 0x145)
 void advManager::SaveAdventureBorder(void)
 {
     DATA(0x004f688c) static short s_saveBorderAllocLineBase =
-        ADVMGR_BORDER_FREE_LINE_BASE;
+        ADVMGR_SAVE_BORDER_ALLOC_LINE_BASE;
 
     if (m_adventureBorder != 0)
         return;
