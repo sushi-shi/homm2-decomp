@@ -379,7 +379,7 @@ def main(argv=None):
     queue.add_argument("--limit", type=int, default=0, help="maximum rows; zero means all")
     queue.add_argument(
         "--exact-max-only", action="store_true",
-        help="show only live residuals whose current source hash previously reached 100%",
+        help="show only live residuals whose current source hash previously reached 100%%",
     )
     summary = subparsers.add_parser("summary", help="print exact checked/remaining counts")
     summary.add_argument("--module", help="restrict to a module such as SOURCE or BASE")
