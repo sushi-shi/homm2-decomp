@@ -14,6 +14,7 @@ import os
 import shutil
 import subprocess
 import tempfile
+from collections import Counter
 from pathlib import Path
 
 from homm2.build.link_exe import (
@@ -32,10 +33,8 @@ from homm2.build.contribution_manifest import (
 )
 from homm2.build.candidate_data_manifest import derive_allocations
 from homm2.build.candidate_data_manifest import (
-    OUTPUT as CANDIDATE_PROPOSAL,
     DIAGNOSTICS_OUTPUT as CANDIDATE_DIAGNOSTICS,
     diagnostics_bytes as candidate_diagnostics_bytes,
-    manifest_bytes as candidate_manifest_bytes,
 )
 from homm2.build.audit_text_coverage import main as audit_text_coverage
 from homm2.build.whole_image_coverage import (
@@ -50,8 +49,11 @@ from homm2.build.data_manifest_adapter import (
     SECTION_MANIFEST as CANONICAL_SECTION_MANIFEST,
     SOURCE_MANIFEST as DATA_SOURCE_MANIFEST,
     SUPPLEMENTAL as CANONICAL_SUPPLEMENTAL,
+    SYMBOL_HEADER as DATA_SYMBOL_HEADER,
     build_manifests as build_data_manifests,
+    validate_symbol_rows,
 )
+from homm2.build.data_topology_census import _fallback_kind
 
 
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[3]))
@@ -68,6 +70,12 @@ COVERAGE_DIAGNOSTICS = REPO / "build/gen/retail_coverage_diagnostics.json"
 TEXT_COVERAGE_PROPOSAL = REPO / "build/gen/retail_text_coverage.tsv"
 CANONICAL_COVERAGE = COVERAGE_PROPOSAL
 CANONICAL_COVERAGE_DIAGNOSTICS = COVERAGE_DIAGNOSTICS
+REVIEW_QUEUE = REPO / "build/gen/data_topology_review_queue.tsv"
+REVIEW_QUEUE_HEADER = (
+    "row_kind", "name", "object", "rva", "size", "storage", "alignment",
+    "section_offset", "scope", "evidence", "proof_count",
+    "group_blockers", "group_contradictions", "candidate_provenance",
+)
 
 
 def _digest(path):
@@ -261,6 +269,133 @@ def _atomic_write(path, payload):
         raise
 
 
+def _read_symbol_manifest(path, label):
+    path = Path(path)
+    if not path.is_file():
+        raise RuntimeError("%s manifest is missing: %s" % (label, path))
+    with path.open(newline="", encoding="utf-8") as stream:
+        reader = csv.DictReader(
+            (line for line in stream if not line.lstrip().startswith("#")),
+            delimiter="\t")
+        if tuple(reader.fieldnames or ()) != DATA_SYMBOL_HEADER:
+            raise RuntimeError("%s manifest has an invalid header: %s" % (label, path))
+        rows = list(reader)
+    try:
+        validate_symbol_rows(rows, label)
+    except (KeyError, TypeError, ValueError) as error:
+        raise RuntimeError("%s manifest is invalid: %s" % (label, error)) from error
+    return rows
+
+
+def _canonical_union_rows(source_manifest=None, supplemental=None,
+                          combined_manifest=None):
+    source_manifest = source_manifest or DATA_SOURCE_MANIFEST
+    supplemental = supplemental or CANONICAL_SUPPLEMENTAL
+    combined_manifest = combined_manifest or CANONICAL_MANIFEST
+    source_rows = _read_symbol_manifest(source_manifest, "source DATA")
+    supplemental_rows = _read_symbol_manifest(supplemental, "reviewed supplemental")
+    combined_rows = _read_symbol_manifest(combined_manifest, "canonical combined")
+
+    def row_tuple(row):
+        return tuple(row[key] for key in DATA_SYMBOL_HEADER)
+
+    expected = Counter(row_tuple(row) for row in [*source_rows, *supplemental_rows])
+    actual = Counter(row_tuple(row) for row in combined_rows)
+    if actual != expected:
+        raise RuntimeError(
+            "canonical data manifest is not the exact source DATA plus reviewed "
+            "supplemental union; run `homm2 data-topology assemble`")
+    return combined_rows
+
+
+def _review_evidence(provenance):
+    return {
+        "candidate-coff-section-translation": "exact-section-translation",
+        "candidate-coff-reloc-bijection": "aligned-relocation-bijection",
+    }.get(provenance, provenance)
+
+
+def _synthetic_candidate_identity(name):
+    lower = name.lower()
+    return (_fallback_kind(lower) is not None or lower.startswith((
+        "unresolved_", "fallback_", "__homm2_data_alias$")))
+
+
+def review_queue_bytes(allocations, diagnostics=(), source_manifest=None,
+                       supplemental=None, combined_manifest=None):
+    """Return non-canonical real candidate rows as a review-only queue."""
+    canonical = _canonical_union_rows(
+        source_manifest, supplemental, combined_manifest)
+    canonical_identities = {(row["object"], row["name"]) for row in canonical}
+    proposed = [(allocation, (), ()) for allocation in allocations]
+    proposed.extend(
+        (allocation, diagnostic.causes, diagnostic.details)
+        for diagnostic in diagnostics
+        for allocation in diagnostic.proposed_allocations)
+    queue = []
+    queued_identities = set()
+    already_canonical = 0
+    synthetic_filtered = 0
+    for allocation, blockers, contradictions in proposed:
+        identity = (allocation.object_name, allocation.name)
+        if identity in canonical_identities:
+            already_canonical += 1
+            continue
+        if _synthetic_candidate_identity(allocation.name):
+            synthetic_filtered += 1
+            continue
+        if identity in queued_identities:
+            continue
+        queued_identities.add(identity)
+        queue.append({
+            "row_kind": "allocation-symbol",
+            "name": allocation.name,
+            "object": allocation.object_name,
+            "rva": "0x%x" % allocation.rva,
+            "size": "0x%x" % allocation.size,
+            "storage": allocation.storage,
+            "alignment": "0x%x" % allocation.alignment,
+            "section_offset": "0x%x" % allocation.section_offset,
+            "scope": allocation.scope,
+            "evidence": _review_evidence(allocation.provenance),
+            "proof_count": str(allocation.proof_count),
+            "group_blockers": json.dumps(list(blockers), separators=(",", ":")),
+            "group_contradictions": json.dumps(
+                list(contradictions), separators=(",", ":")),
+            "candidate_provenance": allocation.provenance,
+        })
+    lines = [
+        "# Review queue only; never a delinker input and never auto-promoted.",
+        "\t".join(REVIEW_QUEUE_HEADER),
+    ]
+    for row in sorted(queue, key=lambda value: (
+            value["object"], value["storage"], int(value["section_offset"], 0),
+            value["name"])):
+        lines.append("\t".join(row[key] for key in REVIEW_QUEUE_HEADER))
+    stats = {
+        "candidate_rows": len(proposed),
+        "canonical_rows": len(canonical),
+        "already_canonical": already_canonical,
+        "review_queue_rows": len(queue),
+        "synthetic_filtered": synthetic_filtered,
+    }
+    return ("\n".join(lines) + "\n").encode("utf-8"), stats
+
+
+def _build_reviewed_canonical_manifests(strict):
+    """Assemble canonical rows only from source DATA and the reviewed supplement."""
+    supplemental_rows = _read_symbol_manifest(
+        CANONICAL_SUPPLEMENTAL, "reviewed supplemental")
+    synthetic = [row["name"] for row in supplemental_rows
+                 if _synthetic_candidate_identity(row["name"])]
+    if synthetic:
+        raise RuntimeError(
+            "reviewed supplemental contains forbidden synthetic identities: %s" %
+            ", ".join(sorted(synthetic)))
+    return build_data_manifests(
+        supplemental=CANONICAL_SUPPLEMENTAL, migrate_from=None, strict=strict)
+
+
 def refresh_required(current, expected):
     return current is None or any(current.get(key) != value
                                   for key, value in expected.items())
@@ -326,14 +461,13 @@ def ensure_reviewed_targets(delinker=None):
 
 
 def propose_candidate_topology():
-    """Write a disposable partial proposal and diagnostics under build/gen."""
-    payload, stats, diagnostics = candidate_manifest_bytes()
-    _atomic_write(CANDIDATE_PROPOSAL, payload)
+    """Write review-only candidate rows and diagnostics under build/gen."""
+    allocations, stats, diagnostics = derive_allocations()
+    queue, queue_stats = review_queue_bytes(allocations, diagnostics)
+    _atomic_write(REVIEW_QUEUE, queue)
     _atomic_write(CANDIDATE_DIAGNOSTICS,
                   candidate_diagnostics_bytes(stats, diagnostics))
-    allocations, _stats, _diagnostics = derive_allocations()
-    _build_coverage_proposal(allocations)
-    return stats, diagnostics
+    return stats, diagnostics, queue_stats
 
 
 def _build_coverage_proposal(allocations):
@@ -371,7 +505,7 @@ def promote_canonical_topology(require_all=False):
     blockers = [*group_diagnostics, *coverage_diagnostics]
     if require_all and blockers:
         return stats, blockers
-    build_data_manifests(strict=require_all)
+    _build_reviewed_canonical_manifests(strict=require_all)
     contribution_manifest = contribution_manifest_bytes()
     _atomic_write(CANONICAL_CONTRIBUTION_MANIFEST, contribution_manifest)
     return stats, blockers
@@ -379,7 +513,7 @@ def promote_canonical_topology(require_all=False):
 
 def regenerate_canonical_targets(delinker=None):
     """Regenerate canonical inputs and atomically replace targets."""
-    build_data_manifests(strict=True)
+    _build_reviewed_canonical_manifests(strict=True)
     _atomic_write(CANONICAL_CONTRIBUTION_MANIFEST, contribution_manifest_bytes())
     allocations, _stats, group_diagnostics = derive_allocations()
     _coverage, _padding, coverage_diagnostics = _build_coverage_proposal(allocations)
@@ -467,10 +601,12 @@ def main(argv=None):
     elif args.record_current:
         record_current_targets()
     elif args.propose:
-        stats, diagnostics = propose_candidate_topology()
-        print("candidate data: %d/%d definitions in %d closed groups; %d open groups" % (
+        stats, diagnostics, queue = propose_candidate_topology()
+        print("candidate data: %d/%d definitions in %d closed groups; %d open groups; "
+              "%d review rows (%d already canonical, %d synthetic filtered)" % (
             stats.mapped_definitions, stats.candidate_definitions,
-            stats.closed_groups, stats.open_groups))
+            stats.closed_groups, stats.open_groups, queue["review_queue_rows"],
+            queue["already_canonical"], queue["synthetic_filtered"]))
         return 0
     elif args.promote or args.finalize:
         stats, diagnostics = promote_canonical_topology(require_all=args.finalize)

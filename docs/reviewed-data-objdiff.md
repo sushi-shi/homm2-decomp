@@ -49,6 +49,14 @@ stale canonical stamp and instruct the user to regenerate; they never rewrite co
 There is no canonical unresolved-data fallback. `homm2 data-topology finalize` requires every
 machine-readable symbol, section, contribution, and coverage diagnostic to reach zero.
 
+Candidate discovery is separated from that canonical path. `homm2 data-topology propose` writes
+`build/gen/data_topology_review_queue.tsv`, whose non-manifest schema records individually evidenced
+real placements absent from the canonical union together with proof counts and the containing open
+group's blockers/contradictions. It writes no canonical or target artifact. Synthetic identities and
+unevidenced rows cannot enter the queue. Promote and regenerate never read it: a reviewed row becomes
+canonical only by reconstructing a source `DATA()` definition or by an explicit human edit to the
+versioned supplemental manifest followed by canonical assembly.
+
 The delinker manifest and parser are project-neutral. Only the HoMM2 adapter knows
 about NB09 and `required_initialized_storage.tsv`, so another reconstruction project
 can generate the same generic manifest from its own reviewed evidence. Per-symbol
