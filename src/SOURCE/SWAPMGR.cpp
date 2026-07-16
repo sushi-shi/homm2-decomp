@@ -247,8 +247,9 @@ void swapManager::DrawSelector(void)
 // +0x43c/+0x43d, +0x49b/+0x49c, +0x60b/+0x60c, and +0x7d9/+0x7da: retail's six
 // completed dialog/view arms jump directly to the shared post-command block,
 // while ours first reaches the matching case-local tail. An explicit shared goto
-// grew the case layout and shifted later relocations, so it was rejected. Revisit
-// after an earlier SWAPMGR/header change or new evidence for case-exit lowering.
+// grew the case layout and shifted later relocations, so it was rejected. Ten
+// bounded TU-state trials also failed to close the residual. Revisit after an
+// earlier SWAPMGR/header change or new evidence for case-exit lowering.
 VA(0x00454be3, 0xaf0)
 int swapManager::Main(tag_message &message)
 {
@@ -696,7 +697,7 @@ void swapManager::SwapMons(void)
 
     armyGroup *selectedArmy = &m_heroes[m_selectedSide]->m_army;
     armyGroup *targetArmy = &m_heroes[m_targetSide]->m_army;
-    if (selectedArmy->m_creatureTypes[m_selectedSlot] ==
+    if (0[&selectedArmy->m_creatureTypes[m_selectedSlot]] ==
         targetArmy->m_creatureTypes[m_targetSlot]) {
         if (selectedArmy->GetNumArmies() == 1)
             return;
