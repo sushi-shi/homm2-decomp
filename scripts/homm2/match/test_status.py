@@ -243,5 +243,98 @@ class BaselineTest(unittest.TestCase):
         self.assertEqual(block.count("0 / 1 (0.0%)"), 2)
 
 
+class SourceHashBoundaryTest(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.root = Path(self.temporary.name)
+        (self.root / "src/SOURCE").mkdir(parents=True)
+        (self.root / "include").mkdir()
+        generated = self.root / "build/gen"
+        generated.mkdir(parents=True)
+        (generated / "symbol_names.csv").write_text(
+            "0x1000,?First@@YAHXZ,SOURCE/UNIT,,func\n"
+            "0x1100,?Second@@YAHXZ,SOURCE/UNIT,,func\n"
+        )
+        self.source = self.root / "src/SOURCE/UNIT.cpp"
+        self.patch = mock.patch.object(status, "REPO", self.root)
+        self.patch.start()
+
+    def tearDown(self):
+        self.patch.stop()
+        self.temporary.cleanup()
+
+    @staticmethod
+    def _source(first_return="localValue + 1", second_return="2"):
+        return f'''#define BRACE_TEXT {{ ignored_by_lexer }}
+VA(0x00401000, 0x20)
+int First(void)
+{{
+    DATA(0x00500000) static int localValue = 1;
+    const char *markerText = "}} DATA(0x00500004)";
+    /* VA(0x00401100, 0x1) {{ }} */
+    if (localValue) {{
+VA(0x0040ffff, 0x1)
+        localValue++;
+    }}
+#ifdef KEEP_BODY_BALANCED
+    localValue += 0;
+#endif
+    return {first_return};
+}}
+
+VA(0x00401100, 0x10)
+int Second(void)
+{{
+    return {second_return};
+}}
+'''
+
+    def test_local_markers_and_nested_braces_stay_in_function_block(self):
+        blocks = list(status._source_function_blocks(self._source()))
+
+        self.assertEqual([va for va, _block in blocks], [0x00401000, 0x00401100])
+        self.assertIn("DATA(0x00500000)", blocks[0][1])
+        self.assertIn("#endif\n    return localValue + 1", blocks[0][1])
+        self.assertIn("return localValue + 1", blocks[0][1])
+        self.assertNotIn("int Second", blocks[0][1])
+        self.assertIn("return 2", blocks[1][1])
+
+    def test_file_scope_boundary_preserves_legacy_blank_line_surface(self):
+        text = '''VA(0x00401000, 0x1)
+int First(void)
+{
+    return 1;
+}
+
+
+DATA(0x00500000) int globalValue;
+'''
+
+        blocks = list(status._source_function_blocks(text))
+
+        self.assertEqual(blocks, [(0x00401000, ''' 0x1)
+int First(void)
+{
+    return 1;
+}
+''')])
+
+    def test_edit_after_local_data_changes_only_own_hash(self):
+        self.source.write_text(self._source())
+        before = status.source_hashes()
+        self.source.write_text(self._source(first_return="localValue + 2"))
+        after_first_edit = status.source_hashes()
+        self.source.write_text(self._source(
+            first_return="localValue + 2", second_return="3"))
+        after_second_edit = status.source_hashes()
+
+        first = ("SOURCE/UNIT", "?First@@YAHXZ")
+        second = ("SOURCE/UNIT", "?Second@@YAHXZ")
+        self.assertNotEqual(before[first], after_first_edit[first])
+        self.assertEqual(before[second], after_first_edit[second])
+        self.assertEqual(after_first_edit[first], after_second_edit[first])
+        self.assertNotEqual(after_first_edit[second], after_second_edit[second])
+
+
 if __name__ == "__main__":
     unittest.main()
