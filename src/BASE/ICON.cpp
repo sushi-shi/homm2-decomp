@@ -25,11 +25,13 @@
 VA(0x004c7a20, 0x67)
 icon::icon(unsigned long int id) : resource(1, id, 1, 0)
 {
+    DATA(0x0051e94c) static char allocationSourceFile[] =
+        "I:\\Projects\\Heroes\\Prog\\BASE\\ICON.CPP";
     gpResourceManager->PointToFile(id);
     m_frameCount = gpResourceManager->ReadWord();
     unsigned int len = gpResourceManager->ReadLong();
     m_data = static_cast<char *>(
-        H2_ALLOC(len, "I:\\Projects\\Heroes\\Prog\\BASE\\ICON.CPP", 0x12));
+        H2_ALLOC(len, allocationSourceFile, 0x12));
     gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(m_data), len);
 }
 
@@ -45,7 +47,9 @@ icon::icon(unsigned long int id) : resource(1, id, 1, 0)
 VA(0x004c7ad0, 0x21)
 icon::~icon()
 {
-    H2_FREE(m_data, "I:\\Projects\\Heroes\\Prog\\BASE\\ICON.CPP", 0x1a);
+    DATA(0x0051e974) static char destructionSourceFile[] =
+        "I:\\Projects\\Heroes\\Prog\\BASE\\ICON.CPP";
+    H2_FREE(m_data, destructionSourceFile, 0x1a);
 }
 
 VA(0x004c7b00, 0x44)
