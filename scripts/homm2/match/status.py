@@ -394,11 +394,14 @@ def _source_function_blocks(text):
     """Yield ``(absolute_va, block)`` using lexical top-level boundaries.
 
     Keep the historical hash surface: each block starts immediately after the
-    comma in its column-zero ``VA(...)`` marker and ends at the next top-level
-    VA/DATA/VTBL/section/#endif marker. Unlike the old regular-expression
-    split, markers inside a function body are not boundaries. This matters for
-    function-local ``DATA(...)`` definitions and remains robust in the presence
-    of nested blocks or marker-like text in comments and literals.
+    comma in its column-zero ``VA(...)`` marker. Its semantic extent ends at the
+    matched closing brace of the function body; only the contiguous legacy
+    whitespace after that brace is retained. Comments, directives, and audit
+    markers between neighboring functions therefore belong to neither hash.
+    The top-level boundary scan remains as the historical whitespace cap, while
+    a second lexical pass keeps function-local ``DATA(...)`` definitions,
+    preprocessor lines, nested blocks, and marker-like text inside literals or
+    comments in the owning function.
     """
     markers = []
     depth = 0
@@ -505,15 +508,112 @@ def _source_function_blocks(text):
         marker_start, block_start, absolute_va = marker
         if block_start is None:
             continue
-        block_end = markers[position + 1][0] if position + 1 < len(markers) else length
+        legacy_end = markers[position + 1][0] if position + 1 < len(markers) else length
+        block_end = _matched_function_end(text, block_start, legacy_end)
+        if block_end is None:
+            raise ValueError("VA(0x%x) has no lexically matched function body" % absolute_va)
         yield absolute_va, text[block_start:block_end]
 
 
+def _matched_function_end(text, block_start, legacy_end):
+    """Return the matched body end plus contiguous legacy trailing whitespace."""
+    depth = 0
+    body_started = False
+    state = "code"
+    at_line_start = False
+    index = block_start
+
+    while index < legacy_end:
+        char = text[index]
+        following = text[index + 1] if index + 1 < legacy_end else ""
+
+        if state == "line-comment":
+            if char == "\n":
+                state = "code"
+                at_line_start = True
+            index += 1
+            continue
+        if state == "block-comment":
+            if char == "*" and following == "/":
+                state = "code"
+                index += 2
+                at_line_start = False
+            else:
+                at_line_start = char == "\n"
+                index += 1
+            continue
+        if state in ("string", "character"):
+            delimiter = '"' if state == "string" else "'"
+            if char == "\\" and following:
+                at_line_start = following == "\n"
+                index += 2
+            else:
+                if char == delimiter:
+                    state = "code"
+                at_line_start = char == "\n"
+                index += 1
+            continue
+        if state == "preprocessor":
+            if char == "\\" and following == "\n":
+                index += 2
+                at_line_start = True
+            elif char == "\n":
+                state = "code"
+                at_line_start = True
+                index += 1
+            else:
+                index += 1
+            continue
+
+        if at_line_start:
+            line_end = text.find("\n", index, legacy_end)
+            if line_end < 0:
+                line_end = legacy_end
+            first = index
+            while first < line_end and text[first] in " \t":
+                first += 1
+            if first < line_end and text[first] == "#":
+                state = "preprocessor"
+                index = first + 1
+                at_line_start = False
+                continue
+        if char == "/" and following == "/":
+            state = "line-comment"
+            index += 2
+            at_line_start = False
+            continue
+        if char == "/" and following == "*":
+            state = "block-comment"
+            index += 2
+            at_line_start = False
+            continue
+        if char == '"':
+            state = "string"
+        elif char == "'":
+            state = "character"
+        elif char == "{":
+            body_started = True
+            depth += 1
+        elif char == "}" and body_started:
+            depth -= 1
+            if depth == 0:
+                end = index + 1
+                while end < legacy_end and text[end].isspace():
+                    end += 1
+                return end
+        at_line_start = char == "\n"
+        index += 1
+    return None
+
+
 def source_hashes():
-    """{(unit, function): 12-hex sha1 of that function's NORMALIZED source block}. A block runs from
-    its VA(...) marker to the next top-level VA/DATA/VTBL/section marker; names are normalized
-    (see _normalize) so editing one function changes only its own hash, and codegen-neutral
-    arg/member renames don't. Function-local audit markers remain part of the function block."""
+    """{(unit, function): 12-hex sha1 of its normalized, brace-bounded source body}.
+
+    Blocks begin inside ``VA(...)`` for historical compatibility and end after
+    the matched function brace plus legacy trailing whitespace. Names are
+    normalized by :func:`_normalize`, so codegen-neutral argument/member renames
+    do not perturb the hash.
+    """
     sym = _rva_to_sym(); cmap = _class_members()
     out = {}
     for cpp in sorted((REPO / "src").rglob("*.cpp")):
