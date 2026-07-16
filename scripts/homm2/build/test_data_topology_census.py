@@ -72,6 +72,40 @@ def _coff(path, sections, symbols, section_definitions=False):
 
 
 class DataTopologyCensusTest(unittest.TestCase):
+    def test_undefined_type_zero_is_classified_from_candidate_inventory(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            sections = [(".data", 4, DATA_FLAGS)]
+            _coff(root / "base/A.obj", sections, [
+                ("global_ref", 0, 0, 0, 2),
+                ("function_ref", 0, 0, 0x20, 2),
+            ])
+            _coff(root / "target/A.c.obj", sections, [
+                ("global_ref", 0, 0, 0, 2),
+                ("function_ref", 0, 0, 0, 2),
+                ("unclassified_ref", 0, 0, 0, 2),
+            ])
+            symbols = root / "symbols.csv"
+            symbols.write_text(
+                "rva,name,unit,size,kind\n"
+                "0x100,global_ref,A,0x4,data\n")
+
+            payload = build_census(
+                ["A"], root / "base", root / "target",
+                symbols_path=symbols)
+            row = payload["objects"][0]
+            self.assertTrue(row["symbol_topology_exact"])
+            self.assertEqual(row["counts"]["target_function_references"], 1)
+            self.assertEqual(row["counts"]["target_only_unclassified_undefined"], 1)
+            self.assertEqual(row["target_undefined_inventory"]["function"], [
+                {"name": "function_ref", "count": 1},
+            ])
+            self.assertEqual(
+                row["target_undefined_inventory"]["target_only_unclassified"], [
+                {"name": "unclassified_ref", "count": 1},
+                ])
+            self.assertEqual(payload["summary"]["canonical_hard_errors"], 1)
+
     def test_reports_multiplicity_and_topology_mismatch_classes(self):
         with TemporaryDirectory() as directory:
             root = Path(directory)
@@ -98,8 +132,14 @@ class DataTopologyCensusTest(unittest.TestCase):
                 ("const_001", 8, 3, 0, 2),
                 ("string_001", 12, 3, 0, 2),
             ])
+            symbols_path = root / "symbols.csv"
+            symbols_path.write_text(
+                "rva,name,unit,size,kind\n"
+                "0x80,state,SOURCE/Test,0x4,data\n"
+                "0x100,target_only,SOURCE/Test,0x4,data\n")
 
-            payload = build_census(["SOURCE/Test"], base, target)
+            payload = build_census(
+                ["SOURCE/Test"], base, target, symbols_path=symbols_path)
             row = payload["objects"][0]
             self.assertEqual(row["counts"]["name_common"], 5)
             self.assertEqual(row["counts"]["name_union"], 10)
@@ -186,6 +226,8 @@ class DataTopologyCensusTest(unittest.TestCase):
                 "--source-root", str(root / "src"),
                 "--supplemental", str(root / "missing.tsv"),
                 "--symbols", str(root / "missing.csv"),
+                "--source-manifest", str(root / "missing-source.tsv"),
+                "--data-manifest", str(root / "missing-data.tsv"),
                 "--output", str(output),
             ]
             self.assertEqual(main(args), 0)
@@ -205,6 +247,9 @@ class DataTopologyCensusTest(unittest.TestCase):
             units = root / "units.toml"
             units.write_text('[[unit]]\nunit = "A"\n')
             sections = [(".data", 8, DATA_FLAGS)]
+            (root / "symbols.csv").write_text(
+                "rva,name,unit,size,kind\n"
+                "0x100,shared,A,0x4,data\n")
             _coff(root / "base/A.obj", sections, [
                 ("shared", 0, 0, 0, 2),
             ])
@@ -217,7 +262,9 @@ class DataTopologyCensusTest(unittest.TestCase):
                 "--target-root", str(root / "target"),
                 "--source-root", str(root / "src"),
                 "--supplemental", str(root / "missing.tsv"),
-                "--symbols", str(root / "missing.csv"),
+                "--symbols", str(root / "symbols.csv"),
+                "--source-manifest", str(root / "missing-source.tsv"),
+                "--data-manifest", str(root / "missing-data.tsv"),
                 "--output", str(root / "census.json"),
                 "--strict",
             ]
@@ -243,7 +290,7 @@ class DataTopologyCensusTest(unittest.TestCase):
             sections = [(".data", 16, DATA_FLAGS)]
             symbols = [
                 ("?global@@3HA", 0, 1, 0, 2),
-                ("_local$S12", 4, 1, 0, 3),
+                ("?local@?1???func@@YIXXZ@4HA", 4, 1, 0, 3),
                 ("compiler_private", 8, 1, 0, 3),
             ]
             _coff(root / "base/A.obj", sections, symbols)
@@ -261,14 +308,22 @@ class DataTopologyCensusTest(unittest.TestCase):
                 "name\tobject\trva\tsize\tstorage\talignment\tsection_offset\t"
                 "scope\tprovenance\n"
                 "?global@@3HA\tA.c\t0x100\t0x4\tdata\t0x4\t0x0\texternal\ttest\n"
-                "_local$S12\tA.c\t0x108\t0x4\trdata\t0x4\t0x4\tlocal\ttest\n"
+                "?local@?1???func@@YIXXZ@4HA\tA.c\t0x108\t0x4\trdata\t0x4\t0x4\tlocal\ttest\n"
                 "compiler_private\tA.c\t0x200\t0x4\tdata\t0x4\t0x8\tlocal\ttest\n")
+            (root / "source-manifest.tsv").write_text(
+                "name\tobject\trva\tsize\tstorage\talignment\tsection_ordinal\t"
+                "section_offset\tscope\tprovenance\n"
+                "?global@@3HA\tA.c\t0x100\t0x4\tdata\t0x4\t1\t0x0\t"
+                "external\tsource-DATA\n"
+                "?local@?1???func@@YIXXZ@4HA\tA.c\t0x104\t0x4\tdata\t0x4\t"
+                "1\t0x4\tlocal\tsource-DATA\n")
 
             payload = build_census(
                 ["A"], root / "base", root / "target",
                 source_root=root / "src",
                 supplemental_path=root / "supplemental.tsv",
-                symbols_path=root / "symbols.csv")
+                symbols_path=root / "symbols.csv",
+                source_manifest_path=root / "source-manifest.tsv")
             provenance = payload["provenance"]
             self.assertEqual(provenance["summary"]["source_data_definitions"], 2)
             self.assertEqual(provenance["summary"]["candidate_data_covered"], 2)
