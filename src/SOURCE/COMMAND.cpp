@@ -3050,9 +3050,10 @@ void combatManager::ViewBallista(int quickView)
 // the private function ownership above. Static placement variants do not steer
 // this compiler allocation order, so do not restore external `const_<rva>`
 // identities or invent padding to reproduce it.
-// The open 0xf0884 and 0xf090c rows are the two identical Sphere of Negation
-// literals: both allocations are present in the byte-exact stripped payload, so
-// their `$SG` identity ambiguity is not missing storage.
+// The two identical Sphere of Negation literals are disambiguated by their
+// owning functions: ProcessCombatMsg relocation ordinal 42 targets 0xf0884,
+// while DoCommand ordinal 12 targets 0xf090c. Both functions have equal
+// candidate/retail DIR32 counts and both literal addends are zero.
 //
 // Retail zero-fill has 15 exact public DATA anchors over 0x1250b8..0x125110
 // (0x58 bytes); all 189 absolute text references to them are HIGHLOW relocations
