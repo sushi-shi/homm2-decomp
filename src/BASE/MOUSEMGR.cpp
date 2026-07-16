@@ -4,6 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <BASE/MOUSEMGR_TYPES.h>
 #include <BASE/mouseManager.h>
 #include <string.h>
 #include <stdio.h>
@@ -20,15 +21,254 @@
 #include <BASE/INPUTMGR.h>
 
 
-DATA(0x0051ef24) static char gDefaultCursorName[] = "";
-
-// ---- module-private synthetic globals (retail xref: single-module) ----
+// ---- zero-fill storage (retail RVA order) ----
 DATA(0x00533238) static int gOldMouseRight;
+DATA(0x00533240) BITMAP bmpAndMask[MOUSE_CURSOR_COUNT];
 DATA(0x00533b40) static POINT gMouseScreenPt;    // GetCursorPos scratch (mouseManager::MouseCoords)
 DATA(0x00533b48) static POINT gMouseCheckPt;     // GetCursorPos scratch (mouseManager::CheckUpdateMousePos/ShowColorPointer)
 DATA(0x00533b50) static int gOldMouseTop;
+DATA(0x00533b58) HICON hMouseCursor[MOUSE_CURSOR_COUNT];
+DATA(0x00533cd8) void *cAndBits[MOUSE_CURSOR_COUNT];
+DATA(0x00533e58) void *cColorBits[MOUSE_CURSOR_COUNT];
 DATA(0x00533fd8) static int gOldMouseBottom;
 DATA(0x00533fdc) static int gOldMouseLeft;
+DATA(0x00533fe0) ICONINFO IconInfo[MOUSE_CURSOR_COUNT];
+DATA(0x00534760) HBITMAP hbmpAndMask[MOUSE_CURSOR_COUNT];
+
+// @data-layout-note Retail loader-zero storage spans 0x133238..0x1348e0
+// (0x16a8). All twelve owners above have proved addresses, types, and extents,
+// and all code references use their exact retail owner-relative addends. VC 4.2
+// emits the same 0x16a0 bytes of owned storage in a 0x16a4 BSS contribution but
+// orders the symbols differently; moving the real definitions into retail order
+// is byte-neutral. This is a final-link/common-allocation packing residual. Do not
+// add padding symbols, aliases, cursor placement, or section pragmas to force it.
+
+// ---- initialized storage (retail RVA order) ----
+DATA(0x0051ebc8) int iMouseOffset[4] = { 0, 41, 57, 0 };
+DATA(0x0051ebd8) signed char iMouseSize[MOUSE_CURSOR_COUNT][2] = {
+    { 15, 21 },
+    { 22, 21 },
+    { 24, 20 },
+    { 24, 24 },
+    { 30, 25 },
+    { 24, 24 },
+    { 24, 24 },
+    { 19, 23 },
+    { 15, 20 },
+    { 30, 30 },
+    { 32, 26 },
+    { 31, 25 },
+    { 30, 25 },
+    { 24, 24 },
+    { 22, 21 },
+    { 31, 31 },
+    { 32, 26 },
+    { 31, 25 },
+    { 30, 25 },
+    { 24, 24 },
+    { 22, 21 },
+    { 31, 31 },
+    { 32, 26 },
+    { 32, 25 },
+    { 32, 25 },
+    { 27, 24 },
+    { 25, 22 },
+    { 31, 31 },
+    { 24, 24 },
+    { 30, 25 },
+    { 30, 25 },
+    { 32, 25 },
+    { 8, 32 },
+    { 24, 24 },
+    { 32, 8 },
+    { 24, 24 },
+    { 8, 32 },
+    { 24, 24 },
+    { 32, 8 },
+    { 24, 24 },
+    { 15, 21 },
+    { 20, 20 },
+    { 18, 23 },
+    { 21, 24 },
+    { 24, 24 },
+    { 18, 22 },
+    { 11, 18 },
+    { 13, 13 },
+    { 22, 22 },
+    { 31, 14 },
+    { 22, 22 },
+    { 22, 22 },
+    { 31, 14 },
+    { 22, 22 },
+    { 14, 31 },
+    { 14, 31 },
+    { 28, 16 },
+    { 20, 20 },
+    { 28, 33 },
+    { 25, 40 },
+    { 37, 41 },
+    { 25, 29 },
+    { 52, 29 },
+    { 24, 39 },
+    { 29, 35 },
+    { 45, 28 },
+    { 52, 40 },
+    { 33, 42 },
+    { 34, 31 },
+    { 32, 35 },
+    { 32, 35 },
+    { 43, 33 },
+    { 34, 38 },
+    { 37, 35 },
+    { 27, 30 },
+    { 29, 27 },
+    { 32, 23 },
+    { 23, 36 },
+    { 30, 36 },
+    { 21, 33 },
+    { 27, 38 },
+    { 28, 34 },
+    { 36, 34 },
+    { 66, 41 },
+    { 38, 35 },
+    { 59, 41 },
+    { 54, 39 },
+    { 35, 42 },
+    { 30, 34 },
+    { 45, 41 },
+    { 39, 34 },
+    { 29, 43 },
+    { 25, 35 },
+    { 39, 35 },
+    { 47, 37 },
+    { 51, 13 }
+};
+DATA(0x0051ec98) signed char iHotSpot[MOUSE_CURSOR_COUNT][2] = {
+    { 2, 3 },
+    { 2, 3 },
+    { 12, 11 },
+    { 12, 13 },
+    { 15, 11 },
+    { 10, 10 },
+    { 12, 13 },
+    { 9, 12 },
+    { 7, 9 },
+    { 15, 15 },
+    { 15, 11 },
+    { 10, 10 },
+    { 12, 13 },
+    { 9, 12 },
+    { 7, 9 },
+    { 15, 15 },
+    { 15, 11 },
+    { 10, 10 },
+    { 12, 13 },
+    { 9, 12 },
+    { 7, 9 },
+    { 15, 15 },
+    { 15, 11 },
+    { 10, 10 },
+    { 12, 13 },
+    { 9, 12 },
+    { 7, 9 },
+    { 15, 15 },
+    { 12, 12 },
+    { 12, 12 },
+    { 12, 12 },
+    { 12, 12 },
+    { 3, 0 },
+    { 23, 0 },
+    { 31, 4 },
+    { 23, 23 },
+    { 3, 31 },
+    { 0, 24 },
+    { 0, 5 },
+    { 0, 0 },
+    { 2, 3 },
+    { 10, 9 },
+    { 9, 11 },
+    { 10, 11 },
+    { 12, 12 },
+    { 10, 12 },
+    { 5, 8 },
+    { 1, 1 },
+    { 21, 1 },
+    { 30, 7 },
+    { 21, 21 },
+    { 1, 21 },
+    { 1, 7 },
+    { 1, 1 },
+    { 7, 1 },
+    { 7, 30 },
+    { 14, 8 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 },
+    { -1, -1 }
+};
+DATA(0x0051ed58) int gbInSetPointer = 0;
+DATA(0x0051ed5c) int bInNewMouseUpdate = 0;
+
+DATA(0x0051ed60) static SMouseManagerStrings gMouseManagerStrings = {
+    { MOUSE_MANAGER_NAME },
+    { MOUSE_MANAGER_SOURCE_FILE },
+    { MOUSE_MANAGER_SOURCE_FILE },
+    { MOUSE_MANAGER_ADVENTURE_ICON },
+    { MOUSE_MANAGER_SPELL_ICON },
+    { MOUSE_MANAGER_COMBAT_ICON },
+    { MOUSE_MANAGER_SOURCE_FILE },
+    { MOUSE_MANAGER_SOURCE_FILE },
+    { MOUSE_MANAGER_SOURCE_FILE },
+    { MOUSE_MANAGER_SOURCE_FILE },
+    { MOUSE_MANAGER_ADVENTURE_BITMAP },
+    { MOUSE_MANAGER_SPELL_BITMAP },
+    { MOUSE_MANAGER_COMBAT_BITMAP },
+    { MOUSE_MANAGER_SOURCE_FILE },
+    { MOUSE_MANAGER_SOURCE_FILE },
+    ""
+};
+
+// @data-layout-note Retail initialized storage spans 0x11ebc8..0x11ef28
+// (0x360). The public cursor tables occupy the first 0x198 bytes. Retail then
+// stores sixteen independently referenced strings at 4-byte boundaries; the
+// typed owner above reproduces their complete payload and addends 0x0, 0x10,
+// 0x3c, 0x68, 0x74, 0x80, 0x8c, 0xb8, 0xe4, 0x110, 0x13c, 0x14c, 0x15c,
+// 0x16c, 0x198, and 0x1c4. The complete candidate contribution is byte-exact.
 
 VA(0x004c9270, 0xd9)
 mouseManager::mouseManager(void) : baseManager()
@@ -37,7 +277,7 @@ mouseManager::mouseManager(void) : baseManager()
     m_savedUnderlying = 0;
     m_active = 0;
     m_cursorType = MOUSE_INVALID_CURSOR_TYPE;
-    strcpy(m_name, "mouseManager");
+    strcpy(m_name, gMouseManagerStrings.managerName.text);
     m_cursorFrame = 0;
     m_cursorReady = 1;
     m_cursorIcon = 0;
@@ -116,10 +356,10 @@ void mouseManager::Close(void)
                 DestroyIcon(hMouseCursor[cursorIndex]);
             hMouseCursor[cursorIndex] = 0;
             if (cAndBits[cursorIndex] != 0)
-                H2_FREE(cAndBits[cursorIndex], "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x14a);
+                H2_FREE(cAndBits[cursorIndex], gMouseManagerStrings.andMaskDestruction.text, 0x14a);
             cAndBits[cursorIndex] = 0;
             if (cColorBits[cursorIndex] != 0)
-                H2_FREE(cColorBits[cursorIndex], "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x14e);
+                H2_FREE(cColorBits[cursorIndex], gMouseManagerStrings.colorBitsDestruction.text, 0x14e);
             cColorBits[cursorIndex] = 0;
             if (hbmpAndMask[cursorIndex] != 0)
                 DeleteObject(hbmpAndMask[cursorIndex]);
@@ -155,13 +395,14 @@ void mouseManager::SetPointer(char *name, int param_2, int param_3)
                 gpResourceManager->Dispose(m_cursorIcon);
             char local_10[16];
             if (m_cursorType == MOUSE_CURSOR_ADVENTURE)
-                sprintf(local_10, "ADVMCO.ICN");
+                sprintf(local_10, gMouseManagerStrings.adventureIcon.text);
             else if (m_cursorType == MOUSE_CURSOR_SPELL)
-                sprintf(local_10, "SPELCO.ICN");
+                sprintf(local_10, gMouseManagerStrings.spellIcon.text);
             else
-                sprintf(local_10, "CMSECO.ICN");
+                sprintf(local_10, gMouseManagerStrings.combatIcon.text);
             m_cursorIcon = gpResourceManager->GetIcon(local_10);
-            H2_ASSERT(param_2 != MOUSE_KEEP_CURRENT_FRAME, "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x19a);
+            H2_ASSERT(param_2 != MOUSE_KEEP_CURRENT_FRAME,
+                gMouseManagerStrings.cursorFrameAssertion.text, 0x19a);
             m_cursorFrame = MOUSE_INVALID_CURSOR_FRAME;
             m_cursorReady = saved82;
         }
@@ -198,22 +439,25 @@ void mouseManager::SetPointer(int frame)
     else
         m_cursorFrame = frame;
     m_cursorSizeIndex = iMouseOffset[m_cursorType] + frame;
-    H2_ASSERT(m_cursorSizeIndex >= 0 && m_cursorSizeIndex < MOUSE_CURSOR_COUNT, "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x1ca);
+    H2_ASSERT(m_cursorSizeIndex >= 0 && m_cursorSizeIndex < MOUSE_CURSOR_COUNT,
+        gMouseManagerStrings.cursorSizeAssertion.text, 0x1ca);
 
     if (gbColorMice != 0) {
         NewUpdate(1);
     } else {
         if (hMouseCursor[m_cursorSizeIndex] == 0) {
-            cColorBits[m_cursorSizeIndex] = H2_ALLOC(MOUSE_CURSOR_COLOR_BYTES, "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x1e0);
-            cAndBits[m_cursorSizeIndex] = H2_ALLOC(MOUSE_CURSOR_AND_BYTES, "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x1e1);
+            cColorBits[m_cursorSizeIndex] = H2_ALLOC(MOUSE_CURSOR_COLOR_BYTES,
+                gMouseManagerStrings.colorBitsAllocation.text, 0x1e0);
+            cAndBits[m_cursorSizeIndex] = H2_ALLOC(MOUSE_CURSOR_AND_BYTES,
+                gMouseManagerStrings.andBitsAllocation.text, 0x1e1);
 
             char filename[16];
             if (m_cursorType == MOUSE_CURSOR_ADVENTURE)
-                sprintf(filename, "ADVMBW%02d.BMP", frame + 1);
+                sprintf(filename, gMouseManagerStrings.adventureBitmap.text, frame + 1);
             else if (m_cursorType == MOUSE_CURSOR_SPELL)
-                sprintf(filename, "SPELBW%02d.BMP", frame);
+                sprintf(filename, gMouseManagerStrings.spellBitmap.text, frame);
             else
-                sprintf(filename, "CMSEBW%02d.BMP", frame + 1);
+                sprintf(filename, gMouseManagerStrings.combatBitmap.text, frame + 1);
 
             gpResourceManager->PointToFile(gpResourceManager->MakeId(filename, 1));
             gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(cColorBits[m_cursorSizeIndex]), MOUSE_CURSOR_BITMAP_HEADER_BYTES);
@@ -243,7 +487,8 @@ void mouseManager::SetPointer(int frame)
             bmpAndMask[m_cursorSizeIndex].bmWidthBytes = MOUSE_CURSOR_MASK_ROW_BYTES;
             bmpAndMask[m_cursorSizeIndex].bmBits = cAndBits[m_cursorSizeIndex];
             hbmpAndMask[m_cursorSizeIndex] = CreateBitmapIndirect(&bmpAndMask[m_cursorSizeIndex]);
-            H2_ASSERT(reinterpret_cast<int>(hbmpAndMask[m_cursorSizeIndex]), "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x202);
+            H2_ASSERT(reinterpret_cast<int>(hbmpAndMask[m_cursorSizeIndex]),
+                gMouseManagerStrings.bitmapAssertion.text, 0x202);
 
             IconInfo[m_cursorSizeIndex].fIcon = 0;
             if (m_cursorType == MOUSE_CURSOR_SPELL) {
@@ -256,7 +501,8 @@ void mouseManager::SetPointer(int frame)
             IconInfo[m_cursorSizeIndex].hbmMask = hbmpAndMask[m_cursorSizeIndex];
             IconInfo[m_cursorSizeIndex].hbmColor = 0;
             hMouseCursor[m_cursorSizeIndex] = CreateIconIndirect(&IconInfo[m_cursorSizeIndex]);
-            H2_ASSERT(reinterpret_cast<int>(hMouseCursor[m_cursorSizeIndex]), "I:\\Projects\\Heroes\\Prog\\BASE\\MOUSEMGR.CPP", 0x215);
+            H2_ASSERT(reinterpret_cast<int>(hMouseCursor[m_cursorSizeIndex]),
+                gMouseManagerStrings.cursorAssertion.text, 0x215);
         }
         SetCursor(hMouseCursor[m_cursorSizeIndex]);
     }
@@ -529,7 +775,7 @@ void mouseManager::SetColorMice(int param_1)
         m_cursorFrame = MOUSE_RELOAD_CURSOR_FRAME;
         m_cursorType = MOUSE_INVALID_CURSOR_TYPE;
         m_forcePointerUpdate = 0;
-        SetPointer(gDefaultCursorName, savedX, savedY);
+        SetPointer(gMouseManagerStrings.defaultCursorName, savedX, savedY);
         m_cursorReady = 1;
         m_forcePointerUpdate = saved7e;
         if (gbColorMice != 0) {
@@ -564,210 +810,3 @@ void mouseManager::SetColorMice(int param_1)
 
 // ---- vtables (compiler-emitted; census) ----
 VTBL(mouseManager, 0x004eba00);
-
-// ---- globals (definitions, RVA order) ----
-DATA(0x0051ebc8) int iMouseOffset[4] = { 0, 41, 57, 0 };
-DATA(0x0051ebd8) signed char iMouseSize[MOUSE_CURSOR_COUNT][2] = {
-    { 15, 21 },
-    { 22, 21 },
-    { 24, 20 },
-    { 24, 24 },
-    { 30, 25 },
-    { 24, 24 },
-    { 24, 24 },
-    { 19, 23 },
-    { 15, 20 },
-    { 30, 30 },
-    { 32, 26 },
-    { 31, 25 },
-    { 30, 25 },
-    { 24, 24 },
-    { 22, 21 },
-    { 31, 31 },
-    { 32, 26 },
-    { 31, 25 },
-    { 30, 25 },
-    { 24, 24 },
-    { 22, 21 },
-    { 31, 31 },
-    { 32, 26 },
-    { 32, 25 },
-    { 32, 25 },
-    { 27, 24 },
-    { 25, 22 },
-    { 31, 31 },
-    { 24, 24 },
-    { 30, 25 },
-    { 30, 25 },
-    { 32, 25 },
-    { 8, 32 },
-    { 24, 24 },
-    { 32, 8 },
-    { 24, 24 },
-    { 8, 32 },
-    { 24, 24 },
-    { 32, 8 },
-    { 24, 24 },
-    { 15, 21 },
-    { 20, 20 },
-    { 18, 23 },
-    { 21, 24 },
-    { 24, 24 },
-    { 18, 22 },
-    { 11, 18 },
-    { 13, 13 },
-    { 22, 22 },
-    { 31, 14 },
-    { 22, 22 },
-    { 22, 22 },
-    { 31, 14 },
-    { 22, 22 },
-    { 14, 31 },
-    { 14, 31 },
-    { 28, 16 },
-    { 20, 20 },
-    { 28, 33 },
-    { 25, 40 },
-    { 37, 41 },
-    { 25, 29 },
-    { 52, 29 },
-    { 24, 39 },
-    { 29, 35 },
-    { 45, 28 },
-    { 52, 40 },
-    { 33, 42 },
-    { 34, 31 },
-    { 32, 35 },
-    { 32, 35 },
-    { 43, 33 },
-    { 34, 38 },
-    { 37, 35 },
-    { 27, 30 },
-    { 29, 27 },
-    { 32, 23 },
-    { 23, 36 },
-    { 30, 36 },
-    { 21, 33 },
-    { 27, 38 },
-    { 28, 34 },
-    { 36, 34 },
-    { 66, 41 },
-    { 38, 35 },
-    { 59, 41 },
-    { 54, 39 },
-    { 35, 42 },
-    { 30, 34 },
-    { 45, 41 },
-    { 39, 34 },
-    { 29, 43 },
-    { 25, 35 },
-    { 39, 35 },
-    { 47, 37 },
-    { 51, 13 }
-};
-DATA(0x0051ec98) signed char iHotSpot[MOUSE_CURSOR_COUNT][2] = {
-    { 2, 3 },
-    { 2, 3 },
-    { 12, 11 },
-    { 12, 13 },
-    { 15, 11 },
-    { 10, 10 },
-    { 12, 13 },
-    { 9, 12 },
-    { 7, 9 },
-    { 15, 15 },
-    { 15, 11 },
-    { 10, 10 },
-    { 12, 13 },
-    { 9, 12 },
-    { 7, 9 },
-    { 15, 15 },
-    { 15, 11 },
-    { 10, 10 },
-    { 12, 13 },
-    { 9, 12 },
-    { 7, 9 },
-    { 15, 15 },
-    { 15, 11 },
-    { 10, 10 },
-    { 12, 13 },
-    { 9, 12 },
-    { 7, 9 },
-    { 15, 15 },
-    { 12, 12 },
-    { 12, 12 },
-    { 12, 12 },
-    { 12, 12 },
-    { 3, 0 },
-    { 23, 0 },
-    { 31, 4 },
-    { 23, 23 },
-    { 3, 31 },
-    { 0, 24 },
-    { 0, 5 },
-    { 0, 0 },
-    { 2, 3 },
-    { 10, 9 },
-    { 9, 11 },
-    { 10, 11 },
-    { 12, 12 },
-    { 10, 12 },
-    { 5, 8 },
-    { 1, 1 },
-    { 21, 1 },
-    { 30, 7 },
-    { 21, 21 },
-    { 1, 21 },
-    { 1, 7 },
-    { 1, 1 },
-    { 7, 1 },
-    { 7, 30 },
-    { 14, 8 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 },
-    { -1, -1 }
-};
-DATA(0x0051ed58) int gbInSetPointer = 0;
-DATA(0x0051ed5c) int bInNewMouseUpdate = 0;
-DATA(0x00533240) BITMAP bmpAndMask[MOUSE_CURSOR_COUNT];
-DATA(0x00533b58) HICON hMouseCursor[MOUSE_CURSOR_COUNT];
-DATA(0x00533cd8) void *cAndBits[MOUSE_CURSOR_COUNT];
-DATA(0x00533e58) void *cColorBits[MOUSE_CURSOR_COUNT];
-DATA(0x00533fe0) ICONINFO IconInfo[MOUSE_CURSOR_COUNT];
-DATA(0x00534760) HBITMAP hbmpAndMask[MOUSE_CURSOR_COUNT];
