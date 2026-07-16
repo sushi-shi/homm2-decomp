@@ -107,9 +107,27 @@ class ReviewedDataTest(unittest.TestCase):
                   mock.patch("homm2.build.reviewed_data.derive_allocations",
                              side_effect=AssertionError("must not derive")),
                   mock.patch("homm2.build.reviewed_data.subprocess.run",
-                             side_effect=AssertionError("must not regenerate")),
-                  mock.patch("homm2.build.reviewed_data._refresh_objdiff_targets")):
+                             side_effect=AssertionError("must not regenerate"))):
                 self.assertFalse(ensure_reviewed_targets())
+
+    def test_normal_ensure_does_not_rewrite_objdiff_comparison_paths(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            target = root / "delink"
+            target.mkdir()
+            stamp = target / ".reviewed-data-stamp.json"
+            stamp.write_text('{"mode": "bootstrap"}\n')
+            config = root / "build/objdiff/objdiff.json"
+            config.parent.mkdir(parents=True)
+            expected = (
+                '{"units":[{"name":"SOURCE/Test",'
+                '"target_path":"./normalized/target/SOURCE/Test.c.obj"}]}\n')
+            config.write_text(expected)
+            with (mock.patch("homm2.build.reviewed_data.REPO", root),
+                  mock.patch("homm2.build.reviewed_data.TARGET", target),
+                  mock.patch("homm2.build.reviewed_data.STAMP", stamp)):
+                self.assertFalse(ensure_reviewed_targets())
+            self.assertEqual(config.read_text(), expected)
 
     def test_normal_ensure_refuses_stale_canonical_target(self):
         with TemporaryDirectory() as directory:
