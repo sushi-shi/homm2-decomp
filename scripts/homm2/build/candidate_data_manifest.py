@@ -90,12 +90,18 @@ def _coff_symbol_fields(coff, symbol):
     return typ, storage
 
 
+def _candidate_data_storage(section_name):
+    if section_name.startswith(".CRT$"):
+        return "data"
+    return DATA_SECTIONS.get(section_name)
+
+
 def candidate_definitions(path, unit):
     """Return candidate-defined data symbols with extents from COFF topology."""
     coff = CoffFile(path)
     definitions = []
     for section in coff.sections:
-        storage = DATA_SECTIONS.get(section.name)
+        storage = _candidate_data_storage(section.name)
         if storage is None:
             continue
         symbols = []
