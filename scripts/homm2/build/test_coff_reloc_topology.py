@@ -275,6 +275,18 @@ class CoffRelocationTopologyTests(unittest.TestCase):
         self.assertIsNone(topology._anchor_for(
             provenance, "SOURCE/C", "??_C@shared"))
 
+        symbols = [{"name": "private$S1", "section": 0}]
+        target = synthetic_coff(
+            self.root / "tu-aware-target.obj", [(0, 0, 0x0006, 0)], symbols)
+        base = synthetic_coff(
+            self.root / "tu-aware-base.obj", [(0, 0, 0x0006, 0)], symbols)
+        self.assertEqual([], topology.compare_pair(
+            "SOURCE/A", base, target, self.mappings(), provenance=provenance
+        )["policy_errors"])
+        self.assertEqual("ambiguous-data-anchor", topology.compare_pair(
+            "SOURCE/C", base, target, self.mappings(), provenance=provenance
+        )["policy_errors"][0]["kind"])
+
     def test_generated_manifest_must_be_exact_conflict_free_union(self):
         source = manifest_row(
             "?gValue@@3HA", "SOURCE/A", 0x1000,
