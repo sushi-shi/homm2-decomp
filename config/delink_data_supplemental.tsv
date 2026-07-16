@@ -583,6 +583,8 @@ $SG36416	SOURCE\SWAPMGR.c	0xf5758	0x10	data	0x4	4	0xa0	local	candidate-coff-sect
 $SG36420	SOURCE\SWAPMGR.c	0xf5768	0x18	data	0x4	4	0xb0	local	candidate-coff-section-translation
 $SG36422	SOURCE\SWAPMGR.c	0xf5780	0x28	data	0x4	4	0xc8	local	candidate-coff-section-translation
 $SG36423	SOURCE\SWAPMGR.c	0xf57a8	0x3	data	0x4	4	0xf0	local	candidate-coff-section-translation
+?sourceLineBase@?1??BuyBuild@townManager@@QAEHHHH@Z@4FA	SOURCE\TOWNMGR.c	0xef174	0x4	data	0x8	2	0x6c0	local	candidate-coff-reloc-bijection
+?sourceLineBase@?1??SetupThievesGuild@townManager@@QAEXPAVheroWindow@@H@Z@4FA	SOURCE\TOWNMGR.c	0xef3b4	0x4	data	0x8	2	0x6c4	local	candidate-coff-reloc-bijection
 ??_7townManager@@6B@	SOURCE\TOWNMGR.c	0xeb140	0xc	rdata	0x8	5	0x0	external	candidate-coff-section-translation
 $SG5092	SOURCE\VIEW.c	0xeddf8	0xc	data	0x4	2	0x4	local	candidate-coff-section-translation
 $SG5094	SOURCE\VIEW.c	0xede04	0x10	data	0x4	2	0x10	local	candidate-coff-section-translation

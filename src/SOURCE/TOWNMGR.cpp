@@ -256,6 +256,25 @@ DATA(0x004eb080) static const signed char
         }
     };
 
+// @data-layout-note Retail's initialized TOWNMGR contribution is
+// 0xee750..0xef4c8 (0xd78); candidate .data is 0xd77. sBuildingInfo is exact at
+// the contribution base with a 0x6c0 logical extent. Before owner recovery, the
+// following literal stream was byte-identical through retail offset 0xa24.
+// Retail's two signed-short source-line owners are independently proved at
+// 0xef174 (BuyBuild, two HIGHLOW sites)
+// and 0xef3b4 (SetupThievesGuild, three HIGHLOW sites). Replacing five raw
+// string casts with those two typed function statics removes the exact 0xc bytes
+// of duplicated owners from the former 0xd83 candidate. VC4.2 hoists the typed
+// owners to candidate offsets 0x6c0 and 0x6c4, while retail interleaves them at
+// offsets 0xa24 and 0xc64. Internal inline accessors also hoist both payloads;
+// external inline accessors create separate three-byte COMDAT sections, so
+// neither recovers the natural retail stream. The 0xc0 object-order table and
+// 0xc townManager vtable sections are assigned at 0xeb080 and 0xeb140; the
+// latter occupies a retail 0x10 contribution with four zero tail bytes. There
+// is no TOWNMGR BSS contribution. Revisit only with evidence for the original
+// private-owner source form; do not add padding, fallback identities, aliases,
+// cursor adjustments, or section pragmas to force the two offsets or terminal
+// alignment byte.
 DATA(0x004ee750) SBuildingInfo
     sBuildingInfo[TOWN_TYPE_COUNT][TOWN_BUILDING_COUNT] = {
         { // Knight
@@ -1905,6 +1924,7 @@ void townManager::DrawTown(int updateScreen, int drawFlags)
 VA(0x00417c9d, 0xf35)
 int townManager::BuyBuild(int building, int cannotBuy, int quickView)
 {
+    static short sourceLineBase = 0x0948;
     unsigned long prerequisiteMask_c;
     int prerequisiteCount_p;
     short dialogLeft_a;
@@ -1952,7 +1972,7 @@ int townManager::BuyBuild(int building, int cannotBuy, int quickView)
     costCount_o = 0;
     description_b = static_cast<char *>(BaseAlloc(
         400, "I:\\Projects\\Heroes\\Prog\\SOURCE\\TOWNMGR.CPP",
-        *reinterpret_cast<short *>(const_cast<char *>("\x48\x09")) + 8));
+        sourceLineBase + 8));
 
     for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
         costs_e[index_h] = -1;
@@ -2154,8 +2174,7 @@ int townManager::BuyBuild(int building, int cannotBuy, int quickView)
                     resourceIcon_c, rowResourceTypes_a[index_h])->w;
                 amountText_n[widgetIndex_f] = static_cast<char *>(BaseAlloc(
                     10, "I:\\Projects\\Heroes\\Prog\\SOURCE\\TOWNMGR.CPP",
-                    *reinterpret_cast<short *>(const_cast<char *>("\x48\x09")) +
-                    0x128));
+                    sourceLineBase + 0x128));
                 sprintf(amountText_n[widgetIndex_f], "%d", costs_e[widgetIndex_f]);
                 int widgetXOffset = 0;
                 amountWidgets_b[widgetIndex_f] = new textWidget(
@@ -2917,6 +2936,7 @@ void townManager::SetupWell(heroWindow *window)
 VA(0x0041a783, 0xf0f)
 void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
 {
+    static short sourceLineBase = 0x0e0e;
     short unusedRankX_last = 0x102;
     short unusedRankWidth_category = 0x44;
     short unusedRankY_j = 0x1b;
@@ -3090,9 +3110,7 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
                     widgetText_control = static_cast<char *>(BaseAlloc(
                         strlen(gText) + 1,
                         "I:\\Projects\\Heroes\\Prog\\SOURCE\\TOWNMGR.CPP",
-                        *reinterpret_cast<short *>(
-                            const_cast<char *>("\x0e\x0e")) +
-                            TOWN_THIEVES_SOURCE_LINE_HERO_LABELS));
+                        sourceLineBase + TOWN_THIEVES_SOURCE_LINE_HERO_LABELS));
                     strcpy(widgetText_control, gText);
                     textControl_icon = new textWidget(
                         static_cast<short>(position_current * 0x44 + 0xef),
@@ -3111,9 +3129,7 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
                     widgetText_control = static_cast<char *>(BaseAlloc(
                         strlen(gText) + 1,
                         "I:\\Projects\\Heroes\\Prog\\SOURCE\\TOWNMGR.CPP",
-                        *reinterpret_cast<short *>(
-                            const_cast<char *>("\x0e\x0e")) +
-                            TOWN_THIEVES_SOURCE_LINE_HERO_STATS));
+                        sourceLineBase + TOWN_THIEVES_SOURCE_LINE_HERO_STATS));
                     strcpy(widgetText_control, gText);
                     textControl_icon = new textWidget(
                         static_cast<short>(position_current * 0x44 + 0x11c),
@@ -3129,9 +3145,7 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
                     widgetText_control = static_cast<char *>(BaseAlloc(
                         strlen(gText) + 1,
                         "I:\\Projects\\Heroes\\Prog\\SOURCE\\TOWNMGR.CPP",
-                        *reinterpret_cast<short *>(
-                            const_cast<char *>("\x0e\x0e")) +
-                            TOWN_THIEVES_SOURCE_LINE_PERSONALITY));
+                        sourceLineBase + TOWN_THIEVES_SOURCE_LINE_PERSONALITY));
                     strcpy(widgetText_control, gText);
                     textControl_icon = new textWidget(
                         static_cast<short>(position_current * 0x44 + 0xe3),
