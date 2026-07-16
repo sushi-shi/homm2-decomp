@@ -1702,7 +1702,7 @@ void combatManager::KeepAttack(int tower)
                                                         : "Tower does",
                 damage8,
                 "damage", killed29, armyName,
-                killed29 > 1 ? "perish" : "perishes");
+                killed29 > 1 ? "perishes" : "perish");
     } else {
         sprintf(gText, "%s %d %s.",
                 tower == COMBAT_TOWER_SELECTOR_GARRISON ? "Garrison does"
@@ -2491,22 +2491,25 @@ int CombatSystemOptionsHandler(tag_message &message)
 VTBL(combatManager, 0x004eb898);
 
 // ---- globals (definitions, RVA order) ----
-// @data-layout-note Retail attributes CMBTMGR initialized storage at
-// 0xf8900+0x358; candidate is 0x354 after restoring boulder.icn, the
-// smalclod/lichclod selection, and retail's 3.14159 constant. The 0x68
-// non-COMDAT .rdata pool is now byte-exact; candidate/retail SHA-256 is
-// 2e4e4857fd9f5831b891b16432a5068ad50eb1dba97f138793ad65a25c77728e.
-// The vtable relocations are exactly Open, Close, Main; its candidate COMDAT is
-// 0xc while the retail owner range is 0x10 with a zero tail. Candidate .data
-// still places wallHex at +8 instead of retail +0x31c, and emits perish at
-// +0x2a0 before perishes at +0x2a8, versus retail perishes at +0x29c before
-// perish at +0x2a8. Retail also has four trailing contribution bytes. Candidate
-// BSS is 0xc versus retail 0x10: candidate order is bCPrefsChanged, CSPanel,
+// @data-layout-note Retail CMBTMGR .data is 0xf8900+0x358. Its 59 local
+// allocations and two referenced public integers account for all 64 HIGHLOW
+// references to 61 distinct owner RVAs; the fresh candidate has the same
+// target multiset, with one zero-addend reference per local allocation. Moving
+// candidate wallHex from +0x8 to retail +0x31c and appending the retail four-byte
+// zero tail translates the complete 0x354 candidate payload exactly: translated
+// and retail SHA-256 are
+// a0f7d69a73915ea5e0da8783fff680d9f5ea1995532c50896a13c31b84866fda.
+// This is compiler allocation order, not missing storage. Candidate BSS is 0xc
+// versus retail 0x10: candidate order is bCPrefsChanged, CSPanel,
 // bMouseWasVis, while retail is bMouseWasVis, CSPanel, bCPrefsChanged followed
-// by four owner bytes. All six public allocations, types, storage classes, and
-// payloads are present. CatAttack, KeepAttack, and ShootMissile relocation
-// audits are respectively 150/150, 44/44, and 52/52 with only-base=0. Revisit
-// only with natural compiler allocation-order evidence; do not add padding,
+// by a four-byte loader-zero tail. Its 29 references match exactly at addend
+// zero: 2 to bMouseWasVis, 19 to CSPanel, and 8 to bCPrefsChanged. The 0x68
+// non-COMDAT .rdata pool is byte-exact (SHA-256
+// 2e4e4857fd9f5831b891b16432a5068ad50eb1dba97f138793ad65a25c77728e).
+// The vtable relocations are exactly Open, Close, Main; its candidate COMDAT is
+// 0xc while the retail owner range is 0x10 with a zero tail. All six public
+// allocations have the proven types, storage classes, and payloads. Revisit
+// allocation order only with natural compiler evidence; do not add padding,
 // aliases, synthetic identities, or unattached literals.
 DATA(0x004f8900) int bInHighMoraleBonus = 0;
 DATA(0x004f8904) int giSeed = 1;
