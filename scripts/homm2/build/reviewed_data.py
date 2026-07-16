@@ -61,6 +61,7 @@ SYMBOLS = REPO / "build/gen/symbol_names.csv"
 LEDGER = REPO / "config/required_initialized_storage.tsv"
 EXE = REPO / "build/orig/HEROES2W.EXE"
 PDB = REPO / "build/pdb/HEROES2W.pdb"
+RELOC_ALIASES = REPO / "config/delink_reloc_aliases.tsv"
 MANIFEST = REPO / "build/gen/reviewed_delink_data.tsv"
 TARGET = REPO / "build/delink"
 STAMP = TARGET / ".reviewed-data-stamp.json"
@@ -237,7 +238,7 @@ def _identity(manifest, contribution_manifest, delinker):
 
 def _canonical_identity_inputs(delinker):
     return {
-        "schema": 6,
+        "schema": 7,
         "mode": "canonical",
         "source_data_manifest_sha256": _digest(DATA_SOURCE_MANIFEST),
         "supplemental_manifest_sha256": _digest(CANONICAL_SUPPLEMENTAL),
@@ -249,6 +250,7 @@ def _canonical_identity_inputs(delinker):
         "coverage_diagnostics_sha256": _digest(CANONICAL_COVERAGE_DIAGNOSTICS),
         "exe_sha256": _digest(EXE),
         "pdb_sha256": _digest(PDB),
+        "reloc_aliases_sha256": _digest(RELOC_ALIASES),
         "delinker_sha256": _digest(delinker),
     }
 
@@ -530,7 +532,7 @@ def regenerate_canonical_targets(delinker=None):
         CANONICAL_SECTION_MANIFEST, DATA_BREAKPOINTS,
         CANONICAL_CONTRIBUTION_MANIFEST,
         CANONICAL_COVERAGE, CANONICAL_COVERAGE_DIAGNOSTICS,
-        EXE, PDB)
+        EXE, PDB, RELOC_ALIASES)
         if not path.is_file()]
     if missing:
         raise RuntimeError("canonical target regeneration requires %s" %
@@ -550,6 +552,7 @@ def regenerate_canonical_targets(delinker=None):
             "--data-manifest", str(CANONICAL_MANIFEST),
             "--data-section-manifest", str(CANONICAL_SECTION_MANIFEST),
             "--contribution-manifest", str(CANONICAL_CONTRIBUTION_MANIFEST),
+            "--reloc-alias-manifest", str(RELOC_ALIASES),
         ], cwd=REPO, check=True)
         _validate_owner_objects(temporary, manifest)
         (temporary / STAMP.name).write_text(json.dumps(identity, indent=2) + "\n")

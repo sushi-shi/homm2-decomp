@@ -145,8 +145,10 @@ The explicit topology commands are:
 - `homm2 data-topology finalize` is the program-wide closure gate. It writes no canonical manifest
   unless every candidate group is closed and the `.text`, retail file, loaded-RVA, and TU-data
   partition audits have zero blockers.
-- The only versioned data-topology input is `config/delink_data_supplemental.tsv`; the source tree
-  is the canonical input for annotated definitions. The three text-delink CSVs remain independent.
+- The only versioned storage-topology supplement is `config/delink_data_supplemental.tsv`; the
+  source tree is the canonical input for annotated definitions. Reviewed COFF relocation spellings
+  are independent and live in `config/delink_reloc_aliases.tsv`. The three text-delink CSVs remain
+  independent.
 - `homm2 data-topology regenerate` deterministically rebuilds the generated inputs and atomically
   replaces `build/delink`. Its provenance stamp hashes every config, the retail executable, the
   synthetic delinker-input PDB, and the pinned delinker executable. Its data symbols come only from
@@ -154,6 +156,8 @@ The explicit topology commands are:
   direct-tool `candidate_delink_data.tsv` output. Proposal evidence comes from candidate COFF,
   retail PE/contribution bytes, NB09 public RVAs, and retail relocations, never from the old delinked
   target's `const_*` or `empty_stub` identities.
+  It passes the reviewed relocation-alias config directly to Vostok; candidate-derived alias
+  proposals under `build/gen/` are never canonical input.
 
 Normal `homm2 build` and `homm2 status` consume the fixed target. They never run the candidate
 mapper, rewrite a topology config, or refresh target objects. If a canonical input changes, they

@@ -97,6 +97,12 @@ function identities and synthetic relocation names are errors. `homm2 relocs 0x<
 reviews one function. Manual relocation-masked raw-byte proof remains useful for separating code
 shape from target identity.
 
+`homm2 relocs --addends [SOURCE|BASE|EDITOR]` compares every report function independently as
+`relocation name -> sorted encoded COFF addends`. It intentionally ignores function-relative sites
+and fuzzy percentage, so code movement in incomplete functions does not hide a missing or wrong
+owner-relative displacement. The complete mismatch queue is written to
+`build/gen/function_reloc_addends.json`.
+
 ## `homm2 sema` — semantic navigation (matcher's read-only toolbox)
 
 One discoverable entrypoint for source/target navigation (**`homm2 sema -h`** lists all;
