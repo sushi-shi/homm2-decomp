@@ -9,7 +9,7 @@
     };
     # Vostok branch with reviewed data topology and real folded-symbol identities.
     vostok-delinker-src = {
-      url = "github:srp-survarium/vostok-delinker/6cb3b487723c7afd80bc4e2b8f5562b085b527f1";
+      url = "github:srp-survarium/vostok-delinker/dcaa3238dcb40c03313263a09a03b4e655852f2c";
       flake = false;
     };
     objdiff-src = {
