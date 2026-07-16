@@ -3469,13 +3469,13 @@
     {
       "unit": "SOURCE/TOWN",
       "function": "?Deallocate@town@@QAEXXZ",
-      "source_hash": "cdedf56eb9df",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
-      "outcome": "parked",
-      "iterations": 10,
+      "source_hash": "4a865017142d",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 3,
       "before": 99.38145,
-      "after": 99.38145,
-      "note": "Exact frame slots CFG and 2 relocations; sole retail cmp versus candidate sub opcode resisted ten bounded variants."
+      "after": 100.0,
+      "note": "Zero-based scalar subscript preserves equality semantics and emits the retail cmp/load order."
     },
     {
       "unit": "SOURCE/TOWNMGR",
@@ -3498,6 +3498,50 @@
       "before": 98.99875,
       "after": 98.98127,
       "note": "Existing complete evaluation-order checkpoint retained after shared-header epoch rebuild."
+    },
+    {
+      "unit": "SOURCE/TOWNMGR",
+      "function": "?DoCommand@townManager@@QAEXH@Z",
+      "source_hash": "9d83f5421eca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.55375,
+      "after": 98.55375,
+      "note": "Complete six-command CFG frame slots and 23 relocations; inline continuation placement remains."
+    },
+    {
+      "unit": "SOURCE/TOWNMGR",
+      "function": "?GetCategoryStats@@YIXHQAJQAC@Z",
+      "source_hash": "b1b0bdc50619",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.09067,
+      "after": 98.09067,
+      "note": "Complete ten-case CFG frame jump table and 42 relocations; equivalent hero-id address spans remain."
+    },
+    {
+      "unit": "SOURCE/TOWNMGR",
+      "function": "?MageGuildHandler@@YIHAAUtag_message@@@Z",
+      "source_hash": "93149e2903e1",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 6,
+      "before": 98.07826,
+      "after": 98.07826,
+      "note": "Six safe index spellings were worse; exact frame CFG and five relocations with one address-order wall."
+    },
+    {
+      "unit": "SOURCE/TOWNMGR",
+      "function": "?Main@townManager@@UAEHAAUtag_message@@@Z",
+      "source_hash": "ce14d751ae92",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.333336,
+      "after": 99.333336,
+      "note": "Complete switch CFG frame and 215 relocations; remaining inline continuation placement documented as semantic wall."
     },
     {
       "unit": "SOURCE/TOWNMGR",
@@ -3525,23 +3569,34 @@
       "unit": "SOURCE/TOWNMGR",
       "function": "?SetupMage@townManager@@QAEXPAVheroWindow@@@Z",
       "source_hash": "92bbdfb1a9cd",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
-      "iterations": 3,
-      "before": 99.9,
-      "after": 99.9,
-      "note": "Complete logic CFG and 34 relocs; retail retains one unexplained unreferenced frame word after three bounded families."
+      "iterations": 0,
+      "before": 99.792,
+      "after": 99.792,
+      "note": "Complete semantics and 34 relocations; retail alone reserves one unreferenced frame word."
+    },
+    {
+      "unit": "SOURCE/TOWNMGR",
+      "function": "?SetupThievesGuild@townManager@@QAEXPAVheroWindow@@H@Z",
+      "source_hash": "65fd59a668cb",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 97.4428,
+      "after": 97.4428,
+      "note": "Complete semantics frame slots and 114 relocations; invalid jump-only marker demoted after non-jump differences were found."
     },
     {
       "unit": "SOURCE/TOWNMGR",
       "function": "?SetupTown@townManager@@QAEXXZ",
       "source_hash": "ab68f0a26725",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
-      "iterations": 3,
+      "iterations": 0,
       "before": 99.59729,
       "after": 99.59729,
-      "note": "Every non-jump byte and 85 relocs align; retail has two five-byte inline continuation jumps absent from base."
+      "note": "Reproduced jump-only proof with exact frame slots non-jump stream and 85 relocations."
     },
     {
       "unit": "SOURCE/TOWNMGR",
@@ -3564,6 +3619,28 @@
       "before": 99.088234,
       "after": 100.0,
       "note": "Qualified second-player index to recover retail comparison evaluation."
+    },
+    {
+      "unit": "SOURCE/TOWNMGR",
+      "function": "?SplitArmy@townManager@@QAEXXZ",
+      "source_hash": "349dd655e4f4",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.76442,
+      "after": 98.76442,
+      "note": "Reproduced relocation-masked exact instruction proof; residual is delinked literal identity."
+    },
+    {
+      "unit": "SOURCE/TOWNMGR",
+      "function": "?SplitArmyHandler@@YIHAAUtag_message@@@Z",
+      "source_hash": "97cfec3de274",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.83721,
+      "after": 98.83721,
+      "note": "Complete dialog CFG slots and 32 relocations; residual branch placement documented as semantic wall."
     },
     {
       "unit": "SOURCE/Viewwrld",
