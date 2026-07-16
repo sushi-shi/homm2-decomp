@@ -141,13 +141,14 @@ class ReviewedDataTest(unittest.TestCase):
                              return_value=(b"coverage\n", [], [])),
                   mock.patch("homm2.build.reviewed_data.build_data_manifests") as build,
                   mock.patch("homm2.build.reviewed_data.contribution_manifest_bytes",
-                             return_value=b"contributions\n")):
+                             side_effect=AssertionError(
+                                 "must preserve section-replay contributions"))):
                 _stats, open_groups = promote_canonical_topology()
             self.assertEqual(open_groups, [open_group])
             self.assertTrue(diagnostics.is_file())
             build.assert_called_once_with(
                 supplemental=supplemental, migrate_from=None, strict=False)
-            self.assertEqual(contribution_manifest.read_bytes(), b"contributions\n")
+            self.assertFalse(contribution_manifest.exists())
 
     def test_review_queue_contains_only_noncanonical_evidenced_real_rows(self):
         with TemporaryDirectory() as directory:
