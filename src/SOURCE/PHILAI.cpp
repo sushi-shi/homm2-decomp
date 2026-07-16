@@ -478,8 +478,12 @@ void philAI::CheckReload(void) {
 }
 
 // @early-stop
-// Objdiff reports 100%; the only disassembly rows are delinker names for
-// compiler-emitted floating constants.
+// @early-stop-reloc-only: Current PHILAI.cpp/header epoch: all 0x302 bytes match after
+// masking 26 ordered relocation sites. The sole raw difference is byte +0x2d4,
+// inside the float-division guard relocation: retail __adjust_fdiv at 0x12126c
+// is delinked as iLeftRightSave+0x10 from 0x12125c. Remaining disassembly rows
+// only rename compiler floating constants; opcodes, operands, frame, and CFG
+// are exact. Revisit only after the PHILAI source/TU/header or comparison epoch.
 VA(0x00438c3d, 0x302)
 void philAI::CheckBerserk(void) {
     int row17;
@@ -1890,9 +1894,12 @@ float philAI::GetOddsOfWinning(int) {
 }
 
 // @early-stop
-// Relocation-masked bytes are exact across all 0x826 bytes. All 75 relocation
-// sites and types align; retail delinks constant-pool/addended data references
-// and jump-table locals under different symbol identities.
+// @early-stop-reloc-only: Current PHILAI.cpp/header epoch: relocation-masked bytes are
+// exact across all 0x826 bytes and all 75 ordered relocation sites/types align.
+// The sole raw byte difference, +0x801, is the proven __adjust_fdiv versus
+// iLeftRightSave+0x10 delinker spelling; constant-pool/addended references and
+// jump-table locals also have equivalent identities. Revisit only after the
+// PHILAI source/TU/header or comparison epoch.
 VA(0x0043ce91, 0x826)
 void philAI::ValueOfBuyingBuilding(town *townPtr, int building, int &resourceValue,
                                    float &benefitCost) {
@@ -2109,9 +2116,12 @@ void philAI::ValueOfBuyingBuilding(town *townPtr, int building, int &resourceVal
 }
 
 // @early-stop
-// Complete & correct except ONE store/compare pair: cl emits `fcoms kn; fstps score`
-// where retail emits `fsts score; fcomps kn` (identical result) — an /Od FPU store-vs-
-// compare scheduling pick around the conditional debug-log reuse of `score`.
+// @early-stop-reloc-only: Current PHILAI.cpp/header epoch: all 0x19b bytes match after
+// masking 17 ordered relocation sites. The sole raw difference is byte +0xd8,
+// inside the proven __adjust_fdiv versus iLeftRightSave+0x10 delinker spelling;
+// the remaining constant/string rows are identity-only. The earlier FPU
+// scheduling residual is absent in this epoch. Revisit only after the PHILAI
+// source/TU/header or comparison epoch.
 VA(0x0043d6b7, 0x19b)
 void philAI::GetBestBuilding(town *t, BHC &bhc, float &fOut) {
     float score;        // -0x18
@@ -3526,6 +3536,13 @@ int philAI::QuickCombat(armyGroup *attacker, hero *attackerHero,
     return attackerWon2;
 }
 
+// @early-stop
+// @early-stop-reloc-only: Current PHILAI.cpp/header epoch: all 0x422 bytes match after
+// masking 29 ordered relocation sites. The only raw differences, +0x19c and
+// +0x282, are float-division guard relocations where retail __adjust_fdiv is
+// delinked as iLeftRightSave+0x10; remaining constant identities are equivalent.
+// Frame, slots, opcodes, operands, and CFG are exact. Revisit only after the
+// PHILAI source/TU/header or comparison epoch.
 VA(0x00441419, 0x422)
 void philAI::HeroInteractionAtHero(hero *firstHero, hero *secondHero,
                                    int evaluateOnly, int *value) {
@@ -5661,6 +5678,13 @@ int philAI::EvaluateMineEvent(int mineIndex, int x, int y, int *liveChance) {
     return result1;
 }
 
+// @early-stop
+// @early-stop-reloc-only: Current PHILAI.cpp/header epoch: all 0x33e bytes match after
+// masking 40 ordered relocation sites. The sole raw difference is byte +0x191,
+// inside the proven __adjust_fdiv versus iLeftRightSave+0x10 delinker spelling;
+// remaining floating-constant rows are identity-only. Frame, slots, opcodes,
+// operands, and CFG are exact. Revisit only after the PHILAI source/TU/header or
+// comparison epoch.
 VA(0x00446928, 0x33e)
 int philAI::EvaluateMonsterEvent(int monsterType, int eventData, int *liveChance) {
     int result5;
