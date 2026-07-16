@@ -5,9 +5,16 @@
 
 #include <va.h>
 #include <BASE/tileset.h>
+#include <BASE/TILESET_TYPES.h>
 #include <BASE/resourceManager.h>
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
+
+DATA(0x00520d9c) static STilesetSourceFiles gTilesetSourceFiles = {
+    "I:\\Projects\\Heroes\\Prog\\BASE\\TILESET.CPP",
+    "I:\\Projects\\Heroes\\Prog\\BASE\\TILESET.CPP"
+};
+
 VA(0x004dac60, 0x8f)
 tileset::tileset(unsigned long id) : resource(3, id, 1, 0)
 {
@@ -16,16 +23,24 @@ tileset::tileset(unsigned long id) : resource(3, id, 1, 0)
     m_tileHeight = gpResourceManager->ReadWord();
     m_tileCount = gpResourceManager->ReadWord();
     unsigned int size = m_tileCount * m_tileWidth * m_tileHeight;
-    m_data = static_cast<char *>(H2_ALLOC(size, "I:\\Projects\\Heroes\\Prog\\BASE\\TILESET.CPP", 0x12));
+    m_data = static_cast<char *>(H2_ALLOC(size, gTilesetSourceFiles.allocation, 0x12));
     gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(m_data), size);
 }
 
 VA(0x004dad30, 0x21)
 tileset::~tileset()
 {
-    H2_FREE(m_data, "I:\\Projects\\Heroes\\Prog\\BASE\\TILESET.CPP", 0x1c);
+    H2_FREE(m_data, gTilesetSourceFiles.destruction, 0x1c);
 }
 
+// @data-layout-note Retail initialized storage is exactly two 0x29-byte
+// TILESET.CPP filename owners at 0x120d9c and 0x120dc8, separated by three
+// alignment bytes. The constructor references owner addend zero and the
+// destructor addend 0x2c. One typed 0x55-byte aggregate reproduces those exact
+// payloads and addends; final-link alignment supplies the three trailing bytes.
+// The only rdata is the existing exact four-byte tileset vtable; this TU has no
+// loader-zero data. Do not pool the filenames or replace alignment with a fake
+// symbol or section pragma.
 
 // ===== vtable tileset (root)  (1 slots) =====
 //  [ 0] VA(0x004dacf0, 0x36)  void * tileset::scalar_dtor(unsigned int)   <- introduces virtual
