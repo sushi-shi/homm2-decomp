@@ -1510,6 +1510,17 @@
     },
     {
       "unit": "SOURCE/PHILAI",
+      "function": "?BuildCreature@philAI@@QAEXPAVtown@@HH@Z",
+      "source_hash": "4d585f5bdb21",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 99.972824,
+      "after": 99.972824,
+      "note": "raw code exact after 29 relocation masks; ten guarded probes did not yield eligible canonical closure"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
       "function": "?CheckBerserk@philAI@@QAEXXZ",
       "source_hash": "256ff2ac6bc1",
       "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
@@ -1518,6 +1529,28 @@
       "before": 99.97488,
       "after": 98.16583,
       "note": "current TU first differs in MAP_WIDTH and MAP_HEIGHT loop-bound operand choice; 26 external relocs align"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?CheckBuyStuff@philAI@@QAEXXZ",
+      "source_hash": "10a10f124bd6",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.243546,
+      "after": 99.243546,
+      "note": "complete frame CFG and 80 relocs; two extra zero-distance continuations and log-string identities remain"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?CheckForCreatureUpgrades@philAI@@QAEXXZ",
+      "source_hash": "9b11154d2938",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.66816,
+      "after": 98.66816,
+      "note": "complete frame CFG and 11 relocs; extra inline continuation jumps remain at count and empty-slot tests"
     },
     {
       "unit": "SOURCE/PHILAI",
@@ -1532,6 +1565,17 @@
     },
     {
       "unit": "SOURCE/PHILAI",
+      "function": "?ComputeValueOfSS@philAI@@QAEHPAVhero@@HH@Z",
+      "source_hash": "0ff5e950d73f",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.891304,
+      "after": 99.891304,
+      "note": "raw code exact after 34 relocation masks; table addends constant pools and jump labels differ only in identity"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
       "function": "?CreaturesToBuy@philAI@@QAEHHH@Z",
       "source_hash": "6b9ea4620c5a",
       "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
@@ -1540,6 +1584,39 @@
       "before": 97.75,
       "after": 97.75,
       "note": "one clamp compare operand-memory choice remains; value-preserving accumulator pin was neutral"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?DetermineHeroToMove@philAI@@QAEPAVhero@@H@Z",
+      "source_hash": "76afd9712f8a",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 92.28205,
+      "after": 92.28205,
+      "note": "complete frame CFG and 8 relocs; player-hero address strength reduction compare polarity and continuations remain"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?DetermineTargetPosition@philAI@@QAEHAAH0H0@Z",
+      "source_hash": "2462c3f4d256",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.67066,
+      "after": 99.67066,
+      "note": "complete 0x90 frame and 179 relocs; inline continuation placement comparison load order and delinked table field remain"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?DoAI@philAI@@QAEXH@Z",
+      "source_hash": "a1e85b212135",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 97.516716,
+      "after": 97.516716,
+      "note": "complete frame CFG and 221 relocs; continuation placement conditional encodings and local identities remain"
     },
     {
       "unit": "SOURCE/PHILAI",
@@ -1554,6 +1631,17 @@
     },
     {
       "unit": "SOURCE/PHILAI",
+      "function": "?DoAnywhereDDoorTownGate@philAI@@QAEHH@Z",
+      "source_hash": "f389d59dc3aa",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.06204,
+      "after": 99.06204,
+      "note": "complete 0x38 frame and 34 relocs; first residual is MAP_WIDTH loop comparison operand and polarity"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
       "function": "?DoDimensionDoor@philAI@@QAEHPAVhero@@@Z",
       "source_hash": "fdc9d1a3d408",
       "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
@@ -1562,6 +1650,39 @@
       "before": 91.28,
       "after": 97.6,
       "note": "fixed signed path-byte indexing; only node versus gpSearchArray load order remains; 11/11 relocs align"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?EvaluateArtifactEvent@philAI@@QAEHHH@Z",
+      "source_hash": "5e470919df12",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.28934,
+      "after": 99.28934,
+      "note": "jump-only proof excludes 0x1c table; non-jump operands and 30 relocs align with one five-byte continuation delta"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?EvaluateHeroEvent@philAI@@QAEHHHHHPAH@Z",
+      "source_hash": "f272119ba8aa",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 96.37143,
+      "after": 96.37143,
+      "note": "complete 0x54 frame battle outputs CFG and 73 relocs; owner compare scheduling trampolines and local identities remain"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?EvaluateMineEvent@philAI@@QAEHHHHPAH@Z",
+      "source_hash": "66983ebfa3cf",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 99.41747,
+      "after": 92.91262,
+      "note": "complete exact-max source hash with 38 relocs; ten probes reached disposable exact but failed guards; forced multiplication order regressed FPU schedule"
     },
     {
       "unit": "SOURCE/PHILAI",
@@ -1587,14 +1708,80 @@
     },
     {
       "unit": "SOURCE/PHILAI",
-      "function": "?GetBestBuilding@philAI@@QAEXPAVtown@@AAUBHC@@AAM@Z",
-      "source_hash": "098e350474c4",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "function": "?EvaluateTownEvent@philAI@@QAEHHHHHPAH@Z",
+      "source_hash": "c0821be49a52",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
       "iterations": 0,
+      "before": 97.34899,
+      "after": 97.34899,
+      "note": "real evaluator body and 48 external occurrences align; assigned span absorbs xCampaign thunks plus compare and continuation residuals"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?GetBestBHC@philAI@@QAEXHAAUBHC@@@Z",
+      "source_hash": "f6aa447390c6",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.7535,
+      "after": 99.7535,
+      "note": "complete frame CFG and 65 relocs; residuals are strings compiler constants and division-guard identities"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?GetBestBuilding@philAI@@QAEXPAVtown@@AAUBHC@@AAM@Z",
+      "source_hash": "098e350474c4",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 10,
       "before": 99.95652,
       "after": 99.95652,
-      "note": "All 411 bytes match after masking 17 relocations; sole raw byte is folded __adjust_fdiv owner/addend spelling."
+      "note": "raw code exact after 17 relocation masks; ten guarded probes did not yield eligible canonical closure"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?GetBestCreature@philAI@@QAEXPAVtown@@AAUBHC@@AAM@Z",
+      "source_hash": "53a558a1bab3",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.72523,
+      "after": 99.72523,
+      "note": "complete frame CFG and 23 relocs; gMonsterDatabase interior addends constants and equivalent x87 store comparison remain"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?GetBestHero@philAI@@QAEXPAVtown@@AAUBHC@@AAM@Z",
+      "source_hash": "6a02e62d1af6",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 95.36364,
+      "after": 95.36364,
+      "note": "complete frame slots CFG and 19 relocs; equivalent x87 compare continuation and map-index order remain"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?GetGameAttentionValue@philAI@@QAEXH@Z",
+      "source_hash": "b89a386383a9",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 99.75207,
+      "after": 99.75207,
+      "note": "fixed final identity to modeled float; raw 0x1d8 code span now exact after 45 relocation masks"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?GetTurnAIVars@philAI@@QAEXH@Z",
+      "source_hash": "8bb045f644cf",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.08912,
+      "after": 98.08912,
+      "note": "complete 0xac frame scopes CFG and 171 relocs; constants division guards and TU comparison shape remain"
     },
     {
       "unit": "SOURCE/PHILAI",
@@ -1609,6 +1796,17 @@
     },
     {
       "unit": "SOURCE/PHILAI",
+      "function": "?GoodAdjacent@philAI@@QAEHPAH@Z",
+      "source_hash": "2cc45727631a",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.360405,
+      "after": 98.360405,
+      "note": "complete frame CFG and 42 relocs; two current-turn exits use JNE plus continuation instead of direct JE"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
       "function": "?HeroInteractionAtHero@philAI@@QAEXPAVhero@@0HPAH@Z",
       "source_hash": "3f12436eaa8e",
       "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
@@ -1617,6 +1815,28 @@
       "before": 99.9671,
       "after": 99.94079,
       "note": "four commutative address-load byte pairs remain; 29 external relocs align"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?HeroInteractionAtTown@philAI@@QAEXPAVhero@@PAVtown@@HPAH@Z",
+      "source_hash": "3f3707baf35e",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.80319,
+      "after": 99.80319,
+      "note": "complete 0x78 frame CFG and 71 relocs; commutative loads x87 polarity continuations and local routing remain"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?ManaRefreshValue@philAI@@QAEHPAVhero@@H@Z",
+      "source_hash": "968340050f51",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 99.91071,
+      "after": 99.91071,
+      "note": "raw code exact after 4 relocation masks; ten guarded probes were flat"
     },
     {
       "unit": "SOURCE/PHILAI",
@@ -1642,6 +1862,39 @@
     },
     {
       "unit": "SOURCE/PHILAI",
+      "function": "?RVOfPosition@philAI@@QAEHHHHHHHHHHH@Z",
+      "source_hash": "f5b700d5e0c4",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.371765,
+      "after": 99.371765,
+      "note": "complete 0xc8 frame CFG and 56 relocs; first code residual is MAP_WIDTH multiplication operand order"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?RedistributeTroops@philAI@@QAEXPAVarmyGroup@@0HHHHH@Z",
+      "source_hash": "eb37c92d1d4e",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 99.7873,
+      "after": 99.7873,
+      "note": "complete 0x48 frame and 19 relocs; three compare operand bytes remain and guarded probes were flat"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?ResetHeroRVs@@YIXHHH@Z",
+      "source_hash": "a42390aeda58",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 93.52679,
+      "after": 93.52679,
+      "note": "complete frame CFG and 17 relocs; loop-bound and MAP_WIDTH multiplication operand orders remain"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
       "function": "?SetupRelativeHeroStrengths@philAI@@QAEXXZ",
       "source_hash": "df43eba197d8",
       "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
@@ -1653,14 +1906,91 @@
     },
     {
       "unit": "SOURCE/PHILAI",
+      "function": "?StrategicValueOfPosition@philAI@@QAEHHHHHPAHH@Z",
+      "source_hash": "d432012ca259",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.54108,
+      "after": 98.54108,
+      "note": "complete frame CFG and 99 relocs; repeated MAP_WIDTH multiplication operand order and loop-bound polarity remain"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?TurnCostResource@philAI@@QAEXH@Z",
+      "source_hash": "101a88d2580f",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 91.41818,
+      "after": 91.41818,
+      "note": "complete frame CFG; player address recomputation and final division evaluation order differ; candidate 15 versus retail 16 relocs from guarded division"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?TurnValueOfObelisk@philAI@@QAEMH@Z",
+      "source_hash": "f65e1f8fd449",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.85849,
+      "after": 99.85849,
+      "note": "complete CFG frame slots and 22 external relocs; guarded division relocation placement and constant identities remain"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?TurnsToBuy@philAI@@QAEMQAH@Z",
+      "source_hash": "3b3151bf4c15",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 99.96491,
+      "after": 99.96491,
+      "note": "all normalized instructions and 4 relocs align; two x87 local-load bytes remain; reversed comparison neutral and disposable exact failed global guards"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
       "function": "?ValueOfBuyingBuilding@philAI@@QAEXPAVtown@@HAAHAAM@Z",
-      "source_hash": "3219c4ff06cc",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "source_hash": "9383a55e7a72",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
       "iterations": 0,
       "before": 99.992546,
       "after": 99.992546,
-      "note": "All 2086 bytes match after masking 75 relocations; sole raw byte is folded __adjust_fdiv owner/addend spelling."
+      "note": "raw code exact after 75 relocation masks; delinker division-guard identity only"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?ValueOfBuyingCreature@philAI@@QAEXPAVtown@@HAAHHAAM@Z",
+      "source_hash": "0dee37eb14b7",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 97.15909,
+      "after": 97.15909,
+      "note": "complete 0x84 frame slots CFG and 31 relocs; one continuation constants and compiler identities remain"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?ValueOfBuyingHero@philAI@@QAEXPAVtown@@PAVhero@@AAHAAM@Z",
+      "source_hash": "0bc4ccfb3926",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 3,
+      "before": 96.23757,
+      "after": 96.23757,
+      "note": "fixed divisor to float and identity to double eliminating two extra relocs; now 27/27; explicit promotion was neutral"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?ValueOfEventAtPosition@philAI@@QAEHHHHPAH@Z",
+      "source_hash": "6bf130c80f69",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.81579,
+      "after": 99.81579,
+      "note": "complete event switch and 356 relocation sites; next-public span absorbs private code and one resource-table reference has delinked identity"
     },
     {
       "unit": "SOURCE/PHILAI",
