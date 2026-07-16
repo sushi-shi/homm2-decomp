@@ -148,8 +148,8 @@ void advManager::DrawCursor(void)
             } else {
                 if (m_cursorCycle == 0) {
                     drawFrame_f = m_updateMaxY % CURSOR_DIRECTION_COUNT +
-                                ((m_cursorFrame & CURSOR_FRAME_MASK) +
-                                 CURSOR_FLAG_FRAME_BASE);
+                                  ((0[&m_cursorFrame] & CURSOR_FRAME_MASK) +
+                                   CURSOR_FLAG_FRAME_BASE);
                 }
                 FlipIconToBitmap(m_flagIcons[gpCurPlayer->m_color],
                                  gpWindowManager->m_screen, drawX, drawY,
@@ -181,8 +181,8 @@ void advManager::DrawCursor(void)
             } else {
                 if (m_cursorCycle == 0) {
                     drawFrame_f = m_updateMaxY % CURSOR_DIRECTION_COUNT +
-                                ((m_cursorFrame & CURSOR_FRAME_MASK) +
-                                 CURSOR_FLAG_FRAME_BASE);
+                                  ((0[&m_cursorFrame] & CURSOR_FRAME_MASK) +
+                                   CURSOR_FLAG_FRAME_BASE);
                 }
                 IconToBitmap(m_flagIcons[gpCurPlayer->m_color],
                              gpWindowManager->m_screen, drawX, drawY,
@@ -406,17 +406,15 @@ int advManager::GetMoveShowIt(hero *movingHero, int direction)
 }
 
 // @semantic
-// Complete semantics, 0x84 frame, all named/temporary slots, case-body order,
-// jump-table data ranges, and 158/158 relocations are accounted for; the
-// only target identity absent from base is delinked normalDirTable.y at 0xfaa79.
-// First non-reloc residual is one extra retail continuation jump after the hero
-// embarked test; later residuals are step/halfSteps and player-resource address
-// register order plus local-scope trampoline counts. Explicit nested hero arms,
-// both equality operand orders, pointer-form resource access (96.98%), and the
-// positive eventCell arm (96.98%) were tried across five bounded families; an
-// AST probe retained no mutation. Revisit only if an earlier CURSOR source edit
-// changes inline continuation placement, a relevant hero/map layout changes, or
-// comparison gains a proved continuation-target normalization.
+// Complete semantics, 0x84 frame, named/temporary slots, case-body order,
+// jump-table data ranges, and 158/158 ordered effective relocations are
+// accounted for. Scalar-lvalue escapes fixed the packed object-metadata write
+// and step/halfSteps operand order. The first non-relocation residual is one
+// extra retail continuation jump after the hero embarked test; later residuals
+// are local-scope trampoline counts and compiler-local tables. Explicit nested
+// hero arms, equality operand orders, pointer-form resource access, and the
+// positive eventCell arm were already rejected. Revisit if CURSOR TU state,
+// relevant hero/map layout, or continuation-target normalization changes.
 VA(0x0040e51f, 0x1234)
 mapCell *advManager::MoveHero(int direction, int stopAfterMove,
                              int *eventX, int *eventY,
@@ -508,7 +506,8 @@ mapCell *advManager::MoveHero(int direction, int stopAfterMove,
         boat->heroId = static_cast<signed char>(
             boat->heroId | MAP_EVENT_ACTION_FLAG);
         boatCell_a->m_triggerType = MAP_EVENT_ACTION_FLAG | MAP_EVENT_BOAT;
-        boatCell_a->m_objectMetadata = static_cast<unsigned short>(step_a);
+        boatCell_a->m_objectMetadata =
+            static_cast<unsigned short>(0[&step_a]);
         boat->x = static_cast<signed char>(movingHero_f->m_x);
         boat->y = static_cast<signed char>(movingHero_f->m_y);
         StopCursor(1);
@@ -653,7 +652,7 @@ stoppingEvent:
                     m_updateMinY = startVals[directionY_b + 1];
                 }
                 long tick = KBTickCount();
-                if (halfSteps_o * 2 == step_a + 1) {
+                if (0[&step_a] + 1 == halfSteps_o * 2) {
                     m_updateMinX = 0;
                     m_updateMinY = 0;
                 } else {
