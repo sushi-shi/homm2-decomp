@@ -11,6 +11,11 @@ from homm2.build.candidate_data_manifest import IMAGE_REL_BASED_HIGHLOW
 from homm2.build.contribution_manifest import contribution_rows
 
 
+CONTRIBUTION_HEADER = (
+    "object", "storage", "rva", "size", "segment", "section", "provenance",
+)
+
+
 @dataclass(frozen=True)
 class CoverageRow:
     domain: str
@@ -40,6 +45,52 @@ class CoverageDiagnostic:
     start: int
     size: int
     detail: str
+
+
+def load_contributions(path):
+    """Load the exact generated contribution classes used by the delinker."""
+    with Path(path).open(newline="", encoding="utf-8") as stream:
+        reader = csv.DictReader(
+            (line for line in stream if not line.lstrip().startswith("#")),
+            delimiter="\t")
+        if tuple(reader.fieldnames or ()) != CONTRIBUTION_HEADER:
+            raise ValueError("invalid contribution manifest header: %s" % path)
+        rows = []
+        for line, row in enumerate(reader, 2):
+            if row["storage"] not in ("text", "rdata", "data", "bss"):
+                raise ValueError("unsupported contribution storage at %s:%d" %
+                                 (path, line))
+            object_name = row["object"].replace("/", "\\")
+            if (not object_name or ":" in object_name or
+                    any(part in ("", ".", "..")
+                        for part in object_name.split("\\"))):
+                raise ValueError("invalid contribution object at %s:%d" % (path, line))
+            rva = int(row["rva"], 0)
+            size = int(row["size"], 0)
+            segment = int(row["segment"], 0)
+            if (size <= 0 or rva < 0 or not 0 < segment <= 0xFFFF or
+                    rva + size > 0x100000000):
+                raise ValueError("invalid contribution extent at %s:%d" % (path, line))
+            expected_section = {
+                "text": ".text", "rdata": ".rdata",
+                "data": ".data", "bss": ".data",
+            }[row["storage"]]
+            if row["section"] != expected_section:
+                raise ValueError("contribution storage/section mismatch at %s:%d" %
+                                 (path, line))
+            if not row["section"] or not row["provenance"]:
+                raise ValueError("empty contribution evidence at %s:%d" % (path, line))
+            rows.append({
+                "object": object_name, "storage": row["storage"],
+                "rva": rva, "size": size, "segment": segment,
+                "section": row["section"], "provenance": row["provenance"],
+            })
+    intervals = sorted((row["rva"], row["rva"] + row["size"], row) for row in rows)
+    for previous, current in zip(intervals, intervals[1:]):
+        if previous[1] > current[0]:
+            raise ValueError(
+                "overlapping contribution manifest rows at 0x%x" % current[0])
+    return rows
 
 
 def _align_up(value, alignment):
@@ -306,12 +357,16 @@ def _validate_partition(rows, domain, start, end):
     return None
 
 
-def build_coverage(allocations, exe, symbols_path, units_path, closed_groups=None):
+def build_coverage(allocations, exe, symbols_path, units_path, closed_groups=None,
+                   contributions_path=None):
     pe = _pe(exe)
     file_rows = file_partition(pe)
     loaded_rows = loaded_partition(pe)
     data_rows, padding, diagnostics = data_partition(
-        allocations, contribution_rows(exe, units_path), pe, symbols_path,
+        allocations,
+        (load_contributions(contributions_path) if contributions_path is not None
+         else contribution_rows(exe, units_path)),
+        pe, symbols_path,
         closed_groups=closed_groups)
     for domain, rows, start, end in (
             ("file", file_rows, 0, len(pe["data"])),
