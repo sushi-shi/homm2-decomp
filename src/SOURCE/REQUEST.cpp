@@ -1131,6 +1131,16 @@ char * fileRequester::GetFilename(void)
 // ---- vtables (compiler-emitted; census) ----
 VTBL(fileRequester, 0x004eb888);
 
+// @data-layout-note Retail initialized storage is 0xf8674..0xf8900.
+// Thirty-six private owners plus giMapSizeFilter and cFRDummy cover all
+// non-alignment bytes. cFRDummy's stored pointer proves its empty-string owner
+// at 0xf88e4. In Main, the first absolute relocation proves the empty string at
+// 0xf8710; the later corresponding strcpy site proves the copy at 0xf87b0.
+// Both candidate addends are zero. The remaining owners have singleton
+// relocation or unique-payload proof. The final three retail bytes are zero
+// alignment. Both rdata contributions and the 0xc-byte BSS contribution are
+// already exact; do not model alignment with a fake owner.
+
 // ---- globals (definitions, RVA order) ----
 DATA(0x004f8674) FileRequesterMapSizeFilter giMapSizeFilter =
     FILE_REQUESTER_MAP_SIZE_ALL;
