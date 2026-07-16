@@ -11,25 +11,28 @@ The primary mapper replays candidate sections into independent `.rdata`, `.data`
 streams in COFF section-table order with their encoded alignment. A retail contribution start plus
 the replayed section/symbol offset derives private RVAs directly. NB09 public RVAs are hard anchors;
 candidate DIR32 versus retail HIGHLOW sites and literal payload bytes validate identity. When the
-current source has a real stream-layout divergence, the exception mapper accepts only a hard public
-RVA, a unique aligned relocation proof, or a unique literal payload occurrence. Ambiguity, overlap,
-a missing definition, or an uncovered reference leaves the whole group open; the generator never
-emits a partial closed-world group.
+current source has a real stream-layout divergence, the individual-evidence mapper records only a
+hard public RVA, a unique aligned relocation proof, or a unique literal payload occurrence.
+Ambiguity, overlap, a missing definition, or an uncovered reference leaves the whole group open.
+Those individual placements may enter the review queue with their contradictions, but never a
+canonical manifest or target.
 
-The generated reviewed manifest records candidate section offsets and symbol scope. The pinned
-delinker emits closed groups in that topology, resolves interior references as owner plus addend,
-and errors if a relocation reaches an uncovered address in a closed group. Undefined candidate
-externs remain undefined; retail storage is never copied into the referring object.
+The direct candidate-tool manifest records closed-group section offsets and symbol scope as
+discovery evidence only. It is not reviewed and is never a delinker input in the canonical path.
+The pinned delinker consumes the separate source-DATA-plus-reviewed-supplemental manifest, resolves
+interior references as owner plus addend, and errors if a relocation reaches an uncovered address.
+Undefined candidate externs remain undefined; retail storage is never copied into the referring
+object.
 
 The compatibility option `--recover-data-relocs-from-pdb` retains permissive nearest-PDB-symbol
 recovery. It now preserves read-only `.rdata`, initialized `.data`, and zero-fill `.bss` storage;
 it can still produce synthetic `const_` or string identities and is not proof for canonical data
 ownership.
 
-`--require-all` turns the inventory command into a canonical-closure gate: it writes no manifest
+`--require-all` turns the inventory command into a discovery-closure gate: it writes no manifest
 and exits unsuccessfully if any candidate data-bearing group remains open. Without that flag the
-tool emits only independently closed groups so they can be reviewed and integrated incrementally;
-that partial output is not evidence that the program-wide topology is complete.
+tool emits only independently closed groups for diagnostics. That partial output is neither a
+canonical input nor evidence that the program-wide topology is complete.
 `--diagnostics-output` always writes a stable JSON queue, including overlapping cause and storage
 counts, even when `--require-all` refuses to write the manifest.
 
@@ -37,8 +40,8 @@ counts, even when `--require-all` refuses to write the manifest.
 
 `homm2 init` has two distinct modes. Before canonical manifests exist, it creates a permissive
 bootstrap target using `--recover-data-relocs-from-pdb`; that target exists only so candidate
-objects can be compiled and inspected. After canonical manifests are promoted, init reproduces the
-strict target from those versioned inputs instead.
+objects can be compiled and inspected. Once source DATA and the reviewed supplemental manifest are
+available, init assembles their exact generated union and reproduces the strict target from it.
 
 The explicit topology commands are:
 
@@ -50,9 +53,10 @@ The explicit topology commands are:
   defined/common/undefined state, data section, local/global scope, raw storage-class mismatches,
   and `const_`/`string_`/`data_`/`bss_` inventories. Exact topology records are proved mappings;
   same-name records with different definition/scope/storage topology are reported separately as
-  provisional real mappings. The canonical target may contain provisional real mappings while
-  recovery is in progress, but `const_`, `string_`, `data_`, `bss_`, `empty_stub`, and
-  `[section-N]` fallback identities are always hard errors.
+  provisional real mappings. These are review diagnostics only; the canonical symbol manifest and
+  target may contain only source DATA and explicitly reviewed supplemental rows. `const_`,
+  `string_`, `data_`, `bss_`, `empty_stub`, and `[section-N]` fallback identities are always hard
+  errors.
 
   Symbol equality is not sufficient for an exact object. A separate raw COFF data-section
   multiset retains section-table ordinal/order, duplicate raw names such as Midi's COMDAT `.data`
@@ -89,18 +93,36 @@ The explicit topology commands are:
   `--strict` rejects any such unresolved assignment. The generated contribution and whole-image
   coverage manifests remain hard regeneration inputs under `build/gen`; they are not copied into
   version control.
-- `homm2 data-topology propose` writes a disposable partial manifest and structured diagnostics to
-  `build/gen/`. It never changes versioned configuration or target objects.
-- `homm2 data-topology promote` refreshes disposable topology and coverage evidence. Source DATA
-  and candidate facts are regenerated rather than promoted as a second versioned definition.
-- `homm2 data-topology finalize` is the program-wide closure gate. It writes nothing unless every
-  candidate group is closed and the `.text`, retail file, loaded-RVA, and TU-data partition audits
-  have zero blockers.
+- `homm2 data-topology propose` writes only structured candidate diagnostics and
+  `build/gen/data_topology_review_queue.tsv`. The queue is deliberately not a Vostok manifest: its
+  header adds evidence kind, proof count, group blockers, and group contradictions. It contains
+  real candidate identities absent from the canonical source-DATA-plus-supplemental union when an
+  individual placement has public-RVA, aligned relocation/addend, unique literal-payload, or
+  section-replay evidence. An open group does not erase that evidence, but its contradictions ride
+  every proposed row. Unmapped rows remain diagnostic-only. Synthetic/fallback identities are
+  filtered, and canonical identities are omitted. `row_kind=allocation-symbol` makes explicit that
+  the current queue contains COFF allocation symbols; aliases and section-definition metadata are
+  not flattened into fake allocations and remain in topology diagnostics until separately modeled.
+
+  Proposal does not refresh coverage, source-DATA, combined symbol/section, contribution, or target
+  artifacts. The queue is review input only: it is never read by promote, finalize, regenerate, or
+  the delinker, and its rows are never auto-promoted.
+- `homm2 data-topology promote` refreshes diagnostics and coverage evidence, then regenerates the
+  canonical symbol/section manifests strictly from source `DATA()` definitions plus the explicitly
+  reviewed `config/delink_data_supplemental.tsv`. Candidate facts and the review queue cannot enter
+  that union. Promote does not replace target objects.
+- `homm2 data-topology finalize` is the program-wide closure gate. It writes no canonical manifest
+  unless every candidate group is closed and the `.text`, retail file, loaded-RVA, and TU-data
+  partition audits have zero blockers.
 - The only versioned data-topology input is `config/delink_data_supplemental.tsv`; the source tree
   is the canonical input for annotated definitions. The three text-delink CSVs remain independent.
 - `homm2 data-topology regenerate` deterministically rebuilds the generated inputs and atomically
   replaces `build/delink`. Its provenance stamp hashes every config, the retail executable, the
-  synthetic delinker-input PDB, and the pinned delinker executable.
+  synthetic delinker-input PDB, and the pinned delinker executable. Its data symbols come only from
+  source `DATA()` plus reviewed supplemental rows; it never reads the review queue or the legacy
+  direct-tool `candidate_delink_data.tsv` output. Proposal evidence comes from candidate COFF,
+  retail PE/contribution bytes, NB09 public RVAs, and retail relocations, never from the old delinked
+  target's `const_*` or `empty_stub` identities.
 
 Normal `homm2 build` and `homm2 status` consume the fixed target. They never run the candidate
 mapper, rewrite a topology config, or refresh target objects. If a canonical input changes, they
@@ -120,20 +142,16 @@ invalid HIGHLOW sites/targets, or any text evidence failure block promotion.
 
 ## Current census
 
-At the stream-replay checkpoint, candidate objects contain 6,733 defined symbols across 167
-data-bearing object/storage groups. This denominator includes public data, compiler-local statics,
-string literals, constant pools, vtables, and other compiler-emitted definitions, not just the 281
-source lines spelling `DATA(...) static`.
+The fresh candidate census contains 6,734 definitions: 1,232 resolve to source `DATA()` and 5,502
+are non-DATA candidate allocations. The reviewed supplemental manifest covers 634 of the latter,
+leaving 4,868 unreviewed definitions. This denominator includes public data, compiler-local statics,
+string literals, constant pools, vtables, and other compiler-emitted definitions.
 
-The replay plus evidence exception path proves 908 definitions in 98 complete groups. The
-remaining 69 groups are reported explicitly; two formerly accepted BSS mappings are now open
-because no matching sstModule contribution owns them. The open set otherwise contains the prior
-47 initialized-data, 19 BSS, and one read-only-data
-group. Diagnostic classes overlap because one group can fail several checks: 53 have a referenced
-retail RVA not yet covered, 35 contain an unmapped candidate definition, 12 have an ambiguous
-mapping, 26 produce overlapping inferred retail extents, 12 have an extent outside retail storage,
-and 10 fail the one-to-one mapping check. Four groups retain nonzero unmodeled tail payload, three
-leave a public definition uncovered, and two lack a usable retail contribution.
+At the reviewed checkpoint, every row in the independently closed candidate-tool manifest already
+exists in the canonical union, so subtracting only closed groups would produce an empty review
+queue. The proposal command therefore also surfaces individually evidenced placements from open
+groups while retaining their blockers. Definitions without individual candidate-plus-retail
+evidence remain only in the JSON group diagnostics; the old target is never used to fill this gap.
 
 `BASE/Icondf2b` is the regression fixture. Its 37 candidate/retail `DIR32` sites, including two
 public `uDimPal` anchors, prove a bijection for all thirteen four-byte function statics. The target

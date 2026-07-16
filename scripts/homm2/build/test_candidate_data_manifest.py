@@ -55,8 +55,8 @@ class CandidateDataManifestTest(unittest.TestCase):
             (row.unit, row.storage) for row in diagnostics
             if "retail_contribution_missing" in row.causes
         }
-        self.assertTrue({("BASE/BUTTON", "bss"), ("BASE/Blur", "bss")} <=
-                        missing_contribution)
+        self.assertIn(("BASE/Blur", "bss"), missing_contribution)
+        self.assertNotIn(("BASE/BUTTON", "bss"), missing_contribution)
 
 
 if __name__ == "__main__":
