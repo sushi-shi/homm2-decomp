@@ -339,9 +339,8 @@ void dpEvaluateMessage(unsigned long int size, int sender) {
     }
 }
 
-// @early-stop
-// Current dpnetwin.cpp/header epoch: the 0x84 frame and all session/result/
-// compiler slots match. Excluding the retail jump table at +0x166/0x10, every
+// @semantic: Current dpnetwin.cpp/header epoch: the 0x84 frame and all session,
+// result, and compiler slots match. Excluding the retail jump table at +0x166/0x10, every
 // non-jump opcode and operand and all 33 ordered relocations agree. One five-byte
 // continuation after case 3 shifts the dispatch/table and epilogue; the two
 // target literal aliases are proven gsThisNetPlayerInfo +26/+27 fields. Revisit
