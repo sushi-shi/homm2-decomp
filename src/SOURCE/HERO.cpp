@@ -1114,7 +1114,7 @@ int HeroHandler(struct tag_message &message) {
             case HERO_UI_SPELL_POINTS_FIRST:
             case HERO_UI_SPELL_POINTS_LAST:
                 sprintf(gText,
-                    "{Spell Points}\n%s currently has %d spell points out of a maximum of %d.  The maximum number of spell points is 10 times your knowledge.  It is occasionally possible to have more than your maximum spell points via special events.",
+                    "{Spell Points}\n\n%s currently has %d spell points out of a maximum of %d.  The maximum number of spell points is 10 times your knowledge.  It is occasionally possible to have more than your maximum spell points via special events.",
                     gpHVHero->m_name, gpHVHero->m_spellPoints,
                     gpHVHero->Stats(HERO_PRIMARY_KNOWLEDGE) *
                         HERO_SPELL_POINTS_PER_KNOWLEDGE);
@@ -1130,7 +1130,7 @@ int HeroHandler(struct tag_message &message) {
             case HERO_UI_EXPERIENCE_LAST: {
                 level14 = gpHVHero->GetLevel(gpHVHero->m_experience);
                 nextExperience12 = gpHVHero->GetExperience(level14 + 1);
-                sprintf(gText, "{Level %d}\nCurrent experience %d\nNext level %d",
+                sprintf(gText, "{Level %d}\n\nCurrent experience %d\nNext level %d",
                     level14, gpHVHero->m_experience, nextExperience12);
                 NormalDialog(gText,
                     quickView0 == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
@@ -1879,10 +1879,21 @@ void hero::CheckAnduranPieces(int showDialog) {
 }
 
 // @data-layout-note Retail and candidate .data are both 0xf6c88+0x458.
-// Retail places the exact 0x40-byte monh%04d/%d/dismiss-dialog literal pool at
-// +0x8 and gMinExpForLevel at +0x48; candidate places the table at +0x8 and the
-// byte-identical pool at +0x20. Both public pointers remain exact at +0/+4.
-// Preserve the proven payloads and RVAs rather than duplicating either block.
+// Moving the candidate 0x18-byte gMinExpForLevel table from +0x8 to retail
+// +0x48, ahead of the candidate +0x20..+0x60 literal pool, translates the
+// complete payload exactly. Translated and retail SHA-256 are
+// 1569dd769d4201aed37a68372a558fb95075f4c4d221238e4b1fbae32845a142.
+// The 27 local allocations each have one zero-addend reference at the mapped
+// retail RVA. gheroWin has 5 exact zero-addend references. The table's 8
+// references also match at owner-relative addends -2 (2), +0x14 (2), and +0x16
+// (4). Candidate gpHVHero has 136 zero-addend references versus retail's 138;
+// this is incomplete function-body coverage, not missing or aliased storage.
+// Candidate BSS is 0x8 versus retail's 0xc contribution: iOrigHeroViewID has one
+// and gbNoDismiss two exact zero-addend references, followed by a retail
+// four-byte loader-zero tail. The 0x8 .rdata constant is byte-exact (SHA-256
+// 9fbabc0d08aa3515342ef4669b29ff3d6a8ae8ef8ad05a606e81c43d383fc723)
+// with four zero-addend references. Preserve these owners and natural compiler
+// allocation order; do not add aliases, padding owners, or section pragmas.
 DATA(0x004f6c88) class hero *gpHVHero = 0;
 DATA(0x004f6c8c) class heroWindow *gheroWin = 0;
 DATA(0x004f6cd0) short gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT] = {
