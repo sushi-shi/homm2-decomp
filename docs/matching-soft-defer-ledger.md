@@ -14,7 +14,7 @@ General rules:
 - Preserve every already-exact predecessor and sibling byte-for-byte, including relocations.
 - Record a distinct source hash and outcome for every retained or rejected source-state variant.
 - Do not normalize operands, registers, stack displacements, or external relocation identities.
-- Use `scripts/permute_ast.py` only after semantics, size, frame, slots, and CFG align at roughly
+- Use `scripts/match_variants.py` only after semantics, size, frame, slots, and CFG align at roughly
   96-97%. Never use the regex permuter for these targets.
 - A clean soft defer is a scheduling decision, not proof that the remaining bytes are impossible.
 
@@ -62,7 +62,8 @@ AST-gated searches after `e4e96c0`:
 - initial constructor pass: 562 unique source hashes; found and retained the 98.695656% state;
 - `Read` pass from the improved constructor: 356 unique source hashes; no improvement;
 - deep constructor continuation: 819 unique source hashes; no further improvement;
-- every mutation was produced by `scripts/permute_ast.py`, all 11 siblings were pinned, and the
+- every mutation was produced by the then-current `scripts/permute_ast.py`, all 11 siblings were
+  pinned, and the
   regex permuter was never used;
 - the exact hash/score rows are persisted under
   [`docs/matching-matrices/`](matching-matrices/README.md) and must be checked before another AST
@@ -92,7 +93,8 @@ Fresh retail-structure pass after `2e351c8`:
 
 Focused Setup AST pass after integration at `341e775`:
 
-- `scripts/permute_ast.py` exposed 18 legal first-order variants and compiled 286 new unique hashes
+- the then-current `scripts/permute_ast.py` exposed 18 legal first-order variants and compiled 286
+  new unique hashes
   in a deterministic 300-attempt walk;
 - every candidate remained at 97.128380% with all 11 objdiff symbols pinned;
 - existing matrix hashes were skipped, unsafe inequality +/-1 rewrites were disabled, and the
@@ -117,7 +119,8 @@ Focused constructor and `Read` AST passes after exact Setup integration at `2aef
   `Main` disassembly fingerprint/placement moved;
 - none of the accepted `Read` candidates exceeded 98.675500%, so the sole raw residual remains the
   adjacent retail `cmp edi,3` before `m_height` load versus the candidate's reversed schedule;
-- both passes used only `scripts/permute_ast.py`; unsafe inequality rewrites and the regex permuter
+- both passes used only the then-current `scripts/permute_ast.py`; unsafe inequality rewrites and
+  the regex permuter
   were disabled. Default constructor/destructor, `Main`, `Draw`, and exact Setup were byte-pinned;
   the `Read` pass additionally byte-pinned the accepted long constructor.
 
@@ -285,7 +288,7 @@ Rejected because an exact sibling changed raw code:
 
 No coordinate accessor was invented because retail/header evidence does not support one.
 The temporary binding-aware AST tooling was fully restored; canonical
-`scripts/permute_ast.py` SHA-256 was
+The then-current `scripts/permute_ast.py` SHA-256 was
 `a3e4268e...`. The regex permuter was never invoked.
 
 ### Retest trigger

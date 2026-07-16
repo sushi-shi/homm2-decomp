@@ -86,7 +86,7 @@
       # known names). Ghidra 12.0.4 + pyghidra + jdk21 pin-match gruntz (same nixpkgs
       # rev) so they're store cache hits, not a rebuild.
       commonTools = [ homm2-cli rust objdiff objdiff-cli vostok-delinker ] ++ (with pkgs; [
-        (python3.withPackages (ps: [ ps.pyghidra ps.libclang ]))  # pyghidra (headless Ghidra) + libclang (clang.cindex, for scripts/permute_ast.py)
+        (python3.withPackages (ps: [ ps.pyghidra ps.libclang ]))  # pyghidra (headless Ghidra) + libclang (clang.cindex, for scripts/match_variants.py)
         ghidra jdk21                      # Ghidra 12.0.4 headless + JRE (homm2 sema xref)
         ninja
         llvm                              # llvm-pdbutil (synth_pdb yaml2pdb)
