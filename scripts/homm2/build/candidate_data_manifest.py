@@ -105,18 +105,19 @@ def candidate_definitions(path, unit):
             typ, symbol_storage = _coff_symbol_fields(coff, symbol)
             if symbol.name == section.name or symbol_storage not in (2, 3) or typ != 0:
                 continue
-            symbols.append(symbol)
+            symbols.append((symbol, symbol_storage))
         by_offset = defaultdict(list)
-        for symbol in symbols:
-            by_offset[symbol.value].append(symbol)
+        for symbol, symbol_storage in symbols:
+            by_offset[symbol.value].append((symbol, symbol_storage))
         ambiguous = [offset for offset, values in by_offset.items() if len(values) != 1]
         if ambiguous:
             raise ValueError("candidate data aliases at %s:%s offsets %s" % (
                 unit, section.name, ", ".join("0x%x" % value for value in ambiguous)))
         ordered = [values[0] for _offset, values in sorted(by_offset.items())]
         alignment = _section_alignment(_coff_section_characteristics(coff, section.index))
-        for index, symbol in enumerate(ordered):
-            end = ordered[index + 1].value if index + 1 < len(ordered) else section.raw_size
+        for index, (symbol, symbol_storage) in enumerate(ordered):
+            end = (ordered[index + 1][0].value
+                   if index + 1 < len(ordered) else section.raw_size)
             if not symbol.value <= end <= section.raw_size or end == symbol.value:
                 raise ValueError("invalid candidate data extent for %s in %s" %
                                  (symbol.name, unit))
@@ -132,6 +133,53 @@ def candidate_definitions(path, unit):
                 "scope": "external" if symbol_storage == 2 else "local",
             })
     return definitions, coff
+
+
+def _reviewed_group_allocations(unit, storage, definitions, reviewed):
+    """Return a group only when every candidate definition is reviewed exactly."""
+    object_name = unit.replace("/", "\\") + ".c"
+    rows = []
+    for candidate in definitions:
+        row = reviewed.get((object_name, candidate["name"]))
+        if row is None:
+            return None
+        logical_size = int(row["size"], 0)
+        expected = {
+            "storage": storage,
+            "alignment": candidate["alignment"],
+            "section_ordinal": candidate["section"],
+            "section_offset": candidate["section_offset"],
+            "scope": candidate["scope"],
+        }
+        actual = {
+            "storage": row["storage"],
+            "alignment": int(row["alignment"], 0),
+            "section_ordinal": int(row["section_ordinal"], 0),
+            "section_offset": int(row["section_offset"], 0),
+            "scope": row["scope"],
+        }
+        if actual != expected or not 0 < logical_size <= candidate["size"]:
+            mismatches = {
+                key: {"reviewed": actual[key], "candidate": value}
+                for key, value in expected.items() if actual[key] != value
+            }
+            if not 0 < logical_size <= candidate["size"]:
+                mismatches["size"] = {
+                    "reviewed": logical_size, "candidate_span": candidate["size"]}
+            raise ValueError(
+                "reviewed candidate topology mismatch for %s:%s: %s" %
+                (unit, candidate["name"], mismatches))
+        rows.append(CandidateAllocation(
+            unit, object_name, candidate["name"], storage,
+            candidate["section_offset"], logical_size, candidate["alignment"],
+            int(row["rva"], 0), 1, candidate["scope"], row["provenance"]))
+    extents = sorted((row.rva, row.rva + row.size, row.name) for row in rows)
+    for previous, current in zip(extents, extents[1:]):
+        if previous[1] > current[0]:
+            raise ValueError(
+                "reviewed candidate allocations overlap: %s and %s" %
+                (previous[2], current[2]))
+    return rows
 
 
 def _pe_layout(path):
@@ -426,8 +474,15 @@ def _literal_rvas(row, coff, intervals, highlow, read_bytes, cache):
 def derive_allocations(base_dir=REPO / "build/objdiff/base",
                        exe=REPO / "build/orig/HEROES2W.EXE",
                        symbols_path=REPO / "build/gen/symbol_names.csv",
-                       units_path=REPO / "config/units.toml"):
+                       units_path=REPO / "config/units.toml",
+                       reviewed_rows=()):
     """Return allocations only for object/storage groups proved complete."""
+    reviewed = {}
+    for row in reviewed_rows:
+        key = (row["object"], row["name"])
+        if key in reviewed:
+            raise ValueError("duplicate reviewed candidate identity %s:%s" % key)
+        reviewed[key] = row
     public, public_data, functions = _symbol_inventory(symbols_path)
     image_base, highlow, read_u32, read_bytes = _pe_layout(exe)
     referenced_targets = {
@@ -488,6 +543,13 @@ def derive_allocations(base_dir=REPO / "build/objdiff/base",
 
         for storage in sorted({row["storage"] for row in definitions}):
             source_group = [row for row in definitions if row["storage"] == storage]
+            reviewed_group = _reviewed_group_allocations(
+                unit, storage, source_group, reviewed)
+            if reviewed_group is not None:
+                allocations.extend(reviewed_group)
+                stats.closed_groups += 1
+                stats.mapped_definitions += len(reviewed_group)
+                continue
             intervals = contributions.get((unit, storage), [])
             mapped, translation_causes, translation_details = _section_stream_translation(
                 source_group, coff, intervals, public, image_base, highlow,

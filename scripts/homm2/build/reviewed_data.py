@@ -462,7 +462,8 @@ def ensure_reviewed_targets(delinker=None):
 
 def propose_candidate_topology():
     """Write review-only candidate rows and diagnostics under build/gen."""
-    allocations, stats, diagnostics = derive_allocations()
+    canonical = _canonical_union_rows()
+    allocations, stats, diagnostics = derive_allocations(reviewed_rows=canonical)
     queue, queue_stats = review_queue_bytes(allocations, diagnostics)
     _atomic_write(REVIEW_QUEUE, queue)
     _atomic_write(CANDIDATE_DIAGNOSTICS,
@@ -498,21 +499,26 @@ def _build_coverage_proposal(allocations):
 
 def promote_canonical_topology(require_all=False):
     """Refresh generated evidence; never copy derived data into config."""
-    allocations, stats, group_diagnostics = derive_allocations()
+    if not require_all:
+        _build_reviewed_canonical_manifests(strict=False)
+    canonical = _canonical_union_rows()
+    allocations, stats, group_diagnostics = derive_allocations(reviewed_rows=canonical)
     _atomic_write(CANDIDATE_DIAGNOSTICS,
                   candidate_diagnostics_bytes(stats, group_diagnostics))
     _coverage, _padding, coverage_diagnostics = _build_coverage_proposal(allocations)
     blockers = [*group_diagnostics, *coverage_diagnostics]
     if require_all and blockers:
         return stats, blockers
-    _build_reviewed_canonical_manifests(strict=require_all)
+    if require_all:
+        _build_reviewed_canonical_manifests(strict=True)
     return stats, blockers
 
 
 def regenerate_canonical_targets(delinker=None):
     """Regenerate canonical inputs and atomically replace targets."""
     _build_reviewed_canonical_manifests(strict=True)
-    allocations, _stats, group_diagnostics = derive_allocations()
+    canonical = _canonical_union_rows()
+    allocations, _stats, group_diagnostics = derive_allocations(reviewed_rows=canonical)
     _coverage, _padding, coverage_diagnostics = _build_coverage_proposal(allocations)
     if group_diagnostics or coverage_diagnostics:
         raise RuntimeError(

@@ -3,6 +3,7 @@ import unittest
 from homm2.build.candidate_data_manifest import (
     REPO,
     _contains,
+    _reviewed_group_allocations,
     candidate_definitions,
     diagnostics_bytes,
     derive_allocations,
@@ -10,6 +11,52 @@ from homm2.build.candidate_data_manifest import (
 
 
 class CandidateDataManifestTest(unittest.TestCase):
+    def test_fully_reviewed_group_closes_with_reordered_retail_owners(self):
+        definitions = [
+            {"name": "_row", "storage": "bss", "section": 3,
+             "section_offset": 0, "size": 4, "alignment": 4,
+             "scope": "local"},
+            {"name": "_mode", "storage": "bss", "section": 3,
+             "section_offset": 4, "size": 4, "alignment": 4,
+             "scope": "local"},
+        ]
+        reviewed = {
+            ("BASE\\TILE.c", "_row"): {
+                "name": "_row", "object": "BASE\\TILE.c", "rva": "0x104",
+                "size": "0x4", "storage": "bss", "alignment": "0x4",
+                "section_ordinal": "3", "section_offset": "0x0",
+                "scope": "local", "provenance": "source-DATA:test:1",
+            },
+            ("BASE\\TILE.c", "_mode"): {
+                "name": "_mode", "object": "BASE\\TILE.c", "rva": "0x100",
+                "size": "0x4", "storage": "bss", "alignment": "0x4",
+                "section_ordinal": "3", "section_offset": "0x4",
+                "scope": "local", "provenance": "source-DATA:test:2",
+            },
+        }
+        allocations = _reviewed_group_allocations(
+            "BASE/TILE", "bss", definitions, reviewed)
+        self.assertEqual([(row.name, row.rva) for row in allocations],
+                         [("_row", 0x104), ("_mode", 0x100)])
+
+    def test_partially_reviewed_group_remains_open(self):
+        definitions = [
+            {"name": "_one", "storage": "data", "section": 2,
+             "section_offset": 0, "size": 4, "alignment": 4,
+             "scope": "local"},
+            {"name": "_two", "storage": "data", "section": 2,
+             "section_offset": 4, "size": 4, "alignment": 4,
+             "scope": "local"},
+        ]
+        reviewed = {("A.c", "_one"): {
+            "name": "_one", "object": "A.c", "rva": "0x100",
+            "size": "0x4", "storage": "data", "alignment": "0x4",
+            "section_ordinal": "2", "section_offset": "0x0",
+            "scope": "local", "provenance": "reviewed",
+        }}
+        self.assertIsNone(_reviewed_group_allocations(
+            "A", "data", definitions, reviewed))
+
     def test_interval_containment_is_extent_aware(self):
         intervals = [(0x100, 0x120)]
         self.assertTrue(_contains(intervals, 0x100, 0x20))
@@ -57,6 +104,17 @@ class CandidateDataManifestTest(unittest.TestCase):
         }
         self.assertNotIn(("BASE/Blur", "bss"), missing_contribution)
         self.assertNotIn(("BASE/BUTTON", "bss"), missing_contribution)
+
+    def test_candidate_scope_is_read_per_symbol(self):
+        path = REPO / "build/objdiff/base/BASE/Bzip.obj"
+        if not path.is_file():
+            self.skipTest("candidate objects are not built")
+        definitions, _coff = candidate_definitions(path, "BASE/Bzip")
+        by_name = {row["name"]: row for row in definitions}
+        self.assertEqual(by_name["?crc32Table@@3PAIA"]["scope"], "external")
+        self.assertTrue(any(
+            row["name"].startswith("$SG") and row["scope"] == "local"
+            for row in definitions))
 
 
 if __name__ == "__main__":

@@ -137,6 +137,8 @@ class ReviewedDataTest(unittest.TestCase):
                   mock.patch("homm2.build.reviewed_data.CANONICAL_CONTRIBUTION_MANIFEST",
                              contribution_manifest),
                   mock.patch("homm2.build.reviewed_data.CANDIDATE_DIAGNOSTICS", diagnostics),
+                  mock.patch("homm2.build.reviewed_data._canonical_union_rows",
+                             return_value=[]),
                   mock.patch("homm2.build.reviewed_data._build_coverage_proposal",
                              return_value=(b"coverage\n", [], [])),
                   mock.patch("homm2.build.reviewed_data.build_data_manifests") as build,
@@ -273,6 +275,8 @@ class ReviewedDataTest(unittest.TestCase):
                          return_value=([], stats, [open_group])),
               mock.patch("homm2.build.reviewed_data._build_coverage_proposal",
                          return_value=(b"coverage\n", [], [])),
+              mock.patch("homm2.build.reviewed_data._canonical_union_rows",
+                         return_value=[]),
               mock.patch("homm2.build.reviewed_data._atomic_write") as write):
             _stats, blockers = promote_canonical_topology(require_all=True)
         self.assertEqual(blockers, [open_group])
