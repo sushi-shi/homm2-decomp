@@ -160,10 +160,10 @@ $SG36609	SOURCE\CURSOR.c	0xee1b0	0xc	data	0x8	2	0x190	local	candidate-coff-reloc
 $SG36610	SOURCE\CURSOR.c	0xee1bc	0x18	data	0x4	2	0x19c	local	candidate-coff-reloc-bijection
 $SG36624	SOURCE\CURSOR.c	0xee1d4	0x4	data	0x4	2	0x1b4	local	candidate-coff-reloc-bijection
 $SG36631	SOURCE\CURSOR.c	0xee1d8	0x4	data	0x8	2	0x1b8	local	candidate-coff-reloc-bijection
-$SG36643	SOURCE\CURSOR.c	0xee1e0	0x2c	data	0x4	2	0x1bc	local	candidate-coff-reloc-bijection
-$SG36650	SOURCE\CURSOR.c	0xee20c	0x2c	data	0x8	2	0x1e8	local	candidate-coff-reloc-bijection
-$SG36701	SOURCE\CURSOR.c	0xee238	0x10	data	0x4	2	0x214	local	candidate-coff-reloc-bijection
-$T36717	SOURCE\CURSOR.c	0xeb078	0x8	rdata	0x8	5	0x0	local	candidate-coff-section-translation
+$SG36645	SOURCE\CURSOR.c	0xee1e0	0x2c	data	0x4	2	0x1bc	local	candidate-coff-reloc-bijection
+$SG36652	SOURCE\CURSOR.c	0xee20c	0x2c	data	0x8	2	0x1e8	local	candidate-coff-reloc-bijection
+$SG36703	SOURCE\CURSOR.c	0xee238	0x10	data	0x4	2	0x214	local	candidate-coff-reloc-bijection
+$T36719	SOURCE\CURSOR.c	0xeb078	0x8	rdata	0x8	5	0x0	local	candidate-coff-section-translation
 $SG4986	SOURCE\Castle.c	0xef5f4	0xc	data	0x4	2	0x14	local	candidate-coff-section-translation
 $SG4994	SOURCE\Castle.c	0xef600	0x18	data	0x8	2	0x20	local	candidate-coff-section-translation
 $SG5009	SOURCE\Castle.c	0xef618	0x10	data	0x8	2	0x38	local	candidate-coff-section-translation
