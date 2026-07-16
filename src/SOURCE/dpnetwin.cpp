@@ -19,14 +19,6 @@
 #include <SOURCE/dpnetwin.h>
 
 #define DPFILE const_cast<char *>("I:\\Projects\\Heroes\\Prog\\SOURCE\\dpnetwin.cpp")
-#define DP_INIT_LINE_BASE (*reinterpret_cast<const short *>("_"))
-#define DP_TERM_LINE_BASE (*reinterpret_cast<const short *>("\xdb"))
-#define DP_SEND_LINE_BASE (*reinterpret_cast<const short *>("\xfe"))
-#define DP_RCV_LINE_BASE (*reinterpret_cast<const short *>("\x1c\x01"))
-#define DP_PROCESS_LINE_BASE (*reinterpret_cast<const short *>("\x38\x01"))
-#define DP_EVALUATE_LINE_BASE (*reinterpret_cast<const short *>("\x63\x01"))
-#define DP_FIRST_GUEST_LINE_BASE (*reinterpret_cast<const short *>("\xaa\x01"))
-#define DP_HOST_LINE_BASE (*reinterpret_cast<const short *>("\xfe\x01"))
 
 VA(0x0041eda0, 0x95)
 int __stdcall dpEnumServiceProvider(struct _GUID *guid, char *name,
@@ -63,6 +55,7 @@ int __stdcall dpEnumSession(DPSESSIONDESC *session, void *,
 // thunk normalization or shared Win32 declaration recovery.
 VA(0x0041eeaf, 0x311)
 short int dpnet_init(void) {
+    DATA(0x004ef83c) static short initSourceLineBase = DP_SOURCE_LINE_INIT_BASE;
     DirectPlayStartupMessage startup;
     typedef HRESULT (WINAPI *DirectPlayCreateFunction)(GUID *, IDirectPlay **, IUnknown *);
     typedef HRESULT (WINAPI *DirectPlayEnumerateFunction)(LPDPENUMDPCALLBACK, void *);
@@ -76,10 +69,10 @@ short int dpnet_init(void) {
     {
         ppDPRcvBuffer = static_cast<unsigned char **>(
             BaseAlloc(DP_TRANSPORT_BUFFER_COUNT * sizeof(unsigned char *), DPFILE,
-                      DP_INIT_LINE_BASE + 7));
+                      initSourceLineBase + DP_SOURCE_LINE_INIT_BUFFER_ALLOC_OFFSET));
         piDPRcvBufferSize = static_cast<int *>(
             BaseAlloc(DP_TRANSPORT_BUFFER_COUNT * sizeof(int), DPFILE,
-                      DP_INIT_LINE_BASE + 8));
+                      initSourceLineBase + DP_SOURCE_LINE_INIT_SIZE_ALLOC_OFFSET));
         memset(ppDPRcvBuffer, 0,
                DP_TRANSPORT_BUFFER_COUNT * sizeof(unsigned char *));
         memset(piDPRcvBufferSize, 0,
@@ -108,18 +101,19 @@ short int dpnet_init(void) {
         }
         result = createFunction(g_lpGuid, &lpIDC, 0);
         if (result != DP_RESULT_OK)
-            DPSD(result, DPFILE, DP_INIT_LINE_BASE + 0x29);
+            DPSD(result, DPFILE,
+                 initSourceLineBase + DP_SOURCE_LINE_INIT_CREATE_OFFSET);
 
         if (GameMode == REMOTE_GAME_NETWORK_HOST) {
             gbRemoteGameOpen = 1;
             giWaitType = DP_WAIT_FIRST_GUEST;
-            sprintf(gText, "Waiting On Guest. Press 'CANCEL' to quit.");
+            sprintf(gText, "Waiting On Guest.\n\n  Press 'CANCEL' to abort.");
             NormalDialog(gText, 6, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)
                 ShutDown(0);
             iLastMsgNumHumanPlayers = giNumHumanPlayers;
             giWaitType = DP_WAIT_EXTRA_GUESTS;
-            sprintf(gText, "You have %d guest(s) now logged in.",
+            sprintf(gText, "You have %d guest(s) now logged in.  Click 'OK' to move on, or wait for additional guests.",
                     giNumHumanPlayers - 1);
             NormalDialog(gText, 5, -1, -1, -1, 0, -1, 0, -1, 0);
             gbRemoteGameOpen = 0;
@@ -133,7 +127,7 @@ short int dpnet_init(void) {
             }
         } else {
             giWaitType = DP_WAIT_HOST;
-            sprintf(gText, "Waiting for other remote player to log in.");
+            sprintf(gText, "Waiting for other remote player to set up game.");
             NormalDialog(gText, 6, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)
                 ShutDown(0);
@@ -173,6 +167,7 @@ void CleanupDPVars(void) {
 // the import-thunk normalization work.
 VA(0x0041f28e, 0x116)
 void dpnet_term(void) {
+    DATA(0x004efa00) static short termSourceLineBase = DP_SOURCE_LINE_TERM_BASE;
     char drainBuffer[DP_TRANSPORT_TERM_DRAIN_SIZE];
 
     gbRemoteOn = 0;
@@ -184,10 +179,12 @@ void dpnet_term(void) {
     while (dpnet_rcv(0, DP_TRANSPORT_TERM_DRAIN_SIZE, drainBuffer) != 0) {
     }
     if (ppDPRcvBuffer != 0)
-        BaseFree(ppDPRcvBuffer, DPFILE, DP_TERM_LINE_BASE + 0xe);
+        BaseFree(ppDPRcvBuffer, DPFILE,
+                 termSourceLineBase + DP_SOURCE_LINE_TERM_BUFFER_FREE_OFFSET);
     ppDPRcvBuffer = 0;
     if (piDPRcvBufferSize != 0)
-        BaseFree(piDPRcvBufferSize, DPFILE, DP_TERM_LINE_BASE + 0x12);
+        BaseFree(piDPRcvBufferSize, DPFILE,
+                 termSourceLineBase + DP_SOURCE_LINE_TERM_SIZE_FREE_OFFSET);
     piDPRcvBufferSize = 0;
     if (hinstDplayx != 0)
         FreeLibrary(hinstDplayx);
@@ -198,8 +195,10 @@ void dpnet_term(void) {
 VA(0x0041f3a4, 0xee)
 void dpSendMessage(int destination, unsigned char type, unsigned short int size,
                    void *data) {
+    DATA(0x004efa5c) static short sendSourceLineBase = DP_SOURCE_LINE_SEND_BASE;
     unsigned char *message = static_cast<unsigned char *>(
-        BaseAlloc(size + 1, DPFILE, DP_SEND_LINE_BASE + 2));
+        BaseAlloc(size + 1, DPFILE,
+                  sendSourceLineBase + DP_SOURCE_LINE_SEND_ALLOC_OFFSET));
     int result;
 
     message[0] = type;
@@ -208,9 +207,11 @@ void dpSendMessage(int destination, unsigned char type, unsigned short int size,
     result = lpIDC->Send(dcoID, destination, 0, message, size + 1);
     if (result != DP_RESULT_OK && result != DP_RESULT_INVALID_PLAYER &&
         result != DP_RESULT_INVALID_ARGUMENT) {
-        DPSD(result, DPFILE, DP_SEND_LINE_BASE + 0xe);
+        DPSD(result, DPFILE,
+             sendSourceLineBase + DP_SOURCE_LINE_SEND_ERROR_OFFSET);
     }
-    BaseFree(message, DPFILE, DP_SEND_LINE_BASE + 0x10);
+    BaseFree(message, DPFILE,
+             sendSourceLineBase + DP_SOURCE_LINE_SEND_FREE_OFFSET);
 }
 
 VA(0x0041f492, 0x5a)
@@ -228,6 +229,7 @@ int dpnet_snd(int position, int size, void *data) {
 
 VA(0x0041f4ec, 0xa7)
 short int dpnet_rcv(short int, unsigned short int, void *data) {
+    DATA(0x004efae4) static short receiveSourceLineBase = DP_SOURCE_LINE_RECEIVE_BASE;
     unsigned int size;
 
     dpProcessMessages();
@@ -235,7 +237,8 @@ short int dpnet_rcv(short int, unsigned short int, void *data) {
         return 0;
     size = piDPRcvBufferSize[iDPRcvBufferTail];
     memcpy(data, ppDPRcvBuffer[iDPRcvBufferTail], size);
-    BaseFree(ppDPRcvBuffer[iDPRcvBufferTail], DPFILE, DP_RCV_LINE_BASE + 9);
+    BaseFree(ppDPRcvBuffer[iDPRcvBufferTail], DPFILE,
+             receiveSourceLineBase + DP_SOURCE_LINE_RECEIVE_FREE_OFFSET);
     iDPRcvBufferTail = (iDPRcvBufferTail + 1) % DP_TRANSPORT_BUFFER_COUNT;
     return static_cast<short>(size);
 }
@@ -253,6 +256,7 @@ short int __cdecl dpnet_sess(int, int, ...) { return 0; }
 // skips that jump and targets the common epilogue directly.
 VA(0x0041f5c3, 0xbe)
 void dpProcessMessages(void) {
+    DATA(0x004efb14) static short processSourceLineBase = DP_SOURCE_LINE_PROCESS_BASE;
     unsigned long packetSize[2];
     int destinationIds[2];
     int senderId;
@@ -268,7 +272,8 @@ void dpProcessMessages(void) {
         if (receiveResult == DP_RESULT_NO_MESSAGES)
             break;
         if (receiveResult != DP_RESULT_OK)
-            DPSD(receiveResult, DPFILE, DP_PROCESS_LINE_BASE + 0x17);
+            DPSD(receiveResult, DPFILE,
+                 processSourceLineBase + DP_SOURCE_LINE_PROCESS_ERROR_OFFSET);
         if (senderId == 0) {
         } else {
             if (destinationIds[0] == 0 ||
@@ -283,13 +288,15 @@ void dpProcessMessages(void) {
 // jump-table/local-label identity; case-body order and external targets agree.
 VA(0x0041f681, 0x274)
 void dpEvaluateMessage(unsigned long int size, int sender) {
+    DATA(0x004efb44) static short evaluateSourceLineBase = DP_SOURCE_LINE_EVALUATE_BASE;
     char *ptr = rcvBufIn + 1;
     int i;
 
     switch (rcvBufIn[0]) {
     case DP_MESSAGE_DATA:
         ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<unsigned char *>(
-            BaseAlloc(size - 1, DPFILE, DP_EVALUATE_LINE_BASE + 8));
+            BaseAlloc(size - 1, DPFILE,
+                      evaluateSourceLineBase + DP_SOURCE_LINE_EVALUATE_ALLOC_OFFSET));
         memcpy(ppDPRcvBuffer[iDPRcvBufferHead], rcvBufIn + 1, size - 1);
         piDPRcvBufferSize[iDPRcvBufferHead] = size;
         iDPRcvBufferHead = (iDPRcvBufferHead + 1) % DP_TRANSPORT_BUFFER_COUNT;
@@ -329,7 +336,7 @@ void dpEvaluateMessage(unsigned long int size, int sender) {
         bStartUpInfoReceived = 1;
         break;
     default:
-        sprintf(gText, "Unknown message: %d", static_cast<int>(rcvBufIn[0]));
+        sprintf(gText, "Unknown message: %d\n", static_cast<int>(rcvBufIn[0]));
         LogStr(gText);
         break;
     }
@@ -343,6 +350,7 @@ void dpEvaluateMessage(unsigned long int size, int sender) {
 // gsThisNetPlayerInfo +26/+27 fields.
 VA(0x0041f8f5, 0x182)
 int dpWaitForFirstGuest(void) {
+    DATA(0x004efb9c) static short firstGuestSourceLineBase = DP_SOURCE_LINE_FIRST_GUEST_BASE;
     DPSESSIONDESC session;
     int result;
 
@@ -356,7 +364,8 @@ int dpWaitForFirstGuest(void) {
         strcpy(session.szSessionName, "Heroes 2");
         result = lpIDC->Open(&session);
         if (result != DP_RESULT_OK)
-            DPSD(result, DPFILE, DP_FIRST_GUEST_LINE_BASE + 0x10);
+            DPSD(result, DPFILE,
+                 firstGuestSourceLineBase + DP_SOURCE_LINE_FIRST_GUEST_OPEN_OFFSET);
         iDPWaitForFirstGuestStatus++;
         break;
     case 1:
@@ -365,9 +374,10 @@ int dpWaitForFirstGuest(void) {
         iDPWaitForFirstGuestStatus++;
         break;
     case 2:
-        result = lpIDC->CreatePlayer(&dcoID, "Heroes Player", "Dude", &dphEvent);
+        result = lpIDC->CreatePlayer(&dcoID, "Dude", "Heroes Player", &dphEvent);
         if (result != DP_RESULT_OK)
-            DPSD(result, DPFILE, DP_FIRST_GUEST_LINE_BASE + 0x2e);
+            DPSD(result, DPFILE,
+                 firstGuestSourceLineBase + DP_SOURCE_LINE_FIRST_GUEST_CREATE_OFFSET);
         giNetPosToDCOPos[0] = dcoID;
         iDPWaitForFirstGuestStatus++;
         break;
@@ -387,7 +397,7 @@ int dpWaitForExtraGuests(void) {
     dpProcessMessages();
     if (iLastMsgNumHumanPlayers != 0[&giNumHumanPlayers]) {
         iLastMsgNumHumanPlayers = giNumHumanPlayers;
-        sprintf(gText, "You have %d guest(s) now logged in.",
+        sprintf(gText, "You have %d guest(s) now logged in.  Click 'OK' to move on, or wait for additional guests.",
                 giNumHumanPlayers - 1);
         message.type = 0x200;
         message.payload.widget.command = 3;
@@ -404,6 +414,7 @@ int dpWaitForExtraGuests(void) {
 // The objdiff residual is only delinked switch-table/local-label identity.
 VA(0x0041fafb, 0x3d2)
 int dpWaitForHost(void) {
+    DATA(0x004efc78) static short hostSourceLineBase = DP_SOURCE_LINE_HOST_BASE;
     unsigned long enumerationTimeout;
     DPSESSIONDESC sessionDescription;
     int playResult;
@@ -436,7 +447,8 @@ int dpWaitForHost(void) {
             return 0;
         }
         if (playResult != DP_RESULT_OK)
-            DPSD(playResult, DPFILE, DP_HOST_LINE_BASE + 0x26);
+            DPSD(playResult, DPFILE,
+                 hostSourceLineBase + DP_SOURCE_LINE_HOST_ENUM_OFFSET);
         if (iMaxSession > 0) {
             iWaitForHostWaitCount = DP_TRANSPORT_RETRY_WAIT_COUNT;
             iDPWaitForHostStatus++;
@@ -452,13 +464,15 @@ int dpWaitForHost(void) {
         strcpy(sessionDescription.szSessionName, "Heroes 2");
         playResult = lpIDC->Open(&sessionDescription);
         if (playResult != DP_RESULT_OK)
-            DPSD(playResult, DPFILE, DP_HOST_LINE_BASE + 0x39);
+            DPSD(playResult, DPFILE,
+                 hostSourceLineBase + DP_SOURCE_LINE_HOST_OPEN_OFFSET);
         iDPWaitForHostStatus++;
         break;
     case 2:
-        playResult = lpIDC->CreatePlayer(&dcoID, "Heroes Player", "Dude", &dphEvent);
+        playResult = lpIDC->CreatePlayer(&dcoID, "Dude", "Heroes Player", &dphEvent);
         if (playResult != DP_RESULT_OK)
-            DPSD(playResult, DPFILE, DP_HOST_LINE_BASE + 0x43);
+            DPSD(playResult, DPFILE,
+                 hostSourceLineBase + DP_SOURCE_LINE_HOST_CREATE_OFFSET);
         iDPWaitForHostStatus++;
         break;
     case 3:
@@ -481,7 +495,8 @@ int dpWaitForHost(void) {
             }
             playResult = lpIDC->Close();
             if (playResult != DP_RESULT_OK)
-                DPSD(playResult, DPFILE, DP_HOST_LINE_BASE + 0x5d);
+                DPSD(playResult, DPFILE,
+                     hostSourceLineBase + DP_SOURCE_LINE_HOST_CLOSE_OFFSET);
         } else if (iLastHereIAmTickCount + DP_TRANSPORT_ACCEPT_TIMEOUT <
                    KBTickCount()) {
             iDPWaitForHostStatus--;
@@ -599,12 +614,37 @@ void DPSD(int result, char *file, int line) {
     MessageBeep(0);
     MessageBeep(0);
     MessageBeep(0);
-    sprintf(gText, "DirectPlay Error:  %s File: %s Line: %d",
+    sprintf(gText, "DirectPlay Error:\n\n'%s'\n\n  File:'%s'\n Line# %d",
             errorText, file, line);
     LogStr(gText);
     ShutDown(gText);
 }
 
+// @data-layout-note
+// Fresh VC 4.2 storage contains 103 real definitions: 97 initialized owners
+// in one 0x8e3-byte .data section and six loader-zero owners in one 0x54-byte
+// .bss section. Retail contributes 0x8e8 bytes at 0xef7c8..0xf00b0 and 0x58
+// bytes at 0x125060..0x1250b8; this TU owns no .rdata.
+//
+// All 97 initialized logical payloads are byte-exact. The eight function-local
+// signed-short source-line owners are proved at 0xef83c, 0xefa00, 0xefa5c,
+// 0xefae4, 0xefb14, 0xefb44, 0xefb9c, and 0xefc78. Each leaves two zero
+// alignment bytes, and the final 0x2f-byte DPSD format leaves five terminal
+// zero bytes. Those 21 bytes exactly explain the candidate/retail extent gap.
+// The .data payload SHA-256 is
+// fd3770c478657698e62fb1e6a8c5f3cf94af7d5b764ce5e26237b7e2d1bf74b6.
+//
+// All 238 code references to dpnetwin-owned storage resolve to the exact owner
+// with addend zero: 227 pair at the same function-relative DIR32/HIGHLOW site,
+// and 11 pair in complete equal-count ordered streams after validation against
+// the surrounding source-DATA anchors. Retail BSS has only two four-byte zero
+// alignment gaps at 0x12506c and 0x12508c; all six logical owners and all BSS
+// reference targets are exact.
+//
+// Retail payloads also prove the multiline host/guest dialog text, the newline
+// in the unknown-message log, the Dude/Heroes Player argument order, and the
+// multiline DPSD format. Do not restore raw string-dereference line constants,
+// duplicate owners, aliases, padding, cursor replay, or synthetic identities.
 // ---- globals (definitions, RVA order) ----
 DATA(0x004ef7c8) struct IDirectPlay *lpIDC = 0;
 DATA(0x004ef7cc) unsigned long dcoID = 0;
