@@ -46,7 +46,7 @@ int combatManager::HasValidSpellTarget(int spell)
     return 0;
 }
 
-// @match-note 99.7447% retained: recovered retail body order and CFG, including the
+// @semantic: recovered retail body order and CFG, including the
 // in-switch common action block, all four elemental continuation jumps, ordinary
 // switch-break cleanup, and the no-selection scope. The 0x0c frame has
 // elementalType at -0x4, this at -0x8, and the switch temporary at -0x0c. Explicit
@@ -54,8 +54,10 @@ int combatManager::HasValidSpellTarget(int spell)
 // to the function; external relocations agree. The first residual is the entry
 // no-selection branch: retail jumps directly to the false result, while the
 // equal-size canonical form jumps to the final comparison. Explicit early label,
-// nested return, and explicit else forms added 5-10 bytes or reversed the branch;
-// do not retry them without a TU-state change.
+// nested return, explicit terminal false label, selected-arm constant returns,
+// reversed comparison operands, and OR-zero comparison spellings added 1-18 bytes,
+// kept the same two-byte residual, or reversed the branch. Revisit only after a
+// material TU-state change.
 VA(0x00420546, 0x44a)
 int combatManager::ViewSpells(int)
 {
@@ -1045,6 +1047,11 @@ void combatManager::DefaultSpell(int targetHex)
     }
 }
 
+// @semantic: complete 0x58 frame/CFG and all 51 ordered external relocations agree.
+// The only raw residual is +0x368..+0x36d: retail loads affectedCount (-0x0c),
+// compares it with frame (-0x18), and branches `jge`; VC4.2 emits the equivalent
+// reversed compare/`jle`. `frame < count`, `count > frame`, and OR-zero variants
+// all emitted the same residual. Revisit only after a material TU-state change.
 VA(0x00423762, 0x623)
 void combatManager::Fireball(int targetHex, int spell)
 {
@@ -1292,8 +1299,8 @@ void combatManager::ElementalStorm(void)
                         stormIcon_i->CombatClipDrawToBuffer(
                             column_e * SPELL_STORM_TILE_SIZE,
                             row_b * SPELL_STORM_TILE_SIZE,
-                            (column_e * SPELL_STORM_FRAME_COLUMN_STEP + frame_i +
-                             row_b) %
+                            (column_e * SPELL_STORM_FRAME_COLUMN_STEP +
+                             (frame_i | 0) + row_b) %
                                 SPELL_STORM_FRAME_COUNT,
                             &limits_n, 0, 0, 0, 0);
                     }
@@ -1855,15 +1862,6 @@ void combatManager::DrawBolt(SBolt *bolt, int stepCount)
     }
 }
 
-// @match-note 99.59%: complete initialization/clamping/orientation/distance CFG;
-// the 0x18 frame, 0x26f byte size, and all seven relocation targets agree. The
-// first raw and normalized instruction difference starts at retail +0x1c3:
-// retail `mov eax,[ebp+0x14]`, ours `mov eax,[ebp+0x18]`; the first differing
-// byte is its +0x1c5 displacement, retail 0x14 versus ours 0x18. Retail evaluates
-// horizontal abs first and retains it in ebx; ours evaluates vertical abs first,
-// producing the later equivalent `jle`/`jge` polarity difference. Tried reversed
-// inequality, explicit distance locals, and direct abs expressions. Revisit at
-// 95% or after predecessor compiler-state changes.
 VA(0x004259dd, 0x26f)
 void combatManager::AddBolt(SBolt *bolt, int startX, int startY, int endX,
                             int endY, int branchDistance, int startWidth,
@@ -1916,7 +1914,7 @@ void combatManager::AddBolt(SBolt *bolt, int startX, int startY, int endX,
             bolt->drawVertically = 1;
         else
             bolt->drawVertically = 0;
-    } else if (abs(endX - startX) > abs(endY - startY))
+    } else if ((abs(endX - startX) | 0) > abs(endY - startY))
         bolt->drawVertically = 1;
     else
         bolt->drawVertically = 0;
@@ -1924,7 +1922,7 @@ void combatManager::AddBolt(SBolt *bolt, int startX, int startY, int endX,
     int deltaX = abs(endX - startX);
     int deltaY = abs(endY - startY);
     bolt->totalDistance = static_cast<int>(
-        sqrt(static_cast<double>(deltaX * deltaX + deltaY * deltaY)));
+        sqrt(static_cast<double>((deltaX * deltaX | 0) + deltaY * deltaY)));
     ResetBoltAngle(bolt);
 }
 
@@ -2912,17 +2910,6 @@ mirror_found:
     DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 }
 
-// @early-stop 99.97%: soft TU-cumulative operand-evaluation artifact. Complete
-// hex selection, quantity artifact, AddArmy, ability flag, and duration
-// artifacts; the 0x1c frame, every local slot, all
-// 157 instructions, and all five external relocation targets agree. The only
-// raw residual is four stack-displacement bytes at +0x94/+0x97 and
-// +0xd7/+0xda: retail loads randomOffset at -0x18 then offset at -0x14, while
-// ours loads the equivalent addition in the opposite order. Both operand
-// spellings compile identically, and a bounded syntax-aware AST pass found no
-// improvement. An 80-trial guarded TU-state-noise sweep also found no audited
-// exact closure; all rounded-100 candidates failed a strict identity/size guard.
-// Revisit only after a TU compiler-state change.
 VA(0x00428951, 0x218)
 void combatManager::SummonElemental(int monsterType, int spellPower)
 {
@@ -2941,10 +2928,10 @@ void combatManager::SummonElemental(int monsterType, int spellPower)
     int offset;
     for (offset = 0; offset < 3; ++offset) {
         if (m_hexCells[summonHexes_l[m_currentSide * 3 +
-                                     (offset + randomOffset_a) % 3]]
+                                     ((randomOffset_a | 0) + offset) % 3]]
                 .m_occupantSide == COMBAT_HEX_EMPTY)
             summonHex = summonHexes_l[m_currentSide * 3 +
-                                      (offset + randomOffset_a) % 3];
+                                      ((randomOffset_a | 0) + offset) % 3];
     }
     m_unknown351D[m_currentSide] = static_cast<unsigned char>(monsterType);
     AddArmy(m_currentSide, monsterType,
@@ -2960,15 +2947,6 @@ void combatManager::SummonElemental(int monsterType, int spellPower)
         spellPower += SPELL_WIZARD_HAT_POWER_BONUS;
 }
 
-// @match-note: complete standing-frame lookup, edge selection, clamping, and
-// rainbow-bolt call; the 0x18 frame, all five semantic local slots, CFG, and 3/3
-// relocation targets agree. Retail uses animationFrames[ARMY_ANIMATION_STAND][0]
-// at army+0x2ae. The first residual is the final equivalent color selection:
-// retail emits `cmp targetX,startX; setge; dec; and -3; add 303`, while MSVC
-// lowers the direct `targetX >= startX` spelling as `cmp startX,targetX; setg;
-// dec; and 3; add 300`; both select reverse exactly when targetX >= startX.
-// All relational operand orientations, negated `<`, and both ternary arm orders
-// were tried. Revisit only after a material TU-state change.
 VA(0x00428b69, 0x1e6)
 void combatManager::DoLuck(int side, int armyIndex)
 {
@@ -3005,61 +2983,78 @@ void combatManager::DoLuck(int side, int armyIndex)
         startX_b = COMBAT_SCREEN_WIDTH - 1;
     DoBolt(0, startX_b, startY_n, targetX_k, targetY_l, 0, 0, LUCK_BOLT_WIDTH,
            LUCK_BOLT_WIDTH,
-           targetX_k >= startX_b ? BOLT_COLOR_RAINBOW_REVERSE
-                                 : BOLT_COLOR_RAINBOW_FORWARD,
+           BOLT_COLOR_RAINBOW_REVERSE +
+               ((((targetX_k | 0) >= startX_b) - 1) &
+                (BOLT_COLOR_RAINBOW_FORWARD -
+                 BOLT_COLOR_RAINBOW_REVERSE)),
            LUCK_BOLT_ANGLE, LUCK_BOLT_ANGLE,
            LUCK_BOLT_DISTANCE, LUCK_BOLT_FORCE_ANGLE, 1,
            LUCK_BOLT_FRAME_DELAY, 0);
 }
 
-// @match-note retained 99.75%, live 99.49% after shared-header changes:
-// complete blast interpolation/draw/update CFG; the 0x7c frame and all 50
-// relocation targets agree. A prior stabilized build differed only in local
-// string/constant identities; current TU state first differs at the segment
-// loop branch (`jle` versus retail `jge`). Tried `count > segment`, `<`, and an
-// explicit break (worse). Revisit at 95% after headers settle, not before.
-// The 10.0f deadline value and relocation now agree with retail; see MirrorImage's
-// durable note for the remaining two-value constant-pool ordering residual.
+// @semantic: complete 0x7c frame/CFG and all 50 ordered external relocations agree.
+// Moving frame and limits to function scope and solving semantic local suffixes
+// reproduces every retail slot. The OR-zero loop bound reproduces retail's
+// count-first `cmp`/`jge`. The only raw residual is four operand bytes at
+// +0x1ce/+0x1d1 and +0x1d7/+0x1da: retail loads currentX/currentY before the
+// commutative step, while VC4.2 loads stepX/stepY first. Compound assignment and
+// both direct addition orders emit the same residual. Revisit after TU-state changes.
 VA(0x00428d4f, 0x33a)
 void combatManager::DoBlast(int targetHex, int spell)
 {
-    icon *blastIcon;
-    int frameSpacing;
+    float stepY_e;
+    int frameSpacing_c;
+    army *target_i;
+    int targetY_a;
+    int targetX_a;
+    int frame_j;
+    int deltaX_a;
+    int deltaY_a;
+    float currentX_i;
+    int distance_d;
+    SLimitData limits_a;
+    int segment_h;
+    int startY_d;
+    int startX_d;
+    int deadline_j;
+    float currentY_d;
+    icon *blastIcon_h;
+    float stepX_a;
+    int segmentCount_f;
+
     if (spell == SPELL_COLD_RAY) {
-        blastIcon = gpResourceManager->GetIcon("coldray.icn");
-        frameSpacing = BLAST_COLD_RAY_FRAME_SPACING;
+        blastIcon_h = gpResourceManager->GetIcon("coldray.icn");
+        frameSpacing_c = BLAST_COLD_RAY_FRAME_SPACING;
     } else {
-        blastIcon = gpResourceManager->GetIcon("disrray.icn");
-        frameSpacing = BLAST_DISRUPTING_RAY_FRAME_SPACING;
+        blastIcon_h = gpResourceManager->GetIcon("disrray.icn");
+        frameSpacing_c = BLAST_DISRUPTING_RAY_FRAME_SPACING;
     }
-    army *target = &m_armies[m_hexCells[targetHex].m_occupantSide]
-                             [m_hexCells[targetHex].m_occupantIndex];
-    int targetX = target->MidX();
-    int targetY = target->MidY();
-    int startX = castX;
-    int startY = castY;
-    int deltaX = targetX - startX;
-    int deltaY = targetY - startY;
-    int distance = static_cast<int>(
-        sqrt(static_cast<double>(deltaX * deltaX + deltaY * deltaY)));
-    int segmentCount = distance / frameSpacing;
-    float currentX = static_cast<float>(startX);
-    float currentY = static_cast<float>(startY);
-    float stepX = static_cast<float>(deltaX) / segmentCount;
-    float stepY = static_cast<float>(deltaY) / segmentCount;
-    int deadline = 0;
-    int segment;
-    for (segment = 0; segmentCount > segment; ++segment) {
+    target_i = &m_armies[m_hexCells[targetHex].m_occupantSide]
+                         [m_hexCells[targetHex].m_occupantIndex];
+    targetX_a = target_i->MidX();
+    targetY_a = target_i->MidY();
+    startX_d = castX;
+    startY_d = castY;
+    deltaX_a = targetX_a - startX_d;
+    deltaY_a = targetY_a - startY_d;
+    distance_d = static_cast<int>(
+        sqrt(static_cast<double>(deltaX_a * deltaX_a + deltaY_a * deltaY_a)));
+    segmentCount_f = distance_d / frameSpacing_c;
+    currentX_i = static_cast<float>(startX_d);
+    currentY_d = static_cast<float>(startY_d);
+    stepX_a = static_cast<float>(deltaX_a) / segmentCount_f;
+    stepY_e = static_cast<float>(deltaY_a) / segmentCount_f;
+    deadline_j = 0;
+    for (segment_h = 0; segmentCount_f > (segment_h | 0); ++segment_h) {
         ResetLimitCreature();
         gbComputeExtent = 1;
         gbSaveBiggestExtent = 1;
-        currentX += stepX;
-        currentY += stepY;
-        int frame = (segment * BLAST_FRAME_COUNT - 1) / segmentCount;
-        SLimitData limits;
-        blastIcon->CombatClipDrawToBuffer(
-            static_cast<int>(currentX), static_cast<int>(currentY), frame,
-            &limits, stepX < 0.0f, 0, 0, 0);
+        currentX_i += stepX_a;
+        currentY_d += stepY_e;
+        frame_j = (segment_h * BLAST_FRAME_COUNT - 1) / segmentCount_f;
+        blastIcon_h->CombatClipDrawToBuffer(
+            static_cast<int>(currentX_i), static_cast<int>(currentY_d), frame_j,
+            &limits_a, stepX_a < 0.0f, 0, 0, 0);
         if (giMinExtentX < 0)
             giMinExtentX = 0;
         if (giMinExtentY < 0)
@@ -3068,8 +3063,8 @@ void combatManager::DoBlast(int targetHex, int spell)
             giMaxExtentX = COMBAT_SCREEN_WIDTH - 1;
         if (COMBAT_AREA_HEIGHT - 1 < giMaxExtentY)
             giMaxExtentY = COMBAT_AREA_HEIGHT - 1;
-        DelayTil(&deadline);
-        deadline = static_cast<int>(
+        DelayTil(&deadline_j);
+        deadline_j = static_cast<int>(
             KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] *
                                 BLAST_FRAME_DELAY);
         gpWindowManager->UpdateScreenRegion(
@@ -3079,7 +3074,7 @@ void combatManager::DoBlast(int targetHex, int spell)
     gbComputeExtent = 0;
     gbSaveBiggestExtent = 0;
     DrawFrame(1, 0, 0, 0, 0, 1, 0);
-    gpResourceManager->Dispose(blastIcon);
+    gpResourceManager->Dispose(blastIcon_h);
 }
 
 // @match-note 91.73%: quantity/artifact handling, both dead-hex removals, message,
