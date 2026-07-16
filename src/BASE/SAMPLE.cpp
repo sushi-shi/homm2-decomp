@@ -6,10 +6,25 @@
 #include <va.h>
 #include <BASE/MIDIWrap.h>
 #include <BASE/sample.h>
+#include <BASE/SAMPLE_TYPES.h>
 #include <BASE/Misc.h>
 #include <BASE/resourceManager.h>
 #include <SOURCE/KB.h>
 #include <string.h>
+
+// @data-layout-note Retail stores four distinct writable source-file copies in one
+// 0xa0-byte interval at RVA 0x120df4. The sample allocation/destruction and MIDI
+// allocation/destruction call sites reference this owner at +0x00/+0x28/+0x50/+0x78.
+// Independent function-local arrays put both constructor copies before the inline-
+// destructor COMDATs, which conflicts with the retail order. This record emits one
+// section whose complete payload is byte-exact against the retail interval.
+DATA(0x00520df4) static SSampleSourceFiles gSampleSourceFiles = {
+    SAMPLE_SOURCE_FILE,
+    SAMPLE_SOURCE_FILE,
+    SAMPLE_SOURCE_FILE,
+    SAMPLE_SOURCE_FILE
+};
+
 // @early-stop
 // The explicit 0x181-byte CodeView range is raw-exact after relocation-union masking;
 // retail's enclosing row has three trailing padding bytes. Frame/slots and CFG are
@@ -58,7 +73,8 @@ sample::sample(char *name, long channelType, long volume, long loopCount)
 
     unsigned long size = gpResourceManager->GetFileSize(m_id);
 #line 57
-    m_data = static_cast<char *>(H2_ALLOC(size, "I:\\Projects\\Heroes\\Prog\\BASE\\SAMPLE.CPP", 0x39));
+    m_data = static_cast<char *>(
+        H2_ALLOC(size, gSampleSourceFiles.sampleAllocation, 0x39));
     m_size = size;
     gpResourceManager->PointToFile(m_id);
     gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(m_data), size);
@@ -74,7 +90,7 @@ VA(0x004daf40, 0x2c)
 inline sample::~sample()
 {
 #line 97
-    H2_FREE(m_data, "I:\\Projects\\Heroes\\Prog\\BASE\\SAMPLE.CPP", 0x61);
+    H2_FREE(m_data, gSampleSourceFiles.sampleDestruction, 0x61);
     m_data = 0;
     m_size = 0;
     m_volume = 0;
@@ -85,7 +101,8 @@ MIDIWrap::MIDIWrap(char *name) : resource(6, gpResourceManager->MakeId(name, 1),
 {
     unsigned long size = gpResourceManager->GetFileSize(m_id);
 #line 110
-    m_data = static_cast<char *>(H2_ALLOC(size, "I:\\Projects\\Heroes\\Prog\\BASE\\SAMPLE.CPP", 0x6e));
+    m_data = static_cast<char *>(
+        H2_ALLOC(size, gSampleSourceFiles.midiAllocation, 0x6e));
     gpResourceManager->PointToFile(m_id);
     gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(m_data), size);
 }
@@ -100,7 +117,7 @@ VA(0x004db030, 0x28)
 inline MIDIWrap::~MIDIWrap()
 {
 #line 118
-    H2_FREE(m_data, "I:\\Projects\\Heroes\\Prog\\BASE\\SAMPLE.CPP", 0x76);
+    H2_FREE(m_data, gSampleSourceFiles.midiDestruction, 0x76);
     m_data = 0;
 }
 
