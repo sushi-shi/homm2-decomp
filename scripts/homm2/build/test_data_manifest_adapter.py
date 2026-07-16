@@ -188,14 +188,14 @@ class DataManifestAdapterTest(unittest.TestCase):
 
     def test_multiple_sections_pack_in_candidate_order(self):
         topology = {"A": ([], [section("A", 2, 4, 4), section("A", 5, 8, 4)])}
-        rows, diagnostics, _physical = _section_rows(
+        rows, diagnostics, _physical, _classifications = _section_rows(
             topology, [], {}, {}, [contribution("A", 0x100, 0x0c)])
         self.assertEqual([row["rva"] for row in rows], ["0x100", "0x104"])
         self.assertEqual(diagnostics, [])
 
     def test_alignment_gap_is_implicit_not_a_padding_symbol(self):
         topology = {"A": ([], [section("A", 1, 3), section("A", 2, 4, 4)])}
-        rows, diagnostics, _physical = _section_rows(
+        rows, diagnostics, _physical, _classifications = _section_rows(
             topology, [], {}, {}, [contribution("A", 0x100, 8)])
         self.assertEqual([row["rva"] for row in rows], ["0x100", "0x104"])
         self.assertEqual(len(rows), 2)
@@ -203,16 +203,64 @@ class DataManifestAdapterTest(unittest.TestCase):
 
     def test_breakpoint_drift_never_snaps_replay_cursor(self):
         topology = {"A": ([], [section("A", 1, 4), section("A", 2, 4)])}
-        rows, diagnostics, _physical = _section_rows(
+        rows, diagnostics, _physical, _classifications = _section_rows(
             topology, [anchor("A", 1, 0x110)], {}, {},
             [contribution("A", 0x100, 8)])
         self.assertEqual([row["rva"] for row in rows], ["0x100", "0x104"])
         self.assertEqual([row["cause"] for row in diagnostics], ["breakpoint-drift"])
         self.assertEqual(diagnostics[0]["predicted_base"], 0x100)
 
+    def test_unique_reviewed_base_overrides_replay_and_need_not_be_pe_aligned(self):
+        definition = candidate("A", "reviewed", ordinal=1, value=0)
+        topology = {"A": ([definition], [section("A", 1, 8, 8)])}
+        rows, diagnostics, _physical, classifications = _section_rows(
+            topology, [anchor("A", 1, 0x102, name="reviewed")], {}, {},
+            [contribution("A", 0x102, 8)])
+        self.assertEqual(rows[0]["rva"], "0x102")
+        self.assertEqual(rows[0]["provenance"],
+                         "reviewed-definition-affine-section+validated-anchor")
+        self.assertEqual(diagnostics, [])
+        self.assertEqual(classifications, [])
+
+    def test_fully_reviewed_nonaffine_section_is_an_exact_classification(self):
+        definitions = [
+            candidate("A", "first", ordinal=1, value=0),
+            candidate("A", "second", ordinal=1, value=4),
+        ]
+        topology = {"A": (definitions, [section("A", 1, 8, 4)])}
+        reviewed = [
+            anchor("A", 1, 0x100, name="first"),
+            anchor("A", 1, 0x120, offset=4, name="second"),
+        ]
+        rows, diagnostics, physical, classifications = _section_rows(
+            topology, reviewed, {}, {}, [contribution("A", 0x100, 0x30)])
+        self.assertEqual(rows[0]["rva"], "-")
+        self.assertEqual(rows[0]["storage"], "data")
+        self.assertEqual(rows[0]["provenance"],
+                         "reviewed-definition-nonaffine-section")
+        self.assertEqual(diagnostics, [])
+        self.assertEqual(classifications[0]["anchor_bases"], [0x100, 0x11c])
+        classified = _classified_contribution_rows(physical, rows)
+        self.assertEqual(classified[0]["storage"], "data")
+        self.assertEqual(classified[0]["size"], 0x30)
+
+    def test_partial_nonaffine_section_remains_a_blocking_diagnostic(self):
+        definitions = [
+            candidate("A", "first", ordinal=1, value=0),
+            candidate("A", "missing", ordinal=1, value=4),
+        ]
+        topology = {"A": (definitions, [section("A", 1, 8, 4)])}
+        rows, diagnostics, _physical, classifications = _section_rows(
+            topology, [anchor("A", 1, 0x120, name="first")], {}, {},
+            [contribution("A", 0x100, 8)])
+        self.assertEqual(rows[0]["rva"], "0x100")
+        self.assertEqual([row["cause"] for row in diagnostics],
+                         ["breakpoint-drift"])
+        self.assertEqual(classifications, [])
+
     def test_multiple_contribution_chunks_restart_cursor(self):
         topology = {"A": ([], [section("A", 1, 4), section("A", 2, 8, 8)])}
-        rows, diagnostics, _physical = _section_rows(
+        rows, diagnostics, _physical, _classifications = _section_rows(
             topology, [], {}, {}, [
                 contribution("A", 0x100, 4), contribution("A", 0x200, 8),
             ])
@@ -221,7 +269,7 @@ class DataManifestAdapterTest(unittest.TestCase):
 
     def test_adjacent_nb09_chunks_remain_distinct(self):
         topology = {"A": ([], [section("A", 1, 4), section("A", 2, 4)])}
-        rows, diagnostics, physical = _section_rows(
+        rows, diagnostics, physical, _classifications = _section_rows(
             topology, [], {}, {}, [
                 contribution("A", 0x100, 4), contribution("A", 0x104, 4),
             ])
@@ -234,7 +282,7 @@ class DataManifestAdapterTest(unittest.TestCase):
             section("A", 1, 8, 4),
             section("A", 2, 4, 4, name=".CRT$XCU"),
         ])}
-        rows, diagnostics, _physical = _section_rows(
+        rows, diagnostics, _physical, _classifications = _section_rows(
             topology, [], {}, {}, [
                 contribution("A", 0x100, 4),
                 contribution("A", 0x200, 8),
@@ -251,7 +299,7 @@ class DataManifestAdapterTest(unittest.TestCase):
             section("A", 1, 8, 4),
             section("A", 2, 4, 4, name=".CRT$XCU"),
         ])}
-        rows, diagnostics, _physical = _section_rows(
+        rows, diagnostics, _physical, _classifications = _section_rows(
             topology, [], {}, {}, [
                 contribution("A", 0x100, 4),
                 contribution("A", 0x104, 4),
@@ -268,7 +316,7 @@ class DataManifestAdapterTest(unittest.TestCase):
             section("A", 1, 4, selection=2),
             section("A", 2, 4, selection=2),
         ])}
-        rows, diagnostics, physical = _section_rows(
+        rows, diagnostics, physical, _classifications = _section_rows(
             topology, [anchor("A", 1, 0x180)], {}, {}, [])
         self.assertEqual(rows[0]["rva"], "0x180")
         self.assertEqual(rows[0]["provenance"], "explicit-comdat-anchor+validated-anchor")
@@ -282,7 +330,7 @@ class DataManifestAdapterTest(unittest.TestCase):
         definition = replace(candidate("A", "literal", ordinal=1),
                              comdat_selection=2)
         topology = {"A": ([definition], [section("A", 1, 4, selection=2)])}
-        rows, diagnostics, _physical = _section_rows(
+        rows, diagnostics, _physical, _classifications = _section_rows(
             topology, [], {}, {"literal": (0x180,)}, [])
         self.assertEqual(rows[0]["rva"], "0x180")
         self.assertEqual(diagnostics, [])
@@ -291,7 +339,7 @@ class DataManifestAdapterTest(unittest.TestCase):
         definition = replace(candidate("A", "literal", ordinal=1),
                              comdat_selection=2)
         topology = {"A": ([definition], [section("A", 1, 4, selection=2)])}
-        rows, diagnostics, _physical = _section_rows(
+        rows, diagnostics, _physical, _classifications = _section_rows(
             topology, [], {}, {"literal": (0x180, 0x1a0)}, [])
         self.assertEqual(rows[0]["rva"], "-")
         self.assertEqual(diagnostics[0]["cause"],
@@ -304,7 +352,7 @@ class DataManifestAdapterTest(unittest.TestCase):
             section("A", 1, 4, storage="bss", selection=2),
             section("A", 2, 4, storage="data"),
         ])}
-        rows, diagnostics, physical = _section_rows(
+        rows, diagnostics, physical, _classifications = _section_rows(
             topology, [], {}, {"literal": (0x104,)},
             [contribution("A", 0x100, 8)])
         by_ordinal = {int(row["ordinal"]): row for row in rows}
@@ -316,7 +364,7 @@ class DataManifestAdapterTest(unittest.TestCase):
 
     def test_candidate_bss_classifies_physical_writable_contribution(self):
         topology = {"A": ([], [section("A", 1, 8, 4, storage="bss")])}
-        rows, diagnostics, physical = _section_rows(
+        rows, diagnostics, physical, _classifications = _section_rows(
             topology, [], {}, {}, [contribution("A", 0x122f20, 8)])
         classified = _classified_contribution_rows(physical, rows)
         self.assertEqual(diagnostics, [])
@@ -328,7 +376,7 @@ class DataManifestAdapterTest(unittest.TestCase):
         first = contribution("A", 0x122f20, 4)
         second = contribution("A", 0x122f24, 4)
         second["storage"] = "bss"
-        rows, diagnostics, physical = _section_rows(
+        rows, diagnostics, physical, _classifications = _section_rows(
             topology, [], {}, {}, [first, second])
         self.assertEqual(len(physical), 1)
         classified = _classified_contribution_rows(physical, rows)

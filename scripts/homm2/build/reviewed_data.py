@@ -475,7 +475,8 @@ def _build_coverage_proposal(allocations):
     closed_groups = {(row.unit, row.storage) for row in allocations}
     rows, padding, diagnostics = build_coverage(
         allocations, EXE, SYMBOLS, REPO / "config/units.toml",
-        closed_groups=closed_groups)
+        closed_groups=closed_groups,
+        contributions_path=CANONICAL_CONTRIBUTION_MANIFEST)
     try:
         TEXT_COVERAGE_PROPOSAL.unlink()
     except FileNotFoundError:

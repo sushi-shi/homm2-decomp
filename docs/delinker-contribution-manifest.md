@@ -4,10 +4,11 @@ The shipping NB09 stream is publics-only, but its `sstModule` records retain eve
 linked segment ranges. `python3 -m homm2.build.contribution_manifest` converts the ranges belonging
 to configured reconstruction TUs into `build/gen/delink_contributions.tsv`.
 
-The manifest assigns `.text`, `.rdata`, initialized `.data`, and loader-zero `.bss` intervals to the
-synthetic delinker object name. Writable ranges are split at the retail PE `.data` raw-size boundary;
-the initialized part has bytes in the image while the remaining virtual tail is loader-zeroed. The
-generator rejects unknown modules, out-of-section extents, and overlapping contribution intervals.
+The bootstrap manifest assigns `.text`, `.rdata`, initialized `.data`, and loader-zero `.bss`
+intervals to the synthetic delinker object name. Writable ranges are initially split at the retail
+PE `.data` raw-size boundary. Canonical assembly then classifies writable NB09 owner chunks with the
+reviewed candidate section/storage evidence and writes the same generated path. The generator
+rejects unknown modules, out-of-section extents, and overlapping contribution intervals.
 
 `vostok-delinker --contribution-manifest` uses these intervals only to constrain fallback data-symbol
 selection. When resolving an address in a known contribution, a candidate public/string symbol must
@@ -24,3 +25,5 @@ regeneration deterministically refreshes the same generated path; it is never co
 configuration. Its digest is part of
 `.reviewed-data-stamp.json`. A changed canonical input makes normal build/status fail until the
 explicit `homm2 data-topology regenerate` command replaces the target.
+The whole-image coverage gate loads and validates this exact generated manifest, so Vostok owner
+resolution and TU `.data`/`.rdata`/`.bss` coverage cannot silently use different storage classes.

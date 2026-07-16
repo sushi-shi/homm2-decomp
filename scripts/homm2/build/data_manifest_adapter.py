@@ -454,10 +454,12 @@ def _is_linker_sorted_subsection(section):
 def _section_rows(topology_by_unit, symbol_rows, public_by_symbol,
                   global_public_rvas, contributions):
     anchors = defaultdict(list)
+    reviewed_by_section = defaultdict(list)
     comdat_identity_anchors = defaultdict(list)
     for row in symbol_rows:
         unit = row["object"].replace("\\", "/").removesuffix(".c")
         ordinal = int(row["section_ordinal"], 0)
+        reviewed_by_section[(unit, ordinal)].append(row)
         base = int(row["rva"], 0) - int(row["section_offset"], 0)
         anchors[(unit, ordinal)].append(
             (base, row["name"], int(row["rva"], 0), row["provenance"]))
@@ -516,6 +518,7 @@ def _section_rows(topology_by_unit, symbol_rows, public_by_symbol,
 
     result = []
     diagnostics = []
+    classifications = []
     assignments = {}
     used_contributions = set()
     for contribution in physical:
@@ -637,6 +640,18 @@ def _section_rows(topology_by_unit, symbol_rows, public_by_symbol,
             for section in group:
                 values = anchors.get((unit, section.ordinal), [])
                 bases = {value[0] for value in values}
+                candidate_definitions = [
+                    definition for definition in _definitions
+                    if definition.section_ordinal == section.ordinal
+                ]
+                reviewed_keys = {
+                    (row["name"], int(row["section_offset"], 0))
+                    for row in reviewed_by_section.get((unit, section.ordinal), [])
+                }
+                fully_reviewed = bool(candidate_definitions) and all(
+                    (definition.symbol, definition.section_value) in reviewed_keys
+                    for definition in candidate_definitions
+                )
                 predicted = None
                 owner_index = None
                 while interval_index < len(intervals):
@@ -646,7 +661,6 @@ def _section_rows(topology_by_unit, symbol_rows, public_by_symbol,
                         predicted = candidate
                         owner_index = interval["index"]
                         cursor = candidate + section.size
-                        used_contributions.add(interval["index"])
                         break
                     interval_index += 1
                     if interval_index < len(intervals):
@@ -663,6 +677,92 @@ def _section_rows(topology_by_unit, symbol_rows, public_by_symbol,
                         values = fallback_values
                         bases = fallback_bases
                         provenance = "explicit-comdat-anchor"
+
+                # A unique reviewed base is stronger than contribution-order replay.
+                # The RVA is only the retail byte-copy source; it need not retain the
+                # candidate input section's alignment after linking.
+                affine_owner = None
+                if fully_reviewed and len(bases) == 1:
+                    reviewed_base = next(iter(bases))
+                    owners = [
+                        contribution for contribution in physical
+                        if (contribution["object"].replace("\\", "/")
+                            .removesuffix(".c") == unit)
+                        and contribution["domain"] == _section_domain(section)
+                        and contribution["rva"] <= reviewed_base
+                        and reviewed_base + section.size <= (
+                            contribution["rva"] + contribution["size"])
+                    ]
+                    if len(owners) == 1:
+                        affine_owner = owners[0]
+                        predicted = reviewed_base
+                        owner_index = affine_owner["index"]
+                        used_contributions.add(owner_index)
+                        provenance = "reviewed-definition-affine-section"
+
+                # The linker may reorder independently emitted definitions inside
+                # one candidate COFF section. Preserve the candidate section shape,
+                # but let Vostok copy every enrolled definition from its own retail
+                # RVA. This is exact once every candidate allocation is reviewed.
+                if fully_reviewed and affine_owner is None:
+                    owner_indexes = set()
+                    unowned = []
+                    for row in reviewed_by_section[(unit, section.ordinal)]:
+                        rva = int(row["rva"], 0)
+                        end = rva + int(row["size"], 0)
+                        owners = [
+                            contribution for contribution in physical
+                            if (contribution["object"].replace("\\", "/")
+                                .removesuffix(".c") == unit)
+                            and contribution["domain"] == _section_domain(section)
+                            and contribution["rva"] <= rva
+                            and end <= contribution["rva"] + contribution["size"]
+                        ]
+                        if len(owners) != 1:
+                            unowned.append({
+                                "name": row["name"], "rva": rva,
+                                "size": int(row["size"], 0),
+                                "owner_count": len(owners),
+                            })
+                        else:
+                            owner_indexes.add(owners[0]["index"])
+                    if not unowned:
+                        used_contributions.update(owner_indexes)
+                        assignments[(unit, section.ordinal)] = (None, None)
+                        result.append({
+                            "object": section.object_name,
+                            "ordinal": str(section.ordinal),
+                            "name": section.name,
+                            "rva": "-",
+                            "size": f"0x{section.size:x}",
+                            "alignment": f"0x{section.alignment:x}",
+                            "characteristics": f"0x{section.characteristics:08x}",
+                            "comdat_selection": str(section.comdat_selection),
+                            "associative_ordinal": (
+                                str(section.associative_ordinal)
+                                if section.associative_ordinal is not None else "-"),
+                            "storage": section.storage,
+                            "provenance": "reviewed-definition-nonaffine-section",
+                        })
+                        classifications.append({
+                            "unit": unit,
+                            "section_ordinal": section.ordinal,
+                            "section_name": section.name,
+                            "storage": section.storage,
+                            "classification": "reviewed-definition-nonaffine-section",
+                            "anchor_bases": sorted(bases),
+                            "definition_count": len(candidate_definitions),
+                            "contribution_indexes": sorted(owner_indexes),
+                        })
+                        continue
+                    diagnostics.append({
+                        "unit": unit,
+                        "section_ordinal": section.ordinal,
+                        "section_name": section.name,
+                        "storage": section.storage,
+                        "cause": "reviewed-definition-outside-contributions",
+                        "definitions": unowned,
+                    })
                 if predicted is None:
                     fallback_values = comdat_identity_anchors.get(
                         (unit, section.ordinal), [])
@@ -692,6 +792,8 @@ def _section_rows(topology_by_unit, symbol_rows, public_by_symbol,
                     continue
 
                 assignments[(unit, section.ordinal)] = (predicted, owner_index)
+                if owner_index is not None:
+                    used_contributions.add(owner_index)
                 if len(bases) > 1:
                     cause = "inconsistent-anchor-bases"
                 elif bases and predicted not in bases:
@@ -777,7 +879,7 @@ def _section_rows(topology_by_unit, symbol_rows, public_by_symbol,
             "contribution_size": contribution["size"],
         })
     result.sort(key=lambda row: (row["object"], int(row["ordinal"])))
-    return result, diagnostics, physical
+    return result, diagnostics, physical, classifications
 
 
 def _stream_bounds(pe, storage: str) -> tuple[int, int]:
@@ -809,6 +911,17 @@ def _classified_contribution_rows(physical, section_rows):
                        if row[0] == contribution["object"]
                        and start <= row[1] and row[2] <= end)
         if not owned:
+            storage = contribution.get("candidate_storage")
+            if storage is not None:
+                result.append({
+                    "object": contribution["object"],
+                    "storage": storage,
+                    "rva": start,
+                    "size": contribution["size"],
+                    "segment": contribution["segment"],
+                    "section": contribution["section"],
+                    "provenance": "retail-nb09-sstModule+reviewed-definition-class",
+                })
             continue
         piece_start = start
         current_storage = owned[0][3]
@@ -838,7 +951,7 @@ def _classified_contribution_rows(physical, section_rows):
 
 
 def breakpoint_report(topology_by_unit, section_rows, section_diagnostics,
-                      physical, exe=EXE) -> dict:
+                      section_classifications, physical, exe=EXE) -> dict:
     assigned = {(row["object"].replace("\\", "/").removesuffix(".c"),
                  int(row["ordinal"], 0)): int(row["rva"], 0)
                 for row in section_rows if row["rva"] != "-"}
@@ -890,10 +1003,12 @@ def breakpoint_report(topology_by_unit, section_rows, section_diagnostics,
             "intervals": intervals,
         }
     return {
-        "schema": 1,
-        "policy": ("candidate-order replay within exact NB09 contribution chunks; "
-                   "observed anchors validate and never move the cursor"),
+        "schema": 2,
+        "policy": ("affine sections use exact reviewed bases or candidate-order replay; "
+                   "fully reviewed non-affine sections preserve candidate topology and "
+                   "copy each definition from its independent retail RVA"),
         "section_assignment_diagnostics": section_diagnostics,
+        "section_assignment_classifications": section_classifications,
         "streams": streams,
     }
 
@@ -927,11 +1042,12 @@ def build_manifests(source_root=SOURCE_ROOT, base_root=BASE_ROOT, symbols=SYMBOL
     combined = [*source_rows, *supplemental_rows]
     validate_symbol_rows(combined, "combined")
     retail_contributions = contribution_rows(exe, units)
-    section_rows, section_diagnostics, physical = _section_rows(
+    section_rows, section_diagnostics, physical, section_classifications = _section_rows(
         topology_by_unit, combined, public_by_symbol, global_public_rvas,
         retail_contributions)
     report = breakpoint_report(
-        topology_by_unit, section_rows, section_diagnostics, physical, exe)
+        topology_by_unit, section_rows, section_diagnostics,
+        section_classifications, physical, exe)
     classified_contributions = [
         dict(row) for row in retail_contributions if row["storage"] == "text"
     ]
@@ -958,6 +1074,7 @@ def build_manifests(source_root=SOURCE_ROOT, base_root=BASE_ROOT, symbols=SYMBOL
         "combined_definitions": len(combined),
         "sections": len(section_rows),
         "section_assignment_diagnostics": len(section_diagnostics),
+        "section_assignment_classifications": len(section_classifications),
         "breakpoints": {name: {
             "exact": row["exact_sections"], "total": row["section_count"],
             "terminal_drift": row["terminal_drift"],
