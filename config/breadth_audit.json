@@ -2785,6 +2785,83 @@
       "note": "two castle-coordinate equalities load byte and word operands in reverse order; 11 external relocs align"
     },
     {
+      "unit": "SOURCE/REMOTE",
+      "function": "?DecodePacket@@YIHPAEH@Z",
+      "source_hash": "8097f39c0aed",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.76,
+      "after": 99.76,
+      "note": "Complete 0x11c candidate code range and 17 ordered relocations agree; retail next-public span has a 30-byte unowned tail, so the old whole-span exact claim was removed."
+    },
+    {
+      "unit": "SOURCE/REMOTE",
+      "function": "?PollRemote@@YIXXZ",
+      "source_hash": "34a4d78aef36",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 91.98191,
+      "after": 91.98191,
+      "note": "Complete polling/timeout/queue CFG/frame and 132 ordered relocations agree; host-loop load order remains. Retail confirms the unusual guest-timeout bInTimeoutFail=1 store."
+    },
+    {
+      "unit": "SOURCE/REMOTE",
+      "function": "?RemoteCleanup@@YIXXZ",
+      "source_hash": "9afb5be07535",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.33701,
+      "after": 99.33701,
+      "note": "Complete cleanup CFG/frame and 38 ordered relocations agree; residual is the documented switch continuation/local-label shape after exhausted obvious forms."
+    },
+    {
+      "unit": "SOURCE/REMOTE",
+      "function": "?RemoteMain@@YIXH@Z",
+      "source_hash": "4205d2bfe59c",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 97.6823,
+      "after": 97.6823,
+      "note": "Complete setup/synchronization CFG/frame and 143 ordered relocations agree; residual is documented table/local-label attribution after exhausted obvious forms."
+    },
+    {
+      "unit": "SOURCE/REMOTE",
+      "function": "?SendRemoteData@@YIHPAE0HH@Z",
+      "source_hash": "75e78f759608",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 91.103775,
+      "after": 91.103775,
+      "note": "Complete backend switch/frame and 23 ordered relocations agree; residual begins at switch dispatch after both obvious polarity forms were exhausted."
+    },
+    {
+      "unit": "SOURCE/REMOTE",
+      "function": "?TransmitAndWait@@YIHPADHHCCPAPAD@Z",
+      "source_hash": "ccb08709b399",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 97.71277,
+      "after": 97.71277,
+      "note": "Complete transmit/wait CFG/frame and 11 ordered relocations agree; documented continuation and epilogue local jump remain after exhausted obvious forms."
+    },
+    {
+      "unit": "SOURCE/REMOTE",
+      "function": "?TransmitRemoteData@@YIHPADHHCCCC@Z",
+      "source_hash": "0cf104bf9659",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.15966,
+      "after": 99.15966,
+      "note": "Complete retry and confirmation CFG/frame and 15 ordered relocations agree; documented five-byte continuation and load-order residual already exhausted obvious forms."
+    },
+    {
       "unit": "SOURCE/REQUEST",
       "function": "?DoKnob@fileRequester@@QAEXXZ",
       "source_hash": "e2f7010fe137",
@@ -3591,23 +3668,23 @@
       "unit": "SOURCE/dpnetwin",
       "function": "?dpWaitForFirstGuest@@YIHXZ",
       "source_hash": "0da95907179c",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
       "iterations": 0,
       "before": 98.98058,
       "after": 98.98058,
-      "note": "Complete frame and 33 relocations; one proved five-byte continuation shifts only local dispatch and table positions."
+      "note": "Complete frame/slots/CFG and 33 ordered relocations agree; documented switch-table shift and five-byte continuation are retained as semantic rather than raw-exact proof."
     },
     {
       "unit": "SOURCE/dpnetwin",
       "function": "?dpnet_init@@YIFXZ",
       "source_hash": "2d70d52cb3e4",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
-      "outcome": "improved",
-      "iterations": 10,
-      "before": 99.02577,
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.04124,
       "after": 99.04124,
-      "note": "Recovered guestIndex slot; ten bounded variants leave player-count compare order and import-thunk shapes."
+      "note": "Complete semantics/CFG/frame and 71 semantic ordered relocations agree; prior ten bounded attempts exhausted the loop load/comparison and import-call residuals."
     },
     {
       "unit": "SOURCE/dpnetwin",
@@ -3674,6 +3751,28 @@
       "before": 99.8,
       "after": 100.0,
       "note": "Assigned the target-Y local its retail bucket; the complete frame, bytes, and 19 ordered relocations now match."
+    },
+    {
+      "unit": "SOURCE/netwin",
+      "function": "?nb_add_name_done@@YGXPAUNetbiosControlBlock@@@Z",
+      "source_hash": "6b001c3bf79a",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.70414,
+      "after": 99.70414,
+      "note": "All 0x1ca bytes match after masking 35 aligned relocations; frame/tables/CFG agree and residual is delinked private/global/literal/local-label identity only."
+    },
+    {
+      "unit": "SOURCE/netwin",
+      "function": "?nb_recv_complete@@YIXH@Z",
+      "source_hash": "ccedd52a72a8",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.75177,
+      "after": 99.75177,
+      "note": "Byte-proven code/frame/CFG with 24 semantic ordered targets and 26 raw relocation fields; residual is private aliases, fixed IAT operands, and local-label identity only."
     },
     {
       "unit": "SOURCE/tradpost",
