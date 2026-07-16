@@ -1,0 +1,43 @@
+#ifndef HOMM2_BASE_EXEC_TYPES_H
+#define HOMM2_BASE_EXEC_TYPES_H
+
+#include <va.h>
+
+typedef enum ExecutiveTextSlotSize {
+    EXEC_TEXT_RESOURCE_INIT_SLOT_SIZE = 0x38,
+    EXEC_TEXT_INPUT_INIT_SLOT_SIZE = 0x50,
+    EXEC_TEXT_DEVICE_INIT_SLOT_SIZE = 0x1c,
+    EXEC_TEXT_WINDOW_INIT_SLOT_SIZE = 0x40,
+    EXEC_TEXT_MANAGER_ERROR_SLOT_SIZE = 0x14,
+    EXEC_TEXT_LIST_START_SLOT_SIZE = 0x20,
+    EXEC_TEXT_LIST_DIVIDER_SLOT_SIZE = 0x8,
+    EXEC_TEXT_LIST_HEADER_SLOT_SIZE = 0x14,
+    EXEC_TEXT_LIST_ENTRY_SLOT_SIZE = 0x2c,
+    EXEC_TEXT_LIST_STOP_SLOT_SIZE = 0x20,
+    EXEC_TEXT_TERMINATION_SLOT_SIZE = 0xc
+} ExecutiveTextSlotSize;
+
+typedef struct SExecutiveText {
+    char resourceInitError[EXEC_TEXT_RESOURCE_INIT_SLOT_SIZE];
+    char inputInitError[EXEC_TEXT_INPUT_INIT_SLOT_SIZE];
+    char soundInitError[EXEC_TEXT_DEVICE_INIT_SLOT_SIZE];
+    char mouseInitError[EXEC_TEXT_DEVICE_INIT_SLOT_SIZE];
+    char windowInitError[EXEC_TEXT_WINDOW_INIT_SLOT_SIZE];
+    char dialogManagerError1[EXEC_TEXT_MANAGER_ERROR_SLOT_SIZE];
+    char dialogManagerError2[EXEC_TEXT_MANAGER_ERROR_SLOT_SIZE];
+    char dialogManagerError3[EXEC_TEXT_MANAGER_ERROR_SLOT_SIZE];
+    char dialogManagerError4[EXEC_TEXT_MANAGER_ERROR_SLOT_SIZE];
+    char managerListStart[EXEC_TEXT_LIST_START_SLOT_SIZE];
+    char managerListDivider1[EXEC_TEXT_LIST_DIVIDER_SLOT_SIZE];
+    char managerListHeaderFormat[EXEC_TEXT_LIST_HEADER_SLOT_SIZE];
+    char managerListDivider2[EXEC_TEXT_LIST_DIVIDER_SLOT_SIZE];
+    char managerListEntryFormat[EXEC_TEXT_LIST_ENTRY_SLOT_SIZE];
+    char managerListStop[EXEC_TEXT_LIST_STOP_SLOT_SIZE];
+    char callManagerError1[EXEC_TEXT_MANAGER_ERROR_SLOT_SIZE];
+    char callManagerError2[EXEC_TEXT_MANAGER_ERROR_SLOT_SIZE];
+    char terminationMessage[EXEC_TEXT_TERMINATION_SLOT_SIZE];
+} SExecutiveText;
+
+SIZE(SExecutiveText, 0x214);
+
+#endif

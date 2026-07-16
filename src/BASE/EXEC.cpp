@@ -5,6 +5,7 @@
 
 #include <va.h>
 #include <BASE/executive.h>
+#include <BASE/EXEC_TYPES.h>
 #include <BASE/baseManager.h>
 #include <BASE/Misc.h>
 #include <stdio.h>
@@ -16,6 +17,41 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/X_GLOBAL.h>
+
+// @data-layout-note Retail's EXEC contribution is one initialized-data interval,
+// RVA 0x11fb20..0x11fd34 (0x214), with no rdata or loader-zero contribution.
+// The former source produced 12 pooled literal COMDATs: raw size 0x156 and a
+// replay end at offset 0x163. It collapsed six "Can't add manager!" uses and two
+// "-----" uses, and five initialization/list payloads differed from the PE.
+// Retail HIGHLOW sites prove 18 distinct addresses in call order at owner addends
+// 0x000, 0x038, 0x088, 0x0a4, 0x0c0, 0x100, 0x114, 0x128, 0x13c, 0x150,
+// 0x170, 0x178, 0x18c, 0x194, 0x1c0, 0x1e0, 0x1f4, and 0x208. Separate static
+// arrays were tested and rejected because VC4.2 aligned each owner to eight bytes,
+// growing candidate data to 0x23b. This structured owner compiles to one 0x214
+// section whose bytes equal the retail interval and whose 18 relocation addends
+// equal those PE addresses. Do not reintroduce pooled literals, independent arrays,
+// padding symbols, aliases, supplemental identities, or section pragmas.
+DATA(0x0051fb20) static SExecutiveText gExecutiveText = {
+    "Unable to initialize resources - possible disk problem.",
+    "Unable to initialize input devices - possible problem with mouse or keyboard.",
+    "Unable to initialize sound.",
+    "Unable to initialize mouse.",
+    "Unable to initialize windows - possible memory or disk error.",
+    "Can't add manager!",
+    "Can't add manager!",
+    "Can't add manager!",
+    "Can't add manager!",
+    "-----Manager List Start-----",
+    "-----",
+    "Head %d   Tail %d",
+    "-----",
+    "Manager %20s  this %d   prev %d  next %d",
+    "--*--Manager List Stop --*--\n\n",
+    "Can't add manager!",
+    "Can't add manager!",
+    "Terminated"
+};
+
 VA(0x004d1610, 0x10)
 executive::executive(void)
 {
@@ -29,17 +65,17 @@ VA(0x004d1620, 0x9e)
 int executive::InitSystem(void)
 {
     if (gpResourceManager->Open(EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
-        ShutDown("Unable to initialize resources!");
+        ShutDown(gExecutiveText.resourceInitError);
     if (gpInputManager->Open(EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
-        ShutDown("Unable to initialize input devices!");
+        ShutDown(gExecutiveText.inputInitError);
     if (giCurExe == 1) {
         if (gpSoundManager->Open(EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
-            ShutDown("Unable to initialize sound!");
+            ShutDown(gExecutiveText.soundInitError);
     }
     if (AddManager(gpMouseManager, EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
-        ShutDown("Unable to initialize mouse!");
+        ShutDown(gExecutiveText.mouseInitError);
     if (AddManager(gpWindowManager, EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
-        ShutDown("Unable to initialize windows!  Perhaps you are low on memory?");
+        ShutDown(gExecutiveText.windowInitError);
     return 0;
 }
 
@@ -105,13 +141,13 @@ int executive::DoDialog(class baseManager *manager)
         } while (listManager != 0);
     }
     if (AddManager(manager, EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
-        ShutDown("Can't add manager!");
+        ShutDown(gExecutiveText.dialogManagerError1);
     if (dialog->AddManager(gpMouseManager, EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
-        ShutDown("Can't add manager!");
+        ShutDown(gExecutiveText.dialogManagerError2);
     if (dialog->AddManager(gpWindowManager, EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
-        ShutDown("Can't add manager!");
+        ShutDown(gExecutiveText.dialogManagerError3);
     if (dialog->AddManager(manager, EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
-        ShutDown("Can't add manager!");
+        ShutDown(gExecutiveText.dialogManagerError4);
     dialog->MainLoop();
     RemoveManager(manager);
     if (managerCount > 0) {
@@ -130,17 +166,18 @@ int executive::DoDialog(class baseManager *manager)
 VA(0x004d1850, 0x86)
 void executive::PrintManagerList(void)
 {
-    LogStr("----- Manager List Start -----");
-    LogStr("-----");
-    sprintf(gText, "Head: %d Tail: %d", m_managerListHead, m_managerListTail);
+    LogStr(gExecutiveText.managerListStart);
+    LogStr(gExecutiveText.managerListDivider1);
+    sprintf(gText, gExecutiveText.managerListHeaderFormat,
+            m_managerListHead, m_managerListTail);
     LogStr(gText);
-    LogStr("-----");
+    LogStr(gExecutiveText.managerListDivider2);
     for (baseManager *m = m_managerListHead; m != 0; m = m->m_next) {
-        sprintf(gText, "Manager: %20s this: %d prev: %d next: %d", m->m_name, m,
+        sprintf(gText, gExecutiveText.managerListEntryFormat, m->m_name, m,
                 m->m_prev, m->m_next);
         LogStr(gText);
     }
-    LogStr("----- Manager List Stop -----");
+    LogStr(gExecutiveText.managerListStop);
 }
 
 VA(0x004d18e0, 0xce)
@@ -228,11 +265,11 @@ void executive::CallManager(class baseManager *mgr)
     baseManager *saved = m_activeManager;
     RemoveManager(saved);
     if (AddManager(mgr, EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
-        ShutDown("Can't add manager!");
+        ShutDown(gExecutiveText.callManagerError1);
     MainLoop();
     RemoveManager(mgr);
     if (AddManager(saved, EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
-        ShutDown("Can't add manager!");
+        ShutDown(gExecutiveText.callManagerError2);
     m_activeManager = saved;
 }
 
@@ -295,5 +332,5 @@ void executive::MainLoop(void)
 VA(0x004d1b90, 0xa)
 void executive::Terminate(void)
 {
-    ShutDown("Terminated");
+    ShutDown(gExecutiveText.terminationMessage);
 }
