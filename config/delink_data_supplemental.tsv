@@ -5204,3 +5204,14 @@ $SG33122	SOURCE\x_arena.c	0x11dbdc	0xdc	data	0x4	4	0x10	local	candidate-coff-sec
 $SG33128	SOURCE\x_arena.c	0x11dcb8	0x10	data	0x4	4	0xec	local	candidate-coff-section-translation
 $SG33132	SOURCE\x_arena.c	0x11dcc8	0x10	data	0x4	4	0xfc	local	candidate-coff-section-translation
 $SG33178	SOURCE\x_arena.c	0x11dcd8	0xd	data	0x4	4	0x10c	local	candidate-coff-section-translation
+$SG30360	SOURCE\x_cdtest.c	0xf52e4	0x10	data	0x4	2	0x15c	local	aligned-relocation-addend
+$SG30361	SOURCE\x_cdtest.c	0xf52f4	0x14	data	0x4	2	0x16c	local	aligned-relocation-addend
+$SG30362	SOURCE\x_cdtest.c	0xf5308	0x44	data	0x8	2	0x180	local	aligned-relocation-addend
+$SG30363	SOURCE\x_cdtest.c	0xf534c	0x4	data	0x4	2	0x1c4	local	aligned-relocation-addend
+$SG30364	SOURCE\x_cdtest.c	0xf5350	0x20	data	0x8	2	0x1c8	local	aligned-relocation-addend
+$SG30365	SOURCE\x_cdtest.c	0xf5370	0x38	data	0x8	2	0x1e8	local	aligned-relocation-addend
+$SG30366	SOURCE\x_cdtest.c	0xf53a8	0x4	data	0x8	2	0x220	local	aligned-relocation-addend
+$SG30370	SOURCE\x_cdtest.c	0xf53ac	0xc	data	0x4	2	0x224	local	aligned-relocation-addend
+$SG30372	SOURCE\x_cdtest.c	0xf53b8	0x4	data	0x8	2	0x230	local	aligned-relocation-addend
+$SG30373	SOURCE\x_cdtest.c	0xf53bc	0x4	data	0x4	2	0x234	local	aligned-relocation-addend
+$SG30374	SOURCE\x_cdtest.c	0xf53c0	0x4	data	0x8	2	0x238	local	aligned-relocation-addend
