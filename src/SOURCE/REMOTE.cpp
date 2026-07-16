@@ -34,28 +34,45 @@
 #define REMOTE_PLAYER_INFO(message) \
     (reinterpret_cast<SNetPlayerInfo *>((message)->payload))
 
-// @data-layout-note Retail's initialized REMOTE contribution is
-// 0x116f60..0x11733c (0x3dc); candidate .data is 0x3db both before and after
-// restoring the retail newline in the CRC failure format at retail offset 0x158.
-// The newline consumes an existing candidate padding byte, and the corrected
-// literal payload is now exact. The two signed-short source-line owners are
-// independently proved at 0x117118=0x02cc (GetRemoteData, one HIGHLOW use with
-// addend 25) and 0x117148=0x02f5 (PollRemote, one HIGHLOW use with addend 235).
-// VC4.2 hoists them to candidate offsets 0x0 and 0x4; retail interleaves them at
-// contribution offsets 0x1b8 and 0x1e8. After accounting for those moves, every
-// other candidate byte maps to retail, which has one terminal alignment zero at
-// offset 0x3db. This produces the three expected data anchor bases.
-// Retail's loader-zero contribution is 0x12a268..0x12adc0 (0xb58), while the
-// candidate .bss is 0xb50. Every PE reference in that range resolves inside the
-// 15 known public objects and their proven field/addend spans; no private BSS
-// owner occupies an alignment gap. The residual comes from final-link/common
-// allocation order and tail alignment, reflected by the distinct public anchor
-// bases, not missing source storage. Revisit only with original COFF/link-order
-// evidence. Do not add padding, aliases, synthetic identities, cursor snapping,
-// guessed allocations, or section pragmas to force either contribution extent.
+DATA(0x00516f60) int iInOrderCtr = 0;
+DATA(0x00516f64) int iCurLastID = 0;
+DATA(0x00516f68) int giLastConfirm = -1;
+DATA(0x00516f6c) unsigned char GameMode = 0;
+DATA(0x00516f70) long lLastHeartbeatSend = 0;
+DATA(0x00516f74) int gbInRemoteMain = 0;
+DATA(0x00516f78) int gbInRemoteCleanup = 0;
+DATA(0x00516f7c) int iIDCtr = 0;
+DATA(0x00516f80) int iTimesDropped = 0;
+DATA(0x00516f84) signed char gbInNetSetup = 0;
+DATA(0x00516f88) int bUseDirectPlay = 0;
+DATA(0x00516f8c) int bUseWinsock = 0;
+DATA(0x00516f90) signed char bInTimeoutFail = 0;
+DATA(0x00516f98) int iBaud[REMOTE_BAUD_RATE_COUNT] = {
+    300, 1200, 2400, 9600, 19200, 38400, 57600, 0
+};
+DATA(0x00516fb8) int iIRQ[REMOTE_IRQ_COUNT] = { 1, 2, 3, 4, 5, 7, 9 };
 DATA(0x00517118) static short gGetRemoteDataLineBase = 716;
 DATA(0x00517148) static short gPollRemoteLineBase = 757;
 
+// @data-layout-note Retail's initialized REMOTE contribution is
+// 0x116f60..0x11733c (0x3dc); candidate .data is 0x3db. The public initialized
+// owners occupy candidate and retail offsets 0x0..0x73 exactly. All 34 compiler
+// literals have byte-exact payloads and singleton ordered DIR32/HIGHLOW proofs.
+// The two signed-short source-line owners are independently proved at
+// 0x117118=0x02cc (GetRemoteData, addend 25) and 0x117148=0x02f5 (PollRemote,
+// addend 235). VC4.2 buckets them at candidate offsets 0x74 and 0x78, while
+// retail interleaves them at contribution offsets 0x1b8 and 0x1e8. The reviewed
+// literal mappings account for both insertions and leave one terminal retail
+// alignment zero at offset 0x3db. REMOTE has no candidate .rdata contribution.
+// Retail's loader-zero contribution is 0x12a268..0x12adc0 (0xb58), while the
+// candidate .bss is 0xb50. All 176 retail HIGHLOW targets in that range resolve
+// inside the 15 source DATA owners with proven owner-relative addends; none land
+// in an alignment gap. Retail has 0x18 bytes of inter-owner/tail alignment versus
+// 0x10 in candidate common order, exactly explaining the eight-byte extent
+// residual. There is no missing private BSS storage. Revisit only with original
+// COFF/link-order evidence. Do not add padding, aliases, synthetic identities,
+// cursor snapping, guessed allocations, or section pragmas to force either
+// contribution extent.
 // @match-note
 // Complete cleanup guards, backend switch, and all state resets. The 0x04 frame
 // and switch temporary at -0x04 agree, including the retail duplicate protocol
@@ -875,24 +892,7 @@ transmitComplete:
     return result;
 }
 
-// ---- globals (definitions, RVA order) ----
-DATA(0x00516f60) int iInOrderCtr = 0;
-DATA(0x00516f64) int iCurLastID = 0;
-DATA(0x00516f68) int giLastConfirm = -1;
-DATA(0x00516f6c) unsigned char GameMode = 0;
-DATA(0x00516f70) long lLastHeartbeatSend = 0;
-DATA(0x00516f74) int gbInRemoteMain = 0;
-DATA(0x00516f78) int gbInRemoteCleanup = 0;
-DATA(0x00516f7c) int iIDCtr = 0;
-DATA(0x00516f80) int iTimesDropped = 0;
-DATA(0x00516f84) signed char gbInNetSetup = 0;
-DATA(0x00516f88) int bUseDirectPlay = 0;
-DATA(0x00516f8c) int bUseWinsock = 0;
-DATA(0x00516f90) signed char bInTimeoutFail = 0;
-DATA(0x00516f98) int iBaud[REMOTE_BAUD_RATE_COUNT] = {
-    300, 1200, 2400, 9600, 19200, 38400, 57600, 0
-};
-DATA(0x00516fb8) int iIRQ[REMOTE_IRQ_COUNT] = { 1, 2, 3, 4, 5, 7, 9 };
+// ---- loader-zero globals (definitions, retail RVA order) ----
 DATA(0x0052a268) char rcvBufOut[REMOTE_TRANSPORT_BUFFER_SIZE];
 DATA(0x0052a378) int iLastIds[REMOTE_RECENT_ID_COUNT];
 DATA(0x0052a3f0) char PacketSend[REMOTE_ENCODED_BUFFER_SIZE];
