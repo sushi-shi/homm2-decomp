@@ -3412,6 +3412,61 @@
       "note": "Became live exact after shared-header rebuild."
     },
     {
+      "unit": "SOURCE/Wsnetwin",
+      "function": "?wsEvaluateMessage@@YIXKH@Z",
+      "source_hash": "26f960648197",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.12281,
+      "after": 99.12281,
+      "note": "Complete message switch and 77 relocations; residual begins at the embedded jump table and candidate span ends one byte earlier."
+    },
+    {
+      "unit": "SOURCE/Wsnetwin",
+      "function": "?wsProcessMessages@@YIXXZ",
+      "source_hash": "2f5d24985962",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.77778,
+      "after": 99.77778,
+      "note": "Complete frame and 13 relocations; only two break-target branch displacements differ after documented arm spellings."
+    },
+    {
+      "unit": "SOURCE/Wsnetwin",
+      "function": "?wsSendMessage@@YIXHEGPAX@Z",
+      "source_hash": "ac52bf025df7",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 97.23776,
+      "after": 97.23776,
+      "note": "Complete frame/CFG and 32 relocations; loop comparison and return-trampoline spellings are exhausted, and retail confirms the non-incrementing retry counter."
+    },
+    {
+      "unit": "SOURCE/Wsnetwin",
+      "function": "?wsWaitForFirstGuest@@YIHXZ",
+      "source_hash": "0c397dff2efb",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 99.70588,
+      "after": 99.70588,
+      "note": "All non-branch bytes and two relocations agree; explicit if/else regressed to 94.12 percent and one return-join byte remains."
+    },
+    {
+      "unit": "SOURCE/Wsnetwin",
+      "function": "?wsnet_init@@YIFXZ",
+      "source_hash": "cdb5dc54141a",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.56403,
+      "after": 99.56403,
+      "note": "Complete frame/CFG and 164 relocations; final invalid-address block-selection variants are already exhausted in the semantic marker."
+    },
+    {
       "unit": "SOURCE/X_CAMPGN",
       "function": "?Days@ExpCampaign@@QAEFXZ",
       "source_hash": "58577a62fb8d",
@@ -3564,6 +3619,61 @@
       "before": 99.98508,
       "after": 100.0,
       "note": "Corrected 104-byte frame buffer to request the retail 100-byte payload; all code and 27 relocations agree."
+    },
+    {
+      "unit": "SOURCE/kbwin",
+      "function": "?AppAbout@@YGHPAXIIJ@Z",
+      "source_hash": "e6eca91b4090",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.902435,
+      "after": 100.0,
+      "note": "Assigned the notification local a semantic deterministic bucket; all bytes and both ordered relocations now match."
+    },
+    {
+      "unit": "SOURCE/kbwin",
+      "function": "?AppIdle@@YIHXZ",
+      "source_hash": "ffbde79dc4b6",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 96.47059,
+      "after": 96.47059,
+      "note": "Complete semantics and sole relocation; retail mov-zero versus candidate xor-zero remains after direct/comparison/conditional forms."
+    },
+    {
+      "unit": "SOURCE/kbwin",
+      "function": "?AppWndProc@@YGJPAXIIJ@Z",
+      "source_hash": "e1576a8d6968",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.714005,
+      "after": 99.714005,
+      "note": "Complete message switch and 79 ordered relocations; residual begins at the embedded jump table and candidate span ends one byte earlier."
+    },
+    {
+      "unit": "SOURCE/kbwin",
+      "function": "?KBChangeMenu@@YIXPAX@Z",
+      "source_hash": "41c5fca7005b",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 97.9,
+      "after": 97.9,
+      "note": "Complete semantics and 11 relocations; retail has one continuation jump after null-menu fallback and the empty-arm spelling already regressed."
+    },
+    {
+      "unit": "SOURCE/kbwin",
+      "function": "?ResizeWindow@@YIXHHHH@Z",
+      "source_hash": "463f2c1424c1",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.8,
+      "after": 100.0,
+      "note": "Assigned the target-Y local its retail bucket; the complete frame, bytes, and 19 ordered relocations now match."
     },
     {
       "unit": "SOURCE/tradpost",
