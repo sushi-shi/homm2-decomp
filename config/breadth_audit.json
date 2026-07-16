@@ -651,6 +651,17 @@
       "note": "All 2086 bytes match after masking 75 relocations; sole raw byte is folded __adjust_fdiv owner/addend spelling."
     },
     {
+      "unit": "SOURCE/STRIP",
+      "function": "?DrawIcons@strip@@QAEXH@Z",
+      "source_hash": "250b3650ad1d",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "exact",
+      "iterations": 2,
+      "before": 99.982635,
+      "after": 100.0,
+      "note": "No-army guard return removes redundant continuation; all 979 bytes and 24 relocations agree."
+    },
+    {
       "unit": "SOURCE/TOWN",
       "function": "?BuildBuilding@town@@QAEXH@Z",
       "source_hash": "5b85e7506518",
