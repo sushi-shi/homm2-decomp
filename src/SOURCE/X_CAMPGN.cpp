@@ -99,18 +99,17 @@ expansionCampaignDifficulty[EXPANSION_CAMPAIGN_COUNT]
 };
 
 // @data-layout-note Retail X_CAMPGN initialized storage is
-// 0x51d450..0x51d9ce (0x57e bytes), followed by two alignment bytes before
-// SOURCE/tradpost. The first 0x508 bytes are byte-exact: campaign coordinates at
-// +0, map counts at +0x100, xCampaignChoices at +0x110, difficulty at +0x2f0,
-// and compiler literals from +0x310. Retail's symbol pass mistakes coordinate
-// value 113 at +0 for the string "q" and exposes the Y member at +4 as
-// const_0011d454; code relocations prove both are one array owner. Twenty-six
-// unique literals in the exact prefix have reviewed supplemental mappings. The
-// repeated literals $SG35707, $SG35712, $SG35740, $SG35741, $SG35742, $SG35743,
-// $SG35744, $SG35760, $SG35799, $SG35804, $SG35809, $SG35811, $SG35813,
-// $SG35816, and $SG35819 remain unresolved. The seven-symbol tail beginning at
-// $SG35821/+0x508 has a different order and also remains unresolved; do not map
-// it by section offset or select arbitrary duplicate payloads.
+// 0x51d450..0x51d9ca (0x57a bytes), followed by six alignment bytes before
+// SOURCE/tradpost. The whole candidate .data contribution is byte-exact:
+// campaign coordinates at +0, map counts at +0x100, xCampaignChoices at +0x110,
+// difficulty at +0x2f0, and compiler literals from +0x310. Retail's symbol pass
+// mistakes coordinate value 113 at +0 for the string "q" and exposes the Y
+// member at +4 as const_0011d454; code relocations prove both are one array
+// owner. UpdateInfo relocation ordinal 142 proves the choice-none text is "n/a"
+// at +0x508, not "None"; correcting it removed the four-byte tail displacement.
+// All 48 compiler literals have reviewed mappings: 26 by unique payload in the
+// previously exact prefix and the remaining 22 by exact section translation,
+// paired function relocation ordinal/type, and the absolute retail operand RVA.
 VA(0x004bb680, 0x23)
 ExpCampaign::ExpCampaign(void)
 {
@@ -610,7 +609,7 @@ void ExpCampaign::UpdateInfo(int redraw)
             sprintf(gText, "%d %s", choice->value, "Experience");
             break;
         case CAMPAIGN_CHOICE_NONE:
-            sprintf(gText, "None");
+            sprintf(gText, "n/a");
             break;
         case CAMPAIGN_CHOICE_ALIGNMENT:
             sprintf(gText, gAlignmentNames[choice->value]);
