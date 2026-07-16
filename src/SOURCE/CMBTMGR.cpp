@@ -1570,10 +1570,11 @@ foundMissHex:
 // uses base -0xcc/-0xc8 versus retail -0xc8/-0xc4; nested armyNameValue uses
 // base -0xc4 versus retail -0xcc. The 0xd8 frame size, other slots, CFG, and all
 // 44 ordered relocations agree. Three val|0 spellings recover both comparison
-// orders, and defense replaces the incorrect attack field. Inverted string
-// selection and bucket-12/-14 wider-scope pointer placements regressed; a nested
-// bucket rename was stagnant. Revisit only after compiler allocation or the
-// source/TU/header epoch changes.
+// orders. The recovered defense field and the singular "perishes" / plural
+// "perish" selection replace incorrect source semantics without changing the
+// current score or resolved relocations. Bucket-12/-14 wider-scope pointer
+// placements regressed and a nested bucket rename was stagnant. Revisit only
+// after compiler allocation or the source/TU/header epoch changes.
 VA(0x0049412d, 0x74f)
 void combatManager::KeepAttack(int tower)
 {
@@ -1703,7 +1704,7 @@ void combatManager::KeepAttack(int tower)
                                                         : "Tower does",
                 damage8,
                 "damage", killed29, armyNameValue,
-                killed29 > 1 ? "perishes" : "perish");
+                killed29 > 1 ? "perish" : "perishes");
     } else {
         sprintf(gText, "%s %d %s.",
                 tower == COMBAT_TOWER_SELECTOR_GARRISON ? "Garrison does"
@@ -1718,8 +1719,8 @@ void combatManager::KeepAttack(int tower)
     LogStr("KA2");
 }
 
-// @match-note: retained 100.00% at source hash f53df3a552e3; do not replace this
-// exact recovered body to improve a transient live score. The 0xc frame, all
+// @semantic: Retained 100.00% at source hash f53df3a552e3; do not replace this
+// exact recovered body to improve the transient live score. The 0xc frame, all
 // three stack slots, 0x17b size, loop CFG, and sole relocation still align. The
 // current TU expands the commutative army index before the side offset, while
 // retail used side-first order. Flattened pointer arithmetic raised the live
@@ -1727,7 +1728,9 @@ void combatManager::KeepAttack(int tower)
 // explicit array casts, operand swaps, scalar wrappers, and an inline side-offset
 // helper did not restore exact output. A diagnostic TU-state probe reached
 // 99.99167% but invented a class solely for matching and regressed a sibling.
-// Revisit only after real TU/header state changes or post-95% TU-state work.
+// The current ten-trial diagnostic again produced a disposable exact member probe,
+// rejected by the sibling/exact guards; the other nine were stagnant. Revisit only
+// after a real TU/header or comparison-epoch change.
 VA(0x0049487c, 0x17b)
 int combatManager::ExperienceValueOfStack(int side)
 {
@@ -1780,20 +1783,18 @@ void combatManager::DrawCombatBorder(void)
     return;
 }
 
-// @match-note: retained/live 98.43%; the 0x58 frame, every local slot, semantics,
-// CFG, and all 22/22 external relocation targets align. Candidate size 0x4c9 is
-// exactly 15 bytes below retail 0x4d8. The first residual is instruction 187: three
-// equivalent positive-arm tests compile as direct jne/jg/jne branches, while
-// retail uses je/jle/je followed by three five-byte continuation jumps. Splitting
-// terrain/used tests and spelling bounds as <= 2 and >= 10 raised the checkpoint;
-// two explicit loop exits scored 97.02%, while explicit else/continue blocks
-// scored 96.32% and moved six jumps to the loop tail. The remaining relocation
-// row is the same cobj%04d.icn literal under a delinked identity. Do not retry
-// those forms.
+// @semantic: The 0x58 frame, every local slot, semantics, CFG, and all 22/22
+// external relocation targets align. Castle checks now use retail's defender-town
+// field at +0x3283, not the stale original-town pointer at +0x31e6. Candidate size
+// 0x4c9 is 15 bytes below retail 0x4d8: normalized instructions 179, 194, and 242
+// use direct branches where retail uses the opposite branch plus a five-byte
+// continuation. Instructions 207 and 264 retain equivalent obstacle/cell-index
+// address order. Split conditions, explicit exits/continues, <= 2 / >= 10 bounds,
+// and direct versus typed inverted cell-offset subscripts are exhausted.
 // The table is exactly 0x1c0 bytes (32 * 0xe) before gEstatesGoldLevel; retail
 // SRandom is inclusive and its literal high 32 can index past both 32-entry
 // arrays. Preserve that retail defect; never expand the table or change it to 31.
-// Revisit continuation steering only in the post-95% last-mile phase.
+// Revisit only after the source/TU/header or comparison epoch changes.
 VA(0x00494ae1, 0x4d8)
 void combatManager::SetupAndLoadObstacles(void)
 {
@@ -1819,18 +1820,20 @@ void combatManager::SetupAndLoadObstacles(void)
              cellIndex1++) {
             m_wallStates[cellIndex1 + COMBAT_WALL_SLOT_SECTION_FIRST] =
                 COMBAT_WALL_STATE_KEEP_STANDING;
-            if (m_originalCombatTown->m_type == TOWN_TYPE_KNIGHT &&
-                (m_originalCombatTown->m_buildings &
+            if (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type == TOWN_TYPE_KNIGHT &&
+                (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings &
                  TOWN_BUILDING_FORTIFICATIONS)) {
                 m_wallStates[cellIndex1 + COMBAT_WALL_SLOT_SECTION_FIRST] =
                     COMBAT_WALL_STATE_SECTION_DAMAGE_FIRST;
             }
             m_wallStates[cellIndex1] = COMBAT_WALL_STATE_KEEP_STANDING;
         }
-        if (m_originalCombatTown->m_buildings & TOWN_BUILDING_LEFT_TURRET)
+        if (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings &
+            TOWN_BUILDING_LEFT_TURRET)
             m_wallStates[COMBAT_WALL_SLOT_TOP_TOWER] =
                 COMBAT_WALL_STATE_TOWER_STANDING;
-        if (m_originalCombatTown->m_buildings & TOWN_BUILDING_RIGHT_TURRET)
+        if (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings &
+            TOWN_BUILDING_RIGHT_TURRET)
             m_wallStates[COMBAT_WALL_SLOT_BOTTOM_TOWER] =
                 COMBAT_WALL_STATE_TOWER_STANDING;
 
@@ -1932,59 +1935,61 @@ void combatManager::SetupAndLoadObstacles(void)
     }
 }
 
-// @match-note: retained 97.18%, combined live 96.02%; frame, slots, CFG, and
-// all 20/20 relocation sites align. The first code residual is normalized instruction 134
-// (again at 150), where retail uses sbb and this TU uses equivalent mov/adc/neg.
-// Equality and alternate unsigned spellings regressed to 94.90%; unsigned
-// (facing - 1) < 1 is the high water. Remaining names are delinked gConfig and
-// 150.0f DATA identities; accept the shared-header live regression.
+// @early-stop
+// Soft TU-cumulative wall: the exact 0x2a1 span, 0x20 frame, all seven semantic
+// slots, CFG, and 20 ordered relocation sites agree. The ternary mask recovers
+// retail's two sbb sequences. Only 11 unmasked bytes at +0x77..+0x83 remain: the
+// commutative side/army-index address order for m_limitCreatureCount. Direct and
+// typed inverted subscripts compile to the same instructions. Revisit after a
+// source/TU/header or comparison-epoch change.
 VA(0x00494fb9, 0x2a1)
 void combatManager::MakeCreaturesVanish(void)
 {
     ResetLimitCreature();
-    int side;
-    int armyIndex;
-    for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; side++) {
-        for (armyIndex = 0; armyIndex < gpCombatManager->m_armyCount[side];
-             armyIndex++) {
-            if (m_removedArmies[side][armyIndex])
-                m_limitCreatureCount[side][armyIndex] = 1;
+    int side3;
+    int armyIndex0;
+    army *removedArmy27;
+    for (side3 = 0; side3 < COMBAT_MANAGER_SIDE_COUNT; side3++) {
+        for (armyIndex0 = 0;
+             armyIndex0 < gpCombatManager->m_armyCount[side3]; armyIndex0++) {
+            if (m_removedArmies[side3][armyIndex0])
+                m_limitCreatureCount[side3][armyIndex0] = 1;
         }
     }
     DrawFrame(0, 1, 0, 1, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
-    int extentX = giMinExtentX;
-    int extentY = giMinExtentY;
-    int extentWidth = giMaxExtentX - giMinExtentX + 1;
-    int extentHeight = giMaxExtentY - giMinExtentY + 1;
-    for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; side++) {
-        for (armyIndex = 0; armyIndex < gpCombatManager->m_armyCount[side];
-             armyIndex++) {
-            if (m_removedArmies[side][armyIndex]) {
-                army *removedArmy = &m_armies[side][armyIndex];
-                m_hexCells[removedArmy->m_hex].m_occupantSide = -1;
-                m_hexCells[removedArmy->m_hex].m_occupantIndex = -1;
-                if (removedArmy->m_monster.flags.all & MONSTER_FLAGS_WIDE) {
-                    m_hexCells[((-(static_cast<unsigned int>(
-                                           removedArmy->m_facing - 1) < 1) &
+    int extentX2 = giMinExtentX;
+    int extentY37 = giMinExtentY;
+    int extentWidth8 = giMaxExtentX - giMinExtentX + 1;
+    int extentHeight9 = giMaxExtentY - giMinExtentY + 1;
+    for (side3 = 0; side3 < COMBAT_MANAGER_SIDE_COUNT; side3++) {
+        for (armyIndex0 = 0;
+             armyIndex0 < gpCombatManager->m_armyCount[side3]; armyIndex0++) {
+            if (m_removedArmies[side3][armyIndex0]) {
+                removedArmy27 = &m_armies[side3][armyIndex0];
+                m_hexCells[removedArmy27->m_hex].m_occupantSide = -1;
+                m_hexCells[removedArmy27->m_hex].m_occupantIndex = -1;
+                if (removedArmy27->m_monster.flags.all & MONSTER_FLAGS_WIDE) {
+                    m_hexCells[(((static_cast<unsigned int>(
+                                           removedArmy27->m_facing - 1) < 1 ? -1 : 0) &
                                   2) -
                                  1) +
-                               removedArmy->m_hex]
+                               removedArmy27->m_hex]
                         .m_occupantSide = -1;
-                    m_hexCells[((-(static_cast<unsigned int>(
-                                           removedArmy->m_facing - 1) < 1) &
+                    m_hexCells[(((static_cast<unsigned int>(
+                                           removedArmy27->m_facing - 1) < 1 ? -1 : 0) &
                                   2) -
                                  1) +
-                               removedArmy->m_hex]
+                               removedArmy27->m_hex]
                         .m_occupantIndex = -1;
                 }
             }
         }
     }
-    gpWindowManager->SaveFizzleSource(extentX, extentY, extentWidth,
-                                      extentHeight);
+    gpWindowManager->SaveFizzleSource(extentX2, extentY37, extentWidth8,
+                                      extentHeight9);
     gpCombatManager->DrawFrame(0, 0, 1, 0, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
     gpWindowManager->FizzleForward(
-        extentX, extentY, extentWidth, extentHeight,
+        extentX2, extentY37, extentWidth8, extentHeight9,
         static_cast<int>(gfCombatSpeedMod[gConfig.combatSpeed] *
                          COMBAT_CREATURE_VANISH_DURATION),
         0, 0);
@@ -2062,11 +2067,11 @@ int combatManager::InCastle(int hex)
          hex > COMBAT_CASTLE_INTERIOR_ROW_8_LAST)) ? 1 : 0;
 }
 
-// @match-note: retained/live 99.52%; frame, slots, loop CFG, calls, and all 25/25
-// relocation sites align. First code residual is +0x108, normalized instruction
-// 84: an equivalent abs-distance jge/jle from operand evaluation/register
-// assignment. Both abs(column) > abs(row) and abs(row) < abs(column) compiled to
-// the same score. Other differences are only the delinked 10.0f DATA identity.
+// @early-stop
+// Soft TU-cumulative wall: the 0x5c frame, all semantic/compiler-temporary slots,
+// CFG, and 25 resolved relocations agree. Only +0x245/+0x248 and +0x24e/+0x251
+// differ: retail loads traceColumn/traceRow before the commutative step, while this
+// TU loads the step first. += and both explicit addition orders compile identically.
 VA(0x00495559, 0x346)
 int combatManager::ShotIsThroughWall(int side, int sourceHex, int targetHex)
 {
@@ -2080,54 +2085,55 @@ int combatManager::ShotIsThroughWall(int side, int sourceHex, int targetHex)
     if (InCastle(sourceHex) || !InCastle(targetHex))
         return 0;
 
-    int sourceColumn = sourceHex % COMBAT_GRID_ROW_LENGTH;
-    int sourceRow = sourceHex / COMBAT_GRID_ROW_LENGTH;
-    int targetColumn = targetHex % COMBAT_GRID_ROW_LENGTH;
-    int targetRow = targetHex / COMBAT_GRID_ROW_LENGTH;
-    int columnDistance = targetColumn - sourceColumn;
-    int rowDistance = targetRow - sourceRow;
-    int traceLength;
-    float columnStep;
-    float rowStep;
-    if (abs(columnDistance) > abs(rowDistance)) {
-        traceLength = abs(columnDistance);
-        columnStep = columnDistance > 0 ? 1 : -1;
-        rowStep = static_cast<float>(rowDistance) /
-                  static_cast<float>(abs(columnDistance));
+    int sourceColumn1 = sourceHex % COMBAT_GRID_ROW_LENGTH;
+    int sourceRow9 = sourceHex / COMBAT_GRID_ROW_LENGTH;
+    int targetColumn8 = targetHex % COMBAT_GRID_ROW_LENGTH;
+    int targetRow26 = targetHex / COMBAT_GRID_ROW_LENGTH;
+    int columnDistance4 = targetColumn8 - sourceColumn1;
+    int rowDistance17 = targetRow26 - sourceRow9;
+    int traceLength1;
+    float columnStep5;
+    float rowStep2;
+    if (abs(columnDistance4) > abs(rowDistance17)) {
+        traceLength1 = abs(columnDistance4);
+        columnStep5 = columnDistance4 > 0 ? 1 : -1;
+        rowStep2 = static_cast<float>(rowDistance17) /
+                  static_cast<float>(abs(columnDistance4));
     } else {
-        traceLength = abs(rowDistance);
-        rowStep = rowDistance > 0 ? 1 : -1;
-        columnStep = static_cast<float>(columnDistance) /
-                     static_cast<float>(abs(rowDistance));
+        traceLength1 = abs(rowDistance17);
+        rowStep2 = rowDistance17 > 0 ? 1 : -1;
+        columnStep5 = static_cast<float>(columnDistance4) /
+                     static_cast<float>(abs(rowDistance17));
     }
-    columnStep /= static_cast<float>(COMBAT_WALL_TRACE_SUBDIVISIONS);
-    rowStep /= static_cast<float>(COMBAT_WALL_TRACE_SUBDIVISIONS);
-    float traceColumn = static_cast<float>(sourceColumn);
-    float traceRow = static_cast<float>(sourceRow);
-    int traceIndex;
-    for (traceIndex = 0;
-         traceIndex < traceLength * COMBAT_WALL_TRACE_SUBDIVISIONS;
-         traceIndex++) {
-        traceColumn += columnStep;
-        traceRow += rowStep;
-        int traceHex = static_cast<int>(traceRow) * COMBAT_GRID_ROW_LENGTH +
-                       static_cast<int>(traceColumn);
-        int structureIndex;
-        for (structureIndex = 0;
-             structureIndex < COMBAT_CASTLE_STRUCTURE_COUNT;
-             structureIndex++) {
-            if (iWallToHexCell[structureIndex] == traceHex &&
-                m_wallStates[structureIndex + COMBAT_WALL_SLOT_SECTION_FIRST] !=
+    columnStep5 /= static_cast<float>(COMBAT_WALL_TRACE_SUBDIVISIONS);
+    rowStep2 /= static_cast<float>(COMBAT_WALL_TRACE_SUBDIVISIONS);
+    float traceColumn6 = static_cast<float>(sourceColumn1);
+    float traceRow1 = static_cast<float>(sourceRow9);
+    int traceIndex13;
+    int traceHex11;
+    int structureIndex0;
+    for (traceIndex13 = 0;
+         traceIndex13 < traceLength1 * COMBAT_WALL_TRACE_SUBDIVISIONS;
+         traceIndex13++) {
+        traceColumn6 += columnStep5;
+        traceRow1 += rowStep2;
+        traceHex11 = static_cast<int>(traceRow1) * COMBAT_GRID_ROW_LENGTH +
+                     static_cast<int>(traceColumn6);
+        for (structureIndex0 = 0;
+             structureIndex0 < COMBAT_CASTLE_STRUCTURE_COUNT;
+             structureIndex0++) {
+            if (iWallToHexCell[structureIndex0] == traceHex11 &&
+                m_wallStates[structureIndex0 + COMBAT_WALL_SLOT_SECTION_FIRST] !=
                     COMBAT_WALL_STATE_DESTROYED &&
-                m_wallStates[structureIndex + COMBAT_WALL_SLOT_SECTION_FIRST] !=
+                m_wallStates[structureIndex0 + COMBAT_WALL_SLOT_SECTION_FIRST] !=
                     COMBAT_WALL_STATE_SECTION_DESTROYED) {
                 return 1;
             }
-            if (iTowerToHexCell[structureIndex] == traceHex &&
-                m_wallStates[structureIndex] != COMBAT_WALL_STATE_DESTROYED) {
+            if (iTowerToHexCell[structureIndex0] == traceHex11 &&
+                m_wallStates[structureIndex0] != COMBAT_WALL_STATE_DESTROYED) {
                 return 1;
             }
-            if (traceHex == COMBAT_CASTLE_HEX_GATE &&
+            if (traceHex11 == COMBAT_CASTLE_HEX_GATE &&
                 m_drawbridgeState == COMBAT_DRAWBRIDGE_RAISED) {
                 return 1;
             }
@@ -2136,125 +2142,125 @@ int combatManager::ShotIsThroughWall(int side, int sourceHex, int targetHex)
     return 0;
 }
 
-// @match-note: retained/combined-live 98.60%; the 0x80 frame, slot reuse,
-// animation CFG, calls, and all 52/52 relocation sites align. First DATA-name residual is +0xb9;
-// first code residual is +0x283 (normalized instruction 197), then two extent
-// compares. frame < missileSteps versus missileSteps > frame and both orientations
-// of the extent operands compiled identically. Remaining names are delinked
-// floating constants and the gConfig DATA alias.
+// @semantic: One frame16 lifetime now serves direction and animation loops, giving
+// retail's 0x80 frame; all 24 semantic slots, compiler temporaries, CFG, calls, and
+// 52 resolved relocations agree. Residuals are the x/y square order, five integer
+// sums, and three extent comparisons; the latter shift subsequent relocation sites.
+// Direct commutation of every sum and both orientations of the comparisons compile
+// identically. Remaining identities are QIfdiv/floating constants and gConfig.
+// Revisit only after the source/TU/header or comparison epoch changes.
 VA(0x0049589f, 0x52e)
 void combatManager::ShootMissile(int sourceX, int sourceY, int targetX,
                                  int targetY, float *directionAngles,
                                  icon *missileIcon)
 {
-    int xDistance = targetX - sourceX;
-    int yDistance = targetY - sourceY;
-    int absoluteXDistance = targetX - sourceX;
-    signed char reverseMissile = 0;
-    if (absoluteXDistance < 0) {
-        reverseMissile = 1;
-        absoluteXDistance = -absoluteXDistance;
+    int xDistance1 = targetX - sourceX;
+    int yDistance19 = targetY - sourceY;
+    int absoluteXDistance15 = targetX - sourceX;
+    signed char reverseMissile7 = 0;
+    if (absoluteXDistance15 < 0) {
+        reverseMissile7 = 1;
+        absoluteXDistance15 = -absoluteXDistance15;
     }
-    int directionYDistance = targetY - sourceY;
-    int directionFrame;
-    if (absoluteXDistance == 0) {
-        if (directionYDistance > 0)
-            directionFrame = COMBAT_MISSILE_LAST_DIRECTION;
+    int directionYDistance1 = targetY - sourceY;
+    int directionFrame27;
+    int frame16;
+    if (absoluteXDistance15 == 0) {
+        if (directionYDistance1 > 0)
+            directionFrame27 = COMBAT_MISSILE_LAST_DIRECTION;
         else
-            directionFrame = 0;
+            directionFrame27 = 0;
     } else {
-        float directionSlope =
-            static_cast<float>(-directionYDistance) / absoluteXDistance;
-        float angle = static_cast<float>(
-            atan(static_cast<double>(directionSlope)) *
+        float directionSlope4 =
+            static_cast<float>(-directionYDistance1) / absoluteXDistance15;
+        float angle3 = static_cast<float>(
+            atan(static_cast<double>(directionSlope4)) *
             COMBAT_MISSILE_DEGREES_PER_RADIAN / COMBAT_MISSILE_PI);
-        int frame;
-        for (frame = 1; frame < COMBAT_MISSILE_DIRECTION_COUNT;
-             frame++) {
-            if ((directionAngles[frame - 1] +
-                 directionAngles[frame]) /
+        for (frame16 = 1; frame16 < COMBAT_MISSILE_DIRECTION_COUNT;
+             frame16++) {
+            if ((directionAngles[frame16 - 1] +
+                 directionAngles[frame16]) /
                     COMBAT_MISSILE_DIRECTION_AVERAGE_DIVISOR <
-                angle) {
+                angle3) {
                 break;
             }
         }
-        if (frame < COMBAT_MISSILE_DIRECTION_COUNT)
-            directionFrame = frame - 1;
+        if (frame16 < COMBAT_MISSILE_DIRECTION_COUNT)
+            directionFrame27 = frame16 - 1;
         else
-            directionFrame = COMBAT_MISSILE_LAST_DIRECTION;
+            directionFrame27 = COMBAT_MISSILE_LAST_DIRECTION;
     }
 
-    int distance = static_cast<int>(sqrt(static_cast<double>(
-        xDistance * xDistance + yDistance * yDistance)));
-    int missileSteps =
-        (distance + COMBAT_MISSILE_SPACING_ROUND) / COMBAT_MISSILE_SPACING;
-    int xStep;
-    int yStep;
-    if (missileSteps > 1) {
-        xStep = xDistance / (missileSteps - 1);
-        yStep = yDistance / (missileSteps - 1);
+    int distance4 = static_cast<int>(sqrt(static_cast<double>(
+        xDistance1 * xDistance1 + yDistance19 * yDistance19)));
+    int missileSteps8 =
+        (distance4 + COMBAT_MISSILE_SPACING_ROUND) / COMBAT_MISSILE_SPACING;
+    int xStep29;
+    int yStep17;
+    if (missileSteps8 > 1) {
+        xStep29 = xDistance1 / (missileSteps8 - 1);
+        yStep17 = yDistance19 / (missileSteps8 - 1);
     } else {
-        xStep = xDistance;
-        yStep = yDistance;
+        xStep29 = xDistance1;
+        yStep17 = yDistance19;
     }
-    int missileX = sourceX;
-    int missileY = sourceY;
-    int missileHalfWidth = COMBAT_MISSILE_HALF_WIDTH;
-    int missileHalfHeight = COMBAT_MISSILE_HALF_HEIGHT;
-    bitmap *missileBackground =
-        new bitmap(COMBAT_MISSILE_BITMAP_TYPE, missileHalfWidth * 2,
-                   missileHalfHeight * 2);
-    missileBackground->GrabBitmapCareful(
+    int missileX16 = sourceX;
+    int missileY7 = sourceY;
+    int missileHalfWidth5 = COMBAT_MISSILE_HALF_WIDTH;
+    int missileHalfHeight28 = COMBAT_MISSILE_HALF_HEIGHT;
+    bitmap *missileBackground9 =
+        new bitmap(COMBAT_MISSILE_BITMAP_TYPE, missileHalfWidth5 * 2,
+                   missileHalfHeight28 * 2);
+    missileBackground9->GrabBitmapCareful(
         gpWindowManager->m_screen,
-        static_cast<short>(missileX - missileHalfWidth),
-        static_cast<short>(missileY - missileHalfHeight));
+        static_cast<short>(missileX16 - missileHalfWidth5),
+        static_cast<short>(missileY7 - missileHalfHeight28));
 
-    int oldX = missileX;
-    int oldY = missileY;
-    int minX = COMBAT_MAX_EXTENT_X;
-    int maxX = 0;
-    int minY = 480;
-    int maxY = 0;
-    int frame;
-    for (frame = 0; missileSteps > frame; frame++) {
-        if (oldX - missileHalfWidth < minX)
-            minX = oldX - missileHalfWidth;
-        if (minX < 0)
-            minX = 0;
-        if (oldX + missileHalfWidth > maxX)
-            maxX = oldX + missileHalfWidth;
-        if (maxX > COMBAT_MAX_EXTENT_X)
-            maxX = COMBAT_MAX_EXTENT_X;
-        if (oldY - missileHalfHeight < minY)
-            minY = oldY - missileHalfHeight;
-        if (minY < 0)
-            minY = 0;
-        if (oldY + missileHalfHeight > maxY)
-            maxY = oldY + missileHalfHeight;
-        if (maxY > COMBAT_MAX_EXTENT_Y)
-            maxY = COMBAT_MAX_EXTENT_Y;
+    int oldX8 = missileX16;
+    int oldY5 = missileY7;
+    int minX8 = COMBAT_MAX_EXTENT_X;
+    int maxX9 = 0;
+    int minY5 = 480;
+    int maxY6 = 0;
+    for (frame16 = 0; missileSteps8 > frame16; frame16++) {
+        if (oldX8 - missileHalfWidth5 < minX8)
+            minX8 = oldX8 - missileHalfWidth5;
+        if (minX8 < 0)
+            minX8 = 0;
+        if (oldX8 + missileHalfWidth5 > maxX9)
+            maxX9 = oldX8 + missileHalfWidth5;
+        if (maxX9 > COMBAT_MAX_EXTENT_X)
+            maxX9 = COMBAT_MAX_EXTENT_X;
+        if (oldY5 - missileHalfHeight28 < minY5)
+            minY5 = oldY5 - missileHalfHeight28;
+        if (minY5 < 0)
+            minY5 = 0;
+        if (oldY5 + missileHalfHeight28 > maxY6)
+            maxY6 = oldY5 + missileHalfHeight28;
+        if (maxY6 > COMBAT_MAX_EXTENT_Y)
+            maxY6 = COMBAT_MAX_EXTENT_Y;
 
-        if (frame != 0) {
-            missileBackground->DrawToBufferCareful(
-                static_cast<short>(oldX - missileHalfWidth),
-                static_cast<short>(oldY - missileHalfHeight));
-            missileBackground->GrabBitmapCareful(
+        if (frame16 != 0) {
+            missileBackground9->DrawToBufferCareful(
+                static_cast<short>(oldX8 - missileHalfWidth5),
+                static_cast<short>(oldY5 - missileHalfHeight28));
+            missileBackground9->GrabBitmapCareful(
                 gpWindowManager->m_screen,
-                static_cast<short>(missileX - missileHalfWidth),
-                static_cast<short>(missileY - missileHalfHeight));
+                static_cast<short>(missileX16 - missileHalfWidth5),
+                static_cast<short>(missileY7 - missileHalfHeight28));
         } else {
-            if (giMinExtentX > minX)
-                giMinExtentX = minX;
-            if (maxX > giMaxExtentX)
-                giMaxExtentX = maxX;
-            if (minY < giMinExtentY)
-                giMinExtentY = minY;
-            if (maxY > giMaxExtentY)
-                giMaxExtentY = maxY;
+            if (giMinExtentX > minX8)
+                giMinExtentX = minX8;
+            if (maxX9 > giMaxExtentX)
+                giMaxExtentX = maxX9;
+            if (minY5 < giMinExtentY)
+                giMinExtentY = minY5;
+            if (maxY6 > giMaxExtentY)
+                giMaxExtentY = maxY6;
         }
-        missileIcon->DrawToBuffer(missileX, missileY, directionFrame,
-                                  reverseMissile);
-        if (frame == 0) {
+        missileIcon->DrawToBuffer(missileX16, missileY7, directionFrame27,
+                                  reverseMissile7);
+        if (frame16 == 0) {
             gpWindowManager->UpdateScreenRegion(
                 giMinExtentX, giMinExtentY,
                 giMaxExtentX - giMinExtentX + 1,
@@ -2262,27 +2268,27 @@ void combatManager::ShootMissile(int sourceX, int sourceY, int targetX,
         } else {
             DelayTil(glTimers);
             gpWindowManager->UpdateScreenRegion(
-                minX, minY, maxX - minX + 1, maxY - minY + 1);
+                minX8, minY5, maxX9 - minX8 + 1, maxY6 - minY5 + 1);
         }
         glTimers[0] = static_cast<int>(
             KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] *
                                 COMBAT_MISSILE_TIMER_DELAY);
-        oldX = missileX;
-        oldY = missileY;
-        missileX += xStep;
-        missileY += yStep;
-        minX = missileX - missileHalfWidth;
-        maxX = missileX + missileHalfWidth;
-        minY = missileY - missileHalfHeight;
-        maxY = missileY + missileHalfHeight;
+        oldX8 = missileX16;
+        oldY5 = missileY7;
+        missileX16 += xStep29;
+        missileY7 += yStep17;
+        minX8 = missileX16 - missileHalfWidth5;
+        maxX9 = missileX16 + missileHalfWidth5;
+        minY5 = missileY7 - missileHalfHeight28;
+        maxY6 = missileY7 + missileHalfHeight28;
     }
-    missileBackground->DrawToBuffer(
-        static_cast<short>(oldX - missileHalfWidth),
-        static_cast<short>(oldY - missileHalfHeight));
+    missileBackground9->DrawToBuffer(
+        static_cast<short>(oldX8 - missileHalfWidth5),
+        static_cast<short>(oldY5 - missileHalfHeight28));
     gpWindowManager->UpdateScreenRegion(
-        oldX - missileHalfWidth, oldY - missileHalfHeight,
-        missileHalfWidth * 2, missileHalfHeight * 2);
-    delete missileBackground;
+        oldX8 - missileHalfWidth5, oldY5 - missileHalfHeight28,
+        missileHalfWidth5 * 2, missileHalfHeight28 * 2);
+    delete missileBackground9;
 }
 
 VA(0x00495dcd, 0xf2)
