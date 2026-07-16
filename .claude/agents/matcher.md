@@ -200,6 +200,7 @@ accessor `jmp $+0` fingerprint — most plateaus are one of these two, both fixa
      FIRST; if they don't apply, park it and expect 100% for free once the TU fills.
 
        // @early-stop
+       // @early-stop-reloc-only
        // reloc-masked: code bytes identical (llvm-objdump -dr); only the operand's symbol name differs
        VA(0x0040b396, 0x1d3)
        mapCellExtra *fullMap::GetNewCellExtraOverlay(int x, int y) { /* complete body */ }
@@ -208,6 +209,9 @@ Every integrated non-100 method carries exactly one durable marker:
 
 - `@early-stop` means the permitted residual is byte-proven. `rg '@early-stop' src` is the
   proven-artifact set, never a "gave up" set.
+- `@early-stop-reloc-only` accompanies `@early-stop` when every non-relocation byte is claimed
+  identical. It is a hard-build assertion: actual COFF relocation fields are masked and no other
+  opcode, immediate, displacement, branch, padding, or operand byte may differ.
 - `@semantic` means the method is semantically and structurally complete but the residual is not
   necessarily a valid early-stop proof. It must name the first assembly/byte divergence, confirmed
   frame/slot/CFG and relocation state, obvious attempts already exhausted, and the revisit trigger.
