@@ -5,7 +5,7 @@ name	object	rva	size	storage	alignment	section_ordinal	section_offset	scope	prov
 ??_7bitmap@@6B@	BASE\BITMAP.c	0xeba3c	0x4	rdata	0x4	4	0x0	external	candidate-coff-section-translation
 ??_7border@@6B@	BASE\BORDER.c	0xeba60	0xc	rdata	0x8	3	0x0	external	candidate-coff-section-translation
 ??_7button@@6B@	BASE\BUTTON.c	0xebaf0	0xc	rdata	0x8	4	0x0	external	candidate-coff-section-translation
-$T32365	BASE\Blur.c	0xeba84	0x4	rdata	0x4	3	0x0	local	candidate-coff-section-translation
+$T32373	BASE\Blur.c	0xeba84	0x4	rdata	0x4	4	0x0	local	candidate-coff-section-translation
 $SG3295	BASE\Bzip.c	0x120364	0x14	data	0x4	2	0x414	local	candidate-coff-section-translation
 $SG3301	BASE\Bzip.c	0x120378	0x14	data	0x8	2	0x428	local	candidate-coff-section-translation
 $SG3338	BASE\Bzip.c	0x12038c	0x8	data	0x4	2	0x43c	local	candidate-coff-section-translation
