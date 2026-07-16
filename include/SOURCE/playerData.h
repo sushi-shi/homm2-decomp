@@ -5,6 +5,16 @@
 #include <va.h>
 
 #pragma pack(push, 1)  // recovered layout is byte-packed
+struct playerAttentionWeights {
+    float gameWeightA;    // +0x00
+    float gameRemainder;  // +0x04
+    float gameWeightB;    // +0x08
+    float buildingValue;  // +0x0c
+    float upgradeBase;    // +0x10
+    float heroValue;      // +0x14
+};
+SIZE(playerAttentionWeights, 0x18);
+
 class playerData {
 public:
     signed char m_color;  // +0x00
@@ -29,12 +39,7 @@ public:
     signed char m_evilInterface;  // +0xab
     signed char m_barrierTents;  // +0xac
     char m_unknownad[6];  // +0xad
-    float m_gameAttentionWeightA;  // +0xb3
-    float m_gameAttentionRemainder;  // +0xb7
-    float m_gameAttentionWeightB;  // +0xbb
-    float m_buildingValueWeight;  // +0xbf
-    float m_upgradeBaseWeight;  // +0xc3
-    float m_heroValueWeight;  // +0xc7
+    playerAttentionWeights m_attentionWeights;  // +0xb3
     char m_unknownCb[0x1c];  // +0xcb
     int m_income[7];  // +0xe7
     int m_obeliskValue;  // +0x103
