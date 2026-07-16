@@ -71,7 +71,10 @@ report. A target/config/tool/topology change, corrupt cache, or explicit force r
 objdiff over the whole project.
 
 `homm2 build` compiles each `config/units.toml` unit to `build/objdiff/base/<unit>.obj`
-and diffs it against the delinked retail target `build/delink/<unit>.c.obj`. ninja **tracks
+and generates comparison-only copies under `build/objdiff/normalized/`. Compiler-private
+`$SG`, `$T`, and `name$S<number>` symbols receive deterministic content-derived names in
+both copies before objdiff runs; the original compiler and delinker objects remain the inputs
+for linking, disassembly, and hard gates. See `docs/data-symbol-normalization.md`. ninja **tracks
 header deps** (MSVC 4.2 has no `/showIncludes`, so `cc_wrap.py` scans each TU's `#include`
 graph into a depfile) — editing a shared header recompiles exactly its includers, so a header
 change can't leave a stale obj. It then runs **eight hard gates** (a red gate fails the build):

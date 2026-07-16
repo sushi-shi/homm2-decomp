@@ -266,11 +266,12 @@ authoritative. This file is the short, restart-ready Codex workflow.
   `const_*`, `string_*`, `data_*`, `bss_*`, `[section-N]`, `empty_stub`, or unresolved-range
   identities. An uncovered retail relocation or unassigned section is a hard diagnostic, not
   permission to invent a name.
-- Compare candidate and delinked COFF identities directly. For every relocation, the source
-  section/site, referenced symbol, and owner-relative addend must agree. Do not use a post-hoc name
-  or addend mapping to make HoMM2 comparisons pass. `homm2 data-relocs` independently audits raw
-  COFF relocation topology because ordinary code scoring may mask relocation fields; objdiff's
-  `data_value` comparison remains the per-symbol payload view.
+- Compare candidate and delinked COFF identities directly after the independent anonymous-name
+  normalization described below. For every relocation, the source section/site, referenced symbol,
+  and owner-relative addend must agree. Do not use a paired-object name or addend mapping to make
+  HoMM2 comparisons pass. `homm2 data-relocs` independently audits raw COFF relocation topology
+  because ordinary code scoring may mask relocation fields; objdiff's `data_value` comparison
+  remains the per-symbol payload view.
 - Never resolve an interior alias by emitting overlapping independent storage. Replace aliases into
   `gConfig`, monster tables, formation/elevation records, or other known objects with real member or
   table access. Refine the owning packed layout when necessary and then remove the synthetic model
@@ -293,6 +294,22 @@ authoritative. This file is the short, restart-ready Codex workflow.
   padding can contain logically zero-fill contributions. Reconstruct storage from candidate COFF
   class, exact NB09 ownership chunks, public/DATA anchors, and retail bytes; conflicting evidence
   remains a diagnostic until the declaration or contribution model is corrected.
+
+## Anonymous Data Comparison
+
+- Objdiff compares disposable canonical copies under `build/objdiff/normalized/`, not the raw
+  compiler and delinker objects directly. `$SG`, `$T`, and `name$S<number>` identities are rebuilt
+  independently from each object's bytes and relocation topology. See
+  `docs/data-symbol-normalization.md`.
+- Never pass normalized copies to the linker, disassembler, layout recovery, or hard-gate tooling.
+  Raw objects in `build/objdiff/base/` and `build/delink/` remain authoritative; the canonicalizer
+  enforces that only symbol names and the COFF string table change.
+- Do not restore compiler counters or use source order, retail RVAs, the opposite object, or a
+  persistent manifest to make anonymous names agree. Identical allocations use deterministic
+  section/offset occurrences; ambiguous float widths remain `$anon_data` and are still compared.
+- Treat canonical-name or normalized-record differences as evidence to inspect, not permission to
+  alias relocations. A wrong relocation target between identical writable allocations must remain
+  visible.
 
 ## CodeView Function Boundaries
 
