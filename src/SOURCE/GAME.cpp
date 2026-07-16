@@ -1451,7 +1451,7 @@ inline town *GetCastleSlot(game *instance, int index)
     return &instance->m_castleRecs[index];
 }
 
-// @match-note
+// @semantic
 // soft/TU-cumulative: frame 0x1d8 exact; base 0x25fe vs retail 0x2601. Residual is three MAP_WIDTH/xPos2 commutative compare encodings (+0x9d, +0x1db7, +0x1ee4; one byte each) and equal-length packed-m_objectMetadata RHS/cell-word evaluation order at +0x2e1; val|0, setter, union, cast, and bitfield-type spellings do not steer MSVC 4.2.
 VA(0x00476448, 0x2601)
 void game::RandomizeEvents(void)
@@ -2372,7 +2372,7 @@ int ViewSpellsHandler(tag_message &msg)
     return 1;
 }
 
-// @match-note
+// @semantic
 // Manual relocation audit finds 35 sites in both objects. This body is 0x17d versus
 // retail's 0x17c solely because the commutative hover equality loads msg first into eax
 // (15 bytes) instead of the window manager first into eax (14 bytes); all later blocks
@@ -2861,7 +2861,7 @@ void game::TurnOffAIMusic(void)
     gpSoundManager->m_samplesReady = 1;
 }
 
-// @match-note
+// @semantic
 // The reconstructed body realigns after each of the first two flag clears and thereafter
 // matches instruction-for-instruction. Retail expands each clear into a 0x1e-byte longer
 // address/load/and/address/store sequence (114 relocations versus 112); direct, bitfield,
@@ -3036,7 +3036,7 @@ int game::ComputeDailyGold(int player)
     return gold;
 }
 
-// @match-note
+// @semantic
 // Frame/slots and 30 relocations are exact. The only residual is target 0x47ce94..0x47cec2:
 // the commutative handicap sum loads gpGame secondary income before this->primary income;
 // this partial /Od TU loads the same two operands in the opposite order, then realigns at fild.
@@ -3188,7 +3188,7 @@ void game::PerDay(void)
     }
 }
 
-// @match-note
+// @semantic
 // 99.09%: frame and control flow are byte-exact. The six hero-slot index residuals
 // differ only in when a commutative subtraction is issued, and the map-height loop
 // differs only in compare operand order; both are the documented TU-cumulative /Od
@@ -3568,7 +3568,7 @@ void game::PerMonth(void)
     gpAdvManager->CompleteDraw(0);
 }
 
-// @match-note
+// @semantic
 // The complete control flow and both relocations align. The AST-permuted bounds spelling
 // improves the match to 99.19%: this 0x472-byte body materializes y + 1 with a one-byte inc,
 // while retail's 0x476-byte body compares y directly and retains a five-byte continuation.
@@ -3690,7 +3690,7 @@ void game::RandomizeTown(int x, int y, int)
     m_castleRecs[townId0].m_type = static_cast<signed char>(race0);
 }
 
-// @match-note
+// @semantic
 // Exact 0x619-byte span and 22 relocation sites. The remaining /Od differences
 // are operand evaluation in the inlined GetCell(x + 1, ...) accessors and the
 // columnOffset + x expressions. Both operand spellings were tested unchanged;
@@ -3824,6 +3824,12 @@ void game::RandomizeMine(int x, int y)
     m_mines[mineId].resourceType = static_cast<signed char>(mineType29);
 }
 
+// @semantic: Complete semantics/frame/CFG and all three external relocation
+// identities agree. The only structural residual is the outer width guard:
+// retail loads x then compares MAP_WIDTH with jle; base loads MAP_WIDTH then
+// compares x with jge. Reversed relational and 0[&x] barrier forms were neutral,
+// and ten bounded TU-state probes did not close it. Revisit after a material
+// GAME predecessor/header or comparison-tool change.
 VA(0x0047fc0a, 0xc6)
 void game::InitRandomArtifacts(void)
 {
@@ -3921,6 +3927,12 @@ void game::RandomizeHeroPool(void)
     }
 }
 
+// @semantic: Complete army-table semantics, frame/slots, CFG, and all three
+// external relocation identities agree. At +0x111 retail computes the strong-army
+// threshold before Random and compares threshold<=roll; base calls Random first
+// and emits the equivalent roll>=threshold. Reversing the source comparison was
+// byte-neutral; ten bounded TU-state probes found only disposable closures.
+// Revisit after a material GAME predecessor/header or comparison-tool change.
 VA(0x004800a6, 0x378)
 void game::SetRandomHeroArmies(int heroId, int strongArmy)
 {
@@ -4131,7 +4143,7 @@ monsterBoundsReady:
     }
 }
 
-// @match-note
+// @semantic
 // Logic and frame slots are byte-exact. The only residual is the TU-cumulative /Od
 // polarity/load order of cutoff <= visibility: retail emits cmp cutoff,visibility; jg,
 // while this partial TU emits the relationally equivalent cmp visibility,cutoff; jl.
@@ -4185,7 +4197,7 @@ void game::SetVisibility(int x, int y, int player, int radius)
     }
 }
 
-// @match-note
+// @semantic
 // Logic and frame slots are byte-exact; residual is three commutative operand-load swaps (the
 // inner-loop test y<MAP_HEIGHT and the two y*MAP_WIDTH index multiplies load the OTHER
 // operand into eax first). Not source-steerable (operand order / reversed compare /
@@ -4284,7 +4296,7 @@ int game::GetLuck(hero *h, class army *, town *castle)
     return luck;
 }
 
-// @match-note
+// @semantic
 // Logic + frame slots byte-exact (col/row/mask + nested x/y land on retail's -0x4..-0x14
 // via the {} block); residual is the same TU-cumulative /Od eval-order parity as
 // MakeAllWaterVisible - the inner-loop test and the y*MAP_WIDTH multiplies load the other
@@ -4452,7 +4464,7 @@ void game::ConvertAllToLateOverlay(int col, int row)
     }
 }
 
-// @match-note
+// @semantic
 // Logic is complete. The residual is one coupled TU-cumulative /Od lowering choice:
 // retail evaluates the packed m_objectMetadata lvalue first and reserves two hidden temporary words;
 // this partial TU evaluates townId first and omits them. The same parity flips the three
@@ -4887,7 +4899,7 @@ void game::ProcessOnMapHeroes(void)
     }
 }
 
-// @match-note
+// @semantic
 // Frame layout and all seven relocations are exact. The 0x8-byte size residual is one
 // five-byte inlined hero-bounds continuation plus three bytes of equivalent commutative
 // packed-record index arithmetic; every ownership, repair, and army check realigns.
@@ -5225,6 +5237,12 @@ transmitCleanup:
 #define samplesReady samplesReady0
 #define success success15
 
+// @semantic: Complete receive/decompress/write/cleanup semantics, 0x1e4 frame,
+// CFG, and all 102 ordered relocation sites/effective targets agree. The only
+// unmasked bytes are +0x5bc/+0x5bf: decodedData/incomingData equality loads use
+// opposite stack operands. Reversing the source equality was byte-neutral; ten
+// bounded TU-state probes found only sibling-rejected disposable closures.
+// Revisit after a material GAME predecessor/header or comparison-tool change.
 VA(0x00483937, 0x68d)
 int game::ReceiveSaveGame(int dataSize, int expectedCrc, int expectedTransmitCrc,
                           int remotePlayer)
@@ -5495,7 +5513,7 @@ int game::GetBoatsBuilt(void)
     return count;
 }
 
-// @match-note
+// @semantic
 // Complete logic and frame; the sole relocation agrees. The canonical player layout
 // leaves an operand-order residual: retail forms i + color * sizeof(playerData), while
 // this TU forms color * sizeof(playerData) + i. Keep the retained maximum.
@@ -5603,7 +5621,7 @@ void game::RestoreCell(int x, int y, int obj, int barrier, mapCell *passedCell, 
     }
 }
 
-// @match-note
+// @semantic
 // Frame, reinit, realloc, and all 23 relocations agree. The first divergence is the
 // height equality's commutative load order; retail also retains two redundant jumps
 // for the empty then-branch: an end-of-function trampoline and a dead `jmp realloc`
@@ -5630,7 +5648,7 @@ void game::SetMapSize(int w, int h)
     memset(mapExtra, 0, MAP_WIDTH * MAP_HEIGHT);
 }
 
-// @match-note
+// @semantic
 // Logic + frame slots byte-exact; residual is the operand-eval order of the two
 // `flags |= <extracted len bits>` ORs: retail loads `flags` into al first (then keeps
 // len in ecx and pulls the shifted byte via ch), my build evaluates the value first and
@@ -5838,6 +5856,12 @@ void CreateDiffFile(char *oldName, char *joinName, char *diffName,
     return;
 }
 
+// @semantic: Complete join-file semantics, frame/slots, CFG, and all 77 ordered
+// relocation sites/effective targets agree. The only unmasked bytes are
+// +0x1ea/+0x1ed/+0x1ef: the diffSize/position loop comparison uses reversed
+// operands and branch polarity. Reversed relational and 0[&position] forms were
+// neutral; ten bounded TU-state probes did not produce an admissible closure.
+// Revisit after a material GAME predecessor/header or comparison-tool change.
 VA(0x00485107, 0x3ce)
 void CreateJoinFile(char *oldName, char *diffName, char *joinName)
 {
@@ -6075,7 +6099,7 @@ EventExtra *GetMapEvent(int x, int y)
     return 0;
 }
 
-// @match-note
+// @semantic
 // Frame/CFG/logic match. Only +0xc..+0x37 (calendar term register order) and
 // +0x19d..+0x286 (four equivalent player-resource address orders) are TU-cumulative.
 VA(0x00485e07, 0x34c)
@@ -6150,7 +6174,7 @@ void game::CheckForTimeEvent(void)
     }
 }
 
-// @match-note
+// @semantic
 // Frame/loops match; +0xc5..+0xe8 is only the equivalent packed expression
 // heroIndex + player * 283. Direct, commuted, accessor, and AST variants did not steer it.
 VA(0x00486153, 0x143)
@@ -6204,7 +6228,7 @@ int CalcFileCRC(char *filename)
     return crc;
 }
 
-// @match-note
+// @semantic
 // All bytes except +0x8d..+0x99 match; /Od reverses the equivalent index/size
 // loop-test load order and branch polarity. Relational and AST variants did not steer it.
 VA(0x00486341, 0x153)
@@ -6311,6 +6335,11 @@ void CompressTest3(void)
     }
 }
 
+// @semantic: Complete shrine-count semantics, frame/slots, CFG, and all four
+// relocation identities agree. Base retains one extra local continuation jump
+// before the building-mask load; later relocation sites shift accordingly and
+// then realign. Ten bounded TU-state probes were neutral. Revisit after a
+// material GAME predecessor/header or comparison-tool change.
 VA(0x004866a5, 0x119)
 int game::CountShrines(int player)
 {
