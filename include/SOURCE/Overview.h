@@ -29,6 +29,7 @@ typedef iconWidget *OverviewIconWidgetRow[OVERVIEW_DYNAMIC_WIDGETS_PER_ROW];
 typedef textWidget *OverviewTextWidgetRow[OVERVIEW_DYNAMIC_WIDGETS_PER_ROW];
 
 typedef enum OverviewUiConstant {
+    OVERVIEW_DYNAMIC_SOURCE_LINE = 116,
     OVERVIEW_SETUP_SOURCE_LINE = 0x2ba,
     OVERVIEW_DIALOG_SOURCE_LINE = 0x30a,
     OVERVIEW_DYNAMIC_ARRAY_BYTES = 0x2bc0,
