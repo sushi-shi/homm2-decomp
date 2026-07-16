@@ -2161,7 +2161,8 @@ void advManager::PasswordEvent(mapCell *cell, hero *)
 // Equivalent prefix/postfix/index spellings are byte-neutral in the identical
 // GenericSiteAIEvent shape. Revisit only if the hero primary-stat representation
 // or accessor changes, an earlier EVENTS source edit changes emitted evaluation
-// order, or comparison gains a proved commutative-load normalization.
+// order, or comparison gains a proved commutative-load normalization. Ten bounded
+// TU-state declaration families produced no canonical exact closure.
 VA(0x004aed38, 0x6fe)
 void advManager::GenericSiteEvent(mapCell *cell, hero *eventHero)
 {
@@ -4609,6 +4610,7 @@ void advManager::PasswordAIEvent(mapCell *cell, hero *)
 // read/add/write grew the body by 12 bytes. Revisit only if the hero primary-stat
 // representation/accessor changes, an earlier EVENTS source edit changes emitted
 // evaluation order, or comparison gains a proved commutative-load normalization.
+// Ten bounded TU-state declaration families produced no canonical exact closure.
 VA(0x004b493b, 0x369)
 void advManager::GenericSiteAIEvent(mapCell *cell, hero *eventHero)
 {
@@ -4731,7 +4733,8 @@ void advManager::GenericSiteAIEvent(mapCell *cell, hero *eventHero)
 // retail reads the cell word before shifting packedSite17 for the bitfield write,
 // while ours shifts first. Direct, `| 0`, and 0[&packedSite17] assignments were
 // byte-neutral; an explicit m_objectData mask/write changed the body size/register
-// width. Revisit after later EVENTS TU or mapCell accessor changes.
+// width. Ten bounded TU-state declaration families produced no canonical exact
+// closure; revisit after later EVENTS TU or mapCell accessor changes.
 VA(0x004b4ca4, 0x18f)
 void advManager::RecruitSiteAIEvent(mapCell *cell, hero *eventHero)
 {
@@ -4838,10 +4841,8 @@ void advManager::JailAIEvent(mapCell *cell, hero *eventHero, int x, int y)
 
 // @early-stop
 // @early-stop-reloc-only
-// All 0x82b relocation-masked bytes, normalized instructions, the 0x154 frame,
-// slots, and CFG match after correcting the shared CampaignAward values. All
-// 85 ordered relocation sites resolve to the same effective targets; the retained
-// objdiff residual is folded monster-field and pooled string/float identities.
+// All 0x82b bytes match after masking the 85 aligned relocation sites. The
+// remaining objdiff residual is limited to delinked symbol identities.
 VA(0x004b4fd5, 0x82b)
 void advManager::PlayerMonsterInteract(mapCell *cell, mapCell *combatCell, hero *eventHero,
                                        int *handled, int x, int y, int unused,
