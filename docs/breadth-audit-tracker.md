@@ -45,6 +45,7 @@ homm2 breadth-audit epoch
 homm2 breadth-audit summary
 homm2 breadth-audit summary --module SOURCE
 homm2 breadth-audit queue --module SOURCE --limit 35
+homm2 breadth-audit queue --module SOURCE --exact-max-only --limit 35
 ```
 
 The queue is TSV on standard output, sorted from closest to 100% downward. It
