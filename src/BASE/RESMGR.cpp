@@ -527,4 +527,4 @@ VTBL(resourceManager, 0x004eb9f0);
 // ---- globals (definitions, RVA order) ----
 DATA(0x0051e99c) int iSaveCtr = 0;
 DATA(0x005331e8) int lastAggZ[10];
-DATA(0x00533210) long lastPositionZ[12];
+DATA(0x00533210) long lastPositionZ[10];
