@@ -608,10 +608,12 @@ void advManager::CheckSetEvilInterface(int redraw, int player)
     }
 }
 
-// @semantic: after compiler-local table normalization, the 0x48 frame, CFG
-// semantics, all 232 ordered relocations, and every non-relocation byte agree
-// except +0x7f0. Retail's failed coordinate-cheat comparison selects the first
-// of two adjacent jumps to the same case epilogue; VC4.2 selects the second.
+// @semantic: the 0x48 frame, CFG, semantics, all 232 relocation sites/external
+// targets, and every non-relocation byte agree except +0x7f0. The same-function
+// table differs only at +0xd0c: base selects +0x48e and retail +0x83e, but both
+// labels are unconditional jumps to the same +0xdf1 epilogue. Retail's failed
+// coordinate-cheat comparison selects the first of two adjacent jumps to that
+// epilogue; VC4.2 selects the second.
 // Ten bounded attempts are exhausted: inverted guard, removed inner break,
 // comparison-order AST swap, matched/miss gotos, empty-else, negated/boolean
 // guards, single-case switch, and do/while body. Revisit only after Main's
@@ -2630,6 +2632,12 @@ void advManager::DrawCell(int mapX, int mapY, int screenX, int screenY,
     }
 }
 
+// @semantic: Complete bounds semantics, frame/slots, CFG, and both MAP_WIDTH/
+// MAP_HEIGHT relocation targets agree. The only residual is the width guard:
+// retail loads x, compares MAP_WIDTH, and uses jle; base loads MAP_WIDTH,
+// compares x, and uses jge. The equivalent x>=MAP_WIDTH, MAP_WIDTH<=x, and
+// MAP_WIDTH<=0[&x] spellings compiled identically. Revisit after a material
+// ADVMGR predecessor/header or comparison-tool change.
 VA(0x0045e047, 0x93)
 class mapCell * advManager::GetCell(int x, int y)
 {
@@ -4469,17 +4477,14 @@ char * advManager::GetArmySizeName(int armySize, int grammar)
     return gArmySizeNames[8][grammar];
 }
 
-// @semantic: Full brace-bounded source hash 4e7e3b2af55d at comparison epoch
-// 93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca covers
-// the function-local DATA declaration and the complete body through Dispose.
-// The 0xec frame/slots, CFG, 0xc29 retail span, tail bytes, and all 102 ordered
-// relocation sites and effective targets agree. OR-zero steering closes both
+// @semantic: the 0xec frame/slots, CFG, 0xc29 retail span, tail bytes, and all
+// 102 ordered relocation sites/effective targets agree. OR-zero steering closes both
 // first-row multiplication-order residuals. The only eight unmasked bytes are
 // +0x831..+0x838: retail loads firstRowCountState then adds secondRowCountState,
 // while base loads/adds the same two ints oppositely. The two prior retained
-// iterations were commuted multiplication followed by OR-zero steering; the
-// unchanged evidence does not justify replaying the remaining variant budget.
-// Revisit only after this full-body hash or the comparison epoch changes.
+// iterations were commuted multiplication followed by OR-zero steering; directly
+// commuting this loop bound was also byte-neutral. Revisit after a material
+// ADVMGR predecessor/header or comparison-tool change.
 VA(0x004631ad, 0xc29)
 void advManager::TownQuickView(int townId, int locatorSlot, int windowX, int windowY)
 {
@@ -5634,12 +5639,14 @@ int advManager::ComboDraw(int update)
     return ComboDraw(m_mapOriginX, m_mapOriginY, update);
 }
 
-// @match-note
+// @semantic
 // Raw bytes differ only at +0x1dd/+0x1e0, +0x1f4/+0x1f7,
 // +0x1fb/+0x1fe, and +0x215/+0x218: four commutative /Od add operand
 // orders. The frame, size, logic, and all 18 relocation targets agree. The
 // environment-volume relocation reaches the same retail table address; only
-// the delinker's synthetic constant-pool identity differs.
+// the delinker's synthetic constant-pool identity differs. Commuting all four
+// origin-plus-radius expressions was byte-neutral. Revisit after a material
+// ADVMGR predecessor/header or comparison-tool change.
 VA(0x0046668e, 0x338)
 void advManager::SetEnvironmentOrigin(int originX, int originY, int stopSounds)
 {
@@ -7303,14 +7310,13 @@ int MapExtraPosAndAdjacentsSet(int x, int y, unsigned char mask)
     return 0;
 }
 
-// @early-stop
-// Complete 0x6c frame/slots, CFG, semantics, and all 54 ordered relocation
-// sites/targets agree. The only three unmasked bytes are +0x385, +0x388, and
-// +0x38a: base loads pixelIterator then compares rowLimitAddress and emits jbe;
-// retail loads rowLimitAddress then compares pixelIterator and emits jae. Both
-// pixelIterator < rowLimitAddress and the reversed rowLimitAddress >
-// pixelIterator spelling compile identically. Revisit after a relevant ADVMGR
-// predecessor/header change alters this TU-cumulative commutative load order.
+// @semantic: Complete 0x6c frame/slots, CFG, semantics, and all 54 relocation
+// target identities agree. The y-adjustment expression is reassociated at +0x26f,
+// shifting one later DIR32 site from +0x244 to +0x247; both forms compute
+// y*5+x*2. At +0x385 base loads pixelIterator then compares rowLimitAddress and
+// emits jbe, while retail loads rowLimitAddress then compares pixelIterator and
+// emits jae. Both comparison orders compile identically. Revisit after a material
+// ADVMGR predecessor/header or comparison-tool change.
 VA(0x0046a1dd, 0x4c6)
 void advManager::ViewPuzzle(void)
 {
@@ -8165,10 +8171,13 @@ int GetManaFrame(int mana) {
     return frame;
 }
 
-// @early-stop
-// @early-stop-reloc-only
-// All 0x559 relocation-masked bytes and all 42 ordered relocation sites/targets
-// are identical; objdiff differs only on compiler-local string/float symbol names.
+// @semantic: Complete semantics, frame/slots, CFG, and all 42 ordered relocation
+// sites/effective targets agree. The only unmasked code residual is the nearest
+// monster comparison at +0xfc, +0x102, and +0x107: base spells nearest>distance
+// with the operands opposite retail's distance<nearest form. Reversing the source
+// comparison produced broader block-layout changes and was reverted; ten bounded
+// TU-state perturbations also failed to close it. Revisit after a material ADVMGR
+// predecessor/header or comparison-tool change.
 VA(0x0046bce8, 0x559)
 int advManager::DoVisions(hero *visionHero)
 {
