@@ -24,9 +24,9 @@ DATA(0x0051fa70) static STextWidgetSourceFiles gTextWidgetSourceFiles = {
 // @data-layout-note NB09 assigns TEXTWDGT one 0xb0 initialized-data
 // contribution at 0x11fa70. Retail stores four identical source paths in 0x2c
 // slots at owner addends 0, 0x2c, 0x58, and 0x84. Read and destruction use the
-// first two owners; the two Main allocation sites share the third, and the two
-// SetText sites share the fourth. This typed aggregate reproduces the complete
-// contribution and all six relocation addends. The existing 0xc textWidget
+// first two owners; both resize frees use the third, and both resize allocations
+// use the fourth. This typed aggregate reproduces the complete contribution and
+// all six relocation addends. The existing 0xc textWidget
 // vtable is the only rdata contribution, and this TU has no loader-zero data.
 // Do not pool the paths or split them with padding symbols or section pragmas.
 // @semantic
@@ -154,9 +154,9 @@ int textWidget::Main(tag_message &msg)
             }
             unsigned short newLen = strlen(newText);
             if (strlen(m_text) < newLen) {
-                H2_FREE(m_text, gTextWidgetSourceFiles.mainMessage, 0xd3);
+                H2_FREE(m_text, gTextWidgetSourceFiles.resizeFree, 0xd3);
                 m_text = static_cast<char *>(H2_ALLOC(
-                    newLen + 5, gTextWidgetSourceFiles.mainMessage, 0xd4));
+                    newLen + 5, gTextWidgetSourceFiles.resizeAlloc, 0xd4));
             }
             strcpy(m_text, newText);
             return 1;
@@ -207,9 +207,9 @@ void textWidget::SetText(char *text)
     }
     unsigned short newLen = strlen(text);
     if (strlen(m_text) < newLen) {
-        H2_FREE(m_text, gTextWidgetSourceFiles.setText, 0xd3);
+        H2_FREE(m_text, gTextWidgetSourceFiles.resizeFree, 0xd3);
         m_text = static_cast<char *>(H2_ALLOC(
-            newLen + 5, gTextWidgetSourceFiles.setText, 0xd4));
+            newLen + 5, gTextWidgetSourceFiles.resizeAlloc, 0xd4));
     }
     strcpy(m_text, text);
 }
