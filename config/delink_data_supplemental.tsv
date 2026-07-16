@@ -109,6 +109,9 @@ $T32155	BASE\Ripple.c	0xeba80	0x4	rdata	0x4	3	0x0	local	candidate-coff-section-t
 ??_7MIDIWrap@@6B@	BASE\SAMPLE.c	0xebab8	0x4	rdata	0x4	11	0x0	external	candidate-coff-section-translation
 ??_7textWidget@@6B@	BASE\TEXTWDGT.c	0xeba50	0xc	rdata	0x8	4	0x0	external	candidate-coff-section-translation
 ??_7tileset@@6B@	BASE\TILESET.c	0xebab0	0x4	rdata	0x4	4	0x0	external	candidate-coff-section-translation
+??_C@_0CK@GEEO@I?3?2Projects?2Heroes?2Prog?2BASE?2Tex@	BASE\Textntry.c	0x120cec	0x2a	data	0x4	8	0x0	external	candidate-coff-section-translation
+??_C@_0CL@CGE@I?3?2Projects?2Heroes?2Prog?2BASE?2Tex@	BASE\Textntry.c	0x120d18	0x2b	data	0x4	13	0x0	external	candidate-coff-section-translation
+??_C@_0FG@FDHO@I?3?2Projects?2Heroes?2Prog?2BASE?2Tex@	BASE\Textntry.c	0x120d44	0x56	data	0x4	16	0x0	external	candidate-coff-section-translation
 ??_7textEntryWidget@@6B@	BASE\Textntry.c	0xebaa0	0xc	rdata	0x8	3	0x0	external	candidate-coff-section-translation
 ??_7widget@@6B@	BASE\WIDGET.c	0xebb00	0xc	rdata	0x8	3	0x0	external	candidate-coff-section-translation
 $SG31761	BASE\WINDOW.c	0x11f9d0	0x14	data	0x4	3	0x0	local	candidate-coff-section-translation
