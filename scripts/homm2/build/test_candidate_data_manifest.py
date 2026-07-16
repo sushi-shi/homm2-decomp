@@ -342,6 +342,19 @@ class CandidateDataManifestTest(unittest.TestCase):
         self.assertEqual(payload["open_by_storage"], {"data": 2})
         self.assertEqual(payload["open_by_cause"], {"uncovered": 2, "unmapped": 1})
 
+    def test_diagnostics_separate_evidenced_from_closed_definitions(self):
+        from homm2.build.candidate_data_manifest import DerivationStats
+        import json
+
+        stats = DerivationStats(
+            candidate_definitions=10, evidenced_definitions=8,
+            mapped_definitions=3, closed_groups=1, open_groups=1,
+        )
+        payload = json.loads(diagnostics_bytes(stats, []))
+        self.assertEqual(payload["stats"]["candidate_definitions"], 10)
+        self.assertEqual(payload["stats"]["evidenced_definitions"], 8)
+        self.assertEqual(payload["stats"]["mapped_definitions"], 3)
+
     def test_icondf2b_candidate_topology_and_retail_bijection(self):
         path = REPO / "build/objdiff/base/BASE/Icondf2b.obj"
         if not path.is_file():
