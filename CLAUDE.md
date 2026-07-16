@@ -65,7 +65,10 @@ homm2 status    # per-unit + overall match %   (also: status update | status che
 
 The objdiff report is content-addressed over `objdiff.json`, every configured base/target object,
 and the resolved `objdiff-cli` binary. An unchanged `homm2 build` reuses the verified report;
-`homm2 status --force-refresh` explicitly regenerates it.
+`homm2 status --force-refresh` explicitly regenerates it. When only base-object content changes,
+the cache regenerates complete reports for those units and merges them into the prior verified
+report. A target/config/tool/topology change, corrupt cache, or explicit force refresh still runs
+objdiff over the whole project.
 
 `homm2 build` compiles each `config/units.toml` unit to `build/objdiff/base/<unit>.obj`
 and diffs it against the delinked retail target `build/delink/<unit>.c.obj`. ninja **tracks

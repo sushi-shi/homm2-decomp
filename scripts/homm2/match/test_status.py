@@ -67,6 +67,22 @@ class ReportCacheTest(unittest.TestCase):
         self.target.write_bytes(b"new target")
         self.assertIsNone(self._cached())
 
+    def test_base_only_change_is_incremental(self):
+        self._seed()
+        self.base.write_bytes(b"new base")
+        report, units = status._trusted_incremental_base_units(
+            self.report, self.stamp, self._identity())
+        self.assertEqual(report, self.report_data)
+        self.assertEqual(units, ["SOURCE/UNIT"])
+
+    def test_target_change_is_not_incremental(self):
+        self._seed()
+        self.target.write_bytes(b"new target")
+        report, units = status._trusted_incremental_base_units(
+            self.report, self.stamp, self._identity())
+        self.assertIsNone(report)
+        self.assertIsNone(units)
+
     def test_executable_path_and_content_changes_invalidate_report(self):
         original = self._seed()
         second_tool = self.tool.with_name("objdiff-cli-new")
@@ -114,6 +130,37 @@ class ReportCacheTest(unittest.TestCase):
                 mock.patch.object(status, "source_hashes", return_value={}):
             self.assertEqual(status.main(["--force-refresh"]), 0)
         loader.assert_called_once_with(force_refresh=True)
+
+    def test_partial_report_replaces_units_and_recomputes_measures(self):
+        def unit(name, total, matched, fuzzy):
+            return {
+                "name": name,
+                "measures": {
+                    "total_code": str(total),
+                    "matched_code": str(matched),
+                    "fuzzy_match_percent": fuzzy,
+                    "total_functions": 1,
+                    "matched_functions": int(total == matched),
+                },
+                "functions": [],
+                "sections": [],
+            }
+
+        previous = {"version": 1, "units": [
+            unit("SOURCE/A", 100, 10, 80.0),
+            unit("SOURCE/B", 300, 30, 90.0),
+        ], "measures": {}}
+        replacement = unit("SOURCE/A", 100, 100, 100.0)
+        partial = {"version": 1, "units": [replacement], "measures": {}}
+        merged = status._merge_partial_report(
+            previous, partial, ["SOURCE/A", "SOURCE/B"], ["SOURCE/A"])
+
+        self.assertEqual([row["name"] for row in merged["units"]],
+                         ["SOURCE/A", "SOURCE/B"])
+        self.assertEqual(merged["measures"]["total_code"], "400")
+        self.assertEqual(merged["measures"]["matched_code"], "130")
+        self.assertAlmostEqual(merged["measures"]["fuzzy_match_percent"], 92.5)
+        self.assertAlmostEqual(merged["measures"]["matched_code_percent"], 32.5)
 
 
 class BaselineTest(unittest.TestCase):
