@@ -22,11 +22,29 @@
 #include <SOURCE/Wsnetwin.h>
 
 #define WSFILE const_cast<char *>("I:\\Projects\\Heroes\\Prog\\SOURCE\\Wsnetwin.cpp")
-#define WS_INIT_LINE_BASE (*reinterpret_cast<const short *>("="))
-#define WS_TERM_LINE_BASE (*reinterpret_cast<const short *>("_"))
-#define WS_SEND_LINE_BASE (*reinterpret_cast<const short *>("\x17\x01"))
-#define WS_RCV_LINE_BASE (*reinterpret_cast<const short *>("\x67\x01"))
-#define WS_EVALUATE_LINE_BASE (*reinterpret_cast<const short *>("\x9d\x01"))
+#define WS_SOURCE_LINE_INIT_BASE 61
+#define WS_SOURCE_LINE_TERM_BASE 248
+#define WS_SOURCE_LINE_SEND_BASE 279
+#define WS_SOURCE_LINE_RECEIVE_BASE 359
+#define WS_SOURCE_LINE_EVALUATE_BASE 413
+
+DATA(0x004ed2c4) static short s_wsInitSourceLineBase = WS_SOURCE_LINE_INIT_BASE;
+DATA(0x004ed730) static short s_wsTermSourceLineBase = WS_SOURCE_LINE_TERM_BASE;
+DATA(0x004ed78c) static short s_wsSendSourceLineBase = WS_SOURCE_LINE_SEND_BASE;
+DATA(0x004ed830) static short s_wsReceiveSourceLineBase = WS_SOURCE_LINE_RECEIVE_BASE;
+DATA(0x004ed860) static short s_wsEvaluateSourceLineBase = WS_SOURCE_LINE_EVALUATE_BASE;
+
+// @data-layout-note Retail initialized storage is 0xed2ac+0x73c. Candidate
+// .data is 0x737 across 11 source DATA definitions and 32 private literals;
+// every payload matches retail after mapping the candidate permutation. All 67
+// initialized-data references pair at the same function-relative sites with
+// addend zero. Five source-line shorts leave ten alignment bytes, and the final
+// literal leaves five terminal zero bytes; neither is a separate owner.
+// Retail loader-zero storage is 0x122f88+0x2d0 across eight public definitions.
+// All 72 candidate BSS references pair: saddr_loc uses addends 0/2/4 and every
+// other reference uses addend zero. iAddrLen and saddr_remote have no code
+// references, but their public RVAs and exact candidate identities/types prove
+// ownership. The 18 uncovered BSS bytes are alignment only; no .rdata is owned.
 
 // @semantic
 // Complete 0x128 frame/slots and 164/164 relocation targets. First raw residual is the
@@ -42,17 +60,17 @@ short int wsnet_init(void) {
     int player;
 
     if (gConfig.gfx[giCurExe].fullScreen != 0) {
-        sprintf(gText, "About to initiate TCP/IP connection.  Heroes II will now drop from full screen mode to windowed mode, so that any Windows 95 generated dialog boxes can be seen.");
+        sprintf(gText, "About to initiate TCP/IP connection.  Heroes II will now drop from full screen mode to windowed mode, so that any Windows 95 generated dialog boxes can be seen.\n\nWhen the connection is successfully made, you can return to full screen mode by pressing 'F4'.");
         NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
         SetFullScreenStatus(0);
     }
     gbRemoteOn = 1;
     ppDPRcvBuffer = static_cast<unsigned char **>(
         BaseAlloc(WS_TRANSPORT_BUFFER_COUNT * sizeof(unsigned char *), WSFILE,
-                  WS_INIT_LINE_BASE + 0xa));
+                  s_wsInitSourceLineBase + 0xa));
     piDPRcvBufferSize = static_cast<int *>(
         BaseAlloc(WS_TRANSPORT_BUFFER_COUNT * sizeof(int), WSFILE,
-                  WS_INIT_LINE_BASE + 0xb));
+                  s_wsInitSourceLineBase + 0xb));
     memset(ppDPRcvBuffer, 0,
            WS_TRANSPORT_BUFFER_COUNT * sizeof(unsigned char *));
     memset(piDPRcvBufferSize, 0,
@@ -164,10 +182,10 @@ void wsnet_term(void) {
     if (sd_dg != INVALID_SOCKET)
         closesocket(sd_dg);
     if (ppDPRcvBuffer != 0)
-        BaseFree(ppDPRcvBuffer, WSFILE, WS_TERM_LINE_BASE + 7);
+        BaseFree(ppDPRcvBuffer, WSFILE, s_wsTermSourceLineBase + 7);
     ppDPRcvBuffer = 0;
     if (piDPRcvBufferSize != 0)
-        BaseFree(piDPRcvBufferSize, WSFILE, WS_TERM_LINE_BASE + 0xb);
+        BaseFree(piDPRcvBufferSize, WSFILE, s_wsTermSourceLineBase + 0xb);
     piDPRcvBufferSize = 0;
     WSACleanup();
     bHostFound = 0;
@@ -188,7 +206,7 @@ VA(0x00406f37, 0x1f5)
 void wsSendMessage(int destination, unsigned char type, unsigned short int size,
                    void *data) {
     unsigned char *packetBuffer = static_cast<unsigned char *>(
-        BaseAlloc(size + 1, WSFILE, WS_SEND_LINE_BASE + 2));
+        BaseAlloc(size + 1, WSFILE, s_wsSendSourceLineBase + 2));
     struct sockaddr_in peerAddress;
     int attemptCount;
     int error;
@@ -216,7 +234,7 @@ void wsSendMessage(int destination, unsigned char type, unsigned short int size,
                         continue;
                     }
                     sprintf(cWSTextBuffer,
-                            "TCP/IP Error During command 'sendto': %d", error);
+                            "TCP/IP Error During command 'sendto()' # %d", error);
                     NormalDialog(cWSTextBuffer, 5, -1, -1, -1, 0, -1, 0, -1, 0);
                     return;
                 }
@@ -233,7 +251,7 @@ void wsSendMessage(int destination, unsigned char type, unsigned short int size,
             return;
         }
     }
-    BaseFree(packetBuffer, WSFILE, WS_SEND_LINE_BASE + 0x39);
+    BaseFree(packetBuffer, WSFILE, s_wsSendSourceLineBase + 0x39);
 }
 
 VA(0x0040712c, 0x61)
@@ -258,7 +276,8 @@ short int wsnet_rcv(short int, unsigned short int, void *data) {
         return 0;
     size = piDPRcvBufferSize[iDPRcvBufferTail];
     memcpy(data, ppDPRcvBuffer[iDPRcvBufferTail], size);
-    BaseFree(ppDPRcvBuffer[iDPRcvBufferTail], WSFILE, WS_RCV_LINE_BASE + 9);
+    BaseFree(ppDPRcvBuffer[iDPRcvBufferTail], WSFILE,
+             s_wsReceiveSourceLineBase + 9);
     iDPRcvBufferTail = (iDPRcvBufferTail + 1) % WS_TRANSPORT_BUFFER_COUNT;
     return static_cast<short>(size);
 }
@@ -304,7 +323,7 @@ void wsEvaluateMessage(unsigned long int size, int sender) {
     switch (rcvBufIn[0]) {
     case WS_MESSAGE_DATA:
         ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<unsigned char *>(
-            BaseAlloc(size - 1, WSFILE, WS_EVALUATE_LINE_BASE + 10));
+            BaseAlloc(size - 1, WSFILE, s_wsEvaluateSourceLineBase + 10));
         memcpy(ppDPRcvBuffer[iDPRcvBufferHead], rcvBufIn + 1, size - 1);
         piDPRcvBufferSize[iDPRcvBufferHead] = size;
         iDPRcvBufferHead = (iDPRcvBufferHead + 1) % WS_TRANSPORT_BUFFER_COUNT;
