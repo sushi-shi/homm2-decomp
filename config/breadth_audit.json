@@ -2675,6 +2675,94 @@
       "note": "All relocation-masked bytes and eight effective targets agree; CRT or compiler identities remain."
     },
     {
+      "unit": "SOURCE/SETUP",
+      "function": "?BaseSetupHandler@@YIHAAUtag_message@@@Z",
+      "source_hash": "ecdba17223f9",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 2,
+      "before": 97.22414,
+      "after": 100.0,
+      "note": "Inclusive widget maximum and fallthrough-only final switch case remove the two CFG residuals; six relocs align."
+    },
+    {
+      "unit": "SOURCE/SETUP",
+      "function": "?PickLoadGame@game@@QAEHXZ",
+      "source_hash": "bc35b5c3616a",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 4,
+      "before": 98.13333,
+      "after": 100.0,
+      "note": "Signed-short dialog read, explicit else continuation, and od_slots local names restore exact code; 43 relocs align."
+    },
+    {
+      "unit": "SOURCE/SETUP",
+      "function": "?SetupBaudHandler@@YIHAAUtag_message@@@Z",
+      "source_hash": "10e64235496f",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.92618,
+      "after": 100.0,
+      "note": "Direct-connect help arm first matches retail conditional body order; 11 relocs align."
+    },
+    {
+      "unit": "SOURCE/SETUP",
+      "function": "?SetupComPortHandler@@YIHAAUtag_message@@@Z",
+      "source_hash": "65e2ba9dfc2f",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.92618,
+      "after": 100.0,
+      "note": "Direct-connect help arm first matches retail conditional body order; 11 relocs align."
+    },
+    {
+      "unit": "SOURCE/SETUP",
+      "function": "?SetupGame@game@@QAEHXZ",
+      "source_hash": "1719a6fc7934",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 4,
+      "before": 92.8063,
+      "after": 100.0,
+      "note": "Signed-short dialog switches and in-switch remote body recover retail layout; exact closure retained across TU-state drift with 122 relocs."
+    },
+    {
+      "unit": "SOURCE/SETUP",
+      "function": "?SetupGameHandler@@YIHAAUtag_message@@@Z",
+      "source_hash": "f9e26200c130",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 3,
+      "before": 95.97561,
+      "after": 100.0,
+      "note": "Nested right-button command test fixes behavior; coalesced empty cases and fallthrough close the CFG with three relocs."
+    },
+    {
+      "unit": "SOURCE/SETUP",
+      "function": "?SetupHotSeatGame@game@@QAEHXZ",
+      "source_hash": "eb5255dc14e5",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 6,
+      "before": 98.91873,
+      "after": 100.0,
+      "note": "Scalar-global lvalue escape restores retail loop operand order; full body and 39 relocs align."
+    },
+    {
+      "unit": "SOURCE/SETUP",
+      "function": "?SetupModemGameHandler@@YIHAAUtag_message@@@Z",
+      "source_hash": "4456b523dca2",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.10256,
+      "after": 100.0,
+      "note": "Direct-connect help arm first corrects the conditional polarity/body order; six relocs align."
+    },
+    {
       "unit": "SOURCE/SMACKMGR",
       "function": "?PlaySmacker@@YIHH@Z",
       "source_hash": "625c16a40190",
@@ -2788,23 +2876,23 @@
       "unit": "SOURCE/SWAPMGR",
       "function": "?Main@swapManager@@UAEHAAUtag_message@@@Z",
       "source_hash": "b2288406120e",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
-      "iterations": 1,
-      "before": 99.96976,
-      "after": 99.96976,
-      "note": "Complete body frame CFG and 71 relocs; six real case-exit branch destinations remain after shared-goto steering regressed."
+      "iterations": 10,
+      "before": 99.96169,
+      "after": 99.96169,
+      "note": "Complete body, 0x28 frame/slots, CFG, and 71 effective relocs; ten TU-state trials did not close six case-exit branch destinations."
     },
     {
       "unit": "SOURCE/SWAPMGR",
       "function": "?SwapMons@swapManager@@QAEXXZ",
-      "source_hash": "5c59bb601929",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "source_hash": "d6174189d64f",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "exact",
-      "iterations": 2,
-      "before": 99.94546,
+      "iterations": 1,
+      "before": 99.96364,
       "after": 100.0,
-      "note": "Scalar-lvalue escapes restore all three repeated operand-order pairs; function is exact."
+      "note": "Scalar-lvalue escape fixes the commutative selected/target creature comparison; all 0x177 bytes and three relocs align."
     },
     {
       "unit": "SOURCE/TOWN",
