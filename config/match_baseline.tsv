@@ -1016,7 +1016,7 @@ SOURCE/Netbios	?WaitForHost@@YICXZ	100.0000	9e61cfefbe85
 SOURCE/Netbios	?nbnet_init@@YIHXZ	100.0000	7ababa8cd25c
 SOURCE/Newgame	?CleanUpNewGameWindow@game@@QAEXXZ	100.0000	19077f07cd83
 SOURCE/Newgame	?DrawNGKPDisplayString@game@@QAEXH@Z	99.6667	15157b0c5d45
-SOURCE/Newgame	?GetLossConditionText@game@@QAEXPAD@Z	99.9155	df3276e0140f
+SOURCE/Newgame	?GetLossConditionText@game@@QAEXPAD@Z	100.0000	5bd97b05a3f8
 SOURCE/Newgame	?GetMap@game@@QAEXXZ	100.0000	fa2312998aaf
 SOURCE/Newgame	?GetSideDesc@game@@QAEHPADHH@Z	99.6923	e4881eeb5844
 SOURCE/Newgame	?GetVictoryConditionText@game@@QAEXPAD@Z	99.8545	5aad1e7134ed
@@ -1028,8 +1028,8 @@ SOURCE/Newgame	?NewGameHandler@@YIHAAUtag_message@@@Z	97.3416	14f9d661fdf8
 SOURCE/Newgame	?ProcessNGKeyPress@game@@QAEHAAUtag_message@@@Z	99.9868	1f930e99521d
 SOURCE/Newgame	?ProcessNewMap@game@@QAEXPAUSMapHeader@@@Z	99.8571	862c6e52452f
 SOURCE/Newgame	?SetupNetPlayerNames@game@@QAEXXZ	100.0000	b924a0fd67dd
-SOURCE/Newgame	?ShowScenInfo@game@@QAEXXZ	100.0000	e9778559e359
-SOURCE/Newgame	?UpdateNewGameWindow@game@@QAEXXZ	99.8997	6b17afbea0a9
+SOURCE/Newgame	?ShowScenInfo@game@@QAEXXZ	100.0000	adf8f86079db
+SOURCE/Newgame	?UpdateNewGameWindow@game@@QAEXXZ	100.0000	338c02c0754d
 SOURCE/Overview	?DoKnob@game@@QAEXXZ	100.0000	95a3d216b362
 SOURCE/Overview	?Overview@game@@QAEXXZ	100.0000	f1872538675d
 SOURCE/Overview	?OverviewHandler@@YIHAAUtag_message@@@Z	100.0000	04a208d92aa7
