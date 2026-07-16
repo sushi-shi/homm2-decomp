@@ -404,6 +404,10 @@ def _section_domain(section):
     return section.storage
 
 
+def _is_linker_sorted_subsection(section):
+    return section.name.startswith(".CRT$")
+
+
 def _section_rows(topology_by_unit, symbol_rows, public_by_symbol,
                   global_public_rvas, contributions):
     anchors = defaultdict(list)
@@ -497,13 +501,94 @@ def _section_rows(topology_by_unit, symbol_rows, public_by_symbol,
                 "contribution_size": contribution["size"],
                 "candidate_storages": storages,
             })
+
+    for unit, (_definitions, sections) in sorted(topology_by_unit.items()):
+        for section in sections:
+            if section.storage is None or not _is_linker_sorted_subsection(section):
+                continue
+            candidates = [
+                contribution for contribution in physical
+                if contribution["index"] not in used_contributions
+                and contribution["object"].replace("\\", "/").removesuffix(".c") == unit
+                and contribution["domain"] == _section_domain(section)
+                and contribution["size"] == section.size
+            ]
+            values = anchors.get((unit, section.ordinal), [])
+            bases = {value[0] for value in values}
+            if len(candidates) != 1:
+                diagnostics.append({
+                    "unit": unit,
+                    "section_ordinal": section.ordinal,
+                    "section_name": section.name,
+                    "storage": section.storage,
+                    "cause": ("linker-subsection-without-contribution"
+                              if not candidates else
+                              "ambiguous-linker-subsection-contribution"),
+                    "candidate_contributions": [
+                        {"rva": contribution["rva"],
+                         "size": contribution["size"]}
+                        for contribution in candidates
+                    ],
+                })
+                continue
+
+            contribution = candidates[0]
+            predicted = contribution["rva"]
+            owner_index = contribution["index"]
+            assignments[(unit, section.ordinal)] = (predicted, owner_index)
+            used_contributions.add(owner_index)
+            provenance = "retail-linker-subsection-contribution"
+            if len(bases) > 1:
+                cause = "inconsistent-anchor-bases"
+            elif bases and predicted not in bases:
+                cause = "breakpoint-drift"
+            else:
+                cause = None
+            if cause:
+                diagnostics.append({
+                    "unit": unit,
+                    "section_ordinal": section.ordinal,
+                    "section_name": section.name,
+                    "storage": section.storage,
+                    "cause": cause,
+                    "predicted_base": predicted,
+                    "anchor_bases": sorted(bases),
+                    "anchors": [
+                        {"base": base, "name": name, "rva": rva,
+                         "provenance": anchor_provenance}
+                        for base, name, rva, anchor_provenance in values
+                    ],
+                })
+            elif bases:
+                provenance += "+validated-anchor"
+            result.append({
+                "object": section.object_name,
+                "ordinal": str(section.ordinal),
+                "name": section.name,
+                "rva": f"0x{predicted:x}",
+                "size": f"0x{section.size:x}",
+                "alignment": f"0x{section.alignment:x}",
+                "characteristics": f"0x{section.characteristics:08x}",
+                "comdat_selection": str(section.comdat_selection),
+                "associative_ordinal": (str(section.associative_ordinal)
+                                        if section.associative_ordinal is not None else "-"),
+                "storage": section.storage,
+                "provenance": provenance,
+            })
+
     for unit, (_definitions, sections) in sorted(topology_by_unit.items()):
         data_sections = [section for section in sections if section.storage is not None]
         grouped_sections = defaultdict(list)
         for section in data_sections:
+            if _is_linker_sorted_subsection(section):
+                continue
             grouped_sections[section.storage].append(section)
         for storage, group in sorted(grouped_sections.items()):
-            intervals = contribution_groups.get((unit, storage), [])
+            intervals = [
+                contribution
+                for contribution in contribution_groups.get((unit, storage), [])
+                if contribution["index"] not in used_contributions
+            ]
             interval_index = 0
             cursor = intervals[0]["rva"] if intervals else None
             for section in group:

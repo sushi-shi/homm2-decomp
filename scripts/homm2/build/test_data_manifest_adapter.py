@@ -30,8 +30,9 @@ def candidate(unit, symbol, ordinal=1, value=0):
     )
 
 
-def section(unit, ordinal, size, alignment=1, storage="data", selection=0):
-    name = ".bss" if storage == "bss" else ".data"
+def section(unit, ordinal, size, alignment=1, storage="data", selection=0,
+            name=None):
+    name = name or (".bss" if storage == "bss" else ".data")
     return CandidateSection(
         unit, unit + ".c", ordinal, name, size, alignment, DATA_FLAGS,
         storage, selection, None)
@@ -186,6 +187,40 @@ class DataManifestAdapterTest(unittest.TestCase):
         self.assertEqual(len(physical), 2)
         self.assertEqual([row["rva"] for row in rows], ["0x100", "0x104"])
         self.assertEqual(diagnostics, [])
+
+    def test_linker_sorted_subsection_uses_isolated_owner_contribution(self):
+        topology = {"A": ([], [
+            section("A", 1, 8, 4),
+            section("A", 2, 4, 4, name=".CRT$XCU"),
+        ])}
+        rows, diagnostics, _physical = _section_rows(
+            topology, [], {}, {}, [
+                contribution("A", 0x100, 4),
+                contribution("A", 0x200, 8),
+            ])
+        by_ordinal = {int(row["ordinal"]): row for row in rows}
+        self.assertEqual(by_ordinal[1]["rva"], "0x200")
+        self.assertEqual(by_ordinal[2]["rva"], "0x100")
+        self.assertEqual(by_ordinal[2]["provenance"],
+                         "retail-linker-subsection-contribution")
+        self.assertEqual(diagnostics, [])
+
+    def test_ambiguous_linker_sorted_subsection_remains_unassigned(self):
+        topology = {"A": ([], [
+            section("A", 1, 8, 4),
+            section("A", 2, 4, 4, name=".CRT$XCU"),
+        ])}
+        rows, diagnostics, _physical = _section_rows(
+            topology, [], {}, {}, [
+                contribution("A", 0x100, 4),
+                contribution("A", 0x104, 4),
+                contribution("A", 0x200, 8),
+            ])
+        by_ordinal = {int(row["ordinal"]): row for row in rows}
+        self.assertEqual(by_ordinal[1]["rva"], "0x200")
+        self.assertEqual(by_ordinal[2]["rva"], "-")
+        self.assertIn("ambiguous-linker-subsection-contribution",
+                      {row["cause"] for row in diagnostics})
 
     def test_comdat_without_contribution_requires_explicit_anchor(self):
         topology = {"A": ([], [
