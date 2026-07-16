@@ -204,11 +204,6 @@ int army::ValidMove(int sourceHex, int direction)
         return frontValid;
 }
 
-// @match-note
-// +0x7d retail uses mov eax,3; adc eax,-1, while ours uses sbb eax,eax;
-// add eax,3. The 0xc-byte frame, local slots, CFG, and all 11 relocations
-// agree. Tried == 0, == 1, signed/unsigned < 1 and >= 1 ternaries,
-// 3 - predicate, and 2 + predicate; revisit at 95% or after TU state changes.
 VA(0x004be217, 0x273)
 int army::ValidAttack(int sourceHex, int direction, int targetMode,
                       int requiredTargetHex, int *attackHex)
@@ -230,7 +225,7 @@ int army::ValidAttack(int sourceHex, int direction, int targetMode,
         } else if (direction == COMBAT_DIRECTION_WIDE_EAST) {
             *attackHex = GetAdjacentCellIndex(
                 sourceHex,
-                1 <= static_cast<unsigned int>(m_facing)
+                static_cast<unsigned int>(m_facing) < 1
                     ? COMBAT_DIRECTION_SOUTHEAST
                     : COMBAT_DIRECTION_EAST);
         } else {
