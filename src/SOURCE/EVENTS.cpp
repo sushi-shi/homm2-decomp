@@ -52,6 +52,9 @@
     (reinterpret_cast<combatRemoteHeroFragment *>(EVENTS_REMOTE_MESSAGE(buffer)->payload))
 #define EVENTS_HERO_BUFFER(buffer) \
     (reinterpret_cast<combatRemoteHeroFragment *>(buffer))
+
+DATA(0x005190a4) static char s_twoStringFormat[] = "%s %s";
+
 // @match-note
 // Complete semantics/CFG with the retail 0x350 frame, all source slots, and the
 // main plus eight nested-switch spills at -0x330..-0x350. All 972 relocation
@@ -792,8 +795,7 @@ chestGold:
     case MAP_EVENT_SKELETON: {
         switch (cell->m_objectMetadata) {
         case SKELETON_EMPTY:
-            EventWindow(93, 1,
-                        "{Skeleton}\n\nYou come upon the remains of an unfortunate adventurer.  Searching through the tattered clothing, you find nothing.",
+            EventWindow(EVENT_TEXT_SKELETON_EMPTY, 1, "",
                         -1, 0, -1, 0, -1);
             break;
         default:
@@ -805,9 +807,8 @@ chestGold:
             }
             else {
                 eventValue1 = cell->m_objectMetadata - SKELETON_ARTIFACT_OFFSET;
-                sprintf(gText,
-                        "%s %s",
-                        "{Skeleton}\n\nYou come upon the remains of an unfortunate adventurer.  Searching through the tattered clothing, you find ",
+                sprintf(gText, s_twoStringFormat,
+                        gEventText[EVENT_TEXT_SKELETON_REWARD],
                         gArtifactNames[eventValue1]);
                 GiveArtifact(eventHero2, eventValue1, 1, -1);
                 EventWindow(-1, 1, gText, MAP_EVENT_REWARD_ARTIFACT, eventValue1,
@@ -949,7 +950,7 @@ chestGold:
                          : cell->m_objectMetadata);
         strcpy(sphinxAnswer_a, gResourceNames[resourceType]);
         sphinxAnswer_a[0] += ' ';
-        sprintf(gText, "You find a small quantity of %s.", sphinxAnswer_a);
+        sprintf(gText, gEventText[EVENT_TEXT_RESOURCE_PICKUP], sphinxAnswer_a);
         BVResMsg(gText, resourceType,
                  resourceType == RES_GOLD
                      ? cell->m_objectMetadata * CAMPFIRE_GOLD_MULTIPLIER
@@ -1268,21 +1269,21 @@ recruitDragon:
 
     case MAP_EVENT_SHRINE_FIRST_CIRCLE:
         eventValue1 = cell->m_objectMetadata - 1;
-        sprintf(gText, "%s %s",
+        sprintf(gText, "%s'%s'.  ",
                 "{Shrine of the 1st Circle}\n\nYou come across a small shrine attended by a group of novice acolytes.  In exchange for your protection, they agree to teach you a simple spell - ",
                 gSpellNames[eventValue1]);
         goto shrineSpell;
 
     case MAP_EVENT_SHRINE_SECOND_CIRCLE:
         eventValue1 = cell->m_objectMetadata - 1;
-        sprintf(gText, "%s %s",
+        sprintf(gText, "%s'%s'.  ",
                 "{Shrine of the 2nd Circle}\n\nYou come across an ornate shrine attended by a group of rotund friars.  In exchange for your protection, they agree to teach you a spell - ",
                 gSpellNames[eventValue1]);
         goto shrineSpell;
 
     case MAP_EVENT_SHRINE_THIRD_CIRCLE:
         eventValue1 = cell->m_objectMetadata - 1;
-        sprintf(gText, "%s %s",
+        sprintf(gText, "%s'%s'.  ",
                 "{Shrine of the 3rd Circle}\n\nYou come across a lavish shrine attended by a group of high priests.  In exchange for your protection, they agree to teach you a sophisticated spell - ",
                 gSpellNames[eventValue1]);
 shrineSpell:
@@ -1687,14 +1688,12 @@ daemonExperienceGold:
 
     case MAP_EVENT_GRAVEYARD: {
         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-        EventWindow(20, 2,
-                    "{Graveyard}\n\nYou tentatively approach the burial ground of ancient warriors.  Do you want to search the graves?",
+        EventWindow(EVENT_TEXT_GRAVEYARD_PROMPT, 2, "",
                     -1, 0, -1, 0, -1);
         if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
             switch (cell->m_objectMetadata) {
             case SKELETON_EMPTY:
-                EventWindow(21, 1,
-                            "Upon defeating the Zombies you spend several hours searching the graves and find nothing.  Such a despicable act reduces your army's morale.",
+                EventWindow(EVENT_TEXT_GRAVEYARD_EMPTY, 1, "",
                             13, 0, -1, 0, -1);
                 if (!(eventHero2->m_eventFlags & HERO_EVENT_GRAVEYARD)) {
                     eventHero2->m_eventFlags =
@@ -1707,7 +1706,7 @@ daemonExperienceGold:
                 zombieCell6 = GetCell(x - normalDirTable[eventHero2->m_direction].x,
                                      y - normalDirTable[eventHero2->m_direction].y);
                 if (ZombieEvent(eventHero2, zombieCell6,
-                                "Upon defeating the zomies you search the graves and find something!",
+                                gEventText[EVENT_TEXT_GRAVEYARD_REWARD],
                                 x, y))
                     cell->m_objectMetadata = SKELETON_EMPTY;
                 break;
@@ -1770,7 +1769,7 @@ daemonExperienceGold:
                                        -1, 0, 0) == 0) {
                     eventHero2->CheckLevel();
                     eventValue1 = cell->m_objectMetadata - 1;
-                    sprintf(eventText, "%s %s",
+                    sprintf(eventText, "%s'%s'.  ",
                             "Upon defeating the monsters, you decipher an ancient glyph on the wall, telling the secret of the spell - ",
                             gSpellNames[eventValue1]);
                     if (!eventHero2->HasArtifact(PYRAMID_SPELLBOOK_ARTIFACT)) {
@@ -4900,7 +4899,7 @@ void advManager::PlayerMonsterInteract(mapCell *cell, mapCell *combatCell, hero 
                 return;
             }
             else {
-                EventWindow(0x43, 1, "Insulted by your refusal of their offer, the monsters attack!",
+                EventWindow(EVENT_TEXT_MONSTER_REFUSAL, 1, "",
                             -1, 0, -1, 0, -1);
                 goto fightMonsters;
             }
@@ -4950,7 +4949,7 @@ void advManager::PlayerMonsterInteract(mapCell *cell, mapCell *combatCell, hero 
                 return;
             }
             else {
-                EventWindow(0x43, 1, "Insulted by your refusal of their offer, the monsters attack!",
+                EventWindow(EVENT_TEXT_MONSTER_REFUSAL, 1, "",
                             -1, 0, -1, 0, -1);
                 goto fightMonsters;
             }
@@ -5649,18 +5648,14 @@ int RiddleStringsEqual(char *answer, char *expected)
 
 // ---- globals (definitions, RVA order) ----
 // @data-layout-note Retail's initialized EVENTS contribution is 0x5700 bytes at
-// RVA 0x117620. The candidate .data shrank from 0x59ef to 0x59bb after replacing
-// 17 casted three-byte string literals with four typed function-local shorts:
-// DoNetCombat 0x51c9b4=0x1655 (5 HIGHLOW uses), DoCombat
-// 0x51ca94=0x16ba (5), SendHeroTownData 0x51cbac=0x17cc (2), and
-// ReceiveHeroTownData 0x51cc08=0x183d (5). Their candidate spans are respectively
-// offsets 0x0, 0x4, 0x8, and 0xc; gbNoShowCombat follows at 0x10 and its retail
-// RVA is 0x51cc0c. The former string-literal form both duplicated owners and gave
-// the first three incorrect retail values. The four retail owners are interleaved
-// with per-call EVENTS.CPP literals, yielding four incompatible section anchor
-// bases; topology therefore correctly reports section-outside-contributions and
-// leaves the 0x5700 contribution unconsumed. Revisit the remaining 0x2bb size and
-// literal-order residual only with new PE relocation evidence that proves further
-// one-to-one owners. Do not add padding, aliases, synthetic identities, or snap a
-// section cursor to force wholesale replay.
+// RVA 0x117620. The recovered candidate .data is 0x56ff bytes: 247 definitions
+// cover every nonzero retail byte, and the one-byte stream difference is terminal
+// zero padding rather than an allocation. s_twoStringFormat and gbNoShowCombat
+// are the two source DATA owners. The reviewed compiler-private group has 245
+// .data allocations: 147 unique payloads, 48 aligned relocation-addend proofs,
+// 11 bounded-section runs, one direct relocation bijection, three remaining-slot
+// bijections, and 35 members of four exact-payload equivalence classes. All seven
+// .rdata temporaries replay exactly over the 0x38-byte retail contribution. The
+// constrained group validator proves exact payloads, disjoint extents, complete
+// nonzero-byte coverage, and zero diagnostics for all 254 definitions.
 DATA(0x0051cc0c) int gbNoShowCombat = 0;
