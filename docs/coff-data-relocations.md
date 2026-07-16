@@ -70,23 +70,26 @@ proven mapping. Object form records status and an optional addend adjustment:
 
 Proven mappings participate in normalization. Provisional mappings never hide an identity
 or addend mismatch: the residual remains and carries the mapping record for the next
-topology correction. Mapping provenance containing `fallback` or `unresolved` is rejected.
+topology correction.
 
 Target names `const_*`, `string_*`, `data_*`, `bss_*`, `empty_stub`, metadata aliases,
 and unresolved/fallback names are unconditional errors even if a mapping mentions them.
-With `--homm2-root`, destinations anchored inside an explicit unresolved range are also
-errors.
 
 ## HoMM2 provenance
 
-`--homm2-root .` makes source `DATA(0x...)` definitions the primary owner/RVA anchors.
-`config/delink_data_topology.tsv` is supplemental only. A supplemental row that repeats a
-source-DATA symbol/RVA is reported as duplication; a different RVA is disagreement. This
-keeps versioned topology from silently overriding recovered source ownership. Rows for
-symbols absent from source DATA remain available as supplemental anchors.
+`--homm2-root .` reads the shared Clang `VarDecl` inventory used by the data-manifest
+adapter and cross-checks it against `build/gen/delink_data_from_source.tsv`. Compiler and
+linker allocations without a source annotation live only in
+`config/delink_data_supplemental.tsv`. The generated
+`build/gen/delink_data_manifest.tsv` must be exactly the conflict-free union of those two
+inputs: missing rows, extra rows, duplicate identities/RVAs, overlaps, malformed schemas,
+and source-inventory drift are hard provenance diagnostics.
 
-The report includes all provenance diagnostics and unresolved intervals. These are
-iteration outputs, not normalization permissions.
+Anchors are indexed by translation unit. A relocation resolves against its current unit
+first, which preserves private identities and repeated compiler names. Cross-unit lookup
+is allowed only for an external symbol identity that occurs exactly once in the merged
+manifest; repeated or private names are never guessed globally. These checks validate
+provenance and do not grant normalization permission.
 
 ## Empty return stubs
 

@@ -12,12 +12,14 @@ import csv
 import hashlib
 import io
 import json
-import re
 import struct
 import sys
 from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
+
+from homm2.build.annotated_data import source_definitions as annotated_source_definitions
+from homm2.build.data_manifest_adapter import SYMBOL_HEADER, validate_symbol_rows
 
 
 COFF_HEADER = struct.Struct("<HHIIIHH")
@@ -72,7 +74,6 @@ SYNTHETIC_PREFIXES = (
     "__homm2_data_alias$",
 )
 SYNTHETIC_NAMES = {"empty_stub"}
-DATA_MARKER_RE = re.compile(r"^\s*DATA\(0x([0-9a-fA-F]+)\)\s+(.*)$")
 csv.field_size_limit(sys.maxsize)
 
 
@@ -420,11 +421,6 @@ def _load_mappings(path: Path | None) -> dict:
             raise CoffError(f"symbol mapping {target_name!r} has invalid status")
         if not isinstance(entry["addend_adjustment"], int):
             raise CoffError(f"symbol mapping {target_name!r} has non-integer addend adjustment")
-        provenance = str(entry.get("provenance", ""))
-        if "unresolved" in provenance.lower() or "fallback" in provenance.lower():
-            raise CoffError(
-                f"symbol mapping {target_name!r} uses forbidden {provenance!r} provenance"
-            )
         symbols[target_name] = entry
     return {
         "symbol_mappings": symbols,
@@ -547,133 +543,130 @@ def compare_censuses(target: dict, base: dict, mappings: dict) -> tuple[list[dic
     return residuals, matched
 
 
-def _definition_name(code: str) -> str | None:
-    code = code.split("//", 1)[0]
-    if not (code[:1].isalpha() or code[:1] == "_"):
-        return None
-    declaration = code.split("=", 1)[0].rstrip().rstrip(";{").rstrip()
-    match = re.search(
-        r"([A-Za-z_]\w*)\s*(?:\[[^\]]*\]\s*)*$",
-        declaration,
-    )
-    return match.group(1) if match else None
-
-
-def _source_data_anchors(root: Path) -> tuple[dict[str, dict], list[dict]]:
-    inventory = root / "build" / "gen" / "symbol_names.csv"
-    identifier_symbols: dict[str, list[dict]] = {}
-    if inventory.is_file():
-        with inventory.open(encoding="latin-1", newline="") as handle:
-            for row in csv.DictReader(handle):
-                if row.get("kind") != "data":
-                    continue
-                match = (re.match(r"\?([A-Za-z_]\w*)@@", row["name"])
-                         or re.match(r"[_@]?([A-Za-z_]\w*)", row["name"]))
-                if match:
-                    identifier_symbols.setdefault(match.group(1), []).append(row)
-    anchors = {}
-    diagnostics = []
-    for source in sorted((root / "src").glob("**/*.cpp")):
-        lines = source.read_text(encoding="latin-1").splitlines()
-        for line_number, line in enumerate(lines, 1):
-            marker = DATA_MARKER_RE.match(line)
-            if not marker:
-                continue
-            declaration = marker.group(2)
-            cursor = line_number
-            while (not any(token in declaration for token in ("=", ";", "{"))
-                   and cursor < len(lines) and cursor < line_number + 8):
-                declaration += " " + lines[cursor].strip()
-                cursor += 1
-            name = _definition_name(declaration)
-            if not name:
-                continue
-            va = int(marker.group(1), 16)
-            rva = va - 0x400000 if va >= 0x400000 else va
-            rows = identifier_symbols.get(name, [])
-            symbol_name = rows[0]["name"] if len(rows) == 1 else name
-            unit = str(source.relative_to(root / "src").with_suffix(""))
-            anchor_key = symbol_name if len(rows) == 1 else f"{unit}::{name}"
-            entry = {
-                "symbol": symbol_name,
-                "identifier": name,
-                "unit": unit,
-                "rva": rva,
-                "source": f"{source.relative_to(root)}:{line_number}",
-                "provenance": "source-DATA",
-            }
-            if anchor_key in anchors:
-                diagnostics.append({
-                    "kind": "duplicate-source-DATA",
-                    "symbol": anchor_key,
-                    "first": anchors[anchor_key],
-                    "duplicate": entry,
-                })
-            else:
-                anchors[anchor_key] = entry
-    return anchors, diagnostics
-
-
-def _load_tsv(path: Path) -> list[dict]:
+def _load_symbol_manifest(path: Path, label: str, diagnostics: list[dict]) -> list[dict]:
     if not path.is_file():
+        diagnostics.append({
+            "kind": "missing-data-manifest", "manifest": label, "path": str(path),
+        })
         return []
     lines = [line for line in path.read_text(encoding="utf-8").splitlines()
-             if line and not line.startswith("#")]
-    return list(csv.DictReader(io.StringIO("\n".join(lines)), delimiter="\t"))
+             if line and not line.lstrip().startswith("#")]
+    reader = csv.DictReader(io.StringIO("\n".join(lines)), delimiter="\t")
+    if tuple(reader.fieldnames or ()) != SYMBOL_HEADER:
+        diagnostics.append({
+            "kind": "invalid-data-manifest-header", "manifest": label,
+            "expected": list(SYMBOL_HEADER), "actual": reader.fieldnames,
+        })
+        return []
+    rows = list(reader)
+    try:
+        validate_symbol_rows(rows, label)
+    except (KeyError, TypeError, ValueError) as error:
+        diagnostics.append({
+            "kind": "invalid-data-manifest", "manifest": label, "error": str(error),
+        })
+        return []
+    return rows
+
+
+def _row_tuple(row: dict) -> tuple[str, ...]:
+    return tuple(row[key] for key in SYMBOL_HEADER)
+
+
+def _unit_from_object(value: str) -> str:
+    return value.replace("\\", "/").removesuffix(".c")
+
+
+def _anchor_for(provenance: dict | None, unit: str, symbol: str) -> dict | None:
+    if not provenance:
+        return None
+    local = provenance["anchors_by_unit"].get(unit, {}).get(symbol)
+    if local is not None:
+        return local
+    return provenance["unique_external_anchors"].get(symbol)
 
 
 def load_homm2_provenance(root: Path) -> dict:
     root = root.resolve()
-    anchors, diagnostics = _source_data_anchors(root)
-    supplemental = _load_tsv(root / "config" / "delink_data_topology.tsv")
-    supplemental_anchors = {}
-    for row in supplemental:
-        name = row.get("name", "")
-        if not isinstance(name, str) or not name:
-            diagnostics.append({"kind": "malformed-supplemental-row", "row": row})
-            continue
-        try:
-            rva = int(row["rva"], 0)
-        except (KeyError, ValueError):
-            diagnostics.append({"kind": "malformed-supplemental-row", "row": row})
-            continue
-        if name in anchors:
-            diagnostics.append({
-                "kind": ("supplemental-data-duplication"
-                         if anchors[name]["rva"] == rva
-                         else "supplemental-data-disagreement"),
-                "symbol": name,
-                "source_DATA": anchors[name],
-                "supplemental_rva": rva,
-                "supplemental_object": row.get("object"),
-            })
-            continue
-        supplemental_anchors[name] = {
-            "symbol": name,
-            "rva": rva,
-            "source": "config/delink_data_topology.tsv",
-            "provenance": row.get("provenance", "supplemental"),
-        }
-    unresolved = []
-    for row in _load_tsv(root / "config" / "delink_unresolved_data.tsv"):
-        try:
-            start = int(row["rva"], 0)
-            size = int(row["size"], 0)
-        except (KeyError, ValueError):
-            diagnostics.append({"kind": "malformed-unresolved-row", "row": row})
-            continue
-        unresolved.append({
-            "start": start,
-            "end": start + size,
-            "object": row.get("object"),
-            "provenance": row.get("provenance"),
+    diagnostics: list[dict] = []
+    source_path = root / "build" / "gen" / "delink_data_from_source.tsv"
+    supplemental_path = root / "config" / "delink_data_supplemental.tsv"
+    merged_path = root / "build" / "gen" / "delink_data_manifest.tsv"
+    source_rows = _load_symbol_manifest(source_path, "source DATA", diagnostics)
+    supplemental_rows = _load_symbol_manifest(
+        supplemental_path, "supplemental", diagnostics)
+    merged_rows = _load_symbol_manifest(merged_path, "merged", diagnostics)
+
+    expected_merged = Counter(map(_row_tuple, [*source_rows, *supplemental_rows]))
+    actual_merged = Counter(map(_row_tuple, merged_rows))
+    if actual_merged != expected_merged:
+        diagnostics.append({
+            "kind": "merged-manifest-not-exact-union",
+            "missing": [list(row) for row in sorted((expected_merged - actual_merged).elements())],
+            "extra": [list(row) for row in sorted((actual_merged - expected_merged).elements())],
         })
+
+    try:
+        definitions = annotated_source_definitions(root / "src", root)
+    except Exception as error:
+        definitions = []
+        diagnostics.append({"kind": "invalid-source-DATA-inventory", "error": str(error)})
+    expected_source = Counter(
+        (definition.unit, definition.rva, definition.size,
+         f"source-DATA:{definition.location}")
+        for definition in definitions
+    )
+    actual_source = Counter(
+        (_unit_from_object(row["object"]), int(row["rva"], 0), int(row["size"], 0),
+         row["provenance"])
+        for row in source_rows
+    )
+    if actual_source != expected_source:
+        diagnostics.append({
+            "kind": "source-manifest-inventory-mismatch",
+            "missing": [list(row) for row in sorted((expected_source - actual_source).elements())],
+            "extra": [list(row) for row in sorted((actual_source - expected_source).elements())],
+        })
+
+    source_identities = {(row["object"], row["name"]) for row in source_rows}
+    source_rvas = {int(row["rva"], 0) for row in source_rows}
+    for row in supplemental_rows:
+        if ((row["object"], row["name"]) in source_identities
+                or int(row["rva"], 0) in source_rvas):
+            diagnostics.append({
+                "kind": "supplemental-source-DATA-overlap", "row": row,
+            })
+
+    anchors_by_unit: dict[str, dict[str, dict]] = {}
+    external_by_name: dict[str, list[dict]] = {}
+    for row in merged_rows:
+        unit = _unit_from_object(row["object"])
+        anchor = {
+            "symbol": row["name"], "unit": unit, "rva": int(row["rva"], 0),
+            "size": int(row["size"], 0), "scope": row["scope"],
+            "provenance": row["provenance"],
+        }
+        unit_anchors = anchors_by_unit.setdefault(unit, {})
+        if row["name"] in unit_anchors:
+            diagnostics.append({
+                "kind": "duplicate-unit-data-anchor", "unit": unit,
+                "symbol": row["name"],
+            })
+        else:
+            unit_anchors[row["name"]] = anchor
+        if row["scope"] == "external":
+            external_by_name.setdefault(row["name"], []).append(anchor)
+    unique_external_anchors = {
+        name: rows[0] for name, rows in external_by_name.items() if len(rows) == 1
+    }
     return {
         "root": str(root),
-        "anchors": {**supplemental_anchors, **anchors},
-        "source_DATA_count": len(anchors),
-        "supplemental_count": len(supplemental_anchors),
-        "unresolved_ranges": unresolved,
+        "anchors_by_unit": anchors_by_unit,
+        "unique_external_anchors": unique_external_anchors,
+        "source_DATA_count": len(definitions),
+        "source_manifest_count": len(source_rows),
+        "supplemental_count": len(supplemental_rows),
+        "merged_count": len(merged_rows),
         "diagnostics": diagnostics,
     }
 
@@ -687,10 +680,10 @@ def _synthetic_identity(name: str) -> str | None:
     return None
 
 
-def _target_policy_errors(target: dict, provenance: dict | None) -> list[dict]:
+def _target_policy_errors(target: dict, provenance: dict | None, unit: str) -> list[dict]:
     errors = []
-    anchors = provenance["anchors"] if provenance else {}
-    unresolved = provenance["unresolved_ranges"] if provenance else []
+    known_anchors = ({name for rows in provenance["anchors_by_unit"].values()
+                      for name in rows} if provenance else set())
     for symbol in target["symbols"]:
         reason = _synthetic_identity(symbol["name"])
         if reason:
@@ -723,21 +716,14 @@ def _target_policy_errors(target: dict, provenance: dict | None) -> list[dict]:
                 "offset": relocation["offset"],
                 "symbol": owner_name,
             })
-        anchor = anchors.get(relocation["symbol_name"])
-        if not anchor:
-            continue
-        destination = anchor["rva"] + (relocation["addend"] or 0)
-        unresolved_owner = next(
-            (row for row in unresolved if row["start"] <= destination < row["end"]), None
-        )
-        if unresolved_owner:
+        name = relocation["symbol_name"]
+        if name in known_anchors and _anchor_for(provenance, unit, name) is None:
             errors.append({
-                "kind": "unresolved-range-generated-identity",
+                "kind": "ambiguous-data-anchor",
                 "section": relocation["section_name"],
                 "offset": relocation["offset"],
-                "symbol": relocation["symbol_name"],
-                "destination_rva": destination,
-                "unresolved_range": unresolved_owner,
+                "symbol": name,
+                "unit": unit,
             })
     return errors
 
@@ -749,7 +735,7 @@ def compare_pair(unit: str, base_path: Path, target_path: Path, mappings: dict,
     base = base_object.census(include_code)
     target = target_object.census(include_code)
     residuals, matched = compare_censuses(target, base, mappings)
-    policy_errors = _target_policy_errors(target_object.census(True), provenance)
+    policy_errors = _target_policy_errors(target_object.census(True), provenance, unit)
     return {
         "unit": unit,
         "target": target,
