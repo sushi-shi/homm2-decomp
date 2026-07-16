@@ -73,9 +73,8 @@ DATA(0x00517148) static short gPollRemoteLineBase = 757;
 // COFF/link-order evidence. Do not add padding, aliases, synthetic identities,
 // cursor snapping, guessed allocations, or section pragmas to force either
 // contribution extent.
-// @match-note
-// Complete cleanup guards, backend switch, and all state resets. The 0x04 frame
-// and switch temporary at -0x04 agree, including the retail duplicate protocol
+// @semantic: Complete cleanup guards, backend switch, and all state resets. The
+// 0x04 frame and switch temporary at -0x04 agree, including the retail duplicate protocol
 // reset block. All 38 relocation occurrences and external targets agree. The
 // first residual is the delinked switch continuation/local-label trampoline.
 // Empty positive arms and direct early exits were both tested. Revisit in the
@@ -128,9 +127,8 @@ void RemoteCleanup(void)
     }
 }
 
-// @match-note
-// Complete setup, transport initialization, player exchange, and game-type
-// synchronization CFG. The 0x74 frame and live slots agree, including the legacy
+// @semantic: Complete setup, transport initialization, player exchange, and
+// game-type synchronization CFG. The 0x74 frame and live slots agree, including the legacy
 // 64-byte name buffer, player-state word, setup counter, and command switch temp.
 // All 143 raw relocation entries and external targets agree. llvm-objdump starts
 // the retail post-table block one byte inside its compare at .text+0x559; the raw
@@ -384,11 +382,12 @@ int EncodePacket(unsigned char *data, char source, char destination, int length)
     return length + REMOTE_PACKET_HEADER_SIZE;
 }
 
-// @early-stop
-// The relocation-masked instruction stream, 0xcc frame, stack slots, and CFG are
-// byte-identical. All 17 relocation sites and target classes agree; the remaining
-// report residual is solely delinked packet/global, literal, and local-label
-// identity, with no code-byte difference.
+// @semantic: The complete 0x11c-byte candidate code range, 0xcc frame, stack
+// slots, and CFG agree. All 17 ordered relocation owners/addends agree; the only
+// normalized instruction identities are two volatile $SG literal spellings.
+// Retail's provisional 0x13a next-public span has 30 trailing bytes beyond this
+// code range, so it is not valid to claim the entire public span as raw exact.
+// Revisit only after private-function/boundary evidence or comparison-epoch changes.
 VA(0x004a3aa7, 0x13a)
 int DecodePacket(unsigned char *data, int)
 {
@@ -419,9 +418,8 @@ int DecodePacket(unsigned char *data, int)
     return 1;
 }
 
-// @match-note
-// Complete destination folding and all network/modem switch bodies, in retail
-// DirectPlay/Winsock/NetBIOS body order. The 0x11c frame is exact: size -0x04,
+// @semantic: Complete destination folding and all network/modem switch bodies in
+// retail DirectPlay/Winsock/NetBIOS body order. The 0x11c frame is exact: size -0x04,
 // result -0x08, backend status -0x0c, the retail-proven dead 260-byte aggregate
 // through -0x110, fastcall spills -0x114/-0x118, and switch temporary -0x11c.
 // All 23 relocations agree; the first comparison boundary is the delinked switch
@@ -516,9 +514,8 @@ int ReceiveRemoteData(unsigned char *, unsigned char *data, int decodeType)
     return result;
 }
 
-// @match-note
-// Complete message construction, retry/dialog loop, confirmation polling, and
-// reliable/unreliable exits. The 0x118 frame is exact: result -0x04, message through
+// @semantic: Complete message construction, retry/dialog loop, confirmation
+// polling, and reliable/unreliable exits. The 0x118 frame is exact: result -0x04, message through
 // -0x108, retail-proven dead word -0x10c, attempt -0x110, poll -0x114, and fastcall
 // spills through -0x118. All 15 relocation targets agree. The first residual is a
 // retail five-byte continuation after the unreliable-success return, followed by
@@ -617,15 +614,15 @@ char * GetRemoteData(signed char remove)
     return 0;
 }
 
-// @match-note
-// Complete backend pumping, heartbeat, host/guest timeout recovery, confirmation,
-// duplicate suppression, queue allocation, and recent-ID rotation. The retail
+// @semantic: Complete backend pumping, heartbeat, host/guest timeout recovery,
+// confirmation, duplicate suppression, queue allocation, and recent-ID rotation. The retail
 // queue-full snapshot is byte-sized; its -0x14 slot, queue count -0x0c, saved poll
 // state -0x08, both seven-byte exit records, and the 0x30 frame agree. All 132
 // relocation occurrences and external targets agree. Ignoring delinked literal
 // identities, the first code residual is the host-loop queueIndex/giThisNetPos load
 // order; both operand orders, empty guards, and arm polarities were tested. Revisit
-// in the 95% last-mile phase.
+// in the 95% last-mile phase. Retail explicitly stores 1 to bInTimeoutFail after
+// restoring gbInPollSound in the guest-timeout path; that unusual state is authentic.
 VA(0x004a41ec, 0x6f4)
 void PollRemote(void)
 {
@@ -837,9 +834,8 @@ void PollRemote(void)
     }
 }
 
-// @match-note
-// Complete transmit, timeout/retry dialog, response filtering, and common result
-// path. The 0x1c frame is exact: wait start -0x04, result -0x08, response -0x0c,
+// @semantic: Complete transmit, timeout/retry dialog, response filtering, and
+// common result path. The 0x1c frame is exact: wait start -0x04, result -0x08, response -0x0c,
 // byte completion flag -0x10, retail-proven dead response state -0x14, and fastcall
 // spills -0x18/-0x1c. All 11 relocation targets agree. The first residual is one
 // retail five-byte continuation after successful transmit, with one final local-label
