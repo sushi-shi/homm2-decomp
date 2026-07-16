@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 import glob
+import hashlib
 import json
+import os
 import re
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -13,6 +16,8 @@ import clang.cindex as ci
 
 IMAGE_BASE = 0x400000
 DATA_TOKEN = re.compile(rb"\bDATA\s*\(\s*(0x[0-9a-fA-F]+)\s*\)")
+INCLUDE_TOKEN = re.compile(r'^[ \t]*#[ \t]*include[ \t]*[<"]([^>"]+)[>"]', re.M)
+INVENTORY_CACHE_SCHEMA = 1
 
 
 @dataclass(frozen=True, order=True)
@@ -191,10 +196,106 @@ def definitions_for_file(path: Path, source_root: Path, repo: Path) -> list[Anno
     return rows
 
 
-def source_definitions(source_root: Path, repo: Path) -> list[AnnotatedDataDefinition]:
+def _source_dependencies(path: Path, include_roots: list[Path]) -> list[Path]:
+    seen = set()
+    stack = [path.resolve()]
+    while stack:
+        current = stack.pop()
+        if current in seen:
+            continue
+        seen.add(current)
+        try:
+            text = current.read_text(errors="replace")
+        except OSError:
+            continue
+        for include in INCLUDE_TOKEN.findall(text):
+            for candidate in (current.parent / include,
+                              *(root / include for root in include_roots)):
+                if candidate.is_file():
+                    stack.append(candidate.resolve())
+                    break
+    seen.discard(path.resolve())
+    return sorted(seen)
+
+
+def _inventory_cache_key(path: Path, unit: str, object_root: Path,
+                         compile_database: bytes, include_roots: list[Path]) -> str | None:
+    object_path = object_root / f"{unit}.obj"
+    if not object_path.is_file():
+        return None
+    digest = hashlib.sha256()
+    digest.update(f"annotated-data-v{INVENTORY_CACHE_SCHEMA}\0".encode("ascii"))
+    digest.update(Path(__file__).read_bytes())
+    digest.update(compile_database)
+    digest.update(path.read_bytes())
+    digest.update(object_path.read_bytes())
+    for dependency in _source_dependencies(path, include_roots):
+        digest.update(str(dependency).encode("utf-8"))
+        digest.update(dependency.read_bytes())
+    return digest.hexdigest()
+
+
+def _load_inventory_cache(path: Path) -> dict:
+    try:
+        data = json.loads(path.read_text())
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        return {}
+    if data.get("schema") != INVENTORY_CACHE_SCHEMA:
+        return {}
+    entries = data.get("entries")
+    return entries if isinstance(entries, dict) else {}
+
+
+def _write_inventory_cache(path: Path, entries: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile("w", encoding="utf-8", prefix=f".{path.name}.",
+                                     dir=path.parent, delete=False) as stream:
+        temporary = Path(stream.name)
+        json.dump({"schema": INVENTORY_CACHE_SCHEMA, "entries": entries},
+                  stream, separators=(",", ":"))
+    os.replace(temporary, path)
+
+
+def source_definitions(source_root: Path, repo: Path, object_root: Path | None = None,
+                       cache_path: Path | None = None) -> list[AnnotatedDataDefinition]:
+    source_root = Path(source_root)
+    repo = Path(repo)
+    if object_root is None and source_root.resolve() == (repo / "src").resolve():
+        candidate = repo / "build/objdiff/base"
+        if candidate.is_dir():
+            object_root = candidate
+    if cache_path is None and object_root is not None:
+        cache_path = repo / "build/gen/annotated_data_cache.json"
+    object_root = Path(object_root) if object_root is not None else None
+    cache_path = Path(cache_path) if cache_path is not None else None
+    compile_path = repo / "build/clangd/compile_commands.json"
+    compile_database = compile_path.read_bytes() if compile_path.is_file() else b""
+    include_roots = [repo / "include"]
+    vendor = repo / "vendor"
+    if vendor.is_dir():
+        include_roots.extend(sorted(path for path in vendor.iterdir() if path.is_dir()))
+    cached = _load_inventory_cache(cache_path) if cache_path is not None else {}
+    retained = {}
     rows = []
-    for path in sorted(Path(source_root).rglob("*.cpp")):
-        rows.extend(definitions_for_file(path, Path(source_root), Path(repo)))
+    for path in sorted(source_root.rglob("*.cpp")):
+        unit = path.relative_to(source_root).with_suffix("").as_posix()
+        key = (_inventory_cache_key(path, unit, object_root, compile_database, include_roots)
+               if object_root is not None else None)
+        entry = cached.get(unit) if key is not None else None
+        if isinstance(entry, dict) and entry.get("key") == key:
+            values = [AnnotatedDataDefinition(**row) for row in entry.get("rows", [])]
+        else:
+            values = definitions_for_file(path, source_root, repo)
+        rows.extend(values)
+        if key is not None:
+            retained[unit] = {
+                "key": key,
+                "rows": [{field: getattr(row, field)
+                          for field in AnnotatedDataDefinition.__dataclass_fields__}
+                         for row in values],
+            }
+    if cache_path is not None:
+        _write_inventory_cache(cache_path, retained)
     identities = {(row.unit, row.rva) for row in rows}
     if len(identities) != len(rows):
         raise ValueError("duplicate DATA RVA within a translation unit")
