@@ -709,12 +709,23 @@
       "unit": "SOURCE/CMBTMGR",
       "function": "?CatAttack@combatManager@@QAEXH@Z",
       "source_hash": "f892133d70a3",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
       "iterations": 0,
       "before": 99.97605,
       "after": 99.97605,
-      "note": "Exact size frame CFG and 150 relocs; only three proved commutative load-order spans remain."
+      "note": "Reproduced the byte-proven TU-cumulative wall; size, frame, CFG, and 150 ordered relocations agree and previously exhausted commutations remain documented."
+    },
+    {
+      "unit": "SOURCE/CMBTMGR",
+      "function": "?ExperienceValueOfStack@combatManager@@QAEHH@Z",
+      "source_hash": "f53df3a552e3",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 73.5,
+      "after": 73.5,
+      "note": "Exact retained body remains structurally valid; ten guarded TU-state trials yielded nine stagnant variants and one disposable exact probe rejected for invented structure/sibling effects."
     },
     {
       "unit": "SOURCE/CMBTMGR",
@@ -763,13 +774,79 @@
     {
       "unit": "SOURCE/CMBTMGR",
       "function": "?KeepAttack@combatManager@@QAEXH@Z",
-      "source_hash": "b72a30d7d29e",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
-      "outcome": "improved",
-      "iterations": 8,
-      "before": 99.669136,
+      "source_hash": "65e9fc15b550",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.98272,
       "after": 99.98272,
-      "note": "Corrected defense field and steered three comparisons; only aggregate temporary and nested pointer slots remain."
+      "note": "Corrected tower defense semantics and singular/plural perish wording; exact frame, CFG, and 44 ordered relocations remain, with only documented TU allocation ordering residual."
+    },
+    {
+      "unit": "SOURCE/CMBTMGR",
+      "function": "?LoadIcons@combatManager@@QAEXXZ",
+      "source_hash": "da837039512f",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.095024,
+      "after": 99.095024,
+      "note": "Revalidated exact span and operands outside the documented inline continuation; all 58 ordered relocations agree."
+    },
+    {
+      "unit": "SOURCE/CMBTMGR",
+      "function": "?MakeCreaturesVanish@combatManager@@QAEXXZ",
+      "source_hash": "5e02992b8e4a",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
+      "iterations": 2,
+      "before": 96.0202,
+      "after": 98.833336,
+      "note": "Recovered removed-army lifetime, exact seven-slot frame, and retail sbb masks; only side/index address order remains and 20 ordered relocations agree."
+    },
+    {
+      "unit": "SOURCE/CMBTMGR",
+      "function": "?MoreTreesNear@combatManager@@QAEHXZ",
+      "source_hash": "7ceea378fa47",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.21072,
+      "after": 99.21072,
+      "note": "Revalidated the documented MAP_HEIGHT operand-order and embedded jump-table delinker wall; all 14 ordered relocations agree."
+    },
+    {
+      "unit": "SOURCE/CMBTMGR",
+      "function": "?SetupAndLoadObstacles@combatManager@@QAEXXZ",
+      "source_hash": "bd309d6b3ad2",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
+      "iterations": 1,
+      "before": 96.605095,
+      "after": 96.617836,
+      "note": "Corrected castle checks to use the defender combat town at +0x3283; remaining continuation and index-order forms are exhausted and 22 ordered relocations agree."
+    },
+    {
+      "unit": "SOURCE/CMBTMGR",
+      "function": "?ShootMissile@combatManager@@QAEXHHHHPAMPAVicon@@@Z",
+      "source_hash": "05bdf6acb8f1",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
+      "iterations": 1,
+      "before": 97.914894,
+      "after": 98.49202,
+      "note": "Recovered one shared frame lifetime and exact slots for all 24 semantic locals; remaining commutative sums and extent comparisons are score-stagnant and 52 ordered relocations agree."
+    },
+    {
+      "unit": "SOURCE/CMBTMGR",
+      "function": "?ShotIsThroughWall@combatManager@@QAEHHHH@Z",
+      "source_hash": "2bbcd1eb0daa",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
+      "iterations": 2,
+      "before": 99.685715,
+      "after": 99.90204,
+      "note": "Recovered function-scope locals and exact MSVC slot order, reducing the residual to two commutative floating additions; 25 ordered relocations agree."
     },
     {
       "unit": "SOURCE/CMBTMGR",
