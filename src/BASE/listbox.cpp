@@ -5,6 +5,7 @@
 
 #include <va.h>
 #include <BASE/listBoxWidget.h>
+#include <BASE/LISTBOX_TYPES.h>
 #include <BASE/bitmap.h>
 #include <BASE/resourceManager.h>
 #include <BASE/icon.h>
@@ -17,6 +18,36 @@
 #include <SOURCE/kbwin.h>
 #include <string.h>
 #include <SOURCE/X_GLOBAL.h>
+
+#define LISTBOX_SOURCE_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp"
+#define LISTBOX_SOURCE_FILE_SEPARATOR "\0\0\0\0"
+#define LISTBOX_DESTRUCTOR_SOURCE_FILES \
+    LISTBOX_SOURCE_FILE LISTBOX_SOURCE_FILE_SEPARATOR LISTBOX_SOURCE_FILE
+#define LISTBOX_DELETE_SOURCE_FILES                                                       \
+    LISTBOX_SOURCE_FILE LISTBOX_SOURCE_FILE_SEPARATOR LISTBOX_SOURCE_FILE                 \
+        LISTBOX_SOURCE_FILE_SEPARATOR LISTBOX_SOURCE_FILE LISTBOX_SOURCE_FILE_SEPARATOR   \
+            LISTBOX_SOURCE_FILE
+#define LISTBOX_MAIN_SOURCE_FILES                                                         \
+    LISTBOX_SOURCE_FILE LISTBOX_SOURCE_FILE_SEPARATOR LISTBOX_SOURCE_FILE                 \
+        LISTBOX_SOURCE_FILE_SEPARATOR LISTBOX_SOURCE_FILE LISTBOX_SOURCE_FILE_SEPARATOR   \
+            LISTBOX_SOURCE_FILE LISTBOX_SOURCE_FILE_SEPARATOR LISTBOX_SOURCE_FILE
+
+// @data-layout-note Retail's initialized listbox contribution is
+// RVA 0x120e94..0x121078 (0x1e4), with eleven identical source-path views at
+// 0x2c-byte intervals. Destructor item/list frees, DeleteItem item/list frees,
+// allocation/old-list free, and Main replace free/allocation plus append
+// list-allocation/item-allocation/old-list free use those addresses in that
+// order. The only rdata owner is the reviewed 0xc listBoxWidget vtable at
+// RVA 0x0ebac0; its 0x10 retail contribution includes four bytes of natural
+// tail alignment. This TU has no loader-zero contribution. The former source
+// pooled all eleven uses into one 0x29 COMDAT. A typed 0x1e4 aggregate
+// reproduced every byte and addend but emitted an align-eight writable section
+// at the align-four-only retail start, so it cannot represent the retail object.
+// The retained align-four COMDAT banks contain 2, 4, and 5 views and have
+// logical sizes 0x55, 0xad, and 0xd9. Their natural three-byte alignment tails
+// exactly cover the retail interval. Do not pool the paths or add padding
+// symbols, aliases, fake owners, section pragmas, or per-TU flag exceptions.
+
 VA(0x004db060, 0x42)
 listBoxWidget::listBoxWidget(void) : widget(0, 0, 0, 0, 0, 0)
 {
@@ -37,9 +68,11 @@ listBoxWidget::~listBoxWidget()
         delete m_scrollbar;
     for (i = 0; i < m_itemCount; i++)
 #line 25
-        H2_FREE(m_items[i], "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp", 25);
+        H2_FREE(m_items[i], LISTBOX_DESTRUCTOR_SOURCE_FILES, 25);
 #line 27
-    H2_FREE(m_items, "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp", 27);
+    H2_FREE(m_items,
+            LISTBOX_DESTRUCTOR_SOURCE_FILES + LISTBOX_DESTRUCTOR_LIST_SOURCE_FILE_OFFSET,
+            27);
     gbSendMouseMoveMessages = 0;
 }
 
@@ -146,19 +179,25 @@ void listBoxWidget::DeleteItem(int index)
         m_topIndex = m_scrollRange;
     if (m_itemCount == 1) {
 #line 156
-        H2_FREE(m_items[0], "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp", 0x9c);
-        H2_FREE(m_items, "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp", 0x9d);
+        H2_FREE(m_items[0], LISTBOX_DELETE_SOURCE_FILES, 0x9c);
+        H2_FREE(m_items,
+                LISTBOX_DELETE_SOURCE_FILES + LISTBOX_DELETE_LIST_SOURCE_FILE_OFFSET,
+                0x9d);
         m_items = 0;
     } else {
 #line 162
         char **newItems = static_cast<char **>(H2_ALLOC((m_itemCount - 1) * 4,
-                                                         "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp", 0xa2));
+                                                         LISTBOX_DELETE_SOURCE_FILES +
+                                                             LISTBOX_DELETE_ALLOCATION_SOURCE_FILE_OFFSET,
+                                                         0xa2));
         memcpy(newItems, m_items, (m_itemCount - 1) * 4);
         if (m_itemCount - index - 1 > 0)
             memcpy(&newItems[index], &m_items[index + 1], (m_itemCount - index - 1) * 4);
         if (m_items != 0)
 #line 169
-            H2_FREE(m_items, "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp", 0xa9);
+            H2_FREE(m_items,
+                    LISTBOX_DELETE_SOURCE_FILES + LISTBOX_DELETE_OLD_LIST_SOURCE_FILE_OFFSET,
+                    0xa9);
         m_items = newItems;
     }
     m_itemCount--;
@@ -230,8 +269,11 @@ int listBoxWidget::Main(tag_message &message)
                 if (m_itemCount <= message.payload.widget.parameter)
                     break;
 #line 222
-                H2_FREE(m_items[message.payload.widget.parameter], "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp", 0xde);
-                m_items[message.payload.widget.parameter] = static_cast<char *>(H2_ALLOC(strlen(text) + 1, "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp", 0xdf));
+                H2_FREE(m_items[message.payload.widget.parameter], LISTBOX_MAIN_SOURCE_FILES, 0xde);
+                m_items[message.payload.widget.parameter] = static_cast<char *>(H2_ALLOC(
+                    strlen(text) + 1,
+                    LISTBOX_MAIN_SOURCE_FILES + LISTBOX_REPLACE_ALLOCATION_SOURCE_FILE_OFFSET,
+                    0xdf));
                 strcpy(m_items[message.payload.widget.parameter], text);
             }
             break;
@@ -240,17 +282,24 @@ int listBoxWidget::Main(tag_message &message)
                 char *text = message.payload.widget.data.text;
 #line 233
                 char **newItems = static_cast<char **>(H2_ALLOC((m_itemCount + 1) * 4,
-                                                                 "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp", 0xe9));
+                                                                 LISTBOX_MAIN_SOURCE_FILES +
+                                                                     LISTBOX_APPEND_LIST_ALLOCATION_SOURCE_FILE_OFFSET,
+                                                                 0xe9));
                 if (m_itemCount != 0)
                     memcpy(newItems, m_items, m_itemCount * 4);
 #line 236
                 newItems[m_itemCount] = static_cast<char *>(H2_ALLOC(strlen(text) + 1,
-                                                                      "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp", 0xec));
+                                                                      LISTBOX_MAIN_SOURCE_FILES +
+                                                                          LISTBOX_APPEND_ITEM_ALLOCATION_SOURCE_FILE_OFFSET,
+                                                                      0xec));
                 strcpy(newItems[m_itemCount], text);
                 m_itemCount++;
                 if (m_items != 0)
 #line 240
-                    H2_FREE(m_items, "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp", 0xf0);
+                    H2_FREE(m_items,
+                            LISTBOX_MAIN_SOURCE_FILES +
+                                LISTBOX_APPEND_OLD_LIST_SOURCE_FILE_OFFSET,
+                            0xf0);
                 m_items = newItems;
                 if (m_maxVisibleItems < m_itemCount) {
                     m_scrollRange = m_itemCount - m_maxVisibleItems;
