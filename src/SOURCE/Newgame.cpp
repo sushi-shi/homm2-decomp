@@ -202,7 +202,7 @@ void game::SetupNetPlayerNames(void)
     int player;
 
     if (giNumHumanPlayers > 1) {
-        for (player = 0; player < giNumHumanPlayers; ++player) {
+        for (player = 0; 0[&giNumHumanPlayers] > player; ++player) {
             if (iMPBaseType != NEW_GAME_MULTIPLAYER_HOTSEAT)
                 strcpy(cPlayerNames[player], gsNetPlayerInfo[player].name);
         }
@@ -593,7 +593,7 @@ void game::InitNewGameWindow(void)
         iconControlLocal = new iconWidget(
             static_cast<short>(playerSpacingTemp * playerCounter +
                                firstPlayerXLocal + 11),
-            static_cast<short>(multiplayerYOffsetValue +
+            static_cast<short>(0[&multiplayerYOffsetValue] +
                                singlePlayerYOffsetValue + 277),
             64, 47, "ngextra.icn", 61, 0,
             static_cast<short>(playerCounter + NEW_GAME_RACE_ICON_FIRST), 16,
@@ -618,7 +618,7 @@ void game::InitNewGameWindow(void)
             static_cast<short>(playerSpacingTemp * playerCounter +
                                firstPlayerXLocal + 15 -
                                raceTextWidth / 2),
-            static_cast<short>(multiplayerYOffsetValue +
+            static_cast<short>(0[&multiplayerYOffsetValue] +
                                singlePlayerYOffsetValue + 322),
             static_cast<short>(raceTextWidth + 64), 12, label,
             "smalfont.fnt", 1,
@@ -631,7 +631,7 @@ void game::InitNewGameWindow(void)
         iconControlLocal = new iconWidget(
             static_cast<short>(playerSpacingTemp * playerCounter +
                                firstPlayerXLocal + 16),
-            static_cast<short>(multiplayerYOffsetValue +
+            static_cast<short>(0[&multiplayerYOffsetValue] +
                                singlePlayerYOffsetValue + 274),
             62, 45, "ngextra.icn", 51, 0,
             static_cast<short>(playerCounter + NEW_GAME_RACE_CYCLE_FIRST), 16,
@@ -1412,34 +1412,27 @@ void game::NGKPSetupDisplayString(char *text, unsigned short cursor)
         cNGKPDisplay[cursor + 1] = 0;
 }
 
-// @early-stop
-// The complete 55-instruction stream is identical with relocations masked and
-// all 10 relocation sites and targets agree; the residual is delinker identity.
 VA(0x004ba2ee, 0xae)
 void game::DrawNGKPDisplayString(int updateScreen)
 {
-    if (gbNewGameDialogOver != 0) {
-    } else if (giNumHumanPlayers != 1) {
-        if (iMPBaseType == NEW_GAME_MULTIPLAYER_HOTSEAT) {
-        } else {
-            NGKPBkg->DrawToBuffer(NEW_GAME_CHAT_DRAW_X, NEW_GAME_CHAT_DRAW_Y,
-                                  NEW_GAME_CHAT_BACKGROUND_WIDTH, 0);
-            smallFont->DrawBoundedString(
-                cNGKPDisplay, NEW_GAME_CHAT_DRAW_X, NEW_GAME_CHAT_DRAW_Y,
-                NEW_GAME_CHAT_DRAW_WIDTH, NEW_GAME_CHAT_DRAW_HEIGHT, 2, 0);
-            if (updateScreen)
-                gpWindowManager->UpdateScreenRegion(
-                    NEW_GAME_CHAT_DRAW_X, NEW_GAME_CHAT_DRAW_Y,
-                    NEW_GAME_CHAT_DRAW_WIDTH, NEW_GAME_CHAT_DRAW_HEIGHT);
-        }
-    }
+    if (gbNewGameDialogOver != 0)
+        return;
+
+    if (giNumHumanPlayers == 1 ||
+        iMPBaseType == NEW_GAME_MULTIPLAYER_HOTSEAT)
+        return;
+
+    NGKPBkg->DrawToBuffer(NEW_GAME_CHAT_DRAW_X, NEW_GAME_CHAT_DRAW_Y,
+                          NEW_GAME_CHAT_BACKGROUND_WIDTH, 0);
+    smallFont->DrawBoundedString(
+        cNGKPDisplay, NEW_GAME_CHAT_DRAW_X, NEW_GAME_CHAT_DRAW_Y,
+        NEW_GAME_CHAT_DRAW_WIDTH, NEW_GAME_CHAT_DRAW_HEIGHT, 2, 0);
+    if (updateScreen)
+        gpWindowManager->UpdateScreenRegion(
+            NEW_GAME_CHAT_DRAW_X, NEW_GAME_CHAT_DRAW_Y,
+            NEW_GAME_CHAT_DRAW_WIDTH, NEW_GAME_CHAT_DRAW_HEIGHT);
 }
 
-// @early-stop
-// @early-stop-reloc-only: Current Newgame.cpp/header epoch: all 0xb71 bytes
-// match after masking 118 ordered relocation sites. The scalar-lvalue spelling
-// `0[&playerSpacingTemp]` restores retail's counter-first load at all eight
-// player-position products; remaining rows only rename compiler-local strings.
 VA(0x004ba39c, 0xb71)
 void game::ShowScenInfo(void)
 {
@@ -1597,7 +1590,7 @@ void game::ShowScenInfo(void)
         iconControlLocal = new iconWidget(
             static_cast<short>(0[&playerSpacingTemp] * playerCounter + firstPlayerXLocal +
                                11),
-            static_cast<short>(multiplayerYOffsetValue +
+            static_cast<short>(0[&multiplayerYOffsetValue] +
                                singlePlayerYOffsetValue + 243),
             64, 47,
             "ngextra.icn", 61, 0,
@@ -1621,7 +1614,7 @@ void game::ShowScenInfo(void)
         textControlLocal = new textWidget(
             static_cast<short>(0[&playerSpacingTemp] * playerCounter + firstPlayerXLocal +
                                15 - raceTextWidth / 2),
-            static_cast<short>(multiplayerYOffsetValue +
+            static_cast<short>(0[&multiplayerYOffsetValue] +
                                singlePlayerYOffsetValue + 288),
             static_cast<short>(raceTextWidth + 64), 12, label,
             "smalfont.fnt", 1,
@@ -1634,7 +1627,7 @@ void game::ShowScenInfo(void)
         iconControlLocal = new iconWidget(
             static_cast<short>(0[&playerSpacingTemp] * playerCounter + firstPlayerXLocal +
                                16),
-            static_cast<short>(multiplayerYOffsetValue +
+            static_cast<short>(0[&multiplayerYOffsetValue] +
                                singlePlayerYOffsetValue + 240),
             62, 45,
             "ngextra.icn", 51, 0,
@@ -1784,15 +1777,10 @@ void game::GetLossConditionText(char *text)
     }
 }
 
-// @early-stop
-// Excluding the 0x14-byte jump table, opcodes and CFG agree after normalizing a
-// uniform four-byte stack displacement. Retail reserves one unreferenced frame
-// word and one trailing alignment NOP; its const_000fe2ac relocation is the
-// linked equivalent of gArtifactNames-1. Both objects have 32 relocations and
-// every external target agrees.
 VA(0x004bb0d4, 0x2fb)
 void game::GetVictoryConditionText(char *text)
 {
+    int unusedVictoryWord;
     hero *victoryHeroData;
     int firstSideIsLocalResult;
     char firstSide[NEW_GAME_SIDE_TEXT_SIZE];
@@ -1855,52 +1843,50 @@ void game::GetVictoryConditionText(char *text)
     }
 }
 
-// @early-stop
-// At this source hash's retained max, the instruction stream differs only in
-// string-symbol identities. The current TU-cumulative output also reverses the
-// operands of equivalent signed bounds checks; frame roles and 25 relocations agree.
 VA(0x004bb3cf, 0x2a7)
 int game::GetSideDesc(char *text, int firstPlayer, int lastPlayer)
 {
-    char colorName[NEW_GAME_SIDE_TEXT_SIZE];
+    char colorName3[NEW_GAME_SIDE_TEXT_SIZE];
     int sideSize;
     int localPlayerOnSide;
+    int unusedSideWord1;
     int localPlayerIndex;
-    int player;
-    int listedPlayerCount;
-    int otherPlayerCount;
+    int player5;
+    int listedPlayerCount5;
+    int otherPlayerCount2;
 
     localPlayerIndex = -1;
-    for (player = 0; player < m_mapHeader.playerCount; ++player) {
-        if (m_setupPlayerNetworkId[player] == giThisGamePos)
-            localPlayerIndex = player;
+    for (player5 = 0; player5 < m_mapHeader.playerCount; ++player5) {
+        if (m_setupPlayerNetworkId[player5] == giThisGamePos)
+            localPlayerIndex = player5;
     }
 
-    if (localPlayerIndex >= firstPlayer && localPlayerIndex <= lastPlayer)
+    if (0[&localPlayerIndex] >= firstPlayer &&
+        0[&localPlayerIndex] <= lastPlayer)
         localPlayerOnSide = 1;
     else
         localPlayerOnSide = 0;
 
     sideSize = lastPlayer - firstPlayer + 1;
-    otherPlayerCount = sideSize - (localPlayerOnSide != 0);
+    otherPlayerCount2 = sideSize - (localPlayerOnSide != 0);
 
     if (localPlayerOnSide) {
-        if (otherPlayerCount != 0) {
-            if (otherPlayerCount > 1)
+        if (otherPlayerCount2 != 0) {
+            if (otherPlayerCount2 > 1)
                 sprintf(text, "You and your allies ");
             else
                 sprintf(text, "You and your ally ");
 
-            listedPlayerCount = 0;
-            for (player = firstPlayer; player <= lastPlayer; ++player) {
-                if (player != localPlayerIndex) {
-                    ++listedPlayerCount;
-                    sprintf(colorName, gColors[m_setupPlayerColor[player]]);
-                    colorName[0] -= 'a' - 'A';
-                    strcat(text, colorName);
-                    if (listedPlayerCount < otherPlayerCount - 1)
+            listedPlayerCount5 = 0;
+            for (player5 = firstPlayer; 0[&player5] <= lastPlayer; ++player5) {
+                if (player5 != 0[&localPlayerIndex]) {
+                    ++listedPlayerCount5;
+                    sprintf(colorName3, gColors[m_setupPlayerColor[player5]]);
+                    colorName3[0] -= 'a' - 'A';
+                    strcat(text, colorName3);
+                    if (listedPlayerCount5 < otherPlayerCount2 - 1)
                         strcat(text, ", ");
-                    else if (listedPlayerCount < otherPlayerCount)
+                    else if (listedPlayerCount5 < otherPlayerCount2)
                         strcat(text, " and ");
                 }
             }
@@ -1913,15 +1899,15 @@ int game::GetSideDesc(char *text, int firstPlayer, int lastPlayer)
         else
             strcpy(text, "the enemy - ");
 
-        listedPlayerCount = 0;
-        for (player = firstPlayer; player <= lastPlayer; ++player) {
-            ++listedPlayerCount;
-            sprintf(colorName, gColors[m_setupPlayerColor[player]]);
-            colorName[0] -= 'a' - 'A';
-            strcat(text, colorName);
-            if (listedPlayerCount < otherPlayerCount - 1)
+        listedPlayerCount5 = 0;
+        for (player5 = firstPlayer; 0[&player5] <= lastPlayer; ++player5) {
+            ++listedPlayerCount5;
+            sprintf(colorName3, gColors[m_setupPlayerColor[player5]]);
+            colorName3[0] -= 'a' - 'A';
+            strcat(text, colorName3);
+            if (listedPlayerCount5 < otherPlayerCount2 - 1)
                 strcat(text, ", ");
-            else if (listedPlayerCount < otherPlayerCount)
+            else if (listedPlayerCount5 < otherPlayerCount2)
                 strcat(text, " and ");
         }
     }
