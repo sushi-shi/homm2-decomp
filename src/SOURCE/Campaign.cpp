@@ -947,6 +947,11 @@ DATA(0x004f4f28) short trackXY[2][13][2] = {
     372, 294, 409, 336, 483, 294, 483, 378, 557, 336, 261, 294, 261, 378
 };
 DATA(0x004f4f90) class heroWindow *campWin = 0;
+// @data-layout-note Retail and candidate BSS both cover 0x127ea4+0x10 with
+// these four public identities. Retail COMMON order is side/track/viewOnly/map
+// at +0/+4/+8/+0xc; VC4.2 currently emits track/viewOnly/side/map. Declaration
+// order is byte-neutral for these fixed external names, so retain the proven
+// storage and RVAs rather than introducing aliases or initialized data.
 DATA(0x00527ea4) int iCurViewSide;
 DATA(0x00527ea8) int iCampaignTrackType;
 DATA(0x00527eac) int bCampaignViewOnly;
