@@ -1878,12 +1878,6 @@ daemonExperienceGold:
     CheckEndGame(0, 0);
 }
 
-// @early-stop
-// @early-stop-reloc-only
-// All 0x9f7 relocation-masked bytes, frame/slots, and CFG match after restoring
-// retail's m_mapData-before-extra-index accessor evaluation in both late chains.
-// All 18 ordered relocation sites/effective targets align; the retained objdiff
-// residual is delinked local-label identity.
 VA(0x004ae00b, 0x9f7)
 void advManager::EraseObj(class mapCell *cell, int x, int y)
 {
@@ -2047,8 +2041,10 @@ void advManager::EraseObj(class mapCell *cell, int x, int y)
                 extra_i->objectIndex != ERASE_EMPTY_INDEX && !extra_i->objectLayerBit1)
                 goto cellDone;
 
-            if (extra_i->nextIndex && m_mapData->Extra(extra_i->nextIndex)->objectIndex != ERASE_EMPTY_INDEX)
-                extra_i = m_mapData->Extra(extra_i->nextIndex);
+            if (extra_i->nextIndex &&
+                0[&m_mapData]->Extra(extra_i->nextIndex)->objectIndex !=
+                    ERASE_EMPTY_INDEX)
+                extra_i = 0[&m_mapData]->Extra(extra_i->nextIndex);
             else
                 extra_i = 0;
         }
@@ -3284,11 +3280,6 @@ int advManager::CombatMonsterEvent(hero *eventHero, int monsterType,
     return combatResult7;
 }
 
-// @early-stop
-// @early-stop-reloc-only
-// All 0x5f3 relocation-masked bytes, frame/slots, CFG, and 105 ordered relocation
-// sites/effective targets match. The retained residual is the 103-entry switch
-// table's delinked local-label identities.
 VA(0x004b1380, 0x5f3)
 void GiveTakeArtifactStat(hero *targetHero, int artifact, int take)
 {
@@ -3408,10 +3399,6 @@ void GiveTakeArtifactStat(hero *targetHero, int artifact, int take)
         statChanges[HERO_PRIMARY_KNOWLEDGE] = 2;
         break;
     case EVENT_ARTIFACT_MAGIC_BOOK: break;
-    case EVENT_ARTIFACT_EDITOR_ANY_ULTIMATE:
-    case EVENT_ARTIFACT_EDITOR_UNUSED_84:
-    case EVENT_ARTIFACT_EDITOR_UNUSED_85:
-    case EVENT_ARTIFACT_EDITOR_UNUSED_86:
     case EVENT_ARTIFACT_SPELL_SCROLL:
         break;
     case EVENT_ARTIFACT_ARM_OF_MARTYR: statChanges[HERO_PRIMARY_SPELL_POWER] = 3; break;
