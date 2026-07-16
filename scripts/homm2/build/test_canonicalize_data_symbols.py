@@ -18,6 +18,8 @@ TEXT = 0x60000020
 DATA = 0xC0000040
 RDATA = 0x40000040
 BSS = 0xC0000080
+DIR32 = 0x0006
+REL32 = 0x0014
 
 
 @dataclass(frozen=True)
@@ -92,7 +94,121 @@ def names_by_offset(result):
     }
 
 
+def army_style_jump_table(canonical=False, unequal_destination=False):
+    text = bytearray(0x40)
+    relocations = [
+        (0x10, 1, DIR32),
+        (0x14, 1, DIR32),
+        (0x18, 2, DIR32),
+        (0x1C, 2, REL32),
+        # The site is in next_fn but the target remains in army_fn.
+        (0x24, 1, DIR32),
+    ]
+    if canonical:
+        struct.pack_into("<I", text, 0x10, 4)
+        struct.pack_into("<I", text, 0x14, 4)
+        struct.pack_into("<I", text, 0x18, 9 if unequal_destination else 8)
+        relocations[0] = (0x10, 0, DIR32)
+        relocations[1] = (0x14, 0, DIR32)
+        relocations[2] = (0x18, 0, DIR32)
+    return make_coff([SectionSpec(
+        ".text", bytes(text), TEXT, tuple(relocations),
+    )], [
+        ("army_fn", 0x00, 1, 0x20, 2),
+        ("$L100", 0x04, 1, 0, 6),
+        ("$L101", 0x08, 1, 0, 6),
+        ("next_fn", 0x20, 1, 0x20, 2),
+    ])
+
+
 class CanonicalizeDataSymbolsTest(unittest.TestCase):
+    def test_army_style_repeated_jump_labels_match_owner_addends(self):
+        candidate = canonicalize_coff(army_style_jump_table()).data
+        target = canonicalize_coff(army_style_jump_table(canonical=True)).data
+
+        self.assertEqual(candidate, target)
+        parsed = CoffObject(candidate)
+        relocations = parsed.relocations
+        self.assertEqual(
+            [parsed.symbols[row.symbol_index].name for row in relocations[:3]],
+            ["army_fn", "army_fn", "army_fn"],
+        )
+        text = parsed.section_bytes(parsed.sections[0])
+        self.assertEqual(
+            [struct.unpack_from("<I", text, site)[0]
+             for site in (0x10, 0x14, 0x18)],
+            [4, 4, 8],
+        )
+
+    def test_jump_table_destination_difference_remains_visible(self):
+        candidate = canonicalize_coff(army_style_jump_table()).data
+        wrong_target = canonicalize_coff(army_style_jump_table(
+            canonical=True, unequal_destination=True)).data
+
+        self.assertNotEqual(candidate, wrong_target)
+
+    def test_rel32_and_cross_function_dir32_remain_local(self):
+        result = canonicalize_coff(army_style_jump_table()).data
+        parsed = CoffObject(result)
+
+        self.assertEqual(parsed.relocations[3].typ, REL32)
+        self.assertEqual(
+            parsed.symbols[parsed.relocations[3].symbol_index].name, "$L101")
+        self.assertEqual(parsed.relocations[4].typ, DIR32)
+        self.assertEqual(
+            parsed.symbols[parsed.relocations[4].symbol_index].name, "$L100")
+
+    def test_local_text_dir32_without_external_owner_is_untouched(self):
+        obj = make_coff([SectionSpec(
+            ".text", bytes(0x20), TEXT, ((0x08, 1, DIR32),),
+        )], [
+            ("static_fn", 0x00, 1, 0x20, 3),
+            ("$L1", 0x10, 1, 0, 6),
+        ])
+
+        result = canonicalize_coff(obj).data
+
+        parsed = CoffObject(result)
+        self.assertEqual(
+            parsed.symbols[parsed.relocations[0].symbol_index].name, "$L1")
+        self.assertEqual(parsed.section_bytes(parsed.sections[0]), bytes(0x20))
+
+    def test_named_dispatch_label_uses_semantic_local_label_class(self):
+        obj = make_coff([SectionSpec(
+            ".text", bytes(0x20), TEXT, ((0x18, 1, DIR32),),
+        )], [
+            ("handler", 0x00, 1, 0x20, 2),
+            ("$hoverEvent$2316", 0x08, 1, 0, 6),
+        ])
+
+        result = canonicalize_coff(obj).data
+
+        parsed = CoffObject(result)
+        relocation = parsed.relocations[0]
+        self.assertEqual(parsed.symbols[relocation.symbol_index].name, "handler")
+        self.assertEqual(
+            struct.unpack_from("<I", parsed.section_bytes(parsed.sections[0]),
+                               0x18)[0],
+            0x08,
+        )
+
+    def test_same_owner_static_function_pointer_is_not_a_dispatch_label(self):
+        obj = make_coff([SectionSpec(
+            ".text", bytes(0x20), TEXT, ((0x08, 1, DIR32),),
+        )], [
+            ("owner", 0x00, 1, 0x20, 2),
+            ("static_callback", 0x10, 1, 0x20, 3),
+        ])
+
+        result = canonicalize_coff(obj).data
+
+        parsed = CoffObject(result)
+        self.assertEqual(
+            parsed.symbols[parsed.relocations[0].symbol_index].name,
+            "static_callback",
+        )
+        self.assertEqual(parsed.section_bytes(parsed.sections[0]), bytes(0x20))
+
     def test_sg_renumber_is_identical_and_input_is_not_mutated(self):
         sections = [SectionSpec(".data", b"hello\0\0\0", DATA)]
         old = make_coff(sections, [("$SG10", 0, 1, 0, 3)])
