@@ -1465,31 +1465,38 @@ int game::ProcessIconSelect(int widgetId, int quickView)
 
 // @data-layout-note
 // Retail `.rdata` and the candidate are byte-exact over 0xeb058..0xeb078
-// (0x20 bytes). The five reviewed candidate allocations are `$T36552`,
-// `$T36553`, `$T36554`, `$T36584`, and `$T36585`; all referenced relocation
-// owners and interior addends agree with the retail constants.
+// (0x20 bytes; SHA-256
+// 5056c5fe34ffbea2975bf20e2b32cc504bc21c8028dc3fc1680313e0adb5d1c9).
+// The five reviewed candidate allocations are `$T36552`,
+// `$T36553`, `$T36554`, `$T36584`, and `$T36585`; the three direct owners and
+// `$T36552 + 4` agree at all seven function-relative relocation sites.
 //
 // Retail initialized storage spans 0xed9e8..0xeddf4 (0x40c bytes), including
-// three trailing zero alignment bytes. Before recovery the candidate was
-// 0x405 bytes and omitted the 0x0074 short at 0xeda04. The candidate is now
-// 0x40d bytes and contains every retail payload byte. Retail interleaves the
-// dynamic, setup, and dialog source-line words at offsets 0x1c, 0x2c0, and
-// 0x304; VC 4.2 groups the three function statics at 0x0, 0x4, and 0x8 and
-// inserts a four-byte zero alignment hole before giOverviewTop. Focused
-// relocation audits are 340/340 for SetupDynamicStuff, 52/52 for
-// SetupNewOverviewType, and 90/90 for Overview, with no candidate-only sites;
-// the only warnings are the expected private-name versus delinked literal or
-// `const_<rva>` identities. The resulting data section-outside-contribution
-// and unconsumed-contribution diagnostics replace the former single
-// inconsistent-anchor-bases diagnostic. Do not restore the synthetic `"t"`
-// owner, add padding, or alias these words to hide this allocation-order wall.
+// three trailing zero alignment bytes. All 51 compiler-private allocations are
+// reviewed at their exact retail extents. Three relocation-anchored literal
+// intervals are byte-exact: candidate +0x2c..+0x2cc maps to 0xeda08 (SHA-256
+// 8ceded7abee16abf3915178f5f256981322b8ddfeb580c1f95c1b7ba34668d62),
+// +0x2cc..+0x30c maps to 0xedcac (ae253ea11ca33d3278868c1c3f44e15766730e74bf34d1e95a6f88d0b9f59b97),
+// and +0x30c..+0x40d maps to 0xedcf0
+// (f12678b2bfae3df500cd50473146f5808ff36aed3f56616cf39b9943b02779a4).
+// Exact extent boundaries resolve repeated payloads without payload guessing.
+// Retail interleaves the dynamic, setup, and dialog source-line words at
+// 0xeda04, 0xedca8, and 0xedcec; VC 4.2 groups their candidate allocations at
+// +0x0, +0x4, and +0x8 and inserts a four-byte zero alignment hole before
+// giOverviewTop. All 276 candidate DIR32 sites exist at the same retail
+// function-relative offsets. Of 218 sites targeting Overview-owned storage,
+// 216 resolve to the exact owner/addend. The two residuals are the documented
+// SetupDynamicStuff equality swap at +0xc6/+0xcc between giOverviewType and
+// iLastDynamicType. Do not restore a synthetic owner, add padding, or alias
+// these allocations to hide compiler allocation order.
 //
 // Retail zero-fill spans 0x123258..0x123280 (0x28 bytes) and includes a
 // four-byte alignment hole before giOverviewItems. The candidate `.bss` is
 // 0x24 bytes and contains the same 36 logical bytes in COMMON order:
 // giOverviewItems, iLastDynamicTop, iLastDynamicType, textWidgetTitle,
-// iOverviewItems. Every public extent and relocation is present; retain the
-// inconsistent-anchor-bases diagnostic rather than inventing storage.
+// iOverviewItems. All five public extents are exact; every BSS relocation uses
+// owner +0 except one proven giOverviewItems +4 reference. Preserve the natural
+// linker hole rather than inventing storage or placement controls.
 // ---- globals (definitions, RVA order) ----
 DATA(0x004ed9e8) class heroWindow *overWin = 0;
 DATA(0x004ed9ec) class textWidget **textWidgetDynamic = 0;
