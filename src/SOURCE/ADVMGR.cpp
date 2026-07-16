@@ -3796,15 +3796,16 @@ int advManager::UpdBottomViewEnemyTurn(void)
     return updated;
 }
 
-// @match-note
-// Complete semantics/CFG and all 45 relocation targets agree. The first byte
-// divergence is the frame allocation at +0x03: retail uses 0x24, ours 0x20.
+// @semantic: Complete semantics/CFG and all 45 ordered relocation sites/targets
+// agree. The first byte divergence is the frame allocation at +0x03: retail
+// uses 0x24, ours 0x20.
 // Retail slots are dateIconFrame=-0x4, unused=-0x8, dayText=-0xc,
 // weekText=-0x10; ours are weekText=-0x4, dayText=-0x8,
 // dateIconFrame=-0xc. The decompile/local-use audit found no real source local
 // for -0x8, and declaration ordering cannot create it without fake padding.
-// Revisit only if later type/predecessor recovery explains the word, or after
-// the SOURCE placeholder census reaches zero.
+// The current audit rechecked the three real locals with od_slots and found no
+// source-supported fourth role. Revisit only if later type/predecessor recovery
+// explains the word or a relevant ADVMGR TU/header change alters the frame.
 VA(0x004613b0, 0x366)
 int advManager::UpdBottomViewNewTurn(void)
 {
@@ -4187,13 +4188,13 @@ int advManager::UpdBottomViewHero(void)
     return 1;
 }
 
-// @match-note
-// Complete semantics, 0xf0 frame/slots, CFG, and all 109 relocation targets
+// @semantic: Complete semantics, 0xf0 frame/slots, CFG, and all 109 relocation targets
 // agree. The first code divergence is the commutative loop comparison at +0x409;
 // later residuals are multiply/load order, folding of literal 30 + 6, consequent
 // jump displacements, and two retail NOPs. Reversing the loop comparison and
-// multiplication operands and splitting the literal sum were checked. Revisit
-// after a material TU-state change or in the last-mile phase.
+// multiplication operands, splitting the literal sum, and a value-neutral OR-zero
+// barrier were checked; the current loop reversal and OR-zero forms were byte-neutral.
+// Revisit after a material ADVMGR predecessor/header or comparison-tool change.
 VA(0x0046235b, 0xd32)
 void advManager::HeroQuickView(int heroId, int locatorSlot, int windowX, int windowY)
 {
@@ -7072,10 +7073,6 @@ void advManager::EnableButtons(void)
     msg.payload.widget.id = ADVMGR_BUTTON_SLOT_6; m_adventureWindow->BroadcastMessage(msg);
 }
 
-// @early-stop
-// Relocation-masked instructions are byte-identical. All eight relocation
-// sites and target addresses agree; objdiff retains only retail/base names for
-// the "% " and source-path string-pool entries.
 VA(0x00469976, 0x145)
 void advManager::SaveAdventureBorder(void)
 {
@@ -7089,27 +7086,27 @@ void advManager::SaveAdventureBorder(void)
         BaseAlloc(ADVMGR_BORDER_BUFFER_SIZE, ADVMGR_SOURCE_FILE,
                   s_saveBorderAllocLineBase +
                       ADVMGR_BORDER_ALLOC_LINE_OFFSET));
-    unsigned char *savedPixel = m_adventureBorder;
+    unsigned char *savedPixels = m_adventureBorder;
     unsigned char *screenPixel = gpWindowManager->m_screen->m_pixels;
     int row;
     for (row = 0; row < ADVMGR_BORDER_EDGE_SIZE; ++row) {
-        memcpy(savedPixel, screenPixel, ADVMGR_BORDER_ROW_BYTES);
+        memcpy(savedPixels, screenPixel, ADVMGR_BORDER_ROW_BYTES);
         screenPixel += ADVMGR_BORDER_SCREEN_PITCH;
-        savedPixel += ADVMGR_BORDER_ROW_BYTES;
+        savedPixels += ADVMGR_BORDER_ROW_BYTES;
     }
     for (row = ADVMGR_BORDER_EDGE_SIZE; row < ADVMGR_BORDER_MIDDLE_END;
          ++row) {
-        memcpy(savedPixel, screenPixel, ADVMGR_BORDER_SIDE_BYTES);
-        memcpy(savedPixel + ADVMGR_BORDER_SIDE_BYTES,
+        memcpy(savedPixels, screenPixel, ADVMGR_BORDER_SIDE_BYTES);
+        memcpy(savedPixels + ADVMGR_BORDER_SIDE_BYTES,
                screenPixel + ADVMGR_BORDER_MIDDLE_END,
                ADVMGR_BORDER_SIDE_BYTES);
         screenPixel += ADVMGR_BORDER_SCREEN_PITCH;
-        savedPixel += ADVMGR_BORDER_SAVED_SIDE_BYTES;
+        savedPixels += ADVMGR_BORDER_SAVED_SIDE_BYTES;
     }
     for (row = ADVMGR_BORDER_MIDDLE_END; row < ADVMGR_SCREEN_HEIGHT; ++row) {
-        memcpy(savedPixel, screenPixel, ADVMGR_BORDER_ROW_BYTES);
+        memcpy(savedPixels, screenPixel, ADVMGR_BORDER_ROW_BYTES);
         screenPixel += ADVMGR_BORDER_SCREEN_PITCH;
-        savedPixel += ADVMGR_BORDER_ROW_BYTES;
+        savedPixels += ADVMGR_BORDER_ROW_BYTES;
     }
 }
 
@@ -7293,14 +7290,14 @@ int MapExtraPosAndAdjacentsSet(int x, int y, unsigned char mask)
     return 0;
 }
 
-// @match-note
-// Complete 0x6c frame and retail slots (Y/window/icon/X adjustment/count/Y
-// adjustment/row/piece/end/pixel/order[48]/X); all 54 relocation targets
-// agree. Residuals are three string-pool names, the commuted Y*5+X*2 lowering,
-// and pixel<rowEnd lowering as jbe instead of jae. Tried both term orders,
-// constant-left multiplication, and an explicit >= break (which regressed).
-// Revisit only with new expression/TU evidence or after the SOURCE placeholder
-// census is zero.
+// @early-stop
+// Complete 0x6c frame/slots, CFG, semantics, and all 54 ordered relocation
+// sites/targets agree. The only three unmasked bytes are +0x385, +0x388, and
+// +0x38a: base loads pixelIterator then compares rowLimitAddress and emits jbe;
+// retail loads rowLimitAddress then compares pixelIterator and emits jae. Both
+// pixelIterator < rowLimitAddress and the reversed rowLimitAddress >
+// pixelIterator spelling compile identically. Revisit after a relevant ADVMGR
+// predecessor/header change alters this TU-cumulative commutative load order.
 VA(0x0046a1dd, 0x4c6)
 void advManager::ViewPuzzle(void)
 {
@@ -8153,7 +8150,9 @@ int GetManaFrame(int mana) {
 }
 
 // @early-stop
-// Exact bytes and all 42 relocation targets.
+// @early-stop-reloc-only
+// All 0x559 relocation-masked bytes and all 42 ordered relocation sites/targets
+// are identical; objdiff differs only on compiler-local string/float symbol names.
 VA(0x0046bce8, 0x559)
 int advManager::DoVisions(hero *visionHero)
 {
