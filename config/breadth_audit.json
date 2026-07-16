@@ -959,6 +959,28 @@
       "note": "No-army guard return removes redundant continuation; all 979 bytes and 24 relocations agree."
     },
     {
+      "unit": "SOURCE/SWAPMGR",
+      "function": "?Main@swapManager@@UAEHAAUtag_message@@@Z",
+      "source_hash": "b2288406120e",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 99.96976,
+      "after": 99.96976,
+      "note": "Complete body frame CFG and 71 relocs; six real case-exit branch destinations remain after shared-goto steering regressed."
+    },
+    {
+      "unit": "SOURCE/SWAPMGR",
+      "function": "?SwapMons@swapManager@@QAEXXZ",
+      "source_hash": "5c59bb601929",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "exact",
+      "iterations": 2,
+      "before": 99.94546,
+      "after": 100.0,
+      "note": "Scalar-lvalue escapes restore all three repeated operand-order pairs; function is exact."
+    },
+    {
       "unit": "SOURCE/TOWN",
       "function": "?BuildBuilding@town@@QAEXH@Z",
       "source_hash": "5b85e7506518",
