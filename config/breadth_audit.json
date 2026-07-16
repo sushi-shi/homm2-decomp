@@ -531,6 +531,61 @@
     },
     {
       "unit": "SOURCE/AI",
+      "function": "?AICheckRetreat@combatManager@@QAEHXZ",
+      "source_hash": "9c5afd5833b5",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 7,
+      "before": 99.73036,
+      "after": 99.73036,
+      "note": "Complete semantics/frame/slots/CFG and 29 ordered relocations; residual FPU store/compare schedule resisted three source spellings and four TU-state probes."
+    },
+    {
+      "unit": "SOURCE/AI",
+      "function": "?AttemptAdjacentAttack@combatManager@@QAEHPAVarmy@@@Z",
+      "source_hash": "140c81bd291d",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 4,
+      "before": 99.11504,
+      "after": 99.11504,
+      "note": "All 99 non-jump instructions and six ordered relocations exact; sole residual one five-byte Ob1 continuation jump; four TU-state probes did not close."
+    },
+    {
+      "unit": "SOURCE/AI",
+      "function": "?AttemptAttack@combatManager@@QAEHPAVarmy@@HH@Z",
+      "source_hash": "f8a0927303b2",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 3,
+      "before": 86.07299,
+      "after": 100.0,
+      "note": "Scalar-SIB lvalues fixed all three army-index address blocks; raw function and eight ordered relocations exact."
+    },
+    {
+      "unit": "SOURCE/AI",
+      "function": "?DoCompAI@combatManager@@QAEXH@Z",
+      "source_hash": "bcc3c663b9eb",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 4,
+      "before": 97.140656,
+      "after": 97.140656,
+      "note": "Complete semantics/frame/slots/CFG and 92 ordered relocations; operand-order and Ob1 continuation-jump placement remained after four bounded TU-state probes."
+    },
+    {
+      "unit": "SOURCE/AI",
+      "function": "?DoLichShot@combatManager@@QAEXPAVarmy@@@Z",
+      "source_hash": "71e8f6e66f8c",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 3,
+      "before": 99.72727,
+      "after": 100.0,
+      "note": "Scalar-SIB lvalue forced retail floating comparison operand order; raw function and six ordered relocations exact."
+    },
+    {
+      "unit": "SOURCE/AI",
       "function": "?GetAllMask@combatManager@@QAEHH@Z",
       "source_hash": "cccc40393b4e",
       "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
@@ -553,6 +608,17 @@
     },
     {
       "unit": "SOURCE/AI",
+      "function": "?GetClosestArmy@combatManager@@QAEHPAVarmy@@HH@Z",
+      "source_hash": "b97e2f165af9",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 4,
+      "before": 93.60361,
+      "after": 100.0,
+      "note": "Scalar-SIB lvalues fixed mask, army-index addressing, and comparison load order; raw function and two ordered relocations exact."
+    },
+    {
+      "unit": "SOURCE/AI",
       "function": "?GetFlyerMask@combatManager@@QAEHH@Z",
       "source_hash": "6cf02a469494",
       "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
@@ -572,6 +638,17 @@
       "before": 88.43636,
       "after": 88.43636,
       "note": "complete; equivalent pointer-add term orders emitted the same m_armies evaluation order"
+    },
+    {
+      "unit": "SOURCE/AI",
+      "function": "?GetModLichDamage@combatManager@@QAEMPAVarmy@@M@Z",
+      "source_hash": "194662536c5d",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.91228,
+      "after": 99.91228,
+      "note": "Relocation-masked code bytes exact; delinker renames anonymous constants and misattributes __adjust_fdiv as iLeftRightSave+0x10."
     },
     {
       "unit": "SOURCE/AI",
@@ -638,6 +715,17 @@
       "before": 98.91228,
       "after": 98.73684,
       "note": "complete; one worst-strength compare operand-memory choice remains; value pin added a test mismatch"
+    },
+    {
+      "unit": "SOURCE/AI",
+      "function": "?WalkTowardArmyFront@combatManager@@QAEHPAVarmy@@HH@Z",
+      "source_hash": "fc992b388363",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 3,
+      "before": 92.38323,
+      "after": 100.0,
+      "note": "Scalar-SIB lvalues fixed both army-index address blocks; raw function and sixteen ordered relocations exact."
     },
     {
       "unit": "SOURCE/ARMY",
