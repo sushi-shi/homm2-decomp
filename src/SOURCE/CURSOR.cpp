@@ -35,8 +35,6 @@
 #define CURSOR_SOURCE_FILE \
     const_cast<char *>("I:\\Projects\\Heroes\\Prog\\SOURCE\\CURSOR.CPP")
 
-DATA(0x004ee1dc) static short s_groupLineBase = CURSOR_GROUP_LINE_BASE;
-
 // @early-stop
 // All non-relocation bytes and all six effective targets match. Retail delinks
 // normalDirTable.y at 0xfaa79 as ??_C@_02DNGE while base uses normalDirTable+1.
@@ -1236,6 +1234,7 @@ duplicateChange:
 VA(0x00410a5b, 0xce)
 void advManager::ProcessIncomingGroupMapChange(char *incomingData)
 {
+    DATA(0x004ee1dc) static short s_groupLineBase = CURSOR_GROUP_LINE_BASE;
     SMapChange *ptr;
     int size;
     SMapChange *buf;
@@ -1359,6 +1358,31 @@ void SendMapChange(int type, signed char id, unsigned char x, unsigned char y,
 }
 
 // ---- globals (definitions, RVA order) ----
+// @data-layout-note Retail initialized storage is 0xee020+0x228; candidate is
+// 0x224. All public initializers and private literals are byte-exact. Candidate
+// groups ProcessIncomingGroupMapChange's 1505 line-base word at +0 and
+// bMoveSoundMade at +4, while retail places bMoveSoundMade at +0, a zero word
+// at +4, and the line base at +0x1bc. Candidate +8..+0x1bc equals retail at the
+// same offsets; candidate +0x1bc..+0x224 equals retail +0x1c0..+0x228. The two
+// retail references from ProcessIncomingGroupMapChange load the word owner with
+// addend zero, then add 7 and 25; candidate emits the same instructions and
+// addends. The opt-in relocation helper calls the recovered private identity
+// fake because the delinked target synthesizes const_000ee1dc; this is the same
+// publics-only representational limitation as COMMAND, not a fallback identity.
+// Candidate and retail .rdata are byte-exact at 0xeb078+0x8, with SHA-256
+// e163f8cb0f7067a7fc78ca859a77f849aea3214f38fb75b884e4a16be725c905.
+//
+// Retail zero-fill is 0x124bc0+0x48; candidate is 0x40. Retail orders cycle,
+// frame-count, turning, base-frame, and direction at +0..+0x14, leaves four
+// bytes before sMapChangeLastFew at +0x18, and has four owner-tail bytes.
+// Candidate COMMON order is frame-count +0, base-frame +4,
+// sMapChangeLastFew +8, direction +0x34, cycle +0x38, turning +0x3c. All six
+// public allocations have their proven types and extents. Focused audits for
+// DrawCursor, DrawCursorShadow, MoveHero, ProcessIncomingGroupMapChange,
+// PurgeMapChangeQueue, and SendMapChange cover 61/61, 22/22, 158/158, 9/9,
+// 2/2, and 14/14 ordered relocations with only-base=0. Revisit only with a
+// natural compiler allocation-order change; do not add padding, aliases,
+// synthetic identities, or unattached literals.
 DATA(0x004ee020) int bMoveSoundMade = 1;
 DATA(0x004ee028) int giPixelsPerStep[6] = { 2, 4, 6, 8, 16, 0 };
 DATA(0x004ee040) int giStepDelay[5] = { 20, 25, 20, 15, 15 };
