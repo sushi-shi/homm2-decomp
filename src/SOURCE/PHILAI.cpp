@@ -35,6 +35,35 @@
 
 // __FILE__ for the NWC BaseAlloc/BaseFree memory tracking (reloc-masked path string).
 #define PHFILE const_cast<char *>("I:\\Projects\\Heroes\\Prog\\SOURCE\\PHILAI.CPP")
+#define PHILAI_INIT_MAP_LINE_BASE 0x1b86
+#define PHILAI_CLOSE_MAP_LINE_BASE 0x1b96
+
+// @data-layout-note
+// Retail initialized storage is 0xf20e0..0xf2552 (0x472 bytes). The 18 public
+// definitions, 35 compiler-private literals, and two recovered short line-base
+// statics have exact retail owners and payloads; all private references use
+// owner-relative addend zero. The line bases are 0x1b86 at 0xf2394 and 0x1b96
+// at 0xf2474, with five references each. The separate CRT constructor entry is
+// at 0xec004. Do not restore the former five overlapping literal aliases for
+// either line base.
+//
+// Retail .rdata is 0xeb280..0xeb5e0 (0x360 bytes). Candidate .rdata is 0x368
+// bytes and contains the complete retail four-byte payload multiset plus two
+// candidate-only zero words, so whole-section translation is not valid. The
+// supplemental manifest records only the 86 private allocations (0x24c bytes)
+// proved by one-owner aligned relocation sites and exact payloads. The other
+// 53 repeated, unreferenced, or nonexact candidate allocations remain
+// intentionally unclaimed. The corrected pool distinguishes campfire 500.0f,
+// buoy 400.0f, watering-hole 300.0f, and the shared 200.0f land-site factor.
+//
+// All 33 zero-fill owners are source DATA definitions. Their retail public
+// span is 0x125620..0x127e20 (0x2800 bytes); candidate COMMON ordering differs
+// and is not a reason to add padding or aliases. Of 1238 candidate data
+// references, 1231 pair at exact function-relative sites. The seven residuals
+// are two uncarved initializer references and five already documented
+// function-shape sites, not evidence for another data owner.
+DATA(0x004f2394) static short s_initAIMapLineBase = PHILAI_INIT_MAP_LINE_BASE;
+DATA(0x004f2474) static short s_closeAIMapLineBase = PHILAI_CLOSE_MAP_LINE_BASE;
 
 DATA(0x005256f0) searchArray SVSearchArray;
 
@@ -4095,7 +4124,7 @@ void philAI::BuildHero(town *townPtr, int availableHeroIndex) {
     int townY9;
     hero *newHero6;
 
-    sprintf(gText, "Player %d built hero in town %d.", giCurPlayer,
+    sprintf(gText, "Player %d built hero in town %d.\n", giCurPlayer,
             townPtr->m_id);
     LogStr(gText);
     if (giDebugLevel >= AI_PURCHASE_DEBUG_LEVEL) {
@@ -4160,7 +4189,7 @@ void philAI::BuildCreature(town *townPtr, int dwelling, int purchaseCount) {
     int monsterCosts10[AI_PURCHASE_RESOURCE_COUNT];
     float weakestValue5;
 
-    sprintf(gText, "Player %d built %d %s in town %d.", giCurPlayer,
+    sprintf(gText, "Player %d built %d %s in town %d.\n", giCurPlayer,
             purchaseCount,
             GetMonsterName(gDwellingType[townPtr->m_type][dwelling]),
             townPtr->m_id);
@@ -4768,7 +4797,7 @@ int philAI::ValueOfEventAtPosition(int x, int y, int immediate, int *liveChance)
     case AI_OBJECT_BUOY:
         if (!(gpCurAIHero->m_eventFlags & 2) && giCurAIHeroMorale < 3)
             value_h = static_cast<int>(
-                gpCurAIHero->m_aiFightValue * AI_MORALE_LUCK_SITE_VALUE_FACTOR);
+                gpCurAIHero->m_aiFightValue * AI_BUOY_VALUE_FACTOR);
         break;
     case AI_OBJECT_TEMPLE:
         if (!(gpCurAIHero->m_eventFlags & 0x100) && giCurAIHeroMorale < 3)
@@ -5392,33 +5421,33 @@ void InitAIMapVars(void) {
     SVSearchArray.Init();
     gaiLiveChanceOfPos = static_cast<short *>(
         BaseAlloc(0[&MAP_WIDTH] * MAP_HEIGHT * 2, PHFILE,
-                  *reinterpret_cast<const short *>("\x86\x1b") + 8));
+                  s_initAIMapLineBase + 8));
     gaiHeroStrategicRVOfPos = static_cast<short *>(
         BaseAlloc(0[&MAP_WIDTH] * MAP_HEIGHT * 2, PHFILE,
-                  *reinterpret_cast<const short *>("\x86\x1b") + 9));
+                  s_initAIMapLineBase + 9));
     gaiHeroEventStratRVOfPos = static_cast<short *>(
         BaseAlloc(0[&MAP_WIDTH] * MAP_HEIGHT * 2, PHFILE,
-                  *reinterpret_cast<const short *>("\x86\x1b") + 10));
+                  s_initAIMapLineBase + 10));
     gaiTurnValueOfMine = static_cast<signed char *>(
         BaseAlloc(0[&MAP_WIDTH] * MAP_HEIGHT, PHFILE,
-                  *reinterpret_cast<const short *>("\x86\x1b") + 11));
+                  s_initAIMapLineBase + 11));
     gaiEnemyHeroReachable = static_cast<signed char *>(
         BaseAlloc(0[&MAP_WIDTH] * MAP_HEIGHT, PHFILE,
-                  *reinterpret_cast<const short *>("\x86\x1b") + 12));
+                  s_initAIMapLineBase + 12));
 }
 
 VA(0x00445fe6, 0x112)
 void CloseAIMapVars(void) {
     if (gaiLiveChanceOfPos != 0)
-        BaseFree(gaiLiveChanceOfPos, PHFILE, *reinterpret_cast<const short *>("\x96\x1b") + 1);
+        BaseFree(gaiLiveChanceOfPos, PHFILE, s_closeAIMapLineBase + 1);
     if (gaiHeroStrategicRVOfPos != 0)
-        BaseFree(gaiHeroStrategicRVOfPos, PHFILE, *reinterpret_cast<const short *>("\x96\x1b") + 2);
+        BaseFree(gaiHeroStrategicRVOfPos, PHFILE, s_closeAIMapLineBase + 2);
     if (gaiHeroEventStratRVOfPos != 0)
-        BaseFree(gaiHeroEventStratRVOfPos, PHFILE, *reinterpret_cast<const short *>("\x96\x1b") + 3);
+        BaseFree(gaiHeroEventStratRVOfPos, PHFILE, s_closeAIMapLineBase + 3);
     if (gaiTurnValueOfMine != 0)
-        BaseFree(gaiTurnValueOfMine, PHFILE, *reinterpret_cast<const short *>("\x96\x1b") + 4);
+        BaseFree(gaiTurnValueOfMine, PHFILE, s_closeAIMapLineBase + 4);
     if (gaiEnemyHeroReachable != 0)
-        BaseFree(gaiEnemyHeroReachable, PHFILE, *reinterpret_cast<const short *>("\x96\x1b") + 5);
+        BaseFree(gaiEnemyHeroReachable, PHFILE, s_closeAIMapLineBase + 5);
     gaiLiveChanceOfPos = 0;
     gaiHeroStrategicRVOfPos = 0;
     gaiHeroEventStratRVOfPos = 0;
