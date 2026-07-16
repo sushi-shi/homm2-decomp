@@ -467,7 +467,7 @@ void hero::Deallocate(int updateMap) {
         gpGame->m_campaignType == CAMPAIGN_ROLAND &&
         gpGame->m_campaignScenario + 1 == CAMPAIGN_ROLAND_FINAL_SCENARIO &&
         !gbRetreatWin && !gbCombatSurrender) {
-        gpGame->m_campaignAwards[CAMPAIGN_AWARD_DEFEAT_CORLAGON] = 1;
+        gpGame->m_campaignAwards[CAMPAIGN_AWARD_CORLAGON_DEFEATED] = 1;
     }
 
     if (updateMap)
