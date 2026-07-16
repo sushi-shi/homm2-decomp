@@ -10,8 +10,8 @@ typedef enum TextWidgetSourceFileSize {
 typedef struct STextWidgetSourceFiles {
     char read[TEXT_WIDGET_SOURCE_FILE_SLOT_SIZE];
     char destruction[TEXT_WIDGET_SOURCE_FILE_SLOT_SIZE];
-    char mainMessage[TEXT_WIDGET_SOURCE_FILE_SLOT_SIZE];
-    char setText[TEXT_WIDGET_SOURCE_FILE_SLOT_SIZE];
+    char resizeFree[TEXT_WIDGET_SOURCE_FILE_SLOT_SIZE];
+    char resizeAlloc[TEXT_WIDGET_SOURCE_FILE_SLOT_SIZE];
 } STextWidgetSourceFiles;
 
 SIZE(STextWidgetSourceFiles, 0xb0);
