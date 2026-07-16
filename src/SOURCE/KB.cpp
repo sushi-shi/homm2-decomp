@@ -787,14 +787,6 @@ char toupper(char c)
         return c;
 }
 
-// @semantic
-// Exact 0x28 frame and 139/139 relocation sites. The first code residual is the
-// outer scan test: base loads len then emits `cmp i,len; jge`, while retail loads
-// i then emits `cmp len,i; jle`. Direct `i < len`, `len > i`, and negated-bound
-// spellings are byte-identical; an explicit break loop gets the operand order
-// but adds a branch. Later diff alignment crosses tables at +0x567/+0x5bd.
-// The 18 reported base-only targets are gConfig/gcCommandLine interior aliases;
-// effective addresses agree. Revisit for TU-cumulative operand ordering.
 VA(0x0049859c, 0x791)
 int InterpretCommandLine(void)
 {
@@ -820,7 +812,7 @@ int InterpretCommandLine(void)
     strcpy(gFullMapName, "Chaos");
 
     len = strlen(gcCommandLine);
-    for (i = 0; len > i; i++) {
+    for (i = 0; 0[&len] > i; i++) {
         if (gcCommandLine[i] == ' ' &&
             i + 1 < len &&
             (gcCommandLine[i + 1] == '?' ||
@@ -1330,6 +1322,12 @@ void GetMonsterCost(int monster, int *const cost)
     }
 }
 
+// @semantic
+// Complete 0x2b5 body, 0x10 frame, local roles/slots, CFG, and 5/5 relocations
+// align. Only +0x261/+0x264 differ: retail loads reqMask [ebp-8] then ANDs
+// haveMask [ebp-4], while ours loads haveMask then ANDs reqMask. Commuting the
+// AND/equality and wrapping either scalar lvalue with 0[&...] were byte-neutral;
+// revisit after later KB TU/header state changes.
 VA(0x00499a6c, 0x2b5)
 int CanBuild(town *t, int building)
 {
@@ -1426,11 +1424,6 @@ int GetBuildingBaseResourceValue(int race, int building, int level)
     }
 }
 
-// @early-stop
-// All 542 authoritative bytes are identical after masking relocations, and all
-// 35 effective relocation targets agree. The residual is confined to the
-// giWaitType jump table at +0x193..+0x1ca, whose self-relocations have different
-// delinked local-label identities.
 VA(0x00499e81, 0x21e)
 int WaitHandler(tag_message &msg)
 {
@@ -1455,10 +1448,10 @@ int WaitHandler(tag_message &msg)
         case 0:
             result = WaitForOtherPlayer();
             break;
-        case 1:
+        case 2:
             result = WaitForHost();
             break;
-        case 2:
+        case 1:
             result = WaitForGuest();
             break;
         case 3:
@@ -3031,10 +3024,6 @@ void SmackFade(unsigned char *src, unsigned char *dst)
              smackFadeSourceLineBase + KB_SOURCE_LINE_SMACK_FADE_MAP_FREE_OFFSET);
 }
 
-// @early-stop
-// Exact 0x330 frame after recovering the 0x304 palette aggregate with its 0x300
-// copied prefix. All normalized instructions and 69/69 relocation sites align;
-// the 99.92% residual is limited to delinked source-line and string identities.
 VA(0x0049e5fd, 0x303)
 void ShowCongrats(int highScoreType)
 {
@@ -3042,7 +3031,7 @@ void ShowCongrats(int highScoreType)
         KB_SOURCE_LINE_CONGRATS_BASE;
     unsigned char savedPalette[CONGRATS_PALETTE_BUFFER_SIZE];
     int baseScore;
-    int score;
+    int score_e;
     char rating[CONGRATS_RATING_LENGTH];
 
     gpMouseManager->HideColorPointer();
@@ -3052,11 +3041,11 @@ void ShowCongrats(int highScoreType)
         CONGRATS_TEXT_SIZE, KBFILE,
         congratsSourceLineBase + KB_SOURCE_LINE_CONGRATS_ALLOC_OFFSET));
     baseScore = CalcBaseScore(giCurTurn);
-    score = gpGame->m_difficultyRating * baseScore / CONGRATS_DIFFICULTY_SCALE;
+    score_e = gpGame->m_difficultyRating * baseScore / CONGRATS_DIFFICULTY_SCALE;
     gpSoundManager->PlayAmbientMusic(CONGRATS_MUSIC_SILENT, 0, CONGRATS_MUSIC_SILENT);
 
     if (highScoreType == CONGRATS_STANDARD) {
-        sprintf(rating, gArmyNames[GetMonType(score, highScoreType)]);
+        sprintf(rating, gArmyNames[GetMonType(score_e, highScoreType)]);
     } else if (highScoreType == CONGRATS_EXPANSION_CAMPAIGN) {
         sprintf(rating,
                 gArmyNames[GetMonType(xCampaign.Days(), highScoreType)]);
@@ -3070,7 +3059,7 @@ void ShowCongrats(int highScoreType)
     if (highScoreType == CONGRATS_STANDARD) {
         sprintf(congratsText,
                 "Congratulations!\n\nDays: %d\nBase Score: %d\nDifficulty: %d\n\nScore: %d\n\nRating:\n%s\n",
-                giCurTurn, baseScore, gpGame->m_difficultyRating, score, rating);
+                giCurTurn, baseScore, gpGame->m_difficultyRating, score_e, rating);
     } else if (highScoreType == CONGRATS_EXPANSION_CAMPAIGN) {
         sprintf(congratsText,
                 "Congratulations!\n\nDays: %d\n\nRating:\n%s\n",
@@ -3087,7 +3076,7 @@ void ShowCongrats(int highScoreType)
     memcpy(gPalette->m_data, savedPalette, CONGRATS_PALETTE_SIZE);
     memcpy(gpBufferPalette->m_data, gPalette->m_data, CONGRATS_PALETTE_SIZE);
     gpMouseManager->ShowColorPointer();
-    AddScoreToHighScore(score, giCurTurn, gpGame->m_difficultyRating,
+    AddScoreToHighScore(score_e, giCurTurn, gpGame->m_difficultyRating,
                         CONGRATS_STANDARD, gpGame->m_mapHeader.name);
     BaseFree(congratsText, KBFILE,
              congratsSourceLineBase + KB_SOURCE_LINE_CONGRATS_FREE_OFFSET);
@@ -3456,13 +3445,6 @@ adjustSound:
     return 0;
 }
 
-// @match-note
-// Pre-95 structural checkpoint (94.755%): exact 0x10 frame, exact 0x310 span,
-// complete music/sound menu loops and switches, and 38/38 relocation sites with
-// no base-only target. Both 0x28-byte tables start at the retail offsets +0x130
-// and +0x24a. The first residual is a delinked gConfig interior-symbol identity;
-// direct loops and retail-order cases are present. Revisit at 95% for explicit-
-// range raw-byte proof and any remaining local-label steering.
 VA(0x0049f61d, 0x310)
 void UpdateSystemOptionsMenu(void)
 {
@@ -3473,7 +3455,7 @@ void UpdateSystemOptionsMenu(void)
         return;
     if (hmnuApp == 0)
         return;
-    if (hmnuApp != hmnuAdv)
+    if (0[&hmnuAdv] != hmnuApp)
         return;
 
     for (menuCommand = APP_MENU_MUSIC_FIRST; menuCommand <= APP_MENU_MUSIC_LAST;
@@ -3627,7 +3609,7 @@ void SetupDynamicWindow(int x, int y, int centered, int boundsWidth, int boundsH
     rightOffset = *contentRight - x;
     bottomOffsetLocal = *contentBottom - y;
 
-    for (tileRowPos = 0; tileRowPos < numRows; tileRowPos++) {
+    for (tileRowPos = 0; 0[&tileRowPos] < numRows; tileRowPos++) {
         for (columnIndex = 0; columnIndex < columnsSize; columnIndex++) {
             newWidgetTemp = new iconWidget(
                 columnIndex * DYNAMIC_TILE_SIZE + leftOffset,
@@ -3694,7 +3676,7 @@ void SetupDynamicWindow(int x, int y, int centered, int boundsWidth, int boundsH
         (*window)->AddWidget(newWidgetTemp, -1);
     }
 
-    for (edge = 0; edge < numRows; edge++) {
+    for (edge = 0; 0[&edge] < numRows; edge++) {
         newWidgetTemp = new iconWidget(
             leftOffset - DYNAMIC_CORNER_LEFT,
             edge * DYNAMIC_TILE_SIZE + topOffsetNum - DYNAMIC_EDGE_OFFSET,
@@ -3885,10 +3867,6 @@ void ReceiveHostReportsPlayerExit(int hostNetPosition, SPlayerExit exitInfo,
                      -1, -1, -1, PLAYER_EXIT_MESSAGE_TIME);
 }
 
-// @early-stop
-// Explicit-range comparison finds all 230 instructions aligned over the exact
-// 0x361 span, with frame 0x10 and every stack slot matching. All 45 relocations
-// agree by offset/type/target; the residual is delinked literal/local identity.
 VA(0x004a07e3, 0x361)
 void ReceiveRemotePlayerExit(SPlayerExit exitInfo)
 {
@@ -3972,7 +3950,9 @@ playerExitHandled:
                      -1, 0);
         gbGameOver = 1;
         giEndSequence = 0;
-    } else if (!exitInfo.continueGame) {
+        return;
+    }
+    if (!exitInfo.continueGame) {
         ShutDown(0);
     }
 }
