@@ -244,14 +244,6 @@ void HeroMessageUpdate(char *text) {
     gpWindowManager->UpdateScreenRegion(0, 459, 640, 20);
 }
 
-// @match-note 97.27%: semantics, the 0x24 frame, message/index/this slots at
-// -0x1c/-0x20/-0x24, CFG, and all 8/8 relocations agree. First divergence is +0x34:
-// retail bytes `8b 45 e0; 39 05 <giHeroScreenSrcIndex>` load index then compare the
-// global (9-byte span through +0x3c); base bytes `a1 <giHeroScreenSrcIndex>; 39 45 e0`
-// load the global then compare index (8-byte span through +0x3b). The remaining
-// instructions and operands agree, with branch displacements shifted by that byte.
-// Tried `global == index`, `index == global`, and `0[&index] == global`; all retained
-// the global-first form, leaving only this TU-cumulative load-order difference.
 VA(0x0046cb33, 0xa8)
 void hero::HeroScreenUpdate(void) {
     tag_message message;
@@ -260,7 +252,7 @@ void hero::HeroScreenUpdate(void) {
     message.type = HERO_UI_MESSAGE;
     UpdateArmies();
     for (index = 0; index < HERO_UI_ARMY_SLOT_COUNT; index++) {
-        if (index == giHeroScreenSrcIndex)
+        if (index == 0[&giHeroScreenSrcIndex])
             message.payload.widget.command = HERO_UI_WIDGET_ENABLE;
         else
             message.payload.widget.command = HERO_UI_WIDGET_DISABLE;

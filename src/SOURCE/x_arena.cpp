@@ -176,6 +176,12 @@ int ArenaWindowHandler(struct tag_message &message_1)
     return EVENT_WINDOW_CONTINUE;
 }
 
+// @semantic
+// Complete body, 0x8 frame/slots, CFG, and all 18 ordered relocation targets
+// agree. At +0x8d retail loads global choice with the five-byte absolute EAX
+// form before comparing widgetIndex; base loads the local first, making the body
+// one byte longer and shifting later relocation sites. Operand swap and
+// widgetIndex == 0[&choice] were byte-neutral.
 VA(0x004c063b, 0x150)
 void UpdateArenaIcons(void)
 {

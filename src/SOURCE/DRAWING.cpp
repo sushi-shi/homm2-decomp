@@ -249,9 +249,9 @@ void combatManager::ResetLimitCreature(void)
              armySlotIndex++) {
             if ((m_armies[side][armySlotIndex].m_monster.flags.all &
                  COMBAT_ARMY_FLAG_MIRROR_IMAGE) != 0)
-                m_limitCreatureCount[side][armySlotIndex] = -1;
+                m_limitCreatureCount[side][0[&armySlotIndex]] = -1;
             else
-                m_limitCreatureCount[side][armySlotIndex] = 0;
+                m_limitCreatureCount[side][0[&armySlotIndex]] = 0;
         }
     }
     m_drawHero[0] = 0;
@@ -318,6 +318,11 @@ void combatManager::SetupGridForArmy(army *armyPtr)
     }
 }
 
+// @semantic
+// Complete 0x5fb body, frame/slots, CFG, and all 15 ordered relocations agree.
+// The outer army-side qualification fixes the address arithmetic. Remaining
+// +0x17d/+0x18c and +0x242/+0x251 bytes reverse m_gridState and
+// m_previousGridState loads; qualifying the current-state lvalues was neutral.
 VA(0x00403621, 0x5fb)
 int combatManager::UpdateGrid(int resetGridDisplay, int rebuildGrid)
 {
@@ -340,7 +345,7 @@ int combatManager::UpdateGrid(int resetGridDisplay, int rebuildGrid)
             m_gridSelectionDisabled != 0) {
             memset(m_gridState, COMBAT_GRID_SHADE_NONE, sizeof(m_gridState));
         } else {
-            SetupGridForArmy(&m_armies[m_currentArmySide][m_currentArmyIndex]);
+            SetupGridForArmy(&m_armies[0[&m_currentArmySide]][m_currentArmyIndex]);
         }
     }
     if (resetGridDisplay != 0)

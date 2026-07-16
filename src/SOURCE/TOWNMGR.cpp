@@ -3341,7 +3341,7 @@ void SortStats(long int * const stats, signed char * const order)
          ++firstPlayer) {
         for (secondPlayer = firstPlayer + 1;
              secondPlayer < gpGame->m_playerCount; ++secondPlayer) {
-            if (stats[secondPlayer] > stats[firstPlayer]) {
+            if (stats[0[&secondPlayer]] > stats[firstPlayer]) {
                 tempStat = stats[firstPlayer];
                 stats[firstPlayer] = stats[secondPlayer];
                 stats[secondPlayer] = tempStat;

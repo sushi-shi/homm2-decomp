@@ -1585,8 +1585,11 @@ int army::WalkTo(void)
     return WalkTo(m_moveTargetHex);
 }
 
-// @early-stop
-// Exact 0x2ee-byte match, including all 19 relocation sites.
+// @semantic
+// Complete 0x2ee body, 0x18 frame/slots, CFG, and all 19 ordered relocation
+// targets agree. At +0x12e retail calls GetAdjacentCellIndex before loading
+// moatCell[moatIndex]; base loads the table byte before the call. Swapped
+// equality operands and qualifying the table lvalue were byte-neutral.
 VA(0x0044f443, 0x2ee)
 int army::WalkTo(int destination)
 {

@@ -21,6 +21,10 @@
 #include <SOURCE/game.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/REQUEST.h>
+// @early-stop
+// @early-stop-reloc-only
+// All 0x80 relocation-masked bytes and eight ordered relocation sites/effective
+// targets agree; residuals are CRT/compiler-local symbol spellings only.
 VA(0x0048c920, 0x80)
 int GetMapHeader(char *filename, struct SMapHeader *header)
 {
@@ -1100,6 +1104,11 @@ void fileRequester::Update(int drawWindow)
     }
 }
 
+// @semantic
+// Complete 0x15b body, 0x4 frame/this slot, CFG, and all 12 ordered relocations
+// agree. At +0x3c retail keeps the positive fileCount > selectedIndex test as
+// `jg`; base canonicalizes the equivalent invalid guard to `jl`. Positive-arm,
+// negated-positive, and explicit !(>) spellings were exhausted.
 VA(0x0048fbc4, 0x15b)
 char * fileRequester::GetFilename(void)
 {

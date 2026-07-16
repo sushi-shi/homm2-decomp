@@ -1502,11 +1502,6 @@ int WaitHandler(tag_message &msg)
     return 1;
 }
 
-// @early-stop
-// All 1,138 authoritative bytes are identical after masking relocations, and
-// all 63 effective relocation targets agree. The retained residual is delinked
-// identity for local jump tables at +0x35d..+0x388 and +0x41c..+0x427, plus
-// equivalent string and cLuckInfo/cMoraleInfo interior aliases.
 VA(0x0049a09f, 0x472)
 int EventWindowHandler(struct tag_message &msg)
 {
@@ -1661,14 +1656,11 @@ void PlayerDead(int player)
 
 // @semantic
 // Complete 0x19bb body, 0x1c4 frame/slots, CFG, and 300/300 effective relocation
-// targets align. First raw divergence is +0xd00: the day calculation evaluates
-// month then week and emits `lea [week7+month7*4]` with reversed base/index from
-// retail; the same residual repeats at +0x15e5. At +0x1632 retail evaluates the
-// campaign completed-table scenario index before type (ours does type first),
-// shifting one gpGame relocation by four bytes; the days+bonus addition at
-// +0x16a8/+0x16d1 is likewise commutative load order. Commuted terms, explicit
-// 7*4 scaling, 0[&month/type], and a commuted subscript were byte-neutral.
-// Revisit after later KB TU/header changes.
+// targets align. The shared playerData epoch leaves one 17-byte residual at
+// +0xe32: retail materializes campaign type before scenario for the completed
+// table address, while base reverses the equivalent index arithmetic. Commuted
+// subscripts and qualifying m_campaignType regressed or were byte-neutral.
+// Revisit after a later KB TU/header change.
 VA(0x0049a6c1, 0x19bb)
 void CheckEndGame(int forcedResult, int dragonCityCaptured)
 {
@@ -3521,6 +3513,10 @@ void CleanUpMenus(void)
     hmnuApp = 0;
 }
 
+// @semantic
+// Complete 0x2a body, 0x4 frame/slots, CFG, and both ordered relocations agree.
+// At +0xe retail loads hMenu from -0x4 and compares hmnuAdv; base loads the
+// global first. Swapped operands and 0[&hMenu] were byte-neutral.
 VA(0x0049f9c6, 0x2a)
 void UpdateAppSpecificMenus(void *hMenu)
 {
@@ -3774,6 +3770,10 @@ void HandleRemoteSuddenExit(void)
     DelayMilli(500);
 }
 
+// @semantic
+// Complete 0x62 body, 0x8 frame/slots, CFG, and all five ordered relocations
+// agree. At +0x2b retail loads i from -0x8 and compares giThisNetPos; base
+// loads the global and compares i. Swapped operands and 0[&i] were byte-neutral.
 VA(0x004a036f, 0x62)
 void DropDownToOnePlayer(void)
 {

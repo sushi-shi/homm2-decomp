@@ -308,11 +308,6 @@ int army::GetAdjacentCellIndex(int sourceHex, int direction)
                      sourceHex * COMBAT_AI_ADJACENT_DIRECTION_COUNT];
 }
 
-// @early-stop
-// TU-cumulative +0x4a..+0x55: both streams compute direction + sourceHex*6,
-// but retail loads direction first and uses two LEAs while ours scales sourceHex
-// first. Frame/CFG and the gpCombatManager relocation agree; this exact source
-// reached 100% before the later TU-state change.
 VA(0x004be52f, 0x6e)
 int GetAdjacentCellIndexNoArmy(int sourceHex, int direction)
 {
@@ -323,7 +318,7 @@ int GetAdjacentCellIndexNoArmy(int sourceHex, int direction)
         direction = COMBAT_DIRECTION_WEST;
     else if (direction == COMBAT_DIRECTION_WIDE_EAST)
         direction = COMBAT_DIRECTION_SOUTHEAST;
-    return direction[gpCombatManager->m_adjacency[sourceHex]];
+    return 0[&direction][gpCombatManager->m_adjacency[sourceHex]];
 }
 
 VA(0x004be59d, 0x44a)

@@ -2151,14 +2151,11 @@ skipBranch:
     gpWindowManager->m_updateFlags = 1;
 }
 
-// @match-note: complete candidate filtering and nearest-distance selection; the
-// 0x2c frame, all ten semantic local slots, CFG, and 12/12 relocation targets
-// agree. The first normalized residual is the equivalent final minimum test:
-// retail emits `cmp distance,closestDistance; jge`, while the direct positive
-// arm emits the reversed operands and `jle`. Reversed positive operands, an
-// empty >= arm, and a >= continue arm were tried; the latter two add a trampoline.
-// The other residual is only $T versus retail's zero-float constant identity.
-// Revisit after a material TU-state change.
+// @semantic
+// Complete 0x18c body, 0x2c frame/slots, CFG, and all 12 ordered relocations
+// agree. Qualifying distance fixes the final minimum branch. The remaining
+// +0x12e/+0x132/+0x135/+0x139 bytes reverse the commutative deltaX/deltaY
+// square loads; writing/qualifying deltaY first was byte-neutral.
 VA(0x004266ce, 0x18c)
 int combatManager::GetNextChainLightningTarget(army *source, int requireWorks)
 {
@@ -2189,7 +2186,7 @@ int combatManager::GetNextChainLightningTarget(army *source, int requireWorks)
                     deltaY_n = abs(candidate_p->MidY() - sourceY);
                     distance = static_cast<int>(sqrt(static_cast<double>(
                         deltaX_e * deltaX_e + deltaY_n * deltaY_n)));
-                    if (closestDistance > distance) {
+                    if (0[&distance] < closestDistance) {
                         closestDistance = distance;
                         closestHex_f = candidate_p->m_hex;
                     }
