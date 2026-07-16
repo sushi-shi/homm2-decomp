@@ -961,13 +961,6 @@ void game::SetupResources(void)
     }
 }
 
-// @match-note: retained/live 99.79%. The 0x44 frame, slots, row-major zeroing
-// loop, semantics, CFG, and all 90/90 external relocations agree. The only
-// non-relocation instruction residual is in the sawmill loop: ours loads
-// sawmills4 and emits `cmp mine4,sawmills4; jle`, while retail loads mine4 and
-// emits `cmp sawmills4,mine4; jge`. Tried `sawmills4 < mine4`, the swapped
-// `mine4 > sawmills4`, both polarity forms, and an early-continue skip arm
-// (99.44%). A bounded AST pass found no audited improvement before stopping.
 VA(0x00409e89, 0x4c7)
 void game::Overview(void)
 {
@@ -1053,7 +1046,7 @@ void game::Overview(void)
         overWin->BroadcastMessage(message8);
     }
     for (mine4 = OVERVIEW_VISIBLE_ROWS; mine4 > 0; mine4--) {
-        if (sawmills4 < mine4) {
+        if (0[&sawmills4] < mine4) {
             message8.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             message8.payload.widget.id = mine4 + 49;
             message8.payload.widget.data.value = 4;
@@ -1078,6 +1071,11 @@ void game::Overview(void)
     iconWidgetDynamic = 0;
 }
 
+// @early-stop
+// @early-stop-reloc-only
+// All 0x31f relocation-masked bytes, frame/slots/CFG, and 49 ordered relocation
+// sites/effective targets agree; residuals are compiler-local float constants
+// and the __adjust_fdiv/iLeftRightSave owner alias.
 VA(0x0040a350, 0x31f)
 void game::DoKnob(void)
 {
@@ -1120,7 +1118,7 @@ void game::DoKnob(void)
                 OVScrollKnob->m_y =
                     static_cast<short>(message9.payload.mouse.y - OVERVIEW_SCROLL_KNOB_OFFSET);
                 newTop8 = static_cast<int>((OVScrollKnob->m_y - scrollTop11) / pixelsPerItem13);
-                if (newTop8 != previousTop6) {
+                if (0[&previousTop6] != newTop8) {
                     if (newTop8 > giOverviewItems[giOverviewType] - OVERVIEW_VISIBLE_ROWS) {
                         newTop8 = giOverviewItems[giOverviewType] - OVERVIEW_VISIBLE_ROWS;
                     }

@@ -1050,11 +1050,6 @@ void combatManager::DefaultSpell(int targetHex)
     }
 }
 
-// @semantic: complete 0x58 frame/CFG and all 51 ordered external relocations agree.
-// The only raw residual is +0x368..+0x36d: retail loads affectedCount (-0x0c),
-// compares it with frame (-0x18), and branches `jge`; VC4.2 emits the equivalent
-// reversed compare/`jle`. `frame < count`, `count > frame`, and OR-zero variants
-// all emitted the same residual. Revisit only after a material TU-state change.
 VA(0x00423762, 0x623)
 void combatManager::Fireball(int targetHex, int spell)
 {
