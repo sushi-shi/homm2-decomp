@@ -25,8 +25,9 @@
 #include <SOURCE/hero.h>
 #include <SOURCE/kbwin.h>
 
-static const int expansionCampaignTrackXY[EXPANSION_CAMPAIGN_COUNT]
-                                         [EXPANSION_CAMPAIGN_MAX_MAP_COUNT][2] = {
+DATA(0x0051d450) static int
+expansionCampaignTrackXY[EXPANSION_CAMPAIGN_COUNT]
+                        [EXPANSION_CAMPAIGN_MAX_MAP_COUNT][2] = {
     {{113, 310}, {187, 310}, {261, 352}, {261, 310},
      {335, 352}, {370, 310}, {445, 352}, {479, 310}},
     {{111, 331}, {185, 331}, {259, 289}, {259, 373},
@@ -37,7 +38,8 @@ static const int expansionCampaignTrackXY[EXPANSION_CAMPAIGN_COUNT]
      {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}}
 };
 
-static const int expansionCampaignMapCounts[EXPANSION_CAMPAIGN_COUNT] = {
+DATA(0x0051d550) static int
+expansionCampaignMapCounts[EXPANSION_CAMPAIGN_COUNT] = {
     8, 8, 4, 4
 };
 
@@ -87,7 +89,7 @@ xCampaignChoices[EXPANSION_CAMPAIGN_COUNT]
     }
 };
 
-static const signed char
+DATA(0x0051d740) static signed char
 expansionCampaignDifficulty[EXPANSION_CAMPAIGN_COUNT]
                            [EXPANSION_CAMPAIGN_MAX_MAP_COUNT] = {
     {0, 1, 1, 1, 1, 2, 2, 3},
@@ -95,6 +97,20 @@ expansionCampaignDifficulty[EXPANSION_CAMPAIGN_COUNT]
     {1, 1, 1, 2, -1, -1, -1, -1},
     {0, 1, 2, 2, -1, -1, -1, -1}
 };
+
+// @data-layout-note Retail X_CAMPGN initialized storage is
+// 0x51d450..0x51d9ce (0x57e bytes), followed by two alignment bytes before
+// SOURCE/tradpost. The first 0x508 bytes are byte-exact: campaign coordinates at
+// +0, map counts at +0x100, xCampaignChoices at +0x110, difficulty at +0x2f0,
+// and compiler literals from +0x310. Retail's symbol pass mistakes coordinate
+// value 113 at +0 for the string "q" and exposes the Y member at +4 as
+// const_0011d454; code relocations prove both are one array owner. Twenty-six
+// unique literals in the exact prefix have reviewed supplemental mappings. The
+// repeated literals $SG35707, $SG35712, $SG35740, $SG35741, $SG35742, $SG35743,
+// $SG35744, $SG35760, $SG35799, $SG35804, $SG35809, $SG35811, $SG35813,
+// $SG35816, and $SG35819 remain unresolved. The seven-symbol tail beginning at
+// $SG35821/+0x508 has a different order and also remains unresolved; do not map
+// it by section offset or select arbitrary duplicate payloads.
 VA(0x004bb680, 0x23)
 ExpCampaign::ExpCampaign(void)
 {
