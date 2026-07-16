@@ -258,9 +258,11 @@ int game::MineTypesOwned(int owner, int resourceType)
 }
 
 // @early-stop
-// Logic, frame, slots, and all 36 external relocations match. Retail's early exits at
-// +0x9f and +0x180 branch through the +0x3fe return trampoline; this TU branches
-// directly to the +0x408 epilogue. Both paths are otherwise byte-identical.
+// Complete semantics, CFG, frame/slots, and all 36 ordered relocation
+// sites/targets agree. The only unmasked bytes are branch displacements +0xa0
+// and +0x181: retail's early exits route through the +0x3fe return trampoline,
+// while base branches directly to the +0x408 epilogue. Revisit after a relevant
+// GAME predecessor/header change alters this local trampoline placement.
 VA(0x004710f3, 0x40d)
 void ComputeUALoc(int player)
 {
@@ -315,9 +317,10 @@ saveLocation:
 }
 
 // @early-stop
-// The full instruction stream, frame, CFG, and external targets match. Objdiff's two
-// remaining rows spell retail's __adjust_fdiv address as iLeftRightSave+0x10; both
-// resolve to RVA 0x12126c and are delinker owner aliases.
+// @early-stop-reloc-only
+// All 0x2ac relocation-masked bytes, the frame/slots/CFG, and all 25 ordered
+// relocation sites/effective targets agree. Objdiff spells retail's
+// __adjust_fdiv address as iLeftRightSave+0x10; both resolve to RVA 0x12126c.
 VA(0x00471500, 0x2ac)
 int game::SetupPuzzlePieces(int player, int justCount)
 {
@@ -991,9 +994,6 @@ void game::LoadGame(char *filename, int loadFromFile, int)
         gpAdvManager->CheckSetEvilInterface(0, -1);
 }
 
-// @early-stop
-// @early-stop-reloc-only: the invalid-key table entry targets retail's +0x2ec
-// trampoline and this TU's +0x3bb common body; both immediately enter GiveArmy.
 VA(0x004741e6, 0x3ee)
 void game::GiveTroopsToNeutralTown(int townId)
 {
@@ -1060,6 +1060,7 @@ void game::GiveTroopsToNeutralTown(int townId)
         case 35: idx = 50; break;
         case 45: idx = 52; break;
         case 55: idx = 54; break;
+        default:;
         }
         GiveArmy(&m_castleRecs[townId].m_army, idx, cnt, -1);
     }
@@ -2216,11 +2217,13 @@ void game::UpdateSpellWidgets(void)
 }
 
 // @early-stop
-// Exact 0x692-byte span and 101 relocation sites. The live residual is the
-// commutative equality at +0x14: retail loads the window-manager field before
-// the hover id, while this TU loads the hover id first. Both source operand orders
-// emit the same sequence; the resulting one-byte shift accounts for all local
-// switch-table addends. This is an /Od TU-cumulative evaluation-order choice.
+// Complete semantics, 0x18 frame/slots, CFG, and all 101 relocation
+// identities/counts/effective targets agree. At +0x27 retail uses the five-byte
+// absolute-EAX load for gpWindowManager before loading the hover id; base loads
+// the hover id first and needs a six-byte absolute-ECX load, making its body one
+// byte longer and shifting later relocation sites/local switch-table addends.
+// Reversing the source equality is byte-neutral. Revisit after a relevant GAME
+// predecessor/header change alters this TU-cumulative commutative load order.
 VA(0x00479e3b, 0x692)
 int ViewSpellsHandler(tag_message &msg)
 {
@@ -4996,10 +4999,12 @@ void game::CheckHeroConsistency(void)
 #define success success14
 
 // @early-stop
-// Exact 0x71e-byte span with the same 94 relocation sites. Five operand bytes
-// differ: +0x524/+0x527/+0x529 reverse the packet/batch-bound loads, and
-// +0x640/+0x643 reverse the fileData/transmitData equality loads. Both source
-// operand orders emit identically; these are commutative /Od TU-state choices.
+// Complete 0x71e body, 0x208 frame/slots, CFG, semantics, and all 94 ordered
+// relocation sites/targets agree. Five operand bytes differ:
+// +0x524/+0x527/+0x529 reverse packet/batch-bound loads, and +0x640/+0x643
+// reverse fileData/transmitData equality loads. Both source operand orders emit
+// identically. Revisit after a relevant GAME predecessor/header change alters
+// these TU-cumulative commutative choices.
 VA(0x00483219, 0x71e)
 int game::TransmitSaveGame(int remotePlayer, int player, int useCurrentSave)
 {
@@ -5575,8 +5580,11 @@ int CalcBaseScore(int days)
 }
 
 // @early-stop
-// Relocation-masked instruction streams are identical for all 0xb5 bytes and all
-// four relocation targets agree. The residual is delinked local-label identity.
+// Complete semantics, 0x8 frame/slots, CFG, and all four ordered relocation
+// sites/targets agree. The only unmasked byte is +0x80: base's empty-town arm
+// jumps directly to the epilogue at +0xa9, while retail routes through its
+// trailing +0xa9 jump at +0xae. Revisit after a relevant GAME predecessor/header
+// change alters this local trampoline placement.
 VA(0x0048480a, 0xb5)
 void game::RestoreCell(int x, int y, int obj, int barrier, mapCell *passedCell, int p6)
 {
