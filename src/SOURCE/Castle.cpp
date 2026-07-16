@@ -281,7 +281,7 @@ void townManager::SetupCastle(heroWindow *window, int updateOnly)
                     static_cast<short>((column8 - 4) * 32 + CASTLE_BACKGROUND_LEFT),
                     static_cast<short>((row9 - 2) * 32), 32, 32,
                     "objntwba.icn",
-                    static_cast<short>(terrainIconFrame27 + backgroundFrame6),
+                    static_cast<short>(0[&terrainIconFrame27] + backgroundFrame6),
                     0, -1, 16, 1);
                 if (backgroundWidget19 == 0)
                     MemError();
@@ -299,7 +299,7 @@ void townManager::SetupCastle(heroWindow *window, int updateOnly)
                     static_cast<short>((column8 - 4) * 32 + CASTLE_BACKGROUND_LEFT),
                     static_cast<short>((row9 - 2) * 32), 32, 32,
                     "objntown.icn",
-                    static_cast<short>(raceIconFrame + backgroundFrame6),
+                    static_cast<short>(0[&raceIconFrame] + backgroundFrame6),
                     0, -1, 16, 1);
                 if (backgroundWidget19 == 0)
                     MemError();
@@ -318,12 +318,16 @@ void townManager::SetupCastle(heroWindow *window, int updateOnly)
     }
 }
 
-// @match-note: Semantics/CFG complete; frame 0x38 and all named/compiler slots match.
+// @semantic: Semantics/CFG complete; frame 0x38 and all named/compiler slots match.
 // First divergence at +0x16e: retail loads gpTownManager before message.id for the
-// m_lastHoverId comparison; swapping comparison operands emits the same base order.
-// Relocs are 165/165. Retail jump tables are +5c9/10, +60a/24, +aef/10, +b2b/24;
-// base tables are +5c7/10, +603/24, +af4/10, +b30/24. Early-goto command CFG was
-// also tried and regressed layout. Revisit load/table placement in the 95% phase.
+// m_lastHoverId comparison; swapping operands and a gpTownManager pointer barrier
+// emit the same base order. All 165 external relocation identities agree. Retail
+// jump tables are +5c9/10, +60a/24, +aef/10, +b2b/24; base tables are +5c7/10,
+// +603/24, +af4/10, +b30/24. Reordering Grouped before Spread aligns the second
+// table's case-body identities; all four tables now preserve the same normalized
+// case multiplicities/destinations under accumulated code-size shifts. Early-goto
+// command CFG was also tried and regressed layout. Revisit after a material Castle
+// predecessor/header or comparison-tool change.
 VA(0x0041e0fb, 0xca3)
 int CastleHandler(tag_message &message)
 {
@@ -376,11 +380,11 @@ int CastleHandler(tag_message &message)
             return 1;
         gpTownManager->m_lastHoverId = message.payload.widget.id;
         switch (buildingIndex) {
-        case CASTLE_CONTROL_CAPTAIN_FORMATION_SPREAD:
-            sprintf(gText, cCastleInfo[CASTLE_INFO_SPREAD_FORMATION]);
-            break;
         case CASTLE_CONTROL_CAPTAIN_FORMATION_GROUPED:
             sprintf(gText, cCastleInfo[CASTLE_INFO_GROUPED_FORMATION]);
+            break;
+        case CASTLE_CONTROL_CAPTAIN_FORMATION_SPREAD:
+            sprintf(gText, cCastleInfo[CASTLE_INFO_SPREAD_FORMATION]);
             break;
 
         case CASTLE_MAGE_GUILD:
