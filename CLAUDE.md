@@ -101,7 +101,11 @@ shape from target identity.
 `relocation name -> sorted encoded COFF addends`. It intentionally ignores function-relative sites
 and fuzzy percentage, so code movement in incomplete functions does not hide a missing or wrong
 owner-relative displacement. The complete mismatch queue is written to
-`build/gen/function_reloc_addends.json`.
+`build/gen/function_reloc_addends.json`. Rows are classified as `value-set` (an addend value exists
+on only one side), `count-only` (the same values occur with different multiplicities), or
+`one-sided` (the relocation identity is absent from one object), and `code-local` (a self-symbol
+relocation whose addend names a local label or jump-table entry); stdout stays focused on the
+actionable external `value-set` rows while JSON retains all structural differences.
 
 ## `homm2 sema` — semantic navigation (matcher's read-only toolbox)
 
