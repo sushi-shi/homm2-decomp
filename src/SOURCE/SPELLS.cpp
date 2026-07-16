@@ -51,7 +51,9 @@ int combatManager::HasValidSpellTarget(int spell)
 // switch-break cleanup, and the no-selection scope. The 0x0c frame has
 // elementalType at -0x4, this at -0x8, and the switch temporary at -0x0c. Explicit
 // objdiff ranges align every switch instruction and the embedded tables relative
-// to the function; all 62 relocations/effective external targets agree. Outside
+// to the function; the first 41 ordered external relocations agree, and the
+// remaining 18 table entries use equivalent delinked local-label targets (62
+// sites total, with three earlier function-local sites). Outside
 // the +0x383..+0x3c3 switch data, raw bytes differ only at +0x45 and +0x41a:
 // the entry no-selection branch and its paired terminal target. Retail jumps
 // directly to the false result, while the
