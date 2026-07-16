@@ -27,6 +27,17 @@ DATA(0x005173b0) static unsigned char gNbLocalNum = 0;         // local netbios 
 DATA(0x005173b4) static unsigned char gNetStatus[NETBIOS_STATUS_COUNT] = { 0 };
 DATA(0x005173c0) static char         *gNbGroupName = "Empire Too ";
 DATA(0x005173c4) static char         *gNbListenName = "*";
+
+// @data-layout-note Retail initialized storage is 0x11739c..0x117620.
+// Source DATA owners recover the nine module globals and eight function-local
+// line bases. Fifteen private literals cover the remaining payload. The two
+// otherwise unreferenced source-path strings are byte-exact immediately after
+// gNbAddNameSourceLineBase and gNbReceiveCompleteSourceLineBase, at 0x11757c
+// and 0x1175f4. All other private owners have singleton relocation or unique
+// payload proof. The candidate payload ends at 0x11761e; retail's final two
+// bytes are zero alignment. Loader-zero storage is the exact 0x82e8-byte BSS
+// group below; do not add a padding owner for the initialized tail.
+
 // Semantic suffixes retain the retail MSVC BSS allocation order; audit with section replay.
 DATA(0x0052ae68) static tag_Anchor gNbFreeQueueRuntime;
 DATA(0x0052ae70) static unsigned char gNbSessionNumbersEntry[NETBIOS_SESSION_COUNT];
