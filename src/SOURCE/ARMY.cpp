@@ -151,9 +151,6 @@ void army::Init(int monsterType, int quantity, int side, int index, int hex, int
     m_armyGroupSlot = unknown;
 }
 
-// @early-stop
-// All instructions and 87/87 relocation sites align; only delinked string
-// literal symbol identities differ.
 VA(0x0044aec8, 0x4a6)
 void army::LoadResources(void)
 {
