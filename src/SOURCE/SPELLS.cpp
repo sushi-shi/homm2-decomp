@@ -483,13 +483,12 @@ int combatManager::ValidSpellTarget(int spell, int hex)
     return 1;
 }
 
-// @early-stop 99.70149%: byte-proven delinker/constant-pool artifact. Target and
-// base are both 0x222 bytes with the same 201-instruction stream and 27/27
-// ordered relocation offsets/types/semantic targets. The positive teleport arm
-// followed by the occupied-target goto recovers the retail CFG. Remaining
-// objdiff arguments are only retail string-pool names versus $SG names and
-// switch-local labels represented as the containing function versus $L labels;
-// there is no opcode, stack, CFG, external-callee, or external-global residual.
+// @semantic: the 0x10 frame, switch CFG, 27 ordered relocations, and all code
+// outside +0xed..+0x128 agree after current compiler-local normalization. The
+// residual is the occupied-target army address: retail evaluates occupantIndex
+// before occupantSide, while VC4.2 evaluates the equivalent two-dimensional
+// subscript in the reverse order. Flattened index-first addition, OR-zero, and
+// reversed pointer addition compile identically. Revisit after TU-state changes.
 VA(0x0042159c, 0x222)
 void combatManager::SpellMessage(int spell, int hex)
 {
@@ -1027,23 +1026,23 @@ void combatManager::CastSpell(int spell, int targetHex, int castByCreature, int 
     CheckChangeSelector();
 }
 
-// @early-stop 99.86%: byte-proven delinker artifact. The 0x08 frame, full
-// instruction/CFG stream, and 3/3 relocation offsets/types/semantic targets
-// agree. The only normalized residual is retail's interior combatEffect label
-// versus the typed gsSpellInfo field relocation; raw local-branch displacements
-// differ only because the delinker assigns the containing-function identity.
+// @semantic: the 0x08 frame, body operands, CFG semantics, and all three ordered
+// relocations agree. The only normalized residual is +0x18: retail routes a
+// failed ValidHex test to the shared empty-cell return trampoline at +0x3f,
+// while VC4.2 targets the common epilogue directly. Nested empty/else, two early
+// guards, positive-arm goto, explicit common-tail goto, and scoped label variants
+// were tried; the retained nested early return removes the former +0x40 residual.
+// Revisit only after a material TU-state change.
 VA(0x00423688, 0xda)
 void combatManager::DefaultSpell(int targetHex)
 {
     if (ValidHex(targetHex)) {
-        if (m_hexCells[targetHex].m_occupantSide < 0) {
-        } else {
-            army *target =
-                &m_armies[m_hexCells[targetHex].m_occupantSide]
-                         [m_hexCells[targetHex].m_occupantIndex];
-            target->SpellEffect(gsSpellInfo[m_selectedSpell].combatEffect, 0,
-                                1);
-        }
+        if (m_hexCells[targetHex].m_occupantSide < 0)
+            return;
+        army *target =
+            &m_armies[m_hexCells[targetHex].m_occupantSide]
+                     [m_hexCells[targetHex].m_occupantIndex];
+        target->SpellEffect(gsSpellInfo[m_selectedSpell].combatEffect, 0, 1);
     }
 }
 
@@ -3233,10 +3232,12 @@ int combatManager::SpaceForElementalExists(void)
         return 1;
 }
 
-// @early-stop
-// All instructions are identical after relocation masking and all 15 targets
-// agree. The 99.89% residual is only delinked identities for NULL_SAMPLE2's
-// second word and four strings; the 0x18 frame and all code bytes agree.
+// @semantic: normalized compiler-local strings, NULL_SAMPLE2 addends, all 15
+// relocation sites, CFG, and semantics agree. The real residual is stack layout:
+// retail stores the aggregate return temporary at -0x10/-0x0c and armyName at
+// -0x14; VC4.2 uses -0x14/-0x10 and -0x0c. Semantic bucket-13/bucket-15 names,
+// declaration order, nested/separate scopes, and an explicit loaded SAMPLE2 all
+// failed to improve or grew the function. Revisit after TU-state changes.
 VA(0x00429797, 0xd9)
 void combatManager::ShowSpellCastFailure(army *target, int)
 {
@@ -3511,58 +3512,54 @@ void combatManager::Earthquake(void)
     gpMouseManager->ShowColorPointer();
 }
 
-// @early-stop 99.86%: complete creature-first and hero-second message selection;
-// the 0x1d8 frame, all 26 relocation targets, and every normalized instruction
-// agree. The recovered unhandled-spell counter accounts for retail's otherwise
-// dead clear/increment block and missing slot. The only residuals are nine local
-// string-pool symbol identities; their relocation-masked code bytes agree.
 VA(0x0042a411, 0x2b1)
 void combatManager::ShowSpellMessage(int castByCreature, int spell,
                                      army *target)
 {
-    char targetName[60];
-    char message[400];
+    char targetName_b[60];
+    char message_m[400];
+    int unhandledSpell_j;
+    char *name_k;
     if (target != 0) {
-        char *name;
         if (target->m_quantity > 1)
-            name = gArmyNamesPlural[target->m_monsterType];
+            name_k = gArmyNamesPlural[target->m_monsterType];
         else
-            name = gArmyNames[target->m_monsterType];
-        sprintf(targetName, name);
+            name_k = gArmyNames[target->m_monsterType];
+        sprintf(targetName_b, name_k);
     }
     if (castByCreature != 0) {
         if (spell == SPELL_PARALYZE)
-            sprintf(message, "The %s are paralyzed by the Cyclopes!", targetName);
+            sprintf(message_m, "The %s are paralyzed by the Cyclopes!", targetName_b);
         else if (spell == SPELL_BLIND)
-            sprintf(message, "The Unicorns' attack blinds the %s!", targetName);
+            sprintf(message_m, "The Unicorns' attack blinds the %s!", targetName_b);
         else if (spell == SPELL_PETRIFY)
-            sprintf(message, "The Medusas' gaze turns the %s to stone!", targetName);
+            sprintf(message_m, "The Medusas' gaze turns the %s to stone!", targetName_b);
         else if (spell == SPELL_CURSE)
-            sprintf(message, "The Mummies' curse falls upon the %s!", targetName);
+            sprintf(message_m, "The Mummies' curse falls upon the %s!", targetName_b);
         else if (spell == SPELL_CREATURE_DISPEL)
-            sprintf(message, "The Archmages dispel all good spells\non your %s!", targetName);
+            sprintf(message_m, "The Archmages dispel all good spells\non your %s!", targetName_b);
         else {
-            int unhandledSpell = 0;
-            ++unhandledSpell;
+            unhandledSpell_j = 0;
+            ++unhandledSpell_j;
         }
     } else {
         if (target != 0) {
             if (m_heroes[m_currentSide]->m_isCaptain != 0)
-                sprintf(message, "The captain casts '%s' on the %s.",
-                        gSpellNames[spell], targetName);
+                sprintf(message_m, "The captain casts '%s' on the %s.",
+                        gSpellNames[spell], targetName_b);
             else
-                sprintf(message, "%s casts '%s' on the %s.",
+                sprintf(message_m, "%s casts '%s' on the %s.",
                         m_heroes[m_currentSide]->m_name, gSpellNames[spell],
-                        targetName);
+                        targetName_b);
         } else {
             if (m_heroes[m_currentSide]->m_isCaptain != 0)
-                sprintf(message, "The captain casts '%s'.", gSpellNames[spell]);
+                sprintf(message_m, "The captain casts '%s'.", gSpellNames[spell]);
             else
-                sprintf(message, "%s casts '%s'.",
+                sprintf(message_m, "%s casts '%s'.",
                         m_heroes[m_currentSide]->m_name, gSpellNames[spell]);
         }
     }
-    CombatMessage(message, 1, 1, 0);
+    CombatMessage(message_m, 1, 1, 0);
 }
 
 // @data-layout-note
