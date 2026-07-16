@@ -4,6 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <BASE/DROPLIST_TYPES.h>
 #include <BASE/dropListWidget.h>
 #include <BASE/bitmap.h>
 #include <BASE/resourceManager.h>
@@ -17,6 +18,23 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/kbwin.h>
 #include <string.h>
+
+// Retail stores eleven independently emitted source-path constants at 4-byte boundaries.
+// The typed slots preserve their natural two-byte tail padding without synthetic objects.
+DATA(0x00521078) static SDropListSourceFiles gDropListSourceFiles = {
+    { DROPLIST_SOURCE_FILE },
+    { DROPLIST_SOURCE_FILE },
+    { DROPLIST_SOURCE_FILE },
+    { DROPLIST_SOURCE_FILE },
+    { DROPLIST_SOURCE_FILE },
+    { DROPLIST_SOURCE_FILE },
+    { DROPLIST_SOURCE_FILE },
+    { DROPLIST_SOURCE_FILE },
+    { DROPLIST_SOURCE_FILE },
+    { DROPLIST_SOURCE_FILE },
+    { DROPLIST_SOURCE_FILE }
+};
+
 VA(0x004dbf00, 0x3b)
 dropListWidget::dropListWidget(void) : widget(0, 0, 0, 0, 0, 0)
 {
@@ -34,8 +52,8 @@ dropListWidget::~dropListWidget()
     if (m_savedBackground != 0)
         delete m_savedBackground;
     for (int itemIndex = 0; itemIndex < m_itemCount; itemIndex++)
-        H2_FREE(m_items[itemIndex], "I:\\Projects\\Heroes\\Prog\\BASE\\droplist.cpp", 25);
-    H2_FREE(m_items, "I:\\Projects\\Heroes\\Prog\\BASE\\droplist.cpp", 27);
+        H2_FREE(m_items[itemIndex], gDropListSourceFiles.itemDestruction.text, 25);
+    H2_FREE(m_items, gDropListSourceFiles.listDestruction.text, 27);
 }
 
 VA(0x004dbfe0, 0x21d)
@@ -107,16 +125,17 @@ void dropListWidget::DeleteItem(int index)
         if (m_selectedIndex == index)
             m_selectedIndex = -1;
         if (m_itemCount == 1) {
-            H2_FREE(m_items[0], "I:\\Projects\\Heroes\\Prog\\BASE\\droplist.cpp", 111);
-            H2_FREE(m_items, "I:\\Projects\\Heroes\\Prog\\BASE\\droplist.cpp", 112);
+            H2_FREE(m_items[0], gDropListSourceFiles.finalItemDestruction.text, 111);
+            H2_FREE(m_items, gDropListSourceFiles.finalListDestruction.text, 112);
             m_items = 0;
         } else {
-            char **newItems = static_cast<char **>(H2_ALLOC(m_itemCount * 4 - 4, "I:\\Projects\\Heroes\\Prog\\BASE\\droplist.cpp", 117));
+            char **newItems = static_cast<char **>(H2_ALLOC(m_itemCount * 4 - 4,
+                gDropListSourceFiles.resizedListAllocation.text, 117));
             memcpy(newItems, m_items, m_itemCount * 4 - 4);
             if (m_itemCount - index - 1 > 0)
                 memcpy(newItems + index, m_items + index + 1, (m_itemCount - index - 1) * 4);
             if (m_items != 0)
-                H2_FREE(m_items, "I:\\Projects\\Heroes\\Prog\\BASE\\droplist.cpp", 123);
+                H2_FREE(m_items, gDropListSourceFiles.oldListDestruction.text, 123);
             m_items = newItems;
         }
         m_itemCount--;
@@ -182,14 +201,16 @@ int dropListWidget::Main(tag_message &message)
         case 0x38:
             if (m_id == message.payload.widget.id) {
                 char *text = message.payload.widget.data.text;
-                char **newItems = static_cast<char **>(H2_ALLOC(m_itemCount * 4 + 4, "I:\\Projects\\Heroes\\Prog\\BASE\\droplist.cpp", 184));
+                char **newItems = static_cast<char **>(H2_ALLOC(m_itemCount * 4 + 4,
+                    gDropListSourceFiles.appendedListAllocation.text, 184));
                 if (m_itemCount != 0)
                     memcpy(newItems, m_items, m_itemCount * 4);
-                newItems[m_itemCount] = static_cast<char *>(H2_ALLOC(strlen(text) + 1, "I:\\Projects\\Heroes\\Prog\\BASE\\droplist.cpp", 187));
+                newItems[m_itemCount] = static_cast<char *>(H2_ALLOC(strlen(text) + 1,
+                    gDropListSourceFiles.appendedTextAllocation.text, 187));
                 strcpy(newItems[m_itemCount], text);
                 m_itemCount++;
                 if (m_items != 0)
-                    H2_FREE(m_items, "I:\\Projects\\Heroes\\Prog\\BASE\\droplist.cpp", 191);
+                    H2_FREE(m_items, gDropListSourceFiles.appendedOldListDestruction.text, 191);
                 m_items = newItems;
             }
             break;
@@ -197,8 +218,10 @@ int dropListWidget::Main(tag_message &message)
             if (m_id == message.payload.widget.id) {
                 char *text = message.payload.widget.data.text;
                 if (message.payload.widget.parameter < m_itemCount) {
-                    H2_FREE(m_items[message.payload.widget.parameter], "I:\\Projects\\Heroes\\Prog\\BASE\\droplist.cpp", 173);
-                    m_items[message.payload.widget.parameter] = static_cast<char *>(H2_ALLOC(strlen(text) + 1, "I:\\Projects\\Heroes\\Prog\\BASE\\droplist.cpp", 174));
+                    H2_FREE(m_items[message.payload.widget.parameter],
+                        gDropListSourceFiles.replacedItemDestruction.text, 173);
+                    m_items[message.payload.widget.parameter] = static_cast<char *>(H2_ALLOC(
+                        strlen(text) + 1, gDropListSourceFiles.replacementItemAllocation.text, 174));
                     strcpy(m_items[message.payload.widget.parameter], text);
                 }
             }

@@ -114,7 +114,7 @@ $T32155	BASE\Ripple.c	0xeba80	0x4	rdata	0x4	3	0x0	local	candidate-coff-section-t
 $SG31761	BASE\WINDOW.c	0x11f9d0	0x14	data	0x4	3	0x0	local	candidate-coff-section-translation
 $SG31769	BASE\WINDOW.c	0x11f9e4	0x12	data	0x4	3	0x14	local	candidate-coff-section-translation
 ??_7heroWindowManager@@6B@	BASE\WINMGR.c	0xeba10	0xc	rdata	0x8	7	0x0	external	candidate-coff-section-translation
-??_7dropListWidget@@6B@	BASE\droplist.c	0xebad0	0xc	rdata	0x8	3	0x0	external	candidate-coff-section-translation
+??_7dropListWidget@@6B@	BASE\droplist.c	0xebad0	0xc	rdata	0x8	4	0x0	external	candidate-coff-section-translation
 _gFYColor$S618	BASE\iconf2by.c	0x138108	0x4	bss	0x4	3	0x0	local	candidate-coff-section-translation
 _gFYXEnd$S612	BASE\iconf2by.c	0x13810c	0x4	bss	0x4	3	0x4	local	candidate-coff-section-translation
 _gFYDst$S624	BASE\iconf2by.c	0x138110	0x4	bss	0x4	3	0x8	local	candidate-coff-section-translation
