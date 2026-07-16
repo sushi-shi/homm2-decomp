@@ -13,6 +13,7 @@ from homm2.build.reviewed_data import (
     ensure_reviewed_targets,
     propose_candidate_topology,
     promote_canonical_topology,
+    reviewed_manifest_bytes,
     review_queue_bytes,
     refresh_required,
 )
@@ -46,6 +47,32 @@ def candidate(name, rva, provenance="aligned-relocation-addend", unit="SOURCE/Te
 
 
 class ReviewedDataTest(unittest.TestCase):
+    def test_initialized_ledger_rejects_raw_padding_boundary_crossing(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            symbols = root / "symbols.csv"
+            symbols.write_text(
+                "name,unit,rva,kind,provenance\n"
+                "global,SOURCE/Test,0x300c,data,cv-public-data\n")
+            ledger = root / "ledger.tsv"
+            ledger.write_text(
+                "name\tunit\tsize\tretail_sha256\thighlow_count\taudit\n"
+                "global\tSOURCE/Test\t0x8\tdeadbeef\t0\tbytes\n")
+            pe = {"sections": {
+                ".data": {"rva": 0x3000, "raw_size": 0x10,
+                          "virtual_size": 0x30},
+            }}
+            with (mock.patch("homm2.build.reviewed_data.read_pe", return_value=pe),
+                  mock.patch("homm2.build.reviewed_data.read_pe_payload_evidence",
+                             side_effect=AssertionError(
+                                 "crossing allocation must fail before payload review"))):
+                with self.assertRaisesRegex(
+                        RuntimeError,
+                        "crosses retail storage data-initialized -> "
+                        "data-loader-zero-tail"):
+                    reviewed_manifest_bytes(
+                        symbols=symbols, ledger=ledger, exe=root / "game.exe")
+
     def test_freshness_requires_exact_identity(self):
         expected = {"schema": 1, "manifest_sha256": "abc"}
         self.assertFalse(refresh_required(dict(expected), expected))
