@@ -7,6 +7,7 @@
 #include <va.h>
 #include <BASE/Blur.h>
 #include <BASE/BlurConstants.h>
+#include <BASE/BLUR_TYPES.h>
 #include <BASE/bitmap.h>
 #include <BASE/palette.h>
 #include <BASE/mouseManager.h>
@@ -21,6 +22,16 @@
 
 #define BLUR_COMPONENT(table, offset)                                                              \
     (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(table) + (offset)))
+
+DATA(0x0051fdc0) static SBlurText gBlurText = {
+    "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp",
+    "RGBLOOKP.BIN",
+    "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp",
+    "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp",
+    "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp",
+    "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp",
+    "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp"
+};
 
 // @semantic
 // Coverage-phase structural checkpoint, not a proven wall. The complete CFG saves the source,
@@ -63,7 +74,7 @@ void DoBlur(
     BlurLookupRow* lookup =
         static_cast<BlurLookupRow*>(
         H2_ALLOC(BLUR_LOOKUP_BYTE_COUNT,
-                 "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp", 0x19)
+                 gBlurText.lookupAllocationSource, 0x19)
     );
     BlurComponentTable components[BLUR_PALETTE_CHANNEL_COUNT];
     signed char* paletteColor = gpBufferPalette->m_data;
@@ -77,7 +88,8 @@ void DoBlur(
     } while (componentOffset < BLUR_COMPONENT_TABLE_BYTE_COUNT);
 
     resourceManager* resourceMgr;
-    unsigned long lookupId = (resourceMgr = gpResourceManager)->MakeId("RGBLOOKP.BIN", 1);
+    unsigned long lookupId =
+        (resourceMgr = gpResourceManager)->MakeId(gBlurText.lookupFilename, 1);
     resourceMgr->PointToFile(lookupId);
     gpResourceManager->ReadBlock(reinterpret_cast<signed char*>(lookup),
                                  BLUR_LOOKUP_BYTE_COUNT);
@@ -177,11 +189,11 @@ void DoBlur(
     PollSound();
     signed char* oldPalette = static_cast<signed char*>(
         H2_ALLOC(BLUR_PALETTE_BYTE_COUNT,
-                 "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp", 0x8b)
+                 gBlurText.oldPaletteAllocationSource, 0x8b)
     );
     signed char* newPalette = static_cast<signed char*>(
         H2_ALLOC(BLUR_PALETTE_BYTE_COUNT,
-                 "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp", 0x8c)
+                 gBlurText.newPaletteAllocationSource, 0x8c)
     );
     memcpy(oldPalette, gPalette->m_data, BLUR_PALETTE_BYTE_COUNT);
     signed char* oldColor = oldPalette;
@@ -220,13 +232,13 @@ void DoBlur(
     memcpy(source->m_pixels, saved->m_pixels, imageSize);
     gpWindowManager->FizzleForward(0, 0, BLUR_SCREEN_WIDTH, height,
                                    BLUR_FIZZLE_DELAY, newPalette, oldPalette);
-    H2_FREE(lookup, "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp", 0xa8);
+    H2_FREE(lookup, gBlurText.lookupFreeSource, 0xa8);
     if (saved != 0) {
         delete saved;
     }
     gpMouseManager->ShowColorPointer();
-    H2_FREE(oldPalette, "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp", 0xad);
-    H2_FREE(newPalette, "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp", 0xae);
+    H2_FREE(oldPalette, gBlurText.oldPaletteFreeSource, 0xad);
+    H2_FREE(newPalette, gBlurText.newPaletteFreeSource, 0xae);
 }
 
 // @data-layout-note
@@ -237,15 +249,9 @@ void DoBlur(
 // table and has been removed.
 //
 // Candidate ordinal 3 and retail 0xeba84+0x4 are byte-exact (350.0f).
-// Retail initialized storage is 0x11fdc0+0x100. Candidate ordinal 4 is a
-// distinct writable Any-COMDAT whose 0xd-byte RGBLOOKP.BIN payload and sole
-// relocation prove retail RVA 0x11fde8; retail supplies three alignment bytes.
-// Candidate ordinal 5 is one pooled 0x26-byte source-path Any-COMDAT, while
-// retail retains six distinct byte-identical 0x28-byte allocations at
-// 0x11fdc0, 0x11fdf8, 0x11fe20, 0x11fe48, 0x11fe70, and 0x11fe98. Their six
-// ordered call sites and zero addends agree, but one candidate definition
-// cannot identify six retail owners. Leave that allocation family unresolved;
-// do not select one copy, flatten the copies, or add aliases, padding objects,
-// guessed arrays, or section pragmas.
+// Retail initialized storage is one 0x100-byte writable record at 0x11fdc0.
+// gBlurText reproduces it exactly: the six source-file slots surround the
+// lookup filename in allocation/free call order, and each relocation uses the
+// corresponding owner-relative field offset.
 
 #undef BLUR_COMPONENT
