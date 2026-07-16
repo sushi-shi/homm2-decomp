@@ -292,14 +292,23 @@ def _normalize_symbol_row(row: dict[str, str], topology_by_unit) -> dict[str, st
                    if value.stream_offset == offset or value.section_value == offset]
     if not matches and row.get("section_offset") not in (None, "", "-"):
         # MSVC's compiler-local $T number is TU-state-sensitive.  The reviewed
-        # stream offset/storage/scope identifies the current exact COFF symbol
-        # without carrying the stale generated spelling forward.
+        # section ordinal/local offset, storage, and scope identify the current
+        # exact COFF symbol without carrying the stale spelling forward. Legacy
+        # supplements used the concatenated storage-stream offset, so retain it
+        # only when no section-local match exists.
         offset = int(row["section_offset"], 0)
+        ordinal = int(row["section_ordinal"], 0)
         expected_scope = "global" if row.get("scope") == "external" else "local"
         matches = [value for value in definitions
                    if value.storage == row.get("storage")
                    and value.scope == expected_scope
-                   and value.stream_offset == offset]
+                   and value.section_ordinal == ordinal
+                   and value.section_value == offset]
+        if not matches:
+            matches = [value for value in definitions
+                       if value.storage == row.get("storage")
+                       and value.scope == expected_scope
+                       and value.stream_offset == offset]
     if len(matches) != 1:
         raise ValueError(f"supplemental {unit}:{row['name']} has {len(matches)} candidate definitions")
     candidate = matches[0]
