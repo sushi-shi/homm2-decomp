@@ -5,6 +5,7 @@
 
 #include <va.h>
 #include <BASE/textWidget.h>
+#include <BASE/TEXTWDGT_TYPES.h>
 #include <BASE/widgetKind.h>
 #include <BASE/resourceManager.h>
 #include <BASE/Misc.h>
@@ -12,6 +13,22 @@
 #include <BASE/heroWindow.h>
 #include <SOURCE/KB.h>
 #include <string.h>
+
+DATA(0x0051fa70) static STextWidgetSourceFiles gTextWidgetSourceFiles = {
+    "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP",
+    "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP",
+    "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP",
+    "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP"
+};
+
+// @data-layout-note NB09 assigns TEXTWDGT one 0xb0 initialized-data
+// contribution at 0x11fa70. Retail stores four identical source paths in 0x2c
+// slots at owner addends 0, 0x2c, 0x58, and 0x84. Read and destruction use the
+// first two owners; the two Main allocation sites share the third, and the two
+// SetText sites share the fourth. This typed aggregate reproduces the complete
+// contribution and all six relocation addends. The existing 0xc textWidget
+// vtable is the only rdata contribution, and this TU has no loader-zero data.
+// Do not pool the paths or split them with padding symbols or section pragmas.
 // @semantic
 // /O2 register-allocation checkpoint: base and retail are both 0x3e bytes and both
 // relocation targets agree. Instruction selection, ordering, and immediates are
@@ -62,7 +79,7 @@ void textWidget::Read(void)
     m_height = gpResourceManager->ReadWord();
     short len = gpResourceManager->ReadWord();
     m_text = static_cast<char *>(
-        H2_ALLOC(len, "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP", 0x39));
+        H2_ALLOC(len, gTextWidgetSourceFiles.read, 0x39));
     gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(m_text), len);
     gpResourceManager->Read13(reinterpret_cast<signed char *>(resourceName));
     gpResourceManager->SavePosition();
@@ -79,7 +96,7 @@ VA(0x004d1250, 0x30)
 textWidget::~textWidget()
 {
     gpResourceManager->Dispose(m_font);
-    H2_FREE(m_text, "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP", 0x55);
+    H2_FREE(m_text, gTextWidgetSourceFiles.destruction, 0x55);
 }
 
 VA(0x004d1280, 0x210)
@@ -137,9 +154,9 @@ int textWidget::Main(tag_message &msg)
             }
             unsigned short newLen = strlen(newText);
             if (strlen(m_text) < newLen) {
-                H2_FREE(m_text, "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP", 0xd3);
+                H2_FREE(m_text, gTextWidgetSourceFiles.mainMessage, 0xd3);
                 m_text = static_cast<char *>(H2_ALLOC(
-                    newLen + 5, "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP", 0xd4));
+                    newLen + 5, gTextWidgetSourceFiles.mainMessage, 0xd4));
             }
             strcpy(m_text, newText);
             return 1;
@@ -190,9 +207,9 @@ void textWidget::SetText(char *text)
     }
     unsigned short newLen = strlen(text);
     if (strlen(m_text) < newLen) {
-        H2_FREE(m_text, "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP", 0xd3);
+        H2_FREE(m_text, gTextWidgetSourceFiles.setText, 0xd3);
         m_text = static_cast<char *>(H2_ALLOC(
-            newLen + 5, "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP", 0xd4));
+            newLen + 5, gTextWidgetSourceFiles.setText, 0xd4));
     }
     strcpy(m_text, text);
 }
