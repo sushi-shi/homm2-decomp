@@ -4807,15 +4807,13 @@ void advManager::JailAIEvent(mapCell *cell, hero *eventHero, int x, int y)
 
 // @early-stop
 // All normalized instructions and the 0x154 frame/slots match; 85/85 relocation
-// sites resolve to the same effective targets. Residuals are folded monster-field,
-// pooled string/float, and function-static follower-text symbol identities.
+// sites resolve to the same effective targets. Residuals are folded monster-field
+// and pooled string/float identities.
 VA(0x004b4fd5, 0x82b)
 void advManager::PlayerMonsterInteract(mapCell *cell, mapCell *combatCell, hero *eventHero,
                                        int *handled, int x, int y, int unused,
                                        int combatX, int combatY)
 {
-    static char *followerText =
-        "{Followers}\n\nA group of %s with a desire for greater glory wish to join you. Do you accept? ";
     int monster_n;
     float strengthRatio_p;
     int combatResult_f;
@@ -4898,7 +4896,8 @@ void advManager::PlayerMonsterInteract(mapCell *cell, mapCell *combatCell, hero 
         monster_n != MONSTER_AIR_ELEMENTAL && monster_n != MONSTER_FIRE_ELEMENTAL &&
         monster_n != MONSTER_WATER_ELEMENTAL) {
         if (forcedJoin_f) {
-            sprintf(gText, followerText, gArmyNamesPlural[monster_n]);
+            sprintf(gText, gEventText[EVENT_TEXT_FOLLOWERS],
+                    gArmyNamesPlural[monster_n]);
             EventWindow(-1, 2, gText, -1, 0, -1, 0, -1);
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 eventHero->m_army.Add(monster_n, monsterCount_n, -1);
