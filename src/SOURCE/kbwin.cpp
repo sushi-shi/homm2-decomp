@@ -140,10 +140,10 @@ int AppInit(HINSTANCE instance, HINSTANCE previousInstance, int showCommand,
     }
 }
 
-// @match-note 96.47%: semantics, the zero-byte frame, both return arms, and the
-// sole external relocation agree. The first residual is retail's `mov eax, 0`
-// in the false arm versus this compiler state's `xor eax, eax`; explicit if/else
-// is the best of the tested direct, comparison, and conditional-return forms.
+// @semantic: semantics, the zero-byte frame, both return arms, and the sole
+// ordered relocation agree. The first residual is retail's `mov eax, 0` in the
+// false arm versus this compiler state's `xor eax, eax`; explicit if/else is the
+// best of the tested direct, comparison, and conditional-return forms.
 VA(0x0041c15f, 0x31)
 int AppIdle(void)
 {
@@ -153,10 +153,10 @@ int AppIdle(void)
         return 0;
 }
 
-// @early-stop
-// All 0x57e bytes match after masking aligned COFF relocation fields. The
-// 99.32% fuzzy result is delinked jump-table/local-label identity; all 17/17
-// external REL32 callees agree at identical offsets.
+// @semantic: complete message switch, frame, CFG, and all 79 ordered relocation
+// identities/addends agree. The first residual is the embedded 0x14-byte jump
+// table at RVA 0x1c61b; the candidate's next public begins one byte earlier, so
+// the old full-span raw-identity claim was invalid.
 VA(0x0041c190, 0x57e)
 long int __stdcall AppWndProc(HWND window, unsigned int message,
     unsigned int messageParam, long int messageData)
@@ -285,16 +285,13 @@ long int __stdcall AppWndProc(HWND window, unsigned int message,
     return DefWindowProcA(window, message, messageParam, messageData);
 }
 
-// @early-stop
-// Relocation-masked instruction streams, the 0x10 frame, and all local slots are
-// identical. The sole EndDialog import resolves to the same target in both objects.
 VA(0x0041c70e, 0x90)
 int __stdcall AppAbout(HWND dialog, unsigned int message,
     unsigned int messageParam, long int messageData)
 {
     int command;
     HWND commandWindow;
-    unsigned short notification;
+    unsigned short notificationType;
 
     switch (message) {
     case WM_INITDIALOG:
@@ -302,7 +299,7 @@ int __stdcall AppAbout(HWND dialog, unsigned int message,
     case WM_COMMAND:
         command = LOWORD(messageParam);
         commandWindow = reinterpret_cast<HWND>(messageData);
-        notification = HIWORD(messageParam);
+        notificationType = HIWORD(messageParam);
         if (command == IDOK)
             EndDialog(dialog, 1);
         break;
@@ -343,16 +340,12 @@ void Process1WindowsMessage(void)
     }
 }
 
-// @early-stop
-// Relocation-masked instruction streams, the 0x1c frame, and all local slots are
-// identical. All 16 relocation targets agree; retail uses resolved Win32 imports and
-// delinked interior gConfig labels where the base retains their typed identities.
 VA(0x0041c880, 0x147)
 void ResizeWindow(int x, int y, int width, int height)
 {
     int windowX;
     RECT windowRect;
-    int windowY;
+    int targetY;
 
     if (gConfig.gfx[giCurExe].fullScreen != 0)
         return;
@@ -362,20 +355,20 @@ void ResizeWindow(int x, int y, int width, int height)
     else
         windowX = x;
     if (y == -1)
-        windowY = windowRect.top;
+        targetY = windowRect.top;
     else
-        windowY = y;
+        targetY = y;
         windowRect.left = 0;
         windowRect.top = 0;
         windowRect.right = width - 1;
         windowRect.bottom = height - 1;
         AdjustWindowRect(&windowRect, giCurWindowsStyleFlags,
             gConfig.gfx[giCurExe].showMenu);
-        MoveWindow(hwndApp, windowX, windowY,
+        MoveWindow(hwndApp, windowX, targetY,
             windowRect.right - windowRect.left + 1,
             windowRect.bottom - windowRect.top + 1, 1);
         gConfig.gfx[giCurExe].x = windowX;
-        gConfig.gfx[giCurExe].y = windowY;
+        gConfig.gfx[giCurExe].y = targetY;
         gConfig.gfx[giCurExe].width = width;
         gConfig.gfx[giCurExe].height = height;
         WritePrefs();
@@ -445,10 +438,10 @@ void UpdateDfltMenu(HMENU menu)
         EnableMenuItem(menu, KBWIN_MENU_FULLSCREEN, MF_GRAYED);
 }
 
-// @match-note 97.90%: semantics, the 0x04 frame, menu slot, both arms, and all
-// 11 relocation targets agree. Retail has one five-byte continuation jump immediately after
-// the null-menu fallback; an explicit empty positive arm lowered the match to
-// 94.70%. Remaining relocation identities are typed config/import references.
+// @semantic: semantics, the 0x04 frame, menu slot, both arms, and all 11 ordered
+// relocation identities/addends agree. Retail has one five-byte continuation
+// jump immediately after the null-menu fallback; an explicit empty positive arm
+// lowered the match to 94.70%.
 VA(0x0041cc35, 0xac)
 void KBChangeMenu(HMENU menu)
 {
