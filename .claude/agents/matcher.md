@@ -183,9 +183,10 @@ accessor `jmp $+0` fingerprint — most plateaus are one of these two, both fixa
    use `@semantic` instead of `@match-note` once behavior, real types/layout, frame/slots, CFG,
    inline structure, and external relocations are complete. Do not run extended permutation or
    brute-force searches on an `@semantic` function.
-3. **When a future byte-last-mile pass is explicitly resumed,** return to the `@semantic` and soft
-   `@early-stop` sets, resume after the attempts recorded there, use the audited AST permuter where
-   appropriate, and push each residual to its highest reproducible match.
+3. **During the exhaustive residual audit,** every live non-100% function is active work, including
+   `@semantic` and `@early-stop` functions. Treat recorded attempts as context only, reproduce all
+   claimed byte evidence from current objects, use the audited AST permuter where appropriate, and
+   push each residual to exactness or a newly verified artifact.
 4. **Size is not a reason to defer.** Reconstruct large bodies leaf-first, in full.
 5. **Acceptable non-100% comes in exactly two `@early-stop` flavors — never a partial
    that under-counts because you stopped guessing.** Mark it `// @early-stop` (marker
@@ -215,8 +216,8 @@ Every integrated non-100 method carries exactly one durable marker:
 - `@semantic` means the method is semantically and structurally complete but the residual is not
   necessarily a valid early-stop proof. It must name the first assembly/byte divergence, confirmed
   frame/slot/CFG and relocation state, obvious attempts already exhausted, and the revisit trigger.
-  It removes the method from the current linking/runtime queue and becomes the explicit future
-  byte-last-mile queue. Remove it when the method reaches 100% or replace it with a proved early-stop.
+  It never removes the method from the exhaustive residual-audit queue. Remove it when the method
+  reaches 100% or replace it with a newly reproduced, proved early-stop.
 
 **Finish every function in your assigned batch** — never leave one un-attempted and never use a
 marker to excuse incomplete semantics, types/layout, frame/slots, CFG, inline-accessor recovery, or

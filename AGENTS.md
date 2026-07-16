@@ -128,21 +128,18 @@ authoritative. This file is the short, restart-ready Codex workflow.
   bodies. Start with the highest-weighted stub-heavy TU and drain it in source order, including
   required predecessors, before moving that lane to the next stub-heavy TU. A stub lane changes
   priority only: it must still recover complete semantics, types, layouts, frames, CFG, and relocs.
-- Until every SOURCE function has a reconstructed body, prioritize structural recovery over wall
-  grinding.
-  A semantically complete function at a proven compiler wall leaves the active queue after only a
-  few obvious steering attempts, even if it is 96-99%. Systematic wall breaking and AST permutation
-  begin only after the placeholder census reaches zero. Total SOURCE fuzzy is a progress signal,
-  not the phase-switch trigger. This prevents later shared-header and class-layout discoveries from
-  invalidating carefully crafted byte matches.
+- During the exhaustive residual campaign, build the queue from every live non-100% function and
+  order it by fuzzy percentage descending, with retail RVA as the deterministic tie break. Closest
+  to exact is handled first. Prior `@early-stop`, `@semantic`, and retained-max results do not remove
+  a live nonexact function from this queue; reproduce their evidence from current objects.
 - Every integrated non-100 function must carry a durable marker immediately above its `VA()`.
   `@early-stop` is the byte-proven artifact set. `@semantic` is the current linking/runtime
   checkpoint:
   record the first retail/ours assembly divergence or byte span, frame/slot/CFG and relocation
   status, the obvious spellings already tried, and the condition for revisiting it. Do not repeat
   attempts listed in `@semantic` while linking and runtime testing are the active priority. The
-  marker does not claim byte exactness or a proven wall; it is the explicit queue for a future
-  byte-last-mile campaign. Remove it when the function reaches 100% or gains a valid
+  marker does not claim byte exactness or a proven wall and never suppresses exhaustive residual
+  work. Remove it when the function reaches 100% or gains a newly reproduced valid
   `@early-stop` proof.
 - Integrate exactly one worker at a time. Apply only its declared source/header files; never copy a
   worker's `README.md`, `config/match_baseline.tsv`, or transient queue. On `source-matching`, run the
@@ -154,10 +151,9 @@ authoritative. This file is the short, restart-ready Codex workflow.
   result and assign the lane to a fresh matcher agent instead.
 - A worker does not escape deferred targets. Return every unfinished or improperly parked function
   to that same worker and lane before assigning new work. During coverage, advance only after each
-  target
-  is structurally complete and is either 100%, a byte-proven permitted `@early-stop`, or a fully
-  evidenced `@semantic` checkpoint under `.claude/agents/matcher.md`; a marker cannot excuse missing
-  semantics, layout, frame/slot, CFG, or relocation work.
+  target is structurally complete and every live residual byte and external relocation is accounted
+  for under `.claude/agents/matcher.md`; a marker cannot excuse missing semantics, layout,
+  frame/slot, CFG, relocation work, or another attempt during the exhaustive residual campaign.
 - Do not repeatedly poll worker worktrees, reports, or percentages while a batch is active. Rely on
   matcher milestone/completion messages and let workers tune uninterrupted. Inspect a lane only for
   serial integration, a reported blocker/coordination need, or after a genuinely long silent period
