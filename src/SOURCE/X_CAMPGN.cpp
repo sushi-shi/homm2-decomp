@@ -351,12 +351,6 @@ void ExpCampaign::InitMap(void)
     gbRetreatWin = 1;
 }
 
-// @match-note 99.97% (pre-95 structural checkpoint): frame (0x44), CFG, all 51
-// relocations, and instruction stream align. Relocation-masked raw comparison
-// leaves seven stack-displacement bytes at +0x3e, +0x15e, +0x1a5, +0x1ad,
-// +0x1b4, +0x1c5, and +0x285 (only [ebp-0x8]/[ebp-0xc] local ordering).
-// Explicit track/campaign widget pointer initialization was tried and retained;
-// it raised 99.52% to 99.97%. Revisit after 95% with od_slots name tuning.
 VA(0x004bc00e, 0x33f)
 void ExpCampaign::ShowInfo(int viewOnly, int)
 {
@@ -364,7 +358,7 @@ void ExpCampaign::ShowInfo(int viewOnly, int)
     gpMouseManager->SetPointer("advmice.mse", 0,
                                CAMPAIGN_POINTER_HIDDEN_HOTSPOT);
     gpMouseManager->ReallyShowPointer();
-    int savedInterface = gbUseEvilInterface;
+    int savedTheme = gbUseEvilInterface;
     gbUseEvilInterface = 1;
     m_viewMap = m_currentMap;
     m_window = new heroWindow(0, 0, "x_camp.bin");
@@ -413,7 +407,7 @@ void ExpCampaign::ShowInfo(int viewOnly, int)
     UpdateInfo(0);
     gpWindowManager->DoDialog(m_window, MessageHandler, 0);
     delete m_window;
-    gbUseEvilInterface = savedInterface;
+    gbUseEvilInterface = savedTheme;
 
     if (gpWindowManager->m_dialogResult == CAMPAIGN_DIALOG_RESTART) {
         NormalDialog("Are you sure you want to restart this scenario?",
@@ -436,7 +430,8 @@ void ExpCampaign::ShowInfo(int viewOnly, int)
     }
 }
 
-// @match-note 98.85% (pre-95 structural checkpoint): all UI semantics, the
+// @semantic
+// All UI semantics, the
 // 0x84 frame and local slots, both selector maps/jump tables, CFG, and all 177
 // relocation targets are recovered. The first raw difference is the forward
 // branch displacement at +0x2a9; the first instruction divergence is +0x2b0,
@@ -444,8 +439,10 @@ void ExpCampaign::ShowInfo(int viewOnly, int)
 // index and this build uses the opposite register order. Retail code is 0x921
 // bytes versus 0x926 here. Tried direct multidimensional indexing, a stored
 // flattened offset, inline flattened terms in both orders, and a partially
-// indexed base; all retained the nonretail evaluation order. Revisit after 95%
-// for last-mile expression tuning; do not repeat these spellings.
+// indexed base; all retained the nonretail evaluation order. Qualifying either
+// m_viewMap or m_campaignId through 0[&...] was also byte-neutral. Seven bounded
+// expression families are exhausted; revisit only after an earlier X_CAMPGN or
+// relevant layout/header change alters evaluation order.
 VA(0x004bc34d, 0x921)
 void ExpCampaign::UpdateInfo(int redraw)
 {
@@ -1182,6 +1179,12 @@ char *ExpCampaign::JosephName(void)
     return xStableText[m_currentMap];
 }
 
+// @early-stop
+// @early-stop-reloc-only
+// All 0x3a bytes match after masking two ordered relocation sites; all 18
+// instructions, the 0x4 frame/this slot, CFG, and effective targets align. The
+// second target is RVA 0xf2718 on both sides: base spells xStableText+0x18 while
+// retail spells the interior alias xJosephName+0x8. Revisit after alias normalization.
 VA(0x004bdab1, 0x3a)
 char *ExpCampaign::IvanName(void)
 {

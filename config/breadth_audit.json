@@ -1124,6 +1124,39 @@
       "note": "Deterministic local-name reconstruction restores the complete retail stack-slot layout; function is exact."
     },
     {
+      "unit": "SOURCE/X_CAMPGN",
+      "function": "?IvanName@ExpCampaign@@QAEPADXZ",
+      "source_hash": "85c73ad17922",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.7619,
+      "after": 99.7619,
+      "note": "All masked bytes and two effective targets align; only an interior public-data alias identity remains."
+    },
+    {
+      "unit": "SOURCE/X_CAMPGN",
+      "function": "?ShowInfo@ExpCampaign@@QAEXHH@Z",
+      "source_hash": "5bcfe6c0c0f4",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.968185,
+      "after": 100.0,
+      "note": "Deterministic local-name bucket correction restores saved-theme and campaign-icon stack slots; function is exact."
+    },
+    {
+      "unit": "SOURCE/X_CAMPGN",
+      "function": "?UpdateInfo@ExpCampaign@@QAEXH@Z",
+      "source_hash": "4d75afc72c7c",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 2,
+      "before": 98.93493,
+      "after": 98.93493,
+      "note": "Complete UI CFG frame slots and 177 relocs; flattened selection evaluation order resists seven bounded families."
+    },
+    {
       "unit": "SOURCE/dpnetwin",
       "function": "?dpEvaluateMessage@@YIXKH@Z",
       "source_hash": "0b6f64c20e48",
