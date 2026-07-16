@@ -326,13 +326,13 @@ int resourceManager::LoadAggregateHeader(char *aggregateName)
     int aggregateFile;
     unsigned int directoryBytes;
     if (m_numAggregates >= RESOURCE_MANAGER_AGGREGATE_LIMIT) {
-        sprintf(gText, "Only %d AGG files can be used at once", RESOURCE_MANAGER_AGGREGATE_LIMIT);
+        sprintf(gText, "Only %d .AGG files can be used at once.", RESOURCE_MANAGER_AGGREGATE_LIMIT);
         ShutDown(gText);
         return RESOURCE_MANAGER_ERROR;
     }
     aggregateFile = _open(aggregateName, RESOURCE_MANAGER_BINARY_OPEN_MODE);
     if (aggregateFile == RESOURCE_MANAGER_INVALID_FILE) {
-        sprintf(gText, "Can't open file '%s'", aggregateName);
+        sprintf(gText, "Can't open file: %s", aggregateName);
         ShutDown(gText);
         return RESOURCE_MANAGER_ERROR;
     }
@@ -523,6 +523,26 @@ void resourceManager::ReadBlock(signed char *destination, unsigned long size)
 
 // ---- vtables (compiler-emitted; census) ----
 VTBL(resourceManager, 0x004eb9f0);
+
+// @data-layout-note Retail's initialized RESMGR contribution is
+// RVA 0x11e99c..0x11ebc8 (0x22c). The retained align-four ordinary .data
+// section begins with iSaveCtr and thirteen compiler-local $SG owners. After
+// correcting the two diagnostic strings to their retail text, its 0x225 bytes
+// are byte-identical to retail; the remaining seven contribution bytes are
+// zero inter-object alignment. The owner offsets are 0x4, 0x8, 0x18, 0x40,
+// 0x68, 0x7c, 0xa4, 0xf0, 0x13c, 0x164, 0x18c, 0x1b4, and 0x1dc. This exact
+// ordinary-section topology rejects both an align-eight typed aggregate at the
+// align-four-only retail start and per-function COMDAT banks. The only rdata
+// owner is the reviewed 0xc resourceManager vtable at RVA 0x0eb9f0; its 0x10
+// contribution includes four bytes of natural alignment.
+// Retail BSS is 0x1331e8..0x133238 (0x50), with lastAggZ then lastPositionZ.
+// Candidate BSS has the exact size and align-eight class but emits
+// lastPositionZ at offset 0 and lastAggZ at 0x28. Header order, definition
+// order, both orders together, top-of-TU placement, and ABI-neutral array
+// typedefs do not change it; an explicit zero initializer incorrectly moves
+// storage into initialized data. SavePosition and RestorePosition remain
+// instruction- and relocation-exact. Retain the one inconsistent-anchor-bases
+// residual rather than inventing aliases, padding, pragmas, or fake owners.
 
 // ---- globals (definitions, RVA order) ----
 DATA(0x0051e99c) int iSaveCtr = 0;
