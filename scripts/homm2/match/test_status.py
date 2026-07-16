@@ -264,7 +264,8 @@ class SourceHashBoundaryTest(unittest.TestCase):
         self.temporary.cleanup()
 
     @staticmethod
-    def _source(first_return="localValue + 1", second_return="2"):
+    def _source(first_return="localValue + 1", second_return="2",
+                between=""):
         return f'''#define BRACE_TEXT {{ ignored_by_lexer }}
 VA(0x00401000, 0x20)
 int First(void)
@@ -282,6 +283,7 @@ VA(0x0040ffff, 0x1)
     return {first_return};
 }}
 
+{between}
 VA(0x00401100, 0x10)
 int Second(void)
 {{
@@ -298,6 +300,32 @@ int Second(void)
         self.assertIn("return localValue + 1", blocks[0][1])
         self.assertNotIn("int Second", blocks[0][1])
         self.assertIn("return 2", blocks[1][1])
+
+    def test_neighboring_va_comments_belong_to_neither_function_hash(self):
+        first = ("SOURCE/UNIT", "?First@@YAHXZ")
+        second = ("SOURCE/UNIT", "?Second@@YAHXZ")
+        self.source.write_text(self._source(
+            between="// @semantic: first neighboring marker\n#undef LOCAL_ONLY"))
+        before = status.source_hashes()
+        self.source.write_text(self._source(
+            between="// @early-stop\n// changed neighboring proof\n#undef OTHER"))
+        after = status.source_hashes()
+
+        self.assertEqual(before[first], after[first])
+        self.assertEqual(before[second], after[second])
+
+    def test_target_body_edit_changes_only_target_hash(self):
+        first = ("SOURCE/UNIT", "?First@@YAHXZ")
+        second = ("SOURCE/UNIT", "?Second@@YAHXZ")
+        self.source.write_text(self._source(
+            between="// @early-stop\n// target proof"))
+        before = status.source_hashes()
+        self.source.write_text(self._source(
+            second_return="3", between="// @early-stop\n// target proof"))
+        after = status.source_hashes()
+
+        self.assertEqual(before[first], after[first])
+        self.assertNotEqual(before[second], after[second])
 
     def test_file_scope_boundary_preserves_legacy_blank_line_surface(self):
         text = '''VA(0x00401000, 0x1)
