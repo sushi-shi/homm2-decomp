@@ -1,4 +1,82 @@
 {
   "version": 1,
-  "records": []
+  "records": [
+    {
+      "unit": "SOURCE/KB",
+      "function": "?AddScoreToHighScore@@YIHHHHHPAD@Z",
+      "source_hash": "caad0d5ec9ee",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.996,
+      "after": 100.0,
+      "note": "Legacy CRT names and retail read-size spelling produced exact code and 27 matching relocations."
+    },
+    {
+      "unit": "SOURCE/KB",
+      "function": "?CheckEndGame@@YIXHH@Z",
+      "source_hash": "0e9a7c50f042",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 5,
+      "before": 99.52409,
+      "after": 99.52409,
+      "note": "Complete body and 300 relocation targets; three commutative evaluation-order residual groups resisted five direct variants."
+    },
+    {
+      "unit": "SOURCE/KB",
+      "function": "?HandleAppSpecificMenuCommands@@YIHH@Z",
+      "source_hash": "015acf27f6db",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.43399,
+      "after": 99.43399,
+      "note": "Current raw immediate-displacement artifact proof revalidated with complete external relocations."
+    },
+    {
+      "unit": "SOURCE/KB",
+      "function": "?InitMenuHandler@@YIHAAUtag_message@@@Z",
+      "source_hash": "26703199975a",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.60789,
+      "after": 99.60789,
+      "note": "Current marker revalidated: complete frame CFG and relocation evidence; compiler-shape residual remains."
+    },
+    {
+      "unit": "SOURCE/KB",
+      "function": "?PopNetBox@@YIXPADH@Z",
+      "source_hash": "8268ad33fe01",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 2,
+      "before": 98.83069,
+      "after": 98.83069,
+      "note": "Complete body frame CFG and 131 relocations; unsigned low-byte keyboard guard still lowers differently."
+    },
+    {
+      "unit": "SOURCE/KB",
+      "function": "?ShowMoraleInfo@game@@QAEXPAVhero@@H@Z",
+      "source_hash": "d07a61f6bd0b",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "improved",
+      "iterations": 1,
+      "before": 99.399,
+      "after": 99.47301,
+      "note": "Hash-derived stack-slot names aligned the frame; only two proved five-byte continuation jumps remain."
+    },
+    {
+      "unit": "SOURCE/KB",
+      "function": "?SmackFade@@YIXPAE0@Z",
+      "source_hash": "ffccb41ed1bf",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 3,
+      "before": 99.28824,
+      "after": 99.28824,
+      "note": "All relocation-masked instructions match; metric residual is only function-local data identity."
+    }
+  ]
 }
