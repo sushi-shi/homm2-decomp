@@ -3452,6 +3452,10 @@ void advManager::UpdateHeroLocator(int locatorSlot, int drawWindow,
     }
 }
 
+// @early-stop
+// Relocation-masked instructions, the 0x10 frame/slots, and CFG are exact.
+// All 14 relocation offsets and effective targets agree; the delinker names
+// retail's __adjust_fdiv test address as the coincident iLeftRightSave symbol.
 VA(0x004607ad, 0x102)
 void advManager::UpdateHeroLocators(int drawWindow, int updateScreen)
 {
@@ -3479,6 +3483,10 @@ void advManager::UpdateHeroLocators(int drawWindow, int updateScreen)
         m_adventureWindow->DrawWindow(updateScreen);
 }
 
+// @early-stop
+// Relocation-masked instructions, the 0x60 frame/slots, and CFG are exact.
+// All 30 relocation offsets and effective targets agree; the delinker names
+// retail's __adjust_fdiv test address as the coincident iLeftRightSave symbol.
 VA(0x004608af, 0x2e8)
 void advManager::UpdateTownLocators(int drawWindow, int updateScreen)
 {
@@ -6016,6 +6024,10 @@ void advManager::TeleportTo(hero *mapHero, int destinationX, int destinationY,
     ForceNewHover();
 }
 
+// @early-stop
+// Relocation-masked instructions, the 0x14 frame/slots, and CFG are exact.
+// All 27 relocation offsets and effective targets agree; the residual is only
+// delinked local string and floating-constant symbol identity.
 VA(0x00467539, 0x1fb)
 void advManager::DimensionDoor(void)
 {
