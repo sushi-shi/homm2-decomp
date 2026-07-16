@@ -104,7 +104,7 @@ $T4299	BASE\Bzip.c	0xeba98	0x8	rdata	0x8	5	0x10	local	candidate-coff-section-tra
 $T32155	BASE\Ripple.c	0xeba80	0x4	rdata	0x4	3	0x0	local	candidate-coff-section-translation
 ??_7sample@@6B@	BASE\SAMPLE.c	0xebab4	0x4	rdata	0x4	4	0x0	external	candidate-coff-section-translation
 ??_7MIDIWrap@@6B@	BASE\SAMPLE.c	0xebab8	0x4	rdata	0x4	11	0x0	external	candidate-coff-section-translation
-??_7textWidget@@6B@	BASE\TEXTWDGT.c	0xeba50	0xc	rdata	0x8	3	0x0	external	candidate-coff-section-translation
+??_7textWidget@@6B@	BASE\TEXTWDGT.c	0xeba50	0xc	rdata	0x8	4	0x0	external	candidate-coff-section-translation
 ??_7tileset@@6B@	BASE\TILESET.c	0xebab0	0x4	rdata	0x4	4	0x0	external	candidate-coff-section-translation
 ??_7textEntryWidget@@6B@	BASE\Textntry.c	0xebaa0	0xc	rdata	0x8	3	0x0	external	candidate-coff-section-translation
 ??_7widget@@6B@	BASE\WIDGET.c	0xebb00	0xc	rdata	0x8	3	0x0	external	candidate-coff-section-translation
