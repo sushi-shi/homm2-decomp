@@ -15,10 +15,8 @@
 #include <BASE/inputManager.h>
 #include <SOURCE/KB.h>
 
+#define BUTTON_REPEAT_TIMER_SLOT 2
 
-
-// ---- module-private synthetic globals (retail xref: single-module) ----
-DATA(0x00528cf8) static long gButtonRepeatTime; // button auto-repeat deadline tick (button::Select)
 
 VA(0x004dd440, 0x34)
 button::button(void) : widget(0, 0, 0, 0, 0, 0)
@@ -98,9 +96,9 @@ inline button::~button()
 // Candidate is 0x585 versus retail 0x595. The first non-relocation byte divergence
 // is +0x47: candidate loads the vptr after storing m_flags, while retail loads it
 // before the store. The modal loop, message CFG, frame, calls, and all 36 ordered
-// relocations are present; identities agree except the proven gButtonRepeatTime
-// interior-label name. Later residuals are CX/DX flag allocation, hit-test register
-// allocation/polarity, and four deselection schedules; relocation offsets accumulate
+// relocations are present with matching identities. Later residuals are CX/DX flag
+// allocation, hit-test register allocation/polarity, and four deselection schedules;
+// relocation offsets accumulate
 // retail deltas of +6, +12, then +16 bytes. Negative key-up gating, per-site short
 // flag snapshots, cached/global flags, hit-test polarity, and goto/break spellings
 // were tried. A completed 40-iteration libclang AST pass and 24 guarded TU-state
@@ -114,7 +112,8 @@ VA(0x004dd6d0, 0x595)
 int button::Main(tag_message &msg)
 {
     if (DecodeWidgetKind(m_kind) == WIDGET_KIND_AUTO_REPEAT &&
-        (m_flags & WIDGET_FLAG_SELECTED) != 0 && KBTickCount() > gButtonRepeatTime) {
+        (m_flags & WIDGET_FLAG_SELECTED) != 0 &&
+        KBTickCount() > glTimers[BUTTON_REPEAT_TIMER_SLOT]) {
         if ((m_flags & WIDGET_FLAG_SELECTED) == 0)
             return 0;
         m_flags &= ~WIDGET_FLAG_SELECTED;
@@ -286,8 +285,8 @@ normalEvent:
 // divergence is +0x0a: candidate loads both owner coordinates first; retail starts
 // button Y in CX, completes X in DX, then adds owner Y to CX. Everything from
 // DrawToBuffer onward is instruction-identical after the one-byte setup shift, and all
-// 6 ordered relocations agree in type and target except the proven gButtonRepeatTime
-// interior-label name. Cached/direct owner access, X/Y declaration order, staged Y,
+// 6 ordered relocations agree in type and target. Cached/direct owner access, X/Y
+// declaration order, staged Y,
 // split/combined sums, and the matching iconWidget staged-coordinate pattern were
 // tried. A separate int X/Y form reached only 90.15% and was reverted. Revisit after a
 // real predecessor/header TU-state change. This residual remains unresolved; it is not
@@ -308,7 +307,7 @@ short button::Select(struct tag_message &msg)
     } else {
         msg.payload.widget.command = WIDGET_COMMAND_SELECT;
     }
-    gButtonRepeatTime = KBTickCount() + BUTTON_REPEAT_DELAY_TICKS;
+    glTimers[BUTTON_REPEAT_TIMER_SLOT] = KBTickCount() + BUTTON_REPEAT_DELAY_TICKS;
     iLeftRightSave = msg.payload.widget.parameter & MESSAGE_MODIFIER_BUTTON_MASK;
     return 2;
 }
