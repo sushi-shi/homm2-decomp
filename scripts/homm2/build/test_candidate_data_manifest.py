@@ -2,6 +2,7 @@ import unittest
 from types import SimpleNamespace
 
 from homm2.build.candidate_data_manifest import (
+    CandidateAllocation,
     REPO,
     _bounded_section_delta_proofs,
     _contains,
@@ -12,6 +13,7 @@ from homm2.build.candidate_data_manifest import (
     _reviewed_candidate_allocation,
     _payload_rvas,
     _reviewed_group_allocations,
+    _validate_constrained_reviewed_group,
     _virtual_section_bytes,
     candidate_definitions,
     diagnostics_bytes,
@@ -20,6 +22,58 @@ from homm2.build.candidate_data_manifest import (
 
 
 class CandidateDataManifestTest(unittest.TestCase):
+    def test_constrained_group_accepts_zero_padding_and_equivalent_payloads(self):
+        definitions = [
+            {"name": "$T1", "section": 1, "section_offset": 0},
+            {"name": "$T2", "section": 1, "section_offset": 4},
+            {"name": "$T3", "section": 1, "section_offset": 8},
+        ]
+        coff = SimpleNamespace(
+            data=b"AAAABBBBBBBB",
+            sections=[SimpleNamespace(raw_offset=0)],
+        )
+        allocations = [
+            CandidateAllocation("A", "A.c", "$T1", "rdata", 0, 4, 4,
+                                0x100, 1, "local",
+                                "candidate-coff-remaining-slot-bijection"),
+            CandidateAllocation("A", "A.c", "$T2", "rdata", 4, 4, 4,
+                                0x108, 1, "local",
+                                "candidate-coff-equivalence-class:A-one"),
+            CandidateAllocation("A", "A.c", "$T3", "rdata", 8, 4, 4,
+                                0x10c, 1, "local",
+                                "candidate-coff-equivalence-class:A-one"),
+        ]
+        retail = b"AAAA\0\0\0\0BBBBBBBB"
+        _validate_constrained_reviewed_group(
+            "A", "rdata", definitions, coff, allocations, [(0x100, 0x110)],
+            lambda rva, size: retail[rva - 0x100:rva - 0x100 + size])
+
+    def test_constrained_group_rejects_uncovered_nonzero_payload(self):
+        definitions = [{"name": "$T1", "section": 1, "section_offset": 0}]
+        coff = SimpleNamespace(
+            data=b"AAAA", sections=[SimpleNamespace(raw_offset=0)])
+        allocations = [CandidateAllocation(
+            "A", "A.c", "$T1", "rdata", 0, 4, 4, 0x100, 1, "local",
+            "candidate-coff-remaining-slot-bijection")]
+        retail = b"AAAAXXXX"
+        with self.assertRaisesRegex(ValueError, "leaves nonzero retail byte"):
+            _validate_constrained_reviewed_group(
+                "A", "rdata", definitions, coff, allocations,
+                [(0x100, 0x108)],
+                lambda rva, size: retail[rva - 0x100:rva - 0x100 + size])
+
+    def test_constrained_group_rejects_singleton_equivalence_class(self):
+        definitions = [{"name": "$T1", "section": 1, "section_offset": 0}]
+        coff = SimpleNamespace(
+            data=b"AAAA", sections=[SimpleNamespace(raw_offset=0)])
+        allocations = [CandidateAllocation(
+            "A", "A.c", "$T1", "rdata", 0, 4, 4, 0x100, 1, "local",
+            "candidate-coff-equivalence-class:A-one")]
+        with self.assertRaisesRegex(ValueError, "fewer than two owners"):
+            _validate_constrained_reviewed_group(
+                "A", "rdata", definitions, coff, allocations,
+                [(0x100, 0x104)], lambda _rva, _size: b"AAAA")
+
     def test_virtual_section_reader_zero_fills_beyond_raw_payload(self):
         data = b"xxxxABCD"
         sections = [(0x100, 8, 4, 4)]

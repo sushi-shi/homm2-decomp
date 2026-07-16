@@ -49,11 +49,14 @@
 //
 // Retail .rdata is 0xeb280..0xeb5e0 (0x360 bytes). Candidate .rdata is 0x368
 // bytes and contains the complete retail four-byte payload multiset plus two
-// candidate-only zero words, so whole-section translation is not valid. The
-// supplemental manifest records only the 86 private allocations (0x24c bytes)
-// proved by one-owner aligned relocation sites and exact payloads. The other
-// 53 repeated, unreferenced, or nonexact candidate allocations remain
-// intentionally unclaimed. The corrected pool distinguishes campfire 500.0f,
+// candidate-only zero words, so whole-section translation is not valid. All
+// 139 private allocations are now closed: 86 by direct relocation/payload
+// evidence, 51 by exact remaining-slot elimination, and the two identical
+// 1.0f header statics as equivalence class PHILAI-rdata-identity-1f in their
+// declaration/candidate order. Their logical payload is 0x330 bytes. Fourteen
+// physical eight-byte candidate spans contain four-byte float allocations plus
+// alignment tails; retail retains twelve zero padding words (0x30 bytes) after
+// reordered allocation. The corrected pool distinguishes campfire 500.0f,
 // buoy 400.0f, watering-hole 300.0f, and the shared 200.0f land-site factor.
 //
 // All 33 zero-fill owners are source DATA definitions. Their retail public
