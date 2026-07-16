@@ -181,9 +181,13 @@ def _align_up(value: int, alignment: int) -> int:
     return (value + alignment - 1) & -alignment
 
 
-def _load_public_data(path: Path = SYMBOLS) -> tuple[dict[tuple[str, int], list[str]], dict[tuple[str, str], int]]:
+def _load_public_data(path: Path = SYMBOLS) -> tuple[
+        dict[tuple[str, int], list[str]],
+        dict[tuple[str, str], int],
+        dict[str, tuple[int, ...]]]:
     by_rva = defaultdict(list)
     by_symbol = {}
+    global_by_symbol = defaultdict(set)
     with Path(path).open(newline="", encoding="latin-1") as stream:
         for row in csv.DictReader(stream):
             if row.get("kind") != "data":
@@ -191,7 +195,13 @@ def _load_public_data(path: Path = SYMBOLS) -> tuple[dict[tuple[str, int], list[
             rva = int(row["rva"], 0)
             by_rva[(row["unit"], rva)].append(row["name"])
             by_symbol[(row["unit"], row["name"])] = rva
-    return by_rva, by_symbol
+            global_by_symbol[row["name"]].add(rva)
+    # The shipping NB09 has S_PUB32 identities but no compiland ownership.
+    # Keep its global name index separate from recovered per-unit associations.
+    global_rvas = {
+        name: tuple(sorted(rvas)) for name, rvas in global_by_symbol.items()
+    }
+    return by_rva, by_symbol, global_rvas
 
 
 def resolve_source_definitions(definitions, topology_by_unit, public_by_rva) -> list[tuple[SourceDefinition, CandidateDefinition]]:
@@ -390,8 +400,10 @@ def _section_domain(section):
     return section.storage
 
 
-def _section_rows(topology_by_unit, symbol_rows, public_by_symbol, contributions):
+def _section_rows(topology_by_unit, symbol_rows, public_by_symbol,
+                  global_public_rvas, contributions):
     anchors = defaultdict(list)
+    comdat_identity_anchors = defaultdict(list)
     for row in symbol_rows:
         unit = row["object"].replace("\\", "/").removesuffix(".c")
         ordinal = int(row["section_ordinal"], 0)
@@ -401,11 +413,17 @@ def _section_rows(topology_by_unit, symbol_rows, public_by_symbol, contributions
     for unit, (definitions, _sections) in topology_by_unit.items():
         for definition in definitions:
             public_rva = public_by_symbol.get((unit, definition.symbol))
-            if public_rva is None:
+            if public_rva is not None:
+                anchors[(unit, definition.section_ordinal)].append((
+                    public_rva - definition.section_value, definition.symbol,
+                    public_rva, "retail-S_PUB32+recovered-owner"))
                 continue
-            anchors[(unit, definition.section_ordinal)].append((
-                public_rva - definition.section_value, definition.symbol,
-                public_rva, "retail-NB09-public-data"))
+            if not definition.comdat_selection:
+                continue
+            for global_rva in global_public_rvas.get(definition.symbol, ()):
+                comdat_identity_anchors[(unit, definition.section_ordinal)].append((
+                    global_rva - definition.section_value, definition.symbol,
+                    global_rva, "retail-S_PUB32-global-COMDAT-identity"))
     physical = _physical_contributions(contributions)
     sections_by_unit = {
         unit: [section for section in sections if section.storage is not None]
@@ -425,7 +443,8 @@ def _section_rows(topology_by_unit, symbol_rows, public_by_symbol, contributions
                 continue
             if any(start <= rva < end
                    for _base, _name, rva, _provenance in
-                   anchors.get((unit, section.ordinal), [])):
+                   [*anchors.get((unit, section.ordinal), []),
+                    *comdat_identity_anchors.get((unit, section.ordinal), [])]):
                 hit_storages.add(section.storage)
         candidate_storages = {
             section.storage for section in sections_by_unit.get(unit, [])
@@ -460,7 +479,8 @@ def _section_rows(topology_by_unit, symbol_rows, public_by_symbol, contributions
             if _section_domain(section) == "writable"
             and any(start <= rva < end
                     for _base, _name, rva, _provenance in
-                    anchors.get((unit, section.ordinal), []))
+                    [*anchors.get((unit, section.ordinal), []),
+                     *comdat_identity_anchors.get((unit, section.ordinal), [])])
         })
         if len(storages) > 1:
             diagnostics.append({
@@ -500,13 +520,30 @@ def _section_rows(topology_by_unit, symbol_rows, public_by_symbol, contributions
                     if interval_index < len(intervals):
                         cursor = intervals[interval_index]["rva"]
 
-                if predicted is None and section.comdat_selection and len(bases) == 1:
-                    predicted = next(iter(bases))
-                    provenance = "explicit-comdat-anchor"
-                elif predicted is None:
-                    cause = ("unanchored-comdat-without-contribution"
-                             if section.comdat_selection else
-                             "section-outside-contributions")
+                provenance = ("retail-contribution-replay"
+                              if predicted is not None else None)
+                if predicted is None and section.comdat_selection:
+                    fallback_values = values or comdat_identity_anchors.get(
+                        (unit, section.ordinal), [])
+                    fallback_bases = {value[0] for value in fallback_values}
+                    if len(fallback_bases) == 1:
+                        predicted = next(iter(fallback_bases))
+                        values = fallback_values
+                        bases = fallback_bases
+                        provenance = "explicit-comdat-anchor"
+                if predicted is None:
+                    fallback_values = comdat_identity_anchors.get(
+                        (unit, section.ordinal), [])
+                    fallback_bases = {value[0] for value in fallback_values}
+                    if fallback_bases and not bases:
+                        values = fallback_values
+                        bases = fallback_bases
+                    if section.comdat_selection:
+                        cause = ("ambiguous-comdat-identity-without-contribution"
+                                 if bases else
+                                 "unanchored-comdat-without-contribution")
+                    else:
+                        cause = "section-outside-contributions"
                     diagnostics.append({
                         "unit": unit,
                         "section_ordinal": section.ordinal,
@@ -521,8 +558,6 @@ def _section_rows(topology_by_unit, symbol_rows, public_by_symbol, contributions
                         ],
                     })
                     continue
-                else:
-                    provenance = "retail-contribution-replay"
 
                 assignments[(unit, section.ordinal)] = (predicted, owner_index)
                 if len(bases) > 1:
@@ -740,7 +775,8 @@ def build_manifests(source_root=SOURCE_ROOT, base_root=BASE_ROOT, symbols=SYMBOL
     for unit in sorted(row["unit"] for row in manifest.get("unit", [])):
         topology_by_unit[unit] = candidate_topology(
             Path(base_root) / f"{unit}.obj", unit)
-    public_by_rva, public_by_symbol = _load_public_data(Path(symbols))
+    public_by_rva, public_by_symbol, global_public_rvas = _load_public_data(
+        Path(symbols))
     resolved = resolve_source_definitions(definitions, topology_by_unit, public_by_rva)
     retail_rvas = sorted({row.rva for row in definitions})
     next_rva = {rva: (retail_rvas[index + 1]
@@ -760,7 +796,8 @@ def build_manifests(source_root=SOURCE_ROOT, base_root=BASE_ROOT, symbols=SYMBOL
     validate_symbol_rows(combined, "combined")
     retail_contributions = contribution_rows(exe, units)
     section_rows, section_diagnostics, physical = _section_rows(
-        topology_by_unit, combined, public_by_symbol, retail_contributions)
+        topology_by_unit, combined, public_by_symbol, global_public_rvas,
+        retail_contributions)
     report = breakpoint_report(
         topology_by_unit, section_rows, section_diagnostics, physical, exe)
     classified_contributions = [
