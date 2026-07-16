@@ -684,6 +684,61 @@
       "note": "Relocation-masked code is exact; sole folded __adjust_fdiv/iLeftRightSave relocation resolves identically."
     },
     {
+      "unit": "SOURCE/HERO",
+      "function": "?CheckLevel@hero@@QAEXXZ",
+      "source_hash": "066b19fb5144",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.51685,
+      "after": 99.51685,
+      "note": "Every non-jump byte and 58 external relocs align; retail has two extra five-byte local trampoline jumps."
+    },
+    {
+      "unit": "SOURCE/HERO",
+      "function": "?DoHeroSplit@@YIXHH@Z",
+      "source_hash": "67c038bb7d71",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "exact",
+      "iterations": 3,
+      "before": 99.97369,
+      "after": 100.0,
+      "note": "Corrected split-amount widget ID to 68 and reconstructed retail local slots; function is exact."
+    },
+    {
+      "unit": "SOURCE/HERO",
+      "function": "?DoSSLevelDialog@hero@@QAEXHH@Z",
+      "source_hash": "eb3e70e63135",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "improved",
+      "iterations": 2,
+      "before": 99.85542,
+      "after": 99.93976,
+      "note": "Corrected skill label index to level minus one and restored local slots; all masked bytes and 11 effective targets align."
+    },
+    {
+      "unit": "SOURCE/HERO",
+      "function": "?GetSSLevel@hero@@QAECH@Z",
+      "source_hash": "6b93b34556b9",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 99.9661,
+      "after": 99.9661,
+      "note": "Exact frame slots and three relocs; only one commutative bonus-plus-level load order remains."
+    },
+    {
+      "unit": "SOURCE/HERO",
+      "function": "?UpdateHeroScreenStatusBar@@YIXAAUtag_message@@@Z",
+      "source_hash": "34daeaffc9cb",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 2,
+      "before": 98.855835,
+      "after": 98.855835,
+      "note": "Complete frame slots and 150 relocs; equality load order and third skill-row branch topology resist bounded steering."
+    },
+    {
       "unit": "SOURCE/KB",
       "function": "?AddScoreToHighScore@@YIHHHHHPAD@Z",
       "source_hash": "caad0d5ec9ee",
