@@ -215,6 +215,10 @@ typedef enum AIFightEventConstant {
     AI_FIGHT_EVENT_REWARD_5000 = 5000
 } AIFightEventConstant;
 
+typedef enum AIShipwreckSurvivorConstant {
+    AI_SHIPWRECK_SURVIVOR_ARTIFACT_METADATA_OFFSET = 2
+} AIShipwreckSurvivorConstant;
+
 typedef enum AIPurchaseType {
     AI_PURCHASE_BUILDING = 0,
     AI_PURCHASE_HERO = 1,

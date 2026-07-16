@@ -164,9 +164,6 @@ void philAI::DoAllHeroInteractions(void) {
     }
 }
 
-// @early-stop
-// reloc-masked asm is instruction-identical; the sole differing relocation is retail's
-// delinked string symbol at the address of gDwellingType versus our typed array symbol.
 VA(0x00437c61, 0x37e)
 void philAI::CheckForCreatureUpgrades(void) {
     int upgradeType = -1;
@@ -198,7 +195,8 @@ void philAI::CheckForCreatureUpgrades(void) {
                     continue;
                 canUpgrade = 0;
                 for (dwelling = 20; dwelling <= 24; dwelling++) {
-                    if (gDwellingType[townPtr->m_type][dwelling] ==
+                    if (gDwellingType[townPtr->m_type]
+                                      [dwelling - AI_BUILDING_FIRST_DWELLING] ==
                             armyPtr->m_creatureTypes[creatureIndex] &&
                         (townPtr->m_buildings & (1 << (dwelling + 5)))) {
                         canUpgrade = 1;
@@ -4684,11 +4682,6 @@ int philAI::ManaRefreshValue(hero *h, int level) {
     return v;
 }
 
-// @early-stop
-// Exact 0x1ac5 size and relocation layout. The only relocation-masked
-// byte difference is +0x34d: SIB 0x01 versus retail 0x08. Both encode the same
-// scale-1 address, EAX + ECX + 0x634c; field, pointer-first, integer-first, and
-// byte-neutral operand spellings all retain the assembler's equivalent encoding.
 VA(0x00443fc4, 0x1ac5)
 int philAI::ValueOfEventAtPosition(int x, int y, int immediate, int *liveChance) {
     mapCell *cell_k;
@@ -5027,7 +5020,8 @@ creature_purchase:
         gbReduceByReload = 0;
         break;
     case AI_OBJECT_SHIPWRECK_SURVIVOR:
-        value_h = gArtifactBaseRV[cell_k->m_objectMetadata];
+        value_h = gArtifactBaseRV[
+            cell_k->m_objectMetadata - AI_SHIPWRECK_SURVIVOR_ARTIFACT_METADATA_OFFSET];
         if (value_h < 125)
             value_h = 125;
         break;
