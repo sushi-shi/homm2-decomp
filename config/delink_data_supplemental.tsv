@@ -131,6 +131,9 @@ _gFYX0$S611	BASE\iconf2by.c	0x138140	0x4	bss	0x4	3	0x38	local	candidate-coff-sec
 _gFYClipR$S626	BASE\iconf2by.c	0x138144	0x4	bss	0x4	3	0x3c	local	candidate-coff-section-translation
 _gFYClipB$S615	BASE\iconf2by.c	0x138148	0x4	bss	0x4	3	0x40	local	candidate-coff-section-translation
 _gFYDimLen2$S620	BASE\iconf2by.c	0x13814c	0x4	bss	0x4	3	0x44	local	candidate-coff-section-translation
+??_C@_0FF@OCJB@I?3?2Projects?2Heroes?2Prog?2BASE?2lis@	BASE\listbox.c	0x120e94	0x55	data	0x4	8	0x0	external	candidate-coff-section-translation
+??_C@_0KN@EBCN@I?3?2Projects?2Heroes?2Prog?2BASE?2lis@	BASE\listbox.c	0x120eec	0xad	data	0x4	13	0x0	external	candidate-coff-section-translation
+??_C@_0NJ@MJHP@I?3?2Projects?2Heroes?2Prog?2BASE?2lis@	BASE\listbox.c	0x120f9c	0xd9	data	0x4	16	0x0	external	candidate-coff-section-translation
 ??_7listBoxWidget@@6B@	BASE\listbox.c	0xebac0	0xc	rdata	0x8	3	0x0	external	candidate-coff-section-translation
 ??_C@_0BE@OAJC@UpdateWindow?5Failed?$AA@	BASE\miscwin.c	0x120cd8	0x14	data	0x4	4	0x0	external	candidate-coff-reloc-bijection
 ??_C@_0BG@DGIP@InvalidateRect?5Failed?$AA@	BASE\miscwin.c	0x120cc0	0x16	data	0x4	5	0x0	external	candidate-coff-reloc-bijection
