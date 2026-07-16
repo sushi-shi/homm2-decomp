@@ -2708,6 +2708,12 @@ int army::SetSpellInfluence(int influence, int rounds)
     return 1;
 }
 
+// @semantic
+// Complete 0x94 body, 0x8 frame/slots, CFG, and the sole ordered relocation
+// agree. At +0x67/+0x6a retail loads this from -0x8 into EAX and i from -0x4
+// into ECX for the decrement SIB; base assigns those registers in reverse.
+// i[m_spellInfluence] was byte-neutral and explicit pointer subtraction
+// materially regressed the lowering. Revisit after an ARMY TU-state change.
 VA(0x00452401, 0x94)
 void army::DecrementSpellRounds(void)
 {

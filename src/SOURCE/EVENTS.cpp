@@ -2102,10 +2102,6 @@ int advManager::BarrierEvent(mapCell *cell, hero *)
     }
 }
 
-// @early-stop
-// All instructions and both external relocations match. The only
-// raw residual is offsets 0x5d and 0x61, where MSVC reverses the two symmetric
-// equality loads from the exact -0x10/-0x14 character slots.
 VA(0x004aebc1, 0x99)
 signed char StrEqNoCase(char *firstString, char *secondString)
 {
@@ -2123,7 +2119,7 @@ signed char StrEqNoCase(char *firstString, char *secondString)
             toupper(static_cast<int>(*firstPosition)));
         secondUpper = static_cast<char>(
             toupper(static_cast<int>(*secondPos)));
-        if (firstUpper == secondUpper) {
+        if (0[&firstUpper] == secondUpper) {
             if (firstUpper == 0)
                 return 1;
             firstPosition++;
