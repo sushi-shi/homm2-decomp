@@ -31,6 +31,8 @@ Review every resolvable same-site target in live exact functions:
     homm2 relocs --resolved
 Review relocation-count deficits among incomplete functions:
     homm2 relocs --counts BASE
+Compare raw relocation identities and encoded addends in every function:
+    homm2 relocs --addends [SOURCE|BASE|EDITOR]
 Run from repo root; exits 1 on any wrong/fabricated reloc target.
 """
 import sys, os, re, csv, json, glob, struct, subprocess, hashlib
@@ -43,7 +45,7 @@ from homm2.build.reloc_owners import load_owner_ranges, owner_for_rva
 IMAGE_BASE = 0x400000
 _PARSE_CACHE = {}
 # Bump only when parse_obj's serialized relocation representation changes.
-_PARSER_FINGERPRINT = "coff-relocs-v1"
+_PARSER_FINGERPRINT = "coff-relocs-v2"
 FIELD_AUDIT_THRESHOLD = 99.5
 
 
@@ -180,17 +182,19 @@ def _text_sections(obj):
         sections.append(blob[raw:raw + size])
     return sections
 
-def parse_obj(obj, with_sites=False):
-    """llvm-objdump -dr -> ordered relocations per function; __imp__ skipped.
+def parse_obj(obj, with_sites=False, include_imports=False):
+    """llvm-objdump -dr -> ordered relocations per function.
 
     ``with_sites`` prefixes each relocation with its function-relative COFF offset.  Those offsets
     let the empty-COMDAT audit recover the original retail REL32 destination from the PE without
-    weakening ordinary target checking.
+    weakening ordinary target checking. Imports remain excluded for legacy callers unless
+    ``include_imports`` requests the complete raw identity set.
     """
     object_path = Path(obj).resolve()
     object_digest = hashlib.sha256(object_path.read_bytes()).hexdigest()
-    cache_key = "%s\0%s\0%s\0%s" % (
-        object_path, int(with_sites), object_digest, _PARSER_FINGERPRINT)
+    cache_key = "%s\0%s\0%s\0%s\0%s" % (
+        object_path, int(with_sites), int(include_imports), object_digest,
+        _PARSER_FINGERPRINT)
     if cache_key in _PARSE_CACHE:
         return _PARSE_CACHE[cache_key]
     cache_name = hashlib.sha256(cache_key.encode("utf-8")).hexdigest() + ".json"
@@ -239,7 +243,7 @@ def parse_obj(obj, with_sites=False):
         mr = re.search(r'IMAGE_REL_I386_(\w+)\s+(\S+)', ln)
         if mr:
             s = mr.group(2)
-            if not s.startswith('__imp__'):
+            if include_imports or not s.startswith('__imp__'):
                 mo = re.match(r'^\s*([0-9a-f]+):', ln)
                 site = int(mo.group(1), 16) if mo else -1
                 if 0 <= site <= len(text_bytes) - 4:
@@ -261,6 +265,42 @@ def parse_obj(obj, with_sites=False):
     os.replace(str(temporary), str(cache_path))
     _PARSE_CACHE[cache_key] = funcs
     return funcs
+
+
+def relocation_addend_map(relocations):
+    """Return ``relocation symbol -> sorted encoded COFF addends``.
+
+    Sites and instruction order are deliberately absent. This representation is
+    stable for structurally incomplete functions while still proving that both
+    objects encode the same displacement set for each relocation identity.
+    """
+    grouped = {}
+    for _typ, symbol, addend in relocations:
+        grouped.setdefault(symbol, []).append(addend)
+    return {symbol: tuple(sorted(addends))
+            for symbol, addends in grouped.items()}
+
+
+def compare_function_reloc_addends(base_relocs, target_relocs):
+    """Return raw-symbol addend differences for one function."""
+    base = relocation_addend_map(base_relocs)
+    target = relocation_addend_map(target_relocs)
+    differences = []
+    for symbol in sorted(set(base) | set(target)):
+        actual = base.get(symbol, ())
+        expected = target.get(symbol, ())
+        if actual == expected:
+            continue
+        missing = tuple(sorted((Counter(expected) - Counter(actual)).elements()))
+        excess = tuple(sorted((Counter(actual) - Counter(expected)).elements()))
+        differences.append({
+            "symbol": symbol,
+            "target": expected,
+            "base": actual,
+            "missing": missing,
+            "excess": excess,
+        })
+    return differences
 
 
 _PE_SECTIONS = None
@@ -650,6 +690,85 @@ def review_counts(scope="BASE"):
           (len(rows), sum(row[7] for row in rows), sum(row[8] for row in rows)))
     return 0
 
+
+def review_addends(scope=None):
+    """Compare raw relocation-name/addend multisets for every report function.
+
+    Unlike the ordered field gate, this audit is valid at any fuzzy percentage:
+    code movement cannot change an encoded owner-relative addend. A relocation
+    that exists on only one side is reported rather than silently skipped.
+    """
+    prefix = scope.rstrip("/") + "/" if scope else None
+    report = json.load(open("build/objdiff/report.json"))
+    output = {
+        "schema": 1,
+        "scope": scope or "all",
+        "compared_functions": 0,
+        "mismatched_functions": 0,
+        "missing_objects": [],
+        "functions": [],
+    }
+    for unit_record in report["units"]:
+        unit = unit_record["name"]
+        if prefix and not unit.startswith(prefix):
+            continue
+        base_obj = "build/objdiff/base/%s.obj" % unit
+        target_obj = "build/delink/%s.c.obj" % unit
+        missing = [path for path in (base_obj, target_obj) if not os.path.exists(path)]
+        if missing:
+            output["missing_objects"].extend(missing)
+            continue
+        base_functions = parse_obj(base_obj, include_imports=True)
+        target_functions = parse_obj(target_obj, include_imports=True)
+        for function in unit_record.get("functions", []):
+            name = function["name"]
+            base_present = name in base_functions
+            target_present = name in target_functions
+            output["compared_functions"] += 1
+            if not base_present or not target_present:
+                output["functions"].append({
+                    "unit": unit,
+                    "function": name,
+                    "base_present": base_present,
+                    "target_present": target_present,
+                    "differences": [],
+                })
+                continue
+            differences = compare_function_reloc_addends(
+                base_functions[name], target_functions[name])
+            if differences:
+                output["functions"].append({
+                    "unit": unit,
+                    "function": name,
+                    "base_present": True,
+                    "target_present": True,
+                    "differences": differences,
+                })
+
+    output["mismatched_functions"] = len(output["functions"])
+    output_path = Path("build/gen/function_reloc_addends.json")
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = output_path.with_suffix(".tmp.%d" % os.getpid())
+    temporary.write_text(json.dumps(output, indent=2) + "\n", encoding="utf-8")
+    os.replace(str(temporary), str(output_path))
+
+    for function in output["functions"]:
+        if not function["base_present"] or not function["target_present"]:
+            print("  %s  %s: base_present=%s target_present=%s" % (
+                function["unit"], function["function"],
+                function["base_present"], function["target_present"]))
+            continue
+        for difference in function["differences"]:
+            print("  %s  %s: %s target=%s base=%s missing=%s excess=%s" % (
+                function["unit"], function["function"], difference["symbol"],
+                difference["target"], difference["base"],
+                difference["missing"], difference["excess"]))
+    print("reloc addends: %d function(s) compared, %d mismatch(es), "
+          "%d missing object(s); report=%s" % (
+              output["compared_functions"], output["mismatched_functions"],
+              len(output["missing_objects"]), output_path))
+    return 1 if output["functions"] or output["missing_objects"] else 0
+
 def main():
     if len(sys.argv) > 1 and sys.argv[1] == "--resolved":
         return review_fields(resolved_addresses=True)
@@ -657,6 +776,8 @@ def main():
         return review_fields()
     if len(sys.argv) > 1 and sys.argv[1] == "--counts":
         return review_counts(sys.argv[2] if len(sys.argv) > 2 else "BASE")
+    if len(sys.argv) > 1 and sys.argv[1] == "--addends":
+        return review_addends(sys.argv[2] if len(sys.argv) > 2 else None)
     if len(sys.argv) > 1:                        # single-function review mode
         review(sys.argv[1]); return 0
     sym, data, dups = load_symbols()

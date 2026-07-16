@@ -28,7 +28,11 @@ class DataTopologyAuditTest(unittest.TestCase):
 
         self.assertEqual(
             [call.args[0] for call in run.call_args_list],
-            [["python3", "configure.py"], ["ninja", "-j", "7", "all"]],
+            [
+                ["python3", "configure.py"],
+                ["ninja", "-j", "7", "all"],
+                ["python3", "-m", "homm2.build.gen_reloc_aliases"],
+            ],
         )
         self.assertTrue(all(call.kwargs == {"check": True}
                             for call in run.call_args_list))

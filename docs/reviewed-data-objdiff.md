@@ -46,6 +46,8 @@ and exact coverage partition live under `build/gen`. An explicit
 and replaces `build/delink` only after success. Its canonical stamp hashes all committed configs,
 the retail EXE, synthetic delinker-input PDB, and delinker executable. Normal commands refuse a
 stale canonical stamp and instruct the user to regenerate; they never rewrite configs or targets.
+The stamp also hashes `config/delink_reloc_aliases.tsv`, whose reviewed function/address rows let
+Vostok reproduce certain positive or negative COFF addends that the linked PE cannot encode.
 There is no canonical unresolved-data fallback. `homm2 data-topology finalize` requires every
 machine-readable symbol, section, contribution, and coverage diagnostic to reach zero.
 An exact section need not have one affine retail base. When all candidate definitions are reviewed,
@@ -72,3 +74,7 @@ can generate the same generic manifest from its own reviewed evidence. Per-symbo
 allocation scoring belongs in the generic objdiff consumer; this adapter does not
 rewrite objdiff's native section measures. The final-link initialized-storage audit
 remains authoritative for PE pointer-target content and final storage.
+
+IAT slots are not project data allocations. Vostok reads their exact decorated names from the
+synthetic PDB's retained CodeView-backed `.idata` symbols and reconstructs `__imp__...` COFF
+relocations directly; no separate IAT naming manifest is required.
