@@ -59,12 +59,6 @@ heroWindow::heroWindow(int x, int y, int w, int h, int flags)
     m_savedBackground = 0;
 }
 
-// @early-stop
-// The explicit 0x521-byte CodeView range is raw-exact after relocation-union masking;
-// retail's enclosing row has three trailing padding bytes. Frame/slots, CFG, and all 51
-// external relocation targets/addends are exact. The remaining six of 57 ordered sites
-// are the dispatch at +0x4d3 and five-word table at +0x4d7: MSVC emits $L local symbols,
-// while the delinker rewrites them as this constructor plus the same local offsets.
 VA(0x004cecd0, 0x521)
 heroWindow::heroWindow(int param_1, int param_2, char *param_3)
 {
@@ -102,65 +96,65 @@ heroWindow::heroWindow(int param_1, int param_2, char *param_3)
         type = gpResourceManager->ReadWord();
         pwdg = 0;
         switch (type) {
-        case 0:
+        case WINDOW_WIDGET_RECORD_END:
             idx++;
             break;
-        case 1:
+        case WINDOW_WIDGET_RECORD_BORDER:
             pbd = new border();
             pbd->Read();
             pwdg = pbd;
             break;
-        case 2:
+        case WINDOW_WIDGET_RECORD_BUTTON:
             pbtn = new button();
             pbtn->Read();
             pwdg = pbtn;
             break;
-        case 0x10:
+        case WINDOW_WIDGET_RECORD_ICON:
             picn = new iconWidget();
             picn->Read();
             pwdg = picn;
             break;
-        case 0x40:
+        case WINDOW_WIDGET_RECORD_DIMMER:
             pdim = new dimmerWidget();
             pdim->Read();
             pwdg = pdim;
             break;
-        case 8:
+        case WINDOW_WIDGET_RECORD_TEXT:
             ptw = new textWidget();
             ptw->Read();
             pwdg = ptw;
             break;
-        case 0x100:
+        case WINDOW_WIDGET_RECORD_TEXT_ENTRY:
             pte = new textEntryWidget();
             pte->Read(1);
             pwdg = pte;
             break;
-        case 0x201:
+        case WINDOW_WIDGET_RECORD_TEXT_ENTRY_RECT:
             pte = new textEntryWidget();
             pte->Read(2);
             pwdg = pte;
             break;
-        case 0x202:
+        case WINDOW_WIDGET_RECORD_TEXT_ENTRY_MULTILINE:
             pte = new textEntryWidget();
             pte->Read(3);
             pwdg = pte;
             break;
-        case 0x203:
+        case WINDOW_WIDGET_RECORD_TEXT_ENTRY_INSET_FIVE:
             pte = new textEntryWidget();
             pte->Read(4);
             pwdg = pte;
             break;
-        case 0x204:
+        case WINDOW_WIDGET_RECORD_TEXT_ENTRY_INSET_FOUR:
             pte = new textEntryWidget();
             pte->Read(5);
             pwdg = pte;
             break;
-        case 0x205:
+        case WINDOW_WIDGET_RECORD_DROP_LIST:
             pdl = new dropListWidget();
             pdl->Read();
             pwdg = pdl;
             break;
-        case 0x206:
+        case WINDOW_WIDGET_RECORD_LIST_BOX:
             plist = new listBoxWidget();
             plist->Read();
             pwdg = plist;

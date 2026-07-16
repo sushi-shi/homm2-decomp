@@ -103,6 +103,12 @@ displacements, branch bytes, padding, or operands. The historical `army::LoadRes
 fails at its unrelocated `this+0xd2` byte when retail uses `this+0xd0`, even though both instructions
 have the same opcode and both test bit four.
 
+Before masking, every same-function `DIR32` relocation is resolved to an ordered
+`(function-relative site, function-relative destination)` pair. Candidate `$L` labels and Vostok's
+undefined containing-function aliases are different spellings of the same destination and compare
+equal. A permuted switch table does not: changing which case index reaches a case body makes the
+gate fail even when all case-body bytes and relocation sites are otherwise identical.
+
 The tag is accepted only when the current compiled object passes this raw masked comparison. It is
 not deferred through the retained-maximum model: a later shared-header or TU-state change that
 invalidates the byte proof makes the hard gate red until the claim is restored or downgraded.

@@ -58,6 +58,7 @@ class IdentityClaim:
 class FunctionSpan:
     payload: bytes
     relocations: tuple[tuple[int, int], ...]
+    same_function_dir32: tuple[tuple[int, int], ...] = ()
 
 
 def is_raw_identity_claim(marker: str) -> bool:
@@ -142,6 +143,7 @@ def function_span(coff: CoffFile, name: str, size: int) -> FunctionSpan:
     payload_start = section.raw_offset + symbol.value
     payload = bytes(coff.data[payload_start:payload_start + size])
     relocations = []
+    same_function_dir32 = []
     for (section_index, site), relocation in coff.relocations.items():
         if section_index != symbol.section or not symbol.value <= site < end:
             continue
@@ -156,7 +158,28 @@ def function_span(coff: CoffFile, name: str, size: int) -> FunctionSpan:
                 f"{coff.path}: relocation at {relative:#x} crosses {name}'s span"
             )
         relocations.append((relative, width))
-    return FunctionSpan(payload, tuple(sorted(relocations)))
+        if relocation.typ == 0x0006:
+            target = coff.symbols.get(relocation.symbol_index)
+            if target is None:
+                raise ValueError(
+                    f"{coff.path}: relocation at {relative:#x} has no target symbol"
+                )
+            addend = struct.unpack_from("<I", payload, relative)[0]
+            if target.section == symbol.section:
+                resolved = (target.value + addend) & 0xFFFFFFFF
+            elif target.section == 0 and target.name == symbol.name:
+                # Vostok spells same-function interior references as an
+                # undefined owner alias plus a function-relative addend.
+                resolved = (symbol.value + addend) & 0xFFFFFFFF
+            else:
+                continue
+            if symbol.value <= resolved < end:
+                same_function_dir32.append((relative, resolved - symbol.value))
+    return FunctionSpan(
+        payload,
+        tuple(sorted(relocations)),
+        tuple(sorted(same_function_dir32)),
+    )
 
 
 def compare_masked_spans(base: FunctionSpan, target: FunctionSpan) -> list[int]:
@@ -166,6 +189,11 @@ def compare_masked_spans(base: FunctionSpan, target: FunctionSpan) -> list[int]:
         raise ValueError(
             "relocation-only claim has different relocation sites: "
             f"retail={target.relocations} base={base.relocations}"
+        )
+    if base.same_function_dir32 != target.same_function_dir32:
+        raise ValueError(
+            "relocation-only claim has different same-function DIR32 destinations: "
+            f"retail={target.same_function_dir32} base={base.same_function_dir32}"
         )
     masked = bytearray(len(base.payload))
     for offset, width in base.relocations:
