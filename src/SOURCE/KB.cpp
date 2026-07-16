@@ -66,6 +66,9 @@
 
 #define KBFILE ((char *)"I:\\Projects\\Heroes\\Prog\\SOURCE\\KB.CPP")
 #define KBLINE (*(short *)"\xBE\x0C")
+#define GLOBAL_POLL_SOUND_TIMER_SLOT 5
+#define GLOBAL_MOUSE_TIMER_SLOT 6
+#define GLOBAL_COLOR_CYCLE_TIMER_SLOT 7
 
 
 
@@ -76,12 +79,6 @@
 
 
 
-
-static long glNextPollTime;
-static long glNextMouseTime;
-static long glNextCycleTime;
-
-static char cBlank0[4], cBlank1[4], cBlank2[4], cBlank3[4];
 
 inline town *GetCastleRec(int i)
 {
@@ -99,26 +96,26 @@ extern "C" void PollSound(void)
     if (gbInPollSound)
         return;
     gbInPollSound = 1;
-    if (KBTickCount() > glNextMouseTime && !gbPutzingWithMouseCtr) {
-        glNextMouseTime = KBTickCount() + 13;
+    if (KBTickCount() > glTimers[GLOBAL_MOUSE_TIMER_SLOT] && !gbPutzingWithMouseCtr) {
+        glTimers[GLOBAL_MOUSE_TIMER_SLOT] = KBTickCount() + 13;
         gpMouseManager->NewUpdate(0);
     }
-    if (KBTickCount() > glNextCycleTime) {
+    if (KBTickCount() > glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT]) {
         if (giCycleType == 1 || giCycleType == 3)
-            glNextCycleTime = KBTickCount() + 110;
+            glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] = KBTickCount() + 110;
         else
-            glNextCycleTime = KBTickCount() + 200;
+            glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] = KBTickCount() + 200;
         bDoColorCycle = 1;
         if (giGraphicsType == 1 && giMainVideoModeColorDepth != 8) {
-            glNextCycleTime += 300;
+            glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] += 300;
             if (gbHeroMoving)
                 bDoColorCycle = 0;
         }
         if (bDoColorCycle)
             CycleColors(0);
     }
-    if (KBTickCount() > glNextPollTime) {
-        glNextPollTime = KBTickCount() + 30;
+    if (KBTickCount() > glTimers[GLOBAL_POLL_SOUND_TIMER_SLOT]) {
+        glTimers[GLOBAL_POLL_SOUND_TIMER_SLOT] = KBTickCount() + 30;
         if (gbForegroundApp)
             gpSoundManager->PollSound();
         PollRemote();
@@ -129,7 +126,7 @@ extern "C" void PollSound(void)
 VA(0x0049659e, 0x20)
 void ForcePollSound(void)
 {
-    glNextPollTime = KBTickCount() - 1;
+    glTimers[GLOBAL_POLL_SOUND_TIMER_SLOT] = KBTickCount() - 1;
     PollSound();
 }
 
@@ -2212,10 +2209,10 @@ void InitVars(void)
     strcpy(gpGame->m_mapFilename, "brokena.mp2");
     gpGame->m_newGameInitialized = 0;
     gbInNewGameSetup = 0;
-    strcpy(cNetBoxLine[0], cBlank0);
-    strcpy(cNetBoxLine[1], cBlank1);
-    strcpy(cNetBoxLine[2], cBlank2);
-    strcpy(cNetBoxLine[3], cBlank3);
+    strcpy(cNetBoxLine[0], "");
+    strcpy(cNetBoxLine[1], "");
+    strcpy(cNetBoxLine[2], "");
+    strcpy(cNetBoxLine[3], "");
     cNetBoxColor[0] = 6;
     cNetBoxColor[1] = 6;
     cNetBoxColor[2] = 6;
@@ -5815,7 +5812,7 @@ DATA(0x004fcda0) int gMageBaseResourceValues[KB_MAGE_GUILD_LEVEL_COUNT] = {
     0, 4000, 6500, 8500, 10500, 15000
 };
 DATA(0x004fcdb8) int
-    gNeutralBaseResourceValues[KB_NEUTRAL_BASE_RESOURCE_VALUE_COUNT] = {
+    gNeutralBaseResourceValues[KB_BUILDING_DWELLING_FIRST + 1] = {
     5000, 300, 350, 2000, 3000, 0, 12000, 2500,
     1500, 1500, 200, 1000, 500, 0, 0, 1100,
     0, 0, 0, 0
@@ -8707,6 +8704,18 @@ DATA(0x00500168) void *gLowPage = 0;
 DATA(0x0050016c) int gbLowPageGrabbed = 0;
 DATA(0x00500170) signed char xSmackFromNetwork = 0;
 DATA(0x00500174) int gbInPollSound = 0;
+// @data-layout-note Retail attributes one initialized KB contribution at
+// 0xf8c58..0x116f60 (0x1e308); candidate .data is 0x1e2f5. All 299 public
+// definitions from giGroundToTerrain through gbInPollSound translate from the
+// exact 0xf8c58 base. The later public runs require bases 0x10e288, 0x10e4d0,
+// 0x10e768, 0x10ea14, 0x10f074, 0x10f2a4, and 0x10f7ac because retail alternates
+// literals and globals, while VC4.2 emits file-scope initialized globals ahead
+// of its literal pool. Source interleaving and the default, /Z7, /Gy, and /Gf
+// forms retain that ordering. InitVars's four unpooled empty literals are now
+// independently relocation-proven at 0x116468, 0x11646c, 0x116470, and
+// 0x116474. KB has no candidate or NB09 .rdata contribution. Revisit only with
+// evidence for a natural original multi-section/source form; do not use padding,
+// synthetic globals, or section pragmas to force the seven late bases.
 DATA(0x005157a8) int iCDRomErr = 0;
 DATA(0x005157ac) int bEarlySetupDone = 0;
 DATA(0x005159f8) int bKBDone = 0;
@@ -8725,6 +8734,19 @@ DATA(0x00515f78) int bInCheckEndGame = 0;
 DATA(0x005165dc) int bInShutDown = 0;
 DATA(0x00516810) int gbInMemError = 0;
 DATA(0x00516d1c) int iShingleAnimFrame = 0;
+// @data-layout-note Retail's loader-zero KB contribution is
+// 0x128598..0x12a1d8 (0x1c40); candidate .bss is 0x1a7c. Its 131 public
+// definitions have 125 inconsistent section bases because VC4.2 emits the
+// candidate in identifier-hash order, not retail RVA order. All 7,970 retail
+// HIGHLOW references into the contribution land inside recovered logical DATA
+// extents; none targets unexplained storage. In particular, the unreferenced
+// holes 0x12864c..0x1286df and 0x12978c..0x1298b3 must not become invented
+// arrays. PollSound/ForcePollSound prove that 0x128d04, 0x128d08, and 0x128d0c
+// are glTimers[5], glTimers[6], and glTimers[7], so the former glNext* globals
+// were duplicate identities. Declaration reorder, extern-before-definition,
+// and file/function-static probes do not recover retail's order. Revisit only
+// with evidence for original common/section topology or referenced private
+// storage; do not add padding definitions solely to close the 0x1c4 size delta.
 DATA(0x00528598) int gbHumanPlayer[6];
 DATA(0x005285b0) int gbHitEvent;
 DATA(0x005285b4) int giMaxExtentX;
