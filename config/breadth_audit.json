@@ -3567,6 +3567,17 @@
     },
     {
       "unit": "SOURCE/Viewwrld",
+      "function": "?VWCompleteDraw@advManager@@QAEXXZ",
+      "source_hash": "e6870420b5df",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 97.67187,
+      "after": 97.67187,
+      "note": "Complete two-pass rendering semantics, exact 0xa8 frame/CFG, and 198 external relocations; early bound/multiply order plus shifted embedded jump-table topology persisted through ten reviewed AST variants."
+    },
+    {
+      "unit": "SOURCE/Viewwrld",
       "function": "?VWInit@advManager@@QAEXHH@Z",
       "source_hash": "cea936b37533",
       "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
@@ -3575,6 +3586,28 @@
       "before": 99.37008,
       "after": 100.0,
       "note": "Became live exact after shared-header rebuild."
+    },
+    {
+      "unit": "SOURCE/Viewwrld",
+      "function": "?ViewWorld@advManager@@QAEXHHH@Z",
+      "source_hash": "8d89d11c1bdd",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 5,
+      "before": 99.93939,
+      "after": 99.93939,
+      "note": "Complete semantics, exact frame/CFG, and 42 relocations; only allocation/delete/legend stack-slot order differs, and five targeted name/scope/declaration probes did not improve it."
+    },
+    {
+      "unit": "SOURCE/Viewwrld",
+      "function": "?ViewWorldDialogHandler@@YIHAAUtag_message@@@Z",
+      "source_hash": "c2c14bd487d0",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 99.90323,
+      "after": 99.90323,
+      "note": "Complete semantics, exact frame/CFG, and 99 resolved relocation destinations; three global-load-order residuals and ten reviewed AST variants did not improve, while four __adjust_fdiv sites retain a delinker-only target alias."
     },
     {
       "unit": "SOURCE/Wsnetwin",
@@ -3872,6 +3905,39 @@
       "before": 99.861115,
       "after": 99.861115,
       "note": "Relocation-masked code proof retained; only compiler symbol identities differ."
+    },
+    {
+      "unit": "SOURCE/tradpost",
+      "function": "?DoTradeKnob@@YIXUtag_message@@@Z",
+      "source_hash": "58a78fccfc3a",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 4,
+      "before": 99.30232,
+      "after": 99.30232,
+      "note": "Complete semantics, exact 0x90 frame/CFG/extent, and 22 relocations; sole upper-clamp operand order persisted through polarity, empty-arm, value-or-zero, and SIB spellings."
+    },
+    {
+      "unit": "SOURCE/tradpost",
+      "function": "?TradingPostHandler@@YIHAAUtag_message@@@Z",
+      "source_hash": "79656372f504",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 99.885414,
+      "after": 99.885414,
+      "note": "Complete nested switches, exact frame/CFG, and 51 external relocations; remaining commuted comparisons/local jump-table labels persisted through ten reviewed AST variants."
+    },
+    {
+      "unit": "SOURCE/tradpost",
+      "function": "?UpdateTradingPost@@YIXH@Z",
+      "source_hash": "91962f8f02ec",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 99.64179,
+      "after": 99.64179,
+      "note": "Complete display/trade semantics, exact 0x3c frame/CFG, and 112 external relocations; five commuted owner-order pairs and one-byte extent residual persisted through ten reviewed AST variants."
     },
     {
       "unit": "SOURCE/x_arena",
