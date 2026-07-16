@@ -262,6 +262,10 @@ $T40517	SOURCE\EVENTS.c	0xeb930	0x8	rdata	0x8	4	0x18	local	candidate-coff-sectio
 $T40518	SOURCE\EVENTS.c	0xeb938	0x8	rdata	0x8	4	0x20	local	candidate-coff-section-translation
 $T40523	SOURCE\EVENTS.c	0xeb940	0x8	rdata	0x8	4	0x28	local	candidate-coff-section-translation
 $T40524	SOURCE\EVENTS.c	0xeb948	0x8	rdata	0x8	4	0x30	local	candidate-coff-section-translation
+?sourceLineBase@?1??DoNetCombat@advManager@@QAEHPAD@Z@4FA	SOURCE\EVENTS.c	0x11c9b4	0x4	data	0x4	2	0x0	local	candidate-coff-reloc-bijection
+?sourceLineBase@?1??DoCombat@advManager@@QAEHHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHH@Z@4FA	SOURCE\EVENTS.c	0x11ca94	0x4	data	0x4	2	0x4	local	candidate-coff-reloc-bijection
+?sourceLineBase@?1??SendHeroTownData@advManager@@QAEXHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHHHHH@Z@4FA	SOURCE\EVENTS.c	0x11cbac	0x4	data	0x4	2	0x8	local	candidate-coff-reloc-bijection
+?sourceLineBase@?1??ReceiveHeroTownData@advManager@@QAEXPADPAH11PAPAVhero@@PAPAVarmyGroup@@PAPAVtown@@23111PAC55@Z@4FA	SOURCE\EVENTS.c	0x11cc08	0x4	data	0x4	2	0xc	local	candidate-coff-reloc-bijection
 $T35152	SOURCE\FLY.c	0xeb910	0x8	rdata	0x8	3	0x0	local	candidate-coff-section-translation
 _gSaveSourceLine$S40373	SOURCE\GAME.c	0xf70e4	0x4	data	0x4	2	0x4	local	candidate-coff-reloc-bijection
 _gLoadSourceLine$S40374	SOURCE\GAME.c	0xf71a8	0x4	data	0x4	2	0x8	local	candidate-coff-reloc-bijection
