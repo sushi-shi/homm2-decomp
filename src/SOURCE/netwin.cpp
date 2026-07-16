@@ -24,29 +24,35 @@ DATA(0x005173a4) static unsigned char gNetbiosLana = 0;
 DATA(0x005173a8) static unsigned char gNbShutdown = 0;         // shutdown flag, cleared by nb_init
 DATA(0x005173ac) static unsigned char gNbMaxSess = NETBIOS_INVALID_ID;
 DATA(0x005173b0) static unsigned char gNbLocalNum = 0;         // local netbios name number
-DATA(0x005173b4) static unsigned char gNetStatus[NETBIOS_SESSION_COUNT];
+DATA(0x005173b4) static unsigned char gNetStatus[NETBIOS_STATUS_COUNT] = { 0 };
 DATA(0x005173c0) static char         *gNbGroupName = "Empire Too ";
 DATA(0x005173c4) static char         *gNbListenName = "*";
-DATA(0x005173d8) static short gNbInitSourceLineBase = NETWIN_SOURCE_LINE_INIT_BASE;
-DATA(0x00517434) static short gNbTermSourceLineBase = NETWIN_SOURCE_LINE_TERM_BASE;
-DATA(0x005174bc) static short gNbReceiveSourceLineBase = NETWIN_SOURCE_LINE_RECEIVE_BASE;
-DATA(0x005174ec) static short gNbSendSourceLineBase = NETWIN_SOURCE_LINE_SEND_BASE;
-DATA(0x0051751c) static short gNbThreadSourceLineBase = NETWIN_SOURCE_LINE_THREAD_BASE;
-DATA(0x00517578) static short gNbAddNameSourceLineBase = NETWIN_SOURCE_LINE_ADD_NAME_BASE;
-DATA(0x005175c0) static short gNbArmReceiveSourceLineBase = NETWIN_SOURCE_LINE_ARM_RECEIVE_BASE;
-DATA(0x005175f0) static short gNbReceiveCompleteSourceLineBase = NETWIN_SOURCE_LINE_RECEIVE_COMPLETE_BASE;
-DATA(0x0052ae68) static tag_Anchor    gNbFreeQueue;        // queue anchor (init_anchor)
-DATA(0x0052ae70) static unsigned char gNbSessLsn[NETBIOS_SESSION_COUNT];
-DATA(0x0052ae78) static NetbiosPayload gNbRcvData[NETBIOS_SESSION_COUNT];
-DATA(0x00531e78) static NetbiosName    gNbNameBuf[NETBIOS_SESSION_COUNT];
-DATA(0x00531ee8) static NetbiosSessionBuffer gNbSessBuf;
-DATA(0x00532ee8) static NetbiosControlBlock gNbSessNcb[NETBIOS_SESSION_COUNT];
-DATA(0x005330a8) static NetbiosControlBlock gNbCtlNcb;
-DATA(0x005330e8) static tag_Anchor    gNbRcvQueue;         // receive queue (nb_rcv pops it)
-DATA(0x005330f0) static tag_Anchor    gNbSndQueue;         // send queue
-DATA(0x005330f8) static CRITICAL_SECTION gNbRcvLock;       // guards gNbRcvQueue
-DATA(0x00533110) static NetbiosThreadEvents gNbEvents;
-DATA(0x00533138) static CRITICAL_SECTION gNbSndLock;       // guards gNbSndQueue
+// Semantic suffixes retain the retail MSVC BSS allocation order; audit with section replay.
+DATA(0x0052ae68) static tag_Anchor gNbFreeQueueRuntime;
+DATA(0x0052ae70) static unsigned char gNbSessionNumbersEntry[NETBIOS_SESSION_COUNT];
+DATA(0x0052ae78) static NetbiosPayload gNbReceiveDataLocal[NETBIOS_SESSION_COUNT];
+DATA(0x00531e78) static NetbiosName gNbNameBufferBacking[NETBIOS_SESSION_COUNT];
+DATA(0x00531ee8) static NetbiosSessionBuffer gNbSessionBufferContext;
+DATA(0x00532ee8) static NetbiosControlBlock gNbSessionControlBlocksArena[NETBIOS_SESSION_COUNT];
+DATA(0x005330a8) static NetbiosControlBlock gNbControlBlockArena;
+DATA(0x005330e8) static tag_Anchor gNbReceiveQueueEntry;
+DATA(0x005330f0) static tag_Anchor gNbSendQueueHead;
+DATA(0x005330f8) static CRITICAL_SECTION gNbReceiveLockCriticalSection;
+DATA(0x00533110) static NetbiosThreadEvents gNbThreadEventsContext;
+DATA(0x00533138) static CRITICAL_SECTION gNbSendLockBacking;
+
+#define gNbFreeQueue gNbFreeQueueRuntime
+#define gNbSessLsn gNbSessionNumbersEntry
+#define gNbRcvData gNbReceiveDataLocal
+#define gNbNameBuf gNbNameBufferBacking
+#define gNbSessBuf gNbSessionBufferContext
+#define gNbSessNcb gNbSessionControlBlocksArena
+#define gNbCtlNcb gNbControlBlockArena
+#define gNbRcvQueue gNbReceiveQueueEntry
+#define gNbSndQueue gNbSendQueueHead
+#define gNbRcvLock gNbReceiveLockCriticalSection
+#define gNbEvents gNbThreadEventsContext
+#define gNbSndLock gNbSendLockBacking
 
 VA(0x004a6be0, 0xa8)
 int is_netbios_avail(void)
@@ -70,6 +76,8 @@ int is_netbios_avail(void)
 VA(0x004a6c88, 0x244)
 extern "C" unsigned short __fastcall nb_init(unsigned short param1, unsigned short param2)
 {
+    // Retail interleaves each line base with this function's literals; this compiler groups them.
+    DATA(0x005173d8) static short gNbInitSourceLineBase = NETWIN_SOURCE_LINE_INIT_BASE;
     NetbiosControlBlock localNcb;
     int i;
     unsigned char *statusBuffer;
@@ -80,7 +88,7 @@ extern "C" unsigned short __fastcall nb_init(unsigned short param1, unsigned sho
     memset(gNbSessNcb, 0, sizeof(gNbSessNcb));
     memset(&gNbSessBuf, -1, sizeof(gNbSessBuf));
     memset(gNbRcvData, -1, sizeof(gNbRcvData));
-    memset(&gNbEvents, 0, sizeof(gNbEvents));
+    memset(&gNbEvents, 0, NETBIOS_THREAD_EVENTS_SIZE);
     if (is_netbios_avail() == 0)
         return 1;
     if (gNetbiosAvail != 0) {
@@ -128,6 +136,7 @@ extern "C" unsigned short __fastcall nb_init(unsigned short param1, unsigned sho
 VA(0x004a6ecc, 0x207)
 extern "C" void __fastcall nb_term(void)
 {
+    DATA(0x00517434) static short gNbTermSourceLineBase = NETWIN_SOURCE_LINE_TERM_BASE;
     tag_Node *node;
     NetbiosControlBlock localNcb;
     int i;
@@ -177,6 +186,7 @@ extern "C" void __fastcall nb_term(void)
 VA(0x004a70d3, 0xb3)
 extern "C" unsigned short __fastcall nb_rcv(short session, void *buf)
 {
+    DATA(0x005174bc) static short gNbReceiveSourceLineBase = NETWIN_SOURCE_LINE_RECEIVE_BASE;
     tag_Node *node;
     int len;
 
@@ -200,6 +210,7 @@ extern "C" unsigned short __fastcall nb_rcv(short session, void *buf)
 VA(0x004a7186, 0xe4)
 extern "C" unsigned short __fastcall nb_snd(short session, short len, void *data)
 {
+    DATA(0x005174ec) static short gNbSendSourceLineBase = NETWIN_SOURCE_LINE_SEND_BASE;
     tag_Node *node;
 
     if (gNbMaxSess == session && len == 0) {
@@ -364,6 +375,7 @@ extern "C" char __fastcall nb_stat(short session) { return gNetStatus[session]; 
 VA(0x004a7758, 0xdd2)
 void nb_thr_ctl(void)
 {
+    DATA(0x0051751c) static short gNbThreadSourceLineBase = NETWIN_SOURCE_LINE_THREAD_BASE;
     int keepRunning;
     int i;
     tag_Node *node;
@@ -469,6 +481,7 @@ static void nb_add_name(void)
 VA(0x004a7a81, 0x1ca)
 static void __stdcall nb_add_name_done(NetbiosControlBlock *ncb)
 {
+    DATA(0x00517578) static short gNbAddNameSourceLineBase = NETWIN_SOURCE_LINE_ADD_NAME_BASE;
     int j;
     ProcessAssert(&gNbSessNcb[gNbMaxSess] == ncb,
                   "I:\\Projects\\Heroes\\Prog\\SOURCE\\netwin.cpp",
@@ -497,7 +510,7 @@ static void __stdcall nb_add_name_done(NetbiosControlBlock *ncb)
     case NETBIOS_RESULT_CANCELLED:
         break;
     default:
-        sprintf(gText, "Add Name Error: %02x", ncb->returnCode);
+        sprintf(gText, "Add Name Error %02x\n", ncb->returnCode);
         ShutDown(gText);
         gNetStatus[gNbMaxSess] |= NETBIOS_SESSION_ERROR;
         break;
@@ -614,6 +627,7 @@ static void __stdcall nb_call_done(NetbiosControlBlock *ncb)
 VA(0x004a8119, 0x13b)
 static void __fastcall nb_arm_recv(int session)
 {
+    DATA(0x005175c0) static short gNbArmReceiveSourceLineBase = NETWIN_SOURCE_LINE_ARM_RECEIVE_BASE;
     unsigned char result;
     for (;;) {
         ProcessAssert(gNbSessNcb[session].returnCode != NETBIOS_RESULT_PENDING,
@@ -676,6 +690,7 @@ static void __fastcall nb_close_session(int session)
 VA(0x004a832a, 0x179)
 static void __fastcall nb_recv_complete(int session)
 {
+    DATA(0x005175f0) static short gNbReceiveCompleteSourceLineBase = NETWIN_SOURCE_LINE_RECEIVE_COMPLETE_BASE;
     tag_Node *node;
     switch (gNbSessNcb[session].command & ~NETBIOS_COMMAND_ASYNC) {
     case NETBIOS_COMMAND_RECEIVE:
