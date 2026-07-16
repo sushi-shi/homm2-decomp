@@ -36,6 +36,8 @@
 // __FILE__ for the NWC BaseAlloc/BaseFree memory tracking (reloc-masked path string).
 #define PHFILE const_cast<char *>("I:\\Projects\\Heroes\\Prog\\SOURCE\\PHILAI.CPP")
 
+DATA(0x005256f0) searchArray SVSearchArray;
+
 // @early-stop
 // Bytes 0x000-0x1b5 are instruction-identical with relocations masked, and all 17
 // relocation targets agree. Retail's three NOPs begin after the CodeView function range.
@@ -1655,9 +1657,9 @@ candidate_scored:
         targetX = static_cast<unsigned char>(gpCurAIHero->m_boatId);
         targetY = static_cast<unsigned char>(gpCurAIHero->m_unknown2a);
     }
-    LogInt("Hero  Best RV target XY current XY", gpCurAIHero->m_owner, bestValue,
+    LogInt("Hero, Best RV target XY  current XY", gpCurAIHero->m_owner, bestValue,
            targetX, targetY, gpCurAIHero->m_x, gpCurAIHero->m_y, -999);
-    LogStr("----");
+    LogStr("\n\n****");
     return bestValue;
 }
 
@@ -3207,7 +3209,7 @@ int philAI::FightValueOfStack(armyGroup *group, hero *heroPtr, int useHero,
     } else if ((armyValue | 0) < townArcherValueValue)
         townArcherValueValue = static_cast<int>(armyValue * 1.25);
     if (giDebugLevel == 9)
-        LogInt("Fight Value", armyValue, spellValueMap, townArcherValueValue,
+        LogInt("FV3", armyValue, spellValueMap, townArcherValueValue,
                0, 0, -999, -999);
     armyValue += spellValueMap;
     armyValue += townArcherValueValue;
@@ -5210,7 +5212,7 @@ creature_purchase:
         value_h = EvaluateJail(cell_k);
         break;
     default:
-        sprintf(gText, "AI encountered object type %d and doesn't know what to do",
+        sprintf(gText, "AI encountered object type %d and doesn't know how to deal with it.   Tell Phil",
                 cell_k->m_triggerType & 0x7f);
         NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
         value_h = 0;
@@ -5981,7 +5983,6 @@ DATA(0x005256c8) int costTemp[7];
 DATA(0x005256e4) int iAlphaMale;
 DATA(0x005256e8) int iDummy;
 DATA(0x005256ec) int gbPossibleShipyardFound;
-DATA(0x005256f0) searchArray SVSearchArray;
 DATA(0x00527c08) float gafAITurnCostResource[7];
 DATA(0x00527c24) int iCurPlaceToVisit;
 DATA(0x00527c28) int giBestShipyardId;
