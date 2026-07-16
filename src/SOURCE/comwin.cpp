@@ -62,12 +62,11 @@ void init_anchor(struct tag_Anchor *anchor, int, int)
     anchor->tail = 0;
 }
 
-// @match-note 98.46%: complete 0x260 frame, Win32 error switch, message
-// assembly, and shutdown CFG; all 72/72 relocation occurrences and targets
-// agree. The first reported residual is the delinked switch-table/local-label
-// identity immediately after GetLastError; the diff then decodes table bytes as
-// instructions. Literal and named Win32 error case values compile identically.
-// Revisit at 95% with the switch data range excluded; do not retry that spelling.
+// @semantic: complete 0x260 frame, Win32 error switch, message assembly, and
+// shutdown CFG; all 72/72 ordered relocation identities and addends agree. The
+// first residual is the embedded 0x4c-byte jump table at RVA 0x8a968; the diff
+// helper stops there and decodes table bytes as instructions. Literal and named
+// Win32 error case values compiled identically, so do not retry that spelling.
 VA(0x0048a72e, 0x3e5)
 void ShutdownComError(char *function)
 {
@@ -144,12 +143,11 @@ void ShutdownComError(char *function)
     ShutDown(message);
 }
 
-// @match-note 97.46%: complete 0x54 frame, two-pass port selection, 0x60 saved
-// state layout, DCB flags, timeout setup, and both queue initializers; all 33/33
-// relocation occurrences and targets agree. The first non-symbol residual is at
-// the baud-rate switch/jump-table boundary after GetCommTimeouts. An initial
-// BaudRate assignment scored 95.64%; the explicit default arm is retained.
-// Revisit at 95% after excluding switch data; do not retry the initial assignment.
+// @semantic: complete 0x54 frame, two-pass port selection, 0x60 saved-state
+// layout, DCB flags, timeout setup, and both queue initializers; all 33/33 ordered
+// relocation identities and addends agree. The first residual is the embedded
+// 0x14-byte baud-rate jump table at RVA 0x8ace2. An initial BaudRate assignment
+// scored 95.64%; the explicit default arm is retained.
 VA(0x0048ab13, 0x34a)
 short int com_init(unsigned char portNumber, int baudRate, int useDtr)
 {
@@ -262,22 +260,18 @@ void com_term(short int portIndex)
     }
 }
 
-// @early-stop
-// The complete 0x24 frame/CFG and relocation-masked instruction stream agree;
-// all 7/7 relocation occurrences resolve to the same targets. The reported
-// 99.88% residual is delinked shared-record, import, and string symbol identity.
 VA(0x0048af7a, 0xdd)
 short int com_rcv(short int portIndex, unsigned short int requested,
                   void *buffer)
 {
-    DWORD errors;
     COMSTAT status;
+    DWORD commErrors;
     unsigned int count;
     short bytesRead[2];
     BOOL result;
 
     if (s_comPorts[portIndex].handle != INVALID_HANDLE_VALUE) {
-        result = ClearCommError(s_comPorts[portIndex].handle, &errors, &status);
+        result = ClearCommError(s_comPorts[portIndex].handle, &commErrors, &status);
         if (result == 0)
             ShutdownComError("Clear communications error queue");
         if (status.cbInQue <= requested)
@@ -295,16 +289,12 @@ short int com_rcv(short int portIndex, unsigned short int requested,
     return 0;
 }
 
-// @early-stop
-// The complete 0x08 frame, break/allocate/queue CFG, and relocation-masked
-// instruction stream agree; all 15/15 relocation occurrences resolve to the
-// same targets. The 99.88% residual is delinked data/string/import identity.
 VA(0x0048b057, 0x145)
 short int com_snd(short int portIndex, unsigned short int,
                   unsigned short int length, void *data, int priority)
 {
     BOOL result;
-    tag_Node *node;
+    tag_Node *sendNode;
 
     if (s_comPorts[portIndex].handle != INVALID_HANDLE_VALUE) {
         if (length == 0) {
@@ -317,16 +307,16 @@ short int com_snd(short int portIndex, unsigned short int,
                 ShutdownComError("Clear communications break");
             return 0;
         }
-        node = static_cast<tag_Node *>(
+        sendNode = static_cast<tag_Node *>(
             BaseAlloc(length + COM_NODE_HEADER_SIZE, COMWIN_SOURCE_FILE,
                       s_comSendSourceLineBase + 16));
-        if (node != 0) {
-            node->len = length;
-            memcpy(node->comData, data, length);
+        if (sendNode != 0) {
+            sendNode->len = length;
+            memcpy(sendNode->comData, data, length);
             if (priority != 0)
-                add_node(&s_comPorts[portIndex].priorityQueue, node);
+                add_node(&s_comPorts[portIndex].priorityQueue, sendNode);
             else
-                add_node(&s_comPorts[portIndex].normalQueue, node);
+                add_node(&s_comPorts[portIndex].normalQueue, sendNode);
             return 0;
         }
     }
@@ -347,35 +337,39 @@ unsigned char com_stat(short int portIndex, unsigned short int)
     return 0;
 }
 
-// @early-stop
-// The complete 0x18 frame, priority/normal queue and partial-write CFG, and
-// relocation-masked instruction stream agree; all 8/8 relocation occurrences
-// resolve to the same targets. The 99.62% residual is local data/string/import
-// symbol identity only.
+// @semantic: complete 0x14 frame, priority/normal queue and partial-write CFG,
+// and all 8 ordered relocation identities/addends agree. After correcting every
+// local slot, the sole raw residual is the exit jump displacement at +0x4d:
+// retail reaches the epilogue directly while this form enters the trailing join.
 VA(0x0048b21d, 0xe8)
 void comm_wrt_task(void)
 {
     DWORD bytesWritten;
-    unsigned int totalWritten;
-    tag_Node *node;
-    BOOL result;
-    ComPortState *port = s_comPorts;
+    unsigned int writtenTotal;
+    tag_Node *packetNode;
+    BOOL callResult;
+    ComPortState *comPort;
 
-    while (port->handle != INVALID_HANDLE_VALUE) {
-        node = pop_node(&port->priorityQueue);
-        if (node == 0)
-            node = pop_node(&port->normalQueue);
-        if (node == 0)
+    comPort = s_comPorts;
+
+    while (comPort->handle != INVALID_HANDLE_VALUE) {
+        packetNode = pop_node(&comPort->priorityQueue);
+        if (packetNode == 0)
+            packetNode = pop_node(&comPort->normalQueue);
+        if (packetNode == 0)
             break;
-        totalWritten = 0;
-        while (port->handle != INVALID_HANDLE_VALUE &&
-               totalWritten < node->len) {
-            result = WriteFile(port->handle, node->comData + totalWritten,
-                               node->len - totalWritten, &bytesWritten, 0);
-            if (result == 0)
+        writtenTotal = 0;
+        while (comPort->handle != INVALID_HANDLE_VALUE &&
+               writtenTotal < packetNode->len) {
+            callResult = WriteFile(comPort->handle,
+                                   packetNode->comData + writtenTotal,
+                                   packetNode->len - writtenTotal,
+                                   &bytesWritten, 0);
+            if (callResult == 0)
                 ShutdownComError("Write communications data");
-            totalWritten += bytesWritten;
+            writtenTotal += bytesWritten;
         }
-        BaseFree(node, COMWIN_SOURCE_FILE, s_comWriteSourceLineBase + 28);
+        BaseFree(packetNode, COMWIN_SOURCE_FILE,
+                 s_comWriteSourceLineBase + 28);
     }
 }
