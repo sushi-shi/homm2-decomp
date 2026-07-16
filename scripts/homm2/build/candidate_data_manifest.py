@@ -135,44 +135,53 @@ def candidate_definitions(path, unit):
     return definitions, coff
 
 
+def _reviewed_candidate_allocation(unit, storage, candidate, reviewed):
+    """Validate and return one reviewed candidate allocation when present."""
+    object_name = unit.replace("/", "\\") + ".c"
+    row = reviewed.get((object_name, candidate["name"]))
+    if row is None:
+        return None
+    logical_size = int(row["size"], 0)
+    expected = {
+        "storage": storage,
+        "alignment": candidate["alignment"],
+        "section_ordinal": candidate["section"],
+        "section_offset": candidate["section_offset"],
+        "scope": candidate["scope"],
+    }
+    actual = {
+        "storage": row["storage"],
+        "alignment": int(row["alignment"], 0),
+        "section_ordinal": int(row["section_ordinal"], 0),
+        "section_offset": int(row["section_offset"], 0),
+        "scope": row["scope"],
+    }
+    if actual != expected or not 0 < logical_size <= candidate["size"]:
+        mismatches = {
+            key: {"reviewed": actual[key], "candidate": value}
+            for key, value in expected.items() if actual[key] != value
+        }
+        if not 0 < logical_size <= candidate["size"]:
+            mismatches["size"] = {
+                "reviewed": logical_size, "candidate_span": candidate["size"]}
+        raise ValueError(
+            "reviewed candidate topology mismatch for %s:%s: %s" %
+            (unit, candidate["name"], mismatches))
+    return CandidateAllocation(
+        unit, object_name, candidate["name"], storage,
+        candidate["section_offset"], logical_size, candidate["alignment"],
+        int(row["rva"], 0), 1, candidate["scope"], row["provenance"])
+
+
 def _reviewed_group_allocations(unit, storage, definitions, reviewed):
     """Return a group only when every candidate definition is reviewed exactly."""
-    object_name = unit.replace("/", "\\") + ".c"
     rows = []
     for candidate in definitions:
-        row = reviewed.get((object_name, candidate["name"]))
-        if row is None:
+        allocation = _reviewed_candidate_allocation(
+            unit, storage, candidate, reviewed)
+        if allocation is None:
             return None
-        logical_size = int(row["size"], 0)
-        expected = {
-            "storage": storage,
-            "alignment": candidate["alignment"],
-            "section_ordinal": candidate["section"],
-            "section_offset": candidate["section_offset"],
-            "scope": candidate["scope"],
-        }
-        actual = {
-            "storage": row["storage"],
-            "alignment": int(row["alignment"], 0),
-            "section_ordinal": int(row["section_ordinal"], 0),
-            "section_offset": int(row["section_offset"], 0),
-            "scope": row["scope"],
-        }
-        if actual != expected or not 0 < logical_size <= candidate["size"]:
-            mismatches = {
-                key: {"reviewed": actual[key], "candidate": value}
-                for key, value in expected.items() if actual[key] != value
-            }
-            if not 0 < logical_size <= candidate["size"]:
-                mismatches["size"] = {
-                    "reviewed": logical_size, "candidate_span": candidate["size"]}
-            raise ValueError(
-                "reviewed candidate topology mismatch for %s:%s: %s" %
-                (unit, candidate["name"], mismatches))
-        rows.append(CandidateAllocation(
-            unit, object_name, candidate["name"], storage,
-            candidate["section_offset"], logical_size, candidate["alignment"],
-            int(row["rva"], 0), 1, candidate["scope"], row["provenance"]))
+        rows.append(allocation)
     extents = sorted((row.rva, row.rva + row.size, row.name) for row in rows)
     for previous, current in zip(extents, extents[1:]):
         if previous[1] > current[0]:
@@ -180,6 +189,17 @@ def _reviewed_group_allocations(unit, storage, definitions, reviewed):
                 "reviewed candidate allocations overlap: %s and %s" %
                 (previous[2], current[2]))
     return rows
+
+
+def _virtual_section_bytes(data, sections, rva, size):
+    """Read PE section payload using loader zero-fill semantics."""
+    for start, span, raw_size, raw in sections:
+        if start <= rva and rva + size <= start + span:
+            delta = rva - start
+            raw_count = max(0, min(size, raw_size - delta))
+            payload = bytes(data[raw + delta:raw + delta + raw_count])
+            return payload + b"\0" * (size - raw_count)
+    raise ValueError("PE RVA 0x%x has no %d-byte virtual payload" % (rva, size))
 
 
 def _pe_layout(path):
@@ -231,10 +251,7 @@ def _pe_layout(path):
         return struct.unpack_from("<I", data, offset)[0]
 
     def read_bytes(rva, size):
-        offset = raw_offset(rva)
-        if offset is None or offset + size > len(data):
-            raise ValueError("PE RVA 0x%x has no %d-byte payload" % (rva, size))
-        return bytes(data[offset:offset + size])
+        return _virtual_section_bytes(data, sections, rva, size)
 
     return image_base, sorted(highlow), read_u32, read_bytes
 
@@ -504,6 +521,21 @@ def _payload_rvas(row, coff, intervals, highlow, read_bytes, cache):
     return result
 
 
+def _payload_matches_at(row, coff, rva, highlow, read_bytes):
+    """Check a relocation-free initialized allocation against retail bytes."""
+    if row["storage"] == "bss":
+        return True
+    first = row["symbol_offset"]
+    last = first + row["size"]
+    if any(reloc_section == row["section"] and first <= site < last
+           for reloc_section, site in coff.relocations):
+        return True
+    section = coff.sections[row["section"] - 1]
+    candidate = bytes(
+        coff.data[section.raw_offset + first:section.raw_offset + last])
+    return candidate == read_bytes(rva, row["size"])
+
+
 def _literal_rvas(row, coff, intervals, highlow, read_bytes, cache):
     if not (row["name"].startswith("$SG") or row["name"].startswith("??_C@")):
         return []
@@ -578,29 +610,55 @@ def derive_allocations(base_dir=REPO / "build/objdiff/base",
                 stats.closed_groups += 1
                 stats.mapped_definitions += len(reviewed_group)
                 continue
+            partial_reviewed = {}
+            for source_row in source_group:
+                allocation = _reviewed_candidate_allocation(
+                    unit, storage, source_row, reviewed)
+                if allocation is not None:
+                    partial_reviewed[source_row["name"]] = allocation
+            analysis_group = []
+            for source_row in source_group:
+                row = dict(source_row)
+                if source_row["name"] in partial_reviewed:
+                    row["size"] = partial_reviewed[source_row["name"]].size
+                analysis_group.append(row)
             intervals = contributions.get((unit, storage), [])
-            mapped, translation_causes, translation_details = _section_stream_translation(
-                source_group, coff, intervals, public, image_base, highlow,
-                read_u32, read_bytes)
+            if partial_reviewed:
+                mapped, translation_causes, translation_details = (
+                    None, ("partial_reviewed_group",),
+                    ("section replay disabled by reviewed allocation anchors",))
+            else:
+                mapped, translation_causes, translation_details = \
+                    _section_stream_translation(
+                        analysis_group, coff, intervals, public, image_base,
+                        highlow, read_u32, read_bytes)
             replay_mapped = dict(mapped or {})
             translated = mapped is not None and not translation_causes
-            evidence = ({row["name"]: "candidate-section-replay" for row in source_group}
+            evidence = ({row["name"]: "candidate-section-replay" for row in analysis_group}
                         if mapped is not None else {})
-            group, _section_bases, _stream_size = _layout_group(source_group, coff)
+            group, _section_bases, _stream_size = _layout_group(analysis_group, coff)
             if not translated:
                 mapped = {}
                 evidence = {}
                 literal_cache = {}
                 for row in group:
+                    reviewed_allocation = partial_reviewed.get(row["name"])
+                    if reviewed_allocation is not None:
+                        mapped[row["name"]] = (reviewed_allocation.rva, 1)
+                        evidence[row["name"]] = reviewed_allocation.provenance
+                        continue
                     if row["name"] in public_data:
                         mapped[row["name"]] = (public_data[row["name"]], 1)
                         evidence[row["name"]] = "retail-public-rva"
                         continue
                     unique = sorted(set(proofs.get(row["name"], [])))
                     if len(unique) == 1:
-                        mapped[row["name"]] = (unique[0], len(proofs[row["name"]]))
-                        evidence[row["name"]] = "aligned-relocation-addend"
-                        continue
+                        if _payload_matches_at(
+                                row, coff, unique[0], highlow, read_bytes):
+                            mapped[row["name"]] = (
+                                unique[0], len(proofs[row["name"]]))
+                            evidence[row["name"]] = "aligned-relocation-addend"
+                            continue
                     literal_rvas = _literal_rvas(
                         row, coff, intervals, highlow, read_bytes, literal_cache)
                     if len(literal_rvas) == 1:
@@ -636,6 +694,12 @@ def derive_allocations(base_dir=REPO / "build/objdiff/base",
                              "%s maps to %s" % (row["name"], unique or "nothing"))
                         continue
                     rva = unique[0]
+                    if not _payload_matches_at(
+                            row, coff, rva, highlow, read_bytes):
+                        fail("relocation_payload_mismatch",
+                             "%s relocation proof at 0x%x contradicts payload" %
+                             (row["name"], rva))
+                        continue
                     if not _contains(owner_intervals, rva, row["size"]):
                         fail("extent_escapes_contribution",
                              "%s extent 0x%x+0x%x escapes contribution" %
