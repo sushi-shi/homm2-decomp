@@ -17,6 +17,11 @@ Ambiguity, overlap, a missing definition, or an uncovered reference leaves the w
 Those individual placements may enter the review queue with their contradictions, but never a
 canonical manifest or target.
 
+Linker-sorted `.CRT$...` subsections do not participate in ordinary `.data` cursor replay. The
+mapper assigns one only when the same owner has exactly one physical retail contribution with the
+same writable domain and size, then removes that contribution from ordinary replay. A missing or
+ambiguous contribution leaves the subsection explicitly unassigned.
+
 The direct candidate-tool manifest records closed-group section offsets and symbol scope as
 discovery evidence only. It is not reviewed and is never a delinker input in the canonical path.
 The pinned delinker consumes the separate source-DATA-plus-reviewed-supplemental manifest, resolves
