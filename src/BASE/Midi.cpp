@@ -10,23 +10,47 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <BASE/resourceManager.h>
 #include <BASE/MIDIWrap.h>
+#include <BASE/MIDI_TYPES.h>
 #include <BASE/Misc.h>
 #include <stdio.h>
+
+DATA(0x0051fec8) struct _MDI_DRIVER *hMDI = 0;
+DATA(0x0051fecc) int CurrentMidiFile = MIDI_NO_TRACK;
+DATA(0x0051fed0) unsigned char bGotMidi[MIDI_TRACK_COUNT] = {
+    0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+};
+DATA(0x0051ff0c) long lLastMIDIPollTickCount = 0;
+DATA(0x0051ff10) static SMidiText gMidiText = {
+    "MS1",
+    "MS2",
+    "MS6b",
+    "MS6c",
+    "MS1",
+    "MS2",
+    "MS4",
+    "MP1a",
+    "MIDI%04d.XMI"
+};
+
 VA(0x004d3850, 0xb8)
 void soundManager::MIDIStartup(void)
 {
     int i;
-    LogStr("MS1");
+    LogStr(gMidiText.startupBegin);
     if (gbNoSound == 0 && (m_midiStarted = 1, gbDontTryMIDI == 0)) {
-        LogStr("MS2");
+        LogStr(gMidiText.startupDriver);
         for (i = 0; i < MIDI_TRACK_COUNT; i++)
             pMIDIWrap[i] = 0;
         for (i = 0; i < MIDI_TRACK_COUNT; i++)
             hSequence[i] = 0;
         m_midiReady = 1;
-        LogStr("MS6b");
+        LogStr(gMidiText.startupOpen);
         i = AIL_midiOutOpen(&hMDI, 0, MIDI_MAPPER);
-        LogInt("MS6c", i, -999, -999, -999, -999, -999, -999);
+        LogInt(gMidiText.startupOpenResult, i, -999, -999, -999, -999, -999, -999);
         if (i != 0)
             m_midiReady = 0;
     }
@@ -38,13 +62,13 @@ void soundManager::MIDIShutdown(void)
     int i;
     if (gbNoSound == 0 && m_midiReady != 0) {
         MIDIStop();
-        LogStr("MS1");
+        LogStr(gMidiText.shutdownBegin);
         for (i = 0; i < MIDI_TRACK_COUNT; i++) {
             if (hSequence[i] != 0)
                 AIL_release_sequence_handle(hSequence[i]);
             hSequence[i] = 0;
         }
-        LogStr("MS2");
+        LogStr(gMidiText.shutdownDriver);
         AIL_midiOutClose(hMDI);
         hMDI = 0;
         m_midiReady = 0;
@@ -53,7 +77,7 @@ void soundManager::MIDIShutdown(void)
                 gpResourceManager->Dispose(pMIDIWrap[i]);
             pMIDIWrap[i] = 0;
         }
-        LogStr("MS4");
+        LogStr(gMidiText.shutdownComplete);
     }
 }
 
@@ -65,7 +89,7 @@ VA(0x004d3ac0, 0x3ab)
 void soundManager::MIDIPlay(int midiTrack)
 {
     if (gbNoSound == 0 && m_midiReady != 0 && gConfig.musicVolume != 0) {
-        LogStr("MP1a");
+        LogStr(gMidiText.playBegin);
         if (bGotMidi[midiTrack] == 0)
             midiTrack = MIDI_NO_TRACK;
         if (midiTrack == MIDI_NO_TRACK) {
@@ -76,7 +100,7 @@ void soundManager::MIDIPlay(int midiTrack)
             MIDIStop();
 
             char filename[16];
-            sprintf(filename, "MIDI%04d.XMI", midiTrack);
+            sprintf(filename, gMidiText.filenameFormat, midiTrack);
             if (hSequence[midiTrack] == 0) {
                 hSequence[midiTrack] = AIL_allocate_sequence_handle(hMDI);
                 if (hSequence[midiTrack] == 0)
@@ -155,25 +179,13 @@ void soundManager::MIDIPoll(void) {}
 // DIR32 sites are retail HIGHLOW sites. Global references use owner addend zero,
 // apart from the proven pMIDIWrap+0xf0 and hSequence+0xf0 end sentinels.
 //
-// `/O2` emits seven distinct writable `.data` COMDATs (selection Any, alignment
-// four) at raw COFF ordinals 5, 6, 7, 8, 11, 14, and 15. The MS6c, MS6b, MS4,
-// filename, and MP1a payloads and owning relocation targets prove their reviewed
-// retail RVAs. Plain repeated MS1 and MS2 literals are pooled into candidate
-// ordinals 8 and 7, but retail references separate byte-identical copies at
-// 0x11ff10/0x11ff28 and 0x11ff14/0x11ff2c. Leave those two identities without
-// canonical allocations until a source-shaped split is proved; do not flatten
-// the retail copies or invent supplemental identities, padding, or static-array
-// storage.
+// Retail appends one 0x40 text bank to the ordinary initialized-data prefix.
+// Its nine owners begin at addends 0x48, 0x4c, 0x50, 0x58, 0x60, 0x64, 0x68,
+// 0x6c, and 0x74. In particular, startup and shutdown use independent MS1/MS2
+// copies; pooled compiler literals cannot represent those relocation addends.
+// The typed gMidiText bank reproduces the complete 0x88 contribution and keeps
+// every source use attached to its retail owner without synthetic identities or
+// padding allocations.
 // ---- globals (definitions, RVA order) ----
-DATA(0x0051fec8) struct _MDI_DRIVER *hMDI = 0;
-DATA(0x0051fecc) int CurrentMidiFile = MIDI_NO_TRACK;
-DATA(0x0051fed0) unsigned char bGotMidi[MIDI_TRACK_COUNT] = {
-    0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-};
-DATA(0x0051ff0c) long lLastMIDIPollTickCount = 0;
 DATA(0x00534cf0) class MIDIWrap *pMIDIWrap[MIDI_TRACK_COUNT];
 DATA(0x00534de0) struct _SEQUENCE *hSequence[MIDI_TRACK_COUNT];
