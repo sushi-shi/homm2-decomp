@@ -41,8 +41,8 @@ void combatManager::ClearCombatMessages(int force)
     if (strlen(m_currentCombatMessage) <= 1 && strlen(m_previousCombatMessage) <= 1)
         return;
     if (force != 0 || m_combatMessageExpiration < KBTickCount()) {
-        strcpy(m_previousCombatMessage, " ");
-        strcpy(m_currentCombatMessage, " ");
+        strcpy(m_previousCombatMessage, "");
+        strcpy(m_currentCombatMessage, "");
         m_previousCombatMessageExpiration = 0;
         m_combatMessageExpiration = m_previousCombatMessageExpiration;
         CombatMessage("", 1, 0, 0);
@@ -84,7 +84,7 @@ void combatManager::CombatMessage(char *message, int updateScreen, int retainPre
         return;
 
     if (clear != 0) {
-        strcpy(m_previousCombatMessage, " ");
+        strcpy(m_previousCombatMessage, "");
         strcpy(m_currentCombatMessage, message);
         m_previousCombatMessageExpiration = 0;
         m_combatMessageExpiration = m_previousCombatMessageExpiration;
@@ -102,7 +102,7 @@ void combatManager::CombatMessage(char *message, int updateScreen, int retainPre
             if (m_combatMessageExpiration != 0)
                 strcpy(m_previousCombatMessage, m_currentCombatMessage);
             else
-                strcpy(m_previousCombatMessage, " ");
+                strcpy(m_previousCombatMessage, "");
             m_previousCombatMessageExpiration = m_combatMessageExpiration;
             m_combatMessageExpiration = KBTickCount() + COMBAT_MESSAGE_TIMEOUT;
         }
@@ -1368,10 +1368,12 @@ void combatManager::DrawSmallView(int viewIndex, int updateScreen)
     gbInDrawSmallView = 0;
 }
 
-// @data-layout-note Retail .data is 0xed22c+0x80 and places the public zero
-// definitions at +0x30 and +0x64 among function literal pools. Candidate .data
-// is 0x7f and emits the same identities at +0/+4 even when the definitions are
-// placed immediately before their first-using functions. Retain the proven
-// initialized storage and RVAs; do not model either prefix as invented data.
+// @data-layout-note Retail initialized storage is 0xed22c+0x80. Candidate
+// .data is 0x7f: its 19 private literals and these two public zero definitions
+// form a relocation-proved permutation whose payloads all match retail. All 26
+// retail HIGHLOW references into the contribution are owned, every candidate
+// data reference pairs at the same function-relative site, and every reference
+// uses addend zero. The sole uncovered extent is one terminal zero alignment
+// byte at +0x7f; do not model it as invented storage.
 DATA(0x004ed25c) int bGridWasShowing = 0;
 DATA(0x004ed290) int gbInDrawSmallView = 0;
