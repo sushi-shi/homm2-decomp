@@ -19,8 +19,6 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <string.h>
 
-DATA(0x004fa954) static int giCombatSpeed;
-
 #define BLUR_COMPONENT(table, offset)                                                              \
     (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(table) + (offset)))
 
@@ -36,8 +34,9 @@ DATA(0x004fa954) static int giCombatSpeed;
 // (+0x54/+0x64), and red/green/blue tables (+0x6c/+0x46c/+0x86c). First divergence is +0x22:
 // ours loads height into eax and loads gpWindowManager before pushing the four arguments; retail
 // loads height into ecx, pushes height/width/zero, then loads gpWindowManager before the last zero.
-// Ours ends at +0x6ab versus retail +0x6a4. All 43 ordered relocation identities agree; retail's
-// delinked names at 0x4fa954 and for 350.0f were audited manually. Correct channel-table declaration
+// Ours ends at +0x6ab versus retail +0x6a4. All 43 ordered relocations remain present with no
+// external-only mismatch; gConfig+0x12e, gfCombatSpeedMod, and 350.0f were audited manually.
+// Correct channel-table declaration
 // order, retail channel-addition order, direct resource/palette aliases, lookup declaration
 // initialization, and moving the aggregate across the lookup allocation were tried. A named
 // BlurSampleIndex enum and fully semantic names for the three scalar samples grew the frame to
@@ -216,7 +215,7 @@ void DoBlur(
 
     gpWindowManager->FizzleForward(0, 0, BLUR_SCREEN_WIDTH, height,
                                    BLUR_FIZZLE_DELAY, oldPalette, newPalette);
-    DelayMilli(static_cast<long>(gfCombatSpeedMod[giCombatSpeed] * 350.0f));
+    DelayMilli(static_cast<long>(gfCombatSpeedMod[gConfig.combatSpeed] * 350.0f));
     gpWindowManager->SaveFizzleSource(0, 0, BLUR_SCREEN_WIDTH, height);
     memcpy(source->m_pixels, saved->m_pixels, imageSize);
     gpWindowManager->FizzleForward(0, 0, BLUR_SCREEN_WIDTH, height,
@@ -229,5 +228,24 @@ void DoBlur(
     H2_FREE(oldPalette, "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp", 0xad);
     H2_FREE(newPalette, "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp", 0xae);
 }
+
+// @data-layout-note
+// Blur has no owned loader-zero storage. Retail DoBlur loads
+// gConfig.combatSpeed at gConfig+0x12e (VA 0x528e4e) and then indexes the
+// real gfCombatSpeedMod table at VA 0x4fa958. The former giCombatSpeed
+// DATA(0x4fa954) declaration was a false interior alias one word before that
+// table and has been removed.
+//
+// Candidate ordinal 3 and retail 0xeba84+0x4 are byte-exact (350.0f).
+// Retail initialized storage is 0x11fdc0+0x100. Candidate ordinal 4 is a
+// distinct writable Any-COMDAT whose 0xd-byte RGBLOOKP.BIN payload and sole
+// relocation prove retail RVA 0x11fde8; retail supplies three alignment bytes.
+// Candidate ordinal 5 is one pooled 0x26-byte source-path Any-COMDAT, while
+// retail retains six distinct byte-identical 0x28-byte allocations at
+// 0x11fdc0, 0x11fdf8, 0x11fe20, 0x11fe48, 0x11fe70, and 0x11fe98. Their six
+// ordered call sites and zero addends agree, but one candidate definition
+// cannot identify six retail owners. Leave that allocation family unresolved;
+// do not select one copy, flatten the copies, or add aliases, padding objects,
+// guessed arrays, or section pragmas.
 
 #undef BLUR_COMPONENT
