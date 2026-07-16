@@ -311,9 +311,10 @@ void wsProcessMessages(void) {
     }
 }
 
-// @early-stop
-// The full 0x37d CodeView span is raw-exact after relocation masking, with all 77 ordered
-// relocation sites/types/targets aligned. Objdiff's residual is the delinked switch jump table.
+// @semantic: complete message switch, frame, CFG, and all 77 ordered relocation
+// identities/addends agree. The first residual is the embedded 0x14-byte jump
+// table at RVA 0x7642; the candidate's next public begins one byte earlier, so
+// the old full-span raw-identity claim was invalid.
 VA(0x004072e3, 0x37d)
 void wsEvaluateMessage(unsigned long int size, int sender) {
     char *message = rcvBufIn + 1;
@@ -390,9 +391,9 @@ void wsEvaluateMessage(unsigned long int size, int sender) {
     }
 }
 
-// @early-stop
-// All non-branch bytes and both ordered relocations are exact; only the +0x1e local JMP
-// displacement differs (retail targets the common epilogue, ours its equivalent JMP block).
+// @semantic: all non-branch bytes and both ordered relocations agree; only the
+// +0x1e local JMP displacement differs, with retail targeting the epilogue and
+// this form its equivalent trailing JMP. Explicit if/else scored 94.12%.
 VA(0x00407660, 0x2e)
 int wsWaitForFirstGuest(void) {
     wsProcessMessages();
