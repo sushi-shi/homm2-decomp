@@ -5529,6 +5529,11 @@ void CloseAIMapVars(void) {
     SVSearchArray.Close();
 }
 
+// @semantic: Complete 0x26a-byte CFG, fastcall frame, and all 25 ordered
+// relocations align. At normalized instruction 7 retail loads player into eax
+// then compares giCurPlayer; ours loads giCurPlayer then compares player. Direct
+// operand reversal, negated inequality, and a value-preserving `player | 0` pin
+// were neutral. Revisit after PHILAI TU/header state changes or in last-mile.
 VA(0x004460f8, 0x26a)
 int OnMySide(int player) {
     if (player != AI_SIDE_NO_PLAYER &&
