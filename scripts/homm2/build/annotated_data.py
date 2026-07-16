@@ -49,6 +49,12 @@ def _clang_args(repo: Path, source: Path) -> list[str]:
             break
     args = ["-x", "c++", "-std=c++14", "-fms-compatibility",
             "-fdelayed-template-parsing", "-ferror-limit=0"]
+    project_includes = [repo / "include"]
+    vendor = repo / "vendor"
+    if vendor.is_dir():
+        project_includes.extend(sorted(path for path in vendor.iterdir() if path.is_dir()))
+    for include in project_includes:
+        args.extend(("-I", str(include)))
     index = 0
     while index < len(raw):
         value = raw[index]
@@ -62,7 +68,7 @@ def _clang_args(repo: Path, source: Path) -> list[str]:
             args.append(value)
         index += 1
     if not raw:
-        args.extend(("-I", str(repo / "include"), "-D__fastcall=", "-D__stdcall="))
+        args.extend(("-D__fastcall=", "-D__stdcall="))
     return args
 
 

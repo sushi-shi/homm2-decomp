@@ -64,6 +64,15 @@ def build_lowercase_mirror(real: Path, mirror: Path) -> Path:
     return mirror
 
 
+def project_include_flags(repo: Path) -> list[str]:
+    flags = ["/I", str(repo / "include")]
+    vendor = repo / "vendor"
+    if vendor.is_dir():
+        for include in sorted(path for path in vendor.iterdir() if path.is_dir()):
+            flags.extend(("/I", str(include)))
+    return flags
+
+
 def base_flags(msvc_inc: Path, msvc_low: Path):
     """clang-cl flags shared by every unit. `/imsvc` = system header (diagnostics
     inside MSVC headers are silenced); `/I include` keeps OUR headers non-system so
@@ -75,7 +84,7 @@ def base_flags(msvc_inc: Path, msvc_low: Path):
         "-fdelayed-template-parsing",
         "/imsvc", str(msvc_low),     # lowercase mirror first (<string.h>)
         "/imsvc", str(msvc_inc),     # then exact-case (<STRING.H>)
-        "/I", str(REPO / "include"),
+        *project_include_flags(REPO),
         *DEFINES,
     ]
 
