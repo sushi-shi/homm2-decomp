@@ -44,11 +44,6 @@
 #include <SOURCE/x_arena.h>
 
 #define EVENTS_FILE const_cast<char *>("I:\\Projects\\Heroes\\Prog\\SOURCE\\EVENTS.CPP")
-// Retail loads these line bases through relocated words; numeric constants change the code shape.
-#define EVENTS_NET_LINE (*reinterpret_cast<const short *>("U\x12"))
-#define EVENTS_COMBAT_LINE (*reinterpret_cast<const short *>("V\x12"))
-#define EVENTS_SEND_LINE (*reinterpret_cast<const short *>("_\x17"))
-#define EVENTS_RECEIVE_LINE (*reinterpret_cast<const short *>("=\x18"))
 #define EVENTS_REMOTE_MESSAGE(buffer) \
     (reinterpret_cast<RemoteMessage *>(buffer))
 #define EVENTS_REMOTE_COMBAT(buffer) \
@@ -5096,6 +5091,7 @@ fightComputerMonsters:
 VA(0x004b5c40, 0x1d0)
 int advManager::DoNetCombat(char *packet)
 {
+    static short sourceLineBase = 0x1655;
     hero *secondHero9;
     int secondSide15;
     int combatX1;
@@ -5132,15 +5128,15 @@ int advManager::DoNetCombat(char *packet)
                          gbCombatSurrender);
     }
     if (firstArmy6)
-        BaseFree(firstArmy6, EVENTS_FILE, EVENTS_NET_LINE + 0x46);
+        BaseFree(firstArmy6, EVENTS_FILE, sourceLineBase + 0x46);
     if (secondArmy10)
-        BaseFree(secondArmy10, EVENTS_FILE, EVENTS_NET_LINE + 0x49);
+        BaseFree(secondArmy10, EVENTS_FILE, sourceLineBase + 0x49);
     if (combatTown[0])
-        BaseFree(combatTown[0], EVENTS_FILE, EVENTS_NET_LINE + 0x4c);
+        BaseFree(combatTown[0], EVENTS_FILE, sourceLineBase + 0x4c);
     if (secondHero9)
-        BaseFree(secondHero9, EVENTS_FILE, EVENTS_NET_LINE + 0x4f);
+        BaseFree(secondHero9, EVENTS_FILE, sourceLineBase + 0x4f);
     if (firstHero29)
-        BaseFree(firstHero29, EVENTS_FILE, EVENTS_NET_LINE + 0x52);
+        BaseFree(firstHero29, EVENTS_FILE, sourceLineBase + 0x52);
     gbRetreatWin = 0;
     return 1;
 }
@@ -5158,6 +5154,7 @@ int advManager::DoCombat(int x, int y, hero *firstHero, armyGroup *firstArmy,
                          armyGroup *secondArmy, int firstSide, int secondSide,
                          int randomSeed, int processLosses)
 {
+    static short sourceLineBase = 0x16ba;
     armyGroup *receivedSecondArmy2;
     hero *receivedSecondHero9;
     hero *receivedFirstHero1;
@@ -5215,30 +5212,30 @@ int advManager::DoCombat(int x, int y, hero *firstHero, armyGroup *firstArmy,
                                 memcpy(firstArmy, receivedFirstArmy,
                                        sizeof(armyGroup));
                                 BaseFree(receivedFirstArmy, EVENTS_FILE,
-                                         EVENTS_COMBAT_LINE + 0x71);
+                                         sourceLineBase + 0x71);
                             }
                             if (receivedSecondArmy2) {
                                 memcpy(secondArmy, receivedSecondArmy2,
                                        sizeof(armyGroup));
                                 BaseFree(receivedSecondArmy2, EVENTS_FILE,
-                                         EVENTS_COMBAT_LINE + 0x77);
+                                         sourceLineBase + 0x77);
                             }
                             if (receivedTown) {
                                 memcpy(combatTown, receivedTown, sizeof(town));
                                 BaseFree(receivedTown, EVENTS_FILE,
-                                         EVENTS_COMBAT_LINE + 0x7d);
+                                         sourceLineBase + 0x7d);
                             }
                             if (receivedSecondHero9) {
                                 memcpy(secondHero, receivedSecondHero9,
                                        sizeof(hero));
                                 BaseFree(receivedSecondHero9, EVENTS_FILE,
-                                         EVENTS_COMBAT_LINE + 0x83);
+                                         sourceLineBase + 0x83);
                             }
                             if (receivedFirstHero1) {
                                 memcpy(firstHero, receivedFirstHero1,
                                        sizeof(hero));
                                 BaseFree(receivedFirstHero1, EVENTS_FILE,
-                                         EVENTS_COMBAT_LINE + 0x89);
+                                         sourceLineBase + 0x89);
                             }
                             gpCombatManager->m_combatResult = combatResult3[0];
                             goto combatFinished;
@@ -5320,12 +5317,13 @@ void advManager::SendHeroTownData(
     int randomSeed, int remotePlayer, int combatResult, int retreatWin,
     int combatSurrender)
 {
+    static short sourceLineBase = 0x17cc;
     char *reply;
     int result;
     combatRemoteData *buffer = 0;
 
     buffer = static_cast<combatRemoteData *>(BaseAlloc(
-        COMBAT_REMOTE_BUFFER_SIZE, EVENTS_FILE, EVENTS_SEND_LINE + 3));
+        COMBAT_REMOTE_BUFFER_SIZE, EVENTS_FILE, sourceLineBase + 3));
     reply = 0;
     buffer->fragment = 0;
     buffer->x = static_cast<signed char>(x);
@@ -5418,7 +5416,7 @@ void advManager::SendHeroTownData(
         if (!result)
             ShutDown(0);
     }
-    BaseFree(buffer, EVENTS_FILE, EVENTS_SEND_LINE + 0x5c);
+    BaseFree(buffer, EVENTS_FILE, sourceLineBase + 0x5c);
 }
 
 VA(0x004b67cd, 0x462)
@@ -5429,6 +5427,7 @@ void advManager::ReceiveHeroTownData(
     signed char *combatResult, signed char *retreatWin,
     signed char *combatSurrender)
 {
+    static short sourceLineBase = 0x183d;
     int hasFirstHero7;
     int hasTown0;
     int hasSecondHero8;
@@ -5469,17 +5468,17 @@ void advManager::ReceiveHeroTownData(
             EVENTS_REMOTE_COMBAT(packet)->secondGold;
 
     *firstArmy = static_cast<armyGroup *>(
-        BaseAlloc(sizeof(armyGroup), EVENTS_FILE, EVENTS_RECEIVE_LINE + 0x26));
+        BaseAlloc(sizeof(armyGroup), EVENTS_FILE, sourceLineBase + 0x26));
     memcpy(*firstArmy, &EVENTS_REMOTE_COMBAT(packet)->firstArmy,
            sizeof(armyGroup));
     *secondArmy = static_cast<armyGroup *>(
-        BaseAlloc(sizeof(armyGroup), EVENTS_FILE, EVENTS_RECEIVE_LINE + 0x29));
+        BaseAlloc(sizeof(armyGroup), EVENTS_FILE, sourceLineBase + 0x29));
     memcpy(*secondArmy, &EVENTS_REMOTE_COMBAT(packet)->secondArmy,
            sizeof(armyGroup));
     if (hasTown0) {
         *combatTown = static_cast<town *>(
             BaseAlloc(sizeof(town), EVENTS_FILE,
-                      EVENTS_RECEIVE_LINE + 0x2e));
+                      sourceLineBase + 0x2e));
         memcpy(*combatTown, &EVENTS_REMOTE_COMBAT(packet)->combatTown,
                sizeof(town));
     }
@@ -5501,14 +5500,14 @@ void advManager::ReceiveHeroTownData(
     if (hasFirstHero7) {
         *firstHero = static_cast<hero *>(
             BaseAlloc(sizeof(hero), EVENTS_FILE,
-                      EVENTS_RECEIVE_LINE + 0x47));
+                      sourceLineBase + 0x47));
         gotFirstHeroFirst3 = 0;
         gotFirstHeroSecond9 = 0;
     }
     if (hasSecondHero8) {
         *secondHero = static_cast<hero *>(
             BaseAlloc(sizeof(hero), EVENTS_FILE,
-                      EVENTS_RECEIVE_LINE + 0x4d));
+                      sourceLineBase + 0x4d));
         gotSecondHeroFirst13 = 0;
         gotSecondHeroSecond6 = 0;
     }
@@ -5649,4 +5648,19 @@ int RiddleStringsEqual(char *answer, char *expected)
 }
 
 // ---- globals (definitions, RVA order) ----
+// @data-layout-note Retail's initialized EVENTS contribution is 0x5700 bytes at
+// RVA 0x117620. The candidate .data shrank from 0x59ef to 0x59bb after replacing
+// 17 casted three-byte string literals with four typed function-local shorts:
+// DoNetCombat 0x51c9b4=0x1655 (5 HIGHLOW uses), DoCombat
+// 0x51ca94=0x16ba (5), SendHeroTownData 0x51cbac=0x17cc (2), and
+// ReceiveHeroTownData 0x51cc08=0x183d (5). Their candidate spans are respectively
+// offsets 0x0, 0x4, 0x8, and 0xc; gbNoShowCombat follows at 0x10 and its retail
+// RVA is 0x51cc0c. The former string-literal form both duplicated owners and gave
+// the first three incorrect retail values. The four retail owners are interleaved
+// with per-call EVENTS.CPP literals, yielding four incompatible section anchor
+// bases; topology therefore correctly reports section-outside-contributions and
+// leaves the 0x5700 contribution unconsumed. Revisit the remaining 0x2bb size and
+// literal-order residual only with new PE relocation evidence that proves further
+// one-to-one owners. Do not add padding, aliases, synthetic identities, or snap a
+// section cursor to force wholesale replay.
 DATA(0x0051cc0c) int gbNoShowCombat = 0;
