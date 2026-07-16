@@ -245,22 +245,40 @@ authoritative. This file is the short, restart-ready Codex workflow.
 
 ## Static Data And Link Resolution
 
-- Do not use objdiff's aggregate `matched_data` or `matched_data_percent` as a static-data coverage
-  metric. The delinker fragments, duplicates, synthesizes, and zero-fills per-TU data sections, so
-  its target objects are not faithful byte-for-byte images of retail `.data`/`.rdata`. Matching
-  those synthetic sections globally is neither meaningful nor a campaign objective.
-- Unresolved data symbols are still actionable link and layout work. CodeView-backed globals must
-  be declared in their canonical owner header and defined in the owning TU with the proven type.
-  Recover retail initializers and pointer relocations when runtime semantics require them; compare
-  those bytes against the original PE at the authoritative VA, not against a synthetic delinked
-  data section.
+- Treat compiled reconstruction objects as the base and Vostok-delinked retail objects as the
+  target. Candidate COFF supplies real symbol spelling, TU ownership, section ordinal/offset,
+  scope, alignment, and storage class. Retail NB09 contributions, public RVAs, PE bytes, and
+  relocations supply placement evidence. Vostok does not discover candidate identities: it emits
+  the names and topology provided by the reviewed manifests.
+- Canonical Vostok symbol input is exactly the conflict-free union of generated source
+  `DATA(...)` definitions in `build/gen/delink_data_from_source.tsv` and explicitly reviewed facts
+  absent from source DATA in `config/delink_data_supplemental.tsv`. The union is generated as
+  `build/gen/delink_data_manifest.tsv`. Generated CSV/TSV files belong under `build/gen`, never
+  `config`.
+- Skip any symbol which lacks reviewed placement. Discovery tools may propose a real candidate
+  symbol, TU, retail RVA, and supporting evidence under `build/gen`, but proposals never mutate the
+  supplemental manifest, canonical union, or target objects. A human-reviewed supplemental row is
+  the only promotion path for a non-DATA symbol. Keep contradictions and missing evidence explicit.
+- Replay candidate data sections in COFF section-table order and with encoded alignment inside the
+  exact NB09 contribution chunks for their TU. Public and DATA RVAs are non-steering breakpoints:
+  they validate the replay and report drift but never move its cursor. Independent initialized,
+  read-only, and zero-fill contributions can be far apart in the linked image.
+- Padding is not a symbol, allocation, or matching target. Preserve it only through COFF section
+  size and alignment so the following real symbol retains its offset. Never add padding rows,
+  anonymous section identities, or address-sized arrays to imitate linked-image gaps.
+- Canonical delinking has no nearest-symbol or synthetic fallback. Target objects must contain no
+  `const_*`, `string_*`, `data_*`, `bss_*`, `[section-N]`, `empty_stub`, or unresolved-range
+  identities. An uncovered retail relocation or unassigned section is a hard diagnostic, not
+  permission to invent a name.
+- Compare candidate and delinked COFF identities directly. For every relocation, the source
+  section/site, referenced symbol, and owner-relative addend must agree. Do not use a post-hoc name
+  or addend mapping to make HoMM2 comparisons pass. `homm2 data-relocs` independently audits raw
+  COFF relocation topology because ordinary code scoring may mask relocation fields; objdiff's
+  `data_value` comparison remains the per-symbol payload view.
 - Never resolve an interior alias by emitting overlapping independent storage. Replace aliases into
   `gConfig`, monster tables, formation/elevation records, or other known objects with real member or
   table access. Refine the owning packed layout when necessary and then remove the synthetic model
   declaration.
-- Keep unresolved-symbol cleanup separate from data-byte matching. Its proof is: no unresolved
-  reconstruction-object reference, correct owner/address/layout, correct call-site semantics, and
-  a passing full build/relocation audit. It does not require improving objdiff's data percentage.
 - `DATA(<VA>)` is audit metadata and does not pin a linker address. Model the retail storage class
   in the definition: a value present in initialized storage needs the corresponding initializer
   (including an explicit zero when retail emitted it), while true loader-zeroed storage remains an
@@ -275,9 +293,10 @@ authoritative. This file is the short, restart-ready Codex workflow.
   comparison. If natural MSVC 4.2 contributions cannot reproduce the order, use generated ordered
   COFF section contributions as a final-link mechanism rather than contaminating reconstructed
   source layouts with address-sized padding arrays.
-- Delinked target objects synthesize data sections and may duplicate a symbol once per reference;
-  their section membership is not evidence for original `.data` versus `.bss`. Use the retail PE's
-  raw/virtual section extents, stored bytes, CodeView addresses, and neighboring symbols instead.
+- Do not classify logical `.data` versus `.bss` solely at the PE raw-size boundary. File-alignment
+  padding can contain logically zero-fill contributions. Reconstruct storage from candidate COFF
+  class, exact NB09 ownership chunks, public/DATA anchors, and retail bytes; conflicting evidence
+  remains a diagnostic until the declaration or contribution model is corrected.
 
 ## CodeView Function Boundaries
 
