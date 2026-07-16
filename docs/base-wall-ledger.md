@@ -164,7 +164,7 @@ and live scores are shown as `retained/live`.
 | `TEXTWDGT` | `0x004d1060` `textWidget::textWidget()` | 97.3684/97.3684 | unresolved/not-a-wall | Δ=10; rel 2/2 | [source note](../src/BASE/TEXTWDGT.cpp#L14) | R2 |
 | `TEXTWDGT` | `0x004d10f0` `textWidget::textWidget(...)` | 99.2727/99.2727 | unresolved/not-a-wall | Δ=8; rel 4/4 | [source note](../src/BASE/TEXTWDGT.cpp#L38) | R2 |
 | `TEXTWDGT` | `0x004d1280` `textWidget::Main` | 99.6316/99.6316 | unresolved/not-a-wall | Δ=2; rel 6/6 | [source note](../src/BASE/TEXTWDGT.cpp#L88) | R2 |
-| `WIDGET` | `0x004dded0` `widget::Close` | unscored | proven-artifact | candidate named body and retail `empty_stub` are the same single `c3`, rel 0/0 | [empty-stub proof pattern](patterns/retail-empty-stubs.md) | A1 |
+| `WIDGET` | `0x004dded0` `widget::Close` | unscored | proven-artifact | both named bodies are the same single `c3`, rel 0/0; canonical delinking now retains the real identity | [empty-stub proof pattern](patterns/retail-empty-stubs.md) | A1 |
 | `WINDOW` | `0x004cecd0` `heroWindow::heroWindow(resource)` | 99.9167/99.9167 | proven-artifact | Δ=0 over 0x521 bytes after 57 relocation payloads; 0x68 frame and EBP displacements exact; only folded dispatch/table identities remain | [WINDOW matrix](matching-matrices/README.md#basewindow-whole-tu-jump-table-revalidation) | A1 |
 | `droplist` | `0x004dc2e0` `dropListWidget::Main` | 99.8745/99.8745 | proven-artifact | Δ=0 over 0x350 bytes; rel 22/22; external sites agree and seven dispatch/table sites are owner-label aliases | [source note](../src/BASE/droplist.cpp#L126) | A1 |
 | `icon2bs` | `0x004d2f90` `IconToBitmapScale` | 76.3262/76.3262 | unresolved/not-a-wall | Δ=317; rel 4/4 | [source note](../src/BASE/icon2bs.cpp#L12) | R1 |

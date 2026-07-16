@@ -105,7 +105,7 @@ not sum to 245:
 | referenced data value/section identity | n/a | 123 | `getFinalCRC`: ordered relocation tuples agree, but `data_value` still compares referenced target data/section identity |
 | same-address external alias | 10 | 8 | `resourceManager::MakeId`: `__stricmp` versus `__strcmpi`, both resolving to the same CRT address |
 | resolved-address difference | 10 | 8 | `armyGroup::HasAllUndead`: candidate `0xfaec9`, retail `0xfaec7` |
-| folded/local branch identity | 1 | 1 | `heroWindow::RemoveWidget`: `widget::Close` versus delinked `empty_stub` |
+| folded/local branch identity | 0 | 0 | canonical Vostok retains the real same-RVA symbol identities |
 
 Later source fixes can reduce the resolved-address row; it is deliberately reported by
 the independent resolved audit rather than allowlisted here.
