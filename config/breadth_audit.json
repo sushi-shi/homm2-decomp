@@ -2059,6 +2059,50 @@
       "note": "Complete body; menu/local equality load order remains after operand swap and local qualification."
     },
     {
+      "unit": "SOURCE/Modem",
+      "function": "?Dial@@YIJXZ",
+      "source_hash": "c40ea88946c8",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 99.88372,
+      "after": 99.88372,
+      "note": "Complete semantics and 19 relocations; one return-join branch byte remains, and explicit if/else regressed."
+    },
+    {
+      "unit": "SOURCE/Modem",
+      "function": "?GUIModemResponseExec@@YICXZ",
+      "source_hash": "464103194e78",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 99.80769,
+      "after": 99.80769,
+      "note": "Complete semantics and 20 relocations; two inline-continuation branch bytes remain, and inner else/return regressed."
+    },
+    {
+      "unit": "SOURCE/Modem",
+      "function": "?Wait@@YIJXZ",
+      "source_hash": "7b3ebee564d6",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 99.80769,
+      "after": 99.80769,
+      "note": "Complete semantics and nine relocations; one return-join branch byte remains, and explicit if/else regressed."
+    },
+    {
+      "unit": "SOURCE/Modem",
+      "function": "?WriteModemPacket@@YIXPADH@Z",
+      "source_hash": "f1f83b4a0412",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.913795,
+      "after": 100.0,
+      "note": "Removed the length-error nesting; candidate now matches all bytes and four ordered relocations."
+    },
+    {
       "unit": "SOURCE/Newgame",
       "function": "?DrawNGKPDisplayString@game@@QAEXH@Z",
       "source_hash": "faa957f81b97",
@@ -3410,6 +3454,61 @@
       "before": 98.93493,
       "after": 98.93493,
       "note": "Complete UI CFG frame slots and 177 relocs; flattened selection evaluation order resists seven bounded families."
+    },
+    {
+      "unit": "SOURCE/comwin",
+      "function": "?ShutdownComError@@YIXPAD@Z",
+      "source_hash": "26ac980a2028",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.44301,
+      "after": 98.44301,
+      "note": "Complete structure and 72 relocations; residual begins at the embedded Win32-error jump table, with literal case spelling already exhausted."
+    },
+    {
+      "unit": "SOURCE/comwin",
+      "function": "?com_init@@YIFEHH@Z",
+      "source_hash": "cbef151c7e14",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.941864,
+      "after": 98.941864,
+      "note": "Complete structure and 33 relocations; residual begins at the embedded baud-rate jump table, with the prior initializer probe documented."
+    },
+    {
+      "unit": "SOURCE/comwin",
+      "function": "?com_rcv@@YIFFGPAX@Z",
+      "source_hash": "266056d53b16",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 2,
+      "before": 99.875,
+      "after": 100.0,
+      "note": "Recovered the retail COMSTAT/error local order with a semantic bucket name; all bytes and seven relocations match."
+    },
+    {
+      "unit": "SOURCE/comwin",
+      "function": "?com_snd@@YIFFGGPAXH@Z",
+      "source_hash": "0b7df1832103",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 2,
+      "before": 99.88095,
+      "after": 100.0,
+      "note": "Assigned distinct semantic local-name buckets; frame, bytes, and 15 ordered relocations now match exactly."
+    },
+    {
+      "unit": "SOURCE/comwin",
+      "function": "?comm_wrt_task@@YIXXZ",
+      "source_hash": "cce55ef44f3a",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
+      "iterations": 2,
+      "before": 99.62319,
+      "after": 99.927536,
+      "note": "Corrected all five local slots; only the direct-epilogue versus trailing-join branch byte remains and eight relocations agree."
     },
     {
       "unit": "SOURCE/dpnetwin",
