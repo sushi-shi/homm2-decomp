@@ -3507,5 +3507,10 @@ int army::GetPowBaseY(void)
 }
 
 // ---- globals (definitions, RVA order) ----
+// @data-layout-note Retail .data is 0xf53c4+0x2f4 and places bSecondAttack at
+// +0xe4, after the first function literal pool. Candidate .data is 0x2f3 and
+// places this external definition at +0 while several later literals still
+// differ in spelling/order. Revisit with exact function literals; do not model
+// the 0xe4 prefix as invented storage.
 DATA(0x004f54a8) int bSecondAttack = 0;
 DATA(0x00527eb4) int gbGenieHalf;
