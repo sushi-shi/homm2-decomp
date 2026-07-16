@@ -12,8 +12,10 @@ from homm2.build.data_manifest_adapter import (
     source_definitions,
     validate_symbol_rows,
     _classified_contribution_rows,
+    _normalize_symbol_row,
     _section_rows,
     _symbol_row,
+    _validate_supplemental_row,
 )
 from homm2.build.test_data_topology_census import (
     COMDAT_DATA_FLAGS,
@@ -92,6 +94,45 @@ class DataManifestAdapterTest(unittest.TestCase):
         self.assertEqual([row.symbol for _source, row in resolved], [
             "?global@@3HA", "_local$S12", "?member@Owner@@2HA",
         ])
+
+    def test_normal_assembly_rejects_implicit_supplemental_identity_migration(self):
+        current = candidate("A", "_private$S2")
+        topology = {"A": ([current], [])}
+        row = {
+            "name": "_private$S1", "object": "A.c", "rva": "0x100",
+            "size": "0x4", "storage": "data", "alignment": "0x4",
+            "section_ordinal": "1", "section_offset": "0x0",
+            "scope": "local", "provenance": "candidate-coff-reloc-bijection",
+        }
+        with self.assertRaisesRegex(ValueError, "stale reviewed supplemental"):
+            _validate_supplemental_row(row, topology)
+        migrated = _normalize_symbol_row(row, topology)
+        self.assertEqual(migrated["name"], "_private$S2")
+
+    def test_normal_assembly_preserves_exact_reviewed_supplemental_row(self):
+        current = candidate("A", "_private$S2")
+        topology = {"A": ([current], [])}
+        row = {
+            "name": "_private$S2", "object": "A.c", "rva": "0x100",
+            "size": "0x4", "storage": "data", "alignment": "0x4",
+            "section_ordinal": "1", "section_offset": "0x0",
+            "scope": "local", "provenance": "candidate-coff-reloc-bijection",
+        }
+        self.assertEqual(_validate_supplemental_row(row, topology), row)
+
+    def test_normal_assembly_preserves_logical_size_below_candidate_span(self):
+        current = replace(candidate("A", "_private$S2"), size=8)
+        topology = {"A": ([current], [])}
+        row = {
+            "name": "_private$S2", "object": "A.c", "rva": "0x100",
+            "size": "0x3", "storage": "data", "alignment": "0x4",
+            "section_ordinal": "1", "section_offset": "0x0",
+            "scope": "local", "provenance": "candidate-coff-reloc-bijection",
+        }
+        self.assertEqual(_validate_supplemental_row(row, topology), row)
+        row["size"] = "0x9"
+        with self.assertRaisesRegex(ValueError, "exceeds candidate span"):
+            _validate_supplemental_row(row, topology)
 
     def test_duplicate_raw_comdat_section_names_keep_distinct_ordinals(self):
         with TemporaryDirectory() as directory:

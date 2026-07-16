@@ -316,6 +316,49 @@ def _normalize_symbol_row(row: dict[str, str], topology_by_unit) -> dict[str, st
     return {key: normalized.get(key, "") for key in SYMBOL_HEADER}
 
 
+def _validate_supplemental_row(row: dict[str, str], topology_by_unit) -> dict[str, str]:
+    """Require a reviewed row to name its current candidate allocation exactly."""
+    unit = row["object"].replace("\\", "/").removesuffix(".c")
+    definitions = topology_by_unit.get(unit, ([], []))[0]
+    ordinal = int(row["section_ordinal"], 0)
+    offset = int(row["section_offset"], 0)
+    matches = [
+        value for value in definitions
+        if value.symbol == row["name"]
+        and value.section_ordinal == ordinal
+        and value.section_value == offset
+    ]
+    if len(matches) != 1:
+        raise ValueError(
+            f"stale reviewed supplemental {unit}:{row['name']}: expected one "
+            f"candidate definition at section {ordinal}+0x{offset:x}, found "
+            f"{len(matches)}; use explicit --migrate-from and review the diff")
+    candidate = matches[0]
+    logical_size = int(row["size"], 0)
+    if logical_size <= 0 or logical_size > candidate.size:
+        raise ValueError(
+            f"stale reviewed supplemental {unit}:{row['name']} logical size "
+            f"0x{logical_size:x} exceeds candidate span 0x{candidate.size:x}; "
+            "update only after reviewing candidate evidence")
+    expected = {
+        "object": unit.replace("/", "\\") + ".c",
+        "storage": candidate.storage,
+        "alignment": f"0x{candidate.alignment:x}",
+        "section_ordinal": str(candidate.section_ordinal),
+        "section_offset": f"0x{candidate.section_value:x}",
+        "scope": "external" if candidate.storage_class == 2 else "local",
+    }
+    mismatches = {
+        key: {"reviewed": row.get(key, ""), "candidate": value}
+        for key, value in expected.items() if row.get(key, "") != value
+    }
+    if mismatches:
+        raise ValueError(
+            f"stale reviewed supplemental {unit}:{row['name']} topology: "
+            f"{mismatches}; update only after reviewing candidate evidence")
+    return {key: row.get(key, "") for key in SYMBOL_HEADER}
+
+
 def migrate_supplemental(legacy: Path, output: Path, source_rows, topology_by_unit) -> list[dict[str, str]]:
     source_identity = {(row["object"], row["name"]) for row in source_rows}
     source_rvas = {int(row["rva"], 0) for row in source_rows}
@@ -878,7 +921,7 @@ def build_manifests(source_root=SOURCE_ROOT, base_root=BASE_ROOT, symbols=SYMBOL
         supplemental_rows = migrate_supplemental(
             Path(migrate_from), Path(supplemental), source_rows, topology_by_unit)
     else:
-        supplemental_rows = [_normalize_symbol_row(row, topology_by_unit)
+        supplemental_rows = [_validate_supplemental_row(row, topology_by_unit)
                              for row in _read_tsv(Path(supplemental))]
         validate_symbol_rows(supplemental_rows, "supplemental")
     combined = [*source_rows, *supplemental_rows]
