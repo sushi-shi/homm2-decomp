@@ -100,32 +100,32 @@ void playerData::Write(int file)
 {
     char unused[52];
 
-    _write(file, &m_color, 1);
-    _write(file, &m_heroCount, 1);
-    _write(file, &m_currentHero, 1);
-    _write(file, &m_heroLocatorPage, 1);
-    _write(file, m_heroIds, 8);
-    _write(file, m_availableHeroIds, 2);
+    write(file, &m_color, 1);
+    write(file, &m_heroCount, 1);
+    write(file, &m_currentHero, 1);
+    write(file, &m_heroLocatorPage, 1);
+    write(file, m_heroIds, 8);
+    write(file, m_availableHeroIds, 2);
     memset(unused, 0, 48);
-    _write(file, unused, 42);
-    _write(file, &gpGame->m_cheated, 1);
-    _write(file, &m_cheatValue, 1);
-    _write(file, &m_aiDifficulty, 4);
-    _write(file, &m_minimumHeroCount, 1);
-    _write(file, &m_evilInterface, 1);
-    _write(file, &m_ultimateArtifactHintChance, 1);
-    _write(file, &m_ultimateArtifactHintX, 1);
-    _write(file, &m_ultimateArtifactHintY, 1);
-    _write(file, &m_daysLeft, 1);
-    _write(file, &m_townCount, 1);
-    _write(file, &m_currentTown, 1);
-    _write(file, &m_townLocatorPage, 1);
-    _write(file, m_townIds, 72);
-    _write(file, m_resources, 28);
-    _write(file, m_income, 28);
-    _write(file, &m_barrierTents, 1);
-    _write(file, &m_barrierTents, 1);
-    _write(file, m_unknownad, 6);
+    write(file, unused, 42);
+    write(file, &gpGame->m_cheated, 1);
+    write(file, &m_cheatValue, 1);
+    write(file, &m_aiDifficulty, 4);
+    write(file, &m_minimumHeroCount, 1);
+    write(file, &m_evilInterface, 1);
+    write(file, &m_ultimateArtifactHintChance, 1);
+    write(file, &m_ultimateArtifactHintX, 1);
+    write(file, &m_ultimateArtifactHintY, 1);
+    write(file, &m_daysLeft, 1);
+    write(file, &m_townCount, 1);
+    write(file, &m_currentTown, 1);
+    write(file, &m_townLocatorPage, 1);
+    write(file, m_townIds, 72);
+    write(file, m_resources, 28);
+    write(file, m_income, 28);
+    write(file, &m_barrierTents, 1);
+    write(file, &m_barrierTents, 1);
+    write(file, m_unknownad, 6);
 }
 
 VA(0x00470aed, 0x22d)
@@ -133,31 +133,31 @@ void playerData::Read(int file)
 {
     char unused[52];
 
-    _read(file, &m_color, 1);
-    _read(file, &m_heroCount, 1);
-    _read(file, &m_currentHero, 1);
-    _read(file, &m_heroLocatorPage, 1);
-    _read(file, m_heroIds, 8);
-    _read(file, m_availableHeroIds, 2);
-    _read(file, unused, 42);
-    _read(file, &gpGame->m_cheated, 1);
-    _read(file, &m_cheatValue, 1);
-    _read(file, &m_aiDifficulty, 4);
-    _read(file, &m_minimumHeroCount, 1);
-    _read(file, &m_evilInterface, 1);
-    _read(file, &m_ultimateArtifactHintChance, 1);
-    _read(file, &m_ultimateArtifactHintX, 1);
-    _read(file, &m_ultimateArtifactHintY, 1);
-    _read(file, &m_daysLeft, 1);
-    _read(file, &m_townCount, 1);
-    _read(file, &m_currentTown, 1);
-    _read(file, &m_townLocatorPage, 1);
-    _read(file, m_townIds, 72);
-    _read(file, m_resources, 28);
-    _read(file, m_income, 28);
-    _read(file, &m_barrierTents, 1);
-    _read(file, &m_barrierTents, 1);
-    _read(file, m_unknownad, 6);
+    read(file, &m_color, 1);
+    read(file, &m_heroCount, 1);
+    read(file, &m_currentHero, 1);
+    read(file, &m_heroLocatorPage, 1);
+    read(file, m_heroIds, 8);
+    read(file, m_availableHeroIds, 2);
+    read(file, unused, 42);
+    read(file, &gpGame->m_cheated, 1);
+    read(file, &m_cheatValue, 1);
+    read(file, &m_aiDifficulty, 4);
+    read(file, &m_minimumHeroCount, 1);
+    read(file, &m_evilInterface, 1);
+    read(file, &m_ultimateArtifactHintChance, 1);
+    read(file, &m_ultimateArtifactHintX, 1);
+    read(file, &m_ultimateArtifactHintY, 1);
+    read(file, &m_daysLeft, 1);
+    read(file, &m_townCount, 1);
+    read(file, &m_currentTown, 1);
+    read(file, &m_townLocatorPage, 1);
+    read(file, m_townIds, 72);
+    read(file, m_resources, 28);
+    read(file, m_income, 28);
+    read(file, &m_barrierTents, 1);
+    read(file, &m_barrierTents, 1);
+    read(file, m_unknownad, 6);
 }
 
 VA(0x00470d1a, 0x12d)
@@ -258,7 +258,9 @@ int game::MineTypesOwned(int owner, int resourceType)
 }
 
 // @early-stop
-// reloc-masked: identical 0x40d-byte instruction stream; 36/36 relocation targets agree, residual is delinked local-label identity
+// Logic, frame, slots, and all 36 external relocations match. Retail's early exits at
+// +0x9f and +0x180 branch through the +0x3fe return trampoline; this TU branches
+// directly to the +0x408 epilogue. Both paths are otherwise byte-identical.
 VA(0x004710f3, 0x40d)
 void ComputeUALoc(int player)
 {
@@ -312,6 +314,10 @@ saveLocation:
     gpGame->m_players[player].m_ultimateArtifactHintY = static_cast<signed char>(y);
 }
 
+// @early-stop
+// The full instruction stream, frame, CFG, and external targets match. Objdiff's two
+// remaining rows spell retail's __adjust_fdiv address as iLeftRightSave+0x10; both
+// resolve to RVA 0x12126c and are delinker owner aliases.
 VA(0x00471500, 0x2ac)
 int game::SetupPuzzlePieces(int player, int justCount)
 {
@@ -558,59 +564,59 @@ int game::SaveGame(char *filename, int generateName, signed char expansionFormat
         sprintf(generatedNameStorage, filename);
     }
 
-    if (_strnicmp(generatedNameStorage, "RMT", 3) == 0) {
+    if (strnicmp(generatedNameStorage, "RMT", 3) == 0) {
         sprintf(savePathValue, "%s%s", ".\\DATA\\", generatedNameStorage);
     } else {
         sprintf(savePathValue, "%s%s", gcGamePath, generatedNameStorage);
-        if (_strnicmp(generatedNameStorage, "AUTOSAVE", 8) != 0 &&
-            _strnicmp(generatedNameStorage, "PLYREXIT", 8) != 0)
+        if (strnicmp(generatedNameStorage, "AUTOSAVE", 8) != 0 &&
+            strnicmp(generatedNameStorage, "PLYREXIT", 8) != 0)
             strcpy(gpGame->m_saveName, filename);
     }
 
-    int fileInfo = _open(savePathValue, 0x8301, 0x80);
+    int fileInfo = open(savePathValue, 0x8301, 0x80);
     if (fileInfo == -1)
         FileError(savePathValue);
 
     int legacyMarkerTemp = -1;
     if (!expansionFormat)
-        _write(fileInfo, &legacyMarkerTemp, 4);
-    _write(fileInfo, &m_worldMap.width, 4);
-    _write(fileInfo, &m_worldMap.height, 4);
-    _write(fileInfo, &m_mapHeader, sizeof(m_mapHeader));
-    _write(fileInfo, m_setupPlayerColor, 0x41);
-    _write(fileInfo, &gbIAmGreatest, 1);
-    _write(fileInfo, this, 2);
-    _write(fileInfo, &giMonthType, 1);
-    _write(fileInfo, &giMonthTypeExtra, 1);
-    _write(fileInfo, &giWeekType, 1);
-    _write(fileInfo, &giWeekTypeExtra, 1);
-    _write(fileInfo, cPlayerNames, 126);
+        write(fileInfo, &legacyMarkerTemp, 4);
+    write(fileInfo, &m_worldMap.width, 4);
+    write(fileInfo, &m_worldMap.height, 4);
+    write(fileInfo, &m_mapHeader, sizeof(m_mapHeader));
+    write(fileInfo, m_setupPlayerColor, 0x41);
+    write(fileInfo, &gbIAmGreatest, 1);
+    write(fileInfo, this, 2);
+    write(fileInfo, &giMonthType, 1);
+    write(fileInfo, &giMonthTypeExtra, 1);
+    write(fileInfo, &giWeekType, 1);
+    write(fileInfo, &giWeekTypeExtra, 1);
+    write(fileInfo, cPlayerNames, 126);
 
     char legacyData[100];
     memset(legacyData, 0, 40);
-    _write(fileInfo, legacyData, 36);
+    write(fileInfo, legacyData, 36);
     if (xIsPlayingExpansionCampaign) {
         int campaignTypeInfo = 2;
-        _write(fileInfo, &campaignTypeInfo, 4);
-        _write(fileInfo, &xCampaign, 0x4f);
+        write(fileInfo, &campaignTypeInfo, 4);
+        write(fileInfo, &xCampaign, 0x4f);
     } else {
-        _write(fileInfo, &gbInCampaign, 4);
+        write(fileInfo, &gbInCampaign, 4);
         if (gbInCampaign)
-            _write(fileInfo, &m_campaignType, 0x147);
+            write(fileInfo, &m_campaignType, 0x147);
     }
     if (!expansionFormat)
-        _write(fileInfo, &xIsExpansionMap, 1);
+        write(fileInfo, &xIsExpansionMap, 1);
 
     gpAdvManager->PurgeMapChangeQueue();
-    _write(fileInfo, &giMapChangeCtr, 4);
+    write(fileInfo, &giMapChangeCtr, 4);
     GenerateStandardFileName(m_saveName, legacyData);
-    _write(fileInfo, legacyData, 14);
-    _write(fileInfo, &m_playerCount, 1);
+    write(fileInfo, legacyData, 14);
+    write(fileInfo, &m_playerCount, 1);
     char currentPlayerInfo[4];
     currentPlayerInfo[0] = static_cast<char>(giCurPlayer);
-    _write(fileInfo, currentPlayerInfo, 1);
-    _write(fileInfo, &m_deadPlayerCount, 1);
-    _write(fileInfo, m_playerDead, 6);
+    write(fileInfo, currentPlayerInfo, 1);
+    write(fileInfo, &m_deadPlayerCount, 1);
+    write(fileInfo, m_playerDead, 6);
 
     char humanFlagsLocal[8];
     for (indexFile = 0; indexFile < GAME_PLAYER_COUNT; indexFile++) {
@@ -618,71 +624,71 @@ int game::SaveGame(char *filename, int generateName, signed char expansionFormat
         if (m_playerDead[indexFile] != 0)
             humanFlagsLocal[indexFile] = 0;
     }
-    _write(fileInfo, humanFlagsLocal, 6);
-    _write(fileInfo, &m_day, 2);
-    _write(fileInfo, &m_week, 2);
-    _write(fileInfo, &m_month, 2);
+    write(fileInfo, humanFlagsLocal, 6);
+    write(fileInfo, &m_day, 2);
+    write(fileInfo, &m_week, 2);
+    write(fileInfo, &m_month, 2);
     for (indexFile = 0; indexFile < GAME_PLAYER_COUNT; indexFile++)
         m_players[indexFile].Write(fileInfo);
 
-    _write(fileInfo, &m_obeliskCount, 1);
+    write(fileInfo, &m_obeliskCount, 1);
     for (indexFile = 0; indexFile < GAME_HERO_COUNT; indexFile++)
         m_heroRecs[indexFile].Write(fileInfo, !expansionFormat);
-    _write(fileInfo, m_availableHeroes, GAME_HERO_COUNT);
-    _write(fileInfo, m_castleRecs, 0x1c20);
-    _write(fileInfo, m_castleOwners, sizeof(m_castleOwners));
-    _write(fileInfo, m_dailyEventFlags, sizeof(m_dailyEventFlags));
-    _write(fileInfo, m_mines, sizeof(m_mines));
-    _write(fileInfo, m_mineOwners, 0x90);
+    write(fileInfo, m_availableHeroes, GAME_HERO_COUNT);
+    write(fileInfo, m_castleRecs, 0x1c20);
+    write(fileInfo, m_castleOwners, sizeof(m_castleOwners));
+    write(fileInfo, m_dailyEventFlags, sizeof(m_dailyEventFlags));
+    write(fileInfo, m_mines, sizeof(m_mines));
+    write(fileInfo, m_mineOwners, 0x90);
     if (!expansionFormat)
-        _write(fileInfo, m_randomArtifacts, 0x67);
+        write(fileInfo, m_randomArtifacts, 0x67);
     else
-        _write(fileInfo, m_randomArtifacts, 0x52);
-    _write(fileInfo, m_boats, 0x180);
-    _write(fileInfo, m_boatSlots, sizeof(m_boatSlots));
-    _write(fileInfo, m_obeliskVisitors, sizeof(m_obeliskVisitors));
-    _write(fileInfo, &m_ultimateArtifactX, 1);
-    _write(fileInfo, &m_ultimateArtifactY, 1);
-    _write(fileInfo, &m_ultimateArtifactId, 1);
-    _write(fileInfo, m_rumour, sizeof(m_rumour));
-    _write(fileInfo, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
-    _write(fileInfo, &m_rumourEventCount, 4);
-    _write(fileInfo, m_rumourEventIndices, m_rumourEventCount * 2);
-    _write(fileInfo, &m_timeEventCount, 4);
-    _write(fileInfo, m_timeEventIndices, m_timeEventCount * 2);
-    _write(fileInfo, &m_mapEventCount, 4);
-    _write(fileInfo, m_mapEventIndices, m_mapEventCount * 2);
+        write(fileInfo, m_randomArtifacts, 0x52);
+    write(fileInfo, m_boats, 0x180);
+    write(fileInfo, m_boatSlots, sizeof(m_boatSlots));
+    write(fileInfo, m_obeliskVisitors, sizeof(m_obeliskVisitors));
+    write(fileInfo, &m_ultimateArtifactX, 1);
+    write(fileInfo, &m_ultimateArtifactY, 1);
+    write(fileInfo, &m_ultimateArtifactId, 1);
+    write(fileInfo, m_rumour, sizeof(m_rumour));
+    write(fileInfo, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
+    write(fileInfo, &m_rumourEventCount, 4);
+    write(fileInfo, m_rumourEventIndices, m_rumourEventCount * 2);
+    write(fileInfo, &m_timeEventCount, 4);
+    write(fileInfo, m_timeEventIndices, m_timeEventCount * 2);
+    write(fileInfo, &m_mapEventCount, 4);
+    write(fileInfo, m_mapEventIndices, m_mapEventCount * 2);
 
     int markerBuffer[3];
     markerBuffer[0] = GAME_FILE_MARKER;
     int unusedMarkerInfo = GAME_UNUSED_FILE_MARKER;
-    _write(fileInfo, markerBuffer, 4);
-    _write(fileInfo, &iMaxMapExtra, 4);
-    _write(fileInfo, markerBuffer, 4);
+    write(fileInfo, markerBuffer, 4);
+    write(fileInfo, &iMaxMapExtra, 4);
+    write(fileInfo, markerBuffer, 4);
     for (indexFile = 1; indexFile < iMaxMapExtra; indexFile++) {
-        _write(fileInfo, markerBuffer, 4);
-        _write(fileInfo, pwSizeOfMapExtra + indexFile, 2);
+        write(fileInfo, markerBuffer, 4);
+        write(fileInfo, pwSizeOfMapExtra + indexFile, 2);
         if (ppMapExtra[indexFile] != 0)
-            _write(fileInfo, ppMapExtra[indexFile], pwSizeOfMapExtra[indexFile]);
+            write(fileInfo, ppMapExtra[indexFile], pwSizeOfMapExtra[indexFile]);
         else
-            _write(fileInfo, emptyPayload, pwSizeOfMapExtra[indexFile]);
+            write(fileInfo, emptyPayload, pwSizeOfMapExtra[indexFile]);
     }
-    _write(fileInfo, markerBuffer, 4);
-    _write(fileInfo, mapExtra, MAP_WIDTH * MAP_HEIGHT);
-    _write(fileInfo, markerBuffer, 4);
+    write(fileInfo, markerBuffer, 4);
+    write(fileInfo, mapExtra, MAP_WIDTH * MAP_HEIGHT);
+    write(fileInfo, markerBuffer, 4);
     m_worldMap.Write(fileInfo);
-    _write(fileInfo, markerBuffer, 4);
-    _close(fileInfo);
+    write(fileInfo, markerBuffer, 4);
+    close(fileInfo);
     BaseFree(emptyPayload, GFILE, GSAVELINE + 0xed);
     return 1;
 }
 
-// @match-note
-// Complete semantics, frame, CFG, and all 75 external relocations agree. Reconstructing
-// hero+0x3f as the retail five-byte starting-stat array removed the missing loop body.
-// The retained maximum is 99.9948%; the current first real divergence is equivalent
-// hero-record index arithmetic in that loop. Split 4+1 fields and the contiguous
-// five-byte array have both been tried; revisit after later shared-layout recovery.
+// @early-stop
+// Complete semantics, frame, CFG, and all 75 external relocations agree after fixing
+// Sorceress Navigation and Warlock Scouting initialization. The only residual is six
+// instructions in the starting-stat loop: retail loads j before scaling i*100, while
+// this TU scales i before adding j. Split 4+1 fields, the contiguous five-byte array,
+// and `j[m_primaryStats]` all emit the same sequence; revisit on cumulative TU changes.
 VA(0x00472a7b, 0xb44)
 void game::SetupOrigData(void)
 {
@@ -765,14 +771,14 @@ void game::SetupOrigData(void)
         }
         if (m_heroRecs[i].m_cursorType == 2) {
             m_heroRecs[i].m_artifacts[0] = 81;
-            m_heroRecs[i].GiveSS(HERO_SKILL_MYSTICISM, 2);
+            m_heroRecs[i].GiveSS(HERO_SKILL_NAVIGATION, 2);
             m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, 1);
         }
         if (m_heroRecs[i].m_cursorType == 1)
             m_heroRecs[i].GiveSS(HERO_SKILL_PATHFINDING, 2);
         if (m_heroRecs[i].m_cursorType == 3) {
             m_heroRecs[i].m_artifacts[0] = 81;
-            m_heroRecs[i].GiveSS(HERO_SKILL_ARCHERY, 2);
+            m_heroRecs[i].GiveSS(HERO_SKILL_SCOUTING, 2);
             m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, 1);
         }
         if (m_heroRecs[i].m_cursorType == 4) {
@@ -823,7 +829,11 @@ void game::SetupOrigData(void)
 }
 
 // @early-stop
-// reloc-masked: identical 0xc27-byte code/frame; 164/164 targets agree, only compiler literal/constant symbol identities differ
+// Exact 0xc27-byte span, all frame slots, CFG, and 164 relocations match after
+// recovering the VC 4.2 legacy I/O spellings. Retail's +0x51 early exit targets the
+// epilogue directly, while this TU uses its adjacent return label. At +0x54b..+0x579
+// only, the commutative week/month calendar terms load in the opposite order; swapping
+// the source terms did not steer them.
 VA(0x004735bf, 0xc27)
 void game::LoadGame(char *filename, int loadFromFile, int)
 {
@@ -833,146 +843,146 @@ void game::LoadGame(char *filename, int loadFromFile, int)
         return;
     }
     LogStr("LG2");
-        int humansLoaded = 0;
+        int humansLoaded3 = 0;
         gbGameOver = 0;
         m_gameLoaded = 1;
 
-        char path[452];
-        if (!loadFromFile && _strnicmp(filename, "RMT", 3) == 0)
-            sprintf(path, "%s%s", ".\\DATA\\", filename);
+        char path28[452];
+        if (!loadFromFile && strnicmp(filename, "RMT", 3) == 0)
+            sprintf(path28, "%s%s", ".\\DATA\\", filename);
         else
-            sprintf(path, "%s%s", gcGamePath, filename);
+            sprintf(path28, "%s%s", gcGamePath, filename);
 
-        int file = _open(path, 0x8000);
-        if (file == -1)
-            FileError(path);
+        int file0 = open(path28, 0x8000);
+        if (file0 == -1)
+            FileError(path28);
         ClearMapExtra();
 
-        signed char expansionMarker = 0;
-        int width;
-        int height[11];
-        _read(file, &width, 4);
-        if (width == -1) {
-            expansionMarker = 1;
-            _read(file, &width, 4);
+        signed char expansionMarker0 = 0;
+        int width8;
+        int height9[11];
+        read(file0, &width8, 4);
+        if (width8 == -1) {
+            expansionMarker0 = 1;
+            read(file0, &width8, 4);
         }
-        _read(file, height, 4);
-        SetMapSize(width, height[0]);
-        _read(file, &m_mapHeader, sizeof(m_mapHeader));
-        _read(file, m_setupPlayerColor, 0x41);
-        _read(file, &gbIAmGreatest, 1);
-        _read(file, this, 2);
-        _read(file, &giMonthType, 1);
-        _read(file, &giMonthTypeExtra, 1);
-        _read(file, &giWeekType, 1);
-        _read(file, &giWeekTypeExtra, 1);
-        _read(file, cPlayerNames, 126);
+        read(file0, height9, 4);
+        SetMapSize(width8, height9[0]);
+        read(file0, &m_mapHeader, sizeof(m_mapHeader));
+        read(file0, m_setupPlayerColor, 0x41);
+        read(file0, &gbIAmGreatest, 1);
+        read(file0, this, 2);
+        read(file0, &giMonthType, 1);
+        read(file0, &giMonthTypeExtra, 1);
+        read(file0, &giWeekType, 1);
+        read(file0, &giWeekTypeExtra, 1);
+        read(file0, cPlayerNames, 126);
 
-        char oldData[40];
-        _read(file, oldData, 36);
-        _read(file, &gbInCampaign, 4);
+        char oldData3[40];
+        read(file0, oldData3, 36);
+        read(file0, &gbInCampaign, 4);
         if (gbInCampaign == 1) {
-            _read(file, &m_campaignType, 0x147);
+            read(file0, &m_campaignType, 0x147);
         } else if (gbInCampaign == 2) {
             xIsPlayingExpansionCampaign = 1;
             gbInCampaign = 0;
-            _read(file, &xCampaign, 0x4f);
+            read(file0, &xCampaign, 0x4f);
         }
-        if (expansionMarker)
-            _read(file, &xIsExpansionMap, 1);
+        if (expansionMarker0)
+            read(file0, &xIsExpansionMap, 1);
 
         gpAdvManager->PurgeMapChangeQueue();
-        _read(file, &giMapChangeCtr, 4);
-        _read(file, oldData, 14);
-        if (_strnicmp(filename, "RMT", 3) != 0)
+        read(file0, &giMapChangeCtr, 4);
+        read(file0, oldData3, 14);
+        if (strnicmp(filename, "RMT", 3) != 0)
             sprintf(gpGame->m_saveName, filename);
-        _read(file, &m_playerCount, 1);
+        read(file0, &m_playerCount, 1);
 
-        char currentPlayer[8];
-        _read(file, currentPlayer, 1);
-        giCurPlayer = currentPlayer[0];
-        _read(file, &m_deadPlayerCount, 1);
-        _read(file, m_playerDead, 6);
+        char currentPlayer6[8];
+        read(file0, currentPlayer6, 1);
+        giCurPlayer = currentPlayer6[0];
+        read(file0, &m_deadPlayerCount, 1);
+        read(file0, m_playerDead, 6);
 
-        char humanFlags[8];
-        _read(file, humanFlags, 6);
-        int i;
-        for (i = 0; i < GAME_PLAYER_COUNT; i++) {
-            if (humanFlags[i] && humansLoaded < (&giNumHumanPlayers)[0]) {
-                humansLoaded++;
-                gbHumanPlayer[i] = 1;
+        char humanFlags1[8];
+        read(file0, humanFlags1, 6);
+        int i29;
+        for (i29 = 0; i29 < GAME_PLAYER_COUNT; i29++) {
+            if (humanFlags1[i29] && humansLoaded3 < (&giNumHumanPlayers)[0]) {
+                humansLoaded3++;
+                gbHumanPlayer[i29] = 1;
             } else {
-                gbHumanPlayer[i] = 0;
+                gbHumanPlayer[i29] = 0;
             }
         }
-        for (i = 0; i < GAME_PLAYER_COUNT; i++) {
-            if (gbHumanPlayer[i]) {
-                if (!gbRemoteOn || (&i)[0] == giThisGamePos)
-                    gbThisNetHumanPlayer[i] = 1;
+        for (i29 = 0; i29 < GAME_PLAYER_COUNT; i29++) {
+            if (gbHumanPlayer[i29]) {
+                if (!gbRemoteOn || (&i29)[0] == giThisGamePos)
+                    gbThisNetHumanPlayer[i29] = 1;
                 else
-                    gbThisNetHumanPlayer[i] = 0;
+                    gbThisNetHumanPlayer[i29] = 0;
             } else {
-                gbThisNetHumanPlayer[i] = 0;
+                gbThisNetHumanPlayer[i29] = 0;
             }
         }
 
-        _read(file, &m_day, 2);
-        _read(file, &m_week, 2);
-        _read(file, &m_month, 2);
+        read(file0, &m_day, 2);
+        read(file0, &m_week, 2);
+        read(file0, &m_month, 2);
         giCurTurn = (m_week - 1) * 7 + (m_month - 1) * 28 + m_day;
-        for (i = 0; i < GAME_PLAYER_COUNT; i++)
-            m_players[i].Read(file);
+        for (i29 = 0; i29 < GAME_PLAYER_COUNT; i29++)
+            m_players[i29].Read(file0);
 
-        _read(file, &m_obeliskCount, 1);
-        for (i = 0; i < GAME_HERO_COUNT; i++)
-            m_heroRecs[i].Read(file, expansionMarker);
-        _read(file, m_availableHeroes, GAME_HERO_COUNT);
-        _read(file, m_castleRecs, 0x1c20);
-        _read(file, m_castleOwners, sizeof(m_castleOwners));
-        _read(file, m_dailyEventFlags, sizeof(m_dailyEventFlags));
-        _read(file, m_mines, 0x3f0);
-        _read(file, m_mineOwners, 0x90);
-        if (expansionMarker)
-            _read(file, m_randomArtifacts, 0x67);
+        read(file0, &m_obeliskCount, 1);
+        for (i29 = 0; i29 < GAME_HERO_COUNT; i29++)
+            m_heroRecs[i29].Read(file0, expansionMarker0);
+        read(file0, m_availableHeroes, GAME_HERO_COUNT);
+        read(file0, m_castleRecs, 0x1c20);
+        read(file0, m_castleOwners, sizeof(m_castleOwners));
+        read(file0, m_dailyEventFlags, sizeof(m_dailyEventFlags));
+        read(file0, m_mines, 0x3f0);
+        read(file0, m_mineOwners, 0x90);
+        if (expansionMarker0)
+            read(file0, m_randomArtifacts, 0x67);
         else
-            _read(file, m_randomArtifacts, 0x52);
-        _read(file, m_boats, 0x180);
-        _read(file, m_boatSlots, sizeof(m_boatSlots));
-        _read(file, m_obeliskVisitors, 0x30);
-        _read(file, &m_ultimateArtifactX, 1);
-        _read(file, &m_ultimateArtifactY, 1);
-        _read(file, &m_ultimateArtifactId, 1);
-        _read(file, m_rumour, sizeof(m_rumour));
-        _read(file, m_defaultPlayerNames, 0x18);
-        _read(file, &m_rumourEventCount, 4);
-        _read(file, m_rumourEventIndices, m_rumourEventCount * 2);
-        _read(file, &m_timeEventCount, 4);
-        _read(file, m_timeEventIndices, m_timeEventCount * 2);
-        _read(file, &m_mapEventCount, 4);
-        _read(file, m_mapEventIndices, m_mapEventCount * 2);
+            read(file0, m_randomArtifacts, 0x52);
+        read(file0, m_boats, 0x180);
+        read(file0, m_boatSlots, sizeof(m_boatSlots));
+        read(file0, m_obeliskVisitors, 0x30);
+        read(file0, &m_ultimateArtifactX, 1);
+        read(file0, &m_ultimateArtifactY, 1);
+        read(file0, &m_ultimateArtifactId, 1);
+        read(file0, m_rumour, sizeof(m_rumour));
+        read(file0, m_defaultPlayerNames, 0x18);
+        read(file0, &m_rumourEventCount, 4);
+        read(file0, m_rumourEventIndices, m_rumourEventCount * 2);
+        read(file0, &m_timeEventCount, 4);
+        read(file0, m_timeEventIndices, m_timeEventCount * 2);
+        read(file0, &m_mapEventCount, 4);
+        read(file0, m_mapEventIndices, m_mapEventCount * 2);
 
-        char marker[8];
-        _read(file, marker, 4);
-        _read(file, &iMaxMapExtra, 4);
-        _read(file, marker, 4);
+        char marker0[8];
+        read(file0, marker0, 4);
+        read(file0, &iMaxMapExtra, 4);
+        read(file0, marker0, 4);
         ppMapExtra = reinterpret_cast<void **>(
             BaseAlloc(iMaxMapExtra * 4, GFILE, GLOADLINE + 0xcb));
         pwSizeOfMapExtra = reinterpret_cast<short *>(
             BaseAlloc(iMaxMapExtra * 2, GFILE, GLOADLINE + 0xcc));
         memset(ppMapExtra, 0, iMaxMapExtra * 4);
         memset(pwSizeOfMapExtra, 0, iMaxMapExtra * 2);
-        for (i = 1; (&i)[0] < iMaxMapExtra; i++) {
-            _read(file, marker, 4);
-            _read(file, pwSizeOfMapExtra + i, 2);
-            ppMapExtra[i] = BaseAlloc(pwSizeOfMapExtra[i], GFILE, GLOADLINE + 0xd5);
-            _read(file, ppMapExtra[i], pwSizeOfMapExtra[i]);
+        for (i29 = 1; (&i29)[0] < iMaxMapExtra; i29++) {
+            read(file0, marker0, 4);
+            read(file0, pwSizeOfMapExtra + i29, 2);
+            ppMapExtra[i29] = BaseAlloc(pwSizeOfMapExtra[i29], GFILE, GLOADLINE + 0xd5);
+            read(file0, ppMapExtra[i29], pwSizeOfMapExtra[i29]);
         }
-        _read(file, marker, 4);
-        _read(file, mapExtra, MAP_WIDTH * MAP_HEIGHT);
-        _read(file, marker, 4);
-        m_worldMap.Read(file, 0);
-        _read(file, marker, 4);
-        _close(file);
+        read(file0, marker0, 4);
+        read(file0, mapExtra, MAP_WIDTH * MAP_HEIGHT);
+        read(file0, marker0, 4);
+        m_worldMap.Read(file0, 0);
+        read(file0, marker0, 4);
+        close(file0);
 
         gpAdvManager->m_heroContextLocked = 0;
         gpCurPlayer = &gpGame->m_players[giCurPlayer];
@@ -988,7 +998,9 @@ void game::LoadGame(char *filename, int loadFromFile, int)
 }
 
 // @early-stop
-// reloc-masked: all 0x3ee code bytes identical; 42/42 relocations, residual is delinked switch local-label identity
+// All non-relocation bytes and 41/42 relocation values match. The switch's invalid-key
+// table entry names the +0x2ec `jmp` trampoline in retail and the +0x3bb common body in
+// this TU; both execute that same trampoline target before GiveArmy.
 VA(0x004741e6, 0x3ee)
 void game::GiveTroopsToNeutralTown(int townId)
 {
@@ -1906,78 +1918,76 @@ void game::RandomizePassword(mapCell *cell)
     RandomizeBarrier(cell);
 }
 
-// @early-stop
-// reloc-masked: identical 0x478-byte code/frame; all residuals are compiler literal/source-line constant symbol identities
 VA(0x00478b72, 0x478)
 int game::LoadMap(char *filename)
 {
-    char column[4];
-    int i;
-    int file;
-    char row[4];
-    char type[8];
-    char trailer[8];
+    char column5[4];
+    int i37;
+    int file2;
+    char row9[4];
+    char type5[8];
+    char trailer15[8];
 
     sprintf(gText, "%s%s", gcMapPath, filename);
-    file = _open(gText, 0x8000);
-    if (file == -1)
+    file2 = open(gText, 0x8000);
+    if (file2 == -1)
         FileError(gText);
-    _read(file, &m_mapHeader, sizeof(m_mapHeader));
-    m_worldMap.Read(file, 1);
+    read(file2, &m_mapHeader, sizeof(m_mapHeader));
+    m_worldMap.Read(file2, 1);
     SetMapSize(m_worldMap.width, m_worldMap.height);
 
-    for (i = 0; i < GAME_TOWN_COUNT; i++) {
-        _read(file, column, 1);
-        _read(file, row, 1);
-        _read(file, type, 1);
-        if (static_cast<unsigned char>(column[0]) != 0xff) {
-            m_castleRecs[i].m_formation = TOWN_FORMATION_GROUPED;
-            m_castleRecs[i].m_x = static_cast<unsigned char>(column[0]);
-            m_castleRecs[i].m_y = static_cast<unsigned char>(row[0]);
-            m_castleRecs[i].m_type = static_cast<signed char>(type[0] & 0x7f);
-            if (type[0] < 0)
-                m_castleRecs[i].m_buildings |= 0x40;
+    for (i37 = 0; i37 < GAME_TOWN_COUNT; i37++) {
+        read(file2, column5, 1);
+        read(file2, row9, 1);
+        read(file2, type5, 1);
+        if (static_cast<unsigned char>(column5[0]) != 0xff) {
+            m_castleRecs[i37].m_onMap = 1;
+            m_castleRecs[i37].m_x = static_cast<unsigned char>(column5[0]);
+            m_castleRecs[i37].m_y = static_cast<unsigned char>(row9[0]);
+            m_castleRecs[i37].m_type = static_cast<signed char>(type5[0] & 0x7f);
+            if (type5[0] < 0)
+                m_castleRecs[i37].m_buildings |= 0x40;
             else
-                m_castleRecs[i].m_buildings |= 0x20;
+                m_castleRecs[i37].m_buildings |= 0x20;
         }
     }
 
-    for (i = 0; i < GAME_MINE_COUNT; i++) {
-        if (m_mapHeader.magic == MAP_HEADER_MAGIC_BASE_GAME && i >= GAME_TOWN_COUNT) {
-            column[0] = -1;
-            row[0] = -1;
-            type[0] = -1;
+    for (i37 = 0; i37 < GAME_MINE_COUNT; i37++) {
+        if (m_mapHeader.magic == MAP_HEADER_MAGIC_BASE_GAME && i37 >= GAME_TOWN_COUNT) {
+            column5[0] = -1;
+            row9[0] = -1;
+            type5[0] = -1;
         } else {
-            _read(file, column, 1);
-            _read(file, row, 1);
-            _read(file, type, 1);
+            read(file2, column5, 1);
+            read(file2, row9, 1);
+            read(file2, type5, 1);
         }
-        if (static_cast<unsigned char>(column[0]) != 0xff) {
-            m_mines[i].guardianType = -1;
-            m_mines[i].x = static_cast<unsigned char>(column[0]);
-            m_mines[i].y = static_cast<unsigned char>(row[0]);
-            m_mines[i].resourceType = type[0];
+        if (static_cast<unsigned char>(column5[0]) != 0xff) {
+            m_mines[i37].guardianType = -1;
+            m_mines[i37].x = static_cast<unsigned char>(column5[0]);
+            m_mines[i37].y = static_cast<unsigned char>(row9[0]);
+            m_mines[i37].resourceType = type5[0];
         }
     }
 
     m_mapHeader.magic = MAP_HEADER_MAGIC_EXPANSION_GAME;
-    _read(file, &m_obeliskCount, 1);
-    _read(file, m_rumourEventIndices, m_mapHeader.rumourCount * 2);
+    read(file2, &m_obeliskCount, 1);
+    read(file2, m_rumourEventIndices, m_mapHeader.rumourCount * 2);
     m_rumourEventCount = m_mapHeader.rumourCount;
-    _read(file, m_timeEventIndices, m_mapHeader.timeEventCount * 2);
+    read(file2, m_timeEventIndices, m_mapHeader.timeEventCount * 2);
     m_timeEventCount = m_mapHeader.timeEventCount;
-    _read(file, &iMaxMapExtra, 4);
+    read(file2, &iMaxMapExtra, 4);
     ppMapExtra = reinterpret_cast<void **>(BaseAlloc(iMaxMapExtra * 4, GFILE, GMAPLINE + 0x59));
     pwSizeOfMapExtra = reinterpret_cast<short *>(BaseAlloc(iMaxMapExtra * 2, GFILE, GMAPLINE + 0x5a));
     memset(ppMapExtra, 0, iMaxMapExtra * 4);
     memset(pwSizeOfMapExtra, 0, iMaxMapExtra * 2);
-    for (i = 1; (&i)[0] < iMaxMapExtra; i++) {
-        _read(file, pwSizeOfMapExtra + i, 2);
-        ppMapExtra[i] = BaseAlloc(pwSizeOfMapExtra[i], GFILE, GMAPLINE + 0x62);
-        _read(file, ppMapExtra[i], pwSizeOfMapExtra[i]);
+    for (i37 = 1; (&i37)[0] < iMaxMapExtra; i37++) {
+        read(file2, pwSizeOfMapExtra + i37, 2);
+        ppMapExtra[i37] = BaseAlloc(pwSizeOfMapExtra[i37], GFILE, GMAPLINE + 0x62);
+        read(file2, ppMapExtra[i37], pwSizeOfMapExtra[i37]);
     }
-    _read(file, trailer, 2);
-    _close(file);
+    read(file2, trailer15, 2);
+    close(file2);
     return 0;
 }
 
@@ -2212,11 +2222,12 @@ void game::UpdateSpellWidgets(void)
     }
 }
 
-// @match-note
+// @early-stop
 // Exact 0x692-byte span and 101 relocation sites. The live residual is the
 // commutative equality at +0x14: retail loads the window-manager field before
 // the hover id, while this TU loads the hover id first. Both source operand orders
-// emit the same sequence; this is an /Od TU-cumulative evaluation-order choice.
+// emit the same sequence; the resulting one-byte shift accounts for all local
+// switch-table addends. This is an /Od TU-cumulative evaluation-order choice.
 VA(0x00479e3b, 0x692)
 int ViewSpellsHandler(tag_message &msg)
 {
@@ -2654,9 +2665,9 @@ void game::ViewArmy(int x, int y, int monsterType, int numTroops, town *castle,
 }
 
 // @early-stop
-// The full 0x3f5 instruction stream is byte-identical and both objects contain
-// 52 relocation sites. The residual is delinked local identities for strings,
-// aggregate interiors, and the now byte-identical GAME constant pool.
+// The full 0x3f5 instruction stream is byte-identical. The sole remaining objdiff
+// row spells retail's __adjust_fdiv address as iLeftRightSave+0x10; both resolve to
+// RVA 0x12126c, so this is a delinked public-owner alias rather than a source mismatch.
 VA(0x0047b2cf, 0x3f5)
 int ViewArmyHandler(tag_message &msg)
 {
@@ -2967,8 +2978,10 @@ void game::NextPlayer(void)
 }
 
 // @early-stop
-// Relocation-masked comparison is identical for the full 0x432-byte span; both objects
-// contain 25 relocation sites and objdiff reports 100%.
+// Logic, frame, slots, CFG, and all 25 relocations match. At +0x2b9 retail forms the
+// commutative hero-record address as `add eax,this; mov ecx,heroIndex`; this TU swaps
+// those two loads. `heroIndex[m_heroIds]` produced the same bytes; revisit only after
+// a cumulative GAME/header-state change.
 VA(0x0047c32f, 0x432)
 int game::ComputeDailyGold(int player)
 {
@@ -3979,11 +3992,6 @@ void game::SetRandomHeroArmies(int heroId, int strongArmy)
     }
 }
 
-// @early-stop
-// Exact 0x746-byte span and 56 relocation sites. The retained source-hash build
-// was relocation-masked byte-identical; after reconstructing its exact predecessor,
-// the live /Od output differs only in commutative MAP_HEIGHT/MAP_WIDTH loop-bound
-// load order. Reversed comparisons emit the same sequence (TU-cumulative state).
 VA(0x0048041e, 0x746)
 void game::ProcessRandomObjects(void)
 {
@@ -4081,13 +4089,13 @@ monsterBoundsReady:
                 switch (randomType0) {
                 case 0:
                 case 2:
-                    cell6->m_objectMetadata = Random(8, 16);
+                    cell6->m_objectMetadata = Random(8, 16) | 0;
                     break;
                 case 6:
-                    cell6->m_objectMetadata = Random(5, 10);
+                    cell6->m_objectMetadata = Random(5, 10) | 0;
                     break;
                 default:
-                    cell6->m_objectMetadata = Random(3, 7);
+                    cell6->m_objectMetadata = Random(3, 7) | 0;
                     break;
                 }
                 break;
@@ -4710,173 +4718,176 @@ void game::SetupTowns(void)
 }
 
 // @early-stop
-// reloc-masked: identical frame/instruction stream and all 23 relocation sites align;
-// only the folded identities of the line-number and source-file string literals differ.
+// The recovered mapHeroExtra offsets, frame slots, CFG, and all 23 relocations match.
+// Retail loads MAP_WIDTH before mapX at the inner-loop test (0x774 bytes); this TU
+// loads mapX first (0x775 bytes). Both comparison polarities emit the latter form.
 VA(0x00482547, 0x774)
 void game::ProcessOnMapHeroes(void)
 {
     DATA(0x004f7598) static short processOnMapHeroesSourceLineBase =
         GAME_PROCESS_ON_MAP_HEROES_SOURCE_LINE_BASE;
-    signed char usedHeroes[GAME_HERO_COUNT];
-    int pass;
-    int mapY;
-    int mapX;
-    int armySlot;
-    int artifactSlot;
-    int skillSlot;
-    int heroClass;
-    int heroId;
-    unsigned int extraIndex;
-    signed char isJail;
-    hero *mapHero;
-    mapHeroExtra *extra;
-    mapCell *cell;
-    mapCell *townCell;
-    town *occupiedTown;
+    unsigned int extraIndex0;
+    int pass19;
+    signed char usedHeroes4[GAME_HERO_COUNT];
+    signed char isJail6;
+    hero *mapHero0;
+    mapCell *cell5;
+    mapHeroExtra *extra0;
+    mapCell *townCell1;
+    int heroId1;
+    int armySlot0;
+    int mapY15;
+    int artifactSlot10;
+    int mapX0;
+    int townId4;
+    int heroClass6;
+    int owner1;
+    town *occupiedTown4;
 
-    memset(usedHeroes, 0, GAME_HERO_COUNT);
-    for (pass = 0; pass < 3; pass++) {
-        for (mapY = 0; mapY < MAP_HEIGHT; mapY++) {
-            for (mapX = 0; mapX < MAP_WIDTH; mapX++) {
-                cell = &WORLDMAP->Row(mapY)[mapX];
-                if ((cell->m_triggerType & MAP_EVENT_TYPE_MASK) == MAP_EVENT_HERO ||
-                    cell->m_triggerType == (MAP_EVENT_ACTION_FLAG | MAP_EVENT_JAIL)) {
+    memset(usedHeroes4, 0, GAME_HERO_COUNT);
+    for (pass19 = 0; pass19 < 3; pass19++) {
+        for (mapY15 = 0; mapY15 < MAP_HEIGHT; mapY15++) {
+            for (mapX0 = 0; mapX0 < MAP_WIDTH; mapX0++) {
+                cell5 = &WORLDMAP->Row(mapY15)[mapX0];
+                if ((cell5->m_triggerType & MAP_EVENT_TYPE_MASK) == MAP_EVENT_HERO ||
+                    cell5->m_triggerType == (MAP_EVENT_ACTION_FLAG | MAP_EVENT_JAIL)) {
 
-                if ((cell->m_triggerType & MAP_EVENT_TYPE_MASK) == MAP_EVENT_JAIL)
-                    isJail = 1;
+                if ((cell5->m_triggerType & MAP_EVENT_TYPE_MASK) == MAP_EVENT_JAIL)
+                    isJail6 = 1;
                 else
-                    isJail = 0;
-                extraIndex = cell->m_objectMetadata;
-                extra = reinterpret_cast<mapHeroExtra *>(ppMapExtra[extraIndex]);
+                    isJail6 = 0;
+                extraIndex0 = cell5->m_objectMetadata;
+                extra0 = reinterpret_cast<mapHeroExtra *>(ppMapExtra[extraIndex0]);
 
-                if (pass == 0) {
-                    if (extra->hasCustomHero && extra->heroId < GAME_HERO_COUNT &&
-                        !usedHeroes[extra->heroId]) {
-                        usedHeroes[extra->heroId] = 1;
-                        extra->hasAssignedHero = 1;
+                if (pass19 == 0) {
+                    if (extra0->hasCustomHero && extra0->heroId < GAME_HERO_COUNT &&
+                        !usedHeroes4[extra0->heroId]) {
+                        usedHeroes4[extra0->heroId] = 1;
+                        extra0->hasAssignedHero = 1;
                     } else {
-                        extra->hasAssignedHero = 0;
+                        extra0->hasAssignedHero = 0;
                     }
-                    if (isJail) {
-                        extra->owner = -1;
+                    if (isJail6) {
+                        extra0->owner = -1;
                     } else {
-                        extra->owner = static_cast<signed char>(cell->m_objectIndex / 7);
-                        heroClass = gcColorToPlayerPos[extra->owner];
-                        extra->owner = static_cast<signed char>(heroClass);
+                        extra0->owner = static_cast<signed char>(cell5->m_objectIndex / 7);
+                        owner1 = gcColorToPlayerPos[extra0->owner];
+                        extra0->owner = static_cast<signed char>(owner1);
                     }
                 }
 
-                if (pass == 1) {
-                    if (isJail) {
-                        heroClass = extra->heroClass;
+                if (pass19 == 1) {
+                    if (isJail6) {
+                        heroClass6 = extra0->heroClass;
                     } else {
-                        heroClass = cell->m_objectIndex % 7;
-                        if (heroClass == 6) {
-                            heroClass = m_setupPlayerRace[
-                                gcColorToSetupPos[gpGame->m_players[extra->owner].m_color]];
+                        heroClass6 = cell5->m_objectIndex % 7;
+                        if (heroClass6 == 6) {
+                            heroClass6 = m_setupPlayerRace[
+                                gcColorToSetupPos[gpGame->m_players[extra0->owner].m_color]];
                         }
                     }
 
-                    if (extra->hasAssignedHero) {
-                        mapHero = GetHero(extra->heroId);
-                        mapHero->m_cursorType = static_cast<unsigned char>(heroClass);
+                    if (extra0->hasAssignedHero) {
+                        mapHero0 = GetHero(extra0->heroId);
+                        mapHero0->m_cursorType = static_cast<unsigned char>(heroClass6);
                     } else {
-                        heroId = RandomScan(usedHeroes, heroClass * 9, 9, 1000, 0);
-                        if (heroId == -1) {
-                            heroId = RandomScan(usedHeroes, 0, GAME_HERO_COUNT, 10000, 0);
-                            heroClass = heroId / 9;
+                        heroId1 = RandomScan(usedHeroes4, heroClass6 * 9, 9, 1000, 0);
+                        if (heroId1 == -1) {
+                            heroId1 = RandomScan(usedHeroes4, 0, GAME_HERO_COUNT, 10000, 0);
+                            heroClass6 = heroId1 / 9;
                         }
-                        usedHeroes[heroId] = 1;
-                        mapHero = GetHero(heroId);
-                        mapHero->m_cursorType = static_cast<unsigned char>(heroClass);
-                        if (extra->hasCustomHero && extra->heroId >= GAME_HERO_COUNT)
-                            mapHero->m_portrait = extra->heroId;
-                        extra->heroId = static_cast<signed char>(heroId);
+                        usedHeroes4[heroId1] = 1;
+                        mapHero0 = GetHero(heroId1);
+                        mapHero0->m_cursorType = static_cast<unsigned char>(heroClass6);
+                        if (extra0->hasCustomHero && extra0->heroId >= GAME_HERO_COUNT)
+                            mapHero0->m_portrait = extra0->heroId;
+                        extra0->heroId = static_cast<signed char>(heroId1);
                     }
                 }
 
-                if (pass == 2) {
-                    mapHero = GetHero(extra->heroId);
-                    if (!isJail && extra->hasPatrol) {
-                        mapHero->m_patrolX = static_cast<signed char>(mapX);
-                        mapHero->m_patrolY = static_cast<signed char>(mapY);
-                        mapHero->m_patrolRadius = extra->patrolRadius;
+                if (pass19 == 2) {
+                    mapHero0 = GetHero(extra0->heroId);
+                    if (!isJail6 && extra0->hasPatrol) {
+                        mapHero0->m_patrolX = static_cast<signed char>(mapX0);
+                        mapHero0->m_patrolY = static_cast<signed char>(mapY15);
+                        mapHero0->m_patrolRadius = extra0->patrolRadius;
                     }
-                    if (extra->hasCustomArmy) {
-                        for (armySlot = 0; armySlot < 5; armySlot++) {
-                            mapHero->m_army.m_troopCounts[armySlot] =
-                                extra->troopCounts[armySlot];
-                            if (static_cast<short>(mapHero->m_army.m_troopCounts[armySlot]) > 0)
-                                mapHero->m_army.m_troopTypes[armySlot] =
-                                    extra->troopTypes[armySlot];
+                    if (extra0->hasCustomArmy) {
+                        for (armySlot0 = 0; armySlot0 < 5; armySlot0++) {
+                            mapHero0->m_army.m_troopCounts[armySlot0] =
+                                extra0->troopCounts[armySlot0];
+                            if (static_cast<short>(mapHero0->m_army.m_troopCounts[armySlot0]) > 0)
+                                mapHero0->m_army.m_troopTypes[armySlot0] =
+                                    extra0->troopTypes[armySlot0];
                             else
-                                mapHero->m_army.m_troopTypes[armySlot] = -1;
+                                mapHero0->m_army.m_troopTypes[armySlot0] = -1;
                         }
                     }
-                    for (artifactSlot = 0; artifactSlot < 3; artifactSlot++) {
-                        if (extra->artifacts[artifactSlot] >= 0)
-                            GiveArtifact(mapHero, extra->artifacts[artifactSlot], 1, -1);
+                    for (artifactSlot10 = 0; artifactSlot10 < 3; artifactSlot10++) {
+                        if (extra0->artifacts[artifactSlot10] >= 0)
+                            GiveArtifact(mapHero0, extra0->artifacts[artifactSlot10], 1, -1);
                     }
-                    if (extra->hasCustomName)
-                        strcpy(mapHero->m_name, extra->name);
-                    mapHero->m_experience = 0;
-                    gpAdvManager->GiveExperience(mapHero, extra->experience, 1);
-                    mapHero->CheckLevel();
-                    mapHero->m_x = mapX;
-                    mapHero->m_y = mapY;
+                    if (extra0->hasCustomName)
+                        strcpy(mapHero0->m_name, extra0->name);
+                    mapHero0->m_experience = 0;
+                    gpAdvManager->GiveExperience(mapHero0, extra0->experience, 1);
+                    mapHero0->CheckLevel();
+                    mapHero0->m_x = mapX0;
+                    mapHero0->m_y = mapY15;
 
-                    if (isJail) {
-                        mapHero->m_owner = -1;
-                        m_availableHeroes[extra->heroId] = 0x41;
+                    if (isJail6) {
+                        mapHero0->m_owner = -1;
+                        m_availableHeroes[extra0->heroId] = 0x41;
                     } else {
-                        mapHero->m_owner = extra->owner;
-                        m_availableHeroes[extra->heroId] = mapHero->m_owner;
-                        m_players[mapHero->m_owner]
-                            .m_heroIds[m_players[mapHero->m_owner].m_heroCount] = mapHero->m_id;
-                        m_players[mapHero->m_owner].m_heroCount++;
+                        mapHero0->m_owner = extra0->owner;
+                        m_availableHeroes[extra0->heroId] = mapHero0->m_owner;
+                        m_players[mapHero0->m_owner]
+                            .m_heroIds[m_players[mapHero0->m_owner].m_heroCount] = mapHero0->m_id;
+                        m_players[mapHero0->m_owner].m_heroCount++;
                     }
 
-                    if (!isJail && mapY > 0) {
-                        townCell = &WORLDMAP->Row(mapY - 1)[mapX];
-                        if (townCell->m_triggerType ==
+                    if (!isJail6 && mapY15 > 0) {
+                        townCell1 = &WORLDMAP->Row(mapY15 - 1)[mapX0];
+                        if (townCell1->m_triggerType ==
                             (MAP_EVENT_ACTION_FLAG | MAP_EVENT_CASTLE)) {
-                            mapHero->m_patrolY--;
-                            mapHero->m_y--;
-                            occupiedTown = GetTown(GetTownId(mapX, mapY - 1));
-                            occupiedTown->m_occupyingHeroId = mapHero->m_id;
+                            mapHero0->m_patrolY--;
+                            mapHero0->m_y--;
+                            townId4 = GetTownId(mapX0, mapY15 - 1);
+                            occupiedTown4 = GetTown(townId4);
+                            occupiedTown4->m_occupyingHeroId = mapHero0->m_id;
                         }
                     }
 
-                    if (isJail) {
-                        cell->m_objectMetadata = extra->heroId;
+                    if (isJail6) {
+                        cell5->m_objectMetadata = extra0->heroId;
                     } else {
-                        cell->m_objectTileset = 0;
-                        cell->m_objectIndex = 0xff;
-                        cell->m_objectMetadata = 0;
-                        cell->m_triggerType = 0;
+                        cell5->m_objectTileset = 0;
+                        cell5->m_objectIndex = 0xff;
+                        cell5->m_objectMetadata = 0;
+                        cell5->m_triggerType = 0;
                     }
 
-                    if (extra->hasCustomSkills) {
-                        mapHero->m_secondarySkillCount = 0;
-                        for (skillSlot = 0; skillSlot < 14; skillSlot++) {
-                            mapHero->m_secondarySkills[skillSlot] = 0;
-                            mapHero->m_secondarySkillOrder[skillSlot] = 0;
+                    if (extra0->hasCustomSkills) {
+                        mapHero0->m_secondarySkillCount = 0;
+                        for (artifactSlot10 = 0; artifactSlot10 < 14; artifactSlot10++) {
+                            mapHero0->m_secondarySkills[artifactSlot10] = 0;
+                            mapHero0->m_secondarySkillOrder[artifactSlot10] = 0;
                         }
-                        for (skillSlot = 0; skillSlot < 8; skillSlot++) {
-                            if (extra->skillTypes[skillSlot] != -1) {
-                                mapHero->GiveSS(extra->skillTypes[skillSlot],
-                                                extra->skillLevels[skillSlot]);
+                        for (artifactSlot10 = 0; artifactSlot10 < 8; artifactSlot10++) {
+                            if (extra0->skillTypes[artifactSlot10] != -1) {
+                                mapHero0->GiveSS(extra0->skillTypes[artifactSlot10],
+                                                extra0->skillLevels[artifactSlot10]);
                             }
                         }
                     }
-                    if (!isJail) {
-                        SetVisibility(mapHero->m_x, mapHero->m_y, mapHero->m_owner,
-                                      giVisRange[mapHero->m_secondarySkills[3]]);
+                    if (!isJail6) {
+                        SetVisibility(mapHero0->m_x, mapHero0->m_y, mapHero0->m_owner,
+                                      giVisRange[mapHero0->m_secondarySkills[3]]);
                     }
-                    BaseFree(ppMapExtra[extraIndex], GFILE,
+                    BaseFree(ppMapExtra[extraIndex0], GFILE,
                              processOnMapHeroesSourceLineBase +
                                  GAME_PROCESS_ON_MAP_HEROES_FREE_OFFSET);
-                    ppMapExtra[extraIndex] = 0;
+                    ppMapExtra[extraIndex0] = 0;
                 }
                 }
             }
@@ -4995,8 +5006,8 @@ void game::CheckHeroConsistency(void)
 #define samplesReady samplesReady1
 #define success success14
 
-// @match-note
-// Exact 0x71e-byte span with the same 94 relocation sites. Five masked bytes
+// @early-stop
+// Exact 0x71e-byte span with the same 94 relocation sites. Five operand bytes
 // differ: +0x524/+0x527/+0x529 reverse the packet/batch-bound loads, and
 // +0x640/+0x643 reverse the fileData/transmitData equality loads. Both source
 // operand orders emit identically; these are commutative /Od TU-state choices.
@@ -5069,15 +5080,15 @@ int game::TransmitSaveGame(int remotePlayer, int player, int useCurrentSave)
     fileData = static_cast<unsigned char *>(
         BaseAlloc(fileSize + 2000, GFILE, GTRANSMITLINE + 0x42));
 
-    file = _open(filename, 0x8000);
+    file = open(filename, 0x8000);
     if (file == -1)
         FileError(filename);
     if (file == -1) {
         goto transmitCleanup;
     }
     {
-        _read(file, fileData, fileSize);
-        _close(file);
+        read(file, fileData, fileSize);
+        close(file);
         fileCrc = calc_crc_long(fileData, fileSize);
         if (gbUseRegularCompression)
             fileSize = EncodeData(reinterpret_cast<char *>(transmitData),
@@ -5220,9 +5231,6 @@ transmitCleanup:
 #define samplesReady samplesReady0
 #define success success15
 
-// @early-stop
-// Relocation-masked comparison is identical for all 0x68d bytes (102 relocation
-// sites in both objects).
 VA(0x00483937, 0x68d)
 int game::ReceiveSaveGame(int dataSize, int expectedCrc, int expectedTransmitCrc,
                           int remotePlayer)
@@ -5348,11 +5356,11 @@ int game::ReceiveSaveGame(int dataSize, int expectedCrc, int expectedTransmitCrc
            expectedCrc, -999, -999, -999, -999);
 
     sprintf(filename, "%s%s", ".\\DATA\\", gConfig.rmtRDName);
-    file = _open(filename, 0x8301, 0x80);
+    file = open(filename, 0x8301, 0x80);
     if (file == -1)
         FileError(filename);
-    _write(file, decodedData, dataSize);
-    _close(file);
+    write(file, decodedData, dataSize);
+    close(file);
     success = 1;
 
     if (received)
@@ -5727,11 +5735,11 @@ void CreateDiffFile(char *oldName, char *joinName, char *diffName,
     joinData29 = static_cast<unsigned char *>(
         BaseAlloc(joinSize36, GFILE, GDIFFLINE + 0x18));
     sprintf(gText, "%s%s", ".\\DATA\\", joinName);
-    joinFile1 = _open(gText, 0x8000);
+    joinFile1 = open(gText, 0x8000);
     if (joinFile1 == -1)
         FileError(gText);
-    _read(joinFile1, joinData29, joinSize36);
-    _close(joinFile1);
+    read(joinFile1, joinData29, joinSize36);
+    close(joinFile1);
     LogInt(const_cast<char *>("Orig Join CRC"),
            calc_crc_long(joinData29, joinSize36), joinSize36,
            -999, -999, -999, -999, -999);
@@ -5742,11 +5750,11 @@ void CreateDiffFile(char *oldName, char *joinName, char *diffName,
         oldData13 = static_cast<unsigned char *>(
             BaseAlloc(oldSize37, GFILE, GDIFFLINE + 0x2d));
         sprintf(gText, "%s%s", ".\\DATA\\", oldName);
-        oldFile17 = _open(gText, 0x8000);
+        oldFile17 = open(gText, 0x8000);
         if (oldFile17 == -1)
             FileError(gText);
-        _read(oldFile17, oldData13, oldSize37);
-        _close(oldFile17);
+        read(oldFile17, oldData13, oldSize37);
+        close(oldFile17);
     }
 
     diffData6 = static_cast<unsigned char *>(
@@ -5814,18 +5822,18 @@ void CreateDiffFile(char *oldName, char *joinName, char *diffName,
     }
 
     sprintf(gText, "%s%s", ".\\DATA\\", diffName);
-    joinFile1 = _open(gText, 0x8301, 0x80);
+    joinFile1 = open(gText, 0x8301, 0x80);
     if (joinFile1 == -1)
         FileError(gText);
-    _write(joinFile1, diffData6, diffSize29);
-    _close(joinFile1);
+    write(joinFile1, diffData6, diffSize29);
+    close(joinFile1);
 
     sprintf(gText, "%s%s", ".\\DATA\\", oldName);
-    joinFile1 = _open(gText, 0x8301, 0x80);
+    joinFile1 = open(gText, 0x8301, 0x80);
     if (joinFile1 == -1)
         FileError(gText);
-    _write(joinFile1, joinData29, joinSize36);
-    _close(joinFile1);
+    write(joinFile1, joinData29, joinSize36);
+    close(joinFile1);
 
     if (oldData13 != 0)
         BaseFree(oldData13, GFILE, GDIFFLINE + 0xa1);
@@ -5836,9 +5844,6 @@ void CreateDiffFile(char *oldName, char *joinName, char *diffName,
     return;
 }
 
-// @match-note
-// Logic and all 0x34-frame slots match. At +0x1e8..+0x1f4 only, /Od emits the
-// equivalent TU-cumulative loop test with the two operand loads reversed.
 VA(0x00485107, 0x3ce)
 void CreateJoinFile(char *oldName, char *diffName, char *joinName)
 {
@@ -5863,11 +5868,11 @@ void CreateJoinFile(char *oldName, char *diffName, char *joinName)
                   createJoinFileSourceLineBase +
                       GAME_CREATE_JOIN_DIFF_ALLOC_OFFSET));
     sprintf(gText, "%s%s", ".\\DATA\\", diffName);
-    diffFile2 = _open(gText, 0x8000);
+    diffFile2 = open(gText, 0x8000);
     if (diffFile2 == -1)
         FileError(gText);
-    _read(diffFile2, diffData5, diffSize1);
-    _close(diffFile2);
+    read(diffFile2, diffData5, diffSize1);
+    close(diffFile2);
 
     joinData9 = static_cast<unsigned char *>(
         BaseAlloc(GAME_JOIN_BUFFER_SIZE, GFILE,
@@ -5885,11 +5890,11 @@ void CreateJoinFile(char *oldName, char *diffName, char *joinName)
                       createJoinFileSourceLineBase +
                           GAME_CREATE_JOIN_OLD_ALLOC_OFFSET));
         sprintf(gText, "%s%s", ".\\DATA\\", oldName);
-        diffFile2 = _open(gText, 0x8000);
+        diffFile2 = open(gText, 0x8000);
         if (diffFile2 == -1)
             FileError(gText);
-        _read(diffFile2, oldData13, oldSize10);
-        _close(diffFile2);
+        read(diffFile2, oldData13, oldSize10);
+        close(diffFile2);
         memcpy(joinData9, oldData13, oldSize10);
 
         position1 = GAME_JOIN_HEADER_SIZE;
@@ -5908,22 +5913,22 @@ void CreateJoinFile(char *oldName, char *diffName, char *joinName)
     }
 
     sprintf(gText, "%s%s", ".\\DATA\\", joinName);
-    joinFile0 = _open(gText, 0x8301, 0x80);
+    joinFile0 = open(gText, 0x8301, 0x80);
     if (joinFile0 == -1)
         FileError(gText);
-    _write(joinFile0, joinData9, joinSize37);
-    _close(joinFile0);
+    write(joinFile0, joinData9, joinSize37);
+    close(joinFile0);
     LogInt(const_cast<char *>("New Join CRC"),
            calc_crc_long(joinData9, joinSize37), joinSize37,
            GAME_JOIN_LOG_UNUSED, GAME_JOIN_LOG_UNUSED, GAME_JOIN_LOG_UNUSED,
            GAME_JOIN_LOG_UNUSED, GAME_JOIN_LOG_UNUSED);
 
     sprintf(gText, "%s%s", ".\\DATA\\", oldName);
-    joinFile0 = _open(gText, 0x8301, 0x80);
+    joinFile0 = open(gText, 0x8301, 0x80);
     if (joinFile0 == -1)
         FileError(gText);
-    _write(joinFile0, joinData9, joinSize37);
-    _close(joinFile0);
+    write(joinFile0, joinData9, joinSize37);
+    close(joinFile0);
 
     if (oldData13)
         BaseFree(oldData13, GFILE,
@@ -6062,16 +6067,13 @@ ultimateRumour:
     }
 }
 
-// @early-stop
-// Relocation-masked instruction streams are identical for all 0xd9 bytes and all
-// five relocation targets agree. The residual is delinked local-label identity.
 VA(0x00485d2e, 0xd9)
 EventExtra *GetMapEvent(int x, int y)
 {
     int i;
-    for (i = 0; i < gpGame->m_timeEventCount; i++) {
+    for (i = 0; i < gpGame->m_mapEventCount; i++) {
         EventExtra *ev = reinterpret_cast<EventExtra *>(
-            ppMapExtra[gpGame->m_timeEventIndices[i]]);
+            ppMapExtra[gpGame->m_mapEventIndices[i]]);
         if (ev->x == x && ev->y == y && ev->active != 0 &&
             ev->players[PlayerEventByte(giCurPlayer)] != 0)
             return ev;
@@ -6197,12 +6199,12 @@ int CalcFileCRC(char *filename)
     long size = FileSize(filename);
     char *block = static_cast<char *>(BaseAlloc(
         size, GFILE, calcFileCrcSourceLineBase + GAME_CALC_CRC_ALLOC_OFFSET));
-    int hand = _open(filename, 0x8000);
+    int hand = open(filename, 0x8000);
     if (hand == -1)
         FileError(filename);
-    _read(hand, block, size);
+    read(hand, block, size);
     int crc = calc_crc_long(reinterpret_cast<unsigned char *>(block), size);
-    _close(hand);
+    close(hand);
     BaseFree(block, GFILE,
              calcFileCrcSourceLineBase + GAME_CALC_CRC_FREE_OFFSET);
     return crc;
@@ -6279,15 +6281,15 @@ void CompressTest(void)
         fileSize7 + COMPRESSION_TEST_FILE_BUFFER_EXTRA,
         GFILE, GCOMPRESSTESTLINE + 0xb));
     LogStr(const_cast<char *>("C2"));
-    fileHandle4 = _open(filename3, 0x8000);
+    fileHandle4 = open(filename3, 0x8000);
     if (fileHandle4 == -1)
         FileError(filename3);
-    _read(fileHandle4, sourceData6, fileSize7);
+    read(fileHandle4, sourceData6, fileSize7);
     LogStr(const_cast<char *>("C3"));
     sourceCrc0 = calc_crc_long(
         reinterpret_cast<unsigned char *>(sourceData6), fileSize7);
     LogStr(const_cast<char *>("C4"));
-    _close(fileHandle4);
+    close(fileHandle4);
     LogStr(const_cast<char *>("C5"));
     encodedSize14 = EncodeData(encodedData6, sourceData6, fileSize7);
     LogStr(const_cast<char *>("C6"));
