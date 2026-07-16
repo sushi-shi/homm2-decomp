@@ -65,26 +65,40 @@ The explicit topology commands are:
   suffixes, unit manifest, and output path are command-line options so the same COFF audit can be
   run against another build tree.
 
-  The same JSON keeps allocation provenance separate. `DATA()` definitions in `src/**/*.cpp` are
-  canonical source allocations. Candidate definitions which map to those source names are reported
-  as DATA-covered; remaining candidate definitions are compiler-private derived topology. Rows in
-  `config/delink_data_topology.tsv` are supplemental linker metadata only. A supplemental row which
+  The same JSON keeps allocation provenance separate. A shared Clang `VarDecl` inventory attaches
+  each token-aware `DATA()` marker to exactly one definition and records its logical `sizeof`.
+  Candidate definitions which map to those source names are reported as DATA-covered; remaining
+  candidate definitions are compiler-private derived topology. Rows in
+  `config/delink_data_supplemental.tsv` are supplemental linker metadata only. A supplemental row which
   repeats a canonical DATA allocation, or disagrees with its owner/RVA/storage evidence, is a hard
   error rather than a second definition. `--source-root`, `--supplemental`, and `--symbols` select
   these inputs for another tree.
+- `homm2 data-topology assemble` creates all HoMM2-specific Vostok inputs. It resolves every source
+  definition to one exact candidate decorated symbol, COFF section ordinal and value, scope, and
+  storage class. The generated `build/gen/delink_data_from_source.tsv` and versioned
+  `config/delink_data_supplemental.tsv` are validated separately, then merged without logical
+  duplicates or overlaps into `build/gen/delink_data_manifest.tsv`. Logical `sizeof` is never
+  replaced by a padded next-symbol span; padding exists only in section size/alignment.
+
+  `build/gen/delink_data_sections.tsv` preserves every candidate section ordinal, including
+  multiple same-name COMDAT sections, characteristics, alignment, selection, associative parent,
+  and assigned retail RVA. Non-data sections are explicit `-` placeholders. The companion
+  `build/gen/delink_data_breakpoints.json` replays independent rdata/data/bss cursors in retail
+  object order. Observed DATA/public anchors never change a replay cursor: every difference is an
+  explicit signed drift, and missing or inconsistent section bases remain diagnostics.
+  `--strict` rejects any such unresolved assignment. The generated contribution and whole-image
+  coverage manifests remain hard regeneration inputs under `build/gen`; they are not copied into
+  version control.
 - `homm2 data-topology propose` writes a disposable partial manifest and structured diagnostics to
   `build/gen/`. It never changes versioned configuration or target objects.
-- `homm2 data-topology promote` writes a versioned snapshot of every currently proved closed group,
-  the explicit unresolved-range allowlist, and the current coverage/open diagnostics. Partial
-  promotion is intentional: regenerate, run objdiff, review the delta, and iterate without silently
-  extending fallback beyond `config/delink_unresolved_data.tsv`.
+- `homm2 data-topology promote` refreshes disposable topology and coverage evidence. Source DATA
+  and candidate facts are regenerated rather than promoted as a second versioned definition.
 - `homm2 data-topology finalize` is the program-wide closure gate. It writes nothing unless every
   candidate group is closed and the `.text`, retail file, loaded-RVA, and TU-data partition audits
   have zero blockers.
-- Promoted snapshots live in `config/delink_data_topology.tsv`,
-  `config/delink_contributions.tsv`, `config/delink_unresolved_data.tsv`,
-  `config/retail_coverage.tsv`, and `config/retail_coverage_diagnostics.json` for review and commit.
-- `homm2 data-topology regenerate` consumes only those versioned canonical files and atomically
+- The only versioned data-topology input is `config/delink_data_supplemental.tsv`; the source tree
+  is the canonical input for annotated definitions. The three text-delink CSVs remain independent.
+- `homm2 data-topology regenerate` deterministically rebuilds the generated inputs and atomically
   replaces `build/delink`. Its provenance stamp hashes every config, the retail executable, the
   synthetic delinker-input PDB, and the pinned delinker executable.
 
@@ -92,10 +106,8 @@ Normal `homm2 build` and `homm2 status` consume the fixed target. They never run
 mapper, rewrite a topology config, or refresh target objects. If a canonical input changes, they
 fail with an explicit regeneration instruction.
 
-Strict partial regeneration still uses legacy PDB naming for unresolved addresses, but only inside
-the promoted nonoverlapping unresolved-range union. That union is built from open compiland
-contributions plus exact unowned retail HIGHLOW targets (needed for linker-aggregated common/BSS
-storage). Vostok rejects any fallback target absent from this explicit allowlist.
+Canonical regeneration has no unresolved-data fallback. Every emitted data relocation must resolve
+through the generated symbol and section manifests.
 
 The coverage manifest contains independent exact partitions. `file` covers every byte from offset
 zero through the end of the appended debug payload, including headers, raw sections, alignment,

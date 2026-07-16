@@ -20,7 +20,7 @@ its proven extent before contribution-level fallback runs; contribution ranges a
 and never authorize materializing an entire TU data interval as one object.
 
 Bootstrap `homm2 init` generates and passes `build/gen/delink_contributions.tsv`. Canonical
-promotion copies the reviewed result to versioned `config/delink_contributions.tsv`; strict target
-regeneration consumes that file without rederiving it. Its digest is part of
+regeneration deterministically refreshes the same generated path; it is never copied into versioned
+configuration. Its digest is part of
 `.reviewed-data-stamp.json`. A changed canonical input makes normal build/status fail until the
 explicit `homm2 data-topology regenerate` command replaces the target.

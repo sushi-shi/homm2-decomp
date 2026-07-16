@@ -18,6 +18,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from homm2.build.canonicalize_relocs import CoffFile
+from homm2.build.annotated_data import source_definitions as annotated_source_definitions
 
 
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[3]))
@@ -31,11 +32,6 @@ MISMATCH_ATTRIBUTES = (
     ("storage_class", "storage_class"),
     ("symbol_type", "symbol_type"),
 )
-IMAGE_BASE = 0x400000
-DATA_DEFINITION = re.compile(
-    r"DATA\(0x([0-9a-fA-F]+)\).*?\b([A-Za-z_]\w*)\s*(?:\[|;|=)")
-DATA_START = re.compile(r"DATA\(0x[0-9a-fA-F]+\)")
-
 IMAGE_SCN_CNT_INITIALIZED_DATA = 0x00000040
 IMAGE_SCN_CNT_UNINITIALIZED_DATA = 0x00000080
 IMAGE_SCN_LNK_INFO = 0x00000200
@@ -319,38 +315,8 @@ def fallback_identities(path):
 
 
 def source_definitions(source_root):
-    rows = []
-    for path in sorted(source_root.rglob("*.cpp")):
-        unit = path.relative_to(source_root).with_suffix("").as_posix()
-        with path.open(encoding="latin-1") as stream:
-            pending = None
-            start_line = None
-            for line_number, line in enumerate(stream, 1):
-                if pending is None:
-                    if DATA_START.search(line) is None:
-                        continue
-                    pending = line.strip()
-                    start_line = line_number
-                else:
-                    pending += " " + line.strip()
-                match = DATA_DEFINITION.search(pending)
-                if match:
-                    try:
-                        display_path = path.relative_to(REPO)
-                    except ValueError:
-                        display_path = path.relative_to(source_root)
-                    rows.append(SourceDefinition(
-                        unit, match.group(2), int(match.group(1), 16) - IMAGE_BASE,
-                        "%s:%d" % (display_path.as_posix(), start_line)))
-                    pending = None
-                    start_line = None
-                elif ";" in line:
-                    raise ValueError("cannot parse DATA definition at %s:%d" %
-                                     (path, start_line))
-            if pending is not None:
-                raise ValueError("unterminated DATA definition at %s:%d" %
-                                 (path, start_line))
-    return rows
+    return [SourceDefinition(row.unit, row.name, row.rva, row.location)
+            for row in annotated_source_definitions(Path(source_root), REPO)]
 
 
 def _public_source_names(path):
@@ -908,7 +874,7 @@ def main(argv=None):
     parser.add_argument("--target-root", type=Path, default=Path("build/delink"))
     parser.add_argument("--source-root", type=Path, default=Path("src"))
     parser.add_argument("--supplemental", type=Path,
-                        default=Path("config/delink_data_topology.tsv"))
+                        default=Path("config/delink_data_supplemental.tsv"))
     parser.add_argument("--symbols", type=Path,
                         default=Path("build/gen/symbol_names.csv"))
     parser.add_argument("--base-suffix", default=".obj")

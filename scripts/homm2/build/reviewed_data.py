@@ -1,4 +1,4 @@
-"""Generate bootstrap data manifests and explicitly promote canonical targets.
+"""Generate bootstrap manifests and reproduce canonical targets from source data.
 
 NB09 public-data records prove names, addresses, and compiland ownership, but do not
 carry allocation lengths.  Exact extents in this module always come from the reviewed
@@ -14,7 +14,6 @@ import os
 import shutil
 import subprocess
 import tempfile
-from collections import defaultdict
 from pathlib import Path
 
 from homm2.build.link_exe import (
@@ -29,10 +28,9 @@ from homm2.build.reloc_owners import (
 )
 from homm2.build.contribution_manifest import (
     OUTPUT as CONTRIBUTION_MANIFEST,
-    contribution_rows,
     manifest_bytes as contribution_manifest_bytes,
 )
-from homm2.build.candidate_data_manifest import _pe_layout, derive_allocations
+from homm2.build.candidate_data_manifest import derive_allocations
 from homm2.build.candidate_data_manifest import (
     OUTPUT as CANDIDATE_PROPOSAL,
     DIAGNOSTICS_OUTPUT as CANDIDATE_DIAGNOSTICS,
@@ -46,6 +44,14 @@ from homm2.build.whole_image_coverage import (
     diagnostics_bytes as coverage_diagnostics_bytes,
     manifest_bytes as coverage_manifest_bytes,
 )
+from homm2.build.data_manifest_adapter import (
+    BREAKPOINTS as DATA_BREAKPOINTS,
+    COMBINED_MANIFEST as CANONICAL_MANIFEST,
+    SECTION_MANIFEST as CANONICAL_SECTION_MANIFEST,
+    SOURCE_MANIFEST as DATA_SOURCE_MANIFEST,
+    SUPPLEMENTAL as CANONICAL_SUPPLEMENTAL,
+    build_manifests as build_data_manifests,
+)
 
 
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[3]))
@@ -56,14 +62,12 @@ PDB = REPO / "build/pdb/HEROES2W.pdb"
 MANIFEST = REPO / "build/gen/reviewed_delink_data.tsv"
 TARGET = REPO / "build/delink"
 STAMP = TARGET / ".reviewed-data-stamp.json"
-CANONICAL_MANIFEST = REPO / "config/delink_data_topology.tsv"
-CANONICAL_CONTRIBUTION_MANIFEST = REPO / "config/delink_contributions.tsv"
+CANONICAL_CONTRIBUTION_MANIFEST = CONTRIBUTION_MANIFEST
 COVERAGE_PROPOSAL = REPO / "build/gen/retail_coverage.tsv"
 COVERAGE_DIAGNOSTICS = REPO / "build/gen/retail_coverage_diagnostics.json"
 TEXT_COVERAGE_PROPOSAL = REPO / "build/gen/retail_text_coverage.tsv"
-CANONICAL_COVERAGE = REPO / "config/retail_coverage.tsv"
-CANONICAL_COVERAGE_DIAGNOSTICS = REPO / "config/retail_coverage_diagnostics.json"
-CANONICAL_UNRESOLVED = REPO / "config/delink_unresolved_data.tsv"
+CANONICAL_COVERAGE = COVERAGE_PROPOSAL
+CANONICAL_COVERAGE_DIAGNOSTICS = COVERAGE_DIAGNOSTICS
 
 
 def _digest(path):
@@ -225,13 +229,16 @@ def _identity(manifest, contribution_manifest, delinker):
 
 def _canonical_identity_inputs(delinker):
     return {
-        "schema": 5,
+        "schema": 6,
         "mode": "canonical",
+        "source_data_manifest_sha256": _digest(DATA_SOURCE_MANIFEST),
+        "supplemental_manifest_sha256": _digest(CANONICAL_SUPPLEMENTAL),
         "data_manifest_sha256": _digest(CANONICAL_MANIFEST),
+        "data_section_manifest_sha256": _digest(CANONICAL_SECTION_MANIFEST),
+        "data_breakpoints_sha256": _digest(DATA_BREAKPOINTS),
         "contribution_manifest_sha256": _digest(CANONICAL_CONTRIBUTION_MANIFEST),
         "coverage_manifest_sha256": _digest(CANONICAL_COVERAGE),
         "coverage_diagnostics_sha256": _digest(CANONICAL_COVERAGE_DIAGNOSTICS),
-        "unresolved_manifest_sha256": _digest(CANONICAL_UNRESOLVED),
         "exe_sha256": _digest(EXE),
         "pdb_sha256": _digest(PDB),
         "delinker_sha256": _digest(delinker),
@@ -298,9 +305,11 @@ def ensure_reviewed_targets(delinker=None):
         raise RuntimeError("delinked target has no valid provenance stamp; run `homm2 init`")
     if current.get("mode") == "canonical":
         missing = [path for path in (
-            CANONICAL_MANIFEST, CANONICAL_CONTRIBUTION_MANIFEST,
+            DATA_SOURCE_MANIFEST, CANONICAL_SUPPLEMENTAL, CANONICAL_MANIFEST,
+            CANONICAL_SECTION_MANIFEST, DATA_BREAKPOINTS,
+            CANONICAL_CONTRIBUTION_MANIFEST,
             CANONICAL_COVERAGE, CANONICAL_COVERAGE_DIAGNOSTICS,
-            CANONICAL_UNRESOLVED, EXE, PDB)
+            EXE, PDB)
             if not path.is_file()]
         delinker = Path(delinker or shutil.which("vostok-delinker") or "")
         if missing or not delinker.is_file():
@@ -353,105 +362,37 @@ def _build_coverage_proposal(allocations):
     return payload, padding, diagnostics
 
 
-def unresolved_manifest_bytes(group_diagnostics, promoted_manifest):
-    contributions = defaultdict(list)
-    for row in contribution_rows():
-        if row["storage"] == "text":
-            continue
-        unit = row["object"].replace("\\", "/").removesuffix(".c")
-        contributions[(unit, row["storage"])].append((
-            row["rva"], row["size"], row["segment"], row["section"]))
-    records = []
-    for diagnostic in sorted(group_diagnostics, key=lambda row: (row.unit, row.storage)):
-        ranges = contributions.get((diagnostic.unit, diagnostic.storage), [])
-        provenance = "retail-nb09-sstModule-open-group"
-        if not ranges:
-            segment = 2 if diagnostic.storage == "rdata" else 3
-            section = ".rdata" if diagnostic.storage == "rdata" else ".data"
-            ranges = [(rva, size, segment, section)
-                      for rva, size, _name in diagnostic.evidence_ranges]
-            provenance = "candidate-reloc-evidence-without-sstModule"
-        for rva, size, segment, section in ranges:
-            records.append({
-                "storage": diagnostic.storage, "rva": rva, "size": size,
-                "segment": segment, "section": section,
-                "identity": "%s:%s:%s" % (
-                    diagnostic.unit, provenance, ",".join(diagnostic.causes)),
-            })
-    promoted = []
-    lines = [line for line in promoted_manifest.decode("utf-8").splitlines()
-             if line and not line.startswith("#")]
-    for row in csv.DictReader(lines, delimiter="\t"):
-        promoted.append((int(row["rva"], 0), int(row["size"], 0)))
-    retail = read_pe(EXE)
-    image_base, highlow, read_u32, _read_bytes = _pe_layout(EXE)
-    for site in highlow:
-        target = (read_u32(site) - image_base) & 0xFFFFFFFF
-        if any(rva <= target < rva + size for rva, size in promoted):
-            continue
-        storage_class = classify_pe_storage(retail, target)["class"]
-        storage = {
-            "rdata": "rdata",
-            "data-initialized": "data",
-            "data-loader-zero-tail": "bss",
-        }.get(storage_class)
-        if storage is None:
-            continue
-        records.append({
-            "storage": storage, "rva": target, "size": 1,
-            "segment": 2 if storage == "rdata" else 3,
-            "section": ".rdata" if storage == "rdata" else ".data",
-            "identity": "HIGHLOW@0x%x:retail-unowned-target" % site,
-        })
-    merged = []
-    for row in sorted(records, key=lambda value: (value["storage"], value["rva"])):
-        if (merged and merged[-1]["storage"] == row["storage"] and
-                row["rva"] <= merged[-1]["rva"] + merged[-1]["size"]):
-            previous = merged[-1]
-            end = max(previous["rva"] + previous["size"], row["rva"] + row["size"])
-            previous["size"] = end - previous["rva"]
-            previous["identities"].append(row["identity"])
-        else:
-            merged.append({**row, "identities": [row["identity"]]})
-    lines = [
-        "object\tstorage\trva\tsize\tsegment\tsection\tprovenance",
-    ]
-    for row in merged:
-        lines.append("UNRESOLVED\\%s.c\t%s\t0x%x\t0x%x\t%s\t%s\t%s" % (
-            row["storage"], row["storage"], row["rva"], row["size"],
-            row["segment"], row["section"], "|".join(row["identities"])))
-    return ("\n".join(lines) + "\n").encode("utf-8")
-
-
 def promote_canonical_topology(require_all=False):
-    """Promote a reviewed snapshot; optionally require final whole-image closure."""
+    """Refresh generated evidence; never copy derived data into config."""
     allocations, stats, group_diagnostics = derive_allocations()
     _atomic_write(CANDIDATE_DIAGNOSTICS,
                   candidate_diagnostics_bytes(stats, group_diagnostics))
-    coverage, padding, coverage_diagnostics = _build_coverage_proposal(allocations)
+    _coverage, _padding, coverage_diagnostics = _build_coverage_proposal(allocations)
     blockers = [*group_diagnostics, *coverage_diagnostics]
     if require_all and blockers:
         return stats, blockers
-    manifest = reviewed_manifest_bytes(
-        candidate_allocations=allocations,
-        padding_allocations=padding if require_all else ())
+    build_data_manifests(strict=require_all)
     contribution_manifest = contribution_manifest_bytes()
-    unresolved = unresolved_manifest_bytes(group_diagnostics, manifest)
-    _atomic_write(CANONICAL_MANIFEST, manifest)
     _atomic_write(CANONICAL_CONTRIBUTION_MANIFEST, contribution_manifest)
-    _atomic_write(CANONICAL_COVERAGE, coverage)
-    _atomic_write(CANONICAL_COVERAGE_DIAGNOSTICS,
-                  coverage_diagnostics_bytes(coverage_diagnostics))
-    _atomic_write(CANONICAL_UNRESOLVED, unresolved)
     return stats, blockers
 
 
 def regenerate_canonical_targets(delinker=None):
-    """Atomically replace targets from committed canonical manifests only."""
+    """Regenerate canonical inputs and atomically replace targets."""
+    build_data_manifests(strict=True)
+    _atomic_write(CANONICAL_CONTRIBUTION_MANIFEST, contribution_manifest_bytes())
+    allocations, _stats, group_diagnostics = derive_allocations()
+    _coverage, _padding, coverage_diagnostics = _build_coverage_proposal(allocations)
+    if group_diagnostics or coverage_diagnostics:
+        raise RuntimeError(
+            "canonical regeneration requires closed data and whole-image coverage; "
+            "see %s and %s" % (CANDIDATE_DIAGNOSTICS, COVERAGE_DIAGNOSTICS))
     missing = [path for path in (
-        CANONICAL_MANIFEST, CANONICAL_CONTRIBUTION_MANIFEST,
+        DATA_SOURCE_MANIFEST, CANONICAL_SUPPLEMENTAL, CANONICAL_MANIFEST,
+        CANONICAL_SECTION_MANIFEST, DATA_BREAKPOINTS,
+        CANONICAL_CONTRIBUTION_MANIFEST,
         CANONICAL_COVERAGE, CANONICAL_COVERAGE_DIAGNOSTICS,
-        CANONICAL_UNRESOLVED, EXE, PDB)
+        EXE, PDB)
         if not path.is_file()]
     if missing:
         raise RuntimeError("canonical target regeneration requires %s" %
@@ -469,8 +410,8 @@ def regenerate_canonical_targets(delinker=None):
             str(delinker), "--pdb-path", str(PDB), "--exe-path", str(EXE),
             "--output-path", str(temporary), "--engine-path", "c:\\proj\\",
             "--data-manifest", str(CANONICAL_MANIFEST),
+            "--data-section-manifest", str(CANONICAL_SECTION_MANIFEST),
             "--contribution-manifest", str(CANONICAL_CONTRIBUTION_MANIFEST),
-            "--unresolved-data-manifest", str(CANONICAL_UNRESOLVED),
         ], cwd=REPO, check=True)
         _validate_owner_objects(temporary, manifest)
         (temporary / STAMP.name).write_text(json.dumps(identity, indent=2) + "\n")

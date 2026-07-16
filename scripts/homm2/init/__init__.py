@@ -21,18 +21,10 @@ def main(argv=None):
     if run("python3", "scripts/name_strings.py"): return 1
     # 3. synthesize the PDB the delinker needs
     if run("python3", "-m", "homm2.build.synth_pdb"): return 1
-    canonical = [
-        REPO / "config/delink_data_topology.tsv",
-        REPO / "config/delink_contributions.tsv",
-        REPO / "config/retail_coverage.tsv",
-        REPO / "config/retail_coverage_diagnostics.json",
-        REPO / "config/delink_unresolved_data.tsv",
-    ]
-    if any(path.is_file() for path in canonical) and not all(path.is_file() for path in canonical):
-        print("[init] canonical data topology is incomplete: all versioned manifests are required")
-        return 1
-    if all(path.is_file() for path in canonical):
-        # A promoted target is reproduced only from versioned canonical inputs.
+    supplemental = REPO / "config/delink_data_supplemental.tsv"
+    if supplemental.is_file():
+        # Source DATA plus the sole versioned supplement deterministically
+        # regenerate every Vostok data/section/contribution input.
         if run("python3", "-m", "homm2.build.reviewed_data", "--regenerate"): return 1
     else:
         # Bootstrap is intentionally permissive. It exists only to compile candidates

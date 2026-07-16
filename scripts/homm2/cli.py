@@ -25,11 +25,14 @@ def main(argv=None):
         if rest and rest[0] == "census":
             from homm2.build.data_topology_census import main as m
             return m(rest[1:])
+        if rest and rest[0] == "assemble":
+            from homm2.build.data_manifest_adapter import main as m
+            return m(rest[1:])
         from homm2.build.reviewed_data import main as m
         if len(rest) != 1 or rest[0] not in (
                 "propose", "promote", "finalize", "regenerate"):
             print("usage: homm2 data-topology "
-                  "{census|propose|promote|finalize|regenerate}",
+                  "{assemble|census|propose|promote|finalize|regenerate}",
                   file=sys.stderr)
             return 1
         return m(["--" + rest[0]])
