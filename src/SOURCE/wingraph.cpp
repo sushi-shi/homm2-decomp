@@ -950,33 +950,27 @@ void CleanUpWinGraphics(void)
     DisconnectDLLs();
 }
 
-// @early-stop
-// Relocation-masked code bytes and the 0x4 frame are identical. The only two
-// objdiff rows are gConfig+0x30 versus retail's delinked const_00128d50 label;
-// both indexed operands resolve to VA 0x00528d50 and all 13 relocations align.
 VA(0x00437483, 0xe1)
 void SetFullScreenStatus(int fullScreen)
 {
-    if (gbInSmackMgr != 0) {
+    if (gbInSmackMgr != 0)
+        return;
+    if (gConfig.gfx[giCurExe].fullScreen == fullScreen)
+        return;
+    if (giGraphicsType == WINGRAPH_GRAPHICS_WING) {
+        if (gbDDrawAttached == 0)
+            return;
+        gConfig.gfx[giCurExe].fullScreen = 1;
+        if (SetGraphicsType(WINGRAPH_GRAPHICS_DIRECT_DRAW) != 0)
+            DDSetFullScreenStatus(fullScreen);
+    } else if (fullScreen == 0) {
+        if (gbWinGAttached != 0)
+            SetGraphicsType(WINGRAPH_GRAPHICS_WING);
     } else {
-        if (gConfig.gfx[giCurExe].fullScreen == fullScreen) {
-        } else {
-            if (giGraphicsType == WINGRAPH_GRAPHICS_WING) {
-                if (gbDDrawAttached == 0)
-                    return;
-                gConfig.gfx[giCurExe].fullScreen = 1;
-                if (SetGraphicsType(WINGRAPH_GRAPHICS_DIRECT_DRAW) != 0)
-                    DDSetFullScreenStatus(fullScreen);
-            } else if (fullScreen == 0) {
-                if (gbWinGAttached != 0)
-                    SetGraphicsType(WINGRAPH_GRAPHICS_WING);
-            } else {
-                DDSetFullScreenStatus(fullScreen);
-            }
-            if (fullScreen != 0)
-                CheckChangeCursor(0, 0, 1);
-        }
+        DDSetFullScreenStatus(fullScreen);
     }
+    if (fullScreen != 0)
+        CheckChangeCursor(0, 0, 1);
 }
 
 VA(0x00437564, 0x31)
@@ -988,14 +982,6 @@ int QueryNewPalette(void)
         return DDQueryNewPalette();
 }
 
-// @match-note
-// The real body is target +0x000..+0x219; frame 0x1c, all six local slots, CFG,
-// calls, and external relocations align. First code divergence is target +0x0c
-// `mov eax,[ebp-0x1c]; cmp [giGraphicsType],eax` versus ours `mov eax,
-// [giGraphicsType]; cmp [ebp-0x1c],eax` (one byte shorter). Equality operands
-// were swapped and direct/addressed parameter spellings were tried. Target
-// +0x21a..+0x285 is a delinked SVSearchArray ctor/dtor/atexit tail, not this body.
-// Revisit after the SOURCE placeholder census reaches zero.
 VA(0x00437595, 0x286)
 int SetGraphicsType(int graphicsType)
 {
@@ -1006,7 +992,7 @@ int SetGraphicsType(int graphicsType)
     int height7;
     void *screenBuffer;
 
-    if (graphicsType == giGraphicsType)
+    if (0[&giGraphicsType] == graphicsType)
         return 1;
     if (graphicsType == WINGRAPH_GRAPHICS_WING && gbWinGAttached == 0)
         return 0;
