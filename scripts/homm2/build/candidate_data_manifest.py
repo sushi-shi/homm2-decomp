@@ -289,6 +289,32 @@ def _function_relocation_offsets_align(candidate, function_rva, retail_sites):
             [site - function_rva for site in retail_sites])
 
 
+def _function_relocation_proofs(candidate, function_rva, retail_sites,
+                                read_u32, image_base, defined, public):
+    """Pair only identical function-relative relocation sites."""
+    offsets_align = _function_relocation_offsets_align(
+        candidate, function_rva, retail_sites)
+    retail_by_offset = {site - function_rva: site for site in retail_sites}
+    proposed = []
+    known_anchors = 0
+    paired_sites = 0
+    valid = True
+    for site, symbol, addend in candidate:
+        retail_site = retail_by_offset.get(site)
+        if retail_site is None:
+            continue
+        paired_sites += 1
+        target_rva = (read_u32(retail_site) - image_base) & 0xFFFFFFFF
+        if symbol.name in defined:
+            proposed.append((symbol.name, (target_rva - addend) & 0xFFFFFFFF))
+        elif symbol.name in public:
+            known_anchors += 1
+            if (public[symbol.name] + addend) & 0xFFFFFFFF != target_rva:
+                valid = False
+                break
+    return proposed, known_anchors, paired_sites, offsets_align, valid
+
+
 def _contribution_index(exe, units):
     result = defaultdict(list)
     for row in contribution_rows(exe, units):
@@ -531,28 +557,15 @@ def derive_allocations(base_dir=REPO / "build/objdiff/base",
                 continue
             retail_sites = [rva for rva in highlow
                             if function["rva"] <= rva < function["rva"] + function["size"]]
-            if len(candidate) != len(retail_sites):
-                stats.rejected_functions += 1
-                continue
-            offsets_align = _function_relocation_offsets_align(
-                candidate, function["rva"], retail_sites)
-            proposed = []
-            known_anchors = 0
-            valid = True
-            for (_site, symbol, addend), retail_site in zip(candidate, retail_sites):
-                target_rva = (read_u32(retail_site) - image_base) & 0xFFFFFFFF
-                if symbol.name in defined:
-                    proposed.append((symbol.name, (target_rva - addend) & 0xFFFFFFFF))
-                elif symbol.name in public:
-                    known_anchors += 1
-                    if (public[symbol.name] + addend) & 0xFFFFFFFF != target_rva:
-                        valid = False
-                        break
+            proposed, known_anchors, paired_sites, offsets_align, valid = \
+                _function_relocation_proofs(
+                    candidate, function["rva"], retail_sites, read_u32,
+                    image_base, defined, public)
             if not valid or (proposed and known_anchors == 0 and not offsets_align):
                 stats.rejected_functions += 1
                 continue
             stats.paired_functions += 1
-            stats.aligned_dir32_sites += len(candidate)
+            stats.aligned_dir32_sites += paired_sites
             for symbol, rva in proposed:
                 proofs[symbol].append(rva)
 
