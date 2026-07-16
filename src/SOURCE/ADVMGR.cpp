@@ -777,7 +777,7 @@ process_cheat_digit: {
             UpdateScreen(0, 0);
         }
         if (giCheatSeq % 1000 == 0x19b) {
-            sprintf(gText, "Coordinates at top left corner of view: %d, %d",
+            sprintf(gText, "Coordinates at top left corner of view:\n\n  X: %d\n  Y: %d",
                     m_mapOriginX, m_mapOriginY);
             NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
             break;
@@ -1140,7 +1140,8 @@ int advManager::ProcessSelect(struct tag_message *message, class mapCell **event
     }
     case 9:
         if (message->payload.widget.parameter & 0x200) {
-            NormalDialog("{World Map}",
+            NormalDialog("{World Map}\n\nA miniature view of the known world.  "
+                         "Left click to move viewing area.",
                          4, -1, -1, -1, 0, -1, 0, -1, 0);
             break;
         }
@@ -1220,7 +1221,9 @@ int advManager::ProcessSelect(struct tag_message *message, class mapCell **event
     if ((message->payload.widget.parameter & 0x200) &&
         message->payload.widget.id >= ADVMGR_BOTTOM_VIEW_FIRST_MESSAGE &&
         message->payload.widget.id <= ADVMGR_BOTTOM_VIEW_LAST_MESSAGE) {
-        NormalDialog("{Status Window}",
+        NormalDialog("{Status Window}\n\nThis window provides information on the status "
+                     "of your hero or kingdom, and shows the date.  Left click here to "
+                     "cycle through these windows.",
                      4, -1, -1, -1, 0, -1, 0, -1, 0);
     }
     return 1;
@@ -8184,10 +8187,11 @@ int advManager::DoVisions(hero *visionHero)
 
             if (joiningCount == monsterCountIndex) {
                 sprintf(visionMessageResult,
-                        "All the creatures will join us...", joiningCostIndex);
+                        "All the creatures will join us...\n\nfor a fee of %d gold.",
+                        joiningCostIndex);
             } else {
                 sprintf(visionMessageResult,
-                        "%d of the creatures will join us...",
+                        "%d of the creatures will join us...\n\nfor a fee of %d gold.",
                         monsterCountIndex, joiningCostIndex);
             }
             strcat(gText, visionMessageResult);
@@ -8265,6 +8269,19 @@ unsigned char StopOnTrigger(class mapCell *cell)
 VTBL(advManager, 0x004eb6c8);
 
 // ---- globals (definitions, RVA order) ----
+// @data-layout-note
+// Retail ADVMGR owns initialized 0xf57b0+0x14d8 and zero-fill
+// 0x127eb8+0x224. After restoring every retail string payload, candidate
+// `.data` is 0x14ec: MSVC coalesces giCheatSeq/iQWE/monAnimDrawFrame,
+// iLastSandAnimTime/iLastNewSandAnimTime, and giFrameCount at offsets
+// 0x2c..0x50, while retail interleaves them at 0x238/0x23c/0x688,
+// 0x930/0x934, and 0xf70. Candidate `.bss` is 0x21c; all 40 proven
+// allocations and extents are present, but retail packing has alignment holes
+// at +0x2, +0x34, +0x6c, and +0x1f4. Restored payload relocation sites agree;
+// ProcessSelect is 118/118 and DoVisions is 42/42 with only-base=0. Main is
+// 232/232 but retains one unrelated pre-existing CreateColorTables identity.
+// Revisit only after a natural declaration/TU-state change; do not add padding,
+// aliases, or unattached literals.
 DATA(0x004f57b0) int giLimitUpdMinX = -1;
 DATA(0x004f57b4) int iLastScrollTime = 0;
 DATA(0x004f57b8) int iSandAnim = 0;
