@@ -75,15 +75,16 @@ void SetupRecruitWin(class heroWindow *window, int creatureType, int goldCost,
     }
 }
 
-// @match-note 95.79%: complete window/menu setup, affordability calculation,
-// zero-availability disable path, frame/CFG, and all 26/26 relocation targets.
-// First non-string divergence follows the gold division: ours stores directly
-// to m_maximum while retail stages the quotient in a local. Reconstructing the
-// decompiler's local plus explicit no-resource arm regressed to 94.54%.
-// Revisit at 95%; do not retry that local/arm spelling.
+// @early-stop
+// The recovered 0x10 frame, affordability locals/minimum expression, CFG, and
+// all non-relocation instructions are exact. All 26/26 relocation occurrences
+// resolve to the same owners/addends; only delinked pooled-string identities differ.
 VA(0x0048b49c, 0x24b)
 int recruitUnit::Open(int priority)
 {
+    int goldMaximum;
+    int resourceMaximum;
+
     m_window = new heroWindow(RECRUIT_WINDOW_X, RECRUIT_WINDOW_Y,
                               m_resourceType == RECRUIT_NO_RESOURCE
                                   ? "recruit0.bin"
@@ -102,13 +103,16 @@ int recruitUnit::Open(int priority)
                                       RECRUIT_BROADCAST_FLAGS);
     gpWindowManager->AddWindow(m_window, -1, 1);
 
-    m_maximum = gpCurPlayer->m_resources[RECRUIT_GOLD_RESOURCE] / m_goldCost;
+    goldMaximum =
+        gpCurPlayer->m_resources[RECRUIT_GOLD_RESOURCE] / m_goldCost;
     if (m_resourceType != RECRUIT_NO_RESOURCE) {
-        int resourceMaximum =
+        resourceMaximum =
             gpCurPlayer->m_resources[m_resourceType] / m_resourceCost;
-        if (resourceMaximum < m_maximum)
-            m_maximum = resourceMaximum;
-    }
+        m_maximum = goldMaximum < resourceMaximum
+                        ? goldMaximum
+                        : resourceMaximum;
+    } else
+        m_maximum = goldMaximum;
     if (*m_available < m_maximum)
         m_maximum = *m_available;
     m_recruited = 0;
@@ -183,34 +187,33 @@ void recruitUnit::Update(void)
     }
 }
 
-// @match-note 90.33%: complete 0x0c frame, select/alternate/de-select semantics,
-// case-body order, resource mutation, close result, and all 16/16 relocations.
-// First divergence at the quantity-control case uses a direct JNE while retail
-// emits JE plus a continuation jump; the same /Od shape repeats for the button
-// cases. De-select-first if/else scored 40.90%, switch ordering 88.03%, and the
-// retained positive outer MESSAGE_WIDGET arm 90.33%. Revisit at 95%; do not
-// retry those three dispatch spellings.
+// @early-stop
+// Jump-only proof: the 0x3fd-byte candidate versus the 0x41b-byte retail span
+// differs by exactly six five-byte continuation JMPs (0x1e bytes). Every
+// non-jump opcode/operand and all 16/16 ordered external relocations match; this
+// function has no embedded jump table. Guard-clause cases, confirmation shared
+// tails, right-button quick view, frame/slots, and final close==1 CFG are recovered.
 VA(0x0048b8f0, 0x41b)
 int recruitUnit::Main(struct tag_message &message)
 {
     int close = 0;
     int quickView =
-        (message.payload.widget.parameter & MESSAGE_MODIFIER_LEFT_SHIFT) != 0;
+        (message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0;
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
         case WIDGET_COMMAND_SELECT:
         case WIDGET_COMMAND_ALTERNATE_SELECT:
         switch (message.payload.widget.id) {
         case RECRUIT_QUANTITY_CONTROL:
-            if (quickView == 0) {
-                message.payload.widget.command = RECRUIT_GET_TEXT;
-                m_window->BroadcastMessage(message);
-                m_quantity = atoi(message.payload.widget.data.text);
-                if (m_quantity < 0)
-                    m_quantity = 0;
-                if (m_quantity > m_maximum)
-                    m_quantity = m_maximum;
-            }
+            if (quickView != 0)
+                break;
+            message.payload.widget.command = RECRUIT_GET_TEXT;
+            m_window->BroadcastMessage(message);
+            m_quantity = atoi(message.payload.widget.data.text);
+            if (m_quantity < 0)
+                m_quantity = 0;
+            if (m_quantity > m_maximum)
+                m_quantity = m_maximum;
             break;
         case RECRUIT_CREATURE_CONTROL:
             gpGame->ViewArmy(RECRUIT_VIEW_ARMY_X, RECRUIT_VIEW_ARMY_Y,
@@ -224,65 +227,66 @@ int recruitUnit::Main(struct tag_message &message)
         case WIDGET_COMMAND_DESELECT:
         switch (message.payload.widget.id) {
         case RECRUIT_INCREASE_CONTROL:
-            if (quickView == 0) {
-                ++m_quantity;
-                if (m_quantity > m_maximum)
-                    m_quantity = m_maximum;
-                Update();
-                m_window->DrawWindow(1, 0, RECRUIT_DRAW_DEPTH);
-            }
+            if (quickView != 0)
+                break;
+            ++m_quantity;
+            if (m_quantity > m_maximum)
+                m_quantity = m_maximum;
+            Update();
+            m_window->DrawWindow(1, 0, RECRUIT_DRAW_DEPTH);
             break;
         case RECRUIT_DECREASE_CONTROL:
-            if (quickView == 0) {
-                --m_quantity;
-                if (m_quantity < 0)
-                    m_quantity = 0;
-                Update();
-                m_window->DrawWindow(1, 0, RECRUIT_DRAW_DEPTH);
-            }
+            if (quickView != 0)
+                break;
+            --m_quantity;
+            if (m_quantity < 0)
+                m_quantity = 0;
+            Update();
+            m_window->DrawWindow(1, 0, RECRUIT_DRAW_DEPTH);
             break;
         case RECRUIT_MAXIMUM_CONTROL:
-            if (quickView == 0) {
-                m_quantity = m_maximum;
-                Update();
-                m_window->DrawWindow(1, 0, RECRUIT_DRAW_DEPTH);
-            }
+            if (quickView != 0)
+                break;
+            m_quantity = m_maximum;
+            Update();
+            m_window->DrawWindow(1, 0, RECRUIT_DRAW_DEPTH);
             break;
         case RECRUIT_CANCEL_CONTROL:
-            if (quickView == 0) {
-                m_quantity = 0;
-                close = 1;
-            }
+            if (quickView != 0)
+                break;
+            m_quantity = 0;
+            close = 1;
             break;
         case RECRUIT_CONFIRM_CONTROL:
-            if (quickView == 0) {
-                if (m_quantity == 0) {
-                    close = 1;
-                } else {
-                    if (m_army->CanJoin(m_creatureType) != 0) {
-                        m_army->Add(m_creatureType, m_quantity,
-                                    ARMY_GROUP_EMPTY_SLOT);
-                        gpCurPlayer->m_resources[RECRUIT_GOLD_RESOURCE] -=
-                            m_quantity * m_goldCost;
-                        if (m_resourceType != RECRUIT_NO_RESOURCE) {
-                            gpCurPlayer->m_resources[m_resourceType] -=
-                                m_quantity * m_resourceCost;
-                        }
-                        *m_available -= m_quantity;
-                        m_recruited = 1;
-                        close = 1;
-                    } else {
-                        close = 1;
-                        m_noRoom = 1;
-                    }
-                }
+            if (quickView != 0)
+                break;
+            if (m_quantity == 0) {
+                close = 1;
+                break;
             }
+            if (m_army->CanJoin(m_creatureType) != 0) {
+                m_army->Add(m_creatureType, m_quantity,
+                            ARMY_GROUP_EMPTY_SLOT);
+            } else {
+                close = 1;
+                m_noRoom = 1;
+                break;
+            }
+            gpCurPlayer->m_resources[RECRUIT_GOLD_RESOURCE] -=
+                m_quantity * m_goldCost;
+            if (m_resourceType != RECRUIT_NO_RESOURCE) {
+                gpCurPlayer->m_resources[m_resourceType] -=
+                    m_quantity * m_resourceCost;
+            }
+            *m_available -= m_quantity;
+            m_recruited = 1;
+            close = 1;
             break;
         }
         break;
         }
 
-        if (close != 0) {
+        if (close == 1) {
             message.type = MESSAGE_EXECUTIVE;
             message.payload.executive.command = 4;
             return 2;

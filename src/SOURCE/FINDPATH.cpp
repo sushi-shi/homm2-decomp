@@ -115,8 +115,11 @@ void searchArray::Clear(void)
     m_queueCount = 0;
 }
 
-// @early-stop: every meaningful byte matches and neither side has relocations;
-// retail has one trailing two-byte alignment LEA after RET.
+// @semantic
+// Complete distance semantics, no frame, zero relocations, and matching return
+// blocks. First residual is the compare at +0x1f: retail emits CMP ESI,EAX/JL,
+// while candidate emits CMP EAX,ESI/JG; retail also has a trailing alignment LEA.
+// x>=y, y<=x, y<x, and x<y with reversed return-arm order were all compiled.
 VA(0x004a4b60, 0x40)
 int searchArray::QuickDistance(int x1, int y1, int x2, int y2)
 {
@@ -128,7 +131,7 @@ int searchArray::QuickDistance(int x1, int y1, int x2, int y2)
     return yDistance + xDistance / 2;
 }
 
-// @match-note: complete semantics, no stack frame, matching CFG and 5/5 external
+// @semantic: complete semantics, no stack frame, matching CFG and 5/5 external
 // relocations. First live divergence is retail keeping mobility in EBX and saving
 // EBP for roadCost while ours uses EDI/EBX. Tried direct/reused cost values, scoped
 // and top-level locals, operand reversal, row pointers, semantic aliases, register
@@ -160,7 +163,7 @@ terrainCost:
     return giTerrainCost[terrain][direction][diagonal & SEARCH_DIAGONAL_COST_MASK];
 }
 
-// @match-note: complete queue semantics, slots and CFG; 38/38 relocation
+// @semantic: complete queue semantics, slots and CFG; 38/38 relocation
 // occurrences, with only delinked interior aliases for normalDirTable and search
 // scratch globals. First divergence is scratch-register assignment at queue setup;
 // revisit after 95% or shared-layout/TU-state changes.
@@ -224,7 +227,7 @@ void searchArray::PushPoint(int x, int y, int direction, int cost,
     }
 }
 
-// @match-note: complete eight-direction CFG, object/trigger semantics and no local
+// @semantic: complete eight-direction CFG, object/trigger semantics and no local
 // frame; 66/66 relocation occurrences, with four delinked interior aliases only.
 // First divergence is EBX/EDI ownership in occupied-array initialization; memset,
 // byte stores, sentinels and both terrain-arm orders were tried. Revisit after 95%.
@@ -332,10 +335,9 @@ void searchArray::TestPossibleDirections(int x, int y,
     } while (gSearchDirection < SEARCH_DIRECTION_COUNT);
 }
 
-// @match-note: complete flying/ground and enemy-wide semantics, no frame, and all
-// 16/16 external relocations agree. First divergence is EBP versus EBX for the
-// combat-hex loop index; cached enemySide was removed to recover the retail frame.
-// Revisit after 95% or TU-state changes.
+// @early-stop: after restoring the signed speed <= 0 predicate, every meaningful
+// instruction and all 16/16 ordered external relocations match. Retail alone has
+// a trailing three-byte alignment LEA after RET.
 VA(0x004a5200, 0x1f0)
 void searchArray::SeedCombatPosition(class army *unit)
 {
@@ -363,7 +365,7 @@ void searchArray::SeedCombatPosition(class army *unit)
         unit->m_targetIndex = enemy->m_index;
         hex = enemy->m_hex;
 
-        if (unit->m_monster.speed < 1 ||
+        if (unit->m_monster.speed <= 0 ||
             unit->GetAttackMask(unit->m_hex, 1, -1) != 0xff) {
             if (unit->ValidPath(hex, 1) == 1)
                 gpCombatManager->m_hexCells[hex].m_pathReachable = 1;
@@ -386,7 +388,7 @@ void searchArray::SeedCombatPosition(class army *unit)
     unit->m_targetSide = -1;
 }
 
-// @match-note: complete moat, queue, attack and reconstruction CFG with the retail
+// @semantic: complete moat, queue, attack and reconstruction CFG with the retail
 // 0x30 frame; all 23/23 external relocations agree. First divergence is EAX versus
 // ECX for the moat-cell byte. Result/attack-target lifetime reuse and branch
 // polarities are recovered; revisit after 95% for register allocation only.
@@ -535,7 +537,7 @@ reconstructPath:
     goto restoreMoat;
 }
 
-// @match-note: complete nested gates, signed binary search, queue update and packed
+// @semantic: complete nested gates, signed binary search, queue update and packed
 // node writes; both external relocations agree and there is no frame. First
 // divergence is ESI/EDI ownership in the prologue. Compound/nested gates, signed
 // and unsigned indices, and early/late cell formation were tried; revisit at 95%.
