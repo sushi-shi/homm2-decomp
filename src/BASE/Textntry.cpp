@@ -5,6 +5,7 @@
 
 #include <va.h>
 #include <BASE/textEntryWidget.h>
+#include <BASE/TEXTNTRY_TYPES.h>
 #include <BASE/widgetKind.h>
 #include <BASE/resourceManager.h>
 #include <BASE/font.h>
@@ -18,6 +19,27 @@
 #include <BASE/Misc.h>
 #include <BASE/icon.h>
 #include <string.h>
+
+#define TEXT_ENTRY_SOURCE_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp"
+#define TEXT_ENTRY_MAIN_SOURCE_FILES \
+    TEXT_ENTRY_SOURCE_FILE "\0\0\0" TEXT_ENTRY_SOURCE_FILE
+
+// @data-layout-note Retail's initialized Textntry contribution is
+// RVA 0x120cec..0x120d9c (0xb0), with four identical source-path views at
+// addends 0, 0x2c, 0x58, and 0x84. Constructor allocation, Read allocation,
+// Main free, and Main reallocation use those addresses in order. The only rdata
+// contribution is the reviewed 0xc textEntryWidget vtable at RVA 0x0ebaa0, and
+// the TU has no loader-zero contribution. The former source pooled all four uses
+// into one 0x2a COMDAT. `/Gf-` retained that pooling and `/GF-` only moved it to
+// rdata. A typed 0xb0 aggregate reproduced bytes and addends but emitted an
+// align-eight section at the align-four-only retail start, adding
+// section-outside-contributions and unconsumed-contribution diagnostics.
+// The retained align-four COMDATs are 0x2a, 0x2b, and 0x56 bytes. The last is a
+// two-slot Main owner whose second relocation has addend 0x2c. Their bytes plus
+// natural 2/1/2-byte section alignment tails equal the complete retail interval,
+// and strict replay closes the group. Do not pool the paths or add padding
+// symbols, aliases, fake owners, section pragmas, or per-TU flag exceptions.
+
 VA(0x004d8740, 0x2d)
 textEntryWidget::textEntryWidget(void) : textWidget()
 {
@@ -69,7 +91,7 @@ textEntryWidget::textEntryWidget(short x, short y, short width, short height, sh
 #line 61 "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp"
     m_text = static_cast<char *>(
         H2_ALLOC(static_cast<unsigned short>(maxLength) + 5,
-                 "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp", 0x3e));
+                 TEXT_ENTRY_SOURCE_FILE, 0x3e));
     strcpy(m_text, text);
     if (layout == 4) {
         m_innerX = horizontalInset + m_x;
@@ -104,7 +126,7 @@ void textEntryWidget::Read(int type)
 #line 99
     m_text = static_cast<char *>(H2_ALLOC(
         m_maxLength + 5,
-        "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp", 0x63));
+        TEXT_ENTRY_SOURCE_FILE "\0", 0x63));
     gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(m_text), m_maxLength);
     gpResourceManager->Read13(reinterpret_cast<signed char *>(resourceName));
     gpResourceManager->SavePosition();
@@ -290,11 +312,13 @@ int textEntryWidget::Main(struct tag_message &message)
                                 if (typed != 0) {
                                     strcpy(scratch, m_text);
 #line 388
-                                    H2_FREE(m_text, "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp", 0x184);
+                                    H2_FREE(m_text, TEXT_ENTRY_MAIN_SOURCE_FILES, 0x184);
 #line 389
                                     m_text = static_cast<char *>(H2_ALLOC(
                                         strlen(edit) + 6,
-                                        "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp", 0x185));
+                                        TEXT_ENTRY_MAIN_SOURCE_FILES +
+                                            TEXT_ENTRY_SOURCE_FILE_SLOT_SIZE,
+                                        0x185));
                                     strcpy(scratch, edit);
                                     scratch[m_cursorPosition] = typed;
                                     scratch[m_cursorPosition + 1] = 0;
