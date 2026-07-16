@@ -102,10 +102,13 @@ def reviewed_manifest_bytes(symbols=SYMBOLS, ledger=LEDGER, exe=EXE,
             raise RuntimeError("reviewed data lacks CV public-data provenance: %s" %
                                required["name"])
         rva = int(symbol["rva"], 0)
-        storage = classify_pe_storage(retail, rva)["class"]
-        if storage != "data-initialized":
-            raise RuntimeError("reviewed initialized data has retail storage %s: %s" %
-                               (storage, required["name"]))
+        start_storage = classify_pe_storage(retail, rva)["class"]
+        end_storage = classify_pe_storage(
+            retail, rva + required["size"] - 1)["class"]
+        if start_storage != "data-initialized" or end_storage != "data-initialized":
+            raise RuntimeError(
+                "reviewed initialized data crosses retail storage %s -> %s: %s" %
+                (start_storage, end_storage, required["name"]))
         evidence = read_pe_payload_evidence(exe, rva, required["size"], required["audit"])
         if (evidence["sha256"] != required["retail_sha256"] or
                 evidence["highlow_base_relocation_count"] != required["highlow_count"]):

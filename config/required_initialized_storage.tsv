@@ -33,7 +33,6 @@ name	unit	size	retail_sha256	highlow_count	audit
 ?iBaud@@3PAHA	SOURCE/REMOTE	0x20	1a8985e186333aaffaba2ea7c70b2f7872289d67ec93cafcd4840d58af602d6a	0	bytes
 ?iIRQ@@3PAHA	SOURCE/REMOTE	0x1c	5b2351c91be975a9d8db717103fa87c13cf8987f61078393eb9ef9cc7167cab3	0	bytes
 ?coreRatio@@3PAGA	SOURCE/tradpost	0xe	cc695846771dc46930f9d7f96645a9d561b4b6727bc1159fdb7c8f65d6ca4ef9	0	bytes
-?cWSTextBuffer@@3PADA	SOURCE/Wsnetwin	0x100	5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1	0	bytes
 ?iMemEntries@@3HA	BASE/Misc	0x4	df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119	0	bytes
 ?gpMemEntry@@3PAUMemEntry@@A	BASE/Misc	0x4	df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119	0	bytes
 ?giTotalMemAllocated@@3HA	BASE/Misc	0x4	df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119	0	bytes
