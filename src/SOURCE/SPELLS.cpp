@@ -51,8 +51,10 @@ int combatManager::HasValidSpellTarget(int spell)
 // switch-break cleanup, and the no-selection scope. The 0x0c frame has
 // elementalType at -0x4, this at -0x8, and the switch temporary at -0x0c. Explicit
 // objdiff ranges align every switch instruction and the embedded tables relative
-// to the function; external relocations agree. The first residual is the entry
-// no-selection branch: retail jumps directly to the false result, while the
+// to the function; all 62 relocations/effective external targets agree. Outside
+// the +0x383..+0x3c3 switch data, raw bytes differ only at +0x45 and +0x41a:
+// the entry no-selection branch and its paired terminal target. Retail jumps
+// directly to the false result, while the
 // equal-size canonical form jumps to the final comparison. Explicit early label,
 // nested return, explicit terminal false label, selected-arm constant returns,
 // reversed comparison operands, and OR-zero comparison spellings added 1-18 bytes,
@@ -1027,7 +1029,7 @@ void combatManager::CastSpell(int spell, int targetHex, int castByCreature, int 
 }
 
 // @semantic: the 0x08 frame, body operands, CFG semantics, and all three ordered
-// relocations agree. The only normalized residual is +0x18: retail routes a
+// relocations agree. The only raw residual is the branch byte at +0x18: retail routes a
 // failed ValidHex test to the shared empty-cell return trampoline at +0x3f,
 // while VC4.2 targets the common epilogue directly. Nested empty/else, two early
 // guards, positive-arm goto, explicit common-tail goto, and scoped label variants
@@ -1623,12 +1625,15 @@ void combatManager::BloodLustEffect(army *target, int effect)
         giMaxExtentY - giMinExtentY + 1, SPELL_BLOOD_LUST_FIZZLE_STEPS, 0, 0);
 }
 
-// @match-note: The 48-instruction stream and all five relocation targets agree,
+// @semantic
+// The 48-instruction stream, body semantics/CFG, and all five ordered relocation
+// sites/effective targets agree,
 // but this is not an exact raw-byte match: retail reserves a 0x0c frame and stores
 // this at -0x0c, while ours reserves 0x04 and stores it at -0x04. The other two
-// retail words are unused compiler slots; the body has no source locals. Tried
-// direct screen access and cached screen pointers without recovering the slots.
-// Revisit for predecessor/compiler-state frame shaping.
+// retail words are unused compiler slots; the body has no source locals. Six raw
+// frame/this displacement bytes differ. Direct screen access and two cached bitmap
+// roles changed the body loads without improving the frame. Revisit only after an
+// earlier SPELLS source or relevant bitmap/window header change reshapes the frame.
 VA(0x004250db, 0x80)
 void combatManager::Ripple(int strength)
 {
@@ -2991,13 +2996,14 @@ void combatManager::DoLuck(int side, int armyIndex)
            LUCK_BOLT_FRAME_DELAY, 0);
 }
 
-// @semantic: complete 0x7c frame/CFG and all 50 ordered external relocations agree.
-// Moving frame and limits to function scope and solving semantic local suffixes
-// reproduces every retail slot. The OR-zero loop bound reproduces retail's
-// count-first `cmp`/`jge`. The only raw residual is four operand bytes at
-// +0x1ce/+0x1d1 and +0x1d7/+0x1da: retail loads currentX/currentY before the
-// commutative step, while VC4.2 loads stepX/stepY first. Compound assignment and
-// both direct addition orders emit the same residual. Revisit after TU-state changes.
+// @early-stop
+// @early-stop-reloc-only
+// All 0x33a bytes match after masking 50 relocation sites; the 0x7c frame/slots,
+// CFG, and effective targets align. 0[&deltaX_a] fixes the commutative squared-
+// distance load order, and 0[&currentX_i]/0[&currentY_d] fix both float updates.
+// The retained report residual is only compiler-local strings/constants and the
+// retail iLeftRightSave+0x10 identity for __adjust_fdiv. Revisit after relocation
+// identity normalization or a material SPELLS source/header change.
 VA(0x00428d4f, 0x33a)
 void combatManager::DoBlast(int targetHex, int spell)
 {
@@ -3037,7 +3043,8 @@ void combatManager::DoBlast(int targetHex, int spell)
     deltaX_a = targetX_a - startX_d;
     deltaY_a = targetY_a - startY_d;
     distance_d = static_cast<int>(
-        sqrt(static_cast<double>(deltaX_a * deltaX_a + deltaY_a * deltaY_a)));
+        sqrt(static_cast<double>(0[&deltaX_a] * deltaX_a +
+                                 deltaY_a * deltaY_a)));
     segmentCount_f = distance_d / frameSpacing_c;
     currentX_i = static_cast<float>(startX_d);
     currentY_d = static_cast<float>(startY_d);
@@ -3048,8 +3055,8 @@ void combatManager::DoBlast(int targetHex, int spell)
         ResetLimitCreature();
         gbComputeExtent = 1;
         gbSaveBiggestExtent = 1;
-        currentX_i += stepX_a;
-        currentY_d += stepY_e;
+        currentX_i = 0[&currentX_i] + stepX_a;
+        currentY_d = 0[&currentY_d] + stepY_e;
         frame_j = (segment_h * BLAST_FRAME_COUNT - 1) / segmentCount_f;
         blastIcon_h->CombatClipDrawToBuffer(
             static_cast<int>(currentX_i), static_cast<int>(currentY_d), frame_j,
@@ -3236,8 +3243,10 @@ int combatManager::SpaceForElementalExists(void)
 // relocation sites, CFG, and semantics agree. The real residual is stack layout:
 // retail stores the aggregate return temporary at -0x10/-0x0c and armyName at
 // -0x14; VC4.2 uses -0x14/-0x10 and -0x0c. Semantic bucket-13/bucket-15 names,
-// declaration order, nested/separate scopes, and an explicit loaded SAMPLE2 all
-// failed to improve or grew the function. Revisit after TU-state changes.
+// declaration order, nested/separate scopes, cached result assignment, and direct
+// result initialization all failed to improve or added an extra aggregate copy.
+// Seven raw stack-displacement bytes remain. Revisit after an earlier SPELLS edit
+// or relevant SAMPLE2/header change perturbs aggregate-temporary placement.
 VA(0x00429797, 0xd9)
 void combatManager::ShowSpellCastFailure(army *target, int)
 {
