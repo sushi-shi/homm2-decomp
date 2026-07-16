@@ -15,12 +15,11 @@
 #include <SOURCE/combatManager.h>
 #include <SOURCE/searchArray.h>
 #include <SOURCE/FINDPATH.h>
+#include <SOURCE/FINDPATH_TYPES.h>
 #include <SOURCE/CMBTMGR.h>
 #include <EDITOR/mapcell.h>
 #include <stdlib.h>
 #include <string.h>
-
-#define FINDPATH_SOURCE_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\FINDPATH.CPP"
 
 // ---- module-private synthetic globals (retail xref: single-module) ----
 // Retail .data raw storage ends at VA 0x00523000. These VAs are in its loader-zero
@@ -38,6 +37,25 @@ DATA(0x0052ae5c) static searchNode *gSearchQueueNode;
 DATA(0x0052ae60) static int gSearchMiddle;
 DATA(0x0052ae64) static int gSearchHigh;
 
+// ---- initialized allocation provenance (retail RVA order) ----
+// @data-layout-note Retail initialized storage is exactly two contiguous 0x30-byte
+// source-location records at 0x11733c..0x11739c. The fresh candidate has the same
+// extent and SHA-256 d657e9dc9d8c980efa0bc771232ecc88ad147ea956dbf4cfbcc79d4a302975de.
+// Its eight code relocations use the record starts and sourceFile at owner +0x4;
+// retail has the same 1/1 allocation and 3/3 destruction target counts. Candidate
+// and retail BSS are both 0xa8 and contain the same 13 DATA-proved logical owners.
+// The candidate's internal owner order differs from retail packing. Thirty-one
+// directly aligned owner references have exact RVAs/addends; all remaining BSS
+// references use zero addends, but current nonexact function shape leaves candidate
+// counts +1 for gSearchNextX/gSearchNextY and -1 for gSearchDirection. Preserve this
+// as function/link packing work; do not add aliases, padding, or placement rules.
+DATA(0x0051733c) static SFindPathSourceLocation gSearchAllocationSource = {
+    { FINDPATH_ALLOCATION_SOURCE_LINE_BASE, 0 }, FINDPATH_SOURCE_FILE
+};
+DATA(0x0051736c) static SFindPathSourceLocation gSearchDestructionSource = {
+    { FINDPATH_DESTRUCTION_SOURCE_LINE_BASE, 0 }, FINDPATH_SOURCE_FILE
+};
+
 // @early-stop: all 14 meaningful bytes are raw-identical and both sides have zero
 // relocations; retail's only residual is the trailing 8B FF two-byte alignment pad.
 VA(0x004a4a50, 0x10)
@@ -54,8 +72,8 @@ VA(0x004a4a60, 0x30)
 searchArray::~searchArray()
 {
     if (m_storage.cells != 0)
-        BaseFree(m_storage.cells, FINDPATH_SOURCE_FILE,
-                 *reinterpret_cast<short *>(")") + 1);
+        BaseFree(m_storage.cells, gSearchDestructionSource.sourceFile,
+                 gSearchDestructionSource.line.value + 1);
     m_storage.cells = 0;
 }
 
@@ -66,12 +84,12 @@ VA(0x004a4a90, 0x60)
 void searchArray::Init(void)
 {
     if (m_storage.cells != 0)
-        BaseFree(m_storage.cells, FINDPATH_SOURCE_FILE,
-                 *reinterpret_cast<short *>(")") + 1);
+        BaseFree(m_storage.cells, gSearchDestructionSource.sourceFile,
+                 gSearchDestructionSource.line.value + 1);
     m_storage.cells = 0;
     m_storage.cells = static_cast<searchCell *>(BaseAlloc(
-        MAP_WIDTH * MAP_HEIGHT * sizeof(searchCell), FINDPATH_SOURCE_FILE,
-        *reinterpret_cast<short *>(">") + 2));
+        MAP_WIDTH * MAP_HEIGHT * sizeof(searchCell), gSearchAllocationSource.sourceFile,
+        gSearchAllocationSource.line.value + 2));
 }
 
 // @early-stop: relocation-masked instructions are identical; the 3/3 external
@@ -81,8 +99,8 @@ VA(0x004a4af0, 0x30)
 void searchArray::Close(void)
 {
     if (m_storage.cells != 0)
-        BaseFree(m_storage.cells, FINDPATH_SOURCE_FILE,
-                 *reinterpret_cast<short *>(")") + 1);
+        BaseFree(m_storage.cells, gSearchDestructionSource.sourceFile,
+                 gSearchDestructionSource.line.value + 1);
     m_storage.cells = 0;
 }
 
