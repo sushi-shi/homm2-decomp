@@ -97,10 +97,6 @@ void strip::Draw(void)
                                         STRIP_WINDOW_HEIGHT);
 }
 
-// @early-stop
-// All non-relocation instruction bytes agree and all 24/24 relocation sites and
-// targets resolve identically. The raw residual is limited to local literal names
-// and retail's interior `const_000faeba` name for `gMonsterDatabase[].race`.
 VA(0x00432632, 0x3d3)
 void strip::DrawIcons(int drawWindow)
 {
@@ -121,68 +117,68 @@ void strip::DrawIcons(int drawWindow)
                                   m_y + STRIP_CONTENT_Y,
                                   STRIP_NO_ARMY_FRAME, 0);
         m_window->DrawWindow(drawWindow);
-    } else {
-        iconsCurrent_8 = 1;
-        for (slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
-            if (m_army->m_creatureTypes[slot] != ARMY_GROUP_EMPTY_SLOT &&
-                m_army->m_creatureTypes[slot] !=
-                    m_cachedCreatureTypes[slot])
-                iconsCurrent_8 = 0;
-        }
+        return;
+    }
+    iconsCurrent_8 = 1;
+    for (slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
+        if (m_army->m_creatureTypes[slot] != ARMY_GROUP_EMPTY_SLOT &&
+            m_army->m_creatureTypes[slot] !=
+                m_cachedCreatureTypes[slot])
+            iconsCurrent_8 = 0;
+    }
 
-        if (iconsCurrent_8 == 0) {
-            for (slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
-                oldIcons[slot] = m_creatureIcons[slot];
-                oldCreatureTypes[slot] = m_cachedCreatureTypes[slot];
-                if (m_army->m_creatureTypes[slot] == ARMY_GROUP_EMPTY_SLOT) {
-                    m_creatureIcons[slot] = 0;
-                    m_cachedCreatureTypes[slot] = ARMY_GROUP_EMPTY_SLOT;
-                } else {
-                    sprintf(gText, "monh%04d.icn",
-                            m_army->m_creatureTypes[slot]);
-                    m_creatureIcons[slot] = gpResourceManager->GetIcon(gText);
-                    m_cachedCreatureTypes[slot] =
-                        m_army->m_creatureTypes[slot];
-                }
-            }
-            for (slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
-                if (oldCreatureTypes[slot] != 0)
-                    gpResourceManager->Dispose(oldIcons[slot]);
-            }
-        }
-
+    if (iconsCurrent_8 == 0) {
         for (slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
-            creatureType = m_army->m_creatureTypes[slot];
-            if (creatureType != ARMY_GROUP_EMPTY_SLOT) {
-                m_stripIcon->DrawToBuffer(
-                    m_x + slot * STRIP_ARMY_X_STEP + STRIP_ARMY_FIRST_X,
-                    m_y + STRIP_CONTENT_Y,
-                    gMonsterDatabase[creatureType].race +
-                        STRIP_RACE_FRAME_OFFSET,
-                    0);
-                m_creatureIcons[slot]->DrawToBuffer(
-                    m_x + slot * STRIP_ARMY_X_STEP + STRIP_ARMY_FIRST_X,
-                    m_y + STRIP_CONTENT_Y, 0, 0);
-                sprintf(gText, "%d", m_army->m_creatureCounts[slot]);
-                smallFont->DrawBoundedString(
-                    gText,
-                    m_x + slot * STRIP_ARMY_X_STEP + STRIP_ARMY_FIRST_X,
-                    m_y + STRIP_QUANTITY_Y, STRIP_QUANTITY_WIDTH,
-                    STRIP_QUANTITY_HEIGHT, STRIP_QUANTITY_COLOR,
-                    STRIP_QUANTITY_BACKGROUND);
+            oldIcons[slot] = m_creatureIcons[slot];
+            oldCreatureTypes[slot] = m_cachedCreatureTypes[slot];
+            if (m_army->m_creatureTypes[slot] == ARMY_GROUP_EMPTY_SLOT) {
+                m_creatureIcons[slot] = 0;
+                m_cachedCreatureTypes[slot] = ARMY_GROUP_EMPTY_SLOT;
             } else {
-                m_stripIcon->DrawToBuffer(
-                    m_x + slot * STRIP_ARMY_X_STEP + STRIP_ARMY_FIRST_X,
-                    m_y + STRIP_CONTENT_Y, STRIP_EMPTY_FRAME, 0);
+                sprintf(gText, "monh%04d.icn",
+                        m_army->m_creatureTypes[slot]);
+                m_creatureIcons[slot] = gpResourceManager->GetIcon(gText);
+                m_cachedCreatureTypes[slot] =
+                    m_army->m_creatureTypes[slot];
             }
         }
-        m_window->DrawWindow(drawWindow);
-        if (m_selectedSlot != ARMY_GROUP_EMPTY_SLOT) {
-            m_stripIcon->DrawToBuffer(
-                m_x + m_selectedSlot * STRIP_ARMY_X_STEP +
-                    STRIP_ARMY_FIRST_X,
-                m_y + STRIP_CONTENT_Y, STRIP_SELECTED_FRAME, 0);
+        for (slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
+            if (oldCreatureTypes[slot] != 0)
+                gpResourceManager->Dispose(oldIcons[slot]);
         }
+    }
+
+    for (slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
+        creatureType = m_army->m_creatureTypes[slot];
+        if (creatureType != ARMY_GROUP_EMPTY_SLOT) {
+            m_stripIcon->DrawToBuffer(
+                m_x + slot * STRIP_ARMY_X_STEP + STRIP_ARMY_FIRST_X,
+                m_y + STRIP_CONTENT_Y,
+                gMonsterDatabase[creatureType].race +
+                    STRIP_RACE_FRAME_OFFSET,
+                0);
+            m_creatureIcons[slot]->DrawToBuffer(
+                m_x + slot * STRIP_ARMY_X_STEP + STRIP_ARMY_FIRST_X,
+                m_y + STRIP_CONTENT_Y, 0, 0);
+            sprintf(gText, "%d", m_army->m_creatureCounts[slot]);
+            smallFont->DrawBoundedString(
+                gText,
+                m_x + slot * STRIP_ARMY_X_STEP + STRIP_ARMY_FIRST_X,
+                m_y + STRIP_QUANTITY_Y, STRIP_QUANTITY_WIDTH,
+                STRIP_QUANTITY_HEIGHT, STRIP_QUANTITY_COLOR,
+                STRIP_QUANTITY_BACKGROUND);
+        } else {
+            m_stripIcon->DrawToBuffer(
+                m_x + slot * STRIP_ARMY_X_STEP + STRIP_ARMY_FIRST_X,
+                m_y + STRIP_CONTENT_Y, STRIP_EMPTY_FRAME, 0);
+        }
+    }
+    m_window->DrawWindow(drawWindow);
+    if (m_selectedSlot != ARMY_GROUP_EMPTY_SLOT) {
+        m_stripIcon->DrawToBuffer(
+            m_x + m_selectedSlot * STRIP_ARMY_X_STEP +
+                STRIP_ARMY_FIRST_X,
+            m_y + STRIP_CONTENT_Y, STRIP_SELECTED_FRAME, 0);
     }
 }
 
