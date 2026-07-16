@@ -28,7 +28,14 @@ VA(0x004cb630, 0x68)
 void HandleMCIError(int param_1, char *param_2)
 {
     mciGetErrorStringA(param_1, lpszReturnString, 0xff);
-    sprintf(gText, "CD MUSIC ERROR\nDescription: %s\nCall: %s", lpszReturnString, param_2);
+    sprintf(gText,
+            "CD MUSIC ERROR\n\n"
+            "Description '%s'\n\n"
+            "Command '%s'\n\n\n"
+            "Because of this problem running with CD stereo music, Heroes II has been "
+            "configured to run with MIDI music in the future.  You can always manually "
+            "change this setting in the control panel within the game.",
+            lpszReturnString, param_2);
     gConfig.mciError = 1;
     gConfig.musicSource = CONFIG_MUSIC_SOURCE_MIDI;
     WritePrefs();
@@ -511,13 +518,13 @@ void soundManager::Close(void)
         return;
     if (gbNoSound != 0)
         goto soundClosed;
-    LogStr("Shutting down CD audio");
+    LogStr("SD1");
     CDShutdown();
-    LogStr("Shutting down MIDI");
+    LogStr("SD2");
     MIDIShutdown();
-    LogStr("Shutting down AIL");
+    LogStr("SD3");
     AIL_shutdown();
-    LogStr("Sound shut down");
+    LogStr("SD4");
 soundClosed:
     m_active = 0;
     gbNoSound = 1;
@@ -974,6 +981,26 @@ int soundManager::MusicPlaying(void)
 
 // ---- vtables (compiler-emitted; census) ----
 VTBL(soundManager, 0x004eba20);
+
+// @data-layout-note Retail's initialized soundmgr contribution is
+// RVA 0x11f018..0x11f980 (0x968). Candidate section 2 is one align-eight
+// ordinary .data section of 0x965 bytes. Its public owners are exact at offsets
+// 0, 0x38, 0x68, 0x3ec, 0x3f0, and 0x3f4. Seventy compiler-local $SG owners
+// cover 0x3f8..0x965: thirteen driver-name strings, the 0x100-byte MCI error
+// format, and every later diagnostic literal. Bytes 0x38..0x964 are directly
+// identical to retail. The thirteen pointer slots at 0..0x30 relocate in order
+// to retail VAs 0x0051f410..0x0051f4a4, and the final three contribution bytes
+// are zero alignment. Those thirteen data relocations plus 57 code references
+// cover every local owner; all owner-relative addends are zero. The only rdata
+// owner is the reviewed 0xc soundManager vtable at RVA 0x0eba20; its 0x10
+// contribution includes four bytes of natural alignment.
+// Retail loader-zero storage is 0x134970..0x134bc8 (0x258), ordered as
+// gWaveFormat, lpszReturnString, nMCIError, iLastVolume, and CommandString at
+// offsets 0, 0x10, 0x110, 0x118, and 0x158. Candidate BSS has the exact size and
+// align-eight class, but emits those owners at 0x208, 0x108, 0, 0x218, and 0x8.
+// Their definitions already occur in retail order. Keep the resulting
+// inconsistent-anchor-bases residual instead of inventing aliases, aggregates,
+// padding, pragmas, or fake owners.
 
 // ---- globals (definitions, RVA order) ----
 DATA(0x0051f018) char *digitalDriverNames[14] = {
