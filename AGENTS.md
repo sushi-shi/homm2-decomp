@@ -54,9 +54,9 @@ authoritative. This file is the short, restart-ready Codex workflow.
    optional hand-authored exact-span axes. Keep searches shallow and bounded, use repeatable
    `--require-mutation` filters for the specific residual, and inspect every retained candidate;
    syntax-aware mutations are not automatically semantically valid. The family-balanced enumerator
-   prevents one axis from consuming the finite candidate budget. `scripts/permute_ast.py` is only a
-   legacy compatibility wrapper, while standalone `scripts/tu_state_noise.py` remains a bounded
-   diagnostic for a specifically suspected TU-state wall.
+   prevents one axis from consuming the finite candidate budget. The historical compatibility
+   wrapper is archived at `scripts/archive/permute_ast.py`; standalone `scripts/tu_state_noise.py`
+   remains a bounded diagnostic for a specifically suspected TU-state wall.
    If modern libclang rejects a reviewed MSVC 4.2 construct in another function, use the repeatable
    `--allow-external-diagnostic` exact-substring option. It cannot allow target-local, fatal, foreign-
    file, or unmatched diagnostics, and every allowance is recorded in the generated manifest.

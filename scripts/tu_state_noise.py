@@ -22,7 +22,7 @@ Run inside ``nix develop .#build`` after entering the worktree first::
 
 This is appropriate only after semantics, frame/slots, CFG, and external relocations
 have already been audited.  It is not a substitute for reconstruction, od_slots.py,
-or scripts/permute_ast.py.
+or scripts/match_variants.py.
 """
 
 from __future__ import annotations
