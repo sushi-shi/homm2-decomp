@@ -506,15 +506,12 @@ def promote_canonical_topology(require_all=False):
     if require_all and blockers:
         return stats, blockers
     _build_reviewed_canonical_manifests(strict=require_all)
-    contribution_manifest = contribution_manifest_bytes()
-    _atomic_write(CANONICAL_CONTRIBUTION_MANIFEST, contribution_manifest)
     return stats, blockers
 
 
 def regenerate_canonical_targets(delinker=None):
     """Regenerate canonical inputs and atomically replace targets."""
     _build_reviewed_canonical_manifests(strict=True)
-    _atomic_write(CANONICAL_CONTRIBUTION_MANIFEST, contribution_manifest_bytes())
     allocations, _stats, group_diagnostics = derive_allocations()
     _coverage, _padding, coverage_diagnostics = _build_coverage_proposal(allocations)
     if group_diagnostics or coverage_diagnostics:
