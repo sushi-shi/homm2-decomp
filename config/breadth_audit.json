@@ -894,36 +894,47 @@
     },
     {
       "unit": "SOURCE/CURSOR",
+      "function": "?DrawCursor@advManager@@QAEXXZ",
+      "source_hash": "db33fa003058",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 2,
+      "before": 96.73902,
+      "after": 100.0,
+      "note": "Using the scalar-lvalue form for m_cursorFrame fixed both repeated modulo/mask evaluation-order spans; all 61 ordered effective relocations agree."
+    },
+    {
+      "unit": "SOURCE/CURSOR",
       "function": "?MoveHero@advManager@@QAEPAVmapCell@@HHPAH00H0H@Z",
-      "source_hash": "b4ee4cda3678",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
-      "outcome": "parked",
-      "iterations": 5,
-      "before": 97.19727,
-      "after": 97.19727,
-      "note": "Complete frame slots tables and 158 relocs; five bounded families leave continuation and register-order residuals."
+      "source_hash": "1c61b9267083",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
+      "iterations": 2,
+      "before": 96.9922,
+      "after": 97.39747,
+      "note": "Scalar-lvalue escapes fixed the packed object-metadata write and step/halfSteps operand order; the first residual is now one retail inline-continuation jump, with 158 ordered effective relocations agreeing."
     },
     {
       "unit": "SOURCE/CURSOR",
       "function": "?MoveOrigin@advManager@@QAEXHH@Z",
       "source_hash": "309b85081cb9",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
-      "iterations": 1,
-      "before": 95.03704,
-      "after": 95.03704,
-      "note": "Complete frame and operands; four GetCell continuation placements remain after accessor variant regressed."
+      "iterations": 0,
+      "before": 95.049385,
+      "after": 95.049385,
+      "note": "Every non-jump opcode and operand, frame/slots, CFG, and zero relocations agree; four GetCell inline-continuation placements remain."
     },
     {
       "unit": "SOURCE/CURSOR",
       "function": "?ProcessMapChange@advManager@@QAEXUSMapChange@@@Z",
       "source_hash": "b3f781aee4b6",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
       "iterations": 0,
       "before": 99.24386,
       "after": 99.24386,
-      "note": "Complete frame and 98 relocs; two GetCell continuation placements and one trailing NOP remain."
+      "note": "Executable body, frame, slots, jump table exclusion, and 98 ordered effective relocations agree; only two GetCell continuation placements and the retail trailing NOP remain."
     },
     {
       "unit": "SOURCE/CURSOR",
@@ -951,23 +962,23 @@
       "unit": "SOURCE/CURSOR",
       "function": "?UnwindMapChangeQueue@advManager@@QAEXHH@Z",
       "source_hash": "1a249c7c08f7",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
-      "iterations": 4,
-      "before": 99.327866,
-      "after": 99.327866,
-      "note": "Complete frame CFG and 12 relocs; loop-bound compare polarity resists four bounded condition families."
+      "iterations": 0,
+      "before": 99.91803,
+      "after": 99.91803,
+      "note": "Current normalized instruction stream and 12 ordered effective relocations agree; the documented relational operand load order remains after four prior bounded spellings."
     },
     {
       "unit": "SOURCE/CURSOR",
       "function": "?ValidMove@advManager@@QAEHHH@Z",
       "source_hash": "0cd3266bcffc",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
-      "outcome": "improved",
-      "iterations": 9,
-      "before": 99.988335,
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.99417,
       "after": 99.99417,
-      "note": "OR-zero closes one commutative Y sum; one reversed cursor-origin sum remains with nine relocs aligned."
+      "note": "Current normalized instruction stream and nine ordered effective relocations agree; only the documented commutative cursor/origin Y load order remains."
     },
     {
       "unit": "SOURCE/Campaign",
@@ -2731,6 +2742,17 @@
     },
     {
       "unit": "SOURCE/REQUEST",
+      "function": "?DoKnob@fileRequester@@QAEXXZ",
+      "source_hash": "e2f7010fe137",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
+      "iterations": 2,
+      "before": 99.770836,
+      "after": 99.947914,
+      "note": "Slot-solver names and function-scope newTopIndex reproduce the retail message, FP, and mouse-local order; strict relocation-only proof now passes for 36 ordered effective targets."
+    },
+    {
+      "unit": "SOURCE/REQUEST",
       "function": "?GetFilename@fileRequester@@QAEPADXZ",
       "source_hash": "e5e142a36e61",
       "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
@@ -2750,6 +2772,61 @@
       "before": 99.64286,
       "after": 99.64286,
       "note": "All relocation-masked bytes and eight effective targets agree; CRT or compiler identities remain."
+    },
+    {
+      "unit": "SOURCE/REQUEST",
+      "function": "?InitializeFiles@fileRequester@@QAEHPAD0H@Z",
+      "source_hash": "14b8be1139fb",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 93.49657,
+      "after": 93.49657,
+      "note": "Both passes, frame/slots, CFG, and 53 ordered effective targets agree; the documented map-filter positive-arm continuation layout remains after prior polarity/nesting trials."
+    },
+    {
+      "unit": "SOURCE/REQUEST",
+      "function": "?Main@fileRequester@@UAEHAAUtag_message@@@Z",
+      "source_hash": "5d6c0cc200e7",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 95.14344,
+      "after": 95.14344,
+      "note": "Semantics and primary slots are complete; jump-table-excluded review confirms 76 external relocations, with the documented one-word FP-frame and key-up comparison residuals remaining."
+    },
+    {
+      "unit": "SOURCE/REQUEST",
+      "function": "?Open@fileRequester@@UAEHH@Z",
+      "source_hash": "f8f2197224fd",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
+      "iterations": 2,
+      "before": 99.86598,
+      "after": 99.948456,
+      "note": "Semantic bucket-9 OK state and bucket-14 file index fixed the proven slot swap; strict relocation-only proof now passes for 47 ordered effective targets."
+    },
+    {
+      "unit": "SOURCE/REQUEST",
+      "function": "?ShowThisMapGame@@YIHPAD@Z",
+      "source_hash": "85935d0998d5",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
+      "iterations": 1,
+      "before": 99.6875,
+      "after": 99.895836,
+      "note": "Moving the loop index to the retail -0x4 slot removed the long-displacement tail; strict relocation-only proof passes for all four ordered effective targets."
+    },
+    {
+      "unit": "SOURCE/REQUEST",
+      "function": "?Update@fileRequester@@QAEXH@Z",
+      "source_hash": "5310e55ca58d",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
+      "iterations": 2,
+      "before": 99.97535,
+      "after": 99.98459,
+      "note": "Retail initialization order and the unused-double bucket fixed all unmasked bytes; strict relocation-only proof now passes for 71 ordered effective targets."
     },
     {
       "unit": "SOURCE/SETUP",
