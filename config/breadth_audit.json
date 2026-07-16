@@ -695,6 +695,17 @@
       "note": "Complete frame slots CFG and three relocs; repeated equality load order resists four bounded forms."
     },
     {
+      "unit": "SOURCE/ARMY",
+      "function": "?WalkTo@army@@QAEHH@Z",
+      "source_hash": "9eaffeb39cf1",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 2,
+      "before": 96.75,
+      "after": 96.75,
+      "note": "Complete body and 19 targets; call versus moat-table evaluation order remains after two neutral spellings."
+    },
+    {
       "unit": "SOURCE/CMBTMGR",
       "function": "?CatAttack@combatManager@@QAEXH@Z",
       "source_hash": "f892133d70a3",
@@ -783,6 +794,28 @@
       "note": "Ternary return topology restores retail branch routing; function is exact."
     },
     {
+      "unit": "SOURCE/COMMAND",
+      "function": "?Main@combatManager@@UAEHAAUtag_message@@@Z",
+      "source_hash": "50c497816774",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 97.01905,
+      "after": 100.0,
+      "note": "Qualified outer current-army side index."
+    },
+    {
+      "unit": "SOURCE/COMMAND",
+      "function": "?SetCombatGrid@combatManager@@QAEXHHH@Z",
+      "source_hash": "9245e1f2048a",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 90.927536,
+      "after": 100.0,
+      "note": "Qualified outer current-army side index at grid setup."
+    },
+    {
       "unit": "SOURCE/CURSOR",
       "function": "?MoveHero@advManager@@QAEPAVmapCell@@HHPAH00H0H@Z",
       "source_hash": "b4ee4cda3678",
@@ -819,23 +852,23 @@
       "unit": "SOURCE/CURSOR",
       "function": "?StartCursor@advManager@@QAEXH@Z",
       "source_hash": "427ee9282cc3",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
-      "iterations": 5,
+      "iterations": 0,
       "before": 99.97561,
       "after": 99.97561,
-      "note": "Exact frame CFG and six relocs; reversed commutative cursor-origin Y loads resist five bounded forms."
+      "note": "Existing complete TU-state commutative operand-order checkpoint; prior marker exhausts direct and subscript forms."
     },
     {
       "unit": "SOURCE/CURSOR",
       "function": "?StopCursor@advManager@@QAEXH@Z",
       "source_hash": "f93176136a31",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
-      "iterations": 9,
+      "iterations": 0,
       "before": 99.970146,
       "after": 99.970146,
-      "note": "Exact frame CFG and five relocs; reversed commutative origin-cursor X loads resist nine bounded forms."
+      "note": "Existing complete TU-state commutative operand-order checkpoint; prior marker exhausts direct and subscript forms."
     },
     {
       "unit": "SOURCE/CURSOR",
@@ -884,13 +917,13 @@
     {
       "unit": "SOURCE/Campaign",
       "function": "?HandleCampaignWin@game@@QAEHXZ",
-      "source_hash": "838bc6e45bca",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "source_hash": "70f5588e63fa",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "exact",
-      "iterations": 2,
-      "before": 99.98553,
+      "iterations": 3,
+      "before": 99.845215,
       "after": 100.0,
-      "note": "Corrected Roland ending movie 19 to retail 18 and recovered loop slots; exact before codegen-neutral award enum rename."
+      "note": "Corrected serialized award values and qualified map index to close final SIB residual."
     },
     {
       "unit": "SOURCE/Campaign",
@@ -993,14 +1026,25 @@
     },
     {
       "unit": "SOURCE/DRAWING",
-      "function": "?UpdateGrid@combatManager@@QAEHHH@Z",
-      "source_hash": "3b0f84908889",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "function": "?ResetLimitCreature@combatManager@@QAEXXZ",
+      "source_hash": "c4bd44e6ef70",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "exact",
       "iterations": 1,
-      "before": 99.98969,
+      "before": 93.49296,
       "after": 100.0,
-      "note": "Corrected logical hex coordinates to pixel grid origins; 1531 raw bytes and 15 relocations agree."
+      "note": "Qualified inner army-slot index in both assignments."
+    },
+    {
+      "unit": "SOURCE/DRAWING",
+      "function": "?UpdateGrid@combatManager@@QAEHHH@Z",
+      "source_hash": "32f726c8cea0",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 3,
+      "before": 98.37629,
+      "after": 99.98969,
+      "note": "Outer army-side qualification fixes address lowering; two grid-state commutative load spans remain."
     },
     {
       "unit": "SOURCE/DRAWING",
@@ -1215,12 +1259,12 @@
       "unit": "SOURCE/EVENTS",
       "function": "?RiddleStringsEqual@@YIHPAD0@Z",
       "source_hash": "b14797525557",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
       "iterations": 0,
       "before": 99.916664,
       "after": 99.916664,
-      "note": "All 184 bytes match after masking four relocations; only equivalent CRT alias spelling remains."
+      "note": "Relocation-masked bytes exact; final CRT alias differs while effective targets agree."
     },
     {
       "unit": "SOURCE/EVENTS",
@@ -1763,6 +1807,17 @@
     },
     {
       "unit": "SOURCE/HERO",
+      "function": "?HeroScreenUpdate@hero@@QAEXXZ",
+      "source_hash": "53aee49d98a7",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 97.27273,
+      "after": 100.0,
+      "note": "Qualified global hero-screen source index to reproduce retail equality load order."
+    },
+    {
+      "unit": "SOURCE/HERO",
       "function": "?UpdateHeroScreenStatusBar@@YIXAAUtag_message@@@Z",
       "source_hash": "34daeaffc9cb",
       "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
@@ -1776,12 +1831,12 @@
       "unit": "SOURCE/HISCORE",
       "function": "?Update@highScoreManager@@QAEXXZ",
       "source_hash": "5e862e03cbff",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
       "iterations": 0,
       "before": 99.96314,
       "after": 99.96314,
-      "note": "All relocation-masked bytes and 73 effective targets align; only CRT COFF symbol spellings remain."
+      "note": "Relocation-masked bytes exact; only CRT COFF symbol spellings differ."
     },
     {
       "unit": "SOURCE/KB",
@@ -1809,12 +1864,34 @@
       "unit": "SOURCE/KB",
       "function": "?CheckEndGame@@YIXHH@Z",
       "source_hash": "0e9a7c50f042",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
-      "iterations": 5,
+      "iterations": 1,
       "before": 99.52409,
-      "after": 99.52409,
-      "note": "Complete body and 300 relocation targets; three commutative evaluation-order residual groups resisted five direct variants."
+      "after": 99.76171,
+      "note": "Complete semantics and 300 relocations; one campaign table address-order residual remains; qualified type regressed."
+    },
+    {
+      "unit": "SOURCE/KB",
+      "function": "?DropDownToOnePlayer@@YIXXZ",
+      "source_hash": "e14732932bbe",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 2,
+      "before": 95.38461,
+      "after": 95.38461,
+      "note": "Complete body; local/global equality load order remains after operand swap and local qualification."
+    },
+    {
+      "unit": "SOURCE/KB",
+      "function": "?EventWindowHandler@@YIHAAUtag_message@@@Z",
+      "source_hash": "093a3455f4c3",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 0,
+      "before": 99.52381,
+      "after": 100.0,
+      "note": "Became live exact after shared-header rebuild; 63 ordered relocations retained."
     },
     {
       "unit": "SOURCE/KB",
@@ -1883,6 +1960,17 @@
       "note": "Symmetric subscript spelling restores retail source-palette channel load order; all 597 bytes and 21 relocation sites align."
     },
     {
+      "unit": "SOURCE/KB",
+      "function": "?UpdateAppSpecificMenus@@YIXPAX@Z",
+      "source_hash": "f40021f3ef8a",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 2,
+      "before": 92.94118,
+      "after": 92.94118,
+      "note": "Complete body; menu/local equality load order remains after operand swap and local qualification."
+    },
+    {
       "unit": "SOURCE/Newgame",
       "function": "?GetLossConditionText@game@@QAEXPAD@Z",
       "source_hash": "5bd97b05a3f8",
@@ -1897,12 +1985,12 @@
       "unit": "SOURCE/Newgame",
       "function": "?GetMap@game@@QAEXXZ",
       "source_hash": "fa2312998aaf",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
       "iterations": 0,
       "before": 99.96212,
       "after": 99.96212,
-      "note": "All non-relocation bytes and 37 effective targets match; residuals are compiler-local string and CRT spellings."
+      "note": "Relocation-masked bytes exact; effective targets agree and only local string or CRT aliases differ."
     },
     {
       "unit": "SOURCE/Newgame",
@@ -1936,6 +2024,28 @@
       "before": 99.899704,
       "after": 100.0,
       "note": "Semantic local suffixes restore the retail slots; function is exact."
+    },
+    {
+      "unit": "SOURCE/Overview",
+      "function": "?SetupNewOverviewType@game@@QAEXHH@Z",
+      "source_hash": "0a9b0ffab331",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 96.78392,
+      "after": 100.0,
+      "note": "Qualified title index in both local two-dimensional title tables."
+    },
+    {
+      "unit": "SOURCE/PATH",
+      "function": "?GetAdjacentCellIndexNoArmy@@YIHHH@Z",
+      "source_hash": "c55ef86c7330",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 91.09677,
+      "after": 100.0,
+      "note": "Qualified direction operand in inverted adjacency subscript."
     },
     {
       "unit": "SOURCE/PHILAI",
@@ -2444,6 +2554,28 @@
       "note": "two castle-coordinate equalities load byte and word operands in reverse order; 11 external relocs align"
     },
     {
+      "unit": "SOURCE/REQUEST",
+      "function": "?GetFilename@fileRequester@@QAEPADXZ",
+      "source_hash": "e5e142a36e61",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 3,
+      "before": 99.34737,
+      "after": 99.34737,
+      "note": "Complete CFG; positive-arm rewrite regressed and two equivalent guard spellings retained the branch-polarity residual."
+    },
+    {
+      "unit": "SOURCE/REQUEST",
+      "function": "?GetMapHeader@@YIHPADPAUSMapHeader@@@Z",
+      "source_hash": "4d73be2ecfc4",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.64286,
+      "after": 99.64286,
+      "note": "All relocation-masked bytes and eight effective targets agree; CRT or compiler identities remain."
+    },
+    {
       "unit": "SOURCE/SMACKMGR",
       "function": "?PlaySmacker@@YIHH@Z",
       "source_hash": "625c16a40190",
@@ -2466,6 +2598,17 @@
       "note": "Corrected the primary-start/fade condition and frame-zero comparisons; all bytes and 334 relocations align."
     },
     {
+      "unit": "SOURCE/SPELLAI",
+      "function": "?DoSpellAI@combatManager@@QAEHHH@Z",
+      "source_hash": "36ba1f407be9",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 2,
+      "before": 99.6,
+      "after": 99.6,
+      "note": "Complete body; best-effect comparison load order remains after both lvalue qualifications."
+    },
+    {
       "unit": "SOURCE/SPELLS",
       "function": "?DefaultSpell@combatManager@@QAEXH@Z",
       "source_hash": "4472d99338cd",
@@ -2486,6 +2629,17 @@
       "before": 99.92071,
       "after": 99.95595,
       "note": "Symmetric subscript steering restores three commutative load orders; all masked bytes and 50 effective targets align."
+    },
+    {
+      "unit": "SOURCE/SPELLS",
+      "function": "?GetNextChainLightningTarget@combatManager@@QAEHPAVarmy@@H@Z",
+      "source_hash": "165c734b4183",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 2,
+      "before": 94.42478,
+      "after": 99.9646,
+      "note": "Qualified distance fixes final minimum branch; delta-square commutative load order remains after one neutral attempt."
     },
     {
       "unit": "SOURCE/SPELLS",
@@ -2577,6 +2731,28 @@
     },
     {
       "unit": "SOURCE/TOWNMGR",
+      "function": "??0townObject@@QAE@HHPAD@Z",
+      "source_hash": "0dbe6f8bb21e",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 90.64815,
+      "after": 90.64815,
+      "note": "Complete constructor; proven repeated two-dimensional address register-order residual remains."
+    },
+    {
+      "unit": "SOURCE/TOWNMGR",
+      "function": "?BuyBuild@townManager@@QAEHHHH@Z",
+      "source_hash": "efd807303015",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.99875,
+      "after": 98.98127,
+      "note": "Existing complete evaluation-order checkpoint retained after shared-header epoch rebuild."
+    },
+    {
+      "unit": "SOURCE/TOWNMGR",
       "function": "?RecruitHero@townManager@@QAEHHH@Z",
       "source_hash": "64009b00fbd3",
       "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
@@ -2631,15 +2807,48 @@
       "note": "Deterministic local-name reconstruction restores the complete retail stack-slot layout; function is exact."
     },
     {
+      "unit": "SOURCE/TOWNMGR",
+      "function": "?SortStats@@YIXQAJQAC@Z",
+      "source_hash": "33384cbe43c1",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.088234,
+      "after": 100.0,
+      "note": "Qualified second-player index to recover retail comparison evaluation."
+    },
+    {
+      "unit": "SOURCE/Viewwrld",
+      "function": "?VWInit@advManager@@QAEXHH@Z",
+      "source_hash": "cea936b37533",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 0,
+      "before": 99.37008,
+      "after": 100.0,
+      "note": "Became live exact after shared-header rebuild."
+    },
+    {
+      "unit": "SOURCE/X_CAMPGN",
+      "function": "?Days@ExpCampaign@@QAEFXZ",
+      "source_hash": "58577a62fb8d",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 2,
+      "before": 65.65714,
+      "after": 100.0,
+      "note": "Qualified week field after one neutral term reorder to recover retail calendar evaluation."
+    },
+    {
       "unit": "SOURCE/X_CAMPGN",
       "function": "?IvanName@ExpCampaign@@QAEPADXZ",
       "source_hash": "85c73ad17922",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
       "iterations": 0,
       "before": 99.7619,
       "after": 99.7619,
-      "note": "All masked bytes and two effective targets align; only an interior public-data alias identity remains."
+      "note": "Relocation-masked bytes exact; interior stable-text alias resolves to the same target."
     },
     {
       "unit": "SOURCE/X_CAMPGN",
@@ -2717,6 +2926,28 @@
       "before": 99.98508,
       "after": 100.0,
       "note": "Corrected 104-byte frame buffer to request the retail 100-byte payload; all code and 27 relocations agree."
+    },
+    {
+      "unit": "SOURCE/tradpost",
+      "function": "?ComputeTradeRatios@@YIXHHPAH00@Z",
+      "source_hash": "a43d41e7b384",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.861115,
+      "after": 99.861115,
+      "note": "Relocation-masked code proof retained; only compiler symbol identities differ."
+    },
+    {
+      "unit": "SOURCE/x_arena",
+      "function": "?UpdateArenaIcons@@YIXXZ",
+      "source_hash": "3d0d15d9350a",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 2,
+      "before": 98.70968,
+      "after": 98.70968,
+      "note": "Complete body; global/local equality encoding remains after operand swap and global qualification."
     }
   ]
 }
