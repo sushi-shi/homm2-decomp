@@ -64,8 +64,7 @@
 // SWinSetup -> _types.h; SNetPlayerInfo -> REMOTE_TYPES.h;
 // SPlayerExit -> KB.h.
 
-#define KBFILE ((char *)"I:\\Projects\\Heroes\\Prog\\SOURCE\\KB.CPP")
-#define KBLINE (*(short *)"\xBE\x0C")
+#define KBFILE const_cast<char *>("I:\\Projects\\Heroes\\Prog\\SOURCE\\KB.CPP")
 #define GLOBAL_POLL_SOUND_TIMER_SLOT 5
 #define GLOBAL_MOUSE_TIMER_SLOT 6
 #define GLOBAL_COLOR_CYCLE_TIMER_SLOT 7
@@ -678,7 +677,7 @@ initialize_game:
         bShowIt = 1;
         gpMouseManager->SetPointer("advmice.mse", 0, OLD_MAIN_POINTER_TYPE);
         sprintf(reinterpret_cast<char *>(&gcWinText),
-                "My heroes, our foes have been scattered, their castles broken and laid bare.  The great campaign is now complete, and I stand before you as the undisputed High King!",
+                "My heroes, our foes have been scattered, their castles broken and laid bare.  The great campaign is now complete, and I stand before you as the undisputed High King!\n\nOur victory was achieved in %d days!",
                 giCurTurn);
 
         if (giEndSequence != 1) {
@@ -2428,16 +2427,24 @@ void game::ShowLuckInfo(hero *h, int dialogType)
 VA(0x0049cc9e, 0xd7)
 void ClearMapExtra(void)
 {
+    DATA(0x005164bc) static short clearMapExtraSourceLineBase =
+        KB_SOURCE_LINE_CLEAR_MAP_EXTRA_BASE;
     int i;
     for (i = 0; i < iMaxMapExtra; i++) {
         if (ppMapExtra[i])
-            BaseFree(ppMapExtra[i], KBFILE, KBLINE + 6);
+            BaseFree(ppMapExtra[i], KBFILE,
+                     clearMapExtraSourceLineBase +
+                         KB_SOURCE_LINE_CLEAR_MAP_EXTRA_ITEM_FREE_OFFSET);
     }
     if (ppMapExtra)
-        BaseFree(ppMapExtra, KBFILE, KBLINE + 9);
+        BaseFree(ppMapExtra, KBFILE,
+                 clearMapExtraSourceLineBase +
+                     KB_SOURCE_LINE_CLEAR_MAP_EXTRA_POINTER_FREE_OFFSET);
     ppMapExtra = 0;
     if (pwSizeOfMapExtra)
-        BaseFree(pwSizeOfMapExtra, KBFILE, KBLINE + 0xd);
+        BaseFree(pwSizeOfMapExtra, KBFILE,
+                 clearMapExtraSourceLineBase +
+                     KB_SOURCE_LINE_CLEAR_MAP_EXTRA_SIZE_FREE_OFFSET);
     pwSizeOfMapExtra = 0;
     iMaxMapExtra = 0;
 }
@@ -2888,6 +2895,8 @@ void AddNetBoxLine(char *str, char color)
 VA(0x0049e0f2, 0x214)
 void ShutDown(char *msg)
 {
+    DATA(0x005165e0) static short shutdownSourceLineBase =
+        KB_SOURCE_LINE_SHUTDOWN_BASE;
     char buf[768];
     if (bInShutDown)
         return;
@@ -2929,7 +2938,8 @@ void ShutDown(char *msg)
         gEventHandle = 0;
     }
     if (mapExtra)
-        BaseFree(mapExtra, KBFILE, (*(short *)"\x5f\x0e") + 0x47);
+        BaseFree(mapExtra, KBFILE,
+                 shutdownSourceLineBase + KB_SOURCE_LINE_SHUTDOWN_MAP_FREE_OFFSET);
     mapExtra = 0;
     CloseAIMapVars();
     DeleteMainClasses();
@@ -2965,6 +2975,8 @@ void FileError(char *filename)
 VA(0x0049e3a8, 0x255)
 void SmackFade(unsigned char *src, unsigned char *dst)
 {
+    DATA(0x00516668) static short smackFadeSourceLineBase =
+        KB_SOURCE_LINE_SMACK_FADE_BASE;
     // /Od frame slots (od_oracle-verified): a=newPal(-8) b=avg2(-c) c=x(-10)
     // d=minDist(-14) e=avg1(-18) f=map(-1c) g=y(-20) h=outer(-24) i=inner(-28)
     // j=screen(-2c) k=best(-30) p=dist(-4)
@@ -2981,8 +2993,12 @@ void SmackFade(unsigned char *src, unsigned char *dst)
     a = 0;
     f = 0;
     k = -1;
-    a = (unsigned char *)BaseAlloc(0x300, KBFILE, (*(short *)"\x61\x0f") + 0xd);
-    f = (unsigned char *)BaseAlloc(0x100, KBFILE, (*(short *)"\x61\x0f") + 0xe);
+    a = static_cast<unsigned char *>(BaseAlloc(
+        0x300, KBFILE,
+        smackFadeSourceLineBase + KB_SOURCE_LINE_SMACK_FADE_PALETTE_ALLOC_OFFSET));
+    f = static_cast<unsigned char *>(BaseAlloc(
+        0x100, KBFILE,
+        smackFadeSourceLineBase + KB_SOURCE_LINE_SMACK_FADE_MAP_ALLOC_OFFSET));
     memset(a, 0, 0x300);
     memset(f, 0, 0x100);
     for (h = 0xa; h < 0xf6; h++) {
@@ -3008,9 +3024,11 @@ void SmackFade(unsigned char *src, unsigned char *dst)
         }
     }
     gpWindowManager->UpdateScreen();
-    UpdatePalette((signed char *)dst);   // real sig is signed char* (?UpdatePalette@@YIXPAC@Z)
-    BaseFree(a, KBFILE, (*(short *)"\x61\x0f") + 0x31);
-    BaseFree(f, KBFILE, (*(short *)"\x61\x0f") + 0x32);
+    UpdatePalette(reinterpret_cast<signed char *>(dst));
+    BaseFree(a, KBFILE,
+             smackFadeSourceLineBase + KB_SOURCE_LINE_SMACK_FADE_PALETTE_FREE_OFFSET);
+    BaseFree(f, KBFILE,
+             smackFadeSourceLineBase + KB_SOURCE_LINE_SMACK_FADE_MAP_FREE_OFFSET);
 }
 
 // @early-stop
@@ -3020,6 +3038,8 @@ void SmackFade(unsigned char *src, unsigned char *dst)
 VA(0x0049e5fd, 0x303)
 void ShowCongrats(int highScoreType)
 {
+    DATA(0x0051670c) static short congratsSourceLineBase =
+        KB_SOURCE_LINE_CONGRATS_BASE;
     unsigned char savedPalette[CONGRATS_PALETTE_BUFFER_SIZE];
     int baseScore;
     int score;
@@ -3030,7 +3050,7 @@ void ShowCongrats(int highScoreType)
     gpWindowManager->m_updateFlags = 0;
     congratsText = static_cast<char *>(BaseAlloc(
         CONGRATS_TEXT_SIZE, KBFILE,
-        *reinterpret_cast<const short *>("\x97\x0f") + 9));
+        congratsSourceLineBase + KB_SOURCE_LINE_CONGRATS_ALLOC_OFFSET));
     baseScore = CalcBaseScore(giCurTurn);
     score = gpGame->m_difficultyRating * baseScore / CONGRATS_DIFFICULTY_SCALE;
     gpSoundManager->PlayAmbientMusic(CONGRATS_MUSIC_SILENT, 0, CONGRATS_MUSIC_SILENT);
@@ -3070,7 +3090,7 @@ void ShowCongrats(int highScoreType)
     AddScoreToHighScore(score, giCurTurn, gpGame->m_difficultyRating,
                         CONGRATS_STANDARD, gpGame->m_mapHeader.name);
     BaseFree(congratsText, KBFILE,
-             *reinterpret_cast<const short *>("\x97\x0f") + 0x4e);
+             congratsSourceLineBase + KB_SOURCE_LINE_CONGRATS_FREE_OFFSET);
     congratsText = 0;
     gpWindowManager->m_updateFlags = 1;
     memcpy(gpBufferPalette->m_data, gPalette->m_data, CONGRATS_PALETTE_SIZE);
@@ -4027,6 +4047,8 @@ void NormalDialog(char *text, int dialogType, int windowX, int windowY,
                   int secondResourceType, int secondResourceValue,
                   int showOrText, int timeout)
 {
+    DATA(0x00516d20) static short normalDialogSourceLineBase =
+        KB_SOURCE_LINE_NORMAL_DIALOG_BASE;
     short panelHeight_p;
     short labelY_o;
     widget *borderWidget_o;
@@ -4229,7 +4251,9 @@ void NormalDialog(char *text, int dialogType, int windowX, int windowY,
             break;
 
         resourceText_e[resourceSlot_n] = static_cast<char *>(BaseAlloc(
-            NORMAL_DIALOG_TEXT_LENGTH, KBFILE, NORMAL_DIALOG_FIRST_TEXT_LINE));
+            NORMAL_DIALOG_TEXT_LENGTH, KBFILE,
+            normalDialogSourceLineBase +
+                KB_SOURCE_LINE_NORMAL_DIALOG_FIRST_TEXT_ALLOC_OFFSET));
         if (resourceType_l[resourceSlot_n] >= NORMAL_DIALOG_RESOURCE_FIRST &&
             resourceType_l[resourceSlot_n] <= NORMAL_DIALOG_RESOURCE_LAST) {
             if (resourceValue_l[resourceSlot_n] < 1) {
@@ -4475,7 +4499,8 @@ void NormalDialog(char *text, int dialogType, int windowX, int windowY,
 
             resourceText_e[resourceSlot_n] = static_cast<char *>(BaseAlloc(
                 NORMAL_DIALOG_TEXT_LENGTH, KBFILE,
-                NORMAL_DIALOG_SECONDARY_TEXT_LINE));
+                normalDialogSourceLineBase +
+                    KB_SOURCE_LINE_NORMAL_DIALOG_SECONDARY_TEXT_ALLOC_OFFSET));
             labelY_o = static_cast<short>(iconHeight_d) +
                      static_cast<short>(resourceY_l) - 24;
             sprintf(resourceText_e[resourceSlot_n], "%s",
@@ -4500,7 +4525,9 @@ void NormalDialog(char *text, int dialogType, int windowX, int windowY,
         if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_PRIMARY_SKILL &&
             showPrimaryBonus_e) {
             char *bonusText = static_cast<char *>(BaseAlloc(
-                5, KBFILE, NORMAL_DIALOG_PRIMARY_BONUS_LINE));
+                5, KBFILE,
+                normalDialogSourceLineBase +
+                    KB_SOURCE_LINE_NORMAL_DIALOG_PRIMARY_BONUS_ALLOC_OFFSET));
             strcpy(bonusText, "+1 ");
             textPanel_h = new textWidget(
                 resourceCenterX_a - 50, iconHeight_d + resourceY_l - 22, 100, 16,
@@ -4527,7 +4554,9 @@ void NormalDialog(char *text, int dialogType, int windowX, int windowY,
 
     if (showOrText == NORMAL_DIALOG_SHOW_OR_TEXT) {
         orText_f = static_cast<char *>(BaseAlloc(
-            3, KBFILE, NORMAL_DIALOG_OR_TEXT_LINE));
+            3, KBFILE,
+            normalDialogSourceLineBase +
+                KB_SOURCE_LINE_NORMAL_DIALOG_OR_TEXT_ALLOC_OFFSET));
         strcpy(orText_f, "or");
         textPanel_h = new textWidget(
             windowWidth_a / 2 - 10, resourceY_l + 43, 40, 12,
@@ -8704,18 +8733,22 @@ DATA(0x00500168) void *gLowPage = 0;
 DATA(0x0050016c) int gbLowPageGrabbed = 0;
 DATA(0x00500170) signed char xSmackFromNetwork = 0;
 DATA(0x00500174) int gbInPollSound = 0;
-// @data-layout-note Retail attributes one initialized KB contribution at
-// 0xf8c58..0x116f60 (0x1e308); candidate .data is 0x1e2f5. All 299 public
-// definitions from giGroundToTerrain through gbInPollSound translate from the
-// exact 0xf8c58 base. The later public runs require bases 0x10e288, 0x10e4d0,
-// 0x10e768, 0x10ea14, 0x10f074, 0x10f2a4, and 0x10f7ac because retail alternates
-// literals and globals, while VC4.2 emits file-scope initialized globals ahead
-// of its literal pool. Source interleaving and the default, /Z7, /Gy, and /Gf
-// forms retain that ordering. InitVars's four unpooled empty literals are now
-// independently relocation-proven at 0x116468, 0x11646c, 0x116470, and
-// 0x116474. KB has no candidate or NB09 .rdata contribution. Revisit only with
-// evidence for a natural original multi-section/source form; do not use padding,
-// synthetic globals, or section pragmas to force the seven late bases.
+// @data-layout-note Retail's initialized KB contribution is
+// 0xf8c58..0x116f60 (0x1e308); candidate .data is 0x1e309. All 2,719 initialized
+// candidate definitions close: 315 typed source DATA owners plus 2,404 reviewed
+// compiler-private allocations. Every logical non-relocation byte agrees, and
+// all 2,196 candidate DIR32 sites agree with retail in offset, target identity,
+// addend, HIGHLOW presence, and value. The 36 uncovered ranges (132 bytes) are
+// all retail zero fill; this includes the gArtifactNames-4 prebias target at
+// 0xfe2ac, which is an alignment gap rather than an allocation. The residual 33
+// private owners use 31 relocation/payload-proved remaining slots and one
+// explicit two-member equivalence class for NormalDialog's identical "%d"
+// literals. Five former string-backed short views are now typed owners at
+// 0x1164bc, 0x1165e0, 0x116668, 0x11670c, and 0x116d20. Candidate/retail raw
+// SHA-256 values are fa172a30c9d76e7541ceae2c4aac45b190bd4aacef277452cef3fed57e9a487c
+// and 75bba73ed144117efade24fa386a3dfb14f2717d48ef2246817e900e687499b7.
+// KB has no candidate or NB09 .rdata contribution. Do not invent padding,
+// aliases, synthetic owners, or section pragmas for the physical stream delta.
 DATA(0x005157a8) int iCDRomErr = 0;
 DATA(0x005157ac) int bEarlySetupDone = 0;
 DATA(0x005159f8) int bKBDone = 0;

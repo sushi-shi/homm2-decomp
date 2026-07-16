@@ -81,6 +81,47 @@ class CandidateDataManifestTest(unittest.TestCase):
                 "A", "rdata", definitions, coff, allocations,
                 [(0x100, 0x104)], lambda _rva, _size: b"AAAA")
 
+    def test_constrained_group_validates_initialized_relocations(self):
+        definitions = [
+            {"name": "pointer", "section": 1, "section_offset": 0},
+            {"name": "target", "section": 1, "section_offset": 4},
+        ]
+        coff = SimpleNamespace(
+            data=b"\0\0\0\0DATA",
+            sections=[SimpleNamespace(raw_offset=0)],
+            relocations={(1, 0): SimpleNamespace(typ=0x0006, symbol_index=1)},
+            symbols={1: SimpleNamespace(name="target")},
+        )
+        allocations = [
+            CandidateAllocation(
+                "A", "A.c", "pointer", "data", 0, 4, 4, 0x100, 1,
+                "local", "candidate-coff-remaining-slot-bijection"),
+            CandidateAllocation(
+                "A", "A.c", "target", "data", 4, 4, 4, 0x104, 1,
+                "local", "source-DATA:test:1"),
+        ]
+        retail = b"\x04\x01\x40\x00DATA"
+        _validate_constrained_reviewed_group(
+            "A", "data", definitions, coff, allocations, [(0x100, 0x108)],
+            lambda rva, size: retail[rva - 0x100:rva - 0x100 + size],
+            0x400000, {0x100},
+            lambda rva: int.from_bytes(
+                retail[rva - 0x100:rva - 0x100 + 4], "little"),
+            {},
+        )
+        wrong_target = b"\x08\x01\x40\x00DATA"
+        with self.assertRaisesRegex(ValueError, "relocation target differs"):
+            _validate_constrained_reviewed_group(
+                "A", "data", definitions, coff, allocations,
+                [(0x100, 0x108)],
+                lambda rva, size: wrong_target[
+                    rva - 0x100:rva - 0x100 + size],
+                0x400000, {0x100},
+                lambda rva: int.from_bytes(
+                    wrong_target[rva - 0x100:rva - 0x100 + 4], "little"),
+                {},
+            )
+
     def test_virtual_section_reader_zero_fills_beyond_raw_payload(self):
         data = b"xxxxABCD"
         sections = [(0x100, 8, 4, 4)]
