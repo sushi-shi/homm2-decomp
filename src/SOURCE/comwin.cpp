@@ -19,6 +19,16 @@ DATA(0x004f84d8) static short s_comSendSourceLineBase = 247;
 DATA(0x004f8540) static short s_comWriteSourceLineBase = 310;
 DATA(0x005284b8) static ComPortState s_comPorts[COM_PORT_COUNT];
 
+// @data-layout-note Retail initialized storage is 0xf81ac..0xf858a. The
+// candidate section contains the same 0x3de bytes across three aligned DATA
+// line-base slots and 33 private literals; the compiler places the line bases
+// first in the candidate section but interleaves them with retail literals.
+// Comparing every owner after translation covers the entire section and gives
+// the identical SHA-256
+// e8b9ae94105e402d824e047a766565d6dee5a9a9598e638799051ceb973fdbcd.
+// The single 0xc0-byte s_comPorts loader-zero allocation is exact. Do not add
+// aliases or padding owners to reproduce the compiler's allocation order.
+
 VA(0x0048a640, 0x74)
 void add_node(struct tag_Anchor *anchor, struct tag_Node *node)
 {
@@ -214,7 +224,7 @@ short int com_init(unsigned char portNumber, int baudRate, int useDtr)
     result = SetupComm(s_comPorts[portIndex].handle,
                        COM_RECEIVE_BUFFER_SIZE, COM_TRANSMIT_BUFFER_SIZE);
     if (result == 0)
-        ShutdownComError("Initialize communications parameters");
+        ShutdownComError("Initialize communications paramaters");
     result = SetCommState(s_comPorts[portIndex].handle, &state);
     if (result == 0)
         ShutdownComError("Configure communications device");
