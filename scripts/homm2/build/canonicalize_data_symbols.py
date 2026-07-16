@@ -2,8 +2,10 @@
 
 The transform is deliberately local to one object.  It does not consult a
 manifest, a paired object, source text, or retail addresses.  Symbol indices do
-not change, so relocations and auxiliary symbol-index references keep pointing
-at the same definitions while objdiff sees stable, content-derived names.
+not change. Compiler-private data receives stable, content-derived names. In
+embedded .text jump tables, same-function DIR32 references to volatile local
+labels are rewritten to the containing external function plus an equivalent
+owner-relative addend; all resolved section offsets are proved unchanged.
 """
 
 from __future__ import annotations
@@ -42,6 +44,9 @@ RELOCATION_WIDTHS = {
     0x000B: 4,  # IMAGE_REL_I386_SECREL
     0x0014: 4,  # IMAGE_REL_I386_REL32
 }
+DIR32 = 0x0006
+FUNCTION_TYPE = 0x0020
+EXTERNAL_STORAGE = 2
 
 
 @dataclass(frozen=True)
@@ -74,6 +79,19 @@ class Relocation:
     site: int
     symbol_index: int
     typ: int
+    offset: int = 0
+
+
+@dataclass(frozen=True)
+class JumpTableRewrite:
+    relocation_offset: int
+    section: int
+    site: int
+    original_symbol_index: int
+    owner_symbol_index: int
+    original_addend: int
+    owner_addend: int
+    resolved_offset: int
 
 
 @dataclass(frozen=True)
@@ -218,7 +236,8 @@ class CoffObject:
                     raise ValueError("COFF relocation site is outside its section")
                 if symbol_index not in self.symbols:
                     raise ValueError("COFF relocation targets an auxiliary/missing symbol")
-                rows.append(Relocation(section.index, site, symbol_index, typ))
+                rows.append(Relocation(
+                    section.index, site, symbol_index, typ, offset))
         return tuple(rows)
 
     def section_bytes(self, section: Section) -> bytes:
@@ -337,6 +356,75 @@ def _digest(record: bytes, seen: dict[str, bytes]) -> str:
     return value
 
 
+def _function_ranges(coff: CoffObject) -> dict[int, tuple[tuple[int, int, Symbol], ...]]:
+    """Return unambiguous external-function ownership ranges per text section."""
+    by_section: dict[int, dict[int, list[Symbol]]] = defaultdict(
+        lambda: defaultdict(list))
+    for symbol in coff.symbols.values():
+        if (symbol.section > 0 and symbol.typ == FUNCTION_TYPE and
+                symbol.storage_class == EXTERNAL_STORAGE and
+                coff.sections[symbol.section - 1].characteristics & MEM_EXECUTE):
+            by_section[symbol.section][symbol.value].append(symbol)
+    result = {}
+    for section_index, by_start in by_section.items():
+        starts = sorted(by_start)
+        ranges = []
+        for index, start in enumerate(starts):
+            if len(by_start[start]) != 1:
+                continue
+            end = starts[index + 1] if index + 1 < len(starts) else (
+                coff.sections[section_index - 1].raw_size)
+            ranges.append((start, end, by_start[start][0]))
+        result[section_index] = tuple(ranges)
+    return result
+
+
+def _function_owner(ranges, section: int, offset: int) -> Symbol | None:
+    for start, end, symbol in ranges.get(section, ()):
+        if start <= offset < end:
+            return symbol
+    return None
+
+
+def _rewrite_jump_table_relocations(
+        original: CoffObject, payload: bytes) -> tuple[bytes, tuple[JumpTableRewrite, ...]]:
+    """Rewrite same-function local-label DIR32 sites to owner+relative addend."""
+    data = bytearray(payload)
+    ranges = _function_ranges(original)
+    rewrites = []
+    for relocation in original.relocations:
+        if relocation.typ != DIR32:
+            continue
+        section = original.sections[relocation.section - 1]
+        if not section.characteristics & MEM_EXECUTE:
+            continue
+        target = original.symbols[relocation.symbol_index]
+        if (target.section != relocation.section or target.typ != 0 or
+                target.storage_class != 6):
+            continue
+        site_owner = _function_owner(ranges, relocation.section, relocation.site)
+        target_owner = _function_owner(ranges, target.section, target.value)
+        if site_owner is None or target_owner is None or site_owner != target_owner:
+            continue
+        if relocation.site + 4 > section.raw_size:
+            raise ValueError("DIR32 jump-table relocation crosses .text payload")
+        operand_offset = section.raw_offset + relocation.site
+        original_addend = struct.unpack_from("<I", original.data, operand_offset)[0]
+        owner_addend = (
+            original_addend + target.value - target_owner.value) & 0xFFFFFFFF
+        resolved_offset = (target.value + original_addend) & 0xFFFFFFFF
+        if ((target_owner.value + owner_addend) & 0xFFFFFFFF != resolved_offset):
+            raise RuntimeError("jump-table owner/addend resolution changed")
+        struct.pack_into("<I", data, operand_offset, owner_addend)
+        struct.pack_into("<I", data, relocation.offset + 4, target_owner.index)
+        rewrites.append(JumpTableRewrite(
+            relocation.offset, relocation.section, relocation.site,
+            target.index, target_owner.index, original_addend, owner_addend,
+            resolved_offset,
+        ))
+    return bytes(data), tuple(rewrites)
+
+
 def _rewrite_names(coff: CoffObject, renames: dict[int, str]) -> bytes:
     data = bytearray(coff.data[:coff.string_offset])
     strings = bytearray(struct.pack("<I", 4))
@@ -369,9 +457,15 @@ def _rewrite_names(coff: CoffObject, renames: dict[int, str]) -> bytes:
     return bytes(data)
 
 
-def _assert_only_names_changed(original: CoffObject, payload: bytes,
-                               renames: dict[int, str]) -> None:
+def _assert_only_canonical_changes(
+        original: CoffObject, payload: bytes, renames: dict[int, str],
+        jump_table_rewrites: tuple[JumpTableRewrite, ...]) -> None:
     normalized = CoffObject(payload)
+    rewrites_by_offset = {
+        rewrite.relocation_offset: rewrite for rewrite in jump_table_rewrites
+    }
+    if len(rewrites_by_offset) != len(jump_table_rewrites):
+        raise RuntimeError("duplicate jump-table rewrite record")
     if (original.section_count != normalized.section_count or
             original.symbol_count != normalized.symbol_count or
             original.symbol_offset != normalized.symbol_offset):
@@ -386,10 +480,34 @@ def _assert_only_names_changed(original: CoffObject, payload: bytes,
                 after.raw_size, after.raw_offset, after.reloc_offset,
                 after.reloc_count, after.characteristics):
             raise RuntimeError("canonical COFF changed section metadata")
-        if original.section_bytes(before) != normalized.section_bytes(after):
-            raise RuntimeError("canonical COFF changed section payload bytes")
-    if original.relocations != normalized.relocations:
-        raise RuntimeError("canonical COFF changed relocation records")
+        before_payload = bytearray(original.section_bytes(before))
+        after_payload = bytearray(normalized.section_bytes(after))
+        for rewrite in jump_table_rewrites:
+            if rewrite.section != before.index:
+                continue
+            expected_before = struct.pack("<I", rewrite.original_addend)
+            expected_after = struct.pack("<I", rewrite.owner_addend)
+            site = rewrite.site
+            if (before_payload[site:site + 4] != expected_before or
+                    after_payload[site:site + 4] != expected_after):
+                raise RuntimeError("canonical COFF emitted an unexpected jump-table addend")
+            before_payload[site:site + 4] = bytes(4)
+            after_payload[site:site + 4] = bytes(4)
+        if before_payload != after_payload:
+            raise RuntimeError("canonical COFF changed unexpected section payload bytes")
+    if len(original.relocations) != len(normalized.relocations):
+        raise RuntimeError("canonical COFF changed relocation count")
+    for before, after in zip(original.relocations, normalized.relocations):
+        rewrite = rewrites_by_offset.get(before.offset)
+        expected_symbol = (rewrite.owner_symbol_index if rewrite is not None
+                           else before.symbol_index)
+        if (before.offset, before.section, before.site, before.typ) != (
+                after.offset, after.section, after.site, after.typ):
+            raise RuntimeError("canonical COFF changed relocation site/type/order")
+        if after.symbol_index != expected_symbol:
+            raise RuntimeError("canonical COFF changed an unexpected relocation target")
+        if rewrite is not None and before.symbol_index != rewrite.original_symbol_index:
+            raise RuntimeError("jump-table rewrite source-symbol postcondition failed")
     if set(original.symbols) != set(normalized.symbols):
         raise RuntimeError("canonical COFF changed symbol indices")
     for index, before in original.symbols.items():
@@ -417,8 +535,47 @@ def _assert_only_names_changed(original: CoffObject, payload: bytes,
     for symbol in original.symbols.values():
         before_prefix[symbol.offset:symbol.offset + 8] = bytes(8)
         after_prefix[symbol.offset:symbol.offset + 8] = bytes(8)
+    for rewrite in jump_table_rewrites:
+        section = original.sections[rewrite.section - 1]
+        operand = section.raw_offset + rewrite.site
+        before_prefix[operand:operand + 4] = bytes(4)
+        after_prefix[operand:operand + 4] = bytes(4)
+        before_prefix[rewrite.relocation_offset + 4:
+                      rewrite.relocation_offset + 8] = bytes(4)
+        after_prefix[rewrite.relocation_offset + 4:
+                     rewrite.relocation_offset + 8] = bytes(4)
     if before_prefix != after_prefix:
-        raise RuntimeError("canonical COFF changed bytes outside symbol names")
+        raise RuntimeError(
+            "canonical COFF changed bytes outside symbol names/jump-table relocations")
+
+    normalized_relocations = {row.offset: row for row in normalized.relocations}
+    for rewrite in jump_table_rewrites:
+        before_relocation = next(
+            row for row in original.relocations
+            if row.offset == rewrite.relocation_offset)
+        after_relocation = normalized_relocations[rewrite.relocation_offset]
+        before_target = original.symbols[before_relocation.symbol_index]
+        after_target = normalized.symbols[after_relocation.symbol_index]
+        before_section = original.sections[before_relocation.section - 1]
+        after_section = normalized.sections[after_relocation.section - 1]
+        before_addend = struct.unpack_from(
+            "<I", original.data,
+            before_section.raw_offset + before_relocation.site)[0]
+        after_addend = struct.unpack_from(
+            "<I", payload,
+            after_section.raw_offset + after_relocation.site)[0]
+        before_resolved = (
+            before_target.section,
+            (before_target.value + before_addend) & 0xFFFFFFFF,
+        )
+        after_resolved = (
+            after_target.section,
+            (after_target.value + after_addend) & 0xFFFFFFFF,
+        )
+        expected = (rewrite.section, rewrite.resolved_offset)
+        if before_resolved != expected or after_resolved != expected:
+            raise RuntimeError(
+                "jump-table relocation resolved-target postcondition failed")
 
 
 def canonicalize_coff(payload: bytes) -> CanonicalizedObject:
@@ -611,7 +768,10 @@ def canonicalize_coff(payload: bytes) -> CanonicalizedObject:
         ))
 
     normalized = _rewrite_names(coff, renames)
-    _assert_only_names_changed(coff, normalized, renames)
+    normalized, jump_table_rewrites = _rewrite_jump_table_relocations(
+        coff, normalized)
+    _assert_only_canonical_changes(
+        coff, normalized, renames, jump_table_rewrites)
     return CanonicalizedObject(normalized, tuple(rows))
 
 
