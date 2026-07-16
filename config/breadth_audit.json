@@ -222,6 +222,61 @@
       "note": "All relocation-masked instructions match; metric residual is only function-local data identity."
     },
     {
+      "unit": "SOURCE/PHILAI",
+      "function": "?CheckBerserk@philAI@@QAEXXZ",
+      "source_hash": "256ff2ac6bc1",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.97488,
+      "after": 99.97488,
+      "note": "All 770 bytes match after masking 26 relocations; sole raw byte is folded __adjust_fdiv owner/addend spelling."
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?EvaluateMonsterEvent@philAI@@QAEHHHPAH@Z",
+      "source_hash": "3563ffb62a93",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.978905,
+      "after": 99.978905,
+      "note": "All 830 bytes match after masking 40 relocations; sole raw byte is folded __adjust_fdiv owner/addend spelling."
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?GetBestBuilding@philAI@@QAEXPAVtown@@AAUBHC@@AAM@Z",
+      "source_hash": "098e350474c4",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.95652,
+      "after": 99.95652,
+      "note": "All 411 bytes match after masking 17 relocations; sole raw byte is folded __adjust_fdiv owner/addend spelling."
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?HeroInteractionAtHero@philAI@@QAEXPAVhero@@0HPAH@Z",
+      "source_hash": "3f12436eaa8e",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.9671,
+      "after": 99.9671,
+      "note": "All 1058 bytes match after masking 29 relocations; two raw bytes are folded __adjust_fdiv owner/addend spellings."
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?ValueOfBuyingBuilding@philAI@@QAEXPAVtown@@HAAHAAM@Z",
+      "source_hash": "3219c4ff06cc",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.992546,
+      "after": 99.992546,
+      "note": "All 2086 bytes match after masking 75 relocations; sole raw byte is folded __adjust_fdiv owner/addend spelling."
+    },
+    {
       "unit": "SOURCE/TOWN",
       "function": "?BuildBuilding@town@@QAEXH@Z",
       "source_hash": "5b85e7506518",
