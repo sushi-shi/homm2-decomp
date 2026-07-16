@@ -271,6 +271,17 @@ def classify(report, source_hashes, state, epoch, module=None):
     }
 
 
+def exact_max_rows(rows, baseline):
+    """Select live residuals that reached 100% for the same source hash."""
+    selected = []
+    for row in rows:
+        maximum, source_hash = baseline.get(
+            (row["unit"], row["function"]), (0.0, None))
+        if maximum >= 100.0 and source_hash == row["source_hash"]:
+            selected.append(row)
+    return selected
+
+
 def _load_batch(path):
     stream = sys.stdin if str(path) == "-" else Path(path).open(
         encoding="utf-8", newline="")
@@ -366,6 +377,10 @@ def main(argv=None):
     queue = subparsers.add_parser("queue", help="print closest-to-100 pending functions")
     queue.add_argument("--module", help="restrict to a module such as SOURCE or BASE")
     queue.add_argument("--limit", type=int, default=0, help="maximum rows; zero means all")
+    queue.add_argument(
+        "--exact-max-only", action="store_true",
+        help="show only live residuals whose current source hash previously reached 100%",
+    )
     summary = subparsers.add_parser("summary", help="print exact checked/remaining counts")
     summary.add_argument("--module", help="restrict to a module such as SOURCE or BASE")
     args = parser.parse_args(argv)
@@ -409,6 +424,8 @@ def main(argv=None):
             _print_summary(classified, epoch)
             return 0
         rows = classified["pending"]
+        if args.exact_max_only:
+            rows = exact_max_rows(rows, status.load_baseline())
         if args.limit < 0:
             raise AuditError("--limit must be zero or positive")
         if args.limit:
