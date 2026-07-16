@@ -69,6 +69,8 @@ enum {
     GLOBAL_COMMAND_LINE_SIZE = 0x40
 };
 
+#define X_GLOBAL_PASSWORD_STRING_INDEX_COUNT 8
+
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
 extern signed char xIsExpansionMap;
 extern int xLastChoice;
@@ -92,7 +94,7 @@ extern char *xUncleIvanName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT];
 extern char *xShortSSLevelNames[X_GLOBAL_SHORT_SKILL_LEVEL_COUNT];
 extern char *xPasswordStrings[X_GLOBAL_PASSWORD_STRING_COUNT];
 extern unsigned char xNewHeroAlignment[X_GLOBAL_NEW_HERO_ALIGNMENT_COUNT];
-extern int xPasswordStringsIndex[];
+extern int xPasswordStringsIndex[X_GLOBAL_PASSWORD_STRING_INDEX_COUNT];
 extern int xShrineBuildingCost[X_GLOBAL_BUILDING_RESOURCE_COUNT];
 
 // ---- globals (declarations, RVA order) ----
