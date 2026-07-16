@@ -509,6 +509,17 @@
     },
     {
       "unit": "SOURCE/KB",
+      "function": "?CanBuild@@YIHPAVtown@@H@Z",
+      "source_hash": "add3f9d13557",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 99.98788,
+      "after": 99.98788,
+      "note": "Exact frame CFG and five relocs; only two commutative mask-load bytes remain after ten bounded variants."
+    },
+    {
+      "unit": "SOURCE/KB",
       "function": "?CheckEndGame@@YIXHH@Z",
       "source_hash": "0e9a7c50f042",
       "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
@@ -550,6 +561,17 @@
       "before": 98.83069,
       "after": 98.83069,
       "note": "Complete body frame CFG and 131 relocations; unsigned low-byte keyboard guard still lowers differently."
+    },
+    {
+      "unit": "SOURCE/KB",
+      "function": "?SetupDynamicWindow@@YIXHHHHHHHPAH00000PAPAVheroWindow@@H@Z",
+      "source_hash": "c378cb459a40",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "exact",
+      "iterations": 8,
+      "before": 99.87674,
+      "after": 100.0,
+      "note": "Qualified column index closes loop polarity; all 1724 bytes match after masking 51 canonical string relocations."
     },
     {
       "unit": "SOURCE/KB",
