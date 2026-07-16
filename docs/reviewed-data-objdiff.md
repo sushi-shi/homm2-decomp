@@ -48,6 +48,11 @@ the retail EXE, synthetic delinker-input PDB, and delinker executable. Normal co
 stale canonical stamp and instruct the user to regenerate; they never rewrite configs or targets.
 There is no canonical unresolved-data fallback. `homm2 data-topology finalize` requires every
 machine-readable symbol, section, contribution, and coverage diagnostic to reach zero.
+An exact section need not have one affine retail base. When all candidate definitions are reviewed,
+the section manifest retains the candidate storage/ordinal/size with `rva=-`; the delinker
+zero-initializes that candidate-shaped section, copies each definition and its relocations from the
+definition's own retail RVA, and rejects candidate-offset overflow or overlap. Such rows are exact
+classifications in `delink_data_breakpoints.json`, not unresolved diagnostics.
 Normal assembly also never rewrites a reviewed supplemental identity from its section offset. A
 stale compiler-local name or topology is a hard error. The explicit migration path may generate a
 candidate translation, but that versioned diff must be reviewed and committed before it becomes a

@@ -103,12 +103,19 @@ The explicit topology commands are:
   replaced by a padded next-symbol span; padding exists only in section size/alignment.
 
   `build/gen/delink_data_sections.tsv` preserves every candidate section ordinal, including
-  multiple same-name COMDAT sections, characteristics, alignment, selection, associative parent,
-  and assigned retail RVA. Non-data sections are explicit `-` placeholders. The companion
-  `build/gen/delink_data_breakpoints.json` replays independent rdata/data/bss cursors in retail
-  object order. Observed DATA/public anchors never change a replay cursor: every difference is an
-  explicit signed drift, and missing or inconsistent section bases remain diagnostics.
-  `--strict` rejects any such unresolved assignment. The generated contribution and whole-image
+  multiple same-name COMDAT sections, characteristics, alignment, selection, and associative
+  parent. An affine section records one retail RVA used as its byte-copy source. A fully reviewed
+  non-affine section records `rva=-` while retaining its storage class: Vostok creates the exact
+  candidate COFF section, zero-fills gaps, and copies each enrolled definition and its relocations
+  from that definition's independent reviewed retail RVA. Non-data sections remain explicit `-`
+  placeholders with no storage class. Candidate-offset bounds and overlaps are hard errors.
+
+  The companion `build/gen/delink_data_breakpoints.json` separates blocking assignment
+  diagnostics from exact non-affine classifications. Candidate-order replay remains discovery
+  evidence for sections without complete reviewed definitions. A unique complete reviewed base
+  overrides replay and is not required to retain the candidate input section alignment: NB09
+  contribution ranges exclude final-link padding. `--strict` rejects unresolved sections, not
+  reviewed non-affine placement. The generated contribution and whole-image
   coverage manifests remain hard regeneration inputs under `build/gen`; they are not copied into
   version control. The Clang DATA inventory is cached under `build/gen` per TU, keyed by source,
   recursively resolved project/vendor headers, candidate object, compile database, and parser
@@ -163,6 +170,8 @@ fail-closed procedure/jump-table/exclusion/padding audit. `tu-data` partitions e
 `.rdata`, initialized `.data`, and zero-fill `.bss` contribution into literal, constant, allocation,
 or explicit zero-padding records. Nonzero gaps, overlaps, cross-owner allocations, unowned publics,
 invalid HIGHLOW sites/targets, or any text evidence failure block promotion.
+Canonical coverage consumes the same generated, candidate-classified contribution manifest passed
+to Vostok; it never silently reverts to the raw PE-boundary split during promotion.
 
 ## Current census
 

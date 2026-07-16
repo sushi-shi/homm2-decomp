@@ -8,10 +8,31 @@ from homm2.build.whole_image_coverage import (
     _partition,
     _validate_partition,
     data_partition,
+    load_contributions,
 )
 
 
 class WholeImageCoverageTest(unittest.TestCase):
+    def test_loads_the_exact_classified_contribution_manifest(self):
+        with TemporaryDirectory() as directory:
+            path = Path(directory) / "contributions.tsv"
+            path.write_text(
+                "# generated\n"
+                "object\tstorage\trva\tsize\tsegment\tsection\tprovenance\n"
+                "SOURCE/Test.c\tdata\t0x100\t0x8\t3\t.data\treviewed-data\n"
+                "SOURCE/Test.c\tbss\t0x108\t0x10\t3\t.data\treviewed-bss\n")
+            rows = load_contributions(path)
+            self.assertEqual([(row["storage"], row["rva"], row["size"])
+                              for row in rows], [
+                ("data", 0x100, 8), ("bss", 0x108, 0x10),
+            ])
+
+            path.write_text(
+                "object\tstorage\trva\tsize\tsegment\tsection\tprovenance\n"
+                "SOURCE/Test.c\tbss\t0x100\t0x8\t3\t.rdata\twrong\n")
+            with self.assertRaisesRegex(ValueError, "storage/section mismatch"):
+                load_contributions(path)
+
     def test_partition_fills_gaps_and_rejects_overlaps(self):
         middle = CoverageRow("test", "owner", "data", 4, 4,
                              "allocation", "value", "test")

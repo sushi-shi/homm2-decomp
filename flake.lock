@@ -65,17 +65,17 @@
     "vostok-delinker-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1784161961,
-        "narHash": "sha256-EjnBpl3tZvb8+DAZepasuQf/8OQx66MjiKzUyL1cCPo=",
+        "lastModified": 1784190287,
+        "narHash": "sha256-CI6TKisrDlH0nIj1T1UZXyHs6fHWWHUTG5nacAhbyJQ=",
         "owner": "srp-survarium",
         "repo": "vostok-delinker",
-        "rev": "fe8e3c50be307e7412adacf755af1051e6c98d04",
+        "rev": "6cb3b487723c7afd80bc4e2b8f5562b085b527f1",
         "type": "github"
       },
       "original": {
         "owner": "srp-survarium",
         "repo": "vostok-delinker",
-        "rev": "fe8e3c50be307e7412adacf755af1051e6c98d04",
+        "rev": "6cb3b487723c7afd80bc4e2b8f5562b085b527f1",
         "type": "github"
       }
     }
