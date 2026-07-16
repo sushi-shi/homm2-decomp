@@ -671,6 +671,61 @@
       "before": 99.38145,
       "after": 99.38145,
       "note": "Exact frame slots CFG and 2 relocations; sole retail cmp versus candidate sub opcode resisted ten bounded variants."
+    },
+    {
+      "unit": "SOURCE/dpnetwin",
+      "function": "?dpEvaluateMessage@@YIXKH@Z",
+      "source_hash": "0b6f64c20e48",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.765434,
+      "after": 98.765434,
+      "note": "Complete candidate range and 52 relocs; residual is local switch identities and one-byte provisional retail boundary."
+    },
+    {
+      "unit": "SOURCE/dpnetwin",
+      "function": "?dpProcessMessages@@YIXXZ",
+      "source_hash": "f61c64428da4",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "exact",
+      "iterations": 2,
+      "before": 99.90566,
+      "after": 100.0,
+      "note": "No-message path is a direct return rather than break-through continuation; code and nine relocations exact."
+    },
+    {
+      "unit": "SOURCE/dpnetwin",
+      "function": "?dpWaitForFirstGuest@@YIHXZ",
+      "source_hash": "0da95907179c",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.98058,
+      "after": 98.98058,
+      "note": "Complete frame and 33 relocations; one proved five-byte continuation shifts only local dispatch and table positions."
+    },
+    {
+      "unit": "SOURCE/dpnetwin",
+      "function": "?dpnet_init@@YIFXZ",
+      "source_hash": "2d70d52cb3e4",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "improved",
+      "iterations": 10,
+      "before": 99.02577,
+      "after": 99.04124,
+      "note": "Recovered guestIndex slot; ten bounded variants leave player-count compare order and import-thunk shapes."
+    },
+    {
+      "unit": "SOURCE/dpnetwin",
+      "function": "?dpnet_term@@YIXXZ",
+      "source_hash": "bf673b99ff4a",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "exact",
+      "iterations": 4,
+      "before": 99.98508,
+      "after": 100.0,
+      "note": "Corrected 104-byte frame buffer to request the retail 100-byte payload; all code and 27 relocations agree."
     }
   ]
 }

@@ -47,12 +47,15 @@ int __stdcall dpEnumSession(DPSESSIONDESC *session, void *,
     return 1;
 }
 
-// @match-note 99.95%: semantics, CFG, the 0x30 frame/local slots, and all 71
-// ordered relocations agree. The first raw residual at +0x8d is the delinked
-// LoadLibraryA/import-call shape; later residuals are the corresponding
-// GetProcAddress imports and local branch displacements. Direct Win32 calls and
-// explicitly typed resolver pointers are already retained. Revisit after import
-// thunk normalization or shared Win32 declaration recovery.
+// @semantic: Current dpnetwin.cpp/header epoch: semantics, CFG, the 0x30 frame,
+// and all 71 semantic ordered relocations agree. Renaming player to guestIndex
+// recovers retail's -0x8 slot and improves 99.02577% to 99.04124%. The remaining
+// loop residual loads giNumHumanPlayers before guestIndex and emits JGE, while
+// retail reverses the loads and emits JLE. Ten bounded attempts exhausted seven
+// identifier_rename spellings, relational reversal, their rejected overlapping
+// combination, and 0[&guestIndex]. Earlier residuals are delinked LoadLibraryA/
+// GetProcAddress import-call shapes. Revisit only after relevant import-thunk,
+// declaration, source/TU/header, or comparison-epoch changes.
 VA(0x0041eeaf, 0x311)
 short int dpnet_init(void) {
     DATA(0x004ef83c) static short initSourceLineBase = DP_SOURCE_LINE_INIT_BASE;
@@ -61,7 +64,7 @@ short int dpnet_init(void) {
     typedef HRESULT (WINAPI *DirectPlayEnumerateFunction)(LPDPENUMDPCALLBACK, void *);
     DirectPlayCreateFunction createFunction;
     DirectPlayEnumerateFunction enumerateFunction;
-    int player;
+    int guestIndex;
     int result;
 
     if (lpIDC != 0)
@@ -120,9 +123,9 @@ short int dpnet_init(void) {
             startup.playerCount = static_cast<unsigned char>(giNumHumanPlayers);
             memcpy(startup.playerIds, giNetPosToDCOPos,
                    sizeof(giNetPosToDCOPos));
-            for (player = 1; player < giNumHumanPlayers; player++) {
-                startup.netPosition = static_cast<unsigned char>(player);
-                dpSendMessage(giNetPosToDCOPos[player], DP_MESSAGE_STARTUP,
+            for (guestIndex = 1; guestIndex < giNumHumanPlayers; guestIndex++) {
+                startup.netPosition = static_cast<unsigned char>(guestIndex);
+                dpSendMessage(giNetPosToDCOPos[guestIndex], DP_MESSAGE_STARTUP,
                               sizeof(startup), &startup);
             }
         } else {
@@ -159,16 +162,10 @@ void CleanupDPVars(void) {
     iLastMsgNumHumanPlayers = 1;
 }
 
-// @match-note 99.99%: semantics, CFG, the 0x68 drain-buffer frame, and all 27
-// ordered relocations agree. The first non-relocation byte residual is the local
-// branch at +0x65; the only structural disassembly residual is FreeLibrary's
-// imported-call representation near +0xf9. Both the prior void*/static_cast
-// spelling and the typed HMODULE/direct spelling have been tested. Revisit with
-// the import-thunk normalization work.
 VA(0x0041f28e, 0x116)
 void dpnet_term(void) {
     DATA(0x004efa00) static short termSourceLineBase = DP_SOURCE_LINE_TERM_BASE;
-    char drainBuffer[DP_TRANSPORT_TERM_DRAIN_SIZE];
+    char drainBuffer[DP_TRANSPORT_TERM_DRAIN_READ_SIZE + sizeof(int)];
 
     gbRemoteOn = 0;
     if (dcoID != 0)
@@ -176,7 +173,7 @@ void dpnet_term(void) {
     lpIDC->Close();
     lpIDC->Release();
     lpIDC = 0;
-    while (dpnet_rcv(0, DP_TRANSPORT_TERM_DRAIN_SIZE, drainBuffer) != 0) {
+    while (dpnet_rcv(0, DP_TRANSPORT_TERM_DRAIN_READ_SIZE, drainBuffer) != 0) {
     }
     if (ppDPRcvBuffer != 0)
         BaseFree(ppDPRcvBuffer, DPFILE,
@@ -249,11 +246,6 @@ unsigned char dpnet_stat(short int, unsigned short int) { return 0; }
 VA(0x0041f5b0, 0x13)
 short int __cdecl dpnet_sess(int, int, ...) { return 0; }
 
-// @early-stop 99.91%: frame 0x18 and senderId/packetSize/destinationIds/
-// receiveResult slots match, all 9 ordered relocations agree, and every
-// non-jump opcode and operand matches. Base is exactly five bytes larger because
-// the no-messages branch targets one extra continuation jump at +0xb4; retail
-// skips that jump and targets the common epilogue directly.
 VA(0x0041f5c3, 0xbe)
 void dpProcessMessages(void) {
     DATA(0x004efb14) static short processSourceLineBase = DP_SOURCE_LINE_PROCESS_BASE;
@@ -270,7 +262,7 @@ void dpProcessMessages(void) {
                                        reinterpret_cast<unsigned long *>(destinationIds),
                                        1, rcvBufIn, packetSize);
         if (receiveResult == DP_RESULT_NO_MESSAGES)
-            break;
+            return;
         if (receiveResult != DP_RESULT_OK)
             DPSD(receiveResult, DPFILE,
                  processSourceLineBase + DP_SOURCE_LINE_PROCESS_ERROR_OFFSET);
@@ -283,9 +275,14 @@ void dpProcessMessages(void) {
     }
 }
 
-// @early-stop 99.81%: all 0x274 relocation-masked bytes and all 52 ordered
-// relocations match. The retained objdiff residual is solely the delinked switch
-// jump-table/local-label identity; case-body order and external targets agree.
+// @early-stop
+// Current dpnetwin.cpp/header epoch: the base symbol is 0x273 bytes versus the
+// provisional 0x274 retail span, so the relocation-only hard gate correctly
+// refuses to overlap the following function. Across the complete base range,
+// instruction semantics, case-body order, and all 52 ordered relocation targets
+// agree; the residual is the delinked switch jump-table/local-label identity and
+// one-byte boundary artifact. Revisit only after function-boundary, source/TU/
+// header, or comparison-epoch changes.
 VA(0x0041f681, 0x274)
 void dpEvaluateMessage(unsigned long int size, int sender) {
     DATA(0x004efb44) static short evaluateSourceLineBase = DP_SOURCE_LINE_EVALUATE_BASE;
@@ -342,12 +339,13 @@ void dpEvaluateMessage(unsigned long int size, int sender) {
     }
 }
 
-// @early-stop 98.79%: frame 0x84 and all session/result/compiler slots match.
-// Excluding the retail jump table at +0x166/0x10, every non-jump opcode and
-// operand matches and all 33 ordered relocations agree. Base is exactly five
-// bytes larger: one continuation jump after case 3 shifts the dispatch/table and
-// epilogue by five bytes; the two target literal aliases resolve to the proven
-// gsThisNetPlayerInfo +26/+27 fields.
+// @early-stop
+// Current dpnetwin.cpp/header epoch: the 0x84 frame and all session/result/
+// compiler slots match. Excluding the retail jump table at +0x166/0x10, every
+// non-jump opcode and operand and all 33 ordered relocations agree. One five-byte
+// continuation after case 3 shifts the dispatch/table and epilogue; the two
+// target literal aliases are proven gsThisNetPlayerInfo +26/+27 fields. Revisit
+// only after the source/TU/header or comparison epoch changes.
 VA(0x0041f8f5, 0x182)
 int dpWaitForFirstGuest(void) {
     DATA(0x004efb9c) static short firstGuestSourceLineBase = DP_SOURCE_LINE_FIRST_GUEST_BASE;
