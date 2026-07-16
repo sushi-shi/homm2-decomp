@@ -2874,25 +2874,135 @@
     },
     {
       "unit": "SOURCE/SPELLS",
+      "function": "?Armageddon@combatManager@@QAEXXZ",
+      "source_hash": "da5400020c19",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
+      "iterations": 0,
+      "before": 98.37937,
+      "after": 99.47028,
+      "note": "Complete 0x120 frame and 79 relocations; TU-state shift improved live score, while documented loop branch polarity remains."
+    },
+    {
+      "unit": "SOURCE/SPELLS",
+      "function": "?CastMassSpell@combatManager@@QAEXHH@Z",
+      "source_hash": "e4f77bdf7333",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 96.520035,
+      "after": 96.520035,
+      "note": "Complete mass targeting, damage, presentation, influences, and draw CFG; residuals and tried spellings are documented."
+    },
+    {
+      "unit": "SOURCE/SPELLS",
+      "function": "?CastSpell@combatManager@@QAEXHHHH@Z",
+      "source_hash": "ea246d8393be",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 97.2457,
+      "after": 96.9952,
+      "note": "Complete dispatch and spell bodies with all 270 relocations aligned; semantic marker records the remaining 0xb4 versus 0xa8 frame state."
+    },
+    {
+      "unit": "SOURCE/SPELLS",
+      "function": "?ChainLightning@combatManager@@QAEXHH@Z",
+      "source_hash": "8e4d4711153e",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
+      "iterations": 2,
+      "before": 99.421684,
+      "after": 99.52611,
+      "note": "Three evidenced unused words restore the exact 0x5c frame and slots; all 37 relocations align, with only documented clamp branch shape residual."
+    },
+    {
+      "unit": "SOURCE/SPELLS",
+      "function": "?CombatSpecialHandler@@YIHAAUtag_message@@@Z",
+      "source_hash": "d270094fe831",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 90.42623,
+      "after": 90.42623,
+      "note": "Complete hover conversion, cache, return, and case order with exact source-local model; compiler switch residual is documented."
+    },
+    {
+      "unit": "SOURCE/SPELLS",
       "function": "?DefaultSpell@combatManager@@QAEXH@Z",
       "source_hash": "4472d99338cd",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
       "iterations": 0,
       "before": 99.93056,
       "after": 99.93056,
-      "note": "Complete body and three relocs; one branch routes through a different semantically empty trampoline."
+      "note": "Complete frame, body, CFG, and three relocations; semantic marker documents the single equivalent branch byte."
     },
     {
       "unit": "SOURCE/SPELLS",
       "function": "?DoBlast@combatManager@@QAEXHH@Z",
       "source_hash": "d8045d7d5f6d",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
-      "outcome": "improved",
-      "iterations": 3,
-      "before": 99.92071,
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.95595,
       "after": 99.95595,
-      "note": "Symmetric subscript steering restores three commutative load orders; all masked bytes and 50 effective targets align."
+      "note": "Valid relocation-only early stop: all 826 masked bytes and all 50 ordered relocation targets agree."
+    },
+    {
+      "unit": "SOURCE/SPELLS",
+      "function": "?DoBolt@combatManager@@QAEXHHHHHHHHHHHHHHHHH@Z",
+      "source_hash": "96078250a291",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.74641,
+      "after": 98.74641,
+      "note": "Complete bolt pool, draw, timing, and cleanup CFG; semantic marker records frame and relocation identity residuals."
+    },
+    {
+      "unit": "SOURCE/SPELLS",
+      "function": "?DoLuck@combatManager@@QAEXHH@Z",
+      "source_hash": "aaab807e3ca7",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 0,
+      "before": 95.74149,
+      "after": 100.0,
+      "note": "Current TU state closes the unchanged complete body; all 486 raw masked bytes and all three relocations are exact."
+    },
+    {
+      "unit": "SOURCE/SPELLS",
+      "function": "?DrawBolt@combatManager@@QAEXPAUSBolt@@H@Z",
+      "source_hash": "c12e5b1b2bdd",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 94.83567,
+      "after": 94.83567,
+      "note": "Complete stepping, clipping, color modes, target approach, and finish CFG with exact frame; residual is documented."
+    },
+    {
+      "unit": "SOURCE/SPELLS",
+      "function": "?Earthquake@combatManager@@QAEXXZ",
+      "source_hash": "5f3686858dcb",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 97.195175,
+      "after": 97.0636,
+      "note": "Complete shake, damage, cloud, and restore CFG with exact frame and 62 relocations; loop branch shape residual is documented."
+    },
+    {
+      "unit": "SOURCE/SPELLS",
+      "function": "?FindResurrectArmyIndex@combatManager@@QAEHHHH@Z",
+      "source_hash": "965faff831a2",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 91.39823,
+      "after": 91.39823,
+      "note": "Complete live-first and corpse scan CFG with exact frame and relocations; semantic marker documents address-evaluation residual."
     },
     {
       "unit": "SOURCE/SPELLS",
@@ -2907,36 +3017,124 @@
     },
     {
       "unit": "SOURCE/SPELLS",
-      "function": "?Ripple@combatManager@@QAEXH@Z",
-      "source_hash": "80a92b3d99f9",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "function": "?HandleCastSpell@@YIHAAUtag_message@@@Z",
+      "source_hash": "d4522de35f8f",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
+      "iterations": 0,
+      "before": 99.21466,
+      "after": 99.21466,
+      "note": "Complete two-stage teleport and input CFG; durable semantic marker records exact slots, relocations, and exhausted branch spellings."
+    },
+    {
+      "unit": "SOURCE/SPELLS",
+      "function": "?MirrorImage@combatManager@@QAEXH@Z",
+      "source_hash": "54b8a11e61e4",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 92.73608,
+      "after": 90.90799,
+      "note": "Complete search, army creation, artifacts, links, and slide animation with exact frame and 38 relocations; loop shape is documented."
+    },
+    {
+      "unit": "SOURCE/SPELLS",
+      "function": "?ResetBoltAngle@combatManager@@QAEXPAUSBolt@@@Z",
+      "source_hash": "5c60545ae1bb",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
+      "iterations": 1,
+      "before": 98.31064,
+      "after": 98.42128,
+      "note": "One evidenced bucket-11 word restores the retail 0x58 frame; all 30 relocations align and the remaining constant/guard shape is documented."
+    },
+    {
+      "unit": "SOURCE/SPELLS",
+      "function": "?Resurrect@combatManager@@QAEXHHH@Z",
+      "source_hash": "11a73929e318",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
+      "iterations": 1,
+      "before": 91.72627,
+      "after": 91.89404,
+      "note": "Two evidenced bucket words restore retail unused -0x18 and -0x34 slots and exact 0x44 frame; all 33 relocations align."
+    },
+    {
+      "unit": "SOURCE/SPELLS",
+      "function": "?Ripple@combatManager@@QAEXH@Z",
+      "source_hash": "00cb2ec88dbb",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
       "iterations": 1,
       "before": 99.860466,
-      "after": 99.860466,
-      "note": "Complete body and five relocs; retail reserves two unexplained unused frame words with no source-supported local."
+      "after": 100.0,
+      "note": "Two evidenced unused compiler words restore the retail 0x0c frame; raw bytes and all five relocations are exact."
+    },
+    {
+      "unit": "SOURCE/SPELLS",
+      "function": "?RippleCreature@combatManager@@QAEXHHH@Z",
+      "source_hash": "c10812796b13",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 95.56786,
+      "after": 93.83379,
+      "note": "Complete mode, sine, fade, draw, and cleanup CFG; semantic marker records the remaining frame and compiler ordering residuals."
+    },
+    {
+      "unit": "SOURCE/SPELLS",
+      "function": "?ShowMassSpell@combatManager@@QAEXQAY0BE@CHH@Z",
+      "source_hash": "4dc4a37ff0c7",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
+      "iterations": 0,
+      "before": 92.51474,
+      "after": 94.28798,
+      "note": "Complete effect, animation, death processing, and vanish CFG with 23 relocations; TU-state shift improved score and frame residual remains documented."
     },
     {
       "unit": "SOURCE/SPELLS",
       "function": "?ShowSpellCastFailure@combatManager@@QAEXPAVarmy@@H@Z",
       "source_hash": "81694caddcfa",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
-      "iterations": 3,
+      "iterations": 0,
       "before": 99.893936,
       "after": 99.893936,
-      "note": "Complete CFG and 15 relocs; aggregate temporary and army-name slots resist three bounded scope and initialization forms."
+      "note": "Complete semantics and 15 relocations; semantic marker documents the seven remaining stack displacement bytes."
+    },
+    {
+      "unit": "SOURCE/SPELLS",
+      "function": "?ValidSpellTarget@combatManager@@QAEHHH@Z",
+      "source_hash": "cd938a9ee92e",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
+      "iterations": 1,
+      "before": 92.430695,
+      "after": 93.21535,
+      "note": "Recovered retail 0x14 frame using evidenced unused, target, and teleport predicate slots; all 37 relocations align."
+    },
+    {
+      "unit": "SOURCE/SPELLS",
+      "function": "?VaporizeCreature@combatManager@@QAEXHH@Z",
+      "source_hash": "4e884a876ccd",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 96.85475,
+      "after": 95.56425,
+      "note": "Complete three-phase vapor and cleanup CFG with 31 relocations; semantic marker records the remaining retail frame words."
     },
     {
       "unit": "SOURCE/SPELLS",
       "function": "?ViewSpells@combatManager@@QAEHH@Z",
       "source_hash": "f43c3aa5a89b",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
       "iterations": 0,
       "before": 99.98404,
       "after": 99.98404,
-      "note": "Exact frame slots and 62 relocs; two local branch-displacement bytes remain outside the switch tables."
+      "note": "Complete retail body and CFG; existing semantic marker documents two compiler-shape bytes and 62 aligned relocations."
     },
     {
       "unit": "SOURCE/STRIP",
