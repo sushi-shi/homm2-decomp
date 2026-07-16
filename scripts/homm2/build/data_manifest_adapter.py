@@ -34,7 +34,8 @@ from homm2.build.data_topology_census import (
     _section_definition_symbols,
     _storage,
 )
-from homm2.build.link_exe import load_retail_order, read_pe
+from homm2.build.contribution_manifest import contribution_rows
+from homm2.build.link_exe import read_pe
 
 
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[3]))
@@ -48,6 +49,7 @@ SOURCE_MANIFEST = REPO / "build/gen/delink_data_from_source.tsv"
 COMBINED_MANIFEST = REPO / "build/gen/delink_data_manifest.tsv"
 SECTION_MANIFEST = REPO / "build/gen/delink_data_sections.tsv"
 BREAKPOINTS = REPO / "build/gen/delink_data_breakpoints.json"
+CONTRIBUTION_MANIFEST = REPO / "build/gen/delink_contributions.tsv"
 
 SYMBOL_HEADER = (
     "name", "object", "rva", "size", "storage", "alignment",
@@ -57,6 +59,9 @@ SECTION_HEADER = (
     "object", "ordinal", "name", "rva", "size", "alignment",
     "characteristics", "comdat_selection", "associative_ordinal",
     "storage", "provenance",
+)
+CONTRIBUTION_HEADER = (
+    "object", "storage", "rva", "size", "segment", "section", "provenance",
 )
 LOCAL_SUFFIX = re.compile(r"^_?(.+?)\$S[0-9]+$")
 
@@ -353,7 +358,39 @@ def validate_symbol_rows(rows, label: str) -> None:
             raise ValueError(f"{label} overlapping allocations {previous} and {current}")
 
 
-def _section_rows(topology_by_unit, symbol_rows, public_by_symbol):
+def _physical_contributions(rows):
+    """Return unsplit NB09 owner chunks and defer writable class to COFF replay."""
+    physical = []
+    for row in sorted(rows, key=lambda value: (
+            value["object"], int(value["rva"]), int(value["segment"]))):
+        if row["storage"] == "text":
+            continue
+        domain = "writable" if row["section"] == ".data" else row["storage"]
+        value = dict(row)
+        value["domain"] = domain
+        value["rva"] = int(value["rva"])
+        value["size"] = int(value["size"])
+        if (physical and physical[-1]["object"] == value["object"]
+                and physical[-1]["domain"] == domain
+                and physical[-1]["segment"] == value["segment"]
+                and physical[-1]["section"] == value["section"]
+                and physical[-1]["provenance"] == value["provenance"]
+                and physical[-1]["storage"] == "data"
+                and value["storage"] == "bss"
+                and physical[-1]["rva"] + physical[-1]["size"] == value["rva"]):
+            physical[-1]["size"] += value["size"]
+        else:
+            physical.append(value)
+    return physical
+
+
+def _section_domain(section):
+    if section.storage in ("data", "bss"):
+        return "writable"
+    return section.storage
+
+
+def _section_rows(topology_by_unit, symbol_rows, public_by_symbol, contributions):
     anchors = defaultdict(list)
     for row in symbol_rows:
         unit = row["object"].replace("\\", "/").removesuffix(".c")
@@ -369,45 +406,211 @@ def _section_rows(topology_by_unit, symbol_rows, public_by_symbol):
             anchors[(unit, definition.section_ordinal)].append((
                 public_rva - definition.section_value, definition.symbol,
                 public_rva, "retail-NB09-public-data"))
+    physical = _physical_contributions(contributions)
+    sections_by_unit = {
+        unit: [section for section in sections if section.storage is not None]
+        for unit, (_definitions, sections) in topology_by_unit.items()
+    }
+    for index, contribution in enumerate(physical):
+        contribution["index"] = index
+        unit = contribution["object"].replace("\\", "/").removesuffix(".c")
+        if contribution["domain"] != "writable":
+            contribution["candidate_storage"] = contribution["domain"]
+            continue
+        start = contribution["rva"]
+        end = start + contribution["size"]
+        hit_storages = set()
+        for section in sections_by_unit.get(unit, []):
+            if _section_domain(section) != "writable":
+                continue
+            if any(start <= rva < end
+                   for _base, _name, rva, _provenance in
+                   anchors.get((unit, section.ordinal), [])):
+                hit_storages.add(section.storage)
+        candidate_storages = {
+            section.storage for section in sections_by_unit.get(unit, [])
+            if _section_domain(section) == "writable"
+        }
+        if len(hit_storages) == 1:
+            contribution["candidate_storage"] = next(iter(hit_storages))
+        elif not hit_storages and len(candidate_storages) == 1:
+            contribution["candidate_storage"] = next(iter(candidate_storages))
+        else:
+            contribution["candidate_storage"] = None
+    contribution_groups = defaultdict(list)
+    for contribution in physical:
+        unit = contribution["object"].replace("\\", "/").removesuffix(".c")
+        storage = contribution["candidate_storage"]
+        if storage is not None:
+            contribution_groups[(unit, storage)].append(contribution)
+
     result = []
     diagnostics = []
+    assignments = {}
+    used_contributions = set()
+    for contribution in physical:
+        if contribution["domain"] != "writable":
+            continue
+        unit = contribution["object"].replace("\\", "/").removesuffix(".c")
+        start = contribution["rva"]
+        end = start + contribution["size"]
+        storages = sorted({
+            section.storage
+            for section in sections_by_unit.get(unit, [])
+            if _section_domain(section) == "writable"
+            and any(start <= rva < end
+                    for _base, _name, rva, _provenance in
+                    anchors.get((unit, section.ordinal), []))
+        })
+        if len(storages) > 1:
+            diagnostics.append({
+                "unit": unit,
+                "section_ordinal": None,
+                "section_name": None,
+                "storage": "writable",
+                "cause": "contribution-storage-conflict",
+                "contribution_rva": start,
+                "contribution_size": contribution["size"],
+                "candidate_storages": storages,
+            })
     for unit, (_definitions, sections) in sorted(topology_by_unit.items()):
-        for section in sections:
-            values = anchors.get((unit, section.ordinal), [])
-            bases = {value[0] for value in values}
-            if section.storage is not None and len(bases) != 1:
-                diagnostics.append({
-                    "unit": unit,
-                    "section_ordinal": section.ordinal,
-                    "section_name": section.name,
+        data_sections = [section for section in sections if section.storage is not None]
+        grouped_sections = defaultdict(list)
+        for section in data_sections:
+            grouped_sections[section.storage].append(section)
+        for storage, group in sorted(grouped_sections.items()):
+            intervals = contribution_groups.get((unit, storage), [])
+            interval_index = 0
+            cursor = intervals[0]["rva"] if intervals else None
+            for section in group:
+                values = anchors.get((unit, section.ordinal), [])
+                bases = {value[0] for value in values}
+                predicted = None
+                owner_index = None
+                while interval_index < len(intervals):
+                    interval = intervals[interval_index]
+                    candidate = _align_up(cursor, section.alignment)
+                    if candidate + section.size <= interval["rva"] + interval["size"]:
+                        predicted = candidate
+                        owner_index = interval["index"]
+                        cursor = candidate + section.size
+                        used_contributions.add(interval["index"])
+                        break
+                    interval_index += 1
+                    if interval_index < len(intervals):
+                        cursor = intervals[interval_index]["rva"]
+
+                if predicted is None and section.comdat_selection and len(bases) == 1:
+                    predicted = next(iter(bases))
+                    provenance = "explicit-comdat-anchor"
+                elif predicted is None:
+                    cause = ("unanchored-comdat-without-contribution"
+                             if section.comdat_selection else
+                             "section-outside-contributions")
+                    diagnostics.append({
+                        "unit": unit,
+                        "section_ordinal": section.ordinal,
+                        "section_name": section.name,
+                        "storage": section.storage,
+                        "cause": cause,
+                        "anchor_bases": sorted(bases),
+                        "anchors": [
+                            {"base": base, "name": name, "rva": rva,
+                             "provenance": anchor_provenance}
+                            for base, name, rva, anchor_provenance in values
+                        ],
+                    })
+                    continue
+                else:
+                    provenance = "retail-contribution-replay"
+
+                assignments[(unit, section.ordinal)] = (predicted, owner_index)
+                if len(bases) > 1:
+                    cause = "inconsistent-anchor-bases"
+                elif bases and predicted not in bases:
+                    cause = "breakpoint-drift"
+                else:
+                    cause = None
+                if cause:
+                    diagnostics.append({
+                        "unit": unit,
+                        "section_ordinal": section.ordinal,
+                        "section_name": section.name,
+                        "storage": section.storage,
+                        "cause": cause,
+                        "predicted_base": predicted,
+                        "anchor_bases": sorted(bases),
+                        "anchors": [
+                            {"base": base, "name": name, "rva": rva,
+                             "provenance": anchor_provenance}
+                            for base, name, rva, anchor_provenance in values
+                        ],
+                    })
+                elif bases:
+                    provenance += "+validated-anchor"
+
+                result.append({
+                    "object": section.object_name,
+                    "ordinal": str(section.ordinal),
+                    "name": section.name,
+                    "rva": f"0x{predicted:x}",
+                    "size": f"0x{section.size:x}",
+                    "alignment": f"0x{section.alignment:x}",
+                    "characteristics": f"0x{section.characteristics:08x}",
+                    "comdat_selection": str(section.comdat_selection),
+                    "associative_ordinal": (str(section.associative_ordinal)
+                                            if section.associative_ordinal is not None else "-"),
                     "storage": section.storage,
-                    "cause": ("missing-anchor" if not bases else
-                              "inconsistent-anchor-bases"),
-                    "anchor_bases": sorted(bases),
-                    "anchors": [
-                        {"base": base, "name": name, "rva": rva,
-                         "provenance": provenance}
-                        for base, name, rva, provenance in values
-                    ],
+                    "provenance": provenance,
                 })
+        assigned_ordinals = {section.ordinal for section in data_sections}
+        for section in sections:
+            if section.ordinal in assigned_ordinals:
+                if (unit, section.ordinal) not in assignments:
+                    result.append({
+                        "object": section.object_name,
+                        "ordinal": str(section.ordinal),
+                        "name": section.name,
+                        "rva": "-",
+                        "size": f"0x{section.size:x}",
+                        "alignment": f"0x{section.alignment:x}",
+                        "characteristics": f"0x{section.characteristics:08x}",
+                        "comdat_selection": str(section.comdat_selection),
+                        "associative_ordinal": (str(section.associative_ordinal)
+                                                if section.associative_ordinal is not None else "-"),
+                        "storage": section.storage,
+                        "provenance": "candidate-unassigned-data-section",
+                    })
+                continue
             result.append({
                 "object": section.object_name,
                 "ordinal": str(section.ordinal),
                 "name": section.name,
-                "rva": f"0x{next(iter(bases)):x}" if bases else "-",
+                "rva": "-",
                 "size": f"0x{section.size:x}",
                 "alignment": f"0x{section.alignment:x}",
                 "characteristics": f"0x{section.characteristics:08x}",
                 "comdat_selection": str(section.comdat_selection),
                 "associative_ordinal": (str(section.associative_ordinal)
                                         if section.associative_ordinal is not None else "-"),
-                "storage": section.storage or "-",
-                "provenance": ("DATA/supplemental-anchor" if len(bases) == 1
-                               else "candidate-unassigned-data-section"
-                               if section.storage is not None else
-                               "candidate-nondata-placeholder"),
+                "storage": "-",
+                "provenance": "candidate-nondata-placeholder",
             })
-    return result, diagnostics
+    for contribution in physical:
+        if contribution["index"] in used_contributions:
+            continue
+        unit = contribution["object"].replace("\\", "/").removesuffix(".c")
+        diagnostics.append({
+            "unit": unit,
+            "section_ordinal": None,
+            "section_name": None,
+            "storage": contribution["candidate_storage"] or contribution["domain"],
+            "cause": "unconsumed-contribution",
+            "contribution_rva": contribution["rva"],
+            "contribution_size": contribution["size"],
+        })
+    result.sort(key=lambda row: (row["object"], int(row["ordinal"])))
+    return result, diagnostics, physical
 
 
 def _stream_bounds(pe, storage: str) -> tuple[int, int]:
@@ -415,60 +618,114 @@ def _stream_bounds(pe, storage: str) -> tuple[int, int]:
         section = pe["sections"][".rdata"]
         return section["rva"], section["rva"] + section["virtual_size"]
     section = pe["sections"][".data"]
-    if storage == "data":
-        return section["rva"], section["rva"] + section["raw_size"]
-    return (section["rva"] + section["raw_size"],
-            section["rva"] + section["virtual_size"])
+    # PE raw file alignment does not preserve the linker's initialized/common
+    # distinction. Both candidate classes occupy the writable virtual stream.
+    return section["rva"], section["rva"] + section["virtual_size"]
+
+
+def _classified_contribution_rows(physical, section_rows):
+    assigned = []
+    for row in section_rows:
+        if row["rva"] == "-" or row["storage"] == "-":
+            continue
+        assigned.append((
+            row["object"], int(row["rva"], 0),
+            int(row["rva"], 0) + int(row["size"], 0), row["storage"],
+            int(row["ordinal"], 0),
+        ))
+
+    result = []
+    for contribution in physical:
+        start = contribution["rva"]
+        end = start + contribution["size"]
+        owned = sorted(row for row in assigned
+                       if row[0] == contribution["object"]
+                       and start <= row[1] and row[2] <= end)
+        if not owned:
+            continue
+        piece_start = start
+        current_storage = owned[0][3]
+        for _object, section_start, _section_end, storage, _ordinal in owned[1:]:
+            if storage != current_storage:
+                result.append({
+                    "object": contribution["object"],
+                    "storage": current_storage,
+                    "rva": piece_start,
+                    "size": section_start - piece_start,
+                    "segment": contribution["segment"],
+                    "section": contribution["section"],
+                    "provenance": "retail-nb09-sstModule+candidate-class",
+                })
+                piece_start = section_start
+                current_storage = storage
+        result.append({
+            "object": contribution["object"],
+            "storage": current_storage,
+            "rva": piece_start,
+            "size": end - piece_start,
+            "segment": contribution["segment"],
+            "section": contribution["section"],
+            "provenance": "retail-nb09-sstModule+candidate-class",
+        })
+    return [row for row in result if row["size"] > 0]
 
 
 def breakpoint_report(topology_by_unit, section_rows, section_diagnostics,
-                      units=UNITS, symbols=SYMBOLS, exe=EXE) -> dict:
+                      physical, exe=EXE) -> dict:
     assigned = {(row["object"].replace("\\", "/").removesuffix(".c"),
                  int(row["ordinal"], 0)): int(row["rva"], 0)
                 for row in section_rows if row["rva"] != "-"}
-    order = load_retail_order(units_path=units, symbols_path=symbols, retail_exe=exe)
     pe = read_pe(exe)
     streams = {}
     for storage in ("rdata", "data", "bss"):
         start, retail_end = _stream_bounds(pe, storage)
-        cursor = start
         intervals = []
-        for order_index, item in enumerate(order):
-            unit = item["unit"]
-            sections = [row for row in topology_by_unit[unit][1]
-                        if row.storage == storage]
+        for unit, (_definitions, sections) in sorted(topology_by_unit.items()):
             for section in sections:
-                before = cursor
-                predicted = _align_up(cursor, section.alignment)
+                if section.storage != storage:
+                    continue
                 actual = assigned.get((unit, section.ordinal))
-                cursor = predicted + section.size
+                if actual is not None and not start <= actual <= retail_end - section.size:
+                    section_diagnostics.append({
+                        "unit": unit,
+                        "section_ordinal": section.ordinal,
+                        "section_name": section.name,
+                        "storage": storage,
+                        "cause": "section-outside-pe-stream",
+                        "section_rva": actual,
+                        "section_size": section.size,
+                        "stream_start": start,
+                        "stream_end": retail_end,
+                    })
                 intervals.append({
-                    "order_index": order_index,
                     "unit": unit,
                     "object": section.object_name,
                     "section_ordinal": section.ordinal,
                     "section_name": section.name,
                     "alignment": section.alignment,
                     "size": section.size,
-                    "cursor_before": before,
-                    "predicted_rva": predicted,
                     "actual_rva": actual,
-                    "drift": actual - predicted if actual is not None else None,
-                    "cursor_after": cursor,
                 })
+        evidence = sorted(
+            (row["rva"], row["rva"] + row["size"])
+            for row in physical
+            if ((storage == "rdata" and row["domain"] == "rdata") or
+                (storage in ("data", "bss") and row["domain"] == "writable")))
         streams[storage] = {
             "retail_start": start,
             "retail_end": retail_end,
-            "predicted_end": cursor,
-            "terminal_drift": retail_end - cursor,
-            "exact_sections": sum(row["drift"] == 0 for row in intervals),
+            "evidence_start": evidence[0][0] if evidence else None,
+            "evidence_end": evidence[-1][1] if evidence else None,
+            "terminal_drift": retail_end - evidence[-1][1] if evidence else None,
+            "exact_sections": sum(row["actual_rva"] is not None for row in intervals),
             "unassigned_sections": sum(row["actual_rva"] is None for row in intervals),
             "section_count": len(intervals),
             "intervals": intervals,
         }
     return {
         "schema": 1,
-        "policy": "independent candidate cursors; observed anchors never change the cursor",
+        "policy": ("candidate-order replay within exact NB09 contribution chunks; "
+                   "observed anchors validate and never move the cursor"),
         "section_assignment_diagnostics": section_diagnostics,
         "streams": streams,
     }
@@ -501,16 +758,29 @@ def build_manifests(source_root=SOURCE_ROOT, base_root=BASE_ROOT, symbols=SYMBOL
         validate_symbol_rows(supplemental_rows, "supplemental")
     combined = [*source_rows, *supplemental_rows]
     validate_symbol_rows(combined, "combined")
-    section_rows, section_diagnostics = _section_rows(
-        topology_by_unit, combined, public_by_symbol)
+    retail_contributions = contribution_rows(exe, units)
+    section_rows, section_diagnostics, physical = _section_rows(
+        topology_by_unit, combined, public_by_symbol, retail_contributions)
     report = breakpoint_report(
-        topology_by_unit, section_rows, section_diagnostics, units, symbols, exe)
+        topology_by_unit, section_rows, section_diagnostics, physical, exe)
+    classified_contributions = [
+        dict(row) for row in retail_contributions if row["storage"] == "text"
+    ]
+    classified_contributions.extend(
+        _classified_contribution_rows(physical, section_rows))
+    classified_contributions.sort(key=lambda row: (
+        int(row["rva"]), row["object"], row["storage"]))
     _write_tsv(SOURCE_MANIFEST, SYMBOL_HEADER, _sorted_symbol_rows(source_rows),
                "Generated from source DATA() plus exact candidate COFF identity.")
     _write_tsv(COMBINED_MANIFEST, SYMBOL_HEADER, _sorted_symbol_rows(combined),
                "Generated Vostok symbol manifest; do not edit.")
     _write_tsv(SECTION_MANIFEST, SECTION_HEADER, section_rows,
                "Generated exact candidate COFF section topology; do not edit.")
+    _write_tsv(CONTRIBUTION_MANIFEST, CONTRIBUTION_HEADER,
+               [{key: (f"0x{row[key]:x}" if key in ("rva", "size") else row[key])
+                 for key in CONTRIBUTION_HEADER}
+                for row in classified_contributions],
+               "NB09 owner ranges classified by reconstructed candidate section storage.")
     BREAKPOINTS.parent.mkdir(parents=True, exist_ok=True)
     BREAKPOINTS.write_text(json.dumps(report, indent=2) + "\n")
     summary = {
@@ -526,7 +796,7 @@ def build_manifests(source_root=SOURCE_ROOT, base_root=BASE_ROOT, symbols=SYMBOL
     }
     if strict and section_diagnostics:
         raise ValueError(
-            f"{len(section_diagnostics)} data sections lack one consistent retail base; "
+            f"{len(section_diagnostics)} section replay diagnostics remain; "
             f"see {BREAKPOINTS}")
     return summary
 
