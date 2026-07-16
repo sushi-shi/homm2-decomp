@@ -4463,11 +4463,17 @@ char * advManager::GetArmySizeName(int armySize, int grammar)
     return gArmySizeNames[8][grammar];
 }
 
-// @early-stop: the 0xec frame, CFG, and all 102 ordered relocation targets
-// agree. OR-zero steering closes both first-row multiplication-order residuals.
-// Only +0x831..+0x838 remain: retail loads firstRowCountState then adds
-// secondRowCountState, while VC4.2 loads/adds the same ints oppositely. Textual
-// reversal, unary-plus/cast/zero grouping, and inline helpers were no better.
+// @semantic: Full brace-bounded source hash 4e7e3b2af55d at comparison epoch
+// 93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca covers
+// the function-local DATA declaration and the complete body through Dispose.
+// The 0xec frame/slots, CFG, 0xc29 retail span, tail bytes, and all 102 ordered
+// relocation sites and effective targets agree. OR-zero steering closes both
+// first-row multiplication-order residuals. The only eight unmasked bytes are
+// +0x831..+0x838: retail loads firstRowCountState then adds secondRowCountState,
+// while base loads/adds the same two ints oppositely. The two prior retained
+// iterations were commuted multiplication followed by OR-zero steering; the
+// unchanged evidence does not justify replaying the remaining variant budget.
+// Revisit only after this full-body hash or the comparison epoch changes.
 VA(0x004631ad, 0xc29)
 void advManager::TownQuickView(int townId, int locatorSlot, int windowX, int windowY)
 {

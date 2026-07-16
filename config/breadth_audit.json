@@ -48,13 +48,13 @@
     {
       "unit": "SOURCE/ADVMGR",
       "function": "?TownQuickView@advManager@@QAEXHHHH@Z",
-      "source_hash": "0d971a20a383",
+      "source_hash": "4e7e3b2af55d",
       "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
       "outcome": "improved",
       "iterations": 2,
       "before": 99.907234,
       "after": 99.99727,
-      "note": "OR-zero closes multiplication ordering; only commutative row-count load order remains with 102 relocations aligned."
+      "note": "Full-body re-audit confirms only eight commutative row-count load-order bytes; frame CFG tail and 102 relocations agree."
     },
     {
       "unit": "SOURCE/ADVMGR",
