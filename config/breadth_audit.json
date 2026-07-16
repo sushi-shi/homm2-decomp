@@ -37,7 +37,7 @@
     {
       "unit": "SOURCE/ADVMGR",
       "function": "?PuzzleDraw@advManager@@QAEXHHHH@Z",
-      "source_hash": "92f735bec4d8",
+      "source_hash": "a22b95215573",
       "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
       "outcome": "improved",
       "iterations": 1,
@@ -59,7 +59,7 @@
     {
       "unit": "SOURCE/ADVMGR",
       "function": "?UpdateHeroLocators@advManager@@QAEXHH@Z",
-      "source_hash": "9f85f1c12967",
+      "source_hash": "ff9cf9e945ca",
       "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
       "outcome": "parked",
       "iterations": 0,
@@ -70,7 +70,7 @@
     {
       "unit": "SOURCE/ADVMGR",
       "function": "?UpdateScreen@advManager@@QAEXHH@Z",
-      "source_hash": "136db954e972",
+      "source_hash": "148c3f5544e3",
       "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
       "outcome": "exact",
       "iterations": 1,
@@ -81,13 +81,68 @@
     {
       "unit": "SOURCE/ADVMGR",
       "function": "?UpdateTownLocators@advManager@@QAEXHH@Z",
-      "source_hash": "d2217b855df8",
+      "source_hash": "0297b6eaece9",
       "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
       "outcome": "parked",
       "iterations": 0,
       "before": 99.97175,
       "after": 99.97175,
       "note": "Relocation-masked code is exact and all 30 effective targets agree; only folded relocation identity remains."
+    },
+    {
+      "unit": "SOURCE/GAME",
+      "function": "?DoNewTurn@game@@QAEXXZ",
+      "source_hash": "df9b69eddf3e",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.98239,
+      "after": 100.0,
+      "note": "Non-human arm is a direct early return; 1109 raw bytes and 102 relocations agree."
+    },
+    {
+      "unit": "SOURCE/GAME",
+      "function": "?GiveTroopsToNeutralTown@game@@QAEXH@Z",
+      "source_hash": "95028454f5f0",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 99.9827,
+      "after": 99.9827,
+      "note": "Relocation-masked code is exact; one local switch entry names an equivalent immediate GiveArmy trampoline."
+    },
+    {
+      "unit": "SOURCE/GAME",
+      "function": "?LoadGame@game@@QAEXPADHH@Z",
+      "source_hash": "4f873ce536ca",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.99351,
+      "after": 100.0,
+      "note": "Recovered retail unreachable loadFromFile-or-RMT condition shape; 3111 raw bytes and 164 relocations agree."
+    },
+    {
+      "unit": "SOURCE/GAME",
+      "function": "?ViewArmy@game@@QAEXHHHHPAVtown@@HHHPAVhero@@PAVarmy@@PAVarmyGroup@@H@Z",
+      "source_hash": "a55f8a913a73",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "exact",
+      "iterations": 4,
+      "before": 99.99732,
+      "after": 100.0,
+      "note": "Address-escape loop-index spelling closes the accumulator order; 3206 raw bytes and 186 relocations agree."
+    },
+    {
+      "unit": "SOURCE/GAME",
+      "function": "?ViewArmyHandler@@YIHAAUtag_message@@@Z",
+      "source_hash": "9fc0bb907923",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.97951,
+      "after": 99.97951,
+      "note": "Relocation-masked code is exact; sole folded __adjust_fdiv/iLeftRightSave relocation resolves identically."
     },
     {
       "unit": "SOURCE/KB",
@@ -180,7 +235,7 @@
     {
       "unit": "SOURCE/TOWN",
       "function": "?Deallocate@town@@QAEXXZ",
-      "source_hash": "a8262aac8e34",
+      "source_hash": "cdedf56eb9df",
       "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
       "outcome": "parked",
       "iterations": 10,
