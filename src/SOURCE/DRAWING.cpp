@@ -1368,6 +1368,10 @@ void combatManager::DrawSmallView(int viewIndex, int updateScreen)
     gbInDrawSmallView = 0;
 }
 
-// ---- globals (definitions, RVA order) ----
+// @data-layout-note Retail .data is 0xed22c+0x80 and places the public zero
+// definitions at +0x30 and +0x64 among function literal pools. Candidate .data
+// is 0x7f and emits the same identities at +0/+4 even when the definitions are
+// placed immediately before their first-using functions. Retain the proven
+// initialized storage and RVAs; do not model either prefix as invented data.
 DATA(0x004ed25c) int bGridWasShowing = 0;
 DATA(0x004ed290) int gbInDrawSmallView = 0;
