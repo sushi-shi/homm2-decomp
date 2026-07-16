@@ -25,7 +25,7 @@ from homm2.match import status
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[3]))
 STATE = REPO / "config/breadth_audit.json"
 STATE_VERSION = 1
-EPOCH_VERSION = 1
+EPOCH_VERSION = 2
 OUTCOMES = frozenset(("exact", "improved", "parked"))
 
 
@@ -50,7 +50,11 @@ def comparison_epoch(repo=REPO, objdiff_cli=None):
     repo = Path(repo)
     objdiff = repo / "build/objdiff"
     config_path = objdiff / "objdiff.json"
-    canonicalizer = repo / "scripts/homm2/build/canonicalize_data_symbols.py"
+    comparison_helpers = (
+        repo / "scripts/homm2/build/canonicalize_data_symbols.py",
+        repo / "scripts/homm2/build/assert_relocs.py",
+        repo / "scripts/homm2/build/assert_early_stop_bytes.py",
+    )
     try:
         config = json.loads(config_path.read_text(encoding="utf-8"))
     except (FileNotFoundError, OSError, json.JSONDecodeError) as error:
@@ -94,15 +98,19 @@ def comparison_epoch(repo=REPO, objdiff_cli=None):
     executable = Path(executable_name).resolve()
     if not executable.is_file():
         raise AuditError("objdiff-cli is not a file: %s" % executable)
-    if not canonicalizer.is_file():
-        raise AuditError("comparison canonicalizer is missing: %s" % canonicalizer)
+    missing_helpers = [path for path in comparison_helpers if not path.is_file()]
+    if missing_helpers:
+        raise AuditError("comparison helper is missing: %s" % missing_helpers[0])
 
     identity = {
         "version": EPOCH_VERSION,
         "comparison_config": projected,
         "target_objects": targets,
         "objdiff_cli_sha256": _sha256(executable),
-        "canonicalizer_sha256": _sha256(canonicalizer),
+        "comparison_helpers": [
+            {"path": str(path.relative_to(repo)), "sha256": _sha256(path)}
+            for path in comparison_helpers
+        ],
     }
     return hashlib.sha256(_json_bytes(identity)).hexdigest()
 

@@ -30,11 +30,17 @@ class ComparisonEpochTest(unittest.TestCase):
         self.base = self.objdiff / "base/SOURCE/A.obj"
         self.target = self.objdiff / "target/SOURCE/A.obj"
         self.tool = self.root / "bin/objdiff-cli"
-        self.canonicalizer = (
-            self.root / "scripts/homm2/build/canonicalize_data_symbols.py")
+        self.helpers = [
+            self.root / "scripts/homm2/build/canonicalize_data_symbols.py",
+            self.root / "scripts/homm2/build/assert_relocs.py",
+            self.root / "scripts/homm2/build/assert_early_stop_bytes.py",
+        ]
         for path, contents in (
                 (self.base, b"base-a"), (self.target, b"target-a"),
-                (self.tool, b"objdiff-a"), (self.canonicalizer, b"canonicalizer-a")):
+                (self.tool, b"objdiff-a"),
+                (self.helpers[0], b"canonicalizer-a"),
+                (self.helpers[1], b"relocs-a"),
+                (self.helpers[2], b"early-stop-a")):
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(contents)
         self.config = self.objdiff / "objdiff.json"
@@ -72,13 +78,17 @@ class ComparisonEpochTest(unittest.TestCase):
         self._write_config(scratch="different")
         self.assertNotEqual(self._epoch(), original)
 
-    def test_tool_and_canonicalizer_change_epoch(self):
+    def test_tool_and_comparison_helpers_change_epoch(self):
         original = self._epoch()
         self.tool.write_bytes(b"objdiff-b")
         tool_changed = self._epoch()
         self.assertNotEqual(tool_changed, original)
-        self.canonicalizer.write_bytes(b"canonicalizer-b")
-        self.assertNotEqual(self._epoch(), tool_changed)
+        previous = tool_changed
+        for index, helper in enumerate(self.helpers):
+            helper.write_bytes(("helper-%d-b" % index).encode("ascii"))
+            changed = self._epoch()
+            self.assertNotEqual(changed, previous)
+            previous = changed
 
     def test_missing_target_fails_closed(self):
         self.target.unlink()
@@ -119,6 +129,16 @@ class AuditStateTest(unittest.TestCase):
         self.assertEqual([row["function"] for row in result["pending"]],
                          ["near", "far"])
         self.assertEqual(len(result["checked"]), 0)
+
+    def test_live_score_not_historical_max_controls_queue(self):
+        report = {"units": [{"name": "SOURCE/A", "functions": [
+            function("formerly-exact", 99.99),
+        ]}]}
+        hashes = {("SOURCE/A", "formerly-exact"): "444444444444"}
+        result = classify(report, hashes, self.empty, EPOCH_A)
+        self.assertEqual([], result["exact"])
+        self.assertEqual(["formerly-exact"],
+                         [row["function"] for row in result["pending"]])
 
     def test_matching_hash_and_epoch_are_the_only_nonexact_exclusion(self):
         state = record_audits(

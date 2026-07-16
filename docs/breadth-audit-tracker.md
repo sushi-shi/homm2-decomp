@@ -21,13 +21,15 @@ The comparison epoch hashes:
 
 - every normalized target object consumed by objdiff;
 - objdiff comparison configuration after removing every `base_path`;
-- the `objdiff-cli` executable; and
+- the `objdiff-cli` executable;
 - `canonicalize_data_symbols.py`, which defines comparison-only symbol and
-  local-label normalization.
+  local-label normalization;
+- `assert_relocs.py`; and
+- `assert_early_stop_bytes.py`.
 
 Candidate/base objects are deliberately excluded. Recompiling or editing
 ordinary source therefore cannot invalidate the full campaign. A target,
-comparison configuration, objdiff, or canonicalizer change makes old records
+comparison configuration, objdiff, canonicalizer, or proof-gate change makes old records
 stale. Stale rows remain visible state but do not exclude functions from the
 pending queue. Malformed rows, unknown functions, missing source hashes, and
 missing comparison inputs fail closed.
