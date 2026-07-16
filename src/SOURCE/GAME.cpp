@@ -828,12 +828,6 @@ void game::SetupOrigData(void)
     bShowIt = gbThisNetHumanPlayer[giCurPlayer];
 }
 
-// @early-stop
-// Exact 0xc27-byte span, all frame slots, CFG, and 164 relocations match after
-// recovering the VC 4.2 legacy I/O spellings. Retail's +0x51 early exit targets the
-// epilogue directly, while this TU uses its adjacent return label. At +0x54b..+0x579
-// only, the commutative week/month calendar terms load in the opposite order; swapping
-// the source terms did not steer them.
 VA(0x004735bf, 0xc27)
 void game::LoadGame(char *filename, int loadFromFile, int)
 {
@@ -848,7 +842,7 @@ void game::LoadGame(char *filename, int loadFromFile, int)
         m_gameLoaded = 1;
 
         char path28[452];
-        if (!loadFromFile && strnicmp(filename, "RMT", 3) == 0)
+        if (loadFromFile || strnicmp(filename, "RMT", 3) == 0)
             sprintf(path28, "%s%s", ".\\DATA\\", filename);
         else
             sprintf(path28, "%s%s", gcGamePath, filename);
@@ -998,9 +992,8 @@ void game::LoadGame(char *filename, int loadFromFile, int)
 }
 
 // @early-stop
-// All non-relocation bytes and 41/42 relocation values match. The switch's invalid-key
-// table entry names the +0x2ec `jmp` trampoline in retail and the +0x3bb common body in
-// this TU; both execute that same trampoline target before GiveArmy.
+// @early-stop-reloc-only: the invalid-key table entry targets retail's +0x2ec
+// trampoline and this TU's +0x3bb common body; both immediately enter GiveArmy.
 VA(0x004741e6, 0x3ee)
 void game::GiveTroopsToNeutralTown(int townId)
 {
@@ -1244,9 +1237,9 @@ void game::NewMap(char *filename)
 
     for (player2 = 0; player2 < m_playerCount; player2++) {
         if (player2 == 0 && gbInCampaign &&
-            (m_campaignAwards[CAMPAIGN_AWARD_BATTLE_GARB] != 0 ||
+            (m_campaignAwards[CAMPAIGN_AWARD_SORCERESS_GUILD] != 0 ||
              m_campaignAwards[CAMPAIGN_AWARD_DWARFBANE] != 0)) {
-            if (m_campaignAwards[CAMPAIGN_AWARD_BATTLE_GARB] != 0)
+            if (m_campaignAwards[CAMPAIGN_AWARD_SORCERESS_GUILD] != 0)
                 specialPortrait6 = 2;
             else
                 specialPortrait6 = 5;
@@ -1256,7 +1249,7 @@ void game::NewMap(char *filename)
                     break;
             }
             if (campaignHero15 < GAME_HERO_COUNT) {
-                if (m_campaignAwards[CAMPAIGN_AWARD_BATTLE_GARB] != 0) {
+                if (m_campaignAwards[CAMPAIGN_AWARD_SORCERESS_GUILD] != 0) {
                     m_heroRecs[campaignHero15].m_experience += 5000;
                     m_heroRecs[campaignHero15].CheckLevel();
                     strcpy(m_heroRecs[campaignHero15].m_name, "Sister Eliza");
@@ -2420,9 +2413,6 @@ int ViewSpecialHandler(tag_message &msg)
     return 1;
 }
 
-// @early-stop
-// reloc-masked: identical 0xc86-byte code/frame; the dwelling-table relocation resolves to
-// retail's folded 0x4fca35 symbol (gDwellingType at 0x4fca48 plus the -0x13 addend).
 VA(0x0047a649, 0xc86)
 void game::ViewArmy(int x, int y, int monsterType, int numTroops, town *castle,
                     int disableUpgrade, int facing, int quickView, hero *theHero,
@@ -2635,7 +2625,7 @@ void game::ViewArmy(int x, int y, int monsterType, int numTroops, town *castle,
                     break;
             }
             iconWidget *spellWidget = new iconWidget(
-                static_cast<short>(loopIndex0 * spacing0 + spellX3),
+                static_cast<short>((&loopIndex0)[0] * spacing0 + spellX3),
                 static_cast<short>(spellY3 + 14), 0, 0, const_cast<char *>("spellinl.icn"),
                 static_cast<short>(spellIndex9), 0, static_cast<short>(loopIndex0 + 200), 16, 1);
             if (!spellWidget)
@@ -2665,9 +2655,8 @@ void game::ViewArmy(int x, int y, int monsterType, int numTroops, town *castle,
 }
 
 // @early-stop
-// The full 0x3f5 instruction stream is byte-identical. The sole remaining objdiff
-// row spells retail's __adjust_fdiv address as iLeftRightSave+0x10; both resolve to
-// RVA 0x12126c, so this is a delinked public-owner alias rather than a source mismatch.
+// @early-stop-reloc-only: retail spells __adjust_fdiv as iLeftRightSave+0x10;
+// both resolve to RVA 0x12126c.
 VA(0x0047b2cf, 0x3f5)
 int ViewArmyHandler(tag_message &msg)
 {
@@ -5405,9 +5394,6 @@ int game::ReceiveSaveGame(int dataSize, int expectedCrc, int expectedTransmitCrc
 #undef samplesReady
 #undef success
 
-// @early-stop
-// Both objects have an exact 0x455-byte span and 102 relocation sites. The sole masked
-// byte difference is the +0x32 local epilogue-branch displacement, a delinked-label identity.
 VA(0x00483fc4, 0x455)
 void game::DoNewTurn(void)
 {
@@ -5418,78 +5404,78 @@ void game::DoNewTurn(void)
     CheckForTimeEvent();
     if (!gbThisNetHumanPlayer[giCurPlayer]) {
         CheckEndGame(0, 0);
-    } else {
-        giBottomViewOverrideEndTime = KBTickCount() + 3000;
-        giBottomViewOverride = 1;
-        gpAdvManager->UpdBottomView(1, 1, 1);
-        gpAdvManager->SetInitialMapOrigin();
-        gpAdvManager->CompleteDraw(0);
-        gpAdvManager->UpdateScreen(0, 0);
-        CheckEndGame(0, 0);
-
-        if (gpCurPlayer->m_daysLeft >= 0) {
-            if (gpCurPlayer->m_daysLeft == 1) {
-                sprintf(gText, cNewTurn[1], cPlayerNames[giCurPlayer]);
-            } else {
-                sprintf(gText, cNewTurn[0], cPlayerNames[giCurPlayer],
-                        gpCurPlayer->m_daysLeft);
-            }
-            NormalDialog(gText, 1, -1, -1, 9,
-                         gpGame->GetPlayerColor(static_cast<signed char>(giCurPlayer)),
-                         -1, 0, -1, 0);
-        }
-
-        if (gpCurPlayer->m_heroCount > 0) {
-            gpAdvManager->SetHeroContext(gpCurPlayer->NextHero(0), 0);
-        } else if (gpCurPlayer->m_townCount > 0) {
-            gpAdvManager->SetTownContext(gpCurPlayer->m_townIds[0]);
-        }
-        gpAdvManager->CheckDimNextHeroBut();
-
-        if (m_day == 1 &&
-            (m_month != 1 || m_week != 1 || m_day != 1)) {
-            if (gbThisNetHumanPlayer[giCurPlayer])
-                gpSoundManager->m_samplesReady = 1;
-            if (giWeekType != -1) {
-                musicTrack2 = -1;
-                if (m_week == 1) {
-                    musicTrack2 = 21;
-                    strcpy(musicFile18, "newmonth.82m");
-                    if (giMonthType == 0) {
-                        sprintf(gText, cNewTurn[2], gMonthNames[giMonthTypeExtra]);
-                    } else if (giMonthType == 1) {
-                        strcpy(lowerName19, gArmyNames[giMonthTypeExtra]);
-                        lowerName19[0] -= 0x20;
-                        sprintf(gText, cNewTurn[3],
-                                gArmyNames[giMonthTypeExtra], lowerName19);
-                    } else {
-                        sprintf(gText, cNewTurn[4]);
-                    }
-                } else {
-                    musicTrack2 = 20;
-                    strcpy(musicFile18, "newweek.82m");
-                    if (giWeekType == 0) {
-                        sprintf(gText, cNewTurn[5], gWeekNames[giWeekTypeExtra]);
-                    } else {
-                        strcpy(lowerName19, gArmyNames[giWeekTypeExtra]);
-                        lowerName19[0] -= 0x20;
-                        sprintf(gText, cNewTurn[6],
-                                gArmyNames[giWeekTypeExtra], lowerName19);
-                    }
-                }
-                gpSoundManager->PlayAmbientMusic(musicTrack2, 0, -1);
-                gpMouseManager->SetPointer(0);
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
-                gpSoundManager->SwitchAmbientMusic(
-                    giTerrainToMusicTrack[gpAdvManager->m_currentTerrain]);
-            }
-        }
-        gpSoundManager->SwitchAmbientMusic(
-            giTerrainToMusicTrack[gpAdvManager->m_currentTerrain]);
-        gpAdvManager->SetEnvironmentOrigin(
-            gpAdvManager->m_mapOriginX + 7,
-            gpAdvManager->m_mapOriginY + 7, 1);
+        return;
     }
+    giBottomViewOverrideEndTime = KBTickCount() + 3000;
+    giBottomViewOverride = 1;
+    gpAdvManager->UpdBottomView(1, 1, 1);
+    gpAdvManager->SetInitialMapOrigin();
+    gpAdvManager->CompleteDraw(0);
+    gpAdvManager->UpdateScreen(0, 0);
+    CheckEndGame(0, 0);
+
+    if (gpCurPlayer->m_daysLeft >= 0) {
+        if (gpCurPlayer->m_daysLeft == 1) {
+            sprintf(gText, cNewTurn[1], cPlayerNames[giCurPlayer]);
+        } else {
+            sprintf(gText, cNewTurn[0], cPlayerNames[giCurPlayer],
+                    gpCurPlayer->m_daysLeft);
+        }
+        NormalDialog(gText, 1, -1, -1, 9,
+                     gpGame->GetPlayerColor(static_cast<signed char>(giCurPlayer)),
+                     -1, 0, -1, 0);
+    }
+
+    if (gpCurPlayer->m_heroCount > 0) {
+        gpAdvManager->SetHeroContext(gpCurPlayer->NextHero(0), 0);
+    } else if (gpCurPlayer->m_townCount > 0) {
+        gpAdvManager->SetTownContext(gpCurPlayer->m_townIds[0]);
+    }
+    gpAdvManager->CheckDimNextHeroBut();
+
+    if (m_day == 1 &&
+        (m_month != 1 || m_week != 1 || m_day != 1)) {
+        if (gbThisNetHumanPlayer[giCurPlayer])
+            gpSoundManager->m_samplesReady = 1;
+        if (giWeekType != -1) {
+            musicTrack2 = -1;
+            if (m_week == 1) {
+                musicTrack2 = 21;
+                strcpy(musicFile18, "newmonth.82m");
+                if (giMonthType == 0) {
+                    sprintf(gText, cNewTurn[2], gMonthNames[giMonthTypeExtra]);
+                } else if (giMonthType == 1) {
+                    strcpy(lowerName19, gArmyNames[giMonthTypeExtra]);
+                    lowerName19[0] -= 0x20;
+                    sprintf(gText, cNewTurn[3],
+                            gArmyNames[giMonthTypeExtra], lowerName19);
+                } else {
+                    sprintf(gText, cNewTurn[4]);
+                }
+            } else {
+                musicTrack2 = 20;
+                strcpy(musicFile18, "newweek.82m");
+                if (giWeekType == 0) {
+                    sprintf(gText, cNewTurn[5], gWeekNames[giWeekTypeExtra]);
+                } else {
+                    strcpy(lowerName19, gArmyNames[giWeekTypeExtra]);
+                    lowerName19[0] -= 0x20;
+                    sprintf(gText, cNewTurn[6],
+                            gArmyNames[giWeekTypeExtra], lowerName19);
+                }
+            }
+            gpSoundManager->PlayAmbientMusic(musicTrack2, 0, -1);
+            gpMouseManager->SetPointer(0);
+            NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+            gpSoundManager->SwitchAmbientMusic(
+                giTerrainToMusicTrack[gpAdvManager->m_currentTerrain]);
+        }
+    }
+    gpSoundManager->SwitchAmbientMusic(
+        giTerrainToMusicTrack[gpAdvManager->m_currentTerrain]);
+    gpAdvManager->SetEnvironmentOrigin(
+        gpAdvManager->m_mapOriginX + 7,
+        gpAdvManager->m_mapOriginY + 7, 1);
 }
 
 VA(0x00484419, 0x58)

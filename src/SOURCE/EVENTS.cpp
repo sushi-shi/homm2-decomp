@@ -55,7 +55,7 @@
 
 DATA(0x005190a4) static char s_twoStringFormat[] = "%s %s";
 
-// @match-note
+// @semantic
 // Complete semantics/CFG with the retail 0x350 frame, all source slots, and the
 // main plus eight nested-switch spills at -0x330..-0x350. All 972 relocation
 // sites agree: gpGame is 62/62 and gpWindowManager is 34/34. The mine uses four
@@ -1879,7 +1879,11 @@ daemonExperienceGold:
 }
 
 // @early-stop
-// reloc-masked: all 0x9f7 code bytes identical; residual is delinked local-label naming
+// @early-stop-reloc-only
+// All 0x9f7 relocation-masked bytes, frame/slots, and CFG match after restoring
+// retail's m_mapData-before-extra-index accessor evaluation in both late chains.
+// All 18 ordered relocation sites/effective targets align; the retained objdiff
+// residual is delinked local-label identity.
 VA(0x004ae00b, 0x9f7)
 void advManager::EraseObj(class mapCell *cell, int x, int y)
 {
@@ -2002,8 +2006,10 @@ void advManager::EraseObj(class mapCell *cell, int x, int y)
         if (currentCell_k->m_objectTileset != ERASE_CLEARED_TILESET)
             continue;
 
-        if (currentCell_k->m_extraIndex && m_mapData->Extra(currentCell_k->m_extraIndex)->objectIndex != ERASE_EMPTY_INDEX)
-            extra_i = m_mapData->Extra(currentCell_k->m_extraIndex);
+        if (currentCell_k->m_extraIndex &&
+            0[&m_mapData]->Extra(currentCell_k->m_extraIndex)->objectIndex !=
+                ERASE_EMPTY_INDEX)
+            extra_i = 0[&m_mapData]->Extra(currentCell_k->m_extraIndex);
         else
             continue;
 
@@ -2029,8 +2035,10 @@ void advManager::EraseObj(class mapCell *cell, int x, int y)
             currentCell_k->m_objectIndex != ERASE_EMPTY_INDEX && !currentCell_k->m_objectLayerBit1)
             goto cellDone;
 
-        if (currentCell_k->m_extraIndex && m_mapData->Extra(currentCell_k->m_extraIndex)->objectIndex != ERASE_EMPTY_INDEX)
-            extra_i = m_mapData->Extra(currentCell_k->m_extraIndex);
+        if (currentCell_k->m_extraIndex &&
+            0[&m_mapData]->Extra(currentCell_k->m_extraIndex)->objectIndex !=
+                ERASE_EMPTY_INDEX)
+            extra_i = 0[&m_mapData]->Extra(currentCell_k->m_extraIndex);
         else
             extra_i = 0;
 
@@ -2152,13 +2160,16 @@ void advManager::PasswordEvent(mapCell *cell, hero *)
     gpCurPlayer->m_barrierTents |= 1 << color;
 }
 
-// @early-stop
-// Complete semantics/CFG, 0x54-byte frame, and every source stack
-// slot are recovered. Both sides have 496 non-table instructions; retail is one
-// byte longer solely from the equivalent outer map-width comparison sequence.
-// The monster hit-point relocation is gMonsterDatabase+8 in base and the same
-// effective address const_000faeb8 in retail; other residuals are branch and
-// delinked seven-entry switch-table identities.
+// @semantic
+// Complete 0x6fe body, 0x54 frame/slots, CFG, and all 75 ordered relocation
+// sites/effective targets align. 0[&mapY9] restores retail's inner height compare
+// and closes the former one-byte body/shifted-relocation residual. The only
+// unmasked bytes left are +0x250/+0x253: retail loads primaryStat15 before
+// eventHero for the arena stat increment, while ours loads eventHero first.
+// Equivalent prefix/postfix/index spellings are byte-neutral in the identical
+// GenericSiteAIEvent shape. Revisit only if the hero primary-stat representation
+// or accessor changes, an earlier EVENTS source edit changes emitted evaluation
+// order, or comparison gains a proved commutative-load normalization.
 VA(0x004aed38, 0x6fe)
 void advManager::GenericSiteEvent(mapCell *cell, hero *eventHero)
 {
@@ -2283,7 +2294,7 @@ void advManager::GenericSiteEvent(mapCell *cell, hero *eventHero)
             "journeys.",
             1, -1, -1, -1, 0, -1, 0, -1, 0);
         for (mapX37 = 0; mapX37 < MAP_WIDTH; mapX37++) {
-            for (mapY9 = 0; mapY9 < MAP_HEIGHT; mapY9++) {
+            for (mapY9 = 0; 0[&mapY9] < MAP_HEIGHT; mapY9++) {
                 currentCell5 = gpGame->m_worldMap.Row(mapY9) + mapX37;
                 currentSiteType = currentCell5->m_objectMetadata;
                 currentSiteType &= BARRIER_COLOR_MASK;
@@ -2451,10 +2462,14 @@ void advManager::ExpansionRecruitEvent(hero *eventHero, int creatureType,
     delete dialogManager;
 }
 
-// @early-stop
-// Relocation-masked: only rel32 bytes +0x7e and +0xb4 differ. The two early
-// exits target the epilogue instead of the identical final continuation;
-// every non-branch byte and external relocation target matches.
+// @semantic
+// Complete 0x22a body, frame/slots, CFG, and all 21 ordered relocation sites and
+// effective targets align. Only rel32 bytes +0x7e/+0xb4 differ: retail routes
+// the two dialog-complete arms through the final continuation, while ours targets
+// the epilogue directly. An explicit early-return family removed both retail
+// jumps and shifted the remainder by 10 bytes, so it was rejected. Revisit only
+// if an earlier EVENTS edit changes this function's branch-target lowering or
+// comparison normalizes proven continuation equivalence.
 VA(0x004af652, 0x22a)
 void advManager::JailEvent(mapCell *cell, hero *eventHero, int x, int y)
 {
@@ -2756,9 +2771,10 @@ void advManager::EventWindow(int eventId, int buttons, char *text, int type1,
 }
 
 // @early-stop
-// The base is five bytes larger solely because of the unreachable jump at
-// +0x44. With branch destinations normalized, every other opcode and operand
-// matches; all three external relocation targets also agree.
+// @early-stop-reloc-only
+// All 0xb6 relocation-masked bytes, 54 normalized instructions, frame/slots,
+// CFG, and three ordered relocation sites/effective targets match after removing
+// the empty loop else arm.
 VA(0x004b0033, 0xb6)
 int GiveArtifact(hero *eventHero, int artifact, int checkEndGame,
                  signed char artifactExtra)
@@ -2769,7 +2785,6 @@ int GiveArtifact(hero *eventHero, int artifact, int checkEndGame,
          artifactSlot++) {
         if (eventHero->m_artifacts[artifactSlot] == EVENT_ARTIFACT_NONE) {
             break;
-        } else {
         }
     }
 
@@ -3106,7 +3121,11 @@ void advManager::HouseEvent(hero *eventHero, mapCell *cell)
 }
 
 // @early-stop
-// raw instructions/slots identical; gMonsterDatabase+0x16 and const_000faec6 resolve to the same address
+// @early-stop-reloc-only
+// All 0x62f relocation-masked bytes, 425 normalized instructions, the frame,
+// slots, and CFG match after restoring lastStackCount use and retail coordinate
+// evaluation order. All 29 ordered relocation sites/effective targets agree; the
+// retained residual is folded gMonsterDatabase/constant symbol identity.
 VA(0x004b0d51, 0x62f)
 int advManager::CombatMonsterEvent(hero *eventHero, int monsterType,
                                    int monsterCount, mapCell *, int mapX,
@@ -3150,7 +3169,7 @@ int advManager::CombatMonsterEvent(hero *eventHero, int monsterType,
     if (stackCount < 1)
         stackCount = 1;
     placement4[COMBAT_MONSTER_ARMY_SLOTS] = 0;
-    SRand(combatX + combatY);
+    SRand(combatY + combatX);
     if (stackCount == COMBAT_MONSTER_ARMY_SLOTS &&
         (gMonsterDatabase[monsterType].attributes & MONSTER_ATTRIBUTE_RANGED) == 0) {
         int roll = SRandom(0, COMBAT_MONSTER_RANDOM_MAX);
@@ -3217,14 +3236,14 @@ int advManager::CombatMonsterEvent(hero *eventHero, int monsterType,
     for (stackIndex9 = 0; stackIndex9 < COMBAT_MONSTER_ARMY_SLOTS; stackIndex9++)
         placement4[stackIndex9] = stackIndex9;
 
-    if (stackCount == 1) {
+    if (lastStackCount == 1) {
         placement4[2] = 0;
         placement4[0] = 2;
-    } else if (stackCount == 2) {
+    } else if (lastStackCount == 2) {
         placement4[1] = 1;
         placement4[3] = 0;
         placement4[0] = 3;
-    } else if (stackCount == 3) {
+    } else if (lastStackCount == 3) {
         placement4[0] = 3;
         placement4[1] = 0;
         placement4[2] = 1;
@@ -3256,17 +3275,20 @@ int advManager::CombatMonsterEvent(hero *eventHero, int monsterType,
     if (defender != 0)
         combatResult7 = DoCombat(combatX, combatY, 0, gpMonGroup,
                                 0, eventHero, &eventHero->m_army, mapX, mapY,
-                                combatX + combatY, 1);
+                                combatY + combatX, 1);
     else
         combatResult7 = DoCombat(combatX, combatY, eventHero, &eventHero->m_army,
                                 0, 0, gpMonGroup, mapX, mapY,
-                                combatX + combatY, 1);
+                                combatY + combatX, 1);
     MobilizeCurrHero(0);
     return combatResult7;
 }
 
 // @early-stop
-// non-table instructions/slots identical; 103 table entries differ only by delinked local-label identity
+// @early-stop-reloc-only
+// All 0x5f3 relocation-masked bytes, frame/slots, CFG, and 105 ordered relocation
+// sites/effective targets match. The retained residual is the 103-entry switch
+// table's delinked local-label identities.
 VA(0x004b1380, 0x5f3)
 void GiveTakeArtifactStat(hero *targetHero, int artifact, int take)
 {
@@ -3440,8 +3462,15 @@ void GiveTakeArtifactStat(hero *targetHero, int artifact, int take)
     }
 }
 
-// @early-stop
-// reloc-masked instructions/slots identical; only the string-literal symbol identity differs
+// @semantic
+// The 0xc frame/slots, CFG, and all 11 ordered relocation sites/effective targets
+// align. After relocation masking, only branch bytes +0x12/+0x13/+0x21 differ:
+// retail routes the sourceHero-null arm through the destinationHero-null jump,
+// while ours targets the same epilogue directly. Four bounded CFG families were
+// tried: nested empty arms, positive conjunction, early returns, and shared-label
+// variants; all alternatives added 5-10 bytes. Revisit only if an earlier EVENTS
+// source edit changes this function's emitted CFG or branch comparison normalizes
+// continuation targets. The remaining objdiff residual is pooled string identity.
 VA(0x004b1973, 0x1dd)
 void advManager::TransferArtifacts(hero *sourceHero, hero *destinationHero)
 {
@@ -3494,12 +3523,16 @@ void advManager::TransferArtifacts(hero *sourceHero, hero *destinationHero)
 }
 
 // @early-stop
-// raw instructions identical; retail carries one trailing function-boundary nop
+// @early-stop-reloc-only
+// All 0x7f relocation-masked bytes, 50 normalized instructions, the 0x4 frame,
+// slots, CFG, and six ordered relocation sites/effective targets match after an
+// explicit null early return. Retail carries one nop outside the declared span.
 VA(0x004b1b50, 0x7f)
 void advManager::HeroLoses(hero *lostHero)
 {
-    if (lostHero == 0) {
-    } else {
+    if (lostHero == 0)
+        return;
+    {
         CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
         UpdateScreen(0, 0);
         lostHero->Deallocate(1);
@@ -3510,7 +3543,11 @@ void advManager::HeroLoses(hero *lostHero)
 }
 
 // @early-stop
-// raw instructions/slots identical; the fight-value relocation names the same interior database address
+// @early-stop-reloc-only
+// All 0x132 relocation-masked bytes, 85 normalized instructions, frame/slots,
+// CFG, and four ordered relocation sites/effective targets match after explicit
+// early returns and restoring retail's weakest-value operand order. Objdiff only
+// names the same interior fight-value address differently.
 VA(0x004b1bcf, 0x132)
 void advManager::DoWhirlpool(hero *eventHero)
 {
@@ -3520,11 +3557,12 @@ void advManager::DoWhirlpool(hero *eventHero)
     int slotIndex;
     int groupValues[COMBAT_MONSTER_ARMY_SLOTS];
 
-    if (gbHumanPlayer[eventHero->m_owner] == 0) {
-    } else {
-        if (Random(EVENT_WHIRLPOOL_TRIGGER_ROLL, EVENT_WHIRLPOOL_TRIGGER_MAX) !=
-            EVENT_WHIRLPOOL_TRIGGER_ROLL) {
-        } else {
+    if (gbHumanPlayer[eventHero->m_owner] == 0)
+        return;
+    if (Random(EVENT_WHIRLPOOL_TRIGGER_ROLL, EVENT_WHIRLPOOL_TRIGGER_MAX) !=
+        EVENT_WHIRLPOOL_TRIGGER_ROLL)
+        return;
+    {
             weakestValue = EVENT_WHIRLPOOL_ARMY_VALUE_LIMIT;
             selectedSlot = -1;
             for (slotIndex = 0; slotIndex < COMBAT_MONSTER_ARMY_SLOTS; slotIndex++) {
@@ -3532,7 +3570,7 @@ void advManager::DoWhirlpool(hero *eventHero)
                     armyValue =
                         gMonsterDatabase[eventHero->m_army.m_creatureTypes[slotIndex]].fightValue *
                         eventHero->m_army.m_creatureCounts[slotIndex];
-                    if (weakestValue > armyValue) {
+                    if (armyValue < 0[&weakestValue]) {
                         weakestValue = armyValue;
                         selectedSlot = slotIndex;
                     }
@@ -3545,20 +3583,24 @@ void advManager::DoWhirlpool(hero *eventHero)
             } else if (eventHero->m_army.m_creatureCounts[selectedSlot] > 1) {
                 eventHero->m_army.m_creatureCounts[selectedSlot] >>= 1;
             }
-        }
     }
 }
 
 // @early-stop
-// reloc-masked instructions/slots identical; only literal and interior aggregate relocation identities differ
+// @early-stop-reloc-only
+// All 0x142 relocation-masked bytes, normalized instructions, the 0x1c frame,
+// retail slots, CFG, and 22 ordered relocation sites/effective targets match
+// after an explicit hidden-state early return and hash-derived local renaming.
+// Remaining objdiff noise is pooled literal/interior aggregate identity.
 VA(0x004b1d01, 0x142)
 void advManager::FizzleCenter(int fizzleType)
 {
     SAMPLE2 playedSample;
-    int fizzleSteps;
+    int fizzleStepCount;
 
-    if (bShowIt == 0) {
-    } else {
+    if (bShowIt == 0)
+        return;
+    {
         switch (fizzleType) {
         case EVENT_FIZZLE_HERO_LOSS:
             sprintf(gText, "killfade.82M");
@@ -3575,16 +3617,16 @@ void advManager::FizzleCenter(int fizzleType)
         gpWindowManager->SaveFizzleSource(EVENT_FIZZLE_X, EVENT_FIZZLE_Y,
                                           EVENT_FIZZLE_WIDTH, EVENT_FIZZLE_HEIGHT);
         CompleteDraw(0);
-        fizzleSteps = EVENT_FIZZLE_STEPS;
+        fizzleStepCount = EVENT_FIZZLE_STEPS;
         gpWindowManager->FizzleForward(EVENT_FIZZLE_X, EVENT_FIZZLE_Y,
                                        EVENT_FIZZLE_WIDTH, EVENT_FIZZLE_HEIGHT,
-                                       fizzleSteps, 0, 0);
+                                       fizzleStepCount, 0, 0);
         gpMouseManager->ShowColorPointer();
         WaitEndSample(playedSample, -1);
     }
 }
 
-// @match-note
+// @semantic
 // Complete body and CFG with the retail 0x150 frame, four jump tables, and
 // 356/356 relocation sites. All event-flag updates match retail load/op/store
 // form via static_cast<int>, and the mine-owner and combat-result early breaks
@@ -4575,10 +4617,15 @@ void advManager::PasswordAIEvent(mapCell *cell, hero *)
     gpCurPlayer->m_barrierTents |= (1 << color);
 }
 
-// @early-stop
-// All 0x369 code bytes match after masking 25 relocations. The
-// residual is the two switch tables' delinked local-label identities plus the
-// graveyard multiplier/monster-table folded symbol identities.
+// @semantic
+// Complete 0x369 body, 0x44 frame/slots, CFG, and all 25 ordered relocation
+// sites/effective targets align. After masking those relocations, the only raw
+// differences are +0x197/+0x19a: retail loads primaryStat16 before eventHero for
+// the primary-stat increment, while ours loads eventHero first. Prefix/postfix,
+// 0[&index], and commuted subscript spellings were byte-neutral; an explicit
+// read/add/write grew the body by 12 bytes. Revisit only if the hero primary-stat
+// representation/accessor changes, an earlier EVENTS source edit changes emitted
+// evaluation order, or comparison gains a proved commutative-load normalization.
 VA(0x004b493b, 0x369)
 void advManager::GenericSiteAIEvent(mapCell *cell, hero *eventHero)
 {
@@ -4695,10 +4742,13 @@ void advManager::GenericSiteAIEvent(mapCell *cell, hero *eventHero)
     }
 }
 
-// @early-stop
-// Complete semantics, frame, slots, CFG, and relocation targets.
-// The switch table differs only by delinked local-label identity; the only
-// opcode residual is the packed m_objectMetadata assignment's equivalent operand order.
+// @semantic
+// Complete 0x18f body, 0x44 frame/slots, CFG, and all 12 ordered relocation
+// sites/effective targets align. The sole executable residual is +0x11f..+0x12e:
+// retail reads the cell word before shifting packedSite17 for the bitfield write,
+// while ours shifts first. Direct, `| 0`, and 0[&packedSite17] assignments were
+// byte-neutral; an explicit m_objectData mask/write changed the body size/register
+// width. Revisit after later EVENTS TU or mapCell accessor changes.
 VA(0x004b4ca4, 0x18f)
 void advManager::RecruitSiteAIEvent(mapCell *cell, hero *eventHero)
 {
@@ -4746,7 +4796,7 @@ void advManager::RecruitSiteAIEvent(mapCell *cell, hero *eventHero)
                 static_cast<short>(availableCount1 - purchaseCount17);
             packedSite17 =
                 (availableCount1 << AI_EVENT_RECRUIT_COUNT_SHIFT) | siteType3;
-            cell->m_objectMetadata = packedSite17 | 0;
+            cell->m_objectMetadata = packedSite17;
             GetMonsterCost(creatureType13, cost16);
             for (resourceIndex27 = 0;
                  resourceIndex27 < AI_EVENT_RESOURCE_COUNT;
@@ -4758,11 +4808,15 @@ void advManager::RecruitSiteAIEvent(mapCell *cell, hero *eventHero)
     }
 }
 
-// @early-stop
-// Complete semantics, frame, slots, CFG, and relocation targets.
-// The only opcode residual is the final m_objectMetadata assignment's equivalent operand
-// evaluation order; two earlier exits also target the identical final five-byte
-// continuation rather than its epilogue destination.
+// @semantic
+// All 134 normalized instructions, frame/slots, CFG, and 12 ordered relocation
+// sites/effective targets match. The only raw differences are rel32 bytes +0x4e
+// and +0x65: retail's two early exits target the identical final five-byte
+// continuation while ours target its epilogue destination directly. Four bounded
+// CFG families were tried: nested empty arms, flattened positive guard, explicit
+// early returns, and a shared terminal label; alternatives added or removed 5-15
+// bytes. Revisit only if an earlier EVENTS source edit changes emitted branch
+// targets or comparison normalization learns continuation equivalence.
 VA(0x004b4e33, 0x1a2)
 void advManager::JailAIEvent(mapCell *cell, hero *eventHero, int x, int y)
 {
@@ -4800,9 +4854,11 @@ void advManager::JailAIEvent(mapCell *cell, hero *eventHero, int x, int y)
 }
 
 // @early-stop
-// All normalized instructions and the 0x154 frame/slots match; 85/85 relocation
-// sites resolve to the same effective targets. Residuals are folded monster-field
-// and pooled string/float identities.
+// @early-stop-reloc-only
+// All 0x82b relocation-masked bytes, normalized instructions, the 0x154 frame,
+// slots, and CFG match after correcting the shared CampaignAward values. All
+// 85 ordered relocation sites resolve to the same effective targets; the retained
+// objdiff residual is folded monster-field and pooled string/float identities.
 VA(0x004b4fd5, 0x82b)
 void advManager::PlayerMonsterInteract(mapCell *cell, mapCell *combatCell, hero *eventHero,
                                        int *handled, int x, int y, int unused,
@@ -4826,7 +4882,7 @@ void advManager::PlayerMonsterInteract(mapCell *cell, mapCell *combatCell, hero 
                       static_cast<float>(gMonsterDatabase[monster_n].fightValue * monsterCount_n);
 
     if (gbInCampaign &&
-        ((gpGame->m_campaignAwards[CAMPAIGN_AWARD_DWARF_ALLIANCE] &&
+        ((gpGame->m_campaignAwards[CAMPAIGN_AWARD_DWARVEN_ALLIANCE] &&
           (monster_n == MONSTER_DWARF || monster_n == MONSTER_BATTLE_DWARF)) ||
          (gpGame->m_campaignAwards[CAMPAIGN_AWARD_OGRE_ALLIANCE] &&
           (monster_n == MONSTER_OGRE || monster_n == MONSTER_OGRE_LORD)) ||
@@ -4975,11 +5031,14 @@ fightMonsters:
         *handled = 1;
 }
 
-// @early-stop
+// @semantic
 // Complete semantics, 0x40-byte frame, slots, CFG, and all 36
 // relocation sites are recovered. Retail is 25 bytes larger solely because it
 // retains five five-byte continuation jumps; the remaining relocation names
-// are delinked aliases of the same monster fields and floating constants.
+// are delinked aliases of the same monster fields and floating constants. No
+// additional variant was retained in this pass because the five exact jump sites
+// are already isolated; revisit only if earlier EVENTS source/header changes alter
+// inline continuation placement or comparison normalizes those destinations.
 VA(0x004b5800, 0x440)
 void advManager::ComputerMonsterInteract(mapCell *cell, hero *eventHero,
                                          int *handled)
@@ -5560,10 +5619,13 @@ void advManager::ReceiveHeroTownData(
     }
 }
 
-// @early-stop
+// @semantic
 // Complete semantics, frame, slots, CFG, and external relocation
 // targets. The retail body is exactly one five-byte continuation jump longer;
 // the apparent relocation excess is the delinked six-entry local switch table.
+// No additional variant was retained in this pass because the single jump site
+// is isolated; revisit only if earlier EVENTS source/header changes alter inline
+// continuation placement or comparison normalizes the proven destination.
 VA(0x004b6c2f, 0x254)
 int advManager::AutoResolveCombat(
     int x, int y, hero *firstHero, armyGroup *firstArmy, town *combatTown,
@@ -5626,6 +5688,11 @@ int advManager::AutoResolveCombat(
     return gpCombatManager->m_combatResult;
 }
 
+// @early-stop
+// @early-stop-reloc-only
+// All 0xb8 relocation-masked bytes, frame/slots, and CFG match. All four ordered
+// relocation sites resolve identically; retail names the final CRT alias _strcmpi
+// while the reconstructed SDK declaration emits the equivalent _stricmp symbol.
 VA(0x004b6e83, 0xb8)
 int RiddleStringsEqual(char *answer, char *expected)
 {
