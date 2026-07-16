@@ -80,9 +80,10 @@ void ModemSetup(int mode)
     }
 }
 
-// @early-stop: all non-relocation bytes in the declared 0x9e-byte span agree and
-// all 19 relocation offsets are present. The residual is only delinked literal-pool
-// identities for the dial format/status/CONNECT strings.
+// @semantic: complete 0x9e-byte instruction stream, frame, CFG, and all 19
+// ordered relocations agree. The sole raw residual is the true-return branch
+// displacement at +0x8e: this form enters the trailing join jump while retail
+// reaches the epilogue directly. An explicit if/else return scored 97.67%.
 VA(0x0040cb3e, 0x9e)
 long int Dial(void)
 {
@@ -95,9 +96,10 @@ long int Dial(void)
     return GUIModemResponse(gText, "CONNECT") != 0;
 }
 
-// @early-stop: all non-relocation bytes in the declared 0x54-byte span agree and
-// all 9 relocation offsets are present. The residual is only delinked literal-pool
-// identities for the ring/answer/connection strings.
+// @semantic: complete 0x54-byte instruction stream, frame, CFG, and all 9
+// ordered relocations agree. The sole raw residual is the true-return branch
+// displacement at +0x44: this form enters the trailing join jump while retail
+// reaches the epilogue directly. An explicit if/else return scored 96.15%.
 VA(0x0040cbdc, 0x54)
 long int Wait(void)
 {
@@ -164,9 +166,10 @@ signed char GUIModemResponse(char *message, char *response)
     return 0;
 }
 
-// @early-stop: all 0xe2 bytes agree after masking the 20 aligned relocation
-// fields. The only residual is the target delinker's synthetic literal name for
-// the interior byte at GUIMRresponse + MODEM_RESPONSE_TRUNCATE_INDEX.
+// @semantic: complete semantics, frame, CFG, and all 20 ordered relocations
+// agree. Raw bytes differ only at +0x53 and +0x5f, where retail places the
+// inlined TruncateModemResponse continuation at the trailing join jump. Adding
+// an inner else/return changed the CFG and scored 93.94%.
 VA(0x0040ce4e, 0xe2)
 signed char GUIModemResponseExec(void)
 {
@@ -360,40 +363,37 @@ readPacketStart:
     }
 }
 
-// @early-stop: all non-relocation bytes in the declared 0xff-byte span agree and all
-// 4 relocation offsets are present. The recovered loop assigns `remaining5 = length--`,
-// placing remaining at -0x228 and the encoded buffer at -0x224; the sole residual is
-// the delinked `TOO LONG` literal-pool identity.
 VA(0x0040d4df, 0xff)
 void WriteModemPacket(char *buffer, int length)
 {
     int encodedPosition = 0;
     if (length > MODEM_PACKET_PAYLOAD_SIZE) {
         LogStr("TOO LONG");
-    } else {
-        int remaining5;
-        char encoded[MODEM_ENCODED_PACKET_SIZE];
+        return;
+    }
 
-        encoded[encodedPosition] = MODEM_ESCAPE_BYTE;
-        ++encodedPosition;
-        encoded[encodedPosition] = 0;
-        ++encodedPosition;
-        while ((remaining5 = length--) != 0) {
-            if (*buffer == MODEM_ESCAPE_BYTE) {
-                encoded[encodedPosition] = MODEM_ESCAPE_BYTE;
-                ++encodedPosition;
-            }
-            encoded[encodedPosition] = *buffer;
-            ++buffer;
+    int remaining5;
+    char encoded[MODEM_ENCODED_PACKET_SIZE];
+
+    encoded[encodedPosition] = MODEM_ESCAPE_BYTE;
+    ++encodedPosition;
+    encoded[encodedPosition] = 0;
+    ++encodedPosition;
+    while ((remaining5 = length--) != 0) {
+        if (*buffer == MODEM_ESCAPE_BYTE) {
+            encoded[encodedPosition] = MODEM_ESCAPE_BYTE;
             ++encodedPosition;
         }
-        encoded[encodedPosition] = MODEM_ESCAPE_BYTE;
+        encoded[encodedPosition] = *buffer;
+        ++buffer;
         ++encodedPosition;
-        encoded[encodedPosition] = MODEM_PACKET_END;
-        ++encodedPosition;
-        while (write_buffer(encoded, encodedPosition) == 0)
-            ForcePollSound();
     }
+    encoded[encodedPosition] = MODEM_ESCAPE_BYTE;
+    ++encodedPosition;
+    encoded[encodedPosition] = MODEM_PACKET_END;
+    ++encodedPosition;
+    while (write_buffer(encoded, encodedPosition) == 0)
+        ForcePollSound();
 }
 
 // ---- globals (definitions, RVA order) ----
