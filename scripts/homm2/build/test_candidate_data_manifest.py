@@ -6,8 +6,11 @@ from homm2.build.candidate_data_manifest import (
     _contains,
     _function_relocation_offsets_align,
     _function_relocation_proofs,
+    _payload_matches_at,
+    _reviewed_candidate_allocation,
     _payload_rvas,
     _reviewed_group_allocations,
+    _virtual_section_bytes,
     candidate_definitions,
     diagnostics_bytes,
     derive_allocations,
@@ -15,6 +18,31 @@ from homm2.build.candidate_data_manifest import (
 
 
 class CandidateDataManifestTest(unittest.TestCase):
+    def test_virtual_section_reader_zero_fills_beyond_raw_payload(self):
+        data = b"xxxxABCD"
+        sections = [(0x100, 8, 4, 4)]
+        self.assertEqual(
+            _virtual_section_bytes(data, sections, 0x102, 6),
+            b"CD\0\0\0\0",
+        )
+
+    def test_partial_reviewed_owner_preserves_logical_extent(self):
+        candidate = {
+            "name": "_line", "storage": "data", "section": 2,
+            "section_offset": 8, "size": 8, "alignment": 8,
+            "scope": "local",
+        }
+        reviewed = {("A.c", "_line"): {
+            "name": "_line", "object": "A.c", "rva": "0x120",
+            "size": "0x4", "storage": "data", "alignment": "0x8",
+            "section_ordinal": "2", "section_offset": "0x8",
+            "scope": "local", "provenance": "source-DATA:test:1",
+        }}
+        allocation = _reviewed_candidate_allocation(
+            "A", "data", candidate, reviewed)
+        self.assertEqual(allocation.rva, 0x120)
+        self.assertEqual(allocation.size, 4)
+
     def test_function_relocation_offsets_must_align_exactly(self):
         candidate = [
             (0x10, object(), 0),
@@ -50,6 +78,25 @@ class CandidateDataManifestTest(unittest.TestCase):
         self.assertEqual(paired, 2)
         self.assertFalse(offsets_align)
         self.assertTrue(valid)
+
+    def test_relocation_proof_cannot_override_initialized_payload(self):
+        from types import SimpleNamespace
+
+        coff = SimpleNamespace(
+            data=b"retail payload\0",
+            sections=[SimpleNamespace(raw_offset=0)],
+            relocations={},
+        )
+        row = {
+            "storage": "data",
+            "section": 1,
+            "symbol_offset": 0,
+            "size": len(coff.data),
+        }
+        self.assertTrue(_payload_matches_at(
+            row, coff, 0x100, [], lambda _rva, _size: coff.data))
+        self.assertFalse(_payload_matches_at(
+            row, coff, 0x100, [], lambda _rva, size: b"wrong".ljust(size, b"\0")))
 
     def test_replay_payload_requires_a_unique_retail_occurrence(self):
         coff = SimpleNamespace(
