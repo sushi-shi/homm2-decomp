@@ -152,13 +152,14 @@ void combatManager::CombatMessage(char *message, int updateScreen, int retainPre
     gbLimitToExtent = savedLimitToExtent;
 }
 
-// @match-note
-// Complete semantics, case order, CFG, and 0x18 frame; all 58 relocations align.
-// This source hash was previously raw-byte exact, but correcting tag_monsterInfo's
-// overlapping flag view changed MSVC's cumulative TU state.  The first current
-// divergence is instruction 15 in the army address calculation, followed by a
-// differently delinked jump-table layout.  Revisit compiler steering in the >=95%
-// phase or after later shared-header changes; do not restore the invalid flag alias.
+// @semantic: Current DRAWING.cpp/header epoch: complete semantics, case order,
+// 0x18 frame/slots, 0x3fe extent, CFG, and all 58 ordered external relocations.
+// First residual is instruction 15 (+0x33): retail evaluates m_currentArmySide
+// before m_currentArmyIndex, while base evaluates the equivalent array expression
+// index first; later disassembly loses sync only at the embedded switch table.
+// Direct indexing, typed row-base-plus-index, and array-decay-plus-index spellings
+// compile identically. This body was raw-byte exact before the corrected monster
+// flag view changed TU-cumulative state; do not restore that invalid alias.
 VA(0x00402e80, 0x3fe)
 void combatManager::CombatMessage(int messageType)
 {
@@ -317,9 +318,6 @@ void combatManager::SetupGridForArmy(army *armyPtr)
     }
 }
 
-// @early-stop
-// Reloc-masked instructions are byte-exact; only delinker symbol identities
-// differ for data VAs 0x00528d88 and 0x00528d90.
 VA(0x00403621, 0x5fb)
 int combatManager::UpdateGrid(int resetGridDisplay, int rebuildGrid)
 {
@@ -412,8 +410,9 @@ int combatManager::UpdateGrid(int resetGridDisplay, int rebuildGrid)
     for (cellIndex = 0; cellIndex < COMBAT_HEX_COUNT; cellIndex++) {
         if (m_gridState[cellIndex] != COMBAT_GRID_SHADE_NONE) {
             DimIconToBitmap(
-                m_combatIcons[COMBAT_ICON_GRID], m_backgroundBuffer, m_hexCells[cellIndex].m_x,
-                m_hexCells[cellIndex].m_y, 1,
+                m_combatIcons[COMBAT_ICON_GRID], m_backgroundBuffer,
+                m_hexCells[cellIndex].m_gridLeft,
+                m_hexCells[cellIndex].m_gridTop, 1,
                 m_gridState[cellIndex] - 1, 1, 0, 0,
                 COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT);
             retval = 1;
@@ -428,8 +427,9 @@ DrawCombatGrid:
             if (cellIndex % COMBAT_GRID_ROW_LENGTH != 0 &&
                 cellIndex % COMBAT_GRID_ROW_LENGTH != COMBAT_GRID_ROW_LENGTH - 1) {
                 MonoIconToBitmap(
-                    m_combatIcons[COMBAT_ICON_GRID], m_backgroundBuffer, m_hexCells[cellIndex].m_x,
-                    m_hexCells[cellIndex].m_y, COMBAT_GRID_LINE_FRAME,
+                    m_combatIcons[COMBAT_ICON_GRID], m_backgroundBuffer,
+                    m_hexCells[cellIndex].m_gridLeft,
+                    m_hexCells[cellIndex].m_gridTop, COMBAT_GRID_LINE_FRAME,
                     COMBAT_GRID_LINE_COLOR, 1, 0, 0,
                     COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT);
             }
@@ -443,15 +443,17 @@ CopyGridState:
     return retval;
 }
 
-// @match-note
-// Complete semantics and CFG; all 42 relocations align and the normalized
-// instruction stream differs only in three string-literal identities.  Retail's
-// frame is 0x10 while ours is 0x08, so the prior raw-byte proof was invalid despite
-// the 99.87% score.  Revisit the two missing stack words in the >=95% phase.
+// @early-stop
+// @early-stop-reloc-only: Current DRAWING.cpp/header epoch: all 0x364 bytes match
+// after masking 42 ordered relocation sites. The only raw-object residuals are
+// three compiler-local string identities ($SG35159/$SG35161/$SG35165 versus
+// retail $SG35157/$SG35159/$SG35163); frame, slots, operands, and CFG are exact.
 VA(0x00403c1c, 0x364)
 void combatManager::DrawBackground(void)
 {
     icon *backgroundIcon;
+    int unusedBackgroundHeight;
+    int unusedBackgroundSide;
 
     if (gbNoShowCombat != 0)
         return;
@@ -505,7 +507,7 @@ void combatManager::DrawBackground(void)
     }
 
     m_backgroundBuffer->CopyToCareful(
-        m_combatBuffer, COMBAT_GRID_COPY_LEFT, COMBAT_GRID_COPY_TOP, 0, 0,
+        m_combatBuffer, 0, 0, COMBAT_GRID_COPY_LEFT, COMBAT_GRID_COPY_TOP,
         COMBAT_BACKGROUND_COPY_WIDTH, COMBAT_BACKGROUND_COPY_HEIGHT);
     UpdateGrid(1, 0);
     m_backgroundBuffer->CopyToCareful(
@@ -514,9 +516,6 @@ void combatManager::DrawBackground(void)
     m_backgroundDrawn = 1;
 }
 
-// @early-stop
-// Reloc-masked instructions are byte-exact; only the delinker symbol identity
-// differs for data VA 0x00528d8c.
 VA(0x00403f80, 0x64c)
 void combatManager::UpdateMouseGrid(int hexIndex, int forceUpdate)
 {
@@ -548,27 +547,28 @@ void combatManager::UpdateMouseGrid(int hexIndex, int forceUpdate)
         m_mouseGridBuffer = new bitmap(0, COMBAT_MOUSE_HEX_WIDTH, COMBAT_MOUSE_HEX_HEIGHT);
 
     if (m_mouseGridHex != -1) {
-        if (m_hexCells[m_mouseGridHex].m_y + COMBAT_MOUSE_HEX_MAX_Y_OFFSET >
+        if (m_hexCells[m_mouseGridHex].m_gridTop + COMBAT_MOUSE_HEX_MAX_Y_OFFSET >
             COMBAT_MAX_EXTENT_Y)
-            copyHeight = COMBAT_MAX_EXTENT_Y - m_hexCells[m_mouseGridHex].m_y + 1;
+            copyHeight = COMBAT_MAX_EXTENT_Y - m_hexCells[m_mouseGridHex].m_gridTop + 1;
         else
             copyHeight = COMBAT_MOUSE_HEX_HEIGHT;
         m_mouseGridBuffer->CopyToCareful(
-            m_backgroundBuffer, m_hexCells[m_mouseGridHex].m_x,
-            m_hexCells[m_mouseGridHex].m_y, 0, 0,
+            m_backgroundBuffer, m_hexCells[m_mouseGridHex].m_gridLeft,
+            m_hexCells[m_mouseGridHex].m_gridTop, 0, 0,
             COMBAT_MOUSE_HEX_WIDTH, copyHeight);
     }
     if (hexIndex != -1) {
-        if (m_hexCells[hexIndex].m_y + COMBAT_MOUSE_HEX_MAX_Y_OFFSET >
+        if (m_hexCells[hexIndex].m_gridTop + COMBAT_MOUSE_HEX_MAX_Y_OFFSET >
             COMBAT_MAX_EXTENT_Y)
-            copyHeight = COMBAT_MAX_EXTENT_Y - m_hexCells[hexIndex].m_y + 1;
+            copyHeight = COMBAT_MAX_EXTENT_Y - m_hexCells[hexIndex].m_gridTop + 1;
         else
             copyHeight = COMBAT_MOUSE_HEX_HEIGHT;
         m_backgroundBuffer->CopyToCareful(
-            m_mouseGridBuffer, 0, 0, m_hexCells[hexIndex].m_x,
-            m_hexCells[hexIndex].m_y, COMBAT_MOUSE_HEX_WIDTH, copyHeight);
-        DimIconToBitmap(m_combatIcons[COMBAT_ICON_GRID], m_backgroundBuffer, m_hexCells[hexIndex].m_x,
-                        m_hexCells[hexIndex].m_y, 1, COMBAT_GRID_MOUSE_FRAME,
+            m_mouseGridBuffer, 0, 0, m_hexCells[hexIndex].m_gridLeft,
+            m_hexCells[hexIndex].m_gridTop, COMBAT_MOUSE_HEX_WIDTH, copyHeight);
+        DimIconToBitmap(m_combatIcons[COMBAT_ICON_GRID], m_backgroundBuffer,
+                        m_hexCells[hexIndex].m_gridLeft,
+                        m_hexCells[hexIndex].m_gridTop, 1, COMBAT_GRID_MOUSE_FRAME,
                         1, 0, 0, COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT);
     }
 
@@ -579,10 +579,10 @@ void combatManager::UpdateMouseGrid(int hexIndex, int forceUpdate)
     oldLimit = gbLimitToExtent;
     savedComputeExtents = gbComputeExtent;
     if (m_mouseGridHex != -1) {
-        giMinExtentX = m_hexCells[m_mouseGridHex].m_x;
-        giMinExtentY = m_hexCells[m_mouseGridHex].m_y;
-        giMaxExtentX = m_hexCells[m_mouseGridHex].m_x + COMBAT_MOUSE_HEX_MAX_X_OFFSET;
-        giMaxExtentY = m_hexCells[m_mouseGridHex].m_y + COMBAT_MOUSE_HEX_MAX_Y_OFFSET;
+        giMinExtentX = m_hexCells[m_mouseGridHex].m_gridLeft;
+        giMinExtentY = m_hexCells[m_mouseGridHex].m_gridTop;
+        giMaxExtentX = m_hexCells[m_mouseGridHex].m_gridLeft + COMBAT_MOUSE_HEX_MAX_X_OFFSET;
+        giMaxExtentY = m_hexCells[m_mouseGridHex].m_gridTop + COMBAT_MOUSE_HEX_MAX_Y_OFFSET;
     } else {
         giMinExtentX = COMBAT_SCREEN_WIDTH;
         giMinExtentY = 480;
@@ -590,14 +590,14 @@ void combatManager::UpdateMouseGrid(int hexIndex, int forceUpdate)
         giMaxExtentY = 0;
     }
     if (hexIndex != -1) {
-        if (m_hexCells[hexIndex].m_x < giMinExtentX)
-            giMinExtentX = m_hexCells[hexIndex].m_x;
-        if (m_hexCells[hexIndex].m_y < giMinExtentY)
-            giMinExtentY = m_hexCells[hexIndex].m_y;
-        if (m_hexCells[hexIndex].m_x + COMBAT_MOUSE_HEX_MAX_X_OFFSET > giMaxExtentX)
-            giMaxExtentX = m_hexCells[hexIndex].m_x + COMBAT_MOUSE_HEX_MAX_X_OFFSET;
-        if (m_hexCells[hexIndex].m_y + COMBAT_MOUSE_HEX_MAX_Y_OFFSET > giMaxExtentY)
-            giMaxExtentY = m_hexCells[hexIndex].m_y + COMBAT_MOUSE_HEX_MAX_Y_OFFSET;
+        if (m_hexCells[hexIndex].m_gridLeft < giMinExtentX)
+            giMinExtentX = m_hexCells[hexIndex].m_gridLeft;
+        if (m_hexCells[hexIndex].m_gridTop < giMinExtentY)
+            giMinExtentY = m_hexCells[hexIndex].m_gridTop;
+        if (m_hexCells[hexIndex].m_gridLeft + COMBAT_MOUSE_HEX_MAX_X_OFFSET > giMaxExtentX)
+            giMaxExtentX = m_hexCells[hexIndex].m_gridLeft + COMBAT_MOUSE_HEX_MAX_X_OFFSET;
+        if (m_hexCells[hexIndex].m_gridTop + COMBAT_MOUSE_HEX_MAX_Y_OFFSET > giMaxExtentY)
+            giMaxExtentY = m_hexCells[hexIndex].m_gridTop + COMBAT_MOUSE_HEX_MAX_Y_OFFSET;
     }
     if (giMaxExtentY > COMBAT_MAX_EXTENT_Y)
         giMaxExtentY = COMBAT_MAX_EXTENT_Y;
@@ -621,22 +621,24 @@ void combatManager::UpdateMouseGrid(int hexIndex, int forceUpdate)
     m_mouseGridHex = hexIndex;
 }
 
-// @match-note
-// Retained/live 99.33%; complete draw order, castle switch and moat early-exit CFG.
+// @semantic: Current DRAWING.cpp/header epoch: complete draw order, castle switch,
+// and moat early-exit CFG.
 // The 0xdc frame, every named/compiler slot and EBP reference count, and all 164
 // external relocations match.  After excluding the 0x91-byte switch tables, both
 // streams contain 1230 instructions; ours has 5379 code bytes versus retail's 5376.
-// The first residual is instruction 146's delinked SCmbtHero+0x15 versus retail
-// const_000fd8f5 identity; both resolve to the same address. The first opcode-order
-// residual is instruction 304: fixed-side hero frames evaluate frame/sprite/state,
-// while retail uses sprite/state/frame; enum-indexed direct arrays compile the same.
-// Flat-pointer and flat-index forms regressed to 98.22%/97.93% before the last shared
-// TU-state change. At instruction 984 ours emits jl plus two immediate scope thunks,
-// while retail emits jle and places two thunks after the first moat arm. Structured
-// and goto forms of walkingFrom >, walkingFrom <=, and walkingTo < walkingFrom were
-// tried. Delinked gConfig fields and jump-table locals also resolve to the same retail
-// addresses. Revisit compiler steering after total SOURCE fuzzy reaches 95% or a
-// shared type/TU-state change moves this source hash.
+// The first opcode-order residual is instruction 156: fixed-side hero frames
+// evaluate sprite/frame/state, while retail uses sprite/state/frame;
+// enum-indexed direct arrays compile the same.
+// Flat-pointer and flat-index hero forms regressed to 98.22%/97.93% before the last
+// shared TU-state change. At instruction 984 ours emits jl plus two immediate scope
+// thunks, while retail emits jle and places two thunks after the first moat arm.
+// Ten distinct attempts are exhausted: direct enum-indexed hero arrays; flat-pointer
+// and flat-index hero forms; structured and goto forms for each of walkingFrom >,
+// walkingFrom <=, and walkingTo < walkingFrom; and the final fingerprinted
+// match_variants relational commute `giWalkingTo >= giWalkingFrom`, which was
+// byte-neutral at 99.347140%, size 5954, and 164/164 relocations. Delinked gConfig
+// fields and jump-table locals resolve to the same retail addresses. Revisit only
+// after relevant DRAWING source, TU/header, or comparison-state changes.
 VA(0x004045cc, 0x173f)
 void combatManager::DrawFrame(int updateScreen, int computeExtent, int redrawExtent,
                               int extentOnly, int delay, int drawBackground,
@@ -1062,13 +1064,14 @@ finish:
     PollSound();
 }
 
-// @match-note
-// Complete semantics and CFG; all 100 relocations align.  Retail's frame is 0x7c
-// and ours is 0x74, with the same stack table base.  Differences through instruction
-// 777 are delinked gConfig/string identities; the first code residual is the
-// loop-exit condition-code residual at instruction 778 (ours jle, retail jge), after
-// which the instruction streams realign.  Revisit slot/condition steering in the
-// >=95% phase or after cumulative layout changes.
+// @semantic: Current DRAWING.cpp/header epoch: complete semantics/CFG, exact 0x7c
+// frame and live stack slots, and all 100 ordered relocations. Proven unused words
+// at -0x6c and -0x74 restore retail's frame without changing behavior. The first
+// non-local residual is instruction 778 (+0xa50): base loads spellSlot and emits
+// `cmp visibleSpellCount5,eax; jle`, while retail loads the count and emits the
+// equivalent `cmp spellSlot,eax; jge`; the streams then realign. Direct `<`,
+// commuted `>`, negated `>=`, explicit-break, and slot-neutral index/count names
+// were tried. Five earlier residual rows are compiler-local string identities.
 VA(0x00405d0b, 0xb99)
 void combatManager::DrawSmallView(int viewIndex, int updateScreen)
 {
@@ -1077,7 +1080,7 @@ void combatManager::DrawSmallView(int viewIndex, int updateScreen)
     int savedLimitToExtent9;
     army *viewArmy1;
     int viewX;
-    int spellIndex1;
+    int spellSlot;
     int drawn6;
     unsigned char spellPositions[6][6][2] = {
         {{COMBAT_SMALL_VIEW_SPELL_X_THIRD, COMBAT_SMALL_VIEW_SPELL_Y_SECOND},
@@ -1118,8 +1121,10 @@ void combatManager::DrawSmallView(int viewIndex, int updateScreen)
          {COMBAT_SMALL_VIEW_SPELL_X_FIFTH, COMBAT_SMALL_VIEW_SPELL_Y_THIRD}}
     };
     int viewY2;
-    int spellCount6;
+    int visibleSpellCount5;
+    int unusedSpellSlot15;
     int spellFrame1;
+    int unusedSpellSlot2;
 
     if (gbNoShowCombat != 0)
         return;
@@ -1277,20 +1282,20 @@ void combatManager::DrawSmallView(int viewIndex, int updateScreen)
                                          COMBAT_SMALL_VIEW_TEXT_WIDTH,
                                          COMBAT_SMALL_VIEW_TEXT_HEIGHT, 1, 2);
 
-            spellIndex1 = 0;
+            spellSlot = 0;
             if (viewArmy1->m_morale > 0) {
-                for (spellIndex1 = 0; spellIndex1 < viewArmy1->m_morale; spellIndex1++)
+                for (spellSlot = 0; spellSlot < viewArmy1->m_morale; spellSlot++)
                     m_combatIcons[COMBAT_ICON_SMALL_VIEW_MODIFIER]->DrawToBuffer(
                         viewX + COMBAT_SMALL_VIEW_MODIFIER_RIGHT_X -
-                            spellIndex1 * COMBAT_SMALL_VIEW_MODIFIER_STEP,
+                            spellSlot * COMBAT_SMALL_VIEW_MODIFIER_STEP,
                         viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y +
                             COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * 4,
                         COMBAT_SMALL_VIEW_GOOD_MORALE_FRAME, 0);
             } else if (viewArmy1->m_morale < 0) {
-                for (spellIndex1 = 0; spellIndex1 < -viewArmy1->m_morale; spellIndex1++)
+                for (spellSlot = 0; spellSlot < -viewArmy1->m_morale; spellSlot++)
                     m_combatIcons[COMBAT_ICON_SMALL_VIEW_MODIFIER]->DrawToBuffer(
                         viewX + COMBAT_SMALL_VIEW_MODIFIER_RIGHT_X -
-                            spellIndex1 * COMBAT_SMALL_VIEW_MODIFIER_STEP,
+                            spellSlot * COMBAT_SMALL_VIEW_MODIFIER_STEP,
                         viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y +
                             COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * 4,
                         COMBAT_SMALL_VIEW_BAD_MORALE_FRAME, 0);
@@ -1302,20 +1307,20 @@ void combatManager::DrawSmallView(int viewIndex, int updateScreen)
                     COMBAT_SMALL_VIEW_NEUTRAL_MORALE_FRAME, 0);
             }
 
-            spellIndex1 = 0;
+            spellSlot = 0;
             if (viewArmy1->m_luck > 0) {
-                for (spellIndex1 = 0; spellIndex1 < viewArmy1->m_luck; spellIndex1++)
+                for (spellSlot = 0; spellSlot < viewArmy1->m_luck; spellSlot++)
                     m_combatIcons[COMBAT_ICON_SMALL_VIEW_MODIFIER]->DrawToBuffer(
                         viewX + COMBAT_SMALL_VIEW_MODIFIER_RIGHT_X -
-                            spellIndex1 * COMBAT_SMALL_VIEW_MODIFIER_STEP,
+                            spellSlot * COMBAT_SMALL_VIEW_MODIFIER_STEP,
                         viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y +
                             COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * 5,
                         COMBAT_SMALL_VIEW_GOOD_LUCK_FRAME, 0);
             } else if (viewArmy1->m_luck < 0) {
-                for (spellIndex1 = 0; spellIndex1 < -viewArmy1->m_luck; spellIndex1++)
+                for (spellSlot = 0; spellSlot < -viewArmy1->m_luck; spellSlot++)
                     m_combatIcons[COMBAT_ICON_SMALL_VIEW_MODIFIER]->DrawToBuffer(
                         viewX + COMBAT_SMALL_VIEW_MODIFIER_RIGHT_X -
-                            spellIndex1 * COMBAT_SMALL_VIEW_MODIFIER_STEP,
+                            spellSlot * COMBAT_SMALL_VIEW_MODIFIER_STEP,
                         viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y +
                             COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * 5,
                         COMBAT_SMALL_VIEW_BAD_LUCK_FRAME, 0);
@@ -1336,11 +1341,11 @@ void combatManager::DrawSmallView(int viewIndex, int updateScreen)
             }
         }
 
-        spellCount6 = viewArmy1->m_spellCount < COMBAT_SMALL_VIEW_MAX_SPELLS
-                          ? viewArmy1->m_spellCount
-                          : COMBAT_SMALL_VIEW_MAX_SPELLS;
+        visibleSpellCount5 = viewArmy1->m_spellCount < COMBAT_SMALL_VIEW_MAX_SPELLS
+                                 ? viewArmy1->m_spellCount
+                                 : COMBAT_SMALL_VIEW_MAX_SPELLS;
         spellFrame1 = -1;
-        for (spellIndex1 = 0; spellIndex1 < spellCount6; spellIndex1++) {
+        for (spellSlot = 0; spellSlot < visibleSpellCount5; spellSlot++) {
             spellFrame1++;
             while (viewArmy1->m_spellInfluence[spellFrame1] == 0)
                 spellFrame1++;
@@ -1350,8 +1355,8 @@ void combatManager::DrawSmallView(int viewIndex, int updateScreen)
                 iconY2 = viewY2 + COMBAT_SMALL_VIEW_FULL_SPELL_Y;
             else
                 iconY2 = viewY2 + COMBAT_SMALL_VIEW_COMPACT_SPELL_Y;
-            iconX += spellPositions[spellCount6 - 1][spellIndex1][0];
-            iconY2 += spellPositions[spellCount6 - 1][spellIndex1][1];
+            iconX += spellPositions[visibleSpellCount5 - 1][spellSlot][0];
+            iconY2 += spellPositions[visibleSpellCount5 - 1][spellSlot][1];
             iconX += (COMBAT_SMALL_VIEW_ICON_SIZE -
                       GetIconEntry(m_combatIcons[COMBAT_ICON_SMALL_VIEW_SPELL], spellFrame1)->w) >> 1;
             iconY2 += (COMBAT_SMALL_VIEW_ICON_SIZE -
