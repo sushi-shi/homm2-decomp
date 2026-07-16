@@ -22,6 +22,9 @@ def main(argv=None):
     if cmd == "data-relocs":
         from homm2.build.coff_reloc_topology import main as m; return m(rest)
     if cmd == "data-topology":
+        if rest and rest[0] == "audit":
+            from homm2.build.data_topology_audit import main as m
+            return m(rest[1:])
         if rest and rest[0] == "census":
             from homm2.build.data_topology_census import main as m
             return m(rest[1:])
@@ -32,7 +35,7 @@ def main(argv=None):
         if len(rest) != 1 or rest[0] not in (
                 "propose", "promote", "finalize", "regenerate"):
             print("usage: homm2 data-topology "
-                  "{assemble|census|propose|promote|finalize|regenerate}",
+                  "{audit|assemble|census|propose|promote|finalize|regenerate}",
                   file=sys.stderr)
             return 1
         return m(["--" + rest[0]])
