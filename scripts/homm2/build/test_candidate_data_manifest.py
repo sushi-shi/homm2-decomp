@@ -5,6 +5,7 @@ from homm2.build.candidate_data_manifest import (
     CandidateAllocation,
     REPO,
     _bounded_section_delta_proofs,
+    _candidate_data_storage,
     _contains,
     _function_relocation_offsets_align,
     _function_relocation_proofs,
@@ -22,6 +23,12 @@ from homm2.build.candidate_data_manifest import (
 
 
 class CandidateDataManifestTest(unittest.TestCase):
+    def test_linker_sorted_crt_subsection_is_initialized_data(self):
+        self.assertEqual(_candidate_data_storage(".CRT$XCU"), "data")
+        self.assertEqual(_candidate_data_storage(".CRT$XTX"), "data")
+        self.assertEqual(_candidate_data_storage(".data"), "data")
+        self.assertIsNone(_candidate_data_storage(".text"))
+
     def test_constrained_group_accepts_zero_padding_and_equivalent_payloads(self):
         definitions = [
             {"name": "$T1", "section": 1, "section_offset": 0},
@@ -363,6 +370,17 @@ class CandidateDataManifestTest(unittest.TestCase):
         }
         self.assertNotIn(("BASE/Blur", "bss"), missing_contribution)
         self.assertNotIn(("BASE/BUTTON", "bss"), missing_contribution)
+
+    def test_philai_crt_initializer_is_a_real_candidate_definition(self):
+        path = REPO / "build/objdiff/base/SOURCE/PHILAI.obj"
+        if not path.is_file():
+            self.skipTest("candidate objects are not built")
+        definitions, _coff = candidate_definitions(path, "SOURCE/PHILAI")
+        crt = [row for row in definitions if row["section"] == 3]
+        self.assertEqual(len(crt), 1)
+        self.assertTrue(crt[0]["name"].startswith("_$S5$S"))
+        self.assertEqual(crt[0]["storage"], "data")
+        self.assertEqual(crt[0]["size"], 4)
 
     def test_candidate_scope_is_read_per_symbol(self):
         path = REPO / "build/objdiff/base/BASE/Bzip.obj"
