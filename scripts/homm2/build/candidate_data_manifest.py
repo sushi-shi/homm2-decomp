@@ -18,6 +18,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from homm2.build.canonicalize_relocs import CoffFile
+from homm2.build.canonicalize_data_symbols import _family
 from homm2.build.contribution_manifest import contribution_rows
 
 
@@ -142,10 +143,26 @@ def candidate_definitions(path, unit):
     return definitions, coff
 
 
-def _reviewed_candidate_allocation(unit, storage, candidate, reviewed):
+def _reviewed_candidate_allocation(unit, storage, candidate, reviewed,
+                                   reviewed_by_position=None):
     """Validate and return one reviewed candidate allocation when present."""
     object_name = unit.replace("/", "\\") + ".c"
     row = reviewed.get((object_name, candidate["name"]))
+    candidate_family = _family(candidate["name"])
+    exact_position = (candidate["section"], candidate["section_offset"])
+    raw_name_reused_at_other_position = (
+        row is not None and candidate_family is not None and
+        (int(row["section_ordinal"], 0), int(row["section_offset"], 0)) !=
+        exact_position
+    )
+    if ((row is None or raw_name_reused_at_other_position) and
+            reviewed_by_position is not None):
+        positional = reviewed_by_position.get((
+            object_name, candidate["section"], candidate["section_offset"]))
+        if (positional is not None and candidate["scope"] == "local" and
+                candidate_family is not None and
+                _family(positional["name"]) == candidate_family):
+            row = positional
     if row is None:
         return None
     logical_size = int(row["size"], 0)
@@ -180,12 +197,13 @@ def _reviewed_candidate_allocation(unit, storage, candidate, reviewed):
         int(row["rva"], 0), 1, candidate["scope"], row["provenance"])
 
 
-def _reviewed_group_allocations(unit, storage, definitions, reviewed):
-    """Return a group only when every candidate definition is reviewed exactly."""
+def _reviewed_group_allocations(unit, storage, definitions, reviewed,
+                                reviewed_by_position=None):
+    """Return a group only when every candidate definition has a reviewed owner."""
     rows = []
     for candidate in definitions:
         allocation = _reviewed_candidate_allocation(
-            unit, storage, candidate, reviewed)
+            unit, storage, candidate, reviewed, reviewed_by_position)
         if allocation is None:
             return None
         rows.append(allocation)
@@ -735,11 +753,20 @@ def derive_allocations(base_dir=REPO / "build/objdiff/base",
                        reviewed_rows=()):
     """Return allocations only for object/storage groups proved complete."""
     reviewed = {}
+    reviewed_by_position = {}
     for row in reviewed_rows:
         key = (row["object"], row["name"])
         if key in reviewed:
             raise ValueError("duplicate reviewed candidate identity %s:%s" % key)
         reviewed[key] = row
+        position = (
+            row["object"], int(row["section_ordinal"], 0),
+            int(row["section_offset"], 0),
+        )
+        if position in reviewed_by_position:
+            raise ValueError(
+                "duplicate reviewed candidate position %s:%s+0x%x" % position)
+        reviewed_by_position[position] = row
     public, public_data, functions = _symbol_inventory(symbols_path)
     image_base, highlow, read_u32, read_bytes = _pe_layout(exe)
     referenced_targets = {
@@ -799,7 +826,7 @@ def derive_allocations(base_dir=REPO / "build/objdiff/base",
             source_group = [row for row in definitions if row["storage"] == storage]
             intervals = contributions.get((unit, storage), [])
             reviewed_group = _reviewed_group_allocations(
-                unit, storage, source_group, reviewed)
+                unit, storage, source_group, reviewed, reviewed_by_position)
             if reviewed_group is not None:
                 _validate_constrained_reviewed_group(
                     unit, storage, source_group, coff, reviewed_group,
@@ -812,7 +839,7 @@ def derive_allocations(base_dir=REPO / "build/objdiff/base",
             partial_reviewed = {}
             for source_row in source_group:
                 allocation = _reviewed_candidate_allocation(
-                    unit, storage, source_row, reviewed)
+                    unit, storage, source_row, reviewed, reviewed_by_position)
                 if allocation is not None:
                     partial_reviewed[source_row["name"]] = allocation
             analysis_group = []
