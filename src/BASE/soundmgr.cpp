@@ -22,7 +22,7 @@
 
 
 // ---- module-private synthetic globals (retail xref: single-module) ----
-DATA(0x00534970) static WAVEFORMATEX gWaveFormat; // digital-driver PCM format (WAVE_init_driver)
+DATA(0x00534970) static PCMWAVEFORMAT gWaveFormat; // digital-driver PCM format (WAVE_init_driver)
 
 VA(0x004cb630, 0x68)
 void HandleMCIError(int param_1, char *param_2)
@@ -358,14 +358,13 @@ struct _DIG_DRIVER *WAVE_init_driver(unsigned long param_1, unsigned short param
     }
     if (gbUseWaveout != 0)
         AIL_set_preference(0xf, 1);
-    gWaveFormat.wFormatTag = 1;
-    gWaveFormat.nChannels = param_3;
-    gWaveFormat.nSamplesPerSec = param_1;
-    gWaveFormat.nAvgBytesPerSec = (param_2 >> 3) * param_3 * param_1;
-    gWaveFormat.nBlockAlign = (param_2 >> 3) * param_3;
+    gWaveFormat.wf.wFormatTag = 1;
+    gWaveFormat.wf.nChannels = param_3;
+    gWaveFormat.wf.nSamplesPerSec = param_1;
+    gWaveFormat.wf.nAvgBytesPerSec = (param_2 >> 3) * param_3 * param_1;
+    gWaveFormat.wf.nBlockAlign = (param_2 >> 3) * param_3;
     gWaveFormat.wBitsPerSample = param_2;
-    rc = AIL_waveOutOpen(
-        &drvr, 0, 0, reinterpret_cast<LPWAVEFORMAT>(&gWaveFormat));
+    rc = AIL_waveOutOpen(&drvr, 0, 0, &gWaveFormat.wf);
     if (rc != 0) {
         if (param_4 != 0)
             MessageBoxA(static_cast<HWND>(hwndApp), AIL_last_error(),
