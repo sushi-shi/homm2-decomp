@@ -1280,7 +1280,7 @@ void combatManager::CatAttack(int side)
     int unknown15;
     SAMPLE2 catapultSound37 = NULL_SAMPLE2;
     SAMPLE2 impactSound1 = NULL_SAMPLE2;
-    icon *boulder37 = gpResourceManager->GetIcon("boulder37.icn");
+    icon *boulder37 = gpResourceManager->GetIcon("boulder.icn");
     sprintf(gText, "catsnd%02d.82M", COMBAT_CATAPULT_LAUNCH_SOUND);
     catapultSound37 = LoadPlaySample(gText);
 
@@ -1472,7 +1472,7 @@ foundMissHex:
         giMaxExtentY = COMBAT_MAX_EXTENT_Y;
 
     icon *cloud29 = gpResourceManager->GetIcon(
-        missShot19 ? "lichclod.icn" : "smalclod.icn");
+        missShot19 ? "smalclod.icn" : "lichclod.icn");
 
     for (frame18 = 0; frame18 < COMBAT_CATAPULT_CLOUD_FRAME_COUNT;
          frame18++) {
@@ -2491,6 +2491,23 @@ int CombatSystemOptionsHandler(tag_message &message)
 VTBL(combatManager, 0x004eb898);
 
 // ---- globals (definitions, RVA order) ----
+// @data-layout-note Retail attributes CMBTMGR initialized storage at
+// 0xf8900+0x358; candidate is 0x354 after restoring boulder.icn, the
+// smalclod/lichclod selection, and retail's 3.14159 constant. The 0x68
+// non-COMDAT .rdata pool is now byte-exact; candidate/retail SHA-256 is
+// 2e4e4857fd9f5831b891b16432a5068ad50eb1dba97f138793ad65a25c77728e.
+// The vtable relocations are exactly Open, Close, Main; its candidate COMDAT is
+// 0xc while the retail owner range is 0x10 with a zero tail. Candidate .data
+// still places wallHex at +8 instead of retail +0x31c, and emits perish at
+// +0x2a0 before perishes at +0x2a8, versus retail perishes at +0x29c before
+// perish at +0x2a8. Retail also has four trailing contribution bytes. Candidate
+// BSS is 0xc versus retail 0x10: candidate order is bCPrefsChanged, CSPanel,
+// bMouseWasVis, while retail is bMouseWasVis, CSPanel, bCPrefsChanged followed
+// by four owner bytes. All six public allocations, types, storage classes, and
+// payloads are present. CatAttack, KeepAttack, and ShootMissile relocation
+// audits are respectively 150/150, 44/44, and 52/52 with only-base=0. Revisit
+// only with natural compiler allocation-order evidence; do not add padding,
+// aliases, synthetic identities, or unattached literals.
 DATA(0x004f8900) int bInHighMoraleBonus = 0;
 DATA(0x004f8904) int giSeed = 1;
 DATA(0x004f8c1c) unsigned char wallHex[4] = { 9, 34, 86, 113 };
