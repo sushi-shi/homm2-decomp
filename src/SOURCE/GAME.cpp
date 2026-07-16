@@ -56,26 +56,41 @@
 // GAME's BaseAlloc/BaseFree pass __FILE__ + a source line number. The retail
 // encodes the base line as a 2-byte string read via movswl, then adds a per-call
 // delta; reproduce byte-exactly. __FILE__ is the original build path (reloc-masked).
-#define GFILE const_cast<char *>("I:\\Projects\\Heroes\\Prog\\SOURCE\\GAME.CPP")
-#define GSAVELINE (*reinterpret_cast<const short *>("\x94\x02"))
-#define GLOADLINE (*reinterpret_cast<const short *>("\x4f\x04"))
-#define GMAPLINE (*reinterpret_cast<const short *>("\n"))
-#define GTRANSMITLINE (*reinterpret_cast<const short *>("N\""))
-#define GRECEIVELINE (*reinterpret_cast<const short *>("-["))
-#define GDIFFLINE (*reinterpret_cast<const short *>("f\x1d"))
-#define GCOMPRESSTEST2LINE (*reinterpret_cast<const short *>("r\x1f"))
-#define GCOMPRESSTESTLINE (*reinterpret_cast<const short *>("\x95\x1f"))
-#define VIEW_ARMY_FRAMES \
-    "\x37\x3a\x37\x62\x37\x8a\x37\xb9\x37\xc0\x37\xc6\x37\x0d\x38\x11\x38\x15\x38\x19" \
-    "\x38\x1d\x38\x21\x38\x25\x38\x29\x38\x2d\x38\x31\x38\x35\x38\x39\x38\x3d\x38\x41" \
-    "\x38\x45\x38\x49\x38\x4d\x38\x51\x38\x48\x39\xa1\x39\xad\x39\xb9\x39\x0d\x3a\x5d\x3a" \
-    "\x8d\x3a\xb1\x3a\x8d\x3b\xf7\x3b\x80\x3c\x93\x3c\x0a\x3d\x75\x3d\x7a\x3d\xc1\x3d\xc7" \
-    "\x3d\x1f\x3e\x25\x3e\x36\x3e\x82\x3e\xef\x3e\x22\x3f\xdd\x3f\xe2\x3f"
-#define VIEW_ARMY_FRAME_OFFSETS \
-    "\x3b\x8a\x3b\x9c\x3b\xae\x3b\xd2\x3b\xe7\x3b\xf9\x3b\x1d\x3c\x32\x3c\x44\x3c\x5b\x3c" \
-    "\x7d\x3c\x8f\x3c\xa6\x3c\xd5\x3c\xe7\x3c\x0b\x3d\x20\x3d\x35\x3d\x4a\x3d\x5e\x3d\x70" \
-    "\x3d\x94\x3d\xb8\x3d\xcd\x3d\xe7\x3d\x18\x3e\x2d\x3e\x1a\x3f"
+// @data-layout-note Retail's initialized GAME contribution is
+// 0xf70e0..0xf80b8 (0xfd8); candidate .data is 0xfd6 and .rdata remains exact at
+// 0xb8. The eight source-line owners are independently proved by their payloads
+// and repeated retail HIGHLOW sites at 0xf70e4, 0xf71a8, 0xf7274, 0xf75c4,
+// 0xf77b8, 0xf7a60, 0xf7e90, and 0xf7f84. Sharing them removed 0xa8 bytes of
+// duplicate per-use literals; resolving ViewArmy's actual SMonFrameInfo +0x65
+// and +0x175 owners removed another 0x104 bytes. FW1/RSG1 and the empty default
+// player name are also relocation-proven against retail. gbGameOver and the
+// save-line owner now translate exactly from the contribution base. The later
+// owners require distinct bases because retail alternates literals, private line
+// values, giMonType, and bMapInitialized, while this VC4.2 source form groups
+// file-scope definitions ahead of its literal pool. Moving the two public
+// definitions to their apparent source boundaries hoists them to the section
+// head instead of interleaving them. Revisit only with evidence for the natural
+// original section/source form; do not add padding, synthetic owners, or section
+// pragmas to force the remaining order or two terminal bytes.
+DATA(0x004f70e0) int gbGameOver = 0;
+static char gSaveSourceLine[] = "\x94\x02";
+static char gLoadSourceLine[] = "\x4f\x04";
+static char gMapSourceLine[] = "\xf4\x0a";
+static char gTransmitSourceLine[] = "\x4e\x1a";
+static char gReceiveSourceLine[] = "\x2d\x1b";
+static char gDiffSourceLine[] = "\x66\x1d";
+static char gCompressTest2SourceLine[] = "\x72\x1f";
+static char gCompressTestSourceLine[] = "\x95\x1f";
 
+#define GFILE const_cast<char *>("I:\\Projects\\Heroes\\Prog\\SOURCE\\GAME.CPP")
+#define GSAVELINE (*reinterpret_cast<const short *>(gSaveSourceLine))
+#define GLOADLINE (*reinterpret_cast<const short *>(gLoadSourceLine))
+#define GMAPLINE (*reinterpret_cast<const short *>(gMapSourceLine))
+#define GTRANSMITLINE (*reinterpret_cast<const short *>(gTransmitSourceLine))
+#define GRECEIVELINE (*reinterpret_cast<const short *>(gReceiveSourceLine))
+#define GDIFFLINE (*reinterpret_cast<const short *>(gDiffSourceLine))
+#define GCOMPRESSTEST2LINE (*reinterpret_cast<const short *>(gCompressTest2SourceLine))
+#define GCOMPRESSTESTLINE (*reinterpret_cast<const short *>(gCompressTestSourceLine))
 // Retail folds the embedded member offset into Row/Extra accesses after inlining.
 #define WORLDMAP (&m_worldMap)
 
@@ -697,7 +712,7 @@ void game::SetupOrigData(void)
     int i;
     int j;
     for (i = 0; i < GAME_PLAYER_COUNT; i++) {
-        strcpy(m_defaultPlayerNames + i * 4, "Lord");
+        strcpy(m_defaultPlayerNames + i * 4, "");
         if (i < (&giNumHumanPlayers)[0]) {
             if (i == 0 || iMPBaseType == 2)
                 gbThisNetHumanPlayer[i] = 1;
@@ -2465,10 +2480,10 @@ void game::ViewArmy(int x, int y, int monsterType, int numTroops, town *castle,
         strcpy(filename4, cMonFilename[monsterType]);
 
     icon *monsterIcon5 = gpResourceManager->GetIcon(filename4);
-    int iconFrame15 = static_cast<signed char>(VIEW_ARMY_FRAMES[0]);
+    int iconFrame15 = sViewArmyMonFrameInfo.animationFrames[ARMY_ANIMATION_WALK][0];
     viewArmyBaseX += (GetIconEntry(monsterIcon5, iconFrame15)->w / 2) * viewArmyFacingWIPXMod;
     viewArmyBaseX += GetIconEntry(monsterIcon5, iconFrame15)->x * viewArmyFacingWIPXMod +
-                     static_cast<signed char>(VIEW_ARMY_FRAME_OFFSETS[0]) * viewArmyFacingWIPXMod;
+                     sViewArmyMonFrameInfo.walkXOffsets[0] * viewArmyFacingWIPXMod;
     viewArmyBaseY = 138;
     viewArmyBaseY += GetIconEntry(monsterIcon5, iconFrame15)->h / 2;
     if (gbLowMemory) {
@@ -2478,7 +2493,7 @@ void game::ViewArmy(int x, int y, int monsterType, int numTroops, town *castle,
 
     iconWidget *monsterWidget7 = new iconWidget(
         static_cast<short>(viewArmyBaseX), static_cast<short>(viewArmyBaseY), 86, 149,
-        filename4, gbLowMemory ? 0 : static_cast<signed char>(VIEW_ARMY_FRAMES[0]),
+        filename4, gbLowMemory ? 0 : sViewArmyMonFrameInfo.animationFrames[ARMY_ANIMATION_WALK][0],
         facing == 0, 5, 16, 1);
     if (!monsterWidget7)
         MemError();
@@ -5226,9 +5241,9 @@ int game::ReceiveSaveGame(int dataSize, int expectedCrc, int expectedTransmitCrc
     int packetStart;
     unsigned char *decodedData;
 
-    LogInt(const_cast<char *>("RSG1"), remotePlayer,
+    LogInt(const_cast<char *>("FW1"), remotePlayer,
            -999, -999, -999, -999, -999, -999);
-    LogStr(const_cast<char *>("Receive"));
+    LogStr(const_cast<char *>("RSG1"));
     AiPrint(const_cast<char *>("Receive Start - Getting Data"));
     gpAdvManager->TrimLoopingSounds(4);
 
@@ -6308,12 +6323,23 @@ int game::CountShrines(int player)
     return count;
 }
 
-// ---- globals (definitions, RVA order) ----
-DATA(0x004f70e0) int gbGameOver = 0;
+// ---- remaining globals (retail RVA order) ----
 DATA(0x004f7550) signed char giMonType[] = {
     0, 0x11, 0x15, 0x2a, 0x0f, 0x19, 0x34, 0x0e, 0x1d, 0x1e, 0x1b, 0x36
 };
 DATA(0x004f7a08) char bMapInitialized = 0;
+// @data-layout-note Retail's loader-zero GAME contribution is
+// 0x1280e8..0x1284b4 (0x3cc); candidate .bss is 0x3b4. All 23 public
+// definitions have recovered types, logical extents, and S_PUB32 RVAs. Retail
+// lays them out in RVA order, while VC4.2 emits the candidate in identifier-hash
+// order; the same objects occupy 0x18 fewer bytes only because their natural
+// alignment holes differ. In particular, retail ViewArmy references prove
+// sViewArmyMonFrameInfo +0x65 and +0x175, replacing the former fake initialized
+// byte arrays. Reordering definitions, first extern declarations, and owner
+// headers leaves the candidate BSS order unchanged. No retail reference proves
+// missing storage in the residual holes. Revisit only with evidence for the
+// original common/section topology; do not introduce padding variables,
+// compatibility aliases, or section pragmas to force the retail order.
 DATA(0x005280e8) int iViewArmyNumTroops;
 DATA(0x005280ec) signed char *gbNGHeroType;
 DATA(0x005280f8) SMonFrameInfo sViewArmyMonFrameInfo;
