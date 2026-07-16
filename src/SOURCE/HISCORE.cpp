@@ -133,6 +133,11 @@ int highScoreManager::Main(struct tag_message &message)
     return HIGH_SCORE_MANAGER_CONTINUE;
 }
 
+// @early-stop
+// @early-stop-reloc-only
+// All 0x7d3 relocation-masked bytes and all 73 ordered relocation sites/effective
+// targets agree. Objdiff differs only on CRT COFF spellings: candidate
+// __open/__read/__close versus retail _open/_read/_close.
 VA(0x00489e6a, 0x7d3)
 void highScoreManager::Update(void)
 {
