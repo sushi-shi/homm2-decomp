@@ -2964,11 +2964,6 @@ void FileError(char *filename)
     ShutDown(buf);
 }
 
-// @early-stop
-// All 191 normalized instructions and every relocation-masked code byte match.
-// The 0x38 frame/14 stack slots align, and all 21 relocation sites and effective
-// targets agree. The retained objdiff residual is only the delinked identity of
-// the function-local smackFadeSourceLineBase data referenced by both objects.
 VA(0x0049e3a8, 0x255)
 void SmackFade(unsigned char *src, unsigned char *dst)
 {
@@ -2999,7 +2994,8 @@ void SmackFade(unsigned char *src, unsigned char *dst)
     memset(a, 0, 0x300);
     memset(f, 0, 0x100);
     for (h = 0xa; h < 0xf6; h++) {
-        e = (src[h * 3 + 2] + 0[&src[h * 3]] + src[h * 3 + 1]) / 3;
+        e = (0[&src[h * 3 + 2]] + 0[&src[h * 3]] +
+             src[h * 3 + 1]) / 3;
         d = 0x3e7;
         for (i = 0xa; i < 0x24; i++) {
             b = (0[&dst[i * 3 + 2]] + 0[&dst[i * 3]] +
