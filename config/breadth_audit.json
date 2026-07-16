@@ -145,6 +145,61 @@
       "note": "Exact frame slots and 54 relocs; one commutative compare load order remains after reversed relation was byte-neutral."
     },
     {
+      "unit": "SOURCE/CMBTMGR",
+      "function": "?CatAttack@combatManager@@QAEXH@Z",
+      "source_hash": "f892133d70a3",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.97605,
+      "after": 99.97605,
+      "note": "Exact size frame CFG and 150 relocs; only three proved commutative load-order spans remain."
+    },
+    {
+      "unit": "SOURCE/CMBTMGR",
+      "function": "?GetGridIndex@combatManager@@QAEHHH@Z",
+      "source_hash": "bdf07369d078",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.47899,
+      "after": 100.0,
+      "note": "OR-zero steering restores retail comparison evaluation; function is exact."
+    },
+    {
+      "unit": "SOURCE/CMBTMGR",
+      "function": "?InCastle@combatManager@@QAEHH@Z",
+      "source_hash": "2c298b882d8b",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.90385,
+      "after": 100.0,
+      "note": "Ternary return topology restores retail branch routing; function is exact."
+    },
+    {
+      "unit": "SOURCE/CMBTMGR",
+      "function": "?KeepAttack@combatManager@@QAEXH@Z",
+      "source_hash": "b72a30d7d29e",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "improved",
+      "iterations": 8,
+      "before": 99.669136,
+      "after": 99.98272,
+      "note": "Corrected defense field and steered three comparisons; only aggregate temporary and nested pointer slots remain."
+    },
+    {
+      "unit": "SOURCE/CMBTMGR",
+      "function": "?ValidHex@@YIHH@Z",
+      "source_hash": "b9270bbb0f2a",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "exact",
+      "iterations": 2,
+      "before": 99.75,
+      "after": 100.0,
+      "note": "Ternary return topology restores retail branch routing; function is exact."
+    },
+    {
       "unit": "SOURCE/CURSOR",
       "function": "?MoveHero@advManager@@QAEPAVmapCell@@HHPAH00H0H@Z",
       "source_hash": "b4ee4cda3678",

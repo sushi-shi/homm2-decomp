@@ -940,7 +940,7 @@ int combatManager::GetGridIndex(int x, int y)
         diagonalDistance =
             abs(xResidual - COMBAT_HEX_ROW_STAGGER) /
             COMBAT_GRID_DIAGONAL_SLOPE_DIVISOR;
-        if (yOffset < diagonalDistance) {
+        if ((yOffset | 0) < diagonalDistance) {
             rowIndex--;
             if (xResidual < COMBAT_HEX_ROW_STAGGER) {
                 if (!(rowIndex & 1))
@@ -1181,12 +1181,12 @@ int combatManager::IsWinner(int side)
 }
 
 // @early-stop
-// Raw size, frame/slots, CFG, and all 150 ordered relocations agree. The only
-// instruction residuals are commutative /Od load order at +0x636..+0x63d,
-// +0xac5..+0xac8, and +0xe94..+0xe9b; DIR32 addends at +0x347, +0x358,
-// +0x874, +0xcb6, and +0xda2 resolve to the same final targets.
-// Exhausted direct/AST operand commutation, projectile +=, prefix increment,
-// SIB i[p]/(p)[i], val|0, and +=1; revisit after CMBTMGR TU/header changes.
+// Soft TU-cumulative wall: size, frame/slots, CFG, and all 150 ordered
+// relocations agree. The only unmasked bytes are commutative load order at
+// +0x636..+0x63d, +0xac5..+0xac8, and +0xe94..+0xe9b. Direct/AST commutation,
+// projectile +=, prefix increment, SIB forms, val|0, and +=1 were exhausted.
+// Float guards spell __adjust_fdiv as proven iLeftRightSave+0x10. Revisit only
+// after the source/TU/header or comparison epoch changes.
 VA(0x0049311f, 0x100e)
 void combatManager::CatAttack(int side)
 {
@@ -1566,13 +1566,14 @@ foundMissHex:
     LogStr("CA2");
 }
 
-// @match-note: retained 99.98%, live 99.67%; frame, slots, CFG, 0x74f retail
-// span, and all 44/44 relocation targets align. Normalized instructions 129 and
-// 306 are the same commutative operand-load/reversed-branch residual (base jge,
-// retail jle); remaining diff rows are delinked string/NULL_SAMPLE2 identities.
-// Relational swaps, De Morgan forms, explicit control flow, volatile
-// intermediates, and the attempted AST mutation did not change it. Do not
-// resume source-shape grinding before the post-95% phase.
+// @semantic: The first raw divergence is +0x2e0: the SAMPLE2 compiler temporary
+// uses base -0xcc/-0xc8 versus retail -0xc8/-0xc4; nested armyNameValue uses
+// base -0xc4 versus retail -0xcc. The 0xd8 frame size, other slots, CFG, and all
+// 44 ordered relocations agree. Three val|0 spellings recover both comparison
+// orders, and defense replaces the incorrect attack field. Inverted string
+// selection and bucket-12/-14 wider-scope pointer placements regressed; a nested
+// bucket rename was stagnant. Revisit only after compiler allocation or the
+// source/TU/header epoch changes.
 VA(0x0049412d, 0x74f)
 void combatManager::KeepAttack(int tower)
 {
@@ -1622,8 +1623,8 @@ void combatManager::KeepAttack(int tower)
             // Retail +0x25b loads bestValue10, compares value26, then uses jle.
             // Reversing both operands produces equivalent jge and differs at
             // function offsets +0x25d, +0x260, and +0x262.
-            if (bestPriority0 < priority ||
-                (bestPriority0 == priority && bestValue10 < value26)) {
+            if ((bestPriority0 | 0) < priority ||
+                ((bestPriority0 | 0) == priority && bestValue10 < value26)) {
                 bestValue10 = value26;
                 bestPriority0 = priority;
                 bestArmyIndex5 = armyIndex3;
@@ -1672,7 +1673,7 @@ void combatManager::KeepAttack(int tower)
     if (m_heroes[COMBAT_DEFENDER_SIDE])
         attackBonus4 +=
             m_heroes[COMBAT_DEFENDER_SIDE]->Stats(HERO_PRIMARY_ATTACK);
-    attackBonus4 -= target0->m_monster.attack;
+    attackBonus4 -= target0->m_monster.defense;
     if (attackBonus4 > COMBAT_KEEP_ATTACK_STAT_LIMIT)
         attackBonus4 = COMBAT_KEEP_ATTACK_STAT_LIMIT;
     if (attackBonus4 < -COMBAT_KEEP_ATTACK_STAT_LIMIT)
@@ -1681,7 +1682,7 @@ void combatManager::KeepAttack(int tower)
         shotCount28 /= COMBAT_KEEP_SIDE_TOWER_SHOT_DIVISOR;
 
     int damage8 = 0;
-    for (armyIndex3 = 0; shotCount28 > armyIndex3; armyIndex3++)
+    for (armyIndex3 = 0; (shotCount28 | 0) > armyIndex3; armyIndex3++)
         damage8 += SRandom(COMBAT_KEEP_RANDOM_DAMAGE_MIN,
                            COMBAT_KEEP_RANDOM_DAMAGE_MAX);
     damage8 = static_cast<long>(
@@ -1692,16 +1693,16 @@ void combatManager::KeepAttack(int tower)
 
     int killed29 = target0->Damage(damage8, -1);
     if (killed29 > 0) {
-        char *armyName;
+        char *armyNameValue;
         if (killed29 > 1)
-            armyName = gArmyNamesPlural[target0->m_monsterType];
+            armyNameValue = gArmyNamesPlural[target0->m_monsterType];
         else
-            armyName = gArmyNames[target0->m_monsterType];
+            armyNameValue = gArmyNames[target0->m_monsterType];
         sprintf(gText, "%s %d %s.\n%d %s %s.",
                 tower == COMBAT_TOWER_SELECTOR_GARRISON ? "Garrison does"
                                                         : "Tower does",
                 damage8,
-                "damage", killed29, armyName,
+                "damage", killed29, armyNameValue,
                 killed29 > 1 ? "perishes" : "perish");
     } else {
         sprintf(gText, "%s %d %s.",
@@ -1761,16 +1762,10 @@ void combatManager::ResetHitByCreature(void)
     }
 }
 
-// @early-stop
-// All 0x36 instruction bytes match except +0x26, where the
-// success jump selects an equivalent delinked local label (0x07 versus 0x02).
-// The function has no relocations.
 VA(0x00494a7f, 0x36)
 int ValidHex(int hex)
 {
-    if (hex >= 0 && hex <= COMBAT_VALID_HEX_MAX)
-        return 1;
-    return 0;
+    return hex >= 0 && hex <= COMBAT_VALID_HEX_MAX ? 1 : 0;
 }
 
 VA(0x00494ab5, 0x16)
@@ -2044,16 +2039,10 @@ void combatManager::TestRaiseDoor(void)
     }
 }
 
-// @early-stop
-// Retained/live 99.90%; frame and slots match, all 52 normalized
-// instructions/operands match, and there are 0/0 relocations. Raw bytes differ
-// only at +0xc6, where the first return arm jumps to the common continuation
-// instead of retail's equivalent local-label hop. Positive-arm/else polarity is
-// already aligned; no value-bearing expression mutation applies to this hop.
 VA(0x00495481, 0xd8)
 int combatManager::InCastle(int hex)
 {
-    if ((hex < COMBAT_CASTLE_INTERIOR_ROW_0_FIRST ||
+    return ((hex < COMBAT_CASTLE_INTERIOR_ROW_0_FIRST ||
          hex > COMBAT_CASTLE_INTERIOR_ROW_0_LAST) &&
         (hex < COMBAT_CASTLE_INTERIOR_ROW_1_FIRST ||
          hex > COMBAT_CASTLE_INTERIOR_ROW_1_LAST) &&
@@ -2070,10 +2059,7 @@ int combatManager::InCastle(int hex)
         (hex < COMBAT_CASTLE_INTERIOR_ROW_7_FIRST ||
          hex > COMBAT_CASTLE_INTERIOR_ROW_7_LAST) &&
         (hex < COMBAT_CASTLE_INTERIOR_ROW_8_FIRST ||
-         hex > COMBAT_CASTLE_INTERIOR_ROW_8_LAST)) {
-        return 1;
-    }
-    return 0;
+         hex > COMBAT_CASTLE_INTERIOR_ROW_8_LAST)) ? 1 : 0;
 }
 
 // @match-note: retained/live 99.52%; frame, slots, loop CFG, calls, and all 25/25
