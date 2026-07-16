@@ -93,11 +93,6 @@ $T4299	BASE\Bzip.c	0xeba98	0x8	rdata	0x8	5	0x10	local	candidate-coff-section-tra
 ??_7iconWidget@@6B@	BASE\ICONWDGT.c	0xeba40	0xc	rdata	0x8	3	0x0	external	candidate-coff-section-translation
 ??_7inputManager@@6B@	BASE\INPUTMGR.c	0xeba30	0xc	rdata	0x8	9	0x0	external	candidate-coff-section-translation
 ??_7mouseManager@@6B@	BASE\MOUSEMGR.c	0xeba00	0xc	rdata	0x8	6	0x0	external	candidate-coff-section-translation
-??_C@_04FMGJ@MS6c?$AA@	BASE\Midi.c	0x11ff20	0x5	data	0x4	5	0x0	external	candidate-coff-reloc-bijection
-??_C@_04PGPO@MS6b?$AA@	BASE\Midi.c	0x11ff18	0x5	data	0x4	6	0x0	external	candidate-coff-reloc-bijection
-??_C@_03KFGM@MS4?$AA@	BASE\Midi.c	0x11ff30	0x4	data	0x4	11	0x0	external	candidate-coff-reloc-bijection
-??_C@_0N@FPDP@MIDI?$CF04d?4XMI?$AA@	BASE\Midi.c	0x11ff3c	0xd	data	0x4	14	0x0	external	candidate-coff-reloc-bijection
-??_C@_04JOCJ@MP1a?$AA@	BASE\Midi.c	0x11ff34	0x5	data	0x4	15	0x0	external	candidate-coff-reloc-bijection
 ??_C@_0CJ@HIPF@I?3?2Projects?2Heroes?2Prog?2BASE?2PAL@	BASE\PALETTE.c	0x11fd3c	0x29	data	0x4	3	0x0	external	candidate-coff-section-translation
 ??_C@_0CK@CPHI@I?3?2Projects?2Heroes?2Prog?2BASE?2PAL@	BASE\PALETTE.c	0x11fd68	0x2a	data	0x4	9	0x0	external	candidate-coff-section-translation
 ??_C@_0CL@KICP@I?3?2Projects?2Heroes?2Prog?2BASE?2PAL@	BASE\PALETTE.c	0x11fd94	0x2b	data	0x4	12	0x0	external	candidate-coff-section-translation
