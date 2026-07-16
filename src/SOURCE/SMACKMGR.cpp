@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include <string.h>
 
-DATA(0x00522f7c) static signed char bExpansionSmackNum = 0;
+DATA(0x00522f7c) static signed char bExpansionSmackNum;
 
 VA(0x00401000, 0x4e)
 void ConvertSmackerPalette(unsigned char *paletteData) {
@@ -509,13 +509,13 @@ signed char PointInRect(int x, int y, tag_rect *rect) {
 
 VA(0x004026bc, 0x251)
 void PrintSummaryInfo(SmackSum *summary) {
-    sprintf(gText, "                                        Name - %s",
+    sprintf(gText, "                                              Name - %s",
             SmackOptions[bSmackNum].fileName);
     LogStr(gText);
 #define LOG_SUMMARY_VALUE(format, value) \
     sprintf(gText, format, value);       \
     LogStr(gText)
-    LOG_SUMMARY_VALUE("                                    total time - %8d", summary->TotalTime);
+    LOG_SUMMARY_VALUE("                                        total time - %8d", summary->TotalTime);
     LOG_SUMMARY_VALUE("MS*100 per frame (100000/MS100PerFrame=Frames/Sec) - %8d",
                       summary->MS100PerFrame);
     LOG_SUMMARY_VALUE("        Time to open and prepare for decompression - %8d",
@@ -524,23 +524,23 @@ void PrintSummaryInfo(SmackSum *summary) {
                       summary->TotalFrames);
     LOG_SUMMARY_VALUE("                    Total number of skipped frames - %8d",
                       summary->SkippedFrames);
-    LOG_SUMMARY_VALUE("                           Total time spent blitting - %8d",
+    LOG_SUMMARY_VALUE("                         Total time spent blitting - %8d",
                       summary->TotalBlitTime);
-    LOG_SUMMARY_VALUE("                            Total time spent reading - %8d",
+    LOG_SUMMARY_VALUE("                          Total time spent reading - %8d",
                       summary->TotalReadTime);
     LOG_SUMMARY_VALUE("                    Total time spent decompressing - %8d",
                       summary->TotalDecompTime);
-    LOG_SUMMARY_VALUE("                   Total io speed (sbytes/second) - %8d",
+    LOG_SUMMARY_VALUE("                     Total io speed (sbytes/second) - %8d",
                       summary->TotalReadSpeed);
-    LOG_SUMMARY_VALUE("                           Slowest single frame time - %8d",
+    LOG_SUMMARY_VALUE("                         Slowest single frame time - %8d",
                       summary->SlowestFrameTime);
     LOG_SUMMARY_VALUE("                  Second slowest single frame time - %8d",
                       summary->Slowest2FrameTime);
-    LOG_SUMMARY_VALUE("                         Slowest single frame number - %8d",
+    LOG_SUMMARY_VALUE("                       Slowest single frame number - %8d",
                       summary->SlowestFrameNum);
     LOG_SUMMARY_VALUE("                Second slowest single frame number - %8d",
                       summary->Slowest2FrameNum);
-    LOG_SUMMARY_VALUE("                           Average size of the frame - %8d",
+    LOG_SUMMARY_VALUE("                         Average size of the frame - %8d",
                       summary->AverageFrameSize);
     LOG_SUMMARY_VALUE("                Highest amount of memory allocated - %8d",
                       summary->HighestExtraUsed);
@@ -627,8 +627,21 @@ DATA(0x004ec070) SSmackOptions SmackOptions[73] = {
 DATA(0x004ecd48) int bTesting = 0;
 DATA(0x004ecd4c) Smack *smk1 = 0;
 DATA(0x004ecd50) Smack *smk2 = 0;
-DATA(0x00522f20) signed char bSmackNum = 0;
-DATA(0x00522f24) int gbLastFramePlayed = 0;
-DATA(0x00522f28) SmackSum smksum = {0};
-DATA(0x00522f80) int gbPlayedThrough = 0;
-DATA(0x00522f84) signed char bMainDone = 0;
+// @data-layout-note Retail attributes one loader-zero SMACKMGR contribution at
+// 0x522f20..0x522f88. Removing explicit zero initializers correctly separates it
+// from the byte-exact initialized contribution, but VC4.2 emits one 0x60 .bss in
+// hash order: bSmackNum +0, gbPlayedThrough +4, smksum +8,
+// bExpansionSmackNum +0x54, bMainDone +0x58, gbLastFramePlayed +0x5c. Retail is
+// bSmackNum +0, gbLastFramePlayed +4, smksum +8, an unreferenced eight-byte gap,
+// bExpansionSmackNum +0x5c, gbPlayedThrough +0x60, bMainDone +0x64. SmackSum is
+// exactly 0x4c: the period SDK ends at HighestExtraUsed (+0x48), retail accesses
+// no later field, and no retail relocation targets +0x4c or +0x50. Declaration
+// reorder, extern-before-definition, file/function static placement, /Z7, /Gy,
+// /Gf, and a custom bss_seg all retain the candidate order. Revisit only with
+// evidence for the eight unreferenced bytes or the original common/section form;
+// do not add padding variables or section pragmas solely to force addresses.
+DATA(0x00522f20) signed char bSmackNum;
+DATA(0x00522f24) int gbLastFramePlayed;
+DATA(0x00522f28) SmackSum smksum;
+DATA(0x00522f80) int gbPlayedThrough;
+DATA(0x00522f84) signed char bMainDone;
