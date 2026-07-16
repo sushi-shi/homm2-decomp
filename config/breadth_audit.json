@@ -2,6 +2,94 @@
   "version": 1,
   "records": [
     {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?CheckDimHero@advManager@@QAEXXZ",
+      "source_hash": "a2d96d4c1de6",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.88095,
+      "after": 100.0,
+      "note": "Combined invalid-player and invalid-hero return guard gives 141 exact bytes and 10 matching relocations."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?Main@advManager@@UAEHAAUtag_message@@@Z",
+      "source_hash": "9e6f9cde9deb",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 99.99797,
+      "after": 99.99797,
+      "note": "One adjacent same-epilogue branch byte remains after ten bounded CFG and AST attempts; 232 relocations agree."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?Open@advManager@@UAEHH@Z",
+      "source_hash": "6fde6269ea60",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.94915,
+      "after": 100.0,
+      "note": "Semantic local suffixes recover retail slots; all 2505 raw bytes and 167 relocations agree."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?PuzzleDraw@advManager@@QAEXHHHH@Z",
+      "source_hash": "92f735bec4d8",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "improved",
+      "iterations": 1,
+      "before": 99.88636,
+      "after": 99.90909,
+      "note": "Corrected runtime field to m_objectIcons[17]; only unexplained retail frame provenance remains and 5 relocations agree."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?TownQuickView@advManager@@QAEXHHHH@Z",
+      "source_hash": "0d971a20a383",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "improved",
+      "iterations": 2,
+      "before": 99.907234,
+      "after": 99.99727,
+      "note": "OR-zero closes multiplication ordering; only commutative row-count load order remains with 102 relocations aligned."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?UpdateHeroLocators@advManager@@QAEXHH@Z",
+      "source_hash": "9f85f1c12967",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.92647,
+      "after": 99.92647,
+      "note": "Relocation-masked code is exact and all 14 effective targets agree; only folded relocation identity remains."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?UpdateScreen@advManager@@QAEXHH@Z",
+      "source_hash": "136db954e972",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.96032,
+      "after": 100.0,
+      "note": "Early-return guard closes the epilogue trampoline; all 538 raw bytes and 31 relocations agree."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?UpdateTownLocators@advManager@@QAEXHH@Z",
+      "source_hash": "d2217b855df8",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.97175,
+      "after": 99.97175,
+      "note": "Relocation-masked code is exact and all 30 effective targets agree; only folded relocation identity remains."
+    },
+    {
       "unit": "SOURCE/KB",
       "function": "?AddScoreToHighScore@@YIHHHHHPAD@Z",
       "source_hash": "caad0d5ec9ee",
