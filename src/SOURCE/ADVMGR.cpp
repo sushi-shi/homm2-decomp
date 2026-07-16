@@ -56,14 +56,6 @@
 #include <string.h>
 
 #define ADVMGR_SOURCE_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\ADVMGR.CPP"
-// Retail loads these line bases through relocated words; numeric constants change the code shape.
-#define ADVMGR_QUICK_VIEW_LINE (*reinterpret_cast<const short *>("\x76\x21"))
-#define ADVMGR_TOWN_VIEW_LINE (*reinterpret_cast<const short *>("\x5f\x5e"))
-#define ADVMGR_BOTTOM_HERO_LINE (*reinterpret_cast<const short *>("\x5f\x21"))
-#define ADVMGR_NEW_TURN_LINE (*reinterpret_cast<const short *>("\xd0\x11"))
-#define ADVMGR_RESOURCE_VIEW_LINE (*reinterpret_cast<const short *>("\x2f\x12"))
-#define ADVMGR_KINGDOM_VIEW_LINE (*reinterpret_cast<const short *>("\x96\x12"))
-#define ADVMGR_BORDER_FREE_LINE (*reinterpret_cast<const short *>("\x24\x01"))
 #define ADVMGR_ENVIRONMENT_VOLUME(distance) environmentVolumes[distance]
 #define ADVMGR_REMOTE_PAYLOAD(packet) \
     (reinterpret_cast<AdventureRemotePayload *>((packet)->payload))
@@ -323,6 +315,9 @@ int advManager::Open(int id)
 VA(0x00457028, 0x40a)
 void advManager::Close(void)
 {
+    DATA(0x004f59a8) static short s_closeBorderFreeLineBase =
+        ADVMGR_BORDER_FREE_LINE_BASE;
+
     ClearBottomView();
     gpMouseManager->SetPointer(-1);
     if (!bEnteringTown || gConfig.useOpera || gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
@@ -333,7 +328,8 @@ void advManager::Close(void)
     }
     if (m_adventureBorder != 0) {
         BaseFree(m_adventureBorder, ADVMGR_SOURCE_FILE,
-                 ADVMGR_BORDER_FREE_LINE + ADVMGR_BORDER_FREE_LINE_OFFSET);
+                 s_closeBorderFreeLineBase +
+                     ADVMGR_BORDER_INITIAL_FREE_LINE_OFFSET);
         m_adventureBorder = 0;
     }
 
@@ -3800,6 +3796,9 @@ int advManager::UpdBottomViewEnemyTurn(void)
 VA(0x004613b0, 0x366)
 int advManager::UpdBottomViewNewTurn(void)
 {
+    DATA(0x004f6134) static short s_newTurnLineBase =
+        ADVMGR_NEW_TURN_LINE_BASE;
+
     int dateIconFrame;
     char *weekText;
     char *dayText;
@@ -3836,7 +3835,7 @@ int advManager::UpdBottomViewNewTurn(void)
 
     weekText = static_cast<char *>(BaseAlloc(
         ADVMGR_BOTTOM_VIEW_TEXT_BUFFER_SIZE, ADVMGR_SOURCE_FILE,
-        ADVMGR_NEW_TURN_LINE + ADVMGR_NEW_TURN_WEEK_ALLOC_LINE_OFFSET));
+        s_newTurnLineBase + ADVMGR_NEW_TURN_WEEK_ALLOC_LINE_OFFSET));
     sprintf(weekText, "%s: %d  %s: %d", "Month", gpGame->m_month,
             "Week", gpGame->m_week);
     m_bottomViewAllTexts[0] = new textWidget(
@@ -3850,7 +3849,7 @@ int advManager::UpdBottomViewNewTurn(void)
 
     dayText = static_cast<char *>(BaseAlloc(
         ADVMGR_BOTTOM_VIEW_TEXT_BUFFER_SIZE, ADVMGR_SOURCE_FILE,
-        ADVMGR_NEW_TURN_LINE + ADVMGR_NEW_TURN_DAY_ALLOC_LINE_OFFSET));
+        s_newTurnLineBase + ADVMGR_NEW_TURN_DAY_ALLOC_LINE_OFFSET));
     sprintf(dayText, "%s: %d", "Day", gpGame->m_day);
     m_bottomViewAllTexts[0] = new textWidget(
         ADVMGR_NEW_TURN_DATE_TEXT_X, ADVMGR_NEW_TURN_DAY_TEXT_Y,
@@ -3866,6 +3865,9 @@ int advManager::UpdBottomViewNewTurn(void)
 VA(0x00461716, 0x35f)
 int advManager::UpdBottomViewResMsg(void)
 {
+    DATA(0x004f61f4) static short s_resourceViewLineBase =
+        ADVMGR_RESOURCE_VIEW_LINE_BASE;
+
     int iconWidth6;
     int iconHeight11;
     int textY19;
@@ -3896,7 +3898,7 @@ int advManager::UpdBottomViewResMsg(void)
     }
     messageText2 = static_cast<char *>(BaseAlloc(
         strlen(gcBottomViewText) + 1, ADVMGR_SOURCE_FILE,
-        ADVMGR_RESOURCE_VIEW_LINE +
+        s_resourceViewLineBase +
             ADVMGR_RESOURCE_VIEW_MESSAGE_ALLOC_LINE_OFFSET));
     sprintf(messageText2, gcBottomViewText);
     m_bottomViewAllTexts[0] = new textWidget(
@@ -3931,7 +3933,7 @@ int advManager::UpdBottomViewResMsg(void)
 
         resourceCountText6 = static_cast<char *>(BaseAlloc(
             ADVMGR_BOTTOM_VIEW_COUNT_BUFFER_SIZE, ADVMGR_SOURCE_FILE,
-            ADVMGR_RESOURCE_VIEW_LINE +
+            s_resourceViewLineBase +
                 ADVMGR_RESOURCE_VIEW_COUNT_ALLOC_LINE_OFFSET));
         sprintf(resourceCountText6, "%d", giBottomViewResourceQty);
         m_bottomViewAllTexts[1] = new textWidget(
@@ -3950,6 +3952,9 @@ int advManager::UpdBottomViewResMsg(void)
 VA(0x00461a75, 0x363)
 int advManager::UpdBottomViewKingdom(void)
 {
+    DATA(0x004f6294) static short s_kingdomViewLineBase =
+        ADVMGR_KINGDOM_VIEW_LINE_BASE;
+
     int villageCount37;
     int index11;
     int castleCount12;
@@ -4012,7 +4017,7 @@ int advManager::UpdBottomViewKingdom(void)
     for (index11 = 0; index11 < ADVMGR_KINGDOM_VIEW_ENTRY_COUNT; ++index11) {
         countText14[index11] = static_cast<char *>(BaseAlloc(
             ADVMGR_BOTTOM_VIEW_COUNT_BUFFER_SIZE, ADVMGR_SOURCE_FILE,
-            ADVMGR_KINGDOM_VIEW_LINE +
+            s_kingdomViewLineBase +
                 ADVMGR_KINGDOM_VIEW_COUNT_ALLOC_LINE_OFFSET));
         if (index11 < ADVMGR_KINGDOM_VIEW_RESOURCE_COUNT)
             sprintf(countText14[index11], "%d", gpCurPlayer->m_resources[index11]);
@@ -4040,6 +4045,9 @@ int advManager::UpdBottomViewKingdom(void)
 VA(0x00461dd8, 0x583)
 int advManager::UpdBottomViewHero(void)
 {
+    DATA(0x004f6300) static short s_bottomHeroLineBase =
+        ADVMGR_BOTTOM_HERO_LINE_BASE;
+
     char *armyCountLabelsResult[ADVMGR_BOTTOM_HERO_ARMY_SLOTS];
     icon *monsterIconsLocal;
     int occupiedSlotsLocal;
@@ -4100,7 +4108,8 @@ int advManager::UpdBottomViewHero(void)
 
                 armyCountLabelsResult[displayIndexData] = static_cast<char *>(BaseAlloc(
                     ADVMGR_BOTTOM_HERO_LABEL_BYTES, ADVMGR_SOURCE_FILE,
-                    ADVMGR_BOTTOM_HERO_LINE + 0x44));
+                    s_bottomHeroLineBase +
+                        ADVMGR_BOTTOM_HERO_ALLOC_LINE_OFFSET));
                 if (targetHero->m_army.m_creatureCounts[armySlot] >
                     ADVMGR_BOTTOM_HERO_MAX_FULL_COUNT) {
                     sprintf(armyCountLabelsResult[displayIndexData], "%dk",
@@ -4176,6 +4185,9 @@ int advManager::UpdBottomViewHero(void)
 VA(0x0046235b, 0xd32)
 void advManager::HeroQuickView(int heroId, int locatorSlot, int windowX, int windowY)
 {
+    DATA(0x004f6370) static short s_quickViewLineBase =
+        ADVMGR_QUICK_VIEW_LINE_BASE;
+
     short armyAreaWidthLocal = 160;
     short armyAreaLeftLocal = 22;
     short detailedCreatureY = 124;
@@ -4276,7 +4288,9 @@ void advManager::HeroQuickView(int heroId, int locatorSlot, int windowX, int win
                 if (stackIconsWidgets[armyIndex] == 0)
                     MemError();
                 armyLabelsStrings[armyIndex] = static_cast<char *>(BaseAlloc(
-                    5, ADVMGR_SOURCE_FILE, ADVMGR_QUICK_VIEW_LINE + 0x9b));
+                    5, ADVMGR_SOURCE_FILE,
+                    s_quickViewLineBase +
+                        ADVMGR_QUICK_VIEW_FIRST_ALLOC_LINE_OFFSET));
                 sprintf(armyLabelsStrings[armyIndex], "%d",
                         targetHero->m_army.m_creatureCounts[displayIndexStateOffset]);
                 creatureTextWidgetsLocal[armyIndex] = new textWidget(
@@ -4334,7 +4348,9 @@ void advManager::HeroQuickView(int heroId, int locatorSlot, int windowX, int win
             if (stackIconsWidgets[armyIndex] == 0)
                 MemError();
             armyLabelsStrings[armyIndex] = static_cast<char *>(BaseAlloc(
-                15, ADVMGR_SOURCE_FILE, ADVMGR_QUICK_VIEW_LINE + 0xe3));
+                15, ADVMGR_SOURCE_FILE,
+                s_quickViewLineBase +
+                    ADVMGR_QUICK_VIEW_SECOND_ALLOC_LINE_OFFSET));
             strcpy(armyLabelsStrings[armyIndex],
                    GetArmySizeName(targetHero->m_army.m_creatureCounts[displayIndexValue], 0));
             creatureTextWidgetsLocal[armyIndex] = new textWidget(
@@ -4371,7 +4387,9 @@ void advManager::HeroQuickView(int heroId, int locatorSlot, int windowX, int win
                 if (stackIconsWidgets[armyIndex] == 0)
                     MemError();
                 armyLabelsStrings[armyIndex] = static_cast<char *>(BaseAlloc(
-                    15, ADVMGR_SOURCE_FILE, ADVMGR_QUICK_VIEW_LINE + 0x10e));
+                    15, ADVMGR_SOURCE_FILE,
+                    s_quickViewLineBase +
+                        ADVMGR_QUICK_VIEW_THIRD_ALLOC_LINE_OFFSET));
                 strcpy(armyLabelsStrings[armyIndex],
                        GetArmySizeName(targetHero->m_army.m_creatureCounts[displayIndexValue], 0));
                 creatureTextWidgetsLocal[armyIndex] = new textWidget(
@@ -4443,6 +4461,9 @@ char * advManager::GetArmySizeName(int armySize, int grammar)
 VA(0x004631ad, 0xc29)
 void advManager::TownQuickView(int townId, int locatorSlot, int windowX, int windowY)
 {
+    DATA(0x004f6488) static short s_townViewLineBase =
+        ADVMGR_TOWN_VIEW_LINE_BASE;
+
     icon *monsterIconLocal;
     short portraitWidgetLocal;
     short armyIconHeightState;
@@ -4541,7 +4562,8 @@ void advManager::TownQuickView(int townId, int locatorSlot, int windowX, int win
 
     if (informationLevel == 0 || armyCountLocal == 0) {
         emptyArmyLabel = static_cast<char *>(BaseAlloc(
-            20, ADVMGR_SOURCE_FILE, ADVMGR_TOWN_VIEW_LINE + 0x83));
+            20, ADVMGR_SOURCE_FILE,
+            s_townViewLineBase + ADVMGR_TOWN_VIEW_FIRST_ALLOC_LINE_OFFSET));
         if (informationLevel == 0)
             sprintf(emptyArmyLabel, "Unknown");
         else
@@ -4608,7 +4630,9 @@ void advManager::TownQuickView(int townId, int locatorSlot, int windowX, int win
             if (armyIcons[widgetIndexWidget] == 0)
                 MemError();
             armyLabelsResult[widgetIndexWidget] = static_cast<char *>(BaseAlloc(
-                15, ADVMGR_SOURCE_FILE, ADVMGR_TOWN_VIEW_LINE + 0xd6));
+                15, ADVMGR_SOURCE_FILE,
+                s_townViewLineBase +
+                    ADVMGR_TOWN_VIEW_SECOND_ALLOC_LINE_OFFSET));
             if (informationLevel == 3)
                 sprintf(armyLabelsResult[widgetIndexWidget], "%d",
                         quickTownLocal->m_army.m_creatureCounts[creatureSlotLocal]);
@@ -4651,7 +4675,9 @@ void advManager::TownQuickView(int townId, int locatorSlot, int windowX, int win
                 if (armyIcons[widgetIndexWidget] == 0)
                     MemError();
                 armyLabelsResult[widgetIndexWidget] = static_cast<char *>(BaseAlloc(
-                    15, ADVMGR_SOURCE_FILE, ADVMGR_TOWN_VIEW_LINE + 0x108));
+                    15, ADVMGR_SOURCE_FILE,
+                    s_townViewLineBase +
+                        ADVMGR_TOWN_VIEW_THIRD_ALLOC_LINE_OFFSET));
                 if (informationLevel == 3)
                     sprintf(armyLabelsResult[widgetIndexWidget], "%d",
                             quickTownLocal->m_army.m_creatureCounts[creatureSlotLocal]);
@@ -4698,12 +4724,16 @@ void advManager::TownQuickView(int townId, int locatorSlot, int windowX, int win
 VA(0x00463dd6, 0x11f)
 void advManager::RedrawAdvScreen(int update, int freeBorder)
 {
+    DATA(0x004f6590) static short s_redrawBorderFreeLineBase =
+        ADVMGR_BORDER_FREE_LINE_BASE;
+
     if (!bShowIt)
         return;
     gpResourceManager->GetBackdrop("advbord.icn", gpWindowManager->m_screen, 1);
     if (freeBorder) {
         BaseFree(m_adventureBorder, ADVMGR_SOURCE_FILE,
-                 ADVMGR_BORDER_FREE_LINE + 9);
+                 s_redrawBorderFreeLineBase +
+                     ADVMGR_BORDER_SECONDARY_FREE_LINE_OFFSET);
         m_adventureBorder = 0;
     }
     SaveAdventureBorder();
@@ -7031,12 +7061,16 @@ void advManager::EnableButtons(void)
 VA(0x00469976, 0x145)
 void advManager::SaveAdventureBorder(void)
 {
+    DATA(0x004f688c) static short s_saveBorderAllocLineBase =
+        ADVMGR_BORDER_FREE_LINE_BASE;
+
     if (m_adventureBorder != 0)
         return;
 
     m_adventureBorder = static_cast<unsigned char *>(
         BaseAlloc(ADVMGR_BORDER_BUFFER_SIZE, ADVMGR_SOURCE_FILE,
-                  ADVMGR_BORDER_FREE_LINE + 4));
+                  s_saveBorderAllocLineBase +
+                      ADVMGR_BORDER_ALLOC_LINE_OFFSET));
     unsigned char *savedPixel = m_adventureBorder;
     unsigned char *screenPixel = gpWindowManager->m_screen->m_pixels;
     int row;
