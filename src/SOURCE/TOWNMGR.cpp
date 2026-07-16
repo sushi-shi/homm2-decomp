@@ -1185,7 +1185,7 @@ void townManager::ShowText(char *)
         TOWN_STATUS_REGION_HEIGHT);
 }
 
-// @match-note 99.33%: explicit-range comparison excluding the 0x38-byte jump
+// @semantic: Explicit-range comparison excluding the 0x38-byte jump
 // table has 1306 instructions on both sides, an identical opcode multiset, the
 // exact 0x250 frame/0x1830 size, and all 215/215 ordered relocations. Three
 // /Ob1 continuation jumps move between six otherwise aligned spans. A bounded
@@ -1665,7 +1665,7 @@ int townManager::Main(tag_message &message)
     return 1;
 }
 
-// @match-note 98.69%: exact 0x4e3 size, 0x18 frame, all six command bodies/CFG,
+// @semantic: Exact 0x4e3 size, 0x18 frame, all six command bodies/CFG,
 // retail -0x4/-0x8/-0xc/-0x10 local slots, and 23/23 ordered relocation owners
 // and addends. Fifteen of sixteen external relocation offsets are exact; the
 // first gpGame site is five bytes late because the inlined GetHero continuation
@@ -2443,6 +2443,13 @@ void townManager::SetupMage(heroWindow *window)
     window->BroadcastMessage(message_b);
 }
 
+// @semantic: The 0x28 frame, local slots, select/switch CFG, and all five ordered
+// relocations agree. The first raw divergence is the spell-table address:
+// current code folds slot_p into the town base before loading level, while retail
+// forms base + 4*level and then loads slot_p. Scalar wrappers on level, slot_p,
+// and the town pointer, reversed subscripts, and the flat spell-slot view all
+// produced the same worse level-before-base order. Revisit after a relevant
+// accessor, layout, or TOWNMGR TU-state change.
 VA(0x00419393, 0x190)
 int MageGuildHandler(tag_message &message)
 {
@@ -2685,7 +2692,7 @@ void townManager::DoTavern(void)
     delete m_heroWindow0;
 }
 
-// @match-note 98.81%: exact 0x328 size, 0x24 frame, complete amount/clamp,
+// @semantic: Exact 0x328 size, 0x24 frame, complete amount/clamp,
 // confirm/cancel/redraw CFG, and 32/32 resolved relocation owners/addends.
 // Retail slots are plusButton -0x4, handled -0x8, unusedAction -0xc,
 // minusButton -0x10, amountControl -0x14, and message -0x18; their initializer
@@ -2902,16 +2909,16 @@ void townManager::SetupWell(heroWindow *window)
     }
 }
 
-// @early-stop
-// Jump-only /Od block-topology wall: every non-jump instruction agrees with
-// the exact 0x1b0 frame/slots, and all 114/114 ordered relocations agree. The
-// 0xee7 candidate span is exactly 0x28 short of retail's 0xf0f: eight five-byte
-// jumps at retail +0x576/+0x7f6/+0xa74/+0xb81 and
-// +0xef4/+0xef9/+0xefe/+0xf03. Direct m_heroCount/m_townCount reads remove
-// three false inline continuations, and value-before-position assignment is
-// byte-exact. Positive, negated, empty-else, and explicit-continue nestings
-// were worse or changed rank progression; 256 consolidated atomic variants
-// found no exact closure.
+// @semantic: The 0x1b0 frame/slots, complete guild-rank/UI CFG, and all 114
+// ordered relocations agree. The first raw divergence at +0x249 loads the loop
+// counter before the bound and uses cmp/jle; retail loads the bound first and
+// uses cmp/jge. This is not a jump-only wall: at +0x5d3 the equivalent hero-id
+// address calculation also uses a different non-jump instruction sequence.
+// Direct m_heroCount/m_townCount reads remove three false inline continuations,
+// and value-before-position assignment is byte-exact. Positive, negated,
+// empty-else, and explicit-continue forms were worse or changed rank
+// progression; a prior bounded AST pass found no exact closure. Revisit after
+// a rank-loop source-shape or relevant TOWNMGR TU-state discovery.
 VA(0x0041a783, 0xf0f)
 void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
 {
@@ -3210,7 +3217,7 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
     }
 }
 
-// @match-note retained 98.90%: complete ten-case CFG, exact 0x56a size, 0x2c
+// @semantic: Complete ten-case CFG, exact 0x56a size, 0x2c
 // frame/slots, and the exact +0x531/0x28 jump table. All 31 external and 42
 // total relocations agree in ordered offset/type/identity/addend. Relocation-
 // masked raw proof leaves 38 bytes: four one-byte branches crossing the two

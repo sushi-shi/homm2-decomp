@@ -109,16 +109,6 @@ void town::View(int noFade)
     bEnteringTown = 0;
 }
 
-// @semantic: Current TOWN.cpp/header epoch: ownership removal has the exact 0x10
-// frame, position/i/playerRecord slots, 97-instruction CFG, and both ordered
-// gpGame relocations. The only raw difference is opcode byte +0xce: this best
-// spelling evaluates m_id then currentTown but emits `sub eax, ecx` (0x2b),
-// while retail emits `cmp eax, ecx` (0x3b). Ten non-improving variants exhausted
-// zero-on-left and logical-negation subtraction tests, direct equality in both
-// orders, unary-plus, four cast-qualified equalities, and independent
-// commutative_order steering; direct/cast equality loads currentTown first.
-// Revisit only after a relevant TOWN source/TU/header or comparison epoch changes
-// expression lowering.
 VA(0x00432f54, 0x14d)
 void town::Deallocate(void)
 {
@@ -134,7 +124,7 @@ void town::Deallocate(void)
         playerRecord->m_townIds[i] = playerRecord->m_townIds[i + 1];
 
     playerRecord->m_townIds[playerRecord->m_townCount - 1] = TOWN_ID_NONE;
-    if (m_id - playerRecord->m_currentTown == 0)
+    if (0[&m_id] == playerRecord->m_currentTown)
         playerRecord->m_currentTown = TOWN_ID_NONE;
     --playerRecord->m_townCount;
     if (playerRecord->m_townCount < TOWN_PLAYER_WINDOW_SIZE)
