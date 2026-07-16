@@ -28,7 +28,8 @@
 /*    39-export layout of Smacker 3.0g.                                      */
 /*                                                                           */
 /*    This header is RECONSTRUCTED: real prototypes matching the exported    */
-/*    @N stdcall byte-counts, plus the stable RAD Smack/SmackSum structs.    */
+/*    @N stdcall byte-counts, plus the version-specific Smack/SmackSum       */
+/*    structs recovered from the 3.0g implementation.                       */
 /*    The Win32-GDI-dependent SmackBuffer.. / SmackBlit.. families (ordinals */
 /*    1..13, and 34/35/36/37/39) are NOT imported by the retail EXE and are  */
 /*    intentionally omitted so this header stays free of <windows.h>.        */
@@ -103,6 +104,8 @@ typedef struct SmackSumTag {
   u32 HighestMemAmount;  /* Highest amount of memory allocated              */
   u32 TotalExtraMemory;  /* Total extra memory allocated                    */
   u32 HighestExtraUsed;  /* Highest extra memory actually used              */
+  u32 BitmapHandle;      /* GDI bitmap handle retained by this 3.0g build   */
+  u32 SoundWindowProc;   /* previous sound-window procedure                 */
 } SmackSum;
 
 /*=======================  SmackOpen() flags  ==============================*/
