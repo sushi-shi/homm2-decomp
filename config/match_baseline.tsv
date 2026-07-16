@@ -1364,7 +1364,7 @@ SOURCE/X_CAMPGN	?ResetBonusChoices@ExpCampaign@@QAEXXZ	100.0000	754281c6e8de
 SOURCE/X_CAMPGN	?ResetMapChoices@ExpCampaign@@QAEXXZ	100.0000	4a34fac3f11c
 SOURCE/X_CAMPGN	?ResetMapsPlayed@ExpCampaign@@QAEXXZ	100.0000	50997390bd27
 SOURCE/X_CAMPGN	?SetMapWasPlayed@ExpCampaign@@QAEXXZ	100.0000	7991ea19066f
-SOURCE/X_CAMPGN	?ShowInfo@ExpCampaign@@QAEXHH@Z	99.9682	b8e978b39223
+SOURCE/X_CAMPGN	?ShowInfo@ExpCampaign@@QAEXHH@Z	100.0000	5bcfe6c0c0f4
 SOURCE/X_CAMPGN	?UpdateInfo@ExpCampaign@@QAEXH@Z	98.9349	4d75afc72c7c
 SOURCE/comwin	?ShutdownComError@@YIXPAD@Z	98.4602	26ac980a2028
 SOURCE/comwin	?add_node@@YIXPAUtag_Anchor@@PAUtag_Node@@@Z	100.0000	9772db8d835d
