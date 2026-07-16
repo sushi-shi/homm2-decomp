@@ -325,11 +325,27 @@ def _function_relocation_proofs(candidate, function_rva, retail_sites,
         if symbol.name in defined:
             proposed.append((symbol.name, (target_rva - addend) & 0xFFFFFFFF))
         elif symbol.name in public:
+            if (public[symbol.name] + addend) & 0xFFFFFFFF == target_rva:
+                known_anchors += 1
+    return proposed, known_anchors, paired_sites, offsets_align, valid
+
+
+def _function_sequence_relocation_proofs(candidate, retail_sites, read_u32,
+                                         image_base, defined, public):
+    """Pair equal relocation sequences after validating every known target."""
+    if len(candidate) != len(retail_sites):
+        return [], 0, False
+    proposed = []
+    known_anchors = 0
+    for (_site, symbol, addend), retail_site in zip(candidate, retail_sites):
+        target_rva = (read_u32(retail_site) - image_base) & 0xFFFFFFFF
+        if symbol.name in defined:
+            proposed.append((symbol.name, (target_rva - addend) & 0xFFFFFFFF))
+        elif symbol.name in public:
             known_anchors += 1
             if (public[symbol.name] + addend) & 0xFFFFFFFF != target_rva:
-                valid = False
-                break
-    return proposed, known_anchors, paired_sites, offsets_align, valid
+                return [], known_anchors, False
+    return proposed, known_anchors, True
 
 
 def _contribution_index(exe, units):
@@ -593,6 +609,14 @@ def derive_allocations(base_dir=REPO / "build/objdiff/base",
                 _function_relocation_proofs(
                     candidate, function["rva"], retail_sites, read_u32,
                     image_base, defined, public)
+            if valid and not offsets_align:
+                sequence, sequence_anchors, sequence_valid = \
+                    _function_sequence_relocation_proofs(
+                        candidate, retail_sites, read_u32, image_base,
+                        defined, public)
+                if sequence_valid and sequence_anchors:
+                    proposed.extend(sequence)
+                    known_anchors += sequence_anchors
             if not valid or (proposed and known_anchors == 0 and not offsets_align):
                 stats.rejected_functions += 1
                 continue

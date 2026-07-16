@@ -6,6 +6,7 @@ from homm2.build.candidate_data_manifest import (
     _contains,
     _function_relocation_offsets_align,
     _function_relocation_proofs,
+    _function_sequence_relocation_proofs,
     _payload_matches_at,
     _reviewed_candidate_allocation,
     _payload_rvas,
@@ -77,6 +78,46 @@ class CandidateDataManifestTest(unittest.TestCase):
         self.assertEqual(anchors, 1)
         self.assertEqual(paired, 2)
         self.assertFalse(offsets_align)
+        self.assertTrue(valid)
+
+    def test_mismatching_anchor_does_not_discard_other_exact_sites(self):
+        private = SimpleNamespace(name="$SG1")
+        wrong_anchor = SimpleNamespace(name="?wrong@@3HA")
+        good_anchor = SimpleNamespace(name="?good@@3HA")
+        candidate = [
+            (0x10, private, 0),
+            (0x20, wrong_anchor, 0),
+            (0x30, good_anchor, 0),
+        ]
+        values = {
+            0x4010: 0x400000 + 0x700,
+            0x4020: 0x400000 + 0x999,
+            0x4030: 0x400000 + 0x300,
+        }
+        proposed, anchors, paired, _aligned, valid = \
+            _function_relocation_proofs(
+                candidate, 0x4000, sorted(values), values.__getitem__,
+                0x400000, {"$SG1": {}},
+                {"?wrong@@3HA": 0x200, "?good@@3HA": 0x300})
+        self.assertEqual(proposed, [("$SG1", 0x700)])
+        self.assertEqual(anchors, 1)
+        self.assertEqual(paired, 3)
+        self.assertTrue(valid)
+
+    def test_validated_sequence_pairs_shifted_private_relocation(self):
+        private = SimpleNamespace(name="$SG1")
+        anchor = SimpleNamespace(name="?known@@3HA")
+        candidate = [(0x11, private, 0), (0x21, anchor, 4)]
+        retail_sites = [0x4010, 0x4020]
+        values = {
+            0x4010: 0x400000 + 0x700,
+            0x4020: 0x400000 + 0x204,
+        }
+        proposed, anchors, valid = _function_sequence_relocation_proofs(
+            candidate, retail_sites, values.__getitem__, 0x400000,
+            {"$SG1": {}}, {"?known@@3HA": 0x200})
+        self.assertEqual(proposed, [("$SG1", 0x700)])
+        self.assertEqual(anchors, 1)
         self.assertTrue(valid)
 
     def test_relocation_proof_cannot_override_initialized_payload(self):
