@@ -273,8 +273,8 @@ struct SMonFrameInfo {
     float standingAnimationChances[10]; // +0x76
     int standStillDelay;              // +0x9e
     int walkDuration;                 // +0xa2
-    char unknownA6[4];
-    int attackDuration;               // +0xaa
+    int attackDuration;               // +0xa6
+    int flightSpeed;                  // +0xaa
     struct MissileOffset missileOffsets[ARMY_MISSILE_OFFSET_COUNT]; // +0xae
     unsigned char projectileDirectionCount; // +0xba
     float projectileAngles[ARMY_PROJECTILE_ANGLE_COUNT]; // +0xbb
