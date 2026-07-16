@@ -170,7 +170,7 @@ DATA(0x00537024) FILE   *outputHandleJustInCase;
 // NWC wraps malloc/free in BaseAlloc/BaseFree(ptr, __FILE__, __LINE__). __FILE__ is
 // the original build path (reloc-masked); __LINE__ immediates are hardcoded from the
 // retail disasm since our line layout differs.
-#define BZFILE const_cast<char *>("I:\\Projects\\Heroes\\Prog\\BASE\\Bzip.c")
+#define BZFILE const_cast<char *>("I:\\Projects\\Heroes\\Prog\\BASE\\Bzip.cpp")
 
 VA(0x004d4050, 0x1a)
 void initialiseCRC(void)
@@ -1250,7 +1250,7 @@ void sortIt(void)
                                 SETREST16(a2update + lastPP, k);
                         }
                     }
-                    if (veryVerbose) { sprintf(gText, "\n"); LogStr(gText); }
+                    if (veryVerbose) { sprintf(gText, " "); LogStr(gText); }
 
                 }
             }
@@ -1263,7 +1263,7 @@ void doReversibleTransformation(void)
 {
     Int32 i;
 
-    if (veryVerbose) { sprintf(gText, "\n"); LogStr(gText); }
+    if (veryVerbose) { sprintf(gText, " "); LogStr(gText); }
 
     sortIt();
 
@@ -1541,9 +1541,9 @@ void compressStream(FILE *stream, FILE *zStream)
     ERROR_IF_EOF(retVal);
 
     if (veryVerbose) {
-        sprintf(gText, "\n"); LogStr(gText);
+        sprintf(gText, " "); LogStr(gText);
         dumpAllModelStats();
-        sprintf(gText, "\n"); LogStr(gText);
+        sprintf(gText, " "); LogStr(gText);
     }
 
     if (bytesIn == 0) bytesIn = 1;
@@ -1600,7 +1600,7 @@ Bool uncompressStream(FILE *zStream, FILE *stream)
     initBogusModel();
     arithCodeStartDecoding(zbs);
 
-    if (veryVerbose) { sprintf(gText, "\n  "); LogStr(gText); }
+    if (veryVerbose) { sprintf(gText, "  "); LogStr(gText); }
     currBlockNo = 0;
     do {
         currBlockNo++;
@@ -1943,6 +1943,26 @@ long DecodeData(char *dst, char *src, unsigned long srcLen)
     return flen;
 }
 
+// @data-layout-note
+// Retail `.rdata` and candidate ordinal 5 are byte-exact at 0xeba88+0x18.
+// Retail initialized storage is 0x11ff50+0xd70; candidate ordinal 2 is a
+// byte-exact 0xd6f-byte prefix followed by one retail zero padding byte. Its
+// six DATA definitions and 77 private allocations therefore have exact
+// owner RVAs, extents, payloads, and section offsets.
+//
+// Retail loader-zero storage is 0x134ed0+0x31b0, while the hash-ordered
+// candidate COMMON contribution is 0x2da8. All 26 real definitions have
+// exact public/source anchors. The retail-only gaps are 0x134eec+0x4,
+// 0x13742c+0x4, 0x137c5c+0x3fc, and the terminal 0x13807c+0x4. The only
+// HIGHLOW target inside a gap is uncompress+0x87: candidate and retail both
+// encode outName-3, yielding 0x13742d. It is not a separate allocation. The
+// unreferenced 0x3fc interval remains unresolved; do not add padding, aliases,
+// guessed buffers, or section pragmas for any of these gaps.
+//
+// Ordered Bzip-owned relocation targets are exact in 67 of 69 referencing
+// functions (414 references). getMTFVal has 1 candidate versus 8 retail model
+// references and sortIt has 23 versus 35; those residuals belong to their
+// incomplete function structure, not to data ownership or layout.
 // ---- globals (definitions, RVA order) ----
 DATA(0x00534ee4) int longestFileName;
 DATA(0x00534ee8) int opMode;
