@@ -5,7 +5,7 @@
 the build** — they are not warnings. All gate scripts live in `scripts/homm2/build/` and run
 from the repo root; each is independently runnable (`python3 -m homm2.build.<name>`).
 
-Ordering in `cli.py`: compile must succeed first (ninja), then the seven gates below in order.
+Ordering in `cli.py`: compile must succeed first (ninja), then the eight gates below in order.
 
 ## 0. Compile + header-dependency tracking (ninja)
 
@@ -15,7 +15,7 @@ error fails the build. MSVC 4.2 has no `/showIncludes`, so `cc_wrap.py` scans ea
 header recompiles exactly its includers**, so a header change can never leave a stale object
 (this previously masked drift). See `docs/patterns/` and the `cc_wrap.py` header.
 
-## The seven hard gates
+## The eight hard gates
 
 ### 1. `assert_decls` — header discipline (no local declarations)
 No `.cpp` may carry its own `class` / `struct` / `enum` definition, `extern` declaration, or
@@ -90,6 +90,24 @@ comparison to `None`, then applies the generated project's `functionRelocDiffs=d
 On the captured `DDInitGraphics` regression, masked behavior is `100.0%` while `data_value` is
 `99.947914%`. This stricter score is still not a substitute for the gate: equal-valued BSS fields can
 compare alike, and objdiff has no project-specific public-owner extent map.
+
+### 8. `assert_early_stop_bytes` — prove relocation-only early stops
+
+An `@early-stop` comment that claims complete instruction or non-relocation byte identity must carry
+the explicit `@early-stop-reloc-only` tag. That tag is an executable assertion, not documentation by
+convention; untagged legacy prose is not parsed as a machine contract. For each tagged claim, the
+gate locates the decorated function in the candidate and delinked retail COFF objects, uses the declared retail
+span from `report.json`, masks the actual-width i386 relocation fields present on either side, and
+requires every remaining byte to agree. It does not normalize ordinary immediates, member/stack
+displacements, branch bytes, padding, or operands. The historical `army::LoadResources` bug therefore
+fails at its unrelocated `this+0xd2` byte when retail uses `this+0xd0`, even though both instructions
+have the same opcode and both test bit four.
+
+The tag is accepted only when the current compiled object passes this raw masked comparison. It is
+not deferred through the retained-maximum model: a later shared-header or TU-state change that
+invalidates the byte proof makes the hard gate red until the claim is restored or downgraded.
+New relocation-only or instruction-identical proofs must use the tag; do not add untagged prose that
+makes the same claim.
 
 ## The owner model these enforce
 
