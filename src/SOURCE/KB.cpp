@@ -5814,9 +5814,11 @@ int gNeutralBuildingCosts[KB_BUILDING_NEUTRAL_LIMIT][KB_BUILDING_RESOURCE_COUNT]
 DATA(0x004fcda0) int gMageBaseResourceValues[KB_MAGE_GUILD_LEVEL_COUNT] = {
     0, 4000, 6500, 8500, 10500, 15000
 };
-DATA(0x004fcdb8) int gNeutralBaseResourceValues[KB_BUILDING_NEUTRAL_LIMIT] = {
+DATA(0x004fcdb8) int
+    gNeutralBaseResourceValues[KB_NEUTRAL_BASE_RESOURCE_VALUE_COUNT] = {
     5000, 300, 350, 2000, 3000, 0, 12000, 2500,
-    1500, 1500, 200, 1000, 500, 0, 0, 1100
+    1500, 1500, 200, 1000, 500, 0, 0, 1100,
+    0, 0, 0, 0
 };
 DATA(0x004fce08) int gSpecialBuildingBaseResourceValues[TOWN_TYPE_COUNT] = {
     1500, 1000, 1000, 4500, 3500, 1000
