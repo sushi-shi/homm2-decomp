@@ -479,7 +479,7 @@ int PlaySmacker(int smackNumber) {
 
 DATA(0x004ec040) int bSmackSound = 0;
 DATA(0x004ec044) icon *brotherIcon = 0;
-static tag_rect expansionCampaignRects[SMACK_EXPANSION_RECT_COUNT] = {
+DATA(0x004ec048) static tag_rect expansionCampaignRects[SMACK_EXPANSION_RECT_COUNT] = {
     {215, 49, 230, 150}, {217, 275, 230, 150},
     {475, 132, 120, 180}, {41, 132, 120, 180}
 };
@@ -627,19 +627,29 @@ DATA(0x004ec070) SSmackOptions SmackOptions[73] = {
 DATA(0x004ecd48) int bTesting = 0;
 DATA(0x004ecd4c) Smack *smk1 = 0;
 DATA(0x004ecd50) Smack *smk2 = 0;
-// @data-layout-note Retail attributes one loader-zero SMACKMGR contribution at
-// 0x522f20..0x522f88. Removing explicit zero initializers correctly separates it
-// from the byte-exact initialized contribution, but VC4.2 emits one 0x60 .bss in
-// hash order: bSmackNum +0, gbPlayedThrough +4, smksum +8,
-// bExpansionSmackNum +0x54, bMainDone +0x58, gbLastFramePlayed +0x5c. Retail is
-// bSmackNum +0, gbLastFramePlayed +4, smksum +8, an unreferenced eight-byte gap,
-// bExpansionSmackNum +0x5c, gbPlayedThrough +0x60, bMainDone +0x64. SmackSum is
-// exactly 0x4c: the period SDK ends at HighestExtraUsed (+0x48), retail accesses
-// no later field, and no retail relocation targets +0x4c or +0x50. Declaration
-// reorder, extern-before-definition, file/function static placement, /Z7, /Gy,
-// /Gf, and a custom bss_seg all retain the candidate order. Revisit only with
-// evidence for the eight unreferenced bytes or the original common/section form;
-// do not add padding variables or section pragmas solely to force addresses.
+// @data-layout-note
+// Retail initialized storage is 0xec040..0xed22c (0x11ec bytes). Candidate
+// ordinal 2 is a byte-exact 0x11e9-byte prefix; retail contributes the three
+// trailing zero alignment bytes. The public objects and the 0x20-byte
+// expansionCampaignRects record have exact payloads and owner offsets. Twenty-four
+// unique compiler literals from $SG34107 through $SG34291 have reviewed exact
+// payload/offset translations. The repeated literals at $SG34124, $SG34126,
+// $SG34138, $SG34140, $SG34154, $SG34157, $SG34158, $SG34170, $SG34212, and
+// $SG34231 remain unresolved because payload equality cannot identify an owner;
+// do not select an arbitrary copy or create aliases.
+//
+// Retail loader-zero storage is 0x522f20..0x522f88 (0x68 bytes). Smacker 3.0g's
+// SmackSummary implementation writes output offsets +0x4c and +0x50 after
+// HighestExtraUsed, copying its retained GDI bitmap handle and prior sound-window
+// procedure. Recovering those real fields makes SmackSum 0x54 and naturally makes
+// the candidate contribution 0x68. VC4.2 still emits COMMON/hash order:
+// bSmackNum +0, gbPlayedThrough +4, smksum +8, bExpansionSmackNum +0x5c,
+// bMainDone +0x60, gbLastFramePlayed +0x64. Retail instead places
+// gbLastFramePlayed +4, gbPlayedThrough +0x60, and bMainDone +0x64: a three-way
+// COMMON allocation-order difference. Declaration reorder,
+// extern-before-definition, file/function static placement, /Z7, /Gy, /Gf, and
+// a custom bss_seg retain the candidate order. Do not add padding, aliases, or
+// section pragmas to hide this remaining allocation-order wall.
 DATA(0x00522f20) signed char bSmackNum;
 DATA(0x00522f24) int gbLastFramePlayed;
 DATA(0x00522f28) SmackSum smksum;
