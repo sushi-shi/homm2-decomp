@@ -46,14 +46,37 @@ The classification intentionally does not inspect instructions. A code change
 can remove the only typed x87 use while leaving the same constant allocation;
 using that instruction as type evidence would create a false data mismatch.
 
+## Embedded switch tables
+
+MSVC also emits switch and event-dispatch tables inside `.text`. Their `DIR32`
+relocations commonly name compiler-local code labels such as `$L36759`, while
+the delinked retail object represents the same destination as the containing
+function plus a function-relative addend. Those are two COFF spellings of the
+same table value.
+
+In the disposable comparison copies, a same-function `.text` `DIR32`
+relocation to a semantic local label (`type == 0`, storage class 6) is rewritten
+to the unambiguous containing external function. The encoded addend is adjusted
+so the resolved section offset is unchanged. This also covers MSVC labels such
+as `$normalEvent` that do not use the `$L<number>` spelling.
+
+The rewrite does not apply to `REL32` branches, cross-function references,
+ambiguous function owners, or static function symbols (`type == 0x20`, storage
+class 3). Static callback/function-pointer initializers therefore retain their
+original identity. A wrong switch destination remains a different
+function-relative addend and remains visible to objdiff.
+
 ## Safety properties
 
 The command refuses overlapping input, output, and sidecar paths. After every
-rewrite it reparses the output and proves that section metadata and payloads,
-relocation records, symbol indices and metadata, and auxiliary records are
-unchanged. Only primary symbol name fields and the COFF string table may differ.
-Same-offset aliases, dependency cycles, unsupported relocation forms, and hash
-or name collisions fail closed.
+rewrite it reparses the output and proves that section metadata, relocation
+site/type/order, symbol indices and metadata, and auxiliary records are
+unchanged. Only primary symbol names, the COFF string table, and the paired
+symbol-index/addend fields of authorized switch-table relocations may differ.
+For every such pair, both the original and normalized relocation must resolve
+to the identical section offset. Every other payload and relocation byte must
+remain unchanged. Same-offset aliases, dependency cycles, unsupported
+relocation forms, and hash or name collisions fail closed.
 
 Each normalized object has a readable `.symbols.tsv` sidecar. A corpus census
 can be regenerated with:
