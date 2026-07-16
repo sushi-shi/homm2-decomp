@@ -591,7 +591,7 @@ void hero::ApplyBattleLossTemps(void) {
 }
 
 // @early-stop
-// 99.52%: semantics, CFG, the 0x118 frame, line/statBonuses/newLevel/
+// Semantics, CFG, the 0x118 frame, line/statBonuses/newLevel/
 // levelsGained/currentLevel/sample/index/highLevel/skillChoices/attempts/skillIndex/
 // skillWeight/randomValue slots at -0xc8/-0xd8/-0xdc/-0xe0/-0xe4/-0xec..-0xe8/
 // -0xf0/-0xf4/-0xfc..-0xf8/-0x100/-0x104/-0x108/-0x10c, and all 58/58
@@ -601,7 +601,9 @@ void hero::ApplyBattleLossTemps(void) {
 // by exactly those 10 bytes and every non-jump opcode, operand, and visible stack offset
 // agrees. Empty-positive/else outer flow, branch polarity, regular `break`, indexed Wisdom
 // assignment, real table typing, and computed stack-name/declaration order were tried;
-// only the byte-proven local-label/trampoline shape remains. A post-95
+// only the byte-proven local-label/trampoline shape remains. The current audit
+// reproduced the 0x81e base/0x828 retail spans and 58/58 external relocation
+// targets without replaying exhausted forms. A post-95
 // 30-walk AST pass retained no mutation. Fresh masked disassembly reconfirmed
 // the two jumps as the only non-relocation instruction differences. Ordered
 // COFF audit proves the disputed +0xc3 relocation: base cHeroLevel+4 and retail
@@ -782,17 +784,17 @@ int hero::NumArtifacts(void) {
     return cnt;
 }
 
-// @match-note 98.86%: semantics, the 0x10 frame, army/secondary-skill slots at
-// -0x04/-0x08, message at -0x0c, switch CFG, and all 150 relocation positions
-// agree. The relocation helper's two only-base reports are signed array-addend
-// identities: gStatNames-0x144 and gSecondarySkillLevels-4 resolve to retail's
-// delinked interior labels. The first non-relocation residual is in the third
-// secondary-skill range near +0x59e: retail uses one jge plus tail trampolines,
-// while the value-equivalent invalid-range spelling uses jl and continuation
-// jumps. Direct range bounds and both positive/negative third-range forms select
-// the same residual range-check lowering. A post-95 30-walk AST pass retained
-// no mutation, and an isolated eight-trial TU-state sweep found no audited
-// exact closure. Revisit only after a material TU-state change.
+// @semantic: Semantics, the 0x10 frame, army/secondary-skill slots at
+// -0x04/-0x08, message at -0x0c, switch CFG, and all 150 external relocation
+// identities/counts agree. Base is 0x766 bytes versus retail 0x758. The first
+// normalized divergence is +0x390: equivalent army-type equality operands load
+// giHeroScreenSrcIndex first in base and armySlot first in retail; reversing the
+// source equality is byte-neutral. Near +0x583, base lowers the third skill-row
+// range with jl plus two continuation jumps while retail uses a direct jge;
+// splitting the two invalid-range guards regressed to 0x775 bytes. Prior direct
+// bounds, polarity forms, a 30-walk AST pass, and eight TU-state trials also
+// found no closure. Revisit only after a material HERO predecessor/header or
+// comparison-tool change.
 VA(0x0046e0be, 0x758)
 void UpdateHeroScreenStatusBar(struct tag_message &message) {
     int armySlot;
@@ -1622,14 +1624,10 @@ void SetupHeroView(void) {
     UpdateHeroScreenStatusBar(statusMessage);
 }
 
-// @early-stop
-// All 0x2b0 code bytes and all 50 relocation sites match after
-// masking the three string relocations. Objdiff names this TU's coalesced
-// split-window, prompt, and integer-format literals differently from retail.
 VA(0x0046ff31, 0x2b0)
 void DoHeroSplit(int destinationSlot, int sourceSlot) {
-    short unusedTextControl = HERO_UI_SPLIT_TEXT;
-    short unusedAmountControl = HERO_UI_SPLIT_AMOUNT;
+    short splitTextSlot = HERO_UI_SPLIT_TEXT;
+    short splitAmount = HERO_UI_SPLIT_AMOUNT;
     tag_message message;
 
     gpTownManager->m_heroWindow1 = new heroWindow(
@@ -1787,11 +1785,13 @@ signed char hero::Stats(int stat) {
     return m_primaryStats[stat];
 }
 
-// @match-note 99.97%: semantics, the 0x0c frame, CFG, and all 3/3 relocation
-// targets agree. The first differing instruction is +0x96 (first differing byte
-// +0x99): retail loads shrineAndArtifactBonus from -0x08 before level from -0x04;
-// base loads level first. Both += and reversed binary operand spelling compile
-// to the base sequence; the addition is value-equivalent.
+// @early-stop
+// Complete semantics, 0x0c frame/slots, CFG, and all 3/3 ordered relocation
+// sites/targets agree. The only unmasked bytes are +0x99 and +0x9d: retail loads
+// shrineAndArtifactBonus from -0x08 before level from -0x04, while base loads
+// level first. Both += and explicit shrineAndArtifactBonus + level compile to
+// the base sequence. Revisit after a relevant HERO predecessor/header change
+// alters this TU-cumulative commutative load order.
 VA(0x004705c2, 0xc3)
 signed char hero::GetSSLevel(int skill) {
     signed char shrineAndArtifactBonus = 0;
@@ -1815,21 +1815,20 @@ signed char hero::GetSSLevel(int skill) {
 }
 
 // @early-stop
-// All 0xf4 code bytes and all 11 relocation sites match after masking the three
-// delinked identities. Retail names the long format literal directly and uses
-// interior labels for gSecondarySkillLevels and cSecSkillDesc; typed source uses
-// the owning symbols and their corresponding addends.
+// @early-stop-reloc-only
+// All 0xf4 relocation-masked bytes and all 11 ordered relocation sites/effective
+// targets agree; objdiff differs only on the compiler-local long format literal.
 VA(0x00470685, 0xf4)
 void hero::DoSSLevelDialog(int skill, int quickView) {
-    int skillBonus;
-    char *skillLevelName;
+    int skillBonusValue;
+    char *skillLevelText;
 
-    skillBonus = GetSSLevel(skill) - m_secondarySkills[skill];
-    if (skillBonus > 0) {
-        skillLevelName = gSecondarySkillLevels[m_secondarySkills[skill]];
+    skillBonusValue = GetSSLevel(skill) - m_secondarySkills[skill];
+    if (skillBonusValue > 0) {
+        skillLevelText = gSecondarySkillLevels[m_secondarySkills[skill] - 1];
         sprintf(gText,
             "{%s Necromancy (+%d)}\n\n%s Necromancy (+%d) allows %d percent of the creatures killed in combat to be brought back from the dead as Skeletons.",
-            skillLevelName, skillBonus, skillLevelName, skillBonus,
+            skillLevelText, skillBonusValue, skillLevelText, skillBonusValue,
             GetSSLevel(skill) * HERO_NECROMANCY_PERCENT_PER_LEVEL);
     } else {
         sprintf(gText,
