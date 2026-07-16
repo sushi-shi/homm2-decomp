@@ -105,6 +105,10 @@ authoritative. This file is the short, restart-ready Codex workflow.
     `build/gen/jump_tables.csv`, exclude those data ranges, and compare the remaining instruction
     streams. Normalize only branch destinations and relocation identities, never operands or stack
     displacements.
+12. For every switch table, compare the ordered case-index mapping by resolving each `DIR32` entry
+    to its function-relative destination. Candidate `$L` labels and Vostok's containing-function
+    aliases may spell the same destination differently; relocation masking alone cannot prove that
+    the same case index reaches the same body.
 
 ## Orchestration Campaign
 

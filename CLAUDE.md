@@ -87,7 +87,8 @@ link-completeness), `assert_vtables` (every class vtable is claimed by a `VTBL()
 its owner TU — no drift, no fake classes), ordered `assert_relocs --fields` (an exact function
 cannot silently address the wrong field of a recovered public DATA owner), and
 `assert_early_stop_bytes` (an explicit relocation-only early stop has no unmasked byte
-difference). Full catalog + rationale:
+difference and every same-function `DIR32` site resolves to the same function-relative
+destination). Full catalog + rationale:
 **`docs/build-asserts.md`**.
 
 **`homm2 relocs` — OPT-IN broad reloc-target audit.** The narrow owner-field subset is a hard gate;
