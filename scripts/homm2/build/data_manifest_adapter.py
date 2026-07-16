@@ -26,6 +26,7 @@ from homm2.build.annotated_data import (
     source_definitions as annotated_source_definitions,
 )
 from homm2.build.canonicalize_relocs import CoffFile
+from homm2.build.canonicalize_data_symbols import _family, canonicalize_coff
 from homm2.build.data_topology_census import (
     _is_data_section,
     _scope,
@@ -41,6 +42,7 @@ from homm2.build.link_exe import read_pe
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[3]))
 SOURCE_ROOT = REPO / "src"
 BASE_ROOT = REPO / "build/objdiff/base"
+TARGET_ROOT = REPO / "build/delink"
 SYMBOLS = REPO / "build/gen/symbol_names.csv"
 UNITS = REPO / "config/units.toml"
 EXE = REPO / "build/orig/HEROES2W.EXE"
@@ -96,6 +98,76 @@ class CandidateSection:
     storage: str | None
     comdat_selection: int
     associative_ordinal: int | None
+
+
+def _private_counter_family(name: str):
+    """Return the stable family key for a counter-only private data name."""
+    family = _family(name)
+    if family is None:
+        return None
+    kind, prefix = family
+    return kind, prefix or ""
+
+
+def _canonical_private_identity(row):
+    return (
+        row.canonical_name, row.family, row.storage, row.physical_size,
+        row.meaningful_size, row.digest, row.proof,
+    )
+
+
+class _CanonicalPrivateRenameProof:
+    """Prove reviewed-to-current counter drift against the fixed target COFF."""
+
+    def __init__(self, base_root: Path, target_root: Path):
+        self.base_root = Path(base_root)
+        self.target_root = Path(target_root)
+        self._cache = {}
+
+    @staticmethod
+    def _rows(path: Path):
+        result = canonicalize_coff(path.read_bytes())
+        rows = {}
+        for row in result.rows:
+            if row.section_ordinal <= 0 or row.physical_size <= 0:
+                continue
+            key = (row.section_ordinal, row.section_offset)
+            if key in rows:
+                raise ValueError(
+                    f"ambiguous canonical data identity at {path}:{key[0]}+0x{key[1]:x}")
+            rows[key] = row
+        return rows
+
+    def _unit_rows(self, unit: str):
+        if unit not in self._cache:
+            self._cache[unit] = (
+                self._rows(self.base_root / f"{unit}.obj"),
+                self._rows(self.target_root / f"{unit}.c.obj"),
+            )
+        return self._cache[unit]
+
+    def require(self, unit: str, reviewed_name: str,
+                candidate: CandidateDefinition) -> None:
+        key = (candidate.section_ordinal, candidate.section_value)
+        current_rows, reviewed_rows = self._unit_rows(unit)
+        current = current_rows.get(key)
+        reviewed = reviewed_rows.get(key)
+        if current is None or reviewed is None:
+            raise ValueError(
+                f"compiler-private rename {unit}:{reviewed_name} -> {candidate.symbol} "
+                f"lacks canonical identity at section {key[0]}+0x{key[1]:x}")
+        if (current.original_name != candidate.symbol or
+                reviewed.original_name != reviewed_name):
+            raise ValueError(
+                f"compiler-private rename {unit}:{reviewed_name} -> {candidate.symbol} "
+                "does not identify the reviewed/current symbols at the exact coordinate")
+        before = _canonical_private_identity(reviewed)
+        after = _canonical_private_identity(current)
+        if before != after:
+            raise ValueError(
+                f"compiler-private rename {unit}:{reviewed_name} -> {candidate.symbol} "
+                f"changes canonical content/relocation identity at section "
+                f"{key[0]}+0x{key[1]:x}: reviewed={before}, candidate={after}")
 
 
 def source_definitions(source_root: Path = SOURCE_ROOT,
@@ -325,7 +397,8 @@ def _normalize_symbol_row(row: dict[str, str], topology_by_unit) -> dict[str, st
     return {key: normalized.get(key, "") for key in SYMBOL_HEADER}
 
 
-def _validate_supplemental_row(row: dict[str, str], topology_by_unit) -> dict[str, str]:
+def _validate_supplemental_row(row: dict[str, str], topology_by_unit,
+                               rename_proof=None) -> dict[str, str]:
     """Require a reviewed row to name its current candidate allocation exactly."""
     unit = row["object"].replace("\\", "/").removesuffix(".c")
     definitions = topology_by_unit.get(unit, ([], []))[0]
@@ -337,12 +410,25 @@ def _validate_supplemental_row(row: dict[str, str], topology_by_unit) -> dict[st
         and value.section_ordinal == ordinal
         and value.section_value == offset
     ]
-    if len(matches) != 1:
-        raise ValueError(
-            f"stale reviewed supplemental {unit}:{row['name']}: expected one "
-            f"candidate definition at section {ordinal}+0x{offset:x}, found "
-            f"{len(matches)}; use explicit --migrate-from and review the diff")
-    candidate = matches[0]
+    renamed = False
+    if len(matches) == 1:
+        candidate = matches[0]
+    else:
+        positional = [
+            value for value in definitions
+            if value.section_ordinal == ordinal and value.section_value == offset
+        ]
+        reviewed_family = _private_counter_family(row["name"])
+        if (len(matches) or len(positional) != 1 or reviewed_family is None or
+                _private_counter_family(positional[0].symbol) != reviewed_family or
+                positional[0].storage_class != 3 or row.get("scope") != "local"):
+            raise ValueError(
+                f"stale reviewed supplemental {unit}:{row['name']}: expected one "
+                f"candidate definition at section {ordinal}+0x{offset:x}, found "
+                f"{len(matches)} exact and {len(positional)} positional; use explicit "
+                "--migrate-from and review the diff")
+        candidate = positional[0]
+        renamed = candidate.symbol != row["name"]
     logical_size = int(row["size"], 0)
     if logical_size <= 0 or logical_size > candidate.size:
         raise ValueError(
@@ -365,6 +451,14 @@ def _validate_supplemental_row(row: dict[str, str], topology_by_unit) -> dict[st
         raise ValueError(
             f"stale reviewed supplemental {unit}:{row['name']} topology: "
             f"{mismatches}; update only after reviewing candidate evidence")
+    if renamed:
+        if rename_proof is None:
+            raise ValueError(
+                f"stale reviewed supplemental {unit}:{row['name']} -> "
+                f"{candidate.symbol} lacks a canonical identity proof")
+        rename_proof.require(unit, row["name"], candidate)
+        # Keep the reviewed spelling in the generated canonical union. The
+        # current candidate spelling is associated independently by coordinate.
     return {key: row.get(key, "") for key in SYMBOL_HEADER}
 
 
@@ -657,8 +751,18 @@ def _section_rows(topology_by_unit, symbol_rows, public_by_symbol,
                     (row["name"], int(row["section_offset"], 0))
                     for row in reviewed_by_section.get((unit, section.ordinal), [])
                 }
+                reviewed_private_keys = {
+                    (_private_counter_family(row["name"]),
+                     int(row["section_offset"], 0))
+                    for row in reviewed_by_section.get((unit, section.ordinal), [])
+                    if _private_counter_family(row["name"]) is not None
+                    and row["scope"] == "local"
+                }
                 fully_reviewed = bool(candidate_definitions) and all(
-                    (definition.symbol, definition.section_value) in reviewed_keys
+                    ((definition.symbol, definition.section_value) in reviewed_keys or
+                     (definition.storage_class == 3 and
+                      (_private_counter_family(definition.symbol),
+                       definition.section_value) in reviewed_private_keys))
                     for definition in candidate_definitions
                 )
                 predicted = None
@@ -1024,7 +1128,8 @@ def breakpoint_report(topology_by_unit, section_rows, section_diagnostics,
 
 def build_manifests(source_root=SOURCE_ROOT, base_root=BASE_ROOT, symbols=SYMBOLS,
                     units=UNITS, exe=EXE, supplemental=SUPPLEMENTAL,
-                    migrate_from: Path | None = None, strict=False):
+                    migrate_from: Path | None = None, strict=False,
+                    target_root=TARGET_ROOT):
     definitions = source_definitions(Path(source_root), Path(base_root))
     manifest = tomllib.loads(Path(units).read_text())
     topology_by_unit = {}
@@ -1045,7 +1150,9 @@ def build_manifests(source_root=SOURCE_ROOT, base_root=BASE_ROOT, symbols=SYMBOL
         supplemental_rows = migrate_supplemental(
             Path(migrate_from), Path(supplemental), source_rows, topology_by_unit)
     else:
-        supplemental_rows = [_validate_supplemental_row(row, topology_by_unit)
+        rename_proof = _CanonicalPrivateRenameProof(base_root, target_root)
+        supplemental_rows = [_validate_supplemental_row(
+                                 row, topology_by_unit, rename_proof)
                              for row in _read_tsv(Path(supplemental))]
         validate_symbol_rows(supplemental_rows, "supplemental")
     combined = [*source_rows, *supplemental_rows]
