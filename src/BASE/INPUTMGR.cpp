@@ -15,7 +15,26 @@
 #include <SOURCE/wingraph.h>
 #include <BASE/inputManager.h>
 #include <BASE/INPUTMGR.h>
+#include <BASE/INPUTMGR_TYPES.h>
 #include <_carcass_types.h>
+
+DATA(0x0051f980) int iCurSwapPalette = 0;
+DATA(0x0051f984) int bLastMouseOffscreen = 0;
+DATA(0x0051f988) int bLastOnscreenMouseColor = 0;
+DATA(0x0051f98c) int bInCheckChangeCursor = 0;
+DATA(0x0051f990) static SInputManagerText gInputManagerText = {
+    "ReleaseCapture Failed",
+    "ReleaseCapture Failed",
+    "inputManager"
+};
+
+// @data-layout-note NB09 assigns INPUTMGR one 0x50 initialized-data
+// contribution at 0x11f980. Retail stores the four public integers first,
+// followed by two independent 0x18 ReleaseCapture diagnostic slots and one
+// 0x10 manager-name slot. The two mouse-button release paths reference owner
+// addends 0x10 and 0x28; Open references addend 0x40. Together the definitions
+// above reproduce the complete contribution. INPUTMGR separately owns the
+// four-byte loader-zero iLastBWOnScreenCheck contribution at 0x134bc8.
 // @early-stop
 // The explicit 0x308-byte range is raw-exact after relocation-union masking, proving
 // frame/slots and CFG. All 40 ordered sites/types and every nonlocal runtime address
@@ -144,7 +163,7 @@ int MouseMessageHandler(void *, unsigned int message, unsigned int, long int mes
     case WM_LBUTTONUP - WM_MOUSEMOVE:
         event->type = MESSAGE_LEFT_BUTTON_UP;
         if (ReleaseCapture() == 0)
-            LogStr("ReleaseCapture Failed");
+            LogStr(gInputManagerText.leftReleaseCaptureFailure);
         break;
     case WM_LBUTTONDBLCLK - WM_MOUSEMOVE:
         event->type = MESSAGE_LEFT_BUTTON_DOWN;
@@ -156,7 +175,7 @@ int MouseMessageHandler(void *, unsigned int message, unsigned int, long int mes
     case WM_RBUTTONUP - WM_MOUSEMOVE:
         event->type = MESSAGE_RIGHT_BUTTON_UP;
         if (ReleaseCapture() == 0)
-            LogStr("ReleaseCapture Failed");
+            LogStr(gInputManagerText.rightReleaseCaptureFailure);
         break;
     case WM_RBUTTONDBLCLK - WM_MOUSEMOVE:
         event->type = MESSAGE_RIGHT_BUTTON_DOWN;
@@ -249,7 +268,7 @@ int inputManager::Open(int param_1)
     m_messageMask = 4;
     m_priority = -1;
     m_active = 1;
-    strcpy(m_name, "inputManager");
+    strcpy(m_name, gInputManagerText.managerName);
     return 0;
 }
 
@@ -553,8 +572,4 @@ void inputManager::ForceMouseMove(void)
 VTBL(inputManager, 0x004eba30);
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x0051f980) int iCurSwapPalette = 0;
-DATA(0x0051f984) int bLastMouseOffscreen = 0;
-DATA(0x0051f988) int bLastOnscreenMouseColor = 0;
-DATA(0x0051f98c) int bInCheckChangeCursor = 0;
 DATA(0x00534bc8) int iLastBWOnScreenCheck;
