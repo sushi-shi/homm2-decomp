@@ -36,8 +36,13 @@
     const_cast<char *>("I:\\Projects\\Heroes\\Prog\\SOURCE\\CURSOR.CPP")
 
 // @early-stop
-// All non-relocation bytes and all six effective targets match. Retail delinks
-// normalDirTable.y at 0xfaa79 as ??_C@_02DNGE while base uses normalDirTable+1.
+// All 88 normalized instructions, the 0x18 frame/slots, CFG, and six ordered
+// relocation sites/effective targets align. The only unmasked bytes are
+// +0xd9/+0xda/+0xe2/+0xe3: the cellY sum loads cursor Y before origin Y, while
+// retail loads the commutative terms in reverse order. Five bounded candidates
+// across direct reversal, both 0[&term] escapes, and both OR-zero forms were
+// byte-neutral. Revisit after an earlier CURSOR source edit or relevant
+// advManager layout/header change perturbs TU-cumulative operand evaluation.
 VA(0x0040d5e0, 0x138)
 void advManager::StartCursor(int direction)
 {
@@ -64,6 +69,15 @@ void advManager::StartCursor(int direction)
     m_mapData->GetCell(cellX, cellY)->m_flags |= CURSOR_MAP_VISIBLE_FLAG;
 }
 
+// @early-stop
+// All 72 normalized instructions, the 0x8 frame/slots, CFG, and five ordered
+// relocation sites/effective targets align. The only unmasked bytes are
+// +0xaa/+0xab/+0xb2/+0xb3: the previous-cursor cell offset adds origin X before
+// cursor X, while retail loads the commutative terms in reverse order. Nine
+// bounded candidates across direct term reversal, both 0[&term] escapes, both
+// OR-zero forms, zero grouping, and three depth-one commutative_order AST edits
+// were byte-neutral. Revisit after an earlier CURSOR source edit or relevant
+// advManager layout/header change perturbs TU-cumulative operand evaluation.
 VA(0x0040d718, 0x11c)
 void advManager::StopCursor(int stopSound)
 {
@@ -391,16 +405,18 @@ int advManager::GetMoveShowIt(hero *movingHero, int direction)
         return 0;
 }
 
-// @match-note 97.22%: semantics, 0x84 frame, all named/temporary slots, case-body
-// order, jump-table data ranges, and 158/158 relocations are accounted for; the
+// @semantic
+// Complete semantics, 0x84 frame, all named/temporary slots, case-body order,
+// jump-table data ranges, and 158/158 relocations are accounted for; the
 // only target identity absent from base is delinked normalDirTable.y at 0xfaa79.
 // First non-reloc residual is one extra retail continuation jump after the hero
 // embarked test; later residuals are step/halfSteps and player-resource address
 // register order plus local-scope trampoline counts. Explicit nested hero arms,
 // both equality operand orders, pointer-form resource access (96.98%), and the
-// positive eventCell arm (96.98%) were tried. An AST-permuter probe retained no
-// mutation before it was stopped; restart systematic steering only after a TU-state
-// or shared-layout change provides new evidence.
+// positive eventCell arm (96.98%) were tried across five bounded families; an
+// AST probe retained no mutation. Revisit only if an earlier CURSOR source edit
+// changes inline continuation placement, a relevant hero/map layout changes, or
+// comparison gains a proved continuation-target normalization.
 VA(0x0040e51f, 0x1234)
 mapCell *advManager::MoveHero(int direction, int stopAfterMove,
                              int *eventX, int *eventY,
@@ -876,8 +892,14 @@ int advManager::ValidMoveWithEvent(hero *movingHero, int direction)
 }
 
 // @early-stop
-// All instructions and eight other relocations match; retail delinks
-// normalDirTable.y at 0xfaa79 as ??_C@_02DNGE while base uses normalDirTable+1.
+// All 352 normalized instructions, the 0x3c frame/slots, CFG, and nine ordered
+// relocation sites/effective targets align. Retained second-term OR-zero removed
+// the +0x211/+0x214 centerY/directionY span; only +0x442/+0x443/+0x44b/+0x44c
+// remains, where the cursor/origin Y addends load in reverse order. Nine bounded
+// candidates covered direct reversal, both 0[&term] escapes, both OR-zero forms,
+// regroupings, and a targeted depth-one commutative_order AST edit. Revisit after
+// an earlier CURSOR source edit or relevant advManager layout/header change
+// perturbs TU-cumulative operand evaluation. Retail also delinks normalDirTable.y.
 VA(0x0040fa15, 0x4f2)
 int advManager::ValidMove(int direction, int eventMode)
 {
@@ -930,7 +952,7 @@ int advManager::ValidMove(int direction, int eventMode)
                     centerX_p + directionX_j, centerY_n)->m_terrainImageIndex] !=
                     CURSOR_WATER_TERRAIN ||
                 giGroundToTerrain[m_mapData->GetCell(
-                    centerX_p, centerY_n + directionY_h)->m_terrainImageIndex] !=
+                    centerX_p, centerY_n + (directionY_h | 0))->m_terrainImageIndex] !=
                 CURSOR_WATER_TERRAIN)
                 return 0;
         }
@@ -980,11 +1002,14 @@ int advManager::ValidMove(int direction, int eventMode)
     return 1;
 }
 
-// @early-stop
-// Jump-only: the 0x24 frame, all stack roles, function extent, and every non-jump
-// opcode/operand match; both sides have four GetCell continuations and no relocs.
-// Base places them leading at +0x6e/+0x105/+0x158/+0x1ef, while retail places
-// them trailing at +0xad/+0x132/+0x197/+0x21c. Revisit only after TU-state changes.
+// @semantic
+// Complete 0x24b body, 0x24 frame/slots, CFG, and zero relocations. Every
+// non-jump opcode/operand matches, but four GetCell continuation jumps are real
+// branch-byte residuals: ours lead at +0x6e/+0x105/+0x158/+0x1ef and retail
+// trails at +0xad/+0x132/+0x197/+0x21c. One m_mapData object-lvalue family
+// changed the accessor operands and was rejected. Revisit only if fullMap's
+// GetCell accessor/source changes, an earlier CURSOR edit moves inline tails, or
+// comparison gains proved continuation-target normalization.
 VA(0x0040ff07, 0x24b)
 void advManager::MoveOrigin(int directionX, int directionY)
 {
@@ -1029,12 +1054,15 @@ void advManager::MoveOrigin(int directionX, int directionY)
     m_forceCompleteDraw = 1;
 }
 
-// @early-stop
-// Jump-only after excluding the +0x717..+0x743 jump table: executable extent,
+// @semantic
+// After excluding the +0x717..+0x743 jump table, executable extent,
 // 0x2c frame, all eight stack roles, every non-jump opcode/operand, and 98/98
 // relocation targets agree. Two fullMap::GetCell continuations are leading in
 // base at +0x5bc/+0x5fa and trailing in retail at +0x5ee/+0x62c. Retail also
-// carries one ignored trailing NOP at +0x74f. Revisit only after TU-state changes.
+// carries one trailing NOP at +0x74f. No source variant was retained because the
+// two branch sites are isolated; revisit only if fullMap::GetCell changes, an
+// earlier CURSOR edit moves inline tails, or comparison gains proved continuation
+// normalization.
 VA(0x00410152, 0x74f)
 void advManager::ProcessMapChange(SMapChange change)
 {
@@ -1269,10 +1297,16 @@ void advManager::PurgeMapChangeQueue(void)
         sMapChangeLastFew[slot].type = 0;
 }
 
-// @early-stop
-// Instruction stream, 0x1c frame/slots, CFG, and all 12 effective relocation
-// targets match. Retail delinks three sMapChangeQueue+7 references as the
-// unrelated ??_C@_0IM@EDFP string identity; no source steering is applicable.
+// @semantic
+// Complete 0x1d4 body, 0x1c frame/slots, CFG, and 12/12 ordered relocation
+// sites/effective targets align. First executable divergence is +0xe: retail
+// loads maximumToUnwind before comparing unwoundChanges (`cmp local,eax; jge`),
+// while ours loads the local first and emits the reversed equivalent compare.
+// Four bounded condition families (commuted relation, 0[&parameter], explicit
+// break, and negated relation) were byte-neutral or added a jump. Revisit only
+// if the parameter/local representation or an earlier CURSOR edit changes operand
+// evaluation, or comparison gains proved relational-swap normalization. Retail
+// also delinks three sMapChangeQueue+7 references as a string identity.
 VA(0x00410b9e, 0x1d4)
 void advManager::UnwindMapChangeQueue(int maximumToUnwind, int processChanges)
 {
