@@ -1878,7 +1878,11 @@ void hero::CheckAnduranPieces(int showDialog) {
     }
 }
 
-// ---- globals (definitions, RVA order) ----
+// @data-layout-note Retail and candidate .data are both 0xf6c88+0x458.
+// Retail places the exact 0x40-byte monh%04d/%d/dismiss-dialog literal pool at
+// +0x8 and gMinExpForLevel at +0x48; candidate places the table at +0x8 and the
+// byte-identical pool at +0x20. Both public pointers remain exact at +0/+4.
+// Preserve the proven payloads and RVAs rather than duplicating either block.
 DATA(0x004f6c88) class hero *gpHVHero = 0;
 DATA(0x004f6c8c) class heroWindow *gheroWin = 0;
 DATA(0x004f6cd0) short gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT] = {
