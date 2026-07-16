@@ -34,6 +34,25 @@
 #define REMOTE_PLAYER_INFO(message) \
     (reinterpret_cast<SNetPlayerInfo *>((message)->payload))
 
+// @data-layout-note Retail's initialized REMOTE contribution is
+// 0x116f60..0x11733c (0x3dc); candidate .data is 0x3db both before and after
+// restoring the retail newline in the CRC failure format at retail offset 0x158.
+// The newline consumes an existing candidate padding byte, and the corrected
+// literal payload is now exact. The two signed-short source-line owners are
+// independently proved at 0x117118=0x02cc (GetRemoteData, one HIGHLOW use with
+// addend 25) and 0x117148=0x02f5 (PollRemote, one HIGHLOW use with addend 235).
+// VC4.2 hoists them to candidate offsets 0x0 and 0x4; retail interleaves them at
+// contribution offsets 0x1b8 and 0x1e8. After accounting for those moves, every
+// other candidate byte maps to retail, which has one terminal alignment zero at
+// offset 0x3db. This produces the three expected data anchor bases.
+// Retail's loader-zero contribution is 0x12a268..0x12adc0 (0xb58), while the
+// candidate .bss is 0xb50. Every PE reference in that range resolves inside the
+// 15 known public objects and their proven field/addend spans; no private BSS
+// owner occupies an alignment gap. The residual comes from final-link/common
+// allocation order and tail alignment, reflected by the distinct public anchor
+// bases, not missing source storage. Revisit only with original COFF/link-order
+// evidence. Do not add padding, aliases, synthetic identities, cursor snapping,
+// guessed allocations, or section pragmas to force either contribution extent.
 DATA(0x00517118) static short gGetRemoteDataLineBase = 716;
 DATA(0x00517148) static short gPollRemoteLineBase = 757;
 
@@ -374,7 +393,7 @@ int DecodePacket(unsigned char *data, int)
     calc_crc(calculatedCRC, reinterpret_cast<unsigned char *>(packet),
         length + REMOTE_PACKET_HEADER_SIZE);
     if (receivedCRC != calculatedCRC[0]) {
-        sprintf(errorText, "CRC Check Failed CRC 1 %d CRC 2 %d",
+        sprintf(errorText, "CRC Check Failed CRC 1 %d CRC 2 %d\n",
             receivedCRC, calculatedCRC[0]);
         LogStr(errorText);
         return 0;
