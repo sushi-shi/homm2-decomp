@@ -283,6 +283,12 @@ def _function_dir32(coff, function_name):
     return rows
 
 
+def _function_relocation_offsets_align(candidate, function_rva, retail_sites):
+    """Return whether candidate and retail DIR32 sites have identical offsets."""
+    return ([site for site, _symbol, _addend in candidate] ==
+            [site - function_rva for site in retail_sites])
+
+
 def _contribution_index(exe, units):
     result = defaultdict(list)
     for row in contribution_rows(exe, units):
@@ -440,8 +446,9 @@ def _section_stream_translation(group, coff, intervals, public, image_base,
     return mapped, tuple(sorted(causes)), tuple(details)
 
 
-def _literal_rvas(row, coff, intervals, highlow, read_bytes, cache):
-    if not (row["name"].startswith("$SG") or row["name"].startswith("??_C@")):
+def _payload_rvas(row, coff, intervals, highlow, read_bytes, cache):
+    """Return exact payload occurrences for a relocation-free allocation."""
+    if row["storage"] == "bss":
         return []
     section = coff.sections[row["section"] - 1]
     first = row["symbol_offset"]
@@ -469,6 +476,12 @@ def _literal_rvas(row, coff, intervals, highlow, read_bytes, cache):
     result = sorted(set(matches))
     cache[needle] = result
     return result
+
+
+def _literal_rvas(row, coff, intervals, highlow, read_bytes, cache):
+    if not (row["name"].startswith("$SG") or row["name"].startswith("??_C@")):
+        return []
+    return _payload_rvas(row, coff, intervals, highlow, read_bytes, cache)
 
 
 def derive_allocations(base_dir=REPO / "build/objdiff/base",
@@ -521,6 +534,8 @@ def derive_allocations(base_dir=REPO / "build/objdiff/base",
             if len(candidate) != len(retail_sites):
                 stats.rejected_functions += 1
                 continue
+            offsets_align = _function_relocation_offsets_align(
+                candidate, function["rva"], retail_sites)
             proposed = []
             known_anchors = 0
             valid = True
@@ -528,12 +543,12 @@ def derive_allocations(base_dir=REPO / "build/objdiff/base",
                 target_rva = (read_u32(retail_site) - image_base) & 0xFFFFFFFF
                 if symbol.name in defined:
                     proposed.append((symbol.name, (target_rva - addend) & 0xFFFFFFFF))
-                elif symbol.name in public_data:
+                elif symbol.name in public:
                     known_anchors += 1
-                    if (public_data[symbol.name] + addend) & 0xFFFFFFFF != target_rva:
+                    if (public[symbol.name] + addend) & 0xFFFFFFFF != target_rva:
                         valid = False
                         break
-            if not valid or (proposed and known_anchors == 0):
+            if not valid or (proposed and known_anchors == 0 and not offsets_align):
                 stats.rejected_functions += 1
                 continue
             stats.paired_functions += 1
@@ -658,12 +673,17 @@ def derive_allocations(base_dir=REPO / "build/objdiff/base",
                     failures[:0] = translation_details
                 stats.open_groups += 1
                 object_name = unit.replace("/", "\\") + ".c"
-                proposal_mappings = {
-                    name: value for name, value in replay_mapped.items()
-                    if any(row["name"] == name and
-                           _contains(intervals, value[0], row["size"])
-                           for row in group)
-                }
+                replay_payload_cache = {}
+                proposal_mappings = {}
+                for row in group:
+                    value = replay_mapped.get(row["name"])
+                    if value is None or not _contains(intervals, value[0], row["size"]):
+                        continue
+                    payload_rvas = _payload_rvas(
+                        row, coff, intervals, highlow, read_bytes,
+                        replay_payload_cache)
+                    if payload_rvas == [value[0]]:
+                        proposal_mappings[row["name"]] = value
                 proposal_evidence = {
                     name: "candidate-section-replay" for name in proposal_mappings
                 }

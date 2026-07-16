@@ -1,8 +1,11 @@
 import unittest
+from types import SimpleNamespace
 
 from homm2.build.candidate_data_manifest import (
     REPO,
     _contains,
+    _function_relocation_offsets_align,
+    _payload_rvas,
     _reviewed_group_allocations,
     candidate_definitions,
     diagnostics_bytes,
@@ -11,6 +14,42 @@ from homm2.build.candidate_data_manifest import (
 
 
 class CandidateDataManifestTest(unittest.TestCase):
+    def test_function_relocation_offsets_must_align_exactly(self):
+        candidate = [
+            (0x10, object(), 0),
+            (0x28, object(), 0),
+        ]
+        self.assertTrue(_function_relocation_offsets_align(
+            candidate, 0x4000, [0x4010, 0x4028]))
+        self.assertFalse(_function_relocation_offsets_align(
+            candidate, 0x4000, [0x4010, 0x402C]))
+
+    def test_replay_payload_requires_a_unique_retail_occurrence(self):
+        coff = SimpleNamespace(
+            data=b"same",
+            sections=[SimpleNamespace(raw_offset=0)],
+            relocations={},
+        )
+        row = {
+            "storage": "data",
+            "section": 1,
+            "symbol_offset": 0,
+            "size": 4,
+        }
+        retail = b"same----same"
+
+        def read_bytes(rva, size):
+            return retail[rva - 0x100:rva - 0x100 + size]
+
+        self.assertEqual(
+            _payload_rvas(row, coff, [(0x100, 0x10C)], [], read_bytes, {}),
+            [0x100, 0x108],
+        )
+        self.assertEqual(
+            _payload_rvas(row, coff, [(0x100, 0x108)], [], read_bytes, {}),
+            [0x100],
+        )
+
     def test_fully_reviewed_group_closes_with_reordered_retail_owners(self):
         definitions = [
             {"name": "_row", "storage": "bss", "section": 3,
