@@ -1785,13 +1785,6 @@ signed char hero::Stats(int stat) {
     return m_primaryStats[stat];
 }
 
-// @early-stop
-// Complete semantics, 0x0c frame/slots, CFG, and all 3/3 ordered relocation
-// sites/targets agree. The only unmasked bytes are +0x99 and +0x9d: retail loads
-// shrineAndArtifactBonus from -0x08 before level from -0x04, while base loads
-// level first. Both += and explicit shrineAndArtifactBonus + level compile to
-// the base sequence. Revisit after a relevant HERO predecessor/header change
-// alters this TU-cumulative commutative load order.
 VA(0x004705c2, 0xc3)
 signed char hero::GetSSLevel(int skill) {
     signed char shrineAndArtifactBonus = 0;
@@ -1808,7 +1801,7 @@ signed char hero::GetSSLevel(int skill) {
         shrineAndArtifactBonus += gpGame->CountShrines(m_owner);
     if (shrineAndArtifactBonus > HERO_NECROMANCY_BONUS_MAX)
         shrineAndArtifactBonus = HERO_NECROMANCY_BONUS_MAX;
-    level += shrineAndArtifactBonus;
+    level = 0[&shrineAndArtifactBonus] + level;
     if (level > HERO_NECROMANCY_EFFECTIVE_LEVEL_MAX)
         level = HERO_NECROMANCY_EFFECTIVE_LEVEL_MAX;
     return level;

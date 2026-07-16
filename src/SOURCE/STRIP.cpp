@@ -56,7 +56,7 @@ strip::strip(int x, int y, int stripType, unsigned long portraitIconId,
             m_borders[slot + 1] = new border(
                 slot * STRIP_ARMY_X_STEP + STRIP_ARMY_FIRST_X,
                 STRIP_CONTENT_Y, STRIP_ARMY_BORDER_WIDTH,
-                STRIP_BORDER_HEIGHT, firstBorderId + slot + 1,
+                STRIP_BORDER_HEIGHT, 0[&slot] + firstBorderId + 1,
                 STRIP_BORDER_FILL_COLOR, 0, 0);
             if (m_borders[slot + 1] == 0)
                 MemError();
