@@ -109,13 +109,16 @@ void town::View(int noFade)
     bEnteringTown = 0;
 }
 
-// @match-note
-// Complete ownership removal with the exact 0x10 frame, position/i/playerRecord
-// slots, 97-instruction CFG, and both gpGame relocations. The only raw divergence
-// is at +0xce: this highest-scoring spelling evaluates m_id then currentTown but
-// emits `sub eax, ecx`; retail emits `cmp eax, ecx`. Direct equality in both
-// operand orders and unary-plus equality emit CMP but load currentTown first.
-// Revisit at 95% for expression-shape steering; do not repeat those spellings.
+// @semantic: Current TOWN.cpp/header epoch: ownership removal has the exact 0x10
+// frame, position/i/playerRecord slots, 97-instruction CFG, and both ordered
+// gpGame relocations. The only raw difference is opcode byte +0xce: this best
+// spelling evaluates m_id then currentTown but emits `sub eax, ecx` (0x2b),
+// while retail emits `cmp eax, ecx` (0x3b). Ten non-improving variants exhausted
+// zero-on-left and logical-negation subtraction tests, direct equality in both
+// orders, unary-plus, four cast-qualified equalities, and independent
+// commutative_order steering; direct/cast equality loads currentTown first.
+// Revisit only after a relevant TOWN source/TU/header or comparison epoch changes
+// expression lowering.
 VA(0x00432f54, 0x14d)
 void town::Deallocate(void)
 {
@@ -143,6 +146,14 @@ void town::Deallocate(void)
     m_owner = TOWN_OWNER_NONE;
 }
 
+// @semantic: Current TOWN.cpp/header epoch: the 0x8 frame, CFG, all 155
+// instructions, and all nine ordered external relocations align. Raw bytes
+// differ only at +0xb7 and +0xba: the two MOV stack displacements swap eax/ecx
+// for the discarded-result spell-count increment. The retained prefix form is
+// clearest; ten non-improving variants exhausted symmetric-subscript, postfix,
+// commutative_order, and seven identifier_rename spellings. The retained
+// source-hash maximum is 100%; revisit only after a relevant TOWN source/TU/header
+// or comparison epoch alters MSVC register selection.
 VA(0x004330a1, 0x23e)
 void town::BuildBuilding(int building)
 {

@@ -165,6 +165,28 @@
       "before": 99.28824,
       "after": 99.28824,
       "note": "All relocation-masked instructions match; metric residual is only function-local data identity."
+    },
+    {
+      "unit": "SOURCE/TOWN",
+      "function": "?BuildBuilding@town@@QAEXH@Z",
+      "source_hash": "5b85e7506518",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 99.9863,
+      "after": 99.9863,
+      "note": "All 155 instructions and 9 relocations align; two commutative spell-count stack-load displacements resisted ten bounded variants."
+    },
+    {
+      "unit": "SOURCE/TOWN",
+      "function": "?Deallocate@town@@QAEXXZ",
+      "source_hash": "a8262aac8e34",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 99.38145,
+      "after": 99.38145,
+      "note": "Exact frame slots CFG and 2 relocations; sole retail cmp versus candidate sub opcode resisted ten bounded variants."
     }
   ]
 }
