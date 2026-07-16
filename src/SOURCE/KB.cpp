@@ -1657,10 +1657,16 @@ void PlayerDead(int player)
     }
 }
 
-// @early-stop
-// All 6,587 authoritative bytes are identical after masking relocations, and
-// all 300 effective relocation targets agree. The retained sub-100 residual is
-// confined to four bytes at paired string/interior-symbol relocation sites.
+// @semantic
+// Complete 0x19bb body, 0x1c4 frame/slots, CFG, and 300/300 effective relocation
+// targets align. First raw divergence is +0xd00: the day calculation evaluates
+// month then week and emits `lea [week7+month7*4]` with reversed base/index from
+// retail; the same residual repeats at +0x15e5. At +0x1632 retail evaluates the
+// campaign completed-table scenario index before type (ours does type first),
+// shifting one gpGame relocation by four bytes; the days+bonus addition at
+// +0x16a8/+0x16d1 is likewise commutative load order. Commuted terms, explicit
+// 7*4 scaling, 0[&month/type], and a commuted subscript were byte-neutral.
+// Revisit after later KB TU/header changes.
 VA(0x0049a6c1, 0x19bb)
 void CheckEndGame(int forcedResult, int dragonCityCaptured)
 {
@@ -1932,8 +1938,9 @@ void CheckEndGame(int forcedResult, int dragonCityCaptured)
         }
 
         if (gpGame->m_mapHeader.lossCondition == CHECK_END_GAME_LOSS_TIME) {
-            if (gpGame->m_mapHeader.lossConditionValue < (gpGame->m_week - 1) * CHECK_END_GAME_DAYS_PER_WEEK +
-                                                   (gpGame->m_month - 1) * CHECK_END_GAME_DAYS_PER_MONTH +
+            if (gpGame->m_mapHeader.lossConditionValue <
+                    (gpGame->m_week - 1) * CHECK_END_GAME_DAYS_PER_WEEK +
+                    (gpGame->m_month - 1) * CHECK_END_GAME_DAYS_PER_MONTH +
                                                    gpGame->m_day) {
                 defeated = 1;
                 if (!showedDialog) {
@@ -2227,23 +2234,23 @@ void InitVars(void)
     }
 }
 
-// @match-note
-// Pre-95 structural checkpoint (99.399%): exact 0xe0 frame and 119/119
-// relocation sites with no base-only target. The first real code residual is a
-// retail continuation jump after the mixed-undead strcat; other early rows are
-// string/interior-symbol aliases. The direct nested undead test is represented;
-// revisit at 95% for systematic continuation and condition-shape steering.
+// @early-stop
+// The 0xe0 frame and all retail stack slots match after hash-derived local
+// renaming. Retail has exactly two extra five-byte continuation jumps at +0x101
+// and +0x60f. Deleting those ranges leaves only four branch-displacement bytes
+// caused by the inserted jumps; every non-jump opcode/operand matches, the size
+// delta is exactly 10, and all 119 relocation tuples align after offset adjustment.
 VA(0x0049c312, 0x61b)
 void game::ShowMoraleInfo(hero *h, int dialogType)
 {
-    int hasMixedUndead;
-    int alignment;
-    int homogeneous;
+    int mixedUndead4;
+    int alignment_e;
+    int homogeneous3;
     int modifierStart;
     char description[200];
-    int slot;
+    int slot8;
 
-    hasMixedUndead = 0;
+    mixedUndead4 = 0;
     if (h->m_army.GetMorale(h, h->GetOccupiedTown(), 0) > 0)
         sprintf(description, cMoraleInfo[MORALE_INFO_GOOD]);
     else {
@@ -2260,36 +2267,36 @@ void game::ShowMoraleInfo(hero *h, int dialogType)
     } else {
         if (h->m_army.HasSomeUndead() || h->HasArtifact(ARTIFACT_UNDEAD_MORALE)) {
             strcat(gText, cMoraleInfo[MORALE_INFO_SOME_UNDEAD]);
-            hasMixedUndead = 1;
+            mixedUndead4 = 1;
         }
 
-        homogeneous = h->m_army.IsHomogeneous(-1);
-        if (hasMixedUndead && homogeneous > 0) {
-            homogeneous = 0;
+        homogeneous3 = h->m_army.IsHomogeneous(-1);
+        if (mixedUndead4 && homogeneous3 > 0) {
+            homogeneous3 = 0;
         }
-        if (homogeneous > 0) {
-            alignment = 0;
-            for (slot = 0; slot < 5; slot++) {
-                if (h->m_army.m_creatureTypes[slot] != -1) {
-                    alignment = gMonsterDatabase[h->m_army.m_creatureTypes[slot]].race;
+        if (homogeneous3 > 0) {
+            alignment_e = 0;
+            for (slot8 = 0; slot8 < 5; slot8++) {
+                if (h->m_army.m_creatureTypes[slot8] != -1) {
+                    alignment_e = gMonsterDatabase[h->m_army.m_creatureTypes[slot8]].race;
                 }
             }
             sprintf(
                 description,
                 cMoraleInfo[MORALE_INFO_SAME_ALIGNMENT],
-                gAlignmentNames[alignment]
+                gAlignmentNames[alignment_e]
             );
             strcat(gText, description);
         }
-        if (homogeneous == -1) {
+        if (homogeneous3 == -1) {
             sprintf(description, cMoraleInfo[MORALE_INFO_THREE_ALIGNMENTS]);
             strcat(gText, description);
         }
-        if (homogeneous == -2) {
+        if (homogeneous3 == -2) {
             sprintf(description, cMoraleInfo[MORALE_INFO_FOUR_ALIGNMENTS]);
             strcat(gText, description);
         }
-        if (homogeneous == -3) {
+        if (homogeneous3 == -3) {
             sprintf(description, cMoraleInfo[MORALE_INFO_FIVE_ALIGNMENTS]);
             strcat(gText, description);
         }
@@ -2458,10 +2465,6 @@ int GetMonType(int score, int campaign)
     return giScoreMon[0][MONSTER_SCORE_TYPE];
 }
 
-// @early-stop
-// Exact 0x574 frame and 27/27 relocation sites with no base-only target.
-// Normalized instructions are identical; the retained 99.996% residual consists
-// only of delinked filename and prompt literal identities.
 VA(0x0049ce14, 0x4ac)
 int AddScoreToHighScore(int score, int days, int scenario, int highScoreType, char *scenarioName)
 {
@@ -2479,7 +2482,7 @@ int AddScoreToHighScore(int score, int days, int scenario, int highScoreType, ch
     else
         sprintf(filename_a, "%sCAMPAIGN.HS", ".\\DATA\\");
 
-    file_a = _open(filename_a, HIGH_SCORE_FILE_READ_FLAGS);
+    file_a = open(filename_a, HIGH_SCORE_FILE_READ_FLAGS);
     if (file_a == -1)
         missingFile = 1;
     if (missingFile) {
@@ -2489,8 +2492,8 @@ int AddScoreToHighScore(int score, int days, int scenario, int highScoreType, ch
         }
     } else {
         for (entry = 0; entry < HIGH_SCORE_ENTRY_COUNT; entry++)
-            _read(file_a, &entries_a[entry], sizeof(entries_a[entry]));
-        _close(file_a);
+            read(file_a, &entries_a[entry], sizeof(entries_a));
+        close(file_a);
     }
 
     gbShowHighScore = 1;
@@ -2508,7 +2511,8 @@ int AddScoreToHighScore(int score, int days, int scenario, int highScoreType, ch
     }
 
     if (entry < HIGH_SCORE_ENTRY_COUNT) {
-        for (destination = HIGH_SCORE_ENTRY_COUNT - 2; destination >= entry; destination--)
+        for (destination = HIGH_SCORE_ENTRY_COUNT - 2;
+             destination >= 0[&entry]; destination--)
             entries_a[destination + 1] = entries_a[destination];
 
         GetDataEntry("Please enter your name for the high score list.", playerName_c,
@@ -2523,12 +2527,12 @@ int AddScoreToHighScore(int score, int days, int scenario, int highScoreType, ch
         if (highScoreType == HIGH_SCORE_CAMPAIGN && gpGame->m_campaignCheated)
             entries_a[entry].cheated = 1;
 
-        file_a = _open(filename_a, HIGH_SCORE_FILE_WRITE_FLAGS, HIGH_SCORE_FILE_PERMISSIONS);
+        file_a = open(filename_a, HIGH_SCORE_FILE_WRITE_FLAGS, HIGH_SCORE_FILE_PERMISSIONS);
         if (file_a == -1)
             FileError(filename_a);
         for (entry = 0; entry < HIGH_SCORE_ENTRY_COUNT; entry++)
-            _write(file_a, &entries_a[entry], sizeof(HighScoreEntry));
-        _close(file_a);
+            write(file_a, &entries_a[entry], sizeof(HighScoreEntry));
+        close(file_a);
     } else {
         gbShowHighScore = 0;
     }
@@ -2591,12 +2595,13 @@ int WaitForOtherPlayer(void)
     return result;
 }
 
-// @match-note
-// Retail frame 0x158, CFG, and every stack slot align; relocations are 131/131
-// with only delinked literal/addend aliases. The sole code residual is the
-// printable-key guard: equivalent byte-vs-zero-extend comparisons, with the
-// retail direct-byte sequence eight bytes shorter. Revisit at 95% for systematic
-// guard-expression steering.
+// @semantic
+// Complete 0xb85 body, 0x158 frame/slots, CFG, and 131/131 relocations align.
+// The sole code residual is the printable-key guard: retail emits direct unsigned
+// byte comparisons (`cmp byte; jb/jbe`), while ours zero-extends the low keyCode
+// byte before each signed int comparison, making the sequence eight bytes longer.
+// An unsigned-byte pointer lvalue and byte-cast bounds were byte-neutral; revisit
+// after a genuine keyboard payload low-byte view is recovered in the shared type.
 VA(0x0049d4a6, 0xb85)
 void PopNetBox(char *text, int netPlayer)
 {
@@ -2957,14 +2962,11 @@ void FileError(char *filename)
     ShutDown(buf);
 }
 
-// @match-note
-// tu-cumulative: logic + all 14 frame slots byte-exact (od_oracle-verified). The only
-// residual (coffcmp: 40 bytes, all in the two brightness averages + the minDist test)
-// is a /Od operand-evaluation-order difference this cl renders vs retail: the 3-term
-// sum `p[2]+p[0]+p[1]` reads +2,+1,+0 here but +2,+0,+1 in retail, and the `d>p`
-// compare loads the other operand first. Not source-steerable (probed every term
-// ordering, explicit grouping, `|0`, and an inline helper — all identical here).
-// Revisit at 95% for systematic evaluation-order steering.
+// @early-stop
+// All 191 normalized instructions and every relocation-masked code byte match.
+// The 0x38 frame/14 stack slots align, and all 21 relocation sites and effective
+// targets agree. The retained objdiff residual is only the delinked identity of
+// the function-local smackFadeSourceLineBase data referenced by both objects.
 VA(0x0049e3a8, 0x255)
 void SmackFade(unsigned char *src, unsigned char *dst)
 {
@@ -2995,12 +2997,13 @@ void SmackFade(unsigned char *src, unsigned char *dst)
     memset(a, 0, 0x300);
     memset(f, 0, 0x100);
     for (h = 0xa; h < 0xf6; h++) {
-        e = (src[h * 3 + 2] + src[h * 3] + src[h * 3 + 1]) / 3;
+        e = (src[h * 3 + 2] + 0[&src[h * 3]] + src[h * 3 + 1]) / 3;
         d = 0x3e7;
         for (i = 0xa; i < 0x24; i++) {
-            b = (dst[i * 3 + 2] + dst[i * 3] + dst[i * 3 + 1]) / 3;
+            b = (0[&dst[i * 3 + 2]] + 0[&dst[i * 3]] +
+                 dst[i * 3 + 1]) / 3;
             p = abs(e - b);
-            if (d > p) {
+            if (0[&d] > p) {
                 d = p;
                 k = i;
             }
