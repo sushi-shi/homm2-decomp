@@ -1061,12 +1061,12 @@
       "unit": "SOURCE/EVENTS",
       "function": "?AutoResolveCombat@advManager@@QAEHHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHH@Z",
       "source_hash": "94663c0c8936",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
       "iterations": 0,
       "before": 98.545456,
       "after": 98.545456,
-      "note": "Complete frame CFG and external relocs; one retail continuation and local table identities remain."
+      "note": "complete semantics frame slots CFG and external relocs; one five-byte continuation jump"
     },
     {
       "unit": "SOURCE/EVENTS",
@@ -1083,34 +1083,34 @@
       "unit": "SOURCE/EVENTS",
       "function": "?ComputerMonsterInteract@advManager@@QAEXPAVmapCell@@PAVhero@@PAH@Z",
       "source_hash": "1a89ad0c7be6",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
       "iterations": 0,
       "before": 98.14557,
       "after": 98.14557,
-      "note": "Complete frame CFG and 36 relocations; five retail continuation jumps remain."
+      "note": "complete 0x40 frame slots CFG and 36 relocs; five continuation jumps explain size delta"
     },
     {
       "unit": "SOURCE/EVENTS",
       "function": "?DoAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z",
       "source_hash": "7cbb53d27f6c",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
-      "outcome": "improved",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
       "iterations": 10,
-      "before": 97.67293,
-      "after": 97.76202,
-      "note": "Complete frame and 356 relocs; bounded AST TU-state and member-access variants leave multiply shape."
+      "before": 97.64686,
+      "after": 97.64686,
+      "note": "complete 0x150 frame four tables and 356 relocs; documented multiply shape; bounded probes exhausted"
     },
     {
       "unit": "SOURCE/EVENTS",
       "function": "?DoEvent@advManager@@QAEXPAVmapCell@@HH@Z",
       "source_hash": "5eef811a1afc",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
       "iterations": 10,
-      "before": 96.590416,
-      "after": 96.590416,
-      "note": "Complete frame and 972 relocs; bounded source and TU variants leave Sphinx player-value load order."
+      "before": 96.62353,
+      "after": 96.62353,
+      "note": "complete reconstruction and relocs; documented Sphinx register-order wall; bounded TU probes exhausted"
     },
     {
       "unit": "SOURCE/EVENTS",
@@ -1138,12 +1138,12 @@
       "unit": "SOURCE/EVENTS",
       "function": "?EventSound@advManager@@QAEXHHPAUSAMPLE2@@@Z",
       "source_hash": "72aac3347965",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
       "iterations": 0,
       "before": 99.909645,
       "after": 99.909645,
-      "note": "Executable instructions outside embedded tables and 95 effective relocations align; local table and string identities remain."
+      "note": "all executable instructions align after excluding proved local address and byte tables; external relocs agree"
     },
     {
       "unit": "SOURCE/EVENTS",
@@ -1160,23 +1160,23 @@
       "unit": "SOURCE/EVENTS",
       "function": "?GenericSiteAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z",
       "source_hash": "338f3bfe995b",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
-      "iterations": 5,
+      "iterations": 10,
       "before": 99.996124,
       "after": 99.996124,
-      "note": "Two primary-stat index and hero load-order bytes remain after bounded variants; 25 relocations align."
+      "note": "complete frame CFG and 25 relocs; two commutative stat-load bytes; 10 TU-state families no closure"
     },
     {
       "unit": "SOURCE/EVENTS",
       "function": "?GenericSiteEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z",
       "source_hash": "76098dc5a06b",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
-      "outcome": "improved",
-      "iterations": 3,
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 10,
       "before": 99.583496,
-      "after": 99.976425,
-      "note": "Inner height spelling closes size and relocation shift; only two primary-stat load-order bytes remain."
+      "after": 99.583496,
+      "note": "complete frame CFG and 75 relocs; two commutative stat-load bytes; 10 TU-state families no closure"
     },
     {
       "unit": "SOURCE/EVENTS",
@@ -1215,45 +1215,45 @@
       "unit": "SOURCE/EVENTS",
       "function": "?JailAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z",
       "source_hash": "186c85a30a46",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
       "iterations": 4,
       "before": 99.91803,
       "after": 99.91803,
-      "note": "Two continuation targets remain after nested flattened return and shared-label variants regressed."
+      "note": "complete frame CFG and 12 relocs; two equivalent continuation branch destinations"
     },
     {
       "unit": "SOURCE/EVENTS",
       "function": "?JailEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z",
       "source_hash": "44ad3ee3ea29",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
       "iterations": 1,
       "before": 99.94083,
       "after": 99.94083,
-      "note": "Two continuation targets remain; an early-return variant removed jumps and regressed size."
+      "note": "complete frame CFG and 21 relocs; two equivalent continuation branch destinations"
     },
     {
       "unit": "SOURCE/EVENTS",
       "function": "?PlayerMonsterInteract@advManager@@QAEXPAVmapCell@@0PAVhero@@PAHHHHHH@Z",
       "source_hash": "e4940160528d",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "improved",
       "iterations": 1,
       "before": 99.98633,
       "after": 99.991455,
-      "note": "Corrected CampaignAward indices; all 2091 bytes match after masking 85 folded data relocations."
+      "note": "retail award order fix yields zero unmasked differences across 0x82b bytes and 85 relocs"
     },
     {
       "unit": "SOURCE/EVENTS",
       "function": "?RecruitSiteAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z",
       "source_hash": "088341712124",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
-      "iterations": 4,
+      "iterations": 10,
       "before": 99.951614,
-      "after": 100.0,
-      "note": "Metric exact but raw bitfield-write evaluation order remains after four bounded variants; 12 relocations align."
+      "after": 99.951614,
+      "note": "complete frame CFG and 12 relocs; documented packed-word load order; 10 TU-state families no closure"
     },
     {
       "unit": "SOURCE/EVENTS",
@@ -1270,12 +1270,12 @@
       "unit": "SOURCE/EVENTS",
       "function": "?TransferArtifacts@advManager@@QAEXPAVhero@@0@Z",
       "source_hash": "59ca4bc50195",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
       "iterations": 4,
       "before": 99.91525,
       "after": 99.91525,
-      "note": "Three same-epilogue branch bytes remain after conjunction return and shared-label variants regressed."
+      "note": "complete frame CFG and 11 relocs; null arm routes through equivalent continuation"
     },
     {
       "unit": "SOURCE/GAME",
@@ -1972,6 +1972,17 @@
     },
     {
       "unit": "SOURCE/Newgame",
+      "function": "?DrawNGKPDisplayString@game@@QAEXH@Z",
+      "source_hash": "faa957f81b97",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 4,
+      "before": 99.666664,
+      "after": 100.0,
+      "note": "explicit outer and shared inner return guards restore retail branch destinations; 10 relocs align"
+    },
+    {
+      "unit": "SOURCE/Newgame",
       "function": "?GetLossConditionText@game@@QAEXPAD@Z",
       "source_hash": "5bd97b05a3f8",
       "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
@@ -1994,25 +2005,113 @@
     },
     {
       "unit": "SOURCE/Newgame",
+      "function": "?GetSideDesc@game@@QAEHPADHH@Z",
+      "source_hash": "c11548918df7",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 6,
+      "before": 98.13187,
+      "after": 100.0,
+      "note": "od_slots recovery restores 0x84 frame and all locals; qualified comparisons close 0x2a7 bytes and 25 relocs"
+    },
+    {
+      "unit": "SOURCE/Newgame",
+      "function": "?GetVictoryConditionText@game@@QAEXPAD@Z",
+      "source_hash": "7ec31b2d875d",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.85448,
+      "after": 100.0,
+      "note": "evidenced unused bucket-0 word restores 0xe4 frame; all 0x2fb bytes and 32 relocs align"
+    },
+    {
+      "unit": "SOURCE/Newgame",
+      "function": "?InitNewGame@game@@QAEXPAUSMapHeader@@@Z",
+      "source_hash": "cfb336fad35a",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 97.85714,
+      "after": 97.85714,
+      "note": "244 non-jump instructions and 7 relocs align; two continuation jumps explain size delta"
+    },
+    {
+      "unit": "SOURCE/Newgame",
+      "function": "?InitNewGameWindow@game@@QAEXXZ",
+      "source_hash": "2633d11c4a96",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 10,
+      "before": 99.98742,
+      "after": 100.0,
+      "note": "qualified multiplayer Y-offset accumulator closes all 0x67d bytes and 65 relocs"
+    },
+    {
+      "unit": "SOURCE/Newgame",
+      "function": "?NewGame@game@@QAEHXZ",
+      "source_hash": "758b53b3e5b4",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.33916,
+      "after": 98.33916,
+      "note": "537 non-jump instructions and 156 relocs align; five continuation jumps explain size delta"
+    },
+    {
+      "unit": "SOURCE/Newgame",
+      "function": "?NewGameHandler@@YIHAAUtag_message@@@Z",
+      "source_hash": "14f9d661fdf8",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 97.32119,
+      "after": 97.32119,
+      "note": "executable stream audited outside switch data; continuation jumps and one table entry explain size delta"
+    },
+    {
+      "unit": "SOURCE/Newgame",
       "function": "?ProcessNGKeyPress@game@@QAEHAAUtag_message@@@Z",
       "source_hash": "1f930e99521d",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
       "iterations": 10,
       "before": 99.98682,
       "after": 99.98682,
-      "note": "Exact frame slots and 84 relocs; two real local branch residuals remain after ten bounded CFG and guard families."
+      "note": "complete 0x80 frame CFG and 84 relocs; two documented local branch routes remain"
+    },
+    {
+      "unit": "SOURCE/Newgame",
+      "function": "?ProcessNewMap@game@@QAEXPAUSMapHeader@@@Z",
+      "source_hash": "862c6e52452f",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 99.85714,
+      "after": 99.85714,
+      "note": "all 33 non-jump instructions and 6 relocs align; one equivalent branch destination byte"
+    },
+    {
+      "unit": "SOURCE/Newgame",
+      "function": "?SetupNetPlayerNames@game@@QAEXXZ",
+      "source_hash": "492bf8b3172b",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 10,
+      "before": 95.5,
+      "after": 100.0,
+      "note": "qualified global loop bound restores retail compare; all 0x81 bytes and 6 relocs align"
     },
     {
       "unit": "SOURCE/Newgame",
       "function": "?ShowScenInfo@game@@QAEXXZ",
-      "source_hash": "adf8f86079db",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "source_hash": "a4feb56d0151",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "exact",
-      "iterations": 2,
-      "before": 99.978806,
+      "iterations": 3,
+      "before": 99.99205,
       "after": 100.0,
-      "note": "Scalar-lvalue spelling restores all eight retail player-position products; function is exact."
+      "note": "qualified multiplayer Y-offset accumulator closes all 0xb71 bytes and 118 relocs"
     },
     {
       "unit": "SOURCE/Newgame",
