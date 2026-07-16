@@ -112,8 +112,9 @@ textEntryWidget::~textEntryWidget()
 // Base/retail are both 0x26c with the same frame/CFG and all 52/52 ordered external
 // relocations. The only raw residual is +0x18b..+0x191: retail compares type before
 // loading m_height, while VC4.2 schedules those independent instructions in reverse.
-// Moving the comparison earlier broadened the diff; 22 bounded AST variants did not improve
-// the canonical score. Revisit after TU state changes.
+// Moving the comparison earlier, duplicating the height store in both type arms, and replacing
+// the preserved local with direct constant stores all broadened the diff; 22 bounded AST variants
+// also did not improve the canonical score. Revisit after TU state changes.
 VA(0x004d8920, 0x26c)
 void textEntryWidget::Read(int type)
 {
@@ -183,24 +184,17 @@ void textEntryWidget::Read(int type)
     m_kind = EncodeWidgetKind(WIDGET_KIND_TEXT_ENTRY);
 }
 
-// @semantic
-// Base/retail are both 0x874 with the exact 0x9a8 frame, CFG, jump-table structure,
-// and all 55/55 ordered external relocations. Relocation-masked raw comparison differs
-// only at +0x21: retail's MESSAGE_WIDGET branch targets the push using the existing ECX,
-// while VC4.2 targets an equivalent pointer reload first. An early guard and the direct
-// disabled-widget return/no-else spelling emit the same byte. Revisit after TU state changes.
 VA(0x004d8b90, 0x874)
 int textEntryWidget::Main(struct tag_message &message)
 {
     if ((m_flags & WIDGET_FLAG_ENABLED) == 0) {
-        if (message.type != MESSAGE_WIDGET)
-            return 0;
-        return widget::Main(message);
+        if (message.type == MESSAGE_WIDGET)
+            return widget::Main(message);
+        return 0;
     }
     switch (message.type) {
         default:
-        defaultMessage:
-            return widget::Main(message);
+            break;
         case MESSAGE_LEFT_BUTTON_DOWN:
         case MESSAGE_RIGHT_BUTTON_DOWN: {
             m_cursorBlink = 1;
@@ -378,7 +372,7 @@ int textEntryWidget::Main(struct tag_message &message)
             }
             break;
     }
-    goto defaultMessage;
+    return widget::Main(message);
 }
 
 VA(0x004d9410, 0x160)
