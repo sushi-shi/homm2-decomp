@@ -57,40 +57,36 @@
 // encodes the base line as a 2-byte string read via movswl, then adds a per-call
 // delta; reproduce byte-exactly. __FILE__ is the original build path (reloc-masked).
 // @data-layout-note Retail's initialized GAME contribution is
-// 0xf70e0..0xf80b8 (0xfd8); candidate .data is 0xfd6 and .rdata remains exact at
-// 0xb8. The eight source-line owners are independently proved by their payloads
-// and repeated retail HIGHLOW sites at 0xf70e4, 0xf71a8, 0xf7274, 0xf75c4,
-// 0xf77b8, 0xf7a60, 0xf7e90, and 0xf7f84. Sharing them removed 0xa8 bytes of
-// duplicate per-use literals; resolving ViewArmy's actual SMonFrameInfo +0x65
-// and +0x175 owners removed another 0x104 bytes. FW1/RSG1 and the empty default
-// player name are also relocation-proven against retail. gbGameOver and the
-// save-line owner now translate exactly from the contribution base. The later
-// owners require distinct bases because retail alternates literals, private line
-// values, giMonType, and bMapInitialized, while this VC4.2 source form groups
-// file-scope definitions ahead of its literal pool. Moving the two public
-// definitions to their apparent source boundaries hoists them to the section
-// head instead of interleaving them. Revisit only with evidence for the natural
-// original section/source form; do not add padding, synthetic owners, or section
-// pragmas to force the remaining order or two terminal bytes.
+// 0xf70e0..0xf80b8 (0xfd8); candidate .data is 0xfd6. Its 204 definitions are
+// closed one-to-one as 17 source DATA owners plus 187 private allocations. Every
+// private payload is byte-exact, has one candidate code reference, and maps to a
+// disjoint retail extent. Fourteen typed short line-base owners leave their
+// natural two-byte alignment halves unowned; bMapInitialized leaves three bytes,
+// and retail has a six-byte terminal zero tail. Those 0x25 bytes are the complete
+// initialized-storage residual. ViewArmy and CreateJoinFile require distinct
+// local bases at 0xf7388 and 0xf7bc4; sharing the save/diff bases incorrectly hid
+// two referenced retail owners. The 0xb8 rdata group and all 23 BSS owners are
+// also closed. Do not add padding, aliases, synthetic owners, or section pragmas
+// to force physical allocation order.
 DATA(0x004f70e0) int gbGameOver = 0;
-static char gSaveSourceLine[] = "\x94\x02";
-static char gLoadSourceLine[] = "\x4f\x04";
-static char gMapSourceLine[] = "\xf4\x0a";
-static char gTransmitSourceLine[] = "\x4e\x1a";
-static char gReceiveSourceLine[] = "\x2d\x1b";
-static char gDiffSourceLine[] = "\x66\x1d";
-static char gCompressTest2SourceLine[] = "\x72\x1f";
-static char gCompressTestSourceLine[] = "\x95\x1f";
+DATA(0x004f70e4) static short gSaveSourceLine = 0x294;
+DATA(0x004f71a8) static short gLoadSourceLine = 0x44f;
+DATA(0x004f7274) static short gMapSourceLine = 0xaf4;
+DATA(0x004f75c4) static short gTransmitSourceLine = 0x1a4e;
+DATA(0x004f77b8) static short gReceiveSourceLine = 0x1b2d;
+DATA(0x004f7a60) static short gDiffSourceLine = 0x1d66;
+DATA(0x004f7e90) static short gCompressTest2SourceLine = 0x1f72;
+DATA(0x004f7f84) static short gCompressTestSourceLine = 0x1f95;
 
 #define GFILE const_cast<char *>("I:\\Projects\\Heroes\\Prog\\SOURCE\\GAME.CPP")
-#define GSAVELINE (*reinterpret_cast<const short *>(gSaveSourceLine))
-#define GLOADLINE (*reinterpret_cast<const short *>(gLoadSourceLine))
-#define GMAPLINE (*reinterpret_cast<const short *>(gMapSourceLine))
-#define GTRANSMITLINE (*reinterpret_cast<const short *>(gTransmitSourceLine))
-#define GRECEIVELINE (*reinterpret_cast<const short *>(gReceiveSourceLine))
-#define GDIFFLINE (*reinterpret_cast<const short *>(gDiffSourceLine))
-#define GCOMPRESSTEST2LINE (*reinterpret_cast<const short *>(gCompressTest2SourceLine))
-#define GCOMPRESSTESTLINE (*reinterpret_cast<const short *>(gCompressTestSourceLine))
+#define GSAVELINE gSaveSourceLine
+#define GLOADLINE gLoadSourceLine
+#define GMAPLINE gMapSourceLine
+#define GTRANSMITLINE gTransmitSourceLine
+#define GRECEIVELINE gReceiveSourceLine
+#define GDIFFLINE gDiffSourceLine
+#define GCOMPRESSTEST2LINE gCompressTest2SourceLine
+#define GCOMPRESSTESTLINE gCompressTestSourceLine
 // Retail folds the embedded member offset into Row/Extra accesses after inlining.
 #define WORLDMAP (&m_worldMap)
 
@@ -2421,6 +2417,8 @@ void game::ViewArmy(int x, int y, int monsterType, int numTroops, town *castle,
                     int disableUpgrade, int facing, int quickView, hero *theHero,
                     class army *theArmy, armyGroup *theGroup, int groupIndex)
 {
+    DATA(0x004f7388) static short viewArmySourceLineBase =
+        GAME_VIEW_ARMY_SOURCE_LINE_BASE;
     short baseX7 = 86;
     short quickBaseY3 = 164;
     short blankWidget3 = 1;
@@ -2508,7 +2506,8 @@ void game::ViewArmy(int x, int y, int monsterType, int numTroops, town *castle,
     message6.payload.widget.data.text = armyName8;
     m_viewArmyWindow->BroadcastMessage(message6);
 
-    char *details9 = static_cast<char *>(BaseAlloc(0x226, GFILE, GSAVELINE + 0x93));
+    char *details9 = static_cast<char *>(BaseAlloc(
+        0x226, GFILE, viewArmySourceLineBase + GAME_VIEW_ARMY_ALLOC_OFFSET));
     int morale2 = theGroup ? theGroup->GetMorale(theHero, castle, 0) : 0;
     if (monster8->flags.all & MONSTER_FLAGS_NO_MORALE)
         morale2 = 0;
@@ -2649,7 +2648,8 @@ void game::ViewArmy(int x, int y, int monsterType, int numTroops, town *castle,
         if (gbUpgradeArmy && theGroup)
             theGroup->m_troopTypes[groupIndex] = static_cast<signed char>(iViewArmyUpgradeToType);
     }
-    BaseFree(details9, GFILE, GSAVELINE + 0x164);
+    BaseFree(details9, GFILE,
+             viewArmySourceLineBase + GAME_VIEW_ARMY_FREE_OFFSET);
     delete m_viewArmyWindow;
 }
 
@@ -4513,6 +4513,8 @@ void game::ProcessMapExtra(void)
 VA(0x00481c47, 0x900)
 void game::SetupTowns(void)
 {
+    DATA(0x004f756c) static short setupTownsSourceLineBase =
+        GAME_SETUP_TOWNS_SOURCE_LINE_BASE;
     char defaultDwellingRoll[12];
     signed char usedSpells[65];
     int spellsPerLevel[5];
@@ -4702,7 +4704,7 @@ void game::SetupTowns(void)
             }
         }
         BaseFree(ppMapExtra[extraIndex], GFILE,
-                 *reinterpret_cast<const short *>("\xef\x18") + 0xee);
+                 setupTownsSourceLineBase + GAME_SETUP_TOWNS_FREE_OFFSET);
         ppMapExtra[extraIndex] = 0;
     }
 }
@@ -4713,6 +4715,8 @@ void game::SetupTowns(void)
 VA(0x00482547, 0x774)
 void game::ProcessOnMapHeroes(void)
 {
+    DATA(0x004f7598) static short processOnMapHeroesSourceLineBase =
+        GAME_PROCESS_ON_MAP_HEROES_SOURCE_LINE_BASE;
     signed char usedHeroes[GAME_HERO_COUNT];
     int pass;
     int mapY;
@@ -4870,7 +4874,8 @@ void game::ProcessOnMapHeroes(void)
                                       giVisRange[mapHero->m_secondarySkills[3]]);
                     }
                     BaseFree(ppMapExtra[extraIndex], GFILE,
-                             *reinterpret_cast<const short *>("\xef\x18") + 0xdd);
+                             processOnMapHeroesSourceLineBase +
+                                 GAME_PROCESS_ON_MAP_HEROES_FREE_OFFSET);
                     ppMapExtra[extraIndex] = 0;
                 }
                 }
@@ -5605,6 +5610,8 @@ void game::RestoreCell(int x, int y, int obj, int barrier, mapCell *passedCell, 
 VA(0x004848bf, 0xe3)
 void game::SetMapSize(int w, int h)
 {
+    DATA(0x004f7a0c) static short setMapSizeSourceLineBase =
+        GAME_SET_MAP_SIZE_SOURCE_LINE_BASE;
     if (h == MAP_HEIGHT && w == MAP_WIDTH && bMapInitialized) {
     } else {
         bMapInitialized = 1;
@@ -5614,12 +5621,10 @@ void game::SetMapSize(int w, int h)
     }
     if (mapExtra)
         BaseFree(mapExtra, GFILE,
-                 *reinterpret_cast<const short *>("\x0d\x1d") +
-                     GAME_SET_MAP_SIZE_FREE_OFFSET);
+                 setMapSizeSourceLineBase + GAME_SET_MAP_SIZE_FREE_OFFSET);
     mapExtra = static_cast<unsigned char *>(
         BaseAlloc(MAP_WIDTH * MAP_HEIGHT, GFILE,
-                  *reinterpret_cast<const short *>("\x0d\x1d") +
-                      GAME_SET_MAP_SIZE_ALLOC_OFFSET));
+                  setMapSizeSourceLineBase + GAME_SET_MAP_SIZE_ALLOC_OFFSET));
     memset(mapExtra, 0, MAP_WIDTH * MAP_HEIGHT);
 }
 
@@ -5837,6 +5842,8 @@ void CreateDiffFile(char *oldName, char *joinName, char *diffName,
 VA(0x00485107, 0x3ce)
 void CreateJoinFile(char *oldName, char *diffName, char *joinName)
 {
+    DATA(0x004f7bc4) static short createJoinFileSourceLineBase =
+        GAME_CREATE_JOIN_FILE_SOURCE_LINE_BASE;
     unsigned char *oldData13 = 0;
     unsigned char *diffData5 = 0;
     unsigned char *joinData9 = 0;
@@ -5852,7 +5859,9 @@ void CreateJoinFile(char *oldName, char *diffName, char *joinName)
     sprintf(gText, "%s%s", ".\\DATA\\", diffName);
     diffSize1 = FileSize(gText);
     diffData5 = static_cast<unsigned char *>(
-        BaseAlloc(diffSize1, GFILE, GDIFFLINE + 0xd));
+        BaseAlloc(diffSize1, GFILE,
+                  createJoinFileSourceLineBase +
+                      GAME_CREATE_JOIN_DIFF_ALLOC_OFFSET));
     sprintf(gText, "%s%s", ".\\DATA\\", diffName);
     diffFile2 = _open(gText, 0x8000);
     if (diffFile2 == -1)
@@ -5861,7 +5870,9 @@ void CreateJoinFile(char *oldName, char *diffName, char *joinName)
     _close(diffFile2);
 
     joinData9 = static_cast<unsigned char *>(
-        BaseAlloc(GAME_JOIN_BUFFER_SIZE, GFILE, GDIFFLINE + 0x16));
+        BaseAlloc(GAME_JOIN_BUFFER_SIZE, GFILE,
+                  createJoinFileSourceLineBase +
+                      GAME_CREATE_JOIN_BUFFER_ALLOC_OFFSET));
     if (diffData5[0] == 0) {
         memcpy(joinData9, diffData5 + GAME_JOIN_HEADER_SIZE,
                diffSize1 - GAME_JOIN_HEADER_SIZE);
@@ -5870,7 +5881,9 @@ void CreateJoinFile(char *oldName, char *diffName, char *joinName)
         sprintf(gText, "%s%s", ".\\DATA\\", oldName);
         oldSize10 = FileSize(gText);
         oldData13 = static_cast<unsigned char *>(
-            BaseAlloc(oldSize10, GFILE, GDIFFLINE + 0x21));
+            BaseAlloc(oldSize10, GFILE,
+                      createJoinFileSourceLineBase +
+                          GAME_CREATE_JOIN_OLD_ALLOC_OFFSET));
         sprintf(gText, "%s%s", ".\\DATA\\", oldName);
         diffFile2 = _open(gText, 0x8000);
         if (diffFile2 == -1)
@@ -5913,11 +5926,17 @@ void CreateJoinFile(char *oldName, char *diffName, char *joinName)
     _close(joinFile0);
 
     if (oldData13)
-        BaseFree(oldData13, GFILE, GDIFFLINE + 0x53);
+        BaseFree(oldData13, GFILE,
+                 createJoinFileSourceLineBase +
+                     GAME_CREATE_JOIN_OLD_FREE_OFFSET);
     if (diffData5)
-        BaseFree(diffData5, GFILE, GDIFFLINE + 0x55);
+        BaseFree(diffData5, GFILE,
+                 createJoinFileSourceLineBase +
+                     GAME_CREATE_JOIN_DIFF_FREE_OFFSET);
     if (joinData9)
-        BaseFree(joinData9, GFILE, GDIFFLINE + 0x57);
+        BaseFree(joinData9, GFILE,
+                 createJoinFileSourceLineBase +
+                     GAME_CREATE_JOIN_BUFFER_FREE_OFFSET);
 }
 
 VA(0x004854d5, 0x5d)
@@ -6173,10 +6192,11 @@ void CheckValidAvailableHeroes(void)
 VA(0x00486296, 0xab)
 int CalcFileCRC(char *filename)
 {
+    DATA(0x004f7e3c) static short calcFileCrcSourceLineBase =
+        GAME_CALC_FILE_CRC_SOURCE_LINE_BASE;
     long size = FileSize(filename);
     char *block = static_cast<char *>(BaseAlloc(
-        size, GFILE, *reinterpret_cast<const short *>("\x5e\x1f") +
-                         GAME_CALC_CRC_ALLOC_OFFSET));
+        size, GFILE, calcFileCrcSourceLineBase + GAME_CALC_CRC_ALLOC_OFFSET));
     int hand = _open(filename, 0x8000);
     if (hand == -1)
         FileError(filename);
@@ -6184,8 +6204,7 @@ int CalcFileCRC(char *filename)
     int crc = calc_crc_long(reinterpret_cast<unsigned char *>(block), size);
     _close(hand);
     BaseFree(block, GFILE,
-             *reinterpret_cast<const short *>("\x5e\x1f") +
-                 GAME_CALC_CRC_FREE_OFFSET);
+             calcFileCrcSourceLineBase + GAME_CALC_CRC_FREE_OFFSET);
     return crc;
 }
 
