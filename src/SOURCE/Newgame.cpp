@@ -1915,26 +1915,33 @@ int game::GetSideDesc(char *text, int firstPlayer, int lastPlayer)
 }
 
 // @data-layout-note
-// Retail initialized storage spans 0x11cd20..0x11d450 (0x730 bytes,
-// including six trailing zero alignment bytes); the candidate payload is
-// 0x72a bytes. After moving the three source-line words to their sole function
-// owners above, the other 0x71e payload bytes are exact. Retail interleaves the
-// words at contribution offsets 0xb0, 0x280, and 0x3dc, while VC 4.2 groups
-// explicit function statics at 0x0, 0x4, and 0x8. Their retail values are
-// 0x013f, 0x027b, and 0x064f, and their 6, 2, and 2 HIGHLOW references prove
-// the owner identities and zero addends. Focused relocation audits are
-// 156/156 for NewGame, 65/65 for InitNewGameWindow, and 118/118 for
-// ShowScenInfo, with no candidate-only sites; the only warnings are the
-// expected private-name versus `const_<rva>` identities. Do not add padding or
-// restore those delinker aliases to reproduce this allocation-order wall.
+// Retail initialized storage is 0x11cd20..0x11d450 (0x730 bytes): 105 real
+// definitions cover 0x72a bytes exactly and the final six bytes are zero tail
+// alignment. VC 4.2 puts the three explicit function statics first at candidate
+// offsets 0, 4, and 8; retail interleaves them at offsets 0xb0, 0x280, and
+// 0x3dc. The remaining candidate ranges translate as [0x14,0xbc) - 0xc,
+// [0xbc,0x288) - 8, [0x288,0x3e0) - 4, and [0x3e0,0x72a) unchanged. All 105
+// owner extents are disjoint and byte-exact after that transformation
+// (candidate SHA-256 caa3177722a117716f26b34dd4753e91b4ff168e0812d8ebbc1630bf60116e48).
+// The three static words contain 0x013f, 0x027b, and 0x064f and have 6, 2,
+// and 2 zero-addend references.
 //
-// Retail and candidate zero-fill are both 0x20 bytes. Retail COMMON order is
-// cNGKPDisplay, gbNewGameShadowHidden, cNGKPCore, NGKPcursorIndex,
-// cTextReceivedBuffer[3], NGKPBkg; the compiler emits the candidate order as
-// NGKPcursorIndex, gbNewGameShadowHidden, cTextReceivedBuffer[3], cNGKPCore,
-// NGKPBkg, cNGKPDisplay. Every allocation and extent is present, so keep this
-// as a COMMON allocation-order wall rather than introducing aliases or fake
-// storage.
+// All 100 compiler-local definitions have one candidate code reference and
+// all 100 pair to the translated retail owner. In particular, retail sites
+// 0xb9240, 0xb9253, and 0xb9e09 target $SG35237 at 0x11d0c0, $SG35238 at
+// 0x11d0c4, and $SG35362 at 0x11d0f8. NewGameHandler has one unrelated extra
+// candidate DIR32 at public-range index 116, to local label $L35342; deleting
+// only that local-label site aligns its other 121 DIR32 records with retail.
+// This is not an allocation identity or a reason to add synthetic storage.
+//
+// Retail and candidate zero-fill are both 0x20 bytes and contain the same six
+// source-defined owners. Candidate reference counts are 20, 3, 12, 20, 3,
+// and 11 for NGKPcursorIndex, gbNewGameShadowHidden, cTextReceivedBuffer,
+// cNGKPCore, NGKPBkg, and cNGKPDisplay; cTextReceivedBuffer addends are six
+// at 0, two at 4, and four at 8, and every other addend is zero. Retail COMMON
+// order is cNGKPDisplay, gbNewGameShadowHidden, cNGKPCore, NGKPcursorIndex,
+// cTextReceivedBuffer[3], NGKPBkg; candidate order differs but every owner and
+// extent is present. Do not introduce aliases, padding, or fake storage.
 // ---- globals (definitions, RVA order) ----
 DATA(0x0051cd20) int gbNewGameDialogOver = 1;
 DATA(0x0051cd24) int NGKPcursorFlashOn = 1;
