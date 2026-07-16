@@ -83,8 +83,9 @@ int combatManager::DoSpellAI(int side, int restricted)
 // aggregate; all 156/156 external relocation occurrences agree. The first
 // normalized report boundary is the local first switch label after 17
 // instructions, with retail-only continuation/table output thereafter.
-// Immediate/static 1.0 spellings were tried; revisit with local-table-aware
-// explicit-range comparison in the byte-last-mile phase.
+// The named full-effect constant restores the retail constant-pool order;
+// revisit the remaining code residual with local-table-aware explicit-range
+// comparison in the byte-last-mile phase.
 VA(0x00486a39, 0x1155)
 void combatManager::DetermineEffectOfSpell(int spell, int *bestEffect, int *bestHex)
 {
@@ -107,7 +108,7 @@ void combatManager::DetermineEffectOfSpell(int spell, int *bestEffect, int *best
     doneResult = 0;
     side = 0;
     hexIndex = COMBAT_SPELL_AI_FIRST_HEX;
-    durationMod = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
+    durationMod = COMBAT_SPELL_AI_FULL_EFFECT_MODIFIER;
     fullQuantityFlag = 1;
     totalEffect = 0;
     targetCreature = 0;
@@ -664,13 +665,13 @@ void combatManager::DetermineEffectOfSpell(int spell, int *bestEffect, int *best
 // Exact 0x28 frame and 14/14 external relocations. The first 52 normalized
 // instructions agree, then objdump stops ours at a local switch label; the
 // explicit-range residual begins in local branch/table layout at +0xcb.
-// Static versus immediate 1.0 and the fight-value/power versus retail
-// fight-value/monster expressions were tried; revisit with local-table-aware
-// comparison in the byte-last-mile phase.
+// The named full-effect constant restores the retail constant-pool order. The
+// fight-value/power versus retail fight-value/monster expressions were tried;
+// revisit with local-table-aware comparison in the byte-last-mile phase.
 VA(0x00487b8e, 0x34c)
 int combatManager::EffectSpellCreateCreature(int hex, int spell)
 {
-    float workChance = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
+    float workChance = COMBAT_SPELL_AI_FULL_EFFECT_MODIFIER;
     int spellPower = m_spellPower[m_currentSide];
 
     if ((spell == SPELL_SUMMON_EARTH_ELEMENTAL ||
@@ -1305,7 +1306,7 @@ void combatManager::EffectSpellDamage(int *effect, int spell, int targetHex)
                 gArmyEffected[m_hexCells[currentHex].m_occupantSide]
                               [m_hexCells[currentHex].m_occupantIndex] = 1;
                 workChanceWork = targetCreature->SpellCastWorkChance(spell);
-                if (workChanceWork > 0.0) {
+                if (workChanceWork > 0.0f) {
                     spellDamageWork = static_cast<long>(damage * workChanceWork);
                     monsterTotal = targetCreature->m_monsterType;
                     switch (spell) {
