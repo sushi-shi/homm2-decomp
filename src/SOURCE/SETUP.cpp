@@ -109,8 +109,6 @@ int game::SetupComPort(void)
     return 1;
 }
 
-// @early-stop All 0x238 code bytes match after relocation masking; external
-// relocations match 39/39. Target-only entries are local jump-table relocs.
 VA(0x00411200, 0x238)
 int game::SetupHotSeatGame(void)
 {
@@ -150,7 +148,7 @@ int game::SetupHotSeatGame(void)
         sprintf(gText, "Do you wish to enter each player's name?");
         NormalDialog(gText, 2, -1, -1, -1, 0, -1, 0, -1, 0);
         if (gpWindowManager->m_dialogResult == SETUP_DIALOG_YES) {
-            for (ix = 0; ix < giNumHumanPlayers; ix++) {
+            for (ix = 0; ix < 0[&giNumHumanPlayers]; ix++) {
                 strcpy(defaultName, "");
                 sprintf(gText, "Enter player %d's name.", ix + 1);
                 GetDataEntry(
@@ -383,8 +381,6 @@ int game::SetupMultiPlayerGame(void)
     return 1;
 }
 
-// @match-note 92.78%; complete 0x5c frame, menu/dialog CFG, and semantics.
-// External relocations match 122/122. Revisit at 95% for switch-trampoline tuning.
 VA(0x00411d03, 0x6c9)
 int game::SetupGame(void)
 {
@@ -458,15 +454,17 @@ int game::SetupGame(void)
             iMPExtendedType = SETUP_REMOTE_MODEM_ANSWER;
             gbDirectConnect = 1;
             goto remoteSetup;
-        }
-        goto menuDone;
 
-    remoteSetup:
-        LogStr("Setup 0a");
-        RemoteMain(iMPExtendedType);
-        if (iMPExtendedType == SETUP_REMOTE_NETWORK_GUEST ||
-            iMPExtendedType == SETUP_REMOTE_MODEM_ANSWER)
-            gbWaitForRemoteReceive = 1;
+        remoteSetup:
+            LogStr("Setup 0a");
+            RemoteMain(iMPExtendedType);
+            if (iMPExtendedType == SETUP_REMOTE_NETWORK_GUEST ||
+                iMPExtendedType == SETUP_REMOTE_MODEM_ANSWER)
+                gbWaitForRemoteReceive = 1;
+            break;
+        default:
+            ;
+        }
 
     menuDone:
         giMenuCommand = -1;
@@ -492,7 +490,7 @@ int game::SetupGame(void)
     gpWindowManager->DoDialog(window, SetupGameHandler, 0);
     delete window;
 
-    switch (gpWindowManager->m_dialogResult) {
+    switch (static_cast<short>(gpWindowManager->m_dialogResult)) {
     case 1:
         break;
 
@@ -504,7 +502,7 @@ int game::SetupGame(void)
             gpWindowManager->DoDialog(window, ExpLoadCampaignHandler, 0);
             delete window;
 
-            switch (gpWindowManager->m_dialogResult) {
+            switch (static_cast<short>(gpWindowManager->m_dialogResult)) {
             case 1:
                 gbInCampaign = 1;
                 break;
@@ -523,7 +521,7 @@ int game::SetupGame(void)
             gpWindowManager->DoDialog(window, ExpLoadCampaignHandler, 0);
             delete window;
 
-            switch (gpWindowManager->m_dialogResult) {
+            switch (static_cast<short>(gpWindowManager->m_dialogResult)) {
             case 1:
                 gbInCampaign = 1;
                 if (!SetupCampaignGame()) {
@@ -571,36 +569,34 @@ done:
     return result;
 }
 
-// @match-note Complete requester/dialog CFG and semantics; external relocation
-// identities and occurrences match 43/43. Revisit at 95% for local block order.
 VA(0x004123cc, 0x2aa)
 int game::PickLoadGame(void)
 {
-    char filePattern[12];
-    int dialogResult;
-    heroWindow *window;
-    fileRequester *requester;
+    char filePattern_4[12];
+    int dialogResult_18;
+    heroWindow *window_27;
+    fileRequester *requester_11;
 
     if (gbWaitForRemoteReceive != 0)
         return 1;
 
     if (gbInCampaign != 0) {
-        sprintf(filePattern, "*.GMC");
+        sprintf(filePattern_4, "*.GMC");
     } else if (xIsPlayingExpansionCampaign != 0) {
-        sprintf(filePattern, "*.GXC");
+        sprintf(filePattern_4, "*.GXC");
     } else if (gbRemoteOn != 0 && xNetHasOldPlayers != 0) {
         NormalDialog(
             "At least one player does not have the Heroes II Expansion set.  You will only be able to choose from original Heroes II games.",
             1, -1, -1, -1, 0, -1, 0, -1, 0);
-        sprintf(filePattern, "*.GM%d", giNumHumanPlayers);
+        sprintf(filePattern_4, "*.GM%d", giNumHumanPlayers);
     } else {
-        window = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "x_mapmnu.bin");
-        if (window == 0)
+        window_27 = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "x_mapmnu.bin");
+        if (window_27 == 0)
             MemError();
-        gpWindowManager->DoDialog(window, ExpStdGameHandler, 0);
-        delete window;
+        gpWindowManager->DoDialog(window_27, ExpStdGameHandler, 0);
+        delete window_27;
 
-        switch (gpWindowManager->m_dialogResult) {
+        switch (static_cast<short>(gpWindowManager->m_dialogResult)) {
         case 1:
             xIsExpansionMap = 0;
             break;
@@ -612,25 +608,25 @@ int game::PickLoadGame(void)
         }
 
         if (xIsExpansionMap != 0)
-            sprintf(filePattern, "*.GX%d", giNumHumanPlayers);
+            sprintf(filePattern_4, "*.GX%d", giNumHumanPlayers);
         else
-            sprintf(filePattern, "*.GM%d", giNumHumanPlayers);
+            sprintf(filePattern_4, "*.GM%d", giNumHumanPlayers);
     }
 
-    requester = new fileRequester(
+    requester_11 = new fileRequester(
         200, 58, FILE_REQUESTER_LOAD_GAME,
-        filePattern, gcGamePath, filePattern);
-    if (requester == 0)
+        filePattern_4, gcGamePath, filePattern_4);
+    if (requester_11 == 0)
         MemError();
-    dialogResult = gpExec->DoDialog(requester);
-    if (dialogResult == FILE_REQUESTER_OK) {
+    dialogResult_18 = gpExec->DoDialog(requester_11);
+    if (dialogResult_18 == FILE_REQUESTER_OK) {
         gpGame->LoadGame(gLastFilename, 0, 0);
-        delete requester;
+        delete requester_11;
         return 1;
+    } else {
+        delete requester_11;
+        return 0;
     }
-
-    delete requester;
-    return 0;
 }
 
 VA(0x00412676, 0x1e)
@@ -639,8 +635,6 @@ int SetupCampaignGameHandler(struct tag_message &message)
     return BaseSetupHandler(message);
 }
 
-// @match-note Complete frame/CFG and help-table semantics; external relocs 11/11.
-// Revisit at 95% for delinked local jump-table identity only.
 VA(0x00412694, 0x13e)
 int SetupComPortHandler(struct tag_message &message)
 {
@@ -658,19 +652,17 @@ int SetupComPortHandler(struct tag_message &message)
         case SETUP_DIALOG_CANCEL: helpIndex = 4; break;
         }
         if (helpIndex >= 0) {
-            if (gbDirectConnect == 0)
-                NormalDialog(gSetupComPortHelp[helpIndex], SETUP_HELP_DIALOG,
+            if (gbDirectConnect != 0)
+                NormalDialog(gSetupDCComPortHelp[helpIndex], SETUP_HELP_DIALOG,
                              -1, -1, -1, 0, -1, 0, -1, 0);
             else
-                NormalDialog(gSetupDCComPortHelp[helpIndex], SETUP_HELP_DIALOG,
+                NormalDialog(gSetupComPortHelp[helpIndex], SETUP_HELP_DIALOG,
                              -1, -1, -1, 0, -1, 0, -1, 0);
         }
     }
     return BaseSetupHandler(message);
 }
 
-// @match-note Complete frame/CFG and help-table semantics; external relocs 11/11.
-// Revisit at 95% for delinked local jump-table identity only.
 VA(0x004127d2, 0x13e)
 int SetupBaudHandler(struct tag_message &message)
 {
@@ -688,19 +680,17 @@ int SetupBaudHandler(struct tag_message &message)
         case SETUP_DIALOG_CANCEL: helpIndex = 4; break;
         }
         if (helpIndex >= 0) {
-            if (gbDirectConnect == 0)
-                NormalDialog(gSetupBaudHelp[helpIndex], SETUP_HELP_DIALOG,
+            if (gbDirectConnect != 0)
+                NormalDialog(gSetupDCBaudHelp[helpIndex], SETUP_HELP_DIALOG,
                              -1, -1, -1, 0, -1, 0, -1, 0);
             else
-                NormalDialog(gSetupDCBaudHelp[helpIndex], SETUP_HELP_DIALOG,
+                NormalDialog(gSetupBaudHelp[helpIndex], SETUP_HELP_DIALOG,
                              -1, -1, -1, 0, -1, 0, -1, 0);
         }
     }
     return BaseSetupHandler(message);
 }
 
-// @match-note Complete frame/CFG and help-table semantics; external relocs 9/9.
-// Revisit at 95% for delinked local jump-table identity only.
 VA(0x00412910, 0x118)
 int SetupHotSeatGameHandler(struct tag_message &message)
 {
@@ -725,8 +715,6 @@ int SetupHotSeatGameHandler(struct tag_message &message)
     return BaseSetupHandler(message);
 }
 
-// @match-note 99.23%; complete frame/CFG and modem/DC help semantics; relocs 6/6.
-// Revisit at 95% for packed switch/conditional register allocation.
 VA(0x00412a28, 0x12e)
 int SetupModemGameHandler(struct tag_message &message)
 {
@@ -743,19 +731,17 @@ int SetupModemGameHandler(struct tag_message &message)
         case SETUP_DIALOG_CANCEL: helpIndex = 3; break;
         }
         if (helpIndex >= 0) {
-            if (gbDirectConnect == 0)
-                NormalDialog(gSetupModemGameHelp[helpIndex], SETUP_HELP_DIALOG,
+            if (gbDirectConnect != 0)
+                NormalDialog(gSetupDCGameHelp[helpIndex], SETUP_HELP_DIALOG,
                              -1, -1, -1, 0, -1, 0, -1, 0);
             else
-                NormalDialog(gSetupDCGameHelp[helpIndex], SETUP_HELP_DIALOG,
+                NormalDialog(gSetupModemGameHelp[helpIndex], SETUP_HELP_DIALOG,
                              -1, -1, -1, 0, -1, 0, -1, 0);
         }
     }
     return BaseSetupHandler(message);
 }
 
-// @match-note Complete frame/CFG and help-table semantics; external relocs 8/8.
-// Revisit at 95% for delinked local jump-table identity only.
 VA(0x00412b56, 0x108)
 int SetupMultiPlayerGameHandler(struct tag_message &message)
 {
@@ -822,38 +808,34 @@ int SetupNetworkGame2Handler(struct tag_message &message)
     return BaseSetupHandler(message);
 }
 
-// @match-note 95.98%; complete help and empty deselect-switch CFG; relocs 3/3.
-// Revisit at 95% for no-effect switch label placement.
 VA(0x00412e2d, 0x14b)
 int SetupGameHandler(struct tag_message &message)
 {
     int helpIndex;
 
-    if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0 &&
-        (message.payload.widget.command == WIDGET_COMMAND_SELECT ||
-         message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
-        helpIndex = -1;
-        switch (message.payload.widget.id) {
-        case 1: helpIndex = 0; break;
-        case 2: helpIndex = 1; break;
-        case 3: helpIndex = 2; break;
-        case SETUP_DIALOG_CANCEL: helpIndex = 3; break;
+    if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0) {
+        if (message.payload.widget.command == WIDGET_COMMAND_SELECT ||
+            message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
+            helpIndex = -1;
+            switch (message.payload.widget.id) {
+            case 1: helpIndex = 0; break;
+            case 2: helpIndex = 1; break;
+            case 3: helpIndex = 2; break;
+            case SETUP_DIALOG_CANCEL: helpIndex = 3; break;
+            }
+            if (helpIndex >= 0)
+                NormalDialog(gSetupGameHelp[helpIndex], SETUP_HELP_DIALOG,
+                             -1, -1, -1, 0, -1, 0, -1, 0);
         }
-        if (helpIndex >= 0)
-            NormalDialog(gSetupGameHelp[helpIndex], SETUP_HELP_DIALOG,
-                         -1, -1, -1, 0, -1, 0, -1, 0);
     } else if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
         case WIDGET_COMMAND_DESELECT:
             switch (message.payload.widget.id) {
             case 1:
-                break;
             case 2:
-                break;
             case 3:
                 break;
             }
-            break;
         }
     }
     return BaseSetupHandler(message);
@@ -922,8 +904,6 @@ int ExpStdGameHandler(struct tag_message &message)
     return BaseSetupHandler(message);
 }
 
-// @match-note 97.22%; complete close/continue CFG and dialog semantics; relocs 6/6.
-// Revisit at 95% for handled-local compare polarity.
 VA(0x004131fd, 0xf0)
 int BaseSetupHandler(struct tag_message &message)
 {
@@ -934,10 +914,9 @@ int BaseSetupHandler(struct tag_message &message)
         switch (message.payload.widget.command) {
         case WIDGET_COMMAND_DESELECT:
             if ((message.payload.widget.id > 0 &&
-                 message.payload.widget.id < 1001) ||
+                 message.payload.widget.id <= SETUP_DIALOG_RESULT_MAX) ||
                 message.payload.widget.id == SETUP_DIALOG_CANCEL)
                 handled = 1;
-            break;
         }
     }
 
