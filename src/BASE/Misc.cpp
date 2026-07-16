@@ -16,6 +16,7 @@
 #include <BASE/textEntryWidget.h>
 #include <BASE/Misc.h>
 #include <BASE/MiscConstants.h>
+#include <BASE/MISC_TYPES.h>
 #undef HOMM2_MISC_INLINE_ICONENTRY
 #include <BASE/miscwin.h>        // this TU's own free functions + indexArray/IconEntry
 #include <SOURCE/KB.h>        // EventWindowHandler, FileError, ShutDown
@@ -42,10 +43,228 @@ DATA(0x005331c0) static int giFindMid;
 DATA(0x005331cc) static int gBlitRight;   // BlitBitmapToScreen computed blit-rect right edge
 DATA(0x005331d0) static int gBlitBottom;  // BlitBitmapToScreen computed blit-rect bottom edge
 
+// ---- initialized storage (retail RVA order) ----
+DATA(0x0051dce8) int iMemEntries = 0;
+DATA(0x0051dcec) MemEntry *gpMemEntry = 0;
+DATA(0x0051dcf0) int giTotalMemAllocated = 0;
+DATA(0x0051dcf8) unsigned char giChangeThreshold[16] = {
+    0, 1, 2, 3, 4, 6, 8, 10, 13, 16, 19, 22, 26, 31, 37, 46
+};
+DATA(0x0051dd08) int iLastSeed = 0x08156a03;
+DATA(0x0051dd0c) static char gMemEntryTag[sizeof("IME")] = "IME";
+
+// Retail emits each text operand as an independent aligned allocation. Grouping
+// them by owning workflow preserves those physical owners and their call-site
+// addends without relying on compiler literal pooling.
+DATA(0x0051dd10) static SMiscText gMiscText = {
+    {
+        { "KBAlloc    Size %d   Ptr %d   File %s  Line %d" },
+        { "Free " },
+        { "NULL POINTER" },
+        { "MemEntries Below 0" },
+        { "KBFree    Size %d   Ptr %d   File %s  Line %d" },
+        { "Bad Delete,  File '%13s'  Line % 4d, ptr %12d" },
+        { "Total Memory Leaks" },
+        { "Memory Leak,  File '%13s'  Line % 4d, ptr %12d   size %6d" },
+        { "Mem Left %dK" },
+        { "Assert statement failed in module %s, line %d.  Do you wish to abort the program?" },
+        { "Assert Failure" }
+    },
+    {
+        { "AUTO" },
+        { "AUTO" }
+    },
+    {
+        { "The Unknown Hero" },
+        { "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" }
+    },
+    {
+        { "HEROES2.CFG" },
+        { "%s" },
+        { "rb" },
+        { "" },
+        { "" }
+    },
+    {
+        { "" },
+        { MISC_REGISTRY_KEY },
+        { "Music Volume" },
+        { "Music Volume" },
+        { "Sound Volume" },
+        { "Walk Speed" },
+        { "Computer Walk Speed" },
+        { "Show Route" },
+        { "Blackout Computer" },
+        { "Sound Quality" },
+        { "Use Opera" },
+        { "Direct Connect Com Port" },
+        { "Direct Connect Baud Rate" },
+        { "Modem Com Port" },
+        { "Modem Baud Rate" },
+        { "Modem Init String" },
+        { "Unique System ID" },
+        { "Network Default Name" },
+        { "Autosave" },
+        { "Slow Video" },
+        { "Show Combat Grid" },
+        { "Show Combat Mouse Hex" },
+        { "Combat Shade Level" },
+        { "Combat Army Info Level" },
+        { "Evil Interface Usage" },
+        { "Quick Combat Level" },
+        { "Combat Speed" },
+        { "Auto Combat Use Spells" },
+        { "First Map Offset" },
+        { "Current Map Offset" },
+        { "Show Object Boxes" },
+        { "Editor Screen Animation" },
+        { "Editor Palette Cycling" },
+        { "Main Game Show Menu" },
+        { "Main Game X" },
+        { "Main Game Y" },
+        { "Main Game Width" },
+        { "Main Game Height" },
+        { "Main Game Full Screen" },
+        { "Main Game Color Mouse Cursor" },
+        { "Editor Show Menu" },
+        { "Editor X" },
+        { "Editor Y" },
+        { "Editor Width" },
+        { "Editor Height" },
+        { "Editor Full Screen" },
+        { "Editor Color Mouse Cursor" },
+        { "AppPath" },
+        { "" },
+        { "CDDrive" },
+        { "" }
+    },
+    {
+        { "RMT%sRL.BIN" },
+        { "RMT%sRC.BIN" },
+        { "RMT%sRD.BIN" },
+        { "RMT%sSL.BIN" },
+        { "RMT%sSC.BIN" },
+        { "RMT%sSD.BIN" }
+    },
+    {
+        { "HEROES2.CFG" },
+        { "%s" }
+    },
+    {
+        { "" },
+        { MISC_REGISTRY_KEY },
+        { "Music Volume" },
+        { "Sound Volume" },
+        { "Walk Speed" },
+        { "Computer Walk Speed" },
+        { "Show Route" },
+        { "Blackout Computer" },
+        { "Sound Quality" },
+        { "Use Opera" },
+        { "Direct Connect Com Port" },
+        { "Direct Connect Baud Rate" },
+        { "Modem Com Port" },
+        { "Modem Baud Rate" },
+        { "Modem Init String" },
+        { "Unique System ID" },
+        { "Network Default Name" },
+        { "Autosave" },
+        { "Slow Video" },
+        { "Show Combat Grid" },
+        { "Show Combat Mouse Hex" },
+        { "Combat Shade Level" },
+        { "Combat Army Info Level" },
+        { "Evil Interface Usage" },
+        { "Quick Combat Level" },
+        { "Combat Speed" },
+        { "Auto Combat Use Spells" },
+        { "First Map Offset" },
+        { "Current Map Offset" },
+        { "Show Object Boxes" },
+        { "Editor Screen Animation" },
+        { "Editor Palette Cycling" },
+        { "Main Game Show Menu" },
+        { "Main Game X" },
+        { "Main Game Y" },
+        { "Main Game Width" },
+        { "Main Game Height" },
+        { "Main Game Full Screen" },
+        { "Main Game Color Mouse Cursor" },
+        { "Editor Show Menu" },
+        { "Editor X" },
+        { "Editor Y" },
+        { "Editor Width" },
+        { "Editor Height" },
+        { "Editor Full Screen" },
+        { "Editor Color Mouse Cursor" }
+    },
+    {
+        { "A:\\" },
+        { ".\\DATA\\HEROES2.AGG" },
+        { "%s\\heroes2\\anim\\voy24.smk" },
+        { "%s" },
+        { "open %c: type cdaudio alias CD" },
+        { "info CD UPC wait" },
+        { "close CD" },
+        { "%c:\\heroes2\\anim\\voy24.smk" },
+        { MISC_REGISTRY_KEY },
+        { "%c:" },
+        { "CDDrive" },
+        { "%c:%s" }
+    },
+    {
+        { "KB.LOG" },
+        { "===========New Log==========" },
+        { "\n" },
+        { "at+" },
+        { "KB.LOG" },
+        { "\n" },
+        { "%s : % 8d % 8d % 8d % 8d % 8d % 8d % 8d" },
+        { "%s : % 8d % 8d % 8d % 8d % 8d % 8d" },
+        { "%s : % 8d % 8d % 8d % 8d % 8d" },
+        { "%s : % 8d % 8d % 8d % 8d" },
+        { "%s : % 8d % 8d % 8d" },
+        { "%s : % 8d % 8d" },
+        { "%s : % 8d" }
+    },
+    {
+        { MISC_PCX_SOURCE_FILE },
+        { MISC_PCX_SOURCE_FILE },
+        { MISC_PCX_SOURCE_FILE },
+        { MISC_PCX_SOURCE_FILE }
+    },
+    {
+        { "r+b" }
+    },
+    {
+        { "advmice.mse" },
+        { "" },
+        { "evntwin%d.bin" },
+        { "" },
+        { "buybuild.icn" },
+        { "bigfont.fnt" },
+        { "" }
+    }
+};
+
+// @data-layout-note Retail initialized storage is the contiguous contribution
+// 0x11dce8..0x11e94c (0xc64). The rebuilt section has the same extent and SHA-256
+// 3a271f06aa947cc55114c53bb6d01778a45127f3e381ca1736ba0ebf00ff7e13. Its five
+// public owners occupy offsets 0x0..0x20, gMemEntryTag is the real allocation at
+// +0x24, and gMiscText owns the remaining typed text record at +0x28. All 274
+// initialized/BSS target occurrences and owner-relative addends match retail as
+// a multiset; 272 also align in relocation order. BlitBitmapToScreen interleaves
+// two gBlitRight/gBlitBottom loads with gpMouseManager differently, as documented
+// at that function, but retains the exact six blit-global targets and zero addends.
+// The candidate owns the same nine BSS objects in 0x24 bytes, but VC 4.2 currently
+// packs them in a different internal order; retail's NB09 contribution is 0x28 and
+// includes four unowned tail bytes. Keep the DATA-proved owners and leave that as a
+// final-link packing residual rather than adding aliases, padding, or placement rules.
+
 VA(0x004c3d10, 0x58)
 void InitMemEntry(void)
 {
-    LogInt("IME", iMemEntries, -999, -999, -999, -999, -999, -999);
+    LogInt(gMemEntryTag, iMemEntries, -999, -999, -999, -999, -999, -999);
     gpMemEntry = static_cast<MemEntry *>(malloc(2000 * sizeof(MemEntry)));
     for (int i = 0; i < 2000; ++i)
         gpMemEntry[i].used = 0;
@@ -68,7 +287,7 @@ void *BaseAlloc(unsigned int size, char *originalFile, int originalLine)
     if (size == 0)
         return 0;
     if (gpMemEntry == 0) {
-        LogInt("IME", iMemEntries, -999, -999, -999, -999, -999, -999);
+        LogInt(gMemEntryTag, iMemEntries, -999, -999, -999, -999, -999, -999);
         gpMemEntry = static_cast<MemEntry *>(malloc(2000 * sizeof(MemEntry)));
         for (int initIndex = 0; initIndex < 2000; ++initIndex)
             gpMemEntry[initIndex].used = 0;
@@ -92,14 +311,14 @@ void *BaseAlloc(unsigned int size, char *originalFile, int originalLine)
         }
     }
     if (giDebugLevel == 4) {
-        sprintf(text, "KBAlloc    Size %d   Ptr %d   File %s  Line %d", size, ptr,
+        sprintf(text, gMiscText.memory.allocationFormat.text, size, ptr,
                 originalFile, originalLine);
         if (giDebugLevel >= 2) {
-            FILE *logFile = fopen("KB.LOG", "at+");
+            FILE *logFile = fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
             if (logFile != 0) {
                 strcpy(logText, text);
                 *reinterpret_cast<unsigned short *>(logText + strlen(logText)) =
-                    *reinterpret_cast<const unsigned short *>("\n");
+                    *reinterpret_cast<const unsigned short *>(gMiscText.log.appendNewline.text);
                 fputs(logText, logFile);
                 fclose(logFile);
                 if (giDebugLevel == 4)
@@ -124,20 +343,21 @@ void BaseFree(void *ptr, char *originalFile, int originalLine)
     char logText[500];
     char text[200];
     if (gpMemEntry == 0) {
-        LogInt("IME", iMemEntries, -999, -999, -999, -999, -999, -999);
+        LogInt(gMemEntryTag, iMemEntries, -999, -999, -999, -999, -999, -999);
         gpMemEntry = static_cast<MemEntry *>(malloc(2000 * sizeof(MemEntry)));
         for (int initIndex = 0; initIndex < 2000; ++initIndex)
             gpMemEntry[initIndex].used = 0;
     }
     if (giDebugLevel == 4)
-        LogInt("Free ", reinterpret_cast<int>(ptr), -999, -999, -999, -999, -999, -999);
+        LogInt(gMiscText.memory.freeLabel.text, reinterpret_cast<int>(ptr), -999, -999, -999,
+               -999, -999, -999);
     if (ptr == 0) {
         if (giDebugLevel >= 2) {
-            FILE *logFile = fopen("KB.LOG", "at+");
+            FILE *logFile = fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
             if (logFile != 0) {
-                strcpy(logText, "NULL POINTER");
+                strcpy(logText, gMiscText.memory.nullPointer.text);
                 *reinterpret_cast<unsigned short *>(logText + strlen(logText)) =
-                    *reinterpret_cast<const unsigned short *>("\n");
+                    *reinterpret_cast<const unsigned short *>(gMiscText.log.appendNewline.text);
                 fputs(logText, logFile);
                 fclose(logFile);
                 if (giDebugLevel == 4)
@@ -148,20 +368,23 @@ void BaseFree(void *ptr, char *originalFile, int originalLine)
     }
     --iMemEntries;
     if (iMemEntries < 0)
-        LogInt("MemEntries Below 0", iMemEntries, -999, -999, -999, -999, -999, -999);
+        LogInt(gMiscText.memory.entryUnderflow.text, iMemEntries, -999, -999, -999, -999,
+               -999, -999);
     int entryIndex;
     for (entryIndex = 0; entryIndex < 2000; ++entryIndex) {
         if (gpMemEntry[entryIndex].ptr == ptr) {
             if (giDebugLevel == 4) {
-                sprintf(text, "KBFree    Size %d   Ptr %d   File %s  Line %d",
+                sprintf(text, gMiscText.memory.freeFormat.text,
                         gpMemEntry[entryIndex].size, ptr, gpMemEntry[entryIndex].file,
                         gpMemEntry[entryIndex].line);
                 if (giDebugLevel >= 2) {
-                    FILE *logFile = fopen("KB.LOG", "at+");
+                    FILE *logFile = fopen(gMiscText.log.appendFilename.text,
+                                          gMiscText.log.appendMode.text);
                     if (logFile != 0) {
                         strcpy(logText, text);
                         *reinterpret_cast<unsigned short *>(logText + strlen(logText)) =
-                            *reinterpret_cast<const unsigned short *>("\n");
+                            *reinterpret_cast<const unsigned short *>(
+                                gMiscText.log.appendNewline.text);
                         fputs(logText, logFile);
                         fclose(logFile);
                         if (giDebugLevel == 4)
@@ -175,14 +398,14 @@ void BaseFree(void *ptr, char *originalFile, int originalLine)
         }
     }
     if (entryIndex < 99999) {
-        sprintf(gText, "Bad Delete,  File '%13s'  Line % 4d, ptr %12d", originalFile,
+        sprintf(gText, gMiscText.memory.badDeleteFormat.text, originalFile,
                 originalLine, ptr);
         if (giDebugLevel >= 2) {
-            FILE *logFile = fopen("KB.LOG", "at+");
+            FILE *logFile = fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
             if (logFile != 0) {
                 strcpy(logText, gText);
                 *reinterpret_cast<unsigned short *>(logText + strlen(logText)) =
-                    *reinterpret_cast<const unsigned short *>("\n");
+                    *reinterpret_cast<const unsigned short *>(gMiscText.log.appendNewline.text);
                 fputs(logText, logFile);
                 fclose(logFile);
                 if (giDebugLevel == 4)
@@ -208,20 +431,23 @@ void PrintMemoryLeaks(void)
 {
     char logText[500];
     if (giDebugLevel >= 1 && gpMemEntry != 0) {
-        LogInt("Total Memory Leaks", iMemEntries, -999, -999, -999, -999, -999, -999);
+        LogInt(gMiscText.memory.leakCountLabel.text, iMemEntries, -999, -999, -999, -999,
+               -999, -999);
         int entryIndex = 0;
         do {
             if (gpMemEntry[entryIndex].used != 0) {
-                sprintf(gText, "Memory Leak,  File '%13s'  Line % 4d, ptr %12d   size %6d",
+                sprintf(gText, gMiscText.memory.leakFormat.text,
                         gpMemEntry[entryIndex].file, gpMemEntry[entryIndex].line,
                         reinterpret_cast<int>(gpMemEntry[entryIndex].ptr),
                         gpMemEntry[entryIndex].size);
                 if (giDebugLevel >= 2) {
-                    FILE *logFile = fopen("KB.LOG", "at+");
+                    FILE *logFile = fopen(gMiscText.log.appendFilename.text,
+                                          gMiscText.log.appendMode.text);
                     if (logFile != 0) {
                         strcpy(logText, gText);
                         *reinterpret_cast<unsigned short *>(logText + strlen(logText)) =
-                            *reinterpret_cast<const unsigned short *>("\n");
+                            *reinterpret_cast<const unsigned short *>(
+                                gMiscText.log.appendNewline.text);
                         fputs(logText, logFile);
                         fclose(logFile);
                         if (giDebugLevel == 4)
@@ -237,7 +463,7 @@ void PrintMemoryLeaks(void)
 VA(0x004c4450, 0x91)
 void ShowMemoryStatus(void)
 {
-    sprintf(gText, "Mem Left %dK", 0x3ea2);
+    sprintf(gText, gMiscText.memory.memoryStatusFormat.text, 0x3ea2);
     int savedDebugLevel = giDebugLevel;
     giDebugLevel = 9;
     FillBitmapArea(gpWindowManager->m_screen, 0, 0x1cc, 0x280, 0x14, 0);
@@ -408,8 +634,8 @@ void ProcessAssert(int condition, char *file, int line)
     if (condition == 0) {
         gpMouseManager->SetColorMice(0);
         SetFullScreenStatus(0);
-        sprintf(gText, "Assert statement failed in module %s, line %d.  Do you wish to abort the program?", file, line);
-        if (MessageBoxA(hwndApp, gText, "Assert Failure", 0x14) != 7) {
+        sprintf(gText, gMiscText.memory.assertMessage.text, file, line);
+        if (MessageBoxA(hwndApp, gText, gMiscText.memory.assertTitle.text, 0x14) != 7) {
             ShutDown(0);
         }
     }
@@ -477,8 +703,8 @@ VA(0x004c4930, 0x6c)
 void SetInstallDefaults(void)
 {
     memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
-    strcpy(gConfig.autoLoadName, "AUTO");
-    strcpy(gConfig.autoSaveName, "AUTO");
+    strcpy(gConfig.autoLoadName, gMiscText.installDefaults.autoLoadName.text);
+    strcpy(gConfig.autoSaveName, gMiscText.installDefaults.autoSaveName.text);
     gConfig.musicSource = CONFIG_MUSIC_SOURCE_CD;
 }
 
@@ -539,17 +765,17 @@ void SetGameDefaults(void)
     gConfig.slowVideo = 3;
     gConfig.computerWalkSpeed = 3;
     gConfig.walkSpeed = 2;
-    strcpy(gConfig.networkDefaultName, "The Unknown Hero");
+    strcpy(gConfig.networkDefaultName, gMiscText.gameDefaults.unknownHeroName.text);
     *reinterpret_cast<int *>(gConfig.uniqueSystemID) = 0;
     int idSeed = rand() % MISC_UNIQUE_ID_RANDOM_MODULUS + 1;
     idSeed += KBTickCount();
     gConfig.uniqueSystemID[2] =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[idSeed % MISC_UNIQUE_ID_ALPHANUMERIC_COUNT];
+        gMiscText.gameDefaults.uniqueIdAlphabet.text[idSeed % MISC_UNIQUE_ID_ALPHANUMERIC_COUNT];
     int idAdd = rand() % MISC_UNIQUE_ID_RANDOM_MODULUS + 1;
     idAdd += KBTickCount();
     idSeed += idAdd;
     gConfig.uniqueSystemID[1] =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[idSeed % MISC_UNIQUE_ID_ALPHANUMERIC_COUNT];
+        gMiscText.gameDefaults.uniqueIdAlphabet.text[idSeed % MISC_UNIQUE_ID_ALPHANUMERIC_COUNT];
     idAdd = rand() % MISC_UNIQUE_ID_RANDOM_MODULUS + 1;
     idAdd += KBTickCount();
     idSeed += idAdd;
@@ -560,14 +786,14 @@ void SetGameDefaults(void)
 VA(0x004c4b60, 0x13f)
 void ReadPrefsFromFile(void)
 {
-    sprintf(gText, "%s", "HEROES2.CFG");
+    sprintf(gText, gMiscText.readFile.stringFormat.text, gMiscText.readFile.configFilename.text);
     if (_access(gText, 0) == -1) {
         memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
-        strcpy(gConfig.autoLoadName, "AUTO");
-        strcpy(gConfig.autoSaveName, "AUTO");
+        strcpy(gConfig.autoLoadName, gMiscText.installDefaults.autoLoadName.text);
+        strcpy(gConfig.autoSaveName, gMiscText.installDefaults.autoSaveName.text);
         gConfig.musicSource = CONFIG_MUSIC_SOURCE_CD;
     } else {
-        FILE *f = fopen(gText, "rb");
+        FILE *f = fopen(gText, gMiscText.readFile.binaryMode.text);
         if (f == 0)
             FileError(gText);
         fread(&gConfig, CONFIG_PERSISTED_SIZE, 1, f);
@@ -579,8 +805,8 @@ void ReadPrefsFromFile(void)
     UpdateSystemOptionsMenu();
     WritePrefsToRegistry();
 skipDefaults:
-    strcpy(gcRegCDRomPath, "");
-    strcpy(gcRegAppPath, "");
+    strcpy(gcRegCDRomPath, gMiscText.readFile.cdRomPathDefault.text);
+    strcpy(gcRegAppPath, gMiscText.readFile.appPathDefault.text);
 }
 
 // Byte counts the registry string values are written with (hard-coded in retail; not the
@@ -598,18 +824,18 @@ void ReadPrefsFromRegistry(void)
     char szKey[100];
     char szScratch[100];
 
-    strcpy(szScratch, "");
-    strcpy(szKey, "SOFTWARE\\New World Computing\\Heroes of Might and Magic 2\\1.0");
+    strcpy(szScratch, gMiscText.readRegistry.scratchDefault.text);
+    strcpy(szKey, gMiscText.readRegistry.key.text);
     hKey = 0;
     if (RegCreateKeyA(HKEY_LOCAL_MACHINE, szKey, &hKey) != 0)
         return;
     dwSize = 4;
-    if (RegQueryValueExA(hKey, "Music Volume", 0, &dwType,
+    if (RegQueryValueExA(hKey, gMiscText.readRegistry.musicVolumeProbe.text, 0, &dwType,
                          reinterpret_cast<unsigned char *>(&gConfig.musicVolume), &dwSize) != 0) {
         memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
         memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
-        strcpy(gConfig.autoLoadName, "AUTO");
-        strcpy(gConfig.autoSaveName, "AUTO");
+        strcpy(gConfig.autoLoadName, gMiscText.installDefaults.autoLoadName.text);
+        strcpy(gConfig.autoSaveName, gMiscText.installDefaults.autoSaveName.text);
         gConfig.musicSource = CONFIG_MUSIC_SOURCE_CD;
         SetGameDefaults();
         RegCloseKey(hKey);
@@ -617,62 +843,62 @@ void ReadPrefsFromRegistry(void)
         WritePrefsToRegistry();
         return;
     }
-    RegQueryValueExA(hKey, "Music Volume", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.musicVolume), &dwSize);
-    RegQueryValueExA(hKey, "Sound Volume", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.soundVolume), &dwSize);
-    RegQueryValueExA(hKey, "Walk Speed", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.walkSpeed), &dwSize);
-    RegQueryValueExA(hKey, "Computer Walk Speed", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.computerWalkSpeed), &dwSize);
-    RegQueryValueExA(hKey, "Show Route", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.showRoute), &dwSize);
-    RegQueryValueExA(hKey, "Blackout Computer", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.blackoutComputer), &dwSize);
-    RegQueryValueExA(hKey, "Sound Quality", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.musicSource), &dwSize);
-    RegQueryValueExA(hKey, "Use Opera", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.useOpera), &dwSize);
-    RegQueryValueExA(hKey, "Direct Connect Com Port", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.comPort[CONFIG_CONNECTION_DIRECT]), &dwSize);
-    RegQueryValueExA(hKey, "Direct Connect Baud Rate", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.baudRate[CONFIG_CONNECTION_DIRECT]), &dwSize);
-    RegQueryValueExA(hKey, "Modem Com Port", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.comPort[CONFIG_CONNECTION_MODEM]), &dwSize);
-    RegQueryValueExA(hKey, "Modem Baud Rate", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.baudRate[CONFIG_CONNECTION_MODEM]), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.musicVolume.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.musicVolume), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.soundVolume.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.soundVolume), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.walkSpeed.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.walkSpeed), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.computerWalkSpeed.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.computerWalkSpeed), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.showRoute.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.showRoute), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.blackoutComputer.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.blackoutComputer), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.soundQuality.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.musicSource), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.useOpera.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.useOpera), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.directComPort.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.comPort[CONFIG_CONNECTION_DIRECT]), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.directBaudRate.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.baudRate[CONFIG_CONNECTION_DIRECT]), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.modemComPort.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.comPort[CONFIG_CONNECTION_MODEM]), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.modemBaudRate.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.baudRate[CONFIG_CONNECTION_MODEM]), &dwSize);
     dwSize = 0x63;
-    RegQueryValueExA(hKey, "Modem Init String", 0, &dwType, reinterpret_cast<unsigned char *>(gConfig.modemInitString), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.modemInitString.text, 0, &dwType, reinterpret_cast<unsigned char *>(gConfig.modemInitString), &dwSize);
     dwSize = 4;
-    RegQueryValueExA(hKey, "Unique System ID", 0, &dwType, reinterpret_cast<unsigned char *>(gConfig.uniqueSystemID), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.uniqueSystemId.text, 0, &dwType, reinterpret_cast<unsigned char *>(gConfig.uniqueSystemID), &dwSize);
     // Retail relocation at function +0x2f6 resolves to gConfig +0x125, the terminator byte after
     // this four-byte ID, rather than the unrelated modem string at gConfig +0x110.
     gConfig.uniqueSystemID[3] = 0;
     dwSize = 0x1f;
-    RegQueryValueExA(hKey, "Network Default Name", 0, &dwType, reinterpret_cast<unsigned char *>(gConfig.networkDefaultName), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.networkDefaultName.text, 0, &dwType, reinterpret_cast<unsigned char *>(gConfig.networkDefaultName), &dwSize);
     dwSize = 4;
-    RegQueryValueExA(hKey, "Autosave", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.autosave), &dwSize);
-    RegQueryValueExA(hKey, "Slow Video", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.slowVideo), &dwSize);
-    RegQueryValueExA(hKey, "Show Combat Grid", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.showCombatGrid), &dwSize);
-    RegQueryValueExA(hKey, "Show Combat Mouse Hex", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.showCombatMouseHex), &dwSize);
-    RegQueryValueExA(hKey, "Combat Shade Level", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.combatShadeLevel), &dwSize);
-    RegQueryValueExA(hKey, "Combat Army Info Level", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.combatArmyInfoLevel), &dwSize);
-    RegQueryValueExA(hKey, "Evil Interface Usage", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.evilInterfaceUsage), &dwSize);
-    RegQueryValueExA(hKey, "Quick Combat Level", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.quickCombatLevel), &dwSize);
-    RegQueryValueExA(hKey, "Combat Speed", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.combatSpeed), &dwSize);
-    RegQueryValueExA(hKey, "Auto Combat Use Spells", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.autoCombatUseSpells), &dwSize);
-    RegQueryValueExA(hKey, "First Map Offset", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.firstMapOffset), &dwSize);
-    RegQueryValueExA(hKey, "Current Map Offset", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.currentMapOffset), &dwSize);
-    RegQueryValueExA(hKey, "Show Object Boxes", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.showObjectBoxes), &dwSize);
-    RegQueryValueExA(hKey, "Editor Screen Animation", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.editorScreenAnimation), &dwSize);
-    RegQueryValueExA(hKey, "Editor Palette Cycling", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.editorPaletteCycling), &dwSize);
-    RegQueryValueExA(hKey, "Main Game Show Menu", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].showMenu), &dwSize);
-    RegQueryValueExA(hKey, "Main Game X", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].x), &dwSize);
-    RegQueryValueExA(hKey, "Main Game Y", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].y), &dwSize);
-    RegQueryValueExA(hKey, "Main Game Width", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].width), &dwSize);
-    RegQueryValueExA(hKey, "Main Game Height", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].height), &dwSize);
-    RegQueryValueExA(hKey, "Main Game Full Screen", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].fullScreen), &dwSize);
-    RegQueryValueExA(hKey, "Main Game Color Mouse Cursor", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].colorMouseCursor), &dwSize);
-    RegQueryValueExA(hKey, "Editor Show Menu", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].showMenu), &dwSize);
-    RegQueryValueExA(hKey, "Editor X", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].x), &dwSize);
-    RegQueryValueExA(hKey, "Editor Y", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].y), &dwSize);
-    RegQueryValueExA(hKey, "Editor Width", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].width), &dwSize);
-    RegQueryValueExA(hKey, "Editor Height", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].height), &dwSize);
-    RegQueryValueExA(hKey, "Editor Full Screen", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].fullScreen), &dwSize);
-    RegQueryValueExA(hKey, "Editor Color Mouse Cursor", 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].colorMouseCursor), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.autosave.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.autosave), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.slowVideo.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.slowVideo), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.showCombatGrid.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.showCombatGrid), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.showCombatMouseHex.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.showCombatMouseHex), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.combatShadeLevel.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.combatShadeLevel), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.combatArmyInfoLevel.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.combatArmyInfoLevel), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.evilInterfaceUsage.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.evilInterfaceUsage), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.quickCombatLevel.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.quickCombatLevel), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.combatSpeed.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.combatSpeed), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.autoCombatUseSpells.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.autoCombatUseSpells), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.firstMapOffset.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.firstMapOffset), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.currentMapOffset.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.currentMapOffset), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.showObjectBoxes.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.showObjectBoxes), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.editorScreenAnimation.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.editorScreenAnimation), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.editorPaletteCycling.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.editorPaletteCycling), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.mainGameShowMenu.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].showMenu), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.mainGameX.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].x), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.mainGameY.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].y), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.mainGameWidth.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].width), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.mainGameHeight.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].height), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.mainGameFullScreen.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].fullScreen), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.mainGameColorMouseCursor.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].colorMouseCursor), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.editorShowMenu.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].showMenu), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.editorX.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].x), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.editorY.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].y), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.editorWidth.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].width), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.editorHeight.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].height), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.editorFullScreen.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].fullScreen), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.editorColorMouseCursor.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].colorMouseCursor), &dwSize);
     dwSize = 0x63;
-    if (RegQueryValueExA(hKey, "AppPath", 0, &dwType, reinterpret_cast<unsigned char *>(gcRegAppPath), &dwSize) != 0)
-        strcpy(gcRegAppPath, "");
-    if (RegQueryValueExA(hKey, "CDDrive", 0, &dwType, reinterpret_cast<unsigned char *>(gcRegCDRomPath), &dwSize) != 0)
-        strcpy(gcRegCDRomPath, "");
+    if (RegQueryValueExA(hKey, gMiscText.readRegistry.appPath.text, 0, &dwType, reinterpret_cast<unsigned char *>(gcRegAppPath), &dwSize) != 0)
+        strcpy(gcRegAppPath, gMiscText.readRegistry.appPathDefault.text);
+    if (RegQueryValueExA(hKey, gMiscText.readRegistry.cdDrive.text, 0, &dwType, reinterpret_cast<unsigned char *>(gcRegCDRomPath), &dwSize) != 0)
+        strcpy(gcRegCDRomPath, gMiscText.readRegistry.cdDriveDefault.text);
     RegCloseKey(hKey);
     // Clamp the saved window geometry to sane defaults / on-screen bounds.
     if (gConfig.gfx[giCurExe].width <= 0)
@@ -694,12 +920,12 @@ void ReadPrefs(void)
 {
     memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
     ReadPrefsFromRegistry();
-    sprintf(gConfig.rmtRLName, "RMT%sRL.BIN", gConfig.uniqueSystemID);
-    sprintf(gConfig.rmtRCName, "RMT%sRC.BIN", gConfig.uniqueSystemID);
-    sprintf(gConfig.rmtRDName, "RMT%sRD.BIN", gConfig.uniqueSystemID);
-    sprintf(gConfig.rmtSLName, "RMT%sSL.BIN", gConfig.uniqueSystemID);
-    sprintf(gConfig.rmtSCName, "RMT%sSC.BIN", gConfig.uniqueSystemID);
-    sprintf(gConfig.rmtSDName, "RMT%sSD.BIN", gConfig.uniqueSystemID);
+    sprintf(gConfig.rmtRLName, gMiscText.remoteNames.remoteLocal.text, gConfig.uniqueSystemID);
+    sprintf(gConfig.rmtRCName, gMiscText.remoteNames.remoteCenter.text, gConfig.uniqueSystemID);
+    sprintf(gConfig.rmtRDName, gMiscText.remoteNames.remoteRight.text, gConfig.uniqueSystemID);
+    sprintf(gConfig.rmtSLName, gMiscText.remoteNames.serverLocal.text, gConfig.uniqueSystemID);
+    sprintf(gConfig.rmtSCName, gMiscText.remoteNames.serverCenter.text, gConfig.uniqueSystemID);
+    sprintf(gConfig.rmtSDName, gMiscText.remoteNames.serverRight.text, gConfig.uniqueSystemID);
 }
 
 VA(0x004c5500, 0x6a)
@@ -712,7 +938,7 @@ void WritePrefsToFile(void)
         *p = 0;
         p++;
     }
-    sprintf(gText, "%s", "HEROES2.CFG");
+    sprintf(gText, gMiscText.writeFile.stringFormat.text, gMiscText.writeFile.configFilename.text);
     int fd = _open(gText, 0x8301, 0x80);
     if (fd != -1) {
         _write(fd, &gConfig, CONFIG_PERSISTED_SIZE);
@@ -727,55 +953,55 @@ void WritePrefsToRegistry(void)
     char szKey[100];
     char szScratch[100];
 
-    strcpy(szScratch, "");
-    strcpy(szKey, "SOFTWARE\\New World Computing\\Heroes of Might and Magic 2\\1.0");
+    strcpy(szScratch, gMiscText.writeRegistry.scratchDefault.text);
+    strcpy(szKey, gMiscText.writeRegistry.key.text);
     hKey = 0;
     if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, szKey, 0, KEY_ALL_ACCESS, &hKey) != 0)
         return;
-    RegSetValueExA(hKey, "Music Volume", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.musicVolume), 4);
-    RegSetValueExA(hKey, "Sound Volume", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.soundVolume), 4);
-    RegSetValueExA(hKey, "Walk Speed", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.walkSpeed), 4);
-    RegSetValueExA(hKey, "Computer Walk Speed", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.computerWalkSpeed), 4);
-    RegSetValueExA(hKey, "Show Route", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.showRoute), 4);
-    RegSetValueExA(hKey, "Blackout Computer", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.blackoutComputer), 4);
-    RegSetValueExA(hKey, "Sound Quality", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.musicSource), 4);
-    RegSetValueExA(hKey, "Use Opera", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.useOpera), 4);
-    RegSetValueExA(hKey, "Direct Connect Com Port", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.comPort[CONFIG_CONNECTION_DIRECT]), 4);
-    RegSetValueExA(hKey, "Direct Connect Baud Rate", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.baudRate[CONFIG_CONNECTION_DIRECT]), 4);
-    RegSetValueExA(hKey, "Modem Com Port", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.comPort[CONFIG_CONNECTION_MODEM]), 4);
-    RegSetValueExA(hKey, "Modem Baud Rate", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.baudRate[CONFIG_CONNECTION_MODEM]), 4);
-    RegSetValueExA(hKey, "Modem Init String", 0, REG_SZ, reinterpret_cast<unsigned char *>(gConfig.modemInitString), REG_MODEM_INIT_STRING_SIZE);
-    RegSetValueExA(hKey, "Unique System ID", 0, REG_SZ, reinterpret_cast<unsigned char *>(gConfig.uniqueSystemID), REG_UNIQUE_SYSTEM_ID_SIZE);
-    RegSetValueExA(hKey, "Network Default Name", 0, REG_SZ, reinterpret_cast<unsigned char *>(gConfig.networkDefaultName), REG_NETWORK_DEFAULT_NAME_SIZE);
-    RegSetValueExA(hKey, "Autosave", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.autosave), 4);
-    RegSetValueExA(hKey, "Slow Video", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.slowVideo), 4);
-    RegSetValueExA(hKey, "Show Combat Grid", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.showCombatGrid), 4);
-    RegSetValueExA(hKey, "Show Combat Mouse Hex", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.showCombatMouseHex), 4);
-    RegSetValueExA(hKey, "Combat Shade Level", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.combatShadeLevel), 4);
-    RegSetValueExA(hKey, "Combat Army Info Level", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.combatArmyInfoLevel), 4);
-    RegSetValueExA(hKey, "Evil Interface Usage", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.evilInterfaceUsage), 4);
-    RegSetValueExA(hKey, "Quick Combat Level", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.quickCombatLevel), 4);
-    RegSetValueExA(hKey, "Combat Speed", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.combatSpeed), 4);
-    RegSetValueExA(hKey, "Auto Combat Use Spells", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.autoCombatUseSpells), 4);
-    RegSetValueExA(hKey, "First Map Offset", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.firstMapOffset), 4);
-    RegSetValueExA(hKey, "Current Map Offset", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.currentMapOffset), 4);
-    RegSetValueExA(hKey, "Show Object Boxes", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.showObjectBoxes), 4);
-    RegSetValueExA(hKey, "Editor Screen Animation", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.editorScreenAnimation), 4);
-    RegSetValueExA(hKey, "Editor Palette Cycling", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.editorPaletteCycling), 4);
-    RegSetValueExA(hKey, "Main Game Show Menu", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].showMenu), 4);
-    RegSetValueExA(hKey, "Main Game X", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].x), 4);
-    RegSetValueExA(hKey, "Main Game Y", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].y), 4);
-    RegSetValueExA(hKey, "Main Game Width", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].width), 4);
-    RegSetValueExA(hKey, "Main Game Height", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].height), 4);
-    RegSetValueExA(hKey, "Main Game Full Screen", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].fullScreen), 4);
-    RegSetValueExA(hKey, "Main Game Color Mouse Cursor", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].colorMouseCursor), 4);
-    RegSetValueExA(hKey, "Editor Show Menu", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].showMenu), 4);
-    RegSetValueExA(hKey, "Editor X", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].x), 4);
-    RegSetValueExA(hKey, "Editor Y", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].y), 4);
-    RegSetValueExA(hKey, "Editor Width", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].width), 4);
-    RegSetValueExA(hKey, "Editor Height", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].height), 4);
-    RegSetValueExA(hKey, "Editor Full Screen", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].fullScreen), 4);
-    RegSetValueExA(hKey, "Editor Color Mouse Cursor", 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].colorMouseCursor), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.musicVolume.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.musicVolume), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.soundVolume.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.soundVolume), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.walkSpeed.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.walkSpeed), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.computerWalkSpeed.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.computerWalkSpeed), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.showRoute.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.showRoute), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.blackoutComputer.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.blackoutComputer), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.soundQuality.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.musicSource), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.useOpera.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.useOpera), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.directComPort.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.comPort[CONFIG_CONNECTION_DIRECT]), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.directBaudRate.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.baudRate[CONFIG_CONNECTION_DIRECT]), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.modemComPort.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.comPort[CONFIG_CONNECTION_MODEM]), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.modemBaudRate.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.baudRate[CONFIG_CONNECTION_MODEM]), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.modemInitString.text, 0, REG_SZ, reinterpret_cast<unsigned char *>(gConfig.modemInitString), REG_MODEM_INIT_STRING_SIZE);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.uniqueSystemId.text, 0, REG_SZ, reinterpret_cast<unsigned char *>(gConfig.uniqueSystemID), REG_UNIQUE_SYSTEM_ID_SIZE);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.networkDefaultName.text, 0, REG_SZ, reinterpret_cast<unsigned char *>(gConfig.networkDefaultName), REG_NETWORK_DEFAULT_NAME_SIZE);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.autosave.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.autosave), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.slowVideo.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.slowVideo), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.showCombatGrid.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.showCombatGrid), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.showCombatMouseHex.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.showCombatMouseHex), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.combatShadeLevel.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.combatShadeLevel), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.combatArmyInfoLevel.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.combatArmyInfoLevel), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.evilInterfaceUsage.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.evilInterfaceUsage), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.quickCombatLevel.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.quickCombatLevel), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.combatSpeed.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.combatSpeed), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.autoCombatUseSpells.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.autoCombatUseSpells), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.firstMapOffset.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.firstMapOffset), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.currentMapOffset.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.currentMapOffset), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.showObjectBoxes.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.showObjectBoxes), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.editorScreenAnimation.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.editorScreenAnimation), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.editorPaletteCycling.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.editorPaletteCycling), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.mainGameShowMenu.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].showMenu), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.mainGameX.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].x), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.mainGameY.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].y), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.mainGameWidth.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].width), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.mainGameHeight.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].height), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.mainGameFullScreen.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].fullScreen), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.mainGameColorMouseCursor.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].colorMouseCursor), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.editorShowMenu.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].showMenu), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.editorX.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].x), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.editorY.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].y), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.editorWidth.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].width), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.editorHeight.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].height), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.editorFullScreen.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].fullScreen), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.editorColorMouseCursor.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].colorMouseCursor), 4);
     RegCloseKey(hKey);
 }
 
@@ -789,7 +1015,7 @@ void WritePrefs(void)
 VA(0x004c5a20, 0x3c)
 int IsCDDrive(int driveIndex)
 {
-    sprintf(gText, "A:\\");
+    sprintf(gText, gMiscText.cd.rootDrive.text);
     gText[0] = gText[0] + driveIndex;
     return GetDriveTypeA(gText) == DRIVE_CDROM;
 }
@@ -812,7 +1038,7 @@ int SetupCDDrive(void)
     int attempts;
     HKEY key;
 
-    sprintf(gText, ".\\DATA\\HEROES2.AGG");
+    sprintf(gText, gMiscText.cd.dataArchive.text);
     int file = _open(gText, _O_BINARY);
     if (file == -1) {
         if (_chdir(gcRegAppPath) == -1)
@@ -828,7 +1054,7 @@ int SetupCDDrive(void)
     memset(cdDrives, 0, sizeof(cdDrives));
     for (int drive = MISC_CD_FIRST_DRIVE_INDEX; drive < MISC_CD_DRIVE_SLOT_COUNT; ++drive) {
         if (logicalDrives & (1 << drive)) {
-            sprintf(gText, "A:\\");
+            sprintf(gText, gMiscText.cd.rootDrive.text);
             gText[0] += static_cast<char>(drive);
             if (GetDriveTypeA(gText) == DRIVE_CDROM) {
                 ++cdDriveCount;
@@ -839,11 +1065,11 @@ int SetupCDDrive(void)
     count = static_cast<char>(cdDriveCount);
 
     if (strlen(gcRegCDRomPath) != 0) {
-        sprintf(gText, "%s\\heroes2\\anim\\voy24.smk", gcRegCDRomPath);
+        sprintf(gText, gMiscText.cd.configuredAnimationPath.text, gcRegCDRomPath);
         file = _open(gText, _O_BINARY);
         if (file != -1) {
             _close(file);
-            sprintf(gText + 2, "%s", gcAnimPath);
+            sprintf(gText + 2, gMiscText.cd.stringFormat.text, gcAnimPath);
             strcpy(gcAnimPath, gText);
             return MISC_CD_DRIVE_READY;
         }
@@ -855,14 +1081,14 @@ int SetupCDDrive(void)
         char command[MISC_CD_MCI_BUFFER_SIZE];
         for (;;) {
             for (int index = 0; index < count; ++index) {
-                wsprintfA(command, "open %c: type cdaudio alias CD", cdDrives[index] + 'A');
+                wsprintfA(command, gMiscText.cd.openAudioCommand.text, cdDrives[index] + 'A');
                 if (mciSendStringA(command, resultBuffer, MISC_CD_MCI_RESULT_LENGTH, 0) == 0) {
-                    wsprintfA(command, "info CD UPC wait");
+                    wsprintfA(command, gMiscText.cd.audioInfoCommand.text);
                     mciSendStringA(command, resultBuffer, MISC_CD_MCI_RESULT_LENGTH, 0);
-                    wsprintfA(command, "close CD");
+                    wsprintfA(command, gMiscText.cd.closeAudioCommand.text);
                     mciSendStringA(command, resultBuffer, MISC_CD_MCI_RESULT_LENGTH, 0);
                 }
-                sprintf(gText, "%c:\\heroes2\\anim\\voy24.smk", cdDrives[index] + 'A');
+                sprintf(gText, gMiscText.cd.driveAnimationPath.text, cdDrives[index] + 'A');
                 file = _open(gText, _O_BINARY);
                 if (file != -1) {
                     if (_lseek(file, 0, SEEK_END) != -1 &&
@@ -870,16 +1096,17 @@ int SetupCDDrive(void)
                         _read(file, resultBuffer, MISC_CD_PROBE_TRAILER_SIZE);
                     _close(file);
 
-                    strcpy(registryKey, "SOFTWARE\\New World Computing\\Heroes of Might and Magic 2\\1.0");
+                    strcpy(registryKey, gMiscText.cd.registryKey.text);
                     key = 0;
                     if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, registryKey, 0, KEY_WRITE, &key) == 0) {
-                        wsprintfA(registryPath, "%c:", cdDrives[index] + 'A');
-                        RegSetValueExA(key, "CDDrive", 0, REG_SZ,
+                        wsprintfA(registryPath, gMiscText.cd.driveFormat.text, cdDrives[index] + 'A');
+                        RegSetValueExA(key, gMiscText.cd.cdDrive.text, 0, REG_SZ,
                                        reinterpret_cast<unsigned char *>(registryPath),
                                        lstrlenA(registryPath) + 1);
                         RegCloseKey(key);
                     }
-                    sprintf(gText, "%c:%s", cdDrives[index] + 'A', gcAnimPath);
+                    sprintf(gText, gMiscText.cd.driveAndPathFormat.text,
+                            cdDrives[index] + 'A', gcAnimPath);
                     strcpy(gcAnimPath, gText);
                     return MISC_CD_DRIVE_READY;
                 }
@@ -984,11 +1211,12 @@ void LogTruncate(void)
 {
     char logText[LOG_TEXT_BUFFER_SIZE];
     if (giDebugLevel >= LOG_FILE_DEBUG_LEVEL) {
-        int fileHandle = _open("KB.LOG", _O_WRONLY | _O_CREAT | _O_TRUNC | _O_TEXT, _S_IWRITE);
+        int fileHandle = _open(gMiscText.log.truncateFilename.text,
+                               _O_WRONLY | _O_CREAT | _O_TRUNC | _O_TEXT, _S_IWRITE);
         if (fileHandle != -1) {
-            strcpy(logText, "===========New Log==========");
+            strcpy(logText, gMiscText.log.newLogLabel.text);
             *reinterpret_cast<unsigned short *>(logText + strlen(logText)) =
-                *reinterpret_cast<const unsigned short *>("\n");
+                *reinterpret_cast<const unsigned short *>(gMiscText.log.truncateNewline.text);
             _write(fileHandle, logText, strlen(logText));
             _close(fileHandle);
         }
@@ -1010,11 +1238,11 @@ void LogStr(char *text)
 {
     char logText[LOG_TEXT_BUFFER_SIZE];
     if (giDebugLevel >= LOG_FILE_DEBUG_LEVEL) {
-        FILE *logFile = fopen("KB.LOG", "at+");
+        FILE *logFile = fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
         if (logFile != 0) {
             strcpy(logText, text);
             *reinterpret_cast<unsigned short *>(logText + strlen(logText)) =
-                *reinterpret_cast<const unsigned short *>("\n");
+                *reinterpret_cast<const unsigned short *>(gMiscText.log.appendNewline.text);
             fputs(logText, logFile);
             fclose(logFile);
             if (giDebugLevel == LOG_DEBUGGER_OUTPUT_LEVEL)
@@ -1038,28 +1266,29 @@ void LogInt(char *label, int value1, int value2, int value3, int value4, int val
     char text[LOG_FORMAT_BUFFER_SIZE];
     char logText[LOG_TEXT_BUFFER_SIZE];
     if (value7 != LOG_UNUSED_VALUE)
-        sprintf(text, "%s : % 8d % 8d % 8d % 8d % 8d % 8d % 8d", label, value1, value2,
+        sprintf(text, gMiscText.log.sevenValueFormat.text, label, value1, value2,
                 value3, value4, value5, value6, value7);
     else if (value6 != LOG_UNUSED_VALUE)
-        sprintf(text, "%s : % 8d % 8d % 8d % 8d % 8d % 8d", label, value1, value2,
+        sprintf(text, gMiscText.log.sixValueFormat.text, label, value1, value2,
                 value3, value4, value5, value6);
     else if (value5 != LOG_UNUSED_VALUE)
-        sprintf(text, "%s : % 8d % 8d % 8d % 8d % 8d", label, value1, value2, value3,
+        sprintf(text, gMiscText.log.fiveValueFormat.text, label, value1, value2, value3,
                 value4, value5);
     else if (value4 != LOG_UNUSED_VALUE)
-        sprintf(text, "%s : % 8d % 8d % 8d % 8d", label, value1, value2, value3, value4);
+        sprintf(text, gMiscText.log.fourValueFormat.text, label, value1, value2, value3,
+                value4);
     else if (value3 != LOG_UNUSED_VALUE)
-        sprintf(text, "%s : % 8d % 8d % 8d", label, value1, value2, value3);
+        sprintf(text, gMiscText.log.threeValueFormat.text, label, value1, value2, value3);
     else if (value2 != LOG_UNUSED_VALUE)
-        sprintf(text, "%s : % 8d % 8d", label, value1, value2);
+        sprintf(text, gMiscText.log.twoValueFormat.text, label, value1, value2);
     else
-        sprintf(text, "%s : % 8d", label, value1);
+        sprintf(text, gMiscText.log.oneValueFormat.text, label, value1);
     if (giDebugLevel >= LOG_FILE_DEBUG_LEVEL) {
-        FILE *file = fopen("KB.LOG", "at+");
+        FILE *file = fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
         if (file != 0) {
             strcpy(logText, text);
             *reinterpret_cast<unsigned short *>(logText + strlen(logText)) =
-                *reinterpret_cast<const unsigned short *>("\n");
+                *reinterpret_cast<const unsigned short *>(gMiscText.log.appendNewline.text);
             fputs(logText, file);
             fclose(file);
             if (giDebugLevel == LOG_DEBUGGER_OUTPUT_LEVEL)
@@ -1222,7 +1451,7 @@ void CreatePCXFile(char *filename, unsigned char *pixels, int width, int height,
         return;
     _write(fileHandle, &header, sizeof(header));
     unsigned char *encodedRow = static_cast<unsigned char *>(
-        H2_ALLOC(width * 2, "I:\\Projects\\Heroes\\Prog\\BASE\\Misc.cpp", 0x5c8));
+        H2_ALLOC(width * 2, gMiscText.pcx.encodedRowAllocation.text, 0x5c8));
     for (int row = 0; row < height; ++row) {
         int sourceIndex = 0;
         unsigned int encodedSize = 0;
@@ -1246,22 +1475,22 @@ void CreatePCXFile(char *filename, unsigned char *pixels, int width, int height,
         _write(fileHandle, encodedRow, encodedSize);
         pixels += width;
     }
-    H2_FREE(encodedRow, "I:\\Projects\\Heroes\\Prog\\BASE\\Misc.cpp", 0x5f0);
+    H2_FREE(encodedRow, gMiscText.pcx.encodedRowDestruction.text, 0x5f0);
     unsigned char paletteMarker = PCX_VGA_PALETTE_MARKER;
     _write(fileHandle, &paletteMarker, 1);
     unsigned char *outputPalette = static_cast<unsigned char *>(
-        H2_ALLOC(PCX_PALETTE_BYTE_COUNT, "I:\\Projects\\Heroes\\Prog\\BASE\\Misc.cpp", 0x5f6));
+        H2_ALLOC(PCX_PALETTE_BYTE_COUNT, gMiscText.pcx.outputPaletteAllocation.text, 0x5f6));
     for (int i = 0; i < PCX_PALETTE_BYTE_COUNT; ++i)
         outputPalette[i] = paletteData[i] << PCX_COMPONENT_SCALE_SHIFT;
     _write(fileHandle, outputPalette, PCX_PALETTE_BYTE_COUNT);
-    H2_FREE(outputPalette, "I:\\Projects\\Heroes\\Prog\\BASE\\Misc.cpp", 0x5fb);
+    H2_FREE(outputPalette, gMiscText.pcx.outputPaletteDestruction.text, 0x5fb);
     _close(fileHandle);
 }
 
 VA(0x004c68c0, 0x52)
 long int FileSize(char *filename)
 {
-    FILE *file = fopen(filename, "r+b");
+    FILE *file = fopen(filename, gMiscText.file.readWriteBinaryMode.text);
     if (file == 0) {
         FileError(filename);
     }
@@ -1399,11 +1628,12 @@ void GetDataEntry(char *prompt, char *destination, int maximumLength, char *init
     int savedCursorFrame = gpMouseManager->m_cursorFrame;
     while (gpMouseManager->m_hideCount != 0)
         gpMouseManager->ShowColorPointer();
-    gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer(gMiscText.dataEntry.mouseFilename.text, 0,
+                               MOUSE_AUTO_CURSOR_TYPE);
 
     cDEDest = destination;
     iDEMaxLen = maximumLength;
-    strcpy(destination, "");
+    strcpy(destination, gMiscText.dataEntry.destinationDefault.text);
 
     int rows = bigFont->LineLength(prompt, 0xf0) * 0x10;
     if (showCancel != 0)
@@ -1414,7 +1644,7 @@ void GetDataEntry(char *prompt, char *destination, int maximumLength, char *init
     int entryY = rows * 0x2d - (showCancel != 0 ? 0x1e : 0) + 0x5f;
 
     char windowName[16];
-    sprintf(windowName, "evntwin%d.bin", rows);
+    sprintf(windowName, gMiscText.dataEntry.windowFilenameFormat.text, rows);
     DataEntryWin = new heroWindow(0xb1, 0x14, windowName);
     if (DataEntryWin == 0)
         MemError();
@@ -1428,7 +1658,7 @@ void GetDataEntry(char *prompt, char *destination, int maximumLength, char *init
 
     char entryText[100];
     if (initialText == 0)
-        initialText = "";
+        initialText = gMiscText.dataEntry.initialTextDefault.text;
     strcpy(entryText, initialText);
     message.payload.widget.id = DATA_ENTRY_TEXT_WIDGET;
     message.payload.widget.data.text = entryText;
@@ -1455,7 +1685,8 @@ void GetDataEntry(char *prompt, char *destination, int maximumLength, char *init
 
     textEntryWidget *entry = new textEntryWidget(
         0x23, static_cast<short>(entryY), 0xfb, 0x14, static_cast<short>(maximumLength),
-        destination, "bigfont.fnt", 0, "buybuild.icn", 3, 10, 0, 4, 10, 3);
+        destination, gMiscText.dataEntry.fontFilename.text, 0,
+        gMiscText.dataEntry.iconFilename.text, 3, 10, 0, 4, 10, 3);
     if (entry == 0)
         MemError();
     inBoxY = entryY + 0x17;
@@ -1469,7 +1700,8 @@ void GetDataEntry(char *prompt, char *destination, int maximumLength, char *init
         bDataEntryTime = DATA_ENTRY_PHASE_READY;
     gpWindowManager->DoDialog(DataEntryWin, DataEntryWindowHandler, 0);
     delete DataEntryWin;
-    gpMouseManager->SetPointer("", savedCursorFrame, savedCursorType);
+    gpMouseManager->SetPointer(gMiscText.dataEntry.restoredMouseFilename.text,
+                               savedCursorFrame, savedCursorType);
     gbAllowTextEntryEscape = 1;
 }
 
@@ -1544,14 +1776,7 @@ normalEvent:
     return EventWindowHandler(message);
 }
 
-// ---- globals (definitions, RVA order) ----
-DATA(0x0051dce8) int iMemEntries = 0;
-DATA(0x0051dcec) MemEntry *gpMemEntry = 0;
-DATA(0x0051dcf0) int giTotalMemAllocated = 0;
-DATA(0x0051dcf8) unsigned char giChangeThreshold[16] = {
-    0, 1, 2, 3, 4, 6, 8, 10, 13, 16, 19, 22, 26, 31, 37, 46
-};
-DATA(0x0051dd08) int iLastSeed = 0x08156a03;
+// ---- zero-fill globals (definitions, RVA order) ----
 DATA(0x005331c4) class heroWindow *DataEntryWin;
 DATA(0x005331c8) char *cDEDest;
 DATA(0x005331d4) int iDEMaxLen;
