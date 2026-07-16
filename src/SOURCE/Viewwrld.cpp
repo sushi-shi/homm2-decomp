@@ -38,8 +38,10 @@
 // Exact 0x350 frame, 0x267 extent, CFG/semantics, and 42/42 broad relocation targets.
 // The eight raw residual bytes at +0xc7/+0xcd/+0xe6/+0x15e/+0x173/+0x179/+0x1d7/+0x1dd
 // are a three-slot permutation: retail allocation/delete/legend at -0x340/-0x344/-0x348,
-// ours legend/allocation/delete. Semantic bucket names and moving the legend declaration
-// beside its first use were tried; revisit for hidden-temporary ordering in the last-mile phase.
+// ours legend/allocation/delete. `legendMode`/`mode` (bucket 15), `viewIndex`
+// (bucket 14), moving the declaration to function entry, a nested lexical scope, and
+// declaring the window pointer at its initializer did not recover retail ordering.
+// Revisit only after TU-state changes expose different hidden-temporary ordering.
 VA(0x004333c0, 0x267)
 void advManager::ViewWorld(int whatToDraw, int drawAllObjects, int drawAllTerrains)
 {
@@ -154,7 +156,9 @@ void advManager::VWInit(int centerX, int centerY)
 // the first opcode-shape residual at +0xb3 is ours `mov mapY; imul MAP_WIDTH` versus retail
 // `mov MAP_WIDTH; imul mapY`. The 0x58-byte first jump table starts at ours +0x23b versus
 // retail +0x23a after restoring retail's two explicit default continuations. Both Y-bound
-// operand orders and both multiply orders compile byte-identically; revisit in last-mile.
+// operand orders and both multiply orders compile byte-identically. Ten reviewed depth-one
+// commutative/relational AST variants also produced no improvement; revisit only after TU-state
+// changes or a source-structure discovery beyond operand spelling.
 VA(0x004338d4, 0x1346)
 void advManager::VWCompleteDraw(void)
 {
@@ -525,7 +529,8 @@ void advManager::VWCompleteDraw(void)
 // relocation targets. Explicit switch defaults recover the three retail continuation jumps.
 // The remaining normalized residuals are only commutative global-load order at +0x218,
 // +0x433, and +0x4e3 (Y bounds and the second VWInit argument). Swapping each addition's
-// operands compiled byte-identically; revisit for TU-state/evaluation order in last-mile.
+// operands compiled byte-identically. Ten reviewed depth-one commutative/relational AST
+// variants produced the same bytes; revisit only after TU-state changes.
 VA(0x00434c1a, 0x5e2)
 int ViewWorldDialogHandler(struct tag_message &message)
 {
