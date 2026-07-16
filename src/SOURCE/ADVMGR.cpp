@@ -405,14 +405,12 @@ void advManager::GetCursorSampleSet(int sampleSet)
     }
 }
 
-// @match-note
-// Excluding the 0x24 pointer table, all 429 executable instructions, the 0x80
-// frame/slots, CFG, and all 87 relocation targets agree. Retail's three
-// const_00128d34 references are gConfig + 0x14 (showRoute). The only code
-// residuals are the commutative X-coordinate load orders at retail +0x5a6
-// and +0x5ef: retail loads m_lastHoverCell before adding m_mapOriginX.
-// Both source operand orders and all 31 syntax-aware AST variants were tried.
-// Revisit after a material TU-state change or in the global last-mile phase.
+// @semantic
+// Current epoch: exact 0x80 frame/slots, CFG, all 87 relocation sites/targets,
+// and same-function table destinations. The only unmasked bytes are +0x2eb and
+// +0x2ee: retail loads m_y before comparing m_destinationY, while ours uses the
+// commutative equality order. Both source operand orders compile identically;
+// 31 prior syntax-aware AST variants also failed to steer the remaining shape.
 VA(0x0045751b, 0x6c0)
 class mapCell * advManager::DoAdvCommand(void)
 {
@@ -566,8 +564,12 @@ movement_done:
     return eventCellState;
 }
 
-// @early-stop
-// Raw instructions and relocation sites are byte-identical; only the delinked gConfig relocation symbol name differs.
+// @semantic
+// Current epoch: complete interface-toggle semantics and all 23 resolved
+// relocation targets. At the second translation lookup retail evaluates
+// gbUseEvilInterface before translationIndex; ours evaluates the same 2D
+// address in the opposite order. Symmetric subscript and both pointer-add
+// orders compiled identically in two bounded attempts.
 VA(0x00457bdb, 0x191)
 void advManager::CheckSetEvilInterface(int redraw, int player)
 {
@@ -940,7 +942,7 @@ void advManager::Reseed(int, int)
     giSeedingValid = 0;
 }
 
-// @match-note
+// @semantic
 // The retained source-hash object has the complete 0xb8 frame/slots, switch and radar
 // CFG, 999 aligned instructions, and all 118 relocation targets. The first code
 // residual is commutative load order at +0x73b; later residuals at +0xa94..+0xd21
@@ -1469,10 +1471,13 @@ search_end:
     return 1;
 }
 
-// @early-stop
-// Reloc-masked bytes differ only at +0xc5, +0x2d8, +0x9df, and +0x9fb: four
-// equivalent local-return displacements. The 0x2c frame/slots and CFG agree,
-// and all 106 relocation targets resolve to the same addresses.
+// @semantic
+// Current epoch: complete 0x2c frame/slots, hover semantics, CFG, and all 106
+// resolved relocation targets. The first normalized divergence reassociates
+// the same search-cell address: retail adds the scaled X term before loading
+// m_storage.cells, while ours adds the storage pointer before scaled X. The
+// eight-entry switch table has the same case mapping after its uniform 6-byte
+// code shift. Revisit with a proven shared GetCell accessor shape.
 VA(0x0045a644, 0xa50)
 int advManager::ProcessHover(int mouseX, int mouseY) {
     int heroXHero;
@@ -1930,7 +1935,7 @@ void advManager::CompleteDraw(int update)
     CompleteDraw(m_mapOriginX, m_mapOriginY, update, 1);
 }
 
-// @match-note
+// @semantic
 // Complete 0x8 frame, mask/edge CFG, and all 51 relocation targets agree.
 // The four residual index blocks are the east and west lookups in each path:
 // retail loads MAP_WIDTH before y for east and forms x+mapExtra before the row
@@ -1998,7 +2003,7 @@ int advManager::GetCloudLookup(int x, int y)
     return giCloudType[cloudMask];
 }
 
-// @match-note
+// @semantic
 // The retained source-hash object accounts for all 2373 retail instructions, the
 // complete 0x1c frame/slots and draw CFG, and all 551 relocation targets; there
 // is no data island. The first real code divergence is the MAP_WIDTH boundary
@@ -2634,7 +2639,7 @@ class mapCell * advManager::GetCell(int x, int y)
         return &m_mapData->Row(y)[x];
 }
 
-// @match-note
+// @semantic
 // Complete semantics, 0xb4 frame/slots, radar CFG, and all 122 relocation targets
 // agree. The first divergence is commutative operand order at +0x141; the other
 // spans are +0x1d3..+0x1eb, +0x234..+0x23d, and +0x47d..+0x488, plus retail
@@ -3339,7 +3344,7 @@ quick_info_ready:
     delete windowLocal;
 }
 
-// @match-note
+// @semantic
 // Complete semantics and 0x3c frame/explicit slots match; CFG differs only by
 // missing five-byte /Ob1 continuations at retail +0x3b (after CurrentHero) and
 // +0x1c5 (before the populated locator body). All 25 relocation targets agree.
@@ -3579,7 +3584,7 @@ void advManager::UpdateTownLocators(int drawWindow, int updateScreen)
         m_adventureWindow->DrawWindow(updateScreen);
 }
 
-// @match-note
+// @semantic
 // Complete semantics, 0x0c frame/slots, switch order, CFG, and all 24
 // relocation targets agree. The first and only instruction divergence is the
 // missing retail jmp $+0 at +0x12d after UpdBottomViewEnemyTurn. An explicit
@@ -3667,7 +3672,7 @@ void advManager::ClearBottomView(void)
     iLastAnimFrame = ADVMGR_BOTTOM_VIEW_NO_ANIMATION;
 }
 
-// @match-note
+// @semantic
 // The 0x38 frame/slots, complete CFG, exact size, and all 73 relocation targets
 // agree. The first divergence is commutative global comparison order at
 // +0x29e..+0x2c6; later residuals are the moved GetPlayerColor /Ob1 continuation
@@ -4792,7 +4797,7 @@ void advManager::MobilizeCurrHero(int update)
     SetHeroContext(gpCurPlayer->m_currentHero, update);
 }
 
-// @match-note
+// @semantic
 // First residual at +0xd9: retail loads m_eventFlags, ORs EAX with 0x80, then
 // stores it; ours emits the equivalent OR dword ptr [hero+0xe3],0x80. The 0xc
 // frame and all three slots, CFG, remaining instructions, and all 7 relocation
@@ -4937,7 +4942,7 @@ void advManager::SetHeroContext(int heroId, int update)
     }
 }
 
-// @match-note
+// @semantic
 // First residual bytes are +0xcc/+0xd0: retail uses `cmp eax,[message.y]; jle`,
 // ours uses `cmp [message.y],eax; jge`; the mirrored upper clamp differs at
 // +0xe8/+0xec. The 0x80 frame, every named/compiler slot, CFG, all other code,
@@ -4994,7 +4999,7 @@ void advManager::DoHeroKnob(void)
     UpdateHeroLocators(1, 1);
 }
 
-// @match-note
+// @semantic
 // First residual bytes are +0xcc/+0xd0: retail uses `cmp eax,[message.y]; jle`,
 // ours uses `cmp [message.y],eax; jge`; the mirrored upper clamp differs at
 // +0xe8/+0xec. The 0x80 frame, every named/compiler slot, CFG, all other code,
@@ -5219,7 +5224,7 @@ void advManager::CheckCastSpell(void)
     }
 }
 
-// @match-note
+// @semantic
 // Complete 0x24 frame/slots and message/mouse CFG; all 28 relocation targets
 // agree. Residuals are three continuation-jump placements: one extra retail
 // jump after the accepted widget path, one after the valid-cell SetPointer,
@@ -5313,7 +5318,7 @@ int DimensionDoorHandler(tag_message &message)
     return ADVMGR_DIMENSION_DOOR_UNHANDLED;
 }
 
-// @match-note
+// @semantic
 // Complete 0x1c frame/slots and draw CFG; all 161 resolved relocation targets agree.
 // After masking relocations, the first code-byte difference is +0x3ed: ours loads
 // mapRow before forming the column stride, while retail forms the stride first. The
@@ -5847,12 +5852,12 @@ int advManager::GetSoundId(int x, int y)
     return ADVMGR_ENVIRONMENT_SOUND_NONE;
 }
 
-// @match-note
-// Exact 0x14 frame, 0x23a size, CFG, and instruction stream outside
-// +0x20..+0x3c. Retail and candidate emit equivalent 29-byte map-bound checks
-// with different operand order and polarity. All 9 external relocation
-// addresses agree. The environment-volume relocation reaches the same retail
-// table address; only the delinker's synthetic constant-pool identity differs.
+// @early-stop
+// @early-stop-reloc-only: all 0x23a bytes match after masking the same nine
+// relocation sites, with identical same-function destinations. Spelling the
+// bounds directly and then MAP_WIDTH <= 0[&x] closed the last code residual in
+// two attempts. The remaining score is the delinked environment-volume symbol
+// identity; its resolved retail address agrees.
 VA(0x00466ef0, 0x23a)
 void advManager::InsertSound(int x, int mapY, int distance, int soundLayer)
 {
@@ -5861,7 +5866,7 @@ void advManager::InsertSound(int x, int mapY, int distance, int soundLayer)
     int activeIndex;
     int soundId;
 
-    if (!(x >= 0 && mapY >= 0 && x < MAP_WIDTH && MAP_HEIGHT > mapY))
+    if (x < 0 || mapY < 0 || MAP_WIDTH <= 0[&x] || mapY >= MAP_HEIGHT)
         return;
 
     soundId = GetSoundId(x, mapY);
@@ -5913,7 +5918,7 @@ void advManager::InsertSound(int x, int mapY, int distance, int soundLayer)
     }
 }
 
-// @match-note
+// @semantic
 // The exact 0x24 frame/slots, CFG, instruction stream outside +0x343..+0x359,
 // and all 44 relocation targets agree. Retail emits a 23-byte load/OR/store for
 // m_eventFlags; ours folds to the equivalent 13-byte memory OR, accounting for
@@ -6247,7 +6252,7 @@ void advManager::TownGate(int spellId)
         giTerrainToMusicTrack[m_currentTerrain]);
 }
 
-// @match-note
+// @semantic
 // The exact 0x40 frame/slots, complete CFG, 0x5ac size, and 41 relocation sites
 // agree after manual interior-alias resolution. The first code residual is the
 // CurrentHero /Ob1 continuation at +0x174 versus retail +0x180; the screen-bound
@@ -6419,6 +6424,11 @@ void advManager::SummonBoat(void) {
     }
 }
 
+// @early-stop
+// @early-stop-reloc-only: all 0x4d9 bytes match after masking the same 34
+// relocation sites, and same-function destinations agree. Explicit unsigned
+// direction loads corrected the two former MOVSX/MOVZX semantic mismatches;
+// only delinked relocation identities keep the raw objdiff score below 100%.
 VA(0x00468247, 0x4d9)
 void advManager::ShowRoute(int redraw, int, int updateButton)
 {
@@ -6466,8 +6476,8 @@ void advManager::ShowRoute(int redraw, int, int updateButton)
 
         for (pathIndex = gpSearchArray->m_pathLength - 1;
              pathIndex >= 0; --pathIndex) {
-            direction =
-                gpSearchArray->m_storage.path.directions[pathIndex + 1];
+            direction = static_cast<unsigned char>(
+                gpSearchArray->m_storage.path.directions[pathIndex + 1]);
             currentCell2 = GetCell(routeX1, routeY1);
             routeX1 += normalDirTable[direction].x;
             routeY1 += normalDirTable[direction].y;
@@ -6518,8 +6528,8 @@ void advManager::ShowRoute(int redraw, int, int updateButton)
             if (pathIndex == 0) {
                 m_visibilityMap[routeY1 * (MAP_WIDTH | 0) + routeX1] = 1;
             } else {
-                previousDirection0 =
-                    gpSearchArray->m_storage.path.directions[pathIndex];
+                previousDirection0 = static_cast<unsigned char>(
+                    gpSearchArray->m_storage.path.directions[pathIndex]);
                 m_visibilityMap[routeY1 * (MAP_WIDTH | 0) + routeX1] =
                     static_cast<unsigned short>(
                         gbArrow[previousDirection0][direction | 0] +
@@ -7110,10 +7120,6 @@ void advManager::SaveAdventureBorder(void)
     }
 }
 
-// @early-stop
-// All 87 instructions match after masking relocation bytes, and all six
-// relocation sites and target addresses agree. The remaining objdiff score is
-// delinked symbol identity only.
 VA(0x00469abb, 0x134)
 void advManager::DrawAdventureBorder(void)
 {
@@ -7123,30 +7129,30 @@ void advManager::DrawAdventureBorder(void)
         return;
 
     unsigned char *screenPixel = gpWindowManager->m_screen->m_pixels;
-    unsigned char *savedPixel = m_adventureBorder;
+    unsigned char *savedPixels = m_adventureBorder;
     int row;
     for (row = 0; row < ADVMGR_BORDER_EDGE_SIZE; ++row) {
-        memcpy(screenPixel, savedPixel, ADVMGR_BORDER_ROW_BYTES);
+        memcpy(screenPixel, savedPixels, ADVMGR_BORDER_ROW_BYTES);
         screenPixel += ADVMGR_BORDER_SCREEN_PITCH;
-        savedPixel += ADVMGR_BORDER_ROW_BYTES;
+        savedPixels += ADVMGR_BORDER_ROW_BYTES;
     }
     for (row = ADVMGR_BORDER_EDGE_SIZE; row < ADVMGR_BORDER_MIDDLE_END;
          ++row) {
-        memcpy(screenPixel, savedPixel, ADVMGR_BORDER_SIDE_BYTES);
+        memcpy(screenPixel, savedPixels, ADVMGR_BORDER_SIDE_BYTES);
         memcpy(screenPixel + ADVMGR_BORDER_MIDDLE_END,
-               savedPixel + ADVMGR_BORDER_SIDE_BYTES,
+               savedPixels + ADVMGR_BORDER_SIDE_BYTES,
                ADVMGR_BORDER_SIDE_BYTES);
         screenPixel += ADVMGR_BORDER_SCREEN_PITCH;
-        savedPixel += ADVMGR_BORDER_SAVED_SIDE_BYTES;
+        savedPixels += ADVMGR_BORDER_SAVED_SIDE_BYTES;
     }
     for (row = ADVMGR_BORDER_MIDDLE_END; row < ADVMGR_SCREEN_HEIGHT; ++row) {
-        memcpy(screenPixel, savedPixel, ADVMGR_BORDER_ROW_BYTES);
+        memcpy(screenPixel, savedPixels, ADVMGR_BORDER_ROW_BYTES);
         screenPixel += ADVMGR_BORDER_SCREEN_PITCH;
-        savedPixel += ADVMGR_BORDER_ROW_BYTES;
+        savedPixels += ADVMGR_BORDER_ROW_BYTES;
     }
 }
 
-// @match-note
+// @semantic
 // Complete 0x4 frame, edge/interior loops, duplicated eligibility/exclusion CFG,
 // success writes, and all 52 relocation targets. The instruction streams align;
 // residuals are the six delinked static identities and four excluded-Y comparison
@@ -7235,13 +7241,12 @@ foundAdjacentMonster:
     return 1;
 }
 
-// @match-note
-// Complete 0xc frame/slots, including the retail non-advancing dead-player
-// loop, and all 16 relocation targets agree. The only two divergences load the
-// local player before giCurPlayer instead of giCurPlayer before the local at
-// the two loop guards. Both operand spellings of player!=giCurPlayer were
-// tried. Revisit only with new TU compiler-state evidence or after the SOURCE
-// placeholder census is zero.
+// @semantic
+// Exact retail 0x0c frame and live slots, including the inferred unused
+// currentPlayer local, the retail non-advancing dead-player loop, and all 16
+// relocation sites/targets. The only unmasked byte is +0x21: retail's
+// non-remote arm jumps directly to the epilogue, while ours visits the adjacent
+// jmp $+0 continuation. One frame-recovery attempt closed the other 16 bytes.
 VA(0x00469fc2, 0x125)
 void ComputeAdvNetControl(void)
 {
@@ -7250,6 +7255,7 @@ void ComputeAdvNetControl(void)
     } else {
         int selectedPlayer = -1;
         int player;
+        int currentPlayer;
         if (gpGame->m_playerDead[giCurPlayer]) {
             player = (giCurPlayer + 1) % GAME_PLAYER_COUNT;
             while (giCurPlayer != player) {
@@ -7270,8 +7276,12 @@ void ComputeAdvNetControl(void)
     }
 }
 
-// @early-stop
-// target loads MAP_WIDTH/MAP_HEIGHT before the local operand; base loads the local first
+// @semantic
+// All 77 normalized instructions and six relocation targets agree. Five
+// bounded source spellings recovered the positive Y-bound arm and local-first
+// row multiplication. The remaining raw bytes +0x98 and +0xab..+0xae are only
+// corresponding local branch displacements; do not claim relocation-only
+// identity until those destinations are normalized or made byte-exact.
 VA(0x0046a0e7, 0xf6)
 int MapExtraPosAndAdjacentsSet(int x, int y, unsigned char mask)
 {
@@ -7281,10 +7291,13 @@ int MapExtraPosAndAdjacentsSet(int x, int y, unsigned char mask)
         if (checkX < 0 || checkX >= MAP_WIDTH)
             continue;
         for (int checkY = y - 1; checkY <= y + 1; ++checkY) {
-            if (checkY < 0 || checkY > MAP_HEIGHT - 1)
-                continue;
-            if (mapExtra[checkY * MAP_WIDTH + checkX] & mask)
-                return 1;
+            if (checkY >= 0) {
+                if (MAP_HEIGHT <= 0[&checkY]) {
+                } else {
+                    if (mapExtra[0[&checkY] * MAP_WIDTH + checkX] & mask)
+                        return 1;
+                }
+            }
         }
     }
     return 0;
@@ -7499,7 +7512,7 @@ void advManager::AdvPanel(void)
     }
 }
 
-// @match-note
+// @semantic
 // Complete 0x18 frame, shift-help/selection CFG, and all 8 external relocations agree.
 // The diff first diverges at the delinked 0x10-byte switch table at RVA 0x6aa99;
 // the 23 preceding instructions match. Tried compound command tests in both arms and
@@ -7562,7 +7575,7 @@ int APanelHandler(tag_message &message)
     return ADVMGR_DIMENSION_DOOR_UNHANDLED;
 }
 
-// @match-note
+// @semantic
 // Complete modal/control-disable CFG and all 30 external relocations agree. The first
 // 102 diff lines align apart from string identities, then the helper stops at the
 // delinked result switch table. Retained direct remote-disable broadcasts and result
@@ -7620,12 +7633,12 @@ int advManager::ControlPanel(void)
     return selectedCommand != ADVMGR_PANEL_NO_HELP;
 }
 
-// @match-note
-// Complete 200-byte confirmation buffer, shift-help and confirmation CFG, and all 26
-// external relocations agree. The remaining bytes are compiler lowering around the
-// widget switches and bFreshSave confirmation arm. Tried compound command tests and
-// alternate nesting; the retained source preserves retail body order and relocations.
-// Revisit only after shared dialog/message evidence changes or in the last-mile phase.
+// @semantic
+// Complete 200-byte confirmation buffer, shift-help/confirmation CFG, and all
+// 26 external relocation targets. Both six-entry tables map every widget ID to
+// the same semantic body; retail emits the Save-help body before Main Menu.
+// Reordering those case bodies aligned source order in one attempt without a
+// fuzzy gain. Prior compound-command and alternate-nesting attempts were worse.
 VA(0x0046ad7e, 0x304)
 int CPanelHandler(tag_message &message)
 {
@@ -7643,11 +7656,11 @@ int CPanelHandler(tag_message &message)
                 case ADVMGR_CONTROL_NEW_GAME:
                     helpIndex = ADVMGR_CONTROL_NEW_GAME_HELP;
                     break;
-                case ADVMGR_CONTROL_MAIN_MENU:
-                    helpIndex = ADVMGR_CONTROL_MAIN_MENU_HELP;
-                    break;
                 case ADVMGR_CONTROL_SAVE_GAME:
                     helpIndex = ADVMGR_CONTROL_SAVE_GAME_HELP;
+                    break;
+                case ADVMGR_CONTROL_MAIN_MENU:
+                    helpIndex = ADVMGR_CONTROL_MAIN_MENU_HELP;
                     break;
                 case ADVMGR_PANEL_CLOSE_WIDGET:
                     helpIndex = ADVMGR_CONTROL_CLOSE_HELP;
@@ -7706,9 +7719,12 @@ int CPanelHandler(tag_message &message)
     return ADVMGR_DIMENSION_DOOR_UNHANDLED;
 }
 
-// @early-stop
-// Exact size and instruction stream; all 34 external relocations agree. The remaining
-// objdiff residuals are gConfig field-overlay and pooled-string symbol identities.
+// @semantic
+// Complete option-dialog semantics and all 34 resolved relocation targets.
+// Current source uses a 0x20 frame; retail uses 0x3c, with the same three live
+// saved values at -0x20/-0x24/-0x28 and additional unreferenced slots. Do not
+// restore the old byte-identity claim or invent padding locals without source
+// evidence for those declarations.
 VA(0x0046b082, 0x197)
 void advManager::SystemOptions(void)
 {
@@ -7746,7 +7762,7 @@ void advManager::SystemOptions(void)
         MobilizeCurrHero(0);
 }
 
-// @match-note
+// @semantic
 // Complete 0x24 frame, all 18 frame/text broadcasts, draw CFG, and all 68 external
 // relocations agree. Residual lowering is around music-source, blackout-computer, and
 // slow-video expressions plus gConfig/string overlay identities. Tried direct ternary
@@ -8273,7 +8289,7 @@ showVision:
     return 1;
 }
 
-// @match-note
+// @semantic
 // Complete hero loop, artifact/radius semantics, frame slots, and all 6 external
 // relocations agree. The first byte-level divergence is one extra retail continuation
 // jump after the loop guard; the remaining instruction stream aligns. Tried repeated
