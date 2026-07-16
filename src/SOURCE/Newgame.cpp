@@ -29,12 +29,6 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/Newgame.h>
 
-DATA(0x0051cdd0) static short newGameSourceLineBase = NEW_GAME_SOURCE_LINE_BASE;
-DATA(0x0051cfa0) static short newGameWindowSourceLineBase =
-    NEW_GAME_WINDOW_SOURCE_LINE_BASE;
-DATA(0x0051d0fc) static short scenarioInfoSourceLineBase =
-    NEW_GAME_SCENARIO_SOURCE_LINE_BASE;
-
 VA(0x004b6f40, 0x1d5)
 void game::GetMap(void)
 {
@@ -221,6 +215,8 @@ void game::SetupNetPlayerNames(void)
 VA(0x004b769e, 0xaca)
 int game::NewGame(void)
 {
+    DATA(0x0051cdd0) static short newGameSourceLineBase =
+        NEW_GAME_SOURCE_LINE_BASE;
     char netPlayerPacket[NEW_GAME_PLAYER_INFO_BUFFER_SIZE];
     char mapInfoPacket[NEW_GAME_MAP_PACKET_SIZE];
     tag_message windowMessage;
@@ -463,6 +459,8 @@ void game::CleanUpNewGameWindow(void)
 VA(0x004b8259, 0x67d)
 void game::InitNewGameWindow(void)
 {
+    DATA(0x0051cfa0) static short newGameWindowSourceLineBase =
+        NEW_GAME_WINDOW_SOURCE_LINE_BASE;
     int availableWidthResult;
     widget *textControlLocal;
     int firstPlayerXLocal;
@@ -1431,6 +1429,8 @@ void game::DrawNGKPDisplayString(int updateScreen)
 VA(0x004ba39c, 0xb71)
 void game::ShowScenInfo(void)
 {
+    DATA(0x0051d0fc) static short scenarioInfoSourceLineBase =
+        NEW_GAME_SCENARIO_SOURCE_LINE_BASE;
     int availableWidthResult;
     int mapSizeIndex;
     widget *textControlLocal;
@@ -1914,6 +1914,27 @@ int game::GetSideDesc(char *text, int firstPlayer, int lastPlayer)
     return localPlayerOnSide;
 }
 
+// @data-layout-note
+// Retail initialized storage spans 0x11cd20..0x11d450 (0x730 bytes,
+// including six trailing zero alignment bytes); the candidate payload is
+// 0x72a bytes. After moving the three source-line words to their sole function
+// owners above, the other 0x71e payload bytes are exact. Retail interleaves the
+// words at contribution offsets 0xb0, 0x280, and 0x3dc, while VC 4.2 groups
+// explicit function statics at 0x0, 0x4, and 0x8. Their retail values are
+// 0x013f, 0x027b, and 0x064f, and their 6, 2, and 2 HIGHLOW references prove
+// the owner identities and zero addends. Focused relocation audits are
+// 156/156 for NewGame, 65/65 for InitNewGameWindow, and 118/118 for
+// ShowScenInfo, with no candidate-only sites; the only warnings are the
+// expected private-name versus `const_<rva>` identities. Do not add padding or
+// restore those delinker aliases to reproduce this allocation-order wall.
+//
+// Retail and candidate zero-fill are both 0x20 bytes. Retail COMMON order is
+// cNGKPDisplay, gbNewGameShadowHidden, cNGKPCore, NGKPcursorIndex,
+// cTextReceivedBuffer[3], NGKPBkg; the compiler emits the candidate order as
+// NGKPcursorIndex, gbNewGameShadowHidden, cTextReceivedBuffer[3], cNGKPCore,
+// NGKPBkg, cNGKPDisplay. Every allocation and extent is present, so keep this
+// as a COMMON allocation-order wall rather than introducing aliases or fake
+// storage.
 // ---- globals (definitions, RVA order) ----
 DATA(0x0051cd20) int gbNewGameDialogOver = 1;
 DATA(0x0051cd24) int NGKPcursorFlashOn = 1;
