@@ -605,8 +605,10 @@ def main(argv=None):
         record_current_targets()
     elif args.propose:
         stats, diagnostics, queue = propose_candidate_topology()
-        print("candidate data: %d/%d definitions in %d closed groups; %d open groups; "
-              "%d review rows (%d already canonical, %d synthetic filtered)" % (
+        print("candidate data: %d/%d individually evidenced; %d/%d definitions in "
+              "%d closed groups; %d open groups; %d review rows "
+              "(%d already canonical, %d synthetic filtered)" % (
+            stats.evidenced_definitions, stats.candidate_definitions,
             stats.mapped_definitions, stats.candidate_definitions,
             stats.closed_groups, stats.open_groups, queue["review_queue_rows"],
             queue["already_canonical"], queue["synthetic_filtered"]))
@@ -618,8 +620,9 @@ def main(argv=None):
                   "see %s and %s" % (
                       len(diagnostics), CANDIDATE_DIAGNOSTICS, COVERAGE_DIAGNOSTICS))
             return 1
-        print("candidate data: promoted snapshot with %d definitions in %d closed groups; "
-              "%d open diagnostics" % (
+        print("candidate data: promoted snapshot with %d/%d individually evidenced; "
+              "%d definitions in %d closed groups; %d open diagnostics" % (
+                  stats.evidenced_definitions, stats.candidate_definitions,
                   stats.mapped_definitions, stats.closed_groups, len(diagnostics)))
     else:
         regenerate_canonical_targets()

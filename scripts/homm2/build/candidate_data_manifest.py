@@ -48,6 +48,7 @@ class CandidateAllocation:
 @dataclass
 class DerivationStats:
     candidate_definitions: int = 0
+    evidenced_definitions: int = 0
     mapped_definitions: int = 0
     closed_groups: int = 0
     open_groups: int = 0
@@ -758,6 +759,7 @@ def derive_allocations(base_dir=REPO / "build/objdiff/base",
                     intervals, read_bytes)
                 allocations.extend(reviewed_group)
                 stats.closed_groups += 1
+                stats.evidenced_definitions += len(reviewed_group)
                 stats.mapped_definitions += len(reviewed_group)
                 continue
             partial_reviewed = {}
@@ -925,12 +927,14 @@ def derive_allocations(base_dir=REPO / "build/objdiff/base",
                     proposal_mappings[row["name"]][1], row["scope"],
                     proposal_evidence[row["name"]])
                     for row in group if row["name"] in proposal_mappings)
+                stats.evidenced_definitions += len(proposed)
                 diagnostics.append(GroupDiagnostic(
                     unit, storage, tuple(sorted(causes)), tuple(failures),
                     tuple((rva, size, name) for rva, size, name in extents),
                     proposed))
                 continue
             stats.closed_groups += 1
+            stats.evidenced_definitions += len(group)
             stats.mapped_definitions += len(group)
             object_name = unit.replace("/", "\\") + ".c"
             for row in group:
@@ -992,8 +996,10 @@ def main(argv=None):
         units_path=args.units)
     args.diagnostics_output.parent.mkdir(parents=True, exist_ok=True)
     args.diagnostics_output.write_bytes(diagnostics_bytes(stats, diagnostics))
-    print("candidate data: %d/%d definitions in %d closed groups; %d open groups; "
-          "%d aligned DIR32 sites across %d functions" % (
+    print("candidate data: %d/%d individually evidenced; %d/%d definitions in "
+          "%d closed groups; %d open groups; %d aligned DIR32 sites across "
+          "%d functions" % (
+              stats.evidenced_definitions, stats.candidate_definitions,
               stats.mapped_definitions, stats.candidate_definitions,
               stats.closed_groups, stats.open_groups,
               stats.aligned_dir32_sites, stats.paired_functions))
