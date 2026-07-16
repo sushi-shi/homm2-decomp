@@ -19,14 +19,14 @@
 #include <SOURCE/searchArray.h>
 #include <SOURCE/town.h>
 
-// @semantic live 99.75%: semantics, CFG, the 0x168 frame/local slots, and all
-// 29/29 effective relocation targets agree. Typed flattened army indexing fixed
-// the six repeated address-generation residuals. The first remaining code
-// difference is at +0x8ad: ours compares the ratio with retreatChance and then
-// stores retreatThreshold (`fcom; fstp`), while retail stores the threshold and
-// then compares (`fst; fcomp`). Splitting the threshold assignment from the
-// condition emitted the same sequence. Pooled floating-constant symbol names
-// differ, but their values/targets agree. Revisit after the 95% phase switch.
+// @semantic: semantics, CFG, the 0x168 frame/local slots, and all 29/29
+// effective relocation targets agree. The first code difference is at +0x8ad:
+// ours emits `fcom retreatChance; fstp retreatThreshold`, while retail emits
+// `fst retreatThreshold; fcomp retreatChance`. Assignment-in-condition, split
+// assignment, reversed relation, scalar-SIB lvalues, and four bounded TU-state
+// probes did not improve it. Anonymous floating constants differ only in
+// compiler-counter names; retail also delinks __adjust_fdiv as an interior
+// iLeftRightSave alias. Revisit after a material AI TU/header-state change.
 VA(0x004c0790, 0x8d7)
 int combatManager::AICheckRetreat(void)
 {
@@ -191,16 +191,14 @@ int combatManager::AICheckRetreat(void)
     return 0;
 }
 
-// @semantic live 97.08% (observed 97.14% before later TU-state movement): the
-// complete 0xb4 frame, local slots, behavior, and all 92/92 relocation targets
-// agree. Both sides have 923 non-jump instructions; current non-jump residuals
-// are operand order at +0x25c in the five-mask OR and +0x5bf in a strength
-// comparison. Retail is net 27 five-byte /Ob1 continuation jumps larger.
-// Right-nesting the OR reduced its peak-state residual from five loads to three;
-// left association was worse. Combining the independent AttemptAttack guards
-// into OR chains fell to 86.27% and was restored. Typed flattened army indexing
-// removed all six raw-offset address blocks. Revisit after 95% once TU state is
-// stable; do not repeat these spellings beforehand.
+// @semantic: the complete 0xb4 frame, local slots, behavior, and all 92/92
+// ordered relocation targets agree. Both sides have 923 non-jump instructions;
+// remaining non-jump differences are operand order at +0x25c in the five-mask
+// OR and +0x5bf in a strength comparison. Retail has 27 additional five-byte
+// /Ob1 continuation jumps. Right-nesting the OR was best; left association and
+// OR-chaining the independent AttemptAttack guards regressed. Typed flattened
+// army indexing fixed six address blocks. Four bounded TU-state probes did not
+// improve the canonical score. Revisit after a material AI TU/header change.
 VA(0x004c1067, 0x129c)
 void combatManager::DoCompAI(int)
 {
@@ -500,6 +498,11 @@ finish:
     }
 }
 
+// @early-stop
+// @early-stop-reloc-only
+// reloc-masked code bytes are identical; retail's delinked __adjust_fdiv
+// reference is misidentified as the interior alias iLeftRightSave+0x10, and
+// anonymous floating constants differ only in compiler counter names.
 VA(0x004c2303, 0xc9)
 float combatManager::GetModLichDamage(class army *target, float damage)
 {
@@ -581,7 +584,8 @@ void combatManager::DoLichShot(class army *lich)
                     damageValue10 += adjacentDamage6;
             }
         }
-        if (bestArmy12 == COMBAT_AI_NO_ARMY || bestDamage15 < damageValue10) {
+        if (bestArmy12 == COMBAT_AI_NO_ARMY ||
+            0[&damageValue10] > bestDamage15) {
             bestDamage15 = damageValue10;
             bestArmy12 = armyIndex37;
             giNextAction = COMBAT_AI_ACTION_MOVE;
@@ -814,16 +818,6 @@ int combatManager::GetWorstArmy(int side, int mask)
     return worstArmy6;
 }
 
-// @semantic retained 99.25%, observed 99.44%, live 93.71% after the exact
-// DoLichShot reconstruction moved TU-cumulative codegen: semantics, CFG, the
-// 0x1c frame and every slot are complete (closestValue -0x4, value -0x8, bit
-// -0xc, armyIndex -0x10, closestArmy -0x14, target -0x18, this -0x1c), with
-// both relocation targets agreeing. The current first residual at +0x59 scales
-// side before armyIndex while retail scales armyIndex first; +0x140 reverses the
-// two compare loads. Direct indexing and typed flattened expressions in both
-// term orders emitted the same address order; `closestValue > value` and
-// `value < closestValue` emitted the same compare. Revisit only after 95% and
-// stable TU state.
 VA(0x004c307d, 0x16f)
 int combatManager::GetClosestArmy(class army *currentArmy, int side, int mask)
 {
@@ -835,8 +829,8 @@ int combatManager::GetClosestArmy(class army *currentArmy, int side, int mask)
     army *target26;
 
     for (armyIndex2 = 0; armyIndex2 < m_armyCount[side]; armyIndex2++) {
-        if ((mask & bit1) != 0) {
-            target26 = &m_armies[side][armyIndex2];
+        if ((0[&bit1] & mask) != 0) {
+            target26 = &0[&armyIndex2][m_armies[side]];
             value19 = gpSearchArray->QuickDistance(
                 m_hexCells[currentArmy->m_hex].m_x,
                 m_hexCells[currentArmy->m_hex].m_y,
@@ -844,7 +838,7 @@ int combatManager::GetClosestArmy(class army *currentArmy, int side, int mask)
                 m_hexCells[target26->m_hex].m_y);
             value19 = value19 * COMBAT_AI_DISTANCE_WEIGHT -
                 target26->m_monster.hitPoints * target26->m_quantity;
-            if (value19 < closestValue29) {
+            if (0[&closestValue29] > value19) {
                 closestArmy7 = armyIndex2;
                 closestValue29 = value19;
             }
@@ -894,16 +888,16 @@ int combatManager::AttemptAttack(class army *currentArmy, int side, int mask)
 
         currentArmy->m_targetSide = side;
         currentArmy->m_targetIndex = targetArmy;
-        targetHex = (targetArmy + m_armies[side])->m_hex;
+        targetHex = 0[&targetArmy][m_armies[side]].m_hex;
         currentArmy->m_moveTargetHex = targetHex;
         if (currentArmy->ValidPath(targetHex, 0)) {
             giNextAction = COMBAT_AI_ACTION_MOVE;
             giNextActionGridIndex = targetHex;
             return 1;
         }
-        if (((targetArmy + m_armies[side])->m_monster.flags.abilityFlags &
+        if ((0[&targetArmy][m_armies[side]].m_monster.flags.abilityFlags &
              MONSTER_ABILITY_FLAG_WIDE) != 0) {
-            if ((targetArmy + m_armies[side])->m_facing == 0)
+            if (0[&targetArmy][m_armies[side]].m_facing == 0)
                 targetHex--;
             else
                 targetHex++;
@@ -919,10 +913,11 @@ int combatManager::AttemptAttack(class army *currentArmy, int side, int mask)
     return 0;
 }
 
-// @early-stop 99.12%: all 99 non-jump opcodes/operands, the 0x20 frame/local
-// slots, CFG, and all 6/6 external relocation targets agree. Retail's 0x182
-// code span is exactly five bytes larger than ours (0x17d): the sole residual
-// is its extra /Ob1 continuation `jmp` at +0x16f before the false return.
+// @early-stop
+// All 99 non-jump opcodes/operands, the 0x20 frame/local slots, CFG, and all
+// 6/6 ordered external relocations agree. Retail is exactly five bytes larger:
+// its sole residual is one /Ob1 continuation `jmp` at +0x16f before false return;
+// four bounded TU-state probes produced no exact closure.
 VA(0x004c3468, 0x182)
 int combatManager::AttemptAdjacentAttack(class army *currentArmy)
 {
@@ -984,8 +979,8 @@ int combatManager::WalkTowardArmyFront(class army *currentArmy,
         return 0;
 
     frontOffset13 = 1;
-    targetHex7 = (targetArmy6 + m_armies[side])->m_hex;
-    if (((targetArmy6 + m_armies[side])->m_monster.flags.abilityFlags &
+    targetHex7 = 0[&targetArmy6][m_armies[side]].m_hex;
+    if ((0[&targetArmy6][m_armies[side]].m_monster.flags.abilityFlags &
          MONSTER_ABILITY_FLAG_WIDE) != 0)
         frontOffset13 = 2;
     if (currentArmy->m_facing == 1)
