@@ -74,15 +74,17 @@ objdiff over the whole project.
 and diffs it against the delinked retail target `build/delink/<unit>.c.obj`. ninja **tracks
 header deps** (MSVC 4.2 has no `/showIncludes`, so `cc_wrap.py` scans each TU's `#include`
 graph into a depfile) — editing a shared header recompiles exactly its includers, so a header
-change can't leave a stale obj. It then runs **seven hard gates** (a red gate fails the build):
+change can't leave a stale obj. It then runs **eight hard gates** (a red gate fails the build):
 `assert_decls` (no local `class/struct/enum`/`extern`/fwd-decl in any .cpp), `assert_no_fake_labels`
 (no emitted fn symbol absent from the recovered inventory), `assert_globals_data` (every global's **definition**
 carries a unique `DATA(<VA>)`; no `DATA()` on a header `extern`),
 `assert_defs_declared` (every free-fn definition is declared in its
 owner header), `assert_globals_defined` (every extern global has a definition in its owner TU —
 link-completeness), `assert_vtables` (every class vtable is claimed by a `VTBL()` census marker in
-its owner TU — no drift, no fake classes), and ordered `assert_relocs --fields` (an exact function
-cannot silently address the wrong field of a recovered public DATA owner). Full catalog + rationale:
+its owner TU — no drift, no fake classes), ordered `assert_relocs --fields` (an exact function
+cannot silently address the wrong field of a recovered public DATA owner), and
+`assert_early_stop_bytes` (an explicit relocation-only early stop has no unmasked byte
+difference). Full catalog + rationale:
 **`docs/build-asserts.md`**.
 
 **`homm2 relocs` — OPT-IN broad reloc-target audit.** The narrow owner-field subset is a hard gate;
@@ -154,6 +156,10 @@ dev shell's Ghidra env (in the flake).
   **`// @semantic`** + its remaining compiler/code-shape residual. `@semantic` is the current
   linking/runtime-testing stop: it does not claim byte exactness or a proven compiler wall.
   `rg -n '@(?:early-stop|semantic)' src` is the completed nonexact set.
+  When the proof claims every non-relocation instruction byte is identical and only COFF
+  relocation identity remains, also add **`// @early-stop-reloc-only`**. The build masks the
+  actual relocation fields and hard-fails on any other byte difference; never make that claim
+  in untagged prose.
 - **Header discipline (owner model, gate-enforced):** a symbol defined in `<TU>.cpp` is
   declared ONLY in its owner header `include/<TIER>/<TU>.h`; callers `#include` that. A .cpp
   carries **no** local `class/struct/enum`/`extern`/forward-decls — types come from the recovered
@@ -165,7 +171,7 @@ dev shell's Ghidra env (in the flake).
   symbol's owner header; do not create def-less synthetic externs.
   Win32 from the custom minimal `include/win/windows.h`, CRT from real `<io.h>`/`<string.h>`.
   Include the **specific** headers a TU uses — there is no `_all.h` or `_globals.h` umbrella (both
-  dissolved). The six build gates (`docs/build-asserts.md`) enforce all of this; bootstrap an
+  dissolved). The eight build gates (`docs/build-asserts.md`) enforce all of this; bootstrap an
   owner header with `gen_module_header.py`, global defs with `gen_global_defs.py`.
 
 ## Matching campaign (parallel by default)
@@ -204,7 +210,7 @@ dev shell's Ghidra env (in the flake).
 
 ## Key references
 
-- `docs/build-asserts.md` — the six hard build gates (what `homm2 build` enforces + why).
+- `docs/build-asserts.md` — the eight hard build gates (what `homm2 build` enforces + why).
 - `docs/od-stack-layout.md` — the /Od name-hash + per-scope tables (the matcher's superpower).
 - `docs/patterns/INDEX.md` — codegen idiom catalog (grep by symptom/tag when a diff row sticks).
 - `docs/compiler-detection.md`, `docs/linker-flags.md` — toolchain facts.
