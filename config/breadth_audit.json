@@ -3,6 +3,28 @@
   "records": [
     {
       "unit": "SOURCE/ADVMGR",
+      "function": "?APanelHandler@@YIHAAUtag_message@@@Z",
+      "source_hash": "98769448686e",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 97.86786,
+      "after": 97.86786,
+      "note": "Complete help/selection semantics and 8 relocs; four-entry switch case mapping reviewed and correct."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?CPanelHandler@@YIHAAUtag_message@@@Z",
+      "source_hash": "3f0d845c67ce",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 93.99175,
+      "after": 93.99175,
+      "note": "Both six-entry tables map IDs correctly; reordered Save/Main help bodies to retail source order without fuzzy gain."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
       "function": "?CheckDimHero@advManager@@QAEXXZ",
       "source_hash": "a2d96d4c1de6",
       "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
@@ -14,36 +36,234 @@
     },
     {
       "unit": "SOURCE/ADVMGR",
-      "function": "?DoVisions@advManager@@QAEHPAVhero@@@Z",
-      "source_hash": "5ec4eee3332f",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "function": "?CheckSetEvilInterface@advManager@@QAEXHH@Z",
+      "source_hash": "4bbd400c8bf7",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 2,
+      "before": 98.521736,
+      "after": 98.521736,
+      "note": "Complete translation semantics and 23 relocs; 2D-index evaluation order resisted two forms."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?ComboDraw@advManager@@QAEHHHH@Z",
+      "source_hash": "d68a22fdae0a",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
       "iterations": 0,
+      "before": 98.27748,
+      "after": 98.27748,
+      "note": "Complete draw semantics and 161 relocs; documented operand-order/TU-state walls remain."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?CompleteDraw@advManager@@QAEXHHHH@Z",
+      "source_hash": "3d39efd3fef1",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.69578,
+      "after": 99.69578,
+      "note": "Complete CFG and 23 relocs; twelve commutative coordinate additions remain operand-order walls."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?ComputeAdvNetControl@@YIXXZ",
+      "source_hash": "7447154bbc13",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 99.712326,
+      "after": 99.712326,
+      "note": "Recovered inferred third player local and exact 0x0c frame; one adjacent continuation branch byte remains."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?ControlPanel@advManager@@QAEHXZ",
+      "source_hash": "889a9ffa10fa",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 93.324844,
+      "after": 93.324844,
+      "note": "Complete modal/control CFG and 30 relocs; result-switch table mapping reviewed and correct."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?DemobilizeCurrHero@advManager@@QAEXXZ",
+      "source_hash": "3e3ad19464ef",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 96.50485,
+      "after": 96.50485,
+      "note": "Complete semantics and 7 relocs; compiler folds retail event-flag load/OR/store to memory OR."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?DimensionDoorHandler@@YIHAAUtag_message@@@Z",
+      "source_hash": "cc6b17c16087",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.28571,
+      "after": 98.28571,
+      "note": "Complete message/mouse CFG and 28 relocs; three inline continuation placements remain."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?DoAdvCommand@advManager@@QAEPAVmapCell@@XZ",
+      "source_hash": "2c24fc759993",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 99.99601,
+      "after": 99.99601,
+      "note": "Complete semantics; 87/87 relocs and local table match; two commutative equality operand bytes remain."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?DoHeroKnob@advManager@@QAEXXZ",
+      "source_hash": "a3c948989704",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.93421,
+      "after": 98.93421,
+      "note": "Complete frame/CFG and 26 relocs; two mirrored clamp comparisons remain operand-order walls."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?DoTownKnob@advManager@@QAEXXZ",
+      "source_hash": "7e69ebe18682",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.93421,
+      "after": 98.93421,
+      "note": "Complete frame/CFG and 26 relocs; two mirrored clamp comparisons remain operand-order walls."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?DoVisions@advManager@@QAEHPAVhero@@@Z",
+      "source_hash": "5ec4eee3332f",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 10,
       "before": 99.98485,
       "after": 99.98485,
-      "note": "All relocation-masked bytes and 42 effective targets align; only compiler-local string and float identities remain."
+      "note": "Complete semantics and 42 ordered relocs; three comparison-order bytes remain after ten perturb trials, and the reversed source comparison regressed block layout and was reverted."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?DrawAdventureBorder@advManager@@QAEXXZ",
+      "source_hash": "152d1b9c33e0",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.79012,
+      "after": 100.0,
+      "note": "Renamed savedPixels to recover retail local-slot hash; all 308 bytes and 6 relocs exact."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?DrawCell@advManager@@QAEXHHHHHH@Z",
+      "source_hash": "a79934b1f278",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 96.80784,
+      "after": 96.80784,
+      "note": "Complete 2373-instruction draw semantics and 551 relocs; documented comparisons/associations remain."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?FindAdjacentMonster@advManager@@QAEHHHPAH0HH@Z",
+      "source_hash": "ffe132023fe3",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 96.049385,
+      "after": 96.049385,
+      "note": "Complete edge/interior search CFG and 52 relocs; static identities and four comparisons remain."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?GetCell@advManager@@QAEPAVmapCell@@HH@Z",
+      "source_hash": "cbe735137429",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 2,
+      "before": 95.71429,
+      "after": 95.71429,
+      "note": "Complete bounds/inline-accessor semantics and two relocs; all three equivalent width-guard spellings compiled to the same reversed compare order."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?GetCloudLookup@advManager@@QAEHHH@Z",
+      "source_hash": "42808b6f8d37",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 96.823044,
+      "after": 96.823044,
+      "note": "Complete mask/edge CFG and 51 relocs; four address-evaluation blocks remain TU-order walls."
     },
     {
       "unit": "SOURCE/ADVMGR",
       "function": "?HeroQuickView@advManager@@QAEXHHHH@Z",
       "source_hash": "aada01a6d3be",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
-      "iterations": 2,
+      "iterations": 0,
       "before": 99.79162,
       "after": 99.79162,
-      "note": "Complete frame CFG and 109 relocs; commutative loop order and constant-folding residuals resist bounded steering."
+      "note": "Complete semantics and 109 relocation identities; a three-byte literal-split delta shifts later sites, with documented comparison/evaluation-order residuals."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?InsertSound@advManager@@QAEXHHHH@Z",
+      "source_hash": "a905a981c4cb",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 2,
+      "before": 98.70503,
+      "after": 98.70503,
+      "note": "Recovered exact map bounds; all 0x23a bytes match after masking 9 identical reloc sites."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?IsCrystalBallInEffect@advManager@@QAEHHHH@Z",
+      "source_hash": "9e585cf53920",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.15385,
+      "after": 98.15385,
+      "note": "Complete hero/artifact semantics and 6 relocs; one retail continuation jump remains."
     },
     {
       "unit": "SOURCE/ADVMGR",
       "function": "?Main@advManager@@UAEHAAUtag_message@@@Z",
       "source_hash": "9e6f9cde9deb",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
       "iterations": 10,
       "before": 99.99797,
       "after": 99.99797,
-      "note": "One adjacent same-epilogue branch byte remains after ten bounded CFG and AST attempts; 232 relocations agree."
+      "note": "Complete frame/CFG/semantics and 232 relocs; sole table mismatch selects two labels that both jump directly to the same epilogue; ten prior bounded forms exhausted."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?MapExtraPosAndAdjacentsSet@@YIHHHE@Z",
+      "source_hash": "8d75a8b4f54b",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 5,
+      "before": 93.29578,
+      "after": 93.29578,
+      "note": "Recovered identical 77-instruction normalized stream and 6 relocs; only local branch displacement bytes remain."
     },
     {
       "unit": "SOURCE/ADVMGR",
@@ -58,14 +278,47 @@
     },
     {
       "unit": "SOURCE/ADVMGR",
+      "function": "?ProcessHover@advManager@@QAEHHH@Z",
+      "source_hash": "8c3be1b7a25f",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 97.94643,
+      "after": 97.94643,
+      "note": "Complete hover semantics and 106 relocs; address reassociation remains; switch mapping matches under 6-byte shift."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?ProcessSearch@advManager@@QAEHHH@Z",
+      "source_hash": "ae8fd50adaa6",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.48586,
+      "after": 99.48586,
+      "note": "Complete 0x44 frame/CFG and 84 relocs; only moved GetNullSample continuation remains."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?ProcessSelect@advManager@@QAEHPAUtag_message@@PAPAVmapCell@@@Z",
+      "source_hash": "020aa541811f",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 97.75151,
+      "after": 97.75151,
+      "note": "Complete switch/radar semantics and 118 relocs; final table entry reaches equivalent adjacent epilogue jump."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
       "function": "?PuzzleDraw@advManager@@QAEXHHHH@Z",
       "source_hash": "a22b95215573",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
-      "outcome": "improved",
-      "iterations": 1,
-      "before": 99.88636,
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.90909,
       "after": 99.90909,
-      "note": "Corrected runtime field to m_objectIcons[17]; only unexplained retail frame provenance remains and 5 relocations agree."
+      "note": "Correct object icon 17 is retained; five relocs and CFG agree, with four frame/this-slot bytes unsupported by real local evidence."
     },
     {
       "unit": "SOURCE/ADVMGR",
@@ -80,36 +333,157 @@
     },
     {
       "unit": "SOURCE/ADVMGR",
+      "function": "?SetEnvironmentOrigin@advManager@@QAEXHHH@Z",
+      "source_hash": "a5907b5c3623",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 99.78846,
+      "after": 99.78846,
+      "note": "Complete frame/CFG and 18 relocs; commuting all four origin-plus-radius expressions was byte-neutral, leaving four operand-order spans."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?ShowRoute@advManager@@QAEXHHH@Z",
+      "source_hash": "188b2cb9aa50",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 98.94231,
+      "after": 98.94231,
+      "note": "Fixed signed direction loads; all 0x4d9 bytes match after masking 34 identical reloc sites."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?SummonBoat@advManager@@QAEXXZ",
+      "source_hash": "e45880daa4eb",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.47354,
+      "after": 98.47354,
+      "note": "Complete 0x40 frame/CFG and 41 relocs; bounds, inline continuation, and coordinate add order remain."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?SystemOptions@advManager@@QAEXXZ",
+      "source_hash": "b489248c7008",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.64356,
+      "after": 99.64356,
+      "note": "Semantics and 34 relocs agree; retail has unreferenced frame slots with no source evidence, so no padding invented."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?TeleportTo@advManager@@QAEXPAVhero@@HHHH@Z",
+      "source_hash": "fad7f4321091",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.74564,
+      "after": 98.74564,
+      "note": "Complete semantics and 44 relocs; compiler folds retail load/OR/store to memory OR."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?TownGate@advManager@@QAEXH@Z",
+      "source_hash": "72f65a7b996c",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.76,
+      "after": 99.76,
+      "note": "Complete 0x40 frame/CFG; one proven signed loop comparison operand-order wall; 64 relocs agree."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
       "function": "?TownQuickView@advManager@@QAEXHHHH@Z",
       "source_hash": "4e7e3b2af55d",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
-      "outcome": "improved",
-      "iterations": 2,
-      "before": 99.907234,
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 99.99727,
       "after": 99.99727,
-      "note": "Full-body re-audit confirms only eight commutative row-count load-order bytes; frame CFG tail and 102 relocations agree."
+      "note": "Complete frame/CFG and 102 relocs; directly commuting the final loop bound was byte-neutral, leaving eight operand-order bytes."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?TrimLoopingSounds@advManager@@QAEXH@Z",
+      "source_hash": "d90d0b816d0f",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 97.88288,
+      "after": 97.88288,
+      "note": "Complete code excluding two proven retail inline continuation jumps; 6 relocs agree."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?UpdBottomView@advManager@@QAEXHHH@Z",
+      "source_hash": "4fd5266e5ee5",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.06542,
+      "after": 99.06542,
+      "note": "Complete semantics and 24 relocs; one retail inline continuation is absent."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?UpdBottomViewEnemyTurn@advManager@@QAEHXZ",
+      "source_hash": "918682c75313",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.96774,
+      "after": 98.96774,
+      "note": "Complete CFG and 73 relocs; commutative comparisons and one inline continuation remain."
     },
     {
       "unit": "SOURCE/ADVMGR",
       "function": "?UpdBottomViewNewTurn@advManager@@QAEHXZ",
       "source_hash": "fa80c3cc15ee",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
       "iterations": 0,
       "before": 99.80531,
       "after": 99.80531,
-      "note": "Complete CFG and 45 relocs; retail has one unexplained unreferenced frame word with no source-supported local."
+      "note": "Complete semantics and 45 ordered relocs; retail's unexplained fourth frame word has no source-supported local role."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?UpdateHeroLocator@advManager@@QAEXHHH@Z",
+      "source_hash": "65ed239b077e",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.061035,
+      "after": 99.061035,
+      "note": "Complete locator semantics and 25 relocs; two retail inline continuations remain."
     },
     {
       "unit": "SOURCE/ADVMGR",
       "function": "?UpdateHeroLocators@advManager@@QAEXHH@Z",
       "source_hash": "ff9cf9e945ca",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
-      "iterations": 0,
+      "iterations": 10,
       "before": 99.92647,
       "after": 99.92647,
-      "note": "Relocation-masked code is exact and all 14 effective targets agree; only folded relocation identity remains."
+      "note": "All 0x102 masked bytes and 14 ordered relocs agree; ten perturb-first trials were byte-neutral."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?UpdateRadar@advManager@@QAEXHH@Z",
+      "source_hash": "d3256ad1d898",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.559074,
+      "after": 99.559074,
+      "note": "Complete radar semantics and 122 relocs; local tables map identically under uniform code shift."
     },
     {
       "unit": "SOURCE/ADVMGR",
@@ -124,25 +498,201 @@
     },
     {
       "unit": "SOURCE/ADVMGR",
-      "function": "?UpdateTownLocators@advManager@@QAEXHH@Z",
-      "source_hash": "0297b6eaece9",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "function": "?UpdateSystemOptions@@YIXH@Z",
+      "source_hash": "50a616665ce2",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
       "iterations": 0,
+      "before": 94.0829,
+      "after": 94.0829,
+      "note": "Complete 18 broadcasts and 68 relocs; equivalent option-expression lowering remains."
+    },
+    {
+      "unit": "SOURCE/ADVMGR",
+      "function": "?UpdateTownLocators@advManager@@QAEXHH@Z",
+      "source_hash": "0297b6eaece9",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 10,
       "before": 99.97175,
       "after": 99.97175,
-      "note": "Relocation-masked code is exact and all 30 effective targets agree; only folded relocation identity remains."
+      "note": "All 0x2e8 masked bytes and 30 ordered relocs agree; ten perturb-first trials were byte-neutral."
     },
     {
       "unit": "SOURCE/ADVMGR",
       "function": "?ViewPuzzle@advManager@@QAEXXZ",
       "source_hash": "8208b0271937",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.13837,
+      "after": 99.13837,
+      "note": "Complete semantics and 54 relocation identities; y-adjustment reassociation shifts one site by three bytes and the pointer comparison remains commutative."
+    },
+    {
+      "unit": "SOURCE/AI",
+      "function": "?GetAllMask@combatManager@@QAEHH@Z",
+      "source_hash": "cccc40393b4e",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 90.70909,
+      "after": 90.70909,
+      "note": "complete; flattened m_armies address construction differs; zero relocs"
+    },
+    {
+      "unit": "SOURCE/AI",
+      "function": "?GetBestArmy@combatManager@@QAEHHH@Z",
+      "source_hash": "8098249c5433",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 99.6076,
+      "after": 99.544304,
+      "note": "complete; one best-strength compare operand-memory choice remains; value pin added a test mismatch"
+    },
+    {
+      "unit": "SOURCE/AI",
+      "function": "?GetFlyerMask@combatManager@@QAEHH@Z",
+      "source_hash": "6cf02a469494",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 92.05,
+      "after": 92.05,
+      "note": "complete; first residual is m_armies two-dimensional address evaluation order; zero relocs"
+    },
+    {
+      "unit": "SOURCE/AI",
+      "function": "?GetMirrorImageMask@combatManager@@QAEHH@Z",
+      "source_hash": "f23b99ab85a2",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 88.43636,
+      "after": 88.43636,
+      "note": "complete; equivalent pointer-add term orders emitted the same m_armies evaluation order"
+    },
+    {
+      "unit": "SOURCE/AI",
+      "function": "?GetOutOfItMask@combatManager@@QAEHH@Z",
+      "source_hash": "766bcfbe2ee5",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 10,
+      "before": 90.50746,
+      "after": 100.0,
+      "note": "canonical raw span exact; zero relocations; current report table exact"
+    },
+    {
+      "unit": "SOURCE/AI",
+      "function": "?GetShooterMask@combatManager@@QAEHH@Z",
+      "source_hash": "dda8847950c1",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 92.42857,
+      "after": 92.42857,
+      "note": "complete; first residual is m_armies two-dimensional address evaluation order; zero relocs"
+    },
+    {
+      "unit": "SOURCE/AI",
+      "function": "?GetStrength@combatManager@@QAEKHH@Z",
+      "source_hash": "7d323946f9b4",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 90.875,
+      "after": 90.875,
+      "note": "complete; flattened m_armies address construction differs; sole external relocation aligns"
+    },
+    {
+      "unit": "SOURCE/AI",
+      "function": "?GetTraitorMask@combatManager@@QAEHH@Z",
+      "source_hash": "2adfca181593",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 89.741936,
+      "after": 89.741936,
+      "note": "complete; first residual is m_armies two-dimensional address evaluation order; zero relocs"
+    },
+    {
+      "unit": "SOURCE/AI",
+      "function": "?GetWalkerMask@combatManager@@QAEHH@Z",
+      "source_hash": "2df214096589",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 10,
+      "before": 92.68965,
+      "after": 100.0,
+      "note": "canonical raw span exact; zero relocations; current report table exact"
+    },
+    {
+      "unit": "SOURCE/AI",
+      "function": "?GetWorstArmy@combatManager@@QAEHHH@Z",
+      "source_hash": "ae3b26776188",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 98.91228,
+      "after": 98.73684,
+      "note": "complete; one worst-strength compare operand-memory choice remains; value pin added a test mismatch"
+    },
+    {
+      "unit": "SOURCE/ARMY",
+      "function": "?AttackTo@army@@QAEHH@Z",
+      "source_hash": "478f87ba365c",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.8855,
+      "after": 100.0,
+      "note": "Deterministic path-index local-name correction restores retail stack slots; all bytes and 18 relocs align."
+    },
+    {
+      "unit": "SOURCE/ARMY",
+      "function": "?Damage@army@@QAEHJH@Z",
+      "source_hash": "c5d767178626",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.93056,
+      "after": 100.0,
+      "note": "Deterministic local-name bucket correction restores retail stack slots; all bytes and 15 relocs align."
+    },
+    {
+      "unit": "SOURCE/ARMY",
+      "function": "?DecrementSpellRounds@army@@QAEXXZ",
+      "source_hash": "b2d77b4339d9",
       "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
       "outcome": "parked",
+      "iterations": 3,
+      "before": 99.954544,
+      "after": 99.954544,
+      "note": "Current TU state leaves one commutative load-order span after three bounded forms; retained source hash was exact previously."
+    },
+    {
+      "unit": "SOURCE/ARMY",
+      "function": "?ModifyFrameInfo@@YIXPAUSMonFrameInfo@@H@Z",
+      "source_hash": "44de21ac7c0e",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "exact",
       "iterations": 1,
-      "before": 99.80503,
-      "after": 99.80503,
-      "note": "Exact frame slots and 54 relocs; one commutative compare load order remains after reversed relation was byte-neutral."
+      "before": 99.96581,
+      "after": 100.0,
+      "note": "Recovered attackDuration at +0xa6 and flightSpeed at +0xaa; all bytes and 12 relocs align."
+    },
+    {
+      "unit": "SOURCE/ARMY",
+      "function": "?OtherArmyAdjacent@army@@QAEHHH@Z",
+      "source_hash": "2dba1fca51c2",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 4,
+      "before": 99.92381,
+      "after": 99.92381,
+      "note": "Complete frame slots CFG and three relocs; repeated equality load order resists four bounded forms."
     },
     {
       "unit": "SOURCE/CMBTMGR",
@@ -168,6 +718,17 @@
     },
     {
       "unit": "SOURCE/CMBTMGR",
+      "function": "?GetNextArmy@combatManager@@QAEHH@Z",
+      "source_hash": "caf97be53cc6",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
+      "iterations": 10,
+      "before": 94.283104,
+      "after": 97.141556,
+      "note": "complete; repeated m_armies address evaluation order remains; 4/4 external relocs align"
+    },
+    {
+      "unit": "SOURCE/CMBTMGR",
       "function": "?InCastle@combatManager@@QAEHH@Z",
       "source_hash": "2c298b882d8b",
       "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
@@ -179,6 +740,17 @@
     },
     {
       "unit": "SOURCE/CMBTMGR",
+      "function": "?IsWinner@combatManager@@QAEHH@Z",
+      "source_hash": "d8a51664aba6",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 89.034485,
+      "after": 89.034485,
+      "note": "complete; one m_armies two-dimensional address evaluation-order residual; zero relocs"
+    },
+    {
+      "unit": "SOURCE/CMBTMGR",
       "function": "?KeepAttack@combatManager@@QAEXH@Z",
       "source_hash": "b72a30d7d29e",
       "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
@@ -187,6 +759,17 @@
       "before": 99.669136,
       "after": 99.98272,
       "note": "Corrected defense field and steered three comparisons; only aggregate temporary and nested pointer slots remain."
+    },
+    {
+      "unit": "SOURCE/CMBTMGR",
+      "function": "?UpdateArmyGroup@combatManager@@QAEXH@Z",
+      "source_hash": "1a722a93d70c",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 10,
+      "before": 72.347824,
+      "after": 100.0,
+      "note": "canonical raw span exact; 3/3 ordered relocs exact; current report table exact"
     },
     {
       "unit": "SOURCE/CMBTMGR",
@@ -341,6 +924,28 @@
       "before": 99.8986,
       "after": 100.0,
       "note": "Corrected reversed completed-scenario track mapping and recovered track slot; raw code exact."
+    },
+    {
+      "unit": "SOURCE/Castle",
+      "function": "?CastleHandler@@YIHAAUtag_message@@@Z",
+      "source_hash": "c1558c7eb19b",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
+      "iterations": 2,
+      "before": 98.11658,
+      "after": 98.121925,
+      "note": "Reordered Grouped before Spread to retail body order; complete frame/CFG, 165 external identities, and all four normalized switch-table mappings agree; hover equality load order remains."
+    },
+    {
+      "unit": "SOURCE/Castle",
+      "function": "?SetupCastle@townManager@@QAEXPAVheroWindow@@H@Z",
+      "source_hash": "72fc44681c18",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 10,
+      "before": 99.995056,
+      "after": 100.0,
+      "note": "Forced the two terrain/race frame additions with 0[&local]; all 0x10bb bytes, 139 relocation sites, and table tuples are exact after masking compiler-local identities."
     },
     {
       "unit": "SOURCE/DRAWING",
@@ -818,13 +1423,13 @@
     {
       "unit": "SOURCE/KB",
       "function": "?SetupDynamicWindow@@YIXHHHHHHHPAH00000PAPAVheroWindow@@H@Z",
-      "source_hash": "c378cb459a40",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
-      "outcome": "exact",
-      "iterations": 8,
+      "source_hash": "daf330cebd4b",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 1,
       "before": 99.87674,
-      "after": 100.0,
-      "note": "Qualified column index closes loop polarity; all 1724 bytes match after masking 51 canonical string relocations."
+      "after": 99.87674,
+      "note": "Corrected the first edge-loop operand order; all 1724 non-relocation bytes and 51 ordered reloc sites now align, leaving only canonical string identities."
     },
     {
       "unit": "SOURCE/KB",
@@ -907,23 +1512,78 @@
       "unit": "SOURCE/PHILAI",
       "function": "?CheckBerserk@philAI@@QAEXXZ",
       "source_hash": "256ff2ac6bc1",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
-      "iterations": 0,
+      "iterations": 10,
       "before": 99.97488,
-      "after": 99.97488,
-      "note": "All 770 bytes match after masking 26 relocations; sole raw byte is folded __adjust_fdiv owner/addend spelling."
+      "after": 98.16583,
+      "note": "current TU first differs in MAP_WIDTH and MAP_HEIGHT loop-bound operand choice; 26 external relocs align"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?CheckReload@philAI@@QAEXXZ",
+      "source_hash": "3958629d618e",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 99.35821,
+      "after": 98.82089,
+      "note": "first residual is MAP_WIDTH and MAP_HEIGHT loop-bound operand choice; 61 external relocs align"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?CreaturesToBuy@philAI@@QAEHHH@Z",
+      "source_hash": "6b9ea4620c5a",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 97.75,
+      "after": 97.75,
+      "note": "one clamp compare operand-memory choice remains; value-preserving accumulator pin was neutral"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?DoAllHeroInteractions@philAI@@QAEXXZ",
+      "source_hash": "770d116fda88",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 98.039215,
+      "after": 98.039215,
+      "note": "one extra continuation jump remains; early-continue spelling regressed to 94.90; 6 relocs align"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?DoDimensionDoor@philAI@@QAEHPAVhero@@@Z",
+      "source_hash": "fdc9d1a3d408",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
+      "iterations": 10,
+      "before": 91.28,
+      "after": 97.6,
+      "note": "fixed signed path-byte indexing; only node versus gpSearchArray load order remains; 11/11 relocs align"
     },
     {
       "unit": "SOURCE/PHILAI",
       "function": "?EvaluateMonsterEvent@philAI@@QAEHHHPAH@Z",
       "source_hash": "3563ffb62a93",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
-      "iterations": 0,
+      "iterations": 10,
       "before": 99.978905,
       "after": 99.978905,
-      "note": "All 830 bytes match after masking 40 relocations; sole raw byte is folded __adjust_fdiv owner/addend spelling."
+      "note": "raw code exact after 40 relocation masks; delinker and float identities only"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?EvaluateOneTimeCreaturePurchase@philAI@@QAEXHHHAAH00@Z",
+      "source_hash": "25ed93e46bdc",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 99.54074,
+      "after": 99.54074,
+      "note": "complete; one compare operand-memory choice remains; reverse, value pin, and empty-arm spellings exhausted"
     },
     {
       "unit": "SOURCE/PHILAI",
@@ -938,14 +1598,58 @@
     },
     {
       "unit": "SOURCE/PHILAI",
+      "function": "?GetTurnAttentionValue@philAI@@QAEXH@Z",
+      "source_hash": "0750265d11f0",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 10,
+      "before": 97.93651,
+      "after": 100.0,
+      "note": "fixed base pointer to semantic player attention subrecord; raw span exact and 5/5 ordered relocs exact"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
       "function": "?HeroInteractionAtHero@philAI@@QAEXPAVhero@@0HPAH@Z",
       "source_hash": "3f12436eaa8e",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
-      "iterations": 0,
+      "iterations": 10,
       "before": 99.9671,
-      "after": 99.9671,
-      "note": "All 1058 bytes match after masking 29 relocations; two raw bytes are folded __adjust_fdiv owner/addend spellings."
+      "after": 99.94079,
+      "note": "four commutative address-load byte pairs remain; 29 external relocs align"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?ProbableOutcomeOfBattle@philAI@@QAEXPAVarmyGroup@@PAVhero@@010HHHAAMAAH3333@Z",
+      "source_hash": "a7482e592cec",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
+      "iterations": 10,
+      "before": 98.70205,
+      "after": 99.946,
+      "note": "only four commutative address-load bytes remain after relocation masking; 84 external relocs align"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?QuickCombat@philAI@@QAEHPAVarmyGroup@@PAVhero@@01HHAAM2@Z",
+      "source_hash": "f0c03e65233e",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
+      "iterations": 10,
+      "before": 99.60947,
+      "after": 99.97041,
+      "note": "raw code exact after 85 relocation masks; current fuzzy residual is float and division-guard identities"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?SetupRelativeHeroStrengths@philAI@@QAEXXZ",
+      "source_hash": "df43eba197d8",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 98.87273,
+      "after": 98.87273,
+      "note": "complete; one compare operand-memory choice remains; reverse, value pin, and empty-arm spellings exhausted"
     },
     {
       "unit": "SOURCE/PHILAI",
@@ -957,6 +1661,39 @@
       "before": 99.992546,
       "after": 99.992546,
       "note": "All 2086 bytes match after masking 75 relocations; sole raw byte is folded __adjust_fdiv owner/addend spelling."
+    },
+    {
+      "unit": "SOURCE/PHILAI",
+      "function": "?ValueOfTown@philAI@@QAEHPAVtown@@@Z",
+      "source_hash": "16c9a76f1d46",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 97.03371,
+      "after": 97.03371,
+      "note": "two castle-coordinate equalities load byte and word operands in reverse order; 11 external relocs align"
+    },
+    {
+      "unit": "SOURCE/SMACKMGR",
+      "function": "?PlaySmacker@@YIHH@Z",
+      "source_hash": "625c16a40190",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.948715,
+      "after": 100.0,
+      "note": "Restored retail local identity and summary expression order; all bytes and 33 relocations align."
+    },
+    {
+      "unit": "SOURCE/SMACKMGR",
+      "function": "?SmackManagerMain@@YIXXZ",
+      "source_hash": "c3cf35cfac31",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.95742,
+      "after": 100.0,
+      "note": "Corrected the primary-start/fade condition and frame-zero comparisons; all bytes and 334 relocations align."
     },
     {
       "unit": "SOURCE/SPELLS",
@@ -1050,12 +1787,12 @@
       "unit": "SOURCE/TOWN",
       "function": "?BuildBuilding@town@@QAEXH@Z",
       "source_hash": "5b85e7506518",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
       "iterations": 10,
       "before": 99.9863,
       "after": 99.9863,
-      "note": "All 155 instructions and 9 relocations align; two commutative spell-count stack-load displacements resisted ten bounded variants."
+      "note": "Current source reaches audited exact 100 under controlled typedef TU state (trial 1), with exact 574-byte CodeView span and complete 9-relocation stream; generated state is diagnostic only."
     },
     {
       "unit": "SOURCE/TOWN",
