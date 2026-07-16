@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import fcntl
 import hashlib
 import json
 import math
@@ -67,6 +68,10 @@ PROCESS_GROUP_TERMINATION_GRACE_SECONDS = 1.0
 
 
 class BaselineUpdateError(ValueError):
+    pass
+
+
+class SourceMutationError(RuntimeError):
     pass
 
 
@@ -416,12 +421,41 @@ def insert_variant(original: str, target: Target, variant: Variant) -> str:
 
 @contextmanager
 def temporary_source(path: Path, original: bytes, candidate: bytes):
-    """Expose one candidate to cl and unconditionally restore the exact original bytes."""
+    """Expose one candidate while refusing to overwrite an unexpected source edit."""
+    if path.read_bytes() != original:
+        raise SourceMutationError(f"source changed before probe write: {path}")
     path.write_bytes(candidate)
     try:
         yield
     finally:
+        if path.read_bytes() != candidate:
+            raise SourceMutationError(
+                f"source changed during probe; refusing stale restoration: {path}"
+            )
         path.write_bytes(original)
+
+
+def acquire_source_mutation_lock(root: Path, source: Path):
+    """Hold an exclusive non-blocking lock for one source-mutating search run."""
+    lock_root = root / "build/tu-state-noise/.locks"
+    lock_root.mkdir(parents=True, exist_ok=True)
+    identity = hashlib.sha256(str(source.resolve()).encode("utf-8")).hexdigest()
+    lock_path = lock_root / f"{identity}.lock"
+    handle = lock_path.open("a+")
+    try:
+        fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError as exc:
+        handle.seek(0)
+        owner = handle.read().strip() or "unknown owner"
+        handle.close()
+        raise SourceMutationError(
+            f"another source-variant process owns {source}: {owner}"
+        ) from exc
+    handle.seek(0)
+    handle.truncate()
+    handle.write(f"pid={os.getpid()} source={source}\n")
+    handle.flush()
+    return handle
 
 
 @contextmanager
@@ -794,6 +828,10 @@ def main(argv: list[str] | None = None) -> int:
         else root / "build/tu-state-noise" / default_name
     )
     source_rel = target.source.relative_to(root)
+    try:
+        source_lock = acquire_source_mutation_lock(root, target.source)
+    except (OSError, SourceMutationError) as exc:
+        parser.error(str(exc))
     original_bytes = target.source.read_bytes()
     original = original_bytes.decode("utf-8")
     from homm2.match.status import source_hashes as project_source_hashes
@@ -881,6 +919,7 @@ def main(argv: list[str] | None = None) -> int:
         manifest["restored_target_source_hash"] = restored_target_hash
         (output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
         print(f"dry-run non-matching diagnostic: {len(variants)} auditable variants in {output}")
+        source_lock.close()
         return 0
 
     assert scratch is not None
@@ -895,6 +934,7 @@ def main(argv: list[str] | None = None) -> int:
         finalize_compiled_artifacts(scratch, output, final_output, False)
         reason = "timed out" if baseline_timed_out else "failed"
         print(f"baseline compile {reason}; disposable artifacts removed", file=sys.stderr)
+        source_lock.close()
         return 2
     with measure_stage(timings, "baseline_objdiff"):
         baseline_scores, baseline_sizes, baseline_counts, diff_log = objdiff_scores(
@@ -907,14 +947,17 @@ def main(argv: list[str] | None = None) -> int:
     if baseline_counts.get(target.symbol) != 1:
         finalize_compiled_artifacts(scratch, output, final_output, False)
         print(f"target symbol is not unique in baseline objdiff: {target.symbol}", file=sys.stderr)
+        source_lock.close()
         return 2
     if target.symbol not in baseline_scores or target.symbol not in baseline_metrics:
         finalize_compiled_artifacts(scratch, output, final_output, False)
         print(f"target symbol absent from baseline object: {target.symbol}", file=sys.stderr)
+        source_lock.close()
         return 2
     if target.symbol not in retail_metrics:
         finalize_compiled_artifacts(scratch, output, final_output, False)
         print(f"target symbol absent from retail object: {target.symbol}", file=sys.stderr)
+        source_lock.close()
         return 2
     baseline_target = baseline_metrics[target.symbol]
     baseline_target["objdiff_size"] = baseline_sizes.get(target.symbol)
@@ -1080,9 +1123,8 @@ def main(argv: list[str] | None = None) -> int:
         manifest["interrupted"] = True
         print("probe interrupted; restoring source and removing disposable artifacts", file=sys.stderr)
     finally:
-        # This is deliberately redundant with temporary_source: it also covers exceptions
-        # between trials and makes the postcondition explicit.
-        target.source.write_bytes(original_bytes)
+        # temporary_source owns restoration. Never overwrite a manual or foreign edit
+        # observed outside its guarded candidate interval.
         signal.signal(signal.SIGTERM, old_term)
 
     (output / "trials.tsv").write_text(
@@ -1117,6 +1159,7 @@ def main(argv: list[str] | None = None) -> int:
     if not manifest["source_restored"] or not manifest["target_source_hash_restored"]:
         finalize_compiled_artifacts(scratch, output, final_output, False)
         print("FATAL: source or normalized target-hash restoration check failed", file=sys.stderr)
+        source_lock.close()
         return 3
     record_error = False
     if args.record_max and interrupted:
@@ -1147,9 +1190,11 @@ def main(argv: list[str] | None = None) -> int:
     if record_error:
         finalize_compiled_artifacts(scratch, output, final_output, False)
         print(f"record-max refused: {manifest['record_max']['error']}", file=sys.stderr)
+        source_lock.close()
         return 4
     if interrupted:
         finalize_compiled_artifacts(scratch, output, final_output, False)
+        source_lock.close()
         return 130
 
     if exact_closure is None:
@@ -1165,6 +1210,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.record_max:
             state = manifest["record_max"]
             print(f"no exact closure retained; baseline unchanged: {state['reason']}")
+        source_lock.close()
         return 0
 
     retained_output = finalize_compiled_artifacts(scratch, output, final_output, True)
@@ -1182,6 +1228,7 @@ def main(argv: list[str] | None = None) -> int:
             )
         else:
             print(f"exact closure already retained; baseline unchanged: {state['reason']}")
+    source_lock.close()
     return 0
 
 
