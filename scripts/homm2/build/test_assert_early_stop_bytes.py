@@ -73,6 +73,33 @@ class MaskedSpanTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "different relocation sites"):
             compare_masked_spans(base, target)
 
+    def test_rejects_permuted_jump_table_destination(self):
+        target = FunctionSpan(
+            b"\0" * 8,
+            ((0, 4), (4, 4)),
+            ((0, 0x30), (4, 0x50)),
+        )
+        base = FunctionSpan(
+            b"\0" * 8,
+            ((0, 4), (4, 4)),
+            ((0, 0x50), (4, 0x30)),
+        )
+        with self.assertRaisesRegex(ValueError, "same-function DIR32 destinations"):
+            compare_masked_spans(base, target)
+
+    def test_accepts_local_label_and_owner_addend_with_same_destination(self):
+        target = FunctionSpan(
+            b"\x30\0\0\0",
+            ((0, 4),),
+            ((0, 0x30),),
+        )
+        base = FunctionSpan(
+            b"\0\0\0\0",
+            ((0, 4),),
+            ((0, 0x30),),
+        )
+        self.assertEqual([], compare_masked_spans(base, target))
+
     def test_ordinary_member_operand_mismatch_is_not_masked(self):
         # Historical army::LoadResources regression: both instructions test bit
         # four, but the stale flag constant selected this+0xd2 instead of +0xd0.
