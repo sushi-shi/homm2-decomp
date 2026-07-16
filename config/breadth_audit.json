@@ -838,6 +838,61 @@
       "note": "All 2086 bytes match after masking 75 relocations; sole raw byte is folded __adjust_fdiv owner/addend spelling."
     },
     {
+      "unit": "SOURCE/SPELLS",
+      "function": "?DefaultSpell@combatManager@@QAEXH@Z",
+      "source_hash": "4472d99338cd",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.93056,
+      "after": 99.93056,
+      "note": "Complete body and three relocs; one branch routes through a different semantically empty trampoline."
+    },
+    {
+      "unit": "SOURCE/SPELLS",
+      "function": "?DoBlast@combatManager@@QAEXHH@Z",
+      "source_hash": "d8045d7d5f6d",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "improved",
+      "iterations": 3,
+      "before": 99.92071,
+      "after": 99.95595,
+      "note": "Symmetric subscript steering restores three commutative load orders; all masked bytes and 50 effective targets align."
+    },
+    {
+      "unit": "SOURCE/SPELLS",
+      "function": "?Ripple@combatManager@@QAEXH@Z",
+      "source_hash": "80a92b3d99f9",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 99.860466,
+      "after": 99.860466,
+      "note": "Complete body and five relocs; retail reserves two unexplained unused frame words with no source-supported local."
+    },
+    {
+      "unit": "SOURCE/SPELLS",
+      "function": "?ShowSpellCastFailure@combatManager@@QAEXPAVarmy@@H@Z",
+      "source_hash": "81694caddcfa",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 3,
+      "before": 99.893936,
+      "after": 99.893936,
+      "note": "Complete CFG and 15 relocs; aggregate temporary and army-name slots resist three bounded scope and initialization forms."
+    },
+    {
+      "unit": "SOURCE/SPELLS",
+      "function": "?ViewSpells@combatManager@@QAEHH@Z",
+      "source_hash": "f43c3aa5a89b",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.98404,
+      "after": 99.98404,
+      "note": "Exact frame slots and 62 relocs; two local branch-displacement bytes remain outside the switch tables."
+    },
+    {
       "unit": "SOURCE/STRIP",
       "function": "?DrawIcons@strip@@QAEXH@Z",
       "source_hash": "250b3650ad1d",
