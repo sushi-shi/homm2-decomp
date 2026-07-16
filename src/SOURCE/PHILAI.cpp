@@ -153,6 +153,10 @@ philAI::philAI(void) {
     }
 }
 
+// @semantic: Complete CFG, frame/slots, and all 6/6 ordered relocations align.
+// At normalized instruction 13 ours has one extra continuation jmp before the
+// retail loop body. An early-continue spelling lowered the match to 94.90%.
+// Revisit after PHILAI TU/header state changes or in the byte-last-mile phase.
 VA(0x00437bb5, 0xac)
 void philAI::DoAllHeroInteractions(void) {
     int i;
@@ -414,6 +418,11 @@ int philAI::GoodAdjacent(int *direction) {
     return 0;
 }
 
+// @semantic: Complete CFG, frame/slots, and all 61 external relocations align.
+// The first residual at normalized instruction 72 is the /Od operand-memory
+// choice for both MAP_WIDTH and MAP_HEIGHT loop bounds; later rows are floating
+// constant and division-guard identities. Ten guarded TU-state probes did not
+// produce an eligible closure. Revisit in the byte-last-mile phase.
 VA(0x00438785, 0x4b8)
 void philAI::CheckReload(void) {
     int p;
@@ -477,13 +486,11 @@ void philAI::CheckReload(void) {
     }
 }
 
-// @early-stop
-// @early-stop-reloc-only: Current PHILAI.cpp/header epoch: all 0x302 bytes match after
-// masking 26 ordered relocation sites. The sole raw difference is byte +0x2d4,
-// inside the float-division guard relocation: retail __adjust_fdiv at 0x12126c
-// is delinked as iLeftRightSave+0x10 from 0x12125c. Remaining disassembly rows
-// only rename compiler floating constants; opcodes, operands, frame, and CFG
-// are exact. Revisit only after the PHILAI source/TU/header or comparison epoch.
+// @semantic: Complete 0x302-byte CFG, frame/slots, and all 26 external
+// relocations align. Current TU state first differs at normalized instruction
+// 46: ours loads each loop index before MAP_WIDTH/MAP_HEIGHT and skips on jle;
+// retail loads the bound first and skips on jge. Later rows are floating
+// constant/division-guard identities. Revisit in the byte-last-mile phase.
 VA(0x00438c3d, 0x302)
 void philAI::CheckBerserk(void) {
     int row17;
@@ -652,6 +659,11 @@ int philAI::DoAnywhereDDoorTownGate(int targetValue) {
     return 0;
 }
 
+// @semantic: Complete 0x158-byte CFG, frame/slots, and all 11/11 ordered
+// relocations align. Explicit unsigned path bytes fixed the retail zero-extend
+// semantics and raised the live score from 91.28% to 97.60%. The first residual
+// now only loads node before gpSearchArray where retail loads them in reverse.
+// Revisit after PHILAI TU/header state changes or in the byte-last-mile phase.
 VA(0x004393a9, 0x158)
 int philAI::DoDimensionDoor(hero *pHero) {
     int node;           // i
@@ -666,8 +678,10 @@ int philAI::DoDimensionDoor(hero *pHero) {
     kn = pHero->m_x;
     nb = pHero->m_y;
     for (node = gpSearchArray->m_pathLength - 1; node >= 1; node--) {
-        kn += normalDirTable[gpSearchArray->m_storage.aiPath.directions[node]].x;
-        nb += normalDirTable[gpSearchArray->m_storage.aiPath.directions[node]].y;
+        kn += normalDirTable[static_cast<unsigned char>(
+            gpSearchArray->m_storage.aiPath.directions[node])].x;
+        nb += normalDirTable[static_cast<unsigned char>(
+            gpSearchArray->m_storage.aiPath.directions[node])].y;
         if (abs(kn - pHero->m_x) <= 7 &&
             abs(nb - pHero->m_y) <= 7) {
             jb = gpAdvManager->GetCell(kn, nb);
@@ -685,6 +699,12 @@ int philAI::DoDimensionDoor(hero *pHero) {
     return 1;
 }
 
+// @semantic: The complete 0xb7-byte CFG, 0x14 frame, five stack slots, and all
+// 6/6 ordered relocations align. At normalized instruction 44 retail loads
+// bestFV into eax, compares fv, and skips on jle; ours loads fv, compares bestFV,
+// and skips on jge. Reversed operands, a value-preserving | 0 pin, and an empty
+// positive arm with the update in else were neutral or added a trampoline.
+// Revisit in the byte-last-mile phase or after PHILAI TU/header state changes.
 VA(0x00439501, 0xb7)
 void philAI::SetupRelativeHeroStrengths(void) {
     hero *alpha;
@@ -1154,7 +1174,7 @@ firstWeekDone:
         static_cast<float>(gpCurPlayer->m_income[RES_GOLD] +
                            gpCurPlayer->m_resources[RES_GOLD]) /
             (lastFightValue8 + 1000) +
-        gpCurPlayer->m_upgradeBaseWeight;
+        gpCurPlayer->m_attentionWeights.upgradeBase;
 
     artifactTotal8 = 0;
     for (generalIndex4 = 4; generalIndex4 < 37; generalIndex4++)
@@ -1697,10 +1717,12 @@ candidate_scored:
     return bestValue;
 }
 
-// @early-stop
+// @semantic: Complete CFG, frame/slots, and all 84 external relocations align.
 // Relocation-masked raw bytes differ only at +0x4ee/+0x4f1 and +0x62a/+0x62d:
 // MSVC loads the two commutative hero-artifact address operands into eax/ecx in
 // the opposite order. The effective addresses agree, as do all 84 relocations.
+// Ten guarded TU-state probes peaked at 99.499070 without exact closure; the
+// current header state reaches 99.95%. Revisit in the byte-last-mile phase.
 VA(0x0043c6e2, 0x791)
 void philAI::ProbableOutcomeOfBattle(armyGroup *attacker, hero *attackerHero,
                                      armyGroup *defender, hero *defenderHero,
@@ -1805,12 +1827,12 @@ void philAI::ProbableOutcomeOfBattle(armyGroup *attacker, hero *attackerHero,
 
     difficultyFactor5 = static_cast<float>(
         AI_BATTLE_LOSS_FACTOR_BASE -
-        gpCurPlayer->m_upgradeBaseWeight);
+        gpCurPlayer->m_attentionWeights.upgradeBase);
     outcomeValue = static_cast<int>(
         -attackerRemaining * difficultyFactor5 * difficultyFactor5);
     if (enemyPlayer >= 0) {
         difficultyFactor5 = static_cast<float>(
-            gpCurPlayer->m_upgradeBaseWeight +
+            gpCurPlayer->m_attentionWeights.upgradeBase +
             AI_BATTLE_PLAYER_FACTOR_BASE);
         if (gbHumanPlayer[enemyPlayer] != 0)
             outcomeValue = static_cast<int>(
@@ -1877,7 +1899,7 @@ void philAI::ProbableOutcomeOfBattle(armyGroup *attacker, hero *attackerHero,
     if (giDebugLevel >= AI_BATTLE_DEBUG_LEVEL) {
         LogInt("POBA", static_cast<int>(attackerStrength0),
                static_cast<int>(defenderStrength4),
-               static_cast<int>(gpCurPlayer->m_upgradeBaseWeight *
+               static_cast<int>(gpCurPlayer->m_attentionWeights.upgradeBase *
                                 AI_BATTLE_PERCENT_SCALE),
                0, attackerArtifacts7, defenderArtifacts18,
                static_cast<int>(gpCurPlayer->m_upgradeValueWeight));
@@ -2025,9 +2047,9 @@ void philAI::ValueOfBuyingBuilding(town *townPtr, int building, int &resourceVal
         break;
     case AI_BUILDING_SPECIAL_FOUR:
         adjustedValue = static_cast<float>(
-            (gpCurPlayer->m_buildingValueWeight + 0.66) * adjustedValue);
+            (gpCurPlayer->m_attentionWeights.buildingValue + 0.66) * adjustedValue);
         adjustedValue = static_cast<float>(
-            (gpCurPlayer->m_upgradeBaseWeight * 2.0f + 0.33) * adjustedValue);
+            (gpCurPlayer->m_attentionWeights.upgradeBase * 2.0f + 0.33) * adjustedValue);
         adjustedValue = static_cast<float>((dwellingTotal * 0.33 + 0.66) * adjustedValue);
         if ((townPtr->m_type != 0 ||
              !(townPtr->m_buildings &
@@ -2074,9 +2096,9 @@ void philAI::ValueOfBuyingBuilding(town *townPtr, int building, int &resourceVal
                 break;
         }
         adjustedValue = static_cast<float>(
-            (gpCurPlayer->m_buildingValueWeight + 0.66) * adjustedValue);
+            (gpCurPlayer->m_attentionWeights.buildingValue + 0.66) * adjustedValue);
         adjustedValue = static_cast<float>(
-            (gpCurPlayer->m_upgradeBaseWeight * 2.0f + 0.33) * adjustedValue);
+            (gpCurPlayer->m_attentionWeights.upgradeBase * 2.0f + 0.33) * adjustedValue);
         adjustedValue = static_cast<float>(
             (1.0 - gpCurPlayer->BuildingsOwned(currentTownRace, building, 0) * 0.05) * adjustedValue);
         if (building - AI_BUILDING_FIRST_DWELLING < highestDwellingId)
@@ -2216,7 +2238,7 @@ void philAI::ValueOfBuyingCreature(town *townPtr, int creature, int &resourceVal
                  missileStacks * AI_CREATURE_RANGED_STACK_FACTOR) * creatureValue);
         }
         creatureValue = static_cast<int>(
-            (gpGame->m_players[townPtr->m_owner].m_upgradeBaseWeight +
+            (gpGame->m_players[townPtr->m_owner].m_attentionWeights.upgradeBase +
              AI_CREATURE_BALANCE_BASE) * creatureValue);
     }
 
@@ -2345,11 +2367,11 @@ int philAI::CreaturesToBuy(town *t, int level) {
     return CreaturesToBuy((int)gDwellingType[t->m_type][level], nGarrison);
 }
 
-// @early-stop
-// Complete & byte-exact except ONE clamp `cmp`: this cl loads the param b(0xc) into the
-// reg (cmp [n],b / jle) where retail loads the local n(-0x4) (cmp [b],n / jge) — identical
-// `if (b < n) n = b;` source, a cl operand-memory-selection difference (verified across
-// `<`/`>` and cdecl/thiscall probes; not /QIfdiv-related).
+// @semantic: Complete 0x5f-byte CFG, frame/slots, and the sole relocation align.
+// At normalized instruction 17 ours loads b, compares n, and skips on jle;
+// retail loads n, compares b, and skips on jge. Reversed operands and a | 0
+// accumulator pin were neutral; scratch `<`/`>` and calling-convention probes
+// emitted the same choice. Revisit in the byte-last-mile phase.
 VA(0x0043defb, 0x5f)
 int philAI::CreaturesToBuy(int a, int b) {
     int n = MaxBuyableCreatures(a);
@@ -2415,8 +2437,8 @@ void philAI::ValueOfBuyingHero(town *townPtr, hero *heroPtr, int &resourceValue,
     }
     value27 += heroPtr->m_experience / 2;
     value27 = static_cast<int>(
-        (gpCurPlayer->m_heroValueWeight + 1.0 -
-         gpCurPlayer->m_upgradeBaseWeight) * value27);
+        (gpCurPlayer->m_attentionWeights.heroValue + 1.0 -
+         gpCurPlayer->m_attentionWeights.upgradeBase) * value27);
     magicHero6 = heroPtr->m_cursorType == HERO_CLASS_SORCERESS ||
                  heroPtr->m_cursorType == HERO_CLASS_WARLOCK ||
                  heroPtr->m_cursorType == HERO_CLASS_WIZARD ||
@@ -2508,40 +2530,40 @@ int philAI::MeanRVOfUnexploredTerritory(int) { return 0; }
 // occurrences agree.
 VA(0x0043e4d8, 0x1d8)
 void philAI::GetGameAttentionValue(int player) {
-    playerData *attention =
-        &gpGame->m_players[player];
-    attention->m_gameAttentionWeightA = static_cast<float>(
+    playerAttentionWeights *attention =
+        &gpGame->m_players[player].m_attentionWeights;
+    attention->gameWeightA = static_cast<float>(
         Random(0, 100) / AI_ATTENTION_RANDOM_DIVISOR + AI_ATTENTION_RANDOM_BASE);
-    attention->m_gameAttentionWeightB = static_cast<float>(
+    attention->gameWeightB = static_cast<float>(
         Random(0, 100) / AI_ATTENTION_RANDOM_DIVISOR + AI_ATTENTION_RANDOM_BASE);
-    attention->m_gameAttentionWeightB *=
+    attention->gameWeightB *=
         (AI_ATTENTION_IDENTITY_FLOAT + AI_ATTENTION_PLAYER_CENTER) /
         AI_ATTENTION_NORMALIZER;
-    attention->m_gameAttentionWeightB *=
+    attention->gameWeightB *=
         (AI_ATTENTION_UPPER_BOUND - AI_ATTENTION_IDENTITY_FLOAT) /
         AI_ATTENTION_NORMALIZER;
-    attention->m_gameAttentionWeightA *=
+    attention->gameWeightA *=
         (AI_ATTENTION_IDENTITY_FLOAT + AI_ATTENTION_PLAYER_CENTER) /
         AI_ATTENTION_NORMALIZER;
-    attention->m_gameAttentionWeightB = static_cast<float>(
+    attention->gameWeightB = static_cast<float>(
         ((AI_ATTENTION_PLAYER_CENTER - gpGame->m_playerCount) *
-             AI_ATTENTION_WEIGHT_B_PLAYER_FACTOR + 1.0) * attention->m_gameAttentionWeightB);
-    attention->m_gameAttentionWeightA = static_cast<float>(
+             AI_ATTENTION_WEIGHT_B_PLAYER_FACTOR + 1.0) * attention->gameWeightB);
+    attention->gameWeightA = static_cast<float>(
         ((AI_ATTENTION_PLAYER_CENTER - gpGame->m_playerCount) *
-             AI_ATTENTION_WEIGHT_A_PLAYER_FACTOR + 1.0) * attention->m_gameAttentionWeightA);
-    attention->m_gameAttentionRemainder =
-        static_cast<float>((1.0 - attention->m_gameAttentionWeightB) - attention->m_gameAttentionWeightA);
+             AI_ATTENTION_WEIGHT_A_PLAYER_FACTOR + 1.0) * attention->gameWeightA);
+    attention->gameRemainder =
+        static_cast<float>((1.0 - attention->gameWeightB) - attention->gameWeightA);
 }
 
 VA(0x0043e6b0, 0xf2)
 void philAI::GetTurnAttentionValue(int player) {
-    playerData *ptr = &gpGame->m_players[player];
-    ptr->m_gameAttentionWeightA = 0.4f;
-    ptr->m_gameAttentionWeightB = 0.3f;
-    ptr->m_gameAttentionRemainder = 0.3f;
-    ptr->m_buildingValueWeight = ptr->m_gameAttentionWeightA;
-    ptr->m_heroValueWeight = ptr->m_gameAttentionWeightB;
-    ptr->m_upgradeBaseWeight = ptr->m_gameAttentionRemainder;
+    playerAttentionWeights *ptr = &gpGame->m_players[player].m_attentionWeights;
+    ptr->gameWeightA = 0.4f;
+    ptr->gameWeightB = 0.3f;
+    ptr->gameRemainder = 0.3f;
+    ptr->buildingValue = ptr->gameWeightA;
+    ptr->heroValue = ptr->gameWeightB;
+    ptr->upgradeBase = ptr->gameRemainder;
     float factor;
     if (giCurTurn < 5)
         factor = 1.6f;
@@ -2553,7 +2575,7 @@ void philAI::GetTurnAttentionValue(int player) {
         factor = 1.0f;
     else
         factor = 0.8f;
-    ptr->m_heroValueWeight = ptr->m_heroValueWeight * factor;
+    ptr->heroValue = ptr->heroValue * factor;
 }
 
 VA(0x0043e7a2, 0xa6)
@@ -2931,11 +2953,11 @@ int philAI::StrategicValueOfPosition(int targetX, int targetY, int immediate,
     return score4;
 }
 
-// @early-stop
-// Complete & correct except the two castle-match `==` compares: cl unconditionally loads
-// the byte operand (town castleX/Y) before the word operand (game field); retail evaluates
-// left-to-right (word first). Verified via scratch cl: byte-first is hard-wired, not
-// source-steerable. Same equality result.
+// @semantic: Complete 0x14e-byte CFG, frame/slots, and all 11 external
+// relocations align. The first code residual is the first castle-coordinate
+// equality: ours loads the town byte before the game-header word, while retail
+// loads the word first; the second comparison repeats it. Scratch equality
+// spellings retained the byte-first choice. Revisit in the byte-last-mile phase.
 VA(0x0043fa3e, 0x14e)
 int philAI::ValueOfTown(town *t) {
     int sum = 0;
@@ -3002,7 +3024,8 @@ float philAI::TurnValueOfObelisk(int player) {
         ta->m_obeliskValue = (int)(ta->m_obeliskValue * 1.4);
     ta->m_obeliskValue = (int)((1.5 -
         abs(0x30 - gpGame->SetupPuzzlePieces(giCurPlayer, 1)) / 48.0f) * ta->m_obeliskValue);
-    ta->m_obeliskValue = static_cast<int>((ta->m_heroValueWeight + 0.66) * ta->m_obeliskValue);
+    ta->m_obeliskValue = static_cast<int>(
+        (ta->m_attentionWeights.heroValue + 0.66) * ta->m_obeliskValue);
     return (float)ta->m_obeliskValue;
 }
 
@@ -3256,9 +3279,13 @@ int philAI::FightValueOfStack(armyGroup *group, hero *heroPtr, int useHero,
     return armyValue;
 }
 
-// @early-stop
-// Relocation-masked bytes are exact across all 0x1e7 bytes, and all 14
-// relocation sites and targets agree.
+// @semantic: The complete 0x1e7-byte CFG, 0x18 frame, six stack slots, and all
+// 14/14 ordered relocations align. At normalized instruction 82 retail loads
+// leastStackValue3 into eax, compares replacementStackValue7, and skips on jge;
+// ours loads replacementStackValue7, compares leastStackValue3, and skips on
+// jle. Reversed operands, a value-preserving | 0 pin, and an empty positive arm
+// with the update in else were neutral or added a trampoline. Revisit in the
+// byte-last-mile phase or after PHILAI TU/header state changes.
 VA(0x00440aca, 0x1e7)
 void philAI::EvaluateOneTimeCreaturePurchase(int creature, int availableCount,
                                              int useAvailableCount,
@@ -3322,8 +3349,11 @@ void philAI::EvaluateOneTimeCreaturePurchase(int creature, int availableCount,
 }
 
 // @early-stop
-// Relocation-masked bytes are exact across all 0x768 bytes, and all 85
-// relocation sites and targets agree.
+// @early-stop-reloc-only: Current PHILAI.cpp/header epoch: all 0x768 code bytes
+// match after masking 85 ordered relocation sites. The fuzzy residual consists
+// only of compiler float-constant and division-guard symbol identities; frame,
+// slots, opcodes, operands, and CFG are exact. Revisit only after the PHILAI
+// source/TU/header or comparison epoch changes.
 VA(0x00440cb1, 0x768)
 int philAI::QuickCombat(armyGroup *attacker, hero *attackerHero,
                         armyGroup *defender, hero *defenderHero,
@@ -3536,13 +3566,11 @@ int philAI::QuickCombat(armyGroup *attacker, hero *attackerHero,
     return attackerWon2;
 }
 
-// @early-stop
-// @early-stop-reloc-only: Current PHILAI.cpp/header epoch: all 0x422 bytes match after
-// masking 29 ordered relocation sites. The only raw differences, +0x19c and
-// +0x282, are float-division guard relocations where retail __adjust_fdiv is
-// delinked as iLeftRightSave+0x10; remaining constant identities are equivalent.
-// Frame, slots, opcodes, operands, and CFG are exact. Revisit only after the
-// PHILAI source/TU/header or comparison epoch.
+// @semantic: Complete 0x422-byte CFG, frame/slots, and all 29 external
+// relocations align. Current TU state differs in floating symbol identities and
+// four commutative address-load byte pairs at +0x276/+0x279, +0x2df/+0x2e2,
+// +0x384/+0x387, and +0x3c0/+0x3c3. Ten guarded perturbations did not yield an
+// eligible closure. Revisit in the byte-last-mile phase.
 VA(0x00441419, 0x422)
 void philAI::HeroInteractionAtHero(hero *firstHero, hero *secondHero,
                                    int evaluateOnly, int *value) {
