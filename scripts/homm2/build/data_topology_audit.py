@@ -43,6 +43,9 @@ def audit_candidate_topology(jobs=None, migrate_identities=False):
     )
     _coverage, _padding, coverage_diagnostics = _build_coverage_proposal(
         allocations)
+    subprocess.run([
+        "python3", "-m", "homm2.build.gen_reloc_aliases",
+    ], check=True)
     return (
         manifest_summary, stats, group_diagnostics,
         coverage_diagnostics, queue_stats,

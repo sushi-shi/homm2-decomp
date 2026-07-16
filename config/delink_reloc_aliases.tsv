@@ -1,0 +1,6 @@
+function_rva	target_rva	owner	addend	occurrences	provenance
+0x0004a061	0x000f5180	?cdTestTrackData@@3PAUsCDTest_Track_Data@@A	0xfffffff8	1	reviewed-array-index-and-tu-owner
+0x0004a061	0x000f5184	?cdTestTrackData@@3PAUsCDTest_Track_Data@@A	0xfffffffc	1	reviewed-array-index-and-tu-owner
+0x0004a0f0	0x000e0130	__write	0x00000000	11	reviewed-crt-call-alias
+0x0004a0f0	0x000e0660	__close	0x00000000	1	reviewed-crt-call-alias
+0x0004a0f0	0x000e0760	__open	0x00000000	1	reviewed-crt-call-alias

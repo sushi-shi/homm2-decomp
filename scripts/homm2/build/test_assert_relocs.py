@@ -10,7 +10,9 @@ from homm2.build.assert_relocs import (
     check_owner_offset_multisets,
     check_ordered_owner_offsets,
     check_ordered_reloc_addresses,
+    compare_function_reloc_addends,
     parse_obj,
+    relocation_addend_map,
 )
 from homm2.build.reloc_owners import DataOwner, is_interior_reloc_alias, owners_from_rows
 
@@ -152,6 +154,38 @@ class OrderedRelocFieldTest(unittest.TestCase):
 
 
 class CoffAddendTest(unittest.TestCase):
+    def test_addend_map_is_grouped_by_raw_name_and_sorted(self):
+        relocations = [
+            ("DIR32", "?owner@@3HA", 0x78),
+            ("REL32", "?callee@@YIXXZ", 0),
+            ("DIR32", "?owner@@3HA", 0x1C),
+        ]
+        self.assertEqual(relocation_addend_map(relocations), {
+            "?callee@@YIXXZ": (0,),
+            "?owner@@3HA": (0x1C, 0x78),
+        })
+
+    def test_addend_comparison_catches_wrong_field_without_sites(self):
+        target = [
+            ("DIR32", GCONFIG_SYMBOL, 0x30),
+            ("DIR32", GCONFIG_SYMBOL, 0x78),
+        ]
+        base = [
+            ("DIR32", GCONFIG_SYMBOL, 0x78),
+            ("DIR32", GCONFIG_SYMBOL, 0x1C),
+        ]
+        differences = compare_function_reloc_addends(base, target)
+        self.assertEqual(len(differences), 1)
+        self.assertEqual(differences[0]["missing"], (0x30,))
+        self.assertEqual(differences[0]["excess"], (0x1C,))
+
+    def test_addend_comparison_catches_missing_relocation_name(self):
+        differences = compare_function_reloc_addends(
+            [], [("REL32", "?callee@@YIXXZ", 0)])
+        self.assertEqual(differences[0]["symbol"], "?callee@@YIXXZ")
+        self.assertEqual(differences[0]["missing"], (0,))
+        self.assertEqual(differences[0]["excess"], ())
+
     def test_each_text_comdat_uses_its_own_implicit_addend(self):
         data = bytearray(0x8A)
         struct.pack_into("<HHIIIHH", data, 0, 0x14C, 2, 0, 0, 0, 0, 0)

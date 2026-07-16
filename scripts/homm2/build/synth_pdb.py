@@ -23,7 +23,6 @@ from homm2.build.reloc_owners import (
     is_interior_reloc_alias, load_definition_rvas, load_explicit_extents,
     owners_from_rows,
 )
-from homm2.build.reloc_alias_metadata import encode_pdb_alias, load_aliases
 
 REPO = next((p for p in Path(__file__).resolve().parents if (p / "flake.nix").exists()), Path.cwd())
 
@@ -59,28 +58,11 @@ def read_csv(path):
     return rows
 
 
-def validate_reloc_aliases(rows, reloc_aliases):
-    public_data = {
-        row["name"]: int(row["rva"], 0) for row in rows
-        if (row.get("kind") == "data" and
-            row.get("provenance") == "cv-public-data")
-    }
-    for alias in reloc_aliases.values():
-        owner_rva = public_data.get(alias.owner)
-        if owner_rva is None:
-            raise ValueError("reloc alias owner is not public data: %s" % alias.owner)
-        if (owner_rva + alias.addend) & 0xffffffff != alias.target_rva:
-            raise ValueError("reloc alias does not resolve to target RVA 0x%x" %
-                             alias.target_rva)
-
-
 def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--exe", default=os.environ.get("HOMM2_EXE", str(REPO / "build/orig/HEROES2W.EXE")))
     ap.add_argument("--csv", default=str(REPO / "build/gen/symbol_names.csv"))
     ap.add_argument("--out", default=str(REPO / "build/pdb/HEROES2W.pdb"))
-    ap.add_argument("--reloc-aliases",
-                    help="paired exact-address public-owner alias TSV")
     a = ap.parse_args(argv)
     exe, out = Path(a.exe), Path(a.out)
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -90,12 +72,9 @@ def main(argv=None):
     funcs, data = [], []
     rows = list(csv.DictReader(
         [ln for ln in open(a.csv) if not ln.lstrip().startswith("#")]))
-    reloc_aliases = load_aliases(a.reloc_aliases) if a.reloc_aliases else {}
-    validate_reloc_aliases(rows, reloc_aliases)
     owners = owners_from_rows(
         rows, load_definition_rvas(), load_explicit_extents())
     canonicalized_aliases = 0
-    paired_aliases = set()
     for row in rows:
         rva = int(row["rva"], 16); name = row["name"].strip(); unit = row["unit"].strip()
         size = int((row.get("size") or "0"), 16); kind = (row.get("kind") or "func").strip()
@@ -105,18 +84,10 @@ def main(argv=None):
         if kind == "func" and seg == text_seg and size > 0:
             funcs.append((rva, size, name, unit))
         else:
-            paired_alias = reloc_aliases.get(rva)
-            if paired_alias is not None:
-                name = encode_pdb_alias(paired_alias)
-                paired_aliases.add(rva)
-            elif is_interior_reloc_alias(row, owners):
+            if is_interior_reloc_alias(row, owners):
                 canonicalized_aliases += 1
                 continue
             data.append((rva, name, seg, rva - base))
-    missing_aliases = sorted(set(reloc_aliases) - paired_aliases)
-    if missing_aliases:
-        raise ValueError("reloc aliases lack exact symbol rows: %s" %
-                         ", ".join("0x%x" % rva for rva in missing_aliases[:8]))
     funcs.sort(); data.sort()
 
     # per-unit source files (the delinker emits one <unit>.c.obj per file)
@@ -181,9 +152,8 @@ def main(argv=None):
     if empty is not None:
         _patch_dbi(out, empty)
     print("[synth_pdb] %d funcs + %d data -> %s (%d units); "
-          "%d explicit-owner aliases omitted; %d paired owner aliases encoded" %
-          (len(funcs), len(data), out, len(files), canonicalized_aliases,
-           len(paired_aliases)))
+          "%d explicit-owner aliases omitted" %
+          (len(funcs), len(data), out, len(files), canonicalized_aliases))
 
 
 def _patch_dbi(pdb, empty_stream):
