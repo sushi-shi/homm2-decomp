@@ -816,6 +816,61 @@
       "note": "Exact frame slots CFG and 2 relocations; sole retail cmp versus candidate sub opcode resisted ten bounded variants."
     },
     {
+      "unit": "SOURCE/TOWNMGR",
+      "function": "?RecruitHero@townManager@@QAEHHH@Z",
+      "source_hash": "64009b00fbd3",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.8494,
+      "after": 100.0,
+      "note": "Deterministic local-name reconstruction restores the complete retail stack-slot layout; function is exact."
+    },
+    {
+      "unit": "SOURCE/TOWNMGR",
+      "function": "?SetArmyCommand@townManager@@QAEXH@Z",
+      "source_hash": "7dcacfe0baa4",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "exact",
+      "iterations": 3,
+      "before": 99.98,
+      "after": 100.0,
+      "note": "OR-zero steering restores retail commutative creature-type load order; function is exact."
+    },
+    {
+      "unit": "SOURCE/TOWNMGR",
+      "function": "?SetupMage@townManager@@QAEXPAVheroWindow@@@Z",
+      "source_hash": "92bbdfb1a9cd",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 3,
+      "before": 99.9,
+      "after": 99.9,
+      "note": "Complete logic CFG and 34 relocs; retail retains one unexplained unreferenced frame word after three bounded families."
+    },
+    {
+      "unit": "SOURCE/TOWNMGR",
+      "function": "?SetupTown@townManager@@QAEXXZ",
+      "source_hash": "ab68f0a26725",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "parked",
+      "iterations": 3,
+      "before": 99.59729,
+      "after": 99.59729,
+      "note": "Every non-jump byte and 85 relocs align; retail has two five-byte inline continuation jumps absent from base."
+    },
+    {
+      "unit": "SOURCE/TOWNMGR",
+      "function": "?SetupWell@townManager@@QAEXPAVheroWindow@@@Z",
+      "source_hash": "698002a0c968",
+      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.7057,
+      "after": 100.0,
+      "note": "Deterministic local-name reconstruction restores the complete retail stack-slot layout; function is exact."
+    },
+    {
       "unit": "SOURCE/dpnetwin",
       "function": "?dpEvaluateMessage@@YIXKH@Z",
       "source_hash": "0b6f64c20e48",

@@ -731,16 +731,13 @@ void townManager::ChangeTown(void)
     SetCommandAndText(message);
 }
 
-// @match-note 99.60%: the complete window, object/widget ownership, same-race
-// refresh, garrison/hero strips, spell grant, selection reset, exact 0x58
-// frame/slots, and all 85/85 relocations agree. The 0x950-byte build is exactly
-// ten bytes shorter than retail's 0x95a-byte instruction stream: retail has
-// jump-to-next continuations at +0x58e after crestFrame and +0x692 before the
-// occupying-hero GetHero expansion. All non-jump opcodes/operands match after
-// masking aligned relocations; string-pool and the DATA-backed object-order
-// label identities are the only relocation-name differences. A Color() inline
-// accessor lowered the score to 99.43%, so the continuation context is not that
-// accessor alone. Revisit the two source block boundaries at SOURCE 95%.
+// @early-stop
+// Jump-only proof: the exact 0x58 frame/slots, all 85 ordered relocations, and
+// every non-jump opcode and operand agree. The 0x950-byte base stream is exactly
+// ten bytes short of retail's 0x95a bytes: two five-byte jump-to-next inline
+// continuations at retail +0x58e and +0x692 account for the complete delta.
+// Color() regressed; color and occupying-hero 0[&value] spellings were stagnant.
+// Revisit only after either accessor, source/TU/header, or comparison epoch changes.
 VA(0x0041436f, 0x95a)
 void townManager::SetupTown(void)
 {
@@ -946,12 +943,6 @@ void townManager::Close(void)
     m_town->m_buildings &= TOWN_CLOSE_DYNAMIC_CLEAR_MASK;
 }
 
-// @early-stop
-// Soft TU-cumulative operand-order wall: the 0x0c frame, slots, CFG, and 24/24
-// relocations agree. After relocation masking, only +0xfd/+0x10c/+0x119/+0x128
-// differ: retail loads swap strip/slot before pending strip/slot for the
-// commutative creature-type equality, while this TU state emits the reverse.
-// Reversing operands and the commutative-subscript spelling did not steer it.
 VA(0x00414f62, 0x3b9)
 void townManager::SetArmyCommand(int qualifier)
 {
@@ -972,7 +963,7 @@ void townManager::SetArmyCommand(int qualifier)
         m_command = TOWN_ARMY_COMMAND_VIEW;
     } else {
         sameType = 0;
-        if (m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot] ==
+        if ((m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot] | 0) ==
             m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot])
             sameType = 1;
         if (sameType) {
@@ -2336,14 +2327,13 @@ void townManager::BuildObj(int building)
     }
 }
 
-// @match-note 94.49%: complete spell availability/widget/text CFG and all
-// 34/34 relocations agree. The Library mask is proven 0x2000. od_slots-derived
-// names align retail slots through message(-0x3c), but retail reserves an
-// unreferenced word at -0x48 and has lineCount/hasLibrary/this at
-// -0x58/-0x5c/-0x60 versus -0x54/-0x58/-0x5c. Post-95 flattened and typed
-// row-pointer spellings regressed to 93.28% and 94.49%; neither naturally
-// recovered the compiler-reserved word. Do not invent padding; revisit only
-// after a shared compiler-state/layout change.
+// @semantic: First raw divergence is the frame byte at +0x5: base 0x5c versus
+// retail 0x60. Message(-0x3c), loop/condition CFG, and all 34 ordered relocations
+// agree, but retail reserves an unreferenced word at -0x48 and consequently has
+// hasLibrary/this at -0x5c/-0x60 versus -0x58/-0x5c. Flattened and typed-row
+// spellings and reversed guild-frame assignment order were worse; no padding
+// declaration was invented. Revisit only after compiler state, layout evidence,
+// or the source/TU/header comparison epoch changes.
 VA(0x00418fbb, 0x3d8)
 void townManager::SetupMage(heroWindow *window)
 {
@@ -2503,27 +2493,23 @@ int MageGuildHandler(tag_message &message)
     return EventWindowHandler(message);
 }
 
-// @early-stop
-// Relocation-masked instruction streams are identical with the exact 0x68
-// frame and 65/65 relocations. The only reported residuals are three delinked
-// string-literal identities (window, hero description, and portrait format).
 VA(0x00419523, 0x706)
 int townManager::RecruitHero(int availableHeroIndex, int cannotRecruit)
 {
-    short unusedTextControl = 3;
-    short unusedPortraitControl = 7;
-    short unusedTextState = 1;
-    short unusedPortraitState = 2;
-    short unusedIconState = 4;
-    short unusedDimState = 6;
-    short unusedButtonText = 8;
-    short unusedButtonIcon = 9;
-    tag_message message;
-    int artifactCount;
-    int index;
-    int townX;
-    int townY;
-    int newHeroClass;
+    short unusedTextStateTemp = 1;
+    short unusedPortraitStateSlot = 2;
+    short unusedTextControlValue = 3;
+    short unusedIconStatek = 4;
+    short unusedDimStatem = 6;
+    short unusedPortraitControlIndex = 7;
+    short unusedButtonTextk = 8;
+    short unusedButtonIconl = 9;
+    tag_message messageLocal;
+    int artifactCountb;
+    int indexValue;
+    int townXh;
+    int townYWork;
+    int newHeroClassCount;
 
     m_heroWindow1 = new heroWindow(0xb1, 0x10, "rcrthero.bin");
     if (m_heroWindow1 == 0)
@@ -2532,45 +2518,45 @@ int townManager::RecruitHero(int availableHeroIndex, int cannotRecruit)
     m_recruitHero = &gpGame->m_heroRecs[
         gpCurPlayer->AvailableHeroId(availableHeroIndex)];
     m_recruitHero->m_owner = static_cast<char>(giCurPlayer);
-    message.type = TOWN_MESSAGE_SELECT;
+    messageLocal.type = TOWN_MESSAGE_SELECT;
 
     if (cannotRecruit != 0) {
-        message.payload.widget.command = 6;
-        message.payload.widget.data.value = 2;
-        message.payload.widget.id = 8;
-        m_heroWindow1->BroadcastMessage(message);
-        message.payload.widget.id = 9;
-        m_heroWindow1->BroadcastMessage(message);
-        message.payload.widget.id = TOWN_DIALOG_CONFIRM;
-        m_heroWindow1->BroadcastMessage(message);
-        message.payload.widget.command = 5;
-        message.payload.widget.data.value = 0x1000;
-        message.payload.widget.id = 8;
-        m_heroWindow1->BroadcastMessage(message);
-        message.payload.widget.id = 9;
-        m_heroWindow1->BroadcastMessage(message);
-        message.payload.widget.id = TOWN_DIALOG_CONFIRM;
-        m_heroWindow1->BroadcastMessage(message);
+        messageLocal.payload.widget.command = 6;
+        messageLocal.payload.widget.data.value = 2;
+        messageLocal.payload.widget.id = 8;
+        m_heroWindow1->BroadcastMessage(messageLocal);
+        messageLocal.payload.widget.id = 9;
+        m_heroWindow1->BroadcastMessage(messageLocal);
+        messageLocal.payload.widget.id = TOWN_DIALOG_CONFIRM;
+        m_heroWindow1->BroadcastMessage(messageLocal);
+        messageLocal.payload.widget.command = 5;
+        messageLocal.payload.widget.data.value = 0x1000;
+        messageLocal.payload.widget.id = 8;
+        m_heroWindow1->BroadcastMessage(messageLocal);
+        messageLocal.payload.widget.id = 9;
+        m_heroWindow1->BroadcastMessage(messageLocal);
+        messageLocal.payload.widget.id = TOWN_DIALOG_CONFIRM;
+        m_heroWindow1->BroadcastMessage(messageLocal);
     }
 
-    artifactCount = 0;
-    for (index = 0; index < TOWN_MAX_ARTIFACTS; ++index) {
-        if (m_recruitHero->m_artifacts[index] != -1 &&
-            m_recruitHero->m_artifacts[index] != TOWN_SPELL_BOOK_ARTIFACT)
-            ++artifactCount;
+    artifactCountb = 0;
+    for (indexValue = 0; indexValue < TOWN_MAX_ARTIFACTS; ++indexValue) {
+        if (m_recruitHero->m_artifacts[indexValue] != -1 &&
+            m_recruitHero->m_artifacts[indexValue] != TOWN_SPELL_BOOK_ARTIFACT)
+            ++artifactCountb;
     }
     sprintf(gText, "%s is a level %d %s with %d artifacts.",
             m_recruitHero->m_name, m_recruitHero->m_level,
-            gAlignmentNames[m_recruitHero->m_cursorType], artifactCount);
-    message.payload.widget.command = 3;
-    message.payload.widget.id = 1;
-    message.payload.widget.data.text = gText;
-    m_heroWindow1->BroadcastMessage(message);
+            gAlignmentNames[m_recruitHero->m_cursorType], artifactCountb);
+    messageLocal.payload.widget.command = 3;
+    messageLocal.payload.widget.id = 1;
+    messageLocal.payload.widget.data.text = gText;
+    m_heroWindow1->BroadcastMessage(messageLocal);
     sprintf(gText, "port%04d.icn", m_recruitHero->m_portrait);
-    message.payload.widget.command = 9;
-    message.payload.widget.id = 2;
-    message.payload.widget.data.text = gText;
-    m_heroWindow1->BroadcastMessage(message);
+    messageLocal.payload.widget.command = 9;
+    messageLocal.payload.widget.id = 2;
+    messageLocal.payload.widget.data.text = gText;
+    m_heroWindow1->BroadcastMessage(messageLocal);
 
     m_recruitState = -1;
     gpWindowManager->DoDialog(m_heroWindow1, RecruitHeroHandler, 0);
@@ -2582,23 +2568,23 @@ int townManager::RecruitHero(int availableHeroIndex, int cannotRecruit)
             gpCurPlayer->m_availableHeroIds[m_recruitState];
         ++gpCurPlayer->m_heroCount;
 
-        townX = m_town->m_x;
-        townY = m_town->m_y;
-        m_recruitHero->m_x = townX;
-        m_recruitHero->m_y = townY;
+        townXh = m_town->m_x;
+        townYWork = m_town->m_y;
+        m_recruitHero->m_x = townXh;
+        m_recruitHero->m_y = townYWork;
         m_recruitHero->m_eventFlags = 0;
         m_recruitHero->m_direction = 2;
         m_recruitHero->m_remainingMobility = m_recruitHero->CalcMobility();
         m_recruitHero->m_mobility = m_recruitHero->m_remainingMobility;
         m_recruitHero->m_locationType =
-            gpGame->m_worldMap.GetCell(townX, townY)->m_triggerType;
+            gpGame->m_worldMap.GetCell(townXh, townYWork)->m_triggerType;
         m_recruitHero->m_occupiedTown =
-            gpGame->m_worldMap.GetCell(townX, townY)->m_objectMetadata;
-        gpGame->m_worldMap.GetCell(townX, townY)->m_triggerType =
+            gpGame->m_worldMap.GetCell(townXh, townYWork)->m_objectMetadata;
+        gpGame->m_worldMap.GetCell(townXh, townYWork)->m_triggerType =
             AI_OBJECT_HERO;
-        gpGame->m_worldMap.GetCell(townX, townY)->m_objectMetadata =
+        gpGame->m_worldMap.GetCell(townXh, townYWork)->m_objectMetadata =
             gpCurPlayer->m_availableHeroIds[m_recruitState];
-        SendMapChange(3, m_recruitHero->m_id, townX, townY,
+        SendMapChange(3, m_recruitHero->m_id, townXh, townYWork,
                       TOWN_MAP_CHANGE_UNUSED, 0, 0);
         m_recruitResult = 1;
         m_town->m_occupyingHeroId = m_recruitHero->m_id;
@@ -2609,12 +2595,13 @@ int townManager::RecruitHero(int availableHeroIndex, int cannotRecruit)
         if (m_town->m_buildings & 1)
             m_town->GiveSpells(0);
 
-        newHeroClass =
+        newHeroClassCount =
             gpCurPlayer->m_availableHeroIds[1 - m_recruitState] / 9;
-        newHeroClass = (Random(1, 5) + newHeroClass) % TOWN_HERO_CLASS_COUNT;
+        newHeroClassCount =
+            (Random(1, 5) + newHeroClassCount) % TOWN_HERO_CLASS_COUNT;
         gpCurPlayer->m_availableHeroIds[m_recruitState] =
             static_cast<signed char>(
-                gpGame->GetNewHeroId(giCurPlayer, newHeroClass, 0));
+                gpGame->GetNewHeroId(giCurPlayer, newHeroClassCount, 0));
         gpGame->m_availableHeroes[
             gpCurPlayer->m_availableHeroIds[m_recruitState]] =
             AI_HERO_AVAILABLE_FLAG;
@@ -2787,133 +2774,131 @@ update_amount:
     return 1;
 }
 
-// @early-stop
-// reloc-masked: instruction streams identical; only local-string/interior-global relocation identities differ
 VA(0x0041a1b4, 0x5cf)
 void townManager::SetupWell(heroWindow *window)
 {
-    short unusedFirstIcon = 1;
-    short unusedFirstName = TOWN_WELL_FIRST_NAME_CONTROL;
-    short unusedFirstMonsterIcon = TOWN_WELL_FIRST_MONSTER_ICON_CONTROL;
-    short unusedFirstCreature = TOWN_WELL_FIRST_CREATURE_CONTROL;
-    short unusedFirstDetail = TOWN_WELL_FIRST_DETAIL_CONTROL;
-    short unusedFirstAvailable = TOWN_WELL_FIRST_AVAILABLE_CONTROL;
-    short unusedFirstAvailableCount = TOWN_WELL_FIRST_AVAILABLE_COUNT_CONTROL;
-    unsigned char dwellingTypes[8];
-    int available;
-    int dwelling;
-    tag_message message;
-    char iconName[16];
-    char detailText[40];
-    tag_monsterInfo monsterInfo;
-    int growth;
+    short unusedFirstIconj = 1;
+    short unusedFirstNameh = TOWN_WELL_FIRST_NAME_CONTROL;
+    short unusedFirstMonsterIconSlot = TOWN_WELL_FIRST_MONSTER_ICON_CONTROL;
+    short unusedFirstCreaturep = TOWN_WELL_FIRST_CREATURE_CONTROL;
+    short unusedFirstDetailState = TOWN_WELL_FIRST_DETAIL_CONTROL;
+    short unusedFirstAvailablek = TOWN_WELL_FIRST_AVAILABLE_CONTROL;
+    short unusedFirstAvailableCountm = TOWN_WELL_FIRST_AVAILABLE_COUNT_CONTROL;
+    unsigned char dwellingTypesValue[8];
+    int availablen;
+    int dwellingResult;
+    tag_message messaged;
+    char iconNameCount[16];
+    char detailTextf[40];
+    tag_monsterInfo monsterInfoi;
+    int growthd;
 
-    for (dwelling = 0; dwelling < TOWN_WELL_DWELLING_COUNT; ++dwelling) {
-        if (dwelling == TOWN_WELL_DWELLING_COUNT - 1 &&
+    for (dwellingResult = 0; dwellingResult < TOWN_WELL_DWELLING_COUNT; ++dwellingResult) {
+        if (dwellingResult == TOWN_WELL_DWELLING_COUNT - 1 &&
             (m_town->m_buildings &
              (1L << TOWN_WELL_LAST_UPGRADE_BUILDING))) {
-            dwellingTypes[dwelling] = TOWN_WELL_DWELLING_COUNT * 2 - 1;
-        } else if (dwelling >= 1 &&
+            dwellingTypesValue[dwellingResult] = TOWN_WELL_DWELLING_COUNT * 2 - 1;
+        } else if (dwellingResult >= 1 &&
                    (m_town->m_buildings &
-                    (1L << (dwelling + TOWN_WELL_FIRST_UPGRADE_BUILDING)))) {
-            dwellingTypes[dwelling] = static_cast<unsigned char>(
-                dwelling + TOWN_WELL_FIRST_UPGRADE_OFFSET);
+                    (1L << (dwellingResult + TOWN_WELL_FIRST_UPGRADE_BUILDING)))) {
+            dwellingTypesValue[dwellingResult] = static_cast<unsigned char>(
+                dwellingResult + TOWN_WELL_FIRST_UPGRADE_OFFSET);
         } else {
-            dwellingTypes[dwelling] = static_cast<unsigned char>(dwelling);
+            dwellingTypesValue[dwellingResult] = static_cast<unsigned char>(dwellingResult);
         }
     }
 
-    message.type = TOWN_MESSAGE_SELECT;
-    message.payload.widget.command = 9;
-    sprintf(iconName, "cstl%s.icn", cHeroTypeShortName[m_town->m_type]);
-    message.payload.widget.data.text = iconName;
-    for (dwelling = 0; dwelling < TOWN_WELL_DWELLING_COUNT; ++dwelling) {
-        message.payload.widget.id = dwelling + 1;
-        window->BroadcastMessage(message);
+    messaged.type = TOWN_MESSAGE_SELECT;
+    messaged.payload.widget.command = 9;
+    sprintf(iconNameCount, "cstl%s.icn", cHeroTypeShortName[m_town->m_type]);
+    messaged.payload.widget.data.text = iconNameCount;
+    for (dwellingResult = 0; dwellingResult < TOWN_WELL_DWELLING_COUNT; ++dwellingResult) {
+        messaged.payload.widget.id = dwellingResult + 1;
+        window->BroadcastMessage(messaged);
     }
 
-    for (dwelling = 0; dwelling < TOWN_WELL_DWELLING_COUNT; ++dwelling) {
-        message.payload.widget.command = 4;
-        message.payload.widget.id = dwelling + 1;
-        message.payload.widget.data.value = dwellingTypes[dwelling] +
+    for (dwellingResult = 0; dwellingResult < TOWN_WELL_DWELLING_COUNT; ++dwellingResult) {
+        messaged.payload.widget.command = 4;
+        messaged.payload.widget.id = dwellingResult + 1;
+        messaged.payload.widget.data.value = dwellingTypesValue[dwellingResult] +
                           TOWN_COMMAND_FIRST_DWELLING;
-        window->BroadcastMessage(message);
+        window->BroadcastMessage(messaged);
         sprintf(gText, "monh%04d.icn",
-                gDwellingType[m_town->m_type][dwellingTypes[dwelling]]);
-        message.payload.widget.command = 9;
-        message.payload.widget.id = dwelling + TOWN_WELL_FIRST_MONSTER_ICON_CONTROL;
-        message.payload.widget.data.text = gText;
-        window->BroadcastMessage(message);
+                gDwellingType[m_town->m_type][dwellingTypesValue[dwellingResult]]);
+        messaged.payload.widget.command = 9;
+        messaged.payload.widget.id = dwellingResult + TOWN_WELL_FIRST_MONSTER_ICON_CONTROL;
+        messaged.payload.widget.data.text = gText;
+        window->BroadcastMessage(messaged);
     }
 
-    message.type = TOWN_MESSAGE_SELECT;
-    message.payload.widget.command = 3;
-    for (dwelling = 0; dwelling < TOWN_WELL_DWELLING_COUNT; ++dwelling) {
+    messaged.type = TOWN_MESSAGE_SELECT;
+    messaged.payload.widget.command = 3;
+    for (dwellingResult = 0; dwellingResult < TOWN_WELL_DWELLING_COUNT; ++dwellingResult) {
         sprintf(gText, GetBuildingName(
             m_town->m_type,
-            dwellingTypes[dwelling] + TOWN_COMMAND_FIRST_DWELLING));
-        message.payload.widget.id = dwelling + TOWN_WELL_FIRST_NAME_CONTROL;
-        message.payload.widget.data.text = gText;
-        window->BroadcastMessage(message);
+            dwellingTypesValue[dwellingResult] + TOWN_COMMAND_FIRST_DWELLING));
+        messaged.payload.widget.id = dwellingResult + TOWN_WELL_FIRST_NAME_CONTROL;
+        messaged.payload.widget.data.text = gText;
+        window->BroadcastMessage(messaged);
 
         if (m_town->m_buildings &
-            (1L << (dwellingTypes[dwelling] +
+            (1L << (dwellingTypesValue[dwellingResult] +
                     TOWN_COMMAND_FIRST_DWELLING))) {
-            available = m_town->m_garrison[dwellingTypes[dwelling]];
+            availablen = m_town->m_garrison[dwellingTypesValue[dwellingResult]];
             sprintf(gText, "Available:");
-            message.payload.widget.id = dwelling + TOWN_WELL_FIRST_AVAILABLE_CONTROL;
-            message.payload.widget.data.text = gText;
-            window->BroadcastMessage(message);
-            sprintf(gText, "%d", available);
-            message.payload.widget.id = dwelling +
+            messaged.payload.widget.id = dwellingResult + TOWN_WELL_FIRST_AVAILABLE_CONTROL;
+            messaged.payload.widget.data.text = gText;
+            window->BroadcastMessage(messaged);
+            sprintf(gText, "%d", availablen);
+            messaged.payload.widget.id = dwellingResult +
                              TOWN_WELL_FIRST_AVAILABLE_COUNT_CONTROL;
-            message.payload.widget.data.text = gText;
-            window->BroadcastMessage(message);
+            messaged.payload.widget.data.text = gText;
+            window->BroadcastMessage(messaged);
         }
 
-        message.payload.widget.id = dwelling + TOWN_WELL_FIRST_CREATURE_CONTROL;
+        messaged.payload.widget.id = dwellingResult + TOWN_WELL_FIRST_CREATURE_CONTROL;
         strcpy(gText, gArmyNamesPlural[
-            gDwellingType[m_town->m_type][dwellingTypes[dwelling]]]);
+            gDwellingType[m_town->m_type][dwellingTypesValue[dwellingResult]]]);
         gText[0] -= ' ';
-        message.payload.widget.data.text = gText;
-        window->BroadcastMessage(message);
+        messaged.payload.widget.data.text = gText;
+        window->BroadcastMessage(messaged);
     }
 
-    for (dwelling = 0; dwelling < TOWN_WELL_DWELLING_COUNT; ++dwelling) {
-        monsterInfo = gMonsterDatabase[
-            gDwellingType[m_town->m_type][dwellingTypes[dwelling]]];
+    for (dwellingResult = 0; dwellingResult < TOWN_WELL_DWELLING_COUNT; ++dwellingResult) {
+        monsterInfoi = gMonsterDatabase[
+            gDwellingType[m_town->m_type][dwellingTypesValue[dwellingResult]]];
         strcpy(gText, "");
-        sprintf(detailText, "%s%d", cWellDetail[0], monsterInfo.attack);
-        strcat(gText, detailText);
-        sprintf(detailText, "\n%s%d", cWellDetail[1], monsterInfo.defense);
-        strcat(gText, detailText);
-        sprintf(detailText, "\n%s%d", cWellDetail[3], monsterInfo.damageMin);
-        strcat(gText, detailText);
-        if (monsterInfo.damageMin != monsterInfo.damageMax) {
-            sprintf(detailText, "-%d", monsterInfo.damageMax);
-            strcat(gText, detailText);
+        sprintf(detailTextf, "%s%d", cWellDetail[0], monsterInfoi.attack);
+        strcat(gText, detailTextf);
+        sprintf(detailTextf, "\n%s%d", cWellDetail[1], monsterInfoi.defense);
+        strcat(gText, detailTextf);
+        sprintf(detailTextf, "\n%s%d", cWellDetail[3], monsterInfoi.damageMin);
+        strcat(gText, detailTextf);
+        if (monsterInfoi.damageMin != monsterInfoi.damageMax) {
+            sprintf(detailTextf, "-%d", monsterInfoi.damageMax);
+            strcat(gText, detailTextf);
         }
-        sprintf(detailText, "\n%s%d", cWellDetail[4], monsterInfo.hitPoints);
-        strcat(gText, detailText);
-        sprintf(detailText, cWellDetail[7], speedText[monsterInfo.speed]);
-        strcat(gText, detailText);
+        sprintf(detailTextf, "\n%s%d", cWellDetail[4], monsterInfoi.hitPoints);
+        strcat(gText, detailTextf);
+        sprintf(detailTextf, cWellDetail[7], speedText[monsterInfoi.speed]);
+        strcat(gText, detailTextf);
         if (m_town->m_buildings &
-            (1L << (dwellingTypes[dwelling] +
+            (1L << (dwellingTypesValue[dwellingResult] +
                     TOWN_COMMAND_FIRST_DWELLING))) {
-            growth = gMonsterDatabase[
-                gDwellingType[m_town->m_type][dwellingTypes[dwelling]]].growth;
-            growth += TOWN_WELL_BASE_GROWTH_BONUS;
-            if (dwelling == 0 &&
+            growthd = gMonsterDatabase[
+                gDwellingType[m_town->m_type][dwellingTypesValue[dwellingResult]]].growth;
+            growthd += TOWN_WELL_BASE_GROWTH_BONUS;
+            if (dwellingResult == 0 &&
                 (m_town->m_buildings &
                  (1L << TOWN_WELL_FIRST_DWELLING_GROWTH_BUILDING)))
-                growth += TOWN_WELL_FIRST_DWELLING_GROWTH_BONUS;
-            sprintf(detailText, cWellDetail[8], growth);
-            strcat(gText, detailText);
+                growthd += TOWN_WELL_FIRST_DWELLING_GROWTH_BONUS;
+            sprintf(detailTextf, cWellDetail[8], growthd);
+            strcat(gText, detailTextf);
         }
-        message.payload.widget.command = 3;
-        message.payload.widget.id = dwelling + TOWN_WELL_FIRST_DETAIL_CONTROL;
-        message.payload.widget.data.text = gText;
-        window->BroadcastMessage(message);
+        messaged.payload.widget.command = 3;
+        messaged.payload.widget.id = dwellingResult + TOWN_WELL_FIRST_DETAIL_CONTROL;
+        messaged.payload.widget.data.text = gText;
+        window->BroadcastMessage(messaged);
     }
 }
 
