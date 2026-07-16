@@ -63,6 +63,7 @@ class GroupDiagnostic:
     causes: tuple
     details: tuple
     evidence_ranges: tuple = ()
+    proposed_allocations: tuple = ()
 
     @property
     def reason(self):
@@ -491,23 +492,30 @@ def derive_allocations(base_dir=REPO / "build/objdiff/base",
             mapped, translation_causes, translation_details = _section_stream_translation(
                 source_group, coff, intervals, public, image_base, highlow,
                 read_u32, read_bytes)
+            replay_mapped = dict(mapped or {})
             translated = mapped is not None and not translation_causes
+            evidence = ({row["name"]: "candidate-section-replay" for row in source_group}
+                        if mapped is not None else {})
             group, _section_bases, _stream_size = _layout_group(source_group, coff)
             if not translated:
                 mapped = {}
+                evidence = {}
                 literal_cache = {}
                 for row in group:
                     if row["name"] in public_data:
                         mapped[row["name"]] = (public_data[row["name"]], 1)
+                        evidence[row["name"]] = "retail-public-rva"
                         continue
                     unique = sorted(set(proofs.get(row["name"], [])))
                     if len(unique) == 1:
                         mapped[row["name"]] = (unique[0], len(proofs[row["name"]]))
+                        evidence[row["name"]] = "aligned-relocation-addend"
                         continue
                     literal_rvas = _literal_rvas(
                         row, coff, intervals, highlow, read_bytes, literal_cache)
                     if len(literal_rvas) == 1:
                         mapped[row["name"]] = (literal_rvas[0], 1)
+                        evidence[row["name"]] = "unique-literal-payload"
             mapped = mapped or {}
             failures = []
             causes = set()
@@ -529,6 +537,7 @@ def derive_allocations(base_dir=REPO / "build/objdiff/base",
                                  "%s extent 0x%x+0x%x escapes retail storage" %
                                  (row["name"], rva, row["size"]))
                             del mapped[row["name"]]
+                            evidence.pop(row["name"], None)
                         continue
                     values = proofs.get(row["name"], [])
                     unique = sorted(set(values))
@@ -543,6 +552,7 @@ def derive_allocations(base_dir=REPO / "build/objdiff/base",
                              (row["name"], rva, row["size"]))
                         continue
                     mapped[row["name"]] = (rva, len(values))
+                    evidence[row["name"]] = "aligned-relocation-addend"
             if not intervals:
                 fail("retail_contribution_missing", "retail contribution is missing")
             starts = [value[0] for value in mapped.values()]
@@ -585,9 +595,29 @@ def derive_allocations(base_dir=REPO / "build/objdiff/base",
                     causes.update(translation_causes)
                     failures[:0] = translation_details
                 stats.open_groups += 1
+                object_name = unit.replace("/", "\\") + ".c"
+                proposal_mappings = {
+                    name: value for name, value in replay_mapped.items()
+                    if any(row["name"] == name and
+                           _contains(intervals, value[0], row["size"])
+                           for row in group)
+                }
+                proposal_evidence = {
+                    name: "candidate-section-replay" for name in proposal_mappings
+                }
+                proposal_mappings.update(mapped)
+                proposal_evidence.update(evidence)
+                proposed = tuple(CandidateAllocation(
+                    unit, object_name, row["name"], storage,
+                    row["section_offset"], row["size"], row["alignment"],
+                    proposal_mappings[row["name"]][0],
+                    proposal_mappings[row["name"]][1], row["scope"],
+                    proposal_evidence[row["name"]])
+                    for row in group if row["name"] in proposal_mappings)
                 diagnostics.append(GroupDiagnostic(
                     unit, storage, tuple(sorted(causes)), tuple(failures),
-                    tuple((rva, size, name) for rva, size, name in extents)))
+                    tuple((rva, size, name) for rva, size, name in extents),
+                    proposed))
                 continue
             stats.closed_groups += 1
             stats.mapped_definitions += len(group)
