@@ -282,7 +282,8 @@ def relocation_addend_map(relocations):
 
 
 def compare_function_reloc_addends(base_relocs, target_relocs,
-                                    function_symbol=None):
+                                    function_symbol=None,
+                                    canonical_data_names=()):
     """Return raw-symbol addend differences for one function."""
     base = relocation_addend_map(base_relocs)
     target = relocation_addend_map(target_relocs)
@@ -309,8 +310,26 @@ def compare_function_reloc_addends(base_relocs, target_relocs,
             "missing": missing,
             "excess": excess,
             "classification": classification,
+            "canonical_data": symbol in canonical_data_names,
         })
     return differences
+
+
+def load_canonical_data_names(
+        symbols_path="build/gen/symbol_names.csv",
+        manifest_path="build/gen/delink_data_manifest.tsv"):
+    names = set()
+    if os.path.isfile(symbols_path):
+        with open(symbols_path, encoding="latin-1", newline="") as stream:
+            names.update(row["name"] for row in csv.DictReader(stream)
+                         if row.get("kind") == "data")
+    if os.path.isfile(manifest_path):
+        with open(manifest_path, encoding="utf-8", newline="") as stream:
+            names.update(
+                row["name"] for row in csv.DictReader(
+                    (line for line in stream
+                     if not line.lstrip().startswith("#")), delimiter="\t"))
+    return names
 
 
 _PE_SECTIONS = None
@@ -589,7 +608,7 @@ def review_fields(resolved_addresses=False):
         print("  %s  %s: %s" % (unit, name, problem.diagnostic()))
     if bad:
         label = "ADDRESSES" if resolved_addresses else "FIELDS"
-        print("\nRELOC %s FAIL: %d exact function(s) use a wrong resolved target."
+        print("\nRELOC %s FAIL: %d near-exact audited function(s) use a wrong resolved target."
               % (label, len({(unit, name) for unit, name, _problem in bad})))
         return 1
     label = "addresses" if resolved_addresses else "fields"
@@ -709,9 +728,10 @@ def review_addends(scope=None):
     that exists on only one side is reported rather than silently skipped.
     """
     prefix = scope.rstrip("/") + "/" if scope else None
+    canonical_data_names = load_canonical_data_names()
     report = json.load(open("build/objdiff/report.json"))
     output = {
-        "schema": 2,
+        "schema": 3,
         "scope": scope or "all",
         "compared_functions": 0,
         "mismatched_functions": 0,
@@ -745,7 +765,8 @@ def review_addends(scope=None):
                 })
                 continue
             differences = compare_function_reloc_addends(
-                base_functions[name], target_functions[name], name)
+                base_functions[name], target_functions[name], name,
+                canonical_data_names)
             if differences:
                 output["functions"].append({
                     "unit": unit,
@@ -766,6 +787,13 @@ def review_addends(scope=None):
         for difference in function["differences"]
         if difference["classification"] == "value-set"
     }
+    canonical_one_sided_functions = {
+        (function["unit"], function["function"])
+        for function in output["functions"]
+        for difference in function["differences"]
+        if difference["classification"] == "one-sided" and
+        difference["canonical_data"]
+    }
     output["difference_rows"] = {
         "value_set": difference_counts["value-set"],
         "count_only": difference_counts["count-only"],
@@ -773,6 +801,13 @@ def review_addends(scope=None):
         "code_local": difference_counts["code-local"],
     }
     output["value_mismatch_functions"] = len(value_mismatch_functions)
+    output["canonical_data_one_sided_rows"] = sum(
+        difference["classification"] == "one-sided" and
+        difference["canonical_data"]
+        for function in output["functions"]
+        for difference in function["differences"])
+    output["canonical_data_one_sided_functions"] = len(
+        canonical_one_sided_functions)
     output_path = Path("build/gen/function_reloc_addends.json")
     output_path.parent.mkdir(parents=True, exist_ok=True)
     temporary = output_path.with_suffix(".tmp.%d" % os.getpid())
@@ -786,7 +821,9 @@ def review_addends(scope=None):
                 function["base_present"], function["target_present"]))
             continue
         for difference in function["differences"]:
-            if difference["classification"] != "value-set":
+            if (difference["classification"] != "value-set" and not
+                    (difference["classification"] == "one-sided" and
+                     difference["canonical_data"])):
                 continue
             print("  %s  %s: %s target=%s base=%s missing=%s excess=%s" % (
                 function["unit"], function["function"], difference["symbol"],
@@ -794,7 +831,8 @@ def review_addends(scope=None):
                 difference["missing"], difference["excess"]))
     print("reloc addends: %d function(s) compared, %d value-set row(s) in "
           "%d function(s), %d count-only row(s), %d one-sided row(s), "
-          "%d code-local row(s), "
+          "%d code-local row(s), %d canonical-data one-sided row(s) in "
+          "%d function(s), "
           "%d total mismatched function(s), %d missing object(s); report=%s" % (
               output["compared_functions"],
               output["difference_rows"]["value_set"],
@@ -802,6 +840,8 @@ def review_addends(scope=None):
               output["difference_rows"]["count_only"],
               output["difference_rows"]["one_sided"],
               output["difference_rows"]["code_local"],
+              output["canonical_data_one_sided_rows"],
+              output["canonical_data_one_sided_functions"],
               output["mismatched_functions"], len(output["missing_objects"]),
               output_path))
     return 1 if output["functions"] or output["missing_objects"] else 0
@@ -826,15 +866,18 @@ def main():
     THRESHOLD = 99.5
     for u in report["units"]:
         unit = u["name"]
-        exact = {f["name"] for f in u.get("functions", []) if f.get("fuzzy_match_percent", 0) >= THRESHOLD}
-        if not exact:
+        near_exact_audited = {
+            f["name"] for f in u.get("functions", [])
+            if f.get("fuzzy_match_percent", 0) >= THRESHOLD
+        }
+        if not near_exact_audited:
             continue
         base_obj = "build/objdiff/base/%s.obj" % unit
         tgt_obj = "build/delink/%s.c.obj" % unit
         if not (os.path.exists(base_obj) and os.path.exists(tgt_obj)):
             continue
         bf, tf = parse_obj(base_obj), parse_obj(tgt_obj)
-        for name in sorted(exact):
+        for name in sorted(near_exact_audited):
             if name not in bf or name not in tf:
                 continue
             for p in check_fn(sym, data, dups, unit, name, bf[name], tf[name]):
@@ -842,10 +885,10 @@ def main():
     for unit, name, p in bad:
         print("  %s  %s: %s" % (unit, name, p))
     if bad:
-        print("\nRELOCS FAIL: %d exact function(s) reference a wrong/fabricated target "
+        print("\nRELOCS FAIL: %d near-exact audited function(s) reference a wrong/fabricated target "
               "(objdiff masks relocs, so it can't see this)." % len(bad))
         return 1
-    print("relocs OK: every 100%-exact function's reloc targets resolve to the retail address.")
+    print("relocs OK: every >=99.5% audited function's reloc targets resolve to the retail address.")
     return 0
 
 if __name__ == "__main__":
