@@ -2269,6 +2269,17 @@
     },
     {
       "unit": "SOURCE/PHILAI",
+      "function": "?OnMySide@@YIHH@Z",
+      "source_hash": "27c53437a6af",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 3,
+      "before": 99.23567,
+      "after": 99.23567,
+      "note": "complete 0x26a CFG fastcall frame and 25 ordered relocs; first equality operand-memory choice remains; reversal negated inequality and player-or-zero pin were neutral"
+    },
+    {
+      "unit": "SOURCE/PHILAI",
       "function": "?ProbableOutcomeOfBattle@philAI@@QAEXPAVarmyGroup@@PAVhero@@010HHHAAMAAH3333@Z",
       "source_hash": "a7482e592cec",
       "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
