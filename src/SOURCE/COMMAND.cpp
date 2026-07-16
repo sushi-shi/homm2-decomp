@@ -1395,6 +1395,7 @@ void combatManager::ClearWinLoseBottom(class heroWindow *window)
 VA(0x0042dafd, 0x29a)
 void combatManager::ShowWinLoseArtifact(class heroWindow *window, int artifact)
 {
+    DATA(0x004f09e8) static short artifactSourceLineBase = 0x680;
     short w = 320;
     short winBottom = 458;
     tag_message message;
@@ -1425,7 +1426,8 @@ void combatManager::ShowWinLoseArtifact(class heroWindow *window, int artifact)
     window->AddWidget(m_winLoseBottomWidgets[1], -1);
 
     capturedArtifactName = static_cast<char *>(
-        BaseAlloc(60, COMMAND_SOURCE_FILE, COMMAND_ARTIFACT_ALLOC_LINE));
+        BaseAlloc(60, COMMAND_SOURCE_FILE,
+                  artifactSourceLineBase + COMMAND_ARTIFACT_ALLOC_LINE_OFFSET));
     sprintf(capturedArtifactName, gArtifactNames[artifact]);
     m_winLoseBottomTextWidgets[0] =
         new textWidget(16, 397, 320, 12, capturedArtifactName,
@@ -1447,6 +1449,7 @@ void combatManager::ShowWinLoseArtifact(class heroWindow *window, int artifact)
 VA(0x0042dd97, 0x232)
 void combatManager::ShowSkeletons(class heroWindow *window)
 {
+    DATA(0x004f0a80) static short skeletonSourceLineBase = 0x6c8;
     tag_message message;
     char *skeletonCount;
 
@@ -1458,7 +1461,8 @@ void combatManager::ShowSkeletons(class heroWindow *window)
         MemError();
 
     skeletonCount = static_cast<char *>(
-        BaseAlloc(9, COMMAND_SOURCE_FILE, COMMAND_SKELETON_ALLOC_LINE));
+        BaseAlloc(9, COMMAND_SOURCE_FILE,
+                  skeletonSourceLineBase + COMMAND_SKELETON_ALLOC_LINE_OFFSET));
     sprintf(skeletonCount, "%d", giSkeletonsCreated);
     m_winLoseBottomTextWidgets[0] =
         new textWidget(165, 300, 32, 12, skeletonCount, "smalfont.fnt", 1,
@@ -1498,6 +1502,7 @@ void combatManager::ShowSkeletons(class heroWindow *window)
 VA(0x0042dfc9, 0x2f6)
 void combatManager::ShowEagleEyeSpell(class heroWindow *window)
 {
+    DATA(0x004f0be4) static short eagleEyeSourceLineBase = 0x702;
     int displayedSpell = m_eagleEyeSpell[m_combatResult];
     int x = 105;
     int y = 275;
@@ -1522,7 +1527,8 @@ void combatManager::ShowEagleEyeSpell(class heroWindow *window)
         MemError();
 
     spellName = static_cast<char *>(
-        BaseAlloc(200, COMMAND_SOURCE_FILE, COMMAND_EAGLE_EYE_ALLOC_LINE));
+        BaseAlloc(200, COMMAND_SOURCE_FILE,
+                  eagleEyeSourceLineBase + COMMAND_EAGLE_EYE_ALLOC_LINE_OFFSET));
     sprintf(spellName, "%s", gSpellNames[displayedSpell]);
     m_winLoseBottomTextWidgets[0] =
         new textWidget(x + 34, y + 57, 80, 24, spellName, "smalfont.fnt", 1,
@@ -1569,6 +1575,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow *window)
 VA(0x0042e2bf, 0x9cc)
 void combatManager::ShowDeadArmies(class heroWindow *window)
 {
+    DATA(0x004f0ca0) static short casualtySourceLineBase = 0x74b;
     int casualtyQuantity_0[COMBAT_CASUALTY_QUANTITY_STORAGE_COUNT];
     int casualtyType_1[COMBAT_MANAGER_SIDE_COUNT][COMBAT_ARMY_SLOT_COUNT];
     int side_9;
@@ -1607,7 +1614,8 @@ void combatManager::ShowDeadArmies(class heroWindow *window)
     }
 
     text_27 = static_cast<char *>(BaseAlloc(
-        30, COMMAND_SOURCE_FILE, COMMAND_CASUALTY_TITLE_ALLOC_LINE));
+        30, COMMAND_SOURCE_FILE,
+        casualtySourceLineBase + COMMAND_CASUALTY_TITLE_ALLOC_LINE_OFFSET));
     sprintf(text_27, "Battlefield Casualties");
     m_winLoseBottomTextWidgets[17] =
         new textWidget(16, 263, COMBAT_CASUALTY_WINDOW_WIDTH, 20, text_27,
@@ -1623,7 +1631,8 @@ void combatManager::ShowDeadArmies(class heroWindow *window)
         else
             y_29 = 346;
         text_27 = static_cast<char *>(BaseAlloc(
-            30, COMMAND_SOURCE_FILE, COMMAND_CASUALTY_HEADER_ALLOC_LINE));
+            30, COMMAND_SOURCE_FILE,
+            casualtySourceLineBase + COMMAND_CASUALTY_HEADER_ALLOC_LINE_OFFSET));
         sprintf(text_27,
                 side_9 == COMBAT_ATTACKER_SIDE ? "Attacker" : "Defender");
         m_winLoseBottomTextWidgets[15 + side_9] =
@@ -1637,7 +1646,8 @@ void combatManager::ShowDeadArmies(class heroWindow *window)
 
         if (casualtyQuantity_0[side_9] <= 0) {
             text_27 = static_cast<char *>(BaseAlloc(
-                10, COMMAND_SOURCE_FILE, COMMAND_CASUALTY_NONE_ALLOC_LINE));
+                10, COMMAND_SOURCE_FILE,
+                casualtySourceLineBase + COMMAND_CASUALTY_NONE_ALLOC_LINE_OFFSET));
             sprintf(text_27, "None");
             m_winLoseBottomTextWidgets[side_9 * COMBAT_CASUALTY_WIDGETS_PER_SIDE] =
                 new textWidget(16, y_29 + 21, COMBAT_CASUALTY_WINDOW_WIDTH, 20,
@@ -1705,7 +1715,8 @@ void combatManager::ShowDeadArmies(class heroWindow *window)
 
             text_27 = static_cast<char *>(BaseAlloc(
                 9, COMMAND_SOURCE_FILE,
-                COMMAND_CASUALTY_QUANTITY_ALLOC_LINE));
+                casualtySourceLineBase +
+                    COMMAND_CASUALTY_QUANTITY_ALLOC_LINE_OFFSET));
             sprintf(text_27, "%d",
                     *(&casualtyQuantity_0[COMBAT_MANAGER_SIDE_COUNT] +
                       side_9 * COMBAT_ARMY_SLOT_COUNT + armyIndex_8));
@@ -3029,11 +3040,29 @@ void combatManager::ViewBallista(int quickView)
                  NORMAL_DIALOG_NO_RESOURCE, 0);
 }
 
+// @data-layout-note
+// COMMAND `.rdata` is exact: candidate and retail both span 0xeb208..0xeb26c
+// (0x64 bytes). Candidate and retail initialized storage are both 0x90c bytes;
+// after removing the four source-line-base words, all remaining 0x8fc bytes are
+// identical. Retail interleaves those words at section offsets 0x188, 0x220,
+// 0x384, and 0x440, while VC 4.2 groups the explicit function statics at offsets
+// 0x0, 0x4, 0x8, and 0xc. Their 1, 1, 1, and 4 retail HIGHLOW references prove
+// the private function ownership above. Static placement variants do not steer
+// this compiler allocation order, so do not restore external `const_<rva>`
+// identities or invent padding to reproduce it.
+// The open 0xf0884 and 0xf090c rows are the two identical Sphere of Negation
+// literals: both allocations are present in the byte-exact stripped payload, so
+// their `$SG` identity ambiguity is not missing storage.
+//
+// Retail zero-fill has 15 exact public DATA anchors over 0x1250b8..0x125110
+// (0x58 bytes); all 189 absolute text references to them are HIGHLOW relocations
+// with the exact symbol base/addend. The candidate `.bss` is 0x5c bytes because
+// its hash-ordered COMMON layout has alignment holes at +0x4 and +0x2c, while
+// retail's final COMMON order has only the +0x3c hole. The two inferred 8-byte
+// integer extents are therefore section-gap artifacts, not missing storage.
+// Keep the source extents and leave this section unassigned rather than adding
+// fake objects or replaying the candidate section as a contiguous contribution.
 // ---- globals (definitions, RVA order) ----
-DATA(0x004f09e8) short const_000f09e8 = 0x680;
-DATA(0x004f0a80) short const_000f0a80 = 0x6c8;
-DATA(0x004f0be4) short const_000f0be4 = 0x702;
-DATA(0x004f0ca0) short const_000f0ca0 = 0x74b;
 DATA(0x005250b8) int gbThisNetHasControl;
 DATA(0x005250bc) int iCurTransferArtifact;
 DATA(0x005250c0) signed char iTransferArtifactsInfo[16];
