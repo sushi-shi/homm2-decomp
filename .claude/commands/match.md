@@ -22,20 +22,19 @@ In short (full rules in the two agent docs):
    On startup, reuse any that exist (`git -C … reset --hard master`; their `build/`
    survives — no cold re-provision); only create + provision missing slots
    (`orchestrator.md` § Pool setup). A restart does NOT regenerate the pool.
-2. **Queue:** `nix develop .#build --command python3 -m homm2.match.gen_queue`, then read
-   `config/match-queue.md` — it is **grouped by TU, ordered simple→hard** (every `/Od`
-   "base" TU before every `/O2` "o2" TU; within a tier by remaining bytes). The queue
-   already drops reconstructed RVAs; skip `@early-stop` and `@semantic`. Note src `VA()` carries
+2. **Queue:** regenerate objdiff, then select **every live non-100% function** in descending
+   fuzzy-percentage order (closest to exact first). `@early-stop` and `@semantic` never remove a
+   function from this residual-audit queue; reproduce or reject their claims. Note src `VA()` carries
    **absolute VAs (RVA + 0x400000)** while the queue lists RVAs — normalise before any
    hand cross-check.
 3. **Fan out:** N background matchers (`subagent_type="matcher"`, `run_in_background: true`,
    **NOT** `isolation: worktree`). Each prompt: absolute worktree path + `cd` there first,
    absolute paths, a **whole-TU 20+ function batch** (RVA/name/size each, in retail-RVA
    order) for **one TU**, the 8-digit **absolute-VA** convention, the
-   **`scripts/od_slots.py` stack-naming workflow**, push-to-100% where useful, byte-proven
-   `@early-stop`, or fully audited `@semantic`,
+   **`scripts/od_slots.py` stack-naming workflow**, account for every residual byte and external
+   relocation, and push to 100% or a newly reproduced byte-proven `@early-stop`,
    report per-fn % + one-line summary + full `git diff`. **Lane discipline:** each lane
-   owns one TU and works it in 20+ batches until done, then takes the next simplest TU.
+   owns one TU and works it in 20+ batches until done, then takes the highest remaining TU-safe batch.
    **Any new `docs/patterns/*.md` MUST carry real asm (retail vs ours, side by side) +
    what made it match** — never prose alone (`docs/patterns/INDEX.md` header). Two
    `@early-stop` flavors are legit: permanent reloc/delinker artifacts, and the soft
@@ -49,7 +48,7 @@ In short (full rules in the two agent docs):
    regenerated README so the scoreboard never drifts; do NOT stage `config/match-queue.md`)
    as `match: <fn> -> <result>` with the Co-Authored-By trailer. One matcher = one commit.
    **Refill immediately:** reset the slot to master, pick next, dispatch.
-5. **Stop** when the queue is dry/parked or the user winds down: let in-flight matchers
+5. **Stop** when no live non-100% function remains or the user winds down: let in-flight matchers
    finish, integrate, print the ledger (`fn -> result -> commit`) + a regressions summary.
    **Leave the `matcher-N` worktrees in place**.
 

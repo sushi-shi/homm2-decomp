@@ -64,23 +64,22 @@ to the worktree, not master:
 **`cd` AFTER `nix develop` builds master** (`HOMM2_DIR` is fixed at shell entry).
 Better: open ONE `nix develop .#build` shell per slot.
 
-## Target selection — WHOLE-TU, simple-first (NOT function-size bands)
+## Target selection — exhaustive residual audit, closest-first
 
-1. **Regenerate the queue** in a build shell:
-   `nix develop .#build --command python3 -m homm2.match.gen_queue` → read
-   `config/match-queue.md`. The queue is **grouped by TU** and ordered **simple→hard**:
-   every `/Od` ("base", literal-lowering) TU before every `/O2` ("o2", FPO+regalloc)
-   TU, and within a tier by remaining bytes ascending. Within a TU, functions are in
-   retail-RVA (define) order.
-2. **Skip already-reconstructed RVAs.** The queue already drops them; if cross-checking
-   by hand, src `VA()` macros carry **absolute VAs** (`RVA + 0x400000`), so normalise
-   before comparing to the queue's RVAs. Also skip anything already `@early-stop` or `@semantic`.
+1. **Regenerate objdiff and build the residual queue** from every function whose live fuzzy
+   percentage is below exactly 100%. Sort globally by fuzzy percentage descending, then retail
+   RVA for deterministic ties. This campaign intentionally starts with the smallest residuals.
+2. **Skip only live exact functions.** Source `VA()` macros carry **absolute VAs**
+   (`RVA + 0x400000`), so normalise before comparing to report RVAs. Never skip a non-exact
+   function because it has `@early-stop`, `@semantic`, retained max 100%, or an old proof note.
+   Reproduce the proof from current objects or remove/downgrade it.
 3. **Match TU-by-TU, not function-by-function.** Hand a lane a **whole TU** (or a
    **20+ function chunk** of a large one) and keep that lane on that TU until it is
-   **fully matched**, then give the lane the next simple TU. Tiny TUs (1–8 funcs):
+   **fully audited for its assigned residuals**, then give the lane the next highest-priority TU.
+   Tiny TUs (1–8 funcs):
    bundle a few **adjacent, non-overlapping** TUs into one ≥20-func dispatch on a single
-   lane. **Drain all `/Od` TUs before starting any `/O2` TU.** With `/Od` + the solved
-   stack hash, ctors/dtors/leaf functions go to 100% cheaply — no EH wall to plateau on.
+   lane. The closest-first ordering takes precedence over optimization profile. With `/Od` + the
+   solved stack hash, ctors/dtors/leaf functions go to 100% cheaply — no EH wall to plateau on.
    Do NOT interleave small functions across many TUs (the old size-band order) — a
    half-touched TU per lane multiplies the shared-header/top-of-file churn.
 
@@ -96,9 +95,9 @@ Spawn a **matcher** (`subagent_type: matcher`), **`run_in_background: true`**, *
 3. Carry a **whole-TU batch — each as RVA / mangled+demangled name / size** — plus the
    TU name, the 8-digit ABSOLUTE-VA convention (`VA(RVA+0x400000, size)`; placeholders in
    the scaffold already show it), the **`scripts/od_slots.py` stack-naming workflow**, and
-   the push-to-100% preference where useful + byte-proven `@early-stop` (marker line + byte reason,
-   no %) or fully audited `@semantic` (behavior/structure/types/frame/CFG/relocations complete;
-   remaining compiler/code-shape residual recorded without claiming a wall).
+   a requirement to account for every residual ordinary byte and every external relocation,
+   pushing to 100% or a newly reproduced byte-proven `@early-stop` (marker line + byte reason,
+   no %). An `@semantic` marker does not complete or remove a function from this campaign.
    Tell the matcher to do the functions in retail-RVA order and to report each one's
    result. **Batch SIZING is YOUR job — the matcher finishes every function it's handed
    and does NOT bail, so size the batch to be completable in one matcher run:** ~20+ for
