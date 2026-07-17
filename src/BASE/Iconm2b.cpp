@@ -70,7 +70,7 @@ VA(0x004cfae0, 0x266)
 void MonoIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32 frame,
                       i32 color, i32 clip, i32 clipX, i32 clipY, i32 clipW, i32 clipH)
 {
-    u8 *data = reinterpret_cast<u8 *>(srcIcon->m_data);
+    u8 *data = srcIcon->m_data;
     IconEntry *entry = &srcIcon->Entries()[frame];
     gMonoEntry = entry;
     gMonoSrc = data + entry->srcOffset;

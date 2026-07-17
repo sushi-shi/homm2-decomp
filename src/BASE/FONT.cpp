@@ -124,7 +124,7 @@ void font::DrawBoundedString(char *str, i32 x, i32 y, i32 w, i32 h, i32 mode, i3
     // Semantic suffixes preserve the retail /Od slot buckets. glyphPos, space9, and v1 are
     // vestigial locals present in the retail frame.
     i32 size = strlen(str);
-    char *glyphPos = m_glyphIcon->m_data;
+    u8 *glyphPos = m_glyphIcon->m_data;
     char space9 = ' ';
     i32 xPosition = 0;
     i32 yOffC = 0;
